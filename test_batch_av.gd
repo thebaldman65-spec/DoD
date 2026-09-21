@@ -519,7 +519,11 @@ func _rune_audit() -> void:
 	var probe := BattleUnit.new()
 	for id in ["triage_ward", "sleepless_vigil", "open_hand"]:
 		var e: Dictionary = Runes.config(id)
-		ok(String(e.get("scope", "")) == "spec:holy", "%s is a Holy spec rune" % id)
+		# BATCH HC §1 — a Cleric rune written for the Holy: the scope is the class and
+		# `written_for` keeps the lineage it was scoped to.
+		ok(String(e.get("scope", "")) == "class:cleric"
+				and String(e.get("written_for", "")) == "holy",
+			"%s is a Cleric rune written for the Holy" % id)
 		for field in Runes.build(id)["payload"].get("stat", {}):
 			var f := String(field)
 			ok(f in probe, "%s writes a LIVE field: %s" % [id, f])

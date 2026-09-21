@@ -513,8 +513,12 @@ func _rune_audit() -> void:
 		"standing_vow"]
 	for id in spec_runes:
 		var cfg: Dictionary = Runes.config(id)
-		ok(String(cfg.get("scope", "")) == "spec:inquisitor",
-			"%s is a Devout spec rune" % id)
+		# BATCH HC §1 — every spec rune is `class:<key>` now and `written_for` keeps
+		# the lineage it was scoped to, so the Devout's four are Cleric runes written
+		# for him (the code key is `inquisitor`, never `devout`).
+		ok(String(cfg.get("scope", "")) == "class:cleric"
+				and String(cfg.get("written_for", "")) == "inquisitor",
+			"%s is a Cleric rune written for the Devout" % id)
 		for field in Runes.build(id)["payload"].get("stat", {}):
 			var f := String(field)
 			# A live field is either a BattleUnit property or a cfg field the

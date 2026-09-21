@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-21 (Batch HB &mdash; every Hunter has a pet)</b></p>
+<p align="right"><b>Last updated: 2026-09-21 (Batch HC &mdash; the runes leave their specs)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -659,7 +659,7 @@ all</b> — their kits are gated by resources and AI conditions instead.</li>
 positive one. The talent that counts debuffs (the tree's Mitigation per Debuff You Carry)
 uses this classification.</li>
 <li><b>Crit:</b> 10% base + 25% vs Broken targets + 1% per Arcanist Resonance stack + talent/spec
-bonuses (+10% with Aguila summoned, scaled by its Loyalty tier; +5% for every hit a Sharpshooter
+bonuses (+10% with Aguila summoned, scaled by its Loyalty tier; +5% for every attack a Sharpshooter
 has landed without a critical since his last one, below). Guaranteed: Ice Lance vs Frozen;
 a perfect Execute. Resonance builds
 only on the Mage's own casts — parry counters do not grant stacks.</li>
@@ -1218,26 +1218,37 @@ sheet shows it greyed as &ldquo;sits out&rdquo; and the map's Kit panel says whi
 back. A card that opens without any engine &mdash; Battle Poise and Counter Time on a Guard Change,
 Kill Command and the companion cards on the companion every Hunter but the Sharpshooter summons
 &mdash; always fights.</li>
-<li><b>A rune that reads an engine is offered only while that engine is equipped.</b> Thirty-five of
+<li><b>A rune that reads an engine is offered only while that engine is equipped.</b> Thirty-six of
 the sixty ordinary runes pay nothing at all to a hero whose engine slots do not hold their engine &mdash;
 a Ruin rune to a Cleric who has unequipped the Rune of the Occultist, a Focus rune to a Hunter who has
 unequipped the Rune of the Sharpshooter &mdash; and none of them is rolled for him, at the Peddler, in
 an elite's cache, in a bargain or from an event. <b>A rune that still does part of its job without its
 engine is offered</b>: Killing Cold still bites a boss sitting on four Chilled, Glass Prison still
 freezes a second body, and the runes that read a card, a status, the stance or nothing at all are
-offered to anyone of their lineage. <b>And a rune that needs a companion is not offered to a hero
+offered to every hero of their class. <b>A rune that reads a status or a stance is offered whether or
+not anything he carries lays it</b> &mdash; Long Fuse (Burn), Killing Cold and Deep Cold (Chilled), Long
+Poison (his own Poison), Slaughterhouse (a bleedout) and Mirror Guard (the Defensive guard); no class
+kit supplies any of them, and each pays once a drafted card, an engine or an ally does. <b>And a rune that needs a companion is not offered to a hero
 holding the Rune of the Sharpshooter</b>, which dismisses the pet &mdash; the Shared Hide, the Bared
 Fang, the Answering Pack, the Second Whistle, the Long Leash and the Shared Scent &mdash; and one he
 already wears sits out, saying which rune takes the companion away. <b>A cache rolled while the engine was equipped keeps what it
 rolled</b>: a rune it holds that reads the engine sits out of the choice while the engine is out, the
-overlay says which rune brings it back, and equipping it offers the whole cache again. When nothing is
+overlay says which rune brings it back, and equipping it offers the whole cache again. A companion rune
+it holds sits out of the choice the same way while the Rune of the Sharpshooter is equipped, and the
+overlay says the rune needs a companion that the Sharpshooter's rune dismisses. When nothing is
 left to offer, the Peddler, the cache, the bargain and the event name the engine rune that is not
 equipped as the reason. <b>A rune already bought is never taken away, and everything that shows it says it is
 sitting out</b> &mdash; it stays in its slot, is still worn, and pays nothing until the engine is equipped again.
 Four places say so, each naming the engine rune that brings it back: the rune pouch, whose row shows the reason in
 place of the rune's own rule; the map's rune slot, which marks the slot and gives the reason on hover; the hero
 sheet, which reads &ldquo;sits out&rdquo; in the column that says whether a rune is worn; and the combat log's
-opening roll call, as the fight starts. <b>Unequipping the rune frees the slot, and nothing does it for him</b>.</li>
+opening roll call, as the fight starts. <b>Unequipping the rune frees the slot, and nothing does it for him</b>.
+<b>An engine rune can sit out the same way</b>: the Rune of the Beastmaster slotted beside the Rune of the
+Sharpshooter has no companion and so no bond to deepen, and the same four places say it sits out, in the same
+words &mdash; the pouch's engine row, the map card's engine line (marked &#9675;, the reason on the card's hover),
+the hero sheet and the roll call. The pairing is allowed and is the player's to make; the one thing the Rune of
+the Beastmaster still pays beside it is Mark of the Hunt &mdash; the hunter's +25% on the marked prey and the Mana
+a strike on it restores, both of which are paid only while the Rune of the Beastmaster is equipped.</li>
 <li><b>The enabler travels.</b> An engine's enablers — the abilities it cannot work without, the
 "needs" column of the table in §6b — come with the rune to any hero of the class who holds it, in
 either engine slot, sit <b>outside the ability slot count</b>, and leave when it leaves: Overburn
@@ -1249,8 +1260,9 @@ pool. <b>No engine replaces the class basic</b>: every Mage opens on Magic Bolt 
 Smite, and <b>nothing else of a lineage opens with the rune</b> &mdash; its other cards are drafted
 from its shelf of the class draft pool (§6b) or earned from its zone-boss pool (§6a).</li>
 <li><b>The lineage.</b> The rune taken at class selection also decides, for the whole run, the
-hero's name, his stat block, the zone-boss pool he draws from and the
-spec runes he is offered — all of them the spec's it carried. A hero who takes a class engine or a
+hero's name, his stat block and the zone-boss pool he draws from — all of them the spec's it carried.
+<b>It does not decide his runes</b>: every rune is his class's, and the engines he holds decide which of
+them he is offered (&sect;8, Runes). A hero who takes a class engine or a
 rule engine has no lineage, and opens with his class's basic attack and his class kit (&sect;5.2)
 &mdash; four abilities.</li>
 </ul>
@@ -1346,7 +1358,11 @@ reaches a sibling CLASS. <b>Batch GP merged the draft's two pools into one</b>, 
 the third tier it had rather than losing what that tier offered &mdash; the fallback reads all 41
 to 51 cards of the hero's class. Spec boss pools are 2&ndash;5 deep, so an offer shows what exists
 rather than padding &mdash; a hero deep into its pool may be offered two. The pick is resolved on that hero's map card, and the triple is rolled the
-moment the award drops — re-opening the card never rerolls it.</p>
+moment the award drops — re-opening the card never rerolls it. <b>A hero holding the Rune of the
+Sharpshooter is never offered a card that needs a companion from his boss pool</b> (Bestial Wrath,
+Spirit Bond, Primal Surge), because that rune dismisses the pet; a triple rolled before he equipped it
+holds those cards back while it is equipped, says so on the card, and offers them again if he
+unequips it.</p>
 <p><b>The mini-boss award is different in kind:</b> a <b>generic ability upgrade</b>, chosen
 from three, attached to one ability the hero already owns. Upgrades <b>stack</b> on the same
 ability, but the <b>same upgrade cannot be taken twice in a run</b>. Three awards a run, one
@@ -2419,15 +2435,17 @@ Broken target and a talent are added &mdash; and both conversions pay him on the
 50 Focus he holds, capped at four, resolved with partial credit and paid in Focus &mdash; 8 a
 landed press, plus 20 more for a full sequence. <b>His basic attack only; no other ability of
 his changes.</b><br>
-<b>EVERY HIT HE LANDS WITHOUT A CRITICAL ADDS +5% CRITICAL CHANCE, AND A CRITICAL RESETS IT</b>
-(the Lethal Aim chip reads it live). It is Heavy Plating's climb pointed at crit, and it is
-Focus's complement rather than its copy: <b>Focus is per target and clears on a switch; this is per
-hit and survives one</b>, so a Sharpshooter forced off his mark loses his Focus and keeps this. A hit
-lands when it is not missed, blocked or zeroed by an absolute parry, and only a hit that deals damage
-counts &mdash; so an area attack counts once for every enemy it strikes, and his multi-press basic
-counts once, because the presses pay Focus and the blow is resolved once. <b>Nothing caps it</b>: a
-hit that meets a total at a certainty crits and resets it, so it buys at most one certain critical
-before it starts again.<br>
+<b>EVERY ATTACK HE LANDS WITHOUT A CRITICAL ADDS +5% CRITICAL CHANCE, AND A CRITICAL RESETS IT</b>
+(the Lethal Aim chip reads it live). It is Heavy Plating's climb pointed at crit, and like the plating
+it counts <b>attacks, not hits</b>: an area attack that strikes three enemies adds +5% once, a
+multi-hit card adds it once, and every strike of one attack rolls on the figure the attack began with.
+A critical anywhere in the attack resets it. It is Focus's complement rather than its copy: <b>Focus
+is per target and clears on a switch; this is per attack and survives one</b>, so a Sharpshooter
+forced off his mark loses his Focus and keeps this. An attack lands when a blow of it is not missed,
+blocked or zeroed by an absolute parry, and only a blow that deals damage counts &mdash; his
+multi-press basic is one attack, because the presses pay Focus and the blow is resolved once.
+<b>Nothing caps it</b>: an attack that meets a total at a certainty crits and resets it, so it buys
+at most one certain critical before it starts again.<br>
 <b>HE FIELDS NO COMPANION.</b> Lethal Aim dismisses the Hunter's pet: he opens without Summon
 Companion, no card can call one for him, and its slot is his for a drafted card. The cards and runes
 that need a companion are never offered to him (&sect;6b), and one he already carries sits out.<br>
@@ -2673,8 +2691,9 @@ the 67 retirements are ET's and EO's; FC's and FO's are of a later vintage</b>, 
 read &ldquo;retired&rdquo; as &ldquo;authored under the old one-rune-per-lane rule&rdquo; narrow
 their populations by <code>RUNE_SHAPES</code> membership rather than by an exemption. <b>PRICE IS 100g, FLAT, EVERY RUNE</b> &mdash; rarity is gone and
 price no longer signals power, so the player pays for FIT rather than for magnitude. <b>SCOPE IS
-SPEC ONLY for all sixty</b>, and every hero in the game now draws an authored pool rather than the
-generated stat family alone.
+THE CLASS for all sixty</b> &mdash; a rune reaches every hero of its class, and three gates decide which
+of them he is offered (Eligibility, below) &mdash; and every hero in the game draws an authored pool
+rather than the generated stat family alone.
 <br><b>THE TWO GATED SECONDARIES ARE RETIRED GOING FORWARD (Batch FK, ruled by the designer).</b>
 <b>THRESHOLD and BREADTH are not authored again.</b> A gated rune at a flat price is strictly worse
 than a bare one &mdash; the price does not fall to pay for the condition &mdash; and FJ measured
@@ -2746,7 +2765,7 @@ kill leaves his Focus at the 50 retained, and nothing live keeps it whole. <b>Re
 to be kept</b> &mdash; the entry, the payload, the field and <b>the read site in
 <code>_sharpshooter_focus</code></b> all stay, so a saved run holding it still works and is still
 paid; only <code>eligible_ids</code> refuses it.
-<br><b>SHARED MARK &mdash; 100g, <code>spec:sharpshooter</code>, PASSIVE:
+<br><b>SHARED MARK &mdash; 100g, <code>class:hunter</code>, PASSIVE:
 <i>&ldquo;An ally attacking the enemy he last attacked builds him 5 Focus.&rdquo;</i></b> It reads
 <code>last_attack_target</code>, the same field <code>_focus_mark</code> uses for his bot targeting,
 so <i>the enemy he is working</i> has ONE definition; and it pays through <code>_gain_focus</code>,
@@ -2785,7 +2804,7 @@ on doing exactly what it did: the kind lived in the payload, never in the label.
 <br><b>OFFERS ARE FLAT ACROSS THE RUN.</b> The odds used to deepen with the zone slot —
 60/30/10 &rarr; 40/40/20 &rarr; 25/45/30 — which was <i>the only thing making a late offer
 differ from an early one</i>. <b>They do not, and there is nothing left for a zone to weight:
-every rune in an offer is an authored, spec-scoped entry.</b> <code>check_es</code> §1 measures
+every rune in an offer is an authored entry of the hero's class.</b> <code>check_es</code> §1 measures
 the distribution at all three zone slots every battery run and prints it.
 <br><b>THE GENERATED STAT FAMILY IS OUT OF EVERY OFFER PATH (Batch FM §1, ruled by the
 designer).</b> There is no filler and no exhaustion floor: the Peddler, the elite cache, the
@@ -2797,31 +2816,34 @@ resolve, at their authored magnitudes and one price (+10 max HP / +2% armor / +4
 Constitution / +2% crit / +8 max Mana, 50g), so restoring a floor is one line rather than a
 family being re-authored. <b>The one thing that still reaches them is the simulator's
 <code>DOD_SIM_RUNES=stats</code> arm</b>, whose whole purpose is to measure that family.
-<br><b>Eligibility:</b> every rune declares a scope — universal, class-wide, or spec-only, so
-the awakening shapes the loot table — and ability-modifying runes only roll for heroes who
-actually own the named ability (boss trophies included). <b>SCOPE IS THE AXIS THAT SURVIVES,
-and it is what the shop row and the offer button show where the rarity word used to be.</b>
+<br><b>Eligibility:</b> every rune declares a scope, and every live one is its class &mdash;
+<b>there is no spec scope</b>, and the universal band survives only on five retired entries and the
+generated stat family. <b>Three gates decide which of his class's runes a hero is offered</b>, all
+three at every roll: a rune that reads an engine only while that engine is equipped (&sect;6.0); a
+rune that modifies a named ability only to a hero who owns it (boss trophies and drafted cards
+included, and the enablers of the engines he holds); and a rune that needs a companion only while
+no engine he holds dismisses the pet. A queued cache asks the engine and the companion again when it
+is answered. <b>The scope is what the shop row and the offer button show where the rarity word used
+to be</b>, and every rune a hero can be offered reads Class.
 <b>Three equip slots, flat, from run start</b> — no growth ladder (swapped on the hero's
 map card). Shop offers avoid duplicates per hero.
 <br><b>AN EXHAUSTED POOL RETURNS AN EMPTY OFFER, AND EVERY SITE SAYS SO IN AS MANY WORDS
-(Batch FM §2).</b> Each spec has <b>four to six</b> authored runes and a hero who has drafted
-nothing can reach <b>three to six</b> of them &mdash; seventeen live entries name a
-<code>requires_ability</code> and sixteen of those name something outside the spawn kit, so
-<b>a hero's rune pool DEEPENS as he earns abilities</b>. When there is nothing left, the
+(Batch FM §2).</b> Each class has <b>fourteen to sixteen</b> authored runes, and what a hero can
+reach is decided by his engines and by what he has earned &mdash; a hero holding no engine can reach
+<b>five</b> of the Warrior's at spawn and nine once he has earned what they name (ten for a Berserker,
+whose boss pool holds Blood Price), <b>three</b> of the Mage's and then seven, <b>five</b> of the
+Hunter's and then seven, and <b>none</b> of the Cleric's fourteen, every one of which reads Mercy,
+Faith or Ruin. Seventeen live entries name a <code>requires_ability</code> and sixteen of those name
+something outside the spawn kit, so <b>a hero's rune pool DEEPENS as he earns abilities</b>. When there is nothing left, the
 Peddler names the hero and the reason, the elite cache and the bargain print a line instead of
 paying in silence, and the event verb says nothing answers. <b>A cache with one or two runes
 left offers one or two</b> rather than discarding them, and the spoils line reads the count off
 the offer. <b>And an owed cache pick whose triple repairs to nothing can be SPENT</b> from the
 hero's card &mdash; it cannot be filled, so holding it would strand the run.
-<br><b>SCOPE WAS RULED TO BE SPEC AND CLASS ONLY (Batch ES §2), AND THE FIVE UNIVERSALS WERE
-RE-SCOPED RATHER THAN RETIRED — the class each lands on was unmade.</b> They were 5 of every
-spec's 9&ndash;12 offerable runes, so the re-scope would have been the largest single movement
-the pool had ever taken. <b>BATCH ET §1 SUPERSEDES THAT: the five are retired with the other
-forty-eight, and the class question goes with them.</b> <b>The scope AXIS is untouched</b>
-&mdash; every entry still declares one, <code>_scope_ok</code> still resolves all three bands,
-and the shop row and offer button still show the band. What ET left was nothing to draw;
-<b>EZ authored 21 back and FK finished the twelve at 60, every one of them SPEC-scoped</b>, so the
-universal and class-wide bands still resolve and nothing currently fills either.
+<br><b>EVERY LIVE RUNE IS SCOPED TO ITS CLASS</b>: the Warrior's fifteen, the Mage's fifteen, the
+Cleric's fourteen and the Hunter's sixteen, retired entries scoped the same way. The five universal
+entries are retired, and <code>_scope_ok</code> resolves the class and the universal band and
+nothing else.
 <br><b>PRICE WAS THE OPEN QUESTION RARITY LEFT BEHIND, AND EZ &sect;0 ANSWERED IT: 100g, FLAT.</b>
 Every authored rune has always carried its own <code>price</code> and none moved — but those
 prices were written against a tier table that no longer exists. <b>SUPERSEDED AT EZ &sect;0 AND
@@ -2853,9 +2875,9 @@ Batch X's rule and it still stands. <b>Measured before it was built:</b> two tri
 before either was answered shared a name in <b>265 of 400</b> trials, and a queued candidate was
 also the shop's offer in <b>127 of 400</b>.
 <br><b>AND A RUNE THAT READS AN ENGINE IS OFFERED ONLY WHILE THAT ENGINE IS EQUIPPED (&sect;6.0).</b>
-Thirty-five of the sixty are in that table &mdash; every Ruin, Focus and Resonance rune, the Mercy
-and Faith runes, both Heavy Plating runes, both stance-number runes, two of the Pack Bond runes, two
-of the Trapper runes and both Overburn runes. <b>The roll asks first</b>, so none of them reaches the
+Thirty-six of the sixty are in that table &mdash; every Ruin, Focus and Resonance rune, the Mercy
+and Faith runes and the one that adds to Divine Shield, both Heavy Plating runes, both stance-number
+runes, two of the Pack Bond runes, two of the Trapper runes and both Overburn runes. <b>The roll asks first</b>, so none of them reaches the
 Peddler's row, a cache, a bargain or an event verb for a hero who has unequipped its engine;
 <b>the answer asks again</b>, so a queued cache hands none of them over either &mdash; it keeps them
 stored instead, names the rune they wait on, and offers them again the moment it is equipped.
@@ -2864,12 +2886,13 @@ A retired rune and a rune he already owns can never come back, so those are drop
 triple and the repair is saved; but <b>unequipping an engine is one press away from being undone</b>,
 so writing that repair back would let a moment's experiment before a cache is answered destroy those
 runes for good, and save the loss. <b>A state the player can undo is not a state to destroy.</b>
-<b>A hero who has unequipped his engine is offered very little of his lineage's own set</b>: an
-Arcanist, a Holy Cleric, an Occultist and a Sharpshooter are offered none of their five, a Devout one
-of four, and the widest are the Berserker and the Cryomancer at four. The engine runes of his class
-are still offered to him, as they always were.
+<b>A hero with no engine equipped is offered only the runes that read none</b>: up to nine of the
+Warrior's fifteen (ten with Blood Price earned), seven of the Mage's fifteen, seven of the Hunter's
+sixteen, and <b>none of the Cleric's fourteen</b>. <b>Each engine he equips adds its own runes</b>, and
+a second engine adds its runes too. The engine runes of his class are still offered to him, as they
+always were.
 <br><b>AND A RUNE'S COST IS GATED WITH ITS PAYOUT: NO ENGINE, NO COST AND NO PAYOUT.</b> The offer
-door cannot reach a rune he has <b>already bought</b>, and two of the thirty-five charge him for
+door cannot reach a rune he has <b>already bought</b>, and two of the thirty-six charge him for
 something only the engine pays back. The <b>Martyr</b> can be healed by nobody but himself and gains
 Mercy when an enemy strikes him; <b>Thin Blood</b>'s own Poison deals no damage and his barb fires on
 every strike instead of a quarter. Each price reads the same condition its payout reads, so with the
@@ -2898,8 +2921,7 @@ repairs are <b>written back</b> and neither is a reroll &mdash; a clean offer is
 untouched.
 <br><b>THE RETIRED POOL'S AUTHORING STRUCTURE, WHICH IS HISTORY AND NOT THE LIVE SHAPE
 (corrected at FF &sect;3, and again at FR &sect;2).</b> The live pool is <b>60 runes, every one
-SPEC-scoped, across all twelve specs</b> &mdash; there is no universal and no class-wide rune in
-the game. <b>The 65 ET retired
+scoped to its class</b> &mdash; there is no universal rune in the game. <b>The 65 ET retired
 were 5 universal, 3 class-wide for each of the four classes, and 4 spec runes for every one of the
 twelve specs</b>; the headline that stood here read <i>"Spec coverage: 65 authored runes"</i> with
 nothing marking it as the retired half, and the file holds <b>127 entries</b> now. Each
@@ -2909,8 +2931,9 @@ pays for reaching outside one. Exactly one rune per set <b>charges for its upsid
 sits on a lane; splashes are always clean. <b>That rule no longer describes what the runes
 DO, and ET §1 is the consequence taken to its end: the pool authored to it is retired whole
 rather than patched entry by entry.</b> <b>The 65 entries and their authoring structure are
-still here</b> &mdash; the count, the scopes, the lanes and the one-costed-rune-per-set shape
-are all unchanged, which is what makes them readable by the batch that writes the next pool.
+still here</b> &mdash; the count, the lanes and the one-costed-rune-per-set shape are unchanged,
+which is what makes them readable by the batch that writes the next pool; each is scoped to its class
+like every other entry, so the spec it was written for is carried by its lane and its words.
 <br><b>AND "SCARRED" IS GONE AS A LABEL WHILE EVERY COST CLAUSE STAYS (Batch ES §3).</b>
 There is no flag, no crimson prefix and no crimson colour: <b>a rune that gives and takes is
 simply what that rune does</b>, and its negative terms are byte-unchanged. What recognises a

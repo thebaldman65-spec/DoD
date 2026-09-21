@@ -300,27 +300,24 @@ func _s2_scope_is_the_axis() -> void:
 	print("\n§2 — scope is the surviving axis")
 	var data: Dictionary = JSON.parse_string(
 		FileAccess.get_file_as_string("res://data/runes.json"))
-	var bands := {"universal": 0, "class": 0, "spec": 0}
+	# **BATCH HC §1 — TWO BANDS, AND THE SPEC BAND IS GONE WITH ITS SCOPE.** Every
+	# rune a spec scoped is its class's now (the lineage kept in `written_for`,
+	# history the game never reads), and `_scope_ok` resolves `universal` and
+	# `class:` and refuses anything else. So the arm asks the same question of
+	# the two that are left: a scope that is not `universal` and not a real
+	# class is a rune that rolls for nobody — a stray `spec:` included.
+	var bands := {"universal": 0, "class": 0}
 	var bad: Array = []
 	for id in data:
 		var scope := String((data[id] as Dictionary).get("scope", "universal"))
 		var band := Runes.scope_band(scope)
 		bands[band] = int(bands[band]) + 1
-		# EVERY scope must resolve to a band, and the two narrow bands must name
-		# something real — a scope naming an unknown class or spec is a rune that
-		# rolls for nobody, which is a retirement wearing an eligibility rule.
-		if band == "class" and not Classes.SPEC_IDS.has(scope.trim_prefix("class:")):
+		if scope != "universal" and not (scope.begins_with("class:")
+				and Classes.SPEC_IDS.has(scope.trim_prefix("class:"))):
 			bad.append("%s -> %s" % [id, scope])
-		if band == "spec":
-			var found := false
-			for k in Classes.SPEC_IDS:
-				if Array(Classes.SPEC_IDS[k]).has(scope.trim_prefix("spec:")):
-					found = true
-			if not found:
-				bad.append("%s -> %s" % [id, scope])
 	ok(bad.is_empty(), "§2: %s name a scope nothing resolves" % [bad])
-	print("    scope bands: universal %d, class %d, spec %d" % [
-		int(bands["universal"]), int(bands["class"]), int(bands["spec"])])
+	print("    scope bands: universal %d, class %d" % [
+		int(bands["universal"]), int(bands["class"])])
 
 	# THE FIVE, REACHABLE BY EVERY SPEC. Driven through the live door.
 	var universals: Array = []
@@ -402,6 +399,20 @@ func _s2_scope_is_the_axis() -> void:
 					func(r): return String((r as Dictionary).get("id", "")))
 				if held_here.has(String(id4)):
 					continue
+				# **BATCH HC §1 — A ROW OF ANOTHER LINEAGE'S ENGINE IS WITHHELD FOR A
+				# REASON THAT IS WRITTEN DOWN.** At the spec scope a lineage's hero
+				# was in scope only for his own lineage's runes, so every row he could
+				# see was his engine's; at the class scope he is in scope for his
+				# whole class's, and a row reading another engine of the class is
+				# withheld by `Runes.offerable` — whose table carries the engine and a
+				# `why` (or, for a companion rune, `COMPANION_READ`). That is the gate
+				# talking, not silence; a withheld rune the tables do NOT name still
+				# lands below.
+				var eq_here: Array = Runes.held_engines(mine3)
+				if not Runes.offerable(String(id4), eq_here) and (
+						String((Runes.ENGINE_READ.get(String(id4), {}) as Dictionary).get("why", "")) != ""
+						or Runes.COMPANION_READ.has(String(id4))):
+					continue
 				if not ids3.has(String(id4)) and not Runes.is_retired(String(id4)):
 					silent.append("%s/%s" % [spec3, id4])
 	ok(silent.is_empty(),
@@ -410,7 +421,7 @@ func _s2_scope_is_the_axis() -> void:
 	# THE DEPTH TABLE THE DECISION NEEDS, PRINTED. It is a report and not an
 	# assertion, because how thin a pool may get is a ruling nobody has made.
 	print("    OFFERABLE DEPTH PER SPEC (empty pouch, through the live door)")
-	print("      spec            total  universal  class  spec")
+	print("      spec            total  universal  class")
 	for ckey2 in Classes.SPEC_IDS:
 		for spec2 in Classes.SPEC_IDS[ckey2]:
 			# BATCH GV — the same seat as the arm above: his engine equipped.
@@ -419,25 +430,22 @@ func _s2_scope_is_the_axis() -> void:
 			var ids2: Array = Runes.eligible_ids(mine2, [])
 			var u2 := 0
 			var c2 := 0
-			var s2 := 0
 			for id3 in ids2:
 				var sc := Runes.scope_band(String(Runes.config(String(id3)).get("scope", "")))
 				if sc == "universal":
 					u2 += 1
-				elif sc == "class":
-					c2 += 1
 				else:
-					s2 += 1
-			print("      %-15s %-6d %-10d %-6d %d" % [spec2, ids2.size(), u2, c2, s2])
+					c2 += 1
+			print("      %-15s %-6d %-10d %d" % [spec2, ids2.size(), u2, c2])
 
 
-# Does this scope string admit this class/spec pair? The same three cases
-# `Runes._scope_ok` reads, without needing a member dict to ask.
-func _in_scope(scope: String, class_key: String, spec: String) -> bool:
+# Does this scope string admit this class/spec pair? The same cases
+# `Runes._scope_ok` reads, without needing a member dict to ask — TWO since HC §1,
+# which deleted the spec branch with the scope: a stray `spec:` admits nobody
+# (and §2's first arm names it). `spec` is kept for the callers' shape.
+func _in_scope(scope: String, class_key: String, _spec: String) -> bool:
 	if scope.begins_with("class:"):
 		return scope.trim_prefix("class:") == class_key
-	if scope.begins_with("spec:"):
-		return scope.trim_prefix("spec:") == spec
 	return scope == "universal"
 
 # ── §3 — THE LABEL WENT AND THE COSTS STAYED ────────────────────────────────
@@ -841,7 +849,9 @@ func _s5_breadth() -> void:
 	var retired: Array = []
 	for id in data:
 		var e: Dictionary = data[id]
-		if not String(e.get("scope", "")).begins_with("spec:"):
+		# BATCH HC §1 — a rune WRITTEN FOR a lineage, which is what the spec
+		# scope said until the scope became the class (`written_for`, history).
+		if String(e.get("written_for", "")) == "":
 			continue
 		if String(e.get("retired", "")) != "":
 			# **BATCH FC — A RETIREMENT AFTER EZ IS NOT ONE OF THE TWELVE.** The
@@ -858,11 +868,11 @@ func _s5_breadth() -> void:
 				continue
 			if String(e.get("lane", "")) != "":
 				continue
-			retired.append(String(e["scope"]).trim_prefix("spec:"))
+			retired.append(String(e["written_for"]))
 		else:
 			if not (Runes.rune_shape(String(id)) as Array).has("BREADTH"):
 				continue
-			live.append(String(e["scope"]).trim_prefix("spec:"))
+			live.append(String(e["written_for"]))
 	live.sort()
 	retired.sort()
 	ok(retired.size() == 12,

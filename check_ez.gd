@@ -132,14 +132,20 @@ func _s0_the_pool() -> void:
 		var e: Dictionary = data[id]
 		if int(e.get("price", 0)) != 100:
 			mispriced.append("%s(%d)" % [id, int(e.get("price", 0))])
-		if not String(e.get("scope", "")).begins_with("spec:"):
-			unscoped.append("%s(%s)" % [id, e.get("scope", "")])
+		# **BATCH HC §1 — CLASS ONLY NOW, AND THE LINEAGE IS HISTORY.** The rule
+		# this arm held — no live rune is universal; each belongs to one set of
+		# heroes and one only — is the same rule with the class as the set: a
+		# live rune is `class:<its lineage's class>`, and the lineage it was
+		# written for rides beside it in `written_for`.
+		var wf := String(e.get("written_for", ""))
+		if String(e.get("scope", "")) != "class:" + Classes.class_of_spec(wf) or wf == "":
+			unscoped.append("%s(%s, written for '%s')" % [id, e.get("scope", ""), wf])
 		if (Runes.rune_tags(id) as Array).is_empty():
 			untagged.append(id)
 		if (Runes.rune_shape(id) as Array).is_empty():
 			unshaped.append(id)
 	ok(mispriced.is_empty(), "§0: every rune is 100g flat (%s)" % [mispriced])
-	ok(unscoped.is_empty(), "§0: SCOPE IS SPEC ONLY for all sixty (%s)" % [unscoped])
+	ok(unscoped.is_empty(), "§0: SCOPE IS CLASS ONLY, the class of the lineage each was written for, for all sixty (%s)" % [unscoped])
 	ok(untagged.is_empty(), "§0: every one carries an archetype tag (%s)" % [untagged])
 	ok(unshaped.is_empty(), "§0: every one carries a §0 shape (%s)" % [unshaped])
 
@@ -152,9 +158,12 @@ func _s0_the_pool() -> void:
 	# exists to leave — so that is what is asserted, with the two counts that ARE
 	# rulings (the Beastmaster's extra, and the Devout's owed fifth) named beside
 	# it.
+	# BATCH HC §1 — each lineage's AUTHORED set, read off `written_for`: the
+	# census this section keeps is of what was written, which the scope no
+	# longer records.
 	var per_spec := {}
 	for id2 in ez:
-		var sp := String((data[id2] as Dictionary)["scope"]).trim_prefix("spec:")
+		var sp := String((data[id2] as Dictionary).get("written_for", ""))
 		per_spec[sp] = int(per_spec.get(sp, 0)) + 1
 	ok(per_spec.size() == 12, "§0: %d specs are authored, not all 12 (%s)" % [
 		per_spec.size(), per_spec.keys()])

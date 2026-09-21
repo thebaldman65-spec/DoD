@@ -554,13 +554,19 @@ func _rune_audit() -> void:
 	var cryo := []
 	var mage := []
 	var mage_engines := []
+	# BATCH HC §1 — EVERY ONE OF THESE IS `class:mage` NOW, so the three sets are
+	# told apart by the record the re-scope kept: the Cryomancer's are the entries
+	# `written_for` him, the Mage-wide three are the class entries written for no
+	# spec, and the engine runes are still counted apart. Read off the scope as it
+	# stood, the Cryomancer's nine read 0 and the class-wide three read 30 (HEAD's
+	# copy on HC's data). The sets and the questions are unchanged.
 	for id in pool:
 		var r: Dictionary = pool[id]
-		if String(r.get("scope", "")) == "spec:cryomancer":
+		if String(r.get("written_for", "")) == "cryomancer":
 			cryo.append(id)
 		elif String(r.get("scope", "")) == "class:mage" and String(r.get("engine", "")) != "":
 			mage_engines.append(id)   # BATCH GK — an engine rune, counted apart
-		elif String(r.get("scope", "")) == "class:mage":
+		elif String(r.get("scope", "")) == "class:mage" and String(r.get("written_for", "")) == "":
 			mage.append(id)
 	# **BATCH FK MOVED IT 4 -> 9.** The four are ET's retired ones and FK
 	# authored five more; this walks `runes.json`, retired included, so the count
@@ -569,7 +575,7 @@ func _rune_audit() -> void:
 	# is LIVE on `BattleUnit`, which the loop below asserts one by one — so the
 	# count is here to catch a set going MISSING, and it is re-pointed rather
 	# than deleted for that reason.
-	ok(cryo.size() == 9, "nine Cryomancer spec runes (got %d)" % cryo.size())
+	ok(cryo.size() == 9, "nine runes written for the Cryomancer (got %d)" % cryo.size())
 	ok(mage.size() == 3, "three Mage class-wide runes (got %d)" % mage.size())
 	# **BATCH GO MOVED IT 4 -> 6: the Weaver and the Leech.** The charter gives
 	# every class six, and the count is the charter's rather than a population's.

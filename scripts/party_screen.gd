@@ -526,7 +526,7 @@ func _draw_detail() -> void:
 		rune_label.add_theme_font_size_override("font_size", 12)
 		rune_label.add_theme_color_override("font_color",
 			Color(0.45, 0.9, 0.5) if is_on
-			else rune.get("scope_color", Color(0.8, 0.8, 0.8)))
+			else Runes.shown_scope(rune)["color"])  # HC §1 — the one door
 		# BATCH GX — **GT §3'S SHEET, ONE LAYER UP.** A carried card that sits
 		# out is a greyed chip reading `— sits out` with the sentence as its
 		# tooltip; a worn rune that sits out reads the same two words in the

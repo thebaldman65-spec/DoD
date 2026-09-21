@@ -53,6 +53,7 @@ func _run() -> void:
 	_requires_ability(data)
 	_costs(data)
 	_eligibility(data)
+	_written_for_is_history(data)
 	_coverage(data)
 	_exclusives(data)
 	_ordering(battle_src)
@@ -199,9 +200,10 @@ func _reachable(entry: Dictionary, ability_name: String) -> bool:
 	var run: Node = get_root().get_node("/root/Run")
 	for key in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[key]:
+			# BATCH HC §1 — A RUNE IS SCOPED TO ITS CLASS, SO EVERY LINEAGE OF THE
+			# CLASS IS WALKED. The `spec:` branch that narrowed this to one lineage went
+			# with the scope; `_eligibility` reds any entry still carrying one.
 			if scope.begins_with("class:") and scope.trim_prefix("class:") != String(key):
-				continue
-			if scope.begins_with("spec:") and scope.trim_prefix("spec:") != String(spec):
 				continue
 			# BATCH GK — a hero of that lineage holding its engine rune, as class
 			# selection hands it: an enabler travels with the engine (the charter).
@@ -303,87 +305,120 @@ func _costs(data: Dictionary) -> void:
 # ---------- eligibility ----------
 
 func _eligibility(data: Dictionary) -> void:
+	# **BATCH HC §1 — A RUNE ROLLS FOR EVERY HERO OF ITS CLASS, AND THIS IS WHERE
+	# THAT IS ASSERTED IN ALL THREE DIRECTIONS.** Until HC this walk took each
+	# `spec:` entry and asked that it rolled for its own lineage and leaked into no
+	# other spec; with every entry `class:<key>` that branch matched nothing and the
+	# walk stopped asking — 1,469 checks fell away with no red, HEAD's copy on HC's
+	# data (`docs/reports/HC.md` §6). The questions are re-pointed at the class:
+	#   (1) NO ENTRY CARRIES A SPEC SCOPE — `_scope_ok` refuses one, so a `spec:` rune
+	#       would roll for nobody in silence;
+	#   (2) a live rune rolls for a hero of the lineage it was WRITTEN FOR (the
+	#       `written_for` record), seated as class selection hands him and holding the
+	#       engine the rune reads — and a retired one for NOBODY (EO §3, both ways);
+	#   (3) THE NEW HALF: it reaches EVERY OTHER LINEAGE of its class, and a hero with
+	#       none — each seated with the rune's engine and its required card, so the
+	#       scope and the retirement are the only things that can refuse it;
+	#   (4) it leaks into no hero of another class, seated the same way, so a scope
+	#       that stopped reading the class is what reds here, not the engine gate.
 	for id in data:
 		var e: Dictionary = data[id]
 		var scope := String(e.get("scope", "universal"))
-		if scope.begins_with("spec:"):
-			var spec := scope.trim_prefix("spec:")
-			var owner_key := ""
-			for key in Classes.SPEC_IDS:
-				if Classes.SPEC_IDS[key].has(spec):
-					owner_key = key
-			ok(owner_key != "", "%s: scope names an unknown spec '%s'" % [id, spec])
-			if owner_key == "":
+		ok(not scope.begins_with("spec:"),
+			"%s: carries the scope '%s' — HC §1 re-scoped every spec rune to its class, and `_scope_ok` rolls a spec rune for nobody" % [id, scope])
+		if not scope.begins_with("class:"):
+			continue
+		var ckey := scope.trim_prefix("class:")
+		ok(Classes.SPEC_IDS.has(ckey), "%s: scope names an unknown class" % id)
+		if not Classes.SPEC_IDS.has(ckey):
+			continue
+		var wf := String(e.get("written_for", ""))
+		if wf != "":
+			ok(Array(Classes.SPEC_IDS[ckey]).has(wf),
+				"%s: written_for '%s' is not a spec of its class %s" % [id, wf, ckey])
+		# An engine rune's roll is the engine gates' question (`check_gv`), not this one.
+		if Runes.is_engine_rune(String(id)):
+			continue
+		var eng := Runes.engine_read(String(id))
+		var needs := String(e.get("requires_ability", ""))
+		var retired := Runes.is_retired(String(id))
+		# (2) HIS OWN LINEAGE: holding the rune's engine, or his lineage's, and the
+		# cards his lineage opened with until GS, drafted (the fixtures' seat).
+		# BATCH EZ's third arm is kept: a rune naming a card this member has not
+		# earned correctly does not roll, and one naming a card he has must.
+		var mine := _eligibility_seat(ckey, wf, eng if eng != "" else Classes.engine_of_spec(wf),
+			GateFixture.lineage_cards(wf) if wf != "" else [])
+		var rolls: bool = Runes.eligible_ids(mine, []).has(id)
+		var owns: bool = needs == "" or Runes.kit_names(mine).has(needs)
+		if retired:
+			ok(not rolls, "%s: is RETIRED and must not roll for the lineage it was written for" % id)
+		elif owns:
+			ok(rolls, "%s: does not roll for a %s hero of the lineage it was written for" % [id, ckey])
+		else:
+			ok(not rolls,
+				"%s: requires '%s', which this member does not own, and rolled anyway" % [id, needs])
+		# (3) EVERY OTHER LINEAGE OF HIS CLASS, AND A HERO WITH NONE.
+		for other in [""] + Array(Classes.SPEC_IDS[ckey]):
+			if String(other) == wf:
 				continue
-			# Rolls for its own spec — UNLESS IT IS RETIRED, and then it must
-			# roll for NOBODY.
-			#
-			# BATCH EO §3: twelve of the sixteen the charter emptied are retired
-			# the way Melted Armor is retired — the entry is kept in
-			# `runes.json` and simply never offered. **The property is asserted
-			# in BOTH directions rather than exempted**, because a one-armed
-			# version would go green on the day the whole file stopped rolling.
-			# BATCH GS — THE MEMBER HOLDS HIS LINEAGE'S RETURNED CARDS, DRAFTED, AND
-			# IT IS WHAT KEEPS THE THIRD ARM BELOW TWO-WAY. GS put every card a
-			# lineage opened with but its enablers on its shelf, so a member who has
-			# drafted nothing owns no card a live `requires_ability` names: every
-			# requiring rune fell into the refusal half and "must still roll" asked
-			# it of none. Seated as the fixtures' `lineage_cards` option seats a
-			# lineage (one derivation), a requiring rune naming one of those cards
-			# must roll (GS: offered once the card is held) and one naming anything
-			# else he does not hold must not.
-			# BATCH GV — AND HIS ENGINE RUNE, EQUIPPED, as class selection hands it
-			# (GK's rule for a hand-built seat). A rune that reads an engine is
-			# offered only while it is equipped since GV (`Runes.ENGINE_READ`), so
-			# a member holding none was refused every row and "must still roll"
-			# read thirty-two of them red for the gate working.
-			var mine := {"key": owner_key, "spec": spec, "runes": [],
-				"bm_abilities": GateFixture.lineage_cards(spec),
-				"engines": Runes.engine_pouch_for_spec(spec)}
-			var rolls: bool = Runes.eligible_ids(mine, []).has(id)
-			# BATCH EZ — THE THIRD ARM, AND IT IS `requires_ability` DOING ITS
-			# JOB RATHER THAN AN EXEMPTION. This member has drafted nothing, so
-			# a rune naming an ability outside the DERIVABLE kit — core kit plus
-			# spec abilities plus the overrides — correctly does not roll for
-			# him. **Ambush requires Called Volley, which is a DRAFT card**, and
-			# the alternative to this arm is a rune that applies silently and
-			# does NOTHING for a hero who was offered it. (BATCH GS: he has drafted
-			# his lineage's returned cards and nothing else, and his derivable kit
-			# is his class basic and class kit plus those — Called Volley is still
-			# outside it.)
-			#
-			# **THE ARM IS TWO-WAY, WHICH IS WHAT KEEPS IT FROM BEING A SKIP.**
-			# A rune whose requirement the bare member DOES satisfy must still
-			# roll (Split Tongue, Open Wound and the Split Shield all name core
-			# kit and are asserted to roll), and one whose requirement it does
-			# not must not — so a `requires_ability` pointing at a name nothing
-			# resolves still turns this red. (BATCH GS: Split Tongue is retired;
-			# Open Wound and the Split Shield name cards he DRAFTED, and are among
-			# the requiring runes asserted to roll now.)
-			var needs := String(Runes.config(id).get("requires_ability", ""))
-			# **THE SAME DOOR `eligible_ids` ITSELF USES.** A second reading of
-			# "does he own it" would be a second answer to the question the
-			# filter is asking, and the two would eventually disagree.
-			var owns: bool = needs == "" or Runes.kit_names(mine).has(needs)
-			if Runes.is_retired(id):
-				ok(not rolls, "%s: is RETIRED and must not roll for its own spec" % id)
-			elif owns:
-				ok(rolls, "%s: does not roll for its own spec" % id)
+			var m2 := _eligibility_seat(ckey, String(other), eng, [needs] if needs != "" else [])
+			var r2: bool = Runes.eligible_ids(m2, []).has(id)
+			var who := String(other) if String(other) != "" else "no-lineage"
+			if retired:
+				ok(not r2, "%s: is RETIRED and rolls for a %s %s" % [id, who, ckey])
 			else:
-				ok(not rolls,
-					"%s: requires '%s', which this member does not own, and rolled anyway"
-						% [id, needs])
-			# ...and for nobody else's.
-			for key in Classes.SPEC_IDS:
-				for other in Classes.SPEC_IDS[key]:
-					if other == spec:
-						continue
-					var theirs := {"key": key, "spec": other, "runes": []}
-					ok(not Runes.eligible_ids(theirs, []).has(id),
-						"%s: leaks into spec %s" % [id, other])
-		elif scope.begins_with("class:"):
-			var ckey := scope.trim_prefix("class:")
-			ok(Classes.SPEC_IDS.has(ckey), "%s: scope names an unknown class" % id)
+				ok(r2, "%s: does not reach a %s %s — the scope stops short of the class (HC §1)" % [id, who, ckey])
+		# (4) NO HERO OF ANOTHER CLASS.
+		for key in Classes.SPEC_IDS:
+			if String(key) == ckey:
+				continue
+			for other2 in [""] + Array(Classes.SPEC_IDS[key]):
+				var m3 := _eligibility_seat(String(key), String(other2), eng, [needs] if needs != "" else [])
+				ok(not Runes.eligible_ids(m3, []).has(id),
+					"%s: leaks into a %s %s" % [id, String(other2) if String(other2) != "" else "no-lineage", key])
+
+
+# THE SEAT `_eligibility` ASKS ABOUT: a hero of `key` and lineage `lineage`,
+# holding engine `pid` slotted (none for ""), with `cards` drafted and carried.
+func _eligibility_seat(key: String, lineage: String, pid: String, cards: Array) -> Dictionary:
+	var engines: Array = []
+	if pid != "":
+		var r: Dictionary = Runes.build(Runes.engine_rune_id(pid))
+		r["equipped"] = true
+		engines.append(r)
+	return {"key": key, "spec": lineage, "runes": [], "bm_abilities": cards.duplicate(),
+		"bm_equipped": cards.duplicate(), "engines": engines, "awakened": true}
+
+
+# **BATCH HC §1 — `written_for` IS HISTORY, AND THE GAME MUST NEVER READ IT.** The
+# 110 entries that were `spec:<id>` carry the spec as a record, for the walks
+# above; a game script that read it would be the spec scope back under another
+# name. Asserted over every `.gd` in `scripts/`, comment-stripped (a comment
+# naming it is not a read), with the population the sweep stands on asserted
+# beside it so a clean zero cannot be a vacuous one.
+func _written_for_is_history(data: Dictionary) -> void:
+	var carried := 0
+	for id in data:
+		if String((data[id] as Dictionary).get("written_for", "")) != "":
+			carried += 1
+			ok(String(data[id].get("scope", "")).begins_with("class:"),
+				"%s: carries written_for but its scope is '%s'" % [id, data[id].get("scope", "")])
+	ok(carried == 110,
+		"written_for is on %d entries — the 110 HC §1 re-scoped are the record, no more and no fewer" % carried)
+	var readers: Array = []
+	var files := 0
+	var dir := DirAccess.open("res://scripts")
+	for f in dir.get_files():
+		if not String(f).ends_with(".gd"):
+			continue
+		files += 1
+		var src := GateFixture.strip_comments(FileAccess.get_file_as_string("res://scripts/" + String(f)))
+		if src.contains("written_for"):
+			readers.append(String(f))
+	ok(files > 20, "the scripts/ sweep read %d files" % files)
+	ok(readers.is_empty(), "the game reads written_for in %s — the spec scope is back" % [readers])
+	print("  (HC §1: written_for on %d entries; %d game scripts swept, %d read it)" % [
+		carried, files, readers.size()])
 
 
 # ---------- coverage (the check that catches a lane being renamed) ----------
@@ -425,7 +460,12 @@ func _coverage(data: Dictionary) -> void:
 			var live_here: Array = []
 			var later_retired: Array = []
 			for id in data:
-				if String(data[id].get("scope", "")) != "spec:%s" % spec:
+				# BATCH HC §1 — THE SET A SPEC WAS AUTHORED IS READ OFF `written_for`,
+				# the record the re-scope kept: every one of these is `class:<key>` now,
+				# so "scoped to this spec" named nothing and this walk found zero of the
+				# 4 it asserts (36 FAIL lines, HEAD's copy on HC's data). The questions
+				# below are about the AUTHORING, which the lineage still describes.
+				if String(data[id].get("written_for", "")) != spec:
 					continue
 				if Runes.is_retired(String(id)):
 					if not (Runes.rune_shape(String(id)) as Array).is_empty():
@@ -1017,9 +1057,11 @@ func _start_rune_pool(run: Node) -> void:
 	var trials := 0
 	var with_spec := 0
 	# BATCH GK — THE ENGINE RUNES ARE IN THE ORDINARY POOL (the charter), so a
-	# candidate may be one of the holder's CLASS's engine runes as well as his
-	# own spec's rune. Anything else is still the scope leak FM's line catches,
-	# asserted per candidate below.
+	# candidate may be one of the holder's CLASS's engine runes as well as an
+	# ordinary rune of his. Anything else is still the scope leak FM's line
+	# catches, asserted per candidate below. **BATCH HC §1 — "his" IS HIS CLASS
+	# NOW**: an ordinary candidate is `class:<his key>`, where it was his own
+	# `spec:` until HC, and `with_spec` counts a triple holding an ordinary rune.
 	var leaks: Array = []
 	var engine_candidates := 0
 	for key in Classes.SPEC_IDS:
@@ -1037,10 +1079,11 @@ func _start_rune_pool(run: Node) -> void:
 						engine_candidates += 1
 						if sc != "class:%s" % key:
 							leaks.append("%s <- %s" % [spec, c0.get("name", "")])
-					elif sc != "spec:%s" % spec:
+					elif sc != "class:%s" % key:
 						leaks.append("%s <- %s" % [spec, c0.get("name", "")])
 				for c in triple:
-					if String(c.get("scope", "")) == "spec:%s" % spec:
+					if String(c.get("engine", "")) == "" \
+							and String(c.get("scope", "")) == "class:%s" % key:
 						with_spec += 1
 						break
 	var rate := 100.0 * with_spec / maxf(float(trials), 1.0)
@@ -1056,7 +1099,7 @@ func _start_rune_pool(run: Node) -> void:
 	for key2 in Classes.SPEC_IDS:
 		for spec2 in Classes.SPEC_IDS[key2]:
 			for rid in Runes.eligible_ids({"key": key2, "spec": spec2, "runes": []}, []):
-				if String(Runes.config(rid).get("scope", "")) == "spec:%s" % spec2:
+				if not Runes.is_engine_rune(String(rid)):
 					any_spec_eligible = true
 	# *(FK moved this band 20-70 -> 70-95 and FM replaces it outright; FK's
 	# reasoning is kept below because it is what the 100 is measured against.)*
@@ -1083,15 +1126,15 @@ func _start_rune_pool(run: Node) -> void:
 	# first triple rather than after a twenty-five-point drift.
 	if any_spec_eligible:
 		ok(leaks.is_empty(),
-			"every cache candidate is the holder's own spec rune or one of his class's ENGINE runes (GK) — %d are neither: %s"
+			"every cache candidate is an ordinary rune of the holder's class or one of his class's ENGINE runes (GK, HC §1) — %d are neither: %s"
 				% [leaks.size(), leaks.slice(0, 6)])
 		ok(engine_candidates > 0,
 			"...and the engine runes the charter puts in the ordinary pool DO reach the cache (%d of %d candidates)"
 				% [engine_candidates, trials * 3])
 	else:
 		ok(is_zero_approx(rate),
-			"no spec rune is eligible for any spec (ET §1 retired the pool), yet one reached a cache triple %.0f%% of the time" % rate)
-	print("  (Batch AE report-back, re-pointed at the elite cache by CD: a spec-scoped rune is among the three %.0f%% of the time)" % rate)
+			"no ordinary rune is eligible for any hero (ET §1 retired the pool), yet one reached a cache triple %.0f%% of the time" % rate)
+	print("  (Batch AE report-back, re-pointed at the elite cache by CD and at the class by HC: an ordinary rune of his class is among the three %.0f%% of the time)" % rate)
 	run.sim_run = had_sim
 
 
@@ -1115,7 +1158,9 @@ func _healing_floor(data: Dictionary) -> void:
 		else:
 			by_scope[scope] = float(by_scope.get(scope, 0.0)) + float(v)
 	# Worst reachable hero: every universal cost plus the worst single scope's
-	# (a hero has one class and one spec, so scopes cannot combine).
+	# (a hero has one class, and since HC §1 every rune is scoped to one, so
+	# scopes cannot combine — and one class's scope now holds all three lineages'
+	# costs together, which is the stricter sum).
 	var worst := uni
 	for scope in by_scope:
 		worst = minf(worst, uni + float(by_scope[scope]))
@@ -1150,8 +1195,12 @@ func _rich_grant(run: Node) -> void:
 				"engines": Runes.engine_pouch_for_spec(spec)}
 			var names := {}
 			var own := 0
+			# BATCH HC §1 — "HIS OWN SET" IS THE ORDINARY RUNES HE CAN BE OFFERED.
+			# `grant_rune` preferred `spec:<his lineage>` and prefers an ordinary
+			# rune now — an engine rune of his class rides the same roll and is the
+			# fallback, which is the reading a spec rune had (`Run.grant_rune`).
 			for rid in Runes.eligible_ids(member, []):
-				if String(Runes.config(rid).get("scope", "")) == "spec:%s" % spec:
+				if not Runes.is_engine_rune(String(rid)):
 					own += 1
 			# **BATCH ET §2 — TWO-ARMED, BECAUSE THE POOL BEING EMPTY IS NOW A
 			# RULING RATHER THAN A DEFECT.** This asserted `own > 0` — "the
@@ -1169,14 +1218,15 @@ func _rich_grant(run: Node) -> void:
 				var only: Dictionary = run.grant_rune(member)
 				ok(not only.is_empty(),
 					"%s: with no spec rune surviving, the grant returned nothing" % spec)
-				ok(String(only.get("scope", "")) != "spec:%s" % spec,
-					"%s: no spec rune is eligible, yet the grant returned one" % spec)
+				ok(String(only.get("engine", "")) != "",
+					"%s: no ordinary rune is eligible, yet the grant returned one" % spec)
 			for i in own:
 				var rune: Dictionary = run.grant_rune(member)
 				ok(not rune.is_empty(), "%s: grant %d came back empty" % [spec, i])
-				ok(String(rune.get("scope", "")) == "spec:%s" % spec,
-					"%s: grant %d was scope '%s', not the spec's own set" % [
-						spec, i, rune.get("scope", "")])
+				ok(String(rune.get("engine", "")) == ""
+						and String(rune.get("scope", "")) == "class:%s" % key,
+					"%s: grant %d was '%s' (scope '%s'), not an ordinary rune of his class" % [
+						spec, i, rune.get("name", ""), rune.get("scope", "")])
 				ok(not names.has(String(rune["name"])),
 					"%s: grant %d duplicated '%s' — the payload would double-apply" % [
 						spec, i, rune.get("name", "")])

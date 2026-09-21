@@ -4,6 +4,47 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The runes leave their specs (Batch HC) — 2026-09-21
+
+**Why a rune is scoped to its class now.** A spec was the one thing a rune could still be tied to once the talent
+layer merged, and the scope did its tying through the lineage — the engine a hero took at class selection. That
+worked while every hero had a lineage. It stopped working the day a hero could take a spine or a rule engine instead:
+he had no lineage, so every ordinary rune in the game was out of his reach, and three of the four heroes in the
+designer's own run were that hero. The cards had the same problem and GP answered it by merging the pools and letting a
+gate decide what a hero can use. This is the same answer one layer over: every rune reaches every hero of its class,
+and the gates — the engine it reads, the card it names, the companion it needs — keep a rune away from the hero it
+cannot pay.
+
+**Why the gates and not the scope.** A scope says who a rune was written for; a gate says who can use it. Those were
+the same people while a lineage and an engine could not be separated. Since GK they can: a Warrior can take the Berserker
+at class selection and slot the Warden's plating second, and the Warden's runes were no use to him only because of a
+label. Reading the engine is the honest version of the same question, and it is the one the game already asks
+everywhere else.
+
+**Why the retired runes moved too.** A retired rune is kept so it can be read. If the retired half kept a spec scope,
+the file would carry two scope vocabularies and a reader would have to know which one is live — the same defect the
+tags avoided when the retired rows followed the live ones.
+
+**Why one rune became an engine row.** Layered Aegis names Divine Shield, and Divine Shield is only ever in a kit
+because the Devout's engine brings it. Its requirement was an engine gate that only the offer's roll asked; the cache's
+answer and the sitting-out tell ask the engine table instead. Making it a row asks the same question at all three.
+
+**Why the six status runes are named rather than gated.** Long Fuse, Killing Cold, Deep Cold, Long Poison, Mirror Guard
+and Slaughterhouse read something a card lays — a Burn, a Chill, a Poison, a bleedout, the Defensive guard — and no
+class kit lays any of them. Before, the lineage that could be offered them usually brought the source with its engine;
+now any hero of the class can be offered them before he has drafted one. Gating them is a design choice (they are also
+the runes a player drafts around), so this batch names them and leaves the choice to the design pass.
+
+**Why the pity meter counts attacks.** The designer's reason: it mirrors Heavy Plating, the model it was built from,
+which answers the attacks that come at the Warden (an enemy's area attack reaches him once; its multi-hit climbs him
+once a blow, which HC §0 records). Counting hits made an area attack climb the Sharpshooter's meter once per enemy,
+which rewarded the one kind of play the lone marksman is not about. Per attack, and the reset on a crit still bounds
+it, so it needs no cap.
+
+**Why Pack Bond beside Lethal Aim says it sits out rather than being refused.** Holding both is a decision a player may
+make, and refusing it would take a choice away. A dead engine that looks alive is a trap, so it says so in the same
+words and the same places a rune that is not paying already does.
+
 ## Every Hunter has a pet, and the lone marksman sends his away (Batch HB) — 2026-09-21
 
 **Why the companion moved into the class kit.** The three summons were the one exception to the rule that an engine

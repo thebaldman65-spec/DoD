@@ -1367,6 +1367,19 @@ func _spawn_units() -> void:
 								Runes.held_engines(Run.party[i])).split("\n")
 						rc_tail = " — %s %s" % [rc_lines[0], rc_lines[1]]
 					_rune_roll_call.append("%s: %s%s" % [cfg["unit_name"], rune["name"], rc_tail])
+			# BATCH HC §5 — AND A SLOTTED ENGINE RUNE THAT SITS OUT IS NAMED IN THE SAME
+			# ROLL CALL, WITH THE SAME CLAUSE (ruled: GX's tell, the same surfaces). An
+			# engine is not otherwise in this list — its chip names it — so a Rune of
+			# the Beastmaster slotted beside the Rune of the Sharpshooter would open a
+			# fight it pays nothing in with nothing in the log to say so.
+			for eng_rune in Run.party[i].get("engines", []):
+				var eg_d: Dictionary = eng_rune
+				var eg_id := String(eg_d.get("id", ""))
+				var eg_held: Array = Runes.held_engines(Run.party[i])
+				if bool(eg_d.get("equipped", false)) and Runes.sits_out(eg_id, eg_held):
+					var eg_lines := Run.rune_sits_out_note(eg_id, eg_held).split("\n")
+					_rune_roll_call.append("%s: %s — %s %s" % [cfg["unit_name"],
+						eg_d.get("name", ""), eg_lines[0], eg_lines[1]])
 			# Mini-boss ability upgrades (Batch AP) — the FIRST thing that reads
 			# `upgrades`, which Batch AN recorded and nothing acted on. It runs
 			# LAST of everything that touches an ability, and that is the point:
@@ -8749,6 +8762,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# second Barrage next turn starts from a clean board.
 		var _spread_struck := {}
 		var any_crit := false
+		# BATCH HC §5 — THE PITY METER IS SETTLED ONCE PER CAST (ruled), so the
+		# loop only RECORDS whether a counted blow landed and whether any of them
+		# critted, and `_note_pity` moves the meter once, after the loop.
+		var pity_landed := false
+		var pity_crit := false
 		# Critical Mass's third-crit trips, counted here and PAID AFTER the
 		# strike loop (Batch AT). It must not pay inside the loop: granting
 		# Resonance mid-cast would let the compounding curve read the new stack
@@ -9529,9 +9547,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if attacker.has_status("held_breath") and ab.damage > 0 and not is_counter:
 				is_crit = true
 			any_crit = any_crit or is_crit
-			# BATCH HB §4 — AND THE PITY METER MOVES HERE, BELOW EVERY SOURCE OF
-			# `is_crit`, so a forced crit resets it like a rolled one.
-			_note_pity(attacker, ab, is_crit, wall_parry)
+			# BATCH HB §4 — THE PITY METER READS `is_crit` HERE, BELOW EVERY SOURCE
+			# OF IT, so a forced crit resets it like a rolled one. **BATCH HC §5 —
+			# IT IS RECORDED HERE AND MOVED ONCE, AFTER THE LOOP**: the designer
+			# ruled per CAST, so an area attack or a multi-hit climbs it once.
+			if _pity_counts(attacker, ab, wall_parry):
+				pity_landed = true
+				pity_crit = pity_crit or is_crit
 			# Ability damage is a PERCENT of the attacker's current Attack.
 			var raw := ab.damage * 0.01 * attacker.attack * randf_range(0.9, 1.1) * dmg_mult
 			# BATCH GO — REDOUBT BANKS WHAT IS KEPT OFF THE BODY IT IS HELD ON.
@@ -12210,6 +12232,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				await _arcane_echo_repeat(attacker, ab, final)
 			if (ab.random_hits > 0 or ab.multi_hits > 0) and total_hits > 1:
 				await _wait(0.45)  # sequential strikes land distinctly
+		# BATCH HC §5 — THE CAST'S ONE MOVE OF THE PITY METER: reset if any counted
+		# blow critted, else one step if any landed. Every strike of the cast
+		# rolled on the meter the cast opened with.
+		if pity_landed:
+			_note_pity(attacker, pity_crit)
 		# ---- GLACIAL HOLD: the NAMED RELEASES (Batch AS §1/§2) ----
 		# Both sit AFTER the strike loop so every hit is paid on the pile the
 		# hold was carrying. Ice Lance keeps its damage, its Break and its
@@ -24667,28 +24694,45 @@ func _focus_safe(ab: Ability) -> bool:
 
 # ══ BATCH HB §4 — THE SHARPSHOOTER'S PITY METER, AND WHAT "LANDS" MEANS ══════
 #
-# **EVERY HIT HE LANDS THAT DOES NOT CRIT RAISES HIS CRIT CHANCE BY
-# `PITY_CRIT_STEP`; A CRIT RESETS IT TO ZERO** (the designer's rule). It is Heavy
+# **EVERY CAST HE LANDS THAT DOES NOT CRIT RAISES HIS CRIT CHANCE BY
+# `PITY_CRIT_STEP`; A CRIT RESETS IT TO ZERO** (the designer's rule; per cast
+# since HC §5, per hit before it). It is Heavy
 # Plating's climb pointed at crit, and it is built the same way: a field on the
-# unit (`crit_pity`), one writer — this function, called from `_resolve`'s strike
-# loop below every source of `is_crit` — and a chip that shows the live figure.
+# unit (`crit_pity`), one writer — `_note_pity` below, called once after
+# `_resolve`'s strike loop off what the loop recorded below every source of
+# `is_crit` — and a chip that shows the live figure.
 #
 # **"LANDS" IS THE COMBAT RULE'S WORD FOR A CHARGE, NOT A NEW ONE** (BR §1,
 # `docs/combat-rules.md`): *a strike that MISSED or was BLOCKED spends nothing,
 # and neither does one an absolute parry zeroed — a charge rides a blow that
-# landed.* A missed or blocked strike never reaches the crit roll, so this is
-# never called for one; an absolute parry reaches it and is refused here. **AND
-# THAT RULE COUNTS HITS, NOT CASTS**, so the unit is the blow the strike loop
-# resolves: an area attack is one landing PER TARGET STRUCK, a multi-hit one per
-# hit, and his basic's multi-press SEQUENCE is ONE landing — the presses pay
-# Focus, and the blow is resolved once, off the first press's grade.
+# landed.* A missed or blocked strike never reaches the crit roll, so it is
+# never recorded; an absolute parry reaches it and `_pity_counts` refuses it.
+#
+# **BATCH HC §5 — THE METER COUNTS CASTS, NOT HITS (RULED BY THE DESIGNER).** HB
+# read *"per landed attack"* as BR §1 reads a charge, so an area attack climbed
+# it once per enemy struck and a multi-hit once per hit. **The ruling is per
+# CAST**, because it mirrors Heavy Plating, which counts per incoming ATTACK, and
+# **the reset on a crit already bounds it, so no cap is added.** The strike loop
+# records whether any counted blow of the cast landed and whether any of them
+# critted, and this function moves the meter ONCE after the loop: a crit anywhere
+# in the cast resets it, and a cast that landed without one climbs it one step —
+# Called Volley on three enemies is +5%, not +15%, and Triple Shot's three
+# arrows are one step. **Every strike of a cast rolls on the meter the cast
+# opened with**, so it no longer climbs between the arrows of one volley. His
+# basic's multi-press sequence was already one blow and is one cast. **The BR §1
+# rule is unchanged for what it governs** — charges and on-hit effects still
+# count hits; this meter is not one of them.
 #
 # **ONLY A BLOW THAT DEALS DAMAGE COUNTS** (`ab.damage > 0`), the line Held
 # Breath's forced crit already draws: a blow with nothing to multiply cannot
 # crit meaningfully, so it neither climbs the meter nor spends it.
-func _note_pity(attacker: BattleUnit, ab: Ability, is_crit: bool,
-		wall_parry: bool) -> void:
-	if not attacker.has_engine("lethal_aim") or ab.damage <= 0 or wall_parry:
+func _pity_counts(attacker: BattleUnit, ab: Ability, wall_parry: bool) -> bool:
+	return attacker.has_engine("lethal_aim") and ab.damage > 0 and not wall_parry
+
+
+# THE METER'S ONE WRITER, called once per cast that landed a counted blow.
+func _note_pity(attacker: BattleUnit, is_crit: bool) -> void:
+	if not attacker.has_engine("lethal_aim"):
 		return
 	if is_crit:
 		if attacker.crit_pity > 0.0:

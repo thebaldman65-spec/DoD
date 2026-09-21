@@ -335,8 +335,12 @@ func _rune_audit() -> void:
 	var written := {}
 	for id in Runes.ids():
 		var r: Dictionary = Runes.config(String(id))
+		# BATCH HC §1 — the Pyromancer's runes are `class:mage`, written for him
+		# (`written_for`); the population is his and the Mage's class-wide ones,
+		# as it was, not every Mage rune the class scope now holds.
 		var scope := String(r.get("scope", ""))
-		if not (scope == "spec:pyromancer" or scope == "class:mage"):
+		var wf := String(r.get("written_for", ""))
+		if not (wf == "pyromancer" or (scope == "class:mage" and wf == "")):
 			continue
 		for f in r.get("payload", {}).get("stat", {}):
 			written[String(f)] = true

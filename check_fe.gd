@@ -296,8 +296,16 @@ func _s2_the_idiom_population() -> void:
 	# would hand the player the button beside the one they pressed.
 	ok(m.contains("var offer: Array = Run.upgrade_choice(member)"),
 		"§2: the upgrade OVERLAY no longer renders through `upgrade_choice` — its index and the handler's have come apart")
-	ok(m.contains("for pool_name in Run.ability_choice(member):"),
-		"§2: the ability OVERLAY no longer renders through `ability_choice`")
+	# **BATCH HC §5 — THE LIST IS HELD IN A LOCAL NOW, AND THE PIN IS SPLIT IN
+	# TWO.** The overlay reads `ability_choice` once and draws its buttons off
+	# that list, because it also says how many cards the offer holds back for a
+	# dismissed pet and whether any is live. The question is unchanged: the
+	# buttons are the list the door handed over. Two arms, each naming its own
+	# break.
+	ok(m.contains("var ab_live: Array = Run.ability_choice(member)"),
+		"§2: the ability OVERLAY no longer takes its list from `ability_choice`")
+	ok(m.contains("for pool_name in ab_live:"),
+		"§2: the ability OVERLAY no longer draws its buttons from the list `ability_choice` handed over")
 	# AND THE OLD GUARD IS GONE RATHER THAN SITTING BESIDE THE NEW ONE.
 	ok(not m.contains('or pool_name in member.get("bm_abilities", []):'),
 		"§2: `_pick_ability`'s old refuse-and-return guard is still there — the dead button it drew is still drawn")

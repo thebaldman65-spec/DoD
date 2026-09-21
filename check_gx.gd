@@ -264,8 +264,13 @@ func _engine_rune_name(rune_id: String) -> String:
 
 func _s1_the_predicate() -> void:
 	print("\n§1 — which worn runes sit out, over every live ordinary rune")
-	ok(_gated.size() == 35, "§1: %d gated runes — GV's table holds 35" % _gated.size())
-	ok(_ungated.size() == 25, "§1: %d ungated live ordinary runes — GV counted 25" % _ungated.size())
+	# **BATCH HC §2 — 36 AND 24: LAYERED AEGIS IS A ROW.** Its card is the
+	# Devout's enabler and leaves with Conviction, and a cache's answer never asks
+	# the requirement, so it joined `Runes.ENGINE_READ`. The populations are still
+	# derived from the table and the file (`_populations`); these two lines are
+	# the ruling's count, and they move only when a row does.
+	ok(_gated.size() == 36, "§1: %d gated runes — the table holds 36 (GV's 35 and HC's Layered Aegis)" % _gated.size())
+	ok(_ungated.size() == 24, "§1: %d ungated live ordinary runes — 24 since HC" % _ungated.size())
 	# THE GATED THIRTY-FIVE: out without the engine, in with it. Both arms.
 	var out_without := 0
 	var in_with := 0
@@ -284,8 +289,9 @@ func _s1_the_predicate() -> void:
 		# A HERO HOLDING SOME OTHER ENGINE IS NOT HOLDING THIS ONE.
 		var other := "old_gods" if pid != "old_gods" else "mercy"
 		ok(Runes.sits_out(rid, [other]), "§1: %s does not sit out for a hero holding only %s" % [rid, other])
-	ok(out_without == 35 and in_with == 35,
-		"§1: %d of 35 sit out with the engine out and %d of 35 pay with it in" % [out_without, in_with])
+	ok(out_without == _gated.size() and in_with == _gated.size(),
+		"§1: %d of %d sit out with the engine out and %d of %d pay with it in" % [
+			out_without, _gated.size(), in_with, _gated.size()])
 	# THE PAIRED POSITIVE: the other 25 never sit out, on any engine set —
 	# **BATCH HB: ON ANY SET THAT FIELDS A PET.** Four of them need a companion
 	# (`Runes.COMPANION_READ`), and a hero holding the engine that dismisses the
@@ -345,7 +351,7 @@ func _s2_the_slot_measures() -> void:
 		ok(float(widest[k2]) > SLOT_W,
 			"§2: the %s form fits the slot at %.0f px — the marker is no longer the only face that fits" % [
 				k2, widest[k2]])
-	print("    font 10, widest of 35: name %.0f, marker %.0f, (out) %.0f, — out %.0f, — sits out %.0f; the slot is %.0f px, pitched %.0f" % [
+	print("    font 10, widest of the gated: name %.0f, marker %.0f, (out) %.0f, — out %.0f, — sits out %.0f; the slot is %.0f px, pitched %.0f" % [
 		widest["name"], widest["mark"], widest["paren"], widest["dash"], widest["sits"], SLOT_W, SLOT_PITCH])
 
 
@@ -442,11 +448,11 @@ func _s3_the_three_surfaces() -> void:
 						"§3 %s: the pouch row carries a raw line break" % rid)
 			_close_overlays(mp)
 			await Gate.frames(self, 1)
-	ok(pouch_said == 35 and pouch_quiet == 35,
-		"§3: the pouch said it for %d of 35 with the engine out and stayed quiet for %d of 35 with it in" % [
+	ok(pouch_said == _gated.size() and pouch_quiet == _gated.size(),
+		"§3: the pouch said it for %d of the gated with the engine out and stayed quiet for %d of them with it in" % [
 			pouch_said, pouch_quiet])
-	ok(slot_said == 35 and slot_quiet == 35,
-		"§3: the map's slot marked %d of 35 with the engine out and left %d of 35 bare with it in" % [
+	ok(slot_said == _gated.size() and slot_quiet == _gated.size(),
+		"§3: the map's slot marked %d of the gated with the engine out and left %d of them bare with it in" % [
 			slot_said, slot_quiet])
 	# THE UNGATED CONTROL, ON THE SAME SURFACES AND THE SAME FRAME: a rune with
 	# no engine to wait on is never marked, whatever the hero's slots hold.
@@ -843,10 +849,10 @@ func _s5_the_sentence() -> void:
 			"§5: %s's note does not name its engine rune" % rid2)
 		if ername != "":
 			named += 1
-	ok(named == 35, "§5: %d of 35 notes name a real engine rune" % named)
+	ok(named == _gated.size(), "§5: %d of %d notes name a real engine rune" % [named, _gated.size()])
 	ok(String(_run.rune_sits_out_note("no_such_rune")).contains("engine rune it needs"),
 		"§5: the note's fallback clause is unreachable")
-	print("    the longest line of 35: %d characters — \"%s\"" % [longest.length(), longest])
+	print("    the longest line of the gated: %d characters — \"%s\"" % [longest.length(), longest])
 
 
 # ── §6 — NOTHING WAS RETUNED ────────────────────────────────────────────────
@@ -859,7 +865,12 @@ func _s5_the_sentence() -> void:
 
 func _s6_nothing_was_retuned() -> void:
 	print("\n§6 — the tell moved no magnitude, no slot and no state")
-	var seat := 0
+	# **BATCH HC §1 — THE CLERIC'S SEAT, BECAUSE THE RUNE IS A CLERIC'S.** This
+	# stood at the Warrior's seat with `spec = "occultist"` below, which reached
+	# an Occultist rune only because the spec scope matched the LINEAGE and never
+	# the class. The scope is the class now, so the rune is dressed on the class
+	# it belongs to and the paired positive asks the question it always asked.
+	var seat := SEATS.find("cleric")
 	_seat_party()
 	var rid := ""
 	for g in _gated:

@@ -70,7 +70,12 @@ const FK_FLOAT := "rune_seasoned_off_bonus"
 
 # The two display names that are NOT code keys. A rune scoped to either rolls
 # for nobody, silently — FJ §0's finding, and the one this gate can keep true.
-const NOT_KEYS := ["spec:devout", "spec:survivalist"]
+# **BATCH HC §1 — THE TRAP MOVED TO THE MAPPING, AND IT IS KEPT THERE.** No rune
+# carries a spec scope now; the lineage it was written for is `written_for`, and
+# its class came off the CODE key (`inquisitor` -> the Cleric, `mystic` -> the
+# Hunter). A display name in `written_for` is the same slip one field over: it
+# maps to no class, so the rune would have been scoped to nothing.
+const NOT_KEYS := ["devout", "survivalist"]
 
 var _g := Gate.new()
 
@@ -109,13 +114,17 @@ func _s1_the_pool() -> void:
 		live.append(String(id))
 		var cfg: Dictionary = Runes.config(String(id))
 		var scope := String(cfg.get("scope", ""))
-		if NOT_KEYS.has(scope):
-			bad_scope.append("%s=%s" % [id, scope])
-		if not scope.begins_with("spec:"):
-			bad_scope.append("%s=%s" % [id, scope])
+		var wf := String(cfg.get("written_for", ""))
+		if NOT_KEYS.has(wf):
+			bad_scope.append("%s written for %s" % [id, wf])
+		# BATCH HC §1 — THE SCOPE IS THE CLASS OF THE LINEAGE IT WAS WRITTEN FOR,
+		# and nothing else; a scope that is not a class, or the wrong class, rolls
+		# for nobody or for the wrong heroes.
+		if scope != "class:" + Classes.class_of_spec(wf) or Classes.class_of_spec(wf) == "":
+			bad_scope.append("%s=%s (written for %s)" % [id, scope, wf])
 		if int(cfg.get("price", 0)) != 100:
 			priced_wrong.append("%s=%s" % [id, cfg.get("price", 0)])
-		by_spec[scope] = int(by_spec.get(scope, 0)) + 1
+		by_spec[wf] = int(by_spec.get(wf, 0)) + 1
 	ok(live.size() == 60, "§1: the live pool is %d, not 60" % live.size())
 	ok(by_spec.size() == 12,
 		"§1: the live pool spans %d specs, not all 12 — %s" % [
@@ -126,10 +135,10 @@ func _s1_the_pool() -> void:
 	# the first arm cleanly.
 	ok(bad_scope.is_empty(),
 		"§1: a live rune carries a scope that rolls for nobody — %s" % [bad_scope])
-	ok(int(by_spec.get("spec:inquisitor", 0)) > 0,
-		"§1: nothing is scoped `spec:inquisitor` — the Devout's set is gone")
-	ok(int(by_spec.get("spec:mystic", 0)) > 0,
-		"§1: nothing is scoped `spec:mystic` — the Survivalist's set is gone")
+	ok(int(by_spec.get("inquisitor", 0)) > 0,
+		"§1: nothing is written for `inquisitor` — the Devout's set is gone")
+	ok(int(by_spec.get("mystic", 0)) > 0,
+		"§1: nothing is written for `mystic` — the Survivalist's set is gone")
 	ok(priced_wrong.is_empty(),
 		"§1: price is not flat 100g across the live pool — %s" % [priced_wrong])
 	# EZ §0's own rule, carried forward: a live rune carrying a `lane` is ES §5's
@@ -319,7 +328,13 @@ func _s5_requires_ability_resolves() -> void:
 		if not corpus.has(req):
 			unknown.append("%s -> %s" % [id, req])
 			continue
-		var spec := String(cfg.get("scope", "")).trim_prefix("spec:")
+		# **BATCH HC §1 — THE BUYERS ARE THE CLASS NOW, SO THE REACH IS THE
+		# CLASS'S.** A rune reaches every hero of its class and `requires_ability`
+		# withholds it from one who does not hold the card, so the question this
+		# arm asks — can anybody who can buy it own the card? — is asked of every
+		# route a hero of the class has to a card: the class kit, the one draft
+		# pool (GP), every lineage's zone-boss pool, and every engine's enablers.
+		var cls := String(cfg.get("scope", "")).trim_prefix("class:")
 		# **ALL FOUR CHANNELS, AND ALL FOUR ARE NAME LISTS.** FJ §1's finding:
 		# `hold_ability()` is the one writer, so a zone-boss pick and an elite
 		# draft both land in `bm_abilities` and either can satisfy a
@@ -327,16 +342,17 @@ func _s5_requires_ability_resolves() -> void:
 		# boss-pool rune unreachable — which is exactly what the Rune of Blood
 		# Debt is (Blood Price is `SPEC_POOLS` only).
 		var reach: Array = []
-		reach.append_array(Classes.protected_names(spec))
-		reach.append_array(Classes.spec_draft_pool(spec))
-		reach.append_array(Classes.spec_pool(spec))
-		reach.append_array(Classes.class_draft_pool(Classes.class_of_spec(spec)))
+		reach.append_array(Classes.class_kit_names(cls))
+		reach.append_array(Classes.draft_pool(cls))
+		for sp in Classes.SPEC_IDS.get(cls, []):
+			reach.append_array(Classes.protected_names(String(sp)))
+			reach.append_array(Classes.spec_pool(String(sp)))
 		if not reach.has(req):
-			unreachable.append("%s -> %s (%s cannot earn it)" % [id, req, spec])
+			unreachable.append("%s -> %s (no hero of %s can hold it)" % [id, req, cls])
 	ok(unknown.is_empty(),
 		"§5: an FK rune requires an ability that is not in the corpus — %s" % [unknown])
 	ok(unreachable.is_empty(),
-		"§5: an FK rune requires an ability its own spec cannot earn — %s" % [unreachable])
+		"§5: an FK rune requires an ability no hero of its class can hold — %s" % [unreachable])
 	ok(n == 14, "§5: %d FK runes carry `requires_ability`, not 14" % n)
 
 

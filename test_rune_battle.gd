@@ -117,25 +117,33 @@ func _run() -> void:
 # WHETHER a rune is offered is `test_runes`' question and it is asserted there
 # in both directions; whether its clauses PAY is this file's, and that question
 # is unchanged by the retirement.
-# **HOW MANY ENTRIES `runes.json` SCOPES TO THIS SPEC, RETIRED INCLUDED.**
-# `_equip_all` walks `Runes.ids()` and equips every one of them by scope — it
+# **HOW MANY ENTRIES `runes.json` WROTE FOR THIS SPEC, RETIRED INCLUDED.**
+# `_equip_all` walks `Runes.ids()` and equips every one of them — it
 # does NOT go through `eligible_ids`, deliberately, because EO's rule is that
 # kept content nothing drives is content that rots and this suite is what
 # drives the retired half. So the expected count is the FILE's population and
 # not the offerable one.
+#
+# **BATCH HC §1 — IT READS `written_for`, NOT THE SCOPE.** Every rune is
+# `class:<key>` since HC, so "scoped to this spec" names nothing and both
+# functions returned zero — the equip loop seated no rune and every clause below
+# went red for the lineage having none (48 FAIL lines, HEAD's copy on HC's data).
+# The question is unchanged: do the runes written for this lineage pay their
+# clauses on a hero of it? `written_for` is the record of that lineage the
+# re-scope kept, so it is the population this walks.
 func _spec_scoped(spec: String) -> int:
 	var n := 0
 	for id in Runes.ids():
-		if String(Runes.config(String(id)).get("scope", "")) == "spec:%s" % spec:
+		if String(Runes.config(String(id)).get("written_for", "")) == spec:
 			n += 1
 	return n
 
 
 func _equip_all(member: Dictionary) -> Array:
 	var names: Array = []
-	var want := "spec:%s" % String(member.get("spec", ""))
+	var want := String(member.get("spec", ""))
 	for id in Runes.ids():
-		if String(Runes.config(id).get("scope", "")) != want:
+		if String(Runes.config(id).get("written_for", "")) != want:
 			continue
 		var rune := Runes.build(id)
 		rune["equipped"] = true

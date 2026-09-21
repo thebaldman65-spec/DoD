@@ -244,9 +244,10 @@ func _s1_depth() -> void:
 		var scope := String(d.get("scope", "universal"))
 		for cls in Classes.SPEC_IDS:
 			for spec in Classes.SPEC_IDS[cls]:
+				# BATCH HC §1 — universal or the class: the spec branch went with
+				# the spec scope, and a lineage's rune is its class's.
 				var wearable: bool = scope == "universal" \
-					or scope == "class:%s" % String(cls) \
-					or scope == "spec:%s" % spec
+					or scope == "class:%s" % String(cls)
 				if not wearable:
 					continue
 				if Classes.spec_draft_pool(spec).has(gname):

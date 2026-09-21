@@ -417,10 +417,16 @@ func _s2_data() -> void:
 		"§2a: the retirement string does not date the restated reason — a retirement must be DECLARATIVE")
 	ok(not r.contains("AUTHORED AGAINST A BASE A NODE ALREADY PROVIDED"),
 		"§2a: the retirement string still offers FO's reason as live — that base was deleted at FX, and the sentence would send a future author looking for a collision that is not there")
+	# **BATCH HC §1 — THE SCOPE MOVED WITH ALL 110, AND THE LINEAGE IT WAS
+	# WRITTEN FOR IS KEPT BESIDE IT.** A retired entry's `spec:` scope became its
+	# class's like every live one (FE §1's one-vocabulary ruling), and the lineage
+	# is `written_for`, the history field. The arm still asks that the kept entry
+	# is whole, now in the fields that carry it.
 	ok(String(ww.get("name", "")) == "Wide Watch"
-			and String(ww.get("scope", "")) == "spec:sharpshooter"
+			and String(ww.get("scope", "")) == "class:hunter"
+			and String(ww.get("written_for", "")) == "sharpshooter"
 			and int(ww.get("price", 0)) == 100,
-		"§2a: the retired entry lost its name, scope or price — a saved run holding it breaks")
+		"§2a: the retired entry lost its name, scope, lineage or price — a saved run holding it breaks")
 	ok(((ww.get("payload", {}) as Dictionary).get("stat", {}) as Dictionary)
 			.has("rune_wide_watch"),
 		"§2a: the retired entry lost its payload — a saved run holding it installs nothing")
@@ -494,8 +500,11 @@ func _s2_data() -> void:
 	ok(engines == 24 and engines_of == engines,
 		"§2c: ...and the twenty-four ENGINE runes beside it all wear `Rune of the …`, the charter's names (%d of %d)"
 			% [engines_of, engines])
-	ok(String(sm.get("scope", "")) == "spec:sharpshooter",
-		"§2c: the Shared Mark is scoped `%s`" % sm.get("scope", ""))
+	# BATCH HC §1 — the Hunter's since the spec scope went, written for the
+	# Sharpshooter; offered only while Lethal Aim is slotted (`Runes.ENGINE_READ`).
+	ok(String(sm.get("scope", "")) == "class:hunter"
+			and String(sm.get("written_for", "")) == "sharpshooter",
+		"§2c: the Shared Mark is scoped `%s`, written for `%s`" % [sm.get("scope", ""), sm.get("written_for", "")])
 	ok(int(sm.get("price", 0)) == 100, "§2c: the Shared Mark is not the flat 100g")
 	ok(not sm.has("condition")
 			and not (sm.get("payload", {}) as Dictionary).has("condition"),

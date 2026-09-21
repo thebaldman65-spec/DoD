@@ -50,8 +50,9 @@
 #   Blacksmith               buy the first offered pairing when the gold
 #                            clears the 40g reserve (Batch BK §3).
 #   Relics (DOD_SIM_RELICS)  armed at the draft; none by default.
-#   Elite rune spoils        pick-of-3 resolved instantly: spec-scoped
-#                            first, else the first candidate (the build-lane
+#   Elite rune spoils        pick-of-3 resolved instantly: an ordinary
+#                            rune first (a spec-scoped one until HC §1),
+#                            else the first candidate (the build-lane
 #                            preference went with the lanes at FX);
 #                            auto-equip while a slot (Run.rune_slots:
 #                            2/3/4 by zone) is free.
@@ -186,7 +187,7 @@ static var rune_granted := 0        # DOD_SIM_RUNE_ECON=rich only
 # the lever chosen.
 static var slots_avail_sum := 0.0   # summed over heroes at run end
 static var slots_filled_sum := 0.0
-static var worn_kind := {}          # spec|class|universal|stick -> runes worn
+static var worn_kind := {}          # class|universal|stick -> runes worn (HC §1 took the spec kind)
 # ---------- Stage 0b: per-run samples ----------
 # Completions is a binary read on a 2-6% event: at n=50 the difference
 # between "2%" and "6%" is TWO RUNS, and two batches concluded "noise" from
@@ -732,8 +733,9 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 	if node_type == "elite":
 		var looter: Dictionary = run.party.pick_random()
 		# Pick-of-3 (Batch X), resolved instantly by bot policy — dumb and
-		# printed in the report header: prefer a spec-scoped candidate,
-		# else the first (the build-lane preference went with the talent
+		# printed in the report header: prefer an ordinary candidate over an
+		# engine rune (a spec-scoped one until HC §1 re-scoped them all to the
+		# class), else the first (the build-lane preference went with the talent
 		# lanes at FX). Auto-equip while a slot
 		# (Run.rune_slots) is free. Empty = DOD_SIM_RUNES=off — the elite
 		# still drops its item.
@@ -860,19 +862,20 @@ static func _finish_run(run: Node, battle, done: bool) -> void:
 	# that is a structural half of dilution and nobody had measured it.
 	for m in run.party:
 		slots_avail_sum += run.rune_slots()
-		var spec_scope := "spec:%s" % String(m.get("spec", ""))
+		# BATCH HC §1 — THE `spec` KIND WENT WITH THE SPEC SCOPE. Every authored
+		# ordinary rune is `class:<key>` now, so the kind is read off the band
+		# `Runes.shown_scope` reads (the data by id), and a `spec` column would
+		# print zero for ever rather than say what a hero wore.
 		var worn := 0
 		for r in m.get("runes", []):
 			if not r.get("equipped", false):
 				continue
 			worn += 1
-			var scope := String(r.get("scope", "universal"))
 			var kind := "universal"
 			if String(r.get("id", "")).begins_with("tpl_"):
 				kind = "stick"  # the generated stat family, not authored
-			elif scope == spec_scope:
-				kind = "spec"
-			elif scope.begins_with("class:"):
+			elif Runes.scope_band(String(Runes.config(String(r.get("id", ""))).get(
+					"scope", "universal"))) == "class":
 				kind = "class"
 			worn_kind[kind] = int(worn_kind.get(kind, 0)) + 1
 		slots_filled_sum += worn
@@ -1012,10 +1015,14 @@ static func install_builds(run: Node) -> void:
 	run.sim_talents = loadout
 
 
-static func _pick_rune_candidate(member: Dictionary, candidates: Array) -> Dictionary:
-	var spec := String(member.get("spec", ""))
+# BATCH HC §1 — IT PREFERRED A `spec:<his lineage>` CANDIDATE, AND NO RUNE
+# CARRIES ONE NOW, so read as it stood it would take the first candidate every
+# time — an engine rune as often as the roll draws one. The spec runes were the
+# ORDINARY runes in a lineage's reach, so the preference it keeps is an ordinary
+# candidate over one of his class's engine runes (`Run.grant_rune`'s reading).
+static func _pick_rune_candidate(_member: Dictionary, candidates: Array) -> Dictionary:
 	for c in candidates:
-		if String(c.get("scope", "")) == "spec:%s" % spec:
+		if String(c.get("engine", "")) == "":
 			return c
 	return candidates[0]
 
@@ -1424,7 +1431,7 @@ static func _print_report(battle) -> void:
 	if rune_granted > 0:
 		print("  GRANTED  %.2f   <-- DOD_SIM_RUNE_ECON=rich is ON; this row is an experiment arm" % [
 			rune_granted / runs])
-	print("  Acquired per hero per run: %.2f   (the four written for a spec are the target)" % [
+	print("  Acquired per hero per run: %.2f   (his reach is his class's ordinary runes less what the gates withhold)" % [
 		(runes_bought + rune_elite_taken + rune_granted) / runs / 4.0])
 	print("  Shop offers refused:  no free slot %.2f   unaffordable (40g reserve) %.2f   duplicate %.2f" % [
 		rune_refused_noslot / runs, rune_refused_gold / runs, rune_refused_dupe / runs])
@@ -1439,10 +1446,10 @@ static func _print_report(battle) -> void:
 		slots_avail_sum / runs / 4.0, slots_filled_sum / runs / 4.0,
 		100.0 * slots_filled_sum / heroes_seen])
 	var kind_parts := PackedStringArray()
-	for kind in ["spec", "class", "universal", "stick"]:
+	for kind in ["class", "universal", "stick"]:
 		kind_parts.append("%s %.2f" % [kind, float(worn_kind.get(kind, 0)) / runs / 4.0])
 	print("  Worn per hero at run end, by kind: %s" % "   ".join(kind_parts))
-	print("    (spec = one of the FOUR authored for that spec; stick = the generated stat family)")
+	print("    (class = an authored rune of his class, every live ordinary rune since HC; stick = the generated stat family)")
 
 	# ROUTE AGENCY — Batch BK's headline, and it is the SAME measurement Batch
 	# BG printed as 0% of 2,764 steps. 42 steps a run (an entry plus 13

@@ -1665,8 +1665,10 @@ talent cannot be about a spec either.
 **NO PERMANENT LAYER IS SPEC-SPECIFIC ANY MORE (RULED BY THE DESIGNER AT GE §2), AND THAT IS WHAT FX
 INTENDED, NOT A GAP IT LEFT.** A relic is party-wide because it is chosen before a spec exists; a
 talent is class-wide because one tree serves every spec of every class. **THE ONE LAYER THAT CAN
-STILL BE TIED TO A SPEC IS THE RUNE** — bought by one hero, for one run, and scoped to a spec or a
-class. Stated here so the question is closed rather than left for a later batch to infer.
+STILL BE TIED TO A SPEC IS THE RUNE** — bought by one hero, for one run, scoped to his class, and tied
+to a spec's ENGINE by the offer gate that withholds it from a hero whose slots do not hold the engine
+it reads (the spec scope went at HC §1). Stated here so the question is closed rather than left for a
+later batch to infer.
 
 **THE RULE FOR A FUTURE AUTHOR, AND THE TELL IS THE READ SITE:**
 - **If the effect must be read while a turn resolves, and pays every hero who wears it whatever his
@@ -1680,8 +1682,10 @@ class. Stated here so the question is closed rather than left for a later batch 
 - **If it is this run's kit rather than this account's — a stat, a resource, or the mechanics and
   values of a core ability, draft ability or passive — it is a RUNE** (the charter, Batch EM).
   Runes are the run-scoped, per-hero, bought layer between the two permanent ones. **AND IF IT MUST
-  KNOW WHICH SPEC THE HERO IS, IT IS A RUNE (GE §2, ruled by the designer)**: a rune is scoped to a
-  spec or a class and bought by one hero, which is what makes it the only layer that can know.
+  KNOW WHICH SPEC THE HERO IS, IT IS A RUNE (GE §2, ruled by the designer)**: a rune is bought by one
+  hero, which is what makes it the only layer that can know — **and since HC §1 it knows by READING
+  THE ENGINE**: it is scoped to his class, and `Runes.ENGINE_READ` offers it only while the engine it
+  reads is slotted (the block *A RUNE IS SCOPED TO ITS CLASS* below).
 - **A NEW HOOK IS A BIGGER DECISION THAN A NEW RELIC.** Every hook was built to be read at one site;
   a second read site for one hook is how the vocabulary stops being auditable, and several hooks
   already have more than one (`docs/state.md` carries the census).
@@ -1886,8 +1890,8 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
 - **BUILT (GO): six engine runes a class** — the fifteen and the designer's nine rule engines (the GO
   block below), so every deal is three of six. **RULED, NOT BUILT: there are no specs** — the spec
   id survives as the hero's LINEAGE, set by the engine taken at class selection and read by the layers
-  not yet merged (the opening kit — its engine's enablers alone since GS §1 — the stat block, the boss
-  pools and the spec-scoped runes; the draft pools merged at GP). A hero who takes a spine has none and opens with his basic and his class kit (the GN block below). The COST of an engine rune is
+  not yet merged (the opening kit — its engine's enablers alone since GS §1 — the stat block and the
+  boss pools; the draft pools merged at GP and the runes at HC §1). A hero who takes a spine has none and opens with his basic and his class kit (the GN block below). The COST of an engine rune is
   the flat 100g rule's, not a set price.
 - **AN ENABLER CANNOT BE A STAT, AND ONE IS**: the Warden's `block_chance` 0.10 is his lineage's stat
   block, so Heavy Plating on another Warrior climbs from zero plus its own 15% slice.
@@ -1990,7 +1994,9 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   applied at the spawn, because the refusal lives inside each read site where GV put it.
 - **THE SENTENCE IS ONE SENTENCE WITH TWO NOUN SETS, NEVER TWO SENTENCES** (`Run.rune_sits_out_note` beside
   `Run.sits_out_note`). The opening clause is byte-identical in both; a rune is WORN where a card is CARRIED, and
-  UNEQUIPPING frees the slot where BENCHING does. **A second phrasing of one idea is a second thing to keep in step** —
+  UNEQUIPPING frees the slot where BENCHING does — **and an ENGINE rune that sits out (Pack Bond beside Lethal Aim, HC §5)
+  takes the rune's sentence unchanged**, an engine slot being worn, filled and freed as an ordinary one is. **A second
+  phrasing of one idea is a second thing to keep in step** —
   `check_gx` §5 asserts the shared clause in both and the divergent clauses apart in both directions, so collapsing
   them or rewording either reds. Both are hand-broken at 44 characters because the sheet renders them as a tooltip and
   a tooltip does not wrap.
@@ -2081,6 +2087,19 @@ the block left out, spend what they were paid.
   with no companion to pay into). **The bond rows are in both tables** —
   a bond needs a companion as well as the engine. **Derived by casting and read at the read site; a new Hunter card or
   rune that needs a companion owes its row in the batch that authors it.**
+  · **AND IT REACHES THE ZONE BOSS'S FIRST TIER (HC §5, ruled by the designer).** The boss pools stay spec-keyed (GP),
+    and `Run.roll_spec_ability_offer` asks `Classes.pet_withholds` — the pet half of `offerable`, ALONE: the engine half
+    would move every engine's boss offer, which nobody ruled. **A triple rolled before the pet was dismissed is filtered
+    at its answer** (`Run.ability_choice`), never repaired away (GV's rule for a state the player can undo), and the
+    overlay says what it holds back with the empty-offer sentence's own clause (`check_hc` §5).
+  · **AND AN ENGINE THAT NEEDS THE PET SITS OUT BESIDE THE ONE THAT DISMISSES IT (HC §5, ruled: LEGAL, AND VISIBLE).**
+    Pack Bond slotted beside Lethal Aim (`Classes.PET_ENGINES`, `Runes.needs_companion`) is still offered, held and
+    slotted, and says it sits out with GX's sentence, word for word, on GX's four surfaces — the pouch's engine row, the
+    map card's engine line (marked `○`, the sentence on the card's hover), the hero sheet's state column and the battle
+    log's roll call (`check_hc` §6). **It is not a `COMPANION_READ` row**, which the OFFER reads. **One Pack Bond card needs no
+    companion** and still pays beside Lethal Aim: both halves of Mark of the Hunt — the hunter's +25% on the marked
+    prey and the Mana a strike on it restores — sit inside `has_engine("pack")` (GM §1's open shape: a card's payload
+    inside an engine's block), so they pay with Pack Bond slotted and never without it — `docs/state.md` carries it.
 - **THE SUMMON DOOR REFUSES A DISMISSER EVERY ROUTE**, Call the Wilds included, so *a Sharpshooter has no companion* is
   a door and not a hope. **Call of the Wild's spirits are bodiless and are not a pet**: it stays castable.
 - **THE KIT A HERO OPENS WITH READS HIS SLOTTED ENGINES.** `Classes.class_kit_names_for` and `class_kit_for` are the
@@ -2089,13 +2108,16 @@ the block left out, spend what they were paid.
   the one answer, shown on the disabled button) — a cap one route can walk past is not a cap (EG), and the answer is
   the player's: bench a card first.
 - **THE PITY METER IS A FIELD OF ITS OWN** (`BattleUnit.crit_pity`), never `second_resource`, which is already three
-  currencies (FT). It is Heavy Plating's climb pointed at crit — `PITY_CRIT_STEP` for every hit he LANDS without a
-  crit, reset by a crit — with one writer (`battle._note_pity`, below every source of `is_crit`), read into the same
-  total the roll spends so EW's surplus sees it, and shown on the Lethal Aim chip. **"LANDS" IS BR §1's WORD FOR A
-  CHARGE** (`docs/combat-rules.md`): not missed, not blocked, not zeroed by an absolute parry, and it counts HITS — an
-  area attack once per enemy it strikes, a multi-hit once per hit, his multi-press basic once (the presses pay Focus
-  and the blow resolves once). Only a blow that deals damage counts. **No cap is written**: the reset governs, and a hit
-  that meets a certainty crits and resets it.
+  currencies (FT). It is Heavy Plating's climb pointed at crit — `PITY_CRIT_STEP` for every ATTACK he lands without a
+  crit, reset by a crit — with one writer (`battle._note_pity`), read into the same total the roll spends so EW's
+  surplus sees it, and shown on the Lethal Aim chip. **IT COUNTS CASTS, NOT HITS (HC §5, RULED BY THE DESIGNER)**,
+  because it mirrors Heavy Plating, which counts per incoming attack, and **the reset on a crit already bounds it, so no
+  cap is written.** The strike loop RECORDS, below every source of `is_crit`, whether a counted blow of the cast landed
+  and whether any critted, and the meter moves ONCE after the loop: a crit anywhere resets it, a cast that landed
+  without one climbs it one step — an area attack on three enemies +5%, never +15%, and every strike of a cast rolls on
+  the meter the cast opened with (`check_hc` §4). **"Landed" is still BR §1's word** (`docs/combat-rules.md`: not missed, not blocked,
+  not zeroed by an absolute parry), and only a blow that deals damage counts; **BR §1's own rule is unchanged** —
+  charges and on-hit effects count hits, and this meter is not one of them.
 - **THE +50% CRIT MULTIPLIER IS POINTS ON LETHAL AIM'S OWN** (`BattleUnit.SHARPSHOOTER_CRIT_MULT`, added inside
   `lethal_crit_mult()`, the one implementation the strike loop, the nameplate and the sim read), so his crit opens at
   x2.5 — the unit every other term in that function is written in.
@@ -2719,28 +2741,50 @@ runes have always carried their own.
   `_zone_slot`, asserted by `check_es` §1. It is the hook a later batch would want if a zone is
   ever allowed to change an offer again, and a parameter nothing reads cannot break the ruling.
 
-## STANDING RULE — A RUNE'S SCOPE IS SPEC AND CLASS (Batch ES §2; the five universals' half SUPERSEDED at ET §1)
+## STANDING RULE — A RUNE IS SCOPED TO ITS CLASS, AND THREE GATES DECIDE WHAT A HERO CAN USE (Batch HC §1/§2, ruled by the designer; ES §2's spec half SUPERSEDED)
 
-> **Losing five authored, working runes to a scoping rule is waste. The class each of the five
-> lands on is CONTENT and is the designer's, and until it is made they stay universal.**
+> **Every rune declares `class:<key>` — there is no spec scope — and reaches every hero of its class. What narrows it to
+> the hero who can use it is three gates, asked together at every roll (`Runes.eligible_ids`): its ENGINE slotted
+> (`Runes.ENGINE_READ`), its CARD held (`requires_ability`), and its PET present (`Runes.COMPANION_READ`).** GP's pool
+> merge one layer over: *re-scope to class, and let the gates decide.*
 
-**BATCH ET §1 SUPERSEDED THE SECOND SENTENCE AND LEFT THE FIRST STANDING.** The five are retired
-with the other forty-eight, so there is no class left to choose and the question leaves the queue.
-**The scope AXIS is untouched**: every entry still declares one, `_scope_ok` still resolves all
-three bands, and the shop row still shows the band — the next pool is authored against this rule.
-**`check_es` §2 was re-pointed rather than deleted**, and onto a wider population than it watched
-before: every entry a spec cannot draw must be undrawable BECAUSE IT IS RETIRED, so a retirement
-wearing an eligibility rule still goes red across all 65.
-
-**THE SIZE OF THE MOVE IS MEASURED: the five are 5 of every spec's 9–12 offerable runes** — 42% to
-56% of the drawable pool — so this is the largest single movement the rune pool has ever taken.
-Whichever class each lands on, the other three specs' pools lose it. **The Occultist is thinnest
-at 9 today.** **Those figures are ET's BEFORE reading and are kept as the record of what the pool
-was**; `check_es` §2 prints the live depth table every battery.
-
-· **TWO OF THE FIVE CHARGE FOR THEIR UPSIDE** (the Glass and Vampiric Runes), and EP measured that
-  those two are what a Swordmaster falls back on if the Bared Guard is ever retired. **Re-scoping
-  them removes that fallback for every spec outside the chosen class.**
+- **THE MAPPING IS BY THE CODE KEY, NEVER THE DISPLAY NAME**: `spec:inquisitor` is the Cleric's and `spec:mystic` the
+  Hunter's (THE NAMES THAT LOOK WRONG AND ARE RIGHT, above). **All 110 moved — the 60 live and the 50 retired**, on FE §1's
+  ruling that one vocabulary does not carry two rules; a retired entry keeps its name, price, payload, desc and string.
+- **THE LINEAGE A RUNE WAS WRITTEN FOR IS HISTORY, KEPT IN `written_for`, AND THE GAME NEVER READS IT.** The scope was the
+  only record of it, so the 110 carry it as `lane` carries a retired lane, for the instruments that ask about a lineage's
+  authored set. **A script that read it would be the spec scope back under another name**: `test_runes` asserts none
+  does, and `Runes.build` does not copy it onto an instance.
+- **`_scope_ok` RESOLVES TWO BANDS AND REFUSES ANY THIRD** — the spec branch is deleted, not kept for a scope nothing
+  carries, because a branch still reading `spec:` is a scope read as a spec after the data stopped being one.
+  `test_runes` holds the data to the two bands, so a `spec:` entry reds rather than rolling for nobody. **The `Spec` band
+  is gone from `SCOPE_INFO`**, and every offer reads `[Class]`: the band now tells a retired universal from a live rune
+  and nothing else (`docs/state.md` carries the question of whether a surface still shows it).
+- **THE BAND A SURFACE SHOWS IS READ LIVE AT ONE DOOR** (`Runes.shown_scope`), GS §3's reason one field over: an instance
+  rides the save with the band of the day it was built, so a rune cached before HC would go on saying `Spec`.
+- **EVERY READER OF A SCOPE IS RE-POINTED IN THE BATCH THAT MOVES ONE** (`docs/reports/HC.md` §1 is the census). The event
+  verb's `Run.grant_rune` and the sim bot's cache pick preferred `spec:<his lineage>`; read as they stood they would
+  have matched nothing and handed an event's rune to an engine as often as the roll draws one, so both prefer an
+  ORDINARY rune — the reading a spec rune had. The empty-offer sentence says *that class*.
+- **THE GATES ARE AN AND AT THE ROLL, AND THE ANSWER RE-ASKS TWO OF THE THREE.** A queued cache's answer
+  (`Run.rune_choice` → `_engine_seated` → `Runes.offerable`) re-asks the engine and the pet but never the requirement,
+  because the pool a requirement reads only grows. **The one requirement that can shrink is an ENGINE'S ENABLER**, which
+  leaves with the engine — so a rune whose required card only an engine brings is an `ENGINE_READ` row (Layered Aegis,
+  HC §2), and the gate holds at the answer and at the seat as well as at the roll.
+- **A FOURTH CONDITION NO GATE ASKS, NAMED SO IT IS NOT MISTAKEN FOR COVERED: A STATUS OR A STANCE.** Long Fuse (Burn),
+  Killing Cold and Deep Cold (Chilled), Long Poison (his Poison), Mirror Guard (the Defensive guard) and Slaughterhouse (a
+  bleedout) are offered to every hero of the class whether or not anything he carries lays what they read, and **no class
+  kit lays any of the five** (cast on a board, HC §2). Each pays once a drafted card, an engine's enabler or an ally
+  supplies it. Whether they are gated is the designer's (`docs/state.md`); **a new rune of that shape is sorted into
+  this list in the batch that authors it.**
+- **WHAT A HERO CAN BE OFFERED IS MEASURED, NEVER WRITTEN HERE** (`docs/reports/HC.md` §3, and `check_gv` §3 prints it).
+  One reading is a rule's consequence and is stated: **a Cleric holding no Cleric lineage engine is offered no ordinary
+  rune**, because every Cleric rune reads Mercy, Conviction or Ruin.
+- **ES §2's OTHER HALF STANDS AS RECORD**: the five universals were ruled re-scoped rather than retired, ET §1 retired
+  them with the other forty-eight, and `universal` still resolves for them and for the generated stat family.
+- **`check_hc` KEEPS THE DOORS, EACH NEGATIVE WITH ITS POSITIVE**: `_scope_ok` and `shown_scope` (§1), Layered Aegis at a
+  cache's answer (§2), the event verb's preference (§3), and the three HB follow-ups below (§4-§6). What a class can be
+  offered is `check_gv` §3's, and that the game reads no `written_for` is `test_runes`'.
 
 ## STANDING RULE — A RUNE READS ITS HOLDER'S EQUIPPED CARDS, NEVER HIS POOL (Batch ES §4, ruled by the designer)
 
@@ -2995,7 +3039,8 @@ five reachable at once.
   not drafted — `Runes.kit_names` reads `bm_abilities`, so **a rune pool DEEPENS during a run.**
   Sixteen of the sixty live runes are unreachable at spawn for that reason (ten until GS §1 took six cards they name
   out of the lineages' opening kits). Telling the Pyromancer he
-  "carries every rune written for that awakening" at three-of-five is a lie; CO §3's rule that a
+  "carries every rune written for that awakening" at three-of-five is a lie (the sentence says *that class* since HC §1,
+  when the runes left their specs); CO §3's rule that a
   refusal names its cause is what forces the fork. **One door — `Runes.empty_offer_reason` — because
   four sites print it.** The third cause is GV's: what is left reads an engine he has not equipped,
   and the sentence names that engine's rune.
@@ -3550,7 +3595,8 @@ dominated by a basic.
   award chain is two tiers. They were authored WEAKER on purpose (EB §1, and `CLASS_DRAFT_POOLS`'
   own header), the merge removes the reason, **and the rebalance is OWED and not taken.**
 - **BOSS POOLS ARE NOT MERGED.** `SPEC_POOLS` stays spec-keyed and `roll_spec_ability_offer` still
-  reads it. The merge joined the DRAFT's two pools, not the game's three.
+  reads it. The merge joined the DRAFT's two pools, not the game's three. *Its first tier asks the pet half of
+  `offerable` since HC §5 (the HB block), and not the engine half.*
 
 **BATCH FD §1 — THE MERCHANT IS NO LONGER ONE OF THE SOURCES, RULED BY THE DESIGNER.** BO §3
 built four (elite, merchant, event, zone boss) and the merchant's is withdrawn: **a draft pick is
@@ -3560,8 +3606,8 @@ name would be the failure worth catching, so `check_fd` §1f asserts the three s
 same breath as the removal. `run_sim` never bought one, so no measured figure moves.
 
 ## STANDING RULE — A RUNE THAT READS AN ENGINE IS OFFERED ONLY WHILE THAT ENGINE IS EQUIPPED (Batch GV)
-> **GP's card gate, one layer over. `Runes.ENGINE_READ` is the table — thirty-five of the sixty live ordinary runes, an
-> engine and a `why` apiece — and `Runes.offerable` is the one answer: `Runes.eligible_ids` asks it at every roll (the
+> **GP's card gate, one layer over. `Runes.ENGINE_READ` is the table — thirty-six of the sixty live ordinary runes (GV's
+> thirty-five and HC §2's Layered Aegis), an engine and a `why` apiece — and `Runes.offerable` is the one answer: `Runes.eligible_ids` asks it at every roll (the
 > Peddler, the elite cache, the bargain, the event verb) and `Run.rune_choice` at a queued offer's answer.** *Since HB
 > it also withholds a rune that needs a companion from a hero who has dismissed the pet (`Runes.COMPANION_READ`).*
 
@@ -3570,10 +3616,10 @@ same breath as the removal. `run_sim` never bought one, so no measured figure mo
   (`check_gv` §1): a row pays equipped and moves nothing owned. GP's groups hold — a rune that HALF-works, or needs only
   a card, a status any card lays, the stance or nothing, is not gated. **FP's 43 described the game at FP**:
   thirty-three of them are rows, ten are not, and two it did not count are (`docs/reports/GV.md` §1).
-- **EQUIPPED, NEVER OWNED, AND THE CODE LEAVES NO OTHER READING.** A spec rune's scope is the lineage, the lineage is the
-  engine taken at class selection, and nothing sells or discards an engine rune — every hero who can be offered a row
-  owns its engine for the whole run, so a gate on ownership would withhold nothing. The fight, the card gate and a
-  rune's `requires_ability` on an enabler all read the equipped set.
+- **EQUIPPED, NEVER OWNED.** The fight, the card gate and a rune's `requires_ability` on an enabler all read the
+  equipped set. *GV's second reason — a spec rune's scope was the lineage, so every hero who could be offered a row owned
+  its engine and a gate on ownership would withhold nothing — went with the spec scope at HC §1*: a row reaches every
+  hero of its class now, most of whom do not own its engine, and this table is what withholds it from them.
 - **A QUEUED ROW SITS OUT OF THE ANSWER; IT IS NOT REPAIRED AWAY (RULED AT GW §4).** The overlay says what
   waits and on which rune, `map_screen._pick_rune` indexes the list the buttons were built from, and a cache emptied
   this way can still be let go. FD's block below carries why this is not its write-back, and `docs/master.html` carries
@@ -3586,9 +3632,11 @@ same breath as the removal. `run_sim` never bought one, so no measured figure mo
   a hero who unequipped his engine holding either was playing a strictly worse game than one wearing no rune. **Each
   price now reads its PAYOUT's own predicate** — `has_engine("mercy")` and `has_engine("trapper")`, copied rather
   than re-derived, so the two cannot come to disagree about what a rune costs and what it buys. **The other
-  thirty-three need nothing and the twenty-five ungated ones need nothing** (GW §3c): every other price is inside its
+  thirty-four need nothing and the twenty-four ungated ones need nothing** (GW §3c; HC's Layered Aegis has no price): every other price is inside its
   engine's block, reads a meter only the engine installs, or lands on a card that sits out with the engine.
-- **A SECOND ENGINE OPENS NO OTHER LINEAGE'S RUNES**: scope reads the lineage, never the engines held.
+- **A SECOND ENGINE OPENS ITS RUNES (SINCE HC §1; GV's *"a second engine opens no other lineage's runes"* WENT WITH THE
+  SPEC SCOPE).** Every row is class-scoped, so a hero who slots a second engine is offered its rows at once: a
+  Berserker-lineage Warrior holding Heavy Plating second is offered the Standing Wall and the Bracing Line.
 - **A NEW RUNE IS SORTED IN THE BATCH THAT AUTHORS IT.** `check_gv` §0 holds the rows and the named groups and asserts
   that together they are the live ordinary runes; a rune in neither reds.
 
@@ -4164,7 +4212,7 @@ call and one string).
   (`Blood Price`). **Nothing resolves a rune by name**: `config` and `build` key on the id, and the
   only name-keyed lookup is `eligible_ids`'s PER-MEMBER pouch dedupe. **That was checked rather
   than assumed, and it is what made the two `Long Watch` runes safe as well, until FK renamed the Holy's `Carried
-  Mercy`** — the Warden's and the Holy's have disjoint spec scopes and `_scope_ok` runs before the dedupe, so no hero can ever
+  Mercy`** — the Warden's and the Holy's have disjoint scopes (a class apiece since HC §1) and `_scope_ok` runs before the dedupe, so no hero can ever
   hold both and the dedupe can never mis-fire.
 · **CONFIRMED AT GC — THE TIER-2 NODE IS *DEFLECTION*, AND THE NAME IS NOT REVISITED (ruled by the
   designer).** GB swept it against **746 names in ten populations** — abilities, enemies, enemy

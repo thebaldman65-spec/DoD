@@ -686,14 +686,16 @@ func _source_audit() -> void:
 
 func _rune_audit() -> void:
 	var arcanist_runes := []
+	# BATCH HC §1 — THE ARCANIST'S SET IS THE ENTRIES `written_for` HIM, the record
+	# the re-scope kept (every one is `class:mage` now; read off the scope it was 0).
 	for id in Runes.ids():
-		if String(Runes.config(id).get("scope", "")) == "spec:arcanist":
+		if String(Runes.config(id).get("written_for", "")) == "arcanist":
 			arcanist_runes.append(id)
 	ok(arcanist_runes.size() == 9,
 		# **BATCH FK MOVED IT 4 -> 9** — ET's four retired plus FK's five. The
 		# walk reads the FILE, retired included, so this is the file's own
 		# population; the assertions below it are the ones about fields.
-		"the Arcanist has 9 spec runes (got %d)" % arcanist_runes.size())
+		"the Arcanist has 9 runes written for him (got %d)" % arcanist_runes.size())
 	# Every counter a rune writes must be written by a node OR still have a live
 	# read site. This is the assertion that caught real breakage in AR and AS.
 	# BATCH FX: "noded" is asked of the tree an Arcanist wears — the ONE tree, no
@@ -758,6 +760,14 @@ func _rune_audit() -> void:
 	var mage_engines := 0
 	for id in Runes.ids():
 		if String(Runes.config(id).get("scope", "")) != "class:mage":
+			continue
+		# BATCH HC §1 — "CLASS-WIDE" MEANT WRITTEN FOR NO SPEC, and that is what it
+		# still means here: every Mage rune is `class:mage` since HC, so the three
+		# are the class entries with no `written_for`. The Arcanist's own runes
+		# writing his counters is what they are for, and since HC what keeps one
+		# from re-tuning every Mage is the engine gate (`Runes.ENGINE_READ`, which
+		# `check_gv` drives), not a scope.
+		if String(Runes.config(id).get("written_for", "")) != "":
 			continue
 		# BATCH GK — the Mage ENGINE runes are class:mage too, with an empty
 		# payload; counted apart so the three ordinary ones stay pinned. Six since

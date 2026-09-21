@@ -696,7 +696,7 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 			slot_btn.tooltip_text = "%s\n%s\n\nClick to manage %s's runes." % [
 				rune["name"], Runes.shown_desc(rune), key.capitalize()]
 			slot_btn.add_theme_color_override("font_color",
-				rune.get("scope_color", Color(0.8, 0.8, 0.8)))
+				Runes.shown_scope(rune)["color"])  # HC §1 — the one door
 			# BATCH GX — A FILLED SLOT THAT PAYS NOTHING SAYS SO ON THE MAP
 			# ITSELF, which is the only surface the player reads without
 			# opening anything. **THE MARKER IS IN THE
@@ -816,12 +816,31 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 		# hero with no engine is a legal state and should read as one.
 		var held: Array = Runes.held_engines(member)
 		var held_titles := PackedStringArray()
-		for pid in held:
-			held_titles.append(Classes.engine_title(String(pid)))
+		# BATCH HC §5 — AN ENGINE THAT SITS OUT IS MARKED ON THE CARD, as a worn rune
+		# is on its slot (GX): the marker in the text and the line in the same amber.
+		# This line is the map's one place an engine is named without opening
+		# anything. **The sentence goes on the card's own tooltip**, which is what a
+		# hover over this line shows: the line stays click-through, so a press on
+		# it still opens the sheet, where the engine's row carries the sentence too.
+		var eng_sits: Array = Run.sitting_out_rune_names(member)
+		var eng_note := ""
+		for er in member.get("engines", []):
+			var erd: Dictionary = er
+			if not bool(erd.get("equipped", false)):
+				continue
+			var e_title := Classes.engine_title(String(erd.get("engine", "")))
+			if eng_sits.has(String(erd.get("name", ""))):
+				held_titles.append("○ %s" % e_title)
+				eng_note = Run.rune_sits_out_note(String(erd.get("id", "")), held)
+			else:
+				held_titles.append(e_title)
 		hint.text = "engines: %s — click the card for the sheet" % (
 			" + ".join(held_titles) if not held.is_empty() else "none")
 		hint.add_theme_font_size_override("font_size", 11)
 		hint.add_theme_color_override("font_color", Color(0.5, 0.48, 0.52))
+		if eng_note != "":
+			hint.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
+			open.tooltip_text += "\n\n%s" % eng_note
 		hint.position = at + Vector2(8, 124)
 		hint.size = Vector2(CARD_W - 16, 14)
 		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -951,12 +970,33 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 			# name he has taken since is not drawn as a button that refuses
 			# itself. Same door FD §1 put in front of the rune cache.
 			var spec := String(member.get("spec", ""))
-			for pool_name in Run.ability_choice(member):
+			var ab_live: Array = Run.ability_choice(member)
+			for pool_name in ab_live:
 				var ab: Ability = Classes.spec_pool_ability(spec, String(pool_name))
 				_pick_button(box, String(pool_name),
 					Classes.resolve_values(ab.description) if ab != null else "",
 					Color(0.85, 0.82, 0.75),
 					_pick_ability.bind(idx, String(pool_name)), overlay)
+			# BATCH HC §5 — WHAT THE OFFER HOLDS BACK FOR THE PET, SAID RATHER THAN
+			# HIDDEN. `ability_choice` hands over only what a hero who has dismissed
+			# the pet can use and keeps the rest stored; a card that silently left
+			# the offer would read as a bug (CO §3). The clause is the empty-offer
+			# sentence's own (`Runes.empty_offer_reason`), not a new phrasing, and
+			# the pick is HELD rather than spent: unslotting the dismisser is the
+			# player's own button and brings the cards back.
+			var ab_held: Array = Run.ability_choice_withheld(member)
+			if not ab_held.is_empty():
+				var ab_more := Label.new()
+				ab_more.text = "The offer holds %d more that need%s a companion, which the %s dismisses.%s" % [
+					ab_held.size(), "s" if ab_held.size() == 1 else "",
+					Runes.dismisser_name(Run.held_engines(member)),
+					"\nUnequip it and they return." if ab_live.is_empty() else ""]
+				ab_more.add_theme_font_size_override("font_size", 13)
+				ab_more.add_theme_color_override("font_color", Color(0.72, 0.68, 0.62))
+				ab_more.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				ab_more.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+				ab_more.custom_minimum_size = Vector2(600, 0)
+				box.add_child(ab_more)
 		"upgrade":
 			# BATCH FE §2 — THROUGH `Run.upgrade_choice`, same reason, and this
 			# one is indexed rather than named: `_pick_upgrade` takes an INDEX,
@@ -977,9 +1017,12 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 			var triple: Array = Run.rune_choice(member)
 			for i in triple.size():
 				var rune: Dictionary = triple[i]
-				_pick_button(box, "%s  [%s]" % [rune["name"], rune["scope_label"]],
+				# BATCH HC §1 — the band off the data, never the cached copy: a
+				# triple rolled before the re-scope rides the save saying `Spec`.
+				var band: Dictionary = Runes.shown_scope(rune)
+				_pick_button(box, "%s  [%s]" % [rune["name"], band["label"]],
 					Runes.shown_desc(rune),
-					rune.get("scope_color", Color(0.8, 0.8, 0.8)),
+					band["color"],
 					_pick_rune.bind(idx, i), overlay)
 			# ══ BATCH FM §3 — A TRIPLE THAT REPAIRED TO NOTHING STRANDS THE
 			#    PICK, AND THIS IS WHERE IT SHOWED ═══════════════════════════
@@ -1013,12 +1056,31 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 			# §3), and a cache emptied this way is NOT "nothing can arrive" —
 			# the pouch's own button fills it — so that case has its own words.
 			var withheld: Array = Run.rune_choice_withheld(member)
-			var waits_on: String = Runes.waited_on(withheld.map(
+			# BATCH HC §5 — WHAT IS HELD BACK HAS TWO CAUSES SINCE HB, AND THE ENGINE'S
+			# SENTENCE WAS PRINTED FOR BOTH. A rune that needs a companion is held back
+			# while the pet's dismisser is EQUIPPED, and "wait on the engine rune they
+			# read being equipped" was false of it. Split by `Runes.pet_holds_back`: the
+			# engine's words are byte-for-byte what they were for an engine-withheld
+			# rune, and the pet's take the empty-offer sentence's own clause.
+			var wh_held: Array = Run.held_engines(member)
+			var wh_pet: Array = withheld.filter(func(c): return Runes.pet_holds_back(
+				String((c as Dictionary).get("id", "")), wh_held))
+			var wh_engine: Array = withheld.filter(func(c): return not Runes.pet_holds_back(
+				String((c as Dictionary).get("id", "")), wh_held))
+			var waits_on: String = Runes.waited_on(wh_engine.map(
 				func(c): return String((c as Dictionary).get("id", ""))))
+			var pet_line := "The cache holds %d more that need%s a companion, which the %s dismisses." % [
+				wh_pet.size(), "s" if wh_pet.size() == 1 else "",
+				Runes.dismisser_name(wh_held)]
 			if not triple.is_empty() and not withheld.is_empty():
 				var more := Label.new()
-				more.text = "The cache holds %d more that wait%s on %s being equipped." % [
-					withheld.size(), "s" if withheld.size() == 1 else "", waits_on]
+				var more_lines := PackedStringArray()
+				if not wh_engine.is_empty():
+					more_lines.append("The cache holds %d more that wait%s on %s being equipped." % [
+						wh_engine.size(), "s" if wh_engine.size() == 1 else "", waits_on])
+				if not wh_pet.is_empty():
+					more_lines.append(pet_line)
+				more.text = "\n".join(more_lines)
 				more.add_theme_font_size_override("font_size", 13)
 				more.add_theme_color_override("font_color", Color(0.72, 0.68, 0.62))
 				more.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -1027,8 +1089,14 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 				box.add_child(more)
 			if triple.is_empty() and not withheld.is_empty():
 				var held_back := Label.new()
-				held_back.text = "The cache holds nothing this hero can take while %s is not equipped.\nEquip it and the cache's runes return; letting the pick go spends it." % \
-					waits_on
+				if wh_engine.is_empty():
+					held_back.text = "The cache holds nothing this hero can take while the %s is equipped, which dismisses the companion they need.\nUnequip it and the cache's runes return; letting the pick go spends it." % \
+						Runes.dismisser_name(wh_held)
+				else:
+					held_back.text = "The cache holds nothing this hero can take while %s is not equipped.\nEquip it and the cache's runes return; letting the pick go spends it." % \
+						waits_on
+					if not wh_pet.is_empty():
+						held_back.text += "\n" + pet_line
 				held_back.add_theme_font_size_override("font_size", 14)
 				held_back.add_theme_color_override("font_color", Color(0.72, 0.68, 0.62))
 				held_back.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -1865,6 +1933,15 @@ func _open_rune_panel(idx: int) -> void:
 		elbl.add_theme_font_size_override("font_size", 12)
 		elbl.add_theme_color_override("font_color", Color(0.95, 0.75, 0.45) if e_on
 			else Color(0.62, 0.6, 0.57))
+		# BATCH HC §5 — A SLOTTED ENGINE THAT SITS OUT SAYS SO HERE, IN THE ORDINARY
+		# ROWS' OWN SHAPE (GX's tell, ruled): the sentence in place of the rule and
+		# the same amber, off the same door. It is the Rune of the Beastmaster beside
+		# the Rune of the Sharpshooter, and this panel is where either is unslotted.
+		if e_on and sitting_runes.has(String(er["name"])):
+			elbl.text = "✦ %s — %s" % [er["name"],
+				Run.rune_sits_out_note(String(er.get("id", "")),
+					Run.held_engines(member)).replace("\n", " ")]
+			elbl.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
 		elbl.custom_minimum_size = Vector2(POUCH_TEXT_W, 20)
 		elbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		erow.add_child(elbl)
@@ -1897,7 +1974,7 @@ func _open_rune_panel(idx: int) -> void:
 		lbl.text = "%s%s — %s" % ["✦ " if is_on else "", rune["name"], Runes.shown_desc(rune)]
 		lbl.add_theme_font_size_override("font_size", 12)
 		lbl.add_theme_color_override("font_color", Color(0.45, 0.9, 0.5) if is_on
-			else rune.get("scope_color", Color(0.8, 0.8, 0.8)))
+			else Runes.shown_scope(rune)["color"])  # HC §1 — the one door
 		# BATCH GX — WORN, AND SITTING OUT. The row says so in place of the
 		# rune's own text, because this is the panel where the engine it waits
 		# on is re-slotted and where the slot it holds can be freed; the

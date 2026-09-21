@@ -1505,9 +1505,9 @@ func deal_engines(member: Dictionary) -> Array:
 
 # THE ONE DOOR A HERO IS AWAKENED THROUGH — the class-selection screen and the
 # run sim both come here. It slots the one engine taken, and sets the LINEAGE
-# the unmerged layers still read (the opening kit, the stat block, the draft and
-# boss pools, the spec-scoped runes) to the spec that engine carried: "" for a
-# spine, whose hero opens with his class kit.
+# the unmerged layers still read (the opening kit, the stat block, the boss pool
+# — the draft pools merged at GP and the runes at HC §1) to the spec that engine
+# carried: "" for a spine, whose hero opens with his class kit.
 func awaken(idx: int, rune_id: String) -> void:
 	if idx < 0 or idx >= party.size() or not Runes.is_engine_rune(rune_id):
 		return
@@ -1620,8 +1620,8 @@ func runes_mode() -> String:
 #
 # It used to read *"returns {} when runes are off — every call site skips
 # empties"*, and both halves have changed. **`Runes.generate` returns `{}` on an
-# EXHAUSTED POOL now**, which a real run reaches: every rune is spec-scoped,
-# so a hero who has seen his spec's set draws nothing. Skipping an
+# EXHAUSTED POOL now**, which a real run reaches: the authored pool is finite,
+# so a hero who has seen his class's set (spec's, until HC §1) draws nothing. Skipping an
 # empty is what made the failure invisible, so the four offer sites ANNOUNCE it
 # instead (FM §2) — an empty panel that says nothing reads as a bug, and the
 # designer will hit this inside a run.
@@ -1661,26 +1661,35 @@ func _apply_rune_power(rune: Dictionary) -> Dictionary:
 
 
 # DOD_SIM_RUNE_ECON=rich: the crudest probe that answers "what happens when
-# the runes actually arrive" — a spec-eligible authored rune handed over
-# rather than shopped for. Prefers the ones written for THIS spec, because
-# those are the entries the dilution question is actually about; falls back
-# to the ordinary roll when the spec's set is exhausted. Honours
-# DOD_SIM_RUNES (nothing under off, stat sticks under stats) so the arms
+# the runes actually arrive" — an eligible authored rune handed over rather
+# than shopped for. **THE EVENT VERB `rune_grant` CALLS IT TOO**, so it is a
+# player's door as well as a sim arm. Prefers an ORDINARY rune — one written
+# for the hero, never one of his class's engine runes, which ride the same roll
+# — because those are the entries the dilution question is actually about;
+# falls back to the ordinary roll, engine runes and all, when they are spent.
+# Honours DOD_SIM_RUNES (nothing under off, stat sticks under stats) so the arms
 # still compose with the Batch X matrix flag.
+#
+# **BATCH HC §1 — IT PREFERRED `spec:<his lineage>` AND THERE IS NO SUCH SCOPE
+# NOW.** Read as it stood, it would have matched nothing for every hero and
+# fallen through to the plain roll every time, handing an event's rune to an
+# engine as often as the roll draws one — the preference gone in silence. The
+# spec runes were the ordinary runes a lineage could be offered, and an
+# ordinary rune is what `eligible_ids` hands this hero that is not an engine
+# rune, so that is the preference it keeps.
 func grant_rune(member: Dictionary) -> Dictionary:
 	if runes_mode() != "full":
 		return generate_rune(member)
 	var owned: Array = []
 	for r in member.get("runes", []):
 		owned.append(String(r["name"]))
-	var spec_scope := "spec:%s" % String(member.get("spec", ""))
-	var spec_ids: Array = []
+	var ordinary_ids: Array = []
 	for id in Runes.eligible_ids(member, owned):
-		if String(Runes.config(id).get("scope", "")) == spec_scope:
-			spec_ids.append(id)
-	if spec_ids.is_empty():
+		if not Runes.is_engine_rune(String(id)):
+			ordinary_ids.append(id)
+	if ordinary_ids.is_empty():
 		return generate_rune(member)
-	return _apply_rune_power(Runes.build(String(spec_ids.pick_random())))
+	return _apply_rune_power(Runes.build(String(ordinary_ids.pick_random())))
 
 
 # Elite pick-of-3 (Batch X): the three candidates are rolled AT DROP TIME
@@ -1922,7 +1931,7 @@ func ability_choice(member: Dictionary) -> Array:
 			continue
 		kept.append(nm)
 	if kept.size() == triple.size():
-		return triple
+		return _pet_seated(member, triple)
 	while kept.size() < 3:
 		var fresh := _ability_topup(member, kept)
 		if fresh == "":
@@ -1930,7 +1939,38 @@ func ability_choice(member: Dictionary) -> Array:
 		kept.append(fresh)
 	queue[0] = kept
 	member["bm_candidates"] = queue
-	return kept
+	return _pet_seated(member, kept)
+
+
+# ══ BATCH HC §5 — THE PET GATE HOLDS AT THE BOSS OFFER'S ANSWER, NOT ONLY AT ITS
+#    ROLL, AND IT FILTERS RATHER THAN REPAIRS ═════════════════════════════════
+#
+# **FD §1's RULE AND GV's SHAPE, ONE DOOR OVER.** The triple is rolled at the
+# zone boss and answered on the map, and the pouch can slot the engine that
+# dismisses the pet in between — so a companion card rolled for a Hunter who
+# still had one would reach him after it went. It is not written back: slotting
+# an engine is the player's own reversible choice (GV's `_engine_seated` for the
+# rune cache), so the stored triple keeps the card and this re-reads the slots at
+# every answer — unslot the dismisser and it is offered again. Nothing is drawn,
+# so it is not a reroll. **The render and the pick read this same list**, and
+# `_pick_ability` refuses a name that is not in it.
+func _pet_seated(member: Dictionary, names: Array) -> Array:
+	var held: Array = held_engines(member)
+	return names.filter(func(n): return not Classes.pet_withholds(String(n), held))
+
+
+# The queued names the pet gate is holding back from the head triple, for the
+# overlay's sentence. Asks `ability_choice` first, so FE's repair has run.
+func ability_choice_withheld(member: Dictionary) -> Array:
+	var live: Array = ability_choice(member)
+	var queue: Array = member.get("bm_candidates", [])
+	if queue.is_empty():
+		return []
+	var out: Array = []
+	for c in queue[0]:
+		if not live.has(String(c)):
+			out.append(String(c))
+	return out
 
 
 # The first name the tier `award_ability_pick` would read TODAY offers that is
@@ -2276,10 +2316,15 @@ func _dismisser_clause(engines: Array) -> String:
 # away. **The payload is still applied at the spawn** — the refusal is inside
 # each read site, where GV put it — so this pair of functions is a TELL and
 # changes no magnitude.
+#
+# **BATCH HC §5 — AND A SLOTTED ENGINE RUNE THAT SITS OUT IS NAMED HERE TOO**: the
+# Rune of the Beastmaster beside the Rune of the Sharpshooter (ruled legal and
+# visible). Its slot is one of the two engine slots rather than one of the three,
+# and every surface that marks a rune by name off this list marks it the same way.
 func sitting_out_rune_names(member: Dictionary) -> Array:
 	var held: Array = held_engines(member)
 	var out: Array = []
-	for r in member.get("runes", []):
+	for r in member.get("runes", []) + member.get("engines", []):
 		var rd: Dictionary = r
 		if bool(rd.get("equipped", false)) \
 				and Runes.sits_out(String(rd.get("id", "")), held):
@@ -2299,9 +2344,13 @@ func sitting_out_rune_names(member: Dictionary) -> Array:
 #
 # **BATCH HB §4 — THE PET'S CAUSE, ON THE RUNE'S NOUNS.** `engines` is the card
 # note's argument above, for the same reason.
+#
+# **BATCH HC §5 — THE ENGINE RUNE THAT NEEDS THE PET TAKES THE PET'S SENTENCE, WORD
+# FOR WORD** (`Runes.needs_companion`): an engine slot is WORN and FILLED and freed
+# by UNEQUIPPING exactly as an ordinary slot is, so no third phrasing is owed.
 func rune_sits_out_note(rune_id: String, engines: Array = []) -> String:
 	var eng := Runes.engine_read(rune_id)
-	if (eng == "" or engines.has(eng)) and Runes.reads_companion(rune_id) \
+	if (eng == "" or engines.has(eng)) and Runes.needs_companion(rune_id) \
 			and Classes.dismisses_pet(engines):
 		return "Sits out of every fight while the\n%s\nStill worn: the slot stays filled.\nUnequipping the rune frees the slot." % _dismisser_clause(engines)
 	var rid := Runes.engine_rune_id(eng)
@@ -3911,13 +3960,25 @@ func buy_blacksmith(pairing: Dictionary) -> bool:
 # draw Batch AH added is dropped, abilities were spec-locked then. Spec pools
 # are 2-5 deep, so this offers what exists and fills short rather than
 # padding from somewhere the batch just closed off.
+#
+# **BATCH HC §5 — AND IT ASKS THE PET GATE (ruled by the designer).** HB found a
+# Beastmaster-lineage Hunter holding Lethal Aim offered Bestial Wrath, Spirit
+# Bond and Primal Surge here — companion cards that sit out for him. The boss
+# pools stay spec-keyed (GP), and **only the pet half of `Classes.offerable` is
+# asked** — `Classes.pet_withholds` — because the ruling is about the companion:
+# the engine half would move every engine's boss offer, which nobody ruled. A
+# card withheld here is withheld from the roll and from the top-up
+# `ability_choice` reads through this function; a triple rolled before the pet
+# was dismissed is filtered at its answer (`ability_choice`), not repaired away.
 func roll_spec_ability_offer(member: Dictionary) -> Array:
 	var spec := String(member.get("spec", ""))
 	if spec == "":
 		return []
 	var owned: Array = owned_ability_names(member)
+	var held: Array = held_engines(member)
 	var left: Array = Classes.spec_pool(spec).filter(
-		func(n): return not owned.has(n))
+		func(n): return not owned.has(n) \
+			and not Classes.pet_withholds(String(n), held))
 	left.shuffle()
 	return left.slice(0, 3)
 

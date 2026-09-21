@@ -309,14 +309,15 @@ var last_attack_target: BattleUnit = null  # Focus: the enemy worked last turn
 # three currencies wearing one name (Mercy, Resonance, Focus), and Focus is the
 # Sharpshooter's — a second meter folded into it would make every Focus reader
 # pay the pity and every pity reader lose it on a target switch. **IT IS HEAVY
-# PLATING'S SHAPE POINTED AT CRIT** (`plating_bonus` above): every hit he LANDS
-# that does not crit adds `PITY_CRIT_STEP` to his crit chance, and a crit resets
-# it to zero. Like the plating it is fresh every battle (a unit is built per
-# battle) and it has ONE writer, the strike loop (`battle._note_pity`). **AND IT
-# IS FOCUS'S COMPLEMENT, NOT ITS COPY**: Focus is per TARGET and clears on a
-# switch; this is per HIT and survives one. No cap is written: the reset is the
-# governor, and a hit that meets a total at or past a certainty crits and zeroes
-# it, so the meter can buy at most one certain crit before it starts again.
+# PLATING'S SHAPE POINTED AT CRIT** (`plating_bonus` above): every ATTACK he
+# lands that does not crit adds `PITY_CRIT_STEP` to his crit chance, and a crit
+# resets it to zero — per cast since HC §5 (ruled), per hit before it. Like the
+# plating it is fresh every battle (a unit is built per battle) and it has ONE
+# writer, `battle._note_pity`, called once a cast. **AND IT IS FOCUS'S
+# COMPLEMENT, NOT ITS COPY**: Focus is per TARGET and clears on a switch; this is
+# per ATTACK and survives one. No cap is written: the reset is the governor, and
+# an attack that meets a total at or past a certainty crits and zeroes it, so the
+# meter can buy at most one certain crit before it starts again.
 var crit_pity := 0.0         # crit chance, as a fraction, the misses since his last crit bought
 var same_target_turns := 0   # Unwavering: consecutive turns on that same enemy
 var lethal_eye_ranks := 0    # Executioner's Eye: percentage POINTS of crit mult
@@ -2765,7 +2766,7 @@ func refresh_bars() -> void:
 			if s.id == engine_chip_id("lethal_aim"):
 				var pity_pct := int(round(crit_pity * 100.0))
 				s.short = "Aim +%d%%" % pity_pct
-				s.desc = "%s\nNow +%d%% critical chance from the hits that\nlanded without a critical since the last one." % [
+				s.desc = "%s\nNow +%d%% critical chance from the attacks that\nlanded without a critical since the last one." % [
 					Classes.engine_desc("lethal_aim"), pity_pct]
 				_refresh_chips()
 				break

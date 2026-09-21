@@ -541,11 +541,12 @@ func _s4_what_the_grants_lose() -> void:
 		"§4: %s collide with an already-held card and have no upgrade to pay" % [no_fallback])
 
 
-func _in_scope(scope: String, class_key: String, spec: String) -> bool:
+# BATCH HC §1 — TWO CASES, `Runes._scope_ok`'s own: the spec branch went with the
+# spec scope, so a granter written for a lineage is in scope for every hero of its
+# class now, which is who could wear it. `spec` is kept for the caller's shape.
+func _in_scope(scope: String, class_key: String, _spec: String) -> bool:
 	if scope.begins_with("class:"):
 		return scope.trim_prefix("class:") == class_key
-	if scope.begins_with("spec:"):
-		return scope.trim_prefix("spec:") == spec
 	return scope == "universal"
 
 

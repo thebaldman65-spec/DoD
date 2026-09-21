@@ -315,9 +315,31 @@ func _s2a_the_peddler() -> void:
 			named += 1
 	ok(named == _run.party.size(),
 		"§2a: the empty column names %d of %d heroes" % [named, _run.party.size()])
-	ok(_has_text(shop2, "already carry every rune written for that awakening")
-			or _has_text(shop2, "wait on cards they have not drafted"),
-		"§2a: the empty column gives no reason — a refusal with no reason reads as a bug (CO §3)")
+	# **BATCH HC §1 — EVERY HERO'S LINE CARRIES THE DOOR'S REASON, WHICHEVER CASE
+	# IT IS.** This read *"already carry every rune written for that awakening"*,
+	# the one case a drained party met while the scope was the lineage. At the
+	# class scope a drained hero is not holding his class's OTHER lineages' rows —
+	# they wait on engines he has not slotted — so the case he meets is the
+	# engine's (and *"wait on cards they have not drafted"*, the other needle, was
+	# a phrasing the door has not printed since FM: it says *abilities they have
+	# not earned*). So the arm asks the door what each hero's reason IS and
+	# requires the column to print it, and requires it to be one of the door's
+	# causes, so an empty or garbled reason cannot pass by matching itself.
+	var reasons := 0
+	for mi in _run.party.size():
+		var why: String = Runes.empty_offer_reason(_run.party[mi])
+		if (why.contains("already carry every rune written for that class")
+				or why.contains("wait on abilities they have not earned")
+				or why.contains("being equipped") or why.contains("need a companion")) \
+				and _has_text(shop2, why):
+			reasons += 1
+	ok(reasons == _run.party.size(),
+		"§2a: the empty column gives no reason — a refusal with no reason reads as a bug (CO §3) (%d of %d heroes)"
+			% [reasons, _run.party.size()])
+	# **AND "THAT AWAKENING" IS GONE** — the lineage scope went at HC §1 and the
+	# door says *that class* in every case.
+	ok(not _has_text(shop2, "that awakening"),
+		"§2a: the empty column still says \"that awakening\" — the lineage scope went at HC §1")
 	ok(_buttons_named(shop2, "Buy — ") == 0,
 		"§2a: a Buy button survived an empty rune column — FE's dead button, on the shop")
 	# AND THE SCREEN IS STILL USABLE. An empty column that swallowed the exit

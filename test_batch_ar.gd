@@ -818,7 +818,13 @@ func _rune_audit() -> void:
 	var probe := BattleUnit.new()
 	for rid in Runes.ids():
 		var r: Dictionary = Runes.config(String(rid))
-		if not String(r.get("scope", "")) in ["spec:pyromancer", "class:mage"]:
+		# BATCH HC §1 — THE PYROMANCER'S RUNES ARE `class:mage` NOW, WRITTEN FOR
+		# THE PYROMANCER (`written_for`). The population is what it was — his
+		# runes and the Mage's class-wide ones — read off the lineage the scope
+		# no longer carries, so the walk does not quietly widen to every Mage rune.
+		var wf := String(r.get("written_for", ""))
+		if not (wf == "pyromancer"
+				or (String(r.get("scope", "")) == "class:mage" and wf == "")):
 			continue
 		for f in r.get("payload", {}).get("stat", {}):
 			var lands: bool = probe.get(f) != null \

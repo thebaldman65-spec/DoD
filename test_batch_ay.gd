@@ -500,14 +500,19 @@ func _counter_name_trap() -> void:
 	var pool := {}
 	for rid in Runes.ids():
 		pool[rid] = Runes.config(rid)
-	var bm_fields := _writer_fields(_tree(), pool, "spec:beastmaster")
+	# BATCH HC §1 — a spec's rune writers are the runes WRITTEN FOR it (`written_for`,
+	# the record the re-scope kept): every one is `class:<key>` since HC, so read
+	# off the scope they were none and the Beastmaster's writers lost the one that
+	# writes his step (HEAD's copy on HC's data: *"...and one writes
+	# wild_communion_step's rune half"* red).
+	var bm_fields := _writer_fields(_tree(), pool, "beastmaster")
 	ok(not bm_fields.has("communion_ranks") and not bm_fields.has("rune_communion_ranks"),
 		"NO Beastmaster writer writes communion_ranks — that is the Devout's")
 	ok(bm_fields.has("rune_wild_communion_step"),
 		"...and one writes wild_communion_step's rune half, which is his")
 	# THE DEVOUT'S SPEC ID IS "inquisitor" — the rename never reached the id.
 	var dv_fields := _writer_fields(Talents.generate_tree("inquisitor", "cleric"), pool,
-		"spec:inquisitor")
+		"inquisitor")
 	var bsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	ok(bsrc.contains("devout.communion_ranks"),
 		"the Devout still owns communion_ranks — battle.gd reads it off the Devout")
@@ -528,15 +533,16 @@ func _counter_name_trap() -> void:
 
 
 # BATCH FX: every stat field a spec's writers write — the tree it wears, plus
-# every rune of its own scope (retired entries included: `Runes.ids()` is the
-# file, which is what this section has always walked).
-func _writer_fields(tree: Array, pool: Dictionary, scope: String) -> Dictionary:
+# every rune written for it (retired entries included: `Runes.ids()` is the
+# file, which is what this section has always walked). BATCH HC §1: the rune half
+# reads `written_for` where it read the scope, which no rune names a spec in now.
+func _writer_fields(tree: Array, pool: Dictionary, lineage: String) -> Dictionary:
 	var out := {}
 	for t in tree:
 		for f in t.get("payload", {}).get("stat", {}):
 			out[f] = true
 	for id in pool:
-		if scope != "" and String(pool[id].get("scope", "")) == scope:
+		if lineage != "" and String(pool[id].get("written_for", "")) == lineage:
 			for f in pool[id].get("payload", {}).get("stat", {}):
 				out[f] = true
 	return out
@@ -638,6 +644,12 @@ func _rune_audit() -> void:
 		bm_fields[f] = true
 	for id in pool:
 		if String(pool[id].get("scope", "")) != "class:hunter":
+			continue
+		# BATCH HC §1 — "CLASS-WIDE" MEANT WRITTEN FOR NO SPEC, and every Hunter rune is
+		# `class:hunter` since HC, so the three are the class entries with no
+		# `written_for`. Walking all of `class:hunter` would ask the Beastmaster's own
+		# runes whether they write his counters, which is what they are for.
+		if String(pool[id].get("written_for", "")) != "":
 			continue
 		for f in pool[id].get("payload", {}).get("stat", {}):
 			ok(not bm_fields.has(f),

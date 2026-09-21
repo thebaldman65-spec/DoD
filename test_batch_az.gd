@@ -619,6 +619,14 @@ func _rune_audit() -> void:
 	for id in pool:
 		if String(pool[id].get("scope", "")) != "class:hunter":
 			continue
+		# BATCH HC §1 — "CLASS-WIDE" MEANT WRITTEN FOR NO SPEC. Every Hunter rune is
+		# `class:hunter` since HC, so read off the scope alone this walked the
+		# Sharpshooter's own runes and asked whether they write his counters — which
+		# is what they are for (three FAIL lines, HEAD's copy on HC's data: the Narrow
+		# Gap, the Long Draw, the Level Aim). The three are the class entries with no
+		# `written_for`, which is the population this arm was written about.
+		if String(pool[id].get("written_for", "")) != "":
+			continue
 		for f in pool[id].get("payload", {}).get("stat", {}):
 			ok(not ss_fields.has(f),
 				"the class-wide rune %s does not write the Sharpshooter counter %s" % [id, f])

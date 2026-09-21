@@ -635,7 +635,12 @@ func _rune_audit() -> void:
 		"gluttony_ranks", "pact_flesh_ranks", "barter_step", "avatar_ruin",
 		"soul_glut"]
 	for rid in data:
-		if String(data[rid].get("scope", "")) != "class:cleric":
+		# BATCH HC §1 — THE THREE ARE THE ONES AUTHORED CLASS-WIDE, which carry no
+		# `written_for`: every lineage's runes are `class:cleric` too since the
+		# spec scope went, and walking them would widen this to a question it
+		# never asked.
+		if String(data[rid].get("scope", "")) != "class:cleric" \
+				or String(data[rid].get("written_for", "")) != "":
 			continue
 		for field in (data[rid]["payload"].get("stat", {}) as Dictionary):
 			ok(not oc_fields.has(String(field)),
@@ -651,7 +656,12 @@ func _rune_audit() -> void:
 			"healing_received_mult", null)
 		if v == null or float(v) >= 0.0:
 			continue
+		# BATCH HC §1 — keyed by the lineage a rune was written for where it was
+		# (`written_for`), so the worst loadout is still summed per hero who can
+		# hold the pair — the scope is the class now and would merge them.
 		var scope := String(data[rid].get("scope", "universal"))
+		if String(data[rid].get("written_for", "")) != "":
+			scope = "spec:" + String(data[rid]["written_for"])
 		if scope == "universal":
 			uni += float(v)
 		else:

@@ -7,9 +7,10 @@
 # or swap from the map, and a second can join it from the ordinary rune pool.
 #
 # **THE SPEC THE TAKEN ENGINE CARRIED IS THE HERO'S LINEAGE** — the key the
-# unmerged layers still read: his opening kit, his stat block, his draft and boss
-# pools and his spec-scoped runes. A spine taken here leaves him none, and he
-# opens with his class kit. `Run.awaken` is the one door; the sim uses it too.
+# unmerged layers still read: his opening kit, his stat block and his boss pool.
+# (His draft pool merged into the class's at GP, and his runes at HC §1.) A spine
+# taken here leaves him none, and he opens with his class kit. `Run.awaken` is
+# the one door; the sim uses it too.
 #
 # **BATCH GQ — EACH CARD SAYS ONLY WHAT DIFFERS.** A card is the rune's name, its
 # engine rule, and — for a rune that carries a lineage — the abilities it opens

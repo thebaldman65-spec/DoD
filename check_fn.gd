@@ -40,7 +40,8 @@
 # party: `spec:occultist`, `spec:warden`, `spec:sharpshooter`, `spec:beastmaster`
 # — asserted off the entries rather than written in, so a rune re-scoped
 # elsewhere moves this list rather than quietly leaving the gate driving the
-# wrong four heroes.
+# wrong four heroes. *(Since HC §1 the entries carry the lineage in
+# `written_for` and their class in `scope`; the four are read off the first.)*
 #
 #   /Applications/Godot.app/Contents/MacOS/Godot --headless --path . \
 #       --script check_fn.gd
@@ -196,6 +197,7 @@ func _s1_the_eight_are_ungated() -> void:
 	var priced: Array = []
 	var still_gated: Array = []
 	var scopes: Array = []
+	var wrong_class: Array = []
 	for id in UNGATED:
 		if not data.has(id):
 			missing.append(String(id))
@@ -207,9 +209,16 @@ func _s1_the_eight_are_ungated() -> void:
 			priced.append("%s:%d" % [id, int(e.get("price", 0))])
 		if (e.get("payload", {}) as Dictionary).has("condition"):
 			still_gated.append(String(id))
-		var sc := String(e.get("scope", ""))
+		# **BATCH HC §1 — THE LINEAGE IS `written_for` NOW, AND THE SCOPE IS THE
+		# CLASS.** The eight were authored for four lineages and that is still
+		# the population this gate seats; it is read off the history field the
+		# spec scope left behind, and the scope itself must be that lineage's
+		# class (the arm below), or the eight are offered to nobody.
+		var sc := "spec:" + String(e.get("written_for", ""))
 		if not scopes.has(sc):
 			scopes.append(sc)
+		if String(e.get("scope", "")) != "class:" + Classes.class_of_spec(String(e.get("written_for", ""))):
+			wrong_class.append("%s=%s" % [id, e.get("scope", "")])
 	ok(missing.is_empty(), "§1a: an id of the eight is not in the file (%s)" % [missing])
 	# **BATCH FO RETIRED ONE OF THE EIGHT, BY RULING, AND THIS ARM IS RE-POINTED
 	# RATHER THAN WEAKENED.** It asserted that no one of the eight was quietly
@@ -232,6 +241,8 @@ func _s1_the_eight_are_ungated() -> void:
 	ok(scopes == ["spec:beastmaster", "spec:occultist", "spec:sharpshooter",
 			"spec:warden"],
 		"§1a: the eight no longer sit on the four specs this gate drives (%s)" % [scopes])
+	ok(wrong_class.is_empty(),
+		"§1a: one of the eight is not scoped to the class of the lineage it was written for (%s)" % [wrong_class])
 
 	# ── (b) THE CENSUS, WHICH IS WHAT CATCHES A NINTH ────────────────────────
 	#
@@ -701,8 +712,10 @@ func _names_call(body: String, name: String) -> bool:
 	return false
 
 
+# BATCH HC §1 — the lineage a rune was written for is `written_for`, history the
+# game never reads; its scope is the class.
 func _spec_of(id: String) -> String:
-	return String(Runes.config(id).get("scope", "")).replace("spec:", "")
+	return String(Runes.config(id).get("written_for", ""))
 
 
 func _class_of(id: String) -> String:

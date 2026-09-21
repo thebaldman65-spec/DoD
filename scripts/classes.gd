@@ -811,12 +811,21 @@ static func engine_read(card_name: String) -> String:
 # DISMISSED THE PET** (`COMPANION_READ`, `dismisses_pet`): the negative of the
 # engine test, asked beside it rather than folded into it.
 static func offerable(names: Array, engines: Array) -> Array:
-	var no_pet := dismisses_pet(engines)
 	return names.filter(func(n):
 		var e := engine_read(String(n))
 		if e != "" and not engines.has(e):
 			return false
-		return not (no_pet and reads_companion(String(n))))
+		return not pet_withholds(String(n), engines))
+
+
+# **THE PET HALF OF `offerable`, ON ITS OWN (BATCH HC §5).** Whether a hero whose
+# slotted engines are `engines` is kept from `card_name` because it needs a
+# companion and he has dismissed the pet. `offerable` asks it beside the engine
+# test, and **the zone boss's first-tier offer asks it ALONE** — the designer
+# ruled that the pet gate reaches that door while the boss pools stay spec-keyed
+# (GP), so the engine half is not asked there. One answer, two doors.
+static func pet_withholds(card_name: String, engines: Array) -> bool:
+	return reads_companion(card_name) and dismisses_pet(engines)
 
 
 # ══ BATCH HB §3/§4 — A CARD THAT NEEDS A COMPANION ═══════════════════════════
@@ -1129,6 +1138,20 @@ const PET_CARD := "Summon Companion"
 const COMPANION_KINDS := ["ursus", "canis", "aguila"]
 const PET_DISMISSERS := ["lethal_aim"]
 
+# **BATCH HC §5 — THE ENGINES THAT NEED A COMPANION, AND ONE IS.** Pack Bond deepens
+# a bond, and with a dismisser equipped there is no bond to deepen: the designer
+# ruled the pairing LEGAL AND VISIBLE — offered, held and slotted as ever, and
+# marked as sitting out with GX's tell (`Runes.sits_out`). **Derived at the read
+# site, not from the brief**: every `has_engine("pack")` read in `battle.gd` goes
+# through a companion — the three boons (`_bond_reach` reads a living, avenged or
+# remembered companion), Loyalty's growth, the conversion, the ghost strikes and
+# the party's crit share — **except one: Mark of the Hunt's Mana on every strike
+# at the marked prey sits inside the engine test and needs no companion**, so a
+# hero who carries that card (a Beastmaster boss-pool card) still draws it from
+# Pack Bond beside Lethal Aim. That is reported (`docs/reports/HC.md` §5), not
+# changed: no card or engine moves here.
+const PET_ENGINES := ["pack"]
+
 
 # Whether a hero whose SLOTTED engines are `engines` has dismissed the pet. The
 # negative of GV's question — "is a pet present" is "is no dismisser equipped"
@@ -1139,6 +1162,12 @@ static func dismisses_pet(engines: Array) -> bool:
 		if engines.has(String(pid)):
 			return true
 	return false
+
+
+# Whether engine `pid` cannot pay without a companion on the field (HC §5). THE ONE
+# ANSWER; `Runes.sits_out` asks it of an engine rune.
+static func engine_needs_pet(pid: String) -> bool:
+	return PET_ENGINES.has(pid)
 
 
 # The call a Summon Companion cast makes for `kind` — the companion's own
@@ -1860,12 +1889,15 @@ static func protected_names(spec: String) -> Array:
 # `SPEC_INFO[spec]["passive"]`, its `passive_desc` and `PROTECTED_CORES[spec]`,
 # and the three spines carry the only new rows.
 #
-# **AND THE SPEC ID SURVIVES AS A LINEAGE, NOT AN IDENTITY.** Four layers are
+# **AND THE SPEC ID SURVIVES AS A LINEAGE, NOT AN IDENTITY.** Four layers were
 # not merged by GK — the opening kit, the stat block, the draft and boss pools,
-# and the spec-scoped runes — and each still keys on `member["spec"]`. The
-# lineage is set by the engine taken at class selection and does not change in a
-# run; a hero who takes a spine there has none and opens with his class kit. The
-# pool merge and the stat line are what retire it.
+# and the spec-scoped runes. **GP merged the draft pools and HC §1 the runes**
+# (every rune is class-scoped and the gates narrow it), so what still keys on
+# `member["spec"]` is the lineage's opening (its engine's enablers since GS), its
+# stat block and its boss pool. The lineage is set by the engine taken at class
+# selection and does not change in a run; a hero who takes a spine there has none
+# and opens with his class kit. The stat line and the boss pools are what retire
+# it.
 #
 # **THE SPINES' TEXT IS PROPOSED, NOT CONFIRMED** (GK): FT built them with no
 # player-facing words at all, and a rune a player can hold has to say something.
@@ -6439,7 +6471,7 @@ const SPEC_INFO := {
 	"sharpshooter": {"name": "Sharpshooter", "constitution": 90, "archetype": "Nuker", "passive": "lethal_aim",
 		"max_hp": 140, "armor": 0.10,
 		"resists": {"nature": 0.10, "physical": -0.10},
-		"passive_desc": "Lethal Aim: critical hits deal x2.5 damage instead of\nx1.5. Each consecutive attack against the same enemy\ngrants +20 FOCUS (NO CEILING; cleared on switching\ntargets, 50 retained on a kill). The first 100 points\neach grant +0.5% critical chance; every point past 100\ngrants +0.5% CRITICAL MULTIPLIER instead. Every hit\nthat lands without a critical adds +5% critical\nchance, kept through a target switch; a critical\nhit resets it. The Sharpshooter fields no companion:\nSummon Companion leaves the kit, and its slot is free.",
+		"passive_desc": "Lethal Aim: critical hits deal x2.5 damage instead of\nx1.5. Each consecutive attack against the same enemy\ngrants +20 FOCUS (NO CEILING; cleared on switching\ntargets, 50 retained on a kill). The first 100 points\neach grant +0.5% critical chance; every point past 100\ngrants +0.5% CRITICAL MULTIPLIER instead. Every attack\nthat lands without a critical adds +5% critical\nchance, kept through a target switch; a critical\nhit resets it. The Sharpshooter fields no companion:\nSummon Companion leaves the kit, and its slot is free.",
 		"blurb": "Every arrow an execution — patient, precise, final."},
 	# The toughest Hunter by design: his passive rewards being struck and
 	# Tripwire wants him in the fray. Deep nature affinity from a life

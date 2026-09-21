@@ -311,6 +311,7 @@ func _s1_the_pouch() -> void:
 	var have_pin := false
 	var seen := 0
 	var closed := 0
+	var sat_rows := 0
 	var scrolled: Array = []
 	var worst := {"alone": ["", 0, 0], "pair": ["", 0, 0], "six": ["", 0, 0]}
 	var scroll_h := 0
@@ -344,11 +345,24 @@ func _s1_the_pouch() -> void:
 			ok(cr == pinned, "§1: %s — Close moved to %s from %s" % [label, str(cr), str(pinned)])
 			ok(not _inside_scroll(close), "§1: %s — Close is inside a scroller, where text can carry it off" % label)
 			# EVERY RULE, WHOLE, AT ITS SIZE, IN THE SCROLLER.
+			# **BATCH HC §5 — OR, FOR AN ENGINE THAT SITS OUT, GX's SENTENCE, WHOLE.**
+			# The Rune of the Beastmaster slotted beside the Rune of the Sharpshooter
+			# sits out, and its pouch row carries the tell in place of the rule —
+			# the ordinary rows' own shape (GX §1, ruled for this pairing). What this
+			# arm measures is unchanged: the text the row carries is drawn whole, at
+			# its size, inside the scroller, with Close where it was.
 			var eng_h := 0.0
+			var sat_out: Array = _run.sitting_out_rune_names(_run.party[idx])
 			for er in held:
 				var l: Label = _label_with(ov, String(er["name"]) + " — ")
-				ok(l != null and String(l.text).ends_with(" — " + Runes.shown_desc(er)),
-					"§1: %s — %s's rule is not drawn whole" % [label, er["id"]])
+				var want_text: String = Runes.shown_desc(er)
+				if sat_out.has(String(er["name"])):
+					want_text = _run.rune_sits_out_note(String(er["id"]),
+						_run.held_engines(_run.party[idx])).replace("\n", " ")
+					sat_rows += 1
+				ok(l != null and String(l.text).ends_with(" — " + want_text),
+					"§1: %s — %s's %s is not drawn whole" % [label, er["id"],
+						"sits-out sentence" if sat_out.has(String(er["name"])) else "rule"])
 				if l == null:
 					continue
 				ok(l.get_theme_font_size("font_size") == 12,
@@ -378,6 +392,11 @@ func _s1_the_pouch() -> void:
 	ok(scrolled.is_empty(), "§1: the text scrolls for %d configurations, first %s — the pouch is not sized to its longest" % [
 		scrolled.size(), str(scrolled.slice(0, 3))])
 	ok(seen == 176 and closed == 176, "§1: Close drawn in %d and pressed shut in %d of 176" % [seen, closed])
+	# BATCH HC §5 — THE ONE SLOTTED PAIRING THAT SITS OUT, AND ONLY IT: the Rune of
+	# the Beastmaster beside the Rune of the Sharpshooter, which is one pair and the
+	# Hunter's six (its first two slots), in both pouches — four rows. Fewer is a
+	# tell gone missing; more is a tell drawn on an engine that pays.
+	ok(sat_rows == 4, "§1: %d engine rows drew the sits-out sentence — the Pack Bond pairing appears in 4" % sat_rows)
 	print("    Close at %s in all %d configurations; pressed shut in %d" % [str(pinned), seen, closed])
 	for kind2 in ["alone", "pair", "six"]:
 		print("    the longest %s: %s — its rules %d px, the list %d px in a %d px scroller" % [
@@ -438,15 +457,17 @@ func _s2_the_peddler() -> void:
 		shortest.append(six[six.size() - 1])
 		var best := ""
 		var best_len := -1
+		# BATCH HC §1 — THE SEAT'S CLASS'S RUNES: every ordinary rune is scoped to
+		# its class now, so the longest a seat can be offered is its class's
+		# longest — the same population the three lineages' runes made before.
 		for rid in Runes.ids():
 			if Runes.is_engine_rune(String(rid)) or Runes.is_retired(String(rid)):
 				continue
 			var sc0 := String(Runes.config(String(rid)).get("scope", ""))
-			for sp in Classes.SPEC_IDS[key]:
-				var dl := String(Runes.config(String(rid)).get("desc", "")).length()
-				if sc0 == "spec:%s" % String(sp) and dl > best_len:
-					best = String(rid)
-					best_len = dl
+			var dl := String(Runes.config(String(rid)).get("desc", "")).length()
+			if sc0 == "class:%s" % String(key) and dl > best_len:
+				best = String(rid)
+				best_len = dl
 		ordinary.append(best)
 	ok(not ordinary.has(""), "§2: a seat has no ordinary rune to be offered (%s)" % str(ordinary))
 	for deal in [["every seat's longest ordinary rune", ordinary], ["every class's shortest engine rule", shortest],

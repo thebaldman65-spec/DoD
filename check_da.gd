@@ -103,19 +103,15 @@ const WALK_EXEMPT := {
 	# exemption whose reason has expired is a suppression waiting to hide the
 	# next real walk. It is DELETED rather than reworded: the gate needs none.
 	"check_ea.gd": "measures the AWARD CHAIN's depth per spec — it reads both draft pools because the chain does",
-	# **BATCH FK — THE FOURTH TIME THE MARK OVER-FIRES, AND IT IS EH §1's REASON
-	# EXACTLY.** `check_fk` §5 asks whether a rune's `requires_ability` names an
-	# ability the SCOPED SPEC CAN ACTUALLY EARN — a rune naming one its hero
-	# cannot own applies silently and does nothing, which is the whole point of
-	# that section. **`ability_corpus()` cannot answer it**: it returns a flat
-	# list with no membership, so "can a Berserker earn Blood Price?" has no
-	# other source than the pools the award chain itself reads (boss pool, spec
-	# draft, class draft — FJ §1's three channels, all writing `bm_abilities`
-	# through one `hold_ability()`). **And the gate calls `ability_corpus()`
-	# OUTRIGHT for the walk itself**, which is `check_dn.gd`'s exemption verbatim:
-	# canonical walk for the enumeration, pools for the membership question the
-	# enumeration cannot answer.
-	"check_fk.gd": "asks whether a rune's `requires_ability` is EARNABLE by its scoped spec — it reads both draft pools because the award chain does, and calls `Classes.ability_corpus()` for the walk itself",
+	# **BATCH HC TOOK `check_fk.gd` OFF THIS LIST, AND FOR EH's REASON.** Its §5
+	# asked whether the rune's SCOPED SPEC could earn the card, which needed the
+	# spec's shelf and the class's; the spec scope went at HC §1, the buyers are
+	# the class, and the question is asked of every route a hero of the class has
+	# to a card — `Classes.draft_pool` (the one pool since GP), each lineage's
+	# boss pool and enablers, the class kit — so it reads neither shelf accessor
+	# and stopped tripping the mark. **This rule caught the exemption going stale**
+	# (43 / 1: *"no longer carries the old walk"*), and it is DELETED rather than
+	# reworded: the gate needs none.
 	# **BATCH FU — THE FIFTH TIME THE MARK OVER-FIRES, AND IT IS FK's REASON
 	# EXACTLY.** `check_ft` §5h asserts that Channel's free-cast floor sits at or
 	# under the cheapest price a MAGE can pay — the relation that is the floor's

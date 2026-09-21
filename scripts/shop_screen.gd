@@ -44,8 +44,9 @@ func _ready() -> void:
 #
 # `Run.generate_rune` returning `{}` used to mean one thing — runes are off —
 # and `continue` was the whole handling. FM §1 gives it a second meaning that a
-# real run reaches: **the hero has seen every rune written for his spec.** Five
-# a hero, spec-scoped, nothing universal left to fall back on. Skipping that
+# real run reaches: **the hero has seen every rune written for his spec** — his
+# CLASS since HC §1, less what the gates withhold — with nothing universal left to
+# fall back on. Skipping that
 # silently leaves the merchant's rune column holding a header and white space,
 # which is FE's finding wearing a different coat — a correct refusal that leaves
 # the screen lying.
@@ -254,11 +255,14 @@ func _draw_screen() -> void:
 		vbox.add_theme_constant_override("separation", 6)
 		panel.add_child(vbox)
 		var label := Label.new()
+		# BATCH HC §1 — the band through `Runes.shown_scope`, the one door every
+		# surface asks, so a rune reads the scope it has rather than its copy.
+		var band: Dictionary = Runes.shown_scope(rune)
 		label.text = "%s  [%s]  (for %s %d)\n%s — equip it from that hero's sheet" % [rune["name"],
-			rune["scope_label"], member["key"].capitalize(), offer["member_idx"] + 1,
+			band["label"], member["key"].capitalize(), offer["member_idx"] + 1,
 			Runes.shown_desc(rune)]
 		label.add_theme_font_size_override("font_size", 14)
-		label.add_theme_color_override("font_color", rune["scope_color"])
+		label.add_theme_color_override("font_color", band["color"])
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		vbox.add_child(label)
 		var buy := Button.new()
@@ -272,10 +276,11 @@ func _draw_screen() -> void:
 	#
 	# **A HEADER OVER WHITE SPACE READS AS A BUG AND THE DESIGNER WILL HIT
 	# THIS.** With the generated stat family out of the offer (FM §1) the pool
-	# is authored-only and spec-scoped — **four to six a hero, of which three to
-	# six are reachable at spawn** (FM §2's census; the brief's "five per hero"
-	# is right about the shape and wrong about the number in both directions) —
-	# so a hero draws nothing inside an ordinary run with no fault anywhere.
+	# is authored-only and finite — it was spec-scoped and **four to six a hero,
+	# of which three to six are reachable at spawn** at FM §2's census, and since
+	# HC §1 it is the hero's class set less what the gates withhold
+	# (`docs/reports/HC.md` §3 counts it) — so a hero can draw nothing inside an
+	# ordinary run with no fault anywhere.
 	# CO §3's rule is that a refusal with no reason reads as a bug, and this is
 	# that rule applied to an offer that is simply absent rather than darkened.
 	#

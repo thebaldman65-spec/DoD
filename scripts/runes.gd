@@ -30,11 +30,25 @@
 # at its authored value under the sim's power probe.
 #
 # ── ELIGIBILITY (the load-bearing part) ────────────────────────────────────
-# "scope" is universal | class:<key> | spec:<id> — spec runes only roll for a
-# matching hero, so the awakening shapes the loot table. **ES §2 RULED THAT
-# SCOPE IS SPEC AND CLASS ONLY and the five universals are RE-SCOPED, not
-# retired — the class each lands on is the designer's and is unmade, so
-# `universal` still resolves here.** The day the five are re-homed it can go.
+# "scope" is universal | class:<key>. **BATCH HC §1 — THERE IS NO SPEC SCOPE
+# ANY MORE.** Every `spec:<id>` entry, live and retired, is `class:<key>` for the
+# class its lineage belongs to, mapped by the code key (`inquisitor` is the
+# Cleric's, `mystic` the Hunter's), so a rune reaches every hero of its class and
+# the GATES decide what he can use: `ENGINE_READ` (an engine equipped), a
+# `requires_ability` (a card in his kit), and `COMPANION_READ` (a pet present).
+# It is GP's pool merge one layer over. **ES §2 ruled the five universals
+# RE-SCOPED, not retired — the class each lands on is the designer's and is
+# unmade, and ET §1 retired them — so `universal` still resolves here.** The day
+# the five are re-homed it can go.
+#
+# **`written_for` IS HISTORY, AND NOTHING IN THE GAME READS IT (HC §1).** Each of
+# the 110 entries that were `spec:<id>` carries the spec it was scoped to until
+# HC, as `lane` carries its retired lane: the scope was the only record of which
+# lineage a rune was authored for, and the instruments that ask about a lineage's
+# authored set (`test_rune_battle`'s per-lineage drives, `test_runes`' retired
+# coverage) read it there. **A game script that read it would be the spec scope
+# back under another name**, which is why `test_runes` asserts no file in
+# `scripts/` does. `Runes.build` does not copy it onto an instance.
 # Ability-payload runes MUST carry "requires_ability": Talents.apply_payload
 # matches on display_name and a rune naming an ability the hero does not own
 # applies silently and does NOTHING. The derivable kit checked here: the one
@@ -55,10 +69,16 @@ const DATA_PATH := "res://data/runes.json"
 # to the eye. **THIS IS NOT RARITY UNDER A NEW NAME**: it drives no odds, no
 # price and no magnitude, and it is derived from a field that decides
 # eligibility rather than from a tier nobody can see.
+#
+# **BATCH HC §1 — THE `spec` BAND IS DELETED WITH THE SCOPE, NOT ZEROED.** No
+# entry carries a spec scope, so no rune built from the data can show one; and a
+# rune instance that rides a save from before HC still says `Spec` in its own
+# fields, which is why every surface asks `shown_scope` below and never the
+# instance's copy. Every authored rune a hero can be offered reads `Class` now —
+# the band still tells a retired universal from a live rune and nothing more.
 const SCOPE_INFO := {
 	"universal": {"label": "Universal", "color": Color(0.8, 0.8, 0.8)},
 	"class": {"label": "Class", "color": Color(0.45, 0.65, 1.0)},
-	"spec": {"label": "Spec", "color": Color(0.75, 0.45, 1.0)},
 }
 
 # The generated family's price. It is the Common floor these six already sat
@@ -807,23 +827,46 @@ static func display_name(entry: Dictionary) -> String:
 
 
 # BATCH ES §1 — THE SCOPE BAND A SURFACE SHOWS, taking rarity's old slot.
-# "universal" | "class" | "spec", off the same string `_scope_ok` reads.
+# "universal" | "class", off the same string `_scope_ok` reads (HC §1 deleted
+# the third band with the scope).
 static func scope_band(scope: String) -> String:
 	if scope.begins_with("class:"):
 		return "class"
-	if scope.begins_with("spec:"):
-		return "spec"
 	return "universal"
 
 
+# **BATCH HC §1 — WHAT A SURFACE SHOWS FOR A RUNE'S BAND, READ LIVE AT ONE DOOR.**
+# `build` writes `scope`, `scope_label` and `scope_color` onto the instance, and
+# the instance rides the save — so a rune bought or cached before the re-scope
+# goes on saying `Spec` in its own fields for the rest of that run. That is GS
+# §3's reason for `shown_desc`, one field over: **the door reads the data by id
+# at render time, never the instance's copy**, so the shop row, the offer
+# button, the pouch, the map's slot and the hero sheet show the scope the rune
+# HAS. A generated stat stick (`tpl_*`) is not in the data and keeps its own.
+static func shown_scope(rune: Dictionary) -> Dictionary:
+	var id := String(rune.get("id", ""))
+	if id != "" and _load().has(id):
+		return SCOPE_INFO[scope_band(String(config(id).get("scope", "universal")))]
+	return {"label": String(rune.get("scope_label", SCOPE_INFO["universal"]["label"])),
+		"color": rune.get("scope_color", SCOPE_INFO["universal"]["color"])}
+
+
+# **BATCH HC §1 — A RUNE ROLLS FOR EVERY HERO OF ITS CLASS.** The spec branch
+# that stood here passed a `spec:` rune only for a matching LINEAGE, and a hero
+# who took a spine or a rule engine at class selection has none — so every one
+# of the sixty live ordinary runes was out of his reach (HA §1g). **It is
+# deleted, not kept for a scope nothing carries**: a branch that still resolved
+# `spec:` would be a scope read as a spec after the data stopped being one, the
+# half-repair the brief names. What narrows a class rune to the hero who can use
+# it is the three gates `eligible_ids` asks below, never the lineage. A stray
+# `spec:` entry is refused here, and `test_runes` holds the data to the two bands
+# so one cannot be authored in silence.
 static func _scope_ok(entry: Dictionary, member: Dictionary) -> bool:
 	var scope := String(entry.get("scope", "universal"))
 	if scope == "universal":
 		return true
 	if scope.begins_with("class:"):
 		return scope.trim_prefix("class:") == String(member["key"])
-	if scope.begins_with("spec:"):
-		return scope.trim_prefix("spec:") == String(member.get("spec", ""))
 	return false
 
 
@@ -847,9 +890,12 @@ static func _scope_ok(entry: Dictionary, member: Dictionary) -> bool:
 # stat family, and `grant_rune` falls back to `generate_rune`"*. The second half
 # still holds and the first is what FM removed: with the family out of the offer
 # `generate` returns `{}` on an exhausted pool, so `grant_rune`'s fallback lands
-# on an empty too. **An empty offer is a ruled outcome, not a fault** — every
-# authored rune is spec-scoped and five per hero, so a hero who has seen his
-# five has seen the pool. The four offer sites each say so (FM §2).
+# on an empty too. **An empty offer is a ruled outcome, not a fault** — the
+# authored pool is finite, so a hero who has seen what his gates let through has
+# seen the pool. The four offer sites each say so (FM §2). *(FM wrote "every
+# authored rune is spec-scoped and five per hero"; since HC §1 every one is
+# class-scoped, and what a hero can be offered is his class's set less what the
+# gates withhold — `docs/reports/HC.md` §3 counts it per class.)*
 static func is_retired(id: String) -> bool:
 	return String((_load().get(id, {}) as Dictionary).get("retired", "")) != ""
 
@@ -872,7 +918,8 @@ static func is_retired(id: String) -> bool:
 #   · CANNOT WORK WITHOUT THE ENGINE — the field is read only inside the engine's
 #     block, or through a meter only the engine installs (Resonance, Mercy,
 #     Focus, Ruin, Faith, Loyalty, the holds), or it modifies a card that is
-#     itself refused without the engine. **Gated: these 35.**
+#     itself refused without the engine — or, since HC §2, a card that only the
+#     engine brings. **Gated: GV's 35 and HC's one (Layered Aegis), 36.**
 #   · HALF-WORKS — Killing Cold still bites a boss that sits on four Chilled,
 #     Glass Prison still freezes a second body for a turn, Blood Debt still
 #     bills the target. **NOT gated**, GP's reading.
@@ -880,18 +927,20 @@ static func is_retired(id: String) -> bool:
 #     (Burn, Chilled, Bleed, Poison), a stance any swap card reaches, a card the
 #     class pool offers, or a companion Call the Wilds fields. **NOT gated.**
 #
-# **TWO OF THE THIRTY-FIVE ARE WORSE THAN NOTHING WITHOUT THEIR ENGINE**, which
+# **TWO OF THE ROWS ARE WORSE THAN NOTHING WITHOUT THEIR ENGINE**, which
 # is a second reason for the row rather than the first: the Martyr's price (no
 # heal but his own) and Thin Blood's (his poison stops biting) are read with no
 # engine at all, while what each pays for is read only under it.
 #
-# **"HAS IT EQUIPPED", NEVER "OWNS IT", AND THE CODE LEAVES NO OTHER READING.** A
-# hero is offered a spec rune only for his LINEAGE (`_scope_ok`), the lineage is
-# the engine he took at class selection, and nothing sells or discards an engine
-# rune — so every hero who can be offered Deepening Hex OWNS the Rune of the
-# Occultist for the whole run. A gate reading ownership would withhold nothing.
-# The fight reads the same set (`held_engines`, the spawn's `engines`), and so do
-# the card gate and a rune's `requires_ability` on an engine's enabler.
+# **"HAS IT EQUIPPED", NEVER "OWNS IT".** The fight reads the equipped set
+# (`held_engines`, the spawn's `engines`), and so do the card gate and a rune's
+# `requires_ability` on an engine's enabler. *GV's second reason — that a hero was
+# offered a spec rune only for his LINEAGE, so every hero who could be offered
+# Deepening Hex owned the Rune of the Occultist and a gate on ownership would
+# withhold nothing — went with the spec scope at HC §1.* A row is class-scoped
+# now, so it reaches heroes who do not own its engine at all, and this table is
+# what withholds it from them: **it is the whole of the narrowing a lineage used
+# to do, and a second engine opens its runes** (`docs/reports/HC.md` §2).
 const ENGINE_READ := {
 	# OLD GODS — `_gain_ruin` returns at once with no Occultist equipped, and it
 	# is the one door a Ruin stack is laid through (Transference only MOVES one).
@@ -911,6 +960,15 @@ const ENGINE_READ := {
 	"deep_absorb": {"engine": "conviction", "why": "adds Faith to an absorb; `_gain_faith` returns with no Devout"},
 	"fourth_stack": {"engine": "conviction", "why": "moves the Faith release; `_gain_faith` returns with no Devout"},
 	"bare_altar": {"engine": "conviction", "why": "doubles an absorb's Faith; its price lands on Divine Shield, the engine's enabler"},
+	# BATCH HC §2 — RE-SORTED FROM GV's CARD GROUP. Its `requires_ability` is Divine
+	# Shield, which is in no pool, no boss pool and no kit: it is the engine's
+	# ENABLER and travels with it, so the requirement was an engine gate that only
+	# the ROLL asked. The cache's answer (`_engine_seated`) and the seat
+	# (`sits_out`) ask this table and not the requirement, so a hero who unslots the
+	# engine between a cache's drop and its answer was handed a rune that modifies
+	# nothing, and one who unslots it while wearing the rune got no tell. A row here
+	# is the same gate at all three doors; the roll withholds exactly what it did.
+	"layered_aegis": {"engine": "conviction", "why": "adds to Divine Shield, the engine's enabler; the card leaves with the engine"},
 	# OVERBURN — both ride `_overburn_refund`, whose first line refuses a hero
 	# without the engine.
 	"ember_leap": {"engine": "overburn", "why": "consumed fire leaps inside `_overburn_refund`, which refuses without the engine"},
@@ -1000,9 +1058,23 @@ const COMPANION_READ := {
 }
 
 
-# Whether rune `id` cannot pay without a companion on the field. THE ONE ANSWER.
+# Whether rune `id` cannot pay without a companion on the field. THE ONE ANSWER
+# for an ORDINARY rune — the offer asks it, so a row is withheld from a hero who
+# has dismissed the pet.
 static func reads_companion(id: String) -> bool:
 	return COMPANION_READ.has(id)
+
+
+# **BATCH HC §5 — AND FOR ANY RUNE, AN ENGINE RUNE INCLUDED.** An engine rune whose
+# engine needs a companion (`Classes.engine_needs_pet`: Pack Bond) is dead beside a
+# dismisser, and the designer ruled that pairing LEGAL AND VISIBLE — so it is not
+# a `COMPANION_READ` row, which the OFFER reads, and the Rune of the Beastmaster is
+# still offered to a Lethal Aim holder. It is asked only where a rune already HELD
+# is shown: `sits_out` below and the one sentence (`Run.rune_sits_out_note`).
+static func needs_companion(id: String) -> bool:
+	if reads_companion(id):
+		return true
+	return Classes.engine_needs_pet(String(config(id).get("engine", "")))
 
 
 # ══ BATCH GX — A RUNE ALREADY IN A SLOT, WITH ITS ENGINE OUT ════════════════
@@ -1021,11 +1093,16 @@ static func reads_companion(id: String) -> bool:
 # inside it still refuses for want of the engine. **This function changes
 # nothing about what a rune does; it is what the screens ask so they can say
 # so.** Re-slot the engine and the rune pays again, because nothing was moved.
+#
+# **BATCH HC §5 — AND AN ENGINE RUNE THAT NEEDS THE PET SITS OUT BESIDE THE ONE
+# THAT DISMISSES IT** (`needs_companion`): the Rune of the Beastmaster slotted beside
+# the Rune of the Sharpshooter. Ruled legal and visible, so nothing is written and
+# nothing is withheld; the same four surfaces say so with the same sentence.
 static func sits_out(id: String, engines: Array) -> bool:
 	var e := engine_read(id)
 	if e != "" and not engines.has(e):
 		return true
-	return reads_companion(id) and Classes.dismisses_pet(engines)
+	return needs_companion(id) and Classes.dismisses_pet(engines)
 
 
 # Authored entries this member may roll, excluding names already in their pouch
@@ -1189,9 +1266,20 @@ static func _engine_withheld(id: String, equipped: Array) -> bool:
 	return e != "" and not equipped.has(e)
 
 
+# **BATCH HC §5 — THE OTHER HALF, BY NAME.** Whether `offerable` withholds rune
+# `id` for the PET — it needs a companion the equipped engines dismiss — and not
+# for an engine. The cache's overlay asks it to split what a queued triple holds
+# back into its two causes, because the engine sentence (*"wait on X being
+# equipped"*) is false of a rune that waits on a dismisser being UNequipped.
+static func pet_holds_back(id: String, equipped: Array) -> bool:
+	return not offerable(id, equipped) and not _engine_withheld(id, equipped)
+
+
 # The engine runes, by name, that the runes `ids` wait on — "the Rune of the
-# Occultist", or two joined by "or". A spec rune reads its own lineage's engine,
-# so today this is always one name; the join is for the day it is not.
+# Occultist", or two joined by "or". **BATCH HC §1 — THE JOIN IS LIVE NOW.** A
+# spec rune read its own lineage's engine, so this was always one name; a class
+# rune reads any of the class's engines, so what a hero is waiting on can be
+# two of them at once.
 static func waited_on(ids: Array) -> String:
 	var names: Array = []
 	for id in ids:
@@ -1223,8 +1311,8 @@ static func empty_offer_reason(member: Dictionary) -> String:
 	if locked_by_pet(member).is_empty():
 		return base
 	var clause := "need a companion, which the %s dismisses" % dismisser_name(held_engines(member))
-	if base == "they already carry every rune written for that awakening":
-		return "the runes left for that awakening %s" % clause
+	if base == "they already carry every rune written for that class":
+		return "the runes left for that class %s" % clause
 	return "%s, or %s" % [base, clause]
 
 
@@ -1233,13 +1321,13 @@ static func _empty_offer_base(member: Dictionary) -> String:
 	var by_engine := locked_by_engine(member)
 	var by_kit := not locked_by_kit(member).is_empty()
 	if not by_engine.is_empty() and by_kit:
-		return "the runes left for that awakening wait on abilities they have not earned, or on %s being equipped" % \
+		return "the runes left for that class wait on abilities they have not earned, or on %s being equipped" % \
 			waited_on(by_engine)
 	if not by_engine.is_empty():
-		return "the runes left for that awakening wait on %s being equipped" % waited_on(by_engine)
+		return "the runes left for that class wait on %s being equipped" % waited_on(by_engine)
 	if by_kit:
-		return "the runes left for that awakening wait on abilities they have not earned"
-	return "they already carry every rune written for that awakening"
+		return "the runes left for that class wait on abilities they have not earned"
+	return "they already carry every rune written for that class"
 
 
 # The name of the equipped engine rune that dismisses the pet (HB), or a plain

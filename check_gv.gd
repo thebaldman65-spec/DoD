@@ -1,8 +1,8 @@
 # BATCH GV — THE RUNES THAT READ AN ENGINE.
 #
 #   §0  THE POPULATION — every live rune a hero can be offered: the engine runes
-#       (an engine each, no payload, class scope) and the ordinary runes (spec
-#       scope, a payload of fields); `Runes.ENGINE_READ` against this gate's own
+#       (an engine each, no payload, class scope) and the ordinary runes (class
+#       scope since HC §1, the lineage kept in `written_for`, a payload of fields); `Runes.ENGINE_READ` against this gate's own
 #       copy of the ruled rows, and the rows and the named groups partitioning
 #       the ordinary runes with nothing over and nothing missing
 #   §1  EVERY ORDINARY RUNE DRIVEN BOTH WAYS — a board per arm: its engine
@@ -16,8 +16,8 @@
 #       cache and the bargain, rolled equipped and answered unequipped — the rows
 #       sit out, stay stored, and come back; the event verb; the empty-offer
 #       sentence's causes
-#   §3  WHAT A HERO WITH NO ENGINE, AND ONE WITH TWO, CAN BE OFFERED — per class
-#       and per lineage, a number and a list
+#   §3  WHAT A HERO CAN BE OFFERED — per class, with no engine, with each single
+#       engine and with every pair: a number and a list (HC §3's table)
 #   §4  A WHOLE RUN PER ARM, ON THE REAL SCREENS — the rune offers each hero was
 #       shown, by name: none a row with its engine unequipped, and rows shown to
 #       a hero holding two
@@ -62,6 +62,12 @@ const ROWS := {
 	"grace": "mercy", "martyr_fk": "mercy",
 	"deep_absorb": "conviction", "fourth_stack": "conviction",
 	"bare_altar": "conviction",
+	# BATCH HC §2 — THE THIRTY-SIXTH ROW, AND ITS READING DID NOT CHANGE: it
+	# needs Divine Shield, the Devout's enabler, which leaves with Conviction.
+	# GV sorted it CARD because `requires_ability` withholds it at the ROLL; HC
+	# drove the ANSWER, which never asks the requirement, and a cache rolled
+	# with Conviction slotted handed it over after Conviction was unslotted.
+	"layered_aegis": "conviction",
 	"ember_leap": "overburn", "pyre_debt": "overburn",
 	"second_winter": "permafrost",
 	"resonant_core_fk": "resonance", "half_note": "resonance",
@@ -98,7 +104,6 @@ const GROUPS := {
 	"long_blade": ["CARD", "Sever"],
 	"full_board": ["CARD", "Cull"],
 	"carrion": ["CARD", "Downwind"],
-	"layered_aegis": ["CARD", "Divine Shield — the Devout's enabler, so its requires_ability already withholds it"],
 	"answering_pack": ["CARD", "a companion, which Call the Wilds fields with no engine"],
 	"bared_fang": ["CARD", "a companion, which Call the Wilds fields with no engine"],
 	"long_fuse": ["STATUS", "Burn"],
@@ -188,8 +193,12 @@ func _ordinary() -> Array:
 	return out
 
 
+# **BATCH HC §1 — THE LINEAGE A RUNE WAS WRITTEN FOR IS `written_for`.** It was
+# the scope until the scope became the class; the field is history the game never
+# reads, and this gate reads it for the one thing history is for — which lineage's
+# engine and cards a drive seats to reach the rune's read site.
 func _lineage(id: String) -> String:
-	return String(Runes.config(id).get("scope", "")).trim_prefix("spec:")
+	return String(Runes.config(id).get("written_for", ""))
 
 
 func _hero(s: Node, key: String) -> BattleUnit:
@@ -244,7 +253,12 @@ func _board(id: String, equip: bool, wear: bool) -> Node:
 	over[seat]["runes"] = worn
 	var cards: Array = (EXTRA_CARDS.get(id, []) as Array).duplicate()
 	var req := String(Runes.config(id).get("requires_ability", ""))
-	if req != "" and not cards.has(req):
+	# BATCH HC §2 — AN ENGINE'S OWN ENABLER IS NEVER DRAFTED. It is in no pool
+	# (`check_gn` §0), so no hero holds it without the engine; seated here by
+	# hand it would be a state the game cannot reach, and the arm with the engine
+	# merely owned would pay off it. The engine brings it, and takes it away.
+	var own_enabler: bool = ROWS.has(id) and Classes.engine_enablers(String(ROWS[id])).has(req)
+	if req != "" and not cards.has(req) and not own_enabler:
 		cards.append(req)
 	over[seat]["bm_abilities"] = cards
 	over[seat]["bm_equipped"] = cards.duplicate()
@@ -332,8 +346,11 @@ func _s0_the_population() -> void:
 				"§0: the engine rune %s is a row — an engine rune is what the gate checks FOR" % id)
 		else:
 			ordinary += 1
-			ok(String(e.get("scope", "")).begins_with("spec:"),
-				"§0: the ordinary rune %s is not scoped to a lineage" % id)
+			# BATCH HC §1 — scoped to the CLASS of the lineage it was written for.
+			ok(String(e.get("scope", "")) == "class:" + Classes.class_of_spec(_lineage(String(id)))
+					and _lineage(String(id)) != "",
+				"§0: the ordinary rune %s is not scoped to the class of the lineage it was written for (%s, %s)"
+					% [id, e.get("scope", ""), _lineage(String(id))])
 			ok(not (e.get("payload", {}) as Dictionary).is_empty(),
 				"§0: the ordinary rune %s has no payload to trace" % id)
 	print("    %d live: %d engine runes and %d ordinary runes" % [engines + ordinary, engines, ordinary])
@@ -344,8 +361,10 @@ func _s0_the_population() -> void:
 	for id in ROWS:
 		ok(Runes.engine_read(String(id)) == String(ROWS[id]),
 			"§0: %s reads %s by ruling and the table says '%s'" % [id, ROWS[id], Runes.engine_read(String(id))])
-		# A ROW READS ITS OWN LINEAGE'S ENGINE — the only one a hero in its
-		# scope can have come to it by.
+		# A ROW READS THE ENGINE OF THE LINEAGE IT WAS WRITTEN FOR — the only one a
+		# hero in its scope could come to it by while the scope was the lineage (GV),
+		# and an authoring fact since the scope became the class (HC §1): a row is the
+		# lineage's rune, and the engine is what that lineage brought.
 		ok(Classes.engine_of_spec(_lineage(String(id))) == String(ROWS[id]),
 			"§0: %s is a %s rune and its row names %s" % [id, _lineage(String(id)), ROWS[id]])
 		ok(not GROUPS.has(id), "§0: %s is a row AND in a group" % id)
@@ -453,7 +472,14 @@ func _drive(id: String, s: Node) -> Dictionary:
 			s._gain_faith(ally, 5, "gv")
 			return {"peak": ally.faith_peak}
 		"layered_aegis":
-			var cast3 := await _cast(s, u, "Divine Shield", ally)
+			# BATCH HC §2 — OFF THE BAR ONLY. Divine Shield is the Devout's enabler:
+			# it is on the bar while Conviction is slotted and nowhere else, so with
+			# the engine merely owned the drive casts nothing — the state the game is
+			# in. `_card`'s fall-back to the pool would cast a card no hero without
+			# the engine can hold, which is how this read as a CARD rune at GV.
+			var cast3 := false
+			if s._find_ability(u, "Divine Shield") != null:
+				cast3 = await _cast(s, u, "Divine Shield", ally)
 			var warded := 0
 			for h in s.get("heroes"):
 				if not h.is_companion and h.has_status("barrier"):
@@ -963,18 +989,36 @@ func _s2_the_doors() -> void:
 					"§2a: %s reads no engine and is not rolled for a %s either way" % [id2, spec])
 	ok(opened == ROWS.size(), "§2a: equipping the engine opened %d rows, not %d" % [opened, ROWS.size()])
 	print("    the roll: every row withheld from its owner unequipped and rolled once equipped (%d)" % opened)
-	# (b) THE LOAD-BEARING READING: A SECOND ENGINE WIDENS NOTHING. A Holy Cleric
-	# with the Old Gods equipped beside Mercy is rolled no Occultist rune — scope
-	# is the lineage, and the gate is not a door into another lineage's runes.
+	# (b) **BATCH HC §1 — A SECOND ENGINE OPENS ITS RUNES, AND THE READING THIS ARM
+	# HELD IS INVERTED, NOT DROPPED.** GV's *"a second engine widens nothing"* was
+	# the spec scope's consequence — scope was the lineage, so another lineage's
+	# rows were out of reach whatever he slotted. The scope is the class now, and
+	# the engine gate is exactly the door into a row: a Holy Cleric with the Old
+	# Gods slotted beside Mercy is rolled the Occultist rows, and with the Old Gods
+	# merely OWNED he is rolled none of them. Both arms, and his own Mercy rows in
+	# both, so neither reading can pass on an empty roll.
 	var holy := _member("holy", true)
 	var og: Dictionary = Runes.build(Runes.engine_rune_id("old_gods"))
 	og["equipped"] = true
 	holy["engines"] = (holy["engines"] as Array) + [og]
 	var two: Array = Runes.eligible_ids(holy, [])
-	var occ_rolled := two.filter(func(i): return _lineage(String(i)) == "occultist")
-	ok(occ_rolled.is_empty(),
-		"§2b: a Holy Cleric holding the Old Gods second is rolled Occultist runes — %s" % [occ_rolled])
-	ok(two.any(func(i): return ROWS.get(String(i), "") == "mercy"),
+	var occ_rows: Array = []
+	for rid in ROWS:
+		if String(ROWS[rid]) == "old_gods" and String(Runes.config(String(rid)).get("requires_ability", "")) == "":
+			occ_rows.append(String(rid))
+	var occ_rolled := two.filter(func(i): return occ_rows.has(String(i)))
+	ok(occ_rolled.size() == occ_rows.size() and not occ_rows.is_empty(),
+		"§2b: a Holy Cleric holding the Old Gods second is rolled %d of the %d Old Gods rows that need no card — %s" % [
+			occ_rolled.size(), occ_rows.size(), occ_rolled])
+	var holy_off := _member("holy", true)
+	var og_off: Dictionary = Runes.build(Runes.engine_rune_id("old_gods"))
+	og_off["equipped"] = false
+	holy_off["engines"] = (holy_off["engines"] as Array) + [og_off]
+	var two_off: Array = Runes.eligible_ids(holy_off, [])
+	ok(not two_off.any(func(i): return occ_rows.has(String(i))),
+		"§2b: a Holy Cleric who OWNS the Old Gods and has not slotted it is rolled its rows")
+	ok(two.any(func(i): return ROWS.get(String(i), "") == "mercy")
+			and two_off.any(func(i): return ROWS.get(String(i), "") == "mercy"),
 		"§2b: ...and he is rolled none of his own Mercy rows either — the arm cannot be read")
 	# (c) THE ELITE CACHE AND THE BARGAIN — ROLLED EQUIPPED, ANSWERED UNEQUIPPED.
 	await _s2c_the_cache()
@@ -996,7 +1040,14 @@ func _s2_the_doors() -> void:
 	for id3 in Runes.eligible_ids(full, []):
 		if not Runes.is_engine_rune(String(id3)):
 			(full["runes"] as Array).append(Runes.build(String(id3)))
-	ok(not Runes.empty_offer_reason(full).contains("equipped"),
+	# **BATCH HC §1 — "EQUIPPED" CAN BE TRUE OF HIS CLASS AND NOT OF HIM.** At the
+	# spec scope everything left for him was his lineage's, so the word alone said
+	# the sentence blamed his own engine. At the class scope the Holy's and the
+	# Devout's rows are left too, and they DO wait on engines he has not slotted —
+	# so the sentence says so, and what it must not do is name the one he has.
+	var why_full := Runes.empty_offer_reason(full)
+	print("    the same Occultist with the Old Gods equipped and his runes taken: \"%s\"" % why_full)
+	ok(not why_full.contains("Rune of the Occultist"),
 		"§2f: an Occultist with the Old Gods equipped is told his runes wait on it")
 
 
@@ -1210,23 +1261,40 @@ func _s2d_the_peddler() -> void:
 
 
 # ── §3 — WHAT A HERO CAN BE OFFERED ─────────────────────────────────────────
+#
+# **BATCH HC §3 — PER CLASS, AND THE NUMBER THE DESIGN PASS STARTS FROM.** GV's
+# form asked what a LINEAGE could be offered, because the scope was the lineage.
+# The scope is the class since HC §1, so the question is the brief's: a hero of
+# each class with NO engine, with EACH single engine, and with EVERY pair — AT
+# SPAWN (his opening kit and his slotted engines) and at the CEILING (every card
+# his class draft pool and his lineage's boss pool hold, drafted). **The counts
+# and the names are PRINTED, never asserted** — how many a class should hold is
+# the design pass's, and a pinned count would be a second copy of HC §3's table.
+# **What is asserted is how the gates compose**: with no engine he is offered
+# exactly the class's runes that no gate withholds; a single engine opens its
+# own rows and no other engine's; a pair's offer is its two singles' union, less
+# every rune that needs a companion when either dismisses the pet.
 
-# His whole reachable rune pool, his kit made whole, with his lineage's engine
-# EQUIPPED or merely owned — and, for two, a second engine of his class beside it.
-func _reach(spec: String, equip: bool, second := "") -> Array:
-	var m := _member(spec, equip)
-	var cards: Array = []
-	for id in _ordinary():
-		if _lineage(id) == spec:
-			var req := String(Runes.config(id).get("requires_ability", ""))
-			if req != "":
-				cards.append(req)
-	m["bm_abilities"] = cards
-	if second != "":
-		var r: Dictionary = Runes.build(Runes.engine_rune_id(second))
+# One hero of `cls`, lineage `lineage`, holding `engines` slotted; at the
+# ceiling his whole draftable set is drafted. His ordinary offer, sorted.
+func _offer(cls: String, lineage: String, engines: Array, ceiling: bool) -> Array:
+	var eng: Array = []
+	for pid in engines:
+		var r: Dictionary = Runes.build(Runes.engine_rune_id(String(pid)))
 		r["equipped"] = true
-		m["engines"] = (m["engines"] as Array) + [r]
-	return Runes.eligible_ids(m, [])
+		eng.append(r)
+	var cards: Array = []
+	if ceiling:
+		cards = Classes.draft_pool(cls).duplicate()
+		for n in Classes.spec_pool(lineage):
+			if not cards.has(n):
+				cards.append(n)
+	var m := {"key": cls, "spec": lineage, "runes": [], "bm_abilities": cards,
+		"bm_equipped": cards.duplicate(), "engines": eng, "awakened": true}
+	var out: Array = Runes.eligible_ids(m, []).filter(
+		func(i): return not Runes.is_engine_rune(String(i)))
+	out.sort()
+	return out
 
 
 func _names(ids: Array) -> Array:
@@ -1237,48 +1305,67 @@ func _names(ids: Array) -> Array:
 
 
 func _s3_what_can_be_offered() -> void:
-	print("\n§3 — what a hero can be offered, his kit made whole")
+	print("\n§3 — what a hero can be offered: per class, no engine, each engine and every pair")
 	for cls in SEATS:
-		var cls_total := 0
-		var cls_bare := 0
-		print("    %s" % cls.to_upper())
-		for spec in Classes.SPEC_IDS[cls]:
-			var eq: Array = _reach(String(spec), true)
-			var bare: Array = _reach(String(spec), false)
-			var own_eq: Array = eq.filter(func(i): return not Runes.is_engine_rune(String(i)))
-			var own_bare: Array = bare.filter(func(i): return not Runes.is_engine_rune(String(i)))
-			cls_total += own_eq.size()
-			cls_bare += own_bare.size()
-			print("      %-12s equipped: %d of his lineage's runes; engine unequipped: %d — %s" % [
-				Classes.SPEC_INFO[spec]["name"], own_eq.size(), own_bare.size(), ", ".join(_names(own_bare))])
-			for id in own_bare:
-				ok(not ROWS.has(String(id)),
-					"§3: a %s with his engine unequipped can be offered the row %s" % [spec, id])
-			# TWO ENGINES: his own and one more of his class. The second opens
-			# nothing of another lineage's — scope is the lineage.
-			# **BATCH HB — AND ONE SECOND ENGINE TAKES SOMETHING AWAY.** The
-			# Sharpshooter's Lethal Aim dismisses the pet, so a hero holding it
-			# second is offered his runes less every one that needs a companion
-			# (`Runes.COMPANION_READ` — all six of the Beastmaster's); every other
-			# pairing still offers exactly his own, which is the positive arm.
-			for pid in Classes.class_engines(cls):
-				if String(pid) == Classes.engine_of_spec(String(spec)):
-					continue
-				var two: Array = _reach(String(spec), true, String(pid))
-				var two_own: Array = two.filter(func(i): return not Runes.is_engine_rune(String(i)))
-				var dismisses: bool = Classes.dismisses_pet([String(pid)])
-				var want_two: Array = own_eq.filter(func(i): return not (dismisses and Runes.reads_companion(String(i))))
-				ok(two_own.size() == want_two.size(),
-					"§3: a %s holding %s second is offered %d of his runes, not %d" % [
-						spec, pid, two_own.size(), want_two.size()])
-		print("      the class: %d of its lineages' runes reachable with each engine equipped, %d with it unequipped" % [
-			cls_total, cls_bare])
-	# THE SPINE-TAKER: no lineage, so no spec rune at all, engine or none.
-	for cls2 in SEATS:
-		var m := {"key": cls2, "spec": "", "runes": [], "bm_abilities": [], "engines": [], "awakened": true}
-		var ids: Array = Runes.eligible_ids(m, [])
-		ok(ids.all(func(i): return Runes.is_engine_rune(String(i))),
-			"§3: a %s with no lineage is offered a spec rune" % cls2)
+		var mine: Array = _ordinary().filter(
+			func(i): return String(Runes.config(String(i)).get("scope", "")) == "class:" + cls)
+		# THE SET NO GATE WITHHOLDS FROM A HERO HOLDING NOTHING: not a row, no card
+		# to name, and — with no dismisser slotted — any rune needing a companion.
+		var free: Array = mine.filter(func(i): return (not ROWS.has(String(i))
+			and String(Runes.config(String(i)).get("requires_ability", "")) == ""))
+		free.sort()
+		var bare_sp := _offer(cls, "", [], false)
+		var bare_ce := _offer(cls, "", [], true)
+		print("    %s — %d ordinary runes. NO ENGINE: %d at spawn, %d at the ceiling" % [
+			cls.to_upper(), mine.size(), bare_sp.size(), bare_ce.size()])
+		print("      at spawn: %s" % (", ".join(_names(bare_sp)) if not bare_sp.is_empty() else "(none)"))
+		ok(bare_sp == free,
+			"§3: a %s holding no engine is offered %s at spawn, not the %d runes no gate withholds (%s)" % [
+				cls, _names(bare_sp), free.size(), _names(free)])
+		ok(not bare_ce.any(func(i): return ROWS.has(String(i))),
+			"§3: a %s holding no engine can be offered a row at the ceiling — %s" % [
+				cls, _names(bare_ce.filter(func(i): return ROWS.has(String(i))))])
+		var engs: Array = Classes.class_engines(cls)
+		for pid in engs:
+			var lin := Classes.engine_spec(String(pid))
+			var one_sp := _offer(cls, lin, [pid], false)
+			var one_ce := _offer(cls, lin, [pid], true)
+			var leak: Array = one_ce.filter(
+				func(i): return ROWS.has(String(i)) and String(ROWS[String(i)]) != String(pid))
+			ok(leak.is_empty(), "§3: a %s holding %s alone is offered another engine's row — %s" % [
+				cls, pid, _names(leak)])
+			var dis: bool = Classes.dismisses_pet([String(pid)])
+			var missing: Array = mine.filter(func(i): return (String(ROWS.get(String(i), "")) == String(pid)
+				and not one_ce.has(String(i)) and not (dis and Runes.reads_companion(String(i)))))
+			ok(missing.is_empty(), "§3: a %s holding %s is never offered its own rows %s" % [
+				cls, pid, _names(missing)])
+			print("      %-22s %2d at spawn, %2d at the ceiling — spawn: %s" % [
+				Classes.engine_title(String(pid)), one_sp.size(), one_ce.size(),
+				", ".join(_names(one_sp)) if not one_sp.is_empty() else "(none)"])
+		var best := -1
+		var best_label := ""
+		var best_names: Array = []
+		for x in engs.size():
+			for y in range(x + 1, engs.size()):
+				var pa := String(engs[x])
+				var pb := String(engs[y])
+				var la := Classes.engine_spec(pa)
+				var pair_ce := _offer(cls, la, [pa, pb], true)
+				var dis2: bool = Classes.dismisses_pet([pa, pb])
+				var want: Array = []
+				for i in _offer(cls, la, [pa], true) + _offer(cls, la, [pb], true):
+					if not want.has(i) and not (dis2 and Runes.reads_companion(String(i))):
+						want.append(i)
+				want.sort()
+				ok(pair_ce == want,
+					"§3: a %s holding %s and %s is offered %d, not the %d its two engines open — the gates are not an AND" % [
+						cls, pa, pb, pair_ce.size(), want.size()])
+				if pair_ce.size() > best:
+					best = pair_ce.size()
+					best_label = "%s + %s" % [Classes.engine_title(pa), Classes.engine_title(pb)]
+					best_names = _names(pair_ce)
+		print("      the best pair on %s's lineage: %s — %d at the ceiling: %s" % [
+			best_label.get_slice(" + ", 0), best_label, best, ", ".join(best_names)])
 
 
 # ── §4 — A WHOLE RUN PER ARM ────────────────────────────────────────────────
@@ -1306,10 +1393,12 @@ const ROAD_SEED := 20260919
 const MAX_STEPS := 900
 const FRAME_CAP := 30000
 # THREE ROADS FOR THE ARM WITH EVERY ENGINE UNEQUIPPED, SO EVERY LINEAGE WALKS
-# ONE: a party is one hero of each class, a rune is offered only to its own
-# lineage, and "no row reaches him" is a claim about all twelve. ONE ROAD FOR THE
-# ARM HOLDING TWO ENGINES — its claim is that rows DO reach a holder, and the
-# first road seats four lineages holding sixteen of the thirty-five rows.
+# ONE: a party is one hero of each class, and "no row reaches him" is a claim
+# about all twelve lineages' engines. *(Since HC §1 a rune reaches every hero of
+# its class, so each road already puts every row of a class in front of its hero;
+# the three still walk every lineage, which is what the arm was built to cover.)*
+# ONE ROAD FOR THE ARM HOLDING TWO ENGINES — its claim is that rows DO reach a
+# holder, and since HC the second engine's rows reach him as well as his own.
 const ROADS := [
 	["berserker", "arcanist", "occultist", "sharpshooter"],
 	["warden", "pyromancer", "holy", "beastmaster"],
@@ -1563,10 +1652,14 @@ func _s4_the_road() -> void:
 		for spec in _shown:
 			var names: Array = (_shown[spec] as Dictionary).keys()
 			names.sort()
+			# BATCH HC §1 — ANY ROW, WHOSEVER LINEAGE IT WAS WRITTEN FOR: at the
+			# class scope a hero holding two engines is shown the second's rows too,
+			# so counting only his own lineage's would under-read the arm this
+			# count is the positive of. A row shown with its engine OUT is still
+			# `_leaks`' to catch, per offer.
 			for nm in names:
 				for id in ROWS:
-					if String(Runes.config(String(id)).get("name", "")) == String(nm) \
-							and _lineage(String(id)) == String(spec):
+					if String(Runes.config(String(id)).get("name", "")) == String(nm):
 						rows_shown += 1
 			print("      [%s] %-12s was shown %d: %s" % [arm, Classes.SPEC_INFO[spec]["name"],
 				names.size(), ", ".join(names)])

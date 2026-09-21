@@ -542,14 +542,17 @@ func _no_ability_grants() -> void:
 func _rune_audit() -> void:
 	var pool := _rune_pool()
 	var mystic: Array = []
+	# BATCH HC §1 — THE SURVIVALIST'S SET IS THE ENTRIES `written_for` HIM (the code
+	# key is `mystic`, never `survivalist`), the record the re-scope kept: every
+	# one is `class:hunter` now, and read off the scope the nine read 0.
 	for id in pool:
-		if String(pool[id].get("scope", "")) == "spec:mystic":
+		if String(pool[id].get("written_for", "")) == "mystic":
 			mystic.append(id)
 	mystic.sort()
 	# **BATCH FK MOVED IT 4 -> 9** — BA's four retired plus FK's five. The walk
 	# reads the FILE, retired included; the per-field assertions below are the
 	# claim, and this count is what catches a set going missing.
-	ok(mystic.size() == 9, "nine spec:mystic runes (got %d)" % mystic.size())
+	ok(mystic.size() == 9, "nine runes written for the Survivalist (got %d)" % mystic.size())
 	# EACH STILL PAYS EXACTLY WHAT ITS TEXT ADVERTISES — only the units moved.
 	var lh: Dictionary = pool["long_hunt"]["payload"]["stat"]
 	# BATCH EM RE-KEYED THE RUNE SIDE IN PLACE. The charter disconnects runes
@@ -588,6 +591,11 @@ func _rune_audit() -> void:
 	var hunter_engines := 0
 	for id in pool:
 		if String(pool[id].get("scope", "")) != "class:hunter":
+			continue
+		# BATCH HC §1 — "CLASS-WIDE" MEANT WRITTEN FOR NO SPEC, and every Hunter rune
+		# is `class:hunter` since HC, so the three are the class entries with no
+		# `written_for` (read off the scope alone this counted 32).
+		if String(pool[id].get("written_for", "")) != "":
 			continue
 		# BATCH GK — the Hunter ENGINE runes are class:hunter too; their payload
 		# is empty, so the walk below passes them, and they are counted apart so

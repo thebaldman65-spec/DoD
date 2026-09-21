@@ -16,6 +16,50 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-09-21 &mdash; Batch HC: THE RUNES LEAVE THEIR SPECS</h2>
+<p><b>Every rune belongs to a class now, and three gates decide what a hero can use.</b> IMPLEMENT ONLY. The rune
+version of the pool merge: re-scope to the class and let the gates decide. <b>No rune was authored, retuned or
+retired</b>; no engine, kit, card, node or pool moved; the Mage pool is not split; HD and HE come after.
+Full working: <code>docs/reports/HC.md</code>.</p>
+
+<p><b>&sect;1 &mdash; SPEC SCOPE BECOMES CLASS SCOPE.</b> All <b>110</b> runes that were scoped to a spec &mdash; the 60
+live and the 50 retired &mdash; are scoped to that spec's class, mapped by the code key (the Devout's are the
+Cleric's, the Survivalist's the Hunter's). <b>A hero who took a spine, a rule engine or nothing at class selection
+can be offered ordinary runes again</b>: a Warrior 5, a Mage 3 and a Hunter 5 at the start of a run, before a card
+is drafted. <b>A Cleric still cannot</b>: all fourteen of his runes read one of his three lineage engines. The
+lineage each rune was written for is kept as a record the game never reads. Every rune's band reads
+<i>[Class]</i>, read off the rune's own entry so one bought before this batch says the same. An event that hands
+out a rune now prefers an ordinary one, as it preferred a spec rune; and a shop, cache or bargain with nothing
+left says the runes <i>written for that class</i> are taken, where it said <i>that awakening</i>.</p>
+
+<p><b>&sect;2 &mdash; THREE GATES.</b> A rune is offered only while the engine it reads is slotted, only once the hero
+holds the card it changes, and &mdash; for the six that need a companion &mdash; only while no slotted engine
+dismisses the pet. <b>Layered Aegis joins the engine gate</b>: it needs Divine Shield, which the Rune of the Devout
+brings and takes away, and a cache rolled with the rune slotted could hand it over after it was unslotted.
+<b>Six runes read a status or a stance no gate asks about</b> &mdash; Long Fuse, Killing Cold, Deep Cold, Long Poison,
+Mirror Guard, Slaughterhouse &mdash; and can reach a hero with nothing that lays what they read; that is the
+designer's to rule.</p>
+
+<p><b>&sect;3 &mdash; THE THREE HB FOLLOW-UPS, AS RULED.</b> <b>The Sharpshooter's pity meter counts once per attack</b>, not
+once per enemy or per hit: an area attack on three enemies adds +5%, where it added +15%, and a critical anywhere in
+the attack still resets it. <b>A zone boss's first offer no longer holds a companion card for a Hunter whose Lethal
+Aim dismisses the pet</b>, and an offer rolled before he slotted it holds such cards back &mdash; saying so &mdash; until
+he unslots it. <b>The Rune of the Beastmaster slotted beside the Rune of the Sharpshooter says it sits out</b>, in the
+same words and amber as a rune whose engine is out, on the same four places: the rune pouch, the hero card's engine
+line (marked &#9675;, the reason in the card's hover), the hero sheet and the fight's opening roll call. The
+pairing is still allowed.</p>
+
+<p><b>NEW GATE <code>check_hc</code></b>, seven sections, every negative with its positive. <b>WHAT MOVED:</b>
+<code>data/runes.json</code> (every spec scope, and the lineage record), <code>data/glossary.json</code>;
+<code>scripts/runes.gd</code>, <code>run_state.gd</code>, <code>classes.gd</code>, <code>battle.gd</code>, <code>unit.gd</code>,
+<code>map_screen.gd</code>, <code>party_screen.gd</code>, <code>shop_screen.gd</code>, <code>run_sim.gd</code> and
+<code>spec_choice_screen.gd</code>; twenty-five gates and suites re-pointed to the class scope (thirteen gates, twelve suites) &mdash; every repair
+broken on purpose in an isolated copy to prove it bites (<code>docs/reports/HC.md</code> &sect;7) &mdash; with
+<code>run_battery.sh</code>, <code>pin-manifest.json</code> and <code>baselines.json</code>; <code>CLAUDE.md</code> (the
+standing rule <i>A RUNE IS SCOPED TO ITS CLASS</i>, replacing ES &sect;2's spec half), <code>docs/master.html</code> and
+its stamp, <code>docs/state.md</code>, <code>docs/design-notes.md</code>, this entry and <code>docs/reports/HC.md</code>
+(<b>new</b>).</p>
+
 <h2>2026-09-21 &mdash; Batch HB: EVERY HUNTER HAS A PET</h2>
 <p><b>The companion is the Hunter's class identity now, and dismissing it is a build decision.</b>
 Authored with the designer and transcribed. <b>THE SEQUENCE SHIFTS:</b> HA planned HB for its twenty

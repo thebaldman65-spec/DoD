@@ -13,61 +13,141 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-21 (Batch HB).*
+*Last rewritten: 2026-09-21 (Batch HC).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: HB — EVERY HUNTER HAS A PET. IMPLEMENT ONLY, AUTHORED WITH THE DESIGNER AND TRANSCRIBED, AND THE
-  THIRTY-FOURTH BATCH ON `class-merge`.** The companion is the Hunter's class identity, and dismissing it is the
-  Sharpshooter's build decision. `main` is untouched. Full working: **`docs/reports/HB.md`**.
-- **THE SEQUENCE SHIFTED, AND HA's REPORT IS NOT THE CURRENT PLAN.** HA planned HB for its twenty holes and HC for the
-  other 75. **This batch took HB; the rune scopes are HC; HA's twenty holes are HD; the other 75 are HE.** HA §2's HB
-  was the twenty tier-1 arms **and** the thirty-five FOLD arms (55 arms, 23 targets), so **HD is both**, as HA priced
-  them. Nothing HA priced was repaired here except where HB's own move reached it.
-- **§1 — SUMMON COMPANION IS ONE CARD WITH THREE CALLS.** Ursus, Canis and Aguila are chosen **at the cast**, in the
-  picker the three summons already opened (`_open_summon_picker`); each call is built by `_summon_choice` for the
-  player and the bot alike and keeps its own definition, its own words and **its own cooldown**, as three cards did.
-  **The swap is unchanged**: three swap options, 10 Mana, 1.0 initiative, one shared 3-turn cooldown. **What crosses a
-  swap is what crossed it before** — Loyalty, which lives on the Hunter per companion; not health, not statuses —
-  driven on this tree and on HEAD's (`docs/reports/HB.md` §1).
-- **§2 — THE HUNTER KIT IS POWERSHOT · SNARE TRAP · SUMMON COMPANION.** Tripwire went to the **Survivalist's shelf**
-  (it had never been in a pool — GN took it from the Survivalist's opening into the kit), so the Hunter's pool is
-  **42**, the draft **179** (159 spec + 20 class) and the Survivalist's shelf **12**; **the Warden's eleven is the
-  shallowest shelf alone**. The drafted hook casts it for the bot.
-- **§3 — PACK BOND BRINGS NOTHING; GS's EXCEPTION IS RETIRED.** `PROTECTED_CORES["beastmaster"]` is slots 0, enablers
-  none. **Every Hunter's companion fights**: the strike beside the Hunter sat inside Pack Bond's check and is the
-  companion's now; the Ghost Pack node and the Ghostpack card stay Pack Bond's. **Pack Bond deepens the bond**: the
-  three boons, Loyalty's growth, the conversion at 8 and EV's fallback all read it. **The Shared Hide is not Pack
-  Bond's** — it reads a companion's blow and no engine. Re-derived at the read site: **the companion readers are
-  fourteen cards (nine refused at the door with none standing, five that do nothing without one) and six runes**,
-  ungated for every Hunter; **the bond readers are GP's and GV's Pack Bond rows, unchanged**.
-- **§4 — THE SHARPSHOOTER DISMISSES THE PET, AND ONLY HE DOES** (`Classes.PET_DISMISSERS`). A Lethal Aim holder
-  opens on **two** slots, the freed one his for a drafted card; his crit multiplier is **×2.5** (`unit.gd`
-  `SHARPSHOOTER_CRIT_MULT` 0.50 on Lethal Aim's ×2), Focus unchanged on top; and **every hit he lands without a
-  critical adds +5% critical chance, a critical resetting it to zero** (`BattleUnit.crit_pity`, moved at the one crit
-  site in `_resolve`'s strike loop, shown on the Lethal Aim chip). **No cap was written** — the brief gave none; the
-  reset governs. **The gate learned a negative**: a companion reader is withheld from his offer
-  (`Classes.offerable`, `Runes.offerable`), one he carries sits out with a note naming the rune, the summon door
-  refuses him, and **unequipping the Rune of the Sharpshooter is refused while every slot is full**, because it puts
-  Summon Companion back in the kit.
-- **THE VERIFICATION.** HEAD's unmodified battery ran first against the new tree: **121 of 121 launched, the tree hashed at the start and at the end (425 paths, none moved), no `Parse Error` in any log; 25 targets red — 10 suites and 15 gates — every one on HB's own move (the multiplier, the one summon card, Pack Bond's empty core, Tripwire's shelf, the dismissed pet, the draft of 179 in `master.html`'s needles, `check_es`'s census) — and the two sanctioned reds at their counts.** `check_de` read 35 failures and 8 notices; every one is accounted for, by FAIL text or by an `ok()` trace, in `docs/reports/HB.md` §6. **The run against the
-  tree with this batch's documents is in `docs/reports/HB.md` §7.** The player's four saves were backed up to
-  `../save-backups/HB-20260921-045412` and hash-verified before anything ran.
-- **`CLAUDE.md` IS 358,552 B = 350.15 KiB, WITH 59.85 KiB UNDER ITS 410 KiB CEILING** (+7,109 B this
-  batch: the HB standing rule and the kit, core, draft and summoning facts it moved).
-- **WHAT MOVED:** `scripts/classes.gd`, `unit.gd`, `battle.gd`, `run_state.gd`, `runes.gd`, `map_screen.gd`,
-  `party_screen.gd`, `spec_choice_screen.gd`; `data/runes.json` (the Second Whistle's words) and `data/glossary.json`;
-  eighteen gates and suites re-pointed to HB's rules — `check_dr`, `check_eh`, `check_fd`, `check_fe`, `check_gm`, `check_gn`, `check_go`, `check_gq`, `check_gs`, `check_gu`, `check_gv`, `check_gx`, `test_batch_az`, `bb`, `bo`, `bv`, `cd` and `ce` — and `pin-manifest.json`; `baselines.json`; `CLAUDE.md`, `docs/master.html` and its stamp, `docs/changelog.html`,
-  `docs/design-notes.md`, this file and `docs/reports/HB.md` (**NEW**).
-- **Phase.** Steps 1–5 of the merge's running order are done. **Step 6 is censused (HA) and its repair is HD and HE**,
-  behind HC's rune scopes. The Crown's Break and freeze resistance, Sanctity's potency layer and the engine-card texts
-  stay queued; companion runes and a new companion are queued by the brief, not authored.
-- **Next letter: HC.**
+- **Last batch: HC — THE RUNES LEAVE THEIR SPECS. IMPLEMENT ONLY, AND THE THIRTY-FIFTH BATCH ON `class-merge`.** GP's
+  pool merge one layer over: every rune is scoped to its CLASS, and three gates decide what a hero can use. `main` is
+  untouched. Full working: **`docs/reports/HC.md`**.
+- **THE SEQUENCE: HD IS NEXT** — HA's twenty holes and the fold family — **then HE**, the other seventy-five. Nothing HA
+  priced was repaired here except where HC's own move reached it (`docs/reports/HC.md` §7).
+- **§1 — SPEC SCOPE IS CLASS SCOPE.** All **110** `spec:` entries — the 60 live and the 50 retired — are `class:`,
+  mapped by the code key (`spec:inquisitor` → the Cleric, `spec:mystic` → the Hunter): **15 Warrior, 15 Mage, 14 Cleric
+  and 16 Hunter** live runes. **The lineage each was written for is kept as history in `written_for`, and the game
+  never reads it** (`test_runes` asserts none of `scripts/` does, and `Runes.build` does not copy it). `_scope_ok`'s
+  spec branch and the `Spec` band are deleted; every surface reads the band through `Runes.shown_scope`, the data by
+  id. **Every reader of a scope was censused first** (HC §1c): the event verb (`Run.grant_rune`) and the sim bot's
+  cache pick preferred `spec:<his lineage>` and prefer an ORDINARY rune now; the empty-offer sentence says *that class*.
+- **§2 — THREE GATES, AN AND AT EVERY ROLL**: the ENGINE a rune reads slotted (`Runes.ENGINE_READ`, **36 rows** —
+  GV's 35 and **Layered Aegis**, the one requirement an engine can take away between a roll and its answer), the CARD
+  it changes held (`requires_ability`, asked at the roll through `kit_names` — owned cards, benched included — and
+  never at the answer), and a COMPANION present (`Runes.COMPANION_READ`, HB's six). **HB's six companion runes are the
+  six**: four reach every Hunter who fields a companion, and the Long Leash and the Shared Scent stay Pack Bond's.
+  **Six runes fall through all three and can be useless to the hero they reach** — Long Fuse, Killing Cold, Deep Cold,
+  Long Poison, Mirror Guard, Slaughterhouse — because no class kit lays what they read (HC's ruling 1).
+- **§3 — WHAT A HERO CAN BE OFFERED, UNROUNDED** (at spawn / once every card a rune names is drafted): **with no
+  engine, Warrior 5 / 9, Mage 3 / 7, Cleric 0 / 0, Hunter 5 / 7**; the best pairs **Warrior 9 / 13, Mage 9 / 14, Cleric
+  8 / 10, Hunter 9 / 11**. **Every Cleric rune reads Mercy, Conviction or Ruin, so a Cleric holding none of the three is
+  offered no ordinary rune at all.** By name, with every single engine: `docs/reports/HC.md` §3.
+- **§4 — THE DESIGNER'S SAVE**, backed up to `../save-backups/HC-20260921-093502` and hash-verified first, driven in
+  an isolated copy: **Warrior 0 → 5, Mage 3 → 5, Cleric 0 → 0, Hunter 0 → 5** ordinary runes the doors can hand them.
+  Four of the fifteen cannot pay on that party as it stands, and a fifth only through the Hunter's wolf.
+- **§5 — HB's THREE, RULED AND BUILT.** **The pity meter counts per CAST** (one writer, `battle._note_pity`, after the
+  strike loop: Called Volley on three enemies +5%, HEAD's +15%). **The zone boss's first-tier offer asks the pet half of
+  `offerable`** (`Classes.pet_withholds`) at the roll, and filters at the answer (`Run.ability_choice`): 0 companion
+  cards in 400 rolls with Lethal Aim slotted, HEAD's 716. **Pack Bond slotted beside Lethal Aim sits out**, legal and
+  visible, in GX's sentence on GX's four surfaces — the pouch's engine row, the map card's engine line (`○`, the
+  sentence on the card's hover), the hero sheet and the roll call. **HB's other four stand as built.**
+- **THE VERIFICATION.** HEAD's unmodified battery ran first against the new code — **121 of 121 launched, no `Parse
+  Error`; `check_de` 501 / 26 failures / 8 notices, every one read before a gate moved** (`docs/reports/HC.md` §7). The
+  acceptance run: **122 of 122 (with `check_hc`), `check_de` 505 checks / 0 failures / 0 notices, no `Parse Error` and no
+  `SCRIPT ERROR` in any log, the tree hashed at the start and the end — 428 paths, none moved — and the two sanctioned
+  reds at their counts** (`check_cm_live` 13 / 4; `check_gj` 70 / 1, *"+174 gold and the purse moved 194"*). Eighteen
+  controls, one defect a copy, each read by its FAIL text, and the re-pointed gates run on HEAD's code. The player's four
+  saves were backed up to `../save-backups/HC-20260921-093502` and are byte-identical to it after everything ran.
+- **`CLAUDE.md` IS 364,607 B = 356.06 KiB, WITH 53.94 KiB UNDER ITS 410 KiB CEILING** (+6,055 B this batch: the
+  class-scope standing rule replacing ES §2's spec half, the HB block's three follow-ups, and `check_hc`).
+- **WHAT MOVED:** `data/runes.json` (every spec scope, and `written_for`) and `data/glossary.json`; `scripts/runes.gd`,
+  `run_state.gd`, `classes.gd`, `battle.gd`, `unit.gd`, `map_screen.gd`, `party_screen.gd`, `shop_screen.gd`,
+  `run_sim.gd` and `spec_choice_screen.gd`; **`check_hc.gd` (NEW)** and `run_battery.sh`; twenty-five gates and suites
+  re-pointed to the class scope — `check_da`, `check_ea`, `check_es`, `check_et`, `check_ez`, `check_fe`, `check_fk`,
+  `check_fm`, `check_fn`, `check_fo`, `check_gt`, `check_gv`, `check_gx`, `test_batch_ar`, `as`, `at`, `av`, `aw`, `ax`,
+  `ay`, `az`, `ba`, `bs`, `test_rune_battle` and `test_runes` — and `pin-manifest.json`; `baselines.json`; `CLAUDE.md`,
+  `docs/master.html` and its stamp, `docs/changelog.html`, `docs/design-notes.md`, this file and `docs/reports/HC.md`
+  (**NEW**).
+- **Phase.** Steps 1–5 of the merge's running order are done, and **the rune layer is merged** — the first of the
+  lineage layers GK's charter rules away; the boss pools and the stat blocks still read the lineage. **Step 6 is
+  censused (HA) and its repair is HD and HE.** The Crown's Break and freeze resistance, Sanctity's potency layer and
+  the engine-card texts stay queued; companion runes and a new companion are the rune design pass's, not authored.
+- **Next letter: HD.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### HB's RULINGS OWED — **SEVEN, ALL PLAYER-VISIBLE; THE FIRST TWO ARE MAGNITUDES THE BRIEF LEFT OPEN**
+### HC's RULINGS OWED — **FIVE, ALL PLAYER-VISIBLE; THE FIRST DECIDES WHAT THE RUNE DESIGN PASS STARTS FROM**
+
+Full working: `docs/reports/HC.md`, NEEDS A RULING.
+
+1. **SIX RUNES FALL THROUGH ALL THREE GATES AND CAN BE USELESS TO THE HERO THEY REACH.** Long Fuse (Burn), Killing
+   Cold and Deep Cold (Chilled), Long Poison (his own Poison), Mirror Guard (the Defensive guard) and Slaughterhouse (an
+   enemy bleeding out). **No class kit lays any of the five**, so each pays once a drafted card, an engine's enabler or
+   an ally supplies it; at the spec scope each reached one lineage, and now it reaches the class. Driven on a full road,
+   the bot was offered them while carrying nothing that could pay them. **Gate them (and on what), or leave them as a
+   draft to build toward.** No fourth gate was built.
+2. **BARED PLATE'S PRICE COSTS MOST WARRIORS NOTHING.** Its price refuses the Block roll, and a Warrior who is not of
+   the Warden's lineage and holds no Heavy Plating opens at a Block chance of 0.000 (driven) — FP's `block_chance`
+   finding below, arriving through a rune: at `spec:warden` every buyer had the Warden's 10%. **The one costed rune the
+   scope change made free.** Not retuned.
+3. **THE SCOPE BAND DISTINGUISHES NOTHING A PLAYER IS OFFERED.** Every offered rune reads `[Class]`; the band only tells
+   a retired universal from the rest. Keep it, drop it, or show something else — the lineage is `written_for`, which
+   the game may not read.
+4. **THE EMPTY-OFFER SENTENCE SAYS *"that class"* WHERE IT SAID *"that awakening"*** — one door, four sites.
+   Player-visible; confirm the word.
+5. **MARK OF THE HUNT PAYS BESIDE LETHAL AIM, AND PAYS NOTHING WITHOUT PACK BOND.** Of Pack Bond's ten reads, the two
+   that need no companion are both Mark of the Hunt's — the hunter's +25% on the marked prey and 3% of his Mana a strike
+   on it — and both sit inside `has_engine("pack")`: **15 → 18 damage and 0 → 3 Mana with Pack Bond (beside Lethal Aim
+   or alone), 15 and 0 without.** The card's text says *"Works with or without a companion"* and never names Pack Bond,
+   and it is a boss pick, so no engine gate asks about it. So the tell that Pack Bond *sits out* beside Lethal Aim is one
+   card short of true, and the card is dead to a Beastmaster-lineage Hunter who drops Pack Bond. Move the payload out
+   of the block, gate the card, or let the tell stand.
+
+### FOUND AT HC AND NOT FIXED
+
+- **THE CLERIC IS THE CLASS THE RUNE MERGE DID NOT REACH.** All fourteen of his runes are `ENGINE_READ` rows (Mercy,
+  Conviction, Ruin), so a Cleric holding a spine, a rule engine, any pair of the three non-lineage engines, or nothing,
+  is offered no ordinary rune at spawn or ever — the designer's own Cleric (Sanctity) among them. **That is the input
+  the rune design pass needs, stated here so it is not re-derived**: the Warrior's, the Mage's and the Hunter's classes
+  each hold at least three runes that read no engine; the Cleric's holds none.
+- **A CARD DRAFT'S ANSWER RE-ASKS NEITHER THE ENGINE NOR THE PET.** `draft_candidates` are rolled at the elite through
+  `Classes.offerable` and answered on the party draft screen by `take_draft_ability`, which refuses only a card the hero
+  already owns — so a card rolled while its engine was slotted is still handed over after the engine is unslotted (it
+  then sits out, GT §3). The rune cache and, since HC, the zone boss's first tier filter at the answer; the draft does
+  not. **Read at the source, not driven**; pre-existing, and not the rune layer's.
+- **THE EVENT VERB'S EMPTY LINE IS FALSE MORE OFTEN NOW.** When no hero can take a rune, `events.gd` prints *"RUNE:
+  nothing answers — every hero already carries every rune written for them."* — its own sentence, not the door the
+  four other sites share (`Runes.empty_offer_reason`). It was already false whenever a pool was empty for want of a card
+  or an engine; at the class scope that is the ordinary case (a hero's class holds rows for engines he has not
+  slotted). Player-visible; not reworded — a new phrasing is the designer's.
+- **`check_gv`'s DRIVE CAST AN ENABLER OFF THE DEFINITION TABLE.** Its `_card` falls back to `Classes.pool_ability` when
+  the hero does not hold a card, so the Layered Aegis drive cast Divine Shield on a hero whose bar could not hold it —
+  which is how GV read the rune as a CARD rune. Repaired for that drive (off the bar only); every other drive seats the
+  card it casts, so the fall-back reaches nothing else today, and it is left standing.
+- **`requires_ability` READS WHAT HE OWNS, NOT WHAT HE CARRIES**, so a rune whose card is benched is still offered and
+  pays once the card is carried again. Recorded as the loadout lever EG built, not as a defect.
+- **HEAVY PLATING'S CLIMB IS PER STRIKE, NOT PER ATTACK** — the brief's reason for the per-cast pity ruling (*"it mirrors
+  Heavy Plating, which counts per incoming attack"*) holds for an enemy's area attack and not for its multi-hit, which
+  climbs the Warden once a hit. The ruling does not depend on it; nothing moved.
+- **THE BRIEF'S PREMISES THAT DID NOT HOLD** (HC §0): *60 spec-scoped runes* is 110 with the retired; *35* engine rows
+  is 36 now; FM's *10 of 17* is 16 of 17; *a dead engine in a live slot* is one card short (ruling 5); *"§6 already
+  drives three doors"* is the brief's §7.
+- **THIRTY-TWO ISOLATED COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata`, every one named **"Dawn of Decay HC
+  …"**: the designer's-save drive (**"HC save probe"**, seeded from the backup), the recon of HEAD's gates (**"HC recon1
+  probe"**), HEAD's trees (**"HC head probe"**, **"head2"**, **"ctlhead"**, **"trace_head"**, **"trace_head2"**), this
+  tree's probes and repair runs (**"HC new probe"**, **"probe2"**, **"rep1"**–**"rep3"**, **"trace_new"**,
+  **"trace_new2"**) and the eighteen controls (**"HC ctl c01_…"** to **"c18_…"**). Each was renamed in `project.godot`
+  before anything ran in it; they can be deleted. **There are 138 such folders now.** **The untracked `save-backups/`
+  folder inside the repo is not this batch's**; this batch's backup is `../save-backups/HC-20260921-093502`.
+
+### ~~HB's RULINGS OWED~~ — **ALL SEVEN CLOSED AT HC: THREE RULED AND BUILT THERE (2, 5, 6), FOUR RULED TO STAND AS BUILT (1, 3, 4, 7)**
+
+HC's brief ruled all seven. **2**: the pity meter counts per CAST, uncapped, the reset its bound — built at HC §5a.
+**5**: the zone boss's first-tier offer filters companion cards — built at HC §5b, the pet half of `offerable` only.
+**6**: Pack Bond beside Lethal Aim is legal and sits out, visibly — built at HC §5c (and HC's ruling 5 is what it
+found). **1** (×2.5), **3** (no companion by any route), **4** (the refused unequip) and **7** (OFFENSE / BREAK) stand
+as HB built them. The working below is HB's, kept as the record of what was ruled.
+
+#### HB's seven, as HB recorded them
 
 Full working: `docs/reports/HB.md`, NEEDS A RULING.
 
@@ -100,7 +180,8 @@ Full working: `docs/reports/HB.md`, NEEDS A RULING.
 
 - **THE BOSS-POOL DOOR (ruling 5) IS GP's, NOT NEW**: `roll_spec_ability_offer`'s tier-1 draw has never asked
   `offerable` — GP left the boss pools as they were — so it reads no engine at all. HB adds the negative case to
-  what it does not ask.
+  what it does not ask. **Since HC it asks the PET half (`Classes.pet_withholds`) and still no engine** — ruled that
+  way, because the engine half would move every engine's boss offer.
 - **TWO BRIEF PREMISES DID NOT HOLD** (HB §0): Tripwire never was in the Hunter pool, so it went to it rather than
   *back*; and *cards and runes that need a companion were gated on Pack Bond* held at neither layer — GP and GV gated
   the BOND readers and left every card that needs only a companion ungated, because an earned Call the Wilds gave any
@@ -141,18 +222,19 @@ Full working: `docs/reports/HA.md`, NEEDS A RULING.
    build's.** A refusal in `main`'s `load_run`, in the profile's shape, is a small code change on `main`; whether it is
    made before `main` is next played, or the merge simply lands first, is the designer's.
 4. **THE BRANCH IS NOT READY TO LAND, AND TWO THINGS STAND BETWEEN IT AND READY** (HA §3d): the middle group, and the
-   lineage layers GK's charter rules away and nothing has built — spec-scoped runes, per-lineage boss pools and stat
-   blocks. **The rune layer is the one a player meets first**: a hero who takes a spine or a rule engine is offered no
-   ordinary rune at all, and three of the four heroes in the designer's own save are that hero. Whether those layers
+   lineage layers GK's charter rules away and nothing has built — ~~spec-scoped runes~~ (**merged at HC**: every rune is
+   scoped to its class and three gates decide, `docs/reports/HC.md`), per-lineage boss pools and stat blocks. **The
+   rune layer was the one a player meets first**: at HA a hero who took a spine or a rule engine was offered no ordinary
+   rune at all; **since HC a Warrior, a Mage or a Hunter is, and a Cleric still is not** (HC's finding). Whether those layers
    merge before landing or after is the designer's. **Tag `b722cc4` before merging** if the pre-merge game should stay
    one checkout away; nothing tags it today.
 
 ### FOUND AT HA AND NOT FIXED
 
-- **A HERO WITH NO LINEAGE CAN BE OFFERED NO ORDINARY RUNE AT ALL — GV's RULING 5, AT ITS SHARPEST.** All 60 live
-  ordinary runes are `spec:`-scoped and all 24 `class:`-scoped runes are engine runes; `Runes._scope_ok` passes a
-  `spec:` rune only for a matching lineage, and a spine-taker's is empty. **Every Peddler row, cache and bargain he is
-  shown is one of his class's engine runes.** Measured off `data/runes.json`, not driven.
+- ~~**A HERO WITH NO LINEAGE CAN BE OFFERED NO ORDINARY RUNE AT ALL — GV's RULING 5, AT ITS SHARPEST.**~~ **CLOSED AT
+  HC FOR THREE CLASSES OF FOUR**: every rune is class-scoped, and a no-engine Warrior, Mage or Hunter is offered 5, 3 and
+  5 at spawn; **the Cleric's is 0, because every Cleric rune reads a lineage engine** (HC's finding). HA's working: all
+  60 live ordinary runes were `spec:`-scoped and `Runes._scope_ok` passed one only for a matching lineage.
 - **TWO DOCUMENTS STATE A PRE-MERGE FACT AND A PIN KEEPS EACH GREEN**, and both are left for the repair batch because the
   sentence and its pin move together: `CLAUDE.md:3421` still says *"THE ONE-IN-FOUR CLASS SEAM DRAWS A REAL ENTRY FOR
   EVERY HERO IN THE GAME"* (the seam GP deleted; `test_batch_br:1566` pins it), and `docs/master.html` still says *"All
@@ -461,7 +543,9 @@ Full working: `docs/reports/GV.md`, NEEDS A RULING.
    `map_screen._pick_rune` indexes the list the buttons were built from. **The alternative is FD's literal form**: drop
    the row, top the triple up, store that — under which one toggle before answering a cache costs it those runes for
    good, and can spend the pick on nothing.
-2. **THE GATE READS WHAT HE HAS EQUIPPED, AND THAT IS THE ONLY READING THAT GATES ANYTHING.** A spec rune is offered by
+2. **THE GATE READS WHAT HE HAS EQUIPPED, AND THAT IS THE ONLY READING THAT GATES ANYTHING.** *(Its reason was the
+   spec scope, which went at HC §1: a row reaches every hero of its class now, most of whom do not own its engine, so
+   the equipped reading withholds far more than it did; the ruling asked for stands.)* A spec rune is offered by
    LINEAGE, the lineage is the engine taken at class selection, and nothing sells or discards an engine rune — so every
    hero who can be offered a row owns its engine all run, and an ownership gate would withhold nothing. **What the
    designer asked to be told**: a hero who unequips his engine is sold different runes at the Peddler (rolled as he
@@ -482,10 +566,10 @@ Full working: `docs/reports/GV.md`, NEEDS A RULING.
    lands on the HUNTER and `_shared_hide_mult` reads the COMPANION, which never receives it, so a 100g rune multiplies
    a companion's blow by exactly 1.0000 for every hero who has ever bought it. Not repaired: the fix moves a magnitude
    (CQ §6). `check_gv` §1 asserts it dead in both arms, so the day it is wired the gate says so.
-5. **THE RUNE LAYER HAS THE NARROWNESS THE CARD LAYER AVOIDED.** A hero who unequips his engine is offered none of his
-   own five runes on four lineages of twelve, and a hero holding TWO engines is offered nothing of the second's
-   lineage, because a rune's scope is still the lineage while the card pools merged at GP. Whether the rune pools merge
-   the way the draft pools did is the designer's; nothing here assumes it.
+5. ~~**THE RUNE LAYER HAS THE NARROWNESS THE CARD LAYER AVOIDED.**~~ **RULED AND BUILT AT HC: THE RUNES MERGED THE WAY
+   THE DRAFT POOLS DID** — class scope, three gates — and a second engine's runes arrive with it. The finding was: a
+   hero who unequips his engine is offered none of his own five runes on four lineages of twelve, and a hero holding
+   TWO engines is offered nothing of the second's lineage, because a rune's scope was the lineage.
 
 ### FOUND AT GV AND NOT FIXED
 
@@ -1601,7 +1685,7 @@ code, and some of what it found lives elsewhere. **The tables are in `docs/repor
   exact and contained matches against `scripts/` and `data/`). The names a merge would have made collide: Spite (a Warden node and a Berserker card), Whetstone (a Swordmaster node and a
   live rune), Second Wind (a Berserker node and a Holy card).
 
-### THE CLASS MERGE ~~IS MEASURED AND UNRULED~~ WAS MEASURED AT FP AND IS RULED — **A PROJECT ON ITS OWN BRANCH SINCE FQ; STEPS 1–5 BUILT (3's NINE ENGINES AT GO, 4's POOL MERGE AT GP, 5 AT GP AND GV); STEP 6 CENSUSED AT HA AND OWED TO HD AND HE, BEHIND HC's RUNE SCOPES (THE RUNNING ORDER BELOW)**
+### THE CLASS MERGE ~~IS MEASURED AND UNRULED~~ WAS MEASURED AT FP AND IS RULED — **A PROJECT ON ITS OWN BRANCH SINCE FQ; STEPS 1–5 BUILT (3's NINE ENGINES AT GO, 4's POOL MERGE AT GP, 5 AT GP AND GV), AND THE RUNE SCOPES MERGED AT HC; STEP 6 CENSUSED AT HA AND OWED TO HD AND HE (THE RUNNING ORDER BELOW)**
 
 **Full evidence: `docs/merge-recon.html`, written to be read section by section across many
 batches. `docs/reports/FP.md` is the batch's own working.** FP authored nothing and proposed
@@ -1880,8 +1964,9 @@ done at FQ.** The order is recorded so it is not re-litigated batch by batch:
    population is **35 of the 60 live ordinary runes** rather than FP's 43 (a rune that half-works, or reads a card, a
    status, the stance or nothing, is not gated — GP's own groups). GM's standing item — *ten live spec runes are read
    only under their lineage's engine, and a rune's scope is the lineage, so he is still offered them* — is closed by
-   it; **what the scope itself should be is GV's ruling 5.**
-6. **THE GATES — CENSUSED AT HA, AND THE REPAIR IS HD AND HE** (HB was the pet and HC is the rune scopes). FP counted **52 engine-bound targets** carrying
+   it; **what the scope itself should be was GV's ruling 5, answered at HC: the CLASS**, with the engine gate (36 rows
+   since Layered Aegis), the card a rune names and a companion present deciding what a hero is offered.
+6. **THE GATES — CENSUSED AT HA, AND THE REPAIR IS HD AND HE** (HB was the pet and HC the rune scopes). FP counted **52 engine-bound targets** carrying
    71.6% of the battery's asserted checks, and GK repaired every red its own move caused. **HA read all 119 launched
    targets arm by arm**: of FP's 52, **twenty are repaired and correct, thirty-one still ask a pre-merge question and one
    is red on purpose** — and **the middle group is 42 targets and 130 arms, eleven of its targets outside FP's 52**,
@@ -1914,6 +1999,9 @@ payload.** Three surviving Warden nodes died to this at FP.
 - **AT FX ALL THREE NODES WENT WITH THEIR TREES** (`sm_sword_mastery`, `wd_unkillable`, `wd_mountain`). The one
   tree writes `parry_bonus` (Parry More, at Sword Mastery's number) and no `block_chance`, so the finding binds the
   engine move, not the tree.
+- **AND AT HC IT REACHED A RUNE: BARED PLATE'S PRICE IS THE BLOCK ROLL** (*"he can no longer Block"*), and since the
+  rune is `class:warrior` a Warrior with no Warden lineage and no Heavy Plating pays it on a Block chance of 0.000
+  (driven) — HC's ruling 2.
 
 ### THE RUNE LAYER'S OWED ITEMS — **NONE. FN CLOSED THE LAST THREE.**
 
@@ -4193,8 +4281,8 @@ This entry records that it is closed and carries the three things a later batch 
 
 ### Last measurements
 
-**GQ's verification is in `docs/reports/GQ.md`, written after the acceptance run.** GQ moved one screen, so the
-screen was drawn on every deal of every class — in scratch probes and windowed renders on an isolated copy, and by
-`check_gq` in the battery — and HEAD's unmodified gates and suites were run against the new screen before any
-instrument moved. **The figures live in the report and not here**, because this file is read by `check_es` §4 and a
-cell written behind the run would owe a post-run proof of its own.
+**HC's verification is in `docs/reports/HC.md` §8, written after the acceptance run.** HC moved every rune's scope,
+so HEAD's unmodified gates and suites were run against the new code before any instrument moved, the offers were
+driven on a whole road per arm at all four doors on this tree and on HEAD's, and the designer's save was driven in an
+isolated copy seeded from the backup. **The figures live in the report and not here**, because this file is read by
+`check_es` §4 and a cell written behind the run would owe a post-run proof of its own.
