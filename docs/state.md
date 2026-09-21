@@ -13,94 +13,135 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-20 (Batch GZ).*
+*Last rewritten: 2026-09-21 (Batch HA).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: GZ — THE CHANGELOG CUT, ON TIME. IMPLEMENT ONLY, AND THE THIRTY-SECOND
-  BATCH ON `class-merge`.** The fifth cut of `docs/changelog.html`, **taken one batch after the watcher FG built
-  asked for it** — the first cut this file has ever had because something measured it rather than because someone
-  noticed. **No rune, card, kit, engine, pool or node moved and no magnitude was retuned**; the only `.gd` edit in
-  the tree is five literals and two counts in `check_dv` §4. `main` is untouched. Full working:
-  **`docs/reports/GZ.md`**.
-- **§1 — THE CUT, AT FS/FT. 29 ENTRIES MOVED, NOTHING DELETED, NO ENTRY EDITED.** `docs/changelog.html` goes
-  **400,021 B → 144,740 B** (144.74 KB = 141.35 KiB) and **60 → 32 entries**, running **GZ back to FT**; the archive
-  goes **1,646,949 → 1,907,462 B** and **185 → 214 entries** (FS → Batch 1); the `DoD-archive/` folder goes
-  1,680,660 → **1,941,173 B**. **The boundary is the last one that clears 150 on BOTH readings of KB with this
-  batch's own entry counted** — one entry further and the file ships at 153.6 KB — which is the shape FG's cut left
-  (147,929 B / 147.93 KB / 144.46 KiB). **THIS CUT LEAVES THE MOST ENTRIES AND THE FEWEST BYTES OF ANY CUT ON
-  RECORD**, because entries have shortened: the newest 7 average 3,669 B against the 5,863 B a batch the live file
-  actually grew at between FG's cut and GY's crossing. **The headroom reads 44 batches at that realised rate and 62
-  to 70 at the recent one; the first is the honest figure**, being the only one measured over a whole cut-to-cut
-  window.
-- **§1b — NO FILE SIZE IS ASSERTED ANYWHERE, AND THE REASON WAS RE-PROVED RATHER THAN QUOTED.** The proof is a
-  SECOND script sharing no code with the splitter, reading FROZEN copies of both originals: headings counted two
-  independent ways on all four files (60/185/31/214, agreeing), counts summing with zero overlap, the heading
-  MULTISET identical before and after, order preserved on both sides, every heading exactly once, none invented,
-  none dropped, each of the 60 original entries hashed where it now lives, both footers byte-unchanged, and **the
-  two bodies rejoined BYTE-IDENTICAL to the original** (sha256 `06f447fc…`). **THE PROOF WAS PROVED on three
-  scratch pairs the real tree never saw**: an entry dropped → **11** failures, an entry in both halves → **11**, and
-  **one word misspelt inside a kept entry → 3, all three of them byte arms**, on a file that is byte-for-byte the
-  same LENGTH and whose every heading count reads clean. **Only the rejoin sees the third.**
-- **§2 — THE CHANGELOG DOES NOT HAVE THE DESIGN NOTES' PROBLEM, AND THAT WAS ASKED BEFORE A BYTE MOVED.** All 60
-  entries strictly descending by batch code, all 60 dates non-increasing, **zero inversions, zero duplicate labels**,
-  every heading carrying both a date and a batch. The reason is structural: this file has only ever been written
-  append-at-the-**TOP**. **Four letters have no entry at all — AM, CC, CF, GD** — and a missing letter is a batch
-  never written, not an entry lost; the multiset proof is what tells those two apart.
-- **§3 — FIVE BOUNDARY LITERALS WERE OWED A RE-POINT, FOUR BIT, AND THE FIFTH PASSED.** Run unmodified against the
-  cut tree, `check_dv` read **83 checks / 4 failures**, all four in §4. The fifth arm —
-  `live.contains("Batch FG</b> at EP/EQ")`, **the one FG rewrote to kill DV's always-true alternation** — did not
-  fail, because **the live header records every cut in its own history** and FG's clause is still written there.
-  **It is the same shape arriving by a shorter road**: FG's pin asks its question for exactly one batch and is then
-  satisfied by the record again. `check_ec` §1 cannot see it — it is a single `contains` and it resolves.
-  **Re-pointed, NOT repaired** (FZ's pricing rule); the fix is a pin on the header's LAST cut rather than a named
-  one, and it is its own batch with its own two-armed control.
-- **§3b — AND A NEEDLE BROKEN BY A LINE WRAP, CAUGHT BEFORE THE GATE RAN.** The first live header wrapped
-  `<b>Batch GZ</b> at` / `FS/FT` across a newline, so the re-pointed needle was not in the file at all.
-  **`build_pin_manifest.py` returned `"r": "unresolved"` for it — the only document pin in the tree that did** —
-  and re-wrapping took it to `"r": "code"`. **The manifest is a needle instrument and it was read as one.** GY hit
-  the identical hazard on `check_fg`'s regex two batches ago.
-- **§4 — THE READER POPULATION IS DERIVED, AND THE ONE NOBODY HAS EVER COUNTED IS THE FILES THAT *STATE* THE
-  BOUNDARY.** With comments stripped: **17 files open the live changelog** (the 14 suites bb…ce, plus `check_dv` §4,
-  `check_fg` §1 and `check_ec` §2), **15 reach the archive through the live file's own header**, and **0 hardcode
-  it**; two tools read it by relative name (`docs/build_docs.py`, which is why the live file must never move, and
-  `build_pin_manifest.py`). **Not one of the 14 suites owed a re-point** — every one pins a batch archived at BZ's
-  or CX's cut — which is CD's pattern paying for itself. **But `README.md` still named Batch BP**, the boundary BZ's
-  first split left, **never re-pointed through CX, DV or FG: three cuts and 126 batches stale**, plus a second
-  claim one cut old. **Nothing in the tree opens `README.md`**, which is exactly why it could sit stale with a green
-  tree every battery. `CLAUDE.md` carried two more — the count of cuts, and the archive folder's byte size. **All
-  four corrected, and the lesson written into `docs/instrument-rules.md` under CW §4: sweep by the CLAIM, not by
-  the reader.**
-- **§5 — THE ARCHIVE NEEDS NO CEILING OF ITS OWN, AND THAT IS REPORTED, NOT RULED.** It is **1,907,462 B** and
-  nothing measures it. **A ceiling is a number with an answer behind it**: the changelog's answer is *move it to the
-  archive* and `CLAUDE.md`'s is *split it*, and both lose nothing — **the archive's only possible answer is DELETE,
-  which CW §4 forbids in the same block that would state the bar.** Its two real costs are already met elsewhere: it
-  is deselected from the knowledge sync **by name**, so it costs the sync nothing at any size, and its repo cost is
-  git's. **It is a different kind of file from the two that do have ceilings — they are read, and it is only ever
-  reached.** What it is owed is a READING in a file something asserts on, and it has one now: the folder figure is
-  in `CLAUDE.md`'s sync block and the file figure is here.
-- **§6 — WHERE THIS BATCH WENT PAST ITS BRIEF.** The brief said `CLAUDE.md` is not touched; **two live measurements
-  in it are falsified by this cut** — the number of cuts taken and the archive folder's byte size — and both were
-  corrected: **+13 B, and the file ships at 350,849 B = 342.63 KiB with 67.37 KiB of headroom**. **The ceiling block is byte-unchanged and nothing was
-  re-derived**, which is what that instruction was about. CW §4's own rule is that the cut is not done until
-  everything it invalidates is re-pointed in the same batch. **Flagged here and in `docs/reports/GZ.md` §5 rather
-  than buried; it reverts in two `sed` lines and the live figures are in both files.**
-- **WHAT MOVED:** `docs/changelog.html` (cut, header re-pointed, GZ's entry), `DoD-archive/changelog-archive.html`
-  (+29 entries, header re-pointed), `check_dv.gd` (§4 — five literals, two counts and the comment recording why),
-  `pin-manifest.json` (**re-derived: exactly four needles changed and nothing else**), `CLAUDE.md` (two stale
-  facts), `README.md` (two stale claims), `docs/instrument-rules.md` (two lessons under CW §4), this file and
-  `docs/reports/GZ.md` (**NEW**). **No game `.gd`, no `.tscn`, no `data/`, no `run_battery.sh`, no new gate.**
-  **`baselines.json` IS UNTOUCHED AND THAT IS MEASURED, NOT ASSUMED**: no arm was added or removed anywhere, and
-  the count differ read the whole battery. `docs/master.html`, `docs/design-notes.md`, `docs/combat-rules.md` and
-  `docs/ways-of-working.md` are byte-unchanged, proved off the start-of-batch freeze.
-- **Phase.** Unchanged by this batch: steps 1–4 of the merge's running order are done and step 5's rune half is
-  done; **the Crown's Break and freeze resistance is still owed**; step 6 is the 52 engine-bound gates.
-- **Next letter: HA.**
+- **Last batch: HA — THE LAST STAGE, CENSUSED AND PRICED. IMPLEMENT ONLY, AND THE THIRTY-THIRD BATCH ON
+  `class-merge`.** FP's sixth stage, taken as a census of every target the battery launches. **No game code, no rune,
+  card, kit, engine, pool or node, no gate, suite, fixture or baseline row moved**, and `main` is untouched. Full
+  working: **`docs/reports/HA.md`**.
+- **§1 — FORTY-TWO GATES PASS WHILE STILL ASKING ABOUT SPECS: 130 ARMS, AND TWENTY OF THEM ARE HOLES.** The population
+  is the **119 files the battery launches** (46 suites, 69 gates, the harness, two scene runs and `check_de`), the four
+  it launches nothing for and both fixtures — 125 files. Four instruments: a comment-stripped vocabulary sweep, nine
+  readers under one written rubric (eight relations the merge DISSOLVED, nine lineage layers that still LIVE), HA's own
+  sweeps of the class-shelf names and of every document pin, and a re-check of every target left clean. **Outcomes over
+  the 119: 75 repaired and correct, 42 in the middle group, 2 red on purpose.** The middle group's 130 arms are
+  **68 re-points, 35 floors to fold into one per-class floor, and 27 retirements**; **20 arms in 15 targets cannot fail
+  as written or pass while the game contradicts them** — a loop over the class keys that never runs its assertion
+  (`test_batch_bu:385`), an arm that passes whenever the Swordmaster's enablers are empty (`test_batch_bx:410`, empty
+  since GS), Guard Change and Immolate asserted to reach one lineage while every Warrior and every Mage is offered them
+  (`test_batch_ak:345`, `test_batch_ar:684`/`:686`), a pin kept green by `CLAUDE.md` still stating the seam GP deleted
+  (`test_batch_br:1566`). The whole list is in the report, arm by arm.
+- **§1f — OF FP's 52, TWENTY ARE REPAIRED, THIRTY-ONE ARE IN THE MIDDLE GROUP, ONE IS RED ON PURPOSE — AND ELEVEN OF THE
+  MIDDLE GROUP WERE NEVER IN FP's 52.** FP's band was the engine half of the merge (`passive_id`, `second_resource`, a
+  `spec:` scope); the middle group is mostly the other half — the offer (D3, 60 arms), per-spec depth (D8, 31), the kit
+  (D4, 27) and ownership (D7, 12). **FP's 52 is recoverable exactly** from FP's own `run_battery.sh` as 34 suites and
+  18 gates; `docs/merge-recon.html`'s prose says *"All 46 … suites"*, which is the whole suite count.
+- **§2 — PRICED AND NOT REPAIRED, BY THE BRIEF'S OWN RULE: TWO BATCHES.** **HB: the twenty tier-1 arms and the fold
+  family** (55 arms, 23 targets, one shared per-class floor helper). **HC: the other 75 arms in 36 targets**, including
+  `check_ea` §1's four-arm re-derivation and `check_dp` §1's per-class status table. Every repaired target owes a
+  control that breaks what it guards and sees it red, and its row moved before the run.
+- **§3 — LANDING ON `main`: ONE CONFLICT, NOTHING LOST, AND NOT READY.** A trial merge (`git merge-tree`, nothing
+  written) raises exactly one conflict, `docs/state.md`, which FQ's convention answers; `main`'s only commits since the
+  merge base (FS) are twelve lines of this file. **Driven in isolated copies seeded from the player's saves: `main`
+  refuses the merged build's v3 profile and writes nothing, as FQ built it — and LOADS its v13 run save with no word,
+  seating three of the four heroes with their basic attack alone**, because they took a spine or a rule engine and
+  `main` has neither class kits nor engine runes. **The branch is not ready**: the middle group stands between it and a
+  battery that speaks for the merged game, and so do the lineage layers nothing has merged — **a hero who takes a spine
+  or a rule engine is offered no ordinary rune at all**, because all sixty live ordinary runes are spec-scoped.
+- **§4 — `README.md` SAYS ONLY WHAT CANNOT GO STALE** (ruled): what the project is, where things live, which file to
+  open first, 62 lines to 28. The rule and its reason — *a file no instrument reads will always drift* — are in
+  `CLAUDE.md`'s *WHAT THIS FILE IS* block. **§5 — GZ's CEILING PRINCIPLE IS RECORDED** directly after FG §2 in
+  `docs/instrument-rules.md`, with a row in `CLAUDE.md`'s index of that file.
+- **THE VERIFICATION.** HEAD's unmodified battery ran first against the frozen tree: **121 of 121 launched,
+  `check_de` 501 checks / 0 failures / 0 notices, the only reds the two sanctioned ones at their baseline counts**, no
+  `Parse Error` in any log, and the tree and the player's four saves byte-identical before and after. **The run
+  against the tree with this batch's documents is in `docs/reports/HA.md` §7.**
+- **`CLAUDE.md` IS 351,443 B = 343.21 KiB, WITH 66.79 KiB UNDER ITS 410 KiB CEILING** (+594 B this batch: the README
+  rule and one index row).
+- **WHAT MOVED:** `README.md` (stripped), `CLAUDE.md` (the README rule, one index row and the sentence above it),
+  `docs/instrument-rules.md` (GZ's principle), `docs/changelog.html` (this batch's entry), `docs/design-notes.md` (one
+  entry, at the top), this file and `docs/reports/HA.md` (**NEW**). **No `.gd`, no `.tscn`, no `data/`, no
+  `run_battery.sh`, no `baselines.json` row and no new gate** — no gate was edited, so no count could move, and the
+  count differ is what says so.
+- **Phase.** Steps 1–5 of the merge's running order are done. **Step 6 is censused and priced; its repair is HB and
+  HC.** The Crown's Break and freeze resistance, Sanctity's potency layer and the engine-card texts stay queued.
+- **Next letter: HB.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### GZ's RULINGS OWED — **TWO; NEITHER IS PLAYER-VISIBLE, AND THE FIRST IS A GATE THAT PASSES WHEN IT SHOULD NOT**
+### HA's RULINGS OWED — **FOUR; THE FIRST SETS THE NEXT TWO BATCHES, AND THE THIRD AND FOURTH ARE ABOUT `main`**
+
+Full working: `docs/reports/HA.md`, NEEDS A RULING.
+
+1. **THE REPAIR OF THE MIDDLE GROUP IS PROPOSED AS TWO BATCHES.** **HB: the twenty tier-1 arms first** — each cannot
+   fail as written or passes while the merged game contradicts it — **then the thirty-five FOLD arms** in eleven
+   suites, whose per-shelf and class-wide-shelf floors become one per-class floor through one shared helper (55 arms,
+   23 targets). **HC: the other seventy-five tier-2 arms in 36 targets**, with `check_ea` §1's four-arm
+   re-derivation over class × engines held and `check_dp` §1's status table re-keyed by class as the two that are more
+   than a re-point. **The report's §1d is the work list, arm by arm: file, line, relation, action and cost.**
+2. **FIVE CALLS ONLY THE DESIGNER CAN MAKE BEFORE THOSE ARMS ARE REPAIRED:** (a) **Guard Change and Lunge** — every
+   Warrior is offered both since GP; retire `test_batch_ak:345`, or rule them holder-only (two `ENGINE_READ` rows);
+   (b) **Immolate and Pyroblast** — every Mage is offered both and neither reads an engine; retire
+   `test_batch_ar:684`/`:686`, or rule them holder-only; (c) **summoning** — exclusive to the Pack Bond engine's three
+   enablers, or to the Hunter class, since an earned Call the Wilds summons with no Pack Bond (`check_dr` §1, and
+   `CLAUDE.md`'s DR §1 block and FO §2 bullet); (d) **EB §1's "class-wide cards are weaker"** — GP recorded the
+   rebalance as owed; retire `test_batch_bq:344`/`:349` or re-point them over every Cleric who can draft Heal; (e) **the
+   floor the FOLD family asserts** — on `Classes.draft_pool(k)` (43 / 51 / 43 / 41 today), on the engine-free
+   `Classes.offerable(draft_pool(k), [])` (40 / 38 / 29 / 34), or both.
+3. **`main` HAS NO FORWARD GUARD ON THE RUN SAVE.** Driven at HA §3c in isolated copies seeded from the player's saves:
+   `main` refuses the merged build's v3 profile and writes nothing — FQ's guard, working as built — but **loads its v13
+   run save without a word and seats three of the four heroes with their basic attack alone**, because they took a
+   spine or a rule engine and `main` has no class kits or engine runes. **The saves on disk are already the merged
+   build's.** A refusal in `main`'s `load_run`, in the profile's shape, is a small code change on `main`; whether it is
+   made before `main` is next played, or the merge simply lands first, is the designer's.
+4. **THE BRANCH IS NOT READY TO LAND, AND TWO THINGS STAND BETWEEN IT AND READY** (HA §3d): the middle group, and the
+   lineage layers GK's charter rules away and nothing has built — spec-scoped runes, per-lineage boss pools and stat
+   blocks. **The rune layer is the one a player meets first**: a hero who takes a spine or a rule engine is offered no
+   ordinary rune at all, and three of the four heroes in the designer's own save are that hero. Whether those layers
+   merge before landing or after is the designer's. **Tag `b722cc4` before merging** if the pre-merge game should stay
+   one checkout away; nothing tags it today.
+
+### FOUND AT HA AND NOT FIXED
+
+- **A HERO WITH NO LINEAGE CAN BE OFFERED NO ORDINARY RUNE AT ALL — GV's RULING 5, AT ITS SHARPEST.** All 60 live
+  ordinary runes are `spec:`-scoped and all 24 `class:`-scoped runes are engine runes; `Runes._scope_ok` passes a
+  `spec:` rune only for a matching lineage, and a spine-taker's is empty. **Every Peddler row, cache and bargain he is
+  shown is one of his class's engine runes.** Measured off `data/runes.json`, not driven.
+- **TWO DOCUMENTS STATE A PRE-MERGE FACT AND A PIN KEEPS EACH GREEN**, and both are left for the repair batch because the
+  sentence and its pin move together: `CLAUDE.md:3421` still says *"THE ONE-IN-FOUR CLASS SEAM DRAWS A REAL ENTRY FOR
+  EVERY HERO IN THE GAME"* (the seam GP deleted; `test_batch_br:1566` pins it), and `docs/master.html` still says *"All
+  twelve specs draft from at least ten"* (`test_batch_cb:1246` pins it).
+- **AT LEAST TWENTY-THREE TARGETS SEAT A LINEAGE BY HAND WITH NO ENGINE RUNE**, against GK's *"a hand-built seat must
+  too"*. Harmless in most; not in `check_et` (every `Runes.ENGINE_READ` rune withheld from its retirement walks —
+  `check_fd`'s identical helper was repaired at GV and this one never was), `test_runes`' exhaustion and start-pool
+  members, `check_fm`'s `_member`, and `test_batch_bo` §2/§3, where it is what makes three arms vacuous. The list is in
+  the report's §1g.
+- **`Run.ability_slots_used` IS LINEAGE-KEYED AND NEVER READS AN ENGINE**, so two gate arms are near-tautologies against
+  it (`check_gm:378`, `check_gn:197`). Correct while `lineage_slots` is zero for every lineage.
+- **THE DEBUG PRE-GRANT *"All Spec Abilities Unlocked"* STILL GRANTS ONE LINEAGE'S BOSS POOL AND SHELF** (`battle.gd`
+  ~1322), not the class pool a draw reads.
+- **THREE GATES CHECK TWELVE ENGINES' TEXT WHERE THERE ARE TWENTY-FOUR** (`check_cl_resolver`, `check_cl_width`,
+  `check_do` §4), reaching it through `SPEC_INFO[s]["passive_desc"]`; the spines' and the rule engines' texts are never
+  checked. None carries a token today.
+- **SMALL AND DEAD:** `check_di:391`'s `_hero(scene, "pack_bond")` can never match (the id is `pack`); `test_batch_cp`'s
+  `PASSIVE_OF` maps the Beastmaster to `"loyalty"`; `check_cy`'s sweep always casts from the first living hero, so its
+  two-party reason is never exercised.
+- **THE BRIEF'S PREMISES THAT DID NOT HOLD** (HA §0): *"most have been repaired incidentally, batch by batch"* (GK
+  repaired every red its own move caused, deliberately and inside GK); *"every batch since has moved some of them"*
+  (nine of the sixteen batch commits since GK moved none of FP's 52 rows); *"FG's finding recurring for the third
+  time"* (GZ's *third* counts the bare-`contains` shape, whose first two instances are BZ→BB and CD→BO; FG's finding
+  was DV's always-true alternation); and *"two defects"* on `main` (GI's line names a third, the zone boss that could
+  field the Hollow Crown).
+- **TWO ISOLATED COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata`: **"Dawn of Decay HA main probe"** and
+  **"Dawn of Decay HA head probe"**, the two arms of §3c's drive. **Each was renamed in `project.godot` before
+  anything ran in it** and seeded from byte-identical copies of the player's saves; they can be deleted. **There are 102 such folders now.** **The
+  untracked `save-backups/` folder inside the repo is not this batch's** — it holds FR to GT's backups and was left as
+  it was; this batch's backup is `../save-backups/HA-20260921-002123`.
+
+### GZ's RULINGS OWED — **ONE LEFT, AND IT IS A GATE THAT PASSES WHEN IT SHOULD NOT; THE SECOND IS RULED AND TAKEN AT HA §4**
 
 Full working: `docs/reports/GZ.md`, NEEDS A RULING.
 
@@ -114,7 +155,9 @@ Full working: `docs/reports/GZ.md`, NEEDS A RULING.
    single `contains` that resolves. **The repair is a pin on the header's LAST cut clause, or on the boundary its
    opening sentence states**, either of which is a different arm owing a two-armed control on a real cut, so it is
    its own batch by FZ's pricing rule. Re-pointed to `Batch GZ</b> at FS/FT` here and not repaired.
-2. **NOTHING IN THE TREE OPENS `README.md`, AND IT SAT THREE CUTS STALE BECAUSE OF IT.** It named **Batch BP** as
+2. ~~**NOTHING IN THE TREE OPENS `README.md`, AND IT SAT THREE CUTS STALE BECAUSE OF IT.**~~ — **RULED AND TAKEN AT HA §4:
+   STRIPPED TO WHAT CANNOT GO STALE, AND NO GATE.** The rule and its reason are in `CLAUDE.md`'s *WHAT THIS FILE IS* block. The
+   original finding: it named **Batch BP** as
    the live file's first entry — the boundary BZ's first split left, written at `06e382c` and carried unchanged
    through CX, DV and FG, **126 batches**. Corrected here, but **the class of defect is not**: the re-point debt
    has always been counted over the files that OPEN the changelog, and a file no instrument reads is a file whose
@@ -1512,7 +1555,7 @@ code, and some of what it found lives elsewhere. **The tables are in `docs/repor
   exact and contained matches against `scripts/` and `data/`). The names a merge would have made collide: Spite (a Warden node and a Berserker card), Whetstone (a Swordmaster node and a
   live rune), Second Wind (a Berserker node and a Holy card).
 
-### THE CLASS MERGE ~~IS MEASURED AND UNRULED~~ WAS MEASURED AT FP AND IS RULED — **A PROJECT ON ITS OWN BRANCH SINCE FQ; STEPS 1–4 BUILT (3's NINE ENGINES AT GO, 4's POOL MERGE AT GP), 5–6 RULED, NOT BUILT (THE RUNNING ORDER BELOW)**
+### THE CLASS MERGE ~~IS MEASURED AND UNRULED~~ WAS MEASURED AT FP AND IS RULED — **A PROJECT ON ITS OWN BRANCH SINCE FQ; STEPS 1–5 BUILT (3's NINE ENGINES AT GO, 4's POOL MERGE AT GP, 5 AT GP AND GV); STEP 6 CENSUSED AT HA AND OWED TO HB AND HC (THE RUNNING ORDER BELOW)**
 
 **Full evidence: `docs/merge-recon.html`, written to be read section by section across many
 batches. `docs/reports/FP.md` is the batch's own working.** FP authored nothing and proposed
@@ -1791,8 +1834,13 @@ done at FQ.** The order is recorded so it is not re-litigated batch by batch:
    status, the stance or nothing, is not gated — GP's own groups). GM's standing item — *ten live spec runes are read
    only under their lineage's engine, and a rune's scope is the lineage, so he is still offered them* — is closed by
    it; **what the scope itself should be is GV's ruling 5.**
-6. **THE GATES — 52 engine-bound targets**, carrying 71.6% of the battery's asserted checks. **GK repaired the
-   ones its own move broke** — the census and what is left are `docs/reports/GK.md` §3.
+6. **THE GATES — CENSUSED AT HA, AND THE REPAIR IS HB AND HC.** FP counted **52 engine-bound targets** carrying
+   71.6% of the battery's asserted checks, and GK repaired every red its own move caused. **HA read all 119 launched
+   targets arm by arm**: of FP's 52, **twenty are repaired and correct, thirty-one still ask a pre-merge question and one
+   is red on purpose** — and **the middle group is 42 targets and 130 arms, eleven of its targets outside FP's 52**,
+   because FP's band was the engine half of the merge and the middle group is mostly the offer, the kit and
+   ownership. **Twenty arms in fifteen targets cannot fail as written or pass against a false claim.** Priced, not
+   repaired: **HB takes the twenty and the fold family, HC the other seventy-five** (`docs/reports/HA.md` §1–§2).
 
 ### **AND FP's `block_chance` FINDING TRAVELS WITH IT — RE-VERIFIED AT FQ, AND THE CODE SAYS IT OUT LOUD**
 

@@ -205,6 +205,27 @@ below.
   and `CLAUDE.md`'s ceiling block names what is left at 340. **Finding
   that out early is the whole value.**
 
+## A CEILING IS A NUMBER WITH AN ANSWER BEHIND IT (STANDING, Batch GZ §6, recorded at HA §5)
+> **A bar is worth stating only where crossing it has an answer the rules allow.** The changelog's
+> answer is to MOVE entries into the archive; `CLAUDE.md`'s is to SPLIT. **A file whose only answer
+> would be to delete has no ceiling**, because a number with no action behind it is a warning nobody
+> can obey.
+
+- **THIS IS THE BLOCK ABOVE'S COROLLARY, AND IT DECIDES WHICH FILES THAT BLOCK BINDS.** FG's rule
+  is that a bar nobody measures gets crossed silently, so every stated bar owes an instrument. This
+  one says which bars may be stated at all: **a ceiling nobody can answer asks for the thing the
+  rules forbid.**
+- **THE CASE IS `DoD-archive/changelog-archive.html` (GZ §6), AND IT HAS NO CEILING ON PURPOSE.**
+  It IS the archive, and CW §4 says *ARCHIVE MEANS MOVE, NEVER DELETE* in the same block that would
+  have to state its bar, so the bar's one remedy is the one that block bans. **Its
+  two real costs are met elsewhere**: it is deselected from the knowledge sync by name, so it costs
+  the sync nothing at any size, and its repo cost is git's. What it is owed is a READING in a file
+  something asserts on, and `CLAUDE.md`'s sync block carries the folder's bytes.
+- **BEFORE PROPOSING A CEILING, NAME ITS ANSWER.** A move, a split or a re-derivation that loses
+  nothing makes the bar a rule, and the block above says what it then owes. A deletion, a prune or
+  nothing at all means the bar is not stated: report the reading instead, and say why there is no
+  bar.
+
 ## ON A SPLIT-CLAUSE CARD, EVERY PIN NAMES THE CLAUSE IT PINS (STANDING, Batch DM §2)
 > **A pin that matches the CARD rather than the CLAUSE can go red for the wrong reason, or stay
 > green while its subject moves — which is the failure pin-as-measurement exists to prevent.**

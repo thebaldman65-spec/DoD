@@ -36,6 +36,11 @@ describes what happened, it is not a rule and it does not belong here.
   how a batch verifies itself is still in `docs/instrument-rules.md`. That file binds the
   conversation UPSTREAM of a brief, which none of those three has ever covered. **Nothing in it is
   summarised here.**
+- **What the project is, where things live, and which file a reader opens first** → `README.md`,
+  **which says only what cannot go stale (ruled at HA §4)**: no batch, count, boundary, size, branch
+  or phase, and a pointer to `docs/state.md` wherever a live fact would go. **The reason: a file no
+  instrument reads will always drift, so it must not contain anything that can.** Nothing in the tree
+  opens `README.md`, which is how GZ found it naming a changelog boundary three cuts old.
 
 **DO NOT ADD A BATCH BLOCK TO THIS FILE.** If a batch learns something that binds future
 work, add or amend a RULE here in the file's own voice — dateless, batch-agnostic, stated as
@@ -103,7 +108,7 @@ into this file changes it.
 the equality rule travel with their parent. **Eight of the rows are FF §2's**, and they are the
 residue: rules written into this file AFTER the seam was taken, which the seam's own test puts on
 the other side of it. **Every row after those eight was written straight into the reference rather
-than moved there** — FG's, FH's, FI's, and FR §5a's as FS §1 closed it:
+than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, and GZ §6's as HA §5 recorded it:
 
 | | |
 |---|---|
@@ -144,6 +149,7 @@ than moved there** — FG's, FH's, FI's, and FR §5a's as FS §1 closed it:
 | THE PIN MANIFEST BINDS A HOLDER OFF `var x :=`, NEVER OFF `var x: String =` | FH §2 |
 | AN END-STATE CENSUS CANNOT SEE WHAT A TARGET PUTS BACK | FI §1 |
 | A TARGET CUT OFF BY A FRAME BUDGET IS INDISTINGUISHABLE FROM ONE THAT PRINTS NO VERDICT | FR §5a / FS §1 |
+| A CEILING IS A NUMBER WITH AN ANSWER BEHIND IT | GZ §6 / HA §5 |
 
 ## THE COMBAT RULES LIVE IN `docs/combat-rules.md` (STANDING, SET AT GR §2, RULED BY THE DESIGNER)
 > **THIS FILE IS STILL THE ONE A BATCH MUST READ. `docs/combat-rules.md` IS A REFERENCE IT POINTS AT,

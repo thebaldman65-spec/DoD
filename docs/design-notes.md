@@ -4,6 +4,32 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The last stage is a census before it is a repair, and a readme that says nothing that moves (Batch HA) — 2026-09-21
+
+**Why the census stopped at the price.** The question was never how many gates are red — the battery is green bar the
+two reds it carries on purpose. It was how many are green for the wrong reason, and that can only be counted by
+reading what each assertion is for. The answer, forty-two gates and a hundred and thirty assertions, is more than a
+third of the battery, and repairing them honestly means breaking each one on purpose to prove the repair bites. A
+batch that tried to do all of that at once would either run for days or cut corners on the proving, and the proving is
+the whole point. So the census is written to be transcribed: every assertion with its line, its reason and its fix,
+and the repair split into two batches, holes first.
+
+**Why the holes come first.** Most of the forty-two ask a stale question whose answer still happens to be right — a
+floor on a spec's shelf when the hero now draws his whole class's pool. Those are debts. Twenty are worse: they cannot
+fail at all, or they pass while the game does the opposite of what they say. A check that can never go red tells
+everyone the thing is guarded when nothing is watching it, and that is more dangerous than no check.
+
+**Why the readme holds nothing that changes.** Nothing in the project reads it, so nothing can ever tell anyone it is
+wrong — which is how it came to describe a three-hero party, rest nodes and a changelog boundary three cuts old. A
+file no instrument reads will always drift, so the only safe content is content that cannot: what the project is,
+where things live, and which file to open first. Everything else is one pointer to the file that is rewritten every
+batch.
+
+**Why a ceiling needs an answer.** A limit on a file is only worth stating if crossing it has a remedy the rules
+allow. The changelog's remedy is to move old entries into the archive; the rules file's is to split. The archive
+itself has no remedy but deleting history, which the same rules forbid — so it gets no ceiling, only a reading. A
+number nobody can act on is a warning nobody can obey.
+
 ## The ceiling moves again, and a word that sent six entries to the floor (Batch GY) — 2026-09-20
 
 **Why the ceiling moved rather than the file.** `CLAUDE.md` had 3.37 KiB of headroom, which is less than half the
