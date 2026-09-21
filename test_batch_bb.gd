@@ -305,8 +305,13 @@ func _live_never_two_of_a_kind() -> void:
 		{"bm_the_pack": 1})
 	var h := _hero(scene, 3)
 	await scene.call("_do_summon", h, "ursus")
-	var summon_ursus: Ability = scene.call("_find_ability", h, "Summon Ursus")
-	var summon_canis: Ability = scene.call("_find_ability", h, "Summon Canis")
+	# BATCH HB §1 — ONE CARD, THREE CALLS. The three summons are Summon
+	# Companion's calls now, built where the player's picker and the bot build
+	# them (`_summon_choice`), not three cards on the bar to find by name — so the
+	# calls are asked for there. Same question: a second Ursus refused, a Canis
+	# offered.
+	var summon_ursus: Ability = scene.call("_summon_choice", h, "ursus")
+	var summon_canis: Ability = scene.call("_summon_choice", h, "canis")
 	ok(summon_ursus != null and summon_canis != null, "§1: both summons resolve")
 	ok(not scene.call("_ability_usable", h, summon_ursus),
 		"§1: a second Ursus is refused while one stands")

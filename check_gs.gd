@@ -60,10 +60,12 @@ const SCRATCH_RELICS := "user://gs_relics.json"
 # **THE TABLE GS §1 RECORDED.** An engine not named here brings nothing. The
 # Sharpshooter's enabler is Quick Shot, the Hunter's class basic, so it brings
 # nothing a Hunter does not already hold and is not a row.
+# **BATCH HB §3 — PACK BOND'S ROW IS GONE, RULED BY THE DESIGNER.** The three
+# summons were GS's one stated exception; HB put the pet in every Hunter's CLASS
+# KIT (Summon Companion), so Pack Bond brings nothing, and the table names five.
 const MINIMUM := {
 	"bloodrage": ["Bloodlust"],                                  # ruled
 	"overburn": ["Flamewave"],                                   # ruled
-	"pack": ["Summon Ursus", "Summon Canis", "Summon Aguila"],   # ruled
 	"permafrost": ["Razor Ice"],                                 # ruled at GT
 	"conviction": ["Divine Shield"],                             # ruled at GT
 	"old_gods": ["Hex of Ruin"],                                 # ruled at GT
@@ -224,9 +226,14 @@ func _s0_the_minimum() -> void:
 				"§0: the %s rune brings %s — the minimum recorded for it is %s" % [pid, str(adds), str(want)])
 			if not want.is_empty():
 				carrying += 1
-			# NOTHING BARE IS TAKEN AWAY, AND THE CLASS BASIC STANDS IN SLOT 0.
+			# NOTHING BARE IS TAKEN AWAY, AND THE CLASS BASIC STANDS IN SLOT 0 —
+			# BUT ONE ENGINE TAKES THE PET AWAY (HB §4, ruled): the Sharpshooter's
+			# Lethal Aim dismisses Summon Companion, and nothing else is ever taken.
 			for n in bare:
-				ok(own.has(n), "§0: the %s rune takes %s away from the bare kit" % [pid, n])
+				if String(n) == Classes.PET_CARD and Classes.dismisses_pet([pid]):
+					ok(not own.has(n), "§0: the %s rune dismisses the pet and still opens with %s" % [pid, n])
+				else:
+					ok(own.has(n), "§0: the %s rune takes %s away from the bare kit" % [pid, n])
 			ok(own[0] == basic,
 				"§0: the %s rune replaces the class basic with %s" % [pid, own[0]])
 			# WHAT TRAVELS IS WHAT THE TABLE NAMES, SECOND SLOT OR FIRST.
@@ -235,10 +242,11 @@ func _s0_the_minimum() -> void:
 				ok(en == [basic], "§0: the Sharpshooter's enabler is not the Hunter's own basic (%s)" % str(en))
 			else:
 				ok(en == want, "§0: `engine_enablers(%s)` is %s against the table's %s" % [pid, str(en), str(want)])
-	ok(carrying == 6, "§0: %d engines bring a card — the table names six" % carrying)
+	ok(carrying == 5, "§0: %d engines bring a card — the table names five (HB took Pack Bond's summons into the class kit)" % carrying)
 	print("    %d of 24 engines bring a card; the other %d bring nothing" % [carrying, 24 - carrying])
 	# NO LINEAGE TAKES A SLOT: the authored `slots` is the enablers' bar entries,
-	# so the lineage's term is zero — and the six that carry a card take one entry.
+	# so the lineage's term is zero — and the five that carry a card take one entry
+	# (six until HB, when the Beastmaster's summons became the class kit's card).
 	var entries := 0
 	for spec in Classes.all_specs():
 		ok(Classes.lineage_slots(String(spec)) == 0,
@@ -247,23 +255,32 @@ func _s0_the_minimum() -> void:
 			"§0: %s's authored slots (%d) are not its enablers' bar entries (%d)" % [
 				spec, Classes.core_slots(String(spec)), Classes.enabler_slots(String(spec))])
 		entries += Classes.enabler_slots(String(spec))
-	ok(entries == 6, "§0: %d lineages' enablers take a bar entry — the six that carry a card" % entries)
-	# EVERY HERO OPENS ON THE KIT'S THREE, and one earned card is a fourth.
+	ok(entries == 5, "§0: %d lineages' enablers take a bar entry — the five that carry a card" % entries)
+	# EVERY HERO OPENS ON THE KIT'S THREE, and one earned card is a fourth — **AND
+	# THE SHARPSHOOTER ON TWO (HB §4)**: his engine dismisses the pet, and the slot
+	# it held is his for a drafted card. The one engine that dismisses is counted
+	# apart, so the twenty-three that do not still have to read three each.
 	var threes := 0
+	var twos := 0
 	for key in SEATS:
 		for pid in Classes.class_engines(key):
 			var m := _member(key, Classes.engine_spec(String(pid)), [pid])
-			if int(_run.ability_slots_used(m)) == 3:
-				threes += 1
+			var want_slots := 2 if Classes.dismisses_pet([pid]) else 3
+			if int(_run.ability_slots_used(m)) == want_slots:
+				if want_slots == 3:
+					threes += 1
+				else:
+					twos += 1
 			else:
-				ok(false, "§0: a %s holding %s opens using %d slots, not the kit's three" % [
-					key, pid, _run.ability_slots_used(m)])
+				ok(false, "§0: a %s holding %s opens using %d slots, not the %d his kit takes" % [
+					key, pid, _run.ability_slots_used(m), want_slots])
 		var none := _member(key, "", [])
 		ok(int(_run.ability_slots_used(none)) == 3, "§0: a %s holding no engine opens off three slots" % key)
 		var pool: Array = Classes.draft_pool(key)
 		none["bm_abilities"] = [pool[0]]
 		ok(int(_run.ability_slots_used(none)) == 4, "§0: one earned card is not a fourth slot for a %s" % key)
-	ok(threes == 24, "§0: %d of 24 engines open on three slots" % threes)
+	ok(threes == 23 and twos == 1,
+		"§0: %d of 24 engines open on three slots and %d on two — twenty-three and the Sharpshooter's one" % [threes, twos])
 
 
 # ── §1 — NO CARD DELETED BY ACCIDENT ────────────────────────────────────────
@@ -279,9 +296,15 @@ func _s1_nothing_lost() -> void:
 			var en: Array = Classes.core_enablers(String(spec))
 			for ab in Classes.spec_abilities(String(spec)):
 				var n := String(ab.display_name)
-				var homes := int(en.has(n)) + int(kit.has(n)) + int(shelf.has(n))
-				ok(homes == 1, "§1: %s (the %s's) has %d homes among enabler, kit and shelf — one" % [n, spec, homes])
-				if not en.has(n) and not kit.has(n):
+				# BATCH HB §1 — A FOURTH HOME: A CALL OF THE KIT'S PET CARD. The
+				# three summons keep their one definition here and are the three
+				# calls Summon Companion chooses between at the cast, so a summon
+				# whose card is in the kit is housed; one whose card is not is not.
+				var call := int(kit.has(Classes.PET_CARD) and Classes.companion_call(
+					String(n).get_slice(" ", 1).to_lower()) != null and n.begins_with("Summon "))
+				var homes := int(en.has(n)) + int(kit.has(n)) + int(shelf.has(n)) + call
+				ok(homes == 1, "§1: %s (the %s's) has %d homes among enabler, kit, shelf and the pet's calls — one" % [n, spec, homes])
+				if not en.has(n) and not kit.has(n) and call == 0:
 					_returning[n] = [key, String(spec)]
 			# THE BASICS THAT WERE A LINEAGE'S OVERRIDE, found on its shelf by the
 			# one resolver that defines them.
@@ -298,7 +321,9 @@ func _s1_nothing_lost() -> void:
 			ok(not Classes.spec_pool(String(_returning[n3][1])).has(n3),
 				"§1: %s is in a zone-boss pool as well" % n3)
 	ok(overrides == 4, "§1: %d of the four former basic-attack overrides are on a shelf" % overrides)
-	ok(_returning.size() == 29, "§1: %d cards returned to a pool — GS §1 counted twenty-nine" % _returning.size())
+	# GS §1's twenty-nine and HB §2's Tripwire, which left the class kit when
+	# Summon Companion took its slot and landed on the Survivalist's shelf.
+	ok(_returning.size() == 30, "§1: %d cards returned to a pool — GS §1 counted twenty-nine, and HB's Tripwire is the thirtieth" % _returning.size())
 	var per := {}
 	for n4 in _returning:
 		per[_returning[n4][0]] = int(per.get(_returning[n4][0], 0)) + 1

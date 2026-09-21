@@ -369,17 +369,23 @@ func _s2_bound_cards() -> void:
 	# BATCH GS — the table this walked is deleted, and the ruling it priced holds
 	# for every lineage now: only an enabler leaves with an engine, and an enabler
 	# sits outside the count, so a drop frees no slot anywhere. All twelve.
+	# BATCH HB — AND ONE ENGINE TAKES A KIT CARD AWAY WHILE HELD. The
+	# Sharpshooter's Lethal Aim dismisses the pet, so HOLDING it frees the pet's
+	# slot and dropping it takes the slot back: a drop still frees no slot
+	# anywhere, and the held count is the dropped one less the card the engine
+	# dismisses — one lineage, by one, read off the same door the kit reads.
 	for spec2 in Classes.SPEC_INFO:
 		var ck2 := Classes.class_of_spec(String(spec2))
 		var m_held := {"key": ck2, "spec": spec2,
 			"engines": Runes.engine_pouch_for_spec(String(spec2)), "bm_abilities": []}
 		var m_drop := {"key": ck2, "spec": spec2, "engines": [], "bm_abilities": []}
+		var freed := 1 if Classes.dismisses_pet(Runes.held_engines(m_held)) else 0
 		# BATCH GN — the opening is the lineage's count and the class kit's.
-		ok(run.ability_slots_used(m_held) == run.ability_slots_used(m_drop)
+		ok(run.ability_slots_used(m_held) == run.ability_slots_used(m_drop) - freed
 				and run.ability_slots_used(m_drop) == Classes.lineage_slots(String(spec2))
 					+ Classes.kit_slots(ck2, String(spec2)),
-			"§2: %s's slot count is %d with the engine and without (a drop frees no slot)"
-				% [spec2, run.ability_slots_used(m_drop)])
+			"§2: %s's slot count is %d with the engine and %d without (a drop frees no slot)"
+				% [spec2, run.ability_slots_used(m_held), run.ability_slots_used(m_drop)])
 
 	# (e) A DROP WRITTEN IN THE MIDDLE OF A FIGHT MOVES NOTHING IN THAT FIGHT.
 	# Only the map's rune pouch drops an engine, and the fight reads the member
@@ -436,11 +442,18 @@ func _open_board(s: Node, with_engine: bool) -> void:
 		if with_engine and u.second_resource_name != "":
 			u.second_resource = 100
 	s._apply_status(_foe(s), "burn", 3, 0, 0, H[0])
+	# BATCH HB — THE SUMMON ON THE BAR IS ONE CARD NOW, whose picker casts one of
+	# three calls; the card itself names no companion. The board fields the wolf
+	# through the call the picker and the bot build (`_summon_choice`), which is
+	# the companion every Hunter but the Sharpshooter brings since HB.
 	if with_engine:
 		for u2 in H:
 			for ab in u2.abilities:
 				if ab.special == "summon" and s._beasts(u2).is_empty():
-					await s._resolve_special(u2, ab, u2, "good", 1.0)
+					var call: Ability = s._summon_choice(u2, "canis") \
+						if ab.display_name == Classes.PET_CARD else ab
+					if call != null:
+						await s._resolve_special(u2, call, u2, "good", 1.0)
 
 
 func _usable_on_open_board(s: Node, u: BattleUnit, ab: Ability) -> bool:

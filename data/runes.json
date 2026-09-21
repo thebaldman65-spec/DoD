@@ -595,7 +595,7 @@
 	"second_whistle": {
 		"name": "Second Whistle", "scope": "spec:beastmaster",
 		"price": 100,
-		"desc": "Summon Ursus, Canis and Aguila each field the companion with 3 Loyalty already earned.",
+		"desc": "Summon Companion fields each of the three companions with 3 Loyalty already earned.",
 		"payload": {"stat": {"rune_second_whistle": 3}}
 	},
 	"shared_scent": {

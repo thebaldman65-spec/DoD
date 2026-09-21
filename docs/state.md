@@ -13,84 +13,127 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-21 (Batch HA).*
+*Last rewritten: 2026-09-21 (Batch HB).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: HA — THE LAST STAGE, CENSUSED AND PRICED. IMPLEMENT ONLY, AND THE THIRTY-THIRD BATCH ON
-  `class-merge`.** FP's sixth stage, taken as a census of every target the battery launches. **No game code, no rune,
-  card, kit, engine, pool or node, no gate, suite, fixture or baseline row moved**, and `main` is untouched. Full
-  working: **`docs/reports/HA.md`**.
-- **§1 — FORTY-TWO GATES PASS WHILE STILL ASKING ABOUT SPECS: 130 ARMS, AND TWENTY OF THEM ARE HOLES.** The population
-  is the **119 files the battery launches** (46 suites, 69 gates, the harness, two scene runs and `check_de`), the four
-  it launches nothing for and both fixtures — 125 files. Four instruments: a comment-stripped vocabulary sweep, nine
-  readers under one written rubric (eight relations the merge DISSOLVED, nine lineage layers that still LIVE), HA's own
-  sweeps of the class-shelf names and of every document pin, and a re-check of every target left clean. **Outcomes over
-  the 119: 75 repaired and correct, 42 in the middle group, 2 red on purpose.** The middle group's 130 arms are
-  **68 re-points, 35 floors to fold into one per-class floor, and 27 retirements**; **20 arms in 15 targets cannot fail
-  as written or pass while the game contradicts them** — a loop over the class keys that never runs its assertion
-  (`test_batch_bu:385`), an arm that passes whenever the Swordmaster's enablers are empty (`test_batch_bx:410`, empty
-  since GS), Guard Change and Immolate asserted to reach one lineage while every Warrior and every Mage is offered them
-  (`test_batch_ak:345`, `test_batch_ar:684`/`:686`), a pin kept green by `CLAUDE.md` still stating the seam GP deleted
-  (`test_batch_br:1566`). The whole list is in the report, arm by arm.
-- **§1f — OF FP's 52, TWENTY ARE REPAIRED, THIRTY-ONE ARE IN THE MIDDLE GROUP, ONE IS RED ON PURPOSE — AND ELEVEN OF THE
-  MIDDLE GROUP WERE NEVER IN FP's 52.** FP's band was the engine half of the merge (`passive_id`, `second_resource`, a
-  `spec:` scope); the middle group is mostly the other half — the offer (D3, 60 arms), per-spec depth (D8, 31), the kit
-  (D4, 27) and ownership (D7, 12). **FP's 52 is recoverable exactly** from FP's own `run_battery.sh` as 34 suites and
-  18 gates; `docs/merge-recon.html`'s prose says *"All 46 … suites"*, which is the whole suite count.
-- **§2 — PRICED AND NOT REPAIRED, BY THE BRIEF'S OWN RULE: TWO BATCHES.** **HB: the twenty tier-1 arms and the fold
-  family** (55 arms, 23 targets, one shared per-class floor helper). **HC: the other 75 arms in 36 targets**, including
-  `check_ea` §1's four-arm re-derivation and `check_dp` §1's per-class status table. Every repaired target owes a
-  control that breaks what it guards and sees it red, and its row moved before the run.
-- **§3 — LANDING ON `main`: ONE CONFLICT, NOTHING LOST, AND NOT READY.** A trial merge (`git merge-tree`, nothing
-  written) raises exactly one conflict, `docs/state.md`, which FQ's convention answers; `main`'s only commits since the
-  merge base (FS) are twelve lines of this file. **Driven in isolated copies seeded from the player's saves: `main`
-  refuses the merged build's v3 profile and writes nothing, as FQ built it — and LOADS its v13 run save with no word,
-  seating three of the four heroes with their basic attack alone**, because they took a spine or a rule engine and
-  `main` has neither class kits nor engine runes. **The branch is not ready**: the middle group stands between it and a
-  battery that speaks for the merged game, and so do the lineage layers nothing has merged — **a hero who takes a spine
-  or a rule engine is offered no ordinary rune at all**, because all sixty live ordinary runes are spec-scoped.
-- **§4 — `README.md` SAYS ONLY WHAT CANNOT GO STALE** (ruled): what the project is, where things live, which file to
-  open first, 62 lines to 28. The rule and its reason — *a file no instrument reads will always drift* — are in
-  `CLAUDE.md`'s *WHAT THIS FILE IS* block. **§5 — GZ's CEILING PRINCIPLE IS RECORDED** directly after FG §2 in
-  `docs/instrument-rules.md`, with a row in `CLAUDE.md`'s index of that file.
-- **THE VERIFICATION.** HEAD's unmodified battery ran first against the frozen tree: **121 of 121 launched,
-  `check_de` 501 checks / 0 failures / 0 notices, the only reds the two sanctioned ones at their baseline counts**, no
-  `Parse Error` in any log, and the tree and the player's four saves byte-identical before and after. **The run
-  against the tree with this batch's documents is in `docs/reports/HA.md` §7.**
-- **`CLAUDE.md` IS 351,443 B = 343.21 KiB, WITH 66.79 KiB UNDER ITS 410 KiB CEILING** (+594 B this batch: the README
-  rule and one index row).
-- **WHAT MOVED:** `README.md` (stripped), `CLAUDE.md` (the README rule, one index row and the sentence above it),
-  `docs/instrument-rules.md` (GZ's principle), `docs/changelog.html` (this batch's entry), `docs/design-notes.md` (one
-  entry, at the top), this file and `docs/reports/HA.md` (**NEW**). **No `.gd`, no `.tscn`, no `data/`, no
-  `run_battery.sh`, no `baselines.json` row and no new gate** — no gate was edited, so no count could move, and the
-  count differ is what says so.
-- **Phase.** Steps 1–5 of the merge's running order are done. **Step 6 is censused and priced; its repair is HB and
-  HC.** The Crown's Break and freeze resistance, Sanctity's potency layer and the engine-card texts stay queued.
-- **Next letter: HB.**
+- **Last batch: HB — EVERY HUNTER HAS A PET. IMPLEMENT ONLY, AUTHORED WITH THE DESIGNER AND TRANSCRIBED, AND THE
+  THIRTY-FOURTH BATCH ON `class-merge`.** The companion is the Hunter's class identity, and dismissing it is the
+  Sharpshooter's build decision. `main` is untouched. Full working: **`docs/reports/HB.md`**.
+- **THE SEQUENCE SHIFTED, AND HA's REPORT IS NOT THE CURRENT PLAN.** HA planned HB for its twenty holes and HC for the
+  other 75. **This batch took HB; the rune scopes are HC; HA's twenty holes are HD; the other 75 are HE.** HA §2's HB
+  was the twenty tier-1 arms **and** the thirty-five FOLD arms (55 arms, 23 targets), so **HD is both**, as HA priced
+  them. Nothing HA priced was repaired here except where HB's own move reached it.
+- **§1 — SUMMON COMPANION IS ONE CARD WITH THREE CALLS.** Ursus, Canis and Aguila are chosen **at the cast**, in the
+  picker the three summons already opened (`_open_summon_picker`); each call is built by `_summon_choice` for the
+  player and the bot alike and keeps its own definition, its own words and **its own cooldown**, as three cards did.
+  **The swap is unchanged**: three swap options, 10 Mana, 1.0 initiative, one shared 3-turn cooldown. **What crosses a
+  swap is what crossed it before** — Loyalty, which lives on the Hunter per companion; not health, not statuses —
+  driven on this tree and on HEAD's (`docs/reports/HB.md` §1).
+- **§2 — THE HUNTER KIT IS POWERSHOT · SNARE TRAP · SUMMON COMPANION.** Tripwire went to the **Survivalist's shelf**
+  (it had never been in a pool — GN took it from the Survivalist's opening into the kit), so the Hunter's pool is
+  **42**, the draft **179** (159 spec + 20 class) and the Survivalist's shelf **12**; **the Warden's eleven is the
+  shallowest shelf alone**. The drafted hook casts it for the bot.
+- **§3 — PACK BOND BRINGS NOTHING; GS's EXCEPTION IS RETIRED.** `PROTECTED_CORES["beastmaster"]` is slots 0, enablers
+  none. **Every Hunter's companion fights**: the strike beside the Hunter sat inside Pack Bond's check and is the
+  companion's now; the Ghost Pack node and the Ghostpack card stay Pack Bond's. **Pack Bond deepens the bond**: the
+  three boons, Loyalty's growth, the conversion at 8 and EV's fallback all read it. **The Shared Hide is not Pack
+  Bond's** — it reads a companion's blow and no engine. Re-derived at the read site: **the companion readers are
+  fourteen cards (nine refused at the door with none standing, five that do nothing without one) and six runes**,
+  ungated for every Hunter; **the bond readers are GP's and GV's Pack Bond rows, unchanged**.
+- **§4 — THE SHARPSHOOTER DISMISSES THE PET, AND ONLY HE DOES** (`Classes.PET_DISMISSERS`). A Lethal Aim holder
+  opens on **two** slots, the freed one his for a drafted card; his crit multiplier is **×2.5** (`unit.gd`
+  `SHARPSHOOTER_CRIT_MULT` 0.50 on Lethal Aim's ×2), Focus unchanged on top; and **every hit he lands without a
+  critical adds +5% critical chance, a critical resetting it to zero** (`BattleUnit.crit_pity`, moved at the one crit
+  site in `_resolve`'s strike loop, shown on the Lethal Aim chip). **No cap was written** — the brief gave none; the
+  reset governs. **The gate learned a negative**: a companion reader is withheld from his offer
+  (`Classes.offerable`, `Runes.offerable`), one he carries sits out with a note naming the rune, the summon door
+  refuses him, and **unequipping the Rune of the Sharpshooter is refused while every slot is full**, because it puts
+  Summon Companion back in the kit.
+- **THE VERIFICATION.** HEAD's unmodified battery ran first against the new tree: **121 of 121 launched, the tree hashed at the start and at the end (425 paths, none moved), no `Parse Error` in any log; 25 targets red — 10 suites and 15 gates — every one on HB's own move (the multiplier, the one summon card, Pack Bond's empty core, Tripwire's shelf, the dismissed pet, the draft of 179 in `master.html`'s needles, `check_es`'s census) — and the two sanctioned reds at their counts.** `check_de` read 35 failures and 8 notices; every one is accounted for, by FAIL text or by an `ok()` trace, in `docs/reports/HB.md` §6. **The run against the
+  tree with this batch's documents is in `docs/reports/HB.md` §7.** The player's four saves were backed up to
+  `../save-backups/HB-20260921-045412` and hash-verified before anything ran.
+- **`CLAUDE.md` IS 358,552 B = 350.15 KiB, WITH 59.85 KiB UNDER ITS 410 KiB CEILING** (+7,109 B this
+  batch: the HB standing rule and the kit, core, draft and summoning facts it moved).
+- **WHAT MOVED:** `scripts/classes.gd`, `unit.gd`, `battle.gd`, `run_state.gd`, `runes.gd`, `map_screen.gd`,
+  `party_screen.gd`, `spec_choice_screen.gd`; `data/runes.json` (the Second Whistle's words) and `data/glossary.json`;
+  eighteen gates and suites re-pointed to HB's rules — `check_dr`, `check_eh`, `check_fd`, `check_fe`, `check_gm`, `check_gn`, `check_go`, `check_gq`, `check_gs`, `check_gu`, `check_gv`, `check_gx`, `test_batch_az`, `bb`, `bo`, `bv`, `cd` and `ce` — and `pin-manifest.json`; `baselines.json`; `CLAUDE.md`, `docs/master.html` and its stamp, `docs/changelog.html`,
+  `docs/design-notes.md`, this file and `docs/reports/HB.md` (**NEW**).
+- **Phase.** Steps 1–5 of the merge's running order are done. **Step 6 is censused (HA) and its repair is HD and HE**,
+  behind HC's rune scopes. The Crown's Break and freeze resistance, Sanctity's potency layer and the engine-card texts
+  stay queued; companion runes and a new companion are queued by the brief, not authored.
+- **Next letter: HC.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### HA's RULINGS OWED — **FOUR; THE FIRST SETS THE NEXT TWO BATCHES, AND THE THIRD AND FOURTH ARE ABOUT `main`**
+### HB's RULINGS OWED — **SEVEN, ALL PLAYER-VISIBLE; THE FIRST TWO ARE MAGNITUDES THE BRIEF LEFT OPEN**
+
+Full working: `docs/reports/HB.md`, NEEDS A RULING.
+
+1. **"+50% CRIT MULTIPLIER" WAS READ AS +0.50 ON THE MULTIPLIER — ×2 BECOMES ×2.5**, in the unit EW's surplus
+   conversion uses (0.50 of multiplier). The other reading, ×2 × 1.5 = ×3, is one line: `unit.gd`'s
+   `SHARPSHOOTER_CRIT_MULT`. Focus rides on top either way (×3 at 200, ×3.5 at 300).
+2. **THE PITY METER HAS NO CAP, AND IT COUNTS HITS.** The brief gave no cap and Heavy Plating's has one (+40%).
+   Uncapped, the reset governs: a deep Sharpshooter at turn 10 and the odds of a streak reaching certainty are in the
+   report's §4. *"Per landed attack"* was read as BR §1 reads a charge — per HIT — so an area attack climbs it once per
+   enemy struck; per CAST is the other reading.
+3. **A SHARPSHOOTER FIELDS NO COMPANION BY ANY ROUTE, AND THAT INCLUDES CALL THE WILDS.** An earned Call the Wilds
+   is the one card that summons, and *dismisses the pet* was read as no companion at all: it is withheld from his
+   offer and sits out if he carries it. The other reading lets the drafted summon through.
+4. **UNEQUIPPING THE RUNE OF THE SHARPSHOOTER IS REFUSED WHILE EVERY SLOT IS FULL**, because it returns Summon
+   Companion to the kit and the kit would overfill the bar. The refusal names the reason and asks for a card to be
+   benched first. The alternatives — bench one for him, or let the kit overfill — are the designer's.
+5. **THE ZONE BOSS'S TIER-1 OFFER STILL ASKS NO DOOR**, so a Beastmaster-lineage Hunter holding Lethal Aim can be
+   offered Bestial Wrath, Spirit Bond or Primal Surge off his boss pool — companion cards that sit out for him — and
+   Call of the Wild, whose absent companions strike bodiless. GP ruled the boss pools untouched and the brief says no
+   pool changes; asking `Classes.offerable` there is one line.
+6. **A HUNTER MAY STILL HOLD PACK BOND AND LETHAL AIM TOGETHER**, and then Pack Bond does nothing at all: every read of
+   it needs a companion and he has none. Nothing withholds either engine from the other's holder; whether it should
+   is the designer's.
+7. **SUMMON COMPANION IS TAGGED OFFENSE / BREAK — TWO OF ITS THREE CALLS — AND THE CORE-KIT CENSUS MOVED WITH IT.**
+   The Beastmaster's core no longer carries Summon Canis's DEBUFF, so DEBUFF is met at 2+ by **five** lineages'
+   cores alone, not six (`check_es` §4, and the three documents that state it). Tagging the card DEBUFF / BREAK, for
+   the wolf, is the other reading and moves the OFFENSE column instead.
+
+### FOUND AT HB AND NOT FIXED
+
+- **THE BOSS-POOL DOOR (ruling 5) IS GP's, NOT NEW**: `roll_spec_ability_offer`'s tier-1 draw has never asked
+  `offerable` — GP left the boss pools as they were — so it reads no engine at all. HB adds the negative case to
+  what it does not ask.
+- **TWO BRIEF PREMISES DID NOT HOLD** (HB §0): Tripwire never was in the Hunter pool, so it went to it rather than
+  *back*; and *cards and runes that need a companion were gated on Pack Bond* held at neither layer — GP and GV gated
+  the BOND readers and left every card that needs only a companion ungated, because an earned Call the Wilds gave any
+  Hunter one. **The Shared Hide is a companion reader, not a Pack Bond one.**
+- **THE THREE SUMMONS WERE ONE BUTTON IN A FIGHT BEFORE HB** — *Summon Companion ▸* on W, opening the picker — and
+  three rows everywhere else. HB made them one card everywhere, and the fight's button did not change.
+- **FOUR ISOLATED COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata`: **"Dawn of Decay HB head probe"** (the
+  HEAD arm of §1's swap drive and of the traces), **"HB trace new"** (the `ok()` traces), **"HB probe new"** (the probes)
+  and **"HB ctl"** (the controls). Each was renamed in `project.godot` before anything ran in it; they can be deleted.
+  **There are 106 such folders now.** **The
+  untracked `save-backups/` folder inside the repo is not this batch's**; this batch's backup is
+  `../save-backups/HB-20260921-045412`.
+
+### HA's RULINGS OWED — **FOUR; THE FIRST IS ANSWERED BY HB's SEQUENCE AND 2(c) BY HB ITSELF, AND THE THIRD AND FOURTH ARE ABOUT `main`**
 
 Full working: `docs/reports/HA.md`, NEEDS A RULING.
 
-1. **THE REPAIR OF THE MIDDLE GROUP IS PROPOSED AS TWO BATCHES.** **HB: the twenty tier-1 arms first** — each cannot
+1. **THE REPAIR OF THE MIDDLE GROUP IS PROPOSED AS TWO BATCHES — ANSWERED WITH HB's BRIEF: THEY ARE HD AND HE, BEHIND
+   HB's PET AND HC's RUNE SCOPES.** **HD (HA's HB): the twenty tier-1 arms first** — each cannot
    fail as written or passes while the merged game contradicts it — **then the thirty-five FOLD arms** in eleven
    suites, whose per-shelf and class-wide-shelf floors become one per-class floor through one shared helper (55 arms,
-   23 targets). **HC: the other seventy-five tier-2 arms in 36 targets**, with `check_ea` §1's four-arm
+   23 targets). **HE (HA's HC): the other seventy-five tier-2 arms in 36 targets**, with `check_ea` §1's four-arm
    re-derivation over class × engines held and `check_dp` §1's status table re-keyed by class as the two that are more
    than a re-point. **The report's §1d is the work list, arm by arm: file, line, relation, action and cost.**
 2. **FIVE CALLS ONLY THE DESIGNER CAN MAKE BEFORE THOSE ARMS ARE REPAIRED:** (a) **Guard Change and Lunge** — every
    Warrior is offered both since GP; retire `test_batch_ak:345`, or rule them holder-only (two `ENGINE_READ` rows);
    (b) **Immolate and Pyroblast** — every Mage is offered both and neither reads an engine; retire
-   `test_batch_ar:684`/`:686`, or rule them holder-only; (c) **summoning** — exclusive to the Pack Bond engine's three
-   enablers, or to the Hunter class, since an earned Call the Wilds summons with no Pack Bond (`check_dr` §1, and
-   `CLAUDE.md`'s DR §1 block and FO §2 bullet); (d) **EB §1's "class-wide cards are weaker"** — GP recorded the
+   `test_batch_ar:684`/`:686`, or rule them holder-only; (c) **~~summoning~~ — RULED AT HB: THE HUNTER CLASS**, every
+   Hunter but the Sharpshooter, through the class kit's Summon Companion (`check_dr` §1 re-pointed, and `CLAUDE.md`'s
+   DR §1 block and FO §2 bullet with it); (d) **EB §1's "class-wide cards are weaker"** — GP recorded the
    rebalance as owed; retire `test_batch_bq:344`/`:349` or re-point them over every Cleric who can draft Heal; (e) **the
-   floor the FOLD family asserts** — on `Classes.draft_pool(k)` (43 / 51 / 43 / 41 today), on the engine-free
-   `Classes.offerable(draft_pool(k), [])` (40 / 38 / 29 / 34), or both.
+   floor the FOLD family asserts** — on `Classes.draft_pool(k)` (43 / 51 / 43 / 42 since HB), on the engine-free
+   `Classes.offerable(draft_pool(k), [])` (40 / 38 / 29 / 35 since HB), or both.
 3. **`main` HAS NO FORWARD GUARD ON THE RUN SAVE.** Driven at HA §3c in isolated copies seeded from the player's saves:
    `main` refuses the merged build's v3 profile and writes nothing — FQ's guard, working as built — but **loads its v13
    run save without a word and seats three of the four heroes with their basic attack alone**, because they took a
@@ -119,8 +162,9 @@ Full working: `docs/reports/HA.md`, NEEDS A RULING.
   `check_fd`'s identical helper was repaired at GV and this one never was), `test_runes`' exhaustion and start-pool
   members, `check_fm`'s `_member`, and `test_batch_bo` §2/§3, where it is what makes three arms vacuous. The list is in
   the report's §1g.
-- **`Run.ability_slots_used` IS LINEAGE-KEYED AND NEVER READS AN ENGINE**, so two gate arms are near-tautologies against
-  it (`check_gm:378`, `check_gn:197`). Correct while `lineage_slots` is zero for every lineage.
+- **`Run.ability_slots_used` IS LINEAGE-KEYED, AND SINCE HB IT READS ONE ENGINE QUESTION** — whether one held dismisses
+  the pet (`Classes.kit_slots(class, spec, engines)`) — so two gate arms are still near-tautologies against its
+  lineage half (`check_gm:378`, `check_gn:197`). Correct while `lineage_slots` is zero for every lineage.
 - **THE DEBUG PRE-GRANT *"All Spec Abilities Unlocked"* STILL GRANTS ONE LINEAGE'S BOSS POOL AND SHELF** (`battle.gd`
   ~1322), not the class pool a draw reads.
 - **THREE GATES CHECK TWELVE ENGINES' TEXT WHERE THERE ARE TWENTY-FOUR** (`check_cl_resolver`, `check_cl_width`,
@@ -827,8 +871,9 @@ Full working: `docs/reports/GN.md`, NEEDS A RULING.
   run draws, and that run now holds the Bell (card +178, purse +198). **HEAD's code with the Bell forced reds the same
   arm** (card +157, purse +177). One expression in `battle.gd`; not in the brief. The red is sanctioned in
   `baselines.json` until it is fixed.
-- **TRIPWIRE ANSWERS A BLOW ON A COMPANION.** The brief said *a hero*; the block reads any hero-side body, and a
-  Beastmaster holds Tripwire since GN — measured, a melee blow on his bear is answered for 75%. The card's *ally* is
+- **TRIPWIRE ANSWERS A BLOW ON A COMPANION.** The brief said *a hero*; the block reads any hero-side body, and every
+  Hunter held Tripwire from GN to HB (a drafted card since, off the Survivalist's shelf) — measured, a melee blow on
+  his bear is answered for 75%. The card's *ally* is
   the code's.
 - **MANA SHIELD IS STILL NEVER CAST BY THE BOT** (GM's item below); the class branch covers the kit cards only.
 - **THE WARRIOR'S OTHER ENGINE-ONLY BOT CASTS STAY** — Wildstrikes, Shieldwall and Guard Change are not kit cards.
@@ -907,8 +952,8 @@ Full working: `docs/reports/GL.md` and `docs/reports/GN.md`.
    picked.
 5. **~~TWO VERDICTS HAVE TWO READINGS~~ — MOOT FOR THE KIT:** Ministration was picked and heals 20% of its target's
    maximum on a Cleric holding no engine (driven, `check_gn` §1). Divine Shield was not picked.
-6. **~~THE BOT NEVER CASTS THREE OF THE 64~~ — TWO CLOSED AT GN:** Powershot and Tripwire are the Hunter kit's and the
-   class branch casts them. **Mana Shield is still never cast** (GM's item above).
+6. **~~THE BOT NEVER CASTS THREE OF THE 64~~ — TWO CLOSED AT GN:** Powershot is the Hunter kit's and the class branch
+   casts it; Tripwire was the kit's until HB, and the drafted hook casts it since. **Mana Shield is still never cast** (GM's item above).
 
 ### FOUND AT GL AND NOT FIXED — **FOUR CLOSED AT GM: HOLD BREATH, THE DEAD BUTTONS, SPLIT SHIELD AND DISPEL; THE BOT'S KIT CARDS AT GN**
 
@@ -957,7 +1002,8 @@ Full working: `docs/reports/GL.md` and `docs/reports/GN.md`.
   Command's "both companions" names a mode nothing writes (`the_pack`); Arcane Explosion's "Builds 1 Resonance".
 - **THE SIM BOT CASTS SEVERAL CANDIDATES ONLY INSIDE ENGINE BRANCHES — THE KIT CARDS CLOSED AT GN:** the class
   branch (`_bot_class_kit_pick`) casts Mocking Blow and Pommel Strike for any Warrior (Bloodlust until GS §2, and the
-  Berserker rotation casts it again), and Powershot and Tripwire for any Hunter; **Wildstrikes, Shieldwall and Guard Change are not kit cards and stay engine-only.** GL's record: (Bloodlust,
+  Berserker rotation casts it again), and Powershot for any Hunter (Summon Companion too since HB, for any Hunter who
+  holds it; Tripwire until HB, cast by the drafted hook since); **Wildstrikes, Shieldwall and Guard Change are not kit cards and stay engine-only.** GL's record: (Bloodlust,
   Wildstrikes, Mocking Blow, Shieldwall, Guard Change — `battle.gd:4656-4760`). A class kit owes the bot a class-level
   branch, or a sim never plays the kit. **GM SHARPENED IT:** those five are the only candidates the bot casts solely inside an engine
   branch, all of them the Warrior's — the Mage, Cleric and Hunter branches key on the card, not the engine — and
@@ -1555,7 +1601,7 @@ code, and some of what it found lives elsewhere. **The tables are in `docs/repor
   exact and contained matches against `scripts/` and `data/`). The names a merge would have made collide: Spite (a Warden node and a Berserker card), Whetstone (a Swordmaster node and a
   live rune), Second Wind (a Berserker node and a Holy card).
 
-### THE CLASS MERGE ~~IS MEASURED AND UNRULED~~ WAS MEASURED AT FP AND IS RULED — **A PROJECT ON ITS OWN BRANCH SINCE FQ; STEPS 1–5 BUILT (3's NINE ENGINES AT GO, 4's POOL MERGE AT GP, 5 AT GP AND GV); STEP 6 CENSUSED AT HA AND OWED TO HB AND HC (THE RUNNING ORDER BELOW)**
+### THE CLASS MERGE ~~IS MEASURED AND UNRULED~~ WAS MEASURED AT FP AND IS RULED — **A PROJECT ON ITS OWN BRANCH SINCE FQ; STEPS 1–5 BUILT (3's NINE ENGINES AT GO, 4's POOL MERGE AT GP, 5 AT GP AND GV); STEP 6 CENSUSED AT HA AND OWED TO HD AND HE, BEHIND HC's RUNE SCOPES (THE RUNNING ORDER BELOW)**
 
 **Full evidence: `docs/merge-recon.html`, written to be read section by section across many
 batches. `docs/reports/FP.md` is the batch's own working.** FP authored nothing and proposed
@@ -1824,23 +1870,25 @@ done at FQ.** The order is recorded so it is not re-litigated batch by batch:
    only what it cannot run without.
    - **~~AND A CLASS KIT OF THREE, RULED IN GL's BRIEF~~ — BUILT AT GN.** Its recon is `docs/kit-recon.html` (GL); GN's
      brief names the Crown's Break and freeze resistance as the batch after the kits. No step number was ruled for it.
-4. **~~POOL MERGING~~ — BUILT AT BATCH GP.** One pool a class (38 / 41 / 34 / 36; **43 / 51 / 43 / 41 since GS §1**,
+4. **~~POOL MERGING~~ — BUILT AT BATCH GP.** One pool a class (38 / 41 / 34 / 36; **43 / 51 / 43 / 41 since GS §1**, **43 / 51 / 43 / 42 since HB §2**, Tripwire on
+   the Survivalist's shelf;
    which put the 29 cards that stopped travelling on their shelves), the class-wide cards ordinary cards in it, the
    class-wide share and EH §1's third zone-boss tier deleted, and **a card that reads an engine offered only to its
-   holder** — 34 of the 149, derived at the read site and driven both ways; **37 of the 178 since GS**.
+   holder** — 34 of the 149, derived at the read site and driven both ways; **37 of the 178 since GS, and of the 179 since HB**.
 5. **~~THE 43 ENGINE-READING RUNES AND THE ENGINE-READING CARDS~~ — THE CARDS AT GP, THE RUNES AT GV.** GP took the
    CARDS half at the offer door; **GV took the RUNES half at every rune door and at a queued cache's answer**, and the
    population is **35 of the 60 live ordinary runes** rather than FP's 43 (a rune that half-works, or reads a card, a
    status, the stance or nothing, is not gated — GP's own groups). GM's standing item — *ten live spec runes are read
    only under their lineage's engine, and a rune's scope is the lineage, so he is still offered them* — is closed by
    it; **what the scope itself should be is GV's ruling 5.**
-6. **THE GATES — CENSUSED AT HA, AND THE REPAIR IS HB AND HC.** FP counted **52 engine-bound targets** carrying
+6. **THE GATES — CENSUSED AT HA, AND THE REPAIR IS HD AND HE** (HB was the pet and HC is the rune scopes). FP counted **52 engine-bound targets** carrying
    71.6% of the battery's asserted checks, and GK repaired every red its own move caused. **HA read all 119 launched
    targets arm by arm**: of FP's 52, **twenty are repaired and correct, thirty-one still ask a pre-merge question and one
    is red on purpose** — and **the middle group is 42 targets and 130 arms, eleven of its targets outside FP's 52**,
    because FP's band was the engine half of the merge and the middle group is mostly the offer, the kit and
    ownership. **Twenty arms in fifteen targets cannot fail as written or pass against a false claim.** Priced, not
-   repaired: **HB takes the twenty and the fold family, HC the other seventy-five** (`docs/reports/HA.md` §1–§2).
+   repaired: **HD takes the twenty and the fold family, HE the other seventy-five** — HA priced them as HB and HC
+   (`docs/reports/HA.md` §1–§2).
 
 ### **AND FP's `block_chance` FINDING TRAVELS WITH IT — RE-VERIFIED AT FQ, AND THE CODE SAYS IT OUT LOUD**
 
@@ -2208,7 +2256,7 @@ deliberately.
   **Thresholds are the default shape and a splash pays for breadth**, both ruled. **The one hard
   constraint on whoever authors the first is measured and printed every battery run**: the protected
   cores ALONE meet a 2+ threshold on **BREAK for ten of the twelve specs** and on **DEBUFF for
-  six** (the class kits count, since GN), so those two magnitudes are already spent; **MARK and TEMPO are zero for all
+  five** (the class kits count, since GN; six until HB), so those two magnitudes are already spent; **MARK and TEMPO are zero for all
   twelve** (since GS §1 a lineage's cores are its enablers and the class kit), so those two are the ones a draft can
   actually move. **And the place a rune
   reads it in a fight is the SPAWN, not the strike loop** — the loadout cannot change during a
@@ -2242,9 +2290,10 @@ and every authored rune, and the draft card shows it.
   surface may not BRANCH on one is asserted directly over `TAG_ORDER` rather than by proxy.
 - **AND THE FIRST THING THE MACHINERY MEASURED IS THE CONSTRAINT ON EVERY FUTURE THRESHOLD RUNE.**
   The protected cores ALONE meet a 2+ threshold on **BREAK for ten of the twelve specs** and on
-  **DEBUFF for six** — five until GN, whose class kits put Crushing Blow and Mocking Blow on every
-  Swordmaster and Snare Trap on every Beastmaster, seven from GN to GS, and six since GS §1 took every card but the
-  enablers out of the lineages' kits (FR §2 had corrected an earlier *seven* here that
+  **DEBUFF for five** — five until GN, whose class kits put Crushing Blow and Mocking Blow on every
+  Swordmaster and Snare Trap on every Beastmaster, seven from GN to GS, six from GS §1, which took every card but the
+  enablers out of the lineages' kits, and five since HB, when the Beastmaster's Summon Canis became a call of the
+  kit's one OFFENSE / BREAK card (FR §2 had corrected an earlier *seven* here that
   was the OFFENSE column), while **MARK and TEMPO are zero for all twelve** — Blessing of Zeal, the one TEMPO core,
   is drafted since GS.
   `check_es` §4 prints the per-spec table every battery run rather than this
@@ -3454,15 +3503,16 @@ re-derived from the source at DM; not one was moved.**
   else** — not Fervor, not Apostle. **ALL NINE PLACES THAT SPEAK EITHER MAGNITUDE NOW AGREE**, as
   of DG §1: the two cards, the `passive_desc`, the `faith` chip, the glossary, two `master.html`
   sites and two source comments.
-- **The ability draft is COMPLETE at 178 of 178** — `SPEC_DRAFT_POOLS` is **158** and
+- **The ability draft is COMPLETE at 179 of 179** — `SPEC_DRAFT_POOLS` is **159** and
   `CLASS_DRAFT_POOLS` is **20**, counted out of `classes.gd` (**154 and 25 until GN moved five
   class-wide cards into the class kits; 129 and 20 until GS §1 put the 29 cards that stopped travelling on their
-  lineages' shelves**). **NEITHER HALF IS A FLAT MULTIPLE ANY
+  lineages' shelves; 158 until HB put Tripwire on the Survivalist's**). **NEITHER HALF IS A FLAT MULTIPLE ANY
   MORE.** DO's twenty-two took nine spec pools past eight, DR moved two of those nine (Swordmaster to
   TWELVE, Cryomancer down to ELEVEN), DS took the last three at eight to TEN, and **DY took the
   Warden to TEN, the Arcanist to TWELVE and the Devout to ELEVEN**. **THE SHALLOWEST SPEC POOL IN THE
   GAME WAS TEN FROM DY TO GS** — the Warden's nine was the floor from DS to DY — **and is ELEVEN since GS §1** (the
-  Warden and the Survivalist; the Pyromancer and the Arcanist are the deepest at sixteen).
+  Warden and the Survivalist until HB, the Warden alone since; the Pyromancer and the Arcanist are the deepest at
+  sixteen).
   **AND THE CLASS HALF STOPPED BEING 4 × 6 AT DY, AND GN THINNED IT: the Warrior and Hunter pools draw
   six, the MAGE's FIVE and the CLERIC's THREE**, so `CLASS_TARGET` is a summed table (`test_batch_cd.PER_CLASS_DEPTH`) exactly as
   `SPEC_TARGET` has been since DO. **Do not write `12 * 8` or `4 * 6` again.**
@@ -3473,10 +3523,12 @@ re-derived from the source at DM; not one was moved.**
 - **Ability slots are a LADDER: `ABILITY_SLOTS_BY_BOSS` = [7, 8, 9, 10]**, one rung per zone boss
   cleared, read through `Run.ability_slot_cap()` and never off a constant. **A hero's opening is
   `Classes.lineage_slots(spec)` (GK: the lineage's slots less its engine's enablers) plus
-  `Classes.kit_slots(class, spec)` (GN: the class kit less what the lineage already counts)**, and
+  `Classes.kit_slots(class, spec, engines)` (GN: the class kit less what the lineage already counts; HB: and less the
+  pet where an engine held dismisses it)**, and
   `Run.ability_slots_used` adds the carried half. **Since GS §1 every hero opens at 3** — the class kit — because a
   lineage opens with its enablers alone and an enabler sits outside the count, so every hero has four slots to draft
-  into at the first rung. (GN to GS: Berserker 5, Warden 4, Swordmaster 5, Pyromancer 5, Cryomancer 5, Arcanist 6,
+  into at the first rung — **and since HB a Sharpshooter opens at 2**, Lethal Aim dismissing the kit's Summon
+  Companion, so he has five. (GN to GS: Berserker 5, Warden 4, Swordmaster 5, Pyromancer 5, Cryomancer 5, Arcanist 6,
   Holy 5, Devout 4, Occultist 5, Beastmaster 5, Sharpshooter 5, Survivalist 4, and a spine-taker 3.) **`protected_names` is a NAME count and
   counts the kit too** (four to seven a spec since GS); `core_slots` is the lineage's SLOT count before its
   enablers come out, and `lineage_slots` is built from it — equal since GS, so zero. **`check_ea` §1 priced a

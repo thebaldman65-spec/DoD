@@ -1363,7 +1363,8 @@ func _spawn_units() -> void:
 					var rc_id := String(rune.get("id", ""))
 					var rc_tail := ""
 					if Runes.sits_out(rc_id, Runes.held_engines(Run.party[i])):
-						var rc_lines := Run.rune_sits_out_note(rc_id).split("\n")
+						var rc_lines := Run.rune_sits_out_note(rc_id,
+								Runes.held_engines(Run.party[i])).split("\n")
 						rc_tail = " — %s %s" % [rc_lines[0], rc_lines[1]]
 					_rune_roll_call.append("%s: %s%s" % [cfg["unit_name"], rune["name"], rc_tail])
 			# Mini-boss ability upgrades (Batch AP) — the FIRST thing that reads
@@ -4492,10 +4493,19 @@ func _bot_class_kit_pick(u: BattleUnit) -> Array:
 			# Aimed at the Lethal Aim holder's mark, so a switch never clears his
 			# Focus (AZ §7's rule reaches the kit too).
 			var ck_mark := _focus_mark(u, mark)
-			var ck_wire := _bot_kit_card(u, "Tripwire")
-			if ck_wire != null and not u.has_status("tripwire") \
-					and foes.any(func(e): return not e.is_ranged):
-				return [ck_wire, u]
+			# BATCH HB — SUMMON COMPANION TOOK TRIPWIRE'S KIT SLOT, AND ITS CASE
+			# TOOK TRIPWIRE'S PLACE HERE (Tripwire is a drafted card now, and the
+			# drafted hook casts it). The rotation's hunter branch above already
+			# summons FIRST for every Hunter, so this is the class branch's copy
+			# of that rule for the one card it owns: with nothing standing, call a
+			# companion — the rotation's own preference order, through the same
+			# `_summon_choice` the player's picker builds the calls with.
+			if Classes.class_kit_holds(u.hero_key, Classes.PET_CARD) \
+					and _beasts(u).is_empty():
+				for ck_kind in ["canis", "aguila", "ursus"]:
+					var ck_call := _summon_choice(u, ck_kind)
+					if ck_call != null and _ability_usable(u, ck_call):
+						return [ck_call, u]
 			var ck_snare := _bot_kit_card(u, "Snare Trap")
 			if ck_snare != null and not ck_mark.has_status("snared"):
 				return [ck_snare, ck_mark]
@@ -4529,7 +4539,13 @@ func _bot_drafted_pick(u: BattleUnit) -> Array:
 	var allies := heroes.filter(func(h): return not h.dead and not h.is_companion)
 	var mark: BattleUnit = _lowest_hp(foes)
 	for ab in u.abilities:
-		if Classes.draft_ability(ab.display_name) == null:
+		# BATCH HB — TRIPWIRE IS DRAFTED SINCE HB AND ITS ONE DEFINITION STAYS IN
+		# THE SURVIVALIST'S TABLE, which `draft_ability` does not read — the reason
+		# GS's twenty-nine returned cards are invisible to this hook (GS's finding,
+		# reported there). It is let through by its special, because it is the one
+		# of them this hook has a case for (below): the case the class branch gave
+		# it while it was a kit card, so HB's move does not undo GN's.
+		if Classes.draft_ability(ab.display_name) == null and ab.special != "tripwire":
 			continue
 		# BATCH GN — a class-kit card is the class branch's, above, even where
 		# its one definition still lives among the drafted ones.
@@ -4537,6 +4553,15 @@ func _bot_drafted_pick(u: BattleUnit) -> Array:
 			continue
 		if not _ability_usable(u, ab):
 			continue
+		# BATCH HB — TRIPWIRE IS DRAFTED NOW, AND IT KEEPS THE TEST THE CLASS
+		# BRANCH GAVE IT WHILE IT WAS A KIT CARD: rig the ground only when it is
+		# not already rigged and a melee enemy stands to walk into it. Targeting
+		# honesty (BO §5), not a rotation — a wire with no melee enemy to answer
+		# is a turn that reads as the card doing nothing.
+		if ab.special == "tripwire":
+			if u.has_status("tripwire") or not foes.any(func(e): return not e.is_ranged):
+				continue
+			return [ab, u]
 		if ab.target == Ability.Target.ALLY:
 			# BATCH BP: Covering Guard is for SOMEONE ELSE, so the bot's pool is
 			# narrowed exactly as `_player_turn`'s picker is. Two sites, one
@@ -5216,7 +5241,9 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 				for want in ["canis", "aguila", "ursus"]:
 					if bot_beasts.any(func(b): return b.companion_kind == want):
 						continue
-					var summon := _find_ability(u, "Summon " + want.capitalize())
+					# BATCH HB §1 — the call the one card makes for this companion,
+					# built where the player's picker builds it (`_summon_choice`).
+					var summon := _summon_choice(u, want)
 					if summon != null and _ability_usable(u, summon):
 						return [summon, u]
 			elif u.wild_rotation > 0 or u.cooldowns.get("Swap Companion", 0) == 0:
@@ -5236,7 +5263,7 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 				for want in ["canis", "aguila", "ursus"]:
 					if bot_beasts.any(func(b): return b.companion_kind == want):
 						continue
-					var sw := _find_ability(u, "Summon " + want.capitalize())
+					var sw := _summon_choice(u, want)
 					if sw == null or not _ability_usable(u, sw):
 						continue
 					var worth := _bot_boon_worth(u, want)
@@ -5244,7 +5271,7 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 						best_worth = worth
 						best_in = want
 				if best_in != "" and best_worth > out_worth * 1.25:
-					return [_find_ability(u, "Summon " + best_in.capitalize()), u]
+					return [_summon_choice(u, best_in), u]
 			# Spirit Bond when the pack is hurting.
 			var sbond := _find_ability(u, "Spirit Bond")
 			if sbond != null and u.resource >= sbond.cost and u.ability_ready(sbond) \
@@ -5804,7 +5831,10 @@ func _show_actions(u: BattleUnit) -> void:
 			group_btn.add_theme_font_size_override("font_size", 13)
 			group_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 			if swapping:
-				group_btn.tooltip_text = "Swap the active companion (10 %s, 1.0 int,\nshared 3-turn cooldown). The newcomer\narrives with its swap effect and\n+1 Loyalty." % u.resource_name
+				# BATCH HB — the +1 Loyalty is Pack Bond's (`_gain_loyalty`), and every
+				# Hunter swaps since HB, so the tooltip says it only to its holder.
+				group_btn.tooltip_text = "Swap the active companion (10 %s, 1.0 int,\nshared 3-turn cooldown). The newcomer\narrives with its swap effect%s." % [
+					u.resource_name, " and\n+1 Loyalty" if u.has_engine("pack") else ""]
 				if u.the_pack > 0:
 					group_btn.tooltip_text += "\nThe newcomer replaces whichever companion\nholds LESS Loyalty (ties: the older)."
 				if u.cooldowns.get("Swap Companion", 0) > 0:
@@ -6509,6 +6539,18 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 		if not _beasts(u).any(func(b): \
 				return int(u.loyalty.get(b.companion_kind, 0)) >= 1):
 			return false
+	# BATCH HB §1/§4 — THE PET'S TWO DOORS. The card itself is not a cast: it is
+	# the menu entry whose three calls are (`_summon_choice`), so a summon that
+	# names no companion is refused rather than resolved as nobody. And a hero
+	# who has dismissed the pet — the Sharpshooter — fields no companion by ANY
+	# route: his kit holds no card to call with, and this refuses every other,
+	# Call the Wilds included, so "a Sharpshooter has no companion" is a door
+	# and not a hope (`Classes.dismisses_pet`, the one answer).
+	if ab.special == "summon" and not Classes.COMPANION_KINDS.has(
+			ab.display_name.get_slice(" ", 1).to_lower()):
+		return false
+	if ab.special in ["summon", "call_wilds"] and Classes.dismisses_pet(u.engines):
+		return false
 	# Lone Bond: one beast per fight — no swaps, no second call.
 	if ab.special == "summon" and u.lone_bond > 0 and u.beast_committed:
 		return false
@@ -6861,6 +6903,10 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 		ab_btn.tooltip_text += "\n(No living companion)"
 	if ab.special == "ghostpack" and u.kinds_summoned.is_empty():
 		ab_btn.tooltip_text += "\n(You have summoned nothing yet this battle)"
+	# BATCH HB §4 — a summon the dismissed pet refuses says so, on the same rule
+	# as every line above: a darkened button explains itself.
+	if ab.special in ["summon", "call_wilds"] and Classes.dismisses_pet(u.engines):
+		ab_btn.tooltip_text += "\n(The Sharpshooter fields no companion)"
 	if ab.display_name == "Hunt" and not enemies.any(func(e): \
 			return not e.dead and _status_count(e) > 0):
 		ab_btn.tooltip_text += "\n(Nothing on the field is afflicted)"
@@ -6907,18 +6953,55 @@ func _on_summon_group_pressed(popup: PopupPanel) -> void:
 		_open_summon_picker(current_hero)
 
 
+# BATCH HB §1 — WHAT A SUMMON COMPANION CAST CALLS FOR `kind`, AND THE ONE PLACE
+# IT IS BUILT: that companion's own call (`Classes.companion_call` — its arrival,
+# its stats, its words) at THE CARD's price as the spawn baked it, so an upgrade
+# or a rune that moves the card moves all three calls. **It keeps the CALL's name**
+# ("Summon Ursus"), and the name is what keys a cooldown (`start_cooldown`), so a
+# cooldown is kept per companion exactly as three cards kept it: a bear called
+# this turn leaves the wolf and the eagle ready. The player's picker and the bot
+# both come here, so the two cannot price a call differently. A hero who holds
+# the call itself — a seat built by hand, or `DOD_SIM_ABILITIES` — is answered
+# with that; one who holds neither gets null, and so does a hero who has
+# dismissed the pet (the Sharpshooter holds no card to call with).
+func _summon_choice(u: BattleUnit, kind: String) -> Ability:
+	if u == null or not Classes.COMPANION_KINDS.has(kind):
+		return null
+	var own := _find_ability(u, "Summon " + kind.capitalize())
+	if own != null and own.special == "summon":
+		return own
+	var card := _find_ability(u, Classes.PET_CARD)
+	var call: Ability = Classes.companion_call(kind)
+	if card == null or call == null:
+		return null
+	call.cost = card.cost
+	call.delay = card.delay
+	call.cooldown = card.cooldown
+	return call
+
+
+# BATCH HB §1 — ONE CARD, THREE CALLS, AND THIS IS WHERE THE CHOICE IS MADE.
+# The three summons were three cards and the picker listed them; Summon Companion
+# is one card and the picker lists its three CALLS — `_summon_choice` builds each
+# — so the choice at the cast is the same three buttons it always was, under one
+# card. **The swap is unchanged**: at capacity the picker offers the same three
+# swap clones at the same price, one per companion the hero can call.
 func _open_summon_picker(u: BattleUnit) -> void:
 	_close_summon_picker()
 	# At beast capacity the picker offers SWAPS instead: cheap, quick
 	# clones that share one "Swap Companion" cooldown (set in _do_summon).
 	var swapping := _beasts(u).size() >= _beast_cap(u)
+	var calls: Array = []
+	for kind in Classes.COMPANION_KINDS:
+		var call := _summon_choice(u, String(kind))
+		if call != null:
+			calls.append(call)
 	if swapping:
 		_summon_opts = []
-		for a in u.abilities:
-			if a.special != "summon":
-				continue
+		for a in calls:
 			var beast: String = a.display_name.get_slice(" ", 1)
-			var swap_desc := "Swap the pack: %s arrives with its\nswap effect and +1 Loyalty.\nShared cooldown: 3 turns." % beast
+			var swap_desc := "Swap the pack: %s arrives with its\nswap effect%s.\nShared cooldown: 3 turns." % [
+				beast, " and +1 Loyalty" if u.has_engine("pack") else ""]
 			if u.the_pack > 0:
 				swap_desc += "\nReplaces whichever companion holds LESS\nLoyalty (ties: the older)."
 			_summon_opts.append(Ability.make({"display_name": "Swap " + beast,
@@ -6927,7 +7010,7 @@ func _open_summon_picker(u: BattleUnit) -> void:
 				"perfect_id": "", "perfect_text": "",
 				"description": swap_desc}))
 	else:
-		_summon_opts = u.abilities.filter(func(a): return a.special == "summon")
+		_summon_opts = calls
 	# Call of the Wild (boss trophy) rides in the group in both modes.
 	for a in u.abilities:
 		if a.special == "call_wild":
@@ -6955,7 +7038,13 @@ func _open_summon_picker(u: BattleUnit) -> void:
 		b.add_theme_font_size_override("font_size", 13)
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.tooltip_text = _ability_tooltip(u, ab)
-		_mark_upgraded(b, u, ab)
+		# BATCH HB — a call built from the card wears the CARD's upgrade mark:
+		# the upgrade was baked into the card, and the call carries its price.
+		var mark_ab: Ability = ab
+		var pet_card := _find_ability(u, Classes.PET_CARD)
+		if pet_card != null and ab.display_name.begins_with("Summon "):
+			mark_ab = pet_card
+		_mark_upgraded(b, u, mark_ab)
 		b.disabled = not _ability_usable(u, ab)
 		b.focus_mode = Control.FOCUS_NONE  # highlight is drawn, not focus-based
 		b.pressed.connect(_confirm_summon.bind(i))
@@ -9401,6 +9490,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if attacker.tunnel_vision > 0:
 					crit_chance += 0.01 * attacker.tunnel_vision \
 						* (1.0 if strike_target == attacker.last_attack_target else -1.0)
+			# BATCH HB §4 — THE SHARPSHOOTER'S PITY METER, read into the SAME total
+			# the roll spends, so EW's surplus sees it like every other term. It is
+			# outside the Focus test above on purpose: it is the engine's and not
+			# the meter's, and a target switch that empties Focus leaves it whole.
+			if attacker.has_engine("lethal_aim"):
+				crit_chance += attacker.crit_pity
 			var is_crit := randf() < crit_chance
 			# Ice Lance: always crits against Frozen targets.
 			if ab.display_name == "Ice Lance" and strike_target.has_status("frozen"):
@@ -9434,6 +9529,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if attacker.has_status("held_breath") and ab.damage > 0 and not is_counter:
 				is_crit = true
 			any_crit = any_crit or is_crit
+			# BATCH HB §4 — AND THE PITY METER MOVES HERE, BELOW EVERY SOURCE OF
+			# `is_crit`, so a forced crit resets it like a rolled one.
+			_note_pity(attacker, ab, is_crit, wall_parry)
 			# Ability damage is a PERCENT of the attacker's current Attack.
 			var raw := ab.damage * 0.01 * attacker.attack * randf_range(0.9, 1.1) * dmg_mult
 			# BATCH GO — REDOUBT BANKS WHAT IS KEPT OFF THE BODY IT IS HELD ON.
@@ -9451,10 +9549,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if strike_target.is_hero:
 					_prev(strike_target, pv_was - raw)
 			if is_crit:
-				# LETHAL AIM: x2 base, Executioner's Eye deepens it, Consistent
+				# LETHAL AIM: x2 base and the Sharpshooter's +0.5 on top of it (HB
+				# §4, so x2.5), Executioner's Eye deepens it, Consistent
 				# Aim takes half a multiplier back in exchange for chance — and
 				# EVERY POINT OF FOCUS PAST THE CONVERSION POINT ADDS 0.5% MORE
-				# (Batch AZ §1): x2.5 at 200 Focus, x3 at 300, and it never stops
+				# (Batch AZ §1): x3 at 200 Focus, x3.5 at 300, and it never stops
 				# paying. ONE implementation, on BattleUnit, so this site, the
 				# nameplate and the sim instrument cannot read different numbers.
 				var crit_mult := 1.5
@@ -12614,12 +12713,24 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var hi_info: Array = STATUS_INFO["instinct"]
 				attacker.update_status("instinct", "HI%d" % hi_left,
 					hi_info[3], hi_left)
-		# The Beastmaster's beasts strike alongside the hunter (The Pack:
-		# both fire; a beast whose prey just fell picks the next weakest).
-		if attacker.is_hero and attacker.has_engine("pack") and ab.damage > 0 \
-				and not is_counter:
+		# The hunter's beasts strike alongside him (The Pack: both fire; a beast
+		# whose prey just fell picks the next weakest).
+		#
+		# **BATCH HB §3 — EVERY HUNTER'S COMPANION FIGHTS, NOT ONLY PACK BOND'S.**
+		# This block sat inside `has_engine("pack")` because until HB only Pack
+		# Bond brought a companion (Call the Wilds aside, whose beast therefore
+		# stood and never struck with its hunter). Every Hunter but the
+		# Sharpshooter summons one from the class kit now, and a companion that
+		# never strikes is not a companion — so the STRIKE is the companion's and
+		# reads no engine. **WHAT PACK BOND DEEPENS IS UNCHANGED AND STAYS ITS**:
+		# the blow's Loyalty step reads a meter only the engine grows
+		# (`_gain_loyalty`), the three boons read `_bond_reach`, and the two
+		# ghost strikes below stay inside the engine test exactly as they stood
+		# (Ghostpack's `ENGINE_READ` row says its strike rides this block).
+		if attacker.is_hero and ab.damage > 0 and not is_counter:
 			var comp_target: BattleUnit = target
 			var pack_now := _beasts(attacker)
+			var pack_bond: bool = attacker.has_engine("pack")
 			# BATCH BM §2 — GHOST PACK (Beastmaster, handler row 8). THE
 			# BEAST'S ABSENCE BECOMES AN ASSET. Vengeance already inherits a
 			# dead beast's BOON; this inherits its STRIKE, so an empty field
@@ -12627,7 +12738,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# path Call of the Wild already uses, rather than a second
 			# implementation — and it only fires when NOTHING stands, which is
 			# what keeps it a Handler node instead of a Pack one.
-			if pack_now.is_empty() and attacker.ghost_pack > 0 \
+			if pack_bond and pack_now.is_empty() and attacker.ghost_pack > 0 \
 					and comp_target != null and not comp_target.dead:
 				_log("   → Talent: Ghost Pack — a shape that is not there strikes",
 					"#b0a8e0")
@@ -12654,7 +12765,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# turns — so a Beastmaster holding both while standing beastless gets
 			# both. FLAGGED IN THE CHANGELOG rather than pre-tuned, per the
 			# standing testing scope.
-			if attacker.has_status("ghostpack") and comp_target != null \
+			if pack_bond and attacker.has_status("ghostpack") and comp_target != null \
 					and not comp_target.dead:
 				for gpk in ["ursus", "canis", "aguila"]:
 					if not attacker.kinds_summoned.has(gpk):
@@ -18296,8 +18407,15 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s: Tripwire set" % attacker.unit_name, "#70d878")
 			_message("%s rigs the ground" % attacker.unit_name)
 		"summon":
-			await _do_summon(attacker, ab.display_name.get_slice(" ", 1).to_lower(),
-				target)
+			# BATCH HB — THE CARD ITSELF NAMES NO COMPANION: the picker and the bot
+			# cast one of its three calls, and `_ability_usable` refuses the card.
+			# Resolved directly past that door (a gate's sweep), it summons nothing
+			# and says so, rather than reading a companion called "companion".
+			var sm_kind := ab.display_name.get_slice(" ", 1).to_lower()
+			if not Classes.COMPANION_KINDS.has(sm_kind):
+				push_warning("%s resolved with no companion chosen — nothing is summoned" % ab.display_name)
+			else:
+				await _do_summon(attacker, sm_kind, target)
 		"kill_command":
 			# The order is the beast's own: maul, feast, or blinding dive.
 			# The Pack: BOTH beasts obey; if the prey falls mid-order the
@@ -23177,9 +23295,10 @@ func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null,
 	# assignment would let a re-call into a deep bond LOWER it — a rune sold on
 	# arriving devoted quietly costing depth.
 	#
-	# **IT NAMES THREE ABILITIES IN THE PROTECTED CORE**, so every Beastmaster
-	# can roll it — `Summon Ursus`, `Summon Canis` and `Summon Aguila` are his
-	# passive's own enablers and no draft can take them away.
+	# **IT NAMES THE CARD EVERY HUNTER BUT THE SHARPSHOOTER HOLDS** — Summon
+	# Companion, the class kit's since HB (the three summons were Pack Bond's
+	# enablers until then), so no draft can take the thing it reads away; its
+	# three calls all come through here.
 	if hunter.rune_second_whistle > int(hunter.loyalty.get(kind, 0)):
 		hunter.loyalty[kind] = hunter.rune_second_whistle
 	# BATCH EZ §4 — THE SHARED SCENT. Loyalty carries to the NEXT companion when
@@ -24546,6 +24665,44 @@ func _focus_safe(ab: Ability) -> bool:
 	return ab.aoe or ab.display_name == "Called Volley"
 
 
+# ══ BATCH HB §4 — THE SHARPSHOOTER'S PITY METER, AND WHAT "LANDS" MEANS ══════
+#
+# **EVERY HIT HE LANDS THAT DOES NOT CRIT RAISES HIS CRIT CHANCE BY
+# `PITY_CRIT_STEP`; A CRIT RESETS IT TO ZERO** (the designer's rule). It is Heavy
+# Plating's climb pointed at crit, and it is built the same way: a field on the
+# unit (`crit_pity`), one writer — this function, called from `_resolve`'s strike
+# loop below every source of `is_crit` — and a chip that shows the live figure.
+#
+# **"LANDS" IS THE COMBAT RULE'S WORD FOR A CHARGE, NOT A NEW ONE** (BR §1,
+# `docs/combat-rules.md`): *a strike that MISSED or was BLOCKED spends nothing,
+# and neither does one an absolute parry zeroed — a charge rides a blow that
+# landed.* A missed or blocked strike never reaches the crit roll, so this is
+# never called for one; an absolute parry reaches it and is refused here. **AND
+# THAT RULE COUNTS HITS, NOT CASTS**, so the unit is the blow the strike loop
+# resolves: an area attack is one landing PER TARGET STRUCK, a multi-hit one per
+# hit, and his basic's multi-press SEQUENCE is ONE landing — the presses pay
+# Focus, and the blow is resolved once, off the first press's grade.
+#
+# **ONLY A BLOW THAT DEALS DAMAGE COUNTS** (`ab.damage > 0`), the line Held
+# Breath's forced crit already draws: a blow with nothing to multiply cannot
+# crit meaningfully, so it neither climbs the meter nor spends it.
+func _note_pity(attacker: BattleUnit, ab: Ability, is_crit: bool,
+		wall_parry: bool) -> void:
+	if not attacker.has_engine("lethal_aim") or ab.damage <= 0 or wall_parry:
+		return
+	if is_crit:
+		if attacker.crit_pity > 0.0:
+			_log("   → Lethal Aim: the critical resets the +%d%% the misses built" % \
+				int(round(attacker.crit_pity * 100.0)), "#e0c070")
+		attacker.crit_pity = 0.0
+	else:
+		attacker.crit_pity += BattleUnit.PITY_CRIT_STEP
+		_log("   → Lethal Aim: no critical — +%d%% critical chance, now +%d%%" % [
+			int(round(BattleUnit.PITY_CRIT_STEP * 100.0)),
+			int(round(attacker.crit_pity * 100.0))], "#e0c070")
+	attacker.refresh_bars()
+
+
 func _sharpshooter_focus(attacker: BattleUnit, victim: BattleUnit,
 		ab: Ability = null) -> void:
 	if attacker.second_resource_name != "Focus" or victim == null:
@@ -24694,10 +24851,11 @@ func _sharpshooter_focus(attacker: BattleUnit, victim: BattleUnit,
 #
 # **AND THE COMPANION ARM IS UNREACHABLE IN A LEGAL PARTY, WHICH IS RECORDED
 # HERE RATHER THAN LEFT TO BE FOUND.** A run's party is one of each class
-# (`draft_screen.ROSTER`), the Sharpshooter IS the Hunter, and companion
-# summoning is the Beastmaster's exclusive axis (DR §1; `check_dr` reds a
-# `special: "summon"` ability authored onto the Sharpshooter) — so no beast can
-# stand beside a Sharpshooter today. **The arm is written and DRIVEN anyway**:
+# (`draft_screen.ROSTER`), the Sharpshooter IS the Hunter, and since HB he is the
+# one Hunter who DISMISSES the pet — every other Hunter summons from the class
+# kit, and the summon door refuses a Lethal Aim holder every route to one
+# (`Classes.dismisses_pet`) — so no beast can stand beside a Sharpshooter today.
+# **The arm is written and DRIVEN anyway**:
 # `check_fo` §2 seats both Hunter specs through the fixture and measures the
 # Focus arriving off a live companion's blow, which is DK §1's rule met with a
 # real measurement rather than with an argument that it cannot be measured.

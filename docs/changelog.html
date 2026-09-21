@@ -16,6 +16,47 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-09-21 &mdash; Batch HB: EVERY HUNTER HAS A PET</h2>
+<p><b>The companion is the Hunter's class identity now, and dismissing it is a build decision.</b>
+Authored with the designer and transcribed. <b>THE SEQUENCE SHIFTS:</b> HA planned HB for its twenty
+holes and HC for the other 75; <b>this batch took HB, the rune scopes are HC, the twenty holes are HD
+and the other 75 are HE</b> (<code>docs/state.md</code>). Full working: <code>docs/reports/HB.md</code>.</p>
+
+<p><b>&sect;1 &mdash; SUMMON COMPANION IS ONE CARD.</b> Ursus, Canis and Aguila are called by a single
+card, and the Hunter chooses which at the cast &mdash; in the picker the three summons always opened,
+under one card now. Each companion's call keeps its own definition, its own words and <b>its own
+cooldown</b>, as three cards did. <b>The swap did not move</b>: the same three swap options, 10 Mana, 1.0 initiative and one shared
+3-turn cooldown. <b>What crosses a swap is what crossed it before</b>: the bond (Loyalty lives on the
+Hunter, per companion, and a companion swapped back in keeps what it earned) and nothing of the body
+&mdash; its health and its statuses stay behind and it returns fresh. The bot calls through the same
+builder the picker does.</p>
+
+<p><b>&sect;2 &mdash; IT TOOK TRIPWIRE'S SLOT.</b> The Hunter's kit is <b>Powershot &middot; Snare Trap
+&middot; Summon Companion</b>. Tripwire only pays when enemies come to the Hunter, and a companion is
+what brings them; <b>it went to the Survivalist's shelf of the Hunter pool</b>, so the draft is
+<b>179</b> and the Hunter's pool <b>42</b>.</p>
+
+<p><b>&sect;3 &mdash; PACK BOND BRINGS NOTHING, AND EVERY HUNTER'S COMPANION FIGHTS.</b> The Beastmaster's
+three summons were the one stated exception to <i>an engine brings only what it cannot run without</i>,
+and that exception is retired. <b>A companion now strikes beside its Hunter whatever engine he holds</b>
+&mdash; the strike sat inside Pack Bond's check while only Pack Bond brought one. <b>Pack Bond deepens
+the bond</b>: Loyalty grows only with it, its conversion at 8 and the saturation fallback read it, and
+the three boons are its own. The cards and runes that need a companion are offered to every Hunter who
+fields one; the ones that read the bond stay gated on Pack Bond.</p>
+
+<p><b>&sect;4 &mdash; THE SHARPSHOOTER DISMISSES THE PET.</b> A Hunter holding Lethal Aim opens without
+Summon Companion, <b>and its slot is his for a drafted card</b> &mdash; his kit fills 2 slots where
+every other hero's fills 3. <b>His crits hit x2.5 instead of x2</b> (+0.5 of multiplier), and <b>every
+hit he lands without a critical adds +5% critical chance until his next critical</b>, whatever the
+target: Focus clears on a switch and this does not, so a Sharpshooter forced off his mark loses his
+Focus and keeps this. A hit lands when it is not missed, blocked or zeroed by an absolute parry; an area
+attack counts once per enemy it strikes, a multi-hit card once per hit, and his multi-press basic once. The Lethal Aim chip
+shows it live. <b>He has no companion by any route</b>: the cards and runes that need one are never
+offered to him, one he already carries sits out, and unequipping the Rune of the Sharpshooter is refused
+while every slot is full, because it puts Summon Companion back in the kit.</p>
+
+<p><b>WHAT MOVED:</b> <code>scripts/classes.gd</code>, <code>unit.gd</code>, <code>battle.gd</code>, <code>run_state.gd</code>, <code>runes.gd</code>, <code>map_screen.gd</code>, <code>party_screen.gd</code> and <code>spec_choice_screen.gd</code>; <code>data/runes.json</code> (the Second Whistle's words) and <code>data/glossary.json</code>; <b>eighteen gates and suites re-pointed to HB's rules</b> &mdash; every repair broken on purpose in an isolated copy to prove it bites (<code>docs/reports/HB.md</code> &sect;6) &mdash; and <code>pin-manifest.json</code>; <code>baselines.json</code>; <code>CLAUDE.md</code> (the standing rule <i>EVERY HUNTER HAS A PET</i>), <code>docs/master.html</code> and its stamp, <code>docs/state.md</code>, <code>docs/design-notes.md</code>, this entry and <code>docs/reports/HB.md</code> (<b>new</b>).</p>
+
 <h2>2026-09-21 &mdash; Batch HA: THE LAST STAGE, CENSUSED AND PRICED</h2>
 <p><b>IMPLEMENT ONLY. NOTHING A PLAYER MEETS CHANGED, AND NO GATE MOVED.</b> No game code, no rune,
 card, kit, engine, pool or node, no gate, suite, fixture or baseline row. <b>FP's sixth stage &mdash;

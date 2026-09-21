@@ -416,7 +416,7 @@ func _draw_detail() -> void:
 		so_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		so_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		so_chip.add_child(so_label)
-		so_chip.tooltip_text = Run.sits_out_note(String(so_name))
+		so_chip.tooltip_text = Run.sits_out_note(String(so_name), Run.held_engines(member))
 		ab_grid.add_child(so_chip)
 
 	# ── BATCH ES §4 — THE TAG CENSUS ON THE HERO SHEET ─────────────────────
@@ -540,7 +540,7 @@ func _draw_detail() -> void:
 			state.text = "sits out"
 			state.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
 			rune_label.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
-			var note := Run.rune_sits_out_note(String(rune.get("id", "")))
+			var note := Run.rune_sits_out_note(String(rune.get("id", "")), Run.held_engines(member))
 			state.tooltip_text = note
 			rune_label.tooltip_text = note
 		rune_label.custom_minimum_size = Vector2(354, 20)

@@ -95,6 +95,10 @@ const NO_RUNE_GRANT := ["scripts/spec_choice_screen.gd", "scripts/relics.gd",
 	"scripts/party_screen.gd"]
 
 const TRIALS := 400
+# BATCH HB — the rows AUTHORED into `["OFFENSE", "BREAK"]` since FD, which did
+# not move and so are not FD's 53 (§2). Pinned at its size, and each name is
+# asserted to read the shape, so a stale or a vacuous entry reds.
+const AUTHORED_SINCE_FD := ["Summon Companion"]
 
 
 func _s1_the_offer_sites() -> void:
@@ -499,14 +503,27 @@ func _s2_break_is_secondary_only() -> void:
 	# under this used it to show that the fold can only ever make BREADTH
 	# harder; BREADTH is retired and its predicate is deleted, so there is
 	# nothing left to be harder. See the block below.
+	# **BATCH HB — THE FIRST ROW AUTHORED INTO THAT SHAPE SINCE FD.** Summon
+	# Companion, the Hunter's class-kit card, leads with OFFENSE and carries
+	# BREAK second, as two of its three calls do. It did not MOVE, so it is not
+	# one of the 53: the reconstruction counts the rows in the shape less the
+	# rows authored into it since (`AUTHORED_SINCE_FD`), and that list is held
+	# to its size and to each row reading the shape, beside it.
 	var moved := 0
+	var since := 0
 	for nm3 in Classes.CARD_TAGS:
 		var t4: Array = Classes.CARD_TAGS[nm3]
 		if t4.size() == 2 and String(t4[0]) == "OFFENSE" and String(t4[1]) == "BREAK":
-			moved += 1
+			if AUTHORED_SINCE_FD.has(String(nm3)):
+				since += 1
+			else:
+				moved += 1
 	ok(moved == 53,
 		"§2: %d rows read `[OFFENSE, BREAK]`, not the 53 that moved into that shape — the reconstruction is not exact"
 			% moved)
+	ok(since == AUTHORED_SINCE_FD.size() and AUTHORED_SINCE_FD.size() == 1,
+		"§2: %d of the %d rows authored into `[OFFENSE, BREAK]` since FD read that shape — HB's Summon Companion is the one"
+			% [since, AUTHORED_SINCE_FD.size()])
 	# **AND THE FIFTY-FOURTH IS FEINT, WHICH IS THE ONE PER-CARD JUDGEMENT IN
 	# §2 AND IS ASSERTED RATHER THAN LEFT IN PROSE.** EL §2 ruled that Feint
 	# carries MARK second (it marks on one of its two stance branches), so the

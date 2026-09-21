@@ -154,6 +154,13 @@ func _draw_screen() -> void:
 		if adds != "":
 			# PROPOSED WORDS (GQ).
 			body.text += "\n\nAlso opens with: %s" % adds
+		# BATCH HB §4 — AND WHAT IT OPENS WITHOUT: the Sharpshooter dismisses the
+		# pet, so his card leaves Summon Companion out of the kit drawn below it.
+		# Derived off the same builder, so a rune that dismisses nothing says
+		# nothing. PROPOSED WORDS (HB), on GQ's shape.
+		var leaves := _leaves(key, lineage, pid, shared)
+		if leaves != "":
+			body.text += "\n\nOpens without: %s" % leaves
 		body.add_theme_font_size_override("font_size", 12)
 		body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		body.custom_minimum_size = Vector2(298, 0)
@@ -184,6 +191,19 @@ static func _adds(key: String, lineage: String, pid: String, shared: Array) -> S
 	return ", ".join(parts)
 
 
+# BATCH HB §4 — the other direction of `_adds`: what the kit below holds that
+# this rune's hero does NOT open with. Since HB that is Summon Companion for the
+# Sharpshooter's rune and nothing for any other.
+static func _leaves(key: String, lineage: String, pid: String, shared: Array) -> String:
+	var own_names: Array = Classes.opening_kit(key, lineage, [pid]).map(
+		func(a): return a.display_name)
+	var parts := PackedStringArray()
+	for ab in shared:
+		if not own_names.has(ab.display_name):
+			parts.append(ab.display_name)
+	return ", ".join(parts)
+
+
 # One ability as this screen has always printed it: the name, its damage range
 # at `atk` with the scaling, and the description on the line under it.
 static func _ability_text(ab: Ability, atk: int) -> String:
@@ -205,8 +225,9 @@ static func _ability_text(ab: Ability, atk: int) -> String:
 func _draw_kit(column: VBoxContainer, key: String, shared: Array, base_atk: int,
 		dealt: Array) -> void:
 	var head := Label.new()
-	# PROPOSED WORDS (GQ).
-	head.text = "With no engine, the %s opens every fight with these. A rune adds what its card names." % key.capitalize()
+	# PROPOSED WORDS (GQ); "or leaves out" is HB's, for the Sharpshooter's rune,
+	# which opens without the pet.
+	head.text = "With no engine, the %s opens every fight with these. A rune adds, or leaves out, what its card names." % key.capitalize()
 	head.add_theme_font_size_override("font_size", 14)
 	head.add_theme_color_override("font_color", Color(0.82, 0.74, 0.55))
 	head.custom_minimum_size = Vector2(ROW_W, 0)

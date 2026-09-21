@@ -715,7 +715,7 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 				slot_btn.text = "○ %s" % String(rune["name"])
 				slot_btn.tooltip_text = "%s\n\n%s\n\nClick to manage %s's runes." % [
 					rune["name"],
-					Run.rune_sits_out_note(String(rune.get("id", ""))),
+					Run.rune_sits_out_note(String(rune.get("id", "")), Run.held_engines(member)),
 					key.capitalize()]
 				slot_btn.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
 		slot_btn.pressed.connect(Music.click)
@@ -1848,7 +1848,15 @@ func _open_rune_panel(idx: int) -> void:
 		etoggle.text = "Unequip" if e_on else "Equip"
 		etoggle.custom_minimum_size = Vector2(84, 26)
 		etoggle.add_theme_font_size_override("font_size", 11)
-		etoggle.disabled = not e_on and worn_engines >= Run.ENGINE_SLOTS
+		# BATCH HB §4 — THE REFUSAL IS `Run.engine_toggle_refusal`'s, and it has
+		# two causes now: both slots full (GK), and unequipping the rune that
+		# dismisses the pet into a kit with no slot free to take it back. The
+		# button is disabled on either and says which, so the refusal is never
+		# a silent no-op.
+		var e_why: String = Run.engine_toggle_refusal(member, ei)
+		etoggle.disabled = e_why != ""
+		if e_why != "":
+			etoggle.tooltip_text = e_why
 		etoggle.pressed.connect(Music.click)
 		etoggle.pressed.connect(_toggle_engine.bind(idx, ei, overlay))
 		erow.add_child(etoggle)
@@ -1898,7 +1906,8 @@ func _open_rune_panel(idx: int) -> void:
 		# second shape for the same idea is a second thing to keep in step.
 		if is_on and sitting_runes.has(String(rune["name"])):
 			lbl.text = "✦ %s — %s" % [rune["name"],
-				Run.rune_sits_out_note(String(rune.get("id", ""))).replace("\n", " ")]
+				Run.rune_sits_out_note(String(rune.get("id", "")),
+					Run.held_engines(member)).replace("\n", " ")]
 			lbl.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
 		lbl.custom_minimum_size = Vector2(POUCH_TEXT_W, 20)
 		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -1917,7 +1926,8 @@ func _open_rune_panel(idx: int) -> void:
 
 
 # BATCH GK — drop or swap one engine rune. The rule is `Run.toggle_engine`'s; a
-# refusal (both slots full) is the disabled button, never a silent no-op here.
+# refusal (both slots full, or — since HB — the pet with no slot to come back
+# to) is the disabled button, never a silent no-op here.
 func _toggle_engine(idx: int, engine_idx: int, overlay: Control) -> void:
 	if not Run.toggle_engine(Run.party[idx], engine_idx):
 		return
@@ -2119,7 +2129,8 @@ func _open_loadout_panel(idx: int) -> void:
 		# the card's own text, because this is the panel where the slot it
 		# still holds can be freed; the sentence is the hero sheet's, one door.
 		if is_on and sitting.has(aname):
-			lbl.text = "✦ %s — %s" % [aname, Run.sits_out_note(aname).replace("\n", " ")]
+			lbl.text = "✦ %s — %s" % [aname, Run.sits_out_note(aname,
+				Run.held_engines(member)).replace("\n", " ")]
 			lbl.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
 		lbl.custom_minimum_size = Vector2(520, 20)
 		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

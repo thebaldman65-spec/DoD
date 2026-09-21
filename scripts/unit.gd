@@ -304,6 +304,20 @@ var damaged_since_turn := false  # Unbroken Watch bookkeeping
 # is reported rather than silently generalised (the AW/AX call). The four that
 # are still honest FLAGS are marked as such — they buy a rule, not an amount.
 var last_attack_target: BattleUnit = null  # Focus: the enemy worked last turn
+# ── BATCH HB §4 — THE SHARPSHOOTER'S PITY METER, AND WHERE IT LIVES ──────────
+# **A FIELD OF ITS OWN, NEVER `second_resource`.** FT found that field is already
+# three currencies wearing one name (Mercy, Resonance, Focus), and Focus is the
+# Sharpshooter's — a second meter folded into it would make every Focus reader
+# pay the pity and every pity reader lose it on a target switch. **IT IS HEAVY
+# PLATING'S SHAPE POINTED AT CRIT** (`plating_bonus` above): every hit he LANDS
+# that does not crit adds `PITY_CRIT_STEP` to his crit chance, and a crit resets
+# it to zero. Like the plating it is fresh every battle (a unit is built per
+# battle) and it has ONE writer, the strike loop (`battle._note_pity`). **AND IT
+# IS FOCUS'S COMPLEMENT, NOT ITS COPY**: Focus is per TARGET and clears on a
+# switch; this is per HIT and survives one. No cap is written: the reset is the
+# governor, and a hit that meets a total at or past a certainty crits and zeroes
+# it, so the meter can buy at most one certain crit before it starts again.
+var crit_pity := 0.0         # crit chance, as a fraction, the misses since his last crit bought
 var same_target_turns := 0   # Unwavering: consecutive turns on that same enemy
 var lethal_eye_ranks := 0    # Executioner's Eye: percentage POINTS of crit mult
 var consistent_aim := 0      # Consistent Aim: percentage POINTS SUBTRACTED from it
@@ -836,10 +850,20 @@ func resonance_taken_bonus() -> float:
 # is legible in a tooltip — the first hundred is your aim, everything past it is
 # your force — and it keeps those three nodes meaningful, because they are what
 # buy reliable crits while Focus is still shallow.
-#   100 Focus  +50% chance / x2.0     200 Focus  +50% / x2.5
-#   300 Focus  +50% / x3.0            400 Focus  +50% / x3.5
+#   100 Focus  +50% chance / x2.5     200 Focus  +50% / x3.0
+#   300 Focus  +50% / x3.5            400 Focus  +50% / x4.0
+# (the multipliers are HB's — `SHARPSHOOTER_CRIT_MULT` added +0.5 to each; they
+# read x2.0 / x2.5 / x3.0 / x3.5 from AZ to HB)
 const FOCUS_CONVERT := 100      # where chance stops and multiplier starts
 const FOCUS_STEP := 0.005       # what one point of Focus buys, either side
+# BATCH HB §4 — the Sharpshooter's two new terms, the designer's figures: +5%
+# crit chance for every hit he lands that does not crit (a crit resets it), and
+# +50% crit MULTIPLIER — bigger crits rather than more of them. The multiplier is
+# written as POINTS added to Lethal Aim's own x2, the unit this file already
+# writes every multiplier term in (Executioner's Eye, Consistent Aim, the Focus
+# past the split), so his crit opens at x2.5.
+const PITY_CRIT_STEP := 0.05
+const SHARPSHOOTER_CRIT_MULT := 0.50
 const FOCUS_BAR_REF := 200.0    # what the second-resource bar fills toward when
                                 # the meter is uncapped: One Shot's threshold and
                                 # Coup de Grâce's reading cap, which are the two
@@ -872,15 +896,16 @@ func focus_crit_mult() -> float:
 	return maxi(second_resource - focus_convert(), 0) * FOCUS_STEP
 
 
-# Lethal Aim's multiplier, whole: the base x2, Executioner's Eye's percentage
-# POINTS on top, Consistent Aim's points taken back off, and the converted half
-# of Focus. Written as +/- POINTS rather than as a `set` deliberately — Batch AZ
+# Lethal Aim's multiplier, whole: the base x2, the Sharpshooter's +0.5 (HB §4),
+# Executioner's Eye's percentage POINTS on top, Consistent Aim's points taken back
+# off, and the converted half of Focus. Written as +/- POINTS rather than as a `set` deliberately — Batch AZ
 # §4 dissolved the Executioner's Eye <-> Consistent Aim fork (they sit in rows 4
 # and 5 of ONE lane, so row exclusivity lets a player hold both), and the old
 # wording SET the multiplier to 1.5, which contradicts the other node outright.
-# Held together they resolve to x2.0, which is the whole point of the rewording.
+# Held together they cancel (x2.5 since HB), which is the whole point of the rewording.
 func lethal_crit_mult() -> float:
-	return 2.0 + 0.01 * (lethal_eye_ranks - consistent_aim) + focus_crit_mult()
+	return 2.0 + SHARPSHOOTER_CRIT_MULT + 0.01 * (lethal_eye_ranks - consistent_aim) \
+		+ focus_crit_mult()
 
 
 # Holy tree — RE-AUTHORED IN BATCH AV. Every counter is ADDITIVE: it holds
@@ -2729,6 +2754,19 @@ func refresh_bars() -> void:
 					int(round(block_chance * 100.0)),
 					int(round(plating_bonus * 100.0)), wall_line,
 					int(round(total))]
+				_refresh_chips()
+				break
+	# BATCH HB §4 — THE SHARPSHOOTER'S CHIP CARRIES HIS PITY METER, for Heavy
+	# Plating's reason one arm up: the whole value of a pity ramp is the player
+	# watching it climb toward the next critical. The rule is `Classes.engine_desc`'s
+	# and is not restated; the live line sits under it (GO's rule-engine shape).
+	if has_engine("lethal_aim"):
+		for s in statuses:
+			if s.id == engine_chip_id("lethal_aim"):
+				var pity_pct := int(round(crit_pity * 100.0))
+				s.short = "Aim +%d%%" % pity_pct
+				s.desc = "%s\nNow +%d%% critical chance from the hits that\nlanded without a critical since the last one." % [
+					Classes.engine_desc("lethal_aim"), pity_pct]
 				_refresh_chips()
 				break
 	# Seasoned Fighter chip shows which guard is live; the tooltip carries

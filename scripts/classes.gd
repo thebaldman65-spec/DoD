@@ -476,8 +476,10 @@ const SPEC_DRAFT_POOLS := {
 		"Ghostpack", "Last Howl", "Succession", "Unleash",
 		# BATCH DS — MIT-SELF and AMP-TEAM, both read off Loyalty.
 		"Bear the Brunt", "Bring It Down",
-		# BATCH GS §1 — OUT OF THE OPENING KIT: the engine brings the three
-		# summons, the ruling's stated exception, and nothing else.
+		# BATCH GS §1 — OUT OF THE OPENING KIT. The engine brought the three
+		# summons as the ruling's stated exception until BATCH HB retired it:
+		# every Hunter summons from the class kit's Summon Companion now, so
+		# Pack Bond brings nothing (`PROTECTED_CORES`).
 		"Hunter's Instinct", "Kill Command"],
 	"sharpshooter": ["Called Volley", "Quarry's Mark", "Crossfire",
 		"Calibrating Shot", "Trophy Shot", "Reacquire", "Fault Line",
@@ -496,8 +498,17 @@ const SPEC_DRAFT_POOLS := {
 		# BATCH DS — MIT-SELF and HEAL, both read off the affliction board.
 		"Thick Hide", "Salve",
 		# BATCH GS §1 — OUT OF THE OPENING KIT: Trapper reads no ability.
-		# Tripwire and Snare Trap are the class kit's.
-		"Shrapnel Charge"],
+		# Snare Trap is the class kit's.
+		"Shrapnel Charge",
+		# BATCH HB §2 — OUT OF THE CLASS KIT, AND ONTO THE SHELF OF THE LINEAGE
+		# THAT DEFINES IT (GS §1's rule: a card that stops travelling lands
+		# somewhere, never nowhere). Summon Companion took its kit slot, ruled by
+		# the designer: Tripwire only pays when enemies come to the Hunter, and a
+		# companion is what brings them. Its one definition stays in
+		# `spec_abilities("mystic")`, where `pool_ability` already resolves it.
+		# It reads no engine: it was a class-kit card, which GN's rule proved on
+		# a hero holding none (`check_gn` §1).
+		"Tripwire"],
 }
 
 # CLASS-WIDE DRAFT ABILITIES — COMPLETE (Batch BR). Six per class at BR,
@@ -515,8 +526,10 @@ const SPEC_DRAFT_POOLS := {
 # `test_batch_cd.PER_CLASS_DEPTH` — for the same reason the spec half became
 # one at DO. **DO NOT WRITE `4 * 6` AGAIN.**
 #
-# **THE DRAFT IS 178 AS OF BATCH GS (158 spec + 20 class-wide), AND NOTHING IS
-# OWED.** GS §1 put the 29 cards that stopped travelling with an engine on their
+# **THE DRAFT IS 179 AS OF BATCH HB (159 spec + 20 class-wide), AND NOTHING IS
+# OWED.** HB §2 put Tripwire on the Survivalist's shelf when Summon Companion
+# took its class-kit slot; it was 178 at GS (158 + 20), when GS §1 put the 29
+# cards that stopped travelling with an engine on their
 # lineages' shelves, none of them authored; it was 149 of 149 at GN (129 + 20).
 # GN moved five class-wide cards into the class kits
 # (`CLASS_KITS`), so the class half went 25 -> 20 without a card being deleted;
@@ -628,15 +641,17 @@ const CLASS_DRAFT_POOLS := {
 # channel reads which. THE MERGE JOINED THE DRAFT'S TWO, NOT THE GAME'S THREE.
 #
 # **THE DEPTHS, DERIVED** (`check_gp` §1 derives them again every battery, and
-# no figure here is authored twice): Warrior 43, Mage 51, Cleric 43, Hunter 41
-# — 178, which is `SPEC_DRAFT_POOLS`' 158 plus `CLASS_DRAFT_POOLS`' 20 with no
+# no figure here is authored twice): Warrior 43, Mage 51, Cleric 43, Hunter 42
+# — 179, which is `SPEC_DRAFT_POOLS`' 159 plus `CLASS_DRAFT_POOLS`' 20 with no
 # card in both. **GP's merge made them 38 / 41 / 34 / 36 and GS §1 added the 29
 # cards that stopped travelling with an engine** — 5 / 10 / 9 / 5 — each on the
-# shelf of the lineage that opened with it. A hero drew from 13 to 18 before the
+# shelf of the lineage that opened with it; **HB §2 added Tripwire to the
+# Hunter's** when it left his class kit. A hero drew from 13 to 18 before the
 # merge (his lineage's shelf plus his class's) and a spine-taker from 3 to 6.
 # **AND WHAT HE CAN BE OFFERED IS NARROWER THAN THE POOL**, because of the gate
 # below: holding no engine at all he is offered 40 of the Warrior's 43, 38 of
-# the Mage's 51, 29 of the Cleric's 43 and 34 of the Hunter's 41.
+# the Mage's 51, 29 of the Cleric's 43 and 35 of the Hunter's 42 — and a
+# Sharpshooter, who fields no companion (HB §4), fewer again (`COMPANION_READ`).
 static func draft_pool(class_key: String) -> Array:
 	var out: Array = []
 	for spec in SPEC_IDS.get(class_key, []):
@@ -749,10 +764,14 @@ const ENGINE_READ := {
 	"Transference": {"engine": "old_gods", "why": "moves a Ruin mark; refused with none on the field"},
 	"Requiem": {"engine": "old_gods", "why": "consumes a Ruin mark; refused with none on the field"},
 	# PACK — `_gain_loyalty` returns at once without the engine, so a companion
-	# summoned by Call the Wilds stands at 0 Loyalty forever. THE COMPANION IS
+	# summoned without it — by Summon Companion, every Hunter's kit card since
+	# HB, or by Call the Wilds — stands at 0 Loyalty forever. THE COMPANION IS
 	# NOT THE GATE (Twin Hunt, Savage Sweep, Bloodbond and Call the Wilds itself
 	# all work at 0 bond); the BOND is. Ghostpack's payout sits inside
 	# `has_engine("pack")` in the strike loop — the status lands and does nothing.
+	# **A COMPANION HAS A SECOND GATE SINCE HB, AND IT IS NOT AN ENGINE HELD BUT
+	# ONE ABSENT**: the Sharpshooter dismisses the pet, so a row here also needs
+	# a companion on the field, and `COMPANION_READ` below says which do.
 	"Unleash": {"engine": "pack", "why": "spends a bond; refused below 1 Loyalty"},
 	"Bring It Down": {"engine": "pack", "why": "\"no bond deep enough to call on\""},
 	"Last Howl": {"engine": "pack", "why": "+3% a stack of Loyalty a fallen companion held"},
@@ -788,10 +807,81 @@ static func engine_read(card_name: String) -> String:
 
 # What a hero holding `engines` may be offered out of `names`. A card reading no
 # engine is always offered; a card reading one is offered only to its holder.
+# **AND SINCE HB A CARD THAT NEEDS A COMPANION IS NOT OFFERED TO A HERO WHO HAS
+# DISMISSED THE PET** (`COMPANION_READ`, `dismisses_pet`): the negative of the
+# engine test, asked beside it rather than folded into it.
 static func offerable(names: Array, engines: Array) -> Array:
+	var no_pet := dismisses_pet(engines)
 	return names.filter(func(n):
 		var e := engine_read(String(n))
-		return e == "" or engines.has(e))
+		if e != "" and not engines.has(e):
+			return false
+		return not (no_pet and reads_companion(String(n))))
+
+
+# ══ BATCH HB §3/§4 — A CARD THAT NEEDS A COMPANION ═══════════════════════════
+#
+# **EVERY HUNTER HAS A PET, SO A CARD THAT NEEDS ONE IS NO LONGER GATED ON PACK
+# BOND — EXCEPT WHERE IT READS THE BOND ITSELF.** Until HB the only companion
+# a Hunter could field without Pack Bond came from an earned Call the Wilds,
+# which is why GP left the companion cards ungated (GS: Kill Command was
+# already offered to any Hunter). HB generalises that: the rows above that
+# read LOYALTY or the BOND (`ENGINE_READ`'s PACK rows) stay gated on Pack Bond,
+# and everything below that reads only A COMPANION is offered to every Hunter
+# who fields one.
+#
+# **THE SHARPSHOOTER FIELDS NONE, SO THIS IS THE NEGATIVE GV'S GATE COULD NOT
+# EXPRESS.** `ENGINE_READ` holds the one engine a card NEEDS; it has no slot for
+# an engine that KILLS a card, and "is a pet present" is exactly that — no
+# dismisser equipped. So it is a table of its own, asked by the same two doors:
+# `offerable` withholds every row from a hero who has dismissed the pet, and
+# `sits_out` benches the rows whose `door` is true — the cards the usability
+# door refuses on every board with no companion standing — for as long as he
+# holds the dismisser, on GT §3's rule (an earned card is kept and sits out; it
+# is never destroyed). **A row with `door` false resolves and pays nothing**,
+# which is an offer's business and not a seat's (GP's groups: CANNOT-work is
+# gated; a card that half-works is not a row at all).
+#
+# **DERIVED BY CASTING, NEVER BY READING A NAME** (`docs/reports/HB.md` §3): every
+# card a Hunter can earn cast on a hero holding Pack Bond, once with a companion
+# standing and once with none, on the same board and the same dice; a row is a
+# card that did something with the companion and nothing — or was refused —
+# without it. The bond rows are here too, because a bond needs a companion as
+# well as the engine: a hero holding Pack Bond AND Lethal Aim has no pet, and
+# offering him a bond card would be offering a card that does nothing.
+const COMPANION_READ := {
+	# REFUSED AT THE DOOR WITH NO COMPANION STANDING — `_ability_usable` reads
+	# `_beasts(u)`, `kinds_summoned` or the deepest bond, and since HB the summon
+	# door refuses a hero who has dismissed the pet outright.
+	"Kill Command": {"door": true, "why": "orders the companion; refused with none standing"},
+	"Twin Hunt": {"door": true, "why": "the Hunter and the companion strike as one; refused with none standing"},
+	"Savage Sweep": {"door": true, "why": "the companion sweeps; refused with none standing"},
+	"Bestial Wrath": {"door": true, "why": "unleashes the companions' wrath; refused with none standing"},
+	"Spirit Bond": {"door": true, "why": "binds the Hunter to the companions; refused with none standing"},
+	"Ghostpack": {"door": true, "why": "every companion fielded this battle strikes as a ghost; refused with none fielded"},
+	"Call the Wilds": {"door": true, "why": "fields a companion; the summon door refuses a Hunter who has dismissed the pet"},
+	"Unleash": {"door": true, "why": "spends the deepest bond; refused with no companion to hold one"},
+	"Primal Surge": {"door": true, "why": "spends a companion's Loyalty; refused with no companion to hold any"},
+	# RESOLVES AND PAYS NOTHING — each lays a status or reads a bond whose payout
+	# needs a companion on the field, so the card is dead for a Hunter who fields
+	# none; it is an offer's business and not a seat's.
+	"Bloodbond": {"door": false, "why": "the Hunter takes a blow meant to fell the companion; with none there is no blow to take"},
+	"Bear the Brunt": {"door": false, "why": "the deepest bond takes the blow meant to fell the Hunter; with no companion the guard is never spent"},
+	"Bring It Down": {"door": false, "why": "calls on the deepest bond; says there is none with no companion"},
+	"Last Howl": {"door": false, "why": "pays for a companion that falls; none can fall with none fielded"},
+	"Succession": {"door": false, "why": "hands a bond on at a swap; nothing is swapped with no companion"},
+}
+
+
+# Whether a card cannot pay without a companion on the field. THE ONE ANSWER.
+static func reads_companion(card_name: String) -> bool:
+	return COMPANION_READ.has(card_name)
+
+
+# Whether the usability door refuses the card on every board with no companion
+# standing — the rows that SIT OUT, rather than merely are not offered.
+static func companion_door(card_name: String) -> bool:
+	return bool(COMPANION_READ.get(card_name, {}).get("door", false))
 
 
 # ══ BATCH GT §3 — A CARD THAT CANNOT BE CAST WITHOUT ITS ENGINE SITS OUT WHILE
@@ -852,10 +942,15 @@ static func sits_out_engine(card_name: String) -> String:
 
 
 # Whether a hero whose slotted engines are `engines` leaves `card_name` out of
-# his next fight.
+# his next fight. **BATCH HB — OR WHETHER HE HAS DISMISSED THE PET THE CARD
+# NEEDS**: a `COMPANION_READ` row the door refuses with no companion standing
+# sits out while he holds a dismisser, on GT §3's rule, and is seated again the
+# moment he unequips it.
 static func sits_out(card_name: String, engines: Array) -> bool:
 	var e := sits_out_engine(card_name)
-	return e != "" and not engines.has(e)
+	if e != "" and not engines.has(e):
+		return true
+	return companion_door(card_name) and dismisses_pet(engines)
 
 
 # ---------- THE PROTECTED CORE (Batch BO §2) ----------
@@ -892,7 +987,8 @@ static func sits_out(card_name: String, engines: Array) -> bool:
 # and stands PROPOSED until the designer rules it (`docs/reports/GS.md` §1).
 # Three were the designer's from the start: Bloodlust for the Berserker,
 # Flamewave for the Pyromancer, and the Beastmaster's three summons, the stated
-# exception; GS's three derivations were ruled at GT and stand.
+# exception — RETIRED AT HB, when every Hunter's class kit took the pet; GS's
+# three derivations were ruled at GT and stand.
 #
 # TWO COLUMNS:
 # · `enablers` — the minimum. An EMPTY list is a real answer: the engine runs on
@@ -902,8 +998,9 @@ static func sits_out(card_name: String, engines: Array) -> bool:
 # · `slots` — the bar entries the lineage's opening cards take, which since GS
 #   are its enablers alone, so `lineage_slots` (this less the enablers) is zero
 #   for every lineage: an enabler sits outside the slot count (the charter). THE
-#   BEASTMASTER'S THREE SUMMONS ARE ONE ENTRY, AH's rule since the pools were
-#   built.
+#   BEASTMASTER'S THREE SUMMONS WERE ONE ENTRY, AH's rule since the pools were
+#   built; since HB they are one CARD, the class kit's Summon Companion, and
+#   the Beastmaster's row has no enabler to count.
 #
 # THE FAILURE THIS TABLE PREVENTS IS STILL SILENT — an engine that stops working
 # because its enabler became draftable — so `enablers` is AUTHORED, and
@@ -934,11 +1031,15 @@ const PROTECTED_CORES := {
 		"why": "Conviction builds Faith when Divine Shield absorbs, which is what its own rule says, and no Cleric basic or kit card lays a divine shield (derived at GS, ruled at GT)."},
 	"occultist": {"slots": 1, "enablers": ["Hex of Ruin"],
 		"why": "Wrath of the Old Gods marks Ruin on debuffs he applies, and no Cleric basic or kit card applies one. Hex of Ruin curses three at once (derived at GS, ruled at GT)."},
-	# RULED (GS §1): the stated exception — "only the absolutely necessary, like
-	# the Beastmaster summons."
-	"beastmaster": {"slots": 1,
-		"enablers": ["Summon Ursus", "Summon Canis", "Summon Aguila"],
-		"why": "Pack Bond reads a living companion. With no summon there is no boon, no Loyalty and no engine at all."},
+	# RULED (GS §1) as the stated exception — "only the absolutely necessary,
+	# like the Beastmaster summons" — and RETIRED AT HB, ruled by the designer:
+	# every Hunter summons from the class kit's Summon Companion, so the engine
+	# that needed a companion no longer has to bring one. It brings nothing and
+	# deepens a bond the Hunter already has. The three calls keep their one
+	# definition in `spec_abilities("beastmaster")`; they are what the kit card
+	# chooses between at the cast (`companion_call`).
+	"beastmaster": {"slots": 0, "enablers": [],
+		"why": "Pack Bond reads a living companion, and every Hunter but the Sharpshooter summons one from the class kit's Summon Companion (HB). The engine brings nothing: it makes the bond grow."},
 	"sharpshooter": {"slots": 0, "enablers": ["Quick Shot"],
 		"why": "Lethal Aim counts consecutive single-target attacks, and the Hunter's own basic is the free one that keeps him on a mark."},
 	"mystic": {"slots": 0, "enablers": [],
@@ -972,9 +1073,23 @@ const PROTECTED_CORES := {
 # arrived by. **SINCE BATCH GS NO LINEAGE OPENS WITH A KIT CARD** — a lineage
 # opens with its engine's enablers and nothing else (`PROTECTED_CORES` below),
 # and no enabler is a kit card — so the Warden's Mocking Blow and Crushing Blow,
-# the Sharpshooter's Powershot, the Survivalist's Tripwire and Snare Trap and
-# the Swordmaster's Pommel Strike are held as KIT cards by every hero of the
-# class, and `kit_slots` counts all three.
+# the Sharpshooter's Powershot, the Survivalist's Snare Trap and the
+# Swordmaster's Pommel Strike are held as KIT cards by every hero of the class,
+# and `kit_slots` counts all three.
+#
+# **BATCH HB — EVERY HUNTER HAS A PET (ruled by the designer).** The Hunter's
+# third kit card is SUMMON COMPANION, one card that calls Ursus, Canis or Aguila
+# — the Hunter chooses at the cast — and it took TRIPWIRE's slot: Tripwire only
+# pays when enemies come to the Hunter, and a companion is what brings them, so
+# it went to the Survivalist's shelf of the class pool (GS §1's rule: a card
+# that stops travelling lands somewhere). **The kit is the one place the pet
+# comes from**, so Pack Bond brings nothing (`PROTECTED_CORES`), and **the
+# Sharpshooter is the one engine that dismisses it** (`PET_DISMISSERS` below):
+# a hero holding Lethal Aim opens without the card, and the slot it held is
+# free for a drafted one — `class_kit_names_for` is that kit and `kit_slots`
+# counts it. `CLASS_KITS` itself still names all three: it is the CLASS's kit,
+# and what a given hero opens with is the class's kit less what his engines
+# dismiss.
 #
 # **BATCH GS §2 — BLOODLUST LEFT THE WARRIOR'S KIT AND POMMEL STRIKE TOOK ITS
 # PLACE (ruled by the designer).** Bloodlust was a Berserker card wearing a
@@ -990,12 +1105,66 @@ const CLASS_KITS := {
 	"warrior": ["Crushing Blow", "Pommel Strike", "Mocking Blow"],
 	"mage": ["Magic Burst", "Nexus Ward", "Magic Missiles"],
 	"cleric": ["Ministration", "Unburden", "Consecration"],
-	"hunter": ["Powershot", "Snare Trap", "Tripwire"],
+	"hunter": ["Powershot", "Snare Trap", "Summon Companion"],
 }
+
+
+# ══ BATCH HB — THE PET, AND THE ENGINE THAT DISMISSES IT ═════════════════════
+#
+# **`PET_CARD` IS THE ONE CARD A COMPANION COMES FROM.** One card, three calls:
+# the Hunter chooses the companion at the cast, and a second cast with another
+# chosen swaps the one standing out, exactly as the three separate summons did.
+# The three calls keep their one definition each in `spec_abilities("beastmaster")`
+# (`companion_call` reads them), so the arrival, the stats and the text of each
+# companion did not move a byte; the card takes the price the three already
+# shared (20 Mana, cooldown 3, initiative 3.0), so no magnitude moved either.
+#
+# **ONLY THE SHARPSHOOTER DISMISSES THE PET (ruled by the designer).** A hero
+# whose slotted engines hold one of `PET_DISMISSERS` opens without `PET_CARD`, and
+# the battle's summon door refuses him every other way to field one — Call the
+# Wilds included — so a Sharpshooter has no companion at all. **The slot the card
+# held is his for a drafted card**: `kit_slots` counts the kit he holds, not the
+# class's.
+const PET_CARD := "Summon Companion"
+const COMPANION_KINDS := ["ursus", "canis", "aguila"]
+const PET_DISMISSERS := ["lethal_aim"]
+
+
+# Whether a hero whose SLOTTED engines are `engines` has dismissed the pet. The
+# negative of GV's question — "is a pet present" is "is no dismisser equipped"
+# — and THE ONE ANSWER to it: the kit builder, the slot count, the offer, the
+# seat and the battle's summon door all ask here.
+static func dismisses_pet(engines: Array) -> bool:
+	for pid in PET_DISMISSERS:
+		if engines.has(String(pid)):
+			return true
+	return false
+
+
+# The call a Summon Companion cast makes for `kind` — the companion's own
+# definition, read out of `spec_abilities("beastmaster")` where it has always
+# been, or null for a kind that is not one of the three.
+static func companion_call(kind: String) -> Ability:
+	var want := "Summon " + kind.capitalize()
+	for ab in spec_abilities("beastmaster"):
+		if ab != null and ab.display_name == want:
+			return ab
+	return null
 
 
 static func class_kit_names(class_key: String) -> Array:
 	return CLASS_KITS.get(class_key, [])
+
+
+# The kit a hero of `class_key` whose slotted engines are `engines` opens with:
+# the class's kit less the pet, where an engine he holds dismisses it (HB).
+static func class_kit_names_for(class_key: String, engines: Array) -> Array:
+	var out: Array = []
+	for nm in class_kit_names(class_key):
+		if String(nm) == PET_CARD and dismisses_pet(engines):
+			continue
+		out.append(nm)
+	return out
 
 
 static func class_kit_holds(class_key: String, display_name: String) -> bool:
@@ -1005,8 +1174,14 @@ static func class_kit_holds(class_key: String, display_name: String) -> bool:
 # The kit as abilities, fresh on every call like `kit()`. A name that resolves
 # to nothing is skipped here and asserted by `check_gn`.
 static func class_kit(class_key: String) -> Array:
+	return class_kit_for(class_key, [])
+
+
+# The kit a hero holding `engines` opens with, as abilities (HB): `class_kit`
+# less the pet where his engines dismiss it. `opening_kit` reads THIS.
+static func class_kit_for(class_key: String, engines: Array) -> Array:
 	var out: Array = []
-	for nm in class_kit_names(class_key):
+	for nm in class_kit_names_for(class_key, engines):
 		var ab := pool_ability(String(nm))
 		if ab != null:
 			out.append(ab)
@@ -1014,27 +1189,49 @@ static func class_kit(class_key: String) -> Array:
 
 
 # The kit cards the lineage's slots do not already count — a card the lineage
-# opens with outside its enablers is one slot, not two. Engine-agnostic, like
-# `lineage_slots`: the slot a card holds does not move with an engine. **SINCE
-# GS A LINEAGE OPENS WITH ITS ENABLERS AND NOTHING ELSE** (`lineage_opening`),
-# so it counts no kit card and every hero's kit is three slots; the walk stays
-# derived so a lineage card put back into an opening kit is counted once.
-static func kit_slots(class_key: String, spec: String) -> int:
+# opens with outside its enablers is one slot, not two. **SINCE GS A LINEAGE
+# OPENS WITH ITS ENABLERS AND NOTHING ELSE** (`lineage_opening`), so it counts
+# no kit card and every hero's kit is three slots; the walk stays derived so a
+# lineage card put back into an opening kit is counted once.
+#
+# **BATCH HB — AND IT COUNTS THE KIT THE HERO HOLDS, SO IT READS HIS ENGINES.**
+# Until HB the slot a card held did not move with an engine; the Sharpshooter's
+# is the one that does — he opens without Summon Companion and its slot is his
+# for a drafted card, so a Lethal Aim holder's kit is two slots. `engines` is
+# the SLOTTED set; left empty it is a hero holding none, who dismisses nothing.
+static func kit_slots(class_key: String, spec: String, engines: Array = []) -> int:
 	var counted: Array = []
 	for ab in lineage_opening(spec):
 		if not core_enablers(spec).has(ab.display_name):
 			counted.append(ab.display_name)
 	var n := 0
-	for nm in class_kit_names(class_key):
+	for nm in class_kit_names_for(class_key, engines):
 		if not counted.has(String(nm)):
 			n += 1
 	return n
 
 
 # A card that exists ONLY in a class kit is defined here, and `pool_ability`
-# reads it. One today.
+# reads it. Two today: GN's Magic Burst and HB's Summon Companion.
 static func class_kit_ability(display_name: String) -> Ability:
 	match display_name:
+		# AXIS: the Hunter's companion, for every Hunter but the Sharpshooter
+		# (HB, ruled by the designer). ONE CARD, THREE CALLS: the cast opens a
+		# choice of Ursus, Canis or Aguila, and what resolves is that
+		# companion's own call (`companion_call`) at THIS card's price — so a
+		# rune or an upgrade that moves the card moves all three calls. The
+		# price is the one the three summons already shared, so nothing moved:
+		# 20 Mana, initiative 3.0, cooldown 3, and the cooldown is KEPT PER
+		# COMPANION exactly as three cards kept it (the call's own name keys it).
+		# With a companion standing, a second cast is the swap, at the swap's
+		# own price (`battle._open_summon_picker`). No bar: a summon deals no
+		# damage and lays no Break, so the grade would have nothing to multiply.
+		"Summon Companion":
+			return Ability.make({"display_name": "Summon Companion",
+				"cooldown": 3, "cost": 20, "special": "summon",
+				"delay": 3.0, "anim": "attack01",
+				"perfect_id": "", "perfect_text": "",
+				"description": "Call a companion to fight beside the\nHunter: Ursus, Canis or Aguila, chosen\nat the cast. With one standing, casting\nit again swaps in another."})
 		# AXIS: the Mage's opener for the whole party. Elemental Weakness lowers
 		# the target's resistance to every school but physical, so a Cleric's
 		# holy and a Survivalist's nature land harder too — ELEMENT-BLIND BY
@@ -1306,6 +1503,10 @@ const CARD_TAGS := {
 	"Magic Bolt": ["OFFENSE", "BREAK"],
 	# --- kit:mage (GN) — its read site lays Elemental Weakness after the blow ---
 	"Magic Burst": ["DEBUFF", "BREAK"],
+	# --- kit:hunter (HB) — its read site is the summon of the companion chosen at
+	# the cast, and two of its three calls read OFFENSE / BREAK (the three rows
+	# above, under core:beastmaster, are the calls it chooses between) ---
+	"Summon Companion": ["OFFENSE", "BREAK"],
 	# --- spec:arcanist ---
 	"Arcane Bolt": ["OFFENSE", "BREAK"],
 	"Arcane Echo": ["MARK", "OFFENSE"],
@@ -1885,7 +2086,8 @@ static func lineage_opening(spec: String) -> Array:
 #
 #   the class basic
 #   + the lineage's enablers, while its engine is held (`lineage_opening`, GS)
-#   + the class kit (`CLASS_KITS`, GN)
+#   + the class kit (`CLASS_KITS`, GN) — less the pet where a held engine
+#     dismisses it (`class_kit_for`, HB)
 #   + every OTHER held engine's enablers
 #
 # **THE DEDUPE FOLLOWS THE CARD, NOT THE KIT** (GS §2): every append asks
@@ -1899,7 +2101,7 @@ static func opening_kit(class_key: String, spec: String, engines: Array) -> Arra
 	var own := engine_of_spec(spec)
 	if own != "" and engines.has(own):
 		_hold_each(cfg, lineage_opening(spec))
-	_hold_each(cfg, class_kit(class_key))
+	_hold_each(cfg, class_kit_for(class_key, engines))
 	for pid in engines:
 		var es := engine_spec(String(pid))
 		if es == "" or es == spec:
@@ -1923,7 +2125,8 @@ static func _kit_holds(abilities: Array, name: String) -> bool:
 
 # **THE ENABLER SITS OUTSIDE THE SLOT COUNT**, so the slots a lineage's opening
 # abilities occupy are `core_slots` less the enablers among them — derived off
-# the live kit, with the three summons one bar entry as they always were. **SINCE
+# the live kit, with summons one bar entry as they always were (no lineage opens
+# with one since HB: the pet is the class kit's). **SINCE
 # GS A LINEAGE OPENS WITH ITS ENABLERS ALONE**, so `core_slots` is this figure
 # for every lineage and `lineage_slots` is zero; `check_gs` §1 asserts both.
 static func enabler_slots(spec: String) -> int:
@@ -2386,7 +2589,10 @@ static func talent_granted_names() -> Array:
 	return out
 
 
-# -- THE DRAFTED ABILITIES — ONE HUNDRED AND SEVENTY-EIGHT OF A TARGET 178 (BO..GS) --
+# -- THE DRAFTED ABILITIES — ONE HUNDRED AND SEVENTY-NINE OF A TARGET 179 (BO..HB) --
+#
+# BATCH HB §2 — 179: Tripwire joined the Survivalist's shelf when Summon Companion
+# took its class-kit slot, and its one definition stays in `spec_abilities`.
 #
 # BATCH GS §1 — THE DRAFT IS 178, AND THE 29 IT GAINED ARE NOT DEFINED HERE. They
 # are the cards a lineage opened with until an engine stopped bringing them; each
@@ -6233,7 +6439,7 @@ const SPEC_INFO := {
 	"sharpshooter": {"name": "Sharpshooter", "constitution": 90, "archetype": "Nuker", "passive": "lethal_aim",
 		"max_hp": 140, "armor": 0.10,
 		"resists": {"nature": 0.10, "physical": -0.10},
-		"passive_desc": "Lethal Aim: critical hits deal x2 damage instead of\nx1.5. Each consecutive attack against the same enemy\ngrants +20 FOCUS (NO CEILING; cleared on switching\ntargets, 50 retained on a kill). The first 100 points\neach grant +0.5% critical chance; every point past 100\ngrants +0.5% CRITICAL MULTIPLIER instead.",
+		"passive_desc": "Lethal Aim: critical hits deal x2.5 damage instead of\nx1.5. Each consecutive attack against the same enemy\ngrants +20 FOCUS (NO CEILING; cleared on switching\ntargets, 50 retained on a kill). The first 100 points\neach grant +0.5% critical chance; every point past 100\ngrants +0.5% CRITICAL MULTIPLIER instead. Every hit\nthat lands without a critical adds +5% critical\nchance, kept through a target switch; a critical\nhit resets it. The Sharpshooter fields no companion:\nSummon Companion leaves the kit, and its slot is free.",
 		"blurb": "Every arrow an execution — patient, precise, final."},
 	# The toughest Hunter by design: his passive rewards being struck and
 	# Tripwire wants him in the fray. Deep nature affinity from a life
@@ -6475,7 +6681,7 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Summon Ursus", "cooldown": 3, "cost": 20, "special": "summon",
 					"delay": 3.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "",
-					"description": "Call the bear (110 HP): attacks with\nyou, striking your target AND adjacent\nenemies for 10% of your Attack.\nSavage Presence: enemies are drawn to\nUrsus; you take 10% less damage.\nOn arrival: GUARDIAN'S ROAR — taunts\nthe weakest enemy, bear takes 25% less\ndamage for 2 turns.\nLoyalty gift: +3% max health per stack."}),
+					"description": "Call the bear (110 HP): attacks with\nyou, striking your target AND adjacent\nenemies for 10% of your Attack.\nPack Bond: enemies are drawn to Ursus;\nyou take 10% less damage.\nOn arrival: GUARDIAN'S ROAR — taunts\nthe weakest enemy, bear takes 25% less\ndamage for 2 turns.\nLoyalty gift: +3% max health per stack."}),
 				Ability.make({"display_name": "Summon Canis", "cooldown": 3, "cost": 20, "special": "summon",
 					"delay": 3.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "",

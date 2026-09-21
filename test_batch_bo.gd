@@ -430,12 +430,19 @@ func _cores() -> void:
 	ok(Classes.core_enablers("swordmaster").is_empty()
 			and Classes.spec_draft_pool("swordmaster").has("Guard Change"),
 		"§2: the Swordmaster's stances need no enabler — his stance swap, Guard Change, is drafted off his shelf (GS §1)")
-	ok(Classes.core_enablers("beastmaster").size() == 3,
-		"§2: Pack Bond needs a beast — all three summons are protected")
-	# BATCH GS — the summons are one bar entry and nothing else opens with them, so
-	# the core is ONE slot (it was three: the summons' entry and two lineage cards).
-	ok(Classes.core_slots("beastmaster") == 1,
-		"§2: ...and they cost ONE slot — the three summons share one bar entry, and nothing else opens with them (GS §1)")
+	# BATCH HB §3 — RE-POINTED TO THE DESIGNER'S RULING: PACK BOND BRINGS NOTHING.
+	# The three summons were the one stated exception to *an engine brings only
+	# what it cannot run without* (GS §1), and HB retired it by putting the pet in
+	# every Hunter's CLASS KIT. The Beastmaster still needs a beast, and the beast
+	# is still protected — as the kit's Summon Companion, for every Hunter who
+	# holds it — so the claim this arm guarded is kept, and only its owner moved.
+	ok(Classes.core_enablers("beastmaster").is_empty()
+			and Classes.protected_names("beastmaster").has(Classes.PET_CARD),
+		"§2: Pack Bond needs a beast, and the beast is every Hunter's — the kit's Summon Companion, protected (HB §3)")
+	# BATCH GS made the Beastmaster's core ONE slot (the summons' one bar entry);
+	# with no enabler it is none, like every lineage but the five that bring a card.
+	ok(Classes.core_slots("beastmaster") == 0,
+		"§2: ...so the Beastmaster's lineage fills NO slot of its own — nothing opens with it (HB §3; the summons' one entry until then)")
 	# BATCH GS §1 — Mercy pays on every heal she casts, the kit's Ministration among
 	# them, so the Holy opens with no card of her lineage: her four are on her shelf
 	# and cost no slot, and Batch AV's deliberate parity break ended with them.

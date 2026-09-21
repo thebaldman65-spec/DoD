@@ -102,12 +102,32 @@ func _classes_code() -> String:
 	return _code_only(FileAccess.get_file_as_string("res://scripts/classes.gd"))
 
 
-# ---------------- §1 — COMPANION SUMMONING IS THE BEASTMASTER'S ----------------
+# BATCH HB — the class kits holding a card, read through the kit's own door.
+const PET_HOME := "THE HUNTER'S CLASS KIT"
+
+
+func _kits_holding(card: String) -> Array:
+	var out: Array = []
+	for key in ["warrior", "mage", "cleric", "hunter"]:
+		if Classes.class_kit_holds(key, card):
+			out.append(key)
+	return out
+
+
+# ---------------- §1 — COMPANION SUMMONING IS THE HUNTER'S ----------------
+# **RE-POINTED BY BATCH HB (ruled by the designer): EVERY HUNTER HAS A PET.** The
+# three summons are still DEFINED once, in the Beastmaster's lineage, and they
+# are the three calls of ONE class-kit card — Summon Companion — which every
+# Hunter but the Sharpshooter opens with. So the exclusive moved from a lineage
+# to a class, and it is still an exclusive: a summon anywhere but those three
+# definitions and the Hunter's one kit card fails here, and so does that card
+# in any other class's kit.
 func _s1_summoning() -> void:
-	print("§1 — COMPANION SUMMONING is exclusive to the Beastmaster")
+	print("§1 — COMPANION SUMMONING is exclusive to the Hunter (the Beastmaster defines the calls; the class kit carries the card)")
 	# THE PROPERTY: every ability in the game whose `special` is "summon"
-	# belongs to the Beastmaster's protected core. Derived over the WHOLE
-	# corpus, so a summon authored onto any other spec fails here.
+	# belongs to the Beastmaster's protected core, or is the Hunter class kit's
+	# one pet card. Derived over the WHOLE corpus, so a summon authored onto any
+	# other spec, or into any other class's kit, fails here.
 	var owners := {}
 	var summons: Array = []
 	for spec in Classes.SPEC_INFO:
@@ -120,12 +140,26 @@ func _s1_summoning() -> void:
 	for cab in Classes.ability_corpus():
 		if cab.special == "summon" and not owners.has(cab.display_name):
 			summons.append(cab.display_name)
-			owners[cab.display_name] = "OUTSIDE THE BEASTMASTER'S CORE"
+			owners[cab.display_name] = PET_HOME if cab.display_name == Classes.PET_CARD \
+				and _kits_holding(cab.display_name) == ["hunter"] else "OUTSIDE THE BEASTMASTER'S CORE"
 	ok(not summons.is_empty(), "no summon abilities found at all — the sweep read nothing")
 	for n in summons:
-		ok(owners[n] == SUMMON_SPEC,
-			"%s carries `special: summon` and belongs to %s, not the %s" % [
+		ok(owners[n] == SUMMON_SPEC or (n == Classes.PET_CARD and owners[n] == PET_HOME),
+			"%s carries `special: summon` and belongs to %s, not the %s or the Hunter's kit" % [
 				n, owners[n], SUMMON_SPEC])
+	# THE POSITIVE ARM BESIDE THE ONE ADMITTED CARD: it is in the corpus, it is the
+	# Hunter's kit card and no other class's, and its three calls are the three
+	# summons the Beastmaster defines — so the admission above is not vacuous and
+	# is not a door a fourth summon could come through.
+	ok(owners.get(Classes.PET_CARD, "") == PET_HOME,
+		"%s is in the corpus and held by the Hunter's class kit alone (%s)" % [
+			Classes.PET_CARD, str(_kits_holding(Classes.PET_CARD))])
+	var calls: Array = []
+	for k in Classes.COMPANION_KINDS:
+		var c: Ability = Classes.companion_call(String(k))
+		calls.append(c.display_name if c != null else "")
+	ok(calls.all(func(c): return owners.get(c, "") == SUMMON_SPEC) and calls.size() == 3,
+		"the pet card's three calls are the Beastmaster's three summons (%s)" % str(calls))
 	print("  %d summon abilities, all of them %s core: %s" % [
 		summons.size(), SUMMON_SPEC, ", ".join(summons)])
 	# AND THE SECOND DOOR: `_do_summon` is the only thing that puts a body on

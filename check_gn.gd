@@ -138,10 +138,14 @@ func _ready_to_cast(u: BattleUnit) -> void:
 	u.cooldowns.clear()
 
 
-func _no_lineage_board() -> Node:
+func _no_lineage_board(drafted: Dictionary = {}) -> Node:
 	var over := {}
 	for seat in 4:
 		over[seat] = {"engines": []}
+		# BATCH HB — a seat may carry drafted cards (Tripwire, since it left the kit).
+		if drafted.has(seat):
+			over[seat]["bm_abilities"] = (drafted[seat] as Array).duplicate()
+			over[seat]["bm_equipped"] = (drafted[seat] as Array).duplicate()
 	return await Gate.spawn(self, NO_LINEAGE, {"deterministic": true, "party": over})
 
 
@@ -170,7 +174,14 @@ func _s0_the_kit() -> void:
 				for n in got:
 					if got.count(n) > 1 and not twice.has(n):
 						twice.append(n)
-				ok(twice.is_empty() and kit.all(func(k): return got.has(k)),
+				# BATCH HB §4 — THE KIT A HERO OPENS WITH READS HIS ENGINES. The
+				# Sharpshooter's Lethal Aim dismisses the pet, so held he opens with
+				# the kit less Summon Companion AND WITHOUT IT — the negative arm —
+				# while the same lineage with the engine dropped holds all three
+				# again, which is the positive arm beside it on the next pass.
+				var want_kit: Array = Classes.class_kit_names_for(ck, held)
+				var pet_gone: bool = not Classes.dismisses_pet(held) or not got.has(Classes.PET_CARD)
+				ok(twice.is_empty() and want_kit.all(func(k): return got.has(k)) and pet_gone,
 					"§0: %s (%s) holds the kit, each card once (%s)"
 						% [pid, "engine held" if not held.is_empty() else "engine dropped", str(twice)])
 			if spec != "":
@@ -200,9 +211,13 @@ func _s0_the_kit() -> void:
 			print("    %-14s %-12s opens at %d of %d" % [pid, spec if spec != "" else "(no lineage)",
 				used, _run.ability_slot_cap()])
 		# the protected list names the kit
+		# BATCH HB — the kit its lineage HOLDS: the Sharpshooter's protected list
+		# names Powershot and Snare Trap once each, and the pet not at all.
 		for spec2 in Classes.SPEC_IDS[ck]:
 			var prot: Array = Classes.protected_names(String(spec2))
-			ok(kit.all(func(k): return prot.count(k) == 1),
+			var kit2: Array = Classes.class_kit_names_for(ck, [Classes.engine_of_spec(String(spec2))])
+			ok(kit2.all(func(k): return prot.count(k) == 1)
+					and (kit2.size() == kit.size() or not prot.has(Classes.PET_CARD)),
 				"§0: %s's protected list names each kit card once" % spec2)
 	# A KIT CARD IS PROTECTED AT THE ONE BENCH DOOR, and the door still benches
 	# an earned card — the positive arm, on the same member.
@@ -474,11 +489,42 @@ func _s1_the_twelve() -> void:
 		ok(bool(sprung["sprung"]) and bool(sprung["stunned"]) and bool(sprung["poisoned"]),
 			"§1: ...and when that enemy's turn comes it is Stunned and Poisoned (%s)" % str(sprung))
 		print("    Snare Trap: %s" % str(sprung))
+
+	# SUMMON COMPANION — ONE CARD, THREE CALLS (BATCH HB §1). The Hunter on this
+	# board holds no engine, so this is the drive every kit card owes: the picker
+	# offers the three calls, the chosen one fields the companion it names, and
+	# that companion strikes beside his basic — the strike that sat inside Pack
+	# Bond's check until HB.
+	var pet := _card(H, Classes.PET_CARD)
+	if pet != null:
+		_ready_to_cast(H)
+		s._open_summon_picker(H)
+		var offered: Array = _names(s.get("_summon_opts"))
+		s._close_summon_picker()
+		ok(offered == ["Summon Ursus", "Summon Canis", "Summon Aguila"],
+			"§1: Summon Companion's picker offers its three calls (%s)" % str(offered))
+		for e in foes:
+			_reset_foe(e)
+		await s._resolve(H, s._summon_choice(H, "canis"), H, "good")
+		var fielded: Array = s._beasts(H).map(func(b): return b.companion_kind)
+		ok(fielded == ["canis"], "§1: ...the call fields the companion it names (%s)" % str(fielded))
+		_ready_to_cast(H)
+		var hist: RichTextLabel = s.get("history")
+		var was := hist.get_parsed_text().length()
+		await s._resolve(H, H.abilities[0], e0, "good")
+		var struck := hist.get_parsed_text().substr(was).contains("Canis: strikes")
+		ok(struck, "§1: ...and it strikes beside the Hunter's basic with no engine held")
+		print("    Summon Companion: %s; fielded %s; struck beside the basic: %s" % [
+			str(offered), str(fielded), struck])
 	await _clear(s)
 
 	# TRIPWIRE — 6 turns; a melee blow on a hero is answered with 75% of it, a
 	# ranged one is not.
-	var s2: Node = await _no_lineage_board()
+	# **RE-POINTED BY BATCH HB §2: TRIPWIRE IS A DRAFTED CARD NOW**, off the
+	# Survivalist's shelf — Summon Companion took its kit slot. What it promises
+	# is unchanged, so the drive is: seated the way a player now gets it, as a
+	# card the Hunter drafted, on the same no-engine board.
+	var s2: Node = await _no_lineage_board({3: ["Tripwire"]})
 	var H2 := _hero(s2, "hunter")
 	var W2 := _hero(s2, "warrior")
 	var mel: BattleUnit = null
@@ -893,11 +939,16 @@ func _s4_the_bot() -> void:
 	picks["Consecration"] = _pick_name(s, C)
 	W.hp = W.max_hp
 	M.hp = M.max_hp
-	# HUNTER: Tripwire with a melee enemy standing; then Snare Trap; a snared
-	# mark -> Powershot.
+	# HUNTER: no companion standing -> Summon Companion (named by the call it
+	# casts); a companion standing -> Snare Trap; a snared mark -> Powershot.
+	# **RE-POINTED BY BATCH HB**: Summon Companion took Tripwire's kit slot and
+	# its case took Tripwire's place at the head of the class branch. Tripwire is
+	# a drafted card; the drafted hook's arm for it is below.
 	_ready_to_cast(H)
-	picks["Tripwire"] = _pick_name(s, H)
-	s._apply_status(H, "tripwire", 6)
+	var pet_pick: String = _pick_name(s, H)
+	picks[Classes.PET_CARD] = Classes.PET_CARD if pet_pick.begins_with("Summon ") \
+		and Classes.COMPANION_KINDS.has(pet_pick.get_slice(" ", 1).to_lower()) else pet_pick
+	await s._do_summon(H, "canis", H)
 	picks["Snare Trap"] = _pick_name(s, H)
 	var mark: BattleUnit = s._lowest_hp(foes)
 	s._apply_status(mark, "snared", -1, s.get("heroes").find(H), 0, H)
@@ -906,6 +957,22 @@ func _s4_the_bot() -> void:
 	for card in picks:
 		ok(String(picks[card]) == String(card),
 			"§4: on a board it has work on, the class branch names %s (named %s)" % [card, picks[card]])
+	# TRIPWIRE, DRAFTED (BATCH HB §2): the drafted hook names it for a Hunter who
+	# carries it, with a melee enemy standing and no wire rigged — and not with
+	# the wire already rigged, the negative arm beside it.
+	var wire_ab: Ability = Classes.pool_ability("Tripwire")
+	H.abilities.append(wire_ab)
+	_ready_to_cast(H)
+	H.remove_status("tripwire")
+	var dp: Array = s._bot_drafted_pick(H)
+	var wire_named: bool = not dp.is_empty() and (dp[0] as Ability).display_name == "Tripwire"
+	s._apply_status(H, "tripwire", 6)
+	var dp2: Array = s._bot_drafted_pick(H)
+	var wire_again: bool = not dp2.is_empty() and (dp2[0] as Ability).display_name == "Tripwire"
+	H.abilities.erase(wire_ab)
+	ok(wire_named and not wire_again,
+		"§4: the drafted hook names a drafted Tripwire with a melee enemy standing, and not with the wire rigged (%s, %s)"
+			% [wire_named, wire_again])
 	# A NEGATIVE ARM: a card with nothing to do is not named.
 	for e in foes:
 		_reset_foe(e)
@@ -949,6 +1016,12 @@ func _s4_the_bot() -> void:
 			for n in Classes.class_kit_names(h.hero_key):
 				if int(h.cooldowns.get(n, 0)) > 0:
 					seen[n] = true
+				# BATCH HB — Summon Companion is cast as one of its three calls,
+				# and the cooldown is kept under the call's name.
+				if String(n) == Classes.PET_CARD:
+					for k in Classes.COMPANION_KINDS:
+						if int(h.cooldowns.get("Summon " + String(k).capitalize(), 0)) > 0:
+							seen[n] = true
 		for e in _foes(s2):
 			if e.hp < 50000:
 				e.hp = e.max_hp

@@ -334,8 +334,14 @@ func _s3_the_record() -> void:
 	# lineage's shelf, and five lineages name none. Re-pinned to the table GS
 	# left, so a tenth enabler — or an eighth engine carrying one — is a decision
 	# this line has to be moved for.
-	ok(enablers == 9 and enabler_lineages == 7,
-		"§3: %d named enablers across %d lineages, not the nine across seven GS left the table holding" % [
+	# **BATCH HB §3 — SIX ACROSS SIX, RULED BY THE DESIGNER.** The three summons
+	# were GS's one stated exception; HB made them the Hunter's class-kit card
+	# (Summon Companion), so Pack Bond names no enabler and the Beastmaster is
+	# the sixth lineage that names none. Re-pinned for GS's reason: a seventh
+	# enabler, or a seventh engine carrying one, is a decision this line has to
+	# be moved for.
+	ok(enablers == 6 and enabler_lineages == 6,
+		"§3: %d named enablers across %d lineages, not the six across six HB left the table holding" % [
 			enablers, enabler_lineages])
 	# REASON ONE: Heal is one of FIVE Mercy outlets, not Mercy's only outlet.
 	var bs := Gate.strip_comments(

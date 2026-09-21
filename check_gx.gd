@@ -286,16 +286,28 @@ func _s1_the_predicate() -> void:
 		ok(Runes.sits_out(rid, [other]), "§1: %s does not sit out for a hero holding only %s" % [rid, other])
 	ok(out_without == 35 and in_with == 35,
 		"§1: %d of 35 sit out with the engine out and %d of 35 pay with it in" % [out_without, in_with])
-	# THE PAIRED POSITIVE: the other 25 never sit out, on any engine set.
+	# THE PAIRED POSITIVE: the other 25 never sit out, on any engine set —
+	# **BATCH HB: ON ANY SET THAT FIELDS A PET.** Four of them need a companion
+	# (`Runes.COMPANION_READ`), and a hero holding the engine that dismisses the
+	# pet fields none, so those four sit out beside it and for nobody else; the
+	# other twenty-one never sit out at all. Both halves on every rune.
 	var never := 0
+	var pet_out := 0
 	for uid in _ungated:
 		var s_none: bool = Runes.sits_out(uid, [])
-		var s_all: bool = Runes.sits_out(uid, ["old_gods", "mercy", "pack", "lethal_aim"])
-		ok(not s_none and not s_all, "§1: %s is ungated and reads as sitting out" % uid)
-		if not s_none and not s_all:
+		var s_all: bool = Runes.sits_out(uid, ["old_gods", "mercy", "pack"])
+		var s_dis: bool = Runes.sits_out(uid, ["old_gods", "mercy", "pack", "lethal_aim"])
+		var fits: bool = not s_none and not s_all and s_dis == Runes.reads_companion(uid)
+		ok(fits, "§1: %s is ungated and reads as sitting out (%s), or beside the dismisser it reads %s where it %s a companion" % [
+			uid, "empty set" if s_none else "a set with a pet", s_dis,
+			"needs" if Runes.reads_companion(uid) else "needs no"])
+		if fits:
 			never += 1
-	ok(never == _ungated.size(),
-		"§1: %d of %d ungated runes never sit out" % [never, _ungated.size()])
+		if s_dis:
+			pet_out += 1
+	ok(never == _ungated.size() and pet_out == 4,
+		"§1: %d of %d ungated runes never sit out on a set that fields a pet, and %d sit out beside the dismisser — the four that need a companion" % [
+			never, _ungated.size(), pet_out])
 	# AN ENGINE RUNE IS NOT AN ORDINARY ONE AND NEVER SITS OUT.
 	for spec in ["beastmaster", "occultist", "holy", "arcanist"]:
 		var erid := Runes.engine_rune_id(Classes.engine_of_spec(spec))

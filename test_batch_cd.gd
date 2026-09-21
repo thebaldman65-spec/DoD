@@ -73,9 +73,9 @@ const DEAD_TEST_SYMBOLS := ["award_talent_points", "award_spec_point",
 # anyway, where the failure costs one edit in one file instead of thirty-five
 # across twelve. **A STALENESS TRIPWIRE IS A SINGLE INSTRUMENT WHOSE MESSAGE SAYS
 # THE GROUND MOVED**; thirty-five copies of one is not a tripwire, it is a tax.
-const SPEC_TARGET := 158     # the twelve pools, summed from PER_SPEC_DEPTH — 129 until GS
+const SPEC_TARGET := 159     # the twelve pools, summed from PER_SPEC_DEPTH — 129 until GS, 158 until HB
 const CLASS_TARGET := 20     # summed from PER_CLASS_DEPTH — 25 until GN
-const DRAFT_TARGET := 178    # 158 + 20
+const DRAFT_TARGET := 179    # 159 + 20
 const SPEC_FLOOR := 8        # no pool may fall below CI's flat eight
 # What each spec drafts from now. The nine that grew are the nine that HAD an
 # ability-granting talent node; beastmaster, sharpshooter and mystic had none,
@@ -106,10 +106,14 @@ const PER_SPEC_DEPTH := {
 	# +2, the Warden +1, the Swordmaster +2, the Pyromancer +3, the Cryomancer +3,
 	# the Arcanist +4, the Holy +4, the Devout +2, the Occultist +3, the
 	# Beastmaster +2, the Sharpshooter +2 and the Survivalist +1.
+	# BATCH HB §2: THE SURVIVALIST 11 -> 12, AND NOTHING WAS AUTHORED. Tripwire
+	# left the Hunter's class kit when Summon Companion took its slot, and it
+	# lands on the shelf of the lineage that defines it — GS's rule: a card that
+	# stops travelling lands on its lineage's shelf, never nowhere.
 	"berserker": 12, "warden": 11, "swordmaster": 14,
 	"pyromancer": 16, "cryomancer": 14, "arcanist": 16,
 	"holy": 14, "inquisitor": 13, "occultist": 13,
-	"beastmaster": 12, "sharpshooter": 12, "mystic": 11,
+	"beastmaster": 12, "sharpshooter": 12, "mystic": 12,
 }
 # **BATCH DY §1 — THE CLASS HALF STOPPED BEING A FLAT MULTIPLE, SO IT BECAME A
 # TABLE TOO.** `CLASS_TARGET` was written `4 * 6` and asserted as such; Mana

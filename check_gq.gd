@@ -266,8 +266,16 @@ func _s0_what_a_rune_adds() -> void:
 			ok(added_set == travels_set,
 				"§0: %s adds %s — exactly its engine's enablers outside the bare kit (%s), and nothing else of its lineage (%s)"
 					% [pid, str(added), str(travels), lineage])
-			ok(gone.is_empty() or gone == [basic],
-				"§0: the one bare card %s can take away is the class basic (%s)" % [pid, str(gone)])
+			# BATCH HB §4 — AND THE PET, WHICH ONE ENGINE DISMISSES. Two kinds of bare
+			# card can leave now: the class basic (no engine replaces it since GS)
+			# and the kit's Summon Companion, which the Sharpshooter's Lethal Aim
+			# dismisses — and only a dismisser may take it. One arm, both lists.
+			var dismissed: Array = gone.filter(func(n): return String(n) == Classes.PET_CARD)
+			gone = gone.filter(func(n): return String(n) != Classes.PET_CARD)
+			ok((gone.is_empty() or gone == [basic])
+					and dismissed == ([Classes.PET_CARD] if Classes.dismisses_pet([pid]) else []),
+				"§0: the one bare card %s can take away is the class basic, and the pet only where it dismisses it (basic: %s; pet: %s)"
+					% [pid, str(gone), str(dismissed)])
 			if not gone.is_empty():
 				var own: Array = _names(Classes.opening_kit(key, lineage, [pid]))
 				ok(not bare.has(own[0]),
@@ -439,6 +447,10 @@ func _read_screen(scene: Node, seat: int, key: String, deal: Array) -> Dictionar
 		var ad: Array = _adds(key, pid)
 		var added: Array = ad[0]
 		var gone: Array = ad[1]
+		# BATCH HB §4 — A DISMISSED PET IS NOT A REPLACED BASIC: the card says what
+		# the hero opens WITHOUT on a line of its own, after what it adds.
+		var dismissed: Array = gone.filter(func(n): return String(n) == Classes.PET_CARD)
+		gone = gone.filter(func(n): return String(n) != Classes.PET_CARD)
 		var parts := PackedStringArray()
 		for n in added:
 			var part := String(n)
@@ -448,6 +460,8 @@ func _read_screen(scene: Node, seat: int, key: String, deal: Array) -> Dictionar
 		var want := "Engine: %s" % rule
 		if not parts.is_empty():
 			want += "\n\nAlso opens with: %s" % ", ".join(parts)
+		if not dismissed.is_empty():
+			want += "\n\nOpens without: %s" % ", ".join(PackedStringArray(dismissed))
 		ok(body == want, "§1: %s — %s's card reads its rule and what it adds, exactly (%s)"
 			% [tag, rid, body.substr(("Engine: %s" % rule).length()).strip_edges()])
 		ok(body.contains("(in place of ") == (not gone.is_empty()),
@@ -463,16 +477,20 @@ func _read_screen(scene: Node, seat: int, key: String, deal: Array) -> Dictionar
 		# What the card LISTS, read back off it: the added cards and nothing of the
 		# kit, the replaced basic appearing only inside its clause.
 		var tail := body.substr(("Engine: %s" % rule).length()).strip_edges()
+		# BATCH HB — what it ADDS is read up to its "Opens without" line, which
+		# `want` above has already held to the dismissed card exactly.
+		var without_at := tail.find("Opens without: ")
+		var with_tail := (tail.substr(0, without_at) if without_at >= 0 else tail).strip_edges()
 		var listed: Array = []
-		if tail != "":
-			for piece in tail.substr(tail.find(": ") + 2).split(", "):
+		if with_tail != "":
+			for piece in with_tail.substr(with_tail.find(": ") + 2).split(", "):
 				listed.append(String(piece).split(" (in place of ")[0])
 		ok(listed == added and not bare.any(func(ab3): return listed.has(ab3.display_name)),
 			"§1: %s — %s's card lists exactly what it adds and nothing the kit shows (%s)"
 				% [tag, rid, str(listed)])
 		if tail != "":
 			var scrub := tail
-			for n2 in added + gone:
+			for n2 in added + gone + dismissed:
 				scrub = scrub.replace(String(n2), "")
 			authored.append(scrub)
 		# §4 — the card's window, measured the first time this rune is drawn.

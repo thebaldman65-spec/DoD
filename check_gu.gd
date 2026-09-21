@@ -90,14 +90,20 @@ const BELOW := {
 		"why": "a cantrip: under half the damage of either kit card, bought for tempo"},
 	"Primal Surge": {"kit": ["Powershot"], "group": "point",
 		"why": "paid in Loyalty, all of it, and it sits out without Pack Bond"},
-	"Bola": {"kit": ["Snare Trap"], "group": "point",
-		"why": "a class-wide card authored as the lesser applier: two afflictions, no damage and no Break"},
-	"Quarry's Mark": {"kit": ["Snare Trap"], "group": "role",
-		"why": "a mark that pays Focus, not a trap"},
-	"Hold Breath": {"kit": ["Snare Trap"], "group": "role",
-		"why": "the Sharpshooter's own Focus and crit, not a trap"},
-	"Mark of the Hunt": {"kit": ["Snare Trap"], "group": "role",
-		"why": "a mark for the Beastmaster and his companion, not a trap"},
+	# BATCH HB — SUMMON COMPANION JOINED THE HUNTER KIT (in Tripwire's slot) AND
+	# THESE FOUR SIT BELOW IT TOO, SORTED HERE IN THE BATCH THAT MOVED THE KIT:
+	# every one of them only through the field role's catch-all bucket, where a
+	# card with no damage, no heal and no status lands — the summon is 20 Mana,
+	# a 3-turn cooldown and 3.0 initiative, and none of the four is a summon.
+	# Nothing is retuned; Bola keeps its point against Snare Trap.
+	"Bola": {"kit": ["Snare Trap", "Summon Companion"], "group": "point",
+		"why": "a class-wide card authored as the lesser applier: two afflictions, no damage and no Break (below Summon Companion only through the catch-all: an applier, not a summon)"},
+	"Quarry's Mark": {"kit": ["Snare Trap", "Summon Companion"], "group": "role",
+		"why": "a mark that pays Focus, not a trap and not a summon"},
+	"Hold Breath": {"kit": ["Snare Trap", "Summon Companion"], "group": "role",
+		"why": "the Sharpshooter's own Focus and crit, not a trap and not a summon"},
+	"Mark of the Hunt": {"kit": ["Snare Trap", "Summon Companion"], "group": "role",
+		"why": "a mark for the Beastmaster and his companion, not a trap and not a summon"},
 }
 # A GENUINE MISPRICING, RETUNED — and the kit card it ties now.
 const RETUNED := {"Sweeping Strikes": "Crushing Blow"}

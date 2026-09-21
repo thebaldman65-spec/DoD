@@ -485,18 +485,31 @@ func _protected_cores() -> void:
 	# SILENT — a spine that stops working because its enabler became draftable —
 	# so it is asserted against every pool the game can offer from, not just the
 	# draft this batch touched.
+	# BATCH HB — AND THE THREE SUMMONS, WHICH STOPPED BEING ENABLERS AND DID NOT
+	# STOP NEEDING THIS. They are the three calls of the Hunter kit's Summon
+	# Companion since HB, and a call that entered a pool would hand a companion,
+	# through a drafted or a boss card, to the one Hunter the kit gives none — the
+	# Sharpshooter. So the sweep reads the enablers AND the pet card's calls.
+	var swept := {}
 	for spec in Classes.PROTECTED_CORES:
 		for enabler in Classes.core_enablers(String(spec)):
-			var name := String(enabler)
-			for sp2 in Classes.SPEC_DRAFT_POOLS:
-				ok(not Classes.spec_draft_pool(String(sp2)).has(name),
-					"%s's enabler %s is in NO spec draft pool (%s)" % [spec, name, sp2])
-			for cls in Classes.CLASS_DRAFT_POOLS:
-				ok(not Classes.class_draft_pool(String(cls)).has(name),
-					"%s's enabler %s is in NO class draft pool (%s)" % [spec, name, cls])
-			for sp3 in Classes.SPEC_POOLS:
-				ok(not Classes.SPEC_POOLS[sp3].has(name),
-					"%s's enabler %s is in NO boss spec pool (%s)" % [spec, name, sp3])
+			swept[String(enabler)] = "%s's enabler" % spec
+	for kind in Classes.COMPANION_KINDS:
+		var call: Ability = Classes.companion_call(String(kind))
+		ok(call != null, "the pet card calls %s" % kind)
+		if call != null:
+			swept[call.display_name] = "the Hunter kit's %s call" % Classes.PET_CARD
+	for name in swept:
+		var whose := String(swept[name])
+		for sp2 in Classes.SPEC_DRAFT_POOLS:
+			ok(not Classes.spec_draft_pool(String(sp2)).has(name),
+				"%s %s is in NO spec draft pool (%s)" % [whose, name, sp2])
+		for cls in Classes.CLASS_DRAFT_POOLS:
+			ok(not Classes.class_draft_pool(String(cls)).has(name),
+				"%s %s is in NO class draft pool (%s)" % [whose, name, cls])
+		for sp3 in Classes.SPEC_POOLS:
+			ok(not Classes.SPEC_POOLS[sp3].has(name),
+				"%s %s is in NO boss spec pool (%s)" % [whose, name, sp3])
 	# The three Cleric cores are what this batch could most easily have broken,
 	# so they are named rather than only swept.
 	# BATCH GS — THE THREE ROWS ARE GS §1's NOW: an engine brings only what it

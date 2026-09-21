@@ -1103,7 +1103,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_dr.gd#89"
+   "g": "check_dr.gd#102"
   },
   {
    "s": "check_dr.gd",
@@ -1114,7 +1114,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dr.gd#171"
+   "g": "check_dr.gd#184"
   },
   {
    "s": "check_dr.gd",
@@ -1125,7 +1125,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dr.gd#170"
+   "g": "check_dr.gd#183"
   },
   {
    "s": "check_dr.gd",
@@ -1136,7 +1136,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dr.gd#169"
+   "g": "check_dr.gd#182"
   },
   {
    "s": "check_dr.gd",
@@ -1147,7 +1147,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dr.gd#168"
+   "g": "check_dr.gd#181"
   },
   {
    "s": "check_ds.gd",
@@ -2137,7 +2137,7 @@
    "r": "missing-file",
    "k": "non-literal",
    "how": "read",
-   "g": "check_fd.gd#30",
+   "g": "check_fd.gd#31",
    "expr": "String"
   },
   {
@@ -2149,7 +2149,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#36",
+   "g": "check_fd.gd#37",
    "alt": true
   },
   {
@@ -2161,7 +2161,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#36",
+   "g": "check_fd.gd#37",
    "alt": true
   },
   {
@@ -2173,7 +2173,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#36",
+   "g": "check_fd.gd#37",
    "alt": true
   },
   {
@@ -2185,7 +2185,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#194"
+   "g": "check_fd.gd#195"
   },
   {
    "s": "check_fd.gd",
@@ -2196,7 +2196,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#180"
+   "g": "check_fd.gd#181"
   },
   {
    "s": "check_fd.gd",
@@ -2207,7 +2207,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#193"
+   "g": "check_fd.gd#194"
   },
   {
    "s": "check_fd.gd",
@@ -2218,7 +2218,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#179"
+   "g": "check_fd.gd#180"
   },
   {
    "s": "check_fd.gd",
@@ -2229,7 +2229,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#181"
+   "g": "check_fd.gd#182"
   },
   {
    "s": "check_fd.gd",
@@ -2240,7 +2240,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#188"
+   "g": "check_fd.gd#189"
   },
   {
    "s": "check_fd.gd",
@@ -2251,7 +2251,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#196"
+   "g": "check_fd.gd#197"
   },
   {
    "s": "check_fd.gd",
@@ -2262,7 +2262,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#188"
+   "g": "check_fd.gd#189"
   },
   {
    "s": "check_fe.gd",
@@ -3149,7 +3149,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_gm.gd#212"
+   "g": "check_gm.gd#213"
   },
   {
    "s": "check_gm.gd",
@@ -3182,7 +3182,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_gm.gd#212"
+   "g": "check_gm.gd#213"
   },
   {
    "s": "check_gm.gd",
@@ -3215,7 +3215,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_gm.gd#213"
+   "g": "check_gm.gd#214"
   },
   {
    "s": "check_gs.gd",
@@ -3226,7 +3226,7 @@
    "r": "narrow",
    "k": "loop-list",
    "how": "read",
-   "g": "check_gs.gd#193"
+   "g": "check_gs.gd#202"
   },
   {
    "s": "check_gs.gd",
@@ -3237,7 +3237,7 @@
    "r": "narrow",
    "k": "loop-list",
    "how": "read",
-   "g": "check_gs.gd#193"
+   "g": "check_gs.gd#202"
   },
   {
    "s": "check_gs.gd",
@@ -3248,7 +3248,7 @@
    "r": "absent",
    "k": "loop-list",
    "how": "read",
-   "g": "check_gs.gd#193"
+   "g": "check_gs.gd#202"
   },
   {
    "s": "check_gs.gd",
@@ -3259,7 +3259,7 @@
    "r": "narrow",
    "k": "loop-list",
    "how": "read",
-   "g": "check_gs.gd#193"
+   "g": "check_gs.gd#202"
   },
   {
    "s": "check_gs.gd",
@@ -3270,7 +3270,7 @@
    "r": "absent",
    "k": "loop-list",
    "how": "read",
-   "g": "check_gs.gd#193"
+   "g": "check_gs.gd#202"
   },
   {
    "s": "check_gs.gd",
@@ -3281,7 +3281,7 @@
    "r": "narrow",
    "k": "loop-list",
    "how": "read",
-   "g": "check_gs.gd#193"
+   "g": "check_gs.gd#202"
   },
   {
    "s": "check_gs.gd",
@@ -3292,7 +3292,7 @@
    "r": "narrow",
    "k": "loop-list",
    "how": "read",
-   "g": "check_gs.gd#193"
+   "g": "check_gs.gd#202"
   },
   {
    "s": "check_gs.gd",
@@ -3303,7 +3303,7 @@
    "r": "absent",
    "k": "loop-list",
    "how": "read",
-   "g": "check_gs.gd#193"
+   "g": "check_gs.gd#202"
   },
   {
    "s": "check_gs.gd",
@@ -3314,7 +3314,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "read",
-   "g": "check_gs.gd#195"
+   "g": "check_gs.gd#204"
   },
   {
    "s": "check_gs.gd",
@@ -3325,7 +3325,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "read",
-   "g": "check_gs.gd#195"
+   "g": "check_gs.gd#204"
   },
   {
    "s": "check_gs.gd",
@@ -3336,7 +3336,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_gs.gd#369"
+   "g": "check_gs.gd#378"
   },
   {
    "s": "check_gs.gd",
@@ -3347,7 +3347,7 @@
    "r": "missing-file",
    "k": "loop-list",
    "how": "read",
-   "g": "check_gs.gd#371"
+   "g": "check_gs.gd#380"
   },
   {
    "s": "check_gw.gd",
@@ -6679,7 +6679,7 @@
    "s": "test_batch_az.gd",
    "fn": "_negative_control_source",
    "h": "scripts/unit.gd",
-   "n": "2.0 + 0.01 * (lethal_eye_ranks - consistent_aim)",
+   "n": "SHARPSHOOTER_CRIT_MULT + 0.01 * (lethal_eye_ranks - consistent_aim)",
    "p": "+",
    "r": "code",
    "k": "literal",
@@ -14333,7 +14333,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "test_batch_bv.gd#238",
+   "g": "test_batch_bv.gd#247",
    "expr": "n"
   },
   {
@@ -14345,7 +14345,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "test_batch_bv.gd#244"
+   "g": "test_batch_bv.gd#253"
   },
   {
    "s": "test_batch_bv.gd",
@@ -14356,7 +14356,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_bv.gd#234"
+   "g": "test_batch_bv.gd#243"
   },
   {
    "s": "test_batch_bv.gd",
@@ -14367,7 +14367,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bv.gd#247"
+   "g": "test_batch_bv.gd#256"
   },
   {
    "s": "test_batch_bv.gd",
@@ -14378,7 +14378,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bv.gd#249"
+   "g": "test_batch_bv.gd#258"
   },
   {
    "s": "test_batch_bv.gd",
@@ -14389,7 +14389,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bv.gd#253"
+   "g": "test_batch_bv.gd#262"
   },
   {
    "s": "test_batch_bv.gd",
@@ -14400,7 +14400,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bv.gd#245"
+   "g": "test_batch_bv.gd#254"
   },
   {
    "s": "test_batch_bv.gd",
@@ -14411,7 +14411,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bv.gd#231"
+   "g": "test_batch_bv.gd#240"
   },
   {
    "s": "test_batch_bv.gd",
@@ -14422,7 +14422,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bv.gd#256"
+   "g": "test_batch_bv.gd#265"
   },
   {
    "s": "test_batch_bv.gd",
@@ -14433,7 +14433,7 @@
    "r": "code",
    "k": "literal",
    "how": "stripped",
-   "g": "test_batch_bv.gd#216"
+   "g": "test_batch_bv.gd#225"
   },
   {
    "s": "test_batch_bv.gd",
@@ -14444,7 +14444,7 @@
    "r": "code",
    "k": "literal",
    "how": "stripped",
-   "g": "test_batch_bv.gd#215"
+   "g": "test_batch_bv.gd#224"
   },
   {
    "s": "test_batch_bv.gd",
@@ -14455,7 +14455,7 @@
    "r": "code",
    "k": "literal",
    "how": "stripped",
-   "g": "test_batch_bv.gd#217"
+   "g": "test_batch_bv.gd#226"
   },
   {
    "s": "test_batch_bv.gd",
@@ -14466,7 +14466,7 @@
    "r": "code",
    "k": "literal",
    "how": "stripped",
-   "g": "test_batch_bv.gd#219"
+   "g": "test_batch_bv.gd#228"
   },
   {
    "s": "test_batch_bv.gd",
@@ -14477,7 +14477,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "test_batch_bv.gd#160"
+   "g": "test_batch_bv.gd#169"
   },
   {
    "s": "test_batch_bv.gd",
@@ -14488,7 +14488,7 @@
    "r": "runtime",
    "k": "format",
    "how": "derived",
-   "g": "test_batch_bv.gd#124"
+   "g": "test_batch_bv.gd#133"
   },
   {
    "s": "test_batch_bv.gd",
@@ -14499,7 +14499,7 @@
    "r": "comment",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_bv.gd#130"
+   "g": "test_batch_bv.gd#139"
   },
   {
    "s": "test_batch_bv.gd",
@@ -14510,7 +14510,7 @@
    "r": "comment",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bv.gd#118"
+   "g": "test_batch_bv.gd#127"
   },
   {
    "s": "test_batch_bv.gd",
@@ -14521,7 +14521,7 @@
    "r": "comment",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_bv.gd#129"
+   "g": "test_batch_bv.gd#138"
   },
   {
    "s": "test_batch_bw.gd",
@@ -15756,7 +15756,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "test_batch_ce.gd#218",
+   "g": "test_batch_ce.gd#226",
    "expr": "n"
   },
   {
@@ -15768,7 +15768,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "test_batch_ce.gd#216",
+   "g": "test_batch_ce.gd#224",
    "alt": true
   },
   {
@@ -15780,7 +15780,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "test_batch_ce.gd#216",
+   "g": "test_batch_ce.gd#224",
    "alt": true
   },
   {
@@ -15792,7 +15792,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_ce.gd#208"
+   "g": "test_batch_ce.gd#216"
   },
   {
    "s": "test_batch_ce.gd",
@@ -15803,7 +15803,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#235"
+   "g": "test_batch_ce.gd#243"
   },
   {
    "s": "test_batch_ce.gd",
@@ -15814,7 +15814,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#237"
+   "g": "test_batch_ce.gd#245"
   },
   {
    "s": "test_batch_ce.gd",
@@ -15825,7 +15825,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#241"
+   "g": "test_batch_ce.gd#249"
   },
   {
    "s": "test_batch_ce.gd",
@@ -15836,7 +15836,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#224"
+   "g": "test_batch_ce.gd#232"
   },
   {
    "s": "test_batch_ce.gd",
@@ -15847,7 +15847,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#223"
+   "g": "test_batch_ce.gd#231"
   },
   {
    "s": "test_batch_ce.gd",
@@ -15858,7 +15858,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#226"
+   "g": "test_batch_ce.gd#234"
   },
   {
    "s": "test_batch_ce.gd",
@@ -15869,7 +15869,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#230"
+   "g": "test_batch_ce.gd#238"
   },
   {
    "s": "test_batch_ce.gd",
@@ -15880,7 +15880,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#219"
+   "g": "test_batch_ce.gd#227"
   },
   {
    "s": "test_batch_ce.gd",
@@ -15891,7 +15891,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#231"
+   "g": "test_batch_ce.gd#239"
   },
   {
    "s": "test_batch_ce.gd",
@@ -15902,7 +15902,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#231"
+   "g": "test_batch_ce.gd#239"
   },
   {
    "s": "test_batch_ce.gd",
@@ -15913,7 +15913,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#205"
+   "g": "test_batch_ce.gd#213"
   },
   {
    "s": "test_batch_ce.gd",
@@ -15924,7 +15924,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#229"
+   "g": "test_batch_ce.gd#237"
   },
   {
    "s": "test_batch_ce.gd",
@@ -15935,7 +15935,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#229"
+   "g": "test_batch_ce.gd#237"
   },
   {
    "s": "test_batch_ce.gd",
@@ -15946,7 +15946,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#222"
+   "g": "test_batch_ce.gd#230"
   },
   {
    "s": "test_batch_ce.gd",
@@ -15957,7 +15957,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#224"
+   "g": "test_batch_ce.gd#232"
   },
   {
    "s": "test_batch_ce.gd",
@@ -15968,7 +15968,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#231"
+   "g": "test_batch_ce.gd#239"
   },
   {
    "s": "test_batch_ce.gd",
@@ -15979,7 +15979,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#228"
+   "g": "test_batch_ce.gd#236"
   },
   {
    "s": "test_batch_ce.gd",
@@ -15990,7 +15990,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#192"
+   "g": "test_batch_ce.gd#200"
   },
   {
    "s": "test_batch_ce.gd",
@@ -16001,7 +16001,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#200"
+   "g": "test_batch_ce.gd#208"
   },
   {
    "s": "test_batch_ce.gd",
@@ -16012,7 +16012,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_ce.gd#197"
+   "g": "test_batch_ce.gd#205"
   },
   {
    "s": "test_batch_ce.gd",
@@ -16023,7 +16023,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_ce.gd#196"
+   "g": "test_batch_ce.gd#204"
   },
   {
    "s": "test_batch_ce.gd",
@@ -16034,7 +16034,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#201"
+   "g": "test_batch_ce.gd#209"
   },
   {
    "s": "test_batch_ce.gd",
@@ -16045,7 +16045,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_ce.gd#585"
+   "g": "test_batch_ce.gd#593"
   },
   {
    "s": "test_batch_ce.gd",
@@ -16056,7 +16056,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_ce.gd#586"
+   "g": "test_batch_ce.gd#594"
   },
   {
    "s": "test_batch_ce.gd",
@@ -16067,7 +16067,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ce.gd#582"
+   "g": "test_batch_ce.gd#590"
   },
   {
    "s": "test_batch_ce.gd",

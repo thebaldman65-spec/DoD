@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-20 (Batch GX &mdash; a rune sitting out says so)</b></p>
+<p align="right"><b>Last updated: 2026-09-21 (Batch HB &mdash; every Hunter has a pet)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -591,7 +591,7 @@ unstruck one stands, Triple Shot pays out one guaranteed critical, and Pommel St
 Stun even on an unbroken boss. Abilities with no roll to remove keep an ordinary bonus.</p>
 <h3>4.3 Attack resolution pipeline</h3>
 <p>Per strike, in order: <b>ability % × the attacker's current Attack</b> × random variance
-(0.9–1.1) × grade multiplier × crit (×1.5; the Sharpshooter's Lethal Aim ×2, rising with Focus) × attacker modifiers ×
+(0.9–1.1) × grade multiplier × crit (×1.5; the Sharpshooter's Lethal Aim ×2.5, rising with Focus) × attacker modifiers ×
 target modifiers × (1 − resist) × (1 − effective armor), minimum 1.</p>
 <ul>
 <li><b>Attack (stat) &amp; node scaling:</b> every unit has an Attack stat, and every
@@ -659,7 +659,8 @@ all</b> — their kits are gated by resources and AI conditions instead.</li>
 positive one. The talent that counts debuffs (the tree's Mitigation per Debuff You Carry)
 uses this classification.</li>
 <li><b>Crit:</b> 10% base + 25% vs Broken targets + 1% per Arcanist Resonance stack + talent/spec
-bonuses (+10% with Aguila summoned, scaled by its Loyalty tier). Guaranteed: Ice Lance vs Frozen;
+bonuses (+10% with Aguila summoned, scaled by its Loyalty tier; +5% for every hit a Sharpshooter
+has landed without a critical since his last one, below). Guaranteed: Ice Lance vs Frozen;
 a perfect Execute. Resonance builds
 only on the Mage's own casts — parry counters do not grant stacks.</li>
 <li><b>Crit chance above a certainty becomes crit MULTIPLIER, from every source.</b> A total crit
@@ -667,8 +668,8 @@ chance over 100% cannot make a hit any more certain, so the surplus is paid as c
 instead at <b>+0.5 of multiplier per 1.0 of surplus chance</b> — a hero assembling 250% crit
 chance lands every blow as a critical at ×2.25 rather than ×1.5. It is the whole assembled total
 that converts, not any one source: the base rate, a Broken target's 25%, Resonance, Aguila's shared
-boon, the Sweeping Strikes rider and Lethal Aim's own
-sub-split Focus all feed one number and the surplus belongs to none of them. <b>This is not the Sharpshooter's Focus conversion and the two
+boon, the Sweeping Strikes rider, Lethal Aim's own
+sub-split Focus and the Sharpshooter's misses since his last critical all feed one number and the surplus belongs to none of them. <b>This is not the Sharpshooter's Focus conversion and the two
 are independent</b> — a hero below his Focus split point still converts the total's surplus, and
 both fire on the same blow. In practice only the deep game reaches it: the heroes' crit output
 rises about <b>1.2%</b> at a fully-talented loadout and not measurably at all untalented, but the
@@ -1068,7 +1069,7 @@ basic adds +10; potions/Rally restore more.</li>
 consecutive attack on the same enemy, CLEARED on
 switching targets, up to 50 retained on a kill. THE PAYOFF
 CONVERTS: the first 100 points each grant +0.5% critical chance, and every point past 100
-grants +0.5% of critical MULTIPLIER instead, so ×2 becomes ×2.5 at 200 Focus and ×3 at
+grants +0.5% of critical MULTIPLIER instead, so ×2.5 becomes ×3 at 200 Focus and ×3.5 at
 300. <b>The game-wide surplus rule in &sect;4.3 is a separate
 conversion and does not touch this one</b> — this one converts a DEPTH in one meter, that one
 converts an assembled TOTAL, and both can fire on one blow. Spent by Coup de Grâce (which reads at most 200).</li>
@@ -1120,7 +1121,9 @@ escape, and <b>Threshold</b> sets the meter to 15, which from above 15 takes sta
 hero of the class holds, whatever engine he takes, holds or drops.</b> Beside them he opens with
 the enablers of the engine runes he holds (&sect;6.0), and nothing else. The kit counts against
 the ability slot cap (&sect;6b) and can never be benched, exactly as an enabler cannot. None of the
-twelve reads an engine, and none sits in a draft or boss pool.</p>
+twelve reads an engine, and none sits in a draft or boss pool. <b>One engine takes a kit card away:
+the Sharpshooter's Lethal Aim dismisses the Hunter's pet</b>, so a Hunter holding it opens without
+Summon Companion and its slot is his for a drafted card (&sect;6.4).</p>
 <ul>
 <li><b>Warrior:</b> Strike — 23 dmg / 18 BD / delay 2.0, builds 20 Rage
 (Perfect: +10 Rage).</li>
@@ -1146,7 +1149,7 @@ does.</li>
 <tr><td><b>Consecration</b></td><td>25 Mana, 1.0, 5cd, every hero</td><td>For 4 turns <b>every hero regains 5% of maximum health</b> at the start of each of their turns.</td></tr>
 <tr><td rowspan="3"><b>Hunter</b></td><td><b>Powershot</b></td><td>25 Mana, 3.0, 2cd, one enemy</td><td><b>20% of Attack</b> and <b>20 Break damage</b>, +2% damage for every point of the target's Break meter already full.</td></tr>
 <tr><td><b>Snare Trap</b></td><td>20 Mana, 2.0, 3cd, one enemy</td><td>The next time that enemy acts it is <b>Stunned for 1 turn</b> and <b>Poisoned for 4</b>. A boss shrugs the Stun off until it is Broken.</td></tr>
-<tr><td><b>Tripwire</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For 6 turns every <b>melee</b> enemy that strikes an ally takes <b>75% of the damage it dealt</b>.</td></tr>
+<tr><td><b>Summon Companion</b></td><td>20 Mana, 3.0, 3cd, self (Aguila: an enemy, for its dive)</td><td>Calls <b>a companion</b> to fight beside the Hunter &mdash; <b>Ursus, Canis or Aguila, chosen at the cast</b> (&sect;6.4). Each of the three calls keeps its own cooldown. <b>With one standing, casting it again swaps it for another</b>: 10 Mana, 1.0 initiative, and a 3-turn cooldown every swap shares. <b>Every Hunter but the Sharpshooter holds it.</b></td></tr>
 </table>
 <p><b>The Cleric's kit is all healing and mitigation, and carries no damage card.</b> He is a
 support class: he attacks with Smite and drafts damage if he wants it.</p>
@@ -1206,11 +1209,15 @@ while none of his slotted engines is theirs they sit out of every fight and come
 is equipped again: Winter's Toll, Rimebinding, Cryoclasm and Shatter (Glacial Hold); Arcane Bolt,
 Unmaking, Death Ray and Stabilize (Runaway Resonance); Divine Plea, Hymn of Hope and Resurrection
 (Mercy); Blessing of the Faithful and Aegis Reversal (Conviction); Transference and Requiem (Wrath
-of the Old Gods); Unleash and Primal Surge (Pack Bond). <b>A card that sits out is kept, still
+of the Old Gods); Unleash and Primal Surge (Pack Bond). <b>And a card that needs a companion sits out
+while its hero holds the Rune of the Sharpshooter</b>, which dismisses the pet: Kill Command, Twin Hunt,
+Savage Sweep, Bestial Wrath, Spirit Bond, Ghostpack, Call the Wilds, Unleash and Primal Surge.
+<b>A card that sits out is kept, still
 carried and still counted in the ability slots</b>; benching it on the map frees the slot. The hero
 sheet shows it greyed as &ldquo;sits out&rdquo; and the map's Kit panel says which rune brings it
 back. A card that opens without any engine &mdash; Battle Poise and Counter Time on a Guard Change,
-Kill Command and the companion cards on an earned Call the Wilds &mdash; always fights.</li>
+Kill Command and the companion cards on the companion every Hunter but the Sharpshooter summons
+&mdash; always fights.</li>
 <li><b>A rune that reads an engine is offered only while that engine is equipped.</b> Thirty-five of
 the sixty ordinary runes pay nothing at all to a hero whose engine slots do not hold their engine &mdash;
 a Ruin rune to a Cleric who has unequipped the Rune of the Occultist, a Focus rune to a Hunter who has
@@ -1218,7 +1225,10 @@ unequipped the Rune of the Sharpshooter &mdash; and none of them is rolled for h
 an elite's cache, in a bargain or from an event. <b>A rune that still does part of its job without its
 engine is offered</b>: Killing Cold still bites a boss sitting on four Chilled, Glass Prison still
 freezes a second body, and the runes that read a card, a status, the stance or nothing at all are
-offered to anyone of their lineage. <b>A cache rolled while the engine was equipped keeps what it
+offered to anyone of their lineage. <b>And a rune that needs a companion is not offered to a hero
+holding the Rune of the Sharpshooter</b>, which dismisses the pet &mdash; the Shared Hide, the Bared
+Fang, the Answering Pack, the Second Whistle, the Long Leash and the Shared Scent &mdash; and one he
+already wears sits out, saying which rune takes the companion away. <b>A cache rolled while the engine was equipped keeps what it
 rolled</b>: a rune it holds that reads the engine sits out of the choice while the engine is out, the
 overlay says which rune brings it back, and equipping it offers the whole cache again. When nothing is
 left to offer, the Peddler, the cache, the bargain and the event name the engine rune that is not
@@ -1231,8 +1241,10 @@ opening roll call, as the fight starts. <b>Unequipping the rune frees the slot, 
 <li><b>The enabler travels.</b> An engine's enablers — the abilities it cannot work without, the
 "needs" column of the table in §6b — come with the rune to any hero of the class who holds it, in
 either engine slot, sit <b>outside the ability slot count</b>, and leave when it leaves: Overburn
-brings Flamewave, Glacial Hold Razor Ice, Blood Frenzy Bloodlust, Pack Bond the three summons,
-Conviction Divine Shield and Wrath of the Old Gods Hex of Ruin. An enabler is in no draft or boss
+brings Flamewave, Glacial Hold Razor Ice, Blood Frenzy Bloodlust,
+Conviction Divine Shield and Wrath of the Old Gods Hex of Ruin. <b>Pack Bond brings nothing</b>: every
+Hunter but the Sharpshooter summons a companion from his class kit (&sect;5.2), and Pack Bond is what
+makes the bond grow &mdash; Loyalty, its conversion at 8 and the boon. An enabler is in no draft or boss
 pool. <b>No engine replaces the class basic</b>: every Mage opens on Magic Bolt and every Cleric on
 Smite, and <b>nothing else of a lineage opens with the rune</b> &mdash; its other cards are drafted
 from its shelf of the class draft pool (§6b) or earned from its zone-boss pool (§6a).</li>
@@ -1262,7 +1274,7 @@ rule engine has no lineage, and opens with his class's basic attack and his clas
 <tr><td>Rune of the Hierophant</td><td>Sanctity</td><td>—</td></tr>
 <tr><td>Rune of the Oathkeeper</td><td>Covenant</td><td>—</td></tr>
 <tr><td>Rune of the Arbiter</td><td>Judgment</td><td>—</td></tr>
-<tr><td rowspan="6">Hunter</td><td>Rune of the Beastmaster</td><td>Pack Bond</td><td>Summon Ursus, Summon Canis, Summon Aguila</td></tr>
+<tr><td rowspan="6">Hunter</td><td>Rune of the Beastmaster</td><td>Pack Bond</td><td>—</td></tr>
 <tr><td>Rune of the Sharpshooter</td><td>Lethal Aim</td><td>Quick Shot (every Hunter's basic)</td></tr>
 <tr><td>Rune of the Survivalist</td><td>Trapper</td><td>—</td></tr>
 <tr><td>Rune of the Tracker</td><td>Quarry</td><td>—</td></tr>
@@ -1320,8 +1332,8 @@ health and sheds one harmful effect.</li>
 
 <h3>6a. Ability progression</h3>
 <p>Every hero <b>opens a run with its core attack, its class kit's three abilities (&sect;5.2) and
-the enablers of every engine rune it holds</b> (&sect;6.0) — which sit outside the slot count, the
-Beastmaster's three summons sharing one bar entry (see the protected-core table in §6b) — and <b>earns one boss pick from each of the three zone
+the enablers of every engine rune it holds</b> (&sect;6.0) — which sit outside the slot count (see
+the protected-core table in §6b) — and <b>earns one boss pick from each of the three zone
 bosses</b>. The end boss awards none: the run is over and the pick would be dead value.
 <b>There is a cap and there is a swap step</b>: the cap is a ladder from seven carried
 abilities to ten, one rung per zone boss, and past the cap an incoming card is taken by
@@ -1394,7 +1406,7 @@ draft pool (&sect;6b).</p>
 <tr><td><b>Holy</b></td><td>—</td><td>Divine Plea, Dawnbreak, Sanctuary</td></tr>
 <tr><td><b>Devout</b></td><td>Divine Shield</td><td>Sacred Resolve, Bulwark of Fortitude</td></tr>
 <tr><td><b>Occultist</b></td><td>Hex of Ruin</td><td>Mind Flay, Mass Hysteria, Umbral Sigil</td></tr>
-<tr><td><b>Beastmaster</b></td><td>Summon Companion (the three-companion picker counts as one)</td><td>Bestial Wrath, Spirit Bond, Primal Surge, Call of the Wild, Mark of the Hunt</td></tr>
+<tr><td><b>Beastmaster</b></td><td>—</td><td>Bestial Wrath, Spirit Bond, Primal Surge, Call of the Wild, Mark of the Hunt</td></tr>
 <tr><td><b>Sharpshooter</b></td><td>—</td><td>Quick Draw, Triple Shot, Coup de Grâce, Pinning Shot, Called Shot</td></tr>
 <tr><td><b>Survivalist</b></td><td>—</td><td>Explosive Shot, Venom Coating, Hamstring, Deadfall, Harvest</td></tr>
 </table>
@@ -1409,7 +1421,7 @@ seven into live draft and boss pools first and removed the container behind them
 §6b, which are live: an ability offered class-wide has to FUNCTION for a sibling, so anything
 costing a spec-exclusive resource (Mercy, Faith), reading a passive the taker will not have (Burn,
 Resonance, Loyalty, a living companion, the Swordmaster's stance), or carrying a spec's signature
-identity (the three summons, Kill Command, Hex of Ruin) stays spec-only.</p>
+identity (Kill Command, Hex of Ruin) stays spec-only.</p>
 <p><b>A ZONE-BOSS AWARD ALWAYS PAYS, AND UNTIL BATCH EA IT COULD PAY NOTHING AT
 ALL.</b> A boss offer is the hero's spec pool minus what they already hold, and
 <b>both channels write the same earned list</b> — so a card taken in the draft
@@ -1526,7 +1538,10 @@ engine's enablers (§6.0). Protected abilities <b>can never be benched</b>, so e
 decision is among <i>earned</i> abilities — which keeps the choice clean and makes the cap unable
 to break an engine. <b>The core counts against the cap and an engine's enablers do not</b>: they
 sit outside the slot count. The class kit fills <b>3</b> slots and nothing else a hero opens with
-fills one, so <b>every hero opens at 3 of 7</b>, whatever engine he holds.</p>
+fills one, so <b>every hero opens at 3 of 7</b> &mdash; <b>and a Sharpshooter at 2</b>, because his
+engine dismisses the pet and Summon Companion's slot is his for a drafted card. <b>Unequipping the
+Rune of the Sharpshooter puts the card back in his kit</b>, so the rune pouch refuses it while every
+slot is full and says so: bench a card first.</p>
 <p><b>What a hero HOLDS and what a hero CARRIES are two different things.</b> Every card a hero
 takes is kept for the rest of the run. What the cap limits is how many of them are
 <b>carried</b> into a fight — the rest sit on the bench, and <b>swapping between them costs
@@ -1559,8 +1574,8 @@ answer — that engine runs on the class basic and the class kit alone.</p>
 <tr><td><b>Holy</b></td><td>0</td><td>—</td><td>Mercy is gained when an ally falls below half health and pays +5% healing a stack on every heal, the kit's Ministration among them.</td></tr>
 <tr><td><b>Devout</b></td><td>0</td><td>Divine Shield</td><td>Conviction builds Faith when Divine Shield absorbs, and no Cleric basic or kit card lays a divine shield.</td></tr>
 <tr><td><b>Occultist</b></td><td>0</td><td>Hex of Ruin</td><td>Wrath of the Old Gods marks Ruin on debuffs he applies, and no Cleric basic or kit card applies one; Hex of Ruin curses three at once.</td></tr>
-<tr><td><b>Beastmaster</b></td><td>0</td><td>All three summons</td><td>Pack Bond reads a living companion. With no summon there is no boon, no Loyalty and no passive at all. The summons travel with Pack Bond and fill no slot.</td></tr>
-<tr><td><b>Sharpshooter</b></td><td>0</td><td>Quick Shot (every Hunter's basic)</td><td>Lethal Aim counts consecutive single-target attacks; the free shot lets him stay on a mark every turn — and his Quick Shot alone runs the multi-press SEQUENCE (§4.2).</td></tr>
+<tr><td><b>Beastmaster</b></td><td>0</td><td>—</td><td>Pack Bond reads a living companion, and every Hunter but the Sharpshooter summons one from the class kit's Summon Companion. The engine brings nothing: it makes the bond grow.</td></tr>
+<tr><td><b>Sharpshooter</b></td><td>0</td><td>Quick Shot (every Hunter's basic)</td><td>Lethal Aim counts consecutive single-target attacks; the free shot lets him stay on a mark every turn — and his Quick Shot alone runs the multi-press SEQUENCE (§4.2). <b>It dismisses the pet</b>: he opens without Summon Companion, so his kit fills 2 slots and the third is his for a drafted card.</td></tr>
 <tr><td><b>Survivalist</b></td><td>0</td><td>—</td><td>Trapper's poison rides being struck, and its breadth term counts statuses from any source — including his allies'.</td></tr>
 </table>
 
@@ -1576,20 +1591,30 @@ Cleric. <b>It is accepted, flagged, and a rebalance owed</b>; no card was retune
 
 <p><b>A CARD THAT READS AN ENGINE IS OFFERED ONLY TO A HERO WHO HOLDS IT (Batch GP).</b> A wide
 pool is only worth having if what it widens is playable, and offering a Ruin card to a Cleric
-without Ruin is offering a card that does nothing. <b>Thirty-seven of the 178 read one</b> — five
+without Ruin is offering a card that does nothing. <b>Thirty-seven of the 179 read one</b> — five
 of Permafrost, eight of Runaway Resonance (Death Ray among them, refused below 8 Resonance), seven of
 Mercy (Hymn of Hope and Resurrection among them, both priced in Mercy), five of Conviction, two of
 Wrath of the Old Gods, five of Pack Bond, two of Lethal Aim, two of Heavy Plating and one of Blood
 Frenzy — and each was derived at the read site and driven both ways. <b>Kill Command is not among
-them</b>: it needs a living companion, and Call the Wilds summons one with no engine, so it is
-conditional on a card rather than on an engine. <b>Three groups, and only the first is
+them</b>: it needs a living companion, and every Hunter but the Sharpshooter summons one from his
+class kit, so it is conditional on a companion rather than on an engine. <b>Three groups, and only the first is
 gated:</b> cards that CANNOT work without the engine; cards that HALF-work (Boil Over deals 22
 against 89 and cashes no meter; Drumfire and Calibrating Shot fire and bank no Focus) — a card
 that still does most of its job is a legitimate offer; and cards that FEED an engine without
 reading it (Blight the Well marks Ruin through the generic hook, Call the Wilds summons at 0
 Loyalty, every fire card builds the Overburn field) — they work for anyone and pre-arm an engine
 a hero might later draft. <b>What a hero holding no engine can be offered: 40 of 43, 38 of 51,
-29 of 43, 34 of 41.</b></p>
+29 of 43, 35 of 42.</b></p>
+
+<p><b>A CARD THAT NEEDS A COMPANION IS NOT OFFERED TO A SHARPSHOOTER (Batch HB).</b> He dismisses
+the pet, so the gate above has a second half, and it is a negative one: <b>fourteen Hunter cards
+cannot pay without a companion on the field</b>, and none of them is offered to a hero holding the
+Rune of the Sharpshooter. Nine are refused outright with no companion standing &mdash; Kill
+Command, Twin Hunt, Savage Sweep, Bestial Wrath, Spirit Bond, Ghostpack, Call the Wilds, Unleash
+and Primal Surge &mdash; and those also sit out of a fight he brings them to (&sect;6.0); five
+resolve and pay nothing &mdash; Bloodbond, Bear the Brunt, Bring It Down, Last Howl and Succession.
+<b>The ones that read the BOND stay gated on Pack Bond as well</b>: a companion is every Hunter's,
+and its Loyalty is Pack Bond's. A Sharpshooter is offered 31 of the Hunter's 42.</p>
 
 <p><b>The draft shelves.</b> Separate from the §6a boss pools above: the boss pick still reads
 SPEC_POOLS and is untouched by the merge, the draft reads these. <b>They are SHELVES rather than
@@ -1608,16 +1633,16 @@ below is part of one pool, its class's.</p>
 <tr><td><b>Occultist</b></td><td>Blight the Well, Covenant of Ash, Suffering, Transference, Anointing, Breaking Darkness, Requiem, Penance, <b>Mind Flay</b>, <b>Mass Hysteria</b>, <b>Shadowrend</b>, <b>Bewitch</b>, <b>Dark Pact</b></td></tr>
 <tr><td><b>Beastmaster</b></td><td>Twin Hunt, Call the Wilds, Bloodbond, Savage Sweep, Ghostpack, Last Howl, Succession, Unleash, <b>Bear the Brunt</b>, <b>Bring It Down</b>, <b>Hunter's Instinct</b>, <b>Kill Command</b></td></tr>
 <tr><td><b>Sharpshooter</b></td><td>Called Volley, Quarry&#x27;s Mark, Crossfire, Calibrating Shot, Trophy Shot, Reacquire, Fault Line, Drumfire, <b>Dug In</b>, <b>Heads Down</b>, <b>Aimed Shot</b>, <b>Hold Breath</b></td></tr>
-<tr><td><b>Survivalist</b></td><td>Choking Smoke, Snare Line, Loaded Shot, Hunt, Preparation, Stalking Horse, Downwind, Cull, <b>Thick Hide</b>, <b>Salve</b>, <b>Shrapnel Charge</b></td></tr>
+<tr><td><b>Survivalist</b></td><td>Choking Smoke, Snare Line, Loaded Shot, Hunt, Preparation, Stalking Horse, Downwind, Cull, <b>Thick Hide</b>, <b>Salve</b>, <b>Shrapnel Charge</b>, <b>Tripwire</b></td></tr>
 <tr><td colspan="2"><b>Class-wide shelves</b> — ordinary cards of the class pool since Batch GP, drawn at no special rate</td></tr>
 <tr><td><b>Mage</b> (all three specs)</td><td>Mirror Image, Mana Well, Dispel, Blink, <b>Mana Shield</b> (five)</td></tr>
 <tr><td><b>Cleric</b> (all three specs)</td><td>Chastise, Exhortation, Undying Vigil (three)</td></tr>
 <tr><td><b>Hunter</b> (all three specs)</td><td>Field Dressing, Camouflage, Aimed Volley, Bola, Hunter's Mark, Arcane Arrows</td></tr>
 <tr><td><b>Warrior</b> (all three specs)</td><td>Battle Trance, Rally, Charge, Cleave, Warcry, Ironclad</td></tr>
 </table>
-<p><b>THE DRAFT IS COMPLETE.</b> <b>The draft stands at 178 of 178</b> &mdash; <b>158 spec</b>
+<p><b>THE DRAFT IS COMPLETE.</b> <b>The draft stands at 179 of 179</b> &mdash; <b>159 spec</b>
 cards plus <b>20 class-wide</b> ones &mdash; and since Batch GP those are <b>four pools of 43, 51,
-43 and 41</b>. The class kits (&sect;5.2) hold five cards that are guaranteed rather than drawn, and
+43 and 42</b>; the Hunter's gained Tripwire when Summon Companion took its class-kit slot. The class kits (&sect;5.2) hold five cards that are guaranteed rather than drawn, and
 <b>a hero with no lineage draws the whole class pool</b> where he drew his class-wide shelf alone
 before &mdash; three cards for a Cleric, forty-three now.
 <b>BATCH DY EMPTIED THE VAULT AND IS WHAT TOOK IT PAST 149, WITHOUT AUTHORING A CARD.</b> Seven
@@ -1676,7 +1701,7 @@ named partner is dead most of the time.</p>
 <tr><td><b>Shared Grief</b> (Holy)</td><td>+1 Mercy for every other ally already below half health</td><td><b>The best coupling in the batch, and the reason is structural.</b> Mercy accrues only on the <i>crossing</i> below half, so she is starved when the heroes are healthy — and the <b>Berserker's</b> entire Blood Frenzy band lives down there on purpose. The two specs whose engines are inverted become each other's fuel</td></tr>
 </table>
 <p><b>What the nine deliberately do not do.</b> No new abilities (the pools were complete when DH
-wrote them and are complete at 178 now
+wrote them and are complete at 179 now
 and a synergy card per spec would be twelve more), <b>no new statuses</b> (every coupling uses
 vocabulary already in the game), <b>no two-way pairs</b> (each clause runs one way into a hub,
 so no card is dead when its partner is absent), and <b>no magnitude on an existing effect
@@ -1702,7 +1727,7 @@ pick you take when your spec's engine is not online yet, which is a different ro
 <p><b>The one hundred and twenty-two drafted abilities catalogued here.</b> Each names the
 axis it serves, and — from the first Mage nine onward — <b>what it builds with</b>. The one
 hundred and three spec cards come first; the nineteen class-wide ones close the table.
-<b>The draft itself is one hundred and seventy-eight</b> (the pools above): the fifty-six not
+<b>The draft itself is one hundred and seventy-nine</b> (the pools above): the fifty-seven not
 listed here are described in their spec's section in §6.1&ndash;§6.4, <b>except four &mdash;
 Arcane Surge, Divine Wrath, Mana Shield and Reality Fracture &mdash; which are named in the
 pools and described nowhere.</b> Those four arrived when Batch DY emptied the vault and their
@@ -1926,7 +1951,7 @@ rune asks.</b> These are ES &sect;4/&sect;5's absolute-count shapes and they are
 first tag-reading rune would come back through.</p>
 <p><b>AND ITS ONE HARD CONSTRAINT IS MEASURED RATHER THAN LEFT TO BE DISCOVERED.</b> Before a
 single card is drafted, the protected cores alone already meet a 2+ threshold on <b>BREAK for ten
-of the twelve specs</b> and on <b>DEBUFF for six</b>; <b>MARK and TEMPO are zero for all twelve</b>. A rune asking for 2+ BREAK would be on from the first
+of the twelve specs</b> and on <b>DEBUFF for five</b>; <b>MARK and TEMPO are zero for all twelve</b>. A rune asking for 2+ BREAK would be on from the first
 fight for almost everyone and no swap could turn it off &mdash; a flat increment arriving through
 the cores instead of through the pool. The per-spec table is printed by <code>check_es</code> on
 every battery run, so the day a core kit moves the baseline is re-measured rather than re-assumed.
@@ -2291,7 +2316,7 @@ Break. That is not a hole in his kit, it is a two-step plan: Break the boss, the
 <b>Talents:</b> the one tree, bought with the Cleric's points — see §7.</li>
 </ul>
 <h3>6.4 Hunter</h3>
-<p>Every Hunter holds the class kit &mdash; <b>Powershot, Snare Trap and Tripwire</b> (&sect;5.2) &mdash; whatever engine he holds. The Sharpshooter's Powershot and the Survivalist's Tripwire and Snare Trap below are those same cards; the Beastmaster's three summons travel with the Rune of the Beastmaster (&sect;6.0).</p>
+<p>Every Hunter holds the class kit &mdash; <b>Powershot, Snare Trap and Summon Companion</b> (&sect;5.2) &mdash; whatever engine he holds, <b>except that the Sharpshooter's Lethal Aim dismisses the pet</b>: a Hunter holding it opens without Summon Companion, and its slot is his for a drafted card. The Sharpshooter's Powershot and the Survivalist's Snare Trap below are those same cards, and <b>Tripwire is drafted from the Survivalist's shelf</b> (&sect;6b). <b>Every Hunter but the Sharpshooter has a companion</b>, and every companion fights beside its Hunter whatever engine he holds; <b>Pack Bond is what makes the bond matter</b> &mdash; without it a companion fights at 0 Loyalty and grants no boon.</p>
 <ul>
 <li><b>Beastmaster (Ramp)</b> — <b>Stat block:</b> 160 HP / 15% armor / +20% nature resist,
 +5% physical (the armor is a multiplier across up to three bodies — companions inherit it
@@ -2336,7 +2361,8 @@ initiative, shared 3-turn cooldown (<code>SWAP_COOLDOWN</code>), no skill check:
 swap effect and +1 Loyalty. Companions have HP, can be targeted by enemies and healed by allies, and
 inherit the hunter's armor, Constitution, and crit chance. They automatically attack (physical) whenever the hunter attacks; they take no
 timeline turns (statuses tick and Breaks recover on the hunter's turn).<br>
-<i>Travel with the rune (§6.0), as one bar entry:</i> Summon Ursus — 20 Mana, 3.0, 3cd. Bear, 110 HP: strikes the hunter's target AND adjacent
+<i>Class kit (§5.2) — Summon Companion calls one of three, chosen at the cast, each on its own
+cooldown:</i> Summon Ursus — 20 Mana, 3.0, 3cd. Bear, 110 HP: strikes the hunter's target AND adjacent
 enemies for 10% of the hunter's Attack.<br>
 Summon Canis — 20 Mana, 3.0, 3cd. Wolf, 80 HP, always ELUSIVE: strikes the hunter's target
 for 20% of the hunter's Attack, building 20 Bleed.<br>
@@ -2376,13 +2402,13 @@ max Mana. The cooldown resets if the marked enemy dies. Works with or without a 
 <li><b>Sharpshooter (Nuker)</b> — <b>Stat block:</b> 140 HP / 10% armor / Constitution 90 /
 +10% nature resist, −10% physical (the lightest of the three: a marksman who wants to be at
 range and pays for being reached).<br>
-Passive <i>Lethal Aim</i>: critical hits deal ×2 damage
+Passive <i>Lethal Aim</i>: critical hits deal ×2.5 damage
 instead of ×1.5, and the marksman runs on <b>FOCUS (NO CEILING, green second bar)</b>: +20
 whenever they attack the enemy they attacked last turn, CLEARED on
 switching targets, and up to 50 retained on a kill. <b>THE PAYOFF CONVERTS AT 100.</b> The
 first 100 points of Focus each grant <b>+0.5% critical chance</b> — a hundred points of
 patience is +50% crit. Every point beyond 100 grants <b>+0.5% of critical MULTIPLIER</b>
-instead, so Lethal Aim's ×2 becomes ×2.5 at 200 Focus, ×3 at 300, and it never stops
+instead, so Lethal Aim's ×2.5 becomes ×3 at 200 Focus, ×3.5 at 300, and it never stops
 paying: patience buys certainty first, then force. The decision the spec is built around:
 the enemy you've been working is rarely the enemy that most needs to die right now.
 <b>A SECOND CONVERSION SITS BESIDE IT AND THE TWO ARE INDEPENDENT</b> (&sect;4.3): crit chance
@@ -2393,6 +2419,18 @@ Broken target and a talent are added &mdash; and both conversions pay him on the
 50 Focus he holds, capped at four, resolved with partial credit and paid in Focus &mdash; 8 a
 landed press, plus 20 more for a full sequence. <b>His basic attack only; no other ability of
 his changes.</b><br>
+<b>EVERY HIT HE LANDS WITHOUT A CRITICAL ADDS +5% CRITICAL CHANCE, AND A CRITICAL RESETS IT</b>
+(the Lethal Aim chip reads it live). It is Heavy Plating's climb pointed at crit, and it is
+Focus's complement rather than its copy: <b>Focus is per target and clears on a switch; this is per
+hit and survives one</b>, so a Sharpshooter forced off his mark loses his Focus and keeps this. A hit
+lands when it is not missed, blocked or zeroed by an absolute parry, and only a hit that deals damage
+counts &mdash; so an area attack counts once for every enemy it strikes, and his multi-press basic
+counts once, because the presses pay Focus and the blow is resolved once. <b>Nothing caps it</b>: a
+hit that meets a total at a certainty crits and resets it, so it buys at most one certain critical
+before it starts again.<br>
+<b>HE FIELDS NO COMPANION.</b> Lethal Aim dismisses the Hunter's pet: he opens without Summon
+Companion, no card can call one for him, and its slot is his for a drafted card. The cards and runes
+that need a companion are never offered to him (&sect;6b), and one he already carries sits out.<br>
 <i>Drafted (§6b):</i> Aimed Shot — 25 Mana, 45 dmg / 15 BD / 3.0, 2cd (Perfect: +20 Focus) — priced as the class kit's Powershot.<br>
 <i>Class kit (§5.2):</i> Powershot — 25 Mana, 20 dmg / 20 BD / 3.0, 2cd: +2% damage for every point of the target's
 Break bar already FULL — allies break them, the marksman ends them.<br>
@@ -2421,7 +2459,7 @@ damage per DIFFERENT status effect</b> afflicting the target (the curated debuff
 — breadth of control IS the damage. Five different debuffs beat fifty stacks of one; his
 meter lives on the enemy. It is the one payoff in the game with a real ceiling, and that is
 deliberate: breadth is bounded by how many distinct debuffs exist.<br>
-<i>Class kit (§5.2):</i> Tripwire — 20 Mana, 1.0, 4cd, for 6 turns the Hunter retaliates against EVERY attacking
+<i>Drafted (§6b):</i> Tripwire — 20 Mana, 1.0, 4cd, for 6 turns the Hunter retaliates against EVERY attacking
 melee enemy — regardless of who they hit.<br>
 <i>Drafted (§6b):</i> Shrapnel Charge — 25 Mana, 3.0, 2cd, rips TWO chosen enemies for 20 NATURE / 25 BD each,
 leaving both Poisoned AND Crippled 3 turns (Perfect: adds Slowed; everything lasts 4). Each
@@ -3168,8 +3206,9 @@ and clicking works as always. With a living companion out, the entry reads <b>Sw
 Companion</b> and the picker offers swaps instead (10 Mana, shared 3-turn cooldown; the
 active companion is greyed out). Summoning or swapping in Aguila then asks for a target — its
 arrival dive. Call of the Wild (when owned) joins the picker as a fourth entry. The
-remaining abilities take the following hotkeys in kit order (the Hunter kit's Powershot E,
-Snare Trap R and Tripwire A; earned abilities follow in the order they were taken — and from the tenth
+remaining abilities take the following hotkeys in kit order (the Hunter kit's Powershot E and
+Snare Trap R, its Summon Companion being the picker on W; a Sharpshooter, who has no picker, takes
+them on W and E; earned abilities follow in the order they were taken — and from the tenth
 onward on Shift + the same key, see §6a).</li>
 <li><b>Burger menu:</b> Restart Run (abandons to a fresh draft), <b>Forfeit Run</b> (ends the
 run where it stands, behind a confirmation with a reason picker — see §2 and §11a),

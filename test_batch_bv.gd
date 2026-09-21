@@ -299,15 +299,34 @@ func _pools() -> void:
 		for enabler in Classes.core_enablers(spec):
 			ok(not Classes.spec_draft_pool(spec).has(enabler),
 				"%s's enabler %s is not draftable" % [spec, enabler])
-	ok(Classes.core_enablers("beastmaster").size() == 3,
-		"the Beastmaster's three summons are still his protected core")
+	# **RE-POINTED BY BATCH HB (ruled by the designer): EVERY HUNTER HAS A PET.**
+	# The three summons left the Beastmaster's protected core for the Hunter's
+	# class kit, as the three calls of ONE card, Summon Companion. What this arm
+	# guarded is unchanged — a summon never becomes draftable — so it asks that
+	# of every draft pool, beside the card that now carries them: a kit card,
+	# which the bench door refuses the same way it refused an enabler.
+	var calls_draftable := false
+	for k in Classes.COMPANION_KINDS:
+		var call: Ability = Classes.companion_call(String(k))
+		if call == null:
+			calls_draftable = true
+			continue
+		for key in ["warrior", "mage", "cleric", "hunter"]:
+			if Classes.draft_pool(key).has(call.display_name):
+				calls_draftable = true
+	ok(Classes.core_enablers("beastmaster").is_empty() and Classes.class_kit_holds("hunter", Classes.PET_CARD)
+			and not calls_draftable,
+		"the three summons are the Hunter kit card's three calls, and none of them is draftable (HB: no longer the Beastmaster's core)")
 	# BATCH GS — "THREE SLOTS, NOT FIVE" WAS HIS WHOLE OPENING: the summons as one
 	# bar entry beside two lineage cards. GS put those two on his shelf, and an
 	# enabler sits outside the slot count, so the AH bar rule is asked of the
 	# summons themselves: ONE bar entry, not three, and no lineage slot at all.
-	ok(Classes.enabler_slots("beastmaster") == 1 and Classes.core_slots("beastmaster") == 1
-			and Classes.lineage_slots("beastmaster") == 0,
-		"and they are ONE bar entry, not three (the AH bar rule), outside the slot count — his lineage takes no slot")
+	# **BATCH HB — THE ONE BAR ENTRY IS NOW A CARD**, the kit's third, so the
+	# lineage brings nothing and the kit is still three slots, not five.
+	ok(Classes.enabler_slots("beastmaster") == 0 and Classes.core_slots("beastmaster") == 0
+			and Classes.lineage_slots("beastmaster") == 0
+			and Classes.kit_slots("hunter", "beastmaster", ["pack"]) == 3,
+		"and they are ONE bar entry, not three (the AH bar rule) — the kit's one card, so a Beastmaster opens on the kit's three and his lineage takes no slot")
 
 
 func _definitions() -> void:

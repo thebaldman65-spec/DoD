@@ -961,10 +961,48 @@ static func engine_read(id: String) -> String:
 
 # Whether a hero whose EQUIPPED engines are `engines` may be offered rune `id`.
 # A rune reading no engine always may; one reading an engine only with it
-# equipped.
+# equipped. **BATCH HB — AND ONE THAT NEEDS A COMPANION ONLY WHILE HE FIELDS ONE**
+# (`COMPANION_READ` below): withheld from a hero who has dismissed the pet.
 static func offerable(id: String, engines: Array) -> bool:
 	var e := engine_read(id)
-	return e == "" or engines.has(e)
+	if e != "" and not engines.has(e):
+		return false
+	return not (reads_companion(id) and Classes.dismisses_pet(engines))
+
+
+# ══ BATCH HB §3/§4 — A RUNE THAT NEEDS A COMPANION ═══════════════════════════
+#
+# **`Classes.COMPANION_READ`'s question one layer up, and the same negative.**
+# Every Hunter but the Sharpshooter fields a companion from his class kit since
+# HB, so a rune that reads only A COMPANION is no longer gated on Pack Bond — and
+# none of these ever was (GV sorted the three below that read a companion alone
+# into its CARD group: *a companion, which Call the Wilds fields with no engine*).
+# The two that read the BOND are `ENGINE_READ`'s PACK rows above and stay gated
+# on Pack Bond; they need a companion as well, so they are here too. **The
+# Sharpshooter fields none**, so every row is withheld from a hero holding the
+# engine that dismisses the pet, and one he already wears SITS OUT (`sits_out`,
+# GX's rule) — its payload still applied at the spawn, and nothing to pay it
+# into.
+#
+# **DERIVED AT THE READ SITE** (`docs/reports/HB.md` §3): every field each of
+# the six writes traced to the lines that read it — the companion's blow
+# (`_companion_hit`), its arrival (`_do_summon`), its death (`_on_beast_death`),
+# the guard that hands it the Hunter's lethal blow (`_deepest_bond`), and the
+# bond's split point — and every one of those lines sits in a companion's own
+# path. The spec's four other companion runes are retired (ET §1).
+const COMPANION_READ := {
+	"shared_hide": {"why": "the companion's blows read the buffs it wears; there is no companion to strike"},
+	"bared_fang": {"why": "+30% to the companion's blows, paid in its heals; there is no companion"},
+	"answering_pack": {"why": "the deepest bond takes the lethal blow; there is no companion to take it"},
+	"second_whistle": {"why": "a summoned companion arrives holding 3 Loyalty; nothing is summoned"},
+	"long_leash": {"why": "moves the companion's Loyalty split point; there is no companion to hold Loyalty"},
+	"shared_scent": {"why": "carries a fallen companion's Loyalty to the next; none falls and none is called"},
+}
+
+
+# Whether rune `id` cannot pay without a companion on the field. THE ONE ANSWER.
+static func reads_companion(id: String) -> bool:
+	return COMPANION_READ.has(id)
 
 
 # ══ BATCH GX — A RUNE ALREADY IN A SLOT, WITH ITS ENGINE OUT ════════════════
@@ -985,7 +1023,9 @@ static func offerable(id: String, engines: Array) -> bool:
 # so.** Re-slot the engine and the rune pays again, because nothing was moved.
 static func sits_out(id: String, engines: Array) -> bool:
 	var e := engine_read(id)
-	return e != "" and not engines.has(e)
+	if e != "" and not engines.has(e):
+		return true
+	return reads_companion(id) and Classes.dismisses_pet(engines)
 
 
 # Authored entries this member may roll, excluding names already in their pouch
@@ -1114,9 +1154,39 @@ static func locked_by_engine(member: Dictionary) -> Array:
 			continue
 		if owned.has(display_name(e)):
 			continue
-		if not offerable(String(id), equipped):
+		# BATCH HB — WITHHELD FOR THE ENGINE, NOT FOR THE PET. `offerable` refuses
+		# both, and a rune the pet's dismissal withholds waits on nothing being
+		# EQUIPPED, so it is `locked_by_pet`'s and the sentence names it apart.
+		if not offerable(String(id), equipped) and _engine_withheld(String(id), equipped):
 			out.append(id)
 	return out
+
+
+# BATCH HB — the runes left for this member that the dismissed pet withholds: a
+# rune whose engine half passes and which needs a companion he does not field.
+static func locked_by_pet(member: Dictionary) -> Array:
+	var equipped := held_engines(member)
+	var owned := owned_names(member)
+	var out: Array = []
+	var data := _load()
+	for id in data:
+		var e: Dictionary = data[id]
+		if String(e.get("retired", "")) != "":
+			continue
+		if not _scope_ok(e, member):
+			continue
+		if owned.has(display_name(e)):
+			continue
+		if not offerable(String(id), equipped) and not _engine_withheld(String(id), equipped):
+			out.append(id)
+	return out
+
+
+# Whether `offerable` withholds rune `id` for its ENGINE half — an engine it
+# reads that is not equipped — rather than for the pet.
+static func _engine_withheld(id: String, equipped: Array) -> bool:
+	var e := engine_read(id)
+	return e != "" and not equipped.has(e)
 
 
 # The engine runes, by name, that the runes `ids` wait on — "the Rune of the
@@ -1145,6 +1215,21 @@ static func waited_on(ids: Array) -> String:
 # sentence is true of every rune it covers: where some wait on a card and some
 # on the engine, the sentence names both doors.
 static func empty_offer_reason(member: Dictionary) -> String:
+	var base := _empty_offer_base(member)
+	# BATCH HB — A FOURTH CAUSE: what is left needs a companion the hero has
+	# dismissed. It is added AFTER the three the sentence already had, so each of
+	# those still reads byte for byte as it did, and it says which rune to take
+	# off rather than which to put on.
+	if locked_by_pet(member).is_empty():
+		return base
+	var clause := "need a companion, which the %s dismisses" % dismisser_name(held_engines(member))
+	if base == "they already carry every rune written for that awakening":
+		return "the runes left for that awakening %s" % clause
+	return "%s, or %s" % [base, clause]
+
+
+# The three causes the sentence had before HB, unchanged.
+static func _empty_offer_base(member: Dictionary) -> String:
 	var by_engine := locked_by_engine(member)
 	var by_kit := not locked_by_kit(member).is_empty()
 	if not by_engine.is_empty() and by_kit:
@@ -1155,6 +1240,18 @@ static func empty_offer_reason(member: Dictionary) -> String:
 	if by_kit:
 		return "the runes left for that awakening wait on abilities they have not earned"
 	return "they already carry every rune written for that awakening"
+
+
+# The name of the equipped engine rune that dismisses the pet (HB), or a plain
+# fallback when none is.
+static func dismisser_name(engines: Array) -> String:
+	for pid in Classes.PET_DISMISSERS:
+		if engines.has(String(pid)):
+			var rid := engine_rune_id(String(pid))
+			var nm := String(config(rid).get("name", "")) if rid != "" else ""
+			if nm != "":
+				return nm
+	return "engine rune that dismisses it"
 
 
 # One rune for this member. **BATCH ES §1 — THE DRAW IS FLAT AND THE ZONE SLOT

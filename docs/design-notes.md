@@ -4,6 +4,52 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Every Hunter has a pet, and the lone marksman sends his away (Batch HB) — 2026-09-21
+
+**Why the companion moved into the class kit.** The three summons were the one exception to the rule that an engine
+brings only what it cannot run without: Pack Bond needed a living companion, so it brought one. That made the
+companion a Beastmaster's thing — and the companion is the most distinctly Hunter thing in the game. Putting it in the
+kit makes it what every Hunter is, and it turns Pack Bond from the engine that makes a companion exist into the engine
+that makes one matter: Loyalty, its conversion, the boons. A Hunter without Pack Bond still has a wolf at his side; a
+Hunter with it has a bond that grows.
+
+**Why one card and not three.** Three cards for one decision spent three names, three definitions and three rows of
+text on what is really a single verb — call a companion — with a choice inside it. One card that asks which companion
+at the cast keeps the choice exactly where it was (the in-battle picker already grouped the three) and gives the kit a
+single slot to hold it. What made three summons a decision was the swap, and the swap did not change: the same three
+swap options at the same price, each companion on its own cooldown, and the same rule about what comes across — the
+bond survives a swap, the body does not.
+
+**Why Tripwire gave up its slot.** Tripwire only pays when enemies come to the Hunter, and a companion is what brings
+them. The pet does Tripwire's job better than Tripwire did, so the wire went back to the pool it came from, where a
+Survivalist who wants to stand in the fray can still draft it.
+
+**Why the companion now fights for everyone.** Until now the only way a Hunter without Pack Bond could have a companion
+was an earned Call the Wilds, and that companion stood beside him and never struck with him, because the
+strike-alongside sat inside Pack Bond's check. A pet that never attacks is not a pet. The strike is the companion's;
+what Pack Bond adds is the Loyalty that makes the strike grow and the boon that makes the companion's presence change the
+fight, and those stay Pack Bond's.
+
+**Why only the Sharpshooter sends it away, and what he gets for it.** The lone marksman is the one Hunter whose identity
+is being alone with his target. Dismissing the pet frees a slot, so he drafts one card deeper, which is its own reward;
+the bigger crit multiplier makes each crit land like one precise shot; and the new meter is the part that changes how
+he plays. Focus rewards staying on one target and punishes switching. The new meter counts every hit he lands without a
+crit, whatever the target, and only a crit resets it — so when the fight forces him off his mark he loses his Focus
+and keeps this. It is the first thing in the game that rewards him for doing what Focus punishes.
+
+**Why the meter counts hits, and why it has no cap.** The combat rules already say what counts: effects that ride a
+blow count per hit, and a blow that is missed or blocked does not count. Using that word rather than inventing one
+keeps the meter predictable — an area attack is one landing per enemy struck, a multi-hit card one per hit, and his multi-press basic is one blow,
+because the presses pay Focus and the blow resolves once. No cap was written because the reset is the cap: the
+lower his chance, the longer the streak certainty needs, so the meter is worth most where a streak is least likely to
+finish — and the hit that reaches it crits and starts the meter over (the report prices both ends).
+
+**Why the gate had to learn a negative.** Every gate the merge built asks whether an engine is equipped. The
+Sharpshooter's question is the opposite — is anything equipped that takes the companion away — and a table that holds
+the one engine a card needs has nowhere to write the engine that kills it. So the companion cards got their own small
+table and the same two doors ask it: the offer never shows a Sharpshooter a card that needs a pet, and one he already
+carries sits out rather than sitting on his bar doing nothing.
+
 ## The last stage is a census before it is a repair, and a readme that says nothing that moves (Batch HA) — 2026-09-21
 
 **Why the census stopped at the price.** The question was never how many gates are red — the battery is green bar the

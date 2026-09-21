@@ -1408,10 +1408,14 @@ func _tracker_arm(s: Node, tag: String, with_beast: bool) -> void:
 # ── §9 — OPENING: THE RUNE OF THE SKIRMISHER ────────────────────────────────
 func _s9_opening() -> void:
 	print("--- GO §9: the Rune of the Skirmisher ---")
-	var s: Node = await _board(NO_LINEAGE, [[], [], [], ["opening_strike"]])
+	# BATCH HB — TRIPWIRE IS A DRAFTED CARD SINCE HB (the Survivalist's shelf;
+	# Summon Companion took its kit slot), so the Hunter carries it the way a
+	# player now gets it, drafted, on both boards.
+	var s: Node = await _board(NO_LINEAGE, [[], [], [], ["opening_strike"]], {3: ["Tripwire"]})
 	await _skirmisher_arm(s, "alone")
 	await _clear(s)
-	s = await _board(["", "", "", "sharpshooter"], [[], [], [], ["lethal_aim", "opening_strike"]])
+	s = await _board(["", "", "", "sharpshooter"], [[], [], [], ["lethal_aim", "opening_strike"]],
+		{3: ["Tripwire"]})
 	await _skirmisher_arm(s, "beside Lethal Aim")
 	await _clear(s)
 
@@ -1647,6 +1651,10 @@ func _stretch(tag: String, specs: Array, engines: Array) -> void:
 	var over := {}
 	for seat in 4:
 		over[seat] = {"engines": _pouch(engines[seat])}
+		# BATCH HB — the answer a parked Lethal Aim holder gives (below) is
+		# Tripwire, a drafted card since HB, so he carries it drafted.
+		if (engines[seat] as Array).has("lethal_aim"):
+			over[seat]["bm_abilities"] = ["Tripwire"]
 	seed(GO_SEED + 120 + tag.length())
 	var s: Node = await Gate.spawn(self, specs, {"party": over})
 	var want: Array = []

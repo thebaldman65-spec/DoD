@@ -477,8 +477,13 @@ func _conversion_math() -> void:
 	ok(abs(BattleUnit.FOCUS_STEP - 0.005) < 0.0001,
 		"one point of Focus buys 0.5%, either side of the split")
 	# THE TABLE §1 NAMES: chance stops at the split, the multiplier takes over.
-	for row in [[0, 0.0, 2.0], [50, 0.25, 2.0], [100, 0.50, 2.0],
-			[200, 0.50, 2.5], [300, 0.50, 3.0], [400, 0.50, 3.5]]:
+	# BATCH HB §4 RE-POINTED EVERY MULTIPLIER UP BY THE SHARPSHOOTER'S +0.5 (the
+	# designer's +50% crit multiplier, written as points on Lethal Aim's own x2,
+	# the unit every term of `lethal_crit_mult` is in): x2.5 below the split, and
+	# the split still adds 0.5% of multiplier a point past it. The chance column
+	# did not move. The literals are the ruling's figures, never the constant.
+	for row in [[0, 0.0, 2.5], [50, 0.25, 2.5], [100, 0.50, 2.5],
+			[200, 0.50, 3.0], [300, 0.50, 3.5], [400, 0.50, 4.0]]:
 		u.second_resource = int(row[0])
 		ok(abs(u.focus_crit_chance() - float(row[1])) < 0.0001,
 			"%d Focus buys +%.0f%% critical CHANCE" % [int(row[0]), float(row[1]) * 100.0])
@@ -491,8 +496,8 @@ func _conversion_math() -> void:
 	u.second_resource = 100
 	ok(abs(u.focus_crit_chance() - 0.30) < 0.0001,
 		"...so 100 Focus buys only +30% chance under it")
-	ok(abs(u.lethal_crit_mult() - 2.20) < 0.0001,
-		"...and the other 40 points are already force (x2.2)")
+	ok(abs(u.lethal_crit_mult() - 2.70) < 0.0001,
+		"...and the other 40 points are already force (x2.7 — HB's x2.5 plus 0.2)")
 	u.deep_focus = 48  # node 40 + the Rune of the Deep Sight's 8
 	ok(u.focus_convert() == 52,
 		"node and rune SUM: 40 + 8 drops the split to 52")
@@ -700,7 +705,9 @@ func _negative_control_source() -> void:
 	# reads identically alone and only diverges in the build §4 legalised.
 	ok(not bsrc.contains("1.5 if attacker.consistent_aim > 0"),
 		"NEGATIVE CONTROL: Consistent Aim no longer SETS the multiplier")
-	ok(usrc.contains("2.0 + 0.01 * (lethal_eye_ranks - consistent_aim)"),
+	# BATCH HB — the Sharpshooter's +0.5 sits between the base and the two nodes'
+	# points, so the needle is the half that carries the SUBTRACTION.
+	ok(usrc.contains("SHARPSHOOTER_CRIT_MULT + 0.01 * (lethal_eye_ranks - consistent_aim)"),
 		"NEGATIVE CONTROL: it SUBTRACTS points, so the two nodes compose")
 	# (3) Unwavering surviving a target switch — the node's old job, and the
 	# one this batch exists to take away from it.
@@ -765,17 +772,18 @@ func _live_conversion() -> void:
 			and not ss_opening.has("Aimed Shot"),
 		"Aimed Shot is a DRAFTED card — on his shelf, not in his opening kit %s — and drafted, it is in his hand"
 			% str(ss_opening))
-	# At 100 Focus the chance is +50% and the multiplier is still x2.
+	# At 100 Focus the chance is +50% and the multiplier is still the base —
+	# x2.5 since HB §4.
 	h.second_resource = 100
 	ok(abs(h.focus_crit_chance() - 0.50) < 0.0001
-		and abs(h.lethal_crit_mult() - 2.0) < 0.0001,
-		"LIVE: 100 Focus is +50% chance at x2.0")
+		and abs(h.lethal_crit_mult() - 2.5) < 0.0001,
+		"LIVE: 100 Focus is +50% chance at x2.5")
 	# Drive a real crit at 300 Focus and read the damage back. Crit is FORCED
 	# through Hold Breath's guarantee rather than by hoping for the roll — the
 	# AR discipline: force determinism, never retry until it passes.
 	h.second_resource = 300
-	ok(abs(h.lethal_crit_mult() - 3.0) < 0.0001,
-		"LIVE: 300 Focus reads x3.0 at the same site the damage block uses")
+	ok(abs(h.lethal_crit_mult() - 3.5) < 0.0001,
+		"LIVE: 300 Focus reads x3.5 at the same site the damage block uses")
 	h.attack = 100.0
 	foe.armor = 0.0
 	foe.resists = {}
@@ -786,10 +794,12 @@ func _live_conversion() -> void:
 	h.update_status("held_breath", "HB1", "", 1)
 	await scene._resolve(h, aimed, foe, "good")
 	var dealt := before - foe.hp
-	# 45% of 100 Attack, x3.0, with the 0.9-1.1 spread: 121-149.
-	ok(dealt >= 110 and dealt <= 160,
-		"LIVE: a crit at 300 Focus lands %d — the x3.0 multiplier is real" % dealt)
-	_report.append("LIVE CRIT at 300 Focus: %d damage off a 45%%-of-100 shot (x3.0)" % dealt)
+	# 45% of 100 Attack, x3.5 (HB §4), with the 0.9-1.1 spread: 142-173. The
+	# multiplier itself is pinned exactly one arm up; this arm proves it reaches the
+	# damage, so its band covers the whole spread with the margin the x3.0 band had.
+	ok(dealt >= 130 and dealt <= 185,
+		"LIVE: a crit at 300 Focus lands %d — the x3.5 multiplier is real" % dealt)
+	_report.append("LIVE CRIT at 300 Focus: %d damage off a 45%%-of-100 shot (x3.5)" % dealt)
 	await _kill(scene)
 
 
@@ -804,8 +814,8 @@ func _live_deep_focus() -> void:
 	ok(abs(h.focus_crit_chance() - 0.30) < 0.0001,
 		"LIVE: the chance half tops out at +30% under it")
 	h.second_resource = 260
-	ok(abs(h.lethal_crit_mult() - 3.0) < 0.0001,
-		"LIVE: and 260 Focus already reads x3.0 — 40 sooner than without it")
+	ok(abs(h.lethal_crit_mult() - 3.5) < 0.0001,
+		"LIVE: and 260 Focus already reads x3.5 — 40 sooner than without it")
 	await _kill(scene)
 
 
@@ -816,8 +826,8 @@ func _live_crit_mult_pair() -> void:
 	var h := _hero(scene, 3)
 	ok(h.lethal_eye_ranks == 50 and h.consistent_aim == 50,
 		"both halves of the dissolved fork applied")
-	ok(abs(h.lethal_crit_mult() - 2.0) < 0.0001,
-		"LIVE: Executioner's Eye + Consistent Aim resolve to x2.0 (got x%.2f)" % \
+	ok(abs(h.lethal_crit_mult() - 2.5) < 0.0001,
+		"LIVE: Executioner's Eye + Consistent Aim resolve to x2.5 (got x%.2f)" % \
 			h.lethal_crit_mult())
 	ok(h.crit_bonus >= 0.59,
 		"...and he keeps Consistent Aim's +60%% chance (got %.2f)" % h.crit_bonus)
@@ -825,13 +835,13 @@ func _live_crit_mult_pair() -> void:
 	# Each alone, so the composition is proven rather than inferred.
 	var s2 := await _spawn({"ss_consistent": 1})
 	var h2 := _hero(s2, 3)
-	ok(abs(h2.lethal_crit_mult() - 1.5) < 0.0001,
-		"LIVE: Consistent Aim ALONE is x1.5 (got x%.2f)" % h2.lethal_crit_mult())
+	ok(abs(h2.lethal_crit_mult() - 2.0) < 0.0001,
+		"LIVE: Consistent Aim ALONE is x2.0 (got x%.2f)" % h2.lethal_crit_mult())
 	await _kill(s2)
 	var s3 := await _spawn({"ss_exec_eye": 1})
 	var h3 := _hero(s3, 3)
-	ok(abs(h3.lethal_crit_mult() - 2.5) < 0.0001,
-		"LIVE: Executioner's Eye ALONE is x2.5 (got x%.2f)" % h3.lethal_crit_mult())
+	ok(abs(h3.lethal_crit_mult() - 3.0) < 0.0001,
+		"LIVE: Executioner's Eye ALONE is x3.0 (got x%.2f)" % h3.lethal_crit_mult())
 	await _kill(s3)
 
 
@@ -973,8 +983,8 @@ func _live_opening_volley() -> void:
 		"Opening Volley opens the fight on 150 Focus (got %d)" % h.second_resource)
 	ok(h.second_resource > h.focus_convert(),
 		"...which is PAST the conversion point — he arrives already converting")
-	ok(abs(h.lethal_crit_mult() - 2.25) < 0.0001,
-		"...reading x2.25 on turn one (got x%.2f)" % h.lethal_crit_mult())
+	ok(abs(h.lethal_crit_mult() - 2.75) < 0.0001,
+		"...reading x2.75 on turn one (got x%.2f)" % h.lethal_crit_mult())
 	await _kill(scene)
 
 

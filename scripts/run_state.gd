@@ -1538,18 +1538,51 @@ func hold_rune(member: Dictionary, rune: Dictionary) -> void:
 # DROP AND SWAP, INCLUDING TO NOTHING. Unslotting an engine takes the engine and
 # its enablers out of the next fight and keeps the rune; slotting one is refused
 # only when both slots are full. **Zero engines is a legal state.**
+#
+# **BATCH HB §4 — AND UNSLOTTING THE ONE ENGINE THAT DISMISSES THE PET IS REFUSED
+# WHILE THE KIT HAS NO ROOM TO TAKE IT BACK.** The Sharpshooter's freed slot is
+# his for a drafted card; unslot Lethal Aim and Summon Companion returns to his
+# kit, which counts, so a hero who filled the freed slot would open the next
+# fight over the cap — a cap one route can walk past is not a cap (EG). **The
+# answer is the player's, and it is one press**: bench a card, then unslot.
+# `engine_toggle_refusal` says why in one sentence and the pouch shows it on the
+# disabled button, so the refusal is never a silent no-op (GK's rule).
 func toggle_engine(member: Dictionary, i: int) -> bool:
 	var held: Array = member.get("engines", [])
 	if i < 0 or i >= held.size():
+		return false
+	if engine_toggle_refusal(member, i) != "":
 		return false
 	var r: Dictionary = held[i]
 	if bool(r.get("equipped", false)):
 		r["equipped"] = false
 		return true
-	if engines_worn(member) >= ENGINE_SLOTS:
-		return false
 	r["equipped"] = true
 	return true
+
+
+# Why the pouch's engine toggle `i` is refused right now, or "" when it is not.
+# THE ONE ANSWER: `toggle_engine` refuses on it and the pouch disables the button
+# with it. Two causes: both slots are full (slotting a third, GK), and unslotting
+# the pet's dismisser into a kit with no free slot for the pet (HB §4).
+func engine_toggle_refusal(member: Dictionary, i: int) -> String:
+	var held: Array = member.get("engines", [])
+	if i < 0 or i >= held.size():
+		return ""
+	var r: Dictionary = held[i]
+	if not bool(r.get("equipped", false)):
+		return "Both engine slots are filled." if engines_worn(member) >= ENGINE_SLOTS else ""
+	var after: Array = held_engines(member).filter(
+		func(p): return String(p) != String(r.get("engine", "")))
+	if not Classes.dismisses_pet(held_engines(member)) or Classes.dismisses_pet(after):
+		return ""
+	var key := String(member.get("key", ""))
+	var spec := String(member.get("spec", ""))
+	var used_after: int = Classes.lineage_slots(spec) + Classes.kit_slots(key, spec, after) \
+		+ equipped_ability_names(member).size()
+	if used_after <= ability_slot_cap():
+		return ""
+	return "Unequipping it returns %s to the kit,\nand every slot is full. Bench a card\nfirst." % Classes.PET_CARD
 
 
 # The opening kit this hero holds, by display name — `Classes.opening_kit`'s.
@@ -2200,12 +2233,29 @@ func sitting_out_names(member: Dictionary) -> Array:
 # card that vanishes from the bar with no reason reads as a bug (CO §3). Broken
 # by hand at 44 characters, because the sheet shows it as a tooltip and a
 # tooltip does not wrap.
-func sits_out_note(card_name: String) -> String:
-	var rid := Runes.engine_rune_id(Classes.sits_out_engine(card_name))
+#
+# **BATCH HB §4 — AND A SECOND CAUSE, WITH THE SAME OPENING CLAUSE.** A card that
+# needs a companion sits out while the hero holds the engine that dismisses the
+# pet, so the rune that brings it back is one to UNEQUIP rather than equip. The
+# clause is GT's word for word and only the middle lines change, which is what
+# `engines` is for: the hero's SLOTTED engines, so the sentence names the cause
+# that holds. Left empty it reads the engine cause alone, as it always did.
+func sits_out_note(card_name: String, engines: Array = []) -> String:
+	var eng := Classes.sits_out_engine(card_name)
+	if (eng == "" or engines.has(eng)) and Classes.companion_door(card_name) \
+			and Classes.dismisses_pet(engines):
+		return "Sits out of every fight while the\n%s\nStill carried: the slot stays counted.\nBenching the card frees the slot." % _dismisser_clause(engines)
+	var rid := Runes.engine_rune_id(eng)
 	var rune_name := String(Runes.config(rid).get("name", "")) if rid != "" else ""
 	if rune_name == "":
 		rune_name = "engine rune it needs"
 	return "Sits out of every fight while the\n%s is not equipped.\nStill carried: the slot stays counted.\nBenching the card frees the slot." % rune_name
+
+
+# The middle of the pet's sentence (HB §4): which equipped rune dismissed the
+# companion the card or rune needs, broken at 44 for the tooltip.
+func _dismisser_clause(engines: Array) -> String:
+	return "%s is equipped,\nwhich dismisses the companion it needs." % Runes.dismisser_name(engines)
 
 
 # ══ BATCH GX — AND THE SAME THING ONE LAYER UP, FOR A RUNE ══════════════════
@@ -2246,8 +2296,15 @@ func sitting_out_rune_names(member: Dictionary) -> Array:
 # second phrasing of the same idea is a second thing to keep in step. Broken by
 # hand at 44 characters, for GT's reason: the sheet shows it as a tooltip and a
 # tooltip does not wrap.
-func rune_sits_out_note(rune_id: String) -> String:
-	var rid := Runes.engine_rune_id(Runes.engine_read(rune_id))
+#
+# **BATCH HB §4 — THE PET'S CAUSE, ON THE RUNE'S NOUNS.** `engines` is the card
+# note's argument above, for the same reason.
+func rune_sits_out_note(rune_id: String, engines: Array = []) -> String:
+	var eng := Runes.engine_read(rune_id)
+	if (eng == "" or engines.has(eng)) and Runes.reads_companion(rune_id) \
+			and Classes.dismisses_pet(engines):
+		return "Sits out of every fight while the\n%s\nStill worn: the slot stays filled.\nUnequipping the rune frees the slot." % _dismisser_clause(engines)
+	var rid := Runes.engine_rune_id(eng)
 	var rune_name := String(Runes.config(rid).get("name", "")) if rid != "" else ""
 	if rune_name == "":
 		rune_name = "engine rune it needs"
@@ -2261,9 +2318,12 @@ func ability_slots_used(member: Dictionary) -> int:
 	# lineage's own slots already count (`Classes.kit_slots`), so a hero with no
 	# lineage opens at three and a Warden, whose kit holds two of the three, at
 	# four.
+	# BATCH HB §4 — AND THE KIT IS THE ONE HE HOLDS, SO IT READS HIS SLOTTED
+	# ENGINES: a Sharpshooter opens without Summon Companion and its slot is his
+	# for a drafted card (`Classes.kit_slots` counts two).
 	var spec := String(member.get("spec", ""))
 	return Classes.lineage_slots(spec) \
-		+ Classes.kit_slots(String(member.get("key", "")), spec) \
+		+ Classes.kit_slots(String(member.get("key", "")), spec, held_engines(member)) \
 		+ equipped_ability_names(member).size()
 
 

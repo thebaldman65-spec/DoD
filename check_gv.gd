@@ -1256,14 +1256,21 @@ func _s3_what_can_be_offered() -> void:
 					"§3: a %s with his engine unequipped can be offered the row %s" % [spec, id])
 			# TWO ENGINES: his own and one more of his class. The second opens
 			# nothing of another lineage's — scope is the lineage.
+			# **BATCH HB — AND ONE SECOND ENGINE TAKES SOMETHING AWAY.** The
+			# Sharpshooter's Lethal Aim dismisses the pet, so a hero holding it
+			# second is offered his runes less every one that needs a companion
+			# (`Runes.COMPANION_READ` — all six of the Beastmaster's); every other
+			# pairing still offers exactly his own, which is the positive arm.
 			for pid in Classes.class_engines(cls):
 				if String(pid) == Classes.engine_of_spec(String(spec)):
 					continue
 				var two: Array = _reach(String(spec), true, String(pid))
 				var two_own: Array = two.filter(func(i): return not Runes.is_engine_rune(String(i)))
-				ok(two_own.size() == own_eq.size(),
+				var dismisses: bool = Classes.dismisses_pet([String(pid)])
+				var want_two: Array = own_eq.filter(func(i): return not (dismisses and Runes.reads_companion(String(i))))
+				ok(two_own.size() == want_two.size(),
 					"§3: a %s holding %s second is offered %d of his runes, not %d" % [
-						spec, pid, two_own.size(), own_eq.size()])
+						spec, pid, two_own.size(), want_two.size()])
 		print("      the class: %d of its lineages' runes reachable with each engine equipped, %d with it unequipped" % [
 			cls_total, cls_bare])
 	# THE SPINE-TAKER: no lineage, so no spec rune at all, engine or none.

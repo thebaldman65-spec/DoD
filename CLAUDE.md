@@ -769,8 +769,8 @@ working — a PARTIAL arrival reads as working too, which is the same failure on
   `docs/design-notes.md` and the batch reports are exempt. **History is not swept.**
 · **UNREACHABLE IS NOT EXCLUDED, AND IT IS NOT A SIXTH REASON (Batch FO §2).** The Shared Mark
   pays a Sharpshooter when an ALLY strikes his mark, and **no companion can stand beside a
-  Sharpshooter**: a party is one of each class, he IS the Hunter, and summoning is the
-  Beastmaster's exclusive axis (DR §1). **That is a fact about the PARTY, not about the beast** —
+  Sharpshooter**: a party is one of each class, he IS the Hunter, and since HB he is the one Hunter
+  whose engine DISMISSES the pet (the block on it below). **That is a fact about the PARTY, not about the beast** —
   the five recorded reasons are all about a companion RECEIVING, and here the companion is the
   ATTACKER. **So the word stays ALLY and the call is made from `_companion_hit` too**, because
   narrowing would need an exception that evaporates the day any other class fields one.
@@ -1845,14 +1845,19 @@ as a bug.
 > **ENGINE RUNES CAN BE DROPPED AND SWAPPED, INCLUDING TO NOTHING.** A hero with no engine has no
 > identity and that is the player's decision to make. **This is a game about good decisions.**
 >
-> **AN ENGINE BRINGS ONLY WHAT IT CANNOT RUN WITHOUT.** Loyalty with no summon is nothing, so the
-> three summons travel. **Burn with no way to apply Burn is nothing, so ONE card travels.** Everything
-> else was that lineage's kit and **belongs in the class pool.**
+> **AN ENGINE BRINGS ONLY WHAT IT CANNOT RUN WITHOUT.** Loyalty with no companion is nothing, and
+> every Hunter but the Sharpshooter summons one from his class kit, so Pack Bond brings nothing. **Burn
+> with no way to apply Burn is nothing, so ONE card travels.** Everything else was that lineage's kit
+> and **belongs in the class pool.**
 
 **THAT CLAUSE IS GS §1's, RECORDED OVER GK's *"an engine's enabler travels with it"* — RULED BY THE DESIGNER, AND
 FOUND IN PLAY: an engine that brings four cards IS choosing a spec, which is the thing the merge dissolved.** GK's
 clause took `PROTECTED_CORES`' whole sixteen, and a lineage opened with its whole opening kit beside them. **What
 travels still sits outside the slot count and still leaves when the engine leaves**: GS narrowed WHAT travels, not how.
+**AND ITS SUMMON SENTENCE IS HB's, RECORDED OVER GS's *"so the three summons travel"* — RULED BY THE DESIGNER.** The
+Beastmaster's three summons were the one stated exception to *only what it cannot run without*, and HB retired it by
+putting the pet in every Hunter's CLASS KIT: an engine no longer has to bring what the class already holds. The block
+*EVERY HUNTER HAS A PET* below is the rule that replaced it.
 - **THE TEST, APPLIED PER ENGINE: WITHOUT THE CARD — WITH THE CLASS BASIC AND THE CLASS KIT EVERY HERO HOLDS — DOES
   THE ENGINE PAY ANYTHING AT ALL?** If not, ONE card travels: the one that produces what the engine reads. If so,
   nothing does. **Where several cards would each serve, which one travels is a ruling**, and a batch's derivation
@@ -1959,8 +1964,11 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   the draft pool and every lineage's zone-boss pool — is asked `_ability_usable` with no engine, on a board dressed
   to allow everything an engine does not give. **A card another CARD or the board can open is never a row**: Battle
   Poise and Counter Time (a drafted Guard Change), Reprisal (a heal landed), Execute (a low or Broken target), Kill
-  Command and the companion cards (an earned Call the Wilds). `check_gt` §3 re-derives it every battery, so a new
-  earnable card is sorted by the gate in the batch that adds it.
+  Command and the companion cards (a companion — which every Hunter but the Sharpshooter summons from his class kit
+  since HB, where until then only an earned Call the Wilds gave one). `check_gt` §3 re-derives it every battery, so a new
+  earnable card is sorted by the gate in the batch that adds it. **The Sharpshooter's own seat gate is the NEGATIVE
+  one** — a companion card sits out while he holds the engine that dismisses the pet — and it is the block *EVERY
+  HUNTER HAS A PET* below, not a row here.
 - **A CARD WHOSE SECOND CLAUSE NEEDS ANOTHER CARD IS NOT A ROW, AND IS NOT PAID THE CLAUSE WITHOUT IT (ruled at GU).**
   Battle Poise's free Guard Change and Shatterpoint's free Overpower fire only with the named card carried; both cards
   do their own work with no engine and no other card, so neither sits out, and paying the clause to a hero who does not
@@ -2012,13 +2020,15 @@ the block left out, spend what they were paid.
 
 ## STANDING RULE — EVERY CLASS OPENS WITH A KIT OF THREE, INSIDE THE SLOT COUNT (Batch GN, ruled by the designer)
 > **`Classes.CLASS_KITS` names three abilities per class. Every hero of the class opens with them after his basic,
-> whatever engine he takes, holds or drops; they are protected, and they count against the slot cap.**
+> whatever engine he takes, holds or drops; they are protected, and they count against the slot cap.** *One engine
+> takes one away since HB: the Sharpshooter's Lethal Aim dismisses the Hunter's pet (the block below).*
 
 - **ONE BUILDER, ONE DEDUPE, AND THE DEDUPE FOLLOWS THE CARD (GS §2).** `Classes.opening_kit` appends every card by
   name and skips one the hero already holds, whichever route it came by — so a Warden holding the Rune of the
   Berserker second holds Bloodlust once. `Classes.kit_slots` counts the kit less what the lineage's slots already
   count, and `Run.ability_slots_used` adds it: **every hero opens at 3**, because a lineage opens with its enablers
-  alone and an enabler sits outside the count. `protected_names` and `ability_corpus` walk the kit too.
+  alone and an enabler sits outside the count — **and a Sharpshooter at 2**, because `kit_slots` counts the kit the
+  hero HOLDS and his engine dismisses the pet (HB). `protected_names` and `ability_corpus` walk the kit too.
 - **THE WARRIOR'S KIT IS CRUSHING BLOW · POMMEL STRIKE · MOCKING BLOW (GS §2, RULED BY THE DESIGNER).** Bloodlust was
   a Berserker card wearing a class card's slot; it is the Berserker's enabler, so a Warrior holds it only with the Rune
   of the Berserker. Pommel Strike keeps its one definition in the Swordmaster's `spec_abilities`.
@@ -2029,7 +2039,9 @@ the block left out, spend what they were paid.
   is a cost the designer rules on, never a tidy-up. The kit is in no draft or boss pool (`check_gn` §0).
 - **A KIT CARD MUST WORK FOR EVERY HERO OF ITS CLASS WITH ANY ENGINE OR NONE**, and that is proved by driving it on a
   hero who holds nothing (`check_gn` §1), never by reading it — a kit card that needs an engine is the failure the
-  kit exists to prevent.
+  kit exists to prevent. **THE PET IS NOT AN EXCEPTION TO THIS**: Summon Companion needs no engine and works for
+  every Hunter who holds it; the Sharpshooter does not hold it at all — an engine that dismisses a card takes the
+  card away, it never leaves a dead one behind.
 - **THE CLERIC'S KIT HAS NO DAMAGE CARD, AND THAT IS THE RULING.** He attacks with Smite and drafts damage if he wants
   it. Do not "complete" his kit with one.
 - **A KIT CARD OWES THE BOT A CASE IN `battle._bot_class_kit_pick`**, which is consulted only where the rotation fell
@@ -2040,6 +2052,53 @@ the block left out, spend what they were paid.
   `_apply_elem_weak`, which never writes a standing weakness down. **Its read site is the strike loop's alone**, like
   Exposed's: a card that computes its own damage, a tick and a trap do not see it (`docs/reports/GN.md` §2). **It
   stays ELEMENT-BLIND by construction**: the read asks whether the blow is physical and nothing else.
+
+## STANDING RULE — EVERY HUNTER HAS A PET, AND ONLY THE SHARPSHOOTER DISMISSES IT (Batch HB, ruled by the designer)
+> **The companion is the Hunter's class identity: `Summon Companion` is his third class-kit card, ONE card that calls
+> Ursus, Canis or Aguila — chosen at the cast — and every Hunter holds it but the one whose engine dismisses it. Pack
+> Bond brings nothing and deepens the bond. The Sharpshooter's Lethal Aim dismisses the pet, and its slot is his for a
+> drafted card.**
+
+- **ONE CARD, THREE CALLS, AND THE SWAP RULES DID NOT MOVE.** The kit holds one card (`Classes.PET_CARD`); the battle
+  builds its three calls (`battle._summon_choice`) off each companion's one definition (`Classes.companion_call`, in
+  `spec_abilities("beastmaster")`) at the CARD's price — so a rune or an upgrade on the card moves all three — and under
+  the call's own name, which is what keys a cooldown: **a cooldown is kept per companion, exactly as three cards kept
+  it.** The player's picker and the bot build through that one helper. The swap is the three clones it always was, at
+  their own price, and `_do_summon` decides what carries: Loyalty lives on the hunter, per companion, and survives; a
+  companion's health and statuses do not — it returns as a fresh body. **The card itself is a menu entry, not a cast**:
+  `_ability_usable` refuses a summon that names no companion.
+- **A COMPANION FIGHTS FOR EVERY HUNTER, AND WHAT PACK BOND DEEPENS STAYS PACK BOND'S.** The strike-alongside in
+  `_resolve` reads no engine since HB — it sat inside `has_engine("pack")` while only Pack Bond brought a pet — and the
+  Loyalty that grows its blow (`_gain_loyalty`), the three boons (`_bond_reach`) and the two ghost strikes stay inside
+  the engine. **A card or a rune reads A COMPANION or it reads THE BOND, and the two are gated differently**: a bond
+  reader is an `ENGINE_READ` row (Pack Bond); a companion reader is offered to every Hunter who fields one.
+- **THE SHARPSHOOTER'S GATE IS A NEGATIVE, AND GV'S TABLE HAS NO SLOT FOR IT.** `ENGINE_READ` holds the one engine a
+  card needs; *is a pet present* is *no engine that dismisses one is equipped* (`Classes.dismisses_pet`, the one
+  answer). So it is its own table at each layer — `Classes.COMPANION_READ` for cards and `Runes.COMPANION_READ` for
+  runes — asked by the same doors beside the engine test: `offerable` withholds every row from a hero who has
+  dismissed the pet, and `sits_out` sits out, for as long as he holds the dismisser, the card rows the door refuses
+  with no companion standing (`door`, GT §3's bench) and every rune row (GX §1's tell — the payload is still applied,
+  with no companion to pay into). **The bond rows are in both tables** —
+  a bond needs a companion as well as the engine. **Derived by casting and read at the read site; a new Hunter card or
+  rune that needs a companion owes its row in the batch that authors it.**
+- **THE SUMMON DOOR REFUSES A DISMISSER EVERY ROUTE**, Call the Wilds included, so *a Sharpshooter has no companion* is
+  a door and not a hope. **Call of the Wild's spirits are bodiless and are not a pet**: it stays castable.
+- **THE KIT A HERO OPENS WITH READS HIS SLOTTED ENGINES.** `Classes.class_kit_names_for` and `class_kit_for` are the
+  class's kit less what his engines dismiss; `opening_kit` reads them and `kit_slots` counts them. **Unslotting the
+  dismisser puts the card back, so the rune pouch refuses it while every slot is full** (`Run.engine_toggle_refusal`,
+  the one answer, shown on the disabled button) — a cap one route can walk past is not a cap (EG), and the answer is
+  the player's: bench a card first.
+- **THE PITY METER IS A FIELD OF ITS OWN** (`BattleUnit.crit_pity`), never `second_resource`, which is already three
+  currencies (FT). It is Heavy Plating's climb pointed at crit — `PITY_CRIT_STEP` for every hit he LANDS without a
+  crit, reset by a crit — with one writer (`battle._note_pity`, below every source of `is_crit`), read into the same
+  total the roll spends so EW's surplus sees it, and shown on the Lethal Aim chip. **"LANDS" IS BR §1's WORD FOR A
+  CHARGE** (`docs/combat-rules.md`): not missed, not blocked, not zeroed by an absolute parry, and it counts HITS — an
+  area attack once per enemy it strikes, a multi-hit once per hit, his multi-press basic once (the presses pay Focus
+  and the blow resolves once). Only a blow that deals damage counts. **No cap is written**: the reset governs, and a hit
+  that meets a certainty crits and resets it.
+- **THE +50% CRIT MULTIPLIER IS POINTS ON LETHAL AIM'S OWN** (`BattleUnit.SHARPSHOOTER_CRIT_MULT`, added inside
+  `lethal_crit_mult()`, the one implementation the strike loop, the nameplate and the sim read), so his crit opens at
+  x2.5 — the unit every other term in that function is written in.
 
 ## STANDING RULE — A RULE ENGINE READS A DOOR THE GAME ALREADY HAS (Batch GO)
 > **The nine rule engines (`Classes.RULE_ENGINES`) bring no lineage, no enabler and no payload, and each reads a door
@@ -2704,8 +2763,9 @@ decision: **you can swap to switch a rune on or off, so the loadout becomes a le
   tag word, which `check_ek` §3 asserts at zero for that file by name.
 · **A THRESHOLD'S MAGNITUDE MUST BE CHOSEN AGAINST THE CORE-KIT BASELINE.** Before a card is
   drafted, the cores alone already meet a 2+ threshold on **BREAK for ten of the twelve specs**
-  and on **DEBUFF for six**; **MARK and TEMPO are zero for all twelve** (since GS §1 a lineage's
-  cores are its enablers and the class kit). A rune asking 2+ BREAK is on from the first fight for
+  and on **DEBUFF for five**; **MARK and TEMPO are zero for all twelve** (since GS §1 a lineage's
+  cores are its enablers and the class kit; five since HB, when the Beastmaster's Summon Canis became a call
+  of the kit's one OFFENSE / BREAK card). A rune asking 2+ BREAK is on from the first fight for
   almost everyone and no swap turns it off. `check_es` §4 prints the per-spec table every battery run.
 · **THE COUNT MUST BE VISIBLE AND MUST MOVE ON A SWAP.** A silent threshold is a stat nobody knows
   they have. It is drawn on the loadout panel (where the swap happens) and on the hero sheet, and
@@ -3405,17 +3465,19 @@ LATER BATCH WOULD MOST EASILY BREAK.** It is AUTHORED rather than derived, and `
 asserts every named enabler is in that spec's opening kit and in NO pool. **The failure it prevents
 is SILENT: a spine that stops working because its enabler became draftable.** **Since GS §1 a
 lineage's protected core IS its enablers** — the minimum its engine cannot run without: one card for
-five engines, the three summons for the Beastmaster (one bar entry since AH) and none for the other
-six — so `slots` is their bar entries and `lineage_slots` is zero for every lineage. **The table itself
+five engines and none for the other seven (the Beastmaster's three summons, one bar entry since AH, were
+the eighth until HB made them every Hunter's class-kit card) — so `slots` is their bar entries and
+`lineage_slots` is zero for every lineage. **The table itself
 is in `classes.gd` with a `why` on every row — read it there rather than copying it here.** **SINCE GK
 THE ENABLERS TRAVEL WITH THE ENGINE RUNE**: `Classes.engine_enablers` reads this column for an engine's
 lineage, `Classes.opening_kit` hands them to any hero of the class who holds that engine and takes them
 out when it is not held, and they sit OUTSIDE the slot count (`Classes.lineage_slots` is `slots` less
 the enablers).
 
-**THE DRAFT IS COMPLETE AND NOTHING IS OWED: 178 of 178, 158 spec + 20 class-wide — FOUR POOLS OF
-43 / 51 / 43 / 41 SINCE GS** (GP's merge made them 38 / 41 / 34 / 36 of 149, and GS §1 put the 29 cards
-that stopped travelling with an engine on their lineages' shelves). All twelve lineage shelves hold at least TEN; the
+**THE DRAFT IS COMPLETE AND NOTHING IS OWED: 179 of 179, 159 spec + 20 class-wide — FOUR POOLS OF
+43 / 51 / 43 / 42 SINCE HB** (GP's merge made them 38 / 41 / 34 / 36 of 149, GS §1 put the 29 cards
+that stopped travelling with an engine on their lineages' shelves, and HB §2 put Tripwire on the
+Survivalist's when Summon Companion took its class-kit slot). All twelve lineage shelves hold at least TEN; the
 Warrior and Hunter class-wide shelves hold six, the Mage's five and the Cleric's three, since GN
 moved five class-wide cards into the class kits. **A hero drew from 13 to 18 before the merge and a
 spine-taker from 3 to 6.**
@@ -3454,14 +3516,16 @@ dominated by a basic.
 
 ## STANDING RULE — ONE DRAFT POOL A CLASS, AND A CARD THAT READS AN ENGINE IS OFFERED ONLY TO ITS HOLDER (Batch GP §1/§2)
 > **The three lineage shelves and the class-wide shelf of a class are ONE POOL. A hero draws from
-> all of it — 43 / 51 / 43 / 41 — and `Classes.draft_pool(class_key)` is the only thing a draw may
+> all of it — 43 / 51 / 43 / 42 — and `Classes.draft_pool(class_key)` is the only thing a draw may
 > read.** `spec_draft_pool()` and `class_draft_pool()` return what they always returned and are
 > SHELVES now: where a card was authored, not a channel it is drawn from. **A reader that takes
 > `spec_draft_pool(his spec)` for "what this hero can be offered" is wrong and still passes.**
 >
 > **A card that READS an engine is offered only to a hero who holds it.** `Classes.ENGINE_READ` is
 > the table — 37 cards, one `why` apiece — and `Classes.offerable` is the one answer, asked by the
-> draft offer and by the zone-boss fallback so the two cannot disagree.
+> draft offer and by the zone-boss fallback so the two cannot disagree. *Since HB it asks a second,
+> negative question beside the engine one: a card that needs a companion is not offered to a hero who
+> has dismissed the pet (the block* EVERY HUNTER HAS A PET *above).*
 
 - **THE TABLE IS AUTHORED, DERIVED AT THE READ SITE, AND DRIVEN BOTH WAYS.** A field-level test
   misjudges 137 abilities (CN); the population came from casting every one of the 149 on a hero
@@ -3498,7 +3562,8 @@ same breath as the removal. `run_sim` never bought one, so no measured figure mo
 ## STANDING RULE — A RUNE THAT READS AN ENGINE IS OFFERED ONLY WHILE THAT ENGINE IS EQUIPPED (Batch GV)
 > **GP's card gate, one layer over. `Runes.ENGINE_READ` is the table — thirty-five of the sixty live ordinary runes, an
 > engine and a `why` apiece — and `Runes.offerable` is the one answer: `Runes.eligible_ids` asks it at every roll (the
-> Peddler, the elite cache, the bargain, the event verb) and `Run.rune_choice` at a queued offer's answer.**
+> Peddler, the elite cache, the bargain, the event verb) and `Run.rune_choice` at a queued offer's answer.** *Since HB
+> it also withholds a rune that needs a companion from a hero who has dismissed the pet (`Runes.COMPANION_READ`).*
 
 - **DERIVED AT THE READ SITE AND DRIVEN BOTH WAYS, NEVER TAKEN FROM A COUNT.** Every payload field traced to every line
   that reads it, with its guard chain, and every rune worn on a board with its engine equipped and with it merely owned
@@ -3748,9 +3813,12 @@ there were five; DO's brief asserted nine grant-capstones and there were twenty-
 brief asserted three exclusive axes and one of the three was false.** A count is a fact about
 today; a property is the thing worth pinning.
 
-· **COMPANION SUMMONING — THE BEASTMASTER.** True, and verified over the whole corpus: `special:
-  "summon"` exists on exactly three abilities and all three are his protected core, and
-  `_do_summon`'s only other caller is his own draft card Call the Wilds.
+· **COMPANION SUMMONING — THE HUNTER CLASS SINCE HB, AND NOT THE SHARPSHOOTER.** It was the Beastmaster's
+  while `special: "summon"` sat on his three protected-core summons alone; HB made the pet every Hunter's class-kit
+  card (`Summon Companion`, whose three calls are those three definitions), and the summon door refuses the one
+  Hunter whose engine dismisses it. `_do_summon`'s other callers are Call the Wilds and a quit fight's returning
+  companion. **Exclusive to a class, then, and not to an engine** — which is HA's summoning question, answered by
+  the designer's ruling.
 · **REVIVAL — THE HOLY CLERIC, AMONG ABILITIES.** True with a qualifier the gate prints rather
   than hides: `BattleUnit.revive()` has **two** callers, `resurrection` (hers) and the **REVIVE
   POTION**, and the `revive_pct` map event is a third channel. **Exclusive as an ability; not
