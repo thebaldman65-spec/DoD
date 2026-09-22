@@ -60,6 +60,14 @@ const RULED := {
 	"Transference": "old_gods", "Requiem": "old_gods",
 	"Unleash": "pack", "Primal Surge": "pack",
 }
+# **BATCH HE §2 — A ROW THE DESIGNER RULED, WHICH THE DOOR NEVER REFUSES.** Mark of
+# the Hunt half-works without Pack Bond (its companion's halves read no engine),
+# so the census below can never find it; it was ruled Pack Bond's and sits out
+# with it. It is held APART from `RULED`, whose population the census derives,
+# and driven as a ruling (HD §1's rule for a ruled row): its premise asserted —
+# usable bare — and its seat driven with the derived rows. The day the door
+# refuses it bare, the census has found it and the ruling is no longer why.
+const RULED_BY_DESIGNER := {"Mark of the Hunt": "pack"}
 # THE TEN THE DOOR REFUSES BARE THAT ARE NOT ROWS, AND WHAT OPENS EACH WITH NO
 # ENGINE: a drafted Guard Change turns the guard Defensive; a heal landed first;
 # an enemy under 20% health; a companion from an earned Call the Wilds.
@@ -573,14 +581,26 @@ func _s3_the_card_that_sits_out() -> void:
 		var er := Classes.engine_read(String(card))
 		ok(er == "" or er == String(RULED[card]),
 			"§3: %s reads %s in `ENGINE_READ` and sits out without %s" % [card, er, RULED[card]])
+		ok(Classes.sits_out_ruled(String(card)) == "",
+			"§3: %s is a derived row and carries a ruling (`%s`)" % [card, Classes.sits_out_ruled(String(card))])
+	for cardr in RULED_BY_DESIGNER:
+		var er2 := String(RULED_BY_DESIGNER[cardr])
+		ok(Classes.sits_out_engine(String(cardr)) == er2 and Classes.sits_out_ruled(String(cardr)) == "HE §2",
+			"§3: %s sits out without %s by the designer's ruling; the table says %s (`ruled` %s)" % [
+				cardr, er2, Classes.sits_out_engine(String(cardr)), Classes.sits_out_ruled(String(cardr))])
+		ok(Classes.engine_read(String(cardr)) == er2 and Classes.engine_read_ruled(String(cardr)) == "HE §2",
+			"§3: %s is not the same ruled row in `ENGINE_READ` (%s, `ruled` %s)" % [
+				cardr, Classes.engine_read(String(cardr)), Classes.engine_read_ruled(String(cardr))])
+		ok(String(table.get(cardr, {}).get("why", "")) != "", "§3: %s's row carries no why" % cardr)
 	for card2 in table:
-		ok(RULED.has(card2), "§3: %s sits out, and no ruling named it" % card2)
+		ok(RULED.has(card2) or RULED_BY_DESIGNER.has(card2), "§3: %s sits out, and no ruling named it" % card2)
 	ok(Classes.sits_out("Death Ray", []) and not Classes.sits_out("Death Ray", ["resonance"])
 			and not Classes.sits_out("Arcane Cannon", []),
 		"§3: `Classes.sits_out` does not answer by the table")
 	# (b) THE CENSUS — every card a hero of each class can earn, asked bare.
 	var asked := 0
 	var refused_all: Array = []
+	var met_ruled := {}
 	for key in SEATS:
 		var pop: Array = []
 		for n in Classes.draft_pool(key):
@@ -604,6 +624,8 @@ func _s3_the_card_that_sits_out() -> void:
 			var refused := not _usable(s, u, ab)
 			if refused:
 				refused_all.append(String(card3))
+			if RULED_BY_DESIGNER.has(card3):
+				met_ruled[String(card3)] = refused
 			ok(not refused or RULED.has(card3) or CARD_ROUTES.has(card3),
 				"§3: a %s holding no engine is refused %s, which is neither a row nor a card-conditional card" % [key, card3])
 			ok(refused or not (RULED.has(card3) or CARD_ROUTES.has(card3)),
@@ -614,6 +636,11 @@ func _s3_the_card_that_sits_out() -> void:
 		"§3: the census asked %d cards and %d were refused bare — %d named" % [asked, refused_all.size(), named])
 	for r3 in RULED.keys() + CARD_ROUTES.keys():
 		ok(refused_all.has(r3), "§3: %s was not met in any class's earnable pool" % r3)
+	# THE RULED ROW'S PREMISE: met in an earnable pool and NOT refused bare.
+	for r4 in RULED_BY_DESIGNER:
+		ok(met_ruled.has(r4) and not bool(met_ruled[r4]),
+			"§3: %s is a ruled row, and the census %s — the ruling is no longer why it sits out" % [
+				r4, "never met it" if not met_ruled.has(r4) else "found the door refuses it bare"])
 	print("    the census: %d earnable cards asked with no engine; %d refused — %d rows and %d card-conditional" % [
 		asked, refused_all.size(), RULED.size(), CARD_ROUTES.size()])
 	# (c) THE TEN OPEN BY THEIR OWN ROUTE, STILL WITH NO ENGINE.
@@ -673,8 +700,10 @@ func _s3_the_card_that_sits_out() -> void:
 				for b in s3._beasts(u3):
 					s3._gain_loyalty(u3, b.companion_kind, 3)
 		u3.resource = 99999
-		for card5 in RULED:
-			if RULED[card5] != pid:
+		var every: Dictionary = RULED.duplicate()
+		every.merge(RULED_BY_DESIGNER)
+		for card5 in every:
+			if every[card5] != pid:
 				continue
 			var yes := _usable(s3, u3, Classes.pool_ability(String(card5)))
 			ok(yes, "§3: %s does not open for a %s holding %s — a row its engine cannot open is a card nobody can cast" % [
@@ -682,7 +711,8 @@ func _s3_the_card_that_sits_out() -> void:
 			if yes:
 				opened += 1
 		await _clear(s3)
-	ok(opened == RULED.size(), "§3: %d of %d rows opened with their engine held" % [opened, RULED.size()])
+	ok(opened == RULED.size() + RULED_BY_DESIGNER.size(),
+		"§3: %d of %d rows opened with their engine held" % [opened, RULED.size() + RULED_BY_DESIGNER.size()])
 	# (e) THE DRIVE, ONE ENGINE AT A TIME, THROUGH THE REAL DOORS.
 	for pid2 in ["permafrost", "resonance", "mercy", "conviction", "old_gods", "pack"]:
 		await _drive(pid2)
@@ -694,7 +724,8 @@ func _s3_the_card_that_sits_out() -> void:
 func _drive(pid: String) -> void:
 	var key := Classes.engine_class(pid)
 	var seat := SEATS.find(key)
-	var rows: Array = RULED.keys().filter(func(c): return RULED[c] == pid)
+	var rows: Array = RULED.keys().filter(func(c): return RULED[c] == pid) \
+		+ RULED_BY_DESIGNER.keys().filter(func(c): return RULED_BY_DESIGNER[c] == pid)
 	var control := String(CONTROL.get(key, ""))
 	_seat_party()
 	_run.zone_bosses_cleared = 3

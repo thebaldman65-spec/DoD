@@ -685,10 +685,10 @@ static func draft_pool(class_key: String) -> Array:
 # and its own meter open. **The table is what those two arms disagreed about**
 # (`docs/reports/GP.md` §2). `check_gp` §2 drives both arms for every row.
 #
-# **THREE GROUPS, AND ONLY THE FIRST IS IN THIS TABLE — BUT FOR TWO RULED ROWS:**
+# **THREE GROUPS, AND ONLY THE FIRST IS IN THIS TABLE — BUT FOR THREE RULED ROWS:**
 #   · CANNOT WORK WITHOUT THE ENGINE — refused at the usability door, or it
-#     resolves and the log says it did nothing. **Gated: these 37** (GP's 34 and
-#     GS's three).
+#     resolves and the log says it did nothing. **Gated: these 39** (GP's 34,
+#     GS's three, and HE §3's two zone-boss cards — the table's last block).
 #   · HALF-WORKS — Boil Over deals 22 against 89 and cashes no meter, Drumfire
 #     and Calibrating Shot fire and bank no Focus. **NOT gated**: a card that
 #     still does most of its job is a legitimate offer (GM's narrowing).
@@ -707,7 +707,9 @@ static func draft_pool(class_key: String) -> Array:
 # `check_gp` §2 drives them as rulings (the offer both ways, and the half they
 # keep without the engine printed as the reason the row is a ruling) rather than
 # as a pair that should read apart. **A row carrying `ruled` is never evidence
-# for the derivation, and the derivation is never evidence against it.**
+# for the derivation, and the derivation is never evidence against it.** *BATCH
+# HE §2 rules a third the same way — Mark of the Hunt, Pack Bond's holder's — and
+# it is the first ruled row that also SITS OUT (`SITS_OUT` below).*
 #
 # **THE GATE IS THE HOLDER'S, AND THAT IS EXACTLY RIGHT HERE FOR A REASON WORTH
 # WRITING DOWN.** Five of the eight producers are PARTY-level in the code
@@ -822,6 +824,32 @@ const ENGINE_READ := {
 		"why": "the stance swap — ruled the Stances holder's; without the engine it still lands 15 Break damage and flips a guard only a card reads"},
 	"Lunge": {"engine": "seasoned", "ruled": "HD §1",
 		"why": "the stance-keyed thrust — ruled the Stances holder's; without the engine it still strikes, always down its Aggressive branch"},
+	# ── BATCH HE §3 — THE ZONE BOSS ASKS THIS TABLE NOW, SO ITS BOSS-ONLY CARDS
+	# OWE THEIR ROWS. ──────────────────────────────────────────────────────────
+	# GP derived the table over the DRAFT pools, because the draft was the one
+	# door that asked it; the boss's first tier asked only the pet half (HC §5).
+	# **HE's ruling points the boss at the engine half** (the lineage outlives the
+	# engine it was chosen with, so the boss went on offering cards that need one
+	# the hero no longer holds), and two cards on a lineage's boss pool and on no
+	# draft pool are refused at the usability door on every board without their
+	# engine — GT §3's own derivation, which `check_gt` §3 re-derives every
+	# battery, has had both in `SITS_OUT` since GT. **A card the door refuses
+	# without its engine owes a row here** (the charter block's rule), and until
+	# the boss asked this table the row would have gated nothing. Derived, not
+	# ruled: each reads apart with its engine and without, as every row above.
+	"Stabilize": {"engine": "resonance", "why": "vents Resonance above 2; refused without the meter, which only the engine installs"},
+	"Primal Surge": {"engine": "pack", "why": "spends a companion's Loyalty; refused with none, and none is gained without the engine"},
+	# ── BATCH HE §2 — RULED, NOT DERIVED: MARK OF THE HUNT IS PACK BOND'S. ──
+	# The hunter's two halves — his +25% on the marked prey and the 3% of his Mana
+	# each of his strikes on it restores — are read inside `has_engine("pack")`,
+	# while the companion's halves (its +25%, and the Mana its blows feed back)
+	# read no engine at all: **the card HALF-WORKS without Pack Bond for a Hunter
+	# who fields a companion**, so the cast test would leave it ungated, and it
+	# still paid beside Lethal Aim, where Pack Bond sits out — which made that
+	# tell one card short of true. The designer ruled it Pack Bond's holder's, and
+	# it sits out WITH Pack Bond (`SITS_OUT` below, and `sits_out`'s last clause).
+	"Mark of the Hunt": {"engine": "pack", "ruled": "HE §2",
+		"why": "ruled Pack Bond's — the hunter's halves are read only under the engine, and without it the card still pays the companion's"},
 }
 
 
@@ -953,8 +981,17 @@ static func companion_door(card_name: String) -> bool:
 # Bestial Wrath and Spirit Bond (a companion from an earned Call the Wilds) —
 # conditional on a card or a board, never on an engine. The other seventeen are
 # below, each opened by its engine held (`check_gt` §3 drives both arms).
-# **Two are zone-boss cards `ENGINE_READ` never swept** (Stabilize, Primal
-# Surge); the other fifteen are rows there too, and the engines must agree.
+# **Two were zone-boss cards `ENGINE_READ` never swept** (Stabilize, Primal
+# Surge) — **rows there too since HE §3**, when the zone boss began asking that
+# table — and the other fifteen always were; the engines must agree.
+#
+# **BATCH HE §2 — AND ONE RULED ROW, THE FIRST: MARK OF THE HUNT SITS OUT WITH
+# PACK BOND.** The door does not refuse it without the engine — it lays its mark
+# with none, and a companion's blows on the marked prey pay with none — so the
+# derivation above would never find it, and `ruled` says why it is here: the
+# designer ruled the card Pack Bond's holder's and ruled it off the bar whenever
+# Pack Bond is — unslotted, or sitting out beside the engine that dismisses the
+# pet (`sits_out`'s last clause). `check_gt` §3 drives a ruled row as a ruling.
 #
 # **THE SLOT STAYS COUNTED**, as GM §2 left a dropped bound card's: a card that
 # sits out is still CARRIED, so `Run.ability_slots_used` counts it. Benching it
@@ -977,6 +1014,8 @@ const SITS_OUT := {
 	"Requiem": {"engine": "old_gods", "why": "consumes a Ruin mark; no Ruin is laid without the engine"},
 	"Unleash": {"engine": "pack", "why": "spends a companion's Loyalty; no Loyalty is gained without the engine"},
 	"Primal Surge": {"engine": "pack", "why": "spends a companion's Loyalty; no Loyalty is gained without the engine"},
+	"Mark of the Hunt": {"engine": "pack", "ruled": "HE §2",
+		"why": "ruled Pack Bond's — it sits out whenever Pack Bond does, unslotted or beside the engine that dismisses the pet"},
 }
 
 
@@ -985,14 +1024,30 @@ static func sits_out_engine(card_name: String) -> String:
 	return String(SITS_OUT.get(card_name, {}).get("engine", ""))
 
 
+# Whether a seat row is the designer's ruling rather than the derivation's
+# finding (BATCH HE §2) — `engine_read_ruled`'s question for this table.
+static func sits_out_ruled(card_name: String) -> String:
+	return String(SITS_OUT.get(card_name, {}).get("ruled", ""))
+
+
 # Whether a hero whose slotted engines are `engines` leaves `card_name` out of
 # his next fight. **BATCH HB — OR WHETHER HE HAS DISMISSED THE PET THE CARD
 # NEEDS**: a `COMPANION_READ` row the door refuses with no companion standing
 # sits out while he holds a dismisser, on GT §3's rule, and is seated again the
 # moment he unequips it.
+#
+# **BATCH HE §2 — AND A CARD SITS OUT WITH ITS ENGINE WHEN THE ENGINE ITSELF SITS
+# OUT.** An engine that needs the pet (`engine_needs_pet`: Pack Bond) sits out
+# beside the one that dismisses it (HC §5), so a row keyed to it sits out there
+# too, slotted or not — the ruling's *"let it sit out with Pack Bond"*. **It
+# moves no existing row**: Pack Bond's other two (Unleash, Primal Surge) are
+# `COMPANION_READ` rows the door refuses with no companion, so each already sat
+# out beside a dismisser by the clause above; Mark of the Hunt is the one it adds.
 static func sits_out(card_name: String, engines: Array) -> bool:
 	var e := sits_out_engine(card_name)
 	if e != "" and not engines.has(e):
+		return true
+	if e != "" and engine_needs_pet(e) and dismisses_pet(engines):
 		return true
 	return companion_door(card_name) and dismisses_pet(engines)
 

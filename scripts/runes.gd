@@ -59,27 +59,28 @@ class_name Runes
 
 const DATA_PATH := "res://data/runes.json"
 
-# BATCH ES §1 — WHAT REPLACED THE RARITY LABEL AND COLOUR ON A RUNE INSTANCE.
-# The shop row, the offer button and both pouch lists showed a rarity word and
-# a rarity tint. **SCOPE IS THE SURVIVING AXIS** (§2 makes it the only one), so
-# it is what those surfaces show now: how narrowly a rune is written, which is
-# the one thing about a rune that is not in its description. The palette is
-# carried over UNCHANGED from the three tiers so nothing about the screens
-# moves except what the words mean — broader reads greyer, narrower reads rarer
-# to the eye. **THIS IS NOT RARITY UNDER A NEW NAME**: it drives no odds, no
-# price and no magnitude, and it is derived from a field that decides
-# eligibility rather than from a tier nobody can see.
+# ══ BATCH HE §4 — NO SCOPE BAND ON ANY SURFACE (ruled by the designer) ══════
 #
-# **BATCH HC §1 — THE `spec` BAND IS DELETED WITH THE SCOPE, NOT ZEROED.** No
-# entry carries a spec scope, so no rune built from the data can show one; and a
-# rune instance that rides a save from before HC still says `Spec` in its own
-# fields, which is why every surface asks `shown_scope` below and never the
-# instance's copy. Every authored rune a hero can be offered reads `Class` now —
-# the band still tells a retired universal from a live rune and nothing more.
-const SCOPE_INFO := {
-	"universal": {"label": "Universal", "color": Color(0.8, 0.8, 0.8)},
-	"class": {"label": "Class", "color": Color(0.45, 0.65, 1.0)},
-}
+# **ES §1 PUT A SCOPE BAND WHERE RARITY'S LABEL AND TINT HAD BEEN** — the word and
+# the colour of how narrowly a rune was written: `[Universal]`, `[Class]` and
+# `[Spec]`. HC §1 deleted the spec band with the spec scope, and from then on
+# **every rune a hero can be offered read `[Class]`**, because a rune reaches only
+# its own class: a Warrior only ever sees Warrior runes, so the band was on every
+# rune and told nobody anything. **HE §4 drops it**, from the two surfaces that
+# printed the word (the Peddler's row, a cache's or a bargain's button) and from
+# the five that tinted a rune's text with it (those two, the map card's rune
+# slot, the pouch row and the hero sheet's row). **`SCOPE_INFO` and `shown_scope`
+# are deleted, not zeroed**, and `build` no longer writes `scope_label` /
+# `scope_color` onto an instance: nothing reads either. An instance that rides a
+# save from before HE still carries both, and nothing displays them.
+#
+# **ONE TINT IN THE BAND'S PLACE, AND IT IS THE ONE EVERY LIVE RUNE ALREADY
+# WORE** — the class band's blue — so no rune a player can be offered changes
+# colour; only a retired universal kept in an old save, which read grey, reads the
+# same as the rest. A rune's own text still says what it does; `scope_band`
+# survives for the sim's worn-rune report and the instruments, which read it off
+# the data and show it to nobody.
+const RUNE_TINT := Color(0.45, 0.65, 1.0)
 
 # The generated family's price. It is the Common floor these six already sat
 # on, carried over so nothing moves — NOT a new pricing rule.
@@ -826,29 +827,21 @@ static func display_name(entry: Dictionary) -> String:
 	return String(entry["name"])
 
 
-# BATCH ES §1 — THE SCOPE BAND A SURFACE SHOWS, taking rarity's old slot.
-# "universal" | "class", off the same string `_scope_ok` reads (HC §1 deleted
-# the third band with the scope).
+# BATCH ES §1 — THE SCOPE BAND, "universal" | "class", off the same string
+# `_scope_ok` reads (HC §1 deleted the third band with the scope). **Since HE §4
+# no surface shows it** — `RUNE_TINT`'s block above — and it is read only by
+# the sim's worn-rune report and the instruments.
 static func scope_band(scope: String) -> String:
 	if scope.begins_with("class:"):
 		return "class"
 	return "universal"
 
 
-# **BATCH HC §1 — WHAT A SURFACE SHOWS FOR A RUNE'S BAND, READ LIVE AT ONE DOOR.**
-# `build` writes `scope`, `scope_label` and `scope_color` onto the instance, and
-# the instance rides the save — so a rune bought or cached before the re-scope
-# goes on saying `Spec` in its own fields for the rest of that run. That is GS
-# §3's reason for `shown_desc`, one field over: **the door reads the data by id
-# at render time, never the instance's copy**, so the shop row, the offer
-# button, the pouch, the map's slot and the hero sheet show the scope the rune
-# HAS. A generated stat stick (`tpl_*`) is not in the data and keeps its own.
-static func shown_scope(rune: Dictionary) -> Dictionary:
-	var id := String(rune.get("id", ""))
-	if id != "" and _load().has(id):
-		return SCOPE_INFO[scope_band(String(config(id).get("scope", "universal")))]
-	return {"label": String(rune.get("scope_label", SCOPE_INFO["universal"]["label"])),
-		"color": rune.get("scope_color", SCOPE_INFO["universal"]["color"])}
+# **`shown_scope` STOOD HERE (HC §1) AND WENT WITH THE BAND AT HE §4.** It was the
+# one door the screens asked for a rune's band, reading the data by id so an
+# instance cached before the re-scope could not go on saying `Spec` — GS §3's
+# `shown_desc` reason, one field over. With no surface drawing a band it had no
+# caller, so it is deleted rather than kept for one.
 
 
 # **BATCH HC §1 — A RUNE ROLLS FOR EVERY HERO OF ITS CLASS.** The spec branch
@@ -919,13 +912,50 @@ static func is_retired(id: String) -> bool:
 #     block, or through a meter only the engine installs (Resonance, Mercy,
 #     Focus, Ruin, Faith, Loyalty, the holds), or it modifies a card that is
 #     itself refused without the engine — or, since HC §2, a card that only the
-#     engine brings. **Gated: GV's 35 and HC's one (Layered Aegis), 36.**
-#   · HALF-WORKS — Killing Cold still bites a boss that sits on four Chilled,
-#     Glass Prison still freezes a second body for a turn, Blood Debt still
-#     bills the target. **NOT gated**, GP's reading.
-#   · WORKS WITHOUT ONE, OR FEEDS ONE — a rune reading a status any card lays
-#     (Burn, Chilled, Bleed, Poison), a stance any swap card reaches, a card the
-#     class pool offers, or a companion Call the Wilds fields. **NOT gated.**
+#     engine brings. **Gated: GV's 35 and HC's one (Layered Aegis), 36 — and
+#     the seven RULED rows below (HE §1), 43.**
+#   · HALF-WORKS — Glass Prison still freezes a second body for a turn, Blood
+#     Debt still bills the target. **NOT gated**, GP's reading. *(Killing Cold
+#     stood here until HE §1, below.)*
+#   · WORKS WITHOUT ONE, OR FEEDS ONE — a rune reading a card the class pool
+#     offers, a companion Call the Wilds fields, or nothing at all. **NOT
+#     gated.** *(The runes that read a status any card lays and the one that read
+#     the stance stood here until HE §1.)*
+#
+# **BATCH HE §1 — SEVEN ROWS ARE THE DESIGNER'S RULING, NOT THE DERIVATION, AND
+# EACH SAYS SO IN ITS OWN `ruled` FIELD.** Six read a status or a stance no class
+# kit lays — Burn (Long Fuse), Chilled (Killing Cold, Deep Cold), his own Poison
+# (Long Poison), the Defensive guard (Mirror Guard) and a bleedout
+# (Slaughterhouse) — so HC found them offered to heroes who could not use them;
+# **each is gated on the engine that authored what it reads**, and Bared Plate on
+# Heavy Plating, because its price is Block chance and only that engine gives a
+# Warrior Block to lose. *Gating on ANY source of the status — engine or drafted
+# card — was weighed and rejected: more accurate, and a fourth gate for six runes.*
+# A hero who drafts a status applier without the engine cannot use them; that
+# is the accepted cost.
+#
+# **AND EACH READ SITE ASKS THE SAME ENGINE, SO A ROW HERE IS TRUE AT THE SEAT AS
+# WELL AS AT THE OFFER.** A row sits out with its engine gone (`sits_out`, GX), and
+# GX's sentence — *"Sits out of every fight while the … is not equipped"* — is
+# true only because every row's read site refuses without the engine. None of
+# these seven did: Long Fuse held a Burn a drafted Firestorm lit, Mirror Guard
+# returned blows in a guard Feint reached. So each read site now asks the row's
+# engine — no engine, no payout, and for Bared Plate no price either (GW §3's
+# ruling: the cost is gated with the payout). **Bared Plate's +25% moved to a
+# field of its own** (`rune_bared_plate_bd`, the same 0.25 read at the same line):
+# `rune_bd_bonus` is also written by three RETIRED runes a saved run may still
+# hold, and a gate on the shared field would have withheld theirs.
+#
+# **THE MAPPING, VERIFIED AT EACH READ SITE** (`docs/reports/HE.md` §1): four
+# engines lay what their rows read — Flamewave (Overburn's enabler) lays Burn,
+# Razor Ice (Permafrost's) lays Chilled, and Trapper's barb and on-hit package lay
+# the Survivalist's Poison. **The Stances lay no guard** — a swap card does, and
+# Guard Change is the Stances holder's since HD §1 — they are the engine the
+# stance's numbers are read under. **And no engine lays a Bleed**: Blood Frenzy
+# reads the Berserker's own health and the Rage he spends, and Bloodlust, the
+# card it brings, lays none (GS §1's ruling). Slaughterhouse is gated on the
+# Berserker's engine as the brief names it — the lineage it was written for, and
+# the engine the game's signature table credits a bleedout to (`_sig`, BJ §3a).
 #
 # **TWO OF THE ROWS ARE WORSE THAN NOTHING WITHOUT THEIR ENGINE**, which
 # is a second reason for the row rather than the first: the Martyr's price (no
@@ -990,8 +1020,9 @@ const ENGINE_READ := {
 	"standing_wall": {"engine": "heavy_plating", "why": "halves the plating reset on a block; the climb is the engine's"},
 	"bracing_line": {"engine": "heavy_plating", "why": "reads the plating level; the holder must have the engine"},
 	# SEASONED FIGHTER — the stance's numbers are read only under the engine; a
-	# stance itself is every Warrior's, and the runes that read only the stance
-	# (Mirror Guard) are not here.
+	# stance itself is every Warrior's, and the rune that reads only the stance
+	# (Mirror Guard) was not here until the designer ruled it the Stances holder's
+	# (HE §1, below with the other six).
 	"whetstone": {"engine": "seasoned", "why": "grows the Aggressive term; the stance's numbers are read only under the engine"},
 	"naked_blade": {"engine": "seasoned", "why": "doubles both stances' terms; read only under the engine"},
 	# PACK BOND — `_gain_loyalty` returns at once without the engine, so a
@@ -1008,7 +1039,30 @@ const ENGINE_READ := {
 	# TRAPPER — the barb is read inside the engine's block on the struck hero.
 	"second_barb": {"engine": "trapper", "why": "a second barb on the counter-hit; the barb is the engine's"},
 	"thin_blood": {"engine": "trapper", "why": "a barb on every strike; its price (poison stops biting) reads no engine"},
+	# ── BATCH HE §1 — RULED, NOT DERIVED: the header's last three paragraphs. ──
+	"long_fuse": {"engine": "overburn", "ruled": "HE §1",
+		"why": "holds Burn's clock; Burn is the Pyromancer's, laid by his engine's Flamewave, and the stamp asks the engine"},
+	"killing_cold_fk": {"engine": "permafrost", "ruled": "HE §1",
+		"why": "bills an enemy at maximum Chill; Chilled is the Cryomancer's, laid by his engine's Razor Ice, and the bill asks the engine"},
+	"deep_cold": {"engine": "permafrost", "ruled": "HE §1",
+		"why": "uncaps the Chilled he lays; Chilled is the Cryomancer's, laid by his engine's Razor Ice, and the stamp asks the engine"},
+	"long_poison": {"engine": "trapper", "ruled": "HE §1",
+		"why": "his Poison never expires; the Poison is the Survivalist's, laid by his engine's barb, and `_apply_poison` asks the engine"},
+	"mirror_guard": {"engine": "seasoned", "ruled": "HE §1",
+		"why": "returns blows in the Defensive guard; the stance's numbers are the Stances holder's, and the return asks the engine"},
+	"slaughterhouse_rune": {"engine": "bloodrage", "ruled": "HE §1",
+		"why": "a bleedout buys an action; the Berserker's (no engine lays a Bleed), and the grant asks his engine"},
+	"bared_plate": {"engine": "heavy_plating", "ruled": "HE §1",
+		"why": "trades Block for Break damage; only Heavy Plating gives a Warrior Block to lose, and the price and the payout both ask it"},
 }
+
+
+# Whether a row is the designer's ruling rather than the derivation's finding
+# (BATCH HE §1) — `Classes.engine_read_ruled`'s question one layer up.
+# `offerable` and `sits_out` gate both kinds the same way; only the instruments
+# that DERIVE the table need to tell them apart.
+static func engine_read_ruled(id: String) -> String:
+	return String((ENGINE_READ.get(id, {}) as Dictionary).get("ruled", ""))
 
 
 # The engine a rune reads, or "" for a rune that reads none. **THE ONE ANSWER**,
@@ -1292,6 +1346,25 @@ static func waited_on(ids: Array) -> String:
 	return "the " + " or the ".join(names)
 
 
+# **BATCH HE §3 — THE SAME NAMES FOR CARDS.** The engine runes, by name, that the
+# cards `names` wait on through GP's card gate (`Classes.engine_read`), joined as
+# `waited_on` joins them — for the zone boss's overlay and the draft's column,
+# which since HE hold back a card whose engine is out and must say which rune
+# brings it back. A second builder rather than a widened `waited_on`, because
+# the two tables are keyed by different things (a rune id, a card name) and a
+# name collision between them would read one table through the other.
+static func cards_wait_on(names: Array) -> String:
+	var runes_named: Array = []
+	for n in names:
+		var rid := engine_rune_id(Classes.engine_read(String(n)))
+		var nm := String(config(rid).get("name", "")) if rid != "" else ""
+		if nm != "" and not runes_named.has(nm):
+			runes_named.append(nm)
+	if runes_named.is_empty():
+		return "the engine rune they read"
+	return "the " + " or the ".join(runes_named)
+
+
 # The clause every empty offer site prints after its own em-dash. Kept as a
 # CLAUSE rather than a whole sentence because each site frames it differently —
 # a merchant has nothing to sell, a cache has nothing to drop — and only the
@@ -1473,8 +1546,6 @@ static func template_rune(class_key: String, noun := "",
 	return {
 		"id": "tpl_%s" % String(template["noun"]).to_lower(),
 		"name": "Rune of %s" % template["noun"],
-		"scope_label": SCOPE_INFO["universal"]["label"],
-		"scope_color": SCOPE_INFO["universal"]["color"],
 		"price": TEMPLATE_PRICE,
 		"desc": template["fmt"] % shown,
 		"payload": {"stat": {template["stat"]: value}},
@@ -1487,18 +1558,16 @@ static func template_rune(class_key: String, noun := "",
 # An authored entry as a pouch-ready rune instance (payload int-restored).
 #
 # **BATCH ES §1/§3 — `rarity`, `rarity_color` AND `scarred` ARE GONE FROM THE
-# INSTANCE.** `scope_label` / `scope_color` take the two display slots; the
-# payload, the price and the desc are byte-unchanged, so what the rune DOES and
-# what it COSTS are exactly what they were.
+# INSTANCE**, and **since HE §4 so are `scope_label` / `scope_color`**, the two
+# display slots ES gave the scope band: no surface draws a band. The payload,
+# the price and the desc are byte-unchanged, so what the rune DOES and what it
+# COSTS are exactly what they were.
 static func build(id: String) -> Dictionary:
 	var e: Dictionary = _load()[id]
 	var scope := String(e.get("scope", "universal"))
-	var band: Dictionary = SCOPE_INFO[scope_band(scope)]
 	return {
 		"id": id,
 		"name": display_name(e),
-		"scope_label": String(band["label"]),
-		"scope_color": band["color"],
 		"price": int(e["price"]),
 		"desc": String(e["desc"]),
 		"payload": _typed_payload(e["payload"]),

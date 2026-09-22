@@ -193,9 +193,20 @@ func _test_offers(RunState) -> void:
 			# mechanism that is load-bearing today rather than being deleted.
 			# The size assertion loosened with it: spec pools are 2-5 deep,
 			# and an offer of three is impossible out of a pool of two.
+			# **BATCH HE §3 — THE SEAT CARRIES ITS LINEAGE'S ENGINE, as GK's rule
+			# says a hand-built seat must.** The zone boss asks the card gate's
+			# engine half since HE, so a lineage seated with NO engine rune is not
+			# offered its own engine's boss cards — Shatter, Overcharge, Stabilize,
+			# Divine Plea — and this arm read `min(3, pool)` short for three
+			# lineages (120 red on HEAD's copy against HE's code). The question is
+			# still what the pool the design says it is offers; the hero it is asked
+			# of is now the one class selection hands a player who took the rune.
+			# What the boss withholds from a hero whose engine is out is `check_he`
+			# §4's, both ways.
 			for trial in 40:
 				var m := {"key": class_key, "spec": spec, "bm_abilities": [],
-					"tree": [], "talents": {}}
+					"tree": [], "talents": {}, "awakened": true,
+					"engines": Runes.engine_pouch_for_spec(spec)}
 				var offer: Array = run.roll_spec_ability_offer(m)
 				ok(not offer.is_empty(), "%s is offered something" % spec)
 				ok(offer.size() == mini(3, spec_pool.size()),
@@ -222,7 +233,8 @@ func _test_offers(RunState) -> void:
 			# Nothing is ever re-offered, and the offer SHRINKS as the pool
 			# empties rather than repeating or crashing.
 			var m2 := {"key": class_key, "spec": spec, "bm_abilities": [],
-				"tree": [], "talents": {}}
+				"tree": [], "talents": {}, "awakened": true,
+				"engines": Runes.engine_pouch_for_spec(spec)}
 			for award in 2:
 				var offer2: Array = run.roll_spec_ability_offer(m2)
 				if offer2.is_empty():

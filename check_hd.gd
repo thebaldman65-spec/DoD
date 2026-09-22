@@ -9,14 +9,16 @@
 #       lineage, or of the Swordmaster's with the Stances merely owned — or holding
 #       another engine is offered NEITHER; one holding the Stances, first or second,
 #       is offered BOTH.
-#   §2  THE TWO DOORS THE GATE DOES NOT STAND AT, DRIVEN AND PRINTED — the zone
-#       boss's first tier asks the pet half of `offerable` and not the engine half
-#       (HC §5, ruled), and Lunge is a Swordmaster boss card, so a Warrior of that
-#       lineage who unslots the Stances is still offered it there; and a draft's
-#       ANSWER re-asks no engine (HC's finding), so a stance piece rolled with the
-#       Stances slotted is still taken after they leave. **Both are PRINTED, as
-#       findings owed a ruling, and neither is asserted** — asserting either way
-#       would rule on them. What is asserted is the positive arm beside each.
+#   §2  THE TWO DOORS THE GATE DID NOT STAND AT UNTIL HE §3, DRIVEN AND ASSERTED —
+#       the zone boss's first tier asked the pet half of `offerable` and not the
+#       engine half (HC §5), so a Swordmaster-lineage Warrior who unslotted the
+#       Stances was still offered Lunge there; and a draft's ANSWER re-asked no
+#       engine (HC's finding), so a stance piece rolled with the Stances slotted was
+#       still taken after they left. **HD printed both as findings owed a ruling;
+#       HE §3 ruled both, and they are asserted now** — the boss asks the whole of
+#       `offerable` (0 in 400 unslotted), and the answer refuses a piece whose
+#       engine is out and hands it over once the engine is back, on one member.
+#       Each negative keeps the positive arm beside it.
 #   §3  THE PLAYER'S FILES
 #
 # **A STATIC CHECK CANNOT SEE AN OFFER** (the brief's words, and GP's reason for
@@ -117,15 +119,23 @@ func _s0_the_rows() -> void:
 				p, Classes.engine_read_ruled(p)])
 		ok(Classes.draft_pool("warrior").has(p),
 			"§0: %s is not in the Warrior's one pool — the gate has nothing to withhold" % p)
-	# THE REST OF THE TABLE IS UNTOUCHED BY THE RULING: every other row names no
-	# ruling, so the two cannot be mistaken for the derivation's 37.
+	# THE REST OF THE TABLE IS UNTOUCHED BY THE RULING: no other row names THIS
+	# ruling, so the two cannot be mistaken for the derivation's rows.
+	# **BATCH HE §2 RULED A THIRD ROW, MARK OF THE HUNT, UNDER ITS OWN RULING** —
+	# so this arm asks which rows carry HD §1, the ruling it is about, and prints
+	# the whole ruled set beside it (`check_he` §0 asserts that set).
 	var ruled: Array = []
+	var ruled_hd: Array = []
 	for card in Classes.ENGINE_READ:
-		if Classes.engine_read_ruled(String(card)) != "":
+		var why := Classes.engine_read_ruled(String(card))
+		if why != "":
 			ruled.append(String(card))
+		if why == "HD §1":
+			ruled_hd.append(String(card))
 	ruled.sort()
-	ok(ruled == ["Guard Change", "Lunge"],
-		"§0: the ruled rows are %s — the ruling named two" % str(ruled))
+	ruled_hd.sort()
+	ok(ruled_hd == ["Guard Change", "Lunge"],
+		"§0: the rows ruled at HD §1 are %s — the ruling named two" % str(ruled_hd))
 	print("    %d rows in the card gate, %d of them ruled: %s" % [
 		Classes.ENGINE_READ.size(), ruled.size(), ", ".join(ruled)])
 
@@ -175,21 +185,24 @@ func _s1_every_door() -> void:
 # ── §2 — THE TWO DOORS THE GATE DOES NOT STAND AT ───────────────────────────
 
 func _s2_the_doors_it_does_not_stand_at() -> void:
-	print("\n§2 — the zone boss's first tier and a draft's answer: driven, and PRINTED as findings")
-	# THE ZONE BOSS'S FIRST TIER. Lunge is on the Swordmaster's boss pool, and the
-	# tier asks the PET half of `offerable` alone (HC §5, ruled): the engine half
-	# would move every engine's boss offer, which nobody has ruled.
+	print("\n§2 — the zone boss's first tier and a draft's answer: driven, and asserted since HE §3")
+	# THE ZONE BOSS'S FIRST TIER. Lunge is on the Swordmaster's boss pool. The tier
+	# asked the PET half of `offerable` alone (HC §5) until HE §3 overturned HC's
+	# reason — the lineage outlives the engine it was chosen with — and it asks
+	# the whole of `offerable` now: Lunge with the Stances slotted, never without.
 	var held_m := _warrior("swordmaster", [_eng(STANCES)])
 	var held_boss := _tally(held_m, func(mm): return _run.roll_spec_ability_offer(mm))
 	ok(int(held_boss.get("Lunge", 0)) > 0,
 		"§2: a Swordmaster-lineage Warrior holding the Stances is never offered Lunge by his zone boss (%s)" % str(held_boss))
 	var bare_m := _warrior("swordmaster", [_eng(STANCES, false)])
 	var bare_boss := _tally(bare_m, func(mm): return _run.roll_spec_ability_offer(mm))
-	print("    FINDING (owed a ruling): the zone boss's first tier offered Lunge %d times in %d rolls to a Swordmaster-lineage Warrior whose Stances are UNSLOTTED — it asks no engine (HC §5), as it does not for Shatter, Overcharge or Divine Plea" % [
-		int(bare_boss.get("Lunge", 0)), ROLLS])
+	ok(int(bare_boss.get("Lunge", 0)) == 0,
+		"§2: the zone boss's first tier offered Lunge %d times in %d rolls to a Swordmaster-lineage Warrior whose Stances are UNSLOTTED — it asks the engine half since HE §3" % [
+			int(bare_boss.get("Lunge", 0)), ROLLS])
 	print("      with the Stances slotted: %s · unslotted: %s" % [str(held_boss), str(bare_boss)])
 	# A DRAFT'S ANSWER. A triple stored with the Stances slotted, answered after
-	# they leave: `take_draft_ability` refuses only a card the hero owns.
+	# they leave: `take_draft_ability` refused only a card the hero owns until
+	# HE §3, and re-asks `Classes.offerable` now (`Run.draft_choice`).
 	var ans := _warrior("", [_eng(STANCES)])
 	seed(ROLL_SEED)
 	var piece := ""
@@ -205,10 +218,22 @@ func _s2_the_doors_it_does_not_stand_at() -> void:
 	ok(piece != "",
 		"§2: %d draft rolls to a Warrior holding the Stances stored no stance piece — the positive arm cannot be read" % ROLLS)
 	if piece != "":
+		# THE NEGATIVE: unslotted, the answer refuses and hands nothing over.
 		ans["engines"] = [_eng(STANCES, false)]
 		var why: String = _run.take_draft_ability(ans, piece)
-		print("    FINDING (HC's, reached by the stance pieces now): %s, rolled with the Stances slotted and answered with them unslotted — the answer %s" % [
-			piece, "hands it over" if why == "" else "refuses it (%s)" % why])
+		ok(why != "" and not (ans["bm_abilities"] as Array).has(piece),
+			"§2: %s, rolled with the Stances slotted and answered with them unslotted, was handed over (%s) — the answer re-asks the engine since HE §3" % [
+				piece, "no refusal" if why == "" else why])
+		# THE POSITIVE, ON THE SAME MEMBER: slotted again, the same stored card is
+		# taken — the refusal filtered it and wrote nothing back (GV's rule).
+		ans["engines"] = [_eng(STANCES)]
+		var why2: String = _run.take_draft_ability(ans, piece)
+		ok(why2 == "" and (ans["bm_abilities"] as Array).has(piece),
+			"§2: %s, with the Stances slotted again, was not handed over (%s) — a held card waits stored" % [
+				piece, why2])
+		print("    %s answered unslotted: %s · slotted again: %s" % [
+			piece, "refused (%s)" % why if why != "" else "handed over",
+			"handed over" if why2 == "" else "refused (%s)" % why2])
 
 
 # ── §3 — THE PLAYER'S FILES ─────────────────────────────────────────────────

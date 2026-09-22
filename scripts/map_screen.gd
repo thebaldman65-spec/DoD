@@ -696,7 +696,7 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 			slot_btn.tooltip_text = "%s\n%s\n\nClick to manage %s's runes." % [
 				rune["name"], Runes.shown_desc(rune), key.capitalize()]
 			slot_btn.add_theme_color_override("font_color",
-				Runes.shown_scope(rune)["color"])  # HC §1 — the one door
+				Runes.RUNE_TINT)  # HE §4 — no scope band; one tint
 			# BATCH GX — A FILLED SLOT THAT PAYS NOTHING SAYS SO ON THE MAP
 			# ITSELF, which is the only surface the player reads without
 			# opening anything. **THE MARKER IS IN THE
@@ -984,13 +984,34 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 			# sentence's own (`Runes.empty_offer_reason`), not a new phrasing, and
 			# the pick is HELD rather than spent: unslotting the dismisser is the
 			# player's own button and brings the cards back.
+			#
+			# **BATCH HE §3 — AND WHAT IT HOLDS BACK FOR AN ENGINE.** The answer asks
+			# the engine half now (`Run._card_seated`), so a held-back card has two
+			# causes, split as the rune cache's overlay splits them: the engine's
+			# words are that overlay's (*"wait on X being equipped"*), and the pet's
+			# line is HC's byte for byte. Each cause's return clause sits after its
+			# own line, because EQUIPPING brings back the one and UNEQUIPPING the
+			# other.
 			var ab_held: Array = Run.ability_choice_withheld(member)
+			var ab_slots: Array = Run.held_engines(member)
+			var ab_eng: Array = ab_held.filter(func(n):
+				var e := Classes.engine_read(String(n))
+				return e != "" and not ab_slots.has(e))
+			var ab_pet: Array = ab_held.filter(func(n): return not ab_eng.has(n))
 			if not ab_held.is_empty():
 				var ab_more := Label.new()
-				ab_more.text = "The offer holds %d more that need%s a companion, which the %s dismisses.%s" % [
-					ab_held.size(), "s" if ab_held.size() == 1 else "",
-					Runes.dismisser_name(Run.held_engines(member)),
-					"\nUnequip it and they return." if ab_live.is_empty() else ""]
+				var ab_lines := PackedStringArray()
+				if not ab_eng.is_empty():
+					ab_lines.append("The offer holds %d more that wait%s on %s being equipped.%s" % [
+						ab_eng.size(), "s" if ab_eng.size() == 1 else "",
+						Runes.cards_wait_on(ab_eng),
+						"\nEquip it and they return." if ab_live.is_empty() else ""])
+				if not ab_pet.is_empty():
+					ab_lines.append("The offer holds %d more that need%s a companion, which the %s dismisses.%s" % [
+						ab_pet.size(), "s" if ab_pet.size() == 1 else "",
+						Runes.dismisser_name(ab_slots),
+						"\nUnequip it and they return." if ab_live.is_empty() else ""])
+				ab_more.text = "\n".join(ab_lines)
 				ab_more.add_theme_font_size_override("font_size", 13)
 				ab_more.add_theme_color_override("font_color", Color(0.72, 0.68, 0.62))
 				ab_more.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -1017,12 +1038,13 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 			var triple: Array = Run.rune_choice(member)
 			for i in triple.size():
 				var rune: Dictionary = triple[i]
-				# BATCH HC §1 — the band off the data, never the cached copy: a
-				# triple rolled before the re-scope rides the save saying `Spec`.
-				var band: Dictionary = Runes.shown_scope(rune)
-				_pick_button(box, "%s  [%s]" % [rune["name"], band["label"]],
+				# BATCH HE §4 — NO SCOPE BAND (ruled). The button read
+				# "<name>  [Class]" on every rune a hero can be offered, since a
+				# rune reaches only its own class; the label told nobody anything
+				# and it is gone, with the band's tint (`Runes.RUNE_TINT`).
+				_pick_button(box, String(rune["name"]),
 					Runes.shown_desc(rune),
-					band["color"],
+					Runes.RUNE_TINT,
 					_pick_rune.bind(idx, i), overlay)
 			# ══ BATCH FM §3 — A TRIPLE THAT REPAIRED TO NOTHING STRANDS THE
 			#    PICK, AND THIS IS WHERE IT SHOWED ═══════════════════════════
@@ -1497,8 +1519,15 @@ func _draft_column(overlay: Control, idx: int, at: Vector2) -> void:
 	# NAME (only `mana`/`max_mana` numbers) — the hero card above does the same.
 	var res_name := String(Classes.hero_config(String(member["key"])).get(
 		"resource_name", "Mana"))
+	# **BATCH HE §3 — THROUGH `Run.draft_choice`, NOT OFF THE MEMBER.** The triple
+	# was rolled at the elite and rides the save; the pouch can unslot an engine
+	# before it is answered, and `take_draft_ability` re-asks the card gate at the
+	# pick. A card it would refuse is NOT drawn as a button here — FE's 604 dead
+	# buttons were a correct refusal that left the screen lying — and the column
+	# says what it holds back and which rune brings it back, below the cards.
 	var queue: Array = member.get("draft_candidates", [])
-	var offer: Array = queue[0] if not queue.is_empty() else []
+	var stored: Array = queue[0] if not queue.is_empty() else []
+	var offer: Array = Run.draft_choice(member)
 	for card in offer:
 		var card_name := String(card)
 		var ab: Ability = Classes.pool_ability(card_name)
@@ -1584,12 +1613,54 @@ func _draft_column(overlay: Control, idx: int, at: Vector2) -> void:
 				nums.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 				cards.add_child(nums)
 
+	# BATCH HE §3 — WHAT THE COLUMN HOLDS BACK, SAID RATHER THAN HIDDEN, in the
+	# rune cache's and the zone boss's words: an engine to EQUIP, or the pet's
+	# dismisser to UNEQUIP. Held, not spent: the pick stays owed, the card stays
+	# stored, and `Later` leaves the screen so the pouch can put the engine back.
+	# **DECLINING STILL REFUSES THE WHOLE STORED OFFER** — the held-back cards with
+	# the rest, on the no-return rule — and the all-held line says so, because it
+	# is the one moment a player might decline to clear a column he cannot answer.
+	var held_back: Array = Run.draft_choice_withheld(member)
+	var slots_now: Array = Run.held_engines(member)
+	var hb_owned: Array = held_back.filter(func(n):
+		return Run.owned_ability_names(member).has(String(n)))
+	var hb_eng: Array = held_back.filter(func(n):
+		var e := Classes.engine_read(String(n))
+		return not hb_owned.has(n) and e != "" and not slots_now.has(e))
+	var hb_pet: Array = held_back.filter(func(n):
+		return not hb_owned.has(n) and not hb_eng.has(n))
+	var hb_lines := PackedStringArray()
+	if not hb_eng.is_empty():
+		hb_lines.append("The offer holds %d more that wait%s on %s being equipped." % [
+			hb_eng.size(), "s" if hb_eng.size() == 1 else "",
+			Runes.cards_wait_on(hb_eng)])
+	if not hb_pet.is_empty():
+		hb_lines.append("The offer holds %d more that need%s a companion, which the %s dismisses." % [
+			hb_pet.size(), "s" if hb_pet.size() == 1 else "",
+			Runes.dismisser_name(slots_now)])
+	if not hb_owned.is_empty():
+		hb_lines.append("The offer holds %d this hero already knows." % hb_owned.size())
+	if offer.is_empty() and not held_back.is_empty():
+		hb_lines.append("Nothing in this offer can be taken now. Later keeps the pick owed; declining refuses the whole offer."
+			if hb_owned.size() < held_back.size()
+			else "Nothing in this offer is new to this hero. Declining clears the pick.")
+	if not hb_lines.is_empty():
+		var hb := Label.new()
+		hb.text = "\n".join(hb_lines)
+		hb.add_theme_font_size_override("font_size", 11)
+		hb.add_theme_color_override("font_color", Color(0.72, 0.68, 0.62))
+		hb.custom_minimum_size = Vector2(DRAFT_COL_W - 38, 0)
+		hb.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		cards.add_child(hb)
+
 	# THE OFFER FILLS SHORT rather than padding with repeats (AP §3, unchanged),
 	# and it SAYS SO — a silently short column reads as a bug, and with the
 	# per-run ledger four columns can now go short at different rates.
-	if offer.size() < 3:
+	# **BATCH HE §3 — READ OFF THE STORED TRIPLE, NOT THE LIVE LIST**: a card held
+	# back for an engine is not a pool that ran dry, and the line above names it.
+	if stored.size() < 3:
 		var short := Label.new()
-		short.text = "Nothing further left to offer this run." if offer.is_empty() \
+		short.text = "Nothing further left to offer this run." if stored.is_empty() \
 			else "The pool holds no more to offer this run."
 		short.add_theme_font_size_override("font_size", 11)
 		short.add_theme_color_override("font_color", Color(0.55, 0.53, 0.5))
@@ -1974,7 +2045,7 @@ func _open_rune_panel(idx: int) -> void:
 		lbl.text = "%s%s — %s" % ["✦ " if is_on else "", rune["name"], Runes.shown_desc(rune)]
 		lbl.add_theme_font_size_override("font_size", 12)
 		lbl.add_theme_color_override("font_color", Color(0.45, 0.9, 0.5) if is_on
-			else Runes.shown_scope(rune)["color"])  # HC §1 — the one door
+			else Runes.RUNE_TINT)  # HE §4 — no scope band; one tint
 		# BATCH GX — WORN, AND SITTING OUT. The row says so in place of the
 		# rune's own text, because this is the panel where the engine it waits
 		# on is re-slotted and where the slot it holds can be freed; the

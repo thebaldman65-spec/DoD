@@ -2,15 +2,15 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1506,
-  "source": 1154,
-  "other": 102,
+  "total": 1511,
+  "source": 1157,
+  "other": 104,
   "document": 250
  },
  "source_residency": {
-  "narrow": 39,
-  "code": 687,
-  "absent": 304,
+  "narrow": 40,
+  "code": 688,
+  "absent": 305,
   "runtime": 80,
   "unresolved": 1,
   "comment": 40,
@@ -2185,7 +2185,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#195"
+   "g": "check_fd.gd#198"
   },
   {
    "s": "check_fd.gd",
@@ -2196,7 +2196,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#181"
+   "g": "check_fd.gd#184"
   },
   {
    "s": "check_fd.gd",
@@ -2207,7 +2207,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#194"
+   "g": "check_fd.gd#197"
   },
   {
    "s": "check_fd.gd",
@@ -2218,7 +2218,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#180"
+   "g": "check_fd.gd#183"
   },
   {
    "s": "check_fd.gd",
@@ -2229,7 +2229,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#182"
+   "g": "check_fd.gd#185"
   },
   {
    "s": "check_fd.gd",
@@ -2240,7 +2240,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#189"
+   "g": "check_fd.gd#192"
   },
   {
    "s": "check_fd.gd",
@@ -2251,7 +2251,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#197"
+   "g": "check_fd.gd#200"
   },
   {
    "s": "check_fd.gd",
@@ -2262,7 +2262,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#189"
+   "g": "check_fd.gd#192"
   },
   {
    "s": "check_fe.gd",
@@ -3424,7 +3424,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_hc.gd#111",
+   "g": "check_hc.gd#106",
    "alt": true
   },
   {
@@ -3436,19 +3436,19 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_hc.gd#111",
+   "g": "check_hc.gd#106",
    "alt": true
   },
   {
    "s": "check_hc.gd",
    "fn": "_s1_the_scope",
    "h": "",
-   "n": "Runes.shown_scope(",
+   "n": "Runes.RUNE_TINT",
    "p": "+",
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_hc.gd#113"
+   "g": "check_hc.gd#110"
   },
   {
    "s": "check_hc.gd",
@@ -3459,7 +3459,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_hc.gd#111",
+   "g": "check_hc.gd#106",
    "alt": true
   },
   {
@@ -3471,8 +3471,65 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_hc.gd#111",
+   "g": "check_hc.gd#106",
    "alt": true
+  },
+  {
+   "s": "check_hc.gd",
+   "fn": "_s1_the_scope",
+   "h": "",
+   "n": "scope_band(",
+   "p": "+",
+   "r": "missing-file",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hc.gd#108",
+   "alt": true
+  },
+  {
+   "s": "check_hc.gd",
+   "fn": "_s1_the_scope",
+   "h": "",
+   "n": "shown_scope(",
+   "p": "+",
+   "r": "missing-file",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hc.gd#108",
+   "alt": true
+  },
+  {
+   "s": "check_he.gd",
+   "fn": "_s0_the_rows",
+   "h": "scripts/unit.gd",
+   "n": "var rune_bared_plate_bd := 0.0",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_he.gd#178"
+  },
+  {
+   "s": "check_he.gd",
+   "fn": "_s6_the_band",
+   "h": "scripts/runes.gd",
+   "n": "SCOPE_INFO",
+   "p": "-",
+   "r": "narrow",
+   "k": "literal",
+   "how": "read",
+   "g": "check_he.gd#436"
+  },
+  {
+   "s": "check_he.gd",
+   "fn": "_s6_the_band",
+   "h": "scripts/runes.gd",
+   "n": "func shown_scope",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_he.gd#436"
   },
   {
    "s": "test_batch_ah.gd",

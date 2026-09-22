@@ -4,6 +4,40 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Gates and doors (Batch HE) — 2026-09-22
+
+**Why six runes follow the engine that lays what they read.** Long Fuse, Killing Cold, Deep Cold, Long Poison, Mirror
+Guard and Slaughterhouse read a status or a stance that no class kit lays, so after the runes moved to their classes
+they were offered to heroes with nothing that could pay them. Gating each on any source of its status — the engine or
+a drafted card — would be more accurate, and it needs a fourth kind of gate for six runes. Gating each on the engine
+that authored the status is one table everybody already reads. The cost is accepted on purpose: a hero who drafts a
+Burn card without the Pyromancer's engine cannot use Long Fuse.
+
+**Why the runes also stop paying without the engine, not only stop being offered.** A rune held without its engine is
+shown as sitting out, and that sentence is only true if it pays nothing. These six (and Bared Plate) had always paid
+whenever their status was present, so the gate had to reach the line that pays them as well as the offer.
+
+**Why Bared Plate belongs to Heavy Plating.** Its price is the Block roll, and a Warrior without Heavy Plating has almost
+no Block to give up — the rune was a free +25% Break damage for most of them. A tradeoff whose cost exists for one
+engine's holder belongs to that holder.
+
+**Why Mark of the Hunt sits out with Pack Bond.** Half the card pays only under Pack Bond and the card never said so,
+and it still paid beside Lethal Aim, where Pack Bond is supposed to do nothing. Gating it on Pack Bond, and letting it
+sit out whenever Pack Bond does, makes the card honest and makes Pack Bond's "sits out" true in one move.
+
+**Why the zone boss asks about engines now.** It was left off because it would move every engine's boss offer. But the
+lineage a hero chose stays with him after he drops the engine, so the boss kept offering cards that need an engine he
+no longer holds. Every other door already asked; this one does too. Two boss cards that already sit out without their
+engine had never been gated only because the gate had never been asked there, so they are gated with the rest.
+
+**Why the draft asks again when the card is taken.** The cards are rolled after the elite and chosen later, and an
+engine can be unslotted in between — the same gap the rune cache and the boss offer already close. The held card is
+kept rather than thrown away, because putting the engine back is one press, and the draft screen shows no button for
+it: a button that refuses when pressed is a screen lying about what it offers.
+
+**Why the scope label went.** Every rune a hero can be offered is his own class's, so every one read "[Class]". A label
+on everything distinguishes nothing.
+
 ## The twenty holes, and the pool floors folded (Batch HD) — 2026-09-21
 
 **Why the stance pieces are the Stances holder's.** Guard Change and Lunge are the two cards a Swordmaster's stances

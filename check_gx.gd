@@ -269,9 +269,14 @@ func _s1_the_predicate() -> void:
 	# the requirement, so it joined `Runes.ENGINE_READ`. The populations are still
 	# derived from the table and the file (`_populations`); these two lines are
 	# the ruling's count, and they move only when a row does.
-	ok(_gated.size() == 36, "§1: %d gated runes — the table holds 36 (GV's 35 and HC's Layered Aegis)" % _gated.size())
-	ok(_ungated.size() == 24, "§1: %d ungated live ordinary runes — 24 since HC" % _ungated.size())
-	# THE GATED THIRTY-FIVE: out without the engine, in with it. Both arms.
+	# **BATCH HE §1 — 43 AND 17: SEVEN RULED ROWS.** Long Fuse, Killing Cold,
+	# Deep Cold, Long Poison, Mirror Guard, Slaughterhouse and Bared Plate read a
+	# status or a stance no class kit lays (or a price only one engine gives), and
+	# the designer gated each on its engine. Each read site asks the engine too, so
+	# each sits out without it, and every arm below walks them as rows.
+	ok(_gated.size() == 43, "§1: %d gated runes — the table holds 43 (GV's 35, HC's Layered Aegis and HE's seven)" % _gated.size())
+	ok(_ungated.size() == 17, "§1: %d ungated live ordinary runes — 17 since HE" % _ungated.size())
+	# THE GATED FORTY-THREE: out without the engine, in with it. Both arms.
 	var out_without := 0
 	var in_with := 0
 	for rid in _gated:
@@ -292,11 +297,12 @@ func _s1_the_predicate() -> void:
 	ok(out_without == _gated.size() and in_with == _gated.size(),
 		"§1: %d of %d sit out with the engine out and %d of %d pay with it in" % [
 			out_without, _gated.size(), in_with, _gated.size()])
-	# THE PAIRED POSITIVE: the other 25 never sit out, on any engine set —
+	# THE PAIRED POSITIVE: the other 17 never sit out, on any engine set —
 	# **BATCH HB: ON ANY SET THAT FIELDS A PET.** Four of them need a companion
 	# (`Runes.COMPANION_READ`), and a hero holding the engine that dismisses the
 	# pet fields none, so those four sit out beside it and for nobody else; the
-	# other twenty-one never sit out at all. Both halves on every rune.
+	# other thirteen never sit out at all (HE §1 took seven into the table, none a
+	# companion rune). Both halves on every rune.
 	var never := 0
 	var pet_out := 0
 	for uid in _ungated:

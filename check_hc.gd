@@ -1,9 +1,10 @@
 # BATCH HC — THE RUNES LEAVE THEIR SPECS.
 #
 #   §1  THE SCOPE'S DOORS — `_scope_ok` passes a rune's own class and universal and
-#       refuses a `spec:` entry and another class's; `shown_scope` reads the band off
-#       the data, so an instance cached before HC — its own fields saying `Spec` —
-#       shows `Class`; and no screen reads a band off an instance
+#       refuses a `spec:` entry and another class's; and a stale band reaches no
+#       screen — HC's `shown_scope` read it off the data; since HE §4 no screen shows
+#       a band at all, none reads one off an instance or asks for one, and a rune
+#       built today carries none
 #   §2  LAYERED AEGIS AT A CACHE'S ANSWER — rolled with Conviction slotted and
 #       answered with it out: nothing handed over and all three kept stored; slotted
 #       again, all three handed back; and it sits out without the engine
@@ -171,32 +172,35 @@ func _s1_the_scope() -> void:
 		"§1: `_scope_ok` passes a Warrior a Mage rune")
 	ok(not Runes._scope_ok({"scope": "spec:berserker"}, w),
 		"§1: `_scope_ok` passes a `spec:` entry for its own lineage — the spec branch is back, and a scope is read as a spec after the data stopped being one")
-	# AN INSTANCE CACHED BEFORE HC: its own fields say Spec, and the band a screen
-	# shows is the data's.
-	var old: Dictionary = Runes.build("bared_plate")
-	old["scope"] = "spec:warden"
-	old["scope_label"] = "Spec"
-	old["scope_color"] = Color(0.8, 0.5, 1.0)
-	var band: Dictionary = Runes.shown_scope(old)
-	ok(String(band.get("label", "")) == "Class",
-		"§1: a rune cached before HC shows the band its own fields carry (%s) — the door read the instance" % band.get("label", ""))
-	# AND THE PAIRED ARM: a generated stick is in no data, so its own band stands.
-	var stick := {"id": "tpl_hc_probe", "scope_label": "Universal", "scope_color": Color(0.8, 0.8, 0.8)}
-	ok(String(Runes.shown_scope(stick).get("label", "")) == "Universal",
-		"§1: a rune the data does not hold lost its own band — the door no longer falls back")
-	# NO SCREEN READS A BAND OFF AN INSTANCE; EVERY ONE ASKS THE DOOR.
+	# AN INSTANCE CACHED BEFORE HC carries `Spec` in its own band fields, and HC's
+	# door (`shown_scope`) read the band off the data so no screen showed it.
+	# **BATCH HE §4 — NO SCREEN SHOWS A BAND AT ALL (ruled), SO THE QUESTION IS
+	# REPAIRED TO WHAT IT WAS FOR: A STALE BAND REACHES NO SURFACE.** The door is
+	# deleted with the band; what keeps an old instance's `Spec` off the screens is
+	# that none reads its band fields (below), none asks a band door, and a rune
+	# built today carries no band to go stale.
+	var fresh: Dictionary = Runes.build("bared_plate")
+	ok(not fresh.has("scope_label") and not fresh.has("scope_color"),
+		"§1: a rune built today still carries a band (%s) — it would ride the save and go stale as HC's did" % str(fresh.keys()))
+	# NO SCREEN READS A BAND OFF AN INSTANCE, AND NONE ASKS FOR ONE; ALL THREE DRAW
+	# A RUNE IN THE ONE TINT — the positive arm, so a screen that stopped drawing
+	# runes cannot pass for one that stopped drawing bands.
 	var readers: Array = []
 	var askers := 0
+	var tinted := 0
 	for f in ["scripts/shop_screen.gd", "scripts/map_screen.gd", "scripts/party_screen.gd"]:
 		var src := Gate.strip_comments(FileAccess.get_file_as_string("res://" + String(f)))
 		ok(src != "", "§1: %s read back empty" % f)
 		if src.contains("[\"scope_label\"]") or src.contains("[\"scope_color\"]") \
 				or src.contains(".get(\"scope_label\"") or src.contains(".get(\"scope_color\""):
 			readers.append(f)
-		if src.contains("Runes.shown_scope("):
+		if src.contains("shown_scope(") or src.contains("scope_band("):
 			askers += 1
+		if src.contains("Runes.RUNE_TINT"):
+			tinted += 1
 	ok(readers.is_empty(), "§1: %s read a rune's band off the instance, which rides the save" % [readers])
-	ok(askers == 3, "§1: %d of the three screens that show a band ask `Runes.shown_scope`" % askers)
+	ok(askers == 0, "§1: %d of the three screens ask for a rune's band — HE §4 dropped it from every surface" % askers)
+	ok(tinted == 3, "§1: %d of the three screens draw a rune in `Runes.RUNE_TINT` — the band's tint went, the rune did not" % tinted)
 
 
 # ── §2 — LAYERED AEGIS AT A CACHE'S ANSWER ──────────────────────────────────

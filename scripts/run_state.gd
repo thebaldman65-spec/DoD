@@ -1859,6 +1859,8 @@ func rune_choice_withheld(member: Dictionary) -> Array:
 #
 #   `rune_candidates`     elite cache / bargain -> `_pick_rune`      RE-ASKED (FD)
 #   `draft_candidates`    elite victory        -> `take_draft_ability`  RE-ASKED
+#                         (ownership only, until HE §3 re-asked the card gate —
+#                         `draft_choice`, the list the screen draws)
 #   `pending_item_offers` loot / relic / event -> `_check_item_offers`  RE-ASKED
 #   `bm_candidates`       ZONE BOSS            -> `_pick_ability`       RE-ASKED (FE)
 #   `up_candidates`       MINI-BOSS            -> `_pick_upgrade`       RE-ASKED (FE)
@@ -1931,7 +1933,7 @@ func ability_choice(member: Dictionary) -> Array:
 			continue
 		kept.append(nm)
 	if kept.size() == triple.size():
-		return _pet_seated(member, triple)
+		return _card_seated(member, triple)
 	while kept.size() < 3:
 		var fresh := _ability_topup(member, kept)
 		if fresh == "":
@@ -1939,7 +1941,7 @@ func ability_choice(member: Dictionary) -> Array:
 		kept.append(fresh)
 	queue[0] = kept
 	member["bm_candidates"] = queue
-	return _pet_seated(member, kept)
+	return _card_seated(member, kept)
 
 
 # ══ BATCH HC §5 — THE PET GATE HOLDS AT THE BOSS OFFER'S ANSWER, NOT ONLY AT ITS
@@ -1954,13 +1956,20 @@ func ability_choice(member: Dictionary) -> Array:
 # every answer — unslot the dismisser and it is offered again. Nothing is drawn,
 # so it is not a reroll. **The render and the pick read this same list**, and
 # `_pick_ability` refuses a name that is not in it.
-func _pet_seated(member: Dictionary, names: Array) -> Array:
-	var held: Array = held_engines(member)
-	return names.filter(func(n): return not Classes.pet_withholds(String(n), held))
+#
+# **BATCH HE §3 — AND THE ENGINE HALF, AT THE ANSWER AS AT THE ROLL (ruled).** It
+# was `_pet_seated` and asked `Classes.pet_withholds` alone; it asks the whole of
+# `Classes.offerable` now, because the roll does (`roll_spec_ability_offer`) and a
+# door that asks at the roll and not at the answer is FD's hole. A Lunge rolled
+# while the Stances were slotted is held back once they are unslotted, and stays
+# stored: slot them again and it returns.
+func _card_seated(member: Dictionary, names: Array) -> Array:
+	return Classes.offerable(names, held_engines(member))
 
 
-# The queued names the pet gate is holding back from the head triple, for the
-# overlay's sentence. Asks `ability_choice` first, so FE's repair has run.
+# The queued names the card gate is holding back from the head triple, for the
+# overlay's sentence — the pet half, and since HE §3 the engine half. Asks
+# `ability_choice` first, so FE's repair has run.
 func ability_choice_withheld(member: Dictionary) -> Array:
 	var live: Array = ability_choice(member)
 	var queue: Array = member.get("bm_candidates", [])
@@ -2280,11 +2289,24 @@ func sitting_out_names(member: Dictionary) -> Array:
 # clause is GT's word for word and only the middle lines change, which is what
 # `engines` is for: the hero's SLOTTED engines, so the sentence names the cause
 # that holds. Left empty it reads the engine cause alone, as it always did.
+#
+# **BATCH HE §2 — AND A THIRD CAUSE: THE CARD'S ENGINE IS SLOTTED AND SITS OUT.**
+# Mark of the Hunt sits out with Pack Bond (ruled), and beside the Rune of the
+# Sharpshooter Pack Bond is EQUIPPED and sitting out — so the engine's words
+# (*"is not equipped"*) would be false, and the pet's (*"the companion it
+# needs"*) would say the card needs a companion, which it does not. The middle
+# names the chain; the opening clause and the two closing lines are GT's.
 func sits_out_note(card_name: String, engines: Array = []) -> String:
 	var eng := Classes.sits_out_engine(card_name)
 	if (eng == "" or engines.has(eng)) and Classes.companion_door(card_name) \
 			and Classes.dismisses_pet(engines):
 		return "Sits out of every fight while the\n%s\nStill carried: the slot stays counted.\nBenching the card frees the slot." % _dismisser_clause(engines)
+	if eng != "" and engines.has(eng) and Classes.engine_needs_pet(eng) \
+			and Classes.dismisses_pet(engines):
+		var own_rid := Runes.engine_rune_id(eng)
+		return "Sits out of every fight while the\n%s sits out beside\nthe %s, which\ndismisses the companion it needs.\nStill carried: the slot stays counted.\nBenching the card frees the slot." % [
+			String(Runes.config(own_rid).get("name", "engine rune it needs")),
+			Runes.dismisser_name(engines)]
 	var rid := Runes.engine_rune_id(eng)
 	var rune_name := String(Runes.config(rid).get("name", "")) if rid != "" else ""
 	if rune_name == "":
@@ -2517,6 +2539,57 @@ func owed_draft_picks() -> int:
 	return n
 
 
+# ══ BATCH HE §3 — THE DRAFT'S ANSWER, RE-ASKED ═════════════════════════════
+#
+# **WHAT THE PARTY DRAFT SCREEN DRAWS AND WHAT `take_draft_ability` TAKES ARE ONE
+# LIST**: the head triple, less what the hero now owns and what the card gate
+# withholds from the engines he now has slotted (`Classes.offerable`, both
+# halves). **IT FILTERS AND WRITES NOTHING BACK** — GV's rule for a state the
+# player can undo: unslotting an engine is one press from being undone, so the
+# withheld card stays in `draft_candidates` and returns the moment the engine
+# does. Nothing is drawn, so it is not a reroll (BATCH X's rule). A card he owns
+# can only leave (his pool never shrinks), and it is filtered here too, for FE's
+# reason: a name the answer refuses must not be a button the screen draws — two
+# triples queued before either is answered can share a card, and taking it from
+# the first left it a dead button in the second.
+func draft_choice(member: Dictionary) -> Array:
+	var queue: Array = member.get("draft_candidates", [])
+	if queue.is_empty():
+		return []
+	var owned: Array = owned_ability_names(member)
+	var fresh: Array = (queue[0] as Array).filter(func(n): return not owned.has(String(n)))
+	return Classes.offerable(fresh, held_engines(member))
+
+
+# The head triple's names `draft_choice` holds back, for the screen's sentence.
+func draft_choice_withheld(member: Dictionary) -> Array:
+	var queue: Array = member.get("draft_candidates", [])
+	if queue.is_empty():
+		return []
+	var live: Array = draft_choice(member)
+	var out: Array = []
+	for c in queue[0]:
+		if not live.has(String(c)):
+			out.append(String(c))
+	return out
+
+
+# Why `draft_choice` holds `name` back — the refusal `take_draft_ability` returns
+# and the clause the screen prints — in the rune cache's and the zone boss's
+# words: an engine to EQUIP, or a dismisser to UNEQUIP.
+func draft_withheld_reason(member: Dictionary, name: String) -> String:
+	if owned_ability_names(member).has(name):
+		return "already known"
+	var held: Array = held_engines(member)
+	var eng := Classes.engine_read(name)
+	if eng != "" and not held.has(eng):
+		return "%s waits on %s being equipped" % [name, Runes.cards_wait_on([name])]
+	if Classes.pet_withholds(name, held):
+		return "%s needs a companion, which the %s dismisses" % [name,
+			Runes.dismisser_name(held)]
+	return ""
+
+
 # TAKE ONE. At the cap this is take-one-AND-BENCH-ONE: the caller names the
 # earned ability the incoming card displaces from the LOADOUT, and a name that
 # is not an EARNED ability is refused outright — a protected ability can never
@@ -2526,6 +2599,16 @@ func owed_draft_picks() -> int:
 # cap you still choose — because the complaint the batch answers is that the
 # choice was PERMANENT, not that it existed.
 # Returns "" on success, or the reason it was refused.
+#
+# **BATCH HE §3 — IT RE-ASKS THE GATE AT THE PICK (ruled).** The triple is rolled
+# at the elite through `Classes.offerable` and answered on the party draft
+# screen, and the pouch can unslot an engine in between — so a Guard Change
+# rolled while the Stances were slotted was handed over after they left (HD drove
+# it), and then sat out or half-worked. The rune cache and the zone boss re-ask
+# at the answer; this door did not. **FD's shape — roll at the drop, answer later
+# — at the one door that never got the fix.** It asks `draft_choice`, the list
+# the screen draws its buttons from, so a withheld card is refused here and is
+# never a button there.
 func take_draft_ability(member: Dictionary, name: String,
 		bench_name := "") -> String:
 	if int(member.get("draft_picks_owed", 0)) < 1:
@@ -2535,6 +2618,9 @@ func take_draft_ability(member: Dictionary, name: String,
 		return "that card is not in the offer"
 	if owned_ability_names(member).has(name):
 		return "already known"
+	if not draft_choice(member).has(name):
+		var held_why := draft_withheld_reason(member, name)
+		return held_why if held_why != "" else "that card is held back"
 	if ability_slots_full(member):
 		if bench_name == "":
 			return "the kit is full — name an ability to bench"
@@ -3964,21 +4050,30 @@ func buy_blacksmith(pairing: Dictionary) -> bool:
 # **BATCH HC §5 — AND IT ASKS THE PET GATE (ruled by the designer).** HB found a
 # Beastmaster-lineage Hunter holding Lethal Aim offered Bestial Wrath, Spirit
 # Bond and Primal Surge here — companion cards that sit out for him. The boss
-# pools stay spec-keyed (GP), and **only the pet half of `Classes.offerable` is
-# asked** — `Classes.pet_withholds` — because the ruling is about the companion:
-# the engine half would move every engine's boss offer, which nobody ruled. A
-# card withheld here is withheld from the roll and from the top-up
-# `ability_choice` reads through this function; a triple rolled before the pet
-# was dismissed is filtered at its answer (`ability_choice`), not repaired away.
+# pools stay spec-keyed (GP). A card withheld here is withheld from the roll and
+# from the top-up `ability_choice` reads through this function; a triple rolled
+# before the pet was dismissed is filtered at its answer (`ability_choice`), not
+# repaired away.
+#
+# **BATCH HE §3 — AND THE ENGINE HALF, BY RULING: IT ASKS THE WHOLE OF
+# `Classes.offerable` NOW.** HC asked the pet half alone, reasoning that the
+# engine half would move every engine's boss offer. **That reasoning is
+# overturned, and the reason is recorded: the lineage outlives the engine it was
+# chosen with**, so a hero who drops his engine keeps his lineage's boss pool and
+# went on being offered cards that need the engine he no longer holds — Lunge
+# 280 times in 400 to a Swordmaster whose Stances were unslotted (HD). Every
+# other door that offers a card asks both halves; this one does now. What moves
+# is every boss card with a row in the card gate: Lunge, Shatter, Overcharge and
+# Divine Plea, which always had one; Stabilize and Primal Surge, which GT's seat
+# derivation had and this table never swept until the boss asked it; and Mark of
+# the Hunt, ruled Pack Bond's at HE §2 (`docs/reports/HE.md` §3).
 func roll_spec_ability_offer(member: Dictionary) -> Array:
 	var spec := String(member.get("spec", ""))
 	if spec == "":
 		return []
 	var owned: Array = owned_ability_names(member)
-	var held: Array = held_engines(member)
-	var left: Array = Classes.spec_pool(spec).filter(
-		func(n): return not owned.has(n) \
-			and not Classes.pet_withholds(String(n), held))
+	var left: Array = Classes.offerable(Classes.spec_pool(spec).filter(
+		func(n): return not owned.has(n)), held_engines(member))
 	left.shuffle()
 	return left.slice(0, 3)
 

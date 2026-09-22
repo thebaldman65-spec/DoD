@@ -16,6 +16,59 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-09-22 &mdash; Batch HE: GATES AND DOORS</h2>
+<p><b>What a hero is offered, and at which door, follows the engine he holds.</b> IMPLEMENT ONLY. HC and HD each
+left follow-ups about offers and doors; the designer ruled them all, and this batch builds them. The other stale
+checks HA found move to <b>HF</b>. Full working: <code>docs/reports/HE.md</code>.</p>
+
+<p><b>&sect;1 &mdash; SEVEN RUNES FOLLOW THEIR ENGINE.</b> Six runes read a status or a stance that no class kit
+lays, and were offered to heroes with nothing that could pay them: <b>Long Fuse</b> (Burn) is now the Rune of the
+Pyromancer's, <b>Killing Cold</b> and <b>Deep Cold</b> (Chilled) the Rune of the Cryomancer's, <b>Long Poison</b> the
+Rune of the Survivalist's, <b>Mirror Guard</b> (the Defensive guard) the Rune of the Swordmaster's and
+<b>Slaughterhouse</b> (a bleedout) the Rune of the Berserker's. <b>Bared Plate</b> is the Rune of the Warden's: it trades
+Block, and only Heavy Plating gives a Warrior Block to lose. Each is offered only while its engine rune is equipped,
+and <b>one already worn pays nothing, and costs nothing, while it is not</b> &mdash; the screens already said such a
+rune sits out, and now that is true of these seven too. A hero holding no engine is offered fewer runes: a Warrior
+two at spawn where he was offered five, a Mage none where he was offered three, a Hunter four where he was offered
+five. Bared Plate's +25% Break damage moved to a field of its own (the same 0.25), so three retired runes that share
+the old field keep paying in an old save.</p>
+
+<p><b>&sect;2 &mdash; MARK OF THE HUNT IS PACK BOND'S.</b> Its hunter's half paid only under Pack Bond, and it still
+paid beside the Rune of the Sharpshooter, where Pack Bond is shown sitting out. It is offered only with the Rune of
+the Beastmaster equipped and <b>sits out whenever Pack Bond does</b> &mdash; unequipped, or beside the Rune of the
+Sharpshooter &mdash; so Pack Bond's "sits out" is now true. The card's text is unchanged; new wording is proposed in the
+report for the designer to confirm.</p>
+
+<p><b>&sect;3 &mdash; TWO DOORS THAT DID NOT ASK AGAIN.</b> <b>The zone boss asks about engines.</b> A hero keeps his
+lineage's boss pool after he unequips the engine he chose it with, so the boss kept offering cards needing an engine he
+no longer held. Lunge, Shatter, Overcharge and Divine Plea now wait on their engine rune, and so do Stabilize and
+Primal Surge, which already sat out without theirs, and Mark of the Hunt. A stored boss offer holds such a card back,
+says which rune brings it back, and offers it again when that rune is equipped. <b>The draft asks again when a card is
+taken</b>: a card drawn after an elite while its engine was equipped, and chosen after the engine was unequipped, is
+held back rather than handed over; the draft screen shows no button for it and says which rune brings it back.</p>
+
+<p><b>&sect;4 &mdash; NO "[Class]" LABEL.</b> Every rune a hero is offered is his own class's, so the label was on every
+rune and meant nothing. It is gone from the Peddler and from a cache's and a bargain's buttons, and a rune's text is
+drawn in one colour everywhere.</p>
+
+<p><b>&sect;5 &mdash; CHARGE'S PINS ARE RELABELLED</b> as the designer's reprice (20 Break damage, 30 Rage) measured against
+the free Strike, so they are not mistaken for the retired "weaker" rule.</p>
+
+<p><b>NEW GATE <code>check_he</code></b> drives every door above &mdash; the Peddler, an elite cache answered a node later, a
+bargain, the zone boss and the draft &mdash; 400 rolls an arm, for a hero holding each gating engine and one holding
+none, every negative beside a positive. <b>Eight checks were repaired</b> because they read the old game: three counted
+the rune gate's rows or the ruled card rows (<code>check_gv</code>, <code>check_gx</code>, <code>check_hd</code>, whose two
+findings are asserted now that they are built), one read Mark of the Hunt's seat row as a mistake
+(<code>check_gt</code>), two found a rune's row or button by its <code>[Class]</code> label (<code>check_fd</code>,
+<code>check_gs</code>), one asked the deleted band door (<code>check_hc</code>), and one seated a lineage without its engine
+rune (<code>test_batch_ah</code>); <code>test_batch_br</code> is &sect;5. <b>WHAT MOVED:</b> <code>scripts/battle.gd</code>,
+<code>scripts/unit.gd</code>, <code>scripts/runes.gd</code>, <code>scripts/classes.gd</code>, <code>scripts/run_state.gd</code>,
+<code>scripts/map_screen.gd</code>, <code>scripts/shop_screen.gd</code>, <code>scripts/party_screen.gd</code> and a comment in
+<code>scripts/run_sim.gd</code>; <code>data/runes.json</code> (Bared Plate's payload key, nothing else); the gates above and
+the two suites; <code>check_he.gd</code> (new), <code>run_battery.sh</code>, <code>pin-manifest.json</code>,
+<code>baselines.json</code>; <code>CLAUDE.md</code>, <code>docs/master.html</code> and its stamp, <code>docs/design-notes.md</code>,
+<code>docs/state.md</code> and <code>docs/reports/HE.md</code> (new).</p>
+
 <h2>2026-09-21 &mdash; Batch HD: THE TWENTY HOLES, AND THE POOL FLOORS FOLDED</h2>
 <p><b>Twenty checks that could not fail, or passed while the game did the opposite, are repaired or retired &mdash;
 and the thirty-six per-shelf pool floors are one per-class floor.</b> IMPLEMENT ONLY. HA priced the work and HD

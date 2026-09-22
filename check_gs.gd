@@ -624,7 +624,9 @@ func _s4b_the_surfaces(ids: Array) -> void:
 		shop.offers = [{"member_idx": SEATS.find(cls), "rune": r}]
 		shop._draw_screen()
 		await Gate.frames(self, 3)
-		var l: Label = _label_with(shop, String(r["name"]) + "  [")
+		# **BATCH HE §4 — THE ROW LOST ITS `[Class]` BAND**, the word this arm found
+		# it by; it reads `<name>  (for <class> <n>)` now, so the arm finds it by that.
+		var l: Label = _label_with(shop, String(r["name"]) + "  (for ")
 		if _shows(l, String(id), "the Peddler"):
 			shown["shop"] += 1
 			fit["shop"].append([String(id), int(_panel_of(l).size.y)])

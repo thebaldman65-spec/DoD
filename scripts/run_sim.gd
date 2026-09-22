@@ -864,8 +864,9 @@ static func _finish_run(run: Node, battle, done: bool) -> void:
 		slots_avail_sum += run.rune_slots()
 		# BATCH HC §1 — THE `spec` KIND WENT WITH THE SPEC SCOPE. Every authored
 		# ordinary rune is `class:<key>` now, so the kind is read off the band
-		# `Runes.shown_scope` reads (the data by id), and a `spec` column would
-		# print zero for ever rather than say what a hero wore.
+		# (`Runes.scope_band`, off the data by id), and a `spec` column would
+		# print zero for ever rather than say what a hero wore. *No surface shows
+		# the band since HE §4; this report is one of its two readers left.*
 		var worn := 0
 		for r in m.get("runes", []):
 			if not r.get("equipped", false):

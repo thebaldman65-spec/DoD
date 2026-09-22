@@ -343,38 +343,42 @@ func _break_damage() -> void:
 		and volley.pressure * volley.multi_hits <= triple.pressure * triple.multi_hits,
 		"§4: Aimed Volley's %d across three is at or under Triple Shot's %d" % [
 			volley.pressure * volley.multi_hits, triple.pressure * triple.multi_hits])
-	# CHARGE AGAINST THE FREE BASIC — BQ's rule (the floor for a class card is the
-	# free core attack), and this is the ONE card in the twenty-four that clears
-	# it rather than sitting under it.
-	#
-	# INVERTED BY THE DESIGNER'S REPRICE, IMMEDIATELY AFTER BR SHIPPED. The batch
-	# assigned 10 BD deliberately UNDER Strike's 18 and no `resource_gain` at all,
-	# so that what the card bought was the arrival and the Daze. The reprice makes
-	# it 20 BD and 30 Rage. The comparison is still exactly the one worth pinning
-	# — a class card measured against the free basic — so only the answer moves.
+	# **THE DESIGNER'S REPRICE OF CHARGE — 20 BREAK DAMAGE AND 30 RAGE — PINNED
+	# AGAINST THE FREE BASIC. KEPT BY RULING AT HE §5, AND NOT THE RETIRED RULE.**
+	# BR assigned Charge 10 BD, deliberately UNDER Strike's 18, and no Rage at all,
+	# so that what the card bought was the arrival and the Daze; the designer
+	# repriced it to 20 BD and 30 Rage immediately after BR shipped. **These arms say
+	# where the reprice put Charge beside Strike**: over it on Break damage and on
+	# damage, quicker to the target, and behind it on net Rage and on cooldown — so a
+	# later reprice has to come here and say so. They stood under BQ's "the floor for
+	# a class card is the free core attack", the retired "weaker" rule's floor (HD
+	# §1); HD left them live because what they pin is the reprice, and the designer
+	# ruled them kept as its pins. **They ask nothing about whether a class card is
+	# weaker than anything — do not retire them with the "weaker" arms below.**
 	var charge: Ability = Classes.pool_ability("Charge")
 	var strike: Ability = null
 	for ab2 in Classes.kit("warrior"):
 		if ab2.display_name == "Strike":
 			strike = ab2
-	ok(strike != null, "§4: the Warrior's free core attack is Strike")
+	ok(strike != null, "CHARGE'S REPRICE (kept at HE §5): the free basic it is measured against is Strike")
 	if strike != null and charge != null:
 		ok(charge.pressure > strike.pressure,
-			"REPRICE: Charge's %d BD is now OVER the free Strike's %d" % [
+			"CHARGE'S REPRICE (kept at HE §5, not the retired rule): its %d BD is over the free Strike's %d" % [
 				charge.pressure, strike.pressure])
 		ok(charge.damage > strike.damage,
-			"REPRICE: ...and over it on damage too (%d%% against %d%%)" % [
+			"CHARGE'S REPRICE: ...and over it on damage too (%d%% against %d%%)" % [
 				charge.damage, strike.damage])
 		ok(charge.delay < strike.delay,
-			"§4: ...on top of the arrival it always bought (%.1f against %.1f)" % [
+			"CHARGE'S REPRICE: ...on top of the arrival it always bought (%.1f against %.1f)" % [
 				charge.delay, strike.delay])
 		# THE TWO THINGS STRIKE STILL WINS ON, pinned so "Charge is strictly
-		# better than the free basic" cannot become true by accident.
+		# better than the free basic" cannot become true by accident — the 30 Rage
+		# the reprice gave it, net of its cost, is still under Strike's.
 		ok(charge.resource_gain - charge.cost < strike.resource_gain,
-			"REPRICE: Strike still wins on NET Rage (+%d against Charge's +%d)" % [
+			"CHARGE'S REPRICE (kept at HE §5, not the retired rule): Strike still wins on NET Rage (+%d against Charge's +%d)" % [
 				strike.resource_gain, charge.resource_gain - charge.cost])
 		ok(charge.cooldown > 0 and strike.cooldown == 0,
-			"REPRICE: ...and on having no cooldown (Charge sits on %d)" % charge.cooldown)
+			"CHARGE'S REPRICE: ...and on having no cooldown (Charge sits on %d)" % charge.cooldown)
 
 
 # ---------- §4 THE "WEAKER" HALF — RETIRED AT HD §1, KEPT AND SAID TO BE KEPT ----------
@@ -482,7 +486,7 @@ func _weaker_half() -> void:
 		var ab: Ability = Classes.pool_ability(nm)
 		if nm == "Charge":
 			ok(ab != null and ab.resource_gain == 30,
-				"REPRICE: Charge builds 30 Rage — the designer's reprice (NOT RETIRED: it pins a ruling, not the 'weaker' rule)")
+				"CHARGE'S REPRICE (kept at HE §5, not the retired rule): Charge builds 30 Rage — the designer's reprice")
 			continue
 		_retired(ab != null and ab.resource_gain == 0,
 			"§4: %s builds no Rage — the class cards spend without building" % nm)
@@ -495,11 +499,11 @@ func _weaker_half() -> void:
 				continue
 			var ab3: Ability = Classes.pool_ability(nm2)
 			_retired(ab3 != null and ab3.resource_gain == 0,
-				"REPRICE: %s (%s) still generates nothing" % [nm2, cls])
+				"§4: %s (%s) still generates nothing" % [nm2, cls])
 	_retired(strike_gain() > 0,
 		"§4: ...while the free Strike builds %d" % strike_gain())
 	_retired(Classes.pool_ability("Charge").resource_gain > strike_gain(),
-		"REPRICE: and Charge builds MORE than the free basic (30 against %d)" % \
+		"§4: and Charge builds MORE than the free basic (30 against %d)" % \
 			strike_gain())
 	# THE ONE CARD THAT FAILED §4 IN THE OTHER DIRECTION, PINNED AS A FINDING WHILE
 	# THE RULE STOOD: WARCRY OUT-SIZES BATTLE SHOUT, a Berserker SPEC-pool ability,

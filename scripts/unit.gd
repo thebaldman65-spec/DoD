@@ -1485,6 +1485,10 @@ var rune_bracing_line := 0    # rune-owned: Bracing Line 5 (percentage POINTS)
 var rune_split_shield := 0    # rune-owned: the Split Shield 1 (a FLAG)
 var rune_long_watch := 0      # rune-owned: the Long Watch 1 (a FLAG)
 var rune_no_block := 0        # rune-owned: Bared Plate 1 (a FLAG) — he cannot Block
+var rune_bared_plate_bd := 0.0 # rune-owned: Bared Plate 0.25 (a FRACTION) — its Break
+                              # damage, on a field of its own since HE §1: it rode
+                              # `rune_bd_bonus`, which retired runes write too, and
+                              # it is read only under Heavy Plating (ruled)
 # Sharpshooter —
 var rune_keen_focus := 0      # rune-owned: Keen Focus 1 (a FLAG)
 var rune_heavy_bolts := 0     # rune-owned: Heavy Bolts 20 (points off the split)

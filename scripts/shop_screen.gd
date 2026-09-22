@@ -255,14 +255,14 @@ func _draw_screen() -> void:
 		vbox.add_theme_constant_override("separation", 6)
 		panel.add_child(vbox)
 		var label := Label.new()
-		# BATCH HC §1 — the band through `Runes.shown_scope`, the one door every
-		# surface asks, so a rune reads the scope it has rather than its copy.
-		var band: Dictionary = Runes.shown_scope(rune)
-		label.text = "%s  [%s]  (for %s %d)\n%s — equip it from that hero's sheet" % [rune["name"],
-			band["label"], member["key"].capitalize(), offer["member_idx"] + 1,
+		# BATCH HE §4 — NO SCOPE BAND (ruled). The row read "<name>  [Class]" on
+		# every rune, because a hero is offered only his own class's; the label
+		# told nobody anything and it is gone, with the band's tint.
+		label.text = "%s  (for %s %d)\n%s — equip it from that hero's sheet" % [rune["name"],
+			member["key"].capitalize(), offer["member_idx"] + 1,
 			Runes.shown_desc(rune)]
 		label.add_theme_font_size_override("font_size", 14)
-		label.add_theme_color_override("font_color", band["color"])
+		label.add_theme_color_override("font_color", Runes.RUNE_TINT)
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		vbox.add_child(label)
 		var buy := Button.new()

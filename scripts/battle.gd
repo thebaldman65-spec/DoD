@@ -1851,9 +1851,21 @@ func _spawn_units() -> void:
 # PASS** — every summon in the game is hero-side (`companions`), and
 # `_next_unit()` walks `heroes + enemies` — so a single stamp at the spawn is
 # the whole population rather than a first instalment of it.
+#
+# **BATCH HE §1 — AND EACH STAMP ASKS ITS WEARER'S ENGINE (ruled).** Long Fuse is
+# the Pyromancer's and Deep Cold the Cryomancer's, gated on the engine that lays
+# what each reads — Overburn's Flamewave lays Burn, Permafrost's Razor Ice lays
+# Chilled (`Runes.ENGINE_READ`). A wearer without it is told the rune sits out
+# (GX), and this is what makes that true: no engine, no stamp, however much Burn
+# or Chill a drafted card lights. Read once, here, for the reason the stamp
+# itself is here — the wearer's slots are fixed for the fight.
 func _stamp_fk_enemy_runes() -> void:
 	var lf := _living_hero_with("rune_long_fuse")
+	if lf != null and not lf.has_engine("overburn"):
+		lf = null
 	var dc := _living_hero_with("rune_deep_cold")
+	if dc != null and not dc.has_engine("permafrost"):
+		dc = null
 	if lf == null and dc == null:
 		return
 	for e in enemies:
@@ -8976,7 +8988,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					# none. **THE COVERING GUARD SLICE IS DELIBERATELY LEFT
 					# STANDING**: that third slice is another Warden's Block
 					# chance doing its job on this body, and it is not his.
-					var bared: bool = strike_target.rune_no_block > 0
+					# **BATCH HE §1 — THE PRICE ASKS HEAVY PLATING (ruled)**, as
+					# the payout does: the rune is that engine's holder's at
+					# every door and sits out without it (GX), and GW §3's
+					# ruling is that no engine means no cost and no payout.
+					var bared: bool = strike_target.rune_no_block > 0 \
+						and strike_target.has_engine("heavy_plating")
 					if bared:
 						plating = 0.0
 					if not bared and block_roll < strike_target.block_chance:
@@ -11004,10 +11021,23 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					+ attacker.rune_broken_will_ranks))))
 			# Breaker runes (rune_bd_bonus, its only read site): every blow
 			# lands heavier on the meter.
-			if attacker.rune_bd_bonus > 0.0 and pr > 0:
-				pr = int(round(pr * (1.0 + attacker.rune_bd_bonus)))
+			#
+			# **BATCH HE §1 — BARED PLATE'S SHARE IS ITS OWN FIELD, READ HERE AND
+			# ASKING HEAVY PLATING (ruled).** It rode `rune_bd_bonus` until HE, a
+			# field three RETIRED runes also write — so gating the field would have
+			# withheld theirs from a saved run that still holds one. Summed into
+			# the same multiplier at the same line, so with the engine slotted the
+			# arithmetic is byte for byte what it was; without it Bared Plate sits
+			# out (GX) and pays nothing, as its price at the Block roll does not
+			# charge (GW §3).
+			var bd_rune: float = attacker.rune_bd_bonus
+			if attacker.rune_bared_plate_bd > 0.0 \
+					and attacker.has_engine("heavy_plating"):
+				bd_rune += attacker.rune_bared_plate_bd
+			if bd_rune > 0.0 and pr > 0:
+				pr = int(round(pr * (1.0 + bd_rune)))
 				_log("   → Rune: +%d%% Break damage" % int(round(
-					attacker.rune_bd_bonus * 100)), "#b0a8e0")
+					bd_rune * 100)), "#b0a8e0")
 			# BATCH CM §2 — THE BRACE, HALF TWO OF TWO. LAST of everything that
 			# moves `pr`, so it reduces the Break damage that is actually about to
 			# land rather than a figure the attacker's amplifiers then raise back.
@@ -13281,8 +13311,15 @@ func _hold_freeze(target: BattleUnit, src: BattleUnit, force := false) -> void:
 # working, not a blow he threw: it must not roll a crit, must not be parried,
 # must not feed a counter, and must not carry Break. A kill still routes through
 # `_on_enemy_death` because that is where the function's own lethal path ends.
+#
+# **BATCH HE §1 — AND IT ASKS HIS ENGINE (ruled).** Chilled is the Cryomancer's —
+# Permafrost's Razor Ice lays it — and the rune is gated on that engine at every
+# door (`Runes.ENGINE_READ`); a wearer without it is told the rune sits out (GX),
+# so the bill must not fire off a pile a drafted Frostbolt built. Until HE it did,
+# which is what GV sorted as HALF-WORKS.
 func _killing_cold_cast(caster: BattleUnit) -> void:
-	if caster.rune_killing_cold <= 0 or not caster.is_hero or caster.is_companion:
+	if caster.rune_killing_cold <= 0 or not caster.is_hero or caster.is_companion \
+			or not caster.has_engine("permafrost"):
 		return
 	for e in enemies:
 		if e.dead or not e.has_status("chilled"):
@@ -16436,9 +16473,18 @@ func _stamp_discipline_chip(u: BattleUnit) -> void:
 # Swordmaster is in NEITHER stance and gets nothing — `stance` still holds the
 # guard he will land back in, and reading it here would pay him for a stance he
 # is not currently in.
+#
+# **BATCH HE §1 — AND IT ASKS THE STANCES (ruled).** A guard is every Warrior's,
+# reached by a swap card — Feint, Precision Strike and Wheeling Cut with no
+# engine at all — but the rune is ruled the Stances holder's and gated on
+# `seasoned` at every door (`Runes.ENGINE_READ`); a wearer without it is told the
+# rune sits out (GX), so a Defensive guard a drafted Feint reached returns
+# nothing. The Stances lay no guard: they are the engine the guard's numbers are
+# read under, which is the one sense in which the stance is theirs.
 func _mirror_guard_return(defender: BattleUnit, attacker: BattleUnit,
 		ab: Ability, how: String) -> void:
 	if defender.rune_mirror_guard <= 0 or defender.stance != "defensive" \
+			or not defender.has_engine("seasoned") \
 			or defender.has_status("formless") or attacker == null \
 			or attacker.dead or ab.damage <= 0:
 		return
@@ -16552,8 +16598,10 @@ func _live_block_chance(u: BattleUnit) -> float:
 	# of the rune's two sites for the reason the roll's own comment gives: the
 	# ward Covering Guard lays reads THIS number, so a rune that only refused
 	# his own roll would leave him blocking blows on an ally's body while
-	# blocking none on his own.
-	if u.rune_no_block > 0:
+	# blocking none on his own. **BATCH HE §1 — AND IT ASKS HEAVY PLATING, as the
+	# roll's own site does (ruled)**: with the engine out the rune sits out, price
+	# and payout alike.
+	if u.rune_no_block > 0 and u.has_engine("heavy_plating"):
 		return 0.0
 	var bc := u.block_chance + _plating_slice(u)
 	return clampf(bc, 0.0, 1.0)
@@ -24065,10 +24113,17 @@ func _apply_poison(src: BattleUnit, victim: BattleUnit, turns: int) -> void:
 	# permanence. `sticky` is deliberately NOT set here: that flag is what makes
 	# a poison uncleansable, and taking cleansing off the table is the
 	# capstone's, not this rune's.
+	#
+	# **BATCH HE §1 — AND THE RUNE ASKS HIS ENGINE (ruled).** His Poison is the
+	# Survivalist's — Trapper's barb and its on-hit package lay it — and the rune
+	# is gated on Trapper at every door (`Runes.ENGINE_READ`); a wearer without it
+	# is told the rune sits out (GX), so a poison a drafted Explosive Shot laid
+	# must count down as any other. Thin Blood's price above asks the same engine
+	# for GW §3's reason.
 	if src.perfected_toxin > 0:
 		p_turns = -1
 		sticky = true
-	elif src.rune_long_poison > 0:
+	elif src.rune_long_poison > 0 and src.has_engine("trapper"):
 		p_turns = -1
 	for _i in 1 + src.virulence_ranks:
 		_apply_status(victim, "poison", p_turns, 0, tick, src)
@@ -25165,8 +25220,17 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int,
 			# of how many wounds open. The rune reads the WEARER through
 			# `_living_hero_with`, exactly as the node's own clause does, because
 			# `_add_bleed_with_burst` is called from sites that do not carry him.
+			#
+			# **BATCH HE §1 — AND IT ASKS THE BERSERKER'S ENGINE (ruled).** The
+			# rune is gated on Blood Frenzy at every door (`Runes.ENGINE_READ`) and
+			# a wearer without it is told it sits out (GX), so a bleedout a
+			# drafted Hack and Slash or an ally's wolf opened buys him nothing.
+			# **No engine lays a Bleed** — Blood Frenzy reads his health and the
+			# Rage he spends — so the gate is the lineage's engine, as ruled, and
+			# the one this table already credits a bleedout to (`_sig` above).
 			var butcher_rune := _living_hero_with("rune_bleedout_action")
-			if butcher_rune != null and not butcher_rune.free_action_taken:
+			if butcher_rune != null and butcher_rune.has_engine("bloodrage") \
+					and not butcher_rune.free_action_taken:
 				butcher_rune.free_action_taken = true
 				_grant_free_action(butcher_rune, "SLAUGHTERHOUSE",
 					"Rune: the Slaughterhouse — the kill is an opening")

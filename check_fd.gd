@@ -310,11 +310,20 @@ func _s1e_the_live_screen() -> void:
 	await process_frame
 	var labels: Array = []
 	_button_labels(screen, labels)
+	# **BATCH HE §4 — A RUNE'S BUTTON IS ITS NAME AND NOTHING ELSE.** This read the
+	# pick buttons off their `"  [<band>]"` suffix, and the band is gone from every
+	# surface (ruled), so it found none and read the overlay as empty. A button is
+	# found by being ANY rune's name — never by the triple, which the overlay's own
+	# re-ask has already repaired by now, so a locator built off it could not see
+	# the worn or retired rune the two arms below exist to catch.
+	var rune_names: Array = []
+	for rid in Runes.ids():
+		rune_names.append(Runes.display_name(Runes.config(String(rid))))
 	var offered: Array = []
 	for l in labels:
 		var s := String(l)
-		if s.contains("  ["):
-			offered.append(s.split("  [")[0])
+		if rune_names.has(s):
+			offered.append(s)
 	ok(not offered.is_empty(),
 		"§1e: the rune overlay drew NO pick buttons — the drive read nothing")
 	ok(not offered.has("Heavy Bolts"),

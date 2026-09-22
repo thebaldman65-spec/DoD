@@ -534,7 +534,7 @@
 		"name": "Bared Plate", "scope": "class:warrior", "written_for": "warden",
 		"price": 100,
 		"desc": "+25% Break damage — but he can no longer Block.",
-		"payload": {"stat": {"rune_bd_bonus": 0.25, "rune_no_block": 1}}
+		"payload": {"stat": {"rune_bared_plate_bd": 0.25, "rune_no_block": 1}}
 	},
 	"keen_focus": {
 		"name": "Keen Focus", "scope": "class:hunter", "written_for": "sharpshooter",

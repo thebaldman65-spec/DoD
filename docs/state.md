@@ -13,100 +13,177 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-21 (Batch HD).*
+*Last rewritten: 2026-09-22 (Batch HE).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: HD — THE TWENTY HOLES, AND THE POOL FLOORS FOLDED. IMPLEMENT ONLY, AND THE THIRTY-SIXTH BATCH ON
-  `class-merge`.** HA's twenty tier-1 arms are repaired or retired, the shelf floors are one per-class floor, and one
-  game change is built: the stance pieces are the Stances holder's. `main` is untouched. Full working:
-  **`docs/reports/HD.md`**.
-- **THE SEQUENCE: HE IS NEXT — THE OTHER SEVENTY-THREE.** HA's middle group was 130 arms: the twenty holes and the
-  thirty-five fold arms are HD's, and `test_batch_bq`'s two "weaker" arms were retired here by ruling, so HE is HA's
-  seventy-five tier-2 arms less those two. **The brief's *"the other 110 are HE"* counted the fold family into HE**; the
-  fold is this batch's. HA §1d is still HE's work list, arm by arm.
-- **§1 — THE ONE GAME CHANGE: GUARD CHANGE AND LUNGE ARE OFFERED ONLY TO A HERO HOLDING THE STANCES** (`seasoned`), as
-  two RULED rows of GP's card gate (`Classes.ENGINE_READ`, each carrying `ruled: "HD §1"`, read by
-  `Classes.engine_read_ruled`). Both half-work without the engine, so the cast test never gated them; the ruling does.
-  **A Warrior holding no engine is offered 38 of his 43, a Stances holder 40.** Driven (`check_hd` §1, 400 rolls an
-  arm): **no stance piece** at the elite draft, the stored triple or the zone-boss fallback for a Warrior with no
-  engine, with the Stances owned and unslotted, or with Heavy Plating or Bloodrage; **both at every door** for the
-  Stances first or second. **Immolate and Pyroblast stay as GP left them** (every Mage is offered both, and the checks
-  say so). **The "class-wide cards are weaker" rule is RETIRED** — struck and kept in `CLAUDE.md` with its reason;
-  `test_batch_bq` §2 and `test_batch_br` §4, the two checks that re-verified it, print their comparisons as the record
-  and assert the retirement. The cards are unchanged, and GP's rebalance stays owed.
-- **§2 — THE TWENTY: SIXTEEN REPAIRED TO INTENT, FOUR RETIRED WITH THE FACT THAT RETIRED THEM ASSERTED IN THEIR PLACE**
-  (`check_du`'s census, `test_batch_ar`'s all-fire kit, `test_batch_az`'s class-wide Hunter runes, `test_batch_ba`'s
-  base kit). Every one was broken on purpose in an isolated copy: the repaired arm read red, and HEAD's version of the
-  same target, on the same defect, never read that arm red — green, or red only on an older arm of its own that sees
-  the same defect — the hole, shown. `docs/reports/HD.md` §2 and §4 have each arm, its defect and both FAIL texts.
-- **§3 — ONE POOL FLOOR A CLASS, BOTH HALVES.** Thirty-six shelf-floor arms in eleven suites — HA's thirty-five and
-  `test_batch_bq`'s class-wide floor of three, the same shape and not on HA's list — are one helper,
-  `suite_fixture.class_pool_floors`: per class, the whole pool and what a hero holding no engine can be offered, at the
-  reading — **Warrior 43 / 38, Mage 51 / 38, Cleric 43 / 29, Hunter 42 / 35** — and a floor of zero refused. **The
-  brief's figures (5 / 9, 3 / 7, 0 / 0, 5 / 7) are HC's RUNE table**, so they are the per-class RUNE floor where that
-  table is derived (`check_gv` §3's `RUNE_FLOOR`): the Cleric's zero is OWED, and his row asserts instead that some
-  engine he can slot opens a rune.
-- **THE VERIFICATION.** HEAD's unmodified battery ran first against HD's game code — **122 of 122 launched, no `Parse Error`;
-  `check_de` 505 / 3 failures / 3 notices, the three gates that read the two ruled rows as mistakes**
-  (`docs/reports/HD.md` §5). The pre-pass — the whole battery on an isolated copy of the landed tree, rows written —
-  read `check_de` 509 / 1, and its one red was `check_ek`: `test_batch_ar` checks a tag now, and joined
-  `TAG_CHECKERS`. The acceptance run: **123 of 123 (with `check_hd`), `check_de` 509 checks / 0 failures / 0
-  notices, no `Parse Error` and no `SCRIPT ERROR` in any log, the tree hashed at the start and the end — 430 paths,
-  none moved — and the two sanctioned reds at their counts** (`check_cm_live` 13 / 4; `check_gj` 70 / 1, *"+178
-  gold and the purse moved 198"*, moved from HC's +174 / 194 by HD's game code, the gap the same twenty). Twenty-six controls, one defect a copy, each read by its FAIL text beside HEAD's copy of
-  the same target. The player's four saves were backed up to `../save-backups/HD-20260921-144901` and are
-  byte-identical to it after everything ran.
-- **`CLAUDE.md` IS 368,259 B = 359.63 KiB, WITH 50.37 KiB UNDER ITS 410 KiB CEILING** (+3,652 B this batch: the retired rule, struck; the ruled rows; the per-class floor; the
-  merged seam sentence; the rune floor).
-- **WHAT MOVED:** `scripts/classes.gd` (two ruled rows, `engine_read_ruled`, and the comments stating the retired
-  rule); `suite_fixture.gd` (`class_pool_floors`); the gates `check_dr`, `check_du`, `check_eg`, `check_ek`, `check_fo`,
-  `check_ft`, `check_gm`, `check_gp`, `check_gs` and `check_gv`; the suites `test_batch_ah_battle`, `ak`, `ar`, `az`, `ba`, `bo`, `bp`, `bq`, `br`, `bt`,
-  `bu`, `bv`, `bw`, `bx`, `cb`, `ce`, `cp` and `test_run_harness`; **`check_hd.gd` (NEW)** and `run_battery.sh`;
-  `pin-manifest.json`, `baselines.json`; `CLAUDE.md`, `docs/master.html` and its stamp, `docs/changelog.html`,
-  `docs/design-notes.md`, this file and `docs/reports/HD.md` (**NEW**).
-- **Phase.** Steps 1–5 of the merge's running order are done and the rune layer is merged; **step 6's first half is
-  HD, and HE is its second**. The Crown's Break and freeze resistance, Sanctity's potency layer and the engine-card
-  texts stay queued; the rune design pass (companion runes, a new companion, the Cleric's no-engine runes, and HC's
-  five rulings) is its own.
-- **Next letter: HE.**
+- **Last batch: HE — GATES AND DOORS. IMPLEMENT ONLY, AND THE THIRTY-SEVENTH BATCH ON `class-merge`.** HC's and HD's
+  follow-ups about what a hero is offered and at which door, all ruled in the brief, are built: seven runes gated on
+  their engine, Mark of the Hunt gated on Pack Bond and sitting out with it, the zone boss asking the engine half, the
+  draft re-asking at the pick, the `[Class]` band gone, and Charge's pins relabelled. `main` is untouched. Full working:
+  **`docs/reports/HE.md`**.
+- **THE SEQUENCE SHIFTED AGAIN: HF IS NEXT — THE OTHER SEVENTY-THREE.** HE took the offers-and-doors follow-ups, so
+  HA's seventy-five tier-2 arms less `test_batch_bq`'s two retired at HD are **HF's**; HA §1d is still the work list,
+  arm by arm.
+- **§1 — SEVEN RULED RUNE ROWS** (`Runes.ENGINE_READ`, each `ruled: "HE §1"`, read by `Runes.engine_read_ruled`): Long
+  Fuse (Overburn), Killing Cold and Deep Cold (Permafrost), Long Poison (Trapper), Mirror Guard (the Stances),
+  Slaughterhouse (Blood Frenzy) and Bared Plate (Heavy Plating). **Each read site asks the same engine**, because a row
+  sits out without its engine (GX) and the sentence is true only if it pays nothing: no engine, no payout, and for Bared
+  Plate no price (GW §3). **Bared Plate's 0.25 moved to `rune_bared_plate_bd`** — `rune_bd_bonus` is shared with three
+  retired runes, whose payouts stand. **The mapping, verified at each read site: four hold as authored; the Stances lay
+  no guard (a swap card does); and no engine lays a Bleed**, so Slaughterhouse is on Blood Frenzy as the brief named it
+  (NEEDS A RULING 3). **What a hero holding no engine can be offered moved** — Warrior 5 / 9 → **2 / 6**, Mage 3 / 7 →
+  **0 / 4**, Hunter 5 / 7 → **4 / 6**, Cleric 0 / 0 — and `check_gv` §3's `RUNE_FLOOR` moved with it: **the Mage's spawn
+  half is OWED now, as the Cleric's is.**
+- **§2 — MARK OF THE HUNT IS PACK BOND'S** (a RULED row of the card gate and of `Classes.SITS_OUT`, `ruled: "HE §2"`), and
+  **`Classes.sits_out` sits a row out while its engine itself sits out** — so it sits out beside the Rune of the
+  Sharpshooter with Pack Bond, and Pack Bond's tell is true. **The brief's premise held for half the card**: its
+  companion's halves read no engine (driven: a Canis blow on the prey 94 against 75, 3 Mana fed, with no engine), so a
+  Hunter with a companion and no Pack Bond loses a card that half-worked for him (NEEDS A RULING 2). The card's text
+  is unchanged; wording is proposed (NEEDS A RULING 1).
+- **§3 — THE ZONE BOSS ASKS THE WHOLE OF `Classes.offerable`**, roll and answer, HC's reason for the pet half alone
+  overturned; **seven boss offers moved, not four** — Lunge, Shatter, Overcharge and Divine Plea, and **Stabilize and
+  Primal Surge**, which sat out without their engines since GT and became card-gate rows here, and Mark of the Hunt
+  (NEEDS A RULING 4). Driven 400 rolls an arm: each offered with its engine slotted exactly as often as at HEAD, and 0
+  times unslotted where HEAD offered it just as often. **The draft re-asks at the pick** — `Run.draft_choice` is the one
+  list the screen draws and `take_draft_ability` takes; a held card is not a button, the column names the rune that
+  brings it back, and **a card known from an earlier queued triple is not a button either** (found here: two triples
+  queued before either is answered can share a card).
+- **§4 — NO SCOPE BAND ON ANY SURFACE.** The word on the Peddler's row and a cache's button, the tint on those and three
+  more; `SCOPE_INFO`, `shown_scope` and the instance's band fields deleted.
+- **§5 — CHARGE'S PINS RELABELLED** as the designer's reprice: five comparisons against Strike and their anchor, and the
+  30 Rage arm — the brief said two.
+- **THE VERIFICATION.** HEAD's unmodified battery ran first against HE's game code — **123 of 123 launched; `check_de` 509 / 16
+  failures / 4 notices**, and the one file that failed to parse was HEAD's `check_hc`, which calls the band door HE §4 deleted
+  (`docs/reports/HE.md` §6). The pre-pass — the whole battery on an isolated copy of the landed tree, rows written —
+  read **`check_de` 513 / 0 / 0**, 124 of 124 logs with no `Parse Error` and no `SCRIPT ERROR`. The acceptance run:
+  **124 of 124 (with `check_he`), `check_de` 513 checks / 0 failures / 0 notices, no `Parse Error` and no
+  `SCRIPT ERROR` in any log, the tree hashed at the start and the end — 562 paths, none moved — and the two
+  sanctioned reds at their counts** (`check_cm_live` 13 / 4; `check_gj` 70 / 1, *"+159 gold and the purse moved 179"*,
+  moved from HD's +178 / 198 by HE's game code — HEAD's own code reads +178 / 198 on the same saves the same day —
+  the gap the same twenty). Thirty-five control runs, one defect a copy, each read by its FAIL text. The player's four
+  saves were backed up to `../save-backups/HE-20260922-101431` and are byte-identical to it after everything ran.
+- **`CLAUDE.md` IS 372,642 B = 363.91 KiB, WITH 46.09 KiB UNDER ITS 410 KiB CEILING** (+4,383 B this batch: the seven rune
+  rows and their read sites, Mark of the Hunt's ruled rows and the sits-out clause, the boss's engine half, the
+  draft's re-ask, the band, and the two card rows a door that starts asking the table owes it).
+- **WHAT MOVED:** `scripts/runes.gd` (the seven ruled rows, `engine_read_ruled`, `cards_wait_on` and `RUNE_TINT`;
+  `SCOPE_INFO` and `shown_scope` deleted), `scripts/battle.gd` (the seven runes' read sites), `scripts/unit.gd`
+  (`rune_bared_plate_bd`), `scripts/classes.gd` (three card rows, Mark of the Hunt's seat row, `sits_out_ruled` and the
+  sits-out clause), `scripts/run_state.gd` (the note's third cause, the boss's whole `offerable`, `draft_choice` and the
+  refusal at the pick), `scripts/map_screen.gd` (the boss overlay, the draft column and the band),
+  `scripts/shop_screen.gd` and `scripts/party_screen.gd` (the band), a comment in `scripts/run_sim.gd`;
+  `data/runes.json` (Bared Plate's payload key, nothing else); the gates `check_fd`, `check_gs`, `check_gt`, `check_gv`,
+  `check_gx`, `check_hc` and `check_hd`; the suites `test_batch_ah` and `test_batch_br`; **`check_he.gd` (NEW)** and
+  `run_battery.sh`; `pin-manifest.json`, `baselines.json`; `CLAUDE.md`, `docs/master.html` and its stamp,
+  `docs/changelog.html`, `docs/design-notes.md`, this file and `docs/reports/HE.md` (**NEW**).
+- **Phase.** Steps 1–5 of the merge's running order are done and the rune layer is merged; **step 6 is HD (the twenty
+  holes and the fold), HE (the offers and the doors) and HF (the other seventy-three)**. The Crown's Break and freeze
+  resistance, Sanctity's potency layer and the engine-card texts stay queued; the rune design pass (companion runes, a
+  new companion, the Cleric's no-engine runes — and now the Mage's) is its own.
+- **Next letter: HF.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### HD's RULINGS OWED — **FOUR; THE FIRST TWO ARE WHERE THE STANCE RULING DOES NOT REACH**
+### HE's RULINGS OWED — **SIX; THE FIRST IS WORDING, THE REST ARE WHERE A RULING'S PREMISE DID NOT HOLD WHOLE**
+
+Full working: `docs/reports/HE.md`, NEEDS A RULING.
+
+1. **MARK OF THE HUNT'S TEXT.** A card that needs an engine should name it; the card still reads *"Works with or without
+   a companion"* and names none. Proposed: the first five lines as they are, and the sixth replaced by two —
+   *"Needs the Rune of the Beastmaster, and\nworks with or without a companion."* (38 and 34 characters; the report
+   carries the whole card). The designer confirms.
+2. **MARK OF THE HUNT HALF-WORKED WITHOUT PACK BOND.** The brief's *"its bonus damage and Mana pay nothing without it"* is
+   true of the HUNTER's halves and not of the companion's: with no engine, a companion's blows on the marked prey took
+   +25% and fed the hunter 3% Mana a blow (driven, HEAD's code). The ruling is built — it is Pack Bond's, as HD's stance
+   pieces are the Stances holder's — so **a Hunter who fields a companion and holds no Pack Bond is no longer offered,
+   or seated, a card that paid him half**. Confirm, or move the hunter's halves out of the Pack Bond block and ungate it.
+3. **SLAUGHTERHOUSE'S ENGINE AUTHORS NO BLEED.** *"Gate each on the engine that authored it"*: Blood Frenzy reads the
+   Berserker's own health and the Rage he spends, Bloodlust (the card it brings) lays no Bleed, and no engine lays one —
+   drafted cards, the Hunter's wolf and the Bloodletting bargain do. Gated on Blood Frenzy as the brief's table names it
+   (the lineage the rune was written for, and the engine the game's signature table credits a bleedout to). Confirm.
+4. **THE ZONE BOSS MOVED SEVEN OFFERS, NOT FOUR.** Stabilize and Primal Surge are on a lineage's boss pool and in no
+   draft pool, cannot be cast without their engine (GT's seat rows), and were never card-gate rows because GP derived
+   that table over the draft pools — the one door that asked it. Asking the engine half without them would have left
+   the boss offering two cards the hero sheet greys out at once, so they are rows, derived and not ruled. Confirm.
+5. **A MAGE HOLDING NO ENGINE IS OFFERED NO ORDINARY RUNE AT SPAWN.** His three were Long Fuse, Killing Cold and Deep
+   Cold; four more wait on cards he drafts. It is §1's accepted cost at its sharpest, and `check_gv` §3 records his
+   spawn half as OWED beside the Cleric's. The rune design pass inherits it.
+6. **DECLINING A DRAFT REFUSES ITS HELD-BACK CARDS TOO.** The no-return rule refuses the whole stored offer, so a player
+   who declines an offer he cannot answer while an engine is unequipped also refuses the cards that were waiting on it.
+   The column says so; whether declining should skip what is held back is the designer's.
+
+### FOUND AT HE AND NOT FIXED
+
+- **VENOM COATING IS OFFERED AT THE SURVIVALIST'S ZONE BOSS TO A HERO IT CANNOT PAY.** Its whole payoff — every attack
+  Poisons — is read inside Trapper's block (the Survivalist's on-hit package in `battle.gd`), so without Trapper the card
+  spends a turn laying a coating that does nothing. The boss asks the card gate since HE §3, and Venom Coating is not a
+  row: the cast lands, so the cast test cannot see it — GP's *a row whose payout is a later strike* shape, found here by
+  reading the site while deriving the boss-only cards. **It is GM's ruling 1, still open** (move the payload out of the
+  block, or gate the card), so it is reported and not gated.
+- **BESIDE THE RUNE OF THE SHARPSHOOTER, MARK OF THE HUNT IS STILL OFFERED, AND SITS OUT ONCE TAKEN.** The ruling gates
+  the OFFER on Pack Bond being equipped, and beside Lethal Aim it is equipped — and sitting out (HC §5's ruling for
+  Pack Bond itself: legal, and visible). So the Beastmaster's zone boss offers the card to that Hunter exactly as
+  often as to any Pack Bond holder (400 in 400, `check_he` §3 pins it), and the hero sheet greys it out the moment it
+  is taken. Pack Bond's other two rows (Unleash, Primal Surge) need a companion, so the pet half withholds them there;
+  this one needs none. Withholding it would need the offer to ask whether an engine is IN EFFECT, not whether it is
+  slotted — a ruling, not a repair.
+- **MARK OF THE HUNT'S CARD SPEAKS IN *"you"* AND *"your"***, which the text standard forbids. The proposed wording (HE's
+  ruling 1) leaves those lines as they are: rewriting authored text is the designer's.
+- **`check_gv` §2c STILL SPLITS A CACHE BUTTON'S TEXT ON THE BAND'S `"  ["`.** With no band the split returns the whole
+  text, which is the rune's name, so the arm is right; a harmless relic of the band, left standing.
+- **THE BRIEF'S PREMISES THAT DID NOT HOLD** (HE §0): *"Slaughterhouse — the Berserker's engine"* as its author (no
+  engine lays a Bleed; ruling 3); *"Mirror Guard — Stances"* as its author (the Stances lay no guard, a swap card does);
+  *"a Warrior without Heavy Plating has none to lose"* (a Warden-lineage Warrior keeps the lineage's 0.10); *"its bonus
+  damage and Mana pay nothing without it"* (the companion's halves read no engine; ruling 2); *"the four boss offers
+  that move"* (seven; ruling 4); *"a card, so this is GP's card gate, not ENGINE_READ"* (GP's card gate is a table named
+  `ENGINE_READ` too); and *"two `test_batch_br` arms"* (five comparisons, their anchor and the 30 Rage arm).
+- **SIXTY ISOLATED COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata`, every one named **"Dawn of Decay
+  HE …"**: the recon of HEAD's gates (**"HE recon"**), HEAD's trees (**"HE head"**, **"head2"**, **"headgj"**), this tree's
+  traces and standalone runs (**"HE trace"**, **"trace2"**, **"solo"** and the seventeen **"solo check_…"**), the pre-pass
+  (**"HE prepass"**) and the thirty-five controls (**"HE ctl c00"** to **"c28b"**). Each was renamed in `project.godot`
+  before anything ran in it and seeded from the backup; they can be deleted. **There are 228 such folders now**,
+  counting every folder there but the live game's own. **The untracked `save-backups/` folder inside the repo is not
+  this batch's**; this batch's backup is `../save-backups/HE-20260922-101431`.
+
+### HD's RULINGS OWED — **ONE LEFT; THREE CLOSED AT HE (1 AND 2 RULED AND BUILT AT HE §3, 3 KEPT AT HE §5 AS THE REPRICE'S PINS)**
 
 Full working: `docs/reports/HD.md`, NEEDS A RULING.
 
-1. **LUNGE IS STILL OFFERED AT A SWORDMASTER'S ZONE BOSS WITHOUT THE STANCES.** It is on the Swordmaster's boss pool as
+1. ~~**LUNGE IS STILL OFFERED AT A SWORDMASTER'S ZONE BOSS WITHOUT THE STANCES.**~~ — **RULED AND BUILT AT HE §3**: the
+   boss asks the engine half of `offerable`, HC's reason for leaving it off overturned (the lineage outlives the engine);
+   0 in 400 unslotted now (`check_hd` §2, asserted). HD's record: it is on the Swordmaster's boss pool as
    well as his shelf, and the boss's first tier asks the PET half of `offerable` and not the engine half (HC §5's
    ruling: the engine half would move every engine's boss offer). So a Warrior of that lineage who unslots the Stances
    is offered it there — **280 times in 400 rolls, the same as with them slotted** (`check_hd` §2, printed). It is the
    shape Shatter, Overcharge and Divine Plea already had. Ask the engine half at that door (moves four boss offers),
    take Lunge off the boss pool (a pool change), or let it stand.
-2. **A DRAFT'S ANSWER RE-ASKS NO ENGINE, AND THE STANCE PIECES REACH IT NOW.** HC's finding, driven for them: a Guard
+2. ~~**A DRAFT'S ANSWER RE-ASKS NO ENGINE, AND THE STANCE PIECES REACH IT NOW.**~~ — **RULED AND BUILT AT HE §3**:
+   `Run.draft_choice` re-asks `Classes.offerable` at the pick, and the screen draws no button for a held card. HC's finding, driven for them: a Guard
    Change rolled with the Stances slotted is handed over after they are unslotted (`check_hd` §2, printed). The rune
    cache and the boss offer filter at the answer; the draft does not. Whether it should is the designer's.
-3. **`test_batch_br`'s CHARGE-AGAINST-STRIKE ARMS MEASURE A CLASS CARD AGAINST THE FREE BASIC — THE RETIRED RULE'S
-   FLOOR — AND WERE LEFT LIVE**, because they pin the designer's reprice of Charge (20 BD, 30 Rage) rather than
+3. ~~**`test_batch_br`'s CHARGE-AGAINST-STRIKE ARMS MEASURE A CLASS CARD AGAINST THE FREE BASIC — THE RETIRED RULE'S
+   FLOOR — AND WERE LEFT LIVE**~~ — **RULED AT HE §5: KEPT, AND RELABELLED AS THE REPRICE'S PINS** (five comparisons,
+   their anchor and the 30 Rage arm). HD's record: they were left live because they pin the designer's reprice of Charge (20 BD, 30 Rage) rather than
    re-verifying *weaker*. Every other comparison in the two "weaker" sections is retired and printed. Retire these too,
    or keep them as the reprice's pins.
 4. **THE BRIEF'S §3 FIGURES WENT TO THE RUNES, AND THE FOLD TOOK THE CARDS' OWN.** The thirty-five floors are card-pool
    floors; the figures were HC's rune table (a hero holding no engine is offered no Cleric rune, but 29 Cleric cards).
-   Built both ways (`docs/reports/HD.md` §3); confirm that is what was meant.
+   Built both ways (`docs/reports/HD.md` §3); confirm that is what was meant. **HE's brief did not answer it, so it is
+   still owed**; the rune floor has since moved (HE §1).
 
 ### FOUND AT HD AND NOT FIXED
 
-- **THE CLERIC'S NO-ENGINE RUNE FLOOR IS OWED, NOT PASSED.** `check_gv` §3 prints it as owed and notices the day it
-  rises; the design pass is authoring Cleric runes that read no engine, and the batch that lands them owes
+- **THE CLERIC'S NO-ENGINE RUNE FLOOR IS OWED, NOT PASSED — AND SINCE HE §1 SO IS THE MAGE'S SPAWN HALF.** `check_gv` §3
+  prints each as owed and notices the day it rises; the design pass is authoring Cleric runes that read no engine, and the batch that lands them owes
   `RUNE_FLOOR` its reading.
 - **`master.html` STILL SAYS *"All twelve specs draft from at least ten"*** — HA's second document-and-pin pair
-  (`test_batch_cb:1246`, tier 2), HE's. HD corrected the first pair (`CLAUDE.md`'s seam and `test_batch_br`'s pin)
+  (`test_batch_cb:1246`, tier 2), **HF's** now. HD corrected the first pair (`CLAUDE.md`'s seam and `test_batch_br`'s pin)
   and swept that claim's two copies out of `master.html` §6b, and the HB-era *"the Beastmaster's"* Summon Companion
   in its interface section.
 - **THE FOLD'S FLOOR SITS AT THE READING**, so the next batch that gates a card, moves one into a kit or retires one
   reds eleven suites at once through one table (`CLASS_POOL_FLOOR`) — by design; that batch moves the table and says
-  why.
+  why. **HE gated no draft card** (its three new card rows are boss-only), so the table did not move.
 - **THE BRIEF'S PREMISES THAT DID NOT HOLD** (HD §0): *"the other 110 are HE"* (seventy-three); *"derive the floor
   values from HC's measured table"* (HC's table is runes); *"35 per-spec pool floors"* (twenty-three lineage-shelf and
   twelve class-wide, and a thirty-sixth HA did not list); *"HB made every Hunter summon"* (every Hunter but the Lethal
@@ -120,7 +197,15 @@ Full working: `docs/reports/HD.md`, NEEDS A RULING.
   such folders now**, counting every folder there but the live game's own. **The untracked `save-backups/` folder
   inside the repo is not this batch's**; this batch's backup is `../save-backups/HD-20260921-144901`.
 
-### HC's RULINGS OWED — **FIVE, ALL PLAYER-VISIBLE; THE FIRST DECIDES WHAT THE RUNE DESIGN PASS STARTS FROM**
+### ~~HC's RULINGS OWED~~ — **ALL FIVE CLOSED AT HE: FOUR RULED AND BUILT (1, 2, 3, 5), ONE CONFIRMED AS BUILT (4)**
+
+HE's brief ruled all five. **1**: the six are gated on the engine that authored what each reads — Burn, Chilled, the
+Survivalist's Poison, the Defensive guard, a bleedout — and each read site asks it too (HE §1). **2**: Bared Plate is
+gated on Heavy Plating (HE §1). **3**: the scope band is gone from every surface (HE §4). **4**: *that class* stands, as
+built at HC. **5**: Mark of the Hunt is a ruled row on Pack Bond, and sits out with it (HE §2). The working below is
+HC's, kept as the record of what was ruled.
+
+#### HC's five, as HC recorded them
 
 Full working: `docs/reports/HC.md`, NEEDS A RULING.
 
@@ -153,8 +238,10 @@ Full working: `docs/reports/HC.md`, NEEDS A RULING.
   Conviction, Ruin), so a Cleric holding a spine, a rule engine, any pair of the three non-lineage engines, or nothing,
   is offered no ordinary rune at spawn or ever — the designer's own Cleric (Sanctity) among them. **That is the input
   the rune design pass needs, stated here so it is not re-derived**: the Warrior's, the Mage's and the Hunter's classes
-  each hold at least three runes that read no engine; the Cleric's holds none.
-- **A CARD DRAFT'S ANSWER RE-ASKS NEITHER THE ENGINE NOR THE PET.** `draft_candidates` are rolled at the elite through
+  each hold at least three runes that read no engine; the Cleric's holds none. **Since HE §1 the Mage's three that
+  needed no drafted card are gated, so a Mage holding no engine is offered none at spawn either** (HE's ruling 5).
+- ~~**A CARD DRAFT'S ANSWER RE-ASKS NEITHER THE ENGINE NOR THE PET.**~~ **CLOSED AT HE §3** (`Run.draft_choice`). HC's
+  record: `draft_candidates` are rolled at the elite through
   `Classes.offerable` and answered on the party draft screen by `take_draft_ability`, which refuses only a card the hero
   already owns — so a card rolled while its engine was slotted is still handed over after the engine is unslotted (it
   then sits out, GT §3). The rune cache and, since HC, the zone boss's first tier filter at the answer; the draft does

@@ -62,11 +62,21 @@ const SEATS := ["warrior", "mage", "cleric", "hunter"]
 # prints it as owed, notices the day it rises, and asserts instead what still
 # means something — that SOME engine of his opens a rune at spawn, which goes red
 # the day a Cleric can be offered nothing at all.
+#
+# **BATCH HE §1 MOVED ALL THREE FLOORED ROWS, AND SAYS WHY HERE, AS HD RULED THE
+# BATCH THAT THINS A HALF MUST.** Seven runes became RULED rows of `Runes.ENGINE_READ`
+# — the six that read a status or a stance no class kit lays, and Bared Plate — so
+# a hero holding no engine is offered none of them: the Warrior loses Bared Plate,
+# Slaughterhouse and Mirror Guard (5 / 9 → 2 / 6), the Mage Long Fuse, Killing Cold
+# and Deep Cold (3 / 7 → 0 / 4), the Hunter Long Poison (5 / 7 → 4 / 6). **AND A HALF
+# THAT READS ZERO IS OWED HALF BY HALF NOW**: the Mage's spawn half is 0 while his
+# ceiling half is 4, so the ceiling is floored and the spawn half is owed, as the
+# Cleric's whole row is.
 const RUNE_FLOOR := {
-	"warrior": [5, 9],
-	"mage": [3, 7],
+	"warrior": [2, 6],
+	"mage": [0, 4],
 	"cleric": [0, 0],
-	"hunter": [5, 7],
+	"hunter": [4, 6],
 }
 const SCRATCH_PROFILE := "user://gv_profile.json"
 const SCRATCH_RELICS := "user://gv_relics.json"
@@ -100,6 +110,14 @@ const ROWS := {
 	"keen_focus": "lethal_aim", "heavy_bolts": "lethal_aim", "ambush": "lethal_aim",
 	"shared_mark": "lethal_aim", "long_draw_press": "lethal_aim",
 	"second_barb": "trapper", "thin_blood": "trapper",
+	# BATCH HE §1 — SEVEN RULED ROWS (each `ruled: "HE §1"` in the table): the six
+	# that read a status or a stance no class kit lays, gated on the engine that
+	# authored what they read, and Bared Plate on the one engine that gives a
+	# Warrior Block to trade. Each read site asks the engine too, so §1 drives them
+	# as rows — paid with the engine equipped, nothing with it merely owned.
+	"long_fuse": "overburn", "killing_cold_fk": "permafrost", "deep_cold": "permafrost",
+	"long_poison": "trapper", "mirror_guard": "seasoned",
+	"slaughterhouse_rune": "bloodrage", "bared_plate": "heavy_plating",
 }
 
 # ── THE OTHER TWENTY-FIVE, AND WHAT EACH READS IN PLACE OF AN ENGINE ────────
@@ -111,8 +129,11 @@ const ROWS := {
 # the door a rune found paying nobody comes back through, and a batch that
 # deleted it would have to re-derive it; §1 prints how many rows carry it, so an
 # empty group reads as a fact rather than as a branch nobody noticed.
+# **BATCH HE §1 — SEVEN LEFT THE GROUPS FOR `ROWS`** (Killing Cold from HALF, Long Fuse,
+# Deep Cold, Long Poison and Slaughterhouse from STATUS, Mirror Guard from STANCE,
+# Bared Plate from NOTHING), by ruling: the STATUS and STANCE groups are empty
+# now, and a rune authored into either shape is gated on its engine instead.
 const GROUPS := {
-	"killing_cold_fk": ["HALF", "bites a boss sitting on four Chilled either way; a held body only with the engine"],
 	"glass_prison": ["HALF", "a second body frozen either way; a second PRISON only with the engine"],
 	"open_line": ["HALF", "Formless opens both stance gates either way; its numbers only with the engine"],
 	"blood_debt_rune": ["HALF", "the target pays and he does not either way; the Frenzy steps only with the engine"],
@@ -127,14 +148,8 @@ const GROUPS := {
 	"carrion": ["CARD", "Downwind"],
 	"answering_pack": ["CARD", "a companion, which Call the Wilds fields with no engine"],
 	"bared_fang": ["CARD", "a companion, which Call the Wilds fields with no engine"],
-	"long_fuse": ["STATUS", "Burn"],
-	"deep_cold": ["STATUS", "Chilled"],
-	"long_poison": ["STATUS", "Poison"],
-	"slaughterhouse_rune": ["STATUS", "Bleed"],
-	"mirror_guard": ["STANCE", "the Defensive guard, which any swap card reaches"],
 	"last_word": ["NOTHING", "his own health"],
 	"long_watch": ["NOTHING", "Break damage"],
-	"bared_plate": ["NOTHING", "Break damage"],
 	# BATCH GW §1 — THE SHARED HIDE WAS THE `DEAD` ROW AND IT IS NOT DEAD NOW.
 	# GV measured it paying nothing in all four arms, named it DEAD and said the
 	# day it is wired this gate would say so. GW wired it: the field crosses onto
@@ -855,8 +870,15 @@ func _s1_every_rune_driven() -> void:
 # just as well on a price that was simply deleted. The EQUIPPED arm is what
 # still discriminates: the refusal has to land there, or this section is
 # measuring nothing. `check_gw` §3 carries the payouts beside the prices.
+#
+# **BATCH HE §1 — AND A THIRD: BARED PLATE, WHOSE PRICE ASKS HEAVY PLATING BY
+# RULING.** Its price refuses his Block roll and zeroes the chance a Covering
+# Guard reads (`_live_block_chance`), and both sites ask the engine since HE, as
+# its payout does (§1 drives the payout; nothing drove the price until this arm,
+# so a price site that stopped asking would have read green). The same three
+# boards: the refusal lands only with the engine EQUIPPED.
 func _s1b_the_price() -> void:
-	print("\n§1b — the two rows whose price is gated with its payout (GW §3)")
+	print("\n§1b — the three rows whose price is gated with its payout (GW §3, and Bared Plate at HE §1)")
 	for arm in [[true, true], [false, true], [false, false]]:
 		var equip: bool = arm[0]
 		var wear: bool = arm[1]
@@ -888,6 +910,31 @@ func _s1b_the_price() -> void:
 			ok(tick > 0, "§1b: his poison does not bite with the engine %s and the rune %s (%d)" % [
 				"equipped" if equip2 else "merely owned", "worn" if wear2 else "not worn", tick])
 		await _clear(s2)
+	# BARED PLATE: his Block chance set to a certainty, so a blow whose roll is
+	# not refused is a block — and the chance a Covering Guard would read, beside.
+	for arm3 in [[true, true], [false, true], [false, false]]:
+		var equip3: bool = arm3[0]
+		var wear3: bool = arm3[1]
+		var s3: Node = await _board("bared_plate", equip3, wear3)
+		var u3: BattleUnit = _hero(s3, "warrior")
+		var f3: BattleUnit = _foes(s3)[0]
+		u3.block_chance = 1.0
+		var live: float = s3._live_block_chance(u3)
+		seed(SEED)
+		for _b in 4:
+			u3.hp = u3.max_hp
+			await _struck(s3, f3, u3, 20)
+		var blocked := _log_count(s3, " BLOCKS ")
+		print("    [Bared Plate, engine %s, rune %s] Block chance read %.2f; %d of 4 blows blocked" % [
+			"equipped" if equip3 else "owned", "worn" if wear3 else "not worn", live, blocked])
+		if equip3 and wear3:
+			ok(live == 0.0 and blocked == 0,
+				"§1b: Bared Plate's price did not refuse his Block with the engine EQUIPPED (chance %.2f, %d blocked)" % [live, blocked])
+		else:
+			ok(live > 0.0 and blocked > 0,
+				"§1b: his Block was refused with the engine %s and the rune %s (chance %.2f, %d blocked)" % [
+					"equipped" if equip3 else "merely owned", "worn" if wear3 else "not worn", live, blocked])
+		await _clear(s3)
 
 
 # ── §1c — WHAT EACH HALF-WORKS RUNE KEEPS ONLY WITH ITS ENGINE ───────────────
@@ -895,6 +942,10 @@ func _s1c_the_half() -> void:
 	print("\n§1c — the half each HALF-WORKS rune keeps only with its engine")
 	# KILLING COLD on a body that can be HELD: the held pile stays at four with
 	# the engine; without it the freeze is ordinary ice and the pile drops to one.
+	# **BATCH HE §1 — IT IS A RULED ROW NOW, AND ITS BILL ASKS PERMAFROST**, so the
+	# half it kept without the engine (a boss already sitting on four Chilled) is
+	# gone and §1 drives it as a row. This arm is kept as the record of the half:
+	# it still separates with the engine and not without, which a row does too.
 	var kc := {}
 	for equip in [true, false]:
 		for wear in [true, false]:
@@ -1210,9 +1261,12 @@ func _s2c_the_screen(rolled: Array) -> void:
 	# the line says one more waits; and THE BUTTON PRESSED IS THE RUNE HANDED
 	# OVER — the second button shows the THIRD stored rune, so a pick that
 	# indexed the stored triple would hand over the wrong one.
+	# **BATCH HE §1 — THE THIRD WAS SLAUGHTERHOUSE, AND IT IS BLOOD FRENZY'S NOW**
+	# (a ruled row), so the cache held two rows and drew one button. Long Watch
+	# reads no engine and takes its place: the arm's shape is unchanged.
 	var bz: Dictionary = _run.party[0]
 	bz["rune_candidates"] = [[Runes.build("open_vein"), Runes.build("last_word"),
-		Runes.build("slaughterhouse_rune")]]
+		Runes.build("long_watch")]]
 	bz["rune_picks_owed"] = 1
 	(bz["engines"][0] as Dictionary)["equipped"] = false
 	screen.call("_open_pick_overlay", 0)
@@ -1229,7 +1283,7 @@ func _s2c_the_screen(rolled: Array) -> void:
 			var t3 := String((b3 as Button).text)
 			if t3.begins_with("Open Vein"):
 				ok(false, "§2c: Open Vein was drawn as a button with Blood Frenzy unequipped")
-			if t3.begins_with("Last Word") or t3.begins_with("Slaughterhouse"):
+			if t3.begins_with("Last Word") or t3.begins_with("Long Watch"):
 				rune_btns.append(b3)
 		ok(rune_btns.size() == 2, "§2c: the part-row cache drew %d rune buttons, not two" % rune_btns.size())
 		if rune_btns.size() == 2:
@@ -1350,17 +1404,21 @@ func _s3_what_can_be_offered() -> void:
 				cls, _names(bare_ce.filter(func(i): return ROWS.has(String(i))))])
 		# HD §3 — THE NO-ENGINE FLOOR, OFF HC's TABLE (the const above says why).
 		var fl: Array = RUNE_FLOOR[cls]
-		var owed := int(fl[0]) <= 0 or int(fl[1]) <= 0
-		if not owed:
-			ok(bare_sp.size() >= int(fl[0]) and bare_ce.size() >= int(fl[1]),
-				"§3 floor: a %s holding no engine is offered %d at spawn and %d at the ceiling, below HC's %d / %d — the no-engine half thinned (HD §3)" % [
-					cls, bare_sp.size(), bare_ce.size(), int(fl[0]), int(fl[1])])
-		else:
-			print("      OWED (HD §3): a %s holding no engine is offered %d at spawn and %d at the ceiling — a floor of zero asserts nothing, and the rune design pass owes this class runes that read no engine" % [
-				cls, bare_sp.size(), bare_ce.size()])
-			if bare_sp.size() > 0 or bare_ce.size() > 0:
-				print("      NOTICE (HD §3): the owed floor has arrived — %s's no-engine offer is %d / %d; RUNE_FLOOR is owed its reading" % [
-					cls, bare_sp.size(), bare_ce.size()])
+		# BATCH HE §1 — EACH HALF IS FLOORED OR OWED ON ITS OWN: a zero asserts
+		# nothing, and since HE a class can read zero at spawn and not at the
+		# ceiling (the Mage). A half at zero prints OWED and notices the day it rises.
+		var halves := [["at spawn", bare_sp.size(), int(fl[0])], ["at the ceiling", bare_ce.size(), int(fl[1])]]
+		for hf in halves:
+			if int(hf[2]) > 0:
+				ok(int(hf[1]) >= int(hf[2]),
+					"§3 floor: a %s holding no engine is offered %d %s, below its floor of %d — the no-engine half thinned (HD §3; the floor moved at HE §1)" % [
+						cls, int(hf[1]), hf[0], int(hf[2])])
+			else:
+				print("      OWED (HD §3): a %s holding no engine is offered %d %s — a floor of zero asserts nothing, and the rune design pass owes this class runes that read no engine" % [
+					cls, int(hf[1]), hf[0]])
+				if int(hf[1]) > 0:
+					print("      NOTICE (HD §3): the owed floor has arrived — %s's no-engine offer %s is %d; RUNE_FLOOR is owed its reading" % [
+						cls, hf[0], int(hf[1])])
 		var engs: Array = Classes.class_engines(cls)
 		# AND THE ARM THAT STILL MEANS SOMETHING FOR AN OWED ROW: some engine of his
 		# class opens a rune at spawn. It goes red the day a hero of the class can
