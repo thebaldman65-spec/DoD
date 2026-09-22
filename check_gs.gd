@@ -419,10 +419,25 @@ func _s2_who_is_offered() -> void:
 	print("\n§2 — who is offered a returning card")
 	var gated := 0
 	var working := 0
+	var ruled := 0
 	for card in _returning:
 		var key := String(_returning[card][0])
 		var eng := Classes.engine_read(String(card))
 		var r: Array = await _cast_bare(String(card), key, false)
+		# **BATCH HD §1 — A RETURNING CARD GATED BY RULING, NOT BY WHAT A CAST
+		# SHOWS.** Guard Change came back to the Swordmaster's shelf at GS and is a
+		# row of the card gate since HD, by the designer's ruling — and it still
+		# casts without the Stances, which is WHY it is a ruling and not one of the
+		# three rows GS's cast derived. So it is not the arm below (refused without
+		# its engine), and it is not counted in GS's three: it is asserted castable
+		# and moving the board with no engine, and counted apart. Its offer is
+		# asked below with every other row's, both directions.
+		if eng != "" and Classes.engine_read_ruled(String(card)) != "":
+			ruled += 1
+			ok(bool(r[0]) and bool(r[1]),
+				"§2: %s is a RULED row (%s) and a %s holding no engine can no longer cast it — the cast test would find it now (usable %s, moved %s)" % [
+					card, Classes.engine_read_ruled(String(card)), key, r[0], r[1]])
+			continue
 		if eng != "":
 			gated += 1
 			ok(not bool(r[0]), "§2: %s is gated on %s and a %s holding none can cast it" % [card, eng, key])
@@ -445,9 +460,11 @@ func _s2_who_is_offered() -> void:
 					card, key, r[0], r[1]])
 			if bool(r[0]) and bool(r[1]):
 				working += 1
-	print("    %d refused without their engine (rows of `ENGINE_READ`), %d work with none" % [gated, working])
-	ok(gated == 3, "§2: %d returning cards are gated — GS derived three" % gated)
-	ok(gated + working == _returning.size(), "§2: %d of %d returning cards were driven" % [gated + working, _returning.size()])
+	print("    %d refused without their engine (rows of `ENGINE_READ`), %d work with none, %d gated by ruling (HD §1)" % [
+		gated, working, ruled])
+	ok(gated == 3, "§2: %d returning cards are gated by what a cast shows — GS derived three" % gated)
+	ok(gated + working + ruled == _returning.size(), "§2: %d of %d returning cards were driven" % [
+		gated + working + ruled, _returning.size()])
 	# THE OFFER DOOR, BOTH DIRECTIONS: offered to none exactly when ungated, and
 	# offered to the holder when gated.
 	_run.sim_run = false

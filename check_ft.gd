@@ -1295,8 +1295,43 @@ func _s5_the_floor() -> void:
 
 	# (f) ELEMENT-BLIND, DRIVEN. Fire, frost and arcane book the same floor. The
 	# SOURCE assertion in §1a is the proof; this is the drive beside it.
-	ok(free_books.size() == 3 and free_books.count(fl) == 3,
-		"§5f: the free casts of all three Mage specs read %s, want [%d, %d, %d] — identical, the floor" % [str(free_books), fl, fl, fl])
+	# **BATCH HD §2 — REPAIRED: THE DRIVE CAST ONE ELEMENT THREE TIMES.** It read
+	# the three lineages' FREE casts, and since GS no engine overrides the Mage's
+	# basic — so all three were Magic Bolt, arcane, and fire and frost were never
+	# cast at all while this read [floor, floor, floor]. The free casts are still
+	# (a)'s evidence and still printed; the element drive now casts one card of
+	# EACH school a Mage can hold, each from an empty bar — a cast that took
+	# nothing off it, so what it books is the floor or it is not element-blind —
+	# and asserts the three schools really are three before it reads the books.
+	print("  §5a free casts, per lineage: %s" % str(free_books))
+	var el_scene: Node = await Gate.spawn(self, ["berserker", "pyromancer", "holy", "sharpshooter"])
+	var el_mage: BattleUnit = el_scene.get("heroes")[1]
+	var el_foe: BattleUnit = el_scene.get("enemies")[0]
+	for e in el_scene.get("enemies"):
+		e.max_hp = 500000
+		e.hp = 500000
+	var by_school := {}
+	for nm in Classes.draft_pool("mage"):
+		var cand: Ability = Classes.pool_ability(String(nm))
+		if cand == null or cand.special != "" or cand.damage <= 0 \
+				or cand.target != Ability.Target.ENEMY:
+			continue
+		if ["fire", "frost", "arcane"].has(cand.dmg_type) and not by_school.has(cand.dmg_type):
+			by_school[cand.dmg_type] = cand
+	ok(by_school.size() == 3,
+		"§5f: a plain fire, frost and arcane card a Mage can hold — found %s" % str(by_school.keys()))
+	var el_books := {}
+	for school in by_school:
+		var el_ab: Ability = by_school[school]
+		var el_d := await _cast_delta(el_scene, el_mage, el_ab, el_foe, false, 0)
+		el_books[school] = int(el_d["mana"])
+	el_scene.queue_free()
+	await process_frame
+	var el_vals: Array = el_books.values()
+	ok(el_books.size() == 3 and el_vals.count(fl) == 3,
+		"§5f: a %s cast from an empty bar books %s — every school the floor, %d" % [
+			" / ".join(PackedStringArray(by_school.keys().map(func(k): return "%s (%s)" % [by_school[k].display_name, k]))),
+			str(el_books), fl])
 
 	# (h) THE RELATION, OVER THE CORPUS. `Classes.ability_corpus()` is the one
 	# authorised walk (DA §3, and `check_da` §3 is what said so when this section's

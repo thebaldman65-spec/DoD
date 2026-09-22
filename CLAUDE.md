@@ -2778,6 +2778,10 @@ runes have always carried their own.
   supplies it. Whether they are gated is the designer's (`docs/state.md`); **a new rune of that shape is sorted into
   this list in the batch that authors it.**
 - **WHAT A HERO CAN BE OFFERED IS MEASURED, NEVER WRITTEN HERE** (`docs/reports/HC.md` §3, and `check_gv` §3 prints it).
+  **Since HD §3 its no-engine half is also a FLOOR per class at HC's reading** (`check_gv` §3's `RUNE_FLOOR`, ruled):
+  a floor and never an equality, and **a class whose floor reads zero is OWED, not passed** — a floor of zero asserts
+  nothing, so that class's row asserts instead that some engine it can slot opens a rune, which goes red the day a
+  hero of it can be offered nothing.
   One reading is a rule's consequence and is stated: **a Cleric holding no Cleric lineage engine is offered no ordinary
   rune**, because every Cleric rune reads Mercy, Conviction or Ruin.
 - **ES §2's OTHER HALF STANDS AS RECORD**: the five universals were ruled re-scoped rather than retired, ET §1 retired
@@ -3530,17 +3534,26 @@ spine-taker from 3 to 6.**
 · **THE WARRIOR POOLS WERE OWED AND ARE PAID** — Berserker Blood Offering / Gut Rip, Warden
   Covering Guard / Eye of the Storm, Swordmaster Precision Strike / Feint.
 · **THE CLASS-WIDE TRANCHE IS PAID IN FULL**: `CLASS_DRAFT_POOLS` meets its
-  own original target, and
-  **THE ONE-IN-FOUR CLASS SEAM DRAWS A REAL ENTRY FOR EVERY HERO IN THE GAME** — no class rolls an
-  empty pool and no offer loses its class card.
+  own original target, and **EVERY CLASS-WIDE CARD IS AN ORDINARY CARD OF ITS CLASS'S ONE POOL**
+  since GP — the one-in-four seam that drew one went with the merge, so no offer holds a class card
+  by rule and a class-wide card reaches a hero through the shuffle alone (HD §2 re-pointed this line,
+  and `test_batch_br`'s pin on it, from the seam to the merge).
 · **TRANCHES 2 AND 3 ARE BOTH PAID**, the four classes completing in order — the Mage first,
   **THE CLERIC SECOND**, the Hunter third and the Warrior last, and **ALL FOUR ARE COMPLETE**.
 · **NEITHER HALF IS A FLAT MULTIPLE ANY MORE.** Both expectations are summed tables
   (`test_batch_cd.PER_SPEC_DEPTH` and `PER_CLASS_DEPTH`) — **do not write `12 * 8` or `4 * 6`
   again**, and do not quote the old ninety-six-card denominator, which died at CD §2.
-· **THE ASSERTED FLOORS ARE EIGHT (spec) AND THREE (class, the Cleric's pool since GN), AND BOTH ARE DELIBERATELY SLACK.** They
-  catch a pool that EMPTIES rather than tracking the deepening. **Every draft suite asserts the
-  FLOOR and the TOTAL; the two tables above are the only authoritative depths.**
+· **THE ASSERTED FLOOR IS ONE PER CLASS, IN TWO HALVES, AT THE MEASURED READING (HD §3, ruled by the
+  designer).** The per-shelf floors — eight a lineage shelf, three a class-wide one — described sixteen
+  shelves and are FOLDED: a hero draws his class's one pool, so a shelf floor reds on a card moved
+  between two shelves and says nothing when the gate thins what he is offered. **The floor asserts
+  BOTH the whole pool (`Classes.draft_pool(k)`) and what a hero holding no engine can be offered
+  (`Classes.offerable(draft_pool(k), [])`): they measure different things, and the no-engine half is
+  the one that goes thin.** It is ONE helper, `suite_fixture.class_pool_floors`, which the eleven draft
+  suites share, with its values in `CLASS_POOL_FLOOR` at the reading and never below it — **and a floor
+  of zero is refused**, because it asserts nothing: the helper reds the day a class can be offered
+  nothing. The batch that thins either half moves that one table and says why. Every draft suite
+  still asserts the TOTAL, and the two tables above are still the only authoritative depths.
 · **A STANDING BLOCK STATES A NUMBER ONCE.** A superseded snapshot once sat forty-nine lines below
   the line that contradicted it, inside this block, and **survived CW's split because that sweep
   was for narrative FORM and this was narrative in every way but its formatting.**
@@ -3553,11 +3566,18 @@ spine-taker from 3 to 6.**
 
 **CLASS-WIDE AUTHORING RULES, recorded with the arrays so they travel with the content:**
 deliberately UNTIED AND GENERAL (Mirror Image, not Frostbolt — the test is whether it would read
-as off-theme for ANY spec of that class), and **WEAKER THAN SPEC ABILITIES AND UNCONDITIONAL** —
-they feed no passive, so at equal power they would be a safe default that dilutes every build.
-**VERIFY THE "WEAKER" HALF AGAINST THE LIVE SPEC KITS RATHER THAN TRUSTING THE BRIEF, AND CHECK IT
-AGAINST THE FREE CORE ATTACK TOO** — a comparison against spec ABILITIES alone misses a card
-dominated by a basic.
+as off-theme for ANY spec of that class).
+**~~WEAKER THAN SPEC ABILITIES AND UNCONDITIONAL~~ — RETIRED AT HD §1, RULED BY THE DESIGNER. DO NOT APPLY IT.**
+It read: *they feed no passive, so at equal power they would be a safe default that dilutes every
+build* — the class-wide card was the FALLBACK a hero drew while his engine was not online, and a
+fallback at equal power is the default everybody takes. **GP merged the pools and there is no
+fallback: a class-wide card is just a card of its class's one pool.** Its companion — *verify the
+"weaker" half against the live spec kits and against the free core attack* — retired with it. **The
+rule is struck and kept here so that nobody re-derives it; the two suites that re-verified it
+(`test_batch_bq` §2, `test_batch_br` §4) print their comparisons as the record and assert this
+retirement, on the Melted Armor contract. The cards are still authored weaker, and the rebalance GP
+recorded as owed stays owed** — retiring the rule removes the reason they must be weaker, not the
+fact that they are.
 
 ## STANDING RULE — ONE DRAFT POOL A CLASS, AND A CARD THAT READS AN ENGINE IS OFFERED ONLY TO ITS HOLDER (Batch GP §1/§2)
 > **The three lineage shelves and the class-wide shelf of a class are ONE POOL. A hero draws from
@@ -3567,7 +3587,8 @@ dominated by a basic.
 > `spec_draft_pool(his spec)` for "what this hero can be offered" is wrong and still passes.**
 >
 > **A card that READS an engine is offered only to a hero who holds it.** `Classes.ENGINE_READ` is
-> the table — 37 cards, one `why` apiece — and `Classes.offerable` is the one answer, asked by the
+> the table — 39 rows, one `why` apiece: 37 the cast test found and two the designer RULED (HD §1) —
+> and `Classes.offerable` is the one answer, asked by the
 > draft offer and by the zone-boss fallback so the two cannot disagree. *Since HB it asks a second,
 > negative question beside the engine one: a card that needs a companion is not offered to a hero who
 > has dismissed the pet (the block* EVERY HUNTER HAS A PET *above).*
@@ -3584,6 +3605,20 @@ dominated by a basic.
 - **THREE GROUPS AND ONLY ONE IS GATED.** CANNOT-work is gated; HALF-works is not (a card that
   still does most of its job is a legitimate offer — Boil Over deals 22 against 89); FEEDS an
   engine without reading it is not (it works for anyone and pre-arms an engine he might draft).
+- **BUT TWO ROWS ARE RULINGS, NOT FINDINGS: THE STANCE PIECES ARE THE STANCES HOLDER'S (HD §1, ruled by
+  the designer).** Guard Change and Lunge HALF-WORK without the engine (`seasoned`) — the swap still lands
+  its 15 Break damage and flips a guard only a card reads; the thrust still strikes, down its Aggressive
+  branch — so the cast test leaves both in the second group, and the designer gated them anyway. **Each
+  row carries `ruled` (`Classes.engine_read_ruled`), `offerable` gates it like any other, and an
+  instrument that DERIVES the table drives a ruled row as a ruling** — its offer both ways, and its
+  premise asserted: with no engine it is still usable and still moves the board (`check_gp` §2e,
+  `check_gm` §2, `check_gs` §2), so the day it is not, the cast test has found it and `ruled` is no
+  longer why it is gated — **never as a pair that should read apart.** Three of HEAD's gates read the
+  two rows as mistakes on the new code, each asking a row to be refused at the door; that was their
+  assumption, not the rows'. A ruled row is no evidence for the derivation, and the derivation none against it.
+  **Lunge is also on the Swordmaster's zone-boss pool, whose first tier asks the pet half of `offerable`
+  and not the engine half (HC §5)**, so a Warrior of that lineage who unslots the Stances can still be
+  offered it there — as he can Shatter, Overcharge or Divine Plea on theirs. `docs/state.md` carries it.
 - **A ROW WHOSE PAYOUT IS A LATER STRIKE OR A LATER EVENT CANNOT BE FOUND BY A BOARD TEST.**
   Unslaked, Anvil and Recompense land and move nothing until a blow arrives; Intercession, Last
   Howl and Succession until a death or a swap. Six of the 34 were found by READING the site and
@@ -3593,7 +3628,8 @@ dominated by a basic.
 - **THE CLASS-WIDE CARDS LOST THEIR TIER AND ARE NOW THE WORST CARDS IN EACH POOL.**
   `CLASS_DRAFT_SHARE`, `Run.draft_card_is_class` and EH §1's third zone-boss tier are DELETED; the
   award chain is two tiers. They were authored WEAKER on purpose (EB §1, and `CLASS_DRAFT_POOLS`'
-  own header), the merge removes the reason, **and the rebalance is OWED and not taken.**
+  own header), the merge removes the reason — **and the rule itself is RETIRED at HD §1** (the
+  class-wide authoring rules above, struck) — **and the rebalance is OWED and not taken.**
 - **BOSS POOLS ARE NOT MERGED.** `SPEC_POOLS` stays spec-keyed and `roll_spec_ability_offer` still
   reads it. The merge joined the DRAFT's two pools, not the game's three. *Its first tier asks the pet half of
   `offerable` since HC §5 (the HB block), and not the engine half.*

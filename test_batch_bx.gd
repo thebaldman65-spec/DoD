@@ -404,11 +404,20 @@ func _cap_and_drop() -> void:
 	# §2, `drop_earned_ability` before it) refuses anything not in the POOL,
 	# which is the mechanical form of the rule rather than a branch that could
 	# be got wrong.
-	var protected: Array = Classes.PROTECTED_CORES.get("swordmaster",
-		{}).get("enablers", [])
-	var guard := "Guard Change"
-	ok(run.take_draft_ability(m, card, guard) != "" or protected.is_empty(),
-		"§2: a protected ability cannot be named as the bench")
+	# **BATCH HD §2 — REPAIRED: THE ARM COULD NOT FAIL.** It named Guard Change
+	# and passed OR the Swordmaster's enablers were empty — and they have been
+	# empty since GS, when the stance swap became a drafted card: protected for
+	# nobody, and the escape was always taken. The name is now one this member
+	# genuinely opens with — his class kit's first card — asserted in his loadout
+	# and out of his pool, and the door must refuse it as the bench with no way
+	# out: the pick still owed and the card not landed.
+	var guard := String(Classes.class_kit_names_for("warrior", run.held_engines(m))[0])
+	ok(run.loadout_ability_names(m).has(guard) and not run.earned_ability_names(m).has(guard),
+		"§2: %s is in this Swordmaster's loadout and out of his pool — a protected card" % guard)
+	ok(run.take_draft_ability(m, card, guard) != "",
+		"§2: a protected ability cannot be named as the bench (%s was accepted)" % guard)
+	ok(int(m.get("draft_picks_owed", 0)) == 1 and not (m["bm_abilities"] as Array).has(card),
+		"§2: ...and naming it spends nothing — the pick is still owed and %s did not land" % card)
 	# NAMED, IT RESOLVES — and **INVERTED AT BATCH EG §2**: the named one leaves
 	# the LOADOUT and stays in the POOL, and the ledger is not written. The
 	# guarantee the old assertion protected is kept beside it, reached through

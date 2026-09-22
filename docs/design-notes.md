@@ -4,6 +4,39 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The twenty holes, and the pool floors folded (Batch HD) — 2026-09-21
+
+**Why the stance pieces are the Stances holder's.** Guard Change and Lunge are the two cards a Swordmaster's stances
+are built on: one swaps the guard and the other is sold on which guard it is thrown from. After the merge every
+Warrior drew the Swordmaster's shelf, so every Warrior was offered both whether or not anything he held read a
+stance. Neither is useless without the engine — the swap still lands its Break damage, the thrust still hits — which
+is why the cast test GP used to build the card gate never gated them. The designer ruled that they belong with the
+engine anyway, so they are rows of the same gate, marked as rulings so nobody mistakes them for what the cast test
+found.
+
+**Why the "weaker" rule is gone.** Class-wide cards were written weaker because they were a fallback: the card a hero
+drew while his engine was not online, and a fallback at equal power is the default everybody takes. The merge put them
+in one pool beside everything else and took the fallback away, so the reason is spent. They are still weaker as
+authored, and whether to lift them is the rebalance the merge already recorded as owed.
+
+**Why a floor per class, and why two halves.** A shelf is where a card was written, not what a hero is offered, so a
+floor on a shelf could go red on a card moved between two shelves of one class — which changes nothing a player sees
+— and stay green while what he is offered thinned. The class pool is what he draws, and what a hero holding no engine
+can be offered is the half that thins, because every new gated card comes out of it. Asking both keeps the two apart.
+
+**Why the floor sits at the reading.** A floor set well below today's depth only notices a pool that nearly empties.
+Set at the reading, the batch that removes a card from either half has to change one table and say why, which is the
+point of the check.
+
+**Why the brief's numbers went to the runes.** They were HC's measured rune table, not the card pools; applied to the
+cards they would have asserted almost nothing. What the designer wanted from them — the no-engine case watched per
+class, and the Cleric's zero treated as owed rather than as correct — is exactly what a rune floor does, so that is
+where they went.
+
+**Why a hole is retired by asserting the fact that retired it.** A check with no subject left is tempting to delete, and
+deleting it loses the reason it stopped mattering. Keeping it, and making it assert the thing that dissolved its subject,
+means the day that thing stops being true the old question comes back on its own.
+
 ## The runes leave their specs (Batch HC) — 2026-09-21
 
 **Why a rune is scoped to its class now.** A spec was the one thing a rune could still be tied to once the talent

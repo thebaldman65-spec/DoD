@@ -184,46 +184,19 @@ func _run() -> void:
 # ---------- the pools ----------
 
 func _pools() -> void:
-	# THE HUNTER THREE JOIN THE MAGE AND CLERIC AT FIVE; THE WARRIOR THREE DO
-	# NOT MOVE. A batch that widens three pools is exactly where a fourth gets
-	# widened by accident, and the Warrior debt has to stay visible IN CODE
-	# rather than only in prose — it is the last third of tranche 2.
-	# RE-POINTED BY BATCH CB, THE FOURTH INVERSION: the three MAGE pools went
-	# to EIGHT when tranche 3's first third landed, so the Hunter three this
-	# suite shipped are no longer level with them. What still has to stay
-	# visible in code is which thirds are owed.
-	# RE-POINTED BY BATCH CE, AND IT IS THE FIFTH INVERSION OF THIS LOOP. It has
-	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
-	# tranche 2 achieved, then CB's new asymmetry, and now that asymmetry HALVED
-	# — the CLERIC three joined the Mage three at EIGHT when tranche 3's second
-	# third landed, so six pools are eight deep and six are five. The question is
-	# unchanged and is still what tells the two answers apart; what is owed now
-	# is the HUNTER and WARRIOR thirds, and it has to stay visible in code.
-	# RE-POINTED BY BATCH CH, AND IT IS AN INVERSION OF THIS SUITE'S OWN SUBJECT.
-	# BV is the batch that took these three pools 2 -> 5, so this loop is where
-	# that debt was recorded; CH takes them 5 -> 8 and the Hunter is the third
-	# class complete, so what the loop asserts is the payment rather than the
-	# debt. BV's own five are still the FIRST five of each pool — a later tranche
-	# APPENDS, it does not rewrite — which the literal pins below still check.
-	var five := ["beastmaster", "sharpshooter", "mystic"]
-	for spec in five:
-		var pool: Array = Classes.spec_draft_pool(spec)
-		ok(pool.size() >= 8, "%s drafts at least EIGHT since Batch CH (got %d)" % [spec, pool.size()])
-	for spec in ["pyromancer", "cryomancer", "arcanist",
-			"holy", "inquisitor", "occultist",
-			"beastmaster", "sharpshooter", "mystic"]:
-		ok(Classes.spec_draft_pool(spec).size() >= 8,
-			"%s drafts at least EIGHT since Batch CB/CE (got %d)"
-				% [spec, Classes.spec_draft_pool(spec).size()])
-	# RE-POINTED BY BATCH BW, AND IT IS AN INVERSION: this asserted the WARRIOR
-	# three were still at TWO because that debt was real and had to stay visible
-	# in code. BW paid it, so tranche 2 is complete and what is asserted is that
-	# ALL TWELVE are five. A pool quietly emptying still trips.
-	var still_two := ["berserker", "warden", "swordmaster"]
-	for spec in still_two:
-		ok(Classes.spec_draft_pool(spec).size() >= 8,
-			"%s drafts at least EIGHT (DO deepened it) (got %d)"
-				% [spec, Classes.spec_draft_pool(spec).size()])
+	# **FOLDED BY BATCH HD §3.** Three loops stood here asking each lineage's
+	# SHELF for at least eight — the Hunter three this suite shipped (2 -> 5 here,
+	# 5 -> 8 at CH), the nine beside them, and the Warrior three whose debt this
+	# suite kept visible until BW and CI paid it. The question — *did a pool
+	# quietly empty* — is kept; what moved is what a pool IS. Since GP a hero
+	# draws his class's one pool, so a shelf floor reds on a card moved between
+	# two shelves of one class and says nothing when the gate thins what a
+	# no-engine hero is offered. The helper the eleven suites share asks both
+	# halves of each class's pool at the floors HD measured; it also takes the
+	# class-wide shelves' floor of three from further down. BV's own five are
+	# still pinned as the first of each shelf by the literals below.
+	for fl in Fixture.class_pool_floors("test_batch_bv pools"):
+		ok(bool(fl[0]), String(fl[1]))
 	# And nothing else exists: twelve specs, nine at five and three at two.
 	ok(Classes.SPEC_DRAFT_POOLS.size() == 12, "there are twelve spec pools")
 	var total := 0
@@ -266,12 +239,9 @@ func _pools() -> void:
 		"BT's and BU's pools still lead with their own tranche-1 entries")
 	# CLASS_DRAFT_POOLS IS BYTE-UNTOUCHED — this batch adds no class card, and a
 	# spec ability leaking into a class pool is the BQ/BR/BU negative control.
-	# BATCH GN — THE FLOOR IS THREE, BY RULING: five class-wide cards moved into
-	# the class kits, so the Mage pool reads five and the Cleric's three. It
-	# still catches a pool that EMPTIES, which is all this floor ever asked.
+	# (The class-wide shelf's floor of three that stood beside it is FOLDED BY
+	# BATCH HD §3 into the per-class floor at the top of this function.)
 	for cls in Classes.CLASS_DRAFT_POOLS:
-		ok(Classes.class_draft_pool(cls).size() >= 3,
-			"%s's class pool has FALLEN below THREE" % cls)
 		for n in NINE:
 			ok(not Classes.class_draft_pool(cls).has(n),
 				"%s is a SPEC card and is not in %s's class pool" % [n, cls])

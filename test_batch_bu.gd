@@ -164,62 +164,18 @@ func _run() -> void:
 # ---------- the pools ----------
 
 func _pools() -> void:
-	# THE CLERIC THREE JOIN THE MAGE AT FIVE; THE HUNTER AND WARRIOR SIX DO NOT
-	# MOVE. A batch that widens three pools is exactly where a fourth gets
-	# widened by accident.
-	# RE-POINTED BY BATCH CB, AN INVERSION: the three MAGE pools this suite was
-	# written beside went to EIGHT when tranche 3's first third landed, so the
-	# CLERIC three it shipped are no longer level with them. BU's own five are
-	# still the first five of each Cleric pool, because a later tranche APPENDS.
-	# RE-POINTED BY BATCH CE, AND IT IS THE FIFTH INVERSION OF THIS LOOP. It has
-	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
-	# tranche 2 achieved, then CB's new asymmetry, and now that asymmetry HALVED
-	# — the CLERIC three joined the Mage three at EIGHT when tranche 3's second
-	# third landed, so six pools are eight deep and six are five. The question is
-	# unchanged and is still what tells the two answers apart; what is owed now
-	# is the HUNTER and WARRIOR thirds, and it has to stay visible in code.
-	var five := ["holy", "inquisitor", "occultist"]
-	for spec in five:
-		var pool: Array = Classes.spec_draft_pool(spec)
-		ok(pool.size() >= 8, "%s drafts at least EIGHT since Batch CE (got %d)" % [spec, pool.size()])
-	for spec in ["pyromancer", "cryomancer", "arcanist"]:
-		ok(Classes.spec_draft_pool(spec).size() >= 8,
-			"%s drafts at least EIGHT since Batch CB (got %d)"
-				% [spec, Classes.spec_draft_pool(spec).size()])
-	# RE-POINTED BY BATCH BV, which paid the HUNTER third: those three joined the
-	# Mage and Cleric at five, so ONLY THE WARRIOR THREE are still at two. Kept
-	# as an inversion rather than deleted — what matters is that the LAST unpaid
-	# third stays visible in code rather than only in prose.
-	for spec in ["beastmaster", "sharpshooter", "mystic"]:
-		ok(Classes.spec_draft_pool(spec).size() >= 8,
-			"%s drafts at least EIGHT since Batch CH — the Hunter is the third class complete" % spec)
-	# RE-POINTED BY BATCH BW, AND IT IS AN INVERSION: this asserted the WARRIOR
-	# three were still at TWO because that debt was real and had to stay visible
-	# in code. BW paid it, so tranche 2 is complete and what is asserted is that
-	# ALL TWELVE are five. A pool quietly emptying still trips.
-	# RE-POINTED BY BATCH CH, AND IT IS THE SIXTH INVERSION OF THIS LOOP. It has
-	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
-	# tranche 2 achieved, then CB's new asymmetry, then that asymmetry HALVED at
-	# CE, and now QUARTERED — the HUNTER three joined the Mage and Cleric at
-	# EIGHT when tranche 3's third third landed, so NINE pools are eight deep and
-	# only the WARRIOR THREE are still at five. The question is unchanged and is
-	# still what tells the two answers apart; what is owed is the Warrior third,
-	# and it is the LAST of the debt, so it has to stay visible in code.
-	# RE-POINTED BY BATCH CI, AND IT IS THE SEVENTH AND LAST INVERSION OF THIS
-	# LOOP. It has asserted, in order: each earlier tranche's own asymmetry, then
-	# the FLATNESS tranche 2 achieved, then CB's new asymmetry, that asymmetry
-	# HALVED at CE, QUARTERED at CH — and now GONE. The WARRIOR three joined the
-	# other nine at EIGHT when tranche 3's last third landed, so ALL TWELVE specs
-	# draft from eight and the draft is 120 of 120.
-	#
-	# **THERE IS NO DEBT LEFT TO KEEP VISIBLE, so what this loop guards from here
-	# on is the FLATNESS rather than an asymmetry**: a pool that quietly EMPTIES
-	# trips, where before it would have read as the old debt coming back. That is
-	# the reason it inverts rather than being deleted — the question is still
-	# worth asking, only the correct answer moved, and it moved for the last time.
-	for spec in ["berserker", "warden", "swordmaster"]:
-		ok(Classes.spec_draft_pool(spec).size() >= 8,
-			"%s drafts at least EIGHT (BW's five, CI's eight, DO's more)" % spec)
+	# **FOLDED BY BATCH HD §3.** Four loops stood here asking each lineage's
+	# SHELF for at least eight — the Cleric three this suite shipped, then the
+	# Mage, the Hunter and the Warrior three — through seven inversions of one
+	# question, *did a pool quietly empty*, that closed when CI paid the last
+	# third. The question is kept; what moved is what a pool IS. Since GP a hero
+	# draws his class's one pool, so a shelf floor reds on a card moved between
+	# two shelves of one class and says nothing when the gate thins what a
+	# no-engine hero is offered. The helper the eleven suites share asks both
+	# halves of each class's pool at the floors HD measured; it also takes the
+	# class-wide shelves' floor of three from further down.
+	for fl in Fixture.class_pool_floors("test_batch_bu pools"):
+		ok(bool(fl[0]), String(fl[1]))
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
@@ -244,13 +200,10 @@ func _pools() -> void:
 		and Classes.spec_draft_pool("occultist")[1] == "Covenant of Ash",
 		"the Occultist's tranche-1 pair still leads his pool")
 	# CLASS_DRAFT_POOLS IS BYTE-UNTOUCHED — this batch adds no class card, and a
-	# spec ability leaking into a class pool is the BQ/BR negative control.
-	# BATCH GN — THE FLOOR IS THREE, BY RULING: five class-wide cards moved into
-	# the class kits, so the Mage pool reads five and the Cleric's three. It
-	# still catches a pool that EMPTIES, which is all this floor ever asked.
+	# spec ability leaking into a class pool is the BQ/BR negative control. (The
+	# class-wide shelf's floor of three that stood beside it is FOLDED BY BATCH
+	# HD §3 into the per-class floor at the top of this function.)
 	for cls in Classes.CLASS_DRAFT_POOLS:
-		ok(Classes.class_draft_pool(cls).size() >= 3,
-			"%s's class pool has FALLEN below THREE" % cls)
 		for n in NINE:
 			ok(not Classes.class_draft_pool(cls).has(n),
 				"%s is a SPEC card and is not in %s's class pool" % [n, cls])
@@ -380,11 +333,30 @@ func _names() -> void:
 			"%s appears in exactly ONE pool (got %d)" % [n, int(seen.get(n, 0))])
 	# AND THE SWEEP THAT MATTERS: no OTHER ability in the game already carries
 	# one of these names. Every kit, pool, vault and talent grant is walked.
-	for spec in Classes.SPEC_IDS:
+	# **BATCH HD §2 — REPAIRED: THIS LOOP NEVER RAN.** It walked `Classes.SPEC_IDS`,
+	# whose keys are the four CLASSES, and asked `spec_abilities("warrior")` and
+	# the rest for their abilities — which is nothing, so not one assertion fired
+	# and the sweep read clean. It walks the twelve lineages now (`SPEC_INFO`), and
+	# since GS a lineage's table is its DEFINITIONS rather than its opening kit, so
+	# the opening kit's other halves are walked beside it — every class's basic and
+	# class kit. **And it counts what it walked**, because a sweep that asks its
+	# question of nothing prints exactly like a clean one.
+	var walked := 0
+	for spec in Classes.SPEC_INFO:
 		for ab in Classes.spec_abilities(spec):
+			walked += 1
 			ok(not (ab.display_name in NINE)
 				or Classes.spec_draft_pool(spec).has(ab.display_name),
-				"%s is not also an opening-kit ability" % ab.display_name)
+				"%s is defined by %s but not drafted off its shelf — a second home for a NINE name" % [
+					ab.display_name, spec])
+	for cls in Classes.SPEC_IDS:
+		for ab2 in Classes.kit(cls) + Classes.class_kit(cls):
+			walked += 1
+			ok(not (ab2.display_name in NINE),
+				"%s is also an opening-kit ability — the %s basic or class kit" % [ab2.display_name, cls])
+	print("  CHECKED %d lineage definitions, basics and class-kit cards against the NINE" % walked)
+	ok(walked >= 40,
+		"the NINE sweep walked %d abilities — the lineage tables and the kits read (almost) nothing" % walked)
 	# SUFFERING vs VOW OF SUFFERING — REPORTED, NOT RESOLVED, and the closest
 	# adjacency the draft has. One name is a strict SUBSTRING of the other, both
 	# are draft cards, and both belong to the CLERIC class (the Occultist's and

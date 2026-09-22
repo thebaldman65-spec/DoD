@@ -188,16 +188,14 @@ func _pools() -> void:
 	# BATCH GN — TWENTY: five class-wide cards moved into the class kits, by ruling.
 	ok(total >= 20,
 		"§0: the class-wide pool has FALLEN to %d, below the twenty GN left it at" % total)
-	# EVERY class pool holds six — the seam is closed, and this is the assertion
-	# that keeps it closed. BQ's own suite recorded the debt as an assertion so
-	# it stayed visible; this is the same discipline pointed the other way.
-	# BATCH GN — THE FLOOR IS THREE: the Mage pool reads five and the Cleric's
-	# three since five cards moved into the class kits. It still catches a pool
-	# that EMPTIES.
-	for cls2 in Classes.CLASS_DRAFT_POOLS:
-		ok(Classes.class_draft_pool(cls2).size() >= 3,
-			"§0: the %s class pool has FALLEN below three (%d)" % [
-				cls2, Classes.class_draft_pool(cls2).size()])
+	# EVERY class pool held six once BR paid the seam, and the assertion that kept
+	# it closed stood here at GN's floor of three. **FOLDED BY BATCH HD §3, WITH
+	# THE TWO LINEAGE-SHELF LOOPS BELOW AND §6's NO-EMPTY-POOL LOOP**: since GP a
+	# shelf is where a card was authored, not what a hero is offered, so the
+	# question *did a pool quietly empty* is asked once, of the class's one pool,
+	# both halves, by the helper the eleven suites share.
+	for fl in Fixture.class_pool_floors("test_batch_br §0"):
+		ok(bool(fl[0]), String(fl[1]))
 	for cls3 in TRANCHE_4:
 		var live: Array = Classes.class_draft_pool(cls3)
 		for nm in TRANCHE_4[cls3]:
@@ -235,32 +233,10 @@ func _pools() -> void:
 			% spec_total)
 	ok(spec_total + total >= 149,
 		"§0+DO+DR+DS: the draft has FALLEN to %d, below the 149 that shipped" % (spec_total + total))
-	# THE UNEVENNESS IS GONE, AND THAT IS THE INVERSION. Every earlier version of
-	# this loop asserted an asymmetry (five here, two there) because the debt was
-	# real and had to stay visible in code; BW paid the last of it, so what is
-	# asserted now is the FLATNESS. A pool quietly emptying still trips.
-	# RE-POINTED BY BATCH CB, AND IT IS THE FOURTH INVERSION OF THIS LOOP. It has
-	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
-	# tranche 2 achieved, and now a NEW asymmetry pointing the other way — the
-	# three MAGE pools are EIGHT deep and the other nine are five, because CB
-	# paid tranche 3's first third. The question is unchanged and is still what
-	# tells the two answers apart; what is owed now is the Cleric, Hunter and
-	# Warrior thirds of tranche 3, and it has to stay visible in code.
-	# RE-POINTED BY BATCH CE, AND IT IS THE FIFTH INVERSION OF THIS LOOP. It has
-	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
-	# tranche 2 achieved, then CB's new asymmetry, and now that asymmetry HALVED
-	# — the CLERIC three joined the Mage three at EIGHT when tranche 3's second
-	# third landed, so six pools are eight deep and six are five. The question is
-	# unchanged and is still what tells the two answers apart; what is owed now
-	# is the HUNTER and WARRIOR thirds, and it has to stay visible in code.
-	for sp2 in ["pyromancer", "cryomancer", "arcanist",
-			"holy", "inquisitor", "occultist",
-			"beastmaster", "sharpshooter", "mystic"]:
-		ok(Classes.spec_draft_pool(sp2).size() >= 8,
-			"§0+DO: %s's SPEC pool is at least EIGHT deep" % sp2)
-	for sp2 in ["berserker", "warden", "swordmaster"]:
-		ok(Classes.spec_draft_pool(sp2).size() >= 8,
-			"§0+tranche 3: %s drafts at least EIGHT — the Warrior third is paid" % sp2)
+	# THE UNEVENNESS WENT AT BW AND THE LOOPS THAT STOOD HERE ASSERTED THE
+	# FLATNESS — every lineage shelf at least eight, the nine and then the Warrior
+	# three (CB, CE, CH, CI). **FOLDED BY BATCH HD §3** into the per-class floor at
+	# the top of this section: a shelf is where a card was authored since GP.
 	# EVERY ENTRY RESOLVES THROUGH THE ONE RESOLVER, which is what makes the
 	# battle spawn, the hero sheet, the rune filter and the blacksmith pairing
 	# all pick them up with no new plumbing.
@@ -401,9 +377,33 @@ func _break_damage() -> void:
 			"REPRICE: ...and on having no cooldown (Charge sits on %d)" % charge.cooldown)
 
 
-# ---------- §4 THE "WEAKER" HALF, VERIFIED RATHER THAN TRUSTED ----------
+# ---------- §4 THE "WEAKER" HALF — RETIRED AT HD §1, KEPT AND SAID TO BE KEPT ----------
+
+const WEAKER_RETIRED := "RETIRED at HD §1 — the class-wide 'weaker' rule; printed as the record, not asserted"
+
+
+func _retired(held: bool, what: String) -> void:
+	print("  [retired] %s — %s (%s)" % [what, "held" if held else "NO LONGER HOLDS",
+		WEAKER_RETIRED])
+
 
 func _weaker_half() -> void:
+	# **RETIRED AT HD §1, KEPT AND SAID TO BE KEPT (the designer's ruling).** The
+	# rule this section re-verified — class-wide cards are written WEAKER than spec
+	# work — existed because they were a fallback, and GP left no fallback: a
+	# class-wide card is an ordinary card of its class's one pool. So every
+	# comparison below that held a class card to "weaker" (Bola, Aimed Volley,
+	# Cleave, the Rage the class cards do not build, Warcry against Battle Shout)
+	# is still computed and PRINTED as the record through `_retired`, and none is
+	# asserted. **What is asserted is the ruling, where the rule lives**, and what
+	# was never the rule: that the cards resolve, the Camouflage finding (a NODE's,
+	# GB) and the designer's reprice of Charge. The cards are still authored
+	# weaker, and the rebalance GP recorded as owed stays owed — the designer's.
+	var claude_r := _src("res://CLAUDE.md")
+	ok(claude_r.contains("~~WEAKER THAN SPEC ABILITIES AND UNCONDITIONAL~~ — RETIRED AT HD §1"),
+		"§4: CLAUDE.md does not record the class-wide 'weaker' rule as retired (HD §1)")
+	ok(not claude_r.contains("**WEAKER THAN SPEC ABILITIES AND UNCONDITIONAL**"),
+		"§4: CLAUDE.md still states the class-wide 'weaker' rule as a live rule")
 	# BOLA AGAINST THE SURVIVALIST'S OWN STATUS APPLIERS — §2's named flag,
 	# checked as arithmetic rather than asserted as prose. It lands TWO
 	# afflictions; Hamstring lands THREE and damage and Break for 10 more Mana,
@@ -415,15 +415,15 @@ func _weaker_half() -> void:
 	ok(bola != null and ham != null and shrap != null and pin != null,
 		"§4: the Survivalist's and Sharpshooter's own appliers resolve")
 	if bola != null and ham != null and pin != null and shrap != null:
-		ok(bola.damage == 0 and bola.pressure == 0,
+		_retired(bola.damage == 0 and bola.pressure == 0,
 			"§4: Bola deals no damage and no Break — it is ONLY the two statuses")
-		ok(ham.damage > 0 and ham.pressure > 0,
+		_retired(ham.damage > 0 and ham.pressure > 0,
 			"§4: ...while Hamstring lands three statuses AND damage AND Break")
-		ok(pin.damage > 0 and pin.pressure > 0,
+		_retired(pin.damage > 0 and pin.pressure > 0,
 			"§4: ...and Pinning Shot two statuses AND damage AND Break")
-		ok(shrap.choose_two and shrap.damage > 0,
+		_retired(shrap.choose_two and shrap.damage > 0,
 			"§4: ...and Shrapnel Charge two statuses on TWO targets, with damage")
-		ok(bola.cost < ham.cost and bola.cost < pin.cost and bola.cost < shrap.cost,
+		_retired(bola.cost < ham.cost and bola.cost < pin.cost and bola.cost < shrap.cost,
 			"§4: Bola is the CHEAPEST of the four, which is all it wins on")
 	# CAMOUFLAGE AGAINST GHILLIE SUIT — the other named flag. The node is
 	# PERMANENT and free; the card is two turns on a 4-turn cooldown for 20
@@ -451,10 +451,10 @@ func _weaker_half() -> void:
 	# AIMED VOLLEY AGAINST TRIPLE SHOT, the class's other multi-hit shot.
 	var volley: Ability = Classes.pool_ability("Aimed Volley")
 	var triple: Ability = Classes.pool_ability("Triple Shot")
-	ok(volley.damage * volley.multi_hits < triple.damage * triple.multi_hits,
+	_retired(volley.damage * volley.multi_hits < triple.damage * triple.multi_hits,
 		"§4: Aimed Volley's total (%d%%) is under Triple Shot's (%d%%)" % [
 			volley.damage * volley.multi_hits, triple.damage * triple.multi_hits])
-	ok(volley.cost < triple.cost,
+	_retired(volley.cost < triple.cost,
 		"§4: ...for less Mana, which is what makes it the FILLER rather than the shot")
 	# CLEAVE AGAINST WAR STOMP, the spec card it sits closest to. Same 15% and
 	# the same 15 BD; the stomp costs LESS Rage and refuels the party on top, so
@@ -464,27 +464,27 @@ func _weaker_half() -> void:
 	var stomp: Ability = Classes.pool_ability("War Stomp")
 	ok(cleave != null and stomp != null, "§4: Cleave and War Stomp both resolve")
 	if cleave != null and stomp != null:
-		ok(cleave.damage == stomp.damage and cleave.pressure == stomp.pressure,
+		_retired(cleave.damage == stomp.damage and cleave.pressure == stomp.pressure,
 			"§4: Cleave matches War Stomp on damage and Break (%d%% / %d BD)" % [
 				cleave.damage, cleave.pressure])
-		ok(cleave.cost > stomp.cost,
+		_retired(cleave.cost > stomp.cost,
 			"§4: ...for MORE Rage (%d against %d) and with no party refuel" % [
 				cleave.cost, stomp.cost])
-		ok(cleave.choose_three and stomp.random_hits == 3,
+		_retired(cleave.choose_three and stomp.random_hits == 3,
 			"§4: ...and the distinction is CHOSEN three against RANDOM three")
 	# FIVE OF THE SIX WARRIOR CARDS BUILD NO RAGE, which was the cleanest
 	# statement of "weaker than spec work" a Rage class can be given: every
 	# Warrior spec ability builds 10-15 while it spends, and these spend without
 	# building. **CHARGE IS THE EXCEPTION AND IT IS THE DESIGNER'S REPRICE**, not
-	# an oversight — asserted BY NAME so a later batch cannot quietly add a
-	# second one, and so the exception stays a decision.
+	# an oversight. Its 30 is still asserted (a ruling); that no OTHER class card
+	# generates was the "weaker" rule's and is printed with the rest (HD §1).
 	for nm in TRANCHE_4["warrior"]:
 		var ab: Ability = Classes.pool_ability(nm)
 		if nm == "Charge":
 			ok(ab != null and ab.resource_gain == 30,
-				"REPRICE: Charge builds 30 Rage — the ONE class card that generates")
+				"REPRICE: Charge builds 30 Rage — the designer's reprice (NOT RETIRED: it pins a ruling, not the 'weaker' rule)")
 			continue
-		ok(ab != null and ab.resource_gain == 0,
+		_retired(ab != null and ab.resource_gain == 0,
 			"§4: %s builds no Rage — the class cards spend without building" % nm)
 	# AND IT IS THE ONLY ONE IN ALL TWENTY-FOUR. The Mage, Cleric and Hunter
 	# pools have no resource generator at all, so this stays a Warrior-only
@@ -494,27 +494,28 @@ func _weaker_half() -> void:
 			if nm2 == "Charge":
 				continue
 			var ab3: Ability = Classes.pool_ability(nm2)
-			ok(ab3 != null and ab3.resource_gain == 0,
+			_retired(ab3 != null and ab3.resource_gain == 0,
 				"REPRICE: %s (%s) still generates nothing" % [nm2, cls])
-	ok(strike_gain() > 0,
+	_retired(strike_gain() > 0,
 		"§4: ...while the free Strike builds %d" % strike_gain())
-	ok(Classes.pool_ability("Charge").resource_gain > strike_gain(),
+	_retired(Classes.pool_ability("Charge").resource_gain > strike_gain(),
 		"REPRICE: and Charge builds MORE than the free basic (30 against %d)" % \
 			strike_gain())
-	# THE ONE CARD THAT FAILS §4 IN THE OTHER DIRECTION, PINNED AS A FINDING.
-	# WARCRY OUT-SIZES BATTLE SHOUT, a Berserker SPEC-pool ability, on its
-	# headline number. It ships as specified (§4 says confirm and REPORT, not
-	# re-tune) and this check is what makes the report survive: a later batch
-	# that re-prices either number trips it and has to read the reasoning first.
-	ok(battle_src.contains("const WARCRY_PCT := 20"),
+	# THE ONE CARD THAT FAILED §4 IN THE OTHER DIRECTION, PINNED AS A FINDING WHILE
+	# THE RULE STOOD: WARCRY OUT-SIZES BATTLE SHOUT, a Berserker SPEC-pool ability,
+	# on its headline number. It shipped as specified, and these pins made the
+	# report survive a re-price. With the rule retired (HD §1) a class card beating
+	# a spec card is no finding, so they are printed as the record and a re-price
+	# no longer trips them.
+	_retired(battle_src.contains("const WARCRY_PCT := 20"),
 		"§3 FINDING (reported, not re-tuned): Warcry is +20% damage, party-wide, 3 turns")
-	ok(battle_src.contains("var shout_base: int = [8, 12, 18][clampi(attacker.battle_shout_node, 0, 2)]"),
+	_retired(battle_src.contains("var shout_base: int = [8, 12, 18][clampi(attacker.battle_shout_node, 0, 2)]"),
 		"§3 FINDING: ...against Battle Shout's 8 base, 12 or 18 with its node")
-	ok(battle_src.contains("var shout_turns: int = [2, 3, 4][clampi(attacker.battle_shout_node, 0, 2)]"),
+	_retired(battle_src.contains("var shout_turns: int = [2, 3, 4][clampi(attacker.battle_shout_node, 0, 2)]"),
 		"§3 FINDING: ...and 2, 3 or 4 turns")
 	# The bleed term is what keeps the spec card's ceiling above the class one's
 	# — worth pinning, because it is the whole argument for shipping as written.
-	ok(battle_src.contains("var shout_pct := shout_base + int(shout_bleed / 20.0)"),
+	_retired(battle_src.contains("var shout_pct := shout_base + int(shout_bleed / 20.0)"),
 		"§3 FINDING: ...plus 1% per 20 enemy bleed, which is the term Warcry has no answer to")
 
 
@@ -748,12 +749,10 @@ func _seam() -> void:
 			"§6: the %s class pool is really drawn from (%d cards over 90 offers)" % [
 				cls2, int(seen_class.get(cls2, 0))])
 	# NO CLASS ROLLS AN EMPTY POOL — the degenerate branch BO wrote for the case
-	# that no longer exists, asserted UNREACHABLE from a real class rather than
-	# deleted (it is still the right answer if a pool is ever exhausted by the
-	# no-return ledger).
-	for cls3 in Classes.CLASS_DRAFT_POOLS:
-		ok(not Classes.class_draft_pool(cls3).is_empty(),
-			"§6: %s never rolls an empty class pool" % cls3)
+	# that no longer exists, asserted unreachable from a real class. **FOLDED BY
+	# BATCH HD §3** into §0's per-class floor, which refuses a floor of zero on
+	# either half of the class's one pool: it is the shelf that was asked here,
+	# and a shelf is not what a hero draws since GP.
 	# **BATCH GP — `draft_card_is_class` AND ITS TWO DEGENERATE ENDS WENT WITH
 	# THE POOL MERGE.** One pool has no sides to fall between, so the three
 	# checks that stood here are replaced by the thing they were protecting: a
@@ -1563,8 +1562,26 @@ func _docs() -> void:
 	# passing WITHOUT ITS SUBJECT BEING ENUMERATED AT ALL — the same fault BE
 	# found in test_batch_bb and CD in test_batch_bo, arriving through a document.
 	# WHAT CLAUDE.md SHOULD CARRY IS THE RULE THE TWELVE PAID FOR, and it does.
-	ok(claude.contains("THE ONE-IN-FOUR CLASS SEAM DRAWS A REAL ENTRY FOR"),
-		"§5: ...and CLAUDE.md carries the class-seam rule the twelve paid for")
+	# **BATCH HD §2 — REPAIRED: THE PIN WAS SATISFIED BY A SENTENCE THE GAME HAD
+	# STOPPED MAKING TRUE.** It asked for *"THE ONE-IN-FOUR CLASS SEAM DRAWS A REAL
+	# ENTRY FOR EVERY HERO"*, and GP deleted the seam — so from GP to HD this read
+	# green off a document still holding the old answer, GZ's shape. The rule the
+	# twelve paid for survives the merge in its merged form — every class-wide card
+	# is an ordinary card of its class's one pool — and CLAUDE.md says that now. So
+	# the pin is three arms, and no one of them can pass on prose alone: the merged
+	# sentence is there; the seam's is gone; and the game makes the merged sentence
+	# true — every class-wide card is in its class's one pool.
+	ok(claude.contains("EVERY CLASS-WIDE CARD IS AN ORDINARY CARD OF ITS CLASS'S ONE POOL"),
+		"§5: ...and CLAUDE.md carries the class-seam rule the twelve paid for, in its merged form")
+	ok(not claude.contains("THE ONE-IN-FOUR CLASS SEAM DRAWS A REAL ENTRY FOR"),
+		"§5: ...and no longer carries the seam GP deleted as a live rule")
+	var outside_pool: Array = []
+	for cls_s in Classes.CLASS_DRAFT_POOLS:
+		for nm_s in Classes.class_draft_pool(String(cls_s)):
+			if not Classes.draft_pool(String(cls_s)).has(String(nm_s)):
+				outside_pool.append("%s (%s)" % [nm_s, cls_s])
+	ok(outside_pool.is_empty(),
+		"§5: ...and the game makes it true — class-wide cards outside their class's one pool: %s" % str(outside_pool))
 	# RE-POINTED AT BATCH GB, TO THE CLAIM THE FIGURE STOOD FOR. The needle was the
 	# figure "is 24 of a target 24", and GB §4's census of `CLAUDE.md` found it stale:
 	# `CLASS_DRAFT_POOLS` holds 25 against the original target of 24. GA's rule deletes a

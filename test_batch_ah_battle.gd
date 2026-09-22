@@ -318,7 +318,12 @@ func _test_party_sheet() -> void:
 		run.party[i]["spec"] = chosen[i]
 		run.party[i]["tree"] = Talents.generate_tree(chosen[i], run.party[i]["key"])
 		run.sync_spec_hp(i)
-	run.party[0]["bm_abilities"] = ["Blood Price", "Crushing Blow", "Rallying Shout"]
+	# **BATCH HD §2 — CRUSHING BLOW LEFT THIS LIST.** It has been every Warrior's
+	# class-kit card since GN, so the sheet printed it whether or not he had earned
+	# it, and its arm below could not fail on a sheet that stopped reading the
+	# earned list. CLEAVE took its place: a Warrior draft card in no opening kit,
+	# asserted so below, which the sheet can only show by reading what he earned.
+	run.party[0]["bm_abilities"] = ["Blood Price", "Cleave", "Rallying Shout"]
 	run.specs_chosen = true
 	run.active = true
 	var scene: Node = load("res://scenes/party.tscn").instantiate()
@@ -330,7 +335,13 @@ func _test_party_sheet() -> void:
 	scene._draw_screen()
 	for _i in 8:
 		await process_frame
-	var found := {"Blood Price": false, "Crushing Blow": false, "Rallying Shout": false}
+	var opened: Array = Classes.opening_kit("warrior", String(run.party[0]["spec"]),
+		run.held_engines(run.party[0])).map(func(a): return a.display_name)
+	for earned_nm in run.party[0]["bm_abilities"]:
+		ok(not opened.has(String(earned_nm)),
+			"%s is not in this Warrior's opening kit %s — the sheet can show it only off the earned list" % [
+				earned_nm, str(opened)])
+	var found := {"Blood Price": false, "Cleave": false, "Rallying Shout": false}
 	var walk: Array = [scene]
 	while not walk.is_empty():
 		var n: Node = walk.pop_back()

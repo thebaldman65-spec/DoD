@@ -168,13 +168,16 @@ func _s1_summoning() -> void:
 	# BATCH GH MOVED THE COUNT 3 -> 4, AND THE FOURTH IS NOT A NEW WAY IN:
 	# `_return_standing_beasts` fields again, at a restarted fight, a beast that
 	# stood when the fight was quit — a body only a summon put on the field — so
-	# the axis is still the Beastmaster's alone.
+	# the axis is still the one class's. (BATCH HD §1 — the Hunter's, ruled: every
+	# Hunter but the Lethal Aim holder calls the pet, and Call the Wilds is drafted
+	# off the Beastmaster's shelf by any of them. This comment said "the
+	# Beastmaster's alone" from GH until HD.)
 	var code := _battle_code()
 	ok(code.count("_do_summon(") == 4,
 		"`_do_summon` has %d mentions in code, not 4 (its def, the `summon` special, Call the Wilds, and a standing beast's return)" % \
 			code.count("_do_summon("))
 	ok(code.contains("\"call_wilds\":"),
-		"Call the Wilds is the one draft card that summons and it is the Beastmaster's")
+		"Call the Wilds is the one draft card that summons, and it is a Hunter card (drafted off the Beastmaster's shelf)")
 
 
 # ---------------- §2 — REVIVAL IS THE HOLY CLERIC'S ----------------
@@ -205,12 +208,20 @@ func _s2_revival() -> void:
 	# revival to whoever drafted it. (BATCH GS: Resurrection is itself drafted now —
 	# on the Holy's shelf, offered only to a Mercy holder by `ENGINE_READ` — so what
 	# this asks is that no SECOND card carries the special.)
-	var leaks: Array = []
+	# **BATCH HD §2 — REPAIRED: THE ARM EXCUSED A SECOND REVIVER ON HER OWN TABLE.**
+	# It counted a card carrying the special as a leak only when it was NOT
+	# defined in the Holy's `spec_abilities`, so a second reviving card authored
+	# THERE — the exact thing this arm exists to catch — passed as hers. Revival is
+	# exclusive AMONG ABILITIES because exactly ONE card carries the special,
+	# wherever it is defined, and that is what is asserted now: every card in the
+	# corpus carrying it, by name, is Resurrection and nothing else — and the walk
+	# found it, so an empty walk cannot pass.
+	var revivers := {}
 	for cab in Classes.ability_corpus():
-		if cab.special == "resurrection" and not Classes.spec_abilities(REVIVE_SPEC).any(
-				func(k): return k.display_name == cab.display_name):
-			leaks.append(cab.display_name)
-	ok(leaks.is_empty(), "draft cards reaching `resurrection`: %s" % ", ".join(leaks))
+		if cab.special == "resurrection":
+			revivers[String(cab.display_name)] = true
+	ok(revivers.keys() == ["Resurrection"],
+		"cards carrying `resurrection`: %s — exactly one, Resurrection, wherever it is defined" % str(revivers.keys()))
 	print("  Revival is one ability (Resurrection, %s) plus two non-ability channels" % REVIVE_SPEC)
 	print("  — the Revive Potion item and the `revive_pct` map event. Reported, not ruled.")
 

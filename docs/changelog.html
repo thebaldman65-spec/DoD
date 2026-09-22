@@ -16,6 +16,48 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-09-21 &mdash; Batch HD: THE TWENTY HOLES, AND THE POOL FLOORS FOLDED</h2>
+<p><b>Twenty checks that could not fail, or passed while the game did the opposite, are repaired or retired &mdash;
+and the thirty-six per-shelf pool floors are one per-class floor.</b> IMPLEMENT ONLY. HA priced the work and HD
+takes the first half of it; the other seventy-three stale checks are HE's. Full working:
+<code>docs/reports/HD.md</code>.</p>
+
+<p><b>&sect;1 &mdash; THE ONE GAME CHANGE: GUARD CHANGE AND LUNGE ARE THE STANCES HOLDER'S.</b> Every Warrior was
+offered both since the pools merged; now <b>only a hero holding the Stances (the Rune of the Swordmaster) is
+offered them</b>, as two ruled rows of the card gate &mdash; ruled, because each still works in part without the
+engine. A Warrior holding no engine is offered 38 of his pool's 43 cards where he was offered 40. <b>Lunge is also
+on the Swordmaster's zone-boss pool</b>, whose first offer does not ask the engine gate, so a Warrior of that lineage
+who unslots the Stances can still be offered it there &mdash; recorded for a ruling. <b>Immolate and Pyroblast stay
+as they were</b> (every Mage is offered both), and the checks about them now say so. <b>The rule that class-wide
+cards are written weaker is retired</b>: there is no fallback since the merge, so a class-wide card is just a card.
+The cards themselves did not change, and the rebalance recorded at the merge is still owed.</p>
+
+<p><b>&sect;2 &mdash; THE TWENTY.</b> Each repaired to what it was for, or retired with the fact that retired it
+asserted in its place, and <b>every repair broken on purpose in an isolated copy and seen to go red</b>. Among them:
+a check that looped over class names where it meant lineages, so it never ran; one that passed whenever a list
+empty since GS was empty; one that pinned <code>CLAUDE.md</code>'s description of the one-in-four class seam the merge
+deleted (the sentence is corrected, and so are its two copies in <code>master.html</code>); one whose "fire, frost and
+arcane" were three casts of the same arcane basic; and one that read a purse key nothing ever writes.</p>
+
+<p><b>&sect;3 &mdash; ONE POOL FLOOR A CLASS, BOTH HALVES.</b> Thirty-six shelf floors in eleven suites become one shared
+check (<code>suite_fixture.class_pool_floors</code>) that asks each class's whole pool and what a hero holding no
+engine can be offered, at the measured reading &mdash; 43 / 38, 51 / 38, 43 / 29, 42 / 35 &mdash; and refuses a floor
+of zero. <b>The brief's figures (5 / 9, 3 / 7, 0 / 0, 5 / 7) are the RUNE table</b>, so they became the rune floor
+where that table is derived (<code>check_gv</code> &sect;3): the Cleric's zero is recorded as owed, and his row goes red
+the day no engine he can slot opens a rune.</p>
+
+<p><b>NEW GATE <code>check_hd</code></b> drives the stance pieces at the draft and the zone boss's fallback, 400 rolls an
+arm, every negative beside a positive. <b>WHAT MOVED:</b> <code>scripts/classes.gd</code> (two rows and a comment set);
+<code>suite_fixture.gd</code>; the gates <code>check_dr</code>, <code>check_du</code>, <code>check_eg</code>, <code>check_ek</code>, <code>check_fo</code>,
+<code>check_ft</code>, <code>check_gm</code>, <code>check_gp</code>, <code>check_gs</code> and <code>check_gv</code> (three of them
+because HEAD's version read the two ruled rows as mistakes, each assuming a gated card is refused at the door, and
+<code>check_ek</code> because a suite now checks a tag); the suites <code>test_batch_ah_battle</code>, <code>ak</code>,
+<code>ar</code>, <code>az</code>, <code>ba</code>, <code>bo</code>, <code>bp</code>, <code>bq</code>, <code>br</code>, <code>bt</code>, <code>bu</code>,
+<code>bv</code>, <code>bw</code>, <code>bx</code>, <code>cb</code>, <code>ce</code>, <code>cp</code> and <code>test_run_harness</code>;
+<code>check_hd.gd</code> (new), <code>run_battery.sh</code>, <code>pin-manifest.json</code>, <code>baselines.json</code>;
+<code>CLAUDE.md</code>, <code>docs/master.html</code> and its stamp, <code>docs/design-notes.md</code>, <code>docs/state.md</code>
+and <code>docs/reports/HD.md</code> (new).</p>
+
 <h2>2026-09-21 &mdash; Batch HC: THE RUNES LEAVE THEIR SPECS</h2>
 <p><b>Every rune belongs to a class now, and three gates decide what a hero can use.</b> IMPLEMENT ONLY. The rune
 version of the pool merge: re-scope to the class and let the gates decide. <b>No rune was authored, retuned or

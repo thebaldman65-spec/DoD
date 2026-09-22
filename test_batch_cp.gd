@@ -169,14 +169,17 @@ func _run() -> void:
 
 func _pools() -> void:
 	print("\n§2 pools")
-	# THE FLATNESS, NOT A DEBT. Every draft suite's depth loop has inverted
-	# seven times; since CI it asserts a flat EIGHT, so a pool that quietly
-	# EMPTIES trips rather than reading as the old asymmetry returning.
+	# THE FLATNESS, NOT A DEBT. Every draft suite's depth loop inverted seven
+	# times and asserted a flat EIGHT a shelf from CI. **FOLDED BY BATCH HD §3**:
+	# since GP a hero draws his class's one pool, so the question *did a pool
+	# quietly empty* is asked of that pool, both halves, by the helper the eleven
+	# suites share, at the floors HD measured. The spec half's total is still
+	# summed here for the line below it.
+	for fl in Fixture.class_pool_floors("test_batch_cp §2"):
+		ok(bool(fl[0]), String(fl[1]))
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
-		var pool: Array = Classes.spec_draft_pool(spec)
-		ok(pool.size() >= 8, "%s drafts at least EIGHT (got %d)" % [spec, pool.size()])
-		total += pool.size()
+		total += Classes.spec_draft_pool(spec).size()
 	ok(Classes.SPEC_DRAFT_POOLS.size() == 12,
 		"twelve spec draft pools (got %d)" % Classes.SPEC_DRAFT_POOLS.size())
 	# BATCH DX §1 — A FLOOR, NOT AN EQUALITY. The draft is a collection that

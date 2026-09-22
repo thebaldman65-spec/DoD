@@ -338,12 +338,39 @@ func _kit_correction() -> void:
 	# still live. **DY §3 DELETED `CLASS_POOLS`**, so "Shatterpoint is in the
 	# warrior class pool" has no subject any more; what AK actually protects is
 	# that the STANCE PIECES are never offered to a sibling who has no stance to
-	# swap, and that claim is asserted against the class-wide DRAFT.
-	var warrior: Array = Classes.class_draft_pool("warrior")
+	# swap.
 	ok(Classes.spec_pool("swordmaster").has("Shatterpoint"),
 		"Shatterpoint is still EARNABLE from the Swordmaster's boss pool")
-	ok(not warrior.has("Guard Change") and not warrior.has("Lunge"),
-		"the stance pieces stay out of the class-wide draft — a sibling has no stance to swap")
+	# **BATCH HD §2 — REPAIRED, AND THE GAME MOVED WITH IT (HD §1, ruled).** This
+	# asked the class-wide SHELF, which never held either card — while from GP to HD
+	# every Warrior drew the Swordmaster's shelf in his one pool and was offered
+	# both, so the arm read green against the opposite of its claim. The designer
+	# ruled the claim true: Guard Change and Lunge are offered only to a hero
+	# holding the Stances engine, as two ruled rows of GP's card gate. So it is asked
+	# at the gate and at the door the draft rolls from — a Warrior holding no
+	# engine, and one holding another, is offered neither; one holding the Stances
+	# is offered both.
+	var run_ak := root.get_node("/root/Run")
+	var stance_pieces := ["Guard Change", "Lunge"]
+	for sp_nm in stance_pieces:
+		ok(Classes.engine_read(sp_nm) == "seasoned" and Classes.engine_read_ruled(sp_nm) == "HD §1",
+			"%s is a ruled Stances row of the card gate (reads `%s`, ruled `%s`)" % [
+				sp_nm, Classes.engine_read(sp_nm), Classes.engine_read_ruled(sp_nm)])
+	for held in [[], ["heavy_plating"], ["seasoned"]]:
+		var eng_rows: Array = []
+		for pid in held:
+			eng_rows.append({"engine": String(pid), "equipped": true})
+		var w_m := {"key": "warrior", "spec": "", "awakened": true, "bm_abilities": [],
+			"talents": {}, "tree": [], "engines": eng_rows}
+		var left: Array = run_ak.draft_pool_left(w_m)
+		var stance_left: Array = stance_pieces.filter(func(n): return left.has(n))
+		if held == ["seasoned"]:
+			ok(stance_left == stance_pieces,
+				"a Warrior holding the Stances engine is offered both stance pieces (offered %s)" % str(stance_left))
+		else:
+			ok(stance_left.is_empty(),
+				"a Warrior holding %s is offered %s — the stance pieces are the Stances holder's (HD §1)" % [
+					str(held) if not held.is_empty() else "no engine", str(stance_left)])
 
 	# The passive blurb must not still advertise Guard Change as earnable.
 	var blurb := String(Classes.SPEC_INFO["swordmaster"]["passive_desc"])

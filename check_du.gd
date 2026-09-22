@@ -402,11 +402,31 @@ func _s5_corpus() -> void:
 			if ab2 != null and ab2.cooldown == 0:
 				inst += 1
 				distinct[ab2.display_name] = true
-	ok(distinct.size() < inst,
-		"the protected-core cooldown-zero census reads %d instances and %d distinct names — they agree now, so the correction this gate carries is stale" % [
-			inst, distinct.size()])
+	# **RETIRED BY BATCH HD §2, WITH ITS REASON — KEPT AND SAID TO BE KEPT.** The
+	# arm that stood here asserted INSTANCES exceed DISTINCT names, so the day the
+	# two agreed DU's correction would read as stale. **Since GS it could not fail:**
+	# every lineage opens on its CLASS's basic (no engine overrides it any more), so
+	# the three lineages of a class count one free basic three times and the census
+	# holds four basics twelve times over by construction — whatever any card's
+	# cooldown is. The census is still taken and printed below (it is the record);
+	# what is asserted is the construction that retired the arm, so the day an
+	# engine replaces a class basic again — the per-lineage cores DU counted — this
+	# goes red and says the arm's subject is back.
+	var own_basic: Array = []
+	for spec3 in Classes.SPEC_INFO:
+		var ck3 := Classes.class_of_spec(spec3)
+		if ck3 == "":
+			continue
+		var opened: Array = Classes.opening_kit(ck3, spec3, [Classes.engine_of_spec(spec3)])
+		var basic3: Array = Classes.kit(ck3)
+		if opened.is_empty() or basic3.is_empty() \
+				or String(opened[0].display_name) != String(basic3[0].display_name):
+			own_basic.append(spec3)
+	ok(own_basic.is_empty(),
+		"a lineage opens on something other than its class's basic (%s) — the per-lineage cores DU's census counted are back, and its instances/distinct arm is owed again (retired at HD §2)" % ", ".join(PackedStringArray(own_basic)))
 	print("  protected-core cooldown-zero: %d INSTANCES, %d DISTINCT names — %s" % [
 		inst, distinct.size(), ", ".join(distinct.keys())])
+	print("  (DU's instances/distinct arm RETIRED at HD §2: every lineage opens on its class's basic, so instances exceed names by construction)")
 
 
 # ── §6 — THE RULINGS ARE WRITTEN DOWN ───────────────────────────────────────

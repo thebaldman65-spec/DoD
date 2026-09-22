@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-21 (Batch HC &mdash; the runes leave their specs)</b></p>
+<p align="right"><b>Last updated: 2026-09-21 (Batch HD &mdash; the twenty holes, and the pool floors folded)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1463,9 +1463,9 @@ spec-locked, which is the one thing the merge gives up, and it is not a re-opene
 it reads the live, curated shelves of §6b, not the 61-entry container Batch DY deleted.
 <b>What it does not do is make the chain unemptiable.</b> No sibling drains it, because every
 hero filters it against what he himself owns; but the hero himself can, by taking at every
-offer. <b>And a hero is only offered what he can USE</b> — the 37 cards that read an engine are
-offered only to its holder (§6b) — so his reachable pool is smaller than his class pool: 40 of
-43, 38 of 51, 29 of 43 and 34 of 41 for a hero holding no engine at all. What holds the floor up
+offer. <b>And a hero is only offered what he can USE</b> — the cards the engine gate holds are
+offered only to their engine's holder (§6b) — so his reachable pool is smaller than his class pool: 38 of
+43, 38 of 51, 29 of 43 and 35 of 42 for a hero holding no engine at all. What holds the floor up
 is arithmetic: emptying the chain means owning every card he can be shown, and an offer pays
 one card.</p>
 <p><b>Ashes of Al'ar</b> &mdash; 30 Mana, 1.0 initiative, no cooldown, self-cast: wreathe
@@ -1497,8 +1497,8 @@ are <b>route-dependent</b>: a greedy route drafts far more than a cautious one.<
 <tr><td><b>Event</b></td><td>Some events trade for one — the Ancient Training Grounds sells a
 new form for 200 gold, and the Echo of the Warden teaches one for a hero's health.</td></tr>
 <tr><td><b>Zone bosses</b></td><td>The §6a pick: same timing and same overlay. Its draw is
-the three-tier chain — spec boss pool, then spec draft pool, then class-wide draft pool — and
-the last two are the pools on this page.</td></tr>
+the two-tier chain — the lineage's zone-boss pool, then the class's one draft pool — and the
+second is the pool on this page.</td></tr>
 </table>
 <p><b>Every offer is 3 cards</b>, and if the pool cannot fill three it <b>fills short rather
 than padding with repeats</b> — the same rule ability upgrades already follow.</p>
@@ -1511,8 +1511,9 @@ bought one, so no measured figure in the economy report moves.</p>
 
 <p><b>The elite draft screen.</b> An elite victory offers a draft to <b>every living hero at
 once</b>, on <b>one screen with four columns</b> rather than four screens in sequence. Each
-hero draws <b>their own three cards</b> from their own spec pool and their own class pool, at
-the usual one-in-four seam — a Pyromancer is never shown a Warden card. A hero who <b>fell</b>
+hero draws <b>their own three cards</b> from their class's one pool — a Pyromancer is never
+shown a Warden card, and is shown the Cryomancer's and the Arcanist's — less what the engine gate
+keeps from him. A hero who <b>fell</b>
 during the fight is back on their feet before the screen opens (every won battle returns the
 fallen at 20% of maximum), so they draft like anyone else. A hero whose pool has nothing left
 to show simply has no column.</p>
@@ -1583,7 +1584,7 @@ answer — that engine runs on the class basic and the class kit alone.</p>
 <tr><th>Lineage</th><th>Slots it fills</th><th>Its engine needs</th><th>Why</th></tr>
 <tr><td><b>Berserker</b></td><td>0</td><td>Bloodlust</td><td>Blood Frenzy reads his own health bar and his own Rage spent, and no ability; Bloodlust travels with it by the designer's ruling.</td></tr>
 <tr><td><b>Warden</b></td><td>0</td><td>—</td><td>Heavy Plating is a Block-chance rule; it reads no ability.</td></tr>
-<tr><td><b>Swordmaster</b></td><td>0</td><td>—</td><td>Seasoned Fighter is two stances, and every battle opens Aggressive, which pays from the first blow — so a stance swap is a card, not a need: Guard Change, his only UNCONDITIONAL swap, is drafted like Precision Strike and Feint.</td></tr>
+<tr><td><b>Swordmaster</b></td><td>0</td><td>—</td><td>Seasoned Fighter is two stances, and every battle opens Aggressive, which pays from the first blow — so a stance swap is a card, not a need: Guard Change, his only UNCONDITIONAL swap, is drafted like Precision Strike and Feint, and offered only to a hero holding the Stances.</td></tr>
 <tr><td><b>Pyromancer</b></td><td>0</td><td>Flamewave</td><td>Overburn reads Burn standing on the field, and no Mage basic or kit card lays any; Flamewave lays it on every enemy.</td></tr>
 <tr><td><b>Cryomancer</b></td><td>0</td><td>Razor Ice</td><td>Glacial Hold needs four Chilled on one enemy, and no Mage basic or kit card lays any; Razor Ice lays three on one target in one cast.</td></tr>
 <tr><td><b>Arcanist</b></td><td>0</td><td>—</td><td>Runaway Resonance builds on every damaging cast, and Magic Bolt, every Mage's free basic, is one.</td></tr>
@@ -1599,11 +1600,10 @@ answer — that engine runs on the class basic and the class kit alone.</p>
 and the class-wide shelf below are a single pool now, and the class-wide cards are <b>ordinary
 cards in it</b>: no share, no seam, no tier of their own. Class-wide abilities are deliberately
 untied and general — Mirror Image, not Frostbolt — and the test is whether an ability would read
-as off-theme for any spec of that class. They are <b>weaker than spec abilities, and
-unconditional</b>: they feed no passive, so at equal power they would be a safe default that
-dilutes every build. <b>That reason is spent now</b> — in a merged pool they are simply the
-weakest cards in it, six for the Warrior and the Hunter, five for the Mage and three for the
-Cleric. <b>It is accepted, flagged, and a rebalance owed</b>; no card was retuned at the merge.</p>
+as off-theme for any spec of that class. <b>Nothing holds them weaker than a lineage's cards</b>:
+a class-wide card is just a card of its class's pool. As authored they are the weakest cards in
+it — six for the Warrior and the Hunter, five for the Mage and three for the Cleric — and <b>a
+rebalance is owed</b>.</p>
 
 <p><b>A CARD THAT READS AN ENGINE IS OFFERED ONLY TO A HERO WHO HOLDS IT (Batch GP).</b> A wide
 pool is only worth having if what it widens is playable, and offering a Ruin card to a Cleric
@@ -1611,7 +1611,11 @@ without Ruin is offering a card that does nothing. <b>Thirty-seven of the 179 re
 of Permafrost, eight of Runaway Resonance (Death Ray among them, refused below 8 Resonance), seven of
 Mercy (Hymn of Hope and Resurrection among them, both priced in Mercy), five of Conviction, two of
 Wrath of the Old Gods, five of Pack Bond, two of Lethal Aim, two of Heavy Plating and one of Blood
-Frenzy — and each was derived at the read site and driven both ways. <b>Kill Command is not among
+Frenzy — and each was derived at the read site and driven both ways. <b>Two more are the
+designer's ruling rather than the derivation: Guard Change and Lunge, the stance pieces, are
+offered only to a hero holding the Stances</b> (the Rune of the Swordmaster). Each would work in
+part without it — the swap still lands its Break damage, the thrust still strikes — and they are
+the Stances holder's by ruling. <b>Kill Command is not among
 them</b>: it needs a living companion, and every Hunter but the Sharpshooter summons one from his
 class kit, so it is conditional on a companion rather than on an engine. <b>Three groups, and only the first is
 gated:</b> cards that CANNOT work without the engine; cards that HALF-work (Boil Over deals 22
@@ -1619,7 +1623,7 @@ against 89 and cashes no meter; Drumfire and Calibrating Shot fire and bank no F
 that still does most of its job is a legitimate offer; and cards that FEED an engine without
 reading it (Blight the Well marks Ruin through the generic hook, Call the Wilds summons at 0
 Loyalty, every fire card builds the Overburn field) — they work for anyone and pre-arm an engine
-a hero might later draft. <b>What a hero holding no engine can be offered: 40 of 43, 38 of 51,
+a hero might later draft. <b>What a hero holding no engine can be offered: 38 of 43, 38 of 51,
 29 of 43, 35 of 42.</b></p>
 
 <p><b>A CARD THAT NEEDS A COMPANION IS NOT OFFERED TO A SHARPSHOOTER (Batch HB).</b> He dismisses
@@ -1733,12 +1737,10 @@ anything, and DS and DY have since raised the floor to ten</b>, so what the dept
 unchanged — a run has to refuse further
 before an offer starts filling short.</p>
 
-<p><b>What a class-wide ability is, and is not.</b> Deliberately <b>untied and general</b> —
+<p><b>What a class-wide ability is.</b> Deliberately <b>untied and general</b> —
 Mirror Image, not Frostbolt: the test is whether it would read as off-theme for <i>any</i>
-spec of that class. And <b>weaker than spec abilities, and unconditional</b> — they feed no
-passive (an image does nothing for Overburn, a blessing nothing for Ruin), so at equal power they
-would be a safe default that dilutes every build. Slightly weaker but always-on makes them the
-pick you take when your spec's engine is not online yet, which is a different role.</p>
+spec of that class. It is an ordinary card of its class's one pool, and nothing holds it weaker
+than a lineage's cards.</p>
 
 <p><b>The one hundred and twenty-two drafted abilities catalogued here.</b> Each names the
 axis it serves, and — from the first Mage nine onward — <b>what it builds with</b>. The one
@@ -2066,7 +2068,7 @@ extender — good on both sides of the Break), builds 10 Rage (Perfect: +5 bonus
 <i>Class kit (§5.2):</i> Pommel Strike — 20 Rage, 25 dmg / 30 BD / 2.0, 3cd, has its own <b>25% base crit
 chance</b> and <b>ALWAYS Stuns for 1 turn</b>; bosses resist Stun until Broken, builds
 10 Rage (Perfect: the Stun lands even on an unbroken boss).<br>
-<i>Drafted (§6b):</i> Guard Change — 0 Rage, 1.5 int, 1cd; a self-cast with no target selection: switches
+<i>Drafted (§6b), offered only to a hero holding the Stances:</i> Guard Change — 0 Rage, 1.5 int, 1cd; a self-cast with no target selection: switches
 stance, deals <b>15 BD to the un-Broken enemy nearest to Breaking</b> (auto-picked —
 the swordsman presses the opening he already made) and builds 15 Rage (Perfect: +10%
 parry chance for 2 turns). Deliberately not a free action: the swap does double duty —
@@ -2078,7 +2080,7 @@ the opening, into the rider that extends the window it just opened (Perfect: +15
 <i>Earnable (§6a):</i> Sweeping Strikes — 20 Rage, 2 strikes × 15 dmg / 12 BD,
 3.0, 2cd, Dazes the target
 3 turns, builds 10 Rage (Perfect: +25% crit on the second swing) — priced as the class kit's Crushing Blow.<br>
-<i>Earnable (§6a) or drafted:</i> Lunge — 25 Rage, 30 dmg / 20 BD, 3.5, <b>3cd</b>, builds
+<i>Earnable (§6a), or drafted (§6b) — where it is offered only to a hero holding the Stances:</i> Lunge — 25 Rage, 30 dmg / 20 BD, 3.5, <b>3cd</b>, builds
 10 Rage (Perfect: 3.0 initiative). <b>RE-AUTHORED AT BATCH DR ONTO BREAK.</b> The stance still picks the wound (Exposed in Aggressive, Cripple in
 Defensive, 3 turns) and now also picks where the Break lands: <b>AGGRESSIVE puts 15 MORE Break
 into that one enemy; DEFENSIVE puts 12 Break on EVERY OTHER enemy</b>, because he does not
@@ -2772,7 +2774,8 @@ so <i>the enemy he is working</i> has ONE definition; and it pays through <code>
 which is the only way into that meter. <b>ALLY MEANS HEROES AND COMPANIONS</b> and the code
 implements both &mdash; one function called from the hero path and from
 <code>_companion_hit</code> &mdash; even though <b>no companion can stand beside a Sharpshooter in a
-legal run</b> (one class each, and summoning is the Beastmaster's exclusive axis). <b>The five
+legal run</b> (one class each, summoning is the Hunter's, and the Rune of the Sharpshooter dismisses
+the pet). <b>The five
 recorded reasons a companion cannot receive something are all about a RECIPIENT, and here the
 companion is the ATTACKER.</b> <b>5 is a quarter of the 20 his own repeat shot pays</b>, which is
 the largest share that keeps his own attack the biggest single source no matter who stands beside
@@ -3190,7 +3193,7 @@ report their stack multiplier.</li>
 each entry live-previews its initiative cost on the bar (costs shown, unaffordable entries
 greyed); <b>[Alt] Items</b> — opens the item picker.</li>
 <li><b>Ability hotkeys:</b> <b>Q / W / E / R / A / S / D / F / G</b> map to the ability MENU
-slots in order — Q is always the basic attack, the Beastmaster's "Summon Companion" picker
+slots in order — Q is always the basic attack, the Hunter's "Summon Companion" picker
 holds W, and the remaining abilities follow in kit order. The menu is the hero's
 <b>LOADOUT</b>, which the slot ladder caps at ten (§6b), and slot 10 onward binds to
 <b>Shift + the same key in the same order</b> (10 = Shift+Q, 11 = Shift+W, … 18 = Shift+G).
@@ -3221,7 +3224,7 @@ Heal / Renewal / Hymn / Resurrection / Divine Plea spends +1 Mercy for its bonus
 every turn.</li>
 <li><b>Space continues:</b> on a victory screen, Space (or Enter) presses the primary
 button — Continue / Descend / New Run. Defeat screens still require a click.</li>
-<li><b>Summon Companion</b> sits at the TOP of the Beastmaster's ability list on hotkey
+<li><b>Summon Companion</b> sits at the TOP of the Hunter's ability list (every Hunter's but the Sharpshooter's) on hotkey
 <b>W</b>. Selecting it (key or click) opens the <b>companion picker</b> — a small window listing
 Ursus / Canis / Aguila with costs: <b>Tab cycles</b> the options (unaffordable companions are
 skipped and greyed), <b>Space summons</b> the highlighted one, <b>X closes</b> the picker,

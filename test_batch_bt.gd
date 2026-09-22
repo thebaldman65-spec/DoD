@@ -166,70 +166,18 @@ func _run() -> void:
 # ---------- the pools ----------
 
 func _pools() -> void:
-	# RE-POINTED IN PLACE BY BATCH BU, AND IT IS AN INVERSION OF THE SECOND
-	# HALF. BT's own line was "the Mage three go to five; NOBODY ELSE MOVES",
-	# which was true of BT and is the exact statement BU pays off: the CLERIC
-	# three joined them. The question the loop asks — which pools are deep and
-	# which are still owed — is unchanged and is still what tells the two
-	# answers apart; only the correct answer moved.
-	# RE-POINTED BY BATCH CB: the three MAGE pools this suite was written for
-	# went to EIGHT when tranche 3's first third landed. BT's own five are
-	# still the first five of each (asserted below), because a later tranche
-	# APPENDS — it does not rewrite.
-	for spec in ["pyromancer", "cryomancer", "arcanist"]:
-		var pool: Array = Classes.spec_draft_pool(spec)
-		ok(pool.size() >= 8, "%s drafts at least EIGHT (got %d)" % [spec, pool.size()])
-	for spec in ["holy", "inquisitor", "occultist"]:
-		ok(Classes.spec_draft_pool(spec).size() >= 8,
-			"%s drafts at least EIGHT (CE took it to eight; DO deepened it)" % spec)
-	# RE-POINTED BY BATCH BV, which paid the HUNTER third: the three Hunter pools
-	# joined the Mage and Cleric at five, so ONLY THE WARRIOR THREE are still at
-	# two. Kept as an inversion rather than deleted — the half of this check that
-	# matters is that the LAST unpaid third stays visible in code.
-	# RE-POINTED BY BATCH BW, AND IT IS AN INVERSION: this asserted the WARRIOR
-	# three were still at TWO because that debt was real and had to stay visible
-	# in code. BW paid it, so tranche 2 is complete and what is asserted is that
-	# ALL TWELVE are five. A pool quietly emptying still trips.
-	# RE-POINTED BY BATCH CB, AND IT IS THE FOURTH INVERSION OF THIS LOOP. It has
-	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
-	# tranche 2 achieved, and now a NEW asymmetry pointing the other way — the
-	# three MAGE pools are EIGHT deep and the other nine are five, because CB
-	# paid tranche 3's first third. The question is unchanged and is still what
-	# tells the two answers apart; what is owed now is the Cleric, Hunter and
-	# Warrior thirds of tranche 3, and it has to stay visible in code.
-	# RE-POINTED BY BATCH CE, AND IT IS THE FIFTH INVERSION OF THIS LOOP. It has
-	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
-	# tranche 2 achieved, then CB's new asymmetry, and now that asymmetry HALVED
-	# — the CLERIC three joined the Mage three at EIGHT when tranche 3's second
-	# third landed, so six pools are eight deep and six are five. The question is
-	# unchanged and is still what tells the two answers apart; what is owed now
-	# is the HUNTER and WARRIOR thirds, and it has to stay visible in code.
-	# RE-POINTED BY BATCH CH, AND IT IS THE SIXTH INVERSION OF THIS LOOP. It has
-	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
-	# tranche 2 achieved, then CB's new asymmetry, then that asymmetry HALVED at
-	# CE, and now QUARTERED — the HUNTER three joined the Mage and Cleric at
-	# EIGHT when tranche 3's third third landed, so NINE pools are eight deep and
-	# only the WARRIOR THREE are still at five. The question is unchanged and is
-	# still what tells the two answers apart; what is owed is the Warrior third,
-	# and it is the LAST of the debt, so it has to stay visible in code.
-	# RE-POINTED BY BATCH CI, AND IT IS THE SEVENTH AND LAST INVERSION OF THIS
-	# LOOP. It has asserted, in order: each earlier tranche's own asymmetry, then
-	# the FLATNESS tranche 2 achieved, then CB's new asymmetry, that asymmetry
-	# HALVED at CE, QUARTERED at CH — and now GONE. The WARRIOR three joined the
-	# other nine at EIGHT when tranche 3's last third landed, so ALL TWELVE specs
-	# draft from eight and the draft is 120 of 120.
-	#
-	# **THERE IS NO DEBT LEFT TO KEEP VISIBLE, so what this loop guards from here
-	# on is the FLATNESS rather than an asymmetry**: a pool that quietly EMPTIES
-	# trips, where before it would have read as the old debt coming back. That is
-	# the reason it inverts rather than being deleted — the question is still
-	# worth asking, only the correct answer moved, and it moved for the last time.
-	for spec in ["berserker", "warden", "swordmaster"]:
-		ok(Classes.spec_draft_pool(spec).size() >= 8,
-			"%s drafts at least EIGHT — tranche 3 is complete" % spec)
-	for spec in ["beastmaster", "sharpshooter", "mystic"]:
-		ok(Classes.spec_draft_pool(spec).size() >= 8,
-			"%s drafts at least EIGHT since Batch CH — the Hunter is the third class complete" % spec)
+	# **FOLDED BY BATCH HD §3.** Four loops stood here asking each lineage's
+	# SHELF for at least eight — the Mage three this suite was written for, then
+	# the Cleric, the Warrior and the Hunter three — through seven inversions of
+	# one question, *did a pool quietly empty*, that closed when CI paid the last
+	# third. The question is kept; what moved is what a pool IS. Since GP a hero
+	# draws his class's one pool, so a shelf floor reds on a card moved between
+	# two shelves of one class and says nothing when the gate thins what a
+	# no-engine hero is offered. The helper the eleven suites share asks both
+	# halves of each class's pool at the floors HD measured; it also takes the
+	# class-wide shelves' floor of three from further down.
+	for fl in Fixture.class_pool_floors("test_batch_bt pools"):
+		ok(bool(fl[0]), String(fl[1]))
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
@@ -244,13 +192,10 @@ func _pools() -> void:
 		"the spec pools have FALLEN to %d, below the 125 that shipped"
 			% total)
 	# CLASS_DRAFT_POOLS IS BYTE-UNTOUCHED — this batch adds no class card, and a
-	# spec ability leaking into a class pool is the BQ/BR negative control.
-	# BATCH GN — THE FLOOR IS THREE, BY RULING: five class-wide cards moved into
-	# the class kits, so the Mage pool reads five and the Cleric's three. It
-	# still catches a pool that EMPTIES, which is all this floor ever asked.
+	# spec ability leaking into a class pool is the BQ/BR negative control. (The
+	# class-wide shelf's floor of three that stood beside it is FOLDED BY BATCH
+	# HD §3 into the per-class floor at the top of this function.)
 	for cls in Classes.CLASS_DRAFT_POOLS:
-		ok(Classes.class_draft_pool(cls).size() >= 3,
-			"%s's class pool has FALLEN below THREE" % cls)
 		for n in BT_CARDS:
 			ok(not Classes.class_draft_pool(cls).has(n),
 				"%s is a SPEC card and is not in %s's class pool" % [n, cls])

@@ -322,6 +322,18 @@ func _s2_bound_cards() -> void:
 						ok(ab == null and Array(run.party[i]["bm_abilities"]).has(String(n)) and refused,
 							"§2: with no engine, %s's %s sits out — kept, off the bar, and refused by the door (GT §3): it reads %s"
 								% [spec, n, reads])
+					elif reads != "" and Classes.engine_read_ruled(String(n)) != "":
+						# **BATCH HD §1 — A RULED ROW IS GATED AT THE OFFER, NOT AT THE
+						# DOOR.** Guard Change is the Swordmaster's lineage card and, since
+						# HD, a row of the card gate by the designer's ruling — and it still
+						# casts without the Stances (it lands its Break damage and flips a
+						# guard only a card reads), which is WHY it is a ruling and not a
+						# row the cast test found. So the arm below, whose premise is that
+						# a row is refused at the door, is not its arm: drafted, it stays
+						# on the bar and castable. The offer is `check_hd`'s and `check_gp`'s.
+						ok(ab != null and usable and _names(u).has(String(n)),
+							"§2: with no engine, %s's %s — a RULED row (%s), gated at the offer — stays on the bar and castable"
+								% [spec, n, Classes.engine_read_ruled(String(n))])
 					elif reads != "":
 						ok(ab != null and not usable,
 							"§2: with no engine, %s's %s stays on the bar — drafted — and the door refuses it: it reads %s"

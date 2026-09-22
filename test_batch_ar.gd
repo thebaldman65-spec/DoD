@@ -677,14 +677,26 @@ func _pools() -> void:
 		"Flame Shield resolves to NOTHING — the name is dead in every pool")
 	ok(Classes.SPEC_POOLS["pyromancer"].has("Immolate"),
 		"Immolate took its place in the spec pool")
-	# Immolate reads Overburn, so it must NOT be offered class-wide. **DY §3
-	# re-points both from `CLASS_POOLS["mage"]` (deleted) to
-	# `CLASS_DRAFT_POOLS["mage"]`, which is the live class-wide offer** — the
-	# curation rule is the same rule and it now has a structure that exists.
-	ok(not Classes.class_draft_pool("mage").has("Immolate"),
-		"Immolate is spec-only — it reads a passive a sibling will not have")
-	ok(not Classes.class_draft_pool("mage").has("Pyroblast"),
-		"Pyroblast is spec-only for the same reason")
+	# AR's curation rule was that Immolate and Pyroblast are spec-only — "it reads
+	# a passive a sibling will not have" — asserted against the class-wide shelf
+	# (DY §3 re-pointed it there from the deleted `CLASS_POOLS`).
+	# **BATCH HD §2 — REPAIRED TO WHAT THE GAME DOES NOW, BY THE DESIGNER'S RULING
+	# (HD §1): THEY STAY AS GP LEFT THEM, AND HOW THAT PLAYS IS WATCHED FIRST.**
+	# The shelf never held either, and since GP every Mage draws the Pyromancer's
+	# shelf in his one pool — so from GP to HD this read green while every Mage was
+	# offered both. Neither reads Overburn now (Immolate is a ward and a Burn on
+	# whoever strikes him; Pyroblast is priced by tempo and Mana, DU §1), and
+	# neither is a row of the card gate. So what is asserted is that: each is in
+	# the Mage's one pool, reads no engine, and is offered to a Mage holding none.
+	# A later ruling that gates them moves a row into `ENGINE_READ` and reds this,
+	# which is the batch that rules it saying so here.
+	var bare_mage: Array = Classes.offerable(Classes.draft_pool("mage"), [])
+	ok(Classes.draft_pool("mage").has("Immolate") and Classes.engine_read("Immolate") == ""
+			and bare_mage.has("Immolate"),
+		"Immolate is an ordinary card of the Mage's pool, offered to every Mage with any engine or none (HD §1: stays as GP left it)")
+	ok(Classes.draft_pool("mage").has("Pyroblast") and Classes.engine_read("Pyroblast") == ""
+			and bare_mage.has("Pyroblast"),
+		"Pyroblast is an ordinary card of the Mage's pool, offered to every Mage with any engine or none (HD §1: stays as GP left it)")
 	# ...and every entry that remains still resolves.
 	for name in Classes.SPEC_POOLS["pyromancer"]:
 		ok(Classes.spec_pool_ability("pyromancer", name) != null,
@@ -704,13 +716,29 @@ func _no_defence() -> void:
 	# INFERNO LANE IS HIS DEFENCE NOW.
 	# THE QUESTION IS STILL WORTH ASKING; ONLY THE CORRECT ANSWER MOVED, so the
 	# check is kept pointed at the two things that must stay true: the defence
-	# is EARNED IN THE TREE (his opening kit is still all fire), and it is the
+	# is EARNED IN THE TREE (his opening kit is still all fire — RETIRED at HD §2,
+	# just below), and it is the
 	# INFERNO LANE that carries it rather than being scattered.
-	var kit_defensive := ["Flame Shield", "Mana Shield", "Molten Core",
-		"Ashes of Al'ar", "Scorched Earth"]
-	for ab in Classes.spec_abilities("pyromancer"):
-		ok(not kit_defensive.has(ab.display_name),
-			"no defensive ability in the OPENING KIT (%s)" % ab.display_name)
+	# **THE FIRST HALF — "his opening kit is still all fire" — IS RETIRED BY BATCH
+	# HD §2, WITH ITS REASON, AND KEPT HERE SAID TO BE KEPT.** It walked
+	# `spec_abilities("pyromancer")` against five named defences, and since GS that
+	# table is his lineage's DEFINITIONS, not what he opens with; what he opens with
+	# since GN is the class basic, Flamewave and the MAGE CLASS KIT — and the kit
+	# holds Nexus Ward, a DEFENSE card. So every Mage, the Pyromancer among them,
+	# opens with a defence, and the arm read green against the opposite of its own
+	# claim. **What is asserted is the fact that retired it**: his opening kit
+	# holds a DEFENSE card, and it is the class kit's. The day the kit carries no
+	# defence, the old question is live again and this goes red saying so.
+	var opened: Array = Classes.opening_kit("mage", "pyromancer", ["overburn"])
+	var opened_def: Array = []
+	for ab in opened:
+		if ab != null and Classes.card_tags(ab.display_name).has("DEFENSE") \
+				and Classes.class_kit_holds("mage", ab.display_name):
+			opened_def.append(ab.display_name)
+	ok(not opened_def.is_empty(),
+		"the Pyromancer opens with no DEFENSE card of the Mage class kit (%s) — the retired AR/BS question, whether his defence is earned rather than opened, is live again" % str(
+			opened.map(func(a): return a.display_name)))
+	print("  [record] AR/BS's 'opening kit all fire' retired at HD §2 — he opens with %s" % str(opened_def))
 	# Every mitigating node is in INFERNO and nowhere else — a Kindling or
 	# Detomation node that started reducing damage would be the lane's thesis
 	# leaking, which is exactly the shape BS was written to remove.

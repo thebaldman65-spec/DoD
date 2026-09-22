@@ -196,26 +196,25 @@ func _pools() -> void:
 	# NEXT BATCH TO AUTHOR A CLASS-WIDE CARD WOULD TRIP**, and DY is that batch
 	# — Mana Shield takes the Mage class pool to SEVEN. The floor is what this
 	# suite owns; the authoritative per-class table is `test_batch_cd`'s.
-	# BATCH GN — THE FLOOR IS THREE (the Mage pool reads five and the Cleric's
-	# three), and a card is in the pool OR the class kit: a kit card offered in a
-	# draft is an offer nobody can take, and a card in neither is a card lost.
+	# A card is in the pool OR the class kit (GN): a kit card offered in a draft
+	# is an offer nobody can take, and a card in neither is a card lost. **The
+	# shelf's floor of three that stood beside this is FOLDED BY BATCH HD §3** —
+	# below, with the two floors of six — into the class's one pool.
 	for cls in TRANCHE_3:
 		var live: Array = Classes.class_draft_pool(cls)
-		ok(live.size() >= 3,
-			"§3/§4: the %s class pool has FALLEN to %d, below the three GN left it at" % [
-				cls, live.size()])
 		for nm in TRANCHE_3[cls]:
 			ok(live.has(nm) != Classes.class_kit_holds(cls, nm),
 				"§3/§4: %s is in the %s class pool or its class kit, and in exactly one" % [nm, cls])
 	# THE DEBT WAS STATED AS AN ASSERTION rather than as prose, so that it stayed
-	# visible until it was paid. BATCH BR PAID IT, and the check INVERTS rather
-	# than being deleted — "the Hunter and Warrior pools emptied again" is the
-	# thing a later batch could actually break, and BQ's twelve are still pinned
-	# by name above, so nothing this suite was written to protect is lost.
-	ok(Classes.class_draft_pool("hunter").size() >= 6,
-		"§0+BR: the HUNTER class pool has FALLEN below the six BR paid")
-	ok(Classes.class_draft_pool("warrior").size() >= 6,
-		"§0+BR: the WARRIOR class pool has FALLEN below the six BR paid")
+	# visible until it was paid; BATCH BR PAID IT and the check inverted into
+	# *the Hunter and Warrior class-wide shelves emptied again*. **FOLDED BY
+	# BATCH HD §3**, with the shelf floor of three above: a class-wide shelf is
+	# where a card was authored since GP, and the question is asked of the
+	# class's one pool, both halves, by the helper the eleven suites share. BQ's
+	# twelve are still pinned by name above, so nothing this suite was written to
+	# protect is lost.
+	for fl in Fixture.class_pool_floors("test_batch_bq §0"):
+		ok(bool(fl[0]), String(fl[1]))
 	# EVERY ENTRY RESOLVES THROUGH THE ONE RESOLVER, which is what makes the
 	# battle spawn, the hero sheet, the rune filter and the blacksmith pairing
 	# all pick them up with no new plumbing.
@@ -331,41 +330,68 @@ func _break_damage() -> void:
 		"§2: ...and it throws fewer bolts than Arcane Barrage")
 
 
-# ---------- §2 THE "WEAKER" HALF, VERIFIED RATHER THAN TRUSTED ----------
+# ---------- §2 THE "WEAKER" HALF — RETIRED AT HD §1, KEPT AND SAID TO BE KEPT ----------
+#
+# **THE RULE THIS SECTION RE-VERIFIED IS RETIRED, BY THE DESIGNER'S RULING (HD §1).**
+# Class-wide cards were written WEAKER than spec work because they were a fallback —
+# the card a hero drew while his engine was not online — and a fallback at equal
+# power is a safe default everyone takes. GP merged the pools and there is no
+# fallback: a class-wide card is an ordinary card of its class's one pool. **So the
+# section is RETIRED, NOT REPAIRED, on the Melted Armor contract**: every comparison
+# it made is still computed and PRINTED below as the record of what the rule held
+# them to (`_retired`), none of them is asserted, and what IS asserted is the
+# ruling that retired it, where the rule lives — `CLAUDE.md` records the rule
+# struck and says why. The cards are still authored weaker; the rebalance GP
+# recorded as owed stays owed, and is the designer's.
+#
+# What is NOT the retired rule stays asserted: Mirror Image and Nexus Ward are not
+# a strict upgrade of each other (§3's rule, one pool), and Smite is the Cleric's
+# free core attack.
+const WEAKER_RETIRED := "RETIRED at HD §1 — the class-wide 'weaker' rule; printed as the record, not asserted"
+
+
+func _retired(held: bool, what: String) -> void:
+	print("  [retired] %s — %s (%s)" % [what, "held" if held else "NO LONGER HOLDS",
+		WEAKER_RETIRED])
+
 
 func _weaker_half() -> void:
+	# THE RULING, ASSERTED WHERE THE RULE LIVES — the struck rule is kept in
+	# `CLAUDE.md` and said to be retired, and the live form of it is gone.
+	var claude := _src("res://CLAUDE.md")
+	ok(claude.contains("~~WEAKER THAN SPEC ABILITIES AND UNCONDITIONAL~~ — RETIRED AT HD §1"),
+		"§2: CLAUDE.md does not record the class-wide 'weaker' rule as retired (HD §1)")
+	ok(not claude.contains("**WEAKER THAN SPEC ABILITIES AND UNCONDITIONAL**"),
+		"§2: CLAUDE.md still states the class-wide 'weaker' rule as a live rule")
 	# MINISTRATION AGAINST HOLY'S HEAL. Heal is 40% of the CLERIC's maximum;
-	# Ministration is 20% of the TARGET's. The worst case for the rule is the
-	# beefiest target in the game, so that is the one it is checked against.
+	# Ministration is 20% of the TARGET's. The worst case for the rule was the
+	# beefiest target in the game, so that is the one it was checked against.
 	var holy_max := int(Classes.SPEC_INFO["holy"].get("max_hp", 150))
 	var warden_max := int(Classes.SPEC_INFO["warden"].get("max_hp", 200))
 	var heal_on_holy := int(round(holy_max * 0.40))
 	var ministration_on_warden := int(round(warden_max * 0.20))
-	ok(ministration_on_warden < heal_on_holy,
+	_retired(ministration_on_warden < heal_on_holy,
 		"§2: Ministration on the beefiest ally (%d) is LESS than Holy's Heal (%d)" % [
 			ministration_on_warden, heal_on_holy])
-	# The same Mercy multiplier scales both, so the gap survives every build —
-	# checked as arithmetic rather than asserted as prose.
-	ok(int(round(ministration_on_warden * 1.25)) < int(round(heal_on_holy * 1.25)),
+	_retired(int(round(ministration_on_warden * 1.25)) < int(round(heal_on_holy * 1.25)),
 		"§2: ...and still less at five Mercy, because one term scales both")
 	# MAGIC MISSILES AGAINST THE MAGE FILLERS IT SITS BESIDE.
 	var missiles: Ability = Classes.pool_ability("Magic Missiles")
 	var razor: Ability = Classes.pool_ability("Razor Ice")
 	var barrage: Ability = Classes.pool_ability("Arcane Barrage")
-	ok(missiles.damage * missiles.multi_hits < razor.damage * razor.multi_hits,
+	_retired(missiles.damage * missiles.multi_hits < razor.damage * razor.multi_hits,
 		"§2: Magic Missiles' total (%d%%) is under Razor Ice's (%d%%)" % [
 			missiles.damage * missiles.multi_hits, razor.damage * razor.multi_hits])
-	ok(missiles.damage * missiles.multi_hits < barrage.damage * barrage.random_hits,
+	_retired(missiles.damage * missiles.multi_hits < barrage.damage * barrage.random_hits,
 		"§2: ...and under Arcane Barrage's (%d%%)" % [
 			barrage.damage * barrage.random_hits])
 	# NEXUS WARD (MAGIC BARRIER UNTIL GN) AGAINST DIVINE SHIELD, the game's other
-	# absorb. The ward's figure has been 20% since CQ §3; the line said 15 until GN
-	# renamed the card under it.
-	ok(0.20 < 0.30,
-		"§2: Nexus Ward's 20%% of maximum is under Divine Shield's 30%%")
+	# absorb. (Its first comparison was two literals, 0.20 against 0.30, and could
+	# never have failed; it is printed with the rest.)
 	var barrier: Ability = Classes.pool_ability("Nexus Ward")
 	var shield: Ability = Classes.pool_ability("Divine Shield")
-	ok(barrier.cost > shield.cost and barrier.cooldown > shield.cooldown,
+	_retired(0.20 < 0.30, "§2: Nexus Ward's 20% of maximum is under Divine Shield's 30%")
+	_retired(barrier.cost > shield.cost and barrier.cooldown > shield.cooldown,
 		"§2: ...for more Mana and a longer cooldown")
 	# MIRROR IMAGE AND NEXUS WARD ARE NOT A STRICT UPGRADE OF EACH OTHER,
 	# which was §3's rule applied inside one pool — and since GN one is the kit
@@ -373,14 +399,15 @@ func _weaker_half() -> void:
 	# the rule matters more, not less. The structural proof is that
 	# each answers something the other cannot: the images are spent only by
 	# SINGLE-TARGET attacks, and the barrier eats a share of everything.
+	# **NOT RETIRED**: this is §3's rule, not the "weaker" half.
 	var battle_src := _src("res://scripts/battle.gd")
 	ok(battle_src.contains("and (_mirror_dodge(attacker, target) \\"),
 		"§3: Mirror Image is spent inside the single-target branch, so an AoE never touches it")
-	# THE ONE CARD THAT FAILS §2 IN THE OTHER DIRECTION, PINNED AS A FINDING.
-	# Chastise is DOMINATED by the free core attack on damage for all three
-	# Cleric specs. It ships as specified and this check is what makes the
-	# report survive: a later batch that re-prices either number trips it and
-	# has to read the reasoning first.
+	# THE ONE CARD THAT FAILED §2 IN THE OTHER DIRECTION, PINNED AS A FINDING WHILE
+	# THE RULE STOOD: Chastise is DOMINATED by the free core attack on damage for
+	# all three Cleric specs. The floor it fell through was the retired rule's own
+	# ("check it against the free core attack too"), so it is printed with the
+	# rest; whether Chastise is repriced is the owed rebalance, the designer's.
 	var chastise: Ability = Classes.pool_ability("Chastise")
 	var smite: Ability = null
 	for ab in Classes.cleric_kit():
@@ -388,22 +415,19 @@ func _weaker_half() -> void:
 			smite = ab
 	ok(smite != null, "§2: the Cleric's free core attack is Smite")
 	if smite != null:
-		ok(chastise.damage < smite.damage,
-			"§2 FINDING (reported, not re-tuned): Chastise's %d%% is UNDER the free Smite's %d%%" % [
+		_retired(chastise.damage < smite.damage,
+			"§2 FINDING: Chastise's %d%% is UNDER the free Smite's %d%%" % [
 				chastise.damage, smite.damage])
-		ok(chastise.cost > 0 and chastise.cooldown > 0 and smite.cost == 0,
+		_retired(chastise.cost > 0 and chastise.cooldown > 0 and smite.cost == 0,
 			"§2 FINDING: ...while costing Mana and a cooldown Smite does not")
-		ok(chastise.pressure > smite.pressure,
+		_retired(chastise.pressure > smite.pressure,
 			"§2 FINDING: ...and the ONLY thing it wins on is Break (%d vs %d)" % [
 				chastise.pressure, smite.pressure])
-	# Shadowrend is the other comparison and it reads the same way.
-	# BATCH GS — Shadowrend was the Occultist's slot-0 basic (his Smite, overridden)
-	# until GS deleted `apply_kit_overrides`: every Cleric opens on Smite now and
-	# Shadowrend is a free DRAFT card on the Occultist's shelf, defined once by
-	# `basic_override_ability`. The finding is about the card, so it reads that one
-	# definition — the same object the override laid in slot 0.
+	# Shadowrend was the other comparison and it read the same way. (BATCH GS —
+	# every Cleric opens on Smite now and Shadowrend is a free DRAFT card on the
+	# Occultist's shelf, defined once by `basic_override_ability`.)
 	var shadowrend: Ability = Classes.basic_override_ability("Shadowrend")
-	ok(shadowrend.display_name == "Shadowrend" and chastise.damage <= shadowrend.damage,
+	_retired(shadowrend.display_name == "Shadowrend" and chastise.damage <= shadowrend.damage,
 		"§2 FINDING: ...and level with Shadowrend's %d%%, which is free and Cripples" % \
 			shadowrend.damage)
 

@@ -10,7 +10,8 @@
 #       cast on a hero holding NO engine and on one holding it with the engine's
 #       own state built through the game's doors; the gate at the offer door in
 #       both directions; and how much of his pool a hero with no engine can be
-#       offered, per class
+#       offered, per class. §2e: the two RULED rows (HD §1), whose premise is that
+#       they still work in part without the engine
 #   §3  THE ZONE-BOSS FALLBACK — two tiers now, not three; the second reads the
 #       class pool and honours the same gate
 #   §4  A WHOLE RUN, DRAFTING THROUGHOUT — one on a party holding NO engine and
@@ -455,8 +456,18 @@ func _same(a: Dictionary, b: Dictionary) -> bool:
 func _s2_the_engine_gate() -> void:
 	print("\n§2 — the engine gate, driven both ways")
 	var by_engine := {}
+	# **BATCH HD §1 — TWO ROWS ARE RULINGS, AND THIS PAIR TEST IS NOT THEIRS.**
+	# Guard Change and Lunge carry `ruled` (the designer's, HD §1): each HALF-WORKS
+	# without the Stances, so the claim this test makes of a row — the card reads
+	# its engine and moves nothing without it — is not their claim, and reading
+	# them here would call the ruling a mistake. They are driven as rulings in
+	# §2e instead, and §2b below asks their offer both ways like every other row.
+	var ruled_rows: Array = []
 	for card in Classes.ENGINE_READ:
 		if LATER_STRIKE.has(String(card)) or LATER_EVENT.has(String(card)):
+			continue
+		if Classes.engine_read_ruled(String(card)) != "":
+			ruled_rows.append(String(card))
 			continue
 		var eng := String(Classes.ENGINE_READ[card]["engine"])
 		by_engine[eng] = by_engine.get(eng, []) + [String(card)]
@@ -525,6 +536,7 @@ func _s2_the_engine_gate() -> void:
 
 	await _s2c_the_later_strike()
 	await _s2d_the_later_event()
+	await _s2e_the_ruled_rows(ruled_rows)
 
 	# ── §2b — THE GATE AT THE OFFER DOOR, IN BOTH DIRECTIONS ───────────────
 	_run.sim_run = false
@@ -562,6 +574,28 @@ func _s2_the_engine_gate() -> void:
 			m["engines"] = []
 	print("    a hero holding no engine can be offered: %s" % ", ".join(reach))
 
+
+
+# ── §2e — THE RULED ROWS (BATCH HD §1) ──────────────────────────────────────
+#
+# **A RULED ROW IS GATED BY THE DESIGNER, NOT BY WHAT A CAST SHOWS**, and what
+# this section asserts is the premise that makes it a ruling rather than a
+# finding: without its engine the card is still usable and still does something.
+# The day one of them is refused, or does nothing, without the engine, the cast
+# test would have found it and `ruled` is no longer the reason it is gated — this
+# goes red saying so. What each keeps without the engine is PRINTED, as the
+# record of why the ruling was needed. The offer is §2b's, both ways.
+func _s2e_the_ruled_rows(ruled_rows: Array) -> void:
+	print("\n§2e — the ruled rows: gated by ruling, and each still works in part without its engine")
+	ok(not ruled_rows.is_empty(), "§2e: no row of the card gate carries `ruled` — HD §1's two are gone")
+	for card in ruled_rows:
+		var eng := String(Classes.ENGINE_READ[card]["engine"])
+		var bare: Dictionary = await _arm(eng, [String(card)], false)
+		var b: Dictionary = bare.get(card, {})
+		ok(bool(b.get("usable", false)) and not (b.get("moved", []) as Array).is_empty(),
+			"§2e: %s is refused, or moves nothing, without %s — the cast test finds it now, and `ruled` is not why it is gated" % [card, eng])
+		print("      %-14s ruled `%s`; without %s it still moves %s" % [card,
+			Classes.engine_read_ruled(String(card)), eng, str(b.get("moved", []))])
 
 
 # ── §2c — THE THREE WHOSE PAYOUT IS A LATER STRIKE ──────────────────────────

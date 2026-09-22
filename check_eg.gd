@@ -254,10 +254,25 @@ func _s2_pool_and_loadout() -> void:
 
 	# A PROTECTED NAME CAN NEVER BE BENCHED, AND THE MECHANISM IS ITS ABSENCE
 	# FROM THE POOL rather than a branch.
-	ok(not run.unequip_earned_ability(m, "Guard Change"),
-		"§2: a protected ability can never be benched")
-	ok(not run.equip_earned_ability(m, "Guard Change"),
-		"§2: ...nor carried through this door, which would double it")
+	# **BATCH HD §2 — REPAIRED: THE NAME HERE WAS PROTECTED FOR NOBODY.** Guard
+	# Change stood here from EG to HD, and since GS it is a card drafted off the
+	# Swordmaster's shelf — so both doors refused it only because this member had
+	# never earned it, which they do for ANY name at all, protected or not. The
+	# name is now one this member genuinely opens with — his class kit's first
+	# card — asserted in his loadout and out of his pool before either door is
+	# asked; and the bench door is asked with it CARRIED as well, a state only the
+	# pool rule refuses, which is the mechanism this arm is about.
+	var prot := String(Classes.class_kit_names_for("warrior", run.held_engines(m))[0])
+	ok(run.loadout_ability_names(m).has(prot) and not run.earned_ability_names(m).has(prot),
+		"§2: %s is in this Warrior's loadout and out of his pool — a protected card (loadout %s)" % [
+			prot, str(run.loadout_ability_names(m))])
+	var eq_was: Array = run.equipped_ability_names(m)
+	m["bm_equipped"] = eq_was + [prot]
+	ok(not run.unequip_earned_ability(m, prot),
+		"§2: a protected ability can never be benched — %s, named in the loadout, was benched" % prot)
+	m["bm_equipped"] = eq_was
+	ok(not run.equip_earned_ability(m, prot),
+		"§2: ...nor carried through this door, which would double it (%s)" % prot)
 
 	# **THE LEDGER STILL BITES, AND `decline_draft` IS ITS ONLY WRITER.**
 	var m2 := {"key": "warrior", "spec": "berserker", "bm_abilities": [],

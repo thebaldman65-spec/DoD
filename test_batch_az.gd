@@ -616,20 +616,37 @@ func _rune_audit() -> void:
 	var ss_fields := {}
 	for f in SS_COUNTERS:
 		ss_fields[f] = true
+	# BATCH HC §1 — "CLASS-WIDE" MEANT WRITTEN FOR NO SPEC. Every Hunter rune is
+	# `class:hunter` since HC, so read off the scope alone this walked the
+	# Sharpshooter's own runes and asked whether they write his counters — which
+	# is what they are for (three FAIL lines, HEAD's copy on HC's data: the Narrow
+	# Gap, the Long Draw, the Level Aim). The class entries with no `written_for`
+	# are the population this arm was written about.
+	# **RETIRED BY BATCH HD §2, WITH ITS REASON — KEPT AND SAID TO BE KEPT.** That
+	# population holds no LIVE ordinary rune: the three class-wide Hunter runes
+	# were retired at ET §1 and the rest are the class's engine runes, which carry
+	# no payload — so the walk below could not fail, and did not ask its question
+	# of anything a Hunter can be offered. What it was FOR — a rune every Hunter
+	# is offered must not pay only the Sharpshooter — is `Runes.ENGINE_READ`'s
+	# since GV: a live rune that reads his engine is offered only with Lethal Aim
+	# slotted, and `check_gv` §1 drives every one both ways. **What is asserted is
+	# the fact that retired it**, so the day a live Hunter rune written for no
+	# lineage exists, the question is live again and this goes red saying so.
+	var class_wide_live: Array = []
+	var walked := 0
 	for id in pool:
-		if String(pool[id].get("scope", "")) != "class:hunter":
+		if String(pool[id].get("scope", "")) != "class:hunter" \
+				or String(pool[id].get("written_for", "")) != "":
 			continue
-		# BATCH HC §1 — "CLASS-WIDE" MEANT WRITTEN FOR NO SPEC. Every Hunter rune is
-		# `class:hunter` since HC, so read off the scope alone this walked the
-		# Sharpshooter's own runes and asked whether they write his counters — which
-		# is what they are for (three FAIL lines, HEAD's copy on HC's data: the Narrow
-		# Gap, the Long Draw, the Level Aim). The three are the class entries with no
-		# `written_for`, which is the population this arm was written about.
-		if String(pool[id].get("written_for", "")) != "":
-			continue
+		walked += 1
+		if not Runes.is_retired(String(id)) and not Runes.is_engine_rune(String(id)):
+			class_wide_live.append(String(id))
 		for f in pool[id].get("payload", {}).get("stat", {}):
-			ok(not ss_fields.has(f),
-				"the class-wide rune %s does not write the Sharpshooter counter %s" % [id, f])
+			if ss_fields.has(f):
+				print("  [record] the retired class-wide Hunter rune %s writes the Sharpshooter counter %s" % [id, f])
+	ok(walked > 0 and class_wide_live.is_empty(),
+		"a LIVE Hunter rune written for no lineage exists (%s of %d walked) — AZ's retired question, whether it writes a Sharpshooter counter, is live again (retired at HD §2)" % [
+			str(class_wide_live), walked])
 	# No lane tag went stale: his lanes did not rename (the AS Honed Lance
 	# lesson, checked even though nothing moved).
 	# (FX: no tree has lanes now, and a rune's `lane` records HISTORY — CLAUDE.md,

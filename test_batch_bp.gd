@@ -157,11 +157,13 @@ func _pools() -> void:
 	# twice — so the setup stays byte-identical.
 	ok(Classes.CLASS_DRAFT_POOLS.size() == 4,
 		"§5: the four class-wide pools are still named")
-	# BATCH GN — THE FLOOR IS THREE: five class-wide cards moved into the class
-	# kits by ruling, so the Mage pool reads five and the Cleric's three.
-	for ck in ["mage", "cleric", "warrior", "hunter"]:
-		ok(Classes.class_draft_pool(ck).size() >= 3,
-			"§5: ...the %s one has FALLEN below the three GN left it at" % ck)
+	# **FOLDED BY BATCH HD §3.** The class-wide shelves' floor of three (GN's)
+	# stood here — BP's inversion of an empty class draft into a paid one. A
+	# class-wide shelf is where a card was authored since GP, not what a hero is
+	# offered, so the question *did a pool quietly empty* is asked of the class's
+	# one pool now, both halves, by the one helper the eleven suites share.
+	for fl in Fixture.class_pool_floors("test_batch_bp §5"):
+		ok(bool(fl[0]), String(fl[1]))
 	# EVERY NEW ENTRY RESOLVES, to itself, with the fields a card needs. A pool
 	# name that does not resolve is an offer that hands out nothing.
 	for spec3 in TRANCHE_2:

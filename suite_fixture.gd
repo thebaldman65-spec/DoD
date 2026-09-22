@@ -220,3 +220,64 @@ static func kill(tree: SceneTree, scene: Node) -> void:
 	scene.queue_free()
 	await tree.process_frame
 	await tree.process_frame
+
+
+# ══ BATCH HD §3 — ONE POOL FLOOR A CLASS, AND BOTH OF ITS FLOORS ════════════
+#
+# **THIRTY-FIVE FLOORS DESCRIBED SIXTEEN SHELVES; A HERO HAS DRAWN FROM ONE POOL
+# A CLASS SINCE GP.** Eleven suites asserted that a lineage's shelf held at least
+# eight and a class-wide shelf at least three (six, in one) — twenty-three and
+# twelve arms, each written *"so a pool that quietly empties trips"*. After the
+# merge a shelf is where a card was authored, not what a hero is offered, so
+# those arms could go red on a card moved between two shelves of one class —
+# which moves nothing a hero is offered — and stay green while what he IS offered
+# thinned. **They fold into this one floor, asked per CLASS and in TWO halves,
+# because the two measure different things and the second is the one that goes
+# thin (ruled at HD §1):**
+#   · WHOLE — `Classes.draft_pool(k)`: everything a hero of the class can draft;
+#   · NO ENGINE — `Classes.offerable(draft_pool(k), [])`: what a hero holding no
+#     engine at all can be offered, which is the pool less every `ENGINE_READ`
+#     row and the half a new gated card thins.
+#
+# **THE VALUES ARE MEASURED, NOT CHOSEN, AND NO OLD SHELF FIGURE SURVIVES IN THEM.**
+# They are the live reading on HD's tree, after its own card gate took Guard
+# Change and Lunge out of the no-engine Warrior's half (40 -> 38). A floor AT the
+# reading is the strict form of *a pool that quietly empties trips*: it reds on
+# the first card that leaves either half, so the batch that thins a pool says so
+# here, in one table, instead of in eleven suites. **A pool that GROWS passes** —
+# it is a floor, never an equality (DX §1) — and the batch that grows it may raise
+# the floor or leave it.
+#
+# **A FLOOR OF ZERO ASSERTS NOTHING, SO THE HELPER REFUSES ONE.** Every half must
+# be at least one, whatever the table says, so the day a class can be offered
+# nothing this goes red — rather than a zero row reading as correct. No class's
+# card pool is near it (the Cleric's no-engine half is the thinnest, 29 of 43);
+# the class whose RUNE offer is zero with no engine is the Cleric, and that floor
+# is `check_gv` §3's, where the rune table is derived.
+const CLASS_POOL_FLOOR := {
+	"warrior": {"whole": 43, "bare": 38},
+	"mage": {"whole": 51, "bare": 38},
+	"cleric": {"whole": 43, "bare": 29},
+	"hunter": {"whole": 42, "bare": 35},
+}
+
+
+# Every floor, as `[held, message]` pairs: the calling suite asserts each through
+# its own `ok()`, so the count and the FAIL line are the suite's and this file
+# holds no copy of anybody's assertion machinery. `who` names the caller, so a
+# FAIL line says which suite read it. Eight pairs — four classes, two halves.
+static func class_pool_floors(who: String) -> Array:
+	var out: Array = []
+	for k in CLASS_POOL_FLOOR:
+		var f: Dictionary = CLASS_POOL_FLOOR[k]
+		var pool: Array = Classes.draft_pool(String(k))
+		var bare: Array = Classes.offerable(pool, [])
+		var fw := maxi(int(f["whole"]), 1)
+		var fb := maxi(int(f["bare"]), 1)
+		out.append([pool.size() >= fw,
+			"%s: the %s pool holds %d cards, below its floor of %d — a card left the class's one pool (HD §3)"
+				% [who, k, pool.size(), fw]])
+		out.append([bare.size() >= fb,
+			"%s: a %s holding no engine can be offered %d of the pool, below its floor of %d — the no-engine half thinned (HD §3)"
+				% [who, k, bare.size(), fb]])
+	return out

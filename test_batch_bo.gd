@@ -170,76 +170,30 @@ func _pools() -> void:
 		ok(head == TRANCHE_1[spec],
 			"§5: %s's pool still OPENS with tranche 1's %s (got %s)" % [
 				spec, TRANCHE_1[spec], head])
-	# AND EVERY SPEC POOL IS FIVE DEEP (Batch BW closed tranche 2). This loop
-	# has been re-pointed once per tranche and each re-point was an INVERSION of
-	# the debt the previous one recorded; it names all twelve now, so there is
-	# no list left to extend.
-	# RE-POINTED BY BATCH CB, AND IT IS THE FOURTH INVERSION OF THIS LOOP. It has
-	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
-	# tranche 2 achieved, and now a NEW asymmetry pointing the other way — the
-	# three MAGE pools are EIGHT deep and the other nine are five, because CB
-	# paid tranche 3's first third. The question is unchanged and is still what
-	# tells the two answers apart; what is owed now is the Cleric, Hunter and
-	# Warrior thirds of tranche 3, and it has to stay visible in code.
-	# RE-POINTED BY BATCH CE, AND IT IS THE FIFTH INVERSION OF THIS LOOP. It has
-	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
-	# tranche 2 achieved, then CB's new asymmetry, and now that asymmetry HALVED
-	# — the CLERIC three joined the Mage three at EIGHT when tranche 3's second
-	# third landed, so six pools are eight deep and six are five. The question is
-	# unchanged and is still what tells the two answers apart; what is owed now
-	# is the HUNTER and WARRIOR thirds, and it has to stay visible in code.
-	for spec in ["pyromancer", "cryomancer", "arcanist",
-			"holy", "inquisitor", "occultist",
-			"beastmaster", "sharpshooter", "mystic"]:
-		ok(Classes.spec_draft_pool(spec).size() >= 8,
-			"§5+tranche 3: %s drafts at least EIGHT" % spec)
-	# RE-POINTED BY BATCH CH, AND IT IS THE SIXTH INVERSION OF THIS LOOP. It has
-	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
-	# tranche 2 achieved, then CB's new asymmetry, then that asymmetry HALVED at
-	# CE, and now QUARTERED — the HUNTER three joined the Mage and Cleric at
-	# EIGHT when tranche 3's third third landed, so NINE pools are eight deep and
-	# only the WARRIOR THREE are still at five. The question is unchanged and is
-	# still what tells the two answers apart; what is owed is the Warrior third,
-	# and it is the LAST of the debt, so it has to stay visible in code.
-	# RE-POINTED BY BATCH CI, AND IT IS THE SEVENTH AND LAST INVERSION OF THIS
-	# LOOP. It has asserted, in order: each earlier tranche's own asymmetry, then
-	# the FLATNESS tranche 2 achieved, then CB's new asymmetry, that asymmetry
-	# HALVED at CE, QUARTERED at CH — and now GONE. The WARRIOR three joined the
-	# other nine at EIGHT when tranche 3's last third landed, so ALL TWELVE specs
-	# draft from eight and the draft is 120 of 120.
-	#
-	# **THERE IS NO DEBT LEFT TO KEEP VISIBLE, so what this loop guards from here
-	# on is the FLATNESS rather than an asymmetry**: a pool that quietly EMPTIES
-	# trips, where before it would have read as the old debt coming back. That is
-	# the reason it inverts rather than being deleted — the question is still
-	# worth asking, only the correct answer moved, and it moved for the last time.
-	for spec in ["berserker", "warden", "swordmaster"]:
-		ok(Classes.spec_draft_pool(spec).size() >= 8,
-			"§5+tranche 3: %s drafts at least EIGHT — the Warrior third is paid" % spec)
-	# THE WARRIOR POOLS ARE NAMED **AND FULL** — named and empty at BO, filled to
-	# two at BP, and five at BW. One of four heroes in every party had no draft
-	# at all until BP, and had the shallowest one in the game until BW.
+	# **FOLDED BY BATCH HD §3: FOUR SHELF FLOORS BECOME THE ONE PER-CLASS FLOOR.**
+	# Three loops stood here asking each lineage's SHELF for at least eight — the
+	# nine that reached eight at CB, CE and CH, and the Warrior three that closed
+	# the draft at CI — and a fourth asked each class-wide shelf for three (GN).
+	# Their history was seven inversions of one question, *did a pool quietly
+	# empty*, and the question is kept. **What moved is what a pool IS**: since GP
+	# a hero draws his class's one pool, so a shelf floor reds on a card moved
+	# between two shelves of one class — which moves nothing he is offered — and
+	# says nothing when the gate takes a card out of what a no-engine hero is
+	# offered. `Fixture.class_pool_floors` asks both halves of the pool per class,
+	# at the floors HD measured, and it is the one copy the eleven suites share.
+	for fl in Fixture.class_pool_floors("test_batch_bo §5"):
+		ok(bool(fl[0]), String(fl[1]))
+	# THE WARRIOR POOLS ARE NAMED — named and empty at BO, filled to two at BP,
+	# five at BW and eight at CI. One of four heroes in every party had no draft
+	# at all until BP. (Their depth is the per-class floor's above, since HD §3.)
 	for w in ["berserker", "warden", "swordmaster"]:
 		ok(Classes.SPEC_DRAFT_POOLS.has(w),
 			"§5: %s's draft pool is NAMED" % w)
-		ok(Classes.spec_draft_pool(w).size() >= 8,
-			"CI: ...and FULL — %s drafts at least EIGHT of its own" % w)
-	# CLASS-WIDE: four keys, ALL FOUR FILLED.
-	# RE-POINTED IN PLACE TWICE, AND BOTH RE-POINTS ARE INVERSIONS — the honest
-	# treatment when a later batch pays a debt an older suite was recording.
-	# BO asserted all four pools were EMPTY, because none shipped here. BQ
-	# filled the Mage and Cleric six and this became "two filled, two owed".
-	# BATCH BR FILLED THE OTHER TWO, so the debt is gone and what a later batch
-	# could break is no longer "did the remaining debt stay visible" but "did a
-	# class pool quietly empty again". The setup is byte-identical, because it
-	# is still what tells the answers apart.
+	# CLASS-WIDE: four keys. BO asserted all four EMPTY, BQ filled two and BR the
+	# other two; their depth is the per-class floor's above since HD §3, and the
+	# four names are still asserted here.
 	ok(Classes.CLASS_DRAFT_POOLS.size() == 4,
 		"§4: all four class-wide pools are named")
-	# BATCH GN — THE FLOOR IS THREE: five class-wide cards moved into the class
-	# kits by ruling, so the Mage pool reads five and the Cleric's three.
-	for ck in ["mage", "cleric", "warrior", "hunter"]:
-		ok(Classes.class_draft_pool(ck).size() >= 3,
-			"§4: the %s class pool has FALLEN below the three GN left it at" % ck)
 	# **BATCH GP — `CLASS_DRAFT_SHARE` IS GONE AND SO IS THE SEAM IT NAMED.**
 	# The pool merge made the class-wide cards ordinary cards of the class pool,
 	# so there is no ratio to hold: the assertion is INVERTED rather than
@@ -473,7 +427,14 @@ func _cap_and_slots() -> void:
 	ok(int(run.ability_slot_cap()) == CAP, "§2: ability slots cap at 7 at run start")
 	ok(run.ABILITY_SLOTS_BY_BOSS == [7, 8, 9, 10],
 		"§2: ...and grow one a zone boss to ten (EG §1)")
-	var m := {"key": "mage", "spec": "pyromancer", "bm_abilities": []}
+	# **BATCH HD §2 — HE HOLDS HIS ENGINE NOW.** This member had no `engines` until
+	# HD, so he never opened with Flamewave — Overburn's enabler travels with the
+	# engine — and the two arms below that call Flamewave protected and refuse to
+	# bench it passed for a card he did not hold. Seated the way GK's rule says an
+	# instrument seats a lineage: with its engine rune slotted. Overburn dismisses
+	# nothing, so no count below moves.
+	var m := {"key": "mage", "spec": "pyromancer", "bm_abilities": [],
+		"engines": [{"engine": "overburn", "equipped": true}]}
 	# BATCH GK — AN ENABLER SITS OUTSIDE THE SLOT COUNT (the charter). Overburn's
 	# enablers are Fireball and Detonation, so the Pyromancer's lineage opens
 	# using TWO slots — `Classes.lineage_slots` — and five earned cards fill him.
@@ -511,6 +472,11 @@ func _cap_and_slots() -> void:
 	# not in the drop list at all — there is no branch to get wrong.
 	# BATCH GS — THE PROTECTED CARD NAMED HERE IS HIS ENABLER: Detonation is a card
 	# on his shelf now, and Flamewave is the one his engine travels with.
+	# BATCH HD §2 — AND THE POSITIVE ARM THE TWO NEEDED: Flamewave is in THIS
+	# member's loadout, so the refusal below is of a card he holds.
+	ok(run.loadout_ability_names(m).has("Flamewave"),
+		"§2: Flamewave is in this Pyromancer's loadout — he holds Overburn, so its enabler travels with him (%s)"
+			% str(run.loadout_ability_names(m)))
 	ok(not run.earned_ability_names(m).has("Flamewave")
 			and Classes.protected_names("pyromancer").has("Flamewave"),
 		"§2: a protected ability is not in the drop list")
@@ -628,8 +594,21 @@ func _offer_and_ratio() -> void:
 	# AN OWNED ABILITY IS NEVER OFFERED AGAIN. Owned covers EVERY source —
 	# kit, talent grant, boss pick, earlier draft — because the roller reads
 	# `owned_ability_names`, which is `Talents.ability_names`.
-	var m2 := {"key": "mage", "spec": "cryomancer",
-		"bm_abilities": ["Winter's Toll"], "talents": {}, "tree": []}
+	# **BATCH HD §2 — REPAIRED: THE ENGINE GATE WAS ANSWERING FOR OWNERSHIP.**
+	# Winter's Toll reads Permafrost (`Classes.ENGINE_READ`, GP), and this member
+	# held no engine — so the gate kept it off his offer whether he owned it or
+	# not, and the arm could not tell the two apart. He holds Permafrost now, and a
+	# TWIN who holds it and does NOT own the card is offered it: that is the
+	# positive arm, and it is what makes the owner's absence the ownership rule.
+	var perma := [{"engine": "permafrost", "equipped": true}]
+	var m2 := {"key": "mage", "spec": "cryomancer", "awakened": true,
+		"bm_abilities": ["Winter's Toll"], "talents": {}, "tree": [], "engines": perma}
+	var twin := {"key": "mage", "spec": "cryomancer", "awakened": true,
+		"bm_abilities": [], "talents": {}, "tree": [], "engines": perma}
+	ok(Array(run.draft_pool_left(twin)).has("Winter's Toll"),
+		"§3: a Cryomancer holding Permafrost who does NOT own Winter's Toll can be offered it — the gate is open")
+	ok(not Array(run.draft_pool_left(m2)).has("Winter's Toll"),
+		"§3: ...and the same hero who OWNS it cannot — an owned ability is out of the pool the offer rolls from")
 	var offer2: Array = run.roll_draft_offer(m2)
 	ok(not offer2.has("Winter's Toll"),
 		"§3: an ability already held is never offered again")

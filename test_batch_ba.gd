@@ -530,8 +530,22 @@ func _no_ability_grants() -> void:
 	var pool: Array = Classes.SPEC_POOLS["mystic"]
 	for n in ["Explosive Shot", "Venom Coating", "Hamstring", "Deadfall", "Harvest"]:
 		ok(pool.has(n), "%s is boss-trophy pool, not a tree grant" % n)
-	for n in ["Tripwire", "Shrapnel Charge", "Snare Trap"]:
-		ok(not pool.has(n), "%s is base kit, not earnable" % n)
+	# **RETIRED BY BATCH HD §2, WITH ITS REASON — KEPT AND SAID TO BE KEPT.** This
+	# asked that his "three kit pieces" stayed out of the trophy pool, so no trophy
+	# could land on a node's grant. Neither half has a subject: no node grants
+	# anything since FX (asserted just above), and the three are not one kit any
+	# more — Snare Trap is the Hunter CLASS kit's (every Hunter, GN), Shrapnel
+	# Charge (GS) and Tripwire (HB) are drafted off his shelf — so the arm read
+	# "base kit, not earnable" of two cards any Hunter can draft. **What is asserted
+	# is where each lives now**, and that none is a trophy; the day one returns to
+	# a base kit of the lineage's own, this goes red.
+	var hunter_pool: Array = Classes.draft_pool("hunter")
+	ok(Classes.class_kit_holds("hunter", "Snare Trap") and not hunter_pool.has("Snare Trap")
+			and not pool.has("Snare Trap"),
+		"Snare Trap is the Hunter class kit's — not drafted, not a trophy (retired at HD §2: the lineage's 'base kit' dissolved)")
+	for n in ["Tripwire", "Shrapnel Charge"]:
+		ok(hunter_pool.has(n) and not Classes.class_kit_holds("hunter", n) and not pool.has(n),
+			"%s is drafted off the Survivalist's shelf — not a kit card, not a trophy (retired at HD §2: the lineage's 'base kit' dissolved)" % n)
 	_report.append("§5: the Survivalist owes NO AU §1 fallback in either direction — "
 		+ "his tree grants no abilities at all. With this batch, EVERY spec's "
 		+ "fallback ownership is recorded.")

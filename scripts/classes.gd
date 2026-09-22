@@ -578,11 +578,14 @@ const SPEC_DRAFT_POOLS := {
 # ability is DELIBERATELY UNTIED AND GENERAL — Mirror Image, not Frostbolt.
 # The test is whether it would read as off-theme for ANY spec of that class; if
 # a Pyromancer drawing it would feel like he wandered into the wrong tree, it is
-# a spec ability. And they are WEAKER THAN SPEC ABILITIES AND UNCONDITIONAL:
-# they feed no passive (a Barrier does nothing for Overburn, a heal nothing for
-# Ruin), so at equal power they would be a safe default that dilutes every
-# build. Slightly weaker but always-on makes them the pick you take when your
-# spec's engine is not online yet, which is a real role and a different one.
+# a spec ability. **The rule's second half — that they are written WEAKER than
+# spec abilities and unconditional — is RETIRED at HD §1, by the designer's
+# ruling.** It read: they feed no passive (a Barrier does nothing for Overburn,
+# a heal nothing for Ruin), so at equal power they would be a safe default that
+# dilutes every build — the pick you took while your engine was not online. GP
+# merged the pools and there is no such fallback: a class-wide card is just a
+# card of its class's one pool. They are still authored weaker, and the
+# rebalance GP recorded as owed stays owed (`CLAUDE.md` keeps the rule, struck).
 const CLASS_DRAFT_POOLS := {
 	"warrior": ["Battle Trance", "Rally", "Charge", "Cleave", "Warcry",
 		"Ironclad"],
@@ -625,9 +628,10 @@ const CLASS_DRAFT_POOLS := {
 # reachable beside a twelve-card one, and one pool has nothing to ration.
 #
 # **WHAT THAT COSTS, RECORDED RATHER THAN DISCOVERED.** EB §1 ruled the
-# protected core is the baseline, and the authoring rule above this dict says
+# protected core is the baseline, and the authoring rule above this dict said
 # class-wide cards are **written WEAKER than spec cards** — deliberately, so a
-# safe always-on default could not dilute every build. In a merged pool that
+# safe always-on default could not dilute every build (that half is RETIRED at
+# HD §1). In a merged pool that
 # reason is gone and they are simply **the worst cards in it**: six for the
 # Warrior and the Hunter, five for the Mage, three for the Cleric. **That is
 # accepted and is NOT repaired here — it is a rebalance owed** (GN's ruling 7,
@@ -649,7 +653,8 @@ const CLASS_DRAFT_POOLS := {
 # Hunter's** when it left his class kit. A hero drew from 13 to 18 before the
 # merge (his lineage's shelf plus his class's) and a spine-taker from 3 to 6.
 # **AND WHAT HE CAN BE OFFERED IS NARROWER THAN THE POOL**, because of the gate
-# below: holding no engine at all he is offered 40 of the Warrior's 43, 38 of
+# below: holding no engine at all he is offered 38 of the Warrior's 43 (40 until
+# HD §1 ruled Guard Change and Lunge the Stances holder's), 38 of
 # the Mage's 51, 29 of the Cleric's 43 and 35 of the Hunter's 42 — and a
 # Sharpshooter, who fields no companion (HB §4), fewer again (`COMPANION_READ`).
 static func draft_pool(class_key: String) -> Array:
@@ -680,7 +685,7 @@ static func draft_pool(class_key: String) -> Array:
 # and its own meter open. **The table is what those two arms disagreed about**
 # (`docs/reports/GP.md` §2). `check_gp` §2 drives both arms for every row.
 #
-# **THREE GROUPS, AND ONLY THE FIRST IS IN THIS TABLE:**
+# **THREE GROUPS, AND ONLY THE FIRST IS IN THIS TABLE — BUT FOR TWO RULED ROWS:**
 #   · CANNOT WORK WITHOUT THE ENGINE — refused at the usability door, or it
 #     resolves and the log says it did nothing. **Gated: these 37** (GP's 34 and
 #     GS's three).
@@ -691,6 +696,18 @@ static func draft_pool(class_key: String) -> Array:
 #     the generic hook, Call the Wilds summons at 0 Loyalty, every fire card
 #     builds the Overburn field. **NOT gated**: they work for anyone and they
 #     pre-arm an engine a hero might later draft.
+#
+# **BATCH HD §1 — TWO ROWS ARE THE DESIGNER'S RULING, NOT THE DERIVATION, AND
+# EACH SAYS SO IN ITS OWN `ruled` FIELD.** Guard Change and Lunge are offered only
+# to a hero holding the Stances engine (`seasoned`). **Both HALF-WORK without it**
+# — Guard Change still lands its 15 Break damage and flips a guard that only a
+# card reads, and Lunge still strikes, always down its Aggressive branch — so the
+# cast test that found the other 37 would have left both in the second group. They
+# are here because the stance pieces are ruled the Stances holder's, and
+# `check_gp` §2 drives them as rulings (the offer both ways, and the half they
+# keep without the engine printed as the reason the row is a ruling) rather than
+# as a pair that should read apart. **A row carrying `ruled` is never evidence
+# for the derivation, and the derivation is never evidence against it.**
 #
 # **THE GATE IS THE HOLDER'S, AND THAT IS EXACTLY RIGHT HERE FOR A REASON WORTH
 # WRITING DOWN.** Five of the eight producers are PARTY-level in the code
@@ -796,7 +813,23 @@ const ENGINE_READ := {
 	# `has_engine("bloodrage")` block, the nameplate chip included. `check_gp`
 	# §2c drives it as a damage pair rather than as a board delta for that reason.
 	"Unslaked": {"engine": "bloodrage", "why": "raises the Blood Frenzy floor's ratchet; nothing reads the floor without the engine"},
+	# THE STANCES — **RULED (HD §1), NOT DERIVED**: the header's last paragraph.
+	# Every Warrior was offered both from GP to HD, because neither is refused and
+	# neither resolves into nothing without the engine; the designer ruled the
+	# stance pieces the Stances holder's. `ruled` names the ruling, so a reader of
+	# the table can tell these two from the 37 the cast test found.
+	"Guard Change": {"engine": "seasoned", "ruled": "HD §1",
+		"why": "the stance swap — ruled the Stances holder's; without the engine it still lands 15 Break damage and flips a guard only a card reads"},
+	"Lunge": {"engine": "seasoned", "ruled": "HD §1",
+		"why": "the stance-keyed thrust — ruled the Stances holder's; without the engine it still strikes, always down its Aggressive branch"},
 }
+
+
+# Whether a row is the designer's ruling rather than the cast test's finding
+# (BATCH HD §1). `offerable` gates both kinds the same way; only the instruments
+# that DERIVE the table need to tell them apart.
+static func engine_read_ruled(card_name: String) -> String:
+	return String(ENGINE_READ.get(card_name, {}).get("ruled", ""))
 
 
 # The engine a card reads, or "" for a card that reads none. THE ONE ANSWER, so
@@ -806,7 +839,9 @@ static func engine_read(card_name: String) -> String:
 
 
 # What a hero holding `engines` may be offered out of `names`. A card reading no
-# engine is always offered; a card reading one is offered only to its holder.
+# engine is always offered; a card reading one is offered only to its holder —
+# and so is a card RULED its holder's (Guard Change and Lunge, HD §1), by the
+# same row and the same test.
 # **AND SINCE HB A CARD THAT NEEDS A COMPANION IS NOT OFFERED TO A HERO WHO HAS
 # DISMISSED THE PET** (`COMPANION_READ`, `dismisses_pet`): the negative of the
 # engine test, asked beside it rather than folded into it.
@@ -3586,9 +3621,10 @@ static func draft_ability(display_name: String) -> Ability:
 		# for every hero in the game. THE HUNTER AND WARRIOR TWELVE FOLLOW
 		# BELOW (Batch BR) and the seam is closed — see `CLASS_DRAFT_POOLS`.
 		#
-		# THEY ARE WEAKER THAN SPEC ABILITIES AND UNCONDITIONAL, and the
-		# "weaker" half was VERIFIED against the live spec kits rather than
-		# assumed — every comparison is in the changelog with its arithmetic.
+		# THEY WERE WRITTEN WEAKER THAN SPEC ABILITIES AND UNCONDITIONAL (a rule
+		# RETIRED at HD §1 — they are still authored so), and the "weaker" half
+		# was VERIFIED against the live spec kits rather than assumed — every
+		# comparison is in the changelog with its arithmetic.
 		# ONE OF THE TWELVE FAILS IT IN THE OTHER DIRECTION AND IS REPORTED
 		# RATHER THAN RE-TUNED: see Chastise below.
 		#

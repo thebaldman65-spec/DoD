@@ -385,10 +385,17 @@ const TAG_DOOR := "loadout_condition_met"
 # tag: the swap and the kit's strikes do different jobs, and three cards the
 # field role pairs with Snare Trap are a MARK, a RESOURCE card and a MARK. **It
 # changes no behaviour and it is not exempted; it is listed.**
+# **BATCH HD ADDED `test_batch_ar.gd`, THE FIRST SUITE ON THE LIST, AND THE
+# PRE-PASS CAUGHT IT RATHER THAN THE BATCH.** HD §2 retired AR's *his opening
+# kit is still all fire* and asserts the fact that retired it in its place — the
+# Pyromancer opens with a DEFENSE card of the Mage class kit — so it asks each
+# opening card's tags through `Classes.card_tags`. **It changes no behaviour and
+# it is not exempted; it is listed.** A suite joins the list the same way a gate
+# does: by checking a tag, which is all this half of the population records.
 const TAG_CHECKERS := ["check_ek.gd", "check_el.gd", "check_es.gd",
 	"check_ez.gd", "check_fd.gd", "check_fe.gd", "check_fh.gd",
 	"check_fk.gd", "check_fn.gd", "check_fo.gd", "check_gn.gd",
-	"check_go.gd", "check_gu.gd", "check_map_screen.gd"]
+	"check_go.gd", "check_gu.gd", "check_map_screen.gd", "test_batch_ar.gd"]
 
 # The files a MECHANIC would have to live in. Asserted at ZERO separately from
 # the set above, because "the set is exactly these five" and "battle.gd holds

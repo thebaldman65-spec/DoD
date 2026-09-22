@@ -40,9 +40,11 @@
 # **AND §2's COMPANION ARM IS THE ONE THAT COULD NOT BE ARGUED.** *Ally* is
 # heroes AND companions (CV §4 / DM §3), and DK §1's rule is that a widening is
 # done when the EFFECT ARRIVES — measured on a live body, never inferred from a
-# collection. A companion cannot stand beside a Sharpshooter in a legal run (one
-# class each, and summoning is the Beastmaster's exclusive axis), so the arm is
-# unreachable in PLAY and drivable in a FIXTURE. It is driven.
+# collection. A companion cannot stand beside a Sharpshooter in a legal run — one
+# class each, summoning is the Hunter class's, and the Focus engine dismisses the
+# pet (HB; BATCH HD §2 re-pointed the arm that records it from the party's shape
+# to that door) — so the arm is unreachable in PLAY and drivable in a FIXTURE. It
+# is driven.
 #
 #   /Applications/Godot.app/Contents/MacOS/Godot --headless --path . \
 #       --script check_fo.gd
@@ -658,11 +660,37 @@ func _s2_driven() -> void:
 	# *Ally* is heroes AND companions, a beast's blows go through
 	# `_companion_hit` and never enter the hero strike loop, and a widening that
 	# changes no measurement is worse than the narrow word. This party is
-	# ILLEGAL — two Hunter specs — and that is stated rather than hidden: no run
+	# ILLEGAL — two Hunter lineages — and that is stated rather than hidden: no run
 	# reaches it, and the fixture is what makes the arm drivable at all.
-	ok(Classes.SPEC_IDS.get("hunter", []).has("sharpshooter")
-			and Classes.SPEC_IDS.get("hunter", []).has("beastmaster"),
-		"§2g: the two specs are no longer both Hunter — the unreachability this arm records has changed")
+	# **BATCH HD §2 — REPAIRED: WHAT MAKES IT UNREACHABLE IS A DOOR, NOT THE PARTY'S
+	# SHAPE.** This asked that both lineages were the Hunter's, which stayed true
+	# while it stopped being the reason: engines are held, not born (GK), so from GK
+	# to HB one Hunter could slot Lethal Aim and Pack Bond together and field a
+	# companion beside his own Focus — REACHABLE — while this read green. Since HB
+	# the Focus engine dismisses the pet, so the one hero of a party who can call a
+	# companion is refused it while he holds Focus. Asserted at that door: the
+	# engine dismisses, the kit it opens with has no pet card, and the summon door
+	# refuses him — each beside the positive arm, a Pack Bond Hunter who is not
+	# refused.
+	ok(Classes.dismisses_pet(["lethal_aim"]) and Classes.dismisses_pet(["pack", "lethal_aim"])
+			and not Classes.dismisses_pet(["pack"]),
+		"§2g: the Focus engine no longer dismisses the pet (alone %s, beside Pack Bond %s; Pack Bond alone %s) — a companion can stand beside a Focus holder in a legal run" % [
+			Classes.dismisses_pet(["lethal_aim"]), Classes.dismisses_pet(["pack", "lethal_aim"]),
+			Classes.dismisses_pet(["pack"])])
+	ok(not Classes.class_kit_names_for("hunter", ["lethal_aim"]).has(Classes.PET_CARD)
+			and Classes.class_kit_names_for("hunter", ["pack"]).has(Classes.PET_CARD),
+		"§2g: a Focus holder's kit %s / a Pack Bond Hunter's %s — the pet card is not where the dismissal says" % [
+			str(Classes.class_kit_names_for("hunter", ["lethal_aim"])),
+			str(Classes.class_kit_names_for("hunter", ["pack"]))])
+	var cw: Ability = Classes.pool_ability("Call the Wilds")
+	ss.resource = 99999
+	ss.cooldowns.clear()
+	bm.resource = 99999
+	bm.cooldowns.clear()
+	ok(cw != null and not bool(scene._ability_usable(ss, cw)) and bool(scene._ability_usable(bm, cw)),
+		"§2g: the summon door — a Focus holder %s, a Pack Bond Hunter %s — must refuse the first and open for the second" % [
+			"refused" if cw != null and not bool(scene._ability_usable(ss, cw)) else "ADMITTED",
+			"admitted" if cw != null and bool(scene._ability_usable(bm, cw)) else "REFUSED"])
 	ok(bm.has_engine("pack"),
 		"§2g: seat %d is not the Beastmaster (engines `%s`)" % [int(SEAT["beastmaster"]),
 			str(bm.engines)])

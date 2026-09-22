@@ -152,6 +152,13 @@ func _purse_total() -> int:
 	return total
 
 
+# BATCH HD §2 — EVERY KEY THE PURSE HOLDS, not only the four classes: a point
+# banked to a key no class has is a point `_purse_total` cannot see.
+func _purse_every_key() -> Dictionary:
+	Profile.talent_points_earned("warrior")  # the one read that loads the file
+	return (Profile.data.get("talent_points", {}) as Dictionary).duplicate()
+
+
 func _profile_scratch() -> void:
 	Profile.save_path = SCRATCH_PROFILE
 	Profile.data = {}
@@ -400,8 +407,26 @@ func _gate_talent_conservation() -> void:
 	# Warrior's purse stays at 2 while the three classes that played go to 3.
 	var held := String(run.party[0]["spec"])
 	run.party[0]["spec"] = ""
+	# **BATCH HD §2 — REPAIRED: THE ARM READ A KEY NOTHING EVER WRITES.** It asked
+	# the purse keyed `""` for 0 — and `award_zone_boss_points` skips an empty key,
+	# so no bank could ever put a point there and the check could not fail. What
+	# "an un-awakened hero banks nothing" means is that this bank paid the three
+	# classes that played and nobody else, so it is asked of the WHOLE purse —
+	# every key it holds, not only the four classes — as a delta across the bank:
+	# exactly three points, one to each of the three awakened classes.
+	var purse_before := _purse_every_key()
 	run.bank_zone_boss_points()
-	_check("an un-awakened hero banks nothing", Profile.talent_points_earned(""), 0)
+	var purse_after := _purse_every_key()
+	var moved := {}
+	for k in purse_after:
+		var d := int(purse_after[k]) - int(purse_before.get(k, 0))
+		if d != 0:
+			moved[String(k)] = d
+	var played := {}
+	for i in range(1, SPECS.size()):
+		played[Classes.class_of_spec(SPECS[i])] = 1
+	_check("an un-awakened hero banks nothing — the bank moved the whole purse by exactly the three classes that played",
+		moved, played)
 	_check("the awakened three still banked",
 		Profile.talent_points_earned(Classes.class_of_spec(SPECS[1])), 3)
 	_check("the un-awakened one did not",

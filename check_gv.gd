@@ -17,7 +17,9 @@
 #       sit out, stay stored, and come back; the event verb; the empty-offer
 #       sentence's causes
 #   §3  WHAT A HERO CAN BE OFFERED — per class, with no engine, with each single
-#       engine and with every pair: a number and a list (HC §3's table)
+#       engine and with every pair: a number and a list (HC §3's table); and
+#       since HD §3 the no-engine half's FLOOR per class, off that table, with
+#       the Cleric's zero recorded as owed rather than asserted as correct
 #   §4  A WHOLE RUN PER ARM, ON THE REAL SCREENS — the rune offers each hero was
 #       shown, by name: none a row with its engine unequipped, and rows shown to
 #       a hero holding two
@@ -47,6 +49,25 @@ extends SceneTree
 const Gate = preload("res://gate_fixture.gd")
 
 const SEATS := ["warrior", "mage", "cleric", "hunter"]
+
+# **BATCH HD §3 — WHAT A HERO HOLDING NO ENGINE CAN BE OFFERED, AS A FLOOR PER
+# CLASS: [at spawn, at the ceiling].** HC §3 measured these and GV/HC printed them
+# and asserted nothing, on purpose — how many a class SHOULD hold is the rune
+# design pass's. The designer ruled the floor at HD: the no-engine half is the one
+# that goes thin, so it is asserted per class at HC's reading. **A FLOOR, NEVER AN
+# EQUALITY**: the design pass adds runes, and the batch that raises a reading may
+# raise its floor. **A ZERO IS NOT A FLOOR**: the Cleric's is 0 / 0 — every Cleric
+# rune reads Mercy, Conviction or Ruin — and asserting zero asserts nothing, so his
+# row is OWED (the design pass is authoring Cleric runes that read no engine): §3
+# prints it as owed, notices the day it rises, and asserts instead what still
+# means something — that SOME engine of his opens a rune at spawn, which goes red
+# the day a Cleric can be offered nothing at all.
+const RUNE_FLOOR := {
+	"warrior": [5, 9],
+	"mage": [3, 7],
+	"cleric": [0, 0],
+	"hunter": [5, 7],
+}
 const SCRATCH_PROFILE := "user://gv_profile.json"
 const SCRATCH_RELICS := "user://gv_relics.json"
 const SEED := 20260919
@@ -1268,8 +1289,10 @@ func _s2d_the_peddler() -> void:
 # each class with NO engine, with EACH single engine, and with EVERY pair — AT
 # SPAWN (his opening kit and his slotted engines) and at the CEILING (every card
 # his class draft pool and his lineage's boss pool hold, drafted). **The counts
-# and the names are PRINTED, never asserted** — how many a class should hold is
-# the design pass's, and a pinned count would be a second copy of HC §3's table.
+# and the names are PRINTED** — how many a class should hold is the design
+# pass's. **The one count asserted is the no-engine half's FLOOR (HD §3, ruled)**,
+# which IS a second copy of HC §3's table on purpose: it is `RUNE_FLOOR`, a floor
+# and never an equality, with the Cleric's zero owed rather than asserted.
 # **What is asserted is how the gates compose**: with no engine he is offered
 # exactly the class's runes that no gate withholds; a single engine opens its
 # own rows and no other engine's; a pair's offer is its two singles' union, less
@@ -1325,7 +1348,29 @@ func _s3_what_can_be_offered() -> void:
 		ok(not bare_ce.any(func(i): return ROWS.has(String(i))),
 			"§3: a %s holding no engine can be offered a row at the ceiling — %s" % [
 				cls, _names(bare_ce.filter(func(i): return ROWS.has(String(i))))])
+		# HD §3 — THE NO-ENGINE FLOOR, OFF HC's TABLE (the const above says why).
+		var fl: Array = RUNE_FLOOR[cls]
+		var owed := int(fl[0]) <= 0 or int(fl[1]) <= 0
+		if not owed:
+			ok(bare_sp.size() >= int(fl[0]) and bare_ce.size() >= int(fl[1]),
+				"§3 floor: a %s holding no engine is offered %d at spawn and %d at the ceiling, below HC's %d / %d — the no-engine half thinned (HD §3)" % [
+					cls, bare_sp.size(), bare_ce.size(), int(fl[0]), int(fl[1])])
+		else:
+			print("      OWED (HD §3): a %s holding no engine is offered %d at spawn and %d at the ceiling — a floor of zero asserts nothing, and the rune design pass owes this class runes that read no engine" % [
+				cls, bare_sp.size(), bare_ce.size()])
+			if bare_sp.size() > 0 or bare_ce.size() > 0:
+				print("      NOTICE (HD §3): the owed floor has arrived — %s's no-engine offer is %d / %d; RUNE_FLOOR is owed its reading" % [
+					cls, bare_sp.size(), bare_ce.size()])
 		var engs: Array = Classes.class_engines(cls)
+		# AND THE ARM THAT STILL MEANS SOMETHING FOR AN OWED ROW: some engine of his
+		# class opens a rune at spawn. It goes red the day a hero of the class can
+		# be offered nothing by any engine he can slot.
+		var best_single := 0
+		for pid0 in engs:
+			best_single = maxi(best_single,
+				_offer(cls, Classes.engine_spec(String(pid0)), [pid0], false).size())
+		ok(best_single >= 1,
+			"§3 floor: no engine a %s can slot opens a single rune at spawn — a hero of the class can be offered nothing (HD §3)" % cls)
 		for pid in engs:
 			var lin := Classes.engine_spec(String(pid))
 			var one_sp := _offer(cls, lin, [pid], false)
