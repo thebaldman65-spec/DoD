@@ -602,6 +602,7 @@ func _rune_audit() -> void:
 		"vulture", "ghillie", "improvised", "perfected_toxin", "whole_forest",
 		"force_of_nature"]
 	var hunter_runes := 0
+	var hunter_hf := 0
 	var hunter_engines := 0
 	for id in pool:
 		if String(pool[id].get("scope", "")) != "class:hunter":
@@ -615,15 +616,22 @@ func _rune_audit() -> void:
 		# is empty, so the walk below passes them, and they are counted apart so
 		# the three ordinary ones stay pinned. Six since GO (the Tracker, the
 		# Skirmisher and the Medic), the charter's six a class.
+		# BATCH HF — AND THE ORDINARY ONES ARE TWO SETS NOW: the three this was
+		# written about are RETIRED, and HF's two are LIVE runes written for the
+		# class that read no engine. Counted apart, and both walked below: a rune
+		# every Hunter can hold touches no Survivalist counter.
 		if String(pool[id].get("engine", "")) != "":
 			hunter_engines += 1
-		else:
+		elif String(pool[id].get("retired", "")) != "":
 			hunter_runes += 1
+		else:
+			hunter_hf += 1
 		var st: Dictionary = pool[id].get("payload", {}).get("stat", {})
 		for f in sv_fields:
 			ok(not st.has(f),
 				"the class:hunter rune %s touches no Survivalist counter (writes %s)" % [id, f])
-	ok(hunter_runes == 3, "three class:hunter runes checked (got %d)" % hunter_runes)
+	ok(hunter_runes == 3, "three class:hunter runes checked, retired (got %d)" % hunter_runes)
+	ok(hunter_hf >= 2, "...and HF's two class:hunter runes written for the class, live (got %d)" % hunter_hf)
 	ok(hunter_engines == 6, "...and six class:hunter ENGINE runes beside them (GK, GO) (got %d)" % hunter_engines)
 	# THE FLOAT TRAP, BOTH WAYS (§6, per AZ).
 	for f in ["vulture", "coated_blades", "necrosis", "quartermaster",

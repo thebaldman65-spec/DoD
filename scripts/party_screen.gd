@@ -540,7 +540,8 @@ func _draw_detail() -> void:
 			state.text = "sits out"
 			state.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
 			rune_label.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
-			var note := Run.rune_sits_out_note(String(rune.get("id", "")), Run.held_engines(member))
+			var note := Run.rune_sits_out_note(String(rune.get("id", "")), Run.held_engines(member),
+				Run.worn_rune_ids(member))
 			state.tooltip_text = note
 			rune_label.tooltip_text = note
 		rune_label.custom_minimum_size = Vector2(354, 20)

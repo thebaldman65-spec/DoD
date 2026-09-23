@@ -98,6 +98,9 @@ func _s1_rune_tags_follow_the_cards() -> void:
 	# the ruling. **The count is kept rather than deleted** because it is what
 	# catches a batch satisfying the primary rule by scattering BREAK into every
 	# second slot — a table where the word is everywhere says nothing.
+	# **BATCH HF ADDED FIFTEEN ROWS AND NOT ONE CARRIES BREAK**: Rending Blows
+	# deepens Sunder, which takes ARMOR, and nothing any of the fifteen reads
+	# touches the Break meter — so the count is FK's 11 still.
 	ok(brk_any.size() == 11,
 		"§1: %d rune rows carry BREAK at all, not the 11 after FK — %s" % [
 			brk_any.size(), brk_any])
@@ -128,16 +131,22 @@ func _s1_rune_tags_follow_the_cards() -> void:
 	# column here where it leaves the LIVE pool at sixty**, which is the one
 	# place those two counts disagree, and it is why the column table is asserted
 	# rather than derived.
-	var want := {"DEBUFF": 34, "DEFENSE": 35, "BREAK": 0, "RESOURCE": 28,
-		"OFFENSE": 25, "TEMPO": 5, "MARK": 0}
+	# **BATCH HF MOVED DEBUFF 34 -> 38, DEFENSE 35 -> 39 AND OFFENSE 25 -> 32, AND
+	# NOTHING ELSE.** Fifteen class runes that read no engine, each row derived at
+	# its read site: four DEBUFF first (Returned Burden, Unravel, Rending Blows,
+	# Tusk and Bristle), four DEFENSE (Abundance, Eleventh Hour, Vow of Silence,
+	# Goading Roar), seven OFFENSE. BREAK and MARK stay at zero, for FE's and EK's
+	# reasons above, and RESOURCE and TEMPO did not move.
+	var want := {"DEBUFF": 38, "DEFENSE": 39, "BREAK": 0, "RESOURCE": 28,
+		"OFFENSE": 32, "TEMPO": 5, "MARK": 0}
 	var moved_col: Array = []
 	for k in want:
 		if int(spread[String(k)]) != int(want[k]):
 			moved_col.append("%s %d!=%d" % [k, int(spread[String(k)]), int(want[k])])
 	ok(moved_col.is_empty(),
 		"§1: a primary column the demotion does not touch has moved — %s" % [moved_col])
-	ok(Runes.RUNE_TAGS.size() == 127,
-		"§1: the table is %d rows, not the 127 after FO" % Runes.RUNE_TAGS.size())
+	ok(Runes.RUNE_TAGS.size() == 142,
+		"§1: the table is %d rows, not the 142 after HF (FO's 127 and HF's fifteen)" % Runes.RUNE_TAGS.size())
 	print("    RUNE_TAGS primaries: %s" % [spread])
 
 	# **THE CARD TABLE IS THE POSITIVE ARM.** FD's ruling is what this one

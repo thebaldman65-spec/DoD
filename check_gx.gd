@@ -274,8 +274,12 @@ func _s1_the_predicate() -> void:
 	# status or a stance no class kit lays (or a price only one engine gives), and
 	# the designer gated each on its engine. Each read site asks the engine too, so
 	# each sits out without it, and every arm below walks them as rows.
-	ok(_gated.size() == 43, "§1: %d gated runes — the table holds 43 (GV's 35, HC's Layered Aegis and HE's seven)" % _gated.size())
-	ok(_ungated.size() == 17, "§1: %d ungated live ordinary runes — 17 since HE" % _ungated.size())
+	# **BATCH HF — 42 AND 33: LONG POISON LEFT THE TABLE AND FIFTEEN RUNES CAME IN
+	# BESIDE IT.** HF §6 un-gated Long Poison (Snare Trap, in every Hunter's kit,
+	# lays the Poison it reads), and HF §1-§4 authored fifteen class runes that
+	# read no engine, so neither sits out for want of one: 17 + 1 + 15.
+	ok(_gated.size() == 42, "§1: %d gated runes — the table holds 42 (GV's 35, HC's Layered Aegis and HE's seven less Long Poison)" % _gated.size())
+	ok(_ungated.size() == 33, "§1: %d ungated live ordinary runes — 33 since HF (HE's 17, Long Poison and HF's fifteen)" % _ungated.size())
 	# THE GATED FORTY-THREE: out without the engine, in with it. Both arms.
 	var out_without := 0
 	var in_with := 0
@@ -303,6 +307,11 @@ func _s1_the_predicate() -> void:
 	# pet fields none, so those four sit out beside it and for nobody else; the
 	# other thirteen never sit out at all (HE §1 took seven into the table, none a
 	# companion rune). Both halves on every rune.
+	# **BATCH HF — FIVE, AND TWENTY-EIGHT**: Tusk and Bristle adds Aper to the
+	# companion card, so it needs a companion too and is the pet gate's fifth row;
+	# the other twenty-eight never sit out on an engine set. (Burning Ground sits
+	# out beside a worn Vow of Silence — a RUNE, not an engine, so these sets never
+	# ask it; `check_hf` §4 drives that pair.)
 	var never := 0
 	var pet_out := 0
 	for uid in _ungated:
@@ -317,8 +326,8 @@ func _s1_the_predicate() -> void:
 			never += 1
 		if s_dis:
 			pet_out += 1
-	ok(never == _ungated.size() and pet_out == 4,
-		"§1: %d of %d ungated runes never sit out on a set that fields a pet, and %d sit out beside the dismisser — the four that need a companion" % [
+	ok(never == _ungated.size() and pet_out == 5,
+		"§1: %d of %d ungated runes never sit out on a set that fields a pet, and %d sit out beside the dismisser — the five that need a companion" % [
 			never, _ungated.size(), pet_out])
 	# AN ENGINE RUNE IS NOT AN ORDINARY ONE AND NEVER SITS OUT.
 	for spec in ["beastmaster", "occultist", "holy", "arcanist"]:

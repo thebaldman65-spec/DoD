@@ -164,7 +164,9 @@ func _s1_rarity_is_gone() -> void:
 	# what they do.
 	# **BATCH GO: 142 -> 151.** The designer's nine rule engines, authored as
 	# engine runes on GK's shape — the charter's six a class.
-	ok(data.size() == 151, "§1: the authored pool is %d entries, expected 151" % data.size())
+	# **BATCH HF: 151 -> 166.** Fifteen runes written for their class that read no
+	# engine (the designer's, HF §1-§4), live, at the flat 100g.
+	ok(data.size() == 166, "§1: the authored pool is %d entries, expected 166" % data.size())
 	ok(with_rarity.is_empty(), "§1: %s still carry a `rarity` key" % [with_rarity])
 	ok(with_scarred.is_empty(), "§1: %s still carry a `scarred` key" % [with_scarred])
 
@@ -462,8 +464,14 @@ func _in_scope(scope: String, class_key: String, _spec: String) -> bool:
 # −10 Speed and was never flagged because the old schema forbade a "scarred
 # common" and it is the one common in the file. **A RARITY RULE WAS HIDING A
 # COST**, and removing rarity is what surfaced it.
+# **BATCH HF ADDED ONE: `grudge`.** Grudge's -20% against every enemy but the
+# last one that struck him is a real payload term (`rune_grudge_rest` -0.20), so
+# `is_cost` reads it. HF's other two tradeoffs are behaviours with no term — Vow
+# of Silence's silence and Profligate's doubled price — and are not in this set;
+# they are not `COST_WITHOUT_A_TERM` either, which names the one flagged entry
+# whose cost the old flag once recorded (its reason is below).
 const COSTED := ["anchor", "bared_guard", "burning_censer", "carrion_wake",
-	"glass", "hollow_chalice", "iron_promise", "killing_cold", "long_draw",
+	"glass", "grudge", "hollow_chalice", "iron_promise", "killing_cold", "long_draw",
 	"loosened_straps", "martyr", "reckless_channeling", "sleepless_vigil",
 	"unquiet_mind", "vampiric", "white_flame", "wolfs_hunger"]
 

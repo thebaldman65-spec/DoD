@@ -66,8 +66,26 @@ func _ez_ids() -> Array:
 	for id in _data():
 		# BATCH GK — the fifteen ENGINE runes are live and are not EZ's sixty: no
 		# shape, no archetype tag, no stat to land. §0 counts them beside it.
-		if String((_data()[id] as Dictionary).get("retired", "")) == "" \
-				and String((_data()[id] as Dictionary).get("engine", "")) == "":
+		# BATCH HF — AND NEITHER ARE HF's FIFTEEN, which were written for their
+		# CLASS and read no engine (`written_for` absent): the sixty are the pool
+		# written for a lineage, and §0 counts the fifteen beside it as it counts
+		# the engine runes (`_hf_ids`), asking each the same price, scope, tag and
+		# shape questions, and §4 lands both populations' payloads.
+		var e: Dictionary = _data()[id]
+		if String(e.get("retired", "")) == "" and String(e.get("engine", "")) == "" \
+				and String(e.get("written_for", "")) != "":
+			out.append(String(id))
+	out.sort()
+	return out
+
+
+# BATCH HF — the live ordinary runes written for no lineage: HF's fifteen.
+func _hf_ids() -> Array:
+	var out: Array = []
+	for id in _data():
+		var e: Dictionary = _data()[id]
+		if String(e.get("retired", "")) == "" and String(e.get("engine", "")) == "" \
+				and String(e.get("written_for", "")) == "":
 			out.append(String(id))
 	out.sort()
 	return out
@@ -112,13 +130,21 @@ func _s0_the_pool() -> void:
 		% ez.size())
 	# **BATCH GO MOVED BOTH, 142 -> 151 AND 15 -> 24**: the designer's nine rule
 	# engines, so every class holds the charter's six engine runes.
-	ok(data.size() == 151, "§0: the authored pool is %d entries, expected 151 (the twenty-four engine runes)" % data.size())
+	# **BATCH HF MOVED IT 151 -> 166**: fifteen live runes written for their class.
+	ok(data.size() == 166, "§0: the authored pool is %d entries, expected 166 (the twenty-four engine runes, and HF's fifteen)" % data.size())
 	var eng := 0
 	for id0 in data:
 		if String((data[id0] as Dictionary).get("engine", "")) != "":
 			eng += 1
-	ok(eng == 24 and ez.size() + eng == 84,
-		"§0: ...and twenty-four of them are ENGINE runes (GK, GO), live beside the sixty and outside this gate's population (%d)" % eng)
+	var hf := _hf_ids()
+	ok(eng == 24 and hf.size() == 15 and ez.size() + eng + hf.size() == 99,
+		"§0: ...and twenty-four of them are ENGINE runes (GK, GO) and %d are HF's class runes, live beside the sixty and outside this gate's population (%d engines)" % [hf.size(), eng])
+	for idh in hf:
+		var eh: Dictionary = data[idh]
+		ok(int(eh.get("price", 0)) == 100 and String(eh.get("scope", "")).begins_with("class:")
+			and Classes.CLASS_KITS.has(String(eh.get("scope", "")).trim_prefix("class:"))
+			and not (Runes.rune_tags(idh) as Array).is_empty() and not (Runes.rune_shape(idh) as Array).is_empty(),
+			"§0: HF's %s is not a class rune at 100g with a tag and a shape (%s, %dg)" % [idh, eh.get("scope", ""), int(eh.get("price", 0))])
 
 	# **PRICE IS 100g FLAT, EVERY RUNE, AND IT IS ASSERTED AS AN EQUALITY.**
 	# ES §1 removed the tiers and left pricing to the designer; EZ §0 rules the
@@ -378,7 +404,7 @@ func _s4_the_payloads() -> void:
 	var landed := 0
 	var missed: Array = []
 	var not_refused: Array = []
-	for id in _ez_ids():
+	for id in _ez_ids() + _hf_ids():
 		var e: Dictionary = data[id]
 		var payload: Dictionary = Runes.build(id).get("payload", {})
 		var stats: Dictionary = payload.get("stat", {})
@@ -411,7 +437,8 @@ func _s4_the_payloads() -> void:
 			gated += 1
 			not_refused.append("%s carries %s" % [id, cond])
 	ok(missed.is_empty(), "§4: every payload lands its field (%s)" % [missed])
-	ok(landed == 60, "§4: %d of 60 landed" % landed)
+	# BATCH HF — AND HF's FIFTEEN LAND TOO: 60 + 15.
+	ok(landed == 75, "§4: %d of 75 landed (the sixty and HF's fifteen)" % landed)
 	ok(gated == 0, "§4: %d runes carry a condition, and FN retired the last of them" % gated)
 	ok(not_refused.is_empty(),
 		"§4: a live payload is conditional again (%s)" % [not_refused])

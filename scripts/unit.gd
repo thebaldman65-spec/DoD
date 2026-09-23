@@ -926,6 +926,11 @@ var last_hope_pct := 0        # Last Hope: the nearly-dead heal N% deeper
 var rune_last_hope_pct := 0   # rune-owned: the Open Hand +5
 var last_hope_bonus := 0      # party-wide stamp (receiver side of Last Hope)
 var last_overheal := 0        # overheal of the most recent heal_amount call
+# BATCH HF — whether Abundance has already shielded THIS heal's overheal. A heal
+# can be booked twice (a card that credits a healer through two doors), and the
+# overheal it spilled is one number, so the shield is paid once: set when
+# Abundance spends it, cleared by the next heal that recomputes the spill.
+var overheal_shielded := false
 var on_mend_pct := 0          # On the Mend: N% chance a Renewal tick dispels
 var sanctified_pct := 0       # Sanctified: N% chance a Mercy spend refunds
 var cascade_pct := 0          # Radiant Cascade: crit heals splash N% onward
@@ -1210,6 +1215,14 @@ var credit_cb := Callable()
 # `hp_before` rides along because the killing-blow line needs the number the
 # hit landed against, and only this scope still has it.
 var damage_taken_cb := Callable()
+# BATCH HF — VOW OF SILENCE'S DOOR, AT THE SAME TWO PLACES AND ABOVE EVERYTHING
+# THEY DO. Fires as (victim, amount) BEFORE a barrier, a split or a death
+# refusal sees the number, and returns what is left of it. **The battle answers
+# off the attribution frame** (`_dmg_frame`) — the frame the recap already reads
+# to say who dealt a blow — so "he deals no damage" means "nothing the game
+# credits to him lands", one definition for every source he has rather than a
+# list of his cards that a later card would slip past.
+var deal_gate_cb := Callable()
 
 # BATCH BS §3 — KILN-FORGED asks the BOARD a question, which is the one thing
 # this file cannot answer for itself, so it asks back the way every other
@@ -1602,11 +1615,57 @@ var rune_bare_altar := 0      # rune-owned: the Bare Altar 1 (a FLAG)
 # FORCE OF NATURE REPLACES that term via `elif` rather than adding to it, so a
 # rune written against the 8% is silently worth nothing to a Survivalist holding
 # that capstone. All five are written elsewhere on purpose.
-var rune_long_poison := 0     # rune-owned: the Long Poison 1 (a FLAG). STAMPED on enemies.
+var rune_long_poison := 0     # rune-owned: the Long Poison 1 (a FLAG), read off the Poison's SOURCE at `_apply_poison`.
 var rune_second_barb := 0     # rune-owned: the Second Barb 1 (a FLAG)
 var rune_full_board := 0      # rune-owned: the Full Board 1 (a FLAG)
 var rune_carrion := 0         # rune-owned: the Carrion 1 (a FLAG)
 var rune_thin_blood := 0      # rune-owned: Thin Blood 1 (a FLAG)
+# ══ BATCH HF — THE FIFTEEN THAT READ NO ENGINE ══════════════════════════════
+# **EVERY ONE IS A FLOAT, AND DELIBERATELY OFF `Runes.STAT_INT_KEYS`.** A flag
+# carried as 1.0 reads `> 0.0` exactly as an int flag reads `> 0`, and a float
+# field needs no row in that list — a `rune_` int whose name does not end
+# `_ranks` does (EM's rule), and forgetting it is a runtime error at the spawn.
+# Each reads only its class's kit, its class resource, a status its own kit
+# lays, or healing and damage in general (HF §0); the read sites say which.
+# Cleric —
+var rune_abundance := 0.0         # Abundance 1.0: his overheal becomes a shield on them
+var rune_returned_burden := 0.0   # Returned Burden 1.0: what Unburden lifts is cast onto an enemy
+var rune_burning_ground := 0.0    # Burning Ground 0.05: the burn's share of his maximum health (PROPOSED)
+var rune_eleventh_hour := 0.0     # Eleventh Hour 1.0: Ministration's increase below a quarter health
+var rune_vow_of_silence := 0.0    # Vow of Silence 0.50: his heals' increase — and he deals no damage
+# Mage —
+var rune_unravel := 0.0           # Unravel 1.0: Magic Burst's weakness reaches every enemy
+var rune_seeking_missiles := 0.0  # Seeking Missiles 1.0: a missile more per weakened enemy
+var rune_detonating_ward := 0.0   # Detonating Ward 1.0: the share of what the ward absorbed it deals back
+var rune_clarity := 0.0           # Clarity 0.50: a spell cast at full Mana deals this much more
+var rune_profligate := 0.0        # Profligate 0.40: his spells deal this much more — and cost twice the Mana
+# Warrior —
+var rune_goading_roar := 0.0      # Goading Roar 0.25: what an enemy his taunt binds deals less
+var rune_rending_blows := 0.0     # Rending Blows 3.0: the deepest Sunder a Crushing Blow can stack to
+var rune_grudge_struck := 0.0     # Grudge 0.40: more against the last enemy that struck him
+var rune_grudge_rest := 0.0       # Grudge -0.20: against every other enemy — ITS COST, a real term
+# Hunter —
+var rune_opportunist_shot := 0.0  # Opportunist 1.0: Powershot's increase against a stunned enemy.
+# (NOT named after the rune alone: `opportunist` is the Swordmaster node counter FX
+# left dormant, and `rune_X` beside `X` is the re-keyed pair `check_em` holds
+# together — a name that shadowed it would claim a kinship the two do not have.)
+var rune_tusk_and_bristle := 0.0  # Tusk and Bristle 1.0: Summon Companion can call Aper
+# **AND THE BATTLE STATE THEY NEED, NONE OF IT NAMED `rune_*`** (`check_ez` §4:
+# a `rune_*` field is written by `runes.json` and by nothing else).
+# Grudge — the enemy whose blow last reached him, through the one door every
+# blow that reaches a body passes (`note_blow_met`'s line in the strike loop).
+# Null until one does, and null again when it falls: no grudge, no penalty.
+var grudge_foe: BattleUnit = null
+# Detonating Ward — armed when he casts Nexus Ward wearing the rune, and what
+# every barrier absorb books while it is armed; spent when the barrier breaks
+# or ends. On the UNIT and not on the status, because the expiry door hands the
+# battle an id and not the status that left.
+var ward_det_armed := false
+var ward_det_absorbed := 0
+# Aper — its charges since it was fielded. On the BODY, so a fresh summon, a
+# swap and a new fight each start it over (a returning companion is a fresh
+# body; `_do_summon`).
+var aper_strikes := 0
 var second_barb_next := 0     # engine state: where the barb's cycle stands
 # **ENGINE STATE AND NOT A RUNE FIELD**: the Glass Prison stamps this on the
 # BODIES it seals, not on the Cryomancer, so a prison laid while the rune was
@@ -3004,10 +3063,19 @@ func dispel_one_debuff() -> String:
 # Cleanse: strip every harmful status. Broken stays — it's a Break-meter
 # state, not a dispellable status. Returns how many were removed.
 func purge_debuffs() -> int:
+	return purge_debuffs_taken().size()
+
+
+# BATCH HF — THE SAME CLEANSE, HANDING BACK WHAT IT TOOK. Returned Burden casts
+# every harmful effect Unburden lifts onto an enemy, so it needs the effects and
+# not their count; `purge_debuffs` is this function's size, so there is ONE
+# filter deciding what a cleanse removes and a second copy of it cannot drift.
+# Each entry is a COPY of the status as it stood (its turns, power, tick, stacks
+# and who laid it) — the live one is gone by the time the caller reads it.
+func purge_debuffs_taken() -> Array:
 	# Sticky statuses (Slow Acting / Perfected Toxin poison) refuse every
 	# cleanse. Batch BA leans on this: Harvest is now paid for what the purge
 	# actually TOOK, so what survives here is what it is not billed for.
-	var before := statuses.size()
 	# BATCH FT — SANCTITY's other removal door. The ids are captured BEFORE the
 	# filter because a cleanse takes several at once and the ledger is keyed on
 	# (body, status): three debuffs off one body is three statuses leaving, and
@@ -3015,14 +3083,19 @@ func purge_debuffs() -> int:
 	var was: Array = []
 	for s in statuses:
 		was.append(String(s.id))
-	statuses = statuses.filter(
-		func(s): return s.id == "broken" or s.get("sticky", false) \
-			or not DEBUFF_IDS.has(s.id))
+	var kept: Array = []
+	var taken: Array = []
+	for s in statuses:
+		if s.id == "broken" or s.get("sticky", false) or not DEBUFF_IDS.has(s.id):
+			kept.append(s)
+		else:
+			taken.append((s as Dictionary).duplicate())
+	statuses = kept
 	for gone_id in was:
 		if not has_status(gone_id):
 			note_status_event(self, gone_id)
 	_refresh_chips()
-	return before - statuses.size()
+	return taken
 
 
 # Updates a live status chip's tag and tooltip (and optionally its power /
@@ -3255,9 +3328,25 @@ func effective_armor() -> float:
 		a += float(get_status("standard").get("armor", 0.0))
 	if broken:
 		a *= 0.7
+	# BATCH HF — RENDING BLOWS DEEPENS SUNDER, AND THE DEPTHS ADD. One Sunder is
+	# the 35% it always was (x0.65, byte for byte); the status's power is how
+	# many a Rending Blows Warrior has stacked, and each takes 35% more of the
+	# armor this line started from — 70% at two, and three times 35% is past a
+	# whole armor value, so the third is FLOORED AT ZERO rather than reading
+	# negative. A Sunder laid by anything else carries power 0 and reads one deep.
 	if has_status("sunder"):
-		a *= 0.65
+		a *= maxf(1.0 - SUNDER_STEP * sunder_depth(), 0.0)
 	return minf(a, 0.85)
+
+
+# BATCH HF — one Sunder's share of armor, and how deep the Sunder on this body
+# stands (1 unless a Rending Blows Crushing Blow deepened it). THE ONE ANSWER:
+# the armor line above and the chip `battle.gd` stamps both read it.
+const SUNDER_STEP := 0.35
+func sunder_depth() -> int:
+	if not has_status("sunder"):
+		return 0
+	return maxi(int(get_status("sunder").get("power", 0)), 1)
 
 
 func _refresh_chips() -> void:
@@ -3529,6 +3618,12 @@ func _siphon_pay(amount: int) -> int:
 
 
 func take_hit(amount: int, pressure_add: int) -> Dictionary:
+	# BATCH HF — VOW OF SILENCE, first: a blow its source may not deal is not
+	# dealt, so nothing below it — a barrier's absorb, One Soul's split, the
+	# Unbroken Watch flag — ever sees it. The Break damage rides `pressure_add`
+	# and is untouched (the rune says damage, and Break damage is its own word).
+	if amount > 0 and deal_gate_cb.is_valid():
+		amount = int(deal_gate_cb.call(self, amount))
 	if amount > 0:
 		damaged_since_turn = true  # Unbroken Watch bookkeeping
 	# One Soul (Beastmaster capstone): a wound to ANY member of the bond
@@ -3561,6 +3656,11 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 			var absorbed: int = mini(s.power, amount)
 			amount -= absorbed
 			s.power -= absorbed
+			# BATCH HF — DETONATING WARD books what the ward eats while it is
+			# armed; the battle spends the total when the barrier breaks
+			# (`barrier_broken_cb`, below) or ends (`status_expired_cb`).
+			if ward_det_armed:
+				ward_det_absorbed += absorbed
 			float_text("Absorbed %d" % absorbed, Color(0.4, 0.85, 0.95))
 			var bb_pct := float(s.get("blessed_pct", 0.0))
 			if bb_pct > 0.0 and absorbed > 0:
@@ -4091,6 +4191,10 @@ func set_ruin_stacks(n: int) -> void:
 
 
 func take_tick_damage(amount: int, label: String, color: Color) -> bool:
+	# BATCH HF — VOW OF SILENCE, as in `take_hit`: a tick its source may not
+	# deal is not dealt.
+	if amount > 0 and deal_gate_cb.is_valid():
+		amount = int(deal_gate_cb.call(self, amount))
 	# BATCH GO — COVENANT AND SIPHON READ "DAMAGE TAKEN", AND A TICK IS DAMAGE
 	# TAKEN. Both run here too, in `take_hit`'s order. The half a bond hands the
 	# other body arrives through THIS function with the receiver's guard up, so it
@@ -4313,6 +4417,7 @@ func heal_amount(amount: int, external := false) -> int:
 	var heal_was_below_mercy := hp <= max_hp * mercy_threshold
 	var heal_was_below_quarter := hp <= max_hp * LAST_WORD_AT
 	last_overheal = maxi(final - (max_hp - hp), 0)
+	overheal_shielded = false
 	# BATCH BM §2 — FONT OF LIGHT (Holy, Radiance row 8). Overhealing is the
 	# lane's waste product and seven rows make more of it; here it becomes the
 	# resource that pays for casting. The field is on the CASTER, so battle.gd

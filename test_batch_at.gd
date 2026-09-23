@@ -757,6 +757,7 @@ func _rune_audit() -> void:
 			"rune_on_edge_ranks", "on_edge_stacks", "volatility_recoil"]:
 		arc_fields[extra] = true
 	var mage_runes := 0
+	var mage_hf := 0
 	var mage_engines := 0
 	for id in Runes.ids():
 		if String(Runes.config(id).get("scope", "")) != "class:mage":
@@ -772,14 +773,22 @@ func _rune_audit() -> void:
 		# BATCH GK — the Mage ENGINE runes are class:mage too, with an empty
 		# payload; counted apart so the three ordinary ones stay pinned. Six since
 		# GO (the Weaver and the Leech), the charter's six a class.
+		# BATCH HF — AND THE CLASS ENTRIES WRITTEN FOR NO SPEC ARE TWO SETS NOW: the
+		# three this was written about are RETIRED (class-wide before a lineage
+		# existed), and HF's five are LIVE runes written for the class that read no
+		# engine. Counted apart, both asked the question below: a Mage rune written
+		# for no lineage writes no Arcanist counter.
 		if Runes.is_engine_rune(String(id)):
 			mage_engines += 1
-		else:
+		elif Runes.is_retired(String(id)):
 			mage_runes += 1
+		else:
+			mage_hf += 1
 		for f in Runes.config(id).get("payload", {}).get("stat", {}):
 			ok(not arc_fields.has(String(f)),
 				"the Mage-wide rune %s does not write the Arcanist counter %s" % [id, f])
-	ok(mage_runes == 3, "there are 3 Mage class-wide runes (got %d)" % mage_runes)
+	ok(mage_runes == 3, "there are 3 Mage class-wide runes, retired (got %d)" % mage_runes)
+	ok(mage_hf >= 5, "...and HF's five Mage runes written for the class, live (got %d)" % mage_hf)
 	ok(mage_engines == 6, "...and 6 Mage ENGINE runes beside them (GK, GO) (got %d)" % mage_engines)
 
 

@@ -600,13 +600,21 @@ func _s5_reported_not_fixed() -> void:
 	# that kit to be the Berserker's enabler alone and joined it. **What is left is
 	# exactly the eight enablers** — an enabler is in no pool, by rule — so the
 	# day this reads nine, a card sits outside every pool that no engine carries.
+	# **BATCH HF MOVED IT 8 -> 9, AND THE NINTH IS A CARD NO ENGINE CARRIES, ON
+	# PURPOSE.** Summon Aper is Tusk and Bristle's call: a rune adds it to Summon
+	# Companion, and `battle._summon_choice` builds it only for the rune's wearer,
+	# so it is in no pool and no kit by the ruling that authored it — reachable
+	# through the rune exactly as the three calls are reachable through the kit card.
+	# It is named here, so a tenth is still a card nothing carries.
 	var unseen: Array = []
 	for ab2 in Classes.ability_corpus():
 		if not pooled.has(ab2.display_name):
 			unseen.append(ab2.display_name)
 	unseen.sort()
-	ok(unseen.size() == 8,
-		"§5: %d abilities sit outside every pool and every class kit, not the 8 on record — re-derive it (%s)" % [
+	ok(unseen.has("Summon Aper"),
+		"§5: Summon Aper is in a pool or a class kit — Tusk and Bristle is its one door (%s)" % ", ".join(PackedStringArray(unseen)))
+	ok(unseen.size() == 9,
+		"§5: %d abilities sit outside every pool and every class kit, not the 9 on record — re-derive it (%s)" % [
 			unseen.size(), ", ".join(PackedStringArray(unseen))])
 	ok(unseen.size() > 0,
 		"§5: every ability is now in a pool or a class kit — a walk built the old way would agree with the corpus, and §5's finding is stale")

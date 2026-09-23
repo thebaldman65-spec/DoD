@@ -280,8 +280,12 @@ func _s1_the_eight_are_ungated() -> void:
 	ok(rows >= 60, "§1c: `RUNE_SHAPES` holds %d rows — the walk read nothing" % rows)
 	ok(thr == 0 and brd == 0,
 		"§1c: %d rows still carry THRESHOLD and %d BREADTH" % [thr, brd])
-	ok(trade == 12,
-		"§1c: TRADEOFF reads %d, not the 12 that survive the retirement" % trade)
+	# **BATCH HF MOVED IT 12 -> 15**: three of HF's fifteen charge for their upside
+	# — Vow of Silence (he deals no damage), Profligate (his spells cost twice as
+	# much) and Grudge (-20% against every enemy but his grudge) — and carry the
+	# label; none carries a condition, which is the zero above.
+	ok(trade == 15,
+		"§1c: TRADEOFF reads %d, not the 15 after HF (the 12 that survive the retirement, and HF's three)" % trade)
 	# **AND THE VOCABULARY IS KEPT RATHER THAN RE-SPELLED.** Deleting the two
 	# words from `RUNE_SECONDARIES` would make a re-authored gate impossible to
 	# express and would hide the retirement instead of stating it; the ruling

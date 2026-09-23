@@ -553,6 +553,7 @@ func _rune_audit() -> void:
 	var bsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	var cryo := []
 	var mage := []
+	var mage_hf := []
 	var mage_engines := []
 	# BATCH HC §1 — EVERY ONE OF THESE IS `class:mage` NOW, so the three sets are
 	# told apart by the record the re-scope kept: the Cryomancer's are the entries
@@ -566,8 +567,17 @@ func _rune_audit() -> void:
 			cryo.append(id)
 		elif String(r.get("scope", "")) == "class:mage" and String(r.get("engine", "")) != "":
 			mage_engines.append(id)   # BATCH GK — an engine rune, counted apart
+		# BATCH HF — THE CLASS ENTRIES WRITTEN FOR NO SPEC ARE TWO SETS NOW, TOLD
+		# APART BY `retired`: the Mage-wide three this section was written about
+		# (retired, class-wide before a lineage existed) and the five HF wrote for
+		# the class that read no engine. Both are asked the question below — no
+		# Mage class rune touches a Cryomancer counter — and each is counted apart,
+		# so neither set can go missing inside the other's number.
 		elif String(r.get("scope", "")) == "class:mage" and String(r.get("written_for", "")) == "":
-			mage.append(id)
+			if String(r.get("retired", "")) != "":
+				mage.append(id)
+			else:
+				mage_hf.append(id)
 	# **BATCH FK MOVED IT 4 -> 9.** The four are ET's retired ones and FK
 	# authored five more; this walks `runes.json`, retired included, so the count
 	# is the FILE's population and not the offerable one. **The claim was never
@@ -576,7 +586,8 @@ func _rune_audit() -> void:
 	# count is here to catch a set going MISSING, and it is re-pointed rather
 	# than deleted for that reason.
 	ok(cryo.size() == 9, "nine runes written for the Cryomancer (got %d)" % cryo.size())
-	ok(mage.size() == 3, "three Mage class-wide runes (got %d)" % mage.size())
+	ok(mage.size() == 3, "three Mage class-wide runes, retired (got %d)" % mage.size())
+	ok(mage_hf.size() >= 5, "...and HF's five Mage runes written for the class, live (got %d)" % mage_hf.size())
 	# **BATCH GO MOVED IT 4 -> 6: the Weaver and the Leech.** The charter gives
 	# every class six, and the count is the charter's rather than a population's.
 	ok(mage_engines.size() == 6, "...and six Mage ENGINE runes beside them (GK, GO) (got %d)" % mage_engines.size())
@@ -638,7 +649,7 @@ func _rune_audit() -> void:
 				"the counter %s (rune %s) still has a read site" % [f, id])
 	# No Mage class-wide rune touches a Cryomancer counter — asserted so a
 	# future re-tune of one cannot silently re-tune the other.
-	for id in mage:
+	for id in mage + mage_hf:
 		for f in pool[id].get("payload", {}).get("stat", {}):
 			ok(not cryo_fields.has(String(f)),
 				"the Mage rune %s does not write a Cryomancer counter (%s)" % [id, f])

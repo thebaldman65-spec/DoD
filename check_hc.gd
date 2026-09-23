@@ -10,7 +10,9 @@
 #       again, all three handed back; and it sits out without the engine
 #   §3  THE EVENT VERB PREFERS AN ORDINARY RUNE — a Warrior holding no engine is
 #       granted ordinary runes and no engine rune while one is eligible; a Cleric
-#       holding none, with no ordinary rune eligible, is still granted a rune
+#       holding none, with no ordinary rune eligible, is still granted a rune (since
+#       HF a Cleric carrying every ordinary rune he could be offered, and one
+#       carrying nothing is granted ordinary runes, HF's five)
 #   §4  THE PITY METER COUNTS CASTS — an area attack on three enemies, a multi-hit
 #       of three and a single shot each climb it ONE step; a crit resets it
 #   §5  THE ZONE BOSS'S FIRST TIER ASKS THE PET — no companion card rolled while
@@ -259,8 +261,32 @@ func _s3_the_event_verb() -> void:
 	ok(engine == 0 and ordinary == 60,
 		"§3: a Warrior holding no engine was granted %d engine runes and %d ordinary of 60 — the verb no longer prefers an ordinary rune" % [
 			engine, ordinary])
+	# **BATCH HF — A CLERIC HOLDING NO ENGINE IS OFFERED ORDINARY RUNES NOW** (HF
+	# §1's five, which read no engine), so he is the Warrior's case: the verb hands
+	# him ordinary runes. The fall-back's premise — nothing ordinary eligible — is
+	# built instead: the same Cleric already carrying every ordinary rune he could be
+	# offered. The arm's question is unchanged: with nothing ordinary left, the
+	# verb still pays.
+	var cn := {"key": "cleric", "spec": "", "runes": [], "bm_abilities": [], "engines": [],
+		"awakened": true}
+	var c_ordinary := 0
+	for _k in 20:
+		var g3: Dictionary = _run.grant_rune(cn)
+		if not g3.is_empty() and not Runes.is_engine_rune(String(g3.get("id", ""))):
+			c_ordinary += 1
+	ok(c_ordinary == 20,
+		"§3: a Cleric holding no engine was granted %d ordinary runes of 20 — HF's five read no engine, so the verb prefers one" % c_ordinary)
 	var cm := {"key": "cleric", "spec": "", "runes": [], "bm_abilities": [], "engines": [],
 		"awakened": true}
+	for e in Runes.eligible_ids(cm, []):
+		if not Runes.is_engine_rune(String(e)):
+			(cm["runes"] as Array).append(Runes.build(String(e)))
+	# What he owns is passed by name, as the verb itself passes it (`grant_rune`).
+	var cm_owned: Array = (cm["runes"] as Array).map(func(r): return String(r["name"]))
+	ok(cm_owned.size() >= 5
+			and Runes.eligible_ids(cm, cm_owned).all(func(i): return Runes.is_engine_rune(String(i))),
+		"§3: the Cleric carrying every ordinary rune he could be offered (%d) is still eligible for an ordinary one (%s)" % [
+			cm_owned.size(), Runes.eligible_ids(cm, cm_owned).filter(func(i): return not Runes.is_engine_rune(String(i)))])
 	var c_engine := 0
 	for _j in 20:
 		var g2: Dictionary = _run.grant_rune(cm)
@@ -268,7 +294,8 @@ func _s3_the_event_verb() -> void:
 			c_engine += 1
 	ok(c_engine == 20,
 		"§3: a Cleric holding no engine — no ordinary rune eligible — was granted %d runes of 20; the fall-back stopped paying" % c_engine)
-	print("    a no-engine Warrior: %d ordinary of 60; a no-engine Cleric: %d engine runes of 20" % [ordinary, c_engine])
+	print("    a no-engine Warrior: %d ordinary of 60; a no-engine Cleric: %d ordinary of 20, and carrying his %d: %d engine runes of 20" % [
+		ordinary, c_ordinary, (cm["runes"] as Array).size(), c_engine])
 
 
 # ── §4 — THE PITY METER COUNTS CASTS ────────────────────────────────────────

@@ -632,21 +632,33 @@ func _rune_audit() -> void:
 	# slotted, and `check_gv` §1 drives every one both ways. **What is asserted is
 	# the fact that retired it**, so the day a live Hunter rune written for no
 	# lineage exists, the question is live again and this goes red saying so.
+	# **BATCH HF — AND THE QUESTION IS LIVE AGAIN, AS THE LINE ABOVE SAID IT WOULD
+	# BE.** HF wrote two Hunter runes for the CLASS, reading no engine (Opportunist,
+	# Tusk and Bristle), so AZ's question is ASKED of them rather than retired: a
+	# rune every Hunter is offered writes no Sharpshooter counter — it would pay only
+	# the Sharpshooter. The retired entries are still printed as the record; the
+	# live ones are the population, and the population is asserted non-empty.
 	var class_wide_live: Array = []
+	var ss_writers: Array = []
 	var walked := 0
 	for id in pool:
 		if String(pool[id].get("scope", "")) != "class:hunter" \
 				or String(pool[id].get("written_for", "")) != "":
 			continue
 		walked += 1
-		if not Runes.is_retired(String(id)) and not Runes.is_engine_rune(String(id)):
+		var live: bool = not Runes.is_retired(String(id)) and not Runes.is_engine_rune(String(id))
+		if live:
 			class_wide_live.append(String(id))
 		for f in pool[id].get("payload", {}).get("stat", {}):
 			if ss_fields.has(f):
-				print("  [record] the retired class-wide Hunter rune %s writes the Sharpshooter counter %s" % [id, f])
-	ok(walked > 0 and class_wide_live.is_empty(),
-		"a LIVE Hunter rune written for no lineage exists (%s of %d walked) — AZ's retired question, whether it writes a Sharpshooter counter, is live again (retired at HD §2)" % [
-			str(class_wide_live), walked])
+				if live:
+					ss_writers.append("%s: %s" % [id, f])
+				else:
+					print("  [record] the retired class-wide Hunter rune %s writes the Sharpshooter counter %s" % [id, f])
+	ok(walked > 0 and not class_wide_live.is_empty(),
+		"no LIVE Hunter rune is written for no lineage (%d walked) — HF's two are the population AZ's question asks about" % walked)
+	ok(ss_writers.is_empty(),
+		"a live Hunter rune written for no lineage writes a Sharpshooter counter (%s) — every Hunter is offered it, and it would pay only the Sharpshooter" % str(ss_writers))
 	# No lane tag went stale: his lanes did not rename (the AS Honed Lance
 	# lesson, checked even though nothing moved).
 	# (FX: no tree has lanes now, and a rune's `lane` records HISTORY — CLAUDE.md,

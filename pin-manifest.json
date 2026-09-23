@@ -2,16 +2,16 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1511,
-  "source": 1157,
+  "total": 1517,
+  "source": 1163,
   "other": 104,
   "document": 250
  },
  "source_residency": {
   "narrow": 40,
-  "code": 688,
-  "absent": 305,
-  "runtime": 80,
+  "code": 691,
+  "absent": 306,
+  "runtime": 82,
   "unresolved": 1,
   "comment": 40,
   "alt-sibling": 3
@@ -1422,7 +1422,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dv.gd#301"
+   "g": "check_dv.gd#302"
   },
   {
    "s": "check_dv.gd",
@@ -1433,7 +1433,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dv.gd#303"
+   "g": "check_dv.gd#304"
   },
   {
    "s": "check_dv.gd",
@@ -1444,7 +1444,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dv.gd#302"
+   "g": "check_dv.gd#303"
   },
   {
    "s": "check_dv.gd",
@@ -1455,7 +1455,7 @@
    "r": "alt-sibling",
    "k": "literal",
    "how": "read",
-   "g": "check_dv.gd#304",
+   "g": "check_dv.gd#305",
    "alt": true
   },
   {
@@ -1467,7 +1467,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dv.gd#304",
+   "g": "check_dv.gd#305",
    "alt": true
   },
   {
@@ -2025,7 +2025,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ez.gd#116"
+   "g": "check_ez.gd#129"
   },
   {
    "s": "check_ez.gd",
@@ -2036,7 +2036,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_ez.gd#115"
+   "g": "check_ez.gd#128"
   },
   {
    "s": "check_ez.gd",
@@ -2047,7 +2047,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ez.gd#116"
+   "g": "check_ez.gd#129"
   },
   {
    "s": "check_ez.gd",
@@ -2058,7 +2058,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_ez.gd#115"
+   "g": "check_ez.gd#128"
   },
   {
    "s": "check_ez.gd",
@@ -2069,7 +2069,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ez.gd#335",
+   "g": "check_ez.gd#348",
    "expr": "rq_key"
   },
   {
@@ -2081,7 +2081,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ez.gd#336",
+   "g": "check_ez.gd#349",
    "expr": "rq_key"
   },
   {
@@ -2093,7 +2093,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ez.gd#337"
+   "g": "check_ez.gd#350"
   },
   {
    "s": "check_ez.gd",
@@ -2104,7 +2104,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "derived",
-   "g": "check_ez.gd#341"
+   "g": "check_ez.gd#354"
   },
   {
    "s": "check_ez.gd",
@@ -2115,7 +2115,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ez.gd#340"
+   "g": "check_ez.gd#353"
   },
   {
    "s": "check_ez.gd",
@@ -2126,7 +2126,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ez.gd#333"
+   "g": "check_ez.gd#346"
   },
   {
    "s": "check_fd.gd",
@@ -2784,7 +2784,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_fk.gd#116"
+   "g": "check_fk.gd#125"
   },
   {
    "s": "check_fk.gd",
@@ -2795,7 +2795,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_fk.gd#116"
+   "g": "check_fk.gd#125"
   },
   {
    "s": "check_fk.gd",
@@ -2806,7 +2806,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_fk.gd#116"
+   "g": "check_fk.gd#125"
   },
   {
    "s": "check_fk.gd",
@@ -2817,7 +2817,7 @@
    "r": "code",
    "k": "literal",
    "how": "stripped",
-   "g": "check_fk.gd#182"
+   "g": "check_fk.gd#191"
   },
   {
    "s": "check_fk.gd",
@@ -2828,7 +2828,7 @@
    "r": "code",
    "k": "literal",
    "how": "stripped",
-   "g": "check_fk.gd#183"
+   "g": "check_fk.gd#192"
   },
   {
    "s": "check_fm.gd",
@@ -3361,6 +3361,28 @@
    "g": "check_gs.gd#385"
   },
   {
+   "s": "check_gv.gd",
+   "fn": "_s1_every_rune_driven",
+   "h": "check_hf.gd",
+   "n": "\t\"%s\": [",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_gv.gd#538"
+  },
+  {
+   "s": "check_gv.gd",
+   "fn": "_s1_every_rune_driven",
+   "h": "check_hf.gd",
+   "n": "_s1_the_fifteen",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_gv.gd#538"
+  },
+  {
    "s": "check_gw.gd",
    "fn": "_battery_targets",
    "h": "run_battery.sh",
@@ -3507,7 +3529,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_he.gd#178"
+   "g": "check_he.gd#183"
   },
   {
    "s": "check_he.gd",
@@ -3518,7 +3540,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "read",
-   "g": "check_he.gd#436"
+   "g": "check_he.gd#479"
   },
   {
    "s": "check_he.gd",
@@ -3529,7 +3551,51 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_he.gd#436"
+   "g": "check_he.gd#479"
+  },
+  {
+   "s": "check_hf.gd",
+   "fn": "_s0_the_data",
+   "h": "scripts/battle.gd",
+   "n": "_apply_poison(heroes[sn_idx], u, 4)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hf.gd#175"
+  },
+  {
+   "s": "check_hf.gd",
+   "fn": "_s0_the_data",
+   "h": "scripts/battle.gd",
+   "n": "elif src.rune_long_poison > 0:",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hf.gd#174"
+  },
+  {
+   "s": "check_hf.gd",
+   "fn": "_s0_the_data",
+   "h": "scripts/battle.gd",
+   "n": "src.rune_long_poison > 0 and src.has_engine",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hf.gd#174"
+  },
+  {
+   "s": "check_hf.gd",
+   "fn": "_s0_the_data",
+   "h": "scripts/unit.gd",
+   "n": "var %s := 0.0",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_hf.gd#209"
   },
   {
    "s": "test_batch_ah.gd",
@@ -3818,7 +3884,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_as.gd#213"
+   "g": "test_batch_as.gd#218"
   },
   {
    "s": "test_batch_as.gd",
@@ -3862,7 +3928,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "test_batch_as.gd#207",
+   "g": "test_batch_as.gd#212",
    "alt": true,
    "expr": "String"
   },
@@ -3875,7 +3941,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_as.gd#202"
+   "g": "test_batch_as.gd#207"
   },
   {
    "s": "test_batch_at.gd",
@@ -3886,7 +3952,7 @@
    "r": "unresolved",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_at.gd#287"
+   "g": "test_batch_at.gd#291"
   },
   {
    "s": "test_batch_at.gd",
@@ -3897,7 +3963,7 @@
    "r": "unresolved",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_at.gd#286"
+   "g": "test_batch_at.gd#290"
   },
   {
    "s": "test_batch_at.gd",
@@ -3908,7 +3974,7 @@
    "r": "absent",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_at.gd#288"
+   "g": "test_batch_at.gd#292"
   },
   {
    "s": "test_batch_at.gd",
@@ -3919,7 +3985,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_at.gd#364"
+   "g": "test_batch_at.gd#368"
   },
   {
    "s": "test_batch_at.gd",
@@ -3930,7 +3996,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_at.gd#605"
+   "g": "test_batch_at.gd#609"
   },
   {
    "s": "test_batch_at.gd",
@@ -3941,7 +4007,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_at.gd#607"
+   "g": "test_batch_at.gd#611"
   },
   {
    "s": "test_batch_at.gd",
@@ -3952,7 +4018,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_at.gd#606"
+   "g": "test_batch_at.gd#610"
   },
   {
    "s": "test_batch_at.gd",
@@ -3963,7 +4029,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_at.gd#606"
+   "g": "test_batch_at.gd#610"
   },
   {
    "s": "test_batch_at.gd",
@@ -6655,7 +6721,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_az.gd#228"
+   "g": "test_batch_az.gd#234"
   },
   {
    "s": "test_batch_az.gd",
@@ -6666,7 +6732,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_az.gd#224"
+   "g": "test_batch_az.gd#230"
   },
   {
    "s": "test_batch_az.gd",
@@ -6677,7 +6743,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_az.gd#225"
+   "g": "test_batch_az.gd#231"
   },
   {
    "s": "test_batch_az.gd",
@@ -6688,7 +6754,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_az.gd#229"
+   "g": "test_batch_az.gd#235"
   },
   {
    "s": "test_batch_az.gd",
@@ -6699,7 +6765,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_az.gd#227"
+   "g": "test_batch_az.gd#233"
   },
   {
    "s": "test_batch_az.gd",
@@ -6710,7 +6776,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_az.gd#226"
+   "g": "test_batch_az.gd#232"
   },
   {
    "s": "test_batch_az.gd",
@@ -6721,7 +6787,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_az.gd#230"
+   "g": "test_batch_az.gd#236"
   },
   {
    "s": "test_batch_az.gd",
@@ -6732,7 +6798,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_az.gd#238"
+   "g": "test_batch_az.gd#244"
   },
   {
    "s": "test_batch_az.gd",
@@ -6743,7 +6809,7 @@
    "r": "alt-sibling",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_az.gd#240",
+   "g": "test_batch_az.gd#246",
    "alt": true
   },
   {
@@ -6755,7 +6821,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_az.gd#241"
+   "g": "test_batch_az.gd#247"
   },
   {
    "s": "test_batch_az.gd",
@@ -6766,7 +6832,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_az.gd#237"
+   "g": "test_batch_az.gd#243"
   },
   {
    "s": "test_batch_az.gd",
@@ -6777,7 +6843,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_az.gd#240",
+   "g": "test_batch_az.gd#246",
    "alt": true
   },
   {
@@ -6789,7 +6855,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_az.gd#234"
+   "g": "test_batch_az.gd#240"
   },
   {
    "s": "test_batch_az.gd",
@@ -6800,7 +6866,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_az.gd#250"
+   "g": "test_batch_az.gd#256"
   },
   {
    "s": "test_batch_az.gd",
@@ -6811,7 +6877,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_az.gd#251"
+   "g": "test_batch_az.gd#257"
   },
   {
    "s": "test_batch_az.gd",
@@ -6822,7 +6888,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_az.gd#253"
+   "g": "test_batch_az.gd#259"
   },
   {
    "s": "test_batch_az.gd",
@@ -6833,7 +6899,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_az.gd#255"
+   "g": "test_batch_az.gd#261"
   },
   {
    "s": "test_batch_az.gd",
@@ -6844,7 +6910,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_az.gd#249"
+   "g": "test_batch_az.gd#255"
   },
   {
    "s": "test_batch_az.gd",
@@ -6855,7 +6921,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_az.gd#248"
+   "g": "test_batch_az.gd#254"
   },
   {
    "s": "test_batch_az.gd",
@@ -6866,7 +6932,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_az.gd#252"
+   "g": "test_batch_az.gd#258"
   },
   {
    "s": "test_batch_az.gd",
@@ -6877,7 +6943,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_az.gd#256"
+   "g": "test_batch_az.gd#262"
   },
   {
    "s": "test_batch_az.gd",
@@ -6888,7 +6954,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_az.gd#254"
+   "g": "test_batch_az.gd#260"
   },
   {
    "s": "test_batch_az.gd",
@@ -6949,7 +7015,7 @@
    "r": "comment",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#226"
+   "g": "test_batch_ba.gd#230"
   },
   {
    "s": "test_batch_ba.gd",
@@ -6960,7 +7026,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#223"
+   "g": "test_batch_ba.gd#227"
   },
   {
    "s": "test_batch_ba.gd",
@@ -6971,7 +7037,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#228"
+   "g": "test_batch_ba.gd#232"
   },
   {
    "s": "test_batch_ba.gd",
@@ -6982,7 +7048,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#229"
+   "g": "test_batch_ba.gd#233"
   },
   {
    "s": "test_batch_ba.gd",
@@ -6993,7 +7059,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#230"
+   "g": "test_batch_ba.gd#234"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7004,7 +7070,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#224"
+   "g": "test_batch_ba.gd#228"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7015,7 +7081,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#225"
+   "g": "test_batch_ba.gd#229"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7147,7 +7213,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#239"
+   "g": "test_batch_ba.gd#243"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7158,7 +7224,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#239"
+   "g": "test_batch_ba.gd#243"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7169,7 +7235,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#242"
+   "g": "test_batch_ba.gd#246"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7180,7 +7246,7 @@
    "r": "absent",
    "k": "loop-list",
    "how": "read",
-   "g": "test_batch_ba.gd#238"
+   "g": "test_batch_ba.gd#242"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7191,7 +7257,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#243"
+   "g": "test_batch_ba.gd#247"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7202,7 +7268,7 @@
    "r": "absent",
    "k": "loop-list",
    "how": "read",
-   "g": "test_batch_ba.gd#238"
+   "g": "test_batch_ba.gd#242"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7213,7 +7279,7 @@
    "r": "absent",
    "k": "loop-list",
    "how": "read",
-   "g": "test_batch_ba.gd#238"
+   "g": "test_batch_ba.gd#242"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7224,7 +7290,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#240"
+   "g": "test_batch_ba.gd#244"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7235,7 +7301,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#233"
+   "g": "test_batch_ba.gd#237"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7246,7 +7312,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#233"
+   "g": "test_batch_ba.gd#237"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7257,7 +7323,7 @@
    "r": "comment",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#220"
+   "g": "test_batch_ba.gd#224"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7268,7 +7334,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#259"
+   "g": "test_batch_ba.gd#263"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7279,7 +7345,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#258"
+   "g": "test_batch_ba.gd#262"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7290,7 +7356,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#252"
+   "g": "test_batch_ba.gd#256"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7301,7 +7367,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#249"
+   "g": "test_batch_ba.gd#253"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7312,7 +7378,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#254"
+   "g": "test_batch_ba.gd#258"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7323,7 +7389,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#250"
+   "g": "test_batch_ba.gd#254"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7334,7 +7400,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#251"
+   "g": "test_batch_ba.gd#255"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7345,7 +7411,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#256"
+   "g": "test_batch_ba.gd#260"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7356,7 +7422,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#255"
+   "g": "test_batch_ba.gd#259"
   },
   {
    "s": "test_batch_ba.gd",
@@ -7367,7 +7433,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ba.gd#257"
+   "g": "test_batch_ba.gd#261"
   },
   {
    "s": "test_batch_ba.gd",

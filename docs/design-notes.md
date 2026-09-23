@@ -4,6 +4,49 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Fifteen class runes, and the boar (Batch HF) — 2026-09-22
+
+**Why these fifteen read no engine.** After the status runes followed their engines, a hero who took no engine was
+offered almost nothing: two Warrior runes, four Hunter runes, and none for a Mage or a Cleric. The fifteen read only
+what every hero of the class already has — his three kit cards, his resource, the statuses his own kit lays — so
+every class now has at least five runes a hero with no engine can use from the first fight.
+
+**Why "he deals no damage" is read off who the game credits a blow to.** A list of the Cleric's damage sources would go
+stale the first time he drafted a new one. The game already records who dealt every point of damage, for the recap and
+for three engines that pay on it, so Vow of Silence refuses exactly what that record would credit to him. Break damage
+is left alone because this game treats it as its own word.
+
+**Why a bad pairing sits out instead of being refused.** Vow of Silence makes Burning Ground useless. Refusing the
+second rune would hide the choice; letting it sit out, with the same sentence every other idle rune uses, lets the
+player see the waste and decide. It is the same answer Pack Bond beside Lethal Aim got.
+
+**Why Abundance's shield adds up.** The rune says the extra healing becomes a shield. If a new shield only replaced a
+smaller one, most of that healing would become nothing. How fast it stacks under Consecration is measured and reported
+so the designer can decide on a ceiling.
+
+**Why Returned Burden sends an effect back to whoever cast it.** The rune says "returned". Sending it back to its source
+also makes the card an answer to the enemy doing the damage. An effect with no known source goes to a random enemy,
+because nothing says which one it should prefer.
+
+**Why Seeking Missiles spreads.** Each extra missile is counted for one weakened enemy, so that enemy is where it flies.
+Paired with Unravel, which weakens every enemy, the volley reaches the whole field. That makes the two runes a build,
+as the brief wanted, instead of a single-target spike that grows with the number of enemies.
+
+**Why Aper's stun never speeds up.** A stun that came faster as the bond deepened would end with a boar that locks a room.
+A fixed rhythm the player can see lets them hold Powershot for the charge that stuns. That is the point of pairing it
+with Opportunist.
+
+**Why Mark of the Hunt is offered again without Pack Bond.** The earlier gate rested on the claim that the card paid
+nothing without Pack Bond, but the companion's half never needed it. A card that half-works is a fair offer, so it goes
+to every Hunter with a pet. Beside the Sharpshooter's engine it still sits out, because there both halves are dead.
+
+**Why Long Poison is back for every Hunter.** Snare Trap is in every Hunter's kit and its snare lays exactly the Poison
+Long Poison reads. The earlier census missed it because the snare springs on the enemy's next turn, not when it is cast.
+
+**Why Venom Coating waits on Trapper.** Every Poison it promises is paid inside the Rune of the Survivalist's own on-hit
+rule, so without that engine the card spends a turn and does nothing. It is offered only while the engine is equipped,
+the same rule every other card that needs an engine follows.
+
 ## Gates and doors (Batch HE) — 2026-09-22
 
 **Why six runes follow the engine that lays what they read.** Long Fuse, Killing Cold, Deep Cold, Long Poison, Mirror

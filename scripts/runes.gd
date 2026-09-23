@@ -515,6 +515,26 @@ const RUNE_TAGS := {
 	"full_board": ["DEBUFF", "OFFENSE"],       # the Full Board — billed, and left standing
 	"carrion": ["DEBUFF"],                     # the Carrion — every body, not one
 	"thin_blood": ["DEBUFF", "OFFENSE"],       # Thin Blood — certainty bought with the tick
+	# ── BATCH HF — THE FIFTEEN THAT READ NO ENGINE, ON THE SAME SEVEN WORDS ──
+	# Cleric —
+	"abundance": ["DEFENSE"],                  # Abundance — the spill becomes a shield
+	"returned_burden": ["DEBUFF", "DEFENSE"],  # Returned Burden — the cleanse sends it back
+	"burning_ground": ["OFFENSE"],             # Burning Ground — the blessing burns
+	"eleventh_hour": ["DEFENSE"],              # Eleventh Hour — the office doubles for the dying
+	"vow_of_silence": ["DEFENSE"],             # Vow of Silence — heals for silence
+	# Mage —
+	"unravel": ["DEBUFF"],                     # Unravel — the weakness spreads
+	"seeking_missiles": ["OFFENSE"],           # Seeking Missiles — a missile a weakened body
+	"detonating_ward": ["OFFENSE", "DEFENSE"], # Detonating Ward — the ward gives it back
+	"clarity": ["OFFENSE", "RESOURCE"],        # Clarity — a full bar, a harder spell
+	"profligate": ["OFFENSE", "RESOURCE"],     # Profligate — harder spells at twice the price
+	# Warrior —
+	"goading_roar": ["DEFENSE"],               # Goading Roar — the taunted swing softer
+	"rending_blows": ["DEBUFF"],               # Rending Blows — Sunder, three deep (armor, not Break)
+	"grudge": ["OFFENSE"],                     # Grudge — the last one to strike him
+	# Hunter —
+	"opportunist": ["OFFENSE"],                # Opportunist — Powershot cashes the stun
+	"tusk_and_bristle": ["DEBUFF", "OFFENSE"], # Tusk and Bristle — the boar, and its stun
 }
 
 
@@ -625,6 +645,24 @@ const RUNE_SHAPES := {
 	"full_board": ["ABILITY"],
 	"carrion": ["ABILITY"],
 	"thin_blood": ["PASSIVE", "TRADEOFF"],
+	# ── BATCH HF — AS THE BRIEF LABELS THEM (PASSIVE; ABILITY → its card;
+	# PASSIVE + TRADEOFF). Tusk and Bristle carried no label; it changes Summon
+	# Companion, so it is an ABILITY rune, as the Second Whistle on the same card is.
+	"abundance": ["PASSIVE"],
+	"returned_burden": ["ABILITY"],
+	"burning_ground": ["ABILITY"],
+	"eleventh_hour": ["ABILITY"],
+	"vow_of_silence": ["PASSIVE", "TRADEOFF"],
+	"unravel": ["ABILITY"],
+	"seeking_missiles": ["ABILITY"],
+	"detonating_ward": ["ABILITY"],
+	"clarity": ["PASSIVE"],
+	"profligate": ["PASSIVE", "TRADEOFF"],
+	"goading_roar": ["ABILITY"],
+	"rending_blows": ["ABILITY"],
+	"grudge": ["PASSIVE", "TRADEOFF"],
+	"opportunist": ["ABILITY"],
+	"tusk_and_bristle": ["ABILITY"],
 }
 
 const RUNE_TYPES := ["ABILITY", "PASSIVE", "STAT"]
@@ -913,7 +951,8 @@ static func is_retired(id: String) -> bool:
 #     Focus, Ruin, Faith, Loyalty, the holds), or it modifies a card that is
 #     itself refused without the engine — or, since HC §2, a card that only the
 #     engine brings. **Gated: GV's 35 and HC's one (Layered Aegis), 36 — and
-#     the seven RULED rows below (HE §1), 43.**
+#     the seven RULED rows below (HE §1), 43 — and 42 since HF §6 took Long
+#     Poison out (Snare Trap lays the Poison it reads in every Hunter's kit).**
 #   · HALF-WORKS — Glass Prison still freezes a second body for a turn, Blood
 #     Debt still bills the target. **NOT gated**, GP's reading. *(Killing Cold
 #     stood here until HE §1, below.)*
@@ -932,7 +971,9 @@ static func is_retired(id: String) -> bool:
 # Warrior Block to lose. *Gating on ANY source of the status — engine or drafted
 # card — was weighed and rejected: more accurate, and a fourth gate for six runes.*
 # A hero who drafts a status applier without the engine cannot use them; that
-# is the accepted cost.
+# is the accepted cost. **HF §6 TOOK LONG POISON BACK OUT**: HC's census missed that
+# Snare Trap — every Hunter's kit card — lays the very Poison it reads when its
+# snare springs, so the row withheld a rune every Hunter could use. Six rows stand.
 #
 # **AND EACH READ SITE ASKS THE SAME ENGINE, SO A ROW HERE IS TRUE AT THE SEAT AS
 # WELL AS AT THE OFFER.** A row sits out with its engine gone (`sits_out`, GX), and
@@ -1046,8 +1087,13 @@ const ENGINE_READ := {
 		"why": "bills an enemy at maximum Chill; Chilled is the Cryomancer's, laid by his engine's Razor Ice, and the bill asks the engine"},
 	"deep_cold": {"engine": "permafrost", "ruled": "HE §1",
 		"why": "uncaps the Chilled he lays; Chilled is the Cryomancer's, laid by his engine's Razor Ice, and the stamp asks the engine"},
-	"long_poison": {"engine": "trapper", "ruled": "HE §1",
-		"why": "his Poison never expires; the Poison is the Survivalist's, laid by his engine's barb, and `_apply_poison` asks the engine"},
+	# BATCH HF §6 — LONG POISON'S RULED ROW (HE §1) IS GONE. HE gated it because HC
+	# found no class kit laying Poison; **Snare Trap is in every Hunter's kit, and its
+	# spring lays Poison 4 through the same `_apply_poison` with the Hunter as its
+	# source** — the status this rune reads, not a different one. HC's census cast
+	# each card once onto a clean enemy and a snare springs only when the enemy
+	# next acts, so the census could not see it. The rune works for every Hunter;
+	# it is un-gated, and its read site stops asking Trapper.
 	"mirror_guard": {"engine": "seasoned", "ruled": "HE §1",
 		"why": "returns blows in the Defensive guard; the stance's numbers are the Stances holder's, and the return asks the engine"},
 	"slaughterhouse_rune": {"engine": "bloodrage", "ruled": "HE §1",
@@ -1109,6 +1155,10 @@ const COMPANION_READ := {
 	"second_whistle": {"why": "a summoned companion arrives holding 3 Loyalty; nothing is summoned"},
 	"long_leash": {"why": "moves the companion's Loyalty split point; there is no companion to hold Loyalty"},
 	"shared_scent": {"why": "carries a fallen companion's Loyalty to the next; none falls and none is called"},
+	# BATCH HF §4 — TUSK AND BRISTLE adds Aper to Summon Companion, a card the one
+	# Hunter who dismisses the pet does not hold; HB's pet gate is what withholds it
+	# from him, and a copy he already wears sits out beside his engine (GX's tell).
+	"tusk_and_bristle": {"why": "adds a fourth companion to Summon Companion; there is no companion to call"},
 }
 
 
@@ -1152,11 +1202,41 @@ static func needs_companion(id: String) -> bool:
 # THAT DISMISSES IT** (`needs_companion`): the Rune of the Beastmaster slotted beside
 # the Rune of the Sharpshooter. Ruled legal and visible, so nothing is written and
 # nothing is withheld; the same four surfaces say so with the same sentence.
-static func sits_out(id: String, engines: Array) -> bool:
+static func sits_out(id: String, engines: Array, worn: Array = []) -> bool:
 	var e := engine_read(id)
 	if e != "" and not engines.has(e):
 		return true
+	if cancelled_by(id, worn) != "":
+		return true
 	return needs_companion(id) and Classes.dismisses_pet(engines)
+
+
+# ══ BATCH HF §5 — A RUNE ANOTHER RUNE HE WEARS CANCELS ══════════════════════
+#
+# **VOW OF SILENCE AND BURNING GROUND.** The vow says he deals no damage, and the
+# burn is all Burning Ground does — the only damage a Cleric's kit can deal — so a
+# Cleric wearing both has wasted one. **A BAD PAIRING IS MADE VISIBLE, NOT A TRAP**
+# (the designer's ruling, the one that marked Pack Bond as sitting out beside
+# Lethal Aim, HC §5): both are still offered, bought and worn, and the one that
+# pays nothing SITS OUT with GX's sentence on GX's four surfaces. Its read site
+# refuses too (`battle._burning_ground_tick`), so the sentence is true.
+#
+# **KEYED TO WHAT HE WEARS, NOT TO WHAT HE OWNS**: `worn` is the ids of the
+# ordinary runes he has equipped — a Vow of Silence in the pouch and off his
+# slots forbids nothing. A table rather than a clause, so the next pair the
+# designer rules is a row.
+const CANCELLED_BY := {
+	"burning_ground": "vow_of_silence",
+}
+
+
+# The id of the worn rune that cancels `id`, or "" — THE ONE ANSWER, asked by
+# `sits_out` and by the sentence (`Run.rune_sits_out_note`).
+static func cancelled_by(id: String, worn: Array) -> String:
+	var c := String(CANCELLED_BY.get(id, ""))
+	if c != "" and worn.has(c):
+		return c
+	return ""
 
 
 # Authored entries this member may roll, excluding names already in their pouch

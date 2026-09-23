@@ -708,8 +708,9 @@ static func draft_pool(class_key: String) -> Array:
 # keep without the engine printed as the reason the row is a ruling) rather than
 # as a pair that should read apart. **A row carrying `ruled` is never evidence
 # for the derivation, and the derivation is never evidence against it.** *BATCH
-# HE §2 rules a third the same way — Mark of the Hunt, Pack Bond's holder's — and
-# it is the first ruled row that also SITS OUT (`SITS_OUT` below).*
+# HE §2 ruled a third the same way — Mark of the Hunt, Pack Bond's holder's — and
+# HF §7 undid it: the premise was wrong (the card half-works with a companion), so
+# it is a `COMPANION_READ` row now. BATCH HF §7 rules Venom Coating Trapper's.*
 #
 # **THE GATE IS THE HOLDER'S, AND THAT IS EXACTLY RIGHT HERE FOR A REASON WORTH
 # WRITING DOWN.** Five of the eight producers are PARTY-level in the code
@@ -839,17 +840,24 @@ const ENGINE_READ := {
 	# ruled: each reads apart with its engine and without, as every row above.
 	"Stabilize": {"engine": "resonance", "why": "vents Resonance above 2; refused without the meter, which only the engine installs"},
 	"Primal Surge": {"engine": "pack", "why": "spends a companion's Loyalty; refused with none, and none is gained without the engine"},
-	# ── BATCH HE §2 — RULED, NOT DERIVED: MARK OF THE HUNT IS PACK BOND'S. ──
-	# The hunter's two halves — his +25% on the marked prey and the 3% of his Mana
-	# each of his strikes on it restores — are read inside `has_engine("pack")`,
-	# while the companion's halves (its +25%, and the Mana its blows feed back)
-	# read no engine at all: **the card HALF-WORKS without Pack Bond for a Hunter
-	# who fields a companion**, so the cast test would leave it ungated, and it
-	# still paid beside Lethal Aim, where Pack Bond sits out — which made that
-	# tell one card short of true. The designer ruled it Pack Bond's holder's, and
-	# it sits out WITH Pack Bond (`SITS_OUT` below, and `sits_out`'s last clause).
-	"Mark of the Hunt": {"engine": "pack", "ruled": "HE §2",
-		"why": "ruled Pack Bond's — the hunter's halves are read only under the engine, and without it the card still pays the companion's"},
+	# ── BATCH HF §7 — MARK OF THE HUNT IS NO LONGER A ROW HERE. ────────────────
+	# HE §2 ruled it Pack Bond's on the premise that it paid nothing without the
+	# engine; HE itself found the companion's halves read no engine, so it
+	# HALF-WORKS for every Hunter who fields a companion — and a card that
+	# half-works is a legitimate offer (GP). The designer undid the gate: it is a
+	# `COMPANION_READ` row below (HB's pet gate withholds it from a Sharpshooter),
+	# and its Pack Bond half pays only while Pack Bond is equipped, as its read
+	# site always did.
+	# ── BATCH HF §7 — RULED, NOT DERIVED: VENOM COATING IS TRAPPER'S. ──────────
+	# The cast lands with no engine — it lays its coating — so the cast test never
+	# found it (GP's *a row whose payout is a later strike* shape): everything the
+	# coating DOES is read inside Trapper's block in the strike loop, the
+	# Survivalist's on-hit package. HE found it offered at his zone boss to heroes
+	# who could not use it. The designer ruled it the rule every engine-reading
+	# card takes — offered only while Trapper is equipped, at every door this table
+	# is asked at, the zone boss's included (HE §3).
+	"Venom Coating": {"engine": "trapper", "ruled": "HF §7",
+		"why": "ruled Trapper's — the cast lays a coating with no engine, and every poison it promises is read inside Trapper's on-hit block"},
 }
 
 
@@ -942,6 +950,19 @@ const COMPANION_READ := {
 	"Bring It Down": {"door": false, "why": "calls on the deepest bond; says there is none with no companion"},
 	"Last Howl": {"door": false, "why": "pays for a companion that falls; none can fall with none fielded"},
 	"Succession": {"door": false, "why": "hands a bond on at a swap; nothing is swapped with no companion"},
+	# BATCH HF §7 — RULED (`ruled`), AND THE ONE ROW THAT SITS OUT THOUGH ITS DOOR
+	# OPENS (`seat`). Offered to every Hunter who fields a companion — HB's pet gate
+	# withholds it from a Sharpshooter, which also closes HE's finding that it was
+	# offered beside Lethal Aim only to sit out. Its door never refuses it (the mark
+	# lands with no companion), so `door` is false, as the cast finds; but beside a
+	# dismisser it pays NOTHING — the companion's half has no companion, and the
+	# hunter's half is Pack Bond's, which sits out there (HC §5) — so a copy
+	# already carried sits out beside one, on GT §3's rule that a card that cannot
+	# pay says so rather than sitting on the bar. That is the one half of HE §2 the
+	# designer's correction did not reach: its wrong premise was about a Hunter
+	# WITH a companion.
+	"Mark of the Hunt": {"door": false, "seat": true, "ruled": "HF §7",
+		"why": "marks the prey for the companion and the hunter; the companion's half needs a companion, and the hunter's half is Pack Bond's"},
 }
 
 
@@ -954,6 +975,21 @@ static func reads_companion(card_name: String) -> bool:
 # standing — the rows that SIT OUT, rather than merely are not offered.
 static func companion_door(card_name: String) -> bool:
 	return bool(COMPANION_READ.get(card_name, {}).get("door", false))
+
+
+# BATCH HF §7 — whether a row sits out beside a dismisser: every row the door
+# refuses (`companion_door`), and a RULED row whose door opens but which pays
+# nothing there (`seat`: Mark of the Hunt). THE ONE ANSWER for the seat; the
+# derivation's question stays `companion_door`'s.
+static func companion_seat(card_name: String) -> bool:
+	return companion_door(card_name) \
+		or bool(COMPANION_READ.get(card_name, {}).get("seat", false))
+
+
+# Whether a companion row is the designer's ruling rather than the cast's finding
+# (BATCH HF §7) — `engine_read_ruled`'s question for this table.
+static func companion_read_ruled(card_name: String) -> String:
+	return String(COMPANION_READ.get(card_name, {}).get("ruled", ""))
 
 
 # ══ BATCH GT §3 — A CARD THAT CANNOT BE CAST WITHOUT ITS ENGINE SITS OUT WHILE
@@ -985,13 +1021,12 @@ static func companion_door(card_name: String) -> bool:
 # Surge) — **rows there too since HE §3**, when the zone boss began asking that
 # table — and the other fifteen always were; the engines must agree.
 #
-# **BATCH HE §2 — AND ONE RULED ROW, THE FIRST: MARK OF THE HUNT SITS OUT WITH
-# PACK BOND.** The door does not refuse it without the engine — it lays its mark
-# with none, and a companion's blows on the marked prey pay with none — so the
-# derivation above would never find it, and `ruled` says why it is here: the
-# designer ruled the card Pack Bond's holder's and ruled it off the bar whenever
-# Pack Bond is — unslotted, or sitting out beside the engine that dismisses the
-# pet (`sits_out`'s last clause). `check_gt` §3 drives a ruled row as a ruling.
+# **BATCH HE §2 RULED ONE ROW HERE — MARK OF THE HUNT, SITTING OUT WITH PACK BOND —
+# AND HF §7 TOOK IT OUT.** The door does not refuse it without the engine, and a
+# companion's blows on the marked prey pay with none, so with a companion it
+# half-works without Pack Bond and does not sit out. Beside a dismisser it pays
+# nothing and still sits out: that is its `COMPANION_READ` row's `seat` (above),
+# not a row here. `check_gt` §3 drives a ruled row as a ruling.
 #
 # **THE SLOT STAYS COUNTED**, as GM §2 left a dropped bound card's: a card that
 # sits out is still CARRIED, so `Run.ability_slots_used` counts it. Benching it
@@ -1014,8 +1049,10 @@ const SITS_OUT := {
 	"Requiem": {"engine": "old_gods", "why": "consumes a Ruin mark; no Ruin is laid without the engine"},
 	"Unleash": {"engine": "pack", "why": "spends a companion's Loyalty; no Loyalty is gained without the engine"},
 	"Primal Surge": {"engine": "pack", "why": "spends a companion's Loyalty; no Loyalty is gained without the engine"},
-	"Mark of the Hunt": {"engine": "pack", "ruled": "HE §2",
-		"why": "ruled Pack Bond's — it sits out whenever Pack Bond does, unslotted or beside the engine that dismisses the pet"},
+	# BATCH HF §7 — MARK OF THE HUNT'S RULED ROW (HE §2) IS GONE: with a companion
+	# it half-works without Pack Bond, so it no longer sits out when Pack Bond is
+	# merely unslotted. Beside a dismisser it still sits out, and that is its
+	# `COMPANION_READ` row's `seat` now.
 }
 
 
@@ -1042,14 +1079,20 @@ static func sits_out_ruled(card_name: String) -> String:
 # too, slotted or not — the ruling's *"let it sit out with Pack Bond"*. **It
 # moves no existing row**: Pack Bond's other two (Unleash, Primal Surge) are
 # `COMPANION_READ` rows the door refuses with no companion, so each already sat
-# out beside a dismisser by the clause above; Mark of the Hunt is the one it adds.
+# out beside a dismisser by the clause above; Mark of the Hunt was the one it
+# added. **SINCE HF §7 IT ADDS NONE** — Mark of the Hunt's seat row is gone and
+# its sitting out beside a dismisser is the companion clause's (`seat`) — and it
+# is KEPT, because it is the rule and not a patch for one card: the day a seat row
+# names Pack Bond without being a companion row, it is what sits that row out.
 static func sits_out(card_name: String, engines: Array) -> bool:
 	var e := sits_out_engine(card_name)
 	if e != "" and not engines.has(e):
 		return true
 	if e != "" and engine_needs_pet(e) and dismisses_pet(engines):
 		return true
-	return companion_door(card_name) and dismisses_pet(engines)
+	# BATCH HF §7 — `companion_seat`, not `companion_door`: Mark of the Hunt's
+	# ruled seat sits it out beside a dismisser though its door opens.
+	return companion_seat(card_name) and dismisses_pet(engines)
 
 
 # ---------- THE PROTECTED CORE (Batch BO §2) ----------
@@ -1227,6 +1270,21 @@ const CLASS_KITS := {
 const PET_CARD := "Summon Companion"
 const COMPANION_KINDS := ["ursus", "canis", "aguila"]
 const PET_DISMISSERS := ["lethal_aim"]
+# **BATCH HF — A FOURTH CHOICE A RUNE ADDS, KEPT APART FROM THE THREE THE CARD
+# ALWAYS OFFERS.** Tusk and Bristle adds Aper to Summon Companion; `COMPANION_KINDS`
+# stays the three every Hunter with a pet can call, so every reader of "the three"
+# still reads three, and this list is what the doors ask beside it — the summon
+# door and `_ability_usable` (is this a companion at all) through
+# `is_companion_kind`, and `battle._summon_choice` (may THIS hunter call it)
+# through the rune.
+const RUNE_COMPANION_KINDS := ["aper"]
+
+
+# Whether `kind` names a companion any Summon Companion cast can field — the
+# three, or one a rune adds. THE ONE ANSWER for the doors that ask "is this a
+# companion", which are not the doors that ask "may he call it".
+static func is_companion_kind(kind: String) -> bool:
+	return COMPANION_KINDS.has(kind) or RUNE_COMPANION_KINDS.has(kind)
 
 # **BATCH HC §5 — THE ENGINES THAT NEED A COMPANION, AND ONE IS.** Pack Bond deepens
 # a bond, and with a dismisser equipped there is no bond to deepen: the designer
@@ -1572,6 +1630,10 @@ const CARD_TAGS := {
 	"Summon Aguila": ["OFFENSE", "BREAK"],
 	"Summon Canis": ["DEBUFF", "BREAK"],
 	"Summon Ursus": ["OFFENSE", "BREAK"],
+	# BATCH HF — Tusk and Bristle's call. A stun every third charge is what it is
+	# FOR, and Summon Canis — the companion whose signature is an affliction —
+	# is the precedent for DEBUFF first.
+	"Summon Aper": ["DEBUFF", "BREAK"],
 	# --- core:berserker ---
 	"Bloodlust": ["OFFENSE", "BREAK"],
 	"Hack and Slash": ["DEBUFF", "BREAK"],
@@ -6813,6 +6875,22 @@ static func spec_abilities(spec: String) -> Array:
 					"delay": 3.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "",
 					"description": "Call the eagle (80 HP): attacks with you\nfor 20% of your Attack, applying\nExposed. Always ELUSIVE: enemies miss\nit 25% more. Pack Bond: every hero\ngains +10% crit chance.\nOn arrival: dives a chosen enemy for\n15% of your Attack, Dazing them.\nLoyalty gift: ignores 20% armor\nper stack."}),
+				# BATCH HF — APER, THE BOAR: TUSK AND BRISTLE'S FOURTH CHOICE. The call
+				# is defined HERE, beside the other three, because `companion_call`
+				# reads every companion's call out of this table and a second home for
+				# one of them is the drift the resolver exists to prevent; it is in no
+				# kit and no pool, and `battle._summon_choice` builds it only for a
+				# Hunter wearing the rune (`RUNE_COMPANION_KINDS`). WHAT IS RULED: it
+				# charges, EVERY THIRD STRIKE STUNS for one turn and the rhythm never
+				# shortens, a boss resists until Broken, and Loyalty raises its charge.
+				# WHAT IS PROPOSED (HF §4): its body and its blow are the wolf's and
+				# the eagle's (80 health, 20% of Attack), and its Pack Bond boon is the
+				# wolf's 15%, paid into its own charge. No arrival and no gift: none was
+				# authored. The words avoid a digit in parentheses (CL §1).
+				Ability.make({"display_name": "Summon Aper", "cooldown": 3, "cost": 20, "special": "summon",
+					"delay": 3.0, "anim": "attack01",
+					"perfect_id": "", "perfect_text": "",
+					"description": "Call the boar, 80 health: charges beside\nthe Hunter for 20% of Attack, and EVERY\nTHIRD STRIKE STUNS the target for 1 turn.\nA BOSS RESISTS UNTIL BROKEN. Pack Bond:\neach charge lands 15% harder, and deeper\nwith Loyalty."}),
 				Ability.make({"display_name": "Hunter's Instinct", "cooldown": 3, "cost": 20, "special": "instinct",
 					"delay": Ability.BUFF_DELAY_CAP, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "",

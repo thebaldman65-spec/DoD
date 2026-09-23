@@ -867,6 +867,97 @@
 		"payload": {"stat": {"rune_thin_blood": 1}}
 	},
 
+	"abundance": {
+		"name": "Abundance", "scope": "class:cleric",
+		"price": 100,
+		"desc": "Healing beyond an ally's missing health becomes a shield on them.",
+		"payload": {"stat": {"rune_abundance": 1.0}}
+	},
+	"returned_burden": {
+		"name": "Returned Burden", "scope": "class:cleric",
+		"price": 100,
+		"desc": "Every harmful effect Unburden removes is cast onto an enemy.",
+		"payload": {"stat": {"rune_returned_burden": 1.0}}
+	},
+	"burning_ground": {
+		"name": "Burning Ground", "scope": "class:cleric",
+		"price": 100,
+		"desc": "Consecration also deals holy damage to every enemy each turn it lasts.",
+		"payload": {"stat": {"rune_burning_ground": 0.05}}
+	},
+	"eleventh_hour": {
+		"name": "Eleventh Hour", "scope": "class:cleric",
+		"price": 100,
+		"desc": "Ministration heals twice as much on an ally below 25% health.",
+		"payload": {"stat": {"rune_eleventh_hour": 1.0}}
+	},
+	"vow_of_silence": {
+		"name": "Vow of Silence", "scope": "class:cleric",
+		"price": 100,
+		"desc": "His heals are 50% stronger, and he deals no damage.",
+		"payload": {"stat": {"rune_vow_of_silence": 0.5}}
+	},
+	"unravel": {
+		"name": "Unravel", "scope": "class:mage",
+		"price": 100,
+		"desc": "Elemental Weakness spreads to every enemy, not just the target.",
+		"payload": {"stat": {"rune_unravel": 1.0}}
+	},
+	"seeking_missiles": {
+		"name": "Seeking Missiles", "scope": "class:mage",
+		"price": 100,
+		"desc": "One extra missile for each enemy under Elemental Weakness.",
+		"payload": {"stat": {"rune_seeking_missiles": 1.0}}
+	},
+	"detonating_ward": {
+		"name": "Detonating Ward", "scope": "class:mage",
+		"price": 100,
+		"desc": "When it breaks or ends, it deals the damage it absorbed to every enemy.",
+		"payload": {"stat": {"rune_detonating_ward": 1.0}}
+	},
+	"clarity": {
+		"name": "Clarity", "scope": "class:mage",
+		"price": 100,
+		"desc": "A spell cast at full Mana deals 50% more damage.",
+		"payload": {"stat": {"rune_clarity": 0.5}}
+	},
+	"profligate": {
+		"name": "Profligate", "scope": "class:mage",
+		"price": 100,
+		"desc": "His spells deal 40% more damage and cost twice the Mana.",
+		"payload": {"stat": {"rune_profligate": 0.4}}
+	},
+	"goading_roar": {
+		"name": "Goading Roar", "scope": "class:warrior",
+		"price": 100,
+		"desc": "Taunted enemies deal 25% less damage while they must attack him.",
+		"payload": {"stat": {"rune_goading_roar": 0.25}}
+	},
+	"rending_blows": {
+		"name": "Rending Blows", "scope": "class:warrior",
+		"price": 100,
+		"desc": "Sunder stacks — each Crushing Blow on an already-Sundered enemy deepens it, up to three times.",
+		"payload": {"stat": {"rune_rending_blows": 3.0}}
+	},
+	"grudge": {
+		"name": "Grudge", "scope": "class:warrior",
+		"price": 100,
+		"desc": "He deals 40% more damage to the last enemy that struck him, and 20% less to every other.",
+		"payload": {"stat": {"rune_grudge_struck": 0.4, "rune_grudge_rest": -0.2}}
+	},
+	"opportunist": {
+		"name": "Opportunist", "scope": "class:hunter",
+		"price": 100,
+		"desc": "Powershot deals double damage to a stunned enemy.",
+		"payload": {"stat": {"rune_opportunist_shot": 1.0}}
+	},
+	"tusk_and_bristle": {
+		"name": "Tusk and Bristle", "scope": "class:hunter",
+		"price": 100,
+		"desc": "Adds a fourth choice to Summon Companion: Aper, the boar.",
+		"payload": {"stat": {"rune_tusk_and_bristle": 1.0}}
+	},
+
 	"engine_berserker": {
 		"name": "Rune of the Berserker", "scope": "class:warrior",
 		"price": 100, "engine": "bloodrage",

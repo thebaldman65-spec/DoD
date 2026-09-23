@@ -16,6 +16,63 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-09-22 &mdash; Batch HF: FIFTEEN CLASS RUNES, AND THE BOAR</h2>
+<p><b>Every class now has at least five runes a hero with no engine can use.</b> IMPLEMENT ONLY: the designer
+authored the fifteen and the boar, and this batch builds them. The other stale checks HA found move to <b>HG</b>.
+Full working: <code>docs/reports/HF.md</code>.</p>
+
+<p><b>&sect;1&ndash;&sect;4 &mdash; FIFTEEN RUNES THAT READ NO ENGINE</b>, each 100g, each its class's, each reading only
+what every hero of the class has. <b>Cleric:</b> Abundance (overhealing becomes a shield), Returned Burden (what
+Unburden removes goes back to the enemy that cast it), Burning Ground (Consecration also burns every enemy),
+Eleventh Hour (Ministration heals twice as much below a quarter health) and Vow of Silence (heals 50% stronger, and
+he deals no damage). <b>Mage:</b> Unravel (Elemental Weakness on every enemy), Seeking Missiles (a missile more for each
+weakened enemy, each flying at its own), Detonating Ward (the ward deals what it absorbed to every enemy when it
+breaks or ends), Clarity (a spell cast at full Mana deals 50% more) and Profligate (spells deal 40% more and cost twice
+the Mana). <b>Warrior:</b> Goading Roar (an enemy his taunt binds deals 25% less), Rending Blows (Crushing Blow deepens
+Sunder, up to three deep, and three leave no armor) and Grudge (+40% on the last enemy that struck him, &minus;20% on
+the rest, and nothing before anything has struck him). <b>Hunter:</b> Opportunist (Powershot doubles on a stunned
+enemy) and Tusk and Bristle, which adds <b>Aper, the boar</b>, to Summon Companion: it charges beside the Hunter, and
+<b>every third charge stuns its target for one turn</b> &mdash; a fixed rhythm a chip on the boar counts, which a boss
+resists until Broken. Burning Ground's damage (5% of the Cleric's maximum health a turn), Aper's body and Pack Bond
+boon, and Abundance's two-turn shield are <b>proposed</b> in the report for the designer to confirm. <b>What a hero
+holding no engine can be offered at the start of a run:</b> Warrior 5 (from 2), Mage 5 (from none), Cleric 5 (from
+none), Hunter 7 (from 4).</p>
+
+<p><b>&sect;5 &mdash; TWO PAIRINGS.</b> <b>Burning Ground sits out beside Vow of Silence</b>, which forbids every point of
+damage he deals: both can be bought and worn together, and the rune pouch, the map's rune slot, the hero sheet and
+the combat log each say Burning Ground sits out while the Vow of Silence is worn. <b>Abundance under Consecration</b>
+turns every drip on a hero at full health into shield: about 5% of his maximum health a turn, added up, measured in
+the report so the designer can decide whether it needs a ceiling.</p>
+
+<p><b>&sect;6 &mdash; LONG POISON IS EVERY HUNTER'S AGAIN.</b> Snare Trap, in every Hunter's kit, lays exactly the Poison
+Long Poison reads when its snare springs, so the rune was withheld from Hunters who could use it. It is offered to
+every Hunter and stops his snare's Poison from running out, with or without an engine.</p>
+
+<p><b>&sect;7 &mdash; MARK OF THE HUNT AND VENOM COATING.</b> <b>Mark of the Hunt is offered to every Hunter with a
+companion</b>: its companion's half never needed Pack Bond. Its own half still pays only with the Rune of the
+Beastmaster equipped, and it sits out beside the Rune of the Sharpshooter, where neither half can pay. New wording for
+the card is proposed for the designer to confirm. <b>Venom Coating is offered only while the Rune of the Survivalist
+is equipped</b>, the zone boss included: every Poison it promises comes from Trapper.</p>
+
+<p><b>NEW GATE <code>check_hf</code></b> drives all fifteen on a party holding no engine, each worn and bare on the same
+board under the same dice; Aper's rhythm, its boss rule, its reset and the bot's choice of it; what each class can be
+offered, by name, at the Peddler, an elite cache and a bargain; both pairings on their surfaces; and Mark of the Hunt
+and Venom Coating at the zone boss; and Burning Ground's sitting out drawn on the pouch, the map's rune slot and the hero
+sheet. <b>Eighteen checks were repaired</b> because they read the old game: nine counted the rune pool, its tag table,
+its costed set or its call sites and met the fifteen (<code>check_ez</code>, <code>check_fk</code>, <code>check_fo</code>,
+<code>check_fe</code>, <code>check_fn</code>, <code>check_es</code>, <code>check_di</code>, <code>check_dv</code>,
+<code>check_gx</code>); four read a class's class-wide runes and met them too (<code>test_batch_as</code>,
+<code>test_batch_at</code>, <code>test_batch_az</code>, <code>test_batch_ba</code>); three asserted HE's rulings that &sect;6 and
+&sect;7 overturn (<code>check_he</code>, <code>check_gt</code>, <code>check_gv</code>, which also sorts the fifteen and raises
+its no-engine floors to the new reading); one used a Cleric holding no engine as a hero offered nothing
+(<code>check_hc</code>); and <code>check_ek</code> lists the new gate among those that read a tag. <b>WHAT MOVED:</b>
+<code>scripts/battle.gd</code>, <code>scripts/unit.gd</code>,
+<code>scripts/runes.gd</code>, <code>scripts/classes.gd</code>, <code>scripts/run_state.gd</code>,
+<code>scripts/map_screen.gd</code>, <code>scripts/party_screen.gd</code>; <code>data/runes.json</code> (the fifteen);
+<code>check_hf.gd</code> (new), the repaired instruments the report lists, <code>run_battery.sh</code>,
+<code>pin-manifest.json</code>, <code>baselines.json</code>; <code>CLAUDE.md</code>, <code>docs/master.html</code> and its
+stamp, <code>docs/design-notes.md</code>, <code>docs/state.md</code> and <code>docs/reports/HF.md</code> (new).</p>
+
 <h2>2026-09-22 &mdash; Batch HE: GATES AND DOORS</h2>
 <p><b>What a hero is offered, and at which door, follows the engine he holds.</b> IMPLEMENT ONLY. HC and HD each
 left follow-ups about offers and doors; the designer ruled them all, and this batch builds them. The other stale

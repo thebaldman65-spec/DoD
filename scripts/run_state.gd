@@ -2298,7 +2298,10 @@ func sitting_out_names(member: Dictionary) -> Array:
 # names the chain; the opening clause and the two closing lines are GT's.
 func sits_out_note(card_name: String, engines: Array = []) -> String:
 	var eng := Classes.sits_out_engine(card_name)
-	if (eng == "" or engines.has(eng)) and Classes.companion_door(card_name) \
+	# BATCH HF §7 — `companion_seat`: Mark of the Hunt sits out beside a dismisser
+	# though its door opens, and takes the pet's sentence (without Pack Bond its
+	# working half IS the companion's; with Pack Bond, Pack Bond sits out there).
+	if (eng == "" or engines.has(eng)) and Classes.companion_seat(card_name) \
 			and Classes.dismisses_pet(engines):
 		return "Sits out of every fight while the\n%s\nStill carried: the slot stays counted.\nBenching the card frees the slot." % _dismisser_clause(engines)
 	if eng != "" and engines.has(eng) and Classes.engine_needs_pet(eng) \
@@ -2345,12 +2348,25 @@ func _dismisser_clause(engines: Array) -> String:
 # and every surface that marks a rune by name off this list marks it the same way.
 func sitting_out_rune_names(member: Dictionary) -> Array:
 	var held: Array = held_engines(member)
+	var worn: Array = worn_rune_ids(member)
 	var out: Array = []
 	for r in member.get("runes", []) + member.get("engines", []):
 		var rd: Dictionary = r
 		if bool(rd.get("equipped", false)) \
-				and Runes.sits_out(String(rd.get("id", "")), held):
+				and Runes.sits_out(String(rd.get("id", "")), held, worn):
 			out.append(String(rd.get("name", "")))
+	return out
+
+
+# BATCH HF §5 — the ids of the ORDINARY runes he has equipped: what a rune that
+# another rune cancels asks (`Runes.CANCELLED_BY`). Worn, not owned — a rune in
+# the pouch and off his slots cancels nothing.
+func worn_rune_ids(member: Dictionary) -> Array:
+	var out: Array = []
+	for r in member.get("runes", []):
+		var rd: Dictionary = r
+		if bool(rd.get("equipped", false)):
+			out.append(String(rd.get("id", "")))
 	return out
 
 
@@ -2370,7 +2386,16 @@ func sitting_out_rune_names(member: Dictionary) -> Array:
 # **BATCH HC §5 — THE ENGINE RUNE THAT NEEDS THE PET TAKES THE PET'S SENTENCE, WORD
 # FOR WORD** (`Runes.needs_companion`): an engine slot is WORN and FILLED and freed
 # by UNEQUIPPING exactly as an ordinary slot is, so no third phrasing is owed.
-func rune_sits_out_note(rune_id: String, engines: Array = []) -> String:
+func rune_sits_out_note(rune_id: String, engines: Array = [], worn: Array = []) -> String:
+	# BATCH HF §5 — A THIRD CAUSE, ON THE SAME SENTENCE: another rune he wears
+	# forbids what this one does (Vow of Silence, beside Burning Ground). GX's
+	# opening clause and closing lines are word for word; only the middle names
+	# the rune that cancels it and why, so the note never says an engine is
+	# missing when none is. Broken at 44 for the tooltip.
+	var canc := Runes.cancelled_by(rune_id, worn)
+	if canc != "":
+		return "Sits out of every fight while the\n%s is worn, which forbids\nthe damage it deals.\nStill worn: the slot stays filled.\nUnequipping the rune frees the slot." % String(
+			Runes.config(canc).get("name", "the rune that cancels it"))
 	var eng := Runes.engine_read(rune_id)
 	if (eng == "" or engines.has(eng)) and Runes.needs_companion(rune_id) \
 			and Classes.dismisses_pet(engines):

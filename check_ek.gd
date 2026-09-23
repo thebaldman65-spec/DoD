@@ -392,10 +392,15 @@ const TAG_DOOR := "loadout_condition_met"
 # opening card's tags through `Classes.card_tags`. **It changes no behaviour and
 # it is not exempted; it is listed.** A suite joins the list the same way a gate
 # does: by checking a tag, which is all this half of the population records.
+# **BATCH HF ADDED `check_hf.gd`, LISTED BEFORE THE BATTERY.** Its §0 asks each of
+# the fifteen class runes, and Summon Aper, for a row in the tables — the owed row
+# EK §1 requires of any new rune or card. **It changes no behaviour and it is not
+# exempted; it is listed.**
 const TAG_CHECKERS := ["check_ek.gd", "check_el.gd", "check_es.gd",
 	"check_ez.gd", "check_fd.gd", "check_fe.gd", "check_fh.gd",
 	"check_fk.gd", "check_fn.gd", "check_fo.gd", "check_gn.gd",
-	"check_go.gd", "check_gu.gd", "check_map_screen.gd", "test_batch_ar.gd"]
+	"check_go.gd", "check_gu.gd", "check_hf.gd", "check_map_screen.gd",
+	"test_batch_ar.gd"]
 
 # The files a MECHANIC would have to live in. Asserted at ZERO separately from
 # the set above, because "the set is exactly these five" and "battle.gd holds

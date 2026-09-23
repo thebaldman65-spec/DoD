@@ -715,7 +715,8 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 				slot_btn.text = "○ %s" % String(rune["name"])
 				slot_btn.tooltip_text = "%s\n\n%s\n\nClick to manage %s's runes." % [
 					rune["name"],
-					Run.rune_sits_out_note(String(rune.get("id", "")), Run.held_engines(member)),
+					Run.rune_sits_out_note(String(rune.get("id", "")), Run.held_engines(member),
+						Run.worn_rune_ids(member)),
 					key.capitalize()]
 				slot_btn.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
 		slot_btn.pressed.connect(Music.click)
@@ -2055,7 +2056,7 @@ func _open_rune_panel(idx: int) -> void:
 		if is_on and sitting_runes.has(String(rune["name"])):
 			lbl.text = "✦ %s — %s" % [rune["name"],
 				Run.rune_sits_out_note(String(rune.get("id", "")),
-					Run.held_engines(member)).replace("\n", " ")]
+					Run.held_engines(member), Run.worn_rune_ids(member)).replace("\n", " ")]
 			lbl.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
 		lbl.custom_minimum_size = Vector2(POUCH_TEXT_W, 20)
 		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

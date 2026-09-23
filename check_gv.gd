@@ -72,11 +72,22 @@ const SEATS := ["warrior", "mage", "cleric", "hunter"]
 # THAT READS ZERO IS OWED HALF BY HALF NOW**: the Mage's spawn half is 0 while his
 # ceiling half is 4, so the ceiling is floored and the spawn half is owed, as the
 # Cleric's whole row is.
+#
+# **BATCH HF MOVED ALL FOUR ROWS UP, AND NONE IS OWED NOW.** Fifteen class runes
+# that read no engine (HF §1-§4, each in `GROUPS` as `KIT`) and Long Poison
+# un-gated (HF §6, Snare Trap lays its Poison): the Warrior 2 / 6 -> 5 / 9
+# (Goading Roar, Rending Blows, Grudge), the Mage 0 / 4 -> 5 / 9 (Unravel,
+# Seeking Missiles, Detonating Ward, Clarity, Profligate), the Cleric 0 / 0 ->
+# 5 / 5 (Abundance, Returned Burden, Burning Ground, Eleventh Hour, Vow of
+# Silence) and the Hunter 4 / 6 -> 7 / 9 (Opportunist, Tusk and Bristle, Long
+# Poison). The brief's bar was five with no engine for every class, and each
+# floor sits at the reading, as HD ruled; the owed branch below binds no half
+# today and is kept for the next batch that thins one to nothing.
 const RUNE_FLOOR := {
-	"warrior": [2, 6],
-	"mage": [0, 4],
-	"cleric": [0, 0],
-	"hunter": [4, 6],
+	"warrior": [5, 9],
+	"mage": [5, 9],
+	"cleric": [5, 5],
+	"hunter": [7, 9],
 }
 const SCRATCH_PROFILE := "user://gv_profile.json"
 const SCRATCH_RELICS := "user://gv_relics.json"
@@ -115,8 +126,11 @@ const ROWS := {
 	# authored what they read, and Bared Plate on the one engine that gives a
 	# Warrior Block to trade. Each read site asks the engine too, so §1 drives them
 	# as rows — paid with the engine equipped, nothing with it merely owned.
+	# **BATCH HF §6 TOOK LONG POISON BACK OUT** (the designer): Snare Trap, in
+	# every Hunter's kit, lays the very Poison it reads when the snare springs, so
+	# it is `STATUS` in the groups below and its read site asks no engine.
 	"long_fuse": "overburn", "killing_cold_fk": "permafrost", "deep_cold": "permafrost",
-	"long_poison": "trapper", "mirror_guard": "seasoned",
+	"mirror_guard": "seasoned",
 	"slaughterhouse_rune": "bloodrage", "bared_plate": "heavy_plating",
 }
 
@@ -161,6 +175,34 @@ const GROUPS := {
 	# which GW's own pre-pass measured before this line moved (18 against 15 on
 	# BOTH arms) and which §1 below asserts.
 	"shared_hide": ["CARD", "a companion, which Call the Wilds fields with no engine"],
+	# BATCH HF §6 — the STATUS group's one member again: the Poison is Snare
+	# Trap's, a kit card every Hunter holds, and the snare springs it with the
+	# Hunter as its source (`_apply_poison`), the door the rune reads.
+	"long_poison": ["STATUS", "the Poison Snare Trap lays when it springs — every Hunter's kit card"],
+	# **BATCH HF §0-§4 — `KIT`: FIFTEEN RUNES WRITTEN TO READ NO ENGINE.** Each
+	# reads only its class's kit cards and basic, its class resource, a status
+	# its kit lays, or healing and damage in general (the designer's rule, HF §0),
+	# and is written for no lineage — so there is no engine to equip or own, and
+	# the four-arm drive below has no board to seat. **`check_hf` §1 IS THEIR
+	# ARM**: each worn and bare on a party holding no engine, on the same board
+	# under the same dice, and what it pays read off the board. §1 here asserts
+	# that gate names every one, so a sixteenth sorted here with nobody driving it
+	# reds rather than reading clean.
+	"abundance": ["KIT", "healing: the overheal of a heal he lands"],
+	"returned_burden": ["KIT", "Unburden, a Cleric kit card"],
+	"burning_ground": ["KIT", "Consecration, a Cleric kit card"],
+	"eleventh_hour": ["KIT", "Ministration, a Cleric kit card"],
+	"vow_of_silence": ["KIT", "healing, and damage in general"],
+	"unravel": ["KIT", "Magic Burst's Elemental Weakness, a Mage kit card's status"],
+	"seeking_missiles": ["KIT", "Magic Missiles, and Magic Burst's Elemental Weakness"],
+	"detonating_ward": ["KIT", "Nexus Ward, a Mage kit card"],
+	"clarity": ["KIT", "his Mana, the class resource"],
+	"profligate": ["KIT", "his Mana, the class resource"],
+	"goading_roar": ["KIT", "Mocking Blow's taunt, a Warrior kit card's status"],
+	"rending_blows": ["KIT", "Crushing Blow's Sunder, a Warrior kit card's status"],
+	"grudge": ["KIT", "damage in general: the last enemy whose blow reached him"],
+	"opportunist": ["KIT", "Powershot, a Hunter kit card, and a stun"],
+	"tusk_and_bristle": ["KIT", "Summon Companion, a Hunter kit card"],
 }
 
 # The cards a drive casts beyond the one `requires_ability` names, seated drafted
@@ -383,10 +425,18 @@ func _s0_the_population() -> void:
 		else:
 			ordinary += 1
 			# BATCH HC §1 — scoped to the CLASS of the lineage it was written for.
-			ok(String(e.get("scope", "")) == "class:" + Classes.class_of_spec(_lineage(String(id)))
-					and _lineage(String(id)) != "",
-				"§0: the ordinary rune %s is not scoped to the class of the lineage it was written for (%s, %s)"
-					% [id, e.get("scope", ""), _lineage(String(id))])
+			# BATCH HF — or, written for NO lineage, to a class, and then it is one
+			# of the `KIT` runes the designer wrote to read no engine (HF §0).
+			if _lineage(String(id)) == "":
+				ok(String(GROUPS.get(id, [""])[0]) == "KIT"
+						and SEATS.has(String(e.get("scope", "")).trim_prefix("class:"))
+						and String(e.get("scope", "")).begins_with("class:"),
+					"§0: the ordinary rune %s is written for no lineage and is not a class-scoped KIT rune (%s)"
+						% [id, e.get("scope", "")])
+			else:
+				ok(String(e.get("scope", "")) == "class:" + Classes.class_of_spec(_lineage(String(id))),
+					"§0: the ordinary rune %s is not scoped to the class of the lineage it was written for (%s, %s)"
+						% [id, e.get("scope", ""), _lineage(String(id))])
 			ok(not (e.get("payload", {}) as Dictionary).is_empty(),
 				"§0: the ordinary rune %s has no payload to trace" % id)
 	print("    %d live: %d engine runes and %d ordinary runes" % [engines + ordinary, engines, ordinary])
@@ -814,7 +864,18 @@ func _s1_every_rune_driven() -> void:
 	print("\n§1 — every ordinary rune, its engine equipped and merely owned, worn and not")
 	var rows_ok := 0
 	var others_ok := 0
+	var kit := 0
+	var hf_src := FileAccess.get_file_as_string("res://check_hf.gd")
 	for id in _ordinary():
+		# BATCH HF — A `KIT` RUNE HAS NO ENGINE TO EQUIP OR OWN, AND `check_hf` §1
+		# DRIVES IT WORN AND BARE ON A HERO HOLDING NONE (the group's comment). The
+		# arm here is that the drive exists: the gate names the rune in its table
+		# and drives its section.
+		if String(GROUPS.get(id, [""])[0]) == "KIT":
+			ok(hf_src.contains('\t"%s": [' % id) and hf_src.contains("_s1_the_fifteen"),
+				"§1: %s reads no engine and `check_hf` §1 does not drive it — a KIT rune nobody drives" % id)
+			kit += 1
+			continue
 		var ew: Dictionary = await _arm(id, true, true)
 		var en: Dictionary = await _arm(id, true, false)
 		var bw: Dictionary = await _arm(id, false, true)
@@ -848,8 +909,8 @@ func _s1_every_rune_driven() -> void:
 	for id6 in GROUPS:
 		if String(GROUPS[id6][0]) == "DEAD":
 			dead += 1
-	print("    %d of %d rows pay equipped and move nothing unequipped; %d of %d others pay unequipped (%d named DEAD)" % [
-		rows_ok, ROWS.size(), others_ok, GROUPS.size() - dead, dead])
+	print("    %d of %d rows pay equipped and move nothing unequipped; %d of %d others pay unequipped (%d named DEAD); %d KIT runes driven by `check_hf` §1" % [
+		rows_ok, ROWS.size(), others_ok, GROUPS.size() - dead - kit, dead, kit])
 	ok(rows_ok == ROWS.size(), "§1: only %d of %d rows read clean on both arms" % [rows_ok, ROWS.size()])
 	await _s1b_the_price()
 	await _s1c_the_half()

@@ -106,7 +106,18 @@ const SRC_FLOOR := 107
 # pass the rune's holder as the source, so `with_src` moves 111 -> 113 and the
 # unstamped remainder stays 104. Found by running this gate unmodified against
 # GO's code, before it was touched.
-const CALL_SITES := 217
+#
+# **BATCH HF MOVED IT 217 -> 220, AND SAYS WHY. Net +3, three arrivals.** Returned
+# Burden casts each effect Unburden lifted onto an enemy (`_return_burden`), Aper's
+# third charge stuns its target (`_companion_strike`'s boar arm), and Abundance's
+# overheal becomes a barrier on the ally it spilled over (`_abundance_shield`).
+# **The two that land on an ENEMY pass their source** — the Cleric, and the boar —
+# DI's rule, so `with_src` moves 113 -> 115; **the shield is a HERO-SIDE grant**,
+# nothing Harvest reads and nothing `_note_debuff_applied` counts, so it is
+# correctly unstamped, as DS's four and FK's Open Line were, and the unstamped
+# remainder goes 104 -> 105. Found by running this gate unmodified against HF's
+# code, before it was touched.
+const CALL_SITES := 220
 
 # Four plain afflictions: all in `DEBUFF_IDS`, none sticky, none on the boss
 # immunity list, so `_harvest_yield` counts all four and `purge_debuffs` takes

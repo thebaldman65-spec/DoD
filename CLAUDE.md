@@ -1972,9 +1972,12 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   since HB, where until then only an earned Call the Wilds gave one). `check_gt` §3 re-derives it every battery, so a new
   earnable card is sorted by the gate in the batch that adds it. **The Sharpshooter's own seat gate is the NEGATIVE
   one** — a companion card sits out while he holds the engine that dismisses the pet — and it is the block *EVERY
-  HUNTER HAS A PET* below, not a row here. **One row is RULED, not derived (HE §2): Mark of the Hunt**, which the door
-  never refuses, sits out with Pack Bond; it carries `ruled` (`Classes.sits_out_ruled`), and the derivation drives it as
-  a ruling rather than reading it as a mistake — HD §1's rule for a ruled row of the offer's table.
+  HUNTER HAS A PET* below, not a row here. **No row is RULED since HF §7**: HE §2 ruled Mark of the Hunt a seat row
+  keyed to Pack Bond on a premise the batch itself found half wrong (its companion's half reads no engine), and the
+  designer undid it — the card now sits out only beside a dismisser, as a RULED seat of its `COMPANION_READ` row
+  (`seat`, `Classes.companion_seat`; the HB block). `sits_out_ruled` stays the door that tells a ruled seat row from a
+  derived one, for the next ruling, and the derivation drives a ruled row as a ruling rather than as a mistake — HD
+  §1's rule for a ruled row of the offer's table.
 - **A CARD WHOSE SECOND CLAUSE NEEDS ANOTHER CARD IS NOT A ROW, AND IS NOT PAID THE CLAUSE WITHOUT IT (ruled at GU).**
   Battle Poise's free Guard Change and Shatterpoint's free Overpower fire only with the named card carried; both cards
   do their own work with no engine and no other card, so neither sits out, and paying the clause to a hero who does not
@@ -2024,9 +2027,11 @@ the block left out, spend what they were paid.
   sat in (`docs/reports/GM.md` §1 carries the population). **A static census finds the next one; a live drive with
   the engine gone proves it** (`check_gm` §1).
 - **A CARD'S OWN PAYLOAD INSIDE AN ENGINE'S BLOCK IS THE SAME SHAPE ONE STEP ALONG, AND IT IS OPEN.** Shrapnel
-  Charge, Hamstring, Venom Coating, Pinning Shot and Called Shot apply part of what their text promises only while
-  the engine is held (`docs/state.md`). BV moved Loaded Shot out of the Survivalist's block and Crossfire out of
-  the Sharpshooter's for this reason: **the effect belongs to the ability, not to whoever is holding it.**
+  Charge, Hamstring, Pinning Shot and Called Shot apply part of what their text promises only while the engine is held
+  (`docs/state.md`). BV moved Loaded Shot out of the Survivalist's block and Crossfire out of the Sharpshooter's for
+  this reason: **the effect belongs to the ability, not to whoever is holding it.** **Venom Coating was the one of them
+  whose WHOLE payoff sat in the block, and the designer answered it at the offer (HF §7)**: it is a RULED card-gate row
+  on Trapper, offered only while Trapper is equipped at every door, and its payload stayed where it was.
 
 ## STANDING RULE — EVERY CLASS OPENS WITH A KIT OF THREE, INSIDE THE SLOT COUNT (Batch GN, ruled by the designer)
 > **`Classes.CLASS_KITS` names three abilities per class. Every hero of the class opens with them after his basic,
@@ -2104,13 +2109,24 @@ the block left out, spend what they were paid.
     slotted, and says it sits out with GX's sentence, word for word, on GX's four surfaces — the pouch's engine row, the
     map card's engine line (marked `○`, the sentence on the card's hover), the hero sheet's state column and the battle
     log's roll call (`check_hc` §6). **It is not a `COMPANION_READ` row**, which the OFFER reads.
-  · **AND MARK OF THE HUNT IS PACK BOND'S, AND SITS OUT WITH IT (HE §2, ruled by the designer).** Its hunter's halves
-    (+25% on the marked prey, and the Mana his strikes on it restore) are read inside `has_engine("pack")`, and its
-    companion's halves read no engine — so it paid beside Lethal Aim, where Pack Bond sits out, and HALF-works without
-    Pack Bond; the cast test would never gate it. **It is a RULED row of the card gate and of `SITS_OUT`** (`ruled`),
-    and **`Classes.sits_out` sits a row out while its engine itself sits out** — a row keyed to an engine that needs the
-    pet, beside the one that dismisses it — so Pack Bond's tell is true. The sentence names that chain
-    (`Run.sits_out_note`'s third cause); GT's opening and closing lines are unchanged (`check_he` §3).
+  · **AND MARK OF THE HUNT IS OFFERED TO EVERY HUNTER WITH A PET, AND SITS OUT BESIDE A DISMISSER (HF §7, ruled by the
+    designer, undoing HE §2's Pack Bond gate).** Its hunter's halves (+25% on the marked prey, and the Mana his strikes on
+    it restore) are read inside `has_engine("pack")` and pay only while Pack Bond is equipped; its companion's halves read
+    no engine, so it HALF-works for any Hunter who fields a companion — and a card that half-works is a legitimate offer
+    (GP). **It is a `COMPANION_READ` row** (the pet gate withholds it from a Sharpshooter), **its door opens (`door`
+    false) and it carries a RULED seat (`seat`, `ruled`)**: beside a dismisser neither half can pay, so a copy already
+    carried sits out there with the pet's sentence. `Classes.sits_out`'s clause for *a row whose engine itself sits out*
+    is kept and now binds no row — it is the rule for the next one, not a patch for this card (`check_hf` §5).
+  · **AND A RUNE CAN ADD A COMPANION (HF §4, ruled by the designer): Tusk and Bristle's APER.** `Classes.COMPANION_KINDS`
+    stays the three every Hunter's card offers; **a kind a rune adds lives in `Classes.RUNE_COMPANION_KINDS`**, the doors
+    that ask *is this a companion at all* ask `Classes.is_companion_kind`, and the one door that asks *may this hunter
+    call it* is `battle._summon_choice`, which builds every call — so the picker, the swap and the bot are gated in one
+    line. The bot's order of preference is `battle.BOT_PET_ORDER`, once, with the rune's kind first: a bot that owned
+    the rune and never fielded the boar would measure a build nobody plays (GN, GS). **A card that orders a companion
+    BY KIND owes a new kind its arm, or it does nothing for it** — Kill Command, Ghostpack and Call of the Wild name the
+    three and were not given one (the designer's, `docs/state.md`). **Aper's rhythm is FIXED — every third strike — and
+    lives on the body** (`aper_strikes`), so a swap, a fresh call and a new fight each start it over, and its chip says
+    which charge stuns; a stun that tightened with the bond is what the ruling forbids.
 - **THE SUMMON DOOR REFUSES A DISMISSER EVERY ROUTE**, Call the Wilds included, so *a Sharpshooter has no companion* is
   a door and not a hope. **Call of the Wild's spirits are bodiless and are not a pet**: it stays castable.
 - **THE KIT A HERO OPENS WITH READS HIS SLOTTED ENGINES.** `Classes.class_kit_names_for` and `class_kit_for` are the
@@ -2796,19 +2812,58 @@ runes have always carried their own.
   no price (GW §3) — because a row sits out without it (GX) and the sentence is true only if it pays nothing; Bared
   Plate's share moved to `rune_bared_plate_bd` so the retired runes sharing `rune_bd_bonus` keep theirs. **A new rune
   of that shape is gated the same way in the batch that authors it** (`check_he` §0-§2, `check_gv` §1).
+  · **HF §6 TOOK LONG POISON BACK OUT, AND THE REASON IS A CENSUS'S BLIND SPOT, NOT A CHANGE OF RULE.** HC's census
+    cast every card ONCE onto a clean enemy and read what it laid; Snare Trap — every Hunter's kit card — lays nothing
+    at the cast and lays Poison 4 through `_apply_poison`, the Hunter its source, when the snare SPRINGS on the enemy's
+    next turn. So a kit card did lay what Long Poison reads, and the row withheld a rune every Hunter could use; its read
+    site asks no engine again. **Before gating a status rune on "no kit card lays it", find every kit card that lays
+    the status, including one whose payload lands on a later turn** — a trap, a mark that pays on a later strike, a DoT
+    laid by a spring.
 - **WHAT A HERO CAN BE OFFERED IS MEASURED, NEVER WRITTEN HERE** (`docs/reports/HC.md` §3, and `check_gv` §3 prints it).
   **Since HD §3 its no-engine half is also a FLOOR per class at HC's reading** (`check_gv` §3's `RUNE_FLOOR`, ruled):
   a floor and never an equality, and **a class whose floor reads zero is OWED, not passed** — a floor of zero asserts
   nothing, so that class's row asserts instead that some engine it can slot opens a rune, which goes red the day a
   hero of it can be offered nothing.
-  One reading is a rule's consequence and is stated: **a Cleric holding no Cleric lineage engine is offered no ordinary
-  rune**, because every Cleric rune reads Mercy, Conviction or Ruin — **and since HE §1 neither is a Mage holding none at
-  spawn**, whose three were the Burn and Chill runes; his row is OWED at spawn as the Cleric's is.
+  **No class's floor reads zero since HF §1** — fifteen runes that read no engine (the block *A NO-ENGINE RUNE*
+  below) lift every class to five at spawn, the Cleric and the Mage from nothing — so no class is OWED any more; the
+  floors sit at HF's reading, and the batch that thins a class's no-engine offer moves its row and says why.
 - **ES §2's OTHER HALF STANDS AS RECORD**: the five universals were ruled re-scoped rather than retired, ET §1 retired
   them with the other forty-eight, and `universal` still resolves for them and for the generated stat family.
 - **`check_hc` KEEPS THE DOORS, EACH NEGATIVE WITH ITS POSITIVE**: `_scope_ok` (§1), Layered Aegis at a
   cache's answer (§2), the event verb's preference (§3), and the three HB follow-ups below (§4-§6). What a class can be
   offered is `check_gv` §3's, and that the game reads no `written_for` is `test_runes`'.
+
+## STANDING RULE — A NO-ENGINE RUNE READS ONLY WHAT EVERY HERO OF ITS CLASS HAS (Batch HF §0, ruled by the designer)
+> **A rune written to read no engine may read only its class's three kit cards and its basic, its class resource, the
+> statuses its own kit lays (the Mage's Elemental Weakness, the Warrior's taunt and Sunder, the Hunter's stun and
+> Poison), and healing and damage in general. It may not read any engine's meter, state or status.** Fifteen are
+> authored so (HF §1-§4): each is class-scoped at the flat 100g, written for no lineage (`written_for` absent), and on
+> no `Runes.ENGINE_READ` row — `check_hf` §0 asserts all three and §1 drives every one on a hero holding no engine.
+
+- **CONFIRM IT AT THE READ SITE, NEVER FROM THE NAME.** A no-engine rune that reads an engine it did not name is the
+  defect this rule exists to prevent, and only the line that pays it can show one (HF §0's table in
+  `docs/reports/HF.md` names each read site and what it reads).
+- **"HE DEALS NO DAMAGE" IS READ OFF THE ATTRIBUTION FRAME** (Vow of Silence). `battle._deal_gate`, called from
+  `unit.take_hit` and `unit.take_tick_damage` above everything either does (`deal_gate_cb`), refuses what `_dmg_frame`
+  credits to a hero wearing the vow — the frame the recap and three rule engines already read — so a damage source a
+  later batch adds is silenced without a list to keep. **It answers for enemies only** (a health cost he pays is not
+  damage he deals, and a frame left standing from his action can never silence an enemy's blow on a hero), **and it
+  leaves Break damage alone** — its own word in this game. A new damage path that sets no frame leaks past the vow as
+  it leaks past the recap: BL's rule, one reader more.
+- **A RUNE THAT ANOTHER RUNE HE WEARS CANCELS SITS OUT, VISIBLY (HF §5, on HC §5's ruling for Pack Bond beside
+  Lethal Aim).** `Runes.CANCELLED_BY` is the table (Burning Ground: Vow of Silence), `Runes.cancelled_by` the one
+  answer, asked by `Runes.sits_out` off the ids of the ordinary runes he has EQUIPPED (`Run.worn_rune_ids`) — never
+  what he owns. Both are still offered, bought and worn; the cancelled one takes GX's sentence with a third cause
+  (`Run.rune_sits_out_note`) on GX's four surfaces, and its read site refuses too, so the sentence is true. **A new
+  cancelling pair is a row, and a new surface that says a rune sits out passes the worn ids.**
+- **A SPELL IS A CAST WITH A MANA PRICE** (Clarity, Profligate): `ab.cost > 0`, the Mana bar, and the spend line's own
+  `not is_counter`, decided at that line in `_resolve` before the price comes off. The Mage's free basic is not one.
+- **A SHIELD A HEAL SPILLS ADDS TO THE BARRIER STANDING** (Abundance, through `_stat_heal`'s door, off
+  `last_overheal`, once per heal — `overheal_shielded`), where every other barrier writer maxes; **the ceiling is the
+  designer's** and none is written (`docs/reports/HF.md` §5 measures the rate).
+- **SUNDER'S DEPTH IS ONE ANSWER** (`BattleUnit.sunder_depth`, Rending Blows): the status's power, one deep when
+  nothing deepened it, and each depth takes `SUNDER_STEP` of the armor, **floored at zero** — so one Sunder is the x0.65
+  it always was and three leave no armor.
 
 ## STANDING RULE — A RUNE READS ITS HOLDER'S EQUIPPED CARDS, NEVER HIS POOL (Batch ES §4, ruled by the designer)
 
@@ -3616,7 +3671,7 @@ fact that they are.
 >
 > **A card that READS an engine is offered only to a hero who holds it.** `Classes.ENGINE_READ` is
 > the table — 42 rows, one `why` apiece: 39 the cast test found (two of them HE §3's zone-boss cards) and three the
-> designer RULED (HD §1's two, HE §2's one) —
+> designer RULED (HD §1's two, HF §7's Venom Coating) —
 > and `Classes.offerable` is the one answer, asked by the
 > draft offer and by the zone-boss fallback so the two cannot disagree. *Since HB it asks a second,
 > negative question beside the engine one: a card that needs a companion is not offered to a hero who
@@ -3645,17 +3700,19 @@ fact that they are.
   longer why it is gated — **never as a pair that should read apart.** Three of HEAD's gates read the
   two rows as mistakes on the new code, each asking a row to be refused at the door; that was their
   assumption, not the rows'. A ruled row is no evidence for the derivation, and the derivation none against it.
-  **HE §2 rules a third, Mark of the Hunt (Pack Bond's), and it is the first ruled row that also SITS OUT**
-  (the HB block). Lunge on the Swordmaster's zone-boss pool was offered there with the Stances unslotted
-  until HE §3 pointed the boss at the engine half.
+  **HE §2 ruled a third, Mark of the Hunt (Pack Bond's), and HF §7 undid it** on the premise's other half (its
+  companion's half pays with no engine; the HB block). **HF §7 rules Venom Coating Trapper's** — the third ruled row
+  now, and the first found on a boss pool rather than a shelf. Lunge on the Swordmaster's zone-boss pool was offered
+  there with the Stances unslotted until HE §3 pointed the boss at the engine half.
 - **A CARD THAT SITS OUT WITHOUT ITS ENGINE IS A ROW HERE TOO, NAMING THE SAME ENGINE (HE §3).** The boss
   asks this table since HE, and two cards on a lineage's boss pool and no draft pool — Stabilize and Primal
   Surge — had sat out without their engines since GT and never been rows, because GP derived the table over
   the draft pools, the one door that asked it then. They are rows now, derived and not ruled; **a door that
   starts asking this table owes it the derivation over the pools it reaches** (`check_he` §0 asserts every
   `SITS_OUT` row is a row here with the same engine). HE's, over the boss-only cards, found those two and one
-  more: **Venom Coating's whole payoff sits in Trapper's block** — GM §1's open shape, the designer's question
-  (move the payload out, or gate the card), so it is reported and not gated.
+  more: **Venom Coating's whole payoff sits in Trapper's block** — GM §1's open shape — **and HF §7 ruled it a row**
+  (gate the card; the payload stays). It is a row at the OFFER only: its cast lands with no engine, so the seat
+  derivation never finds it, and a copy carried without Trapper stays seated (`docs/state.md`).
 - **A ROW WHOSE PAYOUT IS A LATER STRIKE OR A LATER EVENT CANNOT BE FOUND BY A BOARD TEST.**
   Unslaked, Anvil and Recompense land and move nothing until a blow arrives; Intercession, Last
   Howl and Succession until a death or a swap. Six of the 34 were found by READING the site and
@@ -3679,8 +3736,8 @@ name would be the failure worth catching, so `check_fd` §1f asserts the three s
 same breath as the removal. `run_sim` never bought one, so no measured figure moves.
 
 ## STANDING RULE — A RUNE THAT READS AN ENGINE IS OFFERED ONLY WHILE THAT ENGINE IS EQUIPPED (Batch GV)
-> **GP's card gate, one layer over. `Runes.ENGINE_READ` is the table — forty-three of the sixty live ordinary runes (GV's
-> thirty-five, HC §2's Layered Aegis and HE §1's seven RULED rows), an engine and a `why` apiece — and `Runes.offerable` is the one answer: `Runes.eligible_ids` asks it at every roll (the
+> **GP's card gate, one layer over. `Runes.ENGINE_READ` is the table — forty-two of the seventy-five live ordinary runes (GV's
+> thirty-five, HC §2's Layered Aegis and HE §1's RULED rows less Long Poison, un-gated at HF §6), an engine and a `why` apiece — and `Runes.offerable` is the one answer: `Runes.eligible_ids` asks it at every roll (the
 > Peddler, the elite cache, the bargain, the event verb) and `Run.rune_choice` at a queued offer's answer.** *Since HB
 > it also withholds a rune that needs a companion from a hero who has dismissed the pet (`Runes.COMPANION_READ`).*
 

@@ -355,6 +355,10 @@ const STATUS_INFO := {
 	"vengeance": ["Vengeance", "Vn", Color(0.85, 0.35, 0.30), "The fallen companion's boon lives on in\nthe hunter at FULL strength for the\nrest of the battle, and he strikes\nharder for the loss."],
 	"held_breath": ["Held Breath", "HB", Color(0.70, 0.90, 0.60), "The next attack is a GUARANTEED\ncritical and ignores all armor."],
 	"snared": ["Snared", "Sn", Color(0.75, 0.65, 0.30), "A trap waits underfoot: the next\ntime this enemy acts it is STUNNED\nfor 1 turn and Poisoned."],
+	# BATCH HF — Aper's rhythm, on the boar itself: how many charges since its last
+	# stun, so the player sees which charge stuns and can hold Powershot for it.
+	# A hero-side chip that is not a buff anyone cast, so nothing else reads it.
+	"aper_rhythm": ["Rhythm", "0/3", Color(0.62, 0.45, 0.28), "Every third charge STUNS its target\nfor 1 turn. A BOSS RESISTS UNTIL\nBROKEN."],
 	"caught": ["Caught Fast", "Cf", Color(0.75, 0.55, 0.25), "The trap's teeth hold the wound\nopen: cannot be healed."],
 	"venom_coat": ["Venom Coating", "VC", Color(0.45, 0.80, 0.30), "Coated arrows: every attack applies\nPoison and refreshes its timer."],
 	# ---- BATCH BO §5: the drafted abilities' statuses ----
@@ -827,6 +831,17 @@ const FORMLESS_RECOIL_TURNS := 2
 # literals two functions apart.
 const CONSECRATION_PCT := 0.05    # of the holder's OWN max health, each turn
 const VIGIL_SHARE := 0.5          # of the heal that forked, to the second ally
+# ---- BATCH HF: the fifteen runes' numbers that are not on the rune ----
+# Each rune carries its MAGNITUDE in its payload (`data/runes.json`), so a ruling
+# moves data. What is here is the brief's own fixed figures — the thresholds and
+# rhythms the designer named, which no payload scales.
+const ELEVENTH_HOUR_AT := 0.25    # Eleventh Hour: "below 25% health", of the ally's own maximum
+const ABUNDANCE_TURNS := 2        # Abundance: the shield holds Blessed Vestments' two turns (PROPOSED)
+const PROFLIGATE_COST_MULT := 2   # Profligate: "cost twice the Mana"
+const APER_STUN_EVERY := 3        # Aper: EVERY THIRD STRIKE stuns — fixed, and never shortens (ruled)
+const APER_STUN_TURNS := 1        # Aper: "for one turn"
+const APER_CHARGE_PCT := 0.20     # Aper: its charge, of the hunter's Attack — Canis's and Aguila's blow (PROPOSED)
+const APER_BOON_PCT := 0.15       # Aper: Pack Bond's boon, charge damage a curve step — the wolf's 15% (PROPOSED)
 # ---- BATCH BR: the Hunter and Warrior class-wide magnitudes, in ONE place ----
 # Each of these is read at a site the ability's own `special` never touches — an
 # enemy's target pick, the raw-damage block, a turn-start tick, the strike loop —
@@ -1362,9 +1377,10 @@ func _spawn_units() -> void:
 					# step (`check_gx` §3c asserts it against the note itself).
 					var rc_id := String(rune.get("id", ""))
 					var rc_tail := ""
-					if Runes.sits_out(rc_id, Runes.held_engines(Run.party[i])):
+					var rc_worn: Array = Run.worn_rune_ids(Run.party[i])
+					if Runes.sits_out(rc_id, Runes.held_engines(Run.party[i]), rc_worn):
 						var rc_lines := Run.rune_sits_out_note(rc_id,
-								Runes.held_engines(Run.party[i])).split("\n")
+								Runes.held_engines(Run.party[i]), rc_worn).split("\n")
 						rc_tail = " — %s %s" % [rc_lines[0], rc_lines[1]]
 					_rune_roll_call.append("%s: %s%s" % [cfg["unit_name"], rune["name"], rc_tail])
 			# BATCH HC §5 — AND A SLOTTED ENGINE RUNE THAT SITS OUT IS NAMED IN THE SAME
@@ -2039,6 +2055,9 @@ func _make_unit(config: Dictionary, pos: Vector2, tint: Color,
 	# above. `_die()` is the one way down for every unit, a tick's kill included,
 	# which `_on_enemy_death` never sees.
 	u.died_cb = _on_unit_died
+	# BATCH HF — VOW OF SILENCE'S DOOR, stamped where every unit passes for the
+	# same reason as the four above: any body can be struck.
+	u.deal_gate_cb = _deal_gate
 	# The nameplate is a sibling (not a child) so lunges/knockback never move it.
 	var plate := Node2D.new()
 	plate.position = plate_pos
@@ -3120,6 +3139,9 @@ func _run_battle() -> void:
 		# reason: a rule left inside this loop can only ever be checked by a
 		# grep, because `_run_battle` cannot be driven headlessly.
 		_consecration_tick(u)
+		# BATCH HF — and Burning Ground's burn beside it, on the caster's own turn,
+		# in its own function for the same reason.
+		_burning_ground_tick(u)
 		if u.has_status("focus") and u.resource_name == "Mana":
 			u.resource = mini(u.resource + 10, u.max_resource)
 			u.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
@@ -4527,7 +4549,7 @@ func _bot_class_kit_pick(u: BattleUnit) -> Array:
 			# `_summon_choice` the player's picker builds the calls with.
 			if Classes.class_kit_holds(u.hero_key, Classes.PET_CARD) \
 					and _beasts(u).is_empty():
-				for ck_kind in ["canis", "aguila", "ursus"]:
+				for ck_kind in BOT_PET_ORDER:
 					var ck_call := _summon_choice(u, ck_kind)
 					if ck_call != null and _ability_usable(u, ck_call):
 						return [ck_call, u]
@@ -5263,7 +5285,7 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 			# Under The Pack, FILL BOTH SLOTS — preferring a second beast over
 			# swapping the first is what the `< _beast_cap` gate buys.
 			if bot_beasts.size() < _beast_cap(u):
-				for want in ["canis", "aguila", "ursus"]:
+				for want in BOT_PET_ORDER:
 					if bot_beasts.any(func(b): return b.companion_kind == want):
 						continue
 					# BATCH HB §1 — the call the one card makes for this companion,
@@ -5285,7 +5307,7 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 				var out_worth := _bot_boon_worth(u, out_b.companion_kind)
 				var best_in := ""
 				var best_worth := 0.0
-				for want in ["canis", "aguila", "ursus"]:
+				for want in BOT_PET_ORDER:
 					if bot_beasts.any(func(b): return b.companion_kind == want):
 						continue
 					var sw := _summon_choice(u, want)
@@ -5936,6 +5958,11 @@ func _eff_cost(u: BattleUnit, ab: Ability, target: BattleUnit = null) -> int:
 	# to a zero: Strike and its kin are cost 0 already, which is the whole of
 	# "basic attacks are free" — the clause describes the kit rather than
 	# changing it, and this is the line that keeps it true.
+	# BATCH HF — PROFLIGATE: his spells cost twice the Mana. On the price after
+	# every discount and before the ward's multiplier, which composes with it
+	# either way; a waived cast returned 0 above and stays free.
+	if c > 0 and u.rune_profligate > 0.0 and u.resource_name == "Mana":
+		c *= PROFLIGATE_COST_MULT
 	if c > 0 and not is_equal_approx(u.mod_cost_mult, 1.0):
 		c = maxi(int(round(c * u.mod_cost_mult)), 1)
 	return c
@@ -6571,7 +6598,7 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# route: his kit holds no card to call with, and this refuses every other,
 	# Call the Wilds included, so "a Sharpshooter has no companion" is a door
 	# and not a hope (`Classes.dismisses_pet`, the one answer).
-	if ab.special == "summon" and not Classes.COMPANION_KINDS.has(
+	if ab.special == "summon" and not Classes.is_companion_kind(
 			ab.display_name.get_slice(" ", 1).to_lower()):
 		return false
 	if ab.special in ["summon", "call_wilds"] and Classes.dismisses_pet(u.engines):
@@ -6990,7 +7017,12 @@ func _on_summon_group_pressed(popup: PopupPanel) -> void:
 # with that; one who holds neither gets null, and so does a hero who has
 # dismissed the pet (the Sharpshooter holds no card to call with).
 func _summon_choice(u: BattleUnit, kind: String) -> Ability:
-	if u == null or not Classes.COMPANION_KINDS.has(kind):
+	if u == null or not Classes.is_companion_kind(kind):
+		return null
+	# BATCH HF — APER IS TUSK AND BRISTLE'S: every Hunter's card offers the three,
+	# and only one wearing the rune is handed the fourth. The ONE place a call is
+	# built, so the picker, the swap and the bot are all gated by this line.
+	if kind == "aper" and u.rune_tusk_and_bristle <= 0.0:
 		return null
 	var own := _find_ability(u, "Summon " + kind.capitalize())
 	if own != null and own.special == "summon":
@@ -7017,7 +7049,9 @@ func _open_summon_picker(u: BattleUnit) -> void:
 	# clones that share one "Swap Companion" cooldown (set in _do_summon).
 	var swapping := _beasts(u).size() >= _beast_cap(u)
 	var calls: Array = []
-	for kind in Classes.COMPANION_KINDS:
+	# BATCH HF — the three, and any a rune adds (`_summon_choice` refuses Aper to a
+	# hunter who does not wear Tusk and Bristle).
+	for kind in Classes.COMPANION_KINDS + Classes.RUNE_COMPANION_KINDS:
 		var call := _summon_choice(u, String(kind))
 		if call != null:
 			calls.append(call)
@@ -8466,6 +8500,23 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	# and the clamp at zero without knowing any of their names. It books the
 	# NET, so a card that hands back what it took feeds the band nothing.
 	var cz_res_before: int = attacker.resource
+	# BATCH HF — CLARITY AND PROFLIGATE READ THIS LINE, BEFORE THE PRICE COMES OFF.
+	# **A SPELL IS A CAST WITH A MANA PRICE** — the Mage's basic costs nothing and
+	# is not one, so neither rune turns every free Magic Bolt into a bigger one —
+	# and a counter is not a cast (this line's own `not is_counter`). Clarity asks
+	# whether the bar stood FULL as the spell was cast, which only this line still
+	# knows; Profligate's doubled price is `_eff_cost`'s, and its damage is here.
+	var hf_spell: bool = ab.cost > 0 and attacker.resource_name == "Mana" \
+		and not is_counter and attacker.is_hero
+	var hf_clarity_mult := 1.0
+	if hf_spell and attacker.rune_clarity > 0.0 \
+			and cz_res_before >= attacker.max_resource:
+		hf_clarity_mult = 1.0 + attacker.rune_clarity
+		_log("   → Rune: Clarity — %s casts at full Mana; the spell lands %d%% harder" % [
+			attacker.unit_name, int(round(attacker.rune_clarity * 100.0))], "#8fc8e0")
+	var hf_profligate_mult := 1.0
+	if hf_spell and attacker.rune_profligate > 0.0:
+		hf_profligate_mult = 1.0 + attacker.rune_profligate
 	attacker.resource = clampi(attacker.resource - _eff_cost(attacker, ab, target) \
 		+ ab.resource_gain, 0, attacker.max_resource)
 	# BATCH FU — AND THE DOOR IS TOLD WHETHER THIS WAS A CAST, which is how
@@ -8757,6 +8808,27 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					bk_doubled, "" if bk_doubled == 1 else "s",
 					"s" if bk_doubled == 1 else "", attacker.berserk_strikes],
 					"#e05050")
+		# BATCH HF — SEEKING MISSILES: ONE EXTRA MISSILE FOR EACH ENEMY UNDER
+		# ELEMENTAL WEAKNESS, COUNTED AS THE CAST BEGINS. **WHERE THEY GO: EACH
+		# SEEKS THE ENEMY IT WAS COUNTED FOR** — spread, not piled on the target:
+		# the rune pairs each missile with one weakened body, so that body is where
+		# it flies, and with Unravel's weakness on every enemy the volley reaches
+		# every enemy (the target, if weakened, takes its seeker as well as its
+		# three). They fly AFTER the volley's own missiles, and a seeker whose
+		# enemy has fallen by its launch falls back on the target; one with no
+		# living body to reach is spent. Each is an ordinary strike of this loop —
+		# its own crit, its own roll — so every rule that counts hits counts it.
+		var seek_bodies: Array = []
+		var seek_from := total_hits
+		if ab.display_name == "Magic Missiles" and attacker.rune_seeking_missiles > 0.0 \
+				and not is_counter and attacker.is_hero:
+			seek_bodies = enemies.filter(
+				func(e): return not e.dead and e.has_status("elem_weak"))
+			if not seek_bodies.is_empty():
+				total_hits += seek_bodies.size()
+				_log("   → Rune: Seeking Missiles — %d more missile%s seek%s the weakened" % [
+					seek_bodies.size(), "" if seek_bodies.size() == 1 else "s",
+					"s" if seek_bodies.size() == 1 else ""], "#8fc8e0")
 		# BATCH BV — CALIBRATING SHOT reads MISSING HEALTH BEFORE ITS OWN SHOT,
 		# and that snapshot is the whole reason the number is taken here rather
 		# than beside the other Sharpshooter riders below the loop. By the time
@@ -8871,10 +8943,24 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				strike_target = live_pool.pick_random()
 				_spread_struck[strike_target] = true
 				struck_before = strike_target
+			elif ab.multi_hits > 0 and hit_i >= seek_from and not seek_bodies.is_empty():
+				# BATCH HF — a Seeking Missile: the weakened enemy it was counted
+				# for, else the target, else nobody (the header above the loop).
+				strike_target = seek_bodies[hit_i - seek_from]
+				if strike_target.dead:
+					strike_target = target
+				if strike_target.dead:
+					continue
 			elif ab.multi_hits > 0:
 				# Repeated strikes on the chosen target; stop if it falls.
 				strike_target = target
 				if strike_target.dead:
+					# BATCH HF — unless Seeking Missiles still has missiles to fly:
+					# the volley's own are spent on a fallen target and the seekers
+					# go on to theirs.
+					if not seek_bodies.is_empty() and hit_i < seek_from:
+						hit_i = seek_from - 1
+						continue
 					break
 			else:
 				strike_target = strike_targets[hit_i]
@@ -8915,6 +9001,18 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					if attacker.dead:
 						break
 					continue
+			# BATCH HF — GRUDGE'S FOE IS WHOEVER'S BLOW LAST REACHED HIM, recorded
+			# at the door Opening and Momentum read "an enemy struck him" off — the
+			# blow-met line just below, past both miss rolls and above the Block roll
+			# — so a blocked or parried blow names its enemy and a miss does not. It
+			# stands ABOVE that line's comment rather than between the call and the
+			# Block roll, which `check_ft` §6c holds adjacent.
+			if strike_target.is_hero and not attacker.is_hero \
+					and strike_target.rune_grudge_struck > 0.0 \
+					and strike_target.grudge_foe != attacker:
+				strike_target.grudge_foe = attacker
+				_log("   → Rune: Grudge — %s now holds a grudge against %s" % [
+					strike_target.unit_name, attacker.unit_name], "#e0a050")
 			# BATCH FV §1 — MOMENTUM'S TAKEN HALF, SECOND DOOR: A BLOW MET. Every
 			# blow past the miss rolls reaches this line and no missed blow does —
 			# the single-target miss is the branch above this loop and the per-hit
@@ -9879,6 +9977,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var ps_step := 2.0 + attacker.opp_aim_step
 				raw *= 1.0 + ps_step * clampf(
 					strike_target.pressure / float(strike_target.stability), 0.0, 1.0)
+				# BATCH HF — OPPORTUNIST: double damage to a stunned enemy, whoever
+				# stunned it — Snare Trap's spring, Pommel Strike, Aper's third
+				# charge. It reads the status, so a boss that refused the stun is
+				# not stunned and is not doubled.
+				if attacker.rune_opportunist_shot > 0.0 and strike_target.has_status("stunned"):
+					raw *= 1.0 + attacker.rune_opportunist_shot
+					_log("   → Rune: Opportunist — %s is stunned; Powershot cashes it in" % \
+						strike_target.unit_name, "#b8e070")
 			# One Shot (capstone): deep enough into the patience the perfect
 			# moment arrives — Aimed Shot executes below 35% health (never
 			# bosses; elites are fair game), doubles otherwise. THE THRESHOLD IS
@@ -9987,6 +10093,25 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# BATCH GO — the Skirmisher's opening, read and spent above the loop
 			# for Exhortation's reason.
 			raw *= opening_mult
+			# BATCH HF — CLARITY AND PROFLIGATE, both decided at the spend line
+			# above the loop (a spell is a cast with a Mana price; Clarity's "at
+			# full Mana" is the bar BEFORE that price came off) and read here per
+			# strike, so a volley's every missile carries them. They compose: a
+			# Profligate Mage full enough to cast a spell at full Mana gets both.
+			raw *= hf_clarity_mult * hf_profligate_mult
+			# BATCH HF — GRUDGE: +40% against the last enemy whose blow reached
+			# him, -20% against every other. **WITH NO GRUDGE THERE IS NO PENALTY**
+			# (the brief's ruling): until an enemy's blow reaches him, and again
+			# once that enemy falls, `grudge_foe` is null and neither term applies.
+			# The foe is set at the blow-met line below, the door Opening and
+			# Momentum already read "an enemy struck him" off.
+			if attacker.is_hero and attacker.grudge_foe != null:
+				if not is_instance_valid(attacker.grudge_foe) or attacker.grudge_foe.dead:
+					attacker.grudge_foe = null
+				elif strike_target == attacker.grudge_foe:
+					raw *= 1.0 + attacker.rune_grudge_struck
+				else:
+					raw *= 1.0 + attacker.rune_grudge_rest
 			# Overburn: the Pyromancer feeds on every TURN of fire still
 			# standing on the enemy team, capped at +40% (see _overburn_mult).
 			raw *= _overburn_mult(attacker, inferno_turns)
@@ -10010,6 +10135,21 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					raw *= 1.0 - 0.05 * sc_r
 			if attacker.has_status("cripple"):
 				raw *= 0.75
+			# BATCH HF — GOADING ROAR: an enemy his taunt binds deals 25% less
+			# damage while it must attack him. The taunt is `mocked`, and its power
+			# is the hero it binds to (100 and up is a companion's roar, never his),
+			# so the bind is read the way the enemy's own target pick reads it; a
+			# taunt on a fallen Warrior binds nobody and cuts nothing. It sits at
+			# Cripple's line, which is where this game says an enemy "deals less",
+			# and it books what it spared to him, as Chilled's cut books to its own.
+			if not attacker.is_hero and attacker.has_status("mocked"):
+				var gr_i := attacker.status_power("mocked")
+				if gr_i >= 0 and gr_i < heroes.size() and not heroes[gr_i].dead \
+						and heroes[gr_i].rune_goading_roar > 0.0:
+					var gr_was := raw
+					raw *= 1.0 - heroes[gr_i].rune_goading_roar
+					if strike_target.is_hero:
+						_prev(heroes[gr_i], gr_was - raw)
 			# BATCH CT §5: the Cursed Visage's hex. MULTIPLICATIVE with Cripple
 			# rather than replacing it — they are separate statuses from separate
 			# sources and both are on the board at once often enough (the Visage
@@ -11480,10 +11620,29 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				else:
 					# Pommel Strike's perfect (Batch AH) is the Stun landing on an
 					# unbroken boss — reliability where it was a parry buff.
+					var rb_depth := strike_target.sunder_depth()
 					_apply_status(strike_target, ab.applies_status["id"], turns, status_meta,
 						_dot_tick(ab.applies_status["id"], attacker), attacker,
 						is_perfect and ab.display_name == "Pommel Strike")
 					_note_debuff_applied(attacker, ab.applies_status["id"])
+					# BATCH HF — RENDING BLOWS: a Crushing Blow on an enemy that was
+					# ALREADY Sundered deepens it, up to the rune's three. Read before
+					# the Sunder above landed, so the first Crushing Blow lays one deep
+					# and each after it one more; the power the armor line reads is the
+					# depth (`unit.sunder_depth`), and the chip says it.
+					if ab.display_name == "Crushing Blow" and attacker.rune_rending_blows > 0.0 \
+							and rb_depth > 0 and strike_target.has_status("sunder"):
+						var rb_to := mini(rb_depth + 1,
+							maxi(int(round(attacker.rune_rending_blows)), 1))
+						if rb_to > rb_depth:
+							strike_target.update_status("sunder", "D%d" % rb_to,
+								"-%d%% armor (Sundered %d deep)." % [
+									mini(int(round(BattleUnit.SUNDER_STEP * 100.0)) * rb_to, 100),
+									rb_to], rb_to)
+							_log("   → Rune: Rending Blows — the Sunder on %s deepens to %d (%d%% of its armor gone)" % [
+								strike_target.unit_name, rb_to,
+								mini(int(round(BattleUnit.SUNDER_STEP * 100.0)) * rb_to, 100)],
+								"#e0a050")
 					# Deep Chill (Batch AS): Frostbolt lays TWO stacks, not one —
 					# the free pump doubles, so the build is two casts instead of
 					# four. The extra goes through the same door as the first, so
@@ -11681,6 +11840,21 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if ab.display_name == "Magic Burst" and not strike_target.dead:
 				_apply_elem_weak(strike_target, ELEM_WEAK_PCT, ELEM_WEAK_TURNS,
 					attacker)
+			# BATCH HF — UNRAVEL: the weakness spreads to every enemy, not just the
+			# target — the same weakness, through the same door, on each living
+			# body, laid after the blow for the same reason (the Burst's own hit is
+			# not raised by it). It spreads even when the target fell to the blow:
+			# the Burst still went off.
+			if ab.display_name == "Magic Burst" and attacker.rune_unravel > 0.0:
+				var ur_n := 0
+				for ur_e in enemies:
+					if ur_e.dead or ur_e == strike_target:
+						continue
+					_apply_elem_weak(ur_e, ELEM_WEAK_PCT, ELEM_WEAK_TURNS, attacker)
+					ur_n += 1
+				if ur_n > 0:
+					_log("   → Rune: Unravel — the weakness spreads to %d more %s" % [
+						ur_n, "enemy" if ur_n == 1 else "enemies"], "#8fc8e0")
 			if ab.display_name == "Crushing Blow" and attacker.sundering_ranks > 0 \
 					and attacker.is_hero:
 				var splash_bd := int(round(pr * 1.00 * attacker.sundering_ranks))
@@ -15527,6 +15701,10 @@ func _stamp_loyalty_chip(hunter: BattleUnit, comp: BattleUnit) -> void:
 			gift = "+%d Bleed per strike" % (2 * stacks)
 		"aguila":
 			gift = "%d%% of armor ignored" % mini(20 * stacks, 100)
+		"aper":
+			# BATCH HF — the boar has no raw-stack gift (none was authored); what
+			# Loyalty buys it past the strike step is its boon, printed below.
+			gift = "the stun still every third charge"
 	var cap := _loyalty_cap(hunter)
 	var strike_step := 5.0 + hunter.wild_communion_step + hunter.rune_wild_communion_step
 	# BATCH EU §4 — THE STRIKE FIGURE READS THE PAID HALF, NOT THE METER. A chip
@@ -15583,6 +15761,24 @@ func _stamp_loyalty_chip(hunter: BattleUnit, comp: BattleUnit) -> void:
 	var info: Array = STATUS_INFO["loyalty"]
 	if not comp.update_status("loyalty", "L%d" % stacks, l_desc, stacks):
 		comp.add_status("loyalty", info[0], "L%d" % stacks, info[2], -1, l_desc, stacks)
+
+
+# BATCH HF — APER'S RHYTHM CHIP. The count since its last stun, and how many more
+# charges to the next one; stamped when the boar arrives and after every charge,
+# so what the chip says is what the next charge does. Deterministic on purpose
+# (ruled) — a chip that could not say which charge stuns would make Opportunist
+# a coin-flip.
+func _stamp_aper_rhythm(comp: BattleUnit) -> void:
+	if comp == null or comp.dead or comp.companion_kind != "aper":
+		return
+	var ar_at := comp.aper_strikes % APER_STUN_EVERY
+	var ar_left := APER_STUN_EVERY - ar_at
+	var ar_desc := "Every third charge STUNS its target\nfor 1 turn. A BOSS RESISTS UNTIL\nBROKEN. %s" % (
+		"The next charge stuns." if ar_left == 1 else "%d charges to the next stun." % ar_left)
+	var ar_short := "%d/%d" % [ar_at, APER_STUN_EVERY]
+	if not comp.update_status("aper_rhythm", ar_short, ar_desc, ar_at):
+		var ar_info: Array = STATUS_INFO["aper_rhythm"]
+		comp.add_status("aper_rhythm", ar_info[0], ar_short, ar_info[2], -1, ar_desc, ar_at)
 
 
 # The party's crit bonus from Aguila's bond (best tier among pack heroes:
@@ -15675,6 +15871,12 @@ func _healing_done_mult(caster: BattleUnit) -> float:
 	m += 0.01 * (caster.triage_heal + caster.rune_triage_heal)
 	if caster.sanctum > 0:
 		m += 0.60
+	# BATCH HF — VOW OF SILENCE'S HALF THAT PAYS: his heals, 50% stronger. It is
+	# summed with the other healer terms rather than multiplied over them, which
+	# is how this function has always composed. Consecration's drip reads the
+	# recipient's own maximum and never came through here, so it asks the vow
+	# itself (`_consecration_tick`).
+	m += caster.rune_vow_of_silence
 	return m
 
 
@@ -16736,6 +16938,10 @@ func _living_occultist() -> BattleUnit:
 # on — Decay takes root. Fires from unit.tick_statuses (natural expiry)
 # and from the Hysteria act-consumption site in _enemy_turn.
 func _on_status_expired(u: BattleUnit, id: String) -> void:
+	# BATCH HF — Detonating Ward's second door: the ward ENDS. It is a HERO's
+	# barrier, so it is asked above the enemy-only early return.
+	if id == "barrier" and u.ward_det_armed and not u.dead and not battle_over:
+		_ward_detonate(u, "ends")
 	if u.is_hero or u.dead or battle_over:
 		return
 	if not (id in ["psychosis", "bewitch", "hysteria"]):
@@ -17423,6 +17629,9 @@ func _reset_faith_meters() -> void:
 # riders are HIS talents read live, so there is nobody to grant the next one —
 # the same rule `_covering_warden` and Conviction itself already follow.
 func _on_barrier_broken(holder: BattleUnit, broke: Dictionary) -> void:
+	# BATCH HF — Detonating Ward's first door: the ward BREAKS.
+	if holder.ward_det_armed:
+		_ward_detonate(holder, "breaks")
 	var hops := int(broke.get("mantle", 0))
 	if hops <= 0:
 		return
@@ -17448,6 +17657,53 @@ func _on_barrier_broken(holder: BattleUnit, broke: Dictionary) -> void:
 	pick.float_text("MANTLE", Color(0.95, 0.88, 0.60))
 	_log("   → Mantle: the broken shield passes from %s to %s (%d pass(es) left)" % [
 		holder.unit_name, pick.unit_name, hops - 1], "#c8b880")
+
+
+# BATCH HF — DETONATING WARD: WHEN THE WARD BREAKS OR ENDS, IT DEALS THE DAMAGE IT
+# ABSORBED TO EVERY ENEMY. Armed at Nexus Ward's cast; `unit.take_hit` books every
+# absorb while armed (the barrier is one pool, so whatever shares it — an
+# Abundance shield, a Divine Shield the ward was cast over — is the ward too).
+# **THE TWO DOORS THE BRIEF NAMES AND NO THIRD**: a break (`barrier_broken_cb`,
+# the Mantle's door, called from inside the blow that broke it — so the blast
+# lands mid-blow, exactly where Mirror Guard's return already does) and an end
+# (`status_expired_cb`, at his turn's tick). A barrier stripped some other way, or
+# a ward on a Mage who falls, pays nothing, and the next cast starts the count
+# over. **THE NUMBER IS THE NUMBER**: what it absorbed, to each living enemy, as a
+# flat blow — no armor and no resistance, because either would make it less than
+# the damage it ate. The frame is his while it lands and the blow's own after.
+func _ward_detonate(holder: BattleUnit, how: String) -> void:
+	var wd_total := holder.ward_det_absorbed
+	holder.ward_det_armed = false
+	holder.ward_det_absorbed = 0
+	if holder.dead or holder.rune_detonating_ward <= 0.0:
+		return
+	var wd_amt := int(round(wd_total * holder.rune_detonating_ward))
+	if wd_amt <= 0:
+		_log("   → Rune: Detonating Ward — the ward %s having absorbed nothing" % how,
+			"#909090")
+		return
+	var wd_was_src: BattleUnit = _dmg_src
+	var wd_was_label := _dmg_label
+	var wd_was_name := _dmg_src_name
+	var wd_hit: Array = []
+	for wd_e in enemies.duplicate():
+		if wd_e.dead:
+			continue
+		_dmg_frame(holder, "Detonating Ward")
+		var wd_res: Dictionary = wd_e.take_hit(wd_amt, 0)
+		wd_e.float_text("-%d Ward" % wd_amt, Color(0.40, 0.85, 0.95))
+		_stat("dmg_hero_" + _contrib_name(holder), wd_amt)
+		wd_hit.append(wd_e.unit_name)
+		if wd_res["died"]:
+			_stat("enemy_deaths")
+			_sfx("death", -4.0)
+			_message("%s falls!" % wd_e.unit_name)
+			_log("† %s dies" % wd_e.unit_name, "#e05050")
+			_on_enemy_death(wd_e)
+	_dmg_frame(wd_was_src, wd_was_label, wd_was_name)
+	if not wd_hit.is_empty():
+		_log("   → Rune: Detonating Ward — %s's ward %s and deals the %d it absorbed to every enemy (%s)" % [
+			holder.unit_name, how, wd_amt, ", ".join(wd_hit)], "#8fc8e0")
 
 
 # Conviction: a mitigated hit steels the struck ally. At 5 stacks the
@@ -17709,13 +17965,111 @@ func _ground_faith_tick(u: BattleUnit) -> void:
 func _consecration_tick(u: BattleUnit) -> void:
 	if u.dead or not u.has_status("consecration"):
 		return
-	var cn_amt := maxi(int(round(u.max_hp * CONSECRATION_PCT)), 1)
+	var cn_src := String(u.get_status("consecration").get("src_name", ""))
+	var cn_pct := CONSECRATION_PCT
+	# BATCH HF — VOW OF SILENCE reaches the drip. The drip is 5% of the
+	# RECIPIENT's maximum and never read `_healing_done_mult`, so the vow's term is
+	# asked here off the Cleric the ground is booked to; nothing else of his is.
+	var cn_cleric := _hero_named(cn_src)
+	if cn_cleric != null and cn_cleric.rune_vow_of_silence > 0.0:
+		cn_pct *= 1.0 + cn_cleric.rune_vow_of_silence
+	var cn_amt := maxi(int(round(u.max_hp * cn_pct)), 1)
 	var cn_got := u.heal_amount(cn_amt, true)
 	if cn_got <= 0:
 		return
 	u.float_text("+%d" % cn_got, Color(0.95, 0.88, 0.60))
-	_stat_heal(String(u.get_status("consecration").get("src_name", "")), cn_got, u)
+	_stat_heal(cn_src, cn_got, u)
 	_log("%s regains %d on consecrated ground" % [u.unit_name, cn_got], "#c8b880")
+
+
+# BATCH HF — BURNING GROUND: CONSECRATION ALSO BURNS EVERY ENEMY, EACH TURN IT
+# LASTS. **"Each turn it lasts" is the CASTER's**: the blessing is four turns on
+# every hero he laid it on, and his own copy counts down on his own turns, so the
+# ground burns once at the start of each of HIS turns while HIS copy holds — four
+# burns a cast, the four heals his own body takes — rather than once per hero's
+# turn, which would be sixteen. It ticks beside the drip and above
+# `tick_statuses`, for the drip's reason (a four-turn blessing is read four
+# times). **THE BURN IS 5% OF HIS MAXIMUM HEALTH — PROPOSED, NOT RULED**: the
+# drip's own 5%, measured off the caster where the heal is measured off each
+# recipient, carried in the rune's payload so a ruling moves data and not code.
+# Holy, so an enemy's holy resistance takes its share, and a tick, so no armor —
+# the drip's school and a DoT's rule. A dead Cleric's ground still heals and no
+# longer burns: nothing starts his turn.
+# **AND IT SITS OUT BESIDE VOW OF SILENCE** (HF §5): the vow forbids every point of
+# damage he deals, this is all this rune does, and the tell says so
+# (`Runes.CANCELLED_BY`); it does not even try, so the log is not a column of
+# zeroes.
+func _burning_ground_tick(u: BattleUnit) -> void:
+	if u.dead or not u.is_hero or u.is_companion or u.rune_burning_ground <= 0.0 \
+			or u.rune_vow_of_silence > 0.0 or not u.has_status("consecration") \
+			or String(u.get_status("consecration").get("src_name", "")) != u.unit_name:
+		return
+	var bg_base := u.max_hp * u.rune_burning_ground
+	var bg_hit: Array = []
+	for bg_e in enemies.duplicate():
+		if bg_e.dead:
+			continue
+		var bg_amt := maxi(int(round(bg_base
+			* (1.0 - float(bg_e.resists.get("holy", 0.0))))), 1)
+		_dmg_frame(u, "Burning Ground")
+		var bg_died: bool = bg_e.take_tick_damage(bg_amt, "-%d Burning Ground" % bg_amt,
+			Color(0.95, 0.80, 0.45))
+		if not bg_e.is_hero:
+			_stat("dmg_hero_" + _contrib_name(u), bg_amt)
+		bg_hit.append("%s %d" % [bg_e.unit_name, bg_amt])
+		if bg_died:
+			_stat("enemy_deaths")
+			_message("%s falls!" % bg_e.unit_name)
+			_log("† %s dies" % bg_e.unit_name, "#e05050")
+			_on_enemy_death(bg_e)
+	if not bg_hit.is_empty():
+		_log("Burning Ground: the consecrated ground burns — %s" % \
+			", ".join(bg_hit), "#e8c070")
+
+
+# BATCH HF — RETURNED BURDEN: EVERY HARMFUL EFFECT UNBURDEN REMOVES IS CAST ONTO AN
+# ENEMY. **WHICH ENEMY: THE ONE THAT APPLIED IT, WHILE IT STILL STANDS** — the
+# rune's own word is *returned*, and a burden returned goes back to whoever laid
+# it, which also makes the card an answer to the enemy doing the laying. The
+# applier is the name `_apply_status` stamped on the status (`src_name`, DI's
+# rule), matched to a living enemy of that name — so where two of one kind stand,
+# the first of that name on the field takes it, since instances of a kind share
+# a name. **OTHERWISE ANOTHER, AT RANDOM**: the applier has fallen, or the effect
+# carries no applier (a bargain's, a modifier's — 104 applications pass no
+# `src`), or a hero laid it; nothing says which other enemy, so none is preferred.
+# **EACH GOES AS IT STOOD** — its turns left, its power, its tick, every stack —
+# through `_apply_status` with the Cleric as its source, so a boss still refuses
+# a stun until Broken (CR §1), Hallowed still refuses, and a tick of it is now
+# his (under Vow of Silence, a tick that deals nothing).
+func _return_burden(cleric: BattleUnit, from: BattleUnit, taken: Array) -> void:
+	var rb_sent: Array = []
+	for eff in taken:
+		var rb: Dictionary = eff
+		var rb_id := String(rb.get("id", ""))
+		if not STATUS_INFO.has(rb_id):
+			continue
+		var rb_to: BattleUnit = null
+		var rb_src := String(rb.get("src_name", ""))
+		if rb_src != "":
+			for rb_e in enemies:
+				if not rb_e.dead and rb_e.unit_name == rb_src:
+					rb_to = rb_e
+					break
+		if rb_to == null:
+			var rb_live: Array = enemies.filter(func(e): return not e.dead)
+			if rb_live.is_empty():
+				break
+			rb_to = rb_live.pick_random()
+		var rb_turns := int(rb.get("turns", 1))
+		if rb_turns == 0:
+			rb_turns = 1
+		for _rb_s in maxi(int(rb.get("stacks", 1)), 1):
+			_apply_status(rb_to, rb_id, rb_turns, int(rb.get("power", 0)),
+				int(rb.get("tick", 0)), cleric)
+		rb_sent.append("%s to %s" % [String(STATUS_INFO[rb_id][0]), rb_to.unit_name])
+	if not rb_sent.is_empty():
+		_log("   → Rune: Returned Burden — what %s carried goes back: %s" % [
+			from.unit_name, ", ".join(rb_sent)], "#70d878")
 
 
 # BATCH BH §2 — RUNE-ONLY, AND IT IS A RE-POINT RATHER THAN A NEW DESIGN. The
@@ -18487,7 +18841,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# Resolved directly past that door (a gate's sweep), it summons nothing
 			# and says so, rather than reading a companion called "companion".
 			var sm_kind := ab.display_name.get_slice(" ", 1).to_lower()
-			if not Classes.COMPANION_KINDS.has(sm_kind):
+			if not Classes.is_companion_kind(sm_kind):
 				push_warning("%s resolved with no companion chosen — nothing is summoned" % ab.display_name)
 			else:
 				await _do_summon(attacker, sm_kind, target)
@@ -19790,6 +20144,14 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# out through a class card.
 			var mb_pct := 0.20
 			var mb_power := maxi(int(round(attacker.max_hp * mb_pct)), 1)
+			# BATCH HF — DETONATING WARD ARMS HERE. A ward cast over one that is
+			# already armed and standing is the same ward, refreshed, and keeps
+			# counting; any other cast starts the count at nothing, so a total
+			# left by a barrier that went some other way is never paid out later.
+			if attacker.rune_detonating_ward > 0.0:
+				if not (attacker.ward_det_armed and attacker.has_status("barrier")):
+					attacker.ward_det_absorbed = 0
+				attacker.ward_det_armed = true
 			# `add_status` already takes the MAX of power and turns on
 			# re-application, so a fresh ward can never be worth less than the
 			# one it replaces and this site needs no arithmetic of its own.
@@ -19918,8 +20280,18 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# multiplier is applied to both so the gap survives every build.
 			if target != null and not target.dead:
 				var mn_pct := 0.26 if is_perfect else 0.20
+				# BATCH HF — ELEVENTH HOUR: twice as much on an ally below a quarter
+				# health, read BEFORE the heal lands (after it, nobody is low). The
+				# rune's field is the increase, so 1.0 is twice; it multiplies the
+				# whole heal, the Perfect and the healer terms included.
+				var mn_eleventh := attacker.rune_eleventh_hour > 0.0 \
+					and target.hp < target.max_hp * ELEVENTH_HOUR_AT
 				var mn_amount := maxi(int(round(target.max_hp * mn_pct
-					* _healing_done_mult(attacker))), 1)
+					* _healing_done_mult(attacker)
+					* (1.0 + attacker.rune_eleventh_hour if mn_eleventh else 1.0))), 1)
+				if mn_eleventh:
+					_log("   → Rune: Eleventh Hour — %s is below a quarter health; the office doubles" % \
+						target.unit_name, "#70d878")
 				_sfx("heal", -8.0)
 				# Book what LANDED, not what was asked for (the BC log-honesty
 				# rule): a heal into a full bar must not read like a heal into
@@ -19974,7 +20346,12 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# METER STATE and stays, sticky poison refuses every cleanse.
 			if target != null and not target.dead:
 				var ub_turns := 3
-				var ub_removed := target.purge_debuffs()
+				# BATCH HF — the cleanse hands back what it took (one filter,
+				# `purge_debuffs_taken`), so Returned Burden can cast it onward.
+				var ub_taken: Array = target.purge_debuffs_taken()
+				var ub_removed := ub_taken.size()
+				if attacker.rune_returned_burden > 0.0 and not ub_taken.is_empty():
+					_return_burden(attacker, target, ub_taken)
 				_apply_status(target, "unburdened", ub_turns)
 				var ub_st := target.get_status("unburdened")
 				if not ub_st.is_empty():
@@ -23136,6 +23513,9 @@ const COMPANION_STATS := {
 	"ursus": [110, Color(0.9, 0.3, 0.25)],
 	"canis": [80, Color(0.35, 0.55, 0.95)],
 	"aguila": [80, Color(0.35, 0.85, 0.4)],
+	# BATCH HF — Aper, Tusk and Bristle's boar. Its body is the wolf's and the
+	# eagle's 80 (PROPOSED — none was authored); the sphere is a tusk-brown.
+	"aper": [80, Color(0.62, 0.45, 0.28)],
 }
 
 
@@ -23179,6 +23559,17 @@ func _deepest_bond(hunter: BattleUnit) -> BattleUnit:
 # The shared Swap Companion cooldown before Quick Whistle shaves it.
 const SWAP_COOLDOWN := 3
 
+# BATCH HF — THE BOT'S ORDER OF PREFERENCE WHEN IT CALLS A COMPANION, WRITTEN ONCE.
+# It was the literal `["canis", "aguila", "ursus"]` at three sites (the class
+# kit's case, the rotation's fill and its swap), and a list copied three times
+# is three lists. **APER LEADS, AND IT IS HANDED ONLY TO A HUNTER WEARING TUSK
+# AND BRISTLE** (`_summon_choice` refuses it to everyone else), so every other
+# Hunter's order is the three it always was, draw for draw: the rune is bought to
+# field the boar, and a bot that owned it and never called it would measure a
+# build nobody plays — the shape GN and GS both found for cards outside the
+# bot's branches.
+const BOT_PET_ORDER := ["aper", "canis", "aguila", "ursus"]
+
 
 # BATCH AY §7 — WHAT A BOON IS WORTH TO THE BOT RIGHT NOW, so "swap only when
 # the incoming boon is the better one" is a comparison and not a vibe. Each
@@ -23208,6 +23599,11 @@ func _bot_boon_worth(hunter: BattleUnit, kind: String) -> float:
 		"aguila":
 			# +10% crit for the whole party: flat, and always live.
 			return 0.10 * curve
+		"aper":
+			# BATCH HF — its charge lands 15% harder a curve step, and every third
+			# charge stuns: priced at its boon, flat, as the eagle's is. The stun is
+			# not priced in — it is the same every third strike at any Loyalty.
+			return APER_BOON_PCT * curve
 	return 0.0
 
 
@@ -23473,6 +23869,9 @@ func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null,
 	if kind in ["canis", "aguila"]:
 		var el_info: Array = STATUS_INFO["elusive"]
 		comp.add_status("elusive", el_info[0], el_info[1], el_info[2], -1, el_info[3])
+	# BATCH HF — the boar arrives showing its rhythm at 0 of 3: a fresh body.
+	if kind == "aper":
+		_stamp_aper_rhythm(comp)
 	# Feral Momentum / Menagerie bookkeeping: this beast has been fielded.
 	hunter.kinds_summoned[kind] = true
 	# Lone Bond's gate: only a REAL summon spends the one beast. Call of the
@@ -23716,6 +24115,31 @@ func _companion_strike(comp: BattleUnit, victim: BattleUnit, mult: float,
 				_apply_status(victim, "exposed", 4 if boosted else 2, 0, 0, comp)
 				if comp.has_status("bestial"):
 					_apply_status(victim, "blind", 2, 0, 0, comp)
+		"aper":
+			# BATCH HF — THE BOAR CHARGES, AND EVERY THIRD STRIKE STUNS ITS TARGET
+			# FOR ONE TURN. **THE RHYTHM IS FIXED AND NEVER SHORTENS** (ruled: a stun
+			# that tightened with the bond would end at a boar that locks a room),
+			# and it is DETERMINISTIC ON PURPOSE, so the player can see which charge
+			# stuns and hold Powershot for it — the chip below says it. Every charge
+			# counts, on the body (`aper_strikes`: a fresh summon, a swap and a new
+			# fight each start it over). **A BOSS RESISTS UNTIL BROKEN**, Pommel
+			# Strike's rule exactly — the refusal in `_apply_status`, reached by not
+			# forcing; the charge still counts, so a boss is not stun-locked by a pet.
+			# **LOYALTY RAISES ITS CHARGE**: the strike step every companion takes
+			# (`dmg_mult`) and, under Pack Bond, its boon — its own charge, 15% harder
+			# a curve step (PROPOSED: the wolf's 15%); the stun stays every third.
+			var ap_boon := 0.0
+			if comp.pack_master != null:
+				ap_boon = APER_BOON_PCT * _bond_mult(comp.pack_master, "aper")
+			await _companion_hit(comp, victim, APER_CHARGE_PCT * comp.attack * dmg_mult
+				* (1.0 + ap_boon), 0)
+			comp.aper_strikes += 1
+			if comp.aper_strikes % APER_STUN_EVERY == 0 and not victim.dead:
+				_apply_status(victim, "stunned", APER_STUN_TURNS, 0, 0, comp)
+				if victim.has_status("stunned"):
+					_log("   → %s's third charge STUNS %s" % [comp.unit_name,
+						victim.unit_name], "#e0a050")
+			_stamp_aper_rhythm(comp)
 
 
 # All beasts deal physical damage using the hunter's inherited crit chance.
@@ -24114,16 +24538,17 @@ func _apply_poison(src: BattleUnit, victim: BattleUnit, turns: int) -> void:
 	# a poison uncleansable, and taking cleansing off the table is the
 	# capstone's, not this rune's.
 	#
-	# **BATCH HE §1 — AND THE RUNE ASKS HIS ENGINE (ruled).** His Poison is the
-	# Survivalist's — Trapper's barb and its on-hit package lay it — and the rune
-	# is gated on Trapper at every door (`Runes.ENGINE_READ`); a wearer without it
-	# is told the rune sits out (GX), so a poison a drafted Explosive Shot laid
-	# must count down as any other. Thin Blood's price above asks the same engine
-	# for GW §3's reason.
+	# **BATCH HE §1 GATED THE RUNE ON TRAPPER; BATCH HF §6 UN-GATED IT.** HE read
+	# his Poison as the Survivalist's alone, on HC's finding that no class kit lays
+	# one — but Snare Trap is in every Hunter's kit, and its spring calls THIS
+	# function with the Hunter as `src` (the turn-start snare block): the same
+	# status, through the same door, that this rune reads. So it asks no engine
+	# again, and every Hunter's snare poison stops counting down. Thin Blood's
+	# price above still asks Trapper, for GW §3's reason — its payout is the barb.
 	if src.perfected_toxin > 0:
 		p_turns = -1
 		sticky = true
-	elif src.rune_long_poison > 0 and src.has_engine("trapper"):
+	elif src.rune_long_poison > 0:
 		p_turns = -1
 	for _i in 1 + src.virulence_ranks:
 		_apply_status(victim, "poison", p_turns, 0, tick, src)
@@ -27944,11 +28369,61 @@ func _stat_heal(owner, amount: float, healed: BattleUnit = null) -> void:
 	# other side). The SIM COLUMNS ARE BYTE-UNCHANGED — they still book `amount`,
 	# so every contribution row ever measured stays comparable.
 	_book_healing(owner, amount, healed)
+	# BATCH HF — ABUNDANCE rides the same door, for Reprisal's reason: every heal
+	# that names its healer and its recipient arrives here, so a heal a later
+	# card adds reaches the rune without anybody remembering to.
+	_abundance_shield(owner, healed)
 	if not sim or amount <= 0.0:
 		return
 	var name := _contrib_name(owner)
 	if name != "":
 		_stat("heal_hero_" + name, amount)
+
+
+# BATCH HF — ABUNDANCE: HEALING BEYOND AN ALLY'S MISSING HEALTH BECOMES A SHIELD ON
+# THEM. The spill is `last_overheal`, which `heal_amount` stamps on the recipient
+# and `_book_healing` above already trusts; the healer is the owner this door was
+# handed (a name for a Consecration drip, whose caster may have fallen — and a
+# fallen Cleric's ground still shields: the drip is still his heal, booked to him,
+# and `_hero_named` finds his body where it fell).
+# **THE SHIELD ADDS**: it is the `barrier` pipeline every shield in the game rides
+# (the absorb, its riders, the prevented ledger), and the overheal is added to
+# whatever barrier stands rather than maxed against it — the rune says the spill
+# BECOMES a shield, and a max would make most of it become nothing. **IT HOLDS
+# TWO TURNS — PROPOSED, NOT RULED**: Blessed Vestments' duration, the one other
+# heal that leaves a barrier behind; a standing barrier's longer clock is kept.
+# **NO CEILING IS WRITTEN** — how fast it stacks under Consecration is measured
+# in `docs/reports/HF.md` §5 and is the designer's to cap or not. A barrier that
+# stood with no source takes his name, so what it absorbs credits him; one laid by
+# someone else keeps theirs, and its riders (a divine flag, a Mantle) with it.
+func _abundance_shield(owner, healed: BattleUnit) -> void:
+	if healed == null or not is_instance_valid(healed) or healed.dead \
+			or healed.last_overheal <= 0 or healed.overheal_shielded:
+		return
+	var ab_h: BattleUnit = null
+	if owner is BattleUnit:
+		ab_h = owner
+	elif owner is String:
+		ab_h = _hero_named(String(owner))
+	if ab_h == null or not is_instance_valid(ab_h) or ab_h.rune_abundance <= 0.0:
+		return
+	var ab_add := int(round(healed.last_overheal * ab_h.rune_abundance))
+	if ab_add <= 0:
+		return
+	healed.overheal_shielded = true
+	var ab_turns := ABUNDANCE_TURNS
+	if healed.has_status("barrier") \
+			and int(healed.get_status("barrier").get("turns", 0)) < 0:
+		ab_turns = -1
+	var ab_had := maxi(healed.status_power("barrier"), 0)
+	_apply_status(healed, "barrier", ab_turns, ab_had + ab_add)
+	var ab_st := healed.get_status("barrier")
+	if not ab_st.is_empty() and String(ab_st.get("src", "")) == "":
+		ab_st["src"] = ab_h.unit_name
+	healed.float_text("+%d shield" % ab_add, Color(0.40, 0.85, 0.95))
+	_log("   → Rune: Abundance — %s's overheal of %d becomes a shield on %s (%d)" % [
+		ab_h.unit_name, healed.last_overheal, healed.unit_name, ab_had + ab_add],
+		"#70d878")
 
 
 # BATCH BU — WHAT REPRISAL READS, WRITTEN AT THE ONE PLACE HEALING IS CREDITED.
@@ -28033,6 +28508,31 @@ func _dmg_frame(src: BattleUnit, label: String, src_name := "") -> void:
 	_dmg_src = src
 	_dmg_label = label
 	_dmg_src_name = src_name
+
+
+# BATCH HF — VOW OF SILENCE: "HE DEALS NO DAMAGE", READ OFF THIS FRAME. The frame
+# is what the recap already reads to say who dealt a blow, and what the Weaver,
+# the Leech and the Arbiter are paid off, so "no damage" here is "nothing the
+# game credits to him lands" — his basic, a drafted card, a tick of a status he
+# laid, Burning Ground — with no list of his sources to fall behind the next card
+# he drafts. Called from `unit.take_hit` and `unit.take_tick_damage`, above
+# everything either does, and it answers for ENEMIES only: damage to his own side
+# (a health cost he pays, a blow that reflects onto him) is not damage he deals
+# to anyone the vow is about, and the side test is also what keeps a frame left
+# standing from an earlier action from ever silencing an enemy's blow on a hero.
+# **BREAK DAMAGE IS NOT HERE**: it rides `take_hit`'s `pressure_add` and is its
+# own word in this game ("Break damage (BD)"), so a Vow Cleric still Breaks.
+func _deal_gate(victim: BattleUnit, amount: int) -> int:
+	if amount <= 0 or victim == null or victim.is_hero:
+		return amount
+	var vs: BattleUnit = _dmg_src
+	if vs == null or not is_instance_valid(vs):
+		vs = _hero_named(_dmg_src_name) if _dmg_src_name != "" else null
+	if vs == null or not vs.is_hero or vs.is_companion or vs == victim \
+			or vs.rune_vow_of_silence <= 0.0:
+		return amount
+	victim.float_text("SILENT", Color(0.85, 0.85, 0.75))
+	return 0
 
 
 # WHO A SOURCE IS, FOR THE RECAP — AND FOR AN ENEMY THAT IS ITS KIND, NEVER ITS

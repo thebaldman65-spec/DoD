@@ -60,14 +60,18 @@ const RULED := {
 	"Transference": "old_gods", "Requiem": "old_gods",
 	"Unleash": "pack", "Primal Surge": "pack",
 }
-# **BATCH HE §2 — A ROW THE DESIGNER RULED, WHICH THE DOOR NEVER REFUSES.** Mark of
-# the Hunt half-works without Pack Bond (its companion's halves read no engine),
-# so the census below can never find it; it was ruled Pack Bond's and sits out
-# with it. It is held APART from `RULED`, whose population the census derives,
-# and driven as a ruling (HD §1's rule for a ruled row): its premise asserted —
-# usable bare — and its seat driven with the derived rows. The day the door
-# refuses it bare, the census has found it and the ruling is no longer why.
-const RULED_BY_DESIGNER := {"Mark of the Hunt": "pack"}
+# **BATCH HE §2 RULED A ROW THE DOOR NEVER REFUSES, AND BATCH HF §7 UNDID IT (the
+# designer).** Mark of the Hunt half-works without Pack Bond (its companion's
+# halves read no engine), so the census below can never find it; HE ruled it Pack
+# Bond's, to sit out with it, and HF §7 took the ruling back on that half: it is
+# offered to every Hunter with a pet and sits out only beside the engine that
+# dismisses the pet (`Classes.COMPANION_READ`'s ruled `seat`, `check_hf` §5). **So
+# it is held here as an UNDONE row, keyed to the engine HE named**: asserted to be
+# a row of neither table, its premise kept — usable bare, which is why it is no
+# row — and driven through Pack Bond's drive as a card that STAYS SEATED when the
+# engine is dropped, on the bar and on both screens. The day the door refuses it
+# bare, the census has found it, and whether it sits out is a question again.
+const UNDONE_BY_DESIGNER := {"Mark of the Hunt": "pack"}
 # THE TEN THE DOOR REFUSES BARE THAT ARE NOT ROWS, AND WHAT OPENS EACH WITH NO
 # ENGINE: a drafted Guard Change turns the guard Defensive; a heal landed first;
 # an enemy under 20% health; a companion from an earned Call the Wilds.
@@ -583,17 +587,17 @@ func _s3_the_card_that_sits_out() -> void:
 			"§3: %s reads %s in `ENGINE_READ` and sits out without %s" % [card, er, RULED[card]])
 		ok(Classes.sits_out_ruled(String(card)) == "",
 			"§3: %s is a derived row and carries a ruling (`%s`)" % [card, Classes.sits_out_ruled(String(card))])
-	for cardr in RULED_BY_DESIGNER:
-		var er2 := String(RULED_BY_DESIGNER[cardr])
-		ok(Classes.sits_out_engine(String(cardr)) == er2 and Classes.sits_out_ruled(String(cardr)) == "HE §2",
-			"§3: %s sits out without %s by the designer's ruling; the table says %s (`ruled` %s)" % [
-				cardr, er2, Classes.sits_out_engine(String(cardr)), Classes.sits_out_ruled(String(cardr))])
-		ok(Classes.engine_read(String(cardr)) == er2 and Classes.engine_read_ruled(String(cardr)) == "HE §2",
-			"§3: %s is not the same ruled row in `ENGINE_READ` (%s, `ruled` %s)" % [
+	for cardr in UNDONE_BY_DESIGNER:
+		ok(Classes.sits_out_engine(String(cardr)) == "" and Classes.sits_out_ruled(String(cardr)) == ""
+				and not table.has(cardr),
+			"§3: %s still sits out without %s — HF §7 undid HE §2's ruling (the table says %s, `ruled` %s)" % [
+				cardr, UNDONE_BY_DESIGNER[cardr], Classes.sits_out_engine(String(cardr)),
+				Classes.sits_out_ruled(String(cardr))])
+		ok(Classes.engine_read(String(cardr)) == "" and Classes.engine_read_ruled(String(cardr)) == "",
+			"§3: %s is still gated in `ENGINE_READ` — HF §7 undid HE §2's ruling (%s, `ruled` %s)" % [
 				cardr, Classes.engine_read(String(cardr)), Classes.engine_read_ruled(String(cardr))])
-		ok(String(table.get(cardr, {}).get("why", "")) != "", "§3: %s's row carries no why" % cardr)
 	for card2 in table:
-		ok(RULED.has(card2) or RULED_BY_DESIGNER.has(card2), "§3: %s sits out, and no ruling named it" % card2)
+		ok(RULED.has(card2), "§3: %s sits out, and no ruling named it" % card2)
 	ok(Classes.sits_out("Death Ray", []) and not Classes.sits_out("Death Ray", ["resonance"])
 			and not Classes.sits_out("Arcane Cannon", []),
 		"§3: `Classes.sits_out` does not answer by the table")
@@ -624,7 +628,7 @@ func _s3_the_card_that_sits_out() -> void:
 			var refused := not _usable(s, u, ab)
 			if refused:
 				refused_all.append(String(card3))
-			if RULED_BY_DESIGNER.has(card3):
+			if UNDONE_BY_DESIGNER.has(card3):
 				met_ruled[String(card3)] = refused
 			ok(not refused or RULED.has(card3) or CARD_ROUTES.has(card3),
 				"§3: a %s holding no engine is refused %s, which is neither a row nor a card-conditional card" % [key, card3])
@@ -636,10 +640,11 @@ func _s3_the_card_that_sits_out() -> void:
 		"§3: the census asked %d cards and %d were refused bare — %d named" % [asked, refused_all.size(), named])
 	for r3 in RULED.keys() + CARD_ROUTES.keys():
 		ok(refused_all.has(r3), "§3: %s was not met in any class's earnable pool" % r3)
-	# THE RULED ROW'S PREMISE: met in an earnable pool and NOT refused bare.
-	for r4 in RULED_BY_DESIGNER:
+	# THE UNDONE ROW'S PREMISE: met in an earnable pool and NOT refused bare —
+	# the half-working that made HF §7 take the ruling back.
+	for r4 in UNDONE_BY_DESIGNER:
 		ok(met_ruled.has(r4) and not bool(met_ruled[r4]),
-			"§3: %s is a ruled row, and the census %s — the ruling is no longer why it sits out" % [
+			"§3: %s's row was undone because it half-works bare, and the census %s — whether it sits out is a question again" % [
 				r4, "never met it" if not met_ruled.has(r4) else "found the door refuses it bare"])
 	print("    the census: %d earnable cards asked with no engine; %d refused — %d rows and %d card-conditional" % [
 		asked, refused_all.size(), RULED.size(), CARD_ROUTES.size()])
@@ -701,7 +706,6 @@ func _s3_the_card_that_sits_out() -> void:
 					s3._gain_loyalty(u3, b.companion_kind, 3)
 		u3.resource = 99999
 		var every: Dictionary = RULED.duplicate()
-		every.merge(RULED_BY_DESIGNER)
 		for card5 in every:
 			if every[card5] != pid:
 				continue
@@ -711,8 +715,8 @@ func _s3_the_card_that_sits_out() -> void:
 			if yes:
 				opened += 1
 		await _clear(s3)
-	ok(opened == RULED.size() + RULED_BY_DESIGNER.size(),
-		"§3: %d of %d rows opened with their engine held" % [opened, RULED.size() + RULED_BY_DESIGNER.size()])
+	ok(opened == RULED.size(),
+		"§3: %d of %d rows opened with their engine held" % [opened, RULED.size()])
 	# (e) THE DRIVE, ONE ENGINE AT A TIME, THROUGH THE REAL DOORS.
 	for pid2 in ["permafrost", "resonance", "mercy", "conviction", "old_gods", "pack"]:
 		await _drive(pid2)
@@ -724,8 +728,9 @@ func _s3_the_card_that_sits_out() -> void:
 func _drive(pid: String) -> void:
 	var key := Classes.engine_class(pid)
 	var seat := SEATS.find(key)
-	var rows: Array = RULED.keys().filter(func(c): return RULED[c] == pid) \
-		+ RULED_BY_DESIGNER.keys().filter(func(c): return RULED_BY_DESIGNER[c] == pid)
+	var rows: Array = RULED.keys().filter(func(c): return RULED[c] == pid)
+	# BATCH HF §7 — a row undone is carried with the engine and STAYS SEATED without it.
+	var undone: Array = UNDONE_BY_DESIGNER.keys().filter(func(c): return UNDONE_BY_DESIGNER[c] == pid)
 	var control := String(CONTROL.get(key, ""))
 	_seat_party()
 	_run.zone_bosses_cleared = 3
@@ -736,7 +741,7 @@ func _drive(pid: String) -> void:
 	# THROUGH THE DOORS A PLAYER USES: the draft's for a pool card, the boss
 	# pick's one writer for a zone-boss card.
 	var drafted := Classes.draft_pool(key)
-	for card in rows + [control]:
+	for card in rows + undone + [control]:
 		if drafted.has(card):
 			m["draft_candidates"] = [[card]]
 			m["draft_picks_owed"] = 1
@@ -747,10 +752,10 @@ func _drive(pid: String) -> void:
 	var pool_before: Array = m.get("bm_abilities", []).duplicate()
 	var carried_before: Array = _run.equipped_ability_names(m)
 	var slots_before: int = int(_run.ability_slots_used(m))
-	ok(carried_before.size() == rows.size() + 1, "§3 %s: carrying %s" % [pid, str(carried_before)])
+	ok(carried_before.size() == rows.size() + undone.size() + 1, "§3 %s: carrying %s" % [pid, str(carried_before)])
 	# HELD: every row seated.
 	var got: Array = await _bar(seat, m)
-	for card2 in rows + [control]:
+	for card2 in rows + undone + [control]:
 		ok(got.has(card2), "§3 %s: holding the engine, the fight does not seat %s (%s)" % [pid, card2, str(got)])
 	# DROPPED, THROUGH THE POUCH'S DOOR.
 	ok(bool(_run.toggle_engine(m, 0)) and Runes.held_engines(m).is_empty(),
@@ -766,13 +771,18 @@ func _drive(pid: String) -> void:
 	sat.sort()
 	var want: Array = rows.duplicate()
 	want.sort()
-	ok(sat == want and seated == [control], "§3 %s: sitting out %s and seated %s" % [pid, str(sat), str(seated)])
+	var want_seated: Array = undone + [control]
+	want_seated.sort()
+	seated.sort()
+	ok(sat == want and seated == want_seated, "§3 %s: sitting out %s and seated %s" % [pid, str(sat), str(seated)])
 	var got2: Array = await _bar(seat, m, true)
 	for card3 in rows:
 		ok(not got2.has(card3), "§3 %s: with the engine dropped the fight still seats %s" % [pid, card3])
 	ok(got2.has(control), "§3 %s: with the engine dropped the fight does not seat %s either" % [pid, control])
+	for cardu in undone:
+		ok(got2.has(cardu), "§3 %s: with the engine dropped the fight does not seat %s — HF §7 undid its row" % [pid, cardu])
 	# THE SCREENS SAY WHY.
-	await _screens_say_why(pid, seat, rows)
+	await _screens_say_why(pid, seat, rows, undone)
 	# THE SAVE CARRIES IT.
 	_run.save_run()
 	ok(_run.load_run(), "§3 %s: the harness save did not load back" % pid)
@@ -790,7 +800,7 @@ func _drive(pid: String) -> void:
 		"§3 %s: the pouch's door did not slot the engine back" % pid)
 	ok(_run.sitting_out_names(m2).is_empty(), "§3 %s: cards still sit out with the engine back" % pid)
 	var got3: Array = await _bar(seat, m2)
-	for card4 in rows:
+	for card4 in rows + undone:
 		ok(got3.has(card4), "§3 %s: the engine is back and the fight does not seat %s" % [pid, card4])
 	print("    %s: %s — kept, %d slots before and after the drop, left out of the fight and seated again" % [
 		pid, ", ".join(PackedStringArray(rows)), slots_before])
@@ -845,7 +855,7 @@ func _bar(seat: int, m: Dictionary, run_it := false) -> Array:
 	return names
 
 
-func _screens_say_why(pid: String, seat: int, rows: Array) -> void:
+func _screens_say_why(pid: String, seat: int, rows: Array, undone: Array = []) -> void:
 	var rune_name := String(Runes.config(Runes.engine_rune_id(pid))["name"])
 	# THE HERO SHEET.
 	_run.hero_screen_idx = seat
@@ -864,6 +874,13 @@ func _screens_say_why(pid: String, seat: int, rows: Array) -> void:
 			var t := String((l as Label).text).trim_prefix("◆ ")
 			return t == String(card) or t.begins_with(String(card) + "  ("))
 		ok(as_seated.is_empty(), "§3 %s: the hero sheet also shows %s as a seated card" % [pid, card])
+	# BATCH HF §7 — AN UNDONE ROW IS SHOWN SEATED, AND NOT AS SITTING OUT.
+	for cardu in undone:
+		var as_seated_u := sheet_labels.filter(func(l):
+			var t := String((l as Label).text).trim_prefix("◆ ")
+			return t == String(cardu) or t.begins_with(String(cardu) + "  ("))
+		ok(_label_with(current_scene, "%s — sits out" % cardu) == null and not as_seated_u.is_empty(),
+			"§3 %s: the hero sheet does not show %s as a seated card with the engine dropped" % [pid, cardu])
 	# THE KIT PANEL ON THE MAP.
 	change_scene_to_file("res://scenes/map.tscn")
 	await Gate.frames(self, 8)
@@ -877,6 +894,12 @@ func _screens_say_why(pid: String, seat: int, rows: Array) -> void:
 		var l: Label = _label_with(ov, "✦ %s — Sits out" % card2) if ov != null else null
 		ok(l != null and String(l.text).contains(rune_name),
 			"§3 %s: the Kit panel does not say %s sits out, or which rune brings it back" % [pid, card2])
+	for cardu2 in undone:
+		# Carried and seated, the row reads its own text; sitting out, the sentence.
+		var lu: Label = _label_with(ov, "✦ %s — " % cardu2) if ov != null else null
+		ok(lu != null and not String(lu.text).contains("Sits out"),
+			"§3 %s: the Kit panel does not show %s carried and seated with the engine dropped — HF §7 undid its row (%s)" % [
+				pid, cardu2, String(lu.text) if lu != null else "no row"])
 	_close_overlays(mp)
 	await Gate.frames(self, 2)
 

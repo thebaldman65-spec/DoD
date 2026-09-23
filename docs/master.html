@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-22 (Batch HE &mdash; gates and doors)</b></p>
+<p align="right"><b>Last updated: 2026-09-22 (Batch HF &mdash; fifteen class runes, and the boar)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1149,7 +1149,7 @@ does.</li>
 <tr><td><b>Consecration</b></td><td>25 Mana, 1.0, 5cd, every hero</td><td>For 4 turns <b>every hero regains 5% of maximum health</b> at the start of each of their turns.</td></tr>
 <tr><td rowspan="3"><b>Hunter</b></td><td><b>Powershot</b></td><td>25 Mana, 3.0, 2cd, one enemy</td><td><b>20% of Attack</b> and <b>20 Break damage</b>, +2% damage for every point of the target's Break meter already full.</td></tr>
 <tr><td><b>Snare Trap</b></td><td>20 Mana, 2.0, 3cd, one enemy</td><td>The next time that enemy acts it is <b>Stunned for 1 turn</b> and <b>Poisoned for 4</b>. A boss shrugs the Stun off until it is Broken.</td></tr>
-<tr><td><b>Summon Companion</b></td><td>20 Mana, 3.0, 3cd, self (Aguila: an enemy, for its dive)</td><td>Calls <b>a companion</b> to fight beside the Hunter &mdash; <b>Ursus, Canis or Aguila, chosen at the cast</b> (&sect;6.4). Each of the three calls keeps its own cooldown. <b>With one standing, casting it again swaps it for another</b>: 10 Mana, 1.0 initiative, and a 3-turn cooldown every swap shares. <b>Every Hunter but the Sharpshooter holds it.</b></td></tr>
+<tr><td><b>Summon Companion</b></td><td>20 Mana, 3.0, 3cd, self (Aguila: an enemy, for its dive)</td><td>Calls <b>a companion</b> to fight beside the Hunter &mdash; <b>Ursus, Canis or Aguila, chosen at the cast</b> (&sect;6.4), and a Hunter wearing the rune <b>Tusk and Bristle</b> can call a fourth, <b>Aper</b>, the boar. Each call keeps its own cooldown. <b>With one standing, casting it again swaps it for another</b>: 10 Mana, 1.0 initiative, and a 3-turn cooldown every swap shares. <b>Every Hunter but the Sharpshooter holds it.</b></td></tr>
 </table>
 <p><b>The Cleric's kit is all healing and mitigation, and carries no damage card.</b> He is a
 support class: he attacks with Smite and drafts damage if he wants it.</p>
@@ -1209,20 +1209,20 @@ while none of his slotted engines is theirs they sit out of every fight and come
 is equipped again: Winter's Toll, Rimebinding, Cryoclasm and Shatter (Glacial Hold); Arcane Bolt,
 Unmaking, Death Ray and Stabilize (Runaway Resonance); Divine Plea, Hymn of Hope and Resurrection
 (Mercy); Blessing of the Faithful and Aegis Reversal (Conviction); Transference and Requiem (Wrath
-of the Old Gods); Unleash and Primal Surge (Pack Bond). <b>Mark of the Hunt sits out with Pack Bond</b>
-&mdash; while the Rune of the Beastmaster is not equipped, and while it is equipped beside the Rune of the
-Sharpshooter, where it sits out itself &mdash; though the card is never refused: it is Pack Bond's by ruling,
-because the hunter's half of what it pays is Pack Bond's. <b>And a card that needs a companion sits out
+of the Old Gods); Unleash and Primal Surge (Pack Bond). <b>And a card that needs a companion sits out
 while its hero holds the Rune of the Sharpshooter</b>, which dismisses the pet: Kill Command, Twin Hunt,
-Savage Sweep, Bestial Wrath, Spirit Bond, Ghostpack, Call the Wilds, Unleash and Primal Surge.
+Savage Sweep, Bestial Wrath, Spirit Bond, Ghostpack, Call the Wilds, Unleash and Primal Surge &mdash; and
+<b>Mark of the Hunt</b>, which is never refused but pays nothing there: its companion's half has no
+companion, and its hunter's half is Pack Bond's, which sits out beside the Rune of the Sharpshooter. Without
+Pack Bond, a Hunter with a companion fights with it, and its companion's half pays.
 <b>A card that sits out is kept, still
 carried and still counted in the ability slots</b>; benching it on the map frees the slot. The hero
 sheet shows it greyed as &ldquo;sits out&rdquo; and the map's Kit panel says which rune brings it
 back. A card that opens without any engine &mdash; Battle Poise and Counter Time on a Guard Change,
 Kill Command and the companion cards on the companion every Hunter but the Sharpshooter summons
 &mdash; always fights.</li>
-<li><b>A rune that reads an engine is offered only while that engine is equipped.</b> Forty-three of
-the sixty ordinary runes pay nothing at all to a hero whose engine slots do not hold their engine &mdash;
+<li><b>A rune that reads an engine is offered only while that engine is equipped.</b> Forty-two of
+the seventy-five ordinary runes pay nothing at all to a hero whose engine slots do not hold their engine &mdash;
 a Ruin rune to a Cleric who has unequipped the Rune of the Occultist, a Focus rune to a Hunter who has
 unequipped the Rune of the Sharpshooter &mdash; and none of them is rolled for him, at the Peddler, in
 an elite's cache, in a bargain or from an event. <b>A rune that still does part of its job without its
@@ -1230,15 +1230,16 @@ engine is offered</b>: Glass Prison still freezes a second body, and the runes t
 nothing at all are offered to every hero of their class. <b>A rune that reads a status or a stance is
 the rune of the engine that lays it</b>, and is offered, and pays, only while that engine rune is
 equipped &mdash; however much of the status a drafted card lays: Long Fuse (Burn) the Rune of the
-Pyromancer's, Killing Cold and Deep Cold (Chilled) the Rune of the Cryomancer's, Long Poison (his own
-Poison) the Rune of the Survivalist's, Mirror Guard (the Defensive guard) the Rune of the Swordmaster's and
-Slaughterhouse (a bleedout) the Rune of the Berserker's. No class kit lays any of them, and no engine lays
-a Bleed; the Berserker's is the engine Slaughterhouse was written for. <b>Bared Plate is the Rune of the
+Pyromancer's, Killing Cold and Deep Cold (Chilled) the Rune of the Cryomancer's, Mirror Guard (the Defensive
+guard) the Rune of the Swordmaster's and Slaughterhouse (a bleedout) the Rune of the Berserker's. No class kit
+lays any of them, and no engine lays a Bleed; the Berserker's is the engine Slaughterhouse was written for.
+<b>Long Poison is not one of them</b>: Snare Trap, in every Hunter's kit, lays the Poison it reads when its
+snare springs, so every Hunter is offered it and it stops his snare's Poison from running out. <b>Bared Plate is the Rune of the
 Warden's</b> the same way: it trades Block for Break damage, and only Heavy Plating gives a Warrior Block to
 lose. <b>And a rune that needs a companion is not offered to a hero
 holding the Rune of the Sharpshooter</b>, which dismisses the pet &mdash; the Shared Hide, the Bared
-Fang, the Answering Pack, the Second Whistle, the Long Leash and the Shared Scent &mdash; and one he
-already wears sits out, saying which rune takes the companion away. <b>A cache rolled while the engine was equipped keeps what it
+Fang, the Answering Pack, the Second Whistle, the Long Leash, the Shared Scent and Tusk and Bristle &mdash;
+and one he already wears sits out, saying which rune takes the companion away. <b>A cache rolled while the engine was equipped keeps what it
 rolled</b>: a rune it holds that reads the engine sits out of the choice while the engine is out, the
 overlay says which rune brings it back, and equipping it offers the whole cache again. A companion rune
 it holds sits out of the choice the same way while the Rune of the Sharpshooter is equipped, and the
@@ -1250,11 +1251,15 @@ Four places say so, each naming the engine rune that brings it back: the rune po
 place of the rune's own rule; the map's rune slot, which marks the slot and gives the reason on hover; the hero
 sheet, which reads &ldquo;sits out&rdquo; in the column that says whether a rune is worn; and the combat log's
 opening roll call, as the fight starts. <b>Unequipping the rune frees the slot, and nothing does it for him</b>.
+<b>A rune another rune he wears cancels sits out the same way</b>: <b>Burning Ground beside Vow of Silence</b>,
+which forbids every point of damage he deals, when all Burning Ground does is deal damage. Both are offered and
+both can be worn together; the four places say Burning Ground sits out while the Vow of Silence is worn, and
+the ground does not burn.
 <b>An engine rune can sit out the same way</b>: the Rune of the Beastmaster slotted beside the Rune of the
 Sharpshooter has no companion and so no bond to deepen, and the same four places say it sits out, in the same
 words &mdash; the pouch's engine row, the map card's engine line (marked &#9675;, the reason on the card's hover),
 the hero sheet and the roll call. The pairing is allowed and is the player's to make, and <b>nothing of the
-Rune of the Beastmaster pays beside it</b>: Mark of the Hunt, whose hunter's half it pays, sits out with it.</li>
+Rune of the Beastmaster pays beside it</b>: Mark of the Hunt, whose hunter's half it pays, sits out there too.</li>
 <li><b>The enabler travels.</b> An engine's enablers — the abilities it cannot work without, the
 "needs" column of the table in §6b — come with the rune to any hero of the class who holds it, in
 either engine slot, sit <b>outside the ability slot count</b>, and leave when it leaves: Overburn
@@ -1635,8 +1640,10 @@ offered only to a hero holding the Stances</b> (the Rune of the Swordmaster). Ea
 part without it — the swap still lands its Break damage, the thrust still strikes — and they are
 the Stances holder's by ruling. <b>The zone boss asks the same gate of its own pools</b> (&sect;6a), and
 three of its cards are in no draft pool: Stabilize and Primal Surge, which cannot be cast without Runaway
-Resonance and Pack Bond, and Mark of the Hunt, Pack Bond's by ruling &mdash; the hunter's half of what it pays is
-paid only under Pack Bond, though its companion's half is not. <b>Kill Command is not among
+Resonance and Pack Bond, and <b>Venom Coating, the Rune of the Survivalist's by ruling</b> &mdash; the coating
+lands with no engine, but every Poison it promises is laid by Trapper's on-hit package. <b>Mark of the Hunt is not
+gated on an engine</b>: its companion's half pays with no engine, so it is offered to every Hunter who fields a
+companion, and its hunter's half pays only while the Rune of the Beastmaster is equipped. <b>Kill Command is not among
 them</b>: it needs a living companion, and every Hunter but the Sharpshooter summons one from his
 class kit, so it is conditional on a companion rather than on an engine. <b>Three groups, and only the first is
 gated:</b> cards that CANNOT work without the engine; cards that HALF-work (Boil Over deals 22
@@ -1648,12 +1655,13 @@ a hero might later draft. <b>What a hero holding no engine can be offered: 38 of
 29 of 43, 35 of 42.</b></p>
 
 <p><b>A CARD THAT NEEDS A COMPANION IS NOT OFFERED TO A SHARPSHOOTER (Batch HB).</b> He dismisses
-the pet, so the gate above has a second half, and it is a negative one: <b>fourteen Hunter cards
+the pet, so the gate above has a second half, and it is a negative one: <b>fifteen Hunter cards
 cannot pay without a companion on the field</b>, and none of them is offered to a hero holding the
 Rune of the Sharpshooter. Nine are refused outright with no companion standing &mdash; Kill
 Command, Twin Hunt, Savage Sweep, Bestial Wrath, Spirit Bond, Ghostpack, Call the Wilds, Unleash
-and Primal Surge &mdash; and those also sit out of a fight he brings them to (&sect;6.0); five
-resolve and pay nothing &mdash; Bloodbond, Bear the Brunt, Bring It Down, Last Howl and Succession.
+and Primal Surge &mdash; and those also sit out of a fight he brings them to (&sect;6.0); six
+resolve and pay nothing &mdash; Bloodbond, Bear the Brunt, Bring It Down, Last Howl, Succession and
+Mark of the Hunt, which also sits out beside the Rune of the Sharpshooter.
 <b>The ones that read the BOND stay gated on Pack Bond as well</b>: a companion is every Hunter's,
 and its Loyalty is Pack Bond's. A Sharpshooter is offered 31 of the Hunter's 42.</p>
 
@@ -2393,7 +2401,7 @@ the accrual.<br>
 while the bear takes 25% less damage for 2 turns; Canis: <i>Bloodhowl</i>, 15 Bleed to every
 enemy; Aguila: dives a chosen enemy for 15% of the hunter's Attack, Dazing them.<br>
 <b>Companions:</b> one at a time (placeholder sphere sprites:
-red/blue/green; never two of the same kind). Summoning goes
+red/blue/green, and brown for Aper; never two of the same kind). Summoning goes
 through the <b>"Summon Companion" companion picker</b> at the top of the ability list on hotkey W
 (see §10); at companion capacity it becomes <b>"Swap Companion"</b> — 10 Mana, 1.0
 initiative, shared 3-turn cooldown (<code>SWAP_COOLDOWN</code>), no skill check: the newcomer arrives with its
@@ -2407,6 +2415,13 @@ Summon Canis — 20 Mana, 3.0, 3cd. Wolf, 80 HP, always ELUSIVE: strikes the hun
 for 20% of the hunter's Attack, building 20 Bleed.<br>
 Summon Aguila — 20 Mana, 3.0, 3cd. Eagle, 80 HP, always ELUSIVE: strikes the hunter's target
 for 20% of the hunter's Attack, applying Exposed (2 turns).<br>
+<i>Tusk and Bristle (a Hunter rune) adds a fourth call:</i> Summon Aper — 20 Mana, 3.0, 3cd. Boar, 80 HP:
+charges the hunter's target for 20% of the hunter's Attack, and <b>every third strike Stuns its target
+for 1 turn</b> &mdash; the rhythm is fixed and never shortens, and a chip on the boar counts it
+(0/3, 1/3, 2/3), so the player knows which charge stuns. A boss shrugs the Stun off until it is Broken, and
+the charge still counts. Pack Bond makes each charge 15% harder, deeper as Loyalty climbs; the stun stays
+every third strike. A new body starts the count over: a swap, a fresh call, a new fight. No arrival
+effect. A Hunter holding the Rune of the Sharpshooter cannot call it.<br>
 <i>Drafted (§6b):</i> Hunter's Instinct — 20 Mana, 1.0, 3cd (no skill check): empowers the next 3 Quick Shots —
 each deals +10% of the hunter's Attack and heals every active companion for 15% of its max
 health (HI# chip counts the shots).<br>
@@ -2436,9 +2451,11 @@ depart. Lives inside the
 summon picker, not on its own hotkey.<br>
 Mark of the Hunt — 15 Mana, 2.0, 3cd. Marks an enemy for 7 turns: the hunter
 and their companion deal +25% damage to it, and every strike on it restores 3% of the hunter's
-max Mana. The cooldown resets if the marked enemy dies. Works with or without a companion. <b>It is Pack
-Bond's</b>: offered only to a Hunter with the Rune of the Beastmaster equipped, and sitting out of every
-fight while that rune is not equipped or sits out beside the Rune of the Sharpshooter.<br>
+max Mana. The cooldown resets if the marked enemy dies. Works with or without a companion. <b>Its two halves
+need different things</b>: the companion's +25% and the Mana its blows restore need only a companion; the
+hunter's own +25% and the Mana his strikes restore need the Rune of the Beastmaster equipped. It is offered
+to every Hunter who fields a companion, and sits out of every fight while he holds the Rune of the
+Sharpshooter, where neither half can pay.<br>
 <b>Talents:</b> the one tree, bought with the Hunter's points — see §7.</li>
 <li><b>Sharpshooter (Nuker)</b> — <b>Stat block:</b> 140 HP / 10% armor / Constitution 90 /
 +10% nature resist, −10% physical (the lightest of the three: a marksman who wants to be at
@@ -2518,7 +2535,8 @@ Dressing shipped as a Hunter class-wide draft card, so both names are spent (§1
 Explosive Shot — 35 Mana, 3.0, 3cd: 10 NATURE to ALL / 20 BD, Poisoning each (Perfect: 12
 base).<br>
 Venom Coating — 20 Mana, 1.0, 5cd (no skill check): for 4 turns every attack applies
-Poison and refreshes its timers.<br>
+Poison and refreshes its timers. Every Poison it lays comes from Trapper, so it is offered only while the
+Rune of the Survivalist is equipped.<br>
 Hamstring — 25 Mana, 2.5, 3cd, 20% Atk: Cripple, Slowed AND Exposed — three statuses in
 one cast (Perfect: 4 turns each).<br>
 Deadfall — 25 Mana, 1.0, 5cd: arm a deadfall in the path. The NEXT enemy to act takes 20%
@@ -2701,9 +2719,10 @@ all income</b> (931 gold greedy, 904 balanced, 508 cautious). <b>Unspent gold at
 from Batch BJ's 63% to 25&ndash;28%.</b></li>
 <li><b>Runes</b> (run-scoped gear, bought at the Peddler or chosen from elite caches — the
 in-run power source that scales with depth): an <b>authored pool</b> (data/runes.json).
-<br><b>ALL TWELVE SPECS ARE AUTHORED AS OF BATCH FK. 127 ENTRIES: 67 RETIRED, AND
-60 LIVE ONES ACROSS ALL TWELVE.</b> Nine specs have five, the Beastmaster six, and the
-Devout four &mdash; <b>his fifth is OWED, not missing</b>, and the reason is in
+<br><b>ALL TWELVE SPECS ARE AUTHORED AS OF BATCH FK, AND FIFTEEN CLASS RUNES READ NO ENGINE.
+142 ORDINARY ENTRIES: 67 RETIRED AND 75 LIVE.</b> Sixty were written for a lineage &mdash; nine
+lineages have five, the Beastmaster six, and the Devout four &mdash; and <b>fifteen were written for
+their class and read no engine</b> (below). <b>The Devout's fifth is OWED, not missing</b>, and the reason is in
 <code>docs/reports/FK.md</code> &sect;7: the rune authored for that slot said
 <i>&ldquo;Consecrated Ground grants Faith to allies standing in it, not only to its caster&rdquo;</i>
 and that has been <b>the base kit since Batch AW &sect;2</b>, so it would have shipped 100% inert.
@@ -2716,9 +2735,35 @@ the 67 retirements are ET's and EO's; FC's and FO's are of a later vintage</b>, 
 read &ldquo;retired&rdquo; as &ldquo;authored under the old one-rune-per-lane rule&rdquo; narrow
 their populations by <code>RUNE_SHAPES</code> membership rather than by an exemption. <b>PRICE IS 100g, FLAT, EVERY RUNE</b> &mdash; rarity is gone and
 price no longer signals power, so the player pays for FIT rather than for magnitude. <b>SCOPE IS
-THE CLASS for all sixty</b> &mdash; a rune reaches every hero of its class, and three gates decide which
+THE CLASS for all seventy-five</b> &mdash; a rune reaches every hero of its class, and three gates decide which
 of them he is offered (Eligibility, below) &mdash; and every hero in the game draws an authored pool
 rather than the generated stat family alone.
+<br><b>THE FIFTEEN THAT READ NO ENGINE.</b> Each reads only what every hero of its class already has
+&mdash; his three kit cards and his basic, his class resource, the statuses his own kit lays &mdash; and
+healing and damage in general, so a hero holding no engine can use it from the first fight. None needs a
+drafted card. <b>Cleric:</b> <b>Abundance</b> (passive) &mdash; healing beyond an ally's missing health
+becomes a shield on them, added to any shield already standing and held two turns; <b>Returned
+Burden</b> (Unburden) &mdash; every harmful effect Unburden removes is cast onto the enemy that applied it,
+or onto a random enemy if that one has fallen or nobody applied it, as it stood (its turns, strength and
+stacks); <b>Burning Ground</b> (Consecration) &mdash; at the start of each of the Cleric's turns while his
+Consecration holds, every enemy takes holy damage equal to 5% of his maximum health, less its holy
+resistance; <b>Eleventh Hour</b> (Ministration) &mdash; twice the heal on an ally below a quarter health;
+<b>Vow of Silence</b> (passive, a tradeoff) &mdash; his heals are 50% stronger, Consecration's included, and no
+damage he deals lands, though his Break damage does. <b>Mage:</b> <b>Unravel</b> (Magic Burst) &mdash; its
+Elemental Weakness lands on every enemy; <b>Seeking Missiles</b> (Magic Missiles) &mdash; one more missile
+for each enemy under Elemental Weakness, each flying at the enemy it was counted for, after the volley's
+own three; <b>Detonating Ward</b> (Nexus Ward) &mdash; when the ward breaks or its time runs out, it deals
+every enemy the damage it absorbed; <b>Clarity</b> (passive) &mdash; a spell cast with the Mana bar full deals
+50% more damage; <b>Profligate</b> (passive, a tradeoff) &mdash; his spells deal 40% more damage and cost
+twice the Mana. A spell is an ability with a Mana price, so the free basic attack is not one. <b>Warrior:</b>
+<b>Goading Roar</b> (Mocking Blow) &mdash; an enemy his taunt binds deals 25% less damage;
+<b>Rending Blows</b> (Crushing Blow) &mdash; Crushing Blow on an enemy already Sundered deepens the Sunder,
+up to three deep: each depth takes 35% of the enemy's armor, so three leave it none; <b>Grudge</b>
+(passive, a tradeoff) &mdash; 40% more damage to the last enemy whose blow reached him and 20% less to every
+other, and neither before any enemy has struck him or once that enemy has fallen. <b>Hunter:</b>
+<b>Opportunist</b> (Powershot) &mdash; double damage to a stunned enemy, whatever stunned it; <b>Tusk and
+Bristle</b> (Summon Companion) &mdash; a fourth companion, Aper the boar (&sect;6.4), for any Hunter but the
+one holding the Rune of the Sharpshooter. <b>Burning Ground sits out beside Vow of Silence</b> (&sect;6.0).
 <br><b>THE TWO GATED SECONDARIES ARE RETIRED GOING FORWARD (Batch FK, ruled by the designer).</b>
 <b>THRESHOLD and BREADTH are not authored again.</b> A gated rune at a flat price is strictly worse
 than a bare one &mdash; the price does not fall to pay for the condition &mdash; and FJ measured
@@ -2742,8 +2787,8 @@ question alive pointed the other way.
 <br><b>EVERY RUNE CARRIES A PRIMARY TYPE AND AN OPTIONAL SECONDARY (Batch EZ §0).</b> The
 primary is what it touches &mdash; <b>ABILITY, PASSIVE or STAT</b>; the secondary is what gates
 it, if anything. <b>TRADEOFF is the only secondary any entry carries</b> &mdash; a cost paired
-with a bigger upside, self-balancing and readable on the card &mdash; and <b>twelve of the sixty
-carry one</b>. THRESHOLD and BREADTH remain words in the vocabulary and are on no row. The labels
+with a bigger upside, self-balancing and readable on the card &mdash; and <b>fifteen of the
+seventy-five carry one</b>. THRESHOLD and BREADTH remain words in the vocabulary and are on no row. The labels
 live in <code>Runes.RUNE_SHAPES</code> beside the archetype tags in <code>RUNE_TAGS</code>, and the
 two are <b>different axes</b>: one says what a rune is FOR in the seven-word card vocabulary, the
 other says what it does and what turns it on. <code>check_ez</code> &sect;0 asserts the label and
@@ -2756,7 +2801,7 @@ visible from one side.
 uses one</b>, and the two tag conditions it used to answer are gone from the file, from the code
 and from the screens. <b>A gated rune at a flat 100g is strictly WORSE than a bare one</b>: the
 price does not fall to pay for the clause, so the condition is pure cost with nothing bought by
-it. <code>check_fn</code> &sect;1 asserts the census across all 127 entries, live and retired, so
+it. <code>check_fn</code> &sect;1 asserts the census across all 142 entries, live and retired, so
 a re-gating is caught where it would appear rather than where somebody happened to look.
 <br><b>AND WHAT THE CONDITIONS WERE ACTUALLY COSTING WAS MEASURED BEFORE THEY WENT.</b> Read as
 the share of a spec's reachable loadouts that satisfied the clause at each rung of the slot
@@ -2854,27 +2899,27 @@ so a label on each would tell him nothing, and a rune's text is drawn in one col
 <b>Three equip slots, flat, from run start</b> — no growth ladder (swapped on the hero's
 map card). Shop offers avoid duplicates per hero.
 <br><b>AN EXHAUSTED POOL RETURNS AN EMPTY OFFER, AND EVERY SITE SAYS SO IN AS MANY WORDS
-(Batch FM §2).</b> Each class has <b>fourteen to sixteen</b> authored runes, and what a hero can
+(Batch FM §2).</b> Each class has <b>eighteen to twenty</b> authored runes, and what a hero can
 reach is decided by his engines and by what he has earned &mdash; a hero holding no engine can reach
-<b>two</b> of the Warrior's at spawn and six once he has earned what they name (seven for a Berserker,
-whose boss pool holds Blood Price), <b>none</b> of the Mage's at spawn and four once he has earned
-theirs, <b>four</b> of the Hunter's and then six, and <b>none</b> of the Cleric's fourteen, every one of
-which reads Mercy, Faith or Ruin. Seventeen live entries name a <code>requires_ability</code> and sixteen of those name
+<b>five</b> of the Warrior's at spawn and ten once he has earned what they name (eleven for a Berserker,
+whose boss pool holds Blood Price), <b>five</b> of the Mage's at spawn and nine once he has earned
+theirs, <b>seven</b> of the Hunter's and then nine, and <b>five</b> of the Cleric's nineteen &mdash; the
+five that read no engine; every other one reads Mercy, Faith or Ruin. Seventeen live entries name a <code>requires_ability</code> and sixteen of those name
 something outside the spawn kit, so <b>a hero's rune pool DEEPENS as he earns abilities</b>. When there is nothing left, the
 Peddler names the hero and the reason, the elite cache and the bargain print a line instead of
 paying in silence, and the event verb says nothing answers. <b>A cache with one or two runes
 left offers one or two</b> rather than discarding them, and the spoils line reads the count off
 the offer. <b>And an owed cache pick whose triple repairs to nothing can be SPENT</b> from the
 hero's card &mdash; it cannot be filled, so holding it would strand the run.
-<br><b>EVERY LIVE RUNE IS SCOPED TO ITS CLASS</b>: the Warrior's fifteen, the Mage's fifteen, the
-Cleric's fourteen and the Hunter's sixteen, retired entries scoped the same way. The five universal
+<br><b>EVERY LIVE RUNE IS SCOPED TO ITS CLASS</b>: the Warrior's eighteen, the Mage's twenty, the
+Cleric's nineteen and the Hunter's eighteen, retired entries scoped the same way. The five universal
 entries are retired, and <code>_scope_ok</code> resolves the class and the universal band and
 nothing else.
 <br><b>PRICE WAS THE OPEN QUESTION RARITY LEFT BEHIND, AND EZ &sect;0 ANSWERED IT: 100g, FLAT.</b>
 Every authored rune has always carried its own <code>price</code> and none moved — but those
 prices were written against a tier table that no longer exists. <b>SUPERSEDED AT EZ &sect;0 AND
 CORRECTED HERE AT FF &sect;3: the number IS ruled and the pool is NOT empty.</b> Every one of the
-<b>60 live runes is 100g, flat</b> &mdash; the player pays for FIT rather than for magnitude. The
+<b>75 live runes is 100g, flat</b> &mdash; the player pays for FIT rather than for magnitude. The
 <b>67 retired entries keep their authored prices unmoved</b>, and they run 100 &times;43, 75
 &times;14, 160 &times;6, 120 &times;3 and 50 &times;1, which is the record of what the old pool
 charged rather than a second pricing rule. <b>The two sentences this replaces</b> &mdash; <i>"the
@@ -2901,12 +2946,13 @@ Batch X's rule and it still stands. <b>Measured before it was built:</b> two tri
 before either was answered shared a name in <b>265 of 400</b> trials, and a queued candidate was
 also the shop's offer in <b>127 of 400</b>.
 <br><b>AND A RUNE THAT READS AN ENGINE IS OFFERED ONLY WHILE THAT ENGINE IS EQUIPPED (&sect;6.0).</b>
-Forty-three of the sixty are in that table &mdash; every Ruin, Focus and Resonance rune, the Mercy
+Forty-two of the seventy-five are in that table &mdash; every Ruin, Focus and Resonance rune, the Mercy
 and Faith runes and the one that adds to Divine Shield, both Heavy Plating runes and Bared Plate, both
-stance-number runes and Mirror Guard, two of the Pack Bond runes, two of the Trapper runes and Long
-Poison, both Overburn runes and Long Fuse, the Cryomancer's Killing Cold and Deep Cold, and the
-Berserker's Slaughterhouse &mdash; the last seven because what each reads is its engine's: Burn, Chill, his
-own Poison, the Defensive guard, a bleedout, and the Block Bared Plate trades away. <b>The roll asks first</b>, so none of them reaches the
+stance-number runes and Mirror Guard, two of the Pack Bond runes, two of the Trapper runes, both Overburn
+runes and Long Fuse, the Cryomancer's Killing Cold and Deep Cold, and the Berserker's Slaughterhouse
+&mdash; the last six because what each reads is its engine's: Burn, Chill, the Defensive guard, a bleedout,
+and the Block Bared Plate trades away. <b>Long Poison is not in it</b>: the Poison it reads is Snare
+Trap's, and every Hunter holds Snare Trap. <b>The roll asks first</b>, so none of them reaches the
 Peddler's row, a cache, a bargain or an event verb for a hero who has unequipped its engine;
 <b>the answer asks again</b>, so a queued cache hands none of them over either &mdash; it keeps them
 stored instead, names the rune they wait on, and offers them again the moment it is equipped.
@@ -2915,13 +2961,13 @@ A retired rune and a rune he already owns can never come back, so those are drop
 triple and the repair is saved; but <b>unequipping an engine is one press away from being undone</b>,
 so writing that repair back would let a moment's experiment before a cache is answered destroy those
 runes for good, and save the loss. <b>A state the player can undo is not a state to destroy.</b>
-<b>A hero with no engine equipped is offered only the runes that read none</b>: up to six of the
-Warrior's fifteen (seven with Blood Price earned), four of the Mage's fifteen, six of the Hunter's
-sixteen, and <b>none of the Cleric's fourteen</b>. <b>Each engine he equips adds its own runes</b>, and
+<b>A hero with no engine equipped is offered only the runes that read none</b>: up to ten of the
+Warrior's eighteen (eleven with Blood Price earned), nine of the Mage's twenty, nine of the Hunter's
+eighteen, and five of the Cleric's nineteen. <b>Each engine he equips adds its own runes</b>, and
 a second engine adds its runes too. The engine runes of his class are still offered to him, as they
 always were.
 <br><b>AND A RUNE'S COST IS GATED WITH ITS PAYOUT: NO ENGINE, NO COST AND NO PAYOUT.</b> The offer
-door cannot reach a rune he has <b>already bought</b>, and three of the forty-three charge him for
+door cannot reach a rune he has <b>already bought</b>, and three of the forty-two charge him for
 something only the engine pays back. The <b>Martyr</b> can be healed by nobody but himself and gains
 Mercy when an enemy strikes him; <b>Thin Blood</b>'s own Poison deals no damage and his barb fires on
 every strike instead of a quarter; <b>Bared Plate</b> refuses his every Block roll. Each price reads the

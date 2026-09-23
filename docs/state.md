@@ -13,79 +13,157 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-22 (Batch HE).*
+*Last rewritten: 2026-09-22 (Batch HF).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: HE — GATES AND DOORS. IMPLEMENT ONLY, AND THE THIRTY-SEVENTH BATCH ON `class-merge`.** HC's and HD's
-  follow-ups about what a hero is offered and at which door, all ruled in the brief, are built: seven runes gated on
-  their engine, Mark of the Hunt gated on Pack Bond and sitting out with it, the zone boss asking the engine half, the
-  draft re-asking at the pick, the `[Class]` band gone, and Charge's pins relabelled. `main` is untouched. Full working:
-  **`docs/reports/HE.md`**.
-- **THE SEQUENCE SHIFTED AGAIN: HF IS NEXT — THE OTHER SEVENTY-THREE.** HE took the offers-and-doors follow-ups, so
-  HA's seventy-five tier-2 arms less `test_batch_bq`'s two retired at HD are **HF's**; HA §1d is still the work list,
-  arm by arm.
-- **§1 — SEVEN RULED RUNE ROWS** (`Runes.ENGINE_READ`, each `ruled: "HE §1"`, read by `Runes.engine_read_ruled`): Long
-  Fuse (Overburn), Killing Cold and Deep Cold (Permafrost), Long Poison (Trapper), Mirror Guard (the Stances),
-  Slaughterhouse (Blood Frenzy) and Bared Plate (Heavy Plating). **Each read site asks the same engine**, because a row
-  sits out without its engine (GX) and the sentence is true only if it pays nothing: no engine, no payout, and for Bared
-  Plate no price (GW §3). **Bared Plate's 0.25 moved to `rune_bared_plate_bd`** — `rune_bd_bonus` is shared with three
-  retired runes, whose payouts stand. **The mapping, verified at each read site: four hold as authored; the Stances lay
-  no guard (a swap card does); and no engine lays a Bleed**, so Slaughterhouse is on Blood Frenzy as the brief named it
-  (NEEDS A RULING 3). **What a hero holding no engine can be offered moved** — Warrior 5 / 9 → **2 / 6**, Mage 3 / 7 →
-  **0 / 4**, Hunter 5 / 7 → **4 / 6**, Cleric 0 / 0 — and `check_gv` §3's `RUNE_FLOOR` moved with it: **the Mage's spawn
-  half is OWED now, as the Cleric's is.**
-- **§2 — MARK OF THE HUNT IS PACK BOND'S** (a RULED row of the card gate and of `Classes.SITS_OUT`, `ruled: "HE §2"`), and
-  **`Classes.sits_out` sits a row out while its engine itself sits out** — so it sits out beside the Rune of the
-  Sharpshooter with Pack Bond, and Pack Bond's tell is true. **The brief's premise held for half the card**: its
-  companion's halves read no engine (driven: a Canis blow on the prey 94 against 75, 3 Mana fed, with no engine), so a
-  Hunter with a companion and no Pack Bond loses a card that half-worked for him (NEEDS A RULING 2). The card's text
-  is unchanged; wording is proposed (NEEDS A RULING 1).
-- **§3 — THE ZONE BOSS ASKS THE WHOLE OF `Classes.offerable`**, roll and answer, HC's reason for the pet half alone
-  overturned; **seven boss offers moved, not four** — Lunge, Shatter, Overcharge and Divine Plea, and **Stabilize and
-  Primal Surge**, which sat out without their engines since GT and became card-gate rows here, and Mark of the Hunt
-  (NEEDS A RULING 4). Driven 400 rolls an arm: each offered with its engine slotted exactly as often as at HEAD, and 0
-  times unslotted where HEAD offered it just as often. **The draft re-asks at the pick** — `Run.draft_choice` is the one
-  list the screen draws and `take_draft_ability` takes; a held card is not a button, the column names the rune that
-  brings it back, and **a card known from an earlier queued triple is not a button either** (found here: two triples
-  queued before either is answered can share a card).
-- **§4 — NO SCOPE BAND ON ANY SURFACE.** The word on the Peddler's row and a cache's button, the tint on those and three
-  more; `SCOPE_INFO`, `shown_scope` and the instance's band fields deleted.
-- **§5 — CHARGE'S PINS RELABELLED** as the designer's reprice: five comparisons against Strike and their anchor, and the
-  30 Rage arm — the brief said two.
-- **THE VERIFICATION.** HEAD's unmodified battery ran first against HE's game code — **123 of 123 launched; `check_de` 509 / 16
-  failures / 4 notices**, and the one file that failed to parse was HEAD's `check_hc`, which calls the band door HE §4 deleted
-  (`docs/reports/HE.md` §6). The pre-pass — the whole battery on an isolated copy of the landed tree, rows written —
-  read **`check_de` 513 / 0 / 0**, 124 of 124 logs with no `Parse Error` and no `SCRIPT ERROR`. The acceptance run:
-  **124 of 124 (with `check_he`), `check_de` 513 checks / 0 failures / 0 notices, no `Parse Error` and no
-  `SCRIPT ERROR` in any log, the tree hashed at the start and the end — 562 paths, none moved — and the two
-  sanctioned reds at their counts** (`check_cm_live` 13 / 4; `check_gj` 70 / 1, *"+159 gold and the purse moved 179"*,
-  moved from HD's +178 / 198 by HE's game code — HEAD's own code reads +178 / 198 on the same saves the same day —
-  the gap the same twenty). Thirty-five control runs, one defect a copy, each read by its FAIL text. The player's four
-  saves were backed up to `../save-backups/HE-20260922-101431` and are byte-identical to it after everything ran.
-- **`CLAUDE.md` IS 372,642 B = 363.91 KiB, WITH 46.09 KiB UNDER ITS 410 KiB CEILING** (+4,383 B this batch: the seven rune
-  rows and their read sites, Mark of the Hunt's ruled rows and the sits-out clause, the boss's engine half, the
-  draft's re-ask, the band, and the two card rows a door that starts asking the table owes it).
-- **WHAT MOVED:** `scripts/runes.gd` (the seven ruled rows, `engine_read_ruled`, `cards_wait_on` and `RUNE_TINT`;
-  `SCOPE_INFO` and `shown_scope` deleted), `scripts/battle.gd` (the seven runes' read sites), `scripts/unit.gd`
-  (`rune_bared_plate_bd`), `scripts/classes.gd` (three card rows, Mark of the Hunt's seat row, `sits_out_ruled` and the
-  sits-out clause), `scripts/run_state.gd` (the note's third cause, the boss's whole `offerable`, `draft_choice` and the
-  refusal at the pick), `scripts/map_screen.gd` (the boss overlay, the draft column and the band),
-  `scripts/shop_screen.gd` and `scripts/party_screen.gd` (the band), a comment in `scripts/run_sim.gd`;
-  `data/runes.json` (Bared Plate's payload key, nothing else); the gates `check_fd`, `check_gs`, `check_gt`, `check_gv`,
-  `check_gx`, `check_hc` and `check_hd`; the suites `test_batch_ah` and `test_batch_br`; **`check_he.gd` (NEW)** and
-  `run_battery.sh`; `pin-manifest.json`, `baselines.json`; `CLAUDE.md`, `docs/master.html` and its stamp,
-  `docs/changelog.html`, `docs/design-notes.md`, this file and `docs/reports/HE.md` (**NEW**).
+- **Last batch: HF — FIFTEEN CLASS RUNES, AND THE BOAR. IMPLEMENT ONLY, AND THE THIRTY-EIGHTH BATCH ON `class-merge`.**
+  The designer authored fifteen runes that read no engine — five Cleric, five Mage, three Warrior, two Hunter — and Aper,
+  the boar Tusk and Bristle adds to Summon Companion; HF builds them and drives every one on a hero holding no engine,
+  and builds §6 and §7's rulings. `main` is untouched. Full working: **`docs/reports/HF.md`**.
+- **THE SEQUENCE SHIFTED AGAIN: HG IS NEXT — THE OTHER SEVENTY-THREE.** HE recorded them as HF's; HF took the fifteen
+  runes instead, so HA's seventy-five tier-2 arms less `test_batch_bq`'s two retired at HD are **HG's**, and HA §1d is
+  still the work list, arm by arm.
+- **§0 — A NO-ENGINE RUNE READS ONLY WHAT EVERY HERO OF ITS CLASS HAS** (the designer's rule, now a standing block in
+  `CLAUDE.md`): the class's kit cards and basic, its resource, the statuses its kit lays (Elemental Weakness; taunt and
+  Sunder; stun and Poison), and healing and damage in general. **All fifteen confirmed at the line that pays them**
+  (the table is `docs/reports/HF.md` §0b), each class-scoped, 100g, written for no lineage and on no
+  `Runes.ENGINE_READ` row.
+- **§1–§4 — THE FIFTEEN.** **Cleric:** Abundance, Returned Burden, Burning Ground, Eleventh Hour, Vow of Silence.
+  **Mage:** Unravel, Seeking Missiles, Detonating Ward, Clarity, Profligate. **Warrior:** Goading Roar, Rending Blows,
+  Grudge. **Hunter:** Opportunist, Tusk and Bristle (Aper: 80 health, charges for 20% of the Hunter's Attack, **every
+  third charge stuns for one turn** on a fixed rhythm a chip counts, a boss resists until Broken). **What the brief
+  asked to be reported is in the report's FOR THE RECORD**: Returned Burden goes to the enemy that laid the effect
+  while it stands (else another at random); Seeking Missiles SPREAD, one at each weakened enemy; Rending Blows' three
+  depths ADD (35% of the armor each) and the third floors at zero; Grudge does nothing before anything has struck him;
+  Aper's count lives on the body, so a swap, a fresh call and a new fight each restart it; the bot calls Aper
+  (`battle.BOT_PET_ORDER`, once, the rune's kind first). **Three magnitudes are PROPOSED** (NEEDS A RULING 1–3):
+  Burning Ground's burn, Aper's body and boon, Abundance's two turns.
+- **§5 — VOW OF SILENCE CANCELS BURNING GROUND, VISIBLY.** GX's tell applies with a THIRD cause: `Runes.CANCELLED_BY`
+  and `Runes.cancelled_by`, asked by `Runes.sits_out` off the runes he has equipped (`Run.worn_rune_ids`), on GX's four
+  surfaces; the burn's read site refuses too. **Abundance under Consecration**, on a party at full health, adds the
+  drip's spill every turn: 8 / 5 / 7 / 6 a turn (Warrior / Mage / Cleric / Hunter), about 20% of each maximum after
+  four turns. No ceiling written (NEEDS A RULING 3).
+- **§6 — LONG POISON IS UN-GATED.** Snare Trap — every Hunter's kit card — lays Poison 4 through `_apply_poison`, the
+  Hunter its source, when the snare springs, and that is the door the rune reads; HC's census cast each card once and
+  never saw a later turn. Its row is gone and its read site asks no engine.
+- **§7 — MARK OF THE HUNT IS OFFERED TO EVERY HUNTER WITH A PET; VENOM COATING IS TRAPPER'S.** HE's Pack Bond gate
+  undone: the card is a `Classes.COMPANION_READ` row whose door opens and whose seat is RULED — it sits out only beside
+  a dismisser (`Classes.companion_seat`) — and its hunter's halves still pay only under Pack Bond. **A Hunter with a
+  companion and no Pack Bond is offered it again** (HE: 0 in 400; HF: 307 in 400 with no engine) and receives the
+  companion's half — a wolf's blow on the prey 20 against 16 off it, 3 Mana a blow — not the hunter's (his shot 16 on
+  and off; 20 under Pack Bond). **Venom Coating is a RULED card-gate row on Trapper** (`ruled: "HF §7"`), withheld at
+  every door the card table reaches, the zone boss included (246 in 400 with Trapper slotted, 0 unslotted or absent).
+  Recorded as HE ruled: Slaughterhouse stays on Blood Frenzy; Stabilize and Primal Surge are gated boss cards; declining
+  a draft refuses its held-back cards.
+- **WHAT A HERO HOLDING NO ENGINE CAN BE OFFERED, RE-MEASURED BY NAME** (HC's table; `check_hf` §3, `check_gv` §3):
+  **Warrior 5 at spawn / 9 at the ceiling** (from 2 / 6), **Mage 5 / 9** (from 0 / 4), **Cleric 5 / 5** (from 0 / 0),
+  **Hunter 7 / 9** (from 4 / 6). Every class reaches five; `check_gv` §3's `RUNE_FLOOR` moved to the reading, and no
+  half is OWED any more.
+- **THE VERIFICATION.** HEAD's unmodified battery ran first against HF's game code — **124 of 124 launched, no `Parse Error` in any
+  log, `check_de` 509 → 513 / 21 failures / 16 notices**, every red read by its FAIL text before an instrument was
+  touched (`docs/reports/HF.md` §9). The pre-pass — the whole battery on an isolated copy of the landed tree, the rows
+  written first — read **125 of 125, `check_de` 517 / 0 / 0**, no `Parse Error` and no `SCRIPT ERROR` in any log. The
+  acceptance run, in the repository: **125 of 125 (with `check_hf`), `check_de` 517 checks / 0 failures / 0 notices**,
+  no `Parse Error` and no `SCRIPT ERROR`, the tree hashed at the start and the end — **564 paths, and the only two that
+  moved are this file and `docs/reports/HF.md`, written while the run was going** (`check_es`, the one target that
+  opens this file, was re-run against the final documents: 57 / 0) — and **the two sanctioned reds at their counts**
+  (`check_cm_live` 13 / 4; `check_gj` 70 / 1, *"+167 gold and the purse moved 187"*, moved from HE's +159 / 179 by HF's
+  runes, the gap the same twenty). **Twenty-nine controls, one defect a copy**, each read by its FAIL text, three of
+  them two-armed against HEAD's own copy of the repaired gate; two read green first and both arms were tightened and
+  re-run (§10). The player's four saves were backed up to `../save-backups/HF-20260922-160208` and are byte-identical
+  to it after everything ran.
+- **`CLAUDE.md` IS 378,851 B = 369.97 KiB, WITH 40.03 KiB UNDER ITS 410 KiB CEILING** (+6,209 B this batch: the no-engine rule block, Long Poison's un-gating
+  and the census blind spot behind it, Mark of the Hunt's companion row, Aper's kind table, and Venom Coating's ruled
+  row).
+- **WHAT MOVED:** `scripts/battle.gd` (the fifteen's read sites, Aper and its chip, `_deal_gate`, the bot's `BOT_PET_ORDER`, Long
+  Poison's guard off), `scripts/unit.gd` (sixteen `rune_` fields, the vow's `deal_gate_cb`, the ward's and Aper's
+  state, `sunder_depth`, `purge_debuffs_taken`, `overheal_shielded`), `scripts/classes.gd` (Summon Aper's call and
+  tags, `RUNE_COMPANION_KINDS`, Venom Coating's ruled row, Mark of the Hunt's companion row with a ruled seat),
+  `scripts/runes.gd` (Long Poison's row out, Tusk and Bristle's pet row, `CANCELLED_BY`, the fifteen's tag and shape
+  rows), `scripts/run_state.gd` (`worn_rune_ids`, the cancelled cause in the note), `scripts/map_screen.gd` and
+  `scripts/party_screen.gd` (the worn ids passed to the note); `data/runes.json` (the fifteen, nothing else);
+  **`check_hf.gd` (NEW)** and `run_battery.sh`; the repaired `check_gv`, `check_he`, `check_gt`, `check_ez`,
+  `check_fe`, `check_fk`, `check_gx`, `check_es`, `check_di`, `check_dv`, `check_fn`, `check_fo`, `check_hc`,
+  `check_ek`, `test_batch_as`, `test_batch_at`, `test_batch_az` and `test_batch_ba`; `pin-manifest.json`,
+  `baselines.json`; `CLAUDE.md`, `docs/master.html` and its stamp, `docs/changelog.html`, `docs/design-notes.md`,
+  this file and `docs/reports/HF.md` (**NEW**).
 - **Phase.** Steps 1–5 of the merge's running order are done and the rune layer is merged; **step 6 is HD (the twenty
-  holes and the fold), HE (the offers and the doors) and HF (the other seventy-three)**. The Crown's Break and freeze
-  resistance, Sanctity's potency layer and the engine-card texts stay queued; the rune design pass (companion runes, a
-  new companion, the Cleric's no-engine runes — and now the Mage's) is its own.
-- **Next letter: HF.**
+  holes and the fold), HE (the offers and the doors) and HG (the other seventy-three)**, with HF's fifteen runes taken
+  between them. The Crown's Break and freeze resistance, Sanctity's potency layer and the engine-card texts stay
+  queued; **the rune design pass's first fifteen and its new companion are built (HF)**, and the rest of that pass is
+  its own.
+- **Next letter: HG.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### HE's RULINGS OWED — **SIX; THE FIRST IS WORDING, THE REST ARE WHERE A RULING'S PREMISE DID NOT HOLD WHOLE**
+### HF's RULINGS OWED — **FIVE; THE FIRST THREE ARE MAGNITUDES THE BRIEF LEFT UNSET, THE FOURTH IS WORDING**
+
+Full working: `docs/reports/HF.md`, NEEDS A RULING.
+
+1. **BURNING GROUND'S BURN — PROPOSED 5% OF THE CLERIC'S MAXIMUM HEALTH, HOLY, AT THE START OF EACH OF HIS TURNS WHILE
+   HIS CONSECRATION HOLDS.** Priced against Consecration's own 5% heal, pointed the other way: four burns a cast, 6 to
+   each enemy at his 121 maximum, 72 over a cast against three enemies beside the heal's ~97 across four heroes. The
+   magnitude is the rune's payload (`rune_burning_ground` 0.05), so a ruling moves data. If the card should name a
+   number, wording is proposed.
+2. **APER'S BODY, CHARGE AND BOON — PROPOSED.** 80 health and a charge of 20% of the Hunter's Attack (the wolf's and the
+   eagle's); Pack Bond's boon its own charge, 15% harder a step of the bond's curve (the wolf's rate). No arrival
+   effect and no raw-stack gift: none was authored.
+3. **ABUNDANCE'S SHIELD — IT ADDS, IT HOLDS TWO TURNS (PROPOSED), AND NO CEILING WAS WRITTEN.** Under Consecration it
+   grows by the drip's spill every turn (about 5% of each maximum), and it is bounded by the healing poured into full
+   bars. Cap it, or let it stand.
+4. **MARK OF THE HUNT'S TEXT — TWO PROPOSALS THAT NAME WHAT EACH HALF NEEDS.** (A) keeps the card's five lines and
+   replaces the sixth; (B) also takes out the *"you"* and *"your"* the text standard forbids. HE's proposal no longer
+   fits. The designer confirms.
+5. **KILL COMMAND HAS NO ORDER FOR APER, AND GHOSTPACK AND CALL OF THE WILD NAME THE THREE.** A card that orders a
+   companion by kind does nothing for a kind it does not name; none was given an arm (a card's effect is the
+   designer's). The smallest fix, if wanted: Aper obeys Kill Command with an ordinary charge.
+
+### FOUND AT HF AND NOT FIXED
+
+- **SUMMON COMPANION'S TEXT NAMES THREE COMPANIONS**, and with Tusk and Bristle worn the picker offers a fourth. The
+  card's text is authored; the rune's own text says what it adds, and the picker shows Aper's call with its own
+  description. Wording is the designer's.
+- **A VENOM COATING CARRIED WITHOUT TRAPPER IS STILL SEATED.** HF §7 gates the OFFER; the card casts with no engine
+  (the coating lands and pays nothing), so the seat derivation — the door refusing a card bare — never finds it, and a
+  copy drafted under Trapper stays on the bar after Trapper is dropped. A seat row would be a ruling (HE §2's shape for
+  Mark of the Hunt, since undone).
+- **RETURNED BURDEN FINDS ITS APPLIER BY NAME.** A status carries its applier's name (`src_name`, DI's rule), and two
+  enemies of one kind share a name, so the first of that name on the field takes the burden back.
+- **A REFLECT LEAKS PAST VOW OF SILENCE.** The vow reads the attribution frame, and Consecrated Ground's reflect is
+  dealt inside the enemy's own blow, whose frame is the enemy's — so a Vow Cleric standing on Consecrated Ground (a
+  drafted card) still hurts the enemy that strikes him. BL's rule, one reader more: damage the frame does not credit to
+  him is damage the vow cannot see.
+- **DETONATING WARD PAYS ON TWO REMOVALS, NOT EVERY ONE.** It detonates when the ward BREAKS (`barrier_broken_cb`) or
+  ENDS (`status_expired_cb`); a barrier stripped another way — a purge, a replacement by a smaller ward, the fight
+  ending — pays nothing, and the absorbed total resets at the next cast.
+- **BURNING GROUND STOPS WHEN THE CLERIC FALLS.** It burns at the start of HIS turn, and a fallen Cleric has none, while
+  the ground he laid goes on healing the others for its remaining turns.
+- **THE BRIEF'S PREMISES THAT DID NOT HOLD WHOLE** (HF §0): *"three times 35% is past a whole armour value"* — one
+  Sunder is a MULTIPLIER (x0.65), so compounded three would leave 27%; the words were built as an addition and floored;
+  *"Pommel Strike's rule exactly"* — Pommel's has a Perfect exception, and a companion's charge has no bar; *"the column
+  shows them"* (declining) — the draft column shows how many it holds back and the rune that brings them back, not
+  their names; *"these five build on healing and mitigation"* — Burning Ground is damage, Consecration's, and Returned
+  Burden casts afflictions; and the Hunter's five became **seven**, because §6's Long Poison joins the two.
+- **THIRTY-SEVEN ISOLATED COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata`, every one named **"Dawn of Decay HF
+  …"**: the recon of HEAD's gates (**"recon"**), this tree's working copy (**"dev"**) and a one-off debug copy (**"dbg"**), the two ok() trace trees (**"trace_head"**, **"trace_new"**), the pre-pass (**"prepass"**) and the thirty-one control runs (**"ctl_c01"** to **"ctl_c28"**, with **"ctl_c07b"** and the two re-runs **"ctl_c02r"** and **"ctl_c15r"**). Each was renamed in `project.godot` before anything ran in it and seeded from the backup; they can
+  be deleted. **There are 272 such folders now**, counting every folder there but the live game's own. **The
+  untracked `save-backups/` folder inside the repo is not this batch's**; this batch's backup is
+  `../save-backups/HF-20260922-160208`.
+
+### ~~HE's RULINGS OWED~~ — **ALL SIX CLOSED AT HF: ONE SUPERSEDED (1), ONE RULED AND BUILT (2), THREE RECORDED AS RULED (3, 4, 6), ONE ANSWERED BY THE FIFTEEN (5)**
+
+HF's brief ruled or recorded all six. **1**: superseded — HE's wording no longer fits once the card is every
+pet-holder's, and HF proposes two wordings that name what each half needs (HF's ruling 4). **2**: ruled and built at HF
+§7 — Mark of the Hunt is offered to every Hunter with a pet and sits out only beside a dismisser, HE's Pack Bond gate
+undone. **3**: recorded — Slaughterhouse stays on Blood Frenzy, the cost accepted when the six were gated on their
+authoring engine. **4**: recorded — Stabilize and Primal Surge are gated boss cards, confirmed. **5**: answered by HF
+§2's five Mage runes that read no engine — a Mage holding none is offered five at spawn. **6**: recorded — declining a
+draft refuses its held-back cards; declining is a decision. The working below is HE's, kept as the record of what was
+ruled.
+
+#### HE's six, as HE recorded them
 
 Full working: `docs/reports/HE.md`, NEEDS A RULING.
 
@@ -115,13 +193,16 @@ Full working: `docs/reports/HE.md`, NEEDS A RULING.
 
 ### FOUND AT HE AND NOT FIXED
 
-- **VENOM COATING IS OFFERED AT THE SURVIVALIST'S ZONE BOSS TO A HERO IT CANNOT PAY.** Its whole payoff — every attack
+- ~~**VENOM COATING IS OFFERED AT THE SURVIVALIST'S ZONE BOSS TO A HERO IT CANNOT PAY.**~~ **CLOSED AT HF §7**: ruled
+  Trapper's, a RULED card-gate row, withheld at every door (the zone boss offered it 0 times in 400 without Trapper).
+  HE's record: Its whole payoff — every attack
   Poisons — is read inside Trapper's block (the Survivalist's on-hit package in `battle.gd`), so without Trapper the card
   spends a turn laying a coating that does nothing. The boss asks the card gate since HE §3, and Venom Coating is not a
   row: the cast lands, so the cast test cannot see it — GP's *a row whose payout is a later strike* shape, found here by
   reading the site while deriving the boss-only cards. **It is GM's ruling 1, still open** (move the payload out of the
   block, or gate the card), so it is reported and not gated.
-- **BESIDE THE RUNE OF THE SHARPSHOOTER, MARK OF THE HUNT IS STILL OFFERED, AND SITS OUT ONCE TAKEN.** The ruling gates
+- ~~**BESIDE THE RUNE OF THE SHARPSHOOTER, MARK OF THE HUNT IS STILL OFFERED, AND SITS OUT ONCE TAKEN.**~~ **CLOSED AT
+  HF §7**: the card is a companion row, so the pet gate withholds it from a Sharpshooter (0 in 400). HE's record: The ruling gates
   the OFFER on Pack Bond being equipped, and beside Lethal Aim it is equipped — and sitting out (HC §5's ruling for
   Pack Bond itself: legal, and visible). So the Beastmaster's zone boss offers the card to that Hunter exactly as
   often as to any Pack Bond holder (400 in 400, `check_he` §3 pins it), and the hero sheet greys it out the moment it
@@ -129,7 +210,8 @@ Full working: `docs/reports/HE.md`, NEEDS A RULING.
   this one needs none. Withholding it would need the offer to ask whether an engine is IN EFFECT, not whether it is
   slotted — a ruling, not a repair.
 - **MARK OF THE HUNT'S CARD SPEAKS IN *"you"* AND *"your"***, which the text standard forbids. The proposed wording (HE's
-  ruling 1) leaves those lines as they are: rewriting authored text is the designer's.
+  ruling 1) leaves those lines as they are: rewriting authored text is the designer's. **Still open; HF's ruling 4 carries
+  a second proposal (B) that takes them out.**
 - **`check_gv` §2c STILL SPLITS A CACHE BUTTON'S TEXT ON THE BAND'S `"  ["`.** With no band the split returns the whole
   text, which is the rune's name, so the arm is right; a harmless relic of the band, left standing.
 - **THE BRIEF'S PREMISES THAT DID NOT HOLD** (HE §0): *"Slaughterhouse — the Berserker's engine"* as its author (no
@@ -174,11 +256,12 @@ Full working: `docs/reports/HD.md`, NEEDS A RULING.
 
 ### FOUND AT HD AND NOT FIXED
 
-- **THE CLERIC'S NO-ENGINE RUNE FLOOR IS OWED, NOT PASSED — AND SINCE HE §1 SO IS THE MAGE'S SPAWN HALF.** `check_gv` §3
+- ~~**THE CLERIC'S NO-ENGINE RUNE FLOOR IS OWED, NOT PASSED — AND SINCE HE §1 SO IS THE MAGE'S SPAWN HALF.**~~ **CLOSED
+  AT HF**: the Cleric reads 5 / 5 and the Mage 5 / 9, and `RUNE_FLOOR` sits at the reading. HD's record: `check_gv` §3
   prints each as owed and notices the day it rises; the design pass is authoring Cleric runes that read no engine, and the batch that lands them owes
   `RUNE_FLOOR` its reading.
 - **`master.html` STILL SAYS *"All twelve specs draft from at least ten"*** — HA's second document-and-pin pair
-  (`test_batch_cb:1246`, tier 2), **HF's** now. HD corrected the first pair (`CLAUDE.md`'s seam and `test_batch_br`'s pin)
+  (`test_batch_cb:1246`, tier 2), **HG's** now. HD corrected the first pair (`CLAUDE.md`'s seam and `test_batch_br`'s pin)
   and swept that claim's two copies out of `master.html` §6b, and the HB-era *"the Beastmaster's"* Summon Companion
   in its interface section.
 - **THE FOLD'S FLOOR SITS AT THE READING**, so the next batch that gates a card, moves one into a kit or retires one
@@ -234,7 +317,8 @@ Full working: `docs/reports/HC.md`, NEEDS A RULING.
 
 ### FOUND AT HC AND NOT FIXED
 
-- **THE CLERIC IS THE CLASS THE RUNE MERGE DID NOT REACH.** All fourteen of his runes are `ENGINE_READ` rows (Mercy,
+- ~~**THE CLERIC IS THE CLASS THE RUNE MERGE DID NOT REACH.**~~ **CLOSED AT HF §1**: five Cleric runes read no engine, so a
+  Cleric holding none is offered five at spawn. HC's record: All fourteen of his runes are `ENGINE_READ` rows (Mercy,
   Conviction, Ruin), so a Cleric holding a spine, a rule engine, any pair of the three non-lineage engines, or nothing,
   is offered no ordinary rune at spawn or ever — the designer's own Cleric (Sanctity) among them. **That is the input
   the rune design pass needs, stated here so it is not re-derived**: the Warrior's, the Mage's and the Hunter's classes
@@ -1193,7 +1277,9 @@ Full working: `docs/reports/GL.md` and `docs/reports/GN.md`.
   (below 8 Resonance, `battle.gd:6469`), Resurrection (1 Mercy, 6152; its label reads a bare "1", 6572-6573) and Kill
   Command (no companion, 6157-6159). GK's lineage interim keeps all three in the kit. Driven: each refused in an
   engine-less kit, Resurrection with a hero down. It widens GK's ruling 5.
-- **PLAYER-FACING: LINEAGE CARDS THAT HALF-WORK WHEN THE ENGINE IS DROPPED — STILL OPEN; GM's RULING 1.** Only
+- **PLAYER-FACING: LINEAGE CARDS THAT HALF-WORK WHEN THE ENGINE IS DROPPED — STILL OPEN; GM's RULING 1, EXCEPT FOR VENOM
+  COATING, WHICH HF §7 ANSWERED AT THE OFFER** (a RULED card-gate row on Trapper; its payload stays in the block, and a
+  copy carried without Trapper stays seated — FOUND AT HF). Only
   Shrapnel Charge was in an opening kit, and since GS §1 none is — it is drafted off the Survivalist's shelf; Hamstring, Venom Coating, Pinning Shot and Called Shot are EARNED zone-boss
   cards. Their payload sits inside the engine's block: Shrapnel Charge's Poison, Hamstring's Slow and Exposed and Venom Coating's poison inside Trapper's
   (`battle.gd:12059-12079`); Pinning Shot's Daze and Called Shot's rider inside Lethal Aim's (12214-12227).
@@ -1822,7 +1908,7 @@ code, and some of what it found lives elsewhere. **The tables are in `docs/repor
   exact and contained matches against `scripts/` and `data/`). The names a merge would have made collide: Spite (a Warden node and a Berserker card), Whetstone (a Swordmaster node and a
   live rune), Second Wind (a Berserker node and a Holy card).
 
-### THE CLASS MERGE ~~IS MEASURED AND UNRULED~~ WAS MEASURED AT FP AND IS RULED — **A PROJECT ON ITS OWN BRANCH SINCE FQ; STEPS 1–5 BUILT (3's NINE ENGINES AT GO, 4's POOL MERGE AT GP, 5 AT GP AND GV), AND THE RUNE SCOPES MERGED AT HC; STEP 6 CENSUSED AT HA, ITS FIRST HALF TAKEN AT HD AND ITS SECOND OWED TO HE (THE RUNNING ORDER BELOW)**
+### THE CLASS MERGE ~~IS MEASURED AND UNRULED~~ WAS MEASURED AT FP AND IS RULED — **A PROJECT ON ITS OWN BRANCH SINCE FQ; STEPS 1–5 BUILT (3's NINE ENGINES AT GO, 4's POOL MERGE AT GP, 5 AT GP AND GV), AND THE RUNE SCOPES MERGED AT HC; STEP 6 CENSUSED AT HA, ITS FIRST HALF TAKEN AT HD AND ITS SECOND OWED TO HG (THE RUNNING ORDER BELOW)**
 
 **Full evidence: `docs/merge-recon.html`, written to be read section by section across many
 batches. `docs/reports/FP.md` is the batch's own working.** FP authored nothing and proposed
@@ -2103,7 +2189,7 @@ done at FQ.** The order is recorded so it is not re-litigated batch by batch:
    only under their lineage's engine, and a rune's scope is the lineage, so he is still offered them* — is closed by
    it; **what the scope itself should be was GV's ruling 5, answered at HC: the CLASS**, with the engine gate (36 rows
    since Layered Aegis), the card a rune names and a companion present deciding what a hero is offered.
-6. **THE GATES — CENSUSED AT HA; HD TOOK THE TWENTY HOLES AND THE FOLD, AND HE OWES THE OTHER SEVENTY-THREE** (HB was the pet and HC the rune scopes). FP counted **52 engine-bound targets** carrying
+6. **THE GATES — CENSUSED AT HA; HD TOOK THE TWENTY HOLES AND THE FOLD, AND HG OWES THE OTHER SEVENTY-THREE** (HB was the pet and HC the rune scopes; HE took the offers and the doors, and HF the fifteen no-engine runes). FP counted **52 engine-bound targets** carrying
    71.6% of the battery's asserted checks, and GK repaired every red its own move caused. **HA read all 119 launched
    targets arm by arm**: of FP's 52, **twenty are repaired and correct, thirty-one still ask a pre-merge question and one
    is red on purpose** — and **the middle group is 42 targets and 130 arms, eleven of its targets outside FP's 52**,

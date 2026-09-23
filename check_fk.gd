@@ -103,6 +103,7 @@ func _s1_the_pool() -> void:
 	var priced_wrong: Array = []
 	var bad_scope: Array = []
 	var engines: Array = []
+	var hf_class: Array = []
 	for id in Runes.ids():
 		if Runes.is_retired(String(id)):
 			continue
@@ -111,10 +112,21 @@ func _s1_the_pool() -> void:
 		if Runes.is_engine_rune(String(id)):
 			engines.append(String(id))
 			continue
-		live.append(String(id))
 		var cfg: Dictionary = Runes.config(String(id))
 		var scope := String(cfg.get("scope", ""))
 		var wf := String(cfg.get("written_for", ""))
+		# BATCH HF — AND NEITHER ARE HF's FIFTEEN: written for their CLASS and for
+		# no lineage (`written_for` absent), so they are counted beside this pool
+		# as the engine runes are, and held to the same two rules the pool is — a
+		# class scope a hero can be dealt, and the flat 100g.
+		if wf == "":
+			hf_class.append(String(id))
+			if not (scope.begins_with("class:") and Classes.CLASS_KITS.has(scope.trim_prefix("class:"))):
+				bad_scope.append("%s=%s (written for no lineage)" % [id, scope])
+			if int(cfg.get("price", 0)) != 100:
+				priced_wrong.append("%s=%s" % [id, cfg.get("price", 0)])
+			continue
+		live.append(String(id))
 		if NOT_KEYS.has(wf):
 			bad_scope.append("%s written for %s" % [id, wf])
 		# BATCH HC §1 — THE SCOPE IS THE CLASS OF THE LINEAGE IT WAS WRITTEN FOR,
@@ -126,6 +138,8 @@ func _s1_the_pool() -> void:
 			priced_wrong.append("%s=%s" % [id, cfg.get("price", 0)])
 		by_spec[wf] = int(by_spec.get(wf, 0)) + 1
 	ok(live.size() == 60, "§1: the live pool is %d, not 60" % live.size())
+	ok(hf_class.size() == 15,
+		"§1: %d live runes are written for no lineage, not HF's fifteen — %s" % [hf_class.size(), hf_class])
 	ok(by_spec.size() == 12,
 		"§1: the live pool spans %d specs, not all 12 — %s" % [
 			by_spec.size(), by_spec.keys()])
