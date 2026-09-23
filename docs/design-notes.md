@@ -4,6 +4,33 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The remaining stale assertions, derived and sorted (Batch HG) — 2026-09-22
+
+**Why the number was re-derived instead of taken.** Two figures were on record — HA's 110 and `state.md`'s
+seventy-three — and both were right about different things: HA's counts the thirty-five pool floors HD later
+folded, and the seventy-three still counts three that HB and HC repaired in passing while doing something else.
+A repair batch that trusts either one spends its first hour finding out which arms are already done. The number
+is seventy.
+
+**Why a line number is not enough to re-verify a census entry.** `check_fk`'s assertion reads today exactly as it
+read the day HA recorded it, and it was repaired two batches ago: HC re-pointed the four lines that build the set
+the assertion tests, and never touched the assertion. So the check is not *is the line still there* but *has the
+code that feeds it moved* — which means diffing the enclosing function, comments stripped, for every entry. Twenty-nine
+of the seventy-one surviving arms sat in code that had moved; one of them was a repair.
+
+**Why a retirement gets a control even though nothing is being built.** Three of the seventeen arms marked
+"another check asks this better" were marked wrong, and the only way to find that out is to break the thing and
+watch. In one case the replacement gate read zero failures. In another it caught one of two leaked enablers and was
+silent on the second, because that enabler is the Hunter's own basic attack and the gate exempts it by name — so
+retiring the three siblings together would have quietly stopped anyone asking about the Sharpshooter. One is kept.
+A supersession is a claim about the instruments, and this project does not take a claim on its own word.
+
+**Why the batch stopped at the price.** The rule is FZ's: if repairing a population in one batch means hours, report
+the count, the sort and the method and stop. HD did 56 arms in 23 targets with 26 controls and needed a full battery;
+this is 70 in 34, and every re-pointed assertion owes a control that reds it beside one proving the old version did
+not. Splitting it by disposition rather than by file means each batch does one kind of thing, which is easier to
+check than three. The retirements go first because their controls are already run.
+
 ## Fifteen class runes, and the boar (Batch HF) — 2026-09-22
 
 **Why these fifteen read no engine.** After the status runes followed their engines, a hero who took no engine was

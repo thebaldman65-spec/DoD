@@ -945,6 +945,42 @@ read, which is the one channel this project has never gated.
 **REPORT EVERY DISCREPANCY IN THE BATCH REPORT, INCLUDING THE ONES THAT MADE NO DIFFERENCE.**
 The brief is the shared record; leaving an error in it means the next brief inherits it.
 
+## STANDING RULE — RE-VERIFYING A CENSUS ENTRY MEANS DIFFING WHAT FEEDS THE ARM, NOT THE ARM'S OWN LINE (Batch HG §1b)
+> **A census hands the next batch a file and a line. Both can still be exact while the entry is already
+> repaired**, because a repair often lands in the lines ABOVE the assertion and never touches it.
+
+**HG RE-DERIVED HA's 110 STALE ARMS AND A LINE CHECK WOULD HAVE COUNTED SEVENTY-ONE.** `check_fk` §5's
+`ok(unreachable.is_empty(), …)` is byte-identical to the day HA read it; **HC §1 re-pointed the four lines that
+build `reach`** from the lineage's own shelf to `Classes.draft_pool(cls)`, wrote the reason into the comment above
+it, and left the assertion alone. The arm was done and the census would have said it was outstanding.
+
+- **MAP THE ENTRY FORWARD, THEN DIFF ITS ENCLOSING FUNCTION WITH COMMENTS STRIPPED.** HG did both: 71 of 110 arms
+  were textually unchanged, and **29 of those 71 sat in a function whose code had moved**. Twenty-eight of the
+  moves were a neighbour's repair landing beside the arm; one was the arm's own.
+- **THE COMMENT ABOVE AN ARM IS WHERE A RE-POINT IS RECORDED, so it is evidence and not decoration.** Every repair
+  in this project writes its reason there (`docs/instrument-rules.md`), which is what makes this check cheap.
+- **THIS IS EU's READ-SITE RULE POINTED THE OTHER WAY.** *The read site is the line, not the function* is about
+  where a claim is PAID; this is about where a repair LANDS. A census entry needs both readings.
+
+## STANDING RULE — A SUPERSESSION IS A CLAIM, AND IT IS DRIVEN LIKE ONE (Batch HG §2a)
+> **Retiring an instrument because another one "asks it better" is a statement about the game's instruments, and
+> it can simply be false. Inject the defect the retired arm guards and READ THE NAMED CHECK.**
+
+**HG RAN EIGHT SUCH CONTROLS AND THREE REFUTED THE RULING IT HAD WRITTEN.**
+
+- **`check_gp` read ZERO failures** with a lineage-gated card sitting in a class-wide shelf, because the gate
+  withholds the card at the OFFER door whichever shelf it sits on — so nothing the gate drives breaks, and the arm
+  proposed for retirement was the only one asking.
+- **`check_gs` §1 caught one leaked enabler and was SILENT ON THE OTHER**, because the Sharpshooter's enabler is
+  the Hunter's class basic and §0 exempts it by name. **Retiring all three siblings would have lost that case
+  silently**; one is kept.
+- **AND THE NAMED SUPERSEDER WAS WRONG FOR AN ENTIRE FAMILY OF EIGHT.** `check_gs` counts homes for the thirty
+  RETURNING cards; the eight arms guard authored draft cards, which are not in that population.
+
+**SO THE CONTROL IS TWO-ARMED IN THE USUAL WAY AND THE ARMS ARE NAMED:** the retired arm reds, which proves it
+guarded the defect, **and the named check reds, which proves retiring it loses nothing.** A green second arm is not
+a detail to note — it is the ruling being wrong.
+
 ## THE SHARPSHOOTER'S BASIC IS A SEQUENCE (STANDING, SET AT BATCH CS)
 **HIS BASIC ATTACK ONLY. No other ability of his changes, and no other hero's bar moves at all.**
 `_is_sharpshooter_basic` is the single answer to "is this it" — read off the hero's held engine

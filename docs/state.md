@@ -13,91 +13,103 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-22 (Batch HF).*
+*Last rewritten: 2026-09-22 (Batch HG).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: HF — FIFTEEN CLASS RUNES, AND THE BOAR. IMPLEMENT ONLY, AND THE THIRTY-EIGHTH BATCH ON `class-merge`.**
-  The designer authored fifteen runes that read no engine — five Cleric, five Mage, three Warrior, two Hunter — and Aper,
-  the boar Tusk and Bristle adds to Summon Companion; HF builds them and drives every one on a hero holding no engine,
-  and builds §6 and §7's rulings. `main` is untouched. Full working: **`docs/reports/HF.md`**.
-- **THE SEQUENCE SHIFTED AGAIN: HG IS NEXT — THE OTHER SEVENTY-THREE.** HE recorded them as HF's; HF took the fifteen
-  runes instead, so HA's seventy-five tier-2 arms less `test_batch_bq`'s two retired at HD are **HG's**, and HA §1d is
-  still the work list, arm by arm.
-- **§0 — A NO-ENGINE RUNE READS ONLY WHAT EVERY HERO OF ITS CLASS HAS** (the designer's rule, now a standing block in
-  `CLAUDE.md`): the class's kit cards and basic, its resource, the statuses its kit lays (Elemental Weakness; taunt and
-  Sunder; stun and Poison), and healing and damage in general. **All fifteen confirmed at the line that pays them**
-  (the table is `docs/reports/HF.md` §0b), each class-scoped, 100g, written for no lineage and on no
-  `Runes.ENGINE_READ` row.
-- **§1–§4 — THE FIFTEEN.** **Cleric:** Abundance, Returned Burden, Burning Ground, Eleventh Hour, Vow of Silence.
-  **Mage:** Unravel, Seeking Missiles, Detonating Ward, Clarity, Profligate. **Warrior:** Goading Roar, Rending Blows,
-  Grudge. **Hunter:** Opportunist, Tusk and Bristle (Aper: 80 health, charges for 20% of the Hunter's Attack, **every
-  third charge stuns for one turn** on a fixed rhythm a chip counts, a boss resists until Broken). **What the brief
-  asked to be reported is in the report's FOR THE RECORD**: Returned Burden goes to the enemy that laid the effect
-  while it stands (else another at random); Seeking Missiles SPREAD, one at each weakened enemy; Rending Blows' three
-  depths ADD (35% of the armor each) and the third floors at zero; Grudge does nothing before anything has struck him;
-  Aper's count lives on the body, so a swap, a fresh call and a new fight each restart it; the bot calls Aper
-  (`battle.BOT_PET_ORDER`, once, the rune's kind first). **Three magnitudes are PROPOSED** (NEEDS A RULING 1–3):
-  Burning Ground's burn, Aper's body and boon, Abundance's two turns.
-- **§5 — VOW OF SILENCE CANCELS BURNING GROUND, VISIBLY.** GX's tell applies with a THIRD cause: `Runes.CANCELLED_BY`
-  and `Runes.cancelled_by`, asked by `Runes.sits_out` off the runes he has equipped (`Run.worn_rune_ids`), on GX's four
-  surfaces; the burn's read site refuses too. **Abundance under Consecration**, on a party at full health, adds the
-  drip's spill every turn: 8 / 5 / 7 / 6 a turn (Warrior / Mage / Cleric / Hunter), about 20% of each maximum after
-  four turns. No ceiling written (NEEDS A RULING 3).
-- **§6 — LONG POISON IS UN-GATED.** Snare Trap — every Hunter's kit card — lays Poison 4 through `_apply_poison`, the
-  Hunter its source, when the snare springs, and that is the door the rune reads; HC's census cast each card once and
-  never saw a later turn. Its row is gone and its read site asks no engine.
-- **§7 — MARK OF THE HUNT IS OFFERED TO EVERY HUNTER WITH A PET; VENOM COATING IS TRAPPER'S.** HE's Pack Bond gate
-  undone: the card is a `Classes.COMPANION_READ` row whose door opens and whose seat is RULED — it sits out only beside
-  a dismisser (`Classes.companion_seat`) — and its hunter's halves still pay only under Pack Bond. **A Hunter with a
-  companion and no Pack Bond is offered it again** (HE: 0 in 400; HF: 307 in 400 with no engine) and receives the
-  companion's half — a wolf's blow on the prey 20 against 16 off it, 3 Mana a blow — not the hunter's (his shot 16 on
-  and off; 20 under Pack Bond). **Venom Coating is a RULED card-gate row on Trapper** (`ruled: "HF §7"`), withheld at
-  every door the card table reaches, the zone boss included (246 in 400 with Trapper slotted, 0 unslotted or absent).
-  Recorded as HE ruled: Slaughterhouse stays on Blood Frenzy; Stabilize and Primal Surge are gated boss cards; declining
-  a draft refuses its held-back cards.
-- **WHAT A HERO HOLDING NO ENGINE CAN BE OFFERED, RE-MEASURED BY NAME** (HC's table; `check_hf` §3, `check_gv` §3):
-  **Warrior 5 at spawn / 9 at the ceiling** (from 2 / 6), **Mage 5 / 9** (from 0 / 4), **Cleric 5 / 5** (from 0 / 0),
-  **Hunter 7 / 9** (from 4 / 6). Every class reaches five; `check_gv` §3's `RUNE_FLOOR` moved to the reading, and no
-  half is OWED any more.
-- **THE VERIFICATION.** HEAD's unmodified battery ran first against HF's game code — **124 of 124 launched, no `Parse Error` in any
-  log, `check_de` 509 → 513 / 21 failures / 16 notices**, every red read by its FAIL text before an instrument was
-  touched (`docs/reports/HF.md` §9). The pre-pass — the whole battery on an isolated copy of the landed tree, the rows
-  written first — read **125 of 125, `check_de` 517 / 0 / 0**, no `Parse Error` and no `SCRIPT ERROR` in any log. The
-  acceptance run, in the repository: **125 of 125 (with `check_hf`), `check_de` 517 checks / 0 failures / 0 notices**,
-  no `Parse Error` and no `SCRIPT ERROR`, the tree hashed at the start and the end — **564 paths, and the only two that
-  moved are this file and `docs/reports/HF.md`, written while the run was going** (`check_es`, the one target that
-  opens this file, was re-run against the final documents: 57 / 0) — and **the two sanctioned reds at their counts**
-  (`check_cm_live` 13 / 4; `check_gj` 70 / 1, *"+167 gold and the purse moved 187"*, moved from HE's +159 / 179 by HF's
-  runes, the gap the same twenty). **Twenty-nine controls, one defect a copy**, each read by its FAIL text, three of
-  them two-armed against HEAD's own copy of the repaired gate; two read green first and both arms were tightened and
-  re-run (§10). The player's four saves were backed up to `../save-backups/HF-20260922-160208` and are byte-identical
-  to it after everything ran.
-- **`CLAUDE.md` IS 378,851 B = 369.97 KiB, WITH 40.03 KiB UNDER ITS 410 KiB CEILING** (+6,209 B this batch: the no-engine rule block, Long Poison's un-gating
-  and the census blind spot behind it, Mark of the Hunt's companion row, Aper's kind table, and Venom Coating's ruled
-  row).
-- **WHAT MOVED:** `scripts/battle.gd` (the fifteen's read sites, Aper and its chip, `_deal_gate`, the bot's `BOT_PET_ORDER`, Long
-  Poison's guard off), `scripts/unit.gd` (sixteen `rune_` fields, the vow's `deal_gate_cb`, the ward's and Aper's
-  state, `sunder_depth`, `purge_debuffs_taken`, `overheal_shielded`), `scripts/classes.gd` (Summon Aper's call and
-  tags, `RUNE_COMPANION_KINDS`, Venom Coating's ruled row, Mark of the Hunt's companion row with a ruled seat),
-  `scripts/runes.gd` (Long Poison's row out, Tusk and Bristle's pet row, `CANCELLED_BY`, the fifteen's tag and shape
-  rows), `scripts/run_state.gd` (`worn_rune_ids`, the cancelled cause in the note), `scripts/map_screen.gd` and
-  `scripts/party_screen.gd` (the worn ids passed to the note); `data/runes.json` (the fifteen, nothing else);
-  **`check_hf.gd` (NEW)** and `run_battery.sh`; the repaired `check_gv`, `check_he`, `check_gt`, `check_ez`,
-  `check_fe`, `check_fk`, `check_gx`, `check_es`, `check_di`, `check_dv`, `check_fn`, `check_fo`, `check_hc`,
-  `check_ek`, `test_batch_as`, `test_batch_at`, `test_batch_az` and `test_batch_ba`; `pin-manifest.json`,
-  `baselines.json`; `CLAUDE.md`, `docs/master.html` and its stamp, `docs/changelog.html`, `docs/design-notes.md`,
-  this file and `docs/reports/HF.md` (**NEW**).
-- **Phase.** Steps 1–5 of the merge's running order are done and the rune layer is merged; **step 6 is HD (the twenty
-  holes and the fold), HE (the offers and the doors) and HG (the other seventy-three)**, with HF's fifteen runes taken
-  between them. The Crown's Break and freeze resistance, Sanctity's potency layer and the engine-card texts stay
-  queued; **the rune design pass's first fifteen and its new companion are built (HF)**, and the rest of that pass is
-  its own.
-- **Next letter: HG.**
+- **Last batch: HG — THE REMAINING STALE ASSERTIONS, DERIVED AND SORTED; PRICED AND NOT REPAIRED. THE THIRTY-NINTH BATCH ON `class-merge`.**
+  HA's middle group was re-derived arm by arm against the tree HB through HF left: **seventy arms in thirty-four targets**,
+  sorted into the three dispositions the brief asks for, priced against HD, and **not repaired** — FZ's rule, on a
+  measured population. No gate, suite, fixture or baseline arm moved. `main` is untouched. Full working:
+  **`docs/reports/HG.md`**.
+- **THE NUMBER IS SEVENTY, AND NEITHER FIGURE ON RECORD WAS RIGHT.** HA's 110 counts the thirty-five FOLD arms HD
+  folded; HE's seventy-three counts `check_dr:126` and `test_batch_bo:437` (re-pointed at **HB**) and `check_fk:368`
+  (re-pointed at **HC §1**). **Every one of HD's thirty-five FOLD arms was verified gone.**
+- **§1 — A LINE CHECK WOULD HAVE COUNTED SEVENTY-ONE, AND `check_fk` IS WHY.** An arm's `ok(` line can be
+  byte-identical while the repair lands in the lines that FEED it: HC re-pointed check_fk §5's reach set from the
+  lineage's own shelf to `Classes.draft_pool(cls)` and never touched the assertion. **The enclosing function of all
+  seventy-one was diffed, comments stripped** — twenty-nine sit in moved code, twenty-eight of those moves are HD's
+  fold or HB's pet work landing beside the arm, and one is that repair.
+- **§1d — NOTHING STALE HAS BEEN ADDED SINCE HA.** HF found HC's census had missed Long Poison, so the population HA
+  never read was swept with HA's own vocabulary — the four gates added since (`check_hc`, `check_hd`, `check_he`,
+  `check_hf`) in full, and every line ADDED to the other fifty-nine moved targets. Eight assertion lines name
+  pre-merge words; **all eight are live** (a zone-boss pool, `core_slots` under HB's ruling, a name-absence sweep,
+  Lethal Aim dismissing the pet).
+- **§2 — THE SORT: 48 RE-POINTS in 25 targets, 5 RETIREMENTS whose subject is gone in 5, and 17 RETIREMENTS
+  SUPERSEDED by a newer check in 13.** A re-point's question survives under classes and only its vocabulary is
+  stale; a retirement is inverted onto the ruling that removed its subject, never deleted — the Melted Armor
+  contract; a superseded arm is the second copy of a question, and is retired naming the check that keeps it.
+- **§2a — A SUPERSESSION IS A CLAIM, SO EIGHT CONTROLS DROVE IT.** Each injected the defect a retired arm guards
+  into an isolated copy with its own seeded `user://`, then ran the retired arm's own target AND the named check,
+  both read by their FAIL text. **The clean arm first: `check_gs` on an unmodified copy reads 749 / 0**, which is
+  its `baselines.json` figure. No copy showed a `Parse Error`.
+- **§2b — THREE OF THE EIGHT REFUTED THE RULING, AND THE SORT CARRIES THE MEASUREMENT.** **`test_batch_ah:138`
+  moved C → A**: `check_gp` read **0 failures** with Stabilize in the Mage class-wide shelf, because the gate
+  withholds the card at the offer door whichever shelf it sits on. **`test_batch_bp:234` moved C → A**:
+  `check_gs` §1:338 caught Bloodlust and was **silent on Quick Shot**, because the Sharpshooter's enabler is the
+  Hunter's class basic and §0:242 exempts it by name — retiring all three would have lost that case. **`test_batch_ah:62`
+  moved B → A** and `test_batch_al:692`'s superseder is `al:689`, not the `:519/:521` HA named, which stayed green.
+  And **for all eight of the "leaked into a class pool" arms the named superseder was wrong**: `check_gs` read 0,
+  and what catches the leak is each suite's own cross-pool arm, or `test_batch_bt:318`'s whole-draft uniqueness
+  sweep for the two suites that have none.
+- **§3 — WHY IT STOPPED THERE.** HD took **56 arms in 23 targets** (its twenty holes and the thirty-six it folded) with 26 controls and needed a full battery. This
+  is **70 arms in 34 targets**, and §3 owes a two-armed control per re-pointed ASSERTION — **forty at least**, each
+  an isolated tree with its own seeded `user://`. Every figure is larger. **The proposal is two: HH the twenty-two
+  retirements** (the smaller half, whose controls are already run and recorded), **then HI the forty-eight
+  re-points** — which inverts the brief's stated order, for the reason FZ's rule exists. **`docs/reports/HG.md` §3a
+  carries all seventy with the line each one is on TODAY, written to be transcribed rather than re-derived.**
+- **§4 — THE MERGE IS STILL TRIVIAL, AND HA's FINDING HOLDS AFTER HB–HF.** Merge base still FS (`3b80fbe`);
+  **39 commits on the branch, 2 on `main`** (GG's and GI's documentation lines, still the only ones); 189 files
+  differ, +74,113 / −16,645; **exactly one conflict, `docs/state.md`**, which FQ's convention covers as written;
+  the merged tree is identical to `class-merge` in every other file, and **`main` loses nothing of its own**.
+  **What stands between the branch and `main` is not the merge — it is the seventy arms.** HA's sharpest lineage
+  gap is closed: HC took the runes off their specs and HF authored fifteen reading no engine, so a hero holding
+  none is offered five at spawn in every class.
+- **THE VERIFICATION.** No `.gd`, `.sh` or `data/` file moved, so the battery is HEAD's own instruments against
+  HEAD's own game code with the documents this batch wrote. **125 of 125 launched, `check_de` 517 checks / 0 failures / 0
+  notices**, **no `Parse Error` and no `SCRIPT ERROR` in any of the 125 logs** (grepped per log, never read off a
+  tally), and **the two sanctioned reds at their recorded counts** — `check_cm_live` 13 / 4 (the defensive bar never
+  opens under a headless gate) and `check_gj` 70 / 1, *"+167 gold and the purse moved 187"*, **the same figure HF
+  left**, which is itself the evidence that no rune, card or pool moved. **The tree was hashed before and after:
+  615 paths, and NOT ONE MOVED** — every document this batch writes was written before the run, so the only
+  post-run edits are this line and `docs/reports/HG.md` §6, each proved by re-running the instruments that read
+  them (HG §6a). The player's four saves are byte-identical to
+  `../save-backups/HG-20260922-212509` after everything ran.
+- **`CLAUDE.md` IS 381,747 B = 372.80 KiB, WITH 37.20 KiB UNDER ITS 410 KiB CEILING** (+2896 B this batch: HG §1b's rule that
+  re-verifying a census entry means diffing what FEEDS the arm, and HG §2a's rule that a supersession is a claim and
+  is driven like one — the two blocks, and nothing else).
+- **WHAT MOVED:** `docs/reports/HG.md` (**NEW**), `docs/changelog.html`, `CLAUDE.md`, `docs/design-notes.md` and
+  this file, **and nothing else** — no gate, no suite, no fixture, no `baselines.json` row, no `run_battery.sh`
+  entry, no script and no data file.
+- **Phase.** Steps 1–5 of the merge's running order are done and the rune layer is merged; **step 6 is HD (the
+  twenty holes and the fold), HE (the offers and the doors), and the seventy arms HG derived — HH and HI.** The
+  Crown's Break and freeze resistance, Sanctity's potency layer, the engine-card texts, the class-wide rebalance
+  and the sim bot's blind spot on the twenty-nine returned cards stay queued; the rune design pass's first fifteen
+  and its new companion are built (HF), and the rest of that pass is its own.
+- **Next letter: HH.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
+### HG's RULINGS OWED — **FOUR, AND THE FIRST IS THE ONLY ONE THAT BLOCKS ANYTHING**
+
+Full working: `docs/reports/HG.md`, NEEDS A RULING.
+
+1. **THE SPLIT, AND ITS ORDER.** The brief says *"all the re-points, then all the retirements"*. Measured, the
+   halves are **48 arms in 25 targets** and **22 arms in 16 targets**, and the re-point half is by itself larger
+   than HD's whole batch. **The proposal is HH: the twenty-two retirements first** — the smaller half, and the one
+   whose controls are already run and recorded at HG §2a — **then HI: the forty-eight re-points.** That inverts the
+   brief's order, for the reason FZ's rule exists. Taking the re-points first is the designer's to say.
+2. **`test_batch_bp:234` IS KEPT WHERE ITS TWO SIBLINGS ARE RETIRED.** Control c3 put two enablers on their own
+   lineage shelves; `check_gs` §1:338 caught **Bloodlust and not Quick Shot**, because the Sharpshooter's enabler
+   IS the Hunter's class basic and §0:242 exempts it by name. One of the three is kept and re-pointed over the
+   class pool so that case is not lost. Confirm, or rule the Sharpshooter's case not worth an arm.
+3. **`check_gn:208` HAS TWO ANSWERS IN HA's OWN REPORT.** HA §1d marks it RETIRE; HA §1g calls it *"the door a
+   future lineage card would have to pass through"*. It is sorted **RE-POINT** here, on §1g. Confirm.
+4. **TWO OF THE SEVENTEEN SUPERSEDED ARMS DEPEND ON ANOTHER SUITE.** `test_batch_bp:214` and `test_batch_cp:232`
+   have no arm of their own that catches the leak; what caught it in control c2 was **`test_batch_bt:318`**, the
+   whole-draft uniqueness sweep. Accept the cross-suite dependency, or keep those two.
+
 ### HF's RULINGS OWED — **FIVE; THE FIRST THREE ARE MAGNITUDES THE BRIEF LEFT UNSET, THE FOURTH IS WORDING**
 
 Full working: `docs/reports/HF.md`, NEEDS A RULING.
@@ -412,6 +424,11 @@ Full working: `docs/reports/HB.md`, NEEDS A RULING.
   `../save-backups/HB-20260921-045412`.
 
 ### HA's RULINGS OWED — **TWO LEFT, BOTH ABOUT `main`; THE FIRST IS ANSWERED BY HB's SEQUENCE AND ALL FIVE OF THE SECOND WERE RULED FOR HD**
+
+**AMENDED AT HG.** Ruling 1's second half named *"HE (HA's HC): the other seventy-five tier-2 arms in 36 targets"*.
+HE took the offers and the doors instead and HF took the runes; **HG derived that half and found SEVENTY arms in
+THIRTY-FOUR targets**, sorted 48 re-point / 5 retire / 17 superseded, and priced it at two batches of its own
+(HG's ruling 1). The paragraph below is HA's proposal as HA wrote it, kept as the record.
 
 Full working: `docs/reports/HA.md`, NEEDS A RULING.
 
