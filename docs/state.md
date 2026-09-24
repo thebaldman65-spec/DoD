@@ -13,85 +13,192 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-22 (Batch HG).*
+*Last rewritten: 2026-09-24 (Batch HH).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: HG — THE REMAINING STALE ASSERTIONS, DERIVED AND SORTED; PRICED AND NOT REPAIRED. THE THIRTY-NINTH BATCH ON `class-merge`.**
-  HA's middle group was re-derived arm by arm against the tree HB through HF left: **seventy arms in thirty-four targets**,
-  sorted into the three dispositions the brief asks for, priced against HD, and **not repaired** — FZ's rule, on a
-  measured population. No gate, suite, fixture or baseline arm moved. `main` is untouched. Full working:
-  **`docs/reports/HG.md`**.
-- **THE NUMBER IS SEVENTY, AND NEITHER FIGURE ON RECORD WAS RIGHT.** HA's 110 counts the thirty-five FOLD arms HD
-  folded; HE's seventy-three counts `check_dr:126` and `test_batch_bo:437` (re-pointed at **HB**) and `check_fk:368`
-  (re-pointed at **HC §1**). **Every one of HD's thirty-five FOLD arms was verified gone.**
-- **§1 — A LINE CHECK WOULD HAVE COUNTED SEVENTY-ONE, AND `check_fk` IS WHY.** An arm's `ok(` line can be
-  byte-identical while the repair lands in the lines that FEED it: HC re-pointed check_fk §5's reach set from the
-  lineage's own shelf to `Classes.draft_pool(cls)` and never touched the assertion. **The enclosing function of all
-  seventy-one was diffed, comments stripped** — twenty-nine sit in moved code, twenty-eight of those moves are HD's
-  fold or HB's pet work landing beside the arm, and one is that repair.
-- **§1d — NOTHING STALE HAS BEEN ADDED SINCE HA.** HF found HC's census had missed Long Poison, so the population HA
-  never read was swept with HA's own vocabulary — the four gates added since (`check_hc`, `check_hd`, `check_he`,
-  `check_hf`) in full, and every line ADDED to the other fifty-nine moved targets. Eight assertion lines name
-  pre-merge words; **all eight are live** (a zone-boss pool, `core_slots` under HB's ruling, a name-absence sweep,
-  Lethal Aim dismissing the pet).
-- **§2 — THE SORT: 48 RE-POINTS in 25 targets, 5 RETIREMENTS whose subject is gone in 5, and 17 RETIREMENTS
-  SUPERSEDED by a newer check in 13.** A re-point's question survives under classes and only its vocabulary is
-  stale; a retirement is inverted onto the ruling that removed its subject, never deleted — the Melted Armor
-  contract; a superseded arm is the second copy of a question, and is retired naming the check that keeps it.
-- **§2a — A SUPERSESSION IS A CLAIM, SO EIGHT CONTROLS DROVE IT.** Each injected the defect a retired arm guards
-  into an isolated copy with its own seeded `user://`, then ran the retired arm's own target AND the named check,
-  both read by their FAIL text. **The clean arm first: `check_gs` on an unmodified copy reads 749 / 0**, which is
-  its `baselines.json` figure. No copy showed a `Parse Error`.
-- **§2b — THREE OF THE EIGHT REFUTED THE RULING, AND THE SORT CARRIES THE MEASUREMENT.** **`test_batch_ah:138`
-  moved C → A**: `check_gp` read **0 failures** with Stabilize in the Mage class-wide shelf, because the gate
-  withholds the card at the offer door whichever shelf it sits on. **`test_batch_bp:234` moved C → A**:
-  `check_gs` §1:338 caught Bloodlust and was **silent on Quick Shot**, because the Sharpshooter's enabler is the
-  Hunter's class basic and §0:242 exempts it by name — retiring all three would have lost that case. **`test_batch_ah:62`
-  moved B → A** and `test_batch_al:692`'s superseder is `al:689`, not the `:519/:521` HA named, which stayed green.
-  And **for all eight of the "leaked into a class pool" arms the named superseder was wrong**: `check_gs` read 0,
-  and what catches the leak is each suite's own cross-pool arm, or `test_batch_bt:318`'s whole-draft uniqueness
-  sweep for the two suites that have none.
-- **§3 — WHY IT STOPPED THERE.** HD took **56 arms in 23 targets** (its twenty holes and the thirty-six it folded) with 26 controls and needed a full battery. This
-  is **70 arms in 34 targets**, and §3 owes a two-armed control per re-pointed ASSERTION — **forty at least**, each
-  an isolated tree with its own seeded `user://`. Every figure is larger. **The proposal is two: HH the twenty-two
-  retirements** (the smaller half, whose controls are already run and recorded), **then HI the forty-eight
-  re-points** — which inverts the brief's stated order, for the reason FZ's rule exists. **`docs/reports/HG.md` §3a
-  carries all seventy with the line each one is on TODAY, written to be transcribed rather than re-derived.**
-- **§4 — THE MERGE IS STILL TRIVIAL, AND HA's FINDING HOLDS AFTER HB–HF.** Merge base still FS (`3b80fbe`);
-  **39 commits on the branch, 2 on `main`** (GG's and GI's documentation lines, still the only ones); 189 files
-  differ, +74,113 / −16,645; **exactly one conflict, `docs/state.md`**, which FQ's convention covers as written;
-  the merged tree is identical to `class-merge` in every other file, and **`main` loses nothing of its own**.
-  **What stands between the branch and `main` is not the merge — it is the seventy arms.** HA's sharpest lineage
-  gap is closed: HC took the runes off their specs and HF authored fifteen reading no engine, so a hero holding
-  none is offered five at spawn in every class.
-- **THE VERIFICATION.** No `.gd`, `.sh` or `data/` file moved, so the battery is HEAD's own instruments against
-  HEAD's own game code with the documents this batch wrote. **125 of 125 launched, `check_de` 517 checks / 0 failures / 0
-  notices**, **no `Parse Error` and no `SCRIPT ERROR` in any of the 125 logs** (grepped per log, never read off a
-  tally), and **the two sanctioned reds at their recorded counts** — `check_cm_live` 13 / 4 (the defensive bar never
-  opens under a headless gate) and `check_gj` 70 / 1, *"+167 gold and the purse moved 187"*, **the same figure HF
-  left**, which is itself the evidence that no rune, card or pool moved. **The tree was hashed before and after:
-  615 paths, and NOT ONE MOVED** — every document this batch writes was written before the run, so the only
-  post-run edits are this line and `docs/reports/HG.md` §6, each proved by re-running the instruments that read
-  them (HG §6a). The player's four saves are byte-identical to
-  `../save-backups/HG-20260922-212509` after everything ran.
-- **`CLAUDE.md` IS 381,747 B = 372.80 KiB, WITH 37.20 KiB UNDER ITS 410 KiB CEILING** (+2896 B this batch: HG §1b's rule that
-  re-verifying a census entry means diffing what FEEDS the arm, and HG §2a's rule that a supersession is a claim and
-  is driven like one — the two blocks, and nothing else).
-- **WHAT MOVED:** `docs/reports/HG.md` (**NEW**), `docs/changelog.html`, `CLAUDE.md`, `docs/design-notes.md` and
-  this file, **and nothing else** — no gate, no suite, no fixture, no `baselines.json` row, no `run_battery.sh`
-  entry, no script and no data file.
-- **Phase.** Steps 1–5 of the merge's running order are done and the rune layer is merged; **step 6 is HD (the
-  twenty holes and the fold), HE (the offers and the doors), and the seventy arms HG derived — HH and HI.** The
-  Crown's Break and freeze resistance, Sanctity's potency layer, the engine-card texts, the class-wide rebalance
-  and the sim bot's blind spot on the twenty-nine returned cards stay queued; the rune design pass's first fifteen
-  and its new companion are built (HF), and the rest of that pass is its own.
-- **Next letter: HH.**
+- **Last batch: HH — TWENTY-ONE CHECKS RETIRED, AND ONE THAT COULD NOT BE. THE FORTIETH BATCH ON `class-merge`.**
+  The first half of HG's sort, taken first on the designer's ruling (HG's ruling 1). IMPLEMENT ONLY: no card, rune,
+  engine, kit, pool or node moved, no assertion was re-pointed, and `main` is untouched. Full working:
+  **`docs/reports/HH.md`**.
+- **§1 — THE FIVE WHOSE SUBJECT IS GONE ARE RETIRED**, each kept and said to be kept: its computation still runs and
+  PRINTS as a `[record]`, and its assertion is the fact that retired it — `check_eh` §3 (EG's disagreement: **GK** and
+  **GS §1** took the ladder off both numbers, so it asserts no lineage takes a slot), `test_batch_au` (the twelve trees:
+  **FX**, every lineage dealt the one tree), `test_batch_az` (the Sharpshooter's lane tags: **FX**, no node carries a
+  lane), and `test_batch_bo` §4 (a sibling's boss card) and `test_batch_br` §4 (the seam's spec side), both **GP**: one
+  pool a class.
+- **§2 — SIXTEEN OF THE SEVENTEEN SUPERSEDED ARE RETIRED, EACH NAMING ITS SUPERSEDER; THE SEVENTEENTH IS NOT.** HG
+  sorted `test_batch_bw:417` superseded and never drove it. **Driven first — three ways, before anything was retired —
+  it read GREEN every time, and an ok() trace says why: it fires ZERO times** (it walks the four class keys, and a class
+  has no definition table), the shape HD §2 repaired in `test_batch_bu`. It guards nothing, so it is not superseded: it
+  stays, and it is HI's. **Fourteen of the retired arms — twelve here and two of §1's — rest on one fact, one pool a
+  class, asked through one helper, `suite_fixture.one_pool_a_class`.**
+- **§2c — SIX RETIRED ARMS STAND WHOLLY ON ANOTHER TARGET, NOT THE TWO THE BRIEF NAMED**, and each is recorded at both
+  ends: `test_batch_bp` §5's tranche arm and `test_batch_cp` §2's class-wide half on THREE suites' sweeps (`bt`, `cb`
+  and `ce` — HG's own c2 logs show all three naming all eight cards), `bv`'s and `bw`'s enabler arms on
+  `test_batch_bp` §5's (now the only arm asking Quick Shot), and `check_dv` §2 and `test_batch_ah`'s trim arm on
+  `check_gs`. The table is in the queue below.
+- **§3 — `check_gn`'s slot arm is HI's, by ruling** (HA §1g's reading over §1d's), and a note at its site says so.
+- **§4 — HI's POPULATION IS FORTY-NINE, DERIVED ARM BY ARM**: HG's forty-eight re-points and `bw:417`, each mapped
+  to its line after HH's edits with its own text unchanged, and **every one of the forty-eight traced firing at least
+  once**. The table is in the queue below.
+- **THE CONTROLS.** **Fifteen controls on the landed tree, 108 runs in all, every one with a verdict and none with a
+  parse error, script error or timeout.** Each put one defect into an isolated copy and ran two arms, the landed
+  target and HEAD's copy of the retired arm dropped into the same copy, and each was read by FAIL text. **§2's sixteen
+  (c1, c2, c3, c4, c6, c8): in every control the retired arm is silent and its superseder red**, while HEAD's copy of
+  the arm goes red where HG read it. **§1's five:** b1 and b5 go red on the retiring fact itself; b2 goes red on
+  `test_batch_au` §2, `check_fx` §1 and `check_cz`; b4 on `check_dv` §2's boss-pool census, a count and not the
+  sibling question; **and b3 on nothing at all.** A stale lane tag on a Sharpshooter rune is read by none of the 28
+  targets that name a lane, because FX deleted the lanes. **Four wake-ups (w2, w3, w4, w6), with b1 and b5, saw each
+  of the twenty-one new assertions red**, and in three of the four HEAD's old arm stayed silent. One prediction was
+  wrong and is recorded: `test_batch_an:829` stayed green in b4, because it walks the other lineage's pool.
+- **THE VERIFICATION.** **The prediction held exactly, in the pre-pass (a copy, 71 min 00 s) and in the acceptance run
+  (the repository, 71 min 00 s).** 125 of 125 launched in each, **`check_de` 517 checks / 0 failures / 0 notices**, no
+  `Parse Error` and no `SCRIPT ERROR` in any of the 125 logs (grepped per log, never read off a tally), the thirteen
+  moved rows at their new counts, and **the two sanctioned reds at their recorded counts**: `check_cm_live` 13 / 4,
+  and `check_gj` 70 / 1 with *"+167 gold and the purse moved 187"*. That is the figure HF left, and it is the evidence
+  that no rune, card or pool moved. **The tree was hashed before and after the acceptance run: 486 files, and NOT ONE
+  MOVED.** The only post-run edits are this line, the user-data line below and the report's run figures (HH §6h lists
+  every one), each proved against what reads it. The player's four saves are byte-identical to
+  `../save-backups/HH-20260924-111608` after everything ran.
+- **`CLAUDE.md` IS 383,818 B = 374.82 KiB, WITH 35.18 KiB UNDER ITS 410 KiB CEILING** (+2071 B:
+  HG §2a's supersession block extended with HH's three bullets — an arm that never bites is not superseded, a
+  retirement asserts the fact that retired it, and a superseder in another target is recorded at both ends).
+- **WHAT MOVED:** sixteen suites (`test_batch_ah`, `al`, `ar`, `au`, `az`, `bo`, `bp`, `br`, `bt`, `bu`, `bv`, `bw`,
+  `cb`, `cd`, `ce`, `cp`); four gates, two with code (`check_eh` and `check_dv`, each at its retired arm) and two with
+  notes only (`check_gs` and `check_gn`, 0 code lines by a comment-stripped diff); `suite_fixture.gd`
+  (`one_pool_a_class`, and notes); `pin-manifest.json`, regenerated (the same 1517 pins, 361 of them on a new line in
+  17 files); **thirteen `baselines.json` rows**, net −521 checks, each note naming the arm that moved it;
+  `docs/reports/HH.md` (**NEW**); `docs/changelog.html`; `CLAUDE.md`; `docs/design-notes.md`; and this file. **Nothing
+  moved under `scripts/` or `data/`, `run_battery.sh` gained no entry, and there is no new target.**
+- **Phase.** Steps 1–5 of the merge's running order are done and the rune layer is merged; **step 6 is HD (the twenty
+  holes and the fold), HE (the offers and the doors), HH (the twenty-one retirements) and HI (the forty-nine
+  re-points).** The Crown's Break and freeze resistance, Sanctity's potency layer, the engine-card texts, the
+  class-wide rebalance and the sim bot's blind spot on the twenty-nine returned cards stay queued; HF's five rulings
+  stay open.
+- **Next letter: HI.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### HG's RULINGS OWED — **FOUR, AND THE FIRST IS THE ONLY ONE THAT BLOCKS ANYTHING**
+### HH's RULINGS OWED — **TWO; NEITHER BLOCKS HI**
+
+Full working: `docs/reports/HH.md`, NEEDS A RULING.
+
+1. **`test_batch_cd`'s CLASS-WIDE SHELF FLOOR IS THE SAME STALE SHAPE, AND NO CENSUS HAS IT.** `cd` §2 asserts every
+   class-wide shelf holds at least `CLASS_FLOOR` (three) — the shape HD §3 folded out of eleven other suites into the
+   class floors. It was never on HA's list, so HD did not fold it and HG did not sort it; HH found it retiring the
+   per-shelf floor beside it. Give it to HI as a fiftieth arm, or leave it.
+2. **ONE NAME RESOLVING TO TWO DEFINITIONS MAY BE ASKED BY NOTHING CORPUS-WIDE.** HG wrote that the live half of
+   `test_batch_bo`'s sibling arm belongs to "a corpus name sweep"; HH did not find an instrument that asks it of every
+   card (the per-tranche name sweeps ask it of their own nine). The retired arm never asked it — it asked which pools a
+   name sat in — so nothing was lost, but the question may be unasked. A check, or a ruling that none is needed.
+
+### FOUND AT HH AND NOT FIXED
+
+- **`test_batch_bw:417` NEVER FIRES** (§2 above). It is HI's to repair to what it was for; a note at its site says so,
+  and no code moved there.
+- **`check_gs` §1's returning-card count misnames a second definition.** With Aegis Wall defined a second time in the
+  Warden's own table (HH's control c9a), the arm that reds is the count, and it says *"31 cards returned to a pool"* —
+  a FAIL line that sends its reader to the wrong defect. HH wrote notes into `check_gs` and moved no assertion.
+- **HG's report, corrected in four places** (the record is `docs/reports/HH.md` §0): c2's superseders for `bp` and `cp`
+  were three suites' sweeps, not `bt:318` alone; `bw:417`'s supersession was drivable; HG's "eight controls" were
+  seven injections and a clean arm; and what leaves Quick Shot unasked in `check_gs` §1 is its `MINIMUM` table.
+- **TWENTY-FOUR ISOLATED COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata`, every one named **"Dawn of
+  Decay HH …"**: the recon of HEAD's gates (**"recon"**), the three drives of `bw:417` (**"pre_c9a"** to
+  **"pre_c9c"**), the two ok() trace trees (**"trace_head"**, **"trace_new"**), the gate and census checks
+  (**"gatetest"**, **"edcheck"**), the fifteen controls (**"post_c1"** to **"post_w6"**) and the pre-pass
+  (**"prepass"**). They hold nothing a player needs and can be deleted. **There are 304 such folders now**, counting
+  every folder there but the live game's own. **The untracked `save-backups/` folder inside the repo is not this
+  batch's**; this batch's backup is `../save-backups/HH-20260924-111608`.
+
+### HI's POPULATION — **FORTY-NINE ARMS, DERIVED AT HH; A REPAIR BATCH RE-VERIFIES EACH LINE AND DOES NOT RE-DERIVE THEM**
+
+*Derived at HH (§4 of its report): HG's forty-eight re-points and `test_batch_bw:417`, each mapped from `35752c2` to the
+line it is on after HH, its own text byte-identical, and its enclosing function compared with comments stripped.
+"HH landed" marks an arm whose function HH's retirement code now shares — re-read the lines that feed it before
+editing (HG §1b's rule). The door each should ask is HG's column, kept verbatim but for `check_gn`'s,
+which carries HH §3's ruling.*
+
+| arm (line after HH) | HEAD | fires | HH landed | what it asks | the door it should ask |
+|---|---|---|---|---|---|
+| `check_do:475` | 475 | 3 | no | precision_ranks read-site pin keeps a reason about the Swordmaster's guaranteed statuses (dorma | the guaranteed-status table re-keyed by class (with check_dp:200) |
+| `check_dp:191` | 191 | 1 | no | the per-lineage tree sweep read more than 0 nodes | the positive arm; the sweep walks SPEC_IDS, re-point to the one tree per class |
+| `check_dp:200` | 200 | 1 | no | no node reads a status outside a per-spec guaranteed-status table built on cores and passives | LARGER: needs check_do's per-spec guaranteed-status table re-keyed by class |
+| `check_dr:205` | 205 | 1 | no | resurrection 'belongs to the Holy Cleric' via spec_abilities ownership | resurrection's owner: defined once, reachable by every Cleric of the class pool |
+| `check_dv:251` | 251 | 1 | **yes** | emptiable boss pools counted against the lineage's own shelf | emptiable boss pools, counted against the class pool, not the lineage shelf |
+| `check_dv:260` | 260 | 1 | **yes** | Holy's un-draftable boss cards checked against the Holy shelf only | Holy's un-draftable boss cards, against the class pool |
+| `check_ea:317` | 317 | 12 | no | award-always-pays floor per lineage shelf, not per class pool x engines held | LARGER: one re-derivation over class x engines held, shared by the four |
+| `check_ea:332` | 332 | 12 | no | full-three floor over the pre-GP two-tier chain | LARGER: same re-derivation |
+| `check_ea:347` | 347 | 1 | no | no lineage's shelf floor below 3 | LARGER: same re-derivation |
+| `check_ea:395` | 395 | 1 | no | lost awards from the per-spec two-tier floor | LARGER: same re-derivation |
+| `check_ea:400` | 400 | 1 | no | emptiable boss pools counted against the lineage's own shelf | emptiable against the class pool |
+| `check_eh:156` | 156 | 12 | no | arm C: the lineage's reach is gone and EH's third tier must pay - the tier GP deleted | arm C reaches the tier GP deleted; re-point onto the two live tiers |
+| `check_eh:213` | 213 | 12 | no | all 12 lineages: boss pool + lineage shelf held still leaves the class tier paying 3 | the class tier, asked per class x engines held rather than per lineage |
+| `check_es:656` | 656 | 1 | no | a swap card taken from the Berserker's shelf as 'one a player could actually make' | a swap card taken off the class pool, which is what a player draws |
+| `check_gn:216` | 208 | 24 | no | ability_slots_used == lineage_slots + kit_slots with no engine held | FLAGGED: HA's action says RETIRE, HA §1g says the door is worth keeping. **Ruled at HH §3: a re-point, by §1g; HA §1d's RETIRE is not live** |
+| `test_batch_ah:62` | 62 | 12 | **yes** | each lineage's spec_abilities holds 3 bar entries - 'opens with' | c1: only test_batch_al:689 re-states it, and only for the Warden; the all-twelve definition count survives the merge |
+| `test_batch_ah:157` | 130 | 20 | no | no class-wide card costs a spec-exclusive secondary resource | the curation rule, over the class pool |
+| `test_batch_ah:160` | 133 | 20 | no | no class-wide card is a 'Beastmaster signature' | ditto, and the summons are every Hunter's kit card since HB |
+| `test_batch_ah:163` | 136 | 20 | no | Hex of Ruin 'stays Occultist-only' | Hex of Ruin, over the class pool |
+| `test_batch_ah:165` | 138 | 20 | no | no class-wide card is 'gated on a spec passive' - replaced by ENGINE_READ / SITS_OUT | c5: check_gp read 0 failures on the injection — NOT superseded; re-point onto the ENGINE_READ row the gate uses now |
+| `test_batch_ah:324` | 297 | 1 | no | the award refuses a member 'with no spec' | the award's refusal: seat the spine-taker who DOES bank |
+| `test_batch_ah:326` | 299 | 1 | no | the fallback refuses a member 'with no spec' | ditto |
+| `test_batch_ah_battle:207` | 207 | 1 | no | action-bar fillers from class-wide + Berserker shelf, 'new' = not in spec_abilities | fillers off draft_pool('warrior'), the one pool a Warrior draws |
+| `test_batch_aj:409` | 409 | 1 | no | Hack and Slash 'is in the Berserker kit' via spec_abilities | Hack and Slash: the definition table's wording, not 'the kit' |
+| `test_batch_aj:552` | 552 | 1 | no | Battle Shout 'drafts from the Berserker' as reachability | Battle Shout reachable off the class pool |
+| `test_batch_aj:584` | 584 | 1 | no | Rampage 'drafts from the Berserker' as reachability | Rampage, same |
+| `test_batch_an:824` | 824 | 1 | no | sibling-spec set built from boss pools AND draft shelves (positive arm) | the spec-foreign set under one pool a class |
+| `test_batch_an:829` | 829 | 900 | no | no zone-boss offer returns a sibling-spec entry, over the same mixed set | the zone-boss offer against that set |
+| `test_batch_at:603` | 603 | 1 | no | 'STABILIZE IS OUT of the opening three' = spec_abilities | 'out of the opening three' asked of the live opening |
+| `test_batch_at:628` | 628 | 1 | no | Stabilize 'spec-only: it reads Resonance' via the class-wide shelf | Stabilize's gate is ENGINE_READ now, not absence from a shelf |
+| `test_batch_au:679` | 657 | 2 | no | Firestorm / Rime 'drafts from the <spec> instead' | Firestorm / Rime reachable off the class pool |
+| `test_batch_au:799` | 777 | 1 | no | Magi's Wrath 'drafts from the Arcanist instead' | Magi's Wrath, same |
+| `test_batch_au:968` | 946 | 121 | no | the debug grant holds no sibling-spec entry, siblings' shelves counted as theirs | the debug grant vs sibling entries, under one pool |
+| `test_batch_av:303` | 303 | 1 | no | Resurrection / Intercession not on the Cleric class-wide shelf 'never offered to a sibling with | the two Mercy spenders, against the class pool |
+| `test_batch_aw:466` | 466 | 1 | no | Sacred Resolve 'drafts from the Devout' | Sacred Resolve off the class pool |
+| `test_batch_aw:468` | 468 | 1 | no | Bulwark of Fortitude 'drafts from the Devout' | Bulwark of Fortitude, same |
+| `test_batch_ay:403` | 403 | 1 | no | retired payload edits Kill Command 'which every Beastmaster owns' | 'which every Beastmaster owns': the pet card is every Hunter's since HB |
+| `test_batch_ay:410` | 410 | 1 | no | retired payload edits Hunter's Instinct 'which every Beastmaster owns' | ditto |
+| `test_batch_bb:765` | 765 | 9 | no | no Mage lineage's spec_abilities holds Ashes of Al'ar - 'does not START with it' | 'does not START with it' asked of the live opening |
+| `test_batch_bo:190` | 190 | 3 | **yes** | the Warrior shelf is NAMED - 'one of four heroes had no draft' | the three Warrior shelves NAMED: an authoring location, said so |
+| `test_batch_bo:369` | 348 | 12 | no | CAP - core_slots(spec) >= 3 free slots | CAP - slots >= 3, re-worded off enabler_slots |
+| `test_batch_bp:280` | 234 | 6 | **yes** | a lineage's enablers are absent from its OWN shelf only | c3: check_gs:338 caught Bloodlust and NOT Quick Shot (the Sharpshooter's enabler is the Hunter's basic); this is the widest of the three and is KEPT, re-pointed over the class pool |
+| `test_batch_br:289` | 289 | 3 | no | each Warrior lineage can draw Rally, via the class-wide shelf | Rally: every Warrior draws it off the class pool |
+| `test_batch_br:294` | 294 | 3 | no | each Hunter lineage can draw Field Dressing, via the class-wide shelf | Field Dressing, same |
+| `test_batch_bx:251` | 251 | 1 | no | the Warden shelf >= 8 'spec cards to be offered' | the Warden's shelf as a real, named part of the one Warrior pool |
+| `test_batch_cb:1239` | 1216 | 1 | no | pins master.html's 'All twelve specs draft from at least ten' (a doc edit rides with it) | GZ's SHAPE: master.html's sentence and its pin move together |
+| `test_batch_cd:453` | 426 | 1 | **yes** | the thinnest shelf >= 10 as 'the one a card is owed to next' | the thinnest pool as the one a card is owed to next |
+| `test_run_harness:432` | 432 | 1 | no | a hero with his spec blanked banks nothing - the spine-taker who does bank is never seated | the un-awakened hero: seat the spine-taker who banks |
+| `test_batch_bw:465` | 417 | 0 | no | no NINE card in any `spec_abilities` — 'kit does not already hold' (HG sorted it superseded) | **HH: it fires ZERO times** — walks the four class keys; repair it to what it was for, as HD §2 did `test_batch_bu`'s |
+
+**THREE CONSTRAINTS TRAVEL WITH IT.** (1) `test_batch_bp` §5's enabler arm is the only arm left asking the
+Sharpshooter's case — `bv`'s and `bw`'s enabler arms were retired onto it — so its re-point keeps asking it of Quick
+Shot. (2) `check_gn` §0's slot arm is here by ruling, not by HA §1d. (3) `test_batch_cb`'s pin on `master.html`'s
+*"All twelve specs draft from at least ten"* moves with the sentence, in the same batch (HG §2c).
+
+### THE CROSS-TARGET SUPERSESSIONS — **RECORDED AT BOTH ENDS AT HH; A BATCH THAT RETIRES OR NARROWS A SUPERSEDER READS THIS FIRST**
+
+| retired arm | stands on | control |
+|---|---|---|
+| `test_batch_bp` §5, the tranche arm's class-wide half | `test_batch_bt`, `test_batch_cb` and `test_batch_ce` `_names()` | c2 |
+| `test_batch_cp` §2, the class-wide half | the same three | c2 |
+| `test_batch_bv`, the Hunter enabler arm | `test_batch_bp` §5's enabler arm | c3 |
+| `test_batch_bw`, BO's enabler arm | `test_batch_bp` §5's enabler arm; `check_gs` §1 (five of six) | c3 |
+| `check_dv` §2, the Holy slot tripwire | `check_gs` §0 | c4 |
+| `test_batch_ah` §1, the trims' "left the kit" arm | `check_gs` §1 | c1 |
+| `test_batch_bp` §5, every-spec-has-a-draft (half) | `test_batch_cd` §2's depth table (the other half is `bp`'s own class floors) | c6 |
+| `test_batch_cd` §2, the per-shelf floor (half) | `Fixture.class_pool_floors`, asserted in eleven other suites (the other half is `cd`'s own depth table) | c6 |
+
+### ~~HG's RULINGS OWED~~ — **ALL FOUR ANSWERED IN HH's BRIEF: ONE RULED AND TAKEN (1), ONE CONFIRMED (2), ONE RULED AND RECORDED (3), ONE ACCEPTED AND RECORDED AT BOTH ENDS (4)**
+
+HH's brief took all four. **1**: ruled — the retirements first (HH), the re-points after (HI); HH retired twenty-one and
+HI takes forty-nine. **2**: confirmed — `test_batch_bp:234` is kept, and it is now the only arm asking Quick Shot.
+**3**: ruled — §1g over §1d; `check_gn`'s slot arm goes to HI, recorded at its site. **4**: accepted — and recorded at
+both ends; the population was six arms, not two, and `bp`'s and `cp`'s arms stand on three suites' sweeps, not one.
+The working below is HG's, kept as the record of what was ruled.
+
+#### HG's four, as HG recorded them
 
 Full working: `docs/reports/HG.md`, NEEDS A RULING.
 
@@ -1925,7 +2032,7 @@ code, and some of what it found lives elsewhere. **The tables are in `docs/repor
   exact and contained matches against `scripts/` and `data/`). The names a merge would have made collide: Spite (a Warden node and a Berserker card), Whetstone (a Swordmaster node and a
   live rune), Second Wind (a Berserker node and a Holy card).
 
-### THE CLASS MERGE ~~IS MEASURED AND UNRULED~~ WAS MEASURED AT FP AND IS RULED — **A PROJECT ON ITS OWN BRANCH SINCE FQ; STEPS 1–5 BUILT (3's NINE ENGINES AT GO, 4's POOL MERGE AT GP, 5 AT GP AND GV), AND THE RUNE SCOPES MERGED AT HC; STEP 6 CENSUSED AT HA, ITS FIRST HALF TAKEN AT HD AND ITS SECOND OWED TO HG (THE RUNNING ORDER BELOW)**
+### THE CLASS MERGE ~~IS MEASURED AND UNRULED~~ WAS MEASURED AT FP AND IS RULED — **A PROJECT ON ITS OWN BRANCH SINCE FQ; STEPS 1–5 BUILT (3's NINE ENGINES AT GO, 4's POOL MERGE AT GP, 5 AT GP AND GV), AND THE RUNE SCOPES MERGED AT HC; STEP 6 CENSUSED AT HA, ITS FIRST HALF TAKEN AT HD, ITS RETIREMENTS AT HH AND ITS RE-POINTS OWED TO HI (THE RUNNING ORDER BELOW)**
 
 **Full evidence: `docs/merge-recon.html`, written to be read section by section across many
 batches. `docs/reports/FP.md` is the batch's own working.** FP authored nothing and proposed
@@ -2206,14 +2313,16 @@ done at FQ.** The order is recorded so it is not re-litigated batch by batch:
    only under their lineage's engine, and a rune's scope is the lineage, so he is still offered them* — is closed by
    it; **what the scope itself should be was GV's ruling 5, answered at HC: the CLASS**, with the engine gate (36 rows
    since Layered Aegis), the card a rune names and a companion present deciding what a hero is offered.
-6. **THE GATES — CENSUSED AT HA; HD TOOK THE TWENTY HOLES AND THE FOLD, AND HG OWES THE OTHER SEVENTY-THREE** (HB was the pet and HC the rune scopes; HE took the offers and the doors, and HF the fifteen no-engine runes). FP counted **52 engine-bound targets** carrying
+6. **THE GATES — CENSUSED AT HA; HD TOOK THE TWENTY HOLES AND THE FOLD, HG DERIVED AND SORTED THE OTHER SEVENTY, HH RETIRED TWENTY-ONE OF THEM, AND HI OWES THE FORTY-NINE LEFT** (HB was the pet and HC the rune scopes; HE took the offers and the doors, and HF the fifteen no-engine runes). FP counted **52 engine-bound targets** carrying
    71.6% of the battery's asserted checks, and GK repaired every red its own move caused. **HA read all 119 launched
    targets arm by arm**: of FP's 52, **twenty are repaired and correct, thirty-one still ask a pre-merge question and one
    is red on purpose** — and **the middle group is 42 targets and 130 arms, eleven of its targets outside FP's 52**,
    because FP's band was the engine half of the merge and the middle group is mostly the offer, the kit and
    ownership. **Twenty arms in fifteen targets cannot fail as written or pass against a false claim.** Priced, not
    repaired: **HD takes the twenty and the fold family, HE the other seventy-five** — HA priced them as HB and HC
-   (`docs/reports/HA.md` §1–§2).
+   (`docs/reports/HA.md` §1–§2). **HG re-derived the remainder at seventy and sorted it 48 / 5 / 17; HH retired
+   twenty-one and found the twenty-second vacuous, so it went to HI, whose forty-nine are tabled in this queue**
+   (`docs/reports/HG.md`, `docs/reports/HH.md`).
 
 ### **AND FP's `block_chance` FINDING TRAVELS WITH IT — RE-VERIFIED AT FQ, AND THE CODE SAYS IT OUT LOUD**
 

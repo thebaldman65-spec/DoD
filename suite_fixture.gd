@@ -266,6 +266,13 @@ const CLASS_POOL_FLOOR := {
 # its own `ok()`, so the count and the FAIL line are the suite's and this file
 # holds no copy of anybody's assertion machinery. `who` names the caller, so a
 # FAIL line says which suite read it. Eight pairs — four classes, two halves.
+#
+# **BATCH HH §2 — TWO RETIRED SHELF ARMS STAND ON THESE FLOORS**: `test_batch_bp`
+# §5's "every spec has a draft" and `test_batch_cd` §2's per-shelf floor of eight,
+# each naming them at its own site (HG's control c6 emptied the Warden's shelf and
+# these went red where the suite asserts them). `test_batch_cd` asserts none of them
+# — its own per-shelf depth table stands behind that floor in that suite — so
+# retiring or loosening these floors narrows what stands behind both.
 static func class_pool_floors(who: String) -> Array:
 	var out: Array = []
 	for k in CLASS_POOL_FLOOR:
@@ -281,3 +288,48 @@ static func class_pool_floors(who: String) -> Array:
 			"%s: a %s holding no engine can be offered %d of the pool, below its floor of %d — the no-engine half thinned (HD §3)"
 				% [who, k, bare.size(), fb]])
 	return out
+
+
+# ══ BATCH HH — THE FACT THAT RETIRED THE SHELF ARMS, ASSERTED IN ONE PLACE ═══
+#
+# **FOURTEEN ARMS IN ELEVEN SUITES ASKED WHERE A CARD WAS AUTHORED AS THOUGH IT
+# WERE WHAT A HERO IS OFFERED** — a tranche card "not on a class-wide shelf", an
+# enabler "absent from its OWN shelf", "every spec has a draft", a draft name "not a
+# SIBLING's boss card", a Warden's offer "beside real spec cards". **GP made a
+# class's three lineage shelves and its class-wide shelf ONE POOL**, so a shelf is
+# where a card was written down and nothing more: HH retired those arms, each at its
+# own site with what it guarded, and each asserts THIS instead — the fact that
+# retired it. **The day a class's draft is anything but its shelves together, every
+# one of those questions is live again, and every suite that retired one goes red
+# here saying so.** The questions themselves are asked where they still mean
+# something, and each retired arm names that check (the uniqueness sweeps, the pool
+# floors above, `check_gs` §1, `test_batch_bp` §5's enabler arm).
+#
+# ONE PAIR, `[held, message]`, asserted through the caller's own `ok()`, like the
+# floors: `who` names the suite and the arm, so a FAIL line says which retirement it
+# reopens. It compares the pool against the shelves as SETS, so an order or a dedupe
+# inside `draft_pool` does not read as a split, and it walks all four classes and
+# says so, so an empty walk cannot pass.
+static func one_pool_a_class(who: String) -> Array:
+	var split: Array = []
+	var walked := 0
+	for k in Classes.SPEC_IDS:
+		var shelves := {}
+		for spec in Classes.SPEC_IDS[k]:
+			for n in Classes.spec_draft_pool(String(spec)):
+				shelves[String(n)] = true
+		for n2 in Classes.class_draft_pool(String(k)):
+			shelves[String(n2)] = true
+		var pool := {}
+		for n3 in Classes.draft_pool(String(k)):
+			pool[String(n3)] = true
+		var a: Array = shelves.keys()
+		var b: Array = pool.keys()
+		a.sort()
+		b.sort()
+		walked += 1
+		if a != b or b.is_empty():
+			split.append("%s (%d on its shelves, %d in its pool)" % [k, a.size(), b.size()])
+	return [walked == 4 and split.is_empty(),
+		"%s: a class's draft is not its four shelves together (%s; %d of 4 classes walked) — GP's one pool is split again, and the shelf question this arm asked until HH is live again (retired at HH)"
+			% [who, ", ".join(PackedStringArray(split)), walked]]

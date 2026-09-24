@@ -611,7 +611,23 @@ func _kit() -> void:
 		ok(by_name.has(want) and where_ok,
 			"the Pyromancer still has %s — defined by his lineage, and %s" % [want,
 				"his enabler" if want == "Flamewave" else "on his shelf"])
-	ok(not by_name.has("Flame Shield"), "Flame Shield is not in the kit")
+	# **RETIRED BY BATCH HH §2 — SUPERSEDED, KEPT AND SAID TO BE KEPT.** The arm here
+	# asked that Flame Shield is not in `spec_abilities("pyromancer")` as "not in the
+	# kit" — true to its words until GS §1 made that table the lineage's DEFINITIONS: he
+	# opens with his engine's enabler, Flamewave, and nothing else of it. **Its question
+	# lives in `_pools()` below**: "Flame Shield resolves to NOTHING — the name is dead
+	# in every pool", which asks every resolver rather than one table. HG's control c8
+	# wrote Flame Shield back into his definitions and both went red; HH re-drove it,
+	# and that arm carries a note naming this one. The table is still read and PRINTED
+	# as the record; **what is asserted is the fact that retired it**: he defines more
+	# than he opens with, so the day he opens with his whole table again, "not in the
+	# kit" asks a live question again and this goes red saying so.
+	var py_def := Classes.spec_abilities("pyromancer").size()
+	var py_opened := Classes.lineage_opening("pyromancer").size()
+	ok(py_def > 0 and py_def > py_opened,
+		"the Pyromancer opens with his whole definition table again (%d defined, %d opened) — AR's \"not in the kit\" arm, retired at HH §2 onto `_pools()`'s dead-name arm, asks a live question again" % [py_def, py_opened])
+	print("  [record] AR's \"not in the kit\" arm, retired at HH §2: Flame Shield %s in the Pyromancer's definitions" % (
+		"IS" if by_name.has("Flame Shield") else "is not"))
 	# Detonation's own numbers are unchanged (§2 says cost, cooldown and Break
 	# stay); only its Burn multiplier moved, and that lives in battle.gd.
 	if by_name.has("Detonation"):
@@ -673,6 +689,9 @@ func _pools() -> void:
 	# pool" is now true by the pool not existing.** AR's real claim is that the
 	# NAME is dead everywhere, and that is what is asserted: it resolves to
 	# nothing, so no pool anywhere could offer it.
+	# **BATCH HH §2 — `_kit()`'s "not in the kit" arm was retired onto this one.** HG's
+	# control c8 wrote Flame Shield back into the Pyromancer's definitions and both
+	# went red; retiring or narrowing this re-opens that arm.
 	ok(Classes.pool_ability("Flame Shield") == null,
 		"Flame Shield resolves to NOTHING — the name is dead in every pool")
 	ok(Classes.SPEC_POOLS["pyromancer"].has("Immolate"),

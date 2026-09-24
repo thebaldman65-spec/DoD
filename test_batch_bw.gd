@@ -246,10 +246,26 @@ func _pools() -> void:
 	# spec ability leaking into a class pool is the BQ/BR/BU/BV negative control.
 	# (The class-wide shelf's floor of three that stood beside it is FOLDED BY
 	# BATCH HD §3 into the per-class floor at the top of this function.)
+	# **RETIRED BY BATCH HH §2 — SUPERSEDED, KEPT AND SAID TO BE KEPT.** The loop
+	# here asked, of every NINE card and every class, that the card is not on the
+	# class-wide shelf. **GP made that shelf part of its class's one pool**, so a
+	# shelf is where a card was written down: a card moved onto its own class's
+	# class-wide shelf changes nothing a hero is offered. The defect this guarded — a
+	# card on two shelves — is asked by `_names()` below ("appears in exactly ONE
+	# pool"), which HG's control c2 turned red and HH re-drove; a card moved into
+	# ANOTHER class's pool thins its own class's floor at the top of this function.
+	# The loop is still walked and PRINTED as the record; what is asserted is the
+	# fact that retired it, one pool a class, so the day the shelves are split again
+	# this goes red and says the old question is live.
+	var on_wide: Array = []
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		for n in NINE:
-			ok(not Classes.class_draft_pool(cls).has(n),
-				"%s is a SPEC card and is not in %s's class pool" % [n, cls])
+			if Classes.class_draft_pool(cls).has(n):
+				on_wide.append("%s/%s" % [cls, n])
+	var gp := Fixture.one_pool_a_class("test_batch_bw, the BQ/BR/BU/BV leak arm (a NINE card on a class-wide shelf)")
+	ok(bool(gp[0]), String(gp[1]))
+	print("  [record] the BQ/BR/BU/BV leak arm, retired at HH §2 onto `_names()`: %d of %d NINE cards sit on a class-wide shelf %s" % [
+		on_wide.size(), NINE.size(), str(on_wide)])
 	# SPEC_POOLS FEEDS THE BOSS PICK and must not move (BO's rule): dropping
 	# nine names in there would silently re-weight every boss offer in the game
 	# as a side effect of a draft change.
@@ -267,10 +283,28 @@ func _pools() -> void:
 			ok(not Classes.SPEC_POOLS[spec].has(n),
 				"%s is not in the %s BOSS pool" % [n, spec])
 	# AND NO PROTECTED ENABLER LEAKED INTO A DRAFT POOL (BO's own control).
+	# **RETIRED BY BATCH HH §2 — SUPERSEDED BY TWO OTHER TARGETS, KEPT AND SAID TO BE
+	# KEPT.** The loop asks that each lineage's enabler is not on its OWN shelf: six
+	# checks, and `test_batch_bp` §5's enabler arm asks the same six of every lineage
+	# word for word. `check_gs` §1 asks five of them more strictly — not in the CLASS
+	# pool — and leaves out the sixth, Quick Shot, because the Sharpshooter's enabler
+	# is the Hunter's class basic. HG's control c3 put Bloodlust and Quick Shot on
+	# their own shelves: `check_gs` caught Bloodlust and was silent on Quick Shot, and
+	# `bp` §5 caught both. **So both superseders are in other targets**, each carries a
+	# note naming this arm, and `bp` §5 is HI's to re-point — the re-point keeps
+	# asking it of Quick Shot. **What moved this arm's framing is GP**: since a class's
+	# shelves are one pool, "not on its OWN shelf" is the narrow form of a question the
+	# pool asks. The loop is still walked and PRINTED as the record; what is asserted
+	# is that fact, one pool a class.
+	var own_shelf: Array = []
 	for spec in Classes.PROTECTED_CORES:
 		for en in Classes.PROTECTED_CORES[spec]["enablers"]:
-			ok(not Classes.spec_draft_pool(spec).has(en),
-				"%s's enabler %s is not draftable" % [spec, en])
+			if Classes.spec_draft_pool(spec).has(en):
+				own_shelf.append("%s/%s" % [spec, en])
+	var gp2 := Fixture.one_pool_a_class("test_batch_bw, BO's enabler-off-its-own-shelf arm")
+	ok(bool(gp2[0]), String(gp2[1]))
+	print("  [record] BO's enabler arm, retired at HH §2 onto test_batch_bp §5 and check_gs §1: %d enabler(s) on their own shelf %s" % [
+		own_shelf.size(), str(own_shelf)])
 
 
 func _definitions() -> void:
@@ -408,10 +442,24 @@ func _names() -> void:
 	# other three arms are every pool a name can now live in.
 	for n in pools:
 		seen[n] = int(seen.get(n, 0)) + 1
+	# **BATCH HH §2 — THE LEAK ARM IN `_pools()` WAS RETIRED ONTO THIS ONE.** HG's
+	# control c2 put Aegis Wall on the Warrior class-wide shelf beside its own: the
+	# leak arm and this arm both went red, and this is the one that asks the question
+	# the merge left — a card in two places. Retiring or narrowing it re-opens that arm.
 	for n in NINE:
 		ok(int(seen.get(n, 0)) == 1,
 			"%s appears in exactly ONE pool (got %d)" % [n, int(seen.get(n, 0))])
 	# AND AGAINST EVERY OPENING KIT, which pools do not contain.
+	# **BATCH HH §2 — THIS ARM IS NOT RETIRED, BECAUSE IT HAS NEVER ASKED ANYTHING.**
+	# HG sorted it SUPERSEDED by `check_gs` §1 and never drove that claim, so HH did,
+	# before retiring anything: a second Aegis Wall defined in the Warden's table, in
+	# the Berserker's, and in the Warrior class kit. **This arm read GREEN all three
+	# times**, and an ok() trace says why: it fires ZERO times. `Classes.SPEC_IDS`'s
+	# keys are the four CLASSES, and `spec_abilities("warrior")` is empty, so the
+	# inner loop never runs — the shape HD §2 repaired in `test_batch_bu`'s NINE-name
+	# sweep. `check_gs` §1's homes arm caught only the Berserker case. So it is not
+	# superseded, and by the brief's rule it stays: it is HI's, with the re-points,
+	# to be repaired to what it was FOR. Nothing here changed but this note.
 	for spec in Classes.SPEC_IDS:
 		for ab in Classes.spec_abilities(spec):
 			ok(not NINE.has(ab.display_name),

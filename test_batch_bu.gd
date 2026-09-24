@@ -203,10 +203,26 @@ func _pools() -> void:
 	# spec ability leaking into a class pool is the BQ/BR negative control. (The
 	# class-wide shelf's floor of three that stood beside it is FOLDED BY BATCH
 	# HD §3 into the per-class floor at the top of this function.)
+	# **RETIRED BY BATCH HH §2 — SUPERSEDED, KEPT AND SAID TO BE KEPT.** The loop
+	# here asked, of every NINE card and every class, that the card is not on the
+	# class-wide shelf. **GP made that shelf part of its class's one pool**, so a
+	# shelf is where a card was written down: a card moved onto its own class's
+	# class-wide shelf changes nothing a hero is offered. The defect this guarded — a
+	# card on two shelves — is asked by `_names()` below ("appears in exactly ONE
+	# pool"), which HG's control c2 turned red and HH re-drove; a card moved into
+	# ANOTHER class's pool thins its own class's floor at the top of this function.
+	# The loop is still walked and PRINTED as the record; what is asserted is the
+	# fact that retired it, one pool a class, so the day the shelves are split again
+	# this goes red and says the old question is live.
+	var on_wide: Array = []
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		for n in NINE:
-			ok(not Classes.class_draft_pool(cls).has(n),
-				"%s is a SPEC card and is not in %s's class pool" % [n, cls])
+			if Classes.class_draft_pool(cls).has(n):
+				on_wide.append("%s/%s" % [cls, n])
+	var gp := Fixture.one_pool_a_class("test_batch_bu, the BQ/BR leak arm (a NINE card on a class-wide shelf)")
+	ok(bool(gp[0]), String(gp[1]))
+	print("  [record] the BQ/BR leak arm, retired at HH §2 onto `_names()`: %d of %d NINE cards sit on a class-wide shelf %s" % [
+		on_wide.size(), NINE.size(), str(on_wide)])
 	# **DY §3 — THE `CLASS_POOLS` BYTE-FREEZE PIN IS REPLACED BY THE ABSENCE OF
 	# THE CONTAINER.** A frozen collection is not a growing one, so DX left this
 	# pin standing correctly; DY deletes the collection, so the strongest thing
@@ -327,6 +343,10 @@ func _names() -> void:
 	# pool" is still the whole question.
 	for n in pools:
 		seen[n] = int(seen.get(n, 0)) + 1
+	# **BATCH HH §2 — THE LEAK ARM IN `_pools()` WAS RETIRED ONTO THIS ONE.** HG's
+	# control c2 put Recant on the Warrior class-wide shelf beside its own: the leak
+	# arm and this arm both went red, and this is the one that asks the question the
+	# merge left — a card in two places. Retiring or narrowing it re-opens that arm.
 	for n in NINE:
 		# It may appear in exactly one pool — its own.
 		ok(int(seen.get(n, 0)) == 1,

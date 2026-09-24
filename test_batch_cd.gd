@@ -40,6 +40,10 @@
 # drives itself does not terminate. A post-pass has no such hazard.
 extends SceneTree
 
+# BATCH HH §2 — for `Fixture.one_pool_a_class`, the fact the per-shelf floor in §2
+# was retired onto; nothing else here reaches the fixture.
+const Fixture = preload("res://suite_fixture.gd")
+
 # Every site that was aborting, by the symbol that aborted it. Pinned ABSENT
 # from the test tree so the same dead name cannot come back in a sixth suite.
 const DEAD_TEST_SYMBOLS := ["award_talent_points", "award_spec_point",
@@ -76,7 +80,7 @@ const DEAD_TEST_SYMBOLS := ["award_talent_points", "award_spec_point",
 const SPEC_TARGET := 159     # the twelve pools, summed from PER_SPEC_DEPTH — 129 until GS, 158 until HB
 const CLASS_TARGET := 20     # summed from PER_CLASS_DEPTH — 25 until GN
 const DRAFT_TARGET := 179    # 159 + 20
-const SPEC_FLOOR := 8        # no pool may fall below CI's flat eight
+const SPEC_FLOOR := 8        # CI's flat eight a shelf; asserted until HH §2, printed since (see §2)
 # What each spec drafts from now. The nine that grew are the nine that HAD an
 # ability-granting talent node; beastmaster, sharpshooter and mystic had none,
 # which is why they alone still read eight.
@@ -91,7 +95,9 @@ const PER_SPEC_DEPTH := {
 	# UNCHANGED AT EIGHT AND IS NOW SLACK EVERYWHERE** — the Warden's nine is
 	# the shallowest pool in the game now — and it stays there deliberately:
 	# `SPEC_FLOOR` catches a pool that EMPTIES, and ratcheting it to nine would
-	# buy nothing but a re-edit next time a pool moves.
+	# buy nothing but a re-edit next time a pool moves. (**SINCE HH §2 IT CATCHES
+	# NOTHING AND IS PRINTED**: a class's shelves are one pool since GP, so a pool
+	# emptying is this table's equality and the class floors' to catch — §2 says why.)
 	# BATCH DY §1: the WARDEN 9 -> 10 (Rallying Shout), the ARCANIST 10 -> 12
 	# (Arcane Surge and Reality Fracture) and the DEVOUT 10 -> 11 (Divine
 	# Wrath). All four cards came OUT OF THE VAULT rather than being authored —
@@ -393,21 +399,42 @@ func _pools() -> void:
 		for spec in Classes.SPEC_IDS[key]:
 			specs.append(String(spec))
 	ok(specs.size() == 12, "twelve specs (%d)" % specs.size())
+	var under_floor: Array = []
 	for spec in specs:
 		var pool: Array = Classes.spec_draft_pool(spec)
 		spec_total += pool.size()
 		# BATCH DO: the expectation is the TABLE now, and the FLOOR is asserted
 		# beside it — a pool quietly emptying trips the floor even if a later
 		# batch forgets to move the table with it.
+		# **BATCH HH §2 — THE PER-SHELF FLOOR THAT STOOD BELOW THIS LINE WAS RETIRED
+		# ONTO IT** (and onto the class floors): see the block after this loop. So
+		# this equality is now the one arm in this suite that reds on a shelf
+		# emptying, and retiring or loosening it re-opens that floor.
 		var want := int(PER_SPEC_DEPTH.get(spec, SPEC_FLOOR))
 		ok(pool.size() == want, "%s drafts %d (want %d)" % [spec, pool.size(), want])
-		ok(pool.size() >= SPEC_FLOOR,
-			"...and %s is still at or above CI's flat floor of %d" % [spec, SPEC_FLOOR])
+		if pool.size() < SPEC_FLOOR:
+			under_floor.append("%s (%d)" % [spec, pool.size()])
 		# A pool with a repeat would keep the count and change the draft.
 		var seen := {}
 		for n in pool:
 			seen[String(n)] = 1
 		ok(seen.size() == pool.size(), "%s's pool holds no duplicate" % spec)
+	# **RETIRED BY BATCH HH §2 — SUPERSEDED, KEPT AND SAID TO BE KEPT.** The loop
+	# asked each of the twelve lineage shelves to hold at least CI's flat eight,
+	# "so a pool that quietly empties trips". **GP made a class's shelves ONE POOL**,
+	# so a hero draws his class's pool and a shelf is where a card was written down:
+	# HD §3 folded thirty-six shelf floors into `Fixture.class_pool_floors`, which the
+	# eleven draft suites assert per class and in both halves. That helper, and the
+	# per-shelf depth equality just above (`PER_SPEC_DEPTH`, the authoritative table),
+	# are this floor's superseders: HG's control c6 emptied the Warden's shelf and
+	# both went red (the helper in `test_batch_bo` and `test_batch_bp`), and HH
+	# re-drove it. The floor is still read and PRINTED as the record; what is asserted
+	# is the fact that retired it, one pool a class, so the day the shelves are split
+	# again this goes red and says the old question is live.
+	var gp := Fixture.one_pool_a_class("test_batch_cd, §2's per-shelf floor of eight")
+	ok(bool(gp[0]), String(gp[1]))
+	print("  [record] §2's per-shelf floor of %d, retired at HH §2 onto the depth table and the class floors: %d shelf(s) under it %s" % [
+		SPEC_FLOOR, under_floor.size(), str(under_floor)])
 	ok(spec_total == SPEC_TARGET,
 		"SPEC_DRAFT_POOLS holds %d entries (got %d)" % [SPEC_TARGET, spec_total])
 	ok(spec_total > 12 * 8,

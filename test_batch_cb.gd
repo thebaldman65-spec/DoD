@@ -192,10 +192,26 @@ func _pools() -> void:
 	# spec ability leaking into a class pool is the BQ/BR/BT negative control.
 	# (The class-wide shelf's floor of three that stood beside it is FOLDED BY
 	# BATCH HD §3 into the per-class floor at the top of this function.)
+	# **RETIRED BY BATCH HH §2 — SUPERSEDED, KEPT AND SAID TO BE KEPT.** The loop
+	# here asked, of every NINE card and every class, that the card is not on the
+	# class-wide shelf. **GP made that shelf part of its class's one pool**, so a
+	# shelf is where a card was written down: a card moved onto its own class's
+	# class-wide shelf changes nothing a hero is offered. The defect this guarded — a
+	# card on two shelves — is asked by `_names()` below ("is not in a spec pool as
+	# well", over every class-wide card), which HG's control c2 turned red and HH
+	# re-drove; a card moved into ANOTHER class's pool thins its own class's floor at
+	# the top of this function. The loop is still walked and PRINTED as the record;
+	# what is asserted is the fact that retired it, one pool a class, so the day the
+	# shelves are split again this goes red and says the old question is live.
+	var on_wide: Array = []
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		for n in NINE:
-			ok(not Classes.class_draft_pool(cls).has(n),
-				"%s is a SPEC card and is not in %s's class pool" % [n, cls])
+			if Classes.class_draft_pool(cls).has(n):
+				on_wide.append("%s/%s" % [cls, n])
+	var gp := Fixture.one_pool_a_class("test_batch_cb, the BQ/BR/BT leak arm (a NINE card on a class-wide shelf)")
+	ok(bool(gp[0]), String(gp[1]))
+	print("  [record] the BQ/BR/BT leak arm, retired at HH §2 onto `_names()`: %d of %d NINE cards sit on a class-wide shelf %s" % [
+		on_wide.size(), NINE.size(), str(on_wide)])
 	# **DY §3 — THE `CLASS_POOLS` BYTE-FREEZE PIN IS REPLACED BY THE ABSENCE OF
 	# THE CONTAINER.** A frozen collection is not a growing one, so DX left this
 	# pin standing correctly; DY deletes the collection, so the strongest thing
@@ -324,6 +340,13 @@ func _names() -> void:
 		for n in Classes.spec_draft_pool(spec):
 			ok(not seen.has(n), "%s appears in exactly one spec draft pool" % n)
 			seen[n] = spec
+	# **BATCH HH §2 — THREE RETIRED ARMS STAND ON THIS ONE, TWO OF THEM IN OTHER
+	# SUITES.** HG's control c2 put eight lineage cards on the Warrior class-wide shelf
+	# beside their own, and this arm named all eight: so it is what this suite's leak
+	# arm in `_pools()` was retired onto, and — with `test_batch_bt`'s and
+	# `test_batch_ce`'s whole-draft sweeps — what `test_batch_bp` §5's tranche arm and
+	# `test_batch_cp` §2's class-wide half stand on, having no such arm of their own.
+	# Each names this sweep at its own site. Retiring or narrowing it narrows them.
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		for n in Classes.class_draft_pool(cls):
 			ok(not seen.has(n), "%s is not in a spec pool as well" % n)

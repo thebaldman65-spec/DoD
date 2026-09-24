@@ -195,10 +195,26 @@ func _pools() -> void:
 	# spec ability leaking into a class pool is the BQ/BR negative control. (The
 	# class-wide shelf's floor of three that stood beside it is FOLDED BY BATCH
 	# HD §3 into the per-class floor at the top of this function.)
+	# **RETIRED BY BATCH HH §2 — SUPERSEDED, KEPT AND SAID TO BE KEPT.** The loop
+	# here asked, of every BT card and every class, that the card is not on the
+	# class-wide shelf. **GP made that shelf part of its class's one pool**, so a
+	# shelf is where a card was written down: a BT card moved onto its own class's
+	# class-wide shelf changes nothing a hero is offered. The defect this guarded — a
+	# card on two shelves — is asked by `_names()` below, the whole-draft uniqueness
+	# sweep, which HG's control c2 turned red on eight duplicated cards and HH
+	# re-drove; a card moved into ANOTHER class's pool thins its own class's floor at
+	# the top of this function. The loop is still walked and PRINTED as the record;
+	# what is asserted is the fact that retired it, one pool a class, so the day the
+	# shelves are split again this goes red and says the old question is live.
+	var on_wide: Array = []
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		for n in BT_CARDS:
-			ok(not Classes.class_draft_pool(cls).has(n),
-				"%s is a SPEC card and is not in %s's class pool" % [n, cls])
+			if Classes.class_draft_pool(cls).has(n):
+				on_wide.append("%s/%s" % [cls, n])
+	var gp := Fixture.one_pool_a_class("test_batch_bt, the BQ/BR leak arm (a BT card on a class-wide shelf)")
+	ok(bool(gp[0]), String(gp[1]))
+	print("  [record] the BQ/BR leak arm, retired at HH §2 onto `_names()`: %d of %d BT cards sit on a class-wide shelf %s" % [
+		on_wide.size(), BT_CARDS.size(), str(on_wide)])
 	# **DY §3 — THE `CLASS_POOLS` BYTE-FREEZE PIN IS REPLACED BY THE ABSENCE OF
 	# THE CONTAINER.** A frozen collection is not a growing one, so DX left this
 	# pin standing correctly; DY deletes the collection, so the strongest thing
@@ -314,6 +330,16 @@ func _names() -> void:
 			if seen.has(n):
 				dupes.append(n)
 			seen[n] = true
+	# **BATCH HH §2 — THREE RETIRED ARMS STAND ON THIS ONE, TWO OF THEM IN OTHER
+	# SUITES.** It is what `test_batch_bt`'s own leak arm (`_pools()`), `test_batch_bp`
+	# §5's tranche arm (a BP card "not in the class-wide draft either") and
+	# `test_batch_cp` §2's (a CP card "ABSENT from CLASS_DRAFT_POOLS") were retired
+	# onto: HG's control c2 duplicated eight cards into the Warrior class-wide shelf,
+	# and for `bp` and `cp`, which have no such arm of their own, what went red was
+	# this sweep and the class-wide arms of `test_batch_cb`'s and `test_batch_ce`'s
+	# `_names()`, each naming all eight. Each of the three names this sweep at its own
+	# site. **Retiring or narrowing it narrows what stands behind all three** — so a
+	# batch that does drives their defect first (HG §2a's rule).
 	ok(dupes.is_empty(),
 		"no ability name is used twice across the whole draft (%s)" % str(dupes))
 	# THE ONE COLLISION THIS BATCH SHIPPED, PINNED BY NAME SO IT COULD NOT BE

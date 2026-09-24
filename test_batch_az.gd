@@ -663,11 +663,35 @@ func _rune_audit() -> void:
 	# lesson, checked even though nothing moved).
 	# (FX: no tree has lanes now, and a rune's `lane` records HISTORY — CLAUDE.md,
 	# EM. The tag must still be one of his three names and not a stale rename.)
+	# **RETIRED BY BATCH HH §1 — ITS SUBJECT IS GONE, KEPT AND SAID TO BE KEPT.** The
+	# arm here asked that each of his four runes carries one of his three lane names,
+	# so a lane RENAMED in his tree could not leave a rune tagged with the old one —
+	# the AS Honed Lance lesson. **FX deleted his tree and its lanes**: there is one
+	# class tree and no node in it has a lane, and a rune's `lane` is history the
+	# rune build copies and no screen or script reads (CLAUDE.md, the EM block). A lane
+	# that cannot be renamed cannot go stale. The tags are still read and PRINTED as the
+	# record; **what is asserted is the fact that retired it**: no node of the one tree
+	# carries a lane, so the day a tree has lanes again, a rune's tag can go stale
+	# again and this goes red saying so.
 	var lanes := {"Precision": true, "Penetration": true, "Pace": true}
+	var tags: Array = []
+	var not_his: Array = []
 	for id in ss_runes:
 		var lane := String(pool[id].get("lane", ""))
-		ok(lane == "" or lanes.has(lane),
-			"the rune %s carries a live lane tag (%s)" % [id, lane])
+		tags.append("%s=%s" % [id, lane])
+		if lane != "" and not lanes.has(lane):
+			not_his.append(String(id))
+	var laned: Array = []
+	var cells := 0
+	for t in Talents.tree():
+		cells += 1
+		if t.has("lane"):
+			laned.append(String(t.get("id", "?")))
+	ok(cells > 0 and laned.is_empty(),
+		"a node of the one tree carries a lane again (%s; %d cells walked) — AZ's lane-tag arm, retired at HH §1 (FX deleted the lanes), asks a live question again" % [
+			", ".join(PackedStringArray(laned)), cells])
+	print("  [record] AZ's lane-tag arm, retired at HH §1: %s — %d not one of his three old lane names" % [
+		", ".join(PackedStringArray(tags)), not_his.size()])
 
 
 # ---------- §7 the bot's rules, at the source ----------

@@ -135,9 +135,25 @@ func _pools() -> void:
 		"§5+DO: the spec half has FALLEN to %d, below the 125 that shipped" % total)
 	ok(Classes.SPEC_DRAFT_POOLS.size() == 12,
 		"§5: all twelve specs are named")
+	# **RETIRED BY BATCH HH §2 — SUPERSEDED, KEPT AND SAID TO BE KEPT.** The loop
+	# asked that each of the twelve lineage shelves is non-empty — "EVERY spec has a
+	# draft now", BP's claim when a spec's shelf was the draft it drew. **GP made a
+	# class's shelves ONE POOL**, so a hero draws his class's pool and an empty shelf
+	# is a shelf nobody wrote on. The defect this guarded — a pool quietly emptying —
+	# is asked by `Fixture.class_pool_floors` below, per class and in both halves, and
+	# by `test_batch_cd` §2's per-shelf depth table (an equality, in another suite):
+	# HG's control c6 emptied the Warden's shelf and both went red, and HH re-drove it.
+	# The loop is still walked and PRINTED as the record; what is asserted is the fact
+	# that retired it, one pool a class, so the day the shelves are split again this
+	# goes red and says the old question is live.
+	var empty_shelves: Array = []
 	for spec2 in Classes.SPEC_DRAFT_POOLS:
-		ok(not Classes.spec_draft_pool(spec2).is_empty(),
-			"§5: EVERY spec has a draft now — %s is not empty" % spec2)
+		if Classes.spec_draft_pool(spec2).is_empty():
+			empty_shelves.append(spec2)
+	var gp0 := Fixture.one_pool_a_class("test_batch_bp, §5's every-spec-has-a-draft arm")
+	ok(bool(gp0[0]), String(gp0[1]))
+	print("  [record] §5's every-spec-has-a-draft arm, retired at HH §2 onto the class floors: %d of %d lineage shelves empty %s" % [
+		empty_shelves.size(), Classes.SPEC_DRAFT_POOLS.size(), str(empty_shelves)])
 	# BATCH BW RE-POINTED THIS FROM AN EQUALITY TO A PREFIX, on BO's own
 	# precedent: A LATER TRANCHE APPENDS, IT DOES NOT REWRITE. BP's six are still
 	# pinned as LITERALS and still lead their pools — which is what would catch a
@@ -207,14 +223,34 @@ func _pools() -> void:
 	# NO NAME COLLIDES WITH AN EXISTING ONE. `pool_ability` resolves by display
 	# name across the WHOLE game, so a collision would silently re-point an
 	# existing ability at a new def.
+	var on_wide: Array = []
 	for spec5 in TRANCHE_2:
 		for n3 in TRANCHE_2[spec5]:
 			ok(not Classes.spec_pool(spec5).has(n3),
 				"§5: '%s' is not also in the BOSS pool — the two draws stay separate" % n3)
-			ok(Classes.class_draft_pool("warrior").find(n3) < 0,
-				"§5: '%s' is not in the class-wide draft either" % n3)
+			# The class-wide half is RETIRED (HH §2) — walked here as the record, and
+			# asserted below the loop as the fact that retired it.
+			if Classes.class_draft_pool("warrior").find(n3) >= 0:
+				on_wide.append(String(n3))
 			ok(not Classes.protected_names(spec5).has(n3),
 				"§5: '%s' is not in the opening kit either" % n3)
+	# **THE CLASS-WIDE HALF IS RETIRED BY BATCH HH §2 — SUPERSEDED BY OTHER SUITES'
+	# ARMS, KEPT AND SAID TO BE KEPT.** It asked, of BP's six, that none is on the
+	# Warrior class-wide shelf. **GP made that shelf part of the Warrior's one pool**,
+	# so a BP card moved onto it changes nothing a Warrior is offered. The defect this
+	# guarded — a card on two shelves — is asked by NO arm of this suite: HG's control
+	# c2 put Blood Offering on the Warrior class-wide shelf beside its own, and what
+	# went red for it outside this loop was three OTHER suites' sweeps, each naming all
+	# eight cards c2 moved — `test_batch_bt`'s `_names()` (the whole-draft uniqueness
+	# sweep HG named) and the class-wide arms of `test_batch_cb`'s and `test_batch_ce`'s
+	# `_names()`. **Those are this half's superseders, all in other suites**, and each
+	# carries a note naming this suite; retiring or narrowing any of them narrows what
+	# stands behind this half, and retiring all three re-opens it. What is asserted
+	# here is the fact that retired it, one pool a class.
+	var gp1 := Fixture.one_pool_a_class("test_batch_bp, §5's tranche arm (a BP card in the class-wide draft)")
+	ok(bool(gp1[0]), String(gp1[1]))
+	print("  [record] §5's tranche arm, retired at HH §2 onto test_batch_bt/cb/ce's sweeps: %d of BP's six on the Warrior class-wide shelf %s" % [
+		on_wide.size(), str(on_wide)])
 	# NO ENTRY IS A STRICTLY BETTER VERSION OF ITS SIBLING (BD's Deadfall
 	# lesson): within a pool, no two cards may share a special, and every card
 	# must differ from its sibling on more than one number.
@@ -229,6 +265,16 @@ func _pools() -> void:
 			"§5: ...and differ on more than their damage (%s)" % spec6)
 	# THE PROTECTED CORES ARE UNTOUCHED BY THIS BATCH — no new entry may become
 	# an enabler, and every enabler stays out of every draft pool.
+	# **BATCH HH §2 — TWO RETIRED ARMS IN OTHER SUITES STAND ON THIS ONE.**
+	# `test_batch_bv`'s Hunter-enabler arm and `test_batch_bw`'s BO enabler arm asked
+	# the same question — an enabler off its own shelf — and were retired onto this
+	# arm, which asks it of every lineage. `check_gs` §1 asks five of the six more
+	# strictly (not in the CLASS pool) and leaves out Quick Shot, the Sharpshooter's
+	# enabler, because it is the Hunter's class basic: HG's control c3 put Bloodlust
+	# and Quick Shot on their own shelves, `check_gs` caught Bloodlust and was silent
+	# on Quick Shot, and this arm caught both. **So this arm is the only one left
+	# asking the Sharpshooter's case.** It is HI's to re-point over the class pool;
+	# the re-point keeps asking it of Quick Shot, or it re-opens both retired arms.
 	for spec7 in Classes.all_specs():
 		for en in Classes.core_enablers(spec7):
 			ok(not Classes.spec_draft_pool(spec7).has(en),

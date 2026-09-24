@@ -686,11 +686,33 @@ func _kit_unchanged() -> void:
 	# enabler), and Shieldwall is drafted off his shelf. What the re-specs depend
 	# on is that he can HOLD it, so the check asks where it lives now.
 	var kit := _ability_names(Classes.spec_abilities("warden"))
+	# **BATCH HH §2 — THE "NOT OPENING KIT" ARM BELOW WAS RETIRED ONTO THIS COUNT.**
+	# HG's control c1 wrote War Stomp back into the Warden's definitions and this went
+	# red ("has 4"); retiring or loosening it re-opens that arm.
 	ok(kit.size() == 3, "the Warden still DEFINES exactly 3 lineage abilities (has %d)" % kit.size())
 	ok(kit.has("Shieldwall") and Classes.spec_draft_pool("warden").has("Shieldwall"),
 		"Shieldwall is one of his three, drafted off his shelf since GS — Bulwark Line keys to it")
-	ok(not kit.has("War Stomp") and not kit.has("Interpose"),
-		"War Stomp and Interpose are still earnable, not opening kit")
+	# **RETIRED BY BATCH HH §2 — SUPERSEDED, KEPT AND SAID TO BE KEPT.** The arm here
+	# asked that War Stomp and Interpose are out of `spec_abilities("warden")` as "not
+	# opening kit" — true to its words until GS §1 made that table the lineage's
+	# DEFINITIONS: a lineage opens with its engine's enablers alone, and Heavy Plating
+	# carries none. HA named `:519`/`:521` its duplicates, and HG's control c1 found
+	# they stay green (they ask a fresh Warden what he OWNS, and a card added to his
+	# definitions never reaches him); what went red beside this arm was the count just
+	# above, which is its superseder. The pair is still read and PRINTED as the record;
+	# **what is asserted is the fact that retired it**: the Warden defines more than he
+	# opens with, so the day he opens with his whole table again, "not opening kit"
+	# asks a live question again and this goes red saying so.
+	var stray: Array = []
+	for nm in ["War Stomp", "Interpose"]:
+		if kit.has(nm):
+			stray.append(nm)
+	var w_def := Classes.spec_abilities("warden").size()
+	var w_open := Classes.lineage_opening("warden").size()
+	ok(w_def > 0 and w_def > w_open,
+		"the Warden opens with his whole definition table again (%d defined, %d opened) — AL's \"not opening kit\" arm, retired at HH §2 onto the definition count, asks a live question again" % [w_def, w_open])
+	print("  [record] AL's \"not opening kit\" arm, retired at HH §2: %s in the Warden's definitions" % (
+		str(stray) if not stray.is_empty() else "neither War Stomp nor Interpose"))
 	var pool: Array = Classes.spec_pool("warden")
 	ok(pool.size() == 4, "the spec pool still holds 4 (has %d)" % pool.size())
 	# Every pool entry of every spec still resolves: an upgrade path is a

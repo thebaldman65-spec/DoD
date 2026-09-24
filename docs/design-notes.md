@@ -4,6 +4,34 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Twenty-one checks retired, and one that could not be (Batch HH) — 2026-09-24
+
+**Why a retired check still asserts something.** Deleting a check leaves a hole nobody can see. Retiring one is a
+statement about the game, so every retired check still works out what it used to ask and prints the answer, and its
+assertion becomes the fact that made the old question stale: a class's shelves are one pool (since GP), a lineage
+opens with its engine's enablers alone (since GS), there is one talent tree (since FX), and no lineage takes a slot.
+If one of those facts ever stops being true, the old question matters again, and the retired check goes red and says
+so on its own.
+
+**Why one of the twenty-two was not retired.** It was marked "another check asks this better", and that had never
+been tested. Tested three ways, the check itself stayed green every time, because it has never asserted anything: it
+loops over the four classes where it meant the twelve lineages, a class has no list of its own abilities, and so its
+inner loop never runs. A check that guards nothing cannot be replaced by a better one. It goes to the repair batch to
+be fixed to what it was for, the way Batch HD fixed the identical loop in another suite.
+
+**Why the dependency is written at both ends.** Six of the retired checks now rely entirely on a check that lives in
+a different file. The note at the retired site says where its question went; the note at the other site lists what
+stands on it. Without the second note, someone tidying that other check later would silently remove a question they
+did not know they were answering.
+
+**Why one helper instead of fourteen copies.** Fourteen retirements rest on the same fact — a class's shelves are its
+one pool. Writing that check fourteen times would make fourteen copies that could drift apart, so it lives once, in
+the suite fixture beside the pool floors, and each retired site asks it and names itself.
+
+**Why the repair batch gets forty-nine, not forty-eight.** The count was worked out again, arm by arm, rather than
+by subtracting: forty-eight re-points, plus the one check that turned out never to run. Every one of the forty-eight
+was also checked to actually fire, so the repair batch will not meet a second one like it.
+
 ## The remaining stale assertions, derived and sorted (Batch HG) — 2026-09-22
 
 **Why the number was re-derived instead of taken.** Two figures were on record — HA's 110 and `state.md`'s

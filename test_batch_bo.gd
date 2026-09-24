@@ -268,6 +268,7 @@ func _pools() -> void:
 	# and that is asserted here rather than assumed, because it is the half that
 	# would actually hurt if it stopped being true.
 	var overlap: Array = []
+	var sib_hits: Array = []
 	for spec3 in Classes.SPEC_DRAFT_POOLS:
 		for n2 in Classes.spec_draft_pool(spec3):
 			if Classes.spec_pool(spec3).has(n2):
@@ -290,12 +291,32 @@ func _pools() -> void:
 			# ONLY source was `py_rebirth`'s grant; putting it in the
 			# Pyromancer's draft pool is what makes it earnable at all. Against
 			# the SIBLING boss pools it was never a collision.
+			#
+			# **RETIRED BY BATCH HH §1** — walked here as the record, and the fact that
+			# retired it asserted below the loop.
 			var sib_hit := false
 			for sib in Classes.SPEC_IDS.get(Classes.class_of_spec(spec3), []):
 				if String(sib) != spec3 and Classes.spec_pool(String(sib)).has(n2):
 					sib_hit = true
-			ok(not sib_hit,
-				"§4: '%s' is a %s draft card and a SIBLING spec's boss card" % [n2, spec3])
+			if sib_hit:
+				sib_hits.append("%s/%s" % [spec3, n2])
+	# **THE SIBLING ARM IS RETIRED BY BATCH HH §1 — ITS SUBJECT IS GONE, KEPT AND SAID
+	# TO BE KEPT.** It asked, of every card on every lineage shelf, that the card is not
+	# in a SIBLING lineage's boss pool. That was a collision while a lineage drew its
+	# own shelf: a sibling's boss card sitting on it was a card two draws reached by two
+	# routes. **GP deleted that subject** — a class's shelves are one pool, so every
+	# lineage of a class draws every shelf, and a card in a sibling's boss pool is a card
+	# of the hero's own pool: the shape of the sixteen own-lineage overlaps asserted just
+	# below, which cannot double-offer because both rollers filter what the hero owns.
+	# (A name resolving to two DEFINITIONS would still hurt, and this arm never asked
+	# that — it asked which pools a name sat in.) The walk is still taken and PRINTED as
+	# the record; what is asserted is the fact that retired it, one pool a class, so the
+	# day a lineage draws its own shelf again this goes red and says the old question is
+	# live.
+	var gp := Fixture.one_pool_a_class("test_batch_bo, §4's sibling-boss-card arm")
+	ok(bool(gp[0]), String(gp[1]))
+	print("  [record] §4's sibling-boss-card arm, retired at HH §1: %d shelf card(s) in a sibling lineage's boss pool %s" % [
+		sib_hits.size(), str(sib_hits)])
 	# SIXTEEN OF THE TWENTY-TWO, NOT ALL OF THEM — DERIVED, NOT ASSUMED. The six
 	# that are NOT in their spec's boss pool are exactly `check_cz` §0's five
 	# (Backdraft, Pyroblast, Glacial Prison, Cryoclasm, Intercession) plus

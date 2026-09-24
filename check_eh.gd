@@ -243,13 +243,34 @@ func _s3_the_record() -> void:
 	# (1) THE TWO NUMBERS DISAGREE ON ALL TWELVE, AND THE LADDER READS
 	# `core_slots`. EG established the disagreement; what was owed is WHICH one
 	# the ladder reads and that nothing else reads the other.
+	#
+	# **RETIRED BY BATCH HH §1 — ITS SUBJECT IS GONE, KEPT AND SAID TO BE KEPT.** The
+	# arm here asserted that all twelve disagree, because only a disagreement tells a
+	# reader WHICH number the ladder reads. **GK and GS §1 removed that question's
+	# subject**: the cap reads `lineage_slots` (asserted just below), and GS §1 made
+	# that term zero for every lineage — a lineage opens with its engine's enablers
+	# alone, outside the count — so neither number reaches a slot, and the twelve
+	# disagree by construction (`core_slots` is an enabler's bar entry, 0 or 1;
+	# `protected_names` is the basic, the enablers and the class kit). The
+	# disagreement is still counted and PRINTED as the record; **what is asserted is
+	# the fact that retired it**: no lineage takes a slot. The day one does, which of
+	# the two numbers the ladder reads matters again, and this goes red saying so.
+	# (`ability_slots_used` is the door that lineage card would pass through — HA §1g
+	# — and `check_gn` §0's slot arm pins it; that arm is HI's.)
 	var disagree := 0
+	var walked := 0
+	var slotted: Array = []
 	for cls in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[cls]:
+			walked += 1
 			if Classes.core_slots(spec) != Classes.protected_names(spec).size():
 				disagree += 1
-	ok(disagree == 12,
-		"§3: %d of the twelve specs disagree between `core_slots` and `protected_names`, not all twelve" % disagree)
+			if Classes.lineage_slots(String(spec)) != 0:
+				slotted.append("%s (%d)" % [spec, Classes.lineage_slots(String(spec))])
+	ok(walked == 12 and slotted.is_empty(),
+		"§3: a lineage takes a slot again (%s; %d of 12 walked) — EG's question, which of `core_slots` and `protected_names` the ladder reads, is live again (retired at HH §1)" % [
+			", ".join(PackedStringArray(slotted)), walked])
+	print("    [record] EG's disagreement, retired at HH §1: %d of the twelve disagree between `core_slots` and `protected_names`, by construction since GS §1" % disagree)
 	var rs := Gate.strip_comments(
 		FileAccess.get_file_as_string("res://scripts/run_state.gd"))
 	var used := rs.find("func ability_slots_used")

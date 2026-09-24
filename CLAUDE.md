@@ -981,6 +981,26 @@ it, and left the assertion alone. The arm was done and the census would have sai
 guarded the defect, **and the named check reds, which proves retiring it loses nothing.** A green second arm is not
 a detail to note — it is the ruling being wrong.
 
+- **AND A GREEN FIRST ARM IS THE OTHER WAY THE RULING IS WRONG: AN ARM THAT NEVER BITES IS NOT SUPERSEDED, IT IS
+  VACUOUS (Batch HH §2).** HG sorted one of its seventeen superseded arms without driving it. Driven three ways — the
+  defect written into its own lineage's definitions, into a sibling's, and into the class kit — the arm read green
+  every time, and an ok() trace said why: it fires ZERO times, because it walks `Classes.SPEC_IDS`, whose keys are the
+  four classes, and a class has no definition table. There is nothing to retire onto; it goes to a repair, as HD §2
+  repaired the identical walk in another suite. **Count an arm's fires before sorting it** — a census reads a line,
+  and a line can hold an assertion that never runs.
+- **A RETIREMENT ASSERTS THE FACT THAT RETIRED IT, AND PRINTS WHAT IT USED TO READ (HD §2's four; HH's twenty-one).**
+  The old computation stays and its reading is PRINTED as a `[record]`; the `ok()` becomes the game fact that made the
+  question stale — GP's one pool a class (`suite_fixture.one_pool_a_class`, the one helper every shelf arm retires
+  onto), GS §1's opening (a lineage defines more than it opens with), FX's one tree — so the day that fact stops
+  holding, the retired question is live again and the arm goes red saying so. **An arm "retired" onto a new door for
+  its OLD question is a re-point**, and the control tells the two apart: a retired arm stays GREEN on the defect it
+  used to guard while its superseder goes red.
+- **A SUPERSEDER IN ANOTHER TARGET IS A DEPENDENCY, AND IT IS RECORDED AT BOTH ENDS (Batch HH §2).** The retired arm
+  names it at its site; the superseder carries a note naming every arm retired onto it, so a batch that retires or
+  narrows it meets what stands on it. **Derive the population off the controls, never off a brief**: HH's brief named
+  two such arms and the controls found six — two on `check_gs`, two on three other suites' whole-draft sweeps, and
+  two on `test_batch_bp` §5's enabler arm, the only arm left asking the Sharpshooter's case.
+
 ## THE SHARPSHOOTER'S BASIC IS A SEQUENCE (STANDING, SET AT BATCH CS)
 **HIS BASIC ATTACK ONLY. No other ability of his changes, and no other hero's bar moves at all.**
 `_is_sharpshooter_basic` is the single answer to "is this it" — read off the hero's held engine

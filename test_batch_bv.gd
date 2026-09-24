@@ -241,10 +241,26 @@ func _pools() -> void:
 	# spec ability leaking into a class pool is the BQ/BR/BU negative control.
 	# (The class-wide shelf's floor of three that stood beside it is FOLDED BY
 	# BATCH HD §3 into the per-class floor at the top of this function.)
+	# **RETIRED BY BATCH HH §2 — SUPERSEDED, KEPT AND SAID TO BE KEPT.** The loop
+	# here asked, of every NINE card and every class, that the card is not on the
+	# class-wide shelf. **GP made that shelf part of its class's one pool**, so a
+	# shelf is where a card was written down: a card moved onto its own class's
+	# class-wide shelf changes nothing a hero is offered. The defect this guarded — a
+	# card on two shelves — is asked by `_names()` below ("appears in exactly ONE
+	# pool"), which HG's control c2 turned red and HH re-drove; a card moved into
+	# ANOTHER class's pool thins its own class's floor at the top of this function.
+	# The loop is still walked and PRINTED as the record; what is asserted is the
+	# fact that retired it, one pool a class, so the day the shelves are split again
+	# this goes red and says the old question is live.
+	var on_wide: Array = []
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		for n in NINE:
-			ok(not Classes.class_draft_pool(cls).has(n),
-				"%s is a SPEC card and is not in %s's class pool" % [n, cls])
+			if Classes.class_draft_pool(cls).has(n):
+				on_wide.append("%s/%s" % [cls, n])
+	var gp := Fixture.one_pool_a_class("test_batch_bv, the BQ/BR/BU leak arm (a NINE card on a class-wide shelf)")
+	ok(bool(gp[0]), String(gp[1]))
+	print("  [record] the BQ/BR/BU leak arm, retired at HH §2 onto `_names()`: %d of %d NINE cards sit on a class-wide shelf %s" % [
+		on_wide.size(), NINE.size(), str(on_wide)])
 	# SPEC_POOLS FEEDS THE BOSS PICK and must not move (BO's rule): dropping
 	# nine names in there would silently re-weight every boss offer in the game
 	# as a side effect of a draft change.
@@ -265,10 +281,28 @@ func _pools() -> void:
 	# an enabler becoming draftable is the silent failure `PROTECTED_CORES`
 	# exists to prevent, and this batch touches the Beastmaster — whose enablers
 	# are all three summons — so it is exactly the batch to check it in.
+	# **RETIRED BY BATCH HH §2 — SUPERSEDED BY ANOTHER SUITE'S ARM, KEPT AND SAID TO
+	# BE KEPT.** The loop asks, of the three Hunter lineages, that an enabler is not
+	# on its OWN shelf. HB took the summons into the class kit and the Survivalist
+	# brings none, so it walks ONE card today — Quick Shot, the Sharpshooter's — and
+	# `test_batch_bp` §5's enabler arm asks exactly that of every lineage. **That arm is
+	# this one's superseder, and it is in another suite**: HG's control c3 put Quick
+	# Shot on his own shelf, and `check_gs` §1 — the check HG first named — was SILENT,
+	# because its enabler table leaves out the Hunter's class basic by name; `bp` §5
+	# went red. `bp` §5 carries a note naming this arm, and it is HI's to re-point, so
+	# the re-point keeps asking it of Quick Shot. **What moved this arm's framing is
+	# GP**: since a class's shelves are one pool, "not on its OWN shelf" is the
+	# narrow form of a question the pool asks. The loop is still walked and PRINTED
+	# as the record; what is asserted is that fact, one pool a class.
+	var own_shelf: Array = []
 	for spec in ["beastmaster", "sharpshooter", "mystic"]:
 		for enabler in Classes.core_enablers(spec):
-			ok(not Classes.spec_draft_pool(spec).has(enabler),
-				"%s's enabler %s is not draftable" % [spec, enabler])
+			if Classes.spec_draft_pool(spec).has(enabler):
+				own_shelf.append("%s/%s" % [spec, enabler])
+	var gp2 := Fixture.one_pool_a_class("test_batch_bv, the enabler-off-its-own-shelf arm (the Hunter lineages)")
+	ok(bool(gp2[0]), String(gp2[1]))
+	print("  [record] the enabler arm, retired at HH §2 onto test_batch_bp §5: %d Hunter enabler(s) on their own shelf %s" % [
+		own_shelf.size(), str(own_shelf)])
 	# **RE-POINTED BY BATCH HB (ruled by the designer): EVERY HUNTER HAS A PET.**
 	# The three summons left the Beastmaster's protected core for the Hunter's
 	# class kit, as the three calls of ONE card, Summon Companion. What this arm
@@ -416,6 +450,10 @@ func _names() -> void:
 	# other three arms are every pool a name can now live in.
 	for n in pools:
 		seen[n] = int(seen.get(n, 0)) + 1
+	# **BATCH HH §2 — THE LEAK ARM IN `_pools()` WAS RETIRED ONTO THIS ONE.** HG's
+	# control c2 put Bloodbond on the Warrior class-wide shelf beside its own: the
+	# leak arm and this arm both went red, and this is the one that asks the question
+	# the merge left — a card in two places. Retiring or narrowing it re-opens that arm.
 	for n in NINE:
 		ok(int(seen.get(n, 0)) == 1,
 			"%s appears in exactly ONE pool (got %d)" % [n, int(seen.get(n, 0))])

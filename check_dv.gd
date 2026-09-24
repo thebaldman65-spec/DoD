@@ -267,8 +267,18 @@ func _s2_boss_depth() -> void:
 	# shelf — a lineage opens with its engine's enablers alone and Mercy has none
 	# — so her core takes NO bar entry and she opens on the kit's three like every
 	# hero. The day she opens holding a lineage card again, this reads it.
-	ok(Classes.core_slots("holy") == 0,
-		"§2: Holy's protected core takes %d bar entries, not the 0 GS §1 left it — the slot half of the pricing has moved" % Classes.core_slots("holy"))
+	# **RETIRED BY BATCH HH §2 — SUPERSEDED BY ANOTHER GATE, KEPT AND SAID TO BE
+	# KEPT.** `check_gs` §0 asks this of every lineage — its authored slots are its
+	# enablers' bar entries — and HG's control c4 moved Holy's authored slots 0 -> 1:
+	# this went red and so did that ("holy's authored slots (1) are not its enablers'
+	# bar entries (0)"). HH re-drove it, and that arm carries a note naming this one.
+	# The number is still read and PRINTED as the record; **what is asserted is the
+	# fact that makes her core take no entry**: Mercy brings no card, so her enablers
+	# are empty (GS §1). The day it brings one, the slot half of §2's pricing may
+	# move, and this goes red saying so — `check_gs` §0 says by how much.
+	ok(Classes.core_enablers("holy").is_empty(),
+		"§2: Mercy brings a card now (%s) — Holy's core takes a bar entry, and the slot half of §2's pricing may have moved: DV's slot tripwire, retired at HH §2 onto check_gs §0, asks a live question again" % str(Classes.core_enablers("holy")))
+	print("    [record] DV's Holy slot tripwire, retired at HH §2: her authored core takes %d bar entries" % Classes.core_slots("holy"))
 	print("  awards=%d  pools=%d entries / %d distinct  deepest=%d  thin=%s" % [
 		awards, total, distinct.size(), deepest, ", ".join(PackedStringArray(short))])
 

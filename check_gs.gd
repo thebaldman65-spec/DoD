@@ -247,6 +247,10 @@ func _s0_the_minimum() -> void:
 	# NO LINEAGE TAKES A SLOT: the authored `slots` is the enablers' bar entries,
 	# so the lineage's term is zero — and the five that carry a card take one entry
 	# (six until HB, when the Beastmaster's summons became the class kit's card).
+	# **BATCH HH §2 — `check_dv` §2's Holy slot tripwire was retired onto the second
+	# arm of this loop**, which asks of every lineage what that tripwire asked of the
+	# Holy: HG's control c4 moved her authored slots 0 -> 1 and both went red.
+	# Retiring or narrowing it re-opens that tripwire.
 	var entries := 0
 	for spec in Classes.all_specs():
 		ok(Classes.lineage_slots(String(spec)) == 0,
@@ -303,6 +307,10 @@ func _s1_nothing_lost() -> void:
 				var call := int(kit.has(Classes.PET_CARD) and Classes.companion_call(
 					String(n).get_slice(" ", 1).to_lower()) != null and n.begins_with("Summon "))
 				var homes := int(en.has(n)) + int(kit.has(n)) + int(shelf.has(n)) + call
+				# **BATCH HH §2 — `test_batch_ah`'s "left the kit" arm was retired onto
+				# this one**: HG's control c1 wrote War Stomp back into the Warden's
+				# definitions and both went red ("0 homes"). Retiring or narrowing it
+				# re-opens that arm.
 				ok(homes == 1, "§1: %s (the %s's) has %d homes among enabler, kit, shelf and the pet's calls — one" % [n, spec, homes])
 				if not en.has(n) and not kit.has(n) and call == 0:
 					_returning[n] = [key, String(spec)]
@@ -332,6 +340,12 @@ func _s1_nothing_lost() -> void:
 		depths.append("%s %d (+%d)" % [key, Classes.draft_pool(key).size(), int(per.get(key, 0))])
 	print("    %d returning cards; class pools: %s" % [_returning.size(), ", ".join(depths)])
 	# THE ENABLERS ARE IN NO POOL — the failure BO's table exists to prevent.
+	# **BATCH HH §2 — `test_batch_bw`'s BO enabler arm was retired onto this one and
+	# onto `test_batch_bp` §5's.** This asks five of its six enablers more strictly —
+	# not in the CLASS pool — and `MINIMUM` leaves out the sixth, the Sharpshooter's,
+	# because it is the Hunter's class basic: HG's control c3 put Bloodlust and Quick
+	# Shot on their own shelves and this caught Bloodlust alone, so Quick Shot is `bp`
+	# §5's to ask. Retiring or narrowing this re-opens that arm.
 	for pid in MINIMUM:
 		for n5 in MINIMUM[pid]:
 			var cls := Classes.engine_class(String(pid))

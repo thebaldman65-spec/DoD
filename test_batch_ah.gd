@@ -75,12 +75,39 @@ func _test_kits() -> void:
 	var trims := {"Blood Price": "berserker", "War Stomp": "warden",
 		"Interpose": "warden", "Sweeping Strikes": "swordmaster",
 		"Shatterpoint": "swordmaster"}
+	var in_table: Array = []
 	for name in trims:
 		var spec: String = trims[name]
-		ok(not Classes.spec_abilities(spec).any(func(a): return a.display_name == name),
-			"%s left the %s kit" % [name, spec])
+		# The "left the kit" half is RETIRED (HH §2) — walked here as the record,
+		# with the fact that retired it asserted below the loop.
+		if Classes.spec_abilities(spec).any(func(a): return a.display_name == name):
+			in_table.append("%s/%s" % [spec, name])
 		ok(Classes.spec_pool(spec).has(name),
 			"%s is earnable from the %s pool" % [name, spec])
+	# **THE "LEFT THE KIT" HALF IS RETIRED BY BATCH HH §2 — SUPERSEDED BY A GATE, KEPT
+	# AND SAID TO BE KEPT.** It asked that each of AH's five trims is out of its
+	# lineage's `spec_abilities`, which was the lineage's opening kit until GS §1 made
+	# it the lineage's DEFINITION table: a lineage opens with its engine's enablers
+	# alone. **Its question lives in `check_gs` §1**, which asks every card a lineage
+	# defines to have exactly ONE home — an enabler, a kit card, a shelf or a pet call:
+	# HG's control c1 wrote War Stomp back into the Warden's definitions, this arm went
+	# red and so did that one ("War Stomp (the warden's) has 0 homes"), and HH re-drove
+	# it. `check_gs` §1 carries a note naming this arm. The walk is still taken and
+	# PRINTED as the record; **what is asserted is the fact that retired it**: each of
+	# the three lineages defines more than it opens with, so the day a lineage opens
+	# with its whole table again, "left the kit" asks a live question again and this
+	# goes red saying so.
+	var not_wider: Array = []
+	var walked := 0
+	for spec2 in ["berserker", "warden", "swordmaster"]:
+		walked += 1
+		if Classes.spec_abilities(spec2).size() <= Classes.lineage_opening(spec2).size():
+			not_wider.append("%s (%d defined, %d opened)" % [spec2,
+				Classes.spec_abilities(spec2).size(), Classes.lineage_opening(spec2).size()])
+	ok(walked == 3 and not_wider.is_empty(),
+		"a Warrior lineage opens with its whole definition table again (%s) — AH's \"left the kit\" arm, retired at HH §2 onto check_gs §1, asks a live question again" % ", ".join(PackedStringArray(not_wider)))
+	print("  [record] AH's \"left the kit\" arm, retired at HH §2: %d of the five trims in their lineage's definitions %s" % [
+		in_table.size(), str(in_table)])
 
 
 # ---------- §2: both pools ----------

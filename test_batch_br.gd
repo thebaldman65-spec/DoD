@@ -679,7 +679,22 @@ func _draft_flow() -> void:
 			if Classes.spec_draft_pool("warden").has(nm):
 				saw_spec = true
 	ok(saw_class, "§4: ...and real class cards appear in it")
-	ok(saw_spec, "§4: ...beside real spec cards")
+	# **THE SPEC-SIDE ARM IS RETIRED BY BATCH HH §1 — ITS SUBJECT IS GONE, KEPT AND SAID
+	# TO BE KEPT.** It asked that a Warden's offer holds a Warden-shelf card beside the
+	# class cards: the other side of the per-card SEAM, the roll that sent each card of
+	# an offer to the class-wide shelf or the spec's own. **GP deleted the seam**
+	# (`Run.draft_card_is_class` and `CLASS_DRAFT_SHARE` are gone): an offer is three
+	# cards from the class's one pool, one shuffle, and a Warden-shelf card is a card of
+	# that pool like any other. (The arm above still asks that the class-wide cards
+	# REACH a hero, because the shuffle is the only thing left that could hide one.)
+	# The reading is still taken over the same two hundred offers and PRINTED as the
+	# record; what is asserted is the fact that retired it, one pool a class, so the
+	# day the pools are split again — a seam has something to choose between — this
+	# goes red and says the old question is live.
+	var gp := Fixture.one_pool_a_class("test_batch_br, §4's spec-side seam arm")
+	ok(bool(gp[0]), String(gp[1]))
+	print("  [record] §4's spec-side seam arm, retired at HH §1: a Warden-shelf card appeared in %s of 200 offers" % (
+		"at least one" if saw_spec else "none"))
 	var saw_h_class := false
 	for _j in 200:
 		var h_offer: Array = run.roll_draft_offer(hunter)

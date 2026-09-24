@@ -354,16 +354,38 @@ func _arcanist_authored() -> void:
 	# BATCH FX: each spec's tree is the one `generate_tree` DEALS it — the one
 	# tree, for every spec with a class — and the size is asserted beside the
 	# property, so a spec dealt an empty tree cannot pass it vacuously.
+	# **RETIRED BY BATCH HH §1 — ITS SUBJECT IS GONE, KEPT AND SAID TO BE KEPT.** The
+	# arm here asked each of the twelve lineages' trees to deal its 27 cells and grant
+	# nothing — BA's per-spec list, then DO's charter asked of every tree. **FX deleted
+	# the twelve trees**: every lineage is dealt the ONE tree, so the loop asked one
+	# tree's question twelve times. That question is live and is asked where the tree
+	# is: this function's own walk of `Talents.TREE` above (no node edits an ability,
+	# none carries a grant or its fallback), `check_fx` §1 (no talent grants an
+	# ability), and the 27 cells in `test_batch_ai`, `test_batch_aj` and
+	# `test_batch_ak`. The loop is still walked and PRINTED as the record; **what is
+	# asserted is the fact that retired it**: every lineage is dealt the one tree, so
+	# the day a lineage is dealt a tree of its own again, this arm's question is live
+	# again and this goes red saying so.
+	var one_ids: Array = Talents.tree().map(func(t): return String(t["id"]))
+	var own_tree: Array = []
+	var lineages := 0
+	var dealt_cells := {}
+	var granting_cells := 0
 	for key3 in Classes.SPEC_IDS:
 		for exempt in Classes.SPEC_IDS[key3]:
-			var bad: Array = []
+			lineages += 1
 			var dealt: Array = Talents.generate_tree(String(exempt), String(key3))
 			for n3 in dealt:
 				if Talents.granted_name(n3.get("payload", {})) != "":
-					bad.append(String(n3["id"]))
-			ok(bad.is_empty() and dealt.size() == 27,
-				"%s grants no ability from any of its 27 cells (%d dealt; %s)" % [
-					exempt, dealt.size(), ", ".join(bad)])
+					granting_cells += 1
+			dealt_cells[dealt.size()] = int(dealt_cells.get(dealt.size(), 0)) + 1
+			if dealt.map(func(t): return String(t["id"])) != one_ids:
+				own_tree.append(String(exempt))
+	ok(lineages == 12 and not one_ids.is_empty() and own_tree.is_empty(),
+		"a lineage is dealt a tree of its own again (%s; %d of 12 lineages walked, the one tree %d cells) — AU's per-lineage tree arm, retired at HH §1 (FX left one tree), asks a live question again" % [
+			", ".join(PackedStringArray(own_tree)), lineages, one_ids.size()])
+	print("  [record] AU's per-lineage tree arm, retired at HH §1: %d lineages dealt trees of sizes %s, %d granting cell(s) among them" % [
+		lineages, str(dealt_cells), granting_cells])
 	_report.append("ability-granting talent nodes: %d (DO's charter); "
 		% granting.size() + "ability-granting RUNES: %d" % rune_grants)
 

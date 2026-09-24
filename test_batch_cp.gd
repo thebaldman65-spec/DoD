@@ -203,6 +203,7 @@ func _standard_shape() -> void:
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		for nm in Classes.spec_draft_pool(spec):
 			draft_names[nm] = String(draft_names.get(nm, "")) + spec + " "
+	var on_wide: Array = []
 	for nm in all_27:
 		ok(draft_names.has(nm), "§2: %s is in a spec draft pool" % nm)
 		if draft_names.has(nm):
@@ -228,9 +229,31 @@ func _standard_shape() -> void:
 		for spec2 in Classes.SPEC_POOLS:
 			ok(not Classes.SPEC_POOLS[spec2].has(nm),
 				"§2: %s is ABSENT from SPEC_POOLS[%s]" % [nm, spec2])
+		# The class-wide half is RETIRED (HH §2) — walked here as the record, and
+		# asserted below the loop as the fact that retired it.
 		for cls in Classes.CLASS_DRAFT_POOLS:
-			ok(not Classes.CLASS_DRAFT_POOLS[cls].has(nm),
-				"§2: %s is ABSENT from CLASS_DRAFT_POOLS[%s]" % [nm, cls])
+			if Classes.CLASS_DRAFT_POOLS[cls].has(nm):
+				on_wide.append("%s/%s" % [cls, nm])
+	# **THE CLASS-WIDE HALF IS RETIRED BY BATCH HH §2 — SUPERSEDED BY ANOTHER SUITE'S
+	# ARM, KEPT AND SAID TO BE KEPT.** It asked, of each of the twenty-seven and each
+	# class, that the card is not on the class-wide shelf — the draw the comment above
+	# calls the one-in-four class seam, which GP deleted. **GP made that shelf part of
+	# its class's one pool**, so a card moved onto its own class's class-wide shelf
+	# changes nothing a hero is offered. The defect this guarded — a card on two shelves
+	# — is asked by NO arm of this suite: HG's control c2 put Alms and Unslaked on the
+	# Warrior class-wide shelf beside their own, and what went red for them outside this
+	# loop was three OTHER suites' sweeps, each naming all eight cards c2 moved —
+	# `test_batch_bt`'s `_names()` (the whole-draft uniqueness sweep HG named) and the
+	# class-wide arms of `test_batch_cb`'s and `test_batch_ce`'s `_names()`. **Those
+	# are this half's superseders, all in other suites**, and each carries a note naming
+	# this suite; retiring or narrowing any of them narrows what stands behind this
+	# half, and retiring all three re-opens it. (A card moved into ANOTHER class's pool
+	# thins its own class's floor, `Fixture.class_pool_floors`, at the top of
+	# `_pools()`.) What is asserted here is the fact that retired it, one pool a class.
+	var gp := Fixture.one_pool_a_class("test_batch_cp, §2's class-wide half (a CP card on a class-wide shelf)")
+	ok(bool(gp[0]), String(gp[1]))
+	print("  [record] §2's class-wide half, retired at HH §2 onto test_batch_bt/cb/ce's sweeps: %d of the %d on a class-wide shelf %s" % [
+		on_wide.size(), all_27.size(), str(on_wide)])
 
 
 # ---------- §2: Stalking Horse's afflictions are in DEBUFF_IDS ----------

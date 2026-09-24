@@ -203,6 +203,14 @@ func _s0_the_kit() -> void:
 				if not defines.is_empty():
 					defined[spec] = defines
 			# THE SLOTS: the lineage's, plus the kit's less what the lineage counts.
+			# **BATCH HH §3 — THIS ARM IS RE-POINTED AT HI, NOT RETIRED, BY RULING.** HA's
+			# census answers it twice: its §1d table marks it RETIRE (it restates
+			# `ability_slots_used`, a near-tautology while `lineage_slots` is zero for
+			# every lineage), and its §1g calls `ability_slots_used` "the door a future
+			# lineage card would have to pass through" — the door this arm pins. The
+			# designer ruled §1g's specific reading over §1d's general one (HH's brief,
+			# as HG had sorted it), so **HA §1d's RETIRE for this line is not live**: it
+			# goes to HI with the re-points.
 			var m := {"key": ck, "spec": spec, "engines": [], "bm_abilities": []}
 			var used: int = _run.ability_slots_used(m)
 			ok(used == Classes.lineage_slots(spec) + Classes.kit_slots(ck, spec)
