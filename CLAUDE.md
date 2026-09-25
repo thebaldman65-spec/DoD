@@ -1000,6 +1000,15 @@ a detail to note — it is the ruling being wrong.
   narrows it meets what stands on it. **Derive the population off the controls, never off a brief**: HH's brief named
   two such arms and the controls found six — two on `check_gs`, two on three other suites' whole-draft sweeps, and
   two on `test_batch_bp` §5's enabler arm, the only arm left asking the Sharpshooter's case.
+- **A RE-POINT THAT NARROWS WHAT AN ARM CALLS A DEFECT CANNOT PASS HD's SECOND ARM, AND THE CONTROL THAT PROVES IT IS
+  RUN REVERSED (Batch HI §3b).** HD's rule is that the repaired arm reds on the defect and HEAD's copy does not. Two of
+  HI's arms called a SIBLING's shelf foreign to the hero (`test_batch_an`'s zone-boss arm, `test_batch_au`'s debug
+  grant); under one pool a class it is his own, so the repair takes those cards OUT of the set, and every defect the new
+  set can see the old one sees too: a roller or a grant handing out a sibling's boss card reds both. **That is the
+  repair working, not failing.** What shows it was needed is the defect pointed the other way — the roller drawing
+  the hero's OWN class pool: HEAD's arm went red on 21 of his own cards and the grant's on 105, and the repaired arms
+  read nothing. **So: say before arming whether the repair widens or narrows the set; a widening takes HD's two arms,
+  a narrowing takes the forward control (both red) AND the reversed one (HEAD alone red).**
 
 ## THE SHARPSHOOTER'S BASIC IS A SEQUENCE (STANDING, SET AT BATCH CS)
 **HIS BASIC ATTACK ONLY. No other ability of his changes, and no other hero's bar moves at all.**
@@ -3688,7 +3697,7 @@ spine-taker from 3 to 6.**
   between two shelves and says nothing when the gate thins what he is offered. **The floor asserts
   BOTH the whole pool (`Classes.draft_pool(k)`) and what a hero holding no engine can be offered
   (`Classes.offerable(draft_pool(k), [])`): they measure different things, and the no-engine half is
-  the one that goes thin.** It is ONE helper, `suite_fixture.class_pool_floors`, which the eleven draft
+  the one that goes thin.** It is ONE helper, `suite_fixture.class_pool_floors`, which the twelve draft
   suites share, with its values in `CLASS_POOL_FLOOR` at the reading and never below it — **and a floor
   of zero is refused**, because it asserts nothing: the helper reds the day a class can be offered
   nothing. The batch that thins either half moves that one table and says why. Every draft suite
@@ -4411,6 +4420,28 @@ call and one string).
   Blows*, near-misses five** — the glossary's own term *Parry*, the abilities Crushing Blow and
   Mocking Blow, the node Parry More and the status Parry Up. That sweep is the reason for the name,
   and it is recorded with the ruling so the name is not revisited.
+· **AND SINCE HI A GATE ASKS THE ABILITY HALF OF IT OF EVERY CARD: ONE NAME, ONE DEFINITION (`check_hi`).** Nothing
+  in the battery asked it before (HH's finding); the per-tranche sweeps ask it of their own nine. `pool_ability` walks
+  a CHAIN of definition tables and answers the FIRST that holds the name, so a card written into two tables leaves a
+  shadowed copy that every instrument reading the pools reads straight past. **`check_hi` §0 counts every place a
+  name is WRITTEN, off the source** — `Gate.definition_sites()`: every literal `display_name` in the game's scripts,
+  by the function that writes it, and every ability a rune's payload builds — and asserts ONE per name, **because an
+  IDENTICAL second copy is invisible to every runtime comparison**: each route then hands out the same card. §1
+  compares every route that hands a hero a card and §1b a real spawn's bars, which is what sees a DRIFTED copy.
+  **A new definition table joins `pool_ability`'s chain, and §0 reads the chain off the resolver's own body**, so a
+  table the census does not count reds at once. **A card built at the spawn under a name it does not write is the
+  kit-override shape DU and DV found**: `classes.gd` builds none (asserted), and `battle.gd`'s runtime copies are
+  printed. The enemy abilities are a namespace of their own, so a shared word there is a LABEL collision: §2 holds
+  the one there is — Strike, the Warrior's basic and an enemy's swing — as a named set.
+  · **MEASURED AT HI, PLANTING ONE SECOND DEFINITION OF EACH SHAPE.** An IDENTICAL copy in a lineage's table, a kit
+    card written again as a drafted card, and an override written again in the vault each read §0 red and §1 GREEN:
+    every route handed out the first copy — the kit's own route included, since the kit resolves through the chain —
+    so only the count at the source could see them. A drifted copy, a rune's own ability named after a card and a
+    card built at the spawn read §0 and §1 (§1b for the spawn). **HEAD's readers named none of them as a second
+    definition**: of the twelve run against the identical copy, `check_gs` §1 counted it as a returning card,
+    `test_batch_al` as a fourth Warden definition, and the rest said nothing about it; against the rune's ability,
+    `check_et` §4 read a changed rune population; against the kit card, the override and the spawn, the readers run
+    (`check_gs`, `check_cz`, and `check_ek` for the kit card) stayed green.
 
 ## STANDING RULE — A RUNE'S CLAUSE MUST BE CHECKED AGAINST THE BASE KIT, NOT ONLY AGAINST THE
 ## TALENT TREES AND THE CARDS (Batch FK §7)

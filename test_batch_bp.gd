@@ -177,7 +177,7 @@ func _pools() -> void:
 	# stood here — BP's inversion of an empty class draft into a paid one. A
 	# class-wide shelf is where a card was authored since GP, not what a hero is
 	# offered, so the question *did a pool quietly empty* is asked of the class's
-	# one pool now, both halves, by the one helper the eleven suites share.
+	# one pool now, both halves, by the one helper the twelve suites share.
 	for fl in Fixture.class_pool_floors("test_batch_bp §5"):
 		ok(bool(fl[0]), String(fl[1]))
 	# EVERY NEW ENTRY RESOLVES, to itself, with the fields a card needs. A pool
@@ -275,10 +275,22 @@ func _pools() -> void:
 	# on Quick Shot, and this arm caught both. **So this arm is the only one left
 	# asking the Sharpshooter's case.** It is HI's to re-point over the class pool;
 	# the re-point keeps asking it of Quick Shot, or it re-opens both retired arms.
+	# **BATCH HI — RE-POINTED OVER THE CLASS POOL, AND IT STILL ASKS QUICK SHOT.** It
+	# asked only the lineage's OWN shelf, and since GP a hero draws his class's whole
+	# pool: an enabler on a SIBLING's shelf reaches every hero of the class, which is
+	# the failure BO's table exists to prevent (a spine that stops working because
+	# its enabler became draftable). So it asks the class's one pool, for every
+	# enabler of every lineage — the Sharpshooter's Quick Shot, the Hunter's class
+	# basic, included by construction, because `check_gs` §1's table leaves it out.
+	var en_walked := 0
 	for spec7 in Classes.all_specs():
 		for en in Classes.core_enablers(spec7):
-			ok(not Classes.spec_draft_pool(spec7).has(en),
-				"§5: %s's enabler '%s' is still NOT draftable" % [spec7, en])
+			en_walked += 1
+			ok(not Classes.draft_pool(Classes.class_of_spec(spec7)).has(en),
+				"§5: %s's enabler '%s' is still NOT draftable — it is in no shelf of the %s's one pool" % [
+					spec7, en, Classes.class_of_spec(spec7)])
+	ok(en_walked >= 1 and Classes.core_enablers("sharpshooter").has("Quick Shot"),
+		"§5: the enabler walk read %d enablers, and Quick Shot is among them — the Sharpshooter's case is still asked here" % en_walked)
 	# BATCH GS — RE-POINTED: THE SWORDMASTER HAS NO ENABLER. Seasoned Fighter opens
 	# every battle Aggressive, which pays from the first blow, so GS §1 took Guard
 	# Change out of his protected core and put it on his shelf — drafted like any

@@ -463,10 +463,14 @@ func _authored_fallbacks() -> void:
 	# deleted it; the one tree has no capstone row. What they asked is asked below
 	# of EVERY cell of the one tree: whether any grants, and whether any carries a
 	# collision fallback.
-	ok(Classes.spec_draft_pool("inquisitor").has("Sacred Resolve"),
-		"...while the card itself drafts from the Devout")
-	ok(Classes.spec_draft_pool("inquisitor").has("Bulwark of Fortitude"),
-		"...while the card itself drafts from the Devout")
+	# **BATCH HI — RE-POINTED FROM THE SHELF TO THE POOL.** "Drafts from the Devout"
+	# read his SHELF (the pool key is `inquisitor`), which is where both cards are
+	# authored; since GP a Cleric draws his class's one pool, and that pool is what
+	# makes either card earnable.
+	ok(Classes.draft_pool("cleric").has("Sacred Resolve"),
+		"...while the card itself is drafted off the Cleric's one pool")
+	ok(Classes.draft_pool("cleric").has("Bulwark of Fortitude"),
+		"...while the card itself is drafted off the Cleric's one pool")
 	var card: Ability = Classes.pending_talent_ability("Bulwark of Fortitude")
 	ok(card != null and card.description.contains("{mhp:5}"),
 		"CV'S RULING SURVIVES THE MOVE: the cast still heals every hero 5% at once")

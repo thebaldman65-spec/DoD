@@ -760,10 +760,17 @@ func _ashes_pools() -> void:
 	ok(ab.cost > 0 and ab.delay > 0.0,
 		"§6: the wrapper has a real cost and a real initiative price")
 	# It is EARNABLE, never default: no Mage opens with it and no node grants it.
+	# **BATCH HI — RE-POINTED: "START WITH" IS ASKED OF WHAT HE STARTS WITH.** The
+	# walk read each lineage's `spec_abilities`, which is its DEFINITION table since
+	# GS §1 — a lineage opens with its engine's enablers, the class basic and the
+	# class kit — so it asked where cards are written rather than what a Mage opens
+	# holding. It asks the live opening now, off the one kit builder, per lineage.
 	for spec in ["pyromancer", "cryomancer", "arcanist"]:
-		for kit in Classes.spec_abilities(spec):
-			ok(kit.display_name != "Ashes of Al'ar",
-				"§6: %s does not START with it — earnable, not default" % spec)
+		var opens: Array = []
+		for kit in Classes.opening_kit("mage", spec, [Classes.engine_of_spec(spec)]):
+			opens.append(kit.display_name)
+		ok(not opens.has("Ashes of Al'ar"),
+			"§6: %s does not START with it — earnable, not default (opens: %s)" % [spec, str(opens)])
 	ok(Talents.granted_ability("Ashes of Al'ar") == null,
 		"§6: no talent node grants it — AR's removal stands")
 

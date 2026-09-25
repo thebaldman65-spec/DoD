@@ -4,6 +4,35 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Half the re-points, and a check nobody ever wrote (Batch HI) — 2026-09-24
+
+**Why this batch did half the list.** Fifty checks were left asking the merged game a question in the old vocabulary.
+Each repair is small, but each one also has to be proved: a defect is put into a copy of the game on purpose, the
+repaired check has to go red, and the old version of the same check has to stay green — the second half is what
+shows the repair was needed and not just a rewording. Measured against the last two batches, fifty of those is two
+batches' work. The split is by file, so no test file is left half-repaired: this batch took the sixteen test files
+(twenty-seven checks), and the next takes the eight gates and the two remaining test files (twenty-three), which is
+where the two largest re-derivations sit.
+
+**Why most repairs say "the class's one pool" instead of "the lineage's shelf".** Since GP a hero draws from his
+class's whole pool, and a shelf is only where a card was written down. A check that asked "is this card on the
+Berserker's shelf" was answering yes for a card no Warrior could actually be offered, if the pool ever stopped
+reading that shelf. The repaired checks ask the pool the game actually draws from, and each was shown to go red when
+the pool and the shelves come apart, while its old version stayed green.
+
+**Why two repairs could not pass that test, and why that is the finding rather than a failure.** Two checks called a
+sibling lineage's shelf "foreign" to the hero. Under one pool it is his own. The repair takes those cards out of the
+"foreign" list, which makes the list smaller — so every defect the new check can see, the old one saw too, and the
+old one goes red on the same injected defect. What proves the repair was needed is the defect run the other way: let
+the hero be offered his own class's cards, and the old check goes red (it calls his own pool foreign) while the new
+one does not.
+
+**Why a check that a name has one definition had to be written.** The game looks a card up by its name through a
+chain of tables, and takes the first one it finds. If a card were ever written into two tables, the second copy
+would be silently ignored — and every check that reads the pools would read the first copy and see nothing wrong.
+Nothing asked this of every card until now. The new check counts where every card is written, off the source, so it
+sees even an exact duplicate, which no comparison of what the game hands out can see. It finds nothing today.
+
 ## Twenty-one checks retired, and one that could not be (Batch HH) — 2026-09-24
 
 **Why a retired check still asserts something.** Deleting a check leaves a hole nobody can see. Retiring one is a

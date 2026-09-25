@@ -272,14 +272,20 @@ func _migrated_talents(ids: Array) -> Dictionary:
 
 
 # BATCH FX: drives a retired node's ABILITY-arm payload through `apply_payload`
-# onto the Beastmaster's opening kit — built fresh, because `spec_abilities`
-# makes new cards on every call — and reports what the card came out as.
-func _arm_on_kit(retired_id: String, card: String) -> Dictionary:
-	var cfg := {"abilities": Classes.spec_abilities("beastmaster")}
+# onto the card — built fresh, because the resolvers make new cards on every
+# call — and reports what the card came out as.
+# **BATCH HI — RE-POINTED: THE CARD IS TAKEN WHERE A HUNTER GETS IT.** It read the
+# Beastmaster's `spec_abilities` as "his opening kit", and since GS §1 that is his
+# lineage's DEFINITION table: Kill Command and Hunter's Instinct are on his shelf,
+# drafted, and no Hunter opens with either. So the card is found where a Hunter
+# can come to hold it — his class's one pool, resolved by the one resolver — and
+# a card no Hunter can draft is reported not found, which is what "the edit lands
+# on a card a hero holds" needs to be able to say.
+func _arm_on_pool_card(retired_id: String, card: String) -> Dictionary:
 	var hit: Ability = null
-	for ab in cfg["abilities"]:
-		if ab.display_name == card:
-			hit = ab
+	if Classes.draft_pool("hunter").has(card):
+		hit = Classes.pool_ability(card)
+	var cfg := {"abilities": [hit] if hit != null else []}
 	if hit == null:
 		return {"found": false, "cfg": cfg, "base_cost": 0, "cost": 0, "cooldown": 0}
 	var base_cost := hit.cost
@@ -397,19 +403,25 @@ func _magnitudes() -> void:
 	# were never stats: DO pointed each at a PROTECTED CORE card through
 	# `apply_payload`'s ability branch, and that branch is live machinery (runes
 	# still use it). So each node's own payload is driven through it, onto the
-	# Beastmaster's own opening kit — the thing the node checks stood for: the
-	# edit lands on a card every Beastmaster owns, and writes no stat on the way.
-	var kc := _arm_on_kit("bm_devoted_fury", "Kill Command")
+	# card it names — the thing the node checks stood for: the edit lands on a
+	# card a hero can hold, and writes no stat on the way.
+	# **BATCH HI — "WHICH EVERY BEASTMASTER OWNS" WAS FALSE, AND IS RE-POINTED.**
+	# GS §1 put both cards on the Beastmaster's shelf and HB put the pet in every
+	# Hunter's kit, so no Hunter OWNS either card: each is drafted off the Hunter's
+	# one pool (Kill Command by a Hunter who fields a companion). The card is
+	# resolved there now (`_arm_on_pool_card`), so the arm asks that the edit lands
+	# on a card a Hunter can hold.
+	var kc := _arm_on_pool_card("bm_devoted_fury", "Kill Command")
 	ok(bool(kc["found"]) and int(kc["cost"]) == int(kc["base_cost"]) - 10
 		and int(kc["cooldown"]) == 2,
-		"Devoted Fury's payload modifies Kill Command, which every Beastmaster owns (cost %d -> %d, cooldown %d)" % [
-			int(kc["base_cost"]), int(kc["cost"]), int(kc["cooldown"])])
+		"Devoted Fury's payload modifies Kill Command, a card a Hunter drafts off his class's one pool (found %s, cost %d -> %d, cooldown %d)" % [
+			bool(kc["found"]), int(kc["base_cost"]), int(kc["cost"]), int(kc["cooldown"])])
 	ok(not (kc["cfg"] as Dictionary).has("devoted_fury"),
 		"...and writes no `devoted_fury` counter at all")
-	var hi := _arm_on_kit("bm_reserves", "Hunter's Instinct")
+	var hi := _arm_on_pool_card("bm_reserves", "Hunter's Instinct")
 	ok(bool(hi["found"]) and int(hi["cost"]) == int(hi["base_cost"]) - 10,
-		"Deep Reserves' payload modifies Hunter's Instinct, which every Beastmaster owns (cost %d -> %d)" % [
-			int(hi["base_cost"]), int(hi["cost"])])
+		"Deep Reserves' payload modifies Hunter's Instinct, a card a Hunter drafts off his class's one pool (found %s, cost %d -> %d)" % [
+			bool(hi["found"]), int(hi["base_cost"]), int(hi["cost"])])
 	ok(not (hi["cfg"] as Dictionary).has("deep_reserves_ranks"),
 		"...and writes no `deep_reserves_ranks` counter at all")
 	# DELETED AT FX — 3 CHECKS: "bm_one_soul / bm_the_pack / bm_apex is a

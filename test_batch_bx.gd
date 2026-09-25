@@ -248,7 +248,16 @@ func _own_pools() -> void:
 	# must never be shown — is unchanged, so it is written against the LIVE pool
 	# rather than a literal, which is the shape the rest of this suite already
 	# uses and the reason it needed no other repair this batch.
-	ok(warden_cards.size() >= 8, "§2: the Warden has at least eight spec cards to be offered")
+	# **BATCH HI — RE-POINTED: THE WARDEN'S SHELF IS A NAMED PART OF THE WARRIOR POOL.**
+	# "Spec cards to be offered" was a lineage's own draw, and GP made a class's
+	# shelves one pool, so the sample is worth leak-testing only if it is cards a
+	# WARRIOR is offered: the shelf must be deep AND wholly inside the Warrior's one
+	# pool, or the leak test below samples cards no hero draws.
+	var w_pool: Array = Classes.draft_pool("warrior")
+	var w_outside: Array = warden_cards.filter(func(c): return not w_pool.has(c))
+	ok(warden_cards.size() >= 8 and w_outside.is_empty(),
+		"§2: the Warden's shelf holds %d cards (at least eight) and every one is in the one Warrior pool (outside it: %s)" % [
+			warden_cards.size(), str(w_outside)])
 	var leaked := 0
 	for _i in 200:
 		for card in run.roll_draft_offer(pyro):

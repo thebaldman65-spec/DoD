@@ -406,7 +406,21 @@ func _magnitudes() -> void:
 func _ability_nodes() -> void:
 	var kit: Array = Classes.spec_abilities("berserker")
 	var base_hs := _find_in(kit, "Hack and Slash")
-	ok(base_hs != null, "Hack and Slash is in the Berserker kit")
+	# **BATCH HI — RE-POINTED: "IN THE BERSERKER KIT" WAS FALSE.** `spec_abilities`
+	# is the lineage's DEFINITION table since GS §1, not the kit he opens with, and
+	# Hack and Slash is not in his opening: it is DEFINED there and DRAFTED off the
+	# Warrior's one pool. The node payloads below still read it off that table, so
+	# the table is still where the card is found; what the arm asserts now is the
+	# truth about it — defined here, reachable by a Warrior, opened with by no one.
+	# The old arm asked the definition table alone, so a card defined there and
+	# drafted by no one read as "in the kit" — DY §3's reachable-by-nothing shape.
+	var bz_open: Array = []
+	for oa in Classes.opening_kit("warrior", "berserker", [Classes.engine_of_spec("berserker")]):
+		bz_open.append(oa.display_name)
+	ok(base_hs != null and Classes.draft_pool("warrior").has("Hack and Slash")
+			and not bz_open.has("Hack and Slash"),
+		"Hack and Slash is defined in the Berserker's table and drafted off the Warrior pool, not in the kit he opens with (drafted: %s; opens: %s)" % [
+			Classes.draft_pool("warrior").has("Hack and Slash"), str(bz_open)])
 	if base_hs == null:
 		return
 	ok(int(base_hs.multi_hits) == 3, "Hack and Slash opens at 3 strikes")
@@ -549,8 +563,12 @@ func _upgrade_paths() -> void:
 		"the whole one tree, worn, hands out NOTHING — no Battle Shout (DO's charter)")
 	ok(int(bs_grant.get("battle_shout_node", 0)) == 0,
 		"...and `battle_shout_node` is read-only-zero — only a grant could write it")
-	ok(Classes.spec_draft_pool("berserker").has("Battle Shout"),
-		"...while the card itself drafts from the Berserker")
+	# **BATCH HI — RE-POINTED FROM THE SHELF TO THE POOL.** "Drafts from the
+	# Berserker" read his SHELF, which is where the card is authored; since GP a
+	# Warrior draws his class's one pool, so what makes the card reachable is that
+	# pool — asked through `Classes.draft_pool`, the only thing a draw may read.
+	ok(Classes.draft_pool("warrior").has("Battle Shout"),
+		"...while the card itself is drafted off the Warrior's one pool")
 	# It stays in the BOSS pool too, untouched: DO added to the draft and took
 	# nothing away, which is what "the existing pick, unchanged" means.
 	var earned := [Classes.spec_pool_ability("berserker", "Battle Shout")]
@@ -581,8 +599,9 @@ func _upgrade_paths() -> void:
 		"...and `rampage_upgraded` is read-only-zero")
 	var rp_earned := [Classes.spec_pool_ability("berserker", "Rampage")]
 	ok(rp_earned[0] != null, "Rampage still resolves out of the Berserker pool")
-	ok(Classes.spec_draft_pool("berserker").has("Rampage"),
-		"...and drafts from the Berserker as well")
+	# BATCH HI — the Warrior's one pool, as Battle Shout's above.
+	ok(Classes.draft_pool("warrior").has("Rampage"),
+		"...and is drafted off the Warrior's one pool as well")
 	var rp_up := _applied_live(["Rampage"], rp_earned)
 	ok(_names(rp_up["abilities"]).count("Rampage") == 1,
 		"an earned Rampage is never doubled by the tree")

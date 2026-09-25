@@ -813,20 +813,29 @@ func _test_rewards(RunState) -> void:
 	# reach. The spec-foreign set is derived from the siblings' own pools now,
 	# which is what "spec-foreign" always meant — the class pool was only ever
 	# the list that happened to hold them.
+	# **BATCH HI — RE-POINTED UNDER ONE POOL A CLASS.** The set took the siblings'
+	# boss pools AND their draft SHELVES, and GP made a class's shelves one pool:
+	# a card on the Warden's shelf is a card every Warrior draws, so it is not a
+	# name "only a sibling can reach" and calling it foreign claims the hero's own
+	# pool is someone else's. **What only a sibling reaches now is a card in a
+	# sibling's BOSS pool** — boss pools stay lineage-keyed (GP) — that is in
+	# neither the hero's own boss pool nor his class's one pool.
+	var warrior_pool: Array = Classes.draft_pool("warrior")
 	var class_only: Array = []
 	for sib in ["warden", "swordmaster"]:
 		for n in Classes.spec_pool(String(sib)):
-			if not spec_pool.has(n) and not class_only.has(n):
+			if not spec_pool.has(n) and not warrior_pool.has(n) and not class_only.has(n):
 				class_only.append(n)
-		for n2 in Classes.spec_draft_pool(String(sib)):
-			if not spec_pool.has(n2) and not class_only.has(n2):
-				class_only.append(n2)
-	ok(not class_only.is_empty(), "the Warrior siblings hold spec-foreign entries")
+	ok(not class_only.is_empty(),
+		"the Warrior siblings hold boss cards only a sibling can reach (%s)" % str(class_only))
 	for trial2 in 300:
 		var ab_offer: Array = run.roll_spec_ability_offer(run.party[1])
 		for n in ab_offer:
 			ok(spec_pool.has(n), "%s is in the spec pool" % n)
-			ok(not class_only.has(n), "%s never arrives from a sibling spec" % n)
+			# BATCH HI — against the set above: a sibling's boss card no Warrior can
+			# otherwise reach, which is what "arrives from a sibling spec" means once
+			# the shelves are one pool.
+			ok(not class_only.has(n), "%s never arrives from a sibling's boss pool" % n)
 	run.free()
 
 

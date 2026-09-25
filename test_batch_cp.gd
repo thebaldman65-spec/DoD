@@ -172,7 +172,7 @@ func _pools() -> void:
 	# THE FLATNESS, NOT A DEBT. Every draft suite's depth loop inverted seven
 	# times and asserted a flat EIGHT a shelf from CI. **FOLDED BY BATCH HD §3**:
 	# since GP a hero draws his class's one pool, so the question *did a pool
-	# quietly empty* is asked of that pool, both halves, by the helper the eleven
+	# quietly empty* is asked of that pool, both halves, by the helper the twelve
 	# suites share, at the floors HD measured. The spec half's total is still
 	# summed here for the line below it.
 	for fl in Fixture.class_pool_floors("test_batch_cp §2"):

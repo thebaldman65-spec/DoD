@@ -180,15 +180,24 @@ func _pools() -> void:
 	# between two shelves of one class — which moves nothing he is offered — and
 	# says nothing when the gate takes a card out of what a no-engine hero is
 	# offered. `Fixture.class_pool_floors` asks both halves of the pool per class,
-	# at the floors HD measured, and it is the one copy the eleven suites share.
+	# at the floors HD measured, and it is the one copy the twelve suites share.
 	for fl in Fixture.class_pool_floors("test_batch_bo §5"):
 		ok(bool(fl[0]), String(fl[1]))
 	# THE WARRIOR POOLS ARE NAMED — named and empty at BO, filled to two at BP,
 	# five at BW and eight at CI. One of four heroes in every party had no draft
 	# at all until BP. (Their depth is the per-class floor's above, since HD §3.)
+	# **BATCH HI — RE-POINTED: A SHELF IS AN AUTHORING LOCATION, AND IT SAYS SO.**
+	# "One of four heroes had no draft" was true while a lineage drew its own
+	# shelf; since GP a Warrior draws the class's one pool, so a named shelf is
+	# where cards are written down, and what makes one worth naming is that every
+	# card on it reaches the pool a Warrior draws. Both halves are asked.
+	var w_pool: Array = Classes.draft_pool("warrior")
 	for w in ["berserker", "warden", "swordmaster"]:
-		ok(Classes.SPEC_DRAFT_POOLS.has(w),
-			"§5: %s's draft pool is NAMED" % w)
+		var w_shelf: Array = Classes.spec_draft_pool(w)
+		var w_out: Array = w_shelf.filter(func(c): return not w_pool.has(c))
+		ok(Classes.SPEC_DRAFT_POOLS.has(w) and not w_shelf.is_empty() and w_out.is_empty(),
+			"§5: %s's shelf is NAMED — an authoring location — and every card on it is in the one Warrior pool (%d of %d outside it: %s)" % [
+				w, w_out.size(), w_shelf.size(), str(w_out)])
 	# CLASS-WIDE: four keys. BO asserted all four EMPTY, BQ filled two and BR the
 	# other two; their depth is the per-class floor's above since HD §3, and the
 	# four names are still asserted here.
@@ -366,8 +375,17 @@ func _cores() -> void:
 		# actually opens with (`enabler_slots`), not a floor of one.
 		ok(slots == Classes.enabler_slots(spec) and slots <= CAP,
 			"§2: %s's core is its enablers' bar entries and fits inside the cap (%d)" % [spec, slots])
-		ok(CAP - slots >= 3,
-			"§2: %s keeps at least 3 draftable slots (%d)" % [spec, CAP - slots])
+		# **BATCH HI — RE-POINTED OFF THE ENABLERS' BAR ENTRIES.** `slots` is
+		# `core_slots`, which the line above holds equal to `enabler_slots` — and an
+		# enabler sits OUTSIDE the slot count (GK), so `CAP - slots` subtracted
+		# entries that take no slot. What the cap loses at the opening is what the
+		# hero opens with INSIDE the count: `lineage_slots` and `kit_slots`,
+		# `Run.ability_slots_used`'s own two terms, with the lineage's engine held.
+		var inside: int = Classes.lineage_slots(spec) + Classes.kit_slots(
+			Classes.class_of_spec(spec), spec, [Classes.engine_of_spec(spec)])
+		ok(CAP - inside >= 3,
+			"§2: %s keeps at least 3 draftable slots after what it opens with inside the count (%d of %d; %d used)" % [
+				spec, CAP - inside, CAP, inside])
 		ok(String(Classes.PROTECTED_CORES[spec].get("why", "")) != "",
 			"§2: %s's core states WHY" % spec)
 		# EVERY NAMED ENABLER IS IN THE OPENING KIT AND IN NO POOL. This is the

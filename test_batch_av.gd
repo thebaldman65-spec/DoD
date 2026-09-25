@@ -300,9 +300,22 @@ func _kit_and_pool() -> void:
 	# class-wide offer.** Both read Mercy on trigger, so neither can ever be
 	# offered to a sibling Cleric who has no stacks to pay them with — the same
 	# rule, over the structure that still exists.
-	ok(not Classes.class_draft_pool("cleric").has("Resurrection")
-		and not Classes.class_draft_pool("cleric").has("Intercession"),
-		"neither Mercy spender leaked into the CLERIC class-wide draft")
+	# **BATCH HI — RE-POINTED FROM A SHELF'S ABSENCE TO THE GATE.** "Not on the
+	# Cleric class-wide shelf" kept both cards off a sibling's offer while the
+	# shelves were separate draws. GP made them one pool — both sit on Holy's shelf,
+	# and a Devout draws that shelf — so a shelf's absence withholds nothing now.
+	# What still keeps a Mercy spender from a Cleric with no stacks is its
+	# `ENGINE_READ` row: the door offers each only to a hero holding Mercy.
+	var mercy := Classes.engine_of_spec("holy")
+	var spenders_gated := true
+	for spender in ["Resurrection", "Intercession"]:
+		if not (Classes.engine_read(spender) == mercy
+				and Classes.offerable([spender], []).is_empty()
+				and Classes.offerable([spender], [mercy]).has(spender)):
+			spenders_gated = false
+	ok(spenders_gated,
+		"neither Mercy spender is offered to a Cleric without %s (rows: Resurrection '%s', Intercession '%s')" % [
+			mercy, Classes.engine_read("Resurrection"), Classes.engine_read("Intercession")])
 	# EXACTLY ONE DEF (the AK resolver rule): the kit list calls
 	# pending_talent_ability rather than holding a second copy, so the rune
 	# grant, the pool resolver and the kit can never drift apart.

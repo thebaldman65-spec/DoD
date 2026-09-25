@@ -193,7 +193,7 @@ func _pools() -> void:
 	# THE TWO LINEAGE-SHELF LOOPS BELOW AND §6's NO-EMPTY-POOL LOOP**: since GP a
 	# shelf is where a card was authored, not what a hero is offered, so the
 	# question *did a pool quietly empty* is asked once, of the class's one pool,
-	# both halves, by the helper the eleven suites share.
+	# both halves, by the helper the twelve suites share.
 	for fl in Fixture.class_pool_floors("test_batch_br §0"):
 		ok(bool(fl[0]), String(fl[1]))
 	for cls3 in TRANCHE_4:
@@ -283,16 +283,20 @@ func _pools() -> void:
 	# trips, where before it would have read as the old debt coming back. That is
 	# the reason it inverts rather than being deleted — the question is still
 	# worth asking, only the correct answer moved, and it moved for the last time.
+	# **BATCH HI — RE-POINTED FROM THE CLASS-WIDE SHELF TO THE ONE POOL.** "Can draw"
+	# read the class-wide SHELF, where Rally and Field Dressing are authored; since GP
+	# a hero draws his class's one pool, which that shelf is part of, so the pool is
+	# what makes either card drawable — asked through `Classes.draft_pool`.
 	for spec in ["berserker", "warden", "swordmaster"]:
 		ok(Classes.class_of_spec(spec) == "warrior",
 			"§6: %s is a Warrior, so the Warrior class pool is his" % spec)
-		ok(Classes.class_draft_pool(Classes.class_of_spec(spec)).has("Rally"),
-			"§6: ...and %s can draw Rally" % spec)
+		ok(Classes.draft_pool(Classes.class_of_spec(spec)).has("Rally"),
+			"§6: ...and %s can draw Rally off the Warrior's one pool" % spec)
 	for spec2 in ["beastmaster", "sharpshooter", "mystic"]:
 		ok(Classes.class_of_spec(spec2) == "hunter",
 			"§6: %s is a Hunter, so the Hunter class pool is his" % spec2)
-		ok(Classes.class_draft_pool(Classes.class_of_spec(spec2)).has("Field Dressing"),
-			"§6: ...and %s can draw Field Dressing" % spec2)
+		ok(Classes.draft_pool(Classes.class_of_spec(spec2)).has("Field Dressing"),
+			"§6: ...and %s can draw Field Dressing off the Hunter's one pool" % spec2)
 	# NOTHING IN THE CLASS POOL IS ALSO IN A SPEC POOL. The two sides of one
 	# offer must not be able to hold the same card.
 	for cls5 in Classes.CLASS_DRAFT_POOLS:

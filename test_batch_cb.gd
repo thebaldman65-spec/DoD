@@ -166,7 +166,7 @@ func _pools() -> void:
 	# quietly empty*. The question is kept; what moved is what a pool IS. Since
 	# GP a hero draws his class's one pool, so a shelf floor reds on a card moved
 	# between two shelves of one class and says nothing when the gate thins what
-	# a no-engine hero is offered. The helper the eleven suites share asks both
+	# a no-engine hero is offered. The helper the twelve suites share asks both
 	# halves of each class's pool at the floors HD measured; it also takes the
 	# class-wide shelves' floor of three from further down.
 	for fl in Fixture.class_pool_floors("test_batch_cb pools"):
@@ -1236,8 +1236,20 @@ func _docs() -> void:
 		said = said.trim_prefix("one ")
 	ok(master.contains(said),
 		"master.html states the draft count in words (%d, \"%s\")" % [draft, said])
-	ok(master.contains("All twelve specs draft from at least ten"),
-		"master.html records the FLOOR, which DS and DY moved to ten")
+	# **BATCH HI — RE-POINTED, AND THE SENTENCE IT PINS MOVED WITH IT (GZ's shape).**
+	# It pinned *"All twelve specs draft from at least ten"* — true of the lineage
+	# SHELVES, and false of what a hero draws since GP made a class's shelves one pool.
+	# A pin a stale sentence keeps green is a check that has stopped asking, and a
+	# re-point that leaves the document stale is not a repair, so the sentence was
+	# rewritten to the live fact and the pin follows it: the depth a hero draws from,
+	# per class, rendered from the live pools the way the draft count above is — a
+	# batch that moves a pool moves this sentence with it.
+	var per_class: Array = []
+	for pck in ["warrior", "mage", "cleric", "hunter"]:
+		per_class.append(_in_words(Classes.draft_pool(pck).size()))
+	var depth_line := "Every hero draws from his class's one pool: %s cards for a Warrior, %s for a Mage, %s for a Cleric and %s for a Hunter" % per_class
+	ok(master.contains(depth_line),
+		"master.html records the pool a hero draws — his class's one pool — at its live depth (\"%s\")" % depth_line)
 	# The pool summary rows moved with the pools, or a player reads five where
 	# the game offers eight.
 	# RE-POINTED BY DO: the table is regenerated from the live pools and the

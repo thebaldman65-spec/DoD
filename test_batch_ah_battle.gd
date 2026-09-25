@@ -188,23 +188,28 @@ func _test_action_bar() -> void:
 	# two past the six a run can actually award, so the Shift bindings are
 	# stressed rather than merely touched. (A real run tops out at
 	# core + 3 + 6 = 10, which is exactly one Shift slot: ⇧Q.)
-	var starting: Array = []
-	for a in Classes.spec_abilities("berserker"):
-		starting.append(a.display_name)
 	# DY §3: this drew eight fillers out of `CLASS_POOLS["warrior"]`, which is
 	# deleted. **THE FILLERS' JOB IS TO REACH THE SHIFT ROW, NOT TO BE ANY
-	# PARTICULAR CARD** — core + 3 + 6 = 10 is what puts one on ⇧Q. They come
-	# out of the WARRIOR CLASS-WIDE DRAFT plus the Berserker's own draft pool
-	# now, which is where a Berserker's earned abilities actually come from,
-	# and the "not already starting" filter is kept for the reason it existed.
+	# PARTICULAR CARD** — core + 3 + 6 = 10 is what puts one on ⇧Q — and they
+	# come from where a Berserker's earned abilities actually come from, with the
+	# "not already starting" filter kept for the reason it existed.
+	# **BATCH HI — RE-POINTED: BOTH HALVES READ THE LIVE DOOR.** The fillers were
+	# drawn off the Warrior class-wide shelf and the Berserker's shelf — two places
+	# a card is AUTHORED — and "not already starting" read `spec_abilities`, which
+	# is the lineage's DEFINITION table since GS §1 and not what he opens with.
+	# **GP made a class's shelves one pool**, so a Berserker's earned cards come out
+	# of `Classes.draft_pool("warrior")` as it is offered to a hero holding his
+	# engine, and what he starts with is the live opening, `opening_kit`.
+	var bz_engines: Array = [Classes.engine_of_spec("berserker")]
+	var starting: Array = []
+	for a in Classes.opening_kit("warrior", "berserker", bz_engines):
+		starting.append(a.display_name)
 	var earned: Array = []
-	for n in Classes.class_draft_pool("warrior"):
+	for n in Classes.offerable(Classes.draft_pool("warrior"), bz_engines):
 		if earned.size() < 8 and not starting.has(n):
 			earned.append(n)
-	for n2 in Classes.spec_draft_pool("berserker"):
-		if earned.size() < 8 and not starting.has(n2) and not earned.has(n2):
-			earned.append(n2)
-	ok(earned.size() == 8, "the Warrior draft pools can supply 8 new abilities")
+	ok(earned.size() == 8,
+		"the Warrior's one pool offers a Berserker 8 abilities he does not open with (got %d)" % earned.size())
 	var prep := func(run):
 		run.party[0]["bm_abilities"] = earned
 	var scene := await _spawn(["berserker", "cryomancer", "holy", "mystic"],

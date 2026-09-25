@@ -600,8 +600,13 @@ func _kit() -> void:
 	ok(names.has("Arcane Cannon") and names.has("Arcane Barrage")
 			and names.has("Death Ray"),
 		"the three are Cannon, Barrage, DEATH RAY (got %s)" % [names])
-	ok(not names.has("Stabilize"),
-		"STABILIZE IS OUT of the opening three — it is the escape hatch")
+	# **BATCH HI — RE-POINTED: "THE OPENING" IS ASKED OF THE OPENING.** `names` is
+	# his lineage's DEFINITION table since GS §1, so the old arm asked whether the
+	# Arcanist DEFINES Stabilize — a question about where a card is written, while
+	# the arm's claim is about what he opens holding. `ar_open` above is the live
+	# opening, off the one kit builder.
+	ok(not ar_open.has("Stabilize"),
+		"STABILIZE IS OUT of the kit he opens with — it is the escape hatch (opens: %s)" % str(ar_open))
 	# Death Ray's own numbers, from §2 verbatim.
 	for ab in kit:
 		if ab.display_name == "Death Ray":
@@ -625,8 +630,19 @@ func _kit() -> void:
 	# **DY §3 — re-pointed from `CLASS_POOLS["mage"]` (deleted) to the live
 	# class-wide offer.** AH's curation rule is unchanged and Stabilize still
 	# fails it: it reads Resonance, which a sibling Mage does not have.
-	ok(not Classes.class_draft_pool("mage").has("Stabilize"),
-		"...and it is spec-only: it reads Resonance, so AH's curation rule bars it")
+	# **BATCH HI — RE-POINTED FROM A SHELF'S ABSENCE TO THE GATE.** "Not on the Mage
+	# class-wide shelf" was what kept a card that reads Resonance off every Mage's
+	# offer while the shelves were separate draws; GP made the shelves one pool, so a
+	# shelf's absence withholds nothing, and what withholds Stabilize from a Mage
+	# without the Arcanist's engine is its `ENGINE_READ` row (HE §3 made it one). So
+	# that is asked: the row names Runaway Resonance's engine, and the door refuses
+	# the card to a hero holding no engine while offering it to one holding that.
+	var stab_engine := Classes.engine_of_spec("arcanist")
+	ok(Classes.engine_read("Stabilize") == stab_engine
+			and Classes.offerable(["Stabilize"], []).is_empty()
+			and Classes.offerable(["Stabilize"], [stab_engine]).has("Stabilize"),
+		"...and it reads Resonance, so only a holder of %s is offered it (row: '%s')" % [
+			stab_engine, Classes.engine_read("Stabilize")])
 	# Every pool entry still resolves (a pool naming an ability nothing defines
 	# is an offer that pays nothing).
 	for entry in Classes.SPEC_POOLS["arcanist"]:

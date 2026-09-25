@@ -210,7 +210,7 @@ func _pools() -> void:
 	# *the Hunter and Warrior class-wide shelves emptied again*. **FOLDED BY
 	# BATCH HD §3**, with the shelf floor of three above: a class-wide shelf is
 	# where a card was authored since GP, and the question is asked of the
-	# class's one pool, both halves, by the helper the eleven suites share. BQ's
+	# class's one pool, both halves, by the helper the twelve suites share. BQ's
 	# twelve are still pinned by name above, so nothing this suite was written to
 	# protect is lost.
 	for fl in Fixture.class_pool_floors("test_batch_bq §0"):

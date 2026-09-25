@@ -171,7 +171,7 @@ func _pools() -> void:
 	# third. The question is kept; what moved is what a pool IS. Since GP a hero
 	# draws his class's one pool, so a shelf floor reds on a card moved between
 	# two shelves of one class and says nothing when the gate thins what a
-	# no-engine hero is offered. The helper the eleven suites share asks both
+	# no-engine hero is offered. The helper the twelve suites share asks both
 	# halves of each class's pool at the floors HD measured; it also takes the
 	# class-wide shelves' floor of three from further down.
 	for fl in Fixture.class_pool_floors("test_batch_bu pools"):

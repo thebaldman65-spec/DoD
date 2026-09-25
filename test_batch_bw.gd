@@ -196,7 +196,7 @@ func _pools() -> void:
 	# question, *did a pool quietly empty*. The question is kept; what moved is
 	# what a pool IS. Since GP a hero draws his class's one pool, so a shelf floor
 	# reds on a card moved between two shelves of one class and says nothing when
-	# the gate thins what a no-engine hero is offered. The helper the eleven
+	# the gate thins what a no-engine hero is offered. The helper the twelve
 	# suites share asks both halves of each class's pool at the floors HD
 	# measured; it also takes the class-wide shelves' floor of three from further
 	# down. A thirteenth spec pool still trips the line below.
@@ -459,11 +459,32 @@ func _names() -> void:
 	# inner loop never runs — the shape HD §2 repaired in `test_batch_bu`'s NINE-name
 	# sweep. `check_gs` §1's homes arm caught only the Berserker case. So it is not
 	# superseded, and by the brief's rule it stays: it is HI's, with the re-points,
-	# to be repaired to what it was FOR. Nothing here changed but this note.
-	for spec in Classes.SPEC_IDS:
+	# to be repaired to what it was FOR.
+	# **BATCH HI — REPAIRED TO WHAT IT WAS FOR, THE WAY HD §2 REPAIRED `test_batch_bu`'s.**
+	# It walks the twelve lineages (`SPEC_INFO`), and since GS a lineage's table is its
+	# DEFINITIONS rather than its opening kit, so a NINE name it defines must be drafted
+	# off its own shelf — an enabler it opens with, or a card no shelf carries, is a
+	# second home — and the opening kit's other halves are walked beside it: every
+	# class's basic and class kit. **And it counts what it walked**, because a sweep
+	# that asks its question of nothing prints exactly like a clean one — which is what
+	# this arm did from GK until now.
+	var nine_walked := 0
+	for spec in Classes.SPEC_INFO:
 		for ab in Classes.spec_abilities(spec):
-			ok(not NINE.has(ab.display_name),
-				"%s's kit does not already hold %s" % [spec, ab.display_name])
+			nine_walked += 1
+			ok(not NINE.has(ab.display_name)
+				or Classes.spec_draft_pool(spec).has(ab.display_name),
+				"%s is defined by %s but not drafted off its shelf — the kit already holds a NINE name, or it has a second home" % [
+					ab.display_name, spec])
+	for cls in Classes.SPEC_IDS:
+		for ab2 in Classes.kit(cls) + Classes.class_kit(cls):
+			nine_walked += 1
+			ok(not NINE.has(ab2.display_name),
+				"%s is also an opening-kit ability — the %s basic or class kit already holds a NINE name" % [
+					ab2.display_name, cls])
+	print("  CHECKED %d lineage definitions, basics and class-kit cards against the NINE" % nine_walked)
+	ok(nine_walked >= 40,
+		"the NINE kit sweep walked %d abilities — the lineage tables and the kits read (almost) nothing" % nine_walked)
 	# THE COLLISION THIS BATCH FOUND AND RESOLVED, PINNED IN BOTH DIRECTIONS.
 	# `wd_grudge` was a WARDEN THREAT-lane talent (+25% damage against enemies
 	# his taunt binds) and the Rune of Grudges pays into the same term — the same

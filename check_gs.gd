@@ -292,6 +292,20 @@ func _s0_the_minimum() -> void:
 func _s1_nothing_lost() -> void:
 	print("\n§1 — every card that stopped travelling is in a pool")
 	var overrides := 0
+	# **BATCH HI §3 — A SECOND DEFINITION IS NAMED AS ONE.** HH's control c9a wrote a
+	# second Aegis Wall into the Warden's table and this section went red on its count
+	# with *"31 cards returned to a pool"* — true arithmetic, and the wrong problem: the
+	# card had not returned from anywhere, it had been defined twice, and the resolver
+	# chain was answering the first copy. The two FAIL lines below now say so, naming
+	# every site the card is written at, off the one census (`Gate.definition_sites`,
+	# which `check_hi` §0 asserts over every card). Neither condition moved.
+	var defs: Dictionary = Gate.definition_sites()
+	var twice_note := func(nm: String, not_what: String) -> String:
+		var at: Array = defs.get(nm, [])
+		if at.size() < 2:
+			return ""
+		return " — and %s is DEFINED %d TIMES (%s): a second definition, not %s (check_hi §0)" % [
+			nm, at.size(), ", ".join(PackedStringArray(at)), not_what]
 	for key in SEATS:
 		var kit: Array = Classes.class_kit_names(key)
 		var pool: Array = Classes.draft_pool(key)
@@ -311,7 +325,8 @@ func _s1_nothing_lost() -> void:
 				# this one**: HG's control c1 wrote War Stomp back into the Warden's
 				# definitions and both went red ("0 homes"). Retiring or narrowing it
 				# re-opens that arm.
-				ok(homes == 1, "§1: %s (the %s's) has %d homes among enabler, kit, shelf and the pet's calls — one" % [n, spec, homes])
+				ok(homes == 1, "§1: %s (the %s's) has %d homes among enabler, kit, shelf and the pet's calls — one%s" % [
+					n, spec, homes, twice_note.call(n, "a card that lost its home")])
 				if not en.has(n) and not kit.has(n) and call == 0:
 					_returning[n] = [key, String(spec)]
 			# THE BASICS THAT WERE A LINEAGE'S OVERRIDE, found on its shelf by the
@@ -331,7 +346,14 @@ func _s1_nothing_lost() -> void:
 	ok(overrides == 4, "§1: %d of the four former basic-attack overrides are on a shelf" % overrides)
 	# GS §1's twenty-nine and HB §2's Tripwire, which left the class kit when
 	# Summon Companion took its slot and landed on the Survivalist's shelf.
-	ok(_returning.size() == 30, "§1: %d cards returned to a pool — GS §1 counted twenty-nine, and HB's Tripwire is the thirtieth" % _returning.size())
+	var doubled := PackedStringArray()
+	for n6 in _returning:
+		var note6: String = twice_note.call(String(n6), "a card that returned")
+		if note6 != "":
+			doubled.append(note6.trim_prefix(" — and "))
+	doubled.sort()
+	ok(_returning.size() == 30, "§1: %d cards returned to a pool — GS §1 counted twenty-nine, and HB's Tripwire is the thirtieth%s" % [
+		_returning.size(), "" if doubled.is_empty() else "; " + "; ".join(doubled)])
 	var per := {}
 	for n4 in _returning:
 		per[_returning[n4][0]] = int(per.get(_returning[n4][0], 0)) + 1

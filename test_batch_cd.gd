@@ -134,6 +134,8 @@ const PER_SPEC_DEPTH := {
 # out of the Mage pool (7 -> 5), Ministration, Unburden and Consecration out of
 # the Cleric's (6 -> 3). No card was deleted. `CLASS_FLOOR` follows the
 # shallowest pool the ruling leaves, three, for the reason it always had.
+# **BATCH HI FOLDED THE FLOOR** into `Fixture.class_pool_floors` (§2): `CLASS_FLOOR`
+# floors nothing now and is kept only as `PER_CLASS_DEPTH`'s lookup default.
 const PER_CLASS_DEPTH := {
 	"warrior": 6, "mage": 5, "cleric": 3, "hunter": 6,
 }
@@ -424,7 +426,7 @@ func _pools() -> void:
 	# "so a pool that quietly empties trips". **GP made a class's shelves ONE POOL**,
 	# so a hero draws his class's pool and a shelf is where a card was written down:
 	# HD §3 folded thirty-six shelf floors into `Fixture.class_pool_floors`, which the
-	# eleven draft suites assert per class and in both halves. That helper, and the
+	# twelve draft suites assert per class and in both halves. That helper, and the
 	# per-shelf depth equality just above (`PER_SPEC_DEPTH`, the authoritative table),
 	# are this floor's superseders: HG's control c6 emptied the Warden's shelf and
 	# both went red (the helper in `test_batch_bo` and `test_batch_bp`), and HH
@@ -443,17 +445,26 @@ func _pools() -> void:
 	# RE-DERIVED.** DS deepened the three Hunter pools because they were the
 	# shallowest; DY deepened the Warden's nine for the same reason. Whichever
 	# pool is thinnest is the one a card is owed to next, so this prints it.
-	var thinnest := 99
+	# **BATCH HI — RE-POINTED FROM THE THINNEST SHELF TO THE THINNEST POOL.** It read
+	# `PER_SPEC_DEPTH` — the SHELF table — for the shallowest shelf and held it to DY's
+	# ten. **GP made a class's shelves one pool**, so a card is owed to the pool a hero
+	# draws, and HD §3 measured which half of it goes thin: what a hero holding NO
+	# engine can be offered. So the thinnest pool is that half's minimum across the
+	# four classes, named here as the one a card is owed to next and held to its own
+	# floor in `Fixture.CLASS_POOL_FLOOR` — the one table of class floors.
+	var thinnest := 999
 	var thin_who := ""
-	for spec9 in PER_SPEC_DEPTH:
-		var d9 := int(PER_SPEC_DEPTH[spec9])
-		if d9 < thinnest:
-			thinnest = d9
-			thin_who = String(spec9)
-	ok(thinnest >= 10,
-		"the shallowest spec pool is %s at %d — it has fallen below the ten DY left" % [
-			thin_who, thinnest])
-	print("  shallowest spec pool: %s at %d" % [thin_who, thinnest])
+	for cls9 in Fixture.CLASS_POOL_FLOOR:
+		var bare9: int = Classes.offerable(Classes.draft_pool(String(cls9)), []).size()
+		if bare9 < thinnest:
+			thinnest = bare9
+			thin_who = String(cls9)
+	var thin_floor := int((Fixture.CLASS_POOL_FLOOR.get(thin_who, {}) as Dictionary).get("bare", 1))
+	ok(thin_who != "" and thinnest >= maxi(thin_floor, 1),
+		"the thinnest pool is the %s's no-engine offer at %d — below its floor of %d, so a card is owed there" % [
+			thin_who, thinnest, thin_floor])
+	print("  thinnest pool (what a no-engine hero is offered): %s at %d, floor %d — the one a card is owed to next" % [
+		thin_who, thinnest, thin_floor])
 	var class_total := 0
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		var cpool: Array = Classes.class_draft_pool(String(cls))
@@ -463,12 +474,24 @@ func _pools() -> void:
 		var cwant := int(PER_CLASS_DEPTH.get(cls, CLASS_FLOOR))
 		ok(cpool.size() == cwant,
 			"%s draws %d class-wide (want %d)" % [cls, cpool.size(), cwant])
-		ok(cpool.size() >= CLASS_FLOOR,
-			"...and %s is still at or above the class floor of %d" % [cls, CLASS_FLOOR])
 		var cseen := {}
 		for cn in cpool:
 			cseen[String(cn)] = 1
 		ok(cseen.size() == cpool.size(), "%s's class pool holds no duplicate" % cls)
+	# **BATCH HI — THE CLASS-WIDE SHELF FLOOR IS FOLDED, AS HD §3 FOLDED ELEVEN SUITES'
+	# (ruled: the fiftieth arm).** The loop above asked each class-wide SHELF for at
+	# least `CLASS_FLOOR` — the shape HD §3 folded into the class floors everywhere
+	# else, missed by every census because it was never on HA's list (HH found it).
+	# A class-wide shelf is where a card is authored, and since GP a hero draws his
+	# class's one pool: a shelf floor reds on a card moved between two shelves of one
+	# class, which moves nothing he is offered, and says nothing when a lineage shelf
+	# empties or the gate thins what a no-engine hero sees. **The question is kept —
+	# did a pool quietly empty — and asked where it means something**: the class's
+	# one pool, both halves, by the helper the other eleven draft suites share. The
+	# per-class EQUALITY above (`PER_CLASS_DEPTH`) is the authoritative table and
+	# stays; `CLASS_FLOOR` stays as that lookup's default and floors nothing now.
+	for fl in Fixture.class_pool_floors("test_batch_cd §2"):
+		ok(bool(fl[0]), String(fl[1]))
 	ok(class_total == CLASS_TARGET,
 		"CLASS_DRAFT_POOLS holds %d entries (got %d)" % [CLASS_TARGET, class_total])
 	# BATCH DX §1 — THE MESSAGE PRINTED THE TARGET TWICE, so the one assertion

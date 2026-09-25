@@ -676,8 +676,11 @@ func _live_fallback_generic() -> void:
 		var h_p := _hero(plain, 1)
 		ok(_find(h_p, name) == null,
 			"%s is NOT granted by its old cell — a talent may not (DO)" % name)
-		ok(Classes.spec_draft_pool(String(probe["spec"])).has(name),
-			"...it drafts from the %s instead" % probe["spec"])
+		# BATCH HI — RE-POINTED FROM THE SHELF TO THE POOL: "drafts from the
+		# <lineage>" read the lineage's SHELF, where the card is authored; since GP
+		# a Mage draws his class's one pool, and that pool is what makes it earnable.
+		ok(Classes.draft_pool("mage").has(name),
+			"...it is drafted off the Mage's one pool instead (authored on the %s's shelf)" % probe["spec"])
 		ok((h_p.ability_upgrades as Dictionary).get(name, []).is_empty(),
 			"...and nothing is marked on it")
 		plain.queue_free()
@@ -796,8 +799,9 @@ func _live_capstones() -> void:
 	# the grant, and now the grant is what went.
 	ok(_find(arc, "Magi's Wrath") == null,
 		"...and the ability did NOT come with it — a talent may not grant (DO)")
-	ok(Classes.spec_draft_pool("arcanist").has("Magi's Wrath"),
-		"...it drafts from the Arcanist instead")
+	# BATCH HI — the Mage's one pool, as Firestorm's and Rime's above.
+	ok(Classes.draft_pool("mage").has("Magi's Wrath"),
+		"...it is drafted off the Mage's one pool instead")
 	wr.queue_free()
 	await process_frame
 	# §4 AND §1 CLOSE EACH OTHER'S WORST CASE, and this is the check that says so:
@@ -925,6 +929,7 @@ func _live_debug_grant() -> void:
 	run.debug_grant_all = true
 	var specs := ["berserker", "arcanist", "holy", "beastmaster"]
 	var scene := await _spawn({}, specs)
+	var sib_walked := 0
 	for i in specs.size():
 		var spec: String = specs[i]
 		var h := _hero(scene, i)
@@ -945,16 +950,23 @@ func _live_debug_grant() -> void:
 		# pools are where those names live, and they are what the complaint
 		# (testing the Arcanist put Pyromancer abilities in his hands) was
 		# always about.
+		# **BATCH HI — RE-POINTED UNDER ONE POOL A CLASS.** The set took the
+		# siblings' draft SHELVES as theirs, and GP made a class's shelves one
+		# pool: a card on a sibling's shelf is a card of this hero's own pool, which
+		# he drafts like any other, so counting it foreign claims the merge away.
+		# **What a sibling still owns is its BOSS pool**, which stays lineage-keyed
+		# (GP), less anything the hero's class pool also holds. The debug grant is
+		# still this lineage's own boss pool and shelf (`battle.gd`, AU §5 and BO);
+		# what it must never hand him is a card only a sibling can reach.
+		var own_class_pool: Array = Classes.draft_pool(Classes.class_of_spec(spec))
 		var sibling_names: Array = []
 		for sib in Classes.SPEC_IDS.get(Classes.class_of_spec(spec), []):
 			if String(sib) == spec:
 				continue
 			for sn in Classes.spec_pool(String(sib)):
-				if not sibling_names.has(sn):
+				if not own_class_pool.has(sn) and not sibling_names.has(sn):
 					sibling_names.append(sn)
-			for sn2 in Classes.spec_draft_pool(String(sib)):
-				if not sibling_names.has(sn2):
-					sibling_names.append(sn2)
+		sib_walked += sibling_names.size()
 		for entry2 in sibling_names:
 			if Classes.spec_pool(spec).has(entry2):
 				continue
@@ -966,7 +978,11 @@ func _live_debug_grant() -> void:
 						return Talents.granted_name(n.get("payload", {})) == entry2):
 				continue
 			ok(not names.has(entry2),
-				"%s does NOT hold sibling-spec entry %s" % [spec, entry2])
+				"%s does NOT hold %s, a sibling's boss card no hero of the class can draft" % [spec, entry2])
+	# AND THE SET IS NOT EMPTY, so the walk above asked its question of something:
+	# a sibling-only set that read nothing at every seat would pass in silence.
+	ok(sib_walked > 0,
+		"the four seats' sibling-only boss cards number %d — the arm above asked its question of nothing" % sib_walked)
 	# The named complaint, stated as its own check: the Arcanist and the
 	# Pyromancer's signature abilities.
 	var arc := _hero(scene, 1)

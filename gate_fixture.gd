@@ -257,6 +257,101 @@ static func flags_are_inert(scene: Node) -> bool:
 	return bool(scene.call("_nobody_can_press"))
 
 
+# ── BATCH HI §3 — WHERE EVERY ABILITY NAME IS DEFINED, READ OFF THE SOURCE ───
+# `pool_ability`'s own comment says *"no name lives in two of these"* and nothing
+# asserted it: a second definition of a card resolves to whichever resolver the
+# chain reaches first, the other copy is shadowed, and every instrument reading
+# the pools reads the first. HH found `check_gs` §1 misreading exactly that state
+# as a returning card. **This is the census, written once**: `check_hi` asserts it
+# and `check_gs` §1 names what it finds, so the two cannot read it two ways.
+#
+# A DEFINITION IS A `"display_name": "<literal>"` in the game's code — every card
+# in `scripts/classes.gd` is written that way, inside the `Ability.make` of the
+# resolver that owns it — plus an ability a rune's payload builds itself
+# (`new_ability`, walked through `also` and `upgrade`). Comments are stripped first
+# (a comment RECORDING a card names it), and string contents are kept, because
+# the name IS a string. Each site reads `file:function`, and in a function that
+# matches on a key (`spec_abilities`' lineages) the arm it sits in, so the FAIL
+# line says where each copy is. A `"display_name":` whose value is not a whole
+# literal — a variable, or a literal with something glued to it — is returned
+# under `DYNAMIC`, so a card built from a variable cannot hide from the count by
+# not having a name to count. `battle.gd` is walked too: a card built at the
+# spawn under a card's name is the kit-override shape DU and DV found, and GS §1
+# deleted, and it would be a second definition the resolvers never see.
+const DYNAMIC := "<dynamic display_name>"
+
+
+static func definition_sites() -> Dictionary:
+	var sites := {}
+	for path in ["res://scripts/classes.gd", "res://scripts/talents.gd",
+			"res://scripts/runes.gd", "res://scripts/run_state.gd",
+			"res://scripts/battle.gd", "res://scripts/unit.gd"]:
+		_definition_sites_in(path, sites)
+	var parsed = JSON.parse_string(FileAccess.get_file_as_string("res://data/runes.json"))
+	if parsed is Dictionary:
+		for rid in parsed:
+			var row = parsed[rid]
+			if row is Dictionary:
+				_rune_payload_sites(String(rid), (row as Dictionary).get("payload", {}), "payload", sites)
+	return sites
+
+
+static func _definition_sites_in(path: String, sites: Dictionary) -> void:
+	var file := path.get_file()
+	var fn := ""
+	var arm := ""
+	for raw in strip_comments(FileAccess.get_file_as_string(path)).split("\n"):
+		var line := String(raw)
+		if line.begins_with("static func ") or line.begins_with("func "):
+			var head := line.substr(line.find("func ") + 5)
+			fn = head.substr(0, head.find("(")).strip_edges()
+			arm = ""
+			continue
+		var bare := line.strip_edges()
+		if line.begins_with("\t\t\"") and not line.begins_with("\t\t\t") \
+				and bare.ends_with("\":"):
+			arm = bare.substr(1, bare.length() - 3)
+		var at := line.find("\"display_name\":")
+		while at >= 0:
+			var rest := line.substr(at + 15).strip_edges()
+			var site := "%s:%s%s" % [file, fn, ("/" + arm) if arm != "" else ""]
+			var close := 1
+			if rest.begins_with("\""):
+				while close < rest.length() and rest[close] != "\"":
+					close += 2 if rest[close] == "\\" else 1
+			var after := rest.substr(close + 1).strip_edges()
+			if rest.begins_with("\"") and close < rest.length() \
+					and (after == "" or after.begins_with(",") or after.begins_with("}")):
+				var nm := rest.substr(1, close - 1).replace("\\'", "'").replace("\\\"", "\"")
+				if not sites.has(nm):
+					sites[nm] = []
+				(sites[nm] as Array).append(site)
+			else:
+				if not sites.has(DYNAMIC):
+					sites[DYNAMIC] = []
+				(sites[DYNAMIC] as Array).append(site)
+			at = line.find("\"display_name\":", at + 15)
+
+
+static func _rune_payload_sites(rid: String, pay, where: String, sites: Dictionary) -> void:
+	if not (pay is Dictionary):
+		return
+	var p := pay as Dictionary
+	if p.get("new_ability") is Dictionary:
+		var nm := String((p["new_ability"] as Dictionary).get("display_name", ""))
+		var key := nm if nm != "" else DYNAMIC
+		if not sites.has(key):
+			sites[key] = []
+		(sites[key] as Array).append("runes.json:%s/%s" % [rid, where])
+	for sub in ["also", "upgrade"]:
+		var v = p.get(sub)
+		if v is Array:
+			for i in (v as Array).size():
+				_rune_payload_sites(rid, v[i], "%s.%s[%d]" % [where, sub, i], sites)
+		elif v is Dictionary:
+			_rune_payload_sites(rid, v, "%s.%s" % [where, sub], sites)
+
+
 # ── THE TALLY ───────────────────────────────────────────────────────────────
 # Instance state, because a count belongs to one gate's run. `ok()` and
 # `report()` were copied seven ways too: FOUR gates' `ok()` never incremented a
