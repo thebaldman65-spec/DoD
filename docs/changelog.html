@@ -16,6 +16,46 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-09-25 &mdash; Batch HJ: THE LAST TWENTY-THREE</h2>
+<p><b>The last twenty-three checks still asking the merged game an old question are repaired and proved, and with them
+every check the census at Batch HA found is accounted for.</b> The debug toggle that pre-grants cards now grants the
+whole class pool, as ruled. IMPLEMENT ONLY: no card, rune, engine, kit, pool or node moved, and <code>main</code> is
+untouched. Full working: <code>docs/reports/HJ.md</code>.</p>
+
+<p><b>&sect;1 &mdash; THE TWENTY-THREE, AND THE TWO BIG ONES.</b> Two of the checks had to be worked out again from
+scratch rather than re-worded. <b>The first is the guarantee that a zone boss always pays something</b>: it was
+measured per lineage, off that lineage's own shelf, as if no hero ever held an engine. A hero draws his class's whole
+pool now, and the engine gate keeps some of it from him, so it is measured for every class holding every combination
+of engines he can slot &mdash; eighty-eight cases &mdash; against what the game would actually offer him. <b>The second is
+the table of statuses each hero is "guaranteed" to be able to apply</b>, which the talent checks use to tell whether a
+talent is a bet. It credited each lineage with cards it no longer opens with, engines it can drop, and talent nodes that
+no longer exist. It is kept per class now and holds only what every hero of the class carries whatever he picks &mdash;
+his basic attack and his class kit &mdash; and a new check makes sure every card it names really is one. The other
+checks were pointed at the things that answer the merged question: the class pool, the gate tables, which class can
+bring someone back from the dead, what a hero actually opens with, and the difference between a hero who has not
+chosen yet and one who chose a spine instead of a lineage.</p>
+
+<p><b>&sect;2 &mdash; EVERY ONE SHOWN TO MATTER.</b> For each, a defect was put into a copy of the game on purpose: the
+repaired check went red, and the old version of the same check, on the same defect, stayed green. Where a repair makes
+a check stricter in one way and looser in another &mdash; several now allow a card in the pool as long as the gate keeps
+it from the wrong hero &mdash; the defect was also run the other way, and the old check went red where the new one,
+correctly, did not. <b>And every check that says something is ABSENT now also checks that it really
+looked</b> &mdash; that the pool it walked is the real one with every name in it a card, that the card it keeps out of
+every pool is a real card, that the heroes it counts were seated, and that the line it reads is code and not a comment.
+Three of those were missing and one read the wrong thing; each was shown to go red on its own defect.</p>
+
+<p><b>&sect;3 &mdash; THE DEBUG TOGGLE GRANTS THE CLASS POOL.</b> The map menu's pre-grant toggle handed a hero one
+lineage's cards, which was right when a hero was a lineage. It hands him his whole class pool now, plus his lineage's
+zone-boss cards, and a hero who took a spine gets it too. Its comments were corrected, and it is <b>renamed "All Class
+Abilities Unlocked"</b> &mdash; a proposal, the designer's to confirm. It is a developer tool; no player sees it.</p>
+
+<p><b>&sect;4 &mdash; WHAT THIS CLOSES.</b> All 130 checks the census found are repaired, folded into the class floors,
+or retired, and <b>every stage of the merge's running order is done</b>. Merging the branch back to <code>main</code>
+would still be one conflict, in <code>docs/state.md</code>, with nothing of <code>main</code>'s own lost. It is not
+merged: the designer plays it first. Two lineage layers the charter rules away are still standing &mdash; the
+per-lineage stat block and the zone-boss pools (which stay per lineage by an earlier ruling) &mdash; and when to take
+them is the designer's.</p>
+
 <h2>2026-09-24 &mdash; Batch HI: HALF THE RE-POINTS, AND A CHECK NOBODY EVER WROTE</h2>
 <p><b>Twenty-seven of the fifty checks still asking the merged game an old question are repaired, each proved, and
 a new check asks something nothing asked before.</b> IMPLEMENT ONLY: no card, rune, engine, kit, pool or node

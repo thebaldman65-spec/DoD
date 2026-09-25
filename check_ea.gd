@@ -1,7 +1,7 @@
 # BATCH EA — A ZONE-BOSS AWARD ALWAYS PAYS.
 #
 #   §0  the premises §1's fix stands on, re-derived rather than inherited
-#   §1  every spec's depth against the award count AFTER the fallback
+#   §1  every class's depth against the award count AFTER the fallback, per engine set held
 #   §2  the announcement, driven on a real battle in TWO arms
 #   §3  no assertion in the tree pins a BATCH CODE against `CLAUDE.md`
 #   §4  the protected cores against comparable draft cards — a MEASUREMENT
@@ -173,29 +173,49 @@ func _s0_premises() -> void:
 		"§0: the ladder no longer OPENS at 7")
 
 
-# ── §1 — EVERY SPEC'S DEPTH AGAINST THE AWARD COUNT, AFTER THE FALLBACK ─────
+# ── §1 — EVERY CLASS'S DEPTH AGAINST THE AWARD COUNT, PER ENGINE SET HELD ────
 # **THE FIGURE THIS REPLACES IS 14 OF 36.** DZ §1 derived it: eight of the
 # twelve specs can empty their boss pool, because both channels write the same
 # `bm_abilities` list, so a drafted card removes itself from the boss offer.
 # The Devout is the sharp case — his boss pool is 2 and BOTH entries are
 # draftable, so all three of his awards could pay nothing.
 #
-# **THE STRUCTURE DID NOT MOVE AND IS NOT SUPPOSED TO.** Eight specs can still
-# empty a BOSS pool; `check_dv` §2 measures that and still reads 8. What
+# **THE STRUCTURE DID NOT MOVE AND IS NOT SUPPOSED TO.** Eight lineages can
+# still empty a BOSS pool; `check_dv` §2 measures that and still reads 8. What
 # changed is what an emptied pool costs, and that is what this section
 # measures: the fallback pool's DEPTH against the award's own offer size.
 #
+# **BATCH HJ — RE-DERIVED OVER CLASS × ENGINES HELD, AND THIS IS WHAT MOVED.**
+# From EA to HJ this walked the twelve LINEAGES, and each one's fallback depth
+# was its own SHELF (EA's tier) and the class-wide SHELF (EH's third tier),
+# drained by the loadout a lineage opened with and holding no engine. **GP took
+# both halves of that population away.** The fallback reads the class's ONE
+# pool (`roll_draft_fallback_offer` → `Classes.draft_pool`, keyed by the class
+# with no lineage in the way), so a sibling's shelf is as much his as his own;
+# and it asks the ENGINE GATE (`Classes.offerable`), so what he can be paid is
+# the pool less every card that reads an engine he does not hold — which the
+# shelf arithmetic never subtracted: a Holy Cleric's shelf alone carried seven
+# cards a Cleric without Mercy is never offered. **The unit that decides the
+# depth is therefore the CLASS and the ENGINES HE HOLDS**, not the lineage: an
+# engine can be dropped and swapped, to nothing (GK), and the lineage outlives
+# the engine it was chosen with (HE §3). So every class is walked with every
+# set of engines a hero of it can hold slotted — none, one of his six, or two
+# (`ENGINE_SLOTS`) — twenty-two sets a class, and each set is asked what the
+# door would offer, drained by the loadout that set leaves him (Lethal Aim
+# dismisses the pet, and the freed slot is one more earned card).
+#
 # THE RUNE DRAIN IS DERIVED, NOT ASSUMED. `owned_ability_names` cannot see an
 # ability a rune grants — the grant lands on the battle `cfg`, never on the
-# member dict — so a rune-granted card that also sits in a spec draft pool is
-# one name the fallback can offer to a hero who already casts it. That is a
-# PRE-EXISTING property of every channel (`roll_spec_ability_offer` and
-# `draft_pool_left` share it), and it is carried here rather than waved off,
-# because it is the only term that can push the floor below the slot
-# arithmetic. Read off `runes.json` so a third granting rune is covered by
-# doing nothing.
+# member dict — so a rune-granted card that also sits in the pool is one name
+# the fallback can offer to a hero who already casts it. That is a PRE-EXISTING
+# property of every channel (`roll_spec_ability_offer` and `draft_pool_left`
+# share it), and it is carried here rather than waved off, because it is the
+# only term that can push the floor below the slot arithmetic. Read off
+# `runes.json` so a new granting rune is covered by doing nothing, and counted
+# against what the door OFFERS for the set: a rune-granted card the gate
+# withholds anyway drains nothing.
 func _s1_depth() -> void:
-	print("\n§1 — every spec's depth against the award count, after the fallback")
+	print("\n§1 — every class's depth against the award count, after the fallback, per engine set held")
 	var run_gd := load("res://scripts/run_state.gd")
 	var awards: int = int(run_gd.SLOT_COUNT)
 	# The LAST rung, not the first: §1 asks how deep the pool can be drained, and
@@ -203,16 +223,9 @@ func _s1_depth() -> void:
 	var cap: int = int(run_gd.ABILITY_SLOTS_BY_BOSS[
 		run_gd.ABILITY_SLOTS_BY_BOSS.size() - 1])
 
-	# THE RUNE DRAIN, PER SPEC. A rune counts only against a spec that can
-	# actually WEAR it, which is what `scope` decides.
-	var rune_drain := {}
-	# BATCH EH §1 — THE SAME DRAIN, MEASURED AGAINST THE THIRD TIER TOO. It
-	# reads ZERO today across all twelve, and that is worth deriving rather
-	# than asserting from the outside: `Classes.vault_ability` and the rune
-	# grants have crossed pools before, and a rune that ever grants a
-	# class-wide card is the one term that can push the three-tier floor
-	# somewhere this gate is not looking.
-	var rune_drain_cls := {}
+	# THE RUNE DRAIN, PER CLASS: every ability-granting rune a hero of the class
+	# can WEAR, which is what `scope` decides (a class, or universal — HC §1).
+	var granted_by_class := {}
 	var granting := 0
 	var parsed = JSON.parse_string(
 		FileAccess.get_file_as_string("res://data/runes.json"))
@@ -243,110 +256,94 @@ func _s1_depth() -> void:
 		granting += 1
 		var scope := String(d.get("scope", "universal"))
 		for cls in Classes.SPEC_IDS:
-			for spec in Classes.SPEC_IDS[cls]:
-				# BATCH HC §1 — universal or the class: the spec branch went with
-				# the spec scope, and a lineage's rune is its class's.
-				var wearable: bool = scope == "universal" \
-					or scope == "class:%s" % String(cls)
-				if not wearable:
-					continue
-				if Classes.spec_draft_pool(spec).has(gname):
-					rune_drain[spec] = int(rune_drain.get(spec, 0)) + 1
-				if Classes.class_draft_pool(String(cls)).has(gname):
-					rune_drain_cls[spec] = int(rune_drain_cls.get(spec, 0)) + 1
-	print("    ability-granting runes: %d; reachable spec-draft collisions: %s; class-draft collisions: %s" % [
-		granting, rune_drain, rune_drain_cls])
+			if scope == "universal" or scope == "class:%s" % String(cls):
+				granted_by_class[String(cls)] = (granted_by_class.get(String(cls), []) as Array) + [gname]
+	print("    ability-granting runes: %d; granted names a hero of each class can wear: %s" % [
+		granting, granted_by_class])
 
 	var lost_after := 0
 	var thinnest := 999
-	var thinnest_spec := ""
-	var emptiable := 0
-	# BATCH EG §1 — THE SPECS WHOSE FALLBACK CAN FILL SHORT, AS A NAMED SET.
-	var short_specs: Array = []
+	var thinnest_seat := ""
+	var seats := 0
+	# BATCH EG §1 — THE SEATS WHOSE FALLBACK CAN FILL SHORT, AS A NAMED SET.
+	var short_seats: Array = []
 	for cls2 in Classes.SPEC_IDS:
-		for spec2 in Classes.SPEC_IDS[cls2]:
-			var boss: Array = Classes.spec_pool(spec2)
-			var draft: Array = Classes.spec_draft_pool(spec2)
-			var safe := 0
-			for n in boss:
-				if not draft.has(n):
-					safe += 1
-			if safe < awards:
-				emptiable += 1
-			# THE DEEPEST THE FALLBACK POOL CAN BE DRAINED: every earnable slot
-			# spent on a draft card, plus every rune-granted name the filter
-			# cannot see.
-			var wide: Array = Classes.class_draft_pool(
-				Classes.class_of_spec(spec2))
-			# BATCH GS — THE LOADOUT BOUND IS WHAT THE CAP LEAVES FOR EARNED CARDS,
-			# which is the cap less the slots the hero OPENS using: the lineage's
-			# (`lineage_slots`) and the class kit's (`kit_slots`), `ability_slots_used`'s
-			# own two terms. It read `core_slots`, which stood in for that sum
-			# while a lineage's opening kit WAS its core; GS made `core_slots` the
-			# enablers' bar entries, which sit outside the count, and the bound
-			# drifted to nine and ten earned cards against a real seven.
-			var earn: int = cap - (Classes.lineage_slots(spec2)
-				+ Classes.kit_slots(String(cls2), spec2))
-			var floor_now: int = draft.size() - earn - int(rune_drain.get(spec2, 0))
-			# **BATCH EH §1 — THE THIRD TIER'S OWN DEPTH, AND IT IS THE SAME
-			# ARITHMETIC ONE POOL WIDER.** The earnable slots drain ONE budget
-			# across both draft pools — a hero cannot spend the same seven
-			# slots twice — so the chain's floor is the two pools summed
-			# against one `earn`, not two floors added.
-			var floor_all: int = draft.size() + wide.size() - earn \
-				- int(rune_drain.get(spec2, 0)) - int(rune_drain_cls.get(spec2, 0))
-			if floor_now < thinnest:
-				thinnest = floor_now
-				thinnest_spec = spec2
-			if floor_all < 1:
-				lost_after += awards - mini(awards, safe)
-			print("    %-13s boss=%d draft=%d class=%d safe=%d earnable=%d rune=%d+%d  tier2 floor=%d  tier2+3 floor=%d" % [
-				spec2, boss.size(), draft.size(), wide.size(), safe, earn,
-				int(rune_drain.get(spec2, 0)), int(rune_drain_cls.get(spec2, 0)),
-				floor_now, floor_all])
-			# **BATCH EG §1 — THIS WAS ONE ASSERTION AND IT WAS ASKING TWO
-			# QUESTIONS.** EA wrote `floor_now >= awards` and worded it "it can
-			# be paid nothing", and at a flat cap of seven the floor was six
-			# everywhere so both readings were true and nobody had to separate
-			# them. **THE RULE IN `CLAUDE.md` IS "AN AWARD ALWAYS PAYS", WHICH
-			# IS `floor >= 1`; `>= awards` IS THE STRICTER CLAIM THAT EVERY
-			# AWARD OFFERS A FULL THREE.** The slot ladder moves the floor to
-			# exactly 3 for seven specs and to 2 for the Occultist, so the two
-			# claims come apart here — and repairing the assertion TO ITS
-			# INTENT (DC's rule) means splitting it rather than loosening it.
-			ok(floor_now >= 1,
-				"§1: %s's fallback pool floors at %d — it can be drained EMPTY and an award can pay nothing" % [
-					spec2, floor_now])
-			if floor_now < awards:
-				short_specs.append(spec2)
-			# **BATCH EH §1 — THE THIRD TIER IS ITS OWN QUESTION AND IT IS THE
-			# STRICT ONE.** EG split EA's single assertion into the RULE
-			# (`floor >= 1`, an award always pays) and the stricter claim that
-			# every award offers a FULL THREE — and had to give the second one
-			# up as a named-set exception, because the slot ladder took the
-			# Occultist to 2. **THIS IS THAT CLAIM RESTORED, ACROSS THE CHAIN
-			# RATHER THAN INSIDE EITHER HALF.** Neither assertion above is
-			# widened by a character: they still ask what the SPEC tier alone
-			# can do, which is the question the record needs to keep answering
-			# the day somebody re-prices a spec draft pool.
-			ok(floor_all >= awards,
-				"§1: %s's chain floors at %d against %d awards — the class-wide tier does not restore a full offer" % [
-					spec2, floor_all, awards])
+		var ck := String(cls2)
+		var pool: Array = Classes.draft_pool(ck)
+		# Every lineage a hero of the class can carry, and none: the lineage is
+		# set by the engine he TOOK at class selection and outlives it (HE §3).
+		var lineages: Array = [""] + Array(Classes.SPEC_IDS[cls2])
+		var row_floors: Array = []
+		for held in Gate.engine_sets(Classes.class_engines(ck), int(run_gd.ENGINE_SLOTS)):
+			seats += 1
+			var seat := "%s%s" % [ck, str(held)]
+			var offered: Array = Classes.offerable(pool, held)
+			# THE LOADOUT BOUND: the cap less the slots he OPENS using —
+			# `ability_slots_used`'s own two terms, with the engines he holds, since
+			# the kit he holds reads them (HB §4). Taken at the lineage that opens
+			# using the fewest, because that one leaves the most earned cards.
+			var opens := 999
+			for lin in lineages:
+				opens = mini(opens, Classes.lineage_slots(String(lin))
+					+ Classes.kit_slots(ck, String(lin), held))
+			var earn: int = cap - opens
+			var drain := 0
+			for g in granted_by_class.get(ck, []):
+				if offered.has(g):
+					drain += 1
+			# THE DEEPEST THE FALLBACK CAN BE DRAINED UNDER THE LOADOUT BOUND: every
+			# earnable slot spent on a card the door would offer him, plus every
+			# rune-granted name the filter cannot see.
+			var floor_n: int = offered.size() - earn - drain
+			row_floors.append(floor_n)
+			if floor_n < thinnest:
+				thinnest = floor_n
+				thinnest_seat = seat
+			# **BATCH EG §1's SPLIT, KEPT: THE RULE AND THE STRICTER CLAIM ARE TWO
+			# QUESTIONS.** `CLAUDE.md`'s rule is "an award always pays" — a floor of
+			# at least ONE; that every award offers a FULL THREE is the stricter
+			# claim EH restored across the chain. The chain is two tiers since GP and
+			# the fallback is the last of them, so both are asked of it, per seat.
+			# (Until HJ the first read the lineage's SHELF — EA's tier — and the
+			# second the shelf plus the class-wide shelf — EH's; both shelves are one
+			# pool, and the door filters it, so the two floors are one floor asked
+			# at two thresholds.)
+			ok(floor_n >= 1,
+				"§1: a %s holding %s floors at %d — the fallback can be drained EMPTY and an award can pay nothing (%d offered, %d earnable, %d rune-granted)" % [
+					ck, str(held), floor_n, offered.size(), earn, drain])
+			if floor_n < awards:
+				short_seats.append(seat)
+			ok(floor_n >= awards,
+				"§1: a %s holding %s floors at %d against %d awards — the fallback does not restore a full offer" % [
+					ck, str(held), floor_n, awards])
+			# THE LOST AWARDS, PER LINEAGE HE COULD CARRY: when the fallback cannot
+			# pay, what is left is the boss tier's cards that drafting cannot take
+			# (not in the pool) and the door still offers for this set.
+			if floor_n < 1:
+				for lin2 in lineages:
+					var safe := 0
+					for b in Classes.spec_pool(String(lin2)):
+						if not pool.has(b) and not Classes.offerable([b], held).is_empty():
+							safe += 1
+					lost_after += awards - mini(awards, safe)
+		row_floors.sort()
+		print("    %-8s pool=%d  %d engine sets  fallback floor %d to %d  (a hero holding none: %d offered, %d earnable)" % [
+			ck, pool.size(), row_floors.size(), int(row_floors[0]), int(row_floors[row_floors.size() - 1]),
+			Classes.offerable(pool, []).size(),
+			cap - Classes.kit_slots(ck, "", [])])
 
-	# **AND THE STRICTER HALF IS A NAMED SET NOW, ON `emptiable`'s OWN SHAPE.**
-	# A pinned population rather than a pinned count: a THIRTEENTH spec whose
-	# fallback can fill short trips, and so does the Occultist's leaving the
-	# set, which is what a repair looks like from here.
-	# **BATCH GS — RE-DERIVED ON THE LIVE OPENING, AND THE SET IS EMPTY.** Every
-	# hero opens using the class kit's three slots whatever engine he holds, so
-	# the last rung leaves him seven earned cards against lineage shelves of
-	# eleven to sixteen (GS moved twenty-nine cards onto them): the thinnest
-	# floor is four, over three awards. [occultist] was read off `core_slots`
-	# when it still meant the opening. A spec whose fallback can fill short
-	# is a thirteenth-spec event again, and this line trips on it.
-	ok(short_specs.is_empty(),
-		"§1: the specs whose fallback can fill SHORT are %s, not the none GS left on record — the slot ladder or a shelf has moved under this table" % [
-			short_specs])
+	# **AND THE STRICTER HALF IS A NAMED SET, ON `emptiable`'s OWN SHAPE.**
+	# A pinned population rather than a pinned count: a seat whose fallback can
+	# fill short trips, and so does one leaving the set, which is what a repair
+	# looks like from here.
+	# **BATCH GS read it empty on the live opening; BATCH HJ re-derived it over
+	# class × engines held and it is still empty** — the thinnest seat is printed
+	# below, and it floors far above three: a hero draws his class's whole pool
+	# since GP, not one shelf. A seat whose fallback can fill short is a new
+	# event, and this line trips on it.
+	ok(short_seats.is_empty(),
+		"§1: the seats whose fallback can fill SHORT are %s, not the none on record — the slot ladder, a pool or the engine gate has moved under this table" % [
+			short_seats])
 
 	# **BATCH EG §1 — AND THE BOUND ABOVE IS NO LONGER THE ONLY ONE. REPORTED,
 	# NOT ASSERTED, BECAUSE CLOSING IT IS A RULING.** `earn` is the LOADOUT
@@ -355,52 +352,85 @@ func _s1_depth() -> void:
 	# benched card stays in the pool and `owned_ability_names` reads the pool,
 	# so the fallback's filter is drained by everything a hero has EVER taken,
 	# which the slot cap does not bound at all.** The true worst case is a hero
-	# who drafts his entire spec pool, and that floors at ZERO. It is not
-	# asserted because the arithmetic that would make it safe is a design
-	# decision EA priced and did not take (a class-wide third tier), and a gate
-	# encodes a ruling.
+	# who drafts everything he can be offered, and that floors at ZERO. It is
+	# not asserted because the arithmetic that would make it safe is a design
+	# decision EA priced and did not take, and a gate encodes a ruling.
 	# **BATCH EH §1 — AND THE THIRD TIER DID NOT CLOSE IT, WHICH IS SAID HERE
-	# BECAUSE THE BRIEF'S REASON FOR TAKING IT WAS THAT IT WOULD.** The brief
-	# held that the class-wide pool "cannot empty — six cards per class, shared
-	# across three specs, and no hero can hold another spec's picks". **THE
-	# SECOND HALF IS TRUE AND THE FIRST DOES NOT FOLLOW FROM IT.** No SIBLING
-	# drains it — every hero filters this pool against his own
-	# `owned_ability_names`, so three specs sharing six cards is three
-	# independent sixes. But the hero himself can: a hero who takes at every
-	# offer drains what he can be shown. **EA's spec-pool floor was true when
-	# written and stopped being true one batch later; asserting an unemptiable
-	# class pool here would be the identical mistake one tier down.**
+	# BECAUSE THE BRIEF'S REASON FOR TAKING IT WAS THAT IT WOULD.** No SIBLING
+	# drains a pool — every hero filters it against his own
+	# `owned_ability_names` — but the hero himself can: a hero who takes at every
+	# offer drains what he can be shown. **EA's floor was true when written and
+	# stopped being true one batch later; asserting an unemptiable pool here
+	# would be the identical mistake one tier down.**
 	#
 	# **BATCH GP — THE TWO DRAFT POOLS ARE ONE POOL, AND THE GATE MAKES THE
 	# FLOOR LOWER THAN ITS DEPTH.** Emptying the chain means owning every name
 	# the hero can be OFFERED, which is his class pool less the cards that read
-	# an engine he does not hold — 22 of 34 for a Cleric holding none. The
-	# budget below is derived off the live door for that reason.
+	# an engine he does not hold. **BATCH HJ — so the budget below is the
+	# cheapest SEAT, class × engines held, off the live door.**
 	#
 	# WHAT HOLDS THE FLOOR UP IS ARITHMETIC, NOT STRUCTURE, AND IT IS PRINTED:
 	# a draft offer pays at most ONE card. That is the number below.
 	var take_budget: int = 999
-	var take_spec := ""
+	var take_seat := ""
 	for cls3 in Classes.SPEC_IDS:
-		for spec3 in Classes.SPEC_IDS[cls3]:
-			var need: int = Classes.draft_pool(String(cls3)).size() \
-				- int(rune_drain.get(spec3, 0)) - int(rune_drain_cls.get(spec3, 0))
+		var ck3 := String(cls3)
+		for held3 in Gate.engine_sets(Classes.class_engines(ck3), int(run_gd.ENGINE_SLOTS)):
+			var offered3: Array = Classes.offerable(Classes.draft_pool(ck3), held3)
+			var need: int = offered3.size()
+			for g3 in granted_by_class.get(ck3, []):
+				if offered3.has(g3):
+					need -= 1
 			if need < take_budget:
 				take_budget = need
-				take_spec = spec3
-	print("    EH §1 REPORTED, NOT ASSERTED — under the POOL bound (a hero who keeps every card he ever took) the chain still floors at 0. Emptying it costs %d distinct taken cards at the cheapest spec (%s), one card per offer. The LOADOUT bound above is what is asserted." % [
-		take_budget, take_spec])
+				take_seat = "%s holding %s" % [ck3, str(held3)]
+	print("    EH §1 REPORTED, NOT ASSERTED — under the POOL bound (a hero who keeps every card he ever took) the chain still floors at 0. Emptying it costs %d distinct taken cards at the cheapest seat (%s), one card per offer. The LOADOUT bound above is what is asserted." % [
+		take_budget, take_seat])
 
-	# THE ANSWER TO THE QUESTION §1 ASKS, STATED AS A PROPERTY.
+	# THE ANSWER TO THE QUESTION §1 ASKS, STATED AS A PROPERTY — over every seat
+	# and every lineage the seat could carry (BATCH HJ; it was per lineage shelf).
 	ok(lost_after == 0,
 		"§1: %d zone-boss awards can still pay nothing — the fallback does not close the table" % lost_after)
 	# AND THE PREMISE THAT MAKES THE FIX WORTH HAVING: the boss pools can still
 	# empty. If this ever reads 0 the fallback is dead code, and that is worth
 	# being told rather than discovering.
+	# **BATCH HJ — COUNTED AGAINST THE CLASS POOL.** A boss card empties out of the
+	# boss offer the moment it is DRAFTED, and since GP it is drafted off any
+	# shelf of the class: a boss card on a sibling's shelf is draftable too. It
+	# read the lineage's own shelf until HJ (the eight happened to agree).
+	var emptiable := 0
+	for cls4 in Classes.SPEC_IDS:
+		var pool4: Array = Classes.draft_pool(String(cls4))
+		for spec4 in Classes.SPEC_IDS[cls4]:
+			var safe4 := 0
+			for b4 in Classes.spec_pool(String(spec4)):
+				if not pool4.has(b4):
+					safe4 += 1
+			if safe4 < awards:
+				emptiable += 1
 	ok(emptiable == 8,
-		"§1: %d specs can empty a boss pool, not the 8 on record — DZ §1's population has moved" % emptiable)
-	print("  awards=%d  emptiable boss pools=%d  lost awards after the fallback=%d  thinnest fallback=%s(%d)" % [
-		awards, emptiable, lost_after, thinnest_spec, thinnest])
+		"§1: %d lineages can empty a boss pool, not the 8 on record — DZ §1's population has moved" % emptiable)
+	print("  awards=%d  seats=%d  emptiable boss pools=%d  lost awards after the fallback=%d  thinnest fallback=%s(%d)" % [
+		awards, seats, emptiable, lost_after, thinnest_seat, thinnest])
+	# **BATCH HJ — AND THE SEATS THEMSELVES, ASSERTED.** The short set and the
+	# lost-award count are ABSENCES, and the two floor arms fire once per seat:
+	# a walk that seated nobody passes all of them having asked nothing. So the
+	# seats printed above are counted against the arithmetic of the classes'
+	# engines — every set of up to ENGINE_SLOTS of them, none included — which
+	# does not go through `Gate.engine_sets`.
+	var want_seats := 0
+	for cls5 in Classes.SPEC_IDS:
+		var n5: int = Classes.class_engines(String(cls5)).size()
+		for mask in range(1 << n5):
+			var bits := 0
+			for b5 in n5:
+				if (mask & (1 << b5)) != 0:
+					bits += 1
+			if bits <= int(run_gd.ENGINE_SLOTS):
+				want_seats += 1
+	ok(seats == want_seats and seats > Classes.SPEC_IDS.size(),
+		"§1: the floors above seated %d class × engine-set heroes, not the %d the classes' engines make (none, and every set of up to %d) — the floors, the short set and the lost awards read another population" % [
+			seats, want_seats, int(run_gd.ENGINE_SLOTS)])
 
 
 # ── §2 — THE ANNOUNCEMENT, ON A REAL BATTLE, IN TWO ARMS ────────────────────

@@ -47,6 +47,11 @@ var fails := 0
 # makes it true rather than the count that describes it today.
 const SUMMON_SPEC := "beastmaster"
 const REVIVE_SPEC := "holy"
+# BATCH HJ — revival's OWNER in the merged game: the class whose pools reach the
+# card, and the engine its offer row names. `REVIVE_SPEC` is where it is DEFINED,
+# kept as the record.
+const REVIVE_CLASS := "cleric"
+const REVIVE_ENGINE := "mercy"
 
 # THE SEVEN COOLDOWN-MANIPULATION SITES, NAMED WITH THEIR OWNERS. This is a
 # RATCHET and not a pin: a site that VANISHES is a notice, a site that appears
@@ -180,9 +185,9 @@ func _s1_summoning() -> void:
 		"Call the Wilds is the one draft card that summons, and it is a Hunter card (drafted off the Beastmaster's shelf)")
 
 
-# ---------------- §2 — REVIVAL IS THE HOLY CLERIC'S ----------------
+# ---------------- §2 — REVIVAL IS THE CLERIC'S, A MERCY HOLDER'S ----------------
 func _s2_revival() -> void:
-	print("\n§2 — REVIVAL is exclusive to the Holy Cleric AMONG ABILITIES")
+	print("\n§2 — REVIVAL is exclusive to the Cleric, a Mercy holder, AMONG ABILITIES (the Holy Cleric's until the pools merged)")
 	# THE PROPERTY: `BattleUnit.revive()` is the one way a corpse stands up, and
 	# exactly one ABILITY reaches it. **THE BRIEF ASKED THIS BE VERIFIED AND
 	# REPORTED, AND THE HONEST ANSWER HAS A QUALIFIER**: two NON-ability channels
@@ -197,13 +202,36 @@ func _s2_revival() -> void:
 		"the `resurrection` handler is gone — the one ABILITY that revives")
 	# ...and it is HERS. Asserted off the kit rather than off a name. (BATCH GS:
 	# `spec_abilities` is her DEFINITION table now, no longer what she opens with.)
+	# **BATCH HJ — RE-POINTED: WHOSE IT IS IS WHO CAN BE HANDED IT.** The arm asked
+	# which lineage's table DEFINES the special, and since GS that table is where a
+	# card was authored: Resurrection is drafted off the Holy's shelf of the one
+	# Cleric pool (GP), offered to a Cleric only while he holds Mercy (its
+	# `ENGINE_READ` row, GS), and a card moved between two Cleric tables would move
+	# nothing a hero can reach. What makes revival exclusive is that no OTHER class
+	# can be handed a card carrying it — by its draft pool, its lineages' boss pools,
+	# its kit or its basic — and that within the Cleric it is the Mercy holder's.
+	# The definition's lineage is printed as the record.
 	var found := ""
 	for spec in Classes.SPEC_INFO:
 		for ab in Classes.spec_abilities(spec):
 			if ab.special == "resurrection":
 				found = spec
-	ok(found == REVIVE_SPEC,
-		"`resurrection` belongs to '%s', not '%s'" % [found, REVIVE_SPEC])
+	var reviving: Array = []
+	for key in ["warrior", "mage", "cleric", "hunter"]:
+		var reach: Array = Classes.draft_pool(key) + Classes.class_kit_names(key)
+		for sp in Classes.SPEC_IDS[key]:
+			reach += Classes.spec_pool(String(sp))
+		var hands: bool = String(Classes.kit(key)[0].special) == "resurrection"
+		for nm in reach:
+			var rab: Ability = Classes.pool_ability(String(nm))
+			if rab != null and rab.special == "resurrection":
+				hands = true
+		if hands:
+			reviving.append(key)
+	ok(reviving == [REVIVE_CLASS] and Classes.engine_read("Resurrection") == REVIVE_ENGINE,
+		"`resurrection`: the classes handed a card carrying it are %s (want only the %s); Resurrection's offer row names '%s' (want '%s')" % [
+			str(reviving), REVIVE_CLASS, Classes.engine_read("Resurrection"), REVIVE_ENGINE])
+	print("  [record] the card carrying `resurrection` is defined in the %s's table (GS: an authoring location)" % found)
 	# AND NO DRAFT CARD MAY REACH IT. A pool entry with this special would hand
 	# revival to whoever drafted it. (BATCH GS: Resurrection is itself drafted now —
 	# on the Holy's shelf, offered only to a Mercy holder by `ENGINE_READ` — so what
@@ -222,7 +250,8 @@ func _s2_revival() -> void:
 			revivers[String(cab.display_name)] = true
 	ok(revivers.keys() == ["Resurrection"],
 		"cards carrying `resurrection`: %s — exactly one, Resurrection, wherever it is defined" % str(revivers.keys()))
-	print("  Revival is one ability (Resurrection, %s) plus two non-ability channels" % REVIVE_SPEC)
+	print("  Revival is one ability (Resurrection, the %s's, offered to a %s holder) plus two non-ability channels" % [
+		REVIVE_CLASS, REVIVE_ENGINE])
 	print("  — the Revive Potion item and the `revive_pct` map event. Reported, not ruled.")
 
 

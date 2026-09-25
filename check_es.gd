@@ -648,12 +648,22 @@ func _s4_tags_are_read() -> void:
 	var spec3 := String(m["spec"])
 	# A card with at least one tag, taken off the hero's own draft pool so the
 	# swap is one a player could actually make.
+	# **BATCH HJ — RE-POINTED: "HIS OWN DRAFT POOL" IS HIS CLASS'S ONE POOL, AS THE
+	# DOOR OFFERS IT TO HIM.** It read the Berserker's SHELF, which since GP is
+	# where a card was authored, not what a player draws: a Warrior is offered
+	# every shelf of his class, less what reads an engine he does not hold
+	# (`Classes.offerable`, the one door the draft asks). A card off his shelf the
+	# gate withholds is a swap no player could make; a card off a sibling's shelf
+	# the door offers is one he could.
 	var card := ""
-	for n2 in Classes.spec_draft_pool(spec3):
+	var offered_pool: Array = Classes.offerable(
+		Classes.draft_pool(String(m["key"])), run.held_engines(m))
+	for n2 in offered_pool:
 		if not Classes.card_tags(String(n2)).is_empty():
 			card = String(n2)
 			break
-	ok(card != "", "§4: no tagged card in the %s draft pool to swap" % spec3)
+	ok(card != "", "§4: no tagged card the %s's draft offer could hold to swap (%d offered)" % [
+		spec3, offered_pool.size()])
 	run.hold_ability(m, card, true)
 	var carried: Dictionary = Classes.tag_census(run.loadout_ability_names(m))
 	ok(run.loadout_ability_names(m).has(card),

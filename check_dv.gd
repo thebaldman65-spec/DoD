@@ -236,11 +236,18 @@ func _s2_boss_depth() -> void:
 	# removes itself from the offer, so a pool can empty below its own depth.
 	# Derived, never listed: this counts the specs whose whole boss pool is
 	# draftable, and the Devout is one of them.
+	# **BATCH HJ — COUNTED AGAINST THE CLASS POOL, NOT THE LINEAGE'S SHELF.** A boss
+	# card leaves the boss offer the moment the hero DRAFTS it, and since GP he
+	# drafts off his class's one pool (`Classes.draft_pool`): a boss card on a
+	# SIBLING's shelf empties out of his boss offer exactly as one on his own
+	# does. This read the lineage's own shelf until HJ, which could only
+	# undercount; the eight happened to agree, because every boss card any shelf
+	# holds sat on its own lineage's shelf.
 	var emptiable: Array = []
 	for cls2 in Classes.SPEC_IDS:
+		var dp: Array = Classes.draft_pool(String(cls2))
 		for spec2 in Classes.SPEC_IDS[cls2]:
 			var bp: Array = Classes.SPEC_POOLS.get(spec2, [])
-			var dp: Array = Classes.SPEC_DRAFT_POOLS.get(spec2, [])
 			var left := 0
 			for n2 in bp:
 				if not dp.has(n2):
@@ -251,14 +258,17 @@ func _s2_boss_depth() -> void:
 	ok(emptiable.size() == 8,
 		"§2: %d specs can be short of a full award set once drafting is accounted for, not the 8 on record — %s" % [
 			emptiable.size(), ", ".join(PackedStringArray(emptiable))])
+	# **BATCH HJ — AGAINST THE CLERIC'S ONE POOL, FOR THE REASON ABOVE.** What
+	# keeps a Holy boss card safe from her own drafting is that NO shelf of her
+	# class holds it; it read the Holy shelf alone until HJ.
 	var holy_pool: Array = Classes.SPEC_POOLS.get("holy", [])
-	var holy_draft: Array = Classes.SPEC_DRAFT_POOLS.get("holy", [])
+	var holy_draft: Array = Classes.draft_pool(Classes.class_of_spec("holy"))
 	var holy_safe := 0
 	for n3 in holy_pool:
 		if not holy_draft.has(n3):
 			holy_safe += 1
 	ok(holy_safe == 2,
-		"§2: the Holy Cleric's un-draftable boss cards are %d, not the 2 DY §2 left her" % holy_safe)
+		"§2: the Holy Cleric's boss cards no Cleric can draft are %d, not the 2 DY §2 left her" % holy_safe)
 	print("    emptiable by drafting: %s" % ", ".join(PackedStringArray(emptiable)))
 	# The slot arithmetic that prices §2's card-shaped options.
 	# BATCH GS — THE SLOT HALF MOVED, AND THIS TRIPWIRE IS RE-PINNED RATHER THAN

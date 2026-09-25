@@ -211,11 +211,41 @@ func _s0_the_kit() -> void:
 			# designer ruled §1g's specific reading over §1d's general one (HH's brief,
 			# as HG had sorted it), so **HA §1d's RETIRE for this line is not live**: it
 			# goes to HI with the re-points.
-			var m := {"key": ck, "spec": spec, "engines": [], "bm_abilities": []}
+			# **BATCH HJ — RE-POINTED BY RULING (HH §3): THE DOOR, ASKED OF WHAT HE OPENS
+			# WITH, WITH HIS ENGINE HELD.** It asked `ability_slots_used` of a member
+			# holding NO engine and compared it with `lineage_slots + kit_slots` — the
+			# door's own two terms, so the arm restated the door and could only fail if
+			# the door disagreed with itself (HA §1d's "near-tautology"). What HA §1g
+			# keeps it for is the door a future lineage card would pass through, so it
+			# asks the door against something the door does not compute: the cards the
+			# hero OPENS with (`Classes.opening_kit`, the one builder), less the class
+			# basic and the enablers of the engines he holds — which sit outside the
+			# count (the charter) — the pet card's calls one entry, as the bar groups
+			# them. Seated holding the engine, as class selection hands it: since HB the
+			# kit he holds reads his engines, and a Sharpshooter holding Lethal Aim
+			# opens at two. The kit's own slots with the engine dropped are still asked
+			# beside it, as GN wrote them.
+			var eng_rune: Dictionary = Runes.build(Runes.engine_rune_id(String(pid)))
+			eng_rune["equipped"] = true
+			var m := {"key": ck, "spec": spec, "engines": [eng_rune], "bm_abilities": []}
 			var used: int = _run.ability_slots_used(m)
-			ok(used == Classes.lineage_slots(spec) + Classes.kit_slots(ck, spec)
+			var basic_nm: String = Classes.kit(ck)[0].display_name
+			var outside: Array = Classes.engine_enablers(String(pid))
+			var opened := 0
+			var calls := false
+			for ab3 in Classes.opening_kit(ck, spec, [pid]):
+				if ab3 == null or ab3.display_name == basic_nm or outside.has(ab3.display_name):
+					continue
+				if ab3.special == "summon":
+					calls = true
+				else:
+					opened += 1
+			if calls:
+				opened += 1
+			ok(used == opened
 					and Classes.kit_slots(ck, spec) == 3 - (dedupe.get(spec, []) as Array).size(),
-				"§0: %s opens at %d of %d slots" % [pid, used, _run.ability_slot_cap()])
+				"§0: %s, engine held, opens at %d of %d slots and the door counts %d (engine dropped, the kit takes %d)" % [
+					pid, opened, _run.ability_slot_cap(), used, Classes.kit_slots(ck, spec)])
 			print("    %-14s %-12s opens at %d of %d" % [pid, spec if spec != "" else "(no lineage)",
 				used, _run.ability_slot_cap()])
 		# the protected list names the kit

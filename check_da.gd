@@ -102,7 +102,13 @@ const WALK_EXEMPT := {
 	# the mark — **and this rule caught the exemption going stale**, because an
 	# exemption whose reason has expired is a suppression waiting to hide the
 	# next real walk. It is DELETED rather than reworded: the gate needs none.
-	"check_ea.gd": "measures the AWARD CHAIN's depth per spec — it reads both draft pools because the chain does",
+	# **BATCH HJ TOOK `check_ea.gd` OFF THIS LIST, FOR THE SAME REASON ONE TIER
+	# FURTHER ON.** Its §1 measured the chain's depth per LINEAGE — the lineage's
+	# shelf and the class-wide shelf, the two pools the chain read until GP — and
+	# HJ re-derived it over class × engines held through the one pool the fallback
+	# reads (`Classes.draft_pool`, filtered by `Classes.offerable`), so it reads
+	# neither shelf accessor and stopped carrying the mark. This rule caught the
+	# exemption going stale, and it is DELETED rather than reworded.
 	# **BATCH HC TOOK `check_fk.gd` OFF THIS LIST, AND FOR EH's REASON.** Its §5
 	# asked whether the rune's SCOPED SPEC could earn the card, which needed the
 	# spec's shelf and the class's; the spec scope went at HC §1, the buyers are

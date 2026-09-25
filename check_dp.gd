@@ -37,8 +37,9 @@
 # positive arm: the sweep must read a non-empty population.
 #
 # **IT READS `check_do`'s TABLES RATHER THAN COPYING THEM.** `GUARANTEED_STATUS`
-# and `STATUS_FORMS` are hand-authored maps of what each spec can reach without
-# a draw, and a second copy of them here would be this project's oldest
+# and `STATUS_FORMS` are hand-authored maps of what each CLASS can reach without
+# a draw (each spec until BATCH HJ re-keyed them — `check_do` says why), and a
+# second copy of them here would be this project's oldest
 # recurring defect wearing a new hat — DG found five live copies of one figure.
 # The load is asserted, so the day that file moves this gate says so rather than
 # silently sweeping against an empty table.
@@ -70,7 +71,7 @@ var fails := 0
 #
 # **BATCH FX — A KEY MAY NAME `*` FOR ITS SPEC.** The one tree is worn by EVERY
 # spec, so a node reading a status now appears once per spec that cannot apply
-# it. A row whose reason holds whatever the wearer — an IMMUNITY's does — says
+# it. (BATCH HJ — once per CLASS since the table re-keyed; `*` matches a class.) A row whose reason holds whatever the wearer — an IMMUNITY's does — says
 # `*`; a row that is a bet for some specs and not others still names its spec.
 #
 # **FOUR ROWS RETIRED WITH THEIR NODES AT FX**, and they were rows, not checks,
@@ -149,31 +150,38 @@ func _row_live(row: String, live: Dictionary) -> bool:
 
 # ---------------- §1 — THE PROPERTY, AND THE COUNT BESIDE IT ----------------
 func _s1_property() -> void:
-	print("\n§1 — no talent node reads a status its own spec cannot guarantee")
+	print("\n§1 — no talent node reads a status a class that wears it cannot guarantee")
 	var do_consts: Dictionary = load("res://check_do.gd").get_script_constant_map()
 	ok(do_consts.has("GUARANTEED_STATUS") and do_consts.has("STATUS_FORMS"),
 		"`check_do`'s status tables no longer load — this sweep would run against nothing")
 	if not (do_consts.has("GUARANTEED_STATUS") and do_consts.has("STATUS_FORMS")):
 		return
-	var guaranteed_by_spec: Dictionary = do_consts["GUARANTEED_STATUS"]
+	var guaranteed_by_class: Dictionary = do_consts["GUARANTEED_STATUS"]
 	var forms: Dictionary = do_consts["STATUS_FORMS"]
-	ok(not forms.is_empty() and not guaranteed_by_spec.is_empty(),
+	ok(not forms.is_empty() and not guaranteed_by_class.is_empty(),
 		"the loaded tables are empty — the sweep would be vacuously green")
 
 	# BATCH FX — EACH SPEC'S TREE IS THE ONE TREE, asked for through the
 	# unchanged `generate_tree` door every caller uses and swept against THAT
 	# spec's guarantees, because one node can be a bet for one spec and not for
 	# another. The property is unchanged; only the population moved.
+	# **BATCH HJ — AND IT MOVED AGAIN, TO THE CLASS.** `check_do`'s table is keyed
+	# by class since HJ — a guarantee is what EVERY hero of a class holds, his
+	# basic and his kit, whatever engine he holds or drops — so the tree is swept
+	# once per CLASS against that class's row. And it is the tree the class's
+	# heroes are HANDED: `Talents.tree()`, which `Run.awaken` gives every hero of
+	# the class, lineage or none. `generate_tree` is the lineage's door, and a hero
+	# who took a spine never passes it (`generate_tree("")` is empty), so a sweep
+	# through it read twelve lineages and never the tree a spine-taker wears.
 	var live: Dictionary = {}
 	var nodes := 0
-	var specs := 0
-	for spec in Classes.all_specs():
-		var tree_nodes: Array = Talents.generate_tree(String(spec),
-			Classes.class_of_spec(String(spec)))
+	var swept := 0
+	for ck in guaranteed_by_class:
+		var tree_nodes: Array = Talents.tree()
 		if tree_nodes.is_empty():
 			continue
-		specs += 1
-		var guaranteed: Dictionary = guaranteed_by_spec.get(spec, {})
+		swept += 1
+		var guaranteed: Dictionary = guaranteed_by_class.get(ck, {})
 		for n in tree_nodes:
 			nodes += 1
 			var text := Talents.desc_for(n, 1)
@@ -182,14 +190,16 @@ func _s1_property() -> void:
 					continue
 				for form in forms[sid]:
 					if _bounded(text, String(form)):
-						live["%s/%s/%s" % [spec, String(n["id"]), sid]] = true
+						live["%s/%s/%s" % [ck, String(n["id"]), sid]] = true
 						break
 	# THE POSITIVE ARM, ADDED AT FX WITH THE POPULATION IT GUARDS. The sweep read
-	# twelve hand-authored trees; it now reads one 27-node tree through
-	# `generate_tree`, and a door that handed every spec an empty tree would
-	# leave the negative arm below green on nothing at all.
-	ok(nodes > 0,
-		"§1 read no talent node — `generate_tree` handed every spec an empty tree, so the property below is vacuously green")
+	# twelve hand-authored trees; it now reads one 27-node tree, and a door that
+	# handed every class an empty tree would leave the negative arm below green on
+	# nothing at all. (BATCH HJ: through `Talents.tree()`, once per class, where it
+	# read `generate_tree` once per lineage.)
+	ok(nodes > 0 and swept == guaranteed_by_class.size(),
+		"§1 read %d talent nodes across %d of %d classes — the tree `Run.awaken` hands every hero is empty, so the property below is vacuously green" % [
+			nodes, swept, guaranteed_by_class.size()])
 	var fresh: Array = []
 	for key in live:
 		if not _known(String(key)):
@@ -198,7 +208,7 @@ func _s1_property() -> void:
 	for f in fresh:
 		ok(false, "%s reads a status with no guaranteed applier — a NEW bet on the draw" % f)
 	ok(fresh.is_empty(),
-		"no talent node reads a status its spec cannot guarantee, outside the named pairs")
+		"no talent node reads a status a class that wears it cannot guarantee, outside the named pairs")
 	# THE OTHER DIRECTION IS A NOTICE, NOT AN ASSERTION: a known pair going
 	# quiet is a REPAIR, and a gate that reds on a repair teaches the next
 	# batch to leave the defect alone.
@@ -209,8 +219,8 @@ func _s1_property() -> void:
 	healed.sort()
 	for h in healed:
 		print("    NOTICE: `%s` is no longer live — a pair was repaired; retire its row." % h)
-	print("  %d nodes swept across %d specs; %d live pairs, %d tolerated and named, %d new" % [
-		nodes, specs, live.size(), live.size() - fresh.size(), fresh.size()])
+	print("  %d nodes swept across %d classes; %d live pairs, %d tolerated and named, %d new" % [
+		nodes, swept, live.size(), live.size() - fresh.size(), fresh.size()])
 	var keys: Array = live.keys()
 	keys.sort()
 	for key3 in keys:
@@ -367,10 +377,13 @@ func _s5_rune_grants() -> void:
 		if pay.has("grant_ability"):
 			ok(Classes.pending_talent_ability(gname) != null,
 				"the %s grants `%s`, which no longer resolves — the rune is dead" % [rid, gname])
+		# BATCH HJ — THE PRINT NAMES THE CLASS WHOSE ONE POOL HOLDS THE CARD. It named the
+		# lineage whose shelf did, which since GP is where a card was authored, not who
+		# can draft it (HA listed this print among the pre-merge tables; not an arm).
 		var pools: Array = []
-		for sp in Classes.all_specs():
-			if Classes.spec_draft_pool(sp).has(gname):
-				pools.append(String(sp))
+		for ck in Classes.SPEC_IDS:
+			if Classes.draft_pool(String(ck)).has(gname):
+				pools.append(String(ck))
 		if not pools.is_empty():
 			overlaps += 1
 		print("    %-14s -> %-16s draftable by: %s" % [
@@ -380,7 +393,7 @@ func _s5_rune_grants() -> void:
 	# rune OWES ITS GENERIC and `Run.apply_upgrades` — which runs last — turns it
 	# into an upgrade on the very card it would have granted. That is the Rune of
 	# the Last Rites' shipped behaviour since AV, now reachable by two more.
-	print("  %d rune grant(s) also live in a spec draft pool." % overlaps)
+	print("  %d rune grant(s) also live in a class's draft pool." % overlaps)
 	print("  Holding both is an UPGRADE on the drafted card, not a wasted rune.")
 
 

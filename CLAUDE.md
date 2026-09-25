@@ -1009,6 +1009,16 @@ a detail to note — it is the ruling being wrong.
   the hero's OWN class pool: HEAD's arm went red on 21 of his own cards and the grant's on 105, and the repaired arms
   read nothing. **So: say before arming whether the repair widens or narrows the set; a widening takes HD's two arms,
   a narrowing takes the forward control (both red) AND the reversed one (HEAD alone red).**
+- **AND ONE RE-POINT CAN DO BOTH AT ONCE, SO IT TAKES BOTH CONTROLS (Batch HJ).** Moving an arm from a lineage's shelf
+  onto the class's one pool WIDENS its population and, where the gate tables now withhold a card, NARROWS what it
+  calls a defect — `test_batch_ah`'s curation arms met Overcharge in the pool and had to ask its `ENGINE_READ` row
+  where the old arm asked its absence. **Each half has its own defect**: a row deleted is seen by the repair alone
+  (forward: the repair red, HEAD silent), and a gated card authored on the class-wide shelf is a defect only to HEAD
+  (reversed: HEAD red, the repair silent). **A re-point that changes WHO an arm weighs — a population re-keyed
+  from lineages to classes — can leave HEAD red on the same defect, and then the per-line FAIL text is the control**:
+  the line HEAD does not print is the case its population missed. **And a target that loads another file's constants
+  takes BOTH files into its HEAD arm** — `check_dp` reads `check_do`'s table, so HEAD's `check_dp` beside the new
+  `check_do` weighed the new table and named every lineage; HJ ran that control again with HEAD's two.
 
 ## THE SHARPSHOOTER'S BASIC IS A SEQUENCE (STANDING, SET AT BATCH CS)
 **HIS BASIC ATTACK ONLY. No other ability of his changes, and no other hero's bar moves at all.**
@@ -2340,9 +2350,11 @@ and `DOD_DEBUG=0` FORCES it shut; every use trips `Run.debug_used` → the run s
 clean data point" line. Sims can never reach the UI surfaces (`_debug_allowed()` excludes
 sim/autoplay/sim_run).
 · MAP BURGER debug items (map_screen, ids 10-16/20-26): +200 Gold | 60 Talent Points to every class, every tier open |
-  Full Heal Heroes | Jump to Boss Slot | Advance to Next Zone | Reroll Specs | "All Spec
-  Abilities Unlocked" check = `Run.debug_grant_all`, the PRE-GRANT toggle (spec-scoped, AU §5;
-  also armable headlessly via `DOD_SIM_GRANT_ALL=1`) | Free Travel check =
+  Full Heal Heroes | Jump to Boss Slot | Advance to Next Zone | Reroll Specs | "All Class
+  Abilities Unlocked" check = `Run.debug_grant_all`, the PRE-GRANT toggle — **the hero's CLASS
+  pool and his lineage's boss pool (HJ §3, ruled by the designer; it granted one lineage's shelf
+  and boss pool from AU §5 until the draft pools merged; the NAME is HJ's proposal, the
+  designer's to confirm)**; also armable headlessly via `DOD_SIM_GRANT_ALL=1` | Free Travel check =
   `Run.debug_free_travel` | Test-a-Node submenu: Shop / ??? Event / Fight / Elite / Mini-boss
   (in place, `Run.debug_summon` books nothing).
 · BATTLE `DEBUG ▾` menu (battle.gd, dev builds, not sim/autoplay): Full Restore | Kill All
@@ -2551,6 +2563,14 @@ SECOND READING STANDS: the hero owns its core kit in EVERY run, so modifying it 
 >
 > *Since FX, read* the spec *as every class that can buy the node (the note at the head of this
 > block, GE §2).*
+
+**A GUARANTEE IS WHAT EVERY HERO OF THE CLASS HOLDS WHATEVER ENGINE HE HOLDS OR DROPS — HIS CLASS BASIC
+AND HIS CLASS KIT, LESS THE PET A DISMISSER LOSES (HJ, which re-keyed `check_do`'s table by class).** A
+protected core is drafted since GS §1, an engine is a rune a hero can drop to nothing (GK), and the twelve
+trees' nodes are deleted (FX), so none of the three is a guarantee, and the lineage-keyed table credited all
+three. **A status a node of the one tree reads must be laid by every class's kit, or it is a bet for the
+classes whose kits do not lay it**; `check_do` §4 asserts every row names a card every hero of the class
+holds, and `check_gn` §1–§2 cast every kit card and assert what it lays.
 
 **A RULING CAN CREATE A DEFECT WITHOUT ANYONE MAKING A MISTAKE.** Moving the only two appliers of a
 status into the draft turned four tree-internal dependencies — which the charter explicitly permits
@@ -4064,9 +4084,12 @@ today; a property is the thing worth pinning.
   Hunter whose engine dismisses it. `_do_summon`'s other callers are Call the Wilds and a quit fight's returning
   companion. **Exclusive to a class, then, and not to an engine** — which is HA's summoning question, answered by
   the designer's ruling.
-· **REVIVAL — THE HOLY CLERIC, AMONG ABILITIES.** True with a qualifier the gate prints rather
-  than hides: `BattleUnit.revive()` has **two** callers, `resurrection` (hers) and the **REVIVE
-  POTION**, and the `revive_pct` map event is a third channel. **Exclusive as an ability; not
+· **REVIVAL — THE CLERIC CLASS, AND WITHIN IT THE MERCY HOLDER, AMONG ABILITIES (re-pointed at HJ; it
+  read *the Holy Cleric* while a hero was a lineage).** Resurrection is drafted off the Holy's shelf of the
+  one Cleric pool and offered only to a hero holding Mercy (its `ENGINE_READ` row); no other class is
+  handed a card carrying the special, by any pool, kit or basic (`check_dr` §2). True with a qualifier
+  the gate prints rather than hides: `BattleUnit.revive()` has **two** callers, `resurrection` and the
+  **REVIVE POTION**, and the `revive_pct` map event is a third channel. **Exclusive as an ability; not
   exclusive as a channel.**
 · **COOLDOWN MANIPULATION IS *NOT* THE SWORDMASTER'S, AND THE CLAIM THAT IT WAS IS THE USEFUL
   RECORD.** `_tick_cooldowns` has **SEVEN** callers: Answering Steel and Battle Poise (his),

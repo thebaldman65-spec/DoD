@@ -257,6 +257,31 @@ static func flags_are_inert(scene: Node) -> bool:
 	return bool(scene.call("_nobody_can_press"))
 
 
+# ── BATCH HJ — THE ENGINE SETS A HERO OF A CLASS CAN HOLD, WRITTEN ONCE ─────
+# A hero holds up to `Run.ENGINE_SLOTS` of his class's engine runes slotted,
+# and can drop and swap them, to nothing (the charter, GK). So a question about
+# what a hero of a class is OFFERED — the award floor in `check_ea` §1, the
+# class tier's depth in `check_eh` §2 — is asked of every set he can hold:
+# none, and every combination of up to `most` of `engs`, each set once, in the
+# order `engs` lists them. It returns ENGINE IDS, never abilities, so it is no
+# corpus walk (`check_da` §3b). One copy, for DA/DB's reason: two gates each
+# enumerating the sets would be two enumerations that can disagree.
+static func engine_sets(engs: Array, most: int) -> Array:
+	var out: Array = [[]]
+	var frontier: Array = [[]]
+	for _k in most:
+		var nxt: Array = []
+		for s in frontier:
+			var start := 0
+			if not (s as Array).is_empty():
+				start = engs.find((s as Array).back()) + 1
+			for i in range(start, engs.size()):
+				nxt.append((s as Array) + [engs[i]])
+		out.append_array(nxt)
+		frontier = nxt
+	return out
+
+
 # ── BATCH HI §3 — WHERE EVERY ABILITY NAME IS DEFINED, READ OFF THE SOURCE ───
 # `pool_ability`'s own comment says *"no name lives in two of these"* and nothing
 # asserted it: a second definition of a card resolves to whichever resolver the

@@ -291,7 +291,7 @@ func _draw_header() -> void:
 		bpop.add_item("Jump to Boss Slot", 13)
 		bpop.add_item("Advance to Next Zone", 14)
 		bpop.add_item("Reroll Specs", 15)
-		bpop.add_check_item("All Spec Abilities Unlocked", 16)
+		bpop.add_check_item("All Class Abilities Unlocked", 16)
 		bpop.set_item_checked(bpop.get_item_index(16), Run.debug_grant_all)
 		bpop.add_check_item("Free Travel", 20)
 		bpop.set_item_checked(bpop.get_item_index(20), Run.debug_free_travel)
@@ -2798,10 +2798,11 @@ func _on_burger(id: int) -> void:
 		16:
 			Run.debug_grant_all = not Run.debug_grant_all
 			_draw_screen()
-			# Batch AU §5: it grants each hero their OWN spec's kit only —
-			# the toast says so, or a tester waits for a sibling's ability
+			# BATCH HJ §3: it grants each hero his CLASS's one draft pool and
+			# his lineage's boss pool (it was his lineage's alone from AU §5) —
+			# the toast says so, or a tester waits for a sibling's boss card
 			# that is deliberately never coming.
-			_toast("DEBUG: each hero's OWN spec abilities %s" % (
+			_toast("DEBUG: each hero's class pool and boss cards %s" % (
 				"UNLOCKED for every battle" if Run.debug_grant_all else "gated again"))
 		20:
 			Run.debug_free_travel = not Run.debug_free_travel

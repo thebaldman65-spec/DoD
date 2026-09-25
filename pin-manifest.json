@@ -947,7 +947,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_do.gd#215"
+   "g": "check_do.gd#248"
   },
   {
    "s": "check_do.gd",
@@ -958,7 +958,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_do.gd#280"
+   "g": "check_do.gd#313"
   },
   {
    "s": "check_do.gd",
@@ -969,7 +969,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_do.gd#272"
+   "g": "check_do.gd#305"
   },
   {
    "s": "check_do.gd",
@@ -980,7 +980,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_do.gd#273"
+   "g": "check_do.gd#306"
   },
   {
    "s": "check_dp.gd",
@@ -1103,7 +1103,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_dr.gd#102"
+   "g": "check_dr.gd#117"
   },
   {
    "s": "check_dr.gd",
@@ -1114,7 +1114,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dr.gd#184"
+   "g": "check_dr.gd#199"
   },
   {
    "s": "check_dr.gd",
@@ -1125,7 +1125,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dr.gd#183"
+   "g": "check_dr.gd#198"
   },
   {
    "s": "check_dr.gd",
@@ -1136,7 +1136,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dr.gd#182"
+   "g": "check_dr.gd#197"
   },
   {
    "s": "check_dr.gd",
@@ -1147,7 +1147,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dr.gd#181"
+   "g": "check_dr.gd#196"
   },
   {
    "s": "check_ds.gd",
@@ -1634,7 +1634,7 @@
    "r": "runtime",
    "k": "format",
    "how": "derived",
-   "g": "check_eh.gd#162"
+   "g": "check_eh.gd#175"
   },
   {
    "s": "check_eh.gd",
@@ -1645,7 +1645,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_eh.gd#129"
+   "g": "check_eh.gd#142"
   },
   {
    "s": "check_eh.gd",
@@ -1656,7 +1656,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "derived",
-   "g": "check_eh.gd#168"
+   "g": "check_eh.gd#181"
   },
   {
    "s": "check_eh.gd",
@@ -1667,7 +1667,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_eh.gd#169"
+   "g": "check_eh.gd#182"
   },
   {
    "s": "check_eh.gd",
@@ -1678,7 +1678,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_eh.gd#172"
+   "g": "check_eh.gd#185"
   },
   {
    "s": "check_eh.gd",
@@ -1689,7 +1689,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "derived",
-   "g": "check_eh.gd#133"
+   "g": "check_eh.gd#146"
   },
   {
    "s": "check_eh.gd",
@@ -1700,7 +1700,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_eh.gd#157"
+   "g": "check_eh.gd#170"
   },
   {
    "s": "check_eh.gd",
@@ -1711,7 +1711,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_eh.gd#165"
+   "g": "check_eh.gd#178"
   },
   {
    "s": "check_eh.gd",
@@ -1722,7 +1722,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_eh.gd#131"
+   "g": "check_eh.gd#144"
   },
   {
    "s": "check_eh.gd",
@@ -1733,7 +1733,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_eh.gd#126"
+   "g": "check_eh.gd#139"
   },
   {
    "s": "check_eh.gd",
@@ -1744,7 +1744,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_eh.gd#170"
+   "g": "check_eh.gd#183"
   },
   {
    "s": "check_eh.gd",
@@ -1755,7 +1755,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "derived",
-   "g": "check_eh.gd#130"
+   "g": "check_eh.gd#143"
   },
   {
    "s": "check_eh.gd",
@@ -1766,7 +1766,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_eh.gd#141"
+   "g": "check_eh.gd#154"
   },
   {
    "s": "check_ek.gd",
@@ -3628,7 +3628,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ah.gd#253"
+   "g": "test_batch_ah.gd#297"
   },
   {
    "s": "test_batch_ah.gd",
@@ -3639,7 +3639,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ah.gd#252"
+   "g": "test_batch_ah.gd#296"
   },
   {
    "s": "test_batch_ah.gd",
@@ -3650,7 +3650,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_ah.gd#59"
+   "g": "test_batch_ah.gd#65"
   },
   {
    "s": "test_batch_ar.gd",
@@ -16670,7 +16670,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_run_harness.gd#174"
+   "g": "test_run_harness.gd#179"
   },
   {
    "s": "test_run_harness.gd",
@@ -16681,7 +16681,7 @@
    "r": "comment",
    "k": "literal",
    "how": "derived",
-   "g": "test_run_harness.gd#176"
+   "g": "test_run_harness.gd#181"
   },
   {
    "s": "test_run_harness.gd",
@@ -16692,7 +16692,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_run_harness.gd#206"
+   "g": "test_run_harness.gd#211"
   },
   {
    "s": "test_run_harness.gd",
@@ -16703,7 +16703,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_run_harness.gd#180"
+   "g": "test_run_harness.gd#185"
   },
   {
    "s": "test_run_harness.gd",
@@ -16714,7 +16714,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "derived",
-   "g": "test_run_harness.gd#179"
+   "g": "test_run_harness.gd#184"
   },
   {
    "s": "test_run_harness.gd",
@@ -16725,7 +16725,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "test_run_harness.gd#205"
+   "g": "test_run_harness.gd#210"
   },
   {
    "s": "test_run_harness.gd",
@@ -16736,7 +16736,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_run_harness.gd#173"
+   "g": "test_run_harness.gd#178"
   },
   {
    "s": "test_run_harness.gd",
@@ -16747,7 +16747,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_run_harness.gd#207"
+   "g": "test_run_harness.gd#212"
   },
   {
    "s": "test_run_harness.gd",
@@ -16758,7 +16758,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_run_harness.gd#208"
+   "g": "test_run_harness.gd#213"
   },
   {
    "s": "test_run_harness.gd",
@@ -16769,7 +16769,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_run_harness.gd#208"
+   "g": "test_run_harness.gd#213"
   },
   {
    "s": "test_runes.gd",

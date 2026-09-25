@@ -4,6 +4,41 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The last twenty-three (Batch HJ) — 2026-09-25
+
+**Why the award floor is measured per class and per set of engines, not per lineage.** A zone boss that has nothing
+left in its own pool pays out of the hero's class pool, and the engine gate keeps the cards that need an engine he does
+not hold out of that offer. So how deep the payout can go depends on his class and on which engines he has slotted,
+not on which lineage he took — he can drop and swap engines, and a lineage outlives the engine it was chosen with. The
+old measurement read one lineage's shelf and assumed no engine gate, which counted cards the hero could never be offered
+and skipped the other shelves he draws from. Measuring every class with every combination of engines he can slot (none,
+one, or two of his six — eighty-eight cases) is the smallest population that is the real one.
+
+**Why a "guaranteed" status is only what the class basic and kit lay.** The talent checks ask whether a talent reads a
+status the hero might not be able to apply. Since the merge, every hero of a class wears the same talents, keeps his
+class basic and kit whatever he picks, and can drop any engine to nothing. So a card he drafted, an engine he could
+drop, or a talent node that has been deleted is not a guarantee — only the basic and the kit are. The old table was
+kept per lineage and credited all three; the new one is kept per class and a check makes sure every card it names is
+one every hero of the class holds.
+
+**Why some repaired checks had to be proved in both directions.** A repair that moves a check from one shelf onto the
+whole class pool looks at more cards (stricter), and at the same time now accepts a card in the pool as long as the
+gate keeps it from the wrong hero (looser). A single injected defect can only show one of those halves, so each got
+its own: one where only the repaired check goes red, and one where only the old check goes red.
+
+**Why the debug toggle grants the class pool and keeps the boss cards.** It exists so a tester can try a hero's cards
+without earning them. When a hero was a lineage, "his cards" were the lineage's; now they are his class's whole draft
+pool, which every hero of the class drafts from. The zone-boss pools were not merged, so the boss cards a hero can earn
+are still his lineage's, and the toggle keeps granting those; a sibling's boss card his class cannot draft stays out.
+It does not ask the engine gate, because a tester is better served by seeing a card on the bar and refused than by not
+seeing it at all.
+
+**Why a check that something is absent carries a check that it looked.** A check that a card is in no pool, or that no
+hero falls short, passes when it looked at nothing — an empty pool, no seats, a comment where the code was — and it
+prints exactly like one that looked and found nothing. So each is paired with a check that fails when what it looked
+at is not the real thing. A check of the form *every card that costs Mercy carries its row* is the same shape: it
+passes when no card costs Mercy, so it is paired with one that the walk met such a card.
+
 ## Half the re-points, and a check nobody ever wrote (Batch HI) — 2026-09-24
 
 **Why this batch did half the list.** Fifty checks were left asking the merged game a question in the old vocabulary.

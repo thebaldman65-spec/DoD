@@ -339,9 +339,11 @@ var pending_item_offers: Array = []  # item ids awaiting a swap-or-decline
 # list, so the sheet is always entered for a specific hero). Session-scoped
 # — a resumed run opens the map, never a sheet.
 var hero_screen_idx := 0
-# Debug (map burger): pre-grant every talent/trophy ability at battle
-# spawn. Session-scoped, never saved; DOD_SIM_GRANT_ALL=1 arms it for
-# headless full-kit runs. Default OFF so tests measure gated kits.
+# Debug (map burger, "All Class Abilities Unlocked"): pre-grant, at battle
+# spawn, every card of the hero's class pool and of his lineage's boss pool
+# (BATCH HJ §3 — it was one lineage's shelf and boss pool until the draft
+# pools merged). Session-scoped, never saved; DOD_SIM_GRANT_ALL=1 arms it
+# for headless full-kit runs. Default OFF so tests measure gated kits.
 var debug_grant_all := false
 
 # THE HONESTY FLAG (Batch AC). Batch Z built the run summary so a tester

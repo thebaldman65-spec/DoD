@@ -36,31 +36,54 @@ func _initialize() -> void:
 
 func _test_kits() -> void:
 	print("\n§1 starting kits")
+	# **BATCH HJ — RE-POINTED: THE COUNT IS WHAT A LINEAGE DEFINES, AND THE
+	# COMPANION CALLS ARE THE PET CARD'S.** AH's arm read `spec_abilities` and
+	# called the count what a spec OPENS with. GS §1 made that table the
+	# lineage's DEFINITION table — a lineage opens with its engine's enablers
+	# alone, and every other card it defines is drafted off its shelf — so its
+	# subject is not gone, only the words: HG's control c1 wrote War Stomp back
+	# into the Warden's definitions and this arm is the only one asking the
+	# count of all twelve (`test_batch_al` asks it of the Warden). **And the
+	# fold AH wrote for the summons was an OPENING rule** ("the Summon
+	# Companion picker is ONE slot however many beasts it offers"): since HB
+	# the calls are the Hunter's class-kit pet card's (`Classes.PET_CARD`),
+	# defined in the Beastmaster's table because `companion_call` reads them
+	# there. They still count as one entry — one card's calls — and what they
+	# must be is asked, not assumed: exactly the calls a card or a rune can
+	# make (`COMPANION_KINDS` and `RUNE_COMPANION_KINDS`). A summon defined
+	# there that no card calls is a definition nothing reaches, and the old
+	# fold counted it into the same one slot and said nothing.
+	var callable: Array = []
+	for kind in Classes.COMPANION_KINDS + Classes.RUNE_COMPANION_KINDS:
+		var call: Ability = Classes.companion_call(String(kind))
+		callable.append(call.display_name if call != null else "<no call for %s>" % kind)
+	callable.sort()
 	for class_key in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[class_key]:
 			var kit: Array = Classes.spec_abilities(spec)
-			# The Summon Companion picker is ONE slot however many beasts
-			# it offers — that is the batch's own counting rule, and the
-			# action bar has always grouped them that way.
-			var summons := 0
+			var calls: Array = []
 			var slots := 0
 			for ab in kit:
 				if ab.special in ["summon", "call_wild"]:
-					summons += 1
+					calls.append(ab.display_name)
 				else:
 					slots += 1
-			if summons > 0:
+			if not calls.is_empty():
 				slots += 1
+			calls.sort()
 			# RE-POINTED IN PLACE BY BATCH AV, WITH THE REASON HERE RATHER THAN
-			# IN A CHANGELOG NOBODY READS AT 3AM: the Holy Cleric opens with
-			# FOUR, because Resurrection moved out of her tree and into her kit.
-			# That is a DELIBERATE parity break, not an oversight — she attacks
-			# at 50, so her abilities are not part of her contribution, they are
-			# all of it. Every other spec is still held to three, and the
-			# exception is NAMED so a second one cannot creep in beside it.
+			# IN A CHANGELOG NOBODY READS AT 3AM: the Holy Cleric's table holds
+			# FOUR, because Resurrection moved out of her tree and into it. That
+			# is a DELIBERATE parity break, not an oversight — she attacks at 50,
+			# so her abilities are not part of her contribution, they are all of
+			# it. **Since GS §1 all four are drafted off her shelf and she opens
+			# on the kit's three like every hero; the four are still defined
+			# HERE, and the exception is still NAMED** so a second one cannot
+			# creep in beside it.
 			var want: int = 4 if spec == "holy" else 3
-			ok(slots == want, "%s opens with %d spec abilities (got %d)" % [
-				spec, want, slots])
+			ok(slots == want and (calls.is_empty() or calls == callable),
+				"%s DEFINES %d cards of its own, the pet card's calls as one (got %d; calls %s against the %s a card or rune can make)" % [
+					spec, want, slots, str(calls), str(callable)])
 	# The core attack is still there and still separate from the three.
 	for class_key in ["warrior", "mage", "cleric", "hunter"]:
 		ok(Classes.kit(class_key).size() == 1,
@@ -152,19 +175,105 @@ func _test_pools() -> void:
 			if ab == null:
 				continue
 			ok(ab.display_name == name, "%s resolves to its own name" % name)
-			# THE CURATION RULE, asserted rather than trusted: nothing offered
-			# class-wide may cost a spec-exclusive secondary resource.
-			ok(ab.faith_cost == 0,
-				"%s costs no Mercy/Faith (class draft %s)" % [name, class_key])
-			# ...nor be one of the named signature identity pieces.
-			ok(ab.special != "summon" and ab.special != "call_wild"
-				and ab.special != "kill_command",
-				"%s is not a Beastmaster signature (class pool)" % name)
-			ok(name != "Hex of Ruin", "Hex of Ruin stays Occultist-only")
-			# ...nor be gated on a resource only its own spec generates.
-			ok(not ab.special in ["stabilize", "overcharge", "wildfire", "bestial",
-				"spirit_bond", "primal_surge"],
-				"%s is not gated on a spec passive (class pool)" % name)
+	# **THE CURATION RULE — RE-POINTED BY BATCH HJ ONTO THE CLASS'S ONE POOL AND
+	# THE GATE TABLES.** AH wrote four arms for the cards offered CLASS-WIDE: none
+	# may cost a spec-exclusive resource, be a Beastmaster signature, be Hex of
+	# Ruin, or be gated on a resource only its own spec makes — because a card
+	# every spec of the class could be offered had to work for all of them. **GP
+	# made every card of a class a card of its ONE pool** (`Classes.draft_pool`),
+	# offered to every hero of the class, so the class-wide shelf is only where a
+	# card was authored, and the arms walk the whole pool now. **And the pool
+	# holds cards that DO need one engine's resource — the offer door is what
+	# keeps them from a hero who lacks it** (`Classes.offerable`: `ENGINE_READ`
+	# for an engine, `COMPANION_READ` for a pet), so what each arm asks is that
+	# such a card is withheld by the gate that should withhold it. HG's control
+	# c5 put Stabilize on the Mage class-wide shelf and `check_gp` read nothing:
+	# the gate withholds it whatever shelf it sits on, so this is the arm that
+	# asks whether the gate has the row.
+	#
+	# AH's list of specials "gated on a spec passive", each with the gate that
+	# withholds it now. **Wildfire reads Burn on the board, which the Mage pool's
+	# own fire cards lay** — GP's cast test put it among the cards conditional on
+	# a CARD, not on an engine — so no gate withholds it, and it is named rather
+	# than dropped. The pet cards are every Hunter's but a dismisser's since HB.
+	var gated_on := {"stabilize": "resonance", "overcharge": "resonance",
+		"primal_surge": "pack", "bestial": "a companion", "spirit_bond": "a companion",
+		"wildfire": ""}
+	# **BATCH HJ — AND THE WALK IS PAIRED WITH WHAT MAKES IT ONE.** Two of the
+	# four arms below assert an ABSENCE (no pet call, no Hex of Ruin) and two an
+	# implication (a Mercy card carries its row, a gated card its gate). Over an
+	# empty pool, or one whose names resolve to no card, all four pass having
+	# asked nothing. So the walk counts what it met, and the three arms after it
+	# assert it: every class's pool was walked whole, each implication met its
+	# subject, and the card said to be in no pool is a real card.
+	var walked := {}
+	var unresolved: Array = []
+	var met := {"Mercy card": 0, "companion's order": 0, "engine- or pet-gated card": 0}
+	for class_key2 in Classes.SPEC_IDS:
+		walked[class_key2] = 0
+		for name2 in Classes.draft_pool(String(class_key2)):
+			var ab2: Ability = Classes.pool_ability(String(name2))
+			if ab2 == null:
+				unresolved.append("%s (%s)" % [name2, class_key2])
+				continue
+			walked[class_key2] = int(walked[class_key2]) + 1
+			if ab2.faith_cost > 0:
+				met["Mercy card"] = int(met["Mercy card"]) + 1
+			if ab2.special == "kill_command":
+				met["companion's order"] = int(met["companion's order"]) + 1
+			if String(gated_on.get(ab2.special, "")) != "":
+				met["engine- or pet-gated card"] = int(met["engine- or pet-gated card"]) + 1
+			# A card that costs Mercy is offered only to the engine that installs
+			# the meter: its `ENGINE_READ` row names Mercy.
+			ok(ab2.faith_cost == 0 or Classes.engine_read(String(name2)) == "mercy",
+				"%s costs %d Mercy and its offer row names '%s', not Mercy (the %s pool)" % [
+					name2, ab2.faith_cost, Classes.engine_read(String(name2)), class_key2])
+			# ...no pool card is a companion's own call — the pet card is every
+			# Hunter's kit card since HB — and a companion's order is withheld from
+			# a hero who has dismissed the pet.
+			ok(ab2.special != "summon" and ab2.special != "call_wild"
+				and (ab2.special != "kill_command" or Classes.reads_companion(String(name2))),
+				"%s is a companion's signature a hero with no pet could be offered (the %s pool)" % [
+					name2, class_key2])
+			# ...Hex of Ruin is Wrath of the Old Gods' enabler: it travels with the
+			# engine and is in no pool.
+			ok(name2 != "Hex of Ruin",
+				"Hex of Ruin is in the %s pool — it travels with its engine and is drafted by nobody" % class_key2)
+			# ...and a card that reads an engine's resource carries the row that
+			# withholds it from a hero without that engine.
+			var needs := String(gated_on.get(ab2.special, ""))
+			var row_ok := true
+			if needs == "a companion":
+				row_ok = Classes.reads_companion(String(name2))
+			elif needs != "":
+				row_ok = Classes.engine_read(String(name2)) == needs \
+					and Classes.offerable([name2], []).is_empty() \
+					and Classes.offerable([name2], [needs]) == [name2]
+			ok(row_ok,
+				"%s reads %s and the gate does not withhold it (row '%s'; the %s pool)" % [
+					name2, needs, Classes.engine_read(String(name2)), class_key2])
+	# ...and the window is the pool: every class's, every card of it a card.
+	var thin: Array = []
+	for ck5 in walked:
+		if int(walked[ck5]) == 0:
+			thin.append(ck5)
+	ok(thin.is_empty() and unresolved.is_empty(),
+		"the class-pool walk above read an empty pool for %s and skipped %s, which resolve to no card — its four arms asked a window that is not the pool" % [
+			thin, unresolved])
+	# ...each implication met its subject (Divine Plea, Hymn of Hope and
+	# Resurrection; Kill Command; Overcharge, on the day HJ wrote this)...
+	var unmet: Array = []
+	for what in met:
+		if int(met[what]) == 0:
+			unmet.append(what)
+	ok(unmet.is_empty(),
+		"the class-pool walk met no %s, so the arm conditional on it above asked nothing (met: %s)" % [
+			", ".join(PackedStringArray(unmet)), met])
+	# ...and the card the third arm keeps out of every pool is a real card that
+	# travels with its engine.
+	ok(Classes.pool_ability("Hex of Ruin") != null
+		and Classes.engine_enablers(Classes.engine_of_spec("occultist")).has("Hex of Ruin"),
+		"Hex of Ruin is no longer Wrath of the Old Gods' enabler, so the arm above keeping it out of every pool asserts the absence of nothing")
 	# class_of_spec is the join between the two pools.
 	for class_key in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[class_key]:
@@ -316,14 +425,31 @@ func _test_offers(RunState) -> void:
 	ok(int(mm.get("bm_picks_owed", 0)) == 1,
 		"...and owes exactly one pick, which is what puts the hero on the victory card")
 	# THE REFUSAL ARM, ON THE ONE CONDITION THAT STILL REACHES IT. Both rolls
-	# return `[]` with no spec set, so this is the arm that proves the award
+	# return `[]` for this member, so this is the arm that proves the award
 	# still HAS a false path — without it the assertion above could pass on an
 	# award that can never refuse anything.
+	# **BATCH HJ — RE-POINTED: THE CONDITION IS "HAS NOT CHOSEN", AND THE HERO WHO
+	# HAS CHOSEN WITH NO SPEC IS SEATED BESIDE HIM.** The arm read *"refuses when
+	# the member has no spec"* — true of an un-awakened member, and false since GK
+	# of a hero who took a spine or a rule engine at class selection: he has no
+	# lineage, he HAS chosen (`awakened`), and the fallback pays him out of his
+	# class pool (GK's "has chosen is `awakened`"; GP renamed the fallback for
+	# exactly him). A refusal keyed on the empty spec alone would pay every
+	# spine-taker nothing and this arm, as written, would stay green. So each of
+	# the two checks asks both halves: the un-awakened member is refused and owes
+	# nothing; the spine-taker is paid and owes one.
 	var nospec := {"key": "warrior", "spec": "", "tree": [], "talents": {},
 		"bm_abilities": []}
-	ok(not run.award_ability_pick(nospec),
-		"award_ability_pick still refuses when the member has no spec")
-	ok(int(nospec.get("bm_picks_owed", 0)) == 0, "...and owes no pick")
+	var spine := {"key": "warrior", "spec": "", "tree": [], "talents": {},
+		"bm_abilities": [], "awakened": true}
+	var refused: bool = not run.award_ability_pick(nospec)
+	var paid: bool = run.award_ability_pick(spine)
+	ok(refused and paid,
+		"award_ability_pick refuses a member who has not chosen (%s) and pays a spine-taker who has, with no spec (%s)" % [
+			refused, paid])
+	ok(int(nospec.get("bm_picks_owed", 0)) == 0 and int(spine.get("bm_picks_owed", 0)) == 1,
+		"...and owes the un-awakened nothing (%d) and the spine-taker one pick (%d)" % [
+			int(nospec.get("bm_picks_owed", 0)), int(spine.get("bm_picks_owed", 0))])
 	run.free()
 
 

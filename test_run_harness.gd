@@ -407,6 +407,17 @@ func _gate_talent_conservation() -> void:
 	# Warrior's purse stays at 2 while the three classes that played go to 3.
 	var held := String(run.party[0]["spec"])
 	run.party[0]["spec"] = ""
+	# **BATCH HJ — AND THE HERO WHO HAS CHOSEN WITH NO SPEC SITS BESIDE HIM FOR THE
+	# SAME BANK.** Blanking a spec was how this gate made a hero un-awakened, and
+	# since GK that is half the story: a hero who took a spine or a rule engine at
+	# class selection has no spec and HAS chosen (`awakened`, GK's "has chosen is
+	# `awakened`"), and the bank pays his class. The seat the arm below needed was
+	# never seated, so a bank keyed on the spec alone — which pays every
+	# spine-taker nothing — read green here. SPECS[1]'s hero takes that seat for
+	# this one bank: spec blanked, `awakened` set, restored after.
+	var held1 := String(run.party[1]["spec"])
+	run.party[1]["spec"] = ""
+	run.party[1]["awakened"] = true
 	# **BATCH HD §2 — REPAIRED: THE ARM READ A KEY NOTHING EVER WRITES.** It asked
 	# the purse keyed `""` for 0 — and `award_zone_boss_points` skips an empty key,
 	# so no bank could ever put a point there and the check could not fail. What
@@ -429,9 +440,16 @@ func _gate_talent_conservation() -> void:
 		moved, played)
 	_check("the awakened three still banked",
 		Profile.talent_points_earned(Classes.class_of_spec(SPECS[1])), 3)
-	_check("the un-awakened one did not",
-		Profile.talent_points_earned(Classes.class_of_spec(held)), 2)
+	# **BATCH HJ — RE-POINTED: THE UN-AWAKENED ONE, AND THE SPINE-TAKER BESIDE HIM.**
+	# One check, both halves, as the FX arm above asks Holy's: the un-awakened
+	# hero's class stays at 2, and the class of the hero who chose a spine — no
+	# spec, awakened — went to 3.
+	_check("the un-awakened one did not, and the spine-taker beside him did",
+		[Profile.talent_points_earned(Classes.class_of_spec(held)),
+			Profile.talent_points_earned(Classes.class_of_spec(held1))], [2, 3])
 	run.party[0]["spec"] = held
+	run.party[1]["spec"] = held1
+	run.party[1].erase("awakened")
 	run.sim_run = true
 	# THE END BOSS AWARDS NONE, and that is a rule about what `_resolve_boss`
 	# does NOT call — so it is asserted against the source, which is the only

@@ -1195,10 +1195,10 @@ func _spawn_units() -> void:
 			spec = Run.party[i].get("spec", "")
 		elif autoplay:
 			spec = sim_specs[i]
-		# TESTING AID (Batch 31, user-requested): pre-grant every ability that
-		# would normally be unlocked by talents or boss trophies, so the
-		# reworked trees can be reviewed without spending points. Flip this
-		# const to false to restore gated unlocks.
+		# (The TESTING AID Batch 31 asked for — pre-grant what a hero would have
+		# to earn — is `Run.debug_grant_all`, read below where the earned cards
+		# go on. It was a const flipped by hand until the map burger took it;
+		# BATCH HJ §3 made its scope the hero's class pool.)
 		#
 		# BATCH GK — THE ENGINES THIS HERO HOLDS, which is what `passive_id` was
 		# stamped from the spec to say. A run hero holds what his two engine
@@ -1301,41 +1301,48 @@ func _spawn_units() -> void:
 					if bm_pending != null and not cfg["abilities"].any(
 							func(a): return a.display_name == bm_pending.display_name):
 						cfg["abilities"] = cfg["abilities"] + [bm_pending]
-		# Review aid: pre-grant unlockable abilities when the map-burger
-		# DEBUG toggle is armed. Dedupe keys on display_name, so
-		# talent-learned copies never double up.
+		# Review aid: pre-grant every card this hero could earn when the
+		# map-burger DEBUG toggle ("All Class Abilities Unlocked") is armed.
+		# Dedupe keys on display_name, so an earned copy never doubles up.
 		#
-		# BATCH AU §5 — SCOPED TO THE HERO'S OWN SPEC. It used to pre-grant
-		# every talent-granted and boss-trophy ability the CLASS could reach,
-		# which meant testing the Arcanist put Pyromancer abilities in his
-		# hands. Now: this spec's tree grants, this spec's capstones, and
-		# `SPEC_POOLS[spec]`. Nothing from another spec.
-		# THE CLASS-WIDE BOSS POOL WAS EXCLUDED, AND THAT WAS THE TRADE-OFF:
-		# the sibling abilities showing up WERE that pool's contents, so
-		# excluding it is what fixed the complaint. **THAT DICT (`CLASS_POOLS`)
-		# IS DELETED AS OF BATCH DY §3 and this exclusion is structural now
-		# rather than a choice** — there is no class-wide BOSS pool to include.
-		# The class-wide DRAFT pool is a different structure and is likewise
-		# not pre-granted here. The node summoner and a real reward still reach
-		# every one of them. DO NOT BUILD A SECOND TOGGLE.
-		if Run.debug_grant_all and spec != "":
-			for tn in Talents.generate_tree(spec, hero_keys[i]):
-				var tn_pay: Dictionary = tn.get("payload", {})
-				var tn_grant: Ability = null
-				if tn_pay.has("new_ability"):
-					tn_grant = Ability.make(tn_pay["new_ability"])
-				elif tn_pay.has("grant_ability"):
-					tn_grant = Classes.pending_talent_ability(tn_pay["grant_ability"])
-				if tn_grant != null \
-						and not cfg["abilities"].any(func(a): return a.display_name == tn_grant.display_name):
-					cfg["abilities"] = cfg["abilities"] + [tn_grant]
-			# BATCH BO: the DRAFT pool joins the toggle, for the reason the
-			# toggle exists at all — "All Spec Abilities Unlocked" that skipped
-			# eighteen of them would be a testing aid that lies. Scope is
-			# unchanged (this spec only); the class-wide draft pool is excluded
-			# for exactly AU §5's reason, and is empty today besides.
+		# **BATCH HJ §3 — THE CLASS POOL, RULED BY THE DESIGNER.** From AU §5
+		# to HJ this granted ONE LINEAGE — its boss pool and its draft shelf —
+		# because a hero then WAS a lineage, and handing an Arcanist the
+		# Pyromancer's cards was a sibling's kit in his hands. **GP made a
+		# class's shelves one pool**: every Mage drafts the Pyromancer's shelf,
+		# so the lineage scope granted less than a hero can hold, and every
+		# class-wide shelf holds cards besides. The grant is his CLASS's one
+		# draft pool now (`Classes.draft_pool`), whatever lineage he took — a
+		# hero who took a spine draws that pool too, so he is granted it — plus
+		# his lineage's BOSS pool, which the merge did not merge (GP): a
+		# spine-taker has none. **What stays out is a card only a sibling can
+		# reach**: a sibling's boss card his class pool does not hold. The
+		# engine and pet gates are the OFFER's (`Classes.offerable`) and are not
+		# asked here — a card the usability door refuses without its engine is
+		# granted and refused on its button, which is what the game does with
+		# it. The node summoner and a real reward still reach every card.
+		# DO NOT BUILD A SECOND TOGGLE.
+		if Run.debug_grant_all:
+			# The one tree grants nothing since FX (a talent may not grant an
+			# ability); the walk is kept for the day a node does, on a lineage's
+			# tree as it always was.
+			if spec != "":
+				for tn in Talents.generate_tree(spec, hero_keys[i]):
+					var tn_pay: Dictionary = tn.get("payload", {})
+					var tn_grant: Ability = null
+					if tn_pay.has("new_ability"):
+						tn_grant = Ability.make(tn_pay["new_ability"])
+					elif tn_pay.has("grant_ability"):
+						tn_grant = Classes.pending_talent_ability(tn_pay["grant_ability"])
+					if tn_grant != null \
+							and not cfg["abilities"].any(func(a): return a.display_name == tn_grant.display_name):
+						cfg["abilities"] = cfg["abilities"] + [tn_grant]
+			# BATCH BO put the DRAFT pool in the toggle, for the reason the
+			# toggle exists at all — an "all unlocked" that skipped cards would
+			# be a testing aid that lies — and HJ widened it to the pool the
+			# draft reads.
 			var granted_pool: Array = Classes.spec_pool(spec) \
-				+ Classes.spec_draft_pool(spec)
+				+ Classes.draft_pool(String(hero_keys[i]))
 			for pool_name in granted_pool:
 				var pool_ab := Classes.spec_pool_ability(spec, pool_name)
 				if pool_ab != null \

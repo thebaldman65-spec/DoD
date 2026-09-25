@@ -70,36 +70,40 @@ const MOVED := {
 const CUT_TERMS := ["sunder_guard_bd", "rallying_stomp_ranks",
 	"bulwark_line_ranks"]
 
-# Statuses each spec can reach without a draw, for §4's sweep. Hand-authored
-# and NOT derived, for DN's reason: the declarative `applies_status` map covers
-# only cards that declare one, and most of these are applied from inside a
-# `battle.gd` handler or by the passive itself, where no table can see them.
-# Every entry names the guaranteed source it comes from.
+# Statuses each CLASS can reach without a draw, for §4's sweep and `check_dp` §1.
+# Hand-authored and NOT derived, for DN's reason: the declarative
+# `applies_status` map covers only cards that declare one, and most of these are
+# applied from inside a `battle.gd` handler, where no table can see them. Every
+# entry names the guaranteed source it comes from.
+#
+# **BATCH HJ — RE-KEYED BY CLASS, AND THE POPULATION OF SOURCES IS WHAT MOVED.**
+# It was keyed by the twelve LINEAGES, and each row credited what that lineage
+# held at DN: its PROTECTED CORE (its opening kit then — GS §1 moved every card
+# but the enablers onto the shelves, so Fireball, Renewal, Shadowrend and the rest
+# are drafted cards now), its PASSIVE (an engine rune since GK, which a hero can
+# drop to nothing) and nodes of its TREE (FX deleted all twelve trees, and with
+# them `bz_hemorrhage`, `wd_ricochet`, `dv_judgement` and `oc_emp_hex`). **None of
+# those is a guarantee under the merge**, and a table that still credited them
+# weighed every node against sources no hero is sure to hold — the check_eb
+# shape, a population that silently misses the case it exists for. **A node is
+# worn by every hero of every class that buys the one tree (FX), so the unit of a
+# guarantee is the CLASS, and a guarantee is what EVERY hero of the class holds
+# whatever engine he holds or drops: his class basic and his class kit** (GN),
+# less the pet a dismisser loses (HB). `check_gn` §1 and §2 cast every kit card on
+# a hero holding no engine and assert what each lays — the live witness behind
+# every row — and §4 below asserts every named card is one every hero of the class
+# holds, so a row cannot quietly credit a card the class stops holding.
 const GUARANTEED_STATUS := {
-	"berserker": {"cripple": "bz_hemorrhage applies it from bloodloss"},
-	"warden": {"sunder": "Crushing Blow, PROTECTED CORE",
-		"shieldwall": "Shieldwall, PROTECTED CORE",
-		"stunned": "wd_ricochet applies it on a Block"},
-	"swordmaster": {"stunned": "Pommel Strike, PROTECTED CORE"},
-	"pyromancer": {"burn": "Fireball and Wildfire, PROTECTED CORE"},
-	"cryomancer": {"chilled": "Frostbolt and Razor Ice, PROTECTED CORE",
-		"frozen": "the Glacial Hold passive, at 4 Chilled"},
-	"arcanist": {},
-	"holy": {"empower": "the Mercy passive", "renewal": "Renewal, PROTECTED CORE"},
-	"inquisitor": {"faith": "the Conviction passive",
-		"cons_ground": "Consecrated Ground, PROTECTED CORE",
-		"zeal": "Blessing of Zeal, PROTECTED CORE",
-		"sunder": "dv_judgement applies it itself"},
-	"occultist": {"ruin": "the Wrath of the Old Gods passive",
-		"cripple": "Shadowrend, PROTECTED CORE",
-		"exposed": "Hex of Ruin, PROTECTED CORE",
-		"bewitch": "Bewitch, PROTECTED CORE",
-		"decay": "oc_emp_hex applies it itself"},
-	"beastmaster": {"loyalty": "the Pack Bond passive",
-		"instinct": "Hunter's Instinct, PROTECTED CORE"},
-	"sharpshooter": {},
-	"mystic": {"poison": "the Trapper passive and Venom Coating",
-		"cripple": "Snare Trap, PROTECTED CORE", "slow": "Snare Trap"},
+	"warrior": {"sunder": "Crushing Blow, CLASS KIT",
+		"stunned": "Pommel Strike, CLASS KIT",
+		"mocked": "Mocking Blow, CLASS KIT"},
+	"mage": {"elem_weak": "Magic Burst, CLASS KIT",
+		"barrier": "Nexus Ward, CLASS KIT"},
+	"cleric": {"unburdened": "Unburden, CLASS KIT",
+		"consecration": "Consecration, CLASS KIT"},
+	"hunter": {"snared": "Snare Trap, CLASS KIT",
+		"stunned": "Snare Trap, CLASS KIT, when it springs",
+		"poison": "Snare Trap, CLASS KIT, when it springs"},
 }
 
 # The word forms a node's rendered text uses for each status id.
@@ -422,6 +426,7 @@ func _s3_cells_and_terms() -> void:
 # (CLAUDE.md's DO block says so). A node is worn by every spec of every class
 # now, so the status a node reads is weighed against EVERY spec's guaranteed
 # table rather than one spec's, and each row says how many specs lack a source.
+# **BATCH HJ — EVERY CLASS's, since the table is keyed by class (above).**
 # It is still a REPORT: a text sweep cannot tell a node that pays on a status
 # from one that names a debuff landing on the HERO in order to shrug it off
 # (DP's caveat), and the one tree has a node of that second shape.
@@ -429,7 +434,7 @@ func _s4_status_sweep() -> void:
 	print("\n§4 — nodes reading a status a wearer cannot guarantee")
 	print("  A REPORT, NOT A GATE. DN's instrument matched ability NAMES and this")
 	print("  class of bet is invisible to it — `sm_precision` was found by reading.")
-	var specs: Array = Classes.all_specs()
+	var classes: Array = GUARANTEED_STATUS.keys()
 	var rows: Array = []
 	for n in Talents.tree():
 		var text := Talents.desc_for(n, 1)
@@ -442,15 +447,40 @@ func _s4_status_sweep() -> void:
 			if not reads:
 				continue
 			var lacking := 0
-			for spec in specs:
-				if not (GUARANTEED_STATUS.get(spec, {}) as Dictionary).has(sid):
+			for ck in classes:
+				if not (GUARANTEED_STATUS.get(ck, {}) as Dictionary).has(sid):
 					lacking += 1
 			if lacking > 0:
-				rows.append("%-20s reads %-10s — no guaranteed source for %d of %d specs" % [
-					String(n.get("id", "?")), sid, lacking, specs.size()])
+				rows.append("%-20s reads %-10s — no guaranteed source for %d of %d classes" % [
+					String(n.get("id", "?")), sid, lacking, classes.size()])
 	for r in rows:
 		print("    %s" % r)
 	print("  %d node/status pairs a wearer cannot guarantee." % rows.size())
+	# **BATCH HJ — THE TABLE'S OWN POPULATION, ASSERTED: EVERY GUARANTEE IS A CARD
+	# EVERY HERO OF THE CLASS HOLDS.** The re-key is only as good as its sources,
+	# and the table it replaced credited cards GS moved to the shelves, engines GK
+	# made droppable and nodes FX deleted, with nothing to say so. So each row's
+	# named card is asked: it is the class basic, or it is in the kit the class
+	# holds with no engine AND with each engine of the class held alone — an engine
+	# that dismisses a kit card (Lethal Aim, the pet) takes it out of a guarantee.
+	# What the card LAYS is `check_gn` §1's and §2's, which cast every kit card on
+	# a hero holding no engine.
+	for ck2 in classes:
+		var loose: Array = []
+		var basic := String(Classes.kit(String(ck2))[0].display_name)
+		for sid2 in GUARANTEED_STATUS[ck2]:
+			var card := String(GUARANTEED_STATUS[ck2][sid2]).split(",")[0].strip_edges()
+			var held := card == basic
+			if not held:
+				held = Classes.class_kit_names_for(String(ck2), []).has(card)
+				for pid in Classes.class_engines(String(ck2)):
+					if not Classes.class_kit_names_for(String(ck2), [pid]).has(card):
+						held = false
+			if not held:
+				loose.append("%s (%s)" % [sid2, card])
+		ok(not (GUARANTEED_STATUS[ck2] as Dictionary).is_empty() and loose.is_empty(),
+			"the %s's guaranteed statuses name a card not every hero of the class holds: %s" % [
+				ck2, str(loose)])
 	# ── THE ONE DO RULED ON: `sm_precision`. FX deleted the node, and the four
 	# checks on it split along the line the repair rules draw. ──
 	# DELETED, 1 CHECK: "the node's text reads Stunned". Its subject was the
@@ -462,22 +492,60 @@ func _s4_status_sweep() -> void:
 	# deleted — a later tree, rune or card may write it again). No statement
 	# that reads the field may gate it on a status the Swordmaster cannot
 	# guarantee, because that statement is where such a bet would be paid.
+	# **BATCH HJ — RE-POINTED AGAIN, ONTO THE CLASS TABLE: A WEARER IS EVERY CLASS.**
+	# The three statuses were the ones DP took the Swordmaster's node off, weighed
+	# against HIS row. The node is gone and the one tree is worn by every class, so
+	# a node that writes this field again is worn by all four: the read site may
+	# gate on nothing some class cannot guarantee, and the statuses asked are every
+	# one the sweep knows that at least one class's row lacks — derived, not
+	# listed. **Stunned is DP's own move** (the payout followed the text onto it,
+	# pinned below), the Warrior's and the Hunter's by their kits and no Mage's or
+	# Cleric's: a bet for those two the day a node writes the field. It is held
+	# here, named, while NO node of the tree writes `precision_ranks` — asserted,
+	# not assumed — and the day one does, this arm reds on it.
 	var bsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	var reads_at: Array = []
 	for stmt in _statements_of(bsrc):
 		if String(stmt).contains("precision_ranks"):
 			reads_at.append(String(stmt))
-	for gone in ["dazed", "cripple", "exposed"]:
+	var written := false
+	for tn in Talents.tree():
+		if JSON.stringify(tn.get("payload", {})).contains("precision_ranks"):
+			written = true
+	var asked := 0
+	var gates_on: Array = []
+	for gone in STATUS_FORMS:
+		var short_of: Array = []
+		for ck3 in classes:
+			if not (GUARANTEED_STATUS.get(ck3, {}) as Dictionary).has(gone):
+				short_of.append(String(ck3))
+		if short_of.is_empty():
+			continue
+		asked += 1
 		var gated: Array = []
 		for r2 in reads_at:
 			if String(r2).contains('has_status("%s")' % gone):
 				gated.append(String(r2).strip_edges().substr(0, 90))
-		ok(gated.is_empty(),
-			"the `precision_ranks` read site gates on `%s`, which the Swordmaster cannot guarantee: %s" % [
-				gone, str(gated)])
-	ok(bsrc.contains('attacker.precision_ranks > 0 and strike_target.has_status("stunned")'),
-		"the read site did not follow the text onto `stunned`")
-	print("  %d statements read `precision_ranks`; none gates it on dazed / cripple / exposed" % reads_at.size())
+		if not gated.is_empty():
+			gates_on.append(gone)
+		ok(gated.is_empty() or (gone == "stunned" and not written),
+			"the `precision_ranks` read site gates on `%s`, which the %s cannot guarantee: %s%s" % [
+				gone, ", ".join(PackedStringArray(short_of)), str(gated),
+				" — and a node of the tree now writes the field" if written else ""])
+	# **BATCH HJ — AND THE PIN READS THE WALK, NOT ONLY THE FILE.** The arm above
+	# asserts an ABSENCE over the statements the walk found: over a walk that
+	# found nothing it passes having asked nothing, and a raw `contains` still
+	# finds this text in a comment. So the positive half asks the walk too.
+	var walk_found := false
+	for r3 in reads_at:
+		if String(r3).contains('has_status("stunned")'):
+			walk_found = true
+	ok(bsrc.contains('attacker.precision_ranks > 0 and strike_target.has_status("stunned")')
+		and walk_found,
+		"the read site did not follow the text onto `stunned`, or the statement walk above did not find it there (%d reads found, gating on %s)" % [
+			reads_at.size(), str(gates_on)])
+	print("  %d statements read `precision_ranks`; %d statuses some class cannot guarantee were asked; it gates on %s (stunned is DP's own move, held while no node writes the field: %s)" % [
+		reads_at.size(), asked, str(gates_on), str(not written)])
 
 
 # The code half of a source line: everything before a `#` outside a string

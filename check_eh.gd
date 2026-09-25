@@ -1,7 +1,7 @@
 # BATCH EH — THE THIRD TIER, AND A SWEEP FOR PRECEDENT THAT WAS NEVER TRUE.
 #
 #   §1  the award chain's two tiers, DRIVEN LIVE on real zone bosses (three arms)
-#   §2  every spec's depth across both tiers, under a FULLY-HELD loadout
+#   §2  every class's depth across both tiers, under a FULLY-HELD loadout, per engine set held
 #   §3  the three things EG left on the record, re-derived rather than quoted
 #   §4  the `master.html` sweep — is any useful subset mechanically checkable?
 #
@@ -62,6 +62,7 @@ func _initialize() -> void:
 # ARM C holds both: the offer must come out of the CLASS-WIDE pool, the award
 #   must be OWED, and the victory card must NAME the hero. **This is the arm
 #   the batch exists for, and it is the one a static check cannot make.**
+#   **BATCH HJ — ARM C IS THE LAST LIVE TIER NEARLY DRY** (below).
 func _s1_chain_live() -> void:
 	print("\n§1 — the award chain's two tiers, driven on real zone bosses")
 	var run: Node = root.get_node("/root/Run")
@@ -73,9 +74,17 @@ func _s1_chain_live() -> void:
 	# for: the arm where the cards a hero's lineage could reach are gone and the
 	# award must still pay. It pays out of the sibling lineages' shelves now
 	# instead of out of a tier of its own.
+	# **BATCH HJ — RE-POINTED ONTO THE TWO LIVE TIERS.** "The lineage's reach is
+	# gone" was a tier GP deleted: a hero draws his class's one pool, so holding
+	# his own shelf leaves the tier nearly whole and C read exactly what B read.
+	# What EH's third tier was FOR — the LAST tier pays when everything above it
+	# is dry, and pays what it has — is asked of the last live tier now: C holds
+	# the boss pool and every card the class tier can offer him but TWO, so the
+	# award must still pay, be announced, and offer those two, which is the
+	# fill-short rule on the tier a hero ends on.
 	await _arm(run, "A", party, false, false, "spec boss pool")
 	await _arm(run, "B", party, true, false, "CLASS pool")
-	await _arm(run, "C", party, true, true, "CLASS pool, lineage shelf held")
+	await _arm(run, "C", party, true, true, "CLASS pool, all but two of what it can offer held")
 
 
 # ONE ARM. `hold_boss` and `hold_draft` say which pools the party walks in
@@ -95,7 +104,11 @@ func _arm(run: Node, arm: String, party: Array, hold_boss: bool,
 		if hold_boss:
 			held.append_array(Classes.spec_pool(sp))
 		if hold_draft:
-			held.append_array(Classes.spec_draft_pool(sp))
+			# BATCH HJ — every card the class tier can offer him, but two. It held
+			# the lineage's own shelf until HJ (the tier GP deleted, above).
+			var can: Array = Classes.offerable(
+				Classes.draft_pool(Classes.class_of_spec(sp)), run.held_engines(m))
+			held.append_array(can.slice(0, maxi(can.size() - 2, 0)))
 		m["bm_abilities"] = held.duplicate()
 		m.erase("bm_equipped")
 		m["bm_candidates"] = []
@@ -149,8 +162,13 @@ func _arm(run: Node, arm: String, party: Array, hold_boss: bool,
 		# ("fill short rather than pad with repeats") doing exactly its job, not
 		# a defect. Asserting a flat 3 would have made the one spec this whole
 		# thread was written for the one spec the gate could not measure.
+		# **BATCH HJ — WHAT THE TIER HAD IS WHAT IT CAN OFFER HIM.** Both tiers ask
+		# the offer door (`Classes.offerable`, the boss since HE §3), so a card that
+		# reads an engine he does not hold, or a companion he has dismissed, is not
+		# one the tier had for him; this counted the raw pool until HJ, and the day
+		# a hero stands without an engine the rule's own fill-short read as a defect.
 		var left := 0
-		for w in wanted:
+		for w in Classes.offerable(wanted, run.held_engines(m4)):
 			if not (m4["bm_abilities"] as Array).has(String(w)):
 				left += 1
 		ok(int((q[0] as Array).size()) == mini(3, left),
@@ -173,7 +191,7 @@ func _label_text(n: Node, needle: String) -> String:
 	return ""
 
 
-# ── §2 — EVERY SPEC'S DEPTH ACROSS BOTH TIERS, FULLY HELD ───────────────────
+# ── §2 — EVERY CLASS'S DEPTH ACROSS BOTH TIERS, FULLY HELD ──────────────────
 # **DERIVED THROUGH THE LIVE ROLLERS RATHER THAN OFF A TABLE.** `check_ea` §1
 # measures the depth arithmetically and asserts the LOADOUT bound; this asks
 # the same question of the functions themselves, on a member dict built to the
@@ -186,20 +204,23 @@ func _label_text(n: Node, needle: String) -> String:
 # longer empties it: the fallback pays out of the sibling lineages' shelves and
 # the class-wide cards together. **AND IT STATES THE ANSWER PLAINLY, WHICH IS
 # THE HALF THE BRIEF ASKED FOR.** Under a fully-held loadout the fallback pays a
-# full three to every one of the twelve. Under a fully-held POOL — the same hero
+# full three to every class × engine seat (BATCH HJ; it was every one of the twelve
+# lineages until the loadout was re-derived below). Under a fully-held POOL — the same hero
 # having also taken every card of his class — the chain pays nothing, and that
 # state is REACHABLE rather than impossible. It is asserted in both directions,
 # because "this tier closes the table" is exactly the shape of claim EA made
 # about the one before it and had to give back a batch later.
 func _s2_depth_fully_held() -> void:
-	print("\n§2 — every spec's depth across both tiers, under a fully-held loadout")
+	print("\n§2 — every class's depth across both tiers, under a fully-held loadout, per engine set held")
 	var run: Node = root.get_node("/root/Run")
+	# The LAST rung of the slot ladder: the most a loadout can carry.
+	var cap: int = int(run.ABILITY_SLOTS_BY_BOSS[run.ABILITY_SLOTS_BY_BOSS.size() - 1])
 	var paid_all := 0
+	var seats := 0
 	var starved := 0
 	for cls in Classes.SPEC_IDS:
+		var wide: Array = Classes.draft_pool(String(cls))
 		for spec in Classes.SPEC_IDS[cls]:
-			var wide: Array = Classes.draft_pool(String(cls))
-			# FULLY-HELD LOADOUT: boss pool + spec draft pool, nothing else.
 			# `key` IS THE CLASS AND IT IS NOT OPTIONAL: `owned_ability_names`
 			# reaches `Runes.kit_names`, which builds the hero's config from it.
 			# A member without one throws rather than measuring a shallower
@@ -208,13 +229,7 @@ func _s2_depth_fully_held() -> void:
 				Classes.spec_pool(spec).duplicate()
 				+ Classes.spec_draft_pool(spec).duplicate()}
 			var t1: Array = run.roll_spec_ability_offer(m)
-			var t2: Array = run.roll_draft_fallback_offer(m)
 			ok(t1.is_empty(), "§2: %s's boss tier is not dry under a fully-held loadout" % spec)
-			ok(t2.size() == 3,
-				"§2: %s's class tier pays %d cards, not three, to a fully-held hero" % [
-					spec, t2.size()])
-			if t2.size() == 3:
-				paid_all += 1
 			# AND THE STATE THE FALLBACK DOES *NOT* CLOSE.
 			var m2 := {"key": String(cls), "spec": spec, "bm_abilities":
 				(m["bm_abilities"] as Array).duplicate() + wide.duplicate()}
@@ -223,13 +238,43 @@ func _s2_depth_fully_held() -> void:
 				"§2: %s's class tier still pays a hero who holds every card in it — the filter is not reading the pool" % spec)
 			if t2b.is_empty():
 				starved += 1
-			print("    %-13s fully-held loadout → the fallback offers %d of %d in the class pool; +class held → %d" % [
-				spec, t2.size(), wide.size(), t2b.size()])
-	ok(paid_all == 12,
-		"§2: only %d of the twelve specs are paid a full three under a fully-held loadout" % paid_all)
+			print("    %-13s holding its boss pool → the boss tier offers %d; +the whole class pool held → the class tier offers %d" % [
+				spec, t1.size(), t2b.size()])
+		# **BATCH HJ — THE CLASS TIER'S THREE IS ASKED PER CLASS × ENGINE SET, NOT PER
+		# LINEAGE.** It was asked of each lineage holding "its boss pool AND its own
+		# SHELF" — EH's worst case while the shelf was a tier of its own. GP made the
+		# shelves one pool, so a hero's shelf is only where his cards were authored,
+		# and his loadout can be full of ANY of them; and the tier asks the engine
+		# gate, so what drains it is what the door would have offered him. **The
+		# fully-held LOADOUT is his loadout full of the cards the tier can offer him**
+		# — the cap less the slots he opens using, with the engines he holds (the
+		# pet a dismisser loses frees one) — for every set of engines a hero of the
+		# class can hold slotted, each driven through the live roller on a hero who
+		# took a spine (no lineage, awakened), the seat the tier cannot tell apart
+		# from any other: the tier reads his class and his engines, never a lineage.
+		for held in Gate.engine_sets(Classes.class_engines(String(cls)), int(run.ENGINE_SLOTS)):
+			seats += 1
+			var slotted: Array = []
+			for pid in held:
+				var rune: Dictionary = Runes.build(Runes.engine_rune_id(String(pid)))
+				rune["equipped"] = true
+				slotted.append(rune)
+			var can: Array = Classes.offerable(wide, held)
+			var earn: int = cap - (Classes.lineage_slots("")
+				+ Classes.kit_slots(String(cls), "", held))
+			var seat := {"key": String(cls), "spec": "", "awakened": true,
+				"engines": slotted, "bm_abilities": can.slice(0, earn)}
+			var t2: Array = run.roll_draft_fallback_offer(seat)
+			ok(t2.size() == 3,
+				"§2: a %s holding %s, his loadout full of %d of the %d cards the class tier can offer him, is paid %d cards, not three" % [
+					String(cls), str(held), mini(earn, can.size()), can.size(), t2.size()])
+			if t2.size() == 3:
+				paid_all += 1
+	ok(seats > 0 and paid_all == seats,
+		"§2: only %d of the %d class × engine seats are paid a full three under a fully-held loadout" % [paid_all, seats])
 	ok(starved == 12,
 		"§2: only %d of the twelve go quiet when the class pool is held too — the worst case is not what this gate thinks it is" % starved)
-	print("  PLAINLY: under a fully-held LOADOUT no hero can be paid nothing — all twelve are offered a full three off the class-wide tier.")
+	print("  PLAINLY: under a fully-held LOADOUT no hero can be paid nothing — all %d class × engine seats are offered a full three off the class tier." % seats)
 	print("  PLAINLY: under a fully-held POOL every hero CAN still be paid nothing. The third tier deepens the floor; it does not remove it.")
 
 

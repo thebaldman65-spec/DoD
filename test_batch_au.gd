@@ -25,11 +25,12 @@
 #      from Singularity; Magi's Wrath still carries no per-stack damage term;
 #      crit building sums to 5 with Attunement (additive, one read site); and
 #      the kill clause fires ONCE PER DEATH.
-#   §5 THE DEBUG GRANT, spec-scoped: with the toggle on an Arcanist holds no
-#      Pyromancer ability and nothing from a class-wide pool, and each hero
-#      holds every ability of their own spec. (The class-wide BOSS pool it
-#      named, `CLASS_POOLS`, was deleted at DY §3; the assertion is kept and a
-#      second one pins the accessor's absence.)
+#   §5 THE DEBUG GRANT, scoped to the CLASS POOL since HJ §3 (it was one
+#      lineage's from AU §5 to HJ): with the toggle on each hero holds every
+#      card of his own lineage's boss pool, an Arcanist holds the Pyromancer
+#      and Cryomancer cards of the Mage pool and neither sibling's enabler, and
+#      no hero holds a sibling's boss card his class cannot draft. (The
+#      class-wide BOSS pool it once named, `CLASS_POOLS`, was deleted at DY §3.)
 #   NEGATIVE CONTROLS for the two that would fail silently — the step-doubling
 #      back on Singularity, and the fallback consuming a mini-boss slot.
 extends SceneTree
@@ -956,8 +957,9 @@ func _live_debug_grant() -> void:
 		# he drafts like any other, so counting it foreign claims the merge away.
 		# **What a sibling still owns is its BOSS pool**, which stays lineage-keyed
 		# (GP), less anything the hero's class pool also holds. The debug grant is
-		# still this lineage's own boss pool and shelf (`battle.gd`, AU §5 and BO);
-		# what it must never hand him is a card only a sibling can reach.
+		# his CLASS pool and his lineage's own boss pool since HJ §3 (`battle.gd`,
+		# ruled; it was the lineage's boss pool and shelf from AU §5 and BO); what
+		# it must never hand him is a card only a sibling can reach.
 		var own_class_pool: Array = Classes.draft_pool(Classes.class_of_spec(spec))
 		var sibling_names: Array = []
 		for sib in Classes.SPEC_IDS.get(Classes.class_of_spec(spec), []):
@@ -985,15 +987,35 @@ func _live_debug_grant() -> void:
 		"the four seats' sibling-only boss cards number %d — the arm above asked its question of nothing" % sib_walked)
 	# The named complaint, stated as its own check: the Arcanist and the
 	# Pyromancer's signature abilities.
+	# **BATCH HJ §3 — IT FOLLOWS THE RULING, AND IS NOT REPAIRED TO THE OLD
+	# SCOPE.** AU §5's complaint was that testing the Arcanist put Pyromancer
+	# cards in his hands, and the answer was a grant scoped to one lineage.
+	# **The designer ruled the grant his CLASS pool** (HJ §3): GP made a
+	# class's shelves one pool, so every one of these that sits on a Mage
+	# shelf is a card of the Arcanist's OWN pool, which he drafts like any
+	# other — and the grant hands it to him. What is still a sibling's is the
+	# card that TRAVELS with a sibling's engine: Flamewave is Overburn's
+	# enabler and Razor Ice is Permafrost's, in no pool at all, so an
+	# Arcanist holding Resonance holds neither. Each name is asked the side
+	# the pool puts it on, read off `Classes.draft_pool` rather than listed.
 	var arc := _hero(scene, 1)
 	var arc_names: Array = arc.abilities.map(func(a): return a.display_name)
+	var mage_pool: Array = Classes.draft_pool("mage")
 	for pyro in ["Flamewave", "Firestorm", "Fireball", "Detonation", "Wildfire",
 			"Immolate", "Pyroblast", "Backdraft"]:
-		ok(not arc_names.has(pyro),
-			"the Arcanist holds no Pyromancer ability (%s)" % pyro)
+		if mage_pool.has(pyro):
+			ok(arc_names.has(pyro),
+				"the Arcanist holds %s, a Pyromancer card of his own class pool (the grant is the class pool, HJ §3)" % pyro)
+		else:
+			ok(not arc_names.has(pyro),
+				"the Arcanist holds no Pyromancer card his pool does not hold (%s travels with its engine)" % pyro)
 	for cryo in ["Razor Ice", "Blizzard", "Ice Lance", "Rime", "Shatter"]:
-		ok(not arc_names.has(cryo),
-			"...nor any Cryomancer one (%s)" % cryo)
+		if mage_pool.has(cryo):
+			ok(arc_names.has(cryo),
+				"...and %s, a Cryomancer card of his own class pool" % cryo)
+		else:
+			ok(not arc_names.has(cryo),
+				"...nor a Cryomancer card his pool does not hold (%s travels with its engine)" % cryo)
 	run.debug_grant_all = false
 	scene.queue_free()
 	await process_frame
