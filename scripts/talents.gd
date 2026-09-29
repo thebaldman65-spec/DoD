@@ -454,7 +454,82 @@ static func condition_met(cond: Dictionary, ctx: Dictionary) -> bool:
 	if cond.has("owns_ability") \
 			and not owns_ability(ctx.get("member", {}), String(cond["owns_ability"])):
 		return false
+	if not party_condition_met(cond, ctx.get("party", [])):
+		return false
 	return true
+
+
+# ══ BATCH HL §6 — A CONDITION ON WHO IS IN THE PARTY ════════════════════════
+#
+# **THE ONE HERO WAS ALL THIS DOOR COULD READ** — his nodes and his owned cards. A
+# condition on the PARTY reads the four, and they are known in one place: the
+# spawn, where a crest rune's payload is stamped on every hero (HK §4). **So the
+# spawn hands the four in**, as `ctx.party`, and so does the hero sheet, which
+# shows the numbers the fight will use; a static function cannot see `Run`, so the
+# party is always handed, never fetched. **A party key with no party in the ctx is
+# FALSE** — the header's own safe direction: an effect that fails to appear is a
+# bug you can see.
+#
+# **EVALUATED ONCE, AT THE SPAWN, AND THE KEYS ARE THE ONES THAT CANNOT CHANGE IN
+# A FIGHT.** Who is in the party and what core runes they carry are fixed when the
+# four are built (nothing in `battle.gd` writes an engine's slot, GM §2), so a
+# payload stamped on them stays true to the end. **Every key counts the heroes who
+# STAND when the fight opens** — a hero who fell and stays down (GH) is not
+# counted — because a condition phrased "while a Cleric stands" is false of a
+# Cleric lying on the field. `heroes_all_standing` is that same reading, of all of
+# them, AT THE OPENING. **Whether they are all alive LATER is the continuous half,
+# and it is not built**: a stamped payload cannot come off a hero when a sibling
+# falls without a door that undoes an arbitrary payload mid-fight, and a spawn
+# stamp that read true at turn one and false at turn six would be a rune whose text
+# is a lie (`docs/reports/HL.md` §6 names the split).
+#
+#   heroes_include_class: "cleric"                    — at least one stands
+#   heroes_lack_class:    "mage"                      — none stands
+#   heroes_class_count:   {"class": "warrior", "min": 2, "max": 2} — how many stand
+#   heroes_hold_core:     "pack"                      — a standing hero has that
+#                                                       core rune's engine slotted
+#   heroes_all_standing:  true                        — every hero stands at the opening
+#
+# The keys say HEROES, never the retired word (`test_batch_bx` §4b sweeps every
+# literal here): a key is data a rune is authored in, and the four are heroes.
+const HERO_KEYS := ["heroes_include_class", "heroes_lack_class", "heroes_class_count",
+	"heroes_hold_core", "heroes_all_standing"]
+
+
+static func party_condition_met(cond: Dictionary, party: Array) -> bool:
+	var asks := false
+	for k in HERO_KEYS:
+		if cond.has(k):
+			asks = true
+	if not asks:
+		return true
+	if party.is_empty():
+		return false
+	var standing: Array = party.filter(func(m): return int((m as Dictionary).get("hp", 1)) > 0)
+	if cond.has("heroes_include_class") and _class_count(standing, String(cond["heroes_include_class"])) < 1:
+		return false
+	if cond.has("heroes_lack_class") and _class_count(standing, String(cond["heroes_lack_class"])) > 0:
+		return false
+	if cond.has("heroes_class_count"):
+		var cc: Dictionary = cond["heroes_class_count"]
+		var n := _class_count(standing, String(cc.get("class", "")))
+		if n < int(cc.get("min", 0)) or n > int(cc.get("max", party.size())):
+			return false
+	if cond.has("heroes_hold_core"):
+		var pid := String(cond["heroes_hold_core"])
+		if not standing.any(func(m): return Runes.held_engines(m as Dictionary).has(pid)):
+			return false
+	if bool(cond.get("heroes_all_standing", false)) and standing.size() < party.size():
+		return false
+	return true
+
+
+static func _class_count(members: Array, class_key: String) -> int:
+	var n := 0
+	for m in members:
+		if String((m as Dictionary).get("key", "")) == class_key:
+			n += 1
+	return n
 
 
 # ---------- tree build ----------

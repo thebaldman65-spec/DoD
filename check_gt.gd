@@ -78,8 +78,10 @@ const RULED := {
 # bare, the census has found it, and whether it sits out is a question again.
 const UNDONE_BY_DESIGNER := {"Mark of the Hunt": "pack"}
 # THE TEN THE DOOR REFUSES BARE THAT ARE NOT ROWS, AND WHAT OPENS EACH WITH NO
-# ENGINE: a drafted Guard Change turns the guard Defensive; a heal landed first;
-# an enemy under 20% health; a companion from an earned Call the Wilds.
+# ENGINE: a drafted swap turns the guard Defensive (Precision Strike — **a drafted
+# Guard Change until HL §1**, when it began travelling with the Stances and left
+# every pool, so no Warrior without them can hold it); a heal landed first; an
+# enemy under 20% health; a companion from an earned Call the Wilds.
 const CARD_ROUTES := {
 	"Battle Poise": "guard", "Counter Time": "guard", "Reprisal": "heal",
 	"Execute": "low", "Kill Command": "companion", "Twin Hunt": "companion",
@@ -838,7 +840,13 @@ func _s3_the_card_that_sits_out() -> void:
 		var foes: Array = _foes(s2)
 		match route:
 			"guard":
-				await s2._resolve(u2, Classes.pool_ability("Guard Change"), foes[0], "good")
+				# BATCH HL §1 — THE ROUTE IS A SWAP HE CAN STILL DRAFT: Precision
+				# Strike, in the Warrior's pool and gated on no engine, switches the
+				# guard as it resolves (Aggressive to Defensive).
+				ok(Classes.draft_pool("warrior").has("Precision Strike")
+						and Classes.engine_read("Precision Strike") == "",
+					"§3: Precision Strike is not a draftable, ungated swap — the guard route has no card")
+				await s2._resolve(u2, Classes.pool_ability("Precision Strike"), foes[0], "good")
 			"heal":
 				var ally: BattleUnit = _hero(s2, "warrior")
 				await s2._resolve(u2, Classes.pool_ability("Ministration"), ally, "good")
@@ -914,6 +922,11 @@ func _drive(pid: String) -> void:
 	_run.zone_bosses_cleared = 3
 	var m: Dictionary = _run.party[seat]
 	var rune := Runes.build(Runes.engine_rune_id(pid))
+	# BATCH HL §1 — `hold_rune` SLOTS A CORE RUNE ONLY WHEN ITS CALLER ASKS (a
+	# cache's answer never does, so no card arrives beside a rune unasked). This
+	# drive takes the rune to wear it, so it asks — as class selection and the sim
+	# do — and the arm below still holds it to slotting.
+	rune["equipped"] = true
 	_run.hold_rune(m, rune)
 	ok(Runes.held_engines(m) == [pid], "§3 %s: the rune did not slot (%s)" % [pid, str(Runes.held_engines(m))])
 	# THROUGH THE DOORS A PLAYER USES: the draft's for a pool card, the boss

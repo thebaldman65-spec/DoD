@@ -273,7 +273,10 @@ func _s1_constants(battle_gd) -> void:
 	var rel: int = battle_gd.FAITH_RELEASE
 	var absorb: int = battle_gd.FAITH_PER_ABSORB
 	var ground: int = battle_gd.FAITH_PER_GROUND_TURN
-	ok(rel == 3, "FAITH_RELEASE is %d, want 3 — CZ's threshold is the half that stays" % rel)
+	# BATCH HL §3 RE-POINTED THE PIN, RULED BY THE DESIGNER: the threshold is 8
+	# (CZ's 3 until HL). DA's own rule is the RELATION below, and it still holds —
+	# 2 an absorb and 1 a ground turn against 8, so an ally holds Faith longer.
+	ok(rel == 8, "FAITH_RELEASE is %d, want 8 — ruled at HL §3 (CZ's 3 until then)" % rel)
 	ok(absorb == 2, "FAITH_PER_ABSORB is %d, want 2" % absorb)
 	ok(ground == 1, "FAITH_PER_GROUND_TURN is %d, want 1" % ground)
 	# THE ASSERTION THAT IS NOT A MAGNITUDE. CZ shipped absorb == release and
@@ -529,15 +532,19 @@ func _live_faith(scene: Node, battle_gd) -> void:
 			ally.faith_peak, per])
 	# ...AND IT STILL RELEASES. A revert that restored the hold by breaking the
 	# release would pass every assertion above.
-	scene._on_shield_absorbed(ally)
+	# BATCH HL §3: the release takes ceil(threshold / per-absorb) absorbs — two
+	# at CZ's three, four at eight — so the count is derived, never a literal.
+	var to_release := ceili(float(rel) / float(per))
+	for _i in to_release - 1:
+		scene._on_shield_absorbed(ally)
 	ok(ally.faith_stacks == 0,
-		"§1: two absorbs (%d Faith against a threshold of %d) did not release — he holds %d" % [
-			2 * per, rel, ally.faith_stacks])
+		"§1: %d absorbs (%d Faith against a threshold of %d) did not release — he holds %d" % [
+			to_release, to_release * per, rel, ally.faith_stacks])
 	ok(ally.faith_peak == rel,
 		"§1: the peak reads %d after the release, want %d — the peak must not reset" % [
 			ally.faith_peak, rel])
-	print("  §1 live: one absorb holds %d of %d, two release and leave a peak of %d" % [
-		per, rel, ally.faith_peak])
+	print("  §1 live: one absorb holds %d of %d, %d release and leave a peak of %d" % [
+		per, rel, to_release, ally.faith_peak])
 
 
 # §2 live, half one — ORDINARY ICE, AND THE POOL IS THE THING THAT DECIDES.

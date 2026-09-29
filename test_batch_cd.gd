@@ -77,9 +77,9 @@ const DEAD_TEST_SYMBOLS := ["award_talent_points", "award_spec_point",
 # anyway, where the failure costs one edit in one file instead of thirty-five
 # across twelve. **A STALENESS TRIPWIRE IS A SINGLE INSTRUMENT WHOSE MESSAGE SAYS
 # THE GROUND MOVED**; thirty-five copies of one is not a tripwire, it is a tax.
-const SPEC_TARGET := 159     # the twelve pools, summed from PER_SPEC_DEPTH — 129 until GS, 158 until HB
+const SPEC_TARGET := 158     # the twelve pools, summed from PER_SPEC_DEPTH — 129 until GS, 158 until HB, 159 until HL
 const CLASS_TARGET := 20     # summed from PER_CLASS_DEPTH — 25 until GN
-const DRAFT_TARGET := 179    # 159 + 20
+const DRAFT_TARGET := 178    # 158 + 20 (179 until HL §1)
 const SPEC_FLOOR := 8        # CI's flat eight a shelf; asserted until HH §2, printed since (see §2)
 # What each spec drafts from now. The nine that grew are the nine that HAD an
 # ability-granting talent node; beastmaster, sharpshooter and mystic had none,
@@ -116,7 +116,11 @@ const PER_SPEC_DEPTH := {
 	# left the Hunter's class kit when Summon Companion took its slot, and it
 	# lands on the shelf of the lineage that defines it — GS's rule: a card that
 	# stops travelling lands on its lineage's shelf, never nowhere.
-	"berserker": 12, "warden": 11, "swordmaster": 14,
+	# BATCH HL §1: THE SWORDMASTER 14 -> 13, AND NOTHING WAS RETIRED. Guard Change
+	# travels with the Stances again (the designer took the engine in play and
+	# could not change stance), and an enabler is in no pool — the table's own
+	# rule, pointed the other way: a card that starts travelling leaves its shelf.
+	"berserker": 12, "warden": 11, "swordmaster": 13,
 	"pyromancer": 16, "cryomancer": 14, "arcanist": 16,
 	"holy": 14, "inquisitor": 13, "occultist": 13,
 	"beastmaster": 12, "sharpshooter": 12, "mystic": 12,

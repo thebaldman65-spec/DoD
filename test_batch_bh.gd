@@ -55,7 +55,7 @@ const APOSTLE_MULT := 2         # base 1x + Apostle's 1x
 const FERVOR_MULT := 2          # base 1x + Fervor's 1x
 const BOTH_MULT := 3            # Batch BI §1: ADDITIVE — never 4
 # BATCH DC: `battle.FAITH_RELEASE`, ruled at CZ §2, mirrored ONCE per suite.
-const RELEASE := 3
+const RELEASE := 8   # BATCH HL §3 — ruled at eight (3 from CZ §2 to HL)
 const HELD_MAX := RELEASE - 1   # the deepest an ally can CARRY; at RELEASE he releases
 # STACKS is a DIRECT-WRITE PROBE DEPTH for the per-stack arithmetic (see bg's
 # note): those checks write `faith_stacks`/`faith_peak` onto the unit and
@@ -783,14 +783,17 @@ func _live_fervor_adds_no_release() -> void:
 	# Five ticks: with the old +1 drip this reached five Faith and RELEASED on
 	# the third; at a flat 1 it reaches exactly five on the fifth and releases
 	# once, which is the base kit's rate and not the node's.
-	for _i in 5:
+	# **BATCH HL §3 — DERIVED OFF THE THRESHOLD**: at a flat 1 a tick, RELEASE + 2
+	# ticks release exactly once and leave two held, whatever RELEASE is (8 now).
+	var ticks := RELEASE + 2
+	for _i in ticks:
 		scene.call("_ground_faith_tick", ally)
 	var rel := _stat_of(scene, "faith_releases")
-	_report.append("§2 five ground ticks with Fervor: %d release(s), %d stacks left"
-		% [int(rel), ally.faith_stacks])
+	_report.append("§2 %d ground ticks with Fervor: %d release(s), %d stacks left"
+		% [ticks, int(rel), ally.faith_stacks])
 	ok(rel == 1.0,
-		"§2: five ticks of the ground release EXACTLY ONCE with Fervor learned (got %d)"
-			% int(rel))
+		"§2: %d ticks of the ground release EXACTLY ONCE with Fervor learned (got %d)"
+			% [ticks, int(rel)])
 	await _kill(scene)
 	_live_ran += 1
 
@@ -804,11 +807,11 @@ func _live_the_ground_drips_a_flat_one() -> void:
 	_neutral(scene)
 	_ground(ally)
 	scene.get("sim_stats").clear()
-	for _i in 5:
+	for _i in RELEASE + 2:
 		scene.call("_ground_faith_tick", ally)
 	var rel := _stat_of(scene, "faith_releases")
 	ok(rel == 1.0,
-		"§2: WITHOUT Fervor, five ticks release exactly once too (got %d)" % int(rel))
+		"§2: WITHOUT Fervor, %d ticks release exactly once too (got %d)" % [RELEASE + 2, int(rel)])
 	# One tick is one stack, stated directly.
 	_neutral(scene)
 	_ground(ally)

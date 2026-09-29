@@ -544,10 +544,14 @@ func _persistence() -> void:
 	# and that a pre-v10 save is refused**, neither of which is a claim about the
 	# newest version number. Asserted as "10 or later" so the next bump does not
 	# fail a talents test either.
+	# BATCH HL §5 re-pointed it again, to the constant: the save writes
+	# `SAVE_VERSION` by name since the run save gained a ceiling, so the number is
+	# read off the constant's declaration — and the save is asserted to write it.
 	var bm_ver := -1
-	var bm_vpos := rs.find('"version": ')
-	if bm_vpos >= 0:
-		bm_ver = int(rs.substr(bm_vpos + 11, 3).strip_edges().split(",")[0])
+	var bm_cdecl := "const SAVE_VERSION := "
+	var bm_cpos := rs.find(bm_cdecl)
+	if bm_cpos >= 0 and rs.contains('"version": SAVE_VERSION'):
+		bm_ver = int(rs.substr(bm_cpos + bm_cdecl.length(), 6).split("\n")[0].strip_edges())
 	_check(bm_ver >= 10, "the run save is v10 or later (found %d)" % bm_ver)
 	_check(rs.contains("if save_version < 10:"), "a pre-v10 save is refused")
 	_check(rs.contains('"party": party'), "the party — and its talents — is saved")

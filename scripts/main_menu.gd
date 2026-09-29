@@ -55,6 +55,11 @@ func _draw_screen() -> void:
 	# Reading `Profile.refused` requires the load to have happened, which the
 	# call below both does and is the cheapest read on the class.
 	var refusal := Profile.refusal_message()
+	# BATCH HL §5 — AND THE RUN SAVE'S CEILING, IN THE SAME BANNER: a run saved by a
+	# newer build is kept, untouched, and Continue is dark rather than silent.
+	var run_refusal := Run.save_refusal_message()
+	if run_refusal != "":
+		refusal = run_refusal if refusal == "" else "%s\n\n%s" % [refusal, run_refusal]
 	if refusal != "":
 		var warn := Label.new()
 		warn.text = refusal
@@ -70,7 +75,7 @@ func _draw_screen() -> void:
 
 	var entries: Array = [
 		["New Game", _on_new_game, true],
-		["Continue", _on_continue, Run.has_save()],
+		["Continue", _on_continue, Run.has_save() and not Run.save_refused],
 		# BATCH BM §4: talents are chosen BETWEEN runs, so the tree needs a
 		# home outside one. Always available — a fresh save opens it to a
 		# board with no rows, which is the honest first thing to show.

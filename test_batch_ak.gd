@@ -305,8 +305,12 @@ func _kit_correction() -> void:
 		"Overpower is one of his three, drafted off his shelf since GS")
 	ok(kit.has("Pommel Strike") and Classes.class_kit_holds("warrior", "Pommel Strike"),
 		"Pommel Strike is one of his three, and the Warrior class kit's since GS")
-	ok(kit.has("Guard Change") and Classes.spec_draft_pool("swordmaster").has("Guard Change"),
-		"GUARD CHANGE IS ONE OF HIS THREE — his unconditional stance swap, drafted off his shelf since GS")
+	# BATCH HL §1 — RE-POINTED, FROM PLAY: the designer took the Stances and could
+	# not change stance, so Guard Change travels with the engine again — his
+	# enabler, and on no shelf (it was drafted off his shelf from GS to HL).
+	ok(kit.has("Guard Change") and Classes.core_enablers("swordmaster") == ["Guard Change"]
+			and not Classes.spec_draft_pool("swordmaster").has("Guard Change"),
+		"GUARD CHANGE IS ONE OF HIS THREE — his unconditional stance swap, the Stances' enabler since HL")
 	ok(not kit.has("Shatterpoint"), "Shatterpoint left the opening three")
 
 	var pool: Array = Classes.spec_pool("swordmaster")
@@ -350,12 +354,20 @@ func _kit_correction() -> void:
 	# at the gate and at the door the draft rolls from — a Warrior holding no
 	# engine, and one holding another, is offered neither; one holding the Stances
 	# is offered both.
+	#
+	# **BATCH HL §1 — GUARD CHANGE LEFT THE OFFER FOR THE KIT.** It travels with the
+	# Stances as their enabler, so it is in no pool and its ruled row is deleted —
+	# HD's ruling holds by construction. Lunge is the one stance piece still OFFERED,
+	# and still only to the Stances holder; Guard Change is asked at the kit instead.
 	var run_ak := root.get_node("/root/Run")
-	var stance_pieces := ["Guard Change", "Lunge"]
+	var stance_pieces := ["Lunge"]
 	for sp_nm in stance_pieces:
 		ok(Classes.engine_read(sp_nm) == "seasoned" and Classes.engine_read_ruled(sp_nm) == "HD §1",
 			"%s is a ruled Stances row of the card gate (reads `%s`, ruled `%s`)" % [
 				sp_nm, Classes.engine_read(sp_nm), Classes.engine_read_ruled(sp_nm)])
+	ok(Classes.engine_read("Guard Change") == "" and Classes.engine_enablers("seasoned") == ["Guard Change"],
+		"Guard Change is no offer row — it travels with the Stances (HL §1) (row `%s`, enablers %s)" % [
+			Classes.engine_read("Guard Change"), str(Classes.engine_enablers("seasoned"))])
 	for held in [[], ["heavy_plating"], ["seasoned"]]:
 		var eng_rows: Array = []
 		for pid in held:
@@ -365,8 +377,8 @@ func _kit_correction() -> void:
 		var left: Array = run_ak.draft_pool_left(w_m)
 		var stance_left: Array = stance_pieces.filter(func(n): return left.has(n))
 		if held == ["seasoned"]:
-			ok(stance_left == stance_pieces,
-				"a Warrior holding the Stances engine is offered both stance pieces (offered %s)" % str(stance_left))
+			ok(stance_left == stance_pieces and not left.has("Guard Change"),
+				"a Warrior holding the Stances engine is offered Lunge, and Guard Change is his without an offer (offered %s)" % str(stance_left))
 		else:
 			ok(stance_left.is_empty(),
 				"a Warrior holding %s is offered %s — the stance pieces are the Stances holder's (HD §1)" % [
@@ -563,16 +575,17 @@ func _conditional_halves() -> void:
 		"an un-upgraded Swordmaster does not own Shatterpoint")
 	ok(Talents.owns_ability(_member({}, ["Shatterpoint"]), "Shatterpoint"),
 		"...and owns it once it is earned")
-	# BATCH GS — RE-POINTED: THE §1 GUARANTEE IS GONE. Guard Change travelled with
-	# Seasoned Fighter until GS; the engine brings no enabler now (every battle
-	# opens Aggressive, which pays from the first blow) and the card is on his
-	# shelf. So the rune alone does NOT give it, and a DRAFTED copy is earned and
-	# stays when the rune is dropped — the pair asks who owns the card, as before.
-	ok(not Talents.owns_ability(_member({}), "Guard Change"),
-		"a Swordmaster holding his engine rune does NOT own Guard Change until he drafts it (GS)")
+	# BATCH GS — RE-POINTED: THE §1 GUARANTEE WENT, AND BATCH HL §1 BROUGHT IT BACK.
+	# Guard Change travelled with Seasoned Fighter until GS, was drafted off his
+	# shelf from GS to HL, and travels again since HL (from play: the designer took
+	# the Stances and could not change stance). So the rune alone gives it, and a
+	# copy DRAFTED in those batches is earned and stays when the rune is dropped —
+	# the pair asks who owns the card, as before.
+	ok(Talents.owns_ability(_member({}), "Guard Change"),
+		"a Swordmaster holding his engine rune owns Guard Change through it — the Stances' enabler (HL §1)")
 	# BATCH GK — THE GUARANTEE WAS THE ENGINE'S: the enabler left with the engine
-	# rune (the charter). BATCH GS: nothing travels with this rune, and a drafted
-	# card is never lost with an engine, so the dropped-rune case now holds one.
+	# rune (the charter). A drafted card is never lost with an engine, so the
+	# dropped-rune case holds one.
 	var dropped := _member({}, ["Guard Change"])
 	dropped["engines"] = []
 	ok(Talents.owns_ability(dropped, "Guard Change"),

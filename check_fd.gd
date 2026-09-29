@@ -72,7 +72,7 @@ func _member(class_key: String, spec: String) -> Dictionary:
 # such sites in the shipped game. Each is pinned by the CALL it makes, so a sixth
 # site — or one of these re-pointed at a pool of its own — has to move a line here.
 #
-#   THE PEDDLER            `shop_screen._roll_offers` → `Run.generate_rune`
+#   THE PEDDLER            `shop_screen._roll_offers` → `Run.peddler_rune`
 #   THE ELITE CACHE        `battle.gd` victory → `Run.roll_rune_candidates`
 #   THE BARGAIN (a rung)   `run_state._resolve_bargain` → the same
 #   THE EVENT VERB         `events.gd` → `Run.grant_rune`
@@ -82,13 +82,17 @@ func _member(class_key: String, spec: String) -> Dictionary:
 # He passes what is already on his counter (`on_counter`), so a crest rune that
 # rolls for every hero is offered to one; the table is a list of pairs because
 # `battle.gd` now holds two of the sites.
+# **BATCH HL §1b — AND AGAIN: HE SELLS NO CORE RUNE.** His call is
+# `Run.peddler_rune`, which is `generate_rune` with every core rune's name added
+# to the same `on_counter` exclusion, so the roll is the door it always was and
+# the Peddler is the one site that withholds the engine runes the others carry.
 #
 # The spec-choice screen offers NO rune (AN deleted the opening pick), boss
 # trophies award ABILITIES, and no relic grants one — all three asserted below
 # as absences, because "this site is fine" and "this site does not exist" are
 # different claims and only the second one stays true on its own.
 const OFFER_SITES := [
-	["scripts/shop_screen.gd", "Run.generate_rune(member, on_counter)"],
+	["scripts/shop_screen.gd", "Run.peddler_rune(member, on_counter)"],
 	["scripts/battle.gd", "Run.roll_rune_candidates(looter)"],
 	["scripts/run_state.gd", "roll_rune_candidates(looter)"],
 	["scripts/events.gd", "run.grant_rune(taker)"],

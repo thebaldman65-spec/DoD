@@ -4,6 +4,55 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## What the playthrough found, and the party condition (Batch HL) — 2026-09-29
+
+**Why a core rune taken from a cache waits in the bag.** A core rune brings the ability its rule cannot work without —
+the Rune of the Cryomancer brings Razor Ice. When the cache slotted one the moment it was chosen, the ability appeared in
+the kit with no act of the player's, and a pick that hands over a rune and a card reads as two things from one choice,
+which is what the designer met. Equipping is already its own act everywhere else since the bag; the cache was the last
+door that did it for him. An ordinary rune is still worn at the pick while a slot is free: it brings nothing with it.
+
+**Why the Peddler sells no core rune.** A core rune is dealt at class selection and found in play. Selling one turns the
+second core — the biggest decision a hero's run makes after the first — into a purchase, and it was also how a core rune
+used to arrive slotted from the counter. Drops, caches and bargains still carry them.
+
+**Why the Rune of the Swordmaster brings Guard Change again.** The test for what an engine brings was *does it pay
+anything without the card*, and the stances do — Aggressive pays from the first blow — so Guard Change went into the
+draft. But the stances are a toggle, and the designer took the rune and could not toggle it. A rule that is a switch
+nobody can press is missing, whatever it pays untouched. Guard Change is proposed because it is the one unconditional
+swap; the others cost Rage and sit on cooldowns.
+
+**Why ten cards stopped asking for a target.** Each of them works on its caster, the whole party, or picks its own
+targets, and none reads the enemy it asked for — the choice was a click that did nothing. They were missing from the
+list of cards the turn treats as self-cast, which a new card joins when it is written.
+
+**Why "(core)" and no "Engine:".** The designer renamed them for the player: the word on every screen is core rune, and
+the rune's card shows its rule without scaffolding in front of it. The code keeps saying engine, because renaming
+identifiers buys nothing a player can see.
+
+**Why the Bastion banks only what is blocked, parried or absorbed.** Those are the three things a guard does. Armor
+works on every blow whether the Warrior guards or not, so banking it turned a passive stat into a steady income, and the
+rune stopped being about guarding.
+
+**Why Mercy's damage cut needs no new cap.** Mercy's bar already holds five, so at 5% a stack the most it can cut is a
+quarter — the premise that it was uncapped was not the game's. A rune or node that raised the bar would raise the cut
+with it, and nothing does today.
+
+**Why Faith at eight moves more than the release.** The count caps at the threshold, and Faith pays on the highest count
+held, so the deeper bar lets an ally's held benefit — and the Devout's own — climb to eight stacks, where three used to
+be the ceiling. The ruling was about how often a release comes; the depth moving with it is its consequence, and it is
+reported with its numbers so it can be ruled on its own.
+
+**Why the run save refuses a newer save and keeps it.** An older build that reads a newer save misreads what it does not
+know and writes it away on its next save. A build cannot protect its own saves from older builds — they have no refusal
+— but it can refuse the saves of builds newer than itself, from now on, and keep them whole for the build that can read
+them. The refusal deletes nothing, because a run is still a run the player was in the middle of.
+
+**Why a party condition is read once, as a fight opens.** Who is in the party and which core runes they carry cannot
+change inside a fight, so an effect stamped on the four as the fight opens stays true to the end. Whether all four are
+still standing can change on any turn, and an effect stamped at the start that the fight made false would be a rune
+telling a lie — so that half waits for a way to take an effect off a hero mid-fight.
+
 ## Runes drop, and there is a bag (Batch HK) — 2026-09-28
 
 **Why the bag holds only the runes nobody is wearing.** Four heroes wear three ordinary runes and two engine runes

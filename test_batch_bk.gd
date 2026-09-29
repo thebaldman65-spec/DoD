@@ -576,10 +576,15 @@ func _section_save() -> void:
 	# this build cannot walk is cleared, not half-loaded), not whatever number
 	# the newest batch happens to be writing. Asserted as "8 or later" so the
 	# next bump does not fail a map test either.
+	# BATCH HL §5 re-pointed it again, to the constant: the save writes
+	# `SAVE_VERSION` by name since the run save gained a ceiling, so the number is
+	# read off the constant's declaration — and the save is asserted to write it
+	# (test_batch_bl's idiom, one suite over).
 	var ver := -1
-	var vpos := src.find("\"version\": ")
-	if vpos >= 0:
-		ver = int(src.substr(vpos + 11, 3).strip_edges().split(",")[0])
+	var cdecl := "const SAVE_VERSION := "
+	var cpos := src.find(cdecl)
+	if cpos >= 0 and src.contains("\"version\": SAVE_VERSION"):
+		ver = int(src.substr(cpos + cdecl.length(), 6).split("\n")[0].strip_edges())
 	ok(ver >= 8, "§6: SAVE version is 8 or later (found %d)" % ver)
 		# BATCH BM: the refusal floor moved with the save version (10). Asserted as
 	# "refuses SOMETHING recent" rather than pinned to a literal, so the next

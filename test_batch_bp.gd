@@ -294,10 +294,12 @@ func _pools() -> void:
 	# BATCH GS — RE-POINTED: THE SWORDMASTER HAS NO ENABLER. Seasoned Fighter opens
 	# every battle Aggressive, which pays from the first blow, so GS §1 took Guard
 	# Change out of his protected core and put it on his shelf — drafted like any
-	# card. Both halves are asked: the core is empty AND the card is on the shelf.
-	ok(Classes.core_enablers("swordmaster").is_empty()
-			and Classes.spec_draft_pool("swordmaster").has("Guard Change"),
-		"§5: the Swordmaster has NO protected enabler since GS — Guard Change is on his shelf, drafted")
+	# card. **BATCH HL §1 RE-POINTED IT BACK, FROM PLAY**: the designer took the
+	# Stances and could not change stance, so Guard Change is the Stances' enabler
+	# again. Both halves are still asked: in the core, and on no shelf.
+	ok(Classes.core_enablers("swordmaster") == ["Guard Change"]
+			and not Classes.spec_draft_pool("swordmaster").has("Guard Change"),
+		"§5: the Swordmaster's enabler is Guard Change since HL — protected, and on no shelf")
 	# BATCH GS — RE-POINTED: A LINEAGE FILLS NO SLOT. The three cores cost 3 slots
 	# until GS (their opening three); each lineage now opens with its enablers
 	# alone, outside the count, so `lineage_slots` is 0 and every Warrior opens at

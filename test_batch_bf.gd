@@ -45,7 +45,7 @@ const Fixture = preload("res://suite_fixture.gd")
 # stacks)%, so four stacks is 60% — and five is now nothing at all.
 const COMMUNION := 15
 # BATCH DC: `battle.FAITH_RELEASE`, ruled at CZ §2, mirrored ONCE per suite.
-const RELEASE := 3
+const RELEASE := 8   # BATCH HL §3 — ruled at eight (3 from CZ §2 to HL)
 const HELD_MAX := RELEASE - 1   # the deepest an ally can HOLD; at RELEASE he releases
 # BATCH DC: the peak of the roll moved down with the threshold — the chance is
 # (COMMUNION x stacks)%% and the top of the eligible band is HELD_MAX, so 30, not 60.
@@ -589,12 +589,17 @@ func _live_rate_at_the_top_of_the_band() -> void:
 		# threshold, which releases and (with no Apostle) resets the ally to zero.
 		# A stack-count detector would read every single fire as a miss and this
 		# row would print 0% next to a node working perfectly.
-		var rate := _measure(scene, scene.get("heroes")[1], HELD_MAX, true)
-		ok(absf(rate - RATE_AT_PEAK) < 0.05,
+		# **BATCH HL §3 — MEASURED AT TWO**: at the threshold of eight the top of
+		# the band is seven and 15% a stack there is a certainty, on a node nothing
+		# writes (`test_batch_be` §6 asserts the dormancy and prints the top). Two is
+		# the depth this row always named, read by stack count — an advance to
+		# three releases nothing at eight.
+		var rate := _measure(scene, scene.get("heroes")[1], 2, false)
+		ok(absf(rate - 0.01 * COMMUNION * 2) < 0.05,
 			"§2: an ally at TWO stacks still advances %d%% of the time (read %.1f%%)" % [
-				int(100.0 * RATE_AT_PEAK), 100.0 * rate])
-		_report.append("Communion at %d stacks (the top of the band): %.1f%% over %d trials (want 30%%)" % [
-			HELD_MAX, 100.0 * rate, TRIALS])
+				COMMUNION * 2, 100.0 * rate])
+		_report.append("Communion at 2 stacks: %.1f%% over %d trials (want 30%%); the top of the band is %d stacks at the threshold of %d" % [
+			100.0 * rate, TRIALS, HELD_MAX, RELEASE])
 	await _kill(scene)
 	_live_ran += 1
 
@@ -628,7 +633,9 @@ func _live_never_rolls_at_five() -> void:
 				h.hp = h.max_hp
 			scene.get("sim_stats").clear()
 			heroes[0].faith_stacks = 0
-			scene.call("_gain_faith", heroes[0], 5, "absorb")
+			# BATCH HL §3 — THE DRIVEN RELEASE IS A GAIN OF `RELEASE`: the literal 5
+			# was the threshold before CZ and overshot three; at eight it is short.
+			scene.call("_gain_faith", heroes[0], RELEASE, "absorb")
 			worst = maxf(worst, _stat_of(scene, "faith_releases"))
 		ok(worst == 1.0,
 			"§2: a fully parked party banks the driven release and nothing else (worst %.0f)" % worst)

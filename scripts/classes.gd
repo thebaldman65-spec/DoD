@@ -334,7 +334,10 @@ const SPEC_DRAFT_POOLS := {
 		"Wheeling Cut", "Counter Time",
 		# BATCH GS §1 — OUT OF THE OPENING KIT: the stances run on the Aggressive
 		# guard every battle opens in. Pommel Strike went to the class kit (§2).
-		"Overpower", "Guard Change"],
+		# BATCH HL §1 — AND GUARD CHANGE WENT BACK INTO IT: the designer played the
+		# Stances with no way to change stance, so the swap travels with the engine
+		# again (`PROTECTED_CORES`) and an enabler sits in no pool.
+		"Overpower"],
 	# MAGE — EIGHT APIECE SINCE BATCH CB, AND THE MAGE WAS THE FIRST CLASS
 	# COMPLETE. BT took the three Mage pools to five (tranche 2's first third),
 	# BU the Cleric three, BV the Hunter three and BW the Warrior three; CB
@@ -820,9 +823,11 @@ const ENGINE_READ := {
 	# Every Warrior was offered both from GP to HD, because neither is refused and
 	# neither resolves into nothing without the engine; the designer ruled the
 	# stance pieces the Stances holder's. `ruled` names the ruling, so a reader of
-	# the table can tell these two from the 37 the cast test found.
-	"Guard Change": {"engine": "seasoned", "ruled": "HD §1",
-		"why": "the stance swap — ruled the Stances holder's; without the engine it still lands 15 Break damage and flips a guard only a card reads"},
+	# the table can tell this one from the rows the cast test found.
+	# **GUARD CHANGE'S ROW STOOD HERE UNTIL HL §1 AND IS DELETED, NOT ZEROED**: the
+	# swap travels with the Stances as their enabler again (`PROTECTED_CORES`), so
+	# it is in no pool and there is no offer left for a row to gate. HD's ruling
+	# holds by construction — only a Stances holder has it.
 	"Lunge": {"engine": "seasoned", "ruled": "HD §1",
 		"why": "the stance-keyed thrust — ruled the Stances holder's; without the engine it still strikes, always down its Aggressive branch"},
 	# ── BATCH HE §3 — THE ZONE BOSS ASKS THIS TABLE NOW, SO ITS BOSS-ONLY CARDS
@@ -1155,11 +1160,15 @@ const PROTECTED_CORES := {
 		"why": "The designer's ruling (GS §1). Blood Frenzy itself reads only his health bar and the Rage he spends, so Bloodlust is the card the ruling sends with it."},
 	"warden": {"slots": 0, "enablers": [],
 		"why": "Heavy Plating is a Block-chance rule; it reads no ability."},
-	# Guard Change travelled until GS as his only UNCONDITIONAL stance swap. The
-	# engine runs without one: every battle opens Aggressive, and Aggressive pays
-	# from the first blow — so the swap is a card, drafted like the others.
-	"swordmaster": {"slots": 0, "enablers": [],
-		"why": "Seasoned Fighter opens every battle Aggressive, and Aggressive pays from the first blow; a stance swap is a card, not the engine."},
+	# Guard Change travelled until GS as his only UNCONDITIONAL stance swap, and GS
+	# sent it to the pool on the test's reading: every battle opens Aggressive, and
+	# Aggressive pays from the first blow. **HL §1 SENT IT BACK, FROM PLAY**: the
+	# designer took the Stances and could not change stance — the engine is a
+	# toggle, and a toggle nobody can press is the engine missing. Which swap
+	# travels is a ruling; Guard Change is PROPOSED, as the one that is
+	# unconditional (the others cost Rage and sit on 3- and 4-turn cooldowns).
+	"swordmaster": {"slots": 1, "enablers": ["Guard Change"],
+		"why": "Seasoned Fighter is a stance toggle, and no Warrior basic or kit card changes stance. Guard Change is the unconditional swap (PROPOSED at HL §1, from play)."},
 	# RULED (GS §1): the Pyromancer brings Flamewave and nothing else.
 	"pyromancer": {"slots": 1, "enablers": ["Flamewave"],
 		"why": "Overburn reads Burn standing on the field, and no Mage basic or kit card lays any. Flamewave lays it on every enemy (the designer's ruling)."},
@@ -2127,8 +2136,9 @@ static func _rule_engine_desc(pid: String) -> String:
 				+ "damage the Warrior deals for the rest of\nthe battle, with no limit. Another ally's\n"
 				+ "kill adds nothing.") % [nm, REAVER_KILL_PCT]
 		"redoubt":
-			return ("%s: damage kept off the Warrior —\nblocked, parried, absorbed by a barrier,\n"
-				+ "or cut by armor and any other mitigation\n— is banked, with no limit. A miss banks\n"
+			# BATCH HL §3 — BLOCKED, PARRIED OR ABSORBED, AND NOTHING ELSE (ruled).
+			return ("%s: damage the Warrior blocks,\nparries, or absorbs with a barrier is\n"
+				+ "banked, with no limit. Armor and other\nmitigation bank nothing, and a miss banks\n"
 				+ "nothing. The Warrior's next basic attack\nthat lands adds the whole bank to its\n"
 				+ "damage and spends it.") % nm
 		"cast_echo":
@@ -2773,7 +2783,7 @@ static func talent_granted_names() -> Array:
 	return out
 
 
-# -- THE DRAFTED ABILITIES — ONE HUNDRED AND SEVENTY-NINE OF A TARGET 179 (BO..HB) --
+# -- THE DRAFTED ABILITIES — ONE HUNDRED AND SEVENTY-EIGHT OF A TARGET 178 (BO..HL) --
 #
 # BATCH HB §2 — 179: Tripwire joined the Survivalist's shelf when Summon Companion
 # took its class-kit slot, and its one definition stays in `spec_abilities`.
@@ -3464,7 +3474,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 6,
 				"anim": "attack03", "special": "formless",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Hold no guard at all. For 4 turns you\ndeal +15% damage AND take 15% less —\nboth stances' upsides and neither\ndownside — and you count as BOTH\nstances for anything that requires one.\nYou cannot Guard Change. When it ends\nyou suffer BOTH downsides for 2 turns."})
+				"description": "Hold no guard at all. For 4 turns you\ndeal +30% damage AND take 15% less —\nboth stances' upsides and neither\ndownside — and you count as BOTH\nstances for anything that requires one.\nYou cannot Guard Change. When it ends\nyou suffer BOTH downsides for 2 turns."})
 		# ----- SWORDMASTER, BATCH DR §4: THE FOUR AXES HIS POOL NEVER HAD.
 		#
 		# DQ MEASURED THIS POOL AS THE MOST CONCENTRATED IN THE GAME: ten cards
@@ -6569,7 +6579,7 @@ const SPEC_INFO := {
 		"blurb": "Protector of the weak — shields allies with their own body."},
 	"swordmaster": {"name": "Swordmaster", "constitution": 120, "archetype": "Bruiser", "passive": "seasoned",
 		"max_hp": 165, "armor": 0.22, "parry_chance": 0.12,
-		"passive_desc": "Seasoned Fighter: fights in one of two stances.\nAGGRESSIVE — +15% damage dealt, +10% damage taken.\nDEFENSIVE — 15% less damage taken, -10% damage dealt.\nStarts each battle Aggressive; Guard Change swaps.",
+		"passive_desc": "Seasoned Fighter: fights in one of two stances.\nAGGRESSIVE — +30% damage dealt, +10% damage taken.\nDEFENSIVE — 15% less damage taken, -10% damage dealt.\nStarts each battle Aggressive; Guard Change swaps.",
 		"blurb": "Precision and technique — presses hard, then weathers the storm."},
 	# The Pyromancer and Cryomancer are mirror-image glass cannons: armoured
 	# in their own element, soft to the opposite — a fire warband and a frost
@@ -6599,12 +6609,12 @@ const SPEC_INFO := {
 	"holy": {"name": "Holy", "constitution": 100, "archetype": "Healer", "passive": "mercy",
 		"max_hp": 150, "armor": 0.10,
 		"resists": {"holy": 0.20, "shadow": -0.15},
-		"passive_desc": "Mercy: a stack is gained when an ally falls below 50%\nhealth (max 5). Each stack: +5% healing done. Stacks pay\nfor Hymn of Hope and talent abilities, or one Empowers a\nheal — Empowered casts forgo their Perfect bonus.",
+		"passive_desc": "Mercy: a stack is gained when an ally falls below 50%\nhealth (max 5). Each stack: +5% healing done and 5% less\ndamage taken. Stacks pay for Hymn of Hope and talent\nabilities, or one Empowers a heal — Empowered casts\nforgo their Perfect bonus.",
 		"blurb": "Pure vessel of light — mercy hardens into miracles."},
 	"inquisitor": {"name": "Devout", "constitution": 110, "archetype": "Warder", "passive": "conviction",
 		"max_hp": 175, "armor": 0.18,
 		"resists": {"holy": 0.15, "fire": 0.10, "shadow": -0.10},
-		"passive_desc": "Conviction: allies build Faith whenever Divine Shield\nabsorbs damage for them — 2 a hit, max 3 stacks, doubled\nunder Blessing of Zeal. Each stack: 2% damage mitigation\nand +1.5% damage dealt, PAID ON THE HIGHEST COUNT HELD\nTHIS BATTLE. At 3 the ally is healed for {mhp:15|ally}, and\nthe COUNT resets while the peak does not. The Devout\nrecovers {res:3}, carries Faith as well, and that count\nnever releases.",
+		"passive_desc": "Conviction: allies build Faith whenever Divine Shield\nabsorbs damage for them — 2 a hit, max 8 stacks, doubled\nunder Blessing of Zeal. Each stack: 2% damage mitigation\nand +1.5% damage dealt, PAID ON THE HIGHEST COUNT HELD\nTHIS BATTLE. At 8 the ally is healed for {mhp:15|ally}, and\nthe COUNT resets while the peak does not. The Devout\nrecovers {res:3}, carries Faith as well, and that count\nnever releases.",
 		"blurb": "A living shrine — faith made armor for every hero."},
 	"occultist": {"name": "Occultist", "constitution": 95, "archetype": "Pressure", "passive": "old_gods",
 		"max_hp": 155, "armor": 0.08,

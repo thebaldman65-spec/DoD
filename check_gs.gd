@@ -63,12 +63,19 @@ const SCRATCH_RELICS := "user://gs_relics.json"
 # **BATCH HB §3 — PACK BOND'S ROW IS GONE, RULED BY THE DESIGNER.** The three
 # summons were GS's one stated exception; HB put the pet in every Hunter's CLASS
 # KIT (Summon Companion), so Pack Bond brings nothing, and the table names five.
+# **BATCH HL §1 — THE STANCES BRING GUARD CHANGE AGAIN, FROM PLAY.** GS sent it to
+# the pool on the test *"does the engine pay without the card"* — Aggressive pays
+# from the first blow — and the designer took the Stances and could not change
+# stance: no Warrior basic or kit card does. A toggle nobody can press is missing,
+# so the swap travels (PROPOSED — which card is the designer's), and the table
+# names six.
 const MINIMUM := {
 	"bloodrage": ["Bloodlust"],                                  # ruled
 	"overburn": ["Flamewave"],                                   # ruled
 	"permafrost": ["Razor Ice"],                                 # ruled at GT
 	"conviction": ["Divine Shield"],                             # ruled at GT
 	"old_gods": ["Hex of Ruin"],                                 # ruled at GT
+	"seasoned": ["Guard Change"],                                # PROPOSED at HL §1
 }
 const WARRIOR_KIT := ["Crushing Blow", "Pommel Strike", "Mocking Blow"]
 
@@ -242,7 +249,7 @@ func _s0_the_minimum() -> void:
 				ok(en == [basic], "§0: the Sharpshooter's enabler is not the Hunter's own basic (%s)" % str(en))
 			else:
 				ok(en == want, "§0: `engine_enablers(%s)` is %s against the table's %s" % [pid, str(en), str(want)])
-	ok(carrying == 5, "§0: %d engines bring a card — the table names five (HB took Pack Bond's summons into the class kit)" % carrying)
+	ok(carrying == 6, "§0: %d engines bring a card — the table names six (HB took Pack Bond's summons into the class kit; HL §1 gave the Stances Guard Change)" % carrying)
 	print("    %d of 24 engines bring a card; the other %d bring nothing" % [carrying, 24 - carrying])
 	# NO LINEAGE TAKES A SLOT: the authored `slots` is the enablers' bar entries,
 	# so the lineage's term is zero — and the five that carry a card take one entry
@@ -259,7 +266,7 @@ func _s0_the_minimum() -> void:
 			"§0: %s's authored slots (%d) are not its enablers' bar entries (%d)" % [
 				spec, Classes.core_slots(String(spec)), Classes.enabler_slots(String(spec))])
 		entries += Classes.enabler_slots(String(spec))
-	ok(entries == 5, "§0: %d lineages' enablers take a bar entry — the five that carry a card" % entries)
+	ok(entries == 6, "§0: %d lineages' enablers take a bar entry — the six that carry a card (five until HL §1)" % entries)
 	# EVERY HERO OPENS ON THE KIT'S THREE, and one earned card is a fourth — **AND
 	# THE SHARPSHOOTER ON TWO (HB §4)**: his engine dismisses the pet, and the slot
 	# it held is his for a drafted card. The one engine that dismisses is counted
@@ -352,7 +359,9 @@ func _s1_nothing_lost() -> void:
 		if note6 != "":
 			doubled.append(note6.trim_prefix(" — and "))
 	doubled.sort()
-	ok(_returning.size() == 30, "§1: %d cards returned to a pool — GS §1 counted twenty-nine, and HB's Tripwire is the thirtieth%s" % [
+	# BATCH HL §1: Guard Change went back to travelling — an enabler, in no pool —
+	# so it left this population, and GS's twenty-nine and HB's Tripwire are 29.
+	ok(_returning.size() == 29, "§1: %d cards returned to a pool — GS §1 counted twenty-nine, HB's Tripwire the thirtieth, and HL §1 took Guard Change back to the Stances%s" % [
 		_returning.size(), "" if doubled.is_empty() else "; " + "; ".join(doubled)])
 	var per := {}
 	for n4 in _returning:
@@ -499,6 +508,11 @@ func _s2_who_is_offered() -> void:
 	print("    %d refused without their engine (rows of `ENGINE_READ`), %d work with none, %d gated by ruling (HD §1)" % [
 		gated, working, ruled])
 	ok(gated == 3, "§2: %d returning cards are gated by what a cast shows — GS derived three" % gated)
+	# **BATCH HL §1 — THE RULED BRANCH ABOVE HAS NO MEMBER NOW, AND THIS SAYS SO.**
+	# Guard Change was its one card; it travels with the Stances again and is no
+	# returning card, so the branch is kept for the next ruled row and its count is
+	# asserted, so a card arriving there is a line moved on purpose.
+	ok(ruled == 0, "§2: %d returning cards are gated by ruling — HL §1 took Guard Change back to the Stances, and none is left" % ruled)
 	ok(gated + working + ruled == _returning.size(), "§2: %d of %d returning cards were driven" % [
 		gated + working + ruled, _returning.size()])
 	# THE OFFER DOOR, BOTH DIRECTIONS: offered to none exactly when ungated, and

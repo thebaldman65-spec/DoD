@@ -179,16 +179,17 @@ func _draw_detail() -> void:
 				cfg["abilities"] = cfg["abilities"] + [bm_ab]
 		Talents.apply_from_tree(cfg, member.get("tree", []), member.get("talents", {}),
 			member)
+	# BATCH HL §6 — the four in the ctx, exactly as the spawn hands them, so a
+	# payload's party condition reads the same party here as in the fight.
+	var pay_ctx := {"learned": member.get("talents", {}), "member": member, "party": Run.party}
 	for rune in member.get("runes", []):
 		if rune.get("equipped", false):
-			Talents.apply_payload(cfg, rune["payload"], 1,
-				{"learned": member.get("talents", {}), "member": member})
+			Talents.apply_payload(cfg, rune["payload"], 1, pay_ctx)
 	# BATCH HK §4 — AND THE PARTY SLOT'S RUNE, ON EVERY HERO, EXACTLY AS THE SPAWN
 	# APPLIES IT: the sheet shows the numbers the fight will use. None is authored.
 	for pr in Run.party_runes:
 		if (pr as Dictionary).get("equipped", false):
-			Talents.apply_payload(cfg, (pr as Dictionary).get("payload", {}), 1,
-				{"learned": member.get("talents", {}), "member": member})
+			Talents.apply_payload(cfg, (pr as Dictionary).get("payload", {}), 1, pay_ctx)
 	# Mini-boss ability upgrades (Batch AP), LAST — same order as the battle
 	# spawn, and for the same reason: a talent that SETS a field would
 	# otherwise overwrite the upgrade. The sheet has to show the numbers the
@@ -298,9 +299,9 @@ func _draw_detail() -> void:
 	# BATCH GK — ONE LINE PER HELD ENGINE, and "none" said out loud: a hero with
 	# no engine is a legal state, and the sheet names it rather than going quiet.
 	for pid in engines:
-		passive_lines.append("Engine: %s" % _passive_desc_live(cfg, String(pid)))
+		passive_lines.append(_passive_desc_live(cfg, String(pid)))
 	if engines.is_empty() and awake:
-		passive_lines.append("Engine: none held.")
+		passive_lines.append("Core rune: none held.")
 	var passive_label := Label.new()
 	passive_label.text = "\n".join(passive_lines)
 	passive_label.add_theme_font_size_override("font_size", 13)
@@ -483,7 +484,7 @@ func _draw_detail() -> void:
 			equipped_count += 1
 	# BATCH GK — the engine slots are counted beside the three ordinary ones.
 	var held_engines: Array = member.get("engines", [])
-	rune_header.text = "RUNES  (%d/%d equipped, %d/%d engines — swap them on the map)" % [
+	rune_header.text = "RUNES  (%d/%d equipped, %d/%d core — swap them on the map)" % [
 		equipped_count, slot_cap, engines.size(), Run.ENGINE_SLOTS]
 
 	rune_header.add_theme_font_size_override("font_size", 15)

@@ -77,7 +77,7 @@ const ELEVATION_STACKS_TEST := 2
 # BATCH DF: `battle.FAITH_RELEASE`, ruled at CZ §2 and re-affirmed at DA §1,
 # mirrored ONCE per suite — DC's device, extended here to the second suite its
 # sweep did not reach. The next threshold ruling costs this file one line.
-const RELEASE := 3
+const RELEASE := 8   # BATCH HL §3 — ruled at eight (3 from CZ §2 to HL)
 const HELD_MAX := RELEASE - 1   # the deepest an ally can CARRY; at RELEASE he releases
 const BREAKING_DARKNESS_BD_PCT_TEST := 25
 const PENANCE_MIRROR_TEST := 0.50
@@ -1076,17 +1076,30 @@ func _live_elevation() -> void:
 	ok(low.faith_stacks == ELEVATION_STACKS_TEST,
 		"an ally at 0 is handed %d stacks (%d)"
 			% [ELEVATION_STACKS_TEST, low.faith_stacks])
-	ok(mid.faith_stacks == 0 and mid.faith_peak == RELEASE,
-		"an ally at 1 is handed %d MORE — he crosses the cap and RELEASES, which a floor could not do (count %d, peak %d)"
-			% [ELEVATION_STACKS_TEST, mid.faith_stacks, mid.faith_peak])
-	ok(high.faith_stacks == 0 and high.faith_peak == RELEASE,
-		"an ally at 2 likewise (count %d, peak %d)" % [high.faith_stacks, high.faith_peak])
+	# BATCH HL §3 — AT EIGHT THE TWO DEEPER ALLIES COME TO REST AGAIN, AND THAT
+	# IS CE's OWN DISCRIMINATOR BACK: a floor-write of 2 leaves them 2 and 2,
+	# adding leaves 3 and 4. Each arm reads its outcome off the threshold — a
+	# release where start + grant reaches it, the count where it does not — so
+	# the next ruling moves neither line.
+	var peaks_follow := low.faith_peak == low.faith_stacks
+	for pair in [[mid, 1], [high, 2]]:
+		var u: BattleUnit = pair[0]
+		var start: int = int(pair[1])
+		var lands: int = start + ELEVATION_STACKS_TEST
+		if lands >= RELEASE:
+			ok(u.faith_stacks == 0 and u.faith_peak == RELEASE,
+				"an ally at %d is handed %d MORE — he crosses the cap and RELEASES, which a floor could not do (count %d, peak %d)"
+					% [start, ELEVATION_STACKS_TEST, u.faith_stacks, u.faith_peak])
+			peaks_follow = peaks_follow and u.faith_peak == RELEASE
+		else:
+			ok(u.faith_stacks == lands and u.faith_peak == lands,
+				"an ally at %d is handed %d MORE — he holds %d, which a floor of %d could not (count %d, peak %d)"
+					% [start, ELEVATION_STACKS_TEST, lands, ELEVATION_STACKS_TEST, u.faith_stacks, u.faith_peak])
+			peaks_follow = peaks_follow and u.faith_peak == u.faith_stacks
 	# AND THE PEAK FOLLOWS THE COUNT rather than being written on its own. This
 	# is BI §1's one ratchet doing the work: no second writer exists any more.
-	# For the two who released, the count it just gained IS the threshold.
-	ok(low.faith_peak == low.faith_stacks
-			and mid.faith_peak == RELEASE
-			and high.faith_peak == RELEASE,
+	# For one who released, the count it just gained IS the threshold.
+	ok(peaks_follow,
 		"every peak follows the count it just gained (%d/%d/%d)"
 			% [low.faith_peak, mid.faith_peak, high.faith_peak])
 	# THE CONSEQUENCE TO IMPLEMENT RATHER THAN GUARD AGAINST: an ally already

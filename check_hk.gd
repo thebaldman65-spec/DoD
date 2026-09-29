@@ -553,7 +553,11 @@ func _s3_the_peddler() -> void:
 	_clear_bag()
 	_new_run()
 	var w: Dictionary = _run.party[0]
-	var w_ids := Runes.eligible_ids(w, Runes.owned_names(w, _held()))
+	# BATCH HL §1b — THE PEDDLER SELLS NO CORE RUNE, so his population is the
+	# ordinary runes the Warrior is eligible for: a core rune kept back here would
+	# be one he can never be offered, and the arm would read the ruling as a hole.
+	var w_ids := Runes.eligible_ids(w, Runes.owned_names(w, _held())).filter(
+		func(x): return not Runes.is_engine_rune(String(x)))
 	var keep := String(w_ids.back())
 	_hold_all(w_ids.slice(0, w_ids.size() - 1))
 	change_scene_to_file("res://scenes/shop.tscn")

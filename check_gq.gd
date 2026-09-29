@@ -436,8 +436,12 @@ func _read_screen(scene: Node, seat: int, key: String, deal: Array) -> Dictionar
 			continue
 		var body := String(bodies[0].text)
 		var rule := _rule(key, pid)
-		ok(body.begins_with("Engine: %s" % rule),
-			"§1: %s — %s's card opens with its engine rule" % [tag, rid])
+		# BATCH HL §2 — THE PREFIX IS GONE (the designer's): the card opens with the
+		# engine's rule itself, *"Momentum: a turn that…"*, where it read
+		# *"Engine: Momentum: …"*. Both halves asserted: the rule first, and no
+		# "Engine:" in front of it.
+		ok(body.begins_with(rule) and not body.begins_with("Engine:"),
+			"§1: %s — %s's card opens with its engine rule, with no \"Engine:\" before it" % [tag, rid])
 		if lineage != "":
 			var blurb := String(Classes.SPEC_INFO[lineage].get("blurb", ""))
 			ok(blurb == "" or not all_text.contains(blurb),
@@ -457,13 +461,13 @@ func _read_screen(scene: Node, seat: int, key: String, deal: Array) -> Dictionar
 			if not gone.is_empty() and part == String(added[0]):
 				part += " (in place of %s)" % String(gone[0])
 			parts.append(part)
-		var want := "Engine: %s" % rule
+		var want := rule
 		if not parts.is_empty():
 			want += "\n\nAlso opens with: %s" % ", ".join(parts)
 		if not dismissed.is_empty():
 			want += "\n\nOpens without: %s" % ", ".join(PackedStringArray(dismissed))
 		ok(body == want, "§1: %s — %s's card reads its rule and what it adds, exactly (%s)"
-			% [tag, rid, body.substr(("Engine: %s" % rule).length()).strip_edges()])
+			% [tag, rid, body.substr(rule.length()).strip_edges()])
 		ok(body.contains("(in place of ") == (not gone.is_empty()),
 			"§1: %s — %s's card names a replaced basic exactly when it replaces one" % [tag, rid])
 		# THE KIT IS ON NO CARD: no ability line, no figure and no bare card's
@@ -476,7 +480,7 @@ func _read_screen(scene: Node, seat: int, key: String, deal: Array) -> Dictionar
 				"§1: %s — %s's card does not repeat %s" % [tag, rid, ab.display_name])
 		# What the card LISTS, read back off it: the added cards and nothing of the
 		# kit, the replaced basic appearing only inside its clause.
-		var tail := body.substr(("Engine: %s" % rule).length()).strip_edges()
+		var tail := body.substr(rule.length()).strip_edges()
 		# BATCH HB — what it ADDS is read up to its "Opens without" line, which
 		# `want` above has already held to the dismissed card exactly.
 		var without_at := tail.find("Opens without: ")

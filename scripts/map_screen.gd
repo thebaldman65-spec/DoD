@@ -851,7 +851,7 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 				eng_note = Run.rune_sits_out_note(String(erd.get("id", "")), held)
 			else:
 				held_titles.append(e_title)
-		hint.text = "engines: %s — click the card for the sheet" % (
+		hint.text = "core runes: %s — click the card for the sheet" % (
 			" + ".join(held_titles) if not held.is_empty() else "none")
 		hint.add_theme_font_size_override("font_size", 11)
 		hint.add_theme_color_override("font_color", Color(0.5, 0.48, 0.52))
@@ -1887,16 +1887,26 @@ func _pick_rune(idx: int, choice: int) -> void:
 	var rune: Dictionary = live[clampi(choice, 0, live.size() - 1)]
 	# Auto-equip while a slot is free — the pick already happens here; save
 	# the extra click. **BATCH HK §2 — ASKED, AND `hold_rune` DECIDES BY KIND**:
-	# an ordinary rune takes one of his three slots, an engine rune an engine slot,
-	# a party rune the party slot, each only while one is free; anything else goes
-	# into the bag, and a full bag holds it for the full-bag panel below.
-	rune["equipped"] = true
-	# BATCH GK — THE ONE DOOR: an engine rune takes an engine slot, not the pouch.
+	# an ordinary rune takes one of his three slots, a party rune the party slot,
+	# each only while one is free; anything else goes into the bag, and a full bag
+	# holds it for the full-bag panel below.
+	#
+	# **BATCH HL §1 — A CORE RUNE IS NOT ASKED FOR.** A slotted engine brings its
+	# enabler, so asking here put a card in the kit beside the rune the player
+	# chose: one pick, two things. It goes into the bag, and its card joins the kit
+	# when he slots it on the hero's panel — an act of his own, as HK made every
+	# other equip.
+	var is_core := String(rune.get("engine", "")) != ""
+	rune["equipped"] = not is_core
+	# BATCH GK — THE ONE DOOR.
 	var landed: String = Run.hold_rune(member, rune)
 	member["rune_picks_owed"] = int(member.get("rune_picks_owed", 0)) - 1
 	Run.save_run()
 	_draw_screen()
-	if landed == "bag":
+	if landed == "bag" and is_core:
+		# PROPOSED WORDS (HL §1).
+		_toast("%s goes into the bag — slot it on the hero's rune panel to use it." % String(rune["name"]))
+	elif landed == "bag":
 		_toast("%s goes into the bag — every slot it fits is filled." % String(rune["name"]))
 	elif landed == "pending":
 		_check_rune_drops()
@@ -1999,14 +2009,14 @@ func _open_rune_panel(idx: int) -> void:
 	# panel only draws it.
 	var worn_engines: int = Run.engines_worn(member)
 	var eng_head := Label.new()
-	eng_head.text = "ENGINES — %d of %d slots filled" % [worn_engines, Run.ENGINE_SLOTS]
+	eng_head.text = "CORE RUNES — %d of %d slots filled" % [worn_engines, Run.ENGINE_SLOTS]
 	eng_head.add_theme_font_size_override("font_size", 15)
 	eng_head.add_theme_color_override("font_color", Color(0.95, 0.75, 0.45))
 	eng_head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	list.add_child(eng_head)
 	if erows.is_empty():
 		var no_eng := Label.new()
-		no_eng.text = "No engine rune held. Engine runes come with the other runes."
+		no_eng.text = "No core rune held. Core runes come with the other runes."
 		no_eng.add_theme_font_size_override("font_size", 12)
 		no_eng.add_theme_color_override("font_color", Color(0.6, 0.57, 0.55))
 		no_eng.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -2026,7 +2036,7 @@ func _open_rune_panel(idx: int) -> void:
 		if e_bag and worn_engines >= Run.ENGINE_SLOTS:
 			# BATCH HK §2 — BOTH SLOTS FULL: the bag's engine goes on in place of one.
 			etoggle.text = "Swap"
-			etoggle.tooltip_text = "Both engine slots are filled. Swap this\nengine rune for one he has slotted."
+			etoggle.tooltip_text = "Both core slots are filled. Swap this\ncore rune for one he has slotted."
 			etoggle.pressed.connect(_open_swap_chooser.bind(idx, "engines", ei, overlay))
 		else:
 			etoggle.text = "Unequip" if e_on else "Equip"

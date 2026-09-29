@@ -83,8 +83,15 @@ const SEATS := ["warrior", "mage", "cleric", "hunter"]
 # Poison). The brief's bar was five with no engine for every class, and each
 # floor sits at the reading, as HD ruled; the owed branch below binds no half
 # today and is kept for the next batch that thins one to nothing.
+#
+# **BATCH HL §1 MOVED THE WARRIOR'S CEILING HALF 9 -> 8, AND SAYS WHY HERE, AS HD
+# RULED.** Guard Change travels with the Stances again (the designer took the
+# engine in play and could not change stance), so it is in no pool, and Open Line
+# — which requires it — can be met only by a hero holding the Stances. A Warrior
+# with no engine can never hold Guard Change now, even with every card he can
+# draft in hand, so his ceiling loses Open Line. The spawn half did not move.
 const RUNE_FLOOR := {
-	"warrior": [5, 9],
+	"warrior": [5, 8],
 	"mage": [5, 9],
 	"cleric": [5, 5],
 	"hunter": [7, 9],
@@ -555,7 +562,11 @@ func _drive(id: String, s: Node) -> Dictionary:
 			await _struck(s, f0, ally, 20)
 			return {"peak": ally.faith_peak}
 		"fourth_stack":
-			s._gain_faith(ally, 5, "gv")
+			# BATCH HL §3 — THE GAIN REACHES ONE PAST THE LIVE THRESHOLD, read off
+			# `battle.gd`: the rune's stack is the one above it, so with the rune the
+			# ally peaks one higher before he releases. The literal 5 reached one past
+			# CZ's three; at eight it reached neither arm's release, and both read 5.
+			s._gain_faith(ally, int(s.get_script().get_script_constant_map()["FAITH_RELEASE"]) + 1, "gv")
 			return {"peak": ally.faith_peak}
 		"layered_aegis":
 			# BATCH HC §2 — OFF THE BAR ONLY. Divine Shield is the Devout's enabler:
@@ -1287,7 +1298,8 @@ func _s2c_the_screen(rolled: Array) -> void:
 		for c2 in rolled:
 			ok(not btn_texts.any(func(t): return String(t).begins_with(String(c2["name"]))),
 				"§2c: the overlay drew %s as a button with the Old Gods unequipped" % c2["name"])
-		ok(Gate.has_text(ov, "Rune of the Occultist is not equipped"),
+		# BATCH HL §2: the rune's name wears "(core)", read off the data.
+		ok(Gate.has_text(ov, "Rune of the Occultist (core) is not equipped"),
 			"§2c: the overlay does not say the runes wait on the Rune of the Occultist")
 		ok(not Gate.has_text(ov, "nothing can arrive to fill it"),
 			"§2c: the overlay says nothing can arrive, and equipping the engine would fill it")
@@ -1335,7 +1347,8 @@ func _s2c_the_screen(rolled: Array) -> void:
 	var ov3: Node = Gate.overlay(screen, 60)
 	var pressed_name := ""
 	if ov3 != null:
-		ok(Gate.has_text(ov3, "1 more that waits on the Rune of the Berserker being equipped"),
+		# BATCH HL §2: the rune's name wears "(core)", read off the data.
+		ok(Gate.has_text(ov3, "1 more that waits on the Rune of the Berserker (core) being equipped"),
 			"§2c: a part-row cache does not say what else it holds")
 		var rune_btns: Array = []
 		var btns3: Array = []

@@ -511,6 +511,10 @@ var vengeful_ready := true    # answers with Crushing Blow; re-arms at his turn
 var seasoned_def_bonus := 0.0 # Defensive Stance: deeper damage-taken cut
 var rune_seasoned_def_bonus := 0.0 # rune-owned: the Bared Guard -0.15
 var seasoned_off_bonus := 0.0 # Aggressive Stance: bigger damage-dealt bonus
+# BATCH HL §3 — THE AGGRESSIVE GUARD'S DAMAGE DEALT, RULED AT +30% (it was +15%).
+# The Defensive guard's cut stays 15%, and both downsides stay 10%. One constant,
+# read by the strike loop, the chip, and Formless's upside in `battle.gd`.
+const SEASONED_AGG_DEALT := 0.30
 var rune_seasoned_off_bonus := 0.0 # rune-owned: the Bared Guard +0.1
 var stance := "aggressive"    # Swordmaster guard (aggressive|defensive), fresh each battle
 # Swordmaster lanes (Batch F; magnitudes re-authored in Batch AK, where a
@@ -2839,7 +2843,7 @@ func refresh_bars() -> void:
 		for s in statuses:
 			if s.id == engine_chip_id("seasoned"):
 				var aggressive := stance == "aggressive"
-				var off_pct := int(round((0.15 + seasoned_off_bonus
+				var off_pct := int(round((SEASONED_AGG_DEALT + seasoned_off_bonus
 					+ rune_seasoned_off_bonus) * 100))
 				var def_pct := int(round((0.15 + seasoned_def_bonus
 					+ rune_seasoned_def_bonus) * 100))
@@ -3612,7 +3616,7 @@ func _siphon_pay(amount: int) -> int:
 		return amount
 	resource -= covered * rate
 	float_text("-%d Mana" % (covered * rate), Color(0.5, 0.7, 1.0))
-	_proc_log("Rune of the Leech — %s pays %d of the damage in Mana" % [unit_name, covered])
+	_proc_log("Rune of the Leech (core) — %s pays %d of the damage in Mana" % [unit_name, covered])
 	refresh_bars()
 	return amount - covered
 

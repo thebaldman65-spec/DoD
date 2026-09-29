@@ -16,6 +16,82 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-09-29 &mdash; Batch HL: WHAT THE PLAYTHROUGH FOUND, AND THE PARTY CONDITION</h2>
+<p><b>The designer played the merged game and found five things wrong; all five are fixed and driven, and four
+rulings from the same play are built with them.</b> Engine runes are called <b>core runes</b> on every screen, four
+magnitudes moved by ruling, the run save gained a ceiling, and a rune's condition can now read who is in the party.
+<b>No rune was authored.</b> Full working: <code>docs/reports/HL.md</code>.</p>
+
+<p><b>&sect;0 &mdash; the letter HM is spent.</b> A batch document <b>HM</b> (the party condition and the run-save
+ceiling) was written and then folded into this one rather than run. <b>Nothing of it will be run as HM</b>; the gap
+between HL and HN is not a lost batch &mdash; the same shape as CC, recorded at CD &sect;3, and CF, at CG &sect;0.</p>
+
+<p><b>&sect;1 &mdash; THE FIVE THINGS THE PLAYTHROUGH FOUND.</b>
+<b>&ldquo;Drafting Fireball also granted Razor Ice.&rdquo;</b> No draft hands over two cards &mdash; every card every hero
+can earn was taken one at a time under every set of core runes a hero can hold, over four thousand takes, and each
+added exactly itself. What <i>can</i> put a second card in a hero's kit from one choice is a core rune: each brings the
+ability its rule needs (the Rune of the Cryomancer brings Razor Ice), and a core rune bought from the Peddler, or taken
+from an elite's cache, used to be slotted the moment it arrived, so its ability simply appeared. <b>Now a core rune taken
+from a cache goes into the bag</b>, and its ability joins the kit when the player slots it. <b>&ldquo;Core runes were offered
+at the Peddler.&rdquo;</b> They were, and the bag had not changed that: <b>the Peddler no longer sells a core rune</b>. They are
+dealt at class selection and found in play &mdash; a drop, a cache, a bargain. <b>&ldquo;A rune bought at the Peddler never
+appeared.&rdquo;</b> At the time a bought rune went onto the hero unworn, where nothing on the map showed it (and a core rune
+was slotted without a word); since the bag, a bought rune goes into the bag, the counter says so, the map counts it and
+the hero's rune panel equips it. <b>&ldquo;Seasoned Fighter gave no way to change stance.&rdquo;</b> It had none: Guard Change had
+been moved into the draft. <b>The Rune of the Swordmaster brings Guard Change again.</b> <b>&ldquo;Hunter's Preparation asks
+for a target.&rdquo;</b> It asked for an enemy it never used, and so did nine more cards &mdash; Salve, Thick Hide, Dug In,
+Sanctuary, Bloodbond, Bear the Brunt, Ghostpack, Bring It Down and Savage Sweep. <b>None of the ten asks now.</b></p>
+
+<p><b>&sect;2 &mdash; ENGINE RUNES ARE CORE RUNES.</b> Every one is named with <i>(core)</i> after it &mdash; <i>Rune of the Warden
+(core)</i> &mdash; pending art of their own, and its card shows its rule with nothing in front of it: <i>&ldquo;Momentum: a turn
+that&hellip;&rdquo;</i>, where it read <i>&ldquo;Engine: Momentum: &hellip;&rdquo;</i>. The class-selection screen, the rune pouch, the hero
+sheet and the glossary say <i>core rune</i>, and the combat log names each one so. A save made before the rename shows the
+new names.</p>
+
+<p><b>&sect;3 &mdash; FOUR MAGNITUDES, RULED.</b> <b>The Bastion banks only damage that is blocked, parried or absorbed by a
+barrier</b>; armor and other mitigation bank nothing. <b>The Aggressive stance deals +30% damage</b> (it was +15%); the
+Defensive stance's 15% less damage taken is unchanged, and Formless, which holds both stances' upsides, deals +30% too.
+<b>Each Mercy stack the Holy cleric holds also cuts the damage she takes by 5%</b> &mdash; 25% at the five the bar holds.
+<b>Faith releases at eight stacks</b> (it was three): at two stacks an absorbed hit, a release comes about every fourth
+absorbed hit. The Fourth Stack rune's text says <i>one more stack</i> now, since four is no longer the number.</p>
+
+<p><b>&sect;4 &mdash; THE RULE THE PLAYTHROUGH EARNED.</b> The designer's rule is recorded beside the core rune charter:
+<b>a core rune is a directional for ability drafting</b> &mdash; it must change what a hero drafts, so that two heroes of
+a class holding different cores draft differently, and a crest rune has to read the four as a group rather than stamp a
+stat on each. Beside it: Ambusher's sharpest direction, cards that follow each other with no turn between, is unbuilt
+(nothing in the game records what was cast last), and of the eight things a crest rune cannot yet read, half of one is
+built here (&sect;6).</p>
+
+<p><b>&sect;5 &mdash; A SAVE FROM A NEWER BUILD IS REFUSED, AND KEPT.</b> The run save now does what the profile has done since
+FQ: a save written by a newer build is not loaded, not written over and not deleted &mdash; not even by a New Game &mdash; and
+the main menu says so, with Continue unavailable. <b>It protects saves from the next version change on; it cannot
+protect this build's saves from an older build</b>, which has no such refusal, so a save made in this build must not be
+opened in an older one, <code>main</code> included.</p>
+
+<p><b>&sect;6 &mdash; A RUNE CAN READ WHO IS IN THE PARTY.</b> A rune's effect may now carry a condition on the party: a class
+among the heroes or absent from them, how many of a class, a core rune any of them carries, or every hero standing. It is
+read once, as each fight opens; when it does not hold the rune pays nothing that fight, and the combat log says so.
+<b>Whether all four are still alive later in a fight is not built</b> &mdash; that would need an effect that can come off a
+hero mid-fight. No rune uses the condition yet; the batch's check proves every one of them with a rune it builds and
+never writes into the game's data.</p>
+
+<p><b>The checks that moved, and why.</b> Every one was run first as it stood against this batch's game, read by what it
+said, and changed only where it asked the old question. <b>Faith at eight</b>: the seven Faith suites carry the threshold
+once each and read 8 now; three more that only need a release to happen read the threshold off the game; the ones that
+measured Communion at the top of its band measure it at two, because at eight the top is a certainty on a talent nothing
+grants any more, and one of them now says so. <b>Guard Change travelling with the Stances</b>: the Warrior's pool is 42
+(the shared pool floor and the draft-count suites follow), the Swordmaster's shelf 13, the draft 178; the checks that
+counted the card among the drafted, the returning or the ruled-by-the-designer cards count it among the cards an engine
+brings; and the check that proves a card like Battle Poise can be opened with no engine opens it with Precision Strike,
+which a Warrior can still draft. <b>Core runes</b>: the class-selection card's check no longer expects <i>Engine:</i>; the
+checks that quote a core rune's name or a sits-out sentence expect <i>(core)</i>, and the battle log quotes a sits-out
+note's first sentence rather than its first two lines. <b>The Peddler</b>: the check that pins where each rune offer
+comes from names his new roll, and the check that holds back every rune but one keeps back an ordinary rune. <b>The
+Bastion</b>: its check asserts that armor cuts a blow and banks nothing. <b>The save</b>: three suites read the version off
+the one constant the save writes. <b>The cache</b>: a check that hands a hero a core rune to wear now asks for it to be
+worn. <b>The new check itself</b>: the check that counts how often a check sets up its own subject by hand allows six
+more, the new check's engine-out controls, each measuring the same blow with the engine taken off the same hero. <b>Eleven checks count differently with nothing in them edited to make it so</b> &mdash; each traced check by check against the same check on the old game: most walk every card in a pool, or every card an engine brings, so Guard Change leaving the Warrior&rsquo;s pool and joining the Stances moves them by a few; one measures every line of a sits-out note and meets one more line on each of 42 notes, because a core rune&rsquo;s name now takes a line of its own; one reads the class-selection cards and meets <i>Also opens with: Guard Change</i>; and one grants every rune a Swordmaster can be offered and meets one more, Open Line, which needs Guard Change. Table: <code>docs/reports/HL.md</code> &sect;10.</p>
+
 <h2>2026-09-28 &mdash; Batch HK: RUNES DROP, AND THERE IS A BAG</h2>
 <p><b>A rune now drops after every normal fight, into a bag of twenty the heroes share, and the Peddler buys runes as
 well as selling them.</b> The first batch authored from a playthrough: the reward loop the designer ruled after

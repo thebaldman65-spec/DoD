@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-28 (Batch HK &mdash; runes drop, and there is a bag)</b></p>
+<p align="right"><b>Last updated: 2026-09-29 (Batch HL &mdash; what the playthrough found, and a condition on the four heroes)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -115,7 +115,7 @@ opens with beyond the class kit, by name (&ldquo;Also opens with:&rdquo;).
 What is true of all three is shown <b>once, below the cards</b>: the class's basic attack and class
 kit (&sect;5.2), each with its damage at the class's own Attack, which is a hero's holding no engine.
 A dealt rune whose lineage sets another Attack and so moves one of those figures is named in a line
-under them &mdash; the Rune of the Warden on a Warrior's screen, and the Rune of the Occultist on a
+under them &mdash; the Rune of the Warden (core) on a Warrior's screen, and the Rune of the Occultist (core) on a
 Cleric's. The rune can be dropped or swapped
 later; the spec it carried is the hero's lineage for the whole run.</li>
 <li><b>Victory rewards:</b> gold for every fight, <b>a rune for every normal fight won</b> &mdash;
@@ -157,7 +157,10 @@ call about pre-v8 saves — a flat 12-slot line has no honest place on a lattice
 pre-v7, and Batch AI about ranked talent purchases: a wipe that says so beats a migration that
 invents state.) <b>v10 is a floor and not the format</b>: v10 and v11 saves load, tolerantly,
 because everything added since is counters and slots rather than structure. Run end (win or
-wipe) clears the save.</li>
+wipe) clears the save. <b>A save written by a newer build is refused and left exactly as it is</b>:
+this build does not load it, write over it or delete it &mdash; not by starting a New Game either
+&mdash; and the main menu says so, with Continue unavailable. An older build has no such refusal, so
+a save from this build must not be opened in one.</li>
 </ul>
 
 <h2>3. Zones &amp; the Map</h2>
@@ -872,14 +875,14 @@ health, snapshotted (and Mercy-scaled) when cast.</td></tr>
 <tr><td>Hallowed</td><td>Immune to new debuffs (Empowered Divine Plea, 3
 turns).</td></tr>
 <tr><td>Faith</td><td>Conviction (Devout passive): Divine Shield absorbs (2 a hit) AND
-standing on Consecrated Ground (1 a hero a turn) build stacks, max 3.
+standing on Consecrated Ground (1 a hero a turn) build stacks, max 8.
 <b>WHAT A STACK PAYS IS READ OFF THE HIGHEST COUNT THE CARRIER HAS HELD THIS BATTLE, NOT
 THE COUNT HELD RIGHT NOW</b> — 2% damage mitigation and +1.5% damage dealt per PEAK stack.
-At 3 the bearer heals 15% max health, the
+At 8 the bearer heals 15% max health, the
 COUNT resets — <b>the peak does not, so a release never takes the held benefit away</b> —
 the Devout recovers 3% max Mana, and the Devout's own maximum health rises 3% of his base
 for the rest of the battle (he is healed for that amount too).
-<b>The Devout carries Faith of his own, and his count never releases</b> — it holds at 3,
+<b>The Devout carries Faith of his own, and his count never releases</b> — it holds at 8,
 paying him the same mitigation and damage it pays everyone else. The chip counts current
 stacks ("F3") and states the peak beside them; it stays up at F0 after a release, because
 the peak is still paying. The peak is per-battle and is zeroed when the next fight
@@ -1084,7 +1087,7 @@ conversion and does not touch this one</b> — this one converts a DEPTH in one 
 converts an assembled TOTAL, and both can fire on one blow. Spent by Coup de Grâce (which reads at most 200).</li>
 <li><b>Mercy (HOLY passive, 0–5):</b> only the Holy spec has the bar. +1 stack whenever a
 hero falls below 50% health (any damage source; crossings count each time). Each
-stack held: <b>+5% healing done</b>. Stacks are SPENT on Hymn of Hope (1), Divine Plea (2),
+stack held: <b>+5% healing done and 5% less damage taken</b> &mdash; 25% at the five the bar holds. Stacks are SPENT on Hymn of Hope (1), Divine Plea (2),
 and Resurrection (1) — costs are paid before the cast resolves, so a spender heals with
 what remains — or on <b>Empowerment</b>: the ✦ Empower toggle (hotkey C) arms the next
 supporting cast for +1 extra stack and a bonus effect. <b>Empowered casts forgo their
@@ -1192,7 +1195,9 @@ Berserker 110, Devout 110, Holy 100, Beastmaster 100, Survivalist 100, Occultist
 Arcanist 90, Sharpshooter 90, Pyromancer 85, Cryomancer 85.</p>
 
 <h3>6.0 Engine runes</h3>
-<p><b>A hero is a CLASS, and what made each specialization what it was is an ENGINE RUNE.</b> An
+<p><b>A hero is a CLASS, and what made each specialization what it was is an ENGINE RUNE</b> &mdash;
+a <b>CORE RUNE</b> on every screen, where each wears <i>(core)</i> after its name and shows its
+engine's rule with nothing in front of it. An
 engine is a rule that changes how a hero fights for the whole run: a meter is one way to build one,
 not the definition — Heavy Plating is a rule about Block, the stances are a state, and Trapper reads
 the board at the moment of a strike. <b>An engine rune of one class is never offered to another</b>:
@@ -1201,9 +1206,11 @@ a Warrior can never hold Burn.</p>
 <li><b>Class selection deals three.</b> Before the first battle each hero is dealt three of his
 class's engine runes and takes one. Every class has six, so every deal leaves three out.</li>
 <li><b>Two engine slots.</b> A hero may hold two engine runes, in two slots of their own that do
-not compete with the three ordinary rune slots. The second comes from the ordinary rune offers —
-the Peddler, an elite's cache, a bargain, an event — mixed in with everything else, and only ever
-his class's. Each costs 150 gold at the Peddler, on the flat rune price, and goes into the bag.</li>
+not compete with the three ordinary rune slots. The second is found in play &mdash; a drop after a
+normal fight, an elite's cache or a bargain &mdash; mixed in with everything else, and only ever his
+class's; <b>the Peddler never sells one</b>, and no event grants one. One taken from a cache goes into
+the bag, as a drop does, and is slotted from the hero's rune panel: taking it adds no ability to his
+kit until he slots it.</li>
 <li><b>Drop and swap, to nothing.</b> The hero's rune pouch on the map equips and unequips engine
 runes. An unequipped rune goes into the heroes' bag, and its engine is out of the next fight; with
 both slots full, one in the bag can be swapped for one slotted. <b>A hero with no
@@ -1220,39 +1227,39 @@ is equipped again: Winter's Toll, Rimebinding, Cryoclasm and Shatter (Glacial Ho
 Unmaking, Death Ray and Stabilize (Runaway Resonance); Divine Plea, Hymn of Hope and Resurrection
 (Mercy); Blessing of the Faithful and Aegis Reversal (Conviction); Transference and Requiem (Wrath
 of the Old Gods); Unleash and Primal Surge (Pack Bond). <b>And a card that needs a companion sits out
-while its hero holds the Rune of the Sharpshooter</b>, which dismisses the pet: Kill Command, Twin Hunt,
+while its hero holds the Rune of the Sharpshooter (core)</b>, which dismisses the pet: Kill Command, Twin Hunt,
 Savage Sweep, Bestial Wrath, Spirit Bond, Ghostpack, Call the Wilds, Unleash and Primal Surge &mdash; and
 <b>Mark of the Hunt</b>, which is never refused but pays nothing there: its companion's half has no
-companion, and its hunter's half is Pack Bond's, which sits out beside the Rune of the Sharpshooter. Without
+companion, and its hunter's half is Pack Bond's, which sits out beside the Rune of the Sharpshooter (core). Without
 Pack Bond, a Hunter with a companion fights with it, and its companion's half pays.
 <b>A card that sits out is kept, still
 carried and still counted in the ability slots</b>; benching it on the map frees the slot. The hero
 sheet shows it greyed as &ldquo;sits out&rdquo; and the map's Kit panel says which rune brings it
-back. A card that opens without any engine &mdash; Battle Poise and Counter Time on a Guard Change,
+back. A card that opens without any engine &mdash; Battle Poise and Counter Time on a stance swap,
 Kill Command and the companion cards on the companion every Hunter but the Sharpshooter summons
 &mdash; always fights.</li>
 <li><b>A rune that reads an engine is offered only while that engine is equipped.</b> Forty-two of
 the seventy-five ordinary runes pay nothing at all to a hero whose engine slots do not hold their engine &mdash;
-a Ruin rune to a Cleric who has unequipped the Rune of the Occultist, a Focus rune to a Hunter who has
-unequipped the Rune of the Sharpshooter &mdash; and none of them is rolled for him, at the Peddler, in
+a Ruin rune to a Cleric who has unequipped the Rune of the Occultist (core), a Focus rune to a Hunter who has
+unequipped the Rune of the Sharpshooter (core) &mdash; and none of them is rolled for him, at the Peddler, in
 an elite's cache, in a bargain or from an event. <b>A rune that still does part of its job without its
 engine is offered</b>: Glass Prison still freezes a second body, and the runes that read a card or
 nothing at all are offered to every hero of their class. <b>A rune that reads a status or a stance is
 the rune of the engine that lays it</b>, and is offered, and pays, only while that engine rune is
 equipped &mdash; however much of the status a drafted card lays: Long Fuse (Burn) the Rune of the
-Pyromancer's, Killing Cold and Deep Cold (Chilled) the Rune of the Cryomancer's, Mirror Guard (the Defensive
-guard) the Rune of the Swordmaster's and Slaughterhouse (a bleedout) the Rune of the Berserker's. No class kit
+Pyromancer's, Killing Cold and Deep Cold (Chilled) the Rune of the Cryomancer (core)'s, Mirror Guard (the Defensive
+guard) the Rune of the Swordmaster (core)'s and Slaughterhouse (a bleedout) the Rune of the Berserker (core)'s. No class kit
 lays any of them, and no engine lays a Bleed; the Berserker's is the engine Slaughterhouse was written for.
 <b>Long Poison is not one of them</b>: Snare Trap, in every Hunter's kit, lays the Poison it reads when its
 snare springs, so every Hunter is offered it and it stops his snare's Poison from running out. <b>Bared Plate is the Rune of the
 Warden's</b> the same way: it trades Block for Break damage, and only Heavy Plating gives a Warrior Block to
 lose. <b>And a rune that needs a companion is not offered to a hero
-holding the Rune of the Sharpshooter</b>, which dismisses the pet &mdash; the Shared Hide, the Bared
+holding the Rune of the Sharpshooter (core)</b>, which dismisses the pet &mdash; the Shared Hide, the Bared
 Fang, the Answering Pack, the Second Whistle, the Long Leash, the Shared Scent and Tusk and Bristle &mdash;
 and one he already wears sits out, saying which rune takes the companion away. <b>A cache rolled while the engine was equipped keeps what it
 rolled</b>: a rune it holds that reads the engine sits out of the choice while the engine is out, the
 overlay says which rune brings it back, and equipping it offers the whole cache again. A companion rune
-it holds sits out of the choice the same way while the Rune of the Sharpshooter is equipped, and the
+it holds sits out of the choice the same way while the Rune of the Sharpshooter (core) is equipped, and the
 overlay says the rune needs a companion that the Sharpshooter's rune dismisses. When nothing is
 left to offer, the Peddler, the cache, the bargain and the event name the engine rune that is not
 equipped as the reason. <b>A rune already bought is never taken away, and everything that shows it says it is
@@ -1265,16 +1272,16 @@ opening roll call, as the fight starts. <b>Unequipping the rune frees the slot, 
 which forbids every point of damage he deals, when all Burning Ground does is deal damage. Both are offered and
 both can be worn together; the four places say Burning Ground sits out while the Vow of Silence is worn, and
 the ground does not burn.
-<b>An engine rune can sit out the same way</b>: the Rune of the Beastmaster slotted beside the Rune of the
+<b>An engine rune can sit out the same way</b>: the Rune of the Beastmaster (core) slotted beside the Rune of the
 Sharpshooter has no companion and so no bond to deepen, and the same four places say it sits out, in the same
 words &mdash; the pouch's engine row, the map card's engine line (marked &#9675;, the reason on the card's hover),
 the hero sheet and the roll call. The pairing is allowed and is the player's to make, and <b>nothing of the
-Rune of the Beastmaster pays beside it</b>: Mark of the Hunt, whose hunter's half it pays, sits out there too.</li>
+Rune of the Beastmaster (core) pays beside it</b>: Mark of the Hunt, whose hunter's half it pays, sits out there too.</li>
 <li><b>The enabler travels.</b> An engine's enablers — the abilities it cannot work without, the
 "needs" column of the table in §6b — come with the rune to any hero of the class who holds it, in
 either engine slot, sit <b>outside the ability slot count</b>, and leave when it leaves: Overburn
 brings Flamewave, Glacial Hold Razor Ice, Blood Frenzy Bloodlust,
-Conviction Divine Shield and Wrath of the Old Gods Hex of Ruin. <b>Pack Bond brings nothing</b>: every
+Conviction Divine Shield, Wrath of the Old Gods Hex of Ruin and the stances Guard Change. <b>Pack Bond brings nothing</b>: every
 Hunter but the Sharpshooter summons a companion from his class kit (&sect;5.2), and Pack Bond is what
 makes the bond grow &mdash; Loyalty, its conversion at 8 and the boon. An enabler is in no draft or boss
 pool. <b>No engine replaces the class basic</b>: every Mage opens on Magic Bolt and every Cleric on
@@ -1289,30 +1296,30 @@ rule engine has no lineage, and opens with his class's basic attack and his clas
 </ul>
 <table border="1" cellpadding="4">
 <tr><th>Class</th><th>Engine rune</th><th>Engine</th><th>Travels with it</th></tr>
-<tr><td rowspan="6">Warrior</td><td>Rune of the Berserker</td><td>Blood Frenzy</td><td>Bloodlust</td></tr>
-<tr><td>Rune of the Warden</td><td>Heavy Plating</td><td>—</td></tr>
-<tr><td>Rune of the Swordmaster</td><td>Seasoned Fighter (the stances)</td><td>—</td></tr>
-<tr><td>Rune of the Vanguard</td><td>Momentum</td><td>—</td></tr>
-<tr><td>Rune of the Reaver</td><td>Savage Assault</td><td>—</td></tr>
-<tr><td>Rune of the Bastion</td><td>Redoubt</td><td>—</td></tr>
-<tr><td rowspan="6">Mage</td><td>Rune of the Pyromancer</td><td>Overburn</td><td>Flamewave</td></tr>
-<tr><td>Rune of the Cryomancer</td><td>Glacial Hold</td><td>Razor Ice</td></tr>
-<tr><td>Rune of the Arcanist</td><td>Runaway Resonance</td><td>—</td></tr>
-<tr><td>Rune of the Invoker</td><td>Channel</td><td>—</td></tr>
-<tr><td>Rune of the Weaver</td><td>Echo</td><td>—</td></tr>
-<tr><td>Rune of the Leech</td><td>Siphon</td><td>—</td></tr>
-<tr><td rowspan="6">Cleric</td><td>Rune of the Holy</td><td>Mercy</td><td>—</td></tr>
-<tr><td>Rune of the Devout</td><td>Conviction</td><td>Divine Shield</td></tr>
-<tr><td>Rune of the Occultist</td><td>Wrath of the Old Gods</td><td>Hex of Ruin</td></tr>
-<tr><td>Rune of the Hierophant</td><td>Sanctity</td><td>—</td></tr>
-<tr><td>Rune of the Oathkeeper</td><td>Covenant</td><td>—</td></tr>
-<tr><td>Rune of the Arbiter</td><td>Judgment</td><td>—</td></tr>
-<tr><td rowspan="6">Hunter</td><td>Rune of the Beastmaster</td><td>Pack Bond</td><td>—</td></tr>
-<tr><td>Rune of the Sharpshooter</td><td>Lethal Aim</td><td>Quick Shot (every Hunter's basic)</td></tr>
-<tr><td>Rune of the Survivalist</td><td>Trapper</td><td>—</td></tr>
-<tr><td>Rune of the Tracker</td><td>Quarry</td><td>—</td></tr>
-<tr><td>Rune of the Skirmisher</td><td>Opening</td><td>—</td></tr>
-<tr><td>Rune of the Medic</td><td>Field Kit</td><td>—</td></tr>
+<tr><td rowspan="6">Warrior</td><td>Rune of the Berserker (core)</td><td>Blood Frenzy</td><td>Bloodlust</td></tr>
+<tr><td>Rune of the Warden (core)</td><td>Heavy Plating</td><td>—</td></tr>
+<tr><td>Rune of the Swordmaster (core)</td><td>Seasoned Fighter (the stances)</td><td>Guard Change</td></tr>
+<tr><td>Rune of the Vanguard (core)</td><td>Momentum</td><td>—</td></tr>
+<tr><td>Rune of the Reaver (core)</td><td>Savage Assault</td><td>—</td></tr>
+<tr><td>Rune of the Bastion (core)</td><td>Redoubt</td><td>—</td></tr>
+<tr><td rowspan="6">Mage</td><td>Rune of the Pyromancer (core)</td><td>Overburn</td><td>Flamewave</td></tr>
+<tr><td>Rune of the Cryomancer (core)</td><td>Glacial Hold</td><td>Razor Ice</td></tr>
+<tr><td>Rune of the Arcanist (core)</td><td>Runaway Resonance</td><td>—</td></tr>
+<tr><td>Rune of the Invoker (core)</td><td>Channel</td><td>—</td></tr>
+<tr><td>Rune of the Weaver (core)</td><td>Echo</td><td>—</td></tr>
+<tr><td>Rune of the Leech (core)</td><td>Siphon</td><td>—</td></tr>
+<tr><td rowspan="6">Cleric</td><td>Rune of the Holy (core)</td><td>Mercy</td><td>—</td></tr>
+<tr><td>Rune of the Devout (core)</td><td>Conviction</td><td>Divine Shield</td></tr>
+<tr><td>Rune of the Occultist (core)</td><td>Wrath of the Old Gods</td><td>Hex of Ruin</td></tr>
+<tr><td>Rune of the Hierophant (core)</td><td>Sanctity</td><td>—</td></tr>
+<tr><td>Rune of the Oathkeeper (core)</td><td>Covenant</td><td>—</td></tr>
+<tr><td>Rune of the Arbiter (core)</td><td>Judgment</td><td>—</td></tr>
+<tr><td rowspan="6">Hunter</td><td>Rune of the Beastmaster (core)</td><td>Pack Bond</td><td>—</td></tr>
+<tr><td>Rune of the Sharpshooter (core)</td><td>Lethal Aim</td><td>Quick Shot (every Hunter's basic)</td></tr>
+<tr><td>Rune of the Survivalist (core)</td><td>Trapper</td><td>—</td></tr>
+<tr><td>Rune of the Tracker (core)</td><td>Quarry</td><td>—</td></tr>
+<tr><td>Rune of the Skirmisher (core)</td><td>Opening</td><td>—</td></tr>
+<tr><td>Rune of the Medic (core)</td><td>Field Kit</td><td>—</td></tr>
 </table>
 <p><b>The three class engines</b> carry no spec: <b>Momentum</b> makes a Warrior's later turns in a
 fight quicker for every exchange — a turn that deals damage and is met by the fight; <b>Channel</b>
@@ -1326,10 +1333,10 @@ float and log line says <i>Reaver</i>, <i>Bastion</i> and so on. Every figure be
 <li><b>Reaver</b> (Warrior): every enemy that falls to the Warrior's own damage &mdash; his attacks, his
 abilities, a damage-over-time effect he laid &mdash; adds +10% to the damage he deals for the rest of
 the battle, with no limit. Another ally's kill adds nothing.</li>
-<li><b>Bastion</b> (Warrior): damage kept off the Warrior is banked, with no limit and for the whole
-battle &mdash; a blocked blow banks the whole blow, a parry the part it turned, a barrier what it
-absorbed, and armor and resistance what they cut, whoever's barrier or buff it was. A miss banks
-nothing. His next basic attack that lands adds the whole bank to its damage, through no armor, and
+<li><b>Bastion</b> (Warrior): damage the Warrior blocks, parries or absorbs is banked, with no limit
+and for the whole battle &mdash; a blocked blow banks the whole blow, a parry the part it turned, and a
+barrier what it absorbed, whoever's barrier it was. Armor, resistance and every other cut bank
+nothing, and a miss banks nothing. His next basic attack that lands adds the whole bank to its damage, through no armor, and
 spends it; an ability or a counter-attack spends none. The bot spends it once the bank is at least one
 basic attack's worth.</li>
 <li><b>Weaver</b> (Mage): every third cast, his basic attack included, repeats once it resolves &mdash; each enemy it damaged is
@@ -1384,9 +1391,9 @@ Sharpshooter is never offered a card that needs a companion from his boss pool</
 Spirit Bond, Primal Surge), because that rune dismisses the pet; a triple rolled before he equipped it
 holds those cards back while it is equipped, says so on the card, and offers them again if he
 unequips it. <b>And a card that reads an engine he has not equipped is not offered from his boss pool
-either</b> &mdash; Lunge (the Rune of the Swordmaster), Shatter (the Rune of the Cryomancer), Overcharge and
-Stabilize (the Rune of the Arcanist), Divine Plea (the Rune of the Holy), and Primal Surge and Mark of the
-Hunt (the Rune of the Beastmaster). The boss pool is his lineage's, and the lineage stays with him after he
+either</b> &mdash; Lunge (the Rune of the Swordmaster (core)), Shatter (the Rune of the Cryomancer (core)), Overcharge and
+Stabilize (the Rune of the Arcanist (core)), Divine Plea (the Rune of the Holy (core)), and Primal Surge and Mark of the
+Hunt (the Rune of the Beastmaster (core)). The boss pool is his lineage's, and the lineage stays with him after he
 unequips the engine it was chosen with, so the offer asks what he holds at the offer; a triple rolled while
 the engine was equipped holds the card back, names the rune that brings it back, and offers it again once
 that rune is equipped.</p>
@@ -1549,7 +1556,7 @@ to show simply has no column.</p>
 others, and a settled kit is a legitimate end state.</li>
 <li><b>A card held back is not a button.</b> The cards are drawn when the elite falls and chosen later,
 and a hero can unequip an engine in between. A card that reads an engine he has not equipped at the moment
-he chooses &mdash; or needs a companion the Rune of the Sharpshooter has dismissed &mdash; stays in his offer
+he chooses &mdash; or needs a companion the Rune of the Sharpshooter (core) has dismissed &mdash; stays in his offer
 but is not shown as a card to take: the column says how many it holds and which rune brings them back, and
 equipping that rune returns them. A card he has already taken from an earlier offer is not shown again
 either. <b>Declining still refuses the whole offer</b>, held cards with it, and the column says so.</li>
@@ -1590,7 +1597,7 @@ to break an engine. <b>The core counts against the cap and an engine's enablers 
 sit outside the slot count. The class kit fills <b>3</b> slots and nothing else a hero opens with
 fills one, so <b>every hero opens at 3 of 7</b> &mdash; <b>and a Sharpshooter at 2</b>, because his
 engine dismisses the pet and Summon Companion's slot is his for a drafted card. <b>Unequipping the
-Rune of the Sharpshooter puts the card back in his kit</b>, so the rune pouch refuses it while every
+Rune of the Sharpshooter (core) puts the card back in his kit</b>, so the rune pouch refuses it while every
 slot is full and says so: bench a card first.</p>
 <p><b>What a hero HOLDS and what a hero CARRIES are two different things.</b> Every card a hero
 takes is kept for the rest of the run. What the cap limits is how many of them are
@@ -1617,7 +1624,7 @@ answer — that engine runs on the class basic and the class kit alone.</p>
 <tr><th>Lineage</th><th>Slots it fills</th><th>Its engine needs</th><th>Why</th></tr>
 <tr><td><b>Berserker</b></td><td>0</td><td>Bloodlust</td><td>Blood Frenzy reads his own health bar and his own Rage spent, and no ability; Bloodlust travels with it by the designer's ruling.</td></tr>
 <tr><td><b>Warden</b></td><td>0</td><td>—</td><td>Heavy Plating is a Block-chance rule; it reads no ability.</td></tr>
-<tr><td><b>Swordmaster</b></td><td>0</td><td>—</td><td>Seasoned Fighter is two stances, and every battle opens Aggressive, which pays from the first blow — so a stance swap is a card, not a need: Guard Change, his only UNCONDITIONAL swap, is drafted like Precision Strike and Feint, and offered only to a hero holding the Stances.</td></tr>
+<tr><td><b>Swordmaster</b></td><td>0</td><td>Guard Change</td><td>Seasoned Fighter is two stances the player switches, and no Warrior basic or kit card changes stance; Guard Change, his only UNCONDITIONAL swap, comes with the rune.</td></tr>
 <tr><td><b>Pyromancer</b></td><td>0</td><td>Flamewave</td><td>Overburn reads Burn standing on the field, and no Mage basic or kit card lays any; Flamewave lays it on every enemy.</td></tr>
 <tr><td><b>Cryomancer</b></td><td>0</td><td>Razor Ice</td><td>Glacial Hold needs four Chilled on one enemy, and no Mage basic or kit card lays any; Razor Ice lays three on one target in one cast.</td></tr>
 <tr><td><b>Arcanist</b></td><td>0</td><td>—</td><td>Runaway Resonance builds on every damaging cast, and Magic Bolt, every Mage's free basic, is one.</td></tr>
@@ -1640,20 +1647,20 @@ rebalance is owed</b>.</p>
 
 <p><b>A CARD THAT READS AN ENGINE IS OFFERED ONLY TO A HERO WHO HOLDS IT (Batch GP).</b> A wide
 pool is only worth having if what it widens is playable, and offering a Ruin card to a Cleric
-without Ruin is offering a card that does nothing. <b>Thirty-seven of the 179 read one</b> — five
+without Ruin is offering a card that does nothing. <b>Thirty-seven of the 178 read one</b> — five
 of Permafrost, eight of Runaway Resonance (Death Ray among them, refused below 8 Resonance), seven of
 Mercy (Hymn of Hope and Resurrection among them, both priced in Mercy), five of Conviction, two of
 Wrath of the Old Gods, five of Pack Bond, two of Lethal Aim, two of Heavy Plating and one of Blood
-Frenzy — and each was derived at the read site and driven both ways. <b>Two more are the
-designer's ruling rather than the derivation: Guard Change and Lunge, the stance pieces, are
-offered only to a hero holding the Stances</b> (the Rune of the Swordmaster). Each would work in
-part without it — the swap still lands its Break damage, the thrust still strikes — and they are
-the Stances holder's by ruling. <b>The zone boss asks the same gate of its own pools</b> (&sect;6a), and
+Frenzy — and each was derived at the read site and driven both ways. <b>One more is the
+designer's ruling rather than the derivation: Lunge, the stance-keyed thrust, is offered only to a
+hero holding the Stances</b> (the Rune of the Swordmaster (core)). It would work in part without
+it — the thrust still strikes, always down its Aggressive branch — and it is the Stances holder's by
+ruling. <b>Guard Change, the other stance piece, is in no pool</b>: it comes with the rune. <b>The zone boss asks the same gate of its own pools</b> (&sect;6a), and
 three of its cards are in no draft pool: Stabilize and Primal Surge, which cannot be cast without Runaway
-Resonance and Pack Bond, and <b>Venom Coating, the Rune of the Survivalist's by ruling</b> &mdash; the coating
+Resonance and Pack Bond, and <b>Venom Coating, the Rune of the Survivalist (core)'s by ruling</b> &mdash; the coating
 lands with no engine, but every Poison it promises is laid by Trapper's on-hit package. <b>Mark of the Hunt is not
 gated on an engine</b>: its companion's half pays with no engine, so it is offered to every Hunter who fields a
-companion, and its hunter's half pays only while the Rune of the Beastmaster is equipped. <b>Kill Command is not among
+companion, and its hunter's half pays only while the Rune of the Beastmaster (core) is equipped. <b>Kill Command is not among
 them</b>: it needs a living companion, and every Hunter but the Sharpshooter summons one from his
 class kit, so it is conditional on a companion rather than on an engine. <b>Three groups, and only the first is
 gated:</b> cards that CANNOT work without the engine; cards that HALF-work (Boil Over deals 22
@@ -1667,11 +1674,11 @@ a hero might later draft. <b>What a hero holding no engine can be offered: 38 of
 <p><b>A CARD THAT NEEDS A COMPANION IS NOT OFFERED TO A SHARPSHOOTER (Batch HB).</b> He dismisses
 the pet, so the gate above has a second half, and it is a negative one: <b>fifteen Hunter cards
 cannot pay without a companion on the field</b>, and none of them is offered to a hero holding the
-Rune of the Sharpshooter. Nine are refused outright with no companion standing &mdash; Kill
+Rune of the Sharpshooter (core). Nine are refused outright with no companion standing &mdash; Kill
 Command, Twin Hunt, Savage Sweep, Bestial Wrath, Spirit Bond, Ghostpack, Call the Wilds, Unleash
 and Primal Surge &mdash; and those also sit out of a fight he brings them to (&sect;6.0); six
 resolve and pay nothing &mdash; Bloodbond, Bear the Brunt, Bring It Down, Last Howl, Succession and
-Mark of the Hunt, which also sits out beside the Rune of the Sharpshooter.
+Mark of the Hunt, which also sits out beside the Rune of the Sharpshooter (core).
 <b>The ones that read the BOND stay gated on Pack Bond as well</b>: a companion is every Hunter's,
 and its Loyalty is Pack Bond's. A Sharpshooter is offered 31 of the Hunter's 42.</p>
 
@@ -1683,7 +1690,7 @@ below is part of one pool, its class's.</p>
 <tr><th>Spec</th><th>Draft pool</th></tr>
 <tr><td><b>Berserker</b></td><td>Blood Offering, Gut Rip, Reckless Abandon, Berserk, Blood Debt, Unslaked, Spite, Boil Over, <b>Battle Shout</b>, <b>Rampage</b>, <b>Wildstrikes</b>, <b>Hack and Slash</b></td></tr>
 <tr><td><b>Warden</b></td><td>Covering Guard, Eye of the Storm, Shield Slam, Vendetta, Aegis Wall, Anvil, Recompense, Turn the Blade, <b>Hold the Line</b>, <b>Rallying Shout</b>, <b>Shieldwall</b></td></tr>
-<tr><td><b>Swordmaster</b></td><td>Precision Strike, Feint, Sever, Battle Poise, Feigned Guard, Discipline, Answering Steel, Formless, <b>Lunge</b>, <b>Execute</b>, <b>Wheeling Cut</b>, <b>Counter Time</b>, <b>Overpower</b>, <b>Guard Change</b></td></tr>
+<tr><td><b>Swordmaster</b></td><td>Precision Strike, Feint, Sever, Battle Poise, Feigned Guard, Discipline, Answering Steel, Formless, <b>Lunge</b>, <b>Execute</b>, <b>Wheeling Cut</b>, <b>Counter Time</b>, <b>Overpower</b></td></tr>
 <tr><td><b>Pyromancer</b></td><td>Cinderfall, Ember Debt, Slow Burn, Stoke, Funeral Pyre, Firedraw, Pyre Wake, Emberkeep, <b>Backdraft</b>, <b>Immolate</b>, <b>Pyroblast</b>, <b>Firestorm</b>, <b>Phoenix Rebirth</b>, <b>Fireball</b>, <b>Detonation</b>, <b>Wildfire</b></td></tr>
 <tr><td><b>Cryomancer</b></td><td>Winter&#x27;s Toll, Rimebinding, Killing Frost, Hoarfrost Armor, Deep Winter, Cold Iron, Frostbind, <b>Rime</b>, <b>Glacial Prison</b>, <b>Cryoclasm</b>, <b>Shatter</b>, <b>Frostbolt</b>, <b>Blizzard</b>, <b>Ice Lance</b></td></tr>
 <tr><td><b>Arcanist</b></td><td>Null Field, Kindled Mind, Arcane Bolt, Inner Arcane, Arcane Echo, Resonant Field, Threshold, Unmaking, <b>Overcharge</b>, <b>Magi&#x27;s Wrath</b>, <b>Arcane Surge</b>, <b>Reality Fracture</b>, <b>Arcane Explosion</b>, <b>Arcane Cannon</b>, <b>Arcane Barrage</b>, <b>Death Ray</b></td></tr>
@@ -1699,9 +1706,10 @@ below is part of one pool, its class's.</p>
 <tr><td><b>Hunter</b> (all three specs)</td><td>Field Dressing, Camouflage, Aimed Volley, Bola, Hunter's Mark, Arcane Arrows</td></tr>
 <tr><td><b>Warrior</b> (all three specs)</td><td>Battle Trance, Rally, Charge, Cleave, Warcry, Ironclad</td></tr>
 </table>
-<p><b>THE DRAFT IS COMPLETE.</b> <b>The draft stands at 179 of 179</b> &mdash; <b>159 spec</b>
-cards plus <b>20 class-wide</b> ones &mdash; and since Batch GP those are <b>four pools of 43, 51,
-43 and 42</b>; the Hunter's gained Tripwire when Summon Companion took its class-kit slot. The class kits (&sect;5.2) hold five cards that are guaranteed rather than drawn, and
+<p><b>THE DRAFT IS COMPLETE.</b> <b>The draft stands at 178 of 178</b> &mdash; <b>158 spec</b>
+cards plus <b>20 class-wide</b> ones &mdash; and since Batch GP those are <b>four pools of 42, 51,
+43 and 42</b>; the Hunter's gained Tripwire when Summon Companion took its class-kit slot, and Guard
+Change is the Rune of the Swordmaster (core)'s rather than the Warrior's pool's. The class kits (&sect;5.2) hold five cards that are guaranteed rather than drawn, and
 <b>a hero with no lineage draws the whole class pool</b> where he drew his class-wide shelf alone
 before &mdash; three cards for a Cleric, forty-three now.
 <b>BATCH DY EMPTIED THE VAULT AND IS WHAT TOOK IT PAST 149, WITHOUT AUTHORING A CARD.</b> Seven
@@ -1760,14 +1768,14 @@ named partner is dead most of the time.</p>
 <tr><td><b>Shared Grief</b> (Holy)</td><td>+1 Mercy for every other ally already below half health</td><td><b>The best coupling in the batch, and the reason is structural.</b> Mercy accrues only on the <i>crossing</i> below half, so she is starved when the heroes are healthy — and the <b>Berserker's</b> entire Blood Frenzy band lives down there on purpose. The two specs whose engines are inverted become each other's fuel</td></tr>
 </table>
 <p><b>What the nine deliberately do not do.</b> No new abilities (the pools were complete when DH
-wrote them and are complete at 179 now
+wrote them and are complete at 178 now
 and a synergy card per spec would be twelve more), <b>no new statuses</b> (every coupling uses
 vocabulary already in the game), <b>no two-way pairs</b> (each clause runs one way into a hub,
 so no card is dead when its partner is absent), and <b>no magnitude on an existing effect
 moves</b> — a lone Pyromancer draws exactly what he always drew, and a Holy beside a healthy
 she gains exactly the 4 Mercy she always gained.</p>
 
-<p><b>Every hero draws from his class's one pool: forty-three cards for a Warrior, fifty-one for a Mage, forty-three for a Cleric and forty-two for a Hunter.</b>
+<p><b>Every hero draws from his class's one pool: forty-two cards for a Warrior, fifty-one for a Mage, forty-three for a Cleric and forty-two for a Hunter.</b>
 A class's pool is its three lineage shelves and its class-wide shelf together, so a shelf is where
 a card is written down rather than what a hero is offered; a card that reads an engine is offered
 only to a hero who holds that engine, so a hero holding none is offered fewer. What the depth buys
@@ -1781,7 +1789,7 @@ than a lineage's cards.</p>
 <p><b>The one hundred and twenty-two drafted abilities catalogued here.</b> Each names the
 axis it serves, and — from the first Mage nine onward — <b>what it builds with</b>. The one
 hundred and three spec cards come first; the nineteen class-wide ones close the table.
-<b>The draft itself is one hundred and seventy-nine</b> (the pools above): the fifty-seven not
+<b>The draft itself is one hundred and seventy-eight</b> (the pools above): the fifty-six not
 listed here are described in their spec's section in §6.1&ndash;§6.4, <b>except four &mdash;
 Arcane Surge, Divine Wrath, Mana Shield and Reality Fracture &mdash; which are named in the
 pools and described nowhere.</b> Those four arrived when Batch DY emptied the vault and their
@@ -1809,7 +1817,7 @@ beside. A card that appears in nobody's build plan is a card that fills a slot.<
 <tr><td><b>Feigned Guard</b></td><td>20 Rage, 1.0, 3cd, self</td><td>For 3 turns his <b>abilities resolve as though cast from the other stance — and satisfy that stance's requirement</b> — while he keeps the guard he is actually standing in. <b>It does NOT switch his stance</b>, and his passive keeps reading the guard he really holds.</td><td>The only card in the game that lets a build have both halves of its own toggle. The gate-satisfying clause is what makes it worth a slot: without it this is a minor modifier.<br><b>Builds with:</b> every other stance card. An <b>Aggressive</b> build gets <b>Battle Poise</b> plus Precision Strike's armor bypass and Feint's counter charges <i>while keeping Aggressive's damage bonus</i>; a <b>Defensive</b> build gets <b>Sever</b> and Precision Strike's double hit while keeping Seasoned Fighter's mitigation.</td></tr>
 <tr><td><b>Discipline</b></td><td>25 Rage, 1.0, 5cd, self</td><td>For 7 turns, <b>each consecutive turn held in the SAME stance strengthens that stance's own effect by 4%</b>, to a ceiling of 15%. <b>A Guard Change resets the accumulation to nothing</b> — and so does any card that switches him.</td><td>Paying him for refusing to switch. His whole spec is built on the pivot and nothing has ever rewarded standing still.<br><b>It fights his own readers and his own gated cards, and that is the tension:</b> Precision Strike and Feint both flip him, and Sever and Battle Poise each demand a specific guard.<br><b>Builds with:</b> <b>Seasoned Fighter</b>, whose two numbers it deepens, and <b>Feigned Guard</b>, which resolves the whole tension — it satisfies the other stance's requirement <i>without</i> switching him, so a Discipline build can still cast Sever or Battle Poise.</td></tr>
 <tr><td><b>Answering Steel</b></td><td>20 Rage, 1.0, 4cd, self</td><td>For 6 turns, <b>parry chance +20%</b>, and <b>every attack he PARRIES grants 15 Rage and takes a turn off all his cooldowns</b>. It does not shorten its own recast.<br><b>It pays tempo, not damage</b>.</td><td>The parry stat finally buying something. He is the only parry-<b>stat</b> character in the game and this is the first card that reads it.<br><b>Builds with:</b> the talent tree's <b>Parry More</b> and <b>Feint</b>'s charges. <b>Battle Poise</b> is a stacking partner rather than a rival: both pay per parry, so one turned blade takes <i>two</i> turns off everything he holds.</td></tr>
-<tr><td><b>Formless</b></td><td>35 Rage, 1.0, 6cd, self</td><td>For 4 turns he holds <b>both stances' upsides and neither downside</b> — <b>+15% damage dealt AND 15% less damage taken</b> — and <b>counts as BOTH stances for anything that requires one</b>, so every stance-gated card in his kit is usable. <b>He cannot Guard Change while it holds</b>: there is no stance to change. When it ends he suffers <b>both downsides for 2 turns</b> (+10% damage taken, −10% dealt).</td><td>Being neither, and both. The stance is the spec's one binary and every card in his pool sits on one side of it; this refuses the question for three turns.<br><b>Builds with:</b> <b>Sever</b> and <b>Battle Poise</b>, the two cards it exists for — an Aggressive build gets the Defensive window and a Defensive build gets the Aggressive one, without giving up the guard his passive reads. <b>Feigned Guard</b> is the cheaper, narrower version of the same idea and the two compose.</td></tr>
+<tr><td><b>Formless</b></td><td>35 Rage, 1.0, 6cd, self</td><td>For 4 turns he holds <b>both stances' upsides and neither downside</b> — <b>+30% damage dealt AND 15% less damage taken</b> — and <b>counts as BOTH stances for anything that requires one</b>, so every stance-gated card in his kit is usable. <b>He cannot Guard Change while it holds</b>: there is no stance to change. When it ends he suffers <b>both downsides for 2 turns</b> (+10% damage taken, −10% dealt).</td><td>Being neither, and both. The stance is the spec's one binary and every card in his pool sits on one side of it; this refuses the question for three turns.<br><b>Builds with:</b> <b>Sever</b> and <b>Battle Poise</b>, the two cards it exists for — an Aggressive build gets the Defensive window and a Defensive build gets the Aggressive one, without giving up the guard his passive reads. <b>Feigned Guard</b> is the cheaper, narrower version of the same idea and the two compose.</td></tr>
 <tr><td><b>Wheeling Cut</b></td><td>30 Rage, 2.5, 4cd, <b>all enemies</b> (12 BD each)</td><td>Brings the blade all the way round: <b>every enemy takes 20% of Attack and 12 Break</b>, and the guard decides what he comes up holding. <b>FROM AGGRESSIVE</b> he lands Defensive, so he arrives covered &mdash; <b>20% less damage taken for 3 turns</b>. <b>FROM DEFENSIVE</b> he lands Aggressive, so he arrives on the front foot &mdash; <b>+20% damage dealt for 3 turns</b>. Either way <b>the stance then SWITCHES</b> (Perfect: both guards&#x27; gifts at once).</td><td>His pool had <b>no area damage at all</b> &mdash; his only field-wide option for a whole run was Cleave out of the Warrior class pool. A <b>reader</b>, so it branches and flips, and the arriving-stance principle decides which branch buys what: he is never stranded.<br><b>Builds with:</b> <b>Feigned Guard</b>, which changes which branch fires without moving his real guard. <b>Discipline</b> argues with it, which is the tension worth having: casting a reader throws the accumulation away.</td></tr>
 <tr><td><b>Counter Time</b></td><td>25 Rage, 2.0, 5cd, one enemy &mdash; <b>requires Defensive</b></td><td>Reads the attack and answers it before it lands: <b>one enemy loses its next TWO turns</b>. It deals <b>nothing at all</b> &mdash; no damage, no Break, no Rage. <b>A boss resists until it is BROKEN.</b><br><b>Stance-GATED:</b> in the Aggressive guard it is unavailable, and casting it does not move his stance.</td><td>Taking the turn instead of the blow. His pool <b>could not take an enemy&#x27;s turn away at all</b> &mdash; Pommel Strike is his only Stun and it is protected core, so a whole run&#x27;s control was one core ability&#x27;s one-turn rider. <b>It is not a second Pommel Strike:</b> that card is cheaper, ungated, deals 25% of Attack, lands 30 Break, builds Rage and Stuns for ONE turn; this buys a SECOND turn for a stance and a whole action that deals nothing.<br><b>Builds with:</b> the <b>Poise</b> lane, which is what makes the Defensive guard worth standing in, and <b>Battle Poise</b>&#x27;s free Guard Change, which is now how an Aggressive build reaches it without spending a turn. The stolen turn is the Breaker lane&#x27;s setup &mdash; a turn the enemy does not spend closing the window <b>Lunge</b> just opened.</td></tr>
 <tr><td colspan="4"><b>Warden</b> — <i>what does protection look like when it is not his own</i></td></tr>
@@ -2015,7 +2023,7 @@ one.</b> <code>check_fd</code> &sect;2 asserts that no live rune carries a condi
 and names BREAK and OFFENSE &mdash; the two columns the demotion moved &mdash; separately.</p>
 
 <h3>6.1 Warrior</h3>
-<p>Every Warrior holds the class kit &mdash; <b>Crushing Blow, Pommel Strike and Mocking Blow</b> (&sect;5.2) &mdash; whatever engine he holds. The Warden's Mocking Blow and Crushing Blow and the Swordmaster's Pommel Strike below are those same cards; the Berserker's Bloodlust travels with the Rune of the Berserker (&sect;6.0).</p>
+<p>Every Warrior holds the class kit &mdash; <b>Crushing Blow, Pommel Strike and Mocking Blow</b> (&sect;5.2) &mdash; whatever engine he holds. The Warden's Mocking Blow and Crushing Blow and the Swordmaster's Pommel Strike below are those same cards; the Berserker's Bloodlust travels with the Rune of the Berserker (core) (&sect;6.0).</p>
 <ul>
 <li><b>Berserker (Ramp)</b> — <b>Stat block:</b> 175 HP / 15% armor / +10% shadow &amp;
 nature resist, −15% frost (the glass brawler: a bigger visible pool over mitigation —
@@ -2091,10 +2099,10 @@ it refunds 5 Rage; self-cast, no target selection.<br>
 <li><b>Swordmaster (Bruiser)</b> — <b>Stat block:</b> 165 HP / 22% armor / <b>12%
 parry</b> (the technician; the only parry-stat character — see §4.3).<br>
 Passive <i>Seasoned Fighter</i>: fights in one of <b>two stances the PLAYER controls</b> —
-AGGRESSIVE (+15% damage dealt, +10% damage taken) or DEFENSIVE (15% less damage taken,
+AGGRESSIVE (+30% damage dealt, +10% damage taken) or DEFENSIVE (15% less damage taken,
 −10% damage dealt). Every battle opens Aggressive and <b>Guard Change swaps</b> — his only
-<i>unconditional</i> stance swap, drafted like Precision Strike and Feint, which switch it as
-well but cost Rage and carry cooldowns. The spec chip
+<i>unconditional</i> stance swap, which the Rune of the Swordmaster (core) brings with it; Precision
+Strike and Feint, drafted, switch it as well but cost Rage and carry cooldowns. The spec chip
 names the live stance (AGG/DEF) with both stances' numbers in its tooltip.<br>
 His kit is one loop: Break is the key, Stun is the door, and the Broken window is the
 room — build the meter, crack the guard, then walk in while it's down.<br>
@@ -2104,7 +2112,7 @@ extender — good on both sides of the Break), builds 10 Rage (Perfect: +5 bonus
 <i>Class kit (§5.2):</i> Pommel Strike — 20 Rage, 25 dmg / 30 BD / 2.0, 3cd, has its own <b>25% base crit
 chance</b> and <b>ALWAYS Stuns for 1 turn</b>; bosses resist Stun until Broken, builds
 10 Rage (Perfect: the Stun lands even on an unbroken boss).<br>
-<i>Drafted (§6b), offered only to a hero holding the Stances:</i> Guard Change — 0 Rage, 1.5 int, 1cd; a self-cast with no target selection: switches
+<i>Comes with the Rune of the Swordmaster (core):</i> Guard Change — 0 Rage, 1.5 int, 1cd; a self-cast with no target selection: switches
 stance, deals <b>15 BD to the un-Broken enemy nearest to Breaking</b> (auto-picked —
 the swordsman presses the opening he already made) and builds 15 Rage (Perfect: +10%
 parry chance for 2 turns). Deliberately not a free action: the swap does double duty —
@@ -2286,7 +2294,7 @@ three BY DESIGN — Divine Shield and the Faith release both pay
 out percentages of HIS maximum: his own bulk is what he lends out).<br>
 Passive <i>Conviction</i>: allies build <b>Faith</b> whenever
 <b>Divine Shield absorbs damage for them</b> (2 per absorbed hit) and whenever they begin
-a turn standing on <b>Consecrated Ground</b> (1 per hero per turn) — max 3 stacks; doubled
+a turn standing on <b>Consecrated Ground</b> (1 per hero per turn) — max 8 stacks; doubled
 under Blessing of Zeal; the stacks only work while the Devout stands.
 <b>THE HELD VALUE IS PAID ON THE PEAK — the highest Faith the carrier has held this
 battle — RATHER THAN ON THE CURRENT COUNT.</b> That is what stops Conviction's two halves
@@ -2295,13 +2303,13 @@ meter cannot do both. A release resets the count and leaves the peak standing, s
 pure upside instead of a cost paid against the other half.
 Each PEAK stack: 2%
 damage mitigation and +1.5% damage dealt.
-At 3 stacks the ally is healed for 15% of max
+At 8 stacks the ally is healed for 15% of max
 health, their Faith COUNT resets, and the Devout recovers 3% max Mana — <b>and the Devout's own
 maximum health rises by 3% of his BASE maximum for the rest of the battle, healing him for
 the same amount</b>. That growth is linear on his base (3% per release, never 3% of the
 new total) and it lasts the battle only — it does not follow him out of the fight.<br>
 <b>THE DEVOUT HOLDS FAITH OF HIS OWN, AND IT NEVER RELEASES.</b> He builds stacks like
-anyone else — his own Consecrated Ground drips onto him — but at 3 they simply hold, paying him the same mitigation and
+anyone else — his own Consecrated Ground drips onto him — but at 8 they simply hold, paying him the same mitigation and
 damage they pay the heroes. Only an ALLY'S Faith releases, and a release always resets that
 ally's COUNT to zero — his peak, and so everything the peak pays, stands for the rest of
 the fight.<br>
@@ -2428,7 +2436,7 @@ for 1 turn</b> &mdash; the rhythm is fixed and never shortens, and a chip on the
 (0/3, 1/3, 2/3), so the player knows which charge stuns. A boss shrugs the Stun off until it is Broken, and
 the charge still counts. Pack Bond makes each charge 15% harder, deeper as Loyalty climbs; the stun stays
 every third strike. A new body starts the count over: a swap, a fresh call, a new fight. No arrival
-effect. A Hunter holding the Rune of the Sharpshooter cannot call it.<br>
+effect. A Hunter holding the Rune of the Sharpshooter (core) cannot call it.<br>
 <i>Drafted (§6b):</i> Hunter's Instinct — 20 Mana, 1.0, 3cd (no skill check): empowers the next 3 Quick Shots —
 each deals +10% of the hunter's Attack and heals every active companion for 15% of its max
 health (HI# chip counts the shots).<br>
@@ -2460,7 +2468,7 @@ Mark of the Hunt — 15 Mana, 2.0, 3cd. Marks an enemy for 7 turns: the hunter
 and their companion deal +25% damage to it, and every strike on it restores 3% of the hunter's
 max Mana. The cooldown resets if the marked enemy dies. Works with or without a companion. <b>Its two halves
 need different things</b>: the companion's +25% and the Mana its blows restore need only a companion; the
-hunter's own +25% and the Mana his strikes restore need the Rune of the Beastmaster equipped. It is offered
+hunter's own +25% and the Mana his strikes restore need the Rune of the Beastmaster (core) equipped. It is offered
 to every Hunter who fields a companion, and sits out of every fight while he holds the Rune of the
 Sharpshooter, where neither half can pay.<br>
 <b>Talents:</b> the one tree, bought with the Hunter's points — see §7.</li>
@@ -2543,7 +2551,7 @@ Explosive Shot — 35 Mana, 3.0, 3cd: 10 NATURE to ALL / 20 BD, Poisoning each (
 base).<br>
 Venom Coating — 20 Mana, 1.0, 5cd (no skill check): for 4 turns every attack applies
 Poison and refreshes its timers. Every Poison it lays comes from Trapper, so it is offered only while the
-Rune of the Survivalist is equipped.<br>
+Rune of the Survivalist (core) is equipped.<br>
 Hamstring — 25 Mana, 2.5, 3cd, 20% Atk: Cripple, Slowed AND Exposed — three statuses in
 one cast (Perfect: 4 turns each).<br>
 Deadfall — 25 Mana, 1.0, 5cd: arm a deadfall in the path. The NEXT enemy to act takes 20%
@@ -2737,6 +2745,10 @@ unequip until there is room, and a swap &mdash; one rune each way &mdash; always
 <br><b>THE CREST</b> is a slot of its own, beside the heroes' slots, for a rune worn by every hero at
 once: its effect reaches all four as a fight begins. There is one crest slot. <b>No crest rune exists
 yet</b>; the slot stands empty, and one would drop, sell and sit in the bag as any other rune does.
+A crest rune's effect may carry a <b>condition on who the heroes are</b> &mdash; a class among the heroes
+or absent from them, how many of a class, a core rune one of them carries, or every hero standing
+&mdash; read once as each fight opens, over the heroes standing then; when it does not hold, the rune
+pays nothing that fight and the combat log's opening roll call says so.
 <br><b>ALL TWELVE SPECS ARE AUTHORED AS OF BATCH FK, AND FIFTEEN CLASS RUNES READ NO ENGINE.
 142 ORDINARY ENTRIES: 67 RETIRED AND 75 LIVE.</b> Sixty were written for a lineage &mdash; nine
 lineages have five, the Beastmaster six, and the Devout four &mdash; and <b>fifteen were written for
@@ -2783,7 +2795,7 @@ up to three deep: each depth takes 35% of the enemy's armor, so three leave it n
 other, and neither before any enemy has struck him or once that enemy has fallen. <b>Hunter:</b>
 <b>Opportunist</b> (Powershot) &mdash; double damage to a stunned enemy, whatever stunned it; <b>Tusk and
 Bristle</b> (Summon Companion) &mdash; a fourth companion, Aper the boar (&sect;6.4), for any Hunter but the
-one holding the Rune of the Sharpshooter. <b>Burning Ground sits out beside Vow of Silence</b> (&sect;6.0).
+one holding the Rune of the Sharpshooter (core). <b>Burning Ground sits out beside Vow of Silence</b> (&sect;6.0).
 <br><b>THE TWO GATED SECONDARIES ARE RETIRED GOING FORWARD (Batch FK, ruled by the designer).</b>
 <b>THRESHOLD and BREADTH are not authored again.</b> A gated rune at a flat price is strictly worse
 than a bare one &mdash; the price does not fall to pay for the condition &mdash; and FJ measured
@@ -2862,7 +2874,7 @@ so <i>the enemy he is working</i> has ONE definition; and it pays through <code>
 which is the only way into that meter. <b>ALLY MEANS HEROES AND COMPANIONS</b> and the code
 implements both &mdash; one function called from the hero path and from
 <code>_companion_hit</code> &mdash; even though <b>no companion can stand beside a Sharpshooter in a
-legal run</b> (one class each, summoning is the Hunter's, and the Rune of the Sharpshooter dismisses
+legal run</b> (one class each, summoning is the Hunter's, and the Rune of the Sharpshooter (core) dismisses
 the pet). <b>The five
 recorded reasons a companion cannot receive something are all about a RECIPIENT, and here the
 companion is the ATTACKER.</b> <b>5 is a quarter of the 20 his own repeat shot pays</b>, which is
@@ -3383,8 +3395,8 @@ its engine's text and &mdash; for a rune whose engine has enablers &mdash; the a
 (&ldquo;Also opens with:&rdquo;); and once, below the
 cards, the class basic and class kit with their damage and "% Atk" scaling at the class's own Attack.
 The draft screen stays clean — no passive text there.</li>
-<li><b>Shop (The Wandering Peddler):</b> consumables column + one rune offer per hero (150g, into the
-bag; every Buy greyed while the bag is full, and the column says so) + <b>SELL FROM THE BAG</b> below
+<li><b>Shop (The Wandering Peddler):</b> consumables column + one rune offer per hero (150g, never a
+core rune, into the bag; every Buy greyed while the bag is full, and the column says so) + <b>SELL FROM THE BAG</b> below
 the supplies, one row per rune in the bag, each sold for a third of its price with a Sell that asks
 twice; the offers
 stacked at their own heights in one column that scrolls and ends above the Leave button, so every

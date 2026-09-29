@@ -1522,7 +1522,7 @@ static func waited_on(ids: Array) -> String:
 		if nm != "" and not names.has(nm):
 			names.append(nm)
 	if names.is_empty():
-		return "the engine rune they read"
+		return "the core rune they read"
 	return "the " + " or the ".join(names)
 
 
@@ -1541,7 +1541,7 @@ static func cards_wait_on(names: Array) -> String:
 		if nm != "" and not runes_named.has(nm):
 			runes_named.append(nm)
 	if runes_named.is_empty():
-		return "the engine rune they read"
+		return "the core rune they read"
 	return "the " + " or the ".join(runes_named)
 
 
@@ -1592,7 +1592,7 @@ static func dismisser_name(engines: Array) -> String:
 			var nm := String(config(rid).get("name", "")) if rid != "" else ""
 			if nm != "":
 				return nm
-	return "engine rune that dismisses it"
+	return "core rune that dismisses it"
 
 
 # One rune for this member. **BATCH ES §1 — THE DRAW IS FLAT AND THE ZONE SLOT

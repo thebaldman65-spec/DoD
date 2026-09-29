@@ -406,8 +406,12 @@ func _s3_the_record() -> void:
 	# the sixth lineage that names none. Re-pinned for GS's reason: a seventh
 	# enabler, or a seventh engine carrying one, is a decision this line has to
 	# be moved for.
-	ok(enablers == 6 and enabler_lineages == 6,
-		"§3: %d named enablers across %d lineages, not the six across six HB left the table holding" % [
+	# **BATCH HL §1 — SEVEN ACROSS SEVEN, FOUND IN PLAY.** The designer took the
+	# Stances and could not change stance: no Warrior basic or kit card does. So
+	# the Stances bring Guard Change again (PROPOSED), and the Swordmaster is the
+	# seventh lineage that names an enabler. Re-pinned for GS's reason.
+	ok(enablers == 7 and enabler_lineages == 7,
+		"§3: %d named enablers across %d lineages, not the seven across seven HL left the table holding" % [
 			enablers, enabler_lineages])
 	# REASON ONE: Heal is one of FIVE Mercy outlets, not Mercy's only outlet.
 	var bs := Gate.strip_comments(

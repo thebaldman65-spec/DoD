@@ -211,6 +211,15 @@ func _fx_tree(learned: Dictionary) -> Array:
 			"payload": (r["payload"] as Dictionary).duplicate(true)})
 	return tree
 
+# BATCH HL §3 — THE GAIN THAT DRIVES A RELEASE IS THE LIVE THRESHOLD, READ OFF
+# `battle.gd`. The literal 5 this suite gained was the threshold before CZ §2 (it
+# overshot three and the clamp made it a release); at eight it releases nothing.
+# This suite DRIVES a release and asks what the release pays, never what the
+# threshold is, so it reads the constant rather than mirroring it — the Faith
+# suites that assert a rate keyed on the threshold (be to bi, bu, ce) mirror it.
+func _release_gain(scene: Node) -> int:
+	return int(scene.get_script().get_script_constant_map()["FAITH_RELEASE"])
+
 
 func _kill(scene: Node) -> void:
 	await Fixture.kill(self, scene)
@@ -526,7 +535,7 @@ func _live_release_banks_count_and_heal() -> void:
 	if dv != null:
 		mage.hp = 1  # or the release heals into a full bar and reads 0
 		var want := maxi(int(round(mage.max_hp * 0.15)), 1)
-		scene.call("_gain_faith", mage, 5, "absorb")
+		scene.call("_gain_faith", mage, _release_gain(scene), "absorb")
 		ok(_stat_of(scene, "faith_releases") == 1.0,
 			"§1: one release banks one release")
 		ok(_stat_of(scene, "faith_heal_release") == float(want),
@@ -672,7 +681,7 @@ func _live_the_terms_sum_to_the_total() -> void:
 		mage.hp = 1
 		war.hp = maxi(war.max_hp / 2, 1)
 		dv.hp = maxi(dv.max_hp / 2, 1)
-		scene.call("_gain_faith", mage, 5, "absorb")          # release + growth
+		scene.call("_gain_faith", mage, _release_gain(scene), "absorb")          # release + growth
 		scene.call("_grant_divine_shield", dv, war, 200)
 		war.take_hit(60, 0)                          # Blessed Barrier
 		war.hp = 5

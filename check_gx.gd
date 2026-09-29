@@ -626,9 +626,23 @@ func _s3c_the_battle_log() -> void:
 			# tail is built from `rune_sits_out_note`; asserting it against
 			# that function is what makes the log part of the one sentence
 			# rather than a second thing to keep in step.
+			# **BATCH HL §2 — ITS FIRST SENTENCE, NOT ITS FIRST TWO LINES.** A core
+			# rune's name wears "(core)" and takes a line of its own under the 44-
+			# character ceiling, so the first two lines stopped being the first
+			# sentence. The tail is re-derived here, not read off the function the
+			# battle calls: the note's lines, joined, up to the first that ends a
+			# sentence — which must still name the core rune and say it is not
+			# equipped.
 			var nl: PackedStringArray = String(_run.rune_sits_out_note(rid)).split("\n")
-			ok(line.ends_with(" — %s %s" % [nl[0], nl[1]]),
-				"§3c %s: the roll call's tail is not the note's first two lines joined (%s)" % [arm, line])
+			var first := PackedStringArray()
+			for piece in nl:
+				first.append(String(piece))
+				if String(piece).ends_with("."):
+					break
+			var sentence := " ".join(first)
+			ok(line.ends_with(" — %s" % sentence) and sentence.contains(ername)
+					and sentence.ends_with("is not equipped."),
+				"§3c %s: the roll call's tail is not the note's first sentence (%s)" % [arm, line])
 			print("    %s" % line)
 		scene.queue_free()
 		await Gate.frames(self, 2)
@@ -865,7 +879,8 @@ func _s5_the_sentence() -> void:
 		if ername != "":
 			named += 1
 	ok(named == _gated.size(), "§5: %d of %d notes name a real engine rune" % [named, _gated.size()])
-	ok(String(_run.rune_sits_out_note("no_such_rune")).contains("engine rune it needs"),
+	# BATCH HL §2: the fallback says *core rune*, as every screen does.
+	ok(String(_run.rune_sits_out_note("no_such_rune")).contains("core rune it needs"),
 		"§5: the note's fallback clause is unreachable")
 	print("    the longest line of the gated: %d characters — \"%s\"" % [longest.length(), longest])
 

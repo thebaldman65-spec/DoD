@@ -491,10 +491,14 @@ func _section_save(rsrc: String) -> void:
 	# **BL's invariant is that the recap ledgers are IN the save**, not whatever
 	# number the newest batch happens to be writing. Asserted as "9 or later" —
 	# BL's own floor — so the next bump does not fail a recap test either.
+	# BATCH HL §5 re-pointed it again, to the constant: the save writes
+	# `SAVE_VERSION` by name since the run save gained a ceiling, so the number is
+	# read off the constant's declaration — and the save is asserted to write it.
 	var bl_ver := -1
-	var bl_vpos := rsrc.find("\"version\": ")
-	if bl_vpos >= 0:
-		bl_ver = int(rsrc.substr(bl_vpos + 11, 3).strip_edges().split(",")[0])
+	var bl_cdecl := "const SAVE_VERSION := "
+	var bl_cpos := rsrc.find(bl_cdecl)
+	if bl_cpos >= 0 and rsrc.contains("\"version\": SAVE_VERSION"):
+		bl_ver = int(rsrc.substr(bl_cpos + bl_cdecl.length(), 6).split("\n")[0].strip_edges())
 	ok(bl_ver >= 9, "§2: the save version is 9 or later (found %d)" % bl_ver)
 	# TOLERANT LOAD: a v8 tally with none of the new keys must load and simply
 	# start the counters mid-run, not crash the first writer that touches them.

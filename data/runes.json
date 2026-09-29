@@ -824,7 +824,7 @@
 	"fourth_stack": {
 		"name": "Fourth Stack", "scope": "class:cleric", "written_for": "inquisitor",
 		"price": 150,
-		"desc": "Allies hold FOUR stacks of Faith before releasing instead of three.",
+		"desc": "Allies hold one more stack of Faith before releasing.",
 		"payload": {"stat": {"rune_fourth_stack": 1}}
 	},
 	"bare_altar": {
@@ -959,146 +959,146 @@
 	},
 
 	"engine_berserker": {
-		"name": "Rune of the Berserker", "scope": "class:warrior",
+		"name": "Rune of the Berserker (core)", "scope": "class:warrior",
 		"price": 150, "engine": "bloodrage",
 		"desc": "The Berserker's engine.",
 		"payload": {}
 	},
 	"engine_warden": {
-		"name": "Rune of the Warden", "scope": "class:warrior",
+		"name": "Rune of the Warden (core)", "scope": "class:warrior",
 		"price": 150, "engine": "heavy_plating",
 		"desc": "The Warden's engine.",
 		"payload": {}
 	},
 	"engine_swordmaster": {
-		"name": "Rune of the Swordmaster", "scope": "class:warrior",
+		"name": "Rune of the Swordmaster (core)", "scope": "class:warrior",
 		"price": 150, "engine": "seasoned",
 		"desc": "The Swordmaster's engine.",
 		"payload": {}
 	},
 	"engine_momentum": {
-		"name": "Rune of the Vanguard", "scope": "class:warrior",
+		"name": "Rune of the Vanguard (core)", "scope": "class:warrior",
 		"price": 150, "engine": "momentum",
 		"desc": "A Warrior engine.",
 		"payload": {}
 	},
 	"engine_pyromancer": {
-		"name": "Rune of the Pyromancer", "scope": "class:mage",
+		"name": "Rune of the Pyromancer (core)", "scope": "class:mage",
 		"price": 150, "engine": "overburn",
 		"desc": "The Pyromancer's engine.",
 		"payload": {}
 	},
 	"engine_cryomancer": {
-		"name": "Rune of the Cryomancer", "scope": "class:mage",
+		"name": "Rune of the Cryomancer (core)", "scope": "class:mage",
 		"price": 150, "engine": "permafrost",
 		"desc": "The Cryomancer's engine.",
 		"payload": {}
 	},
 	"engine_arcanist": {
-		"name": "Rune of the Arcanist", "scope": "class:mage",
+		"name": "Rune of the Arcanist (core)", "scope": "class:mage",
 		"price": 150, "engine": "resonance",
 		"desc": "The Arcanist's engine.",
 		"payload": {}
 	},
 	"engine_channel": {
-		"name": "Rune of the Invoker", "scope": "class:mage",
+		"name": "Rune of the Invoker (core)", "scope": "class:mage",
 		"price": 150, "engine": "channel",
 		"desc": "A Mage engine.",
 		"payload": {}
 	},
 	"engine_holy": {
-		"name": "Rune of the Holy", "scope": "class:cleric",
+		"name": "Rune of the Holy (core)", "scope": "class:cleric",
 		"price": 150, "engine": "mercy",
 		"desc": "The Holy's engine.",
 		"payload": {}
 	},
 	"engine_inquisitor": {
-		"name": "Rune of the Devout", "scope": "class:cleric",
+		"name": "Rune of the Devout (core)", "scope": "class:cleric",
 		"price": 150, "engine": "conviction",
 		"desc": "The Devout's engine.",
 		"payload": {}
 	},
 	"engine_occultist": {
-		"name": "Rune of the Occultist", "scope": "class:cleric",
+		"name": "Rune of the Occultist (core)", "scope": "class:cleric",
 		"price": 150, "engine": "old_gods",
 		"desc": "The Occultist's engine.",
 		"payload": {}
 	},
 	"engine_sanctity": {
-		"name": "Rune of the Hierophant", "scope": "class:cleric",
+		"name": "Rune of the Hierophant (core)", "scope": "class:cleric",
 		"price": 150, "engine": "sanctity",
 		"desc": "A Cleric engine.",
 		"payload": {}
 	},
 	"engine_beastmaster": {
-		"name": "Rune of the Beastmaster", "scope": "class:hunter",
+		"name": "Rune of the Beastmaster (core)", "scope": "class:hunter",
 		"price": 150, "engine": "pack",
 		"desc": "The Beastmaster's engine.",
 		"payload": {}
 	},
 	"engine_sharpshooter": {
-		"name": "Rune of the Sharpshooter", "scope": "class:hunter",
+		"name": "Rune of the Sharpshooter (core)", "scope": "class:hunter",
 		"price": 150, "engine": "lethal_aim",
 		"desc": "The Sharpshooter's engine.",
 		"payload": {}
 	},
 	"engine_mystic": {
-		"name": "Rune of the Survivalist", "scope": "class:hunter",
+		"name": "Rune of the Survivalist (core)", "scope": "class:hunter",
 		"price": 150, "engine": "trapper",
 		"desc": "The Survivalist's engine.",
 		"payload": {}
 	},
 
 	"engine_savage_assault": {
-		"name": "Rune of the Reaver", "scope": "class:warrior",
+		"name": "Rune of the Reaver (core)", "scope": "class:warrior",
 		"price": 150, "engine": "savage_assault",
 		"desc": "A Warrior engine.",
 		"payload": {}
 	},
 	"engine_redoubt": {
-		"name": "Rune of the Bastion", "scope": "class:warrior",
+		"name": "Rune of the Bastion (core)", "scope": "class:warrior",
 		"price": 150, "engine": "redoubt",
 		"desc": "A Warrior engine.",
 		"payload": {}
 	},
 	"engine_cast_echo": {
-		"name": "Rune of the Weaver", "scope": "class:mage",
+		"name": "Rune of the Weaver (core)", "scope": "class:mage",
 		"price": 150, "engine": "cast_echo",
 		"desc": "A Mage engine.",
 		"payload": {}
 	},
 	"engine_siphon": {
-		"name": "Rune of the Leech", "scope": "class:mage",
+		"name": "Rune of the Leech (core)", "scope": "class:mage",
 		"price": 150, "engine": "siphon",
 		"desc": "A Mage engine.",
 		"payload": {}
 	},
 	"engine_covenant_oath": {
-		"name": "Rune of the Oathkeeper", "scope": "class:cleric",
+		"name": "Rune of the Oathkeeper (core)", "scope": "class:cleric",
 		"price": 150, "engine": "covenant_oath",
 		"desc": "A Cleric engine.",
 		"payload": {}
 	},
 	"engine_judgment": {
-		"name": "Rune of the Arbiter", "scope": "class:cleric",
+		"name": "Rune of the Arbiter (core)", "scope": "class:cleric",
 		"price": 150, "engine": "judgment",
 		"desc": "A Cleric engine.",
 		"payload": {}
 	},
 	"engine_quarry_hunt": {
-		"name": "Rune of the Tracker", "scope": "class:hunter",
+		"name": "Rune of the Tracker (core)", "scope": "class:hunter",
 		"price": 150, "engine": "quarry_hunt",
 		"desc": "A Hunter engine.",
 		"payload": {}
 	},
 	"engine_opening_strike": {
-		"name": "Rune of the Skirmisher", "scope": "class:hunter",
+		"name": "Rune of the Skirmisher (core)", "scope": "class:hunter",
 		"price": 150, "engine": "opening_strike",
 		"desc": "A Hunter engine.",
 		"payload": {}
 	},
 	"engine_field_kit": {
-		"name": "Rune of the Medic", "scope": "class:hunter",
+		"name": "Rune of the Medic (core)", "scope": "class:hunter",
 		"price": 150, "engine": "field_kit",
 		"desc": "A Hunter engine.",
 		"payload": {}

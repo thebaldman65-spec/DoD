@@ -53,7 +53,16 @@ const SEED := 20260920
 # this is for. Measured at GW over the battery's own target list, on the
 # landed tree: 90, after the two `check_ez` sites this batch repaired came out
 # of it (the recon read 92).
-const SHAPE_CEILING := 90
+# **BATCH HL RAISED IT 90 -> 96, AND THE SIX ARE LEGITIMATE BY THIS GATE'S OWN
+# TEST.** `check_hl` §3 measures a magnitude against the same blow with the engine
+# OUT: the Stances' +30% and −15% (four sites) and Mercy's cut (two), each
+# emptying the hero's `engines` on the live unit for the control arm and putting
+# it back. The PRECONDITION of every positive arm — the engine held — is written
+# by the real spawn (the fixture seats the engine rune and the game builds the
+# unit), so a broken seat reds the ratio arms rather than passing them; only the
+# counterfactual is hand-set, which is the one way to ask a read site whether it
+# refuses without its engine on the same body.
+const SHAPE_CEILING := 96
 # ...and the two that were on a body the game never writes the field to, both
 # repaired at GW. Zero is the assertion; the rest of the ceiling is the report.
 const WRONG_BODY := 0

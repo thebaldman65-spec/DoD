@@ -626,6 +626,11 @@ func _s5_reported_not_fixed() -> void:
 	# so it is in no pool and no kit by the ruling that authored it — reachable
 	# through the rune exactly as the three calls are reachable through the kit card.
 	# It is named here, so a tenth is still a card nothing carries.
+	# **BATCH HL §1 MOVED IT 9 -> 10, AND THE TENTH IS AN ENABLER AGAIN.** Guard
+	# Change travels with the Stances (the designer took the engine in play and
+	# could not change stance), and an enabler is in no pool — so it left the
+	# Swordmaster's shelf and joined this population, carried by the rune as the
+	# other enablers are. An eleventh is still a card nothing carries.
 	var unseen: Array = []
 	for ab2 in Classes.ability_corpus():
 		if not pooled.has(ab2.display_name):
@@ -633,8 +638,8 @@ func _s5_reported_not_fixed() -> void:
 	unseen.sort()
 	ok(unseen.has("Summon Aper"),
 		"§5: Summon Aper is in a pool or a class kit — Tusk and Bristle is its one door (%s)" % ", ".join(PackedStringArray(unseen)))
-	ok(unseen.size() == 9,
-		"§5: %d abilities sit outside every pool and every class kit, not the 9 on record — re-derive it (%s)" % [
+	ok(unseen.size() == 10,
+		"§5: %d abilities sit outside every pool and every class kit, not the 10 on record — re-derive it (%s)" % [
 			unseen.size(), ", ".join(PackedStringArray(unseen))])
 	ok(unseen.size() > 0,
 		"§5: every ability is now in a pool or a class kit — a walk built the old way would agree with the corpus, and §5's finding is stale")

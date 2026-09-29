@@ -231,6 +231,15 @@ func _spawn(learned: Dictionary, member_patch := {},
 		{"enemies": lineup, "talents": {2: learned.duplicate()}, "patch": {2: patch},
 		"deterministic": true, "crit": -10.0})
 
+# BATCH HL §3 — THE GAIN THAT DRIVES A RELEASE IS THE LIVE THRESHOLD, READ OFF
+# `battle.gd`. The literal 5 this suite gained was the threshold before CZ §2 (it
+# overshot three and the clamp made it a release); at eight it releases nothing.
+# This suite DRIVES a release and asks what the release pays, never what the
+# threshold is, so it reads the constant rather than mirroring it — the Faith
+# suites that assert a rate keyed on the threshold (be to bi, bu, ce) mirror it.
+func _release_gain(scene: Node) -> int:
+	return int(scene.get_script().get_script_constant_map()["FAITH_RELEASE"])
+
 
 func _kill(scene: Node) -> void:
 	await Fixture.kill(self, scene)
@@ -746,7 +755,7 @@ func _live_growth() -> void:
 	dv.conviction_base_hp = 0
 	for i in 10:
 		ally.faith_stacks = 0
-		scene._gain_faith(ally, 5, "absorb")
+		scene._gain_faith(ally, _release_gain(scene), "absorb")
 	ok(dv.conviction_base_hp == 1000,
 		"the base is captured once, at the first release (got %d)" % dv.conviction_base_hp)
 	ok(dv.max_hp == 1300,
@@ -776,7 +785,7 @@ func _live_growth_heals() -> void:
 	# because of the growth clause — the point being that the dividend arrives
 	# as USABLE health rather than as an empty bar.
 	ally.faith_stacks = 0
-	scene._gain_faith(ally, 5, "absorb")
+	scene._gain_faith(ally, _release_gain(scene), "absorb")
 	ok(dv.max_hp == 1030, "one release: maximum 1000 -> %d" % dv.max_hp)
 	ok(dv.hp == dv.max_hp,
 		"...and he is healed for the amount granted, so the new bar is FULL (%d/%d)" % [dv.hp, dv.max_hp])
@@ -784,7 +793,7 @@ func _live_growth_heals() -> void:
 	# moving — an empty 30 HP would read as a working clause on a full bar.
 	dv.hp = 500
 	ally.faith_stacks = 0
-	scene._gain_faith(ally, 5, "absorb")
+	scene._gain_faith(ally, _release_gain(scene), "absorb")
 	ok(dv.max_hp == 1060, "a second release: maximum -> %d" % dv.max_hp)
 	ok(dv.hp >= 530,
 		"...and a wounded Devout genuinely gains the health (500 -> %d)" % dv.hp)
@@ -819,19 +828,19 @@ func _live_apostle_stream() -> void:
 	dv.conviction_hp_gained = 0
 	dv.conviction_base_hp = 0
 	ally.faith_stacks = 0
-	scene._gain_faith(ally, 5, "absorb")
+	scene._gain_faith(ally, _release_gain(scene), "absorb")
 	ok(ally.faith_stacks == 0,
 		"Batch BG: a release under Apostle consumes the stacks like any other")
 	# Twelve further releases, i.e. a long fight's worth of absorbs — but each
 	# one now costs five gains rather than one, which IS the repair.
 	for i in 12:
-		scene._gain_faith(ally, 5, "absorb")
+		scene._gain_faith(ally, _release_gain(scene), "absorb")
 	ok(ally.faith_stacks == 0, "...and each of them resets him again")
 	ok(dv.max_hp == 1000 + 13 * 30,
 		"13 releases = +39%% of base at the full step (got +%d%%)" % (
 			(dv.max_hp - 1000) * 100 / 1000))
-	_report.append("APOSTLE ROW (AW's number, re-pointed by BG): 13 releases in one fight = max_hp 1000 -> %d, +%d%% — and under BG each one costs five Faith gains, not one" % [
-		dv.max_hp, (dv.max_hp - 1000) * 100 / 1000])
+	_report.append("APOSTLE ROW (AW's number, re-pointed by BG): 13 releases in one fight = max_hp 1000 -> %d, +%d%% — and under BG each one costs a threshold's worth of Faith (%d), not one gain" % [
+		dv.max_hp, (dv.max_hp - 1000) * 100 / 1000, _release_gain(scene)])
 	await _kill(scene)
 
 
@@ -850,7 +859,7 @@ func _live_victory_sync() -> void:
 	# the two loans are handled at one site and a merge would show up here.
 	for i in 6:
 		warrior.faith_stacks = 0
-		scene._gain_faith(warrior, 5, "absorb")
+		scene._gain_faith(warrior, _release_gain(scene), "absorb")
 	warrior.max_hp += 45
 	warrior.tenacity_hp_gained += 45
 	var grown: int = dv.max_hp

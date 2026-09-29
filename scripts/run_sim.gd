@@ -802,6 +802,12 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 			rune_elite_taken += 1
 			if rune["equipped"]:
 				rune_elite_equipped += 1
+			# BATCH HL §1 — `hold_rune` slots an engine rune only when asked now,
+			# and the player's cache answer never asks. The bot's policy is GK's —
+			# it slots one while an engine slot is free — so it asks, after the
+			# count above, and neither the run nor the count moves.
+			if String(rune.get("engine", "")) != "":
+				rune["equipped"] = true
 			run.hold_rune(looter, rune)  # BATCH GK — one door
 		# Batch AN §6: drops honour the per-type stack cap, through the same
 		# Run.add_item every other grant uses — a sim that could stockpile

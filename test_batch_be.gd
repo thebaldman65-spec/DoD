@@ -63,7 +63,7 @@ const FX_RETIRED := {
 }
 # BATCH DC: `battle.FAITH_RELEASE`, ruled at CZ §2. The threshold is mirrored
 # ONCE per suite so the next move costs one line rather than a dozen literals.
-const RELEASE := 3
+const RELEASE := 8   # BATCH HL §3 — ruled at eight (3 from CZ §2 to HL)
 const HELD_MAX := RELEASE - 1   # the deepest an ally can HOLD; at RELEASE he releases
 # Trials per measured rate. At p=0.75 the 3-sigma band is +/-3.8 points, so the
 # +/-5 bands below cannot flap; at p=0.15 it is +/-3.1 against +/-4.
@@ -368,22 +368,41 @@ func _live_rate_at_one_stack() -> void:
 # miss and this row printed 0.0% against a node working perfectly. The release
 # counter is the only honest witness once the driven depth is HELD_MAX; BF
 # recorded that rule and this is the second suite to need it.
+#
+# **BATCH HL §3 — FAITH RELEASES AT EIGHT, SO THE TOP OF THE BAND IS SEVEN, AND
+# 15% A STACK AT SEVEN IS 105%: THE CERTAINTY THIS REPRICE REMOVED IS BACK AT THE
+# TOP.** The row measures the per-stack rate at TWO, where it has an answer (30%,
+# read by stack count — an advance to three releases nothing at eight), and the
+# thesis arm asserts the fact that makes the top moot today: **Communion is
+# dormant** — no node of the one tree and no rune writes `communion_ranks` since FX
+# — and PRINTS the top-of-band rate, so the day a writer arrives this reds with the
+# reason on its line.
 func _live_rate_at_two_stacks() -> void:
 	var scene := await _spawn({"dv_communion": 1})
 	var dv := _devout(scene)
 	if dv != null:
-		var rate := _measure(scene, scene.get("heroes")[1], HELD_MAX, true)
-		ok(absf(rate - 0.01 * COMMUNION * HELD_MAX) < 0.05,
+		var rate := _measure(scene, scene.get("heroes")[1], 2, false)
+		ok(absf(rate - 0.01 * COMMUNION * 2) < 0.05,
 			"§6: an ally at TWO stacks advances 30%% of the time (read %.1f%%)" % \
 				(100.0 * rate))
-		# The whole thesis of the reprice, as an assertion: nothing is certain
-		# any more. At 40 this rate was exactly 1.0.
-		ok(rate < 0.90,
-			"§6: the top of the band is no longer a guarantee (read %.1f%%)" % (100.0 * rate))
-		_report.append("Communion at %d stacks (the top of the band): %.1f%% over %d trials (want 30%%, was 100%% at 40)" % [
-			HELD_MAX, 100.0 * rate, TRIALS])
+		var top := 0.01 * COMMUNION * HELD_MAX
+		ok(_communion_dormant(),
+			"§6: something writes `communion_ranks` again — and at the threshold of %d the top of the band (%d stacks) rolls %d%%, a certainty" % [
+				RELEASE, HELD_MAX, int(round(100.0 * top))])
+		_report.append("Communion at 2 stacks: %.1f%% over %d trials (want 30%%); [record] the top of the band at %d stacks is %d%% at the threshold of %d — dormant, nothing writes it" % [
+			100.0 * rate, TRIALS, HELD_MAX, int(round(100.0 * top)), RELEASE])
 	await _kill(scene)
 	_live_ran += 1
+
+
+# True while nothing the game can hand a hero writes `communion_ranks`: no payload
+# of the one tree, and no rune's payload, live or retired (a saved run can hold a
+# retired rune).
+func _communion_dormant() -> bool:
+	for node in Talents.tree():
+		if JSON.stringify(node.get("payload", {})).contains("communion_ranks"):
+			return false
+	return not FileAccess.get_file_as_string("res://data/runes.json").contains("communion_ranks")
 
 
 # §2, PINNED AS A NUMBER RATHER THAN AS PROSE. Communion read the recipient's

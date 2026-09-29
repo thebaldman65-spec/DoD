@@ -336,7 +336,7 @@ const STATUS_INFO := {
 	"overcharged": ["Overcharged", "OC", Color(0.8, 0.5, 1.0), "Overcharge is spent for this\nbattle — the storm has no feeding\nleft in it."],
 	"sanctified": ["Hallowed", "Hw", Color(0.98, 0.88, 0.55), "Warded by the light: immune to\nnew debuffs."],
 	"capacitor": ["Holy Capacitor", "HC", Color(0.95, 0.9, 0.6), "Stored overhealing, released by\nthe next Heal."],
-	"faith": ["Faith", "F1", Color(0.98, 0.85, 0.45), "Conviction: Divine Shield absorbs\nbuild Faith, 2 a hit — 2% mitigation\nand +1.5% damage per stack, paid on\nthe HIGHEST count held this battle.\nAt 3 the bearer is healed and the\ncount resets; the peak keeps paying."],
+	"faith": ["Faith", "F1", Color(0.98, 0.85, 0.45), "Conviction: Divine Shield absorbs\nbuild Faith, 2 a hit — 2% mitigation\nand +1.5% damage per stack, paid on\nthe HIGHEST count held this battle.\nAt 8 the bearer is healed and the\ncount resets; the peak keeps paying."],
 	"cons_ground": ["Consecrated Ground", "CG", Color(0.9, 0.82, 0.5), "Standing on holy ground: takes 15%\nless damage and reflects 10% of\ndamage taken."],
 	"zeal": ["Blessing of Zeal", "Z+", Color(1.0, 0.78, 0.35), "+15% damage dealt; Faith gain\nis doubled."],
 	"bulwark": ["Bulwark of Fortitude", "BF", Color(0.85, 0.9, 1.0), "The unbreakable stand: NO Break\ndamage taken, armor increased by\n50%, and 10% max health regained\neach turn."],
@@ -652,8 +652,9 @@ var _vigil_forking := false
 # {} otherwise. `_resolve` saves and restores it around the cast.
 var _echo_state: Dictionary = {}
 # The body the strike loop names while its mitigation terms run, if it holds
-# Redoubt — the one thing `_prev` needs to bank into it. Set and cleared in the
-# strike loop, nowhere else.
+# Redoubt — what the parry cut banks into (HL §3: `_prev` banks nothing since the
+# bank was ruled to the block, the parry and a barrier's absorb). Set and cleared
+# in the strike loop, nowhere else.
 var _redoubt_victim: BattleUnit = null
 # Re-entry locks, Downwind's shape: the Medic's mend and the Arbiter's heal each
 # run inside a door they could otherwise re-enter.
@@ -819,7 +820,11 @@ const WHEELING_GRANT_TURNS := 3   # both of them, and the card says so
 const LUNGE_DEPTH_BD := 15        # AGGRESSIVE: extra Break into the one target
 const LUNGE_BREADTH_BD := 12      # DEFENSIVE: Break to every OTHER enemy
 const COUNTER_TIME_TURNS := 2     # the stolen turns — Pommel Strike's is ONE
-const FORMLESS_DEALT := 1.15      # the Aggressive upside...
+# BATCH HL §3 — Formless holds BOTH stances' upsides by its own definition, so its
+# dealt term follows the Aggressive upside the designer ruled to +30%:
+# `1.0 + BattleUnit.SEASONED_AGG_DEALT`, written out because a constant here does
+# not read another script's; `check_hl` §3 asserts the relation.
+const FORMLESS_DEALT := 1.30      # the Aggressive upside...
 const FORMLESS_TAKEN := 0.85      # ...and the Defensive one, held together
 const FORMLESS_RECOIL_DEALT := 0.90   # the Defensive downside...
 const FORMLESS_RECOIL_TAKEN := 1.10   # ...and the Aggressive one, likewise
@@ -1360,10 +1365,13 @@ func _spawn_units() -> void:
 		if hero_keys.count(hero_keys[i]) > 1:
 			cfg["unit_name"] = "%s %d" % [cfg["unit_name"], name_counts[cfg["unit_name"]]]
 		if Run.active and i < Run.party.size():
+			# BATCH HL §6 — THE FOUR RIDE THE CTX, so a payload's condition can read the
+			# party (`Talents.party_condition_met`); it is evaluated here, once.
+			var pay_ctx := {"learned": Run.party[i].get("talents", {}), "member": Run.party[i],
+				"party": Run.party}
 			for rune in Run.party[i].get("runes", []):
 				if rune.get("equipped", false):
-					Talents.apply_payload(cfg, rune["payload"], 1,
-						{"learned": Run.party[i].get("talents", {}), "member": Run.party[i]})
+					Talents.apply_payload(cfg, rune["payload"], 1, pay_ctx)
 					# Batch AA roll call: most spec runes ride an EXISTING
 					# talent counter, so their effect surfaces on that
 					# talent's proc line rather than one of their own. One
@@ -1376,24 +1384,34 @@ func _spawn_units() -> void:
 					# payload is still applied — so it was named in the log of
 					# a fight it paid nothing in. **THE CLAUSE IS TAKEN
 					# FROM `Run.rune_sits_out_note` RATHER THAN WRITTEN**:
-					# its first two lines, joined — the sentence
+					# its first sentence (`Run.note_first_sentence`, HL §2 — its
+					# first two lines until a core rune's name took a line of its
+					# own) — the sentence
 					# that says it sits out and which rune brings it back. The
-					# screens show all four lines; a log line does not need the
+					# screens show every line; a log line does not need the
 					# two about the slot, and building this from the note is
 					# what stops the log becoming a second phrasing to keep in
 					# step (`check_gx` §3c asserts it against the note itself).
 					var rc_id := String(rune.get("id", ""))
 					var rc_tail := ""
 					var rc_worn: Array = Run.worn_rune_ids(Run.party[i])
+					# BATCH HL §2 — THE NOTE'S FIRST SENTENCE, NOT ITS FIRST TWO LINES: a
+					# core rune's name sits on a line of its own since "(core)" joined it.
 					if Runes.sits_out(rc_id, Runes.held_engines(Run.party[i]), rc_worn):
-						var rc_lines := Run.rune_sits_out_note(rc_id,
-								Runes.held_engines(Run.party[i]), rc_worn).split("\n")
-						rc_tail = " — %s %s" % [rc_lines[0], rc_lines[1]]
+						rc_tail = " — %s" % Run.note_first_sentence(Run.rune_sits_out_note(rc_id,
+								Runes.held_engines(Run.party[i]), rc_worn))
+					# BATCH HL §6 — AND A RUNE WHOSE CONDITION DOES NOT HOLD PAYS NOTHING, SO
+					# THE LOG SAYS SO rather than naming it in a fight it is inert in (GX's
+					# rule). No worn rune carries a condition today.
+					if rc_tail == "" and not Talents.condition_met(
+							(rune["payload"] as Dictionary).get("condition", {}), pay_ctx):
+						rc_tail = " — %s" % CONDITION_UNMET_TAIL
 					_rune_roll_call.append("%s: %s%s" % [cfg["unit_name"], rune["name"], rc_tail])
 			# BATCH HK §4 — THE PARTY SLOT'S RUNE, ON EVERY HERO. A party rune is worn by
 			# the party, so its payload is applied to each of the four through the same
 			# door every rune uses, at the same moment: the one party-level mechanism this
-			# game has is "every hero", because nothing reads the party whole. **A HERO,
+			# game has is "every hero" — and since HL §6 its condition can read the four
+			# (`ctx.party`), once, here. **A HERO,
 			# NOT AN ALLY** — this is the spawn of the four, and a companion does not
 			# exist yet (CV §4's first structural reason). Named once in the roll call,
 			# not once a hero. No party rune is authored; this runs over none today.
@@ -1401,10 +1419,13 @@ func _spawn_units() -> void:
 				var pr_d: Dictionary = pr
 				if not bool(pr_d.get("equipped", false)):
 					continue
-				Talents.apply_payload(cfg, pr_d.get("payload", {}), 1,
-					{"learned": Run.party[i].get("talents", {}), "member": Run.party[i]})
+				Talents.apply_payload(cfg, pr_d.get("payload", {}), 1, pay_ctx)
 				if i == 0:
-					_rune_roll_call.append("the crest: %s" % String(pr_d.get("name", "")))
+					var cr_tail := ""
+					if not Talents.condition_met(
+							(pr_d.get("payload", {}) as Dictionary).get("condition", {}), pay_ctx):
+						cr_tail = " — %s" % CONDITION_UNMET_TAIL
+					_rune_roll_call.append("the crest: %s%s" % [String(pr_d.get("name", "")), cr_tail])
 			# BATCH HC §5 — AND A SLOTTED ENGINE RUNE THAT SITS OUT IS NAMED IN THE SAME
 			# ROLL CALL, WITH THE SAME CLAUSE (ruled: GX's tell, the same surfaces). An
 			# engine is not otherwise in this list — its chip names it — so a Rune of
@@ -1415,9 +1436,9 @@ func _spawn_units() -> void:
 				var eg_id := String(eg_d.get("id", ""))
 				var eg_held: Array = Runes.held_engines(Run.party[i])
 				if bool(eg_d.get("equipped", false)) and Runes.sits_out(eg_id, eg_held):
-					var eg_lines := Run.rune_sits_out_note(eg_id, eg_held).split("\n")
-					_rune_roll_call.append("%s: %s — %s %s" % [cfg["unit_name"],
-						eg_d.get("name", ""), eg_lines[0], eg_lines[1]])
+					_rune_roll_call.append("%s: %s — %s" % [cfg["unit_name"],
+						eg_d.get("name", ""),
+						Run.note_first_sentence(Run.rune_sits_out_note(eg_id, eg_held))])
 			# Mini-boss ability upgrades (Batch AP) — the FIRST thing that reads
 			# `upgrades`, which Batch AN recorded and nothing acted on. It runs
 			# LAST of everything that touches an ability, and that is the point:
@@ -2440,6 +2461,9 @@ const FORFEIT_REASONS := [
 ]
 
 var _rune_roll_call: Array = []  # "hero: rune name" per equipped rune, logged at battle open
+# BATCH HL §6 — what the roll call adds after a worn rune whose payload's condition
+# does not hold for this fight (PROPOSED WORDS). Evaluated at the spawn, once.
+const CONDITION_UNMET_TAIL := "its condition does not hold for these heroes, so it pays nothing this fight"
 var _forfeit_panel: Control = null
 var _forfeit_nudge: Label = null
 var _forfeit_nudged := false
@@ -4132,7 +4156,20 @@ func _player_turn(u: BattleUnit) -> void:
 				# nine that is not here — it names ONE enemy, and it carries no
 				# `special` at all, so it never reaches this list in the first place.
 				"unslaked", "spite", "anvil", "recompense", "turn_the_blade",
-				"discipline", "answering_steel", "formless"]:
+				"discipline", "answering_steel", "formless",
+				# BATCH HL §1 — TEN THAT ASKED FOR AN ENEMY AND NEVER READ ONE. The
+				# designer met Preparation: it carries no `target`, so it defaulted to
+				# ENEMY, its special was missing here, and the ordinary picker asked
+				# for an enemy its handler never reads — it writes the caster alone.
+				# Every arm of `_resolve_special` was swept for the same shape (no
+				# damage, no Break damage, no area, and no read of `target`): nine
+				# more. Sanctuary heals every ally; Salve, Dug In and Thick Hide lay
+				# a status on the caster; Bloodbond, Bear the Brunt and Ghostpack
+				# stamp the hunter; Bring It Down stamps every hero; and Savage Sweep
+				# picks its own three. `check_hl` §1 re-derives the population.
+				"preparation", "sanctuary", "salve", "dug_in", "thick_hide",
+				"bloodbond", "bear_brunt", "ghostpack", "bring_it_down",
+				"savage_sweep"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "summon" and not ab.display_name.ends_with("Aguila"):
 			# Summons are self-casts — except the eagle, whose arrival dive
@@ -8909,7 +8946,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			attacker.opening_struck = false
 			attacker.refresh_bars()
 			attacker.float_text("SKIRMISHER", Color(0.75, 0.95, 0.55))
-			_log("   → Rune of the Skirmisher: %s's first attack lands %d%% harder (spent)" % [
+			_log("   → Rune of the Skirmisher (core): %s's first attack lands %d%% harder (spent)" % [
 				attacker.unit_name, Classes.OPENING_BONUS_PCT], "#b8e070")
 		# **BATCH FK — THE BOUND IS LIVE NOW, AND THE RUNE OF THE BUTCHER'S BILL
 		# IS THE ONLY THING THAT MOVES IT MID-CAST.** `for hit_i in total_hits`
@@ -9694,12 +9731,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Ability damage is a PERCENT of the attacker's current Attack.
 			var raw := ab.damage * 0.01 * attacker.attack * randf_range(0.9, 1.1) * dmg_mult
 			# BATCH GO — REDOUBT BANKS WHAT IS KEPT OFF THE BODY IT IS HELD ON.
-			# From this line to the armor read below, every mitigation site that
-			# already books its delta through `_prev` banks it here as well —
-			# whoever the ledger credits, because the Bastion's bank is about his
-			# body, not about whose card it was. The parry cut is the first such
-			# site; the block, a barrier, armor and resistance are banked at their
-			# own lines. Cleared again below, so no later `_prev` can reach it.
+			# **BATCH HL §3 — ONLY WHAT IS BLOCKED, PARRIED OR ABSORBED (ruled).** GO
+			# banked every mitigation site that books through `_prev` from this line
+			# to the armor read, and armor and resistance at their own line; the
+			# designer ruled the bank to the three a guard does: the BLOCK (banked at
+			# the block roll above, the nominal blow), the PARRY (here), and a
+			# BARRIER'S ABSORB (`_on_barrier_prevented`). Armor, resistance, a stance
+			# and every other cut bank nothing. The victim is named for the parry
+			# alone and cleared at the armor read, as it always was.
 			_redoubt_victim = strike_target \
 				if strike_target.is_hero and strike_target.has_engine("redoubt") else null
 			if parried:
@@ -9707,6 +9746,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 0.0 if wall_parry else 0.25
 				if strike_target.is_hero:
 					_prev(strike_target, pv_was - raw)
+				if _redoubt_victim != null and pv_was > raw:
+					_redoubt_victim.redoubt_bank += pv_was - raw
 			if is_crit:
 				# LETHAL AIM: x2 base and the Sharpshooter's +0.5 on top of it (HB
 				# §4, so x2.5), Executioner's Eye deepens it, Consistent
@@ -10399,10 +10440,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					# guard: at zero turns the term reads EXACTLY what a flat
 					# writer would give, so re-pointing that field costs nothing
 					# to anything that ever wrote it flat. **THE NAKED BLADE**
-					# doubles the STANCE's own 0.15 and leaves the talent terms
+					# doubles the STANCE's own upside and leaves the talent terms
 					# alone — it is written as a delta from 1.0 rather than as a
 					# second literal so the doubling and the base cannot drift.
-					var sf_off := 0.15 * (2.0 if attacker.rune_naked_blade > 0 else 1.0)
+					# BATCH HL §3 — the upside is `SEASONED_AGG_DEALT`, 0.30 by
+					# ruling (0.15 until HL).
+					var sf_off := BattleUnit.SEASONED_AGG_DEALT \
+						* (2.0 if attacker.rune_naked_blade > 0 else 1.0)
 					raw *= 1.0 + sf_off + attacker.seasoned_off_bonus \
 						+ attacker.rune_seasoned_off_bonus \
 							* (1 + attacker.whetstone_turns) + sf_disc
@@ -10942,6 +10986,17 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						- strike_target.rune_seasoned_def_bonus - sf_disc, 0.0)
 				if raw < pv_was:
 					_prev(strike_target, pv_was - raw)
+			# BATCH HL §3 — MERCY IS HELD AS WELL AS SPENT: every stack the Holy holds
+			# takes `MERCY_TAKEN_PER_STACK` off a blow that reaches her (ruled, 5%).
+			# Among the DEFENDER's own terms, beside the stance's, and read off the
+			# bar the engine installs — so no engine, no term. **THE BAR IS CAPPED AT
+			# FIVE** (`second_max`, `5 + mercy_cap_bonus`, which nothing writes), so
+			# the term tops out at 25%; the floor below is for a cap that grows.
+			if strike_target.has_engine("mercy") and strike_target.second_resource_name == "Mercy" \
+					and strike_target.second_resource > 0:
+				var mc_was := raw
+				raw *= maxf(1.0 - MERCY_TAKEN_PER_STACK * strike_target.second_resource, 0.0)
+				_prev(strike_target, mc_was - raw)
 			# BATCH CM §2 — THE BRACE, HALF ONE OF TWO. It sits among the DEFENDER's
 			# own terms, below Vendetta and Seasoned Fighter, and it is applied to
 			# `raw` for the same reason the offensive bar's `dmg_mult` is: THE CHECK
@@ -11084,15 +11139,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				final += rd_spent
 				attacker.redoubt_bank = 0.0
 				attacker.refresh_bars()
-				_log("   → Rune of the Bastion: the bank lands — +%d damage (spent)" % \
+				_log("   → Rune of the Bastion (core): the bank lands — +%d damage (spent)" % \
 					rd_spent, "#c8b870")
 			# Armor's share, kept consistent with the displayed final number.
 			var armor_cut := maxi(int(round(raw)) - final, 0)
-			# BATCH GO — AND ARMOR AND RESISTANCE ARE BANKED HERE, the last two cuts
-			# between the blow and the body. Resistance banks only what it CUT: a
-			# weakness adds damage and is never subtracted from a bank.
+			# BATCH GO banked armor and resistance here, the last two cuts between
+			# the blow and the body. **BATCH HL §3 — NO LONGER (ruled): armor and
+			# other mitigation bank nothing.** The parry's bank above is the one the
+			# victim was named for; it is shown and cleared here, where it always was.
 			if _redoubt_victim != null:
-				_redoubt_victim.redoubt_bank += float(armor_cut + maxi(resist_cut, 0))
 				_redoubt_victim.refresh_bars()
 				_redoubt_victim = null
 			# BATCH BM §2 — DEBT OF IRON (Warden, Plate row 8), the BANK half.
@@ -14838,7 +14893,7 @@ func _rule_engine_turn(u: BattleUnit) -> void:
 				u.opening_armed = true
 				u.opening_quiet = 0
 				u.float_text("SKIRMISHER READY", Color(0.75, 0.95, 0.55))
-				_log("Rune of the Skirmisher: %d turns unstruck — %s's bonus returns" % [
+				_log("Rune of the Skirmisher (core): %d turns unstruck — %s's bonus returns" % [
 					Classes.OPENING_QUIET_TURNS, u.unit_name], "#b8e070")
 		u.opening_struck = false
 		u.refresh_bars()
@@ -14874,7 +14929,7 @@ func _covenant_bind(cleric: BattleUnit) -> void:
 		"Oathbound to the %s. Of any damage\neither one takes, and any healing either\none receives, the other carries %d%%." % [
 			cleric.unit_name, int(round(Classes.COVENANT_SHARE * 100.0))])
 	pick.float_text("OATHBOUND", Color(0.95, 0.82, 0.55))
-	_log("Rune of the Oathkeeper: %s is bound to %s" % [cleric.unit_name,
+	_log("Rune of the Oathkeeper (core): %s is bound to %s" % [cleric.unit_name,
 		pick.unit_name], "#e0c880")
 	cleric.refresh_bars()
 
@@ -14894,7 +14949,7 @@ func _on_covenant_share(body: BattleUnit, half: int) -> int:
 	other._covenant_guard = true
 	other.take_tick_damage(half, "-%d Oath" % half, Color(0.95, 0.82, 0.55))
 	other._covenant_guard = false
-	_log("   → Rune of the Oathkeeper: %s carries %d of %s's wound" % [
+	_log("   → Rune of the Oathkeeper (core): %s carries %d of %s's wound" % [
 		other.unit_name, half, body.unit_name], "#e0c880")
 	if other.dead:
 		_log("† %s falls under the oath" % other.unit_name, "#e05050")
@@ -14944,7 +14999,7 @@ func _lay_engine_mark(holder: BattleUnit, pid: String, target: BattleUnit) -> vo
 			holder.unit_name, Classes.JUDGMENT_HEAL_PCT]
 	target.update_status(sid, String(info[1]), desc)
 	target.float_text(String(info[0]).to_upper(), info[2])
-	_log("Rune of the %s: %s %s %s" % [Classes.engine_title(pid), holder.unit_name,
+	_log("Rune of the %s (core): %s %s %s" % [Classes.engine_title(pid), holder.unit_name,
 		"tracks" if pid == "quarry_hunt" else "judges", target.unit_name], "#e0c880")
 
 
@@ -15015,7 +15070,7 @@ func _rule_engines_on_damage(victim: BattleUnit, lost: int) -> void:
 					jd_n += 1
 			_judging = false
 			if jd_n > 0:
-				_log("   → Rune of the Arbiter: the judged %s's wound mends %d all%s for %d" % [
+				_log("   → Rune of the Arbiter (core): the judged %s's wound mends %d all%s for %d" % [
 					victim.unit_name, jd_n, "y" if jd_n == 1 else "ies", jd_amt], "#e0c880")
 	# THE MARKS — the first enemy a holder damages is marked, and once his mark
 	# has fallen with nowhere to go, the next one he damages is. A blow that fells
@@ -15040,7 +15095,7 @@ func _on_unit_died(u: BattleUnit) -> void:
 				and killer.has_engine("savage_assault"):
 			killer.reaver_kills += 1
 			killer.refresh_bars()
-			_log("   → Rune of the Reaver: %s fells %s — +%d%% damage now (%d kill%s)" % [
+			_log("   → Rune of the Reaver (core): %s fells %s — +%d%% damage now (%d kill%s)" % [
 				killer.unit_name, u.unit_name, Classes.REAVER_KILL_PCT * killer.reaver_kills,
 				killer.reaver_kills, "" if killer.reaver_kills == 1 else "s"], "#e07050")
 		# THE MARKS MOVE, while their holder stands.
@@ -15066,11 +15121,11 @@ func _on_unit_died(u: BattleUnit) -> void:
 	other.covenant_with = null
 	other.remove_status("oathbound")
 	if other.has_engine("covenant_oath") and not other.dead:
-		_log("Rune of the Oathkeeper: %s has fallen — the bond passes on" % u.unit_name,
+		_log("Rune of the Oathkeeper (core): %s has fallen — the bond passes on" % u.unit_name,
 			"#e0c880")
 		_covenant_bind(other)
 	else:
-		_log("Rune of the Oathkeeper: %s has fallen — the bond ends" % u.unit_name,
+		_log("Rune of the Oathkeeper (core): %s has fallen — the bond ends" % u.unit_name,
 			"#e0c880")
 	other.refresh_bars()
 
@@ -15090,7 +15145,7 @@ func _field_kit_mend(hunter: BattleUnit, applied_id: String) -> void:
 		_stat_heal(hunter, fk_got, pick)
 		pick.float_text("+%d" % fk_got, Color(0.55, 0.9, 0.5))
 	var fk_shed := pick.dispel_one_debuff()
-	_log("   → Rune of the Medic: %s lays %s — %s mends %d%s" % [
+	_log("   → Rune of the Medic (core): %s lays %s — %s mends %d%s" % [
 		hunter.unit_name,
 		String(STATUS_INFO[applied_id][0]) if STATUS_INFO.has(applied_id) else applied_id,
 		pick.unit_name, fk_amt,
@@ -15109,7 +15164,7 @@ func _echo_fire(caster: BattleUnit, ab: Ability, tally: Dictionary) -> void:
 	if caster == null or caster.dead:
 		return
 	if tally.is_empty():
-		_log("   → Rune of the Weaver: the %s repeats, but it damaged nothing" % \
+		_log("   → Rune of the Weaver (core): the %s repeats, but it damaged nothing" % \
 			ab.display_name, "#a090e0")
 		return
 	var echoed := 0
@@ -15131,7 +15186,7 @@ func _echo_fire(caster: BattleUnit, ab: Ability, tally: Dictionary) -> void:
 			_log("† %s dies" % victim.unit_name, "#e05050")
 			_on_enemy_death(victim)
 	if echoed > 0:
-		_log("   → Rune of the Weaver: the %s repeats for %d" % [ab.display_name, echoed],
+		_log("   → Rune of the Weaver (core): the %s repeats for %d" % [ab.display_name, echoed],
 			"#a090e0")
 		await _wait(0.15)
 
@@ -17513,9 +17568,23 @@ var _communion_chain := false
 # THRESHOLD WAS SIZED AGAINST STRUCTURE AND SURVIVES; THE BUILDERS WERE SIZED
 # AGAINST THE BAD FIGURE AND DO NOT.** Both are back at their pre-CZ rates
 # (`FAITH_PER_ABSORB` 2, `FAITH_PER_GROUND_TURN` 1, below).
-const FAITH_RELEASE := 3
+# ===== BATCH HL §3 — THE RELEASE MOVES TO EIGHT (ruled) =====
+# **THE DESIGNER RULED THE THRESHOLD, ON THE FREQUENCY ARGUMENT**: two Faith an
+# absorb releasing at three is a heal every other absorbed hit; at eight it is
+# roughly every fourth. **THE HELD HALF MOVES WITH IT, AND THAT IS REPORTED, NOT
+# SILENT** (CZ §2's rule): the count caps at the threshold, so the peak an ally
+# can reach — and the Devout's own count, which never releases — rises from 3 to
+# 8, and the mitigation and damage paid on the peak with it (`docs/reports/HL.md`
+# §3). Elevation's 2 and Blessing of the Faithful's 3 are card figures and did
+# not move.
+# The paragraphs above this block describe the threshold at 3, CZ's and DA's, and
+# are kept as the record of why it stood there.
+const FAITH_RELEASE := 8
 const FAITH_MITIGATION_PCT := 2.0
 const FAITH_DAMAGE_PCT := 1.5
+# BATCH HL §3 — what each Mercy stack the Holy holds takes off a blow that reaches
+# her (ruled). Read among the strike loop's defender terms; the bar caps at five.
+const MERCY_TAKEN_PER_STACK := 0.05
 
 
 # What a single Faith stack is worth right now, as a multiplier on the two
@@ -28390,12 +28459,11 @@ func _contrib_name(owner) -> String:
 # (a stat block isn't a contribution; blocks, barriers, stances, Faith
 # and friends are).
 func _prev(owner, cut: float) -> void:
-	# BATCH GO — REDOUBT RIDES THIS DOOR, AND ABOVE THE `sim` GUARD ON PURPOSE:
-	# everything below is measurement, and the bank is a shipped engine
-	# (Reprisal's rule, `_stat_heal`). It banks into the body the strike loop
-	# names while its mitigation terms run, whoever the ledger credits.
-	if _redoubt_victim != null and cut > 0.0:
-		_redoubt_victim.redoubt_bank += cut
+	# BATCH GO — REDOUBT RODE THIS DOOR, banking every delta booked here while the
+	# strike loop named its victim. **BATCH HL §3 TOOK IT OFF (ruled)**: the bank
+	# is what a guard keeps off him — blocked, parried or absorbed — and most of
+	# what books here is mitigation of another kind (a stance, Faith, a status). The
+	# three are banked at their own sites; this door is measurement again.
 	if not sim or cut <= 0.0:
 		return
 	var name := _contrib_name(owner)

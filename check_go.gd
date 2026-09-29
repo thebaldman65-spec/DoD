@@ -296,8 +296,10 @@ func _s0_the_nine() -> void:
 		ok(Classes.engine_spec(String(pid)) == "" and Classes.engine_enablers(String(pid)).is_empty()
 				and (cfg.get("payload", {}) as Dictionary).is_empty() and int(cfg.get("price", 0)) == 150,
 			"§0: %s brings no lineage, no enabler and no payload, at the flat 150 (HK §3)" % pid)
-		ok(String(cfg.get("name", "")) == "Rune of the %s" % NOUNS[pid],
-			"§0: %s's rune is the Rune of the %s (%s)" % [pid, NOUNS[pid], cfg.get("name", "")])
+		# BATCH HL §2 — A CORE RUNE'S NAME WEARS "(core)" (the designer's); the noun
+		# before it is still the engine's, which is what this arm names.
+		ok(String(cfg.get("name", "")) == "Rune of the %s (core)" % NOUNS[pid],
+			"§0: %s's rune is the Rune of the %s (core) (%s)" % [pid, NOUNS[pid], cfg.get("name", "")])
 		# The kit a holder with no lineage opens with is his basic and his class kit.
 		var kit: Array = _names(Classes.opening_kit(ck2, "", [pid]))
 		ok(kit == [Classes.kit(ck2)[0].display_name] + Classes.class_kit_names(ck2),
@@ -737,12 +739,14 @@ func _bastion_arm(s: Node, tag: String) -> void:
 	_deep(W)
 	ok(bare[0] > 0 and absf(float(bare[1])) < 0.5,
 		"§3 (%s): a blow nothing turns banks nothing (%d landed, %.2f banked)" % [tag, bare[0], bare[1]])
-	# ARMOR: what was kept off, plus what landed, is the blow.
+	# ARMOR CUTS THE BLOW AND BANKS NOTHING (BATCH HL §3, ruled: the Bastion banks
+	# only what is blocked, parried or absorbed — GO banked every cut). Both halves:
+	# the armor did cut (less landed than the bare blow), and nothing was banked.
 	var plating_was: float = W.plating_bonus
 	var armored: Array = await _bank_blow(s, foe, W, GO_SEED + 31)
-	ok(armored[1] > 0.0 and absf(float(armored[0]) + armored[1] - float(bare[0])) <= 1.5,
-		"§3 (%s): armor banks what it cut — %d landed + %.1f banked = the %d blow"
-			% [tag, armored[0], armored[1], bare[0]])
+	ok(armored[0] < bare[0] and absf(float(armored[1])) < 0.5,
+		"§3 (%s): armor cuts the blow and banks nothing — %d landed of the %d blow, %.1f banked"
+			% [tag, armored[0], bare[0], armored[1]])
 	if W.has_engine("heavy_plating"):
 		ok(W.plating_bonus > plating_was,
 			"§3 (%s): ...and the same unblocked blow climbs the plating (%.2f -> %.2f)"
@@ -781,19 +785,25 @@ func _bastion_arm(s: Node, tag: String) -> void:
 	_deep(W)
 	W.banked_guards = 1
 	var parried: Array = await _bank_blow(s, foe, W, GO_SEED + 31)
+	# BATCH HL §3: the parry banks what it turned — the same three quarters as on no
+	# armor, because the parry is taken before the armor — and the armor's cut of
+	# what is left banks nothing, so less lands and no more is banked.
 	ok(parried[0] > 0 and parried[0] < parried_bare[0]
-			and absf(float(parried[0]) + float(parried[1]) - p_whole) <= 1.5,
-		"§3 (%s): a parry banks what it turned and armor what it cut — %d landed + %.1f banked = the %.0f blow"
-			% [tag, parried[0], parried[1], p_whole])
+			and absf(float(parried[1]) - float(parried_bare[1])) <= 1.5,
+		"§3 (%s): a parry banks what it turned and armor nothing — %d landed, %.1f banked against %.1f with no armor"
+			% [tag, parried[0], parried[1], parried_bare[1]])
 	# A BARRIER BANKS WHAT IT ATE.
 	_deep(W)
 	s._apply_status(W, "barrier", 3, 30)
 	var shielded: Array = await _bank_blow(s, foe, W, GO_SEED + 31)
 	W.remove_status("barrier")
-	ok(absf(float(shielded[0]) + shielded[1] - float(bare[0])) <= 1.5
-			and shielded[0] < armored[0],
-		"§3 (%s): a barrier banks what it absorbed — %d landed + %.1f banked = the %d blow"
-			% [tag, shielded[0], shielded[1], bare[0]])
+	# BATCH HL §3: the barrier banks what it ate of the blow that got past the
+	# armor, and the armor's cut banks nothing — so what landed plus what was
+	# banked is the ARMORED blow, not the bare one.
+	ok(absf(float(shielded[0]) + shielded[1] - float(armored[0])) <= 1.5
+			and shielded[0] < armored[0] and shielded[1] > 0.0,
+		"§3 (%s): a barrier banks what it absorbed and armor nothing — %d landed + %.1f banked = the %d that passed the armor"
+			% [tag, shielded[0], shielded[1], armored[0]])
 	print("    %s: blow %d; armor banks %.1f, a block %.1f, a parry %.1f, a barrier %.1f; a miss %.1f" % [
 		tag, bare[0], armored[1], blocked[1], parried[1], shielded[1], missed[1]])
 	# THE SPEND: THE BASIC ATTACK ADDS THE WHOLE BANK, AND ONLY THE BASIC.
@@ -1626,16 +1636,18 @@ func _s12_live() -> void:
 		[[], [], [], ["pack", "quarry_hunt"]])
 
 
+# BATCH HL §2 — EACH PREFIX WEARS "(core)": a rule engine's log line names its
+# rune as the data does, and the rune's name is `Rune of the X (core)` since HL.
 const LIVE_NEEDLES := {
-	"savage_assault": ["Rune of the Reaver:", "fells"],
-	"redoubt": ["Rune of the Bastion:", "(spent)"],
-	"cast_echo": ["Rune of the Weaver:", "repeats for"],
-	"siphon": ["Rune of the Leech", "in Mana"],
-	"covenant_oath": ["Rune of the Oathkeeper:", "wound"],
-	"judgment": ["Rune of the Arbiter:", "mends"],
-	"quarry_hunt": ["Rune of the Tracker:", "tracks"],
-	"opening_strike": ["Rune of the Skirmisher:", "(spent)"],
-	"field_kit": ["Rune of the Medic:", "mends"],
+	"savage_assault": ["Rune of the Reaver (core):", "fells"],
+	"redoubt": ["Rune of the Bastion (core):", "(spent)"],
+	"cast_echo": ["Rune of the Weaver (core):", "repeats for"],
+	"siphon": ["Rune of the Leech (core)", "in Mana"],
+	"covenant_oath": ["Rune of the Oathkeeper (core):", "wound"],
+	"judgment": ["Rune of the Arbiter (core):", "mends"],
+	"quarry_hunt": ["Rune of the Tracker (core):", "tracks"],
+	"opening_strike": ["Rune of the Skirmisher (core):", "(spent)"],
+	"field_kit": ["Rune of the Medic (core):", "mends"],
 }
 
 

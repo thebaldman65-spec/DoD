@@ -366,8 +366,9 @@ func _s0_the_data() -> void:
 		if Classes.engine_read_ruled(String(card)) != "":
 			ruled_c.append(String(card))
 	ruled_c.sort()
-	ok(ruled_c == ["Guard Change", "Lunge", VENOM],
-		"§0: the ruled card rows are %s — HD's two and HF's one" % str(ruled_c))
+	# BATCH HL §1: Guard Change's HD row is deleted — it travels with the Stances.
+	ok(ruled_c == ["Lunge", VENOM],
+		"§0: the ruled card rows are %s — HD's Lunge (HL §1 deleted Guard Change's) and HF's one" % str(ruled_c))
 	# APER: a call defined beside the three, a fourth kind the rune adds, and the
 	# three every Hunter's card offers untouched.
 	ok(Classes.COMPANION_KINDS == ["ursus", "canis", "aguila"] and Classes.RUNE_COMPANION_KINDS == ["aper"],
@@ -1245,7 +1246,8 @@ func _s5_mark_and_venom() -> void:
 		ok(benched == bool(arm[3]), "§5: with %s, carried Mark of the Hunt %s" % [arm[0], "sits out" if benched else "is seated"])
 		print("    %-30s offered %3d · %s" % [arm[0], n, "sits out" if benched else "seated"])
 	var beside := String(_run.sits_out_note(MOTH, ["lethal_aim"])).replace("\n", " ")
-	ok(beside.begins_with("Sits out of every fight while the Rune of the Sharpshooter is equipped, which dismisses the companion it needs."),
+	# BATCH HL §2: the dismisser's name wears "(core)", read off the data.
+	ok(beside.begins_with("Sits out of every fight while the Rune of the Sharpshooter (core) is equipped, which dismisses the companion it needs."),
 		"§5: beside Lethal Aim the card says: %s" % beside)
 	# THE BOSS'S ANSWER: stored with a pet, answered beside Lethal Aim — held back; and
 	# stored without Pack Bond, answered without it — handed over.

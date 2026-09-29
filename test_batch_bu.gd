@@ -78,7 +78,7 @@ var fails: Array = []
 # BATCH DF: `battle.FAITH_RELEASE`, ruled at CZ §2 and re-affirmed at DA §1,
 # mirrored ONCE per suite — DC's device, extended here to the suite its sweep
 # did not reach. The next threshold ruling costs this file one line.
-const RELEASE := 3
+const RELEASE := 8   # BATCH HL §3 — ruled at eight (3 from CZ §2 to HL)
 const HELD_MAX := RELEASE - 1   # the deepest an ally can CARRY; at RELEASE he releases
 
 # The nine, transcribed once: name -> [spec, cost, delay, cooldown, break].
@@ -808,6 +808,9 @@ func _live_reprisal() -> void:
 
 # ---------- §3 live: the Devout three ----------
 
+# Ordination's grant (`od_grant` in its handler; 3 until CQ §3 folded it to 4).
+const ORDINATION_GRANT := 4
+
 func _live_ordination() -> void:
 	# §6's FOURTH CLAUSE. THREE DIFFERENT DEPTHS, so "an ally gained Faith" is
 	# not enough to pass: the FLOOR has to be the one that moved.
@@ -837,9 +840,19 @@ func _live_ordination() -> void:
 	# card found and the PEAK is the proof. Only the cap moved — 5 became
 	# RELEASE. (The stacks written above are DIRECT-WRITE PROBE DEPTHS, not held
 	# values: an ally can only CARRY HELD_MAX.)
-	ok(m.faith_stacks == 0 and m.faith_peak >= RELEASE,
-		"Ordination found the FLOOR — the mage on 1 took 4, hit the cap and RELEASED (count %d, peak %d)"
-			% [m.faith_stacks, m.faith_peak])
+	# BATCH HL §3 — AND AT EIGHT THE GRANT COMES TO REST AGAIN. One plus the
+	# grant is five, under the threshold, so the count shows what the card found
+	# and the peak agrees; the arm reads either outcome off the threshold, so the
+	# next ruling moves neither line.
+	var od_lands := 1 + ORDINATION_GRANT
+	if od_lands >= RELEASE:
+		ok(m.faith_stacks == 0 and m.faith_peak >= RELEASE,
+			"Ordination found the FLOOR — the mage on 1 took %d, hit the cap and RELEASED (count %d, peak %d)"
+				% [ORDINATION_GRANT, m.faith_stacks, m.faith_peak])
+	else:
+		ok(m.faith_stacks == od_lands and m.faith_peak == od_lands,
+			"Ordination found the FLOOR — the mage on 1 took %d and holds %d (count %d, peak %d)"
+				% [ORDINATION_GRANT, od_lands, m.faith_stacks, m.faith_peak])
 	ok(w.faith_stacks == 3 and hn.faith_stacks == 2,
 		"and nobody else moved (%d/%d)" % [w.faith_stacks, hn.faith_stacks])
 	# IT IS NOT PLAYER-CHOSEN: the same cast aimed at a different body still
@@ -852,9 +865,15 @@ func _live_ordination() -> void:
 	# 4 — it clamps at RELEASE and releases him on the spot. So the floor is read
 	# off the peak here too. A card that had aimed where it was pointed would
 	# leave the mage at 0 AND at peak 0, which is what this still separates.
-	ok(m.faith_stacks == 0 and m.faith_peak >= RELEASE,
-		"aiming it elsewhere changes nothing — it still finds the floor (count %d, peak %d)"
-			% [m.faith_stacks, m.faith_peak])
+	# BATCH HL §3: from zero the grant is four, under eight, so it comes to rest.
+	if ORDINATION_GRANT >= RELEASE:
+		ok(m.faith_stacks == 0 and m.faith_peak >= RELEASE,
+			"aiming it elsewhere changes nothing — it still finds the floor (count %d, peak %d)"
+				% [m.faith_stacks, m.faith_peak])
+	else:
+		ok(m.faith_stacks == ORDINATION_GRANT and m.faith_peak == ORDINATION_GRANT,
+			"aiming it elsewhere changes nothing — it still finds the floor (count %d, peak %d)"
+				% [m.faith_stacks, m.faith_peak])
 	# THE CASTER IS EXCLUDED. His own Faith holds at five and never releases, so
 	# a stack spent on him buys none of the engine this card exists to start.
 	dv.faith_stacks = 0

@@ -254,8 +254,12 @@ static func kill(tree: SceneTree, scene: Node) -> void:
 # card pool is near it (the Cleric's no-engine half is the thinnest, 29 of 43);
 # the class whose RUNE offer is zero with no engine is the Cleric, and that floor
 # is `check_gv` §3's, where the rune table is derived.
+# **BATCH HL §1 MOVED THE WARRIOR'S WHOLE FLOOR 43 → 42**: Guard Change left his
+# pool to travel with the Stances as their enabler (the designer took the engine and
+# could not change stance), and an enabler is in no pool. The bare half did not move
+# — Guard Change was withheld from a hero holding no engine by its ruled row.
 const CLASS_POOL_FLOOR := {
-	"warrior": {"whole": 43, "bare": 38},
+	"warrior": {"whole": 42, "bare": 38},
 	"mage": {"whole": 51, "bare": 38},
 	"cleric": {"whole": 43, "bare": 29},
 	"hunter": {"whole": 42, "bare": 35},

@@ -80,7 +80,9 @@ func _roll_offers() -> void:
 		var on_counter: Array = []
 		for o in offers:
 			on_counter.append(String((o["rune"] as Dictionary)["name"]))
-		var rune: Dictionary = Run.generate_rune(member, on_counter)
+		# BATCH HL §1 — `peddler_rune`, NOT `generate_rune`: the counter never holds
+		# a core rune (ruled). Everything else about the roll is `generate_rune`'s.
+		var rune: Dictionary = Run.peddler_rune(member, on_counter)
 		if rune.is_empty():
 			_spent.append(i)
 			continue
@@ -90,7 +92,7 @@ func _roll_offers() -> void:
 		for attempt in 4:
 			if not owned_names.has(rune["name"]):
 				break
-			rune = Run.generate_rune(member, on_counter)
+			rune = Run.peddler_rune(member, on_counter)
 			# **AND THE RE-ROLL CAN COME BACK EMPTY NOW.** It could not before
 			# FM §1 — the family always had one more stick — and reading
 			# `rune["name"]` off `{}` on the next pass is a hard error, not a
@@ -335,8 +337,15 @@ func _draw_screen() -> void:
 		for si in _spent.size():
 			var mi: int = int(_spent[si])
 			var spent_label := Label.new()
+			# BATCH HL §1 — A FIFTH CAUSE, AND IT IS THIS COUNTER'S ALONE: what is
+			# left is core runes, which he does not sell (`Run.peddler_rune`). The
+			# shared sentence would say the hero carries every rune written for the
+			# class, which is false while a core rune is still to be found in play.
+			var spent_why := Runes.empty_offer_reason(Run.party[mi], Run.party_rune_names())
+			if Run.peddler_withholds_only_core(Run.party[mi]):
+				spent_why = "the runes left for that class are core runes, which are found in play and never sold"
 			spent_label.text = "The Peddler has nothing for %s — %s." % [
-				_hero_label(mi), Runes.empty_offer_reason(Run.party[mi], Run.party_rune_names())]
+				_hero_label(mi), spent_why]
 			spent_label.add_theme_font_size_override("font_size", 14)
 			spent_label.add_theme_color_override("font_color", Color(0.58, 0.55, 0.62))
 			# GT §1 — in the column's own stack, under the offers.

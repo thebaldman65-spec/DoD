@@ -6,8 +6,9 @@
 #       it replaced in slot 0, with no card of its role in its class kit, and a
 #       nearest card of its role in the class pool whose price it would take.
 #       Guard Change is not a former basic: it opened the Swordmaster's kit until
-#       GS, it is under two kit strikes on all three axes, and under the kit card
-#       nearest its price — Mocking Blow — on its initiative alone
+#       GS (and travels with the Stances again since HL §1), it is under two kit
+#       strikes on all three axes, and under the kit card nearest its price —
+#       Mocking Blow — on its initiative alone
 #   §2  THE SWEEP — every card a hero can earn, against his class kit, in the
 #       same role, with EB's initiative control dropped: every card below the
 #       baseline is a named row with its group, every named row still is one,
@@ -82,8 +83,10 @@ const BELOW := {
 		"why": "the Pyromancer's basic until GS; priced at Magic Missiles since GT"},
 	"Frostbolt": {"kit": ["Magic Burst"], "group": "basic",
 		"why": "the Cryomancer's basic until GS; priced at Magic Missiles since GT"},
-	"Guard Change": {"kit": ["Crushing Blow", "Pommel Strike", "Mocking Blow"], "group": "point",
-		"why": "the stance swap, priced a bargain on purpose at AK — a quick pivot, a refuel, a cooldown that stops spam; its fields call it a strike only for its 15 Break damage"},
+	# BATCH HL §1 — GUARD CHANGE'S ROW WENT WITH IT: it travels with the Stances
+	# again (the designer could not change stance in play), so it is an enabler —
+	# a card the sweep pairs AGAINST, never one a hero earns — and §1 below still
+	# asserts its price, unmoved.
 	"Charge": {"kit": ["Pommel Strike"], "group": "point",
 		"why": "its speed is the card: nothing else a Warrior holds arrives as fast, and its numbers were the designer's call"},
 	"Kindled Mind": {"kit": ["Magic Burst", "Magic Missiles"], "group": "point",
@@ -255,7 +258,9 @@ func _s1_the_three() -> void:
 			and absf(_ab("Chastise").delay - _ab("Shadowrend").delay) < 0.001,
 		"§1: the nearest matches are not what the report names them for — a random-hit area card, and a strike of Shadowrend's damage at its initiative")
 	# GUARD CHANGE: NOT A FORMER BASIC — a card the Swordmaster opened with until
-	# GS, now on his shelf of the Warrior pool.
+	# GS, on his shelf of the Warrior pool from GS to HL, and **since HL §1 the
+	# Stances' enabler again** (from play: the designer could not change stance), in
+	# no pool. Its price did not move with it; the arms below still ask it.
 	var gc := _ab("Guard Change")
 	ok(Classes.basic_override_ability("Guard Change") == null,
 		"§1: Guard Change is defined as a former basic attack")
@@ -263,10 +268,10 @@ func _s1_the_three() -> void:
 	for sa in Classes.spec_abilities("swordmaster"):
 		if sa != null and sa.display_name == "Guard Change":
 			opened = true
-	ok(opened and not Classes.core_enablers("swordmaster").has("Guard Change")
+	ok(opened and Classes.core_enablers("swordmaster") == ["Guard Change"]
 			and not Classes.class_kit_names("warrior").has("Guard Change")
-			and Classes.draft_pool("warrior").has("Guard Change"),
-		"§1: Guard Change is not the Swordmaster's former opening card, drafted from the Warrior pool")
+			and not Classes.draft_pool("warrior").has("Guard Change"),
+		"§1: Guard Change is not the Stances' enabler, defined by the Swordmaster and in no pool (HL §1)")
 	# ITS THREE AXES, AGAINST EACH KIT CARD.
 	var three_under: Array = []
 	for kn2 in ["Crushing Blow", "Pommel Strike"]:

@@ -1571,11 +1571,21 @@ func awaken(idx: int, rune_id: String) -> void:
 # decided, and an engine rune into his engine slots, slotted while one was free
 # and held unslotted otherwise. **The worn halves are unchanged**: an ordinary rune
 # is worn when its caller asks and one of his three slots is free, an ENGINE rune
-# is slotted while one of his two is free (GK's rule, whatever the caller asked),
+# is slotted when its caller asks and one of his two is free (GK's rule slotted it
+# whatever the caller asked, until HL §1 below),
 # and a PARTY rune is worn when its caller asks and the party slot is free.
 # **Everything else goes into the bag through `bag_rune`**, which on a full bag
 # queues it for the full-bag panel. Returns where it went: "worn", "bag" or
 # "pending" — "" for nothing handed over.
+#
+# **BATCH HL §1 — AN ENGINE RUNE IS SLOTTED ONLY WHEN ITS CALLER ASKS, LIKE EVERY
+# OTHER KIND.** GK slotted one whatever the caller asked, and a slotted engine
+# brings its enabler: a core rune taken from an elite's cache put a CARD in the kit
+# beside the rune, one pick handing over two things — the only mechanism the game
+# has for the designer's *"two cards from one pick"* (`docs/reports/HL.md` §1). The
+# player's cache and bargain answer no longer asks for an engine rune
+# (`map_screen._pick_rune`), so a core rune taken there waits in the bag, and its
+# card reaches the kit only when he slots it. The sim still asks (its policy).
 func hold_rune(member: Dictionary, rune: Dictionary) -> String:
 	if rune.is_empty():
 		return ""
@@ -1592,7 +1602,7 @@ func hold_rune(member: Dictionary, rune: Dictionary) -> String:
 			member["runes"] = member.get("runes", []) + [rune]
 			return "worn"
 		return bag_rune(rune)
-	if engines_worn(member) < ENGINE_SLOTS:
+	if asked and engines_worn(member) < ENGINE_SLOTS:
 		rune["equipped"] = true
 		member["engines"] = member.get("engines", []) + [rune]
 		return "worn"
@@ -1815,7 +1825,7 @@ func engine_toggle_refusal(member: Dictionary, i: int) -> String:
 		return ""
 	var r: Dictionary = rows[i]["rune"]
 	if not bool(rows[i]["worn"]):
-		return "Both engine slots are filled." if engines_worn(member) >= ENGINE_SLOTS else ""
+		return "Both core slots are filled." if engines_worn(member) >= ENGINE_SLOTS else ""
 	var after: Array = held_engines(member).filter(
 		func(p): return String(p) != String(r.get("engine", "")))
 	var pet := _pet_return_refusal(member, after)
@@ -2038,6 +2048,42 @@ func generate_rune(member: Dictionary, exclude_names: Array = []) -> Dictionary:
 		"stats":
 			return Runes.template_rune(String(member["key"]), "", excl)
 	return _apply_rune_power(Runes.generate(member, zone_idx + 1, excl))
+
+
+# ══ BATCH HL §1 — THE PEDDLER NEVER SELLS A CORE RUNE (ruled) ═══════════════
+#
+# **A CORE RUNE IS DEALT AT CLASS SELECTION AND FOUND IN PLAY; THE SHOP DOES NOT
+# SELL ONE.** The designer met one on the counter. HK rebuilt his stock and did not
+# close it: his roll is `generate_rune` → `Runes.generate` → `eligible_ids`, which
+# admits every class engine rune the hero does not hold, because GK's charter mixes
+# the second engine into the ORDINARY pool — and that half stands: a cache, the
+# bargain and the drop still carry them. **So the exclusion is the counter's own,
+# and it rides `exclude_names`**, the channel the counter already used for a rune on
+# offer to another hero: every engine rune's name, so nothing else about the roll
+# moves. The event verb never rolled one (`grant_rune`).
+func peddler_rune(member: Dictionary, exclude_names: Array = []) -> Dictionary:
+	var excl: Array = exclude_names.duplicate()
+	for id in Runes.ids():
+		if Runes.is_engine_rune(String(id)):
+			var nm := Runes.display_name(Runes.config(String(id)))
+			if not excl.has(nm):
+				excl.append(nm)
+	return generate_rune(member, excl)
+
+
+# True when the Peddler has nothing for this hero only because what is left for
+# his class is core runes: the ordinary roll is not empty, and every rune in it is
+# an engine rune. The counter's sentence names that cause (`shop_screen`).
+func peddler_withholds_only_core(member: Dictionary) -> bool:
+	if runes_mode() != "full":
+		return false
+	var left: Array = Runes.eligible_ids(member, Runes.owned_names(member, party_rune_names()))
+	if left.is_empty():
+		return false
+	for id in left:
+		if not Runes.is_engine_rune(String(id)):
+			return false
+	return true
 
 
 # The single choke point for the power arm: generate_rune and grant_rune are the only paths
@@ -2770,14 +2816,14 @@ func sits_out_note(card_name: String, engines: Array = []) -> String:
 	if eng != "" and engines.has(eng) and Classes.engine_needs_pet(eng) \
 			and Classes.dismisses_pet(engines):
 		var own_rid := Runes.engine_rune_id(eng)
-		return "Sits out of every fight while the\n%s sits out beside\nthe %s, which\ndismisses the companion it needs.\nStill carried: the slot stays counted.\nBenching the card frees the slot." % [
-			String(Runes.config(own_rid).get("name", "engine rune it needs")),
+		return "Sits out of every fight while the\n%s\nsits out beside the\n%s, which\ndismisses the companion it needs.\nStill carried: the slot stays counted.\nBenching the card frees the slot." % [
+			String(Runes.config(own_rid).get("name", "core rune it needs")),
 			Runes.dismisser_name(engines)]
 	var rid := Runes.engine_rune_id(eng)
 	var rune_name := String(Runes.config(rid).get("name", "")) if rid != "" else ""
 	if rune_name == "":
-		rune_name = "engine rune it needs"
-	return "Sits out of every fight while the\n%s is not equipped.\nStill carried: the slot stays counted.\nBenching the card frees the slot." % rune_name
+		rune_name = "core rune it needs"
+	return "Sits out of every fight while the\n%s\nis not equipped.\nStill carried: the slot stays counted.\nBenching the card frees the slot." % rune_name
 
 
 # The middle of the pet's sentence (HB §4): which equipped rune dismissed the
@@ -2866,8 +2912,23 @@ func rune_sits_out_note(rune_id: String, engines: Array = [], worn: Array = []) 
 	var rid := Runes.engine_rune_id(eng)
 	var rune_name := String(Runes.config(rid).get("name", "")) if rid != "" else ""
 	if rune_name == "":
-		rune_name = "engine rune it needs"
-	return "Sits out of every fight while the\n%s is not equipped.\nStill worn: the slot stays filled.\nUnequipping the rune frees the slot." % rune_name
+		rune_name = "core rune it needs"
+	return "Sits out of every fight while the\n%s\nis not equipped.\nStill worn: the slot stays filled.\nUnequipping the rune frees the slot." % rune_name
+
+
+# **BATCH HL §2 — WHAT A ONE-LINE SURFACE QUOTES OF A NOTE: ITS FIRST SENTENCE.** The
+# battle log's roll call took a note's first two lines, which were its first
+# sentence while every rune name fitted beside "is not equipped." on one line. A
+# core rune's name carries "(core)" since HL and no longer does — the 44-character
+# break puts the name on a line of its own — so the log reads the lines up to the
+# first that ends a sentence, joined, and says what the note says.
+func note_first_sentence(note: String) -> String:
+	var out := PackedStringArray()
+	for line in note.split("\n"):
+		out.append(String(line))
+		if String(line).ends_with("."):
+			break
+	return " ".join(out)
 
 
 func ability_slots_used(member: Dictionary) -> int:
@@ -3217,6 +3278,13 @@ func advance_zone() -> void:
 func save_run() -> void:
 	if not active or sim_run:
 		return
+	# BATCH HL §5 — THE CEILING'S TEETH, and they come before the file is opened:
+	# `FileAccess.open(... WRITE)` truncates it. A save from a newer build is on
+	# disk, so nothing is written — Profile's `_save()`, one file over.
+	if run_save_newer():
+		push_warning("Run: NOT saving — %s holds a run saved by a newer build (version %d); this build reads %d to %d." % [
+			save_path, save_refused_version, MIN_SAVE_VERSION, SAVE_VERSION])
+		return
 	var file := FileAccess.open(save_path, FileAccess.WRITE)
 	# v2 (Batch 38): + seen_events, zone_draw. v3 (Batch Y): + difficulty.
 	# v4 (Batch Z): + tally (the run ledger). v5 (Batch AC): + debug_used
@@ -3313,8 +3381,13 @@ func save_run() -> void:
 	# refusal path is followed and none invented, and a ceiling in this build could
 	# only ever refuse a LATER build's save, never protect this one from an older
 	# build. It is reported (`docs/reports/HK.md` §2) for the designer to rule.
+	# **BATCH HL §5 — THE DESIGNER RULED THE CEILING AND IT IS BUILT** (`SAVE_VERSION`,
+	# `run_save_newer`, below `has_save`): this build refuses a save a newer build
+	# wrote, and neither writes nor deletes it while it is there. **It protects from
+	# the NEXT version bump onward, and not from the hazard above**: an HJ or HK build
+	# has no ceiling to refuse this save with, so an older build must not open it.
 	file.store_var({
-		"version": 14, "party": party, "items": items, "gold": gold,
+		"version": SAVE_VERSION, "party": party, "items": items, "gold": gold,
 		"rune_bag": rune_bag, "crest": party_runes,
 		"pending_rune_drops": pending_rune_drops,
 		"encounter": encounter, "pending_modifier": pending_modifier,
@@ -3335,6 +3408,64 @@ func has_save() -> bool:
 	return FileAccess.file_exists(save_path)
 
 
+# ══ BATCH HL §5 — THE RUN SAVE GETS A CEILING (ruled) ═══════════════════════
+#
+# **`Profile`'s SHAPE, WHICH FQ AUTHORED FOR EXACTLY THIS** (`profile.gd`, its
+# ceiling block): a save written by a NEWER build is REFUSED — not loaded, not
+# written over, and NOT DELETED. `save_run` and `clear_save` are no-ops while one
+# is on disk, and `new_run` clears through `clear_save`, so starting a new game
+# cannot delete it either; the main menu says why Continue is dark. **FQ's
+# distinction holds**: a refused run save is one run, where a refused profile is
+# every run ever finished — and a run save is still not deleted, because the build
+# that wrote it can read it.
+#
+# **THE FLOOR IS A DIFFERENT QUESTION AND DOES NOT MOVE.** A save older than
+# `MIN_SAVE_VERSION` (10: BK's lattice and BM's seventeenth slot) describes a board
+# this build cannot walk, and it is still refused AND cleared in `load_run`. A
+# NEWER save describes a run this build might misread; refusing it keeps it whole
+# for the build that wrote it.
+#
+# **IT IS READ OFF THE DISK AT EVERY WRITE, NOT CACHED**: the file is what the
+# ceiling protects, a check that trusted a cached answer could be stale by the
+# time it mattered, and one read beside a write costs next to nothing.
+const SAVE_VERSION := 14
+# The floor, for the refusal's sentence. `load_run` reads it as the literal
+# `save_version < 10`, which three gates pin as it stands (`test_batch_bk`,
+# `test_batch_bm`, `check_hk`); the two are the same number and neither moved.
+const MIN_SAVE_VERSION := 10
+var save_refused := false
+var save_refused_version := 0
+
+
+# True, and the refusal recorded, when the save on disk was written by a newer
+# build; false for no save, an unreadable one, or one this build reads.
+func run_save_newer() -> bool:
+	save_refused = false
+	save_refused_version = 0
+	if not FileAccess.file_exists(save_path):
+		return false
+	var f := FileAccess.open(save_path, FileAccess.READ)
+	if f == null:
+		return false
+	var d: Variant = f.get_var(true)
+	var v := int((d as Dictionary).get("version", 0)) if d is Dictionary else 0
+	if v > SAVE_VERSION:
+		save_refused = true
+		save_refused_version = v
+	return save_refused
+
+
+# What the main menu tells the player, in Profile's words: the file, and that
+# nothing was changed or deleted. "" when there is no refusal.
+func save_refusal_message() -> String:
+	if not run_save_newer():
+		return ""
+	return ("Your saved run could not be read — it was written by a NEWER build than this one (version %d), and this build reads %d to %d.\n"
+		+ "NOTHING HAS BEEN CHANGED OR DELETED. The file is left exactly as it was, and this session will not write to it — a run started here is not saved.\n"
+		+ "The file is: %s") % [save_refused_version, MIN_SAVE_VERSION, SAVE_VERSION,
+			ProjectSettings.globalize_path(save_path)]
+
+
 func load_run() -> bool:
 	if not has_save():
 		return false
@@ -3343,6 +3474,13 @@ func load_run() -> bool:
 	if not (data is Dictionary):
 		return false
 	var save_version := int(data.get("version", 0))
+	# BATCH HL §5 — THE CEILING: a save from a newer build is refused and KEPT.
+	if save_version > SAVE_VERSION:
+		save_refused = true
+		save_refused_version = save_version
+		push_warning("Run: REFUSED %s (version %d) — written by a newer build; nothing will be written to it or deleted." % [
+			save_path, save_version])
+		return false
 	# Batch BK and BM: a pre-v10 save describes a board this build cannot render or
 	# walk. Refuse it and delete it, rather than half-loading a run whose
 	# every "next node" call would index a dictionary that is not there.
@@ -3426,6 +3564,7 @@ func load_run() -> bool:
 	party_runes = _array_or_empty(data.get("crest", []))
 	pending_rune_drops = _array_or_empty(data.get("pending_rune_drops", []))
 	_bag_the_unworn()
+	_refresh_rune_names()
 	active = true
 	return true
 
@@ -3457,6 +3596,40 @@ func _bag_the_unworn() -> int:
 					moved += 1
 			md[list_key] = kept
 	return moved
+
+
+# **BATCH HL §2 — A RUNE'S NAME IS THE DATA'S, SO A SAVED RUNE TAKES TODAY'S.** An
+# instance carries the name it was built with, and the core runes were renamed
+# (`(core)` appended, ruled): a run saved before would go on showing and matching
+# the old name — the Peddler, the drop and the cache exclude by NAME
+# (`party_rune_names`), so an old-named rune in the bag would not keep its
+# renamed entry from being rolled again. Every rune in the save whose `id` is an
+# authored entry takes that entry's name on load: worn, slotted, in the bag, in the
+# crest, waiting on the panel, and in a queued cache. GS §3's rule for a rune's
+# text (read live, never off the instance), one field over. Nothing else about an
+# instance is touched, and no version moves: a name is not structure.
+func _refresh_rune_names() -> int:
+	var lists: Array = [rune_bag, party_runes, pending_rune_drops]
+	for m in party:
+		var md: Dictionary = m
+		lists.append(md.get("runes", []))
+		lists.append(md.get("engines", []))
+		for triple in md.get("rune_candidates", []):
+			lists.append(triple)
+	var renamed := 0
+	for lst in lists:
+		for r in lst:
+			if not (r is Dictionary):
+				continue
+			var rd: Dictionary = r
+			var id := String(rd.get("id", ""))
+			if id == "" or not Runes.ids().has(id):
+				continue
+			var nm := String(Runes.config(id).get("name", ""))
+			if nm != "" and String(rd.get("name", "")) != nm:
+				rd["name"] = nm
+				renamed += 1
+	return renamed
 
 
 # Trees are FIXED definitions in code: always swap the saved snapshot for
@@ -3494,6 +3667,10 @@ func _migrate_trees() -> void:
 
 func clear_save() -> void:
 	if sim_run:
+		return
+	# BATCH HL §5 — A REFUSED SAVE IS NOT DELETED: not by a wipe, a forfeit, the
+	# end of a run, or a New Game (`new_run` clears through here).
+	if run_save_newer():
 		return
 	if has_save():
 		DirAccess.remove_absolute(save_path)

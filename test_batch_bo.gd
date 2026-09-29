@@ -418,11 +418,14 @@ func _cores() -> void:
 	# the only one in the game. The ENABLER is unchanged and still protected.
 	# (BATCH GS §1: it is no enabler now — see below.)
 	# BATCH GS §1 — Seasoned Fighter opens every battle Aggressive and Aggressive
-	# pays from the first blow, so the stance swap is a card: Guard Change is on
-	# his shelf and the Swordmaster's engine travels with nothing.
-	ok(Classes.core_enablers("swordmaster").is_empty()
-			and Classes.spec_draft_pool("swordmaster").has("Guard Change"),
-		"§2: the Swordmaster's stances need no enabler — his stance swap, Guard Change, is drafted off his shelf (GS §1)")
+	# pays from the first blow, so the stance swap was a card: Guard Change went on
+	# his shelf and the Swordmaster's engine travelled with nothing.
+	# **BATCH HL §1 RE-POINTED IT, FROM PLAY**: the designer took the Stances and
+	# could not change stance, so the swap travels again — Guard Change is the
+	# Stances' enabler and, like every enabler, on no shelf.
+	ok(Classes.core_enablers("swordmaster") == ["Guard Change"]
+			and not Classes.spec_draft_pool("swordmaster").has("Guard Change"),
+		"§2: the Swordmaster's stances bring their swap — Guard Change is his enabler and off his shelf (HL §1)")
 	# BATCH HB §3 — RE-POINTED TO THE DESIGNER'S RULING: PACK BOND BRINGS NOTHING.
 	# The three summons were the one stated exception to *an engine brings only
 	# what it cannot run without* (GS §1), and HB retired it by putting the pet in

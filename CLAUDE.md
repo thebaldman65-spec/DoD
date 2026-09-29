@@ -357,6 +357,8 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
 - **A RULING THE BATCH NEEDS GOES UNDER ITS OWN HEADING**, so the designer can answer without
   reading the rest.
 - **RETROFIT NOTHING.** Reports written before CW stay where they are.
+- **A LETTER WHOSE BRIEF WAS AUTHORED AND NEVER RUN IS SPENT, AND THE NEXT BATCH SAYS SO IN ITS CHANGELOG ENTRY**
+  (CC at CD §3, CF at CG §0, GD in GE's report; **HM was folded into HL**, HL §0): a gap between letters is not a lost batch.
 
 ## THIS FILE IS MEASURED IN KiB, AND THE CEILING IS 410 KiB (STANDING, RULED AT EE §1, RAISED AT FU §1 AND GY §1)
 > **`CLAUDE.md` IS MEASURED AS A SIZE, NEVER AS A SHARE OF THE SYNC, AND THE CEILING IS 410 KiB.**
@@ -1159,12 +1161,14 @@ batch aimed at helping him. **That will keep happening.**
 - **A FOURTH SPEND SITE ADDED LATER MUST REPORT TO IT** or the band silently under-pays.
 
 ## FAITH RELEASES AT `FAITH_RELEASE`, AND THE LANE TRADES DEPTH FOR FREQUENCY (STANDING, CZ §2, AMENDED DA §1)
-**The threshold is ONE number (`battle.FAITH_RELEASE`, 3) and it was a literal `5` in three
+**The threshold is ONE number (`battle.FAITH_RELEASE` — **8 since HL §3, ruled**; 3 from CZ) and it was a literal `5` in three
 places** — the cap on the count, the release branch, and Communion's "still building" guard.
 **THE BUILDERS ARE BACK AT THEIR PRE-CZ RATES: `FAITH_PER_ABSORB` 2, `FAITH_PER_GROUND_TURN` 1.**
 - **SHORTENING THE BAR LOWERS THE HELD CEILING TOO, AND THAT IS THE COST.** Faith pays on the
   highest count held and the count caps at the threshold, so the deepest benefit an ally can carry
-  fell from 5 stacks to 3. **The lane trades depth of hold for frequency of release, deliberately.**
+  fell from 5 stacks to 3. **The lane trades depth of hold for frequency of release, deliberately.** **HL §3's eight
+  moved it back the other way, and the ceiling rose with it** — an ally's peak and the Devout's own count to 8;
+  `docs/reports/HL.md` §3 prices what the peak pays.
 - **A BUILDER RATE THAT MEETS THE THRESHOLD IN ONE EVENT CHANGES WHAT THE CARD IS, AND THAT IS WHY
   CZ's BUILDERS WENT BACK.** At 3 per absorb against a threshold of 3, **one absorbed hit is a
   whole release** — a shielded ally never HOLDS Faith, so `faith_peak`, the high-water mark the
@@ -1186,9 +1190,9 @@ places** — the cap on the count, the release branch, and Communion's "still bu
   `docs/reports/DA.md`. **Elevation (2 of 3) and Blessing of the Faithful (3 of 3) were reported
   and deliberately not changed at either batch.**
 - **THE SUITES WERE PAID AT DC, AND THE DERIVED BAND IS WHAT MOVED.** An ally's count is clamped
-  at the threshold and releases on reaching it, so **the deepest an ally can HOLD is 2**, and
+  at the threshold and releases on reaching it, so **the deepest an ally can HOLD is 2 (7 since HL §3)**, and
   Communion — which skips `faith_stacks >= FAITH_RELEASE` — **rolls over a 1–2 band, peaking at
-  30% rather than 60%.** Each of `be`, `bf`, `bg`, `bh`, `bi` carries `const RELEASE := 3` and
+  30% rather than 60%.** Each of `be`, `bf`, `bg`, `bh`, `bi` carries `const RELEASE := 8` (3 until HL §3) and
   `const HELD_MAX := RELEASE - 1` **once**, so the next ruling costs one line a suite.
 - **AND DA'S REVERT MOVED THE CODE AND LEFT TWO PIECES OF PROSE BEHIND, FOR FOUR BATCHES.** The
   Devout's `passive_desc` in `classes.gd` and the `faith` status chip in `battle.gd` read
@@ -1628,7 +1632,11 @@ questions now; `can_equip`, `equipped_learned` and `Profile.equip_cell` are dele
   **v11 (CT), v12 (EG), v13 (GF) AND v14 (HK: the rune bag, the crest and the waiting drops) ARE ALL
   TOLERANT AND NONE MOVED THE REFUSAL THRESHOLD** — the
   threshold is a claim about a structure this build cannot walk, and a version bump for a field
-  with a sane default is not one. **DO NOT RAISE THE THRESHOLD TO MATCH THE VERSION.** **GH MOVED NO
+  with a sane default is not one. **DO NOT RAISE THE THRESHOLD TO MATCH THE VERSION.** **AND A SAVE FROM A NEWER
+  BUILD IS REFUSED AND KEPT (HL §5, ruled — `Profile`'s shape)**: above `Run.SAVE_VERSION` `load_run` refuses, and
+  `save_run` and `clear_save` are no-ops while the file is on disk (`new_run` clears through `clear_save`); the main
+  menu says so, Continue dark. It guards from the next version bump on, never an older build reading a newer save, and
+  the floor did not move. **A bump raises `SAVE_VERSION`, the one constant `save_run` writes.** **GH MOVED NO
   VERSION**: a fight's losses are written to `hp`, `mana` and `items`, which v13 already carries, and
   to one member key, `companions_standing`, riding the party dict the way `bm_equipped` does.
 · **DELETED, NOT ZEROED** (each pinned ABSENT in test_batch_bm): `Run.award_talent_points`,
@@ -1945,6 +1953,15 @@ putting the pet in every Hunter's CLASS KIT: an engine no longer has to bring wh
   nothing does. **Where several cards would each serve, which one travels is a ruling**, and a batch's derivation
   stands PROPOSED until it is ruled. `Classes.PROTECTED_CORES` carries every row and its `why`;
   `docs/reports/GS.md` §1 carries the working, and which rows were the designer's.
+  · **AND AN ENGINE THAT IS A TOGGLE BRINGS THE TOGGLE (HL §1, from play).** GS sent Guard Change to the pool because
+    Aggressive pays from the first blow; the designer took the Stances and could not change stance. A rule that is a
+    switch nobody can press is missing, whatever it pays untouched: **the Stances bring Guard Change again** (the card
+    PROPOSED), and its offer row is deleted — an enabler is in no pool.
+- **THE SECOND ENGINE IS FOUND IN PLAY, NEVER BOUGHT, AND WAITS IN THE BAG (HL §1, ruled from play).** The Peddler
+  never offers one (`Run.peddler_rune`); a cache, the bargain and the drop still do. **A slotted engine brings its
+  enablers, so `Run.hold_rune` slots an engine rune only when its caller asks, and the player's cache answer never
+  asks**: until HL one pick could hand over a rune and a card — the designer's *Fireball dragging Razor Ice*, which no
+  draft does (`docs/reports/HL.md` §1). Class selection still slots the one taken, and its card names what it brings.
 - **A LINEAGE OPENS WITH ITS ENGINE'S ENABLERS AND NOTHING ELSE, AND NO ENGINE REPLACES THE CLASS BASIC.**
   `Classes.lineage_opening` is the lineage's term in `Classes.opening_kit`, and `spec_abilities` is a lineage's
   DEFINITION table, not its opening kit. The four basics that were overrides (Fireball, Frostbolt, Arcane Explosion,
@@ -2005,6 +2022,25 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   `battle.gd` writes an engine's slot state; the pouch's door is on the map. A drop takes effect at the next fight,
   never inside one, so no card leaves while it is cooling down, chosen or resolving (`check_gm` §2).
 
+## STANDING RULE — A CORE RUNE IS A DIRECTIONAL FOR ABILITY DRAFTING (Batch HL §4, the designer's)
+> **A CORE RUNE IS A DIRECTIONAL FOR ABILITY DRAFTING.** It must change what a hero is optimising
+> for, so that two heroes of a class holding different cores draft differently. **A core rune that
+> only multiplies a turn he would have taken anyway is an ordinary rune wearing a core's slot.**
+>
+> **The test: name the cards it tells you to draft.** Pack Bond says companion cards; Trapper says
+> breadth; Volley says multi-hit; Ambusher says long cooldowns. **A core that names nothing fails.**
+>
+> **A crest rune that only stamps a stat on four heroes is four copies of a hero effect wearing the
+> party's slot.** It fails the same test. **A party rune has to read the party** — its composition,
+> its condition, its moments together.
+
+- **AMBUSHER'S SHARPEST DIRECTION IS UNBUILT: cards that want to follow each other with no turn between.** Nothing in
+  the game reads what was cast last turn — the nearest are `last_attack_target` and Overtone's cast count — so a combo
+  family is new machinery, and it wants a recon first.
+- **OF HK's EIGHT CREST DOORS (`docs/reports/HK.md` §4b), HALF OF ONE IS BUILT**: the party's composition, read once at
+  the spawn (HL §6; the crest block's census bullet). Its condition as a fight runs, its moments together, its money
+  and its companions are still new machinery (`docs/reports/HL.md` §6 lists the doors).
+
 ## STANDING RULE — AN ENGINE RUNE SHOWS ITS ENGINE'S RULE, READ LIVE AT ONE DOOR (Batch GS §3, ruled by the designer)
 > **Wherever a rune's text renders, an ENGINE rune renders its engine's rule — the words its class-selection card
 > shows — and never its `desc` in `data/runes.json`.** `Runes.shown_desc` is the one door every surface asks, and
@@ -2016,6 +2052,9 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
 - **AN ENGINE RUNE'S `desc` IS UNREAD, AND IT STAYS IN THE DATA (ruled: no data change).** Twelve read *"The <spec>'s
   engine."* and twelve *"A <class> engine."* — a placeholder a player met FIRST until GS, ahead of the rule GK's
   `_engine_fields` appended to it. **A surface that shows one has gone around the door.**
+- **THE PLAYER CALLS IT A CORE RUNE (HL §2, ruled).** Its name wears `(core)` (pending art) and its rule shows with no
+  `Engine:` prefix; `ENGINE_READ`, `has_engine` and every identifier keep *engine*. **A rune's name is the data's**:
+  `Run._refresh_rune_names` gives a saved rune today's name on load, because every roll excludes by name.
 - **A NEW SURFACE THAT SHOWS A RUNE'S TEXT ASKS THE DOOR**, and `check_gs` §4 drives the Peddler, the pouch, an offer
   and the hero sheet with all twenty-four and sweeps the game's scripts for a rune's `desc` read anywhere else.
 
@@ -2045,7 +2084,8 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
 - **THE POPULATION IS DERIVED AT THE DOOR, NEVER FROM A FIELD OR A `why`.** Every card a hero of the class can earn —
   the draft pool and every lineage's zone-boss pool — is asked `_ability_usable` with no engine, on a board dressed
   to allow everything an engine does not give. **A card another CARD or the board can open is never a row**: Battle
-  Poise and Counter Time (a drafted Guard Change), Reprisal (a heal landed), Execute (a low or Broken target), Kill
+  Poise and Counter Time (a drafted swap — Precision Strike, Feint or Wheeling Cut; a drafted Guard Change until HL §1
+  sent it back to the Stances), Reprisal (a heal landed), Execute (a low or Broken target), Kill
   Command and the companion cards (a companion — which every Hunter but the Sharpshooter summons from his class kit
   since HB, where until then only an earned Call the Wilds gave one). `check_gt` §3 re-derives it every battery, so a new
   earnable card is sorted by the gate in the batch that adds it. **The Sharpshooter's own seat gate is the NEGATIVE
@@ -2073,7 +2113,8 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   pouch row and the map's rune slot, which the card layer has no counterpart for, the hero sheet's state column, and
   the battle log's opening roll call — **a rune that sits out is still equipped, so the spawn was naming it in the log
   of a fight it paid nothing in**, where a card that sits out is simply absent. The log line takes the note's first
-  two lines rather than wording it again. **The offer surfaces get nothing**: see the bullet below. **NOTHING IS WRITTEN HERE EITHER** — the rune stays equipped, its slot stays filled and its payload is still
+  sentence (`Run.note_first_sentence`; its first two lines until HL §2 gave a core rune's name a line of its own)
+  rather than wording it again. **The offer surfaces get nothing**: see the bullet below. **NOTHING IS WRITTEN HERE EITHER** — the rune stays equipped, its slot stays filled and its payload is still
   applied at the spawn, because the refusal lives inside each read site where GV put it. **So a row added to the table
   by ruling rather than found by the derivation owes its read site the same refusal** (HE §1's seven): otherwise the
   sentence says it sits out while it pays.
@@ -2238,9 +2279,10 @@ the block left out, spend what they were paid.
   (the Medic). A blow is `_resolve`'s strike loop (the Tracker's and the Skirmisher's pay, the Bastion's spend). **A
   kill outside `_die()`, damage outside the two unit doors or a status written around `_apply_status` is invisible to
   the nine.**
-- **WHAT A BODY IS SPARED IS `_prev`, THE BLOCK, A BARRIER'S ABSORB, ARMOR AND RESISTANCE**, and the Bastion banks all
-  five on the body the strike loop names, whoever's work it was. **A new defence that books nothing to `_prev` is one
-  the Bastion never banks.** A miss is not a blow and banks nothing.
+- **THE BASTION BANKS WHAT IS BLOCKED, PARRIED OR ABSORBED, AND NOTHING ELSE (HL §3, ruled; GO banked every cut)** —
+  the block roll, the parry cut and a barrier's absorb, on the body the strike loop names, whoever's work it was.
+  Armor, resistance and every other `_prev` delta bank nothing. **A new guard of those three kinds owes the bank a line
+  at its own site.** A miss is not a blow and banks nothing.
 - **THE NINE'S ENGINE NAMES ARE INTERNAL; THE RUNE NOUN IS THE NAME (ruled).** No text a player reads carries one, in
   any inflection: the rule text, the chips, the floats and the log say *Reaver*, *Bastion*, *Weaver*. `check_go` §0
   and §12 sweep all four. The fifteen's texts still open with their engine names (`docs/state.md`).
@@ -3468,9 +3510,9 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
   why, and his Sell rows are how the player makes room. **An unequip into a full bag is refused too, and a SWAP — one
   rune each way, the bag's count unchanged — is the way through**, so a full bag beside full slots never strands a rune.
 - **EVERY TAKEN RUNE IS PUT DOWN AT `Run.hold_rune`, AND WHAT IS NOT WORN GOES TO THE BAG.** Worn when its caller asks and
-  a slot it fits is free — an engine rune slotted while an engine slot is free, as GK had it — and otherwise the bag.
-  **The Peddler's purchase goes to the bag and never onto a hero** (`Run.buy_rune`), so an engine rune bought is no
-  longer slotted at the counter. **The charter's *dropped and swapped, including to nothing* stands**: unslotting is into
+  a slot it fits is free — an engine rune too since HL §1 (GK slotted one whatever was asked) — and otherwise the bag.
+  **The Peddler's purchase goes to the bag and never onto a hero** (`Run.buy_rune`), and since HL §1 he sells no
+  engine rune at all. **The charter's *dropped and swapped, including to nothing* stands**: unslotting is into
   the bag, refused only while the bag is full, and the bag can now let an engine rune go for good, sold or dropped.
 - **A HERO'S RUNE PANEL LISTS WHAT HE WEARS, THEN THE BAG'S RUNES HE MAY WEAR** (`Run.rune_rows`, `engine_rows`), his own
   list first so a row's index is the one the toggle always took. `Run.toggle_rune`, `toggle_engine` and
@@ -3499,7 +3541,11 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
   the first structural reason. **Little in the game reads the party whole** — two talent stamps a rune can feed, two
   engines' wiring and the relics' hooks, which it cannot; every card and rune reads one hero — so what a crest rune could
   read beyond a stat or a card on each hero is the census in `docs/reports/HK.md` §4b, and **a crest rune that needs more
-  than that owes new machinery before it is authored.**
+  than that owes new machinery before it is authored.** **HL §6 built half of the census's third door**: a payload's
+  `condition` reads the four through `ctx.party` (`Talents.party_condition_met` — a class present, absent or counted,
+  a core rune carried, all standing at the opening), ONCE at the spawn, counting the heroes who stand then. **Whether all
+  four are alive LATER is not built**: a stamped payload cannot come off a hero mid-fight, and a stamp that turns false
+  by turn six would be a lie. The rune the roll call names says when its condition does not hold.
 - **IT IS OFFERED THROUGH EVERY ROLL, TO ONE HERO AT A TIME.** `Runes._scope_ok` passes it for every hero, so the drop's
   union holds it once and the Peddler excludes what is already on his counter, lest two heroes be offered one rune.
 - **`check_hk` §4 BUILDS ONE IN THE FIXTURE AND NEVER IN THE FILE** (GK's empty engine slots, GO's filling them),
@@ -3762,8 +3808,8 @@ LATER BATCH WOULD MOST EASILY BREAK.** It is AUTHORED rather than derived, and `
 asserts every named enabler is in that spec's opening kit and in NO pool. **The failure it prevents
 is SILENT: a spine that stops working because its enabler became draftable.** **Since GS §1 a
 lineage's protected core IS its enablers** — the minimum its engine cannot run without: one card for
-five engines and none for the other seven (the Beastmaster's three summons, one bar entry since AH, were
-the eighth until HB made them every Hunter's class-kit card) — so `slots` is their bar entries and
+six engines and none for the other six (the Stances' Guard Change the sixth since HL §1; the Beastmaster's three
+summons, one bar entry since AH, were an eighth until HB made them every Hunter's class-kit card) — so `slots` is their bar entries and
 `lineage_slots` is zero for every lineage. **The table itself
 is in `classes.gd` with a `why` on every row — read it there rather than copying it here.** **SINCE GK
 THE ENABLERS TRAVEL WITH THE ENGINE RUNE**: `Classes.engine_enablers` reads this column for an engine's
@@ -3771,8 +3817,8 @@ lineage, `Classes.opening_kit` hands them to any hero of the class who holds tha
 out when it is not held, and they sit OUTSIDE the slot count (`Classes.lineage_slots` is `slots` less
 the enablers).
 
-**THE DRAFT IS COMPLETE AND NOTHING IS OWED: 179 of 179, 159 spec + 20 class-wide — FOUR POOLS OF
-43 / 51 / 43 / 42 SINCE HB** (GP's merge made them 38 / 41 / 34 / 36 of 149, GS §1 put the 29 cards
+**THE DRAFT IS COMPLETE AND NOTHING IS OWED: 178 of 178, 158 spec + 20 class-wide (179 / 159 until HL §1) — FOUR POOLS OF
+42 / 51 / 43 / 42 SINCE HL §1** (Guard Change left the Warrior's for the Stances; 43 from HB) (GP's merge made them 38 / 41 / 34 / 36 of 149, GS §1 put the 29 cards
 that stopped travelling with an engine on their lineages' shelves, and HB §2 put Tripwire on the
 Survivalist's when Summon Companion took its class-kit slot). All twelve lineage shelves hold at least TEN; the
 Warrior and Hunter class-wide shelves hold six, the Mage's five and the Cleric's three, since GN
@@ -3829,14 +3875,14 @@ fact that they are.
 
 ## STANDING RULE — ONE DRAFT POOL A CLASS, AND A CARD THAT READS AN ENGINE IS OFFERED ONLY TO ITS HOLDER (Batch GP §1/§2)
 > **The three lineage shelves and the class-wide shelf of a class are ONE POOL. A hero draws from
-> all of it — 43 / 51 / 43 / 42 — and `Classes.draft_pool(class_key)` is the only thing a draw may
+> all of it — 42 / 51 / 43 / 42 since HL §1 — and `Classes.draft_pool(class_key)` is the only thing a draw may
 > read.** `spec_draft_pool()` and `class_draft_pool()` return what they always returned and are
 > SHELVES now: where a card was authored, not a channel it is drawn from. **A reader that takes
 > `spec_draft_pool(his spec)` for "what this hero can be offered" is wrong and still passes.**
 >
 > **A card that READS an engine is offered only to a hero who holds it.** `Classes.ENGINE_READ` is
-> the table — 42 rows, one `why` apiece: 39 the cast test found (two of them HE §3's zone-boss cards) and three the
-> designer RULED (HD §1's two, HF §7's Venom Coating) —
+> the table — 41 rows, one `why` apiece: 39 the cast test found (two of them HE §3's zone-boss cards) and two the
+> designer RULED (HD §1's Lunge, HF §7's Venom Coating; Guard Change's HD row went at HL §1, as it began travelling) —
 > and `Classes.offerable` is the one answer, asked by the
 > draft offer and by the zone-boss fallback so the two cannot disagree. *Since HB it asks a second,
 > negative question beside the engine one: a card that needs a companion is not offered to a hero who
@@ -3866,7 +3912,7 @@ fact that they are.
   two rows as mistakes on the new code, each asking a row to be refused at the door; that was their
   assumption, not the rows'. A ruled row is no evidence for the derivation, and the derivation none against it.
   **HE §2 ruled a third, Mark of the Hunt (Pack Bond's), and HF §7 undid it** on the premise's other half (its
-  companion's half pays with no engine; the HB block). **HF §7 rules Venom Coating Trapper's** — the third ruled row
+  companion's half pays with no engine; the HB block). **HF §7 rules Venom Coating Trapper's** — the third ruled row (the second since HL §1 deleted Guard Change's)
   now, and the first found on a boss pool rather than a shelf. Lunge on the Swordmaster's zone-boss pool was offered
   there with the Stances unslotted until HE §3 pointed the boss at the engine half.
 - **A CARD THAT SITS OUT WITHOUT ITS ENGINE IS A ROW HERE TOO, NAMING THE SAME ENGINE (HE §3).** The boss
@@ -4124,9 +4170,9 @@ exactly the inverted card, and it would still read fine on the tooltip.
 · **stance-GATED ABILITIES WERE BUILT IN BATCH BW — see its standing rule further down.** BP
   named them a future direction and deliberately did not build them; the rule they wanted is now
   written, and it is the READERS-BRANCH-AND-FLIP / GATED-REQUIRE-AND-STAY distinction.
-· **"GUARD CHANGE IS THE ONLY STANCE SWAP IN THE GAME" IS NO LONGER TRUE**, and **since GS §1 every
-  swap is DRAFTED, Guard Change included**: the stances run on the Aggressive guard every battle opens
-  in, so the swap is a card and not the engine's enabler. It is still the only UNCONDITIONAL one —
+· **"GUARD CHANGE IS THE ONLY STANCE SWAP IN THE GAME" IS NO LONGER TRUE**, and **every swap but Guard Change is
+  DRAFTED**: GS §1 drafted it too, and since HL §1 it travels with the Stances as their enabler, because the designer
+  took the engine and could not change stance. It is still the only UNCONDITIONAL one —
   the others cost Rage and sit on 3- and 4-turn cooldowns.
 
 ## STANDING RULE — AN ENGINE IS EXCLUSIVE, AN AXIS IS SHARED (Batch DR §1)
@@ -4385,6 +4431,9 @@ READ HERE THAN TO REDISCOVER.**
   party's own work inside the cleansable set for a mender's Cleansing Rite. `unit.gd`'s list names
   five existing deliberate absences for this reason. **The one that did belong is the one that
   lands on an enemy** — and being listed is what makes it feed a Survivalist's Trapper breadth.
+· **AND A FOURTH DOOR, FOUND IN PLAY: A CARD WHOSE ARM READS NO TARGET IS ON THE HERO TURN'S NO-TARGET LIST (HL §1).**
+  `_player_turn` sends every other `special` to the enemy picker, so a self-cast missing from it asks for an enemy its
+  handler never reads — Preparation and nine more did until HL. `check_hl` §1e derives the population every battery.
 · **AND EVERY STATUS THE HEROES LAY ON AN ENEMY IS IN ONE OF TWO LISTS (GM §3).** `_dispellable_buffs` is DERIVED
   from absence in both, so an enemy-side status in neither is one a Mage's Dispel strips — and Dispel's own text
   strips only BENEFICIAL effects from an enemy. An affliction goes in `DEBUFF_IDS`; a MARK, or other work of the

@@ -416,7 +416,8 @@ func _s6_pack_beside_lethal() -> void:
 	# GX's sentence is hand-broken at 44 characters for the tooltips that do not
 	# wrap, so it is read flattened.
 	var flat := note.replace("\n", " ")
-	ok(flat.begins_with("Sits out of every fight while the Rune of the Sharpshooter is equipped"),
+	# BATCH HL §2: the dismisser's name wears "(core)", read off the data.
+	ok(flat.begins_with("Sits out of every fight while the Rune of the Sharpshooter (core) is equipped"),
 		"§6: the note does not open with GX's clause naming the dismisser: %s" % flat)
 	ok(flat.contains("Still worn: the slot stays filled.") and flat.contains("Unequipping the rune frees the slot."),
 		"§6: the note is not GX's rune sentence: %s" % flat)
@@ -430,7 +431,9 @@ func _s6_pack_beside_lethal() -> void:
 		# THE MAP CARD'S ENGINE LINE.
 		var seen := {"card": "none", "row": "none"}
 		var line: Label = null
-		for l in _labels_with(mp, "engines:"):
+		# BATCH HL §2: the card's line says *core runes:* (the player's word), where it
+		# said *engines:*; the rune named on it is still the Beastmaster's.
+		for l in _labels_with(mp, "core runes:"):
 			if String((l as Label).text).contains("Beastmaster"):
 				line = l
 		ok(line != null, "§6 (%s): the Hunter's card drew no engine line" % tag)
@@ -480,8 +483,17 @@ func _s6_pack_beside_lethal() -> void:
 		# THE BATTLE LOG'S ROLL CALL.
 		var over := {3: {"engines": [_eng("pack"), _eng("lethal_aim", lethal_in)]}}
 		var s: Node = await Gate.spawn(self, ["", "", "", "beastmaster"], {"party": over, "deterministic": true})
+		# BATCH HL §2 — THE NOTE'S FIRST SENTENCE, NOT ITS FIRST TWO LINES: a core
+		# rune's name wears "(core)" and takes a line of its own, so the dismisser
+		# sentence runs five lines now. Re-derived here — the lines, joined, up to
+		# the first that ends a sentence — never read off the battle's own helper.
 		var lines := note.split("\n")
-		var want_tail := "%s — %s %s" % [bm_name, lines[0], lines[1]]
+		var first := PackedStringArray()
+		for piece in lines:
+			first.append(String(piece))
+			if String(piece).ends_with("."):
+				break
+		var want_tail := "%s — %s" % [bm_name, " ".join(first)]
 		var called := 0
 		for rc in s.get("_rune_roll_call"):
 			if String(rc).ends_with(want_tail):

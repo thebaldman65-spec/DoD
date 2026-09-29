@@ -8,7 +8,9 @@
 #       fallback (`roll_draft_fallback_offer`). A Warrior holding no engine — of no
 #       lineage, or of the Swordmaster's with the Stances merely owned — or holding
 #       another engine is offered NEITHER; one holding the Stances, first or second,
-#       is offered BOTH.
+#       is offered BOTH. **SINCE HL §1 ONLY LUNGE**: Guard Change travels with the
+#       Stances again (the designer could not change stance in play), so it is
+#       asserted offered by no roll and held by every hero who slots the Stances.
 #   §2  THE TWO DOORS THE GATE DID NOT STAND AT UNTIL HE §3, DRIVEN AND ASSERTED —
 #       the zone boss's first tier asked the pet half of `offerable` and not the
 #       engine half (HC §5), so a Swordmaster-lineage Warrior who unslotted the
@@ -37,7 +39,14 @@ extends SceneTree
 
 const Gate = preload("res://gate_fixture.gd")
 
-const STANCE_PIECES := ["Guard Change", "Lunge"]
+# BATCH HL §1 — ONE STANCE PIECE IS GATED NOW. The designer took the Stances in
+# play and could not change stance, so Guard Change TRAVELS with the engine again
+# (its enabler, in no pool) and its ruled row was deleted, not zeroed — there is no
+# offer left to gate. Lunge is still HD §1's ruled row. `TRAVELS` is asserted
+# beside it at every door: never offered by any roll, and held by every hero who
+# slots the Stances.
+const STANCE_PIECES := ["Lunge"]
+const TRAVELS := "Guard Change"
 const STANCES := "seasoned"
 const ROLLS := 400
 const ROLL_SEED := 20260921
@@ -134,8 +143,13 @@ func _s0_the_rows() -> void:
 			ruled_hd.append(String(card))
 	ruled.sort()
 	ruled_hd.sort()
-	ok(ruled_hd == ["Guard Change", "Lunge"],
-		"§0: the rows ruled at HD §1 are %s — the ruling named two" % str(ruled_hd))
+	ok(ruled_hd == ["Lunge"],
+		"§0: the rows ruled at HD §1 are %s — the ruling named two, and HL §1 deleted Guard Change's when it began travelling" % str(ruled_hd))
+	# AND THE ONE THAT TRAVELS: no row, in no pool, the Stances' enabler.
+	ok(Classes.engine_read(TRAVELS) == "" and not Classes.draft_pool("warrior").has(TRAVELS)
+			and Classes.core_enablers("swordmaster") == [TRAVELS],
+		"§0: %s is not the Stances' enabler in no pool with no row (row `%s`, enablers %s)" % [
+			TRAVELS, Classes.engine_read(TRAVELS), str(Classes.core_enablers("swordmaster"))])
 	print("    %d rows in the card gate, %d of them ruled: %s" % [
 		Classes.ENGINE_READ.size(), ruled.size(), ", ".join(ruled)])
 
@@ -171,6 +185,21 @@ func _s1_every_door() -> void:
 				if STANCE_PIECES.has(String(c)):
 					stored[String(c)] = int(stored.get(String(c), 0)) + 1
 		print("    %-58s draft %s · fallback %s · stored %s" % [label, str(draft), str(fall), str(stored)])
+		# BATCH HL §1 — GUARD CHANGE IS OFFERED BY NO ROLL, TO ANYONE, and the hero
+		# who slots the Stances holds it anyway: the negative on the offer, the
+		# positive in his opening kit, on the same member.
+		var gc_seen := _tally(m, func(mm): return _run.roll_draft_offer(mm))
+		var gc_fall := _tally(m, func(mm): return _run.roll_draft_fallback_offer(mm))
+		ok(int(gc_seen.get(TRAVELS, 0)) == 0 and int(gc_fall.get(TRAVELS, 0)) == 0,
+			"§1: a Warrior with %s was offered %s (draft %d, fallback %d) — it travels with the Stances and is in no pool" % [
+				label, TRAVELS, int(gc_seen.get(TRAVELS, 0)), int(gc_fall.get(TRAVELS, 0))])
+		var kit_has := false
+		for ab in Classes.opening_kit("warrior", String(arm[1]), Runes.held_engines(m)):
+			if ab != null and ab.display_name == TRAVELS:
+				kit_has = true
+		ok(kit_has == wants,
+			"§1: a Warrior with %s %s %s in his opening kit — it comes with the slotted Stances and only then" % [
+				label, "does not hold" if wants else "holds", TRAVELS])
 		for p in STANCE_PIECES:
 			if wants:
 				ok(int(draft[p]) > 0 and int(fall[p]) > 0 and int(stored.get(p, 0)) > 0,

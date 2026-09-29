@@ -53,7 +53,7 @@ const BASE_MITIGATION := 2.0    # % per stack (Batch BI §1: was 3)
 const BASE_DAMAGE := 1.5        # % per stack (Batch BI §1: was 2)
 const APOSTLE_MULT := 2
 # BATCH DC: `battle.FAITH_RELEASE`, ruled at CZ §2, mirrored ONCE per suite.
-const RELEASE := 3
+const RELEASE := 8   # BATCH HL §3 — ruled at eight (3 from CZ §2 to HL)
 const HELD_MAX := RELEASE - 1   # the deepest an ally can CARRY; at RELEASE he releases
 # STACKS IS A DIRECT-WRITE PROBE DEPTH, NOT A REACHABLE CARRY CEILING. It used
 # to be both — the comment said "the deepest an ally can CARRY" and CZ §2's
@@ -76,6 +76,9 @@ const BAND := 0.03
 # Communion's rate at four stacks, the BF figure this batch must not disturb.
 # BATCH DC: the roll is (15 x stacks)%% and the top of the eligible band fell
 # from four stacks to two with the threshold, so the peak rate is 30, not 60.
+# BATCH HL §3: the threshold rose to eight, so the top of the band is seven and
+# 15% a stack there is a certainty (dormant: `test_batch_be` §6). The arm below
+# measures at TWO, the depth this 30% always named, and the name is kept.
 const RATE_AT_PEAK := 0.30
 const TRIALS := 600
 
@@ -466,11 +469,14 @@ func _live_release_still_consumes() -> void:
 	ally.faith_stacks = 0
 	ally.hp = maxi(ally.max_hp / 2, 1)
 	scene.get("sim_stats").clear()
-	scene.call("_gain_faith", ally, 5, "absorb")
+	# BATCH HL §3 — THE DRIVEN RELEASE IS A GAIN OF `RELEASE`, NOT THE LITERAL 5
+	# the threshold was before CZ: at eight a gain of five releases nothing, and
+	# every arm below would read a count left standing as a park.
+	scene.call("_gain_faith", ally, RELEASE, "absorb")
 	ok(ally.faith_stacks == 0,
 		"§2: a release under Apostle RESETS the ally (left at %d)" % ally.faith_stacks)
-	ok(ally.faith_stacks != 5,
-		"§2: NEGATIVE CONTROL — the ally is not parked at five")
+	ok(ally.faith_stacks != RELEASE,
+		"§2: NEGATIVE CONTROL — the ally is not parked at the threshold")
 	# BATCH BI §1 INVERTED THIS CHECK RATHER THAN DELETING IT, which is the
 	# honest treatment when a batch reverses a rule an older one guarded. BG
 	# asked whether the chip goes with the stacks; the PEAK keeps paying after a
@@ -486,12 +492,14 @@ func _live_release_still_consumes() -> void:
 		"§2: one release banked, not a stream (%.0f)" % _stat_of(scene, "faith_releases"))
 	# And the stream itself: under the old node, five further gains meant five
 	# further releases. Now they rebuild from zero and pay once.
+	# BATCH HL §3: RELEASE + 2 single gains — through the threshold once and two
+	# past it — which is the "five" this arm drove when the threshold was three.
 	scene.get("sim_stats").clear()
-	for _i in 5:
+	for _i in RELEASE + 2:
 		scene.call("_gain_faith", ally, 1, "absorb")
 	ok(_stat_of(scene, "faith_releases") == 1.0,
-		"§2: five single gains from zero pay ONE release, not five (%.0f)" % \
-			_stat_of(scene, "faith_releases"))
+		"§2: %d single gains from zero pay ONE release, not %d (%.0f)" % [
+			RELEASE + 2, RELEASE + 2, _stat_of(scene, "faith_releases")])
 	# BATCH BH §2 RE-POINTED THIS IN PLACE AND INVERTED IT. BG's check was
 	# "Binding Oath still keeps its 3, capstone or no" — the remnant was the
 	# only one left in the game and BG was guarding it. BH deleted it as the
@@ -502,7 +510,7 @@ func _live_release_still_consumes() -> void:
 	scene = await _spawn({"dv_apostle": 1, "dv_oath": 1})
 	ally = scene.get("heroes")[0]
 	ally.faith_stacks = 0
-	scene.call("_gain_faith", ally, 5, "absorb")
+	scene.call("_gain_faith", ally, RELEASE, "absorb")
 	ok(ally.faith_stacks == 0,
 		"§2: a release resets to ZERO, Binding Oath or no (left at %d)" % ally.faith_stacks)
 	_report.append("release under Apostle leaves %d stacks (was 5); with Binding Oath, also 0" % 0)
@@ -571,26 +579,29 @@ func _live_communion_still_rolls_for_the_carrier() -> void:
 	scene.call("_gain_faith", ally, RELEASE, "absorb")
 	ok(ally.faith_stacks < RELEASE,
 		"§2: an ally who has released is below the threshold again (at %d)" % ally.faith_stacks)
+	# BATCH HL §3 — MEASURED AT TWO, BY STACK COUNT. At the threshold of eight
+	# HELD_MAX is seven and 15% a stack there is a certainty on a node nothing
+	# writes (`test_batch_be` §6 asserts the dormancy). Two is the depth the
+	# assertion always named; an advance to three releases nothing at eight, so
+	# the ally's own count is the witness, not the release counter (BF's rule
+	# was for an advance that reaches the threshold).
 	var fired := 0
 	for _i in TRIALS:
 		for h in heroes:
 			h.faith_stacks = 0
 			h.remove_status("faith")
 			h.hp = h.max_hp
-		ally.faith_stacks = HELD_MAX
-		var before := _stat_of(scene, "faith_releases")
+		ally.faith_stacks = 2
 		war.faith_stacks = 0
 		scene.call("_gain_faith", war, RELEASE, "absorb")
-		# The advance takes the ally TO the threshold, which RELEASES — so the
-		# release counter is the only honest witness at HELD_MAX (BF's rule).
-		if _stat_of(scene, "faith_releases") - before >= 2.0:
+		if ally.faith_stacks > 2:
 			fired += 1
 	var rate := float(fired) / float(TRIALS)
 	ok(absf(rate - RATE_AT_PEAK) < 0.06,
 		"§2: Communion still rolls %d%% for a carrier at two (read %.1f%%)" % [
 			int(100.0 * RATE_AT_PEAK), 100.0 * rate])
-	_report.append("Communion at %d stacks WITH the new Apostle: %.1f%% over %d trials (BF read 58.8%% at four, under the old threshold)" % [
-		HELD_MAX, 100.0 * rate, TRIALS])
+	_report.append("Communion at 2 stacks WITH the new Apostle: %.1f%% over %d trials (BF read 58.8%% at four, under the old threshold)" % [
+		100.0 * rate, TRIALS])
 	await _kill(scene)
 	_live_ran += 1
 

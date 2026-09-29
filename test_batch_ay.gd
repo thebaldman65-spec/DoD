@@ -299,6 +299,15 @@ func _summon(scene: Node, hunter: BattleUnit, kind: String) -> void:
 	for _i in 6:
 		await process_frame
 
+# BATCH HL §3 — THE GAIN THAT DRIVES A RELEASE IS THE LIVE THRESHOLD, READ OFF
+# `battle.gd`. The literal 5 this suite gained was the threshold before CZ §2 (it
+# overshot three and the clamp made it a release); at eight it releases nothing.
+# This suite DRIVES a release and asks what the release pays, never what the
+# threshold is, so it reads the constant rather than mirroring it — the Faith
+# suites that assert a rate keyed on the threshold (be to bi, bu, ce) mirror it.
+func _release_gain(scene: Node) -> int:
+	return int(scene.get_script().get_script_constant_map()["FAITH_RELEASE"])
+
 
 func _kill(scene: Node) -> void:
 	await Fixture.kill(self, scene)
@@ -1206,7 +1215,7 @@ func _live_faith_half_growth() -> void:
 	# The check therefore moves ONE LEVEL DOWN, to the function that owns the
 	# rule — which is the honest place for it, and the two assertions together
 	# say exactly what is true: the tax exists, and the release cannot trigger it.
-	scene.call("_gain_faith", ally, 5, "absorb")
+	scene.call("_gain_faith", ally, _release_gain(scene), "absorb")
 	ok(ally.faith_stacks == 0,
 		"Batch BG: no release parks an ally at five, so no release consumes nothing")
 	ok(dv.max_hp == 1030,
@@ -1230,7 +1239,7 @@ func _live_faith_half_growth() -> void:
 	dv2.conviction_hp_gained = 0
 	dv2.conviction_base_hp = 0
 	ally2.faith_stacks = 0
-	scene2.call("_gain_faith", ally2, 5, "absorb")
+	scene2.call("_gain_faith", ally2, _release_gain(scene2), "absorb")
 	ok(ally2.faith_stacks == 0, "without Apostle the release CONSUMES the stacks")
 	ok(dv2.max_hp == 1030,
 		"NEGATIVE CONTROL: a full-consumption release still grants FULL growth (+30, got +%d)" % \

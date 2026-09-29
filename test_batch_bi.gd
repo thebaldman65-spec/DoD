@@ -48,7 +48,7 @@ const APOSTLE_MULT := 2         # base 1x + Apostle's 1x
 const FERVOR_MULT := 2          # base 1x + Fervor's 1x
 const BOTH_MULT := 3            # ADDITIVE — never 4
 # BATCH DC: `battle.FAITH_RELEASE`, ruled at CZ §2, mirrored ONCE per suite.
-const RELEASE := 3
+const RELEASE := 8   # BATCH HL §3 — ruled at eight (3 from CZ §2 to HL)
 const HELD_MAX := RELEASE - 1   # the deepest an ally can CARRY; at RELEASE he releases
 # STACKS is a DIRECT-WRITE PROBE DEPTH for the per-stack arithmetic (see bg's
 # note): those checks write `faith_stacks`/`faith_peak` onto the unit and bypass
@@ -691,19 +691,27 @@ func _live_conviction_pays_two_per_absorb() -> void:
 	ok(_stat_of(scene, "faith_absorb_hits") == 1.0,
 		"§2: ...and the absorb denominator counted the HIT, not the Faith (%.0f)"
 			% _stat_of(scene, "faith_absorb_hits"))
-	# BATCH DC — THE LADDER IS TWO ABSORBS NOW, NOT THREE. At PER_ABSORB 2
+	# BATCH DC — THE LADDER WAS TWO ABSORBS, NOT THREE. At PER_ABSORB 2
 	# against CZ §2's threshold of 3, one absorb HOLDS at two and the second
 	# reaches the threshold and releases. The row still asks both halves of the
 	# original question — "does the one before release hold, and does the next
-	# one fire" — one rung lower.
-	ok(_stat_of(scene, "faith_releases") == 0.0,
-		"§2: one absorb is two Faith and does not release yet")
+	# one fire".
+	# **BATCH HL §3 — THE LADDER IS DERIVED NOW, AND IT IS FOUR AT EIGHT**: the
+	# absorbs a release takes are RELEASE / PER_ABSORB rounded up, and every one
+	# before the last must hold.
+	var ladder := int(ceil(float(RELEASE) / float(PER_ABSORB)))
+	var held_all := _stat_of(scene, "faith_releases") == 0.0
+	for _k in ladder - 2:
+		scene.call("_on_shield_absorbed", ally)
+		held_all = held_all and _stat_of(scene, "faith_releases") == 0.0
+	ok(held_all,
+		"§2: every absorb before the %d-th holds (%d Faith each) and does not release yet" % [ladder, PER_ABSORB])
 	scene.call("_on_shield_absorbed", ally)
 	ok(_stat_of(scene, "faith_releases") == 1.0,
-		"§2: ...and the SECOND releases, where it used to take five (%.0f)"
-			% _stat_of(scene, "faith_releases"))
-	_report.append("§2 absorbs to a release: 2 (was 5, was 3 under CZ's tripled builders); Faith banked from absorbs across the two: %.0f (the second is capped at the threshold)"
-		% _stat_of(scene, "faith_gained_absorb"))
+		"§2: ...and the %d-th releases, where it took two at three and five before CZ (%.0f)"
+			% [ladder, _stat_of(scene, "faith_releases")])
+	_report.append("§2 absorbs to a release: %d (2 at three, 5 before CZ); Faith banked from absorbs across the ladder: %.0f (the last is capped at the threshold)"
+		% [ladder, _stat_of(scene, "faith_gained_absorb")])
 	await _kill(scene)
 	_live_ran += 1
 

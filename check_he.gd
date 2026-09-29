@@ -294,8 +294,11 @@ func _s0_the_rows() -> void:
 		if Classes.engine_read_ruled(String(card)) != "":
 			c_ruled.append(String(card))
 	c_ruled.sort()
-	ok(c_ruled == ["Guard Change", "Lunge", "Venom Coating"],
-		"§0: the ruled card rows are %s — HD ruled two and HF §7 one (HE §2's was undone)" % str(c_ruled))
+	# BATCH HL §1: Guard Change's HD row is deleted, not zeroed — it travels with
+	# the Stances again (the designer could not change stance in play), and an
+	# enabler is in no pool, so there is no offer left to gate.
+	ok(c_ruled == ["Lunge", "Venom Coating"],
+		"§0: the ruled card rows are %s — HD ruled two, HF §7 one (HE §2's was undone), and HL §1 deleted Guard Change's" % str(c_ruled))
 	ok(Classes.engine_read("Venom Coating") == "trapper" and Classes.engine_read_ruled("Venom Coating") == "HF §7",
 		"§0: Venom Coating reads `%s` ruled `%s` — HF §7 ruled it Trapper's" % [
 			Classes.engine_read("Venom Coating"), Classes.engine_read_ruled("Venom Coating")])
@@ -569,7 +572,8 @@ func _s3_mark_of_the_hunt() -> void:
 	# THE SENTENCE BESIDE LETHAL AIM: the pet's own (HB), not Pack Bond's — the card
 	# sits out because the pet is dismissed, whatever else is slotted.
 	var beside: String = String(_run.sits_out_note(MOTH, ["pack", "lethal_aim"])).replace("\n", " ")
-	ok(beside.begins_with("Sits out of every fight while the Rune of the Sharpshooter is equipped, which dismisses the companion it needs."),
+	# BATCH HL §2: the dismisser's name wears "(core)", read off the data.
+	ok(beside.begins_with("Sits out of every fight while the Rune of the Sharpshooter (core) is equipped, which dismisses the companion it needs."),
 		"§3: beside Lethal Aim the card says: %s" % beside)
 	ok(beside.ends_with("Still carried: the slot stays counted. Benching the card frees the slot."),
 		"§3: beside Lethal Aim the card's sentence is not GT's: %s" % beside)
@@ -647,7 +651,8 @@ func _s4_the_zone_boss() -> void:
 		if ov == null:
 			continue
 		var has_btn: bool = _button_texts(ov).has("Lunge")
-		var says: Array = _labels_with(ov, "wait%s on the Rune of the Swordmaster being equipped" % "s")
+		# BATCH HL §2: the rune's name wears "(core)", read off the data.
+		var says: Array = _labels_with(ov, "wait%s on the Rune of the Swordmaster (core) being equipped" % "s")
 		ok(has_btn == slotted and (not says.is_empty()) == (not slotted),
 			"§4 (%s): the overlay %s Lunge button and %s the engine — %s" % [tag,
 				"draws a" if has_btn else "draws no", "names" if not says.is_empty() else "does not name",
@@ -705,10 +710,14 @@ func _s5_the_draft() -> void:
 			print("    %-8s %-14s %-24s out: \"%s\"  in: taken" % [cls, eng, card, why])
 	ok(engines_seen >= 10, "§5: only %d engines gate a draft card — the arm has stopped covering the pool" % engines_seen)
 	# THE PARTY DRAFT SCREEN: no button for a held card, and the column says why.
+	# BATCH HL §1 — THE HELD CARD IS LUNGE, THE STANCE PIECE STILL GATED: Guard
+	# Change travels with the Stances since HL, so a Stances holder OWNS it and the
+	# column would hold it back as owned, not as waiting on the rune. And the rune's
+	# name wears "(core)" (HL §2), so the sentence names it so.
 	for slotted in [false, true]:
 		var tag := "the Stances in" if slotted else "the Stances out"
 		_seat_party({0: {"engines": [_eng("seasoned", slotted)],
-			"draft_candidates": [["Guard Change", "Cleave", "Warcry"]], "draft_picks_owed": 1}})
+			"draft_candidates": [["Lunge", "Cleave", "Warcry"]], "draft_picks_owed": 1}})
 		change_scene_to_file("res://scenes/map.tscn")
 		await Gate.frames(self, 6)
 		var mp: Node = current_scene
@@ -721,10 +730,10 @@ func _s5_the_draft() -> void:
 		if ov == null:
 			continue
 		var texts: Array = _button_texts(ov)
-		var has_gc: bool = texts.has("Guard Change")
-		var says: Array = _labels_with(ov, "on the Rune of the Swordmaster being equipped")
+		var has_gc: bool = texts.has("Lunge")
+		var says: Array = _labels_with(ov, "on the Rune of the Swordmaster (core) being equipped")
 		ok(has_gc == slotted and (not says.is_empty()) == (not slotted),
-			"§5 (%s): the column %s Guard Change button and %s the engine — %s" % [tag,
+			"§5 (%s): the column %s Lunge button and %s the engine — %s" % [tag,
 				"draws a" if has_gc else "draws no", "names" if not says.is_empty() else "does not name",
 				"slotted, the card is offered and nothing is held back" if slotted
 				else "unslotted, the card is held back and the sentence names the rune that brings it back"])
@@ -732,7 +741,7 @@ func _s5_the_draft() -> void:
 			"§5 (%s): the column drew no button for Cleave or Warcry — the positive arm (%s)" % [tag, texts])
 		ok(_labels_with(ov, "no more to offer").is_empty(),
 			"§5 (%s): a held card is read as a pool run dry" % tag)
-		print("    the draft column, %s: Guard Change button %s, the sentence %s" % [tag, has_gc, not says.is_empty()])
+		print("    the draft column, %s: Lunge button %s, the sentence %s" % [tag, has_gc, not says.is_empty()])
 		_close_overlays(mp)
 		await Gate.frames(self, 2)
 	# A CARD HE ALREADY KNOWS, IN THE SECOND OF TWO QUEUED TRIPLES — constructed:
