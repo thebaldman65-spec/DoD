@@ -181,6 +181,14 @@ static var rune_refused_noslot := 0 # never offered: every slot already worn
 static var rune_refused_gold := 0   # offered, left on the counter: 40g reserve
 static var rune_refused_dupe := 0   # re-roll kept landing on an owned rune
 static var rune_granted := 0        # DOD_SIM_RUNE_ECON=rich only
+# BATCH HK §1 — THE FOURTH SOURCE: a rune after every normal fight, into the bag.
+# The bot's policy is the cache's — WEAR IT WHILE A SLOT IT FITS IS FREE, else it
+# waits in the bag — and on a FULL bag it DECLINES, the item drop's stated policy
+# (CT §3): a legal answer and the conservative one, so the sim's rune economy is a
+# floor on the real thing. The bot never swaps, never drops and never sells.
+static var rune_drops := 0          # normal fights that dropped a rune
+static var rune_drop_worn := 0      # ...of those, worn at once (a slot was free)
+static var rune_drop_declined := 0  # ...of those, let go on a full bag
 # Batch AE: the third source, and the only one that is SHIPPED rather than
 # an arm. Split out because it fails differently again — it cannot fail on
 # gold, on routing, or on a closed slot, which is the whole reason it was
@@ -524,6 +532,45 @@ static func _sim_drop(run: Node, id: String) -> void:
 	run.add_item(id)
 
 
+# THE DROP, UNDER THE BOT'S POLICY: wear it if a hero it fits has a slot free
+# (the party slot for a party rune), leave it in the bag otherwise, and let it go
+# on a full bag. Through `Run`'s own rows and toggles, so the bot can do nothing
+# the panel does not let a player do.
+static func _sim_take_drop(run: Node) -> void:
+	var drop: Dictionary = run.drop_after_fight()
+	if drop.is_empty():
+		return
+	rune_drops += 1
+	if String(drop["where"]) == "pending":
+		run.decline_pending_drop()
+		rune_drop_declined += 1
+		return
+	var rune: Dictionary = drop["rune"]
+	if Runes.is_party_rune(rune):
+		var prows: Array = run.party_rune_rows()
+		for pi in prows.size():
+			if is_same(prows[pi]["rune"], rune) and run.party_toggle_refusal(pi) == "":
+				run.toggle_party_rune(pi)
+				rune_drop_worn += 1
+				return
+		return
+	var is_engine := String(rune.get("engine", "")) != ""
+	for m in run.party:
+		var rows: Array = run.engine_rows(m) if is_engine else run.rune_rows(m)
+		for ri in rows.size():
+			if not is_same(rows[ri]["rune"], rune):
+				continue
+			var why: String = run.engine_toggle_refusal(m, ri) if is_engine \
+				else run.rune_toggle_refusal(m, ri)
+			if why == "":
+				if is_engine:
+					run.toggle_engine(m, ri)
+				else:
+					run.toggle_rune(m, ri)
+				rune_drop_worn += 1
+			return
+
+
 static func _shop_visit(run: Node) -> void:
 	var heal_price := _price(run, int(run.ITEM_PRICES["health"]))
 	for m in run.party:
@@ -730,6 +777,10 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 		battle.heroes[i].sync_victory_state(run.party[i])
 	var node_type := String(run.encounter.get("type", "fight"))
 	run.award_gold(node_type)
+	# BATCH HK §1 — the normal fight's drop, through the game's own door, under the
+	# policy stated at `rune_drops` above.
+	if node_type == "fight":
+		_sim_take_drop(run)
 	if node_type == "elite":
 		var looter: Dictionary = run.party.pick_random()
 		# Pick-of-3 (Batch X), resolved instantly by bot policy — dumb and
@@ -1432,8 +1483,12 @@ static func _print_report(battle) -> void:
 	if rune_granted > 0:
 		print("  GRANTED  %.2f   <-- DOD_SIM_RUNE_ECON=rich is ON; this row is an experiment arm" % [
 			rune_granted / runs])
-	print("  Acquired per hero per run: %.2f   (his reach is his class's ordinary runes less what the gates withhold)" % [
-		(runes_bought + rune_elite_taken + rune_granted) / runs / 4.0])
+	# BATCH HK §1 — the drop, the fourth source, under its stated policy.
+	print("  Drops    %.2f a run   worn at once %.2f   left in the bag %.2f   let go on a full bag %.2f" % [
+		rune_drops / runs, rune_drop_worn / runs,
+		(rune_drops - rune_drop_worn - rune_drop_declined) / runs, rune_drop_declined / runs])
+	print("  Acquired per hero per run: %.2f   (his reach is his class's ordinary runes less what the gates withhold; drops included since HK)" % [
+		(runes_bought + rune_elite_taken + rune_granted + rune_drops - rune_drop_declined) / runs / 4.0])
 	print("  Shop offers refused:  no free slot %.2f   unaffordable (40g reserve) %.2f   duplicate %.2f" % [
 		rune_refused_noslot / runs, rune_refused_gold / runs, rune_refused_dupe / runs])
 	print("  Elite runes won with no free slot: %.2f/run  (pouched, not worn)" % [

@@ -13,73 +13,84 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-25 (Batch HJ).*
+*Last rewritten: 2026-09-28 (Batch HK).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: HJ — THE LAST TWENTY-THREE. THE FORTY-SECOND BATCH ON `class-merge`, AND THE MERGE'S LAST INSTRUMENT
-  BATCH.** IMPLEMENT ONLY: no card, rune, engine, kit, pool or node moved, and `main` is untouched. Full working:
-  **`docs/reports/HJ.md`**.
-- **§1 — THE TWENTY-THREE, RE-POINTED TO WHAT THEY WERE FOR, AND THE TWO RE-DERIVATIONS.** **`check_ea` §1's award
-  floors** were asked of the twelve lineages' own shelves with no engine held; they are asked of **every class holding
-  every set of engines it can slot** (88 seats), through the one pool the fallback reads as the offer door filters it —
-  and `check_eh` §2 drives the same seats through the live roller. **`check_do`'s guaranteed-status table** credited
-  each lineage's old opening kit, its engine and its deleted tree; it is **keyed by class** now and holds only what every
-  hero of a class holds whatever engine he holds or drops — his basic and his kit — with a new arm asserting every row
-  names such a card, and `check_dp` sweeps the one tree once per class against it. The rest moved onto the doors that
-  answer the merged question: the class pool (`check_dv`, `check_es`), the gate tables (`test_batch_ah`'s curation
-  arms), revival's class and engine (`check_dr`), the slot door against what a hero OPENS with (`check_gn`), and the
-  un-awakened hero beside the spine-taker who has chosen (`test_batch_ah`'s award, the harness's bank).
-- **§2 — EVERY ONE SHOWN TO BITE**, twenty-seven controls, one defect per isolated copy, read by FAIL text: **every
-  forward control put the repaired arm red and left HEAD's copy of it silent**, and the fourteen arms whose repair
-  narrows as well as widens — a card moved between two shelves of one class, or a gated card in the pool, is a defect
-  only to the old arm — took the defect run the other way too, and **HEAD's copy alone went red**. One control was
-  confounded as first run (`check_dp` reads `check_do`'s table, so its HEAD arm needs both files) and was run again;
-  recorded. **AND EVERY ABSENCE AMONG THE TWENTY-THREE IS PAIRED WITH AN ARM THAT FAILS WHEN WHAT IT LOOKED AT IS NOT
-  THERE** (the brief's §6): HJ's first pass left two walks unpaired — `test_batch_ah` §2's over the class pools and
-  `check_ea` §1's over the seats — and paired `check_do`'s Stunned pin to the file rather than to its own statement
-  walk. All three are repaired (four new arms, +3 and +1 checks, and the pin), found late and recorded as such, and
-  six more controls show each new arm biting where the arms beside it read green.
-- **§3 — THE DEBUG TOGGLE GRANTS THE CLASS POOL (ruled)**: the hero's class draft pool and his lineage's zone-boss pool,
-  to a spine-taker too, the four stale comments corrected, **renamed "All Class Abilities Unlocked" (PROPOSED, the
-  designer's to confirm)**, and `test_batch_au`'s named-complaint arm follows the ruling.
-- **§4 — WHAT THIS CLOSES.** **All 130 arms HA found are dispositioned**: 68 repaired or re-pointed, 35 folded, 27
-  retired. **FP's six stages are done.** What stands between `class-merge` and `main` is unchanged (merge base FS
-  `3b80fbe`, one conflict, `docs/state.md`, `main` losing nothing of its own), measured on HJ's own tree. **HA §3d's
-  second item is not a stage and still stands**: *there are no specs* is RULED, NOT BUILT for the per-lineage stat block
-  and the zone-boss pools (the latter lineage-keyed by GP's ruling) — the designer's to time.
-- **THE VERIFICATION.** **The reconnaissance battery — HEAD's unmodified gates against §3's code and `test_batch_au`'s
-  re-point, before any gate was edited — read its prediction exactly**: 126 of 126, `check_de` 521 / 0 / 0, every
-  target on HI's row, no `Parse Error` and no `SCRIPT ERROR` in any log (grepped per log, never read off a tally).
-  **The pre-pass ran on the tree before the pairing arms and the acceptance run on the final tree, each predicted
-  before its launch**: every target on its landed row, the five moved rows at 6186 / 235 / 229 / 112 / 41 in the
-  pre-pass and at 6189 / 236 / 229 / 112 / 41 in the acceptance run, the harness 22 / 382 / 8, the two sanctioned reds
-  at their counts (`check_cm_live` 13 / 4, `check_gj` 70 / 1 with *"+167 gold and the purse moved 187"*), and
-  `check_de` 521 / 0 / 0. **The pre-pass** (an isolated copy of the tree before the pairing arms, 12:53:12 to
-  14:04:23) **and the acceptance run** (the repository, frozen: 489 files, none moved; 14:05:09 to 15:16:11) **each
-  read its prediction exactly**: 126 of 126, every target on its row, `test_batch_an` at 6054 and 6053, the harness
-  22 / 382 / 8, the sanctioned reds at their counts and text, `check_de` 521 / 0 / 0, and no `Parse Error` or
-  `SCRIPT ERROR` in any log. Between them, `check_de` run standalone over the pre-pass's logs with the fifty-five
-  re-run targets substituted read 521 / 0 / 0 on the final rows. The player's four files are byte-identical to the
-  backup after both.
-- **`CLAUDE.md` IS 389,760 B = 380.62 KiB, WITH 29.38 KiB UNDER ITS 410 KiB CEILING** (+2418 B: the
-  debug-surfaces row, revival's exclusive re-pointed to the class and the Mercy holder, the status rule's guarantees
-  stated as the class basic and kit, and a control rule for a re-point that widens and narrows at once).
-- **WHAT MOVED:** ten targets — `check_do`, `check_dp`, `check_dr`, `check_dv`, `check_ea`, `check_eh`, `check_es`,
-  `check_gn`, `test_batch_ah`, `test_run_harness` — and `test_batch_au`'s named arm; `check_da` (the stale `check_ea`
-  exemption, deleted); `gate_fixture.gd` (`engine_sets`, additive); `scripts/battle.gd`, `scripts/map_screen.gd` and
-  `scripts/run_state.gd` (§3: the grant, the label and toast, four comments); `docs/master.html` (the toggle and the
-  stamp); `pin-manifest.json`, regenerated; **five `baselines.json` rows**; `docs/reports/HJ.md` (**NEW**);
-  `docs/changelog.html`; `CLAUDE.md`; `docs/design-notes.md`; and this file. **Nothing under `data/`.**
-- **Phase.** The merge's running order is complete: **step 6, the gates, closed at HJ.** The branch is not merged — the
-  designer plays it first. The Crown's Break and freeze resistance, Sanctity's potency layer, the engine-card texts, the
-  class-wide rebalance and the sim bot's blind spot on the twenty-nine returned cards stay queued; HF's five rulings stay
-  open.
-- **Next letter: HK.**
+- **Last batch: HK — RUNES DROP, AND THERE IS A BAG. THE FIRST BATCH AFTER THE MERGE CLOSED, AND THE FIRST AUTHORED FROM A
+  PLAYTHROUGH.** IMPLEMENT ONLY: no rune authored, retuned or re-scoped; one price moved, by ruling. Full working:
+  **`docs/reports/HK.md`**.
+- **§1 — A RUNE DROPS AFTER EVERY NORMAL FIGHT.** One, at random, into the bag — `Run.drop_after_fight`, called from the
+  victory branch for the `fight` node only. Drawn flat from the union of what every hero could be offered (GV's engine
+  gate, a rune's required card and HB's pet gate all hold), never a rune the party holds, so always one of the party's
+  classes. **An elite, a mini-boss and a boss drop none** — each pays its own spoils, the elite a rune cache among them —
+  and whether they should is owed a ruling (below).
+- **§2 — THE BAG HOLDS TWENTY.** `Run.rune_bag`: every rune the heroes hold and nobody wears, shared; a worn rune does not
+  count (four heroes' slots and the crest's are twenty-one). Equip from the bag and unequip back into it on each hero's
+  rune panel; **with every slot full, a bag rune Swaps** for a worn one, which works on a full bag. **A drop onto a full
+  bag waits** (`pending_rune_drops`) and the map shows it beside the twenty: drop one to take it, or leave it behind.
+  A full bag refuses an unequip. The map has a new row under the pouch (the bag's count; the crest), and the bag's own
+  panel drops a rune for good in two presses. **The save is v14, tolerant**: three run-level keys, and a v13 save
+  migrates — what a hero wears he still wears, in the same slots, and what he held unworn moves into the bag, past
+  twenty if need be.
+- **§3 — THE PEDDLER BUYS AND SELLS. A rune is 150g** (the ninety-nine live entries' `price`, 100 until HK; the
+  retired keep theirs) **and sells back for a third, 50g**, from a new column that lists the bag. A purchase goes into the
+  bag, never onto a hero; a full bag greys every Buy and says so. He never sells a rune the party holds, and GV's
+  engine gate holds at his door.
+- **§4 — THE PARTY SCOPE IS BUILT AND HOLDS NO RUNE.** Scope `party`, one slot (`Run.PARTY_RUNE_SLOTS`), its payload on
+  every hero at the spawn; **the screens call it the Crest** (proposed — *party* is retired from player-facing text).
+  `check_hk` §4 drives every door over a fixture crest rune never written to the file. **The census of what a crest
+  rune could read is `docs/reports/HK.md` §4b**: today, a stat or a card on every hero, or the two best-holder stamps;
+  anything that reads the party as a party is new machinery.
+- **THE VERIFICATION.** HEAD's gates against HK's code first (the recon, 71 min: sixteen targets red, every red read and
+  attributed — `docs/reports/HK.md` §7b); twenty-six controls, each one defect in its own copy, read by FAIL text (§7d);
+  then the pre-pass (72 min 23 s) and the acceptance run in the repository (72 min 27 s), each **`check_de` 525 / 0 /
+  0**, the prediction exactly, with the two sanctioned reds at their counts (`check_cm_live` 13 / 4, `check_gj` 70 / 1 at
+  +173 / 193). Not one file moved under the acceptance run, and the player's four files are byte-identical to the 17:03
+  backup.
+- **`CLAUDE.md` IS 397,845 B = 388.52 KiB, WITH 21.48 KiB UNDER ITS 410 KiB CEILING** (+8,085 B: the bag-and-drop
+  block, the crest block, the price rule re-ruled at 150, and the save version, the pouch's engine rows, the scope bands
+  and the retired-word identifiers amended — under EZ's +8,293 B, so the ceiling block's record still stands).
+- **WHAT MOVED:** eight game scripts; `data/runes.json`'s ninety-nine live prices and nothing else in it, and three
+  glossary entries; the run save to v14; a new gate, `check_hk` (140), and thirteen re-pointed (`docs/reports/HK.md`
+  §7c); five baseline rows moved and one added; the pin manifest 1519 → 1534.
+- **Phase.** The merge's running order stays complete; the branch is not merged. The designer plays it first — and
+  playing HK's build on an HK save is the one way to play it (an older build reading a v14 save loses the bag).
+- **Next letter: HL.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
+### HK's RULINGS OWED — **FOUR, AND NOTHING WAITS ON THEM**
+
+Full working: `docs/reports/HK.md`, NEEDS A RULING.
+
+1. **THE CREST — THE SCREEN WORD FOR THE PARTY SLOT (PROPOSED).** The scope keeps `party` in code; every screen says
+   *Crest*, because *party* is retired from player-facing text (DM §3, `test_batch_bx` §4b). Confirm, or name it.
+2. **DO AN ELITE, A MINI-BOSS OR A BOSS DROP A RUNE TOO?** HK says no: the ruling names normal fights, and each pays its
+   own spoils (the elite a rune cache). One line if yes.
+3. **A RUN-SAVE CEILING.** An older build reading a v14 save ignores the bag and its next save writes it away; the brief
+   ruled no new refusal path. Whether the run save carries a ceiling from here (`Profile`'s shape) is the designer's.
+4. **WHAT THE FIRST CREST RUNES READ.** The census is `docs/reports/HK.md` §4b: eight doors a crest rune cannot reach
+   without new machinery.
+
+### FOUND AT HK AND NOT FIXED
+
+- **OWED TO THE NEXT BATCH, BY THE BRIEF: THE PLAYTHROUGH'S DEFECTS.** Fireball dragging Razor Ice; core runes at the
+  store; a bought rune not appearing; Seasoned Fighter with no stance change; Hunter's Preparation demanding a target —
+  and the Core Rune rename and its ruled magnitudes ride with them. **One is touched by HK's path**: a bought rune goes into
+  the bag now and the map's bag row counts it, where HEAD put an ordinary rune unworn in the hero's pouch, which the map
+  card never drew. Whether that was the defect the designer met is theirs to say (`docs/reports/HK.md` §5).
+- **THE POUCH SCROLLS FOR THE FIRST TIME.** Its scroller lost 25 px to the bag's line (583 → 558); a class's six still
+  list at 411 px, but a bag of twenty of one class's runes puts up to twenty-five rows on his pouch — `check_gt` §1's
+  twenty-four read 873–935 px — so it scrolls and Close stays, which is GT §1's second half.
+- **A GATE THAT ROLLS FOR A MEMBER OUTSIDE THE PARTY IS MEASURED BESIDE THE PARTY.** Every roll excludes
+  `Run.party_rune_names` since HK; four gates met it (`docs/reports/HK.md` §7c) and each starts from a fresh party now.
+- **A RETIRED RUNE'S AUTHORED PRICE IS READ BY THE SALE** — a third of it, for a saved run still holding one. Named, not a
+  defect.
+- **FIFTY-ONE ISOLATED COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata`, each named *"Dawn of Decay HK …"*;
+  `docs/reports/HK.md` §6 lists them. They can be deleted.
+
 ### HJ's RULINGS OWED — **ONE, AND NOTHING WAITS ON IT**
 
 Full working: `docs/reports/HJ.md`, NEEDS A RULING.
@@ -1449,7 +1460,7 @@ Full working: `docs/reports/GK.md`, NEEDS A RULING.
 2. **The three spines' rule texts** (`Classes.SPINE_INFO`), which no player read before GK.
 3. **The class-selection words** — *"Take one of three engine runes — a second can join it later, and either can be
    dropped"*.
-4. **An engine rune's cost** — the flat 100 gold until one is set.
+4. **An engine rune's cost** — the flat rune price until one is set: 150 gold since HK §3, 100 until then.
 5. **The lineage interim** — a hero who drops his lineage's engine keeps its name, stats and pools. **GL found what
    else he keeps**: Death Ray, Resurrection and Kill Command, which can then never be cast, a Hold Breath that never
    runs out, and five lineage cards that half-work (GL's findings above). **GM closed the first two** — the three
@@ -2633,11 +2644,11 @@ instrument batch rather than an emergency.
 ### THE THREE DESIGN QUESTIONS ES HANDS OVER — **ALL THREE ARE CLOSED NOW (ET, EZ, AND FN'S RETIREMENT OF TAG CONDITIONS)**
 
 **BATCH EZ §0 ANSWERS PRICING AND OPENS THE POOL, AND THE READING BELOW IS KEPT AS THE RECORD OF
-WHAT THE OLD POOL CHARGED.** (1) **PRICING IS RULED: 100g, FLAT, EVERY AUTHORED RUNE** — rarity is
+WHAT THE OLD POOL CHARGED.** (1) **PRICING IS RULED: FLAT, EVERY AUTHORED RUNE — 100g AT EZ, 150g SINCE HK §3** — rarity is
 gone and price no longer signals power, so the player pays for FIT rather than magnitude; the
 retired runes keep their authored prices unmoved as history and the generated family keeps
-`TEMPLATE_PRICE` = 50, and **neither is a second pricing rule.** `check_ez` §0 asserts the flat 100
-as an equality over the live pool. (3) **THE FIRST RUNE TO KEY OFF A TAG WAS BUILT — eight of
+`TEMPLATE_PRICE` = 50, and **neither is a second pricing rule.** `check_ez` §0 asserts the flat price
+(150 since HK) as an equality over the live pool. (3) **THE FIRST RUNE TO KEY OFF A TAG WAS BUILT — eight of
 them were, until FN** — and what was left of that item was the eight unauthored specs, until FK
 authored them. **(2) is still closed.**
 
@@ -3977,9 +3988,9 @@ re-derived from the source at DM; not one was moved.**
   INHERITS both half-widths through it**, so a change to the base sweep reaches him as tolerance
   and not as pace: his Perfect window is **76.5 ms**, still ×0.85 of the default's.
   **`check_cn.gd`'s `WANT_PROFILE` pins all six by number — moving one here is two edits.**
-- **Save versions: the run save is v13** (a pre-**v10** save is REFUSED and cleared — the version
-  and the threshold are different numbers). **v11 (CT), v12 (EG) and v13 (GF) are all TOLERANT and
-  none moved the threshold; GH moved no version.** Talent cells cost 1/2/3 by tier — **27 cells = 54
+- **Save versions: the run save is v14** (a pre-**v10** save is REFUSED and cleared — the version
+  and the threshold are different numbers). **v11 (CT), v12 (EG), v13 (GF) and v14 (HK) are all
+  TOLERANT and none moved the threshold; GH moved no version.** Talent cells cost 1/2/3 by tier — **27 cells = 54
   points a class.**
 - **Relics: 25 in the pool** — 17 common, 8 rare. **Up to 3 are assigned per run**, party-wide —
   **confirmed at EN as the code's behaviour, not just this file's memory of it.** The per-hero
@@ -4572,11 +4583,13 @@ This entry records that it is closed and carries the three things a later batch 
   `party_screen._make_tree_node` says they are the cheapest hover surface and `disabled` must stay
   false or the tooltip stops firing — and the same silhouette as the 604 dead buttons that shipped
   once. `check_fh` §9 exempts them **by SIGNATURE, never by name**.
-- **`Run.grant_rune` RETURNS A RUNE IT DOES NOT FIT.** Its callers append to `member["runes"]`
-  themselves. Not a defect today; exactly the shape that goes wrong on the next caller.
+- **`Run.grant_rune` RETURNS A RUNE IT DOES NOT FIT.** Its callers put it down themselves, at `Run.hold_rune`
+  (since GK), which sends whatever is not worn to the bag (since HK). Not a defect today; exactly the shape that
+  goes wrong on the next caller.
 - **NO BOSS AWARDS A RUNE.** The live doors are the Peddler, the elite cache, the bargain's `rune`
-  reward and the event verb `rune_grant`. `check_fh` §3 asserts `_resolve_boss` reaches none of
-  them, so the day one is added the claim is re-derived rather than left standing.
+  reward, the event verb `rune_grant` and, since HK §1, a normal fight's drop (`Run.drop_after_fight`). `check_fh` §3 asserts
+  `_resolve_boss` reaches none of the first four and `check_hk` §1e that it reaches no drop, so the day one is added the
+  claim is re-derived rather than left standing.
 - **`build_pin_manifest.py` BINDS A HOLDER OFF `var x :=` AND NEVER OFF `var x: String =`**, so a
   gate written with explicit types pins nothing the manifest can see and `--check` reports
   `current`. `check_fh` contributed **0 pins typed and 5 inferred**; the manifest went 1412 → 1417

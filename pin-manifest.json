@@ -2,14 +2,14 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1519,
-  "source": 1165,
+  "total": 1534,
+  "source": 1180,
   "other": 104,
   "document": 250
  },
  "source_residency": {
-  "narrow": 40,
-  "code": 693,
+  "narrow": 42,
+  "code": 706,
   "absent": 306,
   "runtime": 82,
   "unresolved": 1,
@@ -2137,7 +2137,7 @@
    "r": "missing-file",
    "k": "non-literal",
    "how": "read",
-   "g": "check_fd.gd#31",
+   "g": "check_fd.gd#32",
    "expr": "String"
   },
   {
@@ -2149,7 +2149,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#37",
+   "g": "check_fd.gd#38",
    "alt": true
   },
   {
@@ -2161,7 +2161,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#37",
+   "g": "check_fd.gd#38",
    "alt": true
   },
   {
@@ -2173,7 +2173,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#37",
+   "g": "check_fd.gd#38",
    "alt": true
   },
   {
@@ -2185,7 +2185,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#198"
+   "g": "check_fd.gd#209"
   },
   {
    "s": "check_fd.gd",
@@ -2196,7 +2196,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#184"
+   "g": "check_fd.gd#195"
   },
   {
    "s": "check_fd.gd",
@@ -2207,7 +2207,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#197"
+   "g": "check_fd.gd#208"
   },
   {
    "s": "check_fd.gd",
@@ -2218,7 +2218,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#183"
+   "g": "check_fd.gd#194"
   },
   {
    "s": "check_fd.gd",
@@ -2229,7 +2229,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#185"
+   "g": "check_fd.gd#196"
   },
   {
    "s": "check_fd.gd",
@@ -2240,7 +2240,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#192"
+   "g": "check_fd.gd#203"
   },
   {
    "s": "check_fd.gd",
@@ -2251,7 +2251,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#200"
+   "g": "check_fd.gd#211"
   },
   {
    "s": "check_fd.gd",
@@ -2262,7 +2262,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#192"
+   "g": "check_fd.gd#203"
   },
   {
    "s": "check_fe.gd",
@@ -2663,7 +2663,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fh.gd#1347"
+   "g": "check_fh.gd#1351"
   },
   {
    "s": "check_fh.gd",
@@ -2674,7 +2674,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fh.gd#731"
+   "g": "check_fh.gd#735"
   },
   {
    "s": "check_fh.gd",
@@ -2685,7 +2685,7 @@
    "r": "unresolved",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_fh.gd#734"
+   "g": "check_fh.gd#738"
   },
   {
    "s": "check_fh.gd",
@@ -2696,7 +2696,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_fh.gd#734"
+   "g": "check_fh.gd#738"
   },
   {
    "s": "check_fh.gd",
@@ -2707,7 +2707,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_fh.gd#734"
+   "g": "check_fh.gd#738"
   },
   {
    "s": "check_fi.gd",
@@ -2894,7 +2894,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fn.gd#97"
+   "g": "check_fn.gd#98"
   },
   {
    "s": "check_fq.gd",
@@ -3540,7 +3540,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "read",
-   "g": "check_he.gd#479"
+   "g": "check_he.gd#482"
   },
   {
    "s": "check_he.gd",
@@ -3551,7 +3551,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_he.gd#479"
+   "g": "check_he.gd#482"
   },
   {
    "s": "check_hf.gd",
@@ -3618,6 +3618,171 @@
    "k": "literal",
    "how": "read",
    "g": "check_hi.gd#50"
+  },
+  {
+   "s": "check_hk.gd",
+   "fn": "_s1_the_drop",
+   "h": "scripts/battle.gd",
+   "n": "\nfunc ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hk.gd#165"
+  },
+  {
+   "s": "check_hk.gd",
+   "fn": "_s1_the_drop",
+   "h": "scripts/battle.gd",
+   "n": "_fight_drop_line",
+   "p": "-",
+   "r": "narrow",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_hk.gd#170"
+  },
+  {
+   "s": "check_hk.gd",
+   "fn": "_s1_the_drop",
+   "h": "scripts/battle.gd",
+   "n": "_fight_drop_line()",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_hk.gd#167"
+  },
+  {
+   "s": "check_hk.gd",
+   "fn": "_s1_the_drop",
+   "h": "scripts/battle.gd",
+   "n": "drop_after_fight",
+   "p": "-",
+   "r": "narrow",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_hk.gd#170"
+  },
+  {
+   "s": "check_hk.gd",
+   "fn": "_s1_the_drop",
+   "h": "scripts/battle.gd",
+   "n": "func _check_end() -> void:",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hk.gd#164"
+  },
+  {
+   "s": "check_hk.gd",
+   "fn": "_s1_the_drop",
+   "h": "scripts/battle.gd",
+   "n": "func _resolve_boss(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hk.gd#168"
+  },
+  {
+   "s": "check_hk.gd",
+   "fn": "_s1_the_drop",
+   "h": "scripts/battle.gd",
+   "n": "if node_type == \"fight\":\n\t\t\tspoils += _fight_drop_line()",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_hk.gd#167"
+  },
+  {
+   "s": "check_hk.gd",
+   "fn": "_s5_the_save",
+   "h": "scripts/run_state.gd",
+   "n": "\nfunc ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hk.gd#555"
+  },
+  {
+   "s": "check_hk.gd",
+   "fn": "_s5_the_save",
+   "h": "scripts/run_state.gd",
+   "n": "func load_run() -> bool:",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hk.gd#554"
+  },
+  {
+   "s": "check_hk.gd",
+   "fn": "_s5_the_save",
+   "h": "scripts/run_state.gd",
+   "n": "if save_version < 10:",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_hk.gd#556"
+  },
+  {
+   "s": "check_hk.gd",
+   "fn": "_s6_the_sim",
+   "h": "scripts/run_sim.gd",
+   "n": "\nstatic func ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hk.gd#610"
+  },
+  {
+   "s": "check_hk.gd",
+   "fn": "_s6_the_sim",
+   "h": "scripts/run_sim.gd",
+   "n": "if node_type == \"fight\":\n\t\t_sim_take_drop(run)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_hk.gd#611"
+  },
+  {
+   "s": "check_hk.gd",
+   "fn": "_s6_the_sim",
+   "h": "scripts/run_sim.gd",
+   "n": "run.drop_after_fight()",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_hk.gd#614"
+  },
+  {
+   "s": "check_hk.gd",
+   "fn": "_s6_the_sim",
+   "h": "scripts/run_sim.gd",
+   "n": "static func _sim_take_drop(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hk.gd#612"
+  },
+  {
+   "s": "check_hk.gd",
+   "fn": "_s6_the_sim",
+   "h": "scripts/run_sim.gd",
+   "n": "static func on_battle_end(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hk.gd#609"
   },
   {
    "s": "test_batch_ah.gd",

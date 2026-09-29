@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-25 (Batch HJ &mdash; the debug toggle grants the class pool)</b></p>
+<p align="right"><b>Last updated: 2026-09-28 (Batch HK &mdash; runes drop, and there is a bag)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -118,7 +118,8 @@ A dealt rune whose lineage sets another Attack and so moves one of those figures
 under them &mdash; the Rune of the Warden on a Warrior's screen, and the Rune of the Occultist on a
 Cleric's. The rune can be dropped or swapped
 later; the spec it carried is the hero's lineage for the whole run.</li>
-<li><b>Victory rewards:</b> gold for every fight, and <b>clearing any encounter heals the
+<li><b>Victory rewards:</b> gold for every fight, <b>a rune for every normal fight won</b> &mdash;
+dropped at random into the heroes' bag (§8, Runes) &mdash; and <b>clearing any encounter heals the
 every hero 15% of max HP</b> — there is no resting, so this is the whole recovery curve (the
 Chalice of Dawn relic stacks its 10% on top for 25%). <b>No victory in a run pays a talent
 point</b> except a zone boss's, which banks one for each class among the heroes to the profile
@@ -131,7 +132,7 @@ ability pick, because nothing follows it to use one on. Fallen heroes return aft
 battle at 20% max HP ("the Untouched refuse to stay down").</li>
 <li><b>Defeat:</b> the run ends, the save is cleared, back to a new draft. Quitting after the last
 hero falls does not undo it: Continue opens straight onto the defeat.</li>
-<li><b>Saving:</b> auto-save to user://run_save.bin (format <b>v13</b>) the moment the heroes
+<li><b>Saving:</b> auto-save to user://run_save.bin (format <b>v14</b>) the moment the heroes
 step onto a node, again when what stands there is resolved, again inside a fight each time the
 heroes lose health, spend Mana or use an item, AND after spec confirmation (including debug
 rerolls). <b>Continue puts the heroes back where they were standing:</b> a bargain they walked
@@ -145,7 +146,10 @@ boss beaten on its card descends to the next zone, and a merchant a bargain boug
 is visited. The fight itself is never saved, so nothing it pays is paid until it is won. A
 Peddler or a forge left in the middle of a visit is gone. Loading swaps each member's saved tree
 snapshot for the live definition, so balance edits reach a run in flight, and drops any node
-that no longer exists. A
+that no longer exists. <b>The rune bag, the Crest and a drop waiting on a full bag are saved with
+the run</b>, and a save written before the bag existed loads with every rune a hero was wearing still
+worn, in the same slot, and every rune he held without wearing in the bag &mdash; past twenty if it
+must be, nothing dropped. A
 save <b>older than v10</b> is <b>refused and cleared</b> rather than half-loaded: the final
 zone gained a <b>seventeenth slot</b> at v10, so a v9 save's final-zone map has no position to
 walk onto after its boss, and the migration would have to invent one. (Batch BK made the same
@@ -347,7 +351,7 @@ entry &mdash; so authoring a ninth boon does not make boons commoner.</p>
 (never kills: floors at 1 HP) / mana_pct / max_hp_pct / attack_pct (permanent for the run,
 applied at battle spawn) / item / random_item / revive_pct (the fallen
 return) / relic_grant (random inactive relic; +40 gold when slots are full) / <b>rune_grant</b>
-(a rune through the same door the elite cache uses, equipped when a slot is free) /
+(a rune through the same door the elite cache uses, worn when a slot is free and into the bag otherwise) /
 <b>ability_draft</b> (the three-card offer itself, resolved on the hero's card like any
 other owed pick) —
 aimed by <b>target selectors</b> (<code>party</code>, random, lowest_hp, class:&lt;key&gt;) and gated by
@@ -356,12 +360,10 @@ fallen_hero). Adding an event is a JSON edit; adding a verb is one handler. <b>2
 ship now. Seen events persist in the save and never repeat within a run until the pool
 exhausts.</p>
 <p><b>Not built, and the reason is worth keeping:</b> the "a held rune for two of lower
-rarity" conversion needs a rune to be <i>surrendered</i>, and nothing in the project has ever
-removed a rune from a hero — <code>equipped</code> has exactly one writer and the pouch only
-grows. Building a removal path for one event would put a second, untested writer beside the
-one careful one. <b>Batch ES §1 removed the other half of it too: with no tiers, "of lower
-rarity" names nothing</b>, so the event would have to be re-specified before it could be
-built, on top of the surrender path it always needed.</p>
+rarity" conversion needs a rune to be <i>surrendered</i> to an event. The bag can let a rune go
+now &mdash; the Peddler buys one, and the bag drops one &mdash; but no event verb takes one, and
+<b>Batch ES §1 removed the other half of it too: with no tiers, "of lower rarity" names nothing</b>,
+so the event would have to be re-specified before it could be built.</p>
 
 <h3>3c. Attrition, the pouch and its slots</h3>
 <p><b>There is no resting.</b> Clearing any encounter heals every hero <b>15% of max HP</b>
@@ -416,7 +418,8 @@ is seventeen columns wide, and its last node is the <b>END BOSS</b>, whose toolt
 "The END BOSS. Nothing goes around it. It is always the Hollow Crown, and the road ends here."
 <br><b>The cards sit on the LEFT EDGE, stacked</b> (Batch BK), so the right two thirds belong
 to the map. Each carries portrait, spec name, HP bar with numbers, resource bar, <b>three rune
-slots</b> (filled or empty — click one to open that hero's pouch), an <b>&#9670;N
+slots</b> (filled or empty — click one to open that hero's rune panel: what he wears, and the
+runes in the bag he may wear, each with Equip or Unequip, and a Swap when every slot is full), an <b>&#9670;N
 ability-upgrade count</b> (hidden at zero; hovering it lists them as "Overpower — Honed", one
 per line — it takes no click of its own), and an unspent-talent badge; <b>clicking a card
 opens that hero's talent tree and full sheet</b>. An owed ability pick, ability upgrade or
@@ -424,6 +427,12 @@ rune pick puts a <b>CHOOSE</b> button on the card which opens a <b>three-choice 
 — the card lost 74 pixels of height in the move to the left edge and three choice buttons no
 longer fit inside it, and the overlay is the pattern the rune pouch already set. Each choice
 shows its full description under it rather than behind a hover.
+<br><b>Under the pouch sits the rune bag's row</b>: the bag's count out of twenty (and a drop
+waiting on it, if one is), and the Crest's rune or "&mdash; empty &mdash;". Either opens the bag,
+which lists the Crest's slot and every rune in the bag with the hero it is for, each with a Drop
+that asks twice before the rune is gone for good. <b>A rune that drops onto a full bag opens its own
+panel on the map</b>: the drop with its rule, the twenty below it each with <b>Drop this</b>, which
+drops that one and takes the new one in its place, and <b>Leave it behind</b> below them.
 <br><b>The lattice</b> reads LEFT TO RIGHT inside a clipped viewport with a horizontal
 scrollbar, so <b>the whole zone can be read before the first step</b>. Edges are drawn.
 Cleared nodes are dim green and their edges gold; the nodes the heroes may step onto wear their
@@ -1194,14 +1203,15 @@ class's engine runes and takes one. Every class has six, so every deal leaves th
 <li><b>Two engine slots.</b> A hero may hold two engine runes, in two slots of their own that do
 not compete with the three ordinary rune slots. The second comes from the ordinary rune offers —
 the Peddler, an elite's cache, a bargain, an event — mixed in with everything else, and only ever
-his class's. Each costs 100 gold at the Peddler, on the flat rune price.</li>
+his class's. Each costs 150 gold at the Peddler, on the flat rune price, and goes into the bag.</li>
 <li><b>Drop and swap, to nothing.</b> The hero's rune pouch on the map equips and unequips engine
-runes. An unequipped rune is kept, and its engine is out of the next fight. <b>A hero with no
+runes. An unequipped rune goes into the heroes' bag, and its engine is out of the next fight; with
+both slots full, one in the bag can be swapped for one slotted. <b>A hero with no
 engine is a legal state</b>: his class basic and class kit, the abilities he has drafted and his
 runes still fight, and nothing an engine grants is there. A card he has drafted or earned is never
 lost when an engine is dropped. <b>A drop changes the next fight, never the one in
-progress.</b> The pouch lists every engine rune the hero holds &mdash; two slotted, any others kept
-&mdash; each with its engine's rule, above his other runes, in one list that scrolls; its
+progress.</b> The pouch lists his slotted engine runes and every engine rune of his class in the
+bag, each with its engine's rule, above his other runes, in one list that scrolls; its
 <b>Close</b> button sits below that list, where no rule's length can move it.</li>
 <li><b>A card that cannot be cast without its engine sits out while the engine is gone.</b> Seventeen
 drafted or earned cards are refused on every board by a hero who does not hold their engine, and
@@ -2714,8 +2724,19 @@ blacksmiths a run</b> and buys <b>2.4&ndash;4.1</b> of them &mdash; the rest are
 want of gold, which is a sink doing exactly what a sink is for. It converts <b>41&ndash;47% of
 all income</b> (931 gold greedy, 904 balanced, 508 cautious). <b>Unspent gold at run end falls
 from Batch BJ's 63% to 25&ndash;28%.</b></li>
-<li><b>Runes</b> (run-scoped gear, bought at the Peddler or chosen from elite caches — the
-in-run power source that scales with depth): an <b>authored pool</b> (data/runes.json).
+<li><b>Runes</b> (run-scoped gear, dropped after every normal fight, bought at the Peddler or chosen
+from elite caches — the in-run power source that scales with depth): an <b>authored pool</b> (data/runes.json).
+<br><b>A RUNE DROPS AFTER EVERY NORMAL FIGHT WON</b>: one, at random, always for a class among the
+heroes, never one they already hold, and never one that reads an engine not equipped &mdash; the rules
+every other way of getting a rune follows &mdash; and the victory card names it. An elite, a mini-boss
+and a boss drop none; each pays its own reward. <b>THE DROP GOES INTO THE BAG</b>, which holds every
+rune the heroes hold and nobody wears, shared, <b>twenty at most</b>; a rune worn does not count.
+Equipping takes a rune out of the bag and unequipping puts it back. <b>A drop onto a full bag</b> is
+shown beside the twenty: drop one of them to take it, or leave it behind. A full bag refuses an
+unequip until there is room, and a swap &mdash; one rune each way &mdash; always goes through.
+<br><b>THE CREST</b> is a slot of its own, beside the heroes' slots, for a rune worn by every hero at
+once: its effect reaches all four as a fight begins. There is one crest slot. <b>No crest rune exists
+yet</b>; the slot stands empty, and one would drop, sell and sit in the bag as any other rune does.
 <br><b>ALL TWELVE SPECS ARE AUTHORED AS OF BATCH FK, AND FIFTEEN CLASS RUNES READ NO ENGINE.
 142 ORDINARY ENTRIES: 67 RETIRED AND 75 LIVE.</b> Sixty were written for a lineage &mdash; nine
 lineages have five, the Beastmaster six, and the Devout four &mdash; and <b>fifteen were written for
@@ -2730,8 +2751,10 @@ and authored the Shared Ruin in its place</b>, so the file grew by one entry (a
 retirement is KEPT and said to be kept) while the live count of the day was unchanged. <b>65 of
 the 67 retirements are ET's and EO's; FC's and FO's are of a later vintage</b>, and the three walks that
 read &ldquo;retired&rdquo; as &ldquo;authored under the old one-rune-per-lane rule&rdquo; narrow
-their populations by <code>RUNE_SHAPES</code> membership rather than by an exemption. <b>PRICE IS 100g, FLAT, EVERY RUNE</b> &mdash; rarity is gone and
-price no longer signals power, so the player pays for FIT rather than for magnitude. <b>SCOPE IS
+their populations by <code>RUNE_SHAPES</code> membership rather than by an exemption. <b>PRICE IS 150g, FLAT, EVERY RUNE, AND THE PEDDLER BUYS ONE BACK
+OUT OF THE BAG FOR A THIRD (50g)</b> &mdash; rarity is gone and price no longer signals power, so the
+player pays for FIT rather than for magnitude; selling is a decision rather than free money, and the
+Peddler is where the luck of a drop is fixed. <b>SCOPE IS
 THE CLASS for all seventy-five</b> &mdash; a rune reaches every hero of its class, and three gates decide which
 of them he is offered (Eligibility, below) &mdash; and every hero in the game draws an authored pool
 rather than the generated stat family alone.
@@ -2796,7 +2819,7 @@ visible from one side.
 <code>condition</code> in principle &mdash; <code>Talents.condition_met</code> answers
 <code>has_node</code> and <code>owns_ability</code> for the talent trees &mdash; but <b>no rune
 uses one</b>, and the two tag conditions it used to answer are gone from the file, from the code
-and from the screens. <b>A gated rune at a flat 100g is strictly WORSE than a bare one</b>: the
+and from the screens. <b>A gated rune at a flat price is strictly WORSE than a bare one</b>: the
 price does not fall to pay for the clause, so the condition is pure cost with nothing bought by
 it. <code>check_fn</code> &sect;1 asserts the census across all 142 entries, live and retired, so
 a re-gating is caught where it would appear rather than where somebody happened to look.
@@ -3360,13 +3383,15 @@ its engine's text and &mdash; for a rune whose engine has enablers &mdash; the a
 (&ldquo;Also opens with:&rdquo;); and once, below the
 cards, the class basic and class kit with their damage and "% Atk" scaling at the class's own Attack.
 The draft screen stays clean — no passive text there.</li>
-<li><b>Shop (The Wandering Peddler):</b> consumables column + one rune offer per hero, the offers
+<li><b>Shop (The Wandering Peddler):</b> consumables column + one rune offer per hero (150g, into the
+bag; every Buy greyed while the bag is full, and the column says so) + <b>SELL FROM THE BAG</b> below
+the supplies, one row per rune in the bag, each sold for a third of its price with a Sell that asks
+twice; the offers
 stacked at their own heights in one column that scrolls and ends above the Leave button, so every
 offer's Buy button can be reached however long its rule;
 reached when a cleared fight or elite schedules one (§3b). A consumable already at its cap of
 6 greys its own button rather than taking the gold. <b>It sells no ability draft</b> (Batch FD
-§1) — the column BO §3 put below the supplies is gone and the left side of the screen is
-empty from y=452 down.</li>
+§1); below the supplies stands the bag's rune sale.</li>
 <li><b>Offer screen:</b> three bargain cards before every elite and mini-boss (§3a) — severity
 number, a four-pip severity bar, the modifier's name and effect, and what it pays on victory.
 The heroes' HP and the warband being faced are both on screen, because choosing a

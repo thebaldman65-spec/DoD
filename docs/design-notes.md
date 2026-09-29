@@ -4,6 +4,57 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Runes drop, and there is a bag (Batch HK) — 2026-09-28
+
+**Why the bag holds only the runes nobody is wearing.** Four heroes wear three ordinary runes and two engine runes
+each, and the crest wears one more: twenty-one slots in all. If a worn rune counted against the bag's twenty, the party
+could never fill every slot it has. So a rune is either worn (on a hero, or in the crest) or in the bag, never both,
+and equipping takes it out of the bag while unequipping puts it back.
+
+**Why a drop is drawn flat over runes, not a class first.** The ruling is that a drop is always for a class in the
+party, and that a crest rune drops from the same source as any other rune. Drawing a class first and then a rune would
+give each class a quarter of the drops — and would give the crest, if it were a fifth choice, a fifth of every drop even
+with one crest rune in the game. Drawing one rune flat from everything the party could be offered keeps a crest rune at
+its fair share and still only ever drops a rune for a class the party holds.
+
+**Why only a normal fight drops one.** The ruling names normal fights. An elite already pays gold, an item, a draft and a
+rune cache; a mini-boss pays an upgrade pick; a zone boss pays a relic, an ability pick and a slot. Adding a drop to
+those would change what they are worth, and that is the designer's to decide, so it is reported rather than done.
+
+**Why a full bag is a choice for a drop but a wall for a purchase.** A drop is a reward the player did not pick, so it
+should never vanish without him seeing it: it waits, and the map shows it beside the twenty so he can drop one to take
+it, or let it go. A purchase is something he starts himself, standing at a counter that buys runes back — so the honest
+answer is "not until there is room", and the room is one Sell away. That is the same split the item pouch already makes.
+
+**Why an Unequip into a full bag is refused, and why there is a Swap.** A bag that let one more in whenever a rune came
+off a hero would not be a bag of twenty. But a hero with full slots and a full bag must still be able to change what
+he wears, so a swap moves one rune each way and leaves the bag's count where it was.
+
+**Why selling returns a third, and why the price is read live.** Selling is meant to be a decision rather than free
+money: a third back means a rune sold is mostly a rune lost, and the Peddler becomes the place a player fixes the luck
+of drops they cannot choose. The price lives in each rune's data and is read there when it is shown, so a rune bought
+before the price moved — a save carries every rune it holds — sells at today's price. The shop discount cuts the sale
+exactly as it cuts the purchase, so the two can never be played against each other.
+
+**Why a rune bought goes into the bag, even an engine rune.** Equipping is its own act everywhere now. The counter used
+to slot an engine rune on the spot; now it goes into the bag like any other, and the hero's panel slots it.
+
+**Why the screens call the party slot the Crest.** The word "party" is kept out of everything a player reads, because
+it can mean the four heroes or the heroes and their companions, and that confusion once paid the wrong number for a
+whole project. The rune scope keeps the name `party` in the code, as the ruling gave it; on the screen the slot needs a
+word that means "one thing the whole group carries", and a crest is that. It is a proposal.
+
+**Why a crest rune reaches the heroes and not the companions.** It is applied as the fight builds the four heroes, and
+no companion exists at that moment. Little in the game reads the group as a whole — two talent stamps a rune can feed,
+and relics — so "every hero, as the fight starts" is the door there is; a crest rune that wants more needs new
+machinery first.
+
+**Why the save moved a version, and why nothing new refuses an old save.** The bag, the crest and the waiting drops are
+three new pieces of run-level state, which is what moved earlier versions too. An old save is not refused: whatever a
+hero was wearing he goes on wearing in the same slot, and whatever he was holding without wearing moves into the bag —
+even past twenty, because a migration that dropped runes to fit would lose the player's things. The cap simply applies
+from the next rune that comes in.
+
 ## The last twenty-three (Batch HJ) — 2026-09-25
 
 **Why the award floor is measured per class and per set of engines, not per lineage.** A zone boss that has nothing

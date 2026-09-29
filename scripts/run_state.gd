@@ -144,6 +144,12 @@ const ITEM_PRICES := {"health": 30, "mana": 30, "bomb": 45, "revive": 80,
 # fifths is enough that a wasted purchase is recoverable and not enough that
 # round-tripping is a strategy.
 const SELL_FRACTION := 0.4
+# BATCH HK §3 — AND A RUNE SELLS BACK FOR A THIRD (ruled: 150g bought, 50g sold).
+# A third rather than the pouch's two fifths, and for the same reason made
+# sharper: **selling is a decision rather than free money**, and the Peddler is
+# where a player fixes his luck, since the drop cannot be chosen. Written as the
+# fraction and never as the 50 it comes to, so the relation survives a price move.
+const RUNE_SELL_FRACTION := 1.0 / 3.0
 
 # ---------- BATCH CT §1: THE POUCH IS SLOTTED ----------
 #
@@ -335,6 +341,32 @@ const BARGAIN_NODES := ["elite", "miniboss"]
 # SAVED WITH THE RUN: an offer is a reward already earned, and quitting
 # between the victory screen and the map must not eat it.
 var pending_item_offers: Array = []  # item ids awaiting a swap-or-decline
+
+# ══ BATCH HK §2 — THE BAG, AND THE PARTY SLOT (ruled by the designer) ════════
+#
+# **EVERY RUNE THE PARTY HOLDS AND NOBODY WEARS IS IN THE BAG, SHARED ACROSS THE
+# PARTY, AND IT HOLDS TWENTY.** A hero's `runes` are the ordinary runes he WEARS
+# (three slots, `rune_slots()`), his `engines` the engine runes he has SLOTTED (two,
+# `ENGINE_SLOTS`), and the party slot below is the party rune the party wears (one,
+# `PARTY_RUNE_SLOTS`) — so equipping takes a rune OUT of the bag and unequipping
+# puts it back, and a worn rune is never counted against the twenty. **The
+# four heroes' slots and the party slot hold twenty-one**, which is the reason
+# worn runes cannot count: a bag that held them could never be worn full.
+#
+# **A RUNE THAT LANDS ON A FULL BAG IS NOT LOST AND NOT SOLD** (ruled): it waits
+# on `pending_rune_drops`, and the map shows it beside the twenty until the player
+# drops one of them to take it — or lets it go, which is always a button. It is
+# `pending_item_offers`' shape one layer over: a grant queues, the map answers.
+# **All three ride the save** (v14, the version block in `save_run`).
+const BAG_CAP := 20
+# **ONE PARTY SLOT, AND THE CAP IS THIS ONE CONSTANT** (ruled: a party rune
+# reaches four heroes at once, so it is worth roughly four of anything else, and
+# with one slot which one the party carries is an identity for the run — the
+# designer expects to raise it later). Every reader asks this name.
+const PARTY_RUNE_SLOTS := 1
+var rune_bag: Array = []            # rune instances held, worn by nobody
+var party_runes: Array = []         # the party slot: party runes worn
+var pending_rune_drops: Array = []  # runes waiting on the full-bag panel
 # Which hero the sheet opens onto (Batch AN: the map cards ARE the party
 # list, so the sheet is always entered for a specific hero). Session-scoped
 # — a resumed run opens the map, never a sheet.
@@ -608,6 +640,11 @@ func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []
 	pending_modifier = ""
 	pending_reward = {}
 	pending_item_offers = []
+	# BATCH HK §2 — a fresh run opens with an empty bag, an empty party slot and
+	# nothing waiting on the full-bag panel.
+	rune_bag = []
+	party_runes = []
+	pending_rune_drops = []
 	pending_shop = false
 	# A fresh run starts clean, and starts un-summoned and un-travelled.
 	debug_used = false
@@ -1525,16 +1562,220 @@ func awaken(idx: int, rune_id: String) -> void:
 	equip_spec_talents(idx)
 
 
-# THE ONE PLACE A TAKEN RUNE IS PUT DOWN — the Peddler, the elite cache, the
-# bargain, the event verb and the sim all hand their rune here. An ordinary rune
-# goes in the pouch with the `equipped` its caller decided; an ENGINE rune goes
-# to the engine slots, slotted while one is free and held unslotted otherwise.
-func hold_rune(member: Dictionary, rune: Dictionary) -> void:
+# THE ONE PLACE A TAKEN RUNE IS PUT DOWN — the elite cache, the bargain, the event
+# verb and the sim all hand their rune here (the Peddler hands his to the bag:
+# `buy_rune`, below).
+#
+# **BATCH HK §2 — WHAT IS NOT WORN GOES TO THE BAG, NEVER TO A HERO.** Until HK an
+# ordinary rune went into the hero's own pouch with the `equipped` its caller
+# decided, and an engine rune into his engine slots, slotted while one was free
+# and held unslotted otherwise. **The worn halves are unchanged**: an ordinary rune
+# is worn when its caller asks and one of his three slots is free, an ENGINE rune
+# is slotted while one of his two is free (GK's rule, whatever the caller asked),
+# and a PARTY rune is worn when its caller asks and the party slot is free.
+# **Everything else goes into the bag through `bag_rune`**, which on a full bag
+# queues it for the full-bag panel. Returns where it went: "worn", "bag" or
+# "pending" — "" for nothing handed over.
+func hold_rune(member: Dictionary, rune: Dictionary) -> String:
+	if rune.is_empty():
+		return ""
+	var asked := bool(rune.get("equipped", false))
+	if Runes.is_party_rune(rune):
+		if asked and party_runes.size() < PARTY_RUNE_SLOTS:
+			rune["equipped"] = true
+			party_runes.append(rune)
+			return "worn"
+		return bag_rune(rune)
 	if String(rune.get("engine", "")) == "":
-		member["runes"] = member.get("runes", []) + [rune]
-		return
-	rune["equipped"] = engines_worn(member) < ENGINE_SLOTS
-	member["engines"] = member.get("engines", []) + [rune]
+		if asked and runes_worn(member) < rune_slots():
+			rune["equipped"] = true
+			member["runes"] = member.get("runes", []) + [rune]
+			return "worn"
+		return bag_rune(rune)
+	if engines_worn(member) < ENGINE_SLOTS:
+		rune["equipped"] = true
+		member["engines"] = member.get("engines", []) + [rune]
+		return "worn"
+	return bag_rune(rune)
+
+
+# How many ordinary runes this hero wears — the count `rune_slots()` caps.
+func runes_worn(member: Dictionary) -> int:
+	var n := 0
+	for r in member.get("runes", []):
+		if bool((r as Dictionary).get("equipped", false)):
+			n += 1
+	return n
+
+
+# ══ BATCH HK §2 — THE BAG'S DOORS ═══════════════════════════════════════════
+#
+# **THE ONE DOOR A RUNE ENTERS THE BAG THROUGH.** With room it lands unworn; with
+# none it waits on `pending_rune_drops` for the full-bag panel — shown the drop
+# beside the twenty, the player drops one of them to take it or lets it go (ruled:
+# never lost silently, never auto-sold). The waiting rune is still the party's
+# until it is let go, so it is in `party_rune_names` and nothing offers it twice.
+func bag_rune(rune: Dictionary) -> String:
+	if rune.is_empty():
+		return ""
+	rune["equipped"] = false
+	if bag_full():
+		pending_rune_drops.append(rune)
+		return "pending"
+	rune_bag.append(rune)
+	return "bag"
+
+
+func bag_full() -> bool:
+	return rune_bag.size() >= BAG_CAP
+
+
+# EVERY RUNE THE PARTY HOLDS, BY NAME: the bag, the party slot, a rune waiting on
+# the full-bag panel, and every hero's worn runes and engine runes. **The one list
+# every roll excludes** (`generate_rune`, `grant_rune`, the drop, the cache's
+# re-ask), so the Peddler never sells, a cache never offers and a drop never hands
+# over a rune the party already has — FD §1's "one of each", read across the
+# party now that a rune can sit in a bag no single hero owns.
+func party_rune_names() -> Array:
+	var every: Array = rune_bag + party_runes + pending_rune_drops
+	for m in party:
+		every = every + (m as Dictionary).get("runes", []) + (m as Dictionary).get("engines", [])
+	var out: Array = []
+	for r in every:
+		var nm := String((r as Dictionary).get("name", ""))
+		if nm != "" and not out.has(nm):
+			out.append(nm)
+	return out
+
+
+# ── THE ROWS A HERO'S RUNE PANEL LISTS, AND THE ONE DOOR EACH BUTTON ASKS ─────
+#
+# A row is `{rune, worn, src, at}`: `src` "hero" is his own list (`runes`, or
+# `engines`) at index `at`; "bag" is the bag at `at`. **His own list comes first,
+# in its own order, then the bag's runes he may wear** — so a row's index is the
+# index the toggle took before HK for every rune he carried, and a rune he
+# unequips comes back as a bag row. A rune on his own list that he does not wear
+# is a shape only a save written before the bag or a fixture can hold (`load_run`
+# moves a saved one into the bag); its row equips it where it lies.
+func rune_rows(member: Dictionary) -> Array:
+	return _rows_for(member, "runes", func(r: Dictionary) -> bool:
+		return String(r.get("engine", "")) == "" and not Runes.is_party_rune(r))
+
+
+func engine_rows(member: Dictionary) -> Array:
+	return _rows_for(member, "engines", func(r: Dictionary) -> bool:
+		return String(r.get("engine", "")) != "")
+
+
+func _rows_for(member: Dictionary, list_key: String, kind: Callable) -> Array:
+	var out: Array = []
+	var own: Array = member.get(list_key, [])
+	for i in own.size():
+		out.append({"rune": own[i], "src": "hero", "at": i,
+			"worn": bool((own[i] as Dictionary).get("equipped", false))})
+	for i in rune_bag.size():
+		var r: Dictionary = rune_bag[i]
+		if kind.call(r) and Runes.wearable_by(r, member):
+			out.append({"rune": r, "src": "bag", "at": i, "worn": false})
+	return out
+
+
+# The party slot's rows: the party runes the party wears, then the bag's.
+func party_rune_rows() -> Array:
+	var out: Array = []
+	for i in party_runes.size():
+		out.append({"rune": party_runes[i], "src": "party", "at": i, "worn": true})
+	for i in rune_bag.size():
+		if Runes.is_party_rune(rune_bag[i]):
+			out.append({"rune": rune_bag[i], "src": "bag", "at": i, "worn": false})
+	return out
+
+
+# The two refusal sentences the bag adds, each hand-broken at 44 for the
+# tooltip that shows it (GX's reason: a tooltip does not wrap).
+const BAG_FULL_NOTE := "The bag is full. Drop or sell a rune to\nmake room, or swap this one for one\nin the bag."
+const RUNE_SLOTS_FULL_NOTE := "Every rune slot is filled. Unequip one,\nor swap it for this one."
+const PARTY_SLOT_FULL_NOTE := "The crest is filled. Unequip its rune,\nor swap it for this one."
+
+
+# ORDINARY RUNES — equip from the bag, and unequip back into it.
+func toggle_rune(member: Dictionary, i: int) -> bool:
+	var rows := rune_rows(member)
+	if i < 0 or i >= rows.size() or rune_toggle_refusal(member, i) != "":
+		return false
+	return _toggle_row(member, "runes", rows[i])
+
+
+func rune_toggle_refusal(member: Dictionary, i: int) -> String:
+	var rows := rune_rows(member)
+	if i < 0 or i >= rows.size():
+		return ""
+	if bool(rows[i]["worn"]):
+		return BAG_FULL_NOTE if bag_full() else ""
+	return RUNE_SLOTS_FULL_NOTE if runes_worn(member) >= rune_slots() else ""
+
+
+# A worn rune leaves his list for the bag; a bag rune leaves the bag for his list;
+# a rune on his list he does not wear is put on where it lies.
+func _toggle_row(member: Dictionary, list_key: String, row: Dictionary) -> bool:
+	var r: Dictionary = row["rune"]
+	if bool(row["worn"]):
+		(member[list_key] as Array).remove_at(int(row["at"]))
+		r["equipped"] = false
+		rune_bag.append(r)
+		return true
+	r["equipped"] = true
+	if String(row["src"]) == "hero":
+		return true
+	rune_bag.remove_at(int(row["at"]))
+	member[list_key] = member.get(list_key, []) + [r]
+	return true
+
+
+# THE SWAP, FOR A HERO WHOSE SLOTS ARE FULL — and the only way to change what he
+# wears while the bag is full too, because a swap moves one rune each way and the
+# bag's count does not change. `bag_i` and `worn_i` index the same rows the panel
+# draws: the bag rune goes on in the worn one's place, and the worn one takes the
+# bag rune's place in the bag.
+func swap_rune(member: Dictionary, bag_i: int, worn_i: int) -> bool:
+	return _swap_rows(member, "runes", rune_rows(member), bag_i, worn_i)
+
+
+func swap_engine(member: Dictionary, bag_i: int, worn_i: int) -> bool:
+	var rows := engine_rows(member)
+	if swap_engine_refusal(member, bag_i, worn_i) != "":
+		return false
+	return _swap_rows(member, "engines", rows, bag_i, worn_i)
+
+
+func _swap_rows(member: Dictionary, list_key: String, rows: Array, bag_i: int,
+		worn_i: int) -> bool:
+	if bag_i < 0 or bag_i >= rows.size() or worn_i < 0 or worn_i >= rows.size():
+		return false
+	var incoming: Dictionary = rows[bag_i]
+	var outgoing: Dictionary = rows[worn_i]
+	if String(incoming["src"]) != "bag" or not bool(outgoing["worn"]):
+		return false
+	var in_rune: Dictionary = incoming["rune"]
+	var out_rune: Dictionary = outgoing["rune"]
+	in_rune["equipped"] = true
+	out_rune["equipped"] = false
+	(member[list_key] as Array)[int(outgoing["at"])] = in_rune
+	rune_bag[int(incoming["at"])] = out_rune
+	return true
+
+
+# An engine swap still owes HB §4's refusal: taking the pet's dismisser out puts
+# Summon Companion back in the kit, which counts. "" when the swap may go ahead.
+func swap_engine_refusal(member: Dictionary, bag_i: int, worn_i: int) -> String:
+	var rows := engine_rows(member)
+	if bag_i < 0 or bag_i >= rows.size() or worn_i < 0 or worn_i >= rows.size():
+		return ""
+	var out_pid := String((rows[worn_i]["rune"] as Dictionary).get("engine", ""))
+	var in_pid := String((rows[bag_i]["rune"] as Dictionary).get("engine", ""))
+	var after: Array = held_engines(member).filter(func(p): return String(p) != out_pid)
+	after.append(in_pid)
+	return _pet_return_refusal(member, after)
 
 
 # DROP AND SWAP, INCLUDING TO NOTHING. Unslotting an engine takes the engine and
@@ -1549,33 +1790,43 @@ func hold_rune(member: Dictionary, rune: Dictionary) -> void:
 # answer is the player's, and it is one press**: bench a card, then unslot.
 # `engine_toggle_refusal` says why in one sentence and the pouch shows it on the
 # disabled button, so the refusal is never a silent no-op (GK's rule).
+#
+# **BATCH HK §2 — "KEEPS THE RUNE" MEANS THE BAG NOW.** An unslotted engine rune
+# goes into the bag, and slotting one takes it out; `i` indexes `engine_rows`, so
+# for every engine a hero holds it is the index the toggle always took. Unslotting
+# into a full bag is refused as any unequip is, and a swap is the way through.
 func toggle_engine(member: Dictionary, i: int) -> bool:
-	var held: Array = member.get("engines", [])
-	if i < 0 or i >= held.size():
+	var rows := engine_rows(member)
+	if i < 0 or i >= rows.size():
 		return false
 	if engine_toggle_refusal(member, i) != "":
 		return false
-	var r: Dictionary = held[i]
-	if bool(r.get("equipped", false)):
-		r["equipped"] = false
-		return true
-	r["equipped"] = true
-	return true
+	return _toggle_row(member, "engines", rows[i])
 
 
 # Why the pouch's engine toggle `i` is refused right now, or "" when it is not.
 # THE ONE ANSWER: `toggle_engine` refuses on it and the pouch disables the button
-# with it. Two causes: both slots are full (slotting a third, GK), and unslotting
-# the pet's dismisser into a kit with no free slot for the pet (HB §4).
+# with it. Three causes: both slots are full (slotting a third, GK), unslotting the
+# pet's dismisser into a kit with no free slot for the pet (HB §4), and unslotting
+# into a full bag (HK §2).
 func engine_toggle_refusal(member: Dictionary, i: int) -> String:
-	var held: Array = member.get("engines", [])
-	if i < 0 or i >= held.size():
+	var rows := engine_rows(member)
+	if i < 0 or i >= rows.size():
 		return ""
-	var r: Dictionary = held[i]
-	if not bool(r.get("equipped", false)):
+	var r: Dictionary = rows[i]["rune"]
+	if not bool(rows[i]["worn"]):
 		return "Both engine slots are filled." if engines_worn(member) >= ENGINE_SLOTS else ""
 	var after: Array = held_engines(member).filter(
 		func(p): return String(p) != String(r.get("engine", "")))
+	var pet := _pet_return_refusal(member, after)
+	if pet != "":
+		return pet
+	return BAG_FULL_NOTE if bag_full() else ""
+
+
+# HB §4's refusal, asked of the engines a change would leave slotted: "" unless the
+# change takes the pet's dismisser out and every slot is full for the pet to return.
+func _pet_return_refusal(member: Dictionary, after: Array) -> String:
 	if not Classes.dismisses_pet(held_engines(member)) or Classes.dismisses_pet(after):
 		return ""
 	var key := String(member.get("key", ""))
@@ -1585,6 +1836,136 @@ func engine_toggle_refusal(member: Dictionary, i: int) -> String:
 	if used_after <= ability_slot_cap():
 		return ""
 	return "Unequipping it returns %s to the kit,\nand every slot is full. Bench a card\nfirst." % Classes.PET_CARD
+
+
+# ── THE PARTY SLOT (HK §4) — the same three doors, on `party_runes` ──────────
+func toggle_party_rune(i: int) -> bool:
+	var rows := party_rune_rows()
+	if i < 0 or i >= rows.size() or party_toggle_refusal(i) != "":
+		return false
+	var row: Dictionary = rows[i]
+	var r: Dictionary = row["rune"]
+	if bool(row["worn"]):
+		party_runes.remove_at(int(row["at"]))
+		r["equipped"] = false
+		rune_bag.append(r)
+		return true
+	rune_bag.remove_at(int(row["at"]))
+	r["equipped"] = true
+	party_runes.append(r)
+	return true
+
+
+func party_toggle_refusal(i: int) -> String:
+	var rows := party_rune_rows()
+	if i < 0 or i >= rows.size():
+		return ""
+	if bool(rows[i]["worn"]):
+		return BAG_FULL_NOTE if bag_full() else ""
+	return PARTY_SLOT_FULL_NOTE if party_runes.size() >= PARTY_RUNE_SLOTS else ""
+
+
+func swap_party_rune(bag_i: int, worn_i: int) -> bool:
+	var rows := party_rune_rows()
+	if bag_i < 0 or bag_i >= rows.size() or worn_i < 0 or worn_i >= rows.size():
+		return false
+	if String(rows[bag_i]["src"]) != "bag" or not bool(rows[worn_i]["worn"]):
+		return false
+	var in_rune: Dictionary = rows[bag_i]["rune"]
+	var out_rune: Dictionary = rows[worn_i]["rune"]
+	in_rune["equipped"] = true
+	out_rune["equipped"] = false
+	party_runes[int(rows[worn_i]["at"])] = in_rune
+	rune_bag[int(rows[bag_i]["at"])] = out_rune
+	return true
+
+
+# ── LETTING A RUNE GO, AND THE FULL-BAG PANEL'S ANSWERS ───────────────────────
+#
+# **A DROP FROM THE BAG IS GONE FOR GOOD** — the map's Drop, two presses, the
+# pouch's Discard shape. Returns the rune let go, or {} for a bad index.
+func drop_bag_rune(i: int) -> Dictionary:
+	if i < 0 or i >= rune_bag.size():
+		return {}
+	var r: Dictionary = rune_bag[i]
+	rune_bag.remove_at(i)
+	return r
+
+
+# Take the rune waiting at the head of the queue, dropping bag rune `drop_i` to make
+# room: the waiting rune takes its place. Refused with nothing waiting or a bad index.
+func take_pending_drop(drop_i: int) -> bool:
+	if pending_rune_drops.is_empty() or drop_i < 0 or drop_i >= rune_bag.size():
+		return false
+	var incoming: Dictionary = pending_rune_drops.pop_front()
+	incoming["equipped"] = false
+	rune_bag[drop_i] = incoming
+	return true
+
+
+# Let the rune waiting at the head of the queue go. Always allowed (ruled): the
+# drop itself may be declined.
+func decline_pending_drop() -> Dictionary:
+	if pending_rune_drops.is_empty():
+		return {}
+	return pending_rune_drops.pop_front()
+
+
+# A rune waiting on the panel that the bag now has room for — a sale or a drop on
+# the way here made it — goes straight in: an offer to give something up when
+# nothing has to be given up is a question with one answer (CT §3's rule for the
+# pouch, at `_check_item_offers`). Returns how many went in.
+func settle_pending_drops() -> int:
+	var n := 0
+	while not pending_rune_drops.is_empty() and not bag_full():
+		var r: Dictionary = pending_rune_drops.pop_front()
+		r["equipped"] = false
+		rune_bag.append(r)
+		n += 1
+	return n
+
+
+# ── BATCH HK §3 — THE PEDDLER BUYS AND SELLS ──────────────────────────────────
+#
+# **A RUNE COSTS 150g AND SELLS BACK FOR A THIRD** (ruled): `Runes.price_of` is the
+# price, read live off the data, and the relic discount moves it here exactly as it
+# moves an item's — so the discount cuts the sale as well as the purchase and the
+# two can never be arbitraged (CT §2's reason for reading one `_price`).
+func rune_price(rune: Dictionary) -> int:
+	return maxi(int(round(Runes.price_of(rune) * (1.0 - relic_add("shop_discount")))), 1)
+
+
+func rune_sell_value(rune: Dictionary) -> int:
+	return maxi(int(round(rune_price(rune) * RUNE_SELL_FRACTION)), 1)
+
+
+# THE PEDDLER'S BUY: into the BAG, never onto a hero — equipping is a separate
+# act. **Refused while the bag is full**: a purchase is something the player
+# starts, so the honest answer is "not until there is room", and the Peddler's
+# own Sell rows are how he makes it (the pouch's NO SLOT at the same counter,
+# CT §3). Refused unaffordable too; either way no gold moves.
+func buy_rune(rune: Dictionary) -> bool:
+	if rune.is_empty() or bag_full():
+		return false
+	var price := rune_price(rune)
+	if gold < price:
+		return false
+	gold -= price
+	tally_add("gold_spent", price)
+	bag_rune(rune)
+	return true
+
+
+# THE PEDDLER'S SALE: a rune in the bag, for a third of what he would charge for it.
+# Worn runes are not sold from the counter; unequipping puts one in the bag.
+func sell_bag_rune(i: int) -> int:
+	if i < 0 or i >= rune_bag.size():
+		return 0
+	var value := rune_sell_value(rune_bag[i])
+	rune_bag.remove_at(i)
+	gold += value
+	tally_add("gold_earned", value)
+	return value
 
 
 # The opening kit this hero holds, by display name — `Classes.opening_kit`'s.
@@ -1638,13 +2019,25 @@ func runes_mode() -> String:
 # not own them — the candidates already in the triple being rolled. Empty
 # for every ordinary single-rune caller (shop, `grant_rune`), so their
 # behaviour is untouched.
+#
+# **BATCH HK §2 — AND NEVER A RUNE THE PARTY ALREADY HOLDS.** Every draw excludes
+# `party_rune_names()` — the bag, the party slot, a rune waiting on the full-bag
+# panel and every hero's worn runes — on the same channel `exclude_names` already
+# was, because it is the same question: a rune in the bag is exactly as unavailable
+# as one already worn. With the bag empty and nothing worn elsewhere the list is
+# the hero's own pouch, which the draw already excluded, so a pre-HK roll reads
+# as it did.
 func generate_rune(member: Dictionary, exclude_names: Array = []) -> Dictionary:
+	var excl: Array = exclude_names.duplicate()
+	for nm in party_rune_names():
+		if not excl.has(nm):
+			excl.append(nm)
 	match runes_mode():
 		"off":
 			return {}
 		"stats":
-			return Runes.template_rune(String(member["key"]), "", exclude_names)
-	return _apply_rune_power(Runes.generate(member, zone_idx + 1, exclude_names))
+			return Runes.template_rune(String(member["key"]), "", excl)
+	return _apply_rune_power(Runes.generate(member, zone_idx + 1, excl))
 
 
 # The single choke point for the power arm: generate_rune and grant_rune are the only paths
@@ -1682,9 +2075,8 @@ func _apply_rune_power(rune: Dictionary) -> Dictionary:
 func grant_rune(member: Dictionary) -> Dictionary:
 	if runes_mode() != "full":
 		return generate_rune(member)
-	var owned: Array = []
-	for r in member.get("runes", []):
-		owned.append(String(r["name"]))
+	# BATCH HK §2 — what the party holds, not only his pouch (`party_rune_names`).
+	var owned: Array = Runes.owned_names(member, party_rune_names())
 	var ordinary_ids: Array = []
 	for id in Runes.eligible_ids(member, owned):
 		if not Runes.is_engine_rune(String(id)):
@@ -1738,6 +2130,68 @@ func roll_rune_candidates(member: Dictionary) -> Array:
 	return out
 
 
+# ══ BATCH HK §1 — A RUNE DROPS AFTER EVERY NORMAL FIGHT, AND NOBODY CHOOSES IT ══
+#
+# **ONE RUNE AFTER EVERY NORMAL FIGHT, RANDOM, INTO THE BAG** (ruled). A NORMAL
+# fight is the `fight` node — `battle._check_end`'s victory branch asks this once
+# for it and for nothing else: an elite already pays a rune cache, a draft, an item
+# and gold, a mini-boss an upgrade pick and a zone boss a relic, a pick and a slot,
+# and the ruling names normal fights, so none of the three drops one
+# (`docs/reports/HK.md` §1).
+#
+# **ITS CLASS IS ONE OF THE PARTY'S** (ruled: only classes present). The draw is
+# the union of what every hero in the party could be offered — `eligible_ids` for
+# each, so GV's engine gate, a rune's required card and HB's pet gate all hold at
+# this door as at every roll — less everything the party already holds, deduped
+# by id, and ONE is picked from it flat. **Flat over runes, not over classes**: a
+# party rune is one entry in the same pool as every other (ruled: the same
+# source), where a class-first draw would hand the one party rune a fifth of every
+# drop. A party of one hero of each class meets the ruling's "every drop is useful
+# to someone" by construction, and a party of two of one class would share that
+# class's runes once, which is the rule holding if parties vary.
+#
+# Returns the rune, or {} when runes are off or nothing is left to drop.
+func roll_fight_drop() -> Dictionary:
+	var held := party_rune_names()
+	# Runes off drops nothing; the `stats` arm drops a stat stick through
+	# `generate_rune`, the ONE reach into the generated family (FM §1, which
+	# `check_fm` §1a counts), for a hero picked at random.
+	match runes_mode():
+		"off":
+			return {}
+		"stats":
+			if party.is_empty():
+				return {}
+			return generate_rune(party.pick_random())
+	var pool: Array = []
+	for m in party:
+		for id in Runes.eligible_ids(m, Runes.owned_names(m, held)):
+			if not pool.has(id):
+				pool.append(id)
+	if pool.is_empty():
+		return {}
+	return _apply_rune_power(Runes.build(String(pool.pick_random())))
+
+
+# The drop, rolled and put down: `{rune, where}` with `where` "bag" or "pending"
+# (a full bag: the map shows it beside the twenty), or {} when nothing dropped.
+func drop_after_fight() -> Dictionary:
+	var rune := roll_fight_drop()
+	if rune.is_empty():
+		return {}
+	return {"rune": rune, "where": bag_rune(rune)}
+
+
+# The hero a rune is for, as the victory card and the full-bag panel name him:
+# "the Warrior", or "the crest" for a crest rune. Read off the rune's class, so a
+# rune in the bag names its class whoever it was rolled against.
+func rune_for_label(rune: Dictionary) -> String:
+	if Runes.is_party_rune(rune):
+		return "the crest"
+	var ck := Runes.rune_class(rune)
+	return "the %s" % ck.capitalize() if ck != "" else "any hero"
+
+
 # ══ BATCH FD §1 — THE CACHE'S OFFER IS RE-ASKED AT PICK TIME, NOT ONLY ROLLED
 #    AT DROP TIME ═══════════════════════════════════════════════════════════
 #
@@ -1786,6 +2240,13 @@ func rune_choice(member: Dictionary) -> Array:
 	# BATCH GK — an engine rune in the engine slots is owned too.
 	for r in member.get("runes", []) + member.get("engines", []):
 		owned.append(String(r["name"]))
+	# BATCH HK §2 — AND WHAT THE PARTY HOLDS: a cache rolled before the same rune
+	# dropped into the bag must not hand over a second copy (FD §1's owned
+	# candidate, read across the party). Permanent for this answer — the bag's
+	# rune stays the party's until it is let go — so it is repaired away like one.
+	for nm in party_rune_names():
+		if not owned.has(nm):
+			owned.append(nm)
 	var kept: Array = []
 	var taken: Array = []
 	for c in triple:
@@ -2833,8 +3294,29 @@ func save_run() -> void:
 	# `companions_standing`, which rides the party dict the way `bm_equipped` and
 	# FK's two banks do. A GF build reading such a save restarts a fallen hero at
 	# 1 HP and fields no beast, which is a softer restart and not a misreading.
+	# v14 (BATCH HK §2): THE BAG. `rune_bag` (every rune the party holds that nobody
+	# wears), `crest` (the party slot, `party_runes`, saved under its screen name
+	# because "party" is retired from every string a sweep reads — DM §3) and
+	# `pending_rune_drops` (runes waiting on the full-bag panel) — three run-level
+	# keys, which is why a version moves where
+	# GK's engines and GH's losses, riding the party dict, moved none. TOLERANT, like
+	# v11–v13, and the refusal threshold below does not move: a v13 save loads with an
+	# empty bag and an empty slot, and **`_bag_the_unworn` then moves every rune a hero
+	# held and did not wear into the bag** — his unequipped pouch runes and his
+	# unslotted engine runes — **and touches nothing he wears**, so a run in progress
+	# comes back wearing exactly what it wore. The bag may open over its twenty: the
+	# migration drops nothing, and the cap binds at intake from then on.
+	# **AND THIS IS THE FIRST RUN-SAVE CHANGE AN OLDER BUILD MISREADS DESTRUCTIVELY**,
+	# which the v13 paragraph above said would be the one that needs a ceiling: a v13
+	# build reading a v14 save ignores the three keys, and its next save writes the
+	# bag away. **No ceiling is written here** — the brief ruled that the existing
+	# refusal path is followed and none invented, and a ceiling in this build could
+	# only ever refuse a LATER build's save, never protect this one from an older
+	# build. It is reported (`docs/reports/HK.md` §2) for the designer to rule.
 	file.store_var({
-		"version": 13, "party": party, "items": items, "gold": gold,
+		"version": 14, "party": party, "items": items, "gold": gold,
+		"rune_bag": rune_bag, "crest": party_runes,
+		"pending_rune_drops": pending_rune_drops,
 		"encounter": encounter, "pending_modifier": pending_modifier,
 		"pending_reward": pending_reward, "pending_event": pending_event,
 		"zone_bosses_cleared": zone_bosses_cleared,
@@ -2936,8 +3418,45 @@ func load_run() -> bool:
 	# BATCH CT §3: a v10 save has no offers and loads with none, which is right —
 	# it was written by a build that could not create one.
 	pending_item_offers = data.get("pending_item_offers", [])
+	# BATCH HK §2 — THE BAG, THE PARTY SLOT AND THE FULL-BAG QUEUE. A v13 save has
+	# none of the three and loads with all three empty; then every rune a hero held
+	# and did not wear moves into the bag, and nothing he wears moves at all (the
+	# version block in `save_run`).
+	rune_bag = _array_or_empty(data.get("rune_bag", []))
+	party_runes = _array_or_empty(data.get("crest", []))
+	pending_rune_drops = _array_or_empty(data.get("pending_rune_drops", []))
+	_bag_the_unworn()
 	active = true
 	return true
+
+
+func _array_or_empty(v: Variant) -> Array:
+	return v if v is Array else []
+
+
+# **THE MIGRATION, AND IT RUNS ON EVERY LOAD BECAUSE IT IS A NO-OP ON A SAVE THE BAG
+# WROTE.** A save from before the bag held each hero's unworn runes on the hero —
+# ordinary runes in `runes` with `equipped` false, engine runes in `engines` with
+# `equipped` false — and the bag is where an unworn rune lives now, so each is
+# moved there in the order it was held. **A worn rune is never touched**: the hero
+# goes on wearing it, in the same slot. Nothing is dropped, sold or refused, even
+# if the bag ends up past its twenty. Returns how many moved.
+func _bag_the_unworn() -> int:
+	var moved := 0
+	for m in party:
+		var md: Dictionary = m
+		for list_key in ["runes", "engines"]:
+			if not md.has(list_key):
+				continue
+			var kept: Array = []
+			for r in md[list_key]:
+				if bool((r as Dictionary).get("equipped", false)):
+					kept.append(r)
+				else:
+					rune_bag.append(r)
+					moved += 1
+			md[list_key] = kept
+	return moved
 
 
 # Trees are FIXED definitions in code: always swap the saved snapshot for
@@ -3461,8 +3980,10 @@ func claim_reward() -> Dictionary:
 			# a party of four and throw the reward away. The fallback keeps the
 			# random pick so the empty case still names a hero.
 			var takers: Array = []
+			# BATCH HK §2 — asked against what the PARTY holds, as the roll is.
+			var held_names := party_rune_names()
 			for m in party:
-				if not Runes.pool_empty_for(m):
+				if not Runes.pool_empty_for(m, held_names):
 					takers.append(m)
 			var looter: Dictionary = (takers if not takers.is_empty()
 				else party).pick_random()
@@ -3471,7 +3992,7 @@ func claim_reward() -> Dictionary:
 				if runes_mode() == "off":
 					return {"text": "", "shop": false}
 				return {"text": "RUNE (the bargain): nothing left to hand over — %s."
-					% Runes.empty_offer_reason(looter), "shop": false}
+					% Runes.empty_offer_reason(looter, held_names), "shop": false}
 			looter["rune_candidates"] = looter.get("rune_candidates", []) + [candidates]
 			looter["rune_picks_owed"] = int(looter.get("rune_picks_owed", 0)) + 1
 			# **AND THE COUNT IS READ OFF THE TRIPLE**, for the elite cache's

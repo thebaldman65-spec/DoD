@@ -633,7 +633,14 @@ func _s4_the_rule_everywhere() -> void:
 		calls += code.count("Runes.shown_desc(")
 		for needle in ['rune["desc"]', 'er["desc"]', 'rune.get("desc"', 'er.get("desc"']:
 			ok(not code.contains(needle), "§4: `%s` reads a rune's desc around the door (%s)" % [f, needle])
-	ok(calls == 6, "§4: the four screens ask the door %d times — six surfaces render a rune's text" % calls)
+	# **BATCH HK — THIRTEEN, NOT SIX: THE BAG ADDED SEVEN SURFACES THAT SHOW A RUNE'S TEXT**,
+	# and each asks the door: the Peddler's sale rows (`shop_screen`), and on the map the
+	# crest button's tooltip, the bag panel's crest rows and its bag rows, the full-bag
+	# panel's drop and its twenty, and the swap chooser. Still an equality, so an eighth
+	# surface — or one of these reading `desc` around the door — moves a line here; §4b
+	# drives the three that show a rune an engine rune can be (the bag, the full-bag
+	# panel, the sale rows) with all twenty-four.
+	ok(calls == 13, "§4: the four screens ask the door %d times — thirteen surfaces render a rune's text" % calls)
 	await _s4b_the_surfaces(ids)
 
 
@@ -653,7 +660,7 @@ func _s4b_the_surfaces(ids: Array) -> void:
 	var shop: Node = current_scene
 	ok(Gate.scene_name(self) == "Shop", "§4: the Peddler is not on screen (%s)" % Gate.scene_name(self))
 	var fit := {"shop": [], "pouch": [], "offer": []}
-	var shown := {"shop": 0, "pouch": 0, "offer": 0, "sheet": 0}
+	var shown := {"shop": 0, "pouch": 0, "offer": 0, "sheet": 0, "bag": 0, "full": 0, "sale": 0}
 	for id in ids:
 		var cls := Classes.engine_class(String(Runes.config(String(id))["engine"]))
 		var r: Dictionary = Runes.build(String(id))
@@ -726,10 +733,70 @@ func _s4b_the_surfaces(ids: Array) -> void:
 		if _shows(l4, String(id4), "the hero sheet"):
 			shown["sheet"] += 1
 		_run.party[idx4]["engines"] = []
+	# ── BATCH HK §2/§3 — THE BAG'S THREE SURFACES, ASKED THE SAME QUESTION ─────
+	# An engine rune in the bag, one waiting on the full-bag panel, and one on the
+	# Peddler's sale rows each show the engine's RULE and never its placeholder.
+	# **EACH INSTANCE CARRIES A STALE `desc` — THE ENTRY'S PLACEHOLDER — ON PURPOSE.**
+	# A fresh build's `desc` IS the rule (`Runes._engine_fields`), so a surface reading
+	# it around the door shows the right words and a drive of fresh builds cannot tell
+	# the two apart (HK's control G8 read §4's count red and this green). The door
+	# exists for the instance that rides a save while the rule moves; this is that
+	# instance, constructed, so a read around the door shows the placeholder here.
+	change_scene_to_file("res://scenes/map.tscn")
+	await Gate.frames(self, 8)
+	var mpb: Node = current_scene
+	for id5 in ids:
+		var r5: Dictionary = Runes.build(String(id5))
+		r5["desc"] = String(Runes.config(String(id5))["desc"])
+		_run.rune_bag = [r5]
+		_run.pending_rune_drops = []
+		_close_overlays(mpb)
+		mpb._bag_panel_open = false
+		await Gate.frames(self, 2)
+		mpb._open_bag_panel()
+		await Gate.frames(self, 3)
+		if _shows(_label_with(mpb, String(r5["name"]) + "  (for "), String(id5), "the bag"):
+			shown["bag"] += 1
+	_close_overlays(mpb)
+	mpb._bag_panel_open = false
+	var filler: Array = []
+	for fid in Runes.ids():
+		if filler.size() < 20 and not Runes.is_retired(String(fid)) and not Runes.is_engine_rune(String(fid)):
+			filler.append(Runes.build(String(fid)))
+	for id6 in ids:
+		var r6: Dictionary = Runes.build(String(id6))
+		r6["desc"] = String(Runes.config(String(id6))["desc"])
+		_run.rune_bag = filler.duplicate()
+		_run.pending_rune_drops = [r6]
+		for c6 in mpb.get_children():
+			if c6 is Control and c6.z_index == 74:
+				c6.queue_free()
+		await Gate.frames(self, 2)
+		mpb._check_rune_drops()
+		await Gate.frames(self, 3)
+		if _shows(_label_with(mpb, "A rune has dropped: %s" % String(r6["name"])), String(id6), "the full-bag panel"):
+			shown["full"] += 1
+	for c7 in mpb.get_children():
+		if c7 is Control and c7.z_index == 74:
+			c7.queue_free()
+	_run.pending_rune_drops = []
+	change_scene_to_file("res://scenes/shop.tscn")
+	await Gate.frames(self, 8)
+	var shop2: Node = current_scene
+	shop2.offers = []
+	for id8 in ids:
+		var r8: Dictionary = Runes.build(String(id8))
+		r8["desc"] = String(Runes.config(String(id8))["desc"])
+		_run.rune_bag = [r8]
+		shop2._draw_screen()
+		await Gate.frames(self, 3)
+		if _shows(_label_with(shop2, String(r8["name"]) + "  (for "), String(id8), "the Peddler's sale rows"):
+			shown["sale"] += 1
+	_run.rune_bag = []
 	for k in shown:
 		ok(int(shown[k]) == 24, "§4: %s showed the rule for %d of 24 engine runes" % [k, shown[k]])
-	print("    the rule, and no placeholder: the Peddler %d, the pouch %d, an offer %d, the hero sheet %d — of 24 each" % [
-		shown["shop"], shown["pouch"], shown["offer"], shown["sheet"]])
+	print("    the rule, and no placeholder: the Peddler %d, the pouch %d, an offer %d, the hero sheet %d, the bag %d, the full-bag panel %d, the Peddler's sale rows %d — of 24 each" % [
+		shown["shop"], shown["pouch"], shown["offer"], shown["sheet"], shown["bag"], shown["full"], shown["sale"]])
 	# THE FIT, MEASURED AND PRINTED — the brief asked for the measurement, not a repair.
 	var over_shop := 0
 	var worst_shop := ["", 0]

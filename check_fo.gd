@@ -147,8 +147,9 @@ func _s1_data() -> void:
 		"§1b: the card no longer states the SUBTRACTION — reads `%s`" % d)
 	ok(d.contains("never sooner than every %s" % _ordinal(FLOOR)),
 		"§1b: the card no longer states the FLOOR of %d — reads `%s`" % [FLOOR, d])
-	ok(int(e.get("price", 0)) == 100,
-		"§1b: Deepening Hex left the flat 100g (%s)" % e.get("price", "<absent>"))
+	# BATCH HK §3 — the flat price is 150g (ruled).
+	ok(int(e.get("price", 0)) == 150,
+		"§1b: Deepening Hex left the flat 150g (%s)" % e.get("price", "<absent>"))
 	ok(not e.has("retired"),
 		"§1b: Deepening Hex was RETIRED rather than re-pointed")
 
@@ -515,7 +516,9 @@ func _s2_data() -> void:
 	ok(String(sm.get("scope", "")) == "class:hunter"
 			and String(sm.get("written_for", "")) == "sharpshooter",
 		"§2c: the Shared Mark is scoped `%s`, written for `%s`" % [sm.get("scope", ""), sm.get("written_for", "")])
-	ok(int(sm.get("price", 0)) == 100, "§2c: the Shared Mark is not the flat 100g")
+	# BATCH HK §3 — the flat price is 150g (ruled). (§2a's retired Wide Watch keeps
+	# the 100 it was authored at: a retirement keeps its price.)
+	ok(int(sm.get("price", 0)) == 150, "§2c: the Shared Mark is not the flat 150g")
 	ok(not sm.has("condition")
 			and not (sm.get("payload", {}) as Dictionary).has("condition"),
 		"§2c: the Shared Mark carries a CONDITION — THRESHOLD and BREADTH are retired (FN)")

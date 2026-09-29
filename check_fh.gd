@@ -1010,19 +1010,30 @@ func _s3_the_rune_offer() -> void:
 		for r in (_run.party[who].get("runes", []) as Array) \
 				+ (_run.party[who].get("engines", []) as Array):
 			owned_before.append(String((r as Dictionary).get("name", "")))
-		# THE PRICE IS ON THE BUTTON, and EZ §0 ruled a rune is 100g flat.
+		# THE PRICE IS ON THE BUTTON: EZ §0 ruled a rune 100g flat, and HK §3 150g.
 		var gold_before: int = int(_run.gold)
+		# BATCH HK — the bag as the purchase finds it: the road above may have dropped
+		# runes into it already, so the arm below counts what the purchase ADDS.
+		var bag_before: int = (_run.rune_bag as Array).size()
 		if _press(shop, ["Buy — "]) != "":
 			await process_frame
 			await process_frame
 			bought = gold_before - int(_run.gold)
+			# **BATCH HK §3 — A PURCHASE GOES INTO THE BAG, NEVER ONTO THE HERO (ruled).**
+			# This asked the hero's own two lists to grow by the rune offered; the rune
+			# lands in `Run.rune_bag` now and equipping it is a separate act on the map,
+			# so the arm asks the bag for it, and the hero's lists for their NOT growing.
 			var owned_after: Array = []
 			for r2 in (_run.party[who].get("runes", []) as Array) \
 					+ (_run.party[who].get("engines", []) as Array):
 				owned_after.append(String((r2 as Dictionary).get("name", "")))
-			ok(owned_after.size() == owned_before.size() + 1,
-				"§3: a rune was bought for %dg and the hero's pouch did not grow" % bought)
-			ok(owned_after.has(String(rune.get("name", ""))),
+			var bag_names: Array = []
+			for r3 in _run.rune_bag:
+				bag_names.append(String((r3 as Dictionary).get("name", "")))
+			ok(bag_names.size() == bag_before + 1 and owned_after.size() == owned_before.size(),
+				"§3: a rune was bought for %dg and the bag did not grow by it alone (bag %d -> %d, hero %d -> %d)" % [
+					bought, bag_before, bag_names.size(), owned_before.size(), owned_after.size()])
+			ok(bag_names.has(String(rune.get("name", ""))),
 				"§3: the rune bought was not the rune offered")
 			print("    bought `%s` for %dg" % [String(rune.get("name", "")), bought])
 	ok(bought > 0, "§3: the Peddler's rune Buy button spent nothing")

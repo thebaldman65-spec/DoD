@@ -1,6 +1,6 @@
 # BATCH HF — FIFTEEN CLASS RUNES, AND THE BOAR.
 #
-#   §0  THE DATA — the fifteen as authored: each class-scoped, 100g, written for
+#   §0  THE DATA — the fifteen as authored: each class-scoped, 150g (HK §3), written for
 #       no lineage, its text the designer's word for word, its shape the brief's
 #       label, and NOT ONE an engine row; Tusk and Bristle the pet gate's row;
 #       Long Poison un-gated; Mark of the Hunt a companion row with a ruled seat
@@ -305,8 +305,9 @@ func _s0_the_data() -> void:
 			"§0: %s is not a live ordinary rune in `data/runes.json`" % id)
 		ok(String(e.get("name", "")) == String(want[1]) and String(e.get("desc", "")) == String(want[3]),
 			"§0: %s reads '%s' — '%s', not the designer's words" % [id, e.get("name", ""), e.get("desc", "")])
-		ok(String(e.get("scope", "")) == "class:" + String(want[0]) and int(e.get("price", 0)) == 100,
-			"§0: %s is scoped %s at %dg — it is the %s's, at the flat 100g" % [
+		# BATCH HK §3 — the flat price is 150g (ruled).
+		ok(String(e.get("scope", "")) == "class:" + String(want[0]) and int(e.get("price", 0)) == 150,
+			"§0: %s is scoped %s at %dg — it is the %s's, at the flat 150g" % [
 				id, e.get("scope", ""), int(e.get("price", 0)), want[0]])
 		ok(not e.has("written_for") and String(e.get("requires_ability", "")) == "",
 			"§0: %s claims a lineage or a card (%s / %s) — it was written for the class and reads its kit" % [
@@ -968,7 +969,15 @@ func _s3_the_offers() -> void:
 			"§3: a %s holding no engine is offered %d at spawn — HE's %d and HF's %d" % [cls, spawn_ids.size(), HE_SPAWN[cls], hf_mine.size()])
 		print("    %-8s spawn %2d / ceiling %2d — %s" % [cls, spawn_ids.size(), ceil_ids.size(), ", ".join(names)])
 	# EACH OF THE FIFTEEN AT THE THREE DOORS, for a hero of its class holding none.
+	# **BATCH HK §2 — ASKED WITH A PARTY THAT HOLDS NOTHING.** Since HK every roll
+	# refuses a rune anyone in the PARTY holds (`Run.party_rune_names`), and the
+	# run's party here is whatever the last `_bargain` seated — every other class
+	# holding every rune it could be offered, this class's among them the pass after.
+	# The stand-in `m2` is no member of it, so the party held all his runes and both
+	# doors read zero. The question is a hero holding none beside heroes holding
+	# none of his, so the party is fresh before the two tallies.
 	for cls2 in SEATS:
+		_run.new_run(SEATS, [], "standard")
 		var m2 := _member(String(cls2), "", [])
 		var peddler := _tally(m2, func(mm): return [_run.generate_rune(mm)])
 		var cache := _tally(m2, func(mm): return _run.roll_rune_candidates(mm))
@@ -988,6 +997,7 @@ func _s3_the_offers() -> void:
 	# and Long Poison are not.
 	var arms := [["no engine", [], true], ["Pack Bond", [_eng("pack")], true], ["Lethal Aim", [_eng("lethal_aim")], false]]
 	for arm in arms:
+		_run.new_run(SEATS, [], "standard")
 		var m3 := _member("hunter", "", arm[1])
 		var seen := _tally(m3, func(mm): return _run.roll_rune_candidates(mm))
 		var tb := int(seen.get("tusk_and_bristle", 0))

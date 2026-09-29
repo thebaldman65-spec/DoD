@@ -468,13 +468,13 @@
 	},
 	"deepening_hex": {
 		"name": "Deepening Hex", "scope": "class:cleric", "written_for": "occultist",
-		"price": 100,
+		"price": 150,
 		"desc": "Ruin detonates TWO stacks sooner, whatever the threshold is \u2014 every 8th instead of every 10th, and never sooner than every 8th.",
 		"payload": {"stat": {"rune_hex_deepen": 2}}
 	},
 	"standing_mark": {
 		"name": "Standing Mark", "scope": "class:cleric", "written_for": "occultist",
-		"price": 100,
+		"price": 150,
 		"desc": "Ruin's lifesteal cap rises from 40% to 60%.",
 		"payload": {"stat": {"rune_ruin_leech_cap": 0.20}}
 	},
@@ -488,69 +488,69 @@
 	},
 	"shared_ruin": {
 		"name": "Shared Ruin", "scope": "class:cleric", "written_for": "occultist",
-		"price": 100,
+		"price": 150,
 		"desc": "When Ruin detonates, HALF the stacks that survive the blast leap to the enemy carrying the most Ruin.",
 		"payload": {"stat": {"rune_shared_ruin": 1}}
 	},
 	"wide_rite": {
 		"name": "Wide Rite", "scope": "class:cleric", "written_for": "occultist",
-		"price": 100,
+		"price": 150,
 		"desc": "Every debuff he applies marks 1 MORE Ruin.",
 		"payload": {"stat": {"rune_wide_rite": 1}}
 	},
 	"open_wound": {
 		"name": "Open Wound", "scope": "class:cleric", "written_for": "occultist",
-		"price": 100,
+		"price": 150,
 		"requires_ability": "Shadowrend",
 		"desc": "Shadowrend marks Ruin on EVERY enemy, not one — but Ruin now decays by 1 each turn.",
 		"payload": {"stat": {"rune_open_wound": 1}}
 	},
 	"standing_wall": {
 		"name": "Standing Wall", "scope": "class:warrior", "written_for": "warden",
-		"price": 100,
+		"price": 150,
 		"desc": "A block HALVES the Heavy Plating bonus instead of clearing it.",
 		"payload": {"stat": {"rune_standing_wall": 1}}
 	},
 	"bracing_line": {
 		"name": "Bracing Line", "scope": "class:warrior", "written_for": "warden",
-		"price": 100,
+		"price": 150,
 		"desc": "Allies take 5% less damage while his Heavy Plating bonus stands at +32% or higher.",
 		"payload": {"stat": {"rune_bracing_line": 5}}
 	},
 	"split_shield": {
 		"name": "Split Shield", "scope": "class:warrior", "written_for": "warden",
-		"price": 100,
+		"price": 150,
 		"requires_ability": "Shieldwall",
 		"desc": "Shieldwall is split in two: half its Block for him, and that same half for the ally he sets it in front of.",
 		"payload": {"stat": {"rune_split_shield": 1}}
 	},
 	"long_watch": {
 		"name": "Long Watch", "scope": "class:warrior", "written_for": "warden",
-		"price": 100,
+		"price": 150,
 		"desc": "His Break damage carries to a second enemy.",
 		"payload": {"stat": {"rune_long_watch": 1}}
 	},
 	"bared_plate": {
 		"name": "Bared Plate", "scope": "class:warrior", "written_for": "warden",
-		"price": 100,
+		"price": 150,
 		"desc": "+25% Break damage — but he can no longer Block.",
 		"payload": {"stat": {"rune_bared_plate_bd": 0.25, "rune_no_block": 1}}
 	},
 	"keen_focus": {
 		"name": "Keen Focus", "scope": "class:hunter", "written_for": "sharpshooter",
-		"price": 100,
+		"price": 150,
 		"desc": "A target switch HALVES his Focus instead of clearing it.",
 		"payload": {"stat": {"rune_keen_focus": 1}}
 	},
 	"heavy_bolts": {
 		"name": "Heavy Bolts", "scope": "class:hunter", "written_for": "sharpshooter",
-		"price": 100,
+		"price": 150,
 		"desc": "His patience turns into force at 80 Focus rather than 100.",
 		"payload": {"stat": {"rune_heavy_bolts": 20}}
 	},
 	"ambush": {
 		"name": "Ambush", "scope": "class:hunter", "written_for": "sharpshooter",
-		"price": 100,
+		"price": 150,
 		"requires_ability": "Called Volley",
 		"desc": "Called Volley strikes 0.5% harder for every point of Focus he is holding, and still does not clear it.",
 		"payload": {"stat": {"rune_ambush": 1}}
@@ -564,542 +564,542 @@
 	},
 	"shared_mark": {
 		"name": "Shared Mark", "scope": "class:hunter", "written_for": "sharpshooter",
-		"price": 100,
+		"price": 150,
 		"desc": "An ally attacking the enemy he last attacked builds him 5 Focus.",
 		"payload": {"stat": {"rune_shared_mark": 1}}
 	},
 	"long_draw_press": {
 		"name": "Long Draw", "scope": "class:hunter", "written_for": "sharpshooter",
-		"price": 100,
+		"price": 150,
 		"desc": "His basic attack runs one EXTRA press at every stage — but a missed press drains 16 Focus.",
 		"payload": {"stat": {"rune_long_draw_presses": 1}}
 	},
 	"long_leash": {
 		"name": "Long Leash", "scope": "class:hunter", "written_for": "beastmaster",
-		"price": 100,
+		"price": 150,
 		"desc": "The Loyalty split point moves from 8 to 11 — three more stacks buy the companion's strike step before the boon takes over.",
 		"payload": {"stat": {"rune_long_leash": 3}}
 	},
 	"shared_hide": {
 		"name": "Shared Hide", "scope": "class:hunter", "written_for": "beastmaster",
-		"price": 100,
+		"price": 150,
 		"desc": "The companion's blows finally read the damage buffs it is already wearing — and the two the hunter carries for a bond that broke.",
 		"payload": {"stat": {"rune_shared_hide": 1}}
 	},
 	"answering_pack": {
 		"name": "Answering Pack", "scope": "class:hunter", "written_for": "beastmaster",
-		"price": 100,
+		"price": 150,
 		"desc": "Once a fight, the deepest bond takes the blow that would fell the hunter.",
 		"payload": {"stat": {"rune_answering_pack": 1}}
 	},
 	"second_whistle": {
 		"name": "Second Whistle", "scope": "class:hunter", "written_for": "beastmaster",
-		"price": 100,
+		"price": 150,
 		"desc": "Summon Companion fields each of the three companions with 3 Loyalty already earned.",
 		"payload": {"stat": {"rune_second_whistle": 3}}
 	},
 	"shared_scent": {
 		"name": "Shared Scent", "scope": "class:hunter", "written_for": "beastmaster",
-		"price": 100,
+		"price": 150,
 		"desc": "A fallen companion's Loyalty carries to the next one called.",
 		"payload": {"stat": {"rune_shared_scent": 1}}
 	},
 	"bared_fang": {
 		"name": "Bared Fang", "scope": "class:hunter", "written_for": "beastmaster",
-		"price": 100,
+		"price": 150,
 		"desc": "+30% companion damage — but the companion can no longer be healed.",
 		"payload": {"stat": {"rune_bared_fang": 0.30}}
 	},
 
 	"last_word": {
 		"name": "Last Word", "scope": "class:warrior", "written_for": "berserker",
-		"price": 100,
+		"price": 150,
 		"desc": "Every time he is brought below a quarter health, he acts immediately. Healing back up and diving again re-arms it.",
 		"payload": {"stat": {"rune_last_word": 1}}
 	},
 	"blood_debt_rune": {
 		"name": "Blood Debt", "scope": "class:warrior", "written_for": "berserker",
-		"price": 100,
+		"price": 150,
 		"requires_ability": "Blood Price",
 		"desc": "Blood Price costs the ENEMY's health instead of his — and their missing health becomes his Frenzy steps.",
 		"payload": {"stat": {"rune_blood_debt": 1}}
 	},
 	"butchers_bill": {
 		"name": "Butcher's Bill", "scope": "class:warrior", "written_for": "berserker",
-		"price": 100,
+		"price": 150,
 		"requires_ability": "Hack and Slash",
 		"desc": "Landing a Bleed with Hack and Slash has a 50% chance to add another strike — once a cast.",
 		"payload": {"stat": {"rune_butchers_bill": 50}}
 	},
 	"open_vein": {
 		"name": "Open Vein", "scope": "class:warrior", "written_for": "berserker",
-		"price": 100,
+		"price": 150,
 		"desc": "Rage he spends counts DOUBLE toward Blood Frenzy. The band still caps at 20 steps — it fills sooner, never deeper.",
 		"payload": {"stat": {"rune_open_vein": 1}}
 	},
 	"slaughterhouse_rune": {
 		"name": "Slaughterhouse", "scope": "class:warrior", "written_for": "berserker",
-		"price": 100,
+		"price": 150,
 		"desc": "An enemy that bleeds out grants him a free action — one a turn, however many wounds open.",
 		"payload": {"stat": {"rune_bleedout_action": 1}}
 	},
 
 	"long_fuse": {
 		"name": "Long Fuse", "scope": "class:mage", "written_for": "pyromancer",
-		"price": 100,
+		"price": 150,
 		"desc": "Burn no longer counts down. Only consumption ends it.",
 		"payload": {"stat": {"rune_long_fuse": 1}}
 	},
 	"ashfall": {
 		"name": "Ashfall", "scope": "class:mage", "written_for": "pyromancer",
-		"price": 100,
+		"price": 150,
 		"requires_ability": "Funeral Pyre",
 		"desc": "Funeral Pyre shields for what the Burn would still deal WITHOUT consuming it — and so refunds no Mana.",
 		"payload": {"stat": {"rune_ashfall": 1}}
 	},
 	"chain_fire": {
 		"name": "Chain Fire", "scope": "class:mage", "written_for": "pyromancer",
-		"price": 100,
+		"price": 150,
 		"requires_ability": "Firedraw",
 		"desc": "Firedraw pulls ALL the Burn from every other enemy onto the target instead of a fixed amount from each.",
 		"payload": {"stat": {"rune_chain_fire": 1}}
 	},
 	"ember_leap": {
 		"name": "Ember Leap", "scope": "class:mage", "written_for": "pyromancer",
-		"price": 100,
+		"price": 150,
 		"desc": "When Burn is consumed, the fire jumps to the enemy carrying the LEAST Burn, at half the turns.",
 		"payload": {"stat": {"rune_ember_leap": 1}}
 	},
 	"pyre_debt": {
 		"name": "Pyre Debt", "scope": "class:mage", "written_for": "pyromancer",
-		"price": 100,
+		"price": 150,
 		"desc": "Overburn refunds DOUBLE — but the fire he takes back burns him for a tenth of it.",
 		"payload": {"stat": {"rune_pyre_debt": 10}}
 	},
 
 	"second_winter": {
 		"name": "Second Winter", "scope": "class:mage", "written_for": "cryomancer",
-		"price": 100,
+		"price": 150,
 		"desc": "Breaking a hold leaves the enemy Chilled to the depth the hold was worth, instead of on one stack.",
 		"payload": {"stat": {"rune_second_winter": 1}}
 	},
 	"killing_cold_fk": {
 		"name": "Killing Cold", "scope": "class:mage", "written_for": "cryomancer",
-		"price": 100,
+		"price": 150,
 		"desc": "An enemy at maximum Chill takes 5% of its maximum health per Chilled stack whenever he casts.",
 		"payload": {"stat": {"rune_killing_cold": 5}}
 	},
 	"glass_prison": {
 		"name": "Glass Prison", "scope": "class:mage", "written_for": "cryomancer",
-		"price": 100,
+		"price": 150,
 		"requires_ability": "Glacial Prison",
 		"desc": "Glacial Prison holds TWO enemies — and both cells are glass: any damage shatters them.",
 		"payload": {"stat": {"rune_glass_prison": 1}}
 	},
 	"cold_snap_fk": {
 		"name": "Cold Snap", "scope": "class:mage", "written_for": "cryomancer",
-		"price": 100,
+		"price": 150,
 		"requires_ability": "Ice Lance",
 		"desc": "Ice Lance strikes EVERY Chilled enemy instead of one.",
 		"payload": {"stat": {"rune_cold_snap": 1}}
 	},
 	"deep_cold": {
 		"name": "Deep Cold", "scope": "class:mage", "written_for": "cryomancer",
-		"price": 100,
+		"price": 150,
 		"desc": "Chilled stacks he applies no longer cap at four.",
 		"payload": {"stat": {"rune_deep_cold": 1}}
 	},
 
 	"resonant_core_fk": {
 		"name": "Resonant Core", "scope": "class:mage", "written_for": "arcanist",
-		"price": 100,
+		"price": 150,
 		"desc": "A tenth of his Resonance carries into the next battle.",
 		"payload": {"stat": {"rune_resonant_carry": 10}}
 	},
 	"half_note": {
 		"name": "Half Note", "scope": "class:mage", "written_for": "arcanist",
-		"price": 100,
+		"price": 150,
 		"requires_ability": "Arcane Bolt",
 		"desc": "Arcane Bolt keeps THREE QUARTERS of the meter instead of half.",
 		"payload": {"stat": {"rune_half_note": 25}}
 	},
 	"overtone": {
 		"name": "Overtone", "scope": "class:mage", "written_for": "arcanist",
-		"price": 100,
+		"price": 150,
 		"desc": "Every third cast builds DOUBLE Resonance.",
 		"payload": {"stat": {"rune_overtone": 3}}
 	},
 	"dissonance": {
 		"name": "Dissonance", "scope": "class:mage", "written_for": "arcanist",
-		"price": 100,
+		"price": 150,
 		"desc": "The damage curve reads TWICE his Resonance — and so does the taken curve.",
 		"payload": {"stat": {"rune_dissonance": 1}}
 	},
 	"overflow": {
 		"name": "Overflow", "scope": "class:mage", "written_for": "arcanist",
-		"price": 100,
+		"price": 150,
 		"desc": "A crit builds THREE stacks instead of two.",
 		"payload": {"stat": {"rune_overflow": 1}}
 	},
 
 	"whetstone": {
 		"name": "Whetstone", "scope": "class:warrior", "written_for": "swordmaster",
-		"price": 100,
+		"price": 150,
 		"desc": "The Aggressive bonus grows 3% for each turn he stays in it, and resets on a switch.",
 		"payload": {"stat": {"rune_growing_edge": 1, "rune_seasoned_off_bonus": 0.03}}
 	},
 	"mirror_guard": {
 		"name": "Mirror Guard", "scope": "class:warrior", "written_for": "swordmaster",
-		"price": 100,
+		"price": 150,
 		"desc": "While Defensive, damage he blocks or parries is dealt back at HALF.",
 		"payload": {"stat": {"rune_mirror_guard": 50}}
 	},
 	"open_line": {
 		"name": "Open Line", "scope": "class:warrior", "written_for": "swordmaster",
-		"price": 100,
+		"price": 150,
 		"requires_ability": "Guard Change",
 		"desc": "Guard Change no longer switches stance — it grants BOTH stances' upsides for a turn, and no recoil.",
 		"payload": {"stat": {"rune_open_line": 1}}
 	},
 	"long_blade": {
 		"name": "Long Blade", "scope": "class:warrior", "written_for": "swordmaster",
-		"price": 100,
+		"price": 150,
 		"requires_ability": "Sever",
 		"desc": "Sever's cooldown clears on ANY Broken enemy, not only the one it struck.",
 		"payload": {"stat": {"rune_long_blade": 1}}
 	},
 	"naked_blade": {
 		"name": "Naked Blade", "scope": "class:warrior", "written_for": "swordmaster",
-		"price": 100,
+		"price": 150,
 		"desc": "Both stances' upsides are DOUBLED — and both downsides with them.",
 		"payload": {"stat": {"rune_naked_blade": 1}}
 	},
 
 	"vigil": {
 		"name": "Vigil", "scope": "class:cleric", "written_for": "holy",
-		"price": 100,
+		"price": 150,
 		"desc": "Mercy also accrues when an ally is healed from below half back above it.",
 		"payload": {"stat": {"rune_vigil": 1}}
 	},
 	"open_hand_fk": {
 		"name": "Open Hand", "scope": "class:cleric", "written_for": "holy",
-		"price": 100,
+		"price": 150,
 		"requires_ability": "Divine Plea",
 		"desc": "Divine Plea heals EVERY ally below half to full, not only one.",
 		"payload": {"stat": {"rune_open_hand": 1}}
 	},
 	"long_watch_holy": {
 		"name": "Carried Mercy", "scope": "class:cleric", "written_for": "holy",
-		"price": 100,
+		"price": 150,
 		"desc": "Mercy no longer clears between battles.",
 		"payload": {"stat": {"rune_long_watch_mercy": 1}}
 	},
 	"grace": {
 		"name": "Grace", "scope": "class:cleric", "written_for": "holy",
-		"price": 100,
+		"price": 150,
 		"requires_ability": "Hymn of Hope",
 		"desc": "Hymn of Hope's healing is dealt again at the end of the turn, at half.",
 		"payload": {"stat": {"rune_grace": 50}}
 	},
 	"martyr_fk": {
 		"name": "Martyr", "scope": "class:cleric", "written_for": "holy",
-		"price": 100,
+		"price": 150,
 		"desc": "He gains Mercy when an enemy strikes him — but he can no longer be healed by anyone but himself.",
 		"payload": {"stat": {"rune_martyr": 1}}
 	},
 
 	"layered_aegis": {
 		"name": "Layered Aegis", "scope": "class:cleric", "written_for": "inquisitor",
-		"price": 100,
+		"price": 150,
 		"requires_ability": "Divine Shield",
 		"desc": "Divine Shield holds on TWO allies instead of one — the second is whoever is lowest.",
 		"payload": {"stat": {"rune_layered_aegis": 1}}
 	},
 	"deep_absorb": {
 		"name": "Deep Absorb", "scope": "class:cleric", "written_for": "inquisitor",
-		"price": 100,
+		"price": 150,
 		"desc": "An absorb grants 3 Faith instead of 2.",
 		"payload": {"stat": {"rune_deep_absorb": 1}}
 	},
 	"fourth_stack": {
 		"name": "Fourth Stack", "scope": "class:cleric", "written_for": "inquisitor",
-		"price": 100,
+		"price": 150,
 		"desc": "Allies hold FOUR stacks of Faith before releasing instead of three.",
 		"payload": {"stat": {"rune_fourth_stack": 1}}
 	},
 	"bare_altar": {
 		"name": "Bare Altar", "scope": "class:cleric", "written_for": "inquisitor",
-		"price": 100,
+		"price": 150,
 		"desc": "Faith builds TWICE as fast — and Divine Shield absorbs half as much.",
 		"payload": {"stat": {"rune_bare_altar": 1}}
 	},
 
 	"long_poison": {
 		"name": "Long Poison", "scope": "class:hunter", "written_for": "mystic",
-		"price": 100,
+		"price": 150,
 		"desc": "His Poison never expires. It can still be cleansed.",
 		"payload": {"stat": {"rune_long_poison": 1}}
 	},
 	"second_barb": {
 		"name": "Second Barb", "scope": "class:hunter", "written_for": "mystic",
-		"price": 100,
+		"price": 150,
 		"desc": "An enemy that strikes him takes a DIFFERENT affliction each time, cycling as Stalking Horse does.",
 		"payload": {"stat": {"rune_second_barb": 1}}
 	},
 	"full_board": {
 		"name": "Full Board", "scope": "class:hunter", "written_for": "mystic",
-		"price": 100,
+		"price": 150,
 		"requires_ability": "Cull",
 		"desc": "Cull bills for the whole board and no longer consumes it.",
 		"payload": {"stat": {"rune_full_board": 1}}
 	},
 	"carrion": {
 		"name": "Carrion", "scope": "class:hunter", "written_for": "mystic",
-		"price": 100,
+		"price": 150,
 		"requires_ability": "Downwind",
 		"desc": "Downwind copies onto EVERY other enemy, not one.",
 		"payload": {"stat": {"rune_carrion": 1}}
 	},
 	"thin_blood": {
 		"name": "Thin Blood", "scope": "class:hunter", "written_for": "mystic",
-		"price": 100,
+		"price": 150,
 		"desc": "The barb fires on EVERY strike instead of a quarter — and his Poison deals no damage.",
 		"payload": {"stat": {"rune_thin_blood": 1}}
 	},
 
 	"abundance": {
 		"name": "Abundance", "scope": "class:cleric",
-		"price": 100,
+		"price": 150,
 		"desc": "Healing beyond an ally's missing health becomes a shield on them.",
 		"payload": {"stat": {"rune_abundance": 1.0}}
 	},
 	"returned_burden": {
 		"name": "Returned Burden", "scope": "class:cleric",
-		"price": 100,
+		"price": 150,
 		"desc": "Every harmful effect Unburden removes is cast onto an enemy.",
 		"payload": {"stat": {"rune_returned_burden": 1.0}}
 	},
 	"burning_ground": {
 		"name": "Burning Ground", "scope": "class:cleric",
-		"price": 100,
+		"price": 150,
 		"desc": "Consecration also deals holy damage to every enemy each turn it lasts.",
 		"payload": {"stat": {"rune_burning_ground": 0.05}}
 	},
 	"eleventh_hour": {
 		"name": "Eleventh Hour", "scope": "class:cleric",
-		"price": 100,
+		"price": 150,
 		"desc": "Ministration heals twice as much on an ally below 25% health.",
 		"payload": {"stat": {"rune_eleventh_hour": 1.0}}
 	},
 	"vow_of_silence": {
 		"name": "Vow of Silence", "scope": "class:cleric",
-		"price": 100,
+		"price": 150,
 		"desc": "His heals are 50% stronger, and he deals no damage.",
 		"payload": {"stat": {"rune_vow_of_silence": 0.5}}
 	},
 	"unravel": {
 		"name": "Unravel", "scope": "class:mage",
-		"price": 100,
+		"price": 150,
 		"desc": "Elemental Weakness spreads to every enemy, not just the target.",
 		"payload": {"stat": {"rune_unravel": 1.0}}
 	},
 	"seeking_missiles": {
 		"name": "Seeking Missiles", "scope": "class:mage",
-		"price": 100,
+		"price": 150,
 		"desc": "One extra missile for each enemy under Elemental Weakness.",
 		"payload": {"stat": {"rune_seeking_missiles": 1.0}}
 	},
 	"detonating_ward": {
 		"name": "Detonating Ward", "scope": "class:mage",
-		"price": 100,
+		"price": 150,
 		"desc": "When it breaks or ends, it deals the damage it absorbed to every enemy.",
 		"payload": {"stat": {"rune_detonating_ward": 1.0}}
 	},
 	"clarity": {
 		"name": "Clarity", "scope": "class:mage",
-		"price": 100,
+		"price": 150,
 		"desc": "A spell cast at full Mana deals 50% more damage.",
 		"payload": {"stat": {"rune_clarity": 0.5}}
 	},
 	"profligate": {
 		"name": "Profligate", "scope": "class:mage",
-		"price": 100,
+		"price": 150,
 		"desc": "His spells deal 40% more damage and cost twice the Mana.",
 		"payload": {"stat": {"rune_profligate": 0.4}}
 	},
 	"goading_roar": {
 		"name": "Goading Roar", "scope": "class:warrior",
-		"price": 100,
+		"price": 150,
 		"desc": "Taunted enemies deal 25% less damage while they must attack him.",
 		"payload": {"stat": {"rune_goading_roar": 0.25}}
 	},
 	"rending_blows": {
 		"name": "Rending Blows", "scope": "class:warrior",
-		"price": 100,
+		"price": 150,
 		"desc": "Sunder stacks — each Crushing Blow on an already-Sundered enemy deepens it, up to three times.",
 		"payload": {"stat": {"rune_rending_blows": 3.0}}
 	},
 	"grudge": {
 		"name": "Grudge", "scope": "class:warrior",
-		"price": 100,
+		"price": 150,
 		"desc": "He deals 40% more damage to the last enemy that struck him, and 20% less to every other.",
 		"payload": {"stat": {"rune_grudge_struck": 0.4, "rune_grudge_rest": -0.2}}
 	},
 	"opportunist": {
 		"name": "Opportunist", "scope": "class:hunter",
-		"price": 100,
+		"price": 150,
 		"desc": "Powershot deals double damage to a stunned enemy.",
 		"payload": {"stat": {"rune_opportunist_shot": 1.0}}
 	},
 	"tusk_and_bristle": {
 		"name": "Tusk and Bristle", "scope": "class:hunter",
-		"price": 100,
+		"price": 150,
 		"desc": "Adds a fourth choice to Summon Companion: Aper, the boar.",
 		"payload": {"stat": {"rune_tusk_and_bristle": 1.0}}
 	},
 
 	"engine_berserker": {
 		"name": "Rune of the Berserker", "scope": "class:warrior",
-		"price": 100, "engine": "bloodrage",
+		"price": 150, "engine": "bloodrage",
 		"desc": "The Berserker's engine.",
 		"payload": {}
 	},
 	"engine_warden": {
 		"name": "Rune of the Warden", "scope": "class:warrior",
-		"price": 100, "engine": "heavy_plating",
+		"price": 150, "engine": "heavy_plating",
 		"desc": "The Warden's engine.",
 		"payload": {}
 	},
 	"engine_swordmaster": {
 		"name": "Rune of the Swordmaster", "scope": "class:warrior",
-		"price": 100, "engine": "seasoned",
+		"price": 150, "engine": "seasoned",
 		"desc": "The Swordmaster's engine.",
 		"payload": {}
 	},
 	"engine_momentum": {
 		"name": "Rune of the Vanguard", "scope": "class:warrior",
-		"price": 100, "engine": "momentum",
+		"price": 150, "engine": "momentum",
 		"desc": "A Warrior engine.",
 		"payload": {}
 	},
 	"engine_pyromancer": {
 		"name": "Rune of the Pyromancer", "scope": "class:mage",
-		"price": 100, "engine": "overburn",
+		"price": 150, "engine": "overburn",
 		"desc": "The Pyromancer's engine.",
 		"payload": {}
 	},
 	"engine_cryomancer": {
 		"name": "Rune of the Cryomancer", "scope": "class:mage",
-		"price": 100, "engine": "permafrost",
+		"price": 150, "engine": "permafrost",
 		"desc": "The Cryomancer's engine.",
 		"payload": {}
 	},
 	"engine_arcanist": {
 		"name": "Rune of the Arcanist", "scope": "class:mage",
-		"price": 100, "engine": "resonance",
+		"price": 150, "engine": "resonance",
 		"desc": "The Arcanist's engine.",
 		"payload": {}
 	},
 	"engine_channel": {
 		"name": "Rune of the Invoker", "scope": "class:mage",
-		"price": 100, "engine": "channel",
+		"price": 150, "engine": "channel",
 		"desc": "A Mage engine.",
 		"payload": {}
 	},
 	"engine_holy": {
 		"name": "Rune of the Holy", "scope": "class:cleric",
-		"price": 100, "engine": "mercy",
+		"price": 150, "engine": "mercy",
 		"desc": "The Holy's engine.",
 		"payload": {}
 	},
 	"engine_inquisitor": {
 		"name": "Rune of the Devout", "scope": "class:cleric",
-		"price": 100, "engine": "conviction",
+		"price": 150, "engine": "conviction",
 		"desc": "The Devout's engine.",
 		"payload": {}
 	},
 	"engine_occultist": {
 		"name": "Rune of the Occultist", "scope": "class:cleric",
-		"price": 100, "engine": "old_gods",
+		"price": 150, "engine": "old_gods",
 		"desc": "The Occultist's engine.",
 		"payload": {}
 	},
 	"engine_sanctity": {
 		"name": "Rune of the Hierophant", "scope": "class:cleric",
-		"price": 100, "engine": "sanctity",
+		"price": 150, "engine": "sanctity",
 		"desc": "A Cleric engine.",
 		"payload": {}
 	},
 	"engine_beastmaster": {
 		"name": "Rune of the Beastmaster", "scope": "class:hunter",
-		"price": 100, "engine": "pack",
+		"price": 150, "engine": "pack",
 		"desc": "The Beastmaster's engine.",
 		"payload": {}
 	},
 	"engine_sharpshooter": {
 		"name": "Rune of the Sharpshooter", "scope": "class:hunter",
-		"price": 100, "engine": "lethal_aim",
+		"price": 150, "engine": "lethal_aim",
 		"desc": "The Sharpshooter's engine.",
 		"payload": {}
 	},
 	"engine_mystic": {
 		"name": "Rune of the Survivalist", "scope": "class:hunter",
-		"price": 100, "engine": "trapper",
+		"price": 150, "engine": "trapper",
 		"desc": "The Survivalist's engine.",
 		"payload": {}
 	},
 
 	"engine_savage_assault": {
 		"name": "Rune of the Reaver", "scope": "class:warrior",
-		"price": 100, "engine": "savage_assault",
+		"price": 150, "engine": "savage_assault",
 		"desc": "A Warrior engine.",
 		"payload": {}
 	},
 	"engine_redoubt": {
 		"name": "Rune of the Bastion", "scope": "class:warrior",
-		"price": 100, "engine": "redoubt",
+		"price": 150, "engine": "redoubt",
 		"desc": "A Warrior engine.",
 		"payload": {}
 	},
 	"engine_cast_echo": {
 		"name": "Rune of the Weaver", "scope": "class:mage",
-		"price": 100, "engine": "cast_echo",
+		"price": 150, "engine": "cast_echo",
 		"desc": "A Mage engine.",
 		"payload": {}
 	},
 	"engine_siphon": {
 		"name": "Rune of the Leech", "scope": "class:mage",
-		"price": 100, "engine": "siphon",
+		"price": 150, "engine": "siphon",
 		"desc": "A Mage engine.",
 		"payload": {}
 	},
 	"engine_covenant_oath": {
 		"name": "Rune of the Oathkeeper", "scope": "class:cleric",
-		"price": 100, "engine": "covenant_oath",
+		"price": 150, "engine": "covenant_oath",
 		"desc": "A Cleric engine.",
 		"payload": {}
 	},
 	"engine_judgment": {
 		"name": "Rune of the Arbiter", "scope": "class:cleric",
-		"price": 100, "engine": "judgment",
+		"price": 150, "engine": "judgment",
 		"desc": "A Cleric engine.",
 		"payload": {}
 	},
 	"engine_quarry_hunt": {
 		"name": "Rune of the Tracker", "scope": "class:hunter",
-		"price": 100, "engine": "quarry_hunt",
+		"price": 150, "engine": "quarry_hunt",
 		"desc": "A Hunter engine.",
 		"payload": {}
 	},
 	"engine_opening_strike": {
 		"name": "Rune of the Skirmisher", "scope": "class:hunter",
-		"price": 100, "engine": "opening_strike",
+		"price": 150, "engine": "opening_strike",
 		"desc": "A Hunter engine.",
 		"payload": {}
 	},
 	"engine_field_kit": {
 		"name": "Rune of the Medic", "scope": "class:hunter",
-		"price": 100, "engine": "field_kit",
+		"price": 150, "engine": "field_kit",
 		"desc": "A Hunter engine.",
 		"payload": {}
 	}

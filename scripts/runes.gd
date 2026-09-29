@@ -872,7 +872,91 @@ static func display_name(entry: Dictionary) -> String:
 static func scope_band(scope: String) -> String:
 	if scope.begins_with("class:"):
 		return "class"
+	if is_party_scope(scope):
+		return "party"
 	return "universal"
+
+
+# ══ BATCH HK §4 — THE PARTY SCOPE: THE MACHINERY, AND NO RUNE IN IT ══════════
+#
+# **A PARTY RUNE IS CLASS-NEUTRAL AND IS WORN BY THE PARTY, NOT BY A HERO** (ruled):
+# it has its own slot (`Run.PARTY_RUNE_SLOTS`, one, and the cap is that one
+# constant), it takes no hero's slot, and its payload is applied to every HERO at
+# the spawn through the same `Talents.apply_payload` every rune uses — the one
+# party-level door this game has, because nothing in it reads the party as a
+# whole (`docs/reports/HK.md` §4 is the census of what a party rune could read).
+# **It drops, is sold and sits in the bag exactly as any other rune** (ruled: the
+# same source), so it rolls for every hero — `_scope_ok` passes it for all of
+# them — and a roll that asks several heroes dedupes it by id.
+#
+# **NONE IS AUTHORED (ruled).** `data/runes.json` holds no `party` entry, and every
+# door below works over zero of them: the scope, the slot, the drop, the bag, the
+# Peddler and the display. `check_hk` drives the whole path with a party rune
+# built in the fixture and never written to the file — GK built the engine slots
+# and GO filled them nine batches later, and this is that shape again.
+const PARTY_SCOPE := "party"
+
+
+static func is_party_scope(scope: String) -> bool:
+	return scope == PARTY_SCOPE
+
+
+# Whether a rune instance is a party rune. **Read off the data by id where the
+# id resolves** (GS §3's reason for `shown_desc`: an instance rides the save),
+# and off the instance only for one the data does not hold — a fixture's.
+static func is_party_rune(rune: Dictionary) -> bool:
+	var id := String(rune.get("id", ""))
+	if id != "" and _load().has(id):
+		return is_party_scope(String(config(id).get("scope", "")))
+	return is_party_scope(String(rune.get("scope", "")))
+
+
+# ══ BATCH HK §2 — WHOSE RUNE IT IS, NOW THAT FOUR CLASSES SHARE ONE BAG ═══════
+#
+# The class a rune is written for, by its code key ("warrior"), or "" for a party
+# rune and a universal one. **It is what the bag names beside a rune and what
+# decides who may wear it** — `Run.can_wear` asks `_scope_ok`, and this is the
+# same string read for a screen. HE §4 took the scope's BAND off every surface
+# because a hero only ever saw his own class's runes and the band told him
+# nothing; **the bag holds all four classes' runes at once**, so naming the one a
+# rune is for is the information the panel exists to give. It is the class's
+# name, never a band word and never a band's tint.
+static func rune_class(rune: Dictionary) -> String:
+	var id := String(rune.get("id", ""))
+	var scope := String(config(id).get("scope", "")) if id != "" and _load().has(id) \
+		else String(rune.get("scope", ""))
+	if scope.begins_with("class:"):
+		return scope.trim_prefix("class:")
+	return ""
+
+
+# Whether this hero may WEAR `rune` in one of his own slots — an ordinary rune or
+# an engine rune of his class (`_scope_ok`, the scope the offer reads). A party
+# rune is worn by the party slot and never by a hero, so it is never his to wear.
+# Whether a slot is FREE is the caller's question (`Run.rune_toggle_refusal`).
+static func wearable_by(rune: Dictionary, member: Dictionary) -> bool:
+	if is_party_rune(rune):
+		return false
+	var id := String(rune.get("id", ""))
+	var scope := String(config(id).get("scope", "")) if id != "" and _load().has(id) \
+		else String(rune.get("scope", "universal"))
+	return _scope_ok({"scope": scope}, member)
+
+
+# ══ BATCH HK §3 — WHAT A RUNE COSTS, READ LIVE AT ONE DOOR ═══════════════════
+#
+# **THE PRICE IS THE DATA'S, READ OFF THE ENTRY BY ID** — the Peddler's Buy and
+# his offer to buy it back both ask here, so the two cannot disagree, and an
+# instance built before a price moved (a save carries every rune it holds) sells
+# at today's price rather than the day it was built (GS §3's rule for a rune's
+# text, one field over). A generated stat stick, which the data does not hold,
+# carries its own `price` (`TEMPLATE_PRICE`). **Every live rune is 150g since HK**
+# (ruled, `check_ez` §0 asserts it); the retired keep their authored prices.
+static func price_of(rune: Dictionary) -> int:
+	var id := String(rune.get("id", ""))
+	if id != "" and _load().has(id):
+		return int(config(id).get("price", rune.get("price", 0)))
+	return int(rune.get("price", 0))
 
 
 # **`shown_scope` STOOD HERE (HC §1) AND WENT WITH THE BAND AT HE §4.** It was the
@@ -892,9 +976,16 @@ static func scope_band(scope: String) -> String:
 # it is the three gates `eligible_ids` asks below, never the lineage. A stray
 # `spec:` entry is refused here, and `test_runes` holds the data to the two bands
 # so one cannot be authored in silence.
+#
+# **BATCH HK §4 — AND A THIRD SCOPE IS RULED: `party`.** A party rune is
+# class-neutral, so it passes for every hero, which is what lets every roll door
+# offer it (ruled: it drops from the same source as any other rune). It names no
+# class and no lineage, so the refusal of a `spec:` entry below is untouched.
 static func _scope_ok(entry: Dictionary, member: Dictionary) -> bool:
 	var scope := String(entry.get("scope", "universal"))
 	if scope == "universal":
+		return true
+	if is_party_scope(scope):
 		return true
 	if scope.begins_with("class:"):
 		return scope.trim_prefix("class:") == String(member["key"])
@@ -1313,23 +1404,32 @@ static func eligible_ids(member: Dictionary, owned_names: Array) -> Array:
 # lists or present in both.
 # The member's pouch by display name — the array `eligible_ids` takes as its
 # second argument. Four sites built it inline; one is enough.
-static func owned_names(member: Dictionary) -> Array:
+#
+# **BATCH HK §2 — AND WHAT THE PARTY HOLDS BESIDE IT.** `held` is every rune the
+# party holds that is not on this hero (`Run.party_rune_names`: the bag, the party
+# slot, a drop waiting on the full-bag panel, every hero's worn runes and engines).
+# A static function here cannot see the `Run` autoload, so the caller passes it;
+# the default is empty, which is the pre-HK reading, byte for byte.
+static func owned_names(member: Dictionary, held: Array = []) -> Array:
 	var out: Array = []
 	for r in member.get("runes", []):
 		out.append(String(r["name"]))
+	for nm in held:
+		if not out.has(String(nm)):
+			out.append(String(nm))
 	return out
 
 
 # **THE ONE QUESTION ALL FOUR OFFER SITES ASK BEFORE THEY DRAW.** "Is there a
 # rune left for this hero" — the pouch and the kit both read, so it is the same
 # test `generate` itself applies rather than a second opinion about it.
-static func pool_empty_for(member: Dictionary) -> bool:
-	return eligible_ids(member, owned_names(member)).is_empty()
+static func pool_empty_for(member: Dictionary, held: Array = []) -> bool:
+	return eligible_ids(member, owned_names(member, held)).is_empty()
 
 
-static func locked_by_kit(member: Dictionary) -> Array:
+static func locked_by_kit(member: Dictionary, held: Array = []) -> Array:
 	var kit := kit_names(member)
-	var owned := owned_names(member)
+	var owned := owned_names(member, held)
 	var out: Array = []
 	var data := _load()
 	for id in data:
@@ -1352,9 +1452,9 @@ static func locked_by_kit(member: Dictionary) -> Array:
 # NOT the complement of `eligible_ids` the way `locked_by_kit` is: a rune can be
 # on both lists (Half Note waits on Arcane Bolt AND on Resonance), and the
 # sentence below says so rather than naming only one of the two.
-static func locked_by_engine(member: Dictionary) -> Array:
+static func locked_by_engine(member: Dictionary, held: Array = []) -> Array:
 	var equipped := held_engines(member)
-	var owned := owned_names(member)
+	var owned := owned_names(member, held)
 	var out: Array = []
 	var data := _load()
 	for id in data:
@@ -1375,9 +1475,9 @@ static func locked_by_engine(member: Dictionary) -> Array:
 
 # BATCH HB — the runes left for this member that the dismissed pet withholds: a
 # rune whose engine half passes and which needs a companion he does not field.
-static func locked_by_pet(member: Dictionary) -> Array:
+static func locked_by_pet(member: Dictionary, held: Array = []) -> Array:
 	var equipped := held_engines(member)
-	var owned := owned_names(member)
+	var owned := owned_names(member, held)
 	var out: Array = []
 	var data := _load()
 	for id in data:
@@ -1455,13 +1555,13 @@ static func cards_wait_on(names: Array) -> String:
 # and telling him so would be the lie FM §2 wrote this function to stop. Each
 # sentence is true of every rune it covers: where some wait on a card and some
 # on the engine, the sentence names both doors.
-static func empty_offer_reason(member: Dictionary) -> String:
-	var base := _empty_offer_base(member)
+static func empty_offer_reason(member: Dictionary, held: Array = []) -> String:
+	var base := _empty_offer_base(member, held)
 	# BATCH HB — A FOURTH CAUSE: what is left needs a companion the hero has
 	# dismissed. It is added AFTER the three the sentence already had, so each of
 	# those still reads byte for byte as it did, and it says which rune to take
 	# off rather than which to put on.
-	if locked_by_pet(member).is_empty():
+	if locked_by_pet(member, held).is_empty():
 		return base
 	var clause := "need a companion, which the %s dismisses" % dismisser_name(held_engines(member))
 	if base == "they already carry every rune written for that class":
@@ -1470,9 +1570,9 @@ static func empty_offer_reason(member: Dictionary) -> String:
 
 
 # The three causes the sentence had before HB, unchanged.
-static func _empty_offer_base(member: Dictionary) -> String:
-	var by_engine := locked_by_engine(member)
-	var by_kit := not locked_by_kit(member).is_empty()
+static func _empty_offer_base(member: Dictionary, held: Array = []) -> String:
+	var by_engine := locked_by_engine(member, held)
+	var by_kit := not locked_by_kit(member, held).is_empty()
 	if not by_engine.is_empty() and by_kit:
 		return "the runes left for that class wait on abilities they have not earned, or on %s being equipped" % \
 			waited_on(by_engine)

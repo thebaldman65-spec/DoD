@@ -16,6 +16,62 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-09-28 &mdash; Batch HK: RUNES DROP, AND THERE IS A BAG</h2>
+<p><b>A rune now drops after every normal fight, into a bag of twenty the heroes share, and the Peddler buys runes as
+well as selling them.</b> The first batch authored from a playthrough: the reward loop the designer ruled after
+playing. <b>No rune was authored, retuned or re-scoped</b> &mdash; one price moved, by ruling. Full working:
+<code>docs/reports/HK.md</code>.</p>
+
+<p><b>&sect;1 &mdash; A RUNE DROPS AFTER EVERY NORMAL FIGHT.</b> Win a normal fight and one rune drops, at random, and
+the victory card names it. It is always a rune for one of the four heroes' classes, it is never a rune the party
+already holds, and a rune that reads an engine only drops while that engine is equipped &mdash; the same rules every
+other way of getting a rune follows. It goes into the bag, not onto a hero. <b>An elite, a mini-boss and a boss do not
+drop one</b>: each already pays its own reward (a rune cache, an upgrade pick, a relic and an ability pick), and the
+ruling named normal fights, so whether they should is left to the designer.</p>
+
+<p><b>&sect;2 &mdash; THE BAG HOLDS TWENTY.</b> Every rune the heroes hold that nobody is wearing sits in one bag, shared,
+and it holds twenty. A rune worn does not count. Equipping takes a rune out of the bag and unequipping puts it back,
+from each hero's rune panel on the map; when every slot is full, a rune in the bag can be <b>swapped</b> for one he
+wears. <b>A rune that drops onto a full bag is shown beside the twenty</b>: drop one of them to take it, or leave it
+behind &mdash; nothing is lost without being shown, and nothing is sold for you. A full bag also refuses an unequip
+until there is room, and a swap always works. The map has a new row under the pouch: the bag's count, which opens the
+bag, where a rune can be dropped for good (two presses). <b>A run already in progress keeps everything</b>: what a hero
+was wearing he still wears, in the same slot, and anything he held without wearing moves into the bag. The save moved to
+version 14; an older save still loads.</p>
+
+<p><b>&sect;3 &mdash; THE PEDDLER BUYS AND SELLS.</b> <b>A rune costs 150 gold now (it was 100), and selling one back
+returns 50 &mdash; a third.</b> He still offers one rune to every hero, drawn the same way and never one the party
+already holds; a rune bought goes into the bag, an engine rune too. A new column on his counter lists the bag's runes,
+each with a Sell that asks twice. <b>A full bag greys every Buy</b> and says so at the top of the rune column; selling
+one makes room. The shop discount cuts the sale as it cuts the price.</p>
+
+<p><b>&sect;4 &mdash; A SLOT FOR THE WHOLE PARTY: THE CREST.</b> A new kind of rune is built: one that is not for any
+class and is worn by all four heroes at once, in a slot of its own &mdash; <b>the Crest</b> (a proposed name; the
+word "party" is kept off every screen). There is one crest slot, and raising it later is one number. <b>No crest rune
+exists yet</b>, by ruling: the slot, the drop, the bag, the Peddler and the screens all work with none in the game, and
+the batch's own check proves them with one it builds and never writes into the game's data. A crest rune's effect is
+applied to every hero as a fight begins, and the report lists what else such a rune could and could not reach, for the
+design of the first ones.</p>
+
+<p><b>Also:</b> the fight node's tooltip, the Peddler's, the first-run card and the glossary's Runes, Peddler and Map
+Nodes entries say how runes arrive now; the run simulation takes the drop the same way (it wears one when a slot is
+free, and lets it go on a full bag); a new check, <code>check_hk</code>, drives all of it &mdash; including a whole run
+through the real screens.</p>
+
+<p><b>The checks that moved, and why.</b> Six pinned the old price and read 150 now (<code>check_ez</code>,
+<code>check_fk</code>, <code>check_fn</code>, <code>check_fo</code>, <code>check_go</code>, <code>check_hf</code>); a
+rune the party holds is never offered again, so four checks that measured a stand-in hero beside a party holding runes
+start from a fresh party (<code>check_hf</code>, <code>check_he</code>, <code>check_fm</code>, and
+<code>check_gt</code>'s fight fixture, which also emptied the bag); <code>check_fh</code> and <code>check_gt</code> look
+for a bought rune in the bag; <code>check_fd</code> counts the drop as a fifth way a rune arrives; <code>check_gs</code>
+counts thirteen places a rune's text is shown, where it counted six, and drives the three new ones with every engine
+rune; and <code>check_gt</code>, the check that the Peddler's and the rune panel's buttons can always be reached,
+measured the Peddler's new sale column as if it were his rune column &mdash; it finds the rune column by its Buy buttons
+now, and opens the rune panel on a full bag of one class's runes: the list scrolls and Close does not move. One check's
+count moved with no edit to it: <code>check_gp</code>'s seeded run meets different cards, because the drop spends the
+dice after every fight (proved by switching the drop off, which gave back the old reading exactly). Table:
+<code>docs/reports/HK.md</code> &sect;7c.</p>
+
 <h2>2026-09-25 &mdash; Batch HJ: THE LAST TWENTY-THREE</h2>
 <p><b>The last twenty-three checks still asking the merged game an old question are repaired and proved, and with them
 every check the census at Batch HA found is accounted for.</b> The debug toggle that pre-grants cards now grants the

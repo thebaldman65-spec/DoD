@@ -1,5 +1,14 @@
 # Shop node: spend gold on consumables and class runes (run-long ability
 # and stat modifiers, one copy each).
+#
+# BATCH HK §3 — THE PEDDLER BUYS AND SELLS (ruled). A rune is 150g (the data's
+# price, read at `Run.rune_price`) and goes into the BAG, never onto a hero —
+# equipping is a separate act, on the map. He buys a rune back out of the bag for
+# a third (`Run.rune_sell_value`: 50g at list), two presses like the pouch's Sell,
+# because selling is a decision rather than free money and the Peddler is where a
+# player fixes the luck of a drop he cannot choose. **One rune is still rolled for
+# every hero through the same gates** (GV's engine gate holds at his door), never
+# one the party already holds, and a full bag greys every Buy and says why.
 extends Node2D
 
 const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
@@ -29,6 +38,9 @@ var _spent: Array = []  # member indices whose authored pool is exhausted
 # rather than on the run — leaving the shop with a button armed and coming back
 # must not find it still armed.
 var _sell_pending := ""
+# BATCH HK §3 — which bag rune's Sell is armed, by the rune's name, or "". Its own
+# state beside the pouch's, because arming one must not arm the other.
+var _rune_sell_pending := ""
 
 
 func _ready() -> void:
@@ -60,7 +72,15 @@ func _roll_offers() -> void:
 		# The member dict (Batch X): eligibility reads spec, trophies, and
 		# the owned pouch. Empty = runes off (DOD_SIM_RUNES), or — since FM §1
 		# — the hero's authored pool is spent.
-		var rune: Dictionary = Run.generate_rune(member)
+		# BATCH HK §4 — AND NOT A RUNE ALREADY ON THE COUNTER FOR ANOTHER HERO: a
+		# party rune rolls for every hero, so without this two heroes could be
+		# offered the same one. It rides `exclude_names`, the channel a triple's
+		# own candidates already use; with no party rune authored it excludes
+		# nothing a class-scoped offer could have drawn.
+		var on_counter: Array = []
+		for o in offers:
+			on_counter.append(String((o["rune"] as Dictionary)["name"]))
+		var rune: Dictionary = Run.generate_rune(member, on_counter)
 		if rune.is_empty():
 			_spent.append(i)
 			continue
@@ -70,7 +90,7 @@ func _roll_offers() -> void:
 		for attempt in 4:
 			if not owned_names.has(rune["name"]):
 				break
-			rune = Run.generate_rune(member)
+			rune = Run.generate_rune(member, on_counter)
 			# **AND THE RE-ROLL CAN COME BACK EMPTY NOW.** It could not before
 			# FM §1 — the family always had one more stick — and reading
 			# `rune["name"]` off `{}` on the next pass is a hard error, not a
@@ -217,7 +237,8 @@ func _draw_screen() -> void:
 
 	# Rune offers column.
 	var rune_header := Label.new()
-	rune_header.text = "RUNES  (one of each, permanent for this run)"
+	rune_header.text = "RUNES  (one of each, %dg — into the bag: %d/%d)" % [
+		_price_line(), Run.rune_bag.size(), Run.BAG_CAP]
 	rune_header.add_theme_font_size_override("font_size", 17)
 	rune_header.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
 	rune_header.position = Vector2(620, 130)
@@ -244,6 +265,17 @@ func _draw_screen() -> void:
 	var rune_list := VBoxContainer.new()
 	rune_list.add_theme_constant_override("separation", 10)
 	rune_scroll.add_child(rune_list)
+	# BATCH HK §3 — A FULL BAG SAYS SO AT THE TOP OF THE COLUMN, not only on the
+	# greyed Buy's tooltip: CO §3's rule is that a darkened button owes its reason,
+	# and a reason only a hover can find is one most players never read.
+	if Run.bag_full() and not offers.is_empty():
+		var full_lbl := Label.new()
+		full_lbl.text = "The bag is full at %d. Sell a rune from it, on the left, to buy one." % Run.BAG_CAP
+		full_lbl.add_theme_font_size_override("font_size", 14)
+		full_lbl.add_theme_color_override("font_color", Color(0.95, 0.75, 0.4))
+		full_lbl.custom_minimum_size = Vector2(RUNE_PANEL_W, 0)
+		full_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		rune_list.add_child(full_lbl)
 	for i in offers.size():
 		var offer: Dictionary = offers[i]
 		var member: Dictionary = Run.party[offer["member_idx"]]
@@ -258,7 +290,7 @@ func _draw_screen() -> void:
 		# BATCH HE §4 — NO SCOPE BAND (ruled). The row read "<name>  [Class]" on
 		# every rune, because a hero is offered only his own class's; the label
 		# told nobody anything and it is gone, with the band's tint.
-		label.text = "%s  (for %s %d)\n%s — equip it from that hero's sheet" % [rune["name"],
+		label.text = "%s  (for %s %d)\n%s — into the bag; equip it on the map" % [rune["name"],
 			member["key"].capitalize(), offer["member_idx"] + 1,
 			Runes.shown_desc(rune)]
 		label.add_theme_font_size_override("font_size", 14)
@@ -266,9 +298,15 @@ func _draw_screen() -> void:
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		vbox.add_child(label)
 		var buy := Button.new()
-		buy.text = "Buy — %dg" % _price(rune["price"])
+		buy.text = "Buy — %dg" % Run.rune_price(rune)
 		buy.custom_minimum_size = Vector2(140, 34)
-		buy.disabled = Run.gold < _price(rune["price"])
+		# BATCH HK §3 — A FULL BAG IS A WALL AT THE COUNTER, NOT AN OFFER. A purchase
+		# is something the player starts, so the honest answer is "not until there
+		# is room" — the Sell rows on the left are how he makes it (the pouch's NO
+		# SLOT at this same counter, CT §3).
+		buy.disabled = Run.gold < Run.rune_price(rune) or Run.bag_full()
+		if Run.bag_full():
+			buy.tooltip_text = "The bag is full at %d. Sell a rune from it\n(on the left) to make room." % Run.BAG_CAP
 		buy.pressed.connect(_buy_rune.bind(i))
 		vbox.add_child(buy)
 
@@ -298,13 +336,15 @@ func _draw_screen() -> void:
 			var mi: int = int(_spent[si])
 			var spent_label := Label.new()
 			spent_label.text = "The Peddler has nothing for %s — %s." % [
-				_hero_label(mi), Runes.empty_offer_reason(Run.party[mi])]
+				_hero_label(mi), Runes.empty_offer_reason(Run.party[mi], Run.party_rune_names())]
 			spent_label.add_theme_font_size_override("font_size", 14)
 			spent_label.add_theme_color_override("font_color", Color(0.58, 0.55, 0.62))
 			# GT §1 — in the column's own stack, under the offers.
 			spent_label.custom_minimum_size = Vector2(RUNE_PANEL_W, 0)
 			spent_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			rune_list.add_child(spent_label)
+
+	_draw_bag_sale()
 
 	var leave := Button.new()
 	leave.text = "Leave the Shop"
@@ -378,6 +418,7 @@ func _sell_item(id: String) -> void:
 	# one before it, so only ever one button is hot.
 	if _sell_pending != id:
 		_sell_pending = id
+		_rune_sell_pending = ""
 		_draw_screen()
 		return
 	_sell_pending = ""
@@ -390,14 +431,106 @@ func _sell_item(id: String) -> void:
 
 
 func _buy_rune(offer_idx: int) -> void:
+	if offer_idx < 0 or offer_idx >= offers.size():
+		return
 	var offer: Dictionary = offers[offer_idx]
 	var rune: Dictionary = offer["rune"]
-	if Run.gold < _price(rune["price"]):
+	# BATCH HK §3 — `Run.buy_rune` is the one door: it refuses on a full bag or an
+	# empty purse before any gold moves, and a rune bought goes into the BAG (an
+	# engine rune too — GK slotted one at purchase; the bag is where it waits now).
+	if not Run.buy_rune(rune):
 		return
-	Run.gold -= _price(rune["price"])
-	Run.tally_add("gold_spent", _price(rune["price"]))
-	var member: Dictionary = Run.party[offer["member_idx"]]
-	# BATCH GK — an ENGINE rune goes to the engine slots, not the pouch; one door.
-	Run.hold_rune(member, rune)
 	offers.remove_at(offer_idx)
+	_draw_screen()
+
+
+# The list price every rune on the counter shows, for the column's header: the
+# price of the first offer, or of a live rune if the counter is bare. Every live
+# rune shares it (`check_ez` §0), so one figure is true of the column.
+func _price_line() -> int:
+	if not offers.is_empty():
+		return Run.rune_price(offers[0]["rune"])
+	for id in Runes.ids():
+		if not Runes.is_retired(String(id)):
+			return Run.rune_price(Runes.build(String(id)))
+	return 0
+
+
+# ══ BATCH HK §3 — THE PEDDLER BUYS RUNES OUT OF THE BAG ══════════════════════
+#
+# **THE LEFT COLUMN UNDER THE SUPPLIES, WHICH HAS STOOD EMPTY SINCE FD §1 TOOK THE
+# DRAFT PICK OFF THE COUNTER** (y 452 to the Leave button). One row per rune in the
+# bag, in the bag's order, each with its own Sell at a third of its price — two
+# presses, the pouch's Sell shape, because one press would destroy a rune the
+# player meant to keep. **Worn runes are not listed**: a rune is sold from the
+# bag, and unequipping one on the map puts it there. The rows live in ONE bounded
+# scroller that ends above Leave (GT §1: text never moves the way out).
+const SALE_TOP := 452
+const SALE_W := 464
+
+
+func _draw_bag_sale() -> void:
+	var head := Label.new()
+	head.text = "SELL FROM THE BAG  (%d/%d — a third of the price back)" % [
+		Run.rune_bag.size(), Run.BAG_CAP]
+	head.add_theme_font_size_override("font_size", 15)
+	head.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
+	head.position = Vector2(140, SALE_TOP)
+	add_child(head)
+	var scroll := ScrollContainer.new()
+	scroll.position = Vector2(140, SALE_TOP + 24)
+	scroll.size = Vector2(SALE_W, RUNE_COLUMN_BOTTOM - SALE_TOP - 24)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	add_child(scroll)
+	var rows := VBoxContainer.new()
+	rows.add_theme_constant_override("separation", 4)
+	scroll.add_child(rows)
+	if Run.rune_bag.is_empty():
+		var none := Label.new()
+		none.text = "The bag is empty. Runes that drop after a fight land\nthere, and so does every rune bought here."
+		none.add_theme_font_size_override("font_size", 12)
+		none.add_theme_color_override("font_color", Color(0.58, 0.55, 0.62))
+		rows.add_child(none)
+	for bi in Run.rune_bag.size():
+		var r: Dictionary = Run.rune_bag[bi]
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 8)
+		rows.add_child(row)
+		var nm := String(r.get("name", ""))
+		var armed: bool = _rune_sell_pending == nm
+		var sell := Button.new()
+		var value: int = Run.rune_sell_value(r)
+		sell.text = "Sure? +%dg" % value if armed else "Sell +%dg" % value
+		sell.custom_minimum_size = Vector2(96, 26)
+		sell.add_theme_font_size_override("font_size", 11)
+		if armed:
+			sell.add_theme_color_override("font_color", Color(0.95, 0.75, 0.4))
+		sell.tooltip_text = "Sell %s for %dg of the %dg it costs.\n%s" % [nm, value,
+			Run.rune_price(r), "Press again to confirm." if armed else "Press twice to sell."]
+		sell.pressed.connect(_sell_rune.bind(bi))
+		row.add_child(sell)
+		var lbl := Label.new()
+		lbl.text = "%s  (for %s) — %s" % [nm, Run.rune_for_label(r).trim_prefix("the "),
+			Runes.shown_desc(r)]
+		lbl.add_theme_font_size_override("font_size", 11)
+		lbl.add_theme_color_override("font_color", Runes.RUNE_TINT)
+		lbl.custom_minimum_size = Vector2(SALE_W - 120, 0)
+		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		row.add_child(lbl)
+
+
+# First press ARMS, second press sells — keyed by the rune's name, so a redraw
+# that reorders nothing keeps the armed row, and arming another disarms it.
+func _sell_rune(bag_idx: int) -> void:
+	if bag_idx < 0 or bag_idx >= Run.rune_bag.size():
+		_rune_sell_pending = ""
+		return
+	var nm := String((Run.rune_bag[bag_idx] as Dictionary).get("name", ""))
+	if _rune_sell_pending != nm:
+		_rune_sell_pending = nm
+		_sell_pending = ""
+		_draw_screen()
+		return
+	_rune_sell_pending = ""
+	Run.sell_bag_rune(bag_idx)
 	_draw_screen()

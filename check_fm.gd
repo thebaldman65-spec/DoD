@@ -595,6 +595,12 @@ func _s3_the_re_ask() -> void:
 # left two — and the cache threw both away, printed nothing and owed nothing.
 func _s4_the_short_triple() -> void:
 	print("\n§4 — a short triple is offered rather than discarded")
+	# **BATCH HK §2 — ROLLED BESIDE A PARTY THAT HOLDS NOTHING.** Since HK a roll
+	# refuses a rune anyone in the PARTY holds (`Run.party_rune_names`), and the
+	# run's party here is whatever the sections above left seated, runes and all;
+	# the stand-in member below is no member of it. The question is a hero owning
+	# `own` of his runes and no one else owning any, so the party is fresh first.
+	_run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
 	var sizes: Array = []
 	var wrong: Array = []
 	for ckey in Classes.SPEC_IDS:

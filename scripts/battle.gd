@@ -1390,6 +1390,21 @@ func _spawn_units() -> void:
 								Runes.held_engines(Run.party[i]), rc_worn).split("\n")
 						rc_tail = " — %s %s" % [rc_lines[0], rc_lines[1]]
 					_rune_roll_call.append("%s: %s%s" % [cfg["unit_name"], rune["name"], rc_tail])
+			# BATCH HK §4 — THE PARTY SLOT'S RUNE, ON EVERY HERO. A party rune is worn by
+			# the party, so its payload is applied to each of the four through the same
+			# door every rune uses, at the same moment: the one party-level mechanism this
+			# game has is "every hero", because nothing reads the party whole. **A HERO,
+			# NOT AN ALLY** — this is the spawn of the four, and a companion does not
+			# exist yet (CV §4's first structural reason). Named once in the roll call,
+			# not once a hero. No party rune is authored; this runs over none today.
+			for pr in Run.party_runes:
+				var pr_d: Dictionary = pr
+				if not bool(pr_d.get("equipped", false)):
+					continue
+				Talents.apply_payload(cfg, pr_d.get("payload", {}), 1,
+					{"learned": Run.party[i].get("talents", {}), "member": Run.party[i]})
+				if i == 0:
+					_rune_roll_call.append("the crest: %s" % String(pr_d.get("name", "")))
 			# BATCH HC §5 — AND A SLOTTED ENGINE RUNE THAT SITS OUT IS NAMED IN THE SAME
 			# ROLL CALL, WITH THE SAME CLAUSE (ruled: GX's tell, the same surfaces). An
 			# engine is not otherwise in this list — its chip names it — so a Rune of
@@ -26866,6 +26881,13 @@ func _check_end() -> void:
 		var spoils := ""
 		if reward_text != "":
 			spoils += "\n\nTHE BARGAIN\n%s" % reward_text
+		# BATCH HK §1 — A NORMAL FIGHT DROPS ONE RUNE, RANDOM, INTO THE BAG (ruled).
+		# The `fight` node only: an elite pays its cache below, a mini-boss its
+		# upgrade pick, a boss its relic, pick and slot — and the ruling names normal
+		# fights, so none of those three drops one too. The roll is `Run`'s one door
+		# (`drop_after_fight`), and a full bag holds the rune for the map's panel.
+		if node_type == "fight":
+			spoils += _fight_drop_line()
 		# Elite spoils: a rune for a random hero + a consumable on top of the
 		# bigger gold purse — the snowball reward for hunting elites.
 		if node_type == "elite":
@@ -26937,7 +26959,8 @@ func _check_end() -> void:
 					String(looter["key"]).capitalize(), candidates.size()]
 			elif Run.runes_mode() != "off":
 				spoils += "\nRUNE CACHE: nothing in it for the %s —\n%s." % [
-					_hero_label(looter), Runes.empty_offer_reason(looter)]
+					_hero_label(looter), Runes.empty_offer_reason(looter,
+						Run.party_rune_names())]
 			# Gravelight Lantern: the spoils pile runs deeper.
 			for extra_i in int(Run.relic_add("loot_extra")):
 				spoils += "%s (Gravelight Lantern)" % _drop_item_line(Run.random_loot())
@@ -27115,6 +27138,23 @@ func _drop_item_line(id: String) -> String:
 	# carry smaller ones since §4.
 	return "\n%s — the heroes already carry %d, and cannot hold more." % [
 		Run.ITEM_INFO[id][0], Run.item_stack_cap(id)]
+
+
+# BATCH HK §1 — the drop's line on the victory card. It names the rune, whose it
+# is and where it went; a full bag says the map holds it (the full-bag panel), and
+# a drop that found nothing says so — CO §3's rule that an absent reward reads as a
+# bug. Runes off keeps the silence the other rune doors keep.
+func _fight_drop_line() -> String:
+	var drop: Dictionary = Run.drop_after_fight()
+	if drop.is_empty():
+		if Run.runes_mode() == "off":
+			return ""
+		return "\n\nRUNE DROP: nothing — no rune is left that\nthese heroes can be offered."
+	var rune: Dictionary = drop["rune"]
+	var where := "into the bag." if String(drop["where"]) == "bag" \
+		else "the bag is full: choose on the map."
+	return "\n\nRUNE DROP: %s, for %s —\n%s" % [String(rune["name"]),
+		Run.rune_for_label(rune), where]
 
 
 func _hero_label(member: Dictionary) -> String:

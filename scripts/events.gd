@@ -332,8 +332,11 @@ static func apply(run: Node, fx: Dictionary) -> String:
 			var any_payable := false
 			for i in int(fx.get("amount", 1)):
 				var payable: Array = []
+				# BATCH HK §2 — against what the PARTY holds (the bag included),
+				# the same list the grant's own roll excludes.
+				var held_names: Array = run.party_rune_names()
 				for m in run.get("party"):
-					if not Runes.pool_empty_for(m):
+					if not Runes.pool_empty_for(m, held_names):
 						payable.append(m)
 				if payable.is_empty():
 					break
@@ -356,8 +359,15 @@ static func apply(run: Node, fx: Dictionary) -> String:
 					break  # runes off — say nothing rather than lie
 				rune["equipped"] = not open_slot.is_empty()
 				# BATCH GK — through the one door, so an engine rune takes an engine slot.
-				run.hold_rune(taker, rune)
-				granted.append("%s (%s)" % [String(rune["name"]), _who(taker)])
+				# BATCH HK §2 — what is not worn goes to the bag, and a full bag holds it
+				# on the map's full-bag panel; the line says which.
+				var landed: String = run.hold_rune(taker, rune)
+				var where := ""
+				if landed == "bag":
+					where = " — into the bag"
+				elif landed == "pending":
+					where = " — the bag is full: choose on the map"
+				granted.append("%s (%s)%s" % [String(rune["name"]), _who(taker), where])
 			if granted.is_empty():
 				# **AN EVENT IS A TRADE AND THE PLAYER HAS USUALLY PAID ALREADY**
 				# (§4's own worked example is "health for a rune"), so a blank

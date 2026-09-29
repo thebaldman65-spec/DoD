@@ -1,6 +1,6 @@
 # BATCH FK — FORTY RUNES, EIGHT SPECS, AND THE INSTRUMENT FOR WHAT BINDS THEM.
 #
-#   §1  the pool census: 60 live across all twelve specs, flat 100g, and the
+#   §1  the pool census: 60 live across all twelve specs, flat 150g (HK §3), and the
 #       TWO SCOPE STRINGS THAT WOULD ROLL FOR NOBODY are absent by assertion
 #   §2  NO THRESHOLD AND NO BREADTH among the thirty-nine — the secondaries the
 #       designer retired going forward. **THE EIGHT ALREADY-SHIPPED GATED RUNES
@@ -97,7 +97,7 @@ func _initialize() -> void:
 
 # ── §1 ──────────────────────────────────────────────────────────────────────
 func _s1_the_pool() -> void:
-	print("\n§1 — the pool: 60 live across twelve specs, flat 100g")
+	print("\n§1 — the pool: 60 live across twelve specs, flat 150g")
 	var live: Array = []
 	var by_spec := {}
 	var priced_wrong: Array = []
@@ -118,12 +118,12 @@ func _s1_the_pool() -> void:
 		# BATCH HF — AND NEITHER ARE HF's FIFTEEN: written for their CLASS and for
 		# no lineage (`written_for` absent), so they are counted beside this pool
 		# as the engine runes are, and held to the same two rules the pool is — a
-		# class scope a hero can be dealt, and the flat 100g.
+		# class scope a hero can be dealt, and the flat price (150g since HK §3).
 		if wf == "":
 			hf_class.append(String(id))
 			if not (scope.begins_with("class:") and Classes.CLASS_KITS.has(scope.trim_prefix("class:"))):
 				bad_scope.append("%s=%s (written for no lineage)" % [id, scope])
-			if int(cfg.get("price", 0)) != 100:
+			if int(cfg.get("price", 0)) != 150:
 				priced_wrong.append("%s=%s" % [id, cfg.get("price", 0)])
 			continue
 		live.append(String(id))
@@ -134,7 +134,8 @@ func _s1_the_pool() -> void:
 		# for nobody or for the wrong heroes.
 		if scope != "class:" + Classes.class_of_spec(wf) or Classes.class_of_spec(wf) == "":
 			bad_scope.append("%s=%s (written for %s)" % [id, scope, wf])
-		if int(cfg.get("price", 0)) != 100:
+		# BATCH HK §3 — the flat price is 150g (ruled).
+		if int(cfg.get("price", 0)) != 150:
 			priced_wrong.append("%s=%s" % [id, cfg.get("price", 0)])
 		by_spec[wf] = int(by_spec.get(wf, 0)) + 1
 	ok(live.size() == 60, "§1: the live pool is %d, not 60" % live.size())
@@ -154,7 +155,7 @@ func _s1_the_pool() -> void:
 	ok(int(by_spec.get("mystic", 0)) > 0,
 		"§1: nothing is written for `mystic` — the Survivalist's set is gone")
 	ok(priced_wrong.is_empty(),
-		"§1: price is not flat 100g across the live pool — %s" % [priced_wrong])
+		"§1: price is not flat 150g across the live pool (HK §3) — %s" % [priced_wrong])
 	# EZ §0's own rule, carried forward: a live rune carrying a `lane` is ES §5's
 	# severed rule coming back.
 	var laned: Array = []
@@ -166,11 +167,11 @@ func _s1_the_pool() -> void:
 	for eid in engines:
 		var ecfg: Dictionary = Runes.config(String(eid))
 		if String(ecfg.get("scope", "")) != "class:" + Classes.engine_class(String(ecfg.get("engine", ""))) \
-				or int(ecfg.get("price", 0)) != 100:
+				or int(ecfg.get("price", 0)) != 150:
 			eng_bad.append(String(eid))
 	# BATCH GO: 15 -> 24, the designer's nine rule engines — six a class.
 	ok(engines.size() == 24 and eng_bad.is_empty(),
-		"§1: ...and beside it the twenty-four ENGINE runes (GK, GO), each scoped to its engine's class at the interim 100g (%d; wrong: %s)"
+		"§1: ...and beside it the twenty-four ENGINE runes (GK, GO), each scoped to its engine's class at the flat 150g, HK §3 (%d; wrong: %s)"
 			% [engines.size(), eng_bad])
 	print("    live by spec: %s" % [by_spec])
 

@@ -102,6 +102,12 @@ static func spawn(tree: SceneTree, specs: Array, opts: Dictionary = {}) -> Node:
 	var items: Dictionary = opts.get("items", {})
 	for k in items:
 		run.items[k] = items[k]
+	# BATCH HK §4 — the crest's worn runes (`Run.party_runes`), stamped in the same
+	# window as `party` above: `new_run` empties the slot, and the spawn reads it as
+	# it builds each hero, so a rune set after the scene is built is one the fight
+	# never saw. Additive: a caller that passes nothing gets the empty slot.
+	if opts.has("party_runes"):
+		run.party_runes = opts["party_runes"]
 	run.encounter = {"type": "fight", "theme": "Warband",
 		"enemies": ["raider", "raider", "archer"]}
 	OS.set_environment("DOD_AUTOPLAY", "")
@@ -119,6 +125,19 @@ static func spawn(tree: SceneTree, specs: Array, opts: Dictionary = {}) -> Node:
 			u.block_chance = -10.0
 			u.crit_bonus = -1.0
 	return scene
+
+
+# **BATCH HK — THE REAL BATTLE SCENE FOR THE RUN IN HAND.** `spawn` builds a
+# fixture party and starts a new run, which is right for a check about a fight and
+# wrong for a check about what a fight's VICTORY does to the run — the drop lands
+# in the run's bag, and a new run has emptied it. This enters the battle the way
+# the map's node press does: the run's own encounter set, the scene changed,
+# nothing about the run rebuilt. It lives here for `spawn`'s reason (DB §1: one
+# fixture enters the battle scene, and `check_da` §3 holds every gate to it).
+static func enter_battle(tree: SceneTree, encounter: Dictionary) -> void:
+	var run: Node = tree.root.get_node("/root/Run")
+	run.encounter = encounter
+	tree.change_scene_to_file("res://scenes/battle.tscn")
 
 
 # THE RULING THAT DECIDED THE MERGE, ASSERTED RATHER THAN ARGUED.

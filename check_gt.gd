@@ -3,23 +3,28 @@
 #   §0  THE PLAYER'S FILES, AS FOUND — and this process writes the harness save
 #   §1  THE POUCH NEVER TRAPS THE PLAYER — every engine rune held alone, every pair
 #       of one class's six, and each class's six held at once (two slotted, four
-#       kept), each with the pouch empty and with an ordinary rune beside them:
-#       Close is on the screen, at ONE place in every configuration, outside every
-#       scroller, and pressing it closes the pouch; every rule is drawn whole, at
-#       its size, inside the scroller; the text fits unscrolled; and a toggle that
-#       re-opens the pouch puts Close back where it was
+#       kept — in the bag since HK), each with the pouch empty and with an ordinary
+#       rune beside them (his class's longest, in the bag): Close is on the screen,
+#       at ONE place in every configuration, outside every scroller, and pressing it
+#       closes the pouch; every rule is drawn whole, at its size, inside the
+#       scroller; the text fits unscrolled; a toggle that re-opens the pouch puts
+#       Close back where it was; and (HK) a full bag, all but one of it his own
+#       class's runes, three more worn: the list scrolls, Close does not move, the
+#       other class's rune is not listed, and the last row's
+#       button can be scrolled wholly into view
 #   §2  THE PEDDLER — four offers, three deals (every seat's longest ordinary rune,
 #       his class's shortest engine rule, his class's longest): no offer overlaps
 #       another, every Buy button is inside the one scroller and can be scrolled
 #       wholly into view, the scroller ends above Leave, Leave is outside it and on
-#       the screen, and every Buy pressed buys its own hero's rune
+#       the screen, and every Buy pressed buys its own hero's rune — into the bag
+#       since HK
 #   §3  THE CARD THAT SITS OUT — the table against the door: every card a hero of
 #       each class can earn, asked with NO engine on a dressed board, is refused
 #       exactly when it is a row or one of the ten card-conditional cards; each of
 #       those ten opens by its own card or board route with still no engine; every
 #       row opens with its engine held; and the drive — taken through the draft
 #       door or the boss pick's under the engine, the engine dropped through the
-#       pouch's door: kept, still carried, its slot still counted, not seated, the
+#       pouch's door: kept (in the bag since HK), still carried, its slot still counted, not seated, the
 #       fight runs, the sheet and the Kit panel say why, the save carries it; the
 #       engine slotted again: seated again
 #   §4  THE BASELINE — Fireball and Frostbolt at Magic Missiles' cost, cooldown and
@@ -167,6 +172,48 @@ func _six(key: String) -> Array:
 
 func _rule_len(rid: String) -> int:
 	return Runes.engine_text(String(Runes.config(rid)["engine"])).length()
+
+
+# His class's live ordinary rune with the longest text — the population §2's
+# "every seat's longest ordinary rune" is, read once for both sections.
+func _longest_ordinary(key: String, skip: int = 0) -> String:
+	var ids: Array = _class_ordinary(key)
+	return String(ids[skip]) if ids.size() > skip else ""
+
+
+# Every live ordinary rune of his class, longest text first.
+func _class_ordinary(key: String) -> Array:
+	var ids: Array = []
+	for rid in Runes.ids():
+		if Runes.is_engine_rune(String(rid)) or Runes.is_retired(String(rid)):
+			continue
+		if String(Runes.config(String(rid)).get("scope", "")) == "class:%s" % key:
+			ids.append(String(rid))
+	ids.sort_custom(func(a, b):
+		var la := String(Runes.config(String(a)).get("desc", "")).length()
+		var lb := String(Runes.config(String(b)).get("desc", "")).length()
+		return la > lb or (la == lb and String(a) < String(b)))
+	return ids
+
+
+# **BATCH HK — THE SCROLLER THAT HOLDS THE BUY BUTTONS, NOT THE LAST ONE DRAWN.** The
+# Peddler draws a second scroller since HK, the bag's sale rows under the supplies,
+# after the rune column; HEAD's `for ch in shop.get_children()` kept the LAST
+# ScrollContainer, so it measured the sale rows as the rune column: *"Buy N cannot
+# be scrolled wholly into view"* twelve times (Godot's *"Must be an ancestor of the
+# control"* under each), and the offers read *"37 px in a 156 px column"* — the empty
+# bag's sentence. The rune column is the scroller the Buy buttons are inside.
+func _scroll_holding(n: Node, prefix: String) -> ScrollContainer:
+	var found: ScrollContainer = null
+	for ch in n.get_children():
+		if ch is ScrollContainer and not ch.is_queued_for_deletion() \
+				and not _buttons_from(ch, prefix).is_empty():
+			found = ch
+	return found
+
+
+func _bag_ids() -> Array:
+	return _run.rune_bag.map(func(r): return String((r as Dictionary).get("id", "")))
 
 
 func _inside_scroll(n: Node) -> bool:
@@ -327,21 +374,32 @@ func _s1_the_pouch() -> void:
 	var scrolled: Array = []
 	var worst := {"alone": ["", 0, 0], "pair": ["", 0, 0], "six": ["", 0, 0]}
 	var scroll_h := 0
-	for ordinary in [[], ["deepening_hex"]]:
+	# **BATCH HK — THE SAME RUNES TO HAND, HELD WHERE THE GAME HOLDS THEM NOW.** HEAD
+	# kept the four unslotted engines, and the ordinary rune, on the hero; since HK a
+	# rune nobody wears is in the bag, and the pouch lists the bag's runes he may wear
+	# after what he wears, each marked *(in the bag)*. So the two slotted stay on him
+	# and the rest go into the bag — and the ordinary rune is his CLASS's longest,
+	# because the bag's rows are the runes he may wear (`deepening_hex`, a Cleric's,
+	# is not a row on a Warrior's pouch; on HEAD's it was, off his own list).
+	for ordinary in ["", "one"]:
 		for c in configs:
 			var idx := SEATS.find(String(c[1]))
 			var held: Array = []
+			var bagged: Array = []
 			for k in (c[2] as Array).size():
 				var r: Dictionary = Runes.build(String(c[2][k]))
 				r["equipped"] = k < 2
-				held.append(r)
+				(held if k < 2 else bagged).append(r)
+			if ordinary != "":
+				bagged.append(Runes.build(_longest_ordinary(String(c[1]))))
 			_run.party[idx]["engines"] = held
-			_run.party[idx]["runes"] = (ordinary as Array).map(func(o): return Runes.build(String(o)))
+			_run.party[idx]["runes"] = []
+			_run.rune_bag = bagged
 			_close_overlays(mp)
 			await Gate.frames(self, 2)
 			mp._open_rune_panel(idx)
 			await Gate.frames(self, 3)
-			var label := "%s, %s" % [c[0], "the pouch empty" if ordinary.is_empty() else "one ordinary rune"]
+			var label := "%s, %s" % [c[0], "the pouch empty" if ordinary == "" else "one ordinary rune"]
 			var ov: Node = Gate.overlay(mp, 60)
 			var close: Button = _button(ov, "Close") if ov != null else null
 			ok(close != null, "§1: %s — the pouch drew no Close button" % label)
@@ -365,13 +423,16 @@ func _s1_the_pouch() -> void:
 			# its size, inside the scroller, with Close where it was.
 			var eng_h := 0.0
 			var sat_out: Array = _run.sitting_out_rune_names(_run.party[idx])
-			for er in held:
+			for er in held + bagged:
 				var l: Label = _label_with(ov, String(er["name"]) + " — ")
 				var want_text: String = Runes.shown_desc(er)
-				if sat_out.has(String(er["name"])):
+				if sat_out.has(String(er["name"])) and held.has(er):
 					want_text = _run.rune_sits_out_note(String(er["id"]),
 						_run.held_engines(_run.party[idx])).replace("\n", " ")
 					sat_rows += 1
+				# HK — a bag row carries its rule and then says where the rune is.
+				if bagged.has(er):
+					want_text += "   (in the bag)"
 				ok(l != null and String(l.text).ends_with(" — " + want_text),
 					"§1: %s — %s's %s is not drawn whole" % [label, er["id"],
 						"sits-out sentence" if sat_out.has(String(er["name"])) else "rule"])
@@ -392,7 +453,7 @@ func _s1_the_pouch() -> void:
 				if content_h > sc.size.y + 0.5:
 					scrolled.append(label)
 				var kind := String(c[3])
-				if ordinary.is_empty() and eng_h > float(worst[kind][1]):
+				if ordinary == "" and eng_h > float(worst[kind][1]):
 					worst[kind] = [String(c[0]), int(eng_h), int(content_h)]
 			# THE PLAYER LEAVES, THROUGH THE BUTTON.
 			close.emit_signal("pressed")
@@ -423,14 +484,25 @@ func _s1_the_pouch() -> void:
 		pair.append(r2)
 	_run.party[hunt]["engines"] = pair
 	_run.party[hunt]["runes"] = []
+	_run.rune_bag = []
+	# **BATCH HK — THE ROW THE ENGINE IS ON, READ OFF `Run.engine_rows`.** An unslotted
+	# engine goes into the bag and its row moves below what he still has slotted, so
+	# the Equip that brings it back is on the bag's row, not on row 0: HEAD pressed
+	# row 0 twice, unslotting the Sharpshooter's too, and then read an empty list.
 	for want in ["Unequip", "Equip"]:
 		_close_overlays(mp)
 		await Gate.frames(self, 2)
 		mp._open_rune_panel(hunt)
 		await Gate.frames(self, 3)
 		var ov2: Node = Gate.overlay(mp, 60)
-		var tb: Button = Gate.bound_button(ov2, "_toggle_engine", [hunt, 0, ov2])
-		ok(tb != null and String(tb.text) == want, "§1: no %s button on the pouch's first engine row" % want)
+		var at := -1
+		var erows: Array = _run.engine_rows(_run.party[hunt])
+		for ri in erows.size():
+			if String((erows[ri]["rune"] as Dictionary).get("id", "")) == "engine_beastmaster":
+				at = ri
+		var tb: Button = Gate.bound_button(ov2, "_toggle_engine", [hunt, at, ov2]) if at >= 0 else null
+		ok(tb != null and String(tb.text) == want,
+			"§1: no %s button on the Rune of the Beastmaster's engine row (row %d)" % [want, at])
 		if tb == null:
 			continue
 		tb.emit_signal("pressed")
@@ -440,11 +512,124 @@ func _s1_the_pouch() -> void:
 		ok(close2 != null and close2.get_global_rect() == pinned,
 			"§1: after %s the re-opened pouch puts Close at %s" % [want,
 				str(close2.get_global_rect()) if close2 != null else "nowhere"])
-		ok(bool(_run.party[hunt]["engines"][0]["equipped"]) == (want == "Equip"),
-			"§1: %s did not move the engine's slot" % want)
+		var slotted: bool = Runes.held_engines(_run.party[hunt]).has("pack")
+		var in_bag: bool = _bag_ids().has("engine_beastmaster")
+		ok(slotted == (want == "Equip") and in_bag == (want == "Unequip")
+				and Runes.held_engines(_run.party[hunt]).has("lethal_aim"),
+			"§1: %s did not move the engine's slot (slotted %s, in the bag %s, the Sharpshooter's %s)" % [
+				want, slotted, in_bag, Runes.held_engines(_run.party[hunt]).has("lethal_aim")])
 	_close_overlays(mp)
 	_run.party[hunt]["engines"] = []
+	_run.rune_bag = []
 	await Gate.frames(self, 2)
+	await _s1_a_bag_of_twenty(mp, pinned)
+
+
+# **BATCH HK — THE POUCH'S NEW LONGEST: A BAG OF TWENTY OF HIS OWN CLASS'S RUNES.**
+# The pouch lists every rune in the bag he may wear, so the list is no longer
+# bounded by his slots: two engines slotted and three runes worn, and the bag
+# filled to twenty with the rest of his six and his class's ordinary runes, is
+# twenty-four rows: his class's runes fill the bag but for ONE slot, which holds
+# another class's rune — the bag holds it and his pouch must not list it, so the
+# arm that asks for no stray row has one to find in every class. **This
+# is where the longest genuinely cannot fit, and GT's rule is the one for it: the
+# text scrolls and the button does not move.** Asserted for each class: Close drawn,
+# at the one place, outside the scroller, and pressed shut; every row of his drawn
+# whole at its size inside the scroller, and no row for a rune he may not wear; and
+# the last row's button scrolled wholly into view. The list's height is printed.
+func _s1_a_bag_of_twenty(mp: Node, pinned: Rect2) -> void:
+	var tall := []
+	for key in SEATS:
+		var idx := SEATS.find(key)
+		var six := _six(key)
+		var ords: Array = _class_ordinary(key)
+		var slotted: Array = []
+		for k in 2:
+			var r: Dictionary = Runes.build(String(six[k]))
+			r["equipped"] = true
+			slotted.append(r)
+		var worn: Array = []
+		for k2 in 3:
+			var w: Dictionary = Runes.build(String(ords[k2]))
+			w["equipped"] = true
+			worn.append(w)
+		var bagged: Array = []
+		for k3 in range(2, six.size()):
+			bagged.append(Runes.build(String(six[k3])))
+		var k4 := 3
+		while bagged.size() < int(_run.BAG_CAP) - 1 and k4 < ords.size():
+			bagged.append(Runes.build(String(ords[k4])))
+			k4 += 1
+		var others: Array = []
+		var other_key := String(SEATS[(idx + 1) % SEATS.size()])
+		for oid in _class_ordinary(other_key):
+			if bagged.size() + others.size() >= int(_run.BAG_CAP):
+				break
+			others.append(Runes.build(String(oid)))
+		_run.party[idx]["engines"] = slotted
+		_run.party[idx]["runes"] = worn
+		_run.rune_bag = bagged + others
+		_close_overlays(mp)
+		await Gate.frames(self, 2)
+		mp._open_rune_panel(idx)
+		await Gate.frames(self, 3)
+		var label := "the %s with %d of his class's runes in a full bag" % [key, bagged.size()]
+		ok(_run.rune_bag.size() == int(_run.BAG_CAP) and _run.bag_full() and not others.is_empty(),
+			"§1: %s — the bag is not full (%d), or holds no other class's rune (%d) for the stray arm to find" % [
+				label, _run.rune_bag.size(), others.size()])
+		var ov: Node = Gate.overlay(mp, 60)
+		var close: Button = _button(ov, "Close") if ov != null else null
+		ok(close != null and close.get_global_rect() == pinned and not _inside_scroll(close),
+			"§1: %s — Close is not where it always is, outside the scroller (%s)" % [label,
+				str(close.get_global_rect()) if close != null else "none"])
+		var sat_out: Array = _run.sitting_out_rune_names(_run.party[idx])
+		var whole := 0
+		for er in slotted + worn + bagged:
+			var l: Label = _label_with(ov, String(er["name"]) + " — ") if ov != null else null
+			var want_text: String = Runes.shown_desc(er)
+			if sat_out.has(String(er["name"])) and not bagged.has(er):
+				want_text = (_run.rune_sits_out_note(String(er["id"]), _run.held_engines(_run.party[idx]))
+					if Runes.is_engine_rune(String(er["id"])) else
+					_run.rune_sits_out_note(String(er["id"]), _run.held_engines(_run.party[idx]),
+						_run.worn_rune_ids(_run.party[idx]))).replace("\n", " ")
+			if bagged.has(er):
+				want_text += "   (in the bag)"
+			if l != null and String(l.text).ends_with(" — " + want_text) \
+					and l.get_theme_font_size("font_size") == 12 and _inside_scroll(l):
+				whole += 1
+		ok(whole == slotted.size() + worn.size() + bagged.size(),
+			"§1: %s — %d of %d rows drawn whole, at their size, in the scroller" % [
+				label, whole, slotted.size() + worn.size() + bagged.size()])
+		var strays: Array = others.filter(func(o): return _label_with(ov, String(o["name"]) + " — ") != null) \
+			if ov != null else []
+		ok(strays.is_empty(), "§1: %s — his pouch lists %d rune(s) he may not wear (%s)" % [
+			label, strays.size(), str(strays.map(func(o): return o["id"]))])
+		var sc: ScrollContainer = _first_scroll(ov) if ov != null else null
+		var btns: Array = []
+		if sc != null:
+			Gate.buttons(sc, btns)
+		ok(sc != null and btns.size() == slotted.size() + worn.size() + bagged.size(),
+			"§1: %s — %d row buttons in the scroller for %d rows" % [label, btns.size(),
+				slotted.size() + worn.size() + bagged.size()])
+		if sc != null and not btns.is_empty():
+			var last: Button = btns[btns.size() - 1]
+			sc.ensure_control_visible(last)
+			await Gate.frames(self, 2)
+			ok(sc.get_global_rect().encloses(last.get_global_rect()),
+				"§1: %s — the last row's %s cannot be scrolled wholly into view (%s in %s)" % [
+					label, String(last.text), str(last.get_global_rect()), str(sc.get_global_rect())])
+			var content_h := (sc.get_child(0) as Control).get_combined_minimum_size().y
+			tall.append("%s (%d rows) %d px in %d" % [key, btns.size(), int(content_h), int(sc.size.y)])
+		if close != null:
+			close.emit_signal("pressed")
+			await Gate.frames(self, 2)
+			ok(Gate.overlay(mp, 60) == null and int(mp._rune_panel_for) == -1,
+				"§1: %s — pressing Close did not close the pouch" % label)
+		_run.party[idx]["engines"] = []
+		_run.party[idx]["runes"] = []
+		_run.rune_bag = []
+	print("    a full bag, his class's runes first, three worn and two slotted — the list scrolls, Close stays: %s" % [
+		", ".join(PackedStringArray(tall))])
 
 
 # ── §2 — THE PEDDLER ────────────────────────────────────────────────────────
@@ -467,20 +652,11 @@ func _s2_the_peddler() -> void:
 		six.sort_custom(func(a, b): return _rule_len(String(a)) > _rule_len(String(b)))
 		longest.append(six[0])
 		shortest.append(six[six.size() - 1])
-		var best := ""
-		var best_len := -1
 		# BATCH HC §1 — THE SEAT'S CLASS'S RUNES: every ordinary rune is scoped to
 		# its class now, so the longest a seat can be offered is its class's
 		# longest — the same population the three lineages' runes made before.
-		for rid in Runes.ids():
-			if Runes.is_engine_rune(String(rid)) or Runes.is_retired(String(rid)):
-				continue
-			var sc0 := String(Runes.config(String(rid)).get("scope", ""))
-			var dl := String(Runes.config(String(rid)).get("desc", "")).length()
-			if sc0 == "class:%s" % String(key) and dl > best_len:
-				best = String(rid)
-				best_len = dl
-		ordinary.append(best)
+		# (HK: read through `_longest_ordinary`, which §1 shares.)
+		ordinary.append(_longest_ordinary(String(key)))
 	ok(not ordinary.has(""), "§2: a seat has no ordinary rune to be offered (%s)" % str(ordinary))
 	for deal in [["every seat's longest ordinary rune", ordinary], ["every class's shortest engine rule", shortest],
 			["every class's longest engine rule", longest]]:
@@ -491,12 +667,10 @@ func _s2_the_peddler() -> void:
 		# The four offers alone: a seat the roll found nothing for would add its
 		# sentence under them, which is a different deal from the one measured.
 		shop.set("_spent", [])
+		_run.rune_bag = []
 		shop._draw_screen()
 		await Gate.frames(self, 4)
-		var sc: ScrollContainer = null
-		for ch in shop.get_children():
-			if ch is ScrollContainer and not ch.is_queued_for_deletion():
-				sc = ch
+		var sc: ScrollContainer = _scroll_holding(shop, "Buy — ")
 		var leave: Button = _button(shop, "Leave the Shop")
 		ok(sc != null and leave != null, "§2: %s — no rune scroller (%s) or no Leave button (%s)" % [deal[0], sc, leave])
 		if sc == null or leave == null:
@@ -551,10 +725,7 @@ func _s2_the_peddler() -> void:
 			var last: int = live.size() - 1
 			var mi: int = int(live[last]["member_idx"])
 			var rune_id := String(live[last]["rune"]["id"])
-			var sc2: ScrollContainer = null
-			for ch2 in shop.get_children():
-				if ch2 is ScrollContainer and not ch2.is_queued_for_deletion():
-					sc2 = ch2
+			var sc2: ScrollContainer = _scroll_holding(shop, "Buy — ")
 			var b2: Array = _buttons_from(shop, "Buy — ")
 			if sc2 == null or b2.size() != live.size():
 				ok(false, "§2: %s — %d Buy buttons for %d offers" % [deal[0], b2.size(), live.size()])
@@ -563,12 +734,19 @@ func _s2_the_peddler() -> void:
 			await Gate.frames(self, 2)
 			(b2[last] as Button).emit_signal("pressed")
 			await Gate.frames(self, 2)
+			# **BATCH HK §3 — A PURCHASE GOES INTO THE BAG, EVERY KIND**, and never onto
+			# the hero it was rolled for: the offer leaves the counter, the rune is in
+			# the bag, and nothing is on him.
 			var m: Dictionary = _run.party[mi]
 			var held_ids: Array = (m.get("engines", []) + m.get("runes", [])).map(func(r): return String(r.get("id", "")))
-			ok(held_ids.has(rune_id), "§2: %s — the Buy for %s did not give it to hero %d" % [deal[0], rune_id, mi])
+			var left: Array = (shop.get("offers") as Array).map(func(o): return String(o["rune"]["id"]))
+			ok(_bag_ids().has(rune_id) and not held_ids.has(rune_id) and not left.has(rune_id),
+				"§2: %s — the Buy for %s (rolled for hero %d) did not put it in the bag (bag %s, on him %s)" % [
+					deal[0], rune_id, mi, str(_bag_ids()), str(held_ids)])
 		for i2 in _run.party.size():
 			_run.party[i2]["engines"] = []
 			_run.party[i2]["runes"] = []
+		_run.rune_bag = []
 
 
 # ── §3 — A CARD THAT CANNOT BE CAST WITHOUT ITS ENGINE SITS OUT ─────────────
@@ -760,7 +938,9 @@ func _drive(pid: String) -> void:
 	# DROPPED, THROUGH THE POUCH'S DOOR.
 	ok(bool(_run.toggle_engine(m, 0)) and Runes.held_engines(m).is_empty(),
 		"§3 %s: the pouch's door did not drop the engine" % pid)
-	ok((m.get("engines", []) as Array).size() == 1, "§3 %s: dropping the engine lost the rune" % pid)
+	# HK §2 — KEPT IN THE BAG, where an unslotted engine rune goes.
+	ok((m.get("engines", []) as Array).is_empty() and _bag_ids() == [String(rune["id"])],
+		"§3 %s: dropping the engine lost the rune (bag %s)" % [pid, str(_bag_ids())])
 	ok(m.get("bm_abilities", []) == pool_before, "§3 %s: dropping the engine changed what the hero owns" % pid)
 	ok(_run.equipped_ability_names(m) == carried_before, "§3 %s: dropping the engine changed what he carries" % pid)
 	ok(int(_run.ability_slots_used(m)) == slots_before,
@@ -788,7 +968,7 @@ func _drive(pid: String) -> void:
 	ok(_run.load_run(), "§3 %s: the harness save did not load back" % pid)
 	var m2: Dictionary = _run.party[seat]
 	ok(m2.get("bm_abilities", []) == pool_before and _run.equipped_ability_names(m2) == carried_before
-			and Runes.held_engines(m2).is_empty() and (m2.get("engines", []) as Array).size() == 1,
+			and Runes.held_engines(m2).is_empty() and _bag_ids() == [String(rune["id"])],
 		"§3 %s: the save did not carry the kept cards and the dropped rune" % pid)
 	# BENCHING IS THE PLAYER'S DOOR TO THE SLOT, AND IT IS REVERSIBLE.
 	ok(_run.unequip_earned_ability(m2, String(rows[0])) and int(_run.ability_slots_used(m2)) == slots_before - 1,
@@ -796,8 +976,14 @@ func _drive(pid: String) -> void:
 	ok(_run.equip_earned_ability(m2, String(rows[0])) and int(_run.ability_slots_used(m2)) == slots_before,
 		"§3 %s: carrying %s again did not take the slot back" % [pid, rows[0]])
 	# SLOTTED AGAIN, SEATED AGAIN.
-	ok(bool(_run.toggle_engine(m2, 0)) and Runes.held_engines(m2) == [pid],
-		"§3 %s: the pouch's door did not slot the engine back" % pid)
+	var back := -1
+	var erows2: Array = _run.engine_rows(m2)
+	for ri in erows2.size():
+		if String((erows2[ri]["rune"] as Dictionary).get("id", "")) == String(rune["id"]):
+			back = ri
+	ok(back >= 0 and bool(_run.toggle_engine(m2, back)) and Runes.held_engines(m2) == [pid]
+			and _bag_ids().is_empty(),
+		"§3 %s: the pouch's door did not slot the engine back out of the bag (row %d)" % [pid, back])
 	ok(_run.sitting_out_names(m2).is_empty(), "§3 %s: cards still sit out with the engine back" % pid)
 	var got3: Array = await _bar(seat, m2)
 	for card4 in rows + undone:
@@ -813,6 +999,11 @@ func _drive(pid: String) -> void:
 # the member under test is the one the rest of the drive keeps writing.
 func _bar(seat: int, m: Dictionary, run_it := false) -> Array:
 	var keep: Array = _run.party
+	# **BATCH HK — AND THE BAG, THE CREST AND THE WAITING DROPS**: run state the
+	# fixture's `new_run` resets, and the drive's dropped engine is in the bag.
+	var keep_bag: Array = _run.rune_bag
+	var keep_crest: Array = _run.party_runes
+	var keep_wait: Array = _run.pending_rune_drops
 	var over := {seat: {"engines": m.get("engines", []).duplicate(true),
 		"bm_abilities": m.get("bm_abilities", []).duplicate(),
 		"bm_equipped": m.get("bm_equipped", []).duplicate()}}
@@ -850,6 +1041,9 @@ func _bar(seat: int, m: Dictionary, run_it := false) -> Array:
 			ok(names.has(card), "§3: %s reached the bar mid-fight" % card)
 	await _clear(s)
 	_run.party = keep
+	_run.rune_bag = keep_bag
+	_run.party_runes = keep_crest
+	_run.pending_rune_drops = keep_wait
 	_run.zone_bosses_cleared = 3
 	_run.active = true
 	return names

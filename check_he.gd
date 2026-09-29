@@ -357,6 +357,14 @@ func _s1_the_rune_doors() -> void:
 	for arm in arms:
 		var cls := String(arm[0])
 		var engs: Array = arm[1]
+		# **BATCH HK — A FRESH PARTY BEFORE EVERY ARM'S TALLIES.** Every roll excludes
+		# what the PARTY holds since HK (`Run.party_rune_names`), and the arm before
+		# left its bargain's party standing — three seats holding every rune they
+		# could be offered — so a Hunter measured after the Mage's arm was never shown
+		# Long Poison: the Hunter's seat held it (*"Peddler 0, cache 0, bargain 84"*).
+		# The phantom member is not in the party; the party it is measured beside is
+		# empty-handed, as HEAD's per-member exclusion assumed.
+		_run.new_run(SEATS, [], "standard")
 		var m := _member(cls, "", engs.map(func(p): return _eng(String(p))))
 		var peddler := _tally(m, func(mm): return [_run.generate_rune(mm)])
 		var cache := _tally(m, func(mm): return _run.roll_rune_candidates(mm))
@@ -396,6 +404,9 @@ func _s1_the_rune_doors() -> void:
 	for id2 in HE_RUNE_ROWS:
 		var cls2 := String(Runes.config(String(id2)).get("scope", "")).trim_prefix("class:")
 		var eng2 := String(HE_RUNE_ROWS[id2])
+		# HK — the same fresh party (above): a candidate the party holds is withheld at
+		# the answer since HK, and the last bargain's party held the Warrior's.
+		_run.new_run(SEATS, [], "standard")
 		var m2 := _member(cls2, "", [_eng(eng2)])
 		var trip: Array = [Runes.build(String(id2))]
 		for other in Runes.eligible_ids(m2, []):
@@ -423,6 +434,7 @@ func _s1_the_rune_doors() -> void:
 	for idu2 in HF_UNGATED:
 		var clsu := String(Runes.config(String(idu2)).get("scope", "")).trim_prefix("class:")
 		var engu := String(HF_UNGATED[idu2])
+		_run.new_run(SEATS, [], "standard")
 		var mu := _member(clsu, "", [_eng(engu)])
 		var tripu: Array = [Runes.build(String(idu2))]
 		for otheru in Runes.eligible_ids(mu, []):

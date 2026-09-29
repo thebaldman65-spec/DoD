@@ -183,6 +183,12 @@ func _draw_detail() -> void:
 		if rune.get("equipped", false):
 			Talents.apply_payload(cfg, rune["payload"], 1,
 				{"learned": member.get("talents", {}), "member": member})
+	# BATCH HK §4 — AND THE PARTY SLOT'S RUNE, ON EVERY HERO, EXACTLY AS THE SPAWN
+	# APPLIES IT: the sheet shows the numbers the fight will use. None is authored.
+	for pr in Run.party_runes:
+		if (pr as Dictionary).get("equipped", false):
+			Talents.apply_payload(cfg, (pr as Dictionary).get("payload", {}), 1,
+				{"learned": member.get("talents", {}), "member": member})
 	# Mini-boss ability upgrades (Batch AP), LAST — same order as the battle
 	# spawn, and for the same reason: a talent that SETS a field would
 	# otherwise overwrite the upgrade. The sheet has to show the numbers the
@@ -479,13 +485,14 @@ func _draw_detail() -> void:
 	var held_engines: Array = member.get("engines", [])
 	rune_header.text = "RUNES  (%d/%d equipped, %d/%d engines — swap them on the map)" % [
 		equipped_count, slot_cap, engines.size(), Run.ENGINE_SLOTS]
+
 	rune_header.add_theme_font_size_override("font_size", 15)
 	rune_header.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
 	rune_header.position = Vector2(60, 520)
 	add_child(rune_header)
 	if runes.is_empty():
 		var none := Label.new()
-		none.text = "None yet — the Peddler sells them."
+		none.text = "None worn — a rune drops after every fight, and the Peddler sells them."
 		none.add_theme_font_size_override("font_size", 12)
 		none.add_theme_color_override("font_color", Color(0.55, 0.52, 0.5))
 		none.position = Vector2(60, 548)
@@ -505,7 +512,10 @@ func _draw_detail() -> void:
 	# disagree. Redrawn on every `_draw_detail`, so an engine unequipped on the
 	# map is reflected the next time this page opens; there is no cached set.
 	var sitting_runes: Array = Run.sitting_out_rune_names(member) if awake else []
-	for rune_entry in held_engines + runes:
+	# BATCH HK §4 — THE PARTY SLOT'S RUNE IS ON THIS HERO'S NUMBERS TOO, so it is
+	# listed here beside his own, its state reading PARTY. (A rune he does not wear
+	# is in the party's bag, which the map shows, not on this page.)
+	for rune_entry in Run.party_runes + held_engines + runes:
 		var rune: Dictionary = rune_entry
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 10)
@@ -513,8 +523,8 @@ func _draw_detail() -> void:
 		var state := Label.new()
 		var is_on: bool = rune.get("equipped", false)
 		var sits: bool = is_on and sitting_runes.has(String(rune["name"]))
-		state.text = ("ENGINE" if rune.has("engine") else "WORN") if is_on \
-			else "pouch"
+		state.text = ("CREST" if Runes.is_party_rune(rune) else ("ENGINE" if rune.has("engine")
+			else "WORN")) if is_on else "pouch"
 		state.custom_minimum_size = Vector2(56, 20)
 		state.add_theme_font_size_override("font_size", 11)
 		state.add_theme_color_override("font_color",

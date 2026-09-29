@@ -294,8 +294,8 @@ func _s0_the_nine() -> void:
 			"§0: %s is a %s rule engine" % [pid, ck2])
 		# A RULE: no lineage, no enabler, no payload, the flat price.
 		ok(Classes.engine_spec(String(pid)) == "" and Classes.engine_enablers(String(pid)).is_empty()
-				and (cfg.get("payload", {}) as Dictionary).is_empty() and int(cfg.get("price", 0)) == 100,
-			"§0: %s brings no lineage, no enabler and no payload, at the flat 100" % pid)
+				and (cfg.get("payload", {}) as Dictionary).is_empty() and int(cfg.get("price", 0)) == 150,
+			"§0: %s brings no lineage, no enabler and no payload, at the flat 150 (HK §3)" % pid)
 		ok(String(cfg.get("name", "")) == "Rune of the %s" % NOUNS[pid],
 			"§0: %s's rune is the Rune of the %s (%s)" % [pid, NOUNS[pid], cfg.get("name", "")])
 		# The kit a holder with no lineage opens with is his basic and his class kit.

@@ -1,6 +1,6 @@
 # BATCH EZ — THE FIRST TWENTY-ONE RUNES, AND THE TWO CONDITIONS THEY OBEY.
 #
-#   §0  THE POOL — 21 authored, all at 100g, all spec-scoped, every one tagged
+#   §0  THE POOL — 21 authored, all at the flat price (150g since HK §3), every one tagged
 #       and shaped, and the 65 ET retired still retired and still unreachable
 #   §1  THE TWO CONDITIONS ARE RETIRED (Batch FN) — the payloads, the labels
 #       and the PRIMARY-only count proved different from the both-tags census
@@ -116,8 +116,8 @@ func _s0_the_pool() -> void:
 	# live and 87 -> 126 entries when FK authored the eight unauthored specs, so
 	# every census in this section is a count of a population that grew. Each was
 	# checked for a RULE hiding inside it before it was moved, and the two that
-	# hold one — SCOPE IS SPEC ONLY, and price is flat 100g — are equalities over
-	# the whole live pool and did not have to move at all.
+	# hold one — SCOPE IS SPEC ONLY, and price is flat (100g then, 150g since HK §3) —
+	# are equalities over the whole live pool and did not have to move at all.
 	# **BATCH FO MOVED IT 126 -> 127 AND LEFT THE LIVE COUNT AT SIXTY.** §2
 	# retires the Wide Watch and authors the Shared Mark in its place; the ENTRY
 	# is kept (the Melted Armor contract), so a one-out-one-in replacement grows
@@ -141,14 +141,15 @@ func _s0_the_pool() -> void:
 		"§0: ...and twenty-four of them are ENGINE runes (GK, GO) and %d are HF's class runes, live beside the sixty and outside this gate's population (%d engines)" % [hf.size(), eng])
 	for idh in hf:
 		var eh: Dictionary = data[idh]
-		ok(int(eh.get("price", 0)) == 100 and String(eh.get("scope", "")).begins_with("class:")
+		# BATCH HK §3 — THE FLAT PRICE IS 150g (ruled), and the question is unchanged.
+		ok(int(eh.get("price", 0)) == 150 and String(eh.get("scope", "")).begins_with("class:")
 			and Classes.CLASS_KITS.has(String(eh.get("scope", "")).trim_prefix("class:"))
 			and not (Runes.rune_tags(idh) as Array).is_empty() and not (Runes.rune_shape(idh) as Array).is_empty(),
-			"§0: HF's %s is not a class rune at 100g with a tag and a shape (%s, %dg)" % [idh, eh.get("scope", ""), int(eh.get("price", 0))])
+			"§0: HF's %s is not a class rune at 150g with a tag and a shape (%s, %dg)" % [idh, eh.get("scope", ""), int(eh.get("price", 0))])
 
-	# **PRICE IS 100g FLAT, EVERY RUNE, AND IT IS ASSERTED AS AN EQUALITY.**
-	# ES §1 removed the tiers and left pricing to the designer; EZ §0 rules the
-	# number. A rune priced differently is the pool re-acquiring a power signal
+	# **PRICE IS 150g FLAT, EVERY RUNE, AND IT IS ASSERTED AS AN EQUALITY.**
+	# ES §1 removed the tiers and left pricing to the designer; EZ §0 ruled the
+	# number at 100 and HK §3 re-ruled it at 150 — one edit here, the equality kept. A rune priced differently is the pool re-acquiring a power signal
 	# the charter deliberately removed.
 	var mispriced: Array = []
 	var unscoped: Array = []
@@ -156,7 +157,7 @@ func _s0_the_pool() -> void:
 	var unshaped: Array = []
 	for id in ez:
 		var e: Dictionary = data[id]
-		if int(e.get("price", 0)) != 100:
+		if int(e.get("price", 0)) != 150:
 			mispriced.append("%s(%d)" % [id, int(e.get("price", 0))])
 		# **BATCH HC §1 — CLASS ONLY NOW, AND THE LINEAGE IS HISTORY.** The rule
 		# this arm held — no live rune is universal; each belongs to one set of
@@ -170,7 +171,7 @@ func _s0_the_pool() -> void:
 			untagged.append(id)
 		if (Runes.rune_shape(id) as Array).is_empty():
 			unshaped.append(id)
-	ok(mispriced.is_empty(), "§0: every rune is 100g flat (%s)" % [mispriced])
+	ok(mispriced.is_empty(), "§0: every rune is 150g flat, HK §3 (%s)" % [mispriced])
 	ok(unscoped.is_empty(), "§0: SCOPE IS CLASS ONLY, the class of the lineage each was written for, for all sixty (%s)" % [unscoped])
 	ok(untagged.is_empty(), "§0: every one carries an archetype tag (%s)" % [untagged])
 	ok(unshaped.is_empty(), "§0: every one carries a §0 shape (%s)" % [unshaped])

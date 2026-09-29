@@ -67,26 +67,33 @@ func _member(class_key: String, spec: String) -> Dictionary:
 # ── §1 — EVERY OFFER SITE, ENUMERATED AND DRIVEN ────────────────────────────
 #
 # **THE POPULATION IS DERIVED FROM THE WRITE, NOT FROM A LIST.** A rune reaches
-# a hero exactly where something appends to `member["runes"]`, and there are
-# four such sites in the shipped game. Each is pinned by the CALL it makes, so
-# a fifth site — or one of these four re-pointed at a pool of its own — has to
-# move a line here.
+# the party exactly where something rolls one and puts it down — onto a hero, or
+# since HK into the bag (`Run.hold_rune`, `Run.bag_rune`) — and there are five
+# such sites in the shipped game. Each is pinned by the CALL it makes, so a sixth
+# site — or one of these re-pointed at a pool of its own — has to move a line here.
 #
 #   THE PEDDLER            `shop_screen._roll_offers` → `Run.generate_rune`
 #   THE ELITE CACHE        `battle.gd` victory → `Run.roll_rune_candidates`
 #   THE BARGAIN (a rung)   `run_state._resolve_bargain` → the same
 #   THE EVENT VERB         `events.gd` → `Run.grant_rune`
+#   THE DROP (HK §1)       `battle.gd` victory, a normal fight → `Run.drop_after_fight`
+#
+# **BATCH HK — THE PEDDLER'S PIN MOVED WITH HIS CALL, AND THE DROP IS THE FIFTH.**
+# He passes what is already on his counter (`on_counter`), so a crest rune that
+# rolls for every hero is offered to one; the table is a list of pairs because
+# `battle.gd` now holds two of the sites.
 #
 # The spec-choice screen offers NO rune (AN deleted the opening pick), boss
 # trophies award ABILITIES, and no relic grants one — all three asserted below
 # as absences, because "this site is fine" and "this site does not exist" are
 # different claims and only the second one stays true on its own.
-const OFFER_SITES := {
-	"scripts/shop_screen.gd": "Run.generate_rune(member)",
-	"scripts/battle.gd": "Run.roll_rune_candidates(looter)",
-	"scripts/run_state.gd": "roll_rune_candidates(looter)",
-	"scripts/events.gd": "run.grant_rune(taker)",
-}
+const OFFER_SITES := [
+	["scripts/shop_screen.gd", "Run.generate_rune(member, on_counter)"],
+	["scripts/battle.gd", "Run.roll_rune_candidates(looter)"],
+	["scripts/run_state.gd", "roll_rune_candidates(looter)"],
+	["scripts/events.gd", "run.grant_rune(taker)"],
+	["scripts/battle.gd", "Run.drop_after_fight()"],
+]
 
 # The files that must grant NO rune. `spec_choice_screen.gd` is the one that
 # used to and no longer does.
@@ -110,10 +117,11 @@ func _s1_the_offer_sites() -> void:
 
 	# ── (a) THE POPULATION ──────────────────────────────────────────────────
 	var missing: Array = []
-	for path in OFFER_SITES:
+	for site in OFFER_SITES:
+		var path := String(site[0])
 		var src := Gate.strip_comments(FileAccess.get_file_as_string("res://" + path))
-		if not src.contains(String(OFFER_SITES[path])):
-			missing.append(path)
+		if not src.contains(String(site[1])):
+			missing.append("%s: %s" % [path, site[1]])
 	ok(missing.is_empty(),
 		"§1a: an offer site stopped calling the door it is pinned on — %s" % [missing])
 	var granting: Array = []
@@ -160,6 +168,19 @@ func _s1_the_offer_sites() -> void:
 				for c in trip:
 					if Runes.is_retired(String((c as Dictionary).get("id", ""))):
 						leaked.append("%s/cache -> %s" % [spec, c.get("id", "")])
+	# **BATCH HK §1 — AND THE FIFTH DOOR, THE DROP**, driven on the party §1 opened
+	# with: it draws from what every hero could be offered, through the same
+	# `eligible_ids`, so a retirement holds at it as at the other four.
+	var drops := 0
+	for _dd in 60:
+		var dr: Dictionary = run.roll_fight_drop()
+		drawn += 1
+		if dr.is_empty():
+			continue
+		drops += 1
+		if Runes.is_retired(String(dr.get("id", ""))):
+			leaked.append("drop -> %s" % dr.get("id", ""))
+	ok(drops > 30, "§1b: the drop door rolled %d runes in 60 draws — it was not asked" % drops)
 	ok(drawn > 100, "§1b: only %d draws were taken — the drive read nothing" % drawn)
 	ok(leaked.is_empty(), "§1b: a RETIRED entry reached a rolled offer — %s" % [leaked])
 	# **THE FLOOR IS ON THE LIVE HALF BECAUSE THE RETIRED HALF IS UNREACHABLE BY
@@ -170,7 +191,7 @@ func _s1_the_offer_sites() -> void:
 	ok(live_seen.size() >= 15,
 		"§1b: the shop drive reached %d distinct LIVE runes — it lost its population"
 			% live_seen.size())
-	print("    %d draws through three roll doors; 0 retired, %d live runes reached"
+	print("    %d draws through four roll doors; 0 retired, %d live runes reached"
 		% [drawn, live_seen.size()])
 
 	# ── (c) `Run.rune_choice` — THE RESOLUTION DOOR, WHICH IS WHERE THE HOLE

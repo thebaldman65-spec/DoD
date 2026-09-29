@@ -764,7 +764,9 @@ working — a PARTIAL arrival reads as working too, which is the same failure on
   card, `master.html` and the glossary each carry copies, and fixing one while the rest carry the
   old word is this project's oldest recurring defect.
 - **THE SURVIVING USES OF "party" ARE IDENTIFIERS AND ARE NAMED**: `party_mark` (a status id), the
-  `party` event target, `spec_in_party` (an event condition), and `party.tscn`. Nothing else.
+  `party` event target, `spec_in_party` (an event condition), `party.tscn`, and **the rune scope `party`
+  (HK §4), which the screens call the CREST** — its slot is saved under `crest` for this rule's sake.
+  Nothing else.
 - **PROSE ABOUT THE GAME IS NOT PLAYER-FACING.** This file, `docs/changelog.html`,
   `docs/design-notes.md` and the batch reports are exempt. **History is not swept.**
 · **UNREACHABLE IS NOT EXCLUDED, AND IT IS NOT A SIXTH REASON (Batch FO §2).** The Shared Mark
@@ -1569,7 +1571,7 @@ as a live decision.
 
 ## Architecture (all UI built in code, no editor scenes)
 - `scripts/run_state.gd` (autoload `Run`): party/items/gold/the LINE/zones,
-  save (user://run_save.bin v13, auto-saved at every step onto a node, at every
+  save (user://run_save.bin v14, auto-saved at every step onto a node, at every
   resolution, and inside a fight as each party loss lands — GH; `resume_scene` places
   a resumed run — GF), relic slots
   (max 3), the offer table (MODIFIERS/REWARDS), merchant+event scheduling,
@@ -1621,9 +1623,10 @@ questions now; `can_equip`, `equipped_learned` and `Profile.equip_cell` are dele
 · **VERSIONS** — `Profile` is **v3** (FX: the ledger keys to the CLASS) and reads a **v2 profile
   by a one-step migration** that folds its twelve spec purses into four. **Its floor,
   `MIN_VERSION`, is 2 — the oldest version this build carries a migration for** — so a v1 profile
-  is REFUSED rather than silently zeroed. The run save is **v13** and **a pre-v10 save is REFUSED and
+  is REFUSED rather than silently zeroed. The run save is **v14** and **a pre-v10 save is REFUSED and
   cleared** (the final zone gained a 17th slot; a v9 map has no position after its boss).
-  **v11 (CT), v12 (EG) AND v13 (GF) ARE ALL TOLERANT AND NONE MOVED THE REFUSAL THRESHOLD** — the
+  **v11 (CT), v12 (EG), v13 (GF) AND v14 (HK: the rune bag, the crest and the waiting drops) ARE ALL
+  TOLERANT AND NONE MOVED THE REFUSAL THRESHOLD** — the
   threshold is a claim about a structure this build cannot walk, and a version bump for a field
   with a sane default is not one. **DO NOT RAISE THE THRESHOLD TO MATCH THE VERSION.** **GH MOVED NO
   VERSION**: a fight's losses are written to `hp`, `mana` and `items`, which v13 already carries, and
@@ -1967,7 +1970,7 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   id survives as the hero's LINEAGE, set by the engine taken at class selection and read by the layers
   not yet merged (the opening kit — its engine's enablers alone since GS §1 — the stat block and the
   boss pools; the draft pools merged at GP and the runes at HC §1). A hero who takes a spine has none and opens with his basic and his class kit (the GN block below). The COST of an engine rune is
-  the flat 100g rule's, not a set price.
+  the flat rune price's (150g since HK §3), not a set price.
 - **AN ENABLER CANNOT BE A STAT, AND ONE IS**: the Warden's `block_chance` 0.10 is his lineage's stat
   block, so Heavy Plating on another Warrior climbs from zero plus its own 15% slice.
 - **AN INSTRUMENT THAT SEATS A LINEAGE SEATS ITS ENGINE RUNE.** A spec no longer brings its engine: a
@@ -2024,9 +2027,9 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
 
 - **THE POUCH COULD STRAND THE PLAYER, AND THE CAUSE WAS A STACK, NOT A STRING.** Its Close, the only way out, sat at
   the foot of a fixed stack whose engine rows grew with each rule — wholly below the 720-pixel screen for four engines
-  held alone, all sixty pairs of one class's engines and every class's six. **A hero HOLDS up to all six of his
-  class's engine runes, two slotted, and the pouch lists every one with its rule**: size a screen for every
-  combination it can hold, not the one it opens with.
+  held alone, all sixty pairs of one class's engines and every class's six. **A hero can have up to all six of his
+  class's engine runes to hand — two slotted, and since HK the rest in the bag — and the pouch lists every one with
+  its rule**: size a screen for every combination it can hold, not the one it opens with.
 - **THE PEDDLER WAS THE SAME CAUSE ON A SECOND SURFACE**: offers laid at a fixed pitch whatever their text, so a long
   rule ran under the next hero's Buy button. One shape fixed both. `check_gt` §1 opens the pouch in every
   combination and presses Close in each; §2 buys every offer through its own button.
@@ -2841,7 +2844,7 @@ runes have always carried their own.
 
 · **PRICE WAS THE OPEN QUESTION THIS RULING LEFT BEHIND, AND EZ §0 ANSWERED IT: 100g, FLAT**
   (corrected at Batch FG §3 — this bullet went on stating the question as open for seven batches
-  after it was closed, and *A RUNE IS 100g, FLAT* is further down this same file). The
+  after it was closed, and *A RUNE IS 150g, FLAT* — 100g until HK §3 — is further down this same file). The
   53 offerable runes it named are retired; **all 60 live runes read 100g and `check_ez` §0 asserts
   it as an equality.** The 67 retired keep their authored prices — 100 ×43, 75 ×14, 160 ×6,
   120 ×3, 50 ×1 — as the record of what the old pool charged, and the generated stat family keeps
@@ -2867,9 +2870,11 @@ runes have always carried their own.
   only record of it, so the 110 carry it as `lane` carries a retired lane, for the instruments that ask about a lineage's
   authored set. **A script that read it would be the spec scope back under another name**: `test_runes` asserts none
   does, and `Runes.build` does not copy it onto an instance.
-- **`_scope_ok` RESOLVES TWO BANDS AND REFUSES ANY THIRD** — the spec branch is deleted, not kept for a scope nothing
+- **`_scope_ok` RESOLVES TWO BANDS AND REFUSES `spec:`** — the spec branch is deleted, not kept for a scope nothing
   carries, because a branch still reading `spec:` is a scope read as a spec after the data stopped being one.
-  `test_runes` holds the data to the two bands, so a `spec:` entry reds rather than rolling for nobody.
+  `test_runes` holds the data to the two bands, so a `spec:` entry reds rather than rolling for nobody. **And a third
+  scope is ruled beside them at HK §4: `party`, the CREST's**, which passes for every hero because it names no class
+  (the block *THE PARTY SCOPE IS BUILT AND HOLDS NO RUNE* below); no entry carries it.
 - **NO SURFACE SHOWS A SCOPE BAND (HE §4, ruled by the designer).** From HC every rune a hero could be offered read
   `[Class]` — a hero sees only his class's runes, so the band was on every rune and told nobody anything. The word is
   gone from the Peddler's row and a cache's button, the band's tint from those and the three surfaces that tinted a
@@ -2922,7 +2927,7 @@ runes have always carried their own.
 > **A rune written to read no engine may read only its class's three kit cards and its basic, its class resource, the
 > statuses its own kit lays (the Mage's Elemental Weakness, the Warrior's taunt and Sunder, the Hunter's stun and
 > Poison), and healing and damage in general. It may not read any engine's meter, state or status.** Fifteen are
-> authored so (HF §1-§4): each is class-scoped at the flat 100g, written for no lineage (`written_for` absent), and on
+> authored so (HF §1-§4): each is class-scoped at the flat price, written for no lineage (`written_for` absent), and on
 > no `Runes.ENGINE_READ` row — `check_hf` §0 asserts all three and §1 drives every one on a hero holding no engine.
 
 - **CONFIRM IT AT THE READ SITE, NEVER FROM THE NAME.** A no-engine rune that reads an engine it did not name is the
@@ -2994,7 +2999,7 @@ decision: **you can swap to switch a rune on or off, so the loadout becomes a le
 > authored. The two predicates, the one door, the primary-only arithmetic and the
 > `RUNE CONDITIONS` line on both screens are removed — not zeroed.**
 
-**THE REASON IS THE PRICE AND IT IS ONE SENTENCE.** Every rune is 100g, flat (the rule below), so
+**THE REASON IS THE PRICE AND IT IS ONE SENTENCE.** Every rune is one flat price (150g since HK §3; the rule below), so
 **a condition is pure cost with nothing bought by it** — the price does not fall to pay for the
 clause, and the player is offered a strictly worse item at the same money. FK retired both
 secondaries going forward; **FN took them off the eight that already carried one.**
@@ -3411,10 +3416,20 @@ itself, and EZ's own charter forbids moving an ability, a magnitude or a constan
   can never satisfy — `has_engine` above all, because **a companion holds no engine**, which is the
   same fact the ten unreachable passive-keyed terms above rest on.
 
-## STANDING RULE — A RUNE IS 100g, FLAT (Batch EZ §0, ruled by the designer)
+## STANDING RULE — A RUNE IS 150g, FLAT, AND SELLS BACK FOR A THIRD (Batch EZ §0, re-ruled at HK §3 by the designer)
 
-> **Every authored rune costs 100 gold. Rarity is gone and price no longer signals power — a
+> **Every authored rune costs 150 gold (100 until HK). Rarity is gone and price no longer signals power — a
 > rune's worth is contextual, so the player pays for FIT rather than for magnitude.**
+>
+> **The Peddler buys one back out of the bag for a third — 50g at list** (`Run.RUNE_SELL_FRACTION`, written as the
+> fraction): **selling is a decision rather than free money, and the Peddler is where a player fixes their luck, since
+> the drop cannot be chosen.** A third where the pouch's items sell for two fifths, for the same reason made sharper.
+
+- **THE PRICE IS READ LIVE OFF THE DATA, AT ONE DOOR** (`Runes.price_of`, and `Run.rune_price` / `rune_sell_value`
+  with the relic discount on both halves, so the two can never be arbitraged — CT §2's reason): a rune instance rides
+  the save, and one bought before a price moved sells at today's price, GS §3's rule for a rune's text one field over.
+  **It moved as a data edit on the ninety-nine live entries and nothing else** — every other field byte-unchanged — and
+  the retired keep what they charged.
 
 **THIS CLOSES THE PRICING QUESTION ES §1 OPENED AND `docs/state.md` HAS CARRIED SINCE.** The
 retired 67 keep their authored prices (50g ×1, 75g ×14, 100g ×43, 120g ×3, 160g ×6) unmoved, as the
@@ -3423,7 +3438,72 @@ Batch FG §3**: EZ wrote `100g ×27, 120g ×6, 160g ×5`, and the file said `×4
 day it was written, so the TOTAL was measured and the split was not. FC's and FO's retirements
 have since taken the total to 67; the generated stat family keeps `TEMPLATE_PRICE` = 50, the
 Common floor it already had. **Neither is a second pricing rule** — one is history and the other is
-the absence of a rule. `check_ez` §0 asserts the flat 100 as an EQUALITY over the live pool.
+the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over the live pool — 150 since HK.
+
+## STANDING RULE — A RUNE DROPS AFTER EVERY NORMAL FIGHT, INTO ONE BAG OF TWENTY (Batch HK §1/§2, ruled by the designer)
+
+> **One rune after every NORMAL fight, random and never chosen, and it goes to the BAG — every rune the heroes hold
+> that nobody wears, shared, twenty at most. Equipping is its own act: a rune worn leaves the bag and a rune
+> unequipped goes back into it. A drop that lands on a full bag is shown beside the twenty, and the player drops one
+> to take it or lets it go; it is never lost silently and never sold for him.**
+
+- **THE NORMAL FIGHT IS THE `fight` NODE, AND NOTHING ELSE DROPS ONE.** An elite, a mini-boss and a boss each pay spoils
+  of their own, and the ruling named normal fights, so extending it is the designer's (`docs/reports/HK.md` §1). The one
+  call is in `battle._check_end`'s victory branch, under `node_type == "fight"`; RunSim takes it through the same door.
+- **ITS CLASS IS ONE THE PARTY HOLDS, AND THE DRAW IS FLAT OVER RUNES.** `Run.roll_fight_drop` is the union of what
+  every hero could be offered — `Runes.eligible_ids` for each, so GV's engine gate, a rune's required card and HB's pet
+  gate hold at the drop as at every roll — less everything the party holds, deduped by id, and one is picked flat. A
+  draw by CLASS first would hand a lone crest rune a fifth of every drop; flat, it is one entry among the rest, which is
+  what *the same source as any other rune* means.
+- **NOTHING THE PARTY HOLDS IS OFFERED AGAIN, AND `Run.party_rune_names` IS THE ONE LIST** — the bag, the crest, a rune
+  waiting on the full-bag panel, and every hero's worn runes and engine runes. `Run.generate_rune` excludes it from every
+  draw, and a static `Runes` helper, which cannot see `Run`, takes it as `held`. **A new roll door excludes it, and a new
+  place a rune can sit joins it.**
+- **A WORN RUNE IS NOT COUNTED AGAINST THE TWENTY, AND THAT IS STRUCTURAL**: four heroes' three slots and two engine
+  slots and the crest's one are twenty-one, so a bag that counted what it lent out could never be worn full.
+- **A FULL BAG IS A CHOICE FOR A GRANT AND A WALL FOR A PURCHASE — CT §3's TWO WALLS, ONE LAYER OVER.** A drop, a cache
+  taken, an event's rune: `Run.bag_rune` queues it on `pending_rune_drops`, and the map's full-bag panel
+  (`map_screen._check_rune_drops`, chained after the pouch's own swap offer) shows it beside the twenty — drop one to
+  take it, or leave it behind, which is always a button. **A purchase is refused**: the Peddler greys every Buy and says
+  why, and his Sell rows are how the player makes room. **An unequip into a full bag is refused too, and a SWAP — one
+  rune each way, the bag's count unchanged — is the way through**, so a full bag beside full slots never strands a rune.
+- **EVERY TAKEN RUNE IS PUT DOWN AT `Run.hold_rune`, AND WHAT IS NOT WORN GOES TO THE BAG.** Worn when its caller asks and
+  a slot it fits is free — an engine rune slotted while an engine slot is free, as GK had it — and otherwise the bag.
+  **The Peddler's purchase goes to the bag and never onto a hero** (`Run.buy_rune`), so an engine rune bought is no
+  longer slotted at the counter. **The charter's *dropped and swapped, including to nothing* stands**: unslotting is into
+  the bag, refused only while the bag is full, and the bag can now let an engine rune go for good, sold or dropped.
+- **A HERO'S RUNE PANEL LISTS WHAT HE WEARS, THEN THE BAG'S RUNES HE MAY WEAR** (`Run.rune_rows`, `engine_rows`), his own
+  list first so a row's index is the one the toggle always took. `Run.toggle_rune`, `toggle_engine` and
+  `toggle_party_rune` are the doors, each with a refusal sentence the disabled button shows (CO §3).
+- **THE MIGRATION MOVES WHAT WAS NOT WORN AND TOUCHES NOTHING THAT WAS.** A save written before the bag held each hero's
+  unworn runes on him; `Run._bag_the_unworn` moves them into the bag on every load — a no-op on a save the bag wrote —
+  the worn stay in the same slots, and the bag may open past twenty: **nothing is dropped, sold or refused, and the cap
+  binds at intake.** It moved the save to v14 (the VERSIONS bullet under TALENTS ARE META PROGRESSION).
+- **THE WAITING DROP RIDES THE SAVE AND THE MAP ANSWERS IT, SO A RESUME OWES IT NO BRANCH** — GF's rule met by the
+  screen every resumed run lands on, whose opening chain ends at the full-bag panel.
+- **`check_hk` DRIVES ALL OF IT, A WHOLE RUN ON THE REAL SCREENS AMONG IT** — a static check cannot see a drop.
+
+## STANDING RULE — THE PARTY SCOPE IS BUILT AND HOLDS NO RUNE; ITS SCREEN WORD IS THE CREST (Batch HK §4, ruled by the designer; the word PROPOSED)
+
+> **A rune scoped `party` is class-neutral and reaches every hero at once. It is worn in a slot of its own, the
+> CREST, which takes no hero's slot — ONE slot, `Run.PARTY_RUNE_SLOTS`, the one constant every reader asks, so raising
+> it is one edit. None is authored: the scope, the slot, the drop, the bag, the Peddler and the display all run over
+> zero of them.**
+
+- **"PARTY" IS RETIRED FROM PLAYER-FACING TEXT, SO THE SCOPE KEEPS ITS NAME IN CODE AND THE SCREENS SAY *CREST*** (the
+  designer's to confirm: `docs/reports/HK.md`, NEEDS A RULING). The scope string `party` is an identifier, as the event
+  target the retired-word block names is, and the slot is saved under `crest` so no string a sweep reads spells it.
+- **ITS PAYLOAD REACHES EVERY HERO AT THE SPAWN, AND THAT IS THE ONE PARTY-LEVEL DOOR THE GAME HAS.** The battle applies
+  a worn crest rune's payload to each of the four through `Talents.apply_payload`, where every rune's is applied, and
+  the hero sheet mirrors it. **HERO, NOT ALLY**: it is stamped where the four are built, and no companion exists yet —
+  the first structural reason. **Little in the game reads the party whole** — two talent stamps a rune can feed, two
+  engines' wiring and the relics' hooks, which it cannot; every card and rune reads one hero — so what a crest rune could
+  read beyond a stat or a card on each hero is the census in `docs/reports/HK.md` §4b, and **a crest rune that needs more
+  than that owes new machinery before it is authored.**
+- **IT IS OFFERED THROUGH EVERY ROLL, TO ONE HERO AT A TIME.** `Runes._scope_ok` passes it for every hero, so the drop's
+  union holds it once and the Peddler excludes what is already on his counter, lest two heroes be offered one rune.
+- **`check_hk` §4 BUILDS ONE IN THE FIXTURE AND NEVER IN THE FILE** (GK's empty engine slots, GO's filling them),
+  asserted both ways: no `party` entry in `data/runes.json`, and every door live over the fixture's.
 
 ## STANDING RULE — LOYALTY IS GOVERNED BY A CONVERSION, NEVER BY A CEILING (Batch ER, ruled by the designer)
 > **The designer has ruled that Loyalty does NOT flatten. Above nominal the meter CONVERTS: each

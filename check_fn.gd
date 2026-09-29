@@ -205,7 +205,11 @@ func _s1_the_eight_are_ungated() -> void:
 		var e: Dictionary = data[id]
 		if e.has("retired"):
 			retired.append(String(id))
-		if int(e.get("price", 0)) != 100:
+		# BATCH HK §3 — THE FLAT PRICE IS 150g (ruled) FOR A LIVE RUNE, AND A RETIRED ONE
+		# KEEPS THE PRICE IT WAS AUTHORED AT: the Wide Watch, retired at FO, is one of the
+		# eight and still reads 100, as every retirement keeps its price (EZ §0).
+		var flat := 100 if e.has("retired") else 150
+		if int(e.get("price", 0)) != flat:
 			priced.append("%s:%d" % [id, int(e.get("price", 0))])
 		if (e.get("payload", {}) as Dictionary).has("condition"):
 			still_gated.append(String(id))
@@ -232,7 +236,7 @@ func _s1_the_eight_are_ungated() -> void:
 	ok(retired == RETIRED_BY_RULING,
 		"§1a: the retired set among the eight is %s, not %s — a retirement is a RULING and this is the list of them"
 			% [retired, RETIRED_BY_RULING])
-	ok(priced.is_empty(), "§1a: one of the eight left the flat 100g (%s)" % [priced])
+	ok(priced.is_empty(), "§1a: one of the eight left the flat price — 150g live since HK §3, a retired one its authored 100 (%s)" % [priced])
 	ok(still_gated.is_empty(), "§1a: one of the eight STILL carries a condition (%s)" % [still_gated])
 	scopes.sort()
 	_specs = []
