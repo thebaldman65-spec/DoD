@@ -822,7 +822,7 @@
 		"payload": {"stat": {"rune_deep_absorb": 1}}
 	},
 	"fourth_stack": {
-		"name": "Fourth Stack", "scope": "class:cleric", "written_for": "inquisitor",
+		"name": "Forbearance", "scope": "class:cleric", "written_for": "inquisitor",
 		"price": 150,
 		"desc": "Allies hold one more stack of Faith before releasing.",
 		"payload": {"stat": {"rune_fourth_stack": 1}}

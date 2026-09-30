@@ -1613,7 +1613,7 @@ var rune_martyr := 0          # rune-owned: the Martyr 1 (a FLAG)
 # Devout —
 var rune_layered_aegis := 0   # rune-owned: the Layered Aegis 1 (a FLAG)
 var rune_deep_absorb := 0     # rune-owned: the Deep Absorb +1 Faith an absorb
-var rune_fourth_stack := 0    # rune-owned: the Fourth Stack +1 to the release
+var rune_fourth_stack := 0    # rune-owned: Forbearance +1 to the release
 var rune_bare_altar := 0      # rune-owned: the Bare Altar 1 (a FLAG)
 # Survivalist — none of these five is written against Trapper's +8% step.
 # FORCE OF NATURE REPLACES that term via `elif` rather than adding to it, so a

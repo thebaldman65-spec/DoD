@@ -360,8 +360,8 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
 - **A LETTER WHOSE BRIEF WAS AUTHORED AND NEVER RUN IS SPENT, AND THE NEXT BATCH SAYS SO IN ITS CHANGELOG ENTRY**
   (CC at CD §3, CF at CG §0, GD in GE's report; **HM was folded into HL**, HL §0): a gap between letters is not a lost batch.
 
-## THIS FILE IS MEASURED IN KiB, AND THE CEILING IS 410 KiB (STANDING, RULED AT EE §1, RAISED AT FU §1 AND GY §1)
-> **`CLAUDE.md` IS MEASURED AS A SIZE, NEVER AS A SHARE OF THE SYNC, AND THE CEILING IS 410 KiB.**
+## THIS FILE IS MEASURED IN KiB, AND THE CEILING IS 470 KiB (STANDING, RULED AT EE §1, RAISED AT FU §1, GY §1 AND HN §1)
+> **`CLAUDE.md` IS MEASURED AS A SIZE, NEVER AS A SHARE OF THE SYNC, AND THE CEILING IS 470 KiB.**
 > **When it is reached the answer is a SPLIT. It is never a prune.** The 3%-of-sync target this
 > replaces is retired: three readings killed it and all three are recorded below, so nobody derives
 > it again.
@@ -377,48 +377,55 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
 - **NEVER-QUOTED IS NOT DEAD.** "Neither asserted nor quoted" is a fact about citation, not about
   load. **Nobody quotes the rule they are obeying**, so a well-obeyed rule and a dead one produce
   identical evidence under a citation count. **Do not prune this file by a reference count.**
-- **THE 410 KiB IS DERIVED, NOT CHOSEN — BY EE's OWN METHOD WITH CURRENT INPUTS, ON ITS THIRD RUN
-  (ruled by the designer at FU §1 and again at GY §1).** The FLOOR is measured, and since GY it is
+- **THE 470 KiB IS DERIVED, NOT CHOSEN — BY EE's OWN METHOD WITH CURRENT INPUTS, ON ITS FOURTH RUN
+  (ruled by the designer at FU §1, GY §1 and HN §1).** The FLOOR is measured, and since GY it is
   this file's own reading rather than a past split's: **three audits have found nothing dead in it**
   — ED read all 43 never-cited blocks and retired none, FF classified all 105 by what each binds,
   GR classified all 113 by subject — so a rules-only reading of this file IS its reading, which is
-  the bullet below's *a ceiling derived from a file's own size moves with the file*. **GX's reading
-  was 336.63 KiB.** The HEADROOM is measured, and it is the term nobody should quote without
-  re-measuring:
+  the bullet below's *a ceiling derived from a file's own size moves with the file*. **HL's reading
+  was 393.67 KiB**, taken at HN before it wrote a byte. The HEADROOM is measured, and it is the term
+  nobody should quote without re-measuring:
   the largest single-batch growth on record is **+8.10 KiB**, and **a ceiling within one batch's
   reach fires on whoever writes the big batch rather than on the file's condition**, so it is ten
-  of those. 336.63 + 81.00 = 417.63, **stated as 410 and rounded DOWN** — a ceiling above its own
+  of those. 393.67 + 80.99 = 474.65, **stated as 470 and rounded DOWN** — a ceiling above its own
   derivation is one nobody trusts.
-  · **THE RECORD THE HEADROOM TERM READS DID NOT MOVE AT GY, AND THAT WAS MEASURED RATHER THAN
-    ASSUMED.** Over EE's own window — the 92 batches since DK — the largest single-batch growth is
-    still **EZ's +8,293 B**; the largest since GR's split is GS's +5,137 B, and the largest since FF
-    is FK's +6,957 B. **EB's +8,287 B is the figure that went stale**, at GR; EZ's has stood for
-    thirty-two batches. A later batch re-running this arithmetic re-measures the term before
-    quoting it, and finds it the same way: per-batch deltas of this file across the whole history.
-  · **THIS IS THE METHOD'S THIRD RUN AND THE CEILING'S SECOND RE-DERIVATION, AND WHAT THAT MEANS IS
+  · **THIS IS THE CEILING'S THIRD RE-DERIVATION, AND A FOURTH IS NOT THE ANSWER (ruled by the
+    designer at HN §1).** The ceiling exists because **every batch pays the full read**, so a
+    ceiling that only ever rises is measuring nothing. **The next move at this ceiling is a recon
+    on the file's SHAPE, queued in `docs/state.md` and not run at HN**: whether an index plus
+    subjects read on demand beats one file with a moving ceiling. **GY's rejection of splitting the
+    reasoning out (below) stands, and it is not the seam that recon reconsiders.**
+  · **THE RECORD THE HEADROOM TERM READS DID NOT MOVE AT GY OR AT HN, AND BOTH TIMES THAT WAS
+    MEASURED RATHER THAN ASSUMED.** Over EE's own window — the 105 batches from DK to HL — the
+    largest single-batch growth is still **EZ's +8,293 B**, standing through the 63 batches since
+    it; the largest since GR's split, and since FF, is HK's +8,085 B. **EB's +8,287 B is the figure
+    that went stale**, at GR. A later batch re-running this arithmetic re-measures the term before
+    quoting it, and finds it the same way: per-batch deltas of this file across its history, over
+    EE's window — **a batch before CW's split wrote a narrative block here** (CB's +30,385 B), so it
+    is not a rules-only batch and not the record.
+  · **THIS WAS THE METHOD'S THIRD RUN AND THE CEILING'S SECOND RE-DERIVATION, AND WHAT THAT MEANS IS
     WRITTEN HERE RATHER THAN LEFT TO BE NOTICED (GY §1).** EE derived 290, FU re-derived 340, GY
-    re-derives 410 — and over the same span the split has been taken three times (EF §2, FF §1,
+    re-derived 410 — and over the same span the split has been taken three times (EF §2, FF §1,
     GR §2), after CW's split before them. **A file split four times whose ceiling has moved twice is
     a file that grows faster than any structure contains**, and the two instruments say so from
     opposite ends: nothing in it is dead (three audits, zero retirements), and nothing left in it
     comes away cleanly (FF's and GR's measurements). **So the re-derivation is not a retreat and it
     is not a repair — it is the only move the procedure has left that costs less than it buys**, and
-    the next one is the same arithmetic on the same two inputs.
-  · **THE ROUNDING COST MORE THIS TIME, AND IT IS STATED SO IT IS NOT READ AS A SLIP.** EE's 291.49
-    became 290 and discarded 1.49; FU's 342.03 became 340 and discarded 2.03; **GY's 417.63 becomes
-    410 and discards 7.63**, because the derived figure lands just past a ten. The stated ceiling
-    therefore carries **9.1** worst batches of headroom where EE's carried 9.8 and FU's 9.75. It is
-    still rounded DOWN, which is the rule; the multiple is reported so nobody re-derives it in the
-    belief the arithmetic slipped.
-  · **A FOURTH IS EXPECTED, AND HERE IS WHEN — GR's 5.1-to-9.8 batches is superseded.**
-    From GX's reading the headroom is 73.37 KiB: **about 24 batches** at the +3,086 B a batch this
-    file has grown over the six since GR's split, **about 31** at the +2,383 B a batch it has grown
-    over the 42 since FF, and **9.1** at the largest single batch on record. So the answer is
-    **roughly 24 to 31 batches, and no sooner than 9** — five times further out than GR's reading,
-    which is the point of moving the ceiling rather than the file. **These are GY's figures on GY's
-    window and the live headroom is smaller by whatever has been written since**; the live reading
-    belongs in `docs/state.md`, per the bullet below, and the rate is re-measured before it is
-    quoted.
+    the next one was the same arithmetic on the same two inputs. **HN §1 ran it, and ruled that the
+    one after it is not** (the bullet above).
+  · **THE ROUNDING COST MORE AT GY, AND IT IS STATED SO IT IS NOT READ AS A SLIP.** EE's 291.49
+    became 290 and discarded 1.49; FU's 342.03 became 340 and discarded 2.03; **GY's 417.63 became
+    410 and discarded 7.63**, because the derived figure landed just past a ten, so that ceiling
+    carried **9.1** worst batches of headroom where EE's carried 9.8 and FU's 9.75. **HN's 474.65
+    becomes 470 and discards 4.65, and carries 9.4.** Each is rounded DOWN, which is the rule; the
+    multiple is reported so nobody re-derives it in the belief the arithmetic slipped.
+  · **THE FOURTH RUN CAME FOURTEEN BATCHES AFTER GY's, AND GY's *24 TO 31* WAS A THIRD TOO LONG**:
+    the file grew 1.32 times GY's rate (`docs/reports/HL.md` §7). **From HL's reading the headroom
+    under 470 is 76.33 KiB: about 15 batches at HL's +5,269 B, about 19 at the 4,172 B mean of the
+    fourteen batches GY–HL, and about 9.7 at HK's +8,085 B — no sooner than 9.4 at the record.**
+    These are HN's figures on HN's window; the live reading belongs in `docs/state.md`, per the
+    bullet below, and the rate is re-measured before it is quoted. **The shape recon is owed before
+    the file arrives there** — the arithmetic is not the answer next time (the first bullet above).
   · **AND A THIRD OPTION WAS WEIGHED AT GY AND REJECTED: SPLITTING THE REASONING OUT. DO NOT
     RE-PROPOSE IT.** Much of this file is reasoning recorded beside a rule *so it is not
     re-litigated* rather than rule that binds — **97.04 KiB across 202 `·` sub-bullets at GX's
@@ -460,8 +467,8 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
     its per-group sizes are in `docs/reports/FF.md` §1 — do not re-derive them from a proposal.
   · **AT THE CEILING THE PROCEDURE IS EXHAUSTED, AND THE NEXT QUESTION IS NAMED HERE SO IT IS NOT
     REDISCOVERED (FU §1; RE-RUN AT GY §1).** Split-never-prune has no seam left of the kind it
-    takes, and the ceiling has now been re-derived **twice** (FU §1 at 340, GY §1 at 410). **Neither
-    re-derivation was the same move made twice**: every audit of this file has found nothing dead,
+    takes, and the ceiling has now been re-derived **three times** (FU §1 at 340, GY §1 at 410, HN §1 at
+    470). **No re-derivation was the same move made twice**: every audit of this file has found nothing dead,
     so its next rules-only reading is its own size on the day, and a ceiling derived from a file's
     own size moves with the file. **That is what makes the move repeatable and also what makes it
     cheap — which is the reason to say out loud that it is not free**: each run buys ten worst
@@ -497,7 +504,7 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
     52.50 KiB of headroom rather than at zero. **A seam is cleaner measured than reached**, and a
     split taken under a ceiling is a split taken in a hurry — which is the same argument that made
     the prune the wrong instrument.
-- **THE 410 KiB BINDS THIS FILE, THE REQUIRED READ, AND ITS FLOOR IS THIS FILE ALONE.** EE's 290 was
+- **THE 470 KiB BINDS THIS FILE, THE REQUIRED READ, AND ITS FLOOR IS THIS FILE ALONE.** EE's 290 was
   derived on a file that still held the instrument half, so it was conservative for this file alone
   and fired later than its own derivation would have. **FF's post-split reading carries no such
   term**, so that caveat retires with the number it described. **`docs/instrument-rules.md` is under
@@ -1168,7 +1175,9 @@ places** — the cap on the count, the release branch, and Communion's "still bu
   highest count held and the count caps at the threshold, so the deepest benefit an ally can carry
   fell from 5 stacks to 3. **The lane trades depth of hold for frequency of release, deliberately.** **HL §3's eight
   moved it back the other way, and the ceiling rose with it** — an ally's peak and the Devout's own count to 8;
-  `docs/reports/HL.md` §3 prices what the peak pays.
+  `docs/reports/HL.md` §3 prices what the peak pays. **THE FULL PEAK PAYS, CONFIRMED AT HN §2 (the designer's)** —
+  16% mitigation and +12% damage at the top — **because it is one number rather than two, and the only reading under
+  which Forbearance buys anything**: a paid peak capped apart from the threshold makes *hold one more stack* pay nothing.
 - **A BUILDER RATE THAT MEETS THE THRESHOLD IN ONE EVENT CHANGES WHAT THE CARD IS, AND THAT IS WHY
   CZ's BUILDERS WENT BACK.** At 3 per absorb against a threshold of 3, **one absorbed hit is a
   whole release** — a shielded ally never HOLDS Faith, so `faith_peak`, the high-water mark the
@@ -1955,13 +1964,19 @@ putting the pet in every Hunter's CLASS KIT: an engine no longer has to bring wh
   `docs/reports/GS.md` §1 carries the working, and which rows were the designer's.
   · **AND AN ENGINE THAT IS A TOGGLE BRINGS THE TOGGLE (HL §1, from play).** GS sent Guard Change to the pool because
     Aggressive pays from the first blow; the designer took the Stances and could not change stance. A rule that is a
-    switch nobody can press is missing, whatever it pays untouched: **the Stances bring Guard Change again** (the card
-    PROPOSED), and its offer row is deleted — an enabler is in no pool.
+    switch nobody can press is missing, whatever it pays untouched: **the Stances bring Guard Change again**, and its
+    offer row is deleted — an enabler is in no pool. **The card is RULED at HN §2 (the designer's)**: the one
+    unconditional swap — the other three cost Rage and switch as a side effect, so carrying one would bring a damage card
+    the engine can run without. Battle Poise's free pivot firing for every Stances holder from the first fight is
+    accepted with it.
 - **THE SECOND ENGINE IS FOUND IN PLAY, NEVER BOUGHT, AND WAITS IN THE BAG (HL §1, ruled from play).** The Peddler
   never offers one (`Run.peddler_rune`); a cache, the bargain and the drop still do. **A slotted engine brings its
   enablers, so `Run.hold_rune` slots an engine rune only when its caller asks, and the player's cache answer never
   asks**: until HL one pick could hand over a rune and a card — the designer's *Fireball dragging Razor Ice*, which no
   draft does (`docs/reports/HL.md` §1). Class selection still slots the one taken, and its card names what it brings.
+  **The cache's bag is CONFIRMED at HN §2 (the designer's)**: slotting on the pick is the mechanism that produced the
+  defect — one choice handing over two things with no announcement — and a core rune is a two-slot directional
+  decision the player makes at the panel.
 - **A LINEAGE OPENS WITH ITS ENGINE'S ENABLERS AND NOTHING ELSE, AND NO ENGINE REPLACES THE CLASS BASIC.**
   `Classes.lineage_opening` is the lineage's term in `Classes.opening_kit`, and `spec_abilities` is a lineage's
   DEFINITION table, not its opening kit. The four basics that were overrides (Fireball, Frostbolt, Arcane Explosion,
@@ -3525,7 +3540,7 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
   screen every resumed run lands on, whose opening chain ends at the full-bag panel.
 - **`check_hk` DRIVES ALL OF IT, A WHOLE RUN ON THE REAL SCREENS AMONG IT** — a static check cannot see a drop.
 
-## STANDING RULE — THE PARTY SCOPE IS BUILT AND HOLDS NO RUNE; ITS SCREEN WORD IS THE CREST (Batch HK §4, ruled by the designer; the word PROPOSED)
+## STANDING RULE — THE PARTY SCOPE IS BUILT AND HOLDS NO RUNE; ITS SCREEN WORD IS THE CREST (Batch HK §4, ruled by the designer; the word confirmed in HL's brief)
 
 > **A rune scoped `party` is class-neutral and reaches every hero at once. It is worn in a slot of its own, the
 > CREST, which takes no hero's slot — ONE slot, `Run.PARTY_RUNE_SLOTS`, the one constant every reader asks, so raising
@@ -3533,7 +3548,7 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
 > zero of them.**
 
 - **"PARTY" IS RETIRED FROM PLAYER-FACING TEXT, SO THE SCOPE KEEPS ITS NAME IN CODE AND THE SCREENS SAY *CREST*** (the
-  designer's to confirm: `docs/reports/HK.md`, NEEDS A RULING). The scope string `party` is an identifier, as the event
+  designer's word, confirmed in HL's brief). The scope string `party` is an identifier, as the event
   target the retired-word block names is, and the slot is saved under `crest` so no string a sweep reads spells it.
 - **ITS PAYLOAD REACHES EVERY HERO AT THE SPAWN, AND THAT IS THE ONE PARTY-LEVEL DOOR THE GAME HAS.** The battle applies
   a worn crest rune's payload to each of the four through `Talents.apply_payload`, where every rune's is applied, and
@@ -3543,9 +3558,21 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
   read beyond a stat or a card on each hero is the census in `docs/reports/HK.md` §4b, and **a crest rune that needs more
   than that owes new machinery before it is authored.** **HL §6 built half of the census's third door**: a payload's
   `condition` reads the four through `ctx.party` (`Talents.party_condition_met` — a class present, absent or counted,
-  a core rune carried, all standing at the opening), ONCE at the spawn, counting the heroes who stand then. **Whether all
+  a core rune carried, all standing at the opening), ONCE at the spawn, counting the heroes who stand then — **the
+  standing reading CONFIRMED at HN §2 (the designer's)**: the roster reading would make `heroes_all_standing`
+  meaningless and turn every key into a recruitment choice made once, so a fallen hero switching a conditioned crest
+  off until he is revived is chosen, not overlooked. **Whether all
   four are alive LATER is not built**: a stamped payload cannot come off a hero mid-fight, and a stamp that turns false
   by turn six would be a lie. The rune the roll call names says when its condition does not hold.
+- **WHAT A CREST PAYLOAD CAN WRITE IS HN §3's CENSUS (`docs/reports/HN.md` §3), AND A CREST RUNE IS AUTHORED AGAINST
+  IT.** A `stat` payload adds its value into the spawn's config under ANY key and checks none, so three shapes do not do
+  what a stat says: **a key the unit does not declare is DROPPED** in silence; **a key the config does not carry STARTS
+  FROM ZERO**, so on a field whose default is not zero the payload REPLACES the default — healing received on every hero
+  but the Cleric, parry chance on a hero with no base of his own; and **a party-wide stamp takes the best holder's
+  figure ONCE** (We Do Not Break, Heal More When Low), so four copies pay one. A condition's keys are ANDed and one key
+  cannot appear twice; `heroes_all_standing: false` is read as not asked; `heroes_class_count` reads a named class. A
+  card a crest grants lands on the battle's copy of every hero, every fight, priced in his own resource. `check_hn` §3
+  drives each.
 - **IT IS OFFERED THROUGH EVERY ROLL, TO ONE HERO AT A TIME.** `Runes._scope_ok` passes it for every hero, so the drop's
   union holds it once and the Peddler excludes what is already on his counter, lest two heroes be offered one rune.
 - **`check_hk` §4 BUILDS ONE IN THE FIXTURE AND NEVER IN THE FILE** (GK's empty engine slots, GO's filling them),
@@ -4174,6 +4201,11 @@ exactly the inverted card, and it would still read fine on the tooltip.
   DRAFTED**: GS §1 drafted it too, and since HL §1 it travels with the Stances as their enabler, because the designer
   took the engine and could not change stance. It is still the only UNCONDITIONAL one —
   the others cost Rage and sit on 3- and 4-turn cooldowns.
+· **THE STANCES' MAGNITUDES ARE THE HEADLINE READING (HL §3, CONFIRMED AT HN §2 BY THE DESIGNER).** Aggressive +30%
+  damage dealt, Defensive 15% less taken, both downsides 10%, and Formless +30% as both stances' upsides. **The other
+  reading — every upside 30% and every downside 15% — is REJECTED**: under it Formless deals +30% and takes 30% less with
+  no downside, and it halves what the Bared Guard's price takes back, a consequence nobody has priced. **Defensive is
+  now the weaker stance; that is a playtest question, not a batch's.**
 
 ## STANDING RULE — AN ENGINE IS EXCLUSIVE, AN AXIS IS SHARED (Batch DR §1)
 
@@ -4658,7 +4690,10 @@ wrong, and both were caught by gates that already existed.
   one word.
 · **THE LIVE POOL DOES NOT WEAR `Rune of the …`.** All 21 EZ/FC runes are bare — `Deepening Hex`,
   `Standing Wall`, `Keen Focus` — and `check_fd` §3 pins the long shape as the RETIRED pool's, with
-  a floor on the retired side proving the shape is really theirs.
+  a floor on the retired side proving the shape is really theirs. **A NAME A BRIEF WRITES IN THE LONG SHAPE SHIPS
+  BARE** — FK's thirty-nine, and HN's *Rune of Forbearance* as `Forbearance`, the one-word register of `Clarity` and
+  `Abundance` — unless the designer rules the long shape for that rune, which is a line in `check_fd` §3 as well as
+  the data.
 · **THE TWO INTERACT, AND FK'S FIX WAS ONE EDIT.** Bare-naming thirty-nine runes authored as
   *"Rune of the X"* turned §3 green AND removed four duplicate names at a stroke — under the pool's
   own convention the brief's *"a retired name is free"* becomes TRUE. **It forced exactly one

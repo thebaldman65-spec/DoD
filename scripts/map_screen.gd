@@ -1904,7 +1904,7 @@ func _pick_rune(idx: int, choice: int) -> void:
 	Run.save_run()
 	_draw_screen()
 	if landed == "bag" and is_core:
-		# PROPOSED WORDS (HL §1).
+		# THE WORDS HL §1 PROPOSED, RULED AT HN §2.
 		_toast("%s goes into the bag — slot it on the hero's rune panel to use it." % String(rune["name"]))
 	elif landed == "bag":
 		_toast("%s goes into the bag — every slot it fits is filled." % String(rune["name"]))
@@ -2015,8 +2015,11 @@ func _open_rune_panel(idx: int) -> void:
 	eng_head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	list.add_child(eng_head)
 	if erows.is_empty():
+		# BATCH HN §2 — RULED BY THE DESIGNER: HL's line read as though a core rune
+		# arrives ATTACHED TO another rune — the confusion HL §1a closed — so the
+		# line says where one is found, and nothing about arriving with anything.
 		var no_eng := Label.new()
-		no_eng.text = "No core rune held. Core runes come with the other runes."
+		no_eng.text = "No core rune held. Core runes are found in play, alongside the others."
 		no_eng.add_theme_font_size_override("font_size", 12)
 		no_eng.add_theme_color_override("font_color", Color(0.6, 0.57, 0.55))
 		no_eng.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

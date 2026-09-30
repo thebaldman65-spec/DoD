@@ -1165,10 +1165,13 @@ const PROTECTED_CORES := {
 	# Aggressive pays from the first blow. **HL §1 SENT IT BACK, FROM PLAY**: the
 	# designer took the Stances and could not change stance — the engine is a
 	# toggle, and a toggle nobody can press is the engine missing. Which swap
-	# travels is a ruling; Guard Change is PROPOSED, as the one that is
-	# unconditional (the others cost Rage and sit on 3- and 4-turn cooldowns).
+	# travels is a ruling, and GUARD CHANGE IS RULED (HN §2, the designer's): the
+	# one unconditional swap — the other three cost Rage, sit on 3- and 4-turn
+	# cooldowns and switch as a side effect, so carrying one would bring a damage
+	# card the engine can run without. Battle Poise's free pivot firing for every
+	# Stances holder from the first fight is ACCEPTED with it.
 	"swordmaster": {"slots": 1, "enablers": ["Guard Change"],
-		"why": "Seasoned Fighter is a stance toggle, and no Warrior basic or kit card changes stance. Guard Change is the unconditional swap (PROPOSED at HL §1, from play)."},
+		"why": "Seasoned Fighter is a stance toggle, and no Warrior basic or kit card changes stance. Guard Change is the unconditional swap (found in play at HL §1, ruled at HN §2)."},
 	# RULED (GS §1): the Pyromancer brings Flamewave and nothing else.
 	"pyromancer": {"slots": 1, "enablers": ["Flamewave"],
 		"why": "Overburn reads Burn standing on the field, and no Mage basic or kit card lays any. Flamewave lays it on every enemy (the designer's ruling)."},

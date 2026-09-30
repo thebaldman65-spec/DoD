@@ -2462,7 +2462,7 @@ const FORFEIT_REASONS := [
 
 var _rune_roll_call: Array = []  # "hero: rune name" per equipped rune, logged at battle open
 # BATCH HL §6 — what the roll call adds after a worn rune whose payload's condition
-# does not hold for this fight (PROPOSED WORDS). Evaluated at the spawn, once.
+# does not hold for this fight (HL §6's words, ruled at HN §2). Evaluated at the spawn, once.
 const CONDITION_UNMET_TAIL := "its condition does not hold for these heroes, so it pays nothing this fight"
 var _forfeit_panel: Control = null
 var _forfeit_nudge: Label = null
@@ -17832,14 +17832,14 @@ func _gain_faith(u: BattleUnit, n: int, source: String) -> void:
 	# ONE BRANCH, so there is one answer to "can this unit release".
 	var own := u == devout
 	var f_was := u.faith_stacks
-	# BATCH FK — THE RUNE OF THE FOURTH STACK moves the release THRESHOLD, and
+	# BATCH FK — FORBEARANCE (named at HN §2) moves the release THRESHOLD, and
 	# `FAITH_RELEASE` is both the cap and the threshold, so it moves both — an
-	# ally who cannot hold a fourth stack cannot release on one. It is read off
+	# ally who cannot hold the one more stack cannot release on it. It is read off
 	# the DEVOUT, never off the ally: the release is his engine, and reading it
 	# off the wearer's own field would mean the rune worked only when the Devout
 	# happened to be the ally being kindled.
 	#
-	# **THE PEAK IS WHAT PAYS, AND THE PEAK NEVER FALLS**, so a fourth stack is
+	# **THE PEAK IS WHAT PAYS, AND THE PEAK NEVER FALLS**, so the one more stack is
 	# permanently more mitigation and more damage on that ally for the rest of
 	# the battle — not merely a later release. That is the rune's real weight
 	# and it is why the heal arrives less often rather than more.
@@ -23237,12 +23237,13 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					_log("† %s dies" % target.unit_name, "#e05050")
 					_on_enemy_death(target)
 		"ordination":
-			# THE LOWEST HOLDER, NOT A CLICK. `faith_stacks` caps at five, so
-			# three granted to an ally already on four throws two away; aiming
-			# at the floor makes the grant worth its full three every time. It
+			# THE LOWEST HOLDER, NOT A CLICK. `faith_stacks` caps at the threshold
+			# (`FAITH_RELEASE`), so a grant to an ally already near it throws the
+			# excess away; aiming at the floor makes the grant worth its whole
+			# `od_grant` every time. It
 			# also points the card at the ally COMMUNION CANNOT REACH — that
 			# roll is (15 x their OWN stacks)%, i.e. zero for an ally on zero.
-			# THE CASTER IS EXCLUDED: his own Faith holds at five and never
+			# THE CASTER IS EXCLUDED: his own Faith holds at the threshold and never
 			# releases (BH §2), so a stack spent on him buys held mitigation and
 			# none of the release engine this card exists to start.
 			var od_grant := 4

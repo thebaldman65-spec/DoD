@@ -4,6 +4,55 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The ceiling, seven rulings, and what a crest payload can write (Batch HN) — 2026-09-29
+
+**Why the ceiling moved a third time, and why a fourth is not the answer.** `CLAUDE.md`'s ceiling exists because every
+batch pays the full read of that file. Re-deriving it off the file's own size buys ten record batches of room each time
+and nothing else — which is why the third run was taken now (the file stood two record batches from 410) and why the
+next arrival is answered by a recon on the file's shape instead: an index with subjects read on demand, weighed against
+one file whose ceiling keeps moving. A ceiling that only ever rises is measuring nothing. Splitting the reasoning out
+stays rejected, for the reason GY gave: the reasoning is what stops a settled question being argued again, and a batch
+only meets it by reading it.
+
+**Why Guard Change is the swap the Stances bring.** It is the one unconditional swap. Precision Strike, Feint and
+Wheeling Cut each cost Rage, sit on longer cooldowns and switch stance as a side effect of a strike, so carrying one of
+them would hand every Stances holder a damage card the engine does not need. With it comes Battle Poise's free pivot
+firing for every Stances holder from the first fight; that turns a conditional card into a real one for that engine.
+
+**Why the stances read +30% dealt and −15% taken.** The ruling named two numbers and they are the two headline ones:
+Aggressive deals 30% more, Defensive still takes 15% less, both downsides stay 10%, and Formless — defined as both
+stances' upsides — deals 30% more too. The other reading (every upside 30%, every downside 15%) would make Formless
+deal 30% more and take 30% less with no downside, and would halve what the Bared Guard's price takes back; nobody has
+priced either. It leaves Defensive the weaker stance, and whether that matters is for play to say.
+
+**Why Faith pays on the full peak.** An ally's count caps at the threshold and pays on the highest it held, so at eight
+the top is 16% less damage taken and 12% more dealt. Capping the paid peak apart from the threshold would be a second
+number for one idea, and it would make the rune that lets allies hold one more stack pay nothing. The Devout's own
+count never releases, so once he tops out he keeps the top for the fight; that is the thing to watch in play.
+
+**Why the Fourth Stack is Forbearance.** Its old name counted stacks, and eight made the count wrong. Forbearance says
+what it does — the release is held back — in the Cleric's register of rites and virtues. It ships as the one word, the
+way the pool's other one-word runes (Clarity, Abundance) do, because the live runes are bare-named.
+
+**Why the empty pouch says core runes are found in play.** The old line said they come with the other runes, which
+reads as though a core rune arrives attached to another rune — the very confusion the playthrough's Fireball report came
+from. The new line says where one is found and nothing about arriving with anything.
+
+**Why a party condition counts the heroes standing, not the roster.** Counting the roster would make "every hero
+standing" mean nothing and turn every condition into a choice made once, at recruitment. Counting the standing means a
+fallen hero switches a conditioned crest off for every fight until he is revived, on top of the party being a hero down
+— a real cost of losing someone, chosen rather than overlooked.
+
+**Why a core rune taken from a cache goes to the bag.** Slotting it on the pick is exactly what produced the playthrough's
+complaint: one choice handed over a rune and a card with nothing said. A core rune changes what a hero drafts for the
+rest of the run and takes one of his two core slots; that is a decision for the rune panel, not a side effect of a cache.
+
+**Why the census comes before any crest rune.** A crest rune can put a stat on every hero, but "a stat" hid three shapes
+that do not do what a stat says: a field the hero does not have is dropped without a word, a field the spawn does not
+give every hero replaces its default instead of adding to it (a healing bonus would cut every non-Cleric's healing to
+the bonus itself), and a party-wide stamp takes the best holder once, so four copies are one. Writing crest runes against
+that list, rather than discovering it rune by rune, is the reason the census ran first.
+
 ## What the playthrough found, and the party condition (Batch HL) — 2026-09-29
 
 **Why a core rune taken from a cache waits in the bag.** A core rune brings the ability its rule cannot work without —

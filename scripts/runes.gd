@@ -507,7 +507,7 @@ const RUNE_TAGS := {
 	# Devout —
 	"layered_aegis": ["DEFENSE"],              # the Layered Aegis — two bodies warded
 	"deep_absorb": ["RESOURCE", "DEFENSE"],    # the Deep Absorb — the absorb pays more
-	"fourth_stack": ["DEFENSE", "OFFENSE"],    # the Fourth Stack — the peak goes one higher
+	"fourth_stack": ["DEFENSE", "OFFENSE"],    # Forbearance — the peak goes one higher
 	"bare_altar": ["RESOURCE", "DEFENSE"],     # the Bare Altar — rate bought with size
 	# Survivalist —
 	"long_poison": ["DEBUFF"],                 # the Long Poison — the clock stops

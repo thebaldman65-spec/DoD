@@ -162,7 +162,7 @@ below.
 | the bar | where it is stated | what watched it | what happened |
 |---|---|---|---|
 | `docs/changelog.html` at 400 KB | CW §4, the block above | nothing, from CW to FG | crossed at FB/FC and **four batches went past in silence** |
-| `CLAUDE.md` at 290 KiB (340 since FU §1) | EE §1, `CLAUDE.md`'s ceiling block | nothing, from EE to FG | not yet crossed — **found out by measuring rather than by arriving** |
+| `CLAUDE.md` at 290 KiB (re-derived since; its bar is stated in its own ceiling block alone) | EE §1, `CLAUDE.md`'s ceiling block | nothing, from EE to FG | not yet crossed — **found out by measuring rather than by arriving** |
 
 - **THE FAILURE MODE IS NOT THAT THE BAR IS WRONG. IT IS THAT NOTHING LOOKS.** `check_dv` §4
   printed the live changelog's ENTRY COUNT every single battery from DV onward and nothing
@@ -202,7 +202,7 @@ below.
   changelog is append-only prose. **The same silence on a bar with a harder procedure behind it is
   not cheap**, and `CLAUDE.md`'s is the harder one: FF measured that there is no third seam of its
   kind, so the batch that met 290 KiB had two moves and both were the designer's — FU §1 took one,
-  and `CLAUDE.md`'s ceiling block names what is left at 340. **Finding
+  and `CLAUDE.md`'s ceiling block names what is left. **Finding
   that out early is the whole value.**
 
 ## A CEILING IS A NUMBER WITH AN ANSWER BEHIND IT (STANDING, Batch GZ §6, recorded at HA §5)

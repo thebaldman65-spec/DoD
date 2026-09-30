@@ -2,18 +2,18 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1544,
-  "source": 1189,
+  "total": 1560,
+  "source": 1199,
   "other": 105,
-  "document": 250
+  "document": 256
  },
  "source_residency": {
   "narrow": 43,
-  "code": 711,
-  "absent": 306,
-  "runtime": 85,
+  "code": 716,
+  "absent": 307,
+  "runtime": 88,
   "unresolved": 1,
-  "comment": 40,
+  "comment": 41,
   "alt-sibling": 3
  },
  "pins": [
@@ -3849,6 +3849,184 @@
    "k": "literal",
    "how": "read",
    "g": "check_hl.gd#771"
+  },
+  {
+   "s": "check_hn.gd",
+   "fn": "_s1_the_ceiling",
+   "h": "CLAUDE.md",
+   "n": "\n## ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hn.gd#152"
+  },
+  {
+   "s": "check_hn.gd",
+   "fn": "_s1_the_ceiling",
+   "h": "CLAUDE.md",
+   "n": "## THIS FILE IS MEASURED IN KiB, AND THE CEILING IS ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hn.gd#151"
+  },
+  {
+   "s": "check_hn.gd",
+   "fn": "_s1_the_ceiling",
+   "h": "CLAUDE.md",
+   "n": "A FOURTH IS NOT THE ANSWER",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_hn.gd#155"
+  },
+  {
+   "s": "check_hn.gd",
+   "fn": "_s1_the_ceiling",
+   "h": "CLAUDE.md",
+   "n": "RAISED AT FU §1, GY §1 AND HN §1",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_hn.gd#156"
+  },
+  {
+   "s": "check_hn.gd",
+   "fn": "_s1_the_ceiling",
+   "h": "CLAUDE.md",
+   "n": "SPLITTING THE REASONING OUT. DO NOT",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_hn.gd#157"
+  },
+  {
+   "s": "check_hn.gd",
+   "fn": "_s1_the_ceiling",
+   "h": "CLAUDE.md",
+   "n": "not the seam that recon reconsiders",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_hn.gd#157"
+  },
+  {
+   "s": "check_hn.gd",
+   "fn": "_s2b_the_empty_pouch",
+   "h": "scripts/map_screen.gd",
+   "n": "\"%s\"",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_hn.gd#256"
+  },
+  {
+   "s": "check_hn.gd",
+   "fn": "_s2b_the_empty_pouch",
+   "h": "scripts/map_screen.gd",
+   "n": "Core runes come with",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hn.gd#257"
+  },
+  {
+   "s": "check_hn.gd",
+   "fn": "_s2c_the_markers",
+   "h": "scripts/classes.gd",
+   "n": "Guard Change is the unconditional swap (found in play at HL §1, ruled at HN §2)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hn.gd#291"
+  },
+  {
+   "s": "check_hn.gd",
+   "fn": "_s3a_stat_fields",
+   "h": "scripts/battle.gd",
+   "n": "if u.resource_name == \"Mana\":",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hn.gd#471"
+  },
+  {
+   "s": "check_hn.gd",
+   "fn": "_s3a_stat_fields",
+   "h": "scripts/battle.gd",
+   "n": "u.resource = mini(u.resource + _mana_regen(u), u.max_resource)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hn.gd#470"
+  },
+  {
+   "s": "check_hn.gd",
+   "fn": "_s4_ordination",
+   "h": "scripts/battle.gd",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_hn.gd#577",
+   "expr": "anchor"
+  },
+  {
+   "s": "check_hn.gd",
+   "fn": "_s4_ordination",
+   "h": "scripts/battle.gd",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_hn.gd#578",
+   "expr": "anchor"
+  },
+  {
+   "s": "check_hn.gd",
+   "fn": "_s4_ordination",
+   "h": "scripts/battle.gd",
+   "n": "FAITH_RELEASE",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_hn.gd#585"
+  },
+  {
+   "s": "check_hn.gd",
+   "fn": "_s4_ordination",
+   "h": "scripts/battle.gd",
+   "n": "THE LOWEST HOLDER, NOT A CLICK",
+   "p": "+",
+   "r": "comment",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_hn.gd#581"
+  },
+  {
+   "s": "check_hn.gd",
+   "fn": "_s4_ordination",
+   "h": "scripts/battle.gd",
+   "n": "var od_grant :=",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hn.gd#579"
   },
   {
    "s": "test_batch_ah.gd",

@@ -16,6 +16,60 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-09-29 &mdash; Batch HN: THE CEILING, SEVEN RULINGS, AND WHAT A CREST PAYLOAD CAN WRITE</h2>
+<p><b>The rules file's size ceiling moved a third time, and the next arrival there will be answered by a recon on the
+file's shape rather than a fourth move. Seven rulings on HL's work are recorded: five confirm what HL built, and two
+change the game &mdash; the Fourth Stack rune is now <i>Forbearance</i>, and the empty rune pouch says where core runes
+come from. And the census the crest runes will be written against is taken.</b> No rune was authored. Full working:
+<code>docs/reports/HN.md</code>.</p>
+
+<p><b>&sect;1 &mdash; THE CEILING.</b> <code>CLAUDE.md</code> stood at 393.67 KiB against 410, two of the largest batches on
+record away. <b>Its ceiling is re-derived the way it was twice before</b> &mdash; the file's size on the day plus ten of the
+largest single batch on record (EZ's, which still stands) &mdash; <b>to 470 KiB</b>, rounded down. <b>This is the third
+re-derivation, and the designer has ruled that a fourth is not the answer</b>: the ceiling exists because every batch
+reads the whole file, so a ceiling that only rises measures nothing. A recon on the file's shape &mdash; an index with
+subjects read on demand, against one file with a moving ceiling &mdash; is queued and was not run. Splitting the reasoning
+out of the file stays rejected.</p>
+
+<p><b>&sect;2 &mdash; THE SEVEN RULINGS.</b> <b>Confirmed as built:</b> Guard Change is the swap the Stances bring (the one
+that costs nothing and needs no stance; the others cost Rage and switch as a side effect), and Battle Poise's free pivot
+for every Stances holder comes with it; the stances are Aggressive +30% damage dealt and Defensive 15% less taken, with
+10% downsides and Formless at +30% &mdash; the other reading, every upside 30%, is rejected, and Defensive being the
+weaker stance now is a question for play; Faith pays on the full peak, 16% less damage taken and 12% more dealt at eight,
+so the Devout, whose own count never releases, keeps the top once he reaches it; a core rune taken from a cache waits in
+the bag; and a party condition counts the heroes standing when the fight opens, so a fallen hero switches a conditioned
+crest off until he is revived. <b>Changed:</b> <b>the Fourth Stack rune is Forbearance</b> &mdash; its text is unchanged,
+<i>&ldquo;Allies hold one more stack of Faith before releasing.&rdquo;</i>, and a save holding it under either old name loads it as
+Forbearance; and <b>the empty rune pouch reads <i>&ldquo;No core rune held. Core runes are found in play, alongside the
+others.&rdquo;</i></b>, because the old line read as though a core rune arrives attached to another rune.</p>
+
+<p><b>&sect;3 &mdash; WHAT A CREST PAYLOAD CAN WRITE.</b> Measured, with runes built for the check and never written into the
+game's data. <b>A crest rune can put on every hero any of the stats the talent tree uses</b> (health, Attack, armor,
+critical chance, speed, parry, damage dealt and taken, Break, armor penetration and the rest) and the hero's own stat
+block (Break resistance and the Break bar, block), each arriving exactly on all four. <b>Three shapes do not do what a stat
+says</b>: a stat the heroes do not have is dropped without a word; a stat the fight does not give every hero
+<b>replaces</b> the hero's own value instead of adding to it &mdash; a crest adding 20% healing received would leave every
+hero but the Cleric receiving a fifth of every heal; and a party-wide effect such as <i>We Do Not Break</i> takes the best
+holder's figure once, so four copies are one. <b>A condition can name several requirements and pays only when every one
+holds</b> (<i>no Mage and two Warriors</i> works); it cannot name the same requirement twice; <i>every hero standing: false</i>
+does not mean <i>someone has fallen</i> &mdash; it is ignored; and a count of a class names a class, so <i>any class twice</i> is
+not expressible. <b>A card a crest grants reaches every hero's bar</b>, works, is priced in each hero's own resource (a
+priced card is dark on a Warrior who opens at no Rage), and is the fight's copy &mdash; granted again each fight while the
+crest is worn, never kept.</p>
+
+<p><b>&sect;4 &mdash; HOUSEKEEPING.</b> Ordination's two comments that said Faith caps at five name the threshold now. <b>The 461
+spent user-data folders the test copies left were not deleted</b>: moving them was refused by the session's permission
+check, so they are where they were, and clearing them is left to the designer.</p>
+
+<p><b>Found along the way, and not changed.</b> <b>Elevation's card still describes the release at three</b> &mdash;
+<i>&ldquo;An ally already holding 3 crosses the cap and RELEASES&rdquo;</i> &mdash; which has been false since Faith moved to eight;
+the card's words are the designer's (<code>docs/reports/HN.md</code>, the rulings owed). The Master Document's Elevation and
+Blessing of the Faithful rows said the same and are corrected. <b>Three retired runes with a healing-received price</b> would,
+on a saved run still holding one, stop that hero's healing entirely rather than cut it by the rune's figure &mdash; the same
+replace-not-add shape the census found.</p>
+
+<p><b>The checks that moved, and why.</b> <b>None was changed.</b> Every existing check was first run as it stood against this batch's game and documents &mdash; 128 of them, in 73 minutes &mdash; and every one read exactly what it read before HN, the two long-known reds included, so no check was re-pointed. <b>A new check, <code>check_hn</code>, drives this batch</b>: the new name and a save carrying the old ones, the pouch's line on the real screen, and every answer in the census, each shown to go red when the thing it checks is broken. Two rows of the count table move with it: the parse check counts one more target, and the count checker one more row.</p>
+
 <h2>2026-09-29 &mdash; Batch HL: WHAT THE PLAYTHROUGH FOUND, AND THE PARTY CONDITION</h2>
 <p><b>The designer played the merged game and found five things wrong; all five are fixed and driven, and four
 rulings from the same play are built with them.</b> Engine runes are called <b>core runes</b> on every screen, four

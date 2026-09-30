@@ -13,77 +13,124 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-29 (Batch HL).*
+*Last rewritten: 2026-09-29 (Batch HN).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: HL — WHAT THE PLAYTHROUGH FOUND, AND A CONDITION ON THE FOUR HEROES. THE SECOND BATCH AUTHORED FROM A
-  PLAYTHROUGH.** IMPLEMENT ONLY: no rune authored; four magnitudes moved, each by ruling. **The letter HM was folded in
-  and is spent.** Full working: **`docs/reports/HL.md`**.
-- **§1 — THE FIVE DEFECTS, FIXED AND DRIVEN BOTH WAYS.** (a) *Fireball dragged Razor Ice*: no draft hands over two cards
-  (4,077 takes, zero pairs, on HK's code and HJ's); a **core rune slotted on arrival** did — `Run.hold_rune` slots one only
-  when asked, and the player's cache answer never asks: it goes to the bag. (b) *Core runes at the Peddler*: HK had not
-  closed it (14 in 32 offers) — **`Run.peddler_rune` sells none**. (c) *A bought rune never appeared*: at HJ it went onto
-  the hero unworn, which the map never drew; since HK it goes to the bag, which the counter says and the map counts.
-  (d) *No stance change*: **the Stances bring Guard Change again** (PROPOSED; its offer row deleted, the Warrior pool 42).
-  (e) *Preparation asked for a target*: it and **nine more** read none — all ten on the no-target list.
-- **§2 — ENGINE RUNES ARE CORE RUNES ON EVERY SCREEN.** The 24 are named *(core)*; *"Engine:"* is gone from the card and
-  the sheet, and the combat log names a rule engine's rune as the data does; identifiers keep *engine*; a saved rune gets
-  today's name on load.
-- **§3 — FOUR MAGNITUDES, RULED.** The Bastion banks only the blocked, the parried and the absorbed; **Aggressive +30%**
-  dealt (+15% before; Defensive's −15% unchanged; Formless follows); **each Mercy stack cuts damage taken 5%** (the bar
-  caps at five: 25%); **Faith releases at 8** (3 before) — and the held ceiling rose with it (NEEDS A RULING 3).
-- **§4 — THE PLAYTHROUGH'S RULE** is in `CLAUDE.md` beside the charter: *a core rune is a directional for ability
-  drafting*, with Ambusher's unbuilt direction and the crest's half-built door.
-- **§5 — THE RUN SAVE HAS A CEILING**, `Profile`'s shape: a save above `SAVE_VERSION` is refused and KEPT (`save_run` and
-  `clear_save` no-ops while it is on disk; the menu says so, Continue dark). **It does not fix the current hazard**: an
-  older build still writes a newer save away. The `< 10` floor did not move.
-- **§6 — A PAYLOAD'S CONDITION CAN READ THE FOUR**, once, at the spawn: a class present, absent or counted, a core rune
-  carried, all standing (`heroes_…` keys). The continuous half is not built. Driven with fixture runes only.
-- **THE VERIFICATION.** The recon — HEAD's unmodified gates against HL's game, 127 targets in 72 min 16 s — read 44 targets red and eleven count moves; every red was read by its FAIL text and re-pointed to intent, every move traced check by check (`docs/reports/HL.md` §10). Twenty-five controls, each one defect in its own copy, bit every re-pointed pin (one prediction wrong, and why, recorded). The pre-pass (73 min 36 s) and the acceptance run in the repository (73 min 21 s) each read **`check_de` 529 / 0 / 0** over 128 targets, the prediction exactly, with the two sanctioned reds at their counts (`check_cm_live` 13 / 4, `check_gj` 70 / 1 at +151 / +171). Not one file moved under the acceptance run, and the player's four files are byte-identical to the 10:25 backup.
-- **`CLAUDE.md` IS 403,114 B = 393.67 KiB, WITH 16.33 KiB UNDER ITS 410 KiB CEILING** (+5,269 B; HK's rate
-  leaves **about two batches** — `docs/reports/HL.md` §7 re-derives it and names the next move, which is the designer's).
-- **WHAT MOVED:** twelve game scripts; `data/runes.json`'s twenty-four core-rune names and the Fourth Stack's words, and seven glossary entries; a new gate, `check_hl` (168), and thirty-four targets re-pointed to their intent — seventeen gates (`check_gw`'s ceiling among them) and seventeen suites — and the suites' shared pool floor (`docs/reports/HL.md` §10); eighteen baseline rows moved or added, eleven of them counts the game moved with nothing edited, each traced check by check; the pin manifest 1534 → 1544.
+- **Last batch: HN — THE CEILING, SEVEN RULINGS, AND WHAT A CREST PAYLOAD CAN WRITE.** IMPLEMENT ONLY: no rune authored,
+  no magnitude moved. Full working: **`docs/reports/HN.md`**.
+- **§1 — THE CEILING IS 470 KiB, THE THIRD RE-DERIVATION** (393.67 + 80.99 = 474.65, stated as 470), taken before any
+  other section wrote a byte. **A fourth is not the answer (ruled)**: the next move at the ceiling is the SHAPE RECON
+  queued below, not run here. GY's rejection of splitting the reasoning out stands.
+- **§2 — SEVEN RULINGS: FIVE CONFIRMED AS BUILT, TWO MOVED CODE.** Confirmed: Guard Change travels with the Stances;
+  the stances' headline reading (Aggressive +30% dealt, Defensive −15% taken, 10% downsides, Formless +30%); Faith pays
+  on the full peak; a core rune from a cache goes to the bag; the condition keys count the heroes standing. Moved code:
+  **the Fourth Stack is `Forbearance`** (shipped bare — NEEDS A RULING 1), and **the empty pouch reads "No core rune
+  held. Core runes are found in play, alongside the others."**
+- **§3 — THE CENSUS a crest rune is authored against is `docs/reports/HN.md` §3**, driven by `check_hn` §3 with fixture
+  runes only: the every-hero stat list, three shapes that do not do what a stat says (dropped, replace-not-add,
+  max-merged), a condition's keys ANDed, `heroes_all_standing: false` ignored, a crest's card on the battle's copy, and
+  `heroes_class_count` naming a class. `data/runes.json` holds no crest entry.
+- **§4 — ORDINATION'S TWO COMMENTS NAME THE THRESHOLD.** **THE 461 SPENT USER-DATA FOLDERS WERE NOT DELETED**: moving them
+  was refused by the session's permission check, so the clearing is the designer's (below).
+- **THE VERIFICATION.** The recon — HEAD's unmodified gates against HN's game and documents, 128 targets in 73 min 39 s — read every
+  target at its count (`check_de` 529 / 0 / 0) with only the two sanctioned reds, so **no existing check was
+  re-pointed**. Fourteen controls, one defect each, bit every arm of the new gate, `check_hn` (74). The pre-pass read
+  **`check_de` 533 / 0 / 0** over 129 targets in 73 min 45 s, the prediction exactly. **The acceptance run in the
+  repository (129 targets, 73 min 39 s) read `check_de` 533 / 1**: every target at its pre-pass value but `test_batch_bk`
+  §3, 130 / 1 — a latent 1-in-54 flake in HEAD's own suite, reproduced by seed on both trees (THE FLAKES, below). The two
+  sanctioned reds at their counts (`check_cm_live` 13 / 4, `check_gj` 70 / 1 at +151 / +171); not one file moved under
+  the acceptance run, and the player's four files are byte-identical to the 19:56 backup.
+- **`CLAUDE.md` IS 406,914 B = 397.38 KiB, WITH 72.62 KiB UNDER ITS 470 KiB CEILING** (+3,800 B at HN, measured after this batch's own writing): **about 14.1 batches at HL's +5,269 B** and **about 9.2 at HK's +8,085 B** (9.0 at the record, EZ's +8,293 B). The shape recon is owed before then — the ceiling's next arrival is not answered by the arithmetic.
 - **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in an
   older build** — HL's ceiling guards from the next version bump on, not from HJ's or HK's builds, nor `main`.
-- **Next letter: HN** (HM is spent).
+- **Next letter: HO.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### HL's RULINGS OWED — **SEVEN, AND NOTHING WAITS ON THEM**
+### HN's RULINGS OWED — **THREE; THE FIRST TWO ARE PLAYER-VISIBLE**
 
-Full working: `docs/reports/HL.md`, NEEDS A RULING.
+Full working: `docs/reports/HN.md`, NEEDS A RULING.
 
-1. **WHICH STANCE SWAP TRAVELS WITH THE STANCES — GUARD CHANGE IS PROPOSED.** The one unconditional swap; Battle Poise's
-   free pivot now fires for every Stances holder from the first fight.
-2. **THE STANCES' +30% / −15% WAS READ AS THE HEADLINE PAIR** — Aggressive +30% dealt, Defensive −15% taken (unchanged),
-   downsides 10%; Formless followed to +30%. The other reading (every upside 30%, every downside 15%) is one constant each
-   way.
-3. **FAITH AT EIGHT MOVED THE HELD HALF TOO** — the peak an ally or the Devout can hold rose from 3 to 8 (16% mitigation
-   and +12% damage at the top, from 6% and +4.5%). Confirm the depth, or rule the cap apart from the threshold.
-4. **THE FOURTH STACK RUNE'S WORDS AND NAME** — it reads *"Allies hold one more stack of Faith before releasing."*
-   (PROPOSED); its name no longer describes it.
-5. **A CORE RUNE TAKEN FROM A CACHE GOES TO THE BAG** — the implementation call; slotting it on the pick is one line.
-6. **THE WORDS, ALL PROPOSED** — the counter's only-core sentence, the cache's bag toast, the pouch's *CORE RUNES* lines,
-   the map card's *core runes:*, the sheet's *Core rune: none held.*, the roll call's *"its condition does not hold for
-   these heroes, so it pays nothing this fight"*, and the five `heroes_…` condition keys.
-7. **A CONDITION KEY COUNTS THE HEROES STANDING WHEN THE FIGHT OPENS**, not the roster — one line the other way.
+1. **FORBEARANCE SHIPPED BARE.** The brief named it *RUNE OF FORBEARANCE*; the live pool is bare-named (FK §2a, and
+   `check_fd` §3 reds a live ordinary rune that begins *Rune of*), and FK bare-named the thirty-nine its brief wrote in
+   the long shape — this rune among them, whose *Rune of the Fourth Stack* was `Fourth Stack`. So it reads
+   `Forbearance`, beside `Clarity` and `Abundance`. The long shape is one string in the data plus `check_fd` §3's arm
+   and FK §2a's rule.
+2. **ELEVATION'S CARD STILL DESCRIBES THE RELEASE AT THREE** — *"An ally already holding 3 crosses the cap and RELEASES
+   on the spot"* — false since HL §3 moved the threshold to eight (an ally needs six or seven). The card's words are the
+   designer's and were not touched; `master.html`'s Elevation and Blessing rows said the same and are corrected.
+3. **THE REPLACE-NOT-ADD TRAP, BEFORE ANY CREST IS AUTHORED.** A stat payload on a field the spawn does not give every
+   hero replaces the default: +0.20 healing received leaves every hero but the Cleric at 0.20 (a heal of 100 lands 20),
+   and parry chance replaces the role baseline. Close it (the spawn carries the defaults — priced in the report §3a) or
+   author around it; it also reaches three retired runes on a saved run (below).
+
+### FOUND AT HN AND NOT FIXED
+
+- **THREE RETIRED RUNES' HEALING PRICE ZEROES A NON-CLERIC'S HEALING** on a saved run still holding one — Vampiric
+  (universal, −0.3) and the Rune of the Killing Cold (Mage, −0.25) replace the 1.0 default with a negative figure, which
+  the heal pipeline clamps to nothing. `unit.gd`'s heal comment says *"No reachable loadout gets there today"*, which
+  is false for such a save. None is on disk. (The Cleric-scoped two, Martyr and the Hollow Chalice, land on his 1.15.)
+- **ELEVATION'S HANDLER COMMENT** says *"An ally already holding 3 reaches 5"* — stale since CZ; a comment, left (the
+  brief: Ordination's two, not the sweep).
+- **`test_batch_bk` §3 IS A 1-IN-54 FLAKE** (THE FLAKES, below) — it read red once in HN's acceptance run and is not
+  HN's; the arm owes a repair.
+- **THE CENSUS'S MISSING SHAPES, PRICED FOR THE DESIGN PASS** (`docs/reports/HN.md` §3b, §3c, §3e): one key twice, an OR,
+  `heroes_all_standing: false` as *someone has fallen*, and *any class twice* — each a few lines in
+  `Talents.party_condition_met` and a drive. None is built.
+- **461 ISOLATED USER-DATA FOLDERS REMAIN** under Godot's `app_userdata` — 455 *"Dawn of Decay …"* copies, five *"DoD …"*
+  copies (FY, G2, G6) and one *"[unnamed project]"* (a failed launch's one-line log, 10 July) — **142,436 KiB**. HN moved
+  one into the Trash as a test, the permission check refused the rest, and the one was put back; an empty folder
+  *"DoD spent user-data folders (Batch HN, 2026-09-29)"* is left in the Trash. ****This batch added seventeen of its own, kept**: *"Dawn of Decay HN work"*, *"… HN recon"*, the
+  fourteen controls *"… HN ctl K1"* to *"… HN ctl K14"* and *"… HN prepass"* — so 478 such folders stand beside the live
+  game's own.** This batch's backup is
+  `../save-backups/HN-20260929-195624`.
+
+### THE SHAPE RECON ON `CLAUDE.md` — **QUEUED BY RULING AT HN §1, NOT RUN**
+
+The question it asks: **whether an index plus subjects read on demand beats one file with a moving ceiling.** It is
+not GY's reasoning split, which stays rejected. It is owed before the file reaches 470 KiB — the live headroom and the
+rates are in the WHERE block above.
+
+### TO WATCH IN PLAY — **RULED AT HN §2; EACH IS ONE CONSTANT OR ONE LINE IF IT READS WRONG**
+
+- **The Devout's own Faith never releases, so once he reaches the top he sits at 16% less damage taken and +12% damage
+  dealt for the rest of the fight.** One constant if it reads absurd.
+- **Defensive is now the weaker stance** — Aggressive's upside doubled to +30% and Defensive's cut stayed at 15%. A
+  playtest question, not a batch's.
+- **A fallen hero switches a conditioned crest off for every fight until he is revived**, on top of the party being a
+  hero down — chosen, not overlooked.
+- **Communion's 105% at the top of its band stays dormant and flagged** (`communion_ranks`, which nothing writes);
+  `test_batch_be` §6 reds the day a writer arrives.
+
+### ~~HL's RULINGS OWED~~ — **ALL SEVEN ANSWERED IN HN's BRIEF: FIVE CONFIRMED AS BUILT (1, 2, 3, 5, 7), TWO MOVED CODE (4, 6)**
+
+1. **Guard Change travels with the Stances** — confirmed; Battle Poise's free pivot for every Stances holder accepted.
+2. **The stances' headline reading** — confirmed; the other reading rejected (Formless +30% dealt and 30% less taken
+   with no downside, and half the Bared Guard's take-back — unpriced).
+3. **Faith pays on the full peak** — confirmed: one number rather than two, and the only reading under which
+   Forbearance buys anything.
+4. **The Fourth Stack's words and name** — the words stand; the name is **Forbearance** (built at HN §2; see HN's
+   ruling 1).
+5. **A core rune from a cache goes to the bag** — confirmed.
+6. **The words** — all confirmed, the five `heroes_…` keys among them, with one change built at HN §2: the empty pouch
+   reads *"No core rune held. Core runes are found in play, alongside the others."*
+7. **The condition keys count the heroes standing** — confirmed; the roster reading rejected.
 
 ### FOUND AT HL AND NOT FIXED
 
 - **THREE CARD TEXTS USE *ENGINE* AS A WORD FOR A RULE** (`classes.gd:3891`, `:5624`, `:6944`) — card text, left as
-  authored; a player reads *core rune* on every screen and *engine* on three cards.
-- **ORDINATION'S HANDLER COMMENTS SAY FIVE** (`battle.gd:23240`, `:23245`); the cap is the threshold, 8 since HL.
+  authored (ruled at HN: the designer's); a player reads *core rune* on every screen and *engine* on three cards.
+- ~~**ORDINATION'S HANDLER COMMENTS SAY FIVE**~~ — **FIXED AT HN §4**: both name the threshold, `FAITH_RELEASE`.
 - **AN OLD SAVE WHOSE SWORDMASTER DRAFTED GUARD CHANGE HOLDS IT TWICE** and pays a slot for the earned copy until he
   benches it. None on disk.
 - **`heroes_all_standing` IS TRUE OF THE OPENING AND PAID TO THE END** — the continuous half is not built
   (`docs/reports/HL.md` §6 prices it).
-- **COMMUNION AT EIGHT IS A CERTAINTY AT THE TOP OF ITS BAND** (15% × 7), on a node nothing writes; `test_batch_be` §6
-  reds the day a writer arrives.
-- **`CLAUDE.md` HAS ABOUT TWO BATCHES LEFT AT HK's RATE** — the next move (a third re-derivation, or a subject seam) is the
-  designer's (`docs/reports/HL.md` §7).
-- **THIRTY-SIX ISOLATED COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata`, every one named **"Dawn of Decay HL …"**: **"work"**, **"probe"**, **"probehj"**, **"ctlhead"**, **"recon"**, the controls **"ctl K1"** to **"ctl K25"**, the traces **"trace_head"**, **"trace_hl"**, **"tH0"**, **"tH1"**, **"tN"**, and **"prepass"**. **There are 461 such folders now**, counting every folder there but the live game's own. They hold nothing a player needs and can be deleted. This batch's backup is `../save-backups/HL-20260929-102530`.
+- ~~**`CLAUDE.md` HAS ABOUT TWO BATCHES LEFT AT HK's RATE**~~ — **CLOSED AT HN §1**: the ceiling is 470 KiB, and the next
+  move is the shape recon.
+- **THE THIRTEEN COMBAT-LOG LITERALS STAY LITERALS** (HL §9) — reading the name off the data is the durable form, and it
+  is not a batch the brief has taken.
 
 ### ~~HK's RULINGS OWED~~ — **ALL FOUR ANSWERED IN HL's BRIEF**
 
@@ -2525,8 +2572,8 @@ are closed, and carries the two things a later batch must not re-derive from scr
 - **THE CUT IS NOT A JUDGEMENT CALL ANY MORE AND NOBODY HAS TO REMEMBER IT.** `check_fg.gd` §1
   reads `docs/changelog.html` against CW §4's threshold **every battery**, prints both the decimal
   and binary figures beside the bar, WARNS over it and FAILS if a second batch passes without the
-  cut. `check_fg.gd` §2 does the same for `CLAUDE.md` against its ceiling — EE's 290 KiB, 340 since
-  FU §1. **A threshold with no
+  cut. `check_fg.gd` §2 does the same for `CLAUDE.md` against its ceiling — EE's 290 KiB, re-derived
+  since; the live bar is the one its ceiling block states. **A threshold with no
   instrument is a note, not a gate** — that is now a standing rule in
   `docs/instrument-rules.md`, beside the changelog block itself.
 - **A SAMPLE IS PART OF AN ASSERTION'S TERRITORY, AND A VACUITY THAT IS ONLY PRINTED IS ONE NOTHING
@@ -3451,7 +3498,18 @@ way to apply. The ability rule and the status rule are the same rule.*
   TOLERANT, and there is no version a migration could hang on. **DO needed neither, because nothing
   moved a cell** — but a restructure would need both.
 
-### THE FLAKES — **AND THERE ARE NONE. DY SEEDED THE LAST ONE.**
+### THE FLAKES — ~~**AND THERE ARE NONE. DY SEEDED THE LAST ONE.**~~ **ONE FOUND AT HN, UNSEEDED, AND OWED A REPAIR**
+
+**`test_batch_bk` §3's BLACKSMITH ARM FAILS WHENEVER ITS UNSEEDED FIRST PURCHASE IS WIDENED ON MAGIC MISSILES — ABOUT 1
+IN 54 A RUN.** The arm buys `roll_blacksmith_offer()[0]` and then asks 200 more rolls to offer the same upgrade type on a
+DIFFERENT card. For §3's party (the four classes, lineages set, no core rune) the blacksmith's pool is 54 pairings, and
+Widened fits exactly one card in it — Magic Missiles — so a first pick of it can never recur and the arm must fail. It
+fired once, in HN's acceptance run (130 / 1), and read green in HN's recon and pre-pass and in all fourteen readings its
+row records. **Measured, not argued**: 43 of 2,000 seeds put Widened first, on HEAD's tree and on HN's alike, and the arm
+replayed under seed 98 fails and under seed 0 passes, on both. **Its row was NOT widened after the run** — a band written
+from the red is bookkeeping, not a check. **The repair is the arm's**: buy a pairing whose type fits another card (the
+question it asks needs one), or seed the roll. `docs/reports/HN.md` §7 carries the working.
+
 
 **`test_batch_at` §1 IS SEEDED AND CLOSED AT DY §4, AND IT SETTLED AT ZERO — SO IT WAS A FLAKE AND
 NOT A FINDING.** **THERE ARE NO UNSEEDED FLAKES LEFT IN THE PROJECT.**
@@ -4466,8 +4524,8 @@ the number.*
   batches before anyone noticed. **`check_fg` §1 prints the live figure and the headroom against the bar every
   battery. Read that.**
 - **THE SHARE OF THE SYNC IS RETIRED AS A TARGET (EE §1) AND IS NOT TRACKED.** `CLAUDE.md` is
-  measured in KiB against a **340 KiB ceiling** (EE's 290 until FU §1) whose procedure is a SPLIT, **and EF, FF and GR
-  each took one.** **NO LIVE READING IS CARRIED HERE ANY MORE**: `check_fg` §2 prints the size, the bar
+  measured in KiB against **the ceiling its own block states** (EE's 290, re-derived at FU, GY and HN) whose procedure
+  was a SPLIT, **and EF, FF and GR each took one**; since HN §1 the next move is a recon on the file's shape. **NO LIVE READING IS CARRIED HERE ANY MORE**: `check_fg` §2 prints the size, the bar
   and the headroom every battery, and the two figures this bullet used to carry (EP's 217.17 and
   EU's 235.11, "about twelve batches") are exactly the kind of number that was stale by the time
   anybody read it. **The current reading is `check_fg` §2's print, and each batch report carries its own.**
