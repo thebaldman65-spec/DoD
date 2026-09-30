@@ -82,9 +82,9 @@ Full working: `docs/reports/HN.md`, NEEDS A RULING.
 - **461 ISOLATED USER-DATA FOLDERS REMAIN** under Godot's `app_userdata` — 455 *"Dawn of Decay …"* copies, five *"DoD …"*
   copies (FY, G2, G6) and one *"[unnamed project]"* (a failed launch's one-line log, 10 July) — **142,436 KiB**. HN moved
   one into the Trash as a test, the permission check refused the rest, and the one was put back; an empty folder
-  *"DoD spent user-data folders (Batch HN, 2026-09-29)"* is left in the Trash. ****This batch added seventeen of its own, kept**: *"Dawn of Decay HN work"*, *"… HN recon"*, the
-  fourteen controls *"… HN ctl K1"* to *"… HN ctl K14"* and *"… HN prepass"* — so 478 such folders stand beside the live
-  game's own.** This batch's backup is
+  *"DoD spent user-data folders (Batch HN, 2026-09-29)"* is left in the Trash. **This batch added eighteen of its own, kept**: *"Dawn of Decay HN work"*, *"… HN recon"*, the
+  fourteen controls *"… HN ctl K1"* to *"… HN ctl K14"*, *"… HN prepass"* and *"… HN bkhead"* (HEAD's tree, replaying
+  the flake after the run) — **so 479 such folders stand beside the live game's own.** This batch's backup is
   `../save-backups/HN-20260929-195624`.
 
 ### THE SHAPE RECON ON `CLAUDE.md` — **QUEUED BY RULING AT HN §1, NOT RUN**
