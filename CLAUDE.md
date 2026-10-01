@@ -108,7 +108,7 @@ into this file changes it.
 the equality rule travel with their parent. **Eight of the rows are FF §2's**, and they are the
 residue: rules written into this file AFTER the seam was taken, which the seam's own test puts on
 the other side of it. **Every row after those eight was written straight into the reference rather
-than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two and HP's one:
+than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one and HQ's one:
 
 | | |
 |---|---|
@@ -153,6 +153,7 @@ than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's
 | A BATCH CLEARS THE PREVIOUS BATCH'S ISOLATED COPIES WHEN IT FINISHES | HO §5 |
 | AN INSTRUMENT PUTS A RUNE DOWN THROUGH `Run.hold_rune`, AND A SCOPE WALK NAMES EVERY BAND | HO §1 |
 | A FIXTURE THAT DRIVES A CONDITION ON WHO STANDS WRITES A FIELD THE LIVE DOOR CARRIES | HP §1 |
+| A TALLY NAMED FOR A DOOR ROLLS THROUGH THAT DOOR | HQ §3 |
 
 ## THE COMBAT RULES LIVE IN `docs/combat-rules.md` (STANDING, SET AT GR §2, RULED BY THE DESIGNER)
 > **THIS FILE IS STILL THE ONE A BATCH MUST READ. `docs/combat-rules.md` IS A REFERENCE IT POINTS AT,
@@ -3106,9 +3107,17 @@ Heavy Bolts, 0–4% for the Wide Rite — and two were UNREACHABLE at a full sev
   writes each of its fields strictly beyond the largest figure a BARE writer of that field carries — a live rune with
   no condition, or a node of the one tree — so a conditioned rune authored at a bare rune's figure reds. A field no
   bare writer carries has no reference, and the gate reds until the batch that authors the rune names one.
-  · **HOW FAR BEYOND IS PRICED BY HOW OFTEN IT PAYS, AND THAT IS MEASURED, NOT RULED HERE.** HP measured the three
-    crest runes' conditions before proposing their figures (`docs/reports/HP.md` §2): a condition that holds in a
-    fifth of a fight's hero turns wants a figure about five times the bare one to be worth as much over the fight.
+  · **HOW FAR BEYOND IS MEASURED, NOT RULED HERE.** HP measured the three crest runes' conditions before proposing
+    their figures (`docs/reports/HP.md` §2): a condition that holds in a fifth of a fight's hero turns wants a figure
+    about five times the bare one to be worth as much over the fight. **For a rune paid while a hero is missing the
+    designer ruled the other measure, what it replaces** (HQ §1; the crest block says how), and the worth over a fight
+    is then reported as the state's, not tuned to.
+  · **AND IT CARRIES THE SECONDARY *CONDITIONAL* (HQ §2, ruled by the designer).** *A CONDITIONAL rune's payload is
+    gated on a condition, so it pays only while that condition holds*, and the relation above binds it. **A condition
+    of ANY kind earns the word** — on who stands, a node (`has_node`), a card (`owns_ability`) — and `check_fn` §1c
+    asserts the `Runes.RUNE_SHAPES` label and the payload agree in both directions over every entry, live and retired:
+    a rune authored with a condition carries the word in the batch that authors it. TRADEOFF and CONDITIONAL are the two
+    secondaries a row carries; THRESHOLD and BREADTH stay retired words, on no row.
   · **THE RECONCILIATION RE-OPENS A CONDITION ON WHO STANDS — THE `heroes_…` KEYS — AND NOTHING ELSE.** THRESHOLD and
     BREADTH stay retired: `check_ez` §4 and `check_fn` §1b hold EZ's two tag keys at zero over every entry.
   · **THE THREE GATES THAT READ ANY CONDITION AS FN's WERE RE-POINTED EACH TO ITS OWN INTENT (HP §5)**, because they
@@ -3598,8 +3607,17 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
   stands, and while a hero lies fallen. **Tithe writes the `rune_` half of a counter the one tree writes, summed at the
   node's own site** (`rune_blood_communion`): EM's charter binds a crest rune as it binds any rune, so HN's census says
   what a crest CAN put on all four and the charter says what it MAY write. The three write `dmg_taken_bonus` and
-  `dmg_bonus`, unit math (`check_em.UNIT_MATH`). Every magnitude is PROPOSED (`docs/state.md`). *Fellowship* is
+  `dmg_bonus`, unit math (`check_em.UNIT_MATH`). **Every magnitude is RULED**: Tithe 30 (HP §0); Dirge 45% and Empty
+  Pulpit 50% as HP proposed them, Dead Air 75% (HQ §1, the designer's; `check_hp` §2a holds each). *Fellowship* is
   RETIRED (two bullets down). HK built the scope, the slot and every door over none.
+  · **A RUNE PAID WHILE A HERO IS MISSING IS PRICED BY WHAT IT REPLACES, AND ITS WORTH OVER A FIGHT IS THE STATE'S
+    (HQ §1, the designer's).** Dirge's three at 1.45 out-damage four at 1.00, and it LOWERED falls and lengthened runs
+    (party A 0.74 → 0.67 a normal fight, depth 19.4 → 22.3): **a dead hero still cannot act, cannot heal, and lengthens
+    the fight, so Dirge farms nothing — do not cap it as if it did.** Dead Air is that logic applied honestly: the Mage
+    carries 41–46% of the damage, full replacement is 69–85%, and at 75% *the three who are left do the work of four*
+    (50% half-replaced him for no reason). How often a condition holds sets what a rune is worth over a fight — Dead
+    Air 0.35–0.61 of a bare 10% at 75%, no fall and no depth moved (`docs/reports/HQ.md` §1); Empty Pulpit's 2% of a
+    won fight's damage taken — and that is a property of the state, not of the figure: watched, never tuned on.
 - **A CONDITION ON THE FOUR IS READ AS THE FIGHT RUNS, BECAUSE READ AT THE SPAWN IT WAS A CONSTANT (HP §1, ruled; HO §3c
   found it).** The draft seats exactly one of each class — four picks from a roster of four — and a hero who falls in
   a fight that is WON stands again when it ends, so every fight a run played forward OPENS with one of each class, all
@@ -3613,15 +3631,19 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
     over**: a roster that can leave a class out (not a batch — at least four standing rules rest on one hero a class);
     the fallen staying down between fights (a difficulty ruling of its own, still open, and it made only the fallen
     rune real); and leaving the runes unauthored. `docs/reports/HO.md` §3c prices all four.
-- **THE LIVE DOOR (HP §1).** `Talents.LIVE_KEYS` are `heroes_include_class`, `heroes_lack_class`, `heroes_class_count`
-  and `heroes_all_standing`, both values. **`heroes_hold_core` is read once, as the fight opens** (ruled on GM §2:
-  nothing in the battle writes an engine's slot — though the key counts the heroes who STAND, so a live read would
-  turn with its holder's fall; `docs/state.md`). A payload whose condition carries a live key is LIVE: the spawn does
+- **THE LIVE DOOR (HP §1).** `Talents.LIVE_KEYS` are `heroes_include_class`, `heroes_lack_class`, `heroes_class_count`,
+  `heroes_hold_core` and `heroes_all_standing`, both values — **every key on who stands**. **`heroes_hold_core` joined
+  them at HQ §1 (ruled)**: nothing in the battle writes an engine's slot (GM §2), but the key counts the heroes who
+  STAND, so read once it went on paying after its only holder fell — stale for the reason the other four were, and
+  **four live keys beside one stale one is a trap for the next author**. The re-read hands each hero's slotted engines
+  with his standing (`battle._live_party`), the list the spawn reads off the member: without them the key read no engine
+  at any door, so the change was not the one line it was priced at. A payload whose condition carries a live key is
+  LIVE: the spawn does
   not stamp it (`Talents.LIVE_DOOR` in the ctx), the battle writes it on the built heroes once the fallen are laid
   down (`battle._open_live_payloads`), and re-reads it at every death (`unit._die()` → `died_cb`) and every revive
   (`BattleUnit.revive()` → `revived_cb`). **Those are the only two writers of `dead`, so the pair is every door a
   hero's standing changes through** — a resumed fight's fallen are laid down through `_die()` and are its opening, never
-  a switch. A live condition's other keys are weighed once, at the spawn.
+  a switch. A live condition's other keys — `has_node`, `owns_ability` — are weighed once, at the spawn.
   · **THE REVERSAL RECOMPUTES, IT NEVER SUBTRACTS.** Each field a live payload touches keeps its value from before any
     live payload wrote it (`_live_base`) and is set to that base plus every live payload on it that holds now, in the
     order they were registered — so a cycle returns the figure bit for bit, where a subtraction off a relic's 0.10
@@ -3641,6 +3663,11 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
   and a field on neither list. **It is asked where the table loads (`Runes._load`, which `push_error`s) and wherever a
   payload is applied**, so a refused payload is paid by no route and says so. **A field joins `LIVE_FIELDS` only once
   it is derived** at every line that reads or writes it (`check_hp` §1b: no line writes one after the spawn).
+  · **AND WHAT IT SAYS TO A PLAYER IS A PLAYER'S SENTENCE (HQ §1).** A refused payload can reach a running game: `_load`
+    reports a refused entry and KEEPS it, so a hand-edited or modded file loads one and the roll offers it, and a worn
+    rune's payload rides the save as it was built, so a payload a later build refuses arrives with the save. **The
+    roll call's tail (`LIVE_REFUSED_TAIL`) speaks no word of the door's** — no *payload*, no *refused* — and the reason
+    goes to `push_error`, which the developer reads (`check_hp` §1c holds both).
 - **A CREST RUNE THAT CLEANSES CANNOT BE WORTH THE CREST'S SLOT (HP §3, ruled by the designer; the finding outlives the
   rune).** **HERO-SIDE DEBUFF SUPPLY IS 0.296 A ROUND** (HO §3b: seven statuses from enemy abilities, two from
   bargains, no hard control able to land on a hero at all). **A crest rune that cleanses cannot be worth the crest's
@@ -3649,7 +3676,9 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
   Burden rune, two talents, the Medic core rune and four cards redundant. **Fellowship is RETIRED, not re-shaped**:
   kept on ET's contract with its string, its payload and its `rune_field_medic` read site, which a saved run wearing it
   still pays; no door offers it. The shape cannot be fixed by tuning, so a cleansing crest rune is not re-proposed until
-  the supply it answers is.
+  the supply it answers is. **A SAVE THAT HELD IT LOADS WITH IT — HP's BRIEF SAID *WITHOUT*, AND THE BRIEF WAS THE ERROR
+  (confirmed at HQ §1, the designer's)**: loading without it would have overturned FO §2 for this one rune and changed a
+  retired entry's payload. It is not a reversal of anything, and `data/runes.json`'s 171 entries count it.
 - **A HOLE IN THE FOUR IS PAID IN A STAT ONLY WHERE A STAT STANDS IN FOR THE CLASS (HO §3d, the designer's).** *No
   Cleric* pays mitigation for the healing that is missing and *no Mage* pays damage for the burst, a family of two by
   intent. **A *no Warrior* and a *no Hunter* crest were designed and CUT, and are not re-proposed**: a Warrior tanks by
@@ -3657,7 +3686,8 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
   for it, and a number standing in for a mechanic is a rune that reads nothing.
 - **A RUNE THAT READS WHO STANDS SAYS WHEN IT READS IT (HO §2, ruled; re-pointed at HP §1)**: a live condition says
   *while* — *while no Cleric stands* — and a condition read once, as the fight opens, says so (*as the fight opens*,
-  *enter a fight*). `check_hp` §2e asks every rune that carries a key.
+  *enter a fight*). **Since HQ §1 every key on who stands is live, so every such rune says *while*.** `check_hp` §2e
+  asks every rune that carries a key.
 - **IT WEARS NO MARKER ON ITS NAME (HO §3f, ACCEPTED AT HP §0 with the words beside it, the designer's), AND EVERY
   SURFACE THAT OFFERS IT IN ONE HERO'S NAME SAYS WHOSE IT IS.** A roll asks a hero, so a crest rune reaches the
   Peddler's counter in somebody's row, a cache in somebody's triple and an event in somebody's hands: each asks

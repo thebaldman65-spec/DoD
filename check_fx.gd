@@ -80,7 +80,9 @@ const TEXT := {
 	"dmg_bonus": [100.0, "+%d% damage dealt"],
 	"dmg_taken_bonus": [-100.0, "%d% less damage taken"],
 	"broken_will_ranks": [1.0, "%d% more Break damage"],
-	"blood_communion": [1.0, "for %d% of its value"],
+	# BATCH HQ §1 — *Breaking Heals a Hero*'s words narrowed to its read site, as Tithe's
+	# were (*an attack that lands Break … for N% of it.*); the number still sits in them.
+	"blood_communion": [1.0, "for %d% of it."],
 	"follow_through": [1.0, "cooldowns by %d"],
 	"bonecracker_ranks": [1.0, "+%d% damage against Broken"],
 	"field_medic": [1.0, "cleanse %d debuffs"],

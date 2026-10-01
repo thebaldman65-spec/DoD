@@ -426,7 +426,8 @@ const RUNE_TAGS := {
 	# ── BATCH EZ — THE FIRST TWENTY-ONE, ON THE SAME VOCABULARY ─────────────
 	# **THESE ARE THE ARCHETYPE TAGS AND THEY ARE NOT §0's PRIMARY TYPE.** EZ
 	# §0 gives every rune a TYPE (ABILITY / PASSIVE / STAT) and an optional
-	# SECONDARY (THRESHOLD / BREADTH / TRADEOFF); those live in `RUNE_SHAPES`
+	# SECONDARY (TRADEOFF / CONDITIONAL; THRESHOLD and BREADTH are retired words);
+	# those live in `RUNE_SHAPES`
 	# below and are a different axis entirely — one says what a rune touches,
 	# this says what it is FOR, in the same seven words every card carries.
 	# Both are wanted and neither derives the other: `standing_wall` is a
@@ -561,7 +562,7 @@ const RUNE_TAGS := {
 # `standing_wall` also writes one `stat` field and is a PASSIVE with none — the
 # payload's SHAPE cannot tell them apart.
 #
-# ── BATCH FN — TRADEOFF IS THE ONLY SECONDARY ANY ENTRY CARRIES ────────────
+# ── BATCH FN — THRESHOLD AND BREADTH ARE ON NO ROW ─────────────────────────
 # **THRESHOLD and BREADTH were retired at FK going forward, and FN took them off
 # the eight that still wore them** — the condition and the label together, so
 # there is no longer a row in this table carrying either word. **The two words
@@ -570,12 +571,26 @@ const RUNE_TAGS := {
 # spelling being what makes it impossible. `check_ez` §0 and `check_fk` §2 hold
 # the label half; `check_fn` §1 holds the payload half.
 #
+# ── BATCH HQ §2 — CONDITIONAL, THE SECONDARY FOR A GATED PAYLOAD (ruled) ──────
+# **A CONDITIONAL rune's payload is gated on a condition, so it pays only while
+# that condition holds — and FN's rule binds it: it pays more than the bare
+# equivalent** (HP §5's relation, which `check_fn` §1b asserts). FN's two words were
+# conditions on the hero's drafted tags and stay retired; CONDITIONAL is the word for
+# ANY condition a payload carries — on who stands (the `heroes_…` keys, read as the
+# fight runs), on a node he owns (`has_node`) or a card he holds (`owns_ability`).
+# HP's three crest runes are the population, derived over every entry, live and
+# retired: no other payload carries a `condition` of any kind. TRADEOFF and
+# CONDITIONAL are the two secondaries a row may carry today.
+#
 # **THE SECONDARY IS NOT THE CONDITION AND MUST NOT BE READ AS ONE.** The
 # condition lives in the payload, where `Talents.condition_met` reads it; this
-# is the word a surface shows. They are asserted equal to each other by the gate
-# rather than by one deriving the other, so a rune labelled with a gate whose
-# payload carries no condition is a defect that can be caught — and with the two
-# tag conditions gone that equality now reads zero on both sides.
+# is the word that describes it, and the instruments alone read it — no screen
+# shows a shape. They are asserted equal to each other by the gate rather than
+# by one deriving the other, so a rune labelled with a gate whose payload
+# carries no condition is a defect that can be caught, and so is a condition the
+# label leaves out: for FN's two words that equality reads zero on both sides
+# (`check_ez` §0), and for CONDITIONAL it is asked of every entry in the file
+# (`check_fn` §1c).
 const RUNE_SHAPES := {
 	"deepening_hex": ["PASSIVE"],
 	"standing_mark": ["PASSIVE"],
@@ -682,15 +697,17 @@ const RUNE_SHAPES := {
 	"tithe": ["PASSIVE"],
 	"fellowship": ["PASSIVE"],
 	# BATCH HP §2 — A STAT ON EVERY HERO, WHILE THE FOUR STAND AS THE CONDITION SAYS.
-	# No secondary names the gate: this vocabulary's gates are the two retired tag
-	# conditions and TRADEOFF, and a condition on who stands is none of them.
-	"empty_pulpit": ["STAT"],
-	"dead_air": ["STAT"],
-	"dirge": ["STAT"],
+	# BATCH HQ §2 — AND CONDITIONAL NAMES THE GATE: until HQ the vocabulary's gates were
+	# the two retired tag conditions and TRADEOFF, and a condition on who stands was
+	# none of them, so the three read `["STAT"]` with nothing to say they pay only
+	# while their condition holds.
+	"empty_pulpit": ["STAT", "CONDITIONAL"],
+	"dead_air": ["STAT", "CONDITIONAL"],
+	"dirge": ["STAT", "CONDITIONAL"],
 }
 
 const RUNE_TYPES := ["ABILITY", "PASSIVE", "STAT"]
-const RUNE_SECONDARIES := ["THRESHOLD", "BREADTH", "TRADEOFF"]
+const RUNE_SECONDARIES := ["THRESHOLD", "BREADTH", "TRADEOFF", "CONDITIONAL"]
 
 
 # A rune's shape: `[type]` or `[type, secondary...]`, `[]` for an id the table

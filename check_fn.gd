@@ -351,6 +351,39 @@ func _s1_the_eight_are_ungated() -> void:
 			and Runes.RUNE_SECONDARIES.has("TRADEOFF"),
 		"§1c: the secondary vocabulary was re-spelled instead of the rows being ungated (%s)"
 			% [Runes.RUNE_SECONDARIES])
+	# ── BATCH HQ §2 — CONDITIONAL, THE WORD FOR A GATED PAYLOAD, AGREES WITH IT ──
+	#
+	# **A CONDITIONAL rune's payload is gated on a condition, so it pays only while the
+	# condition holds — and §1b's relation is FN's rule for exactly that population.**
+	# The label and the payload are asked of every entry, live and retired, IN BOTH
+	# DIRECTIONS (`check_ez` §0's shape for THRESHOLD and BREADTH): a rune labelled
+	# CONDITIONAL whose payload carries no condition advertises a gate it does not have,
+	# and a payload carrying one whose row omits the word is a gate the taxonomy never
+	# names. **A condition of ANY kind counts** — on who stands, a node (`has_node`), a
+	# card (`owns_ability`) — and one nested in an `also` or an `upgrade` is a shape the
+	# word has not been ruled on, so it is asserted absent rather than guessed at.
+	var cond_paid: Array = []
+	var cond_labelled: Array = []
+	var nested: Array = []
+	for id6 in data:
+		var p6: Dictionary = (data[id6] as Dictionary).get("payload", {})
+		if not (p6.get("condition", {}) as Dictionary).is_empty():
+			cond_paid.append(String(id6))
+		for nest in ["also", "upgrade"]:
+			for extra in p6.get(nest, []):
+				if extra is Dictionary and (extra as Dictionary).has("condition"):
+					nested.append("%s (%s)" % [id6, nest])
+	for id7 in Runes.RUNE_SHAPES:
+		if (Runes.RUNE_SHAPES[id7] as Array).has("CONDITIONAL"):
+			cond_labelled.append(String(id7))
+	cond_paid.sort()
+	cond_labelled.sort()
+	print("    CONDITIONAL: labelled %s; a payload condition on %s (of %d entries)" % [cond_labelled, cond_paid, data.size()])
+	ok(Runes.RUNE_SECONDARIES.has("CONDITIONAL"),
+		"§1c: CONDITIONAL is not a secondary (%s)" % [Runes.RUNE_SECONDARIES])
+	ok(cond_paid.size() >= 3 and cond_labelled == cond_paid,
+		"§1c: the CONDITIONAL rows %s are not the entries whose payload carries a condition %s" % [cond_labelled, cond_paid])
+	ok(nested.is_empty(), "§1c: a condition sits inside %s — CONDITIONAL is not ruled on a nested one" % [nested])
 
 	# ── (d) THE `desc` HALF, AND THE ONE CLAUSE THAT MUST SURVIVE ───────────
 	#
@@ -377,8 +410,8 @@ func _s1_the_eight_are_ungated() -> void:
 		FileAccess.get_file_as_string("res://scripts/battle.gd"))
 	ok(bsrc.contains("BRACING_LINE_LEVEL := 32"),
 		"§1d: ...and `BRACING_LINE_LEVEL` no longer reads 32 in the fight")
-	print("    8 ungated, 0 of %d entries gated, THRESHOLD 0 / BREADTH 0 / TRADEOFF %d"
-		% [data.size(), trade])
+	print("    8 ungated, 0 of %d entries gated, THRESHOLD 0 / BREADTH 0 / TRADEOFF %d / CONDITIONAL %d"
+		% [data.size(), trade, cond_labelled.size()])
 
 
 # ═══ §2 — THE MACHINERY IS GONE ══════════════════════════════════════════════

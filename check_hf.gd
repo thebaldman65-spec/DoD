@@ -15,8 +15,9 @@
 #       calls it; the chip says which charge stuns
 #   §3  THE OFFERS — HC's table re-measured by name: what a hero of each class
 #       holding NO engine can be offered, at spawn and at the ceiling (every class
-#       at five or more); each of the fifteen reached at the Peddler, an elite
-#       cache and a bargain; Tusk and Bristle withheld from the Sharpshooter
+#       at five or more); each of the fifteen reached at the Peddler (its own door,
+#       `peddler_rune`, since HQ §3), an elite cache and a bargain; Tusk and Bristle
+#       withheld from the Sharpshooter
 #   §4  THE TWO PAIRINGS — Vow of Silence beside Burning Ground sits it out, on
 #       the one door every surface asks, in the sentence and in the battle log,
 #       and the burn pays nothing; Abundance under Consecration, the shield's
@@ -991,9 +992,26 @@ func _s3_the_offers() -> void:
 	for cls2 in SEATS:
 		_run.new_run(SEATS, [], "standard")
 		var m2 := _member(String(cls2), "", [])
-		var peddler := _tally(m2, func(mm): return [_run.generate_rune(mm)])
+		# **BATCH HQ §3 — THE PEDDLER'S COLUMN IS THE PEDDLER'S DOOR** (`check_he` §1's
+		# re-point, the same words): it tallied `generate_rune`, which the counter left at
+		# HL §1 for `peddler_rune` — the same roll less every core rune — so every figure but one
+		# moved at HQ, because the counter draws from `pool` less its `core` runes.
+		var pool: Array = Runes.eligible_ids(m2, Runes.owned_names(m2, _run.party_rune_names()))
+		var cores_in: int = pool.filter(func(pid): return Runes.is_engine_rune(String(pid))).size()
+		var peddler := _tally(m2, func(mm): return [_run.peddler_rune(mm)])
 		var cache := _tally(m2, func(mm): return _run.roll_rune_candidates(mm))
 		var bargain := _bargain(String(cls2), [])
+		var p_core := 0
+		var c_core := 0
+		for pn in peddler:
+			if Runes.is_engine_rune(String(pn)):
+				p_core += int(peddler[pn])
+		for cn in cache:
+			if Runes.is_engine_rune(String(cn)):
+				c_core += int(cache[cn])
+		ok(p_core == 0 and c_core > 0 and cores_in > 0,
+			"§3: a %s holding no engine was stocked %d core runes at the Peddler's door, and offered %d at the cache (%d in his pool) — the column is not the counter's" % [
+				cls2, p_core, c_core, cores_in])
 		var line := PackedStringArray()
 		for id2 in HF_RUNES:
 			if String(HF_RUNES[id2][0]) != String(cls2):
@@ -1004,7 +1022,8 @@ func _s3_the_offers() -> void:
 			ok(p > 0 and c > 0 and b > 0,
 				"§3: a %s holding no engine was never offered %s at one of the doors (Peddler %d, cache %d, bargain %d)" % [cls2, id2, p, c, b])
 			line.append("%s %d·%d·%d" % [id2, p, c, b])
-		print("    %-8s %s" % [cls2, "  ".join(line)])
+		print("    %-8s %s   [pool %d, core %d: the counter draws from %d]" % [
+			cls2, "  ".join(line), pool.size(), cores_in, pool.size() - cores_in])
 	# TUSK AND BRISTLE AND THE PET GATE: withheld from a Sharpshooter; Opportunist
 	# and Long Poison are not.
 	var arms := [["no engine", [], true], ["Pack Bond", [_eng("pack")], true], ["Lethal Aim", [_eng("lethal_aim")], false]]

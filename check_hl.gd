@@ -63,8 +63,10 @@ const HERO_FX := "hl_fixture_hero_rune"
 const HERO_FX_HP := 7
 # BATCH HP §1 — A KEY READ AS THE FIGHT RUNS IS PAID BY THE LIVE DOOR, WHICH REFUSES A
 # CONSUMED FIELD: maximum health builds the bar at the spawn, so a live key's fixture
-# writes damage dealt (a field every blow reads afresh), and `heroes_hold_core`, read
-# once as the fight opens, keeps the stamp this gate was written on.
+# writes damage dealt (a field every blow reads afresh). **Since HQ §1 every key §6
+# drives is live, `heroes_hold_core` among them**, so `_fx_field` hands each of them
+# damage dealt; its maximum-health branch is the stamp this gate was written on, for a
+# condition read once (a node or a card), which §6 no longer drives.
 const CREST_DMG := 0.09
 const HERO_FX_DMG := 0.07
 

@@ -8,8 +8,9 @@
 #       Bared Plate's Break damage on a field of its own, the retired runes that
 #       share the old one untouched
 #   §1  THE SEVEN AT THE RUNE DOORS, 400 ROLLS AN ARM (SIX, AND LONG POISON
-#       OFFERED TO EVERY HUNTER, SINCE HF §6) — the Peddler
-#       (`generate_rune`), an elite cache (`roll_rune_candidates`) and a bargain
+#       OFFERED TO EVERY HUNTER, SINCE HF §6) — the Peddler (`peddler_rune`, the
+#       counter's own door since HL §1; this column tallied `generate_rune` until
+#       HQ §3), an elite cache (`roll_rune_candidates`) and a bargain
 #       (`claim_reward`'s rune reward), for a hero of each class holding each
 #       gating engine and one holding none; and a cache ANSWERED A NODE LATER,
 #       after the pouch's door takes the engine out: held back, kept, returned
@@ -369,9 +370,32 @@ func _s1_the_rune_doors() -> void:
 		# empty-handed, as HEAD's per-member exclusion assumed.
 		_run.new_run(SEATS, [], "standard")
 		var m := _member(cls, "", engs.map(func(p): return _eng(String(p))))
-		var peddler := _tally(m, func(mm): return [_run.generate_rune(mm)])
+		# **BATCH HQ §3 — THE PEDDLER'S COLUMN IS THE PEDDLER'S DOOR.** It tallied
+		# `generate_rune`, the door the counter left at HL §1 for `peddler_rune` — the same
+		# roll less every core rune's name — so it printed what a cache's roll draws, not
+		# what the counter stocks. The gating this section asserts held through either
+		# door; the printed figures did not. Every figure moved at HQ, and the reason is
+		# the pool each roll draws from: `pool` below less its `core` runes, so a rune's
+		# share rises from 1/pool to 1/(pool − core) and the laid seed lands elsewhere.
+		var pool: Array = Runes.eligible_ids(m, Runes.owned_names(m, _run.party_rune_names()))
+		var cores_in: int = pool.filter(func(pid): return Runes.is_engine_rune(String(pid))).size()
+		var peddler := _tally(m, func(mm): return [_run.peddler_rune(mm)])
 		var cache := _tally(m, func(mm): return _run.roll_rune_candidates(mm))
 		var bargain := _bargain(cls, engs)
+		# THE COLUMN IS THE COUNTER'S, BOTH WAYS: it stocks no core rune, and the cache
+		# beside it — which carries them (GK's charter) — does, so a column that had
+		# drifted back onto the cache's door reads red here.
+		var p_core := 0
+		var c_core := 0
+		for pn in peddler:
+			if Runes.is_engine_rune(String(pn)):
+				p_core += int(peddler[pn])
+		for cn in cache:
+			if Runes.is_engine_rune(String(cn)):
+				c_core += int(cache[cn])
+		ok(p_core == 0 and c_core > 0 and cores_in > 0,
+			"§1: a %s holding %s was stocked %d core runes at the Peddler's door, and offered %d at the cache (%d in his pool) — the column is not the counter's" % [
+				cls, engs, p_core, c_core, cores_in])
 		var line := PackedStringArray()
 		for id in HE_RUNE_ROWS:
 			if String(Runes.config(String(id)).get("scope", "")) != "class:" + cls:
@@ -401,7 +425,8 @@ func _s1_the_rune_doors() -> void:
 			ok(pu > 0 and cu > 0 and bu > 0,
 				"§1: a %s holding %s was never offered %s (Peddler %d, cache %d, bargain %d) — HF §6 un-gated it, so every %s is" % [
 					cls, engs, idu, pu, cu, bu, cls])
-		print("    %-8s %-18s %s" % [cls, str(engs), "  ".join(line)])
+		print("    %-8s %-18s %s   [pool %d, core %d: the counter draws from %d]" % [
+			cls, str(engs), "  ".join(line), pool.size(), cores_in, pool.size() - cores_in])
 	# A CACHE ANSWERED A NODE LATER: rolled with the engine slotted, answered after
 	# the pouch's door takes it out — held back and kept; slotted again, handed back.
 	for id2 in HE_RUNE_ROWS:

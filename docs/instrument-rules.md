@@ -1594,14 +1594,16 @@ The reds were the cheap ones; the rest went on passing while asking nothing, or 
 
 ## STANDING RULE — A FIXTURE THAT DRIVES A CONDITION ON WHO STANDS WRITES A FIELD THE LIVE DOOR CARRIES (Batch HP §1)
 > **A gate or a suite whose fixture payload carries a key the battle reads as the fight runs — `heroes_include_class`,
-> `heroes_lack_class`, `heroes_class_count`, `heroes_all_standing` — writes a field `Talents.LIVE_FIELDS` holds, and
-> reads the heroes once the spawn has finished. On a consumed field the payload is refused and pays nothing, whatever
-> the party, so an arm built that way reads "paid on 0" for both parties it compares.**
+> `heroes_lack_class`, `heroes_class_count`, `heroes_hold_core` (since HQ §1), `heroes_all_standing` — writes a field
+> `Talents.LIVE_FIELDS` holds, and reads the heroes once the spawn has finished. On a consumed field the payload is
+> refused and pays nothing, whatever the party, so an arm built that way reads "paid on 0" for both parties it compares.**
 
 - **HL §6, HN §3 AND HO §2–§3 DROVE EVERY KEY WITH A FIXTURE CREST OF +9 MAXIMUM HEALTH.** Maximum health builds the
   health bar at the spawn, so since HP a live key on it is refused where the table loads and wherever a payload is
   applied — the arm's red reads exactly like a key that reads nothing. **A condition read once, as the fight opens
-  (`heroes_hold_core` alone, or no party key), still carries a consumed field**, because the spawn stamps it.
+  (a node or a card, and no key on who stands — every one of those is live since HQ §1), still carries a consumed
+  field**, because the spawn stamps it. A fixture that picks its field with `Talents.is_live` (`check_hl` §6) moved
+  with the ruling; one that named `heroes_hold_core` as the read-once case (`check_hp` §1c, §1f) was re-pointed.
 - **A LIVE PAYLOAD IS WRITTEN LAST.** `battle._open_live_payloads` runs at the end of the spawn, after the fallen are
   laid down; a gate reads the unit after the frames it waits, never the config, and never before the opening read.
 - **A GATE THAT ENTERS A SECOND BATTLE HAS FREED THE FIRST.** Read every figure a battle is asked for before the next is
@@ -1611,3 +1613,23 @@ The reds were the cheap ones; the rest went on passing while asking nothing, or 
   the subtraction's figure beside the base, so the arm's own control is on the line).
 - **A REFUSED PAYLOAD `push_error`s AT EVERY APPLICATION.** A log carrying *A rune payload is refused* beside a green
   count is a fixture built on a consumed field, and is read as that before it is read as noise.
+
+## STANDING RULE — A TALLY NAMED FOR A DOOR ROLLS THROUGH THAT DOOR (Batch HQ §3)
+> **A column a gate prints under a surface's name — *Peddler*, *cache*, *bargain* — calls the function that surface
+> calls, and the batch that gives a surface a door of its own re-points every such column in the same batch.** A
+> column left on the shared door goes on asserting the gating, which holds through either door, and prints the wrong
+> door's figures — so nothing reds, and every figure a report quotes from it describes a roll no player meets.
+
+- **THE WORKED EXAMPLE STOOD FROM HL TO HP, FOUR BATCHES.** HL §1 gave the counter `Run.peddler_rune` — the shared roll less every
+  core rune — and `check_he` §1's and `check_hf` §3's *Peddler* columns kept tallying `Run.generate_rune`, the cache's
+  door, until HQ. HP found it with a stub arm while attributing a move, never by a red. **Re-pointed, 22 of the 23 Peddler figures that are not a
+  withheld zero moved and no cache or bargain figure did**: the counter's draw is flat over the pool less its core runes, so each rune's expected count
+  rises from 400 / pool to 400 / (pool − core), and the laid seed lands elsewhere (`docs/reports/HQ.md` §3).
+- **THE RE-POINT ASSERTS WHAT ONLY THE NAMED DOOR DOES**, or it is a rename. Both columns now hold the counter to
+  stocking no core rune while the cache beside it, on the same hero and the same seed, offers some — so a column that
+  drifted back onto the shared door reds, where a re-pointed call alone would read the same either way.
+- **AND A WALK THAT COUNTS WHAT IT TOOK THROUGH A DOOR ASKS NOTHING OF IT — ITS MESSAGE SAYS SO.** `test_batch_ak`'s
+  whole-pool walk counted every payload *touched* under a ctx with no party, where a condition on who stands reads
+  false, and called that *the pool still applies*. HQ narrowed the words to what the walk proves — the shared
+  applicator takes every payload without a throw — and named the gates that ask what a payload pays. **A count that
+  cannot fail is a population line, and is labelled as one.**

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-30 (Batch HP &mdash; the condition as a fight runs, and the three runes it makes real)</b></p>
+<p align="right"><b>Last updated: 2026-10-01 (Batch HQ &mdash; one magnitude, one key, and the word the taxonomy is missing)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -2645,7 +2645,7 @@ and says plainly that it cannot be changed.</p>
 <tr><td>1</td><td>More Damage Dealt</td><td>+10% damage dealt.</td></tr>
 <tr><td>1</td><td>Less Damage Taken</td><td>10% less damage taken.</td></tr>
 <tr><td>2</td><td>You Break Harder</td><td>Deals 25% more Break damage.</td></tr>
-<tr><td>2</td><td>Breaking Heals a Hero</td><td>Every point of Break damage dealt heals the lowest-health hero for 20% of its value.</td></tr>
+<tr><td>2</td><td>Breaking Heals a Hero</td><td>An attack that lands Break heals the lowest-health hero for 20% of it.</td></tr>
 <tr><td>2</td><td>A Cooldown Ticks on a Crit</td><td>Critical hits reduce ALL cooldowns by 2.</td></tr>
 <tr><td>2</td><td>Kill What Is Down</td><td>+40% damage against Broken enemies.</td></tr>
 <tr><td>2</td><td>Cleanse Debuffs Each Turn</td><td>At the start of this hero&#x27;s turn, cleanse 2 debuffs from random allies.</td></tr>
@@ -2748,18 +2748,18 @@ once: its effect reaches all four in every fight. There is one crest slot. <b>FO
 Break an ordinary attack applies as it lands &mdash; none into an enemy already Broken, and nothing for Break dealt by a
 card's own effect, a trap, a companion, a talent's proc or the Long Watch's carry &mdash; and it is added to the talent
 tree's <i>Breaking Heals a Hero</i> for a hero who wears both. <b><i>Empty Pulpit</i></b>: while no Cleric stands, every
-hero takes 50% less damage. <b><i>Dead Air</i></b>: while no Mage stands, every hero deals 50% more damage.
+hero takes 50% less damage. <b><i>Dead Air</i></b>: while no Mage stands, every hero deals 75% more damage.
 <b><i>Dirge</i></b>: while a hero lies fallen, the rest deal 45% more damage. <b>A crest rune drops, is sold and sits
 in the bag as any other rune does</b>, belongs to no class, and wears no marker on its name: the Peddler's row, a cache
 and an event's line say <i>for the crest</i> beside one, and a crest rune taken from a cache with the Crest empty is worn
 at once and says so.
 A crest rune's effect may carry a <b>condition on who the heroes are</b> &mdash; a class standing among the heroes or
-none of it standing, how many of a class stand, every hero standing, or a hero fallen &mdash; and <b>each of those is read
-as the fight runs</b>: as it opens, again every time a hero falls, and again every time one is raised. The rune pays
-from the moment its condition holds and stops the moment it does not, and the combat log says so each time; at the
-opening, the roll call says a rune whose condition does not hold yet pays nothing until it does. A condition may also
-name <b>a core rune one of the heroes carries</b>, which is read once, as the fight opens. <b>A condition may name
-several of these at once, and holds only when every one does.</b> A rune whose condition is read as the fight runs
+none of it standing, how many of a class stand, a core rune one of the standing heroes carries, every hero standing, or
+a hero fallen &mdash; and <b>each of those is read as the fight runs</b>: as it opens, again every time a hero falls,
+and again every time one is raised, so a condition on a core rune stops holding the moment the only hero carrying it
+falls. The rune pays from the moment its condition holds and stops the moment it does not, and the combat log says so
+each time; at the opening, the roll call says a rune whose condition does not hold yet pays nothing until it does.
+<b>A condition may name several of these at once, and holds only when every one does.</b> A rune whose condition is read as the fight runs
 changes only what every blow reads afresh &mdash; damage dealt and taken, parry, Block, armor piercing and the like &mdash; and
 never maximum health, a resource bar, Attack or anything a companion copies from its Hunter. <b>The four are one
 Warrior, one Mage, one Cleric and one Hunter, and a hero who falls in a fight that is won stands again when it ends</b>,
@@ -2828,30 +2828,36 @@ designer).</b> They were <b>EIGHT, not six</b> &mdash; four THRESHOLD (Deepening
 Heavy Bolts, the Answering Pack) and four BREADTH (the Wide Rite, the Long Watch, the Wide Watch,
 the Shared Scent) &mdash; and every one of them is unconditional now: the payload condition and the
 label came off together, and the clause came off the card. <b>No entry in the file carries a
-condition of any kind</b>, so the reading machinery below had no reader left and went with them.
+condition on a hero's tags</b>, so the reading machinery below had no reader left and went with them.
 <code>check_fk</code> &sect;2 asserted those eight were <b>still gated</b>, so &ldquo;none is
 authored&rdquo; could not be satisfied by quietly ungating the ones that were owed a fix; that arm
 is <b>inverted</b> now and asserts none of the eight carries a condition, which keeps the same
 question alive pointed the other way.
 <br><b>EVERY RUNE CARRIES A PRIMARY TYPE AND AN OPTIONAL SECONDARY (Batch EZ §0).</b> The
 primary is what it touches &mdash; <b>ABILITY, PASSIVE or STAT</b>; the secondary is what gates
-it, if anything. <b>TRADEOFF is the only secondary any entry carries</b> &mdash; a cost paired
-with a bigger upside, self-balancing and readable on the card &mdash; and <b>fifteen of the
-seventy-nine carry one</b>. THRESHOLD and BREADTH remain words in the vocabulary and are on no row. The labels
-live in <code>Runes.RUNE_SHAPES</code> beside the archetype tags in <code>RUNE_TAGS</code>, and the
-two are <b>different axes</b>: one says what a rune is FOR in the seven-word card vocabulary, the
-other says what it does and what turns it on. <code>check_ez</code> &sect;0 asserts the label and
-the payload's condition agree in both directions, because a rune advertising a gate it does not
-have and one carrying a gate the player is never told about are different faults and neither is
-visible from one side.
-<br><b>NO RUNE IS CONDITIONAL. A RUNE INSTALLS AND IT IS ON.</b> A payload may still carry a
-<code>condition</code> in principle &mdash; <code>Talents.condition_met</code> answers
-<code>has_node</code> and <code>owns_ability</code> for the talent trees &mdash; but <b>no rune
-uses one</b>, and the two tag conditions it used to answer are gone from the file, from the code
-and from the screens. <b>A gated rune at a flat price is strictly WORSE than a bare one</b>: the
-price does not fall to pay for the clause, so the condition is pure cost with nothing bought by
-it. <code>check_fn</code> &sect;1 asserts the census across all 142 entries, live and retired, so
-a re-gating is caught where it would appear rather than where somebody happened to look.
+it, if anything, and there are two. <b>TRADEOFF</b> is a cost paired with a bigger upside,
+self-balancing and readable on the card, and <b>fifteen of the seventy-nine carry it</b>.
+<b>CONDITIONAL</b> (Batch HQ &sect;2) is a payload gated on a condition, so the rune pays only while
+that condition holds: <b><i>Empty Pulpit</i>, <i>Dead Air</i> and <i>Dirge</i> carry it</b>, the
+three crest runes that read who stands, and no other rune's payload carries a condition of any
+kind. THRESHOLD and BREADTH remain words in the vocabulary and are on no row. The labels live in
+<code>Runes.RUNE_SHAPES</code> beside the archetype tags in <code>RUNE_TAGS</code>, and the two are
+<b>different axes</b>: one says what a rune is FOR in the seven-word card vocabulary, the other
+says what it does and what turns it on. <code>check_fn</code> &sect;1c asserts the CONDITIONAL label
+and the payload's condition agree in both directions over every entry, and <code>check_ez</code>
+&sect;0 the same of THRESHOLD and BREADTH, because a rune advertising a gate it does not have and
+one carrying a gate it is never labelled with are different faults and neither is visible from one
+side.
+<br><b>A CONDITIONAL RUNE PAYS MORE THAN THE BARE EQUIVALENT.</b> A gated rune at a flat price
+would be strictly WORSE than a bare one &mdash; the price does not fall to pay for the clause
+&mdash; so a rune that pays only while its condition holds pays more than any bare writer of the
+same effect: <i>Dead Air</i>'s 75% and <i>Dirge</i>'s 45% more damage dealt against the talent
+tree's 10%, <i>Empty Pulpit</i>'s 50% less damage taken against its 10%. <code>check_fn</code>
+&sect;1b asserts that relation over every live rune with a condition. <b>No rune carries a
+condition on a hero's tags</b>: THRESHOLD and BREADTH are gone from the file, from the code and
+from the screens, and <code>check_fn</code> &sect;1b asserts their keys absent across all 171
+entries, live and retired, so a re-gating is caught where it would appear rather than where
+somebody happened to look.
 <br><b>AND WHAT THE CONDITIONS WERE ACTUALLY COSTING WAS MEASURED BEFORE THEY WENT.</b> Read as
 the share of a spec's reachable loadouts that satisfied the clause at each rung of the slot
 ladder, the eight ranged from <b>Deepening Hex at 69&ndash;86%</b> &mdash; near enough a free

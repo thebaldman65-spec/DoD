@@ -142,8 +142,14 @@ const TREE := [
 	# ARE WRONG HERE: the word *party* is retired from player-facing text
 	# (CLAUDE.md, HERO AND ALLY — `test_batch_bx` §4b reads this file), and the
 	# read site heals ONE body, the lowest-health hero. The name says that.
+	# BATCH HQ §1 — THE WORDS NARROWED TO THE READ SITE, AS TITHE'S WERE (HP §4; the
+	# wording PROPOSED). They said *every point of Break damage dealt*, and the site
+	# reads the Break an ordinary attack applies as it lands, in the strike loop: four
+	# heroes with a Long Watch Warden among them book 66.3 Break a round and it reads
+	# 42.4 (HO's figures).
+	# The site is NOT widened — that is the owed talent rebalance (`docs/state.md`).
 	{"id": "tn_break_heal", "name": "Breaking Heals a Hero", "tier": 2,
-		"desc": "Every point of Break damage dealt heals the lowest-health hero for 20% of its value.",
+		"desc": "An attack that lands Break heals the lowest-health hero for 20% of it.",
 		"payload": {"stat": {"blood_communion": 20}}},
 	# PRECEDENT: Follow-Through (ss_follow) — follow_through 2. TAKEN.
 	{"id": "tn_crit_cooldown", "name": "A Cooldown Ticks on a Crit", "tier": 2,
@@ -475,25 +481,28 @@ static func condition_met(cond: Dictionary, ctx: Dictionary) -> bool:
 # a Cleric lying on the field. `heroes_all_standing` is that same reading, of all
 # of them.
 #
-# **BATCH HP §1 — FOUR OF THE FIVE ARE READ AS THE FIGHT RUNS (ruled).** Read once
-# at the spawn they were constants in a run played forward: the draft seats one of
-# each class and a won fight raises the fallen, so a key about who stands could
-# only move inside a fight — where nothing re-read it. **`LIVE_KEYS` are the four
-# the battle re-reads at every death and every revive** (`battle._reread_live`),
-# and a payload whose condition carries one is a LIVE payload: the spawn does not
-# stamp it (`LIVE_DOOR` in the ctx), the battle writes it onto the built heroes
-# once the field is laid, takes it back when the condition turns false and puts it
-# back when it turns true. **`heroes_hold_core` stays at the spawn** — ruled, on the
-# reason that nothing in `battle.gd` writes an engine's slot (GM §2); the key still
-# counts the heroes who stand, so it is read once, as the fight opens, and a live
-# payload that also carries it is weighed on it there and never again.
+# **BATCH HP §1 — THE KEYS ARE READ AS THE FIGHT RUNS (ruled), AND SINCE HQ §1 ALL
+# FIVE ARE.** Read once at the spawn they were constants in a run played forward:
+# the draft seats one of each class and a won fight raises the fallen, so a key about
+# who stands could only move inside a fight — where nothing re-read it. **`LIVE_KEYS`
+# are the keys the battle re-reads at every death and every revive**
+# (`battle._reread_live`), and a payload whose condition carries one is a LIVE
+# payload: the spawn does not stamp it (`LIVE_DOOR` in the ctx), the battle writes it
+# onto the built heroes once the field is laid, takes it back when the condition
+# turns false and puts it back when it turns true. **`heroes_hold_core` joined them
+# at HQ §1 (ruled).** Nothing in the battle writes an engine's slot (GM §2), but the
+# key counts the heroes who STAND, so read once it went on paying after its only
+# holder fell — stale for the reason the other four were, and four live keys beside
+# one stale one is a trap for the next author. The re-read hands each hero's slotted
+# engines with his standing (`battle._live_party`), the very list the spawn reads off
+# the member, so the opening read and every later one ask the same question. **Only
+# `has_node` and `owns_ability` are weighed once, at the spawn** (`spawn_half`).
 #
 #   heroes_include_class: "cleric"                    — at least one stands
 #   heroes_lack_class:    "mage"                      — none stands
 #   heroes_class_count:   {"class": "warrior", "min": 2, "max": 2} — how many stand
 #   heroes_hold_core:     "pack"                      — a standing hero has that
 #                                                       core rune's engine slotted
-#                                                       (read as the fight opens)
 #   heroes_all_standing:  true                        — every hero stands
 #   heroes_all_standing:  false                       — one or more is down
 #                                                       (HO §2: the value is read, not only the key)
@@ -503,7 +512,7 @@ static func condition_met(cond: Dictionary, ctx: Dictionary) -> bool:
 const HERO_KEYS := ["heroes_include_class", "heroes_lack_class", "heroes_class_count",
 	"heroes_hold_core", "heroes_all_standing"]
 const LIVE_KEYS := ["heroes_include_class", "heroes_lack_class", "heroes_class_count",
-	"heroes_all_standing"]
+	"heroes_hold_core", "heroes_all_standing"]
 # The ctx key the battle spawn hands `apply_payload` so a live payload is left for
 # the battle's own door rather than stamped into the config.
 const LIVE_DOOR := "live_door"
@@ -633,7 +642,7 @@ static func party_condition_met(cond: Dictionary, party: Array) -> bool:
 			return false
 	# BATCH HO §2 — THE KEY'S PRESENCE IS ASKED APART FROM ITS VALUE (ruled). `false`
 	# was read as *not asked* until HO and held whatever the party; it holds now only
-	# when somebody is down as the fight opens, which is `true`'s reading inverted.
+	# while somebody is down, which is `true`'s reading inverted.
 	if cond.has("heroes_all_standing") \
 			and (standing.size() == party.size()) != bool(cond["heroes_all_standing"]):
 		return false

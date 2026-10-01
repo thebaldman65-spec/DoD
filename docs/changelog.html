@@ -16,6 +16,82 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-01 &mdash; Batch HQ: ONE MAGNITUDE, ONE KEY, AND THE WORD THE TAXONOMY IS MISSING</h2>
+<p><b><i>Dead Air</i> now pays 75% more damage while no Mage stands, where it paid 50%. A crest rune asking whether a standing
+hero carries a core rune is now asked again every time a hero falls or is raised, like every other question about who
+stands. The talent <i>Breaking Heals a Hero</i> says what it actually pays. A rune that pays only while a condition holds
+has a name in the rune taxonomy, <i>conditional</i>. And two checks that printed the wrong shop door now print the
+Peddler's.</b> Full working: <code>docs/reports/HQ.md</code>.</p>
+
+<p><b>&sect;0 &mdash; HP'S FIVE RULINGS.</b> <b>Dirge stays at 45% and Empty Pulpit at 50%</b>, as HP proposed them. <b>Dead Air goes
+to 75%</b>: the Mage deals a bit under half of the four heroes' damage, so the three left standing need about three
+quarters more to do the work of four, and at 50% he was only half replaced. Dirge stands on the same logic &mdash; three
+heroes at 1.45 deal more than four at 1.00 &mdash; and it is recorded that it farms nothing: a fallen hero cannot act or
+heal and makes the fight longer, and measured, Dirge made heroes fall less and carried runs deeper. Empty Pulpit's
+small share of a won fight's damage is recorded as something to watch in play, not a fault. Fellowship's retirement stands
+exactly as HP left it: a save that held it loads with it, and the line in HP's brief that said otherwise was the brief's
+mistake, not a reversal. The core-rune question joins the questions read as the fight runs. <i>Tithe</i>'s words stand and
+the talent's are narrowed. And the battle log's line for a rune the game refuses is reworded for a player.</p>
+
+<p><b>&sect;1 &mdash; DEAD AIR AT 75%, MEASURED.</b> <i>&ldquo;While no Mage stands, every hero deals 75% more damage.&rdquo;</i> Measured
+the way HP measured the other figures &mdash; the second difficulty, no talents, 150 runs for each of the same two parties:
+while it holds it multiplies the damage the three standing heroes deal by exactly 1.75; over an average normal fight it adds
+35 damage in the first party and 18 in the second, about 0.6 and 0.35 of what a flat 10% on every hero would add; and it
+changed neither how often heroes fell nor how deep a run went. It is still the least of the three crest runes over a whole
+fight, because no Mage stands for only about a tenth of one &mdash; which is how often the condition holds, not what the rune
+pays when it does. <b>A core rune held by a standing hero</b> is now asked at every fall and every raise: a rune paid while
+a hero carries, say, Pack Bond stops the moment its only holder falls and starts again when he is raised, and the battle
+log says so both ways. This took more than the one line it was priced at &mdash; the battle's re-reading of who stands had
+never carried the heroes' core runes, so without them the question could only answer no. <b><i>Breaking Heals a Hero</i></b>
+now reads <i>&ldquo;An attack that lands Break heals the lowest-health hero for 20% of it.&rdquo;</i> &mdash; it said <i>every point of
+Break damage dealt</i>, and it has only ever paid for Break an attack lands. Its rule is not widened; that is still owed as
+a talent rebalance. <b>A rune the game refuses</b> can reach a player &mdash; a modified data file or an old save can carry one
+&mdash; so its line in the battle log now reads <i>&ldquo;it cannot work as written, so it pays nothing this fight&rdquo;</i>, and the
+technical reason goes to the error log.</p>
+
+<p><b>&sect;2 &mdash; THE WORD THE TAXONOMY WAS MISSING.</b> Every rune has a type &mdash; ability, passive or stat &mdash; and may have a
+secondary label saying what gates it. The only one in use was <i>tradeoff</i>. <b>Conditional</b> joins it: a conditional
+rune's effect pays only while its condition holds, and so it pays more than a rune that always pays. Empty Pulpit, Dead Air
+and Dirge carry it; every rune in the file was checked, retired ones included, and no other rune carries a condition of any
+kind. A check now holds the label and the condition together in both directions, so a rune written with a condition and no
+label, or a label and no condition, is caught. The glossary's rune entry says it in a player's words.</p>
+
+<p><b>&sect;3 &mdash; TWO CHECKS THAT READ THE WRONG DOOR.</b> Two checks print how often each rune is offered at the Peddler, a cache
+and a bargain, and their Peddler column had been counting the cache's roll since the Peddler got a door of its own &mdash; one
+that never sells a core rune. <b>Both now count the Peddler's own door.</b> Every Peddler figure but one moved, no cache or bargain
+figure did, and the figures moved the way the arithmetic says: the Peddler draws from the same list less its core runes, so each rune
+in it comes up a little more often. Both checks now also confirm the column is the Peddler's, by finding no core rune in it
+where the cache beside it offers some. <b>A check that walked every rune through the shared rule</b> and called that proof
+the whole pool &ldquo;still applies&rdquo; now says only what it shows &mdash; that no rune breaks the rule outright &mdash; and names the checks
+that test what each rune actually pays.</p>
+
+<p><b>&sect;4 &mdash; HOUSEKEEPING.</b> HP's spent test folders were moved to the Trash under a folder that names them. The 461 older
+ones are the designer's and were not touched, nor the save backups.</p>
+
+<p><b>&sect;5 &mdash; DELIBERATELY NOT DONE.</b> Whether a fallen hero stays down between fights is still open, and <i>The Cairn of the
+Fallen</i> and a Revive Potion used from the map still wait on it. The Skirmisher and the Tracker are still ruled and not built,
+and their new names are still owed. Tithe's rule is not widened. No rune was authored, and no figure moved but Dead Air's. The
+class-count question still names one class. No crest rune grants a card. The crest is still one slot. Volley, Ambusher and
+Channel's tempo payout are still their own batch, and the rules file is not split.</p>
+
+<p><b>The checks that moved, and why.</b> Every existing check was first run as it stood against this batch's game, with the
+documents as HP left them &mdash; 131 targets, in 75 minutes &mdash; and two read red. The check HP's rulings were written against
+read red on exactly the eight lines predicted: five questions read as the fight runs where four stood, the core-rune
+question no longer read once, a payload asking it refused, and the three crest runes' new label. <b>One was not predicted</b>:
+the talent-tree check that holds every talent's text to the number its effect pays could not find <i>for 20% of its value</i> in
+<i>Breaking Heals a Hero</i>'s new words, so it now looks for the number in the new ones. Every other check read exactly what it
+read at HP, the two Peddler tables included, line for line &mdash; so nothing this batch changed in the game moved them, and
+re-pointing them is the whole of their movement. <b>Six checks were re-pointed</b>, each to what it was written to ask, with its
+reason at the place: the HP check (twenty-three more checks &mdash; the five questions, the cycle round a Pack Bond holder's fall
+and rise, the refused line's words and the route that lets it reach a player, the three figures at the ruling and their new
+label, the talent's words, and the records), the rune-condition check (three more: the new label agrees with every rune's
+condition, both ways), the two Peddler checks (nine and four more: each column provably the Peddler's), the talent-tree check
+(its words) and the whole-pool walk (its message). <b>Eighteen controls, one defect each</b>, were read by what each printed, and
+every one went red on the line it aimed at &mdash; among them the brief's one line on its own, which leaves a crest asking about
+a core rune never paying, and the game's Peddler selling core runes, which the old Peddler columns read green. Four rows of the
+count table move and three more carry a note. The full rehearsal run, in a copy proved equal to the tree, read every one
+of the 131 checks at the count written down for it before it started, and the count differ found nothing to report.</p>
+
 <h2>2026-09-30 &mdash; Batch HP: THE CONDITION AS A FIGHT RUNS, AND THE THREE RUNES IT MAKES REAL</h2>
 <p><b>A crest rune can now ask who is standing while a fight runs, not only as it opens &mdash; and three crest runes do: <i>Empty
 Pulpit</i> (while no Cleric stands, every hero takes less damage), <i>Dead Air</i> (while no Mage stands, every hero deals

@@ -717,15 +717,31 @@ func _no_rune_regression() -> void:
 	Talents.apply_payload(gated, {"condition": {"has_node": "sm_punish"},
 		"stat": {"crit_bonus": 0.1}}, 1)
 	ok(not gated.has("crit_bonus"), "a conditional payload with no ctx stays inert")
-	# Every authored rune still applies without an `also`/`upgrade` key.
+	# Every authored payload still goes through the shared applicator without an
+	# `also`/`upgrade` key — and THAT IS ALL THIS WALK ASKS (BATCH HQ §3: the claim is
+	# narrowed to what it proves). It applies each payload under a ctx with NO party,
+	# where a condition on who stands reads false (HL §6's safe direction), so the
+	# three crest runes that ask who stands apply nothing here and are counted anyway;
+	# and it asks no payload what it PAYS, which would take a party a condition holds
+	# for and a model of every payload kind — a second, weaker copy of the two real
+	# witnesses: `check_ez` §4 lands every live payload on a party it holds for, and
+	# `check_hp` §2 drives the three through a real fight. What it does prove: a payload
+	# the applicator could not take would throw, abort this section, and show in the
+	# battery's throw column and in this suite's count.
 	var touched := 0
+	var party_asked := 0
 	for rune_id in Runes.ids():
 		var entry: Dictionary = Runes.config(String(rune_id))
 		var rcfg := {"abilities": []}
 		Talents.apply_payload(rcfg, entry.get("payload", {}), 1,
 			{"learned": {}, "member": {}})
 		touched += 1
-	ok(touched > 40, "the whole authored rune pool still applies (%d entries)" % touched)
+		var rc: Variant = (entry.get("payload", {}) as Dictionary).get("condition", {})
+		if rc is Dictionary and Talents.HERO_KEYS.any(func(k): return (rc as Dictionary).has(k)):
+			party_asked += 1
+	print("    the walk took %d payloads through the applicator; %d ask who stands and pay nothing without a party" % [
+		touched, party_asked])
+	ok(touched > 40, "the shared applicator took every authored payload without a throw (%d entries)" % touched)
 
 
 # ---------- the live half ----------

@@ -2,16 +2,16 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1644,
-  "source": 1272,
+  "total": 1657,
+  "source": 1278,
   "other": 108,
-  "document": 264
+  "document": 271
  },
  "source_residency": {
   "narrow": 44,
-  "code": 768,
+  "code": 773,
   "absent": 315,
-  "runtime": 97,
+  "runtime": 98,
   "unresolved": 1,
   "comment": 44,
   "alt-sibling": 3
@@ -2882,7 +2882,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fn.gd#137"
+   "g": "check_fn.gd#157"
   },
   {
    "s": "check_fq.gd",
@@ -3609,7 +3609,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "read",
-   "g": "check_he.gd#482"
+   "g": "check_he.gd#493"
   },
   {
    "s": "check_he.gd",
@@ -3620,7 +3620,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_he.gd#482"
+   "g": "check_he.gd#493"
   },
   {
    "s": "check_hf.gd",
@@ -4438,7 +4438,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#205"
+   "g": "check_hp.gd#211"
   },
   {
    "s": "check_hp.gd",
@@ -4449,7 +4449,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#206"
+   "g": "check_hp.gd#212"
   },
   {
    "s": "check_hp.gd",
@@ -4460,7 +4460,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#184"
+   "g": "check_hp.gd#190"
   },
   {
    "s": "check_hp.gd",
@@ -4471,12 +4471,23 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#185"
+   "g": "check_hp.gd#191"
   },
   {
    "s": "check_hp.gd",
    "fn": "_s1a_the_keys_and_the_doors",
    "h": "scripts/battle.gd",
+   "n": "\nfunc ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#204"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1a_the_keys_and_the_doors",
+   "h": "scripts/unit.gd",
    "n": "\nfunc ",
    "p": "+",
    "r": "code",
@@ -4487,13 +4498,13 @@
   {
    "s": "check_hp.gd",
    "fn": "_s1a_the_keys_and_the_doors",
-   "h": "scripts/unit.gd",
-   "n": "\nfunc ",
+   "h": "scripts/battle.gd",
+   "n": "\"engines\": held",
    "p": "+",
    "r": "code",
    "k": "literal",
-   "how": "read",
-   "g": "check_hp.gd#192"
+   "how": "derived",
+   "g": "check_hp.gd#216"
   },
   {
    "s": "check_hp.gd",
@@ -4504,7 +4515,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#207"
+   "g": "check_hp.gd#213"
   },
   {
    "s": "check_hp.gd",
@@ -4515,7 +4526,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_hp.gd#201"
+   "g": "check_hp.gd#207"
   },
   {
    "s": "check_hp.gd",
@@ -4526,7 +4537,29 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_hp.gd#194"
+   "g": "check_hp.gd#200"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1a_the_keys_and_the_doors",
+   "h": "scripts/battle.gd",
+   "n": "engines = Runes.held_engines(Run.party[i])\n",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#217"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1a_the_keys_and_the_doors",
+   "h": "scripts/battle.gd",
+   "n": "for pid in h.engines:",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_hp.gd#216"
   },
   {
    "s": "check_hp.gd",
@@ -4537,7 +4570,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#190"
+   "g": "check_hp.gd#196"
   },
   {
    "s": "check_hp.gd",
@@ -4548,7 +4581,18 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#202"
+   "g": "check_hp.gd#208"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1a_the_keys_and_the_doors",
+   "h": "scripts/battle.gd",
+   "n": "func _live_party() -> Array:",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#214"
   },
   {
    "s": "check_hp.gd",
@@ -4559,7 +4603,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#197"
+   "g": "check_hp.gd#203"
   },
   {
    "s": "check_hp.gd",
@@ -4570,7 +4614,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#199"
+   "g": "check_hp.gd#205"
   },
   {
    "s": "check_hp.gd",
@@ -4581,7 +4625,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#191"
+   "g": "check_hp.gd#197"
   },
   {
    "s": "check_hp.gd",
@@ -4592,7 +4636,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_hp.gd#194"
+   "g": "check_hp.gd#200"
   },
   {
    "s": "check_hp.gd",
@@ -4603,7 +4647,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_hp.gd#204"
+   "g": "check_hp.gd#210"
   },
   {
    "s": "check_hp.gd",
@@ -4614,7 +4658,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#196"
+   "g": "check_hp.gd#202"
   },
   {
    "s": "check_hp.gd",
@@ -4625,7 +4669,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#196"
+   "g": "check_hp.gd#202"
   },
   {
    "s": "check_hp.gd",
@@ -4636,7 +4680,7 @@
    "r": "runtime",
    "k": "format",
    "how": "derived",
-   "g": "check_hp.gd#268",
+   "g": "check_hp.gd#278",
    "alt": true
   },
   {
@@ -4648,7 +4692,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#272"
+   "g": "check_hp.gd#282"
   },
   {
    "s": "check_hp.gd",
@@ -4659,7 +4703,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#274"
+   "g": "check_hp.gd#284"
   },
   {
    "s": "check_hp.gd",
@@ -4670,7 +4714,7 @@
    "r": "runtime",
    "k": "format",
    "how": "derived",
-   "g": "check_hp.gd#268",
+   "g": "check_hp.gd#278",
    "alt": true
   },
   {
@@ -4682,7 +4726,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#264"
+   "g": "check_hp.gd#274"
   },
   {
    "s": "check_hp.gd",
@@ -4693,7 +4737,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#273"
+   "g": "check_hp.gd#283"
   },
   {
    "s": "check_hp.gd",
@@ -4704,7 +4748,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#274"
+   "g": "check_hp.gd#284"
   },
   {
    "s": "check_hp.gd",
@@ -4715,7 +4759,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#333"
+   "g": "check_hp.gd#352"
   },
   {
    "s": "check_hp.gd",
@@ -4726,7 +4770,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_hp.gd#334"
+   "g": "check_hp.gd#353"
   },
   {
    "s": "check_hp.gd",
@@ -4737,7 +4781,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_hp.gd#334"
+   "g": "check_hp.gd#353"
   },
   {
    "s": "check_hp.gd",
@@ -4748,29 +4792,29 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#332"
+   "g": "check_hp.gd#351"
   },
   {
    "s": "check_hp.gd",
-   "fn": "_s1f_hold_core_is_read_once",
+   "fn": "_s1f_hold_core_is_read_as_the_fight_runs",
    "h": "scripts/battle.gd",
    "n": "[\"equipped\"] = ",
    "p": "-",
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#431"
+   "g": "check_hp.gd#491"
   },
   {
    "s": "check_hp.gd",
-   "fn": "_s1f_hold_core_is_read_once",
+   "fn": "_s1f_hold_core_is_read_as_the_fight_runs",
    "h": "scripts/battle.gd",
    "n": "toggle_engine(",
    "p": "-",
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#431"
+   "g": "check_hp.gd#491"
   },
   {
    "s": "check_hp.gd",
@@ -4781,7 +4825,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#435"
+   "g": "check_hp.gd#506"
   },
   {
    "s": "check_hp.gd",
@@ -4792,7 +4836,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#435"
+   "g": "check_hp.gd#506"
   },
   {
    "s": "check_hp.gd",
@@ -4803,7 +4847,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#726"
+   "g": "check_hp.gd#795"
   },
   {
    "s": "check_hp.gd",
@@ -4814,7 +4858,42 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#726"
+   "g": "check_hp.gd#795"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s4_tithe",
+   "h": "docs/master.html",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_hp.gd#818",
+   "expr": "TALENT_WAS"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s4_tithe",
+   "h": "scripts/talents.gd",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_hp.gd#817",
+   "expr": "TALENT_WAS"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s4_tithe",
+   "h": "docs/master.html",
+   "n": "Breaking Heals a Hero",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#818"
   },
   {
    "s": "check_hp.gd",
@@ -4825,7 +4904,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#737"
+   "g": "check_hp.gd#806"
   },
   {
    "s": "check_hp.gd",
@@ -4836,7 +4915,18 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#737"
+   "g": "check_hp.gd#806"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s4_tithe",
+   "h": "scripts/talents.gd",
+   "n": "tn_break_heal",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#817"
   },
   {
    "s": "check_hp.gd",
@@ -4847,7 +4937,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#743"
+   "g": "check_hp.gd#824"
   },
   {
    "s": "check_hp.gd",
@@ -4858,7 +4948,40 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#741"
+   "g": "check_hp.gd#822"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s5_the_records",
+   "h": "CLAUDE.md",
+   "n": "A RUNE PAID WHILE A HERO IS MISSING IS PRICED BY WHAT IT REPLACES",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#825"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s5_the_records",
+   "h": "CLAUDE.md",
+   "n": "AND IT CARRIES THE SECONDARY *CONDITIONAL*",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#826"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s5_the_records",
+   "h": "CLAUDE.md",
+   "n": "AND THE BRIEF WAS THE ERROR",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#827"
   },
   {
    "s": "check_hp.gd",
@@ -4869,7 +4992,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#742"
+   "g": "check_hp.gd#823"
   },
   {
    "s": "check_hp.gd",
@@ -4880,7 +5003,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#745"
+   "g": "check_hp.gd#829"
   },
   {
    "s": "check_hp.gd",
@@ -4891,7 +5014,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#745"
+   "g": "check_hp.gd#829"
   },
   {
    "s": "check_hp.gd",
@@ -4902,7 +5025,29 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#745"
+   "g": "check_hp.gd#829"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s5_the_records",
+   "h": "CLAUDE.md",
+   "n": "four live keys beside one stale one is a trap",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#827"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s5_the_records",
+   "h": "CLAUDE.md",
+   "n": "so Dirge farms nothing",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#825"
   },
   {
    "s": "check_hp.gd",
@@ -4913,7 +5058,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#776"
+   "g": "check_hp.gd#860"
   },
   {
    "s": "check_hp.gd",
@@ -4924,7 +5069,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#776"
+   "g": "check_hp.gd#860"
   },
   {
    "s": "check_hp.gd",
@@ -4935,7 +5080,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#776"
+   "g": "check_hp.gd#860"
   },
   {
    "s": "check_hp.gd",
@@ -4946,7 +5091,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#775"
+   "g": "check_hp.gd#859"
   },
   {
    "s": "check_hp.gd",
@@ -4957,7 +5102,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hp.gd#775"
+   "g": "check_hp.gd#859"
   },
   {
    "s": "test_batch_ah.gd",

@@ -1,22 +1,26 @@
 # BATCH HP — THE CONDITION AS A FIGHT RUNS, AND THE THREE RUNES IT MAKES REAL.
 #
 #   §0  THE GROUND — this process writes the harness save, and scratch meta files
-#   §1  THE LIVE DOOR — the four keys read as the fight runs; the fields a live
-#       payload may write, DERIVED over HN §3a's twenty-eight and held here as the
-#       partition; the refusal, loud at the table and at every application; the two
-#       doors a hero's standing changes through; a full CYCLE on a base where a
-#       subtraction would drift, returning the figure bit for bit; a fight quit
-#       after a fall and resumed; `heroes_hold_core` read once; the hero sheet
-#   §2  THE THREE RUNES — the entries, offered and taken through a real drop and
+#   §1  THE LIVE DOOR — the keys read as the fight runs (all five since HQ §1); the
+#       fields a live payload may write, DERIVED over HN §3a's twenty-eight and held
+#       here as the partition; the refusal, loud at the table and at every
+#       application, and the roll call's tail for it in a player's words (HQ §1); the
+#       two doors a hero's standing changes through; a full CYCLE on a base where a
+#       subtraction would drift, returning the figure bit for bit; a fight quit after
+#       a fall and resumed; `heroes_hold_core` read as the fight runs, driven round
+#       its own cycle (HQ §1); the hero sheet
+#   §2  THE THREE RUNES — the entries at their RULED figures (HQ §1) and their shape,
+#       STAT and CONDITIONAL (HQ §2), offered and taken through a real drop and
 #       worn in the crest through the bag's own door, then each through a real
 #       fight in which its hero falls and is revived; what a blow pays; the words
 #       say WHILE; the BR §1 sweep of the three names
 #   §3  FELLOWSHIP IS RETIRED — kept and said to be kept, offered by no door, a
 #       save wearing it loads and it still resolves; its read site kept
-#   §4  TITHE'S WORDS — the ruled sentence at the entry's own figure, broken under
-#       the ceiling, and the read site they describe, not widened
-#   §5  THE RULINGS' RECORDS — FN's reconciliation and the §3 finding where a
-#       future session reads them
+#   §4  TITHE'S WORDS AND THE TALENT'S — the ruled sentence at the entry's own
+#       figure, broken under the ceiling; *Breaking Heals a Hero*'s narrowed to the
+#       same read site (HQ §1); the read site they describe, not widened
+#   §5  THE RULINGS' RECORDS — FN's reconciliation, the §3 finding and HQ's three
+#       records where a future session reads them
 #   §6  THE SMALL THINGS — the run summary names the crest, a core rune and the bag;
 #       the sim's counter stocks no core rune; the counter's dead re-roll is gone;
 #       the comments that spoke Faith's threshold as a figure
@@ -30,8 +34,11 @@
 # assigns none of the measured fields by hand (GW §2). **EVERY NEGATIVE ANCHOR HAS
 # ITS POSITIVE ARM**, and a population prints how many it checked.
 #
-# **NO MAGNITUDE IS COPIED HERE**: each rune's figure is read off its entry, the
-# base a cycle runs on off the relic that sets it.
+# **NO MAGNITUDE IS COPIED HERE BUT THE THREE THE DESIGNER RULED**: each rune's figure
+# is read off its entry and the base a cycle runs on off the relic that sets it; the
+# three crest figures were PROPOSED at HP and are RULED since HQ §1 (Dirge 45%, Empty
+# Pulpit 50%, Dead Air 75%), so §2a holds the entries to the ruling — `check_cn`'s
+# shape: moving a ruled figure is two edits, and the second one is this gate's line.
 #
 #   /Applications/Godot.app/Contents/MacOS/Godot --headless --path . \
 #       --script check_hp.gd
@@ -68,16 +75,18 @@ const STAMPS := ["devoutness_ranks", "rune_devoutness_ranks", "last_hope_pct", "
 const SUMMON_COPIED := ["attack", "armor", "speed", "stability", "constitution", "crit_bonus"]
 
 # §2 — the three, by id: the condition key each is ruled to read, the hero whose fall
-# makes it hold (by seat), the field it writes, and its words with the figure left out.
+# makes it hold (by seat), the field it writes, its words with the figure left out,
+# and the figure the designer RULED at HQ §1 (Dirge and Empty Pulpit confirmed as HP
+# proposed them; Dead Air moved 0.50 -> 0.75).
 const THREE := {
 	"empty_pulpit": {"name": "Empty Pulpit", "key": ["heroes_lack_class", "cleric"], "falls": 2,
-		"field": "dmg_taken_bonus", "sign": -1,
+		"field": "dmg_taken_bonus", "sign": -1, "ruled": -0.50,
 		"words": "While no Cleric stands, every hero takes\n%d%% less damage."},
 	"dead_air": {"name": "Dead Air", "key": ["heroes_lack_class", "mage"], "falls": 1,
-		"field": "dmg_bonus", "sign": 1,
+		"field": "dmg_bonus", "sign": 1, "ruled": 0.75,
 		"words": "While no Mage stands, every hero deals\n%d%% more damage."},
 	"dirge": {"name": "Dirge", "key": ["heroes_all_standing", false], "falls": 0,
-		"field": "dmg_bonus", "sign": 1,
+		"field": "dmg_bonus", "sign": 1, "ruled": 0.45,
 		"words": "While a hero lies fallen, the rest deal\n%d%% more damage."},
 }
 # §2e — BR §1: the shared-word near-misses each name is known to have, compared as an
@@ -92,6 +101,12 @@ const NEAR_MISSES := {
 
 # §4 — Tithe's words as the designer ruled them (HP §4), the figure left out.
 const TITHE_WORDS := "A hero's attack that lands Break heals\nwhoever among the four is lowest,\nfor %d%% of it."
+# §4 — and the talent's over the same read site, narrowed the way Tithe's were (HQ §1;
+# the wording PROPOSED), the figure left out, and the words it carried until HQ.
+const TALENT_WORDS := "An attack that lands Break heals the lowest-health hero for %d%% of it."
+const TALENT_WAS := "Every point of Break damage dealt"
+# §1c — words a roll-call tail must not speak to a player (HQ §1): the developer's.
+const DEV_WORDS := ["payload", "refus", "consumed", "field", "live door"]
 
 # §6 — the comments that spoke Faith's threshold as a figure, by the phrase each
 # carried (HO's census of five, and the seven more this batch's sweep found). The
@@ -141,7 +156,7 @@ func _initialize() -> void:
 	await _s1c_the_refusal()
 	await _s1d_the_cycle()
 	await _s1e_a_quit_fight_resumed()
-	await _s1f_hold_core_is_read_once()
+	await _s1f_hold_core_is_read_as_the_fight_runs()
 	_s1g_the_sheet()
 	_s2a_the_entries()
 	await _s2b_the_route()
@@ -322,18 +337,29 @@ func _stale_line(text: String, needle: String) -> bool:
 # ── §1a — THE KEYS AND THE DOORS ────────────────────────────────────────────
 
 func _s1a_the_keys_and_the_doors() -> void:
-	print("\n§1a — the four keys read as the fight runs, and the two doors a hero's standing changes through")
-	# THE RULING, AS THE TABLE: four keys live, `heroes_hold_core` read once.
+	print("\n§1a — the five keys read as the fight runs, and the two doors a hero's standing changes through")
+	# THE RULING, AS THE TABLE: HP's four, and `heroes_hold_core` since HQ §1 (ruled) —
+	# read once it went on paying after its only holder fell, stale for the reason the
+	# other four were.
 	var live: Array = Talents.LIVE_KEYS.duplicate()
 	live.sort()
-	ok(live == ["heroes_all_standing", "heroes_class_count", "heroes_include_class", "heroes_lack_class"],
+	ok(live == ["heroes_all_standing", "heroes_class_count", "heroes_hold_core", "heroes_include_class", "heroes_lack_class"],
 		"§1a: the keys read as the fight runs are %s" % [live])
-	ok(Talents.HERO_KEYS.has("heroes_hold_core") and not Talents.LIVE_KEYS.has("heroes_hold_core"),
-		"§1a: `heroes_hold_core` is read as the fight runs, or is no longer a key")
+	ok(Talents.HERO_KEYS.has("heroes_hold_core") and Talents.LIVE_KEYS.has("heroes_hold_core"),
+		"§1a: `heroes_hold_core` is read once, as the fight opens, or is no longer a key — HQ §1 ruled it live")
+	# AND SO NO CONDITION ON WHO STANDS IS READ ONCE ANY MORE: every key the party is
+	# asked by is a live key, and the spawn's half is a node or a card alone.
+	var stale: Array = Talents.HERO_KEYS.filter(func(k): return not Talents.LIVE_KEYS.has(k))
+	ok(not Talents.HERO_KEYS.is_empty() and stale.is_empty(),
+		"§1a: %s asks who stands and is read once — a key that turns with a fall and is not re-read" % [stale])
 	ok(Talents.is_live({"condition": {"heroes_lack_class": "mage"}, "stat": {"dmg_bonus": 0.1}})
-			and not Talents.is_live({"condition": {"heroes_hold_core": "pack"}, "stat": {"max_hp": 9}})
+			and Talents.is_live({"condition": {"heroes_hold_core": "pack"}, "stat": {"dmg_bonus": 0.1}})
+			and not Talents.is_live({"condition": {"has_node": "tn_damage"}, "stat": {"max_hp": 9}})
 			and not Talents.is_live({"stat": {"dmg_bonus": 0.1}}),
 		"§1a: a payload is live, or not, on the wrong keys")
+	ok(Talents.spawn_half({"heroes_hold_core": "pack", "has_node": "tn_damage"}) == {"has_node": "tn_damage"},
+		"§1a: the spawn still weighs `heroes_hold_core` — its half is %s" % [
+			Talents.spawn_half({"heroes_hold_core": "pack", "has_node": "tn_damage"})])
 	# THE DOORS: `dead` is written in `_die()` and `revive()` and nowhere else in the
 	# game's scripts, so the pair is every door a hero's standing changes through.
 	var writers: Array = []
@@ -378,6 +404,15 @@ func _s1a_the_keys_and_the_doors() -> void:
 	# THE SPAWN LEAVES A LIVE PAYLOAD TO THE DOOR, AND THE HERO SHEET DOES NOT.
 	ok(bs.contains("\"party\": Run.party, Talents.LIVE_DOOR: true}"),
 		"§1a: the battle spawn does not hand `LIVE_DOOR`, so it would stamp a live payload")
+	# THE RE-READ HANDS EACH HERO'S SLOTTED ENGINES (HQ §1), off the unit's own `engines` —
+	# the list the spawn built off `Runes.held_engines` of his member — or `heroes_hold_core`
+	# reads no engine on anybody at every door. §1f drives what this reads.
+	var lp_at := bs.find("func _live_party() -> Array:")
+	var lp := bs.substr(lp_at, bs.find("\nfunc ", lp_at + 5) - lp_at) if lp_at >= 0 else ""
+	ok(lp_at >= 0 and lp.contains("for pid in h.engines:") and lp.contains("\"engines\": held"),
+		"§1a: the live re-read hands the heroes' standing without their engines")
+	ok(bs.contains("engines = Runes.held_engines(Run.party[i])\n"),
+		"§1a: a hero's `engines` are no longer `Runes.held_engines` of his member — the re-read and the spawn may disagree")
 	ok(not Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/party_screen.gd")).contains("LIVE_DOOR"),
 		"§1a: the hero sheet hands `LIVE_DOOR`, so it would show a live rune paying nothing at the opening")
 
@@ -500,7 +535,11 @@ func _s1c_the_refusal() -> void:
 		if Talents.live_refusal({"stat": {String(f2): 1}, "condition": {"heroes_all_standing": false}}) == "":
 			accepted += 1
 	ok(accepted == Talents.LIVE_FIELDS.size(), "§1c: %d of the %d live fields are accepted" % [accepted, Talents.LIVE_FIELDS.size()])
-	ok(Talents.live_refusal({"stat": {"max_hp": 9}, "condition": {"heroes_hold_core": "pack"}}) == "",
+	# HQ §1 — `heroes_hold_core` IS LIVE, SO A PAYLOAD CARRYING IT REFUSES A CONSUMED FIELD,
+	# as every live key's does; a condition read once (a node, a card) still takes one.
+	ok(Talents.live_refusal({"stat": {"max_hp": 9}, "condition": {"heroes_hold_core": "pack"}}).contains("max_hp"),
+		"§1c: a payload carrying `heroes_hold_core` on a consumed field is accepted — the key is read as the fight runs")
+	ok(Talents.live_refusal({"stat": {"max_hp": 9}, "condition": {"has_node": "tn_damage"}}) == "",
 		"§1c: a spawn-only condition on a consumed field is refused — it is stamped once and needs no door")
 	# APPLY REFUSES, AND ADDS NOTHING (the hero sheet's route: no `LIVE_DOOR`).
 	var cfg := {"abilities": [], "max_hp": 100}
@@ -533,6 +572,24 @@ func _s1c_the_refusal() -> void:
 			said = true
 	ok(with_hp.size() == 4 and paid == 0 and said,
 		"§1c: a refused live payload paid on %d heroes at a real spawn, and the roll call %s" % [paid, "said so" if said else "did not say so"])
+	# HQ §1 — AND WHAT THE ROLL CALL SAYS IS A PLAYER'S SENTENCE. The tail reaches the
+	# combat log the player reads, so it carries none of the developer's words and keeps
+	# the roll call's own close; why the entry is refused goes to `push_error`.
+	var dev_said: Array = DEV_WORDS.filter(func(w): return refused_tail.to_lower().contains(String(w)))
+	ok(refused_tail.ends_with("so it pays nothing this fight") and dev_said.is_empty(),
+		"§1c: the refused tail reads '%s' — %s are not a player's words" % [refused_tail, dev_said])
+	# THE ROUTE THAT MAKES IT ONE — the fact the rewording rests on, asserted so the day it
+	# stops holding the reason is seen to go: a refused entry stays in the loaded table
+	# (`Runes._load` reports it and keeps it) and a roll offers it like any other.
+	var refused_fx := "hp_fixture_refused"
+	Runes._load()[refused_fx] = {"name": "HP Fixture Refused", "scope": "party", "price": 150,
+		"desc": "A fixture of check_hp, never in the file.",
+		"payload": {"stat": {"max_hp": 9}, "condition": {"heroes_all_standing": false}}}
+	_new_run(SEATS, ENG4)
+	var rolled: bool = Runes.eligible_ids(_run.party[0], []).has(refused_fx)
+	Runes._load().erase(refused_fx)
+	ok(rolled and not Runes.ids().has(refused_fx),
+		"§1c: a refused entry is not offered by the roll (%s) — the route the player's tail answers is gone, re-read HQ §1" % rolled)
 	# THE FILE HOLDS NONE, AND THE TABLE ASKS THE ONE DOOR AS IT LOADS.
 	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/runes.json"))
 	var bad: Array = []
@@ -646,38 +703,115 @@ func _s1e_a_quit_fight_resumed() -> void:
 	ok(not text.contains(_c(s2, "LIVE_ON_TAIL")), "§1e: the lay-down of the fallen was logged as a switch")
 
 
-# ── §1f — `heroes_hold_core` IS READ ONCE ───────────────────────────────────
+# ── §1f — `heroes_hold_core` IS READ AS THE FIGHT RUNS (HQ §1) ──────────────
+#
+# **HP RULED IT READ ONCE AND PRINTED WHAT THAT LEFT OUT; HQ RULED IT LIVE, AND THE
+# PRINT IS AN ASSERTION NOW.** Nothing in the battle writes an engine's slot (GM §2 —
+# still swept below), but the key counts the heroes who STAND, so read once it went on
+# paying after its only holder fell. Driven as a cycle on the relic's base, through
+# the real doors: the Hunter — the one Pack Bond holder in `ENG4` — falls through the
+# damage door and the key turns; he rises through the battle's own Revive Potion and
+# it turns back; the figure returns to the base bit for bit (`==`), as §1d's does.
 
-func _s1f_hold_core_is_read_once() -> void:
-	print("\n§1f — `heroes_hold_core` is read as the fight opens and never again")
-	var hp_add := 9
-	var s: Node = await _battle({"stat": {"max_hp": hp_add}, "condition": {"heroes_hold_core": "pack"}})
-	var got: Array = _field_row(s, "max_hp")
-	var bare: Node = await _battle({})
-	var none: Array = _field_row(bare, "max_hp")
-	var paid := 0
-	for i in mini(got.size(), none.size()):
-		if int(got[i]) - int(none[i]) == hp_add:
-			paid += 1
-	ok(paid == 4, "§1f: the Hunter on Pack Bond, and a spawn condition paid on %d" % paid)
-	# THE HUNTER — THE ONE HOLDER — FALLS: NOTHING IS RE-READ.
-	s = await _battle({"stat": {"max_hp": hp_add}, "condition": {"heroes_hold_core": "pack"}})
-	var before: Array = _field_row(s, "max_hp")
+func _s1f_hold_core_is_read_as_the_fight_runs() -> void:
+	print("\n§1f — `heroes_hold_core` is read as the fight runs: its holder falls, it turns; he rises, it turns back")
+	# THE KEY ITSELF, BOTH WAYS — the line HP printed, and its positive arm.
+	var holder := {"key": "hunter", "hp": 10,
+		"engines": [{"id": Runes.engine_rune_id("pack"), "engine": "pack", "equipped": true}]}
+	var down: Dictionary = holder.duplicate(true)
+	down["hp"] = 0
+	var warrior := {"key": "warrior", "hp": 10, "engines": []}
+	var up_reads := Talents.party_condition_met({"heroes_hold_core": "pack"}, [warrior, holder])
+	var down_reads := Talents.party_condition_met({"heroes_hold_core": "pack"}, [warrior, down])
+	print("    the key, asked of a party whose only Pack Bond holder stands: %s; is down: %s" % [up_reads, down_reads])
+	ok(up_reads and not down_reads,
+		"§1f: the key reads %s with its only holder standing and %s with him down" % [up_reads, down_reads])
+	# THE CYCLE. The bare battle first, for the base each hero opens at.
+	var add := 0.25
+	var pay := {"stat": {"dmg_bonus": add}, "condition": {"heroes_hold_core": "pack"}}
+	var bare: Node = await _battle({}, "", -1, [BASE_RELIC])
+	var base: Array = _field_row(bare, "dmg_bonus")
+	var s: Node = await _battle(pay, "", -1, [BASE_RELIC], true)
+	var hunter: BattleUnit = _heroes(s)[3]
+	ok(hunter.has_engine("pack") and not (_heroes(s)[0] as BattleUnit).has_engine("pack"),
+		"§1f: the Hunter is not the one Pack Bond holder this drive is built on")
+	var open: Array = _field_row(s, "dmg_bonus")
+	var opened_on := 0
+	for i in open.size():
+		if i < base.size() and is_equal_approx(float(open[i]), float(base[i]) + add):
+			opened_on += 1
+	var roll: Array = s.get("_rune_roll_call")
+	var untailed := false
+	for line in roll:
+		if String(line) == "the crest: HP Fixture Crest":
+			untailed = true
+	ok(base.size() == 4 and opened_on == 4 and untailed,
+		"§1f: with its holder standing the crest opened paying on %d of the four (%s against %s), the roll call %s" % [
+			opened_on, open, base, roll])
+	# THE HOLDER FALLS: IT STOPS ON ALL FOUR, AND THE FIGURE IS THE BASE BIT FOR BIT.
 	await _fell(s, 3)
-	var after: Array = _field_row(s, "max_hp")
-	ok(before == after and not _log_text(s).contains("HP Fixture Crest — its condition"),
-		"§1f: the holder fell and the spawn condition was re-read (%s -> %s)" % [before, after])
-	# WHAT THE RULING'S REASON LEAVES OUT, PRINTED: the key counts the heroes who stand,
-	# so read live it WOULD turn with the holder's fall — the slot does not change, the
-	# standing does.
-	var standing := [{"key": "warrior", "hp": 10, "engines": []}, {"key": "hunter", "hp": 0,
-		"engines": [{"id": Runes.engine_rune_id("pack"), "engine": "pack", "equipped": true}]}]
-	print("    the key, asked of a party whose only Pack Bond holder is down: %s" % Talents.party_condition_met(
-		{"heroes_hold_core": "pack"}, standing))
-	# NOTHING IN THE BATTLE WRITES AN ENGINE'S SLOT (GM §2) — the premise the ruling rests on.
+	var off: Array = _field_row(s, "dmg_bonus")
+	var exact := off.size() == base.size()
+	for i2 in off.size():
+		if i2 >= base.size() or float(off[i2]) != float(base[i2]):
+			exact = false
+	var naive := float(base[0]) + add - add if not base.is_empty() else 0.0
+	print("    open %s; the Hunter down %s (base %s — a subtraction would have left %s)" % [
+		open, off, base, var_to_str(naive)])
+	ok(hunter.dead and exact, "§1f: with Pack Bond's only holder down the heroes read %s — not the base %s exactly" % [off, base])
+	ok(_log_text(s).count("Rune: the crest: HP Fixture Crest — %s" % _c(s, "LIVE_OFF_TAIL")) == 1,
+		"§1f: the switch OFF is not in the log once")
+	# HE RISES: IT PAYS AGAIN, THE SAME BITS IT OPENED WITH.
+	await _revived(s)
+	var again: Array = _field_row(s, "dmg_bonus")
+	var same := again.size() == open.size()
+	for i3 in again.size():
+		if float(again[i3]) != float(open[i3]):
+			same = false
+	ok(not hunter.dead and same, "§1f: the Hunter raised, the heroes read %s, not the %s they opened with" % [again, open])
+	ok(_log_text(s).count("Rune: the crest: HP Fixture Crest — %s" % _c(s, "LIVE_ON_TAIL")) == 1,
+		"§1f: the switch ON is not in the log once")
+	# A FALL THAT IS NOT THE HOLDER'S SWITCHES NOTHING — its own fight, so the pouch's one
+	# potion above is never asked to choose between two fallen.
+	var s3: Node = await _battle(pay, "", -1, [BASE_RELIC])
+	var paid3: Array = _field_row(s3, "dmg_bonus")
+	await _fell(s3, 1)
+	ok(_field_row(s3, "dmg_bonus") == paid3 and not _log_text(s3).contains(_c(s3, "LIVE_OFF_TAIL")),
+		"§1f: the Mage fell and the crest stopped paying — he holds no Pack Bond")
+	# THE NEGATIVE OPENING: a party whose Hunter holds no Pack Bond opens with it not paying,
+	# against the same party bare, and the roll call says it waits.
+	var no_pack := ["bloodrage", "overburn", "mercy", "lethal_aim"]
+	var bare2: Node = await _battle_on({}, no_pack)
+	var bare2_row: Array = _field_row(bare2, "dmg_bonus")
+	var s2: Node = await _battle_on(pay, no_pack)
+	var unpaid: Array = _field_row(s2, "dmg_bonus")
+	var told := false
+	for line2 in s2.get("_rune_roll_call"):
+		if String(line2) == "the crest: HP Fixture Crest — %s" % _c(s2, "CONDITION_UNMET_LIVE_TAIL"):
+			told = true
+	ok(bare2_row.size() == 4 and unpaid == bare2_row and told,
+		"§1f: with no Pack Bond held the crest opened paying %s against %s bare, or the roll call did not say it waits" % [
+			unpaid, bare2_row])
+	# NOTHING IN THE BATTLE WRITES AN ENGINE'S SLOT (GM §2) — the premise both rulings rest on.
 	var bs := Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/battle.gd"))
 	ok(not bs.contains("[\"equipped\"] = ") and not bs.contains("toggle_engine("),
 		"§1f: the battle writes an engine's slot — `heroes_hold_core` can change inside a fight")
+
+
+# `_battle`'s door with the four seated on `engines` rather than `ENG4`, no relic; the
+# fixture crest worn only when `payload` is not empty.
+func _battle_on(payload: Dictionary, engines: Array) -> Node:
+	var table: Dictionary = Runes._load()
+	table[CREST_FX] = {"name": "HP Fixture Crest", "scope": "party", "price": 150,
+		"desc": "A fixture of check_hp, never in the file.", "payload": payload}
+	_new_run(SEATS, engines)
+	if not payload.is_empty():
+		_wear_crest(CREST_FX)
+	OS.set_environment("DOD_AUTOPLAY", "")
+	OS.set_environment("DOD_ENEMIES_OFF", "1")
+	Gate.enter_battle(self, FOE.duplicate(true))
+	await Gate.frames(self, 8)
+	return current_scene
 
 
 # ── §1g — THE HERO SHEET SHOWS WHAT THE OPENING PAYS ─────────────────────────
@@ -721,6 +855,9 @@ func _s2a_the_entries() -> void:
 			"§2a: `%s` carries %s, not the ruled condition" % [id, cond])
 		ok(pay.size() == 2 and (pay.get("stat", {}) as Dictionary).size() == 1 and fig * float(row["sign"]) > 0.0,
 			"§2a: `%s` writes %s" % [id, pay.get("stat", {})])
+		# THE FIGURE THE DESIGNER RULED (HQ §1) — exact, because the entry is the ruling.
+		ok(fig == float(row["ruled"]),
+			"§2a: `%s` writes %s %s — the designer ruled %s" % [id, row["field"], str(fig), str(row["ruled"])])
 		ok(Talents.is_live(pay) and Talents.live_refusal(pay) == "", "§2a: `%s` is not a live payload the door accepts" % id)
 		# THE WORDS ARE THE RULED SENTENCE AT THE ENTRY'S OWN FIGURE, broken under 44.
 		ok(String(cfg.get("desc", "")) == String(row["words"]) % pct, "§2a: `%s` reads '%s'" % [id, cfg.get("desc", "")])
@@ -728,8 +865,9 @@ func _s2a_the_entries() -> void:
 		for ln in String(cfg.get("desc", "")).split("\n"):
 			longest = maxi(longest, String(ln).length())
 		ok(longest <= 44, "§2a: a line of `%s`'s words is %d characters" % [id, longest])
-		ok(not Runes.rune_tags(id).is_empty() and Runes.rune_shape(id) == ["STAT"],
-			"§2a: `%s` has no tag row, or its shape is %s" % [id, Runes.rune_shape(id)])
+		# HQ §2 — A STAT, AND CONDITIONAL NAMES ITS GATE.
+		ok(not Runes.rune_tags(id).is_empty() and Runes.rune_shape(id) == ["STAT", "CONDITIONAL"],
+			"§2a: `%s` has no tag row, or its shape is %s, not [STAT, CONDITIONAL]" % [id, Runes.rune_shape(id)])
 
 
 # ── §2b — OFFERED, TAKEN, WORN: THE REAL ROUTE ──────────────────────────────
@@ -885,7 +1023,11 @@ func _s2d_what_a_blow_pays() -> void:
 func _s2e_the_words_say_while() -> void:
 	print("\n§2e — a rune that reads who stands says when it reads it")
 	# HO §2's rule, re-pointed by the continuous read: a condition read as the fight
-	# runs says WHILE; one read at the opening says so.
+	# runs says WHILE; one read at the opening says so. **SINCE HQ §1 EVERY KEY ON WHO
+	# STANDS IS READ AS THE FIGHT RUNS** (§1a asserts no hero key is left out of
+	# `LIVE_KEYS`), so the second half has no population: the arm that asked a
+	# `heroes_hold_core` rune for *as the fight opens* is gone with the key's read-once,
+	# and such a rune now owes *while* like the rest.
 	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/runes.json"))
 	var live_n := 0
 	var unsaid: Array = []
@@ -896,9 +1038,6 @@ func _s2e_the_words_say_while() -> void:
 		if Talents.is_live(pay):
 			live_n += 1
 			if not words.begins_with("while "):
-				unsaid.append(String(id))
-		elif (pay.get("condition", {}) as Dictionary).has("heroes_hold_core"):
-			if not (words.contains("as the fight opens") or words.contains("enter a fight")):
 				unsaid.append(String(id))
 	print("    CHECKED %d runes read as the fight runs" % live_n)
 	ok(live_n >= 3 and unsaid.is_empty(), "§2e: %s read who stands and do not say when" % [unsaid])
@@ -1058,7 +1197,7 @@ func _s3_fellowship() -> void:
 # ── §4 — TITHE'S WORDS ──────────────────────────────────────────────────────
 
 func _s4_tithe() -> void:
-	print("\n§4 — Tithe's words, narrowed to its read site")
+	print("\n§4 — Tithe's words and the talent's, narrowed to the read site they share")
 	var cfg: Dictionary = Runes.config("tithe")
 	var share := int(((cfg.get("payload", {}) as Dictionary).get("stat", {}) as Dictionary).get("rune_blood_communion", 0))
 	ok(share > 0 and String(cfg.get("desc", "")) == TITHE_WORDS % share, "§4: Tithe reads '%s'" % cfg.get("desc", ""))
@@ -1072,6 +1211,24 @@ func _s4_tithe() -> void:
 	ok(bs.count("attacker.blood_communion + attacker.rune_blood_communion") == 1
 			and bs.contains("result.get(\"bd\", pr) * bc_pct / 100.0"),
 		"§4: Tithe's read site moved, or reads something but the Break the blow applied")
+	# HQ §1 — THE TALENT OVER THE SAME SITE SAYS WHAT IT READS. *Breaking Heals a Hero*
+	# said *every point of Break damage dealt*; the site reads the Break an attack lands,
+	# so its words are narrowed as Tithe's were, at the node's own figure.
+	var node_pct := 0
+	var node_desc := ""
+	for n in Talents.tree():
+		if String((n as Dictionary).get("id", "")) == "tn_break_heal":
+			node_pct = int((((n as Dictionary).get("payload", {}) as Dictionary).get("stat", {}) as Dictionary).get("blood_communion", 0))
+			node_desc = String((n as Dictionary).get("desc", ""))
+	print("    Breaking Heals a Hero (%d%%): '%s'" % [node_pct, node_desc])
+	ok(node_pct > 0 and node_desc == TALENT_WORDS % node_pct,
+		"§4: Breaking Heals a Hero reads '%s', not the read site's words" % node_desc)
+	var ts := Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/talents.gd"))
+	var master := FileAccess.get_file_as_string("res://docs/master.html")
+	ok(ts.contains("tn_break_heal") and not ts.contains(TALENT_WAS),
+		"§4: '%s' still stands in the talent's own source" % TALENT_WAS)
+	ok(master.length() > 100000 and master.contains("Breaking Heals a Hero") and not master.contains(TALENT_WAS),
+		"§4: '%s' still stands in master.html's copy of the talent" % TALENT_WAS)
 
 
 # ── §5 — THE RULINGS' RECORDS ───────────────────────────────────────────────
@@ -1084,6 +1241,17 @@ func _s5_the_records() -> void:
 	ok(cm.contains("HERO-SIDE DEBUFF SUPPLY IS 0.296 A ROUND"), "§5: CLAUDE.md does not carry the cleanse finding")
 	ok(cm.contains("A CARD STATING ITS OWN COST AND PAYOUT IS WHAT A CARD IS"),
 		"§5: the magnitudes rule does not record the distinction ruled at HP §0")
+	# HQ §1-§2's records, where a future session reads them: why the three ruled figures
+	# stand (so Dirge is not capped as a death-farm, nor Dead Air tuned to its worth over a
+	# fight), the word the taxonomy gained, the brief's line that was the error, and why the
+	# fifth key is live.
+	ok(cm.contains("A RUNE PAID WHILE A HERO IS MISSING IS PRICED BY WHAT IT REPLACES")
+			and cm.contains("so Dirge farms nothing"),
+		"§5: CLAUDE.md does not carry why the three crest figures stand")
+	ok(cm.contains("AND IT CARRIES THE SECONDARY *CONDITIONAL*"),
+		"§5: CLAUDE.md does not carry the CONDITIONAL rule beside the relation it binds")
+	ok(cm.contains("AND THE BRIEF WAS THE ERROR") and cm.contains("four live keys beside one stale one is a trap"),
+		"§5: CLAUDE.md does not record a brief's line as the error, or why the fifth key is live")
 	var st := FileAccess.get_file_as_string("res://docs/state.md")
 	ok(st.contains("RULED, NOT BUILT") and st.contains("Skirmisher") and st.contains("Tracker"),
 		"§5: docs/state.md does not record the Skirmisher and Tracker ruling as ruled and unbuilt")

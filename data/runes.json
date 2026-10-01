@@ -980,8 +980,8 @@
 	"dead_air": {
 		"name": "Dead Air", "scope": "party",
 		"price": 150,
-		"desc": "While no Mage stands, every hero deals\n50% more damage.",
-		"payload": {"stat": {"dmg_bonus": 0.5}, "condition": {"heroes_lack_class": "mage"}}
+		"desc": "While no Mage stands, every hero deals\n75% more damage.",
+		"payload": {"stat": {"dmg_bonus": 0.75}, "condition": {"heroes_lack_class": "mage"}}
 	},
 	"dirge": {
 		"name": "Dirge", "scope": "party",

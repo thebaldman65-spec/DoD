@@ -2511,7 +2511,13 @@ const CONDITION_UNMET_TAIL := "its condition does not hold for these heroes, so 
 const CONDITION_UNMET_LIVE_TAIL := "its condition does not hold as the fight opens, so it pays nothing until it does"
 const LIVE_ON_TAIL := "its condition holds now, so it pays from here"
 const LIVE_OFF_TAIL := "its condition no longer holds, so it pays nothing from here"
-const LIVE_REFUSED_TAIL := "its payload is refused, so it pays nothing this fight"
+# BATCH HQ §1 — A REFUSED PAYLOAD CAN REACH A PLAYER, SO ITS TAIL IS IN A PLAYER'S
+# WORDS. `Runes._load` reports a refused entry and KEEPS it — a hand-edited or modded
+# data file loads one, and the roll offers it — and a worn rune's payload rides the
+# save as it was built, so a payload a later build's door refuses arrives with the
+# save. The reason is for the developer and goes to `push_error`; the player reads
+# that the rune does nothing, in the roll call's own shape.
+const LIVE_REFUSED_TAIL := "it cannot work as written, so it pays nothing this fight"
 # THE LIVE DOOR'S STATE (BATCH HP §1c). `_live_pending` is filled at the spawn, one
 # entry a worn payload the battle is to pay; `_open_live_payloads` turns each into a
 # stamp on the built heroes once the field is laid. `_live_base` holds each touched
@@ -26904,12 +26910,20 @@ func _on_unit_revived(u: BattleUnit) -> void:
 
 
 # The four as they stand now, in the shape `Talents.party_condition_met` reads.
+# BATCH HQ §1 — AND EACH WITH HIS SLOTTED ENGINES, since `heroes_hold_core` is read
+# here too: the unit's `engines` are `Runes.held_engines` of his member, taken at the
+# spawn (nothing in the battle writes an engine's slot, GM §2), so handed back in the
+# member's shape the re-read asks exactly what the spawn's read asked. Without them
+# the key read no engine on anybody, and a payload carrying it never paid.
 func _live_party() -> Array:
 	var out: Array = []
 	for h in heroes:
 		if h.is_companion:
 			continue
-		out.append({"key": h.hero_key, "hp": 0 if h.dead else maxi(h.hp, 1)})
+		var held: Array = []
+		for pid in h.engines:
+			held.append({"engine": String(pid), "equipped": true})
+		out.append({"key": h.hero_key, "hp": 0 if h.dead else maxi(h.hp, 1), "engines": held})
 	return out
 
 

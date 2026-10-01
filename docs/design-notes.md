@@ -4,6 +4,42 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## One magnitude, one key, and the word the taxonomy is missing (Batch HQ) — 2026-10-01
+
+**Why Dead Air is 75%.** A rune that pays while the Mage is down stands in for the Mage, so its figure is what the Mage
+was doing. He deals a bit under half of the four heroes' damage, so the three who are left need about seven tenths more to
+do the work of four, and 75% is that figure. At 50% he was half-replaced for no reason. Dirge's 45% rests on the same
+logic: three heroes at 1.45 deal more than four at 1.00.
+
+**Why Dead Air's worth over a fight does not move it.** Measured, Dead Air at 75% is still worth less over an average
+fight than the other two crest runes, because no Mage stands for only a tenth of a fight. That is how often the
+condition holds, not how much the rune pays when it does. Raising the figure to match the others would pay a rune for
+the Mage staying alive, which is the wrong thing to reward. Empty Pulpit's small share of the damage taken in a won
+fight is the same kind of number, so it is watched, not tuned.
+
+**Why Dirge is not a way to farm a death.** It is tempting to read *the rest deal more while a hero lies fallen* as an
+invitation to let one fall. It is not: a fallen hero cannot act, cannot heal, and makes the fight longer, and measured,
+Dirge lowered how often heroes fell and carried runs deeper.
+
+**Why the core-rune condition is read as the fight runs too.** It asks whether a hero who stands carries a core rune, and
+a hero who falls stops standing. Read only as the fight opened, a rune on it kept paying after its one holder fell — the
+same staleness the other four questions lost a batch earlier. Leaving one of five stale would be a trap for whoever
+authors the first rune on it.
+
+**Why *Breaking Heals a Hero* says less, and its rule does not do more.** Its words promised a heal for every point of
+Break dealt; the rule pays only for Break an attack lands. The same rule is Tithe's, whose words were narrowed for the
+same reason. Widening the rule would change a talent every class buys, which needs its own measurement, so the words
+were corrected and the rule left alone.
+
+**Why a broken rune's line in the log is in a player's words.** The game refuses a rune whose effect it cannot pay, and
+the reason it gives is a programmer's. A player can still meet such a rune — a modified data file or an old save can
+carry one — so the line in the combat log says plainly that the rune cannot work as written, and the programmer's reason
+goes to the error log.
+
+**Why there is a word for a conditional rune.** The labels that say what gates a rune had one word left, *tradeoff*, and
+three runes whose whole nature is that they pay only some of the time had none. Naming the shape makes the rule that
+comes with it visible: a rune that pays only some of the time pays more than one that always pays.
+
 ## The condition as a fight runs, and the three runes it makes real (Batch HP) — 2026-09-30
 
 **Why the condition is read as the fight runs, and not at the spawn.** Read once, as a fight opens, four of the five

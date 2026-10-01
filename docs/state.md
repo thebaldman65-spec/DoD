@@ -13,86 +13,111 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-09-30 (Batch HP).*
+*Last rewritten: 2026-10-01 (Batch HQ).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: HP — THE CONDITION AS A FIGHT RUNS, AND THE THREE RUNES IT MAKES REAL.** IMPLEMENT ONLY. The continuous
-  half of HK's door 3 is built, three crest runes are authored against it, Fellowship is retired, Tithe's words narrow.
-  Full working: **`docs/reports/HP.md`**.
-- **§0 — HO's SEVEN RULINGS, TAKEN.** The continuous half is built and the reason it was chosen over the other three
-  answers is in `CLAUDE.md`'s crest block; Tithe holds at 30 with narrower words; Fellowship is retired; FN's ruling is
-  reconciled in magnitude; a card stating its own cost and payout is confirmed as outside the magnitudes rule; the
-  crest's words are accepted; *Cold Hearth* and *Gravesong* are named *Dead Air* and *Dirge*, Tithe keeps its name.
-- **§1 — FOUR `heroes_…` KEYS ARE READ AS THE FIGHT RUNS.** `heroes_include_class`, `heroes_lack_class`,
-  `heroes_class_count` and `heroes_all_standing` (both values) are re-read at every death and every revive — the only
-  two writers of `dead` — and a live payload is written on the built heroes once the fallen are laid down, then
-  RECOMPUTED from its base at every switch, so a cycle returns the figure bit for bit. `heroes_hold_core` is read once.
-  A live payload writes one of seventeen fields read fresh at their read sites (and four `rune_` twins); the eleven of
-  HN's twenty-eight that are consumed, a card and a nested condition are refused where the table loads and wherever a
-  payload is applied. A switch is a line in the log, both ways.
-- **§2 — EMPTY PULPIT, DEAD AIR AND DIRGE ARE AUTHORED**, crest runes at 150g, their figures PROPOSED against a
-  measurement of how often their conditions hold (RULINGS OWED 1). `data/runes.json` holds **171 entries: 68 retired,
-  75 live for a class, 4 for the crest (Tithe and the three), 24 core.**
-- **§3 — FELLOWSHIP IS RETIRED** on ET's contract — kept, its `rune_field_medic` read site kept, offered by nobody. The
-  cleanse finding is in `CLAUDE.md`.
-- **§4 — TITHE READS** *A hero's attack that lands Break heals whoever among the four is lowest, for 30% of it.* The
-  read site is not widened (the owed talent rebalance, below).
-- **§5 — FN's RULING IS RECONCILED**: a conditioned rune pays more than the bare equivalent, and `check_fn` §1b asserts
-  the relation; `check_ez` §4 and `check_fx` §5 are re-pointed to their own intents.
-- **§6 — THE SMALL THINGS.** The run summary names each hero's core runes, the crest and the bag; the sim's counter rolls
-  through the Peddler's door; the counter's dead re-roll is deleted in both; thirteen comments that spoke Faith's
-  threshold as a figure are cleared (HO's five and eight more); HO's fifteen isolated copies are in the Trash.
-- **THE VERIFICATION.** The recon — HEAD's unmodified gates against HP's game and documents, 130 targets in 74 min
-  12 s — read thirteen targets red, six green with a higher count and every other at HEAD's count (`check_de`
-  537 / 14 / 9 notices); every predicted red was red but `check_hk`, already counting crest runes by id. **Thirteen
-  gates were re-pointed, each to its intent**, every count that moved was attributed by an ok() trace, and `check_gp`'s
-  road by a stub arm that read HEAD's 465 message for message. Thirty-eight controls, one defect each, were read by
-  their FAIL text; two were rebuilt before they were trusted and one re-pointed gate was split so each defect names
-  itself. **The pre-pass (131 targets, 75 min 12 s) read `check_de` 541 / 1 / 0, and the one red was this batch's**:
-  `test_batch_bx` §4b, five refusal reasons in `scripts/talents.gd` saying *party-wide*, written after the recon's copy.
-  Reworded, and the twenty-nine readers of the files that changed re-read their rows in a re-proved copy. **The
-  acceptance run in the repository (131 targets, 74 min 56 s) read `check_de` 541 / 0 / 0**: every target at its row,
-  and at its pre-pass value but `test_batch_bx`, 159 / 0, and `test_batch_an`'s seeded count, 6054 inside its band. The
-  tree was byte-identical after it, and the player's four files are byte-identical to the 19:39 backup.
-- **`CLAUDE.md` IS 421,366 B = 411.49 KiB, WITH 58.51 KiB UNDER ITS 470 KiB CEILING** (+7,935 B at HP, measured after
-  this batch's own writing): **about 7.6 batches at HP's rate**, **about 7.4 at HK's +8,085 B** (7.2 at the record,
-  EZ's +8,293 B). The shape recon is owed before then — the ceiling's next arrival is not answered by the arithmetic.
+- **Last batch: HQ — ONE MAGNITUDE, ONE KEY, AND THE WORD THE TAXONOMY IS MISSING.** IMPLEMENT ONLY. HP's five rulings are
+  taken: Dead Air moves to 75% and is measured there, `heroes_hold_core` is read as the fight runs, *Breaking Heals a
+  Hero*'s words narrow, the refused tail speaks a player's words; the rune taxonomy gains CONDITIONAL; two Peddler columns
+  read the Peddler's door. Full working: **`docs/reports/HQ.md`**.
+- **§1.1 — THE THREE CREST FIGURES ARE RULED: DIRGE 45% AND EMPTY PULPIT 50% CONFIRMED, DEAD AIR 50% → 75%** (*the three
+  who are left do the work of four*). Measured at 75% with HP's probe, rung 2, no talents, 150 runs a party (A: Berserker,
+  Arcanist, Devout, Beastmaster; B: Swordmaster, Pyromancer, Holy, Sharpshooter): it multiplies the three standing
+  heroes' damage by exactly 1.75 while it holds; it pays +35.4 ±4.6 (A) and +17.6 ±2.9 (B) a normal fight, worth **0.61
+  and 0.35 of a bare 10%** (0.49 and 0.26 at 50%); falls 0.73 and 1.04 and depth 19.4 and 12.8 of 49, where no crest
+  leaves them (0.74, 1.05; 19.4, 13.1). **75% holds on the rule it was ruled on**: without it the three deal 0.63 (A) and
+  0.51 (B) of the four's damage a round, so at 75% about 1.1 and 0.9 of it. It stays the least of the three over a fight
+  because no Mage stands for 8–12% of hero turns — the state's property, as Empty Pulpit's flag is.
+- **§1.2 — FELLOWSHIP'S RETIREMENT STANDS AS HP BUILT IT.** HP's brief line *a save that did hold it loads without it*
+  was the error, not a reversal (`CLAUDE.md`'s crest block). `data/runes.json` holds **171 entries: 68 retired, 75 live
+  for a class, 4 for the crest (Tithe and the three), 24 core.**
+- **§1.3 — `heroes_hold_core` IS READ AS THE FIGHT RUNS**: it joined `Talents.LIVE_KEYS`, so every key on who stands is
+  live, and a payload carrying it refuses a consumed field. **It was not the one line it was priced at**: the battle's
+  re-read handed each hero's standing and no engines, so the key read none at any re-read; `battle._live_party` hands the
+  engines now, the list the spawn reads. Driven as a cycle (`check_hp` §1f): the Pack Bond holder falls and the crest
+  stops on all four at the base bit for bit; he is raised and it pays the same bits again.
+- **§1.4 — *Breaking Heals a Hero* READS** *An attack that lands Break heals the lowest-health hero for 20% of it.*
+  (PROPOSED, RULINGS OWED 1). Its read site is not widened — the owed talent rebalance, below.
+- **§1.5 — A REFUSED PAYLOAD CAN REACH A PLAYER, SO ITS TAIL IS REWORDED**: *it cannot work as written, so it pays nothing
+  this fight* (PROPOSED, RULINGS OWED 2). `Runes._load` reports a refused entry and keeps it, the roll offers it, and a
+  worn rune's payload rides the save as it was built.
+- **§2 — CONDITIONAL IS A SECONDARY TYPE** beside TRADEOFF: *a CONDITIONAL rune's payload is gated on a condition, so it
+  pays only while that condition holds*, and FN's rule binds it. Empty Pulpit, Dead Air and Dirge carry it; no other
+  entry's payload, live or retired, carries a condition of any kind. `check_fn` §1c holds the label and the payload
+  together in both directions.
+- **§3 — `check_he` §1's AND `check_hf` §3's PEDDLER COLUMNS READ `Run.peddler_rune`**: 22 of the 23 Peddler figures
+  that are not a withheld zero moved, no cache or bargain figure did, each the way the pool less its core runes says. `test_batch_ak`'s whole-pool walk now
+  claims only what it proves.
+- **§4 — HP's TWENTY-EIGHT COPIES ARE IN THE TRASH**, selected by the *"Dawn of Decay HP "* prefix, under *"DoD spent
+  user-data folders (Batch HP's twenty-eight, cleared at HQ 2026-10-01)"*: 28 folders, 17,260 KiB (HP recorded 17,248).
+  Godot's `app_userdata` went from 497 folders and 161,392 KiB to 469 and 144,152 KiB, HQ's own seven copies in both
+  readings; the 461 older folders, the live *Dawn of Decay* folder and `../save-backups/` were not touched.
+- **THE VERIFICATION.** The saves were backed up first and verified by hash (`../save-backups/HQ-20261001-110254`, the
+  four files byte-identical to the live ones and to HP's backup). **The recon** — HEAD's unmodified gates and documents
+  against HQ's game, 131 targets in 75 min 36 s — read `check_de` 541 / 2 / 0: `check_hp` red on exactly the eight lines
+  predicted, and **one red the prediction did not see**, `check_fx` §1, which holds every talent's text to the words its
+  number sits in and could not find *for 20% of its value* in the narrowed talent. Every other target read HP's acceptance
+  count, and the two Peddler tables HP's figures line for line. **Six gates were re-pointed** to their intents, and
+  eighteen controls, one defect each, read by FAIL text, every one red on its own line. **The pre-pass** (131 targets in
+  75 min 06 s, an isolated copy proved equal to the tree) read `check_de` 541 / 0 / 0, every target at its predicted row.
+  **The acceptance run in the repository** (131 targets in 75 min 05 s) read `check_de` 541 / 0 / 0: every target at its
+  row and at its pre-pass reading but `test_batch_an`'s seeded count (6049, inside its band) — `check_hp` 168, `check_fn`
+  85, `check_he` 258, `check_hf` 314, `check_fx` 496, the two sanctioned reds at their counts, the run harness PASS
+  (22 / 382 / 8) — and no Parse Error, SCRIPT ERROR, TIMED OUT or NO VERDICT line in any log. The tree was
+  byte-identical after it (500 files), and the player's four files are byte-identical — hash, size and mtime — to the
+  11:02 backup.
+- **`CLAUDE.md` IS 424,768 B = 414.81 KiB, WITH 55.19 KiB UNDER ITS 470 KiB CEILING** (+3,402 B at HQ, measured after
+  this batch's own writing; HO left it at 403.74 KiB and HP at 411.49): **about 7.1 batches at HP's +7,935 B** and **6.8
+  at the record, EZ's +8,293 B** (16.6 at HQ's own rate, a small batch's). The shape recon is owed before then — the
+  arithmetic is not the answer next time.
 - **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in an
   older build** — HL's ceiling guards from the next version bump on, not from HJ's or HK's builds, nor `main`.
-- **Next letter: HQ.**
+- **Next letter: HR.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### HP's RULINGS OWED — **FIVE; THE FIRST IS THREE MAGNITUDES AND THE SECOND IS WHAT A RETIREMENT KEEPS**
+### HQ's RULINGS OWED — **TWO, BOTH WORDS A PLAYER READS**
 
-Full working: `docs/reports/HP.md`, NEEDS A RULING.
+Full working: `docs/reports/HQ.md`, NEEDS A RULING.
 
-1. **THE THREE LIVE CREST RUNES' FIGURES ARE PROPOSED: DIRGE 45%, EMPTY PULPIT 50%, DEAD AIR 50%.** Measured before they
-   were proposed, at rung 2 with no talents, over two parties: a hero is down for about a fifth of a normal fight's hero
-   turns, the first fall lands a third of the way in, and the bot all but never revives. At the brief's 25 / 12 / 12
-   the three were worth 0.50, 0.08–0.09 and 0.08–0.15 of what a bare ±10% on every hero adds over the same fights.
-   **At the proposed figures each pays 4½ to 5 times the bare figure while it holds** (FN's relation, `check_fn` §1b)
-   and is worth 0.72–0.86 (Dirge), 0.77–0.81 (Empty Pulpit) and **0.26–0.49 (Dead Air)** of it. **Dead Air is the number least to be
-   trusted**: how often no Mage stands depends on which Mage (12% of a party's damage is dealt without an Arcanist, 6%
-   without a Pyromancer), and matching the bare worth would take 80–180%. Only Dirge moved a run's depth.
-2. **FELLOWSHIP'S FIELD WENT INTO RETIREMENT WITH IT, NOT OUT OF THE GAME.** The brief's *if none, they go with the rune*
-   is read as ET's procedure, which the brief names: `rune_field_medic` has no other writer, so it is kept beside the
-   retired entry with its read site and its log name — `check_et` §5 and `check_dp` §4 red on a retired rune's field
-   with no reader, and FO §2's rule keeps it. **So a save that held it loads WITH it, still worn and still paying**, and
-   `data/runes.json` went 168 → 171, not 167. Deleting the field would overturn FO §2 for this rune and change a
-   retired entry's payload; the designer's.
-3. **`heroes_hold_core` STAYS AT THE SPAWN, AND ITS REASON IS HALF OF WHY IT COULD MOVE.** Nothing in the battle writes an
-   engine's slot (GM §2) — but the key counts the heroes who STAND, so read once it stays paid after its only holder
-   falls: the staleness the four live keys no longer have. Confirm it, or make it live (one line — it joins
-   `LIVE_KEYS`, and a payload carrying it then refuses a consumed field).
-4. **TITHE'S WORDS ARE TRUE OF ITS READ SITE BUT FOR THREE NARROW CASES**: Break a card lands in its own handler, the
-   Long Watch's carry onto a second enemy, and a blow that lands no Break, which still heals 1. The talent *Breaking
-   Heals a Hero* says *every point of Break damage dealt* over the same site.
-5. **THE WORDS, PROPOSED**: a switch's lines (*its condition holds now, so it pays from here* / *its condition no longer
-   holds, so it pays nothing from here*), the roll call's *its condition does not hold as the fight opens, so it pays
-   nothing until it does*, the refused tail, and the run summary's *The crest: …* and *The bag: …*.
+1. **THE TALENT'S WORDS, PROPOSED**: *Breaking Heals a Hero* — *An attack that lands Break heals the lowest-health hero
+   for 20% of it.* — where *Every point of Break damage dealt heals the lowest-health hero for 20% of its value.* stood.
+   Narrowed as Tithe's were, to what the shared read site pays; its three exceptions stay invisible, as Tithe's do (a
+   card's Break inside its own handler, the Long Watch's carry, the floor of 1).
+2. **THE REFUSED TAIL'S WORDS, PROPOSED**: *it cannot work as written, so it pays nothing this fight* — where *its payload
+   is refused, so it pays nothing this fight* stood. It reaches the combat log by two routes (§1.5 above); the reason
+   goes to `push_error`, which the developer reads.
+
+### FOUND AT HQ AND NOT FIXED
+
+- **A REFUSED ENTRY IS STILL OFFERED.** `Runes._load` reports it and keeps it, and `Runes.eligible_ids` reads `retired`,
+  scope and the gates, never `Talents.live_refusal` — so a refused rune can drop, be bought and be worn, and pays
+  nothing. Withholding it at the roll is a line; whether a rune the game cannot pay should be offered at all is the
+  designer's, and `check_hp` §1c asserts the route as it stands, so the day it closes the arm says so.
+- **A STRONGER DEAD AIR SHORTENS THE STRETCHES IT PAYS IN.** In party A the share of the four's damage the three deal
+  without the rune, inside each arm's no-Mage stretches, falls as the figure rises (0.63 with no crest, 0.56 at 50%,
+  0.53 at 75%): the rune ends the easy stretches sooner, so the ones left are the hard ones. A live rune's worth over a
+  fight reads under its moment for that reason. Party B's readings are too few to say (0.51, 0.53, 0.43).
+- **`check_hl` §6's MAXIMUM-HEALTH BRANCH HAS NO CASE.** Every key §6 drives is live since HQ §1, so `_fx_field` hands
+  each damage dealt; the stamp branch is for a read-once condition (a node or a card) no case drives. Kept, and said at
+  the site.
+- **TWO DOCUMENTS DESCRIBE THE TAXONOMY AS IT WAS AND ARE NOT EDITED**: `docs/spec-recon.html` (a recon: regenerated,
+  never hand-edited) names THRESHOLD, BREADTH and TRADEOFF, and `docs/talent-audit.html` quotes the talent's old words in
+  the audit it reports. Both are records of their day.
+
+### ~~HP's RULINGS OWED~~ — **ALL FIVE ANSWERED IN HQ's BRIEF AND TAKEN AT HQ §1**
+
+1. **The three magnitudes** — Dirge 45% and Empty Pulpit 50% confirmed; Dead Air 75%, measured there (the WHERE block).
+   Why each stands is in `CLAUDE.md`'s crest block: a rune paid while a hero is missing is priced by what it replaces,
+   and Dirge farms nothing — a dead hero still cannot act, cannot heal, and lengthens the fight.
+2. **What a retirement keeps** — ET's contract holds: `rune_field_medic`, its read site and its log name stay, and 171
+   is the count. HP's brief line was the error, recorded so a later reader does not take it for a reversal.
+3. **`heroes_hold_core`** — joined `LIVE_KEYS` (built at HQ §1, with the engines the re-read was missing).
+4. **Tithe's words stand; the talent's do not** — narrowed (RULINGS OWED 1). The read site is not widened.
+5. **The words** — the switch lines, the roll call's *until it does*, and the run summary's *The crest:* and *The bag:*
+   ship as proposed; the refused tail was reachable and is reworded (RULINGS OWED 2).
 
 ### FOUND AT HP AND NOT FIXED
 
@@ -105,21 +130,18 @@ Full working: `docs/reports/HP.md`, NEEDS A RULING.
 - **THE BOT ALL BUT NEVER REVIVES**: 0 to 0.05 revives a normal fight over both measured parties (a Holy's Resurrection;
   the sim uses no Revive Potion in a fight). A live rune measured in a sim switches off at a fight's end, not at a revive.
 - **DEAD AIR NEAR-MISSES THE SURVIVALIST'S ZONE-BOSS CARD *DEADFALL*** (BR §1): it ships as a named near-miss
-  (`check_hp` §2f).
-- **A LIVE CREST RUNE HAS NO SHAPE WORD FOR ITS GATE.** `Runes.RUNE_SHAPES`' secondaries are the two retired tag
-  conditions and TRADEOFF; the three are `STAT`. Both tables are read by instruments alone.
-- **`check_he` §1's AND `check_hf` §3's "PEDDLER" COLUMN IS NOT THE PEDDLER'S DOOR.** Both tally `Run.generate_rune`,
-  which the Peddler left at HL §1 for `Run.peddler_rune` (the same roll less every core rune), and neither reads the
-  sim's counter. The gating each asserts holds through either door; the printed figures are not the counter's. Their
-  figures moved at HP, for the crest's four runes in every offer alone: run on HP's tree with the three new entries
-  retired and Fellowship restored, both read HO's acceptance exactly. Re-pointing moves both gates' tallies.
+  (`check_hp` §2f). **Ruled at HQ §1: the name stays** — a shared stem nothing a player could confuse, where Cold Hearth
+  and Gravesong each sat among three or four siblings; no further action.
+- ~~**A LIVE CREST RUNE HAS NO SHAPE WORD FOR ITS GATE.**~~ — **CLOSED AT HQ §2**: CONDITIONAL.
+- ~~**`check_he` §1's AND `check_hf` §3's "PEDDLER" COLUMN IS NOT THE PEDDLER'S DOOR.**~~ — **RE-POINTED AT HQ §3**: both
+  tally `Run.peddler_rune`, and both assert the column stocks no core rune where the cache beside it offers some.
 - **`check_hk`'s COUNT IS THE COPY'S: 142 WHERE THE PLAYER'S THREE FILES EXIST, 139 WHERE THEY DO NOT.** §8 asks each
   file that existed whether it was rewritten, so a copy with fresh user data runs three arms fewer and prints
   otherwise identically. The battery runs where the files exist; an isolated run is seeded from the backup to match.
-- **TWENTY-EIGHT ISOLATED COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata`, every one named *"Dawn of Decay
-  HP …"* (17,248 KiB; `docs/reports/HP.md` §9 names them). HQ clears them by that prefix (HO §5's rule). **The 461
-  older folders remain** — outside the policy; the designer's — beside the live *Dawn of Decay* folder: 490 in all,
-  159,772 KiB.
+- ~~**TWENTY-EIGHT ISOLATED COPIES LEFT USER-DATA FOLDERS**~~ — **CLEARED AT HQ §4** (the WHERE block). **The 461 older
+  folders remain** — outside the policy; the designer's — beside the live *Dawn of Decay* folder.
+- **HQ's OWN ISOLATED COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata`, every one named *"Dawn of Decay HQ …"*
+  — `docs/reports/HQ.md` §7 counts them. HR clears them by that prefix (HO §5's rule).
 
 ### THE SKIRMISHER AND THE TRACKER — **RULED INTO ORDINARY RUNES, RULED, NOT BUILT (recorded at HP §7)**
 
@@ -173,7 +195,8 @@ game — HO caught one. `CLAUDE.md`'s rule-engine block carries the same marker.
   healing cost is min-ed as an alternative, not stacked, in `test_runes` `_healing_floor` and `test_batch_ax` §5; one
   that writes a ceiling is unguarded (`test_runes` `_ordering` pins the hero-rune site only). **A live condition is
   now authored** (HP §2), and `test_batch_ak`'s whole-pool walk applies it under a party-less ctx, where it pays
-  nothing and is counted anyway (`docs/reports/HP.md` §9); `check_ez` §4 lands each on a party it holds for.
+  nothing — **its claim narrowed at HQ §3 to what it proves** (the shared applicator takes every payload without a
+  throw); `check_ez` §4 lands each on a party it holds for, and `check_hp` §2 drives the three through a real fight.
 - **EIGHT SUITES' *class-wide runes touch no lineage counter* WALKS DO NOT ASK THE CREST RUNES** (`ar`, `as`, `at`, `ax`,
   `ay`, `az`, `ba`, `bs`): each filters on `class:<key>`. `check_ho` §5a and `check_em` §1 ask it of the crest.
 - **`check_gf` COMPARES NOTHING OF THE BAG, THE CREST OR THE WAITING DROPS ACROSS A QUIT.** `check_hk` §5 and
@@ -223,9 +246,13 @@ rates are in the WHERE block above.
   playtest question, not a batch's.
 - **A fallen hero switches a live crest the moment he falls, and back the moment he is raised** (HP §1; the standing
   reading chosen at HN). Whether a switch reads as a moment or as noise is a playtest question.
-- **TITHE AT 30 AND THE THREE LIVE CREST RUNES, ALL PROPOSED (HO §3, HP §2).** Whether 30% of the Break a blow applies is
+- **TITHE AT 30 AND THE THREE LIVE CREST RUNES, ALL RULED (HP §0, HQ §1).** Whether 30% of the Break a blow applies is
   felt; and whether Empty Pulpit, Dead Air and Dirge are felt in the moments they pay — each is one number in
   `data/runes.json`. Fellowship is retired (HP §3).
+- **EMPTY PULPIT PAYS MOSTLY INSIDE FIGHTS ALREADY BEING LOST (ruled at HQ §1: a watch item, not a defect).** In a normal
+  fight that is WON the Cleric is down for 2% of the damage taken (HP §2a): the Cleric mostly falls in fights already
+  going badly, so that is a property of the state and not of the figure. Whether it is felt when it holds is the
+  playtest question.
 - **Communion's 105% at the top of its band stays dormant and flagged** (`communion_ranks`, which nothing writes);
   `test_batch_be` §6 reds the day a writer arrives.
 
