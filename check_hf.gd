@@ -965,10 +965,21 @@ func _s3_the_offers() -> void:
 		var hf_mine: Array = HF_RUNES.keys().filter(func(id): return String(HF_RUNES[id][0]) == String(cls))
 		var missing: Array = hf_mine.filter(func(id): return not spawn_ids.has(String(id)))
 		ok(missing.is_empty(), "§3: a %s holding no engine is not offered %s at spawn" % [cls, missing])
-		ok(spawn_ids.size() >= 5, "§3: a %s holding no engine is offered %d ordinary runes at spawn — every class reaches five" % [cls, spawn_ids.size()])
-		ok(spawn_ids.size() >= int(HE_SPAWN[cls]) + hf_mine.size(),
-			"§3: a %s holding no engine is offered %d at spawn — HE's %d and HF's %d" % [cls, spawn_ids.size(), HE_SPAWN[cls], hf_mine.size()])
-		print("    %-8s spawn %2d / ceiling %2d — %s" % [cls, spawn_ids.size(), ceil_ids.size(), ", ".join(names)])
+		# **BATCH HO §3 — BOTH FLOORS COUNT HIS CLASS'S OWN RUNES.** The crest's two are
+		# in every hero's offer, so a floor on the offer's size sat two above its
+		# reading and a class could lose two of its own no-engine runes unseen; the
+		# second floor's own sum — HE's and HF's — never counted a crest rune. What a
+		# class reaches is its class runes, and the crest's are asked apart, below.
+		var own_ids: Array = spawn_ids.filter(func(id): return Runes.rune_class(Runes.build(String(id))) == String(cls))
+		var crest_ids: Array = spawn_ids.filter(func(id): return Runes.is_party_rune(Runes.build(String(id))))
+		ok(own_ids.size() >= 5, "§3: a %s holding no engine is offered %d ordinary runes of his class at spawn — every class reaches five" % [cls, own_ids.size()])
+		ok(own_ids.size() >= int(HE_SPAWN[cls]) + hf_mine.size(),
+			"§3: a %s holding no engine is offered %d of his class's at spawn — HE's %d and HF's %d" % [cls, own_ids.size(), HE_SPAWN[cls], hf_mine.size()])
+		ok(own_ids.size() + crest_ids.size() == spawn_ids.size(),
+			"§3: a %s holding no engine is offered %d ordinary runes that are neither his class's (%d) nor the crest's (%d)" % [
+				cls, spawn_ids.size() - own_ids.size() - crest_ids.size(), own_ids.size(), crest_ids.size()])
+		print("    %-8s spawn %2d of his class and the crest's %d / ceiling %2d — %s" % [
+			cls, own_ids.size(), crest_ids.size(), ceil_ids.size(), ", ".join(names)])
 	# EACH OF THE FIFTEEN AT THE THREE DOORS, for a hero of its class holding none.
 	# **BATCH HK §2 — ASKED WITH A PARTY THAT HOLDS NOTHING.** Since HK every roll
 	# refuses a rune anyone in the PARTY holds (`Run.party_rune_names`), and the

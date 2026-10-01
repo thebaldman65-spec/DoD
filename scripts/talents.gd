@@ -489,6 +489,8 @@ static func condition_met(cond: Dictionary, ctx: Dictionary) -> bool:
 #   heroes_hold_core:     "pack"                      — a standing hero has that
 #                                                       core rune's engine slotted
 #   heroes_all_standing:  true                        — every hero stands at the opening
+#   heroes_all_standing:  false                       — one or more is down at the opening
+#                                                       (HO §2: the value is read, not only the key)
 #
 # The keys say HEROES, never the retired word (`test_batch_bx` §4b sweeps every
 # literal here): a key is data a rune is authored in, and the four are heroes.
@@ -519,7 +521,11 @@ static func party_condition_met(cond: Dictionary, party: Array) -> bool:
 		var pid := String(cond["heroes_hold_core"])
 		if not standing.any(func(m): return Runes.held_engines(m as Dictionary).has(pid)):
 			return false
-	if bool(cond.get("heroes_all_standing", false)) and standing.size() < party.size():
+	# BATCH HO §2 — THE KEY'S PRESENCE IS ASKED APART FROM ITS VALUE (ruled). `false`
+	# was read as *not asked* until HO and held whatever the party; it holds now only
+	# when somebody is down as the fight opens, which is `true`'s reading inverted.
+	if cond.has("heroes_all_standing") \
+			and (standing.size() == party.size()) != bool(cond["heroes_all_standing"]):
 		return false
 	return true
 

@@ -795,9 +795,10 @@ func _answer_a_pick(s: Node, idx: int) -> bool:
 	# A rune pick can put an already-owned rune on the card — CD's defect. Say
 	# so rather than pressing past it.
 	if kind == "rune":
-		var owned: Array = []
-		for r in m.get("runes", []):
-			owned.append(String((r as Dictionary).get("name", "")))
+		# BATCH HO §1 — WHAT THE PARTY HOLDS, NOT HIS POUCH ALONE: since HK a rune he
+		# does not wear sits in the bag, and since HO one can be worn in the crest,
+		# and no roll may offer either again (`Run.party_rune_names`).
+		var owned: Array = _run.party_rune_names()
 		for b2 in live:
 			var t2 := String((b2 as Button).text)
 			for o in owned:
@@ -1005,8 +1006,8 @@ func _s3_the_rune_offer() -> void:
 		var first: Dictionary = offers[0]
 		var who: int = int(first["member_idx"])
 		var rune: Dictionary = first["rune"]
-		# BATCH GK — AN ENGINE RUNE GOES TO THE ENGINE SLOTS (`Run.hold_rune`), so
-		# the hero's pouch is both lists.
+		# BATCH GK — THE HERO'S POUCH IS BOTH LISTS, his runes and his engine runes.
+		# (Since HK a purchase lands in the BAG whatever its kind — `Run.buy_rune`.)
 		for r in (_run.party[who].get("runes", []) as Array) \
 				+ (_run.party[who].get("engines", []) as Array):
 			owned_before.append(String((r as Dictionary).get("name", "")))
@@ -1138,17 +1139,50 @@ func _s3_the_rune_offer() -> void:
 		# ENGINE RUNE (`Run.hold_rune`, GK's one door). GN's code moved what this
 		# seed draws, the first candidate came up an engine rune, and a count of
 		# the pouch alone read "no rune arrived" for a rune that did.
-		var first: Dictionary = ((looter.get("rune_candidates", [[{}]]) as Array)[0] as Array)[0]
-		var worn_before: int = int(looter.get("runes", []).size()) \
-			+ int(looter.get("engines", []).size())
+		# **BATCH HO §1 — AND IT IS LOOKED FOR WHERE ITS KIND LANDS.** GN's count was
+		# the hero's two lists. Since HL §1 a core rune taken from a cache is not
+		# slotted — it waits in the bag — and since HO a crest rune is worn in the
+		# crest, so that count read "no rune arrived" for either whenever the seed
+		# drew one first (seven of this Mage's fifteen). Asked in two arms: the
+		# party holds exactly this rune more than it did, and it sits where
+		# `Run.hold_rune` puts its kind. `first` is read off the list the buttons
+		# were built from (`Run.rune_choice`), which is what the press indexes.
+		var first: Dictionary = (_run.rune_choice(looter) as Array)[0]
+		var first_name := String(first.get("name", "?"))
+		var kind := "core" if String(first.get("engine", "")) != "" \
+			else ("crest" if Runes.is_party_rune(first) else "ordinary")
+		var want := "the bag"
+		if kind == "ordinary" and int(_run.runes_worn(looter)) < int(_run.rune_slots()):
+			want = "the hero"
+		elif kind == "crest" and (_run.party_runes as Array).size() < int(_run.PARTY_RUNE_SLOTS):
+			want = "the crest"
+		elif bool(_run.bag_full()):
+			want = "the full-bag panel"
+		var held_before: Array = _run.party_rune_names()
 		s3.call("_pick_rune", 1, 0)
 		await process_frame
 		await process_frame
-		ok(int(looter.get("runes", []).size()) + int(looter.get("engines", []).size())
-				== worn_before + 1,
-			"§3: the cache pick was answered and no rune arrived")
-		print("    the cache's first rune: %s%s" % [String(first.get("name", "?")),
-			" (an engine rune, so it took an engine slot)" if String(first.get("engine", "")) != "" else ""])
+		var gained: Array = (_run.party_rune_names() as Array).filter(
+			func(n): return not held_before.has(n))
+		ok(gained == [first_name],
+			"§3: the cache pick was answered and the party gained %s, not the rune it pressed (%s)" % [
+				gained, first_name])
+		var named := func(list: Array) -> bool:
+			return list.any(func(r): return String((r as Dictionary).get("name", "")) == first_name)
+		var got := "nowhere"
+		if named.call(looter.get("runes", [])):
+			got = "the hero"
+		elif named.call(looter.get("engines", [])):
+			got = "an engine slot"
+		elif named.call(_run.party_runes):
+			got = "the crest"
+		elif named.call(_run.rune_bag):
+			got = "the bag"
+		elif named.call(_run.pending_rune_drops):
+			got = "the full-bag panel"
+		ok(got == want,
+			"§3: the cache's first rune %s, a %s rune, landed on %s, not %s" % [first_name, kind, got, want])
+		print("    the cache's first rune: %s, a %s rune — it went to %s" % [first_name, kind, got])
 		ok(int(looter.get("rune_picks_owed", 0)) == 0,
 			"§3: the cache pick was answered and is still owed")
 		print("    the cache was answered a node later: %d candidates, %d retired" % [
@@ -1946,16 +1980,21 @@ func _s9_every_button() -> void:
 	# CENSUS.** Both are stocked first — through the run's own doors — so the
 	# rows themselves are what gets read.
 	var m1: Dictionary = _run.party[1]
-	# `grant_rune` RETURNS a rune and does not fit it — every caller in the
-	# tree appends it themselves, so a census that only called the door would
-	# read an empty pouch and one Close button.
+	# `grant_rune` RETURNS a rune and does not fit it, so a census that only called
+	# the door would read an empty pouch and one Close button.
+	# **BATCH HO §1 — PUT DOWN THROUGH `Run.hold_rune`, AS ITS CALLERS DO SINCE HK.**
+	# The grant was appended to the hero's own list by hand, which seats a crest
+	# rune (two of his nine) where no run puts one. Enough are granted that his
+	# panel has rows whatever is drawn: a class rune worn or waiting in the bag.
 	var m0r: Dictionary = _run.party[0]
-	for _r in 3:
+	for _r in 4:
 		var got: Dictionary = _run.grant_rune(m0r)
 		if got.is_empty():
 			break
 		got["equipped"] = _r == 0
-		m0r["runes"] = m0r.get("runes", []) + [got]
+		_run.hold_rune(m0r, got)
+	ok(not (_run.rune_rows(m0r) as Array).is_empty(),
+		"§9: the rune pouch was stocked and lists no row — the census reads an empty panel")
 	for _d in 4:
 		if not bool(_run.award_draft_pick(m1)):
 			break
@@ -2095,18 +2134,21 @@ func _s9b_the_numbers() -> void:
 	ok(_has_text(shop2, "Gold: %d" % int(_run.gold)),
 		"§9b: the Peddler does not show `Gold: %d` after the purchase" % int(_run.gold))
 	# THE HERO SHEET'S RUNE LINE, against the runes actually worn.
+	# BATCH HO §1 — EACH GRANT IS PUT DOWN THROUGH `Run.hold_rune`, and the count is
+	# the run's own (`runes_worn`): a crest rune granted here is worn in the crest
+	# and is not one of the hero's slots, which is what the line must say.
 	var m0: Dictionary = _run.party[0]
 	m0["runes"] = []
-	for i in 2:
+	# Four grants, the first three asked for: at most two of any four are the
+	# crest's, so he wears at least one and holds at least one he does not.
+	for i in 4:
 		var got: Dictionary = _run.grant_rune(m0)
 		if got.is_empty():
 			break
-		got["equipped"] = i == 0
-		m0["runes"] = m0.get("runes", []) + [got]
-	var worn := 0
-	for r in m0.get("runes", []):
-		if bool((r as Dictionary).get("equipped", false)):
-			worn += 1
+		got["equipped"] = i < 3
+		_run.hold_rune(m0, got)
+	var worn: int = int(_run.runes_worn(m0))
+	ok(worn >= 1, "§9b: four grants left the hero wearing no rune — the line is read against nothing")
 	_run.hero_screen_idx = 0
 	change_scene_to_file("res://scenes/party.tscn")
 	for _i in 4:
@@ -2162,11 +2204,11 @@ func _s10_the_observations() -> void:
 	print("        and %d MENU %s (the map's burger). Both are deliberate," % [
 		_census_menu, "button" if _census_menu == 1 else "buttons"])
 	print("        and the census exempts them by SIGNATURE, never by name.")
-	# (4) `Run.grant_rune` RETURNS A RUNE IT DOES NOT FIT. Its callers append
-	# to `member["runes"]` by hand afterwards, so the door that LOOKS like the
-	# grant is only the roll. Not a defect today — the callers are COUNTED
-	# below rather than restated, because this gate's own first draft called
-	# the door and read an empty pouch.
+	# (4) `Run.grant_rune` RETURNS A RUNE IT DOES NOT FIT. Its callers put it
+	# down afterwards — through `Run.hold_rune` since HK, which decides by kind —
+	# so the door that LOOKS like the grant is only the roll. Not a defect today
+	# — the callers are COUNTED below rather than restated, because this gate's
+	# own first draft called the door and read an empty pouch.
 	var callers: Array = []
 	for f in ["res://scripts/events.gd", "res://scripts/run_sim.gd",
 			"res://scripts/shop_screen.gd", "res://scripts/battle.gd",

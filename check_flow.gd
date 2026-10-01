@@ -32,10 +32,19 @@ func _go() -> void:
 	if not triple.is_empty():
 		run.party[2]["rune_candidates"] = [triple]
 		run.party[2]["rune_picks_owed"] = 1
-	var worn: Dictionary = run.generate_rune(run.party[3])
-	if not worn.is_empty():
+	# BATCH HO §1 — EACH PUT DOWN THROUGH THE DOOR THAT PUTS A RUNE DOWN, AND NAMED.
+	# The worn rune was an unseeded draw written straight onto the hero's list, so
+	# two draws in fifteen put a crest rune in a hero's slot and six a core rune —
+	# states `Run.hold_rune` cannot make — and the crest's own surfaces were never
+	# built. Now a class rune is worn on the Hunter, a crest rune fills the crest
+	# and the second waits in the bag, so every screen below draws all three.
+	for id in ["opportunist", "tithe", "fellowship"]:
+		var worn: Dictionary = Runes.build(id)
 		worn["equipped"] = true
-		run.party[3]["runes"] = [worn]
+		var where: String = run.hold_rune(run.party[3], worn)
+		if where != ("bag" if id == "fellowship" else "worn"):
+			bad += 1
+			print("FAIL: %s was put down as '%s'" % [id, where])
 
 	await _check("res://scenes/map.tscn", "map (nothing entered)")
 	# Batch BK: advance() takes a NODE index within the next slot, and a

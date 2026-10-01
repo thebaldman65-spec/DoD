@@ -288,7 +288,10 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 	"rune_layered_aegis", "rune_deep_absorb", "rune_fourth_stack",
 	"rune_bare_altar",
 	"rune_long_poison", "rune_second_barb", "rune_full_board", "rune_carrion",
-	"rune_thin_blood"]
+	"rune_thin_blood",
+	# BATCH HO §3 — the two crest runes' fields: each is the `rune_` half of an int
+	# the one tree writes (`blood_communion`, `field_medic`), summed at its site.
+	"rune_blood_communion", "rune_field_medic"]
 
 static var _data := {}
 
@@ -535,6 +538,11 @@ const RUNE_TAGS := {
 	# Hunter —
 	"opportunist": ["OFFENSE"],                # Opportunist — Powershot cashes the stun
 	"tusk_and_bristle": ["DEBUFF", "OFFENSE"], # Tusk and Bristle — the boar, and its stun
+	# BATCH HO §3 — THE CREST. Read at the payload's read site, as every row is:
+	# the heal on the lowest hero is what Tithe is FOR and Break is what it is paid
+	# in (a secondary, FD §2); a cleanse is what Unburden's row already calls it.
+	"tithe": ["DEFENSE", "BREAK"],             # Tithe — the four's Break, drunk by the lowest
+	"fellowship": ["DEFENSE"],                 # Fellowship — a debuff off an ally, every turn
 }
 
 
@@ -663,6 +671,11 @@ const RUNE_SHAPES := {
 	"grudge": ["PASSIVE", "TRADEOFF"],
 	"opportunist": ["ABILITY"],
 	"tusk_and_bristle": ["ABILITY"],
+	# BATCH HO §3 — THE CREST'S TWO. Each pays through a rule every hero already
+	# passes and carries no gate: a condition on a flat-priced rune is FN's ruling,
+	# and these two read the four without one (HL §4's test).
+	"tithe": ["PASSIVE"],
+	"fellowship": ["PASSIVE"],
 }
 
 const RUNE_TYPES := ["ABILITY", "PASSIVE", "STAT"]
@@ -877,7 +890,7 @@ static func scope_band(scope: String) -> String:
 	return "universal"
 
 
-# ══ BATCH HK §4 — THE PARTY SCOPE: THE MACHINERY, AND NO RUNE IN IT ══════════
+# ══ BATCH HK §4 — THE PARTY SCOPE: THE MACHINERY (HO §3 put two runes in it) ══
 #
 # **A PARTY RUNE IS CLASS-NEUTRAL AND IS WORN BY THE PARTY, NOT BY A HERO** (ruled):
 # it has its own slot (`Run.PARTY_RUNE_SLOTS`, one, and the cap is that one
@@ -889,11 +902,11 @@ static func scope_band(scope: String) -> String:
 # same source), so it rolls for every hero — `_scope_ok` passes it for all of
 # them — and a roll that asks several heroes dedupes it by id.
 #
-# **NONE IS AUTHORED (ruled).** `data/runes.json` holds no `party` entry, and every
-# door below works over zero of them: the scope, the slot, the drop, the bag, the
-# Peddler and the display. `check_hk` drives the whole path with a party rune
-# built in the fixture and never written to the file — GK built the engine slots
-# and GO filled them nine batches later, and this is that shape again.
+# **HK AUTHORED NONE (ruled), AND HO §3 AUTHORED THE FIRST.** HK built every door
+# below over zero of them — the scope, the slot, the drop, the bag, the Peddler
+# and the display — and `check_hk` still drives the whole path with a party rune
+# built in the fixture and never written to the file. The runes the file holds
+# are driven through the same doors, on the real screens, by `check_ho`.
 const PARTY_SCOPE := "party"
 
 

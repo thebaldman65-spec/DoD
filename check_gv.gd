@@ -210,6 +210,16 @@ const GROUPS := {
 	"grudge": ["KIT", "damage in general: the last enemy whose blow reached him"],
 	"opportunist": ["KIT", "Powershot, a Hunter kit card, and a stun"],
 	"tusk_and_bristle": ["KIT", "Summon Companion, a Hunter kit card"],
+	# **BATCH HO §3 — `CREST`: THE TWO RUNES THE CREST WEARS.** Scope `party`, written
+	# for no lineage and for no class: each is worn by the crest and stamped on all
+	# four heroes, and each reads a rule every hero already passes — the strike
+	# loop's Break, the turn-start upkeep — behind no `has_engine`. So there is no
+	# engine to equip or own and no hero to seat it on, and the four-arm drive below
+	# has no board for it, exactly as a `KIT` rune has none. **`check_ho` §5 IS THEIR
+	# ARM**: each worn through the crest's own door and bare, on the real battle for
+	# the run in hand. §1 here asserts that gate names every one.
+	"tithe": ["CREST", "every hero's Break at the strike loop, healed to the lowest of the four"],
+	"fellowship": ["CREST", "each hero's turn-start upkeep: one debuff off an ally"],
 }
 
 # The cards a drive casts beyond the one `requires_ability` names, seated drafted
@@ -434,11 +444,16 @@ func _s0_the_population() -> void:
 			# BATCH HC §1 — scoped to the CLASS of the lineage it was written for.
 			# BATCH HF — or, written for NO lineage, to a class, and then it is one
 			# of the `KIT` runes the designer wrote to read no engine (HF §0).
+			# BATCH HO §3 — or to the CREST (`party`), and then it is one of the
+			# `CREST` runes: the scope and the group must agree, both ways.
 			if _lineage(String(id)) == "":
-				ok(String(GROUPS.get(id, [""])[0]) == "KIT"
-						and SEATS.has(String(e.get("scope", "")).trim_prefix("class:"))
-						and String(e.get("scope", "")).begins_with("class:"),
-					"§0: the ordinary rune %s is written for no lineage and is not a class-scoped KIT rune (%s)"
+				var is_kit: bool = String(GROUPS.get(id, [""])[0]) == "KIT" \
+					and SEATS.has(String(e.get("scope", "")).trim_prefix("class:")) \
+					and String(e.get("scope", "")).begins_with("class:")
+				var is_crest: bool = String(GROUPS.get(id, [""])[0]) == "CREST" \
+					and Runes.is_party_scope(String(e.get("scope", "")))
+				ok(is_kit or is_crest,
+					"§0: the ordinary rune %s is written for no lineage and is neither a class-scoped KIT rune nor a crest rune (%s)"
 						% [id, e.get("scope", "")])
 			else:
 				ok(String(e.get("scope", "")) == "class:" + Classes.class_of_spec(_lineage(String(id))),
@@ -876,8 +891,20 @@ func _s1_every_rune_driven() -> void:
 	var rows_ok := 0
 	var others_ok := 0
 	var kit := 0
+	var crest := 0
 	var hf_src := FileAccess.get_file_as_string("res://check_hf.gd")
+	var ho_src := Gate.strip_comments(FileAccess.get_file_as_string("res://check_ho.gd"))
 	for id in _ordinary():
+		# BATCH HO §3 — A `CREST` RUNE HAS NO ENGINE AND NO HERO TO SEAT IT ON, AND
+		# `check_ho` §5 DRIVES IT WORN THROUGH THE CREST AND BARE (the group's
+		# comment). The arm here is that the drive exists: that gate names the rune
+		# among the crest runes it drives, and carries the section that wears it.
+		if String(GROUPS.get(id, [""])[0]) == "CREST":
+			ok(ho_src.contains("const CRESTS := [") and ho_src.contains('"%s"' % id)
+					and ho_src.contains("func _s5b_tithe") and ho_src.contains("func _s5c_fellowship"),
+				"§1: %s is worn by the crest and `check_ho` §5 does not drive it — a CREST rune nobody drives" % id)
+			crest += 1
+			continue
 		# BATCH HF — A `KIT` RUNE HAS NO ENGINE TO EQUIP OR OWN, AND `check_hf` §1
 		# DRIVES IT WORN AND BARE ON A HERO HOLDING NONE (the group's comment). The
 		# arm here is that the drive exists: the gate names the rune in its table
@@ -920,8 +947,8 @@ func _s1_every_rune_driven() -> void:
 	for id6 in GROUPS:
 		if String(GROUPS[id6][0]) == "DEAD":
 			dead += 1
-	print("    %d of %d rows pay equipped and move nothing unequipped; %d of %d others pay unequipped (%d named DEAD); %d KIT runes driven by `check_hf` §1" % [
-		rows_ok, ROWS.size(), others_ok, GROUPS.size() - dead - kit, dead, kit])
+	print("    %d of %d rows pay equipped and move nothing unequipped; %d of %d others pay unequipped (%d named DEAD); %d KIT runes driven by `check_hf` §1; %d CREST runes driven by `check_ho` §5" % [
+		rows_ok, ROWS.size(), others_ok, GROUPS.size() - dead - kit - crest, dead, kit, crest])
 	ok(rows_ok == ROWS.size(), "§1: only %d of %d rows read clean on both arms" % [rows_ok, ROWS.size()])
 	await _s1b_the_price()
 	await _s1c_the_half()
@@ -1201,14 +1228,25 @@ func _s2c_the_cache() -> void:
 	var had := bool(_run.sim_run)
 	_run.sim_run = true
 	var m := _member("occultist", true)
+	# BATCH HO §3 — THE TRIPLE OF THREE ROWS IS BUILT FROM WHAT THE ROLL OFFERS, NOT
+	# WAITED FOR. The arm rolled forty caches and took the first whose three were all
+	# rows — a draw that came up about once in forty-five while the Occultist's pool
+	# was fifteen, found under this gate's seed, and no longer found under it once
+	# the crest's two joined every hero's roll (HEAD's copy, on HO's data: *forty
+	# rolls gave no triple*). **THE QUESTION NEVER NEEDED THAT DRAW**: it is what
+	# `rune_choice` does with a queued triple of rows, and that the ROLL offers rows
+	# at all while the engine is equipped. So the forty rolls are kept and what they
+	# offer is collected: the first three DISTINCT rows they hand over are the triple.
 	var rolled: Array = []
+	var seen_rows := {}
 	for _t in 40:
-		var trip: Array = _run.roll_rune_candidates(m)
-		if trip.all(func(c): return ROWS.has(String((c as Dictionary).get("id", "")))) and trip.size() == 3:
-			rolled = trip
-			break
-	ok(not rolled.is_empty(), "§2c: forty rolls with the Old Gods equipped gave no triple of three rows")
-	if rolled.is_empty():
+		for c in _run.roll_rune_candidates(m):
+			var cid := String((c as Dictionary).get("id", ""))
+			if ROWS.has(cid) and not seen_rows.has(cid) and rolled.size() < 3:
+				seen_rows[cid] = true
+				rolled.append(c)
+	ok(rolled.size() == 3, "§2c: forty rolls with the Old Gods equipped offered %d distinct rows, not the three a triple needs" % rolled.size())
+	if rolled.size() < 3:
 		_run.sim_run = had
 		return
 	m["rune_candidates"] = [rolled.duplicate()]
@@ -1464,11 +1502,17 @@ func _s3_what_can_be_offered() -> void:
 		# to name, and — with no dismisser slotted — any rune needing a companion.
 		var free: Array = mine.filter(func(i): return (not ROWS.has(String(i))
 			and String(Runes.config(String(i)).get("requires_ability", "")) == ""))
+		# BATCH HO §3 — AND THE CREST'S RUNES, WHICH EVERY HERO IS OFFERED: scoped to
+		# no class, on no row, naming no card. The class's own set is still `mine`.
+		var crest_ids: Array = _ordinary().filter(
+			func(i): return Runes.is_party_scope(String(Runes.config(String(i)).get("scope", ""))))
+		for ci in crest_ids:
+			free.append(ci)
 		free.sort()
 		var bare_sp := _offer(cls, "", [], false)
 		var bare_ce := _offer(cls, "", [], true)
-		print("    %s — %d ordinary runes. NO ENGINE: %d at spawn, %d at the ceiling" % [
-			cls.to_upper(), mine.size(), bare_sp.size(), bare_ce.size()])
+		print("    %s — %d class runes and the crest's %d. NO ENGINE: %d at spawn, %d at the ceiling" % [
+			cls.to_upper(), mine.size(), crest_ids.size(), bare_sp.size(), bare_ce.size()])
 		print("      at spawn: %s" % (", ".join(_names(bare_sp)) if not bare_sp.is_empty() else "(none)"))
 		ok(bare_sp == free,
 			"§3: a %s holding no engine is offered %s at spawn, not the %d runes no gate withholds (%s)" % [
@@ -1478,17 +1522,24 @@ func _s3_what_can_be_offered() -> void:
 				cls, _names(bare_ce.filter(func(i): return ROWS.has(String(i))))])
 		# HD §3 — THE NO-ENGINE FLOOR, OFF HC's TABLE (the const above says why).
 		var fl: Array = RUNE_FLOOR[cls]
+		# BATCH HO §3 — THE FLOOR COUNTS THE CLASS'S OWN RUNES, NOT THE WHOLE OFFER. The
+		# crest's two ride every hero's offer, so a floor on the offer's size sat two
+		# above its reading for every class and a class could lose two of its own
+		# no-engine runes unseen. What HD floored is what the CLASS is owed, and a
+		# rune scoped to no class is not part of it: it is asked apart, in `free` above.
+		var own_sp: Array = bare_sp.filter(func(i): return not crest_ids.has(i))
+		var own_ce: Array = bare_ce.filter(func(i): return not crest_ids.has(i))
 		# BATCH HE §1 — EACH HALF IS FLOORED OR OWED ON ITS OWN: a zero asserts
 		# nothing, and since HE a class can read zero at spawn and not at the
 		# ceiling (the Mage). A half at zero prints OWED and notices the day it rises.
-		var halves := [["at spawn", bare_sp.size(), int(fl[0])], ["at the ceiling", bare_ce.size(), int(fl[1])]]
+		var halves := [["at spawn", own_sp.size(), int(fl[0])], ["at the ceiling", own_ce.size(), int(fl[1])]]
 		for hf in halves:
 			if int(hf[2]) > 0:
 				ok(int(hf[1]) >= int(hf[2]),
-					"§3 floor: a %s holding no engine is offered %d %s, below its floor of %d — the no-engine half thinned (HD §3; the floor moved at HE §1)" % [
+					"§3 floor: a %s holding no engine is offered %d of his class's runes %s, below its floor of %d — the no-engine half thinned (HD §3; the floor moved at HE §1)" % [
 						cls, int(hf[1]), hf[0], int(hf[2])])
 			else:
-				print("      OWED (HD §3): a %s holding no engine is offered %d %s — a floor of zero asserts nothing, and the rune design pass owes this class runes that read no engine" % [
+				print("      OWED (HD §3): a %s holding no engine is offered %d of his class's runes %s — a floor of zero asserts nothing, and the rune design pass owes this class runes that read no engine" % [
 					cls, int(hf[1]), hf[0]])
 				if int(hf[1]) > 0:
 					print("      NOTICE (HD §3): the owed floor has arrived — %s's no-engine offer %s is %d; RUNE_FLOOR is owed its reading" % [
@@ -1497,12 +1548,16 @@ func _s3_what_can_be_offered() -> void:
 		# AND THE ARM THAT STILL MEANS SOMETHING FOR AN OWED ROW: some engine of his
 		# class opens a rune at spawn. It goes red the day a hero of the class can
 		# be offered nothing by any engine he can slot.
+		# BATCH HO §3 — COUNTED OVER THE CLASS'S OWN RUNES: the crest's two are in every
+		# offer whatever is slotted, so the whole offer's size could never read zero
+		# again and this arm had stopped asking.
 		var best_single := 0
 		for pid0 in engs:
 			best_single = maxi(best_single,
-				_offer(cls, Classes.engine_spec(String(pid0)), [pid0], false).size())
+				_offer(cls, Classes.engine_spec(String(pid0)), [pid0], false).filter(
+					func(i): return not crest_ids.has(i)).size())
 		ok(best_single >= 1,
-			"§3 floor: no engine a %s can slot opens a single rune at spawn — a hero of the class can be offered nothing (HD §3)" % cls)
+			"§3 floor: no engine a %s can slot opens a single rune of his class at spawn — a hero of the class can be offered nothing of his own (HD §3)" % cls)
 		for pid in engs:
 			var lin := Classes.engine_spec(String(pid))
 			var one_sp := _offer(cls, lin, [pid], false)
@@ -1612,6 +1667,15 @@ func _record(idx: int, rune: Dictionary, door: String) -> void:
 	var eng := Runes.engine_read(id)
 	if eng != "" and not Runes.held_engines(m).has(eng):
 		_leaks.append("%s shown %s at the %s with %s unequipped, %s" % [spec, nm, door, eng, _where()])
+
+
+# EVERY RUNE THE PARTY HOLDS, WHEREVER IT SITS — the places `Run.party_rune_names`
+# reads, as instances (HO §1: the event door).
+func _every_held_rune() -> Array:
+	var every: Array = _run.rune_bag + _run.party_runes + _run.pending_rune_drops
+	for m in _run.party:
+		every = every + (m as Dictionary).get("runes", []) + (m as Dictionary).get("engines", [])
+	return every
 
 
 func _unequip_all() -> int:
@@ -1736,17 +1800,26 @@ func _leave(s: Node, nm: String) -> String:
 					return "bargain"
 			return Gate.press(s, ["Walk on", "Leave", "Onward"])
 		"Event":
-			var before: Array = []
-			for m in _run.party:
-				before.append((m.get("runes", []) as Array).size())
+			# BATCH HO §1 — THE GRANT IS READ AS WHAT THE PARTY HOLDS, NOT AS A HERO'S
+			# LIST. `hold_rune` puts a crest rune in the crest or the bag, and a class
+			# rune in the bag when its hero's slots are full (since HK), so the new
+			# entries of `party[i]["runes"]` recorded neither. A class rune is booked
+			# under the hero of its class, whose engines decide whether it leaked; a
+			# crest rune belongs to no hero and is on no row, so it is counted at the
+			# door alone.
+			var before: Array = _run.party_rune_names()
 			var choice := Gate.press(s, [""])
 			if choice == "":
 				return ""
 			await Gate.frames(self, 3)
-			for i in _run.party.size():
-				var now: Array = _run.party[i].get("runes", [])
-				for j in range(int(before[i]), now.size()):
-					_record(i, now[j], "event")
+			for r in _every_held_rune():
+				if before.has(String((r as Dictionary).get("name", ""))):
+					continue
+				var at := SEATS.find(Runes.rune_class(r))
+				if at >= 0:
+					_record(at, r, "event")
+				else:
+					_doors["event"] = int(_doors.get("event", 0)) + 1
 			var on := Gate.press(s, ["Continue"])
 			return choice if on == "" else on
 		"Blacksmith":

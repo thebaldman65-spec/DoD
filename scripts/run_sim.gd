@@ -671,13 +671,21 @@ static func _roll_rune_offers(run: Node) -> Array:
 		if worn >= run.rune_slots():
 			rune_refused_noslot += 1
 			continue
-		var rune: Dictionary = run.generate_rune(member)
+		# BATCH HO §1 — NOT A RUNE ALREADY ON THIS COUNTER FOR ANOTHER HERO, as the
+		# real counter refuses it (`shop_screen`, HK §4): a crest rune rolls for
+		# every hero, so this mirror could put one on the counter once a hero and
+		# the bot could buy it more than once. A class rune never repeats across
+		# classes, so nothing a sim rolled before a crest rune existed moves.
+		var on_counter: Array = []
+		for o in offers:
+			on_counter.append(String((o["rune"] as Dictionary)["name"]))
+		var rune: Dictionary = run.generate_rune(member, on_counter)
 		if rune.is_empty():
 			continue  # DOD_SIM_RUNES=off — no rune offers at all
 		for attempt in 4:
 			if not owned_names.has(rune["name"]):
 				break
-			rune = run.generate_rune(member)
+			rune = run.generate_rune(member, on_counter)
 		if not owned_names.has(rune["name"]):
 			offers.append({"member_idx": i, "rune": rune})
 			rune_shop_offered += 1

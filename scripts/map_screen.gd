@@ -1059,7 +1059,13 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 				# "<name>  [Class]" on every rune a hero can be offered, since a
 				# rune reaches only its own class; the label told nobody anything
 				# and it is gone, with the band's tint (`Runes.RUNE_TINT`).
-				_pick_button(box, String(rune["name"]),
+				# BATCH HO §1 — AND A CREST RUNE SAYS IT IS THE CREST'S. The cache is
+				# one hero's, and a crest rune in it is not his: the button says whom
+				# it is for (`Run.rune_for_label`), the one word it adds to any rune.
+				var offer_label := String(rune["name"])
+				if Runes.is_party_rune(rune):
+					offer_label = "%s  (for %s)" % [offer_label, Run.rune_for_label(rune)]
+				_pick_button(box, offer_label,
 					Runes.shown_desc(rune),
 					Runes.RUNE_TINT,
 					_pick_rune.bind(idx, i), overlay)
@@ -1910,6 +1916,11 @@ func _pick_rune(idx: int, choice: int) -> void:
 		_toast("%s goes into the bag — every slot it fits is filled." % String(rune["name"]))
 	elif landed == "pending":
 		_check_rune_drops()
+	elif landed == "worn" and Runes.is_party_rune(rune):
+		# BATCH HO §1 — A PICK FROM ONE HERO'S CACHE THAT EVERY HERO NOW WEARS IS
+		# SAID (HL §1's rule: one choice is never two things with no announcement).
+		# PROPOSED WORDS.
+		_toast("%s fills the crest — every hero wears it." % String(rune["name"]))
 
 
 # ---------- the rune pouch overlay ----------
@@ -2544,7 +2555,7 @@ func _draw_footer() -> void:
 # **ONE ROW UNDER THE POUCH**, in the strip from y 644 to the screen's foot that
 # nothing on this screen used. Two buttons, both opening the bag's panel: the bag's
 # count (and a drop waiting on it), and the party slot — what it holds, or that it
-# is empty, which is what it says today: no party rune is authored.
+# is empty.
 const BAG_ROW_Y := 648.0
 
 

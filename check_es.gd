@@ -166,7 +166,9 @@ func _s1_rarity_is_gone() -> void:
 	# engine runes on GK's shape — the charter's six a class.
 	# **BATCH HF: 151 -> 166.** Fifteen runes written for their class that read no
 	# engine (the designer's, HF §1-§4), live, at the flat 100g.
-	ok(data.size() == 166, "§1: the authored pool is %d entries, expected 166" % data.size())
+	# **BATCH HO: 166 -> 168.** The first two CREST runes (the designer's, HO §3):
+	# scope `party`, live, at the flat price, a payload apiece.
+	ok(data.size() == 168, "§1: the authored pool is %d entries, expected 168" % data.size())
 	ok(with_rarity.is_empty(), "§1: %s still carry a `rarity` key" % [with_rarity])
 	ok(with_scarred.is_empty(), "§1: %s still carry a `scarred` key" % [with_scarred])
 
@@ -308,18 +310,25 @@ func _s2_scope_is_the_axis() -> void:
 	# `class:` and refuses anything else. So the arm asks the same question of
 	# the two that are left: a scope that is not `universal` and not a real
 	# class is a rune that rolls for nobody — a stray `spec:` included.
-	var bands := {"universal": 0, "class": 0}
+	#
+	# **BATCH HO §3 — A THIRD BAND, AND THE SAME QUESTION OF IT.** HK ruled the `party`
+	# scope (the crest's) and built it over no rune; HO authored the first two, and
+	# this table indexed a band it had no key for — HEAD's copy THREW here on HO's
+	# data and ran five checks short, which is how it was found. `_scope_ok` passes
+	# the crest's scope for every hero, so it is a scope something resolves; a scope
+	# that is none of the three still rolls for nobody and is still named.
+	var bands := {"universal": 0, "class": 0, "party": 0}
 	var bad: Array = []
 	for id in data:
 		var scope := String((data[id] as Dictionary).get("scope", "universal"))
 		var band := Runes.scope_band(scope)
-		bands[band] = int(bands[band]) + 1
-		if scope != "universal" and not (scope.begins_with("class:")
+		bands[band] = int(bands.get(band, 0)) + 1
+		if scope != "universal" and not Runes.is_party_scope(scope) and not (scope.begins_with("class:")
 				and Classes.SPEC_IDS.has(scope.trim_prefix("class:"))):
 			bad.append("%s -> %s" % [id, scope])
 	ok(bad.is_empty(), "§2: %s name a scope nothing resolves" % [bad])
-	print("    scope bands: universal %d, class %d" % [
-		int(bands["universal"]), int(bands["class"])])
+	print("    scope bands: universal %d, class %d, the crest's %d" % [
+		int(bands["universal"]), int(bands["class"]), int(bands["party"])])
 
 	# THE FIVE, REACHABLE BY EVERY SPEC. Driven through the live door.
 	var universals: Array = []
@@ -436,8 +445,10 @@ func _s2_scope_is_the_axis() -> void:
 				var sc := Runes.scope_band(String(Runes.config(String(id3)).get("scope", "")))
 				if sc == "universal":
 					u2 += 1
-				else:
+				elif sc == "class":
 					c2 += 1
+			# BATCH HO — the total carries the crest's runes, which every hero is
+			# offered; the two columns beside it are the bands they always were.
 			print("      %-15s %-6d %-10d %d" % [spec2, ids2.size(), u2, c2])
 
 
@@ -445,9 +456,16 @@ func _s2_scope_is_the_axis() -> void:
 # `Runes._scope_ok` reads, without needing a member dict to ask — TWO since HC §1,
 # which deleted the spec branch with the scope: a stray `spec:` admits nobody
 # (and §2's first arm names it). `spec` is kept for the callers' shape.
+#
+# **BATCH HO §3 — THREE: THE CREST'S SCOPE ADMITS EVERY HERO**, as `_scope_ok` has
+# passed it since HK §4. With no crest rune in the file the case was never met; with
+# two, leaving it out would skip them in the silent-absence arm — the one population
+# every hero is offered, asked of nobody.
 func _in_scope(scope: String, class_key: String, _spec: String) -> bool:
 	if scope.begins_with("class:"):
 		return scope.trim_prefix("class:") == class_key
+	if Runes.is_party_scope(scope):
+		return true
 	return scope == "universal"
 
 # ── §3 — THE LABEL WENT AND THE COSTS STAYED ────────────────────────────────

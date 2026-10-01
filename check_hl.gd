@@ -52,8 +52,9 @@ const SELF_CASTS := {
 	"Sanctuary": "holy",
 }
 
-# §6's fixture crest rune, put into the loaded table for §6 and taken out again —
-# the file holds none (ruled: author none).
+# §6's fixture crest rune, put into the loaded table for §6 and taken out again.
+# HK and HL authored none (ruled); the two the file holds since HO §3 are
+# `check_ho`'s, and §6 asks the file only that this fixture never reached it.
 const CREST_FX := "hl_fixture_crest"
 const CREST_HP := 9
 # §6's hero-rune arm: the same condition on a rune ONE hero wears, which the spawn
@@ -416,12 +417,28 @@ func _s1c_the_purchase() -> void:
 	ok(not offers.is_empty(), "§1c: the Peddler has nothing on the counter")
 	if offers.is_empty():
 		return
-	var o0: Dictionary = offers[0]
+	# BATCH HO §1 — THE RUNE BOUGHT IS ONE THE HERO IT IS OFFERED TO CAN WEAR. The arm
+	# bought the counter's FIRST row, and since HO §3 a first row can be a crest rune:
+	# rolled against a hero, worn by the crest, and never drawn on his panel — so the
+	# Equip this arm goes on to press would not exist whenever the roll put one
+	# first. Its question is a hero's own rune; a crest rune's route is `check_ho` §1's.
+	var buy_at := -1
+	for oi in offers.size():
+		if buy_at < 0 and not Runes.is_party_rune((offers[oi] as Dictionary)["rune"]):
+			buy_at = oi
+	ok(buy_at >= 0, "§1c: every row on the counter is a crest rune — the arm has no hero's rune to buy (%d rows)" % offers.size())
+	if buy_at < 0:
+		return
+	var o0: Dictionary = offers[buy_at]
 	var for_idx := int(o0["member_idx"])
 	var nm := String((o0["rune"] as Dictionary)["name"])
 	ok(Gate.has_text(shop, "into the bag; equip it on the map"),
 		"§1c: the counter does not say where a bought rune goes")
-	var bought := Gate.press(shop, ["Buy — "])
+	var buy_btn: Button = Gate.bound_button(shop, "_buy_rune", [buy_at])
+	var bought := ""
+	if buy_btn != null and not buy_btn.disabled:
+		bought = String(buy_btn.text)
+		buy_btn.emit_signal("pressed")
 	await Gate.frames(self, 2)
 	ok(bought != "" and _run.gold == 1000 - int(_run.rune_price(o0["rune"])),
 		"§1c: the Buy took %dg" % (1000 - int(_run.gold)))
@@ -1201,12 +1218,23 @@ func _hero_rune_paid(keys: Array, engines: Array, cond: Dictionary) -> Dictionar
 
 func _s6_party_condition() -> void:
 	print("\n§6 — a condition on who is in the party, each key both ways")
+	# BATCH HO §3 — THE FILE HOLDS CREST RUNES NOW, AND NONE OF THEM IS THIS GATE'S. The
+	# arm read *no crest entry in the file* while the ruling was none; what it guarded
+	# is that a FIXTURE never reaches the file, and it asks that of the fixtures now —
+	# by id and by the name each wears. No crest rune the file holds carries a
+	# condition, so every drive below is still of a fixture (`check_ho` §2d).
 	var authored := 0
+	var leaked: Array = []
 	var file_data: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/runes.json"))
 	for id in (file_data as Dictionary):
-		if String(((file_data as Dictionary)[id] as Dictionary).get("scope", "")) == "party":
+		var fe: Dictionary = (file_data as Dictionary)[id]
+		if String(fe.get("scope", "")) == "party":
 			authored += 1
-	ok(authored == 0, "§6: %d party runes are authored — the ruling is none" % authored)
+		if [CREST_FX, HERO_FX].has(String(id)) or String(fe.get("name", "")).begins_with("HL Fixture"):
+			leaked.append(String(id))
+	print("    crest runes in the file: %d (none at HL; the first were authored at HO §3)" % authored)
+	ok((file_data as Dictionary).size() > 100 and leaked.is_empty(),
+		"§6: a fixture of this gate is written in the file, or the file did not read back: %s" % [leaked])
 	var four := ["warrior", "mage", "cleric", "hunter"]
 	var eng4 := ["bloodrage", "overburn", "mercy", "pack"]
 	var cases := [

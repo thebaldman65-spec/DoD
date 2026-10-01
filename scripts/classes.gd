@@ -45,7 +45,26 @@ static func class_icon(key: String, spec := "") -> Texture2D:
 # Class bases; the spec's Attack (spec_attack) replaces "attack" once
 # awakened. Hunters and Mages attack from range — their hits can't be
 # parried (parry is a melee answer).
+#
+# **BATCH HO §0 — AND IT CARRIES EVERY NUMERIC DEFAULT THE UNIT DECLARES THAT IS
+# NOT ZERO, BEFORE ANY PAYLOAD** (ruled). A `stat` payload adds into this config
+# and the add starts from what the config carries, so a field it did not carry was
+# REPLACED by a payload's figure rather than added to (`docs/reports/HN.md` §3a:
+# healing received, the parry chance). The defaults are the unit's own, read off
+# its declarations (`BattleUnit.hero_spawn_defaults`), never a second list here;
+# a class's own figure below always wins, and a lineage's stat block still
+# replaces what it names (`apply_spec_stats`). Every reader of a hero's config
+# comes through here — the spawn, the hero sheet and the map — so they agree.
 static func hero_config(key: String) -> Dictionary:
+	var cfg := _class_config(key)
+	var defaults := BattleUnit.hero_spawn_defaults()
+	for field in defaults:
+		if not cfg.has(field):
+			cfg[field] = defaults[field]
+	return cfg
+
+
+static func _class_config(key: String) -> Dictionary:
 	var soldier := "res://assets/sprites/soldier"
 	match key:
 		"hunter":
@@ -5215,9 +5234,11 @@ static func draft_ability(display_name: String) -> Ability:
 		# ONE DOOR, which is what makes the consequence below real rather than
 		# guarded against.
 		#
-		# AN ALLY ALREADY HOLDING 3 OR MORE REACHES THE CAP AND RELEASES —
-		# healed 15% of maximum, the count reset, the Devout paid 3% of his
-		# Mana. THAT IS CORRECT AND INTENDED rather than an edge case to gate
+		# AN ALLY WHO REACHES THE CAP WITH THE GRANT RELEASES — healed, the count
+		# reset, the Devout paid his share of Mana (HO §0: said against the cap
+		# and the grant, never as the two numbers they evaluate to — the card's
+		# words are ruled the same way, and they went stale when the threshold
+		# moved). THAT IS CORRECT AND INTENDED rather than an edge case to gate
 		# out: the peak is untouched by a release (BI §1), so a release costs
 		# the ally nothing it was holding and the card is pure upside on a
 		# party that has been building.
@@ -5226,14 +5247,15 @@ static func draft_ability(display_name: String) -> Ability:
 		# ratchet on their way up and pays 2.5% of his maximum per point;
 		# UNWAVERING FAITH enlarges the figure both of those are shares of; and
 		# BINDING OATH swears him a stack of his own on every release this
-		# triggers, so a party at three turns one cast into four payouts.
+		# triggers, so a party the grant carries to the cap turns one cast into
+		# four payouts.
 		"Elevation":
 			return Ability.make({"display_name": "Elevation",
 				"dmg_type": "holy", "cost": 35, "damage": 0, "pressure": 0,
 				"delay": 2.5, "cooldown": 5, "anim": "attack03",
 				"special": "elevation",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Raise them up: every ally gains 2\nstacks of Faith.\nAn ally already holding 3 crosses the\ncap and RELEASES on the spot — and\ntheir peak does not fall for it."})
+				"description": "Raise them up: every ally gains 2\nstacks of Faith.\nAn ally who reaches the cap with it\nRELEASES on the spot — and their peak\ndoes not fall for it."})
 		# AXIS: the payout that does not exist for him. An ally's fifth stack
 		# heals them 15% and hands him Mana; HIS count holds at five and never
 		# releases, so his Faith pools and buys him nothing beyond the peak it

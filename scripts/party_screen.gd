@@ -186,7 +186,7 @@ func _draw_detail() -> void:
 		if rune.get("equipped", false):
 			Talents.apply_payload(cfg, rune["payload"], 1, pay_ctx)
 	# BATCH HK §4 — AND THE PARTY SLOT'S RUNE, ON EVERY HERO, EXACTLY AS THE SPAWN
-	# APPLIES IT: the sheet shows the numbers the fight will use. None is authored.
+	# APPLIES IT: the sheet shows the numbers the fight will use.
 	for pr in Run.party_runes:
 		if (pr as Dictionary).get("equipped", false):
 			Talents.apply_payload(cfg, (pr as Dictionary).get("payload", {}), 1, pay_ctx)

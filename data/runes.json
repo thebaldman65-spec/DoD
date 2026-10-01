@@ -958,6 +958,19 @@
 		"payload": {"stat": {"rune_tusk_and_bristle": 1.0}}
 	},
 
+	"tithe": {
+		"name": "Tithe", "scope": "party",
+		"price": 150,
+		"desc": "Every hero's Break damage heals whoever among the four is lowest, for 30% of its value.",
+		"payload": {"stat": {"rune_blood_communion": 30}}
+	},
+	"fellowship": {
+		"name": "Fellowship", "scope": "party",
+		"price": 150,
+		"desc": "At the start of each hero's turn, he clears one debuff from an ally.",
+		"payload": {"stat": {"rune_field_medic": 1}}
+	},
+
 	"engine_berserker": {
 		"name": "Rune of the Berserker (core)", "scope": "class:warrior",
 		"price": 150, "engine": "bloodrage",

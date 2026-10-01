@@ -143,7 +143,7 @@ var second_max := 100
 var engines: Array = []
 var crit_bonus := 0.0      # from talents
 var parry_bonus := 0.0     # from talents
-var parry_chance := -1.0   # spec stat-block base; -1 = role baseline (battle.gd)
+var parry_chance := -1.0   # spec stat-block base; -1 = role baseline (battle.gd) — a hero's config carries the baseline itself (HO §0)
 var block_chance := 0.0    # Block: fully negates an incoming attack (pure tanks)
 var dmg_bonus := 0.0       # global damage multiplier bonus (relics)
 var type_dmg_bonus := {}   # dmg_type -> bonus fraction (relics)
@@ -379,6 +379,7 @@ var hit_and_run := 0         # applying a status grants Elusive for N turns (2)
 var scavenger_ranks := 0     # +N% max Mana on enemy death (25)
 var rune_scavenger_ranks := 0 # rune-owned: the Carrion Wake +16
 var field_medic := 0         # turn start: cleanse N debuffs from random allies (2)
+var rune_field_medic := 0    # rune-owned: the crest Fellowship's cleanses, summed at the same site (HO §3b)
 var vulture := 0             # +N% vs enemies with 3+ different statuses (60)
 var rune_vulture := 0         # rune-owned: the Carrion Wake +30
 var ghillie := 0             # N% less likely to be targeted while allies live (65)
@@ -1759,6 +1760,7 @@ var weight_of_ruin := 0       # Weight of Ruin: the Ruin depth that halves and s
 var broken_mind := 0          # Ruined Mind: the Ruin depth past which a boss
                               # can no longer resist his Bewitchment
 var blood_communion := 0      # Blood Communion: % of his Break dealt, healed
+var rune_blood_communion := 0 # rune-owned: the crest Tithe's share, summed at the same site (HO §3a)
 # --- Hunter ---
 var cocktail := 0             # Cocktail: other statuses per extra Poison stack
 var set_and_forget := 0       # Set and Forget: a sprung trap re-arms next turn
@@ -2363,6 +2365,45 @@ func _rule_engine_live(pid: String) -> Array:
 				"Quiet turns toward the bonus: %d of %d." % [
 					opening_quiet, Classes.OPENING_QUIET_TURNS]]
 	return []
+
+
+# ══ BATCH HO §0 — WHAT A HERO'S SPAWN CONFIG CARRIES BEFORE ANY PAYLOAD ═══════
+#
+# **A `stat` PAYLOAD ADDS INTO THE SPAWN'S CONFIG, AND THE ADD STARTS FROM WHAT THE
+# CONFIG CARRIES** (`Talents.apply_payload`). Where the config carried no key the
+# add started from nothing, so on a field whose declared default is not zero the
+# payload REPLACED the default: healing received went to the payload's own figure
+# on every hero but the Cleric, and a parry chance replaced the role's baseline
+# (`docs/reports/HN.md` §3a). **SO A HERO'S CONFIG CARRIES EVERY NUMERIC DEFAULT
+# THAT IS NOT ZERO, BEFORE ANY PAYLOAD** (ruled at HO §0), and `Classes.hero_config`
+# is where it is handed over.
+#
+# **THE LIST IS DERIVED OFF THE DECLARATIONS ABOVE, NEVER TYPED.** A second copy of
+# a default would go on setting the old number over the unit's the day one moved
+# (DJ §3: fewer copies, not a better number), and a field declared later with a
+# default that is not zero is carried by doing nothing.
+#
+# **THE ONE SENTINEL IS `parry_chance`**: −1 means *the role's baseline*, which is
+# not a number a payload can add to, so a hero's config carries the baseline
+# itself — `HERO_PARRY_CHANCE`, the one constant the parry roll reads for a hero
+# (`battle.PARRY_CHANCE` is this). An enemy keeps the sentinel: nothing stamps a
+# payload on one.
+const HERO_PARRY_CHANCE := 0.05
+static var _hero_spawn_defaults: Dictionary = {}
+
+
+static func hero_spawn_defaults() -> Dictionary:
+	if _hero_spawn_defaults.is_empty():
+		var probe := BattleUnit.new()
+		for p in probe.get_property_list():
+			if not (int(p["usage"]) & PROPERTY_USAGE_SCRIPT_VARIABLE):
+				continue
+			var v: Variant = probe.get(String(p["name"]))
+			if (v is int or v is float) and float(v) != 0.0:
+				_hero_spawn_defaults[String(p["name"])] = v
+		probe.free()
+		_hero_spawn_defaults["parry_chance"] = HERO_PARRY_CHANCE
+	return _hero_spawn_defaults.duplicate()
 
 
 func setup(config: Dictionary) -> void:
@@ -4410,8 +4451,14 @@ func heal_amount(amount: int, external := false) -> int:
 	# Batch AA guard: healing may be reduced to nothing, never INVERTED. The
 	# multiplier is a running sum of rune terms (Vampiric, Killing Cold, the
 	# Hollow Chalice…) and a negative one would quietly turn every heal into
-	# damage that bypasses death handling. No reachable loadout gets there
-	# today — this is here so a future rune cannot open the hole silently.
+	# damage that bypasses death handling. **THE SUM STARTS FROM THE DEFAULT EVERY
+	# HERO'S CONFIG CARRIES, SINCE HO §0** (`hero_spawn_defaults`): until then a hero
+	# whose config carried no healing key took a rune's price as his WHOLE
+	# multiplier, and this clamp cut his healing to nothing — so the sentence that
+	# stood here, that no loadout reached it, was false of a saved run holding
+	# Vampiric or the Killing Cold on anyone but the Cleric (`docs/reports/HN.md`
+	# §6). `test_runes` asserts the costs one hero can hold stay above the floor;
+	# this is here so a future rune cannot open the hole silently.
 	mult = maxf(mult, 0.0)
 	var final := int(round(amount * mult))
 	# BATCH FK — the two UPWARD crossings, captured before the bar moves for the

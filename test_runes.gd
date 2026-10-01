@@ -321,11 +321,33 @@ func _eligibility(data: Dictionary) -> void:
 	#       scope and the retirement are the only things that can refuse it;
 	#   (4) it leaks into no hero of another class, seated the same way, so a scope
 	#       that stopped reading the class is what reds here, not the engine gate.
+	#   (5) BATCH HO §3 — THE THIRD SCOPE. A CREST RUNE (`party`) ROLLS FOR EVERY HERO,
+	#       of every class and lineage and of none, and a retired one for nobody. The
+	#       walk `continue`d past anything that was not `class:`, so it never asked a
+	#       crest rune its question — nor any scope word it did not know, which
+	#       `_scope_ok` rolls for nobody exactly as it does a `spec:` one. Both are
+	#       asked now: the first per seat, the second once over the file.
+	var unknown_scopes: Array = []
 	for id in data:
 		var e: Dictionary = data[id]
 		var scope := String(e.get("scope", "universal"))
 		ok(not scope.begins_with("spec:"),
 			"%s: carries the scope '%s' — HC §1 re-scoped every spec rune to its class, and `_scope_ok` rolls a spec rune for nobody" % [id, scope])
+		if Runes.is_party_scope(scope):
+			var p_eng := Runes.engine_read(String(id))
+			var p_needs := String(e.get("requires_ability", ""))
+			for pkey in Classes.SPEC_IDS:
+				for plin in [""] + Array(Classes.SPEC_IDS[pkey]):
+					var pm := _eligibility_seat(String(pkey), String(plin), p_eng, [p_needs] if p_needs != "" else [])
+					var p_rolls: bool = Runes.eligible_ids(pm, []).has(id)
+					var p_who := String(plin) if String(plin) != "" else "no-lineage"
+					if Runes.is_retired(String(id)):
+						ok(not p_rolls, "%s: is a RETIRED crest rune and rolls for a %s %s" % [id, p_who, pkey])
+					else:
+						ok(p_rolls, "%s: a crest rune does not reach a %s %s — the scope stops short of the four (HK §4)" % [id, p_who, pkey])
+			continue
+		if scope != "universal" and not scope.begins_with("class:") and not scope.begins_with("spec:"):
+			unknown_scopes.append("%s=%s" % [id, scope])
 		if not scope.begins_with("class:"):
 			continue
 		var ckey := scope.trim_prefix("class:")
@@ -376,6 +398,8 @@ func _eligibility(data: Dictionary) -> void:
 				var m3 := _eligibility_seat(String(key), String(other2), eng, [needs] if needs != "" else [])
 				ok(not Runes.eligible_ids(m3, []).has(id),
 					"%s: leaks into a %s %s" % [id, String(other2) if String(other2) != "" else "no-lineage", key])
+	ok(unknown_scopes.is_empty(),
+		"%s carry a scope that is none of `universal`, `class:<key>` and `party` — `_scope_ok` rolls it for nobody" % [unknown_scopes])
 
 
 # THE SEAT `_eligibility` ASKS ABOUT: a hero of `key` and lineage `lineage`,
@@ -1062,8 +1086,15 @@ func _start_rune_pool(run: Node) -> void:
 	# catches, asserted per candidate below. **BATCH HC §1 — "his" IS HIS CLASS
 	# NOW**: an ordinary candidate is `class:<his key>`, where it was his own
 	# `spec:` until HC, and `with_spec` counts a triple holding an ordinary rune.
+	#
+	# **BATCH HO §3 — OR THE CREST'S.** A crest rune is scoped `party`, which
+	# `Runes._scope_ok` passes for every hero (HK §4: it drops from the same source
+	# as any other rune), so it rides every hero's cache roll and is no leak. The two
+	# the file holds since HO are the first this arm has met; a candidate that is
+	# neither his class's nor the crest's is still the scope leak FM's line catches.
 	var leaks: Array = []
 	var engine_candidates := 0
+	var crest_candidates := 0
 	for key in Classes.SPEC_IDS:
 		for spec in Classes.SPEC_IDS[key]:
 			for i in 12:
@@ -1079,6 +1110,8 @@ func _start_rune_pool(run: Node) -> void:
 						engine_candidates += 1
 						if sc != "class:%s" % key:
 							leaks.append("%s <- %s" % [spec, c0.get("name", "")])
+					elif Runes.is_party_scope(sc):
+						crest_candidates += 1
 					elif sc != "class:%s" % key:
 						leaks.append("%s <- %s" % [spec, c0.get("name", "")])
 				for c in triple:
@@ -1126,8 +1159,16 @@ func _start_rune_pool(run: Node) -> void:
 	# first triple rather than after a twenty-five-point drift.
 	if any_spec_eligible:
 		ok(leaks.is_empty(),
-			"every cache candidate is an ordinary rune of the holder's class or one of his class's ENGINE runes (GK, HC §1) — %d are neither: %s"
+			"every cache candidate is an ordinary rune of the holder's class, a crest rune, or one of his class's ENGINE runes (GK, HC §1, HO §3) — %d are none: %s"
 				% [leaks.size(), leaks.slice(0, 6)])
+		# THE POSITIVE ARM OF THE CREST'S ADMISSION: the file holds crest runes, and
+		# they DO reach a cache — so the branch above is walked, not merely allowed.
+		var crest_live := 0
+		for cid in Runes.ids():
+			if not Runes.is_retired(String(cid)) and Runes.is_party_scope(String(Runes.config(String(cid)).get("scope", ""))):
+				crest_live += 1
+		ok((crest_candidates > 0) == (crest_live > 0),
+			"...and the crest's runes reach the cache exactly when the file holds one (%d candidates, %d live)" % [crest_candidates, crest_live])
 		ok(engine_candidates > 0,
 			"...and the engine runes the charter puts in the ordinary pool DO reach the cache (%d of %d candidates)"
 				% [engine_candidates, trials * 3])
@@ -1223,9 +1264,14 @@ func _rich_grant(run: Node) -> void:
 			for i in own:
 				var rune: Dictionary = run.grant_rune(member)
 				ok(not rune.is_empty(), "%s: grant %d came back empty" % [spec, i])
+				# BATCH HO §3 — HIS CLASS'S, OR THE CREST'S: a crest rune is an ordinary
+				# rune every hero can be offered, so the grant may hand one over. The
+				# preference this arm holds — an ordinary rune before an engine rune —
+				# is unchanged, and so is the scope leak it would catch.
 				ok(String(rune.get("engine", "")) == ""
-						and String(rune.get("scope", "")) == "class:%s" % key,
-					"%s: grant %d was '%s' (scope '%s'), not an ordinary rune of his class" % [
+						and (String(rune.get("scope", "")) == "class:%s" % key
+							or Runes.is_party_scope(String(rune.get("scope", "")))),
+					"%s: grant %d was '%s' (scope '%s'), not an ordinary rune he can be offered — his class's or the crest's" % [
 						spec, i, rune.get("name", ""), rune.get("scope", "")])
 				ok(not names.has(String(rune["name"])),
 					"%s: grant %d duplicated '%s' — the payload would double-apply" % [

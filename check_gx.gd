@@ -278,8 +278,12 @@ func _s1_the_predicate() -> void:
 	# BESIDE IT.** HF §6 un-gated Long Poison (Snare Trap, in every Hunter's kit,
 	# lays the Poison it reads), and HF §1-§4 authored fifteen class runes that
 	# read no engine, so neither sits out for want of one: 17 + 1 + 15.
+	# **BATCH HO §3 — 42 AND 35: THE CREST'S TWO.** Tithe and Fellowship are live,
+	# are not engine runes and read no engine, so this gate's ungated population
+	# holds them: a crest rune sits out for no engine, and never for a hero's (it
+	# is worn by the crest). 17 + 1 + 15 + 2.
 	ok(_gated.size() == 42, "§1: %d gated runes — the table holds 42 (GV's 35, HC's Layered Aegis and HE's seven less Long Poison)" % _gated.size())
-	ok(_ungated.size() == 33, "§1: %d ungated live ordinary runes — 33 since HF (HE's 17, Long Poison and HF's fifteen)" % _ungated.size())
+	ok(_ungated.size() == 35, "§1: %d ungated live ordinary runes — 35 since HO (HE's 17, Long Poison, HF's fifteen and the crest's two)" % _ungated.size())
 	# THE GATED FORTY-THREE: out without the engine, in with it. Both arms.
 	var out_without := 0
 	var in_with := 0

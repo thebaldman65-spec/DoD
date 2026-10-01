@@ -367,7 +367,11 @@ static func apply(run: Node, fx: Dictionary) -> String:
 					where = " — into the bag"
 				elif landed == "pending":
 					where = " — the bag is full: choose on the map"
-				granted.append("%s (%s)%s" % [String(rune["name"]), _who(taker), where])
+				# BATCH HO §1 — a crest rune is rolled against a hero and worn by all
+				# four, so the line names the crest and not the hero it was rolled for.
+				var for_whom: String = String(run.rune_for_label(rune)) \
+					if Runes.is_party_rune(rune) else _who(taker)
+				granted.append("%s (%s)%s" % [String(rune["name"]), for_whom, where])
 			if granted.is_empty():
 				# **AN EVENT IS A TRADE AND THE PLAYER HAS USUALLY PAID ALREADY**
 				# (§4's own worked example is "health for a rune"), so a blank

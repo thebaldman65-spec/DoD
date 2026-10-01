@@ -75,8 +75,8 @@ func _roll_offers() -> void:
 		# BATCH HK §4 — AND NOT A RUNE ALREADY ON THE COUNTER FOR ANOTHER HERO: a
 		# party rune rolls for every hero, so without this two heroes could be
 		# offered the same one. It rides `exclude_names`, the channel a triple's
-		# own candidates already use; with no party rune authored it excludes
-		# nothing a class-scoped offer could have drawn.
+		# own candidates already use, and it excludes nothing a class-scoped
+		# offer could have drawn.
 		var on_counter: Array = []
 		for o in offers:
 			on_counter.append(String((o["rune"] as Dictionary)["name"]))
@@ -292,9 +292,17 @@ func _draw_screen() -> void:
 		# BATCH HE §4 — NO SCOPE BAND (ruled). The row read "<name>  [Class]" on
 		# every rune, because a hero is offered only his own class's; the label
 		# told nobody anything and it is gone, with the band's tint.
-		label.text = "%s  (for %s %d)\n%s — into the bag; equip it on the map" % [rune["name"],
-			member["key"].capitalize(), offer["member_idx"] + 1,
-			Runes.shown_desc(rune)]
+		#
+		# BATCH HO §1 — A CREST RUNE IS ROLLED AGAINST ONE HERO AND IS NOT HIS. Every
+		# roll asks a hero, so a crest rune reaches the counter in somebody's row,
+		# and the row named that hero — the one false word on the route. It says
+		# whom the rune is for, the word the Sell rows beside it already use
+		# (`Run.rune_for_label`).
+		var for_whom: String = "%s %d" % [member["key"].capitalize(), offer["member_idx"] + 1]
+		if Runes.is_party_rune(rune):
+			for_whom = Run.rune_for_label(rune)
+		label.text = "%s  (for %s)\n%s — into the bag; equip it on the map" % [rune["name"],
+			for_whom, Runes.shown_desc(rune)]
 		label.add_theme_font_size_override("font_size", 14)
 		label.add_theme_color_override("font_color", Runes.RUNE_TINT)
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

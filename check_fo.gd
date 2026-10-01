@@ -482,6 +482,7 @@ func _s2_data() -> void:
 	var of_live := 0
 	var live := 0
 	var hf_live := 0
+	var crest_live := 0
 	var engines := 0
 	var engines_of := 0
 	for id in data:
@@ -498,7 +499,11 @@ func _s2_data() -> void:
 		# BATCH HF — its fifteen are written for no lineage, and are counted apart
 		# so the trade this arm asks about is still FO's (they are bare too, and the
 		# convention above binds them with the rest).
-		if String((data[id] as Dictionary).get("written_for", "")) == "":
+		# BATCH HO §3 — AND THE CREST'S TWO ARE COUNTED APART FROM BOTH: written for
+		# no lineage and for no class, live, and bare-named with the rest.
+		if Runes.is_party_scope(String((data[id] as Dictionary).get("scope", ""))):
+			crest_live += 1
+		elif String((data[id] as Dictionary).get("written_for", "")) == "":
 			hf_live += 1
 		if String((data[id] as Dictionary).get("name", "")).to_lower().begins_with("rune of"):
 			of_live += 1
@@ -506,8 +511,8 @@ func _s2_data() -> void:
 		"§2c: %d LIVE ordinary entries are named `Rune of the ...` — the bare convention is broken" % of_live)
 	# **BATCH HF MOVED THE POOL 60 -> 75 AND NOT THE TRADE**: fifteen class runes
 	# written for no lineage, so the pool written for a lineage is still FO's 60.
-	ok(live == 75 and hf_live == 15 and live - hf_live == 60,
-		"§2c: the live pool is %d (%d of them HF's), not 60 + 15 — one out and one in was not the trade" % [live, hf_live])
+	ok(live == 77 and hf_live == 15 and crest_live == 2 and live - hf_live - crest_live == 60,
+		"§2c: the live pool is %d (%d of them HF's, %d the crest's), not 60 + 15 + 2 — one out and one in was not the trade" % [live, hf_live, crest_live])
 	ok(engines == 24 and engines_of == engines,
 		"§2c: ...and the twenty-four ENGINE runes beside it all wear `Rune of the …`, the charter's names (%d of %d)"
 			% [engines_of, engines])

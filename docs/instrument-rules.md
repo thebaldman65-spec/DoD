@@ -831,6 +831,15 @@ gives you N, all born wrong, none of them diffed against anything.
   **`check_da` §3 no longer COUNTS the copies, it ASSERTS there are none**: a gate or suite that
   authors its own `_spawn`, or instantiates the battle scene by hand, fails it by name, and the
   hand-built boards that remain are a **named ratchet** rather than a wildcard.
+- **THE MARK IS THE SCENE PATH'S LITERAL, AND A NEW GATE MEETS IT FIRST IN THE PRE-PASS (HK, HO).**
+  `check_da` reads any `check_*.gd` that spells the fight scene's path as one that instantiates it —
+  a gate that names the path only to COMPARE a resumed scene against it included (`check_ho` §2c at
+  HO: 42 / 2). **Enter the fight through `Gate.enter_battle`, and ask what opened, never what its
+  file is called.** A recon cannot see this red: it runs HEAD's root scripts, so the new gate is not
+  in the copy, and HK's new gate and HO's each met the sweep in a full run. **The gates that walk
+  the gate FILES are run standalone against a new gate when it is written**: `check_da`,
+  `check_ea`, `check_ec`, `check_ed`, `check_ek`, `check_es`, `check_ff`, `check_gw`, `check_parse`
+  and `test_batch_cd`.
 - **THE DIFFERENCES THAT ARE REAL BECOME NAMED ARGUMENTS**, not invisible edits inside a copy:
   `deterministic`, `items`, `run`.
 - **A BASE CLASS IS THE RIGHT SHAPE AND IT DOES NOT COMPILE.** `extends GateBase` on a `--script`
@@ -1529,3 +1538,56 @@ a census is taken.
   (104 checks / 0 failures), the new marker stripped from a completed log (`check_de` reds), and an
   `expect` field removed from a row (the §2 ratchet reds). **The second arm is the one that matters
   — the first alone only proves the message can be printed.**
+
+## STANDING RULE — A BATCH CLEARS THE PREVIOUS BATCH'S ISOLATED COPIES WHEN IT FINISHES (Batch HO §5, ruled by the designer)
+> **A batch clears the PREVIOUS batch's isolated copies when it finishes. One batch's worth stays for
+> forensics, which is what they are for; everything older goes.**
+
+- **WHAT AN ISOLATED COPY IS, AND WHY IT LEAVES SOMETHING BEHIND.** A control, a probe, a recon and a pre-pass each
+  run in a copy of the tree outside the repository, and **each copy renames `config/name` in its `project.godot`
+  before it runs**: Godot keys `user://` on that name, so a copy that kept it would read and write the player's own
+  folder, and two copies that shared one would clobber each other's scratch files. The price is one folder a copy
+  under Godot's `app_userdata`, named for the copy, that nothing removes — and the pile only grows unless a batch
+  takes the last one's away.
+- **THE BATCH'S OWN STAY, AND ARE NAMED SO THE NEXT BATCH CAN FIND THEM**: every copy is named *"Dawn of Decay XX …"*
+  for its batch's letters, and the report counts them. **The next batch clears exactly those** — by that prefix, never
+  by age and never the live game's folder, *"Dawn of Decay"*, which carries no suffix.
+- **CLEARED MEANS MOVED TO THE TRASH, SO IT CAN BE UNDONE, AND THE REPORT SAYS THE COUNT BEFORE AND AFTER AND WHAT
+  MOVED.** Emptying the Trash is the designer's.
+- **IF THE SESSION REFUSES THE MOVE, THE BATCH SAYS SO AND DOES NOT PURSUE IT ANOTHER WAY** — it reports the count and
+  leaves the clearing to the designer. HN's move of four hundred and sixty was refused; HO's of HN's eighteen was not.
+- **`../save-backups/` IS NEVER TOUCHED BY IT.** A batch adds its own backup there and removes nothing.
+
+## STANDING RULE — AN INSTRUMENT PUTS A RUNE DOWN THROUGH `Run.hold_rune`, AND A SCOPE WALK NAMES EVERY BAND (Batch HO §1)
+> **A gate or a suite that needs a rune held that it did not NAME — a rolled one, a granted one, a bought one — hands
+> it to `Run.hold_rune`, the door every taken rune is put down at. It never appends one to `member["runes"]`. And a
+> walk that branches on a rune's scope names every band the game has and reds on one it does not know.**
+
+**THE FIRST RUNES OF A THIRD SCOPE TURNED OVER ARMS ACROSS THE RUNE INSTRUMENTS, AND MOST OF THEM NEVER WENT RED.** A
+census of every gate and suite against the two crest runes (`docs/reports/HO.md`, the census) found the shapes below.
+The reds were the cheap ones; the rest went on passing while asking nothing, or asking it of a state no run reaches.
+
+- **A ROLLED RUNE WRITTEN ONTO A HERO'S LIST BY HAND CAN BE A STATE THE GAME CANNOT MAKE.** `hold_rune` decides by
+  kind: a class rune is worn or bagged, a core rune taken from a cache waits in the bag, a crest rune fills the crest.
+  An arm that appended whatever a roll returned seated a crest rune in a hero's slot, proved its exclusion by the pouch
+  where the game proves it by `Run.party_rune_names`, and counted a floor two higher than its reading. **A fixture that
+  seats a rune it NAMED on a hero who can wear it — the two fixtures' `runes` option, a reset to an empty list, a save's
+  fossil — builds a state the game can make or a save can hold, and is not what this rule reaches**: most of the rune
+  instruments do, `check_ho` among them.
+- **AN ARM THAT PRESSES THE FIRST OFFER ASKS WHAT KIND IT PRESSED.** `offers[0]`, `live[0]` and a cache's first
+  candidate are a draw. An arm that goes on to look for the rune on the hero who was offered it is a coin-flip the day
+  a rune can land anywhere else — `check_fh` §3 had been one since HL §1 sent core runes to the bag, and its seed had
+  happened not to draw one. **Look for the rune where its kind lands, or buy one of the kind the arm is about.**
+- **A TABLE INDEXED BY `Runes.scope_band` HAS A KEY FOR EVERY BAND, AND A LOCAL COPY OF `_scope_ok` HAS A CASE FOR
+  EVERY SCOPE.** One such table threw on the third band and took five arms down with it, unseen behind the throw; two
+  walks skipped the new entries in silence. A walk that `continue`s past a scope it does not recognise has
+  stopped asking: collect the unknown ones and assert there are none.
+- **A BUTTON IS LOCATED BY WHAT THE SCREEN PRINTS, WHICH MAY BE MORE THAN A NAME.** A crest rune's cache button reads
+  `<name>  (for the crest)`; a locator matching whole labels against rune names read it as no button, and the two
+  absence arms behind it could not have seen one. **Count what the locator found against what the screen was handed.**
+- **A COUNT OVER A SCOPE IS TAKEN BY ID WHEN A FIXTURE SHARES THE SCOPE.** `check_hk` §4c counted crest offers on the
+  counter and read two — the fixture pair — only because the step before it had put the file's own two in the bag.
+- **A FLOOR ON WHAT A CLASS IS OFFERED COUNTS THE CLASS'S OWN RUNES.** A rune every hero is offered rides every offer,
+  so a floor on the offer's size sits above its reading by that many and a class can lose as many of its own unseen.
+- **AND TWO GATES THAT WRITE A SAVE ARE NEVER RUN AT ONCE IN ONE COPY.** A copy has one `user://`; a whole-run gate
+  beside a save gate handed the second two reds that were the first's file. One lane a copy, or one copy a lane.

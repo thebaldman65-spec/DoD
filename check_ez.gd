@@ -80,12 +80,30 @@ func _ez_ids() -> Array:
 
 
 # BATCH HF — the live ordinary runes written for no lineage: HF's fifteen.
+# BATCH HO §3 — AND SCOPED TO A CLASS, which is what made them HF's. The crest's
+# runes are written for no lineage either; without the scope they were read as
+# HF's and asked whether they were class runes (HEAD's copy, on HO's data).
 func _hf_ids() -> Array:
 	var out: Array = []
 	for id in _data():
 		var e: Dictionary = _data()[id]
 		if String(e.get("retired", "")) == "" and String(e.get("engine", "")) == "" \
-				and String(e.get("written_for", "")) == "":
+				and String(e.get("written_for", "")) == "" \
+				and String(e.get("scope", "")).begins_with("class:"):
+			out.append(String(id))
+	out.sort()
+	return out
+
+
+# BATCH HO §3 — the live runes the CREST wears (scope `party`): the third population
+# beside the sixty and HF's fifteen, counted beside them and asked the same price,
+# tag and shape questions, and landed with them in §4.
+func _crest_ids() -> Array:
+	var out: Array = []
+	for id in _data():
+		var e: Dictionary = _data()[id]
+		if String(e.get("retired", "")) == "" and String(e.get("engine", "")) == "" \
+				and Runes.is_party_scope(String(e.get("scope", ""))):
 			out.append(String(id))
 	out.sort()
 	return out
@@ -131,14 +149,32 @@ func _s0_the_pool() -> void:
 	# **BATCH GO MOVED BOTH, 142 -> 151 AND 15 -> 24**: the designer's nine rule
 	# engines, so every class holds the charter's six engine runes.
 	# **BATCH HF MOVED IT 151 -> 166**: fifteen live runes written for their class.
-	ok(data.size() == 166, "§0: the authored pool is %d entries, expected 166 (the twenty-four engine runes, and HF's fifteen)" % data.size())
+	# **BATCH HO MOVED IT 166 -> 168**: the crest's first two, live.
+	ok(data.size() == 168, "§0: the authored pool is %d entries, expected 168 (the twenty-four engine runes, HF's fifteen and the crest's two)" % data.size())
 	var eng := 0
 	for id0 in data:
 		if String((data[id0] as Dictionary).get("engine", "")) != "":
 			eng += 1
 	var hf := _hf_ids()
-	ok(eng == 24 and hf.size() == 15 and ez.size() + eng + hf.size() == 99,
-		"§0: ...and twenty-four of them are ENGINE runes (GK, GO) and %d are HF's class runes, live beside the sixty and outside this gate's population (%d engines)" % [hf.size(), eng])
+	var crest := _crest_ids()
+	ok(eng == 24 and hf.size() == 15 and crest.size() == 2
+			and ez.size() + eng + hf.size() + crest.size() == 101,
+		"§0: ...and twenty-four of them are ENGINE runes (GK, GO), %d are HF's class runes and %d are the crest's, live beside the sixty and outside this gate's population (%d engines)" % [hf.size(), crest.size(), eng])
+	# THE PARTITION: every live entry is one of the four kinds, so a live rune that
+	# is none of them — a scope nothing resolves, a lineage and the crest at once —
+	# is counted by nobody and reds here.
+	var live_n := 0
+	for idl in data:
+		if String((data[idl] as Dictionary).get("retired", "")) == "":
+			live_n += 1
+	ok(live_n == ez.size() + eng + hf.size() + crest.size(),
+		"§0: %d live entries against %d sorted into the sixty, the engines, HF's and the crest's" % [
+			live_n, ez.size() + eng + hf.size() + crest.size()])
+	for idc in crest:
+		var ec: Dictionary = data[idc]
+		ok(int(ec.get("price", 0)) == 150
+			and not (Runes.rune_tags(idc) as Array).is_empty() and not (Runes.rune_shape(idc) as Array).is_empty(),
+			"§0: the crest's %s is not at 150g with a tag and a shape (%dg)" % [idc, int(ec.get("price", 0))])
 	for idh in hf:
 		var eh: Dictionary = data[idh]
 		# BATCH HK §3 — THE FLAT PRICE IS 150g (ruled), and the question is unchanged.
@@ -405,7 +441,7 @@ func _s4_the_payloads() -> void:
 	var landed := 0
 	var missed: Array = []
 	var not_refused: Array = []
-	for id in _ez_ids() + _hf_ids():
+	for id in _ez_ids() + _hf_ids() + _crest_ids():
 		var e: Dictionary = data[id]
 		var payload: Dictionary = Runes.build(id).get("payload", {})
 		var stats: Dictionary = payload.get("stat", {})
@@ -439,11 +475,13 @@ func _s4_the_payloads() -> void:
 			not_refused.append("%s carries %s" % [id, cond])
 	ok(missed.is_empty(), "§4: every payload lands its field (%s)" % [missed])
 	# BATCH HF — AND HF's FIFTEEN LAND TOO: 60 + 15.
-	ok(landed == 75, "§4: %d of 75 landed (the sixty and HF's fifteen)" % landed)
+	# BATCH HO — AND THE CREST'S TWO: 60 + 15 + 2.
+	ok(landed == 77, "§4: %d of 77 landed (the sixty, HF's fifteen and the crest's two)" % landed)
 	ok(gated == 0, "§4: %d runes carry a condition, and FN retired the last of them" % gated)
 	ok(not_refused.is_empty(),
 		"§4: a live payload is conditional again (%s)" % [not_refused])
-	print("    60 payloads, %d of them gated, all landing on a hero with nothing drafted" % gated)
+	# (The figure printed the literal 60 from EZ until HO, through HF's fifteen.)
+	print("    %d payloads, %d of them gated, all landing on a hero with nothing drafted" % [landed, gated])
 
 	# **AND THE FIELDS ARE RUNE-OWNED**, which is EM's charter asserted rather
 	# than claimed: every `rune_` field these twenty-one write has

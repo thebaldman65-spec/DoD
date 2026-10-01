@@ -105,6 +105,11 @@ const NO_RUNE_GRANT := ["scripts/spec_choice_screen.gd", "scripts/relics.gd",
 	"scripts/blacksmith_screen.gd", "scripts/offer_screen.gd",
 	"scripts/party_screen.gd"]
 
+# What a file that grants a rune writes or calls (§1a). The last five are HO's: the
+# three put-down doors, and an append to the bag's list or the crest's.
+const NO_GRANT_NEEDLES := ["[\"runes\"] =", "generate_rune", "grant_rune",
+	"hold_rune(", "bag_rune(", "buy_rune(", "rune_bag.append(", "party_runes.append("]
+
 const TRIALS := 400
 # BATCH HB — the rows AUTHORED into `["OFFENSE", "BREAK"]` since FD, which did
 # not move and so are not FD's 53 (§2). Pinned at its size, and each name is
@@ -128,14 +133,23 @@ func _s1_the_offer_sites() -> void:
 			missing.append("%s: %s" % [path, site[1]])
 	ok(missing.is_empty(),
 		"§1a: an offer site stopped calling the door it is pinned on — %s" % [missing])
+	# **BATCH HO §1 — THE FINGERPRINT NAMES EVERY PLACE A RUNE IS PUT DOWN.** It read a
+	# hero's list and two roll doors; since HK a rune can be handed to the bag, and
+	# since HO one exists that is worn in the crest, and a file doing either matched
+	# none of the three. The doors and the two lists' writes are needles now.
 	var granting: Array = []
 	for path2 in NO_RUNE_GRANT:
 		var src2 := Gate.strip_comments(FileAccess.get_file_as_string("res://" + path2))
-		if src2.contains("[\"runes\"] =") or src2.contains("generate_rune") \
-				or src2.contains("grant_rune"):
-			granting.append(path2)
+		for needle in NO_GRANT_NEEDLES:
+			if src2.contains(String(needle)):
+				granting.append("%s (%s)" % [path2, needle])
 	ok(granting.is_empty(),
 		"§1a: a file that must grant no rune now grants one — %s" % [granting])
+	# ...and the needles are live: the file that DOES put runes down holds the doors.
+	var rs_src := Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/run_state.gd"))
+	var dead: Array = NO_GRANT_NEEDLES.filter(func(n): return not rs_src.contains(String(n)))
+	ok(dead.is_empty(),
+		"§1a: `run_state.gd` itself holds no %s — a needle that matches nothing there guards nothing here" % [dead])
 
 	# ── (b) EVERY ROLL DOOR, DRIVEN, ON THE DESIGNER'S OWN FOUR SPECS AND ON
 	#        ALL TWELVE. This is ET §2's property and it was never the hole —
@@ -265,6 +279,10 @@ func _s1_the_offer_sites() -> void:
 	#        collision rate is the finding and the post-repair rate is the fix.
 	var raw := 0
 	var after := 0
+	var crest_first := 0
+	var bag0: Array = run.rune_bag.duplicate()
+	var crest0: Array = run.party_runes.duplicate()
+	var wait0: Array = run.pending_rune_drops.duplicate()
 	for _t2 in TRIALS:
 		var mm := _member("hunter", "sharpshooter")
 		var t1: Array = run.roll_rune_candidates(mm)
@@ -279,20 +297,38 @@ func _s1_the_offer_sites() -> void:
 		mm["rune_candidates"] = [t1, t2]
 		mm["rune_picks_owed"] = 2
 		var a: Array = run.rune_choice(mm)
-		mm["runes"] = [a[0]]
+		# **BATCH HO §1 — THE FIRST PICK IS PUT DOWN AS THE MAP PUTS IT DOWN.** It was
+		# written straight onto the hero's list, so a crest rune (two of his pool,
+		# every hero's) was hand-landed where no run can put one and the exclusion
+		# proved was the pouch's. `map_screen._pick_rune` asks for every kind but a
+		# core rune and hands it to `Run.hold_rune`: a class rune is worn, a crest
+		# rune fills the crest, a core rune waits in the bag — and the second offer
+		# must leave out all three.
+		var first: Dictionary = a[0]
+		first["equipped"] = String(first.get("engine", "")) == ""
+		run.hold_rune(mm, first)
+		if Runes.is_party_rune(first):
+			crest_first += 1
 		(mm["rune_candidates"] as Array).pop_front()
 		var b: Array = run.rune_choice(mm)
 		for c2 in b:
 			if String((c2 as Dictionary)["name"]) == String(a[0]["name"]):
 				after += 1
 				break
+		# What the pick left in the bag or the crest goes with the trial, so every
+		# trial rolls against the same party.
+		run.rune_bag = bag0.duplicate()
+		run.party_runes = crest0.duplicate()
+		run.pending_rune_drops = wait0.duplicate()
+	ok(crest_first > 0,
+		"§1d: no first pick of %d was a crest rune — the crest's route was not driven" % TRIALS)
 	ok(raw > TRIALS / 4,
 		"§1d: only %d of %d raw triple pairs collided — the arm is not armed" % [raw, TRIALS])
 	ok(after == 0,
 		"§1d: the second pick still offered the first pick's rune %d times of %d"
 			% [after, TRIALS])
-	print("    two queued caches, %d trials: raw collisions %d, after the re-ask %d"
-		% [TRIALS, raw, after])
+	print("    two queued caches, %d trials: raw collisions %d, after the re-ask %d (%d first picks a crest rune)"
+		% [TRIALS, raw, after, crest_first])
 	run.sim_run = had_sim
 
 
@@ -344,13 +380,21 @@ func _s1e_the_live_screen() -> void:
 	var rune_names: Array = []
 	for rid in Runes.ids():
 		rune_names.append(Runes.display_name(Runes.config(String(rid))))
+	# **BATCH HO §1 — A CREST RUNE'S BUTTON SAYS WHOSE IT IS** (`<name>  (for the
+	# crest)`), so a label is a rune's when the words before that suffix are a rune's
+	# name. The exact match read a crest candidate as no button at all, and the two
+	# absence arms below could not have seen one; the count arm holds the locator to
+	# every button the overlay was handed.
 	var offered: Array = []
 	for l in labels:
-		var s := String(l)
+		var s := String(l).get_slice("  (for ", 0)
 		if rune_names.has(s):
 			offered.append(s)
 	ok(not offered.is_empty(),
 		"§1e: the rune overlay drew NO pick buttons — the drive read nothing")
+	var handed: Array = (run.rune_choice(member) as Array).map(func(r): return String(r["name"]))
+	ok(offered.size() == handed.size(),
+		"§1e: the overlay was handed %s and the drive read %s — a button the locator cannot read" % [handed, offered])
 	ok(not offered.has("Heavy Bolts"),
 		"§1e: the overlay OFFERED a rune the hero is wearing — %s" % [offered])
 	ok(not offered.has("Rune of the Deep Sight"),

@@ -101,8 +101,12 @@ func _s1_rune_tags_follow_the_cards() -> void:
 	# **BATCH HF ADDED FIFTEEN ROWS AND NOT ONE CARRIES BREAK**: Rending Blows
 	# deepens Sunder, which takes ARMOR, and nothing any of the fifteen reads
 	# touches the Break meter — so the count is FK's 11 still.
-	ok(brk_any.size() == 11,
-		"§1: %d rune rows carry BREAK at all, not the 11 after FK — %s" % [
+	# **BATCH HO MOVED IT 11 -> 12, AND THE TWELFTH IS PAID IN BREAK.** Tithe (the
+	# crest's) heals the lowest hero for a share of the Break a blow deals: its read
+	# site multiplies the blow's Break, so BREAK is what it reads and DEFENSE is what
+	# it is for — second slot, never first, which is the ruling three arms up.
+	ok(brk_any.size() == 12,
+		"§1: %d rune rows carry BREAK at all, not the 12 after HO (FK's 11 and Tithe) — %s" % [
 			brk_any.size(), brk_any])
 	ok(bad_size.is_empty(),
 		"§1: the two-tag ceiling is broken on a rune row — %s" % [bad_size])
@@ -137,7 +141,10 @@ func _s1_rune_tags_follow_the_cards() -> void:
 	# Tusk and Bristle), four DEFENSE (Abundance, Eleventh Hour, Vow of Silence,
 	# Goading Roar), seven OFFENSE. BREAK and MARK stay at zero, for FE's and EK's
 	# reasons above, and RESOURCE and TEMPO did not move.
-	var want := {"DEBUFF": 38, "DEFENSE": 39, "BREAK": 0, "RESOURCE": 28,
+	# **BATCH HO MOVED DEFENSE 39 -> 41 AND NOTHING ELSE.** The crest's two rows, each
+	# derived at its read site: Tithe heals the lowest hero and Fellowship cleanses
+	# an ally — what Unburden's row already calls DEFENSE.
+	var want := {"DEBUFF": 38, "DEFENSE": 41, "BREAK": 0, "RESOURCE": 28,
 		"OFFENSE": 32, "TEMPO": 5, "MARK": 0}
 	var moved_col: Array = []
 	for k in want:
@@ -145,8 +152,8 @@ func _s1_rune_tags_follow_the_cards() -> void:
 			moved_col.append("%s %d!=%d" % [k, int(spread[String(k)]), int(want[k])])
 	ok(moved_col.is_empty(),
 		"§1: a primary column the demotion does not touch has moved — %s" % [moved_col])
-	ok(Runes.RUNE_TAGS.size() == 142,
-		"§1: the table is %d rows, not the 142 after HF (FO's 127 and HF's fifteen)" % Runes.RUNE_TAGS.size())
+	ok(Runes.RUNE_TAGS.size() == 144,
+		"§1: the table is %d rows, not the 144 after HO (FO's 127, HF's fifteen and the crest's two)" % Runes.RUNE_TAGS.size())
 	print("    RUNE_TAGS primaries: %s" % [spread])
 
 	# **THE CARD TABLE IS THE POSITIVE ARM.** FD's ruling is what this one

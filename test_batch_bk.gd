@@ -20,6 +20,8 @@ extends SceneTree
 
 const MAPS := 1000
 
+const SuiteFx = preload("res://suite_fixture.gd")
+
 var checks := 0
 var fails := 0
 var sections := 0   # bumped at the LAST line of each section
@@ -363,18 +365,31 @@ func _section_blacksmith(rsrc: String) -> void:
 				ineligible += 1
 	ok(ineligible == 0, "§3: an ineligible pairing is never offered (%d were)" % ineligible)
 
+	# BATCH HO §4 — THE PAIRING BOUGHT IS ONE WHOSE TYPE HAS ANOTHER HOME, NOT
+	# WHICHEVER THE SHUFFLE PUT FIRST. The once-per-run arm below asks whether the
+	# bought TYPE is still offered on a DIFFERENT card, and it bought `offer[0]`
+	# unseeded: when that was the one type that fits a single card in this party
+	# (HN §7: about one run in fifty-four) the question had no answer and the arm
+	# went red on an untouched tree. **REPAIRED TO INTENT, NOT SEEDED AND NOT
+	# WIDENED**: a seed pins one draw of a pool that moves with every card
+	# authored, and a wider row stops asking. `SuiteFx.pairing_with_another_home`
+	# is the one answer, and `check_ho` §6 builds both counters and reads it.
+	var buy_at: int = SuiteFx.pairing_with_another_home(run, offer)
+	ok(buy_at >= 0,
+		"§3: no pairing on the counter has a type that fits another card — the once-per-run arm below has nothing to ask (%s)" % [offer])
+	var bought: Dictionary = offer[maxi(buy_at, 0)]
 	# The purchase: gold out, upgrade onto the member's own list, and the
 	# ◆ badge the map card reads comes off that same list.
 	run.gold = 500
-	var buyer: Dictionary = run.party[int(offer[0]["member_idx"])]
+	var buyer: Dictionary = run.party[int(bought["member_idx"])]
 	var before: int = buyer.get("upgrades", []).size()
-	ok(run.buy_blacksmith(offer[0]), "§3: the purchase clears at 500 gold")
+	ok(run.buy_blacksmith(bought), "§3: the purchase clears at 500 gold")
 	ok(run.gold == 350, "§3: 150 gold deducted (%d left)" % run.gold)
 	ok(buyer.get("upgrades", []).size() == before + 1,
 		"§3: the upgrade lands on the hero's own `upgrades` list — the same one the mini-boss pick writes")
 	var landed: Dictionary = buyer["upgrades"][before]
-	ok(String(landed["id"]) == String(offer[0]["id"])
-		and String(landed["ability"]) == String(offer[0]["ability"]),
+	ok(String(landed["id"]) == String(bought["id"])
+		and String(landed["ability"]) == String(bought["ability"]),
 		"§3: ...and it is the pairing that was bought")
 
 	# AP'S ONCE-PER-RUN RULE IS NOT CONSULTED. That rule governs the MINI-BOSS
@@ -527,11 +542,21 @@ func _section_events() -> void:
 	# (`Run.hold_rune`), so the party's runes are both pouches.
 	var worn_before: int = run.party[0].get("runes", []).size() \
 		+ run.party[0].get("engines", []).size()
+	# BATCH HO §1 — AND THE CREST AND THE BAG, WHICH ARE WHERE A RUNE CAN ALSO LAND.
+	# The arm counted the heroes' own lists, which was every place a granted rune
+	# could go while it was always a hero's and always worn. Since HO §3 the verb
+	# can hand over a CREST rune, which is worn by the crest and by no hero: the
+	# count missed it, so the arm went red whenever the roll drew one (HO's seeded
+	# replay of this suite drew one and read it). It counts every place a rune the
+	# heroes hold can be — a hero, the crest, the bag, the waiting list — so the
+	# question is still *did a rune arrive* and no draw can dodge it.
+	var held_before: int = worn_before + run.party_runes.size() + run.rune_bag.size() \
+		+ run.pending_rune_drops.size()
 	Events.apply(run, {"effect": "rune_grant", "amount": 1})
-	var got := 0
+	var got: int = run.party_runes.size() + run.rune_bag.size() + run.pending_rune_drops.size()
 	for m3 in run.party:
 		got += m3.get("runes", []).size() + m3.get("engines", []).size()
-	ok(got > worn_before, "§4: rune_grant delivers a rune to the party")
+	ok(got > held_before, "§4: rune_grant delivers a rune to the party")
 	sections += 1
 
 

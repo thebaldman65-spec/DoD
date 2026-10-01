@@ -1356,7 +1356,11 @@ func _spawn_units() -> void:
 		# Class passives (every spec of the class, and before awakening).
 		match hero_keys[i]:
 			"cleric":
-				cfg["healing_received_mult"] = 1.15  # Holy Conduit
+				# BATCH HO §0 — HOLY CONDUIT ADDS ITS SHARE TO THE DEFAULT THE CONFIG
+				# CARRIES. It SET the total until HO, which is what made the Cleric the
+				# only hero a healing payload added to rather than replaced.
+				cfg["healing_received_mult"] = float(cfg.get("healing_received_mult", 1.0)) \
+					+ 0.15  # Holy Conduit
 			"mage":
 				cfg["mana_regen_bonus"] = 10          # Evocation
 		# (Warrior: Threatening Presence lives in enemy targeting;
@@ -1414,7 +1418,7 @@ func _spawn_units() -> void:
 			# (`ctx.party`), once, here. **A HERO,
 			# NOT AN ALLY** — this is the spawn of the four, and a companion does not
 			# exist yet (CV §4's first structural reason). Named once in the roll call,
-			# not once a hero. No party rune is authored; this runs over none today.
+			# not once a hero.
 			for pr in Run.party_runes:
 				var pr_d: Dictionary = pr
 				if not bool(pr_d.get("equipped", false)):
@@ -1553,7 +1557,10 @@ func _spawn_units() -> void:
 		var u := _make_unit(cfg, HERO_SLOTS[i], hero_tint, _hero_plate_pos(i))
 		u.crit_bonus = cfg.get("crit_bonus", 0.0)
 		u.parry_bonus = cfg.get("parry_bonus", 0.0)
-		u.parry_chance = cfg.get("parry_chance", -1.0)
+		# BATCH HO §0 — A HERO'S CONFIG CARRIES THE BASELINE, SO THIS IS A NUMBER AND
+		# NEVER THE SENTINEL. Floored: a price that took it below nothing would read
+		# as the sentinel at the roll and hand the baseline back.
+		u.parry_chance = maxf(float(cfg.get("parry_chance", PARRY_CHANCE)), 0.0)
 		u.below_half_cb = _on_hero_below_half
 		# BATCH FK — the two FK crossings, wired beside the Mercy one because
 		# they are the same split: the unit owns WHEN a line is crossed, the
@@ -3269,8 +3276,16 @@ func _run_battle() -> void:
 		# ADDITIVE: the counter holds HOW MANY debuffs he washes off (2), and
 		# each roll picks its own ally — "two debuffs from random allies", not
 		# two off one unlucky hero.
-		if u.is_hero and not u.dead and u.field_medic > 0:
-			for _fm in u.field_medic:
+		#
+		# BATCH HO §3b — AND THE CREST'S SHARE, SUMMED AT THIS ONE SITE. Fellowship
+		# writes `rune_field_medic` (EM's charter: a rune never writes the node's
+		# own counter), and the guard sums the pair — a guard on the node's field
+		# alone pays a rune-only hero nothing, in silence. **ONE LOOP, NO SECOND
+		# TICK**: a hero with the node and the crest washes the two figures added,
+		# never each on its own upkeep. The crest's washes are counted first, so
+		# the log names the source that paid each one.
+		if u.is_hero and not u.dead and u.rune_field_medic + u.field_medic > 0:
+			for fm_i in u.rune_field_medic + u.field_medic:
 				# BATCH DK §1 — `_hero_side()`, SO A BEAST'S AFFLICTIONS COUNT.
 				# The card says "random allies" and this walked bare `heroes`. A
 				# companion carries debuffs like anything else — it is targetable,
@@ -3290,7 +3305,9 @@ func _run_battle() -> void:
 				if fm_washed != "":
 					fm_ally.float_text("Cleansed: %s" % fm_washed,
 						Color(0.5, 0.95, 0.6))
-					_log("   → Cleanse Debuffs Each Turn: %s washes %s off %s" % [
+					_log("   → %s: %s washes %s off %s" % [
+						_crest_name_for("rune_field_medic") if fm_i < u.rune_field_medic \
+							else "Cleanse Debuffs Each Turn",
 						u.unit_name, fm_washed, fm_ally.unit_name], "#70d878")
 		# BATCH DS — SALVE (Survivalist draft), and it is the first HEAL in any
 		# of the twenty-four Hunter spec cards. It sits here, in his turn-start
@@ -8232,6 +8249,20 @@ func _note_debuff_applied(source: BattleUnit, status_id: String) -> void:
 			"#b0a8e0")
 
 
+# BATCH HO §3 — THE WORN CREST RUNE THAT WRITES `field`, BY THE NAME IT WEARS, for
+# a log line that says what paid. Read off the run in hand, so the word is the
+# data's and never a literal copy of it here (HL §9: thirteen log lines hold such a
+# copy, and each goes stale the day a name moves). Outside a run — a fixture that
+# stamps the field by hand — nothing is worn, and the line says "the crest".
+func _crest_name_for(field: String) -> String:
+	for pr in Run.party_runes:
+		var pr_d: Dictionary = pr
+		var pr_stat: Dictionary = (pr_d.get("payload", {}) as Dictionary).get("stat", {})
+		if bool(pr_d.get("equipped", false)) and pr_stat.has(field):
+			return String(pr_d.get("name", "the crest"))
+	return "the crest"
+
+
 func _lowest_hp(pool: Array) -> BattleUnit:
 	var best: BattleUnit = pool[0]
 	for h in pool:
@@ -8323,7 +8354,7 @@ func _adjacent_enemies(target: BattleUnit) -> Array:
 # the MAP burger, where it can still shape the next spawn.)
 
 const MISS_CHANCE := 0.05
-const PARRY_CHANCE := 0.05        # hero baseline
+const PARRY_CHANCE := BattleUnit.HERO_PARRY_CHANCE  # hero baseline — a hero's config carries it (HO §0)
 const ENEMY_PARRY_CHANCE := 0.025 # enemy baseline (half the hero rate)
 const CRIT_CHANCE := 0.10
 # BATCH EW — CRIT CHANCE ABOVE CERTAINTY BECOMES CRIT MULTIPLIER. What one
@@ -11445,13 +11476,20 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				# the attacker, because the node is his and the Break is the
 				# party's — but only his own Break pays, which is what makes
 				# it a Leech-lane node rather than a party aura.
-				if attacker.blood_communion > 0:
+				#
+				# BATCH HO §3a — AND THE CREST'S SHARE, SUMMED HERE. Tithe writes
+				# `rune_blood_communion` on every hero (EM's charter: a rune never
+				# writes the node's own counter), so each hero's Break pays, and the
+				# guard sums the pair for the reason every re-keyed guard does. A
+				# PAYOUT SUMS: a hero wearing the node and the crest pays both shares.
+				var bc_pct: int = attacker.blood_communion + attacker.rune_blood_communion
+				if bc_pct > 0:
 					var bc_pool := heroes.filter(
 						func(h): return not h.dead and not h.is_companion)
 					if not bc_pool.is_empty():
 						var bc_t := _lowest_hp(bc_pool)
 						var bc_amt := maxi(int(round(
-							result.get("bd", pr) * attacker.blood_communion / 100.0)), 1)
+							result.get("bd", pr) * bc_pct / 100.0)), 1)
 						var bc_got: int = bc_t.heal_amount(bc_amt, bc_t != attacker)
 						if bc_got > 0:
 							bc_t.float_text("+%d" % bc_got, Color(0.7, 0.4, 0.9))
@@ -14430,7 +14468,7 @@ const VESPERS_PCT := 0.20
 #
 # BATCH CG §2 — IT WAS A PEAK FLOOR AND IS A PLAIN GRANT. The old constant was
 # the high-water mark it raised every ally TO; this is a count it ADDS, through
-# `_gain_faith`, which is what makes an ally at three cross the cap and release.
+# `_gain_faith`, which is what makes an ally it carries to the cap release.
 const ELEVATION_STACKS := 2
 # JUBILEE: the Faith he must be HOLDING before the year can be called. The gate
 # is what stops it being a heal he presses every time one stack arrives — his
@@ -21286,8 +21324,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# crosses the cap RELEASES.
 			#
 			# THE RELEASE IS THE POINT, NOT AN EDGE CASE TO GUARD AGAINST. An
-			# ally already holding 3 reaches 5 and pays out — healed 15% of
-			# maximum, count reset, the Devout given 3% of his Mana — and their
+			# ally the grant carries to the cap (`FAITH_RELEASE`) pays out — healed,
+			# the count reset, the Devout given his share of Mana — and their
 			# PEAK is untouched by the reset (BI §1), so the release costs them
 			# nothing they were holding. Binding Oath and Communion ride it
 			# exactly as they ride any other release, because it IS one.

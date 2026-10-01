@@ -104,6 +104,7 @@ func _s1_the_pool() -> void:
 	var bad_scope: Array = []
 	var engines: Array = []
 	var hf_class: Array = []
+	var crest: Array = []
 	for id in Runes.ids():
 		if Runes.is_retired(String(id)):
 			continue
@@ -115,6 +116,19 @@ func _s1_the_pool() -> void:
 		var cfg: Dictionary = Runes.config(String(id))
 		var scope := String(cfg.get("scope", ""))
 		var wf := String(cfg.get("written_for", ""))
+		# BATCH HO §3 — NOR ARE THE CREST'S: scope `party`, which `Runes._scope_ok`
+		# passes for every hero (HK §4), so it is a scope that rolls for EVERYBODY
+		# and not the stray one the arm below names. Counted beside the pool, as the
+		# engine runes and HF's are, and held to the flat price with them. Asked
+		# before the no-lineage arm, which would otherwise read a crest rune as a
+		# class rune with a scope no class answers to.
+		if Runes.is_party_scope(scope):
+			crest.append(String(id))
+			if wf != "":
+				bad_scope.append("%s=%s (the crest's, and written for %s)" % [id, scope, wf])
+			if int(cfg.get("price", 0)) != 150:
+				priced_wrong.append("%s=%s" % [id, cfg.get("price", 0)])
+			continue
 		# BATCH HF — AND NEITHER ARE HF's FIFTEEN: written for their CLASS and for
 		# no lineage (`written_for` absent), so they are counted beside this pool
 		# as the engine runes are, and held to the same two rules the pool is — a
@@ -141,6 +155,7 @@ func _s1_the_pool() -> void:
 	ok(live.size() == 60, "§1: the live pool is %d, not 60" % live.size())
 	ok(hf_class.size() == 15,
 		"§1: %d live runes are written for no lineage, not HF's fifteen — %s" % [hf_class.size(), hf_class])
+	ok(crest.size() == 2, "§1: %d live runes are the crest's, not HO's two — %s" % [crest.size(), crest])
 	ok(by_spec.size() == 12,
 		"§1: the live pool spans %d specs, not all 12 — %s" % [
 			by_spec.size(), by_spec.keys()])

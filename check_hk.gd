@@ -12,7 +12,7 @@
 #   §3  THE PEDDLER — 150g a rune and a third back; a purchase lands in the bag;
 #       two presses sell one; a full bag greys every Buy and says so; never a rune
 #       the party holds; GV's engine gate at his door, both ways
-#   §4  THE CREST (the `party` scope) — no party rune in the file, and every door
+#   §4  THE CREST (the `party` scope) — no fixture in the file, and every door
 #       working over a fixture party rune built in this gate: the scope, the drop,
 #       the Peddler, the bag, the one slot, and every hero's numbers at the spawn
 #   §5  THE SAVE — the bag, the crest and the waiting drops round-trip; a save from
@@ -30,9 +30,10 @@
 # the window held something, so a door wired shut, or a walk over nothing, reads
 # red rather than green.
 #
-# **NO PARTY RUNE IS AUTHORED, AND §4 ASSERTS BOTH HALVES**: none in
+# **§4's PARTY RUNES ARE FIXTURES, AND §4 ASSERTS BOTH HALVES**: none of them in
 # `data/runes.json`, and the machinery live over one this gate builds and puts into
 # `Runes`' loaded table for §4 alone — never into the file — removed before §5.
+# (None was authored until HO §3; the two the file holds since are `check_ho`'s.)
 #
 #   /Applications/Godot.app/Contents/MacOS/Godot --headless --path . \
 #       --script check_hk.gd
@@ -49,7 +50,8 @@ const ROAD_SEED := 20260929
 const FRAME_CAP := 30000
 const MAX_STEPS := 900
 # §4's fixture party runes. Built here, put into the loaded table for §4 and taken
-# out again — the file holds none (ruled: author none).
+# out again. HK authored none (ruled); the two the file holds since HO §3 are driven
+# by `check_ho`, and §4 asks the file only that neither fixture reached it.
 const CREST_A := "hk_fixture_crest_a"
 const CREST_B := "hk_fixture_crest_b"
 const CREST_HP := 7
@@ -282,14 +284,24 @@ func _s1_the_drop() -> void:
 	seed(DROP_SEED)
 	_new_run(["warrior", "warrior", "mage", "cleric"])
 	var seen_class := {}
+	var crest_drops := 0
 	for _i in 400:
 		var r: Dictionary = _run.roll_fight_drop()
 		if not r.is_empty():
 			seen_class[Runes.rune_class(r)] = int(seen_class.get(Runes.rune_class(r), 0)) + 1
+			if Runes.is_party_rune(r):
+				crest_drops += 1
 	ok(not seen_class.has("hunter"), "§1f: a party with no Hunter was dropped %d Hunter runes" % int(seen_class.get("hunter", 0)))
 	ok(int(seen_class.get("warrior", 0)) > 0 and int(seen_class.get("mage", 0)) > 0
 			and int(seen_class.get("cleric", 0)) > 0,
 		"§1f: ...and the classes it holds were not all dropped (%s) — the absence read nothing" % [seen_class])
+	# BATCH HO §3 — THE DROPS ARE A PARTITION: a class the party holds, or the crest.
+	# A crest rune has no class, so it fell into a bucket the two arms above never
+	# read; the bucket is held to the crest's own drops, and they do drop.
+	ok(seen_class.keys().all(func(k): return ["warrior", "mage", "cleric", ""].has(String(k)))
+			and int(seen_class.get("", 0)) == crest_drops,
+		"§1f: a drop was neither a class the party holds nor a crest rune (%s, %d of them the crest's)" % [seen_class, crest_drops])
+	ok(crest_drops > 0, "§1f: 400 drops held no crest rune — the file's two are in every party's union")
 	# (g) NEVER A RUNE THE PARTY HOLDS: hold all but one of what the party could be
 	# dropped, and the drop is that one; hold it too, and there is nothing to drop.
 	_new_run()
@@ -461,8 +473,19 @@ func _s2_the_bag() -> void:
 	Gate.press(mp, ["Rune bag"])
 	await process_frame
 	var bp: Node = Gate.overlay(current_scene, 60)
-	ok(bp != null and Gate.has_text(bp, "THE RUNE BAG") and Gate.has_text(bp, "No crest rune held."),
-		"§2h: the bag panel is not on screen, or its crest does not say it is empty")
+	# BATCH HO §3 — THE CREST IS EMPTY, AND THE PANEL SAYS SO IN ONE OF TWO WAYS. The
+	# arm read the line drawn when no crest rune is held at all; a crest rune can sit
+	# in the bag now (two are authored, and this run's drops are the game's own), and
+	# then the section lists it with its Equip instead. The header says the crest is
+	# empty either way, and the line is asked for exactly when nothing is held.
+	var crest_in_bag := false
+	for br in _run.rune_bag:
+		if Runes.is_party_rune(br):
+			crest_in_bag = true
+	ok(bp != null and Gate.has_text(bp, "THE RUNE BAG")
+			and Gate.has_text(bp, "THE CREST — 0 of %d filled" % int(_run.PARTY_RUNE_SLOTS))
+			and Gate.has_text(bp, "No crest rune held.") == (not crest_in_bag),
+		"§2h: the bag panel is not on screen, or its crest does not say it is empty (a crest rune in the bag: %s)" % crest_in_bag)
 	var nb0: int = _run.rune_bag.size()
 	var first := String((_run.rune_bag[0] as Dictionary).get("name", ""))
 	Gate.press(bp, ["Drop"])
@@ -614,13 +637,24 @@ func _s3_the_peddler() -> void:
 # ── §4 — THE CREST ──────────────────────────────────────────────────────────
 
 func _s4_the_crest() -> void:
-	print("\n§4 — the crest: no party rune in the file, and every door live over a fixture one")
+	print("\n§4 — the crest: no fixture in the file, and every door live over a fixture one")
+	# BATCH HO §3 — THE FILE HOLDS CREST RUNES NOW, AND NONE OF THEM IS THIS GATE'S. The
+	# arm read *no party entry in the file* while the ruling was none (HK built every
+	# door over zero of them); what it guarded is that a FIXTURE never reaches the
+	# file, and it asks that of the fixtures — by id and by the name each wears.
+	# `check_ho` §1 drives the same doors with the two the file holds.
 	var authored := 0
+	var leaked: Array = []
 	var file_data: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/runes.json"))
 	for id in (file_data as Dictionary):
-		if String(((file_data as Dictionary)[id] as Dictionary).get("scope", "")) == "party":
+		var fe: Dictionary = (file_data as Dictionary)[id]
+		if String(fe.get("scope", "")) == "party":
 			authored += 1
-	ok(authored == 0, "§4: %d party runes are authored — the ruling is none" % authored)
+		if [CREST_A, CREST_B].has(String(id)) or String(fe.get("name", "")).begins_with("HK Fixture"):
+			leaked.append(String(id))
+	print("    crest runes in the file: %d (none at HK; the first were authored at HO §3)" % authored)
+	ok((file_data as Dictionary).size() > 100 and leaked.is_empty(),
+		"§4: a fixture of this gate is written in the file, or the file did not read back: %s" % [leaked])
 	ok(int(_run.PARTY_RUNE_SLOTS) == 1, "§4: the crest holds %d, not the ruled one" % int(_run.PARTY_RUNE_SLOTS))
 	# EVERY READER OF THE CAP ASKS THE ONE CONSTANT: each comparison of the slot's
 	# size in the game reads `PARTY_RUNE_SLOTS`, and there is at least one.
@@ -660,11 +694,18 @@ func _s4_the_crest() -> void:
 	# (c) THE PEDDLER OFFERS IT TO ONE HERO, NOT FOUR.
 	change_scene_to_file("res://scenes/shop.tscn")
 	await Gate.frames(self, 6)
-	var crest_offers := 0
+	# BATCH HO §3 — COUNTED BY ID. The file holds two crest runes of its own now, and
+	# this read two only because §4b had just put those in the bag; asked by id, the
+	# arm says what it means: each rune the party does not hold is on the counter
+	# once, for one hero, and nothing the party holds is there at all.
+	var crest_offers := {}
 	for o in current_scene.get("offers"):
-		if Runes.is_party_rune((o as Dictionary)["rune"]):
-			crest_offers += 1
-	ok(crest_offers == 2, "§4c: the counter held %d crest runes — two exist, each offered once" % crest_offers)
+		var o_rune: Dictionary = (o as Dictionary)["rune"]
+		if Runes.is_party_rune(o_rune):
+			crest_offers[String(o_rune.get("id", ""))] = int(crest_offers.get(String(o_rune.get("id", "")), 0)) + 1
+	ok(crest_offers.size() == 2 and int(crest_offers.get(CREST_A, 0)) == 1
+			and int(crest_offers.get(CREST_B, 0)) == 1,
+		"§4c: the counter's crest runes were %s — each of the two the party does not hold, once" % [crest_offers])
 	# (d) INTO THE BAG, INTO THE CREST: one slot, a second refused, a swap through.
 	_clear_bag()
 	_run.bag_rune(Runes.build(CREST_A))
@@ -790,7 +831,12 @@ func _s5_the_save() -> void:
 	var others_loose := 0
 	for seat in [1, 2, 3]:
 		var om: Dictionary = _run.party[seat]
-		var oids := Runes.eligible_ids(om, []).filter(func(x): return not Runes.is_engine_rune(String(x)))
+		# BATCH HO §3 — WHAT A HERO COULD HOLD BEFORE THE BAG: a rune he can wear. A
+		# crest rune is offered to every hero and worn by none, so three heroes'
+		# worth of "everything he could be offered" put six crest instances on
+		# heroes — a save no build ever wrote.
+		var oids := Runes.eligible_ids(om, []).filter(func(x): return (not Runes.is_engine_rune(String(x))
+			and Runes.wearable_by(Runes.build(String(x)), om)))
 		var loose: Array = []
 		for id in oids:
 			loose.append(Runes.build(String(id)))

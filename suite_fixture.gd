@@ -337,3 +337,48 @@ static func one_pool_a_class(who: String) -> Array:
 	return [walked == 4 and split.is_empty(),
 		"%s: a class's draft is not its four shelves together (%s; %d of 4 classes walked) — GP's one pool is split again, and the shelf question this arm asked until HH is live again (retired at HH)"
 			% [who, ", ".join(PackedStringArray(split)), walked]]
+
+
+# ══ BATCH HO §4 — THE BLACKSMITH PAIRING AN ARM MAY BUY ═══════════════════════
+#
+# **`test_batch_bk` §3 BOUGHT THE COUNTER'S FIRST PAIRING AND THEN ASKED WHETHER ITS
+# TYPE IS STILL OFFERED ON A DIFFERENT CARD.** That question has an answer only for a
+# type that fits more than one card the party holds, and one type fits exactly one
+# (HN §7 characterised it, unseeded: about one run in fifty-four put that pairing
+# first, and the arm went red on a tree nothing had touched).
+#
+# **THE REPAIR IS THE CONSTRUCTION, NOT A SEED AND NOT A WIDER ROW.** The arm buys
+# the first pairing on the counter whose type has another home, which is the only
+# kind its question can be asked of. A seed would pin one draw of a pool that moves
+# with every card authored, so the day the pool moved the same red would come back
+# as a certainty; a band written from the red would stop asking. **ONE
+# IMPLEMENTATION, TWO CALLERS**: the suite, and `check_ho` §6, which builds the
+# counter that used to fail and the one that never did and reads this on both.
+#
+# `upgrade_homes` is the blacksmith's own pool rule read for one type
+# (`Run.roll_blacksmith_offer`: every card a hero owns but the class basic it
+# skips, that resolves, and that the upgrade fits), by card name. `run` is handed
+# in: this file names no autoload.
+static func upgrade_homes(run: Node, upgrade_id: String) -> Array:
+	var homes: Array = []
+	for m in run.get("party"):
+		for n in run.owned_ability_names(m):
+			var nm := String(n)
+			if nm == "Strike" or homes.has(nm):
+				continue
+			var ab: Ability = Classes.pool_ability(nm)
+			if ab != null and run.upgrade_fits(upgrade_id, ab):
+				homes.append(nm)
+	return homes
+
+
+# The index of the first pairing in `offer` whose upgrade type fits a card other
+# than the one it is paired with, or -1 when none does.
+static func pairing_with_another_home(run: Node, offer: Array) -> int:
+	for i in offer.size():
+		var p: Dictionary = offer[i]
+		var homes: Array = upgrade_homes(run, String(p.get("id", "")))
+		homes.erase(String(p.get("ability", "")))
+		if not homes.is_empty():
+			return i
+	return -1

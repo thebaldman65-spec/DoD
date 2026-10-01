@@ -16,7 +16,7 @@
 #          (additive, multiplicative, max-merged), and the three ways a stat
 #          resolves and does not do what it says
 #       b  a condition holds several keys, and every one must hold
-#       c  `heroes_all_standing: false` does not invert
+#       c  `heroes_all_standing: false` INVERTS (HO §2 ruled it; it did not at HN)
 #       d  a card a crest grants reaches every bar, on the battle's copy
 #       e  `heroes_class_count` reads a named class and nothing else
 #   §4  ORDINATION'S COMMENT names the threshold, not five
@@ -24,11 +24,20 @@
 #
 # **EVERY FIXTURE IS PUT INTO THE LOADED TABLE AND TAKEN OUT AGAIN, AND NONE IS
 # WRITTEN TO THE FILE** (HL §6's shape; the brief: author nothing, measure). §3
-# asserts `data/runes.json` holds no crest entry, and that the table is left as
+# asserts no fixture reached `data/runes.json` (it held no crest entry at HN; the
+# two it holds since HO §3 are `check_ho`'s), and that the table is left as
 # found. **EVERY FIELD A DRIVE MEASURES ARRIVES THROUGH THE REAL DOOR** — the
 # crest's payload, stamped at the spawn — and this gate assigns none of them on
 # a unit by hand (GW §2: a gate that writes the state its assertion is about
 # cannot fail when the door breaks).
+#
+# **BATCH HO — TWO OF THE CENSUS'S ROWS WERE CLOSED BY RULING, AND THEIR ARMS ASSERT
+# WHAT THE RULINGS MADE TRUE.** §3a's replace-not-add shape is gone (a hero's config
+# carries every numeric default that is not zero, HO §0), and §3c's `false` inverts
+# (HO §2). Each arm drives what it always drove and keeps its positive arm; HEAD's
+# copies read red on HO's game at exactly these lines, which is how they were found.
+# And the file holds crest runes now (HO §3), so §3's last arm asks what it was
+# always for — that THIS gate's fixtures never reach the file.
 #
 # **EVERY NEGATIVE ANCHOR HAS ITS POSITIVE ARM** (the brief's rule): an absence
 # is asked beside the arm that shows the window held something, and a population
@@ -519,8 +528,13 @@ func _s3a_stat_fields() -> void:
 			zero_base.append(String(f2))
 	zero_base.sort()
 	print("    replace-not-add fields: %s" % [zero_base])
-	ok(zero_base.has("healing_received_mult") and zero_base.has("parry_chance"),
-		"§3a: the replace-not-add population lost its two a crest would reach for: %s" % [zero_base])
+	# BATCH HO §0 — THE POPULATION IS EMPTY BY RULING. HN printed nine here and
+	# asserted the two a crest would reach for were among them; every one is carried
+	# by a hero's config now (`BattleUnit.hero_spawn_defaults`), so a payload on any
+	# of them ADDS. The positive arm: the two HN named are carried, so the empty list
+	# is the trap closed and not a walk that read nothing (`props` is asserted above).
+	ok(zero_base.is_empty() and carried.has("healing_received_mult") and carried.has("parry_chance"),
+		"§3a: a numeric default that is not zero is not carried by every class's config — a payload there REPLACES it: %s" % [zero_base])
 
 	# (3) PLUMBING: every every-hero field arrives on all four through the crest.
 	var w: Node = await _battle(SEATS, ENG4, {"stat": EVERY_HERO.merged({"max_hp": CREST_HP, "max_hp_pct": 0.1})}, true)
@@ -608,10 +622,11 @@ func _s3a_stat_fields() -> void:
 	ok(cl_field == 12 and p2 == [12, 12, 12, 12],
 		"§3a: the Cleric at 12 beside three at 5 stamped %s (his field %d) — the best holder's figure, never the sum" % [p2, cl_field])
 
-	# (7) RESOLVES AND DOES WHAT IT DOES NOT SAY — THE ZERO-BASE TRAP. The spawn
-	# carries a healing multiplier for the Cleric alone, and a parry chance only
-	# where a lineage's stat block sets one, so on everyone else the crest's value
-	# REPLACES the default rather than adding to it.
+	# (7) THE ZERO-BASE TRAP, CLOSED AT HO §0 (ruled). At HN the spawn carried a
+	# healing multiplier for the Cleric alone, and a parry chance only where a
+	# lineage's stat block set one, so on everyone else the crest's value REPLACED
+	# the default: +0.20 healing received read 0.20 and a heal of 100 landed 20. The
+	# same drive now reads the default PLUS the crest's figure on all four.
 	# Each battle is read before the next replaces it (a changed scene frees the old).
 	var t_w: Node = await _battle(SEATS, ENG4, {"stat": {"healing_received_mult": 0.2, "parry_chance": 0.1}}, true)
 	var mult_w: Array = []
@@ -631,24 +646,24 @@ func _s3a_stat_fields() -> void:
 	var war_o: BattleUnit = _heroes(t_o)[0]
 	war_o.hp = 1
 	var healed_o := war_o.heal_amount(100)
-	var parry_replaced := 0
+	var parry_added := 0
 	var parry_sentinels := 0
 	for k2 in mini(parry_w.size(), parry_o.size()):
 		if float(parry_o[k2]) < 0.0:
 			parry_sentinels += 1
-			if is_equal_approx(float(parry_w[k2]), 0.1):
-				parry_replaced += 1
+		if is_equal_approx(float(parry_w[k2]), float(parry_o[k2]) + 0.1):
+			parry_added += 1
 	print("    healing received, with the crest's +0.20: %s (without: %s)" % [mult_w, mult_o])
-	ok(_approx(mult_o, [1.0, 1.0, 1.15, 1.0]) and _approx(mult_w, [0.2, 0.2, 1.35, 0.2]),
-		"§3a: +0.20 healing received read %s against %s — on every hero but the Cleric it should REPLACE 1.0" % [mult_w, mult_o])
+	ok(_approx(mult_o, [1.0, 1.0, 1.15, 1.0]) and _approx(mult_w, [1.2, 1.2, 1.35, 1.2]),
+		"§3a: +0.20 healing received read %s against %s — it should ADD to every hero's own" % [mult_w, mult_o])
 	print("    a heal of 100 on the Warrior lands %d with the crest, %d without" % [healed_w, healed_o])
-	print("    parry chance, with the crest's +0.10: %s (without: %s) — %d of the %d on the role baseline replaced" % [
-		parry_w, parry_o, parry_replaced, parry_sentinels])
-	ok(healed_o == 100 and healed_w == 20,
-		"§3a: a heal of 100 on the Warrior landed %d with the crest and %d without — the trap is closed, re-derive the census" % [healed_w, healed_o])
-	ok(parry_sentinels >= 1 and parry_replaced == parry_sentinels,
-		"§3a: %d of the %d heroes on the role baseline had their parry chance REPLACED by +0.10 (the baseline is %.2f)" % [
-			parry_replaced, parry_sentinels, 0.05])
+	print("    parry chance, with the crest's +0.10: %s (without: %s) — %d of 4 added to, %d still on the sentinel" % [
+		parry_w, parry_o, parry_added, parry_sentinels])
+	ok(healed_o == 100 and healed_w == 120,
+		"§3a: a heal of 100 on the Warrior landed %d with the crest and %d without — the payload replaced his healing again" % [healed_w, healed_o])
+	ok(parry_sentinels == 0 and parry_added == 4,
+		"§3a: +0.10 parry chance added to %d of the four heroes' own, and %d still carry the sentinel a payload cannot add to" % [
+			parry_added, parry_sentinels])
 
 	# (8) RESOLVES AND DOES NOTHING: a key the unit does not declare is dropped by
 	# `setup`, and a field one currency reads pays the other classes nothing.
@@ -718,10 +733,12 @@ func _s3c_all_standing_false() -> void:
 	var t_down := await _paid(SEATS, ENG4, {"heroes_all_standing": true}, 1)
 	print("    false, all standing: %d; false, the Mage fallen: %d; true, the Mage fallen: %d" % [
 		f_up["paid"], f_down["paid"], t_down["paid"]])
-	# IT DOES NOT INVERT: `false` is read as "not asked", so it pays whatever the
-	# party — the fallen Mage included, whose stamp lands before he is laid down.
-	ok(int(f_up["paid"]) == 4 and int(f_down["paid"]) == 4,
-		"§3c: `false` paid %d with all standing and %d with the Mage fallen — it now reads something" % [f_up["paid"], f_down["paid"]])
+	# BATCH HO §2 — IT INVERTS (ruled). At HN `false` was read as "not asked" and paid
+	# whatever the party: 4 and 4. The key's presence is asked apart from its value
+	# now, so `false` holds only with somebody down as the fight opens — the fallen
+	# Mage's own stamp still lands, since it lands before he is laid down.
+	ok(int(f_up["paid"]) == 0 and bool(f_up["told"]) and int(f_down["paid"]) == 4,
+		"§3c: `false` paid %d with all standing and %d with the Mage fallen — it is read as not asked again" % [f_up["paid"], f_down["paid"]])
 	# THE POSITIVE ARM: the key reads a fallen hero in its `true` form.
 	ok(int(t_down["paid"]) == 0 and bool(t_down["told"]),
 		"§3c: `true` with the Mage fallen paid %d — the key reads nothing at all" % t_down["paid"])
@@ -824,13 +841,22 @@ func _s3e_any_class() -> void:
 
 func _s3_the_file_and_the_table() -> void:
 	print("\n§3 — the fixtures stayed fixtures")
+	# BATCH HO §3 — THE FILE HOLDS CREST RUNES NOW, SO THE ARM ASKS WHAT IT WAS FOR.
+	# It read *no crest entry in the file* while the ruling was none; what it guarded
+	# is that a FIXTURE of this gate never reaches the file, and that is asked of the
+	# fixtures themselves — by id and by the name every one of them wears.
 	var authored := 0
+	var leaked: Array = []
 	var file_data: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/runes.json"))
 	for id in (file_data as Dictionary):
-		if String(((file_data as Dictionary)[id] as Dictionary).get("scope", "")) == "party":
+		var fe: Dictionary = (file_data as Dictionary)[id]
+		if String(fe.get("scope", "")) == "party":
 			authored += 1
+		if [CREST_FX, HERO_FX].has(String(id)) or String(fe.get("name", "")).begins_with("HN Fixture"):
+			leaked.append(String(id))
+	print("    crest runes in the file: %d (none at HN; the first were authored at HO §3)" % authored)
 	ok((file_data as Dictionary).size() > 100, "§3: data/runes.json read back %d entries" % (file_data as Dictionary).size())
-	ok(authored == 0, "§3: %d crest runes are authored in the file — the ruling is none" % authored)
+	ok(leaked.is_empty(), "§3: a fixture of this gate is written in the file: %s" % [leaked])
 	Runes._load().erase(CREST_FX)
 	Runes._load().erase(HERO_FX)
 	ok(not Runes.ids().has(CREST_FX) and not Runes.ids().has(HERO_FX),

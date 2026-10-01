@@ -73,7 +73,7 @@ GATES=(check_parse check_flow check_map check_cl_resolver check_cl_width
        check_fo check_fq check_fr check_fs check_ft check_fx check_gf check_gj
        check_gm check_gn check_go check_gp check_gq check_gs check_gt check_gu
        check_gv check_gw check_gx check_hc check_hd check_he check_hf
-       check_hi check_hk check_hl check_hn)
+       check_hi check_hk check_hl check_hn check_ho)
 
 [[ $# -gt 0 ]] && { SUITES=(); for a in "$@"; do SUITES+=("test_batch_$a"); done }
 
@@ -179,6 +179,14 @@ TMO[check_fx]=720
 # it inside §1, so it gets its own bound at about twice the measurement, the way
 # `check_fx` and `check_map` got theirs.
 TMO[check_gv]=1200
+# BATCH HO — `check_gp` WALKS TWO WHOLE RUNS ON THE REAL SCREENS, AND ITS ROAD GREW
+# TO WITHIN SECONDS OF THE DEFAULT BOUND. It read 223.7 s at HL; with two more runes
+# in every offer its seeded roads run longer, and at HO it read 233.5 s standing
+# alone and 229.5 s beside another lane — six seconds under 240, which a loaded
+# machine would turn into a TIMED OUT that reads like a hang. It gets its own bound
+# at about twice the measurement, the way `check_fx` and `check_gv` got theirs; the
+# road is not shortened.
+TMO[check_gp]=480
 # BATCH DE — `TMO[test_batch_cd]=2400` IS GONE AND SO IS THE REASON FOR IT.
 # DD gave that suite a 2400s bound because its §1 spawned forty-five child
 # Godots — it ran the battery inside the battery, about 22 minutes of a run

@@ -108,7 +108,7 @@ into this file changes it.
 the equality rule travel with their parent. **Eight of the rows are FF §2's**, and they are the
 residue: rules written into this file AFTER the seam was taken, which the seam's own test puts on
 the other side of it. **Every row after those eight was written straight into the reference rather
-than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, and GZ §6's as HA §5 recorded it:
+than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, and HO's two:
 
 | | |
 |---|---|
@@ -150,6 +150,8 @@ than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, and GZ �
 | AN END-STATE CENSUS CANNOT SEE WHAT A TARGET PUTS BACK | FI §1 |
 | A TARGET CUT OFF BY A FRAME BUDGET IS INDISTINGUISHABLE FROM ONE THAT PRINTS NO VERDICT | FR §5a / FS §1 |
 | A CEILING IS A NUMBER WITH AN ANSWER BEHIND IT | GZ §6 / HA §5 |
+| A BATCH CLEARS THE PREVIOUS BATCH'S ISOLATED COPIES WHEN IT FINISHES | HO §5 |
+| AN INSTRUMENT PUTS A RUNE DOWN THROUGH `Run.hold_rune`, AND A SCOPE WALK NAMES EVERY BAND | HO §1 |
 
 ## THE COMBAT RULES LIVE IN `docs/combat-rules.md` (STANDING, SET AT GR §2, RULED BY THE DESIGNER)
 > **THIS FILE IS STILL THE ONE A BATCH MUST READ. `docs/combat-rules.md` IS A REFERENCE IT POINTS AT,
@@ -1244,6 +1246,24 @@ places** — the cap on the count, the release branch, and Communion's "still bu
   ABSORB magnitude, a different constant reverted in the same batch. **When a batch reverts two
   constants at once, sweep them as two sweeps**, or the one with fewer surfaces looks finished
   because the other one was.
+
+## CARD TEXT AND COMMENTS DO NOT NAME A MAGNITUDE A CONSTANT HOLDS (STANDING, SET AT HO §0, RULED BY THE DESIGNER)
+> **CARD TEXT AND COMMENTS DO NOT NAME A MAGNITUDE A CONSTANT HOLDS.** Say it relative to the rule —
+> *reaches the cap*, *the threshold* — or say it not at all. **DJ §3's principle: fewer copies, not a
+> better number.**
+
+- **DF §1's RULE ABOVE SAYS TO SWEEP THE NUMBER WHEN A CONSTANT MOVES; THIS ONE SAYS NOT TO WRITE IT, SO THERE IS
+  NOTHING TO SWEEP.** It was ruled on the fourth kind of text one threshold move left stale: a card, the comments on
+  two handlers, and two rows of `docs/master.html` each went on speaking `FAITH_RELEASE`'s old figure.
+- **THE WORKED EXAMPLE IS ELEVATION'S CARD**: *"An ally who reaches the cap with it RELEASES on the spot"*, chosen over
+  *"within two stacks of the threshold"*, which still spoke the GRANT. It survives a move of the threshold and a move
+  of the grant alike. `check_ho` §7 holds the card's words and asserts the only figure in them is its own.
+- **A CARD STILL STATES ITS OWN EFFECT, AND THAT READING IS THE DESIGNER'S TO CONFIRM.** The ruled words say *gains 2
+  stacks*, the figure `ELEVATION_STACKS` holds: the rule is read as binding a text that speaks ANOTHER rule's number —
+  a cap, a threshold, a rate — never as forbidding a card its own payout, which the text standard has rendered since CL.
+- **IT IS FORWARD-LOOKING, AND WHAT ALREADY NAMES ONE IS A CENSUS, NOT A SWEEP A BATCH TAKES ON ITS OWN.** A comment is
+  an asserted surface, so each is repaired with its literal sweep, in the batch that touches its subject
+  (`docs/state.md` carries the ones found).
 
 ## A PURE BUFF COSTS HALF A SWING (STANDING, SET AT BATCH CY §1)
 > **A pure buff's initiative delay is capped at HALF the basic attack's delay. Setting up costs
@@ -2931,7 +2951,7 @@ runes have always carried their own.
   carries, because a branch still reading `spec:` is a scope read as a spec after the data stopped being one.
   `test_runes` holds the data to the two bands, so a `spec:` entry reds rather than rolling for nobody. **And a third
   scope is ruled beside them at HK §4: `party`, the CREST's**, which passes for every hero because it names no class
-  (the block *THE PARTY SCOPE IS BUILT AND HOLDS NO RUNE* below); no entry carries it.
+  (the block *THE PARTY SCOPE, AND THE TWO RUNES IT HOLDS* below); two entries carry it.
 - **NO SURFACE SHOWS A SCOPE BAND (HE §4, ruled by the designer).** From HC every rune a hero could be offered read
   `[Class]` — a hero sees only his class's runes, so the band was on every rune and told nobody anything. The word is
   gone from the Peddler's row and a cache's button, the band's tint from those and the three surfaces that tinted a
@@ -3540,12 +3560,44 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
   screen every resumed run lands on, whose opening chain ends at the full-bag panel.
 - **`check_hk` DRIVES ALL OF IT, A WHOLE RUN ON THE REAL SCREENS AMONG IT** — a static check cannot see a drop.
 
-## STANDING RULE — THE PARTY SCOPE IS BUILT AND HOLDS NO RUNE; ITS SCREEN WORD IS THE CREST (Batch HK §4, ruled by the designer; the word confirmed in HL's brief)
+## STANDING RULE — THE PARTY SCOPE, AND THE TWO RUNES IT HOLDS; ITS SCREEN WORD IS THE CREST (Batch HK §4, ruled by the designer; the word confirmed in HL's brief; the runes HO §3's)
 
 > **A rune scoped `party` is class-neutral and reaches every hero at once. It is worn in a slot of its own, the
 > CREST, which takes no hero's slot — ONE slot, `Run.PARTY_RUNE_SLOTS`, the one constant every reader asks, so raising
-> it is one edit. None is authored: the scope, the slot, the drop, the bag, the Peddler and the display all run over
-> zero of them.**
+> it is one edit.**
+
+- **TWO ARE AUTHORED, AND EACH PAYS THROUGH A RULE THAT ALREADY READS THE FOUR (HO §3, the designer's; HL §4's test).**
+  *Tithe*: every hero's Break damage heals whoever of the four is lowest. *Fellowship*: at the start of each hero's
+  turn a debuff is cleared from an ally. Neither carries a condition. **EACH WRITES THE `rune_` HALF OF A COUNTER THE
+  ONE TREE WRITES, SUMMED AT THE NODE'S OWN SITE** (`rune_blood_communion`, `rune_field_medic`): EM's charter binds a
+  crest rune as it binds any rune, so HN's census says what a crest CAN put on all four and the charter says what it
+  MAY write. Both magnitudes are PROPOSED (`docs/state.md`). HK built the scope, the slot and every door over none.
+- **A CONDITION ON THE FOUR IS AUTHORED AGAINST WHAT A RUN CAN REACH, AND A RUN REACHES LESS THAN THE KEYS CAN SAY
+  (HO §3; `check_ho` §2 holds both facts).** The draft seats exactly one of each class — four picks from a roster of
+  four — and a hero who falls in a fight that is WON stands again when it ends. **So every fight a run played forward
+  opens has one Warrior, one Mage, one Cleric and one Hunter, all standing**: `heroes_include_class` and
+  `heroes_all_standing: true` always hold, `heroes_lack_class`, `heroes_all_standing: false` and any
+  `heroes_class_count` but one never do, and `heroes_hold_core` is the one key a drafted party answers either way.
+  **THE ONE STATE THE OTHERS HOLD IN IS A FIGHT QUIT AFTER A HERO FELL AND RESUMED (GH)** — so a rune on one of them
+  pays a quitter and nobody else. Three crest runes specified at HO (*Empty Pulpit*, *Cold Hearth*, *Gravesong*) are
+  NOT AUTHORED for that reason — FK §7's *do not ship it and do not re-aim it* — and the gate reds, saying they are
+  authorable, the day the roster grows or the fallen stay down. **A flat-priced rune with a condition is also FN's
+  ruling above, which HL's keys were built past and nothing has reconciled**: the designer's, before one is authored.
+- **A HOLE IN THE FOUR IS PAID IN A STAT ONLY WHERE A STAT STANDS IN FOR THE CLASS (HO §3d, the designer's).** *No
+  Cleric* pays mitigation for the healing that is missing and *no Mage* pays damage for the burst, a family of two by
+  intent. **A *no Warrior* and a *no Hunter* crest were designed and CUT, and are not re-proposed**: a Warrior tanks by
+  being targeted and a Hunter works through marks, Focus and companions, so neither hole has a stat that substitutes
+  for it, and a number standing in for a mechanic is a rune that reads nothing.
+- **A RUNE THAT READS WHO STANDS SAYS WHEN IT READ IT (HO §2, ruled)** — *as the fight opens*, *enter a fight*.
+  `heroes_all_standing` reads its VALUE (`false`: somebody is down at the opening; the key absent is not asked), once,
+  at the spawn, and a hero raised inside the fight does not switch it: a Revive Potion and Resurrection both reach
+  `BattleUnit.revive()`. **That is accepted, and only because the rune's words say when.** `check_ho` §2d asks every
+  rune that carries the key.
+- **IT WEARS NO MARKER ON ITS NAME (HO §3f, PROPOSED as the brief proposed it), AND EVERY SURFACE THAT OFFERS IT IN ONE
+  HERO'S NAME SAYS WHOSE IT IS.** A roll asks a hero, so a crest rune reaches the Peddler's counter in somebody's row,
+  a cache in somebody's triple and an event in somebody's hands: each asks `Run.rune_for_label` (*for the crest*), the
+  door the victory card, the full-bag panel and the Sell rows already asked, and a crest rune worn at a cache's pick is
+  announced. **A new surface that offers a rune rolled against a hero asks that door** (`check_ho` §1).
 
 - **"PARTY" IS RETIRED FROM PLAYER-FACING TEXT, SO THE SCOPE KEEPS ITS NAME IN CODE AND THE SCREENS SAY *CREST*** (the
   designer's word, confirmed in HL's brief). The scope string `party` is an identifier, as the event
@@ -3561,22 +3613,27 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
   a core rune carried, all standing at the opening), ONCE at the spawn, counting the heroes who stand then — **the
   standing reading CONFIRMED at HN §2 (the designer's)**: the roster reading would make `heroes_all_standing`
   meaningless and turn every key into a recruitment choice made once, so a fallen hero switching a conditioned crest
-  off until he is revived is chosen, not overlooked. **Whether all
+  off until he is revived is chosen, not overlooked — *and no such hero exists between fights: a won fight raises him
+  (the bullet above), so what the ruling decides is what a RESUMED fight opens with*. **Whether all
   four are alive LATER is not built**: a stamped payload cannot come off a hero mid-fight, and a stamp that turns false
   by turn six would be a lie. The rune the roll call names says when its condition does not hold.
 - **WHAT A CREST PAYLOAD CAN WRITE IS HN §3's CENSUS (`docs/reports/HN.md` §3), AND A CREST RUNE IS AUTHORED AGAINST
-  IT.** A `stat` payload adds its value into the spawn's config under ANY key and checks none, so three shapes do not do
-  what a stat says: **a key the unit does not declare is DROPPED** in silence; **a key the config does not carry STARTS
-  FROM ZERO**, so on a field whose default is not zero the payload REPLACES the default — healing received on every hero
-  but the Cleric, parry chance on a hero with no base of his own; and **a party-wide stamp takes the best holder's
-  figure ONCE** (We Do Not Break, Heal More When Low), so four copies pay one. A condition's keys are ANDed and one key
-  cannot appear twice; `heroes_all_standing: false` is read as not asked; `heroes_class_count` reads a named class. A
-  card a crest grants lands on the battle's copy of every hero, every fight, priced in his own resource. `check_hn` §3
-  drives each.
+  IT.** A `stat` payload adds its value into the spawn's config under ANY key and checks none, so two shapes do not do
+  what a stat says: **a key the unit does not declare is DROPPED** in silence, and **a party-wide stamp takes the best
+  holder's figure ONCE** (We Do Not Break, Heal More When Low), so four copies pay one. **THE THIRD IS CLOSED (HO §0,
+  ruled): A PAYLOAD ADDS TO A DEFAULT IT USED TO REPLACE.** A hero's config carries every numeric default the unit
+  declares that is not zero, before any payload — `BattleUnit.hero_spawn_defaults`, DERIVED off the declarations and
+  handed over in `Classes.hero_config`, never a second list, so a field declared later is carried by doing nothing;
+  Holy Conduit ADDS its share where it set the total; and the parry sentinel is carried as the hero's baseline. **A
+  field the spawn re-derives after the payloads is still overwritten** — a second resource's ceiling for the hero
+  whose core rune installs one, health, a battle modifier's multiplier while one is armed. A condition's keys are ANDed
+  and one key cannot appear twice; `heroes_class_count` reads a named class. A card a crest grants lands on the
+  battle's copy of every hero, every fight, priced in his own resource. `check_hn` §3 and `check_ho` §4 drive each.
 - **IT IS OFFERED THROUGH EVERY ROLL, TO ONE HERO AT A TIME.** `Runes._scope_ok` passes it for every hero, so the drop's
   union holds it once and the Peddler excludes what is already on his counter, lest two heroes be offered one rune.
-- **`check_hk` §4 BUILDS ONE IN THE FIXTURE AND NEVER IN THE FILE** (GK's empty engine slots, GO's filling them),
-  asserted both ways: no `party` entry in `data/runes.json`, and every door live over the fixture's.
+  No gate withholds one and no roll reads its condition, so a crest rune is offered to a party it cannot pay.
+- **`check_hk` §4 DRIVES EVERY DOOR WITH A FIXTURE, NEVER WRITTEN TO THE FILE** (GK's empty engine slots, GO's filling
+  them), **AND `check_ho` §1 DRIVES THE SAME DOORS WITH THE TWO THE FILE HOLDS, ON THE REAL SCREENS.**
 
 ## STANDING RULE — LOYALTY IS GOVERNED BY A CONVERSION, NEVER BY A CEILING (Batch ER, ruled by the designer)
 > **The designer has ruled that Loyalty does NOT flatten. Above nominal the meter CONVERTS: each
@@ -3974,7 +4031,7 @@ name would be the failure worth catching, so `check_fd` §1f asserts the three s
 same breath as the removal. `run_sim` never bought one, so no measured figure moves.
 
 ## STANDING RULE — A RUNE THAT READS AN ENGINE IS OFFERED ONLY WHILE THAT ENGINE IS EQUIPPED (Batch GV)
-> **GP's card gate, one layer over. `Runes.ENGINE_READ` is the table — forty-two of the seventy-five live ordinary runes (GV's
+> **GP's card gate, one layer over. `Runes.ENGINE_READ` is the table — forty-two of the seventy-seven live ordinary runes (GV's
 > thirty-five, HC §2's Layered Aegis and HE §1's RULED rows less Long Poison, un-gated at HF §6), an engine and a `why` apiece — and `Runes.offerable` is the one answer: `Runes.eligible_ids` asks it at every roll (the
 > Peddler, the elite cache, the bargain, the event verb) and `Run.rune_choice` at a queued offer's answer.** *Since HB
 > it also withholds a rune that needs a companion from a hero who has dismissed the pet (`Runes.COMPANION_READ`).*
@@ -4693,7 +4750,10 @@ wrong, and both were caught by gates that already existed.
   a floor on the retired side proving the shape is really theirs. **A NAME A BRIEF WRITES IN THE LONG SHAPE SHIPS
   BARE** — FK's thirty-nine, and HN's *Rune of Forbearance* as `Forbearance`, the one-word register of `Clarity` and
   `Abundance` — unless the designer rules the long shape for that rune, which is a line in `check_fd` §3 as well as
-  the data.
+  the data. **FORBEARANCE BARE IS CONFIRMED (HO §0), AND ITS LONG SHAPE WAS THE BRIEF'S ERROR, NEVER AN OPTION WEIGHED
+  AND REJECTED**: the game never held *Rune of Forbearance* — the rune had been `Fourth Stack` since FK — so nothing
+  was reversed, and the confirmation is no ruling against the long shape. **A CREST RUNE IS BARE-NAMED TOO**:
+  `check_fd` §3 walks every id and reads no scope, so the `party` scope is inside it by construction.
 · **THE TWO INTERACT, AND FK'S FIX WAS ONE EDIT.** Bare-naming thirty-nine runes authored as
   *"Rune of the X"* turned §3 green AND removed four duplicate names at a stroke — under the pool's
   own convention the brief's *"a retired name is free"* becomes TRUE. **It forced exactly one

@@ -278,15 +278,29 @@ func _s3_the_event_verb() -> void:
 		"§3: a Cleric holding no engine was granted %d ordinary runes of 20 — HF's five read no engine, so the verb prefers one" % c_ordinary)
 	var cm := {"key": "cleric", "spec": "", "runes": [], "bm_abilities": [], "engines": [],
 		"awakened": true}
+	# **BATCH HO §3 — EVERY RUNE IS PUT DOWN WHERE THE GAME PUTS IT, AND THE FLOOR
+	# COUNTS HIS CLASS'S OWN.** The Cleric is offered the crest's two beside his
+	# class's five now, and a crest rune is never on a hero: it is worn in the crest
+	# or waits in the bag. Seating all seven on his own list built a state no run
+	# reaches, and let `>= 5` pass on three class runes. Each goes through
+	# `Run.hold_rune`, the door every taken rune is put down at, and what he owns is
+	# what the verb itself reads: his list and everything the party holds.
+	var cm_class := 0
 	for e in Runes.eligible_ids(cm, []):
-		if not Runes.is_engine_rune(String(e)):
-			(cm["runes"] as Array).append(Runes.build(String(e)))
-	# What he owns is passed by name, as the verb itself passes it (`grant_rune`).
-	var cm_owned: Array = (cm["runes"] as Array).map(func(r): return String(r["name"]))
-	ok(cm_owned.size() >= 5
+		if Runes.is_engine_rune(String(e)):
+			continue
+		var put: Dictionary = Runes.build(String(e))
+		put["equipped"] = true
+		_run.hold_rune(cm, put)
+		if Runes.rune_class(put) == "cleric":
+			cm_class += 1
+	var cm_owned: Array = Runes.owned_names(cm, _run.party_rune_names())
+	ok(not (cm["runes"] as Array).any(func(r): return Runes.is_party_rune(r)),
+		"§3: a crest rune was put down on the Cleric's own list — `hold_rune` sends one to the crest or the bag")
+	ok(cm_class >= 5
 			and Runes.eligible_ids(cm, cm_owned).all(func(i): return Runes.is_engine_rune(String(i))),
-		"§3: the Cleric carrying every ordinary rune he could be offered (%d) is still eligible for an ordinary one (%s)" % [
-			cm_owned.size(), Runes.eligible_ids(cm, cm_owned).filter(func(i): return not Runes.is_engine_rune(String(i)))])
+		"§3: the Cleric carrying every ordinary rune he could be offered (%d of his class's, %d held in all) is still eligible for an ordinary one (%s)" % [
+			cm_class, cm_owned.size(), Runes.eligible_ids(cm, cm_owned).filter(func(i): return not Runes.is_engine_rune(String(i)))])
 	var c_engine := 0
 	for _j in 20:
 		var g2: Dictionary = _run.grant_rune(cm)
@@ -294,8 +308,11 @@ func _s3_the_event_verb() -> void:
 			c_engine += 1
 	ok(c_engine == 20,
 		"§3: a Cleric holding no engine — no ordinary rune eligible — was granted %d runes of 20; the fall-back stopped paying" % c_engine)
-	print("    a no-engine Warrior: %d ordinary of 60; a no-engine Cleric: %d ordinary of 20, and carrying his %d: %d engine runes of 20" % [
-		ordinary, c_ordinary, (cm["runes"] as Array).size(), c_engine])
+	print("    a no-engine Warrior: %d ordinary of 60; a no-engine Cleric: %d ordinary of 20, and holding his class's %d and the crest's %d: %d engine runes of 20" % [
+		ordinary, c_ordinary, cm_class, cm_owned.size() - cm_class, c_engine])
+	# The stand-in's runes leave the run with him: nothing below reads the bag or the crest.
+	_run.rune_bag = []
+	_run.party_runes = []
 
 
 # ── §4 — THE PITY METER COUNTS CASTS ────────────────────────────────────────

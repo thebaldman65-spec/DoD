@@ -4,6 +4,95 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The supply route, the trap, and the first crest runes (Batch HO) — 2026-09-30
+
+**Why card text and comments do not name a number a constant holds.** One move of Faith's threshold left four kinds of
+text speaking the old figure: a card, two handlers' comments, and two rows of the Master Document. The older rule said
+to sweep for the number whenever a constant moves, and that sweep keeps missing a copy. The cheaper
+rule is to not write the number: a text that says *reaches the cap* is still true after the cap moves. Elevation's card
+was the worked case, and its ruled words were chosen over *within two stacks of the threshold* because that wording
+still spoke the grant. A card does still state its own effect — *gains 2 stacks* — and this batch reads the rule as
+binding a text that quotes another rule's number; that reading is the designer's to confirm.
+
+**Why the trap was closed by having every hero carry his starting values.** A rune, a talent and a crest all work the
+same way: they add their figure into the hero's config before the fight builds him. Adding to a value that is not there
+leaves only the figure, so a healing bonus became the hero's whole healing. There were three places to mend it — every
+effect, the adding function, or the config — and the config is the one that mends all of them at once and needs no list:
+the starting values are read off the unit's own declarations, so a stat declared later is carried by doing nothing.
+A hand-kept list would have been a second copy of the unit, and it would have gone stale the day a stat was added. Holy
+Conduit adds its share for the same reason. Parry is the one stat whose "starting value" was a sentinel meaning *use
+the baseline*; the hero's config now carries the baseline itself, and the result is floored at nothing, because a price
+that took it below zero would have read as the sentinel again and handed the baseline back.
+
+**Why the saved-run change is reported as a magnitude.** Closing the trap makes two retired runes pay what their words
+say where they had been stopping all healing. That is a repair, and it is also a number moving on a run somebody may
+hold, so it is written down with its arithmetic rather than left inside a refactor. It was measured on a save carrying
+each rune, on the old code and the new.
+
+**Why no supply route was built.** A crest rune belongs to no class, and the fear was that every roll asks for a class
+and so none would ever offer one. They do not ask for a class; they ask whether the rune's scope admits the hero, and
+the Crest's scope admits every hero. So every door offered one already. What was missing was small and was about words:
+a roll asks one hero at a time, so the screen that shows the roll named that hero.
+
+**Why a crest rune wears no marker and its surfaces say whose it is instead.** A core rune wears *(core)* because it
+sits in a list of ordinary runes and changes what the hero is. A crest rune is met either in the slot the screen already
+calls the Crest, or in a row that now says *for the crest* — and a marker on the name would say the same thing a third
+time. The words that needed adding were the ones at the moment of choice: a row in one hero's name offering something
+that hero will not wear.
+
+**Why *every hero standing: false* reads its value, and why a rune using it must say when.** A condition nobody can
+write the negative of is half a condition. It is read once, as the fight opens, because a crest's effect is stamped on
+the heroes at that moment and cannot be taken off mid-fight; so a hero raised during the fight leaves it as it was. That
+is only fair to the player if the rune's words say when it looked.
+
+**Why Tithe and Fellowship write counters of their own.** Each pays through a rule the talent tree already has, and the
+simplest build would have been to write the talent's own number. The rune charter forbids exactly that — a rune's
+figure sits beside the talent's and the two are summed where they are read — because a rune that writes a talent's
+counter is invisible to everything that checks the two layers apart, and the log cannot say which of them paid.
+
+**Why Tithe is proposed at 30%.** Its brief asked for the number to be found, not assumed: a tithe that heals 2 is
+flavour, and one that heals a third of a bar is the only card anybody wants. Measured, a third of a bar a round is out
+of reach at any percentage — the rule it pays through sees about 41 Break a round, not the 47 to 69 the heroes deal —
+and *heals 2* is what about 12% does. Between those, 20% could not be seen in how often heroes fall, 40% more than
+halved it, and 30% moved it by about a third while changing nothing about how long a fight lasts. It is a first guess
+made on a party with no talents at the middle difficulty, with the rune worn from the first fight, which flatters it.
+
+**Why Tithe does not pay on all the Break damage the heroes deal.** It pays through the talent's rule, which reads an
+ordinary blow as it lands. Break from a card's own effect, a trap, a companion and the Long Watch's carry are dealt by
+other routes that never pass that line, and a blow into an enemy already Broken applies none. Widening it is a
+magnitude change on a talent every class can buy, so it is the designer's, and until then the rune's words promise a
+little more than the rule pays. The Master Document says exactly what is read.
+
+**Why Fellowship ships at 1 although it clears almost everything.** One is the smallest the rune can be: each hero,
+each turn, one debuff. The supply is thirteen times what enemies apply, so the number is not the lever — at 1 it
+already clears 96% — and the brief said not to raise it. It ships because what it removes is small in ordinary fights,
+and it is flagged because of what it switches off: the Cleric's own cleanse has nothing left to do, and an enemy that
+is ever given a stun would find it cleared before it bit.
+
+**Why three of the five crest runes were not authored.** Each pays only when a class is missing from the heroes or a
+hero is down as a fight opens. The draft always seats one of each class, and a won fight raises the fallen, so a run
+played forward never opens a fight in either state; the only way in is to quit a fight after a hero falls and resume
+it. A rune that ships and cannot pay is worse than none, and one that pays only for quitting is worse than that. The
+standing answer to a rune like this is to report it, price what would make it real, and let the designer choose — not
+to ship it and not to bend it into something else.
+
+**Why the no-Warrior and no-Hunter crests were cut.** The designer's reasoning, recorded so they are not proposed
+again: a missing Cleric can be paid in mitigation and a missing Mage in damage, because healing and burst are things a
+number can stand in for. A Warrior tanks by being the one enemies aim at, and a Hunter works through marks, Focus and
+companions; neither hole has a stat that substitutes for it, and a number standing in for a mechanic is a rune that
+reads nothing about the heroes at all.
+
+**Why the blacksmith test buys a pairing that can answer its question.** The test bought whatever the counter put
+first and then asked whether that kind of upgrade could still be offered on another card. For the one kind that fits a
+single card there is no other card, so about one run in fifty-four it failed without anything being wrong. Fixing the
+dice would have kept it green and blind; widening what it accepts would have stopped it asking. Buying the first
+pairing the question can be asked of keeps the question and removes the accident.
+
+**Why a batch clears the last batch's test copies and not its own.** Each isolated copy leaves a folder beside the
+player's saves, and nothing ever removed one. A batch's own copies are what it would go back to if something it shipped
+looked wrong the next day, so they stay one batch; the one before that has no such use. Clearing is a move to the
+Trash, so it can be undone.
+
 ## The ceiling, seven rulings, and what a crest payload can write (Batch HN) — 2026-09-29
 
 **Why the ceiling moved a third time, and why a fourth is not the answer.** `CLAUDE.md`'s ceiling exists because every

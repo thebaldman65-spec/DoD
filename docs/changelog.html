@@ -16,6 +16,169 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-09-30 &mdash; Batch HO: THE SUPPLY ROUTE, THE TRAP, AND THE FIRST CREST RUNES</h2>
+<p><b>Two crest runes exist &mdash; <i>Tithe</i> and <i>Fellowship</i> &mdash; and they reach the player through every door a rune
+already comes through; nothing had to be built for that, but three screens offered one in a single hero's name and now say
+it is for the crest. Three more crest runes were specified and are not in the game, because in a run played forward none of
+the three could ever pay. The trap HN's census found is closed: an effect that adds to a stat now adds to it, where it
+used to replace it. Elevation's card carries the ruled words.</b> Full working, and the rulings this batch needs:
+<code>docs/reports/HO.md</code>.</p>
+
+<p><b>&sect;0 &mdash; HN'S THREE RULINGS.</b> <b>Forbearance keeps its bare name.</b> The long form, <i>Rune of Forbearance</i>, was an
+error in HN's brief and never an option that was weighed and turned down: the game has not held that name at any point, so
+nothing was reversed. <b>Elevation's card reads as ruled</b>: <i>&ldquo;Raise them up: every ally gains 2 stacks of Faith. An ally
+who reaches the cap with it RELEASES on the spot &mdash; and their peak does not fall for it.&rdquo;</i> The comments on its handler
+say it the same way, and <b>a standing rule is recorded from it: card text and comments do not name a magnitude a constant
+holds</b> &mdash; they say it relative to the rule (<i>reaches the cap</i>, <i>the threshold</i>) or not at all, so the next time a
+number moves there is no second copy of it left behind. <b>And the replace-not-add trap is closed.</b> Every hero now opens a
+fight carrying each of his stats' starting values before any rune, talent or crest is applied. So an effect that adds 20%
+healing received gives a Warrior 120% where it used to leave him 20%; the Cleric's Holy Conduit adds its 15% to whatever
+he has (135% under that same effect) where it used to set the total; and a hero's parry chance starts from his own
+baseline &mdash; 5%, or the Swordmaster's 12% &mdash; before anything adds to it. Eighteen stats have a starting value that is not
+zero; the heroes already carried seven and now carry all eighteen, read off the unit's own list so that one added later
+is carried without anybody remembering to. Nothing in the live game wrote one of the eleven that were missing, so no live
+number moved.</p>
+
+<p><b>What it changes on a saved run &mdash; one magnitude, in two runes.</b> Four retired runes change healing received, and a saved
+run can still be wearing one. Two of them were broken by the trap. The <i>Vampiric Rune</i> (<i>&ldquo;heals received are 30%
+weaker&rdquo;</i>) on a Warrior, a Mage or a Hunter replaced the hero's 100% with &minus;30%, which the game reads as no healing at
+all, and the <i>Rune of the Killing Cold</i> (<i>&ldquo;25% weaker&rdquo;</i>, a Mage's) did the same with &minus;25%. Measured on a save
+carrying each, before and after: a heal of 40 landed 0. It now lands 28 under the Vampiric Rune (100% &minus; 30% = 70%) and 30
+under the Killing Cold (100% &minus; 25% = 75%), which is what each rune's words have always said. The other two are the
+Cleric's, whose Holy Conduit had already given him a value to add to, and they read as they did: the Hollow Chalice 85%
+(115% &minus; 30%) and the Martyr 130% (115% + 15%), and a Cleric wearing the Vampiric Rune 85%. The player's own save holds
+none of the four.</p>
+
+<p><b>&sect;1 &mdash; HOW A CREST RUNE REACHES THE PLAYER.</b> <b>Every door already offered one, so nothing was built and the
+authoring below was not held up.</b> A crest rune belongs to no class, and the one test every roll applies passes it for every
+hero. So it drops after a normal fight (it is one rune among everything the four could be offered, counted once); the
+Peddler can have it on his counter, once, whichever hero it was rolled against; an elite's cache and a bargain's rune
+reward can hold it; and the event that grants a rune can grant it. Taken, it is worn in the Crest when that was asked for
+and the Crest is free, and otherwise goes into the bag &mdash; it never sits on a hero. <b>What was wrong was the words.</b> Each
+of those rolls asks one hero at a time, so three screens offered a crest rune in that hero's name: the Peddler's row said
+<i>(for Warrior 1)</i>, a cache's button gave the bare name among that hero's three, and the event's line named the hero
+who took it. <b>Each now says <i>for the crest</i></b>, as the victory card, the full-bag panel and the Peddler's sell rows
+already did; and a crest rune picked from a cache with the Crest empty is worn at once and the map says so &mdash;
+<i>&ldquo;Tithe fills the crest &mdash; every hero wears it.&rdquo;</i> (proposed words). The simulation's own shop, which keeps a
+counter of its own, could stock one crest rune for several heroes; it stocks it once.</p>
+
+<p><b>&sect;2 &mdash; <i>EVERY HERO STANDING: FALSE</i> MEANS SOMETHING NOW.</b> HN found that a crest condition written that way was
+ignored. It now means <i>a hero is down as the fight opens</i>, and <i>true</i> still means all four stand. It is read once, as
+the fight opens, and a hero raised during the fight does not switch it &mdash; accepted only because a rune that uses it
+must say when, in its own words: <i>as the fight opens</i>, <i>enter a fight</i>. Driven both ways against a party of four
+standing and a party with one down. No rune in the game uses it (&sect;3).</p>
+
+<p><b>&sect;3 &mdash; THE CREST RUNES: TWO AUTHORED, THREE NOT.</b> <b><i>Tithe</i></b>: <i>&ldquo;Every hero's Break damage heals whoever among
+the four is lowest, for 30% of its value.&rdquo;</i> <b><i>Fellowship</i></b>: <i>&ldquo;At the start of each hero's turn, he clears one
+debuff from an ally.&rdquo;</i> Each costs 150 gold like every rune, belongs to no class, wears no marker on its name (proposed,
+as the brief proposed) and is one entry among the rest wherever a rune is rolled. Each pays through the rule a talent
+already uses &mdash; <i>Breaking Heals a Hero</i> and <i>Cleanse Debuffs Each Turn</i> &mdash; and is added to it for a hero who has
+both. <b>The brief expected no new code for that, and there is some</b>: a rune may not write a talent's own counter (the rune
+charter, EM), so each writes a counter of its own that is summed where the talent's is read, and the combat log names the
+rune when the rune is what paid.</p>
+
+<p><b>Tithe's number was measured before it was chosen, and it is proposed, not settled.</b> In normal fights in the second zone
+(difficulty 2, no talents), a party with no Break specialist books about 47 Break damage a round, and a party whose
+Warrior runs the Break lane &mdash; the Long Watch and Bared Plate runes, which is what the measurement found that lane to
+be &mdash; about 69. <b>Tithe pays on less than either, and the same for both</b>: about 41 a round, because it reads only the
+Break an ordinary blow applies as it lands &mdash; none into an enemy already Broken, and nothing for Break dealt by a card's
+own effect, a trap, a companion or the Long Watch's carry onto a second enemy. At 30% that is about 12 health a round to
+the lowest hero, about 6% of that hero's health bar, and a little over 90 health a fight. With it worn from the first fight,
+heroes fell 0.38 times a normal fight in the first zone where they fell 0.54 without it, and ended those fights at 83% of
+their health where they ended at 72%; fights did not get shorter or longer. 20% was too small to see in deaths (0.50) and
+40% cut them by more than half (0.23). About half of what it heals replaces healing the Cleric or a potion would have
+done. A hero who already has the talent's 20% gains less from the rune than these figures say.</p>
+
+<p><b>Fellowship ships at 1, and at 1 it is not too strong as power and is total as coverage.</b> Enemies land about 0.3 debuffs
+on the heroes a round; four heroes each clearing one a turn is thirteen times that. So with Fellowship 96% of every debuff
+that lands is cleared, 99% of them before the hero carrying it next acts. In ordinary fights what that removes is small
+&mdash; about 2% of the damage the heroes take, and under half an action a fight spent Crippled &mdash; and no outcome moved
+outside its error: damage taken, deaths, or how long fights last. It matters most against the Withered Warden, whose area
+poison is about an eighth of that fight's damage. <b>What it costs elsewhere</b>: the Cleric's Unburden has almost nothing left
+to lift (0.45 casts a fight falls to 0.01), and the Returned Burden rune is starved with it; beside the talent that
+cleanses twice a turn the rune adds nothing at all; and an enemy effect authored later that stuns or freezes a hero would
+be cleared before it cost him his turn about nineteen times in twenty &mdash; none can reach a hero today. The two builds the design
+conversation expected it to press on, the Occultist's Madness and the Hunter's breadth, count debuffs on <i>enemies</i> and
+do not feel it.</p>
+
+<p><b>The three that were not authored</b> are <i>Empty Pulpit</i> (no Cleric among the heroes: 12% less damage taken),
+<i>Cold Hearth</i> (no Mage: 12% more damage) and <i>Gravesong</i> (enter a fight with a hero down: 25% more damage).
+<b>None of the three could pay in any fight a run played forward opens.</b> The draft seats exactly one Warrior, one Mage, one
+Cleric and one Hunter &mdash; four picks from a roster of four &mdash; and a hero who falls in a fight that is won stands again,
+at a fifth of his health, when it ends. The one state in which each would pay is a fight quit after a hero fell and then
+resumed, so each would pay a player for quitting and nobody else. A rune that ships and cannot pay is worse than one that
+does not ship, and a batch may not re-aim a rune on its own judgment, so the three are held back: what each would pay is
+measured (12% less damage taken is about a sixth of what a Cleric supplies), and what it would take to make each one real
+is priced in the report for a ruling. Both reasons are held as checks that go red, saying the runes can be authored, the
+day the roster grows or the fallen stay down. The no-Warrior and no-Hunter crests were cut in the brief, and the reason is
+recorded with these: the same draft rules them out.</p>
+
+<p><b>The names.</b> All five were swept against every name the game holds &mdash; 1,019 of them: abilities, enemies and their
+abilities, glossary terms, items, talents, relics, runes (retired ones included), statuses and tags &mdash; with a near-miss
+counted as a hit. <i>Fellowship</i> and <i>Empty Pulpit</i> meet nothing. <i>Tithe</i> meets the relic <i>Tithing Scales</i>,
+whose internal id is the same word in a different table, and a combat-log line, <i>Blood Tithe</i>, left by a talent that
+no longer exists and that nothing can trigger. <i>Gravesong</i> shares its first syllable with the enemy <i>Grave Totem</i>
+and the relics <i>Gravelight Lantern</i> and <i>Gravewrought Coin</i>. <i>Cold Hearth</i> shares a word with the card
+<i>Cold Iron</i> and the runes <i>Cold Snap</i>, <i>Deep Cold</i> and <i>Killing Cold</i> (and the retired <i>Rune of the Killing
+Cold</i>). None is the same name and none was renamed: they are reported for the designer to rule on.</p>
+
+<p><b>&sect;4 &mdash; A TEST THAT FAILED ABOUT ONE RUN IN FIFTY-FOUR IS REPAIRED.</b> One check of the blacksmith bought the first upgrade
+on the counter and then asked whether that kind of upgrade could still be offered for a different card. When the first
+upgrade was one that fits only a single card the four heroes hold &mdash; <i>Widened</i>, which here fits Magic Missiles alone
+&mdash; there was no other card, and the check failed for a reason that had nothing to do with the rule it guards. It now buys
+the first upgrade whose kind has another card to go on, and says so if the counter holds none. That was chosen over fixing
+the dice, because a fixed seed would have kept the test passing without ever meeting the counter that broke it. The check
+is no looser: it asks the same question of a counter that can answer it.</p>
+
+<p><b>&sect;5 &mdash; SPENT TEST COPIES ARE CLEARED BY THE NEXT BATCH.</b> Each batch tests in isolated copies of the game, and each
+copy leaves a small folder of its own beside the player's saves. The rule is now recorded: <b>a batch clears the previous
+batch's folders when it finishes</b>, never its own, which it may still need, and never the player's own folder or the
+save backups. HN's eighteen were moved to the Trash under a folder that names them. Before: 479 spent folders (461 older
+ones, 138.9 MiB, and HN's eighteen, 1.4 MiB). After: the 461 older ones, which the policy does not reach and which were
+left where they are, and this batch's own. The 1.4 MiB comes back when the Trash is emptied, which is the designer's to
+do.</p>
+
+<p><b>&sect;6 &mdash; DELIBERATELY NOT DONE.</b> No <i>any class</i> form for counting a class among the heroes, and no either-or form
+for a condition; no crest rune that grants a card; no Kinship rune; no crest for a missing Warrior or Hunter; the half of
+the crest census that would read the heroes as a fight runs is not built; the Crest still holds one rune; the rules file
+was not split; and the Volley, Ambusher and Channel tempo ideas were not built.</p>
+
+<p><b>Found along the way.</b> <b>Corrected:</b> the Master Document still gave a rune's price as 100 gold in three places
+(it has been 150 since HK) and the live pool as sixty runes, all of a class; both are fixed, and its counts read
+seventy-seven ordinary runes now. Five comments in the code that said no crest rune exists say what is true.
+<b>Not changed:</b> the simulation's shop can still stock a core rune, which the real Peddler has not sold since HL. Five
+more comments in the code name Faith's threshold as a number. The run summary shown at the end of a run lists each hero's
+runes and leaves out the Crest's, as it has left out core runes and the bag since those were built. Fellowship can clear
+the Bleed warning chip, which comes straight back on the next hit, as the talent it shares a rule with always could. Two
+things the game already holds wait for the state the three runes wait for &mdash; a hero down between fights &mdash; and so
+never happen: the event <i>The Cairn of the Fallen</i> asks for a fallen hero and cannot be drawn (it came up in none of
+3,957 events drawn across this batch's measurement runs, where each of the other nineteen came up), and a Revive Potion
+used from the map has nobody to use it on. And Elevation's ruled words name the two stacks the card itself grants: this
+batch reads the new rule as binding a text that quotes <i>another</i> rule's number, never a card's own effect, and that
+reading is the designer's to confirm. Each is in the report.</p>
+
+<p><b>The checks that moved, and why.</b> Every existing check was first run as it stood against this batch's game and
+documents &mdash; 129 of them, in 76 minutes &mdash; and, as the brief expected, this time they did not all agree.
+<b>Twelve read red and six more read green with a higher count; every other check read exactly what it read before
+HO</b>, among them every check that drives a fight and reads a number, so the change to what a hero opens a fight
+carrying moved nothing live. The reds were checks written when every rune belonged to a class, or checks asserting the
+very things HN's rulings changed: a count of 166 runes, a table with room for two kinds of scope, a check that bought
+the Peddler's first rune and looked for it on the hero it was offered to, three asserting that the file holds no crest
+rune, one asserting that the trap exists. <b>Eighteen checks were re-pointed</b>, each to what it was written to ask,
+with its reason at the place. A census of every check against the two new runes found more than the reds: checks that
+went on passing while asking nothing &mdash; floors that had gone slack by two, a button a check could no longer read,
+fixtures that wrote a crest rune onto a hero, where the game never puts one &mdash; and those are repaired as well.
+<b>A new check, <code>check_ho</code>, drives this batch</b> (170 checks): the supply route on the real screens, the
+trap both ways, a saved run's four retired healing runes, both crest runes worn through real fights, and the two facts
+that keep three runes out of the file. <b>Fifty-seven controls, one defect each</b>, were read by what each printed:
+forty-three for the new check, one for an older check that a rune carrying a condition would trip, and thirteen for the
+re-points &mdash; seven of those with the old version of the check run beside it on the same defect and staying green.
+The controls found four weaknesses in the new check itself, repaired before it was trusted, and the full rehearsal run
+found a fifth: the new check named the file of the fight's screen in order to compare a resumed fight against it, which
+an older check reads as a check building a fight by hand. It asks what opened now, not what the file is called. Twenty
+rows of the count table move, one of them new, and one check whose whole-run drive now runs within seconds of the time
+limit has a longer limit of its own.</p>
+
 <h2>2026-09-29 &mdash; Batch HN: THE CEILING, SEVEN RULINGS, AND WHAT A CREST PAYLOAD CAN WRITE</h2>
 <p><b>The rules file's size ceiling moved a third time, and the next arrival there will be answered by a recon on the
 file's shape rather than a fourth move. Seven rulings on HL's work are recorded: five confirm what HL built, and two
