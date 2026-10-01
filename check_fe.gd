@@ -144,16 +144,21 @@ func _s1_rune_tags_follow_the_cards() -> void:
 	# **BATCH HO MOVED DEFENSE 39 -> 41 AND NOTHING ELSE.** The crest's two rows, each
 	# derived at its read site: Tithe heals the lowest hero and Fellowship cleanses
 	# an ally — what Unburden's row already calls DEFENSE.
-	var want := {"DEBUFF": 38, "DEFENSE": 41, "BREAK": 0, "RESOURCE": 28,
-		"OFFENSE": 32, "TEMPO": 5, "MARK": 0}
+	# **BATCH HP MOVED DEFENSE 41 -> 42 AND OFFENSE 32 -> 34, AND NOTHING ELSE.** The
+	# crest's three live rows, each derived at its read site: Empty Pulpit writes
+	# `dmg_taken_bonus`, less damage taken (DEFENSE), and Dead Air and Dirge write
+	# `dmg_bonus` (OFFENSE). Fellowship is retired and its row is KEPT — the table is
+	# keyed by id and a retired entry still resolves — so DEFENSE keeps it.
+	var want := {"DEBUFF": 38, "DEFENSE": 42, "BREAK": 0, "RESOURCE": 28,
+		"OFFENSE": 34, "TEMPO": 5, "MARK": 0}
 	var moved_col: Array = []
 	for k in want:
 		if int(spread[String(k)]) != int(want[k]):
 			moved_col.append("%s %d!=%d" % [k, int(spread[String(k)]), int(want[k])])
 	ok(moved_col.is_empty(),
 		"§1: a primary column the demotion does not touch has moved — %s" % [moved_col])
-	ok(Runes.RUNE_TAGS.size() == 144,
-		"§1: the table is %d rows, not the 144 after HO (FO's 127, HF's fifteen and the crest's two)" % Runes.RUNE_TAGS.size())
+	ok(Runes.RUNE_TAGS.size() == 147,
+		"§1: the table is %d rows, not the 147 after HP (FO's 127, HF's fifteen and the crest's five, one retired)" % Runes.RUNE_TAGS.size())
 	print("    RUNE_TAGS primaries: %s" % [spread])
 
 	# **THE CARD TABLE IS THE POSITIVE ARM.** FD's ruling is what this one

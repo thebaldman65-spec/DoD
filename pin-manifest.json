@@ -2,16 +2,16 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1593,
-  "source": 1229,
-  "other": 103,
-  "document": 261
+  "total": 1644,
+  "source": 1272,
+  "other": 108,
+  "document": 264
  },
  "source_residency": {
   "narrow": 44,
-  "code": 735,
-  "absent": 310,
-  "runtime": 92,
+  "code": 768,
+  "absent": 315,
+  "runtime": 97,
   "unresolved": 1,
   "comment": 44,
   "alt-sibling": 3
@@ -2069,7 +2069,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ez.gd#365",
+   "g": "check_ez.gd#385",
    "expr": "rq_key"
   },
   {
@@ -2081,7 +2081,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ez.gd#366",
+   "g": "check_ez.gd#386",
    "expr": "rq_key"
   },
   {
@@ -2093,7 +2093,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ez.gd#367"
+   "g": "check_ez.gd#387"
   },
   {
    "s": "check_ez.gd",
@@ -2104,7 +2104,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "derived",
-   "g": "check_ez.gd#371"
+   "g": "check_ez.gd#391"
   },
   {
    "s": "check_ez.gd",
@@ -2115,7 +2115,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ez.gd#370"
+   "g": "check_ez.gd#390"
   },
   {
    "s": "check_ez.gd",
@@ -2126,7 +2126,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ez.gd#363"
+   "g": "check_ez.gd#383"
   },
   {
    "s": "check_fd.gd",
@@ -2882,7 +2882,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fn.gd#98"
+   "g": "check_fn.gd#137"
   },
   {
    "s": "check_fq.gd",
@@ -3137,7 +3137,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_fx.gd#705"
+   "g": "check_fx.gd#719"
   },
   {
    "s": "check_gm.gd",
@@ -3357,7 +3357,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_gv.gd#546"
+   "g": "check_gv.gd#549"
   },
   {
    "s": "check_gv.gd",
@@ -3368,7 +3368,19 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_gv.gd#542"
+   "g": "check_gv.gd#543",
+   "alt": true
+  },
+  {
+   "s": "check_gv.gd",
+   "fn": "_s1_every_rune_driven",
+   "h": "check_hp.gd",
+   "n": "\"%s\": {",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_gv.gd#544"
   },
   {
    "s": "check_gv.gd",
@@ -3379,7 +3391,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_gv.gd#546"
+   "g": "check_gv.gd#549"
   },
   {
    "s": "check_gv.gd",
@@ -3390,29 +3402,54 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_gv.gd#542"
+   "g": "check_gv.gd#543",
+   "alt": true
+  },
+  {
+   "s": "check_gv.gd",
+   "fn": "_s1_every_rune_driven",
+   "h": "check_hp.gd",
+   "n": "const THREE := {",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_gv.gd#544"
+  },
+  {
+   "s": "check_gv.gd",
+   "fn": "_s1_every_rune_driven",
+   "h": "check_hp.gd",
+   "n": "func _s2c_each_through_a_fall_and_a_revive",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_gv.gd#544"
   },
   {
    "s": "check_gv.gd",
    "fn": "_s1_every_rune_driven",
    "h": "check_ho.gd",
-   "n": "func _s5b_tithe",
+   "n": "func _s5b_%s(",
    "p": "+",
-   "r": "code",
-   "k": "literal",
+   "r": "runtime",
+   "k": "format",
    "how": "read",
-   "g": "check_gv.gd#542"
+   "g": "check_gv.gd#543",
+   "alt": true
   },
   {
    "s": "check_gv.gd",
    "fn": "_s1_every_rune_driven",
    "h": "check_ho.gd",
-   "n": "func _s5c_fellowship",
+   "n": "func _s5c_%s(",
    "p": "+",
-   "r": "code",
-   "k": "literal",
+   "r": "runtime",
+   "k": "format",
    "how": "read",
-   "g": "check_gv.gd#542"
+   "g": "check_gv.gd#543",
+   "alt": true
   },
   {
    "s": "check_gw.gd",
@@ -3825,7 +3862,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hl.gd#412"
+   "g": "check_hl.gd#418"
   },
   {
    "s": "check_hl.gd",
@@ -3836,7 +3873,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hl.gd#411"
+   "g": "check_hl.gd#417"
   },
   {
    "s": "check_hl.gd",
@@ -3847,7 +3884,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hl.gd#410"
+   "g": "check_hl.gd#416"
   },
   {
    "s": "check_hl.gd",
@@ -3858,7 +3895,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "derived",
-   "g": "check_hl.gd#417"
+   "g": "check_hl.gd#423"
   },
   {
    "s": "check_hl.gd",
@@ -3869,7 +3906,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hl.gd#782"
+   "g": "check_hl.gd#788"
   },
   {
    "s": "check_hl.gd",
@@ -3880,7 +3917,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hl.gd#782"
+   "g": "check_hl.gd#788"
   },
   {
    "s": "check_hn.gd",
@@ -3891,7 +3928,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hn.gd#152"
+   "g": "check_hn.gd#156"
   },
   {
    "s": "check_hn.gd",
@@ -3902,7 +3939,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hn.gd#151"
+   "g": "check_hn.gd#155"
   },
   {
    "s": "check_hn.gd",
@@ -3913,7 +3950,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_hn.gd#155"
+   "g": "check_hn.gd#159"
   },
   {
    "s": "check_hn.gd",
@@ -3924,7 +3961,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_hn.gd#156"
+   "g": "check_hn.gd#160"
   },
   {
    "s": "check_hn.gd",
@@ -3935,7 +3972,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_hn.gd#157"
+   "g": "check_hn.gd#161"
   },
   {
    "s": "check_hn.gd",
@@ -3946,7 +3983,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_hn.gd#157"
+   "g": "check_hn.gd#161"
   },
   {
    "s": "check_hn.gd",
@@ -3957,7 +3994,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_hn.gd#256"
+   "g": "check_hn.gd#260"
   },
   {
    "s": "check_hn.gd",
@@ -3968,7 +4005,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_hn.gd#257"
+   "g": "check_hn.gd#261"
   },
   {
    "s": "check_hn.gd",
@@ -3979,7 +4016,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hn.gd#291"
+   "g": "check_hn.gd#295"
   },
   {
    "s": "check_hn.gd",
@@ -3990,7 +4027,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hn.gd#471"
+   "g": "check_hn.gd#475"
   },
   {
    "s": "check_hn.gd",
@@ -4001,7 +4038,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hn.gd#470"
+   "g": "check_hn.gd#474"
   },
   {
    "s": "check_hn.gd",
@@ -4012,7 +4049,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_hn.gd#582",
+   "g": "check_hn.gd#586",
    "expr": "anchor"
   },
   {
@@ -4024,7 +4061,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_hn.gd#583",
+   "g": "check_hn.gd#587",
    "expr": "anchor"
   },
   {
@@ -4036,7 +4073,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_hn.gd#590"
+   "g": "check_hn.gd#594"
   },
   {
    "s": "check_hn.gd",
@@ -4047,7 +4084,7 @@
    "r": "comment",
    "k": "literal",
    "how": "derived",
-   "g": "check_hn.gd#586"
+   "g": "check_hn.gd#590"
   },
   {
    "s": "check_hn.gd",
@@ -4058,7 +4095,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hn.gd#584"
+   "g": "check_hn.gd#588"
   },
   {
    "s": "check_ho.gd",
@@ -4069,7 +4106,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#235"
+   "g": "check_ho.gd#241"
   },
   {
    "s": "check_ho.gd",
@@ -4080,7 +4117,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#236"
+   "g": "check_ho.gd#242"
   },
   {
    "s": "check_ho.gd",
@@ -4091,7 +4128,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#234"
+   "g": "check_ho.gd#240"
   },
   {
    "s": "check_ho.gd",
@@ -4102,7 +4139,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#237"
+   "g": "check_ho.gd#243"
   },
   {
    "s": "check_ho.gd",
@@ -4113,7 +4150,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#237"
+   "g": "check_ho.gd#243"
   },
   {
    "s": "check_ho.gd",
@@ -4124,7 +4161,7 @@
    "r": "comment",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#674"
+   "g": "check_ho.gd#699"
   },
   {
    "s": "check_ho.gd",
@@ -4135,7 +4172,7 @@
    "r": "absent",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#675"
+   "g": "check_ho.gd#700"
   },
   {
    "s": "check_ho.gd",
@@ -4146,7 +4183,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#669"
+   "g": "check_ho.gd#694"
   },
   {
    "s": "check_ho.gd",
@@ -4157,7 +4194,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#670"
+   "g": "check_ho.gd#695"
   },
   {
    "s": "check_ho.gd",
@@ -4168,7 +4205,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#674"
+   "g": "check_ho.gd#699"
   },
   {
    "s": "check_ho.gd",
@@ -4179,7 +4216,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#672"
+   "g": "check_ho.gd#697"
   },
   {
    "s": "check_ho.gd",
@@ -4190,7 +4227,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#844"
+   "g": "check_ho.gd#869"
   },
   {
    "s": "check_ho.gd",
@@ -4201,7 +4238,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#843"
+   "g": "check_ho.gd#868"
   },
   {
    "s": "check_ho.gd",
@@ -4212,7 +4249,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#843"
+   "g": "check_ho.gd#868"
   },
   {
    "s": "check_ho.gd",
@@ -4223,7 +4260,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#991"
+   "g": "check_ho.gd#1020"
   },
   {
    "s": "check_ho.gd",
@@ -4234,7 +4271,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#991"
+   "g": "check_ho.gd#1020"
   },
   {
    "s": "check_ho.gd",
@@ -4245,7 +4282,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#991"
+   "g": "check_ho.gd#1020"
   },
   {
    "s": "check_ho.gd",
@@ -4256,7 +4293,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#991"
+   "g": "check_ho.gd#1020"
   },
   {
    "s": "check_ho.gd",
@@ -4267,7 +4304,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ho.gd#1013",
+   "g": "check_ho.gd#1042",
    "expr": "anchor"
   },
   {
@@ -4279,7 +4316,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ho.gd#1016",
+   "g": "check_ho.gd#1045",
    "expr": "anchor"
   },
   {
@@ -4291,7 +4328,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#1021"
+   "g": "check_ho.gd#1050"
   },
   {
    "s": "check_ho.gd",
@@ -4302,7 +4339,7 @@
    "r": "comment",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#1023"
+   "g": "check_ho.gd#1052"
   },
   {
    "s": "check_ho.gd",
@@ -4313,7 +4350,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#1025"
+   "g": "check_ho.gd#1054"
   },
   {
    "s": "check_ho.gd",
@@ -4324,7 +4361,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#1019"
+   "g": "check_ho.gd#1048"
   },
   {
    "s": "check_ho.gd",
@@ -4335,7 +4372,7 @@
    "r": "comment",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#1016"
+   "g": "check_ho.gd#1045"
   },
   {
    "s": "check_ho.gd",
@@ -4346,7 +4383,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#1014"
+   "g": "check_ho.gd#1043"
   },
   {
    "s": "check_ho.gd",
@@ -4357,7 +4394,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#1029"
+   "g": "check_ho.gd#1058"
   },
   {
    "s": "check_ho.gd",
@@ -4368,7 +4405,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#1032"
+   "g": "check_ho.gd#1061"
   },
   {
    "s": "check_ho.gd",
@@ -4379,7 +4416,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#1032"
+   "g": "check_ho.gd#1061"
   },
   {
    "s": "check_ho.gd",
@@ -4390,7 +4427,537 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#1032"
+   "g": "check_ho.gd#1061"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1a_the_keys_and_the_doors",
+   "h": "scripts/battle.gd",
+   "n": "\t_lay_down_the_fallen()\n",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#205"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1a_the_keys_and_the_doors",
+   "h": "scripts/battle.gd",
+   "n": "\t_open_live_payloads()\n",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#206"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1a_the_keys_and_the_doors",
+   "h": "scripts/",
+   "n": "\n",
+   "p": "+",
+   "r": "missing-file",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#184"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1a_the_keys_and_the_doors",
+   "h": "scripts/",
+   "n": "\n",
+   "p": "+",
+   "r": "missing-file",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#185"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1a_the_keys_and_the_doors",
+   "h": "scripts/battle.gd",
+   "n": "\nfunc ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#198"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1a_the_keys_and_the_doors",
+   "h": "scripts/unit.gd",
+   "n": "\nfunc ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#192"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1a_the_keys_and_the_doors",
+   "h": "scripts/battle.gd",
+   "n": "\"party\": Run.party, Talents.LIVE_DOOR: true}",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#207"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1a_the_keys_and_the_doors",
+   "h": "scripts/battle.gd",
+   "n": "_reread_live(true)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_hp.gd#201"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1a_the_keys_and_the_doors",
+   "h": "scripts/unit.gd",
+   "n": "died_cb.call(self)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_hp.gd#194"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1a_the_keys_and_the_doors",
+   "h": "scripts/unit.gd",
+   "n": "func _die() -> void:",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#190"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1a_the_keys_and_the_doors",
+   "h": "scripts/battle.gd",
+   "n": "func _lay_down_the_fallen() -> void:",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#202"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1a_the_keys_and_the_doors",
+   "h": "scripts/battle.gd",
+   "n": "func _on_unit_died(u: BattleUnit) -> void:",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#197"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1a_the_keys_and_the_doors",
+   "h": "scripts/battle.gd",
+   "n": "func _on_unit_revived(u: BattleUnit) -> void:",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#199"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1a_the_keys_and_the_doors",
+   "h": "scripts/unit.gd",
+   "n": "func revive(pct: float) -> void:",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#191"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1a_the_keys_and_the_doors",
+   "h": "scripts/unit.gd",
+   "n": "revived_cb.call(self)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_hp.gd#194"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1a_the_keys_and_the_doors",
+   "h": "scripts/battle.gd",
+   "n": "u._die()",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_hp.gd#204"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1a_the_keys_and_the_doors",
+   "h": "scripts/battle.gd",
+   "n": "u.died_cb = _on_unit_died",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#196"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1a_the_keys_and_the_doors",
+   "h": "scripts/battle.gd",
+   "n": "u.revived_cb = _on_unit_revived",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#196"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1b_the_fields",
+   "h": "scripts/battle.gd",
+   "n": "\"%s\": hunter.%s",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "derived",
+   "g": "check_hp.gd#268",
+   "alt": true
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1b_the_fields",
+   "h": "scripts/battle.gd",
+   "n": "attacker.attack += attacker.whetstone",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#272"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1b_the_fields",
+   "h": "scripts/battle.gd",
+   "n": "cfg[\"attack\"] = int(round(int(cfg.get(\"attack\", 100))",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#274"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1b_the_fields",
+   "h": "scripts/battle.gd",
+   "n": "comp.%s = hunter.%s",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "derived",
+   "g": "check_hp.gd#268",
+   "alt": true
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1b_the_fields",
+   "h": "scripts/battle.gd",
+   "n": "func _do_summon(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#264"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1b_the_fields",
+   "h": "scripts/battle.gd",
+   "n": "if u.iron_will_ranks > 0:\n\t\t\tu.add_status(\"iron_will\"",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#273"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1b_the_fields",
+   "h": "scripts/battle.gd",
+   "n": "u.crit_bonus = maxf(u.crit_bonus - 0.05, -CRIT_CHANCE)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#274"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1c_the_refusal",
+   "h": "scripts/runes.gd",
+   "n": "\nstatic func ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#333"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1c_the_refusal",
+   "h": "scripts/runes.gd",
+   "n": "Talents.live_refusal(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_hp.gd#334"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1c_the_refusal",
+   "h": "scripts/runes.gd",
+   "n": "push_error(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_hp.gd#334"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1c_the_refusal",
+   "h": "scripts/runes.gd",
+   "n": "static func _load() -> Dictionary:",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#332"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1f_hold_core_is_read_once",
+   "h": "scripts/battle.gd",
+   "n": "[\"equipped\"] = ",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#431"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1f_hold_core_is_read_once",
+   "h": "scripts/battle.gd",
+   "n": "toggle_engine(",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#431"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1g_the_sheet",
+   "h": "scripts/party_screen.gd",
+   "n": "Talents.apply_payload(cfg, (pr as Dictionary).get(\"payload\", {}), 1, pay_ctx)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#435"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1g_the_sheet",
+   "h": "scripts/party_screen.gd",
+   "n": "var pay_ctx := {\"learned\": member.get(\"talents\", {}), \"member\": member, \"party\": Run.party}",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#435"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s3_fellowship",
+   "h": "scripts/battle.gd",
+   "n": "_crest_name_for(\"rune_field_medic\")",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#726"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s3_fellowship",
+   "h": "scripts/battle.gd",
+   "n": "u.rune_field_medic + u.field_medic > 0",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#726"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s4_tithe",
+   "h": "scripts/battle.gd",
+   "n": "attacker.blood_communion + attacker.rune_blood_communion",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#737"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s4_tithe",
+   "h": "scripts/battle.gd",
+   "n": "result.get(\"bd\", pr) * bc_pct / 100.0",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#737"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s5_the_records",
+   "h": "CLAUDE.md",
+   "n": "A CARD STATING ITS OWN COST AND PAYOUT IS WHAT A CARD IS",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#743"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s5_the_records",
+   "h": "CLAUDE.md",
+   "n": "A CONDITIONED RUNE PAYS MORE THAN THE BARE EQUIVALENT",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#741"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s5_the_records",
+   "h": "CLAUDE.md",
+   "n": "HERO-SIDE DEBUFF SUPPLY IS 0.296 A ROUND",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#742"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s5_the_records",
+   "h": "docs/state.md",
+   "n": "RULED, NOT BUILT",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#745"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s5_the_records",
+   "h": "docs/state.md",
+   "n": "Skirmisher",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#745"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s5_the_records",
+   "h": "docs/state.md",
+   "n": "Tracker",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#745"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s6_the_small_things",
+   "h": "scripts/shop_screen.gd",
+   "n": "Run.peddler_rune(member, on_counter)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#776"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s6_the_small_things",
+   "h": "scripts/run_sim.gd",
+   "n": "for attempt in 4:",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#776"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s6_the_small_things",
+   "h": "scripts/shop_screen.gd",
+   "n": "for attempt in 4:",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#776"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s6_the_small_things",
+   "h": "scripts/run_sim.gd",
+   "n": "run.generate_rune(member, on_counter)",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#775"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s6_the_small_things",
+   "h": "scripts/run_sim.gd",
+   "n": "run.peddler_rune(member, on_counter)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#775"
   },
   {
    "s": "test_batch_ah.gd",

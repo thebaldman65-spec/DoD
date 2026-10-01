@@ -679,13 +679,14 @@ static func _roll_rune_offers(run: Node) -> Array:
 		var on_counter: Array = []
 		for o in offers:
 			on_counter.append(String((o["rune"] as Dictionary)["name"]))
-		var rune: Dictionary = run.generate_rune(member, on_counter)
+		# BATCH HP §6 — THE PEDDLER'S OWN DOOR (`Run.peddler_rune`), which sells no core
+		# rune since HL §1; this mirror rolled `generate_rune` and could stock one. Its
+		# four-attempt re-roll went with the counter's (`shop_screen._roll_offers`):
+		# the roll already leaves out every rune the party holds (`party_rune_names`,
+		# HK), so a re-roll for a name the hero owns could never run.
+		var rune: Dictionary = run.peddler_rune(member, on_counter)
 		if rune.is_empty():
 			continue  # DOD_SIM_RUNES=off — no rune offers at all
-		for attempt in 4:
-			if not owned_names.has(rune["name"]):
-				break
-			rune = run.generate_rune(member, on_counter)
 		if not owned_names.has(rune["name"]):
 			offers.append({"member_idx": i, "rune": rune})
 			rune_shop_offered += 1

@@ -511,8 +511,11 @@ func _s2_data() -> void:
 		"§2c: %d LIVE ordinary entries are named `Rune of the ...` — the bare convention is broken" % of_live)
 	# **BATCH HF MOVED THE POOL 60 -> 75 AND NOT THE TRADE**: fifteen class runes
 	# written for no lineage, so the pool written for a lineage is still FO's 60.
-	ok(live == 77 and hf_live == 15 and crest_live == 2 and live - hf_live - crest_live == 60,
-		"§2c: the live pool is %d (%d of them HF's, %d the crest's), not 60 + 15 + 2 — one out and one in was not the trade" % [live, hf_live, crest_live])
+	# **BATCH HP MOVED THE CREST'S 2 -> 4 AND NOT THE TRADE**: three live crest runes
+	# authored and Fellowship retired (HP §2, §3), none written for a lineage, so the
+	# pool written for one is still FO's 60.
+	ok(live == 79 and hf_live == 15 and crest_live == 4 and live - hf_live - crest_live == 60,
+		"§2c: the live pool is %d (%d of them HF's, %d the crest's), not 60 + 15 + 4 — one out and one in was not the trade" % [live, hf_live, crest_live])
 	ok(engines == 24 and engines_of == engines,
 		"§2c: ...and the twenty-four ENGINE runes beside it all wear `Rune of the …`, the charter's names (%d of %d)"
 			% [engines_of, engines])

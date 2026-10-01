@@ -707,7 +707,7 @@ var _r3_recorded := false
 #
 # THE METERS ARE BANKED AS PEAKS AND REPORTED AGAINST WHAT THE SPEC IS BUILT
 # AROUND, because a raw number answers nothing: Focus converts at 100, Faith
-# releases at 5, Pack Bond reads x2 at 5 Loyalty, and Blood Frenzy's band tops
+# releases at its threshold, Pack Bond reads x2 at 5 Loyalty, and Blood Frenzy's band tops
 # out at +40%. Sampled once per unit turn and READ-ONLY — `frenzy_bonus()` is
 # deliberately NOT called, because it ratchets the floor as a side effect and an
 # instrument that moves what it measures is not an instrument.
@@ -1371,11 +1371,15 @@ func _spawn_units() -> void:
 		if Run.active and i < Run.party.size():
 			# BATCH HL §6 — THE FOUR RIDE THE CTX, so a payload's condition can read the
 			# party (`Talents.party_condition_met`); it is evaluated here, once.
+			# BATCH HP §1 — AND A LIVE PAYLOAD IS LEFT FOR THE BATTLE'S DOOR (`LIVE_DOOR`):
+			# its condition is read as the fight runs, so it is written onto the built
+			# heroes once the field is laid (`_open_live_payloads`), never stamped here.
 			var pay_ctx := {"learned": Run.party[i].get("talents", {}), "member": Run.party[i],
-				"party": Run.party}
+				"party": Run.party, Talents.LIVE_DOOR: true}
 			for rune in Run.party[i].get("runes", []):
 				if rune.get("equipped", false):
 					Talents.apply_payload(cfg, rune["payload"], 1, pay_ctx)
+					var rc_live := _live_kind(rune["payload"], pay_ctx)
 					# Batch AA roll call: most spec runes ride an EXISTING
 					# talent counter, so their effect surfaces on that
 					# talent's proc line rather than one of their own. One
@@ -1406,11 +1410,21 @@ func _spawn_units() -> void:
 								Runes.held_engines(Run.party[i]), rc_worn))
 					# BATCH HL §6 — AND A RUNE WHOSE CONDITION DOES NOT HOLD PAYS NOTHING, SO
 					# THE LOG SAYS SO rather than naming it in a fight it is inert in (GX's
-					# rule). No worn rune carries a condition today.
-					if rc_tail == "" and not Talents.condition_met(
-							(rune["payload"] as Dictionary).get("condition", {}), pay_ctx):
+					# rule). No worn hero rune carries a condition today.
+					# BATCH HP §1 — A LIVE ONE'S TAIL WAITS FOR THE OPENING READ: whether it
+					# pays is decided once the field is laid, by the door that pays it.
+					var rc_cond: Dictionary = (rune["payload"] as Dictionary).get("condition", {})
+					if rc_live == "spawn":
+						rc_cond = Talents.spawn_half(rc_cond)
+					if rc_tail == "" and rc_live == "refused":
+						rc_tail = " — %s" % LIVE_REFUSED_TAIL
+					elif rc_tail == "" and rc_live != "live" and not Talents.condition_met(rc_cond, pay_ctx):
 						rc_tail = " — %s" % CONDITION_UNMET_TAIL
 					_rune_roll_call.append("%s: %s%s" % [cfg["unit_name"], rune["name"], rc_tail])
+					if rc_live == "live":
+						_live_pending.append({"name": String(rune["name"]), "who": String(cfg["unit_name"]),
+							"seat": i, "payload": rune["payload"], "roll": _rune_roll_call.size() - 1,
+							"tailed": rc_tail != ""})
 			# BATCH HK §4 — THE PARTY SLOT'S RUNE, ON EVERY HERO. A party rune is worn by
 			# the party, so its payload is applied to each of the four through the same
 			# door every rune uses, at the same moment: the one party-level mechanism this
@@ -1425,11 +1439,22 @@ func _spawn_units() -> void:
 					continue
 				Talents.apply_payload(cfg, pr_d.get("payload", {}), 1, pay_ctx)
 				if i == 0:
+					# BATCH HP §1 — A LIVE CREST PAYLOAD IS REGISTERED ONCE, for all four, and
+					# its tail waits for the opening read (the hero runes' rule above).
+					var cr_live := _live_kind(pr_d.get("payload", {}), pay_ctx)
+					var cr_cond: Dictionary = (pr_d.get("payload", {}) as Dictionary).get("condition", {})
+					if cr_live == "spawn":
+						cr_cond = Talents.spawn_half(cr_cond)
 					var cr_tail := ""
-					if not Talents.condition_met(
-							(pr_d.get("payload", {}) as Dictionary).get("condition", {}), pay_ctx):
+					if cr_live == "refused":
+						cr_tail = " — %s" % LIVE_REFUSED_TAIL
+					elif cr_live != "live" and not Talents.condition_met(cr_cond, pay_ctx):
 						cr_tail = " — %s" % CONDITION_UNMET_TAIL
 					_rune_roll_call.append("the crest: %s%s" % [String(pr_d.get("name", "")), cr_tail])
+					if cr_live == "live":
+						_live_pending.append({"name": String(pr_d.get("name", "")), "who": "the crest",
+							"seat": -1, "payload": pr_d.get("payload", {}),
+							"roll": _rune_roll_call.size() - 1, "tailed": false})
 			# BATCH HC §5 — AND A SLOTTED ENGINE RUNE THAT SITS OUT IS NAMED IN THE SAME
 			# ROLL CALL, WITH THE SAME CLAUSE (ruled: GX's tell, the same surfaces). An
 			# engine is not otherwise in this list — its chip names it — so a Rune of
@@ -1891,6 +1916,10 @@ func _spawn_units() -> void:
 	# party lost before the quit goes on it here, last, so no stamp above reads it.
 	_return_standing_beasts()
 	_lay_down_the_fallen()
+	# BATCH HP §1 — AND THE LIVE PAYLOADS ARE READ ONCE THE FALLEN ARE DOWN, so a fight
+	# resumed with a hero down opens paying what the spawn's reading paid (HO §3c's
+	# state), and the lay-down itself is the opening rather than a switch.
+	_open_live_payloads()
 
 
 # ══ BATCH FK — THE THREE STAMPED RUNES, WRITTEN ONTO THE ENEMY SIDE ════════
@@ -2105,6 +2134,9 @@ func _make_unit(config: Dictionary, pos: Vector2, tint: Color,
 	# above. `_die()` is the one way down for every unit, a tick's kill included,
 	# which `_on_enemy_death` never sees.
 	u.died_cb = _on_unit_died
+	# BATCH HP §1 — AND THE WAY BACK UP. `revive()` is the only other writer of
+	# `dead`, so the two callbacks are every door a hero's standing changes through.
+	u.revived_cb = _on_unit_revived
 	# BATCH HF — VOW OF SILENCE'S DOOR, stamped where every unit passes for the
 	# same reason as the four above: any body can be struck.
 	u.deal_gate_cb = _deal_gate
@@ -2471,6 +2503,26 @@ var _rune_roll_call: Array = []  # "hero: rune name" per equipped rune, logged a
 # BATCH HL §6 — what the roll call adds after a worn rune whose payload's condition
 # does not hold for this fight (HL §6's words, ruled at HN §2). Evaluated at the spawn, once.
 const CONDITION_UNMET_TAIL := "its condition does not hold for these heroes, so it pays nothing this fight"
+# BATCH HP §1c — A RUNE WHOSE CONDITION IS READ AS THE FIGHT RUNS SAYS SO, AND SAYS IT
+# BOTH WAYS. At the opening it may hold or not, so the roll call's tail is not
+# "this fight"; and a switch mid-fight is a new case GX's rule never met — a rune
+# that starts or stops paying with nothing in the log reads as a stat nobody knows
+# they have — so each switch owes its own line, in the roll call's shape.
+const CONDITION_UNMET_LIVE_TAIL := "its condition does not hold as the fight opens, so it pays nothing until it does"
+const LIVE_ON_TAIL := "its condition holds now, so it pays from here"
+const LIVE_OFF_TAIL := "its condition no longer holds, so it pays nothing from here"
+const LIVE_REFUSED_TAIL := "its payload is refused, so it pays nothing this fight"
+# THE LIVE DOOR'S STATE (BATCH HP §1c). `_live_pending` is filled at the spawn, one
+# entry a worn payload the battle is to pay; `_open_live_payloads` turns each into a
+# stamp on the built heroes once the field is laid. `_live_base` holds each touched
+# field's value before any live payload wrote it and `_live_last` what this door
+# last wrote, per unit, so a field is always RECOMPUTED from its base and never
+# subtracted from — a cycle returns the number bit for bit.
+var _live_pending: Array = []
+var _live_stamps: Array = []
+var _live_base := {}
+var _live_last := {}
+var _live_opened := false
 var _forfeit_panel: Control = null
 var _forfeit_nudge: Label = null
 var _forfeit_nudged := false
@@ -15150,6 +15202,9 @@ func _on_unit_died(u: BattleUnit) -> void:
 		return
 	if u.is_companion:
 		return
+	# BATCH HP §1 — A HERO HAS FALLEN: every condition read as the fight runs is read
+	# again, and a rune that switches says so. Before the bond below, which can log.
+	_reread_live(true)
 	# COVENANT — a bound hero has fallen. The bond PASSES when the bound hero
 	# falls and ENDS when the Cleric does.
 	var other: BattleUnit = u.covenant_with
@@ -17552,7 +17607,7 @@ var _communion_chain := false
 
 # BATCH BG §2 — CONVICTION'S HELD HALF, AND THE ONE NODE THAT TOUCHES IT.
 # Faith has two halves: what a stack does WHILE HELD, and what happens when
-# five of them RELEASE. Every one of the eight Faith nodes acts on the release
+# the stacks reach the threshold and RELEASE. Every one of the eight Faith nodes acts on the release
 # half — Communion spreads it, Fervor and Sacred Covenant feed it, Blessed are
 # the Faithful deepens its heal, Binding Oath (and, until this batch, Apostle)
 # changes what it consumes. NOTHING IN THE LANE HAD EVER TOUCHED THE HELD HALF.
@@ -17568,7 +17623,7 @@ var _communion_chain := false
 #
 # BATCH BI §1 — THE MAGNITUDES COME DOWN BECAUSE PEAK-READING MULTIPLIES THEIR
 # EFFECTIVE VALUE. 3% and +2% were priced against a CURRENT count that averages
-# low; read against a peak that ratchets to five and stays there (`faith_peak`),
+# low; read against a peak that ratchets up to the cap and stays there (`faith_peak`),
 # the same numbers pay roughly double in practice for the rest of every fight.
 # 2% and +1.5% at a peak of five is 10% mitigation and +7.5% damage on each ally
 # PERMANENTLY — comparable to what the current-reading version paid at its best
@@ -17835,7 +17890,7 @@ func _ward_detonate(holder: BattleUnit, how: String) -> void:
 			holder.unit_name, how, wd_amt, ", ".join(wd_hit)], "#8fc8e0")
 
 
-# Conviction: a mitigated hit steels the struck ally. At 5 stacks the
+# Conviction: a mitigated hit steels the struck ally. At the threshold the
 # ally is healed (Blessed are the Faithful deepens it), the COUNT resets — the
 # peak does not (Batch BI §1) — the Devout sips Mana, and Communion may spread
 # the fervor.
@@ -17856,7 +17911,7 @@ func _gain_faith(u: BattleUnit, n: int, source: String) -> void:
 	# Blessing of Zeal: the kindled build Faith twice as fast.
 	if u.has_status("zeal"):
 		n *= 2
-	# BATCH BH §2 — THE DEVOUT'S OWN FAITH HOLDS AT FIVE AND NEVER RELEASES.
+	# BATCH BH §2 — THE DEVOUT'S OWN FAITH HOLDS AT THE CAP AND NEVER RELEASES.
 	# His stacks pay him the mitigation and the damage exactly as they pay
 	# everyone else (both read sites test `is_hero`, and always have), but the
 	# release below is an ALLY'S. A RELEASING DEVOUT PUTS THE FREQUENCY LOOP
@@ -17940,7 +17995,7 @@ func _gain_faith(u: BattleUnit, n: int, source: String) -> void:
 	# BATCH BG §2 made the half branch unreachable and BATCH BH §2 makes it
 	# unreachable TWICE OVER: Apostle was the only thing that ever parked an ally
 	# at five, and Binding Oath's remnant — the last writer of a non-zero `keep`
-	# — is deleted, so a release now always consumes all five. The argument and
+	# — is deleted, so a release now always consumes every stack. The argument and
 	# the rule STAY inside `_conviction_growth`, where test_batch_ay drives them
 	# directly; the docs do not claim it happens.
 	_conviction_growth(devout, true)
@@ -17964,11 +18019,11 @@ func _gain_faith(u: BattleUnit, n: int, source: String) -> void:
 	# APOSTLE and does not name it — it does not care WHICH node parks an ally,
 	# which is why it survives BG unchanged.
 	#
-	# `faith_stacks` is capped at 5 above and an ALLY at 5 releases on the spot,
-	# so with Apostle off the release axis (Batch BG §2) and Binding Oath's
-	# remnant deleted (Batch BH §2) nothing parks an ally at five and the
-	# condition is dormant for allies in every shipped build. THE GUARD STAYS,
-	# and BH gave it a second job: THE DEVOUT'S OWN FAITH HOLDS AT FIVE, so he
+	# `faith_stacks` is capped at `FAITH_RELEASE` above and an ALLY who reaches it
+	# releases on the spot, so with Apostle off the release axis (Batch BG §2) and
+	# Binding Oath's remnant deleted (Batch BH §2) nothing parks an ally at the cap
+	# and the condition is dormant for allies in every shipped build. THE GUARD
+	# STAYS, and BH gave it a second job: THE DEVOUT'S OWN FAITH HOLDS AT THE CAP, so he
 	# is a hero this loop really does skip. That is correct — a roll spent on a
 	# meter that never releases buys nothing — and it is why the guard reads
 	# "still building" rather than naming any node.
@@ -18247,8 +18302,8 @@ func _swear_opening_oath() -> void:
 # nobody chose it. CZ recorded the concern here rather than burying it; DA acted
 # on it.
 #
-# **THE THRESHOLD IS THE HALF THAT STAYS.** `FAITH_RELEASE` is still 3 (see
-# above) — it was sized against structure rather than against the bad figure,
+# **THE THRESHOLD IS THE HALF THAT STAYED AT DA.** `FAITH_RELEASE` kept CZ's move
+# (see above; HL §3 has moved it since) — it was sized against structure rather than against the bad figure,
 # and CZ measured the threshold move ALONE at **2.71 releases a battle** at
 # rung 2 against the 0.81 it started from. That combination is this one:
 # `docs/reports/CZ.md` prints all four that were measured, and `docs/reports/DA.md`
@@ -18266,7 +18321,7 @@ const FAITH_PER_ABSORB := 2
 #
 # It goes back for the same reason the absorb rate does: both were sized against
 # CY's arrival row, which was measuring the Devout's held meter rather than
-# release frequency. **The threshold at 3 is the honest half and it stays alone.**
+# release frequency. **The threshold is the honest half and it stayed alone at DA.**
 const FAITH_PER_GROUND_TURN := 1
 
 
@@ -26784,6 +26839,128 @@ func _lay_down_the_fallen() -> void:
 	_fallen_at_spawn.clear()
 
 
+# ══ BATCH HP §1 — THE CONDITION AS A FIGHT RUNS ═══════════════════════════════
+#
+# **A PAYLOAD WHOSE CONDITION ASKS WHO STANDS IS PAID HERE, NOT AT THE SPAWN.** The
+# spawn registers it (`_live_pending`) and stamps nothing; once the field is laid it
+# becomes a stamp on the heroes it pays — the four for the crest, its wearer for a
+# hero rune — and it is read again at every door a hero's standing changes through:
+# a death (`_on_unit_died`, which the lay-down of a resumed fight's fallen passes
+# too) and a revive (`_on_unit_revived`). Those are the only two: `dead` is written
+# in `_die()` and `revive()` and nowhere else.
+#
+# **THE REVERSAL IS A RECOMPUTATION, NEVER A SUBTRACTION.** Each touched field keeps
+# its value from before any live payload wrote it (`_live_base`), and is set to that
+# base plus every live payload on it that holds now, in the order they were
+# registered. Taking a figure back by subtraction is not exact in floating point —
+# 0.1 + 0.25 − 0.25 is not 0.1 — so a hero at the end of a cycle would carry a
+# number that is not the one he started with. Recomputed, the same set of payloads
+# always yields the same bits. **A field another writer moves between two reads
+# keeps that move**: the door notices its own last write is gone and folds the
+# difference into the base (no field this door may write has such a writer today;
+# `Talents.LIVE_FIELDS` is derived so).
+
+# "" — not a live payload; "refused" — `Talents.live_refusal` refuses it; "spawn" —
+# live, but the half the spawn weighs does not hold, so it pays nothing this fight;
+# "live" — the battle is to pay it.
+func _live_kind(payload: Dictionary, pay_ctx: Dictionary) -> String:
+	if Talents.live_refusal(payload) != "":
+		return "refused"
+	if not Talents.is_live(payload):
+		return ""
+	if not Talents.condition_met(Talents.spawn_half(payload.get("condition", {})), pay_ctx):
+		return "spawn"
+	return "live"
+
+
+func _open_live_payloads() -> void:
+	for p in _live_pending:
+		var pd: Dictionary = p
+		var targets: Array = []
+		if int(pd["seat"]) < 0:
+			for h in heroes:
+				if not h.is_companion:
+					targets.append(h)
+		elif int(pd["seat"]) < heroes.size():
+			targets.append(heroes[int(pd["seat"])])
+		var pay: Dictionary = pd["payload"]
+		_live_stamps.append({"name": pd["name"], "who": pd["who"], "roll": pd["roll"],
+			"tailed": pd["tailed"], "cond": pay.get("condition", {}),
+			"stat": pay.get("stat", {}), "targets": targets, "on": false})
+	_live_pending.clear()
+	_live_opened = true
+	_reread_live(false)
+	for e in _live_stamps:
+		if not bool(e["on"]) and not bool(e["tailed"]) and int(e["roll"]) >= 0 \
+				and int(e["roll"]) < _rune_roll_call.size():
+			_rune_roll_call[int(e["roll"])] = "%s — %s" % [_rune_roll_call[int(e["roll"])],
+				CONDITION_UNMET_LIVE_TAIL]
+
+
+func _on_unit_revived(u: BattleUnit) -> void:
+	if u == null or not u.is_hero or u.is_companion:
+		return
+	_reread_live(true)
+
+
+# The four as they stand now, in the shape `Talents.party_condition_met` reads.
+func _live_party() -> Array:
+	var out: Array = []
+	for h in heroes:
+		if h.is_companion:
+			continue
+		out.append({"key": h.hero_key, "hp": 0 if h.dead else maxi(h.hp, 1)})
+	return out
+
+
+# `tell` is false for the opening read, which the roll call speaks for, and true at
+# every door after it.
+func _reread_live(tell: bool) -> void:
+	if not _live_opened or _live_stamps.is_empty():
+		return
+	var party := _live_party()
+	var touched := {}
+	for e in _live_stamps:
+		var now := Talents.live_condition_met(e["cond"], party)
+		if now == bool(e["on"]):
+			continue
+		e["on"] = now
+		for u in e["targets"]:
+			for f in e["stat"]:
+				touched["%d|%s" % [(u as BattleUnit).get_instance_id(), String(f)]] = [u, String(f)]
+		if tell:
+			_log("Rune: %s: %s — %s" % [e["who"], e["name"], LIVE_ON_TAIL if now else LIVE_OFF_TAIL],
+				"#b0a8e0")
+	var refreshed := {}
+	for key in touched:
+		var pair: Array = touched[key]
+		_live_recompute(pair[0], pair[1])
+		refreshed[pair[0]] = true
+	for u2 in refreshed:
+		(u2 as BattleUnit).refresh_bars()
+
+
+func _live_recompute(u: BattleUnit, field: String) -> void:
+	var iid := u.get_instance_id()
+	var base: Dictionary = _live_base.get(iid, {})
+	var last: Dictionary = _live_last.get(iid, {})
+	var cur: Variant = u.get(field)
+	if not base.has(field):
+		base[field] = cur
+	elif cur != last.get(field):
+		base[field] = base[field] + (cur - last[field])
+	var v: Variant = base[field]
+	for e in _live_stamps:
+		if bool(e["on"]) and (e["targets"] as Array).has(u) and (e["stat"] as Dictionary).has(field):
+			v = v + e["stat"][field]
+	if base[field] is int:
+		v = int(v)
+	u.set(field, v)
+	last[field] = v
+	_live_base[iid] = base
+	_live_last[iid] = last
+
+
 func _check_end() -> void:
 	if battle_over:
 		return
@@ -27521,7 +27698,7 @@ static func signature_report_block(stats: Dictionary) -> String:
 #                 the two numbers answer different questions.
 #   Focus        100 points — `BattleUnit.FOCUS_CONVERT`, where chance stops
 #                 and the critical multiplier starts.
-#   Faith          5 stacks — the release threshold.
+#   Faith          `FAITH_RELEASE` stacks — the release threshold.
 const CY_METERS := [
 	["bloodrage", "Blood Frenzy", 40.0, "points"],
 	["pack", "Loyalty", 5.0, "stacks (deepest single bond)"],
@@ -28054,6 +28231,11 @@ func _run_snapshot(outcome: String, closing_text: String) -> Dictionary:
 		"enemy_names": enemy_names,
 		"fallen": fallen,
 		"party": Run.party.duplicate(true),
+		# BATCH HP §6 — AND THE TWO PLACES A RUNE SITS THAT NO HERO'S LIST HOLDS: the
+		# crest (HK §4) and the bag (HK §1). The summary left both out from the day
+		# each was built.
+		"crest": Run.party_runes.duplicate(true),
+		"bag": Run.rune_bag.duplicate(true),
 		"gold": Run.gold,
 		"difficulty": Run.difficulty,
 		"relics": Run.active_relics.duplicate(),
@@ -28145,6 +28327,17 @@ func _summary_lines(snap: Dictionary) -> Array:
 	lines.append(["s", "The heroes as they stood"])
 	for member in snap["party"]:
 		lines.append(["p", _member_summary(member)])
+	# BATCH HP §6 — THE CREST AND THE BAG, which no hero's line can name: a crest rune
+	# is worn by all four and a bagged one by nobody.
+	var crest_names := PackedStringArray()
+	for cr in snap.get("crest", []):
+		if bool((cr as Dictionary).get("equipped", false)):
+			crest_names.append(String((cr as Dictionary).get("name", "")))
+	lines.append(["p", "The crest: %s" % (", ".join(crest_names) if not crest_names.is_empty() else "empty")])
+	var bag_names := PackedStringArray()
+	for br in snap.get("bag", []):
+		bag_names.append(String((br as Dictionary).get("name", "")))
+	lines.append(["p", "The bag: %s" % (", ".join(bag_names) if not bag_names.is_empty() else "empty")])
 	# --- damage share ---
 	var dmg: Dictionary = tally.get("damage", {})
 	var total := 0.0
@@ -28302,7 +28495,13 @@ func _member_summary(member: Dictionary) -> String:
 			", ".join(tier_parts)]
 	else:
 		text += " — no talents learned"
+	# BATCH HP §6 — HIS CORE RUNES FIRST, then the ordinary ones he wears. The core
+	# runes sit in `engines` since GK and this line read `runes` alone, so a summary
+	# named no hero's engine; each core rune's name carries its own "(core)".
 	var rune_names := PackedStringArray()
+	for eng in member.get("engines", []):
+		if bool((eng as Dictionary).get("equipped", false)):
+			rune_names.append(String((eng as Dictionary).get("name", "")))
 	for rune in member.get("runes", []):
 		rune_names.append(String(rune["name"]))
 	if not rune_names.is_empty():

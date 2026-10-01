@@ -542,7 +542,12 @@ const RUNE_TAGS := {
 	# the heal on the lowest hero is what Tithe is FOR and Break is what it is paid
 	# in (a secondary, FD §2); a cleanse is what Unburden's row already calls it.
 	"tithe": ["DEFENSE", "BREAK"],             # Tithe — the four's Break, drunk by the lowest
-	"fellowship": ["DEFENSE"],                 # Fellowship — a debuff off an ally, every turn
+	"fellowship": ["DEFENSE"],                 # Fellowship — a debuff off an ally, every turn (retired at HP §3)
+	# BATCH HP §2 — THE THREE THAT READ WHO STANDS, AS THE FIGHT RUNS. What each is FOR
+	# while its condition holds: less damage taken, more damage dealt.
+	"empty_pulpit": ["DEFENSE"],               # Empty Pulpit — no Cleric stands, every hero takes less
+	"dead_air": ["OFFENSE"],                   # Dead Air — no Mage stands, every hero deals more
+	"dirge": ["OFFENSE"],                      # Dirge — a hero lies fallen, the rest deal more
 }
 
 
@@ -676,6 +681,12 @@ const RUNE_SHAPES := {
 	# and these two read the four without one (HL §4's test).
 	"tithe": ["PASSIVE"],
 	"fellowship": ["PASSIVE"],
+	# BATCH HP §2 — A STAT ON EVERY HERO, WHILE THE FOUR STAND AS THE CONDITION SAYS.
+	# No secondary names the gate: this vocabulary's gates are the two retired tag
+	# conditions and TRADEOFF, and a condition on who stands is none of them.
+	"empty_pulpit": ["STAT"],
+	"dead_air": ["STAT"],
+	"dirge": ["STAT"],
 }
 
 const RUNE_TYPES := ["ABILITY", "PASSIVE", "STAT"]
@@ -828,6 +839,14 @@ static func _load() -> Dictionary:
 	if _data.is_empty():
 		var f := FileAccess.open(DATA_PATH, FileAccess.READ)
 		_data = JSON.parse_string(f.get_as_text())
+		# BATCH HP §1b — A PAYLOAD THE LIVE DOOR CANNOT FOLLOW IS REFUSED WHERE THE TABLE
+		# LOADS, not at the spawn: an entry whose condition is read as the fight runs
+		# and whose stat is consumed once is an authoring fault, and the first process
+		# that reads this file says so (`Talents.live_refusal`, the one answer).
+		for rid in _data:
+			var why := Talents.live_refusal((_data[rid] as Dictionary).get("payload", {}))
+			if why != "":
+				push_error("data/runes.json: '%s' is refused — %s" % [rid, why])
 	return _data
 
 

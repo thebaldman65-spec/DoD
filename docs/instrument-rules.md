@@ -1591,3 +1591,23 @@ The reds were the cheap ones; the rest went on passing while asking nothing, or 
   so a floor on the offer's size sits above its reading by that many and a class can lose as many of its own unseen.
 - **AND TWO GATES THAT WRITE A SAVE ARE NEVER RUN AT ONCE IN ONE COPY.** A copy has one `user://`; a whole-run gate
   beside a save gate handed the second two reds that were the first's file. One lane a copy, or one copy a lane.
+
+## STANDING RULE — A FIXTURE THAT DRIVES A CONDITION ON WHO STANDS WRITES A FIELD THE LIVE DOOR CARRIES (Batch HP §1)
+> **A gate or a suite whose fixture payload carries a key the battle reads as the fight runs — `heroes_include_class`,
+> `heroes_lack_class`, `heroes_class_count`, `heroes_all_standing` — writes a field `Talents.LIVE_FIELDS` holds, and
+> reads the heroes once the spawn has finished. On a consumed field the payload is refused and pays nothing, whatever
+> the party, so an arm built that way reads "paid on 0" for both parties it compares.**
+
+- **HL §6, HN §3 AND HO §2–§3 DROVE EVERY KEY WITH A FIXTURE CREST OF +9 MAXIMUM HEALTH.** Maximum health builds the
+  health bar at the spawn, so since HP a live key on it is refused where the table loads and wherever a payload is
+  applied — the arm's red reads exactly like a key that reads nothing. **A condition read once, as the fight opens
+  (`heroes_hold_core` alone, or no party key), still carries a consumed field**, because the spawn stamps it.
+- **A LIVE PAYLOAD IS WRITTEN LAST.** `battle._open_live_payloads` runs at the end of the spawn, after the fallen are
+  laid down; a gate reads the unit after the frames it waits, never the config, and never before the opening read.
+- **A GATE THAT ENTERS A SECOND BATTLE HAS FREED THE FIRST.** Read every figure a battle is asked for before the next is
+  entered; a scene read afterwards is a freed object, and the arm throws rather than reds.
+- **A CYCLE'S RETURN IS ASSERTED WITH `==`, NEVER `is_equal_approx`.** The door recomputes a field so the figure comes
+  back bit for bit; an approximate comparison passes the subtraction the door was built to avoid (`check_hp` §1d prints
+  the subtraction's figure beside the base, so the arm's own control is on the line).
+- **A REFUSED PAYLOAD `push_error`s AT EVERY APPLICATION.** A log carrying *A rune payload is refused* beside a green
+  count is a fixture built on a consumed field, and is read as that before it is read as noise.

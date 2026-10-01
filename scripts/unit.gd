@@ -985,8 +985,9 @@ var beacon_ranks := 0         # Beacon: turn-start pulse on the nearly-dead
 # been dripping Faith onto its own caster since Batch AW §2 and he has been
 # releasing at five like anybody else. THAT release was a frequency source
 # nobody had counted, and closing it is part of §2's job, not a side effect.
-var faith_stacks := 0         # Conviction: Faith (0-5). Allies release at 5;
-                              # THE DEVOUT'S OWN HOLD THERE (Batch BH §2).
+var faith_stacks := 0         # Conviction: Faith, capped at `FAITH_RELEASE`. Allies
+                              # release on reaching it; THE DEVOUT'S OWN HOLD THERE
+                              # (Batch BH §2).
 # BATCH BI §1 — THE HELD HALF READS THE PEAK, AND THIS FIELD IS WHY THE LANE'S
 # TWO AXES STOP FIGHTING. Fed by ONE meter, releases want it EMPTY and held
 # value wants it FULL, so the second axis BG and BH added to break the
@@ -1002,8 +1003,8 @@ var faith_stacks := 0         # Conviction: Faith (0-5). Allies release at 5;
 # the strike-target block and the damage-dealt term at the attacker block), and
 # ONE RESET, `battle._reset_faith_meters()` at battle start, which zeroes it
 # ALONGSIDE the stacks so the two can never drift. Everything else about the
-# meter is unchanged: releases still fire at five, still reset the stacks to
-# zero, still heal.
+# meter is unchanged: releases still fire at the threshold, still reset the
+# stacks to zero, still heal.
 var faith_peak := 0           # highest Faith held this battle (never falls)
 # Batch AW §1 — CONVICTION'S THIRD CLAUSE: every Faith release raises the
 # Devout's maximum by 3% of the maximum he brought to the fight. Linear on
@@ -2320,6 +2321,11 @@ var covenant_heal_cb := Callable()
 # `battle._on_enemy_death` — so a kill, a mark to move and a bond to pass all
 # hang off this one callback.
 var died_cb := Callable()
+# BATCH HP §1 — AND EVERY RETURN FROM DEATH PASSES `revive()`, whichever card or
+# potion called it: `dead` is written in exactly those two functions, so the pair
+# is every door a hero's standing changes through, and a condition read as the
+# fight runs is re-read at both (`battle._reread_live`).
+var revived_cb := Callable()
 
 
 # SAVAGE ASSAULT's payout, read at the ONE general damage multiplier beside
@@ -4326,6 +4332,8 @@ func revive(pct: float) -> void:
 	sprite.self_modulate = _base_tint
 	sprite.play("idle")
 	refresh_bars()
+	if revived_cb.is_valid():
+		revived_cb.call(self)
 
 
 func recover_from_break() -> void:

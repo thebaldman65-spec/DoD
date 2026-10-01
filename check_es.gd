@@ -168,7 +168,11 @@ func _s1_rarity_is_gone() -> void:
 	# engine (the designer's, HF §1-§4), live, at the flat 100g.
 	# **BATCH HO: 166 -> 168.** The first two CREST runes (the designer's, HO §3):
 	# scope `party`, live, at the flat price, a payload apiece.
-	ok(data.size() == 168, "§1: the authored pool is %d entries, expected 168" % data.size())
+	# **BATCH HP: 168 -> 171.** Three more crest runes, each paying a stat while a
+	# condition on who stands holds as the fight runs (the designer's, HP §2), and
+	# Fellowship retired rather than deleted (HP §3, ET's contract) — so the file
+	# grows by the three and keeps the one.
+	ok(data.size() == 171, "§1: the authored pool is %d entries, expected 171" % data.size())
 	ok(with_rarity.is_empty(), "§1: %s still carry a `rarity` key" % [with_rarity])
 	ok(with_scarred.is_empty(), "§1: %s still carry a `scarred` key" % [with_scarred])
 

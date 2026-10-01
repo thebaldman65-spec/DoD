@@ -535,7 +535,17 @@ func _s2_break_is_secondary_only() -> void:
 	# are true for a stronger reason than the one they were written for. The
 	# population arm is inverted rather than dropped: a rune re-gated on
 	# anything at all turns it red here as well as in `check_fn` §1b.
+	# ── BATCH HP §5 — THE INVERTED POPULATION IS THE TAG CONDITIONS ─────────
+	# HP §5 answered FN with the magnitude — a conditioned rune pays more than
+	# the bare equivalent, `check_fn` §1b's relation — and re-opened a condition
+	# on WHO STANDS, the `heroes_…` keys, and nothing else. So the population held
+	# at zero is the one FN retired: a condition on a TAG, EZ's two keys. The
+	# conditions that ARE carried are counted beside it, and each must read who
+	# stands and nothing else, so a rune re-gated on anything but the four heroes
+	# still turns this red — and the walk is shown to see a condition at all.
 	var gated: Array = []
+	var on_who_stands: Array = []
+	var on_other: Array = []
 	var on_break: Array = []
 	var on_offense: Array = []
 	for id in Runes.ids():
@@ -545,21 +555,42 @@ func _s2_break_is_secondary_only() -> void:
 			.get("condition", {})
 		if cond.is_empty():
 			continue
-		gated.append(String(id))
+		if cond.has("tag_threshold") or cond.has("tag_breadth"):
+			gated.append(String(id))
+		# Each key is sorted once, so each defect names itself: a tag key is the arm
+		# above's, a key that is neither a tag nor who stands is the next one's, and a
+		# rune reading who stands is counted whatever else it carries.
+		var other_keys: Array = []
+		var reads_who := false
+		for ck in cond.keys():
+			if String(ck).begins_with("heroes_"):
+				reads_who = true
+			elif not ["tag_threshold", "tag_breadth"].has(String(ck)):
+				other_keys.append(String(ck))
+		if not other_keys.is_empty():
+			on_other.append("%s: %s" % [id, other_keys])
+		if reads_who:
+			on_who_stands.append(String(id))
 		var tag := String(cond.get("tag_threshold", ""))
 		if tag == "BREAK":
 			on_break.append(String(id))
 		elif tag == "OFFENSE":
 			on_offense.append(String(id))
 	ok(gated.is_empty(),
-		"§2: %d live runes carry a condition — FN retired both gated secondaries (%s)"
+		"§2: %d live runes carry a tag condition — FN retired both gated secondaries (%s)"
 			% [gated.size(), gated])
+	ok(on_other.is_empty(),
+		"§2: a live rune's condition reads something other than who stands — HP §5 re-opened the `heroes_…` keys alone (%s)"
+			% [on_other])
+	ok(on_who_stands.size() >= 3,
+		"§2: the walk saw %d live runes whose condition reads who stands, not HP's three — the zero above is a blind walk's"
+			% on_who_stands.size())
 	ok(on_break.is_empty(),
 		"§2: %s gate on a BREAK threshold, which NO CARD can now contribute to" % [on_break])
 	ok(on_offense.is_empty(),
 		"§2: %s gate on an OFFENSE threshold — the 54 that moved changed its count" % [on_offense])
-	print("    %d live runes are gated; %d name BREAK, %d name OFFENSE"
-		% [gated.size(), on_break.size(), on_offense.size()])
+	print("    %d live runes are gated on a tag; %d name BREAK, %d name OFFENSE; %d read who stands (%s)"
+		% [gated.size(), on_break.size(), on_offense.size(), on_who_stands.size(), on_who_stands])
 	# **AND THE WALK ITSELF STILL READS A REAL POOL**, which is what stops the
 	# three zeroes above being what an empty `Runes.ids()` prints.
 	var live_seen := 0

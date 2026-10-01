@@ -961,14 +961,33 @@
 	"tithe": {
 		"name": "Tithe", "scope": "party",
 		"price": 150,
-		"desc": "Every hero's Break damage heals whoever among the four is lowest, for 30% of its value.",
+		"desc": "A hero's attack that lands Break heals\nwhoever among the four is lowest,\nfor 30% of it.",
 		"payload": {"stat": {"rune_blood_communion": 30}}
 	},
 	"fellowship": {
 		"name": "Fellowship", "scope": "party",
 		"price": 150,
 		"desc": "At the start of each hero's turn, he clears one debuff from an ally.",
+		"retired": "RETIRED at BATCH HP §3, by the designer's ruling — kept, and said to be kept. **THE REASON OUTLIVES THE RUNE:** hero-side debuff supply is about 0.3 a round (HO §3b), so a crest rune that cleanses covers every debuff whatever its number, and no number fixes the shape. LOST: the crest's cleanse — a debuff cleared from an ally at the start of every hero's turn — which for about 2% of damage taken made Unburden, the Returned Burden rune, two talents, the Medic core rune and four cards redundant. Its `rune_field_medic` read site, summed with the talent's in the one loop that cleanses, is KEPT and still pays a saved run wearing it, the `rune_entropy_ranks` contract, and the log still names it there.",
 		"payload": {"stat": {"rune_field_medic": 1}}
+	},
+	"empty_pulpit": {
+		"name": "Empty Pulpit", "scope": "party",
+		"price": 150,
+		"desc": "While no Cleric stands, every hero takes\n50% less damage.",
+		"payload": {"stat": {"dmg_taken_bonus": -0.5}, "condition": {"heroes_lack_class": "cleric"}}
+	},
+	"dead_air": {
+		"name": "Dead Air", "scope": "party",
+		"price": 150,
+		"desc": "While no Mage stands, every hero deals\n50% more damage.",
+		"payload": {"stat": {"dmg_bonus": 0.5}, "condition": {"heroes_lack_class": "mage"}}
+	},
+	"dirge": {
+		"name": "Dirge", "scope": "party",
+		"price": 150,
+		"desc": "While a hero lies fallen, the rest deal\n45% more damage.",
+		"payload": {"stat": {"dmg_bonus": 0.45}, "condition": {"heroes_all_standing": false}}
 	},
 
 	"engine_berserker": {

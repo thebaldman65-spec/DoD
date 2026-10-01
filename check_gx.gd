@@ -282,8 +282,11 @@ func _s1_the_predicate() -> void:
 	# are not engine runes and read no engine, so this gate's ungated population
 	# holds them: a crest rune sits out for no engine, and never for a hero's (it
 	# is worn by the crest). 17 + 1 + 15 + 2.
+	# **BATCH HP §2/§3 — 42 AND 37: THE CREST'S FOUR.** Empty Pulpit, Dead Air and
+	# Dirge are live crest runes that read no engine, and Fellowship is retired, so
+	# the crest's share is four: 17 + 1 + 15 + 4.
 	ok(_gated.size() == 42, "§1: %d gated runes — the table holds 42 (GV's 35, HC's Layered Aegis and HE's seven less Long Poison)" % _gated.size())
-	ok(_ungated.size() == 35, "§1: %d ungated live ordinary runes — 35 since HO (HE's 17, Long Poison, HF's fifteen and the crest's two)" % _ungated.size())
+	ok(_ungated.size() == 37, "§1: %d ungated live ordinary runes — 37 since HP (HE's 17, Long Poison, HF's fifteen and the crest's four)" % _ungated.size())
 	# THE GATED FORTY-THREE: out without the engine, in with it. Both arms.
 	var out_without := 0
 	var in_with := 0

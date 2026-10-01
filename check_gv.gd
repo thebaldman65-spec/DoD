@@ -219,7 +219,15 @@ const GROUPS := {
 	# ARM**: each worn through the crest's own door and bare, on the real battle for
 	# the run in hand. §1 here asserts that gate names every one.
 	"tithe": ["CREST", "every hero's Break at the strike loop, healed to the lowest of the four"],
-	"fellowship": ["CREST", "each hero's turn-start upkeep: one debuff off an ally"],
+	# **BATCH HP §2 — THE CREST'S THREE LIVE RUNES JOIN IT, AND FELLOWSHIP LEAVES.** Each
+	# pays a stat on every hero while a condition on who stands holds as the fight runs,
+	# behind no `has_engine`, so the four-arm drive has no board for them either.
+	# **`check_hp` §2 IS THEIR ARM**: each offered, taken and worn through the crest's own
+	# door, then driven through a real fall and a real revive. Fellowship is retired (HP
+	# §3), and a retired rune is outside the population this table partitions.
+	"empty_pulpit": ["CREST", "every hero's damage taken, while no Cleric stands"],
+	"dead_air": ["CREST", "every hero's damage dealt, while no Mage stands"],
+	"dirge": ["CREST", "every hero's damage dealt, while a hero lies fallen"],
 }
 
 # The cards a drive casts beyond the one `requires_ability` names, seated drafted
@@ -894,15 +902,24 @@ func _s1_every_rune_driven() -> void:
 	var crest := 0
 	var hf_src := FileAccess.get_file_as_string("res://check_hf.gd")
 	var ho_src := Gate.strip_comments(FileAccess.get_file_as_string("res://check_ho.gd"))
+	var hp_src := Gate.strip_comments(FileAccess.get_file_as_string("res://check_hp.gd"))
 	for id in _ordinary():
 		# BATCH HO §3 — A `CREST` RUNE HAS NO ENGINE AND NO HERO TO SEAT IT ON, AND
 		# `check_ho` §5 DRIVES IT WORN THROUGH THE CREST AND BARE (the group's
 		# comment). The arm here is that the drive exists: that gate names the rune
 		# among the crest runes it drives, and carries the section that wears it.
+		# BATCH HP §2 — OR `check_hp` §2 DOES: its table of the three live runes names
+		# the rune, and it carries the section that drives each through a real fall
+		# and a real revive. And `check_ho`'s arm is now its §5 section NAMED FOR THE
+		# RUNE: its `CRESTS` became the route's pair at HP (Tithe and Dirge), which
+		# names a rune §5 does not wear, so naming it there no longer means driving it.
 		if String(GROUPS.get(id, [""])[0]) == "CREST":
-			ok(ho_src.contains("const CRESTS := [") and ho_src.contains('"%s"' % id)
-					and ho_src.contains("func _s5b_tithe") and ho_src.contains("func _s5c_fellowship"),
-				"§1: %s is worn by the crest and `check_ho` §5 does not drive it — a CREST rune nobody drives" % id)
+			var by_ho: bool = ho_src.contains("const CRESTS := [") and ho_src.contains('"%s"' % id) \
+				and (ho_src.contains("func _s5b_%s(" % id) or ho_src.contains("func _s5c_%s(" % id))
+			var by_hp: bool = hp_src.contains("const THREE := {") and hp_src.contains('"%s": {' % id) \
+				and hp_src.contains("func _s2c_each_through_a_fall_and_a_revive")
+			ok(by_ho or by_hp,
+				"§1: %s is worn by the crest and neither `check_ho` §5 nor `check_hp` §2 drives it — a CREST rune nobody drives" % id)
 			crest += 1
 			continue
 		# BATCH HF — A `KIT` RUNE HAS NO ENGINE TO EQUIP OR OWN, AND `check_hf` §1
@@ -947,7 +964,7 @@ func _s1_every_rune_driven() -> void:
 	for id6 in GROUPS:
 		if String(GROUPS[id6][0]) == "DEAD":
 			dead += 1
-	print("    %d of %d rows pay equipped and move nothing unequipped; %d of %d others pay unequipped (%d named DEAD); %d KIT runes driven by `check_hf` §1; %d CREST runes driven by `check_ho` §5" % [
+	print("    %d of %d rows pay equipped and move nothing unequipped; %d of %d others pay unequipped (%d named DEAD); %d KIT runes driven by `check_hf` §1; %d CREST runes driven by `check_ho` §5 or `check_hp` §2" % [
 		rows_ok, ROWS.size(), others_ok, GROUPS.size() - dead - kit - crest, dead, kit, crest])
 	ok(rows_ok == ROWS.size(), "§1: only %d of %d rows read clean on both arms" % [rows_ok, ROWS.size()])
 	await _s1b_the_price()

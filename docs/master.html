@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-09-30 (Batch HO &mdash; the supply route, the trap, and the first crest runes)</b></p>
+<p align="right"><b>Last updated: 2026-09-30 (Batch HP &mdash; the condition as a fight runs, and the three runes it makes real)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1239,7 +1239,7 @@ back. A card that opens without any engine &mdash; Battle Poise and Counter Time
 Kill Command and the companion cards on the companion every Hunter but the Sharpshooter summons
 &mdash; always fights.</li>
 <li><b>A rune that reads an engine is offered only while that engine is equipped.</b> Forty-two of
-the seventy-seven ordinary runes pay nothing at all to a hero whose engine slots do not hold their engine &mdash;
+the seventy-nine ordinary runes pay nothing at all to a hero whose engine slots do not hold their engine &mdash;
 a Ruin rune to a Cleric who has unequipped the Rune of the Occultist (core), a Focus rune to a Hunter who has
 unequipped the Rune of the Sharpshooter (core) &mdash; and none of them is rolled for him, at the Peddler, in
 an elite's cache, in a bargain or from an event. <b>A rune that still does part of its job without its
@@ -2743,28 +2743,33 @@ Equipping takes a rune out of the bag and unequipping puts it back. <b>A drop on
 shown beside the twenty: drop one of them to take it, or leave it behind. A full bag refuses an
 unequip until there is room, and a swap &mdash; one rune each way &mdash; always goes through.
 <br><b>THE CREST</b> is a slot of its own, beside the heroes' slots, for a rune worn by every hero at
-once: its effect reaches all four as a fight begins. There is one crest slot. <b>TWO CREST RUNES EXIST.
-<i>Tithe</i></b>: every hero's Break damage heals whoever among the four is lowest, for 30% of its value. It reads
-the Break an ordinary blow applies as it lands &mdash; none into an enemy already Broken, and nothing for Break dealt by a
-card's own effect, a trap, a companion or a talent's proc &mdash; and it is added to the talent tree's <i>Breaking Heals a
-Hero</i> for a hero who wears both.
-<b><i>Fellowship</i></b>: at the start of each hero's turn, one debuff is cleared from an ally who carries one, the hero
-himself among them &mdash; added to <i>Cleanse Debuffs Each Turn</i> the same way. <b>A crest rune drops, is sold and sits
+once: its effect reaches all four in every fight. There is one crest slot. <b>FOUR CREST RUNES EXIST.
+<i>Tithe</i></b>: a hero's attack that lands Break heals whoever among the four is lowest, for 30% of it. It reads the
+Break an ordinary attack applies as it lands &mdash; none into an enemy already Broken, and nothing for Break dealt by a
+card's own effect, a trap, a companion, a talent's proc or the Long Watch's carry &mdash; and it is added to the talent
+tree's <i>Breaking Heals a Hero</i> for a hero who wears both. <b><i>Empty Pulpit</i></b>: while no Cleric stands, every
+hero takes 50% less damage. <b><i>Dead Air</i></b>: while no Mage stands, every hero deals 50% more damage.
+<b><i>Dirge</i></b>: while a hero lies fallen, the rest deal 45% more damage. <b>A crest rune drops, is sold and sits
 in the bag as any other rune does</b>, belongs to no class, and wears no marker on its name: the Peddler's row, a cache
 and an event's line say <i>for the crest</i> beside one, and a crest rune taken from a cache with the Crest empty is worn
-at once and says so. <b>Neither carries a condition.</b>
-A crest rune's effect may carry a <b>condition on who the heroes are</b> &mdash; a class among the heroes
-or absent from them, how many of a class, a core rune one of them carries, every hero standing, or a hero fallen
-&mdash; read once as each fight opens, over the heroes standing then; when it does not hold, the rune
-pays nothing that fight and the combat log's opening roll call says so. <b>A condition may name several of these at
-once, and holds only when every one does.</b> <b>The four are always one Warrior, one Mage, one Cleric and one Hunter, and a
-hero who falls in a fight that is won stands again when it ends</b>, so a fight opens with a class missing or a hero down
-only when it is resumed after a quit. A card a crest rune grants is on every hero's bar for the fight, priced in
-each hero's own resource, and is not kept after it.
+at once and says so.
+A crest rune's effect may carry a <b>condition on who the heroes are</b> &mdash; a class standing among the heroes or
+none of it standing, how many of a class stand, every hero standing, or a hero fallen &mdash; and <b>each of those is read
+as the fight runs</b>: as it opens, again every time a hero falls, and again every time one is raised. The rune pays
+from the moment its condition holds and stops the moment it does not, and the combat log says so each time; at the
+opening, the roll call says a rune whose condition does not hold yet pays nothing until it does. A condition may also
+name <b>a core rune one of the heroes carries</b>, which is read once, as the fight opens. <b>A condition may name
+several of these at once, and holds only when every one does.</b> A rune whose condition is read as the fight runs
+changes only what every blow reads afresh &mdash; damage dealt and taken, parry, Block, armor piercing and the like &mdash; and
+never maximum health, a resource bar, Attack or anything a companion copies from its Hunter. <b>The four are one
+Warrior, one Mage, one Cleric and one Hunter, and a hero who falls in a fight that is won stands again when it ends</b>,
+so every fight opens with all four standing unless it is resumed after a quit, when a hero who fell before the quit is
+still down. A card a crest rune grants is on every hero's bar for the fight, priced in each hero's own resource, and is
+not kept after it.
 <br><b>ALL TWELVE SPECS ARE AUTHORED AS OF BATCH FK, AND FIFTEEN CLASS RUNES READ NO ENGINE.
-144 ORDINARY ENTRIES: 67 RETIRED AND 77 LIVE.</b> Sixty were written for a lineage &mdash; nine
+147 ORDINARY ENTRIES: 68 RETIRED AND 79 LIVE.</b> Sixty were written for a lineage &mdash; nine
 lineages have five, the Beastmaster six, and the Devout four &mdash; <b>fifteen were written for
-their class and read no engine</b> (below), and <b>two are the Crest's</b> (above). <b>The Devout's fifth is OWED, not missing</b>, and the reason is in
+their class and read no engine</b> (below), and <b>four are the Crest's</b> (above). <b>The Devout's fifth is OWED, not missing</b>, and the reason is in
 <code>docs/reports/FK.md</code> &sect;7: the rune authored for that slot said
 <i>&ldquo;Consecrated Ground grants Faith to allies standing in it, not only to its caster&rdquo;</i>
 and that has been <b>the base kit since Batch AW &sect;2</b>, so it would have shipped 100% inert.
@@ -2832,7 +2837,7 @@ question alive pointed the other way.
 primary is what it touches &mdash; <b>ABILITY, PASSIVE or STAT</b>; the secondary is what gates
 it, if anything. <b>TRADEOFF is the only secondary any entry carries</b> &mdash; a cost paired
 with a bigger upside, self-balancing and readable on the card &mdash; and <b>fifteen of the
-seventy-seven carry one</b>. THRESHOLD and BREADTH remain words in the vocabulary and are on no row. The labels
+seventy-nine carry one</b>. THRESHOLD and BREADTH remain words in the vocabulary and are on no row. The labels
 live in <code>Runes.RUNE_SHAPES</code> beside the archetype tags in <code>RUNE_TAGS</code>, and the
 two are <b>different axes</b>: one says what a rune is FOR in the seven-word card vocabulary, the
 other says what it does and what turns it on. <code>check_ez</code> &sect;0 asserts the label and
@@ -2991,7 +2996,7 @@ Batch X's rule and it still stands. <b>Measured before it was built:</b> two tri
 before either was answered shared a name in <b>265 of 400</b> trials, and a queued candidate was
 also the shop's offer in <b>127 of 400</b>.
 <br><b>AND A RUNE THAT READS AN ENGINE IS OFFERED ONLY WHILE THAT ENGINE IS EQUIPPED (&sect;6.0).</b>
-Forty-two of the seventy-seven are in that table &mdash; every Ruin, Focus and Resonance rune, the Mercy
+Forty-two of the seventy-nine are in that table &mdash; every Ruin, Focus and Resonance rune, the Mercy
 and Faith runes and the one that adds to Divine Shield, both Heavy Plating runes and Bared Plate, both
 stance-number runes and Mirror Guard, two of the Pack Bond runes, two of the Trapper runes, both Overburn
 runes and Long Fuse, the Cryomancer's Killing Cold and Deep Cold, and the Berserker's Slaughterhouse
@@ -3041,11 +3046,11 @@ doubles Break damage twice, Quickened takes four turns off a cooldown rather tha
 repairs are <b>written back</b> and neither is a reroll &mdash; a clean offer is returned
 untouched.
 <br><b>THE RETIRED POOL'S AUTHORING STRUCTURE, WHICH IS HISTORY AND NOT THE LIVE SHAPE
-(corrected at FF &sect;3, and again at FR &sect;2).</b> The live pool is <b>77 ordinary runes, every one
+(corrected at FF &sect;3, and again at FR &sect;2).</b> The live pool is <b>79 ordinary runes, every one
 scoped to its class or to the Crest</b> &mdash; there is no universal rune in the game. <b>The 65 ET retired
 were 5 universal, 3 class-wide for each of the four classes, and 4 spec runes for every one of the
 twelve specs</b>; the headline that stood here read <i>"Spec coverage: 65 authored runes"</i> with
-nothing marking it as the retired half, and the file holds <b>168 entries</b> now. Each
+nothing marking it as the retired half, and the file holds <b>171 entries</b> now. Each
 retired set was <i>authored</i> to one rule:
 <b>one rune per talent lane, plus one splash</b> that carries a term from every lane and
 pays for reaching outside one. Exactly one rune per set <b>charges for its upside</b>, and it

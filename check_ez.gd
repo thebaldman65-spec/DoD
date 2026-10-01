@@ -141,7 +141,7 @@ func _s0_the_pool() -> void:
 	# is kept (the Melted Armor contract), so a one-out-one-in replacement grows
 	# the file by one — the FC Split Tongue / Shared Ruin shape exactly, and
 	# `check_es` §1's own comment already records it.
-	print("\n§0 — the pool: sixty live, sixty-seven retired")
+	print("\n§0 — the pool: sixty live, sixty-eight retired")
 	var data := _data()
 	var ez := _ez_ids()
 	ok(ez.size() == 60, "§0: %d entries carry no retirement, expected 60 live runes"
@@ -150,15 +150,18 @@ func _s0_the_pool() -> void:
 	# engines, so every class holds the charter's six engine runes.
 	# **BATCH HF MOVED IT 151 -> 166**: fifteen live runes written for their class.
 	# **BATCH HO MOVED IT 166 -> 168**: the crest's first two, live.
-	ok(data.size() == 168, "§0: the authored pool is %d entries, expected 168 (the twenty-four engine runes, HF's fifteen and the crest's two)" % data.size())
+	# **BATCH HP MOVED IT 168 -> 171**: the three crest runes that read who stands, live;
+	# Fellowship is retired and its entry kept (ET's contract), so the crest's live count
+	# goes 2 -> 4 and the file grows by the three.
+	ok(data.size() == 171, "§0: the authored pool is %d entries, expected 171 (the twenty-four engine runes, HF's fifteen and the crest's four live)" % data.size())
 	var eng := 0
 	for id0 in data:
 		if String((data[id0] as Dictionary).get("engine", "")) != "":
 			eng += 1
 	var hf := _hf_ids()
 	var crest := _crest_ids()
-	ok(eng == 24 and hf.size() == 15 and crest.size() == 2
-			and ez.size() + eng + hf.size() + crest.size() == 101,
+	ok(eng == 24 and hf.size() == 15 and crest.size() == 4
+			and ez.size() + eng + hf.size() + crest.size() == 103,
 		"§0: ...and twenty-four of them are ENGINE runes (GK, GO), %d are HF's class runes and %d are the crest's, live beside the sixty and outside this gate's population (%d engines)" % [hf.size(), crest.size(), eng])
 	# THE PARTITION: every live entry is one of the four kinds, so a live rune that
 	# is none of them — a scope nothing resolves, a lineage and the crest at once —
@@ -434,14 +437,38 @@ func _s3_the_lever_driven() -> void:
 # BACK.** `Talents.apply_payload` matches an ability payload on `display_name`,
 # so a rune naming an ability the hero does not own applies SILENTLY and does
 # NOTHING — which is why this is driven rather than read off the JSON.
+# **BATCH HP §5 — THE ZERO THIS SECTION ASSERTS IS EZ's OWN.** It counted every
+# `condition` as the one FN retired, and HL's keys on who stands (read as the fight
+# runs since HP §1) are not that: FN's finding stands and is answered by the figure
+# (`check_fn` §1b holds the relation). So the zero is EZ's two retired tag keys over
+# the same population, and a payload whose condition asks who stands is LANDED on a
+# party it holds for, through the sheet's route (no `LIVE_DOOR`), so every payload
+# here still lands its field.
+const EZ_RETIRED_KEYS := ["tag_threshold", "tag_breadth"]
+
+
+func _party_for(cond: Dictionary) -> Array:
+	var party: Array = [{"key": "warrior", "hp": 10}, {"key": "mage", "hp": 10},
+		{"key": "cleric", "hp": 10}, {"key": "hunter", "hp": 10}]
+	if cond.has("heroes_lack_class"):
+		for m in party:
+			if String((m as Dictionary)["key"]) == String(cond["heroes_lack_class"]):
+				(m as Dictionary)["hp"] = 0
+	if cond.has("heroes_all_standing") and not bool(cond["heroes_all_standing"]):
+		(party[1] as Dictionary)["hp"] = 0
+	return party
+
+
 func _s4_the_payloads() -> void:
-	print("\n§4 — every payload lands, and none is refused")
+	print("\n§4 — every payload lands, and none carries a retired tag condition")
 	var data := _data()
 	var gated := 0
+	var asks_who := 0
 	var landed := 0
 	var missed: Array = []
 	var not_refused: Array = []
-	for id in _ez_ids() + _hf_ids() + _crest_ids():
+	var pop: Array = _ez_ids() + _hf_ids() + _crest_ids()
+	for id in pop:
 		var e: Dictionary = data[id]
 		var payload: Dictionary = Runes.build(id).get("payload", {})
 		var stats: Dictionary = payload.get("stat", {})
@@ -462,7 +489,13 @@ func _s4_the_payloads() -> void:
 		# retired predicate re-implemented in that gate as the arm's own control.
 		var met := _member("mage", "occultist", [])
 		var cfg_on := {"abilities": []}
-		Talents.apply_payload(cfg_on, payload, 1, {"learned": {}, "member": met})
+		var ctx := {"learned": {}, "member": met}
+		for hk in Talents.HERO_KEYS:
+			if cond.has(hk):
+				ctx["party"] = _party_for(cond)
+		if ctx.has("party"):
+			asks_who += 1
+		Talents.apply_payload(cfg_on, payload, 1, ctx)
 		var all_on := true
 		for f2 in stats:
 			if not cfg_on.has(f2):
@@ -470,18 +503,27 @@ func _s4_the_payloads() -> void:
 				missed.append("%s: %s did not land" % [id, f2])
 		if all_on:
 			landed += 1
-		if not cond.is_empty():
-			gated += 1
-			not_refused.append("%s carries %s" % [id, cond])
+		for rk in EZ_RETIRED_KEYS:
+			if cond.has(rk):
+				gated += 1
+				not_refused.append("%s carries %s" % [id, cond])
 	ok(missed.is_empty(), "§4: every payload lands its field (%s)" % [missed])
 	# BATCH HF — AND HF's FIFTEEN LAND TOO: 60 + 15.
 	# BATCH HO — AND THE CREST'S TWO: 60 + 15 + 2.
-	ok(landed == 77, "§4: %d of 77 landed (the sixty, HF's fifteen and the crest's two)" % landed)
-	ok(gated == 0, "§4: %d runes carry a condition, and FN retired the last of them" % gated)
+	# BATCH HP — THE CREST'S FOUR (Tithe and the three that ask who stands; Fellowship
+	# is retired): the count is the population itself now, printed, and the sixty and
+	# the fifteen are floored beside it, so a population that emptied cannot pass.
+	ok(landed == pop.size() and _ez_ids().size() >= 60 and _hf_ids().size() >= 15 and _crest_ids().size() >= 4,
+		"§4: %d of %d landed (the sixty %d, HF's fifteen %d and the crest's %d)" % [
+			landed, pop.size(), _ez_ids().size(), _hf_ids().size(), _crest_ids().size()])
+	ok(gated == 0, "§4: %d runes carry EZ's retired tag condition, and FN retired the last of them" % gated)
 	ok(not_refused.is_empty(),
-		"§4: a live payload is conditional again (%s)" % [not_refused])
+		"§4: a live payload carries a retired tag condition again (%s)" % [not_refused])
+	# THE POSITIVE ARM: the crest's conditions on who stands were landed on a party
+	# they hold for, so the arm above read them rather than skipping them.
+	ok(asks_who >= 3, "§4: %d payloads ask who stands — the three crest runes were not landed on a party" % asks_who)
 	# (The figure printed the literal 60 from EZ until HO, through HF's fifteen.)
-	print("    %d payloads, %d of them gated, all landing on a hero with nothing drafted" % [landed, gated])
+	print("    %d payloads, %d asking who stands (landed on a party they hold for), %d carrying a retired tag condition" % [landed, asks_who, gated])
 
 	# **AND THE FIELDS ARE RUNE-OWNED**, which is EM's charter asserted rather
 	# than claimed: every `rune_` field these twenty-one write has

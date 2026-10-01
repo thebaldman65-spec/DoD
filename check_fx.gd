@@ -1063,13 +1063,35 @@ func _conditions(x: Variant) -> int:
 	return n
 
 
+# **BATCH HP §5 — THE QUESTION IS WHETHER A RUNE READS A NODE, AND A CONDITION IS NOT
+# ALWAYS THAT.** This counted every `condition` key, which was the same claim while the
+# only condition a rune could carry was the tree's `has_node` or a retired tag. HL's
+# keys read who STANDS, and since HP three crest runes carry one — none reads a node. So
+# the arm counts a condition that names `has_node`, the tree's own door, and prints
+# every condition it read so the population is on the line.
+func _node_reads(x: Variant) -> int:
+	var n := 0
+	if x is Dictionary:
+		for k in x:
+			if String(k) == "condition" and x[k] is Dictionary and (x[k] as Dictionary).has("has_node"):
+				n += 1
+			n += _node_reads(x[k])
+	elif x is Array:
+		for e in x:
+			n += _node_reads(e)
+	return n
+
+
 func _s5_nothing_reads_a_node() -> void:
 	print("\n§5 — nothing reads a node but the tree's own door")
 	var runes: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/runes.json"))
 	var conds := 0
+	var reads := 0
 	for rid in runes:
 		conds += _conditions(runes[rid])
-	ok(conds == 0, "§5: %d rune payload(s) carry a condition — a rune reading a node" % conds)
+		reads += _node_reads(runes[rid])
+	print("    %d rune conditions read, %d of them naming a node" % [conds, reads])
+	ok(reads == 0, "§5: %d rune payload(s) carry a condition naming a node — a rune reading a node" % reads)
 	ok(runes.size() > 0, "§5: no runes were read — the sweep above read nothing")
 	var callers: Array = []
 	var files := 0
@@ -1088,4 +1110,4 @@ func _s5_nothing_reads_a_node() -> void:
 	for t in Talents.tree():
 		tree_conds += _conditions(t)
 	ok(tree_conds == 0, "§5: a node carries a condition — the tree reads itself")
-	print("  %d runes, 0 conditions; %d scripts swept, `has_node` only in talents.gd" % [runes.size(), files])
+	print("  %d runes, 0 reading a node; %d scripts swept, `has_node` only in talents.gd" % [runes.size(), files])

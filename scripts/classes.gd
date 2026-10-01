@@ -4706,7 +4706,7 @@ static func draft_ability(display_name: String) -> Ability:
 		# PLAYER-CHOSEN. It points the card at the ally COMMUNION CANNOT REACH —
 		# Communion rolls at (15 x their own stacks)%, so the ally on zero is
 		# the one it never touches — and it wastes nothing: `faith_stacks` caps
-		# at five, so three granted to an ally already on four throws two away.
+		# at `FAITH_RELEASE`, so a grant to an ally already near it throws the rest away.
 		# Aiming at the floor makes the grant worth its full three every time.
 		#
 		# CORRECTION TOWARD THE CODE, RECORDED RATHER THAN GLOSSED: the brief

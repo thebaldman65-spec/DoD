@@ -470,32 +470,142 @@ static func condition_met(cond: Dictionary, ctx: Dictionary) -> bool:
 # FALSE** — the header's own safe direction: an effect that fails to appear is a
 # bug you can see.
 #
-# **EVALUATED ONCE, AT THE SPAWN, AND THE KEYS ARE THE ONES THAT CANNOT CHANGE IN
-# A FIGHT.** Who is in the party and what core runes they carry are fixed when the
-# four are built (nothing in `battle.gd` writes an engine's slot, GM §2), so a
-# payload stamped on them stays true to the end. **Every key counts the heroes who
-# STAND when the fight opens** — a hero who fell and stays down (GH) is not
-# counted — because a condition phrased "while a Cleric stands" is false of a
-# Cleric lying on the field. `heroes_all_standing` is that same reading, of all of
-# them, AT THE OPENING. **Whether they are all alive LATER is the continuous half,
-# and it is not built**: a stamped payload cannot come off a hero when a sibling
-# falls without a door that undoes an arbitrary payload mid-fight, and a spawn
-# stamp that read true at turn one and false at turn six would be a rune whose text
-# is a lie (`docs/reports/HL.md` §6 names the split).
+# **Every key counts the heroes who STAND** — a hero who fell and stays down (GH)
+# is not counted — because a condition phrased "while a Cleric stands" is false of
+# a Cleric lying on the field. `heroes_all_standing` is that same reading, of all
+# of them.
+#
+# **BATCH HP §1 — FOUR OF THE FIVE ARE READ AS THE FIGHT RUNS (ruled).** Read once
+# at the spawn they were constants in a run played forward: the draft seats one of
+# each class and a won fight raises the fallen, so a key about who stands could
+# only move inside a fight — where nothing re-read it. **`LIVE_KEYS` are the four
+# the battle re-reads at every death and every revive** (`battle._reread_live`),
+# and a payload whose condition carries one is a LIVE payload: the spawn does not
+# stamp it (`LIVE_DOOR` in the ctx), the battle writes it onto the built heroes
+# once the field is laid, takes it back when the condition turns false and puts it
+# back when it turns true. **`heroes_hold_core` stays at the spawn** — ruled, on the
+# reason that nothing in `battle.gd` writes an engine's slot (GM §2); the key still
+# counts the heroes who stand, so it is read once, as the fight opens, and a live
+# payload that also carries it is weighed on it there and never again.
 #
 #   heroes_include_class: "cleric"                    — at least one stands
 #   heroes_lack_class:    "mage"                      — none stands
 #   heroes_class_count:   {"class": "warrior", "min": 2, "max": 2} — how many stand
 #   heroes_hold_core:     "pack"                      — a standing hero has that
 #                                                       core rune's engine slotted
-#   heroes_all_standing:  true                        — every hero stands at the opening
-#   heroes_all_standing:  false                       — one or more is down at the opening
+#                                                       (read as the fight opens)
+#   heroes_all_standing:  true                        — every hero stands
+#   heroes_all_standing:  false                       — one or more is down
 #                                                       (HO §2: the value is read, not only the key)
 #
 # The keys say HEROES, never the retired word (`test_batch_bx` §4b sweeps every
 # literal here): a key is data a rune is authored in, and the four are heroes.
 const HERO_KEYS := ["heroes_include_class", "heroes_lack_class", "heroes_class_count",
 	"heroes_hold_core", "heroes_all_standing"]
+const LIVE_KEYS := ["heroes_include_class", "heroes_lack_class", "heroes_class_count",
+	"heroes_all_standing"]
+# The ctx key the battle spawn hands `apply_payload` so a live payload is left for
+# the battle's own door rather than stamped into the config.
+const LIVE_DOOR := "live_door"
+
+# ── WHAT A LIVE PAYLOAD MAY WRITE (BATCH HP §1b, DERIVED) ──────────────────────
+#
+# **A FIELD READ FRESH AT ITS READ SITE IS REVERSIBLE; A FIELD CONSUMED ONCE IS
+# NOT.** Change a fresh field and the next read sees it; a consumed one has already
+# built something the change cannot reach. Derived over HN §3a's twenty-eight
+# every-hero fields, each read at every line that reads or writes it
+# (`docs/reports/HP.md` §1b carries the table): seventeen are read fresh and never
+# written after the spawn, and each of the four `rune_` twins below is summed with
+# its node's field in the one expression that reads them.
+const LIVE_FIELDS := ["dmg_bonus", "dmg_taken_bonus", "parry_bonus", "pierce_bonus",
+	"block_chance", "broken_will_ranks", "rune_broken_will_ranks", "blood_communion",
+	"rune_blood_communion", "bonecracker_ranks", "rune_bonecracker_ranks", "field_medic",
+	"rune_field_medic", "follow_through", "deflection", "undying_rage", "no_cover",
+	"sundering_shot", "no_quarter_ranks", "rapid_fire", "snap_shot"]
+# **THE ELEVEN OF THE TWENTY-EIGHT A LIVE PAYLOAD IS REFUSED, AND WHERE EACH IS
+# CONSUMED** — with the party-wide stamps beside them. The refusal names the reason,
+# so the batch that authors one reads why rather than re-deriving it. A field on
+# neither list was never read at its read site for this purpose, and is refused as
+# unknown until it is.
+const CONSUMED_FIELDS := {
+	"max_hp": "consumed at the spawn: it builds the health bar, and the spawn scales it after the payloads",
+	"max_hp_pct": "consumed at the spawn: it is multiplied into maximum health and is not a field",
+	"attack": "consumed at the spawn and at every summon: the spawn scales it after the payloads, a companion copies it, and Whetstone writes it mid-fight",
+	"armor": "consumed at every summon: a companion copies it",
+	"crit_bonus": "consumed at every summon: a companion copies it, and a battle modifier floors it at the spawn",
+	"speed": "consumed at the opening and at every summon: the first turn order is seeded from it, and a companion copies it",
+	"max_resource": "consumed at the spawn: it builds the resource bar, and every gain is clamped to it",
+	"iron_will_ranks": "consumed at the spawn: its chip is laid there, only when the figure is above nothing",
+	"whetstone": "a payout that outlives it: each crit it pays writes Attack for the rest of the fight",
+	"constitution": "consumed at every summon, and written mid-fight: a companion copies it, and Unrelenting lends and takes back Constitution",
+	"stability": "consumed at every summon, and the Break bar is filled against it: a companion copies it",
+	# HN §3a's party-wide stamps (its third group, outside the twenty-eight) and their
+	# `rune_` twins: the battle takes the best holder's figure once, at the spawn, and a
+	# subtraction cannot know whether another holder still supplies it.
+	"devoutness_ranks": "a stamp across the four: the best holder's figure is put on all four once, at the spawn",
+	"rune_devoutness_ranks": "a stamp across the four: the best holder's figure is put on all four once, at the spawn",
+	"last_hope_pct": "a stamp across the four: the best holder's figure is put on all four once, at the spawn",
+	"rune_last_hope_pct": "a stamp across the four: the best holder's figure is put on all four once, at the spawn",
+	"guardian_step": "a stamp across the four: the best holder's figure is put on all four once, at the spawn",
+}
+
+
+# BATCH HP §1 — a payload is LIVE when its condition carries a key read as the fight
+# runs; it is then the battle's door that pays it, never the spawn's stamp.
+static func is_live(payload: Dictionary) -> bool:
+	var cond: Variant = payload.get("condition", {})
+	if not (cond is Dictionary):
+		return false
+	for k in LIVE_KEYS:
+		if (cond as Dictionary).has(k):
+			return true
+	return false
+
+
+# THE ONE ANSWER TO "may this payload be carried" — "" when it may, the reason when
+# it may not. **A LIVE PAYLOAD IS A STAT ON A FIELD READ FRESH, AND NOTHING ELSE**: a
+# card cannot leave a fight it opened with (GM §2), an ability's figures are set as
+# well as added, a nested `also` or `upgrade` has no door that re-reads it, and a
+# consumed field cannot be taken back. Asked where the table loads (`Runes._load`)
+# and wherever a payload is applied, so a refused payload is loud the moment it
+# exists and is paid by no route.
+static func live_refusal(payload: Dictionary) -> String:
+	for nest in ["also", "upgrade"]:
+		for extra in payload.get(nest, []):
+			if extra is Dictionary and (is_live(extra) or live_refusal(extra) != ""):
+				return "a condition read as the fight runs sits inside `%s`, where nothing re-reads it" % nest
+	if not is_live(payload):
+		return ""
+	for k in payload:
+		if not String(k) in ["condition", "stat"]:
+			return "it carries `%s`, and a payload read as the fight runs carries a stat and nothing else" % k
+	var stats: Variant = payload.get("stat", {})
+	if not (stats is Dictionary) or (stats as Dictionary).is_empty():
+		return "it writes no stat"
+	for f in stats:
+		if not LIVE_FIELDS.has(String(f)):
+			return "`%s` is %s" % [f, String(CONSUMED_FIELDS.get(String(f),
+				"not a field this door has read at its read site"))]
+		if not ((stats[f] is int) or (stats[f] is float)):
+			return "`%s` carries %s, not a number" % [f, str(stats[f])]
+	return ""
+
+
+# The live keys alone, against the four as they stand now — the battle's re-read.
+static func live_condition_met(cond: Dictionary, party: Array) -> bool:
+	var live := {}
+	for k in LIVE_KEYS:
+		if cond.has(k):
+			live[k] = cond[k]
+	return party_condition_met(live, party)
+
+
+# Everything BUT the live keys — what the spawn weighs once, as the fight opens.
+static func spawn_half(cond: Dictionary) -> Dictionary:
+	var rest: Dictionary = cond.duplicate()
+	for k in LIVE_KEYS:
+		rest.erase(k)
+	return rest
 
 
 static func party_condition_met(cond: Dictionary, party: Array) -> bool:
@@ -655,6 +765,16 @@ const FALLBACK_KEY := "talent_upgrade_fallbacks"
 
 static func apply_payload(cfg: Dictionary, payload: Dictionary, ranks: int,
 		ctx: Dictionary = {}) -> void:
+	# BATCH HP §1 — A PAYLOAD A LIVE CONDITION CANNOT FOLLOW IS PAID BY NO ROUTE, AND
+	# SAYS SO. And a live one is the battle's to pay once the field is laid: the
+	# spawn hands `LIVE_DOOR`, the hero sheet does not, so the sheet shows what the
+	# opening will pay and the spawn leaves it to the door that can take it back.
+	var why := live_refusal(payload)
+	if why != "":
+		push_error("A rune payload is refused: %s — %s" % [why, str(payload)])
+		return
+	if bool(ctx.get(LIVE_DOOR, false)) and is_live(payload):
+		return
 	if not condition_met(payload.get("condition", {}), ctx):
 		return
 	if payload.has("stat"):

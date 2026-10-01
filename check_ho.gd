@@ -54,19 +54,31 @@ const FRAME_CAP := 60000
 const STRETCH_CAP := 1200
 
 # The two the file holds, and the fixture every condition and trap drive wears.
-const CRESTS := ["tithe", "fellowship"]
+# BATCH HP §3 — FELLOWSHIP IS RETIRED, AND DIRGE TAKES ITS PLACE IN THE PAIR. The
+# route arms (§1) ask their question of two crest runes at once — one row each on a
+# counter, one pick worn and the next bagged — so the pair is any two the file holds
+# live; Dirge is one of the three HP authored. Tithe keeps its own sections (§5b).
+const CRESTS := ["tithe", "dirge"]
+# HO's own two entries, by id: §5a and §5e ask of them whether they are live or not —
+# a retired entry is kept and still resolves (ET), so what HO authored is still asked.
+const HO_TWO := ["tithe", "fellowship"]
 const CREST_FX := "ho_fixture_crest"
 const CREST_HP := 9
 
 # §2 — the three the brief specified and this batch did not author, by the
 # condition each would carry. Driven as fixtures.
+# BATCH HP §2 — AUTHORED AT HP, UNDER THE NAMES THE DESIGNER RULED (HP §0: *Cold
+# Hearth* is Dead Air and *Gravesong* is Dirge), each on the condition HO specified,
+# read as the fight runs. Keyed by the ruled names; the two HO proposed are
+# `HO_NAMES`, which §2d holds out of the file.
 const HELD_BACK := {
 	"Empty Pulpit": {"heroes_lack_class": "cleric"},
-	"Cold Hearth": {"heroes_lack_class": "mage"},
-	"Gravesong": {"heroes_all_standing": false},
+	"Dead Air": {"heroes_lack_class": "mage"},
+	"Dirge": {"heroes_all_standing": false},
 }
+const HO_NAMES := ["Cold Hearth", "Gravesong"]
 # The hero whose fall makes each hold, by seat.
-const FALLS := {"Empty Pulpit": 2, "Cold Hearth": 1, "Gravesong": 1}
+const FALLS := {"Empty Pulpit": 2, "Dead Air": 1, "Dirge": 1}
 
 # §5 — BR §1: the five names, and the shared-word near-misses each is known to
 # have (compared as an EQUALITY, EK's `CLASH_EXEMPT` shape, so a new one reds).
@@ -125,7 +137,7 @@ func _initialize() -> void:
 	await _s2a_the_draft()
 	await _s2b_the_fallen_rise()
 	await _s2c_what_the_three_would_pay()
-	_s2d_none_is_authored()
+	_s2d_the_three_are_authored()
 	await _s3_all_standing()
 	await _s4_the_trap()
 	await _s4d_a_saved_run()
@@ -300,17 +312,29 @@ func _approx(a: Array, b: Array) -> bool:
 
 # The fixture crest's +CREST_HP maximum health against the same party without it:
 # how many of the four it was paid on, and whether the roll call told why not.
+#
+# BATCH HP §1 — A KEY READ AS THE FIGHT RUNS IS PAID BY THE LIVE DOOR, WHICH REFUSES A
+# CONSUMED FIELD (maximum health builds the bar at the spawn). So a condition carrying
+# one of `Talents.LIVE_KEYS` writes damage dealt, read afresh on every blow, and the
+# arm reads that field once the opening read has run; a condition the spawn reads
+# once keeps the stamp this gate was written on. check_hn's shape, the same question.
+const CREST_DMG := 0.09
+
+
 func _paid(keys: Array, engines: Array, cond: Dictionary, fallen := -1) -> Dictionary:
-	var w: Node = await _battle(keys, engines, {"stat": {"max_hp": CREST_HP}, "condition": cond}, true, fallen)
+	var live := Talents.is_live({"condition": cond})
+	var field := "dmg_bonus" if live else "max_hp"
+	var fig: float = CREST_DMG if live else float(CREST_HP)
+	var w: Node = await _battle(keys, engines, {"stat": {field: fig if live else CREST_HP}, "condition": cond}, true, fallen)
 	var hp_w: Array = []
 	for u in _heroes(w):
-		hp_w.append(int((u as BattleUnit).max_hp))
+		hp_w.append(float((u as BattleUnit).get(field)))
 	var roll: Array = (w.get("_rune_roll_call") as Array).duplicate()
-	var o: Node = await _battle(keys, engines, {"stat": {"max_hp": CREST_HP}, "condition": cond}, false, fallen)
+	var o: Node = await _battle(keys, engines, {"stat": {field: fig if live else CREST_HP}, "condition": cond}, false, fallen)
 	var paid := 0
 	var oh: Array = _heroes(o)
 	for i in mini(hp_w.size(), oh.size()):
-		if int(hp_w[i]) - int((oh[i] as BattleUnit).max_hp) == CREST_HP:
+		if is_equal_approx(float(hp_w[i]) - float((oh[i] as BattleUnit).get(field)), fig):
 			paid += 1
 	var told := false
 	for line in roll:
@@ -402,7 +426,7 @@ func _s1b_the_drop() -> void:
 	var parked := _park_all_but(CRESTS)
 	var left := _offerable_now()
 	left.sort()
-	ok(parked > 20 and left == ["fellowship", "tithe"],
+	ok(parked > 20 and left == ["dirge", "tithe"],
 		"§1b: with %d runes parked, the drop's pool is %s — the narrowing did not narrow" % [parked, left])
 	var s := await _win({"type": "fight", "enemies": _run.compose("fight")})
 	ok(_is_battle(s) and bool(s.get("battle_over")), "§1b: the normal fight did not end")
@@ -447,7 +471,7 @@ func _s1c_the_peddler() -> void:
 	for o in offers:
 		on_counter.append(String(((o as Dictionary)["rune"] as Dictionary).get("id", "")))
 	on_counter.sort()
-	ok(on_counter == ["fellowship", "tithe"], "§1c: the counter holds %s — each crest rune once, in one hero's row" % [on_counter])
+	ok(on_counter == ["dirge", "tithe"], "§1c: the counter holds %s — each crest rune once, in one hero's row" % [on_counter])
 	var said := 0
 	for o2 in offers:
 		var r: Dictionary = (o2 as Dictionary)["rune"]
@@ -507,11 +531,11 @@ func _s1d_the_cache() -> void:
 	for c in triple:
 		ids.append(String((c as Dictionary).get("id", "")))
 	ids.sort()
-	ok(ids == ["fellowship", "tithe"], "§1d: the cache's roll offered the Mage %s" % [ids])
+	ok(ids == ["dirge", "tithe"], "§1d: the cache's roll offered the Mage %s" % [ids])
 	mage["rune_candidates"] = [triple.duplicate(true), triple.duplicate(true)]
 	mage["rune_picks_owed"] = 2
 	var ov := await _open_cache(1)
-	ok(ov != null and Gate.has_text(ov, "Tithe  (for the crest)") and Gate.has_text(ov, "Fellowship  (for the crest)"),
+	ok(ov != null and Gate.has_text(ov, "Tithe  (for the crest)") and Gate.has_text(ov, "Dirge  (for the crest)"),
 		"§1d: the Mage's cache does not say its crest runes are the crest's")
 	var took := Gate.press(ov, ["Tithe"]) if ov != null else ""
 	# The toast is read in the frame the press lands: it fades on a timer, and a
@@ -527,10 +551,10 @@ func _s1d_the_cache() -> void:
 	# TAKEN WITH THE CREST FILLED: the second goes to the bag (FD's repair took the
 	# one the party now holds out of the second triple), and the toast says why.
 	var ov2 := await _open_cache(1)
-	var took2 := Gate.press(ov2, ["Fellowship"]) if ov2 != null else ""
-	var said_bag := Gate.has_text(current_scene, "Fellowship goes into the bag — every slot it fits is filled.")
+	var took2 := Gate.press(ov2, ["Dirge"]) if ov2 != null else ""
+	var said_bag := Gate.has_text(current_scene, "Dirge goes into the bag — every slot it fits is filled.")
 	await Gate.frames(self, 3)
-	ok(took2 != "" and _names(_run.party_runes) == ["Tithe"] and _names(_run.rune_bag) == ["Fellowship"],
+	ok(took2 != "" and _names(_run.party_runes) == ["Tithe"] and _names(_run.rune_bag) == ["Dirge"],
 		"§1d: a second crest rune taken went to %s / bag %s — the crest holds one" % [
 			_names(_run.party_runes), _names(_run.rune_bag)])
 	ok(said_bag, "§1d: the second crest rune's trip to the bag was not said")
@@ -562,13 +586,13 @@ func _s1f_the_crest_button() -> void:
 	print("\n§1f — taken: from the bag into the crest, through the bag panel's own button")
 	_new_run(SEATS, ENG4)
 	_run.bag_rune(Runes.build("tithe"))
-	_run.bag_rune(Runes.build("fellowship"))
+	_run.bag_rune(Runes.build("dirge"))
 	var mp := await _to("res://scenes/map.tscn")
 	ok(Gate.has_text(mp, "Crest: "), "§1f: the map draws no crest button")
 	Gate.press(mp, ["Crest:"])
 	await process_frame
 	var bp: Node = Gate.overlay(current_scene, 60)
-	ok(bp != null and Gate.has_text(bp, "THE CREST — 0 of 1 filled") and Gate.has_text(bp, "Tithe") and Gate.has_text(bp, "Fellowship"),
+	ok(bp != null and Gate.has_text(bp, "THE CREST — 0 of 1 filled") and Gate.has_text(bp, "Tithe") and Gate.has_text(bp, "Dirge"),
 		"§1f: the bag panel's crest section does not list the two crest runes in the bag")
 	var rows: Array = _run.party_rune_rows()
 	var ti := -1
@@ -581,7 +605,7 @@ func _s1f_the_crest_button() -> void:
 		eq.emit_signal("pressed")
 		await Gate.frames(self, 3)
 	ok(_names(_run.party_runes) == ["Tithe"] and bool((_run.party_runes[0] as Dictionary).get("equipped", false))
-			and _names(_run.rune_bag) == ["Fellowship"],
+			and _names(_run.rune_bag) == ["Dirge"],
 		"§1f: the Equip left the crest at %s and the bag at %s" % [_names(_run.party_runes), _names(_run.rune_bag)])
 	# THE HELPER THE BATTLE DRIVES USE IS THAT BUTTON'S OWN FUNCTION, and it leaves
 	# the run exactly as the press did.
@@ -704,7 +728,7 @@ func _s2b_the_fallen_rise() -> void:
 	ok(won, "§2b: the fight was not won by the three left")
 	var hp_after := int(_run.party[1]["hp"])
 	print("    the Mage fell in the fight; at its end the member stands at %d of %d" % [hp_after, int(_run.party[1]["max_hp"])])
-	ok(hp_after > 0, "§2b: a hero who fell in a WON fight is still down after it — a fight can now open with a hero fallen in a run played forward, so Gravesong's condition is reachable")
+	ok(hp_after > 0, "§2b: a hero who fell in a WON fight is still down after it — a fight can now open with a hero fallen in a run played forward, so a fallen-hero condition is reachable at the opening")
 	var standing := 0
 	for m in _run.party:
 		if int((m as Dictionary)["hp"]) > 0:
@@ -733,11 +757,12 @@ func _s2c_what_the_three_would_pay() -> void:
 		ok(int(down["paid"]) == 4, "§2c: %s's condition paid on %d with its hero down at the opening — the key reads nothing" % [nm, down["paid"]])
 	# AND THAT STATE, REACHED THE ONLY WAY A RUN REACHES IT: a hero falls, the
 	# process goes, and Continue restarts the fight with him down (GH).
-	var pay := {"stat": {"max_hp": CREST_HP}, "condition": {"heroes_all_standing": false}}
+	# BATCH HP §1 — on `dmg_bonus`, a field the live door carries (`_paid`'s reason).
+	var pay := {"stat": {"dmg_bonus": CREST_DMG}, "condition": {"heroes_all_standing": false}}
 	var s: Node = await _battle(SEATS, ENG4, pay, true)
 	var hp_first: Array = []
 	for u in _heroes(s):
-		hp_first.append(int((u as BattleUnit).max_hp))
+		hp_first.append(float((u as BattleUnit).dmg_bonus))
 	var mage: BattleUnit = _heroes(s)[1]
 	mage.take_hit(999999, 0)
 	await process_frame
@@ -756,54 +781,87 @@ func _s2c_what_the_three_would_pay() -> void:
 	var down_n := 0
 	var back_heroes: Array = _heroes(s2) if _is_battle(s2) else []
 	for u2 in back_heroes:
-		hp_back.append(int((u2 as BattleUnit).max_hp))
+		hp_back.append(float((u2 as BattleUnit).dmg_bonus))
 		if (u2 as BattleUnit).dead:
 			down_n += 1
 	var gained := 0
 	for i in mini(hp_first.size(), hp_back.size()):
-		if int(hp_back[i]) - int(hp_first[i]) == CREST_HP:
+		if is_equal_approx(float(hp_back[i]) - float(hp_first[i]), CREST_DMG):
 			gained += 1
 	print("    the fight as first opened: %s; the same fight resumed after the quit: %s (%d down)" % [hp_first, hp_back, down_n])
 	ok(down_n == 1 and gained == 4,
 		"§2c: the fight resumed after a quit opened with %d down and the fixture paid on %d — the state GH's ruling makes costly is the one a fallen-hero condition pays in" % [down_n, gained])
 
 
-# ── §2d — NONE OF THE THREE IS IN THE FILE ──────────────────────────────────
+# ── §2d — THE THREE ARE IN THE FILE, UNDER THE RULED NAMES ─────────────────
+# BATCH HP §2 — HO held the three back because, read at the spawn, none could pay in
+# a run played forward (§2a–§2c), and this arm held them out of the file for that
+# reason. HP reads the four's standing as the fight runs and authored them, so the
+# arm's question — is a crest rune in the file that can never pay? — is asked of
+# what HP built: each of the three carries the condition HO specified, under the name
+# the designer ruled, every live crest rune that carries one is read through the
+# live door, and the two names HO proposed are in no entry.
 
-func _s2d_none_is_authored() -> void:
-	print("\n§2d — the file holds the two, and no crest rune carries a condition")
+func _s2d_the_three_are_authored() -> void:
+	print("\n§2d — the file holds the three under their ruled names, each on the condition HO specified")
 	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/runes.json"))
 	var crest_ids: Array = []
-	var conditioned: Array = []
-	var named: Array = []
+	var live_ids: Array = []
+	var conditioned := {}
+	var not_live: Array = []
+	var old_named: Array = []
 	for id in (data as Dictionary):
 		var e: Dictionary = (data as Dictionary)[id]
 		if String(e.get("scope", "")) == "party":
 			crest_ids.append(String(id))
-			if not ((e.get("payload", {}) as Dictionary).get("condition", {}) as Dictionary).is_empty():
-				conditioned.append(String(id))
-		for held in HELD_BACK:
-			if String(e.get("name", "")).to_lower() == String(held).to_lower():
-				named.append(String(id))
+			var c0: Dictionary = (e.get("payload", {}) as Dictionary).get("condition", {})
+			if not e.has("retired"):
+				live_ids.append(String(id))
+				if not c0.is_empty():
+					conditioned[String(e.get("name", ""))] = c0
+					if not Talents.is_live(e.get("payload", {})):
+						not_live.append(String(id))
+		for old in HO_NAMES:
+			if String(e.get("name", "")).to_lower() == String(old).to_lower():
+				old_named.append(String(id))
 	crest_ids.sort()
+	live_ids.sort()
 	ok((data as Dictionary).size() > 100, "§2d: data/runes.json read back %d entries" % (data as Dictionary).size())
-	ok(crest_ids == ["fellowship", "tithe"], "§2d: the file's crest runes are %s" % [crest_ids])
-	ok(conditioned.is_empty() and named.is_empty(),
-		"§2d: a crest rune carries a condition (%s) or one of the three held back is authored (%s) — §2a–§2c say when each would pay" % [conditioned, named])
-	# §2 — A RUNE THAT READS WHO STANDS SAYS WHEN IT READ IT (ruled at HO §2). None
-	# does today; the arm is the population, so the first one authored is asked.
+	ok(crest_ids == ["dead_air", "dirge", "empty_pulpit", "fellowship", "tithe"]
+			and live_ids == ["dead_air", "dirge", "empty_pulpit", "tithe"],
+		"§2d: the file's crest runes are %s, %s of them live" % [crest_ids, live_ids])
+	var wrong: Array = []
+	for nm in HELD_BACK:
+		if str(conditioned.get(nm, {})) != str(HELD_BACK[nm]):
+			wrong.append("%s: %s" % [nm, conditioned.get(nm, "<not authored>")])
+	ok(wrong.is_empty() and conditioned.size() == HELD_BACK.size(),
+		"§2d: the crest's conditions are not the three HO specified under the ruled names — %s (every conditioned crest rune: %s)"
+			% [wrong, conditioned.keys()])
+	ok(not_live.is_empty(),
+		"§2d: a live crest rune's condition is read only at the spawn — %s; §2a–§2c say it can never pay" % [not_live])
+	ok(old_named.is_empty(), "§2d: a name HO proposed and the designer ruled out is authored — %s" % [old_named])
+	# §2 — A RUNE THAT READS WHO STANDS SAYS WHEN IT READS IT (ruled at HO §2; re-pointed
+	# at HP §1): a condition read as the fight runs says *while*, and one read once says
+	# *as the fight opens* or *enter a fight*. The arm is the population, both kinds.
 	var standing_runes := 0
 	var unsaid: Array = []
 	for id2 in (data as Dictionary):
 		var e2: Dictionary = (data as Dictionary)[id2]
 		var c: Dictionary = (e2.get("payload", {}) as Dictionary).get("condition", {})
-		if c.has("heroes_all_standing"):
+		var reads_who := false
+		for k in c:
+			if String(k).begins_with("heroes_"):
+				reads_who = true
+		if reads_who:
 			standing_runes += 1
 			var words := String(e2.get("desc", "")).to_lower()
-			if not (words.contains("as the fight opens") or words.contains("enter a fight")):
+			var said: bool = words.contains("while") if Talents.is_live(e2.get("payload", {})) \
+				else (words.contains("as the fight opens") or words.contains("enter a fight"))
+			if not said:
 				unsaid.append(String(id2))
 	print("    CHECKED %d runes that read who stands" % standing_runes)
-	ok(unsaid.is_empty(), "§2d: a rune reads who stands and does not say it is read as the fight opens: %s" % [unsaid])
+	ok(standing_runes >= 3 and unsaid.is_empty(),
+		"§2d: %d runes read who stands, and these do not say when they read it: %s" % [standing_runes, unsaid])
 
 
 # ── §3 — `heroes_all_standing`, BOTH VALUES, BOTH PARTIES ───────────────────
@@ -1027,7 +1085,9 @@ func _s5a_the_entries() -> void:
 	print("\n§5a — Tithe and Fellowship: the entries")
 	var nodes := _node_fields()
 	var want := {"tithe": ["rune_blood_communion", "blood_communion"], "fellowship": ["rune_field_medic", "field_medic"]}
-	for id in CRESTS:
+	# BATCH HP §3 — HO's two by id, not the route's pair: Fellowship is retired and its
+	# entry is KEPT with its payload (ET's contract), so every arm below still holds of it.
+	for id in HO_TWO:
 		var cfg: Dictionary = Runes.config(id)
 		var stat: Dictionary = (cfg.get("payload", {}) as Dictionary).get("stat", {})
 		var pair: Array = want[id]
@@ -1319,7 +1379,10 @@ func _s5e_the_names() -> void:
 				if not near.has(tag_row):
 					near.append(tag_row)
 		near.sort()
-		var own: Array = ["rune:%s" % want] if CRESTS.has(low) else []
+		# BATCH HP §2 — A NAME THE FILE HOLDS AS A CREST RUNE IS ITS OWN EXACT HIT: HO's
+		# two (Fellowship retired and kept) and Empty Pulpit, authored at HP under the
+		# name HO proposed. The two HO names the designer ruled out are in no entry.
+		var own: Array = ["rune:%s" % want] if (HO_TWO.has(low) or HELD_BACK.has(want)) else []
 		print("    %s: exact %s; near %s" % [want, exact, near])
 		ok(exact == own, "§5e: '%s' is the name of %s" % [want, exact])
 		var known: Array = (NEAR_MISSES[want] as Array).duplicate()
@@ -1334,7 +1397,13 @@ func _s5e_the_names() -> void:
 			scripts.append(String(f))
 	scripts.sort()
 	ok(scripts.size() >= 20, "§5e: the literal sweep read %d scripts" % scripts.size())
-	for id2 in CRESTS:
+	# BATCH HP §2 — EVERY CREST ENTRY THE FILE HOLDS, not the route's pair: HO's two and
+	# HP's three, each name swept; a name with no row in `LITERAL_MISSES` is owed none.
+	var crest_all: Array = []
+	for cr in _all_crest_runes():
+		crest_all.append(String((cr as Dictionary).get("id", "")))
+	ok(crest_all.size() == 5, "§5e: the literal sweep asks %d crest entries, not the five" % crest_all.size())
+	for id2 in crest_all:
 		var shipped := Runes.display_name(Runes.config(String(id2)))
 		var found: Array = []
 		for f2 in scripts:

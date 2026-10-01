@@ -4,6 +4,44 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The condition as a fight runs, and the three runes it makes real (Batch HP) — 2026-09-30
+
+**Why the condition is read as the fight runs, and not at the spawn.** Read once, as a fight opens, four of the five
+questions a crest can ask about the four heroes had one answer in a run played forward — one of each class, all
+standing — so a rune about a missing Cleric or a fallen hero paid only a player who quit a fight and came back. The
+designer weighed four answers: let a roster leave a class out, keep a fallen hero down between fights, leave the runes
+unbuilt, or read the heroes as the fight runs. The last was chosen because it fixes all three runes rather than one,
+keeps HL's whole door instead of routing around it, and makes the runes better than they were written: *while no Cleric
+stands, every hero takes less* is a moment in a fight, where *you recruited without a Cleric* was a choice in a lobby.
+
+**Why a switch rebuilds the number instead of taking it back.** Taking 0.25 off 0.35 does not land exactly on 0.10 in
+the arithmetic a computer uses. A hero who went through a cycle — the rune on, off, on — would carry a figure a hair
+from where he started, and a second cycle would move it again. So each touched stat keeps the value it had before any
+such rune wrote it, and is rebuilt from that value and whatever holds now. The same set of runes always yields the same
+number.
+
+**Why a live rune may change only what the game re-reads on every blow.** A number the game reads fresh — damage dealt,
+damage taken — can be changed mid-fight and the next blow sees it. A number the game has already turned into something
+cannot: maximum health built a health bar, Attack was scaled for the run's wins, and a companion copies its Hunter's
+armor and speed the moment he calls it. Changing those mid-fight would leave the bar, the scaling or the beast behind, so
+a rune that tries is refused when the game loads it rather than failing quietly in a fight.
+
+**Why the three figures are 50%, 50% and 45%, and why each is a proposal.** A rune that pays only while a hero is down
+pays about a fifth of a fight, so at the brief's 12% and 25% it was worth a small fraction of what the same effect with no
+condition would be, and nothing about a run moved. FN's old finding — a rune with a condition at the flat price is
+strictly worse — is answered by the figure: while it holds it pays several times the bare effect. The figures were set
+so that over an average fight each is worth a large share of a flat 10% on every hero. Dead Air cannot be brought that
+far without an absurd number, because how often no Mage stands depends on which Mage, so it is the one to watch in play.
+
+**Why Fellowship is retired rather than turned down.** The heroes carry about 0.3 debuffs a round. A crest rune that
+cleanses covers all of them at any figure — one cleanse a hero a turn is already far more than is ever needed — so no
+number makes it a choice rather than a switch that turns off a whole layer of the game (the Cleric's Unburden, a rune,
+two talents, a core rune, four cards) for about 2% of damage taken. The shape was the fault, so the rune went.
+
+**Why Tithe's words narrowed rather than its rule widening.** The rule reads the Break an ordinary attack lands, and the
+talent *Breaking Heals a Hero* is paid through the same rule on every class that buys it. Widening the rule would have
+moved a talent nobody measured for it. The words were what was wrong, so the words changed.
+
 ## The supply route, the trap, and the first crest runes (Batch HO) — 2026-09-30
 
 **Why card text and comments do not name a number a constant holds.** One move of Faith's threshold left four kinds of

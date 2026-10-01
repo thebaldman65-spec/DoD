@@ -61,6 +61,20 @@ const CREST_HP := 9
 # hands the four through the same ctx as the crest's.
 const HERO_FX := "hl_fixture_hero_rune"
 const HERO_FX_HP := 7
+# BATCH HP §1 — A KEY READ AS THE FIGHT RUNS IS PAID BY THE LIVE DOOR, WHICH REFUSES A
+# CONSUMED FIELD: maximum health builds the bar at the spawn, so a live key's fixture
+# writes damage dealt (a field every blow reads afresh), and `heroes_hold_core`, read
+# once as the fight opens, keeps the stamp this gate was written on.
+const CREST_DMG := 0.09
+const HERO_FX_DMG := 0.07
+
+
+# The field a fixture carrying `cond` writes, and its figure: [field, crest figure,
+# hero-rune figure].
+func _fx_field(cond: Dictionary) -> Array:
+	if Talents.is_live({"condition": cond}):
+		return ["dmg_bonus", CREST_DMG, HERO_FX_DMG]
+	return ["max_hp", CREST_HP, HERO_FX_HP]
 
 var _g := Gate.new()
 var _run: Node = null
@@ -1112,12 +1126,14 @@ func _s5_the_ceiling() -> void:
 
 # A party of `keys`, each awakened on the engine named for his seat, the fixture
 # crest rune worn with `cond`, and hero `fallen` at 0 health — entered through the
-# fixture's door for the run in hand. Returns {max_hp: [...], roll: [...]}.
+# fixture's door for the run in hand. Returns {max_hp: [...], roll: [...]} — the
+# `max_hp` row carries whichever field the fixture writes (`_fx_field`).
 func _crest_spawn(keys: Array, engines: Array, cond: Dictionary, fallen := -1, with_crest := true) -> Dictionary:
 	var table: Dictionary = Runes._load()
+	var fx: Array = _fx_field(cond)
 	table[CREST_FX] = {"name": "HL Fixture Crest", "scope": "party", "price": 150,
 		"desc": "A fixture of check_hl, never in the file.",
-		"payload": {"stat": {"max_hp": CREST_HP}, "condition": cond}}
+		"payload": {"stat": {String(fx[0]): fx[1]}, "condition": cond}}
 	_run.sim_run = false
 	_run.new_run(keys, [], "standard")
 	for i in _run.party.size():
@@ -1141,7 +1157,7 @@ func _crest_spawn(keys: Array, engines: Array, cond: Dictionary, fallen := -1, w
 	var hp: Array = []
 	for u in s.get("heroes"):
 		if not (u as BattleUnit).is_companion:
-			hp.append(int((u as BattleUnit).max_hp))
+			hp.append((u as BattleUnit).get(String(fx[0])))
 	var roll: Array = (s.get("_rune_roll_call") as Array).duplicate()
 	return {"max_hp": hp, "roll": roll}
 
@@ -1153,8 +1169,9 @@ func _crest_paid(keys: Array, engines: Array, cond: Dictionary, fallen := -1) ->
 	var paid := 0
 	var hp_w: Array = with_c["max_hp"]
 	var hp_o: Array = without["max_hp"]
+	var fig := float(_fx_field(cond)[1])
 	for i in mini(hp_w.size(), hp_o.size()):
-		if int(hp_w[i]) - int(hp_o[i]) == CREST_HP:
+		if is_equal_approx(float(hp_w[i]) - float(hp_o[i]), fig):
 			paid += 1
 	var told := false
 	for line in with_c["roll"]:
@@ -1168,9 +1185,10 @@ func _crest_paid(keys: Array, engines: Array, cond: Dictionary, fallen := -1) ->
 # without it: paid on him alone when it holds, on nobody and TOLD when it does not.
 func _hero_rune_paid(keys: Array, engines: Array, cond: Dictionary) -> Dictionary:
 	var table: Dictionary = Runes._load()
+	var fx: Array = _fx_field(cond)
 	table[HERO_FX] = {"name": "HL Fixture Rune", "scope": "class:mage", "price": 150,
 		"desc": "A fixture of check_hl, never in the file.",
-		"payload": {"stat": {"max_hp": HERO_FX_HP}, "condition": cond}}
+		"payload": {"stat": {String(fx[0]): fx[2]}, "condition": cond}}
 	var hp_arms: Array = []
 	var roll: Array = []
 	for with_rune in [true, false]:
@@ -1195,16 +1213,16 @@ func _hero_rune_paid(keys: Array, engines: Array, cond: Dictionary) -> Dictionar
 		var hp: Array = []
 		for u in s.get("heroes"):
 			if not (u as BattleUnit).is_companion:
-				hp.append(int((u as BattleUnit).max_hp))
+				hp.append((u as BattleUnit).get(String(fx[0])))
 		hp_arms.append(hp)
 		if with_rune:
 			roll = (s.get("_rune_roll_call") as Array).duplicate()
 	var w: Array = hp_arms[0]
 	var o: Array = hp_arms[1]
-	var on_him := w.size() > 1 and o.size() > 1 and int(w[1]) - int(o[1]) == HERO_FX_HP
+	var on_him := w.size() > 1 and o.size() > 1 and is_equal_approx(float(w[1]) - float(o[1]), float(fx[2]))
 	var others := 0
 	for i in mini(w.size(), o.size()):
-		if i != 1 and int(w[i]) != int(o[i]):
+		if i != 1 and float(w[i]) != float(o[i]):
 			others += 1
 	var named := false
 	var told := false

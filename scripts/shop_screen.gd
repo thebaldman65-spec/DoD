@@ -86,24 +86,11 @@ func _roll_offers() -> void:
 		if rune.is_empty():
 			_spent.append(i)
 			continue
-		var owned_names: Array = []
-		for owned in member.get("runes", []):
-			owned_names.append(owned["name"])
-		for attempt in 4:
-			if not owned_names.has(rune["name"]):
-				break
-			rune = Run.peddler_rune(member, on_counter)
-			# **AND THE RE-ROLL CAN COME BACK EMPTY NOW.** It could not before
-			# FM §1 — the family always had one more stick — and reading
-			# `rune["name"]` off `{}` on the next pass is a hard error, not a
-			# missing offer. Unreachable today (the pouch cannot change inside
-			# this loop, so a non-empty first draw means a non-empty pool), and
-			# guarded anyway: "cannot happen" is not "is not guarded".
-			if rune.is_empty():
-				_spent.append(i)
-				break
-		if not rune.is_empty() and not owned_names.has(rune["name"]):
-			offers.append({"member_idx": i, "rune": rune})
+		# BATCH HP §6 — NO RE-ROLL FOR A RUNE HE ALREADY OWNS: the roll never draws one.
+		# Four attempts stood here from Batch X; since HK every roll leaves out what the
+		# party holds (`Run.generate_rune` → `party_rune_names`, his own list among it),
+		# so the loop's one question — is this a name he owns — was always no.
+		offers.append({"member_idx": i, "rune": rune})
 
 
 func _draw_screen() -> void:

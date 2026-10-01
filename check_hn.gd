@@ -220,19 +220,31 @@ func _foe(s: Node) -> BattleUnit:
 
 # The crest's +CREST_HP maximum health, per hero, against the same party without
 # it — how many of the four it was paid on, and whether the roll call told why not.
+#
+# BATCH HP §1 — A KEY READ AS THE FIGHT RUNS IS PAID BY THE LIVE DOOR, WHICH REFUSES A
+# CONSUMED FIELD (maximum health builds the bar at the spawn). So a condition carrying
+# one of `Talents.LIVE_KEYS` writes damage dealt, read afresh on every blow, and the
+# arm reads that field once the opening read has run; a condition the spawn reads
+# once keeps the stamp this gate was written on.
+const CREST_DMG := 0.09
+
+
 func _paid(keys: Array, engines: Array, cond: Dictionary, fallen := -1) -> Dictionary:
-	var w: Node = await _battle(keys, engines, {"stat": {"max_hp": CREST_HP}, "condition": cond}, true, fallen)
+	var live := Talents.is_live({"condition": cond})
+	var field := "dmg_bonus" if live else "max_hp"
+	var fig: float = CREST_DMG if live else float(CREST_HP)
+	var w: Node = await _battle(keys, engines, {"stat": {field: fig if live else CREST_HP}, "condition": cond}, true, fallen)
 	var hp_w: Array = []
 	for u in _heroes(w):
-		hp_w.append(int((u as BattleUnit).max_hp))
+		hp_w.append(float((u as BattleUnit).get(field)))
 	var roll: Array = (w.get("_rune_roll_call") as Array).duplicate()
-	var o: Node = await _battle(keys, engines, {"stat": {"max_hp": CREST_HP}, "condition": cond}, false, fallen)
+	var o: Node = await _battle(keys, engines, {"stat": {field: fig if live else CREST_HP}, "condition": cond}, false, fallen)
 	var hp_o: Array = []
 	for u2 in _heroes(o):
-		hp_o.append(int((u2 as BattleUnit).max_hp))
+		hp_o.append(float((u2 as BattleUnit).get(field)))
 	var paid := 0
 	for i in mini(hp_w.size(), hp_o.size()):
-		if int(hp_w[i]) - int(hp_o[i]) == CREST_HP:
+		if is_equal_approx(float(hp_w[i]) - float(hp_o[i]), fig):
 			paid += 1
 	var told := false
 	for line in roll:
@@ -735,8 +747,9 @@ func _s3c_all_standing_false() -> void:
 		f_up["paid"], f_down["paid"], t_down["paid"]])
 	# BATCH HO §2 — IT INVERTS (ruled). At HN `false` was read as "not asked" and paid
 	# whatever the party: 4 and 4. The key's presence is asked apart from its value
-	# now, so `false` holds only with somebody down as the fight opens — the fallen
-	# Mage's own stamp still lands, since it lands before he is laid down.
+	# now, so `false` holds only with somebody down as the fight opens — and the
+	# fallen Mage carries the figure too: the live door writes it on all four once the
+	# fallen are laid down (HP §1), and a fallen hero deals nothing with it.
 	ok(int(f_up["paid"]) == 0 and bool(f_up["told"]) and int(f_down["paid"]) == 4,
 		"§3c: `false` paid %d with all standing and %d with the Mage fallen — it is read as not asked again" % [f_up["paid"], f_down["paid"]])
 	# THE POSITIVE ARM: the key reads a fallen hero in its `true` form.

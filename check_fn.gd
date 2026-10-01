@@ -255,13 +255,65 @@ func _s1_the_eight_are_ungated() -> void:
 	# condition re-appearing there is the same defect arriving somewhere nobody
 	# would look. 126 entries at FN; the number is printed, not pinned, because
 	# the pool grows (DX §1) — the ZERO is the assertion.
+	#
+	# **BATCH HP §5 — FN's RULING, RECONCILED, AND THE CENSUS RE-POINTED TO IT.** This
+	# arm counted every `condition` as a retired one, and HL's keys on who stands are
+	# not THRESHOLD or BREADTH. FN's finding stands — a gated rune at a flat price is
+	# strictly worse than a bare one — **and the answer is the magnitude, not a ban**
+	# (ruled). So the census asks two things: that no entry, live or retired, carries
+	# one of the two retired tag keys; and THE RELATION — every live rune whose payload
+	# carries a condition writes each field strictly beyond the largest figure a BARE
+	# writer of that field carries: a live rune with no condition, or a node of the one
+	# tree. A conditioned rune authored at a bare rune's figure reds, and so does one
+	# whose field no bare writer carries, until the batch that authors it names one.
+	var retired_keys: Array = ["tag_threshold", "tag_breadth"]
 	var gated_now: Array = []
+	var conditioned: Array = []
 	for id2 in data:
-		if ((data[id2] as Dictionary).get("payload", {}) as Dictionary).has("condition"):
-			gated_now.append(String(id2))
+		var cond2: Dictionary = ((data[id2] as Dictionary).get("payload", {}) as Dictionary).get("condition", {})
+		for rk in retired_keys:
+			if cond2.has(rk):
+				gated_now.append(String(id2))
+		if not cond2.is_empty() and not (data[id2] as Dictionary).has("retired"):
+			conditioned.append(String(id2))
 	ok(gated_now.is_empty(),
-		"§1b: %d of %d entries carry a payload condition — THRESHOLD and BREADTH are retired (%s)"
+		"§1b: %d of %d entries carry a retired tag condition — THRESHOLD and BREADTH are retired (%s)"
 			% [gated_now.size(), data.size(), gated_now])
+	# THE BARE WRITERS OF EVERY FIELD: the live runes with no condition, and the tree.
+	var bare := {}
+	for id3 in data:
+		var e3: Dictionary = data[id3]
+		var p3: Dictionary = e3.get("payload", {})
+		if e3.has("retired") or not (p3.get("condition", {}) as Dictionary).is_empty():
+			continue
+		for f3 in p3.get("stat", {}):
+			var v3 := float(p3["stat"][f3])
+			if not bare.has(f3) or absf(v3) > absf(float(bare[f3][0])):
+				bare[f3] = [v3, "rune:" + String(id3)]
+	for node in Talents.tree():
+		var st4: Dictionary = ((node as Dictionary).get("payload", {}) as Dictionary).get("stat", {})
+		for f4 in st4:
+			var v4 := float(st4[f4])
+			if not bare.has(f4) or absf(v4) > absf(float(bare[f4][0])):
+				bare[f4] = [v4, "node:" + String((node as Dictionary)["id"])]
+	var under: Array = []
+	var relation_rows: Array = []
+	for id5 in conditioned:
+		var st5: Dictionary = (((data[id5] as Dictionary).get("payload", {}) as Dictionary).get("stat", {}))
+		if st5.is_empty():
+			under.append("%s writes no stat to weigh" % id5)
+		for f5 in st5:
+			var v5 := float(st5[f5])
+			if not bare.has(f5):
+				under.append("%s: no bare writer carries `%s` — name the reference" % [id5, f5])
+				continue
+			var ref := float(bare[f5][0])
+			relation_rows.append("%s %s %s against %s %s" % [id5, f5, str(v5), bare[f5][1], str(ref)])
+			if not (absf(v5) > absf(ref) and signf(v5) == signf(ref)):
+				under.append("%s: `%s` %s is not beyond the bare %s (%s)" % [id5, f5, str(v5), str(ref), bare[f5][1]])
+	print("    CHECKED %d conditioned live runes against the bare writers: %s" % [conditioned.size(), relation_rows])
+	ok(under.is_empty(),
+		"§1b: a conditioned rune pays no more than the bare equivalent — FN's ruling, reconciled at HP §5: %s" % [under])
 
 	# ── (c) THE LABEL HALF, WHICH IS A DIFFERENT FILE ───────────────────────
 	#
