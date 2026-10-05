@@ -773,14 +773,23 @@ func _s4b_the_surfaces(ids: Array) -> void:
 			shown["bag"] += 1
 	_close_overlays(mpb)
 	mpb._bag_panel_open = false
-	var filler: Array = []
-	for fid in Runes.ids():
-		if filler.size() < 20 and not Runes.is_retired(String(fid)) and not Runes.is_engine_rune(String(fid)):
-			filler.append(Runes.build(String(fid)))
+	# BATCH HR §1 — THE PANEL IS HIS HOLDING'S: an engine rune waits on its hero's panel
+	# when he holds all he can, so his own class's runes fill his eight (named runes on a
+	# hero who can wear them) where HK filled the bag's twenty.
 	for id6 in ids:
 		var r6: Dictionary = Runes.build(String(id6))
 		r6["desc"] = String(Runes.config(String(id6))["desc"])
-		_run.rune_bag = filler.duplicate()
+		var hi6: int = _run.holder_index(r6)
+		var his: Array = []
+		for fid2 in Runes.ids():
+			var fe2: Dictionary = Runes.config(String(fid2))
+			if his.size() < int(_run.HERO_HOLD_CAP) and not Runes.is_retired(String(fid2)) \
+					and not Runes.is_engine_rune(String(fid2)) and hi6 >= 0 \
+					and String(fe2.get("scope", "")) == "class:%s" % String(_run.party[hi6]["key"]):
+				his.append(Runes.build(String(fid2)))
+		if hi6 >= 0:
+			_run.party[hi6]["runes"] = his
+		_run.rune_bag = []
 		_run.pending_rune_drops = [r6]
 		for c6 in mpb.get_children():
 			if c6 is Control and c6.z_index == 74:
@@ -790,6 +799,8 @@ func _s4b_the_surfaces(ids: Array) -> void:
 		await Gate.frames(self, 3)
 		if _shows(_label_with(mpb, "A rune has dropped: %s" % String(r6["name"])), String(id6), "the full-bag panel"):
 			shown["full"] += 1
+		if hi6 >= 0:
+			_run.party[hi6]["runes"] = []
 	for c7 in mpb.get_children():
 		if c7 is Control and c7.z_index == 74:
 			c7.queue_free()
@@ -798,14 +809,22 @@ func _s4b_the_surfaces(ids: Array) -> void:
 	await Gate.frames(self, 8)
 	var shop2: Node = current_scene
 	shop2.offers = []
+	# BATCH HR §1 — THE SALE ROW OF A RUNE ITS HERO HOLDS (`held by <hero>`), the rows'
+	# population since the bag split: the rune on his engine list, unworn.
 	for id8 in ids:
 		var r8: Dictionary = Runes.build(String(id8))
 		r8["desc"] = String(Runes.config(String(id8))["desc"])
-		_run.rune_bag = [r8]
+		var hi8: int = _run.holder_index(r8)
+		var keep8: Array = (_run.party[hi8]["engines"] as Array).duplicate() if hi8 >= 0 else []
+		if hi8 >= 0:
+			_run.party[hi8]["engines"] = keep8 + [r8]
+		_run.rune_bag = []
 		shop2._draw_screen()
 		await Gate.frames(self, 3)
-		if _shows(_label_with(shop2, String(r8["name"]) + "  (for "), String(id8), "the Peddler's sale rows"):
+		if _shows(_label_with(shop2, String(r8["name"]) + "  (held by "), String(id8), "the Peddler's sale rows"):
 			shown["sale"] += 1
+		if hi8 >= 0:
+			_run.party[hi8]["engines"] = keep8
 	_run.rune_bag = []
 	for k in shown:
 		ok(int(shown[k]) == 24, "§4: %s showed the rule for %d of 24 engine runes" % [k, shown[k]])

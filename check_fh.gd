@@ -1003,11 +1003,21 @@ func _s3_the_rune_offer() -> void:
 	var bought := 0
 	var owned_before: Array = []
 	if not offers.is_empty():
-		var first: Dictionary = offers[0]
+		# BATCH HR — THE ARM BUYS A CLASS RUNE WHEN THE COUNTER HOLDS ONE, through that
+		# row's own Buy: a crest rune's purchase cannot show a class rune sent the wrong
+		# way, so which kind it bought was the dice's (R39's control read green on a
+		# crest draw). Only a counter of crest runes alone falls back to the first row.
+		var at := 0
+		for oi in offers.size():
+			if not Runes.is_party_rune((offers[oi] as Dictionary)["rune"]):
+				at = oi
+				break
+		var first: Dictionary = offers[at]
 		var who: int = int(first["member_idx"])
 		var rune: Dictionary = first["rune"]
 		# BATCH GK — THE HERO'S POUCH IS BOTH LISTS, his runes and his engine runes.
-		# (Since HK a purchase lands in the BAG whatever its kind — `Run.buy_rune`.)
+		# (From HK to HR a purchase landed in the BAG whatever its kind; since HR §1 a
+		# class or core rune is held by its hero — `Run.buy_rune` through `Run.hold_rune`.)
 		for r in (_run.party[who].get("runes", []) as Array) \
 				+ (_run.party[who].get("engines", []) as Array):
 			owned_before.append(String((r as Dictionary).get("name", "")))
@@ -1016,7 +1026,9 @@ func _s3_the_rune_offer() -> void:
 		# BATCH HK — the bag as the purchase finds it: the road above may have dropped
 		# runes into it already, so the arm below counts what the purchase ADDS.
 		var bag_before: int = (_run.rune_bag as Array).size()
-		if _press(shop, ["Buy — "]) != "":
+		var buy_btn: Button = Gate.bound_button(shop, "_buy_rune", [at])
+		if buy_btn != null and not buy_btn.disabled:
+			buy_btn.emit_signal("pressed")
 			await process_frame
 			await process_frame
 			bought = gold_before - int(_run.gold)
@@ -1024,19 +1036,37 @@ func _s3_the_rune_offer() -> void:
 			# This asked the hero's own two lists to grow by the rune offered; the rune
 			# lands in `Run.rune_bag` now and equipping it is a separate act on the map,
 			# so the arm asks the bag for it, and the hero's lists for their NOT growing.
+			# **BATCH HR §1 — RE-POINTED: A PURCHASE LANDS WHERE ITS KIND LANDS (ruled).** A
+			# crest rune into the bag, as HK built it; a class or core rune HELD, unworn, by
+			# the hero it was offered to, and the bag untouched. Equipping is still its own
+			# act on the map. **ON HR's GAME HK's ARM WAS A COIN FLIP**: the Peddler's first
+			# offer is whatever its roll put first, and HEAD's copy read green when that was a
+			# crest rune (*Dead Air*, in an isolated copy) and red when it was a class rune
+			# (HR's recon) — so each kind is asked its own question, and the kind bought is
+			# printed.
 			var owned_after: Array = []
+			var held_after: Array = []
 			for r2 in (_run.party[who].get("runes", []) as Array) \
 					+ (_run.party[who].get("engines", []) as Array):
 				owned_after.append(String((r2 as Dictionary).get("name", "")))
+				if not bool((r2 as Dictionary).get("equipped", false)):
+					held_after.append(String((r2 as Dictionary).get("name", "")))
 			var bag_names: Array = []
 			for r3 in _run.rune_bag:
 				bag_names.append(String((r3 as Dictionary).get("name", "")))
-			ok(bag_names.size() == bag_before + 1 and owned_after.size() == owned_before.size(),
-				"§3: a rune was bought for %dg and the bag did not grow by it alone (bag %d -> %d, hero %d -> %d)" % [
-					bought, bag_before, bag_names.size(), owned_before.size(), owned_after.size()])
-			ok(bag_names.has(String(rune.get("name", ""))),
-				"§3: the rune bought was not the rune offered")
-			print("    bought `%s` for %dg" % [String(rune.get("name", "")), bought])
+			var rn := String(rune.get("name", ""))
+			if Runes.is_party_rune(rune):
+				ok(bag_names.size() == bag_before + 1 and owned_after.size() == owned_before.size(),
+					"§3: a crest rune was bought for %dg and the bag did not grow by it alone (bag %d -> %d, hero %d -> %d)" % [
+						bought, bag_before, bag_names.size(), owned_before.size(), owned_after.size()])
+				ok(bag_names.has(rn), "§3: the crest rune bought was not the rune offered")
+			else:
+				ok(owned_after.size() == owned_before.size() + 1 and bag_names.size() == bag_before,
+					"§3: a class rune was bought for %dg and its hero's holding did not grow by it alone (bag %d -> %d, hero %d -> %d)" % [
+						bought, bag_before, bag_names.size(), owned_before.size(), owned_after.size()])
+				ok(held_after.has(rn), "§3: the class rune bought is not held, unworn, by the hero it was offered to")
+			print("    bought `%s` for %dg — a %s rune" % [rn, bought,
+				"crest" if Runes.is_party_rune(rune) else "class"])
 	ok(bought > 0, "§3: the Peddler's rune Buy button spent nothing")
 	# **A PEDDLER OFFERS NO ABILITY DRAFT.** FD's defect, and the one thing on
 	# this screen a player already found.
@@ -1151,13 +1181,19 @@ func _s3_the_rune_offer() -> void:
 		var first_name := String(first.get("name", "?"))
 		var kind := "core" if String(first.get("engine", "")) != "" \
 			else ("crest" if Runes.is_party_rune(first) else "ordinary")
-		var want := "the bag"
+		# BATCH HR §1 — WHERE EACH KIND LANDS SINCE THE BAG SPLIT: an ordinary rune worn
+		# while a slot is free, a crest rune in the free crest, and otherwise HELD — a
+		# class or core rune by its hero, unworn (the bag until HR), a crest rune in the
+		# bag — or waiting on that holding's panel when it is full.
+		var want := "his holding"
 		if kind == "ordinary" and int(_run.runes_worn(looter)) < int(_run.rune_slots()):
 			want = "the hero"
 		elif kind == "crest" and (_run.party_runes as Array).size() < int(_run.PARTY_RUNE_SLOTS):
 			want = "the crest"
-		elif bool(_run.bag_full()):
-			want = "the full-bag panel"
+		elif kind == "crest":
+			want = "the full-bag panel" if bool(_run.bag_full()) else "the bag"
+		elif bool(_run.holding_full(looter)):
+			want = "the full-holding panel"
 		var held_before: Array = _run.party_rune_names()
 		s3.call("_pick_rune", 1, 0)
 		await process_frame
@@ -1169,17 +1205,23 @@ func _s3_the_rune_offer() -> void:
 				gained, first_name])
 		var named := func(list: Array) -> bool:
 			return list.any(func(r): return String((r as Dictionary).get("name", "")) == first_name)
+		var worn_l: Array = (looter.get("runes", []) as Array).filter(func(r): return bool((r as Dictionary).get("equipped", false)))
+		var slotted_l: Array = (looter.get("engines", []) as Array).filter(func(r): return bool((r as Dictionary).get("equipped", false)))
+		var held_l: Array = ((looter.get("runes", []) as Array) + (looter.get("engines", []) as Array)).filter(
+			func(r): return not bool((r as Dictionary).get("equipped", false)))
 		var got := "nowhere"
-		if named.call(looter.get("runes", [])):
+		if named.call(worn_l):
 			got = "the hero"
-		elif named.call(looter.get("engines", [])):
+		elif named.call(slotted_l):
 			got = "an engine slot"
+		elif named.call(held_l):
+			got = "his holding"
 		elif named.call(_run.party_runes):
 			got = "the crest"
 		elif named.call(_run.rune_bag):
 			got = "the bag"
 		elif named.call(_run.pending_rune_drops):
-			got = "the full-bag panel"
+			got = "the full-bag panel" if Runes.is_party_rune(first) else "the full-holding panel"
 		ok(got == want,
 			"§3: the cache's first rune %s, a %s rune, landed on %s, not %s" % [first_name, kind, got, want])
 		print("    the cache's first rune: %s, a %s rune — it went to %s" % [first_name, kind, got])
@@ -2139,14 +2181,24 @@ func _s9b_the_numbers() -> void:
 	# and is not one of the hero's slots, which is what the line must say.
 	var m0: Dictionary = _run.party[0]
 	m0["runes"] = []
-	# Four grants, the first three asked for: at most two of any four are the
-	# crest's, so he wears at least one and holds at least one he does not.
+	# Four grants, the first three asked for, so he wears at least one and holds at
+	# least one he does not. BATCH HR — THE CREST'S RUNES ARE HELD FIRST, so no grant can
+	# be one: the line read *at most two of any four are the crest's*, true while two
+	# existed and false since HP made it four — a coin flip HR's seed shift turned over
+	# (three of four grants were the crest's). Held, they are out of every roll.
+	for cid in Runes.ids():
+		if not Runes.is_retired(String(cid)) and Runes.is_party_rune(Runes.build(String(cid))) \
+				and not (_run.party_rune_names() as Array).has(Runes.display_name(Runes.config(String(cid)))):
+			_run.hold_rune(m0, Runes.build(String(cid)))
+	var grants := PackedStringArray()
 	for i in 4:
 		var got: Dictionary = _run.grant_rune(m0)
 		if got.is_empty():
+			grants.append("<nothing>")
 			break
 		got["equipped"] = i < 3
-		_run.hold_rune(m0, got)
+		grants.append("%s -> %s" % [String(got.get("id", "")), String(_run.hold_rune(m0, got))])
+	print("    the four grants: %s" % ", ".join(grants))
 	var worn: int = int(_run.runes_worn(m0))
 	ok(worn >= 1, "§9b: four grants left the hero wearing no rune — the line is read against nothing")
 	_run.hero_screen_idx = 0

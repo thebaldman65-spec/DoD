@@ -25,6 +25,15 @@
 #       purchase at a Peddler, and a rune equipped from the bag and put back
 #   §8  THE PLAYER'S FILES — as this gate found them
 #
+# **BATCH HR §1 RE-POINTED §1, §2, §3, §5, §6 AND §7 TO THE SPLIT HOLDINGS** (ruled): a
+# class or core rune is held unworn by the hero of its class, eight at most, and the bag
+# holds the crest's runes, six at most. Each arm asks HK's question of the holding that
+# took the bag's place — a drop lands once where its kind lands, a hero's eight fill and
+# the next waits on HIS panel, a full holding refuses an Unequip and his own Buy, a save
+# from before the bag keeps its heroes' runes where they held them — and its reason is
+# at the site. The bag's own arms (§2h, §4) ask it of a crest rune. `check_hr` drives
+# what is HR's alone.
+#
 # **EVERY NEGATIVE ANCHOR HAS ITS POSITIVE ARM** (the brief's rule): a refusal is
 # asked where it must pass on the same state, an absence beside the arm that shows
 # the window held something, so a door wired shut, or a walk over nothing, reads
@@ -209,6 +218,50 @@ func _row_where(rows: Array, src: String) -> int:
 	return -1
 
 
+# BATCH HR §1 — the first row a hero holds and does not wear: what `_row_where(rows,
+# "bag")` found while his unworn runes lived in the bag.
+func _row_held(rows: Array) -> int:
+	for i in rows.size():
+		if not bool(rows[i]["worn"]):
+			return i
+	return -1
+
+
+# A hero's runes he holds and does not wear, by name, read off both lists.
+func _unworn(m: Dictionary) -> Array:
+	var out: Array = []
+	for key in ["runes", "engines"]:
+		for r in m.get(key, []):
+			if not bool((r as Dictionary).get("equipped", false)):
+				out.append(String((r as Dictionary).get("name", "")))
+	return out
+
+
+# How many places hold a rune of this name: the bag, the waiting queue, the crest and
+# every hero's two lists. One is right for a rune just put down.
+func _places(nm: String) -> int:
+	return _held().count(nm)
+
+
+# Hand `member` his own class's ordinary runes through the one door until he holds
+# `n` unworn — named runes from the data, on the hero who can wear them (HO §1's rule),
+# never one the party already holds. Drawn from his CLASS's live entries rather than
+# from what he can be offered: a fresh hero is offered a handful (HC §3), fewer than eight.
+func _fill_holding(member: Dictionary, n: int) -> void:
+	var held_now := _held()
+	var ids: Array = []
+	for id in Runes.ids():
+		var e: Dictionary = Runes.config(String(id))
+		if String(e.get("retired", "")) == "" and not Runes.is_engine_rune(String(id)) \
+				and String(e.get("scope", "")) == "class:%s" % String(member["key"]) \
+				and not held_now.has(Runes.display_name(e)):
+			ids.append(String(id))
+	var k := 0
+	while _run.held_count(member) < n and k < ids.size():
+		_run.hold_rune(member, Runes.build(String(ids[k])))
+		k += 1
+
+
 func _fixture_crest(id: String, nm: String) -> Dictionary:
 	return {"name": nm, "scope": "party", "price": 150,
 		"desc": "A fixture of check_hk, never in the file.",
@@ -221,20 +274,31 @@ func _s1_the_drop() -> void:
 	print("\n§1 — the drop: one rune after a normal fight, and none after the three that pay their own")
 	seed(DROP_SEED)
 	_new_run()
-	# (a) A NORMAL FIGHT WON DROPS ONE RUNE INTO THE BAG, AND ITS CARD SAYS SO.
+	# (a) A NORMAL FIGHT WON DROPS ONE RUNE, AND ITS CARD SAYS SO.
+	# BATCH HR §1 — RE-POINTED: the drop goes where its kind lands — held unworn by the
+	# hero of its class, or into the bag for a crest rune — where HK sent every drop into
+	# the bag. Each arm asks the same question of the new place.
+	var held_before: int = _held().size()
 	var s := await _fight("fight")
 	ok(_is_battle(s) and bool(s.get("battle_over")), "§1a: the normal fight did not end")
-	ok(_run.rune_bag.size() == 1 and _run.pending_rune_drops.is_empty(),
-		"§1a: a normal fight won dropped %d runes into the bag (want one)" % _run.rune_bag.size())
-	var dropped := String((_run.rune_bag[0] as Dictionary).get("name", "")) if _run.rune_bag.size() == 1 else ""
+	var drop: Dictionary = _run.last_drop
+	var dropped := String((drop.get("rune", {}) as Dictionary).get("name", ""))
+	ok(dropped != "" and _held().size() == held_before + 1 and _places(dropped) == 1
+			and _run.pending_rune_drops.is_empty(),
+		"§1a: a normal fight won dropped %d runes (want one, held once: %s)" % [_held().size() - held_before, dropped])
 	ok(dropped != "" and Gate.has_text(s, "RUNE DROP: %s" % dropped),
 		"§1a: the victory card does not name the drop (%s)" % dropped)
-	ok(dropped != "" and Gate.has_text(s, "into the bag."), "§1a: the card does not say the drop went into the bag")
-	for m in _run.party:
-		ok(_names((m as Dictionary).get("runes", [])).is_empty(),
-			"§1a: the drop went onto a hero rather than into the bag")
+	var crest_drop := Runes.is_party_rune(drop.get("rune", {}))
+	var hi := int(drop.get("hero", -1))
+	var says := "into the bag." if crest_drop else ("for the %s" % _run.nameplate(_run.party[hi]) if hi >= 0 else "<no hero>")
+	ok(dropped != "" and Gate.has_text(s, says), "§1a: the card does not say where the drop went (%s)" % says)
+	ok(dropped != "" and (crest_drop and _names(_run.rune_bag).has(dropped)
+			or (not crest_drop and hi >= 0 and _unworn(_run.party[hi]).has(dropped)
+				and Runes.wearable_by(drop.get("rune", {}), _run.party[hi]))),
+		"§1a: the drop is not held where its kind lands — its hero unworn, or the bag for a crest rune")
 	# (b) AN ELITE WON DROPS NONE — and pays its own rune reward, the cache, beside it.
-	var bag0: int = _run.rune_bag.size()
+	# BATCH HR §1 — counted over everything held, not the bag: a drop can land on a hero.
+	var bag0: int = _held().size()
 	var owed0 := 0
 	for m in _run.party:
 		owed0 += int((m as Dictionary).get("rune_picks_owed", 0))
@@ -243,28 +307,28 @@ func _s1_the_drop() -> void:
 	for m in _run.party:
 		owed1 += int((m as Dictionary).get("rune_picks_owed", 0))
 	ok(_is_battle(s) and bool(s.get("battle_over")), "§1b: the elite fight did not end")
-	ok(_run.rune_bag.size() == bag0 and not Gate.has_text(s, "RUNE DROP:"),
-		"§1b: an elite won dropped a rune (bag %d -> %d)" % [bag0, _run.rune_bag.size()])
+	ok(_held().size() == bag0 and not Gate.has_text(s, "RUNE DROP:"),
+		"§1b: an elite won dropped a rune (held %d -> %d)" % [bag0, _held().size()])
 	ok(owed1 == owed0 + 1 and Gate.has_text(s, "RUNE CACHE:"),
 		"§1b: ...and the elite did not pay its own cache beside it (owed %d -> %d) — the no-drop reading asked nothing" % [owed0, owed1])
 	# (c) A MINI-BOSS WON DROPS NONE — it pays an upgrade pick.
-	bag0 = _run.rune_bag.size()
+	bag0 = _held().size()
 	s = await _fight("miniboss")
 	var ups := 0
 	for m in _run.party:
 		ups += int((m as Dictionary).get("up_picks_owed", 0))
-	ok(_run.rune_bag.size() == bag0 and not Gate.has_text(s, "RUNE DROP:"),
+	ok(_held().size() == bag0 and not Gate.has_text(s, "RUNE DROP:"),
 		"§1c: a mini-boss won dropped a rune")
 	ok(ups > 0 and Gate.has_text(s, "THE WAY IS OPEN"),
 		"§1c: ...and the mini-boss paid no upgrade pick beside it (%d owed)" % ups)
 	# (d) A ZONE BOSS WON DROPS NONE — it pays an ability pick.
-	bag0 = _run.rune_bag.size()
+	bag0 = _held().size()
 	_run.slot_idx = _run.BOSS_SLOT
 	s = await _fight("boss")
 	var picks := 0
 	for m in _run.party:
 		picks += int((m as Dictionary).get("bm_picks_owed", 0))
-	ok(_run.rune_bag.size() == bag0 and not Gate.has_text(s, "RUNE DROP:"),
+	ok(_held().size() == bag0 and not Gate.has_text(s, "RUNE DROP:"),
 		"§1d: a zone boss won dropped a rune")
 	ok(picks > 0, "§1d: ...and the zone boss paid no ability pick beside it")
 	# (e) THE SITE: the one call, under the normal fight's node type, in the victory
@@ -331,7 +395,8 @@ func _s1_the_drop() -> void:
 	ok(_run.roll_fight_drop().is_empty(),
 		"§1h: with every ungated rune held and the engine out, a drop still came — the gate did not hold")
 	var er: Array = _run.engine_rows(mage)
-	ok(_run.toggle_engine(mage, _row_where(er, "bag")), "§1h: the Mage's engine would not go back into its slot")
+	# BATCH HR §1 — the unslotted engine is held on him, not in the bag.
+	ok(_run.toggle_engine(mage, _row_held(er)), "§1h: the Mage's engine would not go back into its slot")
 	var gated: Dictionary = _run.roll_fight_drop()
 	ok(rows_for.has(String(gated.get("id", ""))),
 		"§1h: ...and with it slotted, the drop was not one of its rows (%s) — the gate is shut, not a gate" % gated.get("id", "<nothing>"))
@@ -340,29 +405,43 @@ func _s1_the_drop() -> void:
 # ── §2 — THE BAG ────────────────────────────────────────────────────────────
 
 func _s2_the_bag() -> void:
-	print("\n§2 — the bag: twenty, the full-bag panel, and equipping through it")
-	ok(int(_run.BAG_CAP) == 20, "§2: the bag holds %d, not the ruled twenty" % int(_run.BAG_CAP))
+	# BATCH HR §1 — RE-POINTED, EVERY ARM. HK's bag of twenty held every rune nobody wore;
+	# since HR a class or core rune is held unworn by its hero, eight at most, and the bag
+	# holds the crest's runes. Each lettered arm asks HK's question of the holding that
+	# replaced the bag: (a)-(g) a hero's, (h) the bag's own panel, with a crest rune in it.
+	print("\n§2 — the holdings: eight a hero, the full-holding panel, and equipping through it")
+	ok(int(_run.HERO_HOLD_CAP) == 8 and int(_run.BAG_CAP) == 6,
+		"§2: a hero holds %d and the bag %d, not the proposed eight and six" % [int(_run.HERO_HOLD_CAP), int(_run.BAG_CAP)])
 	seed(DROP_SEED + 2)
 	_new_run()
-	# (a) TWENTY LAND, THE TWENTY-FIRST WAITS.
+	# (a) DROPS LAND ON THEIR HEROES; THE ONE THAT FINDS ITS HERO HOLDING EIGHT WAITS.
 	var landed := 0
-	for _i in 20:
+	var waited: Dictionary = {}
+	var guard := 0
+	while waited.is_empty() and guard < 400:
 		var d: Dictionary = _run.drop_after_fight()
-		if String(d.get("where", "")) == "bag":
+		guard += 1
+		if d.is_empty():
+			break
+		if String(d.get("where", "")) == "pending":
+			waited = d
+		else:
 			landed += 1
-	ok(landed == 20 and _run.rune_bag.size() == 20, "§2a: twenty drops put %d in the bag" % _run.rune_bag.size())
-	var d21: Dictionary = _run.drop_after_fight()
-	ok(String(d21.get("where", "")) == "pending" and _run.rune_bag.size() == 20,
-		"§2a: the twenty-first drop went '%s' and the bag holds %d" % [d21.get("where", ""), _run.rune_bag.size()])
-	ok(_run.pending_rune_drops.size() == 1, "§2a: ...and nothing waits for the panel (%d)" % _run.pending_rune_drops.size())
-	var waiting := String((d21.get("rune", {}) as Dictionary).get("name", ""))
-	ok(_held().has(waiting) and _run.party_rune_names().has(waiting),
+	var wi := int(waited.get("hero", -1))
+	var waiting := String((waited.get("rune", {}) as Dictionary).get("name", ""))
+	print("    %d drops landed before one found its hero full (%s)" % [landed, _run.nameplate(_run.party[wi]) if wi >= 0 else "none"])
+	ok(wi >= 0 and _run.held_count(_run.party[wi]) == int(_run.HERO_HOLD_CAP) and _run.pending_rune_drops.size() == 1,
+		"§2a: no drop found its hero holding eight and waited (%d drops)" % guard)
+	ok(wi >= 0 and _run.pending_holder(waited.get("rune", {})) == wi,
+		"§2a: the waiting rune is not bound for the hero who is full")
+	ok(waiting != "" and _held().has(waiting) and _run.party_rune_names().has(waiting),
 		"§2a: the rune waiting on the panel is not the party's — it could be offered twice")
-	# (b) THE PANEL, ON THE REAL MAP: shown beside the twenty; a drop takes it.
+	# (b) THE PANEL, ON THE REAL MAP: shown beside his eight; a drop takes it.
 	var mp := await _to_map()
 	var fb: Node = Gate.overlay(mp, 74)
-	ok(fb != null and Gate.has_text(fb, "THE BAG IS FULL") and Gate.has_text(fb, waiting),
-		"§2b: the map did not show the waiting drop on the full-bag panel")
+	ok(fb != null and wi >= 0 and Gate.has_text(fb, "THE %s HOLDS ALL HE CAN" % _run.nameplate(_run.party[wi]).to_upper())
+			and Gate.has_text(fb, waiting),
+		"§2b: the map did not show the waiting drop on its hero's full-holding panel")
 	var drop_btns: Array = []
 	if fb != null:
 		var all_b: Array = []
@@ -370,122 +449,138 @@ func _s2_the_bag() -> void:
 		for b in all_b:
 			if String((b as Button).text) == "Drop this":
 				drop_btns.append(b)
-	ok(drop_btns.size() == 20, "§2b: the panel offers %d runes to drop, not the twenty" % drop_btns.size())
-	var victim := String((_run.rune_bag[3] as Dictionary).get("name", ""))
+	ok(drop_btns.size() == int(_run.HERO_HOLD_CAP), "§2b: the panel offers %d runes to drop, not his eight" % drop_btns.size())
+	var victim := String((_run.held_rows(_run.party[wi])[3]["rune"] as Dictionary).get("name", "")) if wi >= 0 else ""
 	var b3: Button = Gate.bound_button(fb, "_take_pending_drop", [3, fb]) if fb != null else null
 	ok(b3 != null, "§2b: the fourth row's Drop button is not bound to its row")
 	if b3 != null:
 		b3.emit_signal("pressed")
 		await Gate.frames(self, 4)
-	ok(_run.rune_bag.size() == 20 and String((_run.rune_bag[3] as Dictionary).get("name", "")) == waiting,
-		"§2b: dropping one did not put the waiting rune in its place")
+	ok(wi >= 0 and _run.held_count(_run.party[wi]) == int(_run.HERO_HOLD_CAP) and _unworn(_run.party[wi]).has(waiting),
+		"§2b: dropping one did not put the waiting rune in his holding")
 	ok(not _held().has(victim), "§2b: the rune dropped for it is still held — nothing was given up")
 	# (c) DECLINING THE DROP ITSELF IS ALLOWED.
-	var d22: Dictionary = _run.drop_after_fight()
-	var second := String((d22.get("rune", {}) as Dictionary).get("name", ""))
+	var second := ""
+	guard = 0
+	while second == "" and guard < 400:
+		var d2: Dictionary = _run.drop_after_fight()
+		guard += 1
+		if d2.is_empty():
+			break
+		if String(d2.get("where", "")) == "pending":
+			second = String((d2.get("rune", {}) as Dictionary).get("name", ""))
+	var held_total: int = 0
+	for m in _run.party:
+		held_total += _run.held_count(m)
 	mp = await _to_map()
 	fb = Gate.overlay(mp, 74)
 	var left := Gate.press(fb, ["Leave "]) if fb != null else ""
 	await Gate.frames(self, 4)
+	var held_after: int = 0
+	for m in _run.party:
+		held_after += _run.held_count(m)
 	ok(left == "Leave %s behind" % second, "§2c: the panel's decline did not name the drop (%s)" % left)
-	ok(_run.pending_rune_drops.is_empty() and not _held().has(second) and _run.rune_bag.size() == 20,
-		"§2c: leaving the drop behind kept it, or took a rune from the bag")
-	# (d) A WORN RUNE DOES NOT COUNT: equip three from the bag through the panel's
-	# own button, and three more drops fit without a wait.
+	ok(_run.pending_rune_drops.is_empty() and not _held().has(second) and held_after == held_total,
+		"§2c: leaving the drop behind kept it, or took a rune from a hero")
+	# (d) A WORN RUNE DOES NOT COUNT: equip three of his held runes through the panel's
+	# own button, and five more fit before he holds eight.
 	_clear_bag()
 	_new_run()
 	var w: Dictionary = _run.party[0]
-	var warrior_ids := Runes.eligible_ids(w, Runes.owned_names(w, _held())).filter(
-		func(x): return not Runes.is_engine_rune(String(x)))
-	ok(warrior_ids.size() >= 4, "§2d: the Warrior can be offered only %d ordinary runes" % warrior_ids.size())
-	_hold_all(warrior_ids.slice(0, 4))
+	_fill_holding(w, 4)
+	ok(_run.held_count(w) == 4, "§2d: the Warrior could be handed only %d of his runes" % _run.held_count(w))
 	mp = await _to_map()
 	for k in 3:
 		mp.call("_open_rune_panel", 0)
 		await process_frame
 		var ov: Node = Gate.overlay(current_scene, 60)
 		var rows: Array = _run.rune_rows(w)
-		var bi := _row_where(rows, "bag")
+		var bi := _row_held(rows)
 		var eq: Button = Gate.bound_button(ov, "_toggle_rune", [0, bi, ov]) if ov != null else null
-		ok(eq != null and String(eq.text) == "Equip", "§2d: the panel drew no Equip for a bag rune (%s)" % [k])
+		ok(eq != null and String(eq.text) == "Equip", "§2d: the panel drew no Equip for a held rune (%s)" % [k])
 		if eq != null:
 			eq.emit_signal("pressed")
 		await Gate.frames(self, 2)
 		mp = current_scene
-	ok(_run.runes_worn(w) == 3 and _run.rune_bag.size() == 1,
-		"§2d: equipping three from the bag left %d worn and %d in the bag" % [_run.runes_worn(w), _run.rune_bag.size()])
-	for _i in 19:
-		_run.drop_after_fight()
-	ok(_run.rune_bag.size() == 20 and _run.pending_rune_drops.is_empty(),
-		"§2d: with three worn the bag took %d before a wait — a worn rune is counted against the twenty" % _run.rune_bag.size())
-	# (e) FULL BAG, FULL SLOTS: Unequip refused and saying why, Swap goes through.
+	ok(_run.runes_worn(w) == 3 and _run.held_count(w) == 1,
+		"§2d: equipping three of his held runes left %d worn and %d held" % [_run.runes_worn(w), _run.held_count(w)])
+	_fill_holding(w, int(_run.HERO_HOLD_CAP))
+	ok(_run.held_count(w) == int(_run.HERO_HOLD_CAP) and _run.pending_rune_drops.is_empty(),
+		"§2d: with three worn he took %d before a wait — a worn rune is counted against his eight" % _run.held_count(w))
+	# (e) FULL HOLDING, FULL SLOTS: Unequip refused and saying why, Swap goes through.
 	mp = await _to_map()
 	mp.call("_open_rune_panel", 0)
 	await process_frame
 	var ov2: Node = Gate.overlay(current_scene, 60)
+	var worn_i := -1
+	var rows2: Array = _run.rune_rows(w)
+	for i in rows2.size():
+		if bool(rows2[i]["worn"]) and worn_i < 0:
+			worn_i = i
 	var worn_btn: Button = null
 	var all2: Array = []
 	Gate.buttons(ov2, all2, false)
 	for b in all2:
 		for c in (b as Button).pressed.get_connections():
 			var cb: Callable = c["callable"]
-			if cb.get_method() == "_toggle_rune" and cb.get_bound_arguments() == [0, 0, ov2]:
+			if cb.get_method() == "_toggle_rune" and cb.get_bound_arguments() == [0, worn_i, ov2]:
 				worn_btn = b
-	ok(worn_btn != null and worn_btn.disabled and String(worn_btn.tooltip_text) == String(_run.BAG_FULL_NOTE),
-		"§2e: a full bag did not refuse the Unequip with its sentence")
-	ok(_run.rune_toggle_refusal(w, 0) == String(_run.BAG_FULL_NOTE) and not _run.toggle_rune(w, 0),
-		"§2e: the door let a worn rune into a full bag")
+	ok(worn_btn != null and worn_btn.disabled and String(worn_btn.tooltip_text) == String(_run.held_full_note()),
+		"§2e: a full holding did not refuse the Unequip with its sentence")
+	ok(_run.rune_toggle_refusal(w, worn_i) == String(_run.held_full_note()) and not _run.toggle_rune(w, worn_i),
+		"§2e: the door let a worn rune into a full holding")
 	var swap_btn: Button = null
 	for b in all2:
 		if String((b as Button).text) == "Swap" and not (b as Button).disabled:
 			swap_btn = b
-	ok(swap_btn != null, "§2e: with every slot full, no bag rune offered a Swap")
+	ok(swap_btn != null, "§2e: with every slot full, no held rune offered a Swap")
 	if swap_btn != null:
 		swap_btn.emit_signal("pressed")
 		await process_frame
 	var ch: Node = Gate.overlay(current_scene, 80)
-	var worn_before: Array = _names(w["runes"])
-	var bag_before: int = _run.rune_bag.size()
-	var took := Gate.press(ch, [String(worn_before[0])]) if ch != null else ""
+	var worn_before: Array = _names(w["runes"].filter(func(r): return bool(r.get("equipped", false))))
+	var took := Gate.press(ch, [String(worn_before[0])]) if ch != null and not worn_before.is_empty() else ""
 	await Gate.frames(self, 3)
-	ok(took != "" and _run.rune_bag.size() == bag_before and _names(w["runes"])[0] != worn_before[0]
-			and _held().has(String(worn_before[0])),
-		"§2e: the swap did not put a bag rune on in the worn one's place, the bag unchanged at %d" % bag_before)
-	# (f) UNEQUIP BACK INTO IT, once there is room — the positive arm of (e).
-	_run.drop_bag_rune(0)
-	ok(_run.rune_toggle_refusal(w, 0) == "" and _run.toggle_rune(w, 0) and _run.rune_bag.size() == 20
-			and _run.runes_worn(w) == 2,
-		"§2f: with room in the bag, the worn rune would not go back into it")
-	# (g) AN ENGINE RUNE UNSLOTS INTO THE BAG, AND A FULL BAG REFUSES THAT TOO.
+	var worn_now: Array = _names(w["runes"].filter(func(r): return bool(r.get("equipped", false))))
+	ok(took != "" and _run.held_count(w) == int(_run.HERO_HOLD_CAP) and not worn_now.has(worn_before[0])
+			and _unworn(w).has(String(worn_before[0])),
+		"§2e: the swap did not put a held rune on in the worn one's place, his holding unchanged at eight")
+	# (f) UNEQUIP INTO HIS HOLDING, once there is room — the positive arm of (e).
+	_run.drop_held_rune(w, 0)
+	rows2 = _run.rune_rows(w)
+	worn_i = -1
+	for i in rows2.size():
+		if bool(rows2[i]["worn"]) and worn_i < 0:
+			worn_i = i
+	ok(_run.rune_toggle_refusal(w, worn_i) == "" and _run.toggle_rune(w, worn_i)
+			and _run.held_count(w) == int(_run.HERO_HOLD_CAP) and _run.runes_worn(w) == 2,
+		"§2f: with room in his holding, the worn rune would not come off into it")
+	# (g) AN ENGINE RUNE UNSLOTS INTO HIS HOLDING, AND A FULL HOLDING REFUSES THAT TOO.
 	var h: Dictionary = _run.party[3]
+	_fill_holding(h, int(_run.HERO_HOLD_CAP))
 	var er: Array = _run.engine_rows(h)
 	var ei := _row_where(er, "hero")
-	ok(_run.engine_toggle_refusal(h, ei) == String(_run.BAG_FULL_NOTE) and not _run.toggle_engine(h, ei),
-		"§2g: a full bag let an engine rune in")
-	_run.drop_bag_rune(0)
+	ok(_run.engine_toggle_refusal(h, ei) == String(_run.held_full_note()) and not _run.toggle_engine(h, ei),
+		"§2g: a full holding let an engine rune in")
+	_run.drop_held_rune(h, 0)
 	ok(_run.toggle_engine(h, ei) and Runes.held_engines(h).is_empty()
-			and _names(_run.rune_bag).has(String((er[ei]["rune"] as Dictionary)["name"])),
-		"§2g: ...and with room the engine rune did not go into the bag")
-	# (h) THE BAG'S OWN PANEL: two presses drop a rune for good; the crest is empty.
+			and _unworn(h).has(String((er[ei]["rune"] as Dictionary)["name"])),
+		"§2g: ...and with room the engine rune did not come off into his holding")
+	# (h) THE BAG'S OWN PANEL, WITH A CREST RUNE IN IT: two presses drop it for good; the
+	# crest is empty.
+	_clear_bag()
+	var crest_ids: Array = Runes.ids().filter(func(x): return not Runes.is_retired(String(x)) and Runes.is_party_rune(Runes.build(String(x))))
+	_run.hold_rune(w, Runes.build(String(crest_ids[0])))
 	mp = await _to_map()
 	ok(Gate.has_text(mp, "Rune bag  %d/%d" % [_run.rune_bag.size(), int(_run.BAG_CAP)]),
 		"§2h: the map's bag row does not read the bag's count")
 	Gate.press(mp, ["Rune bag"])
 	await process_frame
 	var bp: Node = Gate.overlay(current_scene, 60)
-	# BATCH HO §3 — THE CREST IS EMPTY, AND THE PANEL SAYS SO IN ONE OF TWO WAYS. The
-	# arm read the line drawn when no crest rune is held at all; a crest rune can sit
-	# in the bag now (two are authored, and this run's drops are the game's own), and
-	# then the section lists it with its Equip instead. The header says the crest is
-	# empty either way, and the line is asked for exactly when nothing is held.
-	var crest_in_bag := false
-	for br in _run.rune_bag:
-		if Runes.is_party_rune(br):
-			crest_in_bag = true
 	ok(bp != null and Gate.has_text(bp, "THE RUNE BAG")
 			and Gate.has_text(bp, "THE CREST — 0 of %d filled" % int(_run.PARTY_RUNE_SLOTS))
-			and Gate.has_text(bp, "No crest rune held.") == (not crest_in_bag),
-		"§2h: the bag panel is not on screen, or its crest does not say it is empty (a crest rune in the bag: %s)" % crest_in_bag)
+			and not Gate.has_text(bp, "No crest rune held."),
+		"§2h: the bag panel is not on screen, or its crest does not say it is empty with a crest rune in the bag")
 	var nb0: int = _run.rune_bag.size()
 	var first := String((_run.rune_bag[0] as Dictionary).get("name", ""))
 	Gate.press(bp, ["Drop"])
@@ -501,7 +596,7 @@ func _s2_the_bag() -> void:
 # ── §3 — THE PEDDLER ────────────────────────────────────────────────────────
 
 func _s3_the_peddler() -> void:
-	print("\n§3 — the Peddler: 150g a rune into the bag, a third back, and a wall at twenty")
+	print("\n§3 — the Peddler: 150g a rune to its hero, a third back, and a wall at his eight")
 	_clear_bag()
 	_new_run()
 	var live := Runes.build(String(Runes.ids().filter(func(x): return not Runes.is_retired(String(x)))[0]))
@@ -515,62 +610,75 @@ func _s3_the_peddler() -> void:
 	_run.active_relics = []
 	ok(disc_p < 150 and disc_s == int(round(disc_p / 3.0)) and disc_s < disc_p,
 		"§3: under the shop discount the rune is %dg and sells for %dg — the sale does not follow the price" % [disc_p, disc_s])
-	# (a) A PURCHASE LANDS IN THE BAG, NOT ON THE HERO — through the Buy button.
+	# (a) A PURCHASE LANDS ON THE HERO IT WAS ROLLED FOR, UNWORN — through the Buy button.
+	# BATCH HR §1 — RE-POINTED: HK sent it into the bag and asked that the hero's lists did
+	# not move; the hero holds it now, and a crest rune would still go to the bag, so the
+	# arm looks for the rune where its kind lands (HO §1's rule for a first offer).
 	_run.gold = 1000
 	change_scene_to_file("res://scenes/shop.tscn")
 	await Gate.frames(self, 6)
 	var shop: Node = current_scene
-	ok(Gate.has_text(shop, "SELL FROM THE BAG"), "§3a: the Peddler draws no sale column")
+	ok(Gate.has_text(shop, "SELL A RUNE NOBODY WEARS"), "§3a: the Peddler draws no sale column")
 	var offers: Array = shop.get("offers")
 	ok(offers.size() == 4, "§3a: the Peddler put %d runes on the counter, not one for every hero" % offers.size())
 	var o0: Dictionary = offers[0]
 	var for_idx := int(o0["member_idx"])
 	var o_name := String((o0["rune"] as Dictionary)["name"])
-	var worn0: Array = _names(_run.party[for_idx]["runes"]) + _names(_run.party[for_idx]["engines"])
+	var o_crest := Runes.is_party_rune(o0["rune"])
 	var bought := Gate.press(shop, ["Buy — 150g"])
 	await Gate.frames(self, 2)
 	ok(bought == "Buy — 150g" and _run.gold == 850, "§3a: a Buy took %dg, not 150" % (1000 - int(_run.gold)))
-	ok(_names(_run.rune_bag).has(o_name), "§3a: the rune bought is not in the bag")
-	ok(_names(_run.party[for_idx]["runes"]) + _names(_run.party[for_idx]["engines"]) == worn0,
-		"§3a: ...and it went onto the hero it was rolled for")
+	ok(_places(o_name) == 1 and (_names(_run.rune_bag).has(o_name) if o_crest else _unworn(_run.party[for_idx]).has(o_name)),
+		"§3a: the rune bought is not held where its kind lands (crest: %s)" % o_crest)
+	ok(o_crest or not _names(_run.rune_bag).has(o_name),
+		"§3a: ...and it went into the bag, not to the hero it was rolled for")
 	# (b) TWO PRESSES SELL IT BACK FOR A THIRD.
 	shop = current_scene
 	var g1: int = _run.gold
 	Gate.press(shop, ["Sell +50g"])
 	await Gate.frames(self, 2)
-	ok(_run.gold == g1 and _run.rune_bag.size() == 1, "§3b: one press on Sell sold the rune")
+	ok(_run.gold == g1 and _places(o_name) == 1, "§3b: one press on Sell sold the rune")
 	Gate.press(current_scene, ["Sure? +50g"])
 	await Gate.frames(self, 2)
-	ok(_run.gold == g1 + 50 and _run.rune_bag.is_empty(), "§3b: the second press did not sell it for 50")
-	# (c) A FULL BAG GREYS EVERY BUY AND SAYS SO — and one sale opens the counter.
-	for _i in 20:
-		_run.drop_after_fight()
+	ok(_run.gold == g1 + 50 and _places(o_name) == 0, "§3b: the second press did not sell it for 50")
+	# (c) A FULL HOLDING GREYS THAT HERO'S BUY AND SAYS SO — and one sale opens it. The
+	# other heroes' Buys stay live: the wall is his, not the counter's.
+	_fill_holding(_run.party[0], int(_run.HERO_HOLD_CAP))
 	_run.gold = 1000
 	change_scene_to_file("res://scenes/shop.tscn")
 	await Gate.frames(self, 6)
 	shop = current_scene
-	var enabled := 0
-	var buys := 0
+	var w_row := -1
+	offers = shop.get("offers")
+	for i in offers.size():
+		if int((offers[i] as Dictionary)["member_idx"]) == 0:
+			w_row = i
+	var w_buy: Button = Gate.bound_button(shop, "_buy_rune", [w_row]) if w_row >= 0 else null
+	var w_buy_any: Button = null
 	var sb: Array = []
-	Gate.buttons(shop, sb)
+	Gate.buttons(shop, sb, false)
 	for b in sb:
-		if String((b as Button).text).begins_with("Buy — "):
-			buys += 1
-			if not (b as Button).disabled:
-				enabled += 1
-	ok(buys > 0 and enabled == 0, "§3c: on a full bag %d of %d Buys are live" % [enabled, buys])
-	ok(Gate.has_text(shop, "The bag is full at 20"), "§3c: the rune column does not say the bag is full")
-	Gate.press(shop, ["Sell +50g"])
-	await Gate.frames(self, 2)
-	Gate.press(current_scene, ["Sure? +50g"])
-	await Gate.frames(self, 2)
-	enabled = 0
-	sb = []
-	Gate.buttons(current_scene, sb)
+		for c in (b as Button).pressed.get_connections():
+			var cb: Callable = c["callable"]
+			if cb.get_method() == "_buy_rune" and cb.get_bound_arguments() == [w_row]:
+				w_buy_any = b
+	var enabled := 0
 	for b in sb:
 		if String((b as Button).text).begins_with("Buy — ") and not (b as Button).disabled:
 			enabled += 1
-	ok(enabled > 0, "§3c: a sale made room and still no Buy came back — the wall is a lock")
+	ok(w_buy == null and w_buy_any != null and w_buy_any.disabled
+			and String(w_buy_any.tooltip_text).begins_with("Warrior holds %d unworn runes" % int(_run.HERO_HOLD_CAP)),
+		"§3c: on the Warrior's full holding his Buy is live, or its tooltip does not say why")
+	ok(enabled == offers.size() - 1, "§3c: %d of the %d other Buys are live — a full holding is one hero's wall" % [enabled, offers.size() - 1])
+	ok(Gate.has_text(shop, "Warrior holds %d unworn runes, the most he can." % int(_run.HERO_HOLD_CAP)),
+		"§3c: the Warrior's row does not say his holding is full")
+	var sale_val: int = _run.rune_sell_value(_run.held_rows(_run.party[0])[0]["rune"])
+	Gate.press(shop, ["Sell +%dg" % sale_val])
+	await Gate.frames(self, 2)
+	Gate.press(current_scene, ["Sure? +%dg" % sale_val])
+	await Gate.frames(self, 2)
+	ok(Gate.bound_button(current_scene, "_buy_rune", [w_row]) != null,
+		"§3c: a sale made room and the Warrior's Buy did not come back — the wall is a lock")
 	# (d) NEVER A RUNE THE PARTY HOLDS: hold every Warrior offer but one, and his
 	# offer is that one; hold it too, and the Peddler has nothing for him.
 	_clear_bag()
@@ -623,7 +731,7 @@ func _s3_the_peddler() -> void:
 		if int((o as Dictionary)["member_idx"]) == 1:
 			m_offer = String(((o as Dictionary)["rune"] as Dictionary)["id"])
 	ok(m_offer == "", "§3e: with his engine out, the Mage was offered %s — the gate did not hold at the Peddler" % m_offer)
-	ok(_run.toggle_engine(mage, _row_where(_run.engine_rows(mage), "bag")),
+	ok(_run.toggle_engine(mage, _row_held(_run.engine_rows(mage))),
 		"§3e: the Mage's engine would not go back into its slot")
 	change_scene_to_file("res://scenes/shop.tscn")
 	await Gate.frames(self, 6)
@@ -790,7 +898,7 @@ func _read_save() -> Dictionary:
 
 
 func _s5_the_save() -> void:
-	print("\n§5 — the save: the bag rides it, and a save from before the bag migrates")
+	print("\n§5 — the save: the holdings ride it, and a save from before the bag keeps its heroes' runes")
 	_run.save_path = SCRATCH_SAVE
 	_new_run()
 	for _i in 22:
@@ -801,17 +909,30 @@ func _s5_the_save() -> void:
 	# THE INVARIANT THIS GATE OWNS, never the newest version (BK §6's rule).
 	ok(int(d.get("version", 0)) >= 14 and d.has("rune_bag") and d.has("crest") and d.has("pending_rune_drops"),
 		"§5: the save does not carry the bag, the crest and the waiting drops")
+	# BATCH HR §1 — WHAT RIDES THE SAVE IS EVERY HOLDING: the bag, the waiting drops and
+	# each hero's held runes, which live on him again.
 	var bag_names := _names(_run.rune_bag)
 	var wait_names := _names(_run.pending_rune_drops)
+	var held_names: Array = []
+	for m in _run.party:
+		held_names.append(_unworn(m))
 	_clear_bag()
-	ok(_run.load_run() and _names(_run.rune_bag) == bag_names and _names(_run.pending_rune_drops) == wait_names,
-		"§5: the bag or the waiting drops did not round-trip")
+	var held_back: Array = []
+	var loaded: bool = _run.load_run()
+	for m in _run.party:
+		held_back.append(_unworn(m))
+	ok(loaded and _names(_run.rune_bag) == bag_names and _names(_run.pending_rune_drops) == wait_names
+			and held_back == held_names,
+		"§5: the bag, the waiting drops or a hero's held runes did not round-trip")
 	var rs := FileAccess.get_file_as_string("res://scripts/run_state.gd")
 	var lr := rs.find("func load_run() -> bool:")
 	var lr_body := rs.substr(lr, rs.find("\nfunc ", lr + 10) - lr)
 	ok(lr_body.contains("if save_version < 10:"), "§5: the refusal floor moved off v10")
-	# THE MIGRATION: a save from before the bag, with runes worn and runes held unworn
-	# on each hero, and an engine rune unslotted.
+	# A SAVE FROM BEFORE THE BAG, with runes worn and runes held unworn on each hero, and
+	# an engine rune unslotted. BATCH HR §1 — THE CORRECT ANSWER MOVED: HK's migration put
+	# every unworn rune into the bag; since HR an unworn rune lives on its hero, so the
+	# save loads with each where its hero held it (a v14 bag is handed out instead —
+	# `check_hr` §1e). Each arm below asks HK's question of the new answer.
 	_new_run()
 	var warrior: Dictionary = _run.party[0]
 	var ids := Runes.eligible_ids(warrior, []).filter(func(x): return not Runes.is_engine_rune(String(x)))
@@ -853,24 +974,50 @@ func _s5_the_save() -> void:
 	_clear_bag()
 	ok(_run.load_run(), "§5: a v13 save with runes on its heroes did not load")
 	var w2: Dictionary = _run.party[0]
-	ok(_names(w2["runes"]) == [String(worn_a["name"]), String(worn_b["name"])],
-		"§5: the Warrior does not wear exactly what he wore, in order (%s)" % [_names(w2["runes"])])
-	ok(_names(w2["engines"]).size() == 1 and bool((w2["engines"][0] as Dictionary).get("equipped", false)),
-		"§5: the Warrior's slotted engine did not stay slotted, alone")
+	var w2_worn: Array = _names(w2["runes"].filter(func(r): return bool((r as Dictionary).get("equipped", false))))
+	ok(w2_worn == [String(worn_a["name"]), String(worn_b["name"])],
+		"§5: the Warrior does not wear exactly what he wore, in order (%s)" % [w2_worn])
+	ok(_names(w2["engines"]).size() == 2 and bool((w2["engines"][0] as Dictionary).get("equipped", false))
+			and not bool((w2["engines"][1] as Dictionary).get("equipped", false)),
+		"§5: the Warrior's slotted engine did not stay slotted, and his unslotted one held")
 	var after_all: Array = _names(_run.rune_bag)
 	for m in _run.party:
 		after_all.append_array(_names(m["runes"]) + _names(m["engines"]))
 	after_all.sort()
 	ok(after_all == before_all, "§5: the migration lost or invented a rune (%d before, %d after)" % [before_all.size(), after_all.size()])
-	ok(_names(_run.rune_bag).slice(0, 3) == [String(loose_a["name"]), String(loose_b["name"]), String(spare["name"])],
-		"§5: the Warrior's unworn runes and unslotted engine are not first in the bag, in the order held")
-	ok(_run.rune_bag.size() == 3 + others_loose and _run.rune_bag.size() > int(_run.BAG_CAP),
-		"§5: the bag opened at %d — the migration should move all %d and drop none, past twenty" % [_run.rune_bag.size(), 3 + others_loose])
-	var over: Dictionary = _run.drop_after_fight()
-	ok(String(over.get("where", "")) == "pending", "§5: a drop into an over-full bag landed instead of waiting")
-	for m in _run.party:
-		for r in (m as Dictionary).get("runes", []) + (m as Dictionary).get("engines", []):
-			ok(bool((r as Dictionary).get("equipped", false)), "§5: an unworn rune was left on a hero after the migration")
+	ok(_unworn(w2) == [String(loose_a["name"]), String(loose_b["name"]), String(spare["name"])]
+			and _run.rune_bag.is_empty(),
+		"§5: the Warrior does not still hold his unworn runes and unslotted engine, in the order held, with the bag empty")
+	var over_cap := 0
+	for seat in [1, 2, 3]:
+		if _run.held_count(_run.party[seat]) > int(_run.HERO_HOLD_CAP):
+			over_cap += 1
+	ok(_run.held_count(_run.party[1]) + _run.held_count(_run.party[2]) + _run.held_count(_run.party[3]) == others_loose
+			and over_cap > 0,
+		"§5: the others hold %d of their %d, and %d opened over their eight — a load drops nothing, past the cap" % [
+			_run.held_count(_run.party[1]) + _run.held_count(_run.party[2]) + _run.held_count(_run.party[3]), others_loose, over_cap])
+	var full_seat := -1
+	for seat in [1, 2, 3]:
+		if _run.holding_full(_run.party[seat]) and full_seat < 0:
+			full_seat = seat
+	var over_r: Array = Runes.eligible_ids(_run.party[full_seat], Runes.owned_names(_run.party[full_seat], _held())).filter(
+		func(x): return not Runes.is_party_rune(Runes.build(String(x)))) if full_seat >= 0 else []
+	var over_w: String = String(_run.hold_rune(_run.party[full_seat], Runes.build(String(over_r[0])))) \
+		if not over_r.is_empty() else "<none left>"
+	ok(over_w == "pending", "§5: a rune for a hero over his cap landed (%s) instead of waiting" % over_w)
+	# Every rune on a hero is where the save put it, worn or held as it was written.
+	var saved_party: Array = old["party"]
+	for i in _run.party.size():
+		var saved_m: Dictionary = saved_party[i]
+		for key in ["runes", "engines"]:
+			var saved_l: Array = saved_m.get(key, [])
+			var now_l: Array = (_run.party[i] as Dictionary).get(key, [])
+			for j in saved_l.size():
+				var was: Dictionary = saved_l[j]
+				var is_now: Dictionary = now_l[j] if j < now_l.size() else {}
+				ok(String(is_now.get("name", "")) == String(was.get("name", ""))
+						and bool(is_now.get("equipped", false)) == bool(was.get("equipped", false)),
+					"§5: a rune on a hero moved or changed state in the load (%s)" % String(was.get("name", "")))
 	_remove(SCRATCH_SAVE)
 	_run.save_path = _run.TEST_SAVE_PATH
 	_clear_bag()
@@ -897,26 +1044,31 @@ func _s6_the_sim() -> void:
 		RunSim._sim_take_drop(_run)
 	ok(RunSim.rune_drops == n0 + 6 and RunSim.rune_drop_worn > worn0,
 		"§6: six drops booked %d and wore %d" % [RunSim.rune_drops - n0, RunSim.rune_drop_worn - worn0])
-	# every slot the bot fills first, so the bag fills only after them
+	# every slot the bot fills first, so a hero's holding fills only after them.
+	# BATCH HR §1 — RE-POINTED: the bag's twenty became a hero's eight, so the drop the
+	# bot lets go is the one whose hero holds all he can.
+	var declined0: int = RunSim.rune_drop_declined
 	var guard := 0
-	while not _run.bag_full() and guard < 120:
+	while RunSim.rune_drop_declined == declined0 and guard < 400:
 		RunSim._sim_take_drop(_run)
 		guard += 1
-	ok(_run.bag_full(), "§6: %d drops never filled the bag (%d) — the decline below cannot be asked" % [guard, _run.rune_bag.size()])
-	var declined0: int = RunSim.rune_drop_declined
-	RunSim._sim_take_drop(_run)
-	ok(RunSim.rune_drop_declined == declined0 + 1 and _run.pending_rune_drops.is_empty()
-			and _run.rune_bag.size() == int(_run.BAG_CAP),
-		"§6: on a full bag the bot did not let the drop go (declined %d, waiting %d)" % [RunSim.rune_drop_declined - declined0, _run.pending_rune_drops.size()])
+	var full_n := 0
+	for m in _run.party:
+		if _run.holding_full(m):
+			full_n += 1
+	ok(full_n >= 1, "§6: %d drops never filled a hero's holding — the decline below cannot be asked" % guard)
+	ok(RunSim.rune_drop_declined == declined0 + 1 and _run.pending_rune_drops.is_empty(),
+		"§6: on a full holding the bot did not let the drop go (declined %d, waiting %d)" % [RunSim.rune_drop_declined - declined0, _run.pending_rune_drops.size()])
 	_clear_bag()
 
 
 # ── §7 — THE ROAD ───────────────────────────────────────────────────────────
 #
 # A whole run to the end boss's door on the real screens — `check_gj` §1's walk,
-# with this batch's answers added: the full-bag panel answered by a drop the first
-# time and a decline the next, the first Peddler's counter used to sell a rune and
-# buy one, and a rune equipped from the bag and put back through a hero's panel.
+# with this batch's answers added: the full-holding panel answered by a drop the
+# first time and a decline the next, the first Peddler's counter used to sell a rune
+# and buy one, and a rune a hero holds equipped and put back through his panel (HR §1:
+# a hero's holding where HK had the bag).
 
 var _cards_fight := 0
 var _cards_fight_drop := 0
@@ -927,12 +1079,19 @@ var _sold := 0
 var _bought := 0
 var _equipped := 0
 var _unequipped := 0
-var _bag_max := 0
+var _held_max := 0
 var _road_dead: Array = []
 
 
+func _most_held() -> int:
+	var most := 0
+	for m in _run.party:
+		most = maxi(most, _run.held_count(m))
+	return most
+
+
 func _road_step_map(s: Node) -> String:
-	_bag_max = maxi(_bag_max, _run.rune_bag.size())
+	_held_max = maxi(_held_max, _most_held())
 	if Gate.overlay(s, 62) != null:
 		await _road_decline_draft(s)
 		return "draft"
@@ -954,10 +1113,11 @@ func _road_step_map(s: Node) -> String:
 				or int(m.get("rune_picks_owed", 0)) > 0:
 			await _road_answer_pick(s, idx)
 			return "pick"
-	# EQUIP FROM THE BAG, AND PUT ONE BACK, through the Warrior's own panel.
+	# EQUIP ONE HE HOLDS, AND PUT ONE BACK, through the Warrior's own panel (HR §1: his
+	# holding, where HK's road equipped from the bag).
 	var w: Dictionary = _run.party[0]
 	if _equipped < 2 and _run.runes_worn(w) < int(_run.rune_slots()):
-		var bi := _row_where(_run.rune_rows(w), "bag")
+		var bi := _row_held(_run.rune_rows(w))
 		if bi >= 0:
 			s.call("_open_rune_panel", 0)
 			await process_frame
@@ -974,16 +1134,21 @@ func _road_step_map(s: Node) -> String:
 				Gate.press(ov2, ["Close"])
 				await process_frame
 			return "equip"
-	if _equipped >= 2 and _unequipped == 0 and not _run.bag_full() and _run.runes_worn(w) > 0:
+	if _equipped >= 2 and _unequipped == 0 and not _run.holding_full(w) and _run.runes_worn(w) > 0:
 		s.call("_open_rune_panel", 0)
 		await process_frame
 		var ov3: Node = Gate.overlay(current_scene, 60)
-		var un: Button = Gate.bound_button(ov3, "_toggle_rune", [0, 0, ov3]) if ov3 != null else null
+		var wr := -1
+		var w_rows: Array = _run.rune_rows(w)
+		for i in w_rows.size():
+			if bool(w_rows[i]["worn"]) and wr < 0:
+				wr = i
+		var un: Button = Gate.bound_button(ov3, "_toggle_rune", [0, wr, ov3]) if ov3 != null else null
 		if un != null and String(un.text) == "Unequip":
-			var bag0: int = _run.rune_bag.size()
+			var held0: int = _run.held_count(w)
 			un.emit_signal("pressed")
 			await Gate.frames(self, 2)
-			if _run.rune_bag.size() == bag0 + 1:
+			if _run.held_count(w) == held0 + 1:
 				_unequipped += 1
 		var ov4: Node = Gate.overlay(current_scene, 60)
 		if ov4 != null:
@@ -1070,24 +1235,28 @@ func _road_answer_pick(s: Node, idx: int) -> void:
 
 
 func _road_shop(s: Node) -> String:
-	if _sold == 0 and not _run.rune_bag.is_empty():
+	# BATCH HR §1 — THE SALE IS OF ANY RUNE NOBODY WEARS (a hero's held, or the bag's),
+	# the counter's first row; the purchase lands where its kind does. Counted over
+	# everything held, where HK counted the bag.
+	var sale: Array = s.call("_sale_rows")
+	if _sold == 0 and not sale.is_empty():
 		var g0: int = _run.gold
-		var bag0: int = _run.rune_bag.size()
-		var value: int = _run.rune_sell_value(_run.rune_bag[0])
+		var held0: int = _held().size()
+		var value: int = _run.rune_sell_value(sale[0]["rune"])
 		Gate.press(s, ["Sell +%dg" % value])
 		await Gate.frames(self, 2)
 		Gate.press(current_scene, ["Sure? +%dg" % value])
 		await Gate.frames(self, 2)
-		if _run.gold == g0 + value and _run.rune_bag.size() == bag0 - 1:
+		if _run.gold == g0 + value and _held().size() == held0 - 1:
 			_sold += 1
 		s = current_scene
 	if _bought == 0:
 		_run.gold = maxi(int(_run.gold), 400)
 		var g1: int = _run.gold
-		var bag1: int = _run.rune_bag.size()
+		var held1: int = _held().size()
 		var pressed := Gate.press(s, ["Buy — "])
 		await Gate.frames(self, 2)
-		if pressed != "" and _run.gold < g1 and _run.rune_bag.size() == bag1 + 1:
+		if pressed != "" and _run.gold < g1 and _held().size() == held1 + 1:
 			_bought += 1
 		s = current_scene
 	return Gate.press(s, ["Leave the Shop"])
@@ -1125,6 +1294,12 @@ func _s7_the_road() -> void:
 	seed(ROAD_SEED)
 	_clear_bag()
 	_new_run()
+	# BATCH HR §1 — CONSTRUCTED, NOT WAITED FOR: every hero holds seven of his own runes
+	# before the first step, so the road's drops fill a holding and the full-holding
+	# panel is met on the real screens. A run hands a hero five or six runes from start
+	# to end (HR §1's measurement), so a road left to fill one by itself never would.
+	for m in _run.party:
+		_fill_holding(m, int(_run.HERO_HOLD_CAP) - 1)
 	# Fights won on autoplay with the enemy's attacks off, as `check_gj` walks: a
 	# balance fact is the sim's, and this road is about the rewards.
 	OS.set_environment("DOD_AUTOPLAY", "1")
@@ -1174,21 +1349,22 @@ func _s7_the_road() -> void:
 		elif await _road_leave(s, nm) == "":
 			stalled = "no way off the %s screen" % nm
 			break
-		_bag_max = maxi(_bag_max, _run.rune_bag.size())
+		_held_max = maxi(_held_max, _most_held())
 	Engine.time_scale = 1.0
-	print("    %d battles, %d normal fights, bag at most %d, panel took %d and left %d, sold %d, bought %d, equipped %d, unequipped %d" % [
-		battles, _cards_fight, _bag_max, _panel_took, _panel_left, _sold, _bought, _equipped, _unequipped])
+	print("    %d battles, %d normal fights, a hero held at most %d, panel took %d and left %d, sold %d, bought %d, equipped %d, unequipped %d" % [
+		battles, _cards_fight, _held_max, _panel_took, _panel_left, _sold, _bought, _equipped, _unequipped])
 	ok(stalled == "" and arrived, "§7: the road stopped — %s" % (stalled if stalled != "" else "short of the end boss"))
 	ok(_road_dead.is_empty(), "§7: a screen on the road could not be answered — %s" % [_road_dead])
 	ok(_cards_fight >= 15 and _cards_fight_drop == _cards_fight,
 		"§7: %d normal fights were won and %d of their cards named a drop — every one should" % [_cards_fight, _cards_fight_drop])
 	ok(_cards_other_drop == 0, "§7: %d elite, mini-boss or boss cards named a rune drop" % _cards_other_drop)
-	ok(_bag_max == int(_run.BAG_CAP), "§7: the bag reached %d on the road, never its twenty — the full-bag panel was not met" % _bag_max)
+	ok(_held_max >= int(_run.HERO_HOLD_CAP),
+		"§7: a hero held at most %d on the road, never his eight — the full-holding panel was not met" % _held_max)
 	ok(_panel_took >= 1 and _panel_left >= 1,
-		"§7: the full-bag panel was answered %d times by a drop and %d by a decline — both are owed" % [_panel_took, _panel_left])
+		"§7: the full-holding panel was answered %d times by a drop and %d by a decline — both are owed" % [_panel_took, _panel_left])
 	ok(_sold >= 1 and _bought >= 1, "§7: the road sold %d runes and bought %d at a Peddler" % [_sold, _bought])
 	ok(_equipped >= 1 and _unequipped >= 1,
-		"§7: the road equipped %d runes from the bag and put %d back" % [_equipped, _unequipped])
+		"§7: the road equipped %d runes from a hero's holding and put %d back" % [_equipped, _unequipped])
 	OS.set_environment("DOD_AUTOPLAY", "")
 	OS.set_environment("DOD_ENEMIES_OFF", "")
 

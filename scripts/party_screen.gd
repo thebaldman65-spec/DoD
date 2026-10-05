@@ -514,8 +514,9 @@ func _draw_detail() -> void:
 	# map is reflected the next time this page opens; there is no cached set.
 	var sitting_runes: Array = Run.sitting_out_rune_names(member) if awake else []
 	# BATCH HK §4 — THE PARTY SLOT'S RUNE IS ON THIS HERO'S NUMBERS TOO, so it is
-	# listed here beside his own, its state reading PARTY. (A rune he does not wear
-	# is in the party's bag, which the map shows, not on this page.)
+	# listed here beside his own, its state reading CREST. (BATCH HR §1 — a rune he
+	# holds and does not wear is on his own lists again, and reads HELD here; the bag
+	# holds the crest's runes, which the map shows.)
 	for rune_entry in Run.party_runes + held_engines + runes:
 		var rune: Dictionary = rune_entry
 		var row := HBoxContainer.new()
@@ -525,7 +526,7 @@ func _draw_detail() -> void:
 		var is_on: bool = rune.get("equipped", false)
 		var sits: bool = is_on and sitting_runes.has(String(rune["name"]))
 		state.text = ("CREST" if Runes.is_party_rune(rune) else ("ENGINE" if rune.has("engine")
-			else "WORN")) if is_on else "pouch"
+			else "WORN")) if is_on else "held"
 		state.custom_minimum_size = Vector2(56, 20)
 		state.add_theme_font_size_override("font_size", 11)
 		state.add_theme_color_override("font_color",

@@ -243,17 +243,42 @@ func _close_overlays(mp: Node) -> void:
 # — the face the §2 measurement ruled out, put back — first printed the same
 # FAIL lines as deleting the tell outright, proving nothing the other control
 # had not. Found this way, the width is measured on whatever the slot drew.
+#
+# **BATCH HR §2 — AND THE NAMEPLATE'S MARKER OPENS THE SAME PANEL, SO IT IS NOT A
+# SLOT.** The count of runes a hero holds unworn is a button on his nameplate bound to
+# the same door, `_open_rune_panel(seat)`, and HEAD's sweep counted it: every gated
+# rune read four slot buttons with its engine out — the engine rune held unworn, so
+# the marker drawn — and three with it in (HR's recon, 42 lines). The marker carries
+# the `held_marker` meta; it is left out here and asked for by itself (`_held_marker`),
+# so the slot count stays the slot count and the marker's own arm stands beside it.
 func _slot_buttons(mp: Node, seat: int) -> Array:
 	var all: Array = []
 	_buttons(mp, all)
 	var out: Array = []
 	for b in all:
+		if (b as Button).has_meta("held_marker"):
+			continue
 		for c in (b as Button).pressed.get_connections():
 			var cb: Callable = c["callable"]
 			if cb.get_method() == "_open_rune_panel" and cb.get_bound_arguments() == [seat]:
 				out.append(b)
 				break
 	return out
+
+
+# The nameplate's marker for one seat — the button carrying `held_marker` that opens
+# that seat's rune panel — or null when none is drawn.
+func _held_marker(mp: Node, seat: int) -> Button:
+	var all: Array = []
+	_buttons(mp, all)
+	for b in all:
+		if not (b as Button).has_meta("held_marker"):
+			continue
+		for c in (b as Button).pressed.get_connections():
+			var cb: Callable = c["callable"]
+			if cb.get_method() == "_open_rune_panel" and cb.get_bound_arguments() == [seat]:
+				return b
+	return null
 
 
 func _engine_rune_name(rune_id: String) -> String:
@@ -393,6 +418,8 @@ func _s3_the_three_surfaces() -> void:
 	var pouch_quiet := 0
 	var slot_said := 0
 	var slot_quiet := 0
+	var marker_out := 0
+	var marker_in := 0
 	# EVERY ONE OF THE THIRTY-FIVE, ON THE POUCH AND ON THE MAP'S SLOT, IN BOTH
 	# ARMS. The pouch is the surface the brief names as the one that matters.
 	for rid in _gated:
@@ -412,6 +439,13 @@ func _s3_the_three_surfaces() -> void:
 			ok(slots.size() == _run.rune_slots(),
 				"§3 %s (%s): %d rune slot buttons — %d expected" % [
 					rid, arm, slots.size(), _run.rune_slots()])
+			# HR §2 — THE PAIRED POSITIVE: with the engine out its rune is held unworn,
+			# so the nameplate counts one; with it in, nothing waits and no marker draws.
+			var mk: Button = _held_marker(mp, seat)
+			if engine_in and mk == null:
+				marker_in += 1
+			elif not engine_in and mk != null and String(mk.text) == "✦ 1":
+				marker_out += 1
 			var face: Button = null
 			for b in slots:
 				if String((b as Button).text).contains(rname):
@@ -476,6 +510,9 @@ func _s3_the_three_surfaces() -> void:
 	ok(slot_said == _gated.size() and slot_quiet == _gated.size(),
 		"§3: the map's slot marked %d of the gated with the engine out and left %d of them bare with it in" % [
 			slot_said, slot_quiet])
+	ok(marker_out == _gated.size() and marker_in == _gated.size(),
+		"§3: the nameplate counted the held engine rune (✦ 1) for %d of the gated with the engine out, and drew no marker for %d of them with it in — of %d" % [
+			marker_out, marker_in, _gated.size()])
 	# THE UNGATED CONTROL, ON THE SAME SURFACES AND THE SAME FRAME: a rune with
 	# no engine to wait on is never marked, whatever the hero's slots hold.
 	var cr: Dictionary = Runes.build(CONTROL_RUNE)

@@ -1568,7 +1568,8 @@ census of every gate and suite against the two crest runes (`docs/reports/HO.md`
 The reds were the cheap ones; the rest went on passing while asking nothing, or asking it of a state no run reaches.
 
 - **A ROLLED RUNE WRITTEN ONTO A HERO'S LIST BY HAND CAN BE A STATE THE GAME CANNOT MAKE.** `hold_rune` decides by
-  kind: a class rune is worn or bagged, a core rune taken from a cache waits in the bag, a crest rune fills the crest.
+  kind: a class rune is worn or held unworn by the hero of its class, a core rune taken from a cache waits unworn on
+  its hero, a crest rune fills the crest or waits in the bag (HR §1 split the holdings; HK had every unworn kind bagged).
   An arm that appended whatever a roll returned seated a crest rune in a hero's slot, proved its exclusion by the pouch
   where the game proves it by `Run.party_rune_names`, and counted a floor two higher than its reading. **A fixture that
   seats a rune it NAMED on a hero who can wear it — the two fixtures' `runes` option, a reset to an empty list, a save's
@@ -1633,3 +1634,37 @@ The reds were the cheap ones; the rest went on passing while asking nothing, or 
   false, and called that *the pool still applies*. HQ narrowed the words to what the walk proves — the shared
   applicator takes every payload without a throw — and named the gates that ask what a payload pays. **A count that
   cannot fail is a population line, and is labelled as one.**
+
+## STANDING RULE — A TIMED SCREEN ELEMENT IS READ AT TIME SCALE ONE (Batch HR §2)
+> **`Gate.frames` runs the engine at a hundredfold time scale, so anything that fades on a timer — the map's toast
+> fades in 1.9 s of game time — is gone two frames after it appears. A gate that reads a toast, or any tweened or
+> timed element, steps the frames it reads across at `Engine.time_scale = 1.0`.**
+
+`check_hr` §2's toast arms read red on a toast the map had drawn: the scene change after the victory card's Continue
+was awaited through `Gate.frames`, and by the read the toast had faded and freed itself. **It looked exactly like a
+missing toast.** The arm steps four frames at scale one (`check_hr._arrive`) and reads it there; everything else in
+the drive keeps the fast frames.
+
+## STANDING RULE — AN ARM THAT READS WHAT THE DICE DEALT IS A COIN FLIP THE NEXT BATCH CAN LOSE (Batch HR §6)
+> **An arm whose answer depends on what a seeded draw happened to deal — which offer a shop put first, which hero landed
+> the opening kill — passes on the dice it was written against and nothing else. A batch that moves the dice (a
+> generator, a new roll, one more entry in a pool) flips it. Attribute the move with a stub arm, then CONSTRUCT the state
+> the arm asks about; never re-seed to a lucky draw or raise a frame cap to wait for one.**
+
+- **HR MET THREE AT ONCE, ALL GREEN FOR BATCHES.** HR §3's shop gate changed the board a fresh run is dealt, and every
+  fixture that starts a run deals one from the same dice. `check_go` §12's Reaver is paid only for its holder's own
+  kill, and its fragile foe died once, to the opening volley — the Warrior's under HEAD's dice, the Cleric's under HR's,
+  and in 6000 frames never again. `check_fh` §3 bought the Peddler's first offer and asked the bag for it: a crest rune
+  passed, a class rune failed. `check_fh` §9b had been one since HP added crest runes to the pool. **And HR wrote a fourth
+  into its own new gate**: `check_hr` §1d's event verb granted whatever rune the dice drew, and a control that moved
+  nothing but the dice (the shop gate at twelve) drew a crest rune into the bag and read it red. Its crest runes are
+  held first now, so the grant is a hero's.
+- **ATTRIBUTE BY STUBBING THE DICE-MOVER, NOT BY READING THE DIFF.** With the gate set to zero nodes, HEAD's `check_go`
+  read HEAD's stretch to the frame and `check_gp`'s ok() trace read HEAD's message for message, in order — so the move
+  was the dice and nothing else the batch changed. A green gate's count can move the same way (`check_gp` 474 → 469):
+  that row moves with the trace as its reason, and is not a defect.
+- **CONSTRUCT, THEN CONTROL.** `check_go`'s fragile foe now stands below half health, the lowest share on the board, so
+  every bot's strike goes to it and each hero's kill comes round; `check_fh` buys a class rune through that row's own
+  Buy whenever the counter holds one.
+  **The repair is proved by breaking what the arm reads** — the Reaver's read cut, both of its stretches still read
+  silent — because a constructed state that passes whatever the game does has stopped asking its question.

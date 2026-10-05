@@ -533,9 +533,9 @@ static func _sim_drop(run: Node, id: String) -> void:
 
 
 # THE DROP, UNDER THE BOT'S POLICY: wear it if a hero it fits has a slot free
-# (the party slot for a party rune), leave it in the bag otherwise, and let it go
-# on a full bag. Through `Run`'s own rows and toggles, so the bot can do nothing
-# the panel does not let a player do.
+# (the party slot for a party rune), leave it held otherwise — on its hero since HR
+# §1, a crest rune in the bag — and let it go on a full holding. Through `Run`'s own
+# rows and toggles, so the bot can do nothing the panel does not let a player do.
 static func _sim_take_drop(run: Node) -> void:
 	var drop: Dictionary = run.drop_after_fight()
 	if drop.is_empty():

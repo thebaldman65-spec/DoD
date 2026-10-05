@@ -377,7 +377,14 @@ func _s2a_forbearance() -> void:
 			got_worn = String(r["name"])
 	var got_bag := ""
 	var got_tpl := ""
-	for r2 in _run.rune_bag:
+	# BATCH HR §1 — WHEREVER IT LANDS: a v15 load hands a class rune in the bag to its
+	# hero (and a rune with no class to the first hero who can wear it), so the two the
+	# bag held are looked for in the bag and on every hero's lists — the rename is the
+	# question, not the place.
+	var places: Array = _run.rune_bag.duplicate()
+	for m in _run.party:
+		places.append_array((m as Dictionary).get("runes", []) + (m as Dictionary).get("engines", []))
+	for r2 in places:
 		if String((r2 as Dictionary).get("id", "")) == "fourth_stack":
 			got_bag = String(r2["name"])
 		if String((r2 as Dictionary).get("id", "")) == "tpl:Might":

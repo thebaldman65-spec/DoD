@@ -1071,6 +1071,23 @@ static func is_retired(id: String) -> bool:
 	return String((_load().get(id, {}) as Dictionary).get("retired", "")) != ""
 
 
+# ══ BATCH HR §0 — A RUNE THE GAME CANNOT PAY IS NOT OFFERED (ruled) ═════════════
+#
+# **WITHHELD AT THE ROLL, RULED AT HR AND LEFT OPEN AT HQ §5.** There is no reading
+# where offering it is better: the player spends a drop, a slot or 150 gold on a rune
+# that pays nothing. `_load` reports a refused entry and keeps it (HP §1b's contract:
+# a retired-style kept entry, so a save holding one still resolves), and until HR the
+# roll offered it like any other (HQ §1.5's first route). **The answer is
+# `Talents.live_refusal`'s, the one door, asked of the entry as it stands** — so a
+# fixture added to the table after it loaded is asked too. `eligible_ids` skips it,
+# and so do the three lists that say why an offer came back short, so a refused rune
+# is never named as one that waits on a card, an engine or the pet. **The spawn's
+# refused tail stays** (`battle.gd`'s roll call), as the net for a rune already worn
+# when a build began refusing it — a save carries the payload it was built with.
+static func is_refused(entry: Dictionary) -> bool:
+	return Talents.live_refusal(entry.get("payload", {})) != ""
+
+
 # ══ BATCH GV — A RUNE THAT READS AN ENGINE IS OFFERED ONLY TO A HERO WHO HAS IT
 #                EQUIPPED ════════════════════════════════════════════════════════
 #
@@ -1405,6 +1422,9 @@ static func eligible_ids(member: Dictionary, owned_names: Array) -> Array:
 		var e: Dictionary = data[id]
 		if String(e.get("retired", "")) != "":
 			continue
+		# BATCH HR §0 — A RUNE THE GAME CANNOT PAY IS NOT OFFERED (ruled; `is_refused`).
+		if is_refused(e):
+			continue
 		if not _scope_ok(e, member):
 			continue
 		if held_ids.has(String(id)):
@@ -1485,6 +1505,8 @@ static func locked_by_kit(member: Dictionary, held: Array = []) -> Array:
 		var e: Dictionary = data[id]
 		if String(e.get("retired", "")) != "":
 			continue
+		if is_refused(e):
+			continue  # HR §0 — never offered, so it waits on nothing
 		if not _scope_ok(e, member):
 			continue
 		if owned.has(display_name(e)):
@@ -1510,6 +1532,8 @@ static func locked_by_engine(member: Dictionary, held: Array = []) -> Array:
 		var e: Dictionary = data[id]
 		if String(e.get("retired", "")) != "":
 			continue
+		if is_refused(e):
+			continue  # HR §0 — never offered, so it waits on nothing
 		if not _scope_ok(e, member):
 			continue
 		if owned.has(display_name(e)):
@@ -1533,6 +1557,8 @@ static func locked_by_pet(member: Dictionary, held: Array = []) -> Array:
 		var e: Dictionary = data[id]
 		if String(e.get("retired", "")) != "":
 			continue
+		if is_refused(e):
+			continue  # HR §0 — never offered, so it waits on nothing
 		if not _scope_ok(e, member):
 			continue
 		if owned.has(display_name(e)):

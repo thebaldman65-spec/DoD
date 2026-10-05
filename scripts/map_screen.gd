@@ -101,6 +101,8 @@ var _rune_panel_for := -1
 # two presses, the shop's Sell shape.
 var _bag_panel_open := false
 var _bag_drop_armed := ""
+# BATCH HR §1 — the hero's panel's Drop, armed by the rune's name, as the bag's is.
+var _held_drop_armed := ""
 
 # BATCH EG §2 — the same, for the loadout panel. Its own flag rather than a
 # shared one: the two overlays are opened from two buttons on the same card and
@@ -127,6 +129,7 @@ func _ready() -> void:
 	Run.debug_summon = false
 	Music.play("map")
 	_draw_screen()
+	_announce_arrival()
 	# The draft screen CHAINS OFF the framing card rather than racing it (the
 	# Batch Z/AE precedent). The two can never actually collide — the framing
 	# card only shows before the first step and no draft is owed then — but a
@@ -134,6 +137,50 @@ func _ready() -> void:
 	# is written to prevent, not one to discover.
 	if not _maybe_show_framing():
 		_maybe_open_party_draft()
+
+
+# ══ BATCH HR §2 — THE DROP'S TOAST NAMES THE HERO ════════════════════════════════
+#
+# **ONE CHOICE IS NEVER TWO THINGS WITH NO ANNOUNCEMENT (HO's rule), AND A DROP IS
+# SAID ON THE MAP AGAINST THE HERO WHOSE IT IS**: the rune, the nameplate it went to
+# — the name on the card whose marker just moved — and that it waits unworn. A
+# crest rune is said against the bag, whose marker moved instead. `Run.last_drop`
+# is the drop as `drop_after_fight` put it down; it is read once and cleared, so a
+# redraw never says it twice. And what a load had to tell the player
+# (`Run.load_notes`: a rune kept in the bag with no hero to hold it) is said here
+# too, once.
+func _announce_arrival() -> void:
+	var lines := PackedStringArray()
+	for note in Run.load_notes:
+		lines.append(String(note))
+	Run.load_notes = []
+	var drop: Dictionary = Run.last_drop
+	Run.last_drop = {}
+	if not drop.is_empty():
+		lines.append(drop_toast_text(drop))
+	if not lines.is_empty():
+		_toast("   ·   ".join(lines))
+
+
+# The words, apart so a gate can ask them of a drop it did not have to fight for.
+func drop_toast_text(drop: Dictionary) -> String:
+	var rune: Dictionary = drop.get("rune", {})
+	var nm := String(rune.get("name", ""))
+	var where := String(drop.get("where", ""))
+	var hi := int(drop.get("hero", -1))
+	var who := ""
+	if hi >= 0 and hi < Run.party.size():
+		who = "the %s" % Run.nameplate(Run.party[hi])
+	if Runes.is_party_rune(rune) or who == "":
+		match where:
+			"bag":
+				return "%s drops for the crest — it waits in the bag." % nm
+			"pending":
+				return "%s drops for the crest — the bag is full: choose below." % nm
+		return "%s drops — it waits in the bag." % nm
+	if where == "pending":
+		return "%s drops for %s — every place he holds is taken: choose below." % [nm, who]
+	return "%s drops for %s — held, not worn: equip it from the card." % [nm, who]
 
 
 # First-run orientation (Batch Z): a skippable framing card between the
@@ -169,10 +216,10 @@ func _maybe_show_framing() -> bool:
 		"the end. Scroll it and read the whole zone before you step.\n\n" +
 		"Nothing is guaranteed on a route. Step down a row and the corridor\n" +
 		"above you is closed for the next few columns — that IS the choice.\n\n" +
-		"Every FIGHT drops a rune into the bag. ELITES pay a draft pick and\n" +
-		"a rune cache, and cost you health. The SMITH sells ability upgrades\n" +
-		"for gold. TRADE is the Peddler. ??? is something standing on the\n" +
-		"road, and you will not know what until you stand on it.\n\n" +
+		"Every FIGHT drops a rune for one of the heroes. ELITES pay a draft\n" +
+		"pick and a rune cache, and cost you health. The SMITH sells ability\n" +
+		"upgrades for gold. TRADE is the Peddler. ??? is something standing\n" +
+		"on the road, and you will not know what until you stand on it.\n\n" +
 		"Before every elite and mini-boss you are offered THREE BARGAINS: a\n" +
 		"condition that binds both sides of the battle, and what clearing it\n" +
 		"under that condition pays — one of the three is always survivable.\n\n" +
@@ -204,7 +251,12 @@ func _node_pos(slot: int, node: Dictionary) -> Vector2:
 
 
 func _draw_screen() -> void:
+	# BATCH HR §2 — A TOAST OUTLIVES A REDRAW: the drop's toast is put up as the map
+	# opens, and the chain that follows (the draft, the pouch's offer, a full
+	# holding's panel) can redraw the board under it. It frees itself when it fades.
 	for child in get_children():
+		if child.has_meta("toast"):
+			continue
 		child.queue_free()
 	_rune_panel_for = -1
 	_loadout_panel_for = -1
@@ -539,10 +591,12 @@ func _node_tooltip(node: Dictionary, s: int, reachable_still: bool) -> String:
 		# is enforced where a rune is WORN (this file's own toggle, and the
 		# elite pick's auto-equip), and the sim's "13.6 refusals a run for no
 		# free slot" is the BOT's buying policy rather than the shop's.
-		# BATCH HK §3 — A RUNE BOUGHT GOES INTO THE BAG, AND HE BUYS THEM BACK.
+		# BATCH HK §3 — HE SELLS RUNES AND BUYS THEM BACK. HR §1 — a rune bought goes to
+		# the hero it is for (a crest rune to the bag), and he buys back any rune
+		# nobody wears.
 		"merchant":
-			return ("%s — THE PEDDLER\nPotions, and one rune offered to every hero, into\n" +
-				"the bag. He buys runes back out of it for a third.%s") % [head, closed]
+			return ("%s — THE PEDDLER\nPotions, and one rune offered to every hero. He buys\n" +
+				"back a rune nobody wears for a third.%s") % [head, closed]
 		"event":
 			return ("%s — ???\nSomething stands on the road. It may want to trade, " +
 				"it\nmay be a gift, and it may simply cost you.%s") % [head, closed]
@@ -550,9 +604,10 @@ func _node_tooltip(node: Dictionary, s: int, reachable_still: bool) -> String:
 	if ty == "elite":
 		head += " — ELITE"
 		bargain = "\n\nA bargain is offered before this fight."
-	# BATCH HK §1 — a normal fight won drops a rune, and the node says so.
+	# BATCH HK §1 — a normal fight won drops a rune, and the node says so. HR §1 —
+	# for the hero whose class it is, or the bag for a crest rune.
 	elif ty == "fight":
-		bargain = "\n\nWin it and a rune drops into the bag."
+		bargain = "\n\nWin it and a rune drops for one of the heroes."
 	return "%s\n%s%s%s" % [head, _warband_tooltip(node), bargain, closed]
 
 
@@ -590,6 +645,9 @@ const CARD_H := 152.0
 const CARD_X := 8.0
 const CARD_Y := 84.0
 const CARD_STEP := 158.0
+# BATCH HR §2 — the nameplate marker's width: "✦ 8" at font 13 with the button's
+# own margins, between the name and the upgrades badge.
+const NAMEPLATE_MARK_W := 44.0
 
 
 func _draw_hero_cards() -> void:
@@ -659,6 +717,34 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 	name_lbl.size = Vector2(CARD_W - 108, 18)
 	name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(name_lbl)
+	# ══ BATCH HR §2 — THE NAMEPLATE SAYS A RUNE IS WAITING (ruled) ═══════════════
+	#
+	# **THE COUNT OF RUNES THIS HERO HOLDS AND DOES NOT WEAR**, on his nameplate, so
+	# a rune earned from a fight is visible on the map against the hero whose it is.
+	# **It is read off his holding at every draw (`Run.held_count`), never set by an
+	# event and never cleared by opening a menu**: it clears when nothing is waiting,
+	# because a count that lies is worse than none. It is its own button, which opens
+	# the panel where he equips them (`_open_rune_panel`); the card's press still
+	# opens the sheet everywhere else. It sits between the name and the upgrades
+	# badge, and the name gives up the room it takes only while it is shown.
+	var waiting: int = Run.held_count(member)
+	if waiting > 0:
+		name_lbl.size = Vector2(CARD_W - 110 - NAMEPLATE_MARK_W, 18)
+		var mark := Button.new()
+		mark.text = "✦ %d" % waiting
+		mark.flat = true
+		mark.position = at + Vector2(CARD_W - 52 - NAMEPLATE_MARK_W, 4)
+		mark.custom_minimum_size = Vector2(NAMEPLATE_MARK_W, 22)
+		mark.size = Vector2(NAMEPLATE_MARK_W, 22)
+		mark.add_theme_font_size_override("font_size", 13)
+		mark.add_theme_color_override("font_color", Color(0.85, 0.6, 1.0))
+		mark.tooltip_text = "%d rune%s held, not worn. Click to equip\n%s from the %s's rune panel." % [
+			waiting, "" if waiting == 1 else "s", "it" if waiting == 1 else "them",
+			Run.nameplate(member)]
+		mark.set_meta("held_marker", waiting)
+		mark.pressed.connect(Music.click)
+		mark.pressed.connect(_open_rune_panel.bind(idx))
+		add_child(mark)
 
 	# HP bar with numbers, then the resource bar under it.
 	var hp: int = int(member["hp"])
@@ -698,14 +784,13 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 		slot_btn.add_theme_font_size_override("font_size", 10)
 		if rune.is_empty():
 			slot_btn.text = "— empty —"
-			# BATCH HK §2 — an unworn rune is in the BAG now, not on the hero, so
-			# the count is the bag's runes this hero may wear.
+			# BATCH HR §1 — an unworn rune is held on the hero again (HK put it in
+			# the bag), so the count is his own ordinary runes he does not wear.
 			var wearable_n := 0
 			for rr in Run.rune_rows(member):
-				if String(rr["src"]) == "bag":
+				if not bool(rr["worn"]):
 					wearable_n += 1
-			slot_btn.tooltip_text = "An empty rune slot. Click to equip one\nfrom the bag (%d there for the %s)." % [
-				wearable_n, key.capitalize()]
+			slot_btn.tooltip_text = "An empty rune slot. Click to equip one\nof the runes he holds (%d)." % wearable_n
 			slot_btn.add_theme_color_override("font_color", Color(0.45, 0.43, 0.48))
 		else:
 			slot_btn.text = String(rune["name"])
@@ -1894,12 +1979,12 @@ func _pick_rune(idx: int, choice: int) -> void:
 	# Auto-equip while a slot is free — the pick already happens here; save
 	# the extra click. **BATCH HK §2 — ASKED, AND `hold_rune` DECIDES BY KIND**:
 	# an ordinary rune takes one of his three slots, a party rune the party slot,
-	# each only while one is free; anything else goes into the bag, and a full bag
-	# holds it for the full-bag panel below.
+	# each only while one is free; anything else is held unworn — on him (HR §1), or
+	# in the bag for a crest rune — and a full holding queues it for the panel below.
 	#
 	# **BATCH HL §1 — A CORE RUNE IS NOT ASKED FOR.** A slotted engine brings its
 	# enabler, so asking here put a card in the kit beside the rune the player
-	# chose: one pick, two things. It goes into the bag, and its card joins the kit
+	# chose: one pick, two things. It is held unworn, and its card joins the kit
 	# when he slots it on the hero's panel — an act of his own, as HK made every
 	# other equip.
 	var is_core := String(rune.get("engine", "")) != ""
@@ -1909,10 +1994,17 @@ func _pick_rune(idx: int, choice: int) -> void:
 	member["rune_picks_owed"] = int(member.get("rune_picks_owed", 0)) - 1
 	Run.save_run()
 	_draw_screen()
-	if landed == "bag" and is_core:
-		# THE WORDS HL §1 PROPOSED, RULED AT HN §2.
-		_toast("%s goes into the bag — slot it on the hero's rune panel to use it." % String(rune["name"]))
+	if landed == "held" and is_core:
+		# THE WORDS HL §1 PROPOSED, RULED AT HN §2 — and since HR §1 the rune waits
+		# on the hero, not in the bag, so the place in them is his.
+		_toast("%s waits with the %s — slot it on the hero's rune panel to use it." % [
+			String(rune["name"]), Run.nameplate(member)])
+	elif landed == "held":
+		_toast("%s waits with the %s — every slot it fits is filled." % [
+			String(rune["name"]), Run.nameplate(member)])
 	elif landed == "bag":
+		# HO §1's words for a crest rune with the crest filled — its one slot is the
+		# crest, so *every slot it fits* is still the sentence.
 		_toast("%s goes into the bag — every slot it fits is filled." % String(rune["name"]))
 	elif landed == "pending":
 		_check_rune_drops()
@@ -1946,6 +2038,8 @@ func _pick_rune(idx: int, choice: int) -> void:
 # it). What still scrolls is a long pouch of ordinary runes, as it always did.
 const POUCH_RECT := Rect2(140, 24, 1000, 672)
 const POUCH_TEXT_W := 860
+# BATCH HR §1 — the Drop on a held row, whose width the row's label gives up.
+const HELD_DROP_W := 64
 
 
 func _open_rune_panel(idx: int) -> void:
@@ -1953,10 +2047,11 @@ func _open_rune_panel(idx: int) -> void:
 		return
 	_rune_panel_for = idx
 	var member: Dictionary = Run.party[idx]
-	# BATCH HK §2 — THE ROWS ARE `Run`'s: what he wears, then what the bag holds
-	# that he may wear, for his ordinary slots and his engine slots. The index a
-	# button carries is the row's, and the door it presses (`Run.toggle_rune`,
-	# `Run.toggle_engine`) reads the same rows, so the two cannot disagree.
+	# BATCH HK §2 — THE ROWS ARE `Run`'s: what he wears and, since HR §1, what he
+	# holds unworn (the bag's rows until then), for his ordinary slots and his engine
+	# slots. The index a button carries is the row's, and the door it presses
+	# (`Run.toggle_rune`, `Run.toggle_engine`) reads the same rows, so the two cannot
+	# disagree.
 	var rows: Array = Run.rune_rows(member)
 	var erows: Array = Run.engine_rows(member)
 	# BATCH GX — read ONCE, off the same door the sheet and the slot buttons
@@ -1989,11 +2084,12 @@ func _open_rune_panel(idx: int) -> void:
 	title.add_theme_color_override("font_color", Color(0.85, 0.6, 1.0))
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(title)
-	# BATCH HK §2 — THE BAG IS SHARED, SO THE PANEL SAYS HOW FULL IT IS: a rune he
-	# unequips goes there, and a full one is why an Unequip is refused.
+	# BATCH HR §1 — WHAT HE HOLDS, AND HOW FULL IT IS: a rune he unequips stays with
+	# him, unworn, and a full holding is why an Unequip is refused. (HK's line here
+	# said how full the shared bag was; the bag holds the crest's runes now.)
 	var bag_line := Label.new()
-	bag_line.text = "THE BAG: %d of %d, held for every hero. Unequipping puts a rune there; equipping takes it out." % [
-		Run.rune_bag.size(), Run.BAG_CAP]
+	bag_line.text = "HELD, NOT WORN: %d of %d. A rune taken off stays with him; Drop lets one go for good." % [
+		Run.held_count(member), Run.HERO_HOLD_CAP]
 	bag_line.add_theme_font_size_override("font_size", 12)
 	bag_line.add_theme_color_override("font_color", Color(0.72, 0.66, 0.8))
 	bag_line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -2016,8 +2112,8 @@ func _open_rune_panel(idx: int) -> void:
 	# engine rune is equipped into one of two dedicated slots or unequipped out of
 	# it, and unequipping every one is allowed — a hero with no engine is a legal
 	# state. An unequipped engine and its enablers leave the next fight; the rune
-	# is kept — **in the bag since HK**. `Run.toggle_engine` owns the rule; this
-	# panel only draws it.
+	# is kept — **held on him, unworn (HR §1; in the bag from HK)**. `Run.toggle_engine`
+	# owns the rule; this panel only draws it.
 	var worn_engines: int = Run.engines_worn(member)
 	var eng_head := Label.new()
 	eng_head.text = "CORE RUNES — %d of %d slots filled" % [worn_engines, Run.ENGINE_SLOTS]
@@ -2042,13 +2138,13 @@ func _open_rune_panel(idx: int) -> void:
 		erow.add_theme_constant_override("separation", 10)
 		list.add_child(erow)
 		var e_on: bool = bool(erow_d["worn"])
-		var e_bag: bool = String(erow_d["src"]) == "bag"
+		var e_bag: bool = not e_on  # HR §1 — held unworn on him (HK: in the bag)
 		var etoggle := Button.new()
 		etoggle.custom_minimum_size = Vector2(84, 26)
 		etoggle.add_theme_font_size_override("font_size", 11)
 		etoggle.pressed.connect(Music.click)
 		if e_bag and worn_engines >= Run.ENGINE_SLOTS:
-			# BATCH HK §2 — BOTH SLOTS FULL: the bag's engine goes on in place of one.
+			# BATCH HK §2 — BOTH SLOTS FULL: a held engine goes on in place of one.
 			etoggle.text = "Swap"
 			etoggle.tooltip_text = "Both core slots are filled. Swap this\ncore rune for one he has slotted."
 			etoggle.pressed.connect(_open_swap_chooser.bind(idx, "engines", ei, overlay))
@@ -2065,9 +2161,11 @@ func _open_rune_panel(idx: int) -> void:
 				etoggle.tooltip_text = e_why
 			etoggle.pressed.connect(_toggle_engine.bind(idx, ei, overlay))
 		erow.add_child(etoggle)
+		if e_bag:
+			erow.add_child(_held_drop_button(idx, "engines", int(erow_d["at"]), er, overlay))
 		var elbl := Label.new()
 		elbl.text = "%s%s — %s%s" % ["✦ " if e_on else "", er["name"], Runes.shown_desc(er),
-			"   (in the bag)" if e_bag else ""]
+			"   (held)" if e_bag else ""]
 		elbl.add_theme_font_size_override("font_size", 12)
 		elbl.add_theme_color_override("font_color", Color(0.95, 0.75, 0.45) if e_on
 			else Color(0.62, 0.6, 0.57))
@@ -2080,13 +2178,15 @@ func _open_rune_panel(idx: int) -> void:
 				Run.rune_sits_out_note(String(er.get("id", "")),
 					Run.held_engines(member)).replace("\n", " ")]
 			elbl.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
-		elbl.custom_minimum_size = Vector2(POUCH_TEXT_W, 20)
+		# HR §1 — a held row's Drop takes its width out of the label, so the row stays
+		# inside the panel.
+		elbl.custom_minimum_size = Vector2(POUCH_TEXT_W - (HELD_DROP_W + 10 if e_bag else 0), 20)
 		elbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		erow.add_child(elbl)
 
 	if rows.is_empty():
 		var none := Label.new()
-		none.text = "No rune worn, and none in the bag for this hero. A rune drops\nafter every fight, and the Peddler sells them."
+		none.text = "No rune worn or held. A rune drops after every fight,\nand the Peddler sells them."
 		none.add_theme_font_size_override("font_size", 14)
 		none.add_theme_color_override("font_color", Color(0.6, 0.57, 0.55))
 		none.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -2101,14 +2201,14 @@ func _open_rune_panel(idx: int) -> void:
 		row.add_theme_constant_override("separation", 10)
 		rows_box.add_child(row)
 		var is_on: bool = bool(row_d["worn"])
-		var in_bag: bool = String(row_d["src"]) == "bag"
+		var in_bag: bool = not is_on  # HR §1 — held unworn on him (HK: in the bag)
 		var toggle := Button.new()
 		toggle.custom_minimum_size = Vector2(84, 26)
 		toggle.add_theme_font_size_override("font_size", 11)
 		toggle.pressed.connect(Music.click)
 		if in_bag and equipped >= Run.rune_slots():
-			# BATCH HK §2 — EVERY SLOT FULL: the bag's rune goes on in place of one,
-			# which works on a full bag too, because one rune moves each way.
+			# BATCH HK §2 — EVERY SLOT FULL: a held rune goes on in place of one,
+			# which works on a full holding too, because one rune moves each way.
 			toggle.text = "Swap"
 			toggle.tooltip_text = "Every rune slot is filled. Swap this rune\nfor one he wears."
 			toggle.pressed.connect(_open_swap_chooser.bind(idx, "runes", i, overlay))
@@ -2120,9 +2220,11 @@ func _open_rune_panel(idx: int) -> void:
 				toggle.tooltip_text = why
 			toggle.pressed.connect(_toggle_rune.bind(idx, i, overlay))
 		row.add_child(toggle)
+		if in_bag:
+			row.add_child(_held_drop_button(idx, "runes", int(row_d["at"]), rune, overlay))
 		var lbl := Label.new()
 		lbl.text = "%s%s — %s%s" % ["✦ " if is_on else "", rune["name"], Runes.shown_desc(rune),
-			"   (in the bag)" if in_bag else ""]
+			"   (held)" if in_bag else ""]
 		lbl.add_theme_font_size_override("font_size", 12)
 		lbl.add_theme_color_override("font_color", Color(0.45, 0.9, 0.5) if is_on
 			else Runes.RUNE_TINT)  # HE §4 — no scope band; one tint
@@ -2137,7 +2239,7 @@ func _open_rune_panel(idx: int) -> void:
 				Run.rune_sits_out_note(String(rune.get("id", "")),
 					Run.held_engines(member), Run.worn_rune_ids(member)).replace("\n", " ")]
 			lbl.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
-		lbl.custom_minimum_size = Vector2(POUCH_TEXT_W, 20)
+		lbl.custom_minimum_size = Vector2(POUCH_TEXT_W - (HELD_DROP_W + 10 if in_bag else 0), 20)
 		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		row.add_child(lbl)
 
@@ -2176,6 +2278,57 @@ func _toggle_rune(idx: int, rune_idx: int, overlay: Control) -> void:
 	overlay.queue_free()
 	_rune_panel_for = -1
 	_draw_screen()
+	_open_rune_panel(idx)
+
+
+# ══ BATCH HR §1 — A RUNE HE HOLDS CAN BE LET GO FROM HIS OWN PANEL ═══════════════
+#
+# **THE BAG'S DROP, MOVED TO WHERE THE RUNE IS NOW**: two presses, keyed by the
+# rune's name, and the rune is gone for good. Without it a full holding could only
+# be emptied at the Peddler. `key`/`at` name the rune on his list; `Run`'s door
+# takes the index of `held_rows`, which is the same rune.
+func _held_drop_button(idx: int, key: String, at: int, rune: Dictionary,
+		overlay: Control) -> Button:
+	var nm := String(rune.get("name", ""))
+	var armed: bool = _held_drop_armed == nm
+	var db := Button.new()
+	db.text = "Sure?" if armed else "Drop"
+	db.custom_minimum_size = Vector2(HELD_DROP_W, 26)
+	db.add_theme_font_size_override("font_size", 11)
+	db.add_theme_color_override("font_color", Color(0.95, 0.75, 0.4) if armed
+		else Color(0.78, 0.55, 0.5))
+	db.tooltip_text = "Drop %s for good.\n%s" % [nm,
+		"Press again to confirm." if armed else "Press twice to drop it."]
+	db.pressed.connect(Music.click)
+	db.pressed.connect(_drop_held.bind(idx, key, at, overlay))
+	return db
+
+
+func _drop_held(idx: int, key: String, at: int, overlay: Control) -> void:
+	var member: Dictionary = Run.party[idx]
+	var hi := -1
+	var rows: Array = Run.held_rows(member)
+	for i in rows.size():
+		if String(rows[i]["key"]) == key and int(rows[i]["at"]) == at:
+			hi = i
+	if hi < 0:
+		_held_drop_armed = ""
+		return
+	var nm := String((rows[hi]["rune"] as Dictionary).get("name", ""))
+	overlay.queue_free()
+	_rune_panel_for = -1
+	if _held_drop_armed != nm:
+		_held_drop_armed = nm
+		_open_rune_panel(idx)
+		return
+	_held_drop_armed = ""
+	Run.drop_held_rune(member, hi)
+	# A rune waiting on his full holding may fit now.
+	Run.settle_pending_drops()
+	Run.save_run()
+	_draw_screen()
+	_toast("%s is dropped. The %s holds %d unworn." % [nm, Run.nameplate(member),
+		Run.held_count(member)])
 	_open_rune_panel(idx)
 
 
@@ -2219,7 +2372,10 @@ func _open_swap_chooser(idx: int, kind: String, bag_row: int, parent: Control) -
 			continue
 		var out_rune: Dictionary = rows[wi]["rune"]
 		var b := Button.new()
-		b.text = "%s  — back into the bag" % String(out_rune.get("name", ""))
+		# HR §1 — a hero's swapped-out rune stays with him, unworn; the crest's goes
+		# back into the bag.
+		b.text = "%s  — %s" % [String(out_rune.get("name", "")),
+			"back into the bag" if kind == "party" else "kept, unworn"]
 		b.custom_minimum_size = Vector2(600, 30)
 		b.add_theme_font_size_override("font_size", 12)
 		var why := Run.swap_engine_refusal(member, bag_row, wi) if kind == "engines" else ""
@@ -2555,20 +2711,31 @@ func _draw_footer() -> void:
 # **ONE ROW UNDER THE POUCH**, in the strip from y 644 to the screen's foot that
 # nothing on this screen used. Two buttons, both opening the bag's panel: the bag's
 # count (and a drop waiting on it), and the party slot — what it holds, or that it
-# is empty.
+# is empty. **Since HR §1 the bag is the crest's**, and **HR §2 puts the crest's own
+# marker on it**: the count of crest runes waiting in the bag, read off the bag at
+# every draw, as a hero's is read off his holding.
 const BAG_ROW_Y := 648.0
 
 
 func _draw_bag_row() -> void:
 	var bag_btn := Button.new()
-	var waiting: int = Run.pending_rune_drops.size()
-	bag_btn.text = "Rune bag  %d/%d%s" % [Run.rune_bag.size(), Run.BAG_CAP,
+	var waiting: int = 0
+	for pr in Run.pending_rune_drops:
+		if Run.pending_holder(pr) < 0:
+			waiting += 1
+	var crest_waiting: int = 0
+	for br in Run.rune_bag:
+		if Runes.is_party_rune(br):
+			crest_waiting += 1
+	bag_btn.text = "Rune bag  %d/%d%s%s" % [Run.rune_bag.size(), Run.BAG_CAP,
+		"  ✦ %d" % crest_waiting if crest_waiting > 0 else "",
 		"  (+%d waiting)" % waiting if waiting > 0 else ""]
+	bag_btn.set_meta("crest_marker", crest_waiting)
 	bag_btn.custom_minimum_size = Vector2(230, 30)
 	bag_btn.position = Vector2(VIEW_X + 4, BAG_ROW_Y)
 	bag_btn.add_theme_font_size_override("font_size", 12)
 	bag_btn.add_theme_color_override("font_color", Color(0.85, 0.6, 1.0))
-	bag_btn.tooltip_text = "Every rune the heroes hold and nobody wears.\nIt holds %d. Click to see it, drop a rune,\nor fill the crest." % Run.BAG_CAP
+	bag_btn.tooltip_text = "The crest's runes that nobody wears (%d here).\nIt holds %d. Click to see it, drop a rune,\nor fill the crest." % [crest_waiting, Run.BAG_CAP]
 	bag_btn.pressed.connect(Music.click)
 	bag_btn.pressed.connect(_open_bag_panel)
 	add_child(bag_btn)
@@ -2610,14 +2777,14 @@ func _open_bag_panel() -> void:
 	box.add_theme_constant_override("separation", 8)
 	panel.add_child(box)
 	var title := Label.new()
-	title.text = "THE RUNE BAG — %d of %d, held for every hero" % [Run.rune_bag.size(), Run.BAG_CAP]
+	title.text = "THE RUNE BAG — %d of %d, the crest's" % [Run.rune_bag.size(), Run.BAG_CAP]
 	title.add_theme_font_override("font", NAME_FONT)
 	title.add_theme_font_size_override("font_size", 26)
 	title.add_theme_color_override("font_color", Color(0.85, 0.6, 1.0))
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(title)
 	var sub := Label.new()
-	sub.text = "A rune is equipped from a hero's card. A rune dropped from here is gone for good."
+	sub.text = "A crest rune is worn in the crest, by every hero at once. A rune dropped from here is gone for good."
 	sub.add_theme_font_size_override("font_size", 12)
 	sub.add_theme_color_override("font_color", Color(0.72, 0.66, 0.8))
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -2687,7 +2854,7 @@ func _open_bag_panel() -> void:
 	list.add_child(b_head)
 	if Run.rune_bag.is_empty():
 		var none := Label.new()
-		none.text = "The bag is empty. A rune drops into it after every fight, and the Peddler sells them."
+		none.text = "The bag is empty. A crest rune that drops or is bought waits here; every other rune goes to its hero."
 		none.add_theme_font_size_override("font_size", 12)
 		none.add_theme_color_override("font_color", Color(0.6, 0.57, 0.55))
 		none.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -2711,8 +2878,8 @@ func _open_bag_panel() -> void:
 		db.pressed.connect(_drop_from_bag.bind(bi, overlay))
 		row.add_child(db)
 		var lbl := Label.new()
-		lbl.text = "%s  (for %s) — %s" % [nm, Run.rune_for_label(r).trim_prefix("the "),
-			Runes.shown_desc(r)]
+		lbl.text = "%s  (for %s%s) — %s" % [nm, Run.rune_for_label(r).trim_prefix("the "),
+			_stray_note(r), Runes.shown_desc(r)]
 		lbl.add_theme_font_size_override("font_size", 12)
 		lbl.add_theme_color_override("font_color", Runes.RUNE_TINT)
 		lbl.custom_minimum_size = Vector2(POUCH_TEXT_W, 20)
@@ -2728,6 +2895,15 @@ func _open_bag_panel() -> void:
 		_bag_drop_armed = ""
 		overlay.queue_free())
 	box.add_child(close)
+
+
+# BATCH HR §1 — a rune in the bag that is not a crest rune is a save's whose class
+# no hero in this party is (`Run.bag_strays`): kept, and said so beside its name.
+func _stray_note(r: Dictionary) -> String:
+	if Runes.is_party_rune(r) or Run.holder_index(r) >= 0:
+		return ""
+	var ck := Runes.rune_class(r)
+	return " — no hero here is a %s" % ck.capitalize() if ck != "" else " — no hero here can wear it"
 
 
 func _reopen_bag_panel(overlay: Control) -> void:
@@ -2767,13 +2943,18 @@ func _drop_from_bag(bag_idx: int, overlay: Control) -> void:
 # ══ BATCH HK §2 — A DROP THAT LANDS ON A FULL BAG, SHOWN BESIDE THE TWENTY ═════
 #
 # **THE PLAYER IS SHOWN IT AND MUST DROP SOMETHING TO TAKE IT** (ruled): the drop
-# at the top with its rule, the twenty below it each with a button that drops that
+# at the top with its rule, the holding below it each with a button that drops that
 # one and takes the new one in its place, and — outside the scroller, where no text
 # can move it — **"Leave it behind", which declines the drop itself** (ruled:
 # allowed). Resolved one at a time and re-opened for the next, the pouch's swap
 # offer's shape (`_check_item_offers`, CT §3), which runs first and chains here.
-# A rune the bag has room for by the time this opens — a sale or a drop on the
+# A rune its holding has room for by the time this opens — a sale or a drop on the
 # way — goes straight in, because a question with one answer is not asked.
+#
+# **BATCH HR §1 — THE PANEL IS THE HOLDING'S THE RUNE IS BOUND FOR** (`Run.pending_
+# holder`): a crest rune is shown beside the bag, as HK built it; a class or core
+# rune beside the runes its hero holds unworn, his `HERO_HOLD_CAP` of them — HK's
+# panel made per hero, because a full holding is one hero's and the choice is his.
 const FULL_BAG_RECT := Rect2(190, 30, 900, 660)
 
 
@@ -2783,11 +2964,14 @@ func _check_rune_drops() -> void:
 	if Run.settle_pending_drops() > 0:
 		Run.save_run()
 		_draw_screen()
-		_toast("The bag has room: the waiting rune goes in.")
+		_toast("There is room now: the waiting rune goes in.")
 		if Run.pending_rune_drops.is_empty():
 			return
 	var incoming: Dictionary = Run.pending_rune_drops[0]
 	var in_name := String(incoming.get("name", ""))
+	var hi: int = Run.pending_holder(incoming)
+	var holder: Dictionary = Run.party[hi] if hi >= 0 else {}
+	var held: Array = Run.held_rows(holder) if hi >= 0 else []
 	var overlay := Control.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	overlay.z_index = 74
@@ -2804,14 +2988,19 @@ func _check_rune_drops() -> void:
 	box.add_theme_constant_override("separation", 8)
 	panel.add_child(box)
 	var title := Label.new()
-	title.text = "THE BAG IS FULL — %d of %d" % [Run.rune_bag.size(), Run.BAG_CAP]
+	if hi >= 0:
+		title.text = "THE %s HOLDS ALL HE CAN — %d of %d" % [
+			Run.nameplate(holder).to_upper(), Run.held_count(holder), Run.HERO_HOLD_CAP]
+	else:
+		title.text = "THE BAG IS FULL — %d of %d" % [Run.rune_bag.size(), Run.BAG_CAP]
 	title.add_theme_font_override("font", NAME_FONT)
 	title.add_theme_font_size_override("font_size", 26)
 	title.add_theme_color_override("font_color", Color(0.85, 0.6, 1.0))
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(title)
 	var drop_lbl := Label.new()
-	drop_lbl.text = "A rune has dropped: %s, for %s.\n%s" % [in_name, Run.rune_for_label(incoming),
+	drop_lbl.text = "A rune has dropped: %s, for %s.\n%s" % [in_name,
+		("the %s" % Run.nameplate(holder)) if hi >= 0 else Run.rune_for_label(incoming),
 		Runes.shown_desc(incoming)]
 	drop_lbl.add_theme_font_size_override("font_size", 14)
 	drop_lbl.add_theme_color_override("font_color", Color(0.45, 0.9, 0.5))
@@ -2819,7 +3008,8 @@ func _check_rune_drops() -> void:
 	drop_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(drop_lbl)
 	var ask := Label.new()
-	ask.text = "To take it, drop one of the twenty. Or leave it behind."
+	ask.text = ("To take it, drop one of the %d runes he holds unworn. Or leave it behind." % held.size()) \
+		if hi >= 0 else ("To take it, drop one of the %d in the bag. Or leave it behind." % Run.rune_bag.size())
 	ask.add_theme_font_size_override("font_size", 13)
 	ask.add_theme_color_override("font_color", Color(0.75, 0.72, 0.68))
 	ask.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -2832,8 +3022,14 @@ func _check_rune_drops() -> void:
 	list.add_theme_constant_override("separation", 4)
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(list)
-	for bi in Run.rune_bag.size():
-		var r: Dictionary = Run.rune_bag[bi]
+	var choices: Array = []
+	if hi >= 0:
+		for hr in held:
+			choices.append(hr["rune"])
+	else:
+		choices = Run.rune_bag.duplicate()
+	for bi in choices.size():
+		var r: Dictionary = choices[bi]
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 10)
 		list.add_child(row)
@@ -2847,8 +3043,8 @@ func _check_rune_drops() -> void:
 		b.pressed.connect(_take_pending_drop.bind(bi, overlay))
 		row.add_child(b)
 		var lbl := Label.new()
-		lbl.text = "%s  (for %s) — %s" % [String(r.get("name", "")),
-			Run.rune_for_label(r).trim_prefix("the "), Runes.shown_desc(r)]
+		lbl.text = "%s  (for %s%s) — %s" % [String(r.get("name", "")),
+			Run.rune_for_label(r).trim_prefix("the "), _stray_note(r), Runes.shown_desc(r)]
 		lbl.add_theme_font_size_override("font_size", 11)
 		lbl.add_theme_color_override("font_color", Runes.RUNE_TINT)
 		lbl.custom_minimum_size = Vector2(FULL_BAG_RECT.size.x - 150, 0)
@@ -2862,17 +3058,28 @@ func _check_rune_drops() -> void:
 	box.add_child(decline)
 
 
-func _take_pending_drop(bag_idx: int, overlay: Control) -> void:
-	var gone := String((Run.rune_bag[bag_idx] as Dictionary).get("name", "")) \
-		if bag_idx >= 0 and bag_idx < Run.rune_bag.size() else ""
-	var incoming := String((Run.pending_rune_drops[0] as Dictionary).get("name", "")) \
-		if not Run.pending_rune_drops.is_empty() else ""
-	if not Run.take_pending_drop(bag_idx):
+func _take_pending_drop(drop_idx: int, overlay: Control) -> void:
+	if Run.pending_rune_drops.is_empty():
+		return
+	var head: Dictionary = Run.pending_rune_drops[0]
+	var hi: int = Run.pending_holder(head)
+	var gone := ""
+	if hi >= 0:
+		var held: Array = Run.held_rows(Run.party[hi])
+		if drop_idx >= 0 and drop_idx < held.size():
+			gone = String((held[drop_idx]["rune"] as Dictionary).get("name", ""))
+	elif drop_idx >= 0 and drop_idx < Run.rune_bag.size():
+		gone = String((Run.rune_bag[drop_idx] as Dictionary).get("name", ""))
+	var incoming := String(head.get("name", ""))
+	if not Run.take_pending_drop(drop_idx):
 		return
 	overlay.queue_free()
 	Run.save_run()
 	_draw_screen()
-	_toast("%s is dropped. %s goes into the bag." % [gone, incoming])
+	if hi >= 0:
+		_toast("%s is dropped. The %s holds %s now." % [gone, Run.nameplate(Run.party[hi]), incoming])
+	else:
+		_toast("%s is dropped. %s goes into the bag." % [gone, incoming])
 	_check_rune_drops()
 
 
@@ -3528,6 +3735,7 @@ func _type_counts_line(units_by_type: Dictionary) -> String:
 
 func _toast(text: String) -> void:
 	var label := Label.new()
+	label.set_meta("toast", true)
 	label.text = text
 	label.add_theme_font_size_override("font_size", 20)
 	label.add_theme_color_override("font_color", Color(0.9, 0.85, 0.6))

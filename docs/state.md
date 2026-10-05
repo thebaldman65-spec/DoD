@@ -13,89 +13,129 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-10-01 (Batch HQ).*
+*Last rewritten: 2026-10-05 (Batch HR).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: HQ — ONE MAGNITUDE, ONE KEY, AND THE WORD THE TAXONOMY IS MISSING.** IMPLEMENT ONLY. HP's five rulings are
-  taken: Dead Air moves to 75% and is measured there, `heroes_hold_core` is read as the fight runs, *Breaking Heals a
-  Hero*'s words narrow, the refused tail speaks a player's words; the rune taxonomy gains CONDITIONAL; two Peddler columns
-  read the Peddler's door. Full working: **`docs/reports/HQ.md`**.
-- **§1.1 — THE THREE CREST FIGURES ARE RULED: DIRGE 45% AND EMPTY PULPIT 50% CONFIRMED, DEAD AIR 50% → 75%** (*the three
-  who are left do the work of four*). Measured at 75% with HP's probe, rung 2, no talents, 150 runs a party (A: Berserker,
-  Arcanist, Devout, Beastmaster; B: Swordmaster, Pyromancer, Holy, Sharpshooter): it multiplies the three standing
-  heroes' damage by exactly 1.75 while it holds; it pays +35.4 ±4.6 (A) and +17.6 ±2.9 (B) a normal fight, worth **0.61
-  and 0.35 of a bare 10%** (0.49 and 0.26 at 50%); falls 0.73 and 1.04 and depth 19.4 and 12.8 of 49, where no crest
-  leaves them (0.74, 1.05; 19.4, 13.1). **75% holds on the rule it was ruled on**: without it the three deal 0.63 (A) and
-  0.51 (B) of the four's damage a round, so at 75% about 1.1 and 0.9 of it. It stays the least of the three over a fight
-  because no Mage stands for 8–12% of hero turns — the state's property, as Empty Pulpit's flag is.
-- **§1.2 — FELLOWSHIP'S RETIREMENT STANDS AS HP BUILT IT.** HP's brief line *a save that did hold it loads without it*
-  was the error, not a reversal (`CLAUDE.md`'s crest block). `data/runes.json` holds **171 entries: 68 retired, 75 live
-  for a class, 4 for the crest (Tithe and the three), 24 core.**
-- **§1.3 — `heroes_hold_core` IS READ AS THE FIGHT RUNS**: it joined `Talents.LIVE_KEYS`, so every key on who stands is
-  live, and a payload carrying it refuses a consumed field. **It was not the one line it was priced at**: the battle's
-  re-read handed each hero's standing and no engines, so the key read none at any re-read; `battle._live_party` hands the
-  engines now, the list the spawn reads. Driven as a cycle (`check_hp` §1f): the Pack Bond holder falls and the crest
-  stops on all four at the base bit for bit; he is raised and it pays the same bits again.
-- **§1.4 — *Breaking Heals a Hero* READS** *An attack that lands Break heals the lowest-health hero for 20% of it.*
-  (PROPOSED, RULINGS OWED 1). Its read site is not widened — the owed talent rebalance, below.
-- **§1.5 — A REFUSED PAYLOAD CAN REACH A PLAYER, SO ITS TAIL IS REWORDED**: *it cannot work as written, so it pays nothing
-  this fight* (PROPOSED, RULINGS OWED 2). `Runes._load` reports a refused entry and keeps it, the roll offers it, and a
-  worn rune's payload rides the save as it was built.
-- **§2 — CONDITIONAL IS A SECONDARY TYPE** beside TRADEOFF: *a CONDITIONAL rune's payload is gated on a condition, so it
-  pays only while that condition holds*, and FN's rule binds it. Empty Pulpit, Dead Air and Dirge carry it; no other
-  entry's payload, live or retired, carries a condition of any kind. `check_fn` §1c holds the label and the payload
-  together in both directions.
-- **§3 — `check_he` §1's AND `check_hf` §3's PEDDLER COLUMNS READ `Run.peddler_rune`**: 22 of the 23 Peddler figures
-  that are not a withheld zero moved, no cache or bargain figure did, each the way the pool less its core runes says. `test_batch_ak`'s whole-pool walk now
-  claims only what it proves.
-- **§4 — HP's TWENTY-EIGHT COPIES ARE IN THE TRASH**, selected by the *"Dawn of Decay HP "* prefix, under *"DoD spent
-  user-data folders (Batch HP's twenty-eight, cleared at HQ 2026-10-01)"*: 28 folders, 17,260 KiB (HP recorded 17,248).
-  Godot's `app_userdata` went from 497 folders and 161,392 KiB to 469 and 144,152 KiB, HQ's own seven copies in both
-  readings; the 461 older folders, the live *Dawn of Decay* folder and `../save-backups/` were not touched.
-- **THE VERIFICATION.** The saves were backed up first and verified by hash (`../save-backups/HQ-20261001-110254`, the
-  four files byte-identical to the live ones and to HP's backup). **The recon** — HEAD's unmodified gates and documents
-  against HQ's game, 131 targets in 75 min 36 s — read `check_de` 541 / 2 / 0: `check_hp` red on exactly the eight lines
-  predicted, and **one red the prediction did not see**, `check_fx` §1, which holds every talent's text to the words its
-  number sits in and could not find *for 20% of its value* in the narrowed talent. Every other target read HP's acceptance
-  count, and the two Peddler tables HP's figures line for line. **Six gates were re-pointed** to their intents, and
-  eighteen controls, one defect each, read by FAIL text, every one red on its own line. **The pre-pass** (131 targets in
-  75 min 06 s, an isolated copy proved equal to the tree) read `check_de` 541 / 0 / 0, every target at its predicted row.
-  **The acceptance run in the repository** (131 targets in 75 min 05 s) read `check_de` 541 / 0 / 0: every target at its
-  row and at its pre-pass reading but `test_batch_an`'s seeded count (6049, inside its band) — `check_hp` 168, `check_fn`
-  85, `check_he` 258, `check_hf` 314, `check_fx` 496, the two sanctioned reds at their counts, the run harness PASS
-  (22 / 382 / 8) — and no Parse Error, SCRIPT ERROR, TIMED OUT or NO VERDICT line in any log. The tree was
-  byte-identical after it (500 files), and the player's four files are byte-identical — hash, size and mtime — to the
-  11:02 backup.
-- **`CLAUDE.md` IS 424,768 B = 414.81 KiB, WITH 55.19 KiB UNDER ITS 470 KiB CEILING** (+3,402 B at HQ, measured after
-  this batch's own writing; HO left it at 403.74 KiB and HP at 411.49): **about 7.1 batches at HP's +7,935 B** and **6.8
-  at the record, EZ's +8,293 B** (16.6 at HQ's own rate, a small batch's). The shape recon is owed before then — the
-  arithmetic is not the answer next time.
-- **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in an
-  older build** — HL's ceiling guards from the next version bump on, not from HJ's or HK's builds, nor `main`.
-- **Next letter: HR.**
+- **Last batch: HR — THE BAG SPLITS, THE NAMEPLATE SPEAKS, AND A CENSUS FOR FIRE AND ICE.** IMPLEMENT ONLY. HQ's three
+  rulings are taken; a class rune and a core rune live with the hero of their class and the bag is the Crest's; a mark on
+  each hero's nameplate counts the runes he holds unworn; no Peddler and no Smith stand in the run's first three nodes;
+  and a census of Burn and Chilled builds nothing. Full working: **`docs/reports/HR.md`**.
+- **§0 — HQ's RULINGS ARE TAKEN.** *Breaking Heals a Hero* reads *An attack that lands Break heals the hero furthest from
+  full for 20% of it.* and Tithe *A hero's attack that lands Break heals / the hero furthest from full, for 30% of it.* —
+  the read site checked first: `battle._lowest_hp` compares a hero's SHARE of his health (a Warrior at 100 of 223 is
+  healed before a Mage at 90 of 173), so the amendment is the right way round. The refused tail stands as HQ built it.
+  **A rune the game cannot pay is no longer offered**: `Runes.eligible_ids` and the three lists that say why an offer is
+  short skip what `Talents.live_refusal` refuses (`Runes.is_refused`); the roll call's tail stays the net for a save.
+- **§1 — A CLASS RUNE OR A CORE RUNE IS HELD BY THE HERO OF ITS CLASS; THE BAG HOLDS THE CREST'S.** `Run.hold_rune`
+  routes by scope at every door — the drop, a cache, a bargain, the Peddler's Buy, the event verb. A hero holds **eight
+  unworn** (`Run.HERO_HOLD_CAP`, both kinds counted, his slots not) and the bag **six** (`Run.BAG_CAP`, crest runes only)
+  — both PROPOSED (RULINGS OWED 1). A rune for a full holding waits beside that holding on HK's panel, made per hero; a
+  purchase into one is refused; an unequip into one is refused and a swap is the way through. **Twenty-one surfaces read
+  the bag, where HO had named eight** (`docs/reports/HR.md` §1b). **The save is v15**: a v14 bag's class and core runes
+  are handed to their heroes on load (`Run._hand_out_the_bag`; HK's `_bag_the_unworn` is deleted), and a rune whose class
+  no hero here is stays in the bag and the map says so. **Driven on the designer's own save, both ways**: HR's build put
+  Clarity and Overtone on the Mage, kept Tithe in the bag and wrote v15; HQ's build refused that v15 and left it
+  byte-identical.
+- **§1 — THE SUPPLY THE CAP WAS MEASURED AGAINST, RUNG 2** (150 full runs, two talented parties): a hero is given 4.7–6.3
+  runes a run (drops 2.3–3.0, caches 1.6–1.9, the sim's purchases 0.8–1.7), and 0.8–1.15 bargain caches the sim never
+  answers. Keeping everything, he ends a run holding 2.0–3.7 unworn (p90 4–6) and reaches eight in 1–2% of hero-runs.
+  **Eight does not fill from what a run hands a hero; buying fills it** — every Peddler offer bought, in 23–59%.
+- **§2 — THE NAMEPLATE SAYS A RUNE IS WAITING**: **✦ N** on each hero's card on the map, the runes he holds unworn, read
+  off his holding at every draw — it clears when nothing waits, never because a menu opened; the bag's row carries the
+  crest's count; the victory card and a toast on the map name the hero a drop went to, or the crest. Driven on the real
+  map (`check_hr` §2): a real normal fight won from the real map, its drop on the right nameplate at ✦ 1, the panel
+  opened and closed with the marker kept, the rune equipped through its own button and the marker gone; a crest drop
+  moves the bag's marker and no hero's. **A timed screen element is read at time scale one** — a new instrument rule.
+- **§3 — NO PEDDLER AND NO SMITH IN THE RUN'S FIRST THREE NODES** (`Run.SHOP_GATE_NODES`, the first zone only). Measured
+  first: a trade node stood at node 1 in two maps of three, where the heroes hold 60 gold, and 17% of runs could pay 150
+  at the first one a walk met. With three: 86–89%. **What still fails is the events**: the gated columns take most of
+  the zone's events (2.8 of 5) and an event pays no gold — at node 4 75–78% can pay, and 100% with events kept out of the
+  same columns (RULINGS OWED 2). No board ran short of a kind and later zones are unchanged. The bargain's bought
+  merchant is not gated (RULINGS OWED 3).
+- **§4 — A CENSUS OF BURN AND CHILLED; NOTHING BUILT.** No enemy chills (a hero is chilled only by the Hoarfrost bargain;
+  the Ashblade and the Tyrant burn); the engines that read the two are the Mage's and the statuses are already a party
+  combo (Choking Smoke, Downwind, Returned Burden); nothing removes one when the other lands, and four mechanics rely on
+  them standing together; no status removes another today. **The clash, measured**: 0.44–0.63 a fight; a Chilled landing
+  on a burning enemy meets ~2 turns of Burn (18–23 damage); the sim's order is fire first.
+- **THE VERIFICATION.** The saves were backed up first and verified by hash (`../save-backups/HR-20261005-102217`, the four files
+  byte-identical to the live ones; against HQ's backup the profile and the run save had moved — the designer's play since,
+  a v14 run in the first zone with Clarity, Overtone and Tithe in its bag). **The recon** — HEAD's unmodified gates and
+  documents against HR's game, 131 targets in 79 min 40 s — read `check_de` 541 / 20 / 1: eleven reds besides the two
+  sanctioned, each read by its FAIL lines, and `check_gp` green at 469 where it stood at 474. **Nine gates were re-pointed**
+  to their intents and one is new (`check_hr`, 100); **three arms were coin flips on the dice** — `check_go` §12,
+  `check_fh` §3 and HR's own `check_hr` §1d — each attributed with the shop gate stubbed to zero (HEAD's trace back,
+  message for message) and rebuilt to construct its state: a new instrument rule, beside the one for a timed screen
+  element. **Forty-two controls**, one defect each, read by FAIL text, every one red on the arm it aimed at. **The
+  pre-pass** (132 targets in 75 min 05 s, an isolated copy proved equal to the tree) read `check_de` 545 / 0 / 0, every
+  target at its predicted row. **The acceptance run in the repository** (132 targets in 75 min 03 s, the tree frozen) read
+  `check_de` 545 / 0 / 0: every target at its row and at its pre-pass reading but `test_batch_an`'s seeded count (6053,
+  inside its band) — the two sanctioned reds at their counts, the run harness PASS (22 / 382 / 8) — and no Parse Error,
+  SCRIPT ERROR, TIMED OUT or NO VERDICT line in any log. The tree was byte-identical after it (504 files), and the
+  player's four files are byte-identical — hash, size and mtime — to the 10:22 backup.
+- **HQ's EIGHT COPIES ARE IN THE TRASH**, selected by the *"Dawn of Decay HQ "* prefix, under *"DoD spent user-data folders
+  (Batch HQ's eight, cleared at HR 2026-10-05)"*: 8 folders, 1,880 KiB (HQ recorded 1,924). Godot's `app_userdata` went
+  from 491 folders and 145,028 KiB to 483 and 143,148 KiB, HR's own copies in both readings; the older folders, the live
+  *Dawn of Decay* folder and `../save-backups/` were not touched.
+- **`CLAUDE.md` IS 427,586 B = 417.56 KiB, WITH 52.44 KiB UNDER ITS 470 KiB CEILING** (+2,818 B at HR, measured after
+  this batch's own writing; HQ left it at 414.81 KiB): **about 6.5 batches at the record, EZ's +8,293 B**, and 6.8 at
+  HP's +7,935 B (19.1 at HR's own rate). The shape recon is owed before then — the arithmetic is not the answer next time.
+- **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in a
+  build older than HL**: HL's ceiling refuses a newer save from HL's build on — HR's v15 is the first bump it has
+  guarded, driven at HR §1 — and HJ's and HK's builds, and `main`, carry no ceiling.
+- **Next letter: HS.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### HQ's RULINGS OWED — **TWO, BOTH WORDS A PLAYER READS**
+### HR's RULINGS OWED — **FIVE; THE FIRST FOUR ARE PLAYER-VISIBLE**
 
-Full working: `docs/reports/HQ.md`, NEEDS A RULING.
+Full working: `docs/reports/HR.md`, NEEDS A RULING.
 
-1. **THE TALENT'S WORDS, PROPOSED**: *Breaking Heals a Hero* — *An attack that lands Break heals the lowest-health hero
-   for 20% of it.* — where *Every point of Break damage dealt heals the lowest-health hero for 20% of its value.* stood.
-   Narrowed as Tithe's were, to what the shared read site pays; its three exceptions stay invisible, as Tithe's do (a
-   card's Break inside its own handler, the Long Watch's carry, the floor of 1).
-2. **THE REFUSED TAIL'S WORDS, PROPOSED**: *it cannot work as written, so it pays nothing this fight* — where *its payload
-   is refused, so it pays nothing this fight* stood. It reaches the combat log by two routes (§1.5 above); the reason
-   goes to `push_error`, which the developer reads.
+1. **THE TWO CAPS, PROPOSED: EIGHT UNWORN A HERO, SIX IN THE BAG.** Eight does not fill from what a run hands a hero (the
+   WHERE block); buying fills it. The bag: four crest runes exist, the party holds one of each, so six is the pool and two
+   of headroom.
+2. **THE GATE'S FIGURE: THREE, AS RULED — AND KEEP EVENTS OUT OF THE SAME COLUMNS, PROPOSED.** Three satisfies the reason
+   for 86–89% of runs at the first trade node; what fails it is events in the gated columns, and keeping them out lifts
+   node 4 to 100% (one line in `_assign_node_types`). Four instead reaches 90–94%.
+3. **THE BARGAIN'S BOUGHT MERCHANT IS NOT GATED.** Taken after an elite at node 2 in 8–13% of runs and at node 3 in 3–4%
+   under the sim's policy. Bought rather than rolled, so left; one line gates it if *neither appears* is meant to cover it.
+4. **THE WORDS, PROPOSED.** *Held, not worn* rather than the brief's *kit* (the card's **Kit** is the ability loadout): the
+   panel's *HELD, NOT WORN: 2 of 8*, a row's *(held)*, the marker **✦ 2** and its *2 runes held, not worn*, the full
+   holding's *THE CRYOMANCER HOLDS ALL HE CAN — 8 of 8*, the toast, the victory card's *for the Cryomancer — held, not
+   worn*, the Peddler's *held by him; equip it on the map* and *SELL A RUNE NOBODY WEARS*, the summary's *Held, not worn:*.
+5. **§4's MECHANIC IS THE DESIGNER'S TO DECIDE ON, AND THE CENSUS PROPOSES NOTHING.**
+
+### FOUND AT HR AND NOT FIXED
+
+- **THE CENSUS FOUND THE DOCUMENTS DISAGREEING WITH THE CODE ON FIRE AND ICE** (`docs/reports/HR.md` §4h): `master.html`
+  pays Shatter per stack (the code: per turn held), gives the hold window *+15% from all sources* (hero strikes only), has
+  Firedraw take *what is there or 4* (always 6), has Emberkeep double *every Burn he applies* in one row (any hero's) and
+  lay 4 through Flamewave (a burning body skips the doubling), says only the Tyrant's frost weakness is set, and names
+  four Overburn refund consumers (six); `CLAUDE.md`'s DR §1 block lists Burn and Chilled among statuses exclusive to a
+  class (Hunter and Cleric appliers exist) and its recast block says a re-application resolves as `max()` (Burn adds,
+  Chilled resets the clock); `docs/combat-rules.md` calls Burn's crit snapshot *a BURN MAGNITUDE* (nothing reads it); and
+  six code comments are stale (§4h names them). None is player-facing; each is a sweep for the batch that touches it.
+- **THE SIM NEVER ANSWERS A BARGAIN'S RUNE CACHE**, so every supply figure it prints omits 0.8–1.15 runes a hero a run.
+- **THE BOT CASTS THE MAGE'S FIRE CARDS BEFORE HIS ICE CARDS**, so in the sim a clash is mostly ice landing on fire; a
+  measurement of a chill-then-burn payout reads the rarer order until a policy changes.
+- **A STRAY RUNE CANNOT BE MADE BY PLAY.** Every roll is the party's classes, so a rune whose class no hero here is
+  reaches the bag only from a save; the path keeps it and says so, and is driven only by a constructed save
+  (`check_hr` §1e).
+- **HR's OWN ISOLATED COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata`, every one named *"Dawn of Decay HR …"*
+  — `docs/reports/HR.md` §8 counts them. HS clears them by that prefix (HO §5's rule).
+
+### ~~HQ's RULINGS OWED~~ — **ALL ANSWERED IN HR's BRIEF AND TAKEN AT HR §0**
+
+1. **The talent's words** — amended to *the hero furthest from full*, in Tithe's text too; the read site compares share.
+2. **The refused tail's words** — taken as proposed.
+3. **Withhold a refused entry** — ruled with the two (the item below) and built: `Runes.eligible_ids` asks
+   `Talents.live_refusal`; the tail stays the net.
 
 ### FOUND AT HQ AND NOT FIXED
 
-- **A REFUSED ENTRY IS STILL OFFERED.** `Runes._load` reports it and keeps it, and `Runes.eligible_ids` reads `retired`,
-  scope and the gates, never `Talents.live_refusal` — so a refused rune can drop, be bought and be worn, and pays
-  nothing. Withholding it at the roll is a line; whether a rune the game cannot pay should be offered at all is the
-  designer's, and `check_hp` §1c asserts the route as it stands, so the day it closes the arm says so.
+- ~~**A REFUSED ENTRY IS STILL OFFERED.**~~ — **CLOSED AT HR §0**: no roll offers one, and none is named as waiting on a
+  card. `check_hp` §1c's arm, which asserted the route as it stood, was inverted to the ruling with a payable twin.
 - **A STRONGER DEAD AIR SHORTENS THE STRETCHES IT PAYS IN.** In party A the share of the four's damage the three deal
   without the rune, inside each arm's no-Mage stretches, falls as the figure rises (0.63 with no crest, 0.56 at 50%,
   0.53 at 75%): the rune ends the easy stretches sooner, so the ones left are the hard ones. A live rune's worth over a
@@ -135,13 +175,13 @@ Full working: `docs/reports/HQ.md`, NEEDS A RULING.
 - ~~**A LIVE CREST RUNE HAS NO SHAPE WORD FOR ITS GATE.**~~ — **CLOSED AT HQ §2**: CONDITIONAL.
 - ~~**`check_he` §1's AND `check_hf` §3's "PEDDLER" COLUMN IS NOT THE PEDDLER'S DOOR.**~~ — **RE-POINTED AT HQ §3**: both
   tally `Run.peddler_rune`, and both assert the column stocks no core rune where the cache beside it offers some.
-- **`check_hk`'s COUNT IS THE COPY'S: 142 WHERE THE PLAYER'S THREE FILES EXIST, 139 WHERE THEY DO NOT.** §8 asks each
-  file that existed whether it was rewritten, so a copy with fresh user data runs three arms fewer and prints
-  otherwise identically. The battery runs where the files exist; an isolated run is seeded from the backup to match.
+- **`check_hk`'s COUNT IS THE COPY'S: 167 WHERE THE PLAYER'S THREE FILES EXIST, 164 WHERE THEY DO NOT** (142 and 139
+  until HR §1 re-pointed it). §8 asks each file that existed whether it was rewritten, so a copy with fresh user data
+  runs three arms fewer and prints otherwise identically. The battery runs where the files exist; an isolated run is seeded from the backup to match.
 - ~~**TWENTY-EIGHT ISOLATED COPIES LEFT USER-DATA FOLDERS**~~ — **CLEARED AT HQ §4** (the WHERE block). **The 461 older
   folders remain** — outside the policy; the designer's — beside the live *Dawn of Decay* folder.
-- **HQ's OWN ISOLATED COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata`, every one named *"Dawn of Decay HQ …"*
-  — `docs/reports/HQ.md` §7 counts them. HR clears them by that prefix (HO §5's rule).
+- ~~**HQ's OWN ISOLATED COPIES LEFT USER-DATA FOLDERS**~~ — **CLEARED AT HR** (the WHERE block), by the *"Dawn of Decay
+  HQ "* prefix.
 
 ### THE SKIRMISHER AND THE TRACKER — **RULED INTO ORDINARY RUNES, RULED, NOT BUILT (recorded at HP §7)**
 
@@ -298,12 +338,14 @@ rates are in the WHERE block above.
 - ~~**OWED TO THE NEXT BATCH, BY THE BRIEF: THE PLAYTHROUGH'S DEFECTS.**~~ **ALL FIVE FIXED AND DRIVEN AT HL §1**, with the
   rename and the ruled magnitudes (HL §2, §3). Kept below as HK wrote it: Fireball dragging Razor Ice; core runes at the
   store; a bought rune not appearing; Seasoned Fighter with no stance change; Hunter's Preparation demanding a target —
-  and the Core Rune rename and its ruled magnitudes ride with them. **One is touched by HK's path**: a bought rune goes into
-  the bag now and the map's bag row counts it, where HEAD put an ordinary rune unworn in the hero's pouch, which the map
-  card never drew. Whether that was the defect the designer met is theirs to say (`docs/reports/HK.md` §5).
-- **THE POUCH SCROLLS FOR THE FIRST TIME.** Its scroller lost 25 px to the bag's line (583 → 558); a class's six still
-  list at 411 px, but a bag of twenty of one class's runes puts up to twenty-five rows on his pouch — `check_gt` §1's
-  twenty-four read 873–935 px — so it scrolls and Close stays, which is GT §1's second half.
+  and the Core Rune rename and its ruled magnitudes ride with them. **One is touched by HK's path**: a bought rune went into
+  the bag and the map's bag row counted it, where HEAD put an ordinary rune unworn in the hero's pouch, which the map
+  card never drew. **HR §1 put a bought class rune back on its hero, and the nameplate's marker is what the map card
+  never drew** (`docs/reports/HR.md` §2).
+- **THE POUCH SCROLLS.** Its scroller lost 25 px to the bag's line at HK (583 → 558), and a bag of twenty of one
+  class's runes put up to twenty-five rows on his pouch. **Since HR §1 his panel lists his own lists only** — his worn
+  runes, the eight he may hold and his two core slots — so `check_gt` §1's longest case is a full holding of eight held
+  rows, each with its Drop; it still scrolls and Close stays, which is GT §1's second half.
 - **A GATE THAT ROLLS FOR A MEMBER OUTSIDE THE PARTY IS MEASURED BESIDE THE PARTY.** Every roll excludes
   `Run.party_rune_names` since HK; four gates met it (`docs/reports/HK.md` §7c) and each starts from a fresh party now.
 - **A RETIRED RUNE'S AUTHORED PRICE IS READ BY THE SALE** — a third of it, for a saved run still holding one. Named, not a
@@ -4231,9 +4273,9 @@ re-derived from the source at DM; not one was moved.**
   INHERITS both half-widths through it**, so a change to the base sweep reaches him as tolerance
   and not as pace: his Perfect window is **76.5 ms**, still ×0.85 of the default's.
   **`check_cn.gd`'s `WANT_PROFILE` pins all six by number — moving one here is two edits.**
-- **Save versions: the run save is v14** (a pre-**v10** save is REFUSED and cleared — the version
-  and the threshold are different numbers). **v11 (CT), v12 (EG), v13 (GF) and v14 (HK) are all
-  TOLERANT and none moved the threshold; GH moved no version.** Talent cells cost 1/2/3 by tier — **27 cells = 54
+- **Save versions: the run save is v15** (a pre-**v10** save is REFUSED and cleared — the version
+  and the threshold are different numbers). **v11 (CT), v12 (EG), v13 (GF), v14 (HK) and v15 (HR) are all
+  TOLERANT and none moved the threshold; GH moved no version.** A save from a NEWER build is refused and kept (HL §5). Talent cells cost 1/2/3 by tier — **27 cells = 54
   points a class.**
 - **Relics: 25 in the pool** — 17 common, 8 rare. **Up to 3 are assigned per run**, party-wide —
   **confirmed at EN as the code's behaviour, not just this file's memory of it.** The per-hero
@@ -4827,8 +4869,8 @@ This entry records that it is closed and carries the three things a later batch 
   false or the tooltip stops firing — and the same silhouette as the 604 dead buttons that shipped
   once. `check_fh` §9 exempts them **by SIGNATURE, never by name**.
 - **`Run.grant_rune` RETURNS A RUNE IT DOES NOT FIT.** Its callers put it down themselves, at `Run.hold_rune`
-  (since GK), which sends whatever is not worn to the bag (since HK). Not a defect today; exactly the shape that
-  goes wrong on the next caller.
+  (since GK), which holds whatever is not worn on the hero of its class, or in the bag for a crest rune (since HR §1;
+  the bag took every kind from HK). Not a defect today; exactly the shape that goes wrong on the next caller.
 - **NO BOSS AWARDS A RUNE.** The live doors are the Peddler, the elite cache, the bargain's `rune`
   reward, the event verb `rune_grant` and, since HK §1, a normal fight's drop (`Run.drop_after_fight`). `check_fh` §3 asserts
   `_resolve_boss` reaches none of the first four and `check_hk` §1e that it reaches no drop, so the day one is added the

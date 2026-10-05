@@ -142,14 +142,17 @@ const TREE := [
 	# ARE WRONG HERE: the word *party* is retired from player-facing text
 	# (CLAUDE.md, HERO AND ALLY — `test_batch_bx` §4b reads this file), and the
 	# read site heals ONE body, the lowest-health hero. The name says that.
-	# BATCH HQ §1 — THE WORDS NARROWED TO THE READ SITE, AS TITHE'S WERE (HP §4; the
-	# wording PROPOSED). They said *every point of Break damage dealt*, and the site
-	# reads the Break an ordinary attack applies as it lands, in the strike loop: four
-	# heroes with a Long Watch Warden among them book 66.3 Break a round and it reads
-	# 42.4 (HO's figures).
+	# BATCH HQ §1 — THE WORDS NARROWED TO THE READ SITE, AS TITHE'S WERE (HP §4). They
+	# said *every point of Break damage dealt*, and the site reads the Break an
+	# ordinary attack applies as it lands, in the strike loop: four heroes with a Long
+	# Watch Warden among them book 66.3 Break a round and it reads 42.4 (HO's figures).
+	# BATCH HR §0 — AND *FURTHEST FROM FULL*, RULED, WHERE *THE LOWEST-HEALTH HERO*
+	# STOOD: the site heals the standing hero lowest by SHARE of maximum health
+	# (`battle._lowest_hp`), and a Warrior at 100/223 and a Mage at 90/173 point at
+	# different heroes under the two readings. Tithe's words say the same since HR.
 	# The site is NOT widened — that is the owed talent rebalance (`docs/state.md`).
 	{"id": "tn_break_heal", "name": "Breaking Heals a Hero", "tier": 2,
-		"desc": "An attack that lands Break heals the lowest-health hero for 20% of it.",
+		"desc": "An attack that lands Break heals the hero furthest from full for 20% of it.",
 		"payload": {"stat": {"blood_communion": 20}}},
 	# PRECEDENT: Follow-Through (ss_follow) — follow_through 2. TAKEN.
 	{"id": "tn_crit_cooldown", "name": "A Cooldown Ticks on a Crit", "tier": 2,

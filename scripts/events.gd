@@ -359,14 +359,18 @@ static func apply(run: Node, fx: Dictionary) -> String:
 					break  # runes off — say nothing rather than lie
 				rune["equipped"] = not open_slot.is_empty()
 				# BATCH GK — through the one door, so an engine rune takes an engine slot.
-				# BATCH HK §2 — what is not worn goes to the bag, and a full bag holds it
-				# on the map's full-bag panel; the line says which.
+				# BATCH HK §2 — what is not worn is held, and a full holding keeps it on
+				# the map's panel; the line says which. HR §1 — held on the taker, unworn
+				# (a crest rune in the bag), and his holding's panel when it is full.
 				var landed: String = run.hold_rune(taker, rune)
 				var where := ""
-				if landed == "bag":
+				if landed == "held":
+					where = " — held, not worn"
+				elif landed == "bag":
 					where = " — into the bag"
 				elif landed == "pending":
-					where = " — the bag is full: choose on the map"
+					where = " — the bag is full: choose on the map" if Runes.is_party_rune(rune) \
+						else " — every place he holds is taken: choose on the map"
 				# BATCH HO §1 — a crest rune is rolled against a hero and worn by all
 				# four, so the line names the crest and not the hero it was rolled for.
 				var for_whom: String = String(run.rune_for_label(rune)) \

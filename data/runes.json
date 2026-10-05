@@ -961,7 +961,7 @@
 	"tithe": {
 		"name": "Tithe", "scope": "party",
 		"price": 150,
-		"desc": "A hero's attack that lands Break heals\nwhoever among the four is lowest,\nfor 30% of it.",
+		"desc": "A hero's attack that lands Break heals\nthe hero furthest from full, for 30% of it.",
 		"payload": {"stat": {"rune_blood_communion": 30}}
 	},
 	"fellowship": {

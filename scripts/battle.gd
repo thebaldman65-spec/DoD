@@ -27180,11 +27180,12 @@ func _check_end() -> void:
 		var spoils := ""
 		if reward_text != "":
 			spoils += "\n\nTHE BARGAIN\n%s" % reward_text
-		# BATCH HK §1 — A NORMAL FIGHT DROPS ONE RUNE, RANDOM, INTO THE BAG (ruled).
+		# BATCH HK §1 — A NORMAL FIGHT DROPS ONE RUNE, RANDOM (ruled) — onto the hero
+		# whose class it is, or into the bag for a crest rune, since HR §1.
 		# The `fight` node only: an elite pays its cache below, a mini-boss its
 		# upgrade pick, a boss its relic, pick and slot — and the ruling names normal
 		# fights, so none of those three drops one too. The roll is `Run`'s one door
-		# (`drop_after_fight`), and a full bag holds the rune for the map's panel.
+		# (`drop_after_fight`), and a full holding keeps the rune for the map's panel.
 		if node_type == "fight":
 			spoils += _fight_drop_line()
 		# Elite spoils: a rune for a random hero + a consumable on top of the
@@ -27440,9 +27441,14 @@ func _drop_item_line(id: String) -> String:
 
 
 # BATCH HK §1 — the drop's line on the victory card. It names the rune, whose it
-# is and where it went; a full bag says the map holds it (the full-bag panel), and
-# a drop that found nothing says so — CO §3's rule that an absent reward reads as a
+# is and where it went; a full holding says the map holds it (its panel), and a
+# drop that found nothing says so — CO §3's rule that an absent reward reads as a
 # bug. Runes off keeps the silence the other rune doors keep.
+#
+# **BATCH HR §2 — IT NAMES THE HERO**: a class or core rune is held by the hero of
+# its class, and the line says which, by the name on his card (`Run.nameplate`), so
+# the card it points at is the one whose marker moved. A crest rune goes into the
+# bag, and the line says so as it did.
 func _fight_drop_line() -> String:
 	var drop: Dictionary = Run.drop_after_fight()
 	if drop.is_empty():
@@ -27450,10 +27456,16 @@ func _fight_drop_line() -> String:
 			return ""
 		return "\n\nRUNE DROP: nothing — no rune is left that\nthese heroes can be offered."
 	var rune: Dictionary = drop["rune"]
-	var where := "into the bag." if String(drop["where"]) == "bag" \
-		else "the bag is full: choose on the map."
+	var hi := int(drop.get("hero", -1))
+	var where := String(drop["where"])
+	if hi >= 0 and not Runes.is_party_rune(rune):
+		var who := "the %s" % Run.nameplate(Run.party[hi])
+		var held := "held, not worn —\nequip it from the %s's card." % Run.nameplate(Run.party[hi]) \
+			if where == "held" else "every place he holds is taken:\nchoose on the map."
+		return "\n\nRUNE DROP: %s, for %s —\n%s" % [String(rune["name"]), who, held]
+	var bagged := "into the bag." if where == "bag" else "the bag is full: choose on the map."
 	return "\n\nRUNE DROP: %s, for %s —\n%s" % [String(rune["name"]),
-		Run.rune_for_label(rune), where]
+		Run.rune_for_label(rune), bagged]
 
 
 func _hero_label(member: Dictionary) -> String:
@@ -28512,14 +28524,24 @@ func _member_summary(member: Dictionary) -> String:
 	# BATCH HP §6 — HIS CORE RUNES FIRST, then the ordinary ones he wears. The core
 	# runes sit in `engines` since GK and this line read `runes` alone, so a summary
 	# named no hero's engine; each core rune's name carries its own "(core)".
+	# BATCH HR §1 — AND WHAT HE HOLDS UNWORN, on its own line: a hero's lists hold his
+	# unworn runes again, so `Runes:` reads the worn ones and `Held:` the rest.
 	var rune_names := PackedStringArray()
+	var held_names := PackedStringArray()
 	for eng in member.get("engines", []):
 		if bool((eng as Dictionary).get("equipped", false)):
 			rune_names.append(String((eng as Dictionary).get("name", "")))
+		else:
+			held_names.append(String((eng as Dictionary).get("name", "")))
 	for rune in member.get("runes", []):
-		rune_names.append(String(rune["name"]))
+		if bool((rune as Dictionary).get("equipped", false)):
+			rune_names.append(String(rune["name"]))
+		else:
+			held_names.append(String(rune["name"]))
 	if not rune_names.is_empty():
 		text += "\n    Runes: %s" % ", ".join(rune_names)
+	if not held_names.is_empty():
+		text += "\n    Held, not worn: %s" % ", ".join(held_names)
 	# BATCH EG §2: the pool, with the benched half named. A summary that
 	# printed the pool alone would credit the run with a kit the hero never
 	# fought in, and one that printed the loadout alone would lose the cards

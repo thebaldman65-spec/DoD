@@ -16,6 +16,82 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-05 &mdash; Batch HR: THE BAG SPLITS, THE NAMEPLATE SPEAKS, AND A CENSUS FOR FIRE AND ICE</h2>
+<p><b>A rune for a class now goes to the hero of that class, who holds it unworn until he equips it, and the shared bag holds
+the Crest's runes only. A mark on each hero's nameplate on the map counts the runes he holds and does not wear, and the map
+says whose a dropped rune is. No Peddler and no Smith stand in the run's first three steps. A rune the game cannot pay is no
+longer offered. And <i>Tithe</i> and <i>Breaking Heals a Hero</i> say who they heal: the hero furthest from full.</b> Full working:
+<code>docs/reports/HR.md</code>.</p>
+
+<p><b>&sect;0 &mdash; HQ'S THREE RULINGS.</b> <b><i>Breaking Heals a Hero</i></b> reads <i>&ldquo;An attack that lands Break heals the hero
+furthest from full for 20% of it.&rdquo;</i> and <b><i>Tithe</i></b> <i>&ldquo;A hero's attack that lands Break heals the hero furthest from
+full, for 30% of it.&rdquo;</i> Both pay at the same place, which heals the standing hero lowest by <i>share</i> of his health
+&mdash; checked in the code before the words changed: a Warrior at 100 of 223 and a Mage at 90 of 173 are healed in that order, so
+<i>the lowest-health hero</i> pointed at the wrong one. The battle log's line for a rune the game refuses keeps the words HQ
+proposed. <b>A rune the game cannot pay is no longer offered</b> by a drop, a cache, a bargain, the Peddler or an event; one
+already worn from an old save still says in the battle log that it pays nothing.</p>
+
+<p><b>&sect;1 &mdash; THE BAG IS THE CREST'S; A CLASS RUNE LIVES WITH ITS HERO.</b> The shared bag of twenty held every rune nobody wore,
+all four classes together, and the designer met it in play as <i>&ldquo;I cannot tell whose rune this is.&rdquo;</i> Now a class rune or a
+core rune goes to the hero of its class &mdash; from a drop, a cache, a bargain, the Peddler or an event alike &mdash; and he holds it
+unworn on his own rune panel, where he equips, swaps and drops it. <b>A hero holds eight unworn</b>, ordinary and core together,
+beside his three slots and his two core slots. <b>The bag holds crest runes only, six at most.</b> A rune that arrives for a hero
+holding eight is shown on the map beside his eight, and he drops one to take it or leaves it behind &mdash; the full-bag panel,
+made his. The Peddler's Buy is greyed while that hero holds eight, and his row says so; his Sell rows list every rune nobody
+wears, each named for the hero holding it. <b>A save from before this batch loads with each class rune in its bag handed to the
+hero of its class</b> &mdash; the designer's own save, opened through Continue, puts Clarity and Overtone on the Mage and leaves
+Tithe in the bag &mdash; and the save format moves to version 15, which an older build refuses and leaves untouched.</p>
+
+<p><b>&sect;2 &mdash; THE NAMEPLATE SAYS A RUNE IS WAITING.</b> Each hero's card on the map carries a mark beside his name counting the
+runes he holds and does not wear; pressing it opens his rune panel. It is read from what he holds every time the map is drawn,
+so it goes the moment the last one is equipped, sold or dropped, and opening the panel does not clear it. The bag's row carries
+its own mark, counting the crest runes waiting in it. When a fight drops a rune, the victory card and the map both name the
+hero it went to &mdash; or the Crest.</p>
+
+<p><b>&sect;3 &mdash; NO TRADE IN THE FIRST THREE STEPS.</b> The map put a Peddler or a Smith in the first column of two runs in three,
+where the heroes hold 60 gold and a rune or an upgrade costs 150. Neither stands in the run's first three columns now; by the
+second zone the gold is there, so later zones are unchanged, and the first zone still holds all six Smiths and five Peddlers,
+further along. <b>It was measured before the gate went in</b>: the first trade node a walk met stood at node 1 in 69 runs in 100,
+where 17 in 100 could pay 150; with the gate, 86 to 89 can. <b>What still fails is the events</b>: with the trade nodes kept
+out, the first three columns take most of the zone's events, and an event pays no gold &mdash; keeping events out of those
+columns too would let every run pay at node 4, and that is proposed, not built. A bargain's bought merchant can still follow
+an elite in the second or third column; it is bought rather than rolled, and it is left.</p>
+
+<p><b>&sect;4 &mdash; A CENSUS FOR FIRE AND ICE.</b> Nothing was built. The designer described Burn and Chilled cancelling each other
+with a reward for the clash; the batch read out who applies each, who reads each, whether they stand together today, whether
+any status already removes another, what each is worth and whether enemies could make the player suffer it. <b>No enemy chills a hero</b> &mdash; only the Hoarfrost bargain does &mdash; and two Scarlands enemies burn one. The Mage's
+engines read both, but a Hunter's <i>Choking Smoke</i> and <i>Downwind</i> and a Cleric's <i>Returned Burden</i> already carry them across
+the party. Nothing today removes one when the other lands, and no status has ever removed another, so a cancellation would
+be the first; every reader of either is listed, because a cancellation starves each of them. <b>Measured over 300 full
+runs</b>: about half a clash a fight, a chill landing on a burning enemy eating about two turns of Burn, some twenty damage,
+and the sim casts fire first. A clash on a hero needs the Hoarfrost bargain and an Ashblade in one Scarlands fight. The census
+also found sixteen places where a document or a code comment says something different from the code about fire and ice
+&mdash; ten in the documents, six in comments, none on a card; they are queued, not fixed.</p>
+
+<p><b>&sect;5 &mdash; DELIBERATELY NOT DONE.</b> The fire-and-ice mechanic itself. The Skirmisher and the Tracker are still ruled and not
+built, with Volley's and Ambusher's core slots and new names owed. Channel's tempo payout. Whether a fallen hero stays down
+between fights. Tithe's rule is not widened. No rune was authored, and the crest is still one slot. The class-count question
+still names one class. The rules file is not split.</p>
+
+<p><b>The checks that moved, and why.</b> Every existing check was first run as it stood against this batch's game, with the documents as HQ left them &mdash; 131
+targets, in 80 minutes &mdash; and eleven read red besides the two that are red on purpose; a twelfth ran out of time beside
+other work and passed alone. <b>Most read the bag's old shape</b>: the bag's own check and the checks for the cache, the
+Peddler, the panel's rows and the save asked a shared bag of twenty for runes that now go to their heroes, and the save
+check pinned the version as a number, which the rules forbid &mdash; it now asks for at least the version it was written
+against. The Break-heal check read the old words and the old offer of a rune the game cannot pay, and the rune-slot check
+counted the new nameplate mark as a slot. <b>Two reds were this batch's own slips, caught there</b>: two new lines on screen
+said <i>party</i>, and one toast had been reworded &mdash; both put right in the game, not in the checks. <b>Two were checks
+whose answer had depended on luck all along</b>, and this batch's change to the map moved the dice they are dealt from: a
+live fight's check waited for one hero's kill that the opening volley handed to another, and a purchase check passed only
+when the shop's first offer happened to be a crest rune. Each was proved to be the dice &mdash; with the new map rule switched
+off, the old check read the old run exactly &mdash; and each was rebuilt to set up what it asks about instead of waiting for
+it, which <b>a new rule</b> now records beside the one about reading a toast at normal speed. One green check counted five
+fewer offers for the same reason, and its row moves with the proof. <b>Nine checks were re-pointed</b>, each to what it was
+written to ask, with its reason at the place, and <b>one is new</b>: <code>check_hr</code> drives everything this batch built
+&mdash; a real fight won from the real map, its rune on the right hero's nameplate and gone from it once equipped, an old save
+handed out on load, and eighty boards a zone with no shop in the first three nodes. <b>Forty-two controls, one defect each</b>,
+were read by what each printed, and every one went red on the check it aimed at &mdash; and one of them, which moved nothing but the dice, found the same kind of luck in this batch's own new check, which now sets up what it asks about too. Five rows of the count table move, seven more carry a note, and one is new. <b>The full rehearsal run</b>, in a copy proved equal to the tree, read every one of the 132 checks at the count written down for it before it started, and the count differ found nothing to report.</p>
+
 <h2>2026-10-01 &mdash; Batch HQ: ONE MAGNITUDE, ONE KEY, AND THE WORD THE TAXONOMY IS MISSING</h2>
 <p><b><i>Dead Air</i> now pays 75% more damage while no Mage stands, where it paid 50%. A crest rune asking whether a standing
 hero carries a core rune is now asked again every time a hero falls or is raised, like every other question about who

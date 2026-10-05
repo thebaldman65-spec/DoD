@@ -226,8 +226,8 @@ func _draw_screen() -> void:
 
 	# Rune offers column.
 	var rune_header := Label.new()
-	rune_header.text = "RUNES  (one of each, %dg — into the bag: %d/%d)" % [
-		_price_line(), Run.rune_bag.size(), Run.BAG_CAP]
+	# BATCH HR §1 — a rune bought goes to the hero it is for, a crest rune to the bag.
+	rune_header.text = "RUNES  (one of each, %dg — each to the hero it is for)" % _price_line()
 	rune_header.add_theme_font_size_override("font_size", 17)
 	rune_header.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
 	rune_header.position = Vector2(620, 130)
@@ -254,17 +254,11 @@ func _draw_screen() -> void:
 	var rune_list := VBoxContainer.new()
 	rune_list.add_theme_constant_override("separation", 10)
 	rune_scroll.add_child(rune_list)
-	# BATCH HK §3 — A FULL BAG SAYS SO AT THE TOP OF THE COLUMN, not only on the
-	# greyed Buy's tooltip: CO §3's rule is that a darkened button owes its reason,
-	# and a reason only a hover can find is one most players never read.
-	if Run.bag_full() and not offers.is_empty():
-		var full_lbl := Label.new()
-		full_lbl.text = "The bag is full at %d. Sell a rune from it, on the left, to buy one." % Run.BAG_CAP
-		full_lbl.add_theme_font_size_override("font_size", 14)
-		full_lbl.add_theme_color_override("font_color", Color(0.95, 0.75, 0.4))
-		full_lbl.custom_minimum_size = Vector2(RUNE_PANEL_W, 0)
-		full_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		rune_list.add_child(full_lbl)
+	# BATCH HK §3 — A FULL HOLDING SAYS SO, not only on the greyed Buy's tooltip:
+	# CO §3's rule is that a darkened button owes its reason, and a reason only a
+	# hover can find is one most players never read. **HR §1 — PER OFFER, IN ITS OWN
+	# ROW** (`Run.buy_refusal`): each rune goes to its own hero's holding, so one full
+	# holding refuses one row, and the row says whose.
 	for i in offers.size():
 		var offer: Dictionary = offers[i]
 		var member: Dictionary = Run.party[offer["member_idx"]]
@@ -286,10 +280,14 @@ func _draw_screen() -> void:
 		# whom the rune is for, the word the Sell rows beside it already use
 		# (`Run.rune_for_label`).
 		var for_whom: String = "%s %d" % [member["key"].capitalize(), offer["member_idx"] + 1]
+		var lands := "held by him; equip it on the map"
 		if Runes.is_party_rune(rune):
 			for_whom = Run.rune_for_label(rune)
-		label.text = "%s  (for %s)\n%s — into the bag; equip it on the map" % [rune["name"],
-			for_whom, Runes.shown_desc(rune)]
+			lands = "into the bag; equip it on the map"
+		var refused: String = Run.buy_refusal(rune, member)
+		label.text = "%s  (for %s)\n%s — %s%s" % [rune["name"], for_whom,
+			Runes.shown_desc(rune), lands,
+			("\n" + refused.replace("\n", " ")) if refused != "" else ""]
 		label.add_theme_font_size_override("font_size", 14)
 		label.add_theme_color_override("font_color", Runes.RUNE_TINT)
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -297,13 +295,13 @@ func _draw_screen() -> void:
 		var buy := Button.new()
 		buy.text = "Buy — %dg" % Run.rune_price(rune)
 		buy.custom_minimum_size = Vector2(140, 34)
-		# BATCH HK §3 — A FULL BAG IS A WALL AT THE COUNTER, NOT AN OFFER. A purchase
-		# is something the player starts, so the honest answer is "not until there
-		# is room" — the Sell rows on the left are how he makes it (the pouch's NO
-		# SLOT at this same counter, CT §3).
-		buy.disabled = Run.gold < Run.rune_price(rune) or Run.bag_full()
-		if Run.bag_full():
-			buy.tooltip_text = "The bag is full at %d. Sell a rune from it\n(on the left) to make room." % Run.BAG_CAP
+		# BATCH HK §3 — A FULL HOLDING IS A WALL AT THE COUNTER, NOT AN OFFER. A
+		# purchase is something the player starts, so the honest answer is "not until
+		# there is room" — the Sell rows on the left are how he makes it (the pouch's
+		# NO SLOT at this same counter, CT §3). HR §1: the holding is the hero's.
+		buy.disabled = Run.gold < Run.rune_price(rune) or refused != ""
+		if refused != "":
+			buy.tooltip_text = refused
 		buy.pressed.connect(_buy_rune.bind(i))
 		vbox.add_child(buy)
 
@@ -439,10 +437,10 @@ func _buy_rune(offer_idx: int) -> void:
 		return
 	var offer: Dictionary = offers[offer_idx]
 	var rune: Dictionary = offer["rune"]
-	# BATCH HK §3 — `Run.buy_rune` is the one door: it refuses on a full bag or an
-	# empty purse before any gold moves, and a rune bought goes into the BAG (an
-	# engine rune too — GK slotted one at purchase; the bag is where it waits now).
-	if not Run.buy_rune(rune):
+	# BATCH HK §3 — `Run.buy_rune` is the one door: it refuses on a full holding or an
+	# empty purse before any gold moves, and a rune bought is held unworn — on the
+	# hero it was rolled for (HR §1), a crest rune in the bag.
+	if not Run.buy_rune(rune, Run.party[int(offer["member_idx"])]):
 		return
 	offers.remove_at(offer_idx)
 	_draw_screen()
@@ -463,20 +461,37 @@ func _price_line() -> int:
 # ══ BATCH HK §3 — THE PEDDLER BUYS RUNES OUT OF THE BAG ══════════════════════
 #
 # **THE LEFT COLUMN UNDER THE SUPPLIES, WHICH HAS STOOD EMPTY SINCE FD §1 TOOK THE
-# DRAFT PICK OFF THE COUNTER** (y 452 to the Leave button). One row per rune in the
-# bag, in the bag's order, each with its own Sell at a third of its price — two
-# presses, the pouch's Sell shape, because one press would destroy a rune the
-# player meant to keep. **Worn runes are not listed**: a rune is sold from the
-# bag, and unequipping one on the map puts it there. The rows live in ONE bounded
-# scroller that ends above Leave (GT §1: text never moves the way out).
+# DRAFT PICK OFF THE COUNTER** (y 452 to the Leave button). One row per rune nobody
+# wears, each with its own Sell at a third of its price — two presses, the pouch's
+# Sell shape, because one press would destroy a rune the player meant to keep.
+# **BATCH HR §1 — EVERY HERO'S HELD RUNES, THEN THE BAG'S**: a class or core rune is
+# held on its hero now, so the rows walk the party (`Run.held_rows`, each named for
+# its hero) and then the bag (crest runes, and a stray no hero here can hold).
+# **Worn runes are not listed**: unequipping one on the map keeps it held, and it is
+# sold from there. The rows live in ONE bounded scroller that ends above Leave (GT
+# §1: text never moves the way out).
 const SALE_TOP := 452
 const SALE_W := 464
 
 
+# Every rune the counter will buy, in the order the rows draw: `{rune, hero, at}` —
+# `hero` the party index and `at` his `held_rows` index, or `hero` -1 and `at` the
+# bag's index.
+func _sale_rows() -> Array:
+	var out: Array = []
+	for hi in Run.party.size():
+		var held: Array = Run.held_rows(Run.party[hi])
+		for i in held.size():
+			out.append({"rune": held[i]["rune"], "hero": hi, "at": i})
+	for bi in Run.rune_bag.size():
+		out.append({"rune": Run.rune_bag[bi], "hero": -1, "at": bi})
+	return out
+
+
 func _draw_bag_sale() -> void:
+	var rows_d := _sale_rows()
 	var head := Label.new()
-	head.text = "SELL FROM THE BAG  (%d/%d — a third of the price back)" % [
-		Run.rune_bag.size(), Run.BAG_CAP]
+	head.text = "SELL A RUNE NOBODY WEARS  (%d — a third of the price back)" % rows_d.size()
 	head.add_theme_font_size_override("font_size", 15)
 	head.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
 	head.position = Vector2(140, SALE_TOP)
@@ -489,14 +504,15 @@ func _draw_bag_sale() -> void:
 	var rows := VBoxContainer.new()
 	rows.add_theme_constant_override("separation", 4)
 	scroll.add_child(rows)
-	if Run.rune_bag.is_empty():
+	if rows_d.is_empty():
 		var none := Label.new()
-		none.text = "The bag is empty. Runes that drop after a fight land\nthere, and so does every rune bought here."
+		none.text = "Nobody holds a rune he does not wear. A rune taken off\nis held by its hero, and sold from here."
 		none.add_theme_font_size_override("font_size", 12)
 		none.add_theme_color_override("font_color", Color(0.58, 0.55, 0.62))
 		rows.add_child(none)
-	for bi in Run.rune_bag.size():
-		var r: Dictionary = Run.rune_bag[bi]
+	for ri in rows_d.size():
+		var r: Dictionary = rows_d[ri]["rune"]
+		var hi: int = int(rows_d[ri]["hero"])
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 8)
 		rows.add_child(row)
@@ -511,11 +527,12 @@ func _draw_bag_sale() -> void:
 			sell.add_theme_color_override("font_color", Color(0.95, 0.75, 0.4))
 		sell.tooltip_text = "Sell %s for %dg of the %dg it costs.\n%s" % [nm, value,
 			Run.rune_price(r), "Press again to confirm." if armed else "Press twice to sell."]
-		sell.pressed.connect(_sell_rune.bind(bi))
+		sell.pressed.connect(_sell_rune.bind(ri))
 		row.add_child(sell)
 		var lbl := Label.new()
-		lbl.text = "%s  (for %s) — %s" % [nm, Run.rune_for_label(r).trim_prefix("the "),
-			Runes.shown_desc(r)]
+		var whose := ("held by %s" % _hero_label(hi)) if hi >= 0 \
+			else "in the bag, for %s" % Run.rune_for_label(r).trim_prefix("the ")
+		lbl.text = "%s  (%s) — %s" % [nm, whose, Runes.shown_desc(r)]
 		lbl.add_theme_font_size_override("font_size", 11)
 		lbl.add_theme_color_override("font_color", Runes.RUNE_TINT)
 		lbl.custom_minimum_size = Vector2(SALE_W - 120, 0)
@@ -525,16 +542,21 @@ func _draw_bag_sale() -> void:
 
 # First press ARMS, second press sells — keyed by the rune's name, so a redraw
 # that reorders nothing keeps the armed row, and arming another disarms it.
-func _sell_rune(bag_idx: int) -> void:
-	if bag_idx < 0 or bag_idx >= Run.rune_bag.size():
+func _sell_rune(sale_idx: int) -> void:
+	var rows_d := _sale_rows()
+	if sale_idx < 0 or sale_idx >= rows_d.size():
 		_rune_sell_pending = ""
 		return
-	var nm := String((Run.rune_bag[bag_idx] as Dictionary).get("name", ""))
+	var nm := String((rows_d[sale_idx]["rune"] as Dictionary).get("name", ""))
 	if _rune_sell_pending != nm:
 		_rune_sell_pending = nm
 		_sell_pending = ""
 		_draw_screen()
 		return
 	_rune_sell_pending = ""
-	Run.sell_bag_rune(bag_idx)
+	var hi: int = int(rows_d[sale_idx]["hero"])
+	if hi >= 0:
+		Run.sell_held_rune(Run.party[hi], int(rows_d[sale_idx]["at"]))
+	else:
+		Run.sell_bag_rune(int(rows_d[sale_idx]["at"]))
 	_draw_screen()

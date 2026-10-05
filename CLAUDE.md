@@ -108,7 +108,7 @@ into this file changes it.
 the equality rule travel with their parent. **Eight of the rows are FF §2's**, and they are the
 residue: rules written into this file AFTER the seam was taken, which the seam's own test puts on
 the other side of it. **Every row after those eight was written straight into the reference rather
-than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one and HQ's one:
+than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one and HR's two:
 
 | | |
 |---|---|
@@ -154,6 +154,8 @@ than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's
 | AN INSTRUMENT PUTS A RUNE DOWN THROUGH `Run.hold_rune`, AND A SCOPE WALK NAMES EVERY BAND | HO §1 |
 | A FIXTURE THAT DRIVES A CONDITION ON WHO STANDS WRITES A FIELD THE LIVE DOOR CARRIES | HP §1 |
 | A TALLY NAMED FOR A DOOR ROLLS THROUGH THAT DOOR | HQ §3 |
+| A TIMED SCREEN ELEMENT IS READ AT TIME SCALE ONE | HR §2 |
+| AN ARM THAT READS WHAT THE DICE DEALT IS A COIN FLIP THE NEXT BATCH CAN LOSE | HR §6 |
 
 ## THE COMBAT RULES LIVE IN `docs/combat-rules.md` (STANDING, SET AT GR §2, RULED BY THE DESIGNER)
 > **THIS FILE IS STILL THE ONE A BATCH MUST READ. `docs/combat-rules.md` IS A REFERENCE IT POINTS AT,
@@ -1611,7 +1613,7 @@ as a live decision.
 
 ## Architecture (all UI built in code, no editor scenes)
 - `scripts/run_state.gd` (autoload `Run`): party/items/gold/the LINE/zones,
-  save (user://run_save.bin v14, auto-saved at every step onto a node, at every
+  save (user://run_save.bin v15, auto-saved at every step onto a node, at every
   resolution, and inside a fight as each party loss lands — GH; `resume_scene` places
   a resumed run — GF), relic slots
   (max 3), the offer table (MODIFIERS/REWARDS), merchant+event scheduling,
@@ -1663,16 +1665,18 @@ questions now; `can_equip`, `equipped_learned` and `Profile.equip_cell` are dele
 · **VERSIONS** — `Profile` is **v3** (FX: the ledger keys to the CLASS) and reads a **v2 profile
   by a one-step migration** that folds its twelve spec purses into four. **Its floor,
   `MIN_VERSION`, is 2 — the oldest version this build carries a migration for** — so a v1 profile
-  is REFUSED rather than silently zeroed. The run save is **v14** and **a pre-v10 save is REFUSED and
+  is REFUSED rather than silently zeroed. The run save is **v15** and **a pre-v10 save is REFUSED and
   cleared** (the final zone gained a 17th slot; a v9 map has no position after its boss).
-  **v11 (CT), v12 (EG), v13 (GF) AND v14 (HK: the rune bag, the crest and the waiting drops) ARE ALL
-  TOLERANT AND NONE MOVED THE REFUSAL THRESHOLD** — the
+  **v11 (CT), v12 (EG), v13 (GF), v14 (HK: the rune bag, the crest and the waiting drops) AND v15 (HR: the
+  bag's class and core runes handed to their heroes on load) ARE ALL TOLERANT AND NONE MOVED THE REFUSAL
+  THRESHOLD** — the
   threshold is a claim about a structure this build cannot walk, and a version bump for a field
   with a sane default is not one. **DO NOT RAISE THE THRESHOLD TO MATCH THE VERSION.** **AND A SAVE FROM A NEWER
   BUILD IS REFUSED AND KEPT (HL §5, ruled — `Profile`'s shape)**: above `Run.SAVE_VERSION` `load_run` refuses, and
   `save_run` and `clear_save` are no-ops while the file is on disk (`new_run` clears through `clear_save`); the main
   menu says so, Continue dark. It guards from the next version bump on, never an older build reading a newer save, and
-  the floor did not move. **A bump raises `SAVE_VERSION`, the one constant `save_run` writes.** **GH MOVED NO
+  the floor did not move. **HR's v15 is the first bump it guards**: an HQ build refuses a v15 save and leaves it
+  byte-identical (driven at HR §1). **A bump raises `SAVE_VERSION`, the one constant `save_run` writes.** **GH MOVED NO
   VERSION**: a fight's losses are written to `hp`, `mana` and `items`, which v13 already carries, and
   to one member key, `companions_standing`, riding the party dict the way `bm_equipped` does.
 · **DELETED, NOT ZEROED** (each pinned ABSENT in test_batch_bm): `Run.award_talent_points`,
@@ -1996,12 +2000,14 @@ putting the pet in every Hunter's CLASS KIT: an engine no longer has to bring wh
     unconditional swap — the other three cost Rage and switch as a side effect, so carrying one would bring a damage card
     the engine can run without. Battle Poise's free pivot firing for every Stances holder from the first fight is
     accepted with it.
-- **THE SECOND ENGINE IS FOUND IN PLAY, NEVER BOUGHT, AND WAITS IN THE BAG (HL §1, ruled from play).** The Peddler
+- **THE SECOND ENGINE IS FOUND IN PLAY, NEVER BOUGHT, AND WAITS UNWORN (HL §1, ruled from play; on its hero since HR §1,
+  in the bag before).** The Peddler
   never offers one (`Run.peddler_rune`); a cache, the bargain and the drop still do. **A slotted engine brings its
   enablers, so `Run.hold_rune` slots an engine rune only when its caller asks, and the player's cache answer never
   asks**: until HL one pick could hand over a rune and a card — the designer's *Fireball dragging Razor Ice*, which no
   draft does (`docs/reports/HL.md` §1). Class selection still slots the one taken, and its card names what it brings.
-  **The cache's bag is CONFIRMED at HN §2 (the designer's)**: slotting on the pick is the mechanism that produced the
+  **The cache's bag is CONFIRMED at HN §2 (the designer's; since HR §1 the rune waits unslotted on its hero, not in the
+  bag)**: slotting on the pick is the mechanism that produced the
   defect — one choice handing over two things with no announcement — and a core rune is a two-slot directional
   decision the player makes at the panel.
 - **A LINEAGE OPENS WITH ITS ENGINE'S ENABLERS AND NOTHING ELSE, AND NO ENGINE REPLACES THE CLASS BASIC.**
@@ -2109,7 +2115,8 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
 - **THE POUCH COULD STRAND THE PLAYER, AND THE CAUSE WAS A STACK, NOT A STRING.** Its Close, the only way out, sat at
   the foot of a fixed stack whose engine rows grew with each rule — wholly below the 720-pixel screen for four engines
   held alone, all sixty pairs of one class's engines and every class's six. **A hero can have up to all six of his
-  class's engine runes to hand — two slotted, and since HK the rest in the bag — and the pouch lists every one with
+  class's engine runes to hand — two slotted, and the rest held unworn on him (in the bag from HK to HR) — and his panel
+  lists every one with
   its rule**: size a screen for every combination it can hold, not the one it opens with.
 - **THE PEDDLER WAS THE SAME CAUSE ON A SECOND SURFACE**: offers laid at a fixed pitch whatever their text, so a long
   rule ran under the next hero's Buy button. One shape fixed both. `check_gt` §1 opens the pouch in every
@@ -3533,8 +3540,8 @@ itself, and EZ's own charter forbids moving an ability, a magnitude or a constan
 > **Every authored rune costs 150 gold (100 until HK). Rarity is gone and price no longer signals power — a
 > rune's worth is contextual, so the player pays for FIT rather than for magnitude.**
 >
-> **The Peddler buys one back out of the bag for a third — 50g at list** (`Run.RUNE_SELL_FRACTION`, written as the
-> fraction): **selling is a decision rather than free money, and the Peddler is where a player fixes their luck, since
+> **The Peddler buys back a rune nobody wears for a third — 50g at list** (`Run.RUNE_SELL_FRACTION`, written as the
+> fraction), out of the bag or a hero's holding (HR §1): **selling is a decision rather than free money, and the Peddler is where a player fixes their luck, since
 > the drop cannot be chosen.** A third where the pouch's items sell for two fifths, for the same reason made sharper.
 
 - **THE PRICE IS READ LIVE OFF THE DATA, AT ONE DOOR** (`Runes.price_of`, and `Run.rune_price` / `rune_sell_value`
@@ -3552,48 +3559,68 @@ have since taken the total to 67; the generated stat family keeps `TEMPLATE_PRIC
 Common floor it already had. **Neither is a second pricing rule** — one is history and the other is
 the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over the live pool — 150 since HK.
 
-## STANDING RULE — A RUNE DROPS AFTER EVERY NORMAL FIGHT, INTO ONE BAG OF TWENTY (Batch HK §1/§2, ruled by the designer)
+## STANDING RULE — A RUNE DROPS AFTER EVERY NORMAL FIGHT; A CLASS RUNE LIVES WITH ITS HERO, THE BAG IS THE CREST'S (Batch HK §1, ruled by the designer; the holdings split at HR §1)
 
-> **One rune after every NORMAL fight, random and never chosen, and it goes to the BAG — every rune the heroes hold
-> that nobody wears, shared, twenty at most. Equipping is its own act: a rune worn leaves the bag and a rune
-> unequipped goes back into it. A drop that lands on a full bag is shown beside the twenty, and the player drops one
-> to take it or lets it go; it is never lost silently and never sold for him.**
+> **One rune after every NORMAL fight, random and never chosen. A class rune or a core rune goes to the hero of its
+> class, held UNWORN on him — `HERO_HOLD_CAP` of them, both kinds counted, his slots not — and a crest rune to the
+> Crest or the BAG, which holds crest runes only (`BAG_CAP`). Equipping is its own act. A rune that lands on a full
+> holding is shown beside it, and the player drops one to take it or lets it go; never lost silently, never sold.**
 
+- **THE REASON IS THE DESIGNER'S, MET IN PLAY: *"I cannot tell whose rune this is."*** HK pooled every kind into one bag of
+  twenty, and pooling is what lost the ownership; HR put the class runes back on their heroes (a partial revert of HK —
+  an unworn rune lived on its hero until HK). **Do not re-pool them**: the nameplate's marker counts a hero's own
+  holding, and a shared bag of class runes has no hero to mark.
 - **THE NORMAL FIGHT IS THE `fight` NODE, AND NOTHING ELSE DROPS ONE.** An elite, a mini-boss and a boss each pay spoils
-  of their own, and the ruling named normal fights, so extending it is the designer's (`docs/reports/HK.md` §1). The one
-  call is in `battle._check_end`'s victory branch, under `node_type == "fight"`; RunSim takes it through the same door.
-- **ITS CLASS IS ONE THE PARTY HOLDS, AND THE DRAW IS FLAT OVER RUNES.** `Run.roll_fight_drop` is the union of what
-  every hero could be offered — `Runes.eligible_ids` for each, so GV's engine gate, a rune's required card and HB's pet
-  gate hold at the drop as at every roll — less everything the party holds, deduped by id, and one is picked flat. A
-  draw by CLASS first would hand a lone crest rune a fifth of every drop; flat, it is one entry among the rest, which is
-  what *the same source as any other rune* means.
-- **NOTHING THE PARTY HOLDS IS OFFERED AGAIN, AND `Run.party_rune_names` IS THE ONE LIST** — the bag, the crest, a rune
-  waiting on the full-bag panel, and every hero's worn runes and engine runes. `Run.generate_rune` excludes it from every
-  draw, and a static `Runes` helper, which cannot see `Run`, takes it as `held`. **A new roll door excludes it, and a new
-  place a rune can sit joins it.**
-- **A WORN RUNE IS NOT COUNTED AGAINST THE TWENTY, AND THAT IS STRUCTURAL**: four heroes' three slots and two engine
-  slots and the crest's one are twenty-one, so a bag that counted what it lent out could never be worn full.
-- **A FULL BAG IS A CHOICE FOR A GRANT AND A WALL FOR A PURCHASE — CT §3's TWO WALLS, ONE LAYER OVER.** A drop, a cache
-  taken, an event's rune: `Run.bag_rune` queues it on `pending_rune_drops`, and the map's full-bag panel
-  (`map_screen._check_rune_drops`, chained after the pouch's own swap offer) shows it beside the twenty — drop one to
-  take it, or leave it behind, which is always a button. **A purchase is refused**: the Peddler greys every Buy and says
-  why, and his Sell rows are how the player makes room. **An unequip into a full bag is refused too, and a SWAP — one
-  rune each way, the bag's count unchanged — is the way through**, so a full bag beside full slots never strands a rune.
-- **EVERY TAKEN RUNE IS PUT DOWN AT `Run.hold_rune`, AND WHAT IS NOT WORN GOES TO THE BAG.** Worn when its caller asks and
-  a slot it fits is free — an engine rune too since HL §1 (GK slotted one whatever was asked) — and otherwise the bag.
-  **The Peddler's purchase goes to the bag and never onto a hero** (`Run.buy_rune`), and since HL §1 he sells no
-  engine rune at all. **The charter's *dropped and swapped, including to nothing* stands**: unslotting is into
-  the bag, refused only while the bag is full, and the bag can now let an engine rune go for good, sold or dropped.
-- **A HERO'S RUNE PANEL LISTS WHAT HE WEARS, THEN THE BAG'S RUNES HE MAY WEAR** (`Run.rune_rows`, `engine_rows`), his own
-  list first so a row's index is the one the toggle always took. `Run.toggle_rune`, `toggle_engine` and
-  `toggle_party_rune` are the doors, each with a refusal sentence the disabled button shows (CO §3).
-- **THE MIGRATION MOVES WHAT WAS NOT WORN AND TOUCHES NOTHING THAT WAS.** A save written before the bag held each hero's
-  unworn runes on him; `Run._bag_the_unworn` moves them into the bag on every load — a no-op on a save the bag wrote —
-  the worn stay in the same slots, and the bag may open past twenty: **nothing is dropped, sold or refused, and the cap
-  binds at intake.** It moved the save to v14 (the VERSIONS bullet under TALENTS ARE META PROGRESSION).
-- **THE WAITING DROP RIDES THE SAVE AND THE MAP ANSWERS IT, SO A RESUME OWES IT NO BRANCH** — GF's rule met by the
-  screen every resumed run lands on, whose opening chain ends at the full-bag panel.
-- **`check_hk` DRIVES ALL OF IT, A WHOLE RUN ON THE REAL SCREENS AMONG IT** — a static check cannot see a drop.
+  of their own (`docs/reports/HK.md` §1). The one call is in `battle._check_end`'s victory branch, under
+  `node_type == "fight"`; RunSim takes it through the same door.
+- **ITS CLASS IS ONE THE HEROES HOLD, AND THE DRAW IS FLAT OVER RUNES.** `Run.roll_fight_drop` is the union of what every
+  hero could be offered — `Runes.eligible_ids` for each, so every gate holds at the drop as at every roll — less what
+  the heroes hold, deduped by id, one picked flat; a crest rune is one entry among the rest.
+- **NOTHING HELD IS OFFERED AGAIN, AND `Run.party_rune_names` IS THE ONE LIST** — the bag, the crest, a rune waiting on a
+  full holding, and every hero's runes and engine runes, worn or held. **A new roll door excludes it, and a new place a
+  rune can sit joins it.**
+- **EVERY RUNE IS PUT DOWN AT `Run.hold_rune`, ROUTED BY SCOPE**: a crest rune worn in the crest when its caller asks and
+  the crest is free, else the bag; a class or core rune worn when its caller asks and a slot of its kind is free, else
+  held unworn by `Run.hold_on_hero` on the hero of its class (`Run.holder_index`: the first who can wear it, with room
+  first). The drop, a cache, a bargain, the Peddler's Buy and the event verb all route through it. **A rune no hero here
+  can wear stays in the bag, kept, never destroyed** (`Run.bag_strays`).
+- **A WORN RUNE IS IN NO COUNT.** The three slots, the two core slots and the crest are not part of either cap.
+- **A FULL HOLDING IS A CHOICE FOR A GRANT AND A WALL FOR A PURCHASE — CT §3's TWO WALLS.** A grant queues on
+  `pending_rune_drops`, and the map's panel (`map_screen._check_rune_drops`, chained after the pouch's swap offer) shows it
+  beside the holding it is bound for (`Run.pending_holder`: a hero's unworn runes, or the bag) — drop one to take it, or
+  leave it behind. **A purchase is refused** while that holding is full (`Run.buy_refusal`, its sentence on the row and
+  the Buy), and the Sell rows are how the player makes room. **An unequip into a full holding is refused too, and a SWAP —
+  one rune each way — is the way through.**
+- **A HERO'S RUNE PANEL LISTS HIS OWN LISTS ONLY** (`Run.rune_rows`, `engine_rows`): what he wears and what he holds,
+  each held rune with a Drop that asks twice; the bag's rows are the crest's (`party_rune_rows`).
+- **THE NAMEPLATE CARRIES THE COUNT OF RUNES HE HOLDS UNWORN, READ OFF THE HOLDING AT EVERY DRAW** (`Run.held_count`): it
+  clears when nothing is waiting and never because a menu was opened — *a count that lies is worse than none*. The bag's
+  row carries the crest's own count. **A drop is announced on the map naming the hero** (`Run.last_drop`, read once),
+  HO's rule that one choice is never two things with no announcement.
+- **THE MIGRATION HANDS OUT THE BAG AND TOUCHES NOTHING WORN.** `Run._hand_out_the_bag` runs on every load — a no-op on a
+  save this build wrote — and gives each class or core rune in a v14 bag to the hero of its class, unworn, in the bag's
+  order; **a hero may open over his cap: nothing is dropped, sold or refused, and the cap binds at intake.** It moved the
+  save to v15 (the VERSIONS bullet under TALENTS ARE META PROGRESSION). HK's `_bag_the_unworn`, which did the reverse, is
+  deleted: run after the hand-out, it would undo it.
+- **THE WAITING DROP RIDES THE SAVE AND THE MAP ANSWERS IT, SO A RESUME OWES IT NO BRANCH** — GF's rule.
+- **`check_hk` DROVE HK's HALF AND `check_hr` DRIVES HR's ON THE REAL SCREENS** — a static check cannot see a drop land on a
+  nameplate.
+
+## STANDING RULE — NO PEDDLER AND NO SMITH IN THE RUN'S FIRST THREE NODES (Batch HR §3, ruled by the designer)
+
+> **The map generator deals no merchant and no blacksmith into the first `Run.SHOP_GATE_NODES` columns of the run's
+> FIRST zone. The reason is the gold — *the player will never have enough* — and THE RULING IS THE REASON, NOT THE
+> FIGURE.**
+
+- **IT IS THE RUN'S GATE, NOT EVERY ZONE'S** (`Run.shop_gated`: zone 0, columns 1..N): by the second zone the gold is
+  there. A run opens with 60 gold; a rune and the smith's first pairing cost 150.
+- **THE ZONE STILL DEALS ITS FULL COUNT** — six smiths and five merchants into the eleven columns left, one of a kind a
+  column; measured at HR §3, no board runs short (`check_hr` §3). **What fills the gated columns is the generator's own
+  order**: events are placed after the trade nodes, roomiest column first, so most of the zone's events land there, then
+  fights. **An event pays no gold**, and that substitution is most of the runs that still reach their first trade node
+  short of 150 (`docs/reports/HR.md` §3) — a change to the placement order moves the figure that satisfies the reason.
+- **THE BARGAIN'S BOUGHT MERCHANT IS NOT A MAP NODE AND IS NOT GATED** — it follows an elite whose severity-4 bargain the
+  player chose, in place of that bargain's gold (HR §3 reports how often; a ruling is owed).
 
 ## STANDING RULE — THE PARTY SCOPE, AND THE RUNES IT HOLDS; ITS SCREEN WORD IS THE CREST (Batch HK §4, ruled by the designer; the word confirmed in HL's brief; the runes HO §3's and HP §2's)
 
@@ -3663,11 +3690,17 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
   and a field on neither list. **It is asked where the table loads (`Runes._load`, which `push_error`s) and wherever a
   payload is applied**, so a refused payload is paid by no route and says so. **A field joins `LIVE_FIELDS` only once
   it is derived** at every line that reads or writes it (`check_hp` §1b: no line writes one after the spawn).
-  · **AND WHAT IT SAYS TO A PLAYER IS A PLAYER'S SENTENCE (HQ §1).** A refused payload can reach a running game: `_load`
-    reports a refused entry and KEEPS it, so a hand-edited or modded file loads one and the roll offers it, and a worn
-    rune's payload rides the save as it was built, so a payload a later build refuses arrives with the save. **The
-    roll call's tail (`LIVE_REFUSED_TAIL`) speaks no word of the door's** — no *payload*, no *refused* — and the reason
-    goes to `push_error`, which the developer reads (`check_hp` §1c holds both).
+  · **A RUNE THE GAME CANNOT PAY IS NOT OFFERED (HR §0, ruled — left open at HQ §5).** `_load` reports a refused entry
+    and KEEPS it (a save may hold one), and **`Runes.eligible_ids` skips it (`Runes.is_refused`, asking
+    `Talents.live_refusal` of the entry as it stands)**, as do the three lists that say why an offer is short — so no
+    drop, cache, bargain, counter or event hands one over, and none is named as waiting on a card. There is no reading
+    where offering it is better: a drop, a slot or 150 gold spent on nothing. **A new roll door reaches the pool through
+    `eligible_ids` and inherits it; one that does not owes it.**
+  · **AND WHAT IT SAYS TO A PLAYER IS A PLAYER'S SENTENCE (HQ §1, the words ruled at HR §0).** A worn rune's payload
+    rides the save as it was built, so a payload a later build refuses can still arrive with a save — the one route
+    left, and **the roll call's tail (`LIVE_REFUSED_TAIL`) is its net** (*it cannot work as written, so it pays
+    nothing this fight*): it speaks no word of the door's — no *payload*, no *refused* — and the reason goes to
+    `push_error`, which the developer reads (`check_hp` §1c holds both).
 - **A CREST RUNE THAT CLEANSES CANNOT BE WORTH THE CREST'S SLOT (HP §3, ruled by the designer; the finding outlives the
   rune).** **HERO-SIDE DEBUFF SUPPLY IS 0.296 A ROUND** (HO §3b: seven statuses from enemy abilities, two from
   bargains, no hard control able to land on a hero at all). **A crest rune that cleanses cannot be worth the crest's

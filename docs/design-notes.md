@@ -4,6 +4,42 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The bag splits, the nameplate speaks, and the first nodes sell nothing (Batch HR) — 2026-10-05
+
+**Why a class rune lives with its hero again.** The designer met the shared bag in play as *"I cannot tell whose rune
+this is."* One bag of twenty held every rune nobody wore, all four classes together, and the only way to know whose a
+rune was, was to read its label. A rune held by the hero it belongs to cannot lose its owner, and the nameplate can count
+it. The bag stays for the Crest's runes, which belong to no hero, so the one shared place left holds the one kind of rune
+that is shared. This undoes half of what pooling did, and it was pooling that lost the ownership.
+
+**Why eight a hero, and six in the bag.** Eight unworn sits beside a hero's three slots and two core slots, so a hero can
+carry a second set of runes for a different fight without throwing anything away. The bag only ever holds crest runes,
+and there are four of them; a party can hold one of each, so six is the pool and room for two more before the cap means
+anything. Both are proposals, measured in HR's report, and both bind only at intake: a save that arrives over the cap
+keeps everything.
+
+**Why a full holding is the hero's own question.** The full-bag panel already asked the right thing — drop one to take
+this, or leave it — and with the holdings split, the runes that answer it are the ones that hero holds. A shared panel
+would make the Warrior's drop cost the Mage a rune.
+
+**Why the marker is a count and not a flag.** A marker that cleared when a menu was opened would say nothing is waiting
+while runes still wait. The count is read off what the hero holds every time the map is drawn, so it can only be wrong if
+the holding is.
+
+**Why no Peddler and no Smith in the first three nodes.** A run starts with 60 gold and a rune or the smith's first
+upgrade costs 150. The generator put a trade node in the first column of two maps in three, where the player could buy a
+potion and nothing else. The gate is on the run's first nodes and not on every zone's, because by the second zone the
+gold is there. The positions the shops leave go to events and fights by the generator's own rule, and the events pay no
+gold — which is most of the runs that still reach their first shop short of 150.
+
+**Why a rune the game cannot pay is not offered.** There is no reading where offering it is better: the player would
+spend a drop, a slot or 150 gold on nothing. The battle's refused line stays for a rune already worn when a build began
+refusing it, because an old save can still carry one.
+
+**Why the Break heal says *furthest from full*.** The rule heals the standing hero lowest by share of his health, and *the
+lowest-health hero* reads as the hero with the fewest points — a Warrior at 100 of 223 and a Mage at 90 of 173 are
+different heroes under the two readings. Tithe and the talent pay at the same place, so they say the same thing.
+
 ## One magnitude, one key, and the word the taxonomy is missing (Batch HQ) — 2026-10-01
 
 **Why Dead Air is 75%.** A rune that pays while the Mage is down stands in for the Mage, so its figure is what the Mage

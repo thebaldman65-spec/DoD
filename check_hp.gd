@@ -99,12 +99,15 @@ const NEAR_MISSES := {
 	"Dirge": [],
 }
 
-# §4 — Tithe's words as the designer ruled them (HP §4), the figure left out.
-const TITHE_WORDS := "A hero's attack that lands Break heals\nwhoever among the four is lowest,\nfor %d%% of it."
-# §4 — and the talent's over the same read site, narrowed the way Tithe's were (HQ §1;
-# the wording PROPOSED), the figure left out, and the words it carried until HQ.
-const TALENT_WORDS := "An attack that lands Break heals the lowest-health hero for %d%% of it."
+# §4 — Tithe's words as the designer ruled them (HP §4; *the hero furthest from full*
+# ruled at HR §0), the figure left out.
+const TITHE_WORDS := "A hero's attack that lands Break heals\nthe hero furthest from full, for %d%% of it."
+# §4 — and the talent's over the same read site, narrowed the way Tithe's were (HQ §1),
+# *furthest from full* ruled for both at HR §0, the figure left out; and the words it
+# carried until HQ, and the reading HR's ruling replaced, in both texts.
+const TALENT_WORDS := "An attack that lands Break heals the hero furthest from full for %d%% of it."
 const TALENT_WAS := "Every point of Break damage dealt"
+const READING_WAS := ["lowest-health hero", "whoever among the four is lowest"]
 # §1c — words a roll-call tail must not speak to a player (HQ §1): the developer's.
 const DEV_WORDS := ["payload", "refus", "consumed", "field", "live door"]
 
@@ -578,18 +581,28 @@ func _s1c_the_refusal() -> void:
 	var dev_said: Array = DEV_WORDS.filter(func(w): return refused_tail.to_lower().contains(String(w)))
 	ok(refused_tail.ends_with("so it pays nothing this fight") and dev_said.is_empty(),
 		"§1c: the refused tail reads '%s' — %s are not a player's words" % [refused_tail, dev_said])
-	# THE ROUTE THAT MAKES IT ONE — the fact the rewording rests on, asserted so the day it
-	# stops holding the reason is seen to go: a refused entry stays in the loaded table
-	# (`Runes._load` reports it and keeps it) and a roll offers it like any other.
+	# THE ROUTE HQ FOUND IS CLOSED (HR §0, ruled: a rune the game cannot pay is not
+	# offered). A refused entry stays in the loaded table (`Runes._load` reports it and
+	# keeps it, since a save can hold one) and NO roll offers it; the same entry, payable,
+	# is offered — the positive arm, so the withholding is the refusal's and not the
+	# fixture's. The tail above stays as the net for a rune worn before a build refused
+	# it (HQ §1.5's save route), which `check_hr` §0a holds in the source.
 	var refused_fx := "hp_fixture_refused"
+	var payable_fx := "hp_fixture_payable"
 	Runes._load()[refused_fx] = {"name": "HP Fixture Refused", "scope": "party", "price": 150,
 		"desc": "A fixture of check_hp, never in the file.",
 		"payload": {"stat": {"max_hp": 9}, "condition": {"heroes_all_standing": false}}}
+	Runes._load()[payable_fx] = {"name": "HP Fixture Payable", "scope": "party", "price": 150,
+		"desc": "A fixture of check_hp, never in the file.",
+		"payload": {"stat": {"max_hp": 9}}}
 	_new_run(SEATS, ENG4)
 	var rolled: bool = Runes.eligible_ids(_run.party[0], []).has(refused_fx)
+	var twin: bool = Runes.eligible_ids(_run.party[0], []).has(payable_fx)
 	Runes._load().erase(refused_fx)
-	ok(rolled and not Runes.ids().has(refused_fx),
-		"§1c: a refused entry is not offered by the roll (%s) — the route the player's tail answers is gone, re-read HQ §1" % rolled)
+	Runes._load().erase(payable_fx)
+	ok(not rolled and not Runes.ids().has(refused_fx),
+		"§1c: a refused entry is offered by the roll (%s) — HR §0 withholds a rune the game cannot pay" % rolled)
+	ok(twin, "§1c: ...and its payable twin is not offered either — the withholding is not the refusal's")
 	# THE FILE HOLDS NONE, AND THE TABLE ASKS THE ONE DOOR AS IT LOADS.
 	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/runes.json"))
 	var bad: Array = []
@@ -1229,6 +1242,22 @@ func _s4_tithe() -> void:
 		"§4: '%s' still stands in the talent's own source" % TALENT_WAS)
 	ok(master.length() > 100000 and master.contains("Breaking Heals a Hero") and not master.contains(TALENT_WAS),
 		"§4: '%s' still stands in master.html's copy of the talent" % TALENT_WAS)
+	# HR §0 — *FURTHEST FROM FULL*: the site heals the standing hero lowest by SHARE of
+	# maximum health (`_lowest_hp`), so the reading the two texts carried is gone from
+	# both and from master.html's copies — and the share comparison is the site's.
+	var gone_from: Array = []
+	for w in READING_WAS:
+		if node_desc.contains(String(w)):
+			gone_from.append("the talent: %s" % w)
+		if String(cfg.get("desc", "")).replace("\n", " ").contains(String(w)):
+			gone_from.append("Tithe: %s" % w)
+		if master.contains(String(w) + " for 20% of it") or master.contains("heals " + String(w) + ", for 30%"):
+			gone_from.append("master.html: %s" % w)
+	ok(gone_from.is_empty(), "§4: the reading HR's ruling replaced still stands: %s" % [gone_from])
+	var lh_at := bs.find("func _lowest_hp(")
+	var lh := bs.substr(lh_at, bs.find("\nfunc ", lh_at + 5) - lh_at) if lh_at >= 0 else ""
+	ok(lh.contains("h.hp / float(h.max_hp) < best.hp / float(best.max_hp)"),
+		"§4: the Break heal's site does not pick by share of maximum health — *furthest from full* no longer describes it")
 
 
 # ── §5 — THE RULINGS' RECORDS ───────────────────────────────────────────────

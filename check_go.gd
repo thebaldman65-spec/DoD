@@ -49,6 +49,9 @@ const GO_SEED := 20260918
 const SCRATCH_PROFILE := "user://go_profile.json"
 const SCRATCH_RELICS := "user://go_relics.json"
 const FRAME_CAP := 6000
+# BATCH HR — §12's fragile foe stands at this much of its 60, under half, so it is the
+# lowest share on the board whenever it stands (the deep two never fall below half).
+const FRAGILE_HP := 29
 # THE NINE, BY CLASS — and the internal names, which no player-facing surface
 # may carry. Split so this file's own source never spells the pairs a sweep of
 # the game's text looks for beside each other.
@@ -1678,6 +1681,20 @@ func _stretch(tag: String, specs: Array, engines: Array) -> void:
 	var foes: Array = _foes(s)
 	# Two enemies deep and one fragile: the fragile one falls and is brought back,
 	# so kills, a mark that moves and a bond that holds are all on the table.
+	# **BATCH HR — AND THE FRAGILE ONE IS EVERY STRIKE'S MARK, SO THE KILLS RECUR.** The
+	# bots strike the foe lowest by SHARE of health (`_lowest_hp`), and the deep two are
+	# set back to full below half, so they sit between half and full; at 60 of 60 the
+	# fragile one was nobody's mark once the deep two had been touched. It fell ONCE, to
+	# the opening volley while every foe was at full and the first in the list took the
+	# ties — so the Reaver, paid only for a kill of its holder's own, fired only if the
+	# Warrior landed that first one. HEAD's dice gave it to him; HR's gave it to the
+	# Cleric — the spawn deals a fresh run's board from the same dice, HR §3's shop gate
+	# changed that board, and with the gate set to zero HEAD's stretch came back to the
+	# frame — and in 6000 frames the Raider died once, the Reaver silent. Held below half
+	# (`FRAGILE_HP` of 60) it is the lowest share whenever it stands, so every
+	# single-target strike goes to it and each hero's kill comes round. A construction,
+	# not a wait: the other seven engines fired within 320 frames either way, and with the
+	# Reaver's read cut both of its stretches still read silent.
 	var fragile: BattleUnit = null
 	for e in foes:
 		e.max_hp = 100000
@@ -1723,11 +1740,11 @@ func _stretch(tag: String, specs: Array, engines: Array) -> void:
 				if down_for > 20:
 					fragile.revive(1.0)
 					fragile.max_hp = 60
-					fragile.hp = 60
+					fragile.hp = FRAGILE_HP
 					down_for = 0
-			elif fragile.max_hp > 60:
+			elif fragile.max_hp > 60 or fragile.hp > FRAGILE_HP:
 				fragile.max_hp = 60
-				fragile.hp = 60
+				fragile.hp = FRAGILE_HP
 		for e in foes:
 			if e != fragile and not e.dead and e.hp < 50000:
 				e.hp = e.max_hp

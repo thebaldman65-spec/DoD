@@ -201,6 +201,17 @@ func _names(units: Array) -> Array:
 	return out
 
 
+# BATCH HR §1 — a hero's runes he holds and does not wear, by name, off both lists:
+# where a rune bought, dropped or taken from a cache lands since the bag split.
+func _hr_unworn(m: Dictionary) -> Array:
+	var out: Array = []
+	for key in ["runes", "engines"]:
+		for r in m.get(key, []):
+			if not bool((r as Dictionary).get("equipped", false)):
+				out.append(String((r as Dictionary).get("name", "")))
+	return out
+
+
 # ── §1a — ONE PICK, ONE CARD ────────────────────────────────────────────────
 
 func _s1a_one_pick_one_card() -> void:
@@ -306,9 +317,11 @@ func _s1a_one_pick_one_card() -> void:
 	var took := Gate.press(pick_ov, [String(core["name"])]) if pick_ov != null else ""
 	await Gate.frames(self, 3)
 	ok(took == String(core["name"]), "§1a: the cache drew no button for %s" % core["name"])
-	ok(_names(_run.rune_bag).has(String(core["name"])) and _run.held_engines(mg) == eng0,
-		"§1a: the core rune taken from the cache went onto the Mage (engines %s, bag %s)" % [
-			_run.held_engines(mg), _names(_run.rune_bag)])
+	# BATCH HR §1 — HELD BY THE MAGE, UNWORN (HL put it in the bag): the question is still
+	# that the pick slotted nothing and handed over one thing.
+	ok(_hr_unworn(mg).has(String(core["name"])) and _run.held_engines(mg) == eng0,
+		"§1a: the core rune taken from the cache was slotted on the Mage, or is not held by him (engines %s, held %s)" % [
+			_run.held_engines(mg), _hr_unworn(mg)])
 	ok(_kit_read(mg) == kit0 and not _kit_read(mg).has("Razor Ice"),
 		"§1a: taking a core rune from a cache put a card in the kit: %s" % [
 			_kit_read(mg).filter(func(n): return not kit0.has(n))])
@@ -320,10 +333,10 @@ func _s1a_one_pick_one_card() -> void:
 	var rows: Array = _run.engine_rows(mg)
 	var bag_row := -1
 	for ri in rows.size():
-		if String(rows[ri]["src"]) == "bag" and String((rows[ri]["rune"] as Dictionary).get("engine", "")) == "permafrost":
+		if not bool(rows[ri]["worn"]) and String((rows[ri]["rune"] as Dictionary).get("engine", "")) == "permafrost":
 			bag_row = ri
 	var slot_btn: Button = Gate.bound_button(panel, "_toggle_engine", [1, bag_row, panel]) if panel != null else null
-	ok(slot_btn != null, "§1a: the Mage's panel drew no button to slot the core rune from the bag")
+	ok(slot_btn != null, "§1a: the Mage's panel drew no button to slot the core rune he holds")
 	if slot_btn != null:
 		slot_btn.emit_signal("pressed")
 		await Gate.frames(self, 3)
@@ -448,7 +461,7 @@ func _s1c_the_purchase() -> void:
 	var o0: Dictionary = offers[buy_at]
 	var for_idx := int(o0["member_idx"])
 	var nm := String((o0["rune"] as Dictionary)["name"])
-	ok(Gate.has_text(shop, "into the bag; equip it on the map"),
+	ok(Gate.has_text(shop, "held by him; equip it on the map"),
 		"§1c: the counter does not say where a bought rune goes")
 	var buy_btn: Button = Gate.bound_button(shop, "_buy_rune", [buy_at])
 	var bought := ""
@@ -458,10 +471,22 @@ func _s1c_the_purchase() -> void:
 	await Gate.frames(self, 2)
 	ok(bought != "" and _run.gold == 1000 - int(_run.rune_price(o0["rune"])),
 		"§1c: the Buy took %dg" % (1000 - int(_run.gold)))
-	ok(_names(_run.rune_bag).has(nm), "§1c: the rune bought is not in the bag — gold spent, nothing received")
+	# BATCH HR §1/§2 — HELD BY THE HERO IT WAS BOUGHT FOR, AND THE MAP SHOWS IT ON HIS
+	# NAMEPLATE: HL's complaint was a purchase that appeared nowhere on the map, and HK
+	# answered it with the bag's row; the marker answers it against the hero.
+	ok(_hr_unworn(_run.party[for_idx]).has(nm), "§1c: the rune bought is not held by its hero — gold spent, nothing received")
 	var mp := await _to_map()
-	ok(Gate.has_text(mp, "Rune bag  %d/%d" % [_run.rune_bag.size(), int(_run.BAG_CAP)]),
-		"§1c: the map's bag row does not count the rune bought")
+	var marker: Button = null
+	var mb: Array = []
+	Gate.buttons(mp, mb, false)
+	for b in mb:
+		for c in (b as Button).pressed.get_connections():
+			var cb: Callable = c["callable"]
+			if (b as Button).has_meta("held_marker") and cb.get_method() == "_open_rune_panel" \
+					and cb.get_bound_arguments() == [for_idx]:
+				marker = b
+	ok(marker != null and String(marker.text) == "✦ %d" % _run.held_count(_run.party[for_idx]),
+		"§1c: the hero's nameplate does not count the rune bought")
 	mp.call("_open_rune_panel", for_idx)
 	await process_frame
 	var ov: Node = Gate.overlay(current_scene, 60)
@@ -469,14 +494,15 @@ func _s1c_the_purchase() -> void:
 	var rows: Array = _run.rune_rows(m)
 	var row := -1
 	for ri in rows.size():
-		if String(rows[ri]["src"]) == "bag" and String((rows[ri]["rune"] as Dictionary).get("name", "")) == nm:
+		if not bool(rows[ri]["worn"]) and String((rows[ri]["rune"] as Dictionary).get("name", "")) == nm:
 			row = ri
 	var eq: Button = Gate.bound_button(ov, "_toggle_rune", [for_idx, row, ov]) if ov != null else null
 	ok(eq != null and String(eq.text) == "Equip", "§1c: the hero's panel drew no Equip for the rune bought")
 	if eq != null:
 		eq.emit_signal("pressed")
 		await Gate.frames(self, 3)
-	ok(_names(m.get("runes", [])).has(nm) and not _names(_run.rune_bag).has(nm),
+	ok(_names(m.get("runes", []).filter(func(r): return bool((r as Dictionary).get("equipped", false)))).has(nm)
+			and not _hr_unworn(m).has(nm),
 		"§1c: Equip did not put the rune bought on the hero")
 
 
@@ -891,8 +917,16 @@ func _s2_core_runes() -> void:
 	var got := String(((_run.party[1] as Dictionary)["engines"] as Array)[0]["name"])
 	ok(old_rune["name"] != today and got == today,
 		"§2e: a saved core rune named '%s' loaded as '%s', not today's '%s'" % [old_rune["name"], got, today])
-	ok(String((_run.rune_bag[0] as Dictionary)["name"]) == "Rune of Might",
-		"§2e: a rune the data does not hold was renamed")
+	# BATCH HR §1 — WHEREVER IT LANDS: a v15 load hands a rune with no class to the first
+	# hero who can wear it, so the arm looks in the bag and on every hero's lists.
+	var tpl_name := ""
+	var places: Array = _run.rune_bag.duplicate()
+	for m in _run.party:
+		places.append_array((m as Dictionary).get("runes", []) + (m as Dictionary).get("engines", []))
+	for r in places:
+		if String((r as Dictionary).get("id", "")) == "tpl:Might":
+			tpl_name = String((r as Dictionary)["name"])
+	ok(tpl_name == "Rune of Might", "§2e: a rune the data does not hold was renamed ('%s')" % tpl_name)
 
 
 # ── §3 — THE FOUR MAGNITUDES ────────────────────────────────────────────────
@@ -1049,34 +1083,38 @@ func _s5_the_ceiling() -> void:
 	var path := String(_run.save_path)
 	var had := _bytes(path)
 	var had_file := FileAccess.file_exists(path)
-	ok(int(_run.SAVE_VERSION) == 14 and int(_run.MIN_SAVE_VERSION) == 10,
+	# BATCH HR §1 — THE INVARIANT, NEVER THE NEWEST NUMBER (BK §6's rule): it pinned 14,
+	# and HR's v15 is the first bump the ceiling guards. "14 or later", with the floor at
+	# ten pinned as the real invariant it is; the newer save below is SAVE_VERSION + 1.
+	var newer := int(_run.SAVE_VERSION) + 1
+	ok(int(_run.SAVE_VERSION) >= 14 and int(_run.MIN_SAVE_VERSION) == 10,
 		"§5: this build writes v%d and reads from v%d" % [int(_run.SAVE_VERSION), int(_run.MIN_SAVE_VERSION)])
 	var src := Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/run_state.gd"))
 	ok(src.contains("\"version\": SAVE_VERSION") and src.contains("if save_version < 10:"),
 		"§5: the save does not write SAVE_VERSION, or the floor at ten moved")
-	# (a) A v15-SHAPED SAVE: this build's own save, stamped a version on and given a
-	# key this build does not know.
+	# (a) A NEWER BUILD'S SAVE (SAVE_VERSION + 1): this build's own save, stamped a version
+	# on and given a key this build does not know.
 	_new_run()
 	_run.save_run()
 	var f := FileAccess.open(path, FileAccess.READ)
 	var d: Dictionary = f.get_var(true)
 	f.close()
-	d["version"] = 15
+	d["version"] = newer
 	d["hl_a_key_from_the_future"] = [1, 2, 3]
 	var fw := FileAccess.open(path, FileAccess.WRITE)
 	fw.store_var(d, true)
 	fw.close()
-	var v15 := _bytes(path)
-	ok(not _run.load_run() and bool(_run.save_refused) and int(_run.save_refused_version) == 15,
-		"§5a: this build loaded a v15 save, or did not say it refused it")
-	ok(_bytes(path) == v15, "§5a: refusing the v15 save changed the file")
+	var newer_bytes := _bytes(path)
+	ok(not _run.load_run() and bool(_run.save_refused) and int(_run.save_refused_version) == newer,
+		"§5a: this build loaded a v%d save, or did not say it refused it" % newer)
+	ok(_bytes(path) == newer_bytes, "§5a: refusing the newer save changed the file")
 	_run.active = true
 	_run.save_run()
-	ok(_bytes(path) == v15, "§5a: save_run wrote over the v15 save")
+	ok(_bytes(path) == newer_bytes, "§5a: save_run wrote over the newer save")
 	_run.clear_save()
-	ok(FileAccess.file_exists(path) and _bytes(path) == v15, "§5a: clear_save deleted the v15 save")
+	ok(FileAccess.file_exists(path) and _bytes(path) == newer_bytes, "§5a: clear_save deleted the newer save")
 	_run.new_run(SEATS, [], "standard")
-	ok(FileAccess.file_exists(path) and _bytes(path) == v15, "§5a: a New Game deleted the v15 save")
+	ok(FileAccess.file_exists(path) and _bytes(path) == newer_bytes, "§5a: a New Game deleted the newer save")
 	# The main menu: Continue dark, and the banner says what and why.
 	change_scene_to_file("res://scenes/main_menu.tscn")
 	await Gate.frames(self, 6)
@@ -1087,21 +1125,21 @@ func _s5_the_ceiling() -> void:
 		if String((b as Button).text) == "Continue":
 			cont = b
 	ok(cont != null and cont.disabled, "§5a: the main menu's Continue is live over a refused save")
-	ok(Gate.has_text(current_scene, "NEWER build than this one (version 15)")
+	ok(Gate.has_text(current_scene, "NEWER build than this one (version %d)" % newer)
 			and Gate.has_text(current_scene, "NOTHING HAS BEEN CHANGED OR DELETED"),
 		"§5a: the main menu does not say the save was refused and kept")
-	ok(_bytes(path) == v15, "§5a: the file is not byte-identical after all of it")
-	# (b) THE POSITIVE ARM: a v14 save loads, saves and clears.
+	ok(_bytes(path) == newer_bytes, "§5a: the file is not byte-identical after all of it")
+	# (b) THE POSITIVE ARM: this build's own save loads, saves and clears.
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	_new_run()
 	_run.save_run()
-	ok(_run.load_run() and not bool(_run.save_refused), "§5b: a v14 save was refused")
+	ok(_run.load_run() and not bool(_run.save_refused), "§5b: this build's own save was refused")
 	_run.gold += 7
 	var before14 := _bytes(path)
 	_run.save_run()
-	ok(_bytes(path) != before14, "§5b: a v14 save was not written over")
+	ok(_bytes(path) != before14, "§5b: this build's own save was not written over")
 	_run.clear_save()
-	ok(not FileAccess.file_exists(path), "§5b: a v14 save was not cleared")
+	ok(not FileAccess.file_exists(path), "§5b: this build's own save was not cleared")
 	# (c) THE FLOOR DID NOT MOVE: a v9 save is refused AND cleared.
 	_new_run()
 	_run.save_run()
