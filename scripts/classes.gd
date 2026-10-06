@@ -4437,7 +4437,9 @@ static func draft_ability(display_name: String) -> Ability:
 		# AXIS: THE MULTIPLIER ON GETTING FIRE, not on moving it — and it is the
 		# thing the pool most obviously lacks, because everything else in it is
 		# downstream of already having a bank.
-		# SYNERGY: FLAMEWAVE lays 4 turns on everyone instead of 2. FIRESTORM's
+		# SYNERGY: FLAMEWAVE doubles on every enemy not yet burning (one already
+		# burning is lengthened through `update_status`, which the window never
+		# doubles — HT §3: this line said "on everyone"). FIRESTORM's
 		# 6-8 bolts each land 4 instead of 2 — 24 to 32 burn-turns from ONE cast.
 		# Then SLOW BURN freezes the tick-down and Detonation pays 250% of it. It
 		# also doubles CINDER TRAIL (Fireball 4 -> 8) and CONFLAGRATION.
@@ -6620,7 +6622,7 @@ const SPEC_INFO := {
 	"cryomancer": {"name": "Cryomancer", "constitution": 85, "archetype": "Control", "passive": "permafrost",
 		"max_hp": 135, "armor": 0.08,
 		"resists": {"frost": 0.30, "fire": -0.20},
-		"passive_desc": "Glacial Hold: Chilled stacks the Cryomancer applies\nnever expire, and a Frozen enemy stays Frozen\nINDEFINITELY — it leaves the turn order until Ice Lance\nor Shatter releases it, or a new freeze passes the limit\nof ONE held enemy (which frees the oldest). Nothing else\nthaws it: not ally damage, not Blizzard, not time. A held\nenemy takes +15% damage from all sources and comes back\non 1 stack of Chilled. Bosses resist the freeze until\nBroken and shrug a hold after one turn.",
+		"passive_desc": "Glacial Hold: Chilled stacks the Cryomancer applies\nnever expire, and a Frozen enemy stays Frozen\nINDEFINITELY — it leaves the turn order until Ice Lance\nor Shatter releases it, or a new freeze passes the limit\nof ONE held enemy (which frees the oldest). Nothing else\nthaws it: not ally damage, not Blizzard, not time. A held\nenemy takes +15% damage from every hero's strike and\ncomes back on 1 stack of Chilled. Bosses resist the\nfreeze until Broken and shrug a hold after one turn.",
 		"blurb": "Battlefield control — you decide when the enemy acts."},
 	# The Arcanist's health bar is a resource he spends (like the Devout's):
 	# Resonance bills him a COMPOUNDING damage-taken penalty and Cannon recoils

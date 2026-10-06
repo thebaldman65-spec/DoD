@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-10-05 (Batch HS &mdash; conjunctions: the mechanism, and one of them)</b></p>
+<p align="right"><b>Last updated: 2026-10-06 (Batch HT &mdash; two rulings, and the census that opens the rest of the ladder)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -800,12 +800,13 @@ Cryomancer's Rime on cast.</td></tr>
 <tr><td>Slowed</td><td>−25% speed (generic; e.g. Shrapnel Charge).</td></tr>
 <tr><td>Burn</td><td>6% of the applier's Attack at the start of each turn
 (snapshotted). Reapplication extends duration — new turns ADD to the timer.</td></tr>
-<tr><td>Rupture</td><td><b>Burn and Chilled, joined</b> (a conjunction, tier 2; chip <b>Ru</b>):
+<tr><td>Rupture</td><td><b>Burn and Chilled, joined</b> (a second-degree conjunction; chip <b>Ru</b>):
 it forms the moment either lands on a body carrying the other, in either order, and the two
 chips become one. It ticks when the Burn would, for the Burn's own damage, and deals
 <b>Break damage</b> with that same tick (the chip names the figure) unless the body is already
 Broken; it still slows as its Chilled does. It lasts as long as the SHORTER of the two would have, and the other then stands
-alone with what it had left. A cleanse lifts it whole.</td></tr>
+alone with what it had left. A cleanse lifts it whole &mdash; but an enemy mender's Cleansing Rite only thaws its chill a
+stack at a time, as it thaws any chill, and when that chill's last stack goes the Burn stands alone.</td></tr>
 <tr><td>Poison</td><td>3% of the applier's Attack in nature damage per stack each turn
 (nature resists apply); stacks
 additively, new stacks refresh the timer. Never ticks on the turn it lands.</td></tr>
@@ -976,25 +977,28 @@ its timer (4 turns, on the Survivalist).</td></tr>
 whole battle.</p>
 <p><b>CONJUNCTIONS &mdash; two afflictions meeting on one body make a third.</b> A pair the game
 knows becomes ONE status with one chip, which says what it is made of: a status built from two
-is <b>tier 2</b>, from three <b>tier 3</b>, each stronger than the last. <b>One is in the game:
+is <b>second-degree</b>, from three <b>third-degree</b>, each stronger than the last &mdash; Rupture is a
+second-degree affliction. <b>One is in the game:
 Rupture</b> (Burn + Chilled, above). Four rules hold for every one:</p>
 <ul>
 <li><b>What it is made of still stands.</b> Every card that asks whether the body is Burning
 or Chilled finds both inside a Rupture, its chill's stacks still count and still slow, and
-every effect that counts how many DIFFERENT afflictions a body carries counts a tier-2 as two
+every effect that counts how many DIFFERENT afflictions a body carries counts a second-degree one as two
 &mdash; the Survivalist's Trapper, Hunt, Cull, Harvest, Salve, Thick Hide, the Iron Will talent
 and the rest &mdash; so joining never costs breadth.</li>
 <li><b>Nothing runs twice.</b> The Burn inside it ticks once, as the Rupture's, and the Break is
 that tick's own half.</li>
 <li><b>Its clock is the shorter ingredient's.</b> When that one runs out, or a card consumes an
 ingredient (Detonation eats the Burn), the other goes back on the bar alone with what it had
-left. A cleanse &mdash; a mender's rite, Dispel One, Unburden, the Cleansing Draught &mdash; takes
-the whole Rupture as one status.</li>
+left. A cleanse &mdash; Dispel One, Unburden, the Cleansing Draught &mdash; takes
+the whole Rupture as one status. <b>An enemy mender's Cleansing Rite does not</b>: it thaws the chill inside one
+stack at a time, as it thaws any chill, so the Rupture stands until that chill's last stack goes and the Burn
+then stands alone.</li>
 <li><b>Casting an ingredient again follows that ingredient's own rule</b>: a second Burn adds its
 turns, a second Chill adds a stack and restarts the chill's clock, and the Rupture lasts as long
 as the shorter of the two now would.</li>
 </ul>
-<p>The combat log says when a conjunction forms (what landed on what, its tier, how long it
+<p>The combat log says when a conjunction forms (what landed on what, its degree, how long it
 lasts and whose clock that is), every tick with its Burn and its Break apart (on a Broken body,
 that no Break landed), every time an ingredient is cast again or a card changes its clock, and how it ended &mdash; the clock, a card
 consuming an ingredient, a cleanse, or the body falling.</p>
@@ -1015,7 +1019,7 @@ heroes' own scaling rate, so a run opens unchanged at 50.</td><td>6</td></tr>
 <b>Unchanged.</b></td><td>6</td></tr>
 <tr><td><b>Defense Potion</b></td><td>Every hero gains Fortify (3 turns). <b>Unchanged.</b></td><td>6</td></tr>
 <tr><td><b>Cleansing Draught</b></td><td>Removes <b>every debuff</b> from one chosen hero — the
-same set a Cleric's Cleansing Rite takes, and no more (meter states like Broken and the Bleed
+same set an enemy mender's Cleansing Rite takes, and no more (meter states like Broken and the Bleed
 buildup stay; sticky poison refuses this cleanse as it refuses every other). Greyed when no one is
 afflicted, and handed back rather than swallowed if used anyway.</td><td><b>4</b></td></tr>
 <tr><td><b>Cursed Visage</b></td><td>Applies <b>Hexed</b> (§4.6) to every living enemy for the
@@ -1883,9 +1887,10 @@ beside. A card that appears in nobody's build plan is a card that fills a slot.<
 <tr><td><b>Slow Burn</b></td><td>15 Mana, 1.5, 4cd, no target</td><td>For 4 turns, the Burn on <b>every enemy stops counting down</b>. It still burns for its full damage each turn — it just never gets shorter. The mark rides enemies not yet alight, so fire laid inside the window is held too.</td><td>Time, bought. Every payoff he owns reads a bank that is shrinking under him, and nothing in his kit could slow it.<br><b>Builds with:</b> <b>Firestorm</b> above all — it is strongest straight after one, which lays 12–16 burn-turns in one cast.</td></tr>
 <tr><td><b>Stoke</b></td><td>20 Mana, 2.0, 3cd, one enemy</td><td>25% of Attack, and if the target is Burning its <b>remaining Burn turns are DOUBLED</b> (Perfect: tripled). Nothing extra against an enemy that is not alight. Overburn reads the field <i>before</i> the doubling, so later casts are what collect on it.</td><td>The bank multiplies instead of growing — worth exactly as much as the stack he built, and nothing on an empty one.<br><b>Builds with:</b> <b>Detonation</b> (250% of the bank), so doubling a deep stack is his largest single swing; and <b>Slow Burn</b> — stall, double, detonate.</td></tr>
 <tr><td><b>Funeral Pyre</b></td><td>25 Mana, 2.5, 4cd, one enemy</td><td>Consumes <b>all</b> Burn on the target and grants a shield worth <b>200% of the damage that Burn would still have dealt</b>, for 3 turns. Overburn refunds every turn consumed. Unusable with nothing alight.</td><td>The only card in his kit that converts fire into survival — the defensive cash-in, where Detonation is the offensive one.<br><b>Builds with:</b> <b>Immolate</b>, a percentage cut where this is the flat term. Overburn's refund pays 1 Mana a turn, so a deep stack cashed here is a shield <i>and</i> a pool.</td></tr>
-<tr><td><b>Firedraw</b></td><td>25 Mana, 2.5, 4cd, one enemy</td><td>Consumes <b>6 turns of Burn from every OTHER enemy</b> and adds all of it to this one. It takes what is there <b>or 4, whichever is less</b> — an enemy holding 2 gives 2, not a debt — and it <b>never touches the target's own Burn</b>. Unusable with nothing alight.</td><td>The bank consolidated. Detonation pays 250% of <i>one</i> enemy's remaining Burn, so a field of shallow fires is worth far less than one deep one — and until now the only way to build a deep stack was to keep casting at the same body.<br><b>Builds with:</b> <b>Detonation</b>, which pays on the deep stack it builds. It is the deliberate counterpart to <b>Cinderfall</b>, which spreads the spend where this concentrates it — and under <b>Emberkeep</b> the fire it delivers arrives doubled.</td></tr>
+<tr><td><b>Firedraw</b></td><td>25 Mana, 2.5, 4cd, one enemy</td><td>Consumes <b>6 turns of Burn from every OTHER enemy</b> and adds all of it to this one. It takes what is there <b>or 6, whichever is less</b> — an enemy holding 2 gives 2, not a debt — and it <b>never touches the target's own Burn</b>. Unusable with nothing alight.</td><td>The bank consolidated. Detonation pays 250% of <i>one</i> enemy's remaining Burn, so a field of shallow fires is worth far less than one deep one — and until now the only way to build a deep stack was to keep casting at the same body.<br><b>Builds with:</b> <b>Detonation</b>, which pays on the deep stack it builds. It is the deliberate counterpart to <b>Cinderfall</b>, which spreads the spend where this concentrates it — and under <b>Emberkeep</b> the fire it delivers arrives doubled.</td></tr>
 <tr><td><b>Pyre Wake</b></td><td>25 Mana, 2.5, 4cd, one enemy</td><td>Consumes <b>ALL</b> its Burn. <b>For each turn consumed</b>, a random enemy is set Burning for 1 turn and takes 8% of Attack (Perfect: 12%). Overburn refunds every turn consumed. Unusable with nothing alight.</td><td>The bank scattered rather than cashed. A twelve-turn stack becomes twelve small fires and 96% of Attack spread across the board — <b>the only card in the game that converts depth into width</b>, and the natural answer when the deep target is about to die anyway.<br><b>Builds with:</b> <b>Slow Burn</b> — scatter, then stop the tick-down. Overburn's refund pays 1 Mana a turn.</td></tr>
-<tr><td><b>Emberkeep</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For 4 turns, <b>every Burn he applies lands at DOUBLE duration</b>. It doubles at <b>application</b> and is not retroactive — <b>fire already on the board is untouched</b>.</td><td>The multiplier on <i>getting</i> fire rather than on moving it. Everything else in his pool is downstream of already having a bank; this is the only card that changes how much arrives.<br><b>Builds with:</b> <b>Flamewave</b> lays 4 turns on everyone instead of 2, and <b>Firestorm</b>'s 6–8 bolts each land 4 instead of 2 — <b>24 to 32 burn-turns from one cast</b>. Then <b>Slow Burn</b> freezes the tick-down and Detonation pays 250% of it. Fire already burning is <b>Stoke</b>'s job, not this one.</td></tr>
+<tr><td><b>Emberkeep</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For 4 turns, <b>every Burn any hero applies lands at DOUBLE duration</b>. It doubles at <b>application</b> and is not retroactive — <b>fire already on the board is untouched</b>.</td><td>The multiplier on <i>getting</i> fire rather than on moving it. Everything else in his pool is downstream of already having a bank; this is the only card that changes how much arrives.<br><b>Builds with:</b> <b>Flamewave</b> lays 4 turns instead of 2 on every enemy not yet alight (one already burning
+is lengthened by 2, which the window does not double), and <b>Firestorm</b>'s 6–8 bolts each land 4 instead of 2 — <b>24 to 32 burn-turns from one cast</b>. Then <b>Slow Burn</b> freezes the tick-down and Detonation pays 250% of it. Fire already burning is <b>Stoke</b>'s job, not this one.</td></tr>
 <tr><td colspan="4"><b>Cryomancer</b> — <i>what do you do with the time you bought</i></td></tr>
 <tr><td><b>Winter's Toll</b></td><td>25 Mana, 2.5, 4cd</td><td>The held enemy takes 8% of Attack per turn it has been held (Perfect: 12%). <b>The hold continues.</b> Unusable while he holds nothing.</td><td>Cashing in without releasing.</td></tr>
 <tr><td><b>Rimebinding</b></td><td>20 Mana, 2.0, 3cd, one enemy</td><td>Applies Chilled equal to the stacks on the held enemy, plus one.</td><td>The hold as a template — one deep prison becomes the next one.</td></tr>
@@ -2194,7 +2199,7 @@ Passive <i>Overburn</i>, TWO clauses and one mechanic. <b>Bonus:</b> +2% damage 
 TURN of Burn standing on the enemy team, capped at +40% — one enemy burning for six turns
 feeds him exactly as hard as six burning for one. <b>Refund:</b> every turn of Burn he
 CONSUMES returns 1 Mana, and the refund belongs to the PASSIVE rather than to any one
-ability, so Detonation, Wildfire, Cinderfall and Ember Debt all pay it. <b>Holding fire
+ability, so Detonation, Wildfire, Cinderfall, Ember Debt, Funeral Pyre and Pyre Wake all pay it. <b>Holding fire
 costs him nothing.</b><br>
 What makes him a commitment spec is that his damage is <b>DEFERRED</b>, and that is the
 spine rather than any price: Burn ticks are small, Detonation pays 250% of the bank it
@@ -2241,7 +2246,8 @@ stacks applied by the Cryomancer never expire. <b>The hold</b> — a Frozen enem
 Cryomancer chooses, by Ice Lance, by Shatter, or by freezing past his hold limit (which
 releases the oldest). <b>Nothing else thaws it: not ally damage, not his own AoE, not
 time.</b> He holds <b>one</b> enemy, and a released enemy comes back at 1 stack of Chilled so the engine stays warm.
-<b>The window</b> — a held enemy takes <b>+15% damage from all sources</b>, so the hold is
+<b>The window</b> — a held enemy takes <b>+15% damage from every hero's strike</b> (a companion's
+blow, a tick and a trap never see it), so the hold is
 simultaneously denial and a damage window for every hero he opens and closes. <b>Bosses</b>
 resist Frozen until Broken, and a held boss releases on its own after one turn. The spine
 carries no cost clause: his cost is tempo — every turn spent building stacks is a turn not
@@ -2264,7 +2270,7 @@ target gains also chills one other random enemy. Glacial Prison — 25
 Mana, 2.5, 4cd: Freeze the target outright, whatever its stacks. Cryoclasm — 20 Mana, 2.0,
 3cd: move the hold and its remaining stacks onto a different enemy, without spending it.
 Shatter — 30 Mana, 4.0, 5cd: release EVERY hold at once, each held enemy taking
-10% of Attack per stack of Chilled it was carrying; only castable while he holds something
+10% of Attack for every turn it was held (at most twelve); only castable while he holds something
 (Perfect: cooldown becomes 4).<br>
 <b>Talents:</b> the one tree, bought with the Mage's points — see §7.</li>
 <li><b>Arcanist (Ramp)</b> — <b>Stat block:</b> 155 HP / 6% armor / +20% arcane &amp;
@@ -3275,8 +3281,8 @@ shadow 50%; soft to holy AND nature.</td></tr>
 Slash (fire); Flame Lick (60% Burn 2t). Fire resist 50%; soft to frost.</td></tr>
 <tr><td>Orc Ritual Chanter (pale gold)</td><td>2</td><td>mender</td><td>1·2·3</td><td>105</td>
 <td>Fast (speed 105) ranged support: Warding Chant; Cleansing Rite — strips the
-longest-lasting debuff from EACH ally (Chilled thaws one stack at a time, never the pile;
-sticky poisons and meters hold). Holy resist 25%; soft to shadow AND physical — kill it
+longest-lasting debuff from EACH ally (Chilled thaws one stack at a time, never the pile, inside a Rupture as
+anywhere; sticky poisons and meters hold). Holy resist 25%; soft to shadow AND physical — kill it
 first, or play around it.</td></tr>
 <tr><td>Orc Bloodcaller (crimson)</td><td>2</td><td>hexer</td><td>1·2·3</td><td>125</td>
 <td>Ragged Cut; Blood Tribute (shadow) — +25% damage and Break damage per ally fallen this
@@ -3805,9 +3811,9 @@ template (plus his missing Hurt / Death / second-attack clips); animate the Pyro
 Berserker, real companion art for the placeholder companion spheres, and — the big lever for
 scenery scale — battle backgrounds authored at the template density. Own art is battle-only
 so far; draft/spec screens still show the Soldier.</li>
-<li><b>Design hooks awaiting assignment:</b> Weaknesses (who is weak to which damage type —
-only the Tyrant's frost weakness is set) and Counter Attack (defined term; no talent or
-ability grants it yet).</li>
+<li><b>Design hook awaiting assignment:</b> Counter Attack (defined term; no talent or
+ability grants it yet). Weaknesses are assigned: every enemy kind but the Orc Raider is soft to at
+least one damage type (the roster in §9).</li>
 <li>The Withered Warden has its own kit; the Ash-Wrought Tyrant is still a Chief stand-in —
 unique kit + art planned. Boss art for both pending.</li>
 <li>Boss tri-choice class modifiers deferred until 3+ zones exist.</li>

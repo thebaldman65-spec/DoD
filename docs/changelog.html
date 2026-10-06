@@ -16,6 +16,69 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-06 &mdash; Batch HT: TWO RULINGS, AND THE CENSUS THAT OPENS THE REST OF THE LADDER</h2>
+<p><b>An enemy mender's Cleansing Rite no longer wipes out a Rupture: it thaws the chill inside one stack at a time, as it
+thaws any chill. On screen a conjunction's weight is its DEGREE &mdash; Rupture is a second-degree affliction. And a census of
+every status a hero can lay on an enemy answers the question the next conjunctions wait on.</b> Full working:
+<code>docs/reports/HT.md</code>.</p>
+
+<p><b>&sect;1 &mdash; HS'S SIX RULINGS.</b> <b>Rupture's Break stays at 10 a tick</b>, the designer's to move from play, and the
+watch condition sits beside the number: a Rupture lives one to three ticks, so it pays 10&ndash;30 Break against a meter of
+100 &mdash; about one strike's worth for two heroes' turns. The sim's total is not a guide: the bot makes Ruptures by
+accident and most die with the body. <b>Each ingredient keeps its own clock</b>, confirmed &mdash; one shared clock would have
+let a Glacial Hold's never-ending chill make a Rupture never end. <b>The longer ingredient survives the shorter</b>, and <b>it
+works on heroes too</b>, both confirmed as built. <b>The rite</b>: the Ritual Chanter's Cleansing Rite takes one stack off a
+chill and never the whole pile &mdash; and now that holds for the chill inside a Rupture too, so the Rupture stands; at the
+chill's last stack the chill goes, as it would on its own, and the Burn stands alone. Letting the rite strip a Rupture whole
+would have let one enemy ability delete the best play in the game. A cleanse the heroes cast still takes a Rupture whole.
+<b>The word</b>: the chip, the combat log, the glossary and the Master Document say <i>second degree</i> where they said
+<i>tier 2</i> &mdash; the player already reads <i>tier</i> for the talent tree and the zones, and burns have degrees. Nothing in
+the code was renamed.</p>
+
+<p><b>&sect;2 &mdash; THE CENSUS.</b> Every status a hero can put on an enemy &mdash; <b>forty-four</b> today, Burn, Chilled and
+Frozen three of them &mdash; with who lays each, class by class and which need a core rune, what reads it, what a second cast
+does, how long it lasts and what it does. <b>The Warrior has a seat at the table</b>: his own three starting cards lay Sunder, a
+Stun and a Taunt, and his draft adds Bleed and a Daze. <b>Broken is different</b>: it is the Break meter's state with a chip that
+shows it, not something anyone casts, so no conjunction can see it as the game stands &mdash; and <b>Bleed is a meter the same
+way</b>, so three of the four designed conjunctions have a half the game cannot yet join. The census lists what it would take
+for a meter to be half of one, and proposes nothing. Along the way it found things the game does not do as written, each reported
+for the designer and none changed: <b>a Hunter's Downwind copies a Cryomancer's frozen prison onto a second enemy as a freeze
+that never ends, and copies a perfect Pommel Strike's stun onto a boss that should resist it</b>; Mark of the Hunt's cooldown
+never resets; Counter Time and Snare Line's chilled stun cost one turn, not two; Charge's Daze ends before it does anything;
+and Thin Blood's poison still hurts.</p>
+
+<p><b>&sect;3 &mdash; TWO NAMES, AND THE MASTER DOCUMENT'S FIRE AND ICE.</b> Two of the four designed conjunctions take new names
+in the record: <b>Contagion</b> (Poison and Bleed) for <i>Blight</i>, which is already a live status, and <b>Marrowfire</b>
+(Broken and Burn) for <i>Breach</i>, which sat too close to the Break words. Neither is built. Swept against every name in the
+game, Marrowfire sits near four (<i>Fire</i>, <i>Chain Fire</i>, <i>Arrow Shot</i>, <i>Poison Arrow</i>), and Contagion is the
+very word of a standing rule that reserves disease and spreading for a future spec &mdash; both reported for the designer.
+<b>The Master Document's seven fire-and-ice sentences are corrected toward the game</b>: Shatter pays for every turn a prison
+was held, not for its stacks; the hold's +15% comes from a hero's strike, not from every source; Firedraw takes six turns of
+Burn, not four; Emberkeep doubles any hero's Burn; under Emberkeep, Flamewave lays four turns only on an enemy not already
+burning; every enemy kind but the Orc Raider has a weakness; and six cards pay Overburn's Mana refund, not four. Two of
+those sentences stood elsewhere too &mdash; the glossary's Overburn entry and the Glacial Hold rule a player reads when choosing
+a core rune &mdash; and both now say it right.</p>
+
+<p><b>&sect;4 &mdash; DELIBERATELY NOT DONE.</b> No second conjunction, no tier-three rule, no draft label. No meter state is made
+a conjunction's half. The Skirmisher and the Tracker, Channel's tempo payout, whether a fallen hero stays down between fights,
+and Tithe's read site all stay as they were. No rune is authored, the crest is one slot, and the rules file is not split.</p>
+
+<p><b>The checks that moved, and why.</b> Every existing check was first run as it stood against this batch's game, with the
+documents as HS left them &mdash; 133 targets, in 74 minutes &mdash; and one read red besides the two that are red on purpose:
+<b>HS's conjunction check, at the two lines that read the old word</b> &mdash; the chip's <i>tier 2</i> and the forming line's
+&mdash; which is this batch's ruling arriving, and both read <i>second degree</i> now. The two checks that HS found reading the dice
+read green: nothing here moved what they are dealt, so neither was touched. That first run held the documents as they were, so
+every check that reads the Master Document, the rules file or the design notes was run again on the finished tree &mdash; 46 of
+them &mdash; and every one read its count. <b>Two checks were edited</b>, each with its reason at the place, and <b>one is
+new</b>: <code>check_ht</code> drives the rite both ways &mdash; a bare chill and a Rupture's, a stack at a time, the Burn standing
+alone at the last &mdash; with the cleanses that still take a Rupture whole beside it; holds every surface to <i>degree</i> and every
+line of the conjunction machinery away from <i>tier</i>; holds the seven corrected sentences to the code facts they state; and
+drives the census's two structural facts. <b>Forty-four controls</b>, one defect each, were read by what each printed, and every
+one went red on the line it aimed at &mdash; and the two rounds before them found the new check's own faults first: arms that
+joined two claims under one message, a negative that asked for a phrase the game never prints, and a Flamewave needle that a
+second copy of the phrase, in Slow Burn's row, kept green. Each arm asks one thing now. One row of the count table moves, two
+more carry a note, and one is new. <b>The full rehearsal run</b>, in a copy proved equal to the tree, read every one of the 134 checks at the count written down for it before it started, in 74 minutes, and the count differ found nothing to report.</p>
+
 <h2>2026-10-05 &mdash; Batch HS: CONJUNCTIONS: THE MECHANISM, AND ONE OF THEM</h2>
 <p><b>Two afflictions meeting on one body now make a third. The first is RUPTURE: a Chill landing on a burning enemy, or a
 Burn on a chilled one, joins the two into one status that still burns, still slows, and deals Break damage with every Burn

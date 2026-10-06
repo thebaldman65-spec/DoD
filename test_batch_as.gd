@@ -832,8 +832,10 @@ func _live_no_accidental_thaw() -> void:
 # Clause 3 — THE WINDOW.
 func _live_window() -> void:
 	var scene := await _spawn({}, ["raider", "raider"])
+	# BATCH HT §3 — the message said "from all sources"; the window is read in the hero
+	# strike loop alone (the glossary's words), and the multiplier this asserts did not move.
 	ok(abs(float(scene.call("_hold_window_mult")) - 1.15) < 0.001,
-		"CLAUSE 3: a held enemy takes +15% damage from all sources")
+		"CLAUSE 3: a held enemy takes +15% damage from a hero's strike")
 	scene.queue_free()
 	await process_frame
 	var kf := await _spawn({"cr_freezing": 1}, ["raider", "raider"])

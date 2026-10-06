@@ -20,7 +20,7 @@
 #       Burn tick, one slow. The CLOCK is the shorter ingredient's, and the longer
 #       stands alone when it ends. A CLEANSE takes it whole; a CONSUMER eating one
 #       ingredient leaves the other. A RE-APPLIED ingredient runs its own rule.
-#   §3  Rupture: its one figure pinned HERE and nowhere else (PROPOSED, the
+#   §3  Rupture: its one figure pinned HERE and nowhere else (CONFIRMED at HT §1.1, the
 #       designer's to tune), its chip not `BD`, its Break riding the Burn tick, and
 #       the glossary's two entries carrying no copy of the figure.
 #   §5  The log is the instrument: one ruptured body's whole conjunction log, read
@@ -49,10 +49,10 @@ const BOARDS := 80
 const OFFER_ROLLS := 300
 const STRIKE_SEED := 4401
 const FRAME_CAP := 30000
-# THE ONE PIN ON RUPTURE'S FIGURE (HS §3): PROPOSED, and the designer tunes it from
+# THE ONE PIN ON RUPTURE'S FIGURE (HS §3; CONFIRMED at HT §1.1): the designer tunes it from
 # play. Every other arm in this gate reads `battle.RUPTURE_BREAK_PER_TICK`, and no
 # other gate pins it — a tuning pass moves the constant and this line.
-const RUPTURE_BREAK_PROPOSED := 10
+const RUPTURE_BREAK_CONFIRMED := 10
 
 var _g := Gate.new()
 var _run: Node = null
@@ -737,9 +737,9 @@ func _s3_rupture() -> void:
 	var scene: Node = await _board()
 	var fig := int(scene.RUPTURE_BREAK_PER_TICK)
 	print("    Rupture's Break a tick: %d" % fig)
-	# THE PIN. PROPOSED, flagged and not tuned — the designer's from play.
-	ok(fig == RUPTURE_BREAK_PROPOSED,
-		"§3a: Rupture's Break a tick is %d — PROPOSED at HS §3 as %d; a tuning pass moves this pin and the constant, nothing else" % [fig, RUPTURE_BREAK_PROPOSED])
+	# THE PIN. Proposed at HS §3 and CONFIRMED at HT §1.1 — the designer's from play.
+	ok(fig == RUPTURE_BREAK_CONFIRMED,
+		"§3a: Rupture's Break a tick is %d — CONFIRMED at HT §1.1 as %d; a tuning pass moves this pin and the constant, nothing else" % [fig, RUPTURE_BREAK_CONFIRMED])
 	ok(int((scene.TICK_BREAK as Dictionary).get("rupture", 0)) == fig,
 		"§3a: the tick's table does not read the one constant")
 	var pyro := _hero(scene, "Pyromancer")
@@ -750,8 +750,10 @@ func _s3_rupture() -> void:
 	_chill(scene, a, sv, 3)
 	var desc := String(a.get_status("rupture").get("desc", ""))
 	print("    the chip's words:\n      %s" % desc.replace("\n", "\n      "))
-	ok(desc.contains("Each Burn tick also deals %d Break damage." % fig) and desc.contains("tier 2"),
-		"§3b: the chip does not carry the figure computed off the constant, or its tier")
+	# BATCH HT §1.6 — ON SCREEN A TIER IS A DEGREE (ruled): this needle read `tier 2` until HT;
+	# the chip says the ordinal now, and `check_ht` §2 sweeps every surface for the old word.
+	ok(desc.contains("Each Burn tick also deals %d Break damage." % fig) and desc.contains("(second degree)"),
+		"§3b: the chip does not carry the figure computed off the constant, or its degree")
 	var longest := 0
 	for ln in desc.split("\n"):
 		longest = maxi(longest, String(ln).length())
@@ -836,8 +838,9 @@ func _s5_the_log() -> void:
 		"§5: the Rupture ticked %d times for its Burn and %d for its Break — want its three turns, each with both" % [burns, breaks])
 	ok(ends >= 0 and String(lines[ends]).contains("the clock: its Chilled ran out; Burn stands alone (1 turn)"),
 		"§5: the end did not say the clock ran its Chilled out and the Burn stands on (%s)" % (String(lines[ends]) if ends >= 0 else "none"))
-	ok(lines.size() >= 1 and String(lines[forms if forms >= 0 else 0]).contains("lands on its Burn — tier 2, 2 turns (the Burn's, the shorter)"),
-		"§5: the forming line does not say what landed on what, its tier, its clock and whose clock it took")
+	# BATCH HT §1.6 — the forming line says the DEGREE (ruled); it read `tier 2` until HT.
+	ok(lines.size() >= 1 and String(lines[forms if forms >= 0 else 0]).contains("lands on its Burn — second degree, 2 turns (the Burn's, the shorter)"),
+		"§5: the forming line does not say what landed on what, its degree, its clock and whose clock it took")
 	scene.queue_free()
 	await process_frame
 

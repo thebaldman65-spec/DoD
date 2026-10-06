@@ -109,8 +109,10 @@ const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",
 	"blight",
 	# BATCH HS §2 — `rupture` IS A CONJUNCTION (Burn + Chilled) AND AN AFFLICTION,
 	# so it is listed, for the usual two consequences and one more: a cleanse —
-	# a mender's rite, Dispel One, a purge — can take it, WHOLE, as the one status
-	# it is; it is kept OUT of the derived `_dispellable_buffs`, so a Mage's Dispel
+	# Dispel One, a purge — can take it, WHOLE, as the one status it is (a mender's
+	# rite is listed too, and since HT §1.4 it thaws the chill inside a stack at a
+	# time rather than lifting it: it reads `chilled`); it is kept OUT of the derived
+	# `_dispellable_buffs`, so a Mage's Dispel
 	# never strips the party's work off the enemy wearing it; and a BREADTH reader
 	# must not count it, which is why every one reads `base_statuses()` — the
 	# Burn and the Chilled inside it are what count, two, and the composition none.
@@ -2986,7 +2988,9 @@ func refresh_bars() -> void:
 #   — Detonation, Firedraw, Wildfire), dissolves it: what is left goes back on the
 #   bar as it was, its own turns and stacks. Composing is ADDITIVE: a body never
 #   carries less affliction for having composed. A CLEANSE takes it WHOLE — it is
-#   one status (`dispel_one_debuff`, `purge_debuffs_taken`, a rite's pick).
+#   one status (`dispel_one_debuff`, `purge_debuffs_taken`) — all but an enemy
+#   mender's rite, which reads `chilled` and so thaws the chill INSIDE one a stack at
+#   a time, as it thaws a bare chill (HT §1.4, ruled: HS §2d applied, not a carve-out).
 # · **TIER IS WEIGHT.** A composition's tier is the number of ingredients in it
 #   (`tier_of`), and every reader that counts DISTINCT afflictions counts the
 #   ingredients (`base_statuses`), so a Rupture is two to the Trapper exactly as an
@@ -3060,6 +3064,18 @@ static func tier_of(entry: Dictionary) -> int:
 	return bases_of(entry).size()
 
 
+# BATCH HT §1.6 — ON SCREEN A CONJUNCTION'S TIER IS ITS DEGREE (ruled by the designer):
+# *Rupture is a second-degree affliction.* The player already reads *tier* twice — the
+# talent tree's (Tier Costs, Tier Gates) and the zones' (Zones & Tiers) — and a third
+# meaning is one too many; and *degree* is better than a neutral word, because burns
+# have degrees. **`tier_of` and every identifier keep their names** (HL §2's split:
+# the words a player reads move, the code does not). This is the ordinal the text says
+# a tier in — the chip's *(second degree)*, the log's *second degree*.
+static func tier_ordinal(tier: int) -> String:
+	var words := ["first", "second", "third"]
+	return String(words[tier - 1]) if tier >= 1 and tier <= words.size() else "%dth" % tier
+
+
 # The composition's clock: the SHORTER of its ingredients', a negative count
 # (permanence) reading as endless; -1 only when every ingredient is permanent.
 static func composition_turns(entry: Dictionary) -> int:
@@ -3116,8 +3132,8 @@ static func _resync_composition(entry: Dictionary) -> void:
 		var stack_tag := " x%d" % int(b.get("stacks", 1)) \
 			if int(b.get("stacks", 1)) > 1 else ""
 		lines.append("%s%s: %s" % [String(b.label), stack_tag, span])
-	var head := "%s, joined (tier %d)." % [" + ".join(
-		bases_of(entry).map(func(b): return String(b.label))), tier_of(entry)]
+	var head := "%s, joined (%s degree)." % [" + ".join(
+		bases_of(entry).map(func(b): return String(b.label))), tier_ordinal(tier_of(entry))]
 	var out: Array = [head]
 	var rider := String(entry.get("rider", ""))
 	if rider != "":
@@ -3177,7 +3193,8 @@ func _dissolve(comp: Dictionary, gone_ids: Array, why: String) -> Dictionary:
 		tail = "; %s stands alone (%s)" % [String(survivor.label),
 			"battle-long" if st < 0 else "%d turn%s" % [st, "" if st == 1 else "s"]]
 	_proc_log("   → %s ends on %s — %s: its %s %s%s" % [String(comp.label), unit_name, why,
-		" and ".join(gone_labels), "ran out" if why == "the clock" else "is consumed", tail])
+		" and ".join(gone_labels), "ran out" if why == "the clock" \
+			else ("is lifted" if why == "a cleanse" else "is consumed"), tail])
 	return survivor
 
 
@@ -3319,10 +3336,15 @@ static func _chilled_desc(stacks: int, permanent := false) -> String:
 # a Chilled lifted, two events, as the two chips would have been. An INGREDIENT
 # removed by its id (a consumer eating the Burn) dissolves the composition and the
 # other ingredient stands alone: one event, the one that left.
-func remove_status(id: String) -> void:
+#
+# BATCH HT §1.4 — `why` NAMES WHAT TOOK THE INGREDIENT, FOR THE LOG'S END LINE ONLY. A
+# consumer is every caller but one: an enemy mender's rite thawing the last stack of a
+# chill inside a Rupture is a cleanse taking one ingredient (`battle`'s rite branch),
+# and the line says so rather than calling the rite a consumer. Nothing else reads it.
+func remove_status(id: String, why := "a consumer") -> void:
 	var comp := composition_of(id)
 	if not comp.is_empty():
-		_dissolve(comp, [id], "a consumer")
+		_dissolve(comp, [id], why)
 		note_status_event(self, id)
 		_refresh_chips()
 		return

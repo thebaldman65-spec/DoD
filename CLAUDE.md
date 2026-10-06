@@ -2216,6 +2216,12 @@ the block left out, spend what they were paid.
 > than the last. The table is the whole vocabulary: a pair not in it does nothing.** Rupture (Burn + Chilled) is the one
 > that ships.
 
+- **ON SCREEN A TIER IS A DEGREE (HT §1.6, ruled by the designer): *Rupture is a second-degree affliction.*** Every surface a
+  player reads says *degree* — the chip, the log, the glossary, `docs/master.html` (`BattleUnit.tier_ordinal`) — and
+  `tier_of` and every identifier keep *tier*: HL §2's split, the words move and the code does not. **Why**: the player
+  already reads *tier* twice, the talent tree's and the zones', and a third meaning is one too many; and *degree* beats a
+  neutral word because burns have degrees. A new surface that names a conjunction's weight says degree (`check_ht` §2).
+
 - **IT IS ADDITIVE, AND THAT IS WHY THE DESIGNER'S FIRST SHAPE, A CANCELLATION, WAS REJECTED.** Consuming both would have
   taken Firedraw's best case, Overburn's burn-turns, one affliction off every breadth reader and Snare Line's chilled
   target — Fellowship's shape at a larger size (HR §4c). **A conjunction never removes what it is made of.**
@@ -2235,14 +2241,27 @@ the block left out, spend what they were paid.
   its own clock and the composition's is derived (`composition_turns`, a permanent one counting as endless), so the
   window to climb closes with the shorter. When that one runs out, or a consumer eats an ingredient, the composition
   dissolves and what is left goes back on the bar as it was. **A CLEANSE TAKES IT WHOLE** — it is one status — and
-  books a Sanctity event per ingredient, as unmerged chips would.
+  books a Sanctity event per ingredient, as unmerged chips would. **Each ingredient keeps its own clock, CONFIRMED (HT
+  §1.2): one composition clock running the ingredient's rule was the brief's own reading and it was the defect** — a
+  Glacial Hold's permanent chill re-applied would have reset a Rupture to permanent, an endless Burn paying endless Break,
+  FC's shape; the build was right, and the difference is not drift. **The survivor stands alone with what it had left,
+  CONFIRMED (HT §1.3).**
+  · **AN ENEMY MENDER'S RITE READS `chilled`, SO IT THAWS THE CHILL INSIDE (HT §1.4, ruled: HS §2d applied, not a
+    carve-out).** Its candidates are a cleanse's, and one that carries a chill is ranked and thawed by its chill through
+    the chill door (`battle._rite_chill`, `set_chilled_stacks`): one stack off and the Rupture stands; at the last stack
+    the chill goes as a bare one's does and the Burn stands alone. **A Rupture is never lifted by it**: taking one whole
+    would overturn Batch V for precisely the targets a player spent two turns assembling — one enemy ability deleting the
+    best play in the game. **A reader that takes a status through a generic cleanse door and then asks for a specific id
+    is the same defect** — it asks through the lookup, or it misses the ingredient (`docs/reports/HT.md` §1b).
 - **A RE-APPLIED INGREDIENT RUNS ITS OWN RULE ON ITS OWN ENTRY (HS §2g; refusing the re-application was priced and not
   taken — it makes a card dead on a target the player just improved).** Burn adds its turns, Chilled adds a stack and
   resets its clock, and the composition's clock follows as the shorter; a card that writes an ingredient's clock
   directly (Flamewave on a burning body, a skim) does the same.
 - **IT IS MADE AT THE STATUS DOOR (`_apply_status` calls `_conjoin`) AND NOWHERE ELSE**, so a status laid around that
   door never meets its partner. **It applies to every body**: a hero carrying an Ashblade's Burn under the Hoarfrost
-  bargain's chill is ruptured too.
+  bargain's chill is ruptured too — **CONFIRMED (HT §1.5): one rule, one body.** It is nearly unreachable today (a Scarlands
+  elite under Hoarfrost with an Ashblade, none in 300 runs), so it costs the player almost nothing now, and the day an
+  enemy is given a chill it is already built.
 - **THE COMBAT LOG IS ITS INSTRUMENT (HS §5)** — the sim cannot price one, so the designer reads it in play: it forms, it
   ticks (the Burn and its own half apart), an ingredient is re-applied or written, and it ends and why (the clock, a
   consumer, a cleanse, the body). **Every name comes off the data** — the composed row in `STATUS_INFO`, each
@@ -2250,14 +2269,18 @@ the block left out, spend what they were paid.
 - **UNPRICED CONTENT SHIPS IN THE SMALLEST UNIT THAT CAN BE FELT (HS §4, the designer's).** The sim cannot price a
   conjunction — the bot casts the Mage's fire before his ice (HR §4f) — so the designer's play is the only instrument,
   and five at once would be five unmeasured figures with no way to tell which one is wrong. **One ships, is played, is
-  tuned, and the next arrive against a figure that has been felt.** Seize, Breach, Blight and Reckoning are designed —
-  **RULED, NOT BUILT** (`docs/state.md`) — and **a census of who lays Cripple, Poison, Bleed, Sunder and Dazed on the
-  enemy side is owed before any is authored**. The draft label naming a card's conjunction ships with the second and
-  third — RULED, NOT BUILT.
+  tuned, and the next arrive against a figure that has been felt.** Seize, Marrowfire, Contagion and Reckoning are
+  designed — **RULED, NOT BUILT** (`docs/state.md`; *Marrowfire* and *Contagion* replaced *Breach* and *Blight* in the
+  record at HT §3, both failing BR §1's sweep). **The applier census is taken (`docs/reports/HT.md` §2)** — every status a
+  hero lays on an enemy, by class, with its readers, its re-application rule, its duration and its `DEBUFF_IDS` row — and
+  **the next conjunction, its halves and its class pair are the designer's, decided on it**. The draft label naming a
+  card's conjunction ships with the second and third — RULED, NOT BUILT.
 - **A TIER 3 MUST DO SOMETHING NO CARD CAN DO** — a Break bar emptied, a resistance inverted, a wind-up cancelled. **If a
   tier 3 is only big damage, the ladder is a damage dial with extra steps.** None is built.
-- **RUPTURE'S ONE FIGURE IS `RUPTURE_BREAK_PER_TICK`, PROPOSED AND THE DESIGNER'S TO TUNE FROM PLAY**, pinned in ONE
-  place (`check_hs` §3a): a tuning pass moves the constant and that pin, never a dozen gates.
+- **RUPTURE'S ONE FIGURE IS `RUPTURE_BREAK_PER_TICK`, CONFIRMED (HT §1.1) AND THE DESIGNER'S TO TUNE FROM PLAY**, pinned in
+  ONE place (`check_hs` §3a): a tuning pass moves the constant and that pin, never a dozen gates. **Its watch condition is
+  written beside the constant, and the sim's Break is not a guide**: the bot rolls Ruptures by accident and most die with
+  the body.
 
 ## STANDING RULE — EVERY CLASS OPENS WITH A KIT OF THREE, INSIDE THE SLOT COUNT (Batch GN, ruled by the designer)
 > **`Classes.CLASS_KITS` names three abilities per class. Every hero of the class opens with them after his basic,

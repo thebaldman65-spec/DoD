@@ -4,6 +4,65 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Two rulings, and the census that opens the rest of the ladder (Batch HT) — 2026-10-06
+
+**Why the Ritual Chanter's rite thaws the chill inside a Rupture instead of lifting it.** The rite's rule since Batch V is
+*Chilled loses one stack, never the pile* — one enemy turn must not erase four turns of the Cryomancer's work. The rite
+reads `chilled` to apply that rule, and every other reader that asks for `chilled` finds it inside a composition; the rite
+did not, because it took its pick through the generic cleanse door, which reads the top level. So a Rupture — the target a
+player spent two turns assembling — was the one body the rite could strip whole, Burn and every stack of the chill. That is
+one enemy ability deleting the best play in the game, and it is not a carve-out to stop it: it is the presence rule applied
+to the one reader that missed it. The rite ranks and thaws a chill inside a Rupture exactly as it would a bare one; at the
+chill's last stack the chill goes as a bare one's does, the Rupture ends by it and the Burn stands alone. A generic cleanse
+still takes a Rupture whole — it is one status — and nothing about that changed.
+
+**Why the rite ranks a Rupture by its chill, not by the Rupture's own clock.** The rite takes the longest-lasting debuff.
+A Rupture's clock is the shorter of its ingredients', so a Glacial Hold's permanent chill inside one would have ranked by
+the Burn beside it and stopped being the rite's first pick — a bare permanent chill always is. "Exactly as on a bare chill"
+is the ruling's own phrase, so the chill inside ranks as the chill would. The other reading (rank by the Rupture's clock)
+is the smaller change, and it is priced in the report so the designer can choose it.
+
+**Why the screen says degree and the code says tier.** The player already reads *tier* twice — the talent tree's (Tier
+Costs, Tier Gates) and the zones' (Zones & Tiers) — and a third meaning is one too many. *Degree* is better than a neutral
+word because burns have degrees: a second-degree affliction reads as worse than a first, which is the whole idea. The
+identifiers keep *tier*, as they keep *engine* where the player reads *core rune* (HL §2): the words a player reads move,
+the code does not, so nothing downstream was renamed to change a word on screen.
+
+**Why each ingredient keeps its own clock — and why the brief's reading was the defect.** Read literally, *the component's
+own rule applied to the composition's clock* would let a Glacial Hold's permanent chill, re-applied, reset a Rupture to
+permanent — an endless Burn paying endless Break. That is the Shared Ruin's shape (FC): a loop that feeds itself. The build
+kept a clock per ingredient and derives the Rupture's as the shorter, so the brief's own lean, as worded, was the thing
+that would have broken it, and the build was right. It is written down so a later reader does not take the difference for
+drift.
+
+**Why the longer ingredient survives, and why the conjunction works on heroes.** Composing must never cost the longer
+ingredient's tail: that is the additive rule applied to time. And one rule for one body: a hero chilled by the Hoarfrost
+bargain and burned by an Ashblade is ruptured too. It almost never happens — none in 300 runs — so it costs the player
+almost nothing now, and the day an enemy is given a chill the rule is already built.
+
+**Why Rupture's figure stays at 10, and why the sim does not get a vote.** A Rupture lives one to three ticks, so it pays
+10–30 Break against a meter of 100 — about one strike's worth for two heroes' turns. The sim's 872 Break over 420 fights is
+not a measurement of that: the bot makes Ruptures by accident, because it casts the Mage's fire before his ice, and most
+of its Ruptures die with the body. The designer's play is the instrument for this figure, and the watch condition sits
+beside the constant so the next tuning pass reads it there.
+
+**Why a census and not five more statuses.** The brief that asked for Cripple, Poison, Bleed, Sunder and Dazed was asking
+for five guesses. HR's fire-and-ice table is why Rupture is a real design — it said who lays each, who reads each and what
+each is worth. The same table for everything a hero puts on an enemy makes the design space the answer rather than a list.
+It proposes nothing: the next conjunction, its halves and its class pair are the designer's, and the census is what they
+are decided on.
+
+**Why a meter state cannot be a half as the table stands.** Broken is the Warrior's currency, but it is not a status
+anybody lays: the Break meter writes its chip directly, with no clock of its own (the meter ends it) and no applier, so
+the status door — where every conjunction is made — never sees it, and the cleanses that take a composition whole would
+take its chip while the meter stayed broken. The census prices what accepting it would cost and lists what a Warrior can
+lay instead; it builds nothing. And Broken is not alone: Bleed's chip is written by its meter the same way, so Contagion's
+Bleed half meets the same door — of the four designed, only Seize is two statuses the door can see.
+
+**Why two of the four names changed.** *Blight* is already a live status (Blight the Well's *Blighted*); *Breach*
+near-misses the Break vocabulary by its stem. *Contagion* and *Marrowfire* replace them in the record — and *Contagion*
+is reported, not quietly kept: the reserved contagion space (BA §1) is that word's own rule.
+
 ## Conjunctions: the mechanism, and one of them (Batch HS) — 2026-10-05
 
 **Why two afflictions JOIN instead of cancelling.** The first idea was a clash: Burn and Chilled meeting on one body

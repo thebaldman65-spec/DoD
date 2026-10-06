@@ -590,8 +590,10 @@ const DOT_STATUSES := {"burn": 6, "poison": 3}
 # smallest unit that can be FELT.** The sim cannot price a conjunction — the bot
 # casts the Mage's fire before his ice (HR §4f) — so the designer's play is the
 # instrument, and five at once would be five unmeasured figures with no way to
-# tell which one is wrong. Seize, Breach, Blight and Reckoning are designed and
-# NOT built (`docs/state.md`); a row for one is owed the applier census first.
+# tell which one is wrong. Seize, Marrowfire, Contagion and Reckoning are designed
+# and NOT built (`docs/state.md`; the two middle names replaced Breach and Blight at
+# HT §3); the applier census they waited on is taken (`docs/reports/HT.md` §2), and a
+# row for one is the designer's.
 const CONJUNCTIONS := {"rupture": ["burn", "chilled"]}
 
 # **RUPTURE'S ONE FIGURE: THE BREAK EACH OF ITS TICKS ADDS TO THE BURN'S DAMAGE.
@@ -601,6 +603,18 @@ const CONJUNCTIONS := {"rupture": ["burn", "chilled"]}
 # moves one line here and one in that gate. The reasoning for Break rather than
 # another payout is `docs/design-notes.md`'s, and the size it was set against is
 # HR §4f's clash (about two turns of Burn at its tick).
+#
+# **CONFIRMED AT HT §1.1 — IT STAYS, AND IT IS THE DESIGNER'S TO MOVE FROM PLAY. THE
+# WATCH CONDITION, RECORDED BESIDE IT:** a Rupture lives one to three ticks, so it pays
+# one to three times this figure against an enemy's Break meter — at HT's confirmation,
+# 10–30 Break against a meter of 100: about one strike's worth for two heroes' turns.
+# (A dated reading, HO §0's rule: a tuning pass moves the figure, not this sentence's
+# shape.) **THE SIM'S
+# 872 BREAK OVER 420 FIGHTS (HS §6) IS NOT A GUIDE, AND NOTHING SHOULD BE TUNED ON IT**:
+# the bot makes a Rupture by accident (it casts the Mage's fire before his ice, HR §4f),
+# most of its Ruptures die with the body — 73 of the Pyromancer party's 117, and 20 of
+# them before they ticked at all; 38 of the Cryomancer party's 40, 29 before a tick
+# (HS's lanes, re-read at HT) — so the figure counts a rotation nobody plays.
 const RUPTURE_BREAK_PER_TICK := 10
 # The Break a composed status's tick adds, by composed id: the tick is the Burn's,
 # ONCE, and this is the composition's own half riding it (`_dot_tick_rider`).
@@ -5904,9 +5918,10 @@ func _use_item(item_id: String) -> void:
 			await _wait(0.6)
 		# ---------- BATCH CT §4: the three new ones ----------
 		"cleanse":
-			# THE HOLE THIS CLOSES IS REAL: Cleansing Rite is a CLERIC ability, so
-			# a party without a Cleric has no answer to a debuff at all — and that
-			# worsens the moment enemy interference lands.
+			# THE HOLE THIS CLOSES IS REAL: a hero's cleanse is a CLERIC's (Unburden),
+			# so a party without a Cleric has no answer to a debuff at all — and that
+			# worsens the moment enemy interference lands. (HT §3: this said Cleansing
+			# Rite is a Cleric ability; the rite is the warband's Ritual Chanter's.)
 			#
 			# IT READS `DEBUFF_IDS` RATHER THAN A HAND-ROLLED LIST, exactly as §4
 			# required, and it does so through `_cleansable_debuffs` — the same
@@ -8353,6 +8368,29 @@ func _dispellable_buffs(u: BattleUnit) -> Array:
 func _turns_left(s: Dictionary) -> int:
 	var t := int(s.get("turns", 0))
 	return 999 if t < 0 else t
+
+
+# BATCH HT §1.4 — THE CHILL AN ENEMY MENDER'S RITE READS IN ONE OF ITS CANDIDATES: the
+# entry itself when it is Chilled, the Chilled inside it when it is a conjunction that
+# carries one (HS §2d: the rite asks for `chilled`, so it finds the ingredient), and {}
+# otherwise. The candidates stay a cleanse's (`_cleansable_debuffs`, the top level);
+# this is the one read of the rite's that looks inside a composition.
+func _rite_chill(s: Dictionary) -> Dictionary:
+	if String(s.get("id", "")) == "chilled":
+		return s
+	if s.has("parts"):
+		return BattleUnit._find_in_parts(s, "chilled")
+	return {}
+
+
+# The rite's longest-first rank (Batch V): a candidate carrying a chill ranks BY ITS
+# CHILL, exactly as the chill would rank standing bare — so a Glacial Hold's permanent
+# pile is the rite's first pick inside a Rupture as it is alone — and anything else by
+# its own clock. A composition's own clock is its shorter ingredient's (HS §2e), which
+# would rank that permanent chill by the Burn beside it.
+func _rite_turns_left(s: Dictionary) -> int:
+	var ch := _rite_chill(s)
+	return _turns_left(ch if not ch.is_empty() else s)
 
 
 # Dominant Presence bookkeeping: the Swordmaster's armor feeds on the
@@ -11169,7 +11207,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 1.0 - 0.02 * strike_target.molten_ranks
 				_prev(strike_target, pv_was - raw)
 			# GLACIAL HOLD, CLAUSE 3 — THE WINDOW. A held enemy takes +15%
-			# damage from ALL sources (+30% with Killing Frost). This is the
+			# damage from a hero's strike, read HERE in the strike loop and nowhere
+			# else — a companion's blow, a tick, a trap and a card that computes its
+			# own damage never see it (HT §3: this said ALL sources; the glossary had
+			# it right) — and +30% with Killing Frost. This is the
 			# clause that makes his denial a party resource: everyone wants to
 			# pile onto the target he is holding.
 			if _is_held(strike_target):
@@ -13466,7 +13507,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 #     hold limit (which evicts the OLDEST). NOTHING ELSE THAWS IT — not ally
 #     damage, not his own Blizzard, not time. A released enemy comes back on 1
 #     stack of Chilled, so the engine stays warm.
-#   THE WINDOW — a held enemy takes +15% damage from ALL sources (+30% with
+#   THE WINDOW — a held enemy takes +15% damage from a hero's strike (+30% with
 #     Killing Frost). Clauses 2 and 3 together are the design: the hold is
 #     simultaneously denial and a party-wide damage window he opens and
 #     closes, so his control is a team resource rather than a solo trick.
@@ -13491,7 +13532,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 # `_holds` is the ONE answer to "is this enemy held", so the initiative bar,
 # the damage window, Brittle Ice, Cold Snap, Cryoclasm and the bot all read
 # the same list and cannot disagree.
-const HOLD_WINDOW := 15         # +% damage a held enemy takes, from all sources
+const HOLD_WINDOW := 15         # +% damage a held enemy takes from a hero's strike
 const HOLD_RELEASE_STACKS := 1  # what a released enemy comes back on
 # SHATTER SCALES ON TIME HELD, NOT STACKS HELD (Batch AT §8). AS reported it
 # never firing and correctly called that a design tension rather than a bot bug:
@@ -14344,9 +14385,11 @@ func _conjoin(target: BattleUnit, id: String, src: BattleUnit) -> void:
 		var who := ("%s's " % src.unit_name) if src != null else ""
 		var span := "battle-long" if clock < 0 else "%d turn%s" % [clock, "" if clock == 1 else "s"]
 		target.float_text(String(cinfo[0]).to_upper(), cinfo[2])
-		_log("   → %s forms on %s: %s%s lands on its %s — tier %d, %s (%s)" % [
+		# HT §1.6 — ON SCREEN A TIER IS A DEGREE (`BattleUnit.tier_ordinal`); the code's
+		# word is unmoved.
+		_log("   → %s forms on %s: %s%s lands on its %s — %s degree, %s (%s)" % [
 			String(cinfo[0]), target.unit_name, who, a_name,
-			m_name, BattleUnit.tier_of(made), span, from], "#d090e0")
+			m_name, BattleUnit.tier_ordinal(BattleUnit.tier_of(made)), span, from], "#d090e0")
 		return
 
 
@@ -22917,6 +22960,19 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# from each living ally. Chilled loses a single stack, never the
 			# pile — one cast must not erase four turns of Cryomancer work.
 			# The side follows the TARGET so a psychotic chanter aids heroes.
+			#
+			# BATCH HT §1.4 — THE RITE READS `chilled`, SO IT READS THE CHILL INSIDE A
+			# CONJUNCTION (ruled by the designer — not a carve-out: HS §2d applied). Its
+			# candidates are a cleanse's, the top level, a composition one candidate; one
+			# that CARRIES a chill is ranked and thawed BY ITS CHILL (`_rite_chill`), through
+			# the chill door (`set_chilled_stacks`, which finds an ingredient), exactly as a
+			# bare chill is: one stack off and the Rupture stands; at the chill's last stack
+			# the chill goes as a bare one's does, and the Rupture ends by it with its Burn
+			# standing alone. **A Rupture is never lifted by the rite.** WHY, RECORDED WITH
+			# THE RULING: letting it take a Rupture whole would overturn Batch V for
+			# precisely the targets a player spent two turns assembling — one enemy ability
+			# deleting the best play in the game. A GENERIC cleanse (Dispel One, a purge,
+			# the Cleansing Draught) still takes a composition whole (HS §2f).
 			_sfx("heal", -8.0, 1.2)
 			var rite_side: Array = heroes if target.is_hero else enemies
 			var rite_hits := 0
@@ -22929,14 +22985,28 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					continue
 				var cl_pick: Dictionary = cl_opts[0]
 				for cl_s in cl_opts:
-					if _turns_left(cl_s) > _turns_left(cl_pick):
+					if _rite_turns_left(cl_s) > _rite_turns_left(cl_pick):
 						cl_pick = cl_s
 				rite_hits += 1
 				cl_a.float_text("Cleansed", Color(0.95, 0.9, 0.55))
-				if cl_pick.id == "chilled" and int(cl_pick.get("stacks", 1)) > 1:
-					cl_a.set_chilled_stacks(int(cl_pick.get("stacks", 1)) - 1)
-					_log("   → Cleansing Rite thaws one stack of Chilled on %s (x%d remains)" % [
-						cl_a.unit_name, cl_a.status_stacks("chilled")], "#e8d090")
+				var cl_chill := _rite_chill(cl_pick)
+				var cl_inside := String(cl_pick.get("label", "")) if cl_pick.has("parts") else ""
+				if not cl_chill.is_empty() and int(cl_chill.get("stacks", 1)) > 1:
+					cl_a.set_chilled_stacks(int(cl_chill.get("stacks", 1)) - 1)
+					if cl_inside == "":
+						_log("   → Cleansing Rite thaws one stack of Chilled on %s (x%d remains)" % [
+							cl_a.unit_name, cl_a.status_stacks("chilled")], "#e8d090")
+					else:
+						_log("   → Cleansing Rite thaws one stack of the %s inside %s's %s (x%d remains)" % [
+							String(cl_chill.get("label", "")), cl_a.unit_name, cl_inside,
+							cl_a.status_stacks("chilled")], "#e8d090")
+				elif not cl_chill.is_empty() and cl_inside != "":
+					# The chill's LAST stack, inside a composition: it goes as a bare
+					# chill's last stack goes, and the composition ends by it — the end
+					# line (`_dissolve`) says a cleanse took it and what stands alone.
+					_log("   → Cleansing Rite thaws the last stack of the %s inside %s's %s" % [
+						String(cl_chill.get("label", "")), cl_a.unit_name, cl_inside], "#e8d090")
+					cl_a.remove_status("chilled", "a cleanse")
 				else:
 					cl_a.remove_status(cl_pick.id)
 					# Ruin and its primer travel together — the rite averts
