@@ -52,10 +52,20 @@ const NODE_COPIES := {"elite": 6, "blacksmith": 6, "merchant": 5, "event": 5}
 # the RUN's first nodes, not every zone's** (ruled): by zone 2 the gold is there. It
 # is the constant below, read as columns of the first zone — column c of zone 1 is
 # the c-th node a run steps on — and the figure is the measured one
-# (`docs/reports/HR.md` §3). The bargain's bought merchant is not a map node and is
-# not gated here (HR §3 reports it).
+# (`docs/reports/HR.md` §3).
+#
+# **AND NO EVENT STANDS THERE EITHER (HS §0, ruled on HR §3c's measurement).** The
+# generator places events after the trade nodes, roomiest column first, so with the
+# trade nodes kept out of the first columns those columns took most of a zone's
+# events — and an event pays no gold, which was most of what still left a run short
+# of 150 at its first trade node. Kept out too, every run can pay 150 there. **The
+# second reason is the better one: the run's first three nodes now teach COMBAT
+# before they offer shopping** — fights and elites only. The bargain's bought
+# merchant is gated at the same nodes (`roll_offer`).
+# `GATED_NODE_TYPES` REPLACES HR's `SHOP_NODE_TYPES` (the two trade kinds), whose one
+# reader was the line that now reads this — deleted, not left standing unread.
 const SHOP_GATE_NODES := 3
-const SHOP_NODE_TYPES := ["merchant", "blacksmith"]
+const GATED_NODE_TYPES := ["merchant", "blacksmith", "event"]
 
 # THE TWO GENERATION WEIGHTS, and they are the whole feel of the map.
 # Every legal edge-set for a column is enumerated (see _edge_candidates) and
@@ -381,12 +391,14 @@ var pending_item_offers: Array = []  # item ids awaiting a swap-or-decline
 # the map answers. **All three ride the save** (v15, the version block in
 # `save_run`).
 #
-# **THE BAG'S CAP IS SIX (PROPOSED AT HR §1)**: four crest runes exist, and the party
-# holds one of each, so the bag can hold four at most today; six is the pool and
-# two of headroom. It binds only once seven crest runes exist.
+# **THE BAG'S CAP IS SIX (proposed at HR §1, RULED AT HS §0)**: four crest runes
+# exist, and the party holds one of each, so the bag can hold four at most today;
+# six is the pool and two of headroom. It binds only once seven crest runes exist.
 const BAG_CAP := 6
-# **EIGHT UNWORN A HERO (PROPOSED AT HR §1, MEASURED THERE).** Both kinds count:
-# an unworn class rune and an unworn core rune are each one of the eight.
+# **EIGHT UNWORN A HERO (proposed at HR §1 and measured there, RULED AT HS §0): a net,
+# not a constraint** — it never fills from what a run hands a hero, and only buying
+# reaches it. Both kinds count: an unworn class rune and an unworn core rune are
+# each one of the eight.
 const HERO_HOLD_CAP := 8
 # **ONE PARTY SLOT, AND THE CAP IS THIS ONE CONSTANT** (ruled: a party rune
 # reaches four heroes at once, so it is worth roughly four of anything else, and
@@ -904,8 +916,8 @@ func _build_lattice(alive: Dictionary, out_rows: Dictionary) -> void:
 #               walked at the greediest policy rather than 6.
 #   the rest    one blacksmith / merchant / event per column at most, into
 #               columns that still have a free position, roomiest first —
-#               and, in the run's first zone, never a blacksmith or a merchant
-#               in its first SHOP_GATE_NODES columns (HR §3).
+#               and, in the run's first zone, never a blacksmith, a merchant or
+#               an event in its first SHOP_GATE_NODES columns (HR §3, HS §0).
 #   fights      everything left. Never counted, always the remainder.
 func _assign_node_types() -> void:
 	var free := {}       # column -> Array of free node indices
@@ -926,7 +938,7 @@ func _assign_node_types() -> void:
 	for ty in ["blacksmith", "merchant", "event"]:
 		var cols: Array = []
 		for c in range(1, BRANCH_COLUMNS + 1):
-			if shop_gated(c) and SHOP_NODE_TYPES.has(ty):
+			if shop_gated(c) and GATED_NODE_TYPES.has(ty):
 				continue
 			if not used[c].has(ty) and not free[c].is_empty():
 				cols.append(c)
@@ -4290,6 +4302,13 @@ func roll_offer() -> Array:
 	for id in picked:
 		var sev := modifier_severity(String(id))
 		var choices: Array = REWARDS.get(sev, REWARDS[1])
+		# BATCH HS §0 — THE BARGAIN'S BOUGHT MERCHANT IS GATED WITH THE MAP'S (ruled):
+		# a player who traded a bargain's gold FOR a merchant is the lowest-gold case
+		# in the game, and a merchant he cannot shop at is no reward. At an elite in
+		# the run's first `SHOP_GATE_NODES` nodes the option still comes, and pays
+		# from what is left of its severity's list — at severity 4, its gold or a rune.
+		if shop_gated(slot_idx + 1):
+			choices = choices.filter(func(r): return String(r.get("kind", "")) != "shop")
 		offer.append({"modifier": String(id),
 			"reward": (choices.pick_random() as Dictionary).duplicate()})
 	offer.shuffle()

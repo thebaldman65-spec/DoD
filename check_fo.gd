@@ -553,8 +553,15 @@ func _s2_driven() -> void:
 	print("\n§2 — the Shared Mark, driven on a live board")
 	var built: Dictionary = Runes.build("shared_mark")
 	built["equipped"] = true
+	# BATCH HS — THE BLOWS BELOW ARE MADE TO LAND (the fixture's deterministic seat):
+	# §2d asks what an ally's LANDED blow on the mark pays, and with the dice free the
+	# opening blow can miss. HR's dice landed it; HS's generator change (no event in the
+	# run's first three nodes) moved the dice every fresh run is dealt, and it missed —
+	# 0 Focus where 5 was owed. ATTRIBUTED BY A STUB: HS's game with that one line set
+	# back to HR's read this gate 90 / 0, message for message. HR §6's rule: construct
+	# the state the arm asks about, never wait for a lucky draw.
 	var scene: Node = await Gate.spawn(self, DRIVE,
-		{"party": {int(SEAT["sharpshooter"]): {"runes": [built]}}})
+		{"party": {int(SEAT["sharpshooter"]): {"runes": [built]}}, "deterministic": true})
 	var heroes: Array = scene.get("heroes")
 	var foes: Array = scene.get("enemies")
 	ok(heroes.size() >= 4 and foes.size() >= 2,

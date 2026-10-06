@@ -106,7 +106,15 @@ const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",
 	# here and must not be — both are BUFFS the Cleric lays on his own party,
 	# and listing either would make an ally's own Dispel strip it.
 	"suffering",
-	"blight"]
+	"blight",
+	# BATCH HS §2 — `rupture` IS A CONJUNCTION (Burn + Chilled) AND AN AFFLICTION,
+	# so it is listed, for the usual two consequences and one more: a cleanse —
+	# a mender's rite, Dispel One, a purge — can take it, WHOLE, as the one status
+	# it is; it is kept OUT of the derived `_dispellable_buffs`, so a Mage's Dispel
+	# never strips the party's work off the enemy wearing it; and a BREADTH reader
+	# must not count it, which is why every one reads `base_statuses()` — the
+	# Burn and the Chilled inside it are what count, two, and the composition none.
+	"rupture"]
 
 var frame_size := 100      # square frame edge of this unit's sprite strips
 var portrait_path := ""    # dedicated portrait art (falls back to a sheet crop)
@@ -1933,9 +1941,11 @@ func _proc_log(text: String) -> void:
 		log_proc.call(text, "#b0a8e0")
 
 
+# BATCH HS §2c — A BREADTH READER, SO IT COUNTS INGREDIENTS: a Rupture is the Burn
+# and the Chilled it is made of, two debuffs, as the unmerged chips were.
 func count_debuffs() -> int:
 	var n := 0
-	for s in statuses:
+	for s in base_statuses():
 		if DEBUFF_IDS.has(s.id):
 			n += 1
 	return n
@@ -2949,6 +2959,228 @@ func refresh_bars() -> void:
 
 # ---------- status effects ----------
 
+# ══ BATCH HS §2 — A CONJUNCTION IS ONE ENTRY THAT CARRIES ITS INGREDIENTS ══════
+#
+# **TWO AFFLICTIONS MEETING ON ONE BODY MAKE A THIRD** (the rule, the designer's).
+# The table of what meets what is `battle.CONJUNCTIONS`, and the battle composes at
+# its status door (`_apply_status` → `compose` below). What this file owns is the
+# SHAPE, and it is one rule applied five ways:
+#
+# · **ONE ENTRY, ONE CHIP.** A composition is a single entry in `statuses` whose
+#   `parts` are the two entries that met — each WHOLE, its own turns, power, tick,
+#   stacks and `src_name` — so the bar draws one chip where it drew two.
+# · **COMPONENTS ARE PRESENCE.** `has_status`, `get_status`, `status_power`,
+#   `status_stacks`, `update_status`, `remove_status` and `set_chilled_stacks` find
+#   an id INSIDE a composition as well as standing alone (`_find_status`), so every
+#   reader that asks whether a body carries Burn sees the Burn inside a Rupture —
+#   and `get_status` hands back the component's own live entry, so a reader that
+#   writes its turns writes the component's.
+# · **EACH COMPONENT KEEPS ITS OWN RULE AND ITS OWN CLOCK.** A re-application finds
+#   the component and runs that status's own branch below on it: Burn ADDS its
+#   turns, Chilled adds a stack and RESETS its clock. The composition's clock is
+#   DERIVED — the SHORTER of its components', a permanent one counting as endless
+#   (`composition_turns`) — so it is always "the shorter of the two" (HS §2e) and
+#   never a number a write can carry past what its ingredients would have lasted.
+# · **IT ENDS WHEN ITS SHORTER INGREDIENT DOES, AND THE LONGER ONE STANDS ALONE.**
+#   A clock running out, or a consumer taking a component (`remove_status("burn")`
+#   — Detonation, Firedraw, Wildfire), dissolves it: what is left goes back on the
+#   bar as it was, its own turns and stacks. Composing is ADDITIVE: a body never
+#   carries less affliction for having composed. A CLEANSE takes it WHOLE — it is
+#   one status (`dispel_one_debuff`, `purge_debuffs_taken`, a rite's pick).
+# · **TIER IS WEIGHT.** A composition's tier is the number of ingredients in it
+#   (`tier_of`), and every reader that counts DISTINCT afflictions counts the
+#   ingredients (`base_statuses`), so a Rupture is two to the Trapper exactly as an
+#   unmerged Burn and Chilled were — and the composition itself counts for nothing.
+#
+# **NOTHING RUNS TWICE.** A composition is about what a reader SEES; the Burn tick
+# fires once, as the composition's (`battle`'s DoT pass), never beside it.
+func _find_status(id: String) -> Dictionary:
+	for s in statuses:
+		if s.id == id:
+			return s
+	for s in statuses:
+		if s.has("parts"):
+			var hit := _find_in_parts(s, id)
+			if not hit.is_empty():
+				return hit
+	return {}
+
+
+static func _find_in_parts(comp: Dictionary, id: String) -> Dictionary:
+	for p in comp["parts"]:
+		if p.id == id:
+			return p
+		if p.has("parts"):
+			var hit := _find_in_parts(p, id)
+			if not hit.is_empty():
+				return hit
+	return {}
+
+
+# The standing composition (a top-level entry) that carries `id` as an ingredient,
+# or {} when `id` stands alone or not at all.
+func composition_of(id: String) -> Dictionary:
+	for s in statuses:
+		if s.has("parts") and not _find_in_parts(s, id).is_empty():
+			return s
+	return {}
+
+
+# The base entries an entry is made of: itself, or every ingredient of a
+# composition, depth first. A composition never appears in the list.
+static func bases_of(entry: Dictionary) -> Array:
+	if not entry.has("parts"):
+		return [entry]
+	var out: Array = []
+	for p in entry["parts"]:
+		out.append_array(bases_of(p))
+	return out
+
+
+# Every base status standing on this body — a composition read as its
+# ingredients. THE VIEW A BREADTH READER COUNTS (HS §2c).
+func base_statuses() -> Array:
+	var out: Array = []
+	for s in statuses:
+		out.append_array(bases_of(s))
+	return out
+
+
+# A list of entries (as a cleanse hands them back) read as its base entries.
+static func flatten_statuses(entries: Array) -> Array:
+	var out: Array = []
+	for e in entries:
+		out.append_array(bases_of(e))
+	return out
+
+
+# How many ingredients a status is made of: 1 for a status standing alone, 2 for
+# a composition of two, 3 for one of a composition and a third.
+static func tier_of(entry: Dictionary) -> int:
+	return bases_of(entry).size()
+
+
+# The composition's clock: the SHORTER of its ingredients', a negative count
+# (permanence) reading as endless; -1 only when every ingredient is permanent.
+static func composition_turns(entry: Dictionary) -> int:
+	if not entry.has("parts"):
+		return int(entry.get("turns", 0))
+	var best := -1
+	for p in entry["parts"]:
+		var t := composition_turns(p)
+		if t < 0:
+			continue
+		best = t if best < 0 else mini(best, t)
+	return best
+
+
+# Builds a composition out of two entries standing alone on this body, in the slot
+# the first of them held. Returns the new entry, or {} when either is not standing
+# alone. The battle calls it from its status door, which owns the table and the
+# words (`battle._conjoin`); nothing here books a Sanctity event, because the
+# ingredient that arrived already booked its own landing and nothing else moved.
+func compose(comp_id: String, id_a: String, id_b: String, label: String,
+		short: String, color: Color, rider := "") -> Dictionary:
+	var ea: Dictionary = {}
+	var eb: Dictionary = {}
+	for s in statuses:
+		if s.id == id_a:
+			ea = s
+		elif s.id == id_b:
+			eb = s
+	if ea.is_empty() or eb.is_empty():
+		return {}
+	var at := mini(statuses.find(ea), statuses.find(eb))
+	var entry := {"id": comp_id, "label": label, "short": short, "color": color,
+		"parts": [ea, eb], "rider": rider, "power": 0, "stacks": 1, "tick": 0,
+		"turns": 0, "full_turns": 0, "desc": ""}
+	statuses.erase(ea)
+	statuses.erase(eb)
+	statuses.insert(at, entry)
+	_resync_composition(entry)
+	float_text(label, color)
+	_refresh_chips()
+	return entry
+
+
+# The composition's derived fields, re-read off its ingredients: the clock and the
+# chip's words. Called by `_refresh_chips`, which every status write ends in, so the
+# chip can never show a clock its ingredients have moved past.
+static func _resync_composition(entry: Dictionary) -> void:
+	entry["turns"] = composition_turns(entry)
+	entry["full_turns"] = entry["turns"]
+	var lines: Array = []
+	for b in bases_of(entry):
+		var span := "battle-long" if int(b.turns) < 0 \
+			else "%d turn%s" % [int(b.turns), "" if int(b.turns) == 1 else "s"]
+		var stack_tag := " x%d" % int(b.get("stacks", 1)) \
+			if int(b.get("stacks", 1)) > 1 else ""
+		lines.append("%s%s: %s" % [String(b.label), stack_tag, span])
+	var head := "%s, joined (tier %d)." % [" + ".join(
+		bases_of(entry).map(func(b): return String(b.label))), tier_of(entry)]
+	var out: Array = [head]
+	var rider := String(entry.get("rider", ""))
+	if rider != "":
+		out.append(rider)
+	out.append_array(lines)
+	out.append("Ends when the shorter one would.")
+	entry["desc"] = "\n".join(out)
+
+
+# What is left of `entry` once the base `gone_id` leaves it: the entry itself
+# unchanged, the surviving ingredient alone (a pair loses one), or null when the
+# entry WAS that base. Never a composition of one.
+static func _without(entry: Dictionary, gone_id: String) -> Variant:
+	if not entry.has("parts"):
+		return null if entry.id == gone_id else entry
+	var kept: Array = []
+	for p in entry["parts"]:
+		var k: Variant = _without(p, gone_id)
+		if k != null:
+			kept.append(k)
+	if kept.size() == entry["parts"].size():
+		return entry
+	if kept.is_empty():
+		return null
+	if kept.size() == 1:
+		return kept[0]
+	entry["parts"] = kept
+	return entry
+
+
+# Takes the base `gone_id` out of the composition `comp` standing on this body, and
+# puts what is left back where the composition stood — the survivor alone, as it
+# was. Says so in the combat log, naming why. Returns the survivor (or {}).
+func _dissolve(comp: Dictionary, gone_ids: Array, why: String) -> Dictionary:
+	var at := statuses.find(comp)
+	if at < 0:
+		return {}
+	var left: Variant = comp
+	var gone_labels: Array = []
+	for b in bases_of(comp):
+		if gone_ids.has(String(b.id)):
+			gone_labels.append(String(b.label))
+	for gid in gone_ids:
+		if left == null:
+			break
+		left = _without(left, String(gid))
+	statuses.remove_at(at)
+	var survivor: Dictionary = {}
+	if left != null:
+		survivor = left
+		statuses.insert(at, survivor)
+		if survivor.has("parts"):
+			_resync_composition(survivor)
+	var tail := ""
+	if not survivor.is_empty():
+		var st := int(composition_turns(survivor))
+		tail = "; %s stands alone (%s)" % [String(survivor.label),
+			"battle-long" if st < 0 else "%d turn%s" % [st, "" if st == 1 else "s"]]
+	_proc_log("   → %s ends on %s — %s: its %s %s%s" % [String(comp.label), unit_name, why,
+		" and ".join(gone_labels), "ran out" if why == "the clock" else "is consumed", tail])
+	return survivor
+
+
 # Adds (or refreshes) a status. `short` is the 1-2 char tag shown on the chip.
 # `tick` = damage per turn for DoTs, snapshotted from the applier's Attack.
 func add_status(id: String, label: String, short: String, color: Color, turns: int,
@@ -2961,65 +3193,68 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 	# and shortening it would turn a permanent status into a 1-turn one.
 	if turns > 0:
 		turns = maxi(turns + mod_status_turns, 1)
-	for s in statuses:
-		if s.id == id:
-			# Poison stacks additively (each stack ticks again) and every
-			# new application refreshes the timer (and the tick snapshot).
-			if id == "poison":
-				s.stacks = int(s.get("stacks", 1)) + 1
-				s.turns = turns
-				if tick > 0:
-					s["tick"] = tick
-				s.short = "P%d" % s.stacks
-				s.desc = "Takes %d nature damage at the start of each\nturn (%d per stack); new stacks refresh the timer." % [
-					int(s.get("tick", 3)) * s.stacks, int(s.get("tick", 3))]
-				float_text("%s x%d" % [label, s.stacks], color)
-			elif id == "chilled":
-				# Chilled STACKS (max 4): each application adds a stack and
-				# RESETS the clock; 4 stacks = Frozen (handled by battle.gd).
-				# Permafrost applications arrive with turns -1: the pile stops
-				# thawing the moment the Cryomancer touches it.
-				# BATCH FK — THE RUNE OF THE DEEP COLD lifts the cap and
-				# NOTHING ELSE. Four stacks still flash-freezes (battle.gd's
-				# branch is on the count, not on the cap), so the rune is worth
-				# nothing on an enemy that can be held and everything on one
-				# that cannot — a boss before the Break, and every enemy after
-				# the hold limit of ONE is already spent. `rune_deep_cold` is
-				# STAMPED on the enemy at the spawn for `rune_long_fuse`'s
-				# reason: the pile stands on a body this file cannot ask the
-				# party about.
-				s.stacks = int(s.get("stacks", 1)) + 1
-				if not chill_uncapped:
-					s.stacks = mini(int(s.stacks), 4)
-				s.turns = turns
-				s.short = "C%d" % s.stacks
-				s.desc = _chilled_desc(int(s.stacks), turns < 0)
-				float_text("Chilled x%d" % s.stacks, color)
-			elif id == "ruin":
-				# Ruin STACKS battle-long, and since Batch AX it has NO MAXIMUM
-				# and NEVER CLEARS: corruption that resets is not corruption. A
-				# detonation takes the PRIMER, never the mark. The chip's text is
-				# re-stamped by battle._gain_ruin, the only site that can see the
-				# Occultist's talents (per-stack bite AND threshold both move).
-				s.stacks = int(s.get("stacks", 1)) + 1
-				s.short = "R%d" % s.stacks
-				float_text("Ruin x%d" % s.stacks, color)
-			elif id == "burn":
-				# Reapplied Burn burns LONGER: the fresh application's turns
-				# are ADDED to the running timer.
-				s.turns += maxi(turns, 0)
-				s.power = maxi(s.power, power)
-				if tick > 0:
-					s["tick"] = tick
-				float_text("Burn +%d turns" % turns, color)
-			else:
-				s.turns = maxi(s.turns, turns)
-				s.power = maxi(s.power, power)
-				if tick > 0:
-					s["tick"] = tick
-			_note_full_turns(s, turns)
-			_refresh_chips()
-			return
+	# BATCH HS §2 — THE STATUS MAY STAND INSIDE A COMPOSITION, and `_find_status`
+	# finds it there too: its own rule below runs on its own entry (HS §2g), and
+	# `_refresh_chips` re-derives the composition's clock from it.
+	var s: Dictionary = _find_status(id)
+	if not s.is_empty():
+		# Poison stacks additively (each stack ticks again) and every
+		# new application refreshes the timer (and the tick snapshot).
+		if id == "poison":
+			s.stacks = int(s.get("stacks", 1)) + 1
+			s.turns = turns
+			if tick > 0:
+				s["tick"] = tick
+			s.short = "P%d" % s.stacks
+			s.desc = "Takes %d nature damage at the start of each\nturn (%d per stack); new stacks refresh the timer." % [
+				int(s.get("tick", 3)) * s.stacks, int(s.get("tick", 3))]
+			float_text("%s x%d" % [label, s.stacks], color)
+		elif id == "chilled":
+			# Chilled STACKS (max 4): each application adds a stack and
+			# RESETS the clock; 4 stacks = Frozen (handled by battle.gd).
+			# Permafrost applications arrive with turns -1: the pile stops
+			# thawing the moment the Cryomancer touches it.
+			# BATCH FK — THE RUNE OF THE DEEP COLD lifts the cap and
+			# NOTHING ELSE. Four stacks still flash-freezes (battle.gd's
+			# branch is on the count, not on the cap), so the rune is worth
+			# nothing on an enemy that can be held and everything on one
+			# that cannot — a boss before the Break, and every enemy after
+			# the hold limit of ONE is already spent. `rune_deep_cold` is
+			# STAMPED on the enemy at the spawn for `rune_long_fuse`'s
+			# reason: the pile stands on a body this file cannot ask the
+			# party about.
+			s.stacks = int(s.get("stacks", 1)) + 1
+			if not chill_uncapped:
+				s.stacks = mini(int(s.stacks), 4)
+			s.turns = turns
+			s.short = "C%d" % s.stacks
+			s.desc = _chilled_desc(int(s.stacks), turns < 0)
+			float_text("Chilled x%d" % s.stacks, color)
+		elif id == "ruin":
+			# Ruin STACKS battle-long, and since Batch AX it has NO MAXIMUM
+			# and NEVER CLEARS: corruption that resets is not corruption. A
+			# detonation takes the PRIMER, never the mark. The chip's text is
+			# re-stamped by battle._gain_ruin, the only site that can see the
+			# Occultist's talents (per-stack bite AND threshold both move).
+			s.stacks = int(s.get("stacks", 1)) + 1
+			s.short = "R%d" % s.stacks
+			float_text("Ruin x%d" % s.stacks, color)
+		elif id == "burn":
+			# Reapplied Burn burns LONGER: the fresh application's turns
+			# are ADDED to the running timer.
+			s.turns += maxi(turns, 0)
+			s.power = maxi(s.power, power)
+			if tick > 0:
+				s["tick"] = tick
+			float_text("Burn +%d turns" % turns, color)
+		else:
+			s.turns = maxi(s.turns, turns)
+			s.power = maxi(s.power, power)
+			if tick > 0:
+				s["tick"] = tick
+		_note_full_turns(s, turns)
+		_refresh_chips()
+		return
 	var entry := {"id": id, "label": label, "short": short, "color": color,
 		"turns": turns, "desc": desc, "power": power, "stacks": 1, "tick": tick,
 		"full_turns": turns}
@@ -3077,24 +3312,48 @@ static func _chilled_desc(stacks: int, permanent := false) -> String:
 # is called on statuses that are not standing (a consumer that does not check
 # first, a cleanse aimed at a clean body) and those calls must book nothing.
 # Comparing the sizes is what makes "removed" mean removed.
+#
+# BATCH HS §2 — TWO MORE SHAPES, AND EACH BOOKS WHAT AN UNMERGED BODY WOULD HAVE.
+# A COMPOSITION removed by its own id is a cleanse taking it WHOLE: every
+# ingredient leaves, so each books its own removal — a Rupture lifted is a Burn and
+# a Chilled lifted, two events, as the two chips would have been. An INGREDIENT
+# removed by its id (a consumer eating the Burn) dissolves the composition and the
+# other ingredient stands alone: one event, the one that left.
 func remove_status(id: String) -> void:
+	var comp := composition_of(id)
+	if not comp.is_empty():
+		_dissolve(comp, [id], "a consumer")
+		note_status_event(self, id)
+		_refresh_chips()
+		return
+	var whole: Dictionary = {}
+	for s in statuses:
+		if s.id == id and s.has("parts"):
+			whole = s
 	var before := statuses.size()
 	statuses = statuses.filter(func(s): return s.id != id)
 	if statuses.size() < before:
-		note_status_event(self, id)
+		if whole.is_empty():
+			note_status_event(self, id)
+		else:
+			for b in bases_of(whole):
+				note_status_event(self, String(b.id))
+			_proc_log("   → %s ends on %s — lifted whole (%s)" % [String(whole.label),
+				unit_name, " and ".join(bases_of(whole).map(func(b): return String(b.label)))])
 	_refresh_chips()
 
 
 # Batch O: a Freeze no longer wipes the Chilled pile — battle.gd sets the
 # surviving stack count directly (chip and tooltip follow along).
+# BATCH HS §2 — the pile may stand inside a composition; `_find_status` finds it.
 func set_chilled_stacks(n: int) -> void:
-	for s in statuses:
-		if s.id == "chilled":
-			s.stacks = clampi(n, 1, 4) if not chill_uncapped else maxi(n, 1)
-			s.short = "C%d" % s.stacks
-			s.desc = _chilled_desc(int(s.stacks), int(s.turns) < 0)
-			_refresh_chips()
-			return
+	var s: Dictionary = _find_status("chilled")
+	if s.is_empty():
+		return
+	s.stacks = clampi(n, 1, 4) if not chill_uncapped else maxi(n, 1)
+	s.short = "C%d" % s.stacks
+	s.desc = _chilled_desc(int(s.stacks), int(s.turns) < 0)
+	_refresh_chips()
 
 
 # On the Mend: strip ONE random harmful status (Broken excluded).
@@ -3131,55 +3390,80 @@ func purge_debuffs_taken() -> Array:
 	# filter because a cleanse takes several at once and the ledger is keyed on
 	# (body, status): three debuffs off one body is three statuses leaving, and
 	# one already-clean body is none. A count alone could not say which.
+	#
+	# BATCH HS §2 — A COMPOSITION IS TAKEN WHOLE AND HANDED BACK WHOLE (a deep
+	# copy, its ingredients inside it), and the ledger is read over the BASE ids, so
+	# a Rupture lifted books its Burn and its Chilled as two chips lifted would. A
+	# composition holding a sticky ingredient is sticky: it refuses the cleanse whole.
 	var was: Array = []
-	for s in statuses:
+	for s in base_statuses():
 		was.append(String(s.id))
 	var kept: Array = []
 	var taken: Array = []
 	for s in statuses:
-		if s.id == "broken" or s.get("sticky", false) or not DEBUFF_IDS.has(s.id):
+		if s.id == "broken" or _is_sticky(s) or not DEBUFF_IDS.has(s.id):
 			kept.append(s)
 		else:
-			taken.append((s as Dictionary).duplicate())
+			taken.append((s as Dictionary).duplicate(true))
 	statuses = kept
 	for gone_id in was:
 		if not has_status(gone_id):
 			note_status_event(self, gone_id)
+	for t in taken:
+		if (t as Dictionary).has("parts"):
+			_proc_log("   → %s ends on %s — lifted whole (%s)" % [String(t.label),
+				unit_name, " and ".join(bases_of(t).map(func(b): return String(b.label)))])
 	_refresh_chips()
 	return taken
+
+
+# A status refuses every cleanse when it, or any ingredient of it, is sticky.
+static func _is_sticky(entry: Dictionary) -> bool:
+	for b in bases_of(entry):
+		if bool(b.get("sticky", false)):
+			return true
+	return false
 
 
 # Updates a live status chip's tag and tooltip (and optionally its power /
 # remaining turns) without re-announcing it — for chips that show a counter,
 # like Shieldwall charges or Battle Shout's damage bonus.
 # Returns false if the status isn't active.
+# BATCH HS §2 — the four below find an id inside a composition as well as standing
+# alone (`_find_status`): COMPONENTS ARE PRESENCE, and `get_status` hands back the
+# component's own live entry, so a consumer that writes its turns writes its own.
 func update_status(id: String, short: String, desc: String, power := -1,
 		turns := 0) -> bool:
-	for s in statuses:
-		if s.id == id:
-			s.short = short
-			s.desc = desc
-			if power >= 0:
-				s.power = power
-			if turns > 0:
-				s.turns = turns
-			_refresh_chips()
-			return true
-	return false
+	var s: Dictionary = _find_status(id)
+	if s.is_empty():
+		return false
+	var was_turns := int(s.get("turns", 0))
+	s.short = short
+	s.desc = desc
+	if power >= 0:
+		s.power = power
+	if turns > 0:
+		s.turns = turns
+	# BATCH HS §5 — A CARD THAT WRITES AN INGREDIENT'S CLOCK DIRECTLY (Flamewave on a
+	# burning body, a skim, Stoke) moves the composition's clock with it, and the
+	# conjunction log says so beside the card's own line — or a Rupture would end on
+	# a clock the log never showed changing.
+	var comp := composition_of(id)
+	if not comp.is_empty() and turns > 0 and turns != was_turns:
+		var ct := composition_turns(comp)
+		_proc_log("   → %s inside %s's %s: its turns %d → %d; %s %s" % [String(s.label),
+			unit_name, String(comp.label), was_turns, turns, String(comp.label),
+			"battle-long" if ct < 0 else "%d turn%s" % [ct, "" if ct == 1 else "s"]])
+	_refresh_chips()
+	return true
 
 
 func get_status(id: String) -> Dictionary:
-	for s in statuses:
-		if s.id == id:
-			return s
-	return {}
+	return _find_status(id)
 
 
 func has_status(id: String) -> bool:
-	for s in statuses:
-		if s.id == id:
-			return true
-	return false
+	return not _find_status(id).is_empty()
 
 
 # Bleed is a buildup: wounding attacks add to it; at 100 the target bleeds
@@ -3221,17 +3505,13 @@ func log_bleed_chip() -> void:
 
 
 func status_power(id: String) -> int:
-	for s in statuses:
-		if s.id == id:
-			return int(s.get("power", 0))
-	return -1
+	var s: Dictionary = _find_status(id)
+	return -1 if s.is_empty() else int(s.get("power", 0))
 
 
 func status_stacks(id: String) -> int:
-	for s in statuses:
-		if s.id == id:
-			return int(s.get("stacks", 1))
-	return 0
+	var s: Dictionary = _find_status(id)
+	return 0 if s.is_empty() else int(s.get("stacks", 1))
 
 
 # Called at the start of this unit's turn. Broken is managed separately;
@@ -3258,11 +3538,16 @@ func tick_statuses() -> void:
 	# rather than waiting on the clock, so nothing had to be taught the
 	# difference.
 	var burn_held := has_status("slow_burn") or burn_clock_held
+	# BATCH HS §2 — EVERY INGREDIENT OF A COMPOSITION COUNTS DOWN ITS OWN CLOCK, a
+	# held Burn held there too, and the composition's clock is re-derived as the
+	# shorter of them (`_refresh_chips`). `bases_of` is the entry itself for a status
+	# standing alone, so the loop is the one it always was for every other body.
 	for s in statuses:
-		if s.id == "burn" and burn_held:
-			continue
-		if s.id != "broken" and s.turns > 0:
-			s.turns -= 1
+		for b in bases_of(s):
+			if b.id == "burn" and burn_held:
+				continue
+			if b.id != "broken" and b.turns > 0:
+				b.turns -= 1
 	# Unrelenting Assault: the borrowed Constitution fades with the buff.
 	for s in statuses:
 		if s.id == "unrelenting" and s.turns == 0:
@@ -3270,11 +3555,27 @@ func tick_statuses() -> void:
 			float_text("Unrelenting fades", Color(0.6, 0.65, 0.8))
 	# Expiries reach the combat log so timers are auditable at a glance.
 	var expired: Array = []
+	# BATCH HS §2 — A COMPOSITION ENDS ON THE CLOCK WHEN ITS SHORTER INGREDIENT DOES,
+	# and the longer stands alone with what is left of its own (`_dissolve` says so).
+	# The ingredients that ran out are expiries as an unmerged chip's would be.
+	for comp in statuses.duplicate():
+		if not comp.has("parts"):
+			continue
+		var ran_out: Array = []
+		for b in bases_of(comp):
+			if int(b.turns) == 0:
+				ran_out.append(String(b.id))
+		if ran_out.is_empty():
+			continue
+		_dissolve(comp, ran_out, "the clock")
+		expired.append_array(ran_out)
+		expired.append(String(comp.id))
 	for s in statuses:
-		if s.turns == 0 and s.id != "broken":
+		if s.turns == 0 and s.id != "broken" and not s.has("parts"):
 			_proc_log("   → %s fades from %s" % [s.label, unit_name])
 			expired.append(s.id)
-	statuses = statuses.filter(func(s): return s.id == "broken" or s.turns != 0)
+	statuses = statuses.filter(func(s): return s.id == "broken" or s.turns != 0 \
+		or s.has("parts"))
 	_refresh_chips()
 	# The hook runs last: the list is already clean, so handlers can
 	# apply fresh statuses without racing the filter above.
@@ -3401,6 +3702,12 @@ func sunder_depth() -> int:
 
 
 func _refresh_chips() -> void:
+	# BATCH HS §2 — every status write ends here, so this is where a composition's
+	# clock and words are re-read off its ingredients: the chip never shows a clock
+	# its ingredients have moved past.
+	for s in statuses:
+		if s.has("parts"):
+			_resync_composition(s)
 	# Iron Will's chip tracks the live debuff count (this runs on every
 	# status change, so the readout can never go stale).
 	# BATCH FX — the chip no longer says "the Warden": the counter is written
@@ -4303,6 +4610,10 @@ func _die() -> void:
 	# because a mark that moves is read off the body it is leaving.
 	if died_cb.is_valid():
 		died_cb.call(self)
+	# BATCH HS §5 — A COMPOSITION ENDS WITH THE BODY, AND THE LOG SAYS WHY.
+	for comp in statuses:
+		if comp.has("parts"):
+			_proc_log("   → %s ends on %s — the body died" % [String(comp.label), unit_name])
 	statuses.clear()
 	_refresh_chips()
 	if _plate_root != null:

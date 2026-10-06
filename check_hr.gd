@@ -321,8 +321,9 @@ func _s0b_the_read_site() -> void:
 
 func _s1_the_bag_splits() -> void:
 	print("\n§1 — the bag is the crest's; a class or core rune lives with its hero")
-	ok(int(_run.HERO_HOLD_CAP) == 8, "§1: a hero holds %d unworn — PROPOSED at HR §1 as 8" % int(_run.HERO_HOLD_CAP))
-	ok(int(_run.BAG_CAP) == 6, "§1: the bag holds %d — PROPOSED at HR §1 as 6 (four crest runes and two of headroom)" % int(_run.BAG_CAP))
+	# BATCH HS §0 — BOTH CAPS RULED (proposed at HR §1): the PROPOSED marker is off the two messages, the pins unchanged.
+	ok(int(_run.HERO_HOLD_CAP) == 8, "§1: a hero holds %d unworn — RULED at HS §0 as 8" % int(_run.HERO_HOLD_CAP))
+	ok(int(_run.BAG_CAP) == 6, "§1: the bag holds %d — RULED at HS §0 as 6 (four crest runes and two of headroom)" % int(_run.BAG_CAP))
 	ok(_crest_ids().size() <= int(_run.BAG_CAP),
 		"§1: %d crest runes exist and the bag holds %d — the headroom the cap was proposed with is gone" % [_crest_ids().size(), int(_run.BAG_CAP)])
 	# (a) ROUTED BY SCOPE, through the one door.

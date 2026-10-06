@@ -108,7 +108,7 @@ into this file changes it.
 the equality rule travel with their parent. **Eight of the rows are FF §2's**, and they are the
 residue: rules written into this file AFTER the seam was taken, which the seam's own test puts on
 the other side of it. **Every row after those eight was written straight into the reference rather
-than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one and HR's two:
+than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two and HS's one:
 
 | | |
 |---|---|
@@ -156,6 +156,7 @@ than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's
 | A TALLY NAMED FOR A DOOR ROLLS THROUGH THAT DOOR | HQ §3 |
 | A TIMED SCREEN ELEMENT IS READ AT TIME SCALE ONE | HR §2 |
 | AN ARM THAT READS WHAT THE DICE DEALT IS A COIN FLIP THE NEXT BATCH CAN LOSE | HR §6 |
+| A STRIKE A/B COMPARES ONE KIND OF BODY | HS §2c |
 
 ## THE COMBAT RULES LIVE IN `docs/combat-rules.md` (STANDING, SET AT GR §2, RULED BY THE DESIGNER)
 > **THIS FILE IS STILL THE ONE A BATCH MUST READ. `docs/combat-rules.md` IS A REFERENCE IT POINTS AT,
@@ -1389,9 +1390,17 @@ grants through **`Talents.granted_ability`**. **The live corpus size is in `docs
 refusal is scoped to abilities whose WHOLE PAYLOAD is the status.** `_recast_refused` is the ONE
 answer and `RECAST_GATED` is the set; **its live size is in `docs/state.md`, not here.**
 
-- **WHY IT EXISTS.** `add_status` resolves a re-application as `max()` on duration and power, so a
-  status whose power is a **snapshot of live state** could be recast at a weaker value, have that
-  value discarded by the max, and still charge full resource, a full cooldown and the turn.
+- **WHY IT EXISTS.** `add_status`'s DEFAULT branch resolves a re-application as `max()` on duration and
+  power, so a status whose power is a **snapshot of live state** could be recast at a weaker value,
+  have that value discarded by the max, and still charge full resource, a full cooldown and the turn.
+- **AND FOUR STATUSES ARE NOT `max()`, WHICH THIS BLOCK SAID OF EVERY STATUS UNTIL HS §1.** Each has a
+  branch of its own in `unit.add_status`: Burn ADDS its turns, Chilled adds a stack and RESETS its clock
+  (so a re-application can shorten it), Poison adds a stack and resets its clock too, and Ruin adds a
+  stack and leaves its permanence alone. **One `RECAST_GATED` member writes one of the four** — Glacial
+  Prison's Chilled — **and it proposes that write only where no Chilled stands** (the DA §2 bullet below),
+  so the refusal's reasoning above is untouched; a reader pricing what a second cast does reads the branch,
+  never this block's first sentence. **An ingredient inside a conjunction runs its own branch on its own
+  entry** (the conjunction block).
 - **THE SCOPE LIMIT MATTERS MORE THAN THE RULE.** An ability that also deals damage, heals, or
   converts a resource **must still cast** when its buff would not improve: that half is worth the
   turn on its own, and refusing it would be a worse bug than the one being fixed.
@@ -2201,6 +2210,55 @@ the block left out, spend what they were paid.
   whose WHOLE payoff sat in the block, and the designer answered it at the offer (HF §7)**: it is a RULED card-gate row
   on Trapper, offered only while Trapper is equipped at every door, and its payload stayed where it was.
 
+## STANDING RULE — TWO AFFLICTIONS MEETING ON ONE BODY MAKE A THIRD (Batch HS §2, the designer's)
+> **A CONJUNCTION: two statuses that `battle.CONJUNCTIONS` pairs, meeting on one body, become ONE status — one chip — that
+> carries both. A status built from one ability is TIER 1, from two TIER 2, from three TIER 3, and each tier is stronger
+> than the last. The table is the whole vocabulary: a pair not in it does nothing.** Rupture (Burn + Chilled) is the one
+> that ships.
+
+- **IT IS ADDITIVE, AND THAT IS WHY THE DESIGNER'S FIRST SHAPE, A CANCELLATION, WAS REJECTED.** Consuming both would have
+  taken Firedraw's best case, Overburn's burn-turns, one affliction off every breadth reader and Snare Line's chilled
+  target — Fellowship's shape at a larger size (HR §4c). **A conjunction never removes what it is made of.**
+- **ONE ENTRY CARRIES ITS INGREDIENTS WHOLE** (`BattleUnit.compose`, its `parts`): each keeps its own turns, power, tick,
+  stacks and `src_name`. **COMPONENTS ARE PRESENCE**: `has_status`, `get_status`, `status_power`, `status_stacks`,
+  `update_status`, `remove_status` and `set_chilled_stacks` find an ingredient inside a composition, and `get_status`
+  hands back the ingredient's own live entry. **A reader that walks `u.statuses` itself sees the composition and not
+  its ingredients** — the chip row's view and a cleanse's, and nobody else's.
+- **TIER IS WEIGHT: A READER THAT COUNTS DISTINCT AFFLICTIONS COUNTS INGREDIENTS** (`base_statuses()`), so a tier-N
+  counts N, the composition itself none, and the body with its chips unmerged reads the same. **Never count
+  `DEBUFF_IDS` against `has_status`**: with components present that counts the composition AND its ingredients. A new
+  breadth reader owes the base view (`docs/reports/HS.md` §2c holds the census).
+- **NOTHING RUNS TWICE.** A composition is about what a reader SEES. The Burn inside a Rupture ticks ONCE, as the
+  Rupture's (`battle._dot_pass`); the chill slows once; and what the composition adds rides that same tick
+  (`TICK_BREAK`, `_dot_tick_rider`).
+- **ITS CLOCK IS THE SHORTER INGREDIENT'S AT EVERY MOMENT, AND THE LONGER STANDS ALONE AFTER IT.** Each ingredient keeps
+  its own clock and the composition's is derived (`composition_turns`, a permanent one counting as endless), so the
+  window to climb closes with the shorter. When that one runs out, or a consumer eats an ingredient, the composition
+  dissolves and what is left goes back on the bar as it was. **A CLEANSE TAKES IT WHOLE** — it is one status — and
+  books a Sanctity event per ingredient, as unmerged chips would.
+- **A RE-APPLIED INGREDIENT RUNS ITS OWN RULE ON ITS OWN ENTRY (HS §2g; refusing the re-application was priced and not
+  taken — it makes a card dead on a target the player just improved).** Burn adds its turns, Chilled adds a stack and
+  resets its clock, and the composition's clock follows as the shorter; a card that writes an ingredient's clock
+  directly (Flamewave on a burning body, a skim) does the same.
+- **IT IS MADE AT THE STATUS DOOR (`_apply_status` calls `_conjoin`) AND NOWHERE ELSE**, so a status laid around that
+  door never meets its partner. **It applies to every body**: a hero carrying an Ashblade's Burn under the Hoarfrost
+  bargain's chill is ruptured too.
+- **THE COMBAT LOG IS ITS INSTRUMENT (HS §5)** — the sim cannot price one, so the designer reads it in play: it forms, it
+  ticks (the Burn and its own half apart), an ingredient is re-applied or written, and it ends and why (the clock, a
+  consumer, a cleanse, the body). **Every name comes off the data** — the composed row in `STATUS_INFO`, each
+  ingredient's own label — never a literal.
+- **UNPRICED CONTENT SHIPS IN THE SMALLEST UNIT THAT CAN BE FELT (HS §4, the designer's).** The sim cannot price a
+  conjunction — the bot casts the Mage's fire before his ice (HR §4f) — so the designer's play is the only instrument,
+  and five at once would be five unmeasured figures with no way to tell which one is wrong. **One ships, is played, is
+  tuned, and the next arrive against a figure that has been felt.** Seize, Breach, Blight and Reckoning are designed —
+  **RULED, NOT BUILT** (`docs/state.md`) — and **a census of who lays Cripple, Poison, Bleed, Sunder and Dazed on the
+  enemy side is owed before any is authored**. The draft label naming a card's conjunction ships with the second and
+  third — RULED, NOT BUILT.
+- **A TIER 3 MUST DO SOMETHING NO CARD CAN DO** — a Break bar emptied, a resistance inverted, a wind-up cancelled. **If a
+  tier 3 is only big damage, the ladder is a damage dial with extra steps.** None is built.
+- **RUPTURE'S ONE FIGURE IS `RUPTURE_BREAK_PER_TICK`, PROPOSED AND THE DESIGNER'S TO TUNE FROM PLAY**, pinned in ONE
+  place (`check_hs` §3a): a tuning pass moves the constant and that pin, never a dozen gates.
+
 ## STANDING RULE — EVERY CLASS OPENS WITH A KIT OF THREE, INSIDE THE SLOT COUNT (Batch GN, ruled by the designer)
 > **`Classes.CLASS_KITS` names three abilities per class. Every hero of the class opens with them after his basic,
 > whatever engine he takes, holds or drops; they are protected, and they count against the slot cap.** *One engine
@@ -2522,7 +2580,8 @@ was written. No meter is ungoverned. meter | what governs it | where the governo
   **NEITHER IS A CONTRADICTION TO BE "FIXED"**: AT's "nothing removes it" described the PASSIVE
   (no decay, no cap, no reset), and an earned spender is the exception a player buys. No test ever
   asserted the absolute — checked across every suite at BT, not assumed.
-· **Ruin** (uncapped, never clears, detonates every 10th stack — Avatar installs 5) | the
+· **Ruin** (uncapped, never clears, detonates every 10th stack — the Deepening Hex rune takes the step to
+  `RUIN_FLOOR`; the Avatar of Ruin's 5 is a read nothing has written since FX, corrected at HS §1) | the
   LIFESTEAL caps at RUIN_LEECH_CAP = 0.40 of the damage dealt, whatever the stacks and
   whatever the talents (Soul Glut included); the amplification is ALLOWED to run |
   battle.gd (const), applied at the strike-loop leech block.
@@ -3606,21 +3665,25 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
 - **`check_hk` DROVE HK's HALF AND `check_hr` DRIVES HR's ON THE REAL SCREENS** — a static check cannot see a drop land on a
   nameplate.
 
-## STANDING RULE — NO PEDDLER AND NO SMITH IN THE RUN'S FIRST THREE NODES (Batch HR §3, ruled by the designer)
+## STANDING RULE — NO PEDDLER, NO SMITH AND NO EVENT IN THE RUN'S FIRST THREE NODES (Batch HR §3 and HS §0, ruled by the designer)
 
-> **The map generator deals no merchant and no blacksmith into the first `Run.SHOP_GATE_NODES` columns of the run's
-> FIRST zone. The reason is the gold — *the player will never have enough* — and THE RULING IS THE REASON, NOT THE
+> **The map generator deals no merchant, no blacksmith and no event into the first `Run.SHOP_GATE_NODES` columns of the
+> run's FIRST zone. The reason is the gold — *the player will never have enough* — and THE RULING IS THE REASON, NOT THE
 > FIGURE.**
 
 - **IT IS THE RUN'S GATE, NOT EVERY ZONE'S** (`Run.shop_gated`: zone 0, columns 1..N): by the second zone the gold is
   there. A run opens with 60 gold; a rune and the smith's first pairing cost 150.
-- **THE ZONE STILL DEALS ITS FULL COUNT** — six smiths and five merchants into the eleven columns left, one of a kind a
-  column; measured at HR §3, no board runs short (`check_hr` §3). **What fills the gated columns is the generator's own
-  order**: events are placed after the trade nodes, roomiest column first, so most of the zone's events land there, then
-  fights. **An event pays no gold**, and that substitution is most of the runs that still reach their first trade node
-  short of 150 (`docs/reports/HR.md` §3) — a change to the placement order moves the figure that satisfies the reason.
-- **THE BARGAIN'S BOUGHT MERCHANT IS NOT A MAP NODE AND IS NOT GATED** — it follows an elite whose severity-4 bargain the
-  player chose, in place of that bargain's gold (HR §3 reports how often; a ruling is owed).
+- **THE ZONE STILL DEALS ITS FULL COUNT** — six smiths, five merchants and five events into the eleven columns left, one
+  of a kind a column; measured at HR §3 and again at HS §0, no board runs short (`check_hr` §3, `check_hs` §0).
+- **AND NO EVENT STANDS THERE EITHER (HS §0, ruled on HR §3c's measurement): THE FIRST THREE NODES TEACH COMBAT BEFORE
+  THEY OFFER SHOPPING** — fights and elites only (`Run.GATED_NODE_TYPES`). **That is the better of the two reasons**; the
+  other is the gold: the generator placed events after the trade nodes, roomiest column first, so the gated columns took
+  most of a zone's events, **an event pays no gold**, and with them kept out every run can pay 150 at its first trade node.
+  A change to the placement order moves the figure that satisfies the reason.
+- **THE BARGAIN'S BOUGHT MERCHANT IS GATED AT THE SAME NODES (HS §0, ruled)**: a player who traded a bargain's gold FOR a
+  merchant is the lowest-gold case in the game, and a merchant he cannot shop at is no reward. `Run.roll_offer` drops the
+  merchant from a severity's rewards there, so the option still comes and pays from what is left — at severity 4, its
+  gold or a rune.
 
 ## STANDING RULE — THE PARTY SCOPE, AND THE RUNES IT HOLDS; ITS SCREEN WORD IS THE CREST (Batch HK §4, ruled by the designer; the word confirmed in HL's brief; the runes HO §3's and HP §2's)
 
@@ -4399,7 +4462,7 @@ exactly the inverted card, and it would still read fine on the tooltip.
 **TWO THINGS WERE BOTH BEING CALLED "AXIS" AND SEPARATING THEM IS WHAT MAKES THE RULE WORKABLE.**
 
 > **An ENGINE is a rule that changes how a hero fights, for the whole run** (GK's charter) — stances,
-> Loyalty, Focus, Resonance, Ruin, Faith, Mercy, Burn, Chilled, Frenzy, Block. **Exclusive to its
+> Loyalty, Focus, Resonance, Ruin, Faith, Mercy, Overburn, Glacial Hold, Frenzy, Block. **Exclusive to its
 > class, held as a rune, two a hero at most.** This is where identity lives.
 >
 > **An AXIS is an effect type** — single-target damage, area damage, healing, shielding,
@@ -4410,6 +4473,14 @@ exactly the inverted card, and it would still read fine on the tooltip.
 > holds one build no matter how strong its engine is.
 >
 > **Adding axes to a spec does not dilute its identity; the engine still gates everything.**
+
+- **THE LIST NAMES ENGINES, AND AN ENGINE IS NOT THE STATUS IT READS (corrected at HS §1; HR §4h found it).**
+  It read *Burn, Chilled* until HS, and a reader took the two STATUSES for things only a Mage can lay.
+  Overburn and Glacial Hold are the engines; Burn and Chilled are statuses any class's card can put on a body
+  — a Hunter's Choking Smoke burns, Downwind carries either to another enemy, a Cleric's Returned Burden casts
+  either back off a hero, and an Ashblade burns a hero — and the same holds for Ruin, the Old Gods' mark,
+  which Downwind carries too. **What is exclusive is the RUNE that reads it.** A question about who lays a
+  status is asked of the status door (`_apply_status`) and the cards, never of this list.
 
 **THIS IS THE RULE POOLS ARE AUTHORED AGAINST NOW, INSTEAD OF BY FEEL.** DQ measured the
 Swordmaster at ten cards making FOUR decisions — a player who had drafted four had seen everything

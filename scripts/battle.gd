@@ -164,6 +164,12 @@ const STATUS_INFO := {
 	"chilled": ["Chilled", "Ch", Color(0.5, 0.75, 1.0), "Stacking frost: 1 = -25% speed,\n2 = -50%, 3 = also -15% damage;\n4 stacks FREEZE the victim."],  # 4 = a HOLD when he applied them
 	"frozen": ["Frozen", "Fz", Color(0.65, 0.88, 1.0), "Frozen solid: skips their turns until\nthe ice thaws. A Cryomancer's freeze is a\nHOLD — it never thaws on its own."],
 	"burn": ["Burn", "F", Color(1.0, 0.55, 0.2), "Burning: takes damage at the start of each\nturn (6% of the applier's Attack).\nReapplying Burn extends the duration."],
+	# BATCH HS §3 — THE FIRST CONJUNCTION. A composed status's row is its words, as
+	# every status's is; what it is MADE of is `CONJUNCTIONS` (below DOT_STATUSES),
+	# and the chip's tooltip is re-built off its ingredients as they stand
+	# (`BattleUnit._resync_composition`), so this description is the fallback only.
+	# `Ru`, NOT `BD`: Break damage's shorthand in every log line (CG §3's precedent).
+	"rupture": ["Rupture", "Ru", Color(0.86, 0.48, 0.80), "Burn and Chilled, joined: each Burn\ntick also deals Break damage, and the\nchill still slows. It ends when the\nshorter of the two would."],
 	# ("bleed" had a registry row here until Batch BJ §1 — never applied by any
 	# path and never displayed: the bleed chip is synthesized from bleed_buildup
 	# in unit.gd with its own label and colour. Deleted, not left unreachable.)
@@ -569,6 +575,36 @@ const SFX := {
 # when the status lands); Poison is per-stack (stacks handled at the tick
 # site). The raw number doubles as the legacy fallback for tickless statuses.
 const DOT_STATUSES := {"burn": 6, "poison": 3}
+
+# ══ BATCH HS §2 — THE CONJUNCTIONS: TWO AFFLICTIONS MEETING ON ONE BODY MAKE A THIRD ══
+#
+# **THE TABLE IS THE WHOLE VOCABULARY.** A row is a composed status and the
+# UNORDERED pair it is made of; a pair not in it does nothing, as before HS. The
+# composition is made at the status door (`_conjoin`, called from `_apply_status`
+# the moment the arriving status has taken hold) and its shape is unit.gd's
+# (`BattleUnit.compose` — one entry, one chip, each ingredient kept whole inside
+# it). ITS TIER IS HOW MANY INGREDIENTS IT HOLDS (`BattleUnit.tier_of`), read off
+# the entry and never written here, so a tier cannot disagree with its recipe.
+#
+# **ONE SHIPS, AND THE REASON IS RULED (HS §4): unpriced content ships in the
+# smallest unit that can be FELT.** The sim cannot price a conjunction — the bot
+# casts the Mage's fire before his ice (HR §4f) — so the designer's play is the
+# instrument, and five at once would be five unmeasured figures with no way to
+# tell which one is wrong. Seize, Breach, Blight and Reckoning are designed and
+# NOT built (`docs/state.md`); a row for one is owed the applier census first.
+const CONJUNCTIONS := {"rupture": ["burn", "chilled"]}
+
+# **RUPTURE'S ONE FIGURE: THE BREAK EACH OF ITS TICKS ADDS TO THE BURN'S DAMAGE.
+# PROPOSED AT HS §3, FLAGGED AND NOT TUNED — THE DESIGNER TUNES IT FROM PLAY.** It
+# is pinned in ONE place, `check_hs` §3a (`check_hp` §2a's shape for a figure the
+# designer owns), and every other reader reads this constant, so a tuning pass
+# moves one line here and one in that gate. The reasoning for Break rather than
+# another payout is `docs/design-notes.md`'s, and the size it was set against is
+# HR §4f's clash (about two turns of Burn at its tick).
+const RUPTURE_BREAK_PER_TICK := 10
+# The Break a composed status's tick adds, by composed id: the tick is the Burn's,
+# ONCE, and this is the composition's own half riding it (`_dot_tick_rider`).
+const TICK_BREAK := {"rupture": RUPTURE_BREAK_PER_TICK}
 
 var heroes: Array = []
 var enemies: Array = []
@@ -2814,6 +2850,130 @@ func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability
 
 # ---------- battle loop ----------
 
+# BATCH HS §2 — the damage-over-time pass at the top of a unit's turn, extracted
+# from `_run_battle` unchanged. A composition's Burn ticks here once, as the
+# composition's, with its own half riding the same tick (`_dot_tick_rider`).
+func _dot_pass(u: BattleUnit) -> void:
+	for dot_id in DOT_STATUSES:
+		if u.has_status(dot_id) and not u.dead:
+			# Poison never ticks on the turn it was applied.
+			if dot_id == "poison":
+				var pstatus: Dictionary = u.get_status("poison")
+				if pstatus.get("fresh", false):
+					pstatus["fresh"] = false
+					continue
+				# Perfected Toxin: a poison that never leaves gets worse.
+				_perfected_toxin_tick(u)
+				# BATCH BM §2 — COCKTAIL (Survivalist, Venom row 8).
+				# BREADTH BECOMES SELF-PROPAGATING WITHIN ONE ENEMY, and
+				# the BA contagion reservation holds absolutely: nothing
+				# here spreads between enemies or from a corpse.
+				_cocktail_tick(u)
+			# Tick strength was snapshotted from the applier's Attack.
+			var dot_dmg: int = int(u.get_status(dot_id).get("tick", 0))
+			if dot_dmg <= 0:
+				dot_dmg = DOT_STATUSES[dot_id]
+			var stack_tag := ""
+			if dot_id == "poison":
+				var stacks := maxi(u.status_stacks("poison"), 1)
+				dot_dmg *= stacks
+				stack_tag = " (x%d stacks)" % stacks if stacks > 1 else ""
+				# Poison counts as nature damage: nature resists apply.
+				var nat_resist := float(u.resists.get("nature", 0.0))
+				if nat_resist != 0.0:
+					dot_dmg = maxi(int(round(dot_dmg * (1.0 - nat_resist))), 0)
+					stack_tag += " (resisted)" if nat_resist > 0.0 else " (WEAK!)"
+			if dot_id == "burn":
+				# Burn is fire damage: fire resists shrug the tick the same
+				# way nature resists shrug poison (fire-proof stays true —
+				# unless the Avatar of Flame stands; weaknesses still count).
+				var fire_resist := float(u.resists.get("fire", 0.0))
+				if fire_resist > 0.0 and not u.is_hero \
+						and _living_hero_with("avatar_flame") != null:
+					fire_resist = 0.0
+				if fire_resist != 0.0:
+					dot_dmg = maxi(int(round(dot_dmg * (1.0 - fire_resist))), 0)
+					stack_tag += " (resisted)" if fire_resist > 0.0 else " (WEAK!)"
+			# Bookkeeping: tick damage credits the spec that owns the
+			# lane (heroes never poison/burn each other, so the status
+			# names its owner: poison = Survivalist, burn = Pyromancer).
+			#
+			# BATCH BL §2 DROPPED THE `sim and` GUARD THAT USED TO OPEN THIS
+			# BRANCH, and it was a real hole rather than a tidy-up: in REAL
+			# PLAY a Pyromancer's Burn and a Survivalist's Poison reached
+			# neither the run summary's damage share nor anything else, so
+			# two specs whose whole lane is damage-over-time read as doing
+			# less than they did. Sim totals are untouched — that path
+			# already counted these ticks — so no baseline moves.
+			if not u.is_hero and dot_dmg > 0:
+				var dot_owner := "Survivalist" if dot_id == "poison" else "Pyromancer"
+				for dh in heroes:
+					if dh.unit_name == dot_owner:
+						_dmg_frame(dh, String(STATUS_INFO[dot_id][0]))
+						_stat("dmg_hero_" + dot_owner, dot_dmg)
+						break
+			var info: Array = STATUS_INFO[dot_id]
+			# BATCH BL §2 — a status tick is attributed to WHOEVER APPLIED
+			# IT, which `_apply_status` already stamps on the status as
+			# `src_name`. The applier may be dead by now (a Burn outlives
+			# its Ashblade), so the name is carried rather than the unit.
+			var dot_src := String(u.get_status(dot_id).get("src_name", ""))
+			_dmg_frame(null, String(info[0]), dot_src)
+			_sfx("hit", -14.0, 0.8)
+			# READ BEFORE THE TICK LANDS, and Ashen Skin below is why: a tick
+			# that KILLS its victim takes the status with the body, so a read
+			# after the fact would silently skip the killing tick — the one a
+			# player most expects to be paid for.
+			# BATCH HS §3 — A BURN INSIDE A COMPOSITION TICKS ONCE, AS THE
+			# COMPOSITION'S: read before the tick, because a killing tick takes
+			# the composition with the body.
+			var dot_comp: Dictionary = u.composition_of(dot_id)
+			var dot_died: bool = u.take_tick_damage(dot_dmg, "-%d %s" % [dot_dmg, info[0]], info[2])
+			if dot_comp.is_empty():
+				_log("%s takes %d %s damage%s" % [u.unit_name, dot_dmg, info[0],
+					stack_tag], "#e08850")
+			else:
+				_log("%s's %s ticks — the %s: %d damage%s" % [u.unit_name,
+					String(dot_comp.label), info[0], dot_dmg, stack_tag], "#e08850")
+			if dot_id == "burn" and not dot_comp.is_empty() and not dot_died:
+				_dot_tick_rider(u)
+			# Pyromancer burn-tick talents: mana sipped from the flames,
+			# armor melting off the victim (shown as a chip).
+			if dot_id == "burn" and not u.is_hero:
+				# ASHEN SKIN (Pyromancer, Inferno row 2 — BATCH BS §3). It pays
+				# for the ticks HE APPLIED and nobody else's, so it reads the
+				# `src_name` `_apply_status` already stamps on the status rather
+				# than paying every Pyromancer-shaped hero in range. A rune's
+				# burn, an enemy Ashblade's burn and a second applier's burn all
+				# correctly pay him nothing. The applier may be DEAD by now,
+				# which is exactly why the status carries a name and not a unit —
+				# and `dot_src` is captured ABOVE the tick for the same class of
+				# reason (a killing tick takes the status with the body).
+				for h in heroes:
+					if h.dead:
+						continue
+					if h.ashen_skin_heal > 0 and h.unit_name == dot_src:
+						var ash_back := maxi(int(round(
+							dot_dmg * 0.01 * h.ashen_skin_heal)), 1)
+						var ash_got: int = h.heal_amount(ash_back)
+						if ash_got > 0:
+							_stat_heal(h, ash_got, h)
+							h.float_text("+%d" % ash_got, Color(1.0, 0.7, 0.4))
+							_log("   → Talent: Ashen Skin — %s drinks %d from his own fire" % [
+								h.unit_name, ash_got], "#b0a8e0")
+					if h.melt_ranks > 0 and not u.dead:
+						u.melted += 0.01 * h.melt_ranks
+						var melt_pct := int(round(u.melted * 100))
+						var melt_desc := "Melt Armor: %d%% armor burned away\nfor the rest of the battle." % melt_pct
+						if not u.update_status("melted", "-%d%%" % melt_pct, melt_desc):
+							u.add_status("melted", "Melt Armor", "-%d%%" % melt_pct,
+								Color(1.0, 0.5, 0.2), -1, melt_desc)
+			await _wait(0.5)
+			if dot_died:
+				_message("%s succumbs to %s!" % [u.unit_name, info[0]])
+				_log("† %s dies" % u.unit_name, "#e05050")
+
+
 func _run_battle() -> void:
 	# BATCH GH — A FIGHT RESUMED WITH EVERY HERO DOWN WAS LOST BEFORE THE QUIT.
 	# The last death reaches the save the moment it lands (`_bank_party_losses`,
@@ -2969,114 +3129,11 @@ func _run_battle() -> void:
 			if u.is_hero and not u.is_companion:
 				_cy_turns += 1
 			_cy_sample()
-		for dot_id in DOT_STATUSES:
-			if u.has_status(dot_id) and not u.dead:
-				# Poison never ticks on the turn it was applied.
-				if dot_id == "poison":
-					var pstatus: Dictionary = u.get_status("poison")
-					if pstatus.get("fresh", false):
-						pstatus["fresh"] = false
-						continue
-					# Perfected Toxin: a poison that never leaves gets worse.
-					_perfected_toxin_tick(u)
-					# BATCH BM §2 — COCKTAIL (Survivalist, Venom row 8).
-					# BREADTH BECOMES SELF-PROPAGATING WITHIN ONE ENEMY, and
-					# the BA contagion reservation holds absolutely: nothing
-					# here spreads between enemies or from a corpse.
-					_cocktail_tick(u)
-				# Tick strength was snapshotted from the applier's Attack.
-				var dot_dmg: int = int(u.get_status(dot_id).get("tick", 0))
-				if dot_dmg <= 0:
-					dot_dmg = DOT_STATUSES[dot_id]
-				var stack_tag := ""
-				if dot_id == "poison":
-					var stacks := maxi(u.status_stacks("poison"), 1)
-					dot_dmg *= stacks
-					stack_tag = " (x%d stacks)" % stacks if stacks > 1 else ""
-					# Poison counts as nature damage: nature resists apply.
-					var nat_resist := float(u.resists.get("nature", 0.0))
-					if nat_resist != 0.0:
-						dot_dmg = maxi(int(round(dot_dmg * (1.0 - nat_resist))), 0)
-						stack_tag += " (resisted)" if nat_resist > 0.0 else " (WEAK!)"
-				if dot_id == "burn":
-					# Burn is fire damage: fire resists shrug the tick the same
-					# way nature resists shrug poison (fire-proof stays true —
-					# unless the Avatar of Flame stands; weaknesses still count).
-					var fire_resist := float(u.resists.get("fire", 0.0))
-					if fire_resist > 0.0 and not u.is_hero \
-							and _living_hero_with("avatar_flame") != null:
-						fire_resist = 0.0
-					if fire_resist != 0.0:
-						dot_dmg = maxi(int(round(dot_dmg * (1.0 - fire_resist))), 0)
-						stack_tag += " (resisted)" if fire_resist > 0.0 else " (WEAK!)"
-				# Bookkeeping: tick damage credits the spec that owns the
-				# lane (heroes never poison/burn each other, so the status
-				# names its owner: poison = Survivalist, burn = Pyromancer).
-				#
-				# BATCH BL §2 DROPPED THE `sim and` GUARD THAT USED TO OPEN THIS
-				# BRANCH, and it was a real hole rather than a tidy-up: in REAL
-				# PLAY a Pyromancer's Burn and a Survivalist's Poison reached
-				# neither the run summary's damage share nor anything else, so
-				# two specs whose whole lane is damage-over-time read as doing
-				# less than they did. Sim totals are untouched — that path
-				# already counted these ticks — so no baseline moves.
-				if not u.is_hero and dot_dmg > 0:
-					var dot_owner := "Survivalist" if dot_id == "poison" else "Pyromancer"
-					for dh in heroes:
-						if dh.unit_name == dot_owner:
-							_dmg_frame(dh, String(STATUS_INFO[dot_id][0]))
-							_stat("dmg_hero_" + dot_owner, dot_dmg)
-							break
-				var info: Array = STATUS_INFO[dot_id]
-				# BATCH BL §2 — a status tick is attributed to WHOEVER APPLIED
-				# IT, which `_apply_status` already stamps on the status as
-				# `src_name`. The applier may be dead by now (a Burn outlives
-				# its Ashblade), so the name is carried rather than the unit.
-				var dot_src := String(u.get_status(dot_id).get("src_name", ""))
-				_dmg_frame(null, String(info[0]), dot_src)
-				_sfx("hit", -14.0, 0.8)
-				# READ BEFORE THE TICK LANDS, and Ashen Skin below is why: a tick
-				# that KILLS its victim takes the status with the body, so a read
-				# after the fact would silently skip the killing tick — the one a
-				# player most expects to be paid for.
-				var dot_died: bool = u.take_tick_damage(dot_dmg, "-%d %s" % [dot_dmg, info[0]], info[2])
-				_log("%s takes %d %s damage%s" % [u.unit_name, dot_dmg, info[0],
-					stack_tag], "#e08850")
-				# Pyromancer burn-tick talents: mana sipped from the flames,
-				# armor melting off the victim (shown as a chip).
-				if dot_id == "burn" and not u.is_hero:
-					# ASHEN SKIN (Pyromancer, Inferno row 2 — BATCH BS §3). It pays
-					# for the ticks HE APPLIED and nobody else's, so it reads the
-					# `src_name` `_apply_status` already stamps on the status rather
-					# than paying every Pyromancer-shaped hero in range. A rune's
-					# burn, an enemy Ashblade's burn and a second applier's burn all
-					# correctly pay him nothing. The applier may be DEAD by now,
-					# which is exactly why the status carries a name and not a unit —
-					# and `dot_src` is captured ABOVE the tick for the same class of
-					# reason (a killing tick takes the status with the body).
-					for h in heroes:
-						if h.dead:
-							continue
-						if h.ashen_skin_heal > 0 and h.unit_name == dot_src:
-							var ash_back := maxi(int(round(
-								dot_dmg * 0.01 * h.ashen_skin_heal)), 1)
-							var ash_got: int = h.heal_amount(ash_back)
-							if ash_got > 0:
-								_stat_heal(h, ash_got, h)
-								h.float_text("+%d" % ash_got, Color(1.0, 0.7, 0.4))
-								_log("   → Talent: Ashen Skin — %s drinks %d from his own fire" % [
-									h.unit_name, ash_got], "#b0a8e0")
-						if h.melt_ranks > 0 and not u.dead:
-							u.melted += 0.01 * h.melt_ranks
-							var melt_pct := int(round(u.melted * 100))
-							var melt_desc := "Melt Armor: %d%% armor burned away\nfor the rest of the battle." % melt_pct
-							if not u.update_status("melted", "-%d%%" % melt_pct, melt_desc):
-								u.add_status("melted", "Melt Armor", "-%d%%" % melt_pct,
-									Color(1.0, 0.5, 0.2), -1, melt_desc)
-				await _wait(0.5)
-				if dot_died:
-					_message("%s succumbs to %s!" % [u.unit_name, info[0]])
-					_log("† %s dies" % u.unit_name, "#e05050")
+		# BATCH HS §2 — THE DoT PASS IS ITS OWN FUNCTION, MOVED HERE BYTE FOR BYTE: a
+		# Rupture's Burn ticks ONCE, as the composition's, and that negative can only be
+		# DRIVEN where the pass can be called on a body (`_run_battle` cannot be stepped
+		# headlessly — BB's `_turns_taken` and BD's extractions are the precedent).
+		await _dot_pass(u)
 		if u.dead:
 			_check_end()
 			continue
@@ -3390,8 +3447,10 @@ func _run_battle() -> void:
 			for sv2_e in enemies:
 				if sv2_e.dead:
 					continue
-				for sv2_id in BattleUnit.DEBUFF_IDS:
-					if sv2_id != "broken" and sv2_e.has_status(sv2_id):
+				# BATCH HS §2c — ingredients, as `_status_count` counts them.
+				for sv2_s in sv2_e.base_statuses():
+					var sv2_id := String(sv2_s.id)
+					if sv2_id != "broken" and BattleUnit.DEBUFF_IDS.has(sv2_id):
 						sv2_ids[sv2_id] = true
 			var sv2_n: int = sv2_ids.size()
 			var sv2_pct: int = mini(sv2_n * u.status_power("salve"), SALVE_CAP)
@@ -6106,7 +6165,8 @@ func _eff_cost(u: BattleUnit, ab: Ability, target: BattleUnit = null) -> int:
 # and the hotkeys can never disagree.
 # ================= BATCH CO — A RECAST THAT WOULD DO NOTHING =================
 #
-# `add_status` resolves a re-application as max() on duration and power. For any
+# `add_status`'s default branch resolves a re-application as max() on duration and
+# power (Burn, Chilled, Poison and Ruin have branches of their own — HS §1). For any
 # status whose power is a SNAPSHOT OF LIVE STATE, a recast can therefore cost
 # full resource, a full cooldown and the whole turn and return nothing: the
 # weaker new value is discarded by the max and the player is never told. Vespers
@@ -14041,6 +14101,16 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 	# `docs/reports/FT.md` §3 carries the census.
 	if eff_turns > 0 and src != null and src.sanctity_active:
 		eff_turns += src.sanctity_turn_bonus()
+	# BATCH HS §2g — WHAT A RE-APPLICATION FINDS, READ BEFORE IT LANDS: a status
+	# already standing inside a composition is re-applied there by its own rule
+	# (unit.gd's branch for it runs on its own entry), and the log says what moved.
+	var hs_inside: Dictionary = target.composition_of(id)
+	var hs_before: Dictionary = {}
+	if not hs_inside.is_empty():
+		var hs_part: Dictionary = target.get_status(id)
+		hs_before = {"turns": int(hs_part.get("turns", 0)),
+			"stacks": int(hs_part.get("stacks", 1)),
+			"clock": BattleUnit.composition_turns(hs_inside)}
 	target.add_status(id, info[0], info[1], info[2], eff_turns, info[3], power, tick)
 	# Batch W: the debuffer's ledger — statuses a hero lands on OTHERS
 	# (only sites that pass src are counted; the changelog owns the list).
@@ -14054,6 +14124,14 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 		var st_stamp := target.get_status(id)
 		if not st_stamp.is_empty():
 			st_stamp["src_name"] = src.unit_name
+	# BATCH HS §2 — THE CONJUNCTION IS MADE HERE, AT THE STATUS DOOR, the moment the
+	# arriving status has taken hold (every refusal above has returned) and before
+	# any hook below copies it onward — so Frostbind's mate, a Downwind carry and a
+	# Rime echo each meet their own body's partner through this same line.
+	if not hs_inside.is_empty():
+		_log_reapplied_inside(target, id, hs_inside, hs_before, src)
+	else:
+		_conjoin(target, id, src)
 	# BATCH CB — FROSTBIND'S FIRST CLAUSE: Chilled landing on either partner
 	# lands on the other too. It sits HERE for CREEPING DEATH's exact reason —
 	# above every per-status branch, because the `chilled` branch below returns
@@ -14210,6 +14288,136 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 		return
 	var span := "battle" if turns < 0 else "%d turns" % turns
 	_log("   → %s on %s (%s)" % [info[0], target.unit_name, span], "#b0a8e0")
+
+
+# ══ BATCH HS §2 / §5 — THE CONJUNCTION'S DOOR, AND THE LOG THAT IS ITS INSTRUMENT ══
+#
+# **THE LOG IS WHAT REPLACES THE SIM HERE (HS §5)**: the bot will not assemble a
+# conjunction on purpose, so the designer reads one in play, and every event writes
+# a line — it FORMS (below), it TICKS (`_dot_tick_rider`), a component is RE-APPLIED
+# (`_log_reapplied_inside`), it ENDS (`BattleUnit._dissolve` for the clock or a
+# consumer, `remove_status` / `purge_debuffs_taken` for a cleanse, `_die` for the
+# body). **Every name comes off the data** — the composed status's `STATUS_INFO`
+# row and each ingredient's own label — never a literal (HL §2's thirteen stale
+# lines; HQ's `_crest_name_for` is the pattern).
+
+# The status `id` has just taken hold on `target`, standing alone. If the table
+# pairs it with a status standing alone on the same body, the two become one.
+func _conjoin(target: BattleUnit, id: String, src: BattleUnit) -> void:
+	if target == null or target.dead or not target.composition_of(id).is_empty():
+		return
+	for comp_id in CONJUNCTIONS:
+		var pair: Array = CONJUNCTIONS[comp_id]
+		if not pair.has(id):
+			continue
+		var partner := String(pair[1]) if String(pair[0]) == id else String(pair[0])
+		var partner_alone := false
+		for s in target.statuses:
+			if String(s.id) == partner:
+				partner_alone = true
+		if not partner_alone:
+			continue
+		var cinfo: Array = STATUS_INFO[comp_id]
+		var made: Dictionary = target.compose(comp_id, String(pair[0]), String(pair[1]),
+			cinfo[0], cinfo[1], cinfo[2], _conjunction_rider(comp_id))
+		if made.is_empty():
+			continue
+		made["src_name"] = src.unit_name if src != null else ""
+		var arrived: Dictionary = target.get_status(id)
+		var met: Dictionary = target.get_status(partner)
+		var a_name := String(arrived.get("label", id))
+		var m_name := String(met.get("label", partner))
+		var clock := BattleUnit.composition_turns(made)
+		var a_t := int(arrived.get("turns", 0))
+		var m_t := int(met.get("turns", 0))
+		var from := ""
+		if a_t < 0 and m_t < 0:
+			from = "both permanent"
+		elif a_t < 0:
+			from = "the %s's — the %s does not wear off" % [m_name, a_name]
+		elif m_t < 0:
+			from = "the %s's — the %s does not wear off" % [a_name, m_name]
+		elif a_t == m_t:
+			from = "each ran %d" % a_t
+		else:
+			from = "the %s's, the shorter" % (a_name if a_t < m_t else m_name)
+		var who := ("%s's " % src.unit_name) if src != null else ""
+		var span := "battle-long" if clock < 0 else "%d turn%s" % [clock, "" if clock == 1 else "s"]
+		target.float_text(String(cinfo[0]).to_upper(), cinfo[2])
+		_log("   → %s forms on %s: %s%s lands on its %s — tier %d, %s (%s)" % [
+			String(cinfo[0]), target.unit_name, who, a_name,
+			m_name, BattleUnit.tier_of(made), span, from], "#d090e0")
+		return
+
+
+# The line a composition's chip carries for what it adds beyond its ingredients,
+# built from the constant at render time (CL §1: a figure is computed, never
+# authored). Empty for a composition that adds nothing of its own.
+func _conjunction_rider(comp_id: String) -> String:
+	var bd: int = int(TICK_BREAK.get(comp_id, 0))
+	if bd <= 0:
+		return ""
+	return "Each Burn tick also deals %d Break damage." % bd
+
+
+# HS §2g, AS BUILT: a component re-applied inside a composition runs ITS OWN rule
+# on its own entry — Burn's turns ADD, Chilled adds a stack and RESETS its clock —
+# and the composition's clock follows as the shorter of the two. Read before and
+# after, so the line says exactly what the second cast did.
+func _log_reapplied_inside(target: BattleUnit, id: String, comp: Dictionary,
+		before: Dictionary, src: BattleUnit) -> void:
+	var part: Dictionary = target.get_status(id)
+	if part.is_empty() or comp.is_empty():
+		return
+	var after_t := int(part.get("turns", 0))
+	var after_s := int(part.get("stacks", 1))
+	var clock_after := BattleUnit.composition_turns(comp)
+	var what := ""
+	var bt := int(before.get("turns", 0))
+	if int(before.get("stacks", 1)) != after_s:
+		what = "x%d → x%d, its clock %s" % [int(before.get("stacks", 1)), after_s,
+			"reset to %d" % after_t if after_t >= 0 else "permanent"]
+	elif after_t != bt:
+		what = "its turns %d → %d" % [bt, after_t] if after_t >= 0 and bt >= 0 \
+			else "permanent"
+	else:
+		what = "nothing moved"
+	var c_before := int(before.get("clock", 0))
+	var clock_txt := "%s %s" % [String(comp.label),
+		"battle-long" if clock_after < 0 else "%d turn%s" % [clock_after, "" if clock_after == 1 else "s"]]
+	if c_before != clock_after:
+		clock_txt += " (was %s)" % ("battle-long" if c_before < 0 else str(c_before))
+	_log("   → %s%s re-applied inside %s's %s: its own rule — %s; %s" % [
+		("%s's " % src.unit_name) if src != null else "", String(part.label),
+		target.unit_name, String(comp.label), what, clock_txt], "#d090e0")
+
+
+# HS §3 — A COMPOSITION'S TICK IS ITS BURN'S, ONCE: the DoT pass has just dealt the
+# Burn's damage, and the composition's own half rides the same tick — Break damage,
+# through `take_hit`'s Break block like Decay's (every Break-taken term applies),
+# skipped while the body is Broken as Decay's is.
+func _dot_tick_rider(u: BattleUnit) -> void:
+	var comp: Dictionary = u.composition_of("burn")
+	if comp.is_empty() or u.dead:
+		return
+	var bd: int = int(TICK_BREAK.get(String(comp.id), 0))
+	if bd <= 0:
+		return
+	# A Broken body takes no Break (Decay's shape), and the log says so rather than
+	# leaving the tick's second half to read as missing (HS §5).
+	if u.broken:
+		_log("   → %s's %s ticks — the Break: none, while %s is Broken" % [u.unit_name,
+			String(comp.label), u.unit_name], "#d090e0")
+		return
+	var rp_result: Dictionary = u.take_hit(0, bd)
+	_stat_bd(String(comp.get("src_name", "")), bd)
+	u.float_text("+%d BD" % rp_result.get("bd", 0), STATUS_INFO[String(comp.id)][2])
+	_log("   → %s's %s ticks — the Break: +%d Break damage" % [u.unit_name,
+		String(comp.label), int(rp_result.get("bd", 0))], "#d090e0")
+	if rp_result.broke:
+		_sfx("break", -4.0)
+		_message("%s BREAKS!" % u.unit_name)
+		_log("!! %s BREAKS (%s)" % [u.unit_name, String(comp.label)], "#c070e0")
 
 
 # CREEPING DEATH, RE-SPECCED (Batch BA §2): laying ANY status on an enemy that
@@ -17138,7 +17346,8 @@ func _unique_enemy_debuffs() -> int:
 	for e in enemies:
 		if e.dead:
 			continue
-		for s in e.statuses:
+		# BATCH HS §2c — ingredients: a Rupture is a Burn and a Chilled here.
+		for s in e.base_statuses():
 			if BattleUnit.DEBUFF_IDS.has(s.id):
 				seen[s.id] = true
 	return seen.size()
@@ -18233,7 +18442,10 @@ func _burning_ground_tick(u: BattleUnit) -> void:
 # his (under Vow of Silence, a tick that deals nothing).
 func _return_burden(cleric: BattleUnit, from: BattleUnit, taken: Array) -> void:
 	var rb_sent: Array = []
-	for eff in taken:
+	# BATCH HS §2 — A COMPOSITION GOES BACK AS ITS INGREDIENTS, each to whoever laid
+	# it, and they meet again at the status door only if they land on one body: a
+	# Rupture lifted is a Burn and a Chilled lifted, as the unmerged chips would be.
+	for eff in BattleUnit.flatten_statuses(taken):
 		var rb: Dictionary = eff
 		var rb_id := String(rb.get("id", ""))
 		if not STATUS_INFO.has(rb_id):
@@ -21990,7 +22202,10 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					# same array for every status on the body, and `+` allocates.
 					var hv_party: Array = heroes + companions
 					var hv_ally := 0
-					for hv_s in target.statuses:
+					# BATCH HS §2c — a composition's ingredients each carry who laid
+					# them, so the ally share is read per ingredient.
+					for hv_s in BattleUnit.flatten_statuses(target.statuses.filter(
+							func(hv_t): return not BattleUnit._is_sticky(hv_t))):
 						if hv_s.id == "broken" or bool(hv_s.get("sticky", false)):
 							continue
 						if not BattleUnit.DEBUFF_IDS.has(hv_s.id):
@@ -24561,12 +24776,17 @@ func _bestial_dmg_mult(comp: BattleUnit) -> float:
 # Distinct debuffs on a unit — the Trapper's meter lives on the enemy.
 # Counts the curated DEBUFF_IDS allowlist only, so bookkeeping statuses
 # never inflate it.
+#
+# BATCH HS §2c — IT COUNTS INGREDIENTS (`base_statuses`), so a tier-2 composition is
+# two afflictions and the composition itself none: the same body with the two chips
+# unmerged reads the same. Asked as `DEBUFF_IDS` × `has_status` it would have counted
+# the composition AND both of its ingredients, because components are presence.
 func _status_count(u: BattleUnit) -> int:
-	var n := 0
-	for id in BattleUnit.DEBUFF_IDS:
-		if id != "broken" and u.has_status(id):
-			n += 1
-	return n
+	var seen := {}
+	for s in u.base_statuses():
+		if String(s.id) != "broken" and BattleUnit.DEBUFF_IDS.has(String(s.id)):
+			seen[String(s.id)] = true
+	return seen.size()
 
 
 # BATCH BV — LOADED SHOT (Survivalist draft): every harmful effect on the body
@@ -24589,7 +24809,9 @@ func _loaded_shot_refresh(attacker: BattleUnit, victim: BattleUnit) -> void:
 	if victim == null or victim.dead:
 		return
 	var refreshed := 0
-	for st in victim.statuses:
+	# BATCH HS §2 — every affliction, a composition's ingredients each by its own
+	# `full_turns` (the composition's clock re-derives off them at the chip refresh).
+	for st in victim.base_statuses():
 		if st.id == "broken" or not BattleUnit.DEBUFF_IDS.has(st.id):
 			continue
 		var full := int(st.get("full_turns", 0))
@@ -24623,15 +24845,20 @@ func _loaded_shot_refresh(attacker: BattleUnit, victim: BattleUnit) -> void:
 const HARVEST_BOT_YIELD := 3
 
 
+#
+# BATCH HS §2c — A COMPOSITION IS REAPED WHOLE AND PAID BY ITS TIER: the purge takes
+# it as one status, and what Harvest and Cull are paid is the afflictions in it, so
+# this counts its ingredients — unless it holds a sticky one, when it refuses the
+# purge whole (`BattleUnit._is_sticky`) and is not counted at all.
 func _harvest_yield(u: BattleUnit) -> int:
 	if u == null or u.dead:
 		return 0
 	var n := 0
 	for s in u.statuses:
-		if s.id == "broken" or bool(s.get("sticky", false)):
+		if s.id == "broken" or BattleUnit._is_sticky(s):
 			continue
 		if BattleUnit.DEBUFF_IDS.has(s.id):
-			n += 1
+			n += BattleUnit.tier_of(s)
 	return n
 
 
@@ -24649,7 +24876,9 @@ func _harvest_yield(u: BattleUnit) -> int:
 func _other_spec_debuff(u: BattleUnit) -> bool:
 	if u == null:
 		return false
-	for s2 in u.statuses:
+	# BATCH HS §2d — ingredients: the Chilled inside a Rupture is another spec's
+	# work standing on a burning body, which is this function's whole question.
+	for s2 in u.base_statuses():
 		if s2.id in ["burn", "slow_burn", "broken"]:
 			continue
 		if BattleUnit.DEBUFF_IDS.has(s2.id):

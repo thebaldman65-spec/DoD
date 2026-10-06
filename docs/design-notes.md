@@ -4,6 +4,58 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Conjunctions: the mechanism, and one of them (Batch HS) — 2026-10-05
+
+**Why two afflictions JOIN instead of cancelling.** The first idea was a clash: Burn and Chilled meeting on one body
+would consume each other and pay something for it. It would have taken away exactly what the game already pays for having
+both — Firedraw's deepest draw wants a burning enemy carrying another spec's debuff, Overburn counts burn-turns, every
+breadth reader counts the two as two, and Snare Line stuns a chilled target for longer. A cancellation is a subtraction
+dressed as a reward. A conjunction is the same meeting made additive: the two become one stronger status that still
+carries both, so nothing that read either goes hungry.
+
+**Why the ingredients still count as standing, and as two.** If a Rupture hid its Burn, every fire card's gate, Pyroblast
+and Overburn would stop seeing fire the moment it formed, and the player would be punished for building it. If it counted
+as one affliction where it had been two, the Trapper and every card like him would pay less for the better board. So the
+ingredients are presence, and tier is weight: a tier-two status counts two. That is the designer's tier idea doing the
+work that keeps the mechanic additive.
+
+**Why nothing runs twice.** Presence is about what a card SEES. If the Burn inside a Rupture also ticked as a Burn beside
+the Rupture's own tick, joining would double the fire for free. The Burn ticks once, as the Rupture's, and the Rupture's
+own half — the Break — rides that tick.
+
+**Why its clock is the shorter one, and why the longer one survives it.** The shorter clock is the system's tension: chill
+on turn two for three turns and the window to build on it closes on turn five, so the ladder is not "do three things
+eventually". Each ingredient keeps its own clock and the Rupture's is always the shorter of them, rather than one clock set
+at the moment it formed — otherwise a permanent Glacial Hold chill re-applied would "reset" a Rupture to permanent, and the
+Burn inside it would never end. And when the shorter runs out, the longer goes back on the bar with what it had left:
+joining should never cost the player the tail of the better ingredient.
+
+**Why a cleanse takes it whole.** It is one status, on one chip. A cleanse that took half of it would be a cleanse that
+takes a chill stack off a pile, or a Burn off a Rupture, which no cleanse in the game does. The cost of that is real and it
+is recorded: a joined pair is one cleanse from gone, where two chips were two.
+
+**Why a second Fireball still adds its turns.** Re-casting an ingredient follows that ingredient's own rule — Burn adds,
+Chill stacks and restarts its clock — because the other answer, refusing it, would make a card dead on a target the
+player had just improved. The two rules disagree with each other, and that disagreement is the game's existing one.
+
+**Why Break, for Rupture.** Break is the currency the Mage has no lever for; the Occultist's madness lane waits on a Broken
+target and his pool has nothing that grinds the meter; and Bonecracker and Breaking Darkness already pay for Break that
+lands. A Rupture is fire and ice cracking a body open, and the meter it fills is the one that says so.
+
+**Why one, not five.** The sim cannot price a conjunction: the bot casts the Mage's fire before his ice and will almost
+never build one on purpose. The designer's play is the only instrument, and five at once would be five unmeasured numbers
+with no way to tell which is wrong. One ships, is played and tuned, and the next arrive against a number that has been
+felt. A tier three is held to a higher bar before it is built: it must do something no card can do, or the ladder is a
+damage dial with extra steps.
+
+**Why no draft label yet.** The label that names which conjunction a card touches is what the decision the designer
+wants rests on — but with one recipe and four heroes there is nothing to look up. It ships with the second and third.
+
+**Why no event, and no bargain merchant, in the first three nodes.** The first nodes now teach combat before they offer
+shopping — that is the better reason. The other is the gold: an event pays none, and the events the generator moved into
+those columns were most of the runs that reached their first shop short of 150; a merchant bought with a bargain's gold
+is a merchant for the player with the least gold in the game, which is no reward at all.
+
 ## The bag splits, the nameplate speaks, and the first nodes sell nothing (Batch HR) — 2026-10-05
 
 **Why a class rune lives with its hero again.** The designer met the shared bag in play as *"I cannot tell whose rune

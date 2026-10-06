@@ -2,10 +2,10 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1666,
+  "total": 1670,
   "source": 1285,
   "other": 108,
-  "document": 273
+  "document": 277
  },
  "source_residency": {
   "narrow": 44,
@@ -3774,7 +3774,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hk.gd#638"
+   "g": "check_hk.gd#642"
   },
   {
    "s": "check_hk.gd",
@@ -3785,7 +3785,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hk.gd#637"
+   "g": "check_hk.gd#641"
   },
   {
    "s": "check_hk.gd",
@@ -3796,7 +3796,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_hk.gd#639"
+   "g": "check_hk.gd#643"
   },
   {
    "s": "check_hk.gd",
@@ -3807,7 +3807,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hk.gd#710"
+   "g": "check_hk.gd#714"
   },
   {
    "s": "check_hk.gd",
@@ -3818,7 +3818,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_hk.gd#711"
+   "g": "check_hk.gd#715"
   },
   {
    "s": "check_hk.gd",
@@ -3829,7 +3829,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_hk.gd#714"
+   "g": "check_hk.gd#718"
   },
   {
    "s": "check_hk.gd",
@@ -3840,7 +3840,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hk.gd#712"
+   "g": "check_hk.gd#716"
   },
   {
    "s": "check_hk.gd",
@@ -3851,7 +3851,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hk.gd#709"
+   "g": "check_hk.gd#713"
   },
   {
    "s": "check_hl.gd",
@@ -5205,6 +5205,50 @@
    "k": "format",
    "how": "read",
    "g": "check_hr.gd#433"
+  },
+  {
+   "s": "check_hs.gd",
+   "fn": "_s1_the_rules_file",
+   "h": "CLAUDE.md",
+   "n": "Burn ADDS its turns, Chilled adds a stack and RESETS its clock",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hs.gd#184"
+  },
+  {
+   "s": "check_hs.gd",
+   "fn": "_s1_the_rules_file",
+   "h": "CLAUDE.md",
+   "n": "Faith, Mercy, Burn, Chilled, Frenzy, Block",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hs.gd#181"
+  },
+  {
+   "s": "check_hs.gd",
+   "fn": "_s1_the_rules_file",
+   "h": "CLAUDE.md",
+   "n": "Overburn and Glacial Hold are the engines; Burn and Chilled are statuses",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hs.gd#182"
+  },
+  {
+   "s": "check_hs.gd",
+   "fn": "_s1_the_rules_file",
+   "h": "CLAUDE.md",
+   "n": "`add_status` resolves a re-application as `max()` on duration and power",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hs.gd#183"
   },
   {
    "s": "test_batch_ah.gd",

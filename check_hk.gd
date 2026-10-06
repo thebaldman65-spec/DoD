@@ -644,6 +644,16 @@ func _s3_the_peddler() -> void:
 	# (c) A FULL HOLDING GREYS THAT HERO'S BUY AND SAYS SO — and one sale opens it. The
 	# other heroes' Buys stay live: the wall is his, not the counter's.
 	_fill_holding(_run.party[0], int(_run.HERO_HOLD_CAP))
+	# BATCH HS — THE CREST'S RUNES ARE HELD FIRST, so the counter cannot deal the Warrior
+	# one: a crest rune goes to the bag, never to his holding, so his full holding is no wall
+	# to it and the arm below would ask nothing. HR's dice dealt him a class rune; HS's map
+	# change (no event in the run's first three nodes) moved the dice and dealt a crest rune
+	# — ATTRIBUTED BY A STUB: HS's game with that change set back read this gate 167 / 0.
+	# HR §6's rule, `check_fh` §9b's construction: held, they are out of every roll.
+	for cid in Runes.ids():
+		if not Runes.is_retired(String(cid)) and Runes.is_party_rune(Runes.build(String(cid))) \
+				and not (_run.party_rune_names() as Array).has(Runes.display_name(Runes.config(String(cid)))):
+			_run.hold_rune(_run.party[0], Runes.build(String(cid)))
 	_run.gold = 1000
 	change_scene_to_file("res://scenes/shop.tscn")
 	await Gate.frames(self, 6)
@@ -653,6 +663,8 @@ func _s3_the_peddler() -> void:
 	for i in offers.size():
 		if int((offers[i] as Dictionary)["member_idx"]) == 0:
 			w_row = i
+	ok(w_row >= 0 and not Runes.is_party_rune((offers[w_row] as Dictionary)["rune"]),
+		"§3c: the Warrior's row is not a class rune — the full-holding arm below would ask nothing")
 	var w_buy: Button = Gate.bound_button(shop, "_buy_rune", [w_row]) if w_row >= 0 else null
 	var w_buy_any: Button = null
 	var sb: Array = []

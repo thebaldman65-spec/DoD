@@ -242,6 +242,19 @@
   ]
  },
  {
+  "id": "status_rupture",
+  "term": "Rupture",
+  "category": "statuses",
+  "short": "Burn and Chilled, joined: each Burn tick also deals Break damage.",
+  "long": "Burn and Chilled JOINED into one status - a Conjunction of tier two. It forms the moment either lands on a body already carrying the other, in either order, and it shows as one chip where two stood. It ticks when the Burn would, for the Burn's own damage, and deals Break damage with that same tick. It still burns and still slows: every card that asks whether the body is Burning or Chilled still finds both, and the chill's stacks still count. It lasts only as long as the SHORTER of the two would have; when that one runs out, the other stands alone again with what it had left. A cleanse lifts the whole Rupture as one status, and a card that eats the Burn away entirely - Detonation does - leaves the Chill standing alone; one that only skims some of its turns leaves the Rupture standing.",
+  "see_also": [
+   "conjunctions",
+   "status_burn",
+   "status_chilled",
+   "pressure_break"
+  ]
+ },
+ {
   "id": "status_poison",
   "term": "Poison",
   "category": "statuses",
@@ -1091,10 +1104,22 @@
   "term": "Recasting a Standing Effect",
   "category": "combat",
   "short": "A second cast that could not improve an effect is refused rather than wasted.",
-  "long": "Re-applying a status takes the BETTER of the two on both counts - the longer duration and the stronger power, never simply the newer one. That matters because a great many powers are read LIVE at the moment of the cast: Vespers is worth a fifth of the Cleric's own maximum health, Nexus Ward a fifth of the Mage's, Divine Shield better than a third of the Devout's. Casting one of them again while it still stands can therefore produce a SMALLER number than the one already on the board. The smaller number is discarded; the turn, the resource and the cooldown are not. SO THE GAME REFUSES THE CAST INSTEAD. When an ability's whole effect is the status it applies, and everything it could reach already holds that status for at least as long and at least as strongly, the button greys out and its tooltip names what is already standing. There is nothing to learn card by card and no ability that quietly departs from it. THE LIMIT IS DELIBERATE AND WORTH KNOWING: an ability that ALSO strikes, heals or converts a resource still casts even when its buff would not improve, because that half is worth the turn on its own. Funeral Pyre still smothers a fire for Mana, Stabilize still vents Resonance and heals, Battle Shout still pays its Rage. Only the pure buffs, wards, marks and locks are refused. GLACIAL PRISON is one of them: its whole payload is the Chilled and the freeze, so a second one onto an enemy already held writes nothing and is refused - though only once EVERY enemy in front of you is frozen, since any unfrozen one is still a legal target.",
+  "long": "Re-applying most statuses takes the BETTER of the two on both counts - the longer duration and the stronger power, never simply the newer one. (Four have a rule of their own, in their own entries: Burn adds its turns, Chill adds a stack and restarts its clock, Poison adds a stack and restarts its clock, and Ruin adds a stack.) That matters because a great many powers are read LIVE at the moment of the cast: Vespers is worth a fifth of the Cleric's own maximum health, Nexus Ward a fifth of the Mage's, Divine Shield better than a third of the Devout's. Casting one of them again while it still stands can therefore produce a SMALLER number than the one already on the board. The smaller number is discarded; the turn, the resource and the cooldown are not. SO THE GAME REFUSES THE CAST INSTEAD. When an ability's whole effect is the status it applies, and everything it could reach already holds that status for at least as long and at least as strongly, the button greys out and its tooltip names what is already standing. There is nothing to learn card by card and no ability that quietly departs from it. THE LIMIT IS DELIBERATE AND WORTH KNOWING: an ability that ALSO strikes, heals or converts a resource still casts even when its buff would not improve, because that half is worth the turn on its own. Funeral Pyre still smothers a fire for Mana, Stabilize still vents Resonance and heals, Battle Shout still pays its Rage. Only the pure buffs, wards, marks and locks are refused. GLACIAL PRISON is one of them: its whole payload is the Chilled and the freeze, so a second one onto an enemy already held writes nothing and is refused - though only once EVERY enemy in front of you is frozen, since any unfrozen one is still a legal target.",
   "see_also": [
    "stance_gated",
    "initiative"
+  ]
+ },
+ {
+  "id": "conjunctions",
+  "term": "Conjunctions",
+  "category": "combat",
+  "short": "Two afflictions meeting on one body can join into a stronger one.",
+  "long": "Some afflictions JOIN when they meet: the second lands on a body already carrying the first, and the two become ONE stronger status, with one chip. A status made of two is TIER TWO; one made of three would be TIER THREE, and each tier is stronger than the last. What it is made of still stands: every card that asks whether the body carries one of its ingredients finds it, and anything that counts how many DIFFERENT afflictions a body carries counts each ingredient - so joining never costs breadth. NOTHING RUNS TWICE: the ingredients' effects are not repeated, they are carried. It lasts only as long as the SHORTER of its ingredients would have, so the window to build on it closes with it; when that one runs out, the other stands alone again with what it had left. A cleanse takes it whole, as one status. Casting an ingredient again follows that ingredient's own rule. ONE IS KNOWN SO FAR: Rupture, Burn and Chilled.",
+  "see_also": [
+   "status_rupture",
+   "status_burn",
+   "status_chilled"
   ]
  }
 ]

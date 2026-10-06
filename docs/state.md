@@ -13,84 +13,132 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-10-05 (Batch HR).*
+*Last rewritten: 2026-10-05 (Batch HS).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: HR — THE BAG SPLITS, THE NAMEPLATE SPEAKS, AND A CENSUS FOR FIRE AND ICE.** IMPLEMENT ONLY. HQ's three
-  rulings are taken; a class rune and a core rune live with the hero of their class and the bag is the Crest's; a mark on
-  each hero's nameplate counts the runes he holds unworn; no Peddler and no Smith stand in the run's first three nodes;
-  and a census of Burn and Chilled builds nothing. Full working: **`docs/reports/HR.md`**.
-- **§0 — HQ's RULINGS ARE TAKEN.** *Breaking Heals a Hero* reads *An attack that lands Break heals the hero furthest from
-  full for 20% of it.* and Tithe *A hero's attack that lands Break heals / the hero furthest from full, for 30% of it.* —
-  the read site checked first: `battle._lowest_hp` compares a hero's SHARE of his health (a Warrior at 100 of 223 is
-  healed before a Mage at 90 of 173), so the amendment is the right way round. The refused tail stands as HQ built it.
-  **A rune the game cannot pay is no longer offered**: `Runes.eligible_ids` and the three lists that say why an offer is
-  short skip what `Talents.live_refusal` refuses (`Runes.is_refused`); the roll call's tail stays the net for a save.
-- **§1 — A CLASS RUNE OR A CORE RUNE IS HELD BY THE HERO OF ITS CLASS; THE BAG HOLDS THE CREST'S.** `Run.hold_rune`
-  routes by scope at every door — the drop, a cache, a bargain, the Peddler's Buy, the event verb. A hero holds **eight
-  unworn** (`Run.HERO_HOLD_CAP`, both kinds counted, his slots not) and the bag **six** (`Run.BAG_CAP`, crest runes only)
-  — both PROPOSED (RULINGS OWED 1). A rune for a full holding waits beside that holding on HK's panel, made per hero; a
-  purchase into one is refused; an unequip into one is refused and a swap is the way through. **Twenty-one surfaces read
-  the bag, where HO had named eight** (`docs/reports/HR.md` §1b). **The save is v15**: a v14 bag's class and core runes
-  are handed to their heroes on load (`Run._hand_out_the_bag`; HK's `_bag_the_unworn` is deleted), and a rune whose class
-  no hero here is stays in the bag and the map says so. **Driven on the designer's own save, both ways**: HR's build put
-  Clarity and Overtone on the Mage, kept Tithe in the bag and wrote v15; HQ's build refused that v15 and left it
-  byte-identical.
-- **§1 — THE SUPPLY THE CAP WAS MEASURED AGAINST, RUNG 2** (150 full runs, two talented parties): a hero is given 4.7–6.3
-  runes a run (drops 2.3–3.0, caches 1.6–1.9, the sim's purchases 0.8–1.7), and 0.8–1.15 bargain caches the sim never
-  answers. Keeping everything, he ends a run holding 2.0–3.7 unworn (p90 4–6) and reaches eight in 1–2% of hero-runs.
-  **Eight does not fill from what a run hands a hero; buying fills it** — every Peddler offer bought, in 23–59%.
-- **§2 — THE NAMEPLATE SAYS A RUNE IS WAITING**: **✦ N** on each hero's card on the map, the runes he holds unworn, read
-  off his holding at every draw — it clears when nothing waits, never because a menu opened; the bag's row carries the
-  crest's count; the victory card and a toast on the map name the hero a drop went to, or the crest. Driven on the real
-  map (`check_hr` §2): a real normal fight won from the real map, its drop on the right nameplate at ✦ 1, the panel
-  opened and closed with the marker kept, the rune equipped through its own button and the marker gone; a crest drop
-  moves the bag's marker and no hero's. **A timed screen element is read at time scale one** — a new instrument rule.
-- **§3 — NO PEDDLER AND NO SMITH IN THE RUN'S FIRST THREE NODES** (`Run.SHOP_GATE_NODES`, the first zone only). Measured
-  first: a trade node stood at node 1 in two maps of three, where the heroes hold 60 gold, and 17% of runs could pay 150
-  at the first one a walk met. With three: 86–89%. **What still fails is the events**: the gated columns take most of
-  the zone's events (2.8 of 5) and an event pays no gold — at node 4 75–78% can pay, and 100% with events kept out of the
-  same columns (RULINGS OWED 2). No board ran short of a kind and later zones are unchanged. The bargain's bought
-  merchant is not gated (RULINGS OWED 3).
-- **§4 — A CENSUS OF BURN AND CHILLED; NOTHING BUILT.** No enemy chills (a hero is chilled only by the Hoarfrost bargain;
-  the Ashblade and the Tyrant burn); the engines that read the two are the Mage's and the statuses are already a party
-  combo (Choking Smoke, Downwind, Returned Burden); nothing removes one when the other lands, and four mechanics rely on
-  them standing together; no status removes another today. **The clash, measured**: 0.44–0.63 a fight; a Chilled landing
-  on a burning enemy meets ~2 turns of Burn (18–23 damage); the sim's order is fire first.
-- **THE VERIFICATION.** The saves were backed up first and verified by hash (`../save-backups/HR-20261005-102217`, the four files
-  byte-identical to the live ones; against HQ's backup the profile and the run save had moved — the designer's play since,
-  a v14 run in the first zone with Clarity, Overtone and Tithe in its bag). **The recon** — HEAD's unmodified gates and
-  documents against HR's game, 131 targets in 79 min 40 s — read `check_de` 541 / 20 / 1: eleven reds besides the two
-  sanctioned, each read by its FAIL lines, and `check_gp` green at 469 where it stood at 474. **Nine gates were re-pointed**
-  to their intents and one is new (`check_hr`, 100); **three arms were coin flips on the dice** — `check_go` §12,
-  `check_fh` §3 and HR's own `check_hr` §1d — each attributed with the shop gate stubbed to zero (HEAD's trace back,
-  message for message) and rebuilt to construct its state: a new instrument rule, beside the one for a timed screen
-  element. **Forty-two controls**, one defect each, read by FAIL text, every one red on the arm it aimed at. **The
-  pre-pass** (132 targets in 75 min 05 s, an isolated copy proved equal to the tree) read `check_de` 545 / 0 / 0, every
-  target at its predicted row. **The acceptance run in the repository** (132 targets in 75 min 03 s, the tree frozen) read
-  `check_de` 545 / 0 / 0: every target at its row and at its pre-pass reading but `test_batch_an`'s seeded count (6053,
+- **Last batch: HS — CONJUNCTIONS: THE MECHANISM, AND ONE OF THEM.** IMPLEMENT ONLY. HR's five rulings are taken and two
+  of them built — no event and no bargain-bought merchant in the run's first three nodes; `CLAUDE.md`'s two wrong status
+  rules are corrected and a third is found and corrected; and two afflictions meeting on one body now make a third:
+  **Rupture** (Burn + Chilled) ships, the other four are designed and not built. Full working: **`docs/reports/HS.md`**.
+- **§0 — HR's RULINGS TAKEN.** The caps, eight unworn a hero and six in the bag, are RULED (their PROPOSED markers off) —
+  a net, not a constraint. **No event stands in the run's first three nodes** (`Run.GATED_NODE_TYPES`), so they are fights
+  and elites only — they teach combat before they offer shopping (`check_hs` §0a: over 80 boards a zone those columns held
+  621 fights and 77 elites, every board at its full count, later zones ungated). **A bargain never pays *a merchant follows
+  the fight* there** (`Run.roll_offer`: 0 of 300 offers at columns 1–3, 184 at column 4); a severity-4 option there pays
+  its gold or a rune, about half each. **Re-measured on HS's map** with HR's own probe (1,000 maps, an unsteered walk): the
+  first trade node at node 4 in 43%, node 5 in 33%; **99.7% can pay 150 there as the sim plays its events, 100% declining
+  them** (100/100 on the greedy walk) — HR's three-node gate alone read 86–89%. HR's words for a held rune stand as built.
+- **§1 — THE RULES FILE STATES THE STATUS RULES THE CODE KEEPS.** The DR §1 engine list names engines (Overburn, Glacial
+  Hold), and a bullet says Burn, Chilled and Ruin are statuses other classes' cards lay; the recast block's `max()` is
+  `add_status`'s DEFAULT branch — Burn adds its turns, Chilled adds a stack and resets its clock, Poison does too, Ruin adds
+  a stack. **Swept as one claim across every copy (EH §2)**: the glossary's *Recasting a Standing Effect*, `master.html`'s
+  recast paragraph and a `battle.gd` comment said the same and are corrected. **The derivation over every status claim in
+  the file found one more**: the meter table's Ruin row said *Avatar installs 5*, a field nothing has written since FX.
+- **§2 — THE MECHANISM** (`battle.CONJUNCTIONS`, one row; `BattleUnit.compose`): one entry and one chip, each ingredient
+  whole inside it. **Components are presence** — `has_status`, `get_status`, `status_power`, `status_stacks`,
+  `update_status`, `remove_status` and `set_chilled_stacks` find an ingredient inside it. **Tier is weight** — every reader
+  that counts distinct afflictions reads `base_statuses()` (`_status_count`, `count_debuffs`, `_harvest_yield`, Harvest's
+  ally share, Salve, `_unique_enemy_debuffs`, Firedraw's `_other_spec_debuff`, Loaded Shot), so a Rupture is two and the
+  unmerged chips read the same (the Trapper's driven strike: 19 into a Rupture, 19 into its unmerged twin, 17 into a lone
+  Burn). **Nothing runs twice** — the DoT pass, extracted from `_run_battle` byte for byte as `_dot_pass`, ticks the Burn
+  inside a Rupture once (−6 HP and +10 Break, against −6 and +0 unmerged). **The clock is the shorter ingredient's at every
+  moment**, and the longer stands alone after it; a consumer eating one ingredient leaves the other; **a cleanse takes it
+  whole** and books a Sanctity event per ingredient; **a re-applied ingredient runs its own rule** (§2g, built: Burn adds,
+  Chilled stacks and resets). It forms on heroes too. **No save version moved** — no status outlives its fight.
+- **§3 — RUPTURE**: tier 2, chip `Ru` (never `BD`). It ticks with its Burn, for the Burn's damage and
+  `RUPTURE_BREAK_PER_TICK` Break through `take_hit`'s Break block — **10, PROPOSED, the designer's to tune from play**,
+  pinned in one place (`check_hs` §3a). Breaking Darkness amplifies it; **Tithe does not pay on it** (its read site is a
+  hero's landed blow). The glossary teaches the rule and the recipe (`conjunctions`, `status_rupture`; 100 entries).
+- **§5 — THE LOG IS THE INSTRUMENT**: it forms (what landed on what, whose, its tier, its clock and whose clock that is), it
+  ticks (the Burn and the Break apart, and on a Broken body that no Break landed — added after the sim showed the end
+  boss's Rupture ticking with no Break line), an ingredient is re-applied or a card writes its clock, and it ends — the
+  clock, a consumer, a cleanse, the body. Every name off the data.
+- **§6 — THE BOT IS NOT TAUGHT TO BUILD ONE AND DOES NOT CHOKE.** The sim (15 full runs a party at rung 2, talented, HR's
+  two parties): party A's Cryomancer made 40 Ruptures in 416 fights, party B's Pyromancer 117 in 420 — 38 of 40 and 99 of
+  117 its own Chill landing on its own Burn. It keeps its rotation at the ruptured enemy, which mostly dies first (A 38 of
+  40, B 73 of 117; B's other 43 end on the clock). No script error.
+- **THE VERIFICATION.** The saves were backed up first and verified by hash (`../save-backups/HS-20261005-202947`, the four
+  files byte-identical to the live ones — and to HR's backup: nothing had moved since HR, so the brief's *the designer has
+  played since* was not so). **The recon** — HEAD's unmodified gates and documents against HS's game, 131 targets in 73
+  min — read `check_de` 545 / 5: three reds besides the two sanctioned, each read by its FAIL lines (the glossary's pin,
+  predicted; two arms that were coin flips on the dice, `check_fo` §2d and `check_hk` §3c, each attributed with the
+  first-nodes gate stubbed back — HEAD's gate green on the stub — and rebuilt to construct its state), and two green rows
+  that fell: `check_gp` 469 → 454, the dice, traced message for message with two stub arms, and `test_batch_an` one under
+  its floor, the unseeded maps' own spread (400 maps on each tree). **Four gates were edited** and one is new (`check_hs`,
+  83); one instrument rule is new (a strike A/B compares one kind of body). **Thirty-three controls**, one defect each, read
+  by FAIL text, every one red on the arm it aimed at; a first round on an earlier copy found one arm that asked nothing,
+  repaired. **The pre-pass** (133 targets in 73 min 49 s, an isolated copy proved equal to the tree) read `check_de` 549 /
+  0 / 0, every target at its predicted row. **The acceptance run in the repository** (133 targets in 73 min 46 s, the tree
+  frozen) read `check_de` 549 / 0 / 0: every target at its row and at its pre-pass reading but `test_batch_an`'s unseeded count (6056,
   inside its band) — the two sanctioned reds at their counts, the run harness PASS (22 / 382 / 8) — and no Parse Error,
-  SCRIPT ERROR, TIMED OUT or NO VERDICT line in any log. The tree was byte-identical after it (504 files), and the
-  player's four files are byte-identical — hash, size and mtime — to the 10:22 backup.
-- **HQ's EIGHT COPIES ARE IN THE TRASH**, selected by the *"Dawn of Decay HQ "* prefix, under *"DoD spent user-data folders
-  (Batch HQ's eight, cleared at HR 2026-10-05)"*: 8 folders, 1,880 KiB (HQ recorded 1,924). Godot's `app_userdata` went
-  from 491 folders and 145,028 KiB to 483 and 143,148 KiB, HR's own copies in both readings; the older folders, the live
-  *Dawn of Decay* folder and `../save-backups/` were not touched.
-- **`CLAUDE.md` IS 427,586 B = 417.56 KiB, WITH 52.44 KiB UNDER ITS 470 KiB CEILING** (+2,818 B at HR, measured after
-  this batch's own writing; HQ left it at 414.81 KiB): **about 6.5 batches at the record, EZ's +8,293 B**, and 6.8 at
-  HP's +7,935 B (19.1 at HR's own rate). The shape recon is owed before then — the arithmetic is not the answer next time.
+  SCRIPT ERROR, TIMED OUT or NO VERDICT line in any log. The tree was byte-identical after it (506 files), and the player's four
+  files are byte-identical — hash, size and mtime — to the 20:29 backup.
+- **HR's FIFTY-THREE COPIES ARE IN THE TRASH**, selected by the *"Dawn of Decay HR "* prefix, under *"DoD spent user-data
+  folders (Batch HR's fifty-three, cleared at HS 2026-10-05)"*: 53 folders, 11,056 KiB (HR recorded 11,152). Godot's
+  `app_userdata` went from 520 folders and 154,176 KiB to 467 and 143,120 KiB, HS's own copies in both readings; the older
+  folders, the live *Dawn of Decay* folder and `../save-backups/` were not touched.
+- **`CLAUDE.md` IS 434,586 B = 424.40 KiB, WITH 45.60 KiB UNDER ITS 470 KiB CEILING** (+7,000 B at HS, measured after
+  this batch's own writing; HR left it at 417.56 KiB): **about 5.6 batches at the record, EZ's +8,293 B**, and 5.9 at
+  HP's +7,935 B (6.7 at HS's own rate). The shape recon is owed before then — the arithmetic is not the answer next time.
 - **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in a
   build older than HL**: HL's ceiling refuses a newer save from HL's build on — HR's v15 is the first bump it has
   guarded, driven at HR §1 — and HJ's and HK's builds, and `main`, carry no ceiling.
-- **Next letter: HS.**
+- **Next letter: HT.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### HR's RULINGS OWED — **FIVE; THE FIRST FOUR ARE PLAYER-VISIBLE**
+### HS's RULINGS OWED — **SIX; THE FIRST FIVE ARE PLAYER-VISIBLE**
 
-Full working: `docs/reports/HR.md`, NEEDS A RULING.
+Full working: `docs/reports/HS.md`, NEEDS A RULING.
+
+1. **RUPTURE'S FIGURE: 10 BREAK A TICK, PROPOSED, AND THE DESIGNER TUNES IT FROM PLAY.** One constant
+   (`battle.RUPTURE_BREAK_PER_TICK`) and one pin (`check_hs` §3a). Set against HR §4f's clash, about two turns of Burn at
+   9.5 a tick; in the sim the Pyromancer party's Ruptures added 872 Break over 420 fights and Broke nine enemies.
+2. **§2g, AS BUILT: EACH INGREDIENT KEEPS ITS OWN CLOCK, AND THE RUPTURE'S IS ALWAYS THE SHORTER.** Read literally, *the
+   component's own rule applied to the composition's clock* would let a second Fireball carry the Chill inside a Rupture
+   past its own end, and a Glacial Hold's permanent chill re-applied would make a Rupture permanent. Confirm.
+3. **THE SURVIVOR: WHEN THE SHORTER INGREDIENT RUNS OUT, OR A CARD CONSUMES ONE, THE OTHER STANDS ALONE** with what it had
+   left — composing never costs the longer ingredient's tail. The other reading ends the composition whole. Confirm.
+4. **A CLEANSE TAKES IT WHOLE, AND THE RITUAL CHANTER'S RITE IS THE ONE CLEANSE THIS CHANGES IN SUBSTANCE.** Its rule is
+   *Chilled loses one stack, never the pile*; a Rupture is not Chilled by id, so the rite lifts it whole — the Burn and
+   every stack of the chill. Confirm, or carve the rite.
+5. **IT FORMS ON HEROES TOO** — an Ashblade's Burn on a hero chilled by the Hoarfrost bargain, each tick adding Break to
+   the hero's meter. Confirm.
+6. **THE WORDS, PROPOSED**: the chip `Ru`; the glossary's two entries; the log's lines (`docs/reports/HS.md` §5).
+
+### FOUND AT HS AND NOT FIXED
+
+- **THE BRIEF'S *"THE DESIGNER HAS PLAYED SINCE"* WAS NOT SO**: the player's four files were byte-identical to HR's backup.
+- **TITHE DOES NOT PAY ON A RUPTURE'S BREAK**, though the brief gives it as a reason for Break: its read site is a hero's
+  landed blow in the strike loop, and a tick has no attacker. That read site is §7's owed work, not this batch's.
+- **`BLIGHT` IS ALREADY A LIVE STATUS'S ID** — Blight the Well's *Blighted* (`blight`, chip `Bl`, which is also Bleed's chip
+  prefix). The designed conjunction *Blight* (Poison + Bleed) cannot take the id, and its name meets the label.
+- **TWO DESIGNED CONJUNCTIONS NAME *BROKEN*, WHICH IS A BREAK-METER STATE, NOT AN APPLIED STATUS** (Breach, Reckoning):
+  `broken` is written inside `unit.take_hit` and its chip is the meter's. A conjunction of it owes a design for how a
+  meter state composes before it is authored.
+- **TWO READERS STILL LOOK AT THE TOP LEVEL ONLY**: `log_bleed_chip` and `set_ruin_stacks`. Correct while neither Bleed nor
+  Ruin is an ingredient; the batch that authors Blight or Reckoning re-points them to the lookup.
+- **THE BRIEF'S *"CONFIRM 131 TARGETS STILL RUN"* IS HR'S RECON FIGURE**: HR's pre-pass and acceptance ran 132, and HS's run
+  133 with `check_hs`.
+- **HS's OWN ISOLATED COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata`, every one named *"Dawn of Decay HS …"*
+  — `docs/reports/HS.md` §9 counts them. HT clears them by that prefix (HO §5's rule).
+
+### THE FOUR OTHER CONJUNCTIONS — **DESIGNED; RULED, NOT BUILT (HS §4)**
+
+**Unpriced content ships in the smallest unit that can be felt**: one is played and tuned before the next arrive.
+- **Seize** — Chilled + Cripple: the target loses its turn. The Mage's chill beside a card that cripples.
+- **Breach** — Broken + Burn. Any class that Breaks, beside a Burn.
+- **Blight** — Poison + Bleed. The Hunter's Poison beside the Warrior's Bleed (the name collides — above).
+- **Reckoning** — Ruin + Broken. The Occultist's Ruin beside any class that Breaks.
+- **A census of who lays Cripple, Poison, Bleed, Sunder and Dazed on the enemy side is OWED before any is authored** — HR
+  §4a covered Burn, Chilled and Frozen only. **The draft label** that names which conjunction a card touches ships with the
+  second and third — RULED, NOT BUILT: with one recipe and four heroes there is nothing to look up. **A tier 3 must do something no card can do**; none is designed.
+
+### ~~HR's RULINGS OWED~~ — **ALL FIVE ANSWERED IN HS's BRIEF AND TAKEN AT HS §0: BOTH CAPS RULED (1); THE EVENTS KEPT OUT AND THE BARGAIN'S MERCHANT GATED, BUILT (2, 3); THE WORDS ACCEPTED (4); THE CENSUS ANSWERED BY THE MECHANISM (5)**
+
+Full working: `docs/reports/HR.md`, NEEDS A RULING. Kept below as HR recorded them.
 
 1. **THE TWO CAPS, PROPOSED: EIGHT UNWORN A HERO, SIX IN THE BAG.** Eight does not fill from what a run hands a hero (the
    WHERE block); buying fills it. The bag: four crest runes exist, the party holds one of each, so six is the pool and two
@@ -112,18 +160,20 @@ Full working: `docs/reports/HR.md`, NEEDS A RULING.
   pays Shatter per stack (the code: per turn held), gives the hold window *+15% from all sources* (hero strikes only), has
   Firedraw take *what is there or 4* (always 6), has Emberkeep double *every Burn he applies* in one row (any hero's) and
   lay 4 through Flamewave (a burning body skips the doubling), says only the Tyrant's frost weakness is set, and names
-  four Overburn refund consumers (six); `CLAUDE.md`'s DR §1 block lists Burn and Chilled among statuses exclusive to a
-  class (Hunter and Cleric appliers exist) and its recast block says a re-application resolves as `max()` (Burn adds,
-  Chilled resets the clock); `docs/combat-rules.md` calls Burn's crit snapshot *a BURN MAGNITUDE* (nothing reads it); and
-  six code comments are stale (§4h names them). None is player-facing; each is a sweep for the batch that touches it.
+  four Overburn refund consumers (six); ~~`CLAUDE.md`'s DR §1 block lists Burn and Chilled among statuses exclusive to a
+  class and its recast block says a re-application resolves as `max()`~~ — **BOTH CORRECTED AT HS §1**;
+  `docs/combat-rules.md` calls Burn's crit snapshot *a BURN MAGNITUDE* (nothing reads it); and six code comments are stale
+  (§4h names them). None is player-facing; each is a sweep for the batch that touches it. **`master.html`'s seven stay
+  queued by HS's brief.**
 - **THE SIM NEVER ANSWERS A BARGAIN'S RUNE CACHE**, so every supply figure it prints omits 0.8–1.15 runes a hero a run.
 - **THE BOT CASTS THE MAGE'S FIRE CARDS BEFORE HIS ICE CARDS**, so in the sim a clash is mostly ice landing on fire; a
-  measurement of a chill-then-burn payout reads the rarer order until a policy changes.
+  measurement of a chill-then-burn payout reads the rarer order until a policy changes. **Since HS this is why the sim
+  cannot price a conjunction** (HS §4) and the designer's play is the instrument; no ladder policy is taught (ruled).
 - **A STRAY RUNE CANNOT BE MADE BY PLAY.** Every roll is the party's classes, so a rune whose class no hero here is
   reaches the bag only from a save; the path keeps it and says so, and is driven only by a constructed save
   (`check_hr` §1e).
-- **HR's OWN ISOLATED COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata`, every one named *"Dawn of Decay HR …"*
-  — `docs/reports/HR.md` §8 counts them. HS clears them by that prefix (HO §5's rule).
+- ~~**HR's OWN ISOLATED COPIES LEFT USER-DATA FOLDERS**~~ — **CLEARED AT HS** (the WHERE block), by the *"Dawn of Decay
+  HR "* prefix.
 
 ### ~~HQ's RULINGS OWED~~ — **ALL ANSWERED IN HR's BRIEF AND TAKEN AT HR §0**
 
@@ -2280,9 +2330,8 @@ code, and some of what it found lives elsewhere. **The tables are in `docs/repor
   `shop_discount` at four, and **`rest_heal_add` at none**, so Cairnmoss Poultice pays nothing and
   neither does Martyr's Knucklebone's *"rest nodes restore 10% more"* (GB). **`docs/master.html`'s copy of the claim was
   corrected at GE §2**, where six hooks read at more than one site were counted; this header still owes its own.
-- **`CLAUDE.md`'s recast block says `add_status` resolves a re-application as the max of duration and power** —
-  true only of its default branch: Poison and Chilled reset the timer (so Poison can shorten), Burn adds turns,
-  Ruin adds a stack (`unit.gd:2685-2736`).
+- ~~**`CLAUDE.md`'s recast block says `add_status` resolves a re-application as the max of duration and power**~~ —
+  **CORRECTED AT HS §1**: the block says the default branch maxes, and names the four that do not.
 - **`CLAUDE.md`'s "four death-refusals"** are four call lines holding six refusals, with four more lethal refusals
   above the subtraction that ticks never reach. **~~Its CV §1 cites `tick_statuses` at `unit.gd:2171`~~ — CLOSED AT
   GB §4: the line number is dropped.**

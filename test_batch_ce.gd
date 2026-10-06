@@ -715,8 +715,14 @@ func _docs() -> void:
 	# and this one does not grow on its own — every entry is a decision, and the
 	# check exists so that adding one is a decision somebody made rather than a
 	# side effect. Loosening it to a floor would delete the question.
-	ok(gj != null and gj.size() == 98,
-		"the glossary holds 98 entries (97 + EK's archetype_tags)")
+	# BATCH HS §3 — ONE HUNDRED. **THE PIN IS BUMPED, NOT LOOSENED**, for this
+	# category's own reason, and the two entries are the conjunction RULE and its one
+	# RECIPE: `conjunctions` (what a tier is, that the ingredients still count, that
+	# nothing runs twice, the shorter clock) and `status_rupture` (a chip on the board,
+	# "Ru", that a player has nowhere else to learn is a Burn and a Chill joined).
+	# HS's brief: the glossary is the recipe book until there are enough to need a screen.
+	ok(gj != null and gj.size() == 100,
+		"the glossary holds 100 entries (98 + HS's conjunctions and status_rupture)")
 	# RE-POINTED AT THE ARCHIVE BY BATCH CX. The live changelog passed CW's 400 KB
 	# threshold, so CX cut it at the CN/CO boundary: Batch CE — with everything
 	# from BP to CN — moved OUT OF THE REPO into `changelog-archive.html`. The old

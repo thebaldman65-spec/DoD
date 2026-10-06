@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-10-05 (Batch HR &mdash; the bag splits, the nameplate speaks, and a census for fire and ice)</b></p>
+<p align="right"><b>Last updated: 2026-10-05 (Batch HS &mdash; conjunctions: the mechanism, and one of them)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -232,15 +232,14 @@ would strand a column are never in the bag) rather than by re-rolling.</li>
 <li>Type constraints: <b>no elite in column 1</b>; <b>no two elites in adjacent columns</b>
 (and the columns run 1&ndash;14 straight through the mini-boss, so elite &rarr; mini-boss
 &rarr; elite is barred too); <b>at most one of each non-fight type per column</b>;
-<b>no blacksmith and no merchant in the first three columns of the run's first zone</b> &mdash; the
-run's first three nodes &mdash; and in no other zone's (a run opens with 60 gold and a rune or the
-smith's first upgrade costs 150, so a trade node there is one the heroes cannot use); and
-<b>every entry node reaches at least one elite and at least one trade node</b>. The trade nodes
-the first zone keeps out of its first three columns stand further along it, every one of them: the
-zone still deals six blacksmiths and five merchants, and the positions they leave are dealt as
-the rest are &mdash; events after them, roomiest column first, then fights &mdash; so those three
-columns hold fights, an event in nearly every one of them, and an elite in column 2 or 3 on nearly
-every board.</li>
+<b>no blacksmith, no merchant and no event in the first three columns of the run's first zone</b>
+&mdash; the run's first three nodes teach combat before they offer shopping &mdash; and in no other
+zone's (a run opens with 60 gold and a rune or the smith's first upgrade costs 150, so a trade node
+there is one the heroes cannot use, and an event there pays no gold toward the first one); and
+<b>every entry node reaches at least one elite and at least one trade node</b>. What the first zone
+keeps out of its first three columns stands further along it, every one of them: the zone still
+deals six blacksmiths, five merchants and five events, so those three columns hold fights, and an
+elite in column 2 or 3 on nearly every board.</li>
 </ul>
 <p><b>Why this produces commitment without a rule:</b> stepping down a row makes the corridor
 above unreachable for the rest of the half, because no edge climbs back fast enough.
@@ -337,7 +336,8 @@ of the battle that charged for it.</p>
 <tr><td>2</td><td>80 gold, <b>or</b> a random potion</td></tr>
 <tr><td>3</td><td>140 gold, <b>or</b> a random rune from the current pool</td></tr>
 <tr><td>4</td><td>220 gold, <b>or</b> a random rune, <b>or</b> a merchant follows the
-fight</td></tr>
+fight &mdash; never at an elite among the run's first three nodes, where it pays the gold or the
+rune</td></tr>
 </table>
 
 <h3>3b. Events &mdash; resource conversions in three kinds</h3>
@@ -528,9 +528,9 @@ and the Berserker keeps his live Blood Frenzy bonus. The hero's next turn is sch
 ability's own delay as normal, so the punishment is tempo. <b>The gate is shown before the
 cast is committed</b>, on the ability button, in its tooltip, on the draft card, and on the bar
 itself while it sweeps. <b>No healing or revival ability is ever gated.</b></p>
-<p><b>A RECAST THAT WOULD NOT IMPROVE IS REFUSED.</b> Re-applying a status keeps the BETTER of
-the two on both counts &mdash; the longer duration and the stronger power, never simply the newer
-one. Many powers are read LIVE at the moment of the cast (Vespers is a fifth of the Cleric's own
+<p><b>A RECAST THAT WOULD NOT IMPROVE IS REFUSED.</b> Re-applying most statuses keeps the BETTER
+of the two on both counts &mdash; the longer duration and the stronger power, never simply the newer
+one (Burn, Chilled, Poison and Ruin re-apply by rules of their own, in their own rows). Many powers are read LIVE at the moment of the cast (Vespers is a fifth of the Cleric's own
 maximum health, Nexus Ward a fifth of the Mage's, Divine Shield better than a third of the
 Devout's), so recasting one while it still stands can produce a <i>smaller</i> number than the one
 already on the board. The smaller number is discarded; the turn, the resource and the cooldown are
@@ -800,6 +800,12 @@ Cryomancer's Rime on cast.</td></tr>
 <tr><td>Slowed</td><td>−25% speed (generic; e.g. Shrapnel Charge).</td></tr>
 <tr><td>Burn</td><td>6% of the applier's Attack at the start of each turn
 (snapshotted). Reapplication extends duration — new turns ADD to the timer.</td></tr>
+<tr><td>Rupture</td><td><b>Burn and Chilled, joined</b> (a conjunction, tier 2; chip <b>Ru</b>):
+it forms the moment either lands on a body carrying the other, in either order, and the two
+chips become one. It ticks when the Burn would, for the Burn's own damage, and deals
+<b>Break damage</b> with that same tick (the chip names the figure) unless the body is already
+Broken; it still slows as its Chilled does. It lasts as long as the SHORTER of the two would have, and the other then stands
+alone with what it had left. A cleanse lifts it whole.</td></tr>
 <tr><td>Poison</td><td>3% of the applier's Attack in nature damage per stack each turn
 (nature resists apply); stacks
 additively, new stacks refresh the timer. Never ticks on the turn it lands.</td></tr>
@@ -968,6 +974,30 @@ its timer (4 turns, on the Survivalist).</td></tr>
 </table>
 <p>Statuses tick down at the start of the affected unit's turn; negative durations last the
 whole battle.</p>
+<p><b>CONJUNCTIONS &mdash; two afflictions meeting on one body make a third.</b> A pair the game
+knows becomes ONE status with one chip, which says what it is made of: a status built from two
+is <b>tier 2</b>, from three <b>tier 3</b>, each stronger than the last. <b>One is in the game:
+Rupture</b> (Burn + Chilled, above). Four rules hold for every one:</p>
+<ul>
+<li><b>What it is made of still stands.</b> Every card that asks whether the body is Burning
+or Chilled finds both inside a Rupture, its chill's stacks still count and still slow, and
+every effect that counts how many DIFFERENT afflictions a body carries counts a tier-2 as two
+&mdash; the Survivalist's Trapper, Hunt, Cull, Harvest, Salve, Thick Hide, the Iron Will talent
+and the rest &mdash; so joining never costs breadth.</li>
+<li><b>Nothing runs twice.</b> The Burn inside it ticks once, as the Rupture's, and the Break is
+that tick's own half.</li>
+<li><b>Its clock is the shorter ingredient's.</b> When that one runs out, or a card consumes an
+ingredient (Detonation eats the Burn), the other goes back on the bar alone with what it had
+left. A cleanse &mdash; a mender's rite, Dispel One, Unburden, the Cleansing Draught &mdash; takes
+the whole Rupture as one status.</li>
+<li><b>Casting an ingredient again follows that ingredient's own rule</b>: a second Burn adds its
+turns, a second Chill adds a stack and restarts the chill's clock, and the Rupture lasts as long
+as the shorter of the two now would.</li>
+</ul>
+<p>The combat log says when a conjunction forms (what landed on what, its tier, how long it
+lasts and whose clock that is), every tick with its Burn and its Break apart (on a Broken body,
+that no Break landed), every time an ingredient is cast again or a card changes its clock, and how it ended &mdash; the clock, a card
+consuming an ingredient, a cleanse, or the body falling.</p>
 <h3>4.7 Items in battle</h3>
 <p>The hero inventory is shared and opens as a picker via <b>Alt</b> or the "[Alt] Items"
 button (Tab cycles, Space uses, X closes — see §10). Using an item does <b>not</b> consume
@@ -2696,11 +2726,11 @@ reduction every hero carries.</p>
 <ul>
 <li><b>Gold:</b> start 60 (+80 with Gravewrought Coin). Fight 45–60, elite and mini-boss
 80–100, boss 110–130.</li>
-<li><b>The first trade node:</b> no merchant and no blacksmith stands in the run's first three
-nodes (&sect;2's map constraints), because a run opens with 60 gold and a rune, or the smith's
-cheapest upgrade, costs 150. Most runs reach their first trade node holding 150 or more; one whose
-first three nodes held events reaches it with less, because an event pays no gold. From the second
-zone on the gold is there, and the gate does not apply.</li>
+<li><b>The first trade node:</b> no merchant, no blacksmith and no event stands in the run's first
+three nodes (&sect;3's map constraints), and a bargain there never pays "a merchant follows the
+fight", because a run opens with 60 gold and a rune, or the smith's cheapest upgrade, costs 150.
+The first three nodes are fights and elites, which pay, so a run reaches its first trade node
+holding 150 or more. From the second zone on the gold is there, and the gate does not apply.</li>
 <li><b>Talent points:</b> <b>NONE are awarded in a run.</b> They are META progression
 (see §7): <b>1 per class per ZONE BOSS defeated</b>, banked on the profile, spent between
 runs. Fights, elites and mini-bosses award no talent point at all, and neither does the end

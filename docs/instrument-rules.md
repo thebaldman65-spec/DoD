@@ -1668,3 +1668,17 @@ the drive keeps the fast frames.
   Buy whenever the counter holds one.
   **The repair is proved by breaking what the arm reads** — the Reaver's read cut, both of its stretches still read
   silent — because a constructed state that passes whatever the game does has stopped asking its question.
+
+## STANDING RULE — A STRIKE A/B COMPARES ONE KIND OF BODY (Batch HS §2c)
+> **An arm that compares the damage of one strike into two bodies to read ONE term — a breadth multiplier, a burning-
+> target bonus — must strike two bodies of the SAME kind, the same seed into each. A body's armor, resistances and
+> health are terms of the same product, and across kinds they can cancel the term the arm is reading — or fake it.**
+
+- **`check_hs` §2c's FIRST DRAFT READ 19, 19 AND 19** for the Survivalist's Quick Shot into a ruptured Raider, its
+  unmerged twin and a lone-Burn Archer: the Archer's armor (0.10 against the Raider's 0.15) bought back almost exactly the
+  8% the Trapper's breadth term paid less, and the three read alike. It failed loud, so it was caught; **pointed the other
+  way the same slip passes** — two terms that should differ read equal and the arm asserts nothing. The repair strikes the
+  ruptured Raider, its twin Raider, and the first Raider again carrying a lone Burn: 19, 19, 17.
+- **AND A TERM SHARED WITH THE FIELD MOVES WITH THE FIELD.** Pyroblast's burning-target bonus rides an Overburn holder's
+  multiplier, which counts every burn-turn on the field, so clearing a body between strikes moves both. The arm reads the
+  bonus's own log line beside the damage, so the term is named rather than inferred from a difference.

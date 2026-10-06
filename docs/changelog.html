@@ -16,6 +16,89 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-05 &mdash; Batch HS: CONJUNCTIONS: THE MECHANISM, AND ONE OF THEM</h2>
+<p><b>Two afflictions meeting on one body now make a third. The first is RUPTURE: a Chill landing on a burning enemy, or a
+Burn on a chilled one, joins the two into one status that still burns, still slows, and deals Break damage with every Burn
+tick. The run's first three nodes are fights and elites only &mdash; no event and no bargain-bought merchant there either.
+And the rules file says what Burn and Chilled really do when they are cast again.</b> Full working:
+<code>docs/reports/HS.md</code>.</p>
+
+<p><b>&sect;0 &mdash; HR'S FIVE RULINGS.</b> <b>Both caps stand</b>: eight runes held unworn a hero, six in the bag &mdash; a net,
+not a constraint, since only buying fills it. <b>No event stands in the run's first three nodes any more</b>, as no Peddler and
+no Smith already did: those nodes now teach combat before they offer shopping, and every run reaches its first trade node
+able to pay 150 (measured again on this batch's map: 99.7 in 100 as the sim plays its events, all of them declining). <b>A
+bargain's "a merchant follows the fight" is never offered at an elite among those three nodes</b>: a player who traded a
+bargain's gold for a merchant is the one with least gold in the game; the option still comes, and pays its gold or a rune. HR's
+words for a held rune are kept. The census of fire and ice is answered by this batch.</p>
+
+<p><b>&sect;1 &mdash; THE RULES FILE, CORRECTED WHERE IT STATED A STATUS RULE THE GAME DOES NOT KEEP.</b> It listed Burn and Chilled
+among the engines exclusive to a class; Overburn and Glacial Hold are the engines, and Burn and Chilled are statuses a Hunter's
+and a Cleric's cards lay too. It said a re-applied status always keeps the larger duration and power; Burn adds its turns,
+Chilled adds a stack and restarts its clock, Poison does too, and Ruin adds a stack. The same wrong sentence stood in the
+glossary's entry on recasting, in the Master Document and in a code comment, and all three now say it right. One more stale
+line in the rules file's table of meters is corrected: the Ruin threshold of five it named belonged to a talent deleted long ago.</p>
+
+<p><b>&sect;2 &mdash; THE MECHANISM.</b> A pair the game knows becomes one status with one chip, carrying both of what it is made
+of. <b>A status built from two is tier 2</b>, from three tier 3, each stronger than the last; one pair ships. What it is made
+of still stands: every card that asks whether the body is Burning or Chilled finds both inside it, its chill still slows,
+and everything that counts how many different afflictions a body carries &mdash; the Survivalist's Trapper, Hunt, Cull, Harvest,
+Salve, Thick Hide, the Iron Will talent and Sanctity's count of changes &mdash; counts a tier-2 as two, so joining never costs breadth.
+<b>Nothing runs twice</b>: the Burn inside ticks once. <b>It lasts as long as the shorter of the two would have</b>, and the
+longer then stands alone with what it had left; a card that eats an ingredient &mdash; Detonation eats the Burn &mdash; does the
+same. A cleanse takes it whole. <b>Casting an ingredient again follows its own rule</b>: a second Burn adds its turns, a
+second Chill adds a stack and restarts the chill's clock. It works on heroes too: an Ashblade's Burn on a hero chilled by the
+Hoarfrost bargain makes a Rupture on the hero. No save changes: a status never outlives its fight.</p>
+
+<p><b>&sect;3 &mdash; RUPTURE.</b> Burn and Chilled, tier 2, its chip <b>Ru</b>. It ticks when the Burn would, for the Burn's
+damage, and deals 10 Break damage with that tick &mdash; <b>a first figure, flagged for the designer to tune from play</b> and
+held in one place. Break because it is the currency the Mage has no lever for, the Occultist's madness waits on a Broken
+target his own cards never grind toward, and Bonecracker and Breaking Darkness already pay for Break that lands &mdash; and
+Breaking Darkness amplifies a Rupture's too. The glossary teaches the rule and the recipe in two new entries.</p>
+
+<p><b>&sect;4 &mdash; ONE, NOT FIVE.</b> The sim cannot price a conjunction, because the bot casts the Mage's fire before his ice
+and will not build one on purpose, so the designer's play is the instrument &mdash; and five at once would be five unmeasured
+figures with no way to tell which is wrong. Seize, Breach, Blight and Reckoning are designed and not built, and who lays
+Cripple, Poison, Bleed, Sunder and Dazed on the enemy side is owed a count before any of them is. A tier 3 must do
+something no card can do.</p>
+
+<p><b>&sect;5 &mdash; THE LOG IS THE INSTRUMENT.</b> The combat log writes a line when a conjunction forms (what landed on what,
+whose it was, its tier, how long it lasts and whose clock that is), every tick with its Burn and its Break apart &mdash; and,
+on a Broken body, that no Break landed &mdash; every time an ingredient is cast again or a card rewrites its clock, and how it ended &mdash; the clock, a card eating an ingredient, a
+cleanse, or the body falling. Every name in those lines comes from the game's own data.</p>
+
+<p><b>&sect;6 &mdash; THE BOT.</b> It is not taught to build one. It makes them by accident &mdash; one fight in ten for a
+Cryomancer party, three in ten for a Pyromancer one, almost always its own Chill landing on its own Burn &mdash; and fights on
+as it did: its ordinary rotation at the ruptured enemy, which mostly dies before the Rupture's clock runs out.</p>
+
+<p><b>&sect;7 &mdash; DELIBERATELY NOT DONE.</b> The other four conjunctions, the tier-3 rule's first use and the draft label that
+names a card's conjunction. The census of who lays Cripple, Poison, Bleed, Sunder and Dazed. The Master Document's seven
+fire-and-ice disagreements HR found. The Skirmisher and the Tracker, still ruled and not built. Channel's tempo payout.
+Whether a fallen hero stays down between fights. Tithe's read site and its talent rebalance. No rune is authored, the crest
+is one slot, and the rules file is not split.</p>
+
+<p><b>The checks that moved, and why.</b> Every existing check was first run as it stood against this batch's game, with the documents as HR left them &mdash; 131
+targets, in 73 minutes &mdash; and three read red besides the two that are red on purpose. <b>One was expected</b>: the glossary's
+count, which now holds 100 entries, and its pin moves to 100 rather than loosening. <b>Two were checks whose answer had depended on
+luck</b>, and this batch's change to the map moved the dice they are dealt from, as HR's did: a live fight's opening blow on a
+Sharpshooter's mark missed, and the Peddler dealt the hero with a full holding a crest rune, which a full holding does not wall.
+Each was proved to be the dice &mdash; with the map rule set back, the old check read the old run exactly &mdash; and each now
+sets up what it asks about. <b>Two green checks counted fewer</b>, and each was traced line by line before its row moved: the
+draft check that walks two whole runs read 454 where it read 469, the dice again &mdash; with the map rule and the conjunctions both
+switched off it read HR's count message for message &mdash; and a suite that counts the nodes of three freshly drawn, unseeded maps
+fell one under its floor, which is not this batch at all: 400 maps on HR's game and 400 on this one spread the same way, so the
+floor moves to the lowest count measured. <b>Four checks were edited</b>, each with its reason at the
+place, and <b>one is new</b>: <code>check_hs</code> drives everything this batch built &mdash; the first three nodes on eighty boards a zone,
+the bargain's merchant, the rules file's two corrections, a Rupture formed both ways, its Burn and its Chill found by the cards
+that ask for them, counted as two by the counts of afflictions, ticking once, ending on the shorter clock, cleansed whole, cast into again, its log
+out of a running fight, and the bot fighting one to the end. <b>A new rule</b> records why its first comparison of a strike was
+wrong: two bodies compared must be one kind of body. <b>Thirty-three controls</b>, one defect each, were read by what each
+printed, and every one went red on the check it aimed at &mdash; and one of them, run first against an earlier copy, found an arm of
+the new check that asked nothing (the fire cards' gates opened off a third body's lone Burn), which now clears the field first.
+The sim then showed one thing the log did not say &mdash; a Rupture ticking on a Broken body deals no Break &mdash; and the log
+says it now. Four rows of the count table move, three more carry a note, and one is new. <b>The full rehearsal run</b>, in a copy
+proved equal to the tree, read every one of the 133 checks at the count written down for it before it started, in 74 minutes, and the count
+differ found nothing to report.</p>
+
 <h2>2026-10-05 &mdash; Batch HR: THE BAG SPLITS, THE NAMEPLATE SPEAKS, AND A CENSUS FOR FIRE AND ICE</h2>
 <p><b>A rune for a class now goes to the hero of that class, who holds it unworn until he equips it, and the shared bag holds
 the Crest's runes only. A mark on each hero's nameplate on the map counts the runes he holds and does not wear, and the map
