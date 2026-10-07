@@ -4,6 +4,51 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The bar pages, Downwind is bounded, and every route a chill or a burn takes (Batch HU) — 2026-10-06
+
+**Why the Abilities list pages instead of scrolling.** The list is a column of discrete buttons, and a scroller puts a card
+somewhere different every time the list is opened: a player hunting for Fireball mid-fight finds it at whatever height the
+last scroll left it. A pager keeps every card at a fixed place on its page, so the hand that learned where a card sits finds
+it again next turn. A page is exactly the rows the hotkeys reach, which makes page one the keyboard's page; the pager exists
+only when the list overflows, because a control that is always there trains the eye to skip it, and in normal play it never
+appears — the widest bar a hero raises fits one page. It is the debug menu's unlock-all that overflowed it, and that is not
+nothing: under it a Mage's Fireball, Frostbolt and Blizzard sat off the top of the screen and past every key — for the
+designer's own party, every card that lays a Chill — which is the likeliest reason the designer testing Rupture saw none.
+
+**Why a copied freeze is an ordinary one rather than no copy at all.** Downwind's card promises every affliction an ally
+applies; refusing Frozen would be a hole in the card a player can find by reading it. What the copy must not do is carry what
+the Glacial Hold engine keeps of a freeze — the hold's length, which is the engine's and is managed by it (one enemy, a
+charge, a release). A bounded freeze is the affliction without the engine; the hold stays the Cryomancer's alone.
+
+**Why the copy drops the boss override.** *Hard control lands on a boss only once it is Broken* has one sanctioned exception,
+Pommel Strike's Perfect, and an exception is a property of the card that bought it, aimed at that card's target. A copy that
+carried it onto a second boss was spending the card's privilege on a body the card never aimed at.
+
+**Why every route to a Rupture was derived, and not one door trusted.** The designer reported not seeing the composition, and
+two reports read as if they disagreed about whether anything laid a Burn or a Chill around the status door. They did not —
+one spoke of a status arriving, the other of a standing chill's stack count being rewritten — but the only answer worth giving
+was the population: every write of either, every carrier and rider driven, every card cast on a burning and a chilled board.
+All of them reach the composition. The designer's missing Rupture was most likely the bar, not the door.
+
+**Why a meter state is not a conjunction half.** A conjunction is one status made of two, and a cleanse takes a status whole.
+Broken and Bleed are meters with a chip on top: a cleanse would lift the chip and leave the meter, so the body would read clean
+and stay Broken, and a carrier would cast a chip with no meter behind it onto an enemy. The Warrior is not left out by it —
+Sunder, a Stun and a Taunt are all in his kit — so the re-cut conjunction is built on what he already lays.
+
+**Why Broken stopped counting as a debuff for Iron Will.** The breadth count has excluded Broken by rule from the day it was
+written, because Broken is the meter's state, not something anyone laid. The talent's own count did not, so a Broken hero
+holding *Mitigation per Debuff You Carry* took a debuff's worth less damage for being Broken — the one state in the game meant
+to be a punishment softening itself.
+
+**Why two chips must never wear one tag, counters included.** A chip is the only thing on the nameplate a player reads at a
+glance, and a tag shared by two statuses is a lie on screen whichever one it is. A counter owns its letters too: Blighted's
+`Bl` reads as a Bleed counter that lost its number, Cripple's `C` as a Chilled with no stacks. Where one of a pair is met far
+more often, the rarer one moved, so the chip a player reads most stays what he learned.
+
+**Why a report that has not filled its tokens has not reported.** The verdict is the one line the next batch is built on. HT's
+committed report was whole, but the draft that stood in the tree all through the acceptance run was not, and it was read as the
+report. A draft that nothing in the tree reads can wait in the scratchpad until it is true.
+
 ## Two rulings, and the census that opens the rest of the ladder (Batch HT) — 2026-10-06
 
 **Why the Ritual Chanter's rite thaws the chill inside a Rupture instead of lifting it.** The rite's rule since Batch V is

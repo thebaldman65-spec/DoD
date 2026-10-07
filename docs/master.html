@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-10-06 (Batch HT &mdash; two rulings, and the census that opens the rest of the ladder)</b></p>
+<p align="right"><b>Last updated: 2026-10-06 (Batch HU &mdash; the bar pages, Downwind is bounded, and every route a chill or a burn takes)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -687,7 +687,8 @@ shows on the ability button ("CD n") and in its tooltip. <b>Enemies do not use c
 all</b> — their kits are gated by resources and AI conditions instead.</li>
 <li><b>Buff / Debuff (keywords):</b> a DEBUFF is any negative status effect, a BUFF any
 positive one. The talent that counts debuffs (the tree's Mitigation per Debuff You Carry)
-uses this classification.</li>
+uses this classification &mdash; and <b>Broken</b>, the Break meter's state rather than an affliction
+anyone lays, is not one of the debuffs it counts, as it is not one any breadth count reads.</li>
 <li><b>Crit:</b> 10% base + 25% vs Broken targets + 1% per Arcanist Resonance stack + talent/spec
 bonuses (+10% with Aguila summoned, scaled by its Loyalty tier; +5% for every attack a Sharpshooter
 has landed without a critical since his last one, below). Guaranteed: Ice Lance vs Frozen;
@@ -867,7 +868,8 @@ damage (the Warrior class-wide <b>ability</b>, chip tag <code>Ir</code>). The Br
 live counter.</td></tr>
 <tr><td>Iron Will</td><td>Takes 12% LESS damage per debuff carried, to a maximum of 90% (the
 talent tree's <b>Mitigation per Debuff You Carry</b> node, which every class can buy; the chip
-keeps this name); a permanent chip whose value follows the live debuff count.
+keeps this name); a permanent chip whose value follows the live debuff count. <b>Broken is not
+one of the debuffs it counts</b> &mdash; it is the Break meter's state, not an affliction.
 <b>A different mechanic from Ironclad above, and the only one of the two that wears this
 name.</b></td></tr>
 <tr><td>Crushing Blows</td><td>+9% armor penetration per 20 total warband
@@ -1564,7 +1566,8 @@ says which of the two it is, because a second cast can only write what is alread
 binds to <b>Shift + the same key in the same order</b> (10 = Shift+Q, 11 = Shift+W, …), and
 the button carries the modifier in its label ("[⇧Q] Blood Price"). Shift hotkeys obey every
 existing rule: ignored while the ability is unaffordable or gated, and inactive during
-targeting or a skill check.</p>
+targeting or a skill check. A key names a slot, not a place on a page: past what the keys reach
+the list pages (the battle UI, below), and no key turns a page.</p>
 
 <h3>6b. THE ABILITY DRAFT</h3>
 <p>Beside the zone-boss pick sits a second, larger source of abilities: <b>the draft</b>.
@@ -1968,7 +1971,7 @@ binds exactly as often as it did before the conversion.<br><b>Builds with:</b> e
 <tr><td><b>Hunt</b></td><td>25 Mana, 2.5, 4cd, one enemy, 10 BD</td><td><b>15% of Attack for every DIFFERENT harmful effect</b> on the target (Perfect: 20%) — 60% at four afflictions, 90% at six. <b>Stacks do not count twice:</b> five stacks of Poison are one affliction. Dark against a clean field.</td><td>The count made into a weapon. His passive has always paid for breadth; this is the first thing that lets him <i>spend</i> it.<br><b>Builds with:</b> <b>Loaded Shot</b>, its maintenance card, and <b>Preparation</b>, which buys the turn a wide board costs to arm.</td></tr>
 <tr><td><b>Preparation</b></td><td>25 Mana, 2.0, 5cd, self</td><td><b>After his NEXT turn he immediately takes another one</b>, and it refunds 15 Mana. It is a <b>full turn and his own statuses tick again</b> — enemy statuses tick on enemy turns, so the board he armed is untouched. <b>Only one may be pending</b>, so it can never be cast on the turn it bought.</td><td>An extra action <i>is</i> extra breadth, for a spec where every status costs a whole cast. The delay is what makes it a setup card rather than "take two turns now".<br><b>Builds with:</b> everything of his that costs a turn — trap placement above all. It is the direct setup for <b>Loaded Shot</b> and <b>Hunt</b>.</td></tr>
 <tr><td><b>Stalking Horse</b></td><td>25 Mana, 1.0, 4cd, self</td><td>For <b>4 turns</b> enemies are drawn to swing at him, and <b>every attacker takes a DIFFERENT affliction</b> — Poison, then Cripple, Slowed, Exposed, Dazed and Blind, in turn. It reuses the existing draw (Savage Presence's), not a second taunt.</td><td>The taunt that builds his own engine. Trapper pays for <b>breadth</b> and nothing in his kit ever helped him get it except applying afflictions one at a time off his own turns.<br><b>Builds with:</b> <b>Hunt</b> and <b>Cull</b>, both priced on the count.</td></tr>
-<tr><td><b>Downwind</b></td><td>25 Mana, 1.0, 5cd, self</td><td>For <b>4 turns</b> every harmful effect <b>any hero</b> lands on an enemy is <b>copied onto a second enemy</b>, preferring one that does not already carry it.</td><td>He is the one spec in the game whose passive an ally can pay into — Trapper's breadth counts afflictions from <i>any</i> source — and this is the card that says so.<br><b>Builds with:</b> any ally who applies statuses in volume, the <b>Occultist</b> above all, then the <b>Cryomancer</b> and the <b>Pyromancer</b>; plus <b>Cull</b> below, which cashes what this spreads.</td></tr>
+<tr><td><b>Downwind</b></td><td>25 Mana, 1.0, 5cd, self</td><td>For <b>4 turns</b> every harmful effect <b>any hero</b> lands on an enemy is <b>copied onto a second enemy</b>, preferring one that does not already carry it. <b>A copied freeze is an ordinary one</b> &mdash; it thaws after the turn it costs, and it is never a Glacial Hold, which holds the one enemy it was laid on &mdash; and <b>a copy never carries a Perfect's way past a boss's immunity</b>: a Perfect Pommel Strike's copy is shrugged off by an unbroken boss.</td><td>He is the one spec in the game whose passive an ally can pay into — Trapper's breadth counts afflictions from <i>any</i> source — and this is the card that says so.<br><b>Builds with:</b> any ally who applies statuses in volume, the <b>Occultist</b> above all, then the <b>Cryomancer</b> and the <b>Pyromancer</b>; plus <b>Cull</b> below, which cashes what this spreads.</td></tr>
 <tr><td><b>Cull</b></td><td>30 Mana, 3.0, 5cd, one enemy</td><td><b>CONSUMES every affliction on one enemy</b>, and <b>EVERY</b> enemy takes <b>10% of Attack in nature damage per status removed</b> (Perfect: 12%). A poison that cannot be cleansed stays — and is not paid for.</td><td>Spending the breadth, and it <b>deliberately fights his own passive</b>: what Trapper spent the fight building is what this eats. That tension is the card.<br><b>Builds with:</b> <b>Downwind</b> above all (it spreads the board this cashes), and <b>Stalking Horse</b> (which builds it off enemy turns). It is <i>not</i> Harvest: that one empties one enemy and heals him; this bills the whole field and heals nothing.</td></tr>
 <tr><td><b>Thick Hide</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For <b>4 turns</b> he takes <b>6% less damage per DIFFERENT affliction standing on whoever is striking him</b>, <b>up to 30%</b>.</td><td>His passive pays him for <b>being struck</b> and Stalking Horse <b>pulls the field onto him</b>, and until now <b>nothing in his kit or pool supported being in the fray</b>. It is the first card that reads Trapper breadth <b>on the way in</b>.<br><b>Builds with:</b> <b>Stalking Horse</b> above everything — that card puts a different affliction on every attacker in turn, which is exactly the number this reads.</td></tr>
 <tr><td><b>Salve</b></td><td>25 Mana, 2.0, 5cd, self</td><td>For <b>3 turns</b> (Perfect: 4) he heals <b>2% of maximum health at the start of his turn per DIFFERENT affliction standing on the enemies</b>, <b>up to 10%</b>. Counted <b>once each across the field</b>, so a copied poison does not pay twice. <b>Nothing is consumed.</b></td><td><b>The first heal in any of the twenty-four Hunter spec cards.</b> The class was shortest of this axis by a distance — its only self-mending was one class card and a boss-pick Harvest.<br><b>Builds with:</b> <b>Harvest</b> as its <b>deliberate inverse</b> — that one burns the whole board for a burst and strips his own Trapper bonus; this drinks and leaves everything standing, so Hunt and Cull keep paying. <b>Choking Smoke</b> and <b>Downwind</b> are what make the board wide enough to drink from.</td></tr>
@@ -3388,7 +3391,12 @@ buildup and meter value, Poison lines show stack counts and damage per turn, and
 report their stack multiplier.</li>
 <li><b>Action bar:</b> Basic attack button; <b>Abilities ▾</b> — a button list where hovering
 each entry live-previews its initiative cost on the bar (costs shown, unaffordable entries
-greyed); <b>[Alt] Items</b> — opens the item picker.</li>
+greyed); <b>[Alt] Items</b> — opens the item picker. <b>A long list pages.</b> When it holds more
+cards than the hotkeys reach, it shows one page at a time, with <b>◂ Prev</b>, the page
+(<i>1 of 3</i>) and <b>Next ▸</b> under the last card: page one is exactly the keyed cards, every
+card keeps its place on its page, and the list reopens on the page it last showed for that hero.
+A list that fits shows no pager &mdash; a hero's widest bar in play is one page, and the debug
+toggle's full class pool is what pages.</li>
 <li><b>Ability hotkeys:</b> <b>Q / W / E / R / A / S / D / F / G</b> map to the ability MENU
 slots in order — Q is always the basic attack, the Hunter's "Summon Companion" picker
 holds W, and the remaining abilities follow in kit order. The menu is the hero's

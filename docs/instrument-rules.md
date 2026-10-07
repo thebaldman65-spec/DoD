@@ -680,6 +680,12 @@ means anything.** This is CQ §3's rule applied to an operator rather than to a 
     can see this.
   · **AND "COMMENTS ONLY" STOPS BEING A SAFETY ARGUMENT.** The comment-stripped diff proves no CODE
     moved; it says nothing about whether a suite reads the comment. Both proofs are owed.
+  · **A STRING SHORTER THAN THE FLOOR IS SWEPT AT ITS OWN LENGTH (HU §4).** A chip tag is two or
+    three characters, so the floor of 4 is blind to every one by construction: HU re-tagged fourteen
+    statuses, the sweep read clean, and HEAD's `test_batch_bg` went red in the recon on Faith's
+    `F0` — a chip a running fight writes, compared as text. **When a batch changes a tag, a counter's
+    format or any literal under the floor, it greps the tree for the old string and the new at their
+    own length, and reads every hit.**
 - **THE HAYSTACK CANNOT BE A GREP, AND THIS IS THE SHARP PART.** `check_dv` asserts
   `not rs.contains("func roll_ability_offer")` and `test_batch_an` §1 holds the bare literal
   `"roll_ability_offer"` in its `gone_fn` list — **so the two checks that prove the function is

@@ -13,100 +13,166 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-10-06 (Batch HT).*
+*Last rewritten: 2026-10-06 (Batch HU).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: HT — TWO RULINGS, AND THE CENSUS THAT OPENS THE REST OF THE LADDER.** IMPLEMENT ONLY. HS's six rulings are
-  taken — four confirm what was built, two move code — and a census of every status a hero can lay on an enemy answers what
-  the next conjunctions wait on. Full working: **`docs/reports/HT.md`**.
-- **§1 — HS's RULINGS.** **Rupture's 10 Break a tick stays**, the designer's to move from play; the watch condition sits beside
-  `battle.RUPTURE_BREAK_PER_TICK` (a Rupture lives one to three ticks: 10–30 Break against a meter of 100), and the sim's figure is
-  not a guide (most of the bot's Ruptures die with the body). **Per-ingredient clocks, the survivor and the symmetric rule are
-  confirmed** and recorded with their reasons (`CLAUDE.md`'s conjunction block). **An enemy mender's Cleansing Rite reads the
-  chill INSIDE a Rupture** (`battle._rite_chill`): one stack off and the Rupture stands; at the chill's last stack the Burn stands
-  alone; a Glacial Hold chill inside one is still its first pick; **a Rupture is never lifted by it** — a generic cleanse still
-  takes one whole. **On screen a conjunction's tier is its DEGREE** — *Rupture is a second-degree affliction* — on the chip, the
-  forming line, both glossary entries and `master.html`; `tier_of` and every identifier unmoved (`BattleUnit.tier_ordinal` renders
-  the word). Only the rite reads a specific id after a generic cleanse door (its `ruin` → `ruin_primed` is the same shape,
-  harmless while Ruin is no ingredient).
-- **§2 — THE CENSUS** (`docs/reports/HT.md` §2): **forty-four statuses** a hero lays on an enemy today, Burn, Chilled and Frozen
-  three of them; three more (Caught Fast, Decay, Melted Armor) have only dormant appliers. Each with its appliers by class, its
-  readers, its re-application rule, its duration and its `DEBUFF_IDS` row, and the by-class table. **The structural answer**:
-  Broken is a meter state WITH a chip — `take_hit` writes the entry around the status door, with no clock (the recovery removes
-  it) and no `src`; every reader of the chip is an exclusion and the game reads the flag; so a Broken half costs a second door,
-  a breaker read off the frame, a ruling on *the shorter clock*, a fourth end-cause for `_dissolve`, and cleanses that read
-  through a composition (or they would lift Broken's chip off a body still Broken). **Bleed is a meter too** (`log_bleed_chip`
-  writes its chip around the same door), **so three of the four designed conjunctions have a meter half; only Seize is two
-  statuses the door can see.** **A Warrior holding no engine lays Sunder, Stunned and Mocked from his own kit** (driven at
-  `check_ht` §4) — his seat is not none. It proposes nothing.
-- **§2f — FOUND BY THE CENSUS, DRIVEN: DOWNWIND COPIES A GLACIAL HOLD AS AN UNMANAGED PERMANENT FREEZE, AND FORWARDS `force` PAST
-  AN UNBROKEN BOSS** — two standing rules broken; NEEDS A RULING 1. Five cards and a rune promise what the code does not pay
-  (ruling 5).
-- **§3 — TWO NAMES, AND `master.html`'s SEVEN.** *Contagion* (Poison + Bleed) and *Marrowfire* (Broken + Burn) replace *Blight* and
-  *Breach* in the record, not built; swept over 1,026 names, Marrowfire near-misses four and Contagion is the reserved contagion
-  space's own word (rulings 3, 4). `master.html`'s seven fire-and-ice sentences are corrected toward the code, and the copies off
-  the document with them — the glossary's Overburn (six refund consumers) and the Glacial Hold rule text (*every hero's strike*).
-- **THE VERIFICATION.** The saves were backed up first and verified by hash (`../save-backups/HT-20261006-081045`, the four
-  files byte-identical to the live ones — and to HS's backup: nothing had moved since 5 October 10:13). **The recon** — HEAD's
-  unmodified gates and documents against HT's game, 133 targets in 73 min 57 s — read `check_de` 549 / 1: `check_hs` alone, at
-  the two arms predicted (the chip's and the forming line's *tier*), with the two sanctioned reds at their counts; HS's two coin
-  flips, `check_fo` and `check_hk`, read green (90, 168), so neither was touched and no stub was owed. **Two gates were
-  edited** (`check_hs`, three arms, each with its reason at the site; `test_batch_as`, one message) and **one is new**
-  (`check_ht`, 77, one property an arm: the rite driven both ways with its negative, and the degree over every literal of the
-  composition machinery). **Forty-four controls**, one defect each in a fresh clone of the finished tree, read by FAIL text:
-  every one red on the arm it aimed at — two earlier rounds found the gate's joined arms printing one line for two defects, a
-  negative that could not fail, and a Flamewave needle that a second copy in the document kept green, each repaired. **The 46
-  targets that read the documents edited after the recon copy** (`master.html`, `CLAUDE.md`, `design-notes.md`), **and the
-  twelve that read the gates' own source**, read every one at its row on the finished tree. **The pre-pass** (134 targets in 74 min 4 s, an isolated copy proved equal to the tree) read `check_de` 553 / 0 / 0,
-  every target at its predicted row. **The acceptance run in the repository** (134 targets in 74 min 6 s, the tree frozen and
-  byte-identical after it, 508 files) read `check_de` 553 / 6, **and the six were the designer's own game**: launched from their
-  terminal at 13:14:11, mid-run, it saved into the live folder inside six gates' windows, and each one's player-file arm said so
-  — `check_hl` (`run_save.bin` and `profile.json`), `check_hn`, `check_ho`, `check_hp`, `check_hr`, `check_hs`; the gate before
-  its first save and the gate after its last read green, and every other target read its row and its pre-pass reading but
-  `test_batch_an`'s unseeded count (6051, inside its band) — the two sanctioned reds at their counts and FAIL text, the run
-  harness PASS (22 / 382 / 8), no Parse Error, SCRIPT ERROR, TIMED OUT or NO VERDICT line. **No target can write the player's
-  files**: every headless, `--script` or non-main-scene process saves to the harness path, and every gate points the profile at
-  scratch. Re-run in the repository, `check_hl`, `check_hn` and `check_ho` read their rows before the designer launched again at
-  13:20:57; `check_hp`, `check_hr` and `check_hs`, whose windows that launch's saves landed in, read their rows whole in an
-  isolated copy proved equal to the tree. **The player's files moved by that play alone** — `profile.json` (a new run:
-  `runs_started` +1 on four keys) and `run_save.bin`; `relics.json` and `settings.cfg` are byte-identical to the 08:10 backup,
-  which keeps the batch's opening state.
-- **HS's SEVENTEEN COPIES ARE IN THE TRASH**, selected by the *"Dawn of Decay HS "* prefix, under *"DoD spent user-data folders
-  (Batch HS's seventeen, cleared at HT 2026-10-06)"*: 17 folders, 8,724 KiB (HS recorded 8,724). Godot's `app_userdata` went from
-  479 folders and 151,316 KiB to 462 and 142,592 KiB; the older folders, the live *Dawn of Decay* folder and `../save-backups/`
+- **Last batch: HU — THE BAR PAGES, DOWNWIND IS BOUNDED, AND DID HT ACTUALLY LAND.** IMPLEMENT ONLY. Full working:
+  **`docs/reports/HU.md`**.
+- **§0 — HT LANDED.** At HU's start `git ls-remote origin class-merge` read `7e20de7`, local HEAD; HT's game work is in the tree
+  (`check_ht` 77 / 0 on it, standalone); its acceptance run happened — 12:04:02 to 13:18:08, `check_de` 553 / 6, the six the
+  designer's game saving mid-run, every one re-run clean — and its logs survive. **The committed `docs/reports/HT.md` carries no
+  unfilled token**: the three the brief names stood in the DRAFT in the working tree from 12:03:48 to 13:27:25 — the acceptance
+  run's window, where it was read — and were filled before the 13:29:16 commit. HT's report is not edited. **A report does not ship
+  with an unsubstituted template token, and its draft stays in the scratchpad until its verdict is in** (`CLAUDE.md`, the report block).
+- **§1 — THE ABILITIES LIST PAGES** (ruled: a pager, not a slider; `battle.BAR_PAGE_ROWS`, `_bar_pager`): a page is the rows the
+  hotkeys reach, the pager exists only when the list overflows, every card keeps its place on its page, the list reopens on the page
+  that hero last showed, the keys keep their slots and no key turns a page. **The real ceiling in play is thirteen entries** (264
+  hero shapes walked) **against twenty the bar shows and eighteen the keys reach**; no live crest rune grants a card, so **only the
+  debug menu's unlock-all reaches a second page today** — where a Mage's Fireball, Frostbolt and Blizzard had sat above the screen
+  and past every key. A page-two card was cast through the real turn (`check_hu` §1).
+- **§2 — EVERY ROUTE A CHILL OR A BURN TAKES REACHES `_conjoin`.** The status door's own add is the only write of either;
+  `set_chilled_stacks` rewrites a pile that stands and writes nothing on a body without one — **so HS §2b and HT §2d are both
+  true** (one is about a status arriving, the other about a pile's stack count) **and neither report was wrong** (HS's *one
+  variable-id `add_status` call* is two; the engine chip's can never be a Burn or a Chill). Driven: every card cast on a burning and
+  a chilled board — 408 casts; Razor Ice, Blizzard, Glacial Prison and Frostbolt chill, Flamewave, Firestorm, Ember Debt, Fireball
+  and Choking Smoke burn, and each formed its Rupture — and every carrier and rider, each forming one with its line. **No card's
+  chill or burn fails to compose.** **The designer's missing Rupture was most likely the bar**: the save's party — an Arcanist on
+  Resonance alone, a spine Warrior and Cleric, a Beastmaster — opens with no card that lays a Chill, and under unlock-all every one
+  sat in the rows nothing could reach.
+- **§3 — DOWNWIND IS BOUNDED** (ruled): a copied freeze is an ordinary timed one (`battle.ORDINARY_FREEZE_TURNS`), never a hold,
+  Carrion or not, and the hold still holds its own enemy; the copy drops `force` — a Perfect Pommel Strike still stuns its own
+  unbroken boss, the copy does not, a Broken boss takes the copy. **The other five bare copies are classed and not fixed**: a
+  partner-less Frostbind, a poison without `_apply_poison`'s stamps and a Ruin stack without `_gain_ruin`'s arming are the hold's
+  shape; Vendetta's second permanent taunt and Snare Trap's second spring are the card's own business (HU's ruling 3).
+- **§4 — FOURTEEN CHIPS RE-TAGGED, AND BROKEN IS NOT A DEBUFF IRON WILL COUNTS** (ruled). The designer's two pairs and eleven more
+  the sweep found (a counter's letters included — Cripple's *C* beside Chilled's *C<n>*, Burn's *F* beside Faith's): the rarer of
+  each moved (HU's ruling 1 lists them). `count_debuffs` excludes Broken, as the breadth count does: **one debuff's step, 12 points of
+  damage taken, whenever a hero holding the node is Broken** — a seeded blow on a Broken Warden 21 with the node against 24 without
+  at HEAD, 24 and 24 now. The Holy bot's Empowered Divine Plea reads the same count.
+- **§5 — RECORDED, NOT BUILT**: a meter state is not a conjunction half (the Warrior's half is a status he lays; Marrowfire becomes
+  Sunder + Burn pending the design pass); the Occultist's hole is CE §3's, not a conjunction's; no debug card pick; the six
+  card-versus-code items each one word from built (the queue below).
+- **THE VERIFICATION.** The saves were backed up first and verified by hash (`../save-backups/HU-20261006-134615`, the four
+  files byte-identical to the live ones). **Against HT's backup two had moved, by the designer's play** — `profile.json`
+  (13:29:50, a new run: `runs_started` up on eleven keys) and `run_save.bin` (13:31:25, a debug-touched run at the first node of
+  zone one) — and `relics.json` and `settings.cfg` are byte-identical. **The recon** — HEAD's unmodified gates and documents
+  against HU's game, 134 targets in 74 min 19 s — read `check_de` 553 / 1: **`test_batch_bg` alone, 41 / 2, at the two arms that
+  pin Faith's chip as `F0` and `F%d`** — not predicted, because the literal sweep's floor of 4 cannot see a two-letter chip (an
+  instrument rule now) — with the two sanctioned reds at their counts and FAIL text; every other target read HT's pre-pass
+  reading but `test_batch_an`'s unseeded count (6049, inside its band). HS's two coin flips read green (`check_fo` 90, `check_hk`
+  168), so no stub was owed. **One suite was re-pointed** (`test_batch_bg`, two arms, the question unchanged) and **one gate is
+  new** (`check_hu`, 103, one property an arm). **Twenty-three controls and a baseline**, one defect each in a fresh clone of the
+  finished tree, read by FAIL text: every one red on the arm it aimed at, and the one re-tune green; **HEAD's game under the new
+  gate read 102 / 25 and one SCRIPT ERROR** — red at exactly the four things HU changed, green on every route of §2, and
+  the throw the gate's own (its §1f reads a variable HEAD's battle node lacks; queued below). **The pre-pass** (135 targets in 74 min 38 s, an isolated copy proved equal to the tree)
+  read `check_de` 557 / 0 / 0, every target at its predicted reading. **The acceptance run in the repository** (135 targets
+  in 74 min 26 s, 16:51:35 to 18:06:01) read `check_de` 557 / 0 / 0, every target at its pre-pass reading but `test_batch_an`'s
+  unseeded count (6055, inside its band) — the two sanctioned reds at their counts and HT's FAIL text, the run harness PASS
+  22 / 382 / 8, no Parse Error, SCRIPT ERROR, TIMED OUT or NO VERDICT line; **the tree frozen and byte-identical after it (509
+  files), the player's four files byte-identical before it, after it and to HU's backup**, and no game window open during it
+  (`ps` read every 15 s). Only this block's verification lines, one queue line below and `docs/reports/HU.md` moved after it;
+  this file's two readers (`check_es`, `check_hp`) and the document instruments read their rows on the final tree.
+- **HT's FIFTEEN COPIES ARE IN THE TRASH**, selected by the *"Dawn of Decay HT "* prefix, under *"DoD spent user-data folders
+  (Batch HT's fifteen, cleared at HU 2026-10-06)"*: 15 folders, 2,404 KiB (HT recorded 15 and 2,404). Godot's `app_userdata` went
+  from 482 folders and 145,740 KiB to 467 and 143,336 KiB; the older folders, the live *Dawn of Decay* folder and `../save-backups/`
   were not touched.
-- **`CLAUDE.md` IS 437,200 B = 426.95 KiB, WITH 43.05 KiB UNDER ITS 470 KiB CEILING** (+2,614 B at HT, measured after this
-  batch's own writing; HS left it at 424.40 KiB): **about 5.3 batches at the record, EZ's +8,293 B**, and 5.6 at HP's +7,935 B
-  (6.3 at HS's +7,000 B, 16.9 at HT's own rate). The shape recon is owed before then — the arithmetic is not the answer next
+- **`CLAUDE.md` IS 442,887 B = 432.51 KiB, WITH 37.49 KiB UNDER ITS 470 KiB CEILING** (+5,687 B at HU, measured after this
+  batch's own writing; HT left it at 426.95 KiB): **about 4.6 batches at the record, EZ's +8,293 B**, and 4.8 at HP's +7,935 B
+  (5.5 at HS's +7,000 B, 6.8 at HU's own rate). The shape recon is owed before then — the arithmetic is not the answer next
   time.
 - **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in a build
   older than HL**: HL's ceiling refuses a newer save from HL's build on — HR's v15 is the first bump it has guarded — and HJ's and
   HK's builds, and `main`, carry no ceiling.
-- **Next letter: HU.**
+- **Next letter: HV.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### HT's RULINGS OWED — **SEVEN; THE FIRST IS TWO STANDING RULES BROKEN, DRIVEN**
+### HU's RULINGS OWED — **FOUR, ALL PLAYER-VISIBLE; HT's 2 AND 7 ARE STILL OWED, BELOW**
+
+Full working: `docs/reports/HU.md`, NEEDS A RULING.
+
+1. **THE FOURTEEN NEW CHIP TAGS, PROPOSED** (HU §4): Frostbind *Bn*, Blighted *Bg*, Cripple *Cr*, Faith *Fa*+count, Blood
+   Price *Pr*, Covering Guard *Cv*, Caught Fast *Ct*, Retaliation *Rt*, Rallied *Rl*, Spirit Bond *Si*, Scent of Blood *So*,
+   Unslaked *Uk*, Anvil *Av*, Deathwish *Dh*. The rarer of each colliding pair moved; any can be re-picked, and `check_hu` §4a
+   holds the property, not the letters.
+2. **THE PAGER'S WORDS AND ITS PAGE, AS BUILT** (HU §1): *◂ Prev*, *1 of 3*, *Next ▸*; a page is the rows the hotkeys reach, and
+   the list reopens on the page that hero last showed. Confirm, or reopen every list on page one.
+3. **DOWNWIND'S OTHER FIVE BARE COPIES** (HU §3c): three are the hold's shape and fixable at the copy the way it was — a
+   partner-less Frostbind (an inert chip that still counts for breadth), a poison without `_apply_poison`'s stamps (a cleansable
+   copy of an uncleansable poison), and a Ruin stack copied without `_gain_ruin`'s arming (a skipped detonation); two are the
+   card's own business — Vendetta's second permanent taunt and Snare Trap's second spring (which also takes a trap slot). Which
+   to fix, and whether the two cards should be carried at all.
+4. **THE NINE CASE-ONLY NEAR-MISSES** (HU §4): *BB*/*Bb*, *BL*/*Bl*, *BW*/*Bw*, *DI*/*Di*, *DW*/*Dw*, *FG*/*Fg*, *SH*/*Sh*,
+   *SL*/*Sl*, *TH*/*Th* — two tags that differ only in case. Snare Line's *SL* beside Slowed's *Sl* is the sharpest: both are a
+   Hunter's, both on an enemy. Whether a case-only difference is a collision.
+
+### THE SIX CARD-VERSUS-CODE ITEMS — **RECOMMENDED; EACH IS ONE WORD FROM BUILT (HT's ruling 5, the recommendations HU's brief gave)**
+
+Six magnitudes on the designer's own cards, so they go in on a ruling, not on silence. **"code"** moves the code toward the card;
+**"card"** moves the card toward the code; **"fix"** is a bug with no magnitude in it. The findings are HT §2f's, each read at
+its line there.
+
+1. **Mark of the Hunt's reset — code** (recommended). The card resets its cooldown when the marked enemy dies; the one read runs
+   after `_die()` has cleared the body, so it never fires. Read the mark before the body is cleared.
+2. **Charge's Daze — code** (recommended). A one-turn Daze ticks out before the bearer acts, so it does nothing, and its Perfect's
+   *Dazed for 2 turns* is implemented nowhere.
+3. **Blood Debt's killing bleedout — code** (recommended). *Every time it bleeds out* — the bleedout that kills the bearer pays
+   nothing; pay it.
+4. **Counter Time's two turns — card** (recommended). The turn loop removes a stun whole at the first lost turn, so every stun
+   costs exactly one; **making a stun's LENGTH real touches every stun in the game**, so the card says one turn instead.
+5. **Snare Line's two-turn chilled stun — card** (recommended), for Counter Time's reason.
+6. **Thin Blood — fix** (a straight bug). Its price is *his Poison deals no damage*: the rune sets the tick to zero, and the DoT
+   pass reads a zero tick as *no tick set* and falls back to the legacy 3 a stack (`battle._dot_pass`), so **the rune's price is
+   never charged**. A zero must read as zero.
+
+### FOUND AT HU AND NOT FIXED
+
+- **THE BRIEF'S §0 PREMISE WAS NOT SO OF THE COMMITTED REPORT**: `docs/reports/HT.md` at `7e20de7` — and on the remote — carries
+  no unfilled template token; the three it names were filled at 13:27:25 and 13:28:46, before the 13:29:16 commit. The draft holding them
+  stood in the working tree from 08:55, through the whole acceptance run, and that is the copy that was read. HT's report is not
+  edited: there was nothing to fill.
+- **THE BRIEF'S §1 PREMISE — *"REACHABLE WITHOUT THE DEBUG MENU"* — IS NOT SO TODAY**: the widest bar in play is thirteen entries
+  against the eighteen one page of the list and the basic button hold, and no live crest rune grants a card (HO §6: *no card-granting crest rune*). The finding it cites is
+  HN §3d's, not HO §3d's. The pager is built as ruled; `check_hu` §1a reds the day a hero can hold more than a page in play.
+- **THE BRIEF'S §2 CONFLICT IS NOT ONE**: HS §2b speaks of a status arriving, HT §2d of a standing pile's stacks rewritten; both
+  hold (the WHERE block). HS's *"the one variable-id `add_status` call"* is two — the engine chip's is the other — and the
+  conclusion stands.
+- **A LITERAL SWEEP'S FLOOR OF 4 IS BLIND TO A CHIP TAG**: the sweep read clean and HEAD's `test_batch_bg` went red in the recon
+  on Faith's `F0`. Recorded as an instrument rule (`docs/instrument-rules.md`, EB §2's block).
+- **TWO VALUE CHIPS READ ALIKE BY DESIGN**: Shieldwall and Bulwark Line both show *+N% Block* on one hero; the reading is the
+  value, and `check_hu` §4a leaves chips that lead with a sign out of the tag rule.
+- **THE DESIGNER'S SAVE IS A DEBUG-TOUCHED RUN** (`debug_used` true): an Arcanist on Resonance alone, a spine Warrior on Momentum,
+  a spine Cleric on Sanctity and a Beastmaster, at the first node of zone one. Not a defect.
+- **`check_hu` §1f THROWS ON A GAME WITHOUT THE PAGER**: its last arm casts the battle node's `_bar_page` to a Dictionary
+  (`check_hu.gd:521`), and HEAD's node has none, so on HEAD's game the arm throws where it should fail — 102 checks against the
+  tree's 103. It cannot happen on this game, and a regression that removed the variable still reads red, loudly (a SCRIPT ERROR,
+  and a count fall `check_de` reds). The repair is one line — read the member, then assert it is a Dictionary — and was not
+  made after the acceptance run.
+- **`run_battery.sh` STILL DOES NOT ASK WHETHER THE GAME IS OPEN, AND A PLAIN `kill` STILL DOES NOT STOP IT** (HT's two, below,
+  carried; outside HU's brief).
+
+### HT's RULINGS OWED — **TWO LEFT (2 AND 7); FIVE ANSWERED IN HU's BRIEF: ONE RULED AND BUILT (1), FOUR RULED AND RECORDED (3, 4, 5, 6)**
 
 Full working: `docs/reports/HT.md`, NEEDS A RULING.
 
-1. **DOWNWIND COPIES A GLACIAL HOLD AS AN UNMANAGED PERMANENT FREEZE, AND FORWARDS `force` PAST AN UNBROKEN BOSS — DRIVEN.**
+1. ~~**DOWNWIND COPIES A GLACIAL HOLD AS AN UNMANAGED PERMANENT FREEZE, AND FORWARDS `force` PAST AN UNBROKEN BOSS — DRIVEN.**~~
+   **RULED AND BUILT AT HU §3**: the copy is an ordinary timed freeze, and it drops `force`.
    A hold beside a Hunter's Downwind locks a second enemy for the fight (every enemy with Carrion), outside `_holds` — no limit,
    no release; a Perfect Pommel Strike's copy stuns an unbroken boss. The shapes, unchosen: Downwind leaves Frozen alone or copies
    it as an ordinary timed freeze, and the copy drops `force` — one condition each at the copy in `battle._apply_status`.
 2. **THE RITE'S RANK, AS BUILT: BY THE CHILL** inside a composition (a Glacial Hold chill inside a Rupture is the first pick, as
    bare); the other reading ranks by the composition's own, shorter clock. Confirm, or choose the other.
-3. **CONTAGION IS THE RESERVED CONTAGION SPACE'S OWN WORD** (BA §1 — the mechanism, nothing spreading, is outside it; the name is
-   in it). Keep, or rename.
-4. **MARROWFIRE NEAR-MISSES *Fire*, *Chain Fire*, *Arrow Shot* AND *Poison Arrow*** by containment. A named near-miss, or rename.
-5. **FIVE CARDS AND A RUNE PROMISE WHAT THE CODE DOES NOT PAY** (Mark of the Hunt's reset, Counter Time's two turns, Snare
-   Line's two-turn chilled stun, Charge's Daze and its Perfect, Blood Debt's killing bleedout, Thin Blood's silent poison) — each
-   a repair batch's; which way each goes is a magnitude, the designer's.
-6. **THE CENSUS (`docs/reports/HT.md` §2) IS THE DESIGNER'S TO DECIDE ON, AND PROPOSES NOTHING**: the second conjunction, its
-   halves and its class pair; whether a meter state may be a half (§2e prices it — Broken for Marrowfire and Reckoning, Bleed for
-   Contagion).
+3. ~~**CONTAGION IS THE RESERVED CONTAGION SPACE'S OWN WORD**~~ — **RULED AT HU: THE NAME WAITS** on the conjunction being re-cut
+   (a meter state is not a half, and Bleed is one).
+4. ~~**MARROWFIRE NEAR-MISSES *Fire*, *Chain Fire*, *Arrow Shot* AND *Poison Arrow***~~ — **RULED AT HU: IT SHIPS AS A NAMED
+   NEAR-MISS** when it ships (three of the four are *arrow* inside M-*arrow*-fire).
+5. ~~**FIVE CARDS AND A RUNE PROMISE WHAT THE CODE DOES NOT PAY**~~ — **RULED AT HU: NOT BUILT WITHOUT A RULING**; each has a
+   recommendation one word from built (*THE SIX CARD-VERSUS-CODE ITEMS*, above).
+6. ~~**THE CENSUS (`docs/reports/HT.md` §2) IS THE DESIGNER'S TO DECIDE ON**~~ — **RULED AT HU: A METER STATE IS NOT A
+   CONJUNCTION HALF** (RULED, NOT BUILT; `CLAUDE.md`'s conjunction block): the Warrior's half is a status he lays, and Marrowfire
+   becomes Sunder + Burn pending the design pass (*THE FOUR OTHER CONJUNCTIONS*, below).
 7. **THE WORDS, PROPOSED**: *(second degree)* on the chip, *— second degree,* in the forming line, the glossary's
    *SECOND-DEGREE* and *a second-degree Conjunction*; the rite's *thaws one stack of the Chilled inside …* and *thaws the last
    stack …*, the end line's *a cleanse: its Chilled is lifted*; the Glacial Hold rule's *+15% damage from every hero's strike*.
@@ -125,9 +191,8 @@ Full working: `docs/reports/HT.md`, NEEDS A RULING.
 - **THE BRIEF'S *"BROKEN … NO ENTRY"* AND *"THE WARRIOR HAS NO HALF OF ANYTHING"* WERE NOT SO**: Broken has a chip entry (no
   clock, no `src`), and a Warrior holding no engine lays Sunder, Stunned and Mocked — both driven (`check_ht` §4). Its rite
   *"through `dispel_one_debuff`"* was half so: the rite takes `_cleansable_debuffs`' candidates and strips with `remove_status`.
-- **THE TALENT *MITIGATION PER DEBUFF YOU CARRY* COUNTS A BROKEN HERO'S CHIP AS A DEBUFF** (`count_debuffs` reads `DEBUFF_IDS`,
-  which holds `broken`): 12% less damage taken for being Broken, where the breadth count (`_status_count`) excludes Broken by
-  rule. A magnitude; the designer's.
+- ~~**THE TALENT *MITIGATION PER DEBUFF YOU CARRY* COUNTS A BROKEN HERO'S CHIP AS A DEBUFF**~~ — **RULED AND BUILT AT HU §4**:
+  `count_debuffs` excludes Broken, as the breadth count always has.
 - **THE RITE'S SECOND ID READ IS THE SAME SHAPE AS THE ONE §1.4 FIXED**: a stripped `ruin` takes `ruin_primed` too — correct while
   Ruin is no ingredient; Reckoning's batch owes it the lookup, beside `log_bleed_chip` and `set_ruin_stacks` (HS).
 - **`master.html`'s ITEM ROWS CARRY TWO CHANGE-HISTORY WORDS** (*Unchanged.* on the Revive and Defense Potions) — the document
@@ -139,13 +204,16 @@ Full working: `docs/reports/HT.md`, NEEDS A RULING.
   meet badly — a re-applied Poison SETS its clock (it can shorten, and ends a permanent Long Poison), a fresh Poison skips its
   first tick, a purge takes Bleed's chip and leaves its meter (Cull and Harvest paid for a bleed that stays), a Downwind copy of
   Ruin can skip a detonation, a primed body emptied of Ruin still detonates, Downwind's bare copies (a partner-less Frostbind, a
-  poison without `_apply_poison`'s stamps, a second permanent taunt off Vendetta, a second spring off Snare Trap), Frostbind's
-  partner found by name, two shared chip tags (**Fb** — Frostbind, Frostbite; **Bl** — Blighted, Bleed); stale text — Ruin's row
+  poison without `_apply_poison`'s stamps, a second permanent taunt off Vendetta, a second spring off Snare Trap — **classed at HU
+  §3c, not fixed**; HU's ruling 3), Frostbind's partner found by name, ~~two shared chip tags~~ (**re-tagged at HU §4**, with eleven
+  more the sweep found); stale text — Ruin's row
   and chip under the Open Wound and Deepening Hex runes, the primer's *next acts*, Poison's *3 nature damage per stack* and
   *refresh*, Rime's *every stack*, `VENDETTA_CUT` read by nothing, comments on the dormant Whole Room, on Bewitch's Daze, on
   Lingering Torment and on deleted talent nodes; twenty-odd dormant appliers and six dead branches, listed there.
-- **HT's OWN ISOLATED COPIES LEFT USER-DATA FOLDERS** under Godot's `app_userdata`, every one named *"Dawn of Decay HT …"* —
-  `docs/reports/HT.md` §6 counts them. HU clears them by that prefix (HO §5's rule).
+- ~~**HT's OWN ISOLATED COPIES LEFT USER-DATA FOLDERS**~~ — **CLEARED AT HU** (the WHERE block), by the *"Dawn of Decay HT "*
+  prefix.
+- **HU's OWN ISOLATED COPIES LEFT USER-DATA FOLDERS**, every one named *"Dawn of Decay HU …"* — `docs/reports/HU.md` §7 counts
+  them. HV clears them by that prefix (HO §5's rule).
 
 ### ~~HS's RULINGS OWED~~ — **ALL SIX ANSWERED IN HT's BRIEF AND TAKEN AT HT §1: FOUR CONFIRMED (1, 2, 3, 5), TWO BUILT (4 — THE RITE AT THE CHILL DOOR; 6 — DEGREE ON SCREEN)**
 
@@ -186,14 +254,22 @@ Full working: `docs/reports/HS.md`, NEEDS A RULING. Kept below as HS recorded th
 - ~~**HS's OWN ISOLATED COPIES LEFT USER-DATA FOLDERS**~~ — **CLEARED AT HT** (the WHERE block), by the *"Dawn of Decay
   HS "* prefix.
 
-### THE FOUR OTHER CONJUNCTIONS — **DESIGNED; RULED, NOT BUILT (HS §4); TWO RENAMED AT HT §3, AND THE CENSUS TAKEN AT HT §2**
+### THE FOUR OTHER CONJUNCTIONS — **DESIGNED; RULED, NOT BUILT (HS §4); A METER STATE IS NOT A HALF (RULED AT HU), SO THREE ARE RE-CUT**
 
-**Unpriced content ships in the smallest unit that can be felt**: one is played and tuned before the next arrive.
-- **Seize** — Chilled + Cripple: the target loses its turn. The Mage's chill beside a card that cripples.
-- **Marrowfire** (*Breach* until HT §3) — Broken + Burn. Any class that Breaks, beside a Burn. Broken is a meter (above).
-- **Contagion** (*Blight* until HT §3) — Poison + Bleed. The Hunter's Poison beside the Warrior's Bleed. Bleed is a meter
-  (above), and the name is the reserved contagion space's own word (HT's ruling 3).
-- **Reckoning** — Ruin + Broken. The Occultist's Ruin beside any class that Breaks.
+**Unpriced content ships in the smallest unit that can be felt**: one is played and tuned before the next arrive. **A meter
+state is not a conjunction half** (`CLAUDE.md`'s conjunction block): Broken and Bleed are meters with a chip, and a cleanse would
+lift the chip and leave the meter. **The Warrior's half is a status he already lays** — Sunder, Stunned or Mocked, all from his kit.
+- **Seize** — Chilled + Cripple: the target loses its turn. The Mage's chill beside a card that cripples. Two statuses the door
+  can see; unchanged.
+- **Marrowfire** (*Breach* until HT §3) — **Sunder + Burn, pending the design pass** (it was Broken + Burn). Ships as a named
+  near-miss when it ships.
+- **Contagion** (*Blight* until HT §3) — Poison + Bleed, **re-cut owed** (Bleed is a meter); **the name waits on the re-cut**.
+- **Reckoning** — Ruin + Broken, **re-cut owed** (Broken is a meter).
+- **THE OCCULTIST'S HOLE IS NOT A CONJUNCTION PROBLEM**: Madness is boss-gated on Broken and nothing live in his pool grinds the
+  meter, so no conjunction could open that gate while meters are not halves. **It is CE §3's original ask — a Break card in his
+  pool — and it is owed on its own.**
+- **A TARGETED DEBUG CARD PICK IS NOT BUILT**: the pager makes the unlock-all bar navigable, which was the designer's ask; a debug
+  tool that hands a hero exactly the cards a test needs is available if paging fifty cards proves worse than the overflow did.
 - **THE APPLIER CENSUS IS TAKEN** (`docs/reports/HT.md` §2): every status a hero lays on an enemy — forty-four — by class, with
   its readers, its re-application rule, its duration and its `DEBUFF_IDS` row. It proposes nothing: the next conjunction, its
   halves and its class pair are the designer's (HT's ruling 6). **The draft label** that names which conjunction a card touches

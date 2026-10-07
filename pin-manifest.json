@@ -2,17 +2,17 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1701,
-  "source": 1296,
+  "total": 1710,
+  "source": 1304,
   "other": 108,
-  "document": 297
+  "document": 298
  },
  "source_residency": {
   "narrow": 44,
-  "code": 788,
+  "code": 793,
   "absent": 315,
-  "runtime": 99,
-  "unresolved": 1,
+  "runtime": 100,
+  "unresolved": 3,
   "comment": 46,
   "alt-sibling": 3
  },
@@ -5591,6 +5591,105 @@
    "k": "literal",
    "how": "read",
    "g": "check_ht.gd#408"
+  },
+  {
+   "s": "check_hu.gd",
+   "fn": "_counter_families",
+   "h": "scripts/unit.gd",
+   "n": "\"%s%%d\"",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_hu.gd#860"
+  },
+  {
+   "s": "check_hu.gd",
+   "fn": "_s2a_the_source",
+   "h": "scripts/battle.gd",
+   "n": "_conjoin(target, id, src)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hu.gd#513"
+  },
+  {
+   "s": "check_hu.gd",
+   "fn": "_s2a_the_source",
+   "h": "scripts/battle.gd",
+   "n": "return",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hu.gd#514"
+  },
+  {
+   "s": "check_hu.gd",
+   "fn": "_s2a_the_source",
+   "h": "scripts/battle.gd",
+   "n": "statuses.append(",
+   "p": "+",
+   "r": "unresolved",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hu.gd#516"
+  },
+  {
+   "s": "check_hu.gd",
+   "fn": "_s2a_the_source",
+   "h": "scripts/unit.gd",
+   "n": "statuses.append(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hu.gd#516"
+  },
+  {
+   "s": "check_hu.gd",
+   "fn": "_s2a_the_source",
+   "h": "scripts/battle.gd",
+   "n": "statuses.insert(",
+   "p": "+",
+   "r": "unresolved",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hu.gd#517"
+  },
+  {
+   "s": "check_hu.gd",
+   "fn": "_s2a_the_source",
+   "h": "scripts/unit.gd",
+   "n": "statuses.insert(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hu.gd#517"
+  },
+  {
+   "s": "check_hu.gd",
+   "fn": "_s2a_the_source",
+   "h": "scripts/battle.gd",
+   "n": "target.add_status(id, info[0], info[1], info[2], eff_turns, info[3], power, tick)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hu.gd#512"
+  },
+  {
+   "s": "check_hu.gd",
+   "fn": "_s5_the_record",
+   "h": "CLAUDE.md",
+   "n": "A METER STATE IS NOT A CONJUNCTION HALF",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hu.gd#869"
   },
   {
    "s": "test_batch_ah.gd",

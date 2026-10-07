@@ -298,6 +298,15 @@ than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's
   · **LINE CEILING 44 CHARACTERS, MEASURED not guessed** (Open Sans SemiBold at font 11 in the
     258px draft card; 45 is where it overflows). **`check_cl_width` reports the ability corpus
     against it every battery.**
+  · **A STATUS'S CHIP TAG IS ITS OWN (HU §4).** No two statuses show the same letters on a chip — **a
+    counter's letters included**: Bleed's `Bl<n>`, Chilled's `C<n>` and Faith's `Fa<n>` own their
+    letters, and a fixed tag that reads as one of them is the collision (Blighted's `Bl` beside
+    `Bl37`). A chip that leads with a signed value (`+12%`) is a value, not a tag. **The designer
+    had Frostbite's and Frostbind's `Fb` and Blighted's and Bleed's `Bl` re-tagged and the rest
+    swept for; the sweep found eleven more shared tags (Slow Burn's `SB` three ways), and the
+    rarer status of each moved — fourteen re-tagged in all.** `check_hu` §4a
+    walks every tag and every counter; **not `BD`** (Break damage's shorthand, CG §3) **and not
+    `Ru`** (Rupture's).
   · **`\n` IS LOAD-BEARING IN TOOLTIPS AND MUST NOT BE STRIPPED THERE.** Nothing overrides
     `make_custom_tooltip`, so Godot's default tooltip does NOT autowrap — strip the breaks and a
     322-char description renders ~2000px wide. The no-`\n` rule applies TO `passive_desc` where it
@@ -366,6 +375,13 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
 - **RETROFIT NOTHING.** Reports written before CW stay where they are.
 - **A LETTER WHOSE BRIEF WAS AUTHORED AND NEVER RUN IS SPENT, AND THE NEXT BATCH SAYS SO IN ITS CHANGELOG ENTRY**
   (CC at CD §3, CF at CG §0, GD in GE's report; **HM was folded into HL**, HL §0): a gap between letters is not a lost batch.
+- **A REPORT DOES NOT SHIP WITH AN UNSUBSTITUTED TEMPLATE TOKEN (STANDING, SET AT HU §0, the designer's).** Grep the
+  finished report for `@@` before it is written out. **The verdict is what the next batch is built on; a report without one
+  has not reported.** `docs/state.md` is held to the same grep, for the same reason.
+  · **AND THE DRAFT STAYS IN THE SCRATCHPAD UNTIL ITS VERDICT IS IN (HU's addition, not the designer's words).** Nothing in
+    the tree reads `docs/reports/`, so landing a report before its run buys nothing — and a draft in the tree is read as the
+    report. HT's, with its verdict, its acceptance paragraph and its count of copies still tokens, stood in the working tree
+    for the whole acceptance run and was read there; the file it committed carried none (`docs/reports/HU.md` §0).
 
 ## THIS FILE IS MEASURED IN KiB, AND THE CEILING IS 470 KiB (STANDING, RULED AT EE §1, RAISED AT FU §1, GY §1 AND HN §1)
 > **`CLAUDE.md` IS MEASURED AS A SIZE, NEVER AS A SHARE OF THE SYNC, AND THE CEILING IS 470 KiB.**
@@ -2131,6 +2147,22 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   rule ran under the next hero's Buy button. One shape fixed both. `check_gt` §1 opens the pouch in every
   combination and presses Close in each; §2 buys every offer through its own button.
 
+## STANDING RULE — A LIST OF CARDS PAGES; IT NEVER SCROLLS (Batch HU §1, ruled by the designer)
+> **When a list of discrete buttons outgrows the screen it PAGES — previous, next and a marker (*1 of 3*) — and never
+> scrolls.** On a row of discrete buttons a slider means hunting for a card mid-fight and finding it somewhere different each
+> turn; a pager keeps a card at a fixed place on its page, so the hand that learned where it sits still finds it.
+
+- **THE BATTLE'S ABILITIES LIST IS THE ONE THAT PAGES** (`battle.BAR_PAGE_ROWS`, `_bar_pager`). **A page is the rows the
+  hotkeys reach**, so page one is the keyboard's page; **the pager exists only when the list overflows a page**; the list
+  reopens on the page it last showed for that hero; **the keys keep their slots whatever page shows, and no key turns a page.**
+  A card on page two is the same button through the same builder, so its skill check, its cooldown and its refusal read as
+  they do on page one (`check_hu` §1 casts one through the real turn).
+- **IN NORMAL PLAY THE LIST FITS ONE PAGE** — kit, both core runes' enablers and a full slot ladder (HU's reading; `check_hu`
+  §1a prints the live figure and reds the day it stops being true). **What overflowed it was the debug menu's unlock-all**,
+  which held a Mage's Fireball, Frostbolt and Blizzard past every hotkey and off the top of the screen. **A crest rune that
+  grants a card adds to every bar outside the slot count** (HN §3d), so it is the first thing in play that could reach a second
+  page.
+
 ## STANDING RULE — A CARD OR A RUNE THAT CANNOT PAY WITHOUT ITS ENGINE SITS OUT WHILE THE ENGINE IS GONE (Batch GT §3 for a card, GX §1 for a rune, ruled by the designer)
 > **An earned card the usability door refuses on every board without its engine is left out of every fight while
 > none of the hero's slotted engines is its own, and is seated again the moment one is. It is never destroyed**: a
@@ -2258,7 +2290,11 @@ the block left out, spend what they were paid.
   resets its clock, and the composition's clock follows as the shorter; a card that writes an ingredient's clock
   directly (Flamewave on a burning body, a skim) does the same.
 - **IT IS MADE AT THE STATUS DOOR (`_apply_status` calls `_conjoin`) AND NOWHERE ELSE**, so a status laid around that
-  door never meets its partner. **It applies to every body**: a hero carrying an Ashblade's Burn under the Hoarfrost
+  door never meets its partner. **EVERY ROUTE BY WHICH A BURN OR A CHILL TAKES HOLD GOES THROUGH IT (derived and driven at
+  HU §2):** the door's own add is the only write of either — `set_chilled_stacks` rewrites a pile that stands and writes
+  nothing on a body without one — and every carrier (Downwind, Frostbind's mate, Rime's echo, Returned Burden) and rider
+  (Hoarfrost Armor's, Immolate's) lays through it. **A new route that lays either around the door is this rule broken**, and
+  `check_hu` §2 casts every card in the game on a burning and on a chilled board to say so. **It applies to every body**: a hero carrying an Ashblade's Burn under the Hoarfrost
   bargain's chill is ruptured too — **CONFIRMED (HT §1.5): one rule, one body.** It is nearly unreachable today (a Scarlands
   elite under Hoarfrost with an Ashblade, none in 300 runs), so it costs the player almost nothing now, and the day an
   enemy is given a chill it is already built.
@@ -2275,6 +2311,16 @@ the block left out, spend what they were paid.
   hero lays on an enemy, by class, with its readers, its re-application rule, its duration and its `DEBUFF_IDS` row — and
   **the next conjunction, its halves and its class pair are the designer's, decided on it**. The draft label naming a
   card's conjunction ships with the second and third — RULED, NOT BUILT.
+- **A METER STATE IS NOT A CONJUNCTION HALF (HU, ruled by the designer).** Broken and Bleed are meters, their chips written
+  around the status door with no clock and no applier, and HT §2e priced a meter half at eight costs; **item 5 decides it** — a
+  cleanse would lift the chip while `broken`, `broken_pending` and the pressure stand, and Returned Burden would cast a
+  meterless chip onto an enemy. Three of the four designed conjunctions named one, so **they are re-cut: a Warrior's half is a
+  status he already lays** — Sunder, Stunned or Mocked, all from his kit — **and Marrowfire becomes Sunder + Burn, pending the
+  design pass** (RULED, NOT BUILT). *Contagion*'s name waits on its re-cut; *Marrowfire* ships as a named near-miss when it
+  ships (HP's *Dead Air* beside *Deadfall* is the precedent). **And Broken is not a debuff any count reads**: *Mitigation per
+  Debuff You Carry* (`count_debuffs`) excludes it as the breadth count (`battle._status_count`) always has (HU §4, ruled).
+  **The Occultist's Madness gate is not a conjunction's to open**: it is boss-gated on Broken and nothing live in his pool
+  grinds the meter, which is CE §3's original ask — a Break card in his pool — owed on its own.
 - **A TIER 3 MUST DO SOMETHING NO CARD CAN DO** — a Break bar emptied, a resistance inverted, a wind-up cancelled. **If a
   tier 3 is only big damage, the ladder is a damage dial with extra steps.** None is built.
 - **RUPTURE'S ONE FIGURE IS `RUPTURE_BREAK_PER_TICK`, CONFIRMED (HT §1.1) AND THE DESIGNER'S TO TUNE FROM PLAY**, pinned in
@@ -4504,6 +4550,12 @@ exactly the inverted card, and it would still read fine on the tooltip.
   either back off a hero, and an Ashblade burns a hero — and the same holds for Ruin, the Old Gods' mark,
   which Downwind carries too. **What is exclusive is the RUNE that reads it.** A question about who lays a
   status is asked of the status door (`_apply_status`) and the cards, never of this list.
+  · **A CARRIER CARRIES THE AFFLICTION, NEVER WHAT AN ENGINE KEEPS OF IT (HU §3a, ruled by the designer).** A Cryomancer's
+    hold reaches the door as a battle-long Frozen, and Downwind's copy took that length to a second enemy — not in `_holds`,
+    still on the timeline, with no limit, no charge and no release, and with the Carrion rune on every other enemy. **The copy
+    is an ordinary timed freeze** (`battle.ORDINARY_FREEZE_TURNS`, the one length `_freeze_turns` gives a freeze that is not a
+    hold), **chosen over leaving Frozen alone** because the card promises every affliction an ally applies; **the hold stays
+    Glacial Hold's alone.** Downwind's other bare copies are classed in `docs/reports/HU.md` §3c and are not fixed.
 
 **THIS IS THE RULE POOLS ARE AUTHORED AGAINST NOW, INSTEAD OF BY FEEL.** DQ measured the
 Swordmaster at ten cards making FOUR decisions — a player who had drafted four had seen everything

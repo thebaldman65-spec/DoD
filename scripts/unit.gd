@@ -1945,10 +1945,15 @@ func _proc_log(text: String) -> void:
 
 # BATCH HS §2c — A BREADTH READER, SO IT COUNTS INGREDIENTS: a Rupture is the Burn
 # and the Chilled it is made of, two debuffs, as the unmerged chips were.
+# BATCH HU §4 — BROKEN IS NOT A DEBUFF IT COUNTS (RULED BY THE DESIGNER), matching the
+# breadth count (`battle._status_count`), which has excluded it by rule since it was
+# written. Broken is a meter state with a chip, not an affliction anybody laid (HT §2e),
+# and this count is what *Mitigation per Debuff You Carry* pays on: counting it, a Broken
+# hero holding the node took one debuff's worth less damage for being Broken.
 func count_debuffs() -> int:
 	var n := 0
 	for s in base_statuses():
-		if DEBUFF_IDS.has(s.id):
+		if String(s.id) != "broken" and DEBUFF_IDS.has(s.id):
 			n += 1
 	return n
 

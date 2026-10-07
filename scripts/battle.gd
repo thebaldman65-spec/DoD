@@ -155,6 +155,22 @@ const ABILITY_KEYS: Array = [KEY_Q, KEY_W, KEY_E, KEY_R, KEY_A, KEY_S, KEY_D,
 	KEY_F, KEY_G]
 const ABILITY_KEY_NAMES := ["Q", "W", "E", "R", "A", "S", "D", "F", "G"]
 
+# BATCH HU §1 — THE ABILITIES LIST PAGES (RULED BY THE DESIGNER: A PAGER, NOT A SLIDER).
+# The list opens upward from its button, and a list taller than the screen ran off the
+# top with nothing to reach the rows it lost: the debug menu's unlock-all put a Mage's
+# Fireball, Frostbolt and Blizzard there, past every hotkey. **ON A ROW OF DISCRETE
+# BUTTONS A SLIDER MEANS HUNTING FOR A CARD MID-FIGHT AND FINDING IT SOMEWHERE DIFFERENT
+# EACH TURN; A PAGER KEEPS A CARD AT A FIXED PLACE ON ITS PAGE**, so the hand that learned
+# where a card sits still finds it next turn.
+#
+# **A PAGE IS THE ROWS THE HOTKEYS REACH** — every key but the basic's own, then the same
+# keys shifted — so page one is exactly the keyboard's page, and a page with its pager row
+# still clears the top of the screen (`check_hu` §1 measures both). **THE PAGER EXISTS ONLY
+# WHEN THE LIST OVERFLOWS A PAGE**: below that the list is built exactly as it always was.
+# The keys keep their slots whatever page shows — a hotkey names a slot in kit order, not a
+# place on a page — and no key turns a page.
+const BAR_PAGE_ROWS := 17
+
 # Batch AH: the mini-boss node is an elite warband wearing a boss's health.
 const MINIBOSS_HP_MULT := 1.5
 
@@ -205,7 +221,7 @@ const STATUS_INFO := {
 		"Braced: bonus Block chance while\nthe stance holds."],
 	"empower": ["Empower", "+A", Color(0.95, 0.45, 0.35), "+25% damage dealt."],
 	"exposed": ["Exposed", "E", Color(0.95, 0.9, 0.4), "Takes 15% more damage."],
-	"cripple": ["Cripple", "C", Color(0.5, 0.4, 0.55), "-25% damage dealt."],
+	"cripple": ["Cripple", "Cr", Color(0.5, 0.4, 0.55), "-25% damage dealt."],
 	# BATCH CT §5 — the Cursed Visage's curse. WEAKER AND PERMANENT, against
 	# Cripple's stronger and brief: -15% for the rest of the battle, on every
 	# living enemy at once, from one button that costs no turn. The magnitude is
@@ -216,7 +232,7 @@ const STATUS_INFO := {
 	# name is Hexed and not the brief's `crippled`.
 	"hexed": ["Hexed", "Hx", Color(0.72, 0.35, 0.62),
 		"-15% damage dealt, for the\nrest of the battle."],
-	"retaliate": ["Retaliation", "R!", Color(0.95, 0.6, 0.25), "Counters attackers with a basic strike."],
+	"retaliate": ["Retaliation", "Rt", Color(0.95, 0.6, 0.25), "Counters attackers with a basic strike."],
 	"dazed": ["Dazed", "Dz", Color(0.95, 0.7, 0.35), "Attacks are 20% more likely to miss."],
 	"shielded": ["Shielded", "Sh", Color(0.95, 0.65, 0.25), "Takes 25% less damage\n(a Shieldmaster's ward)."],
 	"wrath": ["Divine Wrath", "DW", Color(1.0, 0.85, 0.35), "+15% damage dealt and +15% speed."],
@@ -234,9 +250,9 @@ const STATUS_INFO := {
 	# with no numbers in it cannot drift. `master.html`'s §4.6 row is correct and
 	# lists all three tiers; it was deliberately left alone.
 	"battle_shout": ["Battle Shout", "BS", Color(0.95, 0.45, 0.30), "More damage dealt, to every hero and\nno companion. The more Bleed the enemy\nwarband carried when the shout went up,\nthe larger the bonus."],
-	"blood_price": ["Blood Price", "BP", Color(0.85, 0.25, 0.25), "Paid in his own blood:\n+25% damage dealt."],
-	"scent": ["Scent of Blood", "SB", Color(0.85, 0.3, 0.3), "Fed by bleedouts: bonus damage for\neach enemy bled out this battle."],
-	"deathwish": ["Deathwish", "DW", Color(0.9, 0.3, 0.3), "Below 35% health: bonus damage —\nnothing left to lose."],
+	"blood_price": ["Blood Price", "Pr", Color(0.85, 0.25, 0.25), "Paid in his own blood:\n+25% damage dealt."],
+	"scent": ["Scent of Blood", "So", Color(0.85, 0.3, 0.3), "Fed by bleedouts: bonus damage for\neach enemy bled out this battle."],
+	"deathwish": ["Deathwish", "Dh", Color(0.9, 0.3, 0.3), "Below 35% health: bonus damage —\nnothing left to lose."],
 	"undying_rage": ["Undying Rage", "UR", Color(0.95, 0.25, 0.2), "Below 25% health: cannot die and\n+50% damage. The hit that would have\nkilled him ends it at 1 HP\n(once per battle)."],
 	# Interpose is the only source of guaranteed charges since Batch AB, so
 	# the label follows the charges rather than the ability that stopped
@@ -262,7 +278,7 @@ const STATUS_INFO := {
 	# stance does, so what it buys is real Block, not a separate ward.
 	"bulwark_line": ["Bulwark Line", "BL", Color(0.72, 0.8, 0.95),
 		"+10% Block chance (the Warden's Shieldwall)."],
-	"rally_heal": ["Rallied", "R+", Color(0.95, 0.75, 0.45), "+30% healing received\n(the Warden's Rally)."],
+	"rally_heal": ["Rallied", "Rl", Color(0.95, 0.75, 0.45), "+30% healing received\n(the Warden's Rally)."],
 	"immolate": ["Immolate", "IM", Color(1.0, 0.55, 0.25), "Wrapped in his own fire: he takes 20%\nless damage, and anything that strikes\nhim is set Burning (3 turns)."],
 	"seeding": ["Seeding Embers", "SE", Color(1.0, 0.65, 0.3), "Empowered by a burning death:\nbonus damage on the next turn."],
 	"rime": ["Rime", "Ri", Color(0.75, 0.9, 1.0), "Rimed: every stack of Chilled this\nenemy gains also chills one other\nrandom enemy."],
@@ -342,7 +358,7 @@ const STATUS_INFO := {
 	"overcharged": ["Overcharged", "OC", Color(0.8, 0.5, 1.0), "Overcharge is spent for this\nbattle — the storm has no feeding\nleft in it."],
 	"sanctified": ["Hallowed", "Hw", Color(0.98, 0.88, 0.55), "Warded by the light: immune to\nnew debuffs."],
 	"capacitor": ["Holy Capacitor", "HC", Color(0.95, 0.9, 0.6), "Stored overhealing, released by\nthe next Heal."],
-	"faith": ["Faith", "F1", Color(0.98, 0.85, 0.45), "Conviction: Divine Shield absorbs\nbuild Faith, 2 a hit — 2% mitigation\nand +1.5% damage per stack, paid on\nthe HIGHEST count held this battle.\nAt 8 the bearer is healed and the\ncount resets; the peak keeps paying."],
+	"faith": ["Faith", "Fa1", Color(0.98, 0.85, 0.45), "Conviction: Divine Shield absorbs\nbuild Faith, 2 a hit — 2% mitigation\nand +1.5% damage per stack, paid on\nthe HIGHEST count held this battle.\nAt 8 the bearer is healed and the\ncount resets; the peak keeps paying."],
 	"cons_ground": ["Consecrated Ground", "CG", Color(0.9, 0.82, 0.5), "Standing on holy ground: takes 15%\nless damage and reflects 10% of\ndamage taken."],
 	"zeal": ["Blessing of Zeal", "Z+", Color(1.0, 0.78, 0.35), "+15% damage dealt; Faith gain\nis doubled."],
 	"bulwark": ["Bulwark of Fortitude", "BF", Color(0.85, 0.9, 1.0), "The unbreakable stand: NO Break\ndamage taken, armor increased by\n50%, and 10% max health regained\neach turn."],
@@ -352,7 +368,7 @@ const STATUS_INFO := {
 	"elusive": ["Elusiveness", "El", Color(0.55, 0.85, 0.75), "Hard to pin down: enemies are 25%\nmore likely to miss this companion."],
 	"instinct": ["Hunter's Instinct", "HI", Color(0.85, 0.75, 0.35), "The next Quick Shots deal +10% of\nthe hunter's Attack and mend the\ncompanion for 15% of its max health."],
 	"bestial": ["Bestial Wrath", "BW", Color(0.95, 0.40, 0.25), "The companion is unleashed — Ursus:\ndoubled health and +50% armor;\nCanis: +50% damage, +10 Bleed;\nAguila: +25% damage, strikes Blind."],
-	"spirit_heal": ["Spirit Bond", "SB", Color(0.45, 0.90, 0.70), "The bond mends: heals 10% of max\nhealth at the next turn start."],
+	"spirit_heal": ["Spirit Bond", "Si", Color(0.45, 0.90, 0.70), "The bond mends: heals 10% of max\nhealth at the next turn start."],
 	"spirit_mana": ["Spirit Flow", "SM", Color(0.40, 0.65, 0.95), "The bond restores 5% max Mana at\neach turn start."],
 	"vigor": ["Vigor", "Vg", Color(0.60, 0.90, 0.45), "Spirit Bond perfected: +10% max\nhealth while it lasts."],
 	"keen_eyes": ["Eagle Eyes", "EE", Color(0.65, 0.85, 0.95), "Aguila watches over the heroes:\nincreased crit chance."],
@@ -365,7 +381,7 @@ const STATUS_INFO := {
 	# stun, so the player sees which charge stuns and can hold Powershot for it.
 	# A hero-side chip that is not a buff anyone cast, so nothing else reads it.
 	"aper_rhythm": ["Rhythm", "0/3", Color(0.62, 0.45, 0.28), "Every third charge STUNS its target\nfor 1 turn. A BOSS RESISTS UNTIL\nBROKEN."],
-	"caught": ["Caught Fast", "Cf", Color(0.75, 0.55, 0.25), "The trap's teeth hold the wound\nopen: cannot be healed."],
+	"caught": ["Caught Fast", "Ct", Color(0.75, 0.55, 0.25), "The trap's teeth hold the wound\nopen: cannot be healed."],
 	"venom_coat": ["Venom Coating", "VC", Color(0.45, 0.80, 0.30), "Coated arrows: every attack applies\nPoison and refreshes its timer."],
 	# ---- BATCH BO §5: the drafted abilities' statuses ----
 	# Six of the eighteen carry one. The other twelve either damage outright,
@@ -374,7 +390,7 @@ const STATUS_INFO := {
 	"null_field": ["Null Field", "NF", Color(0.75, 0.55, 0.95), "The storm folds inward: damage taken\nis reduced by 5% per RESONANCE STACK,\nread live — it deepens as he casts."],
 	"vow": ["Vow of Suffering", "Vw", Color(0.98, 0.85, 0.45), "The Devout carries half of it: half\nthe damage this ally takes is\nredirected to him — and every share\nhe eats kindles this ally 1 Faith."],
 	"rite_return": ["Rite of Return", "RR", Color(0.95, 0.90, 0.55), "Promised the road back: the next blow\nthat would fell this ally restores\nthem to 50% health instead, and costs\nHoly 30% of her own."],
-	"blight": ["Blighted", "Bl", Color(0.55, 0.25, 0.45), "The well is poisoned: any healing this\nenemy receives DAMAGES it for the\nsame amount instead."],
+	"blight": ["Blighted", "Bg", Color(0.55, 0.25, 0.45), "The well is poisoned: any healing this\nenemy receives DAMAGES it for the\nsame amount instead."],
 	"covenant": ["Covenant of Ash", "CA", Color(0.60, 0.45, 0.50), "Bound to the ash: every stack of Ruin\napplied to ANY enemy also lands here."],
 	"quarry": ["Quarry", "Qy", Color(0.60, 0.85, 0.45), "Named the quarry: Focus gained from\nattacking this enemy is DOUBLED.\nSwitching away still clears him."],
 	"snare_line": ["Snare Line", "SL", Color(0.75, 0.65, 0.30), "A line runs across the ground: the\nnext time this enemy acts it springs\na trap where it stands."],
@@ -444,10 +460,10 @@ const STATUS_INFO := {
 	# RECOVERY it charges its own caster. Formless carries TWO because its window
 	# and the debt that window incurs are two different states and a player has
 	# to be able to tell them apart on the bar.
-	"unslaked": ["Unslaked", "Un", Color(0.90, 0.30, 0.35), "The thirst does not settle: Blood\nFrenzy's floor captures the FULL bonus\nhe reaches while this holds, instead\nof half of it. Dive now and the floor\nkeeps all of it."],
+	"unslaked": ["Unslaked", "Uk", Color(0.90, 0.30, 0.35), "The thirst does not settle: Blood\nFrenzy's floor captures the FULL bonus\nhe reaches while this holds, instead\nof half of it. Dive now and the floor\nkeeps all of it."],
 	"spite": ["Spite", "Sp", Color(0.85, 0.40, 0.40), "Pure spite: less damage taken for\nevery 5% of maximum health MISSING.\nIt keeps him inside the frenzy band\nrather than lifting him out of it —\nthis is mitigation, never healing."],
 	"boil_over": ["Boil Over", "Bo", Color(0.80, 0.35, 0.25), "Spent: he receives only Blood Frenzy's\nFLOOR, not the live bonus. The floor\nitself is untouched — a high one makes\nthis cost very little."],
-	"anvil": ["Anvil", "An", Color(0.75, 0.80, 0.90), "The anvil does not move: BLOCKING no\nlonger resets the Heavy Plating bonus,\nso the sawtooth becomes a staircase.\nWhile this holds RECOMPENSE is paid\nnothing — there is no reset to pay it."],
+	"anvil": ["Anvil", "Av", Color(0.75, 0.80, 0.90), "The anvil does not move: BLOCKING no\nlonger resets the Heavy Plating bonus,\nso the sawtooth becomes a staircase.\nWhile this holds RECOMPENSE is paid\nnothing — there is no reset to pay it."],
 	"recompense": ["Recompense", "Rc", Color(0.85, 0.80, 0.65), "Paid for the loss: every Heavy Plating\nreset returns Rage equal to the\npercentage points it took. ANVIL\nprevents those resets, so the two\nfight each other by design."],
 	"turn_the_blade": ["Turn the Blade", "TB", Color(0.80, 0.55, 0.95), "The block answers: every attack he\nBLOCKS deals Break damage back to the\nattacker, scaling on how much damage\nthe block refused."],
 	"discipline": ["Discipline", "Di", Color(0.50, 0.85, 1.0), "Held: each consecutive turn in the\nSAME stance strengthens that stance's\neffect, to a ceiling. A GUARD CHANGE\nresets the accumulation to nothing."],
@@ -467,7 +483,7 @@ const STATUS_INFO := {
 	"open_guard": ["Open Guard", "OG", Color(0.75, 0.85, 0.95), "The seam is found: this unit's attacks\nignore armor ENTIRELY."],
 	"feinted": ["Feinted", "Fn", Color(0.55, 0.80, 0.95), "Sold an opening: this unit's NEXT\nattack lands on one of its own allies\ninstead. It waits until spent."],
 	"feint_guard": ["Feint", "Fg", Color(0.45, 0.85, 1.0), "Charges banked: each parries one\nattack outright and returns its damage\nto the attacker. They wait until spent."],
-	"covering_guard": ["Covering Guard", "CG", Color(0.70, 0.78, 0.95), "Covered by the Warden: HIS Block\nchance is rolled against attacks aimed\nhere, and a success stops the blow\ndead. Nothing moves to him."],
+	"covering_guard": ["Covering Guard", "Cv", Color(0.70, 0.78, 0.95), "Covered by the Warden: HIS Block\nchance is rolled against attacks aimed\nhere, and a success stops the blow\ndead. Nothing moves to him."],
 	"eye_storm": ["Eye of the Storm", "ES", Color(0.85, 0.80, 0.95), "The whole field is his: damage taken\nis reduced by 8% for every enemy he\ntaunted."],
 	# ---- BATCH BQ: the class-wide draft's statuses ----
 	# Four of the twelve carry one of their own. Magic Barrier rides the
@@ -526,7 +542,7 @@ const STATUS_INFO := {
 	# the share is computed at the attacker block off the Arcanist's LIVE meter,
 	# so stamping a value here would freeze it at cast time and delete the card.
 	"emberkeep": ["Emberkeep", "Ek", Color(1.0, 0.68, 0.30), "The embers are kept: every Burn ANY\nHERO applies lands at DOUBLE duration.\nIt changes what ARRIVES — fire already\nstanding on the board is untouched."],
-	"frostbind": ["Frostbind", "Fb", Color(0.55, 0.80, 1.0), "Chained to another: Chilled landing on\neither lands on both, and damage dealt\nto one is dealt to the other at 40%.\nThe mirrored blow does not mirror back.\nIf both reach the threshold, the pair\nfreezes together."],
+	"frostbind": ["Frostbind", "Bn", Color(0.55, 0.80, 1.0), "Chained to another: Chilled landing on\neither lands on both, and damage dealt\nto one is dealt to the other at 40%.\nThe mirrored blow does not mirror back.\nIf both reach the threshold, the pair\nfreezes together."],
 	"unmade": ["Unmaking", "Um", Color(0.75, 0.45, 0.95), "Coming apart: this enemy cannot be\nhealed by anything at all."],
 	"resonant_field": ["Resonant Field", "RF", Color(0.80, 0.55, 1.0), "Tuned to the storm: deals bonus damage\nequal to HALF the Arcanist's CURRENT\nResonance bonus. It reads his meter\nlive — as he climbs, so does this."],
 	"threshold_lock": ["Threshold", "Th", Color(0.65, 0.50, 0.90), "Bought and spent: his Resonance was\nset outright, and he can gain no more\nwhile this holds. Nothing raises it —\nnot a cast, not a crit, not a kill."],
@@ -6072,7 +6088,13 @@ func _show_actions(u: BattleUnit) -> void:
 	var list := VBoxContainer.new()
 	list.add_theme_constant_override("separation", 4)
 	popup.add_child(list)
-	for e_idx in range(1, _menu_entries.size()):
+	# BATCH HU §1 — the rows of the page this hero last showed. One page holds every row
+	# when the list fits, and then nothing below differs from the list before HU.
+	var pages := _bar_pages()
+	var page := clampi(int(_bar_page.get(u, 0)), 0, pages - 1)
+	var first_row := 1 + page * BAR_PAGE_ROWS
+	var end_row := mini(first_row + BAR_PAGE_ROWS, _menu_entries.size())
+	for e_idx in range(first_row, end_row):
 		var entry: Dictionary = _menu_entries[e_idx]
 		if entry.has("summons"):
 			# Top of the list: opens the beast picker (Tab cycles, Space picks).
@@ -6104,6 +6126,8 @@ func _show_actions(u: BattleUnit) -> void:
 			list.add_child(group_btn)
 		else:
 			list.add_child(_ability_popup_button(u, entry["ability"], popup, e_idx))
+	if pages > 1:
+		list.add_child(_bar_pager(u, page, pages))
 	popup.popup_hide.connect(_clear_delay_preview)
 	menu_btn.add_child(popup)
 	menu_btn.pressed.connect(_open_ability_popup.bind(popup, menu_btn))
@@ -7200,6 +7224,59 @@ func _open_ability_popup(popup: PopupPanel, anchor: Button) -> void:
 		int(anchor.global_position.y) - popup.size.y - 6)
 
 
+# BATCH HU §1 — HOW MANY PAGES THE ABILITIES LIST TAKES: its rows (every menu entry but the
+# basic, which is its own button) a page's worth at a time, and never fewer than one.
+func _bar_pages() -> int:
+	var rows := _menu_entries.size() - 1
+	return maxi(int(ceil(float(rows) / float(BAR_PAGE_ROWS))), 1)
+
+
+# The pager row under the last card of a page: previous, the marker, next. Built only when
+# the list takes more than one page (`_show_actions`), so a hero whose cards all fit never
+# sees it. Each end's arrow is dark rather than wrapping round, so the marker always says
+# which way the rest of the list lies.
+func _bar_pager(u: BattleUnit, page: int, pages: int) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 4)
+	var prev := Button.new()
+	prev.text = "◂ Prev"
+	prev.custom_minimum_size = Vector2(60, 30)
+	prev.add_theme_font_size_override("font_size", 13)
+	prev.disabled = page <= 0
+	prev.tooltip_text = "The previous page of abilities."
+	prev.pressed.connect(_turn_bar_page.bind(u, -1))
+	var mark := Label.new()
+	mark.text = "%d of %d" % [page + 1, pages]
+	mark.custom_minimum_size = Vector2(56, 30)
+	mark.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	mark.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	mark.add_theme_font_size_override("font_size", 13)
+	var nxt := Button.new()
+	nxt.text = "Next ▸"
+	nxt.custom_minimum_size = Vector2(60, 30)
+	nxt.add_theme_font_size_override("font_size", 13)
+	nxt.disabled = page >= pages - 1
+	nxt.tooltip_text = "The next page of abilities."
+	nxt.pressed.connect(_turn_bar_page.bind(u, 1))
+	row.add_child(prev)
+	row.add_child(mark)
+	row.add_child(nxt)
+	return row
+
+
+# Turns the list one page and opens it again where it stood. The bar is rebuilt through
+# `_show_actions` — the one builder — so a card on page two is the same button, with the
+# same gates, tooltip and cast, as it would be on page one.
+func _turn_bar_page(u: BattleUnit, step: int) -> void:
+	if u == null or u.dead or u != current_hero:
+		return
+	_bar_page[u] = clampi(int(_bar_page.get(u, 0)) + step, 0, _bar_pages() - 1)
+	if _main_popup != null and is_instance_valid(_main_popup):
+		_main_popup.hide()
+	_show_actions(u)
+	_open_ability_popup(_main_popup, _main_popup_anchor)
+
+
 # ---------- summon picker (Tab cycles, Space summons, X closes) ----------
 
 var _summon_picker: PanelContainer = null
@@ -7363,6 +7440,9 @@ var third_target: BattleUnit = null   # choose_three abilities (Hex of Ruin)
 var _open_popups: Array = []  # ability popups to close when a hotkey fires
 var _main_popup: PopupPanel   # the Abilities list (Tab toggles it)
 var _main_popup_anchor: Button
+# BATCH HU §1 — the page each hero's Abilities list last showed, kept for the fight, so a
+# hero who turned to page two finds it there on his next turn. Keyed by the unit.
+var _bar_page := {}
 # Hotkey slots for the current hero: {"ability": Ability} or {"summons": [...]}.
 var _menu_entries: Array = []
 # Keyboard targeting: Tab cycles the candidates, Space/Enter confirms.
@@ -13639,7 +13719,13 @@ func _freeze_holds(target: BattleUnit) -> bool:
 # the write, and `_recast_writes` PROPOSES it for Glacial Prison's refusal
 # (Batch DA §2). Two copies of one duration is CR §3's defect exactly.
 func _freeze_turns(target: BattleUnit) -> int:
-	return 1 if (target.is_boss or not _freeze_holds(target)) else -1
+	return ORDINARY_FREEZE_TURNS if (target.is_boss or not _freeze_holds(target)) else -1
+
+
+# BATCH HU §3a — THE ORDINARY FREEZE'S LENGTH, AND ITS ONE AUTHORED COPY. Two readers: the
+# freeze above, when it is not a hold, and Downwind's copy of a freeze, which is always one
+# of these and never a hold (the Downwind block in `_apply_status` says why).
+const ORDINARY_FREEZE_TURNS := 1
 
 
 # THE ONE PLACE A HOLD BEGINS. **THREE callers, AND THEY ARE NOT THE THREE
@@ -13981,11 +14067,11 @@ func _hold_sync() -> void:
 				_hold_tooltip(u.is_boss))
 
 
-# `force` is the ONE way past the boss immunity, and it exists for exactly
-# two callers: the Pommel Strike and Snare Trap perfects, whose whole
-# payoff since Batch AH is that the Stun lands on an unbroken boss. It is
-# an explicit argument rather than a name check inside here, so the
-# exception stays visible at the call site that bought it.
+# `force` is the ONE way past the boss immunity, and ONE caller passes it:
+# Pommel Strike's Perfect, on its own target. Batch CR §1 took Snare Trap's
+# perfect off it, and Batch HU §3b stopped Downwind's copy carrying it to a
+# second body. It is an explicit argument rather than a name check inside
+# here, so the exception stays visible at the call site that bought it.
 func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 		tick := 0, src: BattleUnit = null, force := false) -> void:
 	# Bosses shrug off Stuns, Freezes, and mind magic until Broken.
@@ -14253,12 +14339,32 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 				var dw_carrion: bool = dw_src.rune_carrion > 0
 				var dw_targets: Array = dw_others if dw_carrion \
 					else [dw_pool.pick_random()]
+				# **BATCH HU §3 — DOWNWIND IS BOUNDED. TWO THINGS THE COPY USED TO CARRY AND
+				# DOES NOT, BOTH IN THE PLAYER'S FAVOUR, WHICH IS WHY NEITHER WAS NOTICED.**
+				#
+				# **A — A COPIED FREEZE IS AN ORDINARY TIMED FREEZE, NEVER A HOLD.** A
+				# Cryomancer's hold arrives here as a battle-long Frozen, and the copy took
+				# that length to a second enemy: not in `_holds`, still on the timeline, no
+				# limit, no charge, no release — and with the Carrion rune, on every other
+				# enemy. It broke *he holds ONE enemy*. **Chosen over leaving Frozen alone**,
+				# because the card promises every affliction an ally applies and refusing one
+				# would be a hole in the card; a bounded freeze does not impersonate the
+				# engine's hold, which stays Glacial Hold's alone (`_hold_freeze`).
+				#
+				# **B — THE COPY NEVER CARRIES THE BOSS OVERRIDE.** The original's last
+				# argument is the one exception to *hard control lands on a boss only once it
+				# is Broken*, and it belongs to the one card the rule sanctions — Pommel
+				# Strike's Perfect, on ITS OWN target. A copy that forwarded it stunned an
+				# unbroken boss with a stun that card never aimed. Every other caller already
+				# lays a status without it, so the copy carrying it was the anomaly.
+				var dw_turns := ORDINARY_FREEZE_TURNS if id == "frozen" else turns
 				_downwind_spreading = true
 				for dw_to in dw_targets:
-					_apply_status(dw_to, id, turns, power, tick, src, force)
-					_log("   → Downwind: %s carries from %s to %s%s" % [
+					_apply_status(dw_to, id, dw_turns, power, tick, src)
+					_log("   → Downwind: %s carries from %s to %s%s%s" % [
 						String(STATUS_INFO[id][0]) if STATUS_INFO.has(id) else id,
 						target.unit_name, dw_to.unit_name,
+						" — an ordinary freeze, never a hold" if id == "frozen" else "",
 						" (Rune: the Carrion)" if dw_carrion else ""], "#70d878")
 				_downwind_spreading = false
 	# BATCH GO — FIELD KIT, BESIDE DOWNWIND AND ON ITS PREDICATE: a HERO laying an
@@ -17998,8 +18104,8 @@ func _refresh_faith_chip(u: BattleUnit, devout: BattleUnit) -> void:
 		u.faith_stacks, u.faith_peak,
 		_faith_pct_text(FAITH_MITIGATION_PCT * mult * u.faith_peak),
 		_faith_pct_text(FAITH_DAMAGE_PCT * mult * u.faith_peak), f_tail]
-	if not u.update_status("faith", "F%d" % u.faith_stacks, f_desc):
-		u.add_status("faith", "Faith", "F%d" % u.faith_stacks,
+	if not u.update_status("faith", "Fa%d" % u.faith_stacks, f_desc):
+		u.add_status("faith", "Faith", "Fa%d" % u.faith_stacks,
 			Color(0.98, 0.85, 0.45), -1, f_desc)
 
 
@@ -20330,7 +20436,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# there and quietly false everywhere else.
 			var un_turns := 4
 			_apply_status(attacker, "unslaked", un_turns)
-			attacker.update_status("unslaked", "Un",
+			attacker.update_status("unslaked", "Uk",
 				"Unslaked: for %d more turn(s) Blood\nFrenzy's floor keeps the FULL bonus he\nreaches instead of half. It stands at\n+%d%% right now — dive and it keeps all\nof what you reach." % [
 					un_turns, int(round(attacker.frenzy_floor * 100.0))])
 			_sfx("crit", -6.0, 0.7)
@@ -20372,7 +20478,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# CH's Fault Line got the same treatment for the same reason.
 			var an_turns := 4
 			_apply_status(attacker, "anvil", an_turns)
-			attacker.update_status("anvil", "An",
+			attacker.update_status("anvil", "Av",
 				"Anvil: for %d more turn(s) BLOCKING does\nnot reset the Heavy Plating bonus (it\nstands at +%d%%). RECOMPENSE is paid\nnothing while this holds — there is no\nreset left to pay it." % [
 					an_turns, int(round(attacker.plating_bonus * 100.0))])
 			_sfx("parry", -6.0, 0.7)

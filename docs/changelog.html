@@ -16,6 +16,79 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-06 &mdash; Batch HU: THE BAR PAGES, DOWNWIND IS BOUNDED, AND DID HT ACTUALLY LAND</h2>
+<p><b>The battle's Abilities list pages instead of running off the top of the screen. A Hunter's Downwind no longer copies a
+Cryomancer's prison as a freeze that never ends, or a Perfect Pommel Strike's stun onto a boss that should resist it. Fourteen
+status chips that shared a tag with another wear their own now, and being Broken no longer lowers the damage a hero takes.
+Every way a Burn or a Chill can reach a body was traced to the place where they join into a Rupture &mdash; all of them get
+there.</b> Full working: <code>docs/reports/HU.md</code>.</p>
+
+<p><b>&sect;0 &mdash; DID HT LAND? YES.</b> Batch HT is committed and pushed: the remote branch matches the commit, its game
+changes are in the tree, and its final check run happened &mdash; its six red lines were the designer's own game saving while it
+ran, and all six read clean when run again. <b>The finished HT report carries no unfilled placeholders</b>; the copy that did
+was the draft standing in the folder while that last run went on, which is where it was read. A new standing rule: a report
+is searched for placeholders before it ships, and its draft stays out of the repository until its verdict is in.</p>
+
+<p><b>&sect;1 &mdash; THE BATTLE BAR PAGES.</b> The Abilities list opens upward from its button, and a list taller than the screen
+ran off the top with nothing to reach the cards it lost &mdash; under the debug menu's <i>All Class Abilities Unlocked</i>, a Mage's
+Fireball, Frostbolt and Blizzard were off the screen and past every hotkey. <b>Now the list shows one page at a time</b>, with
+<b>&#9666; Prev</b>, the page (<i>1 of 3</i>) and <b>Next &#9656;</b> under the last card. Page one is exactly the cards the
+hotkeys reach; every card keeps its place on its page, so a hand that learned where a card sits finds it again next turn; and the
+list reopens on the page that hero last looked at. <b>A list that fits shows no pager at all</b>, and in ordinary play every
+hero's does: the widest bar a hero can build &mdash; his class kit, both core runes' starting cards and a full set of earned
+cards &mdash; is thirteen, and a page holds more. The keys keep their slots whichever page is showing, and no key turns a page.
+A card on page two casts exactly as one on page one: the timing bar, the cooldown's dark button and the tooltip saying why a
+button is dark all behave the same.</p>
+
+<p><b>&sect;2 &mdash; EVERY ROUTE A CHILL OR A BURN TAKES.</b> Two earlier reports looked as if they disagreed about whether a
+Chill could reach a body without passing the place where a Rupture forms. They did not &mdash; one was about a status arriving,
+the other about an existing chill's stacks being rewritten &mdash; and the answer was checked rather than argued: <b>every card
+in the game was cast on a board where Burn stood and again where Chill stood</b>, and every carrier and rider was driven one by
+one &mdash; Downwind, Frostbind, Rime, Returned Burden, Hoarfrost Armor, Immolate, and an enemy's Burn on a hero the Hoarfrost
+bargain chilled. <b>Every Burn and every Chill formed its Rupture, with its line in the combat log.</b> What kept the designer
+from seeing one was most likely the bar: for the party in the designer's save, every card that lays a Chill was in the part of
+the list that could not be reached.</p>
+
+<p><b>&sect;3 &mdash; DOWNWIND IS BOUNDED.</b> <b>A copied freeze is an ordinary freeze now</b> &mdash; it costs a turn and
+thaws &mdash; where a copy of a Cryomancer's hold used to lock a second enemy for the whole fight, outside every limit the hold
+keeps (with the Carrion rune, every other enemy). The hold itself still holds its own enemy. <b>And a copy never carries a
+Perfect's way past a boss's immunity</b>: a Perfect Pommel Strike still stuns its own target, and its copy is shrugged off by
+an unbroken boss as any other stun would be. Downwind's other loose copies were sorted and left for the designer.</p>
+
+<p><b>&sect;4 &mdash; CHIPS AND BROKEN.</b> Frostbind and Frostbite both wore <i>Fb</i>, and Blighted's <i>Bl</i> read like a
+Bleed counter that had lost its number; the sweep for more found eleven: Cripple's <i>C</i> beside Chilled's stack count,
+Burn's <i>F</i> beside Faith's, and nine shared outright. <b>Fourteen statuses wear new tags</b> &mdash; the less common of each
+pair moved, so the chips a player reads most stay as learned: Frostbind <i>Bn</i>, Blighted <i>Bg</i>, Cripple <i>Cr</i>,
+Faith <i>Fa</i> and its count, Blood Price <i>Pr</i>, Covering Guard <i>Cv</i>, Retaliation <i>Rt</i>, Rallied
+<i>Rl</i>, Spirit Bond <i>Si</i>, Unslaked <i>Uk</i>, Anvil <i>Av</i>, and three a player does not meet today (Caught Fast
+<i>Ct</i>, Scent of Blood <i>So</i>, Deathwish <i>Dh</i>). <b>Broken is no longer a debuff the talent <i>Mitigation per Debuff You
+Carry</i> counts</b>: a Broken hero holding it took 12% less damage for being Broken.</p>
+
+<p><b>&sect;5 &mdash; DELIBERATELY NOT DONE.</b> No conjunction is authored and Rupture's number stays. <b>Recorded, not
+built</b>: a meter like Broken or Bleed is not half of a conjunction, so the designed ones are re-cut around statuses the heroes
+already lay &mdash; the Warrior's half is Sunder, a Stun or a Taunt, and Marrowfire becomes Sunder and Burn, pending the design
+pass. The Occultist's wait for a Break card in his pool is its own problem, not a conjunction's. No debug card picker is built.
+The six cards whose text and code disagree are not changed: each has a recommendation waiting on one word from the designer.
+The Skirmisher and the Tracker, Channel's tempo payout, whether a fallen hero stays down, and Tithe all stay as they were; no
+rune is authored, the crest is one slot, and the rules file is not split.</p>
+
+<p><b>The checks that moved, and why.</b> The saves were copied first and checked byte for byte: against HT's copy two had
+moved &mdash; the designer's own play since &mdash; and the save is a debug-touched run, which is not a defect. Every existing
+check was then run as it stood against this batch's game, with the documents as HT left them &mdash; 134 targets, in
+74 minutes &mdash; and one read red besides the two that are red on purpose: <b>an old check that pinned Faith's chip
+as <i>F0</i></b>, which is this batch's re-tag arriving. The search for changed text had passed it because a two-letter chip is
+shorter than anything that search looks for, so the rule for that search is amended. <b>That check's two lines read <i>Fa0</i>
+now</b>, the question unchanged, and <b>one check is new</b>: <code>check_hu</code> pages a real battle's list both ways and casts
+a card from page two through the real turn; casts every card in the game on a burning board and a chilled one and drives every
+carrier and rider; drives Downwind's copy against a hold and against two bosses; walks every chip tag; and drives a Broken
+Warden's blow with the talent and without it. <b>Twenty-three controls</b>, one defect each, were read by what each printed, and
+every one went red on the line it aimed at but the one built to stay green, which re-tunes the ordinary freeze and must not
+matter; an earlier round found the new check's own faults first &mdash; a sweep that walked the tag tables and missed a chip
+written by hand, and a failure message that contradicted itself. Run against the game as HT left it, the new check went red at
+exactly the four things this batch changed, and read Rupture's routes green there too: nothing bypassed the join before this
+batch either. One row of the count table is new, one moves and one carries a note. The full rehearsal run and the run in the
+repository are in the report.</p>
+
 <h2>2026-10-06 &mdash; Batch HT: TWO RULINGS, AND THE CENSUS THAT OPENS THE REST OF THE LADDER</h2>
 <p><b>An enemy mender's Cleansing Rite no longer wipes out a Rupture: it thaws the chill inside one stack at a time, as it
 thaws any chill. On screen a conjunction's weight is its DEGREE &mdash; Rupture is a second-degree affliction. And a census of

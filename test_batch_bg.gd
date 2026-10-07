@@ -485,7 +485,11 @@ func _live_release_still_consumes() -> void:
 	# The chip therefore STAYS, at zero stacks, stating the peak.
 	ok(ally.has_status("faith"),
 		"§2/BI: ...and the chip STAYS, because the peak keeps paying")
-	ok(String(ally.get_status("faith").get("short", "")) == "F0",
+	# BATCH HU §4 — RE-POINTED, THE QUESTION UNCHANGED: Faith's counter reads `Fa` before its
+	# count now, because Burn's chip is `F` and a burning hero carrying Faith showed `F` beside
+	# `F3` — the sweep the designer asked for past the two shared tags found it. The chip still
+	# shows the count.
+	ok(String(ally.get_status("faith").get("short", "")) == "Fa0",
 		"§2/BI: ...showing a count of zero (got \"%s\")" % \
 			String(ally.get_status("faith").get("short", "")))
 	ok(_stat_of(scene, "faith_releases") == 1.0,
@@ -540,7 +544,8 @@ func _live_the_chip_states_the_doubled_numbers() -> void:
 		"§2: the chip at two stacks reads its doubled mitigation (got \"%s\")" % desc)
 	ok(desc.contains("+%d%%" % (BASE_DAMAGE * APOSTLE_MULT * HELD_MAX)),
 		"§2: ...and its doubled damage dealt")
-	ok(String(s.get("short", "")) == "F%d" % HELD_MAX,
+	# BATCH HU §4 — re-pointed as the arm above was: `Fa` and the count.
+	ok(String(s.get("short", "")) == "Fa%d" % HELD_MAX,
 		"§2: ...and the visible text is still the stack count")
 	await _kill(scene)
 	# The same chip without the capstone, which is the control.

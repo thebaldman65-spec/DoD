@@ -79,6 +79,12 @@ NOT BE WRITTEN**; an ability obeys this rule by not passing `force`.
   its perfect still lands the Stun on an unbroken boss. **REPORTED AND DELIBERATELY NOT CHANGED
   AT CR** — it is the one ability left applying hard control to a boss on a condition other than
   Broken, and whether it joins the rule is a designer's call, not a batch's.
+  · **AND A COPY NEVER CARRIES IT (HU §3b, ruled by the designer).** Downwind's carry re-entered
+    the door with the original's arguments, `force` among them, so a Perfect Pommel Strike's copy
+    stunned a SECOND, unbroken boss — the one exception reaching a body its card never aimed at.
+    The carry lays the status without it, as every other caller does; the Perfect still stuns its
+    own target, and a Broken boss still takes the copy. **A carrier that forwards `force`
+    re-opens this door** (`check_hu` §3b drives both).
 - **`_spring_trap`'s `force_stun` PARAMETER SURVIVES WITH NO CALLER PASSING TRUE.** Left in place
   rather than removed (a shared helper's signature is adjacent scope), but **a future caller
   passing `true` is re-opening the door this rule closed.**
