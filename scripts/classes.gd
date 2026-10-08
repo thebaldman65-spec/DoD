@@ -5648,7 +5648,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 5,
 				"anim": "attack01", "special": "downwind",
 				"perfect_id": "", "perfect_text": "",
-				"description": "For 4 turns the wind carries it: every\nharmful effect any hero lands on an\nenemy is copied onto a SECOND enemy,\npreferring one that does not have it.\nHis engine, fed by every hero."})
+				"description": "For 4 turns the wind carries it: every\nharmful effect any hero lands on an\nenemy is copied onto a SECOND enemy,\npreferring one that does not have it.\nA snare and Vendetta's lock are never\ncopied. His engine, fed by every hero."})
 		# AXIS: spending the breadth. It DELIBERATELY FIGHTS HIS OWN PASSIVE —
 		# what Trapper spent the fight building is what this eats — and that
 		# tension is the point of the card rather than a cost to be smoothed

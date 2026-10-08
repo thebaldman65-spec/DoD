@@ -175,6 +175,9 @@ const BAR_PAGE_ROWS := 17
 const MINIBOSS_HP_MULT := 1.5
 
 # Visual identity of each status effect: [label, chip tag, color, tooltip]
+# A chip tag is its own: no two statuses show the same letters, a counter's included, and
+# case does not tell two apart — a chip is read at a glance on a small sprite (HU §4, HV §1;
+# `check_hu` §4a walks every tag). The rarer status of a colliding pair is the one re-tagged.
 const STATUS_INFO := {
 	"slow": ["Slowed", "Sl", Color(0.55, 0.65, 0.9), "-25% speed; turns arrive later."],
 	"chilled": ["Chilled", "Ch", Color(0.5, 0.75, 1.0), "Stacking frost: 1 = -25% speed,\n2 = -50%, 3 = also -15% damage;\n4 stacks FREEZE the victim."],  # 4 = a HOLD when he applied them
@@ -276,7 +279,7 @@ const STATUS_INFO := {
 	# Bulwark Line (Batch AL): the Warden's Shieldwall covers the line. The
 	# grant rides the same Heavy Plating slice of the block roll his own
 	# stance does, so what it buys is real Block, not a separate ward.
-	"bulwark_line": ["Bulwark Line", "BL", Color(0.72, 0.8, 0.95),
+	"bulwark_line": ["Bulwark Line", "Bu", Color(0.72, 0.8, 0.95),
 		"+10% Block chance (the Warden's Shieldwall)."],
 	"rally_heal": ["Rallied", "Rl", Color(0.95, 0.75, 0.45), "+30% healing received\n(the Warden's Rally)."],
 	"immolate": ["Immolate", "IM", Color(1.0, 0.55, 0.25), "Wrapped in his own fire: he takes 20%\nless damage, and anything that strikes\nhim is set Burning (3 turns)."],
@@ -351,8 +354,8 @@ const STATUS_INFO := {
 	"succession": ["Succession", "Sc", Color(0.85, 0.70, 0.40), "The bond is handed on: a companion\nswapped in starts with HALF the\nLoyalty of the one it replaces."],
 	"reacquire": ["Reacquire", "Rq", Color(0.90, 0.65, 0.25), "Named quarry: leaving this enemy\nBANKS his Focus instead of clearing\nit, and coming back gives it over."],
 	"fault_line": ["Fault Line", "FL", Color(0.80, 0.55, 0.20), "Reading the fault: while his Focus\nstands ABOVE the conversion point,\nevery attack he lands also deals\nBreak damage."],
-	"stalking_horse": ["Stalking Horse", "SH", Color(0.60, 0.80, 0.45), "Playing the stalking horse: enemies\nare drawn to swing at him, and each\nattacker takes a DIFFERENT affliction."],
-	"downwind": ["Downwind", "Dw", Color(0.55, 0.85, 0.55), "Downwind of the pack: every harmful\neffect any hero lands on an enemy is\ncopied onto a second one."],
+	"stalking_horse": ["Stalking Horse", "Hs", Color(0.60, 0.80, 0.45), "Playing the stalking horse: enemies\nare drawn to swing at him, and each\nattacker takes a DIFFERENT affliction."],
+	"downwind": ["Downwind", "Wd", Color(0.55, 0.85, 0.55), "Downwind of the pack: every harmful\neffect any hero lands on an enemy is\ncopied onto a second one. A snare\nand Vendetta's lock are never copied."],
 	"frostbite": ["Frostbite", "Fb", Color(0.45, 0.70, 0.95), "Frostbitten: healing received\nreduced by 50%."],
 	"stabilized": ["Stabilized", "St+", Color(0.55, 0.68, 0.95), "Grounded resonance: takes less\ndamage (10% per stack consumed)."],
 	"overcharged": ["Overcharged", "OC", Color(0.8, 0.5, 1.0), "Overcharge is spent for this\nbattle — the storm has no feeding\nleft in it."],
@@ -367,7 +370,7 @@ const STATUS_INFO := {
 	"blind": ["Blind", "Bd", Color(0.55, 0.55, 0.65), "Attacks are 50% more likely\nto miss."],
 	"elusive": ["Elusiveness", "El", Color(0.55, 0.85, 0.75), "Hard to pin down: enemies are 25%\nmore likely to miss this companion."],
 	"instinct": ["Hunter's Instinct", "HI", Color(0.85, 0.75, 0.35), "The next Quick Shots deal +10% of\nthe hunter's Attack and mend the\ncompanion for 15% of its max health."],
-	"bestial": ["Bestial Wrath", "BW", Color(0.95, 0.40, 0.25), "The companion is unleashed — Ursus:\ndoubled health and +50% armor;\nCanis: +50% damage, +10 Bleed;\nAguila: +25% damage, strikes Blind."],
+	"bestial": ["Bestial Wrath", "Wr", Color(0.95, 0.40, 0.25), "The companion is unleashed — Ursus:\ndoubled health and +50% armor;\nCanis: +50% damage, +10 Bleed;\nAguila: +25% damage, strikes Blind."],
 	"spirit_heal": ["Spirit Bond", "Si", Color(0.45, 0.90, 0.70), "The bond mends: heals 10% of max\nhealth at the next turn start."],
 	"spirit_mana": ["Spirit Flow", "SM", Color(0.40, 0.65, 0.95), "The bond restores 5% max Mana at\neach turn start."],
 	"vigor": ["Vigor", "Vg", Color(0.60, 0.90, 0.45), "Spirit Bond perfected: +10% max\nhealth while it lasts."],
@@ -393,7 +396,7 @@ const STATUS_INFO := {
 	"blight": ["Blighted", "Bg", Color(0.55, 0.25, 0.45), "The well is poisoned: any healing this\nenemy receives DAMAGES it for the\nsame amount instead."],
 	"covenant": ["Covenant of Ash", "CA", Color(0.60, 0.45, 0.50), "Bound to the ash: every stack of Ruin\napplied to ANY enemy also lands here."],
 	"quarry": ["Quarry", "Qy", Color(0.60, 0.85, 0.45), "Named the quarry: Focus gained from\nattacking this enemy is DOUBLED.\nSwitching away still clears him."],
-	"snare_line": ["Snare Line", "SL", Color(0.75, 0.65, 0.30), "A line runs across the ground: the\nnext time this enemy acts it springs\na trap where it stands."],
+	"snare_line": ["Snare Line", "Ln", Color(0.75, 0.65, 0.30), "A line runs across the ground: the\nnext time this enemy acts it springs\na trap where it stands."],
 	# ---- BATCH BV: the Hunter draft's statuses ----
 	# THREE FOR NINE ABILITIES. Bloodbond and Ghostpack sit on the HUNTER (a
 	# placed guard and a summoning window, both his), Crossfire on the
@@ -419,7 +422,7 @@ const STATUS_INFO := {
 	# window that expires, and the two cards are meant to read as a pair.
 	# THE SHARE RIDES THE STATUS rather than a second field, so the chip a
 	# player reads and the bill the callback sends are one value.
-	"bear_brunt": ["Bear the Brunt", "BB", Color(0.80, 0.55, 0.30), "The companion stands in front: the\nnext blow that would fell the hunter is\nrefused, and his deepest bond takes it\ninstead. It waits until it is needed —\nand what it takes can kill it."],
+	"bear_brunt": ["Bear the Brunt", "Be", Color(0.80, 0.55, 0.30), "The companion stands in front: the\nnext blow that would fell the hunter is\nrefused, and his deepest bond takes it\ninstead. It waits until it is needed —\nand what it takes can kill it."],
 	"bring_it_down": ["Bring It Down", "BiD", Color(0.85, 0.72, 0.35), "The horn has sounded: every hero deals\nmore damage while it holds. The number\nwas read off the deepest bond's\nLoyalty as it was called."],
 	# `dug_in` AND `thick_hide` CARRY NO POWER FOR THEIR CUT AND THAT IS THE
 	# DESIGN. Both are read LIVE at the blow — one off the Focus standing at
@@ -448,7 +451,7 @@ const STATUS_INFO := {
 	"berserk_risk": ["Berserk", "Bk!", Color(0.75, 0.20, 0.25), "Nothing held back: takes 30% MORE\ndamage. Blood Frenzy pays for missing\nhealth, so this is the way into his\nown power band."],
 	"blood_debt": ["Blood Debt", "BD!", Color(0.85, 0.20, 0.30), "The debt is named: every time this\nenemy BLEEDS OUT the Berserker heals.\nThe mark SURVIVES the bleedout, so a\nre-opened wound pays again."],
 	"battle_poise": ["Battle Poise", "BP", Color(0.45, 0.88, 1.0), "The blade is answering: every attack\nhe PARRIES takes a turn off all of his\ncooldowns, and ONCE A TURN a parry also\nbuys a free GUARD CHANGE — the pivot\nalone, and it still respects that\nability's own cooldown."],
-	"feigned_guard": ["Feigned Guard", "FG", Color(0.60, 0.80, 1.0), "Showing the wrong guard: his ABILITIES\nresolve as though cast from the OTHER\nstance, and satisfy that stance's\nrequirement. His actual guard — and\neverything his passive reads — has not\nmoved."],
+	"feigned_guard": ["Feigned Guard", "Fe", Color(0.60, 0.80, 1.0), "Showing the wrong guard: his ABILITIES\nresolve as though cast from the OTHER\nstance, and satisfy that stance's\nrequirement. His actual guard — and\neverything his passive reads — has not\nmoved."],
 	"vendetta": ["Vendetta", "Vd", Color(0.90, 0.45, 0.35), "Sworn on: this enemy can attack the\nWarden and nobody else for the rest of\nthe battle, and he takes less damage\nfrom it. It ends only when one of them\ndoes."],
 	"aegis_wall": ["Aegis Wall", "AW", Color(0.70, 0.85, 0.95), "The wall answers for everyone: every\nattack he BLOCKS heals every hero for\na share of his maximum health. A blow\nthat gets THROUGH pays nothing."],
 	# ---- BATCH CI: the tranche-3 Warrior's statuses ----
@@ -466,7 +469,7 @@ const STATUS_INFO := {
 	"anvil": ["Anvil", "Av", Color(0.75, 0.80, 0.90), "The anvil does not move: BLOCKING no\nlonger resets the Heavy Plating bonus,\nso the sawtooth becomes a staircase.\nWhile this holds RECOMPENSE is paid\nnothing — there is no reset to pay it."],
 	"recompense": ["Recompense", "Rc", Color(0.85, 0.80, 0.65), "Paid for the loss: every Heavy Plating\nreset returns Rage equal to the\npercentage points it took. ANVIL\nprevents those resets, so the two\nfight each other by design."],
 	"turn_the_blade": ["Turn the Blade", "TB", Color(0.80, 0.55, 0.95), "The block answers: every attack he\nBLOCKS deals Break damage back to the\nattacker, scaling on how much damage\nthe block refused."],
-	"discipline": ["Discipline", "Di", Color(0.50, 0.85, 1.0), "Held: each consecutive turn in the\nSAME stance strengthens that stance's\neffect, to a ceiling. A GUARD CHANGE\nresets the accumulation to nothing."],
+	"discipline": ["Discipline", "Ds", Color(0.50, 0.85, 1.0), "Held: each consecutive turn in the\nSAME stance strengthens that stance's\neffect, to a ceiling. A GUARD CHANGE\nresets the accumulation to nothing."],
 	"answering_steel": ["Answering Steel", "AS", Color(0.55, 0.90, 1.0), "The blade answers: parry chance is\nraised, and every successful PARRY\ngrants Rage and takes a turn off all\nhis cooldowns. It pays TEMPO, not\ndamage."],
 	"formless": ["Formless", "Fm", Color(0.65, 0.95, 1.0), "Neither guard and both: he deals MORE\ndamage AND takes less, counts as BOTH\nstances for anything that requires one,\nand cannot Guard Change — there is no\nstance to change. When it ends he pays\nboth downsides."],
 	"formless_recoil": ["Formless", "Fm!", Color(0.55, 0.65, 0.80), "The form is paid for: he suffers BOTH\nstances' downsides at once — more\ndamage taken and less dealt — for two\nturns."],
@@ -545,7 +548,7 @@ const STATUS_INFO := {
 	"frostbind": ["Frostbind", "Bn", Color(0.55, 0.80, 1.0), "Chained to another: Chilled landing on\neither lands on both, and damage dealt\nto one is dealt to the other at 40%.\nThe mirrored blow does not mirror back.\nIf both reach the threshold, the pair\nfreezes together."],
 	"unmade": ["Unmaking", "Um", Color(0.75, 0.45, 0.95), "Coming apart: this enemy cannot be\nhealed by anything at all."],
 	"resonant_field": ["Resonant Field", "RF", Color(0.80, 0.55, 1.0), "Tuned to the storm: deals bonus damage\nequal to HALF the Arcanist's CURRENT\nResonance bonus. It reads his meter\nlive — as he climbs, so does this."],
-	"threshold_lock": ["Threshold", "Th", Color(0.65, 0.50, 0.90), "Bought and spent: his Resonance was\nset outright, and he can gain no more\nwhile this holds. Nothing raises it —\nnot a cast, not a crit, not a kill."],
+	"threshold_lock": ["Threshold", "Lk", Color(0.65, 0.50, 0.90), "Bought and spent: his Resonance was\nset outright, and he can gain no more\nwhile this holds. Nothing raises it —\nnot a cast, not a crit, not a kill."],
 	# ---- BATCH GO: the three statuses the nine rule engines lay ----
 	# TWO SIT ON AN ENEMY AND ARE THE HEROES' WORK, SO BOTH ARE IN `DISPEL_NEVER`
 	# AND NEITHER IS IN `DEBUFF_IDS` — a mark is not an affliction (GM §3's rule).
@@ -700,6 +703,17 @@ var _frostbind_mirroring := false
 # and copy again — a chain with no natural bound, because unlike CE's Mantle
 # there is no hop count decrementing toward zero.
 var _downwind_spreading := false
+# BATCH HV §2 — DOWNWIND CARRIES AN AFFLICTION, NEVER A CARD'S OWN BOOKKEEPING (ruled by the
+# designer). A status that is a card's bookkeeping — a binding, a slot, a counter the card reads —
+# is laid with this held, and the carry leaves it alone: a copy would be a second instance of a
+# thing the card counts, which is never what the card meant. Vendetta's lock (one enemy, for the
+# fight) and Snare Trap's snare (a trap slot `trap_count` counts) are laid so. Set and cleared
+# around the one `_apply_status` call each card makes, so it never outlives the lay.
+var _carry_withheld := false
+# BATCH HV §2 — WHAT `_apply_poison` STAMPS ON A POISON AFTER IT LANDS (sticky, its full
+# duration), held while it lays the stacks so the carry's copy takes them too: a copy routed
+# through the original's own route, as HU §3 routed the hold. Empty outside that call.
+var _poison_route: Dictionary = {}
 # BATCH CG §3 — PENANCE'S MIRROR NEEDS THE SAME LOCK FOR THE SAME REASON. The
 # mirror is dealt to the marked enemy through `take_tick_damage`, which
 # re-enters `_on_damage_taken`, and the frame still names that enemy as the
@@ -14305,7 +14319,7 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 	# whole point is BREADTH: copying onto an enemy that already has it deepens
 	# nothing and pays Trapper nothing. When every other enemy has it already it
 	# falls back to any of them, so the card never silently does nothing.
-	if not _downwind_spreading and not target.is_hero \
+	if not _downwind_spreading and not _carry_withheld and not target.is_hero \
 			and src != null and src.is_hero and not src.is_companion \
 			and BattleUnit.DEBUFF_IDS.has(id) and id != "broken":
 		var dw_src: BattleUnit = null
@@ -14357,10 +14371,32 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 				# Strike's Perfect, on ITS OWN target. A copy that forwarded it stunned an
 				# unbroken boss with a stun that card never aimed. Every other caller already
 				# lays a status without it, so the copy carrying it was the anomaly.
+				#
+				# **C (HV §2) — AND NOTHING THAT IS A CARD'S OWN BOOKKEEPING IS CARRIED AT ALL**: the
+				# condition above reads `_carry_withheld`, held by Vendetta's lock and Snare Trap's
+				# snare as each is laid (see the flag). A Frostbind is a binding too, and is still
+				# carried as a chip with no partner — the brief routed it, and which body a copied end
+				# binds to is owed a ruling (`docs/reports/HV.md` §2c).
 				var dw_turns := ORDINARY_FREEZE_TURNS if id == "frozen" else turns
+				# **BATCH HV §2 — A COPY TAKES THE ORIGINAL'S OWN ROUTE (ruled), as A took the hold's.**
+				# A Ruin stack goes through `_gain_ruin`, the one door a stack is meant to arrive by: a
+				# copy that lands a body on the threshold arms the detonation, and a Covenant of Ash
+				# takes its share, as of any stack — the bare door skipped both, in the player's
+				# disfavour. A poison takes the stamps `_apply_poison` puts on its own stack after it
+				# lands (sticky, its full duration), so a copy of an uncleansable poison is not a
+				# cleansable one. Every other affliction's route IS the status door.
 				_downwind_spreading = true
 				for dw_to in dw_targets:
-					_apply_status(dw_to, id, dw_turns, power, tick, src)
+					if id == "ruin":
+						_gain_ruin(dw_to, 1)
+					else:
+						_apply_status(dw_to, id, dw_turns, power, tick, src)
+					if id == "poison" and not _poison_route.is_empty():
+						var dw_ps: Dictionary = dw_to.get_status("poison")
+						if not dw_ps.is_empty():
+							if bool(_poison_route.get("sticky", false)):
+								dw_ps["sticky"] = true
+							dw_ps["full"] = int(_poison_route.get("full", 0))
 					_log("   → Downwind: %s carries from %s to %s%s%s" % [
 						String(STATUS_INFO[id][0]) if STATUS_INFO.has(id) else id,
 						target.unit_name, dw_to.unit_name,
@@ -19459,7 +19495,11 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		"snare_trap":
 			if target != null and not target.dead:
 				var sn_i := heroes.find(attacker)
+				# BATCH HV §2 — THE SNARE IS A TRAP SLOT, SO DOWNWIND LEAVES IT ALONE (ruled): a copy
+				# carried his seat, counted against `trap_count`, and could refuse his next trap.
+				_carry_withheld = true
 				_apply_status(target, "snared", -1, sn_i, 0, attacker)
+				_carry_withheld = false
 				# BATCH CR §1 — THE `perfect` STAMP IS GONE. It was the PERFECT's
 				# clause (the spring's Stun holding an unbroken boss); CN took the
 				# bar off this card, so the stamp became unconditional and boss
@@ -20382,7 +20422,11 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				if vd_idx >= 0:
 					var vd_cut := VENDETTA_PERFECT_CUT
 					var vd_pct := int(round(vd_cut * 100.0))
+					# BATCH HV §2 — THE LOCK IS THE CARD'S OWN BOOKKEEPING, SO DOWNWIND LEAVES IT
+					# ALONE (ruled): it binds ONE enemy to him for the fight, and a copy was a second.
+					_carry_withheld = true
 					_apply_status(target, "mocked", -1, vd_idx, 0, attacker)
+					_carry_withheld = false
 					_note_debuff_applied(attacker, "mocked")
 					_apply_status(target, "vendetta", -1, vd_pct, 0, attacker)
 					target.update_status("vendetta", "-%d%%" % vd_pct,
@@ -22094,7 +22138,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_apply_status(attacker, "downwind", dw_turns)
 			_sfx("heal", -9.0, 0.7)
 			_message("%s puts the field downwind" % attacker.unit_name)
-			_log("%s: Downwind — for %d turns every harmful effect any hero lands is copied onto a second enemy" % [
+			_log("%s: Downwind — for %d turns every harmful effect any hero lands is copied onto a second enemy (never a snare, nor Vendetta's lock)" % [
 				attacker.unit_name, dw_turns], "#70d878")
 		# CULL — HARVEST'S YIELD, THE FIELD'S DAMAGE. It shares `_harvest_yield`
 		# with Harvest so the two can never disagree about what a sticky poison
@@ -25146,8 +25190,11 @@ func _apply_poison(src: BattleUnit, victim: BattleUnit, turns: int) -> void:
 		sticky = true
 	elif src.rune_long_poison > 0:
 		p_turns = -1
+	# BATCH HV §2 — the stamps below ride the carry's copy too (Downwind's block reads them).
+	_poison_route = {"sticky": sticky, "full": p_turns}
 	for _i in 1 + src.virulence_ranks:
 		_apply_status(victim, "poison", p_turns, 0, tick, src)
+	_poison_route = {}
 	var ps: Dictionary = victim.get_status("poison")
 	if not ps.is_empty():
 		if sticky:

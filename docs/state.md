@@ -13,85 +13,127 @@ covered. Read it before writing a brief, not after.** *This pointer is in the pr
 in the WHERE block on purpose: that block is replaced every batch and a pointer inside it would
 last exactly one.*
 
-*Last rewritten: 2026-10-06 (Batch HU).*
+*Last rewritten: 2026-10-07 (Batch HV).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: HU — THE BAR PAGES, DOWNWIND IS BOUNDED, AND DID HT ACTUALLY LAND.** IMPLEMENT ONLY. Full working:
-  **`docs/reports/HU.md`**.
-- **§0 — HT LANDED.** At HU's start `git ls-remote origin class-merge` read `7e20de7`, local HEAD; HT's game work is in the tree
-  (`check_ht` 77 / 0 on it, standalone); its acceptance run happened — 12:04:02 to 13:18:08, `check_de` 553 / 6, the six the
-  designer's game saving mid-run, every one re-run clean — and its logs survive. **The committed `docs/reports/HT.md` carries no
-  unfilled token**: the three the brief names stood in the DRAFT in the working tree from 12:03:48 to 13:27:25 — the acceptance
-  run's window, where it was read — and were filled before the 13:29:16 commit. HT's report is not edited. **A report does not ship
-  with an unsubstituted template token, and its draft stays in the scratchpad until its verdict is in** (`CLAUDE.md`, the report block).
-- **§1 — THE ABILITIES LIST PAGES** (ruled: a pager, not a slider; `battle.BAR_PAGE_ROWS`, `_bar_pager`): a page is the rows the
-  hotkeys reach, the pager exists only when the list overflows, every card keeps its place on its page, the list reopens on the page
-  that hero last showed, the keys keep their slots and no key turns a page. **The real ceiling in play is thirteen entries** (264
-  hero shapes walked) **against twenty the bar shows and eighteen the keys reach**; no live crest rune grants a card, so **only the
-  debug menu's unlock-all reaches a second page today** — where a Mage's Fireball, Frostbolt and Blizzard had sat above the screen
-  and past every key. A page-two card was cast through the real turn (`check_hu` §1).
-- **§2 — EVERY ROUTE A CHILL OR A BURN TAKES REACHES `_conjoin`.** The status door's own add is the only write of either;
-  `set_chilled_stacks` rewrites a pile that stands and writes nothing on a body without one — **so HS §2b and HT §2d are both
-  true** (one is about a status arriving, the other about a pile's stack count) **and neither report was wrong** (HS's *one
-  variable-id `add_status` call* is two; the engine chip's can never be a Burn or a Chill). Driven: every card cast on a burning and
-  a chilled board — 408 casts; Razor Ice, Blizzard, Glacial Prison and Frostbolt chill, Flamewave, Firestorm, Ember Debt, Fireball
-  and Choking Smoke burn, and each formed its Rupture — and every carrier and rider, each forming one with its line. **No card's
-  chill or burn fails to compose.** **The designer's missing Rupture was most likely the bar**: the save's party — an Arcanist on
-  Resonance alone, a spine Warrior and Cleric, a Beastmaster — opens with no card that lays a Chill, and under unlock-all every one
-  sat in the rows nothing could reach.
-- **§3 — DOWNWIND IS BOUNDED** (ruled): a copied freeze is an ordinary timed one (`battle.ORDINARY_FREEZE_TURNS`), never a hold,
-  Carrion or not, and the hold still holds its own enemy; the copy drops `force` — a Perfect Pommel Strike still stuns its own
-  unbroken boss, the copy does not, a Broken boss takes the copy. **The other five bare copies are classed and not fixed**: a
-  partner-less Frostbind, a poison without `_apply_poison`'s stamps and a Ruin stack without `_gain_ruin`'s arming are the hold's
-  shape; Vendetta's second permanent taunt and Snare Trap's second spring are the card's own business (HU's ruling 3).
-- **§4 — FOURTEEN CHIPS RE-TAGGED, AND BROKEN IS NOT A DEBUFF IRON WILL COUNTS** (ruled). The designer's two pairs and eleven more
-  the sweep found (a counter's letters included — Cripple's *C* beside Chilled's *C<n>*, Burn's *F* beside Faith's): the rarer of
-  each moved (HU's ruling 1 lists them). `count_debuffs` excludes Broken, as the breadth count does: **one debuff's step, 12 points of
-  damage taken, whenever a hero holding the node is Broken** — a seeded blow on a Broken Warden 21 with the node against 24 without
-  at HEAD, 24 and 24 now. The Holy bot's Empowered Divine Plea reads the same count.
-- **§5 — RECORDED, NOT BUILT**: a meter state is not a conjunction half (the Warrior's half is a status he lays; Marrowfire becomes
-  Sunder + Burn pending the design pass); the Occultist's hole is CE §3's, not a conjunction's; no debug card pick; the six
-  card-versus-code items each one word from built (the queue below).
-- **THE VERIFICATION.** The saves were backed up first and verified by hash (`../save-backups/HU-20261006-134615`, the four
-  files byte-identical to the live ones). **Against HT's backup two had moved, by the designer's play** — `profile.json`
-  (13:29:50, a new run: `runs_started` up on eleven keys) and `run_save.bin` (13:31:25, a debug-touched run at the first node of
-  zone one) — and `relics.json` and `settings.cfg` are byte-identical. **The recon** — HEAD's unmodified gates and documents
-  against HU's game, 134 targets in 74 min 19 s — read `check_de` 553 / 1: **`test_batch_bg` alone, 41 / 2, at the two arms that
-  pin Faith's chip as `F0` and `F%d`** — not predicted, because the literal sweep's floor of 4 cannot see a two-letter chip (an
-  instrument rule now) — with the two sanctioned reds at their counts and FAIL text; every other target read HT's pre-pass
-  reading but `test_batch_an`'s unseeded count (6049, inside its band). HS's two coin flips read green (`check_fo` 90, `check_hk`
-  168), so no stub was owed. **One suite was re-pointed** (`test_batch_bg`, two arms, the question unchanged) and **one gate is
-  new** (`check_hu`, 103, one property an arm). **Twenty-three controls and a baseline**, one defect each in a fresh clone of the
-  finished tree, read by FAIL text: every one red on the arm it aimed at, and the one re-tune green; **HEAD's game under the new
-  gate read 102 / 25 and one SCRIPT ERROR** — red at exactly the four things HU changed, green on every route of §2, and
-  the throw the gate's own (its §1f reads a variable HEAD's battle node lacks; queued below). **The pre-pass** (135 targets in 74 min 38 s, an isolated copy proved equal to the tree)
-  read `check_de` 557 / 0 / 0, every target at its predicted reading. **The acceptance run in the repository** (135 targets
-  in 74 min 26 s, 16:51:35 to 18:06:01) read `check_de` 557 / 0 / 0, every target at its pre-pass reading but `test_batch_an`'s
-  unseeded count (6055, inside its band) — the two sanctioned reds at their counts and HT's FAIL text, the run harness PASS
-  22 / 382 / 8, no Parse Error, SCRIPT ERROR, TIMED OUT or NO VERDICT line; **the tree frozen and byte-identical after it (509
-  files), the player's four files byte-identical before it, after it and to HU's backup**, and no game window open during it
-  (`ps` read every 15 s). Only this block's verification lines, one queue line below and `docs/reports/HU.md` moved after it;
-  this file's two readers (`check_es`, `check_hp`) and the document instruments read their rows on the final tree.
-- **HT's FIFTEEN COPIES ARE IN THE TRASH**, selected by the *"Dawn of Decay HT "* prefix, under *"DoD spent user-data folders
-  (Batch HT's fifteen, cleared at HU 2026-10-06)"*: 15 folders, 2,404 KiB (HT recorded 15 and 2,404). Godot's `app_userdata` went
-  from 482 folders and 145,740 KiB to 467 and 143,336 KiB; the older folders, the live *Dawn of Decay* folder and `../save-backups/`
-  were not touched.
-- **`CLAUDE.md` IS 442,887 B = 432.51 KiB, WITH 37.49 KiB UNDER ITS 470 KiB CEILING** (+5,687 B at HU, measured after this
-  batch's own writing; HT left it at 426.95 KiB): **about 4.6 batches at the record, EZ's +8,293 B**, and 4.8 at HP's +7,935 B
-  (5.5 at HS's +7,000 B, 6.8 at HU's own rate). The shape recon is owed before then — the arithmetic is not the answer next
-  time.
+- **Last batch: HV — NINE TAGS, DOWNWIND'S RULE, AND THE SHAPE RECON.** IMPLEMENT ONLY. Full working: **`docs/reports/HV.md`**.
+- **§0 — HU LANDED**: at HV's start `git ls-remote origin class-merge` read `fcb3dbe`, local HEAD. **The convention changed with
+  it (HU §0's finding)**: a batch still pushes and reports the `ls-remote` line in its closing message, and the NEXT batch's
+  premise 1 is where the push is confirmed — never inside the report, which cannot carry its own push.
+- **§1 — NINE CASE-ONLY TAGS MOVED (ruled: a case-only difference is a collision).** The rarer of each pair: Bulwark Line *Bu*,
+  Snare Line *Ln* (beside Slowed's *Sl*, the pair that decided it), Stalking Horse *Hs*, Threshold *Lk*, Downwind *Wd*,
+  Discipline *Ds*, Bestial Wrath *Wr*, Bear the Brunt *Be*, Feigned Guard *Fe*. **The sweep at the new rule found exactly HU's
+  nine and no tenth**: 165 tags over 162 statuses, 30 writing a chip by hand, and **165 groups once case is set aside** (156 at
+  HEAD). `check_hu` §4a's property sets case aside — no arm added, the letters stay out of the gate.
+- **§2 — DOWNWIND CARRIES AFFLICTIONS, NOT A CARD'S OWN BOOKKEEPING (ruled).** Vendetta's lock and Snare Trap's snare are laid
+  with the carry held off (`battle._carry_withheld`) — a Mocking Blow's timed taunt and the snare's spring Poison are still
+  carried. **A copy that skipped its original's route takes it**: a Ruin stack through `_gain_ruin` (it primes at the threshold,
+  and a Covenant of Ash takes its share — a bearer gains 3 a stack laid beside it where it gained 1, 5 where 2 with Carrion), a
+  poison with `_apply_poison`'s stamps (`_poison_route`; latent today — the fields that stamp a poison uncleansable have no live
+  writer). **A Frostbind is not built**: the rule names it a binding while the brief routed it, and which body a copied end binds
+  to is the designer's (the queue). The rule over every status Downwind carries: 31 afflictions carried (`check_hv` §2a), two
+  bookkeeping withheld, one owed.
+- **§3 — THE SHAPE RECON IS RUN (read-only: nothing split, moved or re-derived; `docs/reports/HV.md` §3).** A batch needed about
+  30% of the file it loaded — 37% counting what it plainly obeyed — spread thinly across every large subject, so an index plus
+  SUBJECTS saves almost nothing; an index plus BLOCKS, keeping the settled questions and the eleven most-needed blocks in the
+  required read, cuts the read by about 38%. Both past splits held on substance and rotted in prose at the required read's
+  rate, and what held either was a mechanical check, never an opened file. **Recommended, the designer's to rule (HV's ruling
+  1)**: the checks for the two references first, then a pilot of the nine coldest units (13,474 B), then the index on the
+  re-measure.
+- **§4 — `check_hu` §1f FAILS WHERE IT THREW**: it reads the member, asserts it is a Dictionary, then the page — 104 checks. A
+  control on a game without the page memory found a second throw in the same gate (§1e's saturation laid Anointed's chip, which
+  has no table row, through the status door); it skips a write the door cannot lay now, and the gate FAILS there with no SCRIPT
+  ERROR.
+- **THE VERIFICATION.** The saves were backed up first and verified by hash (`../save-backups/HV-20261007-091415`) —
+  **byte-identical to HU's backup: nobody had played since HU.** **The recon** — HEAD's unmodified gates, suites, runner,
+  baselines and documents against HV's game, 135 targets in 74 min 49 s — read `check_de` 557 / 0 / 0, exactly as predicted:
+  no old check asked anything this batch changed. **One gate re-pointed** (`check_hu`, 103 → 104: §1f's arm split in two,
+  §4a's walk setting case aside with no arm added, §1e skipping a write the status door cannot lay) and **one is new**
+  (`check_hv`, 45). **Twenty-one controls**, one defect each in a fresh clone, read by FAIL text: every one red on the arm it
+  aimed at, both re-tunes green; HEAD's game under the new gates read `check_hu` 104 / 1 (all nine pairs) and `check_hv`
+  45 / 17, and HEAD's `check_hu` cannot see a case-only pair (103 / 0) and throws where the new one FAILs. **The pre-pass**
+  (136 targets in 74 min 45 s, an isolated copy proved equal to the tree) read `check_de` 561 / 0 / 0, every target at its
+  predicted reading. **The acceptance run in the repository** (136 targets, 17:30:36 to 18:45:27) read `check_de` 561 / 17:
+  **the designer's game was opened at 18:18:33** (`ps`, a Godot without `--headless`, open until 08:41 the next morning), and
+  **the seventeen are the gates that read the player's files across their own run and ran after that moment** — nineteen FAIL
+  lines, every one *user://run_save.bin* or *user://profile.json* changed under the gate; `check_gn`, the last gate before
+  the window, green. Every other target read its pre-pass reading but two counts that move with a draw inside their bands
+  (`test_batch_an` 6052, `test_batch_bk` 130) — the two sanctioned reds at their counts and HU's FAIL text, the run harness
+  PASS 22 / 382 / 8, no Parse Error, SCRIPT ERROR, TIMED OUT or NO VERDICT line. **The seventeen re-run with the game closed**
+  (08:41:30 to 09:06:58, `ps` read every 15 s, no window) **read each its pre-pass reading, 0 failures, no throw.** **The tree
+  was frozen and byte-identical from before the acceptance run to after the re-run (511 files)**; the player's `relics.json`
+  and `settings.cfg` were untouched throughout, and `profile.json` and `run_save.bin` were written by the designer's play
+  (last at 22:44 and 22:47) and are byte-identical across the re-run, so no gate writes them. Only this block's verification
+  lines and `docs/reports/HV.md` moved after it; this file's two readers (`check_es`, `check_hp`) and the document
+  instruments read their rows on the final tree.
+- **`CLAUDE.md` IS 444,016 B = 433.61 KiB, WITH 36.39 KiB UNDER ITS 470 KiB CEILING** (+1,129 B at HV, measured after this
+  batch's own writing): **about 4.5 batches at the record, EZ's +8,293 B, and 7.4 at the nine-batch mean of +5,005 B** (HL–HU).
+  **The shape recon is run (§3); what to do about the shape is the designer's.**
 - **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in a build
   older than HL**: HL's ceiling refuses a newer save from HL's build on — HR's v15 is the first bump it has guarded — and HJ's and
   HK's builds, and `main`, carry no ceiling.
-- **Next letter: HV.**
+- **Next letter: HW.**
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### HU's RULINGS OWED — **FOUR, ALL PLAYER-VISIBLE; HT's 2 AND 7 ARE STILL OWED, BELOW**
+### HV's RULINGS OWED — **FOUR; HT's 2 AND 7 ARE STILL OWED, BELOW**
 
-Full working: `docs/reports/HU.md`, NEEDS A RULING.
+Full working: `docs/reports/HV.md`, NEEDS A RULING.
+
+1. **THE SHAPE (§3f).** HN §1's question, answered: an index plus SUBJECTS does not beat one file; an index plus BLOCKS does, on
+   the read — 229–297 KiB a batch against 433, with GY's settled questions and the eleven most-needed blocks kept in the
+   required read — and both past splits say a reference is held by its checks, not by being opened. **Recommended, in order**:
+   (a) the checks for the two references that exist — residency both ways, a case-insensitive duplicate check across the rule
+   files, a check that a reference's subject is not written back, a scheduled sweep of their claims; (b) a pilot: the nine
+   coldest whole units, 13,474 B, out under index rows that name their triggers; (c) re-measure, then rule on the index. **Or**
+   a fourth re-derivation: 510 KiB, 76.39 KiB of room, 9.4–15.6 batches, the read growing with it — HN ruled it is not the
+   answer. **The timing**: 4.5–7.4 batches of room today, and the pilot adds 1.6–2.7.
+2. **FROSTBIND'S COPY (§2c).** The rule names a Frostbind bookkeeping — a binding, every effect read through its partner — and
+   the brief routed it as the hold's shape. **Route it**, choosing which body a copied end binds to: its original's partner (one
+   way; a third body on a two-body chain) or the two copies to each other (a second chain; the Carrion rune and a board with one
+   free body each need a rule); **or refuse it**, one condition, the rule's own answer. Today it is still carried as a chip with
+   no partner, which counts for every breadth reader.
+3. **THE COVENANT HALF OF THE RUIN ROUTE (§2c).** Routed through `_gain_ruin`, a copied stack is a stack Covenant of Ash sees:
+   one stack laid beside a bearer raises it 3 where it raised it 1, and 5 where 2 with Carrion (a board +9 where +6). Every hop
+   is a card's own text, and the chain is bounded. Keep it, or narrow the route to the arming alone.
+4. **THE WORDS, PROPOSED (§2e, §1b)**: Downwind's card (*A snare and Vendetta's lock are never / copied.*), its chip (*A snare /
+   and Vendetta's lock are never copied.*) and its cast's line (*(never a snare, nor Vendetta's lock)*); and the nine new tags —
+   any can be re-picked, the gate holds the property.
+
+### FOUND AT HV AND NOT FIXED
+
+- **OPEN LINE OWES AN `ENGINE_READ` ROW (the Stances).** It requires Guard Change, which only the Stances bring since HL §1, and
+  HC §2's clause makes such a rune a row; `check_gv` still sorts it HALF. Worn with the Stances unslotted it pays nothing and says
+  nothing, and a queued cache can hand it over without Guard Change. HL had the rune-scope block open and missed the clause.
+- **`Run.rune_choice` NEVER ASKS `Runes.is_refused`** (FD §1's re-ask at a queued offer's answer; HR withheld a refused rune at
+  the roll only). Reachable only by a saved queued offer of a now-refused rune.
+- **A COPIED ELEMENTAL WEAKNESS SKIPS ITS DOOR'S LAST STEP**: `_apply_elem_weak` rewrites the chip to the value, the copy wears
+  the table's *EW* and pays the same — display only, the hold's shape a fourth time, one line to route.
+- **STALE LINES IN `CLAUDE.md`**: the rune-scope block's *(the block THE PARTY SCOPE, AND THE TWO RUNES IT HOLDS below); two
+  entries carry it* (five carry the scope since HP); the drop block's *HO's rule that one choice is never two things* (HL §1's);
+  the governor table's Ruin *never clears* (the live Open Wound rune decays it a stack a turn); the no-engine block's kit list
+  omits Pommel Strike's Stun. **And in `docs/combat-rules.md`** (§3e's audit): the crit block's *twelve statements, carrying
+  thirteen terms* (fourteen since HB's pity meter), the charges block's *single-target* premise (Seeking Missiles since HF),
+  the header's *byte-identical* (HU edited CR §1), HU's own *as every other caller does* (Frostbind's mate forwards `force`), the
+  clamp list and the six banks one site short each, and the BURN MAGNITUDE line (HR's, carried).
+- **AN ATTRIBUTION FRAME LEFT STANDING CAN SILENCE A TEAMMATE'S DAMAGE (constructed from the source, not driven)**: five
+  callbacks set the frame inside `take_hit` and never restore it (`_on_rite_return`, `_on_vow_share`, `_on_bloodbond_guard`,
+  `_on_brunt_guard`, `_on_blight_heal`), and since HF the frame decides damage (`_deal_gate`, Vow of Silence) — a Cleric wearing the
+  vow with Rite of Return out could leave the frame on himself and zero a teammate's Tripwire or Consecrated Ground reflect.
+- **`docs/state.md` IS LARGER THAN `CLAUDE.md` AND HAS NO STATED CEILING**: 454,777 B at HU's close against 442,887 — grown
+  153,742 B since GR against the rules file's 116,697 B over the same thirty commits — with 21 sections whose headings are struck
+  (30,608 B) and 53 headed *FOUND AT …* back to DM (130,660 B); the closed ones are history its own preamble says it must not
+  hold (`docs/reports/HV.md` §3f). Outside the brief, and the designer's.
+- **THE BRIEF'S §0.1 PREMISE WAS HALF SO**: *Sb* is closed by Slow Burn's *SB* once case is set aside, but *Sc* is Succession's own
+  tag. **Its §6 premise was not so**: the player's four files are byte-identical to HU's backup — nobody has played since HU.
+  **Its §3 premise was half so**: the instrument seam was taken at EF §2 and FF moved its residue.
+- **`run_battery.sh` STILL DOES NOT ASK WHETHER THE GAME IS OPEN, AND A PLAIN `kill` STILL DOES NOT STOP IT** (HT's two, carried).
+
+### ~~HU's RULINGS OWED~~ — **ALL FOUR ANSWERED IN HV's BRIEF: TWO CONFIRMED AS BUILT (1 THE FOURTEEN TAGS, 2 THE PAGER), TWO RULED AND BUILT AT HV (3 DOWNWIND — §2; 4 THE NINE CASE-ONLY TAGS — §1)**
+
+Kept below as HU recorded them.
 
 1. **THE FOURTEEN NEW CHIP TAGS, PROPOSED** (HU §4): Frostbind *Bn*, Blighted *Bg*, Cripple *Cr*, Faith *Fa*+count, Blood
    Price *Pr*, Covering Guard *Cv*, Caught Fast *Ct*, Retaliation *Rt*, Rallied *Rl*, Spirit Bond *Si*, Scent of Blood *So*,
@@ -145,7 +187,8 @@ its line there.
   value, and `check_hu` §4a leaves chips that lead with a sign out of the tag rule.
 - **THE DESIGNER'S SAVE IS A DEBUG-TOUCHED RUN** (`debug_used` true): an Arcanist on Resonance alone, a spine Warrior on Momentum,
   a spine Cleric on Sanctity and a Beastmaster, at the first node of zone one. Not a defect.
-- **`check_hu` §1f THROWS ON A GAME WITHOUT THE PAGER**: its last arm casts the battle node's `_bar_page` to a Dictionary
+- ~~**`check_hu` §1f THROWS ON A GAME WITHOUT THE PAGER**~~ — **FIXED AT HV §4** (and a second throw in the same gate's §1e,
+  found by HV's control, with it): its last arm casts the battle node's `_bar_page` to a Dictionary
   (`check_hu.gd:521`), and HEAD's node has none, so on HEAD's game the arm throws where it should fail — 102 checks against the
   tree's 103. It cannot happen on this game, and a regression that removed the variable still reads red, loudly (a SCRIPT ERROR,
   and a count fall `check_de` reds). The repair is one line — read the member, then assert it is a Dictionary — and was not
@@ -204,16 +247,19 @@ Full working: `docs/reports/HT.md`, NEEDS A RULING.
   meet badly — a re-applied Poison SETS its clock (it can shorten, and ends a permanent Long Poison), a fresh Poison skips its
   first tick, a purge takes Bleed's chip and leaves its meter (Cull and Harvest paid for a bleed that stays), a Downwind copy of
   Ruin can skip a detonation, a primed body emptied of Ruin still detonates, Downwind's bare copies (a partner-less Frostbind, a
-  poison without `_apply_poison`'s stamps, a second permanent taunt off Vendetta, a second spring off Snare Trap — **classed at HU
-  §3c, not fixed**; HU's ruling 3), Frostbind's partner found by name, ~~two shared chip tags~~ (**re-tagged at HU §4**, with eleven
+  poison without `_apply_poison`'s stamps, a second permanent taunt off Vendetta, a second spring off Snare Trap — **ruled at
+  HV §2: the snare and Vendetta's lock are not carried, the Ruin stack and the poison take their route, the Frostbind is owed a
+  ruling**), Frostbind's partner found by name, ~~two shared chip tags~~ (**re-tagged at HU §4**, with eleven
   more the sweep found); stale text — Ruin's row
   and chip under the Open Wound and Deepening Hex runes, the primer's *next acts*, Poison's *3 nature damage per stack* and
   *refresh*, Rime's *every stack*, `VENDETTA_CUT` read by nothing, comments on the dormant Whole Room, on Bewitch's Daze, on
   Lingering Torment and on deleted talent nodes; twenty-odd dormant appliers and six dead branches, listed there.
 - ~~**HT's OWN ISOLATED COPIES LEFT USER-DATA FOLDERS**~~ — **CLEARED AT HU** (the WHERE block), by the *"Dawn of Decay HT "*
   prefix.
-- **HU's OWN ISOLATED COPIES LEFT USER-DATA FOLDERS**, every one named *"Dawn of Decay HU …"* — `docs/reports/HU.md` §7 counts
-  them. HV clears them by that prefix (HO §5's rule).
+- ~~**HU's OWN ISOLATED COPIES LEFT USER-DATA FOLDERS**~~ — **CLEARED AT HV** (the WHERE block), by the *"Dawn of Decay HU "*
+  prefix.
+- **HV's OWN ISOLATED COPIES LEFT USER-DATA FOLDERS**, every one named *"Dawn of Decay HV …"* — `docs/reports/HV.md` §7 counts
+  them. HW clears them by that prefix (HO §5's rule).
 
 ### ~~HS's RULINGS OWED~~ — **ALL SIX ANSWERED IN HT's BRIEF AND TAKEN AT HT §1: FOUR CONFIRMED (1, 2, 3, 5), TWO BUILT (4 — THE RITE AT THE CHILL DOOR; 6 — DEGREE ON SCREEN)**
 
@@ -463,11 +509,11 @@ game — HO caught one. `CLAUDE.md`'s rule-engine block carries the same marker.
 - ~~**461 ISOLATED USER-DATA FOLDERS REMAIN**~~ — carried forward under HO's, above; HN's own eighteen were cleared at
   HO §5.
 
-### THE SHAPE RECON ON `CLAUDE.md` — **QUEUED BY RULING AT HN §1, NOT RUN**
+### THE SHAPE RECON ON `CLAUDE.md` — **QUEUED BY RULING AT HN §1, RUN AT HV §3; WHAT TO DO ABOUT THE SHAPE IS THE DESIGNER'S (HV's RULING 1)**
 
-The question it asks: **whether an index plus subjects read on demand beats one file with a moving ceiling.** It is
-not GY's reasoning split, which stays rejected. It is owed before the file reaches 470 KiB — the live headroom and the
-rates are in the WHERE block above.
+The question it asked: **whether an index plus subjects read on demand beats one file with a moving ceiling.** It is not GY's
+reasoning split, which stays rejected. The figures, the two natural experiments and the recommendation are in
+`docs/reports/HV.md` §3; the ruling is the first of HV's, above. The live headroom is in the WHERE block.
 
 ### TO WATCH IN PLAY — **RULED AT HN §2; EACH IS ONE CONSTANT OR ONE LINE IF IT READS WRONG**
 

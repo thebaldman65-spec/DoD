@@ -306,7 +306,10 @@ than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's
     swept for; the sweep found eleven more shared tags (Slow Burn's `SB` three ways), and the
     rarer status of each moved — fourteen re-tagged in all.** `check_hu` §4a
     walks every tag and every counter; **not `BD`** (Break damage's shorthand, CG §3) **and not
-    `Ru`** (Rupture's).
+    `Ru`** (Rupture's). **AND CASE DOES NOT TELL TWO TAGS APART (HV §1, ruled by the designer)**: a
+    chip is read at a glance on a small sprite, not parsed — Snare Line's `SL` beside Slowed's `Sl`,
+    both a Hunter's and both on one enemy, decided it — so §4a's walk sets case aside, and the rarer
+    of nine such pairs moved.
   · **`\n` IS LOAD-BEARING IN TOOLTIPS AND MUST NOT BE STRIPPED THERE.** Nothing overrides
     `make_custom_tooltip`, so Godot's default tooltip does NOT autowrap — strip the breaks and a
     322-char description renders ~2000px wide. The no-`\n` rule applies TO `passive_desc` where it
@@ -415,8 +418,9 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
   · **THIS IS THE CEILING'S THIRD RE-DERIVATION, AND A FOURTH IS NOT THE ANSWER (ruled by the
     designer at HN §1).** The ceiling exists because **every batch pays the full read**, so a
     ceiling that only ever rises is measuring nothing. **The next move at this ceiling is a recon
-    on the file's SHAPE, queued in `docs/state.md` and not run at HN**: whether an index plus
-    subjects read on demand beats one file with a moving ceiling. **GY's rejection of splitting the
+    on the file's SHAPE, queued at HN and run at HV** (`docs/reports/HV.md` §3; what it recommends is
+    the designer's to rule): whether an index plus subjects read on demand beats one file with a
+    moving ceiling. **GY's rejection of splitting the
     reasoning out (below) stands, and it is not the seam that recon reconsiders.**
   · **THE RECORD THE HEADROOM TERM READS DID NOT MOVE AT GY OR AT HN, AND BOTH TIMES THAT WAS
     MEASURED RATHER THAN ASSUMED.** Over EE's own window — the 105 batches from DK to HL — the
@@ -4555,7 +4559,14 @@ exactly the inverted card, and it would still read fine on the tooltip.
     still on the timeline, with no limit, no charge and no release, and with the Carrion rune on every other enemy. **The copy
     is an ordinary timed freeze** (`battle.ORDINARY_FREEZE_TURNS`, the one length `_freeze_turns` gives a freeze that is not a
     hold), **chosen over leaving Frozen alone** because the card promises every affliction an ally applies; **the hold stays
-    Glacial Hold's alone.** Downwind's other bare copies are classed in `docs/reports/HU.md` §3c and are not fixed.
+    Glacial Hold's alone.**
+  · **AND NEVER A CARD'S OWN BOOKKEEPING (HV §2, ruled by the designer).** *Downwind copies an affliction. It does not
+    copy a status that is a card's own bookkeeping — a binding, a slot, a counter the card reads*: a copy would be a second
+    instance of a thing the card counts. **Vendetta's lock and Snare Trap's snare are laid with the carry held off**
+    (`battle._carry_withheld`; a card that lays its own bookkeeping through the door holds it too), and **a copy that
+    skipped its original's route now takes it** — a Ruin stack through `_gain_ruin` (it primes; a Covenant takes its
+    share), a poison with `_apply_poison`'s stamps. **The rule names a third, Frostbind — a binding the brief routed — and
+    what a copied end binds to is owed a ruling** (`docs/state.md`); it is still carried as a chip with no partner.
 
 **THIS IS THE RULE POOLS ARE AUTHORED AGAINST NOW, INSTEAD OF BY FEEL.** DQ measured the
 Swordmaster at ten cards making FOUR decisions — a player who had drafted four had seen everything

@@ -16,6 +16,64 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-07 &mdash; Batch HV: NINE TAGS, DOWNWIND'S RULE, AND THE SHAPE RECON</h2>
+<p><b>Nine more status chips wear tags of their own: two tags that differ only in capital letters now count as the same tag,
+because a chip is glanced at, not read. A Hunter's Downwind no longer copies a snare or Vendetta's lock &mdash; things a card
+keeps count of &mdash; and its copy of a Ruin stack or a Poison now behaves like the original. And the rules file was measured
+for the first time against what batches actually read from it.</b> Full working: <code>docs/reports/HV.md</code>.</p>
+
+<p><b>&sect;1 &mdash; NINE CASE-ONLY TAGS MOVE.</b> Snare Line's <i>SL</i> beside Slowed's <i>Sl</i> &mdash; both a Hunter's, both on
+an enemy, both able to sit on one body at once &mdash; was the pair that decided it: <b>a case-only difference is a collision</b>.
+The sweep at the new rule found exactly the nine pairs HU had listed and no tenth. The rarer status of each moved, so the chips a
+player reads most stay as learned: <b>Bulwark Line <i>Bu</i>, Snare Line <i>Ln</i>, Stalking Horse <i>Hs</i>, Threshold <i>Lk</i>,
+Downwind <i>Wd</i>, Discipline <i>Ds</i>, Bestial Wrath <i>Wr</i>, Bear the Brunt <i>Be</i>, Feigned Guard <i>Fe</i></b> (two of
+them, Bulwark Line and Discipline, show a value on the chip, so their tag is rarely seen). The check that watches the tags now sets
+case aside; it holds the rule, not the letters, so any of the nine can be re-picked.</p>
+
+<p><b>&sect;2 &mdash; DOWNWIND CARRIES AFFLICTIONS, NOT A CARD'S OWN BOOKKEEPING.</b> The designer's rule: <i>Downwind copies an
+affliction; it does not copy a status that is a card's own bookkeeping &mdash; a binding, a slot, a counter the card reads.</i>
+<b>A Snare Trap's snare is no longer copied</b> &mdash; a copy held one of the Hunter's trap slots and could stop him laying his next
+trap &mdash; and <b>Vendetta's lock is no longer copied</b>: it binds the one enemy it was sworn on for the fight, and a copy was a
+second. A Mocking Blow's ordinary taunt is still copied, and so is the Poison a snare lays when it springs. <b>A copied Ruin stack
+now arrives the way a Ruin stack is meant to</b>, so a copy that brings an enemy to the threshold primes its detonation &mdash; and a
+Covenant of Ash takes its share of the copy, as of any stack. <b>A copied Poison keeps what its original was given</b>, so a poison
+that cannot be cleansed is copied as one that cannot be cleansed. <b>A copied Frostbind is not changed yet</b>: which enemy a
+copied chain binds to is the designer's to choose. Downwind's card, chip and log line now say what the wind leaves alone.</p>
+
+<p><b>&sect;3 &mdash; THE SHAPE RECON.</b> The rules file was measured, for the first time, against what batches
+actually read from it. Over the last nine batches a batch needed about 30% of the file &mdash; 37% counting the rules it obeyed
+without naming them &mdash; but a thin slice of nearly every subject, so that across the nine almost four fifths of the file was
+needed by one of them. <b>Splitting it by subject would save almost nothing</b>; an index of single rules, with the settled
+questions and the most-used rules kept in the part every batch reads, would cut the read by about 38%. The two earlier splits
+were re-read from the day each was taken: <b>both held their substance and both rotted in their prose</b>, at about the rate the
+main file rots, and what protected either was a mechanical check &mdash; never a batch opening the file. <b>Recommended, and the
+designer's to rule</b>: build those checks for the two reference files that exist, then move out as a pilot the nine rules no
+recent batch needed, then decide on the index once the pilot has been measured. Raising the ceiling a fourth time is priced at
+510 KiB. Nothing was moved or split, and the ceiling did not move.</p>
+
+<p><b>&sect;4 &mdash; A CHECK THAT THREW NOW FAILS.</b> One line of HU's new check read the battle's page memory in a way that
+crashed, instead of failing, on a game without it; it reads the memory first now, so a game that loses it fails loudly there.</p>
+
+<p><b>&sect;5 &mdash; DELIBERATELY NOT DONE.</b> The rules file is not split and its ceiling does not move &mdash; its shape is the
+designer's. No conjunction is authored and Rupture's number stays. The six cards whose text and code disagree, the Occultist's
+missing Break card, the Skirmisher and the Tracker, Channel's tempo payout, whether a fallen hero stays down, and Tithe all stay as
+they were; no rune is authored and the crest is one slot.</p>
+
+<p><b>The checks that moved, and why.</b> The saves were copied first and checked byte for byte against HU's copy:
+nothing had moved, so nobody has played since HU. Every existing check was then run as it stood against this batch's game,
+with the documents as HU left them &mdash; 135 targets, in 75 minutes &mdash; and read as HU's own final run did, but for one
+count that varies inside its band by design: nothing this batch changed was asked by an old check. <code>check_hu</code> reads
+104 checks where it read 103 &mdash; the line that crashed is two now &mdash; and its walk over the chip tags sets case aside
+with no new arm: it holds the rule, not the letters, so any of the nine tags can be re-picked. <b>One check is new</b>:
+<code>check_hv</code> lays every affliction Downwind should carry and reads it on a second enemy, drives Vendetta's lock and the
+snare with the Carrion rune and without, lays the Hunter's next trap after his snare is spent, routes a copied Poison and a
+copied Ruin stack both ways, and reads the card, the chip and the log. <b>Twenty-one controls</b>, one defect each, were read by
+what each printed: every one went red on the line it aimed at, and the two built to stay green &mdash; a tag re-picked, the Ruin
+threshold moved &mdash; stayed green. One of them found a second crash in <code>check_hu</code>, the same shape as the first,
+and that line now skips a status the game cannot lay. Run against the game as HU left it, the new check went red at seventeen
+of the things this batch changed, and the old <code>check_hu</code> could not see two tags that differ only in case. Two rows
+of the count table move and one is new. The full rehearsal run and the run in the repository are in the report.</p>
+
 <h2>2026-10-06 &mdash; Batch HU: THE BAR PAGES, DOWNWIND IS BOUNDED, AND DID HT ACTUALLY LAND</h2>
 <p><b>The battle's Abilities list pages instead of running off the top of the screen. A Hunter's Downwind no longer copies a
 Cryomancer's prison as a freeze that never ends, or a Perfect Pommel Strike's stun onto a boss that should resist it. Fourteen

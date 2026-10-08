@@ -4,6 +4,35 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Nine tags, Downwind's rule, and the shape recon (Batch HV) — 2026-10-07
+
+**Why a case-only difference is a collision.** A chip is read at a glance on a small sprite, not parsed. Snare Line's `SL`
+and Slowed's `Sl` are both a Hunter's, both sit on an enemy, and can sit on the same body at once — a player told the two
+apart by the case of one letter is a player asked to read where the chip exists to be glanced at. So the rule HU wrote,
+that a status's tag is its own, now sets case aside, and nine pairs that differed only in case each lost one member. The
+rarer of each moved, HU's rule, so the chips a player reads most stay as learned; two pairs were level on every measure
+there is and the newer card moved, because the older chip is the one that has had longer to be learned.
+
+**Why Downwind leaves a card's own bookkeeping alone.** The card copies an affliction: something done to an enemy. A snare
+is not only a thing done to an enemy — it is one of the Hunter's trap slots, and a copy that carried his seat counted
+against the slot and could refuse his next trap. Vendetta's lock is not only a taunt — it is the one enemy the Warden is
+sworn to for the fight, and a copy was a second. In both cases the copy made a second instance of something the card
+counts, which no card ever meant. The rule is written as a rule rather than as two exceptions, because the next card that
+keeps its own count on a status would otherwise be found the same way these two were: by a player losing something.
+
+**Why a copy that skipped its original's route takes it, rather than being refused.** A copied Ruin stack that landed a
+body on the threshold armed nothing, so the detonation it should have caused never came; a copied poison of one that could
+not be cleansed could be. Both were the copy skipping the door the original came through, and both were against the player.
+Refusing the copy would have fixed the defect by deleting the card's promise; routing it keeps the promise and makes the
+copy a real one. A real Ruin stack is seen by Covenant of Ash too, which is that card's own rule applied to a stack it could
+not see before.
+
+**Why Frostbind waits.** A Frostbind is a binding — two bodies on one chain, every effect of it read through the partner —
+so the rule itself names it, though the brief asked for it to be routed. Routing a one-body copy of a two-body status means
+deciding which body the copy is chained to, and every answer authors something the card does not say: a third body on a
+two-body chain, or a second chain whose pairing the Carrion rune has no rule for. That is the designer's choice, so the copy
+stays the chip it was until it is made.
+
 ## The bar pages, Downwind is bounded, and every route a chill or a burn takes (Batch HU) — 2026-10-06
 
 **Why the Abilities list pages instead of scrolling.** The list is a column of discrete buttons, and a scroller puts a card

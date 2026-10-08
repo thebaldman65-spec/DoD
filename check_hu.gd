@@ -23,7 +23,8 @@
 #       a Perfect Pommel Strike still stuns its own unbroken boss, and the copy does not —
 #       and a Broken boss takes the copy, so the copy still carries the stun.
 #   §4  EVERY STATUS'S CHIP IS ITS OWN: no two statuses share a tag's letters, a counter's
-#       included (Bleed's Bl<n>, Chilled's C<n>, Faith's Fa<n>) — Frostbite and Frostbind,
+#       included (Bleed's Bl<n>, Chilled's C<n>, Faith's Fa<n>), and since HV §1 case does not
+#       tell two apart — Frostbite and Frostbind,
 #       Blighted and Bleed by name. And BROKEN IS NOT A DEBUFF *Mitigation per Debuff You
 #       Carry* COUNTS (ruled), matching the breadth count.
 #   §5  The ruling recorded where the rules live: a meter state is not a conjunction half.
@@ -518,8 +519,14 @@ func _s1_the_bar_pages() -> void:
 			ok(got.size() == 1 and got[0] == want,
 				"§1f: with page two showing, key %s handed over %s — want its own slot's %s" % [
 					s._hotkey_name(k_idx), str(got.map(func(x): return x.display_name)), want.display_name])
-			ok(int((s.get("_bar_page") as Dictionary).get(kh, -1)) == 1,
-				"§1f: the key turned the list off page two")
+			# BATCH HV §4 — READ THE MEMBER, THEN ASSERT IT. Cast straight to a Dictionary, a battle
+			# node without the page memory threw here where it should fail (HU §6d: HEAD's game read
+			# 102 checks and a SCRIPT ERROR); read first, it FAILS, loudly, and the count holds.
+			var k_page = s.get("_bar_page")
+			ok(k_page is Dictionary,
+				"§1f: the battle node keeps no page memory — `_bar_page` reads %s, not a Dictionary" % str(k_page))
+			ok(k_page is Dictionary and int((k_page as Dictionary).get(kh, -1)) == 1,
+				"§1f: the key turned the list off page two (the page memory reads %s)" % str(k_page))
 			print("    the keyboard: with page two showing, %s handed over %s, its own slot; the list stayed on page two" % [
 				s._hotkey_name(k_idx), want.display_name])
 			if not (s.get("_kb_pool") as Array).is_empty():
@@ -664,6 +671,11 @@ func _a_refused_paged_card(s: Node) -> Dictionary:
 			var wrote := false
 			for t in s._recast_targets(u, ab):
 				for wr in s._recast_writes(u, ab, t):
+					# BATCH HV §4 — A WRITE THE STATUS DOOR CANNOT LAY IS SKIPPED, NEVER THROWN ON. A chip with
+					# no table row (Anointed's) is laid by its own card; on a board whose pager has failed this
+					# walk reaches it, and the arm must fail on the page, not throw on the saturation.
+					if not (s.STATUS_INFO as Dictionary).has(String(wr["id"])):
+						continue
 					s._apply_status(t, String(wr["id"]), int(wr["turns"]), int(wr["power"]), 0, u)
 					wrote = true
 			if not wrote or not bool(s._recast_refused(u, ab)):
@@ -1025,19 +1037,28 @@ func _s4_chips_and_broken() -> void:
 		for st2 in counters[sid2]:
 			if not (letters[sid2] as Array).has(st2):
 				letters[sid2].append(st2)
+	# BATCH HV §1 — CASE DOES NOT TELL TWO TAGS APART (ruled by the designer): a chip is read at a
+	# glance on a small sprite, not parsed, so two statuses whose letters differ only in case wear
+	# one tag. The letters are keyed lowercased; each owner is named with the tag it wears.
 	var owners := {}
+	var exact := {}
 	for sid3 in letters:
 		for st3 in letters[sid3]:
-			if not owners.has(st3):
-				owners[st3] = []
-			if not (owners[st3] as Array).has(sid3):
-				owners[st3].append(sid3)
+			exact[st3] = true
+			var key3 := String(st3).to_lower()
+			if not owners.has(key3):
+				owners[key3] = []
+			if not (owners[key3] as Array).has("%s=%s" % [sid3, st3]):
+				owners[key3].append("%s=%s" % [sid3, st3])
 	var shared: Array = []
 	for st4 in owners:
-		if (owners[st4] as Array).size() > 1:
+		var who := {}
+		for e4 in owners[st4]:
+			who[String(e4).get_slice("=", 0)] = true
+		if who.size() > 1:
 			shared.append("%s: %s" % [st4, str(owners[st4])])
-	print("    CHECKED %d tags over %d statuses; %d statuses write a chip by hand: %s" % [owners.size(), letters.size(),
-		counters.size(), str(counters.keys())])
+	print("    CHECKED %d tags (%d once case is set aside) over %d statuses; %d statuses write a chip by hand: %s" % [
+		exact.size(), owners.size(), letters.size(), counters.size(), str(counters.keys())])
 	ok(letters.size() >= 150, "§4a: the tag walk read %d statuses" % letters.size())
 	ok(counters.size() >= 20 and counters.has("bleed") and counters.has("chilled") and counters.has("faith")
 			and counters.has("anointed"),
@@ -1047,12 +1068,15 @@ func _s4_chips_and_broken() -> void:
 		"§4a: Frostbite and Frostbind wear one tag")
 	ok(not (counters.get("bleed", []) as Array).has(_stem(String(info["blight"][1]))),
 		"§4a: Blighted's tag is Bleed's counter's letters")
+	# The re-tagged: HU's fourteen and HV's nine (the rarer of each pair that differed only in case).
 	var fresh: Array = ["frostbind", "blight", "cripple", "faith", "blood_price", "covering_guard", "caught",
-		"retaliate", "rally_heal", "spirit_heal", "scent", "unslaked", "anvil", "deathwish"]
+		"retaliate", "rally_heal", "spirit_heal", "scent", "unslaked", "anvil", "deathwish",
+		"bear_brunt", "bulwark_line", "bestial", "discipline", "downwind", "feigned_guard", "stalking_horse",
+		"snare_line", "threshold_lock"]
 	var reserved := ""
 	for sid5 in fresh:
 		var t5 := String(info[sid5][1])
-		if t5.begins_with("BD") or t5 == "Ru":
+		if t5.to_upper().begins_with("BD") or t5.to_lower() == "ru":
 			reserved += "%s=%s " % [sid5, t5]
 	ok(reserved == "", "§4a: a moved tag took Break damage's or Rupture's: %s" % reserved)
 	# §4b — Broken is not a debuff the talent counts. A Warden holding the node, Broken.
