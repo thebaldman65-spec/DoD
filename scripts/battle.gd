@@ -899,7 +899,7 @@ const WHEELING_EDGE_PCT := 20     # damage DEALT, from the Defensive branch
 const WHEELING_GRANT_TURNS := 3   # both of them, and the card says so
 const LUNGE_DEPTH_BD := 15        # AGGRESSIVE: extra Break into the one target
 const LUNGE_BREADTH_BD := 12      # DEFENSIVE: Break to every OTHER enemy
-const COUNTER_TIME_TURNS := 2     # the stolen turns — Pommel Strike's is ONE
+const COUNTER_TIME_TURNS := 2     # the stun's applied length; it costs ONE turn, as Pommel Strike's does (HW §3)
 # BATCH HL §3 — Formless holds BOTH stances' upsides by its own definition, so its
 # dealt term follows the Aggressive upside the designer ruled to +30%:
 # `1.0 + BattleUnit.SEASONED_AGG_DEALT`, written out because a constant here does
@@ -1973,6 +1973,8 @@ func _spawn_units() -> void:
 		# a conditional one that a later seal path could forget.
 		eu.glass_cb = _on_glass_shatter
 		enemies.append(eu)
+	# BATCH HW §1d — the warband stands where the layout put it: fit each one's click zone.
+	_fit_enemy_target_zones(enemies)
 
 	_apply_battle_modifier()
 	_stamp_fk_enemy_runes()
@@ -2000,6 +2002,58 @@ func _spawn_units() -> void:
 	# resumed with a hero down opens paying what the spawn's reading paid (HO §3c's
 	# state), and the lay-down itself is the opening rather than a switch.
 	_open_live_payloads()
+
+
+# ══ BATCH HW §1d — AN ENEMY'S CLICK ZONE IS ITS OWN BODY, AND NO TWO OVERLAP ═══
+#
+# **WHAT OVERLAPPED.** Every unit's zone was a fixed 140x220 box centred on it
+# (`unit._build_target_zone`), while `ENEMY_LAYOUTS` sets neighbours 80 apart across
+# and 45-70 apart down — so in every warband of two or more the boxes overlapped (60x150
+# between diagonal neighbours of four), and a hover lit whichever box sat on top, not
+# the body under the cursor. The bodies themselves, 66-105 px wide at idle, mostly do
+# not touch. **SO THE ZONE IS THE BODY**: the idle frame's opaque pixels
+# (`unit.idle_body_rect`) grown by `TARGET_ZONE_MARGIN`, and where two still meet the
+# overlap is split between them at its middle, across its thinner side. A zone only
+# ever shrinks, so no pair split here can be made to overlap again by a later one.
+# Enemies only: they are placed once, here, and never move home. A hero's zone and a
+# companion's are unchanged (`docs/state.md` carries that they overlap the same way).
+const TARGET_ZONE_MARGIN := 8.0
+
+
+func _fit_enemy_target_zones(units: Array) -> void:
+	var zones: Array = []
+	for e in units:
+		var body: Rect2 = (e as BattleUnit).idle_body_rect().grow(TARGET_ZONE_MARGIN)
+		zones.append(Rect2(body.position + (e as BattleUnit).position, body.size))
+	for i in zones.size():
+		for j in range(i + 1, zones.size()):
+			var a: Rect2 = zones[i]
+			var b: Rect2 = zones[j]
+			var ov := a.intersection(b)
+			if not ov.has_area():
+				continue
+			if ov.size.x <= ov.size.y:
+				var mid_x := ov.position.x + ov.size.x / 2.0
+				if a.get_center().x <= b.get_center().x:
+					a = Rect2(a.position, Vector2(mid_x - a.position.x, a.size.y))
+					b = Rect2(Vector2(mid_x, b.position.y), Vector2(b.end.x - mid_x, b.size.y))
+				else:
+					b = Rect2(b.position, Vector2(mid_x - b.position.x, b.size.y))
+					a = Rect2(Vector2(mid_x, a.position.y), Vector2(a.end.x - mid_x, a.size.y))
+			else:
+				var mid_y := ov.position.y + ov.size.y / 2.0
+				if a.get_center().y <= b.get_center().y:
+					a = Rect2(a.position, Vector2(a.size.x, mid_y - a.position.y))
+					b = Rect2(Vector2(b.position.x, mid_y), Vector2(b.size.x, b.end.y - mid_y))
+				else:
+					b = Rect2(b.position, Vector2(b.size.x, mid_y - b.position.y))
+					a = Rect2(Vector2(a.position.x, mid_y), Vector2(a.size.x, a.end.y - mid_y))
+			zones[i] = a
+			zones[j] = b
+	for k in units.size():
+		var u: BattleUnit = units[k]
+		var z: Rect2 = zones[k]
+		u.set_target_zone(Rect2(z.position - u.position, z.size))
 
 
 # ══ BATCH FK — THE THREE STAMPED RUNES, WRITTEN ONTO THE ENEMY SIDE ════════
@@ -2915,7 +2969,10 @@ func _dot_pass(u: BattleUnit) -> void:
 				_cocktail_tick(u)
 			# Tick strength was snapshotted from the applier's Attack.
 			var dot_dmg: int = int(u.get_status(dot_id).get("tick", 0))
-			if dot_dmg <= 0:
+			# BATCH HW §3 — A ZERO THAT IS MEANT READS AS ZERO: only a tick never given
+			# falls back to the legacy figure. Thin Blood's price is the meant zero
+			# (`zero_tick`, stamped at the status door), and it read as *no tick set* here.
+			if dot_dmg <= 0 and not bool(u.get_status(dot_id).get("zero_tick", false)):
 				dot_dmg = DOT_STATUSES[dot_id]
 			var stack_tag := ""
 			if dot_id == "poison":
@@ -3573,11 +3630,17 @@ func _run_battle() -> void:
 				# the spring's own 1 rather than stacking a second stun; and the
 				# boss refusal in `_apply_status` still stands, so an unbroken
 				# boss shrugs this off exactly as it shrugs off the spring.
+				#
+				# **BATCH HW §3 — IT BINDS NO HARDER, AND THE CARD NO LONGER SAYS IT
+				# DOES (ruled: the card goes to the code).** The turn loop strips a
+				# stun whole at the first turn it costs, so a chilled body loses the
+				# one turn any sprung body loses. The clause is KEPT and pays nothing;
+				# making a stun's length real is a system change across every stun,
+				# not a card repair. Its log line, which named two turns, is gone with
+				# the card's sentence — `SNARE_LINE_COLD_STUN` is unmoved.
 				if sl_cold and not u.dead:
 					_apply_status(u, "stunned", SNARE_LINE_COLD_STUN, 0, 0,
 						heroes[sl_idx2])
-					_log("   → the ice holds it: the line binds %s %d turns" % [
-						u.unit_name, SNARE_LINE_COLD_STUN], "#8fc8e0")
 		# BATCH BD — the placed deadfall rests and springs at one site, and that
 		# site is ITS OWN FUNCTION rather than a clause buried in this loop:
 		# `_run_battle` cannot be driven headlessly (the AR trap), so a rule with a
@@ -11964,6 +12027,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var turns: int = ab.applies_status["turns"]
 				if is_perfect and ab.perfect_id == "status_plus":
 					turns = 4
+				# BATCH HW §3 — one turn more on a Perfect (Charge's Daze: 2, and 3).
+				elif is_perfect and ab.perfect_id == "status_one_more":
+					turns += 1
 				# Cinder Trail (Batch AR): the free bolt carries more fire —
 				# and more drain. It lengthens FIREBALL'S OWN Burn now; the
 				# old "embers onto a second enemy" reading survives on the
@@ -12340,9 +12406,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# status lives on where it is CHOSEN: Rime applies it on cast.)
 			# Trapper: striking the Survivalist risks a poisoned barb.
 			# BATCH FK — TWO RUNES LAND ON THIS LINE. **THIN BLOOD** replaces the
-			# quarter chance with certainty (and pays for it in `_apply_poison`,
-			# where his Poison stops dealing damage); **THE SECOND BARB** cycles
-			# the affliction instead of always Poisoning.
+			# quarter chance with certainty (and pays for it at the status door,
+			# where his Poison stops dealing damage — HW §3: FK charged it in
+			# `_apply_poison`, which the barb below never calls, so the barb the
+			# rune buys bit in full); **THE SECOND BARB** cycles the affliction
+			# instead of always Poisoning.
 			#
 			# **THE CYCLE IS STALKING HORSE'S OWN TABLE AND ITS OWN RULE**, which
 			# is what the rune's text promises — `STALKING_HORSE_STATUSES`, so
@@ -14252,7 +14320,19 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 		hs_before = {"turns": int(hs_part.get("turns", 0)),
 			"stacks": int(hs_part.get("stacks", 1)),
 			"clock": BattleUnit.composition_turns(hs_inside)}
+	# BATCH HW §3 — THIN BLOOD'S PRICE IS CHARGED HERE, AT THE DOOR EVERY POISON PASSES (ruled: a
+	# straight bug, not a magnitude). It was charged in `_apply_poison` alone, which the barb the rune
+	# buys and Explosive Shot never reach — they lay their Poison here with a tick of their own — and
+	# where it was charged `_dot_pass` read the zero as *no tick set* and dealt the legacy figure. So
+	# every Poison he lays is laid at zero, and the entry says the zero is meant (`zero_tick`).
+	var hw_thin := id == "poison" and _thin_blood_price(src)
+	if hw_thin:
+		tick = 0
 	target.add_status(id, info[0], info[1], info[2], eff_turns, info[3], power, tick)
+	if hw_thin:
+		var hw_ps: Dictionary = target.get_status("poison")
+		if not hw_ps.is_empty():
+			hw_ps["zero_tick"] = true
 	# Batch W: the debuffer's ledger — statuses a hero lands on OTHERS
 	# (only sites that pass src are counted; the changelog owns the list).
 	# The src name also rides the status so mitigation it later performs
@@ -14833,9 +14913,10 @@ const ARCANE_ECHO_TURNS := 3
 # FIREDRAW: how many turns of Burn it pulls from EACH other enemy. It takes
 # what is there or this, WHICHEVER IS LESS — an enemy holding 2 gives 2, never
 # a debt — and the target's own Burn is never touched.
-# BATCH DH §1 — what a Snare Line spring holds a CHILLED enemy for, against
-# the spring's own 1. A named constant rather than a literal because it is a
-# MAGNITUDE a later batch may want to tune, and the card states the number.
+# BATCH DH §1 — the stun a Snare Line spring re-lays on a CHILLED enemy, against
+# the spring's own 1. **It costs the same one turn (HW §3)**: the turn loop strips
+# a stun whole at the first turn it costs, so its length is not what is lost, and
+# the card no longer states it. Unmoved — a stun's length is a system question.
 const SNARE_LINE_COLD_STUN := 2
 # BATCH DH §1 — HARVEST'S ALLY TERM. The base is 12% of Attack per status
 # reaped; this is what is ADDED when every status reaped was opened by someone
@@ -15598,6 +15679,16 @@ func _on_unit_died(u: BattleUnit) -> void:
 			var dest := _mark_destination(u)
 			if dest != null:
 				_lay_engine_mark(holder, String(mk_pid), dest)
+		# BATCH HW §3 — MARK OF THE HUNT RESETS WHEN ITS MARKED ENEMY DIES (ruled: the code goes to the card).
+		# The read stood in `_on_enemy_death`, and every caller of that reaches it after `_die()` has cleared
+		# the body, so the reset never fired. It is read here, off the body it is leaving, as the marks above
+		# are — and every death passes here, whatever dealt it.
+		if u.has_status("hunt_mark"):
+			var mk_idx := u.status_power("hunt_mark")
+			if mk_idx >= 0 and mk_idx < heroes.size() and not heroes[mk_idx].dead \
+					and heroes[mk_idx].cooldowns.get("Mark of the Hunt", 0) > 0:
+				heroes[mk_idx].cooldowns.erase("Mark of the Hunt")
+				_log("   → The hunt is rewarded: Mark of the Hunt resets", "#b0a8e0")
 		return
 	if u.is_companion:
 		return
@@ -20721,9 +20812,10 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_note_debuff_applied(attacker, "stunned")
 				_sfx("parry", -5.0, 0.7)
 				_message("%s answers before the blow lands!" % attacker.unit_name)
-				_log("%s: Counter Time — %s loses its next %d turns" % [
-					attacker.unit_name, target.unit_name, COUNTER_TIME_TURNS],
-					"#7cc8f0")
+				# HW §3 — the words say one turn: the turn loop strips a stun whole at the
+				# first turn it costs, so the stun's length is not what the enemy loses.
+				_log("%s: Counter Time — %s loses its next turn" % [
+					attacker.unit_name, target.unit_name], "#7cc8f0")
 		# ============ BATCH BQ: THE CLASS-WIDE TWELVE ============
 		# TEN OF THE TWELVE RESOLVE HERE. Magic Missiles and Chastise are
 		# ordinary attacks and need no case at all — which is the point of a
@@ -25122,12 +25214,22 @@ func _living_hero_with(field: String) -> BattleUnit:
 	return null
 
 
+# BATCH HW §3 — WHETHER `src` PAYS THIN BLOOD'S PRICE: the rune worn and Trapper equipped
+# (GW §3: no engine, no cost and no payout — the barb's own predicate). THE ONE ANSWER: the
+# status door and `_apply_poison` both ask it.
+func _thin_blood_price(src: BattleUnit) -> bool:
+	return src != null and src.rune_thin_blood > 0 and src.has_engine("trapper")
+
+
 # EVERY SURVIVALIST POISON FLOWS THROUGH HERE, and since Batch BA the Venom
 # lane's nodes hang a DIFFERENT AFFLICTION off it rather than more of the same:
 # Potent Toxins deepens the tick, Distillate stacks it AND Exposes, Slow Acting
 # halves-and-doubles (sticky) AND Slows, Perfected Toxin makes it permanent and
 # uncleansable. His passive pays for BREADTH, so the lane named for his
 # signature damage now feeds it instead of fighting it.
+# **NOT EVERY ONE, FOUND AT HW §3**: Trapper's plain barb and Explosive Shot lay
+# theirs at the status door with a tick of their own and never come here — the
+# Venom lane does not ride them, and Thin Blood's price meets them at the door.
 #
 # `full` is stamped on the status so Creeping Death knows what "full duration"
 # means without a second constant; a permanent poison (turns < 0) has no
@@ -25158,7 +25260,12 @@ func _apply_poison(src: BattleUnit, victim: BattleUnit, turns: int) -> void:
 	# payout** — the ruling. The predicate is the payout's own, copied rather
 	# than re-derived, so the two cannot come to disagree about what Thin Blood
 	# costs and what it buys.
-	if src.rune_thin_blood > 0 and src.has_engine("trapper"):
+	#
+	# **BATCH HW §3 — AND THE PRICE IS CHARGED AT THE STATUS DOOR NOW**, for every
+	# Poison he lays: this line alone missed the barb itself and Explosive Shot,
+	# and `_dot_pass` read its zero as *no tick set*. It stays here so the
+	# function's own tick is the one it lays; the door asks the same predicate.
+	if _thin_blood_price(src):
 		tick = 0
 	var p_turns := turns
 	var sticky := false
@@ -26116,20 +26223,14 @@ func _on_beast_death(comp: BattleUnit) -> void:
 	_sync_soul_bond(pm)
 
 
-# An enemy has died: Apex Predator re-arms Kill Command; a marked kill
-# resets Mark of the Hunt.
-func _on_enemy_death(victim: BattleUnit) -> void:
+# An enemy has died: Apex Predator re-arms Kill Command. (A marked kill's reset of
+# Mark of the Hunt is read in `_on_unit_died`, before the body is cleared — HW §3.)
+func _on_enemy_death(_victim: BattleUnit) -> void:
 	for h in heroes:
 		if not h.dead and not h.is_companion and h.apex > 0 \
 				and h.cooldowns.get("Kill Command", 0) > 0:
 			h.cooldowns.erase("Kill Command")
 			_log("   → Apex Predator: Kill Command is ready again", "#b0a8e0")
-	if victim.has_status("hunt_mark"):
-		var mk_idx := victim.status_power("hunt_mark")
-		if mk_idx >= 0 and mk_idx < heroes.size() and not heroes[mk_idx].dead \
-				and heroes[mk_idx].cooldowns.get("Mark of the Hunt", 0) > 0:
-			heroes[mk_idx].cooldowns.erase("Mark of the Hunt")
-			_log("   → The hunt is rewarded: Mark of the Hunt resets", "#b0a8e0")
 	# Overkill (Batch AJ): a kill resets the two abilities the archetype is
 	# built on. THE ONE read site for `overkill_reset` — the existing kill
 	# hook, which is also where Bloodied Momentum and Apex Predator live.
@@ -26264,6 +26365,10 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int,
 						_stat("hero_deaths")
 						_sfx("death", -4.0)
 						_log("† %s dies" % h.unit_name, "#e05050")
+		# BATCH HW §3 — BLOOD DEBT'S MARK IS READ BEFORE THE BLEEDOUT LANDS (ruled: the code goes to
+		# the card). A bleedout that kills its bearer clears the body inside `take_hit`, so a read after
+		# it found no mark and *every time it bleeds out* skipped the one the Berserker most wants paid.
+		var debt_mark: Dictionary = victim.get_status("blood_debt").duplicate()
 		var bleed_result: Dictionary = victim.take_hit(bleed_dmg, 0)
 		victim.float_text("BLEEDOUT %d" % bleed_dmg, Color(0.9, 0.15, 0.2), true)
 		if not victim.is_hero:
@@ -26316,13 +26421,14 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int,
 			# It reads the mark's stamped `src_name` so a second Berserker
 			# cannot collect on the first's debt, and it is resolved LIVE
 			# against the living party — a dead Berserker collects nothing.
-			if victim.has_status("blood_debt"):
-				var debt_st: Dictionary = victim.get_status("blood_debt")
-				var debt_owner := String(debt_st.get("src_name", ""))
+			# The mark is the one read above the bleedout's hit (HW §3), so the bleedout
+			# that kills the bearer pays too.
+			if not debt_mark.is_empty():
+				var debt_owner := String(debt_mark.get("src_name", ""))
 				for creditor in heroes:
 					if creditor.dead or creditor.unit_name != debt_owner:
 						continue
-					var debt_pct: int = maxi(victim.status_power("blood_debt"), 0)
+					var debt_pct: int = maxi(int(debt_mark.get("power", 0)), 0)
 					var debt_heal := maxi(int(round(
 						creditor.max_hp * 0.01 * debt_pct)), 1)
 					creditor.heal_amount(debt_heal)
@@ -27747,7 +27853,7 @@ func _check_end() -> void:
 			# The merchant and the event are MAP NODES the player routed to, or
 			# past. The only thing that can still stand between a victory and the
 			# map is the bargain's own "a merchant follows the fight" reward — and
-			# that one was BOUGHT, with a severity-4 modifier.
+			# that one was BOUGHT, with a bargain's modifier (severity 1's since HW §2).
 			var buttons: Array = [["Continue", _to_map]]
 			if merchant_owed:
 				spoils += "\n\nA merchant waits on the road ahead."
@@ -27945,7 +28051,7 @@ func _to_map() -> void:
 
 
 # Batch BK §3: the ONE interstitial a fight can still queue — the merchant the
-# bargain's severity-4 reward bought. Run.next_after_scene consumes the flag.
+# bargain's reward bought (severity 1's since HW §2). Run.next_after_scene consumes the flag.
 # BATCH GF: it said a quit on the victory screen "simply drops it"; the flag is
 # saved, and `Run.resume_scene` visits the merchant, as this button would have.
 func _to_after() -> void:

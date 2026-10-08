@@ -271,9 +271,20 @@ func _s0_the_rulings() -> void:
 	var w: Dictionary = _run.party[0]
 	var ped: Dictionary = _run.peddler_rune(w)
 	ok(String(ped.get("id", "")) == PAYABLE_FX, "§0a: the Peddler stocked %s, not the payable fixture" % ped.get("id", "<nothing>"))
+	# BATCH HW §1c — RE-POINTED, THE COUNT UNMOVED: a hero's own pick of three holds no crest rune now
+	# (ruled), so the crest-scoped pair above can no longer reach the cache. Its door is asked with the
+	# same twin pair scoped to his class, laid for this arm alone and lifted before the event verb.
+	data[REFUSED_FX + "_class"] = (data[REFUSED_FX] as Dictionary).duplicate(true)
+	data[REFUSED_FX + "_class"]["scope"] = "class:%s" % String(w["key"])
+	data[PAYABLE_FX + "_class"] = (data[PAYABLE_FX] as Dictionary).duplicate(true)
+	data[PAYABLE_FX + "_class"]["scope"] = "class:%s" % String(w["key"])
+	data[REFUSED_FX + "_class"]["name"] = "HR Fixture Refused Class"
+	data[PAYABLE_FX + "_class"]["name"] = "HR Fixture Payable Class"
 	var trip: Array = _run.roll_rune_candidates(w)
+	data.erase(REFUSED_FX + "_class")
+	data.erase(PAYABLE_FX + "_class")
 	var trip_ids: Array = trip.map(func(c): return String((c as Dictionary).get("id", "")))
-	ok(trip_ids == [PAYABLE_FX], "§0a: a cache holds %s — want the payable fixture and nothing refused" % [trip_ids])
+	ok(trip_ids == [PAYABLE_FX + "_class"], "§0a: a cache holds %s — want the payable class twin and nothing refused, and no crest rune" % [trip_ids])
 	var granted: Dictionary = _run.grant_rune(w)
 	ok(String(granted.get("id", "")) == PAYABLE_FX, "§0a: the event verb granted %s" % granted.get("id", "<nothing>"))
 	_run.pending_rune_drops = []

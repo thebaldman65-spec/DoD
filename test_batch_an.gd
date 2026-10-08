@@ -196,14 +196,20 @@ func _test_offer(RunState) -> void:
 		ok(run.modifier_severity(String(id2)) == int(want[id2]),
 			"%s severity ignores party composition" % id2)
 	# The reward table is keyed on severity and nothing else.
-	ok(run.REWARDS[1].size() == 1, "severity 1 pays one way (40 gold)")
-	ok(int(run.REWARDS[1][0]["amount"]) == 40, "...and it is 40 gold")
-	ok(run.REWARDS[4].size() == 3, "severity 4 pays three ways")
+	# BATCH HW §2 — RE-POINTED TO THE RULING, THE COUNT UNMOVED: the merchant is an easy
+	# fight's reward, so severity 1 pays its 40 gold or a merchant and severity 4 its
+	# gold or a rune (it stood in severity 4's list until HW).
+	ok(run.REWARDS[1].size() == 2, "severity 1 pays two ways (40 gold, or a merchant)")
+	ok(int(run.REWARDS[1][0]["amount"]) == 40, "...and its gold is 40")
+	ok(run.REWARDS[4].size() == 2, "severity 4 pays two ways")
+	var sev1_kinds: Array = []
+	for r1 in run.REWARDS[1]:
+		sev1_kinds.append(String(r1["kind"]))
 	var sev4_kinds: Array = []
 	for r in run.REWARDS[4]:
 		sev4_kinds.append(String(r["kind"]))
-	ok("shop" in sev4_kinds, "severity 4 can summon a merchant on demand")
-	ok("rune" in sev4_kinds, "severity 4 can pay a rune")
+	ok("shop" in sev1_kinds, "severity 1 can summon a merchant on demand")
+	ok(sev4_kinds.has("rune") and not sev4_kinds.has("shop"), "severity 4 pays a rune, and never a merchant")
 	# 2000 offers: three DISTINCT modifiers, rewards matched to severity, THE
 	# FLOOR (always at least one option of severity 1 or 2), and BATCH AQ §2 —
 	# the other two slots come from the 3-4 pool alone, so no offer ever holds
@@ -265,7 +271,7 @@ func _test_offer(RunState) -> void:
 	run.pending_shop = false
 	run.pending_reward = {"kind": "shop"}
 	var shopped: Dictionary = run.claim_reward()
-	ok(bool(shopped["shop"]), "the severity-4 merchant reward reports a merchant")
+	ok(bool(shopped["shop"]), "the bargain's merchant reward reports a merchant")
 	ok(run.pending_shop, "...and arms the one merchant a fight can still queue")
 	run.free()
 

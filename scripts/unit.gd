@@ -2769,6 +2769,38 @@ func _build_target_zone() -> void:
 	add_child(_target_marker)
 
 
+# BATCH HW §1d — THE BODY A CLICK ZONE IS FITTED TO: the idle frame's opaque pixels as
+# they stand on screen, relative to this unit's origin and flipped as the sprite is.
+# The zone above is a fixed 140x220 box, far wider and taller than any body on the field
+# (66-105 px wide, 52-82 tall at idle), which is why neighbours' boxes overlapped. The
+# zone as built is the answer where there is no frame to read.
+func idle_body_rect() -> Rect2:
+	var fallback := Rect2(_target_btn.position, _target_btn.size)
+	if sprite == null or sprite.sprite_frames == null \
+			or not sprite.sprite_frames.has_animation("idle"):
+		return fallback
+	var tex: Texture2D = sprite.sprite_frames.get_frame_texture("idle", 0)
+	var img: Image = tex.get_image() if tex != null else null
+	if img == null or img.is_empty():
+		return fallback
+	var used: Rect2i = img.get_used_rect()
+	if used.size.x <= 0 or used.size.y <= 0:
+		return fallback
+	var frame := Vector2(img.get_width(), img.get_height())
+	var sc: Vector2 = sprite.scale
+	var pos := (Vector2(used.position) - frame / 2.0) * sc
+	if sprite.flip_h:
+		pos.x = -(pos.x + used.size.x * sc.x)
+	return Rect2(pos, Vector2(used.size) * sc)
+
+
+# BATCH HW §1d — the click zone set by the battle, which alone sees the neighbours
+# (`battle._fit_enemy_target_zones`). `r` is relative to this unit's origin.
+func set_target_zone(r: Rect2) -> void:
+	_target_btn.position = r.position
+	_target_btn.size = r.size
+
+
 func set_tint(tint: Color) -> void:
 	_base_tint = tint
 	sprite.self_modulate = tint

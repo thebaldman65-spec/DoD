@@ -78,7 +78,9 @@ const NEW_AXES := {
 # The retired card, named once so the failure messages cannot drift from it.
 const RETIRED := "Flash Freeze"
 
-# Counter Time's promise, held here so the live check and the card cannot drift.
+# The stun Counter Time lays, held here so the live check and the constant cannot drift. **Since HW §3
+# the card says ONE turn** (ruled: the turn loop strips a stun whole at the first turn it costs, so the
+# length laid is not what is lost); the length is unmoved, and this pins it.
 const COUNTER_TIME_TURNS_EXPECT := 2
 
 
@@ -538,7 +540,7 @@ func _s9_live() -> void:
 	await scene.call("_resolve", sm, ct, ct_victim, "good")
 	ok(ct_victim.has_status("stunned"), "Counter Time did not Stun")
 	ok(int(ct_victim.get_status("stunned").get("turns", 0)) >= COUNTER_TIME_TURNS_EXPECT,
-		"Counter Time's Stun is shorter than the %d turns the card promises" % COUNTER_TIME_TURNS_EXPECT)
+		"Counter Time's Stun is laid shorter than its unmoved %d turns" % COUNTER_TIME_TURNS_EXPECT)
 	# GATED ONES REQUIRE AND STAY: it must not have moved him.
 	ok(sm.stance == "defensive",
 		"Counter Time SWITCHED the guard — a gated card requires and stays")

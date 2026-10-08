@@ -3573,6 +3573,11 @@ static func draft_ability(display_name: String) -> Ability:
 		# core card is the better attack and this is the better answer, and the
 		# only board on which this is the pick is one where a turn is worth more
 		# than a blow.
+		# **BATCH HW §3 — IT BUYS ONE TURN, AND THE CARD SAYS SO (ruled: the card goes
+		# to the code).** The turn loop strips a stun whole at the first turn it costs,
+		# so the two it lays cost one, as Pommel Strike's one does. Making a stun's
+		# LENGTH real touches every stun in the game — a system change, not a card
+		# repair — so `COUNTER_TIME_TURNS` is unmoved and the words moved instead.
 		#
 		# THE BOSS RULE IS INHERITED AND NOT RE-WRITTEN. `stunned` is one of the
 		# five ids `_apply_status`'s carve-out refuses on an unbroken boss, and
@@ -3597,7 +3602,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 5,
 				"anim": "attack02", "special": "counter_time",
 				"perfect_id": "", "perfect_text": "",
-				"description": "REQUIRES THE DEFENSIVE GUARD.\nRead the attack and answer it before it\nlands: one enemy loses its next TWO\nturns. It deals nothing at all — the\nturn IS the payload.\nA BOSS RESISTS UNTIL BROKEN."})
+				"description": "REQUIRES THE DEFENSIVE GUARD.\nRead the attack and answer it before it\nlands: one enemy loses its next turn.\nIt deals nothing at all — the turn IS\nthe payload.\nA BOSS RESISTS UNTIL BROKEN."})
 		# ----- PYROMANCER: different answers to how do you commit -----
 		# AXIS: spending wide instead of deep. Detonation empties one bank;
 		# this skims every bank, and Overburn refunds every turn it takes.
@@ -3762,7 +3767,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 2.5, "cooldown": 4, "anim": "attack03",
 				"special": "snare_line",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Run a line across the whole field: for\ntwo turns EVERY enemy that acts springs\none of your traps where it stands —\nteeth, Break and all. It fills no trap\nslot and spends no placed trap.\nThe line binds a CHILLED enemy harder:\nthe spring holds it 2 turns, not 1.\nA Cryomancer lays that ice."})
+				"description": "Run a line across the whole field: for\ntwo turns EVERY enemy that acts springs\none of your traps where it stands —\nteeth, Break and all. It fills no trap\nslot and spends no placed trap."})
 		# ================= BATCH BQ: THE CLASS-WIDE TWELVE =================
 		#
 		# SIX MAGE AND SIX CLERIC, filling half the seam BO opened: one card in
@@ -4131,13 +4136,19 @@ static func draft_ability(display_name: String) -> Ability:
 		# **It is the first class-wide card in the game that generates its
 		# resource**, and the only one of the twenty-four that is not weaker than
 		# the free basic on every axis. Flagged, not silently absorbed.
+		#
+		# **BATCH HW §3 — THE DAZE IS 2 TURNS, 3 ON A PERFECT (ruled: the code goes to the
+		# card).** A status ticks at the start of its bearer's turn, so the one turn this
+		# laid covered NONE of his attacks, and the Perfect's *Dazed for 2 turns* was
+		# implemented nowhere: the card lied twice over. Now the Daze covers his next
+		# attack, two on a Perfect (`status_one_more`, the strike loop's one turn more).
 		"Charge":
 			return Ability.make({"display_name": "Charge", "cost": 20,
 				"damage": 25, "pressure": 20, "delay": 1.0, "cooldown": 3,
 				"anim": "attack02", "resource_gain": 30,
-				"applies_status": {"id": "dazed", "turns": 1},
-				"perfect_id": "", "perfect_text": "Dazed for 2 turns",
-				"description": "Close the distance before it finishes\nthe cast: 25% of Attack and 20 Break\ndamage, and the target is DAZED for a\nturn. Builds 30 Rage. Nothing else in\nthe kit arrives this fast."})
+				"applies_status": {"id": "dazed", "turns": 2},
+				"perfect_id": "status_one_more", "perfect_text": "Dazed for 3 turns",
+				"description": "Close the distance before it finishes\nthe cast: 25% of Attack and 20 Break\ndamage, and the target is DAZED for 2\nturns. Builds 30 Rage. Nothing else in\nthe kit arrives this fast."})
 		# AXIS: breadth from a narrow class. THREE CHOSEN enemies rather than
 		# three random ones, which is the whole distinction from War Stomp (a
 		# Warden spec-pool entry with the same 15% and the same 15 BD, for LESS

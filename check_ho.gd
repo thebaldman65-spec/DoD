@@ -3,7 +3,8 @@
 #   §0  THE GROUND — this process writes the harness save, and scratch meta files
 #   §1  THE SUPPLY ROUTE — how a crest rune reaches the player, driven with the two
 #       that are authored: the scope at every roll; the DROP after a real normal
-#       fight; the PEDDLER's real counter; a CACHE's real overlay; the EVENT verb;
+#       fight; the PEDDLER's real counter; a CACHE's real overlay, which holds none
+#       since HW §1c (a hero's own pick of three is his class's); the EVENT verb;
 #       the bag's real crest button; and the sim's mirror of the counter. Each
 #       surface says whom the rune is for
 #   §2  WHY THREE OF THE BRIEF'S FIVE ARE NOT AUTHORED, HELD AS FACTS RATHER THAN
@@ -520,45 +521,47 @@ func _open_cache(seat: int) -> Node:
 
 
 func _s1d_the_cache() -> void:
-	print("\n§1d — a cache: a crest rune in one hero's triple, on the real overlay")
+	# BATCH HW §1c — RE-POINTED TO THE RULING, THE COUNT UNMOVED. This section drove a crest rune
+	# through one hero's triple and onto the real overlay; HW ruled that a hero's own pick of three is
+	# his class's draft and holds none (a class rune draft is not a roll), and the drop, the Peddler and
+	# the event verb keep offering one (§1b, §1c, §1e). So it now asks the same real overlay the ruled
+	# question: with two crest runes and one class rune left, the roll offers the class rune alone, and a
+	# triple queued holding all three — a save from before HW — shows and hands over the class rune alone.
+	print("\n§1d — a cache: a hero's own pick of three, on the real overlay, holds no crest rune")
 	_new_run(SEATS, ENG4)
-	_park_all_but(CRESTS)
 	var mage: Dictionary = _run.party[1]
+	var cls := ""
+	for id0 in _offerable_now():
+		var cfg0: Dictionary = Runes.config(String(id0))
+		if String(cfg0.get("scope", "")) == "class:mage" and not Runes.is_engine_rune(String(id0)):
+			cls = String(id0)
+			break
+	_park_all_but(CRESTS + [cls])
 	# THE ROLL IS THE GAME'S: the elite's cache and the bargain both call it.
 	var triple: Array = _run.roll_rune_candidates(mage)
 	_unpark()
 	var ids: Array = []
 	for c in triple:
 		ids.append(String((c as Dictionary).get("id", "")))
-	ids.sort()
-	ok(ids == ["dirge", "tithe"], "§1d: the cache's roll offered the Mage %s" % [ids])
-	mage["rune_candidates"] = [triple.duplicate(true), triple.duplicate(true)]
-	mage["rune_picks_owed"] = 2
+	ok(cls != "" and ids == [cls], "§1d: the cache's roll offered the Mage %s — want the class rune %s alone" % [ids, cls])
+	var queued: Array = [Runes.build("tithe"), Runes.build(cls), Runes.build("dirge")]
+	mage["rune_candidates"] = [queued.duplicate(true)]
+	mage["rune_picks_owed"] = 1
 	var ov := await _open_cache(1)
-	ok(ov != null and Gate.has_text(ov, "Tithe  (for the crest)") and Gate.has_text(ov, "Dirge  (for the crest)"),
-		"§1d: the Mage's cache does not say its crest runes are the crest's")
-	var took := Gate.press(ov, ["Tithe"]) if ov != null else ""
-	# The toast is read in the frame the press lands: it fades on a timer, and a
-	# headless frame is long enough to take it.
-	var said_worn := Gate.has_text(current_scene, "Tithe fills the crest — every hero wears it.")
+	var cls_name := String(Runes.config(cls).get("name", cls))
+	ok(ov != null and Gate.has_text(ov, cls_name) and not Gate.has_text(ov, "(for the crest)"),
+		"§1d: the Mage's cache shows a crest rune, or not the class rune left (%s)" % cls_name)
+	ok(ov != null and not Gate.has_text(ov, "Tithe") and not Gate.has_text(ov, "Dirge"),
+		"§1d: the Mage's cache names a crest rune queued before the scope")
+	var took := Gate.press(ov, [cls_name]) if ov != null else ""
+	var said_worn := Gate.has_text(current_scene, "fills the crest")
 	await Gate.frames(self, 3)
-	# TAKEN WITH THE CREST EMPTY: worn at the pick, by every hero, and said.
-	ok(took != "" and _names(_run.party_runes) == ["Tithe"] and _names(mage.get("runes", [])).is_empty(),
-		"§1d: the crest rune taken from the Mage's cache went to %s (the Mage's own: %s)" % [
-			_names(_run.party_runes), _names(mage.get("runes", []))])
-	ok(said_worn, "§1d: a pick every hero now wears was not announced")
-	ok(Gate.has_text(current_scene, "Crest: Tithe"), "§1d: the map's crest button does not name the rune taken")
-	# TAKEN WITH THE CREST FILLED: the second goes to the bag (FD's repair took the
-	# one the party now holds out of the second triple), and the toast says why.
-	var ov2 := await _open_cache(1)
-	var took2 := Gate.press(ov2, ["Dirge"]) if ov2 != null else ""
-	var said_bag := Gate.has_text(current_scene, "Dirge goes into the bag — every slot it fits is filled.")
-	await Gate.frames(self, 3)
-	ok(took2 != "" and _names(_run.party_runes) == ["Tithe"] and _names(_run.rune_bag) == ["Dirge"],
-		"§1d: a second crest rune taken went to %s / bag %s — the crest holds one" % [
-			_names(_run.party_runes), _names(_run.rune_bag)])
-	ok(said_bag, "§1d: the second crest rune's trip to the bag was not said")
-
+	ok(took != "" and _names(mage.get("runes", [])).has(cls_name),
+		"§1d: the class rune taken from the Mage's cache is not his (%s)" % [_names(mage.get("runes", []))])
+	ok(not said_worn, "§1d: a pick from the Mage's own cache was announced as filling the crest")
+	ok(_run.party_runes.is_empty() and _run.rune_bag.is_empty(),
+		"§1d: the Mage's cache put %s in the crest / %s in the bag" % [_names(_run.party_runes), _names(_run.rune_bag)])
+	ok((mage.get("rune_candidates", []) as Array).is_empty(), "§1d: the answered cache is still queued")
 
 # ── §1e — THE EVENT VERB ────────────────────────────────────────────────────
 

@@ -45,6 +45,21 @@ was wanted — and by then the discovery arrives as a report rather than as a co
   that states a ruling in the present tense hands the batch the same false fact**, and the batch has
   no way to tell a transcribed decision from a description of the code it is about to change.
 
+## EVERY RULING LANDS IN THE NEXT BRIEF'S §0
+
+> **EVERY RULING LANDS IN THE NEXT BRIEF'S §0, WHETHER OR NOT IT CHANGES CODE.** A confirmation
+> that moves nothing still moves the record, and a report that lists it as owed is the proof it
+> was never written down. (The designer's, given in HW's brief.)
+
+**A ruling that only exists in the conversation does not exist.** Twice now a decision has gone
+missing between the chat and the brief: HT's rulings on the rite's rank and on the words were
+both answered in conversation, neither reached a brief, and HV's report still listed them as owed.
+
+· **THE BATCH'S HALF IS NOT NEW.** A batch takes its brief's §0 and strikes what it answers from
+  the queue in `docs/state.md`; what it cannot see is an answer that never left the chat.
+· **NOTHING IN THE TREE CAN CHECK IT**, for the pricing rule's reason below: the conversation is
+  not in the repository. What shows it was broken is a report naming as owed what was answered.
+
 ## A BRIEF PRICES WHAT IT ASKS FOR
 
 > **Before an instruction that sweeps, censuses, drives or walks a population, the brief states how

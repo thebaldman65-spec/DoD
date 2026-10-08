@@ -4,6 +4,43 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Four playtest defects, the merchant's place, and the six card-versus-code items (Batch HW) — 2026-10-08
+
+**Why the merchant is an easy fight's reward.** A merchant is a shop the party still pays at, so as the reward for the
+hardest modifier in the game it priced the gamble against nothing a party could keep. Severity 4 now pays what it already
+paid wherever the merchant was gated — its gold or a rune — and the merchant sits beside the 40 gold of a severity-1
+bargain, where taking a shop instead of a little gold is a fair trade and an easy one to read.
+
+**Why a hero's own pick of three never holds a crest rune.** The elite's cache and the bargain's rune are one hero choosing
+from his class: a class rune draft. A crest rune belongs to no class and is worn by all four, so in that pick it was a rune
+the hero could not take for himself. The crest's runes still reach the party wherever a roll is the party's — the drop, the
+Peddler and an event — which is the routing HO found and kept.
+
+**Why an enemy's click zone is its own body.** A hover is a question about the body under the cursor. The zone was one box
+for every unit, much larger than any body, and in every warband of two or more it reached over a neighbour, so the light
+landed on whichever box sat on top. Fitting the zone to the body answers the question the hover asks; where two bodies
+still crowd each other, the meeting is split down its middle so neither can steal the other's hover.
+
+**Why the six go three ways.** Where the card states a feature and the code never paid it — Mark of the Hunt's reset, read
+after the body it reads was cleared; Charge's Daze, gone before the bearer could swing; Blood Debt's killing bleedout,
+paid nothing — the code goes to the card, because the card is the design and the code was the defect. Where the code is
+obeying a rule of the whole game — a stun costs one turn, however long it is laid — the card goes to the code: Counter
+Time's two turns and Snare Line's chilled hold are each that rule, and making a stun's length real would change every
+stun in the game, which is a system to design rather than a card to repair. Thin Blood was neither: a price that was
+never charged is a bug, and fixing it moves no number the rune names.
+
+**Why Boil Over and the Sharpshooter's core change nothing.** The cause was reported before the fix, and in both the cause
+is not the code. Boil Over pays exactly what its text says; the text's opening words name the Warrior's resource while
+the card spends Blood Frenzy, which only the Berserker's core carries — so the words are what is owed. A core rune taken
+after class selection waits unworn until it is slotted, which is a rule ruled for its own reason (one pick is never two
+things); whether the Sharpshooter's should be slotted on the pick is the designer's call, not a repair.
+
+**Why the rite ranks by the chill.** It is the presence rule again: the rite reads the chill, so it ranks by the chill, and
+a Glacial Hold's permanent chill is its first pick inside a Rupture exactly as it is bare.
+
+**Why Mana stays.** The Mage and the Hunter run dry and plan around it; only the Cleric is always full, so the fault is one
+class's regen and not the resource — and keeping Mana keeps Channel's tempo payout, Mana spent buying speed.
+
 ## Nine tags, Downwind's rule, and the shape recon (Batch HV) — 2026-10-07
 
 **Why a case-only difference is a collision.** A chip is read at a glance on a small sprite, not parsed. Snare Line's `SL`

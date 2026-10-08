@@ -765,6 +765,11 @@ brief — `wd_hold_line` (the undying window, 1/2→2/3). The Pivot chip's legen
 moved with them. **The one place the old reading was written down as a rule was
 `battle.gd`'s `hold_the_line` comment**; it now records the ruling instead.
 
+- **A STUN COSTS ONE TURN, WHATEVER IT IS LAID FOR (HW §3, ruled).** The turn loop strips `stunned` whole at the first
+  turn it costs, so a card says the turn its stun takes, never the length it is laid for: Counter Time's *next TWO turns*
+  and Snare Line's chilled *2 turns, not 1* were corrected to what the code does, with `COUNTER_TIME_TURNS` and
+  `SNARE_LINE_COLD_STUN` unmoved. **Making a stun's length real touches every stun in the game** — a system change, owed its own ruling.
+
 ## HERO AND ALLY ARE THE ONLY TWO WORDS (STANDING, SET AT BATCH CV §4, CLOSED AT DM §3)
 > **HERO — one of the four. ALLY — heroes and companions together. AND THERE IS NO THIRD WORD.**
 > Where the group is the ENEMY side, *warband*.
@@ -2289,6 +2294,9 @@ the block left out, spend what they were paid.
     would overturn Batch V for precisely the targets a player spent two turns assembling — one enemy ability deleting the
     best play in the game. **A reader that takes a status through a generic cleanse door and then asks for a specific id
     is the same defect** — it asks through the lookup, or it misses the ingredient (`docs/reports/HT.md` §1b).
+    **RANKED BY ITS CHILL, CONFIRMED (HT's ruling 2, recorded at HW §0)**: a Glacial Hold's permanent chill is the rite's
+    first pick inside a Rupture as it is bare. **The reason is the presence rule again — the rite reads the chill, so it
+    ranks by the chill**; ranking a composition by its own, shorter clock is rejected.
 - **A RE-APPLIED INGREDIENT RUNS ITS OWN RULE ON ITS OWN ENTRY (HS §2g; refusing the re-application was priced and not
   taken — it makes a card dead on a target the player just improved).** Burn adds its turns, Chilled adds a stack and
   resets its clock, and the composition's clock follows as the shorter; a card that writes an ingredient's clock
@@ -3755,8 +3763,9 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
   A change to the placement order moves the figure that satisfies the reason.
 - **THE BARGAIN'S BOUGHT MERCHANT IS GATED AT THE SAME NODES (HS §0, ruled)**: a player who traded a bargain's gold FOR a
   merchant is the lowest-gold case in the game, and a merchant he cannot shop at is no reward. `Run.roll_offer` drops the
-  merchant from a severity's rewards there, so the option still comes and pays from what is left — at severity 4, its
-  gold or a rune.
+  merchant from a severity's rewards there, so the option still comes and pays from what is left. **The merchant is an
+  easy fight's reward (HW §2, ruled)**: severity 1 pays its 40 gold or the merchant — at a gated elite, the gold — and
+  severity 4 pays its gold or a rune everywhere.
 
 ## STANDING RULE — THE PARTY SCOPE, AND THE RUNES IT HOLDS; ITS SCREEN WORD IS THE CREST (Batch HK §4, ruled by the designer; the word confirmed in HL's brief; the runes HO §3's and HP §2's)
 
@@ -3893,7 +3902,10 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
   modifier's multiplier while one is armed. A condition's keys are ANDed and one key cannot appear twice;
   `heroes_class_count` reads a named class. A card a crest grants lands on the battle's copy of every hero, every
   fight, priced in his own resource. `check_hn` §3 and `check_ho` §4 drive each.
-- **IT IS OFFERED THROUGH EVERY ROLL, TO ONE HERO AT A TIME.** `Runes._scope_ok` passes it for every hero, so the drop's
+- **IT IS OFFERED THROUGH EVERY ROLL, TO ONE HERO AT A TIME — AND NEVER IN A HERO'S OWN PICK OF THREE (HW §1c, ruled: a
+  class rune draft is not a roll).** The elite's rune cache and the bargain's rune are one hero's draft of his class, so
+  `Run.roll_rune_candidates` leaves the crest's runes out by name (`Run.crest_rune_names`), `Run.rune_choice` repairs a
+  triple queued holding one, and the bargain pays a hero who has a class rune left. `Runes._scope_ok` passes it for every hero, so the drop's
   union holds it once and the Peddler excludes what is already on his counter, lest two heroes be offered one rune.
   No gate withholds one and no roll reads its condition, so a crest rune is offered whether or not its condition
   could hold for these four.
@@ -4319,7 +4331,7 @@ same breath as the removal. `run_sim` never bought one, so no measured figure mo
 - **AND A ROW'S COST IS GATED WITH ITS PAYOUT: NO ENGINE, NO COST AND NO PAYOUT (RULED AT GW §3).** The offer door
   withholds a row from a hero whose engine is out, and **it cannot reach a row he has already BOUGHT** — two of the
   thirty-five charged him anyway. The Martyr's refusal (`heal_amount`'s absolute block) and Thin Blood's dead tick
-  (`_apply_poison`) were read with no engine at all while the Mercy stack and the barb are each read only under one, so
+  (`_apply_poison`; at the status door since HW §3, which every Poison passes) were read with no engine at all while the Mercy stack and the barb are each read only under one, so
   a hero who unequipped his engine holding either was playing a strictly worse game than one wearing no rune. **Each
   price now reads its PAYOUT's own predicate** — `has_engine("mercy")` and `has_engine("trapper")`, copied rather
   than re-derived, so the two cannot come to disagree about what a rune costs and what it buys. **The other

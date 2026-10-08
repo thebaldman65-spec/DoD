@@ -320,8 +320,13 @@ func _s1_the_offer_sites() -> void:
 		run.rune_bag = bag0.duplicate()
 		run.party_runes = crest0.duplicate()
 		run.pending_rune_drops = wait0.duplicate()
-	ok(crest_first > 0,
-		"§1d: no first pick of %d was a crest rune — the crest's route was not driven" % TRIALS)
+	# BATCH HW §1c — RE-POINTED, THE COUNT UNMOVED. Since HO this arm asked that a crest rune be among
+	# the first picks, so the crest's route was driven; HW ruled that a hero's own cache holds none (a
+	# class rune draft is not a roll), so it now holds that count at zero — over a pool whose live crest
+	# runes every other roll still deals. The repair it guards is unchanged: the second offer leaves out
+	# whatever the first pick put down, class or core.
+	ok(crest_first == 0,
+		"§1d: %d first picks of %d were a crest rune — a hero's own cache holds none since HW §1c" % [crest_first, TRIALS])
 	ok(raw > TRIALS / 4,
 		"§1d: only %d of %d raw triple pairs collided — the arm is not armed" % [raw, TRIALS])
 	ok(after == 0,

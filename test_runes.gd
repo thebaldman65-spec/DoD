@@ -1092,6 +1092,10 @@ func _start_rune_pool(run: Node) -> void:
 	# as any other rune), so it rides every hero's cache roll and is no leak. The two
 	# the file holds since HO are the first this arm has met; a candidate that is
 	# neither his class's nor the crest's is still the scope leak FM's line catches.
+	# **BATCH HW §1c — AND NOW NEVER THE CREST'S (ruled: a class rune draft is not a
+	# roll).** The cache is one hero's draft of his class, so the roll leaves the
+	# crest's runes out; they are still counted here, and the arm below holds them at
+	# zero while the file holds live ones.
 	var leaks: Array = []
 	var engine_candidates := 0
 	var crest_candidates := 0
@@ -1159,16 +1163,18 @@ func _start_rune_pool(run: Node) -> void:
 	# first triple rather than after a twenty-five-point drift.
 	if any_spec_eligible:
 		ok(leaks.is_empty(),
-			"every cache candidate is an ordinary rune of the holder's class, a crest rune, or one of his class's ENGINE runes (GK, HC §1, HO §3) — %d are none: %s"
+			"every cache candidate is an ordinary rune of the holder's class or one of his class's ENGINE runes (GK, HC §1; never the crest's since HW §1c) — %d are neither: %s"
 				% [leaks.size(), leaks.slice(0, 6)])
-		# THE POSITIVE ARM OF THE CREST'S ADMISSION: the file holds crest runes, and
-		# they DO reach a cache — so the branch above is walked, not merely allowed.
+		# THE CREST'S ARM, RE-POINTED AT HW §1c, THE COUNT UNMOVED: it held that the
+		# crest's runes DO reach a cache; the ruling is that a hero's own pick holds none.
+		# It stays two-sided — the file must hold live crest runes, so the zero is asked
+		# of a pool that could have dealt one, never read off an empty file.
 		var crest_live := 0
 		for cid in Runes.ids():
 			if not Runes.is_retired(String(cid)) and Runes.is_party_scope(String(Runes.config(String(cid)).get("scope", ""))):
 				crest_live += 1
-		ok((crest_candidates > 0) == (crest_live > 0),
-			"...and the crest's runes reach the cache exactly when the file holds one (%d candidates, %d live)" % [crest_candidates, crest_live])
+		ok(crest_candidates == 0 and crest_live > 0,
+			"...and no crest rune reaches a hero's own cache while the file holds live ones (%d candidates, %d live)" % [crest_candidates, crest_live])
 		ok(engine_candidates > 0,
 			"...and the engine runes the charter puts in the ordinary pool DO reach the cache (%d of %d candidates)"
 				% [engine_candidates, trials * 3])

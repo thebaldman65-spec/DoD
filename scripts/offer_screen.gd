@@ -15,8 +15,8 @@
 #
 # WHY THE REWARD PAYS ON VICTORY, not on acceptance: the modifier is the
 # price and the reward is what clearing the fight under it bought. It is
-# also the only reading that works for the severity-4 "a merchant follows
-# the fight" — a merchant cannot precede a fight it follows.
+# also the only reading that works for "a merchant follows the fight"
+# (severity 1's since HW §2) — a merchant cannot precede a fight it follows.
 extends Node2D
 
 const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")

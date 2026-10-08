@@ -2356,8 +2356,17 @@ func grant_rune(member: Dictionary) -> Dictionary:
 # parameter no reachable path could set. `_generate_spec_rune`,
 # `start_rune_enabled`, `spec_opening_enabled` and `grant_start_runes` went
 # with it — heroes now begin with no runes and three empty slots.
+#
+# **BATCH HW §1c — A HERO'S OWN PICK OF THREE IS HIS CLASS'S DRAFT, AND A CREST
+# RUNE IS NOT IN IT (ruled: a scoping error, not HO's routing).** This is the one
+# roll a hero answers on his own card — the elite's rune cache and the bargain's
+# rune reward — and the playtest met a crest rune in it. The crest's runes still
+# reach the party through every other roll (the drop, the Peddler, the event
+# verb: HO §1). They are left out BY NAME (`crest_rune_names`), the channel
+# `peddler_rune` uses for the core runes, so nothing else about the draw moves.
 func roll_rune_candidates(member: Dictionary) -> Array:
 	var out: Array = []
+	var crest := crest_rune_names()
 	while out.size() < 3:
 		# Draw WITHOUT REPLACEMENT: everything already in the triple is
 		# excluded from the pool this draw picks out of, so a duplicate is
@@ -2365,7 +2374,7 @@ func roll_rune_candidates(member: Dictionary) -> Array:
 		# retry four times on a collision and then append the fourth
 		# result unchecked — which on a small per-rarity pool emitted the
 		# same rune twice roughly one triple in a hundred.)
-		var taken: Array = []
+		var taken: Array = crest.duplicate()
 		for c in out:
 			taken.append(String(c["name"]))
 		var rune := generate_rune(member, taken)
@@ -2387,6 +2396,21 @@ func roll_rune_candidates(member: Dictionary) -> Array:
 		if rune.is_empty():
 			break
 		out.append(rune)
+	return out
+
+
+# BATCH HW §1c — every crest rune's name: what a hero's own pick of three leaves out,
+# at its roll (`roll_rune_candidates`), at its answer (`rune_choice`) and where the
+# bargain asks who it can pay. Read off the scope, so a crest rune authored later is
+# left out by doing nothing.
+func crest_rune_names() -> Array:
+	var out: Array = []
+	for id in Runes.ids():
+		var cfg: Dictionary = Runes.config(String(id))
+		if Runes.is_party_scope(String(cfg.get("scope", ""))):
+			var nm := Runes.display_name(cfg)
+			if not out.has(nm):
+				out.append(nm)
 	return out
 
 
@@ -2525,8 +2549,12 @@ func rune_choice(member: Dictionary) -> Array:
 	for nm in party_rune_names():
 		if not owned.has(nm):
 			owned.append(nm)
+	# BATCH HW §1c — AND A CREST RUNE: a hero's own pick of three is his class's draft,
+	# so one queued before HW is repaired away as a retired one is (its scope never
+	# moves, so this is permanent), and the top-up below draws none.
+	var crest := crest_rune_names()
 	var kept: Array = []
-	var taken: Array = []
+	var taken: Array = crest.duplicate()
 	for c in triple:
 		if Runes.is_retired(String((c as Dictionary).get("id", ""))):
 			continue
@@ -4219,16 +4247,23 @@ const MODIFIERS := {
 
 # The reward table reads severity and nothing else. Each entry is the list
 # of reward KINDS that severity may pay; the offer picks one at random, so
-# a severity-4 option is sometimes gold and sometimes the merchant.
+# a severity-1 option is sometimes gold and sometimes the merchant.
 #   gold   {amount}      flat gold on victory
 #   potion {}            one random consumable
 #   rune   {}            one rune from the current pool, for a random hero
 #   shop   {}            a merchant follows the fight (the §5 on-demand path)
+#
+# **BATCH HW §2 — THE MERCHANT IS AN EASY FIGHT'S REWARD (ruled).** It stood in
+# severity 4's list, where a party paid the hardest modifier in the game for a
+# shop it still had to pay at; it is severity 1's now, beside the 40 gold, and
+# severity 4 pays its gold or a rune — what it already paid where the merchant
+# was gated (HS §0c). The gate below reads every severity's list, so it still
+# holds the merchant out of the run's first three nodes.
 const REWARDS := {
-	1: [{"kind": "gold", "amount": 40}],
+	1: [{"kind": "gold", "amount": 40}, {"kind": "shop"}],
 	2: [{"kind": "gold", "amount": 80}, {"kind": "potion"}],
 	3: [{"kind": "gold", "amount": 140}, {"kind": "rune"}],
-	4: [{"kind": "gold", "amount": 220}, {"kind": "rune"}, {"kind": "shop"}],
+	4: [{"kind": "gold", "amount": 220}, {"kind": "rune"}],
 }
 
 
@@ -4306,7 +4341,8 @@ func roll_offer() -> Array:
 		# a player who traded a bargain's gold FOR a merchant is the lowest-gold case
 		# in the game, and a merchant he cannot shop at is no reward. At an elite in
 		# the run's first `SHOP_GATE_NODES` nodes the option still comes, and pays
-		# from what is left of its severity's list — at severity 4, its gold or a rune.
+		# from what is left of its severity's list — at severity 1, where the merchant
+		# stands since HW §2, its 40 gold.
 		if shop_gated(slot_idx + 1):
 			choices = choices.filter(func(r): return String(r.get("kind", "")) != "shop")
 		offer.append({"modifier": String(id),
@@ -4430,8 +4466,11 @@ func claim_reward() -> Dictionary:
 			var takers: Array = []
 			# BATCH HK §2 — asked against what the PARTY holds, as the roll is.
 			var held_names := party_rune_names()
+			# BATCH HW §1c — and without the crest's runes, which this pick of three
+			# no longer draws: a hero with only crest runes left cannot be paid here.
+			var scoped_names: Array = held_names + crest_rune_names()
 			for m in party:
-				if not Runes.pool_empty_for(m, held_names):
+				if not Runes.pool_empty_for(m, scoped_names):
 					takers.append(m)
 			var looter: Dictionary = (takers if not takers.is_empty()
 				else party).pick_random()
@@ -4467,7 +4506,7 @@ func claim_reward() -> Dictionary:
 #
 # THE ONE SURVIVOR is the bargain's "a merchant follows the fight" reward,
 # and it survives because it is BOUGHT rather than rolled: the player took a
-# severity-4 modifier to get it. One boolean, not a queue.
+# bargain's modifier to get it (a severity-1 one since HW §2). One boolean, not a queue.
 var pending_shop := false
 
 

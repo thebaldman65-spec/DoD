@@ -691,7 +691,10 @@ func _source_rules() -> void:
 	# BLOOD DEBT'S PAYOUT DOES NOT REMOVE ITS OWN MARK. This is the negative
 	# control at the source level, beside the live one: a `remove_status` here
 	# leaves the card working, logging, and worth a quarter of what it says.
-	var at_bd := code.find('victim.has_status("blood_debt")')
+	# BATCH HW §3 — RE-POINTED, THE COUNT UNMOVED: the payout reads the mark it took BEFORE the
+	# bleedout's hit (`debt_mark`), so a bleedout that kills its bearer pays too; the hook it
+	# anchored on (`victim.has_status`) is gone with that read, and the anchor is the payout's own.
+	var at_bd := code.find('if not debt_mark.is_empty():')
 	ok(at_bd > 0, "the Blood Debt payout hook exists")
 	var bd_body := code.substr(at_bd, 900)
 	ok(bd_body.length() > 400, "and the slice around it is a real region")

@@ -16,6 +16,68 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-08 &mdash; Batch HW: FOUR PLAYTEST DEFECTS, THE MERCHANT'S PLACE, AND THE SIX CARD-VERSUS-CODE ITEMS</h2>
+<p><b>Four things the designer met in one zone, each with its cause found before anything was fixed &mdash; two were not the
+code, two were. The merchant reward moves from the hardest bargain to the easiest. The six cards whose text and code disagreed
+are settled as ruled: three cards now do what they say, two now say what they do, and one rune's price is finally charged. And
+two rulings answered in conversation are written down at last.</b> Full working: <code>docs/reports/HW.md</code>.</p>
+
+<p><b>&sect;0 &mdash; TWO RULINGS THAT GOT LOST, AND THE RULE THAT STOPS IT.</b> HT's rulings on the enemy mender's rite (a body
+carrying a chill is ranked by its chill, so a Glacial Hold's permanent chill is the rite's first pick inside a Rupture as it is
+bare) and on the words (<i>second degree</i>, the rite's lines, <i>+15% damage from every hero's strike</i>) were both answered
+in chat and never briefed. Both are recorded as confirmed. <b>From now on every ruling lands in the next brief's &sect;0, whether
+or not it changes code</b> &mdash; written into <code>docs/ways-of-working.md</code>.</p>
+
+<p><b>&sect;1 &mdash; FOUR DEFECTS FROM THE PLAYTEST.</b> <b>Boil Over</b> pays exactly what its card says &mdash; 30% of Attack
+plus 2% for every point of the live Blood Frenzy bonus, which only the Berserker's core rune carries &mdash; but the card opens
+<i>Spend the rage itself</i>, which reads as the Warrior's Rage; on a Warrior without that core it strikes for the bare 30%. The
+words are what is wrong, so nothing changed and the words go to the designer. <b>The Sharpshooter's core rune</b> dismisses the
+pet the moment it is slotted; a core rune taken after class selection waits on the hero, unworn, until it is slotted on his rune
+panel &mdash; that is a standing rule, so nothing changed, and whether the pick should slot it goes to the designer. <b>A crest
+rune no longer appears in a hero's own pick of three</b>: the elite's rune cache and the bargain's rune hold his class's runes
+alone, while the fight drop, the Peddler and an event still hand crest runes over. <b>Enemy selection boxes no longer
+overlap</b>: every enemy's clickable box was the same 140 by 220 pixels, far bigger than any body, so neighbours' boxes
+overlapped and hovering one enemy could light another; each box now fits its own enemy's body, and where two bodies crowd, the
+meeting is split between them.</p>
+
+<p><b>&sect;2 &mdash; THE MERCHANT IS AN EASY FIGHT'S REWARD.</b> <i>A merchant follows the fight</i> leaves the severity-4
+bargain and becomes a severity-1 reward, beside its 40 gold. A severity-4 bargain now pays 220 gold or a rune. The merchant is
+still never offered in the run's first three steps &mdash; there the easy bargain pays its gold. On the Warden road a bargain
+carries a merchant about one time in five where it was more than half.</p>
+
+<p><b>&sect;3 &mdash; THE SIX, AS RULED.</b> <b>Mark of the Hunt</b> now really resets when its marked enemy dies. <b>Charge</b>
+Dazes for 2 turns, 3 on a Perfect, so the Daze lands on the enemy's next attack instead of wearing off before it. <b>Blood
+Debt</b> now pays on the bleedout that kills its target too. <b>Counter Time</b> now says it takes one turn, and <b>Snare Line</b>
+no longer promises to hold a Chilled enemy longer &mdash; in both cases the card was wrong, because a stun always costs exactly
+one turn however long it is laid for, and making that length matter would change every stun in the game. <b>Thin Blood</b>'s
+price is finally charged: the Hunter's Poison deals no damage while he wears it, including the barbs the rune makes certain and
+Explosive Shot's &mdash; before, every one of them still did.</p>
+
+<p><b>&sect;4 and &sect;5 &mdash; DELIBERATELY NOT DONE.</b> The damage-attribution repair is HX's. The playtest's other findings
+are later batches by ruling: HY (enemy intent on hover, a kit preview, selectable nameplates, rune-effect chips), HZ (three core
+slots and the bag's three sections), IA (the draft flow) and IB (the Cleric's Mana and the Mage's Burn appliers). <b>Mana
+stays</b>, and Channel's tempo payout is still owed. The rules file is not split, and its ceiling does not move.</p>
+
+<p><b>The checks that moved, and why.</b> The saves were copied first and checked byte for byte against HV's copy: the profile
+and the run save had moved &mdash; a zone cleared, three runs started, and a fresh run on the Warden road one fight in &mdash; and
+nothing was restored over them. Every existing check was then run as it stood against this batch's game, with the documents as
+HV left them &mdash; 136 targets, in 75 minutes. <b>Six asked what this batch ruled the other way</b>, and each was re-pointed to
+the ruling with its count unchanged: <code>test_batch_an</code>'s reward table; <code>check_ho</code>'s cache on the real map
+screen, and <code>test_runes</code>', <code>check_fd</code>'s and <code>check_hr</code>'s crest runes in a hero's cache; and
+<code>test_batch_bw</code>'s anchor on Blood Debt's payout, which moved above the bleedout's hit. <code>check_gp</code> counts one
+check for every card a seeded whole run is offered, and that run took another road &mdash; 443 checks where it counted 454 &mdash;
+which six traced runs pinned on the bargain table and the cache's crest scope together, nothing else this batch changed moving
+it; <code>check_gj</code>'s known red reads other gold figures on the same road, for the same reason. <code>check_dr</code>'s reason
+for Counter Time's stun is re-worded. <b>One check is new</b>: <code>check_hw</code> drives each change both ways &mdash; a hero's
+own pick of three beside the drop, the Peddler and the event verb; every enemy layout with the smallest and the largest bodies,
+and a real spawn of six; four hundred bargains a column at every difficulty; a marked kill and an unmarked one; a Good and a
+Perfect Charge; a killing bleedout and one that does not kill; Counter Time's card and line; and Thin Blood's Poison laid three
+ways, with the price on and off. <b>Twenty-two controls</b>, one defect each, were read by what each printed: every one went red
+on the line it aimed at &mdash; two of them at the arms that must stay true, the drop that still deals crest runes and the Poison
+that still bites when it was given no tick &mdash; and the two built to stay green, a margin and a cooldown moved, stayed green.
+Run against the game as HV left it, the new checks went red at every change this batch made. The rehearsal run and the run in
+the repository are in the report.</p>
+
 <h2>2026-10-07 &mdash; Batch HV: NINE TAGS, DOWNWIND'S RULE, AND THE SHAPE RECON</h2>
 <p><b>Nine more status chips wear tags of their own: two tags that differ only in capital letters now count as the same tag,
 because a chip is glanced at, not read. A Hunter's Downwind no longer copies a snare or Vendetta's lock &mdash; things a card

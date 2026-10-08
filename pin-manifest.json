@@ -2,10 +2,10 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1711,
+  "total": 1714,
   "source": 1304,
-  "other": 108,
-  "document": 299
+  "other": 109,
+  "document": 301
  },
  "source_residency": {
   "narrow": 44,
@@ -4161,7 +4161,7 @@
    "r": "comment",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#699"
+   "g": "check_ho.gd#702"
   },
   {
    "s": "check_ho.gd",
@@ -4172,7 +4172,7 @@
    "r": "absent",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#700"
+   "g": "check_ho.gd#703"
   },
   {
    "s": "check_ho.gd",
@@ -4183,7 +4183,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#694"
+   "g": "check_ho.gd#697"
   },
   {
    "s": "check_ho.gd",
@@ -4194,7 +4194,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#695"
+   "g": "check_ho.gd#698"
   },
   {
    "s": "check_ho.gd",
@@ -4205,7 +4205,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#699"
+   "g": "check_ho.gd#702"
   },
   {
    "s": "check_ho.gd",
@@ -4216,7 +4216,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#697"
+   "g": "check_ho.gd#700"
   },
   {
    "s": "check_ho.gd",
@@ -4227,7 +4227,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#869"
+   "g": "check_ho.gd#872"
   },
   {
    "s": "check_ho.gd",
@@ -4238,7 +4238,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#868"
+   "g": "check_ho.gd#871"
   },
   {
    "s": "check_ho.gd",
@@ -4249,7 +4249,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#868"
+   "g": "check_ho.gd#871"
   },
   {
    "s": "check_ho.gd",
@@ -4260,7 +4260,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#1020"
+   "g": "check_ho.gd#1023"
   },
   {
    "s": "check_ho.gd",
@@ -4271,7 +4271,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#1020"
+   "g": "check_ho.gd#1023"
   },
   {
    "s": "check_ho.gd",
@@ -4282,7 +4282,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#1020"
+   "g": "check_ho.gd#1023"
   },
   {
    "s": "check_ho.gd",
@@ -4293,19 +4293,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#1020"
-  },
-  {
-   "s": "check_ho.gd",
-   "fn": "_s7_elevation",
-   "h": "scripts/battle.gd",
-   "n": null,
-   "p": "+",
-   "r": "runtime",
-   "k": "non-literal",
-   "how": "read",
-   "g": "check_ho.gd#1042",
-   "expr": "anchor"
+   "g": "check_ho.gd#1023"
   },
   {
    "s": "check_ho.gd",
@@ -4322,13 +4310,25 @@
   {
    "s": "check_ho.gd",
    "fn": "_s7_elevation",
+   "h": "scripts/battle.gd",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ho.gd#1048",
+   "expr": "anchor"
+  },
+  {
+   "s": "check_ho.gd",
+   "fn": "_s7_elevation",
    "h": "scripts/classes.gd",
    "n": "\t\t\"Elevation\":\n\t\t\treturn Ability.make",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#1050"
+   "g": "check_ho.gd#1053"
   },
   {
    "s": "check_ho.gd",
@@ -4339,7 +4339,7 @@
    "r": "comment",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#1052"
+   "g": "check_ho.gd#1055"
   },
   {
    "s": "check_ho.gd",
@@ -4350,7 +4350,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#1054"
+   "g": "check_ho.gd#1057"
   },
   {
    "s": "check_ho.gd",
@@ -4361,7 +4361,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#1048"
+   "g": "check_ho.gd#1051"
   },
   {
    "s": "check_ho.gd",
@@ -4372,7 +4372,7 @@
    "r": "comment",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#1045"
+   "g": "check_ho.gd#1048"
   },
   {
    "s": "check_ho.gd",
@@ -4383,7 +4383,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#1043"
+   "g": "check_ho.gd#1046"
   },
   {
    "s": "check_ho.gd",
@@ -4394,7 +4394,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#1058"
+   "g": "check_ho.gd#1061"
   },
   {
    "s": "check_ho.gd",
@@ -4405,7 +4405,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#1061"
+   "g": "check_ho.gd#1064"
   },
   {
    "s": "check_ho.gd",
@@ -4416,7 +4416,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#1061"
+   "g": "check_ho.gd#1064"
   },
   {
    "s": "check_ho.gd",
@@ -4427,7 +4427,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#1061"
+   "g": "check_ho.gd#1064"
   },
   {
    "s": "check_hp.gd",
@@ -5160,7 +5160,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hr.gd#187"
+   "g": "check_hr.gd#195"
   },
   {
    "s": "check_hr.gd",
@@ -5171,7 +5171,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hr.gd#210"
+   "g": "check_hr.gd#218"
   },
   {
    "s": "check_hr.gd",
@@ -5182,7 +5182,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hr.gd#209"
+   "g": "check_hr.gd#217"
   },
   {
    "s": "check_hr.gd",
@@ -5193,7 +5193,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_hr.gd#212"
+   "g": "check_hr.gd#220"
   },
   {
    "s": "check_hr.gd",
@@ -5204,7 +5204,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_hr.gd#433"
+   "g": "check_hr.gd#441"
   },
   {
    "s": "check_hs.gd",
@@ -5701,6 +5701,39 @@
    "k": "literal",
    "how": "read",
    "g": "check_hv.gd#310"
+  },
+  {
+   "s": "check_hw.gd",
+   "fn": "_s5_the_record",
+   "h": "docs/ways-of-working.md",
+   "n": "EVERY RULING LANDS IN THE NEXT BRIEF",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hw.gd#514"
+  },
+  {
+   "s": "check_hw.gd",
+   "fn": "_s5_the_record",
+   "h": "CLAUDE.md",
+   "n": "NEVER IN A HERO'S OWN PICK OF THREE",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hw.gd#512"
+  },
+  {
+   "s": "check_hw.gd",
+   "fn": "_s5_the_record",
+   "h": "CLAUDE.md",
+   "n": "RANKED BY ITS CHILL, CONFIRMED",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hw.gd#511"
   },
   {
    "s": "test_batch_ah.gd",
