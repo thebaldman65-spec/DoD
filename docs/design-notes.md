@@ -4,6 +4,44 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The checks a reference is held by, and the bigger file (Batch HX) — 2026-10-08
+
+**Why the checks come before any further split.** HV re-read both of the rule files split out of `CLAUDE.md` from the day each
+was made, and found the same thing twice: the rules themselves held, and the seams rotted — an index row missing, a rule
+standing in both files, instrument rules written back into the required read after the seam was taken. Having the file open
+protected neither; the only thing that ever held a seam was a mechanical check. So the checks come first, whatever shape the
+rules file takes next: they are owed by the two references that already exist, and a third reference built without them would
+inherit the same record.
+
+**Why `docs/state.md` before the pilot.** HV recommended a nine-unit pilot of a block index next. The larger file in the same
+required read was `docs/state.md` — larger than `CLAUDE.md`, with no ceiling, and more than a quarter of it closed or answered history.
+Trimming it asks the pilot's own question — does taking content out of the required read cost anything? — of a far larger
+population, and moves no rule while it does, because `docs/state.md` is rewritten every batch and never appended to. The pilot
+would have bought about 3% of the rules file for a whole batch of the few left before its ceiling. The block index is not
+rejected: the re-measure decides it.
+
+**Why the trim is a triage, not a deletion.** The queue's whole value is that nothing in it is lost. Every item was read
+against the code before it moved; an item fixed, overtaken or superseded moves to the archive verbatim, an item still owed or
+not settled stays, and a doubtful one stays — a doubtful item is cheaper kept than wrongly archived. The archive sits beside
+the changelog's, in `DoD-archive/`, reached through the live file's own header, which is the pattern the changelog's cut taught.
+
+**Why a subject cannot be checked by its words.** Two word-based tests were measured for "is this block an instrument rule"
+and both failed: the instrument file's own vocabulary scored a rule about kept content as high as a rule about superseding a
+gate, and the seam's own nouns — gate, sweep, control — are game words too. A rule's subject is a judgment. What a check can
+hold is the moment a block is written: the file's blocks are a known population, so a new one waits until its author has
+said which file it belongs in.
+
+**Why the two rules every brief carried are in the instrument file.** A rule in a file costs its bytes once; a line repeated
+in every brief costs them every batch, and the brief that forgets it costs a whole verification run. Both bind how a batch
+verifies itself, so they belong in the instrument reference — and putting them there is the placement the new check exists
+to hold, because the rules that went the other way are why it was built.
+
+**Why Frostbind's copy is refused and the Covenant half kept.** A Frostbind binds two bodies, and a copy is one body: which
+body a copied end binds to is not in the card, so every routing invents a rule the card never stated. Refusing the copy is
+the rule's own answer — a binding is a card's bookkeeping, and bookkeeping is not carried. The Covenant half is different in
+kind: every hop is a card doing what its own text says, and the chain ends at a guard, so it is bounded; stopping two cards
+from combining as written would be special-casing, not a repair.
+
 ## Four playtest defects, the merchant's place, and the six card-versus-code items (Batch HW) — 2026-10-08
 
 **Why the merchant is an easy fight's reward.** A merchant is a shop the party still pays at, so as the reward for the

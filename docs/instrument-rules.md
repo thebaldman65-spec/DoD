@@ -1526,18 +1526,21 @@ a census is taken.
   `check_map` and `check_map_screen`. Five of them print `NAME: 0 failures`; two are pure reports.
   **The list is not written twice**: `run_battery.sh` names it for the live report and `check_de`
   derives it from `baselines.json`, and `check_de` §2 is what stops the two drifting.
-- **AND ONE GATE NOW READS A FILE THAT IS WRITTEN AFTER THE VERIFICATION RUN, WHICH IS AN
+- **AND GATES READ A FILE WHOSE LAST LINES ARE WRITTEN AFTER THE VERIFICATION RUN, WHICH IS AN
   OBLIGATION AND NOT A DEFECT.** FS §2 put `docs/state.md` into `check_es` §4(2b)'s swept
   population, because that is where FR's third stale copy of the core-kit figure was standing.
-  **It is the only gate that reads that file's CONTENT** — others name it and every one of
-  them does so inside a comment, and `check_fr` §4 asserts only that the path resolves. Two things
+  **`check_es` was the first gate to read that file's CONTENT and it is not the only one**:
+  `check_hp` §5 reads it for a ruling recorded there, and `check_hx` §2 reads its header for the
+  archive's name. **The readers are found by a census of `res://` reads, never from this list**
+  (HX §2d). `check_fr` §4 asserts only that its conflict table names the file. Two things
   follow and both are load-bearing:
   · **THE ARMS ARE A FIXED TEN, ONE PER DOCUMENT AND NEVER ONE PER FIGURE.** A check count that
     rose and fell with how often `state.md` happened to state the claim would move in the batch
     AFTER the one that caused it, and no baseline can hold a number like that.
-  · **A BATCH THAT REWRITES `docs/state.md` OWES `check_es` A RE-RUN AGAINST THE SHIPPED TREE**,
-    and owes the reading in its report. The rewrite lands behind the battery by convention, so
-    without that re-run every batch would ship a `state.md` nothing had read.
+  · **A BATCH THAT REWRITES `docs/state.md` OWES EVERY READER OF IT A RE-RUN AGAINST THE SHIPPED
+    TREE**, and owes the reading in its report. Only the lines that record the run are written
+    after it (*WRITE THE DOCUMENTS BEFORE THE VERIFICATION RUN*, below), and without that re-run
+    every batch would ship lines of `state.md` nothing had read.
 - **THE PROOF IS THE PART THAT TRANSFERS.** A fix that makes the two distinguishable in theory and
   not in the battery's own output is not a fix. FS armed it four ways: a real gate truncated at 30
   frames (reported as INCOMPLETE, with the budget named), **the same gate with the budget removed**
@@ -1688,3 +1691,35 @@ the drive keeps the fast frames.
 - **AND A TERM SHARED WITH THE FIELD MOVES WITH THE FIELD.** Pyroblast's burning-target bonus rides an Overburn holder's
   multiplier, which counts every burn-turn on the field, so clearing a body between strikes moves both. The arm reads the
   bonus's own log line beside the damage, so the term is named rather than inferred from a difference.
+
+## STANDING RULE — WRITE THE DOCUMENTS BEFORE THE VERIFICATION RUN (Batch HX §3)
+
+> **Every document a target reads is written before the run that certifies the tree** — `CLAUDE.md`, the two references,
+> `docs/master.html`, the changelog, the design notes and `docs/state.md`'s claims, edited, swept and frozen first, so the
+> run reads them as they will ship. **What is written after it is the batch report, which nothing opens, and the lines of
+> `docs/state.md` that record the run** — and those are proved by re-running every target that reads the file, never assumed.
+
+- **A DOCUMENT EDITED AFTER THE RUN IS A TREE THE RUN DID NOT READ.** Targets assert against `CLAUDE.md`'s,
+  `docs/master.html`'s and the changelog's text, `check_fg` measures the changelog against its bar, and `docs/state.md` has
+  readers of its own: a late edit can break a pin or gain one, and either surfaces a battery later. **Find a file's readers
+  by a census of `res://` reads, never from a note** — this file named one reader of `docs/state.md` for batches while two
+  read it.
+- **A LATE EDIT THAT CANNOT WAIT IS PROVED, NOT ASSUMED**: the literal sweep against the copy the run read, the readers of
+  the edited file re-run, and the tree re-stamped against the run's freeze — or the run is taken again.
+- **WHY IT IS A RULE AND NOT A LINE IN THE NEXT BRIEF (HX §3).** HV §3e counted it in 89 of 94 briefs and in no rule file.
+  A rule in a file costs its bytes once; a line in every brief costs them every batch, and the brief that forgets it costs a
+  battery.
+
+## STANDING RULE — READ THE ROWS OF `ps`, NEVER A `grep -c` (Batch HX §3)
+
+> **Whether something is running is answered by reading the rows `ps` prints — the command, its parent, how long it has
+> run — never by counting matching lines.** A count cannot tell the process from the shell that went looking for it.
+
+- **A COUNT OVER `ps` COUNTS THE SEARCH TOO.** A command here runs inside a shell whose command line carries the whole
+  script, so a word the script names is in a live process's arguments: the `[G]odot` trick keeps `grep` off its own pattern
+  and does nothing about the wrapper, or about a sibling in the same pipeline that names the install path. And `pgrep -f`
+  matches its own wait loop, which then waits on itself.
+- **READ THE ROWS, MATCH THE EXECUTABLE, AND NAME EACH ROW** (`ps -axo pid,ppid,stat,etime,command`): the battery's runner,
+  a target's Godot, a probe, a waiter — and **the designer's game, a Godot with no `--headless`**, which reds every
+  player-file arm it runs beside (six gates at HT, seventeen at HV). Read them before a run and through it.
+- **WHY IT IS A RULE AND NOT A LINE IN THE NEXT BRIEF (HX §3).** HV §3e counted it in 51 of 94 briefs and in no rule file.

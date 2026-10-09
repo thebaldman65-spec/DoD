@@ -18,7 +18,8 @@ describes what happened, it is not a rule and it does not belong here.
 
 - **What happened** → `docs/changelog.html` (and `changelog-archive.html`).
 - **Where the project is right now** — open queue, live counts, what is known-broken →
-  **`docs/state.md`**, which is REWRITTEN every batch and never appended to.
+  **`docs/state.md`**, which is REWRITTEN every batch and never appended to — and what it closes goes to
+  `DoD-archive/state-archive.md` (HX §2).
 - **What the game currently is** → `docs/master.html`.
 - **Why a decision was made** → `docs/design-notes.md`.
 - **What a given batch did** → `docs/reports/<CODE>.md`.
@@ -103,12 +104,20 @@ into this file changes it.
   stopped asking its question**, which is the CW/CD fault arriving through an index instead of
   through prose. **`check_ec` §2's own two needles are pinned against `docs/instrument-rules.md`
   for exactly that reason**, and every document instrument scopes a pin to the file it names.
+- **AND SINCE HX THE SEAM IS HELD BY CHECKS, NOT BY BEING OPENED (`check_hx` §1, HV §3e's four).** Both references held on
+  substance and rotted at their seams — a row missing, a rule standing in two files, instrument rules written back into this
+  one — and only a mechanical check ever held either. **Every block of a reference has its row and every row names one
+  block** (§1a, derived from the files, both indexes); **no run of twelve words and no rule statement stands in two rule
+  files, case set aside** (§1b); **a new block in this file reds until its author says which file it binds** (§1c); and
+  **every name a reference backticks resolves in the tree, and not only inside a gate's needle** (§1d). **A batch that
+  writes a rule into a reference writes its row here in the same batch.**
 
 **WHAT IS OVER THERE** — the blocks below, in the order they stood here; the two `###` children of
 the equality rule travel with their parent. **Eight of the rows are FF §2's**, and they are the
 residue: rules written into this file AFTER the seam was taken, which the seam's own test puts on
 the other side of it. **Every row after those eight was written straight into the reference rather
-than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two and HS's one:
+than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one and HX's two —
+and GW §2's, written there at GW and given its row only at HX (HV §3e found it missing; `check_hx` §1a now reds on one):
 
 | | |
 |---|---|
@@ -149,6 +158,7 @@ than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's
 | THE PIN MANIFEST BINDS A HOLDER OFF `var x :=`, NEVER OFF `var x: String =` | FH §2 |
 | AN END-STATE CENSUS CANNOT SEE WHAT A TARGET PUTS BACK | FI §1 |
 | A TARGET CUT OFF BY A FRAME BUDGET IS INDISTINGUISHABLE FROM ONE THAT PRINTS NO VERDICT | FR §5a / FS §1 |
+| A GATE THAT WRITES THE STATE ITS ASSERTION IS ABOUT CANNOT FAIL WHEN THE DOOR THAT WRITES IT BREAKS | GW §2 |
 | A CEILING IS A NUMBER WITH AN ANSWER BEHIND IT | GZ §6 / HA §5 |
 | A BATCH CLEARS THE PREVIOUS BATCH'S ISOLATED COPIES WHEN IT FINISHES | HO §5 |
 | AN INSTRUMENT PUTS A RUNE DOWN THROUGH `Run.hold_rune`, AND A SCOPE WALK NAMES EVERY BAND | HO §1 |
@@ -157,6 +167,8 @@ than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's
 | A TIMED SCREEN ELEMENT IS READ AT TIME SCALE ONE | HR §2 |
 | AN ARM THAT READS WHAT THE DICE DEALT IS A COIN FLIP THE NEXT BATCH CAN LOSE | HR §6 |
 | A STRIKE A/B COMPARES ONE KIND OF BODY | HS §2c |
+| WRITE THE DOCUMENTS BEFORE THE VERIFICATION RUN | HX §3 |
+| READ THE ROWS OF `ps`, NEVER A `grep -c` | HX §3 |
 
 ## THE COMBAT RULES LIVE IN `docs/combat-rules.md` (STANDING, SET AT GR §2, RULED BY THE DESIGNER)
 > **THIS FILE IS STILL THE ONE A BATCH MUST READ. `docs/combat-rules.md` IS A REFERENCE IT POINTS AT,
@@ -418,9 +430,13 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
   · **THIS IS THE CEILING'S THIRD RE-DERIVATION, AND A FOURTH IS NOT THE ANSWER (ruled by the
     designer at HN §1).** The ceiling exists because **every batch pays the full read**, so a
     ceiling that only ever rises is measuring nothing. **The next move at this ceiling is a recon
-    on the file's SHAPE, queued at HN and run at HV** (`docs/reports/HV.md` §3; what it recommends is
-    the designer's to rule): whether an index plus subjects read on demand beats one file with a
-    moving ceiling. **GY's rejection of splitting the
+    on the file's SHAPE, queued at HN and run at HV** (`docs/reports/HV.md` §3): whether an index plus
+    subjects read on demand beats one file with a moving ceiling. **RULED AT HX §0 (the designer's), AND
+    THE ORDER IS NOT HV's: the checks a reference is held by first (`check_hx` §1), then `docs/state.md`'s trim, then a
+    re-measure — HV's nine-unit pilot waits, and the block index is decided at the re-measure.** The reason, so a session that
+    finds HV's order does not wonder: `docs/state.md` was the larger file in the same read, with no ceiling, and trimming it
+    asks the pilot's question — does taking content out of the required read cost anything — of a far larger population,
+    with no rule moving. **GY's rejection of splitting the
     reasoning out (below) stands, and it is not the seam that recon reconsiders.**
   · **THE RECORD THE HEADROOM TERM READS DID NOT MOVE AT GY OR AT HN, AND BOTH TIMES THAT WAS
     MEASURED RATHER THAN ASSUMED.** Over EE's own window — the 105 batches from DK to HL — the
@@ -579,8 +595,8 @@ them** — they move every batch.
   backup for 1,646,681 B of history that four cuts had moved there. **The picker is the tool for
   the capacity problem and the repo is the tool for the backup problem, and they were being
   solved with the same lever.** Tracked and deselected is what the 44 suites already do.
-  **DESELECT `DoD-archive/` — both files. It is 1,941,173 B**, larger than every `check_*.gd` in
-  the tree put together. **THE SHARE IS NOT CARRIED HERE AND THE BYTES
+  **DESELECT `DoD-archive/` — all three files (the state archive joined it at HX §2). It is 2,170,901 B** at HX — no longer
+  more than every `check_*.gd` put together, as it was at FH. **THE SHARE IS NOT CARRIED HERE AND THE BYTES
   ARE**, because a share moves every time any other file does: FH wrote *14.2%* and FS measured
   the same two files at **13.0%** without either of them changing by a byte. **Run
   `python3 claude_md_census.py` for the live file count and total** — that is what it is for.
@@ -4577,8 +4593,12 @@ exactly the inverted card, and it would still read fine on the tooltip.
     instance of a thing the card counts. **Vendetta's lock and Snare Trap's snare are laid with the carry held off**
     (`battle._carry_withheld`; a card that lays its own bookkeeping through the door holds it too), and **a copy that
     skipped its original's route now takes it** — a Ruin stack through `_gain_ruin` (it primes; a Covenant takes its
-    share), a poison with `_apply_poison`'s stamps. **The rule names a third, Frostbind — a binding the brief routed — and
-    what a copied end binds to is owed a ruling** (`docs/state.md`); it is still carried as a chip with no partner.
+    share), a poison with `_apply_poison`'s stamps. **The rule names a third, Frostbind, and the
+    designer ruled its copy REFUSED, not routed (HX §0) — RULED, NOT BUILT**: HX changed no game code, so a copied Frostbind is
+    still carried as a chip with no partner, and the batch that builds the refusal owes the card its words for it (the
+    designer's). **The Covenant half of the Ruin route is KEPT (HX §0, ruled)**: every hop is a card doing what its own text
+    says and the chain is bounded — FC §2's test — so narrowing the route to the arming alone would be four lines of
+    special-casing to stop two cards combining as written.
 
 **THIS IS THE RULE POOLS ARE AUTHORED AGAINST NOW, INSTEAD OF BY FEEL.** DQ measured the
 Swordmaster at ten cards making FOUR decisions — a player who had drafted four had seen everything
