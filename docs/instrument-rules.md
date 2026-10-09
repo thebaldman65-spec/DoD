@@ -771,8 +771,16 @@ firing"; the number that answers that was printed four lines below it the whole 
   agree, repair to the intended value anyway — the habit is the point.**
 - **A SUITE THAT STOPS ASSERTING IS THE FAILURE BEING FIXED, NOT A WAY OF FIXING IT.** Deleting a
   check to reach green destroys exactly the thing that would have caught the next regression.
-- **THE ONE EXCEPTION, AND IT IS NARROW (STANDING, SET AT DG §2): A CHECK ASKING ABOUT A DELETED
-  FEATURE IS NOT A LIVE QUESTION.** This rule exists to stop a live question being silenced. A
+- ~~**THE ONE EXCEPTION, AND IT IS NARROW (STANDING, SET AT DG §2): A CHECK ASKING ABOUT A DELETED
+  FEATURE IS NOT A LIVE QUESTION.**~~ **STRUCK AT HY §4, ON TWENTY BATCHES' PRACTICE: THE PRACTICE RETIRED ONTO THE FACT,
+  SO THIS TEXT IS STALE. DO NOT APPLY IT.** When a check's subject was deleted, HD to HX retired the check onto the fact that
+  deleted it 26 times (8 of them with a record line printed beside the fact) and deleted it with the fall predicted 3 times; eleven more were
+  hybrids or re-points (HY's report, §4, names every one). **The live doctrine is HG's — *A SUPERSESSION IS A CLAIM, AND
+  IT IS DRIVEN LIKE ONE*, moved into this file at HY §4** — so a check about a deleted subject is retired onto the fact, and
+  this bullet is kept, struck, so it is not derived again. **What the practice kept of it is narrower than this bullet**: all
+  three deletions were a ROW of an instrument's own table (`check_da`'s walk exemption at HJ, `check_gu`'s `BELOW` row at HL,
+  `check_gv`'s `GROUPS` row at HP) — an instrument's own data going with its subject, each with its fall predicted and a note
+  where it stood — never an assertion about the game. The struck text, as it stood: This rule exists to stop a live question being silenced. A
   check whose SUBJECT no longer exists anywhere — not in the code, not in the documents, not in
   the archive — **cannot pass, cannot fail meaningfully, and cannot be repointed at anything**,
   and keeping it red is not evidence: it is noise that hides the next real red. DG deleted six
@@ -1530,8 +1538,9 @@ a census is taken.
   OBLIGATION AND NOT A DEFECT.** FS §2 put `docs/state.md` into `check_es` §4(2b)'s swept
   population, because that is where FR's third stale copy of the core-kit figure was standing.
   **`check_es` was the first gate to read that file's CONTENT and it is not the only one**:
-  `check_hp` §5 reads it for a ruling recorded there, and `check_hx` §2 reads its header for the
-  archive's name. **The readers are found by a census of `res://` reads, never from this list**
+  `check_hp` §5 reads it for a ruling recorded there, `check_hx` §2 reads its header for the
+  archive's name, and `check_fg` §4 reads its preamble for its own ceiling (HY §3). **The readers are
+  found by a census of `res://` reads, never from this list**
   (HX §2d). `check_fr` §4 asserts only that its conflict table names the file. Two things
   follow and both are load-bearing:
   · **THE ARMS ARE A FIXED TEN, ONE PER DOCUMENT AND NEVER ONE PER FIGURE.** A check count that
@@ -1723,3 +1732,108 @@ the drive keeps the fast frames.
   a target's Godot, a probe, a waiter — and **the designer's game, a Godot with no `--headless`**, which reds every
   player-file arm it runs beside (six gates at HT, seventeen at HV). Read them before a run and through it.
 - **WHY IT IS A RULE AND NOT A LINE IN THE NEXT BRIEF (HX §3).** HV §3e counted it in 51 of 94 briefs and in no rule file.
+
+## STANDING RULE — RE-VERIFYING A CENSUS ENTRY MEANS DIFFING WHAT FEEDS THE ARM, NOT THE ARM'S OWN LINE (Batch HG §1b)
+> **A census hands the next batch a file and a line. Both can still be exact while the entry is already
+> repaired**, because a repair often lands in the lines ABOVE the assertion and never touches it.
+
+**HG RE-DERIVED HA's 110 STALE ARMS AND A LINE CHECK WOULD HAVE COUNTED SEVENTY-ONE.** `check_fk` §5's
+`ok(unreachable.is_empty(), …)` is byte-identical to the day HA read it; **HC §1 re-pointed the four lines that
+build `reach`** from the lineage's own shelf to `Classes.draft_pool(cls)`, wrote the reason into the comment above
+it, and left the assertion alone. The arm was done and the census would have said it was outstanding.
+
+- **MAP THE ENTRY FORWARD, THEN DIFF ITS ENCLOSING FUNCTION WITH COMMENTS STRIPPED.** HG did both: 71 of 110 arms
+  were textually unchanged, and **29 of those 71 sat in a function whose code had moved**. Twenty-eight of the
+  moves were a neighbour's repair landing beside the arm; one was the arm's own.
+- **THE COMMENT ABOVE AN ARM IS WHERE A RE-POINT IS RECORDED, so it is evidence and not decoration.** Every repair
+  in this project writes its reason there (`docs/instrument-rules.md`), which is what makes this check cheap.
+- **THIS IS EU's READ-SITE RULE POINTED THE OTHER WAY.** *The read site is the line, not the function* is about
+  where a claim is PAID; this is about where a repair LANDS. A census entry needs both readings.
+
+## STANDING RULE — A SUPERSESSION IS A CLAIM, AND IT IS DRIVEN LIKE ONE (Batch HG §2a)
+> **Retiring an instrument because another one "asks it better" is a statement about the game's instruments, and
+> it can simply be false. Inject the defect the retired arm guards and READ THE NAMED CHECK.**
+
+**HG RAN EIGHT SUCH CONTROLS AND THREE REFUTED THE RULING IT HAD WRITTEN.**
+
+- **`check_gp` read ZERO failures** with a lineage-gated card sitting in a class-wide shelf, because the gate
+  withholds the card at the OFFER door whichever shelf it sits on — so nothing the gate drives breaks, and the arm
+  proposed for retirement was the only one asking.
+- **`check_gs` §1 caught one leaked enabler and was SILENT ON THE OTHER**, because the Sharpshooter's enabler is
+  the Hunter's class basic and §0 exempts it by name. **Retiring all three siblings would have lost that case
+  silently**; one is kept.
+- **AND THE NAMED SUPERSEDER WAS WRONG FOR AN ENTIRE FAMILY OF EIGHT.** `check_gs` counts homes for the thirty
+  RETURNING cards; the eight arms guard authored draft cards, which are not in that population.
+
+**SO THE CONTROL IS TWO-ARMED IN THE USUAL WAY AND THE ARMS ARE NAMED:** the retired arm reds, which proves it
+guarded the defect, **and the named check reds, which proves retiring it loses nothing.** A green second arm is not
+a detail to note — it is the ruling being wrong.
+
+- **AND A GREEN FIRST ARM IS THE OTHER WAY THE RULING IS WRONG: AN ARM THAT NEVER BITES IS NOT SUPERSEDED, IT IS
+  VACUOUS (Batch HH §2).** HG sorted one of its seventeen superseded arms without driving it. Driven three ways — the
+  defect written into its own lineage's definitions, into a sibling's, and into the class kit — the arm read green
+  every time, and an ok() trace said why: it fires ZERO times, because it walks `Classes.SPEC_IDS`, whose keys are the
+  four classes, and a class has no definition table. There is nothing to retire onto; it goes to a repair, as HD §2
+  repaired the identical walk in another suite. **Count an arm's fires before sorting it** — a census reads a line,
+  and a line can hold an assertion that never runs.
+- **A RETIREMENT ASSERTS THE FACT THAT RETIRED IT, AND PRINTS WHAT IT USED TO READ (HD §2's four; HH's twenty-one).**
+  The old computation stays and its reading is PRINTED as a `[record]`; the `ok()` becomes the game fact that made the
+  question stale — GP's one pool a class (`suite_fixture.one_pool_a_class`, the one helper every shelf arm retires
+  onto), GS §1's opening (a lineage defines more than it opens with), FX's one tree — so the day that fact stops
+  holding, the retired question is live again and the arm goes red saying so. **An arm "retired" onto a new door for
+  its OLD question is a re-point**, and the control tells the two apart: a retired arm stays GREEN on the defect it
+  used to guard while its superseder goes red.
+- **A SUPERSEDER IN ANOTHER TARGET IS A DEPENDENCY, AND IT IS RECORDED AT BOTH ENDS (Batch HH §2).** The retired arm
+  names it at its site; the superseder carries a note naming every arm retired onto it, so a batch that retires or
+  narrows it meets what stands on it. **Derive the population off the controls, never off a brief**: HH's brief named
+  two such arms and the controls found six — two on `check_gs`, two on three other suites' whole-draft sweeps, and
+  two on `test_batch_bp` §5's enabler arm, the only arm left asking the Sharpshooter's case.
+- **A RE-POINT THAT NARROWS WHAT AN ARM CALLS A DEFECT CANNOT PASS HD's SECOND ARM, AND THE CONTROL THAT PROVES IT IS
+  RUN REVERSED (Batch HI §3b).** HD's rule is that the repaired arm reds on the defect and HEAD's copy does not. Two of
+  HI's arms called a SIBLING's shelf foreign to the hero (`test_batch_an`'s zone-boss arm, `test_batch_au`'s debug
+  grant); under one pool a class it is his own, so the repair takes those cards OUT of the set, and every defect the new
+  set can see the old one sees too: a roller or a grant handing out a sibling's boss card reds both. **That is the
+  repair working, not failing.** What shows it was needed is the defect pointed the other way — the roller drawing
+  the hero's OWN class pool: HEAD's arm went red on 21 of his own cards and the grant's on 105, and the repaired arms
+  read nothing. **So: say before arming whether the repair widens or narrows the set; a widening takes HD's two arms,
+  a narrowing takes the forward control (both red) AND the reversed one (HEAD alone red).**
+- **AND ONE RE-POINT CAN DO BOTH AT ONCE, SO IT TAKES BOTH CONTROLS (Batch HJ).** Moving an arm from a lineage's shelf
+  onto the class's one pool WIDENS its population and, where the gate tables now withhold a card, NARROWS what it
+  calls a defect — `test_batch_ah`'s curation arms met Overcharge in the pool and had to ask its `ENGINE_READ` row
+  where the old arm asked its absence. **Each half has its own defect**: a row deleted is seen by the repair alone
+  (forward: the repair red, HEAD silent), and a gated card authored on the class-wide shelf is a defect only to HEAD
+  (reversed: HEAD red, the repair silent). **A re-point that changes WHO an arm weighs — a population re-keyed
+  from lineages to classes — can leave HEAD red on the same defect, and then the per-line FAIL text is the control**:
+  the line HEAD does not print is the case its population missed. **And a target that loads another file's constants
+  takes BOTH files into its HEAD arm** — `check_dp` reads `check_do`'s table, so HEAD's `check_dp` beside the new
+  `check_do` weighed the new table and named every lineage; HJ ran that control again with HEAD's two.
+
+## STANDING RULE — A BATCH RE-READS THE REFERENCE CLAIMS THAT NAME WHAT IT TOUCHED (Batch HY §6, ruled by the designer)
+> **A batch re-reads every present-tense claim in a reference that names what the batch touched, and repairs or reports
+> each.** Not a schedule — a step, taken by the batch that moves the code.
+
+- **A CLAIM GOES STALE EXACTLY WHEN THE CODE IT NAMES MOVES, AND THE BATCH THAT MOVES IT IS THE ONE THAT KNOWS.** HX's
+  census read every present-tense claim in the two references — 824, 735 of them mechanically checkable — and found 90 of
+  those stale (`docs/reports/HX.md` §1d). A census meets that rot ten batches late, at about 2.1 million tokens a run;
+  **the re-read was ruled over the census for that reason, and the census is not scheduled.**
+- **THE POPULATION IS THE NAMES THE DIFF TOUCHES.** Every function, constant, field, status, file and gate the batch edits,
+  matched against the names `check_hx` §1d already pulls out of both references; each sentence carrying one is read
+  against the new tree. A claim the batch's own change falsifies is repaired in that batch; any other stale claim it
+  meets there is reported in its report, with what is true.
+- **ITS BLIND SPOT IS NAMED, NOT SOLVED**: a claim falsified by a symbol it does not name is never met by this step — the
+  Seeking Missiles rune falsified the combat file's sentence about a multi-hit's single target without either name
+  appearing in it. That is the kind only a census finds.
+
+## STANDING RULE — A LIVE COUNT IN A REFERENCE POINTS AT THE INSTRUMENT THAT PRINTS IT, OR CARRIES ITS BATCH (Batch HY §6, ruled by the designer)
+> **A reference does not state a live count as a bare present-tense figure.** It points at the instrument that prints
+> the count (DJ §3's shape), or it names the batch that measured it, so the figure reads as that batch's. It is
+> `CLAUDE.md`'s rule for a card and a comment — do not name a magnitude a constant holds (HO §0) — held to the two
+> references, for counts.
+
+- **COUNTS ROT SEVEN TIMES FASTER THAN VALUES.** In HX's census, 31 of the references' 106 count claims were stale (29.2%)
+  against 3 of their 75 value claims (4.0%): a count is a fact about a population, and every batch that adds a member
+  moves it without touching the sentence.
+- **31 OF THE 87 STALE CLAIMS STANDING AFTER HX ARE COUNTS** (26 in this file, 5 in the combat rules) — the share this rule
+  would have kept out had it stood from the start. They are not repaired by the rule: the 87 are a batch of their own, by
+  ruling, and each is repaired there with its literal sweep.
+- **IT LOOKS FORWARD**, as HO §0 does: a count written into either reference from here on obeys it.

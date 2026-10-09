@@ -116,8 +116,10 @@ into this file changes it.
 the equality rule travel with their parent. **Eight of the rows are FF §2's**, and they are the
 residue: rules written into this file AFTER the seam was taken, which the seam's own test puts on
 the other side of it. **Every row after those eight was written straight into the reference rather
-than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one and HX's two —
-and GW §2's, written there at GW and given its row only at HX (HV §3e found it missing; `check_hx` §1a now reds on one):
+than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two and HY's two —
+and GW §2's, written there at GW and given its row only at HX (HV §3e found it missing; `check_hx` §1a now reds on one) —
+and two more are MOVED, FF §2's way: HG–HJ's census and supersession blocks, written back into this file after the seam
+was taken and sent over at HY §4 by the designer's ruling, byte for byte (`check_hx` §1c reds on a new block written here):
 
 | | |
 |---|---|
@@ -169,6 +171,10 @@ and GW §2's, written there at GW and given its row only at HX (HV §3e found it
 | A STRIKE A/B COMPARES ONE KIND OF BODY | HS §2c |
 | WRITE THE DOCUMENTS BEFORE THE VERIFICATION RUN | HX §3 |
 | READ THE ROWS OF `ps`, NEVER A `grep -c` | HX §3 |
+| RE-VERIFYING A CENSUS ENTRY MEANS DIFFING WHAT FEEDS THE ARM, NOT THE ARM'S OWN LINE | HG §1b |
+| A SUPERSESSION IS A CLAIM, AND IT IS DRIVEN LIKE ONE | HG §2a / HH / HI / HJ |
+| A BATCH RE-READS THE REFERENCE CLAIMS THAT NAME WHAT IT TOUCHED | HY §6 |
+| A LIVE COUNT IN A REFERENCE POINTS AT THE INSTRUMENT THAT PRINTS IT, OR CARRIES ITS BATCH | HY §6 |
 
 ## THE COMBAT RULES LIVE IN `docs/combat-rules.md` (STANDING, SET AT GR §2, RULED BY THE DESIGNER)
 > **THIS FILE IS STILL THE ONE A BATCH MUST READ. `docs/combat-rules.md` IS A REFERENCE IT POINTS AT,
@@ -398,8 +404,8 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
     report. HT's, with its verdict, its acceptance paragraph and its count of copies still tokens, stood in the working tree
     for the whole acceptance run and was read there; the file it committed carried none (`docs/reports/HU.md` §0).
 
-## THIS FILE IS MEASURED IN KiB, AND THE CEILING IS 470 KiB (STANDING, RULED AT EE §1, RAISED AT FU §1, GY §1 AND HN §1)
-> **`CLAUDE.md` IS MEASURED AS A SIZE, NEVER AS A SHARE OF THE SYNC, AND THE CEILING IS 470 KiB.**
+## THIS FILE IS MEASURED IN KiB, AND THE CEILING IS 510 KiB (STANDING, RULED AT EE §1, RAISED AT FU §1, GY §1 AND HN §1, AND AT HY §2 OVER HN's OWN RULING)
+> **`CLAUDE.md` IS MEASURED AS A SIZE, NEVER AS A SHARE OF THE SYNC, AND THE CEILING IS 510 KiB.**
 > **When it is reached the answer is a SPLIT. It is never a prune.** The 3%-of-sync target this
 > replaces is retired: three readings killed it and all three are recorded below, so nobody derives
 > it again.
@@ -415,21 +421,35 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
 - **NEVER-QUOTED IS NOT DEAD.** "Neither asserted nor quoted" is a fact about citation, not about
   load. **Nobody quotes the rule they are obeying**, so a well-obeyed rule and a dead one produce
   identical evidence under a citation count. **Do not prune this file by a reference count.**
-- **THE 470 KiB IS DERIVED, NOT CHOSEN — BY EE's OWN METHOD WITH CURRENT INPUTS, ON ITS FOURTH RUN
-  (ruled by the designer at FU §1, GY §1 and HN §1).** The FLOOR is measured, and since GY it is
+- **THE 510 KiB IS DERIVED, NOT CHOSEN — BY EE's OWN METHOD WITH CURRENT INPUTS, ON ITS FIFTH RUN
+  (ruled by the designer at FU §1, GY §1, HN §1 and HY §2).** The FLOOR is measured, and since GY it is
   this file's own reading rather than a past split's: **three audits have found nothing dead in it**
   — ED read all 43 never-cited blocks and retired none, FF classified all 105 by what each binds,
   GR classified all 113 by subject — so a rules-only reading of this file IS its reading, which is
-  the bullet below's *a ceiling derived from a file's own size moves with the file*. **HL's reading
-  was 393.67 KiB**, taken at HN before it wrote a byte. The HEADROOM is measured, and it is the term
-  nobody should quote without re-measuring:
+  the bullet below's *a ceiling derived from a file's own size moves with the file*. **HX's close
+  was 437.19 KiB (447,684 B)**, read at HY before it wrote a byte. The HEADROOM is measured, and it is
+  the term nobody should quote without re-measuring:
   the largest single-batch growth on record is **+8.10 KiB**, and **a ceiling within one batch's
   reach fires on whoever writes the big batch rather than on the file's condition**, so it is ten
-  of those. 393.67 + 80.99 = 474.65, **stated as 470 and rounded DOWN** — a ceiling above its own
-  derivation is one nobody trusts.
-  · **THIS IS THE CEILING'S THIRD RE-DERIVATION, AND A FOURTH IS NOT THE ANSWER (ruled by the
-    designer at HN §1).** The ceiling exists because **every batch pays the full read**, so a
-    ceiling that only ever rises is measuring nothing. **The next move at this ceiling is a recon
+  of those. 437.19 + 80.99 = 518.18, **stated as 510 and rounded DOWN** — a ceiling above its own
+  derivation is one nobody trusts. *(The fourth run's floor was HL's 393.67 KiB, read at HN: 393.67 +
+  80.99 = 474.65, stated as 470. HV priced the fifth at 510 on HU's floor; HX's moved it, and the
+  rounding still lands on 510.)*
+  · **THIS WAS THE CEILING'S THIRD RE-DERIVATION, AND HN §1 RULED THAT A FOURTH IS NOT THE ANSWER —
+    SUPERSEDED AT HY §2, BY THE DESIGNER, ON HX's OWN ARITHMETIC. BOTH ARE RECORDED, AND NEITHER IS
+    DELETED.** HN's objection was that a re-derivation grows what every batch loads, and its reason
+    still stands as the reason a ceiling exists: **every batch pays the full read**, so a ceiling
+    that only ever rises is measuring nothing. **HX's trim answered the objection by measurement** —
+    the read, this file and `docs/state.md` together, fell 124,894 B, from 890.84 KiB to 768.87 KiB
+    (−13.7%), and `docs/state.md` closed HX 108,045 B under this file where it had stood 21,333 B over
+    it — so the fifth run was taken on a read already paid down. **A ruling reversed by a measurement
+    is the record working, which is why this one is kept beside its reversal.**
+    · **AND THE ROOM IS FINITE, SAID PLAINLY.** The two files at their two ceilings — this one at 510
+      KiB, `docs/state.md` at its own 380 KiB (HY §3) — are a read of **911,360 B: 857 B under where
+      the read stood at HW's close** (912,217 B), the read the trim was taken to relieve. The room is
+      real and it runs out where HX began; **when it does, the re-measure decides the shape, not a
+      sixth run of this arithmetic.**
+    **The next move at this ceiling is a recon
     on the file's SHAPE, queued at HN and run at HV** (`docs/reports/HV.md` §3): whether an index plus
     subjects read on demand beats one file with a moving ceiling. **RULED AT HX §0 (the designer's), AND
     THE ORDER IS NOT HV's: the checks a reference is held by first (`check_hx` §1), then `docs/state.md`'s trim, then a
@@ -438,9 +458,9 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
     asks the pilot's question — does taking content out of the required read cost anything — of a far larger population,
     with no rule moving. **GY's rejection of splitting the
     reasoning out (below) stands, and it is not the seam that recon reconsiders.**
-  · **THE RECORD THE HEADROOM TERM READS DID NOT MOVE AT GY OR AT HN, AND BOTH TIMES THAT WAS
-    MEASURED RATHER THAN ASSUMED.** Over EE's own window — the 105 batches from DK to HL — the
-    largest single-batch growth is still **EZ's +8,293 B**, standing through the 63 batches since
+  · **THE RECORD THE HEADROOM TERM READS DID NOT MOVE AT GY, AT HN OR AT HY, AND EACH TIME THAT WAS
+    MEASURED RATHER THAN ASSUMED.** Over EE's own window — the 106 batch commits from DK to HX — the
+    largest single-batch growth is still **EZ's +8,293 B**, standing through the 74 batches since
     it; the largest since GR's split, and since FF, is HK's +8,085 B. **EB's +8,287 B is the figure
     that went stale**, at GR. A later batch re-running this arithmetic re-measures the term before
     quoting it, and finds it the same way: per-batch deltas of this file across its history, over
@@ -460,7 +480,8 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
     became 290 and discarded 1.49; FU's 342.03 became 340 and discarded 2.03; **GY's 417.63 became
     410 and discarded 7.63**, because the derived figure landed just past a ten, so that ceiling
     carried **9.1** worst batches of headroom where EE's carried 9.8 and FU's 9.75. **HN's 474.65
-    becomes 470 and discards 4.65, and carries 9.4.** Each is rounded DOWN, which is the rule; the
+    becomes 470 and discards 4.65, and carries 9.4; HY's 518.18 becomes 510, discards 8.18, and
+    carries 9.0.** Each is rounded DOWN, which is the rule; the
     multiple is reported so nobody re-derives it in the belief the arithmetic slipped.
   · **THE FOURTH RUN CAME FOURTEEN BATCHES AFTER GY's, AND GY's *24 TO 31* WAS A THIRD TOO LONG**:
     the file grew 1.32 times GY's rate (`docs/reports/HL.md` §7). **From HL's reading the headroom
@@ -469,6 +490,9 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
     These are HN's figures on HN's window; the live reading belongs in `docs/state.md`, per the
     bullet below, and the rate is re-measured before it is quoted. **The shape recon is owed before
     the file arrives there** — the arithmetic is not the answer next time (the first bullet above).
+    **THE FIFTH RUN CAME ELEVEN BATCHES AFTER HN's, and from HX's close the headroom under 510 is
+    72.81 KiB: about 18 batches at the 4,077 B mean of the ten batches HO–HX, and no sooner than 9.0 at
+    the record** — HY's figures on HY's window, re-measured before they are quoted, like HN's.
   · **AND A THIRD OPTION WAS WEIGHED AT GY AND REJECTED: SPLITTING THE REASONING OUT. DO NOT
     RE-PROPOSE IT.** Much of this file is reasoning recorded beside a rule *so it is not
     re-litigated* rather than rule that binds — **97.04 KiB across 202 `·` sub-bullets at GX's
@@ -510,8 +534,8 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
     its per-group sizes are in `docs/reports/FF.md` §1 — do not re-derive them from a proposal.
   · **AT THE CEILING THE PROCEDURE IS EXHAUSTED, AND THE NEXT QUESTION IS NAMED HERE SO IT IS NOT
     REDISCOVERED (FU §1; RE-RUN AT GY §1).** Split-never-prune has no seam left of the kind it
-    takes, and the ceiling has now been re-derived **three times** (FU §1 at 340, GY §1 at 410, HN §1 at
-    470). **No re-derivation was the same move made twice**: every audit of this file has found nothing dead,
+    takes, and the ceiling has now been re-derived **four times** (FU §1 at 340, GY §1 at 410, HN §1 at
+    470, HY §2 at 510). **No re-derivation was the same move made twice**: every audit of this file has found nothing dead,
     so its next rules-only reading is its own size on the day, and a ceiling derived from a file's
     own size moves with the file. **That is what makes the move repeatable and also what makes it
     cheap — which is the reason to say out loud that it is not free**: each run buys ten worst
@@ -547,7 +571,7 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
     52.50 KiB of headroom rather than at zero. **A seam is cleaner measured than reached**, and a
     split taken under a ceiling is a split taken in a hurry — which is the same argument that made
     the prune the wrong instrument.
-- **THE 470 KiB BINDS THIS FILE, THE REQUIRED READ, AND ITS FLOOR IS THIS FILE ALONE.** EE's 290 was
+- **THE 510 KiB BINDS THIS FILE, THE REQUIRED READ, AND ITS FLOOR IS THIS FILE ALONE.** EE's 290 was
   derived on a file that still held the instrument half, so it was conservative for this file alone
   and fired later than its own derivation would have. **FF's post-split reading carries no such
   term**, so that caveat retires with the number it described. **`docs/instrument-rules.md` is under
@@ -1003,81 +1027,6 @@ read, which is the one channel this project has never gated.
 
 **REPORT EVERY DISCREPANCY IN THE BATCH REPORT, INCLUDING THE ONES THAT MADE NO DIFFERENCE.**
 The brief is the shared record; leaving an error in it means the next brief inherits it.
-
-## STANDING RULE — RE-VERIFYING A CENSUS ENTRY MEANS DIFFING WHAT FEEDS THE ARM, NOT THE ARM'S OWN LINE (Batch HG §1b)
-> **A census hands the next batch a file and a line. Both can still be exact while the entry is already
-> repaired**, because a repair often lands in the lines ABOVE the assertion and never touches it.
-
-**HG RE-DERIVED HA's 110 STALE ARMS AND A LINE CHECK WOULD HAVE COUNTED SEVENTY-ONE.** `check_fk` §5's
-`ok(unreachable.is_empty(), …)` is byte-identical to the day HA read it; **HC §1 re-pointed the four lines that
-build `reach`** from the lineage's own shelf to `Classes.draft_pool(cls)`, wrote the reason into the comment above
-it, and left the assertion alone. The arm was done and the census would have said it was outstanding.
-
-- **MAP THE ENTRY FORWARD, THEN DIFF ITS ENCLOSING FUNCTION WITH COMMENTS STRIPPED.** HG did both: 71 of 110 arms
-  were textually unchanged, and **29 of those 71 sat in a function whose code had moved**. Twenty-eight of the
-  moves were a neighbour's repair landing beside the arm; one was the arm's own.
-- **THE COMMENT ABOVE AN ARM IS WHERE A RE-POINT IS RECORDED, so it is evidence and not decoration.** Every repair
-  in this project writes its reason there (`docs/instrument-rules.md`), which is what makes this check cheap.
-- **THIS IS EU's READ-SITE RULE POINTED THE OTHER WAY.** *The read site is the line, not the function* is about
-  where a claim is PAID; this is about where a repair LANDS. A census entry needs both readings.
-
-## STANDING RULE — A SUPERSESSION IS A CLAIM, AND IT IS DRIVEN LIKE ONE (Batch HG §2a)
-> **Retiring an instrument because another one "asks it better" is a statement about the game's instruments, and
-> it can simply be false. Inject the defect the retired arm guards and READ THE NAMED CHECK.**
-
-**HG RAN EIGHT SUCH CONTROLS AND THREE REFUTED THE RULING IT HAD WRITTEN.**
-
-- **`check_gp` read ZERO failures** with a lineage-gated card sitting in a class-wide shelf, because the gate
-  withholds the card at the OFFER door whichever shelf it sits on — so nothing the gate drives breaks, and the arm
-  proposed for retirement was the only one asking.
-- **`check_gs` §1 caught one leaked enabler and was SILENT ON THE OTHER**, because the Sharpshooter's enabler is
-  the Hunter's class basic and §0 exempts it by name. **Retiring all three siblings would have lost that case
-  silently**; one is kept.
-- **AND THE NAMED SUPERSEDER WAS WRONG FOR AN ENTIRE FAMILY OF EIGHT.** `check_gs` counts homes for the thirty
-  RETURNING cards; the eight arms guard authored draft cards, which are not in that population.
-
-**SO THE CONTROL IS TWO-ARMED IN THE USUAL WAY AND THE ARMS ARE NAMED:** the retired arm reds, which proves it
-guarded the defect, **and the named check reds, which proves retiring it loses nothing.** A green second arm is not
-a detail to note — it is the ruling being wrong.
-
-- **AND A GREEN FIRST ARM IS THE OTHER WAY THE RULING IS WRONG: AN ARM THAT NEVER BITES IS NOT SUPERSEDED, IT IS
-  VACUOUS (Batch HH §2).** HG sorted one of its seventeen superseded arms without driving it. Driven three ways — the
-  defect written into its own lineage's definitions, into a sibling's, and into the class kit — the arm read green
-  every time, and an ok() trace said why: it fires ZERO times, because it walks `Classes.SPEC_IDS`, whose keys are the
-  four classes, and a class has no definition table. There is nothing to retire onto; it goes to a repair, as HD §2
-  repaired the identical walk in another suite. **Count an arm's fires before sorting it** — a census reads a line,
-  and a line can hold an assertion that never runs.
-- **A RETIREMENT ASSERTS THE FACT THAT RETIRED IT, AND PRINTS WHAT IT USED TO READ (HD §2's four; HH's twenty-one).**
-  The old computation stays and its reading is PRINTED as a `[record]`; the `ok()` becomes the game fact that made the
-  question stale — GP's one pool a class (`suite_fixture.one_pool_a_class`, the one helper every shelf arm retires
-  onto), GS §1's opening (a lineage defines more than it opens with), FX's one tree — so the day that fact stops
-  holding, the retired question is live again and the arm goes red saying so. **An arm "retired" onto a new door for
-  its OLD question is a re-point**, and the control tells the two apart: a retired arm stays GREEN on the defect it
-  used to guard while its superseder goes red.
-- **A SUPERSEDER IN ANOTHER TARGET IS A DEPENDENCY, AND IT IS RECORDED AT BOTH ENDS (Batch HH §2).** The retired arm
-  names it at its site; the superseder carries a note naming every arm retired onto it, so a batch that retires or
-  narrows it meets what stands on it. **Derive the population off the controls, never off a brief**: HH's brief named
-  two such arms and the controls found six — two on `check_gs`, two on three other suites' whole-draft sweeps, and
-  two on `test_batch_bp` §5's enabler arm, the only arm left asking the Sharpshooter's case.
-- **A RE-POINT THAT NARROWS WHAT AN ARM CALLS A DEFECT CANNOT PASS HD's SECOND ARM, AND THE CONTROL THAT PROVES IT IS
-  RUN REVERSED (Batch HI §3b).** HD's rule is that the repaired arm reds on the defect and HEAD's copy does not. Two of
-  HI's arms called a SIBLING's shelf foreign to the hero (`test_batch_an`'s zone-boss arm, `test_batch_au`'s debug
-  grant); under one pool a class it is his own, so the repair takes those cards OUT of the set, and every defect the new
-  set can see the old one sees too: a roller or a grant handing out a sibling's boss card reds both. **That is the
-  repair working, not failing.** What shows it was needed is the defect pointed the other way — the roller drawing
-  the hero's OWN class pool: HEAD's arm went red on 21 of his own cards and the grant's on 105, and the repaired arms
-  read nothing. **So: say before arming whether the repair widens or narrows the set; a widening takes HD's two arms,
-  a narrowing takes the forward control (both red) AND the reversed one (HEAD alone red).**
-- **AND ONE RE-POINT CAN DO BOTH AT ONCE, SO IT TAKES BOTH CONTROLS (Batch HJ).** Moving an arm from a lineage's shelf
-  onto the class's one pool WIDENS its population and, where the gate tables now withhold a card, NARROWS what it
-  calls a defect — `test_batch_ah`'s curation arms met Overcharge in the pool and had to ask its `ENGINE_READ` row
-  where the old arm asked its absence. **Each half has its own defect**: a row deleted is seen by the repair alone
-  (forward: the repair red, HEAD silent), and a gated card authored on the class-wide shelf is a defect only to HEAD
-  (reversed: HEAD red, the repair silent). **A re-point that changes WHO an arm weighs — a population re-keyed
-  from lineages to classes — can leave HEAD red on the same defect, and then the per-line FAIL text is the control**:
-  the line HEAD does not print is the case its population missed. **And a target that loads another file's constants
-  takes BOTH files into its HEAD arm** — `check_dp` reads `check_do`'s table, so HEAD's `check_dp` beside the new
-  `check_do` weighed the new table and named every lineage; HJ ran that control again with HEAD's two.
 
 ## THE SHARPSHOOTER'S BASIC IS A SEQUENCE (STANDING, SET AT BATCH CS)
 **HIS BASIC ATTACK ONLY. No other ability of his changes, and no other hero's bar moves at all.**

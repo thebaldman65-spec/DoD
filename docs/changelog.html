@@ -16,6 +16,46 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-09 &mdash; Batch HY: THE ATTRIBUTION FRAME, AND THE CEILING MOVES</h2>
+<p><b>Game code changed, in one place: who the game thinks is dealing a piece of damage at the moment it lands. That one
+answer decides whether a Vow of Silence blanks it, whether Penance bills for it, whether the Reaver counts the kill and the
+rune engines see it, and how the fight's recap books it &mdash; and it had been wrong in a handful of corners.</b> Full working:
+<code>docs/reports/HY.md</code>.</p>
+
+<p><b>&sect;1 &mdash; THE FRAME, PUT BACK.</b> Five reactions that fire inside somebody else's blow &mdash; Rite of Return, the
+Devout's Vow of Suffering share, Bloodbond, Bear the Brunt and Blight the Well &mdash; borrowed that answer for their own bill
+and never handed it back, and the rune Killing Cold did the same at the start of a Mage's cast. Now each puts it back. In the fight
+HX drove, that means: with the Devout's vow carrying half of each enemy blow and the Devout wearing Vow of Silence, the
+Survivalist's Tripwire and the Penance mirror pay again on every blow (the mirror pays on the part of the blow the struck hero
+kept; the half the Devout carried is booked as the vow's own price, as it always was). Things that happen outside anyone's action
+now carry their own owner: at a turn's start, Snare Line's and the Deadfall's springs belong to the Hunter who set them, whoever
+acted last, and a Ruin detonation is the Occultist's; and a thrown bomb is nobody's &mdash; so no vow can blank it. And the hits a hero
+lands <i>inside an enemy's swing</i> &mdash; a Tripwire, a Feint's return, a Mirror Guard return, Consecrated Ground's reflect &mdash;
+are now that hero's: the Reaver counts those kills, the Tracker's and the Arbiter's marks land off them, and the reflect is the
+Cleric's who laid the ground, so his own Vow of Silence silences it. A new check, <code>check_hy</code>, drives all of it on
+real fights and holds a census of every place the game deals damage.</p>
+
+<p><b>&sect;2 &mdash; <code>CLAUDE.md</code>'S CEILING IS 510 KiB.</b> Re-derived by the usual method on today's figures; it
+lands on 510 again. Batch HN had ruled that a fourth re-derivation was not the answer, because the read every batch pays would
+only grow; HX's trim cut that read by 124,894 bytes, so the designer has reversed it. Both rulings are recorded. The room is
+finite: both files at their new ceilings come to almost exactly what the read was before the trim.</p>
+
+<p><b>&sect;3 &mdash; <code>docs/state.md</code> GETS A CEILING OF ITS OWN: 380 KiB</b>, read every battery by
+<code>check_fg</code>. It is an alarm on the habit that keeps the file small &mdash; what a batch closes goes to the archive &mdash;
+so reaching it means archive what is closed, never split the file.</p>
+
+<p><b>&sect;4 &mdash; TWO INSTRUMENT RULES LEAVE <code>CLAUDE.md</code>.</b> The two blocks Batches HG to HJ wrote back into the
+required read move, word for word, to <code>docs/instrument-rules.md</code>. The question the two texts disagreed on &mdash; what to
+do with a check whose subject was deleted &mdash; was settled by reading what the last twenty batches actually did:
+<b>they turned such a check into an assertion of the fact that removed its subject 26 times, and deleted one only 3 times</b> &mdash; each of the three a row in a check's own table, never a question about the game. So the newer rule stands (keep the check, point it at the fact), and the older exception is struck where it stood and kept, so nobody applies it again.</p>
+
+<p><b>&sect;5 &mdash; FOUR RULES STILL STAND IN TWO FILES, AND STAY</b> until the re-measure decides where rule text lives; the
+check still counts four.</p>
+
+<p><b>&sect;6 &mdash; THE CLAIMS IN THE TWO REFERENCES ARE RE-READ BY EVERY BATCH THAT TOUCHES WHAT THEY NAME</b>, and a count
+written into either now points at the check that prints it or names the batch that measured it &mdash; counts went stale seven
+times as often as values. Of the 87 stale claims HX listed, 31 are counts; they are a batch of their own.</p>
+
 <h2>2026-10-08 &mdash; Batch HX: THE CHECKS A REFERENCE IS HELD BY, AND THE BIGGER FILE</h2>
 <p><b>No game code changed: the game plays exactly as it did. This batch built the checks that keep the two split-out rule
 files honest, cut <code>docs/state.md</code> &mdash; the larger file in the read every batch pays &mdash; down to what is still

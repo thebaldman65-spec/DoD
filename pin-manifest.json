@@ -2,10 +2,10 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1728,
+  "total": 1733,
   "source": 1304,
   "other": 113,
-  "document": 311
+  "document": 316
  },
  "source_residency": {
   "narrow": 44,
@@ -2594,7 +2594,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fg.gd#41"
+   "g": "check_fg.gd#42"
   },
   {
    "s": "check_fg.gd",
@@ -2605,7 +2605,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_fg.gd#108",
+   "g": "check_fg.gd#109",
    "expr": "RULE_BODY"
   },
   {
@@ -2617,7 +2617,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_fg.gd#107",
+   "g": "check_fg.gd#108",
    "expr": "RULE_BODY"
   },
   {
@@ -2629,7 +2629,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fg.gd#110"
+   "g": "check_fg.gd#111"
   },
   {
    "s": "check_fg.gd",
@@ -2640,7 +2640,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fg.gd#109"
+   "g": "check_fg.gd#110"
   },
   {
    "s": "check_fh.gd",
@@ -5744,7 +5744,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hx.gd#462"
+   "g": "check_hx.gd#467"
   },
   {
    "s": "check_hx.gd",
@@ -5755,7 +5755,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hx.gd#461"
+   "g": "check_hx.gd#466"
   },
   {
    "s": "check_hx.gd",
@@ -5766,7 +5766,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hx.gd#466"
+   "g": "check_hx.gd#471"
   },
   {
    "s": "check_hx.gd",
@@ -5777,7 +5777,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_hx.gd#468"
+   "g": "check_hx.gd#473"
   },
   {
    "s": "check_hx.gd",
@@ -5788,7 +5788,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hx.gd#497"
+   "g": "check_hx.gd#502"
   },
   {
    "s": "check_hx.gd",
@@ -5799,7 +5799,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hx.gd#495"
+   "g": "check_hx.gd#500"
   },
   {
    "s": "check_hx.gd",
@@ -5810,7 +5810,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hx.gd#498"
+   "g": "check_hx.gd#503"
   },
   {
    "s": "check_hx.gd",
@@ -5821,7 +5821,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hx.gd#496"
+   "g": "check_hx.gd#501"
   },
   {
    "s": "check_hx.gd",
@@ -5832,7 +5832,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_hx.gd#500"
+   "g": "check_hx.gd#505"
   },
   {
    "s": "check_hx.gd",
@@ -5843,7 +5843,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_hx.gd#499"
+   "g": "check_hx.gd#504"
   },
   {
    "s": "check_hx.gd",
@@ -5854,7 +5854,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hx.gd#507"
+   "g": "check_hx.gd#512"
   },
   {
    "s": "check_hx.gd",
@@ -5865,7 +5865,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hx.gd#504"
+   "g": "check_hx.gd#509"
   },
   {
    "s": "check_hx.gd",
@@ -5876,7 +5876,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hx.gd#506"
+   "g": "check_hx.gd#511"
   },
   {
    "s": "check_hx.gd",
@@ -5887,7 +5887,62 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hx.gd#505"
+   "g": "check_hx.gd#510"
+  },
+  {
+   "s": "check_hy.gd",
+   "fn": "_s7_the_rule",
+   "h": "docs/instrument-rules.md",
+   "n": "## STANDING RULE — A SUPERSESSION IS A CLAIM, AND IT IS DRIVEN LIKE ONE",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hy.gd#576"
+  },
+  {
+   "s": "check_hy.gd",
+   "fn": "_s7_the_rule",
+   "h": "docs/combat-rules.md",
+   "n": "A SITE THAT BORROWS THE FRAME INSIDE ANOTHER UNIT'S ACTION PUTS BACK THE ONE IT FOUND",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hy.gd#570"
+  },
+  {
+   "s": "check_hy.gd",
+   "fn": "_s7_the_rule",
+   "h": "docs/instrument-rules.md",
+   "n": "SO THIS TEXT IS STALE. DO NOT APPLY IT.",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hy.gd#575"
+  },
+  {
+   "s": "check_hy.gd",
+   "fn": "_s7_the_rule",
+   "h": "docs/combat-rules.md",
+   "n": "THE FRAME NAMES WHOEVER THE SITE CREDITS, AND ONLY WHILE IT DEALS",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hy.gd#569"
+  },
+  {
+   "s": "check_hy.gd",
+   "fn": "_s7_the_rule",
+   "h": "docs/instrument-rules.md",
+   "n": "~~**THE ONE EXCEPTION, AND IT IS NARROW",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hy.gd#574"
   },
   {
    "s": "test_batch_ah.gd",

@@ -4,6 +4,7 @@
 #   §2  `CLAUDE.md` against EE §1's ceiling, READ OUT OF THE RULE
 #   §3  the rule and this gate cannot drift apart, and the standing rule that
 #       generalises them is where it says it is
+#   §4  `docs/state.md` against HY §3's ceiling, READ OUT OF ITS OWN PREAMBLE
 #
 # **WHY THIS GATE EXISTS.** CW §4 wrote a threshold and a whole cut procedure
 # and **nothing was ever built to notice the threshold being crossed.** It was
@@ -80,6 +81,7 @@ func _initialize() -> void:
 	_s1_the_changelog()
 	_s2_the_required_read()
 	_s3_the_rule_and_the_gate()
+	_s4_the_state_file()
 	_g.report(self)
 
 
@@ -276,3 +278,54 @@ func _s3_the_rule_and_the_gate() -> void:
 	# states the conclusion reads identically on a clean run and a red one.
 	print("  reference: %d heading, %d body sentence; CLAUDE.md: %d index row, %d other lines" % [
 		heads, ir.count(RULE_BODY), rows, other])
+
+
+# ── §4 — `docs/state.md` AGAINST HY §3's CEILING ─────────────────────────────
+#
+# **AN ALARM ON THE CLOSING PRACTICE, NOT A BAR THE FILE IS SPLIT AT.** HX found this file the larger of the two
+# every batch loads — closed items had never left it — and trimmed it; the designer then ruled it a ceiling of its
+# own (HY §3): ten batches of its recent mean growth above HX's close. EE's method, which prices a file against how
+# much ONE batch can add, gave a bar above the level the file stood at when the trouble was met, and an alarm set
+# above the failure level never fires. The answer at this bar is the archive — what a batch closes goes there — and
+# never a split, which is `CLAUDE.md`'s answer at its own; the file says so beside the number, and this arm holds
+# that sentence too. The bar and the record growth are parsed out of the file's preamble, §2's shape: over the bar
+# is a WARNING, and over it by more than the largest single-batch growth on record is a FAILURE.
+func _s4_the_state_file() -> void:
+	print("\n§4 — docs/state.md against the ceiling it states")
+	var st_raw := FileAccess.get_file_as_string("res://docs/state.md")
+	ok(st_raw.length() > 10000, "§4: docs/state.md read back %d chars" % st_raw.length())
+	# READ FLATTENED: the file is rewritten every batch and reflowed with it, so a sentence this arm reads must not
+	# be lost to a line break falling inside it (a wrap is what hid one needle from this arm on its first run).
+	var flat := RegEx.new()
+	flat.compile("\\s+")
+	var st := flat.sub(st_raw, " ", true)
+	var bars := _bar_from_rule(st, "THIS FILE'S CEILING IS ([0-9]+(?:\\.[0-9]+)?) KiB")
+	ok(bars.size() >= 1, "§4: docs/state.md no longer states its own ceiling in the form this gate reads")
+	ok(bars.size() == 1, "§4: docs/state.md states %d DIFFERENT ceilings %s — the copies disagree" % [bars.size(), bars])
+	var growth := _bar_from_rule(st,
+		"largest single-batch growth on record is \\*\\*\\+([0-9]+(?:\\.[0-9]+)?) KiB\\*\\*")
+	ok(growth.size() == 1,
+		"§4: the ceiling's sentence states %d DIFFERENT largest-batch figures %s" % [growth.size(), growth])
+	ok(st.contains("never to split this file"),
+		"§4: the ceiling's sentence no longer says the answer is the archive, never a split")
+	if bars.size() != 1 or growth.size() != 1:
+		return
+	var kib: float = bars[0]
+	var grow: float = growth[0]
+	ok(kib >= 100.0 and kib <= 2000.0,
+		"§4: the ceiling parsed out of docs/state.md reads %.1f KiB, which is not a credible bar" % kib)
+	ok(grow > 0.0 and grow < 100.0,
+		"§4: the largest-batch figure parsed out of docs/state.md reads %.2f KiB, which is not credible" % grow)
+	var bar := int(kib * 1024.0)
+	var deadline := int((kib + grow) * 1024.0)
+	var size := _bytes("res://docs/state.md")
+	print("  docs/state.md %d B = %.2f KiB  |  ceiling %.0f KiB = %d B; deadline %.0f + %.2f = %.2f KiB = %d B" % [
+		size, size / 1024.0, kib, bar, kib, grow, kib + grow, deadline])
+	if size > bar:
+		print("  *** CEILING WARNING *** docs/state.md is %.2f KiB against a %.0f KiB ceiling." % [size / 1024.0, kib])
+		print("      The closing practice has stopped working: archive what is closed. It is never split.")
+	else:
+		print("  under the ceiling with %d B = %.2f KiB of headroom" % [bar - size, (bar - size) / 1024.0])
+	ok(size <= deadline,
+		"§4: docs/state.md is %.2f KiB, past its ceiling by more than the largest single batch on record (%.2f KiB) — what was closed stayed; archive it" % [
+			size / 1024.0, grow])

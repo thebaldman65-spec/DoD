@@ -19,105 +19,138 @@ the batch that closes it; what is still owed, or could not be settled by reading
 than wrongly archived. *This pointer is in the preamble for the reason the one above is; `check_hx` §2 follows it, and reds
 the day this file stops naming its archive.*
 
-*Last rewritten: 2026-10-08 (Batch HX).*
+**AND THIS FILE'S CEILING IS 380 KiB — AN ALARM ON THE CLOSING PRACTICE ABOVE, NOT A BAR THE FILE IS SPLIT AT (HY §3, ruled
+by the designer).** The practice is what holds this file: what a batch closes goes to the archive. **Reaching the number
+means the practice has stopped working — what was closed stayed — and the answer is to archive what is closed, never to
+split this file**: a split is `CLAUDE.md`'s answer at its own ceiling, not this file's. The number is ten batches of this
+file's mean growth over HO–HW (+5,528 B) above HX's close (339,639 B), rounded down. EE's method, ten of one batch's record
+growth above the same close, gave 460 KiB — above the 455.8 KiB this file stood at when the trouble was met, so it would
+never have fired: **an alarm set above the failure level is not an alarm.** `check_fg` §4 reads the number out of this
+sentence every battery: over it is a warning, and past it by more than one batch at the record is a failure — the largest
+single-batch growth on record is **+13.38 KiB** (ES's +13,700 B). *In the preamble for the archive pointer's reason.*
+
+*Last rewritten: 2026-10-09 (Batch HY).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: HX — THE CHECKS A REFERENCE IS HELD BY, AND THE BIGGER FILE.** IMPLEMENT ONLY, and **no game code changed**:
-  the game plays as HW left it. Full working: **`docs/reports/HX.md`**.
-- **§0 — HW LANDED**: at HX's start `git ls-remote origin class-merge` read `d7c0a98`, local HEAD. **HV's four rulings are
-  taken.** (1) **The shape, in a new order**: the checks a reference is held by first, then this file's trim, then a re-measure —
-  HV's nine-unit pilot waits and the block index is decided at the re-measure (`CLAUDE.md`'s ceiling block records why). (2) **A
-  copied Frostbind is REFUSED, not routed — RULED, NOT BUILT**: HX changed no game code, so the copy is still carried as a chip
-  with no partner (the queue, below). (3) **The Covenant half of the Ruin route is KEPT**, its reason recorded: every hop is a
-  card's own text and the chain is bounded. (4) **The words are accepted**, the nine tags included; the one PROPOSED marker
-  (this file's HV section) is gone with that section.
-- **§1 — THE CHECKS (`check_hx`, new).** (a) **Residency, both ways, for each index, derived from the files**: GW §2's block had
-  stood in `docs/instrument-rules.md` with no row since GW — its row is added; the combat index was already whole. `check_ff` §4
-  is not weakened by it: a row is still never a pin's only home. (b) **No rule text in two rule files, case set aside**:
-  it finds **four** passages standing in two files — CT's autoload rule, EV §5's passage on a comment that names a banned string (one of FF's eight, which `check_ff` §2's case-sensitive needle had stopped seeing), the sentence that RunSim calls Profile nowhere, and THE TRAPS' preamble — **named and left; which copy keeps each is HX's ruling 3**; the rest is seam prose each file states of itself. (c) **A reference's subject is not written back**: no word test can tell a rule's subject — two were measured
-  and both failed — so `CLAUDE.md`'s 119 blocks are a known population and a new one reds until its author says which file it
-  binds; **HG–HJ's two written-back instrument blocks are named and LEFT, 7,153 B**, and the supersession block's retirement
-  doctrine contradicts the reference's DG §2 (the queue, below). (d) **The references' names resolve** — 387 backticked names across the two references, none unresolved; (a) seven of them live only inside an instrument's needle, each named in the gate with what its sentence does with it, one a live claim in a dead name (`wd_tank_spank`, a node FX deleted); (b) a constant's value written beside it is the declared one — **and the census sized what no name can carry: 824 present-tense claims in the two references, 735 mechanically checkable (89.2%) and 89 intent; 90 of the 735 were stale at HW's HEAD (12.2%; counts 29%), and the three arms reach one of them.** The other 89, and the intent claims, are the unchecked remainder — the live risk; HX repaired the one passage its own work contradicted and queued the rest (FOUND AT HX, below), and the audit is HX's ruling 4.
-- **§2 — THIS FILE WAS THE BIGGER ONE, AND IT IS TRIMMED.** **Every item of the 89 sections the brief's rule reaches — 24 whose headings were struck, 55 headed *FOUND AT*, and ten closed by their own headings — was read against the code** (502 items and their sections' 86 framing lines, eight read-only readers, a `path:line` behind every verdict that moved one). **358 items went to the archive** — 96 fixed, 149 superseded, 9 overtaken by the code, 104 that asked nothing — **and 144 stay**: 138 owed, 5 unsettled, and one ruling recorded nowhere else (`BOND_MITIGATION_MAX` stays at 0.75). 47 sections went whole, 38 were cut to what they still owe, 4 stayed whole; **of the *FOUND AT* items, 39% were still owed or unsettled.** **The archive is `DoD-archive/state-archive.md`**,
-  named in this file's preamble and reached through it (`check_hx` §2). **The read every batch pays — this file and `CLAUDE.md` — was 912,217 B at HW's close, and the trim took 134,261 B out of it**; HX's own sections put some back, and the reading at HX's close is `docs/reports/HX.md` §2d's, taken on the files as committed. **`check_es` §4, `check_hp` §5 and `check_hx` §2 read this file, and all three were run against it after its last line was written.** **No ceiling is set** — it is the
-  designer's — and what one would cost is HX's ruling 1, below.
-- **§3 — THE TWO RULES EVERY BRIEF WROTE BY HAND ARE INSTRUMENT RULES NOW**: *write the documents before the verification run* and
-  *read the rows of `ps`, never a `grep -c`*, each a block of `docs/instrument-rules.md` with its row in `CLAUDE.md`'s index —
-  and §1c's check is green on the placement and red on the other one (a control).
-- **§4 — THE ATTRIBUTION FRAME, DRIVEN: THE DEFECT IS REAL, IN TWO SHAPES, AND IT IS NOT A ONE-LINE FIX** (FOUND AT HX, below).
-  **Driven on a real battle**: once Vow of Suffering's share fired, an enemy's own blows carried the Devout's frame — the recap booked them to *Vow of Suffering*, **the Penance mirror stopped paying** on every one, rune or no rune, and with the Devout wearing Vow of Silence **the Warden's reflect and the Survivalist's Tripwire were silenced** (the raider lost 0 a blow against 24–27); and after the Devout's Smite, a Snare Line spring at the next turn's start took his frame too (0 against 15–16). Seven readers, every one named; **the fix is a save and a restore in five callbacks and a frame for each frameless site** — a damage-door batch of its own.
-- **THE VERIFICATION.** The saves were backed up first and verified by hash (`../save-backups/HX-20261008-181721`): byte-identical
-  to HW's backup, so nothing was played since HW. **The recon** — HEAD's 49 document readers and the gates that walk every gate
-  file, unmodified, against the landed tree in an isolated copy — read every target at its band but one: **`check_fi` §5, the new
-  gate spelling the player's save path in a list**; repaired by rule (a `user://` path is passed, never listed), and the twelve
-  gate walkers and manifest readers re-ran at their bands. **Twenty-one controls on the final gate**: every defect red on its own
-  line, the four re-tunes and the baseline green — re-tune R04 found §1b's citation test blind to a heading in a third file, and
-  the repair is two-armed — and HW's documents red at exactly the four places HX moved them. **The pre-pass** — 138 targets in an
-  isolated copy proved equal to the tree, 20:04:03 to 21:19:29 — read `check_de` 569 / 0 / 0, as predicted: `check_hx` new at
-  39 / 0, `check_parse` 211 → 212, every other target at its row. Three phrases were corrected after its copy was taken
-  (`docs/design-notes.md`, `docs/changelog.html` and this file), each swept against every gate literal with nothing lost or
-  gained. **The acceptance run in the repository** — 138 targets, 21:20:20 to 22:35:43, `ps` read by rows every 15 s with no game
-  window in 302 readings — read `check_de` 569 / 0 / 0: every target at its pre-pass reading but the two counts that move with a
-  draw, inside their bands. The tree was byte-identical before and after (516 files) and the player's four files untouched.
-  **Then the final tree**: this line written after the run, swept against every gate literal, and the readers of this file with
-  the document instruments re-run on it in an isolated copy, each at its acceptance reading.
-- **`CLAUDE.md` IS 447,684 B = 437.19 KiB, WITH 32.81 KiB UNDER ITS 470 KiB CEILING** (+2,242 B at HX,
-  measured after this batch's own writing): **about 4.1 batches at the record, EZ's +8,293 B, and 7.8 at the
-  nine-batch mean of +4,281 B** (HO–HW). **Not split; the ceiling did not move; the re-measure is next.**
-- **No save version moved**: no game code moved.
+- **Last batch: HY — THE ATTRIBUTION FRAME, AND THE CEILING MOVES.** IMPLEMENT ONLY. **Game code changed in one file,
+  `scripts/battle.gd`, and in one thing: who the game thinks is dealing a piece of damage at the moment it lands.** Full
+  working: **`docs/reports/HY.md`**.
+- **§0 — HX LANDED**: at HY's start `git ls-remote origin class-merge` read `d3773d3`, local HEAD. **HX's four rulings are
+  taken**, each in its own section below: this file's ceiling is 380 KiB (§3); HG–HJ's two blocks moved and the doctrine was
+  read off the practice (§4); the four two-file passages stay (§5); the claims are re-read per batch, and a count points at its
+  instrument (§6).
+- **§1 — THE FRAME, PUT BACK (HX §4's defect, repaired).** (a) **The five callbacks** — `_on_rite_return`, `_on_vow_share`,
+  `_on_bloodbond_guard`, `_on_brunt_guard`, `_on_blight_heal` — **save the frame, set their own and put back the one they
+  found**, Forge Body's shape, **and so does the Killing Cold's bite**, a sixth borrower HY's re-derived census found at a
+  cast's own line (left standing, it booked the cast's strike as the rune's and hid it from the Weaver's tally). (b) **The
+  frameless turn-start sites carry their owner's frame**: Snare Line's spring — its block is a function now,
+  `_snare_line_tick` — an armed Deadfall's and a Ruin detonation, **and a bomb, the fourth the census found, whose frame names
+  nobody: it credits no hero.** (c) **GO's and HF's items are the same repair, taken**: a Tripwire, a Feint's return, a Mirror
+  Guard return, Consecrated Ground's reflect (its LAYER's, read off the status's `src_name`), Spite and the Whole Forest's bite
+  deal under their owner's frame inside the enemy's swing and hand the swing its own back. (d) **`check_hy`, new, is HX's drive
+  built for real** — the party, the board and the four arms the brief named, the springs, the detonation and the bomb, every
+  callback and every retaliation, each reader's figure before and after — **with a census of every function that deals damage
+  (75 sites in 31 functions), each borrower's restore asserted.** **The four arms read the control's FUNCTION of each blow, not
+  its figures**: the mirror pays on what the struck Warden kept (4–6 a blow at power 50, where HX's control read 9–11), the
+  wire on the whole blow, the reflect unless its layer wears the vow — and the frame after the vow's share is the raider's
+  Slash. **Three rulings come out of it** (HY's, below). The rule is in `docs/combat-rules.md`'s recap-ledger block.
+- **§2 — `CLAUDE.md`'S CEILING IS 510 KiB, OVER HN §1's OWN RULING (the designer's).** EE's method on HX's close
+  (447,684 B = 437.19 KiB) and ten of EZ's +8,293 B gives 518.18, stated as 510 — HV's price, unchanged — and **HN §1's
+  ruling is recorded as SUPERSEDED beside its reversal, never deleted.** **The room is finite**: the two files at their two
+  ceilings are a read of 911,360 B, 857 B under the read at HW's close; when it is spent, the re-measure decides the shape.
+- **§3 — THIS FILE'S CEILING IS 380 KiB**, a sentence in the preamble that `check_fg` §4 reads every battery: over it a
+  warning, past it by more than one batch at ES's record a failure. **Reaching it means the closing practice has failed —
+  archive what is closed, never split this file.** The room at HY's close, in batches at HO–HW's +5,528 B and at ES's
+  +13,700 B, is `docs/reports/HY.md` §3's, measured on this file as committed.
+- **§4 — HG–HJ's TWO BLOCKS ARE IN `docs/instrument-rules.md` NOW, BYTE FOR BYTE (7,153 B), EACH WITH ITS ROW.** **The
+  doctrine was read off twenty batches' practice (HD–HX)**: a check whose subject was deleted was retired onto the fact 26
+  times and deleted with its fall predicted 3 times — each of the three a row of an instrument's own table — with 11 hybrids
+  and re-points. **Not split: HG's doctrine stands, and DG §2's exception is struck where it stands**, with what the practice
+  kept of it written beside the strike.
+- **§5 — THE FOUR TWO-FILE PASSAGES STAY, NAMED**: `check_hx` §1b reads four, and there is no fifth.
+- **§6 — TWO RULES IN `docs/instrument-rules.md`**: a batch re-reads every present-tense claim in a reference that names what
+  it touched, and repairs or reports each; and a live count in a reference points at the instrument that prints it, or
+  carries its batch. **31 of the 87 stale claims standing after HX are counts** (26 in the instrument file, 5 in the combat
+  file). **The 87 are not repaired** — a batch of their own (FOUND AT HX, below); HY's re-read repaired the one claim its own
+  change falsified and reported four (FOUND AT HY, below).
+- **THE VERIFICATION.** The saves were backed up first and verified by hash (`../save-backups/HY-20261009-091100`): byte-identical
+  to HX's backup, so nothing was played since HX. **The recon** — HEAD's 138 targets, unmodified, on HY's `battle.gd` in an
+  isolated copy — read `check_de` 569 / 0 / 0, every target at HX's acceptance reading: **the repair moved no count of HEAD's
+  battery**, because no target there reads a repaired site through a frame reader, and the two counts that move with a draw
+  traced as drift on HEAD's code and HY's alike. **Thirty-four controls on the final gates**: every defect red on its own line,
+  the re-tunes and the baseline green, HEAD's code red at every site `check_hy` drives (161 / 69) — and **C19 green on its first
+  run**: §6's restore test was file-wide, and two functions saving under the bare `was_` names masked each other; repaired to
+  read each function's own body, and two-armed. **The pre-pass** — 139 targets in an isolated copy proved equal to the tree,
+  11:20:04 to 12:35:50 — read `check_de` 573 / 0 / 0, as predicted: `check_hy` new at 161 / 0, `check_fg` 22 → 30,
+  `check_parse` 212 → 213, every other target at its row. **The acceptance run in the repository** — 139 targets, 12:36:20 to
+  13:52:03, `ps` read by rows every 15 s with no game window in 302 readings — read `check_de` 573 / 0 / 0: every target at its
+  pre-pass reading but the one count that moved with a draw, inside its band. The tree was byte-identical before and after
+  (518 files) and the player's four files untouched. **Then the final tree**: this line written after the run, swept against
+  every gate literal, and the readers of this file with the document instruments re-run on it in an isolated copy, each at its
+  acceptance reading.
+- **`CLAUDE.md` IS 442,894 B = 432.51 KiB, WITH 77.49 KiB UNDER ITS 510 KiB CEILING** (−4,790 B at HY, measured after
+  this batch's own writing — the two blocks went to the reference): **about 9.6 batches at the record, EZ's +8,293 B, and
+  19.5 at the ten-batch mean of +4,077 B** (HO–HX). **Not split; the ceiling moved by ruling.**
+- **No save version moved**: the repair moves who a fight's damage is credited to, and nothing a save carries.
 - **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in a build
   older than HL**: HL's ceiling refuses a newer save from HL's build on — HR's v15 is the first bump it has guarded — and HJ's and
   HK's builds, and `main`, carry no ceiling.
-- **Next letter: HY — the eyes** (the queue's playtest section, below), with **the re-measure as one section of whatever batch
-  follows**: §3b's census over the batches since HV, and the read this trim left.
+- **Next letter: HZ — the eyes, with Boil Over's Rage dump and the Sharpshooter's toast** (the roadmap, below). **The
+  re-measure did not run at HY**: two batches since HV are too few to measure.
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### HX's RULINGS OWED — **FOUR; NONE IS PLAYER-VISIBLE, AND EACH IS PRICED HERE OR IN `docs/reports/HX.md`**
+### HY's RULINGS OWED — **THREE, ALL PLAYER-VISIBLE; EACH IS ONE LINE IF IT GOES THE OTHER WAY**
 
-Full working: `docs/reports/HX.md`, NEEDS A RULING.
+Full working: `docs/reports/HY.md`, NEEDS A RULING.
 
-1. **THIS FILE'S CEILING (§2c) — PRICED, NOT SET.** **EE's method on this file — its own reading at HX's close, plus ten of its largest single-batch growth on record (ES's +13,700 B), rounded down — gives 460 KiB, which is ABOVE the 456 KiB it stood at before HX's trim.** The method prices a file against its own growth, and this file's trouble was never one batch's growth: it was closed items that never left (it grew in every batch but two since GK — +5,528 B a batch over HO–HW). **What one would cost**: a stated sentence, a `check_fg`-shaped arm, and an answer at the ceiling, which for this file is the archive and not a split. **The alternative is the closing practice alone** — what a batch closes goes to the archive, now in `CLAUDE.md`'s map — with no number; and a tighter number, ten batches at HO–HW's mean, is 380 KiB. Full working: `docs/reports/HX.md` §2c.
-2. **HG–HJ's TWO WRITTEN-BACK INSTRUMENT BLOCKS (§1c): MOVE THEM TO THE REFERENCE, OR LEAVE THEM.** *RE-VERIFYING A CENSUS ENTRY…*
-   (HG §1b, 1,503 B) and *A SUPERSESSION IS A CLAIM…* (HG §2a with HH's, HI's and HJ's bullets, 5,650 B) — 7,153 B of
-   `CLAUDE.md`, both rules about how a batch verifies itself. **The second contradicts the reference's DG §2**: it retires an
-   arm onto the fact that retired it and prints the old reading, where DG §2 deletes a check about a deleted feature, with the
-   count predicted and a note at the site. Moving them is a ruling on which doctrine stands as well as where.
-3. **THE DUPLICATES §1b NAMED (§1b): WHICH COPY KEEPS EACH.** Rule text standing in two rule files: CT's autoload rule (a block in
-   `CLAUDE.md`, a trap in the reference), EV §5's passage on a comment that names a banned string (the reference's block and
-   `CLAUDE.md`'s DR §2 traps), the sentence that RunSim calls Profile nowhere (the talent handoff and the sim bullet), and THE
-   TRAPS' preamble (both halves since EF §2). The rest of what §1b found is seam prose each file states of itself, and stays.
-4. **THE SCHEDULED CLAIMS AUDIT (§1d) — PRICED, NOT SCHEDULED.** **Against** both references' present-tense claims, under HX's rubric, each mechanical claim settled at a `path:line`; **this census cost four read-only readers 2,069,243 tokens in 40–46 minutes, in parallel.** Two shapes: **a full census every ten batches** (about 0.2 million tokens a batch amortised, and the repair batch it feeds), or **a re-read every batch of the claims that name what the batch touched** (a fraction of one reader; blind to a claim falsified by a symbol it does not name). **And a ruling that would shrink the population instead**: counts rot at 29% against values' 4%, so the references could be held to HO §0's rule — a live count points at the instrument that prints it, or carries its batch. `docs/reports/HX.md` §1d.
+1. **THE VOW'S CARRIED HALF (§1a) — THE VOW'S OWN PRICE, OR THE ENEMY'S WOUND ON A SECOND BODY.** Built as the brief prescribed,
+   Forge Body's shape: the share the Devout carries is billed under his own frame, as it has been since BO — his taken ledger
+   books *Vow of Suffering*, and **Penance's mirror pays on the part of the blow the struck ally kept** (4–6 a blow at power 50
+   in `check_hy`'s drive), not on the whole blow (9–11). **The other reading** is Covenant's shape: the carried half is the
+   enemy's wound landing on a second body — the mirror would pay on the whole blow, the Devout's ledger would book the raider,
+   and a Covenant would share it. `docs/master.html`'s Penance row (*whoever it hits*) reads closer to the second. **The change
+   is one line**: the share keeps the frame it found.
+2. **A BOMB'S FRAME NAMES NOBODY (§1b).** It credits no hero's dealt ledger and never has, so the frame agrees with the ledger:
+   no vow blanks it, and no Penance, rule engine or Reaver reads it. **The other reading** names the hero whose turn it is: his
+   own Vow of Silence would blank his bomb, and his Siphon, Judgment, marks and Reaver would be paid off it.
+3. **CONSECRATED GROUND'S REFLECT IS ITS LAYER'S (§1c).** Read off the status's `src_name` — DI's rule, a status's effect is its
+   applier's — so a Cleric wearing Vow of Silence silences his own ground's reflect, on whoever stands on it: HF's leak,
+   closed. **The other reading** is the struck hero's: a teammate on a vowed Cleric's ground would keep his reflect.
 
-### RULED AND NOT BUILT — **FROM HX's BRIEF**
+### FOUND AT HY AND NOT FIXED
+
+- **FOUR STALE CLAIMS HY's RE-READ MET, REPORTED AND NOT REPAIRED (§6's rule: repair or report each).** Three are among HX's
+  87, which stay a batch of their own by ruling: `docs/combat-rules.md`'s header, *every block below is byte-identical to what
+  stood in `CLAUDE.md`* (HU §3b's bullet, and now HY's frame bullet, were written there after the split); `_book_self_cost`
+  *reaches the recap's ledger and nothing else* (it writes the save too, through `_bank_party_losses`, since GH); and the crit
+  total's *twelve statements carrying thirteen terms* (thirteen and fourteen since HB's pity meter). **The fourth stands inside
+  a block moved byte for byte**: HG's supersession block cites *HD §2's four* as retirements that print what they used to
+  read, and only `check_du`'s and `test_batch_az`'s do — `test_batch_ar` prints the new reading, and `test_batch_ba` prints
+  nothing. The one claim HY's own change falsified, the reference's list of this file's readers, was repaired.
+- **TWO OF §1c's SIX RETALIATION SITES ARE FRAMED AND DORMANT**: Spite (`spite_ranks`) and the Whole Forest's bite
+  (`whole_forest`) have had no writer since FX, so no fight reaches either; each now deals under its owner's frame and puts the
+  swing's back, and `check_hy` §5 drives both with the field set by hand. A batch that writes either field again inherits the
+  frame already in place.
+
+### RULED AND NOT BUILT — **FROM HX's AND HY's BRIEFS**
 
 - **A COPIED FROSTBIND IS REFUSED, NOT ROUTED — RULED, NOT BUILT (HV's ruling 2, answered in HX's brief).** HX changed no game
   code. The build is one condition in Downwind's carry, and the card's words owe it a third noun beside the snare and Vendetta's
   lock (the designer's). Until it is built a copied Frostbind is carried as a chip with no partner, which counts for every
   breadth reader.
+- **BOIL OVER BECOMES A RAGE DUMP — RULED, NOT BUILT; HZ's (HY's brief, answering HW's ruling 1).** It spends the whole bar,
+  has no separate Rage cost and wants a minimum to cast; **the Blood Frenzy term and the two-turn recovery go with it.** **Its
+  rate is measured before it is authored** — a Warrior's maximum Rage by lineage, and how full he is when he would cast it —
+  and **the current good case is 84 for 40 Rage** (HW §1a: a Warrior at half health on the Berserker's core), which a full
+  dump must beat. **And `last_rites`** — the tier-3 node *Pay a Lethal Hit out of Your Resource Pool* (`tn_resource_ward`,
+  checked at HY: live) — **pays damage out of Rage below a quarter's health, so a dump turns that protection off at the worst
+  moment.**
 
 ### FOUND AT HX AND NOT FIXED
 
-- **THE ATTRIBUTION FRAME DECIDES DAMAGE, AND IT IS LEFT STANDING IN TWO SHAPES — DRIVEN (HX §4), NOT A ONE-LINE FIX.**
-  (a) **Five callbacks set it inside a blow and never put it back** — `_on_rite_return`, `_on_vow_share`,
-  `_on_bloodbond_guard`, `_on_brunt_guard`, `_on_blight_heal`. Vow of Suffering's share fires on EVERY blow on the vowed ally,
-  inside `take_hit` and before the blow is booked, so the blow itself and the rest of that enemy's action read the Devout's
-  frame. **Driven on a real battle** (an Orc Raider's Slash on a Warden standing on Consecrated Ground, the Survivalist's
-  Tripwire up, Penance on the raider, three blows an arm): with the Devout wearing Vow of Silence the reflect and the Tripwire
-  are **silenced** — the raider lost **0** a blow against **24–27** with no vow share; without the rune they land and are booked
-  under *Vow of Suffering*; **the Penance mirror is lost on every such blow** (9–11 at power 50), rune or no rune; and the recap
-  books the raider's blows as *Devout / Vow of Suffering*. (b) **No site puts the frame back at an action's end**, so a damage site
-  with no frame of its own takes the last action's — Snare Line's spring, an armed Deadfall's spring and a Ruin detonation, each
-  at a unit's turn start. **Driven**: after the Devout's own Smite the Hunter's Snare Line spring dealt **0** (the vow worn)
-  against **15–16** after an enemy's action, and its damage is booked under the last actor's label (*Smite*, *Slash*) every time.
-  **Every reader of the frame**: `_deal_gate` (Vow of Silence); `_rule_engines_on_damage` through `_frame_dealer` — the Echo
-  tally, Siphon, Judgment and the engine marks; `_on_unit_died`'s Reaver credit; the recap's dealt ledger (`_stat`), its taken
-  ledger and kill record (`_book_taken`, `_taken_source`); Penance's mirror; and Covenant's share. **The fix is a save and a
-  restore in each of the five (Forge Body's shape) and a frame for each frameless site** — a damage-door batch of its own. FOUND
-  AT GO's retaliations filed to the enemy's frame inside its swing, and FOUND AT HF's reflect slipping past the vow, are the
-  same missing frames seen from the other side, and stay where they are.
 - **THE OLDER USER-DATA COPIES ARE THE DESIGNER'S TO CLEAR**: 455 named *Dawn of Decay* FX… to HL… and five named *DoD …* stand
   in `app_userdata` (counted at HX, after HW's eighteen went to the Trash) — outside HO §5's policy, which clears only the
   previous batch's. A ready command is in `docs/reports/HX.md` §7. *Every batch's own record of its folders is archived behind
@@ -130,18 +163,13 @@ Full working: `docs/reports/HX.md`, NEEDS A RULING.
   meets first: *the four tracked documents* (six), `_ready()` for the save redirect (`_init()`), *`check_cm_live` is the only
   thing that presses the defensive bar* (`check_fh` §7 too), *`Relics.SAVE_PATH` … with no redirect* (a var since GJ), the crit
   total's *twelve statements, thirteen terms* (thirteen and fourteen), and `_book_self_cost` *reaches the recap's ledger and
-  nothing else* (it writes the save). **Repairing them is the audit HX's ruling 4 prices.**
+  nothing else* (it writes the save). **HX's ruling 4 is answered (HY §6): a batch re-reads the claims that name what it touched, and a live count in a reference points at its instrument or carries its batch — 31 of the 87 are counts. The 87 are a batch of their own, by ruling.**
 
-### HW's RULINGS OWED — **SIX; THE FIRST TWO ARE PLAYTEST DEFECTS WHOSE CAUSE IS NOT THE CODE**
+### HW's RULINGS OWED — **FIVE LEFT; THE FIRST IS HZ's (THE TOAST), AND BOIL OVER'S WAS ANSWERED IN HY's BRIEF (A RAGE DUMP, RULED AND NOT BUILT)**
 
 Full working: `docs/reports/HW.md`, NEEDS A RULING.
 
-1. **BOIL OVER'S WORDS (§1a).** The card pays what it says; its opening *Spend the rage itself* reads as the Warrior's Rage
-   while the card spends Blood Frenzy's live bonus, which only the Berserker's core carries — and GP §2 offers it to every
-   Warrior as a card that half-works (21 against 84). **The words** (one shape: *Cash the frenzy: strike for 30% of Attack
-   plus 2% more for every POINT of a live Blood Frenzy bonus*), **or the card** (it spends Rage for damage — a new magnitude),
-   **or the offer** (to the Berserker's core alone).
-2. **THE SHARPSHOOTER'S CORE TAKEN AFTER CLASS SELECTION (§1b).** Class selection slots the core it deals; one taken later
+2. **THE SHARPSHOOTER'S CORE TAKEN AFTER CLASS SELECTION (§1b) — HZ's, WITH THE EYES (HY's brief).** Class selection slots the core it deals; one taken later
    waits unworn until it is slotted (HL §1: one pick is never two things), and the toast says so. Slotted, the pet card leaves
    at once. **Keep it**, or **slot a core rune on the pick while a core slot is free** (the Sharpshooter's takes a card away
    rather than adding one, which is not what HL §1 refused), or **name the pet in the toast**.
@@ -172,18 +200,16 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
 - **`run_battery.sh` STILL DOES NOT ASK WHETHER THE GAME IS OPEN, AND A PLAIN `kill` STILL DOES NOT STOP IT** (HT's two, carried).
 ### THE PLAYTEST'S OTHER FINDINGS — **LATER BATCHES BY RULING (HW's brief §5); THE ROADMAP HOLDS THE ORDER**
 
-- **HX — the trim and the checks: DONE.** Next is **the re-measure** — §3b's census again over the batches since HV, the read
-  this trim left, and the checks' record — one section of whatever batch follows; **the block index waits on it**, and so does
-  the fourth re-derivation, re-priced against the trimmed read.
-- **HY — the eyes**: enemy attack detail on hover (**the effect, never the target**); a kit preview from the shop and draft
+- **THE RE-MEASURE IS NOT RUN AT HY**: two batches have elapsed since HV and it needs more to measure (HY's brief §7); **the block index and HV's pilot still wait on it.** **THE LETTERS SHIFT BY ONE (HY's brief), AND THIS IS THE ORDER:**
+- **HZ — the eyes, with Boil Over and the Sharpshooter's toast**: enemy attack detail on hover (**the effect, never the target**); a kit preview from the shop and draft
   screens; **nameplates selectable to complete abilities**; **rune-effect chips** (Empty Pulpit pays continuously and nothing
   on screen says so).
-- **HZ — the bag and the slots**: **three core slots — RULED, NOT BUILT** (two has been the designed number since GK,
+- **IA — the bag and the slots**: **three core slots — RULED, NOT BUILT** (two has been the designed number since GK,
   `Run.ENGINE_SLOTS`); the per-class bag in three separated sections — core, equipped, held-not-worn. **The slot and the screen
   that shows it are one change.**
-- **IA — the draft flow**: a waiting draft appears automatically at the node map; **each class drafts separately**; **runes
+- **IB — the draft flow**: a waiting draft appears automatically at the node map; **each class drafts separately**; **runes
   and abilities on one hero-specific screen.**
-- **IB — resources and fire**: the Cleric's regen, against a census of everything that returns Mana to a Cleric; **more Burn
+- **IC — resources and fire**: the Cleric's regen, against a census of everything that returns Mana to a Cleric; **more Burn
   appliers in the Mage's pool.**
 - **MANA STAYS (ruled).** The Mage and the Hunter run dry and plan around it; only the Cleric is always full, so it is one
   class's regen and not the resource. **Channel's tempo payout — Mana spent buys speed — is alive and still owed.**
@@ -331,7 +357,7 @@ The question it asked: **whether an index plus subjects read on demand beats one
 reasoning split, which stays rejected. The figures, the two natural experiments and the recommendation are in
 `docs/reports/HV.md` §3. **Ruled at HX §0 (the designer's)**: the checks first — built, `check_hx` §1 — then this file's
 trim — taken, HX §2 — then a re-measure, one section of the next batch: §3b's census over the batches since HV, the read this
-trim left, and the checks' record. **HV's nine-unit pilot and the block index both wait on it.** The live headroom is in the
+trim left, and the checks' record. **HV's nine-unit pilot and the block index both wait on it** — **and it did not run at HY**: two batches since HV are too few to measure (HY's brief §7). The live headroom is in the
 WHERE block.
 
 ### TO WATCH IN PLAY — **RULED AT HN §2; EACH IS ONE CONSTANT OR ONE LINE IF IT READS WRONG**
@@ -416,10 +442,6 @@ Full working: `docs/reports/HF.md`, NEEDS A RULING.
   Mark of the Hunt, since undone).
 - **RETURNED BURDEN FINDS ITS APPLIER BY NAME.** A status carries its applier's name (`src_name`, DI's rule), and two
   enemies of one kind share a name, so the first of that name on the field takes the burden back.
-- **A REFLECT LEAKS PAST VOW OF SILENCE.** The vow reads the attribution frame, and Consecrated Ground's reflect is
-  dealt inside the enemy's own blow, whose frame is the enemy's — so a Vow Cleric standing on Consecrated Ground (a
-  drafted card) still hurts the enemy that strikes him. BL's rule, one reader more: damage the frame does not credit to
-  him is damage the vow cannot see.
 - **DETONATING WARD PAYS ON TWO REMOVALS, NOT EVERY ONE.** It detonates when the ward BREAKS (`barrier_broken_cb`) or
   ENDS (`status_expired_cb`); a barrier stripped another way — a purge, a replacement by a smaller ward, the fight
   ending — pays nothing, and the absorbed total resets at the next cast.
@@ -881,12 +903,6 @@ Full working: `docs/reports/GO.md`, NEEDS A RULING.
 12. **THE BOT'S BASTION CASE** (`_bot_redoubt_pick`: spend a bank at least one basic's worth) is an implementation
     call that moves simulated figures only.
 
-### FOUND AT GO AND NOT FIXED
-
-- **A KILL, A WOUND OR A RETURN MADE INSIDE AN ENEMY'S OWN SWING IS FILED TO THAT ENEMY.** Tripwire's retaliation, a
-  Feint's reflect and a Mirror Guard return deal their damage under the enemy's attribution frame, so the Reaver does
-  not count the kill, the Leech returns no Mana, the Arbiter heals nobody and no mark is laid off them. Measured: in a
-  party with no lineage, 7 of 74 kills were filed to an enemy's frame (GO §1a).
 ### GN's RULINGS OWED — **EIGHT; THE FIRST FIVE ARE PLAYER-VISIBLE**
 
 Full working: `docs/reports/GN.md`, NEEDS A RULING.
@@ -3792,8 +3808,8 @@ reach `bp` §7 at all: it is a Warrior flow.**
 
 ### Last measurements
 
-**HC's verification is in `docs/reports/HC.md` §8, written after the acceptance run.** HC moved every rune's scope,
-so HEAD's unmodified gates and suites were run against the new code before any instrument moved, the offers were
-driven on a whole road per arm at all four doors on this tree and on HEAD's, and the designer's save was driven in an
-isolated copy seeded from the backup. **The figures live in the report and not here**, because this file is read by
-`check_es` §4 and a cell written behind the run would owe a post-run proof of its own.
+**HY's verification is in `docs/reports/HY.md` §8, written after the acceptance run.** HY moved the attribution frame, so
+HEAD's unmodified gates and suites were run against the new code before any instrument moved, and `check_hy` drove every
+site it moved on this tree and on HEAD's. **The figures live in the report and not here**, because this file is read by
+four gates — `check_es` §4, `check_fg` §4, `check_hp` §5 and `check_hx` §2 — and a cell written behind the run would owe a
+post-run proof of its own.

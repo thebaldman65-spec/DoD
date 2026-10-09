@@ -17,6 +17,81 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT HY — 2026-10-09, FROM `docs/state.md` AS HX LEFT IT (`d3773d3`)
+
+**What came here**: HX's rulings, all four answered in HY's brief; the closed items of four sections that stay live — HX's frame item and HF's reflect leak (both fixed at HY §1), Boil Over's ruling (answered in HY's brief), and the roadmap's *HX — DONE* line — and GO's one item, whose section went whole. Each was read against the code at HY's tree before it moved; everything else in the live file stayed.
+
+### ~~HX's RULINGS OWED~~ — **ALL FOUR ANSWERED IN HY's BRIEF AND TAKEN AT HY §0: THIS FILE'S CEILING 380 KiB (1); THE TWO BLOCKS MOVED, THE DOCTRINE READ OFF THE PRACTICE (2); THE FOUR PASSAGES STAY (3); THE PER-BATCH RE-READ, AND COUNTS POINT AT THEIR INSTRUMENT (4)**
+
+Full working: `docs/reports/HX.md`, NEEDS A RULING.
+
+1. **THIS FILE'S CEILING (§2c) — PRICED, NOT SET.** **EE's method on this file — its own reading at HX's close, plus ten of its largest single-batch growth on record (ES's +13,700 B), rounded down — gives 460 KiB, which is ABOVE the 456 KiB it stood at before HX's trim.** The method prices a file against its own growth, and this file's trouble was never one batch's growth: it was closed items that never left (it grew in every batch but two since GK — +5,528 B a batch over HO–HW). **What one would cost**: a stated sentence, a `check_fg`-shaped arm, and an answer at the ceiling, which for this file is the archive and not a split. **The alternative is the closing practice alone** — what a batch closes goes to the archive, now in `CLAUDE.md`'s map — with no number; and a tighter number, ten batches at HO–HW's mean, is 380 KiB. Full working: `docs/reports/HX.md` §2c.
+2. **HG–HJ's TWO WRITTEN-BACK INSTRUMENT BLOCKS (§1c): MOVE THEM TO THE REFERENCE, OR LEAVE THEM.** *RE-VERIFYING A CENSUS ENTRY…*
+   (HG §1b, 1,503 B) and *A SUPERSESSION IS A CLAIM…* (HG §2a with HH's, HI's and HJ's bullets, 5,650 B) — 7,153 B of
+   `CLAUDE.md`, both rules about how a batch verifies itself. **The second contradicts the reference's DG §2**: it retires an
+   arm onto the fact that retired it and prints the old reading, where DG §2 deletes a check about a deleted feature, with the
+   count predicted and a note at the site. Moving them is a ruling on which doctrine stands as well as where.
+3. **THE DUPLICATES §1b NAMED (§1b): WHICH COPY KEEPS EACH.** Rule text standing in two rule files: CT's autoload rule (a block in
+   `CLAUDE.md`, a trap in the reference), EV §5's passage on a comment that names a banned string (the reference's block and
+   `CLAUDE.md`'s DR §2 traps), the sentence that RunSim calls Profile nowhere (the talent handoff and the sim bullet), and THE
+   TRAPS' preamble (both halves since EF §2). The rest of what §1b found is seam prose each file states of itself, and stays.
+4. **THE SCHEDULED CLAIMS AUDIT (§1d) — PRICED, NOT SCHEDULED.** **Against** both references' present-tense claims, under HX's rubric, each mechanical claim settled at a `path:line`; **this census cost four read-only readers 2,069,243 tokens in 40–46 minutes, in parallel.** Two shapes: **a full census every ten batches** (about 0.2 million tokens a batch amortised, and the repair batch it feeds), or **a re-read every batch of the claims that name what the batch touched** (a fraction of one reader; blind to a claim falsified by a symbol it does not name). **And a ruling that would shrink the population instead**: counts rot at 29% against values' 4%, so the references could be held to HO §0's rule — a live count points at the instrument that prints it, or carries its batch. `docs/reports/HX.md` §1d.
+
+### FOUND AT HX AND NOT FIXED — ITS CLOSED ITEMS (archived at HY; the section stays in `docs/state.md`)
+
+*FIXED AT HY §1: the five callbacks borrow and put back, the frameless sites carry their owner's frame, and GO's and HF's retaliations are their owners' — `check_hy`.*
+
+- **THE ATTRIBUTION FRAME DECIDES DAMAGE, AND IT IS LEFT STANDING IN TWO SHAPES — DRIVEN (HX §4), NOT A ONE-LINE FIX.**
+  (a) **Five callbacks set it inside a blow and never put it back** — `_on_rite_return`, `_on_vow_share`,
+  `_on_bloodbond_guard`, `_on_brunt_guard`, `_on_blight_heal`. Vow of Suffering's share fires on EVERY blow on the vowed ally,
+  inside `take_hit` and before the blow is booked, so the blow itself and the rest of that enemy's action read the Devout's
+  frame. **Driven on a real battle** (an Orc Raider's Slash on a Warden standing on Consecrated Ground, the Survivalist's
+  Tripwire up, Penance on the raider, three blows an arm): with the Devout wearing Vow of Silence the reflect and the Tripwire
+  are **silenced** — the raider lost **0** a blow against **24–27** with no vow share; without the rune they land and are booked
+  under *Vow of Suffering*; **the Penance mirror is lost on every such blow** (9–11 at power 50), rune or no rune; and the recap
+  books the raider's blows as *Devout / Vow of Suffering*. (b) **No site puts the frame back at an action's end**, so a damage site
+  with no frame of its own takes the last action's — Snare Line's spring, an armed Deadfall's spring and a Ruin detonation, each
+  at a unit's turn start. **Driven**: after the Devout's own Smite the Hunter's Snare Line spring dealt **0** (the vow worn)
+  against **15–16** after an enemy's action, and its damage is booked under the last actor's label (*Smite*, *Slash*) every time.
+  **Every reader of the frame**: `_deal_gate` (Vow of Silence); `_rule_engines_on_damage` through `_frame_dealer` — the Echo
+  tally, Siphon, Judgment and the engine marks; `_on_unit_died`'s Reaver credit; the recap's dealt ledger (`_stat`), its taken
+  ledger and kill record (`_book_taken`, `_taken_source`); Penance's mirror; and Covenant's share. **The fix is a save and a
+  restore in each of the five (Forge Body's shape) and a frame for each frameless site** — a damage-door batch of its own. FOUND
+  AT GO's retaliations filed to the enemy's frame inside its swing, and FOUND AT HF's reflect slipping past the vow, are the
+  same missing frames seen from the other side, and stay where they are.
+
+### HW's RULINGS OWED — ITS CLOSED ITEMS (archived at HY; the section stays in `docs/state.md`)
+
+*ANSWERED IN HY's BRIEF: Boil Over becomes a Rage dump — RULED, NOT BUILT; HZ builds it (`docs/state.md`'s RULED AND NOT BUILT).*
+
+1. **BOIL OVER'S WORDS (§1a).** The card pays what it says; its opening *Spend the rage itself* reads as the Warrior's Rage
+   while the card spends Blood Frenzy's live bonus, which only the Berserker's core carries — and GP §2 offers it to every
+   Warrior as a card that half-works (21 against 84). **The words** (one shape: *Cash the frenzy: strike for 30% of Attack
+   plus 2% more for every POINT of a live Blood Frenzy bonus*), **or the card** (it spends Rage for damage — a new magnitude),
+   **or the offer** (to the Berserker's core alone).
+
+### THE PLAYTEST'S OTHER FINDINGS — ITS CLOSED ITEMS (archived at HY; the section stays in `docs/state.md`)
+
+- **HX — the trim and the checks: DONE.** Next is **the re-measure** — §3b's census again over the batches since HV, the read
+  this trim left, and the checks' record — one section of whatever batch follows; **the block index waits on it**, and so does
+  the fourth re-derivation, re-priced against the trimmed read.
+
+### FOUND AT HF AND NOT FIXED — ITS CLOSED ITEMS (archived at HY; the section stays in `docs/state.md`)
+
+*FIXED AT HY §1c: Consecrated Ground's reflect deals under its layer's frame, so his Vow of Silence silences it (`check_hy` §5).*
+
+- **A REFLECT LEAKS PAST VOW OF SILENCE.** The vow reads the attribution frame, and Consecrated Ground's reflect is
+  dealt inside the enemy's own blow, whose frame is the enemy's — so a Vow Cleric standing on Consecrated Ground (a
+  drafted card) still hurts the enemy that strikes him. BL's rule, one reader more: damage the frame does not credit to
+  him is damage the vow cannot see.
+
+### ~~FOUND AT GO AND NOT FIXED~~ — **ITS ONE ITEM FIXED AT HY §1c: A TRIPWIRE, A FEINT'S RETURN AND A MIRROR GUARD RETURN DEAL UNDER THEIR OWNER'S FRAME INSIDE THE ENEMY'S SWING (`check_hy` §5)**
+
+- **A KILL, A WOUND OR A RETURN MADE INSIDE AN ENEMY'S OWN SWING IS FILED TO THAT ENEMY.** Tripwire's retaliation, a
+  Feint's reflect and a Mirror Guard return deal their damage under the enemy's attribution frame, so the Reaver does
+  not count the kill, the Leech returns no Mana, the Arbiter heals nobody and no mark is laid off them. Measured: in a
+  party with no lineage, 7 of 74 kills were filed to an enemy's frame (GO §1a).
+
 ## ARCHIVED AT HX §2 — 2026-10-08, FROM `docs/state.md` AS HW LEFT IT (`d7c0a98`)
 
 **How it was cut** (`docs/reports/HX.md` §2): every item of the 24 sections whose headings were struck, the 55 headed *FOUND AT* and the ten closed by their

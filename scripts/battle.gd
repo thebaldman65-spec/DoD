@@ -3595,52 +3595,10 @@ func _run_battle() -> void:
 				# `_apply_status`; the Poison is a flat 4 turns either way.
 				_spring_trap(heroes[sn_idx], u, 0.0)
 				_apply_poison(heroes[sn_idx], u, 4)
-		# BATCH BO §5 — SNARE LINE. The traps stop waiting: every enemy that
-		# ACTS while the line holds springs one where it stands. It sits beside
-		# the snare rather than in its own hook because it asks the identical
-		# question at the identical moment, and it goes through the same
-		# `_spring_trap`, so Bone Breaker's Break, Cruel Devices' multiplier,
-		# Quick Rigging's Cripple and Caught Fast all pay per spring exactly as
-		# they do on a placed trap. It spends NO placed trap and fills no trap
-		# slot — checked at the cast, stated on the card.
-		if not u.is_hero and not u.dead and u.has_status("snare_line"):
-			var sl_idx2 := u.status_power("snare_line")
-			u.remove_status("snare_line")
-			if sl_idx2 >= 0 and sl_idx2 < heroes.size() and not heroes[sl_idx2].dead:
-				_message("The line springs under %s!" % u.unit_name)
-				_log("%s's snare line springs on %s" % [heroes[sl_idx2].unit_name,
-					u.unit_name], "#c8a860")
-				_stat("snare_line_springs")
-				var sl_cold := u.has_status("chilled")
-				_spring_trap(heroes[sl_idx2], u,
-					DEADFALL_SPRING_PCT * heroes[sl_idx2].attack)
-				# BATCH DH §1 — THE LINE BINDS A CHILLED BODY HARDER, and the
-				# feeder is the CRYOMANCER: Chilled is everywhere in that spec
-				# and nothing in the Survivalist's kit applies it, so this is a
-				# bonus he can only reach by drafting beside one. NAMED on the
-				# card, per §0.
-				#
-				# IT IS WRITTEN HERE AND NOT IN `_spring_trap`, WHICH IS THE
-				# WHOLE CARE OF THIS CLAUSE: that helper is shared with the
-				# placed deadfall and Snare Trap, so a clause inside it would
-				# move a magnitude on TWO existing effects — exactly what §5
-				# forbids. Only the LINE binds harder.
-				#
-				# `add_status` MAXES turns, so re-applying `stunned` at 2 raises
-				# the spring's own 1 rather than stacking a second stun; and the
-				# boss refusal in `_apply_status` still stands, so an unbroken
-				# boss shrugs this off exactly as it shrugs off the spring.
-				#
-				# **BATCH HW §3 — IT BINDS NO HARDER, AND THE CARD NO LONGER SAYS IT
-				# DOES (ruled: the card goes to the code).** The turn loop strips a
-				# stun whole at the first turn it costs, so a chilled body loses the
-				# one turn any sprung body loses. The clause is KEPT and pays nothing;
-				# making a stun's length real is a system change across every stun,
-				# not a card repair. Its log line, which named two turns, is gone with
-				# the card's sentence — `SNARE_LINE_COLD_STUN` is unmoved.
-				if sl_cold and not u.dead:
-					_apply_status(u, "stunned", SNARE_LINE_COLD_STUN, 0, 0,
-						heroes[sl_idx2])
+		# BATCH BO §5 — SNARE LINE, beside the snare it mirrors. Its body is its own
+		# function since HY §1b (`_deadfall_tick`'s reason: `_run_battle` cannot be
+		# driven headlessly, and the spring now owes a frame a gate must read).
+		_snare_line_tick(u)
 		# BATCH BD — the placed deadfall rests and springs at one site, and that
 		# site is ITS OWN FUNCTION rather than a clause buried in this loop:
 		# `_run_battle` cannot be driven headlessly (the AR trap), so a rule with a
@@ -5921,12 +5879,23 @@ func _use_item(item_id: String) -> void:
 			_log("Item: Bomb — %d dmg to all enemies" % bomb_dmg, "#e0c060")
 			_sfx("bomb", -2.0)
 			_shake()
+			# BATCH HY §1b — A BOMB IS THE POUCH'S, NOT A HERO'S, AND ITS FRAME SAYS SO.
+			# It is thrown on a hero's turn before any action, so until HY it dealt under
+			# the last action's frame — a Vow of Silence worn by whoever acted last could
+			# blank it, and an enemy's Penance could bill for it. It credits nobody's
+			# dealt ledger, so the frame names nobody: no vow reads it, no mirror and no
+			# rule engine is paid off it. The frame it found is put back after.
+			var bm_was_src := _dmg_src
+			var bm_was_label := _dmg_label
+			var bm_was_name := _dmg_src_name
+			_dmg_frame(null, String(Run.ITEM_INFO["bomb"][0]))
 			for e in enemies.filter(func(en): return not en.dead):
 				var result: Dictionary = e.take_hit(bomb_dmg, 0)
 				e.float_text(str(bomb_dmg), Color(1.0, 0.8, 0.4))
 				if result.died:
 					_message("%s falls!" % e.unit_name)
 					_log("† %s dies" % e.unit_name, "#e05050")
+			_dmg_frame(bm_was_src, bm_was_label, bm_was_name)
 			await _wait(0.8)
 			_rebuild_turn_bar()
 			_check_end()
@@ -9849,6 +9818,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if parry_source == "Feint" and ab.damage > 0 and not attacker.dead:
 					var fr_dmg := maxi(int(round(ab.damage * 0.01 * attacker.attack
 						* (1.0 - strike_target.effective_armor()))), 1)
+					# BATCH HY §1c — THE RETURN IS THE FEINTER'S, so it deals under his
+					# frame inside the attacker's swing, and the swing's frame comes
+					# back after (GO's item: under the attacker's own frame the return
+					# was self-inflicted by identity, and no rule engine saw it).
+					var fr_was_src := _dmg_src
+					var fr_was_label := _dmg_label
+					var fr_was_name := _dmg_src_name
+					_dmg_frame(strike_target, String(STATUS_INFO["feint_guard"][0]),
+						strike_target.unit_name)
 					if strike_target.is_hero:
 						_prev(strike_target, float(fr_dmg))
 						_stat("dmg_hero_" + _contrib_name(strike_target), fr_dmg)
@@ -9863,6 +9841,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						_log("† %s dies" % attacker.unit_name, "#e05050")
 						if not attacker.is_hero:
 							_on_enemy_death(attacker)
+					_dmg_frame(fr_was_src, fr_was_label, fr_was_name)
 				# Deflection: only that talent lets a ranged attack be parried.
 				if attacker.is_ranged:
 					_log("   → Talent: Deflection — %s turns the shot aside" % \
@@ -11948,12 +11927,23 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_log("   → Consecrated Ground reflects %d to %s%s" % [
 					reflect, attacker.unit_name,
 					" (Righteous Fire)" if cg_pct > 0.10 else ""], "#c8b880")
+				# BATCH HY §1c — THE REFLECT IS THE GROUND'S, SO IT IS WHOEVER LAID IT
+				# (DI: a status's effect is its applier's, by the `src_name` the status
+				# door stamps). Under the attacker's own frame it slipped past the
+				# layer's Vow of Silence (HF's item) and no rule engine saw it.
+				var cg_src := String(strike_target.get_status("cons_ground").get("src_name", ""))
+				var cg_was_src := _dmg_src
+				var cg_was_label := _dmg_label
+				var cg_was_name := _dmg_src_name
+				_dmg_frame(_hero_named(cg_src) if cg_src != "" else null,
+					String(STATUS_INFO["cons_ground"][0]), cg_src)
 				if attacker.take_tick_damage(reflect, "-%d Reflect" % reflect,
 						Color(0.9, 0.82, 0.5)):
 					_stat("enemy_deaths")
 					_sfx("death", -4.0)
 					_message("%s falls!" % attacker.unit_name)
 					_log("† %s dies" % attacker.unit_name, "#e05050")
+				_dmg_frame(cg_was_src, cg_was_label, cg_was_name)
 				# Lifewell: the reflected pain waters the party.
 				if cg_dv != null and cg_dv.lifewell_ranks + cg_dv.rune_lifewell_ranks > 0:
 					var well := maxi(int(round(reflect
@@ -12533,6 +12523,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var spite_bd := 0
 				if strike_target.spite_break > 0:
 					spite_bd = maxi(int(round(spite_dmg * 0.5)), 1)
+				# BATCH HY §1c — the talent's return is his: his frame while it deals,
+				# inside the attacker's swing, and the swing's back at this block's end.
+				var sp_was_src := _dmg_src
+				var sp_was_label := _dmg_label
+				var sp_was_name := _dmg_src_name
+				_dmg_frame(strike_target, "Spite", strike_target.unit_name)
 				var spite_res: Dictionary = attacker.take_hit(spite_dmg, spite_bd)
 				attacker.float_text("-%d Spite" % spite_dmg, Color(0.9, 0.55, 0.4))
 				_log("   → Talent: Spite — %s takes %d damage back" % [
@@ -12548,6 +12544,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_message("%s falls!" % attacker.unit_name)
 					_log("† %s dies" % attacker.unit_name, "#e05050")
 					_on_enemy_death(attacker)
+				_dmg_frame(sp_was_src, sp_was_label, sp_was_name)
 			# Pyromancer fire package (Batch N kit, re-authored by AR).
 			if detonated > 0:
 				_log("   → Detonation consumes %d turn%s of Burn (+%d bonus damage)" % [
@@ -13468,6 +13465,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					+ int(0.01 * (trapper.wire_ranks + trapper.rune_wire_ranks) * trapper.attack)
 				ret = int(round(ret * (1.0 + 0.01 * (trapper.cruel_ranks
 					+ trapper.rune_cruel_ranks))))
+				# BATCH HY §1c — THE WIRE IS THE TRAPPER'S: his frame while it rips,
+				# inside the attacker's swing, and the swing's frame back after. Under
+				# the attacker's own frame it was self-inflicted by identity, so the
+				# Reaver, the Leech, the Arbiter and the marks never saw it (GO's item).
+				var tw_was_src := _dmg_src
+				var tw_was_label := _dmg_label
+				var tw_was_name := _dmg_src_name
+				_dmg_frame(trapper, String(STATUS_INFO["tripwire"][0]), trapper.unit_name)
 				var ret_result: Dictionary = attacker.take_hit(ret, 0)
 				_stat("dmg_hero_" + trapper.unit_name, ret)
 				attacker.float_text("%d Tripwire" % ret, Color(0.8, 0.65, 0.35))
@@ -13485,6 +13490,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_message("%s falls!" % attacker.unit_name)
 					_log("† %s dies" % attacker.unit_name, "#e05050")
 					_on_enemy_death(attacker)
+				_dmg_frame(tw_was_src, tw_was_label, tw_was_name)
 		# Corrupted Channeling (talent): a Crippled enemy's violence feeds
 		# the party — 25%/rank of the damage it dealt.
 		var chan_r := _max_hero_rank("channeling_ranks")
@@ -13945,6 +13951,13 @@ func _killing_cold_cast(caster: BattleUnit) -> void:
 			continue
 		var kc_dmg: int = maxi(int(round(e.max_hp * 0.01
 			* caster.rune_killing_cold * kc_stacks)), 1)
+		# BATCH HY §1a — BORROWED AND PUT BACK, the five callbacks' shape: this runs
+		# at the cast's own line, before its strike, so a frame left naming the rune
+		# booked the cast's whole strike under the rune's label — and the Weaver's
+		# tally, which reads the cast's label, went blind to it. Found by HY's census.
+		var kc_was_src := _dmg_src
+		var kc_was_label := _dmg_label
+		var kc_was_name := _dmg_src_name
 		_dmg_frame(caster, "Rune: the Killing Cold", caster.unit_name)
 		var kc_died: bool = e.take_tick_damage(kc_dmg, "-%d" % kc_dmg,
 			Color(0.65, 0.88, 1.0))
@@ -13957,6 +13970,7 @@ func _killing_cold_cast(caster: BattleUnit) -> void:
 			_message("%s falls!" % e.unit_name)
 			_log("† %s dies" % e.unit_name, "#e05050")
 			_on_enemy_death(e)
+		_dmg_frame(kc_was_src, kc_was_label, kc_was_name)
 
 
 # What rides a freeze: the Mana it pays back and the cold it rolls outward.
@@ -16857,8 +16871,15 @@ func _on_rite_return(saved: BattleUnit) -> bool:
 	# party's other refusals, which is the correct and slightly grim reading of
 	# a resurrection cult's arithmetic.
 	var toll := maxi(int(round(cleric.max_hp * 0.30)), 1)
+	# BATCH HY §1a — THE FRAME IS BORROWED FOR THE BILL AND PUT BACK (Forge Body's
+	# shape). This runs inside the blow that would have killed `saved`, so the rest
+	# of that blow, and of its dealer's action, reads the dealer's frame again.
+	var rr_was_src := _dmg_src
+	var rr_was_label := _dmg_label
+	var rr_was_name := _dmg_src_name
 	_dmg_frame(cleric, "Rite of Return")
 	cleric.take_tick_damage(toll, "-%d" % toll, Color(0.95, 0.9, 0.55))
+	_dmg_frame(rr_was_src, rr_was_label, rr_was_name)
 	saved.refresh_bars()
 	_log("   → Rite of Return — %s is restored to 50%% health; %s pays %d of her own" % [
 		saved.unit_name, cleric.unit_name, toll], "#e0d070")
@@ -16877,8 +16898,17 @@ func _on_vow_share(ally: BattleUnit, share: int) -> int:
 	var devout := _living_devout()
 	if devout == null or devout == ally:
 		return 0
+	# BATCH HY §1a — BORROWED FOR THE BILL AND PUT BACK, and this is the callback
+	# that made it matter: it fires on EVERY blow on a vowed ally, inside `take_hit`
+	# before the blow is booked, so a frame left on the Devout gave him the rest of
+	# the enemy's action — the blow's own booking, Penance's mirror, a teammate's
+	# Tripwire and reflect, each read as his and silenced by his Vow of Silence.
+	var vw_was_src := _dmg_src
+	var vw_was_label := _dmg_label
+	var vw_was_name := _dmg_src_name
 	_dmg_frame(devout, "Vow of Suffering")
 	devout.take_tick_damage(share, "-%d" % share, Color(0.98, 0.85, 0.45))
+	_dmg_frame(vw_was_src, vw_was_label, vw_was_name)
 	_log("   → Vow of Suffering: %s carries %d of %s's wound" % [
 		devout.unit_name, share, ally.unit_name], "#e0c060")
 	# "Every hit he eats builds that ally's Faith" — the ALLY's meter, because
@@ -16925,8 +16955,13 @@ func _on_bloodbond_guard(comp: BattleUnit, amount: int) -> bool:
 		comp.unit_name])
 	_log("%s: Bloodbond — the blow that would have felled %s is REFUSED; %s takes %d of it" % [
 		hunter.unit_name, comp.unit_name, hunter.unit_name, share], "#e05070")
+	# BATCH HY §1a — borrowed for the bill and put back, inside the killing blow.
+	var bb_was_src := _dmg_src
+	var bb_was_label := _dmg_label
+	var bb_was_name := _dmg_src_name
 	_dmg_frame(hunter, "Bloodbond")
 	hunter.take_tick_damage(share, "-%d" % share, Color(0.85, 0.30, 0.35))
+	_dmg_frame(bb_was_src, bb_was_label, bb_was_name)
 	if hunter.dead:
 		_log("† %s falls paying the bond" % hunter.unit_name, "#e05050")
 	return true
@@ -17005,8 +17040,13 @@ func _on_brunt_guard(hunter: BattleUnit, amount: int) -> bool:
 	_log("%s: %s — the blow that would have felled %s is REFUSED; %s takes %d of it" % [
 		hunter.unit_name, brunt_name, hunter.unit_name, comp.unit_name, share],
 		"#e0a050")
+	# BATCH HY §1a — borrowed for the bill and put back, inside the killing blow.
+	var br_was_src := _dmg_src
+	var br_was_label := _dmg_label
+	var br_was_name := _dmg_src_name
 	_dmg_frame(comp, brunt_name)
 	comp.take_tick_damage(share, "-%d" % share, Color(0.80, 0.55, 0.30))
+	_dmg_frame(br_was_src, br_was_label, br_was_name)
 	if comp.dead:
 		# A COMPANION KILLED BY A TICK IS ANNOUNCED AND BOOKED BY ITS CALLER,
 		# never by `take_tick_damage` — the bleed-out site is the precedent and
@@ -17102,6 +17142,11 @@ func _on_blight_heal(victim: BattleUnit, amount: int) -> void:
 	if amount <= 0 or victim.dead:
 		return
 	var occ := _living_occultist()
+	# BATCH HY §1a — borrowed for the bill and put back: the heal it turns is
+	# usually another unit's action (a mender's rite), whose frame resumes after.
+	var bw_was_src := _dmg_src
+	var bw_was_label := _dmg_label
+	var bw_was_name := _dmg_src_name
 	_dmg_frame(occ if occ != null else victim, "Blight the Well",
 		occ.unit_name if occ != null else "")
 	_log("   → Blight the Well: the mending turns on %s for %d" % [
@@ -17115,6 +17160,7 @@ func _on_blight_heal(victim: BattleUnit, amount: int) -> void:
 			_message("%s falls!" % victim.unit_name)
 			_log("† %s dies" % victim.unit_name, "#e05050")
 			_on_enemy_death(victim)
+	_dmg_frame(bw_was_src, bw_was_label, bw_was_name)
 
 
 # The living hero whose second resource IS Mercy — the Holy Cleric. Her
@@ -17353,6 +17399,12 @@ func _mirror_guard_return(defender: BattleUnit, attacker: BattleUnit,
 	var mg_dmg := maxi(int(round(ab.damage * 0.01 * attacker.attack
 		* (1.0 - defender.effective_armor())
 		* 0.01 * defender.rune_mirror_guard)), 1)
+	# BATCH HY §1c — THE RETURN IS THE DEFENDER'S: his frame while it deals, inside
+	# the attacker's swing, and the swing's own frame back after (GO's item).
+	var mg_was_src := _dmg_src
+	var mg_was_label := _dmg_label
+	var mg_was_name := _dmg_src_name
+	_dmg_frame(defender, Runes.display_name(Runes.config("mirror_guard")), defender.unit_name)
 	var mg_res: Dictionary = attacker.take_hit(mg_dmg, 0)
 	attacker.float_text("-%d Mirror" % mg_dmg, Color(0.55, 0.85, 1.0))
 	if defender.is_hero and not attacker.is_hero:
@@ -17366,6 +17418,7 @@ func _mirror_guard_return(defender: BattleUnit, attacker: BattleUnit,
 		_log("† %s dies" % attacker.unit_name, "#e05050")
 		if not attacker.is_hero:
 			_on_enemy_death(attacker)
+	_dmg_frame(mg_was_src, mg_was_label, mg_was_name)
 
 
 func _swordmaster_switch(u: BattleUnit) -> void:
@@ -17969,6 +18022,14 @@ func _detonate_ruin(target: BattleUnit) -> void:
 	_stat("ruin_detonations_boss" if _boss_fight() else "ruin_detonations_trash")
 	_sig("old_gods")  # BJ §3a: the detonation is the Occultist's signature moment
 	_message("RUIN consumes %s!" % target.unit_name)
+	# BATCH HY §1b — A DETONATION IS THE OCCULTIST'S, AND IT FIRES AT ITS BEARER'S
+	# TURN START, OUTSIDE EVERY ACTION — so until HY it dealt under whatever the
+	# last action or tick had left standing. The frame names him for the blast and
+	# what it moves, and the one it found is put back at the end.
+	var dr_was_src := _dmg_src
+	var dr_was_label := _dmg_label
+	var dr_was_name := _dmg_src_name
+	_dmg_frame(occ, String(STATUS_INFO["ruin"][0]), occ.unit_name)
 	var det_died := target.take_tick_damage(det_dmg, "-%d RUIN" % det_dmg,
 		Color(0.8, 0.3, 0.9))
 	_stat("dmg_hero_" + occ.unit_name, det_dmg)
@@ -18084,6 +18145,7 @@ func _detonate_ruin(target: BattleUnit) -> void:
 		_sfx("death", -4.0)
 		_message("%s falls!" % target.unit_name)
 		_log("† %s dies" % target.unit_name, "#e05050")
+	_dmg_frame(dr_was_src, dr_was_label, dr_was_name)
 
 
 # Guards Communion against release chains: a communion-granted stack may
@@ -25397,6 +25459,12 @@ func _forest_bite(enemy: BattleUnit) -> void:
 		var fb := maxi(int(trapper.attack
 			* (0.25 + 0.01 * (trapper.wire_ranks + trapper.rune_wire_ranks)) \
 			* (1.0 + 0.01 * (trapper.cruel_ranks + trapper.rune_cruel_ranks))), 1)
+		# BATCH HY §1c — the retaliation block's frame, for the same wire: the
+		# trapper's while it bites, inside the enemy's own action, and put back.
+		var fw_was_src := _dmg_src
+		var fw_was_label := _dmg_label
+		var fw_was_name := _dmg_src_name
+		_dmg_frame(trapper, String(STATUS_INFO["tripwire"][0]), trapper.unit_name)
 		var fb_res: Dictionary = enemy.take_hit(fb, 0)
 		_stat("dmg_hero_" + trapper.unit_name, fb)
 		enemy.float_text("%d Tripwire" % fb, Color(0.8, 0.65, 0.35))
@@ -25407,6 +25475,7 @@ func _forest_bite(enemy: BattleUnit) -> void:
 			_message("%s falls!" % enemy.unit_name)
 			_log("† %s dies" % enemy.unit_name, "#e05050")
 			_on_enemy_death(enemy)
+		_dmg_frame(fw_was_src, fw_was_label, fw_was_name)
 
 
 # A sprung trap's payload: stun, poison, and every Snares-lane cruelty.
@@ -25529,6 +25598,67 @@ func _battle_trance_tick(u: BattleUnit) -> void:
 		"#e09070")
 
 
+# BATCH BO §5 — SNARE LINE. The traps stop waiting: every enemy that
+# ACTS while the line holds springs one where it stands. It is called beside
+# the snare rather than from a hook of its own because it asks the identical
+# question at the identical moment, and it goes through the same
+# `_spring_trap`, so Bone Breaker's Break, Cruel Devices' multiplier,
+# Quick Rigging's Cripple and Caught Fast all pay per spring exactly as
+# they do on a placed trap. It spends NO placed trap and fills no trap
+# slot — checked at the cast, stated on the card.
+#
+# **BATCH HY §1b — THE SPRING DEALS UNDER ITS LAYER'S FRAME, AND ONLY WHILE IT
+# DEALS.** It fires at an enemy's turn start, outside every action, so it had no
+# frame of its own and took whatever the last action left: after the Devout's
+# Smite, his Vow of Silence silenced the Survivalist's spring (HX §4c). The frame
+# names the hero the spring credits, and the one it found is put back after.
+func _snare_line_tick(u: BattleUnit) -> void:
+	if not u.is_hero and not u.dead and u.has_status("snare_line"):
+		var sl_idx2 := u.status_power("snare_line")
+		u.remove_status("snare_line")
+		if sl_idx2 >= 0 and sl_idx2 < heroes.size() and not heroes[sl_idx2].dead:
+			_message("The line springs under %s!" % u.unit_name)
+			_log("%s's snare line springs on %s" % [heroes[sl_idx2].unit_name,
+				u.unit_name], "#c8a860")
+			_stat("snare_line_springs")
+			var sl_cold := u.has_status("chilled")
+			var sl_was_src := _dmg_src
+			var sl_was_label := _dmg_label
+			var sl_was_name := _dmg_src_name
+			_dmg_frame(heroes[sl_idx2], String(STATUS_INFO["snare_line"][0]),
+				heroes[sl_idx2].unit_name)
+			_spring_trap(heroes[sl_idx2], u,
+				DEADFALL_SPRING_PCT * heroes[sl_idx2].attack)
+			_dmg_frame(sl_was_src, sl_was_label, sl_was_name)
+			# BATCH DH §1 — THE LINE BINDS A CHILLED BODY HARDER, and the
+			# feeder is the CRYOMANCER: Chilled is everywhere in that spec
+			# and nothing in the Survivalist's kit applies it, so this is a
+			# bonus he can only reach by drafting beside one. NAMED on the
+			# card, per §0.
+			#
+			# IT IS WRITTEN HERE AND NOT IN `_spring_trap`, WHICH IS THE
+			# WHOLE CARE OF THIS CLAUSE: that helper is shared with the
+			# placed deadfall and Snare Trap, so a clause inside it would
+			# move a magnitude on TWO existing effects — exactly what §5
+			# forbids. Only the LINE binds harder.
+			#
+			# `add_status` MAXES turns, so re-applying `stunned` at 2 raises
+			# the spring's own 1 rather than stacking a second stun; and the
+			# boss refusal in `_apply_status` still stands, so an unbroken
+			# boss shrugs this off exactly as it shrugs off the spring.
+			#
+			# **BATCH HW §3 — IT BINDS NO HARDER, AND THE CARD NO LONGER SAYS IT
+			# DOES (ruled: the card goes to the code).** The turn loop strips a
+			# stun whole at the first turn it costs, so a chilled body loses the
+			# one turn any sprung body loses. The clause is KEPT and pays nothing;
+			# making a stun's length real is a system change across every stun,
+			# not a card repair. Its log line, which named two turns, is gone with
+			# the card's sentence — `SNARE_LINE_COLD_STUN` is unmoved.
+			if sl_cold and not u.dead:
+				_apply_status(u, "stunned", SNARE_LINE_COLD_STUN, 0, 0,
+					heroes[sl_idx2])
+
+
 func _deadfall_tick(u: BattleUnit) -> void:
 	if u == null or u.is_hero or u.dead:
 		return
@@ -25552,7 +25682,14 @@ func _deadfall_tick(u: BattleUnit) -> void:
 			(" — %d spring(s) left, resting" % df_h.deadfall_armed) \
 				if df_h.deadfall_armed > 0 else " — its last"], "#c8a860")
 		_stat("deadfall_springs")
+		# BATCH HY §1b — Snare Line's frameless spring, a second time: the frame
+		# names the hero who laid the trap while it bites, and is put back after.
+		var df_was_src := _dmg_src
+		var df_was_label := _dmg_label
+		var df_was_name := _dmg_src_name
+		_dmg_frame(df_h, "Deadfall", df_h.unit_name)
 		_spring_trap(df_h, u, DEADFALL_SPRING_PCT * df_h.attack)
+		_dmg_frame(df_was_src, df_was_label, df_was_name)
 		# BATCH BM §2 — SET AND FORGET (Survivalist, Snares row 8). A trap is
 		# spent the moment it works, so the lane pays a turn for every spring
 		# it wants. Marked owed HERE and put back out at his own turn start

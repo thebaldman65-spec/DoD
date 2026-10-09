@@ -150,13 +150,31 @@ books the delta through `_book_self_cost`, which reaches the recap's ledger and 
 A new damage source goes through one of the two functions; a new direct cost calls
 `_book_self_cost`. Anything else reports nothing.
 · **ATTRIBUTION IS A FRAME**, `_dmg_frame(src, label, src_name)`, set at **`_resolve`'s entry** —
-  one site covering the strike, its splash, echoes, the reflect/retaliation it draws and the
-  recoil it costs — **re-established after each nested `await _resolve`** (a counter leaves the
-  frame pointing at itself) and set explicitly at the DoT tick loop, from the status's `src_name`,
-  because the applier may be dead. **SELF-INFLICTED IS DECIDED BY IDENTITY** (`victim ==
-  _dmg_src`), which covers recoil and any self-cost that passes the door in one rule and cannot go
-  stale the way a name list would; the five direct costs reach it through `_book_self_cost`, which
-  frames the payer and the card around the one booking and restores the frame it found.
+  one site covering the strike, its splash, echoes and the recoil it costs — **re-established after
+  each nested `await _resolve`** (a counter leaves the frame pointing at itself) and set explicitly at
+  the DoT tick loop, from the status's `src_name`, because the applier may be dead. **SELF-INFLICTED IS
+  DECIDED BY IDENTITY** (`victim == _dmg_src`), which covers recoil and any self-cost that passes the
+  door in one rule and cannot go stale the way a name list would; the five direct costs reach it
+  through `_book_self_cost`, which frames the payer and the card around the one booking and restores
+  the frame it found.
+· **THE FRAME NAMES WHOEVER THE SITE CREDITS, AND ONLY WHILE IT DEALS (HY §1).** Since HF the frame
+  decides damage — Vow of Silence refuses what it credits to a vowed hero, Penance bills the dealer it
+  names, the rule engines pay and mark off it, the Reaver counts kills by it — so a frame naming the
+  wrong body moves a gate and a magnitude, not only a recap row. Two halves:
+  - **A SITE THAT BORROWS THE FRAME INSIDE ANOTHER UNIT'S ACTION PUTS BACK THE ONE IT FOUND** — save
+    it, set its own, deal, restore. The five callbacks a blow or a heal calls (`_on_rite_return`,
+    `_on_vow_share`, `_on_bloodbond_guard`, `_on_brunt_guard`, `_on_blight_heal`), the Killing Cold's
+    bite at a cast's own line, and every retaliation dealt inside an enemy's swing — a Tripwire, a
+    Feint's return, a Mirror Guard return, Consecrated Ground's reflect (its LAYER's, by the status's
+    `src_name`), Spite and the Whole Forest's bite — deal under their owner's frame and hand the swing
+    its own back. Left standing, the vow's share gave the Devout the rest of an Orc Raider's swing: his
+    Vow of Silence blanked a teammate's Tripwire and the reflect, and Penance's mirror stopped paying.
+  - **A SITE OUTSIDE EVERY ACTION SETS ITS OWN** — Snare Line's spring (`_snare_line_tick`), an armed
+    Deadfall's, a Ruin detonation (the Occultist's) and a bomb (the pouch's, so a frame naming nobody:
+    it credits no hero). With none, a site at a turn's start dealt under whatever the last action left.
+  **A NEW DAMAGE SITE SAYS WHOSE FRAME IT DEALS UNDER**: `check_hy` §6 holds the census of every function
+  that deals damage, reds on one it does not know, and reds on a borrowed frame the function that borrowed it
+  never puts back.
 · **BY KIND, NEVER BY INSTANCE** — `_taken_source` reads `BattleUnit.enemy_kind`, stamped AFTER
   the "boss" alias resolves. `unit_name` happens to agree today; keying on that agreement would
   make the aggregation an accident the first uniquely-named enemy breaks.

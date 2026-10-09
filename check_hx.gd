@@ -10,8 +10,9 @@
 #       heading or a bold lead) standing as a statement in a second file.
 #   §1c A REFERENCE'S SUBJECT IS NOT WRITTEN BACK INTO `CLAUDE.md` — the file's
 #       blocks are a KNOWN population, so a new block reds until its author has
-#       said which file it belongs in; the two written back after the seam are
-#       named here and left (moving them is a ruling).
+#       said which file it belongs in, and a known block that is gone is a
+#       notice; the two written back after the seam moved to the reference at
+#       HY §4, by ruling (`WRITTEN_BACK` names any that are left).
 #   §1d THE REFERENCES' NAMES RESOLVE — every backticked file, function,
 #       constant and identifier in the two references is found in the tree;
 #       (a) and found OUTSIDE an instrument's needle, or named here with what the
@@ -97,7 +98,7 @@ const KNOWN_BLOCKS := [
 	"THE COMBAT RULES LIVE IN `docs/combat-rules.md`",
 	"Working agreement",
 	"EVERY BATCH WRITES ITS REPORT INTO THE REPO",
-	"THIS FILE IS MEASURED IN KiB, AND THE CEILING IS 470 KiB",
+	"THIS FILE IS MEASURED IN KiB, AND THE CEILING IS 510 KiB",
 	"Repo weight and the knowledge-base sync",
 	"The skill check — FOUR CASES, AND THE BAR IS PARAMETERIC",
 	"THE RULE EVERY PROFILE IS AUTHORED TO",
@@ -112,8 +113,6 @@ const KNOWN_BLOCKS := [
 	"`hexed` IS NOT `crippled`, AND THE BRIEF ASKED FOR `crippled`",
 	"VERIFY THE BRIEF AGAINST THE REPO BEFORE IMPLEMENTING IT",
 	"AND A PRECEDENT IS A CLAIM, SO A PRECEDENT GETS CHECKED",
-	"STANDING RULE — RE-VERIFYING A CENSUS ENTRY MEANS DIFFING WHAT FEEDS THE ARM, NOT THE ARM'S OWN LINE",
-	"STANDING RULE — A SUPERSESSION IS A CLAIM, AND IT IS DRIVEN LIKE ONE",
 	"THE SHARPSHOOTER'S BASIC IS A SEQUENCE",
 	"REMOVING A SKILL CHECK MAKES ITS PERFECT-ONLY BEHAVIOUR UNCONDITIONAL",
 	"THE LITERAL-DIGIT RULE IS A BASELINE, NOT A GATE",
@@ -213,14 +212,10 @@ const KNOWN_BLOCKS := [
 	"STANDING RULE — A RETIRED RUNE'S NAME IS NOT FREE, AND THE LIVE POOL'S NAMES ARE BARE",
 ]
 
-# §1c — THE INSTRUMENT RULES WRITTEN BACK AFTER THE SEAM WAS TAKEN (HV §3e),
-# named and LEFT: whether they move is the designer's ruling, not a batch's.
-const WRITTEN_BACK := {
-	"STANDING RULE — RE-VERIFYING A CENSUS ENTRY MEANS DIFFING WHAT FEEDS THE ARM, NOT THE ARM'S OWN LINE":
-		"HG §1b — how a census entry is re-verified: an instrument rule; consistent with the reference",
-	"STANDING RULE — A SUPERSESSION IS A CLAIM, AND IT IS DRIVEN LIKE ONE":
-		"HG §2a with HH's, HI's and HJ's bullets — its retirement doctrine (retire onto a fact, print the old reading) contradicts the reference's DG §2 (delete the assertion, record it at the site)",
-}
+# §1c — THE INSTRUMENT RULES WRITTEN BACK AFTER THE SEAM WAS TAKEN (HV §3e), named and left until a ruling
+# moves them. HG–HJ's two stood here from HX and MOVED to `docs/instrument-rules.md` at HY §4, by the designer's
+# ruling, byte for byte; none is left. A block this table names is printed every run, so it is never forgotten.
+const WRITTEN_BACK := {}
 
 # §1d — THE BACKTICKED NAMES THAT ARE NOT REPO NAMES, BY DESIGN: a path
 # pattern, a player's file named bare, a shell fragment. A path under `user://`
@@ -615,6 +610,13 @@ func _s1c_not_written_back(cm: String) -> void:
 	ok(new_blocks.is_empty(),
 		"§1c: %d block(s) in CLAUDE.md are not in the known population: %s" % [
 			new_blocks.size(), " / ".join(PackedStringArray(new_blocks))])
+	# BOTH WAYS, AS THIS GATE'S HEADER SAYS (repaired at HY §4: until then a block that LEFT printed nothing, so
+	# a block moved out — or deleted — passed in silence): a known block that is gone is a notice, never a red.
+	for kb in KNOWN_BLOCKS:
+		if not keys.has(kb):
+			print("  [notice] §1c: the known block `%s` is gone from CLAUDE.md — delete its line" % kb)
+	for wb in WRITTEN_BACK:
+		print("  [written back, named and left] %s — %s" % [wb, WRITTEN_BACK[wb]])
 	print("  %d blocks read" % keys.size())
 
 

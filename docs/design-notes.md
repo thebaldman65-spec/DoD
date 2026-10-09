@@ -4,6 +4,45 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The attribution frame, and the ceiling moves (Batch HY) — 2026-10-09
+
+**Why the frame names whoever the damage credits, and only while it deals.** Since HF the frame is not bookkeeping: Vow of
+Silence refuses what it credits to a vowed hero, Penance bills the dealer it names, and the rule engines, the Reaver and the
+marks are paid off it. A frame that outlives the thing it describes hands the next damage to the wrong body — and the wrong
+body changes whether the damage lands at all. So the rule is the narrowest one that is always true: a site that borrows the
+frame inside another unit's action puts back the one it found, and a site outside every action sets its own. Both halves
+were already in the code (Forge Body, the ward, the two mirrors); HY made the rest of the code obey them.
+
+**Why the vow's carried half stays the vow's own price.** The brief prescribed Forge Body's shape for every callback — save,
+set its own, restore — and under it the share the Devout carries is billed under his own frame, as it has been since BO. So
+Penance's mirror pays on the part of the blow the struck ally kept, not on the half the Devout carried. The other reading —
+the carried half is the enemy's wound landing on a second body, Covenant's shape — would pay the mirror on the whole blow and
+book the Devout's share to the enemy. It is a ruling, not a repair, and it is left for the designer.
+
+**Why a bomb's frame names nobody.** A bomb is the pouch's, thrown on a hero's turn but credited to no hero's ledger. Naming
+the thrower would let his Vow of Silence blank it and pay his Siphon and his Reaver off it — three rulings nobody has made.
+Naming nobody makes the frame agree with the ledger, and the DI rule already says where a source is ambiguous: absent
+under-pays, wrong mis-credits.
+
+**Why Consecrated Ground's reflect is its layer's.** A status's effect is its applier's — that is DI's rule, read off the
+`src_name` the status door stamps — and the reflect's size is already the living Devout's talents. So a Cleric wearing Vow of
+Silence silences his own ground's reflect, on whoever stands on it, which is what HF found leaking.
+
+**Why the ceiling moved after HN said it would not.** HN's objection was that raising the ceiling grows what every batch
+reads. HX's trim answered it by measurement — the read fell by 124,894 bytes — so the objection no longer holds at today's
+figures. The reversal is recorded beside the ruling it reverses, because a ruling overturned by a measurement is the record
+doing its job. And the room is finite: both files at their ceilings are a read almost exactly where it stood before the trim.
+
+**Why `docs/state.md`'s ceiling is low.** Its trouble was never one large batch; it was closed items nobody removed. A ceiling
+priced against one batch's growth sat above the size the file had already reached when the trouble was met, so it would never
+have fired. The lower number is an alarm on the closing practice — reaching it means archive, not split.
+
+**Why claims are re-read by the batch that touches them.** A claim goes stale exactly when the code it names moves, and only
+the batch moving the code knows. A census catches the same rot ten batches late at a large cost. And counts go stale seven
+times as often as values, so a reference points a count at the instrument that prints it rather than carrying the number.
+
+**Why the doctrine was read off the practice rather than chosen.** Two rules in two files disagreed about a check whose subject is deleted: delete it with the fall predicted (DG §2), or turn it onto the fact that deleted it (HG §2a). Choosing between them on argument would have been a third opinion. The twenty batches since HD had already chosen, 26 times to 3, and the three deletions were each a row of an instrument's own table going with its subject — which is what the practice kept of the older rule, and it is written beside the strike. The older exception is struck where it stands and kept, so nobody derives it again.
+
 ## The checks a reference is held by, and the bigger file (Batch HX) — 2026-10-08
 
 **Why the checks come before any further split.** HV re-read both of the rule files split out of `CLAUDE.md` from the day each
