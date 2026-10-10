@@ -711,9 +711,10 @@ static func draft_pool(class_key: String) -> Array:
 #   · CANNOT WORK WITHOUT THE ENGINE — refused at the usability door, or it
 #     resolves and the log says it did nothing. **Gated: these 39** (GP's 34,
 #     GS's three, and HE §3's two zone-boss cards — the table's last block).
-#   · HALF-WORKS — Boil Over deals 22 against 89 and cashes no meter, Drumfire
-#     and Calibrating Shot fire and bank no Focus. **NOT gated**: a card that
-#     still does most of its job is a legitimate offer (GM's narrowing).
+#   · HALF-WORKS — Drumfire and Calibrating Shot fire and bank no Focus. **NOT
+#     gated**: a card that still does most of its job is a legitimate offer (GM's
+#     narrowing). *Boil Over stood here until HZ §2 made it a Rage dump: it reads
+#     no engine now, and pays every Warrior alike.*
 #   · FEEDS an engine without reading it — Blight the Well marks Ruin through
 #     the generic hook, Call the Wilds summons at 0 Loyalty, every fire card
 #     builds the Overburn field. **NOT gated**: they work for anyone and they
@@ -2393,6 +2394,35 @@ static func class_of_spec(spec: String) -> String:
 const GATED_TELL := "GATED: a Sloppy check loses the cast.\nOnly the turn is spent."
 
 
+# ---------- BATCH HZ §2 — BOIL OVER IS A RAGE DUMP ----------
+#
+# **RULED AT HY AND BUILT AT HZ**: it spends the WHOLE bar, has no separate Rage cost and
+# wants a minimum to cast; Blood Frenzy's per-point term and the two-turn recovery are gone.
+# **THE RATE IS A TUNING HANDLE, THE DESIGNER'S TO RE-RULE** — `docs/state.md` carries it with
+# the figures it was chosen against (`docs/reports/HZ.md` §2). These are the card's own figures,
+# so its words are formatted from them and carry no second copy (HP §0).
+const BOIL_OVER_PCT_PER_RAGE := 0.8    # % of Attack per point of Rage spent
+# The least of the bar it can be cast with — a FRACTION of the maximum, so the floor scales
+# with a bigger bar.
+const BOIL_OVER_MIN_BAR := 0.4
+
+
+# The one name the dump is keyed on: it carries no `special` (it is an ordinary strike that
+# needs the whole attack pipeline), so every site that treats it differently asks here.
+static func is_rage_dump(ab: Ability) -> bool:
+	return ab != null and ab.display_name == "Boil Over"
+
+
+# The least Rage the dump can be cast with, off the hero's own maximum.
+static func rage_dump_min(max_resource: int) -> int:
+	return int(ceil(max_resource * BOIL_OVER_MIN_BAR))
+
+
+# The dump's damage, as a percentage of Attack, for `spent` Rage.
+static func rage_dump_pct(spent: int) -> float:
+	return BOIL_OVER_PCT_PER_RAGE * maxi(spent, 0)
+
+
 # ---------- THE COMPUTED BLOCK (Batch CK §1) ----------
 #
 # ONE BUILDER, TWO SURFACES, AND THAT IS THE WHOLE POINT OF IT LIVING HERE.
@@ -3258,8 +3288,9 @@ static func draft_ability(display_name: String) -> Ability:
 		# holding a `special` down `_resolve_special`, which means hand-rolling
 		# the blow and losing the whole attack pipeline with it — crits, armor,
 		# resists, Break, the parry roll AND Blood Frenzy's own multiplier at the
-		# strike site. Boil Over is an ordinary strike with two riders and NEEDS
-		# that pipeline, so it keys on `display_name` at the ordinary sites.
+		# strike site. Boil Over is an ordinary strike that pours out the whole
+		# Rage bar (HZ §2) and NEEDS that pipeline, so it keys on its name at the
+		# ordinary sites, through `Classes.is_rage_dump`.
 		#
 		# ----- BERSERKER: the ratchet, the band, the payout. His two earlier
 		# tranches asked how he gets LOW (BP) and what a full bar buys (BW).
@@ -3280,8 +3311,8 @@ static func draft_ability(display_name: String) -> Ability:
 		# 30%-more-damage-taken is the same dive from the other side and lands
 		# him deeper. SCAR TISSUE composes rather than overlaps — the card can
 		# only ever RAISE what is kept, so a Berserker holding both loses
-		# nothing. BOIL OVER is the card that spends what this banks, and
-		# UNDYING RAGE and DEATHWISH both pay again for living down there.
+		# nothing. UNDYING RAGE and DEATHWISH both pay again for living down
+		# there.
 		"Unslaked":
 			return Ability.make({"display_name": "Unslaked", "cost": 30,
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 5,
@@ -3312,29 +3343,33 @@ static func draft_ability(display_name: String) -> Ability:
 				"anim": "attack02", "special": "spite",
 				"perfect_id": "", "perfect_text": "",
 				"description": "Out of pure spite. For 6 turns take 1%\nless damage for every 5% of maximum\nhealth MISSING, up to 40%. It is\nmitigation and never healing — it keeps\nyou in the frenzy band rather than\nlifting you out of it."})
-		# AXIS: cashing the live bonus instead of carrying it. Blood Frenzy is a
-		# multiplier he holds and never SPENDS; this is the one card that takes
-		# the number itself as payment.
+		# AXIS: the Rage dump (BATCH HZ §2, ruled at HY). Every other Rage card is
+		# a sip; this one pours out the whole bar at once, so the decision it exists
+		# to make is WAIT OR DUMP NOW — a full bar beats the best ordinary turn and
+		# does not beat two, and a cast at the floor is worse than an ordinary card.
+		# It has no cost of its own and wants a floor to cast (`rage_dump_min`).
 		#
-		# **THE COST IS THE GAP BETWEEN THE BONUS AND THE FLOOR**, which is what
-		# makes it a different card in every build rather than a flat drawback:
-		# the floor is untouched, so a Berserker who banked a deep one barely
-		# feels the two turns, and one who has not just lost most of his damage.
-		# That is precisely why UNSLAKED is worth a slot beside it.
+		# **IT TURNS LAST RITES OFF AT THE WORST MOMENT, AND THAT IS ALLOWED**: the
+		# tier-3 node that pays a wound out of Rage below a quarter's health reads
+		# the bar this empties. The card says it spends the whole bar, and it is not
+		# refused for it — refusing it would remove the decision.
 		#
-		# SYNERGY: UNSLAKED above all — a floor holding the FULL peak makes the
-		# recovery nearly free, and the two together are the batch's own combo.
-		# SCAR TISSUE does the same thing from the tree. BLOOD OFFERING and
-		# BERSERK drive the live bonus up before the strike lands, and RECKLESS
-		# ABANDON's window multiplies the blow it pays for. Anything that Breaks
-		# the target first (SHIELD SLAM, a Swordmaster's SUNDER GUARD) lands it
-		# into a +25% crit window.
+		# SYNERGY: BLOOD OFFERING fills the bar on demand, and every point poured
+		# out feeds Blood Frenzy's second term before the blow lands, so the
+		# Berserker's core multiplies the dump as it multiplies every strike.
+		# RECKLESS ABANDON is the other whole-bar card — a window rather than a
+		# blow — and the two compete for one bar. Anything that Breaks the target
+		# first (SHIELD SLAM, a Swordmaster's SUNDER GUARD) lands it into the
+		# Broken crit window.
 		"Boil Over":
-			return Ability.make({"display_name": "Boil Over", "cost": 40,
-				"damage": 30, "pressure": 15, "delay": 2.5, "cooldown": 5,
+			return Ability.make({"display_name": "Boil Over", "cost": 0,
+				"damage": int(round(BOIL_OVER_PCT_PER_RAGE * 100.0)), "pressure": 15,
+				"delay": 2.5, "cooldown": 5,
 				"anim": "attack03", "gated": true,
-				"perfect_id": "", "perfect_text": "The recovery costs 1 turn",
-				"description": "Spend the rage itself: strike for 30%\nof Attack plus 2% more for every POINT\nof your live Blood Frenzy bonus. For 2\nturns afterwards you receive only the\nFLOOR, not the live bonus — the floor\nitself is untouched."})
+				"perfect_id": "", "perfect_text": "",
+				"description": "Spend the WHOLE Rage bar on one blow,\nfor %s%% of Attack per point spent —\n100 Rage is {atk:%d}.\nNeeds at least %d%% of the bar to cast." % [
+					String.num(BOIL_OVER_PCT_PER_RAGE), int(round(BOIL_OVER_PCT_PER_RAGE * 100.0)),
+					int(round(BOIL_OVER_MIN_BAR * 100.0))]})
 		# ----- WARDEN: deny the reset, get paid for it, or turn it outward.
 		# Heavy Plating climbs +8% Block per unblocked hit and a BLOCK THROWS THE
 		# WHOLE CLIMB AWAY. That sawtooth is his passive's central cruelty and

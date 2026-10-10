@@ -348,6 +348,21 @@ func _draw_screen() -> void:
 
 	_draw_bag_sale()
 
+	# BATCH HZ §1b — THE KIT PREVIEW, from the Peddler: the purse is the party's, so it
+	# opens on the first hero and walks all four (`scripts/kit_preview.gd`, read-only,
+	# LOADED — it names the `Run` autoload). In the empty run of the supplies column
+	# beside Leave, which does not move.
+	var kits := Button.new()
+	kits.text = "See the heroes' kits"
+	kits.custom_minimum_size = Vector2(220, 48)
+	kits.position = Vector2(290, 640)
+	kits.set_meta("kit_preview", -1)
+	kits.pressed.connect(func():
+		var kp: Control = load("res://scripts/kit_preview.gd").new()
+		kp.setup(0, true)
+		add_child(kp))
+	add_child(kits)
+
 	var leave := Button.new()
 	leave.text = "Leave the Shop"
 	leave.custom_minimum_size = Vector2(220, 48)

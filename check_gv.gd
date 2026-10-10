@@ -1748,7 +1748,11 @@ func _answer_pick(s: Node, idx: int) -> void:
 		var btns: Array = []
 		Gate.buttons(ov, btns)
 		for b in btns:
-			if String((b as Button).text) != "Not yet" and not (b as Button).disabled:
+			# BATCH HZ §1b — the overlay carries the kit preview's button under its
+			# title since HZ: it opens the hero's kit and answers nothing, so it is
+			# never the pick. Found by the meta the game sets on it, not by its words.
+			if String((b as Button).text) != "Not yet" and not (b as Button).disabled \
+					and not (b as Button).has_meta("kit_preview"):
 				live.append(b)
 	if live.is_empty():
 		_stall = "hero %d owed a pick at %s and nothing could be pressed" % [idx, _where()]

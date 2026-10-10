@@ -13,6 +13,8 @@
 #   §2  THE CHECKED-BUT-PERFECTLESS POPULATION IS EIGHT, for the same reason
 #       and out of the same blind spot. ARCANE EXPLOSION is a LIVE BASIC
 #       ATTACK that broke both rules on arrival at DU §4 with nothing red.
+#       NINE SINCE HZ §2: Boil Over's Perfect shortened a recovery the Rage
+#       dump no longer leaves, so it states none, and its bar still multiplies.
 #   §3  THE 49-CHARACTER OVERRUN WAS TWO AUTHORED SITES AND THE OLDER ONE WAS
 #       ALWAYS VISIBLE. DV recorded Shadowrend's Perfect as the one thing DU's
 #       corpus fix surfaced; SMITE carried the identical string and has been in
@@ -166,10 +168,12 @@ func _s2_perfectless_population() -> void:
 		"§2: the live checked-but-Perfectless population is %d and `test_batch_cp.CHECK_WITHOUT_PERFECT` names %d — %s against %s"
 			% [live.size(), named.size(), ", ".join(PackedStringArray(live)),
 				", ".join(PackedStringArray(named))])
-	ok(live.size() == 8,
-		"§2: the population is %d, not the eight DW measured — %s"
+	# BATCH HZ §2 — NINE: DW's eight and Boil Over, whose Perfect went with the
+	# recovery the dump removed (`test_batch_cp.CHECK_WITHOUT_PERFECT` names it).
+	ok(live.size() == 9,
+		"§2: the population is %d, not the nine HZ measured (DW's eight and Boil Over) — %s"
 			% [live.size(), ", ".join(PackedStringArray(live))])
-	# THE ONE WORTH NAMING. The other seven are pool cards; this is a hero's
+	# THE ONE WORTH NAMING. The others are pool cards; this is a hero's
 	# BASIC ATTACK, so it is the timing bar a player sees most often with no
 	# stated bonus behind it. Authoring one is a design decision and DW did not
 	# take it — this asserts the GAP is still where DW found it.

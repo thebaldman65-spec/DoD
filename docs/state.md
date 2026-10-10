@@ -29,96 +29,115 @@ never have fired: **an alarm set above the failure level is not an alarm.** `che
 sentence every battery: over it is a warning, and past it by more than one batch at the record is a failure — the largest
 single-batch growth on record is **+13.38 KiB** (ES's +13,700 B). *In the preamble for the archive pointer's reason.*
 
-*Last rewritten: 2026-10-09 (Batch HY).*
+*Last rewritten: 2026-10-09 (Batch HZ).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: HY — THE ATTRIBUTION FRAME, AND THE CEILING MOVES.** IMPLEMENT ONLY. **Game code changed in one file,
-  `scripts/battle.gd`, and in one thing: who the game thinks is dealing a piece of damage at the moment it lands.** Full
-  working: **`docs/reports/HY.md`**.
-- **§0 — HX LANDED**: at HY's start `git ls-remote origin class-merge` read `d3773d3`, local HEAD. **HX's four rulings are
-  taken**, each in its own section below: this file's ceiling is 380 KiB (§3); HG–HJ's two blocks moved and the doctrine was
-  read off the practice (§4); the four two-file passages stay (§5); the claims are re-read per batch, and a count points at its
-  instrument (§6).
-- **§1 — THE FRAME, PUT BACK (HX §4's defect, repaired).** (a) **The five callbacks** — `_on_rite_return`, `_on_vow_share`,
-  `_on_bloodbond_guard`, `_on_brunt_guard`, `_on_blight_heal` — **save the frame, set their own and put back the one they
-  found**, Forge Body's shape, **and so does the Killing Cold's bite**, a sixth borrower HY's re-derived census found at a
-  cast's own line (left standing, it booked the cast's strike as the rune's and hid it from the Weaver's tally). (b) **The
-  frameless turn-start sites carry their owner's frame**: Snare Line's spring — its block is a function now,
-  `_snare_line_tick` — an armed Deadfall's and a Ruin detonation, **and a bomb, the fourth the census found, whose frame names
-  nobody: it credits no hero.** (c) **GO's and HF's items are the same repair, taken**: a Tripwire, a Feint's return, a Mirror
-  Guard return, Consecrated Ground's reflect (its LAYER's, read off the status's `src_name`), Spite and the Whole Forest's bite
-  deal under their owner's frame inside the enemy's swing and hand the swing its own back. (d) **`check_hy`, new, is HX's drive
-  built for real** — the party, the board and the four arms the brief named, the springs, the detonation and the bomb, every
-  callback and every retaliation, each reader's figure before and after — **with a census of every function that deals damage
-  (75 sites in 31 functions), each borrower's restore asserted.** **The four arms read the control's FUNCTION of each blow, not
-  its figures**: the mirror pays on what the struck Warden kept (4–6 a blow at power 50, where HX's control read 9–11), the
-  wire on the whole blow, the reflect unless its layer wears the vow — and the frame after the vow's share is the raider's
-  Slash. **Three rulings come out of it** (HY's, below). The rule is in `docs/combat-rules.md`'s recap-ledger block.
-- **§2 — `CLAUDE.md`'S CEILING IS 510 KiB, OVER HN §1's OWN RULING (the designer's).** EE's method on HX's close
-  (447,684 B = 437.19 KiB) and ten of EZ's +8,293 B gives 518.18, stated as 510 — HV's price, unchanged — and **HN §1's
-  ruling is recorded as SUPERSEDED beside its reversal, never deleted.** **The room is finite**: the two files at their two
-  ceilings are a read of 911,360 B, 857 B under the read at HW's close; when it is spent, the re-measure decides the shape.
-- **§3 — THIS FILE'S CEILING IS 380 KiB**, a sentence in the preamble that `check_fg` §4 reads every battery: over it a
-  warning, past it by more than one batch at ES's record a failure. **Reaching it means the closing practice has failed —
-  archive what is closed, never split this file.** The room at HY's close, in batches at HO–HW's +5,528 B and at ES's
-  +13,700 B, is `docs/reports/HY.md` §3's, measured on this file as committed.
-- **§4 — HG–HJ's TWO BLOCKS ARE IN `docs/instrument-rules.md` NOW, BYTE FOR BYTE (7,153 B), EACH WITH ITS ROW.** **The
-  doctrine was read off twenty batches' practice (HD–HX)**: a check whose subject was deleted was retired onto the fact 26
-  times and deleted with its fall predicted 3 times — each of the three a row of an instrument's own table — with 11 hybrids
-  and re-points. **Not split: HG's doctrine stands, and DG §2's exception is struck where it stands**, with what the practice
-  kept of it written beside the strike.
-- **§5 — THE FOUR TWO-FILE PASSAGES STAY, NAMED**: `check_hx` §1b reads four, and there is no fifth.
-- **§6 — TWO RULES IN `docs/instrument-rules.md`**: a batch re-reads every present-tense claim in a reference that names what
-  it touched, and repairs or reports each; and a live count in a reference points at the instrument that prints it, or
-  carries its batch. **31 of the 87 stale claims standing after HX are counts** (26 in the instrument file, 5 in the combat
-  file). **The 87 are not repaired** — a batch of their own (FOUND AT HX, below); HY's re-read repaired the one claim its own
-  change falsified and reported four (FOUND AT HY, below).
-- **THE VERIFICATION.** The saves were backed up first and verified by hash (`../save-backups/HY-20261009-091100`): byte-identical
-  to HX's backup, so nothing was played since HX. **The recon** — HEAD's 138 targets, unmodified, on HY's `battle.gd` in an
-  isolated copy — read `check_de` 569 / 0 / 0, every target at HX's acceptance reading: **the repair moved no count of HEAD's
-  battery**, because no target there reads a repaired site through a frame reader, and the two counts that move with a draw
-  traced as drift on HEAD's code and HY's alike. **Thirty-four controls on the final gates**: every defect red on its own line,
-  the re-tunes and the baseline green, HEAD's code red at every site `check_hy` drives (161 / 69) — and **C19 green on its first
-  run**: §6's restore test was file-wide, and two functions saving under the bare `was_` names masked each other; repaired to
-  read each function's own body, and two-armed. **The pre-pass** — 139 targets in an isolated copy proved equal to the tree,
-  11:20:04 to 12:35:50 — read `check_de` 573 / 0 / 0, as predicted: `check_hy` new at 161 / 0, `check_fg` 22 → 30,
-  `check_parse` 212 → 213, every other target at its row. **The acceptance run in the repository** — 139 targets, 12:36:20 to
-  13:52:03, `ps` read by rows every 15 s with no game window in 302 readings — read `check_de` 573 / 0 / 0: every target at its
-  pre-pass reading but the one count that moved with a draw, inside its band. The tree was byte-identical before and after
-  (518 files) and the player's four files untouched. **Then the final tree**: this line written after the run, swept against
-  every gate literal, and the readers of this file with the document instruments re-run on it in an isolated copy, each at its
-  acceptance reading.
-- **`CLAUDE.md` IS 442,894 B = 432.51 KiB, WITH 77.49 KiB UNDER ITS 510 KiB CEILING** (−4,790 B at HY, measured after
-  this batch's own writing — the two blocks went to the reference): **about 9.6 batches at the record, EZ's +8,293 B, and
-  19.5 at the ten-batch mean of +4,077 B** (HO–HX). **Not split; the ceiling moved by ruling.**
-- **No save version moved**: the repair moves who a fight's damage is credited to, and nothing a save carries.
+- **Last batch: HZ — THE EYES, AND THE RAGE DUMP.** IMPLEMENT ONLY. **Game code changed in six files** — `battle.gd`, `unit.gd`,
+  `classes.gd`, `map_screen.gd`, `shop_screen.gd` and the new `scripts/kit_preview.gd`: one line in the damage path, four
+  surfaces, a card and a toast. Full working: **`docs/reports/HZ.md`**. **HZ closes the H block; the next letter is IA.**
+- **§0 — HY's THREE RULINGS, ANSWERED (the designer's).** (1) **CHANGED — the vow's carried half is the dealer's damage on a
+  second body**: `_on_vow_share` keeps the frame it found, so the Devout's taken ledger books the raider, a Devout the share fells
+  is the raider's kill, Penance's mirror pays on both bodies and a Covenant-bound Devout shares the carried half. The stop clause
+  did not fire — the swing's riders fire once, in `_resolve`, off its result — and nothing re-enters (the bill's door has no vow
+  block). `check_hy` §1 re-tuned to the ruling: the mirror on the whole blow, a split's rounding asserted per blow and printed —
+  one point more when both parts are odd (18 → 9 + 9 mirrors 5 + 5 against 9). (2) and (3) **CONFIRMED AS BUILT** — a bomb names
+  nobody; Consecrated Ground's reflect is its layer's — both written beside the frame's rule in `docs/combat-rules.md`.
+- **§1a — THE ENEMY'S DECLARED ATTACK, ON HOVER.** Enemies declare before they act, so the hover hangs on the telegraph: the
+  plate's intent line and the turn bar's glyph carry the declared ability's name, its band (the hero tooltip's own line,
+  `battle._damage_line`), what it applies, its Break damage and how many it hits — **never its target**, by the designer's ruling,
+  recorded in the combat rules' intent block.
+- **§1b — THE KIT PREVIEW** (`scripts/kit_preview.gd`): read-only, from every draft surface on the hero whose decision it is, and
+  from the Peddler walking all four. The shop and the draft are two scenes — the Peddler its own, every draft an overlay on the
+  map — both driven by Buttons, so one component serves both at no cost.
+- **§1c — THE NAMEPLATE IS A SECOND HIT AREA** for the same target during targeting — the plate, a chip on it, its intent line;
+  outside targeting it does nothing, as at HY. The battle plate had no click target before: HR's *nameplate* marker is the map
+  card's.
+- **§1d — THE RUNE CHIPS, BUILT (not dropped: nothing above it grew).** An outlined chip with the rune mark at the chip row's right
+  end, ARMED or PAYING, every magnitude read off the payload; the crest's rune is one chip on a CREST strip above the party's
+  plates; Last Rites' window is chipped, and so is a vowed Cleric's ground. **What the chips show: Empty Pulpit and Dead Air open
+  every fight ARMED and pay only once the Cleric (the Mage) has fallen in that fight** — not never: the condition has been re-read
+  at every death since HP §1.
+- **§2 — BOIL OVER IS A RAGE DUMP (ruled at HY, built)**: the whole bar, no cost of its own, a floor of 40% of the bar, 0.8% of
+  Attack a point (`Classes.BOIL_OVER_PCT_PER_RAGE`, `BOIL_OVER_MIN_BAR`). **The rate is the designer's to re-rule** — the figures
+  it was chosen against are under BOIL OVER'S RATE, below. Its recovery status has no writer now (kept, the shape `spite_ranks`
+  and `whole_forest` have), and its Perfect went with the recovery it shortened.
+- **§3 — THE SHARPSHOOTER'S TOAST NAMES THE PET**: a core rune that dismisses the pet, taken after class selection by a Hunter who
+  fields one, says *Summon Companion leaves the kit*, read off `Classes.PET_CARD`.
+- **§4 — HY's TEN COPIES ARE CLEARED** by prefix to the Trash, 2,704 KiB: `app_userdata` 474 → 464 folders, 146,704 → 144,000 KiB.
+  The live folder, the older copies and `../save-backups/` were not touched.
+- **THE INSTRUMENTS HZ MOVED, EACH FOUND BY HEAD's GATES RUN UNMODIFIED ON HZ's CODE (two recons).** `check_hy` §1 (the ruling);
+  the two lists of checked cards with no Perfect (`test_batch_cp`, `test_batch_bo` §5) and `check_dw` §2's count of them, 8 → 9;
+  `check_di`'s status-door call sites, 220 → 219 (the recovery's write); `check_hx`'s known blocks (HZ's new rule block). **And the
+  kit preview's button, first in every pick overlay, is not a choice**: six gates answered a pick by pressing the first button that
+  is not *Not yet* — `check_fe`, `check_fh`, and the four copies of one road walker in `check_gj`, `check_gp`, `check_gv` and
+  `check_hk` — and `check_fm` §3 counts the overlay's buttons; each now passes over it by the meta the game sets
+  (`kit_preview`). A write-only `BattleUnit.rune_chips` field was removed: `check_gw` §1b reads every `var rune_` in `unit.gd`
+  as a rune's payload field, and the prefix is that convention's.
+- **THE VERIFICATION.** The saves were backed up first and verified by hash (`../save-backups/HZ-20261009-163227`): byte-identical
+  to HY's backup, so nothing was played since HY. **Two recons of HEAD's whole battery, each predicted first** — §0.1 alone, then
+  all of HZ's code: the first moved `check_hy` alone, the nine lines the ruling overturned; the second moved eleven gates, each
+  read off its FAIL lines — the kit preview's button stopped every road that answers a pick with the first button, the recovery's
+  write moved `check_di`'s count and Boil Over's missing Perfect two lists, and HZ's own `rune_chips` field threw in `check_gw` —
+  and each was repaired to intent. **Fifty-three controls**, every defect red at its own line, the baselines green, two of them
+  two-armed. **The pre-pass** — 140 targets in an isolated copy proved equal to the tree, 19:46:36 to 21:04:15 — read `check_de`
+  577 / 0 / 0, as predicted: `check_hz` new at 107 / 0, `check_hy` 161 / 9 → 173 / 0, `check_parse` 213 → 215, every other target
+  at recon 1's reading. **The acceptance run in the repository** — 140 targets, 21:04:35 to 22:22:03, `ps` read by rows every 15 s
+  with no game window in 309 readings — read `check_de` 577 / 0 / 0: every target at its pre-pass reading but `test_batch_an`, 6050
+  → 6049 inside its band. The tree was byte-identical before and after (521 files) and the player's four files untouched. **Then
+  the final tree**: this line written after the run, swept against every gate literal, and the readers of this file with the
+  document instruments re-run on it in an isolated copy, each at its acceptance reading.
+- **`CLAUDE.md` IS 445,944 B = 435.49 KiB, WITH 74.51 KiB UNDER ITS 510 KiB CEILING** (+3,050 B at HZ: one rule block and a bullet):
+  **about 9.2 batches at the record, EZ's +8,293 B, and 31 at the mean of the ten batches HQ–HZ, +2,458 B** (23 without HY's
+  −4,790 B move). The re-measure's first reading.
+- **`docs/state.md` IS 339,252 B = 331.30 KiB, WITH 48.70 KiB UNDER ITS 380 KiB CEILING** (+1,827 B at HZ, this line
+  included): the re-measure's second reading.
+- **No save version moved**: nothing HZ changed is carried in a save.
 - **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in a build
   older than HL**: HL's ceiling refuses a newer save from HL's build on — HR's v15 is the first bump it has guarded — and HJ's and
   HK's builds, and `main`, carry no ceiling.
-- **Next letter: HZ — the eyes, with Boil Over's Rage dump and the Sharpshooter's toast** (the roadmap, below). **The
-  re-measure did not run at HY**: two batches since HV are too few to measure.
+- **Next letter: IA — the bag and the slots** (the roadmap, below).
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### HY's RULINGS OWED — **THREE, ALL PLAYER-VISIBLE; EACH IS ONE LINE IF IT GOES THE OTHER WAY**
+### HZ's RULINGS OWED — **SEVEN; THE FIRST TWO ARE THE DESIGNER'S OWN QUESTIONS, ANSWERED WITH FIGURES**
 
-Full working: `docs/reports/HY.md`, NEEDS A RULING.
+Full working: `docs/reports/HZ.md`, NEEDS A RULING.
 
-1. **THE VOW'S CARRIED HALF (§1a) — THE VOW'S OWN PRICE, OR THE ENEMY'S WOUND ON A SECOND BODY.** Built as the brief prescribed,
-   Forge Body's shape: the share the Devout carries is billed under his own frame, as it has been since BO — his taken ledger
-   books *Vow of Suffering*, and **Penance's mirror pays on the part of the blow the struck ally kept** (4–6 a blow at power 50
-   in `check_hy`'s drive), not on the whole blow (9–11). **The other reading** is Covenant's shape: the carried half is the
-   enemy's wound landing on a second body — the mirror would pay on the whole blow, the Devout's ledger would book the raider,
-   and a Covenant would share it. `docs/master.html`'s Penance row (*whoever it hits*) reads closer to the second. **The change
-   is one line**: the share keeps the frame it found.
-2. **A BOMB'S FRAME NAMES NOBODY (§1b).** It credits no hero's dealt ledger and never has, so the frame agrees with the ledger:
-   no vow blanks it, and no Penance, rule engine or Reaver reads it. **The other reading** names the hero whose turn it is: his
-   own Vow of Silence would blank his bomb, and his Siphon, Judgment, marks and Reaver would be paid off it.
-3. **CONSECRATED GROUND'S REFLECT IS ITS LAYER'S (§1c).** Read off the status's `src_name` — DI's rule, a status's effect is its
-   applier's — so a Cleric wearing Vow of Silence silences his own ground's reflect, on whoever stands on it: HF's leak,
-   closed. **The other reading** is the struck hero's: a teammate on a vowed Cleric's ground would keep his reflect.
+1. **BOIL OVER'S RATE (§2)** — 0.8% of Attack a point and a floor of 40% of the bar, chosen against the figures under BOIL OVER'S
+   RATE, below. Re-rule the number, the floor, or both; `check_hz` §2 holds the shape, not the number.
+2. **EMPTY PULPIT AND DEAD AIR PAY ONLY AFTER A FALL (§1d)** — every fight opens with a Cleric and a Mage standing, so both open
+   ARMED, and each turns PAYING for the rest of a fight in which its class's hero falls. The brief expected *never*; the chips
+   show *after a fall*. Dirge is the same shape for any hero. The designer's to re-cut; nothing authored here.
+3. **THE TELEGRAPH'S BAND (§1a)** — shown as the attack's own roll, the line a hero's card quotes, before armor and the rest: a
+   band, not a predicted blow, so BL's ruling is read as standing. **Or** the percentage alone (one line: drop the band).
+4. **THE MIRROR'S ROUNDING ON A SPLIT BLOW (§0.1)** — Penance rounds per body, so a blow whose two parts are both odd mirrors one
+   point more than the whole would (18 → 10, against 9). Keep it, or price the carried half's mirror as the whole's less the kept
+   part's.
+5. **BOIL OVER'S PERFECT (§2)** — none now: it shortened the recovery that is gone. The grade's harder Perfect blow still lands, as
+   on every strike; `test_batch_cp` names it among the checked cards with no Perfect. Author one, or keep.
+6. **LIFEWELL UNDER A VOWED GROUND (found at §1d)** — it heals the party off the reflect the vow silenced (the figure is taken
+   before the gate). Pay it on what landed (one line), or keep.
+7. **TITHE'S CHIP (§1d)** — it has no condition, so it reads PAYING whenever worn and pays at each Break; the chip says how. Keep,
+   or show it only as it pays.
+
+### BOIL OVER'S RATE — **A TUNING HANDLE, THE DESIGNER'S TO RE-RULE (HZ §2)**
+
+**0.8% of Attack for every point of Rage poured out, and a floor of 40% of the bar** (`Classes.BOIL_OVER_PCT_PER_RAGE`,
+`Classes.BOIL_OVER_MIN_BAR`). **The figures it was chosen against**, each HZ's:
+- **Maximum Rage**: 100 for every Warrior lineage; 120 with the tier-1 node that raises the pool (the sim's full build carries it).
+- **Rage a turn, in real fights** (20 sim runs a lineage, the default rung): a Warrior gains **about 20 a turn** (median 15) in every
+  zone and lineage, so a bar of 100 fills in **about five of his turns** — about a fight. Holding 100 or more, the bot's damaging
+  actions dealt a median 35–54% of his Attack.
+- **The census, on one deterministic board at Attack 100** (`check_hz` §2 prints it every battery, each card on its own board):
+  the best ordinary turn is **Rampage, 45 for 40 Rage (52 with the Berserker's core)**; Execute 38, Cleave 35, Crushing Blow 30
+  (31 with the core) — about 1.0 to 1.6 a point of Rage.
+- **The dump on the same board**: **a full bar deals 63 without the core and 88 with it** (the core's band is filled by the dump's
+  own spend, so 88 is its figure at any health); **a cast at the floor deals 25 and 29**, against Crushing Blow's 30 and 31.
+  HW's good case for the old card was **84 for 40 Rage** with the core at half health; a full bar with the core is 88.
+**The shape the designer set as the pass condition holds both ways**: a full bar beats the best ordinary turn and does not beat
+two; a floor cast is worse than an ordinary card.
 
 ### FOUND AT HY AND NOT FIXED
 
@@ -135,19 +154,29 @@ Full working: `docs/reports/HY.md`, NEEDS A RULING.
   swing's back, and `check_hy` §5 drives both with the field set by hand. A batch that writes either field again inherits the
   frame already in place.
 
-### RULED AND NOT BUILT — **FROM HX's AND HY's BRIEFS**
+### FOUND AT HZ AND NOT FIXED
+
+- **A BOMB NEVER MARKS, NEVER FEEDS SIPHON, IS NEVER JUDGED, AND CANNOT BE A REAVER'S KILLING BLOW** — HY's ruling 2 confirmed:
+  an item's damage is the party's, nobody's in the frame and the ledger alike. **A player holding a Reaver should not finish with
+  a bomb**: a line of surface text owed the next time the item surface is touched, not before.
+- **CONSECRATED GROUND'S REFLECT IS LOGGED BEFORE ITS LAYER'S VOW SILENCES IT** — the log reads *reflects N* where the raider
+  takes 0 and floats SILENT; Lifewell then heals off the same pre-gate figure (ruling 6). Display one line, found by the chip
+  survey; not moved here.
+- **THE `boil_over` STATUS HAS NO WRITER SINCE HZ §2** — `unit.frenzy_bonus()` still reads it, `STATUS_INFO` keeps its row and
+  `check_hw` §1a prints it; kept, the `spite_ranks` and `whole_forest` shape.
+- **`docs/combat-rules.md`'s HEADER CLAIM, *every block below is byte-identical to what stood in `CLAUDE.md`*, IS STALER** — HZ
+  edited two more of its blocks (the intent block, the recap-ledger block). Among HX's 87, a batch of their own.
+- **THE PICK OVERLAY'S ROAD WALKER IS FOUR COPIES OF ONE HELPER** — `_answer_a_pick` in `check_gj`, `check_gp`, `check_gv` and
+  `check_hk`, line for line but for what each records — so HZ's one new button stopped all four roads at once (DA §3's shape:
+  propagation by copy). HZ repaired each copy alike. **Owed**: one answer to *which buttons of a pick overlay are choices* — the
+  game marking its choice buttons, or one helper in `gate_fixture.gd` — so the next button on that overlay costs one edit, not four.
+
+### RULED AND NOT BUILT — **FROM HX's BRIEF; BOIL OVER, HY's, IS BUILT AT HZ §2**
 
 - **A COPIED FROSTBIND IS REFUSED, NOT ROUTED — RULED, NOT BUILT (HV's ruling 2, answered in HX's brief).** HX changed no game
   code. The build is one condition in Downwind's carry, and the card's words owe it a third noun beside the snare and Vendetta's
   lock (the designer's). Until it is built a copied Frostbind is carried as a chip with no partner, which counts for every
   breadth reader.
-- **BOIL OVER BECOMES A RAGE DUMP — RULED, NOT BUILT; HZ's (HY's brief, answering HW's ruling 1).** It spends the whole bar,
-  has no separate Rage cost and wants a minimum to cast; **the Blood Frenzy term and the two-turn recovery go with it.** **Its
-  rate is measured before it is authored** — a Warrior's maximum Rage by lineage, and how full he is when he would cast it —
-  and **the current good case is 84 for 40 Rage** (HW §1a: a Warrior at half health on the Berserker's core), which a full
-  dump must beat. **And `last_rites`** — the tier-3 node *Pay a Lethal Hit out of Your Resource Pool* (`tn_resource_ward`,
-  checked at HY: live) — **pays damage out of Rage below a quarter's health, so a dump turns that protection off at the worst
-  moment.**
 
 ### FOUND AT HX AND NOT FIXED
 
@@ -165,14 +194,10 @@ Full working: `docs/reports/HY.md`, NEEDS A RULING.
   total's *twelve statements, thirteen terms* (thirteen and fourteen), and `_book_self_cost` *reaches the recap's ledger and
   nothing else* (it writes the save). **HX's ruling 4 is answered (HY §6): a batch re-reads the claims that name what it touched, and a live count in a reference points at its instrument or carries its batch — 31 of the 87 are counts. The 87 are a batch of their own, by ruling.**
 
-### HW's RULINGS OWED — **FIVE LEFT; THE FIRST IS HZ's (THE TOAST), AND BOIL OVER'S WAS ANSWERED IN HY's BRIEF (A RAGE DUMP, RULED AND NOT BUILT)**
+### HW's RULINGS OWED — **FOUR LEFT; THE TOAST'S WAS ANSWERED IN HZ's BRIEF AND BUILT AT HZ §3 (IT NAMES THE PET)**
 
 Full working: `docs/reports/HW.md`, NEEDS A RULING.
 
-2. **THE SHARPSHOOTER'S CORE TAKEN AFTER CLASS SELECTION (§1b) — HZ's, WITH THE EYES (HY's brief).** Class selection slots the core it deals; one taken later
-   waits unworn until it is slotted (HL §1: one pick is never two things), and the toast says so. Slotted, the pet card leaves
-   at once. **Keep it**, or **slot a core rune on the pick while a core slot is free** (the Sharpshooter's takes a card away
-   rather than adding one, which is not what HL §1 refused), or **name the pet in the toast**.
 3. **THE MERCHANT'S READING (§2).** Built as: an easy fight is a severity-1 bargain, the merchant beside its 40 gold, rolled
    like every reward. **Priced and not taken**: the merchant REPLACES the gold (a gated severity-1 option would then have
    nothing left to pay, and is owed a fallback); it pays the mild slot at any severity up to the rung's floor; or a plain fight
@@ -190,6 +215,7 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
 ### FOUND AT HW AND NOT FIXED
 
 - **A HERO'S CLICK ZONE IS STILL THE 140x220 BOX, AND NEIGHBOURS OVERLAP**: `HERO_SLOTS` sets them 80 apart across and 75 down.
+  *HZ §1c made the nameplate a second hit area for the same target; the body's zone is unchanged.*
   The same fit closes it, but a companion is summoned mid-fight beside them and would be owed a fit at the summon. Not reported
   in play.
 - **THE VENOM LANE DOES NOT RIDE TRAPPER'S PLAIN BARB OR EXPLOSIVE SHOT**: both lay their Poison at the status door with
@@ -200,10 +226,9 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
 - **`run_battery.sh` STILL DOES NOT ASK WHETHER THE GAME IS OPEN, AND A PLAIN `kill` STILL DOES NOT STOP IT** (HT's two, carried).
 ### THE PLAYTEST'S OTHER FINDINGS — **LATER BATCHES BY RULING (HW's brief §5); THE ROADMAP HOLDS THE ORDER**
 
-- **THE RE-MEASURE IS NOT RUN AT HY**: two batches have elapsed since HV and it needs more to measure (HY's brief §7); **the block index and HV's pilot still wait on it.** **THE LETTERS SHIFT BY ONE (HY's brief), AND THIS IS THE ORDER:**
-- **HZ — the eyes, with Boil Over and the Sharpshooter's toast**: enemy attack detail on hover (**the effect, never the target**); a kit preview from the shop and draft
-  screens; **nameplates selectable to complete abilities**; **rune-effect chips** (Empty Pulpit pays continuously and nothing
-  on screen says so).
+- **THE RE-MEASURE IS NOT RUN AT HZ**: three batches have elapsed since HV, and the brief keeps it waiting; **the block index and
+  HV's pilot still wait on it.** Its two readings are in the WHERE block, one line each, so the day it is measurable is visible.
+  **THE ORDER:**
 - **IA — the bag and the slots**: **three core slots — RULED, NOT BUILT** (two has been the designed number since GK,
   `Run.ENGINE_SLOTS`); the per-class bag in three separated sections — core, equipped, held-not-worn. **The slot and the screen
   that shows it are one change.**

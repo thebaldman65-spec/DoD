@@ -2577,6 +2577,8 @@ func build_plate(root: Node2D) -> void:
 	# resist/vulnerability card (static snapshot — live shreds like
 	# Elemental Weakness stay on their status chips).
 	_plate_panel.tooltip_text = resist_summary()
+	# BATCH HZ §1c — the plate is a second hit area for the same target (`_on_plate_input`).
+	_plate_panel.gui_input.connect(_on_plate_input)
 	root.add_child(_plate_panel)
 
 	var name_label := Label.new()
@@ -2669,12 +2671,50 @@ func build_plate(root: Node2D) -> void:
 # BATCH BL §1 — the intent line's ONE writer. Blank text hides the row outright
 # rather than leaving an empty strip, so a Held or dead enemy (which declares
 # nothing) reads as declaring nothing.
-func set_intent_plate(text: String, color: Color) -> void:
+#
+# BATCH HZ §1a — AND THE HOVER HANGS ON IT: `detail` is the declared action's
+# effect, built by the battle off the ability's data (`battle._intent_hover_text`),
+# never its target. The line takes the mouse only while it has something to say,
+# and it PASSES a click on to the plate, so a click on it during targeting is a
+# click on the plate (`_on_plate_input`).
+func set_intent_plate(text: String, color: Color, detail := "") -> void:
 	if _intent_label == null or not is_instance_valid(_intent_label):
 		return
 	_intent_label.text = text
 	_intent_label.add_theme_color_override("font_color", color)
 	_intent_label.visible = text != ""
+	_intent_label.tooltip_text = detail if text != "" else ""
+	_intent_label.mouse_filter = Control.MOUSE_FILTER_PASS \
+		if text != "" and detail != "" else Control.MOUSE_FILTER_IGNORE
+
+
+# BATCH HZ §1c — THE NAMEPLATE IS A SECOND HIT AREA FOR THE SAME TARGET, and it is
+# the other half of HW's finding: HW fitted the click zones around the sprites, and
+# the plate is where a player's eye already is. A left click pressed and released on
+# the plate WHILE THIS UNIT IS A TARGET — its zone is up, and `set_targetable` is the
+# one switch for that — is the same click as one on the body: it emits `clicked`, and
+# the battle's picker takes it. It is not a targeting mode and it changes nothing
+# about what is targetable. **OUTSIDE TARGETING THE PLATE DOES EXACTLY WHAT IT DID
+# BEFORE — NOTHING**: the Panel stops the click as it always has, and its hover,
+# highlight and tooltip are untouched.
+var _plate_press := false
+
+
+func _on_plate_input(ev: InputEvent) -> void:
+	if not (ev is InputEventMouseButton) or ev.button_index != MOUSE_BUTTON_LEFT:
+		return
+	var targeting: bool = _target_btn != null and is_instance_valid(_target_btn) \
+		and _target_btn.visible
+	if ev.pressed:
+		_plate_press = targeting
+		if targeting:
+			_plate_panel.accept_event()
+		return
+	var fire := _plate_press and targeting
+	_plate_press = false
+	if fire:
+		_plate_panel.accept_event()
+		clicked.emit()
 
 
 # Border states: gold = this unit's turn; light = hovered/targeted.
@@ -3794,6 +3834,9 @@ func _refresh_chips() -> void:
 		chip.size = Vector2(chip_w, 12)
 		chip.color = s.color
 		chip.mouse_filter = Control.MOUSE_FILTER_STOP
+		# BATCH HZ §1c — a chip stops the mouse for its tooltip, so a click on it
+		# during targeting is answered as the plate's own (`_on_plate_input`).
+		chip.gui_input.connect(_on_plate_input)
 		chip.tooltip_text = "%s (%s turn%s left)\n%s" % [
 			s.label, s.turns, "" if s.turns == 1 else "s", s.desc]
 		if s.id == "broken" or s.turns < 0:
@@ -3816,6 +3859,81 @@ func _refresh_chips() -> void:
 		tag.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		_chips_root.add_child(tag)
 		x += chip_w + 2.0
+
+
+# BATCH HZ §1d — LAST RITES' WINDOW, ASKED IN ONE PLACE: the node's field, a Rage bar,
+# and a quarter's health or less. `take_hit` pays a wound out of the bar while it
+# holds, and the battle's chip says whether it does — the two read one test.
+func last_rites_window() -> bool:
+	return last_rites > 0 and resource_name == "Rage" and hp <= max_hp * 0.25
+
+
+# ══ BATCH HZ §1d — A RUNE'S CHIPS: WHAT IS PAYING RIGHT NOW ═════════════════
+#
+# Set by the battle (`battle._refresh_rune_chips`), drawn here. **A RUNE CHIP IS NOT A
+# STATUS AND DOES NOT LOOK LIKE ONE**: a status is something done to the hero — a
+# filled chip with its letters, at the row's left (`_refresh_chips`); a rune is
+# something he brought — an OUTLINED chip carrying the rune glyph the map's nameplate
+# already uses, at the same row's RIGHT end. Its label is its tooltip, which says
+# whether it is PAYING or only ARMED, and the outline says it at a glance: bright
+# while it pays, dim while it waits on its condition. **A hero with none draws none
+# and loses no space** — the root is not built at all. A click on one during
+# targeting is the plate's own (`_on_plate_input`).
+const RUNE_CHIP_W := 14.0
+const RUNE_CHIP_PAYING := Color(0.85, 0.6, 1.0)
+const RUNE_CHIP_ARMED := Color(0.42, 0.36, 0.50)
+var _rune_chip_root: Node2D = null
+
+
+func set_rune_chips(chips: Array) -> void:
+	if _rune_chip_root != null and is_instance_valid(_rune_chip_root):
+		_rune_chip_root.queue_free()
+	_rune_chip_root = null
+	if chips.is_empty() or _plate_panel == null or not is_instance_valid(_plate_panel) \
+			or _chips_root == null:
+		return
+	_rune_chip_root = Node2D.new()
+	_rune_chip_root.position = Vector2(PLATE_W - 5.0, _chips_root.position.y)
+	_plate_panel.add_child(_rune_chip_root)
+	var x := 0.0
+	for i in range(chips.size() - 1, -1, -1):
+		x -= RUNE_CHIP_W
+		var chip := rune_chip(chips[i])
+		chip.position = Vector2(x, 0)
+		chip.gui_input.connect(_on_plate_input)
+		_rune_chip_root.add_child(chip)
+		x -= 2.0
+
+
+# ONE BUILDER FOR A RUNE CHIP, for the plate above and the battle's crest strip, so the
+# crest's one chip and a hero's own look the same and say their state the same way.
+static func rune_chip(rc: Dictionary) -> Panel:
+	var on := bool(rc.get("paying", false))
+	var chip := Panel.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.10, 0.07, 0.14, 0.95)
+	sb.border_color = RUNE_CHIP_PAYING if on else RUNE_CHIP_ARMED
+	sb.set_border_width_all(1)
+	sb.set_corner_radius_all(3)
+	chip.add_theme_stylebox_override("panel", sb)
+	chip.size = Vector2(RUNE_CHIP_W, 12)
+	chip.mouse_filter = Control.MOUSE_FILTER_STOP
+	chip.tooltip_text = String(rc.get("tip", ""))
+	chip.set_meta("rune_chip", String(rc.get("name", "")))
+	chip.set_meta("paying", on)
+	var tag := Label.new()
+	tag.text = String(rc.get("tag", ""))
+	tag.add_theme_font_size_override("font_size", 9)
+	tag.add_theme_color_override("font_color", RUNE_CHIP_PAYING if on else RUNE_CHIP_ARMED)
+	tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# The glyph comes from a fallback font whose line is taller than the chip, so the label
+	# is given that line and lifted to centre the mark in the 12px box (measured, HZ §1d).
+	tag.position = Vector2(0, -4)
+	tag.size = Vector2(RUNE_CHIP_W, 18)
+	tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	tag.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	chip.add_child(tag)
+	return chip
 
 
 # Portrait for the initiative bar and nameplate: dedicated art when the unit
@@ -3971,7 +4089,10 @@ func frenzy_bonus() -> float:
 		if scar_tissue_ranks > 0:
 			_proc_log("Talent: Scar Tissue — %s's Frenzy floor scars in at +%d%%" % [
 				unit_name, int(round(frenzy_floor * 100.0))])
-	# BATCH CI — BOIL OVER'S RECOVERY. He receives ONLY the floor for two turns
+	# BATCH CI — BOIL OVER'S RECOVERY. **NOTHING HAS WRITTEN THE STATUS SINCE HZ §2**,
+	# when the card became a Rage dump and its recovery went with the per-point term;
+	# the read is kept, the shape `spite_ranks` and `whole_forest` have, and what
+	# follows is what it did. He received ONLY the floor for two turns
 	# after the strike that cashed the live bonus. **THE RATCHET ABOVE STILL
 	# RUNS AND THAT IS DELIBERATE**: the floor is untouched by the card (a dive
 	# inside the window still banks its floor exactly as it would outside one),
@@ -4168,8 +4289,7 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	# billed once the tank is dry. It sits ABOVE Conversion because the two
 	# are the same shape through different resources and the Berserker holds
 	# neither the other's field nor the other's resource_name.
-	if last_rites > 0 and resource_name == "Rage" and amount > 0 \
-			and hp <= max_hp * 0.25:
+	if amount > 0 and last_rites_window():
 		var paid := mini(int(round(amount * last_rites)), resource)
 		if paid > 0:
 			amount -= paid / maxi(last_rites, 1)

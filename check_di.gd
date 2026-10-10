@@ -117,7 +117,15 @@ const SRC_FLOOR := 107
 # correctly unstamped, as DS's four and FK's Open Line were, and the unstamped
 # remainder goes 104 -> 105. Found by running this gate unmodified against HF's
 # code, before it was touched.
-const CALL_SITES := 220
+#
+# **BATCH HZ MOVED IT 220 -> 219, AND SAYS WHY. Net -1, one departure.** Boil Over
+# is a Rage dump since HZ §2 — it pours out the whole bar and leaves nothing behind
+# it — so the recovery status its strike laid on its caster (`boil_over`, turns of
+# Blood Frenzy at its floor) is no longer written, and its site went
+# with it. It was a HERO-SIDE self-status and passed no source, so `with_src` stays
+# 115 and the unstamped remainder goes 105 -> 104. Found by running this gate
+# unmodified against HZ's code, before it was touched.
+const CALL_SITES := 219
 
 # Four plain afflictions: all in `DEBUFF_IDS`, none sticky, none on the boss
 # immunity list, so `_harvest_yield` counts all four and `purge_debuffs` takes

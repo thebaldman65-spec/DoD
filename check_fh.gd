@@ -183,11 +183,17 @@ func _buttons(n: Node, out: Array, visible_only := true) -> void:
 		_buttons(c, out, visible_only)
 
 
+# BATCH HZ §1b — WITHOUT THE KIT PREVIEW'S BUTTON. Since HZ a pick overlay carries
+# it under its title; it opens the hero's kit and answers nothing, and counted here it
+# would hold §3's and §6's floors over the live buttons up by one — a cache that drew
+# no rune would read one live button. Skipped by the meta the game sets on it.
 func _labels(n: Node) -> Array:
 	var btns: Array = []
 	_buttons(n, btns)
 	var out: Array = []
 	for b in btns:
+		if (b as Button).has_meta("kit_preview"):
+			continue
 		out.append(String((b as Button).text))
 	return out
 
@@ -780,7 +786,8 @@ func _answer_a_pick(s: Node, idx: int) -> bool:
 	var live: Array = []
 	for b in btns:
 		var t := String((b as Button).text)
-		if t == "Not yet" or (b as Button).disabled:
+		# BATCH HZ §1b — nor the kit preview's button, which answers nothing (`_labels`).
+		if t == "Not yet" or (b as Button).disabled or (b as Button).has_meta("kit_preview"):
 			continue
 		live.append(b)
 	if live.is_empty():

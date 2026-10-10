@@ -581,8 +581,11 @@ func _s3_the_re_ask() -> void:
 		"§3: a hero with runes left was told the cache holds nothing")
 	# **THE PICKS PLUS `Not yet`, EXACTLY.** A floor would pass on an overlay
 	# that had grown a second empty-state button beside the real ones.
-	ok(_count_buttons(ov2) == c2.size() + 1,
-		"§3: the control overlay drew %d buttons against %d runes on offer plus `Not yet`"
+	# **BATCH HZ §1b — AND THE KIT PREVIEW'S ONE BUTTON**, which every pick overlay
+	# carries under its title since HZ: it opens the hero's kit and is neither a pick
+	# nor an empty-state door, so the count stays exact over the whole overlay.
+	ok(_count_buttons(ov2) == c2.size() + 2,
+		"§3: the control overlay drew %d buttons against %d runes on offer plus `Not yet` and the kit preview button"
 			% [_count_buttons(ov2), c2.size()])
 
 

@@ -4,6 +4,37 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The eyes, and the Rage dump (Batch HZ) — 2026-10-09
+
+**Why the vow's carried half is the attacker's after all.** The designer ruled HY's first question the other way, for four
+reasons. The vow moves where a blow lands, not who swung it, and every reader of the frame asks *who dealt this*. Penance's own
+row says *50% of the damage it deals, whoever it hits*, and the built reading made it false — a Cleric's vow taxing a Mage's curse
+by half with no text saying so, which is HF's defect one level up. A Devout felled by a blow he absorbed was filed as a suicide.
+And under this reading HY's four arms read one function again: the mirror on the whole blow. The two conditions that could have
+stopped it were measured first: no rider of the swing fires a second time (they fire in `_resolve`, off its result, and none reads
+the frame at the door), and nothing re-enters (the share is billed through a door with no vow block). The one place the reading
+pays a point more is rounding: the mirror rounds per body, so a blow whose two halves are both odd mirrors one more than the whole
+blow would. That is reported, not engineered away.
+
+**Why the telegraph never names its target.** The designer's: knowing what an attack does is the information a player needs to
+decide whether to pre-empt it at all; knowing which hero it will hit turns every defensive decision into arithmetic and retires the
+guessing the turn order is built on. The band it shows is the attack's own roll, the line a hero's own card shows — BL's rule
+against a predicted number stands, because a band is not a prediction of the blow.
+
+**Why the kit preview is read-only and borrows the sheet's words.** A preview that can equip is the rune panel, which is IA's; a
+preview that drafts IA's three sections first would be a layout nobody ruled. So it shows what the hero sheet shows, in the
+sheet's words, and frees only itself so the choice under it survives.
+
+**Why a chip is only for a payout that turns on and off.** The chip row answers *what is paying right now*; the sheet and the
+preview answer *what am I wearing*. A flat stat in the row would bury the one thing the row is for — a condition seen before it
+fires. A party effect is one chip because four copies of it on four plates is the failure HL §4 named.
+
+**Why Boil Over is priced against the ordinary turn.** A dump that is correct at its floor is not a decision; one that beats two
+ordinary turns makes every other Rage card a mistake. So the rate was chosen on one board against every Rage card a Warrior can
+carry: a full bar beats the best of them and not two, a floor cast loses to Crushing Blow, and the Berserker's core — which
+multiplies every strike — is the figure read, since the dump's own spend fills its band. Its floor is a fraction of the bar so it
+scales with a bigger one. The rate is the designer's handle; the figures it was chosen against travel with it in `docs/state.md`.
+
 ## The attribution frame, and the ceiling moves (Batch HY) — 2026-10-09
 
 **Why the frame names whoever the damage credits, and only while it deals.** Since HF the frame is not bookkeeping: Vow of

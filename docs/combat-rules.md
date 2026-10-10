@@ -126,8 +126,15 @@ inside it breaks that promise.
 block fails on two counts, either fatal alone: it MUTATES on the way through (`crit_streak`,
 resource restores, `float_text`, three ledgers), and its FIRST line is `randf_range(0.9, 1.1)`
 with a crit rolling inside it — **the same call with identical inputs returns a different
-number.** Icon plus the ability's own name is shown instead, read off the declaration so it cannot
-drift. **`test_batch_bl` greps the intent block for `attacker.attack` / `effective_armor` /
+number.** Icon plus a word read off the declaration is shown instead — the ability's own name, the
+status an affliction applies, or a wind-up's turns — so it cannot drift. **AND SINCE HZ §1a A HOVER ON
+THAT LINE, AND ON THE TURN BAR'S GLYPH, DETAILS THE DECLARED ABILITY OFF ITS OWN DATA**
+(`battle._intent_hover_text`): its name, the band the hero's own cards quote (`battle._damage_line` — the
+attack's roll, before armor, resistance, Block and crit, so a band and never a prediction), what it
+applies, its Break damage and how many it hits — **AND NEVER WHOM IT IS AIMED AT, BY THE DESIGNER'S
+RULING**: knowing what an attack does decides whether to pre-empt it; knowing which hero it will hit
+turns every defensive decision into arithmetic and retires the guessing the turn order is built on.
+The declaration keeps its target for re-validation and for nothing on screen. **`test_batch_bl` greps the intent block for `attacker.attack` / `effective_armor` /
 `randf_range` / `resists.get` and fails if a later batch adds a preview by reimplementing the
 maths.**
 · **HIDDEN INTENT IS FLAGGED, NOT BUILT** — a good mechanic and a DIFFERENT one; author it once
@@ -162,16 +169,30 @@ A new damage source goes through one of the two functions; a new direct cost cal
   names, the rule engines pay and mark off it, the Reaver counts kills by it — so a frame naming the
   wrong body moves a gate and a magnitude, not only a recap row. Two halves:
   - **A SITE THAT BORROWS THE FRAME INSIDE ANOTHER UNIT'S ACTION PUTS BACK THE ONE IT FOUND** — save
-    it, set its own, deal, restore. The five callbacks a blow or a heal calls (`_on_rite_return`,
-    `_on_vow_share`, `_on_bloodbond_guard`, `_on_brunt_guard`, `_on_blight_heal`), the Killing Cold's
+    it, set its own, deal, restore. The four callbacks a blow or a heal calls (`_on_rite_return`,
+    `_on_bloodbond_guard`, `_on_brunt_guard`, `_on_blight_heal`), the Killing Cold's
     bite at a cast's own line, and every retaliation dealt inside an enemy's swing — a Tripwire, a
     Feint's return, a Mirror Guard return, Consecrated Ground's reflect (its LAYER's, by the status's
     `src_name`), Spite and the Whole Forest's bite — deal under their owner's frame and hand the swing
-    its own back. Left standing, the vow's share gave the Devout the rest of an Orc Raider's swing: his
-    Vow of Silence blanked a teammate's Tripwire and the reflect, and Penance's mirror stopped paying.
+    its own back. Left standing, a borrowed frame gave its borrower the rest of the swing: HY found the
+    vow's share giving the Devout an Orc Raider's, so his Vow of Silence blanked a teammate's Tripwire
+    and the reflect, and Penance's mirror stopped paying.
+  - **THE VOW'S SHARE BORROWS NOTHING: THE HALF THE DEVOUT CARRIES IS THE DEALER'S WOUND ON A SECOND
+    BODY (HZ §0.1, the designer's ruling), so `_on_vow_share` keeps the frame it found** — the Covenant
+    share's and One Soul's shape. The vow moves where a blow LANDS, not who swung it: the Devout's taken
+    ledger books the raider, a Devout the share fells is the raider's kill, Penance's mirror pays on each
+    body (the two sum to the whole blow's but for a point of rounding when both parts are odd), and a
+    Covenant-bound Devout shares the carried half. A frame names a dealer and re-runs nothing: the
+    swing's riders fire once, in `_resolve`, off its result.
   - **A SITE OUTSIDE EVERY ACTION SETS ITS OWN** — Snare Line's spring (`_snare_line_tick`), an armed
     Deadfall's, a Ruin detonation (the Occultist's) and a bomb (the pouch's, so a frame naming nobody:
     it credits no hero). With none, a site at a turn's start dealt under whatever the last action left.
+  - **TWO OWNERS CONFIRMED AT HZ, BY THE DESIGNER: A BOMB NAMES NOBODY, AND A LAID STATUS'S DAMAGE IS ITS
+    LAYER'S.** An item's damage is the party's — nobody in the frame and nobody in the ledger, and the
+    two must agree; naming the thrower would hand his own Vow of Silence the party's bombs. And a laid
+    status pays as its layer wherever it lands — Consecrated Ground's reflect, Snare Line's spring, the
+    Deadfall and Burning Ground alike (DI's rule) — so a vowed Cleric's ground reflects nothing for
+    anybody, which is the trap the rune chips show (`battle._refresh_rune_chips`).
   **A NEW DAMAGE SITE SAYS WHOSE FRAME IT DEALS UNDER**: `check_hy` §6 holds the census of every function
   that deals damage, reds on one it does not know, and reds on a borrowed frame the function that borrowed it
   never puts back.

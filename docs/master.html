@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-10-09 (Batch HY &mdash; the attribution frame, and the ceiling moves)</b></p>
+<p align="right"><b>Last updated: 2026-10-09 (Batch HZ &mdash; the eyes, and the Rage dump)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -449,7 +449,9 @@ marker</b> counting the crest runes waiting in it, a drop waiting on it if one i
 rune or "&mdash; empty &mdash;". Either opens the bag, which lists the Crest's slot and every rune in
 the bag, each with a Drop that asks twice before the rune is gone for good. <b>When a fight drops a
 rune, the map says so as it opens</b>, naming the rune and the hero whose nameplate it went to, or the
-Crest. <b>A rune that drops onto a full holding opens its own panel on the map</b>: the drop with its
+Crest &mdash; and a core rune that dismisses the pet, held unworn by a Hunter who fields one, says that
+slotting it sends the companion away and Summon Companion leaves the kit (so does the toast when one is
+taken from a cache). <b>A rune that drops onto a full holding opens its own panel on the map</b>: the drop with its
 rule, then the runes of the holding it is bound for &mdash; that hero's unworn runes, or the bag's
 &mdash; each with <b>Drop this</b>, which drops that one and takes the new one in its place, and
 <b>Leave it behind</b> below them.
@@ -1054,7 +1056,11 @@ choice is what is displayed, and it is what resolves when the enemy's turn arriv
 <b>selection rules are unchanged</b> (§4.8 above) — only <i>when</i> they run has moved.</p>
 <p>The intent appears in two places: an <b>icon under each enemy's portrait in the turn bar</b>
 (on its next turn's slot only), and an <b>icon plus a line on the enemy's nameplate</b>, so a
-player watching the battlefield never has to read the bar. The seven categories:</p>
+player watching the battlefield never has to read the bar. <b>Hovering either one details the
+declared action</b>: its name, its damage band, the status it applies (for how many turns, and its
+chance), its Break damage and how many heroes it hits &mdash; <b>never which hero it is aimed at</b>.
+Knowing what an attack does is what decides whether to pre-empt it; knowing whom it will hit would
+turn every defensive decision into arithmetic. The seven categories:</p>
 <table>
 <tr><th>Intent</th><th>Icon</th><th>Meaning</th></tr>
 <tr><td>Strike</td><td>→</td><td>Single-target damage. Shows the ability's name.</td></tr>
@@ -1065,11 +1071,13 @@ player watching the battlefield never has to read the bar. The seven categories:
 <tr><td>Mend</td><td>+</td><td>Heals.</td></tr>
 <tr><td>Wind-up</td><td>!!</td><td>A charged blow that lands on a later turn. Shows the turns remaining.</td></tr>
 </table>
-<p><b>No damage number is shown.</b> The only honest number would be one produced by the same
-code the real hit runs, and that code cannot be run twice for the same answer — it rolls
+<p><b>No predicted damage number is shown.</b> The only honest number would be one produced by the
+same code the real hit runs, and that code cannot be run twice for the same answer — it rolls
 variance and a critical on the way through, and it moves the attacker's state as it goes. A
 number computed a second way would be a tooltip that drifts from its ability, so the
-category and the ability's own name are shown instead.</p>
+category and the ability's own name are shown instead. <b>The hover's damage band is the attack's
+own roll</b> &mdash; the range a hero's own ability tooltip shows &mdash; before armor, resistances, Block and
+critical hits: what the attack swings, not what the blow will deal.</p>
 <p><b>A declared action can be denied, and the board moves in between.</b> Three things can
 happen at resolution:</p>
 <ul>
@@ -1606,6 +1614,10 @@ during the fight is back on their feet before the screen opens (every won battle
 fallen at 20% of maximum), so they draft like anyone else. A hero whose pool has nothing left
 to show simply has no column.</p>
 <ul>
+<li><b>Every column carries See the kit</b>, as does a single hero's pick (a zone boss's card, a rune
+cache): a <b>read-only preview</b> of that hero's carried cards and runes &mdash; his opening kit, the
+cards he carries, what sits out and what is benched, and his runes in the hero sheet's own words &mdash;
+over the screen. It changes nothing, and closing it leaves the choice exactly as it was.</li>
 <li><b>Declining is per hero and always allowed.</b> One hero taking a card does not commit the
 others, and a settled kit is a legitimate end state.</li>
 <li><b>A card held back is not a button.</b> The cards are drawn when the elite falls and chosen later,
@@ -1717,8 +1729,8 @@ gated on an engine</b>: its companion's half pays with no engine, so it is offer
 companion, and its hunter's half pays only while the Rune of the Beastmaster (core) is equipped. <b>Kill Command is not among
 them</b>: it needs a living companion, and every Hunter but the Sharpshooter summons one from his
 class kit, so it is conditional on a companion rather than on an engine. <b>Three groups, and only the first is
-gated:</b> cards that CANNOT work without the engine; cards that HALF-work (Boil Over deals 22
-against 89 and cashes no meter; Drumfire and Calibrating Shot fire and bank no Focus) — a card
+gated:</b> cards that CANNOT work without the engine; cards that HALF-work (Drumfire and
+Calibrating Shot fire and bank no Focus) — a card
 that still does most of its job is a legitimate offer; and cards that FEED an engine without
 reading it (Blight the Well marks Ruin through the generic hook, Call the Wilds summons at 0
 Loyalty, every fire card builds the Overburn field) — they work for anyone and pre-arm an engine
@@ -1859,9 +1871,9 @@ beside. A card that appears in nobody's build plan is a card that fills a slot.<
 <tr><td><b>Reckless Abandon</b></td><td>0 Rage, 1.5, 4cd, self</td><td>He spends <b>ALL his Rage</b>. For 3 turns he deals <b>+2% damage for every 10 points SPENT</b> (Perfect: 3%). A full 100-Rage bar is +20%; a half-empty one is half that, because it scales off what was actually spent and not off his maximum. At zero Rage it is refused outright rather than paying nothing.</td><td>The dump. Rage is spent in 20-to-35 point sips and nothing ever asked what a full bar is worth at once — and the three turns with nothing left to cast <b>are</b> the price.<br><b>Builds with:</b> <b>Blood Offering</b> (40 Rage out of his own health, so he can pay for the dump on demand).</td></tr>
 <tr><td><b>Berserk</b></td><td>25 Rage, 1.0, 5cd, self</td><td><b>His next 4 STRIKES each land twice</b>, and he <b>takes 30% more damage for 3 turns</b>.<br><b>Two different clocks:</b> the strikes are <b>charges</b> and wait until spent; the 30% is an ordinary 3-turn window.<br><b>They count HITS, not casts</b>, so a three-hit ability such as Hack and Slash spends the whole bank in one cast and lands six blows.</td><td>The risk dial at maximum, and <b>the drawback is the payoff</b> — Blood Frenzy scales his damage with missing health, so taking 30% more drives him into his own power band.<br><b>Builds with:</b> <b>Hack and Slash</b> and <b>Wildstrikes</b> (multi-hit and area blows that empty the bank at once, every doubled strike carrying his bleed buildup into <b>Gut Rip</b> and <b>Blood Debt</b>), and with the talent tree's <b>Refuse Death Once</b>, which pays again once the risk has taken him low.</td></tr>
 <tr><td><b>Blood Debt</b></td><td>20 Rage, 2.0, 4cd, one enemy (10 BD)</td><td>Strikes for 30% of Attack and <b>marks the enemy for the rest of the battle</b>. Every time that enemy <b>bleeds out</b> &mdash; the bleedout that kills it included &mdash; the Berserker heals <b>25% of his maximum health</b> (Perfect: 35%).<br><b>The mark survives the bleedout it pays for</b>, so a re-opened wound pays again.</td><td>A reason to survive being low. Blood Frenzy pays him for missing health and nothing in his kit paid him back — this fills the sustain hole out of his own engine rather than with a heal.<br><b>Builds with:</b> <b>Gut Rip</b>, which cashes it on demand.</td></tr>
-<tr><td><b>Unslaked</b></td><td>30 Rage, 1.0, 5cd, self</td><td>For 4 turns, <b>Blood Frenzy's floor captures the FULL bonus he reaches</b> rather than half of it. The floor is the half of his passive that keeps paying after he is healed back up — so the play pattern is cast this, <i>then</i> dive, and what he banks at the bottom is his for the rest of the battle.</td><td>The ratchet rate. This is the first card in the game that touches the passive's floor at all, and it is a <b>window</b> rather than a permanent raise.<br><b>Builds with:</b> <b>Blood Offering</b>, the dive he controls, so the two are a two-card combo that banks a floor on his own schedule instead of waiting for an enemy to grant one. <b>Berserk</b> lands him deeper still, and <b>Boil Over</b> is what spends it.</td></tr>
+<tr><td><b>Unslaked</b></td><td>30 Rage, 1.0, 5cd, self</td><td>For 4 turns, <b>Blood Frenzy's floor captures the FULL bonus he reaches</b> rather than half of it. The floor is the half of his passive that keeps paying after he is healed back up — so the play pattern is cast this, <i>then</i> dive, and what he banks at the bottom is his for the rest of the battle.</td><td>The ratchet rate. This is the first card in the game that touches the passive's floor at all, and it is a <b>window</b> rather than a permanent raise.<br><b>Builds with:</b> <b>Blood Offering</b>, the dive he controls, so the two are a two-card combo that banks a floor on his own schedule instead of waiting for an enemy to grant one. <b>Berserk</b> lands him deeper still.</td></tr>
 <tr><td><b>Spite</b></td><td>20 Rage, 1.0, 4cd, self</td><td>For 6 turns, he takes <b>1% less damage for every 5% of maximum health MISSING</b>, up to 40%. <b>It is mitigation and never healing</b> — it keeps him inside the frenzy band instead of lifting him out of it.</td><td>Surviving the band he is paid for standing in. A card that healed him here would fight his own passive: it would take back the missing health Blood Frenzy pays for, so it would cancel itself.<br><b>Builds with:</b> <b>Blood Frenzy</b> itself, which reads the same missing health — every point that makes this bigger makes his damage bigger too. <b>Berserk</b> invites the damage it refuses; <b>Blood Debt</b> is the deliberate opposite number (take that one to leave the band, this one to live in it).</td></tr>
-<tr><td><b>Boil Over</b></td><td>40 Rage, 2.5, 5cd, one enemy (15 BD)</td><td>Strikes for <b>30% of Attack plus 2% more for every POINT of his live Blood Frenzy bonus</b>. For <b>2 turns</b> afterwards (Perfect: 1) he receives <b>only the FLOOR</b>, not the live bonus. <b>The floor itself is untouched</b>, and a dive taken inside the window still banks one.</td><td>Cashing the live bonus instead of carrying it. Blood Frenzy is a multiplier he holds and never spends; this is the one card that takes the number itself as payment, and the cost is the gap between the bonus and the floor.<br><b>Builds with:</b> <b>Unslaked</b> above all — a floor holding the full peak makes the recovery nearly free, which is what makes the two a pair. <b>Blood Offering</b> and <b>Berserk</b> drive the live bonus up before the strike lands.</td></tr>
+<tr><td><b>Boil Over</b></td><td>The whole Rage bar (no cost of its own), 2.5, 5cd, one enemy (15 BD)</td><td>Pours out <b>the whole Rage bar</b> into one strike: <b>0.8% of Attack for every point spent</b> &mdash; a full bar of 100 is 80%. <b>It needs at least 40% of the bar to cast.</b> Gated: a Sloppy check loses the cast and keeps the bar.</td><td>The Rage dump. Every other Rage card is a sip; this one is the whole bar at once, so the decision it makes is <b>wait, or dump now</b> &mdash; a full bar beats the best ordinary turn and does not beat two, and a cast at the floor is worse than an ordinary card. Every point it pours out feeds Blood Frenzy before the blow lands, so the Berserker's core multiplies it as it does every strike. Below a quarter's health it empties the bar <b>Pay a Lethal Hit out of Your Resource Pool</b> pays from &mdash; allowed, and the node's chip shows it.<br><b>Builds with:</b> <b>Blood Offering</b> fills the bar on demand; <b>Reckless Abandon</b> is the other whole-bar card and competes for it.</td></tr>
 <tr><td colspan="4"><b>Swordmaster</b> — <i>what is a stance worth</i>. There are now <b>two kinds of stance card, and the distinction is the rule</b>: <b>READERS BRANCH AND FLIP</b> — Precision Strike and Feint read the stance, buy what the stance they leave him <b>arriving</b> in wants, and then switch it, so he is never stranded. <b>GATED CARDS REQUIRE AND STAY</b> — Sever and Battle Poise are <b>refused outright</b> in the wrong guard (unavailable, not weaker) and casting them moves nothing. Feigned Guard is the seam between the two.</td></tr>
 <tr><td><b>Precision Strike</b></td><td>20 Rage, 2.0, 3cd, one enemy</td><td><b>From Aggressive:</b> strikes <b>twice</b> for 20% of Attack each (6 BD a strike), and grants <b>+25% parry chance for 3 turns</b> — the defence the Defensive guard he lands in wants.<br><b>From Defensive:</b> strikes <b>once</b> for 15% of Attack with 15 BD, and <b>his attacks ignore ALL armor for 3 turns</b> — the offence the Aggressive guard he lands in wants.<br>Either way the stance then switches. Perfect: the stance it grants holds 4 turns.</td><td>The same blade, two intentions. Armor is bypassed outright rather than penetrated by a percentage, which against an unarmoured enemy would have been a clause that does nothing.</td></tr>
 <tr><td><b>Feint</b></td><td>25 Rage, 2.0, 4cd, one enemy</td><td><b>From Aggressive:</b> strikes for 35% of Attack (12 BD), and <b>that enemy's next attack lands on one of its own allies</b> (Perfect: 45%).<br><b>From Defensive:</b> no strike at all — he banks <b>2 charges</b> (Perfect: 3), each of which parries an attack against him outright and deals its damage to the attacker instead.<br>Either way the stance then switches.<br><b>Charges, not turns:</b> both halves wait until spent, so a Feint cast into a lull is not wasted and cannot be dodged by an enemy simply not swinging.</td><td>Their swing lands somewhere they did not intend. From the front foot he tricks them into a friend; from the back foot into themselves.</td></tr>
@@ -1919,7 +1931,7 @@ is lengthened by 2, which the window does not double), and <b>Firestorm</b>'s 6�
 <tr><td><b>Alms</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For 4 turns, <b>every stack of Mercy earned while she is at the CAP wards the ally who earned it instead of being lost</b>, absorbing 12% of her maximum health.</td><td>The sixth stack goes somewhere. A bad fight over-earns the meter and the excess is simply gone.<br><b>Builds with:</b> <b>Divine Presence</b>, whose spare stack at the cap spills into it.</td></tr>
 <tr><td><b>Vespers</b></td><td>25 Mana, 1.0, 4cd, one ally</td><td>For 4 turns, <b>or until it fires</b>: the next blow that would take that ally <b>below half health</b> is absorbed for <b>20% of the Holy Cleric's maximum health</b>. A blow bigger than the ward still crosses. <b>If the ally does not cross, she earns no Mercy for a crossing that never happened.</b></td><td>The crossing itself. Her engine is fuelled by allies falling below the window and every other card of hers is about what to do once one has; this is the one that <b>refuses the fall</b> — and the only place in her pool where helping an ally starves her own engine.<br><b>Builds with:</b> <b>Intercession</b>, which answers the LETHAL blow where this answers the one before it. The deliberate <b>anti-synergy</b> is with her own engine — with <b>Alms</b> and with <b>Divine Presence</b>'s overflow, both of which want the crossings this refuses.</td></tr>
 <tr><td colspan="4"><b>Devout</b> — <i>what else can he lend</i></td></tr>
-<tr><td><b>Vow of Suffering</b></td><td>20 Mana, 1.0, 3cd, one ally</td><td>For 4 turns, half the damage that ally takes is redirected to the Devout — and every share he eats kindles that ally 1 Faith.</td><td>Mitigation by relocation. Divine Shield absorbs a capped amount; this has no cap.</td></tr>
+<tr><td><b>Vow of Suffering</b></td><td>20 Mana, 1.0, 3cd, one ally</td><td>For 4 turns, half the damage that ally takes is redirected to the Devout — and every share he eats kindles that ally 1 Faith. The half he carries is the attacker's damage on him: the recap books it to the attacker, Penance's mirror pays on it, and an Oathkeeper's bond shares it.</td><td>Mitigation by relocation. Divine Shield absorbs a capped amount; this has no cap.</td></tr>
 <tr><td><b>Aegis Reversal</b></td><td>30 Mana, 2.5, 4cd, one ally</td><td>Consumes that ally's Divine Shield; their next attack deals bonus damage worth half again whatever the shield had left.</td><td>Unspent protection becomes offence — and it is the Devout dealing damage without attacking.</td></tr>
 <tr><td><b>Ordination</b></td><td>25 Mana, 2.0, 4cd</td><td>Grants <b>4 Faith</b> to the ally holding the <b>LEAST</b> Faith. Not player-chosen: it always finds the floor.</td><td>Starting the engine without waiting to be hit. Every other Faith source he owns is reactive (an absorb) or slow (the ground's drip).<br><b>The grant is larger than the release threshold</b>, so it always carries its target over the line and heals them; the remainder is spent rather than banked, which is the price of a card that never has to be aimed.<br><b>Builds with:</b> <b>Reliquary</b> below, which cashes the peaks this raises.</td></tr>
 <tr><td><b>Fortified Spirit</b></td><td>25 Mana, 2.0, 4cd, one ally</td><td>That ally's <b>maximum health rises by 30% of the Devout's</b> and they are healed for the same amount (Perfect: 40%). The loan then <b>decays by a tenth of his maximum at the start of each of their turns</b> — 30 → 20 → 10 → gone. <b>Current health clamps under it</b>, so an ally kept topped up loses real health on the way down while one sitting at half never notices.</td><td>Lending the number his whole kit is built on. Divine Shield absorbs 30% of his maximum — this is the first thing that lends the <i>figure itself</i>, and it stacks with a shield rather than duplicating one: a shield is a bucket that empties, this is a bigger bucket.<br><b>Builds with:</b> the talent tree's <b>More Health</b> (+20% his maximum), which enlarges every point of it.</td></tr>
@@ -3375,9 +3387,17 @@ every unit's readouts live on a <b>144px nameplate</b> in a stack behind its sid
 heroes' plates along the LEFT edge, enemies' along the RIGHT. A plate holds a
 <b>portrait</b> (dedicated art if the unit has it — the Berserker does — else a sprite
 close-up), the unit's name, HP bar, resource bar(s), Break meter with numeric x/100
-readout, and its status chips (hover for tooltips; Bleed buildup is a chip). <b>Hovering a
-plate (or a body while targeting) shows the unit's resist card</b> — what it resists and
-what it is vulnerable to — so counterplay is never hidden information.
+readout, and its status chips (hover for tooltips; Bleed buildup is a chip). <b>A rune whose
+payout turns on and off has a rune chip</b> at the right end of the same row &mdash; an outlined chip
+with the rune mark &#10022;, bright while it pays and dim while it waits on its condition; hover it for
+which, and for what it pays, every figure read off the rune itself. <b>The Crest's rune is one chip on
+the CREST strip above the heroes' plates</b>, never one on every hero. Chipped: the Crest's rune, a
+hero's rune that carries a condition, <b>Pay a Lethal Hit out of Your Resource Pool</b> (paying below a
+quarter's health while the Rage bar holds any), and Consecrated Ground laid by a Cleric who wears Vow
+of Silence (that ground reflects nothing, for anybody). A rune that always pays is on the hero sheet,
+not in the row. <b>Hovering a plate (or a body while targeting) shows the unit's resist card</b> — what
+it resists and what it is vulnerable to — so counterplay is never hidden information. <b>Hovering an
+enemy's intent line shows what it is about to do</b> (§4.9).
 <b>The battle UI is deliberately compact</b> (144px plates, 240px log,
 compact action bar and initiative portraits) so the field dominates the screen.
 <b>The acting unit's plate glows with a gold border — that IS the turn
@@ -3446,8 +3466,9 @@ Menu (Continue returns to this fight, from its opening, with the heroes as they 
 <li><b>Stalemate hint:</b> if a single battle runs to an absurd length, a one-line
 non-blocking note appears saying the fight is not resolving and that Forfeit Run is in the
 menu. It appears once and changes nothing about the battle — no HP, no outcome.</li>
-<li><b>Targeting:</b> click a highlighted unit (cancel button available); single-target
-abilities auto-target when only one candidate lives.</li>
+<li><b>Targeting:</b> click a highlighted unit <b>or its nameplate</b> &mdash; the plate, a chip on it
+or its intent line (cancel button available); single-target abilities auto-target when only one
+candidate lives. Outside targeting a click on a plate does nothing.</li>
 <li><b>Skill check controls: Spacebar or Left Click.</b></li>
 <li><b>Feedback:</b> floating damage text (crit pop-ups), hit flash + knockback, screen shake,
 attack movement (units with real locomotion art — the Berserker — <b>walk</b> to melee range
@@ -3493,7 +3514,9 @@ its engine's text and &mdash; for a rune whose engine has enablers &mdash; the a
 (&ldquo;Also opens with:&rdquo;); and once, below the
 cards, the class basic and class kit with their damage and "% Atk" scaling at the class's own Attack.
 The draft screen stays clean — no passive text there.</li>
-<li><b>Shop (The Wandering Peddler):</b> consumables column + one rune offer per hero (150g, never a
+<li><b>Shop (The Wandering Peddler):</b> <b>See the heroes' kits</b> beside Leave opens the same
+read-only preview the draft does, on the first hero, and walks all four (Previous / Next) &mdash; the
+purse is shared by all four. Consumables column + one rune offer per hero (150g, never a
 core rune, held by the hero it is for &mdash; a crest rune into the bag; a Buy greyed while that holding
 is full, and its row says whose) + <b>SELL A RUNE NOBODY WEARS</b> below the supplies, one row per rune
 each hero holds unworn, named for him, and per rune in the bag, each sold for a third of its price with

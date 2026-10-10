@@ -17,6 +17,62 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT HZ — 2026-10-09, FROM `docs/state.md` AS HY LEFT IT (`464bf14`)
+
+**What came here**: HY's rulings, all three answered in HZ's brief; the closed items of three sections that stay live — Boil
+Over's ruled-and-not-built item (built at HZ §2), HW's second ruling (the toast, built at HZ §3) and the roadmap's HZ line (done).
+Each was read against HZ's tree before it moved; everything else in the live file stayed.
+
+### ~~HY's RULINGS OWED~~ — **ALL THREE ANSWERED IN HZ's BRIEF: THE CARRIED HALF IS THE DEALER'S (1, CHANGED AT HZ §0.1); A BOMB NAMES NOBODY (2, CONFIRMED AS BUILT); CONSECRATED GROUND'S REFLECT IS ITS LAYER'S (3, CONFIRMED AS BUILT)**
+
+Full working: `docs/reports/HY.md`, NEEDS A RULING.
+
+1. **THE VOW'S CARRIED HALF (§1a) — THE VOW'S OWN PRICE, OR THE ENEMY'S WOUND ON A SECOND BODY.** Built as the brief prescribed,
+   Forge Body's shape: the share the Devout carries is billed under his own frame, as it has been since BO — his taken ledger
+   books *Vow of Suffering*, and **Penance's mirror pays on the part of the blow the struck ally kept** (4–6 a blow at power 50
+   in `check_hy`'s drive), not on the whole blow (9–11). **The other reading** is Covenant's shape: the carried half is the
+   enemy's wound landing on a second body — the mirror would pay on the whole blow, the Devout's ledger would book the raider,
+   and a Covenant would share it. `docs/master.html`'s Penance row (*whoever it hits*) reads closer to the second. **The change
+   is one line**: the share keeps the frame it found.
+2. **A BOMB'S FRAME NAMES NOBODY (§1b).** It credits no hero's dealt ledger and never has, so the frame agrees with the ledger:
+   no vow blanks it, and no Penance, rule engine or Reaver reads it. **The other reading** names the hero whose turn it is: his
+   own Vow of Silence would blank his bomb, and his Siphon, Judgment, marks and Reaver would be paid off it.
+3. **CONSECRATED GROUND'S REFLECT IS ITS LAYER'S (§1c).** Read off the status's `src_name` — DI's rule, a status's effect is its
+   applier's — so a Cleric wearing Vow of Silence silences his own ground's reflect, on whoever stands on it: HF's leak,
+   closed. **The other reading** is the struck hero's: a teammate on a vowed Cleric's ground would keep his reflect.
+
+### RULED AND NOT BUILT — ITS CLOSED ITEMS (archived at HZ; the section stays in `docs/state.md`)
+
+*BUILT AT HZ §2: Boil Over pours out the whole bar — no cost of its own, a floor of 40% of the bar, 0.8% of Attack a point; the
+Blood Frenzy term and the recovery are gone (`check_hz` §2).*
+
+- **BOIL OVER BECOMES A RAGE DUMP — RULED, NOT BUILT; HZ's (HY's brief, answering HW's ruling 1).** It spends the whole bar,
+  has no separate Rage cost and wants a minimum to cast; **the Blood Frenzy term and the two-turn recovery go with it.** **Its
+  rate is measured before it is authored** — a Warrior's maximum Rage by lineage, and how full he is when he would cast it —
+  and **the current good case is 84 for 40 Rage** (HW §1a: a Warrior at half health on the Berserker's core), which a full
+  dump must beat. **And `last_rites`** — the tier-3 node *Pay a Lethal Hit out of Your Resource Pool* (`tn_resource_ward`,
+  checked at HY: live) — **pays damage out of Rage below a quarter's health, so a dump turns that protection off at the worst
+  moment.**
+
+### HW's RULINGS OWED — ITS CLOSED ITEMS (archived at HZ; the section stays in `docs/state.md`)
+
+*ANSWERED IN HZ's BRIEF AND BUILT AT HZ §3: the toast names the pet — Summon Companion leaves the kit (`check_hz` §3).*
+
+2. **THE SHARPSHOOTER'S CORE TAKEN AFTER CLASS SELECTION (§1b) — HZ's, WITH THE EYES (HY's brief).** Class selection slots the core it deals; one taken later
+   waits unworn until it is slotted (HL §1: one pick is never two things), and the toast says so. Slotted, the pet card leaves
+   at once. **Keep it**, or **slot a core rune on the pick while a core slot is free** (the Sharpshooter's takes a card away
+   rather than adding one, which is not what HL §1 refused), or **name the pet in the toast**.
+
+### THE PLAYTEST'S OTHER FINDINGS — ITS CLOSED ITEMS (archived at HZ; the section stays in `docs/state.md`)
+
+*DONE AT HZ: the four surfaces, Boil Over and the toast (`docs/reports/HZ.md`).*
+
+- **HZ — the eyes, with Boil Over and the Sharpshooter's toast**: enemy attack detail on hover (**the effect, never the target**); a kit preview from the shop and draft
+  screens; **nameplates selectable to complete abilities**; **rune-effect chips** (Empty Pulpit pays continuously and nothing
+  on screen says so).
+
+---
+
 ## ARCHIVED AT HY — 2026-10-09, FROM `docs/state.md` AS HX LEFT IT (`d3773d3`)
 
 **What came here**: HX's rulings, all four answered in HY's brief; the closed items of four sections that stay live — HX's frame item and HF's reflect leak (both fixed at HY §1), Boil Over's ruling (answered in HY's brief), and the roadmap's *HX — DONE* line — and GO's one item, whose section went whole. Each was read against the code at HY's tree before it moved; everything else in the live file stayed.

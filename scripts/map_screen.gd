@@ -180,7 +180,25 @@ func drop_toast_text(drop: Dictionary) -> String:
 		return "%s drops — it waits in the bag." % nm
 	if where == "pending":
 		return "%s drops for %s — every place he holds is taken: choose below." % [nm, who]
-	return "%s drops for %s — held, not worn: equip it from the card." % [nm, who]
+	return "%s drops for %s — held, not worn: equip it from the card.%s" % [nm, who,
+		pet_clause(Run.party[hi], rune)]
+
+
+# ══ BATCH HZ §3 — THE SHARPSHOOTER'S TOAST NAMES THE PET (HW's ruling 2: name it) ═══
+#
+# A core rune taken after class selection waits unworn on the hero until it is slotted
+# (HL §1: one pick is never two things). When it is one that DISMISSES THE PET and the
+# hero still fields one, slotting it takes the pet's card out of the kit — so the toast
+# that says the rune is waiting says that too. **Read off the data, never typed here**:
+# which runes dismiss the pet (`Classes.dismisses_pet`) and the card the pet comes from
+# (`Classes.PET_CARD`). Empty for every other rune, and for a hero already without one.
+func pet_clause(member: Dictionary, rune: Dictionary) -> String:
+	var eng := String(rune.get("engine", ""))
+	if eng == "" or not Classes.dismisses_pet([eng]) \
+			or Classes.dismisses_pet(Run.held_engines(member)) \
+			or not Run.opening_kit_names(member).has(Classes.PET_CARD):
+		return ""
+	return " Slotted, it sends the companion away: %s leaves the kit." % Classes.PET_CARD
 
 
 # First-run orientation (Batch Z): a skippable framing card between the
@@ -1048,6 +1066,8 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 	title.add_theme_color_override("font_color", tint)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(title)
+	# BATCH HZ §1b — the same preview the party draft's columns open, on this hero.
+	box.add_child(_kit_preview_button(idx, 640))
 
 	# BATCH BO §2: the slot ledger, stated before the choice rather than
 	# discovered by it. At the cap the buttons below open the DROP step.
@@ -1453,6 +1473,32 @@ func _pick_ability(idx: int, pool_name: String, bench_name := "") -> void:
 # exactly as the single-hero overlay uses them — this is a second LAYOUT, never
 # a second implementation.
 
+# BATCH HZ §1b — THE KIT PREVIEW (`scripts/kit_preview.gd`): read-only, over a draft, on the
+# hero whose decision it is. LOADED, never preloaded — it names the `Run` autoload (CT's rule).
+const KIT_PREVIEW := "res://scripts/kit_preview.gd"
+
+
+# Added last and on top of whatever overlay is open; it frees only itself, so a staged
+# draft or an open pick is exactly as it was when the preview closes.
+func _open_kit_preview(idx: int) -> Control:
+	var kp: Control = load(KIT_PREVIEW).new()
+	kp.setup(idx, false)
+	add_child(kp)
+	return kp
+
+
+# The button both draft surfaces carry, found by its meta.
+func _kit_preview_button(idx: int, width: float) -> Button:
+	var b := Button.new()
+	b.text = "See the kit"
+	b.custom_minimum_size = Vector2(width, 22)
+	b.add_theme_font_size_override("font_size", 12)
+	b.set_meta("kit_preview", idx)
+	b.pressed.connect(Music.click)
+	b.pressed.connect(_open_kit_preview.bind(idx))
+	return b
+
+
 const DRAFT_COL_W := 296.0
 const DRAFT_COL_GAP := 12.0
 const DRAFT_COL_Y := 92.0
@@ -1598,6 +1644,8 @@ func _draft_column(overlay: Control, idx: int, at: Vector2) -> void:
 	name_lbl.custom_minimum_size = Vector2(DRAFT_COL_W - 16, 26)
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(name_lbl)
+	# BATCH HZ §1b — what this hero already carries, beside the choice that adds to it.
+	box.add_child(_kit_preview_button(idx, DRAFT_COL_W - 16))
 
 	# The slot ledger, stated before the choice rather than discovered by it
 	# (BO §2's rule, per column now). At the cap the card buttons open the drop
@@ -1997,8 +2045,8 @@ func _pick_rune(idx: int, choice: int) -> void:
 	if landed == "held" and is_core:
 		# THE WORDS HL §1 PROPOSED, RULED AT HN §2 — and since HR §1 the rune waits
 		# on the hero, not in the bag, so the place in them is his.
-		_toast("%s waits with the %s — slot it on the hero's rune panel to use it." % [
-			String(rune["name"]), Run.nameplate(member)])
+		_toast("%s waits with the %s — slot it on the hero's rune panel to use it.%s" % [
+			String(rune["name"]), Run.nameplate(member), pet_clause(member, rune)])
 	elif landed == "held":
 		_toast("%s waits with the %s — every slot it fits is filled." % [
 			String(rune["name"]), Run.nameplate(member)])

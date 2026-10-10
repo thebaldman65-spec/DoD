@@ -1949,6 +1949,13 @@ deliberate exception), so frequency and depth can both be real. **DO NOT
 RE-COUPLE THEM.** Faith's held half must never read `faith_stacks` again; that is
 test_batch_bi's first negative control, and the mis-write reads as a smaller number rather than
 as a bug.
+- **A DUMP IS PRICED AGAINST THE ORDINARY TURN, NEVER AGAINST NOTHING (HZ §2, ruled by the designer).** A card that
+  pours out a whole bar at once — Boil Over since HZ — is shaped so that **a full bar beats the hero's best ordinary turn
+  and does not beat two, and a cast at its floor is worse than an ordinary card**: the decision it exists to make is
+  *wait, or dump now*, and a dump that is correct at its floor is not a decision. **Its floor is a fraction of the bar,
+  so it scales; and where an engine multiplies the dump, the figure with the engine is the one read.** The rate is a
+  tuning handle in `docs/state.md`; `check_hz` §2 prices the card against every Rage card on one board and asserts the
+  shape.
 
 ## STANDING RULE — THE ENGINE RUNE CHARTER (Batch GK, the designer's)
 > **THERE ARE NO SPECS AND NO CORE ENGINES.** A hero is a CLASS. Everything that made a spec what it
@@ -2136,6 +2143,27 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   which held a Mage's Fireball, Frostbolt and Blizzard past every hotkey and off the top of the screen. **A crest rune that
   grants a card adds to every bar outside the slot count** (HN §3d), so it is the first thing in play that could reach a second
   page.
+
+## STANDING RULE — A PREVIEW CHANGES NOTHING, A NAMEPLATE IS A SECOND HIT AREA, A CHIP SAYS WHAT PAYS NOW (Batch HZ §1, ruled by the designer)
+> **Three surfaces show the player what the game already knows, and each is bounded by what it must not become.** The
+> enemy's telegraph is a fight rule, in `docs/combat-rules.md`'s intent block.
+
+- **THE KIT PREVIEW IS READ-ONLY, AN OVERLAY, AND IA's LAYOUT IS NOT ITS TO DRAFT** (`scripts/kit_preview.gd`). It opens
+  from every draft surface on the hero whose decision it is, and from the Peddler on the first hero, walking all four —
+  the purse is the party's. **A preview that can equip is the rune panel**, and one that loses the staged choice under
+  it is worse than none: it frees only itself. It reads the hero sheet's doors in the sheet's own words — the state
+  column, the `(core)` suffix, HR's ✦ marker — and its text scrolls inside a bounded frame with Close outside it (GT
+  §1's shape; it lists no buttons, so HU §1's pager is not its rule).
+- **THE NAMEPLATE IS A SECOND HIT AREA FOR THE SAME TARGET, NOT A TARGETING MODE.** A left click on a target's plate —
+  on a chip or the intent line on it — during targeting is a click on its body (`BattleUnit._on_plate_input`); **outside
+  targeting it does what it always did: nothing.** It changes nothing about what is targetable, and it is the other
+  half of HW's click-zone fit.
+- **A CHIP IS FOR A PAYOUT THAT TURNS ON AND OFF; A FLAT STAT IS THE SHEET'S AND THE PREVIEW'S.** Two states, ARMED and
+  PAYING, and the first is the point: a condition seen before it fires. **A rune chip is not a status** — outlined,
+  the rune glyph, the row's right end; nothing ticks, dispels or counts it — and **a party effect is ONE chip**, on the
+  crest strip, never one per hero slot (HL §4's failure). **Its words read every magnitude off the payload, never off
+  the rune's authored line** (`battle._refresh_rune_chips`): HQ moved Dead Air's, and a chip copying the line would
+  have been wrong the batch after.
 
 ## STANDING RULE — A CARD OR A RUNE THAT CANNOT PAY WITHOUT ITS ENGINE SITS OUT WHILE THE ENGINE IS GONE (Batch GT §3 for a card, GX §1 for a rune, ruled by the designer)
 > **An earned card the usability door refuses on every board without its engine is left out of every fight while
@@ -2681,7 +2709,9 @@ cards drafted with no damage figure at all.
 - **THE THIRD COPY IS `battle._ability_tooltip` AND IT IS DELIBERATELY NOT FOLDED IN.** It reads a
   live `BattleUnit`: Surge, Empower and the Resonance curve multiply its damage and it prints
   "(ready in N)" off that unit's cooldown clock. It is a mid-combat tooltip with live state in it,
-  not a static card, and merging it would move numbers inside a fight.
+  not a static card, and merging it would move numbers inside a fight. **Since HZ §1a its damage line
+  is `battle._damage_line`, lifted out unchanged so the enemy's telegraph quotes the same line** — one
+  copy, two readers, still not the block.
 - **OWED: THE LIVE-ATTACK PROLOGUE IS WRITTEN TWICE AND THE MAP SCREEN HAS NONE OF THEM.**
   `party_screen._draw_detail` and the battle spawn each build a hero's live Attack with their own
   sixty-line sequence (hero_config, kit overrides, passive, spec stats, tree, runes, upgrades,
@@ -4225,7 +4255,8 @@ fact that they are.
   separates because Faith raises every cast's damage — that is the engine reading the CARD, which
   is the thing §2 exists to tell apart from the card reading the engine.
 - **THREE GROUPS AND ONLY ONE IS GATED.** CANNOT-work is gated; HALF-works is not (a card that
-  still does most of its job is a legitimate offer — Boil Over deals 22 against 89); FEEDS an
+  still does most of its job is a legitimate offer — Drumfire and Calibrating Shot fire and bank no
+  Focus; Boil Over was the example until HZ §2 made it a Rage dump that reads no engine); FEEDS an
   engine without reading it is not (it works for anyone and pre-arms an engine he might draft).
 - **BUT TWO ROWS ARE RULINGS, NOT FINDINGS: THE STANCE PIECES ARE THE STANCES HOLDER'S (HD §1, ruled by
   the designer).** Guard Change and Lunge HALF-WORK without the engine (`seasoned`) — the swap still lands

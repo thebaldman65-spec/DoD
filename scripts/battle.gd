@@ -459,8 +459,10 @@ const STATUS_INFO := {
 	# ten are correctly ABSENT from `DEBUFF_IDS` — this is the first Warrior
 	# tranche with nothing to put on an enemy at all, which is what a third made
 	# of self-buffs and passive-readers looks like. Boil Over's strike leaves its
-	# target nothing beyond damage and Break; the only status it writes is the
-	# RECOVERY it charges its own caster. Formless carries TWO because its window
+	# target nothing beyond damage and Break, and **since HZ §2 it writes no status
+	# at all**: its recovery went with Blood Frenzy's per-point term when it became a
+	# Rage dump, and the `boil_over` row below has had no writer since — kept, the
+	# shape `spite_ranks` and `whole_forest` have. Formless carries TWO because its window
 	# and the debt that window incurs are two different states and a player has
 	# to be able to tell them apart on the bar.
 	"unslaked": ["Unslaked", "Uk", Color(0.90, 0.30, 0.35), "The thirst does not settle: Blood\nFrenzy's floor captures the FULL bonus\nhe reaches while this holds, instead\nof half of it. Dive now and the floor\nkeeps all of it."],
@@ -867,10 +869,6 @@ const SPITE_PER_5_MISSING := 1    # % less damage taken per FULL 5% of maximum
                                   # health missing...
 const SPITE_CAP := 30             # ...and the ceiling it climbs to (40 perfect)
 const SPITE_PERFECT_CAP := 40
-const BOIL_OVER_PER_POINT := 2    # % of Attack per POINT of his live Blood
-                                  # Frenzy bonus, on top of the ability's own
-                                  # base damage
-const BOIL_OVER_RECOVERY := 2     # turns receiving only the floor (1 perfect)
 # TURN THE BLADE'S RATE IS THIS BATCH'S OWN NUMBER — §2 says "scaling on the
 # damage negated" and names no figure. 50% of the nominal blow the block
 # refused, floored at 1. FLAGGED AND SHIPPED UNTUNED: it rides an UNCAPPED
@@ -2939,8 +2937,10 @@ func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability
 			icon.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
 			icon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			icon.mouse_filter = Control.MOUSE_FILTER_STOP
-			icon.tooltip_text = "%s: %s %s" % [u.unit_name, cat.capitalize(),
-				_intent_detail(u, u.intent["ability"], cat)]
+			# BATCH HZ §1a — the glyph is the same telegraph as the plate's line, so it
+			# carries the same detail: what the attack does, never whom it is aimed at.
+			icon.tooltip_text = "%s: %s\n%s" % [u.unit_name, cat.capitalize(),
+				_intent_hover_text(u)]
 			slot.add_child(icon)
 		turn_bar.add_child(slot)
 		best.t += BASIC_DELAY * 100.0 / u.effective_speed()
@@ -3238,6 +3238,8 @@ func _run_battle() -> void:
 		if u.dead:
 			_check_end()
 			continue
+		# BATCH HZ §1d — the rune chips read as the turn's decision is taken.
+		_refresh_rune_chips()
 		# BATCH CG §3 — PENANCE NO LONGER BILLS AT A TURN START. It was a
 		# snapshotted tick here, beside the DoT pass above and Decay and Entropy
 		# below; it is a MIRROR now and fires from `_on_damage_taken` — BL's one
@@ -4581,10 +4583,11 @@ func _player_turn(u: BattleUnit) -> void:
 		action_panel.visible = false
 	# BATCH CM §1 — THE GATE, AND IT IS AT THE CALL SITE FOR THE REASON §0 GIVES.
 	# `_resolve` is where EVERYTHING is consumed — the resource, the cooldown, the
-	# enemy's Ruin, the companion's Loyalty, the live Frenzy bonus — so refusing
+	# enemy's Ruin, the companion's Loyalty, Boil Over's whole bar — so refusing
 	# to enter it is the whole feature. There is no refund path because nothing is
-	# ever taken, which is what makes the three abilities that consume somebody
-	# ELSE'S meter (Requiem, Unleash, Boil Over) expressible at all.
+	# ever taken, which is what makes the two abilities that consume somebody
+	# ELSE'S meter (Requiem, Unleash) expressible at all — and Boil Over, which pours
+	# out the whole bar since HZ §2, keeps every point of it on a Sloppy.
 	#
 	# THE GRADER IS NOT INVOLVED. `_grade_skill_check()` takes no arguments and
 	# still does; the ability's own flag is tested HERE, against a grade that was
@@ -6847,6 +6850,12 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# different promises; test_batch_bw drives both.
 	if ab.special == "reckless_abandon" and u.resource < RECKLESS_STEP:
 		return false
+	# BATCH HZ §2 — BOIL OVER WANTS A MINIMUM TO CAST, and it is a FRACTION of the
+	# bar (`Classes.rage_dump_min`) so it scales with a bigger one. Below it the dump
+	# is refused at the door, on Reckless Abandon's precedent above; the tooltip says
+	# what the bar holds and what it needs (`_ability_tooltip`).
+	if Classes.is_rage_dump(ab) and u.resource < Classes.rage_dump_min(u.max_resource):
+		return false
 	# BATCH CH — UNLEASH NEEDS THE SAME THING PRIMAL SURGE NEEDS, and the gate
 	# sits beside it for that reason. BO §5's rule: a button that could only
 	# ever print a refusal is refused at the door instead, so the greyed
@@ -7566,6 +7575,93 @@ func _on_popup_ability(popup: PopupPanel, ab: Ability) -> void:
 	_on_ability_button(ab)
 
 
+# THE LIVE DAMAGE LINE — the ability's % of this unit's current Attack, the 0.9/1.1 band
+# the strike rolls inside, with the unit's live damage buffs. **BATCH HZ §1a LIFTED IT OUT
+# OF `_ability_tooltip` UNCHANGED** so the enemy's telegraph (`_intent_hover_text`) quotes
+# the same line off the same arithmetic: one copy, two readers. It is the attack's own
+# roll — before armor, resistance, Block, crit and every door the blow passes — and the
+# telegraph prints it as the band it is, never as what the blow will deal.
+func _damage_line(u: BattleUnit, ab: Ability) -> String:
+	var buff_mult := 1.0
+	if u.second_resource_name == "Resonance":
+		buff_mult *= _resonance_dmg_mult(u)
+	if u.has_status("surge"):
+		buff_mult *= 1.2
+	if u.has_status("empower"):
+		buff_mult *= 1.25
+	# Live numbers: the ability's % of this unit's current Attack — and BOIL OVER's is the
+	# bar it would pour out now (HZ §2), off the same door its strike reads.
+	var pct := Classes.rage_dump_pct(u.resource) if Classes.is_rage_dump(ab) else float(ab.damage)
+	var base_hit := pct * 0.01 * u.attack
+	var line := "Damage: %d–%d (%s)    BD: %d" % [
+		int(base_hit * 0.9 * buff_mult), int(round(base_hit * 1.1 * buff_mult)),
+		ab.dmg_type.capitalize(), ab.pressure]
+	if ab.random_hits > 0 or ab.multi_hits > 0:
+		line += "   × %d hits" % maxi(ab.random_hits, ab.multi_hits)
+	return line
+
+
+# BATCH HZ §1a — THE ENEMY'S DECLARED ACTION ON HOVER: THE EFFECT, NEVER THE TARGET.
+#
+# **THE ATTACK IS DECLARED BEFORE IT RESOLVES, SO THIS DETAILS THE TELEGRAPH.** Every
+# enemy declares its next action at the battle's start and at the end of each of its
+# turns (`_declare_intent`), and the plate's intent line and the turn bar's glyph show it
+# through every hero turn — so there is a NEXT attack to detail, and the hover hangs on
+# it rather than on a move list. Its name, its damage band, what it applies, its Break
+# damage and how many it hits, each read off the declared ability's own data; a line with
+# nothing to say is not printed, so an attack that applies nothing shows no effect line.
+#
+# **IT NEVER SAYS WHO IT IS AIMED AT, AND THAT IS THE DESIGNER'S RULING (HZ §1a), NOT AN
+# OMISSION — DO NOT "FIX" IT.** Knowing WHAT an attack does is what a player needs to
+# decide whether to pre-empt it at all; knowing WHICH hero it will hit turns every
+# defensive decision into arithmetic and retires the guessing the turn order is built on.
+# The declaration stores its target (`intent.target`) for the re-validation branches and
+# for nothing on screen.
+#
+# It sits OUTSIDE the intent block `test_batch_bl` reads (`_intent_category` to
+# `_enemy_turn`), and the band is `_damage_line`'s — the hero tooltip's own line, so the
+# telegraph does no damage arithmetic of its own.
+func _intent_hover_text(u: BattleUnit) -> String:
+	if u == null or not is_instance_valid(u) or u.intent.is_empty() \
+			or not (u.intent.get("ability") is Ability):
+		return ""
+	var ab: Ability = u.intent["ability"]
+	var lines := PackedStringArray([ab.display_name])
+	if String(u.intent.get("category", "")) == "windup":
+		var wt := maxi(int(u.intent.get("turns", 1)), 1)
+		lines.append("Winds up: it lands in %d turn%s" % [wt, "" if wt == 1 else "s"])
+	if ab.damage > 0:
+		lines.append(_damage_line(u, ab))
+	elif ab.pressure > 0:
+		lines.append("BD: %d" % ab.pressure)
+	if ab.heal > 0:
+		lines.append("Heals: %d" % ab.heal)
+	var sid := String(ab.applies_status.get("id", ""))
+	if sid != "":
+		var st_line := "Applies %s" % (String(STATUS_INFO[sid][0]) if STATUS_INFO.has(sid)
+			else sid.capitalize())
+		var st_turns := int(ab.applies_status.get("turns", 0))
+		if st_turns > 0:
+			st_line += " for %d turn%s" % [st_turns, "" if st_turns == 1 else "s"]
+		if ab.status_chance < 1.0:
+			st_line += " (%d%% chance)" % int(round(ab.status_chance * 100.0))
+		lines.append(st_line)
+	if ab.description != "":
+		lines.append(ab.description)
+	# HOW MANY, never which: the reach of an attack on the heroes. A support aimed at its own
+	# side says its reach in its own description, which is printed above.
+	if ab.target != Ability.Target.ALLY and (ab.damage > 0 or ab.pressure > 0 or sid != ""):
+		if ab.aoe:
+			lines.append("Hits every hero")
+		elif ab.random_hits > 0:
+			lines.append("Hits %d times, each at random" % ab.random_hits)
+		elif ab.multi_hits > 0:
+			lines.append("Hits one hero %d times" % ab.multi_hits)
+		else:
+			lines.append("Hits one hero")
+	return "\n".join(lines)
+
+
 # Tooltip with live damage ranges (includes the unit's current buffs).
 func _ability_tooltip(u: BattleUnit, ab: Ability) -> String:
 	# BATCH CL §1 — a live BattleUnit is the richest ctx in the game: every token
@@ -7581,20 +7677,10 @@ func _ability_tooltip(u: BattleUnit, ab: Ability) -> String:
 		if left > 0:
 			tip += "  (ready in %d)" % left
 	if ab.damage > 0:
-		var buff_mult := 1.0
-		if u.second_resource_name == "Resonance":
-			buff_mult *= _resonance_dmg_mult(u)
-		if u.has_status("surge"):
-			buff_mult *= 1.2
-		if u.has_status("empower"):
-			buff_mult *= 1.25
-		# Live numbers: the ability's % of this unit's current Attack.
-		var base_hit := ab.damage * 0.01 * u.attack
-		tip += "\nDamage: %d–%d (%s)    BD: %d" % [
-			int(base_hit * 0.9 * buff_mult), int(round(base_hit * 1.1 * buff_mult)),
-			ab.dmg_type.capitalize(), ab.pressure]
-		if ab.random_hits > 0 or ab.multi_hits > 0:
-			tip += "   × %d hits" % maxi(ab.random_hits, ab.multi_hits)
+		tip += "\n" + _damage_line(u, ab)
+	if Classes.is_rage_dump(ab):
+		tip += "\nPours out the whole bar: %d %s now (at least %d to cast)" % [
+			u.resource, u.resource_name, Classes.rage_dump_min(u.max_resource)]
 	if ab.heal > 0:
 		tip += "\nHeals: %d" % ab.heal
 	tip += "\nInitiative cost: %.1f" % ab.delay
@@ -8030,7 +8116,7 @@ func _refresh_intent_plate(u: BattleUnit) -> void:
 	var cat := String(u.intent.get("category", "strike"))
 	var info: Array = INTENT_ICONS.get(cat, INTENT_ICONS["strike"])
 	var detail := _intent_detail(u, u.intent["ability"], cat)
-	u.set_intent_plate("%s %s" % [info[0], detail], info[1])
+	u.set_intent_plate("%s %s" % [info[0], detail], info[1], _intent_hover_text(u))
 
 
 func _enemy_turn(u: BattleUnit) -> void:
@@ -8898,6 +8984,23 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	# what it always did, and a Rage bar is untouched because the floor names Mana.
 	attacker.note_resource_spent(cz_res_before - attacker.resource, not is_counter)
 	attacker.refresh_bars()
+	# BATCH HZ §2 — BOIL OVER POURS OUT THE WHOLE BAR, HERE, beside the line every
+	# price is paid at and for the same reason: the bar leaves before the strike, so
+	# the band is told (`note_resource_spent` — Blood Frenzy's second term reads the
+	# Rage that left) and the Berserker's multiplier reaches the dump as it reaches
+	# every strike. It has no separate cost; the usability door holds it below its
+	# floor (`Classes.rage_dump_min`). A gated Sloppy never reaches this line, so a
+	# lost cast keeps the bar, as every gated card keeps its price.
+	var bo_dump := Classes.is_rage_dump(ab) and not is_counter
+	var bo_spent := 0
+	if bo_dump:
+		bo_spent = attacker.resource
+		attacker.resource = 0
+		attacker.note_resource_spent(bo_spent)
+		attacker.refresh_bars()
+		attacker.float_text("-%d %s" % [bo_spent, attacker.resource_name], Color(1.0, 0.5, 0.4))
+		_log("   → Boil Over: %s pours out the whole bar — %d %s" % [attacker.unit_name, bo_spent,
+			attacker.resource_name], "#e07050")
 	# BATCH GH — WHAT A CAST PAID IS A PARTY LOSS THE MOMENT IT IS PAID. This is
 	# the one line every cast pays at, so a quit inside the cast it bought cannot
 	# hand the Mana back.
@@ -10052,7 +10155,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				pity_landed = true
 				pity_crit = pity_crit or is_crit
 			# Ability damage is a PERCENT of the attacker's current Attack.
-			var raw := ab.damage * 0.01 * attacker.attack * randf_range(0.9, 1.1) * dmg_mult
+			# **BATCH HZ §2 — BOIL OVER'S PERCENT IS THE BAR IT POURED OUT** (`bo_spent`,
+			# taken at the price line), read through `Classes.rage_dump_pct`; it draws
+			# the one variance roll every strike draws, in the same place, and no other.
+			var raw := (Classes.rage_dump_pct(bo_spent) if bo_dump else float(ab.damage)) \
+				* 0.01 * attacker.attack * randf_range(0.9, 1.1) * dmg_mult
 			# BATCH GO — REDOUBT BANKS WHAT IS KEPT OFF THE BODY IT IS HELD ON.
 			# **BATCH HL §3 — ONLY WHAT IS BLOCKED, PARRIED OR ABSORBED (ruled).** GO
 			# banked every mitigation site that books through `_prev` from this line
@@ -10566,37 +10673,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# the unit-side helper ratchets and returns in one motion.
 			if attacker.has_engine("bloodrage"):
 				raw *= 1.0 + attacker.frenzy_bonus()
-			# BATCH CI — UNSLAKED and BOIL OVER both live INSIDE the helper
-			# above (`frenzy_bonus`, unit.gd) rather than out here, which is what
-			# makes this site — and every other site that reads the bonus —
-			# answer them for free. A card that branched HERE would have been
-			# true of one read of the passive and false of all the others.
-			#
-			# BOIL OVER'S PER-POINT TERM. **IT READS THE LIVE BONUS, WHICH IS THE
-			# VERY NUMBER THE CARD IS ABOUT TO STOP PAYING HIM**, and it is read
-			# HERE, above the strike, so the blow is priced on what he walked in
-			# holding rather than on the floor his own recovery is about to hand
-			# him. The recovery status is applied AFTER the strike loop for
-			# exactly that reason: applied first, this line would read the floor
-			# and the card would quietly pay a fraction of what it promises.
-			#
-			# It carries NO `special`, so the whole attack pipeline reaches it —
-			# crit, armor, resist, Break, the parry roll, and Blood Frenzy's own
-			# multiplier one line above. THE BONUS IS THEREFORE IN THIS BLOW
-			# TWICE, once as the passive every strike gets and once as the term
-			# the card is sold on. That is the design rather than an oversight:
-			# it is the only card in the game that CASHES the meter instead of
-			# carrying it, and the two turns below are what it pays for that.
-			if ab.display_name == "Boil Over" \
-					and attacker.has_engine("bloodrage"):
-				# IT TAKES THE GRADE MULTIPLIER AND **DELIBERATELY DRAWS NO
-				# VARIANCE ROLL OF ITS OWN**: `raw` above already carries one, and
-				# a second `randf_range` here would shift every later roll in the
-				# battle — the draw-order gotcha AQ spent a bisect on, arriving
-				# through a damage term rather than through a talent branch.
-				var bo_pts := int(round(attacker.frenzy_bonus() * 100.0))
-				raw += 0.01 * BOIL_OVER_PER_POINT * bo_pts * attacker.attack \
-					* dmg_mult
+			# BATCH CI — UNSLAKED lives INSIDE the helper above (`frenzy_bonus`, unit.gd)
+			# rather than out here, which is what makes this site — and every other site
+			# that reads the bonus — answer it for free. A card that branched HERE would
+			# have been true of one read of the passive and false of all the others.
+			# **BATCH HZ §2 TOOK BOIL OVER'S PER-POINT TERM OUT**: the card is a Rage dump,
+			# priced at the raw-damage line off the bar it poured out, and the multiplier
+			# one line above reaches it as it reaches every strike — with the dump's own
+			# spend already booked to the band at the price line.
 			# BATCH BM §2 — DEBT OF IRON, the SPEND half. Crushing Blow is
 			# the one button he swings, so the bank pays out through it and
 			# empties. Read before the multipliers below so the bank is a
@@ -13117,30 +13201,6 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					fa_t.freezing_adv_mark = false
 					_log("   → Talent: Freezing Advance — the opening is taken (+%d%%)" % (
 						10 * attacker.freezing_ranks), "#b0a8e0")
-		# BATCH CI — BOIL OVER'S RECOVERY, APPLIED AFTER THE STRIKE AND NOT
-		# BEFORE. The per-point term up at the raw-damage block reads his LIVE
-		# Blood Frenzy bonus; this status makes `frenzy_bonus()` hand back the
-		# FLOOR instead. Applied first it would have priced the blow on the
-		# floor it was about to impose — the card quietly paying a fraction of
-		# what it promises, with nothing to announce it.
-		#
-		# THE FLOOR ITSELF IS UNTOUCHED: unit.gd's ratchet still runs inside
-		# the window, so a dive taken during the recovery banks its floor
-		# exactly as it would outside one. That is what makes UNSLAKED pair
-		# with this card — a floor holding the FULL peak makes the recovery
-		# nearly free — and it is why the window is written as a RETURN value
-		# rather than as a write to `frenzy_floor`, which would be permanent
-		# where this is two turns.
-		if ab.display_name == "Boil Over" \
-				and attacker.has_engine("bloodrage") and not is_counter:
-			var bo_turns := 1 if is_perfect else BOIL_OVER_RECOVERY
-			_apply_status(attacker, "boil_over", bo_turns)
-			attacker.update_status("boil_over", "Bo",
-				"Boil Over: for %d more turn(s) he receives\nonly Blood Frenzy's FLOOR (+%d%%), not the\nlive bonus. The floor itself is untouched." % [
-					bo_turns, int(round(attacker.frenzy_floor * 100.0))])
-			_log("   → Boil Over: for %d turn(s) he receives only the FLOOR (+%d%%), not the live bonus%s" % [
-				bo_turns, int(round(attacker.frenzy_floor * 100.0)),
-				" [PERFECT]" if is_perfect else ""], "#e07050")
 		# Survivalist on-hit package: Shrapnel's poison (perfect adds Slowed),
 		# Hamstring's trio, Coated Blades on basics, Venom Coating on all.
 		if attacker.is_hero and attacker.has_engine("trapper") \
@@ -16898,17 +16958,15 @@ func _on_vow_share(ally: BattleUnit, share: int) -> int:
 	var devout := _living_devout()
 	if devout == null or devout == ally:
 		return 0
-	# BATCH HY §1a — BORROWED FOR THE BILL AND PUT BACK, and this is the callback
-	# that made it matter: it fires on EVERY blow on a vowed ally, inside `take_hit`
-	# before the blow is booked, so a frame left on the Devout gave him the rest of
-	# the enemy's action — the blow's own booking, Penance's mirror, a teammate's
-	# Tripwire and reflect, each read as his and silenced by his Vow of Silence.
-	var vw_was_src := _dmg_src
-	var vw_was_label := _dmg_label
-	var vw_was_name := _dmg_src_name
-	_dmg_frame(devout, "Vow of Suffering")
+	# BATCH HZ §0.1 — THE CARRIED HALF IS THE DEALER'S DAMAGE ON A SECOND BODY (ruled by
+	# the designer). The vow moves where a blow LANDS, not who swung it, so the share
+	# KEEPS THE FRAME IT FOUND and sets none of its own: the Devout's ledger books the
+	# raider, a Devout the share kills is the raider's kill, Penance's mirror pays on
+	# both bodies, and a Covenant-bound Devout shares it. A frame names a dealer; it
+	# does not re-run an attack — the swing's riders fire once, in `_resolve`, off its
+	# result. Nothing re-enters: the bill goes through `take_tick_damage`, which has
+	# no vow block, and the refusal above reads no frame.
 	devout.take_tick_damage(share, "-%d" % share, Color(0.98, 0.85, 0.45))
-	_dmg_frame(vw_was_src, vw_was_label, vw_was_name)
 	_log("   → Vow of Suffering: %s carries %d of %s's wound" % [
 		devout.unit_name, share, ally.unit_name], "#e0c060")
 	# "Every hit he eats builds that ally's Faith" — the ALLY's meter, because
@@ -27587,10 +27645,12 @@ func _open_live_payloads() -> void:
 		var pay: Dictionary = pd["payload"]
 		_live_stamps.append({"name": pd["name"], "who": pd["who"], "roll": pd["roll"],
 			"tailed": pd["tailed"], "cond": pay.get("condition", {}),
-			"stat": pay.get("stat", {}), "targets": targets, "on": false})
+			"stat": pay.get("stat", {}), "targets": targets, "on": false,
+			"crest": int(pd["seat"]) < 0})
 	_live_pending.clear()
 	_live_opened = true
 	_reread_live(false)
+	_refresh_rune_chips()
 	for e in _live_stamps:
 		if not bool(e["on"]) and not bool(e["tailed"]) and int(e["roll"]) >= 0 \
 				and int(e["roll"]) < _rune_roll_call.size():
@@ -27647,6 +27707,8 @@ func _reread_live(tell: bool) -> void:
 		refreshed[pair[0]] = true
 	for u2 in refreshed:
 		(u2 as BattleUnit).refresh_bars()
+	if not refreshed.is_empty():
+		_refresh_rune_chips()
 
 
 func _live_recompute(u: BattleUnit, field: String) -> void:
@@ -27668,6 +27730,183 @@ func _live_recompute(u: BattleUnit, field: String) -> void:
 	last[field] = v
 	_live_base[iid] = base
 	_live_last[iid] = last
+
+
+# ══ BATCH HZ §1d — THE CHIPS: WHAT IS PAYING RIGHT NOW ══════════════════════
+#
+# **A CHIP IS FOR A PAYOUT THAT TURNS ON AND OFF (the designer's ruling).** A rune that
+# always pays — a flat stat — is on the hero sheet and in the kit preview (§1b), not here:
+# the preview answers *what am I wearing*, the chip row *what is paying right now*, and
+# neither has to answer both. Two states, and the second is the point: ARMED (held, its
+# condition not met) and PAYING — a player who can see a condition before it fires is the
+# whole value of the surface.
+#
+# **A RUNE CHIP IS NOT A STATUS** — nothing ticks it, dispels it or counts it — and it is
+# drawn unlike one (`BattleUnit.set_rune_chips`: outlined, the rune glyph, the row's right
+# end). WHAT GETS ONE:
+#   · the crest's rune — ONE chip, on the crest strip above the party's plates, never four
+#     copies of a party effect on four hero slots (HL §4's failure);
+#   · a hero's own rune carrying a `condition`, on his plate;
+#   · the tier-3 node that pays a lethal hit out of Rage (`last_rites_window`), which Boil
+#     Over's dump turns off — allowed, and visible here;
+#   · Consecrated Ground's reflect while its layer wears Vow of Silence (HY's ruling 3, the
+#     trap: his own vow silences his ground's reflect, for anybody).
+# **Every magnitude is read off the payload it describes**, never off a rune's authored line,
+# which carries its own copy of the figure. The state is the live door's own (`_live_stamps`).
+const RUNE_CHIP_TAG := "✦"
+var _crest_strip: Node2D = null
+
+
+func _refresh_rune_chips() -> void:
+	if sim:
+		return
+	var per_hero := {}
+	for h in heroes:
+		if not h.is_companion:
+			per_hero[h] = []
+	# THE CREST — its worn rune, PAYING while the live door pays it; one with no condition
+	# pays whenever its own trigger comes, so it reads PAYING whenever it is worn.
+	var crest: Array = []
+	for r in (Run.party_runes if Run.active else []):
+		var rd: Dictionary = r
+		if not bool(rd.get("equipped", false)):
+			continue
+		var pay: Dictionary = rd.get("payload", {})
+		var on := not pay.has("condition")
+		for e in _live_stamps:
+			if bool(e.get("crest", false)) and String(e["name"]) == String(rd.get("name", "")):
+				on = bool(e["on"])
+		crest.append(_rune_chip_for(String(rd.get("name", "")), "the crest", pay, on))
+	# A HERO'S OWN CONDITIONAL RUNE — off the stamp the live door pays it by.
+	for e2 in _live_stamps:
+		if bool(e2.get("crest", false)):
+			continue
+		for u in e2["targets"]:
+			if per_hero.has(u):
+				per_hero[u].append(_rune_chip_for(String(e2["name"]), "", {"stat": e2["stat"],
+					"condition": e2["cond"]}, bool(e2["on"])))
+	var lr_name := ""
+	for node in Talents.tree():
+		if ((node as Dictionary).get("payload", {}).get("stat", {}) as Dictionary).has("last_rites"):
+			lr_name = String((node as Dictionary).get("name", ""))
+	var vow_name := String(Runes.config("vow_of_silence").get("name", ""))
+	for h2 in per_hero:
+		var hu: BattleUnit = h2
+		if hu.dead:
+			per_hero[hu] = []
+			continue
+		# LAST RITES — PAYING inside its window while the bar has Rage to pay with.
+		if hu.last_rites > 0 and hu.resource_name == "Rage":
+			var lr_on := hu.last_rites_window() and hu.resource > 0
+			var lr_tip := "%s — %s\n" % [lr_name, "PAYING" if lr_on else "ARMED"]
+			if lr_on:
+				lr_tip += "Below a quarter's health: each wound is\npaid out of Rage, %d a point, first (%d left)." % [
+					hu.last_rites, hu.resource]
+			elif hu.last_rites_window():
+				lr_tip += "Below a quarter's health with no Rage left:\nwounds reach health."
+			else:
+				lr_tip += "Below a quarter's health, each wound is\npaid out of Rage first, %d a point." % hu.last_rites
+			per_hero[hu].append({"name": lr_name, "tag": RUNE_CHIP_TAG, "paying": lr_on, "tip": lr_tip})
+		# THE GROUND UNDER A VOW — in effect while a ground he laid stands on anybody.
+		var cg: Ability = _find_ability(hu, "Consecrated Ground")
+		if hu.rune_vow_of_silence > 0.0 and cg != null:
+			var laid := heroes.any(func(x): return not x.dead and x.has_status("cons_ground") \
+				and String(x.get_status("cons_ground").get("src_name", "")) == hu.unit_name)
+			var cg_tip := "%s and %s — %s\n" % [vow_name, cg.display_name, "IN EFFECT" if laid else "ARMED"]
+			cg_tip += "His vow silences his own ground: it\nreflects nothing, for anybody standing on it."
+			per_hero[hu].append({"name": vow_name, "tag": RUNE_CHIP_TAG, "paying": laid, "tip": cg_tip})
+	for h3 in per_hero:
+		(h3 as BattleUnit).set_rune_chips(per_hero[h3])
+	_draw_crest_strip(crest)
+
+
+# The crest's one chip, above the party's plates. Not built at all while the crest wears
+# nothing that turns on and off — a strip with nothing to say takes no space.
+func _draw_crest_strip(chips: Array) -> void:
+	if _crest_strip != null and is_instance_valid(_crest_strip):
+		_crest_strip.queue_free()
+	_crest_strip = null
+	if chips.is_empty():
+		return
+	_crest_strip = Node2D.new()
+	_crest_strip.position = Vector2(HERO_PLATE_X, PLATE_TOP - 16.0)
+	add_child(_crest_strip)
+	var lbl := Label.new()
+	lbl.text = "CREST"
+	lbl.add_theme_font_size_override("font_size", 9)
+	lbl.add_theme_color_override("font_color", BattleUnit.RUNE_CHIP_PAYING)
+	lbl.position = Vector2(0, -1)
+	lbl.size = Vector2(40, 12)
+	lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_crest_strip.add_child(lbl)
+	var x := 40.0
+	for rc in chips:
+		var chip := BattleUnit.rune_chip(rc)
+		chip.position = Vector2(x, 0)
+		_crest_strip.add_child(chip)
+		x += BattleUnit.RUNE_CHIP_W + 2.0
+
+
+# One rune's chip: its state and its words, every magnitude read off `payload`.
+func _rune_chip_for(name: String, whose: String, payload: Dictionary, on: bool) -> Dictionary:
+	var lines := PackedStringArray(["%s%s — %s" % [name, " (%s)" % whose if whose != "" else "",
+		"PAYING" if on else "ARMED"]])
+	var cw := _condition_words(payload.get("condition", {}))
+	if cw != "":
+		lines.append(("Now: %s." if on else "Pays only %s.") % cw)
+	lines.append_array(_wrap_words(_rune_effect_words(payload)))
+	return {"name": name, "tag": RUNE_CHIP_TAG, "paying": on, "tip": "\n".join(lines)}
+
+
+func _rune_effect_words(payload: Dictionary) -> String:
+	var parts := PackedStringArray()
+	var stat: Dictionary = payload.get("stat", {})
+	for f in stat:
+		var v := float(stat[f])
+		match String(f):
+			"dmg_taken_bonus":
+				parts.append("every hero takes %d%% %s damage" % [int(round(absf(v) * 100.0)),
+					"less" if v < 0.0 else "more"])
+			"dmg_bonus":
+				parts.append("every hero deals %d%% %s damage" % [int(round(absf(v) * 100.0)),
+					"more" if v > 0.0 else "less"])
+			"rune_blood_communion":
+				parts.append("a hero's attack that lands Break heals the hero furthest from full for %d%% of it" % int(round(v)))
+			_:
+				parts.append("%s %s" % [String(f).replace("_", " "), str(stat[f])])
+	var s := ", and ".join(parts)
+	return s.substr(0, 1).to_upper() + s.substr(1) + "." if s != "" else ""
+
+
+func _condition_words(cond: Dictionary) -> String:
+	if cond.has("heroes_lack_class"):
+		return "while no %s stands" % String(cond["heroes_lack_class"]).capitalize()
+	if cond.has("heroes_all_standing"):
+		return "while every hero stands" if bool(cond["heroes_all_standing"]) else "while a hero lies fallen"
+	if cond.has("heroes_include_class"):
+		return "while a %s stands" % String(cond["heroes_include_class"]).capitalize()
+	if cond.has("heroes_hold_core"):
+		return "while a hero wears the %s" % Classes.engine_title(String(cond["heroes_hold_core"]))
+	if cond.has("heroes_class_count"):
+		var cc: Dictionary = cond["heroes_class_count"]
+		return "while %d to %d %ss stand" % [int(cc.get("min", 0)), int(cc.get("max", 4)),
+			String(cc.get("class", "")).capitalize()]
+	return ""
+
+
+# A tooltip does not wrap, so a long effect is broken by hand at the card ceiling's width.
+func _wrap_words(text: String) -> PackedStringArray:
+	var out := PackedStringArray()
+	var line := ""
+	for w in text.split(" ", false):
+		if line != "" and line.length() + 1 + w.length() > 44:
+			out.append(line)
+			line = w
+		else:
+			line = w if line == "" else line + " " + w
+	if line != "":
+		out.append(line)
+	return out
 
 
 func _check_end() -> void:

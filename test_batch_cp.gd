@@ -107,7 +107,13 @@ const AUTHORED_DIGIT_CORPUS_CEILING := 89
 # DEATH RAY is the second. Both entered this loop's reach at DU §4 and DW; the
 # ruling that authoring a Perfect for any of these is a DESIGN decision is
 # unchanged, so they are NAMED here rather than suppressed, and a NINTH trips.
-const CHECK_WITHOUT_PERFECT := ["Arcane Explosion", "Called Shot",
+# BATCH HZ §2 — AND BOIL OVER IS THE NINTH, NAMED RATHER THAN SUPPRESSED, AND NOT AN AUTHORING
+# FAULT. Its Perfect shortened the two-turn recovery (*"The recovery costs 1 turn"*), and the
+# recovery went with the card's rebuild into a Rage dump (ruled at HY), so the Perfect had
+# nothing left to shorten. It still runs the gated check — a Sloppy loses the cast — and its
+# Perfect still lands the grade's harder blow, as every strike's does. Authoring it a new
+# Perfect would be a magnitude nobody ruled, so the list grows by the card and a TENTH trips.
+const CHECK_WITHOUT_PERFECT := ["Arcane Explosion", "Boil Over", "Called Shot",
 	"Coup de Grâce", "Death Ray", "Pinning Shot", "Powershot", "Pyroblast",
 	"Rampage"]
 

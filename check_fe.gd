@@ -692,8 +692,12 @@ func _s2d_the_live_screen() -> void:
 	await process_frame
 
 
+# BATCH HZ §1b — THE KIT PREVIEW'S BUTTON IS NOT A PICK. Since HZ the pick overlay
+# carries it under its title (`map_screen._kit_preview_button`): it opens the hero's
+# kit and answers nothing, so the offer read off the labels is every OTHER button.
+# Skipped by the meta the game sets on it, never by its words.
 func _button_labels(node: Node, out: Array) -> void:
-	if node is Button:
+	if node is Button and not node.has_meta("kit_preview"):
 		out.append(String((node as Button).text))
 	for c in node.get_children():
 		_button_labels(c, out)

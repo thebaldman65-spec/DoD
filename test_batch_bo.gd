@@ -252,7 +252,12 @@ func _pools() -> void:
 			# is LIVE now rather than latent**: it ran no bar as the Arcanist's slot-0
 			# basic, and drafted it stands off slot 0, so the player presses a bar
 			# with no Perfect behind it. Authoring one is the designer's; owed.
-			if not (n in ["Rampage", "Pyroblast", "Arcane Explosion", "Death Ray"]):
+			# BATCH HZ §2 — BOIL OVER IS THE FIFTH, AND IT IS NOT AN AUTHORING FAULT EITHER: its Perfect
+			# shortened the two-turn recovery, the recovery went with the card's rebuild into a Rage dump
+			# (ruled at HY), and the Perfect had nothing left to shorten. It still runs the gated check,
+			# and its Perfect blow still lands harder, as every strike's does. Named with the four, and
+			# with `test_batch_cp.CHECK_WITHOUT_PERFECT`; a SIXTH still trips.
+			if not (n in ["Rampage", "Pyroblast", "Arcane Explosion", "Death Ray", "Boil Over"]):
 				ok(ab.perfect_text != "" if ab.runs_skill_check() else ab.perfect_text == "",
 					"§5: ...and states a perfect exactly when it runs a check (%s)" % n)
 			else:

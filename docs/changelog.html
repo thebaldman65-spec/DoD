@@ -16,6 +16,64 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-09 &mdash; Batch HZ: THE EYES, AND THE RAGE DUMP</h2>
+<p><b>Four things on screen that show the player what the game already knows, one line in the damage path, and Boil Over
+rebuilt as a Rage dump.</b> Every one of the four exists because the designer had to guess at something the game knew. Full
+working: <code>docs/reports/HZ.md</code>. HZ closes the H block; the next letter is IA.</p>
+
+<p><b>&sect;0 &mdash; THE VOW'S CARRIED HALF IS THE ATTACKER'S (the designer's ruling on HY's first).</b> Vow of Suffering moves where
+a blow <i>lands</i>, not who swung it, so the half the Devout carries is now the attacker's damage on a second body. The fight's
+recap books it to the attacker (it read <i>themself / Vow of Suffering</i>), a Devout killed by the half he carries is the attacker's
+kill rather than a suicide, Penance's mirror pays on the whole blow again (on both bodies), and a Devout bound by an Oathkeeper's
+bond shares the half he carries. Nothing fires twice: the attack's own riders &mdash; a status it applies, a lifesteal &mdash; still happen
+once. Two more of HY's rulings were confirmed as built and recorded: a bomb is the party's and credits no hero, and Consecrated
+Ground's reflect is the Cleric's who laid it, so a vowed Cleric's ground reflects nothing for anybody.</p>
+
+<p><b>&sect;1a &mdash; THE ENEMY'S NEXT ATTACK, ON HOVER.</b> Every enemy already shows what it means to do next on its nameplate and in
+the turn bar. Hovering that line (or the turn bar's icon) now details it: the attack's name, its damage band (the range a hero's
+own ability shows &mdash; the swing, before armor and the rest), the status it applies with its turns and its chance, its Break
+damage, and how many heroes it hits. <b>It never says which hero it is aimed at, deliberately</b>: knowing what an attack does is
+what decides whether to pre-empt it; knowing whom it will hit would turn every defensive decision into arithmetic.</p>
+
+<p><b>&sect;1b &mdash; SEE THE KIT.</b> Every draft &mdash; the elite's four-column draft, a zone boss's card, a rune cache &mdash; carries a
+<b>See the kit</b> button that opens a read-only preview of that hero's cards and runes over the screen; closing it leaves the
+choice as it was. The Peddler has <b>See the heroes' kits</b>, which walks all four. It shows the kit as the hero sheet does and
+changes nothing &mdash; equipping stays on the map.</p>
+
+<p><b>&sect;1c &mdash; CLICK THE NAMEPLATE.</b> While choosing a target, clicking the target's nameplate &mdash; or a chip on it, or its
+intent line &mdash; picks it, the same as clicking its body. Outside targeting a click on a nameplate does nothing, as before. This
+is the other half of HW's fix to the click boxes around the sprites.</p>
+
+<p><b>&sect;1d &mdash; RUNE CHIPS: WHAT IS PAYING RIGHT NOW.</b> A rune whose payout turns on and off has a small outlined chip with
+the rune mark at the right end of the chip row &mdash; bright while it pays, dim while it waits on its condition; hover it for which
+and for what it pays, every figure read off the rune itself. The Crest's rune is one chip on a CREST strip above the heroes'
+plates, not one per hero. Chipped: the Crest's rune; a hero's rune with a condition; <b>Pay a Lethal Hit out of Your Resource
+Pool</b> (it pays below a quarter's health while the Rage bar holds any); and Consecrated Ground laid by a Cleric wearing Vow of
+Silence. <b>What the chips show:</b> Empty Pulpit and Dead Air open every fight waiting, and pay only once the Cleric (the Mage)
+has fallen in that fight; Dirge pays once any hero has.</p>
+
+<p><b>&sect;2 &mdash; BOIL OVER IS A RAGE DUMP (ruled at HY).</b> It now pours out the whole Rage bar into one strike &mdash; 0.8% of Attack
+for every point spent, so a full bar of 100 is 80% &mdash; has no cost of its own, and needs at least 40% of the bar to cast. The
+Blood Frenzy term and the two-turn recovery are gone; the Berserker's core multiplies it as it does every strike. Measured on one
+board against every Rage card a Warrior can carry: a full bar deals 63 without the core and 88 with it, against a best ordinary
+turn of 45 and 52 (Rampage), and a cast at the floor deals 25 and 29, against Crushing Blow's 30 and 31 &mdash; a full bar beats the
+best ordinary turn and does not beat two, and a floor cast is worse than an ordinary card. <b>The rate is the designer's to
+re-rule</b>; <code>docs/state.md</code> carries it with these figures. Below a quarter's health a dump empties the bar the Last Rites
+node pays from &mdash; allowed, and its chip shows it. Its Perfect went with the recovery it shortened.</p>
+
+<p><b>&sect;3 &mdash; THE SHARPSHOOTER'S TOAST NAMES THE PET.</b> A core rune that dismisses the pet, taken after class selection by a
+Hunter who fields one, says in its toast that slotting it sends the companion away and Summon Companion leaves the kit.</p>
+
+<p><b>The checks.</b> A new check, <code>check_hz</code>, drives every one of these on the real screens and in real fights, each with
+the case that must show nothing. <code>check_hy</code>'s vow table is re-tuned to the ruling (the mirror on the whole blow; it
+reports the one blow where per-body rounding pays a point more). The two lists of checked cards with no Perfect
+(<code>test_batch_cp</code>'s, and <code>test_batch_bo</code>'s exemptions) gain Boil Over, and <code>check_dw</code>'s count of them
+moves with them; <code>check_di</code>'s count of the status door's call sites falls by the one the recovery used. <b>Six checks
+answer a pick on the real screens by pressing the first button that is not <i>Not yet</i></b> &mdash; four of them copies of one
+helper &mdash; and since HZ that button is <b>See the kit</b>, so the runs they walk stopped at the first pick: each passes over it now
+(it answers nothing), and <code>check_fm</code>, which counts the buttons, counts it apart. <code>check_hx</code> knows HZ's new rule
+block. HY's ten scratch copies were cleared.</p>
+
 <h2>2026-10-09 &mdash; Batch HY: THE ATTRIBUTION FRAME, AND THE CEILING MOVES</h2>
 <p><b>Game code changed, in one place: who the game thinks is dealing a piece of damage at the moment it lands. That one
 answer decides whether a Vow of Silence blanks it, whether Penance bills for it, whether the Reaver counts the kill and the

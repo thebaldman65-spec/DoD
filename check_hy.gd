@@ -5,12 +5,13 @@
 # rule engines pay and mark off it, the Reaver counts kills by it, and the recap books by it. HX §4 drove
 # it wrong in two shapes; this gate is the drive HX specified, built for real.
 #
-#   §1  THE VOW SHARE PUTS THE FRAME BACK. An Orc Raider's own Slash on a Warden on the Devout's
-#       Consecrated Ground, the Survivalist's Tripwire up, Penance on the raider from the Pyromancer — three
-#       blows an arm, the vow's share and the Devout's Vow of Silence each on and off. In every arm, every
-#       blow: the frame after is the raider's own Slash; the raider loses EXACTLY the mirror on what the
-#       Warden kept, the wire on the whole blow, and the reflect unless its layer wears the vow; the recap
-#       books the Warden's wound to the raider and the wire to the Tripwire.
+#   §1  THE VOW'S CARRIED HALF IS THE RAIDER'S DAMAGE ON A SECOND BODY (re-tuned at HZ §0.1, the designer's ruling
+#       on HY's first). An Orc Raider's own Slash on a Warden on the Devout's Consecrated Ground, the Survivalist's
+#       Tripwire up, Penance on the raider from the Pyromancer — three blows an arm, the vow's share and the Devout's
+#       Vow of Silence each on and off. In every arm, every blow: the frame after is the raider's own Slash; the
+#       raider loses EXACTLY the mirror on what each body lost — the whole blow between the two — the wire on the
+#       whole blow, and the reflect unless its layer wears the vow; the recap books the Warden's wound and the
+#       Devout's carried half to the raider, and the wire to the Tripwire.
 #   §2  THE SPRINGS AT A TURN START — Snare Line's and the Deadfall's, each called as the turn loop calls it,
 #       after a real action: an enemy's Slash, the Devout's Smite with his vow, and without. The same roll in
 #       every arm, never silenced, booked to the layer under the trap's name, and the frame put back.
@@ -69,7 +70,7 @@ const DAMAGE_FUNCS := {
 	"battle.gd::_forge_body_throw": "BORROWS",
 	"battle.gd::_overburn_refund": "ACTION — the Pyromancer's own price",
 	"battle.gd::_on_rite_return": "BORROWS (HY §1a)",
-	"battle.gd::_on_vow_share": "BORROWS (HY §1a)",
+	"battle.gd::_on_vow_share": "DEALER — the carried half is the swing's own wound on a second body; it keeps the frame it found (HZ §0.1)",
 	"battle.gd::_on_bloodbond_guard": "BORROWS (HY §1a)",
 	"battle.gd::_on_brunt_guard": "BORROWS (HY §1a)",
 	"battle.gd::_on_blight_heal": "BORROWS (HY §1a)",
@@ -228,21 +229,31 @@ func _label(scene: Node, sid: String) -> String:
 	return String((scene.get("STATUS_INFO") as Dictionary)[sid][0])
 
 
-# ── §1 — THE VOW SHARE PUTS THE FRAME BACK ─────────────────────────────────
+# ── §1 — THE VOW'S CARRIED HALF IS THE RAIDER'S ────────────────────────────
 #
 # HX's drive, made a gate. HX read the raider losing 26, 27, 24 with no share and 0, 0, 0 with the share
 # and the Devout's vow: the share's bill left the Devout's frame standing for the rest of the raider's
 # swing, so the Survivalist's wire and the reflect were read as his and silenced, and the mirror — which
-# reads the dealer — never fired. **The figures are not compared ACROSS arms**: the share moves half the
-# blow onto the Devout, so the Warden keeps half, and the mirror pays on what the Warden keeps; and the
-# reflect is the layer's, so his vow silences it with or without a share. What every arm must read is the
-# same FUNCTION of its own blow, which is what the control reads: the mirror on what the Warden kept, the
-# wire on the whole blow, the reflect on the whole blow unless the ground's layer wears the vow.
+# reads the dealer — never fired. HY put the frame back; **HZ §0.1 took the share out of the frame's
+# business altogether**: the vow moves where a blow LANDS, not who swung it, so the share keeps the frame it
+# found and the half the Devout carries is the raider's damage on a second body. **The figures are not
+# compared ACROSS arms**: the reflect is the layer's, so his vow silences it with or without a share. What
+# every arm must read is the same FUNCTION of its own blow: the mirror on what each body lost — the whole
+# blow between the Warden and the Devout, so the share's term is gone from the raider's loss — the wire on
+# the whole blow, the reflect on the whole blow unless the ground's layer wears the vow. **The mirror rounds
+# per body**, so a blow whose two parts are both odd mirrors one more than the whole blow would (18 → 9 + 9
+# mirrors 5 + 5 against 9): asserted per blow as never more than one body's rounding, and every such blow
+# printed.
+func _mirror(lost: int) -> int:
+	return maxi(int(round(lost * 0.01 * PENANCE_POWER)), 1) if lost > 0 else 0
+
+
 func _s1_the_vow_share() -> void:
-	print("\n§1 — the vow's share borrows the frame for its bill and puts it back")
+	print("\n§1 — the vow's carried half is the raider's damage on a second body, under the raider's own frame")
 	var arms := [["A0 no share, the Devout vowed", false, true], ["A1 the share, the Devout vowed", true, true],
 		["A2 the share, no vow", true, false], ["A3 no share, no vow", false, false]]
 	var checked := 0
+	var splits: Array = []
 	for arm in arms:
 		var share: bool = arm[1]
 		var vowed: bool = arm[2]
@@ -288,7 +299,8 @@ func _s1_the_vow_share() -> void:
 			var blow := wl + cl
 			var tw := int(round(float(_dealt(s, h).get(wire, 0.0)) - tw0))
 			var pn := int(round(float(_dealt(s, py).get("Penance", 0.0)) - pn0))
-			var want_pn := maxi(int(round(wl * 0.01 * PENANCE_POWER)), 1) if wl > 0 else 0
+			var want_pn := _mirror(wl) + _mirror(cl)
+			var whole_pn := _mirror(blow)
 			var want_tw := maxi(int(blow * 0.75), 1)
 			var want_rf := 0 if vowed else maxi(int(round(blow * 0.10)), 1)
 			var fr := _frame(s)
@@ -300,8 +312,14 @@ func _s1_the_vow_share() -> void:
 					arm[0], k + 1, wl, cl, "carry half" if share else "carry nothing"])
 			ok(tw == want_tw, "§1 (%s) blow %d: the Survivalist's wire booked %d, the whole blow's wire is %d — silenced or mis-booked" % [
 				arm[0], k + 1, tw, want_tw])
-			ok(pn == want_pn and pn > 0, "§1 (%s) blow %d: Penance's mirror paid %d, on what the Warden kept it is %d" % [
-				arm[0], k + 1, pn, want_pn])
+			ok(pn == want_pn and pn > 0, "§1 (%s) blow %d: Penance's mirror paid %d, on what each body lost (%d and %d) it is %d" % [
+				arm[0], k + 1, pn, wl, cl, want_pn])
+			ok(pn - whole_pn >= 0 and pn - whole_pn <= (1 if cl > 0 else 0),
+				"§1 (%s) blow %d: the mirror on the bodies is %d against %d on the whole blow of %d — more than one body's rounding" % [
+					arm[0], k + 1, pn, whole_pn, blow])
+			if pn != whole_pn:
+				splits.append("%s, blow %d: %d → %d + %d mirrors %d + %d = %d, the whole blow %d" % [
+					arm[0], k + 1, blow, wl, cl, _mirror(wl), _mirror(cl), pn, whole_pn])
 			ok(fl == pn + tw + want_rf,
 				"§1 (%s) blow %d: the raider lost %d — the mirror %d, the wire %d and the reflect %d make %d" % [
 					arm[0], k + 1, fl, pn, tw, want_rf, pn + tw + want_rf])
@@ -313,12 +331,13 @@ func _s1_the_vow_share() -> void:
 		ok(dt.keys() == [wire], "§1 (%s): the Survivalist's dealt ledger reads %s — the wire is booked as the wire" % [arm[0], dt])
 		if share:
 			var ct := _taken(s, c)
-			ok(ct.keys() == ["themself / Vow of Suffering"],
-				"§1 (%s): the Devout's carried share is booked %s — it is the vow's own price" % [arm[0], ct])
+			ok(ct.keys() == [wound_key],
+				"§1 (%s): the Devout's carried share is booked %s — it is the raider's wound on a second body (HZ §0.1)" % [arm[0], ct])
 		print(line + "   [W+C → raider (mirror/wire/reflect)]")
 		await _clear(s)
 	ok(checked == 12, "§1: %d of 12 blows were read — the drive has gone vacuous" % checked)
-	print("  CHECKED %d blows across four arms" % checked)
+	print("  CHECKED %d blows across four arms; the mirror's rounding splits %d of them%s" % [checked, splits.size(),
+		"" if splits.is_empty() else ":\n    " + "\n    ".join(PackedStringArray(splits))])
 
 
 # ── §2 — THE SPRINGS AT A TURN START ───────────────────────────────────────
