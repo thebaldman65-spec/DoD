@@ -17,6 +17,47 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT IA — 2026-10-11, FROM `docs/state.md` AS HZ LEFT IT (`91a824e`)
+
+**What came here**: HZ's rulings, all seven answered in IA's brief; the closed items of two sections that stay live — the
+reflect's log line and Lifewell (FOUND AT HZ, fixed at IA §1) and the roadmap's IA line (built at IA §2 and §3). Each was read
+against IA's tree before it moved; everything else in the live file stayed.
+
+### ~~HZ's RULINGS OWED~~ — **ALL SEVEN ANSWERED IN IA's BRIEF: LIFEWELL AND THE REFLECT'S LINE PAY WHAT LANDED (6, FIXED AT IA §1); THE RATE (1), THE COMEBACK RUNES (2), THE BAND (3), THE ROUNDING (4), THE PERFECTLESS DUMP (5) AND TITHE'S CHIP (7) CONFIRMED, EACH WITH ITS REASON RECORDED**
+
+Full working: `docs/reports/HZ.md`, NEEDS A RULING.
+
+1. **BOIL OVER'S RATE (§2)** — 0.8% of Attack a point and a floor of 40% of the bar, chosen against the figures under BOIL OVER'S
+   RATE, below. Re-rule the number, the floor, or both; `check_hz` §2 holds the shape, not the number.
+2. **EMPTY PULPIT AND DEAD AIR PAY ONLY AFTER A FALL (§1d)** — every fight opens with a Cleric and a Mage standing, so both open
+   ARMED, and each turns PAYING for the rest of a fight in which its class's hero falls. The brief expected *never*; the chips
+   show *after a fall*. Dirge is the same shape for any hero. The designer's to re-cut; nothing authored here.
+3. **THE TELEGRAPH'S BAND (§1a)** — shown as the attack's own roll, the line a hero's card quotes, before armor and the rest: a
+   band, not a predicted blow, so BL's ruling is read as standing. **Or** the percentage alone (one line: drop the band).
+4. **THE MIRROR'S ROUNDING ON A SPLIT BLOW (§0.1)** — Penance rounds per body, so a blow whose two parts are both odd mirrors one
+   point more than the whole would (18 → 10, against 9). Keep it, or price the carried half's mirror as the whole's less the kept
+   part's.
+5. **BOIL OVER'S PERFECT (§2)** — none now: it shortened the recovery that is gone. The grade's harder Perfect blow still lands, as
+   on every strike; `test_batch_cp` names it among the checked cards with no Perfect. Author one, or keep.
+6. **LIFEWELL UNDER A VOWED GROUND (found at §1d)** — it heals the party off the reflect the vow silenced (the figure is taken
+   before the gate). Pay it on what landed (one line), or keep.
+7. **TITHE'S CHIP (§1d)** — it has no condition, so it reads PAYING whenever worn and pays at each Break; the chip says how. Keep,
+   or show it only as it pays.
+
+### FOUND AT HZ AND NOT FIXED — ITS CLOSED ITEMS (archived at IA; the section stays in `docs/state.md`)
+
+- **CONSECRATED GROUND'S REFLECT IS LOGGED BEFORE ITS LAYER'S VOW SILENCES IT** — the log reads *reflects N* where the raider
+  takes 0 and floats SILENT; Lifewell then heals off the same pre-gate figure (ruling 6). Display one line, found by the chip
+  survey; not moved here.
+
+### THE PLAYTEST'S OTHER FINDINGS — ITS CLOSED ITEMS (archived at IA; the section stays in `docs/state.md`)
+
+- **IA — the bag and the slots**: **three core slots — RULED, NOT BUILT** (two has been the designed number since GK,
+  `Run.ENGINE_SLOTS`); the per-class bag in three separated sections — core, equipped, held-not-worn. **The slot and the screen
+  that shows it are one change.**
+
+---
+
 ## ARCHIVED AT HZ — 2026-10-09, FROM `docs/state.md` AS HY LEFT IT (`464bf14`)
 
 **What came here**: HY's rulings, all three answered in HZ's brief; the closed items of three sections that stay live — Boil

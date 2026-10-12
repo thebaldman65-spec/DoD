@@ -1284,7 +1284,7 @@ func _spawn_units() -> void:
 		# BATCH HJ §3 made its scope the hero's class pool.)
 		#
 		# BATCH GK — THE ENGINES THIS HERO HOLDS, which is what `passive_id` was
-		# stamped from the spec to say. A run hero holds what his two engine
+		# stamped from the spec to say. A run hero holds what his core rune
 		# slots hold, and that can be none; a bot battle outside a run
 		# (DOD_SIM_SPECS) holds its spec's own engine, the pick the sim makes at
 		# class selection. **THE OPENING KIT IS `Classes.opening_kit`'s** — the
@@ -12008,9 +12008,6 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if cg_dv != null and cg_dv.righteous_step + cg_dv.rune_righteous_step > 0:
 					cg_pct += 0.01 * (cg_dv.righteous_step + cg_dv.rune_righteous_step)
 				var reflect := maxi(int(round(final * cg_pct)), 1)
-				_log("   → Consecrated Ground reflects %d to %s%s" % [
-					reflect, attacker.unit_name,
-					" (Righteous Fire)" if cg_pct > 0.10 else ""], "#c8b880")
 				# BATCH HY §1c — THE REFLECT IS THE GROUND'S, SO IT IS WHOEVER LAID IT
 				# (DI: a status's effect is its applier's, by the `src_name` the status
 				# door stamps). Under the attacker's own frame it slipped past the
@@ -12021,6 +12018,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var cg_was_name := _dmg_src_name
 				_dmg_frame(_hero_named(cg_src) if cg_src != "" else null,
 					String(STATUS_INFO["cons_ground"][0]), cg_src)
+				# BATCH IA §1 — A FIGURE PRINTED OR PAID OFF A BLOW IS THE BLOW THAT
+				# LANDED (HZ's ruling 6). Asked under the ground's own frame, the one the
+				# door's gate reads: a reflect its layer's vow silences prints no line
+				# and waters nothing, where both read the figure computed above it.
+				var cg_landed := 0 if _vow_silences(attacker) else reflect
+				if cg_landed > 0:
+					_log("   → Consecrated Ground reflects %d to %s%s" % [
+						cg_landed, attacker.unit_name,
+						" (Righteous Fire)" if cg_pct > 0.10 else ""], "#c8b880")
 				if attacker.take_tick_damage(reflect, "-%d Reflect" % reflect,
 						Color(0.9, 0.82, 0.5)):
 					_stat("enemy_deaths")
@@ -12028,9 +12034,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_message("%s falls!" % attacker.unit_name)
 					_log("† %s dies" % attacker.unit_name, "#e05050")
 				_dmg_frame(cg_was_src, cg_was_label, cg_was_name)
-				# Lifewell: the reflected pain waters the party.
-				if cg_dv != null and cg_dv.lifewell_ranks + cg_dv.rune_lifewell_ranks > 0:
-					var well := maxi(int(round(reflect
+				# Lifewell: the reflected pain waters the party — the pain that landed.
+				if cg_landed > 0 and cg_dv != null \
+						and cg_dv.lifewell_ranks + cg_dv.rune_lifewell_ranks > 0:
+					var well := maxi(int(round(cg_landed
 						* 0.01 * (cg_dv.lifewell_ranks + cg_dv.rune_lifewell_ranks))), 1)
 					for wh in heroes:
 						if wh.dead or wh.is_companion:
@@ -17985,7 +17992,7 @@ func _cy_sample() -> void:
 	for h in heroes:
 		if h.dead or h.is_companion or h.engines.is_empty():
 			continue
-		# BATCH GK — a hero can hold two engines, so each is sampled.
+		# BATCH GK — a hero can hold more than one engine, so each is sampled.
 		for cy_pid in h.engines:
 			_cy_sample_one(h, String(cy_pid))
 
@@ -29846,16 +29853,25 @@ func _dmg_frame(src: BattleUnit, label: String, src_name := "") -> void:
 # **BREAK DAMAGE IS NOT HERE**: it rides `take_hit`'s `pressure_add` and is its
 # own word in this game ("Break damage (BD)"), so a Vow Cleric still Breaks.
 func _deal_gate(victim: BattleUnit, amount: int) -> int:
-	if amount <= 0 or victim == null or victim.is_hero:
-		return amount
-	var vs: BattleUnit = _dmg_src
-	if vs == null or not is_instance_valid(vs):
-		vs = _hero_named(_dmg_src_name) if _dmg_src_name != "" else null
-	if vs == null or not vs.is_hero or vs.is_companion or vs == victim \
-			or vs.rune_vow_of_silence <= 0.0:
+	if amount <= 0 or not _vow_silences(victim):
 		return amount
 	victim.float_text("SILENT", Color(0.85, 0.85, 0.75))
 	return 0
+
+
+# BATCH IA §1 — THE GATE'S ANSWER, WITH NOTHING DRAWN: does the frame credit a blow on
+# `victim` to a hero who wears the vow? `_deal_gate` asks it at the two doors; a site
+# that prints or pays a figure off its own blow asks it under the same frame, so what
+# it prints and pays is the blow that LANDED — never the one it computed (the
+# reflect's log line and Lifewell, HZ's ruling 6).
+func _vow_silences(victim: BattleUnit) -> bool:
+	if victim == null or victim.is_hero:
+		return false
+	var vs: BattleUnit = _dmg_src
+	if vs == null or not is_instance_valid(vs):
+		vs = _hero_named(_dmg_src_name) if _dmg_src_name != "" else null
+	return vs != null and vs.is_hero and not vs.is_companion and vs != victim \
+		and vs.rune_vow_of_silence > 0.0
 
 
 # WHO A SOURCE IS, FOR THE RECAP — AND FOR AN ENEMY THAT IS ITS KIND, NEVER ITS

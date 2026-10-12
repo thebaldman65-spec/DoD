@@ -284,7 +284,10 @@ static func flags_are_inert(scene: Node) -> bool:
 # none, and every combination of up to `most` of `engs`, each set once, in the
 # order `engs` lists them. It returns ENGINE IDS, never abilities, so it is no
 # corpus walk (`check_da` §3b). One copy, for DA/DB's reason: two gates each
-# enumerating the sets would be two enumerations that can disagree.
+# enumerating the sets would be two enumerations that can disagree. IA §2 gave
+# it two more readers when the cap became three, so each walks the sets the cap
+# allows rather than pairs: every pouch `check_gt` §1 opens, and every bar
+# `check_hu` §1a measures.
 static func engine_sets(engs: Array, most: int) -> Array:
 	var out: Array = [[]]
 	var frontier: Array = [[]]

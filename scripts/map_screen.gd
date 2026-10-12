@@ -961,8 +961,17 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 		if eng_note != "":
 			hint.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
 			open.tooltip_text += "\n\n%s" % eng_note
-		hint.position = at + Vector2(8, 124)
-		hint.size = Vector2(CARD_W - 16, 14)
+		# BATCH IA §2 — THE LINE WRAPS, AND IT HAS THE ROOM TO. It was one line in a
+		# 284-px box, and two titles already ran past the card's edges — measured at
+		# font 11: the widest pair 372 px, the widest set of three 442 — so it is laid
+		# out bottom-up in the room the badges and the pick button take only when a
+		# pick is owed, which is exactly when this line is not drawn.
+		# Wrapping is switched on BEFORE the box is sized: a label that cannot wrap grows
+		# its box to its one-line width the moment a size is set, and keeps it.
+		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		hint.position = at + Vector2(8, 94)
+		hint.size = Vector2(CARD_W - 16, 54)
+		hint.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(hint)
@@ -2073,17 +2082,21 @@ func _pick_rune(idx: int, choice: int) -> void:
 # rule. Measured on HEAD's layout with the pouch empty: Close was wholly below
 # the 720-pixel screen for four engines held alone, for all sixty pairs of one
 # class's engines, and for all four classes holding their six (y 1142 at worst).
-# **A hero can HOLD up to all six of his class's engine runes** — two slotted,
-# the rest kept — and this panel lists every one with its rule.
+# **A hero can HOLD up to all six of his class's engine runes** — three slotted
+# since IA §2 (two until then), the rest kept — and this panel lists every one
+# with its rule.
 #
 # **THE FIX IS THE LAYOUT, AND NOTHING WAS SHRUNK OR CUT.** The panel is a fixed
 # rect inside the screen; everything whose height depends on text — the engine
 # rows, the notes, the rune rows — lives in ONE scroller that takes the room
 # between the title and Close; Close sits below the scroller, so no text can
-# push it. The panel is wider than it was, which is what lets the longest
-# combination, a class's six rules, fit with nothing scrolling (GQ's rule for
-# the class-selection cards: make room for the longest text rather than cutting
-# it). What still scrolls is a long pouch of ordinary runes, as it always did.
+# push it. The panel is wider than it was, which is what let the longest
+# combination of GT's day, a class's six rules, fit with nothing scrolling (GQ's
+# rule for the class-selection cards: make room for the longest text rather than
+# cutting it). **Since IA §3 an empty core slot is a row**, so a class's six with
+# a slot empty can run past the room the screen allows — the panel already spans
+# it — and scrolls there, Close pinned, as a long pouch of ordinary runes always
+# did; with every slot filled it still fits (`check_gt` §1 walks every slot count).
 const POUCH_RECT := Rect2(140, 24, 1000, 672)
 const POUCH_TEXT_W := 860
 # BATCH HR §1 — the Drop on a held row, whose width the row's label gives up.
@@ -2124,27 +2137,31 @@ func _open_rune_panel(idx: int) -> void:
 	panel.add_child(box)
 
 	var equipped: int = Run.runes_worn(member)
+	var worn_engines: int = Run.engines_worn(member)
+	# ══ BATCH IA §3 — THE HERO'S RUNES IN THREE SECTIONS, THE DESIGNER'S ORDER ══════
+	#
+	# *All the runes from each class in one bag for that class. At the top, the core
+	# runes in their own section. Under that, the normal runes. Below that, all the
+	# held runes that are not equipped. Each section separated.* So: **CORE** — his
+	# core slots, every one drawn, an empty one too — **WORN** — his ordinary slots'
+	# runes — **HELD, NOT WORN** — every rune he holds and does not wear, core runes
+	# first. **THE SECTIONS ARE THE STATE**: a row carries no ✦ for worn and no
+	# *(held)* for held any more, because a list sectioned by state that also prints
+	# the state on every row says one thing twice; and the panel counts what he holds
+	# once, in that section's head (HR's line above the list said it until IA). The
+	# crest's bag is not here: a class's runes live on his panel and the bag holds
+	# the crest's (HR §1, not re-merged). The kit preview stays one flat list with its
+	# state column (HZ §1b): a read-only list is a different surface.
 	var title := Label.new()
-	title.text = "%s — RUNES (%d of %d slots filled)" % [
-		String(member["key"]).capitalize(), equipped, Run.rune_slots()]
+	title.text = "%s — RUNES" % String(member["key"]).capitalize()
 	title.add_theme_font_override("font", NAME_FONT)
 	title.add_theme_font_size_override("font_size", 26)
 	title.add_theme_color_override("font_color", Color(0.85, 0.6, 1.0))
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(title)
-	# BATCH HR §1 — WHAT HE HOLDS, AND HOW FULL IT IS: a rune he unequips stays with
-	# him, unworn, and a full holding is why an Unequip is refused. (HK's line here
-	# said how full the shared bag was; the bag holds the crest's runes now.)
-	var bag_line := Label.new()
-	bag_line.text = "HELD, NOT WORN: %d of %d. A rune taken off stays with him; Drop lets one go for good." % [
-		Run.held_count(member), Run.HERO_HOLD_CAP]
-	bag_line.add_theme_font_size_override("font_size", 12)
-	bag_line.add_theme_color_override("font_color", Color(0.72, 0.66, 0.8))
-	bag_line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(bag_line)
 
 	# GT §1 — THE ONE SCROLLER. It fills whatever the title and Close leave, so
-	# its height is the panel's and never the text's.
+	# its height is the panel's and never the text's; the three sections live in it.
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -2154,142 +2171,62 @@ func _open_rune_panel(idx: int) -> void:
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(list)
 
-	# ── BATCH GK — THE TWO ENGINE SLOTS, AND DROP AND SWAP ──────────────────
+	# ── CORE — every core slot drawn, filled or empty (GK's slots, three since IA §2) ──
 	#
-	# **THE CHARTER'S DROP AND SWAP HAPPEN HERE**, on the pouch's own shape: an
-	# engine rune is equipped into one of two dedicated slots or unequipped out of
-	# it, and unequipping every one is allowed — a hero with no engine is a legal
-	# state. An unequipped engine and its enablers leave the next fight; the rune
-	# is kept — **held on him, unworn (HR §1; in the bag from HK)**. `Run.toggle_engine`
-	# owns the rule; this panel only draws it.
-	var worn_engines: int = Run.engines_worn(member)
-	var eng_head := Label.new()
-	eng_head.text = "CORE RUNES — %d of %d slots filled" % [worn_engines, Run.ENGINE_SLOTS]
-	eng_head.add_theme_font_size_override("font_size", 15)
-	eng_head.add_theme_color_override("font_color", Color(0.95, 0.75, 0.45))
-	eng_head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	list.add_child(eng_head)
+	# **THE CHARTER'S DROP AND SWAP HAPPEN HERE** (GK): a slotted core rune is
+	# unequipped into his holding, and unequipping every one is allowed — a hero with
+	# no core rune is a legal state. Its enabler leaves the next fight with it; the rune
+	# is kept, held on him unworn (HR §1). `Run.toggle_engine` owns the rule; this
+	# panel only draws it. **A core rune applies at the SPAWN, never here**: the battle
+	# reads the slotted set once, as a fight opens, and nothing in it writes a slot.
+	_pouch_head(list, "CORE — %d of %d slots" % [worn_engines, Run.ENGINE_SLOTS],
+		Color(0.95, 0.75, 0.45))
+	for ei in erows.size():
+		if bool(erows[ei]["worn"]):
+			_pouch_engine_row(list, idx, member, erows, ei, worn_engines, sitting_runes, overlay)
+	for _empty in maxi(Run.ENGINE_SLOTS - worn_engines, 0):
+		# AN EMPTY SLOT IS DRAWN AND SAYS SO IN THE MAP CARD'S OWN WORD for one — the
+		# slot is the thing shown; HN §2.6's line below says where a core rune comes from.
+		_pouch_note(list, "— empty core slot —", Color(0.5, 0.48, 0.52), true)
 	if erows.is_empty():
 		# BATCH HN §2 — RULED BY THE DESIGNER: HL's line read as though a core rune
 		# arrives ATTACHED TO another rune — the confusion HL §1a closed — so the
 		# line says where one is found, and nothing about arriving with anything.
-		var no_eng := Label.new()
-		no_eng.text = "No core rune held. Core runes are found in play, alongside the others."
-		no_eng.add_theme_font_size_override("font_size", 12)
-		no_eng.add_theme_color_override("font_color", Color(0.6, 0.57, 0.55))
-		no_eng.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		list.add_child(no_eng)
-	for ei in erows.size():
-		var erow_d: Dictionary = erows[ei]
-		var er: Dictionary = erow_d["rune"]
-		var erow := HBoxContainer.new()
-		erow.add_theme_constant_override("separation", 10)
-		list.add_child(erow)
-		var e_on: bool = bool(erow_d["worn"])
-		var e_bag: bool = not e_on  # HR §1 — held unworn on him (HK: in the bag)
-		var etoggle := Button.new()
-		etoggle.custom_minimum_size = Vector2(84, 26)
-		etoggle.add_theme_font_size_override("font_size", 11)
-		etoggle.pressed.connect(Music.click)
-		if e_bag and worn_engines >= Run.ENGINE_SLOTS:
-			# BATCH HK §2 — BOTH SLOTS FULL: a held engine goes on in place of one.
-			etoggle.text = "Swap"
-			etoggle.tooltip_text = "Both core slots are filled. Swap this\ncore rune for one he has slotted."
-			etoggle.pressed.connect(_open_swap_chooser.bind(idx, "engines", ei, overlay))
-		else:
-			etoggle.text = "Unequip" if e_on else "Equip"
-			# BATCH HB §4 — THE REFUSAL IS `Run.engine_toggle_refusal`'s, and it has
-			# three causes now: both slots full (GK), unequipping the rune that
-			# dismisses the pet into a kit with no slot free to take it back, and
-			# (HK) unequipping into a full bag. The button is disabled on any and
-			# says which, so the refusal is never a silent no-op.
-			var e_why: String = Run.engine_toggle_refusal(member, ei)
-			etoggle.disabled = e_why != ""
-			if e_why != "":
-				etoggle.tooltip_text = e_why
-			etoggle.pressed.connect(_toggle_engine.bind(idx, ei, overlay))
-		erow.add_child(etoggle)
-		if e_bag:
-			erow.add_child(_held_drop_button(idx, "engines", int(erow_d["at"]), er, overlay))
-		var elbl := Label.new()
-		elbl.text = "%s%s — %s%s" % ["✦ " if e_on else "", er["name"], Runes.shown_desc(er),
-			"   (held)" if e_bag else ""]
-		elbl.add_theme_font_size_override("font_size", 12)
-		elbl.add_theme_color_override("font_color", Color(0.95, 0.75, 0.45) if e_on
-			else Color(0.62, 0.6, 0.57))
-		# BATCH HC §5 — A SLOTTED ENGINE THAT SITS OUT SAYS SO HERE, IN THE ORDINARY
-		# ROWS' OWN SHAPE (GX's tell, ruled): the sentence in place of the rule and
-		# the same amber, off the same door. It is the Rune of the Beastmaster beside
-		# the Rune of the Sharpshooter, and this panel is where either is unslotted.
-		if e_on and sitting_runes.has(String(er["name"])):
-			elbl.text = "✦ %s — %s" % [er["name"],
-				Run.rune_sits_out_note(String(er.get("id", "")),
-					Run.held_engines(member)).replace("\n", " ")]
-			elbl.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
-		# HR §1 — a held row's Drop takes its width out of the label, so the row stays
-		# inside the panel.
-		elbl.custom_minimum_size = Vector2(POUCH_TEXT_W - (HELD_DROP_W + 10 if e_bag else 0), 20)
-		elbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		erow.add_child(elbl)
+		_pouch_note(list, "No core rune held. Core runes are found in play, alongside the others.",
+			Color(0.6, 0.57, 0.55), false)
+	list.add_child(HSeparator.new())
 
-	if rows.is_empty():
-		var none := Label.new()
-		none.text = "No rune worn or held. A rune drops after every fight,\nand the Peddler sells them."
-		none.add_theme_font_size_override("font_size", 14)
-		none.add_theme_color_override("font_color", Color(0.6, 0.57, 0.55))
-		none.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		list.add_child(none)
-	var rows_box := VBoxContainer.new()
-	rows_box.add_theme_constant_override("separation", 5)
-	list.add_child(rows_box)
+	# ── WORN — his ordinary slots' runes ──
+	_pouch_head(list, "WORN — %d of %d slots" % [equipped, Run.rune_slots()],
+		Color(0.45, 0.9, 0.5))
+	if equipped == 0:
+		_pouch_note(list, "No rune worn.", Color(0.6, 0.57, 0.55), false)
 	for i in rows.size():
-		var row_d: Dictionary = rows[i]
-		var rune: Dictionary = row_d["rune"]
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 10)
-		rows_box.add_child(row)
-		var is_on: bool = bool(row_d["worn"])
-		var in_bag: bool = not is_on  # HR §1 — held unworn on him (HK: in the bag)
-		var toggle := Button.new()
-		toggle.custom_minimum_size = Vector2(84, 26)
-		toggle.add_theme_font_size_override("font_size", 11)
-		toggle.pressed.connect(Music.click)
-		if in_bag and equipped >= Run.rune_slots():
-			# BATCH HK §2 — EVERY SLOT FULL: a held rune goes on in place of one,
-			# which works on a full holding too, because one rune moves each way.
-			toggle.text = "Swap"
-			toggle.tooltip_text = "Every rune slot is filled. Swap this rune\nfor one he wears."
-			toggle.pressed.connect(_open_swap_chooser.bind(idx, "runes", i, overlay))
-		else:
-			toggle.text = "Unequip" if is_on else "Equip"
-			var why: String = Run.rune_toggle_refusal(member, i)
-			toggle.disabled = why != ""
-			if why != "":
-				toggle.tooltip_text = why
-			toggle.pressed.connect(_toggle_rune.bind(idx, i, overlay))
-		row.add_child(toggle)
-		if in_bag:
-			row.add_child(_held_drop_button(idx, "runes", int(row_d["at"]), rune, overlay))
-		var lbl := Label.new()
-		lbl.text = "%s%s — %s%s" % ["✦ " if is_on else "", rune["name"], Runes.shown_desc(rune),
-			"   (held)" if in_bag else ""]
-		lbl.add_theme_font_size_override("font_size", 12)
-		lbl.add_theme_color_override("font_color", Color(0.45, 0.9, 0.5) if is_on
-			else Runes.RUNE_TINT)  # HE §4 — no scope band; one tint
-		# BATCH GX — WORN, AND SITTING OUT. The row says so in place of the
-		# rune's own text, because this is the panel where the engine it waits
-		# on is re-slotted and where the slot it holds can be freed; the
-		# sentence is the hero sheet's, one door. **GT §3's Kit panel, one
-		# layer up** — same placement, same amber, same flattening, because a
-		# second shape for the same idea is a second thing to keep in step.
-		if is_on and sitting_runes.has(String(rune["name"])):
-			lbl.text = "✦ %s — %s" % [rune["name"],
-				Run.rune_sits_out_note(String(rune.get("id", "")),
-					Run.held_engines(member), Run.worn_rune_ids(member)).replace("\n", " ")]
-			lbl.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
-		lbl.custom_minimum_size = Vector2(POUCH_TEXT_W - (HELD_DROP_W + 10 if in_bag else 0), 20)
-		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		row.add_child(lbl)
+		if bool(rows[i]["worn"]):
+			_pouch_rune_row(list, idx, member, rows, i, equipped, sitting_runes, overlay)
+	list.add_child(HSeparator.new())
+
+	# ── HELD, NOT WORN — every rune he holds and does not wear, core runes first ──
+	#
+	# BATCH HR §1 — WHAT HE HOLDS, AND HOW FULL IT IS: a rune he unequips stays with
+	# him, unworn, and a full holding is why an Unequip is refused. The count is this
+	# section's own, and the line under it says what the section is.
+	_pouch_head(list, "HELD, NOT WORN — %d of %d" % [Run.held_count(member), Run.HERO_HOLD_CAP],
+		Color(0.85, 0.6, 1.0))
+	_pouch_note(list, "A rune taken off stays with him; Drop lets one go for good.",
+		Color(0.72, 0.66, 0.8), false)
+	var any_held := false
+	for ei in erows.size():
+		if not bool(erows[ei]["worn"]):
+			any_held = true
+			_pouch_engine_row(list, idx, member, erows, ei, worn_engines, sitting_runes, overlay)
+	for i in rows.size():
+		if not bool(rows[i]["worn"]):
+			any_held = true
+			_pouch_rune_row(list, idx, member, rows, i, equipped, sitting_runes, overlay)
+	if not any_held:
+		_pouch_note(list, "Nothing held. A rune drops after every fight, and the Peddler sells them.",
+			Color(0.6, 0.57, 0.55), false)
 
 	# BELOW THE SCROLLER, NEVER INSIDE IT: the one control the player needs to
 	# leave is the one thing on this panel that no text can move.
@@ -2303,9 +2240,142 @@ func _open_rune_panel(idx: int) -> void:
 	box.add_child(close)
 
 
+# BATCH IA §3 — a section's head: one line, centred, in the section's colour.
+func _pouch_head(list: VBoxContainer, text: String, color: Color) -> void:
+	var head := Label.new()
+	head.text = text
+	head.add_theme_font_size_override("font_size", 15)
+	head.add_theme_color_override("font_color", color)
+	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	list.add_child(head)
+
+
+# BATCH IA §3 — a line inside a section that is not a rune: an empty core slot, an
+# empty section, what a section is. An empty slot stands where a row would, so it
+# takes a row's height (`slot_row`); a line that speaks for the section does not.
+func _pouch_note(list: VBoxContainer, text: String, color: Color, slot_row: bool) -> void:
+	var note := Label.new()
+	note.text = text
+	note.add_theme_font_size_override("font_size", 12)
+	note.add_theme_color_override("font_color", color)
+	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	if slot_row:
+		note.custom_minimum_size = Vector2(0, 26)
+		note.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	list.add_child(note)
+
+
+# BATCH IA §3 — ONE CORE RUNE'S ROW, in CORE when it is slotted and in HELD, NOT WORN
+# when it is not. `ei` indexes `Run.engine_rows`, which the door it presses reads too.
+func _pouch_engine_row(list: VBoxContainer, idx: int, member: Dictionary, erows: Array,
+		ei: int, worn_engines: int, sitting_runes: Array, overlay: Control) -> void:
+	var erow_d: Dictionary = erows[ei]
+	var er: Dictionary = erow_d["rune"]
+	var erow := HBoxContainer.new()
+	erow.add_theme_constant_override("separation", 10)
+	list.add_child(erow)
+	var e_on: bool = bool(erow_d["worn"])
+	var e_bag: bool = not e_on  # HR §1 — held unworn on him (HK: in the bag)
+	var etoggle := Button.new()
+	etoggle.custom_minimum_size = Vector2(84, 26)
+	etoggle.add_theme_font_size_override("font_size", 11)
+	etoggle.pressed.connect(Music.click)
+	if e_bag and worn_engines >= Run.ENGINE_SLOTS:
+		# BATCH HK §2 — EVERY CORE SLOT FULL: a held core rune goes on in place of one.
+		etoggle.text = "Swap"
+		etoggle.tooltip_text = "Every core slot is filled. Swap this\ncore rune for one he has slotted."
+		etoggle.pressed.connect(_open_swap_chooser.bind(idx, "engines", ei, overlay))
+	else:
+		etoggle.text = "Unequip" if e_on else "Equip"
+		# BATCH HB §4 — THE REFUSAL IS `Run.engine_toggle_refusal`'s, and it has
+		# three causes: every core slot full (GK), unequipping the rune that
+		# dismisses the pet into a kit with no slot free to take it back, and
+		# (HK) unequipping into a full holding. The button is disabled on any and
+		# says which, so the refusal is never a silent no-op.
+		var e_why: String = Run.engine_toggle_refusal(member, ei)
+		etoggle.disabled = e_why != ""
+		if e_why != "":
+			etoggle.tooltip_text = e_why
+		etoggle.pressed.connect(_toggle_engine.bind(idx, ei, overlay))
+	erow.add_child(etoggle)
+	if e_bag:
+		erow.add_child(_held_drop_button(idx, "engines", int(erow_d["at"]), er, overlay))
+	var elbl := Label.new()
+	elbl.text = "%s — %s" % [er["name"], Runes.shown_desc(er)]
+	elbl.add_theme_font_size_override("font_size", 12)
+	elbl.add_theme_color_override("font_color", Color(0.95, 0.75, 0.45) if e_on
+		else Color(0.62, 0.6, 0.57))
+	# BATCH HC §5 — A SLOTTED CORE RUNE THAT SITS OUT SAYS SO HERE, IN THE ORDINARY
+	# ROWS' OWN SHAPE (GX's tell, ruled): the sentence in place of the rule and
+	# the same amber, off the same door. It is the Rune of the Beastmaster beside
+	# the Rune of the Sharpshooter, and this panel is where either is unslotted.
+	if e_on and sitting_runes.has(String(er["name"])):
+		elbl.text = "%s — %s" % [er["name"],
+			Run.rune_sits_out_note(String(er.get("id", "")),
+				Run.held_engines(member)).replace("\n", " ")]
+		elbl.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
+	# HR §1 — a held row's Drop takes its width out of the label, so the row stays
+	# inside the panel.
+	elbl.custom_minimum_size = Vector2(POUCH_TEXT_W - (HELD_DROP_W + 10 if e_bag else 0), 20)
+	elbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	erow.add_child(elbl)
+
+
+# BATCH IA §3 — ONE ORDINARY RUNE'S ROW, in WORN or in HELD, NOT WORN. `i` indexes
+# `Run.rune_rows`, which the door it presses reads too.
+func _pouch_rune_row(list: VBoxContainer, idx: int, member: Dictionary, rows: Array,
+		i: int, equipped: int, sitting_runes: Array, overlay: Control) -> void:
+	var row_d: Dictionary = rows[i]
+	var rune: Dictionary = row_d["rune"]
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	list.add_child(row)
+	var is_on: bool = bool(row_d["worn"])
+	var in_bag: bool = not is_on  # HR §1 — held unworn on him (HK: in the bag)
+	var toggle := Button.new()
+	toggle.custom_minimum_size = Vector2(84, 26)
+	toggle.add_theme_font_size_override("font_size", 11)
+	toggle.pressed.connect(Music.click)
+	if in_bag and equipped >= Run.rune_slots():
+		# BATCH HK §2 — EVERY SLOT FULL: a held rune goes on in place of one,
+		# which works on a full holding too, because one rune moves each way.
+		toggle.text = "Swap"
+		toggle.tooltip_text = "Every rune slot is filled. Swap this rune\nfor one he wears."
+		toggle.pressed.connect(_open_swap_chooser.bind(idx, "runes", i, overlay))
+	else:
+		toggle.text = "Unequip" if is_on else "Equip"
+		var why: String = Run.rune_toggle_refusal(member, i)
+		toggle.disabled = why != ""
+		if why != "":
+			toggle.tooltip_text = why
+		toggle.pressed.connect(_toggle_rune.bind(idx, i, overlay))
+	row.add_child(toggle)
+	if in_bag:
+		row.add_child(_held_drop_button(idx, "runes", int(row_d["at"]), rune, overlay))
+	var lbl := Label.new()
+	lbl.text = "%s — %s" % [rune["name"], Runes.shown_desc(rune)]
+	lbl.add_theme_font_size_override("font_size", 12)
+	lbl.add_theme_color_override("font_color", Color(0.45, 0.9, 0.5) if is_on
+		else Runes.RUNE_TINT)  # HE §4 — no scope band; one tint
+	# BATCH GX — WORN, AND SITTING OUT. The row says so in place of the
+	# rune's own text, because this is the panel where the engine it waits
+	# on is re-slotted and where the slot it holds can be freed; the
+	# sentence is the hero sheet's, one door. **GT §3's Kit panel, one
+	# layer up** — same placement, same amber, same flattening, because a
+	# second shape for the same idea is a second thing to keep in step.
+	if is_on and sitting_runes.has(String(rune["name"])):
+		lbl.text = "%s — %s" % [rune["name"],
+			Run.rune_sits_out_note(String(rune.get("id", "")),
+				Run.held_engines(member), Run.worn_rune_ids(member)).replace("\n", " ")]
+		lbl.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
+	lbl.custom_minimum_size = Vector2(POUCH_TEXT_W - (HELD_DROP_W + 10 if in_bag else 0), 20)
+	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	row.add_child(lbl)
+
+
 # BATCH GK — drop or swap one engine rune. The rule is `Run.toggle_engine`'s; a
-# refusal (both slots full, or — since HB — the pet with no slot to come back
-# to, or — since HK — a full bag to unequip into) is the disabled button, never a
+# refusal (every core slot full, or — since HB — the pet with no slot to come back
+# to, or — since HK — a full holding to unequip into) is the disabled button, never a
 # silent no-op here.
 func _toggle_engine(idx: int, engine_idx: int, overlay: Control) -> void:
 	if not Run.toggle_engine(Run.party[idx], engine_idx):

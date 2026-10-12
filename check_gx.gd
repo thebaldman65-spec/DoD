@@ -483,8 +483,11 @@ func _s3_the_three_surfaces() -> void:
 			ok(ov != null, "§3 %s (%s): the pouch did not open" % [rid, arm])
 			if ov == null:
 				continue
-			var told: Label = _label_with(ov, "✦ %s — %s" % [rname, GT_HEAD])
-			var ordinary: Label = _label_with(ov, "✦ %s — %s" % [
+			# BATCH IA §3 — RE-TUNED, THE QUESTION UNMOVED: the pouch's rows carry no ✦ any
+			# more — the WORN section says what is worn — so a row is the rune's name and then
+			# its rule, or GX's sentence in its place. The hero sheet keeps its ✦ (§3's sheet arm).
+			var told: Label = _label_with(ov, "%s — %s" % [rname, GT_HEAD])
+			var ordinary: Label = _label_with(ov, "%s — %s" % [
 				rname, Runes.shown_desc(Runes.build(rid))])
 			if engine_in:
 				ok(told == null and ordinary != null,
@@ -498,7 +501,7 @@ func _s3_the_three_surfaces() -> void:
 					pouch_said += 1
 					ok(String(told.text).contains(ername),
 						"§3 %s: the pouch row does not name the engine rune that brings it back" % rid)
-					ok(String(told.text) == "✦ %s — %s" % [rname, note.replace("\n", " ")],
+					ok(String(told.text) == "%s — %s" % [rname, note.replace("\n", " ")],
 						"§3 %s: the pouch row is not the one sentence, flattened" % rid)
 					ok(not String(told.text).contains("\n"),
 						"§3 %s: the pouch row carries a raw line break" % rid)
@@ -529,7 +532,7 @@ func _s3_the_three_surfaces() -> void:
 	mp._open_rune_panel(seat)
 	await Gate.frames(self, 3)
 	var cov: Node = Gate.overlay(mp, 60)
-	ok(cov != null and _label_with(cov, "✦ %s — %s" % [cname, Runes.shown_desc(cr)]) != null,
+	ok(cov != null and _label_with(cov, "%s — %s" % [cname, Runes.shown_desc(cr)]) != null,
 		"§3: the ungated control does not show its own rule in the pouch")
 	ok(cov != null and _label_with(cov, GT_HEAD) == null,
 		"§3: the ungated control is told it sits out")
@@ -857,7 +860,7 @@ func _s4b_the_panels_worst_case(mp: Node, seat: int, gated_two: Array, others: A
 	# "Close is fine" cannot be satisfied by a panel that drew no tell at all.
 	var told := 0
 	for nm in sitting:
-		var l: Label = _label_with(ov, "✦ %s — %s" % [String(nm), GT_HEAD])
+		var l: Label = _label_with(ov, "%s — %s" % [String(nm), GT_HEAD])
 		ok(l != null, "§4 (worst case): %s is not told it sits out" % nm)
 		if l == null:
 			continue

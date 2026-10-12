@@ -308,7 +308,7 @@ func _draw_detail() -> void:
 	passive_label.add_theme_color_override("font_color", Color(0.88, 0.85, 0.78))
 	passive_label.custom_minimum_size = Vector2(390, 0)
 	passive_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	# Two engines' text can outgrow the footprint one passive had, so the block
+	# Several engines' text can outgrow the footprint one passive had, so the block
 	# scrolls rather than running into the ability header (EG's scroller rule).
 	var passive_scroll := ScrollContainer.new()
 	passive_scroll.position = Vector2(60, 132 + stat_rows.size() * 22)
@@ -525,7 +525,9 @@ func _draw_detail() -> void:
 		var state := Label.new()
 		var is_on: bool = rune.get("equipped", false)
 		var sits: bool = is_on and sitting_runes.has(String(rune["name"]))
-		state.text = ("CREST" if Runes.is_party_rune(rune) else ("ENGINE" if rune.has("engine")
+		# BATCH IA §4 — THE PLAYER'S WORD IS CORE (HL §2's rename, finished on the two
+		# surfaces that still said ENGINE: this column and the kit preview, which reads it).
+		state.text = ("CREST" if Runes.is_party_rune(rune) else ("CORE" if rune.has("engine")
 			else "WORN")) if is_on else "held"
 		state.custom_minimum_size = Vector2(56, 20)
 		state.add_theme_font_size_override("font_size", 11)

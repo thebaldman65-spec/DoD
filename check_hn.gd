@@ -449,7 +449,9 @@ func _s2b_the_empty_pouch() -> void:
 	await Gate.frames(self, 2)
 	var ov2: Node = Gate.overlay(current_scene, 60)
 	if ov2 != null:
-		ov2_ok = Gate.has_text(ov2, "CORE RUNES — 1 of") and _label_with(ov2, POUCH_EMPTY) == null
+		# BATCH IA §3 — RE-TUNED, THE QUESTION UNMOVED: the core runes' heading is the CORE
+		# section's head now (`CORE — n of 3 slots`), where it read *CORE RUNES — n of 2 …*.
+		ov2_ok = Gate.has_text(ov2, "CORE — 1 of") and _label_with(ov2, POUCH_EMPTY) == null
 	ok(ov2_ok, "§2b: the Warrior holds a core rune and his pouch showed the empty line, or no core-rune header")
 	mage["engines"] = dropped
 

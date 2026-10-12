@@ -4,6 +4,58 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The third core slot, and the bag (Batch IA) — 2026-10-11
+
+**Why a figure paid or printed off a blow is the blow that landed.** HY spent a batch making the frame name whoever a site
+credits, because a frame naming the wrong body moved a magnitude. HZ found the same defect one layer out: Consecrated Ground's
+reflect was computed, printed and paid to Lifewell above the vow's gate, so a reflect that never landed still said *reflects N* and
+still watered the party. The designer ruled it fixed and named the rule: a figure printed or paid off a blow is the blow that
+landed. The two lines now ask the gate's own predicate, under the same frame the door reads, so the log, the heal and the door give
+one answer. The rest of the family — every other reader of a figure computed above that gate — is reported rather than repaired,
+because each is a different arm owing its own control.
+
+**Why three core slots is one constant and no save version.** The designer ruled three, twice, from play: *I was only able to
+equip two.* The cap turned out to be a flat constant that scaled with nothing, read by name at every site, and no save holds it —
+a save holds each rune's `equipped` flag, so a save written with two slotted simply opens with a third slot empty, and an older
+build opens a three-slotted save over its cap and loses nothing. A version bump would have made the older build refuse the save,
+and HL §5's ceiling makes that a decision; there was no new structure to justify it.
+
+**Why the slot ships with the screen.** The designer's words: *it ships with the screen that shows three, not as a loose
+constant.* A third slot with no third box is a slot the player cannot see, so the panel was rebuilt around it in the order the
+designer gave — the core slots, every one drawn, then the runes worn, then everything held and not worn — and the sections took
+over the state marks the rows used to carry. A list sectioned by state that also prints the state on every row says one thing
+twice. The empty slot is drawn so the third slot is visible before anything fills it — and that costs height: an empty slot is a
+line, so a hero holding many runes with a slot empty outgrows the screen where the same runes with every slot filled would fit. There
+the list scrolls with Close pinned, GT §1's shape for this panel; whether a list of buttons that outgrows the screen should page
+instead (HU §1) is the designer's to rule.
+
+**Why the kit preview stays flat.** It is read, not used: nothing moves from it, so it keeps its one list and its state column.
+The panel is where a rune moves between sections; the preview is where a hero's kit is looked at over a decision — two surfaces,
+two jobs, the distinction the designer drew for the crest strip and the chip.
+
+**Why the word is CORE.** HL §2 retired *engine* from what a player reads and kept it in the code. The hero sheet's state column,
+and the preview that borrows its words, still said ENGINE: the last of that rename, finished on the surfaces only.
+
+**Why an event's core rune waits unworn.** HL §1 ruled that one choice must never hand over two things with no announcement — a
+core rune slotted on arrival brings its card too. The cache and the drop already held a core rune unworn; the event verb could still
+slot one through its fallback, and a third slot meant one more free slot to slot it into.
+
+**Why Boil Over's rate stands though its tension is real.** The designer's: the card has never been cast in a real fight, so its
+next number, and any Perfect, come from play. The tension is recorded rather than tuned: a full bar converts worse per point than
+the median Rage card, because the pass condition compares one dump with two ordinary turns and ignores the five turns the bar took
+to fill. The figure it should be read against next is the health of what it kills, and the lever — a rate that rises with the
+fraction poured — is written down and not built.
+
+**Why the crest's comeback runes are kept.** Empty Pulpit, Dead Air and Dirge were expected never to pay; they pay after a fall,
+which makes them comeback runes rather than broken ones, and they read as a set. The finding is the pool — three of the four live
+crest runes are insurance against disaster — and the way out is a condition that is not a death, which the game already reads.
+Whether a fallen hero stays down between fights now prices three of the four, so that ruling comes before any re-cut.
+
+**Why the telegraph keeps its band, the mirror its point, and Tithe its chip.** The band is the line every card in the hand already
+speaks; a percentage alone would be less, in a unit nothing else uses. The mirror rounds per body because every per-body effect
+does, and the alternative is a subtraction coupling two bodies — the shape that once produced 0.09999999999999998. Tithe's chip is
+the crest strip's, which shows what the party wears; a chip that came and went at every Break would be noise.
+
 ## The eyes, and the Rage dump (Batch HZ) — 2026-10-09
 
 **Why the vow's carried half is the attacker's after all.** The designer ruled HY's first question the other way, for four

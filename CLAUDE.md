@@ -1955,7 +1955,9 @@ as a bug.
   *wait, or dump now*, and a dump that is correct at its floor is not a decision. **Its floor is a fraction of the bar,
   so it scales; and where an engine multiplies the dump, the figure with the engine is the one read.** The rate is a
   tuning handle in `docs/state.md`; `check_hz` §2 prices the card against every Rage card on one board and asserts the
-  shape.
+  shape. **NOTHING IS AUTHORED ONTO A CARD NOBODY HAS CAST (IA §0.1 and §0.5, the designer's)**: its rate stands at the
+  figure it shipped with and it carries no Perfect until play says otherwise — the next change to either comes from the
+  designer's hands, never from a batch's arithmetic, and the tension in the rate is recorded beside it, not tuned away.
 
 ## STANDING RULE — THE ENGINE RUNE CHARTER (Batch GK, the designer's)
 > **THERE ARE NO SPECS AND NO CORE ENGINES.** A hero is a CLASS. Everything that made a spec what it
@@ -1972,10 +1974,10 @@ as a bug.
 > **AT CLASS SELECTION, BEFORE THE FIRST BATTLE, a hero is dealt THREE of his class's six and takes
 > ONE.**
 >
-> **A HERO MAY HOLD TWO ENGINE RUNES**, in **two dedicated slots** that do not compete with ordinary
+> **A HERO MAY HOLD THREE ENGINE RUNES**, in **three dedicated slots** that do not compete with ordinary
 > runes.
 >
-> **THE SECOND COMES FROM THE ORDINARY RUNE POOL**, mixed in with everything else — still only ever
+> **THE OTHERS COME FROM THE ORDINARY RUNE POOL**, mixed in with everything else — still only ever
 > that class's six.
 >
 > **ENGINE RUNES CAN BE DROPPED AND SWAPPED, INCLUDING TO NOTHING.** A hero with no engine has no
@@ -1994,6 +1996,11 @@ travels still sits outside the slot count and still leaves when the engine leave
 Beastmaster's three summons were the one stated exception to *only what it cannot run without*, and HB retired it by
 putting the pet in every Hunter's CLASS KIT: an engine no longer has to bring what the class already holds. The block
 *EVERY HUNTER HAS A PET* below is the rule that replaced it.
+**AND ITS SLOT COUNT IS IA §2's, RECORDED OVER GK's *two* — RULED BY THE DESIGNER, TWICE, AND FOUND IN PLAY: *I was only
+able to equip two*.** The count is `Run.ENGINE_SLOTS` and every reader asks it by name; no save carries it — a save
+holds each core rune's `equipped` flag, never a slot count — so a save written with two slotted opens with three slots and
+the third empty, and the raise moved no save version. **Whether three cores dilute the directional is watched in play,
+not argued** (`docs/state.md`, with the lever — an earned third slot — recorded and unbuilt).
 - **THE TEST, APPLIED PER ENGINE: WITHOUT THE CARD — WITH THE CLASS BASIC AND THE CLASS KIT EVERY HERO HOLDS — DOES
   THE ENGINE PAY ANYTHING AT ALL?** If not, ONE card travels: the one that produces what the engine reads. If so,
   nothing does. **Where several cards would each serve, which one travels is a ruling**, and a batch's derivation
@@ -2010,12 +2017,14 @@ putting the pet in every Hunter's CLASS KIT: an engine no longer has to bring wh
   in the bag before).** The Peddler
   never offers one (`Run.peddler_rune`); a cache, the bargain and the drop still do. **A slotted engine brings its
   enablers, so `Run.hold_rune` slots an engine rune only when its caller asks, and the player's cache answer never
-  asks**: until HL one pick could hand over a rune and a card — the designer's *Fireball dragging Razor Ice*, which no
-  draft does (`docs/reports/HL.md` §1). Class selection still slots the one taken, and its card names what it brings.
+  asks** — nor, since IA §2, does the event verb. Its grant prefers an ordinary rune but can hand him a core one once
+  his ordinary pool is spent, and until IA it asked to slot that into a free core slot (a third slot is one more free).
+  Until HL one pick could hand over a rune and a card — the designer's *Fireball dragging Razor Ice*, which no draft does
+  (`docs/reports/HL.md` §1). Class selection still slots the one taken, and its card names what it brings.
   **The cache's bag is CONFIRMED at HN §2 (the designer's; since HR §1 the rune waits unslotted on its hero, not in the
   bag)**: slotting on the pick is the mechanism that produced the
-  defect — one choice handing over two things with no announcement — and a core rune is a two-slot directional
-  decision the player makes at the panel.
+  defect — one choice handing over two things with no announcement — and a core rune is a directional decision the
+  player makes at the panel, three slots deep since IA §2.
 - **A LINEAGE OPENS WITH ITS ENGINE'S ENABLERS AND NOTHING ELSE, AND NO ENGINE REPLACES THE CLASS BASIC.**
   `Classes.lineage_opening` is the lineage's term in `Classes.opening_kit`, and `spec_abilities` is a lineage's
   DEFINITION table, not its opening kit. The four basics that were overrides (Fireball, Frostbolt, Arcane Explosion,
@@ -2031,7 +2040,7 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
 - **BUILT (GK):** the fifteen engines that existed are engine runes — `data/runes.json` names each by
   its passive id in `engine`, scoped to its class, so a Warrior can never hold Burn. The draft of three
   at class selection (`Run.deal_engines`, frozen on the member; `Run.awaken` is the one door, the
-  sim's too). Two slots in `member["engines"]`, apart from the three ordinary ones. The second from the
+  sim's too). Two slots in `member["engines"]` (three since IA §2), apart from the three ordinary ones. The second from the
   ordinary pool (`eligible_ids` rolls them; `Run.hold_rune` slots one). Drop and swap, to nothing
   (`Run.toggle_engine`, from the map's rune pouch). The enabler travels, leaves, and sits outside the
   slot count (`Classes.opening_kit`, the one kit builder; `Classes.lineage_slots`). **`passive_id` is
@@ -2121,7 +2130,8 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
 - **THE POUCH COULD STRAND THE PLAYER, AND THE CAUSE WAS A STACK, NOT A STRING.** Its Close, the only way out, sat at
   the foot of a fixed stack whose engine rows grew with each rule — wholly below the 720-pixel screen for four engines
   held alone, all sixty pairs of one class's engines and every class's six. **A hero can have up to all six of his
-  class's engine runes to hand — two slotted, and the rest held unworn on him (in the bag from HK to HR) — and his panel
+  class's engine runes to hand — three slotted since IA §2 (two until then), and the rest held unworn on him (in the bag
+  from HK to HR) — and his panel
   lists every one with
   its rule**: size a screen for every combination it can hold, not the one it opens with.
 - **THE PEDDLER WAS THE SAME CAUSE ON A SECOND SURFACE**: offers laid at a fixed pitch whatever their text, so a long
@@ -2138,7 +2148,8 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   reopens on the page it last showed for that hero; **the keys keep their slots whatever page shows, and no key turns a page.**
   A card on page two is the same button through the same builder, so its skill check, its cooldown and its refusal read as
   they do on page one (`check_hu` §1 casts one through the real turn).
-- **IN NORMAL PLAY THE LIST FITS ONE PAGE** — kit, both core runes' enablers and a full slot ladder (HU's reading; `check_hu`
+- **IN NORMAL PLAY THE LIST FITS ONE PAGE** — kit, every enabler his core runes bring (two at most whatever the slot count:
+  no class has a third lineage engine that brings one) and a full slot ladder (HU's reading; `check_hu`
   §1a prints the live figure and reds the day it stops being true). **What overflowed it was the debug menu's unlock-all**,
   which held a Mage's Fireball, Frostbolt and Blizzard past every hotkey and off the top of the screen. **A crest rune that
   grants a card adds to every bar outside the slot count** (HN §3d), so it is the first thing in play that could reach a second
@@ -2148,12 +2159,14 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
 > **Three surfaces show the player what the game already knows, and each is bounded by what it must not become.** The
 > enemy's telegraph is a fight rule, in `docs/combat-rules.md`'s intent block.
 
-- **THE KIT PREVIEW IS READ-ONLY, AN OVERLAY, AND IA's LAYOUT IS NOT ITS TO DRAFT** (`scripts/kit_preview.gd`). It opens
+- **THE KIT PREVIEW IS READ-ONLY, AN OVERLAY, AND ONE FLAT LIST** (`scripts/kit_preview.gd`). It opens
   from every draft surface on the hero whose decision it is, and from the Peddler on the first hero, walking all four —
   the purse is the party's. **A preview that can equip is the rune panel**, and one that loses the staged choice under
   it is worse than none: it frees only itself. It reads the hero sheet's doors in the sheet's own words — the state
   column, the `(core)` suffix, HR's ✦ marker — and its text scrolls inside a bounded frame with Close outside it (GT
-  §1's shape; it lists no buttons, so HU §1's pager is not its rule).
+  §1's shape; it lists no buttons, so HU §1's pager is not its rule). **IA §3 sectioned the hero's rune panel and left
+  this list flat, keeping its state column**: the panel is where a rune is moved, the preview is read, and a read-only
+  list is a different surface — the chip bullet's distinction, applied again.
 - **THE NAMEPLATE IS A SECOND HIT AREA FOR THE SAME TARGET, NOT A TARGETING MODE.** A left click on a target's plate —
   on a chip or the intent line on it — during targeting is a click on its body (`BattleUnit._on_plate_input`); **outside
   targeting it does what it always did: nothing.** It changes nothing about what is targetable, and it is the other
@@ -2164,6 +2177,11 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   crest strip, never one per hero slot (HL §4's failure). **Its words read every magnitude off the payload, never off
   the rune's authored line** (`battle._refresh_rune_chips`): HQ moved Dead Air's, and a chip copying the line would
   have been wrong the batch after.
+  · **TWO SURFACES, TWO JOBS (IA §0.7, the designer's). THE CREST STRIP SHOWS THE CREST THE PARTY WEARS, BECAUSE IT IS
+    THE PARTY's ONE SLOT; THE CHIP's ARMED OR PAYING SAYS WHETHER IT PAYS; A HERO's PLATE TAKES A CHIP ONLY FOR A PAYOUT
+    THAT TURNS ON AND OFF.** So Tithe's chip, which has no condition and reads PAYING whenever worn, is the strip's and
+    breaks nothing above. Drawing it only as it pays was rejected: a chip that appears and vanishes at every Break is
+    noise, on the most common event in the game.
 
 ## STANDING RULE — A CARD OR A RUNE THAT CANNOT PAY WITHOUT ITS ENGINE SITS OUT WHILE THE ENGINE IS GONE (Batch GT §3 for a card, GX §1 for a rune, ruled by the designer)
 > **An earned card the usability door refuses on every board without its engine is left out of every fight while
@@ -3719,7 +3737,7 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
   held unworn by `Run.hold_on_hero` on the hero of its class (`Run.holder_index`: the first who can wear it, with room
   first). The drop, a cache, a bargain, the Peddler's Buy and the event verb all route through it. **A rune no hero here
   can wear stays in the bag, kept, never destroyed** (`Run.bag_strays`).
-- **A WORN RUNE IS IN NO COUNT.** The three slots, the two core slots and the crest are not part of either cap.
+- **A WORN RUNE IS IN NO COUNT.** The three slots, the core slots and the crest are not part of either cap.
 - **A FULL HOLDING IS A CHOICE FOR A GRANT AND A WALL FOR A PURCHASE — CT §3's TWO WALLS.** A grant queues on
   `pending_rune_drops`, and the map's panel (`map_screen._check_rune_drops`, chained after the pouch's swap offer) shows it
   beside the holding it is bound for (`Run.pending_holder`: a hero's unworn runes, or the bag) — drop one to take it, or
@@ -3728,6 +3746,15 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
   one rune each way — is the way through.**
 - **A HERO'S RUNE PANEL LISTS HIS OWN LISTS ONLY** (`Run.rune_rows`, `engine_rows`): what he wears and what he holds,
   each held rune with a Drop that asks twice; the bag's rows are the crest's (`party_rune_rows`).
+  · **IN THREE SECTIONS, IN THE DESIGNER'S ORDER, EACH SEPARATED (IA §3): CORE — every core slot drawn, an empty one
+    too — then WORN, then HELD, NOT WORN, core runes first** (`map_screen._open_rune_panel`). **THE SECTIONS ARE THE
+    STATE**: no row prints a worn mark or *(held)*, because a list sectioned by state that also says the state on
+    every row says one thing twice; and the panel counts what he holds once, in that section's head. The nameplate's
+    ✦ count stays — the map's one glance at a holding, outside the panel. A rune moved by Equip, Unequip or Swap
+    re-opens the panel in its new section. **The crest's bag is not sectioned**: its rows are the crest's. **AN EMPTY
+    CORE SLOT IS A ROW, SO FEWER SLOTTED IS TALLER**: the panel is longest with every slot empty and the holding full,
+    and a hero holding his six with a slot empty can scroll — GT §1's scroll, Close pinned; `check_gt` §1 walks every
+    slot count, and whether it pages is owed (`docs/state.md`).
 - **THE NAMEPLATE CARRIES THE COUNT OF RUNES HE HOLDS UNWORN, READ OFF THE HOLDING AT EVERY DRAW** (`Run.held_count`): it
   clears when nothing is waiting and never because a menu was opened — *a count that lies is worse than none*. The bag's
   row carries the crest's own count. **A drop is announced on the map naming the hero** (`Run.last_drop`, read once),
@@ -3798,6 +3825,10 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
     over**: a roster that can leave a class out (not a batch — at least four standing rules rest on one hero a class);
     the fallen staying down between fights (a difficulty ruling of its own, still open, and it made only the fallen
     rune real); and leaving the runes unauthored. `docs/reports/HO.md` §3c prices all four.
+  · **THE RE-READ IS LOAD-BEARING FOR THE CREST POOL, NOT A CONVENIENCE (IA §0.2, the designer's).** Three of the four
+    live crest runes — Dirge, Dead Air, Empty Pulpit — are COMEBACK runes: every fight opens with all four standing, so
+    each pays only after a fall, and only because the condition is read again at every death. Read once at the spawn
+    they would never pay. **A batch that narrows the re-read deletes three runes in silence.**
 - **THE LIVE DOOR (HP §1).** `Talents.LIVE_KEYS` are `heroes_include_class`, `heroes_lack_class`, `heroes_class_count`,
   `heroes_hold_core` and `heroes_all_standing`, both values — **every key on who stands**. **`heroes_hold_core` joined
   them at HQ §1 (ruled)**: nothing in the battle writes an engine's slot (GM §2), but the key counts the heroes who
@@ -4544,7 +4575,7 @@ exactly the inverted card, and it would still read fine on the tooltip.
 
 > **An ENGINE is a rule that changes how a hero fights, for the whole run** (GK's charter) — stances,
 > Loyalty, Focus, Resonance, Ruin, Faith, Mercy, Overburn, Glacial Hold, Frenzy, Block. **Exclusive to its
-> class, held as a rune, two a hero at most.** This is where identity lives.
+> class, held as a rune, three a hero at most (two until IA §2).** This is where identity lives.
 >
 > **An AXIS is an effect type** — single-target damage, area damage, healing, shielding,
 > mitigation, control, tempo, Break, resource generation, meter manipulation. **Shared, and
@@ -4704,7 +4735,7 @@ Chilled.** The difference is not size and it is not confidence:
 **THREE VOCABULARIES, AND THEY ARE NOT THE SAME ONE.** DR separated the first two; EK adds the
 third and it is the only one the player ever sees.
 
-> **An ENGINE is a rule a hero holds as a rune** (GK). Exclusive to its class, two a hero at most. Identity.
+> **An ENGINE is a rule a hero holds as a rune** (GK). Exclusive to its class, three a hero at most (IA §2). Identity.
 > **An AXIS is an effect type** — single-target damage, healing, control, tempo. Shared, internal
 > to the design audits, and **never shown to a player**.
 > **A TAG is what a card is FOR**, in seven words the player reads on the draft card:

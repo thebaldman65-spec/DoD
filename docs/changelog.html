@@ -16,6 +16,57 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-11 &mdash; Batch IA: THE THIRD CORE SLOT, AND THE BAG</h2>
+<p><b>Every hero now carries three core slots, and his rune panel shows them in three sections.</b> One line in the damage path
+was also fixed, HZ's seven questions were answered, and one stale sentence in the instrument rules was repaired. Full working:
+<code>docs/reports/IA.md</code>. IA opens the I block; the next letter is IB.</p>
+
+<p><b>&sect;0 &mdash; HZ's SEVEN QUESTIONS, ANSWERED (the designer's).</b> One changed the game (&sect;1 below). The other six were
+confirmed and their reasons written down where a later batch will meet them: Boil Over keeps 0.8% of Attack a point and its 40%
+floor, with the tension in that rate recorded beside it; Empty Pulpit, Dead Air and Dirge are kept as comeback runes; the enemy's
+telegraph keeps its damage band; Penance keeps rounding per body; Boil Over stays without a Perfect; and Tithe's chip stays.</p>
+
+<p><b>&sect;1 &mdash; THE REFLECT SAYS AND PAYS WHAT LANDED.</b> When a Cleric wearing Vow of Silence lays Consecrated Ground, his vow
+silences its reflect &mdash; and the combat log still said <i>reflects N</i>, and Lifewell still healed the heroes off a reflect that
+never landed. Both now read what actually landed: a silenced reflect prints nothing and heals nobody; with the vow off, nothing
+changes. (Nothing in the game writes Lifewell today &mdash; its talent went at FX and its one rune is retired &mdash; so this reaches a
+saved run that still wears the Burning Censer.)</p>
+
+<p><b>&sect;2 &mdash; THREE CORE SLOTS.</b> A hero can now slot three core runes where he could slot two. A run saved with two slotted
+opens with the third slot empty; the save format did not change. A core rune still takes effect at the start of the next fight,
+never in the middle of one, and taking one from a cache, a drop or an event never slots it for you &mdash; an event's fallback could
+until now, and no longer does. When every core slot is full, the button reads <i>Every core slot is filled</i>. The hero card's
+line naming his core runes now wraps inside the card instead of running past it.</p>
+
+<p><b>&sect;3 &mdash; THE RUNE PANEL IN THREE SECTIONS.</b> A hero's rune panel lists, in this order and separated: his <b>core
+slots</b> (every one drawn, an empty one marked <i>&mdash; empty core slot &mdash;</i>), the runes he <b>wears</b>, and every rune he
+<b>holds and does not wear</b>, core runes first. The sections replace the marks the rows used to carry (the &#10022; and
+<i>(held)</i>), and what he holds is counted once, in that section's heading. The mark on his nameplate on the map stays; the
+Crest's bag is unchanged; the kit preview stays one list. An empty core slot takes a line too, so a hero holding many runes &mdash; or
+all six of his core runes with a slot empty &mdash; has a list that scrolls, with Close where it always is; whether that list should
+page instead is the designer's to rule.</p>
+
+<p><b>&sect;4 &mdash; THE WORD IS CORE.</b> The hero sheet's rune column, and the kit preview, said ENGINE for a slotted core rune; they
+say CORE now, the word every other screen uses.</p>
+
+<p><b>&sect;5 &mdash; ONE STALE SENTENCE.</b> The instrument rules said five places in the battle code spell one particular walk; there
+are nine, and the sentence now points at the check that prints the live count instead of stating a number.</p>
+
+<p><b>&sect;6 &mdash; HZ's SCRATCH COPIES WERE NOT CLEARED.</b> Moving its fifteen leftover user-data folders to the Trash was refused
+by the session, so they stay; the report gives the one command that moves them.</p>
+
+<p><b>The checks.</b> A new check, <code>check_ia</code>, drives every one of these on the real screens, in real fights and through a
+real save, each with the case that must show nothing: the reflect with the vow and without it, the panel for a hero holding nothing
+and for one holding every kind, a rune moved between sections and the panel read again, the holding cap, a save written with two
+slotted and read back, a core rune slotted between fights, and the event's door. <code>check_gt</code> opens the rune panel for
+every set of core runes a hero can slot &mdash; up to three now, so its count grows with the sets &mdash; and no longer expects a held
+row to say <i>(held)</i>; and because an empty core slot is a line, it now opens a class's six and a full holding at every slot count,
+where it first opened them only with every slot filled (the shortest case, which HEAD's own check showed by finding the Cleric's six
+with two slotted scrolling); <code>check_hu</code> measures the battle bar over the same sets. <code>check_hn</code>,
+<code>check_hr</code>, <code>check_hf</code> and <code>check_gx</code> read the panel's section heads and its rows without the
+marks, and <code>check_hz</code> reads CORE in the kit preview. <code>check_ea</code> and <code>check_eh</code> already walked every
+set of core runes a hero can hold, so their counts grew with the third slot without a line changing.</p>
+
 <h2>2026-10-09 &mdash; Batch HZ: THE EYES, AND THE RAGE DUMP</h2>
 <p><b>Four things on screen that show the player what the game already knows, one line in the damage path, and Boil Over
 rebuilt as a Rage dump.</b> Every one of the four exists because the designer had to guess at something the game knew. Full

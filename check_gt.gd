@@ -1,9 +1,10 @@
 # BATCH GT — THE POUCH TRAP, THREE CARDS AT THE BASELINE, AND A CARD THAT SITS OUT.
 #
 #   §0  THE PLAYER'S FILES, AS FOUND — and this process writes the harness save
-#   §1  THE POUCH NEVER TRAPS THE PLAYER — every engine rune held alone, every pair
-#       of one class's six, and each class's six held at once (two slotted, four
-#       kept — in the bag since HK), each with the pouch empty and with an ordinary
+#   §1  THE POUCH NEVER TRAPS THE PLAYER — every set of up to `Run.ENGINE_SLOTS` of one
+#       class's six slotted (alone, pairs and, since IA, triples), and each class's six
+#       held at once (the cap slotted, the rest kept on him unworn — in the bag from HK
+#       to HR), each with the pouch empty and with an ordinary
 #       rune beside them (his class's longest, in the bag): Close is on the screen,
 #       at ONE place in every configuration, outside every scroller, and pressing it
 #       closes the pouch; every rule is drawn whole, at its size, inside the
@@ -368,28 +369,49 @@ func _s1_the_pouch() -> void:
 	ok(Gate.scene_name(self) == "Map", "§1: the map is not on screen (%s)" % Gate.scene_name(self))
 	if Gate.scene_name(self) != "Map":
 		return
+	# **BATCH IA §2 — EVERY SET HE CAN SLOT, READ OFF THE CAP.** GT walked every engine
+	# alone, every pair and each class's six with two slotted, because two was the cap;
+	# with three slots a hero can wear three, so the walk is every set of up to
+	# `Run.ENGINE_SLOTS` of a class's six (`Gate.engine_sets`, the one enumeration),
+	# slotted, and each class's six. The count is derived from the cap: C(6,1) + … +
+	# C(6,cap) a class, and its six at every slot count from none to the cap.
+	#
+	# **AND THE SIX AT EVERY SLOT COUNT, NOT ONLY THE CAP's (IA §3, found by recon 2).**
+	# An empty core slot is a row since the panel drew its sections, so a six with a
+	# slot empty is TALLER than the six with every slot filled: this walk first took the
+	# six with the cap slotted, which is the SHORTEST six, and HEAD's gate on IA's code
+	# found the Cleric's six with two slotted scrolling where this one read green.
+	var cap := int(_run.ENGINE_SLOTS)
 	var configs: Array = []
+	var want_configs := 0
 	for key in SEATS:
 		var six := _six(key)
-		for a in six:
-			configs.append(["%s alone" % a, key, [a], "alone"])
-		for i in six.size():
-			for j in range(i + 1, six.size()):
-				configs.append(["%s + %s" % [six[i], six[j]], key, [six[i], six[j]], "pair"])
-		configs.append(["the %s's six" % key, key, six, "six"])
-	ok(configs.size() == 88, "§1: %d configurations — 24 alone, 60 pairs and 4 sixes expected" % configs.size())
+		for es in Gate.engine_sets(six, cap):
+			var set_: Array = es
+			if set_.is_empty():
+				continue
+			var kind: String = ["", "alone", "pair", "triple"][mini(set_.size(), 3)] if set_.size() <= 3 else "set"
+			configs.append([" + ".join(PackedStringArray(set_)) + (" alone" if set_.size() == 1 else ""), key, set_, kind])
+		for slots_n in range(cap + 1):
+			configs.append(["the %s's six, %d slotted" % [key, slots_n], key, six, "six", slots_n])
+		want_configs += Gate.engine_sets(six, cap).size() + cap
+	ok(configs.size() == want_configs and cap >= 2,
+		"§1: %d configurations — every set of up to %d of each class's six, and its six at every slot count from none to %d: %d expected" % [
+			configs.size(), cap, cap, want_configs])
 	var pinned := Rect2()
 	var have_pin := false
 	var seen := 0
 	var closed := 0
 	var sat_rows := 0
 	var scrolled: Array = []
-	var worst := {"alone": ["", 0, 0], "pair": ["", 0, 0], "six": ["", 0, 0]}
+	var scrolled_open: Array = []
+	var worst := {"alone": ["", 0, 0], "pair": ["", 0, 0], "triple": ["", 0, 0], "set": ["", 0, 0], "six": ["", 0, 0]}
+	var want_sat := 0
 	var scroll_h := 0
 	# **BATCH HK — THE SAME RUNES TO HAND, HELD WHERE THE GAME HOLDS THEM NOW.** HEAD
 	# kept the four unslotted engines, and the ordinary rune, on the hero; since HK a
 	# rune nobody wears is in the bag, and the pouch lists the bag's runes he may wear
-	# after what he wears, each marked *(in the bag)*. So the two slotted stay on him
+	# after what he wears, each marked *(in the bag)*. So the slotted stay on him
 	# and the rest go into the bag — and the ordinary rune is his CLASS's longest,
 	# because the bag's rows are the runes he may wear (`deepening_hex`, a Cleric's,
 	# is not a row on a Warrior's pouch; on HEAD's it was, off his own list).
@@ -398,14 +420,20 @@ func _s1_the_pouch() -> void:
 			var idx := SEATS.find(String(c[1]))
 			var held: Array = []
 			var bagged: Array = []
+			var slots_n: int = int(c[4]) if (c as Array).size() > 4 else cap
 			for k in (c[2] as Array).size():
 				var r: Dictionary = Runes.build(String(c[2][k]))
-				r["equipped"] = k < 2
-				(held if k < 2 else bagged).append(r)
+				r["equipped"] = k < slots_n
+				(held if k < slots_n else bagged).append(r)
+			# THE PACK BOND PAIRING SITS OUT WHEREVER BOTH ARE SLOTTED (HC §5): counted off the
+			# configuration, so the sentence's rows are asserted against the walk.
+			var slotted_ids: Array = held.map(func(x): return String((x as Dictionary).get("id", "")))
+			if slotted_ids.has("engine_beastmaster") and slotted_ids.has("engine_sharpshooter"):
+				want_sat += 1
 			if ordinary != "":
 				bagged.append(Runes.build(_longest_ordinary(String(c[1]))))
 			# BATCH HR §1 — HELD ON HIM AGAIN (HK put them in the bag): the unslotted engines
-			# ride his engine list unworn after the two slotted, and the ordinary rune his
+			# ride his engine list unworn after the slotted, and the ordinary rune his
 			# own list, so the pouch draws them as his held rows. `bagged` keeps its name: it
 			# is the set of runes he holds and does not wear, which was the bag's.
 			var e_list: Array = held.duplicate()
@@ -453,10 +481,9 @@ func _s1_the_pouch() -> void:
 					want_text = _run.rune_sits_out_note(String(er["id"]),
 						_run.held_engines(_run.party[idx])).replace("\n", " ")
 					sat_rows += 1
-				# HK — a bag row carries its rule and then says where the rune is; HR §1 —
-				# a row he holds says so.
-				if bagged.has(er):
-					want_text += "   (held)"
+				# BATCH IA §3 — A ROW SAYS NO STATE: the section it stands in says it (HK's
+				# *(in the bag)* and HR's *(held)* went with the sections), so a held row ends
+				# on its rule as a slotted one does.
 				ok(l != null and String(l.text).ends_with(" — " + want_text),
 					"§1: %s — %s's %s is not drawn whole" % [label, er["id"],
 						"sits-out sentence" if sat_out.has(String(er["name"])) else "rule"])
@@ -475,7 +502,15 @@ func _s1_the_pouch() -> void:
 				var content_h := (sc.get_child(0) as Control).get_combined_minimum_size().y
 				scroll_h = int(sc.size.y)
 				if content_h > sc.size.y + 0.5:
-					scrolled.append(label)
+					# BATCH IA §3 — A SIX WITH A CORE SLOT EMPTY MAY SCROLL, and only it among
+					# these: the panel already spans the screen (`POUCH_RECT`), so where its
+					# empty slots' rows push the list past the room it has, the longest
+					# genuinely cannot fit — GT §1's scroll, Close pinned (asserted above for
+					# every configuration). Every slot filled, nothing scrolls, as at HEAD.
+					if String(c[3]) == "six" and slots_n < cap:
+						scrolled_open.append("%s %d px" % [label, int(content_h)])
+					else:
+						scrolled.append(label)
 				var kind := String(c[3])
 				if ordinary == "" and eng_h > float(worst[kind][1]):
 					worst[kind] = [String(c[0]), int(eng_h), int(content_h)]
@@ -488,14 +523,19 @@ func _s1_the_pouch() -> void:
 				closed += 1
 	ok(scrolled.is_empty(), "§1: the text scrolls for %d configurations, first %s — the pouch is not sized to its longest" % [
 		scrolled.size(), str(scrolled.slice(0, 3))])
-	ok(seen == 176 and closed == 176, "§1: Close drawn in %d and pressed shut in %d of 176" % [seen, closed])
+	print("    [record] a six with a core slot empty scrolls in %d of %d, Close pinned in each — %s" % [
+		scrolled_open.size(), 2 * cap * SEATS.size(), ", ".join(PackedStringArray(scrolled_open))])
+	ok(seen == 2 * configs.size() and closed == 2 * configs.size(),
+		"§1: Close drawn in %d and pressed shut in %d of %d" % [seen, closed, 2 * configs.size()])
 	# BATCH HC §5 — THE ONE SLOTTED PAIRING THAT SITS OUT, AND ONLY IT: the Rune of
-	# the Beastmaster beside the Rune of the Sharpshooter, which is one pair and the
-	# Hunter's six (its first two slots), in both pouches — four rows. Fewer is a
-	# tell gone missing; more is a tell drawn on an engine that pays.
-	ok(sat_rows == 4, "§1: %d engine rows drew the sits-out sentence — the Pack Bond pairing appears in 4" % sat_rows)
+	# the Beastmaster beside the Rune of the Sharpshooter, wherever both are slotted —
+	# one pair, and since IA four triples and the Hunter's six with two or three slotted
+	# (its first two slots) — in both pouches, counted off the walk (`want_sat`). Fewer
+	# is a tell gone missing; more is a tell drawn on an engine that pays.
+	ok(sat_rows == want_sat and want_sat >= 4,
+		"§1: %d engine rows drew the sits-out sentence — the Pack Bond pairing is slotted in %d" % [sat_rows, want_sat])
 	print("    Close at %s in all %d configurations; pressed shut in %d" % [str(pinned), seen, closed])
-	for kind2 in ["alone", "pair", "six"]:
+	for kind2 in ["alone", "pair", "triple", "six"]:
 		print("    the longest %s: %s — its rules %d px, the list %d px in a %d px scroller" % [
 			kind2, worst[kind2][0], worst[kind2][1], worst[kind2][2], scroll_h])
 	# A TOGGLE RE-OPENS THE POUCH, AND CLOSE COMES BACK WHERE IT WAS — driven
@@ -547,7 +587,10 @@ func _s1_the_pouch() -> void:
 	_run.party[hunt]["engines"] = []
 	_run.rune_bag = []
 	await Gate.frames(self, 2)
-	await _s1_a_bag_of_twenty(mp, pinned)
+	# BATCH IA §3 — THE HOLDING CAP AT EVERY SLOT COUNT: an empty core slot is a row, so
+	# the longest panel is every slot EMPTY with the holding full, not every slot filled.
+	for slots_n2 in range(int(_run.ENGINE_SLOTS) + 1):
+		await _s1_a_bag_of_twenty(mp, pinned, slots_n2)
 
 
 # **BATCH HR §1 — THE POUCH'S LONGEST IS HIS EIGHT HELD BESIDE WHAT HE WEARS** (re-pointed:
@@ -569,14 +612,21 @@ func _s1_the_pouch() -> void:
 # at the one place, outside the scroller, and pressed shut; every row of his drawn
 # whole at its size inside the scroller, and no row for a rune he may not wear; and
 # the last row's button scrolled wholly into view. The list's height is printed.
-func _s1_a_bag_of_twenty(mp: Node, pinned: Rect2) -> void:
+#
+# **BATCH IA §3 — AT EVERY SLOT COUNT, AND THE LONGEST IS EVERY CORE SLOT EMPTY.** The
+# panel draws an empty core slot as a row, so with the holding full the list is longest
+# with none slotted — six cores held beside two ordinary runes — and the arm runs once a
+# slot count, none to `Run.ENGINE_SLOTS`, each with the same assertions.
+func _s1_a_bag_of_twenty(mp: Node, pinned: Rect2, slots_n: int) -> void:
 	var tall := []
 	for key in SEATS:
 		var idx := SEATS.find(key)
 		var six := _six(key)
 		var ords: Array = _class_ordinary(key)
 		var slotted: Array = []
-		for k in 2:
+		# BATCH IA §2/§3 — `slots_n` of his six slotted (the cap, two, until IA), three worn,
+		# and the rest of his six held beside his class's ordinary runes, eight in all.
+		for k in slots_n:
 			var r: Dictionary = Runes.build(String(six[k]))
 			r["equipped"] = true
 			slotted.append(r)
@@ -587,7 +637,7 @@ func _s1_a_bag_of_twenty(mp: Node, pinned: Rect2) -> void:
 			worn.append(w)
 		var bagged: Array = []
 		var held_e: Array = []
-		for k3 in range(2, six.size()):
+		for k3 in range(slots_n, six.size()):
 			var he: Dictionary = Runes.build(String(six[k3]))
 			bagged.append(he)
 			held_e.append(he)
@@ -611,7 +661,7 @@ func _s1_a_bag_of_twenty(mp: Node, pinned: Rect2) -> void:
 		await Gate.frames(self, 2)
 		mp._open_rune_panel(idx)
 		await Gate.frames(self, 3)
-		var label := "the %s holding %d of his class's runes" % [key, bagged.size()]
+		var label := "the %s holding %d of his class's runes, %d slotted" % [key, bagged.size(), slots_n]
 		ok(_run.held_count(_run.party[idx]) == int(_run.HERO_HOLD_CAP) and _run.holding_full(_run.party[idx])
 				and not others.is_empty(),
 			"§1: %s — his holding is not full (%d), or the bag holds no other class's rune (%d) for the stray arm to find" % [
@@ -631,8 +681,7 @@ func _s1_a_bag_of_twenty(mp: Node, pinned: Rect2) -> void:
 					if Runes.is_engine_rune(String(er["id"])) else
 					_run.rune_sits_out_note(String(er["id"]), _run.held_engines(_run.party[idx]),
 						_run.worn_rune_ids(_run.party[idx]))).replace("\n", " ")
-			if bagged.has(er):
-				want_text += "   (held)"
+			# BATCH IA §3 — no row says its state: its section does.
 			if l != null and String(l.text).ends_with(" — " + want_text) \
 					and l.get_theme_font_size("font_size") == 12 and _inside_scroll(l):
 				whole += 1
@@ -668,8 +717,8 @@ func _s1_a_bag_of_twenty(mp: Node, pinned: Rect2) -> void:
 		_run.party[idx]["engines"] = []
 		_run.party[idx]["runes"] = []
 		_run.rune_bag = []
-	print("    eight held beside three worn and two slotted — the list scrolls, Close stays: %s" % [
-		", ".join(PackedStringArray(tall))])
+	print("    eight held beside three worn and %d of %d core slots filled — the list scrolls, Close stays: %s" % [
+		slots_n, int(_run.ENGINE_SLOTS), ", ".join(PackedStringArray(tall))])
 
 
 # ── §2 — THE PEDDLER ────────────────────────────────────────────────────────

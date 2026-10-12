@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-10-09 (Batch HZ &mdash; the eyes, and the Rage dump)</b></p>
+<p align="right"><b>Last updated: 2026-10-11 (Batch IA &mdash; the third core slot, and the bag)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -432,9 +432,11 @@ is seventeen columns wide, and its last node is the <b>END BOSS</b>, whose toolt
 "The END BOSS. Nothing goes around it. It is always the Hollow Crown, and the road ends here."
 <br><b>The cards sit on the LEFT EDGE, stacked</b> (Batch BK), so the right two thirds belong
 to the map. Each carries portrait, spec name, HP bar with numbers, resource bar, <b>three rune
-slots</b> (filled or empty — click one to open that hero's rune panel: what he wears and what he
-holds unworn, each with Equip or Unequip, a Drop that asks twice on a rune he holds, and a Swap when
-every slot is full), a <b>&#10022;N marker on his nameplate</b> counting the runes he holds and does
+slots</b> (filled or empty — click one to open that hero's rune panel, in three sections, each
+separated: his <b>core slots</b>, every one drawn and an empty one marked so; the runes he
+<b>wears</b>; and every rune he <b>holds and does not wear</b>, core runes first &mdash; each with Equip or
+Unequip, a Drop that asks twice on a rune he holds, and a Swap when every slot of its kind is full; a
+row carries no mark of its state, because its section says it), a <b>&#10022;N marker on his nameplate</b> counting the runes he holds and does
 not wear &mdash; it opens the same panel, and it is drawn only while he holds one, so it goes the
 moment the last is equipped, sold or dropped, and opening the panel does not clear it &mdash; an <b>&#9670;N
 ability-upgrade count</b> (hidden at zero; hovering it lists them as "Overpower — Honed", one
@@ -1266,15 +1268,16 @@ a Warrior can never hold Burn.</p>
 <ul>
 <li><b>Class selection deals three.</b> Before the first battle each hero is dealt three of his
 class's engine runes and takes one. Every class has six, so every deal leaves three out.</li>
-<li><b>Two engine slots.</b> A hero may hold two engine runes, in two slots of their own that do
-not compete with the three ordinary rune slots. The second is found in play &mdash; a drop after a
+<li><b>Three engine slots.</b> A hero may hold three engine runes, in three slots of their own that do
+not compete with the three ordinary rune slots. The others are found in play &mdash; a drop after a
 normal fight, an elite's cache or a bargain &mdash; mixed in with everything else, and only ever his
-class's; <b>the Peddler never sells one</b>, and no event grants one. One taken from a cache is held
-unworn by the hero, as a dropped one is, and is slotted from his rune panel: taking it adds no ability
-to his kit until he slots it.</li>
+class's; <b>the Peddler never sells one</b>, and an event hands one over only once every ordinary rune
+he could be given is held already. One taken from a cache or an event is held unworn by the hero, as a
+dropped one is, and is slotted from his rune panel: taking it adds no ability to his kit until he
+slots it.</li>
 <li><b>Drop and swap, to nothing.</b> The hero's rune pouch on the map equips and unequips engine
 runes. An unequipped engine rune stays with the hero, unworn, one of his eight, and its engine is out
-of the next fight; with both slots full, one he holds can be swapped for one slotted. <b>A hero with no
+of the next fight; with every engine slot full, one he holds can be swapped for one slotted. <b>A hero with no
 engine is a legal state</b>: his class basic and class kit, the abilities he has drafted and his
 runes still fight, and nothing an engine grants is there. A card he has drafted or earned is never
 lost when an engine is dropped. <b>A drop changes the next fight, never the one in
@@ -2812,7 +2815,7 @@ every other way of getting a rune follows &mdash; and the victory card names it.
 and a boss drop none; each pays its own reward. <b>A CLASS RUNE OR A CORE RUNE GOES TO ITS HERO</b>
 &mdash; the hero of its class &mdash; who holds it unworn until he equips it, and the victory card and
 the map both name him; <b>a hero holds eight runes unworn at most</b>, ordinary and core counted
-together, beside his three slots and his two core slots, which do not count. Equipping puts a rune he
+together, beside his three slots and his three core slots, which do not count. Equipping puts a rune he
 holds on; unequipping takes it off and he goes on holding it. <b>A CREST RUNE GOES INTO THE BAG</b>,
 which holds the Crest's runes nobody wears, <b>six at most</b>. Every way of getting a rune &mdash; the
 drop, an elite's cache, a bargain, the Peddler and an event &mdash; puts it down the same way. <b>A rune
@@ -3065,7 +3068,7 @@ true when ET wrote them, were superseded at EZ, and were named as stale by FD an
 FE.</b> A false claim in this document does not decay and is not caught; it is only ever found by
 someone looking.
 <br><b>Heroes begin the run with no ordinary runes and three empty slots</b> — and the engine
-rune each took at class selection, in the first of two engine slots of its own (§6.0). The first rune comes
+rune each took at class selection, in the first of three engine slots of its own (§6.0). The first rune comes
 from the Peddler, an elite cache, or a severity-3-or-4 bargain. Every pick-of-three is
 resolved on that hero's map card, and <b>the three are always distinct</b>: each candidate is
 drawn from a pool that already excludes the ones beside it, so a triple can never offer the
@@ -3503,7 +3506,8 @@ spawn math: Constitution uses the spec's value and Attack/HP include node
 scaling — the class passive + one line for each engine held
 (or "none held"), ability chips (hover shows real
 numbers AND the "% of Attack" scaling; a chip carrying an <b>ability upgrade</b> wears a gold
-<b>&#9670;</b> and names its upgrades on the last line of its hover), a <b>read-only</b> rune list (three flat slots and the two engine slots;
+<b>&#9670;</b> and names its upgrades on the last line of its hover), a <b>read-only</b> rune list (three flat slots and the three engine slots, each row's state in a column of its
+own &mdash; CREST, CORE, WORN or held;
 equipping happens on the map card, so one place writes it), and the class's talent tree:
 three tiers of nine, READ-ONLY, with every node the hero wears lit and each node's text on its
 tooltip. Talents are bought between runs on the build screen. Owed ability, upgrade and rune

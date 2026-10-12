@@ -357,7 +357,14 @@ static func apply(run: Node, fx: Dictionary) -> String:
 				var rune: Dictionary = run.grant_rune(taker)
 				if rune.is_empty():
 					break  # runes off — say nothing rather than lie
-				rune["equipped"] = not open_slot.is_empty()
+				# BATCH IA §2 — A CORE RUNE IS NOT ASKED FOR, AS AT THE CACHE (HL §1). The
+				# grant prefers an ordinary rune, and once his ordinary pool is spent its
+				# fallback draws from the whole roll, core runes included; asked, that
+				# rune slotted itself into a free core slot and its card joined the kit —
+				# one choice handing over two things, the shape a third slot widens. It is
+				# held unworn, and this line says so.
+				rune["equipped"] = not open_slot.is_empty() \
+					and String(rune.get("engine", "")) == ""
 				# BATCH GK — through the one door, so an engine rune takes an engine slot.
 				# BATCH HK §2 — what is not worn is held, and a full holding keeps it on
 				# the map's panel; the line says which. HR §1 — held on the taker, unworn

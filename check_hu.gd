@@ -234,8 +234,9 @@ func _screen_y(scene: Node, c: Control) -> float:
 
 
 # The widest Abilities menu a hero can raise in normal play: for every class, every lineage
-# and every pair of its core runes (the two engine slots), the opening kit `Classes` builds
-# plus a full slot ladder of earned cards, the summons one entry.
+# and every set of its core runes he can slot (`Gate.engine_sets` up to `Run.ENGINE_SLOTS` —
+# pairs until IA §2 raised the cap to three), the opening kit `Classes` builds plus a full slot
+# ladder of earned cards, the summons one entry.
 func _widest_normal_menu() -> Dictionary:
 	var cap: int = int(_run.ABILITY_SLOTS_BY_BOSS[(_run.ABILITY_SLOTS_BY_BOSS as Array).size() - 1])
 	var by_class := {"warrior": [], "mage": [], "cleric": [], "hunter": []}
@@ -250,11 +251,7 @@ func _widest_normal_menu() -> Dictionary:
 	var shapes := 0
 	for ck in by_class:
 		var engs: Array = by_class[ck]
-		var sets: Array = [[]]
-		for a in engs.size():
-			sets.append([engs[a]])
-			for b in range(a + 1, engs.size()):
-				sets.append([engs[a], engs[b]])
+		var sets: Array = Gate.engine_sets(engs, int(_run.ENGINE_SLOTS))
 		for spec in Classes.SPEC_IDS[ck]:
 			for es in sets:
 				shapes += 1

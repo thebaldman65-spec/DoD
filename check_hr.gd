@@ -603,7 +603,22 @@ func _s1f_the_surfaces() -> void:
 	s.call("_open_rune_panel", mi)
 	await process_frame
 	var ov: Node = Gate.overlay(current_scene, 60)
-	ok(ov != null and Gate.has_text(ov, "HELD, NOT WORN: 2 of %d" % int(_run.HERO_HOLD_CAP)) and Gate.has_text(ov, "(held)"),
+	# BATCH IA §3 — RE-TUNED, THE QUESTION UNMOVED: what he holds is the HELD, NOT WORN
+	# section now — its head counts it (`HELD, NOT WORN — 2 of 8`, where HR's line read
+	# `: 2 of 8`) and the two held rows stand in it, with no `(held)` on a row: the
+	# section says it once.
+	var held_rows := 0
+	if ov != null:
+		var in_held := false
+		for t in Gate.texts(ov):
+			if String(t).begins_with("HELD, NOT WORN — "):
+				in_held = true
+		for id2 in _class_ids("mage", false).slice(0, 2):
+			if Gate.has_text(ov, "%s — " % Runes.build(String(id2))["name"]):
+				held_rows += 1
+		ok(in_held, "§1f: the Mage's panel draws no HELD, NOT WORN section")
+		ok(not Gate.has_text(ov, "(held)"), "§1f: a row of the Mage's panel still prints `(held)` beside the section that says it")
+	ok(ov != null and Gate.has_text(ov, "HELD, NOT WORN — 2 of %d" % int(_run.HERO_HOLD_CAP)) and held_rows == 2,
 		"§1f: the Mage's panel does not say what he holds")
 	ok(ov != null and not Gate.has_text(ov, "(in the bag)"), "§1f: the Mage's panel still lists a rune as in the bag")
 	change_scene_to_file("res://scenes/shop.tscn")

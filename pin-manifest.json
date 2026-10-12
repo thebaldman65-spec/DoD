@@ -2,16 +2,16 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1733,
-  "source": 1304,
+  "total": 1740,
+  "source": 1305,
   "other": 113,
-  "document": 316
+  "document": 322
  },
  "source_residency": {
   "narrow": 44,
   "code": 793,
   "absent": 315,
-  "runtime": 100,
+  "runtime": 101,
   "unresolved": 3,
   "comment": 46,
   "alt-sibling": 3
@@ -5204,7 +5204,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_hr.gd#441"
+   "g": "check_hr.gd#452"
   },
   {
    "s": "check_hs.gd",
@@ -5601,7 +5601,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_hu.gd#870"
+   "g": "check_hu.gd#866"
   },
   {
    "s": "check_hu.gd",
@@ -5612,7 +5612,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hu.gd#517"
+   "g": "check_hu.gd#513"
   },
   {
    "s": "check_hu.gd",
@@ -5623,7 +5623,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hu.gd#518"
+   "g": "check_hu.gd#514"
   },
   {
    "s": "check_hu.gd",
@@ -5634,7 +5634,7 @@
    "r": "unresolved",
    "k": "literal",
    "how": "read",
-   "g": "check_hu.gd#520"
+   "g": "check_hu.gd#516"
   },
   {
    "s": "check_hu.gd",
@@ -5645,7 +5645,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hu.gd#520"
+   "g": "check_hu.gd#516"
   },
   {
    "s": "check_hu.gd",
@@ -5656,7 +5656,7 @@
    "r": "unresolved",
    "k": "literal",
    "how": "read",
-   "g": "check_hu.gd#521"
+   "g": "check_hu.gd#517"
   },
   {
    "s": "check_hu.gd",
@@ -5667,7 +5667,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hu.gd#521"
+   "g": "check_hu.gd#517"
   },
   {
    "s": "check_hu.gd",
@@ -5678,7 +5678,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hu.gd#516"
+   "g": "check_hu.gd#512"
   },
   {
    "s": "check_hu.gd",
@@ -5689,7 +5689,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hu.gd#879"
+   "g": "check_hu.gd#875"
   },
   {
    "s": "check_hv.gd",
@@ -5943,6 +5943,85 @@
    "k": "literal",
    "how": "read",
    "g": "check_hy.gd#581"
+  },
+  {
+   "s": "check_ia.gd",
+   "fn": "_s5_the_claim",
+   "h": "docs/instrument-rules.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "derived",
+   "g": "check_ia.gd#596",
+   "expr": "walk"
+  },
+  {
+   "s": "check_ia.gd",
+   "fn": "_s5_the_claim",
+   "h": "scripts/battle.gd",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ia.gd#603",
+   "expr": "walk"
+  },
+  {
+   "s": "check_ia.gd",
+   "fn": "_s5_the_claim",
+   "h": "docs/instrument-rules.md",
+   "n": "- **ANCHOR ON THE CLAUSE LINE AND SEARCH BACKWARD FOR THE WALK.**",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ia.gd#593"
+  },
+  {
+   "s": "check_ia.gd",
+   "fn": "_s5_the_claim",
+   "h": "docs/instrument-rules.md",
+   "n": "Bulwark",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_ia.gd#597"
+  },
+  {
+   "s": "check_ia.gd",
+   "fn": "_s5_the_claim",
+   "h": "docs/instrument-rules.md",
+   "n": "Bulwark",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_ia.gd#597"
+  },
+  {
+   "s": "check_ia.gd",
+   "fn": "_s5_the_claim",
+   "h": "docs/instrument-rules.md",
+   "n": "`check_dm` §1",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_ia.gd#598"
+  },
+  {
+   "s": "check_ia.gd",
+   "fn": "_s5_the_claim",
+   "h": "docs/instrument-rules.md",
+   "n": "live count",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_ia.gd#598"
   },
   {
    "s": "test_batch_ah.gd",

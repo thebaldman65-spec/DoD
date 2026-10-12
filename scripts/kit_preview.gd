@@ -16,9 +16,10 @@
 #   purchase are exactly as they were when it closes. Its dim stops every click, so the
 #   choice underneath cannot be pressed through it.
 # - **IT DOES NOT INVENT IA's LAYOUT.** The cards read as the hero sheet reads them and
-#   the runes in the sheet's own words — the state it shows (CREST, ENGINE, WORN, held,
+#   the runes in the sheet's own words — the state it shows (CREST, CORE, WORN, held,
 #   sits out), the `(core)` suffix the rune data carries (HL §2) and HR's nameplate marker
-#   (✦ N held, not worn). IA builds the three sections; this is not a first draft of them.
+#   (✦ N held, not worn). IA built the three sections on the hero's rune panel; this
+#   stays one flat list with its state column — a read-only list, a different surface.
 #
 # It reads the doors the hero sheet and the battle spawn read — the opening kit off
 # `Classes.opening_kit`, the seated cards off `Run.seated_ability_names`, what sits out
@@ -198,7 +199,7 @@ func _fill() -> void:
 	for entry in all_runes:
 		var rune: Dictionary = entry
 		var on: bool = rune.get("equipped", false)
-		var state := ("CREST" if Runes.is_party_rune(rune) else ("ENGINE" if rune.has("engine")
+		var state := ("CREST" if Runes.is_party_rune(rune) else ("CORE" if rune.has("engine")
 			else "WORN")) if on else "held"
 		if on and sitting.has(String(rune.get("name", ""))):
 			state = "sits out"

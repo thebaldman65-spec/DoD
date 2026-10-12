@@ -231,10 +231,11 @@ below.
 > green while its subject moves — which is the failure pin-as-measurement exists to prevent.**
 
 - **ANCHOR ON THE CLAUSE LINE AND SEARCH BACKWARD FOR THE WALK.** The clause line is the unique
-  half; the walk is often shared. **FIVE sites in `battle.gd` spell
-  `heroes.filter(func(he): return not he.dead and not he.is_companion)` byte for byte** — Bulwark
-  and Consecrated Ground among them — so a forward `find` from the walk reads the wrong site four
-  times in five. **`check_dm` §1 asserted TWO on its first run and the gate caught it**, which is
+  half; the walk is often shared. **More than one site in `battle.gd` spells
+  `heroes.filter(func(he): return not he.dead and not he.is_companion)` byte for byte — `check_dm` §1
+  prints the live count (IA §5 dropped the figure that stood here, which went stale and was found and left twice)** —
+  Bulwark and Consecrated Ground among them — so a forward `find` from the walk reads the wrong site
+  more often than the right one. **`check_dm` §1 asserted TWO on its first run and the gate caught it**, which is
   the count-in-a-brief fault landing inside the instrument written to prevent it; the live count is
   PRINTED now and the assertion is the property (`> 1`) rather than a number. **DL was bitten by exactly this** — a
   forward `find` on War Stomp's guard measured a site 200k characters earlier — and fixed the

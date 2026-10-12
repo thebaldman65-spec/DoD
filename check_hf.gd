@@ -1213,13 +1213,16 @@ func _s4b_the_screens() -> void:
 		if ov != null:
 			var pl: Array = []
 			_labels(ov, pl)
-			var told: Array = pl.filter(func(l): return String((l as Label).text) == "✦ %s — %s" % [bg, note.replace("\n", " ")])
-			var own: Array = pl.filter(func(l): return String((l as Label).text) == "✦ %s — %s" % [bg, Runes.shown_desc(Runes.build("burning_ground"))])
+			# BATCH IA §3 — RE-TUNED, THE QUESTION UNMOVED: a worn row carries no ✦ any more —
+			# the WORN section says it is worn — so the row is the rune's name and then its rule,
+			# or the one sentence in its place.
+			var told: Array = pl.filter(func(l): return String((l as Label).text) == "%s — %s" % [bg, note.replace("\n", " ")])
+			var own: Array = pl.filter(func(l): return String((l as Label).text) == "%s — %s" % [bg, Runes.shown_desc(Runes.build("burning_ground"))])
 			ok((told.size() == 1 and own.is_empty()) if cut else (told.is_empty() and own.size() == 1),
 				"§4b (%s): the pouch row %s — it should %s" % [arm[0],
 					"says it sits out" if not told.is_empty() else "shows the rune's own rule" if not own.is_empty() else "is missing",
 					"say it sits out, in the one sentence" if cut else "show the rune's own rule"])
-			var vw_row: Array = pl.filter(func(l): return String((l as Label).text) == "✦ %s — %s" % [vw, Runes.shown_desc(Runes.build("vow_of_silence"))])
+			var vw_row: Array = pl.filter(func(l): return String((l as Label).text) == "%s — %s" % [vw, Runes.shown_desc(Runes.build("vow_of_silence"))])
 			ok(not cut or vw_row.size() == 1, "§4b (%s): the vow's pouch row does not show its own rule" % arm[0])
 		_close_overlays(mp)
 		await Gate.frames(self, 2)

@@ -1019,8 +1019,11 @@ func _s1b_the_preview() -> void:
 			var missing: Array = kit.filter(func(n): return not txt.contains(String(n)))
 			ok(missing.is_empty() and not kit.is_empty(), "§1b: the preview leaves out the Warrior's kit cards %s" % [missing])
 			var core_name := String((war.get("engines", [])[0] as Dictionary).get("name", "")) if not war.get("engines", []).is_empty() else ""
-			ok(core_name != "" and core_name.contains("(core)") and txt.contains(core_name) and txt.contains("ENGINE"),
-				"§1b: the preview does not show the Warrior's core rune as it reads (`%s`, ENGINE)" % core_name)
+			# BATCH IA §4 — RE-TUNED, THE QUESTION UNMOVED: the state column's word for a slotted
+			# core rune is the player's, CORE (HL §2's rename finished), where it read ENGINE — and
+			# the arm now reads the row itself, the state beside the name, not the word anywhere.
+			ok(core_name != "" and core_name.contains("(core)") and txt.contains("%s %s" % ["CORE".rpad(8), core_name]),
+				"§1b: the preview does not show the Warrior's core rune as it reads (`%s`, CORE)" % core_name)
 			var btns: Array = []
 			Gate.buttons(p, btns)
 			var labels: Array = btns.map(func(b): return String((b as Button).text))

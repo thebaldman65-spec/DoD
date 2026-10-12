@@ -132,7 +132,12 @@ THAT LINE, AND ON THE TURN BAR'S GLYPH, DETAILS THE DECLARED ABILITY OFF ITS OWN
 (`battle._intent_hover_text`): its name, the band the hero's own cards quote (`battle._damage_line` — the
 attack's roll, before armor, resistance, Block and crit, so a band and never a prediction), what it
 applies, its Break damage and how many it hits — **AND NEVER WHOM IT IS AIMED AT, BY THE DESIGNER'S
-RULING**: knowing what an attack does decides whether to pre-empt it; knowing which hero it will hit
+RULING**. **THE BAND IS KEPT (IA §0.3, the designer's)**: it is the one line every card in the player's
+hand already speaks, and a telegraph stating damage another way would teach a second vocabulary for one
+screen; the percentage alone was rejected — less information, in a unit nothing else on screen uses.
+**THE BOUNDARY, WHERE A LATER BATCH WILL MEET IT: the telegraph quotes the attack's own line and never
+reads a target's body. The day it reads armour it is a prediction, and the finding above bites.** On
+whom it is aimed at: knowing what an attack does decides whether to pre-empt it; knowing which hero it will hit
 turns every defensive decision into arithmetic and retires the guessing the turn order is built on.
 The declaration keeps its target for re-validation and for nothing on screen. **`test_batch_bl` greps the intent block for `attacker.attack` / `effective_armor` /
 `randf_range` / `resists.get` and fails if a later batch adds a preview by reimplementing the
@@ -182,7 +187,12 @@ A new damage source goes through one of the two functions; a new direct cost cal
     share's and One Soul's shape. The vow moves where a blow LANDS, not who swung it: the Devout's taken
     ledger books the raider, a Devout the share fells is the raider's kill, Penance's mirror pays on each
     body (the two sum to the whole blow's but for a point of rounding when both parts are odd), and a
-    Covenant-bound Devout shares the carried half. A frame names a dealer and re-runs nothing: the
+    Covenant-bound Devout shares the carried half. **THAT POINT IS KEPT (IA §0.4, the designer's) AND IT IS
+    NOT A DEFECT TO RE-FIND**: one point, on blows of 4k + 2 at power 50 (18 → 9 + 9 mirrors 5 + 5 against
+    the whole's 9), in the player's favour — rounding per body is how every per-body effect rounds. *The
+    whole blow's mirror less the kept part's* was rejected on its shape: a subtraction couples two bodies'
+    mirrors so neither can be computed where it is dealt, the shape that gave 0.35 − 0.25 =
+    0.09999999999999998, which is why reversal in this codebase is a recomputation. A frame names a dealer and re-runs nothing: the
     swing's riders fire once, in `_resolve`, off its result.
   - **A SITE OUTSIDE EVERY ACTION SETS ITS OWN** — Snare Line's spring (`_snare_line_tick`), an armed
     Deadfall's, a Ruin detonation (the Occultist's) and a bomb (the pouch's, so a frame naming nobody:
@@ -193,6 +203,15 @@ A new damage source goes through one of the two functions; a new direct cost cal
     status pays as its layer wherever it lands — Consecrated Ground's reflect, Snare Line's spring, the
     Deadfall and Burning Ground alike (DI's rule) — so a vowed Cleric's ground reflects nothing for
     anybody, which is the trap the rune chips show (`battle._refresh_rune_chips`).
+  - **A FIGURE PRINTED OR PAID OFF A BLOW IS THE BLOW THAT LANDED, NEVER THE BLOW THAT WAS COMPUTED (IA
+    §0.6, the designer's; it generalises this frame's rule).** A reader that takes a damage figure above the
+    gate that could refuse it pays, or prints, a blow that never landed — the frame's defect one layer out.
+    The worked example is the ground's reflect: its log line and Lifewell read the figure computed above the
+    vow's gate, so a reflect its layer's vow silenced still printed *reflects N* and still watered the
+    party. **Both read what passes the gate now**, asked under the ground's own frame through the gate's
+    own predicate (`battle._vow_silences`, which `_deal_gate` asks at the two doors) — one answer, so the
+    line, the heal and the door cannot disagree. **The rest of the family is reported, not repaired here**
+    (IA's report, §1, holds the census): every other reader of a figure computed above that gate is its own batch.
   **A NEW DAMAGE SITE SAYS WHOSE FRAME IT DEALS UNDER**: `check_hy` §6 holds the census of every function
   that deals damage, reds on one it does not know, and reds on a borrowed frame the function that borrowed it
   never puts back.

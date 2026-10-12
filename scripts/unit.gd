@@ -2308,7 +2308,7 @@ func sanctity_turn_bonus() -> int:
 # ══ BATCH GO — THE NINE RULE ENGINES: WHAT A UNIT CARRIES FOR THEM ═══════════
 #
 # **NONE OF THE NINE TAKES `second_resource`** — that field is already three
-# currencies (FT), and a hero may hold two engines. **FOUR STORE A NUMBER, AND
+# currencies (FT), and a hero may hold several engines. **FOUR STORE A NUMBER, AND
 # EACH HAS A FIELD OF ITS OWN HERE**: the Reaver's kills, the Bastion's bank, the
 # Weaver's cast count and the Skirmisher's quiet-turn count (with its armed flag).
 # The Oathkeeper stores a REFERENCE (who is bound); the Arbiter's and the

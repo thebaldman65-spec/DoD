@@ -374,7 +374,7 @@ var pending_item_offers: Array = []  # item ids awaiting a swap-or-decline
 # with `equipped` false — the shape every rune had until HK pooled them, so the
 # readers that still asked `equipped` on a hero's lists read it again. **He holds
 # `HERO_HOLD_CAP` unworn, both kinds counted together**, beside his three slots and
-# his two core slots, which do not count against it. **The shared bag holds crest
+# his `ENGINE_SLOTS` core slots, which do not count against it. **The shared bag holds crest
 # runes only** — and a rune no hero in this party can hold (a save's, its class
 # absent: kept rather than destroyed, `_hand_out_the_bag`). The reason is the
 # designer's, met in play: *"I cannot tell whose rune this is."* Pooling lost the
@@ -1558,15 +1558,22 @@ func rune_slots() -> int:
 	return 3
 
 
-# ══ BATCH GK — THE TWO ENGINE SLOTS, AND CLASS SELECTION ════════════════════
+# ══ BATCH GK — THE ENGINE SLOTS, AND CLASS SELECTION ═════════════════════════
 #
-# **TWO DEDICATED SLOTS THAT DO NOT COMPETE WITH THE THREE ABOVE** (the engine
-# rune charter, `CLAUDE.md`). A held engine rune lives in `member["engines"]`
-# with its own `equipped` flag, so the ordinary pouch and every count of it is
-# untouched. **The slot state rides the party dict** — saved wholesale, as
-# `bm_equipped` and GH's `companions_standing` do — so it moves NO save version;
-# `load_run` hands a member written before the engines moved his spec's rune.
-const ENGINE_SLOTS := 2
+# **DEDICATED SLOTS THAT DO NOT COMPETE WITH THE THREE ABOVE** (the engine rune
+# charter, `CLAUDE.md`). A held engine rune lives in `member["engines"]` with its
+# own `equipped` flag, so the ordinary pouch and every count of it is untouched.
+# **The slot state rides the party dict** — saved wholesale, as `bm_equipped` and
+# GH's `companions_standing` do — so it moves NO save version; `load_run` hands a
+# member written before the engines moved his spec's rune.
+#
+# **BATCH IA §2 — THREE, RULED BY THE DESIGNER TWICE** (GK's two; found in play: *I
+# was only able to equip two*). **The count is this constant and nothing else**: no
+# save carries it — a save holds each rune's `equipped` flag, never a slot count — so
+# a save written with two slotted opens here with three slots and the third empty, and
+# raising it moved no save version. Every reader asks it by name (`hold_rune`, the
+# refusal below, the hero's panel, the sheet's header, the gates' engine sets).
+const ENGINE_SLOTS := 3
 
 
 func held_engines(member: Dictionary) -> Array:
@@ -1931,7 +1938,7 @@ func swap_engine_refusal(member: Dictionary, bag_i: int, worn_i: int) -> String:
 
 # DROP AND SWAP, INCLUDING TO NOTHING. Unslotting an engine takes the engine and
 # its enablers out of the next fight and keeps the rune; slotting one is refused
-# only when both slots are full. **Zero engines is a legal state.**
+# only when every core slot is full. **Zero engines is a legal state.**
 #
 # **BATCH HB §4 — AND UNSLOTTING THE ONE ENGINE THAT DISMISSES THE PET IS REFUSED
 # WHILE THE KIT HAS NO ROOM TO TAKE IT BACK.** The Sharpshooter's freed slot is
@@ -1957,7 +1964,7 @@ func toggle_engine(member: Dictionary, i: int) -> bool:
 
 # Why the pouch's engine toggle `i` is refused right now, or "" when it is not.
 # THE ONE ANSWER: `toggle_engine` refuses on it and the pouch disables the button
-# with it. Three causes: both slots are full (slotting a third, GK), unslotting the
+# with it. Three causes: every core slot is full (slotting one more, GK), unslotting the
 # pet's dismisser into a kit with no free slot for the pet (HB §4), and unslotting
 # into a full holding (HK §2's full bag, the hero's own since HR §1).
 func engine_toggle_refusal(member: Dictionary, i: int) -> String:
@@ -1966,7 +1973,7 @@ func engine_toggle_refusal(member: Dictionary, i: int) -> String:
 		return ""
 	var r: Dictionary = rows[i]["rune"]
 	if not bool(rows[i]["worn"]):
-		return "Both core slots are filled." if engines_worn(member) >= ENGINE_SLOTS else ""
+		return "Every core slot is filled." if engines_worn(member) >= ENGINE_SLOTS else ""
 	var after: Array = held_engines(member).filter(
 		func(p): return String(p) != String(r.get("engine", "")))
 	var pet := _pet_return_refusal(member, after)
@@ -2274,7 +2281,8 @@ func generate_rune(member: Dictionary, exclude_names: Array = []) -> Dictionary:
 # bargain and the drop still carry them. **So the exclusion is the counter's own,
 # and it rides `exclude_names`**, the channel the counter already used for a rune on
 # offer to another hero: every engine rune's name, so nothing else about the roll
-# moves. The event verb never rolled one (`grant_rune`).
+# moves. The event verb prefers an ordinary rune (`grant_rune`); its fallback can
+# draw a core rune once his ordinary pool is spent, and holds it unworn (IA §2).
 func peddler_rune(member: Dictionary, exclude_names: Array = []) -> Dictionary:
 	var excl: Array = exclude_names.duplicate()
 	for id in Runes.ids():
@@ -3113,7 +3121,7 @@ func _dismisser_clause(engines: Array) -> String:
 #
 # **BATCH HC §5 — AND A SLOTTED ENGINE RUNE THAT SITS OUT IS NAMED HERE TOO**: the
 # Rune of the Beastmaster beside the Rune of the Sharpshooter (ruled legal and
-# visible). Its slot is one of the two engine slots rather than one of the three,
+# visible). Its slot is one of the core slots rather than one of the three,
 # and every surface that marks a rune by name off this list marks it the same way.
 func sitting_out_rune_names(member: Dictionary) -> Array:
 	var held: Array = held_engines(member)

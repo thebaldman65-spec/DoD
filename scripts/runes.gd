@@ -1844,7 +1844,7 @@ static func build(id: String) -> Dictionary:
 #
 # **HELD ENGINE RUNES LIVE IN `member["engines"]`, NOT IN THE POUCH**, so the
 # three ordinary slots and everything that counts them are untouched; an engine
-# rune's own `equipped` flag is its place in one of the two engine slots.
+# rune's own `equipped` flag is its place in one of the core slots (`Run.ENGINE_SLOTS`).
 
 # The instance's engine fields: the id, and a desc that is the engine's rule —
 # read off `Classes`, never copied into the data.
