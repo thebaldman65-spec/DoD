@@ -511,13 +511,17 @@ func _s1c_the_peddler() -> void:
 
 # ── §1d — A CACHE'S REAL OVERLAY ────────────────────────────────────────────
 
+# BATCH IB §1/§2 — A CACHE'S REAL SURFACE IS THE HERO'S OWN DRAFT SCREEN, put up as the
+# party arrives (its RUNES section); the card's CHOOSE opens the same screen.
 func _open_cache(seat: int) -> Node:
 	var mp := await _to("res://scenes/map.tscn")
-	var choose: Button = Gate.bound_button(mp, "_open_pick_overlay", [seat])
-	if choose != null:
-		choose.emit_signal("pressed")
-		await process_frame
-	return Gate.overlay(current_scene, 60)
+	var hd: Node = Gate.hero_draft(mp)
+	if hd == null or int(hd.get_meta("hero_draft")) != seat:
+		var choose: Button = Gate.bound_button(mp, "_open_pick_overlay", [seat])
+		if choose != null:
+			choose.emit_signal("pressed")
+			await process_frame
+	return Gate.hero_draft(current_scene)
 
 
 func _s1d_the_cache() -> void:
@@ -553,7 +557,14 @@ func _s1d_the_cache() -> void:
 		"§1d: the Mage's cache shows a crest rune, or not the class rune left (%s)" % cls_name)
 	ok(ov != null and not Gate.has_text(ov, "Tithe") and not Gate.has_text(ov, "Dirge"),
 		"§1d: the Mage's cache names a crest rune queued before the scope")
+	# The class rune chosen on the screen, then its Confirm — the pick is the Confirm (IB §2).
 	var took := Gate.press(ov, [cls_name]) if ov != null else ""
+	await process_frame
+	var conf: Button = Gate.bound_button(Gate.hero_draft(current_scene), "_confirm_hero_draft", []) \
+		if Gate.hero_draft(current_scene) != null else null
+	if conf != null:
+		conf.emit_signal("pressed")
+	await process_frame
 	var said_worn := Gate.has_text(current_scene, "fills the crest")
 	await Gate.frames(self, 3)
 	ok(took != "" and _names(mage.get("runes", [])).has(cls_name),

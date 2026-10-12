@@ -54,6 +54,9 @@ func _draw_screen() -> void:
 
 func _on_back() -> void:
 	Run.save_run()
+	# BATCH IB §1 — a return from the sheet is not an arrival: the picks the map opened
+	# when the party arrived are not opened again (`Run.map_reentry`).
+	Run.map_reentry = true
 	get_tree().change_scene_to_file("res://scenes/map.tscn")
 
 

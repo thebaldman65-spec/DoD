@@ -415,6 +415,14 @@ var pending_rune_drops: Array = []  # runes waiting on a full holding's panel
 # fact. `load_notes` is the same shape for what a load has to tell the player.
 var last_drop: Dictionary = {}
 var load_notes: Array = []
+# BATCH IB §1 — WHETHER THE MAP IS ENTERED AS A RETURN, NOT AN ARRIVAL. The map opens
+# every pick a hero carries when the party ARRIVES — from a fight, an event, a shop or
+# a load — and the two screens a player visits from the map and comes back from (the
+# hero sheet, the talents) are not an arrival: a pick dismissed on this arrival is not
+# put back in front of him because he went to read his sheet. Each sets this as it
+# returns and the map clears it as it reads it, so any other way into the map is an
+# arrival by default. Session-scoped, never saved: a load is an arrival.
+var map_reentry := false
 # Which hero the sheet opens onto (Batch AN: the map cards ARE the party
 # list, so the sheet is always entered for a specific hero). Session-scoped
 # — a resumed run opens the map, never a sheet.
@@ -1648,7 +1656,7 @@ func awaken(idx: int, rune_id: String) -> void:
 # beside the rune, one pick handing over two things — the only mechanism the game
 # has for the designer's *"two cards from one pick"* (`docs/reports/HL.md` §1). The
 # player's cache and bargain answer no longer asks for an engine rune
-# (`map_screen._pick_rune`), so a core rune taken there waits unworn on the hero,
+# (`map_screen._take_rune_pick`), so a core rune taken there waits unworn on the hero,
 # and its card reaches the kit only when he slots it. The sim still asks (its policy).
 func hold_rune(member: Dictionary, rune: Dictionary) -> String:
 	if rune.is_empty():
@@ -2508,7 +2516,7 @@ func nameplate(member: Dictionary) -> String:
 # THROUGH IT — THE HOLE WAS THAT THE CACHE DOES NOT ROLL AT THE OFFER.**
 # `roll_rune_candidates` runs at DROP time and stores its triple on the member,
 # where it rides the save until the player answers it. Before FD, the screen
-# that showed it and `map_screen._pick_rune` both read that stored array straight,
+# that showed it and the pick that answered it both read that stored array straight,
 # so between the drop and the pick NOTHING re-asked the pool anything — and two facts can
 # move in that window:
 #
@@ -2538,7 +2546,7 @@ func nameplate(member: Dictionary) -> String:
 # returned `{}` only under `DOD_SIM_RUNES=off`, and under that flag `roll_rune_candidates`
 # returns `[]` and nothing is ever queued — so a non-empty queue means runes
 # were on when it was written. The loop still breaks rather than spinning, and
-# `_pick_rune` refuses an empty triple, because "cannot happen" is not the same
+# `_take_rune_pick` refuses an empty triple, because "cannot happen" is not the same
 # as "is not guarded".
 func rune_choice(member: Dictionary) -> Array:
 	var queue: Array = member.get("rune_candidates", [])
@@ -2602,7 +2610,7 @@ func rune_choice(member: Dictionary) -> Array:
 # answer is asked; re-equip the engine and they are offered again. **IT IS NOT A
 # REROLL**, which is what FD's write-back exists to stop: nothing is drawn here,
 # the same candidates come back in the same order, and the render and the pick
-# both read this same list (`map_screen._pick_rune` indexes it). GT §3's ruling
+# both read this same list (`map_screen._take_rune_pick` finds its rune in it). GT §3's ruling
 # for a card that cannot be cast without its engine — it sits out while the
 # engine is gone and returns when it is slotted — applied to an offer.
 func _engine_seated(member: Dictionary, triple: Array) -> Array:
@@ -2634,7 +2642,7 @@ func rune_choice_withheld(member: Dictionary) -> Array:
 # ARE REACHABLE, AND THE POPULATION IS FIVE RATHER THAN FOUR.** Derived off what
 # a rolled offer is STORED on, not off a list of screens:
 #
-#   `rune_candidates`     elite cache / bargain -> `_pick_rune`      RE-ASKED (FD)
+#   `rune_candidates`     elite cache / bargain -> `_take_rune_pick` RE-ASKED (FD)
 #   `draft_candidates`    elite victory        -> `take_draft_ability`  RE-ASKED
 #                         (ownership only, until HE §3 re-asked the card gate —
 #                         `draft_choice`, the list the screen draws)
@@ -2907,6 +2915,7 @@ func award_ability_pick(member: Dictionary) -> bool:
 		offer = roll_draft_fallback_offer(member)
 	if offer.is_empty():
 		return false
+	note_pick_earned(member, "ability")
 	member["bm_candidates"] = member.get("bm_candidates", []) + [offer]
 	member["bm_picks_owed"] = int(member.get("bm_picks_owed", 0)) + 1
 	return true
@@ -3344,9 +3353,89 @@ func award_draft_pick(member: Dictionary) -> bool:
 	var offer := roll_draft_offer(member)
 	if offer.is_empty():
 		return false
+	note_pick_earned(member, "draft")
 	member["draft_candidates"] = member.get("draft_candidates", []) + [offer]
 	member["draft_picks_owed"] = int(member.get("draft_picks_owed", 0)) + 1
 	return true
+
+
+# ══ BATCH IB §1 — THE PICKS A HERO CARRIES TO THE MAP, IN THE ORDER HE EARNED THEM ═══
+#
+# **FOUR KINDS OF PICK ARE ROLLED AT ONE MOMENT AND ANSWERED ON THE MAP**: the draft
+# (an elite, an event), the rune cache (an elite's spoils, a bargain), the zone boss's
+# ability and the mini-boss's upgrade. Each is a counter and a queue of offers on the
+# member, answered oldest first; nothing recorded which came first ACROSS kinds and
+# heroes, and the map opens them in that order when the party arrives
+# (`map_screen._begin_arrival`).
+#
+# **THE ORDER IS A SERIAL STAMPED ON A PICK AS IT IS EARNED** — one count over the
+# party, the newest plus one — kept per kind on the member (`pick_serials`). It is an
+# order and nothing more: the counters stay the truth of what is owed, so
+# `pending_picks` keeps the newest `owed` serials of each kind (a pick is answered
+# oldest first) and gives an owed pick with no serial — a save written before IB, a
+# fixture that set a counter by hand — serial 0, which sorts it first. **It rides the
+# member, which the save carries whole**, so an older build reads past it and writes
+# it back: no key is written away, and no version moved (IA §0.2's principle).
+const PICK_KINDS := ["draft", "rune", "ability", "upgrade"]
+const PICK_OWED := {"draft": "draft_picks_owed", "rune": "rune_picks_owed",
+	"ability": "bm_picks_owed", "upgrade": "up_picks_owed"}
+
+
+func pick_owed(member: Dictionary, kind: String) -> int:
+	return int(member.get(String(PICK_OWED.get(kind, "")), 0))
+
+
+# Called by every door that awards a pick, BEFORE its counter rises.
+func note_pick_earned(member: Dictionary, kind: String) -> void:
+	var serials: Dictionary = member.get("pick_serials", {})
+	var mine: Array = serials.get(kind, [])
+	mine = mine.slice(maxi(0, mine.size() - pick_owed(member, kind)))
+	var top := 0
+	for m in party:
+		var ms: Dictionary = (m as Dictionary).get("pick_serials", {})
+		for k in ms:
+			for s in ms[k]:
+				top = maxi(top, int(s))
+	mine.append(top + 1)
+	serials[kind] = mine
+	member["pick_serials"] = serials
+
+
+# Every pick owed, oldest first: `{hero, kind, serial}`.
+func pending_picks() -> Array:
+	var out: Array = []
+	for i in party.size():
+		var m: Dictionary = party[i]
+		var serials: Dictionary = m.get("pick_serials", {})
+		for k in PICK_KINDS.size():
+			var kind: String = PICK_KINDS[k]
+			var owed := pick_owed(m, kind)
+			if owed <= 0:
+				continue
+			var mine: Array = serials.get(kind, [])
+			mine = mine.slice(maxi(0, mine.size() - owed))
+			for _n in owed - mine.size():
+				out.append({"hero": i, "kind": kind, "serial": 0, "order": k})
+			for s in mine:
+				out.append({"hero": i, "kind": kind, "serial": int(s), "order": k})
+	out.sort_custom(_earned_before)
+	return out
+
+
+static func _earned_before(a: Dictionary, b: Dictionary) -> bool:
+	if int(a["serial"]) != int(b["serial"]):
+		return int(a["serial"]) < int(b["serial"])
+	if int(a["hero"]) != int(b["hero"]):
+		return int(a["hero"]) < int(b["hero"])
+	return int(a["order"]) < int(b["order"])
+
+
+# The one door a rune cache's pick is queued through — the elite's spoils and the
+# bargain's reward both, so neither can forget the order.
+func queue_rune_pick(member: Dictionary, candidates: Array) -> void:
+	note_pick_earned(member, "rune")
+	member["rune_candidates"] = member.get("rune_candidates", []) + [candidates]
+	member["rune_picks_owed"] = int(member.get("rune_picks_owed", 0)) + 1
 
 
 func owed_draft_picks() -> int:
@@ -4488,8 +4577,7 @@ func claim_reward() -> Dictionary:
 					return {"text": "", "shop": false}
 				return {"text": "RUNE (the bargain): nothing left to hand over — %s."
 					% Runes.empty_offer_reason(looter, held_names), "shop": false}
-			looter["rune_candidates"] = looter.get("rune_candidates", []) + [candidates]
-			looter["rune_picks_owed"] = int(looter.get("rune_picks_owed", 0)) + 1
+			queue_rune_pick(looter, candidates)
 			# **AND THE COUNT IS READ OFF THE TRIPLE**, for the elite cache's
 			# reason: a short triple is ordinary now and "one of three" would be
 			# the screen lying about a reward.
@@ -4982,6 +5070,7 @@ func award_upgrade_pick(member: Dictionary) -> bool:
 	var offer := roll_upgrade_offer(member)
 	if offer.is_empty():
 		return false
+	note_pick_earned(member, "upgrade")
 	member["up_candidates"] = member.get("up_candidates", []) + [offer]
 	member["up_picks_owed"] = int(member.get("up_picks_owed", 0)) + 1
 	return true

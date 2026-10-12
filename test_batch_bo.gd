@@ -908,8 +908,12 @@ func _sources() -> void:
 	# single-hero branch is DELETED rather than left standing beside it.
 	ok(not map.contains("\"draft\": \"THE DRAFT\""),
 		"§3: BO's single-hero draft branch is gone from the pick overlay")
-	ok(map.count("func _open_party_draft(") == 1
-		and map.contains("if kind == \"draft\":\n\t\t_open_party_draft()"),
+	# **RE-POINTED AT BATCH IB §2 — THE RENDERER IS THE HERO'S OWN SCREEN (ruled: each
+	# class drafts separately, runes and abilities together).** The question is the same:
+	# exactly one draft renderer, the one CHOOSE routes to, and the party screen it
+	# replaced is gone rather than left beside it.
+	ok(map.count("func _open_hero_draft(") == 1 and not map.contains("func _open_party_draft(")
+		and map.contains("if kind == \"draft\" or kind == \"rune\":\n\t\t_open_hero_draft(idx)"),
 		"§3: ...and the draft has exactly one renderer, which CHOOSE routes to")
 
 

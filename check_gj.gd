@@ -258,52 +258,32 @@ func _fight(s: Node) -> String:
 	return "the battle's card drew nothing to press"
 
 
-# The draft screen, declined column by column through each column's own button
-# (found by what it is bound to), then confirmed.
+# BATCH IB §6a — A HERO'S DRAFT SCREEN, answered through the one helper
+# (`Gate.answer_hero_draft`): his card declined, as this road always declined the draft,
+# and the first rune of his cache taken, as it always took one off the card's overlay.
 func _answer_the_draft(s: Node) -> void:
-	for _i in 8:
-		var ov: Node = Gate.overlay(s, 62)
-		var btn: Button = null
-		var btns: Array = []
-		Gate.buttons(ov if ov != null else s, btns)
-		for b in btns:
-			if String((b as Button).text) != "Decline" or (b as Button).disabled:
-				continue
-			for c in (b as Button).pressed.get_connections():
-				if (c["callable"] as Callable).get_method() == "_stage_draft_decline":
-					btn = b
-		if btn == null:
-			break
-		btn.emit_signal("pressed")
-		await process_frame
-	var again: Node = Gate.overlay(s, 62)
-	if Gate.press(again if again != null else s, ["Confirm the draft"]) == "":
+	var a: Dictionary = await Gate.answer_hero_draft(self, s, false)
+	if not bool(a.get("confirmed", false)):
 		_dead.append("the draft screen at %s would not confirm" % _where())
-		s.call("_close_party_draft")
-	await Gate.frames(self, 2)
+		s.call("_close_hero_draft")
+		await Gate.frames(self, 2)
 
 
-# A pick owed on a hero card: the card's own CHOOSE button, then the first live
-# choice on the overlay it opens.
+# A pick owed on a hero card: the overlay the arrival put up, or else the card's own
+# CHOOSE, and then the first choice the overlay MARKS (IB §6a: the game marks its
+# choices, so a button that only previews or closes is never pressed).
 func _answer_a_pick(s: Node, idx: int) -> void:
 	var m: Dictionary = _run.party[idx]
-	var choose: Button = Gate.bound_button(s, "_open_pick_overlay", [idx])
-	var ov: Node = null
-	if choose != null:
-		choose.emit_signal("pressed")
-		await process_frame
+	var ov: Node = Gate.overlay(s, 60)
+	if Gate.pick_choices(ov).is_empty():
+		var choose: Button = Gate.bound_button(s, "_open_pick_overlay", [idx])
+		if choose != null:
+			choose.emit_signal("pressed")
+			await process_frame
+		if Gate.hero_draft(s) != null:
+			return   # a draft or a rune cache: his own screen, answered on the next step
 		ov = Gate.overlay(s, 60)
-	var live: Array = []
-	if ov != null:
-		var btns: Array = []
-		Gate.buttons(ov, btns)
-		for b in btns:
-			# BATCH HZ §1b — the overlay carries the kit preview's button under its
-			# title since HZ: it opens the hero's kit and answers nothing, so it is
-			# never the pick. Found by the meta the game sets on it, not by its words.
-			if String((b as Button).text) != "Not yet" and not (b as Button).disabled \
-					and not (b as Button).has_meta("kit_preview"):
-				live.append(b)
+	var live: Array = Gate.pick_choices(ov)
 	if live.is_empty():
 		_dead.append("hero %d owed a pick at %s and no live choice could be pressed" % [idx, _where()])
 		for k in ["bm_picks_owed", "up_picks_owed", "rune_picks_owed"]:
@@ -314,22 +294,23 @@ func _answer_a_pick(s: Node, idx: int) -> void:
 		return
 	(live[0] as Button).emit_signal("pressed")
 	await Gate.frames(self, 2)
-	var still: Node = Gate.overlay(s, 60)
-	if still != null:
-		still.queue_free()
+	# A press that left its own overlay up did nothing; the next pick's overlay, which
+	# the arrival opens as this one resolves, is left for the next step.
+	if is_instance_valid(ov) and not ov.is_queued_for_deletion():
+		ov.queue_free()
 		await process_frame
 
 
-# One press on the map: the draft and the owed picks first, as the screen chains
-# them, then the reading, then the node's own button.
+# One press on the map: what the arrival put up and the owed picks first, as the
+# screen chains them, then the reading, then the node's own button.
 func _step_map(s: Node) -> String:
-	if Gate.overlay(s, 62) != null:
+	if Gate.hero_draft(s) != null:
 		await _answer_the_draft(s)
 		return "draft"
 	for idx in _run.party.size():
 		var m: Dictionary = _run.party[idx]
 		if int(m.get("bm_picks_owed", 0)) > 0 or int(m.get("up_picks_owed", 0)) > 0 \
-				or int(m.get("rune_picks_owed", 0)) > 0:
+				or int(m.get("rune_picks_owed", 0)) > 0 or int(m.get("draft_picks_owed", 0)) > 0:
 			await _answer_a_pick(s, idx)
 			return "pick"
 	var reach: Array = _run.reachable()

@@ -29,94 +29,79 @@ never have fired: **an alarm set above the failure level is not an alarm.** `che
 sentence every battery: over it is a warning, and past it by more than one batch at the record is a failure — the largest
 single-batch growth on record is **+13.38 KiB** (ES's +13,700 B). *In the preamble for the archive pointer's reason.*
 
-*Last rewritten: 2026-10-11 (Batch IA).*
+*Last rewritten: 2026-10-12 (Batch IB).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: IA — THE THIRD CORE SLOT, AND THE BAG.** IMPLEMENT ONLY. **Game code changed in eight files** — `battle.gd`, `events.gd`,
-  `kit_preview.gd`, `map_screen.gd`, `party_screen.gd` and `run_state.gd`, and comments only in `runes.gd` and `unit.gd` — and the
-  glossary's Runes entry: two lines in the damage path, a constant, a panel, a word and a door. Full working:
-  **`docs/reports/IA.md`**. **IA opens the I block; the next letter is IB.**
-- **§0 — HZ's SEVEN RULINGS, ANSWERED (the designer's).** One changed code: **Lifewell and the reflect's log line pay and print what
-  landed** (§1). Six are confirmed, each reason recorded where a batch will meet it: Boil Over's 0.8% and 40% floor stand (the tension
-  under BOIL OVER'S RATE, below); Empty Pulpit, Dead Air and Dirge are comeback runes, kept, the live re-read recorded as load-bearing
-  (`CLAUDE.md`'s crest block) and the pool's narrowness under THE CREST POOL, below; the telegraph keeps its band, the boundary in the
-  combat rules' intent block; the mirror's per-body rounding is kept, its magnitude beside the ruling in the frame block; Boil Over
-  stays Perfectless; Tithe's chip stays, the strip and the plate named as two surfaces (`CLAUDE.md`'s HZ §1 block).
-- **§1 — THE TWO LINES.** The vow's gate's own predicate, `battle._vow_silences`, is asked at the reflect under the ground's frame: a
-  reflect its layer's vow silences prints no line and waters nobody; with the vow off both read the figure that landed. **A figure
-  printed or paid off a blow is the blow that landed** — the rule, beside the frame's in `docs/combat-rules.md`; the sweep for the shape
-  is reported, not repaired (FOUND AT IA). **Lifewell has no live writer** — its node went at FX and its one rune, the Burning Censer, is
-  retired — so the fix reaches a saved run that wears the Censer, and nothing else today.
-- **§2 — THREE CORE SLOTS** (`Run.ENGINE_SLOTS` 2 → 3, the designer's ruling, twice). A flat constant, read by name everywhere; it
-  scaled with nothing — `Classes.core_slots` is the protected core's ability slots, another number. No save carries it, so a
-  two-slotted save opens with three slots and the third empty, and a three-slotted save opens in HZ's build over its cap with nothing
-  lost; **no save version moved**. A core rune applies at the SPAWN: slotting one on the map writes its `equipped` flag and nothing
-  else. **HL §1a's door, one more**: the event verb's fallback could hand over a core rune and ask to slot it; it is held unworn now.
-  The map card's core line wraps inside the card — it ran past the card with two titles already. The refusal reads *Every core slot
-  is filled.*
-- **§3 — THE HERO'S RUNE PANEL IN THREE SECTIONS**: CORE (every slot drawn, an empty one *— empty core slot —*), WORN, HELD, NOT WORN
-  (core runes first), separated. The sections replace the per-row state — no ✦, no *(held)* — and what he holds is counted once, in
-  that section's head; HR's nameplate marker stays on the map. The crest's bag is untouched; the kit preview stays one flat list with
-  its column. **Where it holds more than the screen has room for, the panel scrolls** (GT §1's shape, Close pinned): at the holding
-  cap, as HEAD's did for three classes, and — an empty core slot being a row — for a hero holding his class's six with a slot empty
-  (12 of 24 such panels). Whether it pages (HU §1) is IA's ruling 1.
-- **§4 — THE WORD IS CORE** on the hero sheet's state column and in the kit preview — HL §2's rename, finished on the surfaces;
-  `Run._refresh_rune_names` untouched.
-- **§5 — ONE STALE CLAIM**: the instrument rules' shared-walk sentence points at `check_dm` §1 and carries no number. **HX's 87 stand at
-  86** — none was repaired at HY or HZ, whose re-reads repaired only what their own changes falsified.
-- **§6 — HZ's FIFTEEN FOLDERS ARE NOT CLEARED**: the move to the Trash was refused by the session (FOUND AT IA: the count, and the
-  command in the report).
-- **THE INSTRUMENTS IA MOVED, EACH FOUND BY HEAD's GATES RUN UNMODIFIED ON IA's CODE (two recons).** The cap: `check_gt` §1 opens
-  the panel for every set of core runes up to `Run.ENGINE_SLOTS` (3477 → 6813: the eighty triples, and the six and the holding cap at
-  every slot count — recon 2's finding, an empty slot being a row, so the cap's own was the shortest of each) and `check_hu` §1a measures the
-  bar over the same sets, both through `Gate.engine_sets`; `check_ea` (236 → 396) and `check_eh` (230 → 310) already walked the
-  sets the cap allows and grew without a line changing. The panel: `check_hn` §2b, `check_hr` §1f (100 → 102, a compound arm split),
-  `check_hf` §4b, `check_gx` §3 and §4b and `check_gt` read its section heads and rows with no ✦ and no *(held)*; `check_hz` §1b
-  reads CORE in the kit preview. `check_parse` counts `check_ia`.
-- **THE VERIFICATION.** The saves were backed up first and verified by hash (`../save-backups/IA-20261011-174253`): byte-identical
-  to HZ's backup, so nothing has been played for three batches. **Two recons of HEAD's whole battery, each predicted first** — §1
-  alone, then all of IA's code: the first moved nothing; the second moved eight gates, each read off its FAIL lines and repaired to
-  intent — the panel's sections and marks, the preview's word and the cap's sets — **and showed the first re-point of `check_gt`
-  walking only the shortest panels** (an empty core slot is a row), repaired to walk every slot count. **Forty-five controls**, every
-  defect red at its line, the baselines green, the repair two-armed against its first version. **The pre-pass** — 141 targets in an
-  isolated copy proved equal to the tree, 19:29:47 to 20:47:21 — read `check_de` 581 / 0 / 0, as predicted, and the post-repair
-  subset, every reader of what changed after it, read each at its prediction, with a standalone `check_de` at 581 / 0 / 0. **The
-  acceptance run in the repository** — 141 targets, 20:54:27 to 22:12:12, `ps` read by rows every 15 s with no game window in 310
-  readings — read `check_de` 581 / 0 / 0. The tree was byte-identical before and after (521 files) and the player's four files untouched.
-  **Then the final tree**: this line written after the run, swept against every gate literal, and the readers of this file with the
-  document instruments re-run on it in an isolated copy, each at its acceptance reading.
-- **`CLAUDE.md` IS 449,554 B = 439.02 KiB AGAINST ITS 510 KiB CEILING — 70.98 KiB UNDER** (+3,610 B at IA): the re-measure's first reading.
-- **`docs/state.md` IS 345,112 B = 337.02 KiB AGAINST ITS 380 KiB CEILING — 42.98 KiB UNDER** (+5,860 B at IA, this line included): the
-  re-measure's second reading.
-- **No save version moved**: the slot count is no save's field.
+- **Last batch: IB — THE DRAFT APPEARS, AND EACH HERO DRAFTS ALONE.** IMPLEMENT ONLY. **Game code changed in five files** —
+  `map_screen.gd` (the arrival and the hero's draft screen), `run_state.gd` (the order and the return), `battle.gd` (the rune
+  cache's one door), `party_screen.gd` and `talents_screen.gd` (a return is not an arrival) — and the glossary's draft entry.
+  Full working: **`docs/reports/IB.md`**. **The next letter is IC.**
+- **§0 — IA's FIVE RULINGS, ANSWERED (the designer's).** Two moved a line: **an empty core slot reads *— empty —*** (a row does
+  not repeat its section's head; HN §2.6's line unchanged), and **the event verb's core rune is held** — confirmed, its fallback
+  recorded as an unauthored source of core runes (TO WATCH IN PLAY). Three are confirmations with their reasons written: **the rune
+  panel keeps GT §1's scroll** — HU §1 governs a bar of peers under time pressure, GT §1 a sectioned document read between fights
+  (`CLAUDE.md`'s GT §1 block) — and its scroller already draws its bar where it scrolls and nowhere else (measured at the Cleric's
+  815 px and a bare panel, `check_ib` §4); **the save version stays** — a bump is for a key an older build writes away, not a value
+  it reads generously (`CLAUDE.md`'s VERSIONS bullet; the asymmetry is on the save line below); **the family is IC's**, its scope set.
+- **§1 — A PICK OWED OPENS ITSELF WHEN THE PARTY ARRIVES.** The draft did since BX; **the zone boss's ability, the mini-boss's
+  upgrade and the rune cache now do too**, one after another **in the order earned** (`Run.pending_picks`; a serial is stamped at
+  every award door), then the pouch's swap offers and the full holdings as before. **A holding never opens** — HR's ✦ N shows it.
+  Later and Not yet lose nothing, the pick stays marked on its card (the border, `◆ N kind`, CHOOSE), nothing dismissed opens again
+  on that arrival, and **a return from the hero sheet or the talents is not an arrival** (`Run.map_reentry`). It starts in `_ready`
+  after the map is drawn, behind the framing card, and never opens over an overlay.
+- **§2 — EACH HERO DRAFTS ALONE, HIS CARD AND HIS RUNE ON ONE SCREEN** (`map_screen._open_hero_draft`). The four columns were
+  four picks already, so it is a layout and no reward moved. A section only while owed: **the elite's looter owes both at every
+  elite** (a rune cache is an elite's spoils and a bargain's reward, not a map node); one Confirm, live once every section is
+  decided. The kit preview opens on him without walking; the crest stays out of his pick and its bag is untouched. The boss's
+  ability and the upgrade keep the pick overlay (IB's ruling 1).
+- **§3 — *— empty —*.** **§4 — THE CLEARING STEP IS RETIRED** (the designer's): a report and one command, beside HO §5's item
+  (FOUND AT HX, below).
+- **THE ROAD WALKERS ARE ONE ANSWER (FOUND AT HZ, paid)**: `Gate.answer_hero_draft`, `Gate.pick_choices` and the game's own
+  `choice` mark — `check_gj`, `check_gp`, `check_gv`, `check_hk` and `check_fh` answer a hero's screen and a pick by binding and
+  mark, never by words, each recording what it always recorded, and each printing what its run met.
+- **THE INSTRUMENTS.** `check_ib` is new. `check_fd` (+2), `check_fm` (+1), `check_fh` (+1) and `test_batch_bx` (+4) moved, each
+  attributed by an `ok()` trace; `check_he`, `check_hz`, `check_ho`, `check_hl`, `check_ia`, `check_map_screen`, `test_batch_bo` and
+  `check_gv` §2c were re-pointed at their counts; `check_parse` counts `check_ib` (`baselines.json` names each, with HEAD's reading).
+- **THE VERIFICATION.** The saves were backed up first and verified by hash (`../save-backups/IB-20261012-103914`): byte-identical
+  to IA's backup, so nothing has been played for four batches. **One recon of HEAD's whole battery against all of IB's code, predicted
+  first** (IB moved no damage path): `check_de` 581 / 30, every red in a gate the prediction named — fifteen of the seventeen named red,
+  `check_fe` and `test_batch_ah_battle` green, the possible `check_hk` red — each repaired to intent and every moved count attributed by
+  an `ok()` trace; the re-pointed `check_gv`, run alone, then showed its §2c still on the old overlay, and §2c was re-pointed too.
+  **Thirty-seven controls**, every defect red at its line, the baseline green, and the repairs red against HEAD's game code. **The
+  pre-pass** — 142 targets in an isolated copy proved equal to the tree, 12:39:20 to 13:57:51 — read `check_de` 585 / 0 / 0. **The
+  acceptance run in the repository** — 142 targets, 13:58:25 to 15:16:42, `ps` read by rows every 15 s with no game window in 312
+  readings — read `check_de` 585 / 0 / 0. The tree was byte-identical before and after (603 files) and the player's four files
+  untouched. **Then the final tree**: this line written after the run, swept against every gate literal, and the readers of this file
+  with the document instruments re-run on it in an isolated copy, each at its acceptance reading.
+- **`CLAUDE.md` IS 454,754 B = 444.10 KiB AGAINST ITS 510 KiB CEILING — 65.90 KiB UNDER** (+5,200 B at IB): the re-measure's first
+  reading — 8.1 batches at EZ's record, 13.0 at IB's own rate.
+- **`docs/state.md` IS 344,874 B = 336.79 KiB AGAINST ITS 380 KiB CEILING — 43.21 KiB UNDER** (−238 B at IB, this line included;
+  IA's closed entries went to the archive): the re-measure's second reading — 7.6 batches at IA's +5,860 B, 8.0 at HO–HW's
+  +5,528 mean. **It still binds**: 7.6 to 8.0 batches at its own rates against `CLAUDE.md`'s 8.1 at EZ's record and 13.0 at
+  IB's — by a hair at the record.
+- **No save version moved**: the pick order rides the members, which the save carries whole.
 - **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in a build
   older than HL**: HL's ceiling refuses a newer save from HL's build on — HR's v15 is the first bump it has guarded — and HJ's and
-  HK's builds, and `main`, carry no ceiling. **A save written here with three core runes slotted opens in HZ's build with all three
-  slotted**, over that build's cap, nothing lost.
-- **Next letter: IB — the draft flow** (the roadmap, below).
+  HK's builds, and `main`, carry no ceiling.
+- **Next letter: IC — the silenced-figure family** (the roadmap, below).
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### IA's RULINGS OWED — **FIVE; THE FIRST IS A SCREEN'S SHAPE, THE NEXT THREE CONFIRM IMPLEMENTATION CALLS, THE LAST IS A FAMILY**
+### IB's RULINGS OWED — **FOUR; ALL PLAYER-VISIBLE, NONE BLOCKS**
 
-Full working: `docs/reports/IA.md`, NEEDS A RULING.
+Full working: `docs/reports/IB.md`, NEEDS A RULING.
 
-1. **THE PANEL SCROLLS WHERE IT HOLDS MORE THAN THE SCREEN (§3d)** — at the holding cap in every class (eight held beside three worn:
-   693–753 px against a 583 px scroller with every core slot filled, **704–815 px with every slot empty**, an empty slot being a row),
-   and for a hero holding his class's six with a slot empty in 12 of 24 such panels (to 693 px). Close is pinned below the scroller in
-   every one — GT §1's ruled shape — and the panel already spans the screen. **Scrolling here is not new**: HEAD's panel at its own cap
-   scrolled for three classes of four (574–634 px against 558). HU §1 rules that a list of buttons outgrowing the screen pages and
-   never scrolls, and this panel is a list of buttons. Page it, or keep GT §1's scroll for this panel.
-2. **THE SAVE VERSION DID NOT MOVE (§2)** — no save carries a slot count, so the raise is no structure a build must walk, and HZ's
-   build opens a three-slotted save over its own cap with nothing lost. Confirm, or bump it so an older build refuses the save.
-3. **THE EMPTY SLOT'S WORDS (§2)** — an empty core slot reads *— empty core slot —*, the map card's *— empty —* register; where he
-   holds no core rune at all HN §2.6's line follows the slots, word for word. Confirm, or word it.
-4. **THE EVENT VERB'S CORE RUNE IS HELD, NOT SLOTTED (§2)** — the one door HL §1's ruling had not reached: its fallback could hand
-   over a core rune and ask to slot it. Confirm.
-5. **THE FAMILY §0.6 NAMES (§1)** — every other reader of a figure computed above the vow's gate, reported and not repaired: its
-   own batch, by FZ's pricing rule. The census is in the report and under FOUND AT IA.
+1. **THE BOSS'S ABILITY AND THE UPGRADE KEEP THE PICK OVERLAY (§2)** — a hero's own screen holds his draft and his rune cache;
+   the zone boss's card and the mini-boss's upgrade open on the pick overlay, in the same order-earned walk. Fold them into his
+   screen as sections, or keep two surfaces.
+2. **THE WORDS ON THE HERO'S SCREEN (§2), PROPOSED**: *THE DRAFT — <hero>*; a line saying what he is owed; the heads ABILITIES and
+   RUNES; *N choice(s) still to make* on the Confirm until it is live; *lets the cache go* for an empty cache let go. Confirm, or word it.
+3. **A RETURN FROM THE HERO SHEET OPENS NOTHING (§1)** — until IB the draft reopened when the player came back from a hero's sheet;
+   now a pick dismissed on an arrival waits on its card's CHOOSE until the party next arrives. Confirm.
+4. **THE ◆ MARKS A PICK AND A HOLDING (§1d)** — a pending pick reads `◆ 1 upgrade` under the slots; the upgrades a hero already holds
+   read `◆3` at the card's corner. Neither is mistaken for HR's ✦, but the ◆ names both. Keep, or give held upgrades another mark.
 
 ### BOIL OVER'S RATE — **0.8% AND THE 40% FLOOR STAND (IA §0.1, the designer's); THE TENSION IS RECORDED HERE AND THE LEVER IS UNBUILT**
 
@@ -164,6 +149,12 @@ block.
   writes, the three pay for a few turns of a fight; if a fall lasted they would pay for whole fights. **That item is no longer only a
   difficulty ruling — it sets the value of three of four crest runes, and it is owed before any of them is re-cut.**
 
+### FOUND AT IB AND NOT FIXED
+
+- **A POUCH OFFER THAT FINDS ROOM ENDS THE ARRIVAL'S TAIL** — `map_screen._check_item_offers` takes an offer silently when a
+  discard has made room, and returns without opening the next offer or the full-holding panel; they open at the next arrival.
+  HEAD's own (CT §3), met while building the walk; not moved (outside the brief).
+
 ### FOUND AT IA AND NOT FIXED
 
 - **THE FAMILY §0.6 NAMES: A FIGURE PRINTED OR PAID ABOVE THE GATE THAT COULD REFUSE IT** (the rule is in `docs/combat-rules.md`'s
@@ -174,16 +165,9 @@ block.
   built above the gate too**, so a silenced reflect still floats *-N Reflect* beside SILENT. Beyond those, 43 door calls print or
   pay the figure they hand the door within fourteen lines; most are other classes' cards no vow reaches. **Its own batch** (FZ's
   pricing rule): each repair is a different arm owing its own control.
-- **THE HERO'S RUNE PANEL SCROLLS WHERE IT HOLDS MORE THAN THE SCREEN** — at the holding cap, and for a six with a core slot empty
-  (an empty slot is a row): IA's ruling 1, above. `check_gt` §1 walks every slot count since recon 2 found the gap (`docs/reports/IA.md`
-  §8b).
 - **THE MAP CARD'S `Kit n/7` BUTTON RUNS PAST THE CARD** — HEAD's own, measured at IA: x 304–344 on every card, whose right edge is
   308, because its width is `CARD_W - 24 - 3 × 96`, which is below zero, so the button takes its text's width from x 304. Not moved
   here (outside the brief); one constant or one position when the card is next touched.
-- **HZ's FIFTEEN USER-DATA FOLDERS WERE NOT CLEARED** — *Dawn of Decay HZ ctlA … trnew*, **6,312 KiB**: the move to the Trash was
-  refused by the session's safety classifier, and HO §5 says to report it and not pursue it another way. `app_userdata` read **477
-  folders and 148,956 KiB** before and after. The command to run by hand is in `docs/reports/IA.md` §6. IA's own copies are named
-  *Dawn of Decay IA …*.
 - **THE STALE CLAIMS ARE NOT RETIRING**: HX's 87 stood at 87 through HY and HZ — each re-read repaired only what its own change
   falsified — and IA §5 repairs the first of them, so **86 stand**. At one a batch they last eighty-six more: **the claims batch is
   owed its own letter.** One of them is staler by IA's hand: the combat rules' header claim (FOUND AT HZ) — IA wrote into the
@@ -213,10 +197,6 @@ block.
   `check_hw` §1a prints it; kept, the `spite_ranks` and `whole_forest` shape.
 - **`docs/combat-rules.md`'s HEADER CLAIM, *every block below is byte-identical to what stood in `CLAUDE.md`*, IS STALER** — HZ
   edited two more of its blocks (the intent block, the recap-ledger block). Among HX's 87, a batch of their own.
-- **THE PICK OVERLAY'S ROAD WALKER IS FOUR COPIES OF ONE HELPER** — `_answer_a_pick` in `check_gj`, `check_gp`, `check_gv` and
-  `check_hk`, line for line but for what each records — so HZ's one new button stopped all four roads at once (DA §3's shape:
-  propagation by copy). HZ repaired each copy alike. **Owed**: one answer to *which buttons of a pick overlay are choices* — the
-  game marking its choice buttons, or one helper in `gate_fixture.gd` — so the next button on that overlay costs one edit, not four.
 
 ### RULED AND NOT BUILT — **FROM HX's BRIEF; BOIL OVER, HY's, IS BUILT AT HZ §2**
 
@@ -230,7 +210,11 @@ block.
 - **THE OLDER USER-DATA COPIES ARE THE DESIGNER'S TO CLEAR**: 455 named *Dawn of Decay* FX… to HL… and five named *DoD …* stand
   in `app_userdata` (counted at HX, after HW's eighteen went to the Trash) — outside HO §5's policy, which clears only the
   previous batch's. A ready command is in `docs/reports/HX.md` §7. *Every batch's own record of its folders is archived behind
-  this line.*
+  this line.* **HO §5's CLEARING STEP IS RETIRED FROM THE BRIEF (IB §4, the designer's — so no batch reinstates it)**: the move
+  was refused at HN and at IA, so a batch no longer attempts it; it reports the count and the disk and prints ONE command that
+  clears every spent prefix at once, which the designer runs when he likes (the rule's own block, `docs/instrument-rules.md`, says
+  so). **HZ's fifteen (6,312 KiB) and IA's fourteen stand beside the older ones**; IB's count and its command are in
+  `docs/reports/IB.md` §4.
 - **THE TWO REFERENCES HOLD 87 STALE CLAIMS AFTER HX — COUNTED BY A CENSUS (HX §1d), NOT FIXED.** 824 present-tense claims
   (the instrument file's 569, the combat file's 255), 735 of them mechanically checkable; **90 of the 735 were stale at HW's HEAD**
   — 70 in the instrument file, 20 in the combat file — and counts rot fastest (31 of 106). HX repaired the one passage its own work
@@ -273,13 +257,18 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
 - **`run_battery.sh` STILL DOES NOT ASK WHETHER THE GAME IS OPEN, AND A PLAIN `kill` STILL DOES NOT STOP IT** (HT's two, carried).
 ### THE PLAYTEST'S OTHER FINDINGS — **LATER BATCHES BY RULING (HW's brief §5); THE ROADMAP HOLDS THE ORDER**
 
-- **THE RE-MEASURE IS NOT RUN AT IA**: four batches have elapsed since HV, and the brief keeps it waiting; **the block index and
-  HV's pilot still wait on it.** Its two readings are in the WHERE block, one line each, so the day it is measurable is visible.
-  **THE ORDER:**
-- **IB — the draft flow**: a waiting draft appears automatically at the node map; **each class drafts separately**; **runes
-  and abilities on one hero-specific screen.**
-- **IC — resources and fire**: the Cleric's regen, against a census of everything that returns Mana to a Cleric; **more Burn
+- **THE RE-MEASURE IS NOT RUN AT IB**: five batches have elapsed since HV, and the brief keeps it waiting; **the block index and
+  HV's pilot still wait on it.** Its two readings are in the WHERE block, one line each with its arithmetic — **and since IA
+  `docs/state.md` is the tighter of the two, so it is the file the re-measure waits on.** **THE ORDER:**
+- **IC — THE SILENCED-FIGURE FAMILY (IB §0.5, its scope set before the brief)**: a live Cleric rune that does not cost what it
+  says, in the one path HY, HZ and IA each edited, so it goes before resources and before the claims. **§1 is the five readers of
+  the strike loop** — the damage float, the log line, `total_dealt` (which pays the card's lifesteal, the rune's, Siphon and recoil
+  off a refused blow), the Ruin leech and the `take_tick_damage` labels; **§2 is the 43 door calls that print or pay within
+  fourteen lines, and droppable** (FZ's pricing rule). The census is `docs/reports/IA.md` §1b and FOUND AT IA.
+- **ID — resources and fire**: the Cleric's regen, against a census of everything that returns Mana to a Cleric; **more Burn
   appliers in the Mage's pool.**
+- **IE — THE CLAIMS**: HX's 87 stand at **86** — the per-batch re-read stops the backlog growing and does not retire it, so it is a
+  batch of its own (FOUND AT HX, FOUND AT IA).
 - **MANA STAYS (ruled).** The Mage and the Hunter run dry and plan around it; only the Cleric is always full, so it is one
   class's regen and not the resource. **Channel's tempo payout — Mana spent buys speed — is alive and still owed.**
 - **Unchanged, and said so**: `CONJUNCTIONS` keeps its one row and `RUPTURE_BREAK_PER_TICK` stays at 10, still unfelt; a meter is
@@ -451,6 +440,13 @@ WHERE block.
   three things, which may be optimising for nothing. **THE LEVER, NAMED AND NOT BUILT: the third slot could be EARNED rather than
   given** — gated behind a rung, so the early run keeps one direction and the third core is a progression reward. Three is ruled;
   this is the thing play compares against.
+- **THE EVENT VERB IS AN UNAUTHORED SOURCE OF CORE RUNES (IB §0.4, the designer's watch item).** Its grant prefers an ordinary
+  rune and falls back on the whole roll once a hero's ordinary pool is spent, core runes included — held unworn since IA. **Watch
+  whether an ordinary pool actually runs dry in a run played forward**: if it does, events become the main source of core runes, and
+  nobody authored that. The fallback is kept (it beats granting nothing); three core slots make this faucet matter more.
+- **THE ARRIVAL'S WEIGHT (IB §1).** After an elite the four heroes' screens open one after another; after a zone boss, four ability
+  overlays. Whether that reads as a reminder or as a queue to click through is play's to say — the walk's order and its dismissal
+  are one function each (`map_screen._arrival_next`, `_arrival_dismissed`).
 - **Communion's 105% at the top of its band stays dormant and flagged** (`communion_ranks`, which nothing writes);
   `test_batch_be` §6 reds the day a writer arrives.
 
@@ -747,7 +743,7 @@ Full working: `docs/reports/GV.md`, NEEDS A RULING.
    frozen offer is re-asked at the answer and the repair is WRITTEN BACK; that is right for a candidate that can only
    get worse (retired, owned). An unequipped engine is the player's own reversible choice, so the row is kept in the
    stored triple, filtered out of the answer while the engine is out, and offered again when it is back — and
-   `map_screen._pick_rune` indexes the list the buttons were built from. **The alternative is FD's literal form**: drop
+   `map_screen._take_rune_pick` finds its rune in the list the buttons were built from. **The alternative is FD's literal form**: drop
    the row, top the triple up, store that — under which one toggle before answering a cache costs it those runes for
    good, and can spend the pick on nothing.
 2. **THE GATE READS WHAT HE HAS EQUIPPED, AND THAT IS THE ONLY READING THAT GATES ANYTHING.** *(Its reason was the
@@ -3256,7 +3252,10 @@ re-derived from the source at DM; not one was moved.**
   **`check_cn.gd`'s `WANT_PROFILE` pins all six by number — moving one here is two edits.**
 - **Save versions: the run save is v15** (a pre-**v10** save is REFUSED and cleared — the version
   and the threshold are different numbers). **v11 (CT), v12 (EG), v13 (GF), v14 (HK) and v15 (HR) are all
-  TOLERANT and none moved the threshold; GH moved no version.** A save from a NEWER build is refused and kept (HL §5). Talent cells cost 1/2/3 by tier — **27 cells = 54
+  TOLERANT and none moved the threshold; GH, IA and IB moved no version.** A save from a NEWER build is refused and kept (HL §5).
+  **THE ASYMMETRY, FINDABLE (IB §0.2, ruled — not a defect, not refused)**: an IA save opened in HZ's build reads *3 of 2 slots
+  filled*, seats three engines, refuses a fourth, and round-trips whole — a bump is for a key an older build writes away, never a
+  value it reads generously (`CLAUDE.md`'s VERSIONS bullet). IB's pick order rides the members, which an older build keeps. Talent cells cost 1/2/3 by tier — **27 cells = 54
   points a class.**
 - **Relics: 25 in the pool** — 17 common, 8 rare. **Up to 3 are assigned per run**, party-wide —
   **confirmed at EN as the code's behaviour, not just this file's memory of it.** The per-hero
@@ -3884,8 +3883,8 @@ reach `bp` §7 at all: it is a Warrior flow.**
 
 ### Last measurements
 
-**IA's verification is in `docs/reports/IA.md` §8, written after the acceptance run.** IA moved the damage path and two
-screens, so HEAD's unmodified battery read IA's code twice — §1 alone, then all of it — before any instrument moved, and
-`check_ia` drove what it moved on this tree and on HEAD's. **The figures live in the report and not here**, because this file is read by
+**IB's verification is in `docs/reports/IB.md` §6, written after the acceptance run.** IB moved no damage path, so HEAD's
+unmodified battery read all of IB's code once, predicted first, before any instrument moved, and `check_ib` drove what it moved on
+this tree and on HEAD's. **The figures live in the report and not here**, because this file is read by
 four gates — `check_es` §4, `check_fg` §4, `check_hp` §5 and `check_hx` §2 — and a cell written behind the run would owe a
 post-run proof of its own.

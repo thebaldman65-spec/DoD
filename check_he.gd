@@ -734,7 +734,8 @@ func _s5_the_draft() -> void:
 				"§5: %s slotted again, %s is not taken ('%s')" % [eng, card, took])
 			print("    %-8s %-14s %-24s out: \"%s\"  in: taken" % [cls, eng, card, why])
 	ok(engines_seen >= 10, "§5: only %d engines gate a draft card — the arm has stopped covering the pool" % engines_seen)
-	# THE PARTY DRAFT SCREEN: no button for a held card, and the column says why.
+	# THE DRAFT SCREEN — THE HERO'S OWN SINCE IB §2: no button for a held card, and the
+	# section says why.
 	# BATCH HL §1 — THE HELD CARD IS LUNGE, THE STANCE PIECE STILL GATED: Guard
 	# Change travels with the Stances since HL, so a Stances holder OWNS it and the
 	# column would hold it back as owned, not as waiting on the rune. And the rune's
@@ -748,10 +749,10 @@ func _s5_the_draft() -> void:
 		var mp: Node = current_scene
 		_close_overlays(mp)
 		await Gate.frames(self, 2)
-		mp._open_party_draft()
+		mp._open_hero_draft(0)   # BATCH IB §2 — the Warrior's own screen
 		await Gate.frames(self, 3)
 		var ov: Node = Gate.overlay(mp, 62)
-		ok(ov != null, "§5 (%s): the party draft screen did not open" % tag)
+		ok(ov != null, "§5 (%s): the Warrior's draft screen did not open" % tag)
 		if ov == null:
 			continue
 		var texts: Array = _button_texts(ov)
@@ -786,7 +787,7 @@ func _s5_the_draft() -> void:
 	var mp2: Node = current_scene
 	_close_overlays(mp2)
 	await Gate.frames(self, 2)
-	mp2._open_party_draft()
+	mp2._open_hero_draft(0)   # BATCH IB §2 — the Warrior's own screen
 	await Gate.frames(self, 3)
 	var ov2: Node = Gate.overlay(mp2, 62)
 	var texts2: Array = _button_texts(ov2) if ov2 != null else []
@@ -843,7 +844,8 @@ func _s6_the_band() -> void:
 	await Gate.frames(self, 2)
 	mp._open_pick_overlay(0)
 	await Gate.frames(self, 3)
-	var ov: Node = Gate.overlay(mp, 60)
+	# BATCH IB §2 — a cache's buttons are on the hero's own draft screen, its RUNES section.
+	var ov: Node = Gate.hero_draft(mp)
 	var texts: Array = _button_texts(ov) if ov != null else []
 	ok(ov != null and texts.has("Long Watch") and texts.has("Last Word"),
 		"§6: a cache's buttons read %s — each should be the rune's name and nothing else" % [texts])

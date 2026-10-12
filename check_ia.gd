@@ -39,7 +39,9 @@ const SPECS := ["warden", "pyromancer", "inquisitor", "mystic"]
 const SEATS := ["warrior", "mage", "cleric", "hunter"]
 const SEED := 20261011
 const HN_LINE := "No core rune held. Core runes are found in play, alongside the others."
-const EMPTY_SLOT := "— empty core slot —"
+# BATCH IB §0.3 (ruled): *— empty —*, the map card's word — a row does not repeat its
+# section's head, which already says CORE and counts the slots.
+const EMPTY_SLOT := "— empty —"
 const FULL := "Every core slot is filled."
 
 var _g := Gate.new()

@@ -120,11 +120,12 @@ func _process(_d: float) -> void:
 				"  (the swapped card carries no tag)" if swapped else ""])
 			map_scene._toggle_loadout(1, String(lpool[0]))
 			_close()
-			# BATCH BX §2 — THE PARTY-WIDE DRAFT SCREEN, which like the lattice is
-			# only ever EXECUTED here. Four columns is four times the layout, and
-			# a column that overflows or a Callable that does not bind fails at
-			# DRAW time, where no source-level check can see it.
-			# ONE HERO AT THE CAP, so a column renders its DROP step. That
+			# BATCH BX §2 — THE DRAFT SCREEN, which like the lattice is only ever
+			# EXECUTED here; **SINCE IB §2 IT IS EACH HERO'S OWN** (ruled: each class
+			# drafts separately), so it is drawn four times, once a hero, and a section
+			# that overflows or a Callable that does not bind fails at DRAW time, where
+			# no source-level check can see it.
+			# ONE HERO AT THE CAP, so his section renders its DROP step. That
 			# button and the modal it opens are drawn nowhere else, and a
 			# Callable that does not bind fails at DRAW time.
 			var capped: Dictionary = Run.party[0]
@@ -138,23 +139,27 @@ func _process(_d: float) -> void:
 				Run.award_draft_pick(m2)
 			_open("four heroes owed a draft      ")
 			var d_before: int = _tally(map_scene)["all"]
-			map_scene._open_party_draft()
+			map_scene._open_hero_draft(0)
 			var d_after: Dictionary = _tally(map_scene)
-			print("  party draft added %d nodes, %d Buttons, %d columns owed" % [
-				int(d_after["all"]) - d_before, int(d_after["btn"]),
-				map_scene._draft_columns().size()])
+			print("  the Warrior's draft screen added %d nodes, %d Buttons; %d picks owed" % [
+				int(d_after["all"]) - d_before, int(d_after["btn"]), Run.owed_draft_picks()])
 			# **BATCH EK §3 — THE TAG LINE, DRIVEN RATHER THAN ASSERTED.** A
 			# vocabulary that renders on NOTHING passes every static check in
 			# the tree — DS's Heads Down shape, where the code was right and the
 			# behaviour was inert. This walks the drawn tree for Labels whose
 			# text is a live tag line and requires one PER OFFERED CARD, so a
-			# renderer that stops being called says so here and nowhere else.
+			# renderer that stops being called says so here and nowhere else —
+			# **on each hero's own screen since IB §2**, read off the screen up.
 			var ek_offered := 0
-			for i3 in map_scene._draft_columns():
-				var ekq: Array = Run.party[int(i3)].get("draft_candidates", [])
+			var ek_drawn: Array = []
+			for i3 in Run.party.size():
+				map_scene._open_hero_draft(i3)
+				var ekq: Array = Run.party[i3].get("draft_candidates", [])
 				if not ekq.is_empty():
 					ek_offered += (ekq[0] as Array).size()
-			var ek_drawn: Array = _tag_labels(map_scene)
+				var up: Node = map_scene.get("_draft_overlay")
+				if up != null:
+					ek_drawn.append_array(_tag_labels(up))
 			var ek_ok: bool = ek_drawn.size() == ek_offered and ek_offered > 0
 			print("  EK tag lines drawn: %d for %d offered cards (%s)" % [
 				ek_drawn.size(), ek_offered, "OK" if ek_ok else "MISMATCH"])
@@ -165,13 +170,14 @@ func _process(_d: float) -> void:
 			# pinned as `expect` in `baselines.json` — so a MISMATCH has to take
 			# that line away or `check_de` reads a mismatched run as a clean one.
 			_ek_tags_ok = ek_ok and _es_census_ok
-			# Stage a card on every column and confirm through the real door.
+			# Stage a card on every hero and confirm each through the real door.
 			for i2 in Run.party.size():
 				var q: Array = Run.party[i2].get("draft_candidates", [])
 				if not q.is_empty() and not q[0].is_empty():
 					map_scene._stage_draft(i2, String(q[0][0]))
 			print("  hero 0 at cap, decided BEFORE naming a drop: %s"
 				% str(map_scene._draft_decided(0)))
+			map_scene._open_hero_draft(0)
 			var pre: int = _tally(map_scene)["all"]
 			map_scene._open_drop_overlay(0, "draft",
 				String((Run.party[0]["draft_candidates"] as Array)[0][0]),
@@ -180,8 +186,10 @@ func _process(_d: float) -> void:
 			map_scene._stage_draft_drop(0,
 				String((Run.party[0]["bm_abilities"] as Array)[0]))
 			print("  ...decided AFTER: %s" % str(map_scene._draft_decided(0)))
-			map_scene._confirm_party_draft()
-			print("  confirmed; picks still owed: %d" % Run.owed_draft_picks())
+			for i4 in Run.party.size():
+				map_scene._open_hero_draft(i4)
+				map_scene._confirm_hero_draft()
+			print("  confirmed, a hero at a time; picks still owed: %d" % Run.owed_draft_picks())
 			_close()
 			if _ek_tags_ok:
 				print("check_map_screen: OK")

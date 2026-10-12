@@ -527,12 +527,16 @@ func _s3_the_re_ask() -> void:
 	var map: Node = current_scene
 	ok(int(hero.get("rune_picks_owed", 0)) == 1,
 		"§3: the owed pick did not survive the step onto the map")
-	var before := _live_children(map)
-	map.call("_open_pick_overlay", idx)
-	await process_frame
-	ok(_live_children(map) > before, "§3: the pick overlay opened nothing")
-	var overlay: Node = map.get_child(map.get_child_count() - 1)
-	ok(_has_text(overlay, "RUNE"), "§3: the overlay that opened is not the rune pick")
+	# BATCH IB §1/§2 — RE-POINTED, THE QUESTION UNMOVED: the owed pick opens BY ITSELF as
+	# the party arrives, on the hero's own draft screen (its RUNES section; he owes no
+	# card), where it was the card's CHOOSE that opened the rune overlay. What opened is
+	# read off the game's own mark for that screen, never off the child order.
+	var overlay: Node = Gate.hero_draft(map)
+	ok(overlay != null and int(overlay.get_meta("hero_draft")) == idx,
+		"§3: the pick did not open on arrival, on the hero's own screen")
+	if overlay == null:
+		return
+	ok(_has_text(overlay, "RUNE"), "§3: the screen that opened is not the rune pick")
 	# **THE HEADING OVER NOTHING IS THE DEFECT.** Before FM §3 this overlay drew
 	# `"… — RUNE, choose one"` and a single `Not yet` button, and the pick could
 	# never be answered.
@@ -541,9 +545,16 @@ func _s3_the_re_ask() -> void:
 	ok(_buttons_named(overlay, "Let it go") == 1,
 		"§3: the overlay offers no way to spend a pick that cannot be answered — the run carries it forever")
 
-	# (5) PRESS IT. The pick is spent, the queue is emptied, and the card stops
-	# offering a choice it cannot honour.
+	# (5) PRESS IT, AND CONFIRM IT (IB §2: the screen's sections commit at its one
+	# Confirm). The pick is spent, the queue is emptied, and the card stops offering a
+	# choice it cannot honour.
 	ok(_press(overlay, "Let it go"), "§3: the `Let it go` button did not fire")
+	await process_frame
+	var conf: Button = Gate.bound_button(Gate.hero_draft(map), "_confirm_hero_draft", []) \
+		if Gate.hero_draft(map) != null else null
+	ok(conf != null, "§3: letting the cache go left the screen with no Confirm to press")
+	if conf != null:
+		conf.emit_signal("pressed")
 	for _j in 3:
 		await process_frame
 	ok(int(hero.get("rune_picks_owed", 0)) == 0,
@@ -584,8 +595,10 @@ func _s3_the_re_ask() -> void:
 	# **BATCH HZ §1b — AND THE KIT PREVIEW'S ONE BUTTON**, which every pick overlay
 	# carries under its title since HZ: it opens the hero's kit and is neither a pick
 	# nor an empty-state door, so the count stays exact over the whole overlay.
-	ok(_count_buttons(ov2) == c2.size() + 2,
-		"§3: the control overlay drew %d buttons against %d runes on offer plus `Not yet` and the kit preview button"
+	# **BATCH IB §2 — ON THE HERO'S OWN SCREEN**, the buttons beside the runes are the kit
+	# preview's, the Confirm and Later (the overlay's `Not yet` was its one way out).
+	ok(_count_buttons(ov2) == c2.size() + 3,
+		"§3: the control screen drew %d buttons against %d runes on offer plus the kit preview, the Confirm and Later"
 			% [_count_buttons(ov2), c2.size()])
 
 

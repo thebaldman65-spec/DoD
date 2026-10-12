@@ -17,6 +17,56 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT IB — 2026-10-12, FROM `docs/state.md` AS IA LEFT IT (`ae4ee06`)
+
+**What came here**: IA's rulings, all five answered in IB's brief; the closed items of three sections that stay live — the
+panel's scroll (FOUND AT IA, ruled at IB §0.1), HZ's uncleared folders (FOUND AT IA, overtaken by IB §4, which retires the move:
+the counts carry into FOUND AT HX's item), the pick overlay's four-copy walker (FOUND AT HZ, made one helper at IB §6a) — and the
+roadmap's IB line (built at IB §1 and §2). Each was read against IB's tree before it moved; everything else in the live file stayed.
+
+### ~~IA's RULINGS OWED~~ — **ALL FIVE ANSWERED IN IB's BRIEF: THE PANEL KEEPS GT §1's SCROLL (1), THE SAVE VERSION STAYS (2) AND THE EVENT VERB'S CORE RUNE IS HELD (4), CONFIRMED WITH THEIR REASONS RECORDED; THE EMPTY SLOT READS *— empty —* (3, BUILT AT IB §3); THE FAMILY IS IC's, ITS SCOPE SET (5)**
+
+Full working: `docs/reports/IA.md`, NEEDS A RULING.
+
+1. **THE PANEL SCROLLS WHERE IT HOLDS MORE THAN THE SCREEN (§3d)** — at the holding cap in every class (eight held beside three worn:
+   693–753 px against a 583 px scroller with every core slot filled, **704–815 px with every slot empty**, an empty slot being a row),
+   and for a hero holding his class's six with a slot empty in 12 of 24 such panels (to 693 px). Close is pinned below the scroller in
+   every one — GT §1's ruled shape — and the panel already spans the screen. **Scrolling here is not new**: HEAD's panel at its own cap
+   scrolled for three classes of four (574–634 px against 558). HU §1 rules that a list of buttons outgrowing the screen pages and
+   never scrolls, and this panel is a list of buttons. Page it, or keep GT §1's scroll for this panel.
+2. **THE SAVE VERSION DID NOT MOVE (§2)** — no save carries a slot count, so the raise is no structure a build must walk, and HZ's
+   build opens a three-slotted save over its own cap with nothing lost. Confirm, or bump it so an older build refuses the save.
+3. **THE EMPTY SLOT'S WORDS (§2)** — an empty core slot reads *— empty core slot —*, the map card's *— empty —* register; where he
+   holds no core rune at all HN §2.6's line follows the slots, word for word. Confirm, or word it.
+4. **THE EVENT VERB'S CORE RUNE IS HELD, NOT SLOTTED (§2)** — the one door HL §1's ruling had not reached: its fallback could hand
+   over a core rune and ask to slot it. Confirm.
+5. **THE FAMILY §0.6 NAMES (§1)** — every other reader of a figure computed above the vow's gate, reported and not repaired: its
+   own batch, by FZ's pricing rule. The census is in the report and under FOUND AT IA.
+
+### FOUND AT IA AND NOT FIXED — ITS CLOSED ITEMS (archived at IB; the section stays in `docs/state.md`)
+
+- **THE HERO'S RUNE PANEL SCROLLS WHERE IT HOLDS MORE THAN THE SCREEN** — at the holding cap, and for a six with a core slot empty
+  (an empty slot is a row): IA's ruling 1, above. `check_gt` §1 walks every slot count since recon 2 found the gap (`docs/reports/IA.md`
+  §8b).
+- **HZ's FIFTEEN USER-DATA FOLDERS WERE NOT CLEARED** — *Dawn of Decay HZ ctlA … trnew*, **6,312 KiB**: the move to the Trash was
+  refused by the session's safety classifier, and HO §5 says to report it and not pursue it another way. `app_userdata` read **477
+  folders and 148,956 KiB** before and after. The command to run by hand is in `docs/reports/IA.md` §6. IA's own copies are named
+  *Dawn of Decay IA …*.
+
+### FOUND AT HZ AND NOT FIXED — ITS CLOSED ITEMS (archived at IB; the section stays in `docs/state.md`)
+
+- **THE PICK OVERLAY'S ROAD WALKER IS FOUR COPIES OF ONE HELPER** — `_answer_a_pick` in `check_gj`, `check_gp`, `check_gv` and
+  `check_hk`, line for line but for what each records — so HZ's one new button stopped all four roads at once (DA §3's shape:
+  propagation by copy). HZ repaired each copy alike. **Owed**: one answer to *which buttons of a pick overlay are choices* — the
+  game marking its choice buttons, or one helper in `gate_fixture.gd` — so the next button on that overlay costs one edit, not four.
+
+### THE PLAYTEST'S OTHER FINDINGS — ITS CLOSED ITEMS (archived at IB; the section stays in `docs/state.md`)
+
+- **IB — the draft flow**: a waiting draft appears automatically at the node map; **each class drafts separately**; **runes
+  and abilities on one hero-specific screen.**
+
+---
+
 ## ARCHIVED AT IA — 2026-10-11, FROM `docs/state.md` AS HZ LEFT IT (`91a824e`)
 
 **What came here**: HZ's rulings, all seven answered in IA's brief; the closed items of two sections that stay live — the

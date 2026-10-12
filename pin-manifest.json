@@ -2,15 +2,15 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1740,
-  "source": 1305,
+  "total": 1742,
+  "source": 1307,
   "other": 113,
   "document": 322
  },
  "source_residency": {
   "narrow": 44,
   "code": 793,
-  "absent": 315,
+  "absent": 317,
   "runtime": 101,
   "unresolved": 3,
   "comment": 46,
@@ -2173,7 +2173,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#228"
+   "g": "check_fd.gd#236"
   },
   {
    "s": "check_fd.gd",
@@ -2184,7 +2184,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#214"
+   "g": "check_fd.gd#222"
   },
   {
    "s": "check_fd.gd",
@@ -2195,7 +2195,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#227"
+   "g": "check_fd.gd#235"
   },
   {
    "s": "check_fd.gd",
@@ -2206,7 +2206,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#213"
+   "g": "check_fd.gd#221"
   },
   {
    "s": "check_fd.gd",
@@ -2217,7 +2217,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#215"
+   "g": "check_fd.gd#223"
   },
   {
    "s": "check_fd.gd",
@@ -2228,7 +2228,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#222"
+   "g": "check_fd.gd#230"
   },
   {
    "s": "check_fd.gd",
@@ -2239,7 +2239,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#230"
+   "g": "check_fd.gd#238"
   },
   {
    "s": "check_fd.gd",
@@ -2250,7 +2250,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_fd.gd#222"
+   "g": "check_fd.gd#230"
   },
   {
    "s": "check_fe.gd",
@@ -2651,7 +2651,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fh.gd#1402"
+   "g": "check_fh.gd#1393"
   },
   {
    "s": "check_fh.gd",
@@ -2662,7 +2662,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fh.gd#781"
+   "g": "check_fh.gd#772"
   },
   {
    "s": "check_fh.gd",
@@ -2673,7 +2673,18 @@
    "r": "unresolved",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_fh.gd#784"
+   "g": "check_fh.gd#775"
+  },
+  {
+   "s": "check_fh.gd",
+   "fn": "_s3_the_rune_offer",
+   "h": "scripts/battle.gd",
+   "n": "queue_rune_pick",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "derived",
+   "g": "check_fh.gd#775"
   },
   {
    "s": "check_fh.gd",
@@ -2684,18 +2695,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_fh.gd#784"
-  },
-  {
-   "s": "check_fh.gd",
-   "fn": "_s3_the_rune_offer",
-   "h": "scripts/battle.gd",
-   "n": "rune_picks_owed",
-   "p": "+",
-   "r": "code",
-   "k": "loop-list",
-   "how": "derived",
-   "g": "check_fh.gd#784"
+   "g": "check_fh.gd#775"
   },
   {
    "s": "check_fi.gd",
@@ -3862,7 +3862,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hl.gd#433"
+   "g": "check_hl.gd#439"
   },
   {
    "s": "check_hl.gd",
@@ -3873,7 +3873,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hl.gd#432"
+   "g": "check_hl.gd#438"
   },
   {
    "s": "check_hl.gd",
@@ -3884,7 +3884,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hl.gd#431"
+   "g": "check_hl.gd#437"
   },
   {
    "s": "check_hl.gd",
@@ -3895,7 +3895,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "derived",
-   "g": "check_hl.gd#438"
+   "g": "check_hl.gd#444"
   },
   {
    "s": "check_hl.gd",
@@ -3906,7 +3906,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hl.gd#811"
+   "g": "check_hl.gd#817"
   },
   {
    "s": "check_hl.gd",
@@ -3917,7 +3917,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hl.gd#811"
+   "g": "check_hl.gd#817"
   },
   {
    "s": "check_hn.gd",
@@ -4161,7 +4161,7 @@
    "r": "comment",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#702"
+   "g": "check_ho.gd#709"
   },
   {
    "s": "check_ho.gd",
@@ -4172,7 +4172,7 @@
    "r": "absent",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#703"
+   "g": "check_ho.gd#710"
   },
   {
    "s": "check_ho.gd",
@@ -4183,7 +4183,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#697"
+   "g": "check_ho.gd#704"
   },
   {
    "s": "check_ho.gd",
@@ -4194,7 +4194,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#698"
+   "g": "check_ho.gd#705"
   },
   {
    "s": "check_ho.gd",
@@ -4205,7 +4205,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#702"
+   "g": "check_ho.gd#709"
   },
   {
    "s": "check_ho.gd",
@@ -4216,7 +4216,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#700"
+   "g": "check_ho.gd#707"
   },
   {
    "s": "check_ho.gd",
@@ -4227,7 +4227,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#872"
+   "g": "check_ho.gd#879"
   },
   {
    "s": "check_ho.gd",
@@ -4238,7 +4238,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#871"
+   "g": "check_ho.gd#878"
   },
   {
    "s": "check_ho.gd",
@@ -4249,7 +4249,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#871"
+   "g": "check_ho.gd#878"
   },
   {
    "s": "check_ho.gd",
@@ -4260,7 +4260,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#1023"
+   "g": "check_ho.gd#1030"
   },
   {
    "s": "check_ho.gd",
@@ -4271,7 +4271,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#1023"
+   "g": "check_ho.gd#1030"
   },
   {
    "s": "check_ho.gd",
@@ -4282,7 +4282,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#1023"
+   "g": "check_ho.gd#1030"
   },
   {
    "s": "check_ho.gd",
@@ -4293,7 +4293,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#1023"
+   "g": "check_ho.gd#1030"
   },
   {
    "s": "check_ho.gd",
@@ -4304,7 +4304,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ho.gd#1045",
+   "g": "check_ho.gd#1052",
    "expr": "anchor"
   },
   {
@@ -4316,7 +4316,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ho.gd#1048",
+   "g": "check_ho.gd#1055",
    "expr": "anchor"
   },
   {
@@ -4328,7 +4328,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#1053"
+   "g": "check_ho.gd#1060"
   },
   {
    "s": "check_ho.gd",
@@ -4339,7 +4339,7 @@
    "r": "comment",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#1055"
+   "g": "check_ho.gd#1062"
   },
   {
    "s": "check_ho.gd",
@@ -4350,7 +4350,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#1057"
+   "g": "check_ho.gd#1064"
   },
   {
    "s": "check_ho.gd",
@@ -4361,7 +4361,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#1051"
+   "g": "check_ho.gd#1058"
   },
   {
    "s": "check_ho.gd",
@@ -4372,7 +4372,7 @@
    "r": "comment",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#1048"
+   "g": "check_ho.gd#1055"
   },
   {
    "s": "check_ho.gd",
@@ -4383,7 +4383,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#1046"
+   "g": "check_ho.gd#1053"
   },
   {
    "s": "check_ho.gd",
@@ -4394,7 +4394,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ho.gd#1061"
+   "g": "check_ho.gd#1068"
   },
   {
    "s": "check_ho.gd",
@@ -4405,7 +4405,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#1064"
+   "g": "check_ho.gd#1071"
   },
   {
    "s": "check_ho.gd",
@@ -4416,7 +4416,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#1064"
+   "g": "check_ho.gd#1071"
   },
   {
    "s": "check_ho.gd",
@@ -4427,7 +4427,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ho.gd#1064"
+   "g": "check_ho.gd#1071"
   },
   {
    "s": "check_hp.gd",
@@ -6022,6 +6022,61 @@
    "k": "literal",
    "how": "derived",
    "g": "check_ia.gd#598"
+  },
+  {
+   "s": "check_ib.gd",
+   "fn": "_s1f_never_covers",
+   "h": "scripts/map_screen.gd",
+   "n": "\nfunc ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ib.gd#300"
+  },
+  {
+   "s": "check_ib.gd",
+   "fn": "_s1f_never_covers",
+   "h": "scripts/map_screen.gd",
+   "n": "_begin_arrival()",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_ib.gd#301"
+  },
+  {
+   "s": "check_ib.gd",
+   "fn": "_s1f_never_covers",
+   "h": "scripts/map_screen.gd",
+   "n": "_draw_screen()",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_ib.gd#301"
+  },
+  {
+   "s": "check_ib.gd",
+   "fn": "_s1f_never_covers",
+   "h": "scripts/map_screen.gd",
+   "n": "func _ready() -> void:",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ib.gd#299"
+  },
+  {
+   "s": "check_ib.gd",
+   "fn": "_s1f_never_covers",
+   "h": "scripts/map_screen.gd",
+   "n": "not _maybe_show_framing()",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_ib.gd#302"
   },
   {
    "s": "test_batch_ah.gd",
@@ -14891,9 +14946,20 @@
    "s": "test_batch_bo.gd",
    "fn": "_sources",
    "h": "scripts/map_screen.gd",
-   "n": "func _open_party_draft(",
+   "n": "func _open_hero_draft(",
    "p": "+",
    "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "test_batch_bo.gd#299"
+  },
+  {
+   "s": "test_batch_bo.gd",
+   "fn": "_sources",
+   "h": "scripts/map_screen.gd",
+   "n": "func _open_party_draft(",
+   "p": "-",
+   "r": "absent",
    "k": "literal",
    "how": "read",
    "g": "test_batch_bo.gd#299"
@@ -14935,7 +15001,7 @@
    "s": "test_batch_bo.gd",
    "fn": "_sources",
    "h": "scripts/map_screen.gd",
-   "n": "if kind == \"draft\":\n\t\t_open_party_draft()",
+   "n": "if kind == \"draft\" or kind == \"rune\":\n\t\t_open_hero_draft(idx)",
    "p": "+",
    "r": "code",
    "k": "literal",
@@ -17466,7 +17532,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bx.gd#377"
+   "g": "test_batch_bx.gd#385"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17477,7 +17543,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bx.gd#376"
+   "g": "test_batch_bx.gd#384"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17488,7 +17554,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bx.gd#380"
+   "g": "test_batch_bx.gd#388"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17499,7 +17565,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bx.gd#380"
+   "g": "test_batch_bx.gd#388"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17510,7 +17576,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bx.gd#379"
+   "g": "test_batch_bx.gd#387"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17521,7 +17587,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bx.gd#378"
+   "g": "test_batch_bx.gd#386"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17532,7 +17598,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bx.gd#567"
+   "g": "test_batch_bx.gd#575"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17543,7 +17609,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_bx.gd#560"
+   "g": "test_batch_bx.gd#568"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17554,7 +17620,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bx.gd#577"
+   "g": "test_batch_bx.gd#585"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17565,7 +17631,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bx.gd#579"
+   "g": "test_batch_bx.gd#587"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17576,7 +17642,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bx.gd#583"
+   "g": "test_batch_bx.gd#591"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17587,7 +17653,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bx.gd#574"
+   "g": "test_batch_bx.gd#582"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17598,7 +17664,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bx.gd#557"
+   "g": "test_batch_bx.gd#565"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17609,7 +17675,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_bx.gd#570",
+   "g": "test_batch_bx.gd#578",
    "alt": true
   },
   {
@@ -17621,7 +17687,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_bx.gd#564",
+   "g": "test_batch_bx.gd#572",
    "alt": true
   },
   {
@@ -17633,7 +17699,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bx.gd#575"
+   "g": "test_batch_bx.gd#583"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17644,7 +17710,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_bx.gd#570",
+   "g": "test_batch_bx.gd#578",
    "alt": true
   },
   {
@@ -17656,7 +17722,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_bx.gd#564",
+   "g": "test_batch_bx.gd#572",
    "alt": true
   },
   {
@@ -17665,10 +17731,10 @@
    "h": "docs/master.html",
    "n": "four columns",
    "p": "+",
-   "r": "code",
+   "r": "alt-sibling",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_bx.gd#565",
+   "g": "test_batch_bx.gd#573",
    "alt": true
   },
   {
@@ -17680,7 +17746,7 @@
    "r": "unresolved",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_bx.gd#571"
+   "g": "test_batch_bx.gd#579"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17691,7 +17757,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_bx.gd#565",
+   "g": "test_batch_bx.gd#573",
    "alt": true
   },
   {
@@ -17703,7 +17769,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_bx.gd#572"
+   "g": "test_batch_bx.gd#580"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17835,7 +17901,7 @@
    "r": "code",
    "k": "literal",
    "how": "inline",
-   "g": "test_batch_bx.gd#476"
+   "g": "test_batch_bx.gd#484"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17846,7 +17912,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bx.gd#474"
+   "g": "test_batch_bx.gd#482"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17857,7 +17923,7 @@
    "r": "code",
    "k": "literal",
    "how": "inline",
-   "g": "test_batch_bx.gd#545"
+   "g": "test_batch_bx.gd#553"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17868,7 +17934,7 @@
    "r": "code",
    "k": "literal",
    "how": "inline",
-   "g": "test_batch_bx.gd#546"
+   "g": "test_batch_bx.gd#554"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17879,7 +17945,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bx.gd#548"
+   "g": "test_batch_bx.gd#556"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17890,7 +17956,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bx.gd#549"
+   "g": "test_batch_bx.gd#557"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17901,18 +17967,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "stripped",
-   "g": "test_batch_bx.gd#544"
-  },
-  {
-   "s": "test_batch_bx.gd",
-   "fn": "_screen_source",
-   "h": "scripts/map_screen.gd",
-   "n": "\nfunc ",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "read",
-   "g": "test_batch_bx.gd#252"
+   "g": "test_batch_bx.gd#552"
   },
   {
    "s": "test_batch_bx.gd",
@@ -17962,34 +18017,12 @@
    "s": "test_batch_bx.gd",
    "fn": "_screen_source",
    "h": "scripts/map_screen.gd",
-   "n": "_draft_columns().is_empty()",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "derived",
-   "g": "test_batch_bx.gd#255"
-  },
-  {
-   "s": "test_batch_bx.gd",
-   "fn": "_screen_source",
-   "h": "scripts/map_screen.gd",
-   "n": "_maybe_open_party_draft()",
+   "n": "_begin_arrival()",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
    "g": "test_batch_bx.gd#250"
-  },
-  {
-   "s": "test_batch_bx.gd",
-   "fn": "_screen_source",
-   "h": "scripts/map_screen.gd",
-   "n": "_open_party_draft()",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "derived",
-   "g": "test_batch_bx.gd#256"
   },
   {
    "s": "test_batch_bx.gd",
@@ -18006,17 +18039,6 @@
    "s": "test_batch_bx.gd",
    "fn": "_screen_source",
    "h": "scripts/map_screen.gd",
-   "n": "func _maybe_open_party_draft(",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "read",
-   "g": "test_batch_bx.gd#251"
-  },
-  {
-   "s": "test_batch_bx.gd",
-   "fn": "_screen_source",
-   "h": "scripts/map_screen.gd",
    "n": "func _open_drop_overlay(",
    "p": "+",
    "r": "code",
@@ -18028,9 +18050,20 @@
    "s": "test_batch_bx.gd",
    "fn": "_screen_source",
    "h": "scripts/map_screen.gd",
-   "n": "func _open_party_draft(",
+   "n": "func _open_hero_draft(",
    "p": "+",
    "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "test_batch_bx.gd#241"
+  },
+  {
+   "s": "test_batch_bx.gd",
+   "fn": "_screen_source",
+   "h": "scripts/map_screen.gd",
+   "n": "func _open_party_draft(",
+   "p": "-",
+   "r": "absent",
    "k": "literal",
    "how": "read",
    "g": "test_batch_bx.gd#241"
@@ -18061,18 +18094,7 @@
    "s": "test_batch_bx.gd",
    "fn": "_screen_source",
    "h": "scripts/map_screen.gd",
-   "n": "if Run.sim_run:",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "derived",
-   "g": "test_batch_bx.gd#254"
-  },
-  {
-   "s": "test_batch_bx.gd",
-   "fn": "_screen_source",
-   "h": "scripts/map_screen.gd",
-   "n": "if kind == \"draft\":\n\t\t_open_party_draft()",
+   "n": "if kind == \"draft\" or kind == \"rune\":\n\t\t_open_hero_draft(idx)",
    "p": "+",
    "r": "code",
    "k": "literal",

@@ -419,18 +419,20 @@ func _s1_the_whole_run() -> void:
 # chains them: the draft screen first, then the pick overlays on the cards,
 # then the item offers, then the node.
 func _step_the_map(s: Node) -> String:
-	# The party draft opens itself on `_ready`. It is a z=62 overlay.
-	var draft: Node = _overlay(s, 62)
+	# BATCH IB §1/§2 — what the arrival opens: a hero's own draft screen (z=62, his card
+	# and his rune cache), then the boss's ability and the upgrade (z=60).
+	var draft: Node = Gate.hero_draft(s)
 	if draft != null:
 		await _answer_the_draft(s, draft)
 		return "draft"
-	# A pick owed on a card — ability, upgrade or rune — is a z=60 overlay the
-	# card's own CHOOSE button opens. Answer them before stepping.
+	# A pick still owed on a card is answered from what the arrival put up, or from the
+	# card's own CHOOSE button. Answer them before stepping.
 	for idx in _run.party.size():
 		var m: Dictionary = _run.party[idx]
 		if int(m.get("bm_picks_owed", 0)) > 0 \
 				or int(m.get("up_picks_owed", 0)) > 0 \
-				or int(m.get("rune_picks_owed", 0)) > 0:
+				or int(m.get("rune_picks_owed", 0)) > 0 \
+				or int(m.get("draft_picks_owed", 0)) > 0:
 			if await _answer_a_pick(s, idx):
 				return "pick"
 	# **A PLAYER DRINKS.** The autoplay bot does not — `battle.gd` gates its
@@ -652,173 +654,160 @@ func _shop(s: Node) -> void:
 			break
 
 
-# ── THE DRAFT SCREEN, ANSWERED ───────────────────────────────────────────────
+# ── A HERO'S DRAFT SCREEN, ANSWERED ─────────────────────────────────────────
 #
-# One screen, one column per hero owed a card. A column is DECIDED when the
-# player has chosen a card and, at the cap, named what it replaces — or
-# declined. The confirm button is disabled until every column is decided, which
-# is what makes "the screen resolves as one action" a property of one predicate.
+# BATCH IB §2 — ONE SCREEN A HERO: his card and his rune cache, each a section only when
+# owed, and one Confirm for both (BX's four columns until IB). A section is DECIDED when
+# a card is chosen and, at the cap, the card it replaces named — or declined; a rune is
+# chosen, or an empty cache let go. Every button is found by what it is bound to (IA's
+# binding-and-index method, IB §6a), never by its words: the card by `_stage_draft` with
+# his index and its name, the bench step by `_open_drop_overlay`, its bench by the
+# `choice` mark, the rune by `_stage_draft_rune`, the Confirm by `_confirm_hero_draft`.
 func _answer_the_draft(s: Node, overlay: Node) -> void:
 	_bump("draft screens")
-	var cols: Array = s.call("_draft_columns")
+	var i := int(overlay.get_meta("hero_draft"))
+	var m: Dictionary = _run.party[i]
 	var cap: int = int(_run.ability_slot_cap())
-	for idx in cols:
-		var i := int(idx)
-		var m: Dictionary = _run.party[i]
-		# THE OFFER IS READ THE WAY THE COLUMN READS IT — `draft_candidates` is
-		# a QUEUE of offers and the column draws its head.
+	if int(m.get("draft_picks_owed", 0)) > 0:
+		# THE OFFER IS READ THE WAY THE SECTION READS IT — `draft_candidates` is a
+		# QUEUE of offers and the section draws its head.
 		var queue: Array = m.get("draft_candidates", [])
 		var offer: Array = queue[0] if not queue.is_empty() else []
 		_bump("draft offers")
 		_bump("draft offers at cap %d" % cap)
 		if offer.is_empty():
-			note("a draft column opened for hero %d with NO cards in the offer" % i)
-			s.call("_stage_draft_decline", i)
-			continue
-		var card := String(offer[0])
-		# **THE OVERLAY IS RE-FETCHED, NEVER HELD.** Every stage rebuilds the
-		# whole screen, so a reference taken before the last press is a freed
-		# node by the time this one lands.
-		var live_ov: Node = _overlay(s, 62)
-		if live_ov == null:
-			live_ov = overlay
-		# **THE CARD IS PRESSED, NOT STAGED.** `_stage_draft` is what the button
-		# calls; calling it directly would pass a card whose button was never
-		# drawn, which is the exact defect a live drive exists to catch.
-		if not _press_exact(live_ov, card):
-			note("the draft drew no pressable button for `%s` on hero %d" % [card, i])
-			_dead_buttons.append("draft column %d: no button for %s" % [i, card])
-			s.call("_stage_draft_decline", i)
-			continue
-		_bump("draft cards pressed")
-		# EK §3 — THE TAG LINE, READ OFF THE SCREEN.
-		var tag_line: String = Classes.card_tag_line(card)
-		var tag_ov: Node = _overlay(s, 62)
-		if tag_ov == null:
-			tag_ov = live_ov
-		if tag_line == "":
-			note("the draft card `%s` has no tag line to render" % card)
-		elif not _has_text(tag_ov, tag_line):
-			note("the draft card `%s` did NOT render its tag line `%s`" % [card, tag_line])
-			_bump("cards missing their tag line")
+			note("a draft section opened for hero %d with NO cards in the offer" % i)
+			await _decline_on_screen(s, i)
 		else:
-			_bump("cards showing a tag line")
-		await process_frame
-		# At the cap the card button opens the DROP step instead of staging, so
-		# the column is re-drawn and the bench must be named on the new one.
-		if bool(_run.ability_slots_full(m)):
-			_bump("draft swaps (at the cap)")
-			# THE DROP STEP IS TWO PRESSES, NOT ONE. The card button only
-			# STAGES; the re-drawn column then carries "Choose what <card>
-			# replaces", and THAT opens the z=64 overlay whose buttons read
-			# "Bench <name>". The droppable list is `equipped_ability_names` —
-			# the PROTECTED core is not in it, which is the half a drive reading
-			# the whole loadout would get wrong.
-			await process_frame
-			var col_ov: Node = _overlay(s, 62)
-			if col_ov != null:
-				_press_exact(col_ov, "Choose what %s replaces" % card)
-			await process_frame
-			var drop_ov: Node = _overlay(s, 64)
-			var benched := ""
-			if drop_ov != null:
-				var droppable: Array = _run.equipped_ability_names(m)
-				for nm2 in droppable:
-					if _press_exact(drop_ov, "Bench %s" % String(nm2)):
-						benched = String(nm2)
-						break
-			if benched == "":
-				var loadout: Array = _run.loadout_ability_names(m)
-				if loadout.is_empty():
-					note("hero %d is at the cap with an EMPTY loadout" % i)
-				else:
-					s.call("_stage_draft_drop", i, String(loadout[loadout.size() - 1]))
-					note("hero %d: the drop step drew no pressable Bench button" % i)
-					_dead_buttons.append("drop overlay hero %d" % i)
+			var card := String(offer[0])
+			# **THE CARD IS PRESSED, NOT STAGED.** `_stage_draft` is what the button
+			# calls; calling it directly would pass a card whose button was never
+			# drawn, which is the exact defect a live drive exists to catch.
+			var cb: Button = Gate.bound_button(Gate.hero_draft(s), "_stage_draft", [i, card])
+			if cb == null:
+				note("the draft drew no pressable button for `%s` on hero %d" % [card, i])
+				_dead_buttons.append("draft hero %d: no button for %s" % [i, card])
+				await _decline_on_screen(s, i)
 			else:
-				_bump("benches pressed")
+				cb.emit_signal("pressed")
+				_bump("draft cards pressed")
+				# EK §3 — THE TAG LINE, READ OFF THE SCREEN.
+				var tag_line: String = Classes.card_tag_line(card)
+				var tag_ov: Node = Gate.hero_draft(s)
+				if tag_line == "":
+					note("the draft card `%s` has no tag line to render" % card)
+				elif tag_ov == null or not _has_text(tag_ov, tag_line):
+					note("the draft card `%s` did NOT render its tag line `%s`" % [card, tag_line])
+					_bump("cards missing their tag line")
+				else:
+					_bump("cards showing a tag line")
+				await process_frame
+				# At the cap the card only STAGES, and the redrawn section carries the
+				# bench step, which opens the z=64 overlay of what may be benched — the
+				# loadout, `equipped_ability_names`, so the PROTECTED core is not in it.
+				if bool(_run.ability_slots_full(m)):
+					_bump("draft swaps (at the cap)")
+					var steps: Array = Gate.bound_buttons(Gate.hero_draft(s), "_open_drop_overlay")
+					var step: Button = steps[0] if not steps.is_empty() else null
+					if step != null:
+						step.emit_signal("pressed")
+					await process_frame
+					var drop_ov: Node = _overlay(s, 64)
+					var benches: Array = Gate.pick_choices(drop_ov)
+					if benches.is_empty():
+						note("hero %d: the drop step drew no pressable Bench button" % i)
+						_dead_buttons.append("drop overlay hero %d" % i)
+						await _decline_on_screen(s, i)
+					else:
+						(benches[0] as Button).emit_signal("pressed")
+						_bump("benches pressed")
+					await process_frame
+	if int(m.get("rune_picks_owed", 0)) > 0:
+		var rbtns: Array = Gate.bound_buttons(Gate.hero_draft(s), "_stage_draft_rune")
+		if rbtns.is_empty():
+			note("a rune pick was owed on hero %d and the screen drew NO rune button — the pick is STRANDED" % i)
+			_dead_buttons.append("rune section hero %d: %s" % [i, _labels(Gate.hero_draft(s))])
+			m["rune_picks_owed"] = 0
+		else:
+			# A rune pick can put an already-owned rune on the card — CD's defect. Say
+			# so rather than pressing past it. BATCH HO §1 — what the PARTY holds, not
+			# his pouch alone (`Run.party_rune_names`).
+			var owned: Array = _run.party_rune_names()
+			for rb in rbtns:
+				var rn := String(Gate.bound_args(rb, "_stage_draft_rune")[1])
+				if rn != "" and owned.has(rn):
+					note("the rune cache offered hero %d `%s`, which they already wear" % [i, rn])
+			(rbtns[0] as Button).emit_signal("pressed")
+			_bump("picks answered: rune")
 			await process_frame
 	await process_frame
-	var again: Node = _overlay(s, 62)
-	var target: Node = again if again != null else overlay
-	var hit := _press(target, ["Confirm the draft"])
-	if hit == "":
-		var undecided: Array = []
-		for idx2 in cols:
-			if not bool(s.call("_draft_decided", int(idx2))):
-				undecided.append(int(idx2))
-		note("the draft's confirm would not press; undecided columns %s" % [undecided])
-		s.call("_close_party_draft")
+	var conf: Array = Gate.bound_buttons(Gate.hero_draft(s), "_confirm_hero_draft")
+	if conf.is_empty():
+		note("hero %d's draft screen would not confirm with every section decided" % i)
+		_dead_buttons.append("draft screen hero %d: %s" % [i, _labels(Gate.hero_draft(s))])
+		if Gate.hero_draft(s) != null:
+			s.call("_close_hero_draft")
 	else:
+		(conf[0] as Button).emit_signal("pressed")
 		_bump("draft confirms")
 	await process_frame
 	await process_frame
 
 
+# A section that cannot be answered is declined through its own button, so the screen
+# can still be confirmed and the road goes on; the observation is the finding.
+func _decline_on_screen(s: Node, i: int) -> void:
+	var dec: Button = Gate.bound_button(Gate.hero_draft(s), "_stage_draft_decline", [i])
+	if dec != null:
+		dec.emit_signal("pressed")
+		await process_frame
+
+
 # ── A PICK OWED ON A HERO CARD ───────────────────────────────────────────────
 #
-# The ability pick, the upgrade pick and the rune pick all come through the
-# same z=60 overlay `_open_pick_overlay` builds, and all three are answered by
-# pressing one of its buttons. **EVERY BUTTON IT DREW MUST BE LIVE** — the
-# fault this exists to catch is a button that does nothing when pressed, which
-# no assertion on the pouch can see.
+# The ability pick and the upgrade pick come through the z=60 overlay
+# `_open_pick_overlay` builds, opened by the arrival or by the card's CHOOSE; a draft or
+# a rune cache through the hero's own screen (IB §2), answered on the next step. **EVERY
+# CHOICE IT DRAWS MUST BE LIVE** — the fault this exists to catch is a button that does
+# nothing when pressed, which no assertion on the pouch can see — and a choice is what
+# the game MARKS as one (IB §6a), so a button that only previews or closes never is.
 func _answer_a_pick(s: Node, idx: int) -> bool:
 	var m: Dictionary = _run.party[idx]
 	var kind := ""
-	if int(m.get("rune_picks_owed", 0)) > 0:
-		kind = "rune"
-	elif int(m.get("bm_picks_owed", 0)) > 0:
+	if int(m.get("bm_picks_owed", 0)) > 0:
 		kind = "ability"
 	elif int(m.get("up_picks_owed", 0)) > 0:
 		kind = "upgrade"
-	s.call("_open_pick_overlay", idx)
-	await process_frame
 	var ov: Node = _overlay(s, 60)
+	if Gate.pick_choices(ov).is_empty():
+		s.call("_open_pick_overlay", idx)
+		await process_frame
+		if Gate.hero_draft(s) != null:
+			return true   # his own draft screen: answered on the next step
+		ov = _overlay(s, 60)
 	if ov == null:
 		note("a %s pick was owed on hero %d and NO overlay opened — the pick is STRANDED"
 			% [kind, idx])
 		# Drop the pick so the drive can go on; the observation is the finding.
-		m["%s_picks_owed" % ("bm" if kind == "ability" else
-			("up" if kind == "upgrade" else "rune"))] = 0
+		m["%s_picks_owed" % ("bm" if kind == "ability" else "up")] = 0
 		return true
-	var btns: Array = []
-	_buttons(ov, btns)
-	var live: Array = []
-	for b in btns:
-		var t := String((b as Button).text)
-		# BATCH HZ §1b — nor the kit preview's button, which answers nothing (`_labels`).
-		if t == "Not yet" or (b as Button).disabled or (b as Button).has_meta("kit_preview"):
-			continue
-		live.append(b)
+	var live: Array = Gate.pick_choices(ov)
 	if live.is_empty():
 		note("the %s overlay for hero %d drew NO pick buttons — the pick is STRANDED"
 			% [kind, idx])
 		_dead_buttons.append("%s overlay hero %d: %s" % [kind, idx, _labels(ov)])
-		m["%s_picks_owed" % ("bm" if kind == "ability" else
-			("up" if kind == "upgrade" else "rune"))] = 0
+		m["%s_picks_owed" % ("bm" if kind == "ability" else "up")] = 0
 		ov.queue_free()
 		await process_frame
 		return true
-	# A rune pick can put an already-owned rune on the card — CD's defect. Say
-	# so rather than pressing past it.
-	if kind == "rune":
-		# BATCH HO §1 — WHAT THE PARTY HOLDS, NOT HIS POUCH ALONE: since HK a rune he
-		# does not wear sits in the bag, and since HO one can be worn in the crest,
-		# and no roll may offer either again (`Run.party_rune_names`).
-		var owned: Array = _run.party_rune_names()
-		for b2 in live:
-			var t2 := String((b2 as Button).text)
-			for o in owned:
-				if t2.contains(String(o)):
-					note("the rune cache offered hero %d `%s`, which they already wear"
-						% [idx, o])
 	_bump("picks answered: " + kind)
 	(live[0] as Button).emit_signal("pressed")
 	await process_frame
 	await process_frame
-	var still: Node = _overlay(s, 60)
-	if still != null:
-		still.queue_free()
+	# A press that left its own overlay up did nothing; the next pick's overlay, which
+	# the arrival opens as this one resolves, is left for the next step.
+	if is_instance_valid(ov) and not ov.is_queued_for_deletion():
+		ov.queue_free()
 		await process_frame
 	return true
 
@@ -869,7 +858,7 @@ func _s2_the_draft() -> void:
 		ok(awarded, "§2: no draft offer could be rolled at a cap of %d" % cap)
 		if not awarded:
 			continue
-		s.call("_open_party_draft")
+		s.call("_open_hero_draft", 0)
 		await process_frame
 		var ov: Node = _overlay(s, 62)
 		ok(ov != null, "§2: the draft screen did not open at a cap of %d" % cap)
@@ -900,7 +889,7 @@ func _s2_the_draft() -> void:
 			ov = _overlay(s, 62)
 			if ov == null:
 				break
-		s.call("_close_party_draft")
+		s.call("_close_hero_draft")
 		await process_frame
 	print("    slot caps offered against: %s   cards pressed: %d   tag lines rendered: %d" % [
 		caps_seen, cards, tag_lines])
@@ -932,7 +921,7 @@ func _s2_the_draft() -> void:
 	var before_loadout: Array = _run.loadout_ability_names(hero)
 	var pool_before: int = int(_run.owned_ability_names(hero).size())
 	if bool(_run.award_draft_pick(hero)):
-		s2.call("_open_party_draft")
+		s2.call("_open_hero_draft", 0)
 		await process_frame
 		var ov3: Node = _overlay(s2, 62)
 		var q3: Array = hero.get("draft_candidates", [])
@@ -1129,7 +1118,7 @@ func _s3_the_rune_offer() -> void:
 
 	# (b) THE ELITE CACHE, ANSWERED A NODE LATER. FD's hole was in the ANSWER,
 	# not the offer, so the cache is rolled, the party WALKS ON, and only then
-	# is the card's own CHOOSE pressed.
+	# is it answered — on the hero's screen the arrival opens (IB §1).
 	var s2: Node = await _fresh_map(0)
 	var looter: Dictionary = _run.party[1]
 	var cands: Array = _run.roll_rune_candidates(looter)
@@ -1150,16 +1139,14 @@ func _s3_the_rune_offer() -> void:
 	var s3: Node = current_scene
 	ok(int(looter.get("rune_picks_owed", 0)) == 1,
 		"§3: the rune pick did not survive the step to the next node")
-	s3.call("_open_pick_overlay", 1)
-	await process_frame
-	var ov: Node = _overlay(s3, 60)
-	ok(ov != null, "§3: the cache's pick overlay did not open a node later")
+	# BATCH IB §1/§2 — THE ARRIVAL OPENS IT, ON THE HERO'S OWN SCREEN: the cache a node
+	# later is the Mage's draft screen, put up as the party arrives, its RUNES section his
+	# cache (he owes no card, so it is the only section).
+	var ov: Node = Gate.hero_draft(s3)
+	ok(ov != null and int(ov.get_meta("hero_draft")) == 1,
+		"§3: the cache's pick did not open a node later, on the Mage's own screen")
 	if ov != null:
-		var labels := _labels(ov)
-		var live: Array = []
-		for l in labels:
-			if String(l) != "Not yet":
-				live.append(String(l))
+		var live: Array = Gate.bound_buttons(ov, "_stage_draft_rune")
 		ok(live.size() >= 1,
 			"§3: the cache drew %d live buttons a node later — the pick is STRANDED"
 				% live.size())
@@ -1202,7 +1189,14 @@ func _s3_the_rune_offer() -> void:
 		elif bool(_run.holding_full(looter)):
 			want = "the full-holding panel"
 		var held_before: Array = _run.party_rune_names()
-		s3.call("_pick_rune", 1, 0)
+		# The first rune, pressed through its own button, and the screen's Confirm.
+		if not live.is_empty():
+			(live[0] as Button).emit_signal("pressed")
+			await process_frame
+		var conf: Array = Gate.bound_buttons(Gate.hero_draft(s3), "_confirm_hero_draft")
+		ok(not conf.is_empty(), "§3: the cache's rune was chosen and the Mage's screen would not confirm")
+		if not conf.is_empty():
+			(conf[0] as Button).emit_signal("pressed")
 		await process_frame
 		await process_frame
 		var gained: Array = (_run.party_rune_names() as Array).filter(
@@ -1249,7 +1243,9 @@ func _s3_the_rune_offer() -> void:
 		FileAccess.get_file_as_string("res://scripts/battle.gd"))
 	var at := src.find("func _resolve_boss")
 	var body := src.substr(at, 4000) if at >= 0 else ""
-	for door in ["roll_rune_candidates", "grant_rune", "rune_picks_owed"]:
+	# BATCH IB §1 — `Run.queue_rune_pick` is the one door a rune cache's pick is queued
+	# through since IB (the elite's spoils wrote `rune_picks_owed` here by hand until then).
+	for door in ["roll_rune_candidates", "grant_rune", "queue_rune_pick"]:
 		if body.contains(door):
 			boss_rune_doors.append(door)
 	ok(boss_rune_doors.is_empty(),
@@ -1997,7 +1993,7 @@ func _s9_every_button() -> void:
 	# The overlays, each opened through the map's own door.
 	var m0: Dictionary = _run.party[0]
 	if bool(_run.award_draft_pick(m0)):
-		s.call("_open_party_draft")
+		s.call("_open_hero_draft", 0)
 		await process_frame
 		var d: Node = _overlay(s, 62)
 		if d != null:
@@ -2010,7 +2006,7 @@ func _s9_every_button() -> void:
 				var d2: Node = _overlay(s, 62)
 				if d2 != null:
 					_census(d2, "the draft, one card staged")
-		s.call("_close_party_draft")
+		s.call("_close_hero_draft")
 		await process_frame
 	# The card's CHOOSE button resolves in a fixed precedence — ability, draft,
 	# upgrade, rune — so a draft still owed from the block above would open the

@@ -1317,9 +1317,12 @@ func _s2c_the_cache() -> void:
 	_run.sim_run = had
 
 
-# The pick overlay on the real map, with a cache of three rows queued for the
-# Occultist: unequipped — no rune button, the engine named, the pick not spent by
-# opening it; equipped — three buttons, and the one pressed is the one handed over.
+# The hero's own draft screen on the real map (the pick overlay until IB §2), with a cache
+# of three rows queued for the Occultist: unequipped — no rune button, the engine named, the
+# pick not spent by opening it; equipped — three buttons, and the one pressed is the one
+# handed over. **IB §6a — EVERY PRESS BY ITS BINDING**: a rune is `_stage_draft_rune`, the
+# screen's Confirm `_confirm_hero_draft` and its Later `_close_hero_draft`; the texts are read
+# only where the arm is about what the screen SAYS.
 func _s2c_the_screen(rolled: Array) -> void:
 	_fresh_meta()
 	_run.sim_run = true
@@ -1342,8 +1345,8 @@ func _s2c_the_screen(rolled: Array) -> void:
 	await Gate.frames(self, 3)
 	screen.call("_open_pick_overlay", 2)
 	await Gate.frames(self, 2)
-	var ov: Node = Gate.overlay(screen, 60)
-	ok(ov != null, "§2c: the pick overlay did not open")
+	var ov: Node = Gate.hero_draft(screen)
+	ok(ov != null and int(ov.get_meta("hero_draft")) == 2, "§2c: the Occultist's draft screen did not open")
 	if ov != null:
 		var btn_texts: Array = []
 		var btns: Array = []
@@ -1352,34 +1355,34 @@ func _s2c_the_screen(rolled: Array) -> void:
 			btn_texts.append(String((b as Button).text))
 		for c2 in rolled:
 			ok(not btn_texts.any(func(t): return String(t).begins_with(String(c2["name"]))),
-				"§2c: the overlay drew %s as a button with the Old Gods unequipped" % c2["name"])
+				"§2c: the screen drew %s as a button with the Old Gods unequipped" % c2["name"])
 		# BATCH HL §2: the rune's name wears "(core)", read off the data.
 		ok(Gate.has_text(ov, "Rune of the Occultist (core) is not equipped"),
-			"§2c: the overlay does not say the runes wait on the Rune of the Occultist")
+			"§2c: the screen does not say the runes wait on the Rune of the Occultist")
 		ok(not Gate.has_text(ov, "nothing can arrive to fill it"),
-			"§2c: the overlay says nothing can arrive, and equipping the engine would fill it")
-		ok(btn_texts.has("Let it go") and btn_texts.has("Not yet"),
-			"§2c: the overlay offers %s — the pick can be neither spent nor kept" % [btn_texts])
-		print("    the overlay, unequipped: %s" % [btn_texts])
-		Gate.press(ov, ["Not yet"])
+			"§2c: the screen says nothing can arrive, and equipping the engine would fill it")
+		ok(Gate.bound_button(ov, "_stage_draft_rune", [2, ""]) != null
+				and Gate.bound_buttons(ov, "_close_hero_draft").size() == 1,
+			"§2c: the screen offers %s — the pick can be neither spent nor kept" % [btn_texts])
+		print("    the screen, unequipped: %s" % [btn_texts])
+		(Gate.bound_buttons(ov, "_close_hero_draft")[0] as Button).emit_signal("pressed")
 		await Gate.frames(self, 2)
-	ok(int(m.get("rune_picks_owed", 0)) == 1, "§2c: closing the overlay spent the pick")
+	ok(int(m.get("rune_picks_owed", 0)) == 1, "§2c: closing the screen spent the pick")
 	# EQUIPPED AGAIN: the three are buttons, and the pressed one is handed over.
 	(m["engines"][0] as Dictionary)["equipped"] = true
 	screen.call("_open_pick_overlay", 2)
 	await Gate.frames(self, 2)
-	var ov2: Node = Gate.overlay(screen, 60)
+	var ov2: Node = Gate.hero_draft(screen)
 	if ov2 != null:
-		var btn2: Button = null
-		var btns2: Array = []
-		Gate.buttons(ov2, btns2)
-		for b2 in btns2:
-			if String((b2 as Button).text).begins_with(String(rolled[1]["name"])):
-				btn2 = b2
-		ok(btn2 != null, "§2c: with the Old Gods equipped the overlay has no button for %s" % rolled[1]["name"])
+		var btn2: Button = Gate.bound_button(ov2, "_stage_draft_rune", [2, String(rolled[1]["name"])])
+		ok(btn2 != null, "§2c: with the Old Gods equipped the screen has no button for %s" % rolled[1]["name"])
 		if btn2 != null:
 			btn2.emit_signal("pressed")
 			await Gate.frames(self, 2)
+			var conf2: Array = Gate.bound_buttons(Gate.hero_draft(screen), "_confirm_hero_draft")
+			if not conf2.is_empty():
+				(conf2[0] as Button).emit_signal("pressed")
+				await Gate.frames(self, 2)
 	var got_names: Array = (m.get("runes", []) as Array).map(func(r): return String(r["name"]))
 	ok(got_names.has(String(rolled[1]["name"])),
 		"§2c: pressing %s handed over %s" % [rolled[1]["name"], got_names])
@@ -1399,26 +1402,30 @@ func _s2c_the_screen(rolled: Array) -> void:
 	(bz["engines"][0] as Dictionary)["equipped"] = false
 	screen.call("_open_pick_overlay", 0)
 	await Gate.frames(self, 2)
-	var ov3: Node = Gate.overlay(screen, 60)
+	var ov3: Node = Gate.hero_draft(screen)
 	var pressed_name := ""
 	if ov3 != null:
 		# BATCH HL §2: the rune's name wears "(core)", read off the data.
 		ok(Gate.has_text(ov3, "1 more that waits on the Rune of the Berserker (core) being equipped"),
 			"§2c: a part-row cache does not say what else it holds")
+		# The rune buttons in the order the screen draws them, by their binding; an empty
+		# cache's *Let it go* is the same binding with no rune named, so it is left out.
 		var rune_btns: Array = []
-		var btns3: Array = []
-		Gate.buttons(ov3, btns3)
-		for b3 in btns3:
-			var t3 := String((b3 as Button).text)
-			if t3.begins_with("Open Vein"):
+		for b3 in Gate.bound_buttons(ov3, "_stage_draft_rune"):
+			var named := String(Gate.bound_args(b3, "_stage_draft_rune")[1])
+			if named == "Open Vein":
 				ok(false, "§2c: Open Vein was drawn as a button with Blood Frenzy unequipped")
-			if t3.begins_with("Last Word") or t3.begins_with("Long Watch"):
+			if named == "Last Word" or named == "Long Watch":
 				rune_btns.append(b3)
 		ok(rune_btns.size() == 2, "§2c: the part-row cache drew %d rune buttons, not two" % rune_btns.size())
 		if rune_btns.size() == 2:
-			pressed_name = String((rune_btns[1] as Button).text).get_slice("  [", 0)
+			pressed_name = String(Gate.bound_args(rune_btns[1], "_stage_draft_rune")[1])
 			(rune_btns[1] as Button).emit_signal("pressed")
 			await Gate.frames(self, 2)
+			var conf3: Array = Gate.bound_buttons(Gate.hero_draft(screen), "_confirm_hero_draft")
+			if not conf3.is_empty():
+				(conf3[0] as Button).emit_signal("pressed")
+				await Gate.frames(self, 2)
 	var bz_names: Array = (bz.get("runes", []) as Array).map(func(r): return String(r["name"]))
 	print("    a part-row cache, Blood Frenzy unequipped: pressed %s, handed over %s" % [pressed_name, bz_names])
 	ok(pressed_name != "" and bz_names == [pressed_name],
@@ -1705,55 +1712,42 @@ func _unequip_all() -> int:
 	return n
 
 
+# BATCH IB §6a — THE DRAFT, ANSWERED ON THE HERO'S OWN SCREEN THROUGH ITS OWN BUTTONS
+# (`Gate.answer_hero_draft`, the one helper), where this road answered it through the run's
+# doors — the same two the screen's buttons go through. TAKING, as this road always took:
+# the first card the screen draws is the first the door accepts, and at the cap the first
+# card the bench step offers is the first earned card he carries (a road never re-equips).
+# His rune cache is the first rune on the same screen, recorded before it is answered, as
+# it was recorded off the card's overlay.
 func _answer_draft(s: Node) -> void:
-	for m in _run.party:
-		var guard := 0
-		while int(m.get("draft_picks_owed", 0)) > 0 and guard < 8:
-			guard += 1
-			var queue: Array = m.get("draft_candidates", [])
-			var took := false
-			for card in (queue[0] if not queue.is_empty() else []):
-				var bench := ""
-				if _run.ability_slots_full(m):
-					var carried: Array = _run.equipped_ability_names(m)
-					for e in _run.earned_ability_names(m):
-						if carried.has(e):
-							bench = String(e)
-							break
-					if bench == "":
-						break
-				if _run.take_draft_ability(m, String(card), bench) == "":
-					took = true
-					break
-			if not took:
-				_run.decline_draft(m)
-	if s.has_method("_close_party_draft"):
-		s.call("_close_party_draft")
+	var ov: Node = Gate.hero_draft(s)
+	if ov != null:
+		var idx := int(ov.get_meta("hero_draft"))
+		if int(_run.party[idx].get("rune_picks_owed", 0)) > 0:
+			for c in _run.rune_choice(_run.party[idx]):
+				_record(idx, c, "cache or bargain")
+	var a: Dictionary = await Gate.answer_hero_draft(self, s, true)
+	if not bool(a.get("confirmed", false)):
+		_stall = "the draft screen at %s would not confirm" % _where()
+		if s.has_method("_close_hero_draft"):
+			s.call("_close_hero_draft")
 	await Gate.frames(self, 2)
 
 
+# A pick owed on a hero card: the overlay the arrival put up, or else the card's own
+# CHOOSE, and then the first choice the overlay MARKS (IB §6a).
 func _answer_pick(s: Node, idx: int) -> void:
 	var m: Dictionary = _run.party[idx]
-	if int(m.get("rune_picks_owed", 0)) > 0:
-		for c in _run.rune_choice(m):
-			_record(idx, c, "cache or bargain")
-	var choose: Button = Gate.bound_button(s, "_open_pick_overlay", [idx])
-	var ov: Node = null
-	if choose != null:
-		choose.emit_signal("pressed")
-		await process_frame
+	var ov: Node = Gate.overlay(s, 60)
+	if Gate.pick_choices(ov).is_empty():
+		var choose: Button = Gate.bound_button(s, "_open_pick_overlay", [idx])
+		if choose != null:
+			choose.emit_signal("pressed")
+			await process_frame
+		if Gate.hero_draft(s) != null:
+			return   # a draft or a rune cache: his own screen, answered on the next step
 		ov = Gate.overlay(s, 60)
-	var live: Array = []
-	if ov != null:
-		var btns: Array = []
-		Gate.buttons(ov, btns)
-		for b in btns:
-			# BATCH HZ §1b — the overlay carries the kit preview's button under its
-			# title since HZ: it opens the hero's kit and answers nothing, so it is
-			# never the pick. Found by the meta the game sets on it, not by its words.
-			if String((b as Button).text) != "Not yet" and not (b as Button).disabled \
-					and not (b as Button).has_meta("kit_preview"):
-				live.append(b)
+	var live: Array = Gate.pick_choices(ov)
 	if live.is_empty():
 		_stall = "hero %d owed a pick at %s and nothing could be pressed" % [idx, _where()]
 		for k in ["bm_picks_owed", "up_picks_owed", "rune_picks_owed"]:
@@ -1764,20 +1758,21 @@ func _answer_pick(s: Node, idx: int) -> void:
 		return
 	(live[0] as Button).emit_signal("pressed")
 	await Gate.frames(self, 2)
-	var still: Node = Gate.overlay(s, 60)
-	if still != null:
-		still.queue_free()
+	# A press that left its own overlay up did nothing; the next pick's overlay, which
+	# the arrival opens as this one resolves, is left for the next step.
+	if is_instance_valid(ov) and not ov.is_queued_for_deletion():
+		ov.queue_free()
 		await process_frame
 
 
 func _step_map(s: Node) -> String:
-	if Gate.overlay(s, 62) != null:
+	if Gate.hero_draft(s) != null:
 		await _answer_draft(s)
 		return "draft"
 	for idx in _run.party.size():
 		var m: Dictionary = _run.party[idx]
 		if int(m.get("bm_picks_owed", 0)) > 0 or int(m.get("up_picks_owed", 0)) > 0 \
-				or int(m.get("rune_picks_owed", 0)) > 0:
+				or int(m.get("rune_picks_owed", 0)) > 0 or int(m.get("draft_picks_owed", 0)) > 0:
 			await _answer_pick(s, idx)
 			return "pick"
 	var live: Array = Gate.lattice_buttons(s)

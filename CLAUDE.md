@@ -1675,7 +1675,12 @@ questions now; `can_equip`, `equipped_learned` and `Profile.equip_cell` are dele
   `save_run` and `clear_save` are no-ops while the file is on disk (`new_run` clears through `clear_save`); the main
   menu says so, Continue dark. It guards from the next version bump on, never an older build reading a newer save, and
   the floor did not move. **HR's v15 is the first bump it guards**: an HQ build refuses a v15 save and leaves it
-  byte-identical (driven at HR §1). **A bump raises `SAVE_VERSION`, the one constant `save_run` writes.** **GH MOVED NO
+  byte-identical (driven at HR §1). **A bump raises `SAVE_VERSION`, the one constant `save_run` writes.** **AND A BUMP
+  IS FOR A KEY AN OLDER BUILD WOULD WRITE AWAY, NOT FOR A VALUE IT WOULD READ GENEROUSLY (IB §0.2, the designer's)**:
+  an older build reads every key it knows and writes back every key it knows, so nothing is lost by a value it reads
+  generously — IA's third core slot, which no save carries — and the ceiling exists for the destructive case, a key an
+  older build drops on its next save. **The refusal costs more than the misreading**: `save` is a no-op while refused,
+  so a bump would turn a cosmetic *3 of 2 slots filled* into a session that cannot be saved. **GH MOVED NO
   VERSION**: a fight's losses are written to `hp`, `mana` and `items`, which v13 already carries, and
   to one member key, `companions_standing`, riding the party dict the way `bm_equipped` does.
 · **DELETED, NOT ZEROED** (each pinned ABSENT in test_batch_bm): `Run.award_talent_points`,
@@ -2017,8 +2022,11 @@ not argued** (`docs/state.md`, with the lever — an earned third slot — recor
   in the bag before).** The Peddler
   never offers one (`Run.peddler_rune`); a cache, the bargain and the drop still do. **A slotted engine brings its
   enablers, so `Run.hold_rune` slots an engine rune only when its caller asks, and the player's cache answer never
-  asks** — nor, since IA §2, does the event verb. Its grant prefers an ordinary rune but can hand him a core one once
-  his ordinary pool is spent, and until IA it asked to slot that into a free core slot (a third slot is one more free).
+  asks** — nor, since IA §2, does the event verb (CONFIRMED at IB §0.4). Its grant prefers an ordinary rune but can hand
+  him a core one once his ordinary pool is spent, and until IA it asked to slot that into a free core slot (a third slot
+  is one more free). **So the event verb is an UNAUTHORED SOURCE OF CORE RUNES**, invisible while it slotted them: the
+  fallback is kept — it beats granting nothing — and whether an ordinary pool runs dry in a run played forward is
+  watched in play (`docs/state.md`), because if it does, events are the main source of core runes and nobody authored that.
   Until HL one pick could hand over a rune and a card — the designer's *Fireball dragging Razor Ice*, which no draft does
   (`docs/reports/HL.md` §1). Class selection still slots the one taken, and its card names what it brings.
   **The cache's bag is CONFIRMED at HN §2 (the designer's; since HR §1 the rune waits unslotted on its hero, not in the
@@ -2137,6 +2145,13 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
 - **THE PEDDLER WAS THE SAME CAUSE ON A SECOND SURFACE**: offers laid at a fixed pitch whatever their text, so a long
   rule ran under the next hero's Buy button. One shape fixed both. `check_gt` §1 opens the pouch in every
   combination and presses Close in each; §2 buys every offer through its own button.
+- **THE HERO'S RUNE PANEL SCROLLS, AND IT IS SANCTIONED (IB §0.1, the designer's; a pager was weighed and not taken).
+  HU §1 GOVERNS A BAR OF PEERS UNDER TIME PRESSURE; THIS RULE GOVERNS A SECTIONED DOCUMENT READ BETWEEN FIGHTS.** A
+  pager pages a set of equivalent choices — the ability bar, where one card is found inside a turn and a row offers no
+  affordance; a scroller scrolls continuous structured text, and the panel's three sections ARE its navigation: a page
+  break inside a section cuts the player's own model of it in half. It scrolls at the holding cap and where a core slot
+  is empty (`check_gt` §1 records where), Close pinned — **so it is not a layout defect, and is not re-found as one.
+  The scroll must look like a scroll**: its bar is drawn where it scrolls and nowhere else (`check_ib` §4).
 
 ## STANDING RULE — A LIST OF CARDS PAGES; IT NEVER SCROLLS (Batch HU §1, ruled by the designer)
 > **When a list of discrete buttons outgrows the screen it PAGES — previous, next and a marker (*1 of 3*) — and never
@@ -2721,9 +2736,10 @@ count), heal, cost, cooldown, initiative and **Perfect**. Its two callers:
 CK the sheet held the only copy, which is exactly why the draft card had none and thirty damaging
 cards drafted with no damage figure at all.
 - **THE DRAFT CARD IS AN ARITHMETIC-ALLOWED SURFACE AND THE OFFER PICKER IN THE SAME FILE IS NOT.**
-  `map_screen._pick_button` (the mini-boss / upgrade / rune offer and the drop step) renders
+  `map_screen._pick_button` (the zone boss's and the mini-boss's offers and the drop step) renders
   `description` alone BY DESIGN — it is read in the same breath as a fight, so the standard's
-  mid-combat tier binds it. **`map_screen.gd` renders both tiers. Do not "make them consistent".**
+  mid-combat tier binds it; the rune cache's offer, on the hero's own draft screen since IB §2, renders a rune's text alone
+  the same way. **`map_screen.gd` renders both tiers. Do not "make them consistent".**
 - **THE THIRD COPY IS `battle._ability_tooltip` AND IT IS DELIBERATELY NOT FOLDED IN.** It reads a
   live `BattleUnit`: Surge, Empower and the Resonance curve multiply its damage and it prints
   "(ready in N)" off that unit's cooldown clock. It is a mid-combat tooltip with live state in it,
@@ -3394,12 +3410,12 @@ false of the cache, whose triple rides `member["rune_candidates"]` into the save
   FOUND THE POPULATION IS FIVE RATHER THAN FOUR, AND REPAIRED THEM** — see below.
 - **AND THE DRAFT RE-ASKED OWNERSHIP ALONE UNTIL HE §3, WHICH IS FD's SHAPE AT THE LAST DOOR (ruled).** A Guard Change
   rolled with the Stances slotted was handed over after they were unslotted (HD drove it). **`Run.draft_choice` is the
-  one list the party draft screen draws and `take_draft_ability` takes**: the head triple less what he owns and what
+  one list the hero's draft screen draws and `take_draft_ability` takes**: the head triple less what he owns and what
   `Classes.offerable` withholds from the engines slotted NOW. It FILTERS and writes nothing back (GV's rule: an engine
   is one press from back), so the card waits stored; the refusal names the rune to equip or the dismisser to
   unequip, and **the screen draws no button for a held card** — FE's dead buttons were a correct refusal left on
   screen — and says what it holds, in the rune cache's and the boss's words. Declining still refuses the whole stored
-  offer, held cards with it, and the column says so (`check_he` §5).
+  offer, held cards with it, and the section says so (`check_he` §5).
 - **THE REPAIR IS NOT A REROLL AND THE DIFFERENCE IS ASSERTED.** BATCH X's rule is that a cache
   does not reroll when a screen opens. `check_fd` §1c hands it a triple with nothing wrong with it
   and requires it back unchanged — without that arm the section passes on a function that simply
@@ -3753,8 +3769,10 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
     ✦ count stays — the map's one glance at a holding, outside the panel. A rune moved by Equip, Unequip or Swap
     re-opens the panel in its new section. **The crest's bag is not sectioned**: its rows are the crest's. **AN EMPTY
     CORE SLOT IS A ROW, SO FEWER SLOTTED IS TALLER**: the panel is longest with every slot empty and the holding full,
-    and a hero holding his six with a slot empty can scroll — GT §1's scroll, Close pinned; `check_gt` §1 walks every
-    slot count, and whether it pages is owed (`docs/state.md`).
+    and a hero holding his six with a slot empty can scroll — GT §1's scroll, Close pinned, RULED at IB §0.1 (GT §1's
+    block); `check_gt` §1 walks every slot count. **An empty slot's row reads *— empty —* (IB §0.3): a row does not
+    repeat its section's head**, which already says CORE and counts the slots; HN §2.6's line follows the slots only
+    where he holds no core rune, because it says where one comes from.
 - **THE NAMEPLATE CARRIES THE COUNT OF RUNES HE HOLDS UNWORN, READ OFF THE HOLDING AT EVERY DRAW** (`Run.held_count`): it
   clears when nothing is waiting and never because a menu was opened — *a count that lies is worse than none*. The bag's
   row carries the crest's own count. **A drop is announced on the map naming the hero** (`Run.last_drop`, read once),
@@ -4159,8 +4177,8 @@ remains open is design and is in `docs/state.md`: whether the lane rule is repla
 
 
 ## STANDING REFERENCE — THE ABILITY DRAFT, THE SLOT LADDER AND THE TWELVE PROTECTED CORES (Batch BO, reach rewritten at BX, the cap and the loadout at EG)
-**AN ELITE OFFERS A DRAFT TO EVERY LIVING HERO, on ONE SCREEN of four columns, each hero drawing
-from their OWN pool and keeping their OWN no-return ledger.**
+**AN ELITE OFFERS A DRAFT TO EVERY LIVING HERO, each on a screen of his own (IB §2; one screen of four
+columns from BX to IA), each hero drawing from their OWN pool and keeping their OWN no-return ledger.**
 
 **A SECOND ABILITY SOURCE BESIDE THE BOSS PICK, AND IT IS A SEPARATE POOL ON PURPOSE.**
 `Classes.SPEC_DRAFT_POOLS` / `CLASS_DRAFT_POOLS` are the SHELVES of what elites and events offer
@@ -4189,7 +4207,8 @@ lets a boss pool empty below its own depth.**
   one-in-four seam and **went with the GP pool merge** — one pool has no sides to weight. BO's
   reason for driving it thousands of times is kept and pointed at what replaced it: a class-wide
   card must still REACH a hero, and with no seam the only thing that can hide one is the shuffle.
-· **THE UI IS THE EXISTING OVERLAY, NOT A SECOND ONE.**
+· **THE UI IS ONE RENDERER, AND IT IS THE HERO'S OWN SCREEN (IB §2).** BO reused the pick overlay and BX built a
+  party screen of four columns; each was the one draft renderer of its day, and there is still exactly one.
 
 **THE TWELVE PROTECTED CORES — `Classes.PROTECTED_CORES`, AND THE `enablers` COLUMN IS THE THING A
 LATER BATCH WOULD MOST EASILY BREAK.** It is AUTHORED rather than derived, and `test_batch_bo`
@@ -4260,6 +4279,34 @@ rule is struck and kept here so that nobody re-derives it; the two suites that r
 retirement, on the Melted Armor contract. The cards are still authored weaker, and the rebalance GP
 recorded as owed stays owed** — retiring the rule removes the reason they must be weaker, not the
 fact that they are.
+
+## STANDING RULE — A PICK OWED OPENS ITSELF WHEN THE PARTY ARRIVES, AND EACH HERO DRAFTS ALONE (Batch IB §1/§2, the designer's)
+> **Every pick a hero carries out of a fight or an event — the draft, the rune cache, the zone boss's ability, the
+> mini-boss's upgrade — opens by itself when the party arrives at the map, one after another in the order it was
+> earned. A HOLDING NEVER DOES: a rune held unworn is a standing choice, and HR's ✦ N already shows it.** A hero's draft
+> and his rune cache are one screen of his own, a section each only while it is owed, under one Confirm.
+
+- **AN UNMADE PICK, NEVER AN UNEQUIPPED HOLDING — THE ONE PREDICATE THAT KEEPS A REMINDER FROM BECOMING A NAG.**
+  `Run.pending_picks` reads the four pick counters and nothing else; a holding that opened a screen would open it at
+  every arrival for the rest of the run.
+- **DISMISSING LOSES NOTHING, AND IT IS ONCE AN ARRIVAL.** Later and Not yet leave the pick owed, its offer stored and
+  its card marked — the border, `◆ N kind` and CHOOSE, never HR's ✦ — and nothing dismissed opens again until the party
+  next arrives. **A return from the hero sheet or the talents is not an arrival** (`Run.map_reentry`, set as each
+  returns); every other way into the map is one by default, a load included.
+- **IT NEVER COVERS ANOTHER CHOICE.** The walk starts in the map's `_ready`, after the map is drawn and behind the
+  framing card, and every next step waits until no overlay is up (`map_screen._modal_open`).
+- **THE ORDER IS STAMPED AS A PICK IS EARNED** (`Run.note_pick_earned`, a serial on the member's `pick_serials`), so **A
+  NEW DOOR THAT AWARDS A PICK STAMPS IT, AND A NEW KIND OF PICK OWES THE WALK ITS SCREEN.** A pick with no stamp — an
+  older save, a fixture — still opens, in the party's order. The stamp rides the member, which the save carries whole:
+  no key an older build writes away, so no version (the VERSIONS bullet's principle).
+- **EACH HERO DRAFTS ALONE, AND THAT IS A LAYOUT.** The four columns were already four picks — each hero his own offer,
+  pool, ledger and take — so a screen a hero moved no reward. **A section with nothing owed is absent, not empty**, and
+  the elite's looter owes both at every elite. The rules stay `run_state.gd`'s; the screen is
+  `map_screen._open_hero_draft`, its rune half `_take_rune_pick`. **The boss's ability and the upgrade keep the pick
+  overlay**; whether they join the hero's screen is owed (`docs/state.md`).
+- **THE CREST RUNE STAYS OUT OF A HERO'S PICK (HW §1c), AND A SCREEN A HERO IS WHERE IT WOULD QUIETLY RE-MERGE**: the
+  RUNES section draws `Run.rune_choice`, which repairs a crest rune out of a queued triple, and the crest's bag is not
+  touched by a hero's answer (`check_ib` §2d).
 
 ## STANDING RULE — ONE DRAFT POOL A CLASS, AND A CARD THAT READS AN ENGINE IS OFFERED ONLY TO ITS HOLDER (Batch GP §1/§2)
 > **The three lineage shelves and the class-wide shelf of a class are ONE POOL. A hero draws from
@@ -4350,8 +4397,8 @@ same breath as the removal. `run_sim` never bought one, so no measured figure mo
   equipped set. *GV's second reason — a spec rune's scope was the lineage, so every hero who could be offered a row owned
   its engine and a gate on ownership would withhold nothing — went with the spec scope at HC §1*: a row reaches every
   hero of its class now, most of whom do not own its engine, and this table is what withholds it from them.
-- **A QUEUED ROW SITS OUT OF THE ANSWER; IT IS NOT REPAIRED AWAY (RULED AT GW §4).** The overlay says what
-  waits and on which rune, `map_screen._pick_rune` indexes the list the buttons were built from, and a cache emptied
+- **A QUEUED ROW SITS OUT OF THE ANSWER; IT IS NOT REPAIRED AWAY (RULED AT GW §4).** The hero's draft screen says
+  what waits and on which rune (the pick overlay did until IB §2), `map_screen._take_rune_pick` finds its rune in the list the buttons were built from, and a cache emptied
   this way can still be let go. FD's block below carries why this is not its write-back, and `docs/master.html` carries
   the reason on the player-facing side: **a retirement can never be undone and an unequipped engine is one press from
   being undone, so a state the player can undo is not a state to destroy.**

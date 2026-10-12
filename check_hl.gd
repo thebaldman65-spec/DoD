@@ -188,6 +188,31 @@ func _kit_read(m: Dictionary) -> Array:
 	return out
 
 
+# BATCH IB §2 — a rune cache answered on the hero's own draft screen: the arrival's, or
+# the card's CHOOSE when none is up; the rune by its binding, then the Confirm. Returns
+# the rune's name when both pressed, "" otherwise.
+func _take_from_cache(mp: Node, idx: int, rune_name: String) -> String:
+	var hd: Node = Gate.hero_draft(mp)
+	if hd == null:
+		var choose: Button = Gate.bound_button(mp, "_open_pick_overlay", [idx])
+		if choose != null:
+			choose.emit_signal("pressed")
+			await process_frame
+		hd = Gate.hero_draft(current_scene)
+	var rb: Button = Gate.bound_button(hd, "_stage_draft_rune", [idx, rune_name]) if hd != null else null
+	if rb == null:
+		return ""
+	rb.emit_signal("pressed")
+	await process_frame
+	var conf: Button = Gate.bound_button(Gate.hero_draft(current_scene), "_confirm_hero_draft", []) \
+		if Gate.hero_draft(current_scene) != null else null
+	if conf == null:
+		return ""
+	conf.emit_signal("pressed")
+	await Gate.frames(self, 3)
+	return rune_name
+
+
 func _to_map() -> Node:
 	change_scene_to_file("res://scenes/map.tscn")
 	await Gate.frames(self, 6)
@@ -309,13 +334,9 @@ func _s1a_one_pick_one_card() -> void:
 	var kit0 := _kit_read(mg)
 	var eng0: Array = _run.held_engines(mg)
 	var mp2 := await _to_map()
-	var choose: Button = Gate.bound_button(mp2, "_open_pick_overlay", [1])
-	if choose != null:
-		choose.emit_signal("pressed")
-		await process_frame
-	var pick_ov: Node = Gate.overlay(current_scene, 60)
-	var took := Gate.press(pick_ov, [String(core["name"])]) if pick_ov != null else ""
-	await Gate.frames(self, 3)
+	# BATCH IB §1/§2 — the cache is the Mage's own draft screen, put up as the party arrives:
+	# the rune pressed through its own button, then the screen's Confirm.
+	var took := await _take_from_cache(mp2, 1, String(core["name"]))
 	ok(took == String(core["name"]), "§1a: the cache drew no button for %s" % core["name"])
 	# BATCH HR §1 — HELD BY THE MAGE, UNWORN (HL put it in the bag): the question is still
 	# that the pick slotted nothing and handed over one thing.
@@ -349,14 +370,7 @@ func _s1a_one_pick_one_card() -> void:
 	mg2["rune_candidates"] = [[Runes.build(plain_id)]]
 	mg2["rune_picks_owed"] = 1
 	var mp4 := await _to_map()
-	var ch2: Button = Gate.bound_button(mp4, "_open_pick_overlay", [1])
-	if ch2 != null:
-		ch2.emit_signal("pressed")
-		await process_frame
-	var ov4: Node = Gate.overlay(current_scene, 60)
-	if ov4 != null:
-		Gate.press(ov4, [String(plain["name"])])
-	await Gate.frames(self, 3)
+	await _take_from_cache(mp4, 1, String(plain["name"]))
 	ok(_names(mg2.get("runes", [])).has(String(plain["name"])) and _run.runes_worn(mg2) == 1,
 		"§1a: an ordinary rune taken from a cache was not worn while a slot was free")
 

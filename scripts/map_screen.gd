@@ -109,16 +109,6 @@ var _held_drop_armed := ""
 # a shared guard would make one refuse to open because the other had been.
 var _loadout_panel_for := -1
 
-# BATCH BX §2 — THE PARTY DRAFT'S STAGED CHOICES, and staging them rather than
-# committing them IS the section. The screen resolves as ONE action: every
-# column is decided, then the whole screen is confirmed, so a player who fills
-# the Devout's last slot can still reconsider before the Warden's pick locks.
-# hero index -> {"card": String, "drop": String, "declined": bool}. Nothing
-# here has touched `Run` — `_confirm_party_draft` is the only thing that does,
-# and it goes through the same two doors the single-hero overlay uses.
-var _draft_stage: Dictionary = {}
-var _draft_overlay: Control = null
-
 
 func _ready() -> void:
 	if not Run.active:
@@ -130,13 +120,17 @@ func _ready() -> void:
 	Music.play("map")
 	_draw_screen()
 	_announce_arrival()
-	# The draft screen CHAINS OFF the framing card rather than racing it (the
-	# Batch Z/AE precedent). The two can never actually collide — the framing
-	# card only shows before the first step and no draft is owed then — but a
-	# screen that opens over an orientation card is the failure that ordering
-	# is written to prevent, not one to discover.
-	if not _maybe_show_framing():
-		_maybe_open_party_draft()
+	# BATCH IB §1 — A RETURN FROM THE HERO SHEET OR THE TALENTS IS NOT AN ARRIVAL
+	# (`Run.map_reentry`), so what the party carried here is opened once, when it came.
+	var arrived := not Run.map_reentry
+	Run.map_reentry = false
+	# The walk never opens under the framing card: it starts only when the card is not
+	# up, and dismissing the card starts nothing. The two cannot meet in play — the card
+	# shows only before the run's first step, and nothing is owed then — so a pick owed
+	# under it (a fixture's) waits for the next arrival; a screen over an orientation
+	# card is the failure this order is written to prevent.
+	if not _maybe_show_framing() and arrived:
+		_begin_arrival()
 
 
 # ══ BATCH HR §2 — THE DROP'S TOAST NAMES THE HERO ════════════════════════════════
@@ -284,6 +278,7 @@ func _draw_screen() -> void:
 	# nothing was committed, so reopening from the card's CHOOSE button puts
 	# the player back where they were rather than making them start over.
 	_draft_overlay = null
+	_hero_draft_for = -1
 
 	var bg := ColorRect.new()
 	bg.size = Vector2(1280, 720)
@@ -1021,10 +1016,15 @@ func _bar(at: Vector2, w: float, h: float, frac: float, fill: Color,
 # a DROP step once the kit is at the seven-slot cap, and an explicit DECLINE.
 # `pending` carries the card chosen but not yet paid for, so the drop step is
 # the same overlay redrawn rather than a second screen.
-func _open_pick_overlay(idx: int, pending := "") -> void:
+func _open_pick_overlay(idx: int, pending := "", only := "") -> void:
 	var member: Dictionary = Run.party[idx]
 	var kind := ""
-	if int(member.get("bm_picks_owed", 0)) > 0:
+	# BATCH IB §1 — the arrival walk names the kind it is opening (`only`), because
+	# it opens a hero's picks in the order he earned them; the card's CHOOSE keeps
+	# the precedence below.
+	if only != "":
+		kind = only if Run.pick_owed(member, only) > 0 else ""
+	elif int(member.get("bm_picks_owed", 0)) > 0:
 		kind = "ability"
 	elif int(member.get("draft_picks_owed", 0)) > 0:
 		kind = "draft"
@@ -1037,13 +1037,12 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 	if pending != "":
 		_open_drop_overlay(idx, kind, pending)
 		return
-	# BATCH BX §2 — A DRAFT IS A PARTY-WIDE SCREEN NOW, so the card's CHOOSE
-	# button opens the four columns rather than this hero's alone. It is the
-	# same button and the same badge; what changed is that the offer was never
-	# only this hero's. A hero owed an ABILITY pick as well still resolves that
-	# first (the precedence above), which is unchanged.
-	if kind == "draft":
-		_open_party_draft()
+	# BATCH IB §2 — THE DRAFT AND THE RUNE CACHE ARE ONE SCREEN, THE HERO'S OWN. A
+	# draft was a four-column party screen from BX to IA and a rune cache this
+	# overlay's own branch; each hero now answers both on one screen, alone, so the
+	# card's CHOOSE opens his — whichever of the two he owes.
+	if kind == "draft" or kind == "rune":
+		_open_hero_draft(idx)
 		return
 	var overlay := Control.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -1062,10 +1061,9 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 	panel.add_child(box)
 
 	var heading: String = {"ability": "NEW ABILITY",
-		"upgrade": "ABILITY UPGRADE", "rune": "RUNE"}[kind]
+		"upgrade": "ABILITY UPGRADE"}[kind]
 	var tint: Color = {"ability": Color(0.95, 0.85, 0.4),
-		"upgrade": Color(0.95, 0.85, 0.4),
-		"rune": Color(0.85, 0.6, 1.0)}[kind]
+		"upgrade": Color(0.95, 0.85, 0.4)}[kind]
 	var title := Label.new()
 	title.text = "%s — %s, choose one" % [
 		Classes.SPEC_INFO.get(String(member.get("spec", "")), {}).get(
@@ -1161,148 +1159,32 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 					Run.upgrade_name(String(up["id"]))],
 					Run.upgrade_desc(String(up["id"])),
 					Color(1.0, 0.9, 0.5), _pick_upgrade.bind(idx, i), overlay)
-		"rune":
-			# BATCH FD §1 — THROUGH `Run.rune_choice`, NOT OFF THE MEMBER.
-			# The stored triple was rolled at DROP time; this re-asks the pool
-			# and the pouch and writes the repair back, so the button at index
-			# `i` here and the one `_pick_rune` indexes are the same rune.
-			var triple: Array = Run.rune_choice(member)
-			for i in triple.size():
-				var rune: Dictionary = triple[i]
-				# BATCH HE §4 — NO SCOPE BAND (ruled). The button read
-				# "<name>  [Class]" on every rune a hero can be offered, since a
-				# rune reaches only its own class; the label told nobody anything
-				# and it is gone, with the band's tint (`Runes.RUNE_TINT`).
-				# BATCH HO §1 — AND A CREST RUNE SAYS IT IS THE CREST'S. The cache is
-				# one hero's, and a crest rune in it is not his: the button says whom
-				# it is for (`Run.rune_for_label`), the one word it adds to any rune.
-				var offer_label := String(rune["name"])
-				if Runes.is_party_rune(rune):
-					offer_label = "%s  (for %s)" % [offer_label, Run.rune_for_label(rune)]
-				_pick_button(box, offer_label,
-					Runes.shown_desc(rune),
-					Runes.RUNE_TINT,
-					_pick_rune.bind(idx, i), overlay)
-			# ══ BATCH FM §3 — A TRIPLE THAT REPAIRED TO NOTHING STRANDS THE
-			#    PICK, AND THIS IS WHERE IT SHOWED ═══════════════════════════
-			#
-			# **THIS IS FE's DEAD-BUTTON FAILURE WITH THE BUTTON REMOVED
-			# INSTEAD OF LEFT BEHIND, AND IT IS WORSE.** `_pick_ability`
-			# refused illegally and left 604 buttons on screen; this drew a
-			# heading — *"Warden 2 — RUNE, choose one"* — over nothing at all,
-			# and `rune_picks_owed` never came down, so the card kept its
-			# purple border and its CHOOSE button **for the rest of the run**.
-			#
-			# **IT IS REACHABLE AND IT IS NOT RARE.** FD's own repair drops a
-			# queued candidate the hero has since acquired, and tops the triple
-			# back up through `generate_rune` — which returned a stat stick
-			# forever and returns `{}` on an exhausted pool since FM §1. So:
-			# roll a cache, buy the same runes from the Peddler, open the card.
-			# Measured live at FM §3.
-			#
-			# **THE PICK IS SPENT RATHER THAN HELD**, because holding it is what
-			# strands the run: there is nothing that can arrive to fill it — the
-			# pool only ever shrinks for a hero, except through a DRAFT, which
-			# is why the reason line says which of the two it is. The button
-			# says what it does and does not pretend to be a choice.
-			# ══ BATCH GV — WHAT THE CACHE STILL HOLDS FOR AN ENGINE HE HAS NOT
-			#    EQUIPPED, SAID RATHER THAN HIDDEN ═════════════════════════════
-			#
-			# `rune_choice` hands over only what his equipped engines can use,
-			# and it keeps the rest stored (`Run.rune_choice_withheld`) rather
-			# than repairing it away: equipping the engine brings it back. A
-			# candidate that silently left the offer would read as a bug (CO
-			# §3), and a cache emptied this way is NOT "nothing can arrive" —
-			# the pouch's own button fills it — so that case has its own words.
-			var withheld: Array = Run.rune_choice_withheld(member)
-			# BATCH HC §5 — WHAT IS HELD BACK HAS TWO CAUSES SINCE HB, AND THE ENGINE'S
-			# SENTENCE WAS PRINTED FOR BOTH. A rune that needs a companion is held back
-			# while the pet's dismisser is EQUIPPED, and "wait on the engine rune they
-			# read being equipped" was false of it. Split by `Runes.pet_holds_back`: the
-			# engine's words are byte-for-byte what they were for an engine-withheld
-			# rune, and the pet's take the empty-offer sentence's own clause.
-			var wh_held: Array = Run.held_engines(member)
-			var wh_pet: Array = withheld.filter(func(c): return Runes.pet_holds_back(
-				String((c as Dictionary).get("id", "")), wh_held))
-			var wh_engine: Array = withheld.filter(func(c): return not Runes.pet_holds_back(
-				String((c as Dictionary).get("id", "")), wh_held))
-			var waits_on: String = Runes.waited_on(wh_engine.map(
-				func(c): return String((c as Dictionary).get("id", ""))))
-			var pet_line := "The cache holds %d more that need%s a companion, which the %s dismisses." % [
-				wh_pet.size(), "s" if wh_pet.size() == 1 else "",
-				Runes.dismisser_name(wh_held)]
-			if not triple.is_empty() and not withheld.is_empty():
-				var more := Label.new()
-				var more_lines := PackedStringArray()
-				if not wh_engine.is_empty():
-					more_lines.append("The cache holds %d more that wait%s on %s being equipped." % [
-						wh_engine.size(), "s" if wh_engine.size() == 1 else "", waits_on])
-				if not wh_pet.is_empty():
-					more_lines.append(pet_line)
-				more.text = "\n".join(more_lines)
-				more.add_theme_font_size_override("font_size", 13)
-				more.add_theme_color_override("font_color", Color(0.72, 0.68, 0.62))
-				more.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-				more.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-				more.custom_minimum_size = Vector2(600, 0)
-				box.add_child(more)
-			if triple.is_empty() and not withheld.is_empty():
-				var held_back := Label.new()
-				if wh_engine.is_empty():
-					held_back.text = "The cache holds nothing this hero can take while the %s is equipped, which dismisses the companion they need.\nUnequip it and the cache's runes return; letting the pick go spends it." % \
-						Runes.dismisser_name(wh_held)
-				else:
-					held_back.text = "The cache holds nothing this hero can take while %s is not equipped.\nEquip it and the cache's runes return; letting the pick go spends it." % \
-						waits_on
-					if not wh_pet.is_empty():
-						held_back.text += "\n" + pet_line
-				held_back.add_theme_font_size_override("font_size", 14)
-				held_back.add_theme_color_override("font_color", Color(0.72, 0.68, 0.62))
-				held_back.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-				held_back.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-				held_back.custom_minimum_size = Vector2(600, 0)
-				box.add_child(held_back)
-				var let_go := Button.new()
-				let_go.text = "Let it go"
-				let_go.custom_minimum_size = Vector2(200, 34)
-				let_go.pressed.connect(Music.click)
-				let_go.pressed.connect(func():
-					overlay.queue_free()
-					_dismiss_rune_pick(idx))
-				box.add_child(let_go)
-			elif triple.is_empty():
-				var none := Label.new()
-				none.text = "The cache holds nothing this hero can take — %s.\nThe pick is spent rather than held: nothing can arrive to fill it." % \
-					Runes.empty_offer_reason(member, Run.party_rune_names())
-				none.add_theme_font_size_override("font_size", 14)
-				none.add_theme_color_override("font_color", Color(0.72, 0.68, 0.62))
-				none.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-				none.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-				none.custom_minimum_size = Vector2(600, 0)
-				box.add_child(none)
-				var drop := Button.new()
-				drop.text = "Let it go"
-				drop.custom_minimum_size = Vector2(200, 34)
-				drop.pressed.connect(Music.click)
-				drop.pressed.connect(func():
-					overlay.queue_free()
-					_dismiss_rune_pick(idx))
-				box.add_child(drop)
-
+	# BATCH IB §1 — NOT YET LOSES NOTHING: the pick stays owed and marked on the card,
+	# and the arrival walk moves on without bringing this one back on this arrival.
 	var close := Button.new()
 	close.text = "Not yet"
 	close.custom_minimum_size = Vector2(200, 34)
 	close.pressed.connect(Music.click)
-	close.pressed.connect(func(): overlay.queue_free())
+	close.pressed.connect(func():
+		overlay.queue_free()
+		_arrival_dismissed(idx, kind))
 	box.add_child(close)
 
 
 # One choice: its name on the button, its full text under it, so a player
 # never picks an upgrade whose effect they had to hover to read.
+#
+# BATCH IB §6a — **THE GAME MARKS ITS CHOICE BUTTONS** (`choice`: the handler's name
+# and its bound arguments). The press goes through a closure that frees the overlay,
+# so the handler is not on the button's own connection and a walker cannot find it
+# by binding; HZ's one new button on this overlay stopped four roads that found
+# choices by elimination. A walker asks for the buttons this meta marks, never for
+# the ones whose words are not "Not yet".
 func _pick_button(box: VBoxContainer, label: String, desc: String,
 		tint: Color, action: Callable, overlay: Control) -> void:
 	var b := Button.new()
 	b.text = label
+	b.set_meta("choice", [action.get_method(), action.get_bound_arguments()])
 	b.custom_minimum_size = Vector2(600, 32)
 	b.add_theme_font_size_override("font_size", 14)
 	b.add_theme_color_override("font_color", tint)
@@ -1397,6 +1279,11 @@ func _open_drop_overlay(idx: int, kind: String, incoming: String,
 	back.custom_minimum_size = Vector2(200, 30)
 	back.pressed.connect(Music.click)
 	back.pressed.connect(overlay.queue_free)
+	# BATCH IB §1 — over the hero's draft screen, Back returns to it; over nothing (the
+	# boss pick, whose overlay closed to open this one), it leaves the pick owed and
+	# the arrival walk goes on.
+	if not on_drop.is_valid():
+		back.pressed.connect(_arrival_dismissed.bind(idx, kind))
 	box.add_child(back)
 
 
@@ -1459,31 +1346,35 @@ func _pick_ability(idx: int, pool_name: String, bench_name := "") -> void:
 			pool_name, bench_name])
 	else:
 		_toast("%s learns %s." % [String(member["key"]).capitalize(), pool_name])
+	_arrival_next.call_deferred()
 
 
-# ---------- BATCH BX §2: THE PARTY-WIDE DRAFT SCREEN ----------
+# ---------- BATCH IB §2: EACH HERO DRAFTS ALONE, ON HIS OWN SCREEN ----------
 #
-# AN ELITE OFFERS A DRAFT TO EVERY LIVING HERO, ON ONE SCREEN, IN FOUR COLUMNS.
-# Four sequential offers after every elite would slow a run noticeably, and
-# elites run 0-3 a zone since BK — so the shape of the screen is the change,
-# not just its reach.
+# **ONE SCREEN A HERO, AND ON IT EVERY CHOICE OF ONE OF THREE HE IS OWED FROM A FIGHT:
+# THE ABILITY THE DRAFT OFFERS AND THE RUNE THE CACHE HOLDS.** From BX to IA a draft
+# was one party screen of four columns and a rune cache this file's pick overlay; the
+# designer asked for each class to draft separately, runes and abilities together. The
+# columns were already four picks — each hero his own offer, his own pool, his own
+# no-return ledger, his own take at the confirm (`Run.take_draft_ability` per member) —
+# so this is a LAYOUT and moves no reward: one hero's column on a screen of his own,
+# beside his rune, and a Confirm a hero.
 #
-# EACH HERO DRAWS FROM THEIR OWN POOLS. There is no shared offer and no shared
-# ledger: `Run.roll_draft_offer` is called per member and reads that member's
-# own spec pool, class pool and `draft_refused`, so a Pyromancer can never be
-# shown a Warden card and one hero's decline can never hide a card from
-# another. THAT LEDGER BEING PER MEMBER IS LOAD-BEARING AND IS WHY §1 SAYS TO
-# VERIFY IT RATHER THAN ASSUME IT — a shared refusal list is the obvious
-# implementation and the wrong one.
+# **A SECTION WITH NOTHING OWED IS ABSENT, NOT EMPTY.** The elite pays a draft to every
+# living hero and its cache to one of them, so one hero an elite carries both, and the
+# others only the draft; a bargain's rune comes alone. **ONE CONFIRM COMMITS THE HERO'S
+# WHOLE DECISION** — every section on the screen decided, as BX's screen waited on
+# every column — and **LATER LEAVES BOTH OWED**, marked on his card.
 #
-# THE RULES ALL LIVE IN `run_state.gd` AND THIS SCREEN OWNS NONE OF THEM. The
-# cap, the drop, the no-return ledger and the fill-short rule are
-# `Run.take_draft_ability` / `Run.decline_draft` / `Run.roll_draft_offer`,
-# exactly as the single-hero overlay uses them — this is a second LAYOUT, never
-# a second implementation.
+# THE RULES ALL LIVE IN `run_state.gd` AND THIS SCREEN OWNS NONE OF THEM. The cap, the
+# bench, the no-return ledger and the re-asked offers are `Run.take_draft_ability`,
+# `Run.decline_draft`, `Run.draft_choice`, `Run.rune_choice` and `Run.hold_rune`,
+# exactly as the screens before it used them — a second layout, never a second
+# implementation.
 
 # BATCH HZ §1b — THE KIT PREVIEW (`scripts/kit_preview.gd`): read-only, over a draft, on the
-# hero whose decision it is. LOADED, never preloaded — it names the `Run` autoload (CT's rule).
+# hero whose decision it is. Opened from the hero's draft screen and the pick overlay, never
+# by walking: the screen already knows its hero.
 const KIT_PREVIEW := "res://scripts/kit_preview.gd"
 
 
@@ -1514,57 +1405,155 @@ const DRAFT_COL_Y := 92.0
 const DRAFT_COL_H := 540.0
 
 
-# The heroes with a column: everyone owed a draft pick. A hero who was never
-# offered one (an exhausted pool — `award_draft_pick` returns false and queues
-# nothing) simply has no column, which is the honest rendering of "there is
-# nothing left to show you".
-func _draft_columns() -> Array:
-	var out: Array = []
-	for idx in Run.party.size():
-		if int(Run.party[idx].get("draft_picks_owed", 0)) > 0:
-			out.append(idx)
-	return out
+# ══ BATCH IB §1 — WHAT A HERO CARRIES OUT OF A FIGHT OPENS ITSELF WHEN THE PARTY ARRIVES ══
+#
+# **THE DESIGNER'S WORDS: *any applicable draft screens should automatically appear
+# after a battle or event ends and the player arrives at the node map.*** BX opened the
+# draft so from the start; the zone boss's ability, the mini-boss's upgrade and the
+# rune cache waited behind a card's CHOOSE button, which is what read as *difficult to
+# determine*. **Every owed pick opens now, one after another, in the order it was earned**
+# (`Run.pending_picks`), then the pouch's swap offers and the full holdings, as before.
+#
+# **THE THREE RULES THE FEATURE OBEYS, EACH A LINE BELOW:**
+# - **AN UNMADE PICK, NEVER AN UNEQUIPPED HOLDING.** A rune held and not worn is a
+#   standing choice, and HR's ✦ N says so at a glance; were it to open a screen, the
+#   screen would open at every arrival for the rest of the run. `Run.pending_picks`
+#   reads the four pick counters and nothing else.
+# - **DISMISSING LOSES NOTHING, AND IT IS ONCE AN ARRIVAL.** Later and Not yet leave the
+#   pick owed, marked on the card, answered from its CHOOSE; and nothing dismissed opens
+#   again until the party arrives again — not when it comes back from the hero sheet
+#   (`Run.map_reentry`), and not when another screen closes.
+# - **IT NEVER COVERS A CHOICE ALREADY MADE.** It runs from `_ready`, after the map has
+#   drawn and before any press can land, and every next step waits until no overlay is
+#   open (`_modal_open`): a step onto a node changes the scene, and a scene that is gone
+#   opens nothing.
+var _arrival_queue: Array = []
+var _arrival_live := false
+# The overlays a step of the walk, or what it chains to, can put up; nothing opens over
+# one. The framing card and the kit preview (90) and the debug pickers (95) count too.
+const ARRIVAL_MODALS := [60, 62, 64, 70, 72, 74, 80, 90, 91, 95]
 
 
-func _maybe_open_party_draft() -> void:
+func _begin_arrival() -> void:
 	if Run.sim_run:
 		return
-	if _draft_columns().is_empty():
-		# BATCH CT §3: nothing owed on the draft, so the pouch's own owed pick
-		# gets the screen. CHAINED rather than raced, on the same precedent the
-		# framing card and the draft use two functions up: two overlays opening
-		# over each other is the failure ordering exists to prevent.
-		_check_item_offers()
+	_arrival_queue = Run.pending_picks()
+	_arrival_live = true
+	_arrival_next()
+
+
+func _modal_open() -> bool:
+	for c in get_children():
+		if c is Control and not c.is_queued_for_deletion() \
+				and ARRIVAL_MODALS.has((c as Control).z_index):
+			return true
+	return false
+
+
+# The draft and the rune cache are one screen; the boss's ability and the upgrade each
+# their own.
+func _pick_group(kind: String) -> String:
+	return "draft" if kind == "draft" or kind == "rune" else kind
+
+
+# The next pick still owed, on the screen that answers it; when none is left, the
+# pouch's swap offers and the full holdings, as the screen has always chained them.
+func _arrival_next() -> void:
+	if not _arrival_live or _modal_open():
 		return
-	_open_party_draft()
+	while not _arrival_queue.is_empty():
+		var t: Dictionary = _arrival_queue.pop_front()
+		var i := int(t["hero"])
+		var kind := String(t["kind"])
+		if i < 0 or i >= Run.party.size() or Run.pick_owed(Run.party[i], kind) <= 0:
+			continue
+		if _pick_group(kind) == "draft":
+			_open_hero_draft(i)
+		else:
+			_open_pick_overlay(i, "", kind)
+		return
+	_arrival_live = false
+	_check_item_offers()
 
 
-# A column is DECIDED when the player has either declined it or chosen a card
-# AND, at the cap, named what that card replaces. The confirm button reads this
-# for every column, so "the screen resolves as one action" is a property of one
-# predicate rather than of four buttons agreeing. (BATCH EG §1: the cap is a
-# ladder now and this predicate never named the number — it asks the run.)
-func _draft_decided(idx: int) -> bool:
+# A screen closed without its pick answered: the rest of that hero's picks of that
+# kind leave this arrival with it, so the screen does not come straight back.
+func _arrival_dismissed(i: int, kind: String) -> void:
+	var group := _pick_group(kind)
+	_arrival_queue = _arrival_queue.filter(func(t):
+		return not (int(t["hero"]) == i and _pick_group(String(t["kind"])) == group))
+	_arrival_next.call_deferred()
+
+
+# ── THE HERO'S DRAFT SCREEN ──────────────────────────────────────────────────────
+#
+# What he has staged, by hero: `card`, `drop` and `declined` for the ABILITIES section
+# (BX's three), `rune_set` and `rune` for the RUNES section (a rune's name, or "" to
+# let an empty cache go). Nothing here has touched `Run` — `_confirm_hero_draft` is the
+# only thing that does. A redraw keeps it; a close or a confirm clears his.
+var _draft_stage: Dictionary = {}
+var _draft_overlay: Control = null
+var _hero_draft_for := -1
+
+
+func _stage_of(idx: int) -> Dictionary:
 	var st: Dictionary = _draft_stage.get(idx, {})
-	if bool(st.get("declined", false)):
+	for k in ["card", "drop", "rune"]:
+		if not st.has(k):
+			st[k] = ""
+	for k in ["declined", "rune_set"]:
+		if not st.has(k):
+			st[k] = false
+	_draft_stage[idx] = st
+	return st
+
+
+# The ABILITIES section is DECIDED when the player has either declined it or chosen a
+# card AND, at the cap, named what that card replaces. (BATCH EG §1: the cap is a ladder
+# and this predicate never named the number — it asks the run.)
+func _draft_decided(idx: int) -> bool:
+	var st := _stage_of(idx)
+	if bool(st["declined"]):
 		return true
-	if String(st.get("card", "")) == "":
+	if String(st["card"]) == "":
 		return false
 	if Run.ability_slots_full(Run.party[idx]):
-		return String(st.get("drop", "")) != ""
+		return String(st["drop"]) != ""
 	return true
 
 
-func _open_party_draft() -> void:
-	var cols := _draft_columns()
-	if cols.is_empty():
-		_close_party_draft()
+# The RUNES section is DECIDED when a rune is chosen, or an empty cache is let go.
+func _rune_decided(idx: int) -> bool:
+	return bool(_stage_of(idx)["rune_set"])
+
+
+# Every section on his screen decided — what the Confirm waits on.
+func _hero_draft_decided(idx: int) -> bool:
+	var member: Dictionary = Run.party[idx]
+	if Run.pick_owed(member, "draft") > 0 and not _draft_decided(idx):
+		return false
+	if Run.pick_owed(member, "rune") > 0 and not _rune_decided(idx):
+		return false
+	return true
+
+
+func _open_hero_draft(idx: int) -> void:
+	if idx < 0 or idx >= Run.party.size():
 		return
+	var member: Dictionary = Run.party[idx]
+	var has_card := Run.pick_owed(member, "draft") > 0
+	var has_rune := Run.pick_owed(member, "rune") > 0
 	if _draft_overlay != null and is_instance_valid(_draft_overlay):
 		_draft_overlay.queue_free()
+	_draft_overlay = null
+	if not has_card and not has_rune:
+		_hero_draft_for = -1
+		return
+	_hero_draft_for = idx
 	var overlay := Control.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	overlay.z_index = 62
+	overlay.set_meta("hero_draft", idx)
 	add_child(overlay)
 	_draft_overlay = overlay
 	var dim := ColorRect.new()
@@ -1573,7 +1562,7 @@ func _open_party_draft() -> void:
 	overlay.add_child(dim)
 
 	var title := Label.new()
-	title.text = "THE DRAFT"
+	title.text = "THE DRAFT — %s" % Run.nameplate(member)
 	title.add_theme_font_override("font", NAME_FONT)
 	title.add_theme_font_size_override("font_size", 36)
 	title.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
@@ -1582,27 +1571,46 @@ func _open_party_draft() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	overlay.add_child(title)
 	var sub := Label.new()
-	sub.text = "Each hero draws from their own pool. Choose or decline for every one, then confirm."
+	if has_card and has_rune:
+		sub.text = "A new ability and a rune from the cache. Decide both, then confirm."
+	elif has_card:
+		sub.text = "A new ability. Choose one or decline, then confirm."
+	else:
+		sub.text = "A rune from the cache. Choose one, then confirm."
 	sub.add_theme_font_size_override("font_size", 13)
 	sub.add_theme_color_override("font_color", Color(0.62, 0.6, 0.56))
 	sub.position = Vector2(0, 62)
 	sub.size = Vector2(1280, 18)
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	overlay.add_child(sub)
+	# BATCH HZ §1b — what he already carries, beside the choice that adds to it. **IT OPENS
+	# ON HIM**: the screen is his, so the preview's walk across the four is never needed.
+	var kit := _kit_preview_button(idx, 180)
+	kit.position = Vector2(1080, 24)
+	overlay.add_child(kit)
 
-	var span: float = cols.size() * DRAFT_COL_W + (cols.size() - 1) * DRAFT_COL_GAP
+	var sections: Array = []
+	if has_card:
+		sections.append("abilities")
+	if has_rune:
+		sections.append("runes")
+	var span: float = sections.size() * DRAFT_COL_W + (sections.size() - 1) * DRAFT_COL_GAP
 	var x0: float = (1280.0 - span) * 0.5
-	for c in cols.size():
-		_draft_column(overlay, int(cols[c]),
-			Vector2(x0 + c * (DRAFT_COL_W + DRAFT_COL_GAP), DRAFT_COL_Y))
+	for c in sections.size():
+		var at := Vector2(x0 + c * (DRAFT_COL_W + DRAFT_COL_GAP), DRAFT_COL_Y)
+		if sections[c] == "abilities":
+			_draft_column(overlay, idx, at)
+		else:
+			_draft_rune_section(overlay, idx, at)
 
 	var undecided := 0
-	for idx in cols:
-		if not _draft_decided(int(idx)):
-			undecided += 1
+	if has_card and not _draft_decided(idx):
+		undecided += 1
+	if has_rune and not _rune_decided(idx):
+		undecided += 1
 	var confirm := Button.new()
 	confirm.text = "Confirm the draft" if undecided == 0 else \
-		"%d hero%s still to decide" % [undecided, "" if undecided == 1 else "es"]
+		"%d choice%s still to make" % [undecided, "" if undecided == 1 else "s"]
 	confirm.position = Vector2(490, 652)
 	confirm.custom_minimum_size = Vector2(300, 44)
 	confirm.add_theme_font_size_override("font_size", 17)
@@ -1610,29 +1618,29 @@ func _open_party_draft() -> void:
 	if undecided == 0:
 		confirm.add_theme_color_override("font_color", Color(1.0, 0.9, 0.5))
 	confirm.pressed.connect(Music.click)
-	confirm.pressed.connect(_confirm_party_draft)
+	confirm.pressed.connect(_confirm_hero_draft)
 	overlay.add_child(confirm)
 
-	# NOTHING IS COMMITTED UNTIL CONFIRM, so leaving is safe and the picks stay
-	# owed on the members — the card badge and its CHOOSE button reopen this
-	# screen. That is what lets a player go and read a hero sheet mid-draft.
+	# NOTHING IS COMMITTED UNTIL CONFIRM, so leaving is safe and both picks stay owed —
+	# the card's badge and its CHOOSE button reopen this screen.
 	var later := Button.new()
 	later.text = "Later"
 	later.position = Vector2(1100, 652)
 	later.custom_minimum_size = Vector2(140, 44)
 	later.add_theme_font_size_override("font_size", 14)
 	later.pressed.connect(Music.click)
-	later.pressed.connect(_close_party_draft)
+	later.pressed.connect(_close_hero_draft)
 	overlay.add_child(later)
 
 
+# THE ABILITIES SECTION — BX's column, one hero's, on his own screen. Its section head
+# stands where the hero's name stood: the screen's title names him now.
 func _draft_column(overlay: Control, idx: int, at: Vector2) -> void:
 	var member: Dictionary = Run.party[idx]
-	var spec := String(member.get("spec", ""))
-	var st: Dictionary = _draft_stage.get(idx, {})
-	var staged := String(st.get("card", ""))
-	var staged_drop := String(st.get("drop", ""))
-	var declined := bool(st.get("declined", false))
+	var st := _stage_of(idx)
+	var staged := String(st["card"])
+	var staged_drop := String(st["drop"])
+	var declined := bool(st["declined"])
 	var full := Run.ability_slots_full(member)
 
 	var panel := PanelContainer.new()
@@ -1644,18 +1652,14 @@ func _draft_column(overlay: Control, idx: int, at: Vector2) -> void:
 	box.add_theme_constant_override("separation", 4)
 	panel.add_child(box)
 
-	var name_lbl := Label.new()
-	name_lbl.text = Classes.SPEC_INFO.get(spec, {}).get(
-		"name", String(member["key"]).capitalize())
-	name_lbl.add_theme_font_override("font", NAME_FONT)
-	name_lbl.add_theme_font_size_override("font_size", 22)
-	name_lbl.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
-	name_lbl.custom_minimum_size = Vector2(DRAFT_COL_W - 16, 26)
-	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(name_lbl)
-	# BATCH HZ §1b — what this hero already carries, beside the choice that adds to it.
-	box.add_child(_kit_preview_button(idx, DRAFT_COL_W - 16))
-
+	var head := Label.new()
+	head.text = "ABILITIES"
+	head.add_theme_font_override("font", NAME_FONT)
+	head.add_theme_font_size_override("font_size", 22)
+	head.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
+	head.custom_minimum_size = Vector2(DRAFT_COL_W - 16, 26)
+	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(head)
 	# The slot ledger, stated before the choice rather than discovered by it
 	# (BO §2's rule, per column now). At the cap the card buttons open the drop
 	# step instead of staging outright.
@@ -1887,75 +1891,308 @@ func _draft_column(overlay: Control, idx: int, at: Vector2) -> void:
 	box.add_child(state)
 
 
-# Clicking the staged card again UNSTAGES it, so a column can be taken back to
-# undecided without declining — declining is a real decision with a real cost
-# (the whole offer enters that hero's no-return ledger) and must never be the
-# only way out of a misclick.
+
+
+# Clicking the staged card again UNSTAGES it, so a section can be taken back to
+# undecided without declining — declining is a real decision with a real cost (the whole
+# offer enters that hero's no-return ledger) and must never be the only way out of a
+# misclick. Each stage writes its own section's keys and leaves the other's alone.
 func _stage_draft(idx: int, card: String) -> void:
-	var st: Dictionary = _draft_stage.get(idx, {})
-	if String(st.get("card", "")) == card and not bool(st.get("declined", false)):
-		_draft_stage[idx] = {"card": "", "drop": "", "declined": false}
+	var st := _stage_of(idx)
+	if String(st["card"]) == card and not bool(st["declined"]):
+		st["card"] = ""
 	else:
-		_draft_stage[idx] = {"card": card, "drop": "", "declined": false}
-	_open_party_draft()
+		st["card"] = card
+	st["drop"] = ""
+	st["declined"] = false
+	_open_hero_draft(idx)
 
 
 func _stage_draft_drop(idx: int, drop_name: String) -> void:
-	var st: Dictionary = _draft_stage.get(idx, {})
-	st["drop"] = drop_name
-	_draft_stage[idx] = st
-	_open_party_draft()
+	_stage_of(idx)["drop"] = drop_name
+	_open_hero_draft(idx)
 
 
 func _stage_draft_decline(idx: int) -> void:
-	var st: Dictionary = _draft_stage.get(idx, {})
-	if bool(st.get("declined", false)):
-		_draft_stage[idx] = {"card": "", "drop": "", "declined": false}
+	var st := _stage_of(idx)
+	st["declined"] = not bool(st["declined"])
+	st["card"] = ""
+	st["drop"] = ""
+	_open_hero_draft(idx)
+
+
+# A rune by its name, or "" to let an empty cache go; the same press again unstages it.
+func _stage_draft_rune(idx: int, rune_name: String) -> void:
+	var st := _stage_of(idx)
+	if bool(st["rune_set"]) and String(st["rune"]) == rune_name:
+		st["rune_set"] = false
+		st["rune"] = ""
 	else:
-		_draft_stage[idx] = {"card": "", "drop": "", "declined": true}
-	_open_party_draft()
+		st["rune_set"] = true
+		st["rune"] = rune_name
+	_open_hero_draft(idx)
 
 
-func _close_party_draft() -> void:
+# THE RUNES SECTION — the rune cache's offer, re-asked at the answer (`Run.rune_choice`,
+# FD §1), and what it holds back for an engine or the pet said, in the overlay's words
+# it had from GV and HC until IB moved it here.
+func _draft_rune_section(overlay: Control, idx: int, at: Vector2) -> void:
+	var member: Dictionary = Run.party[idx]
+	var st := _stage_of(idx)
+	var rune_set := bool(st["rune_set"])
+	var staged := String(st["rune"])
+
+	var panel := PanelContainer.new()
+	panel.position = at
+	panel.custom_minimum_size = Vector2(DRAFT_COL_W, DRAFT_COL_H)
+	panel.size = Vector2(DRAFT_COL_W, DRAFT_COL_H)
+	overlay.add_child(panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 4)
+	panel.add_child(box)
+	var head := Label.new()
+	head.text = "RUNES"
+	head.add_theme_font_override("font", NAME_FONT)
+	head.add_theme_font_size_override("font_size", 22)
+	head.add_theme_color_override("font_color", Color(0.85, 0.6, 1.0))
+	head.custom_minimum_size = Vector2(DRAFT_COL_W - 16, 26)
+	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(head)
+
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(DRAFT_COL_W - 16, 388)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	box.add_child(scroll)
+	var list := VBoxContainer.new()
+	list.add_theme_constant_override("separation", 2)
+	list.custom_minimum_size = Vector2(DRAFT_COL_W - 34, 0)
+	scroll.add_child(list)
+
+	var triple: Array = Run.rune_choice(member)
+	for i in triple.size():
+		var rune: Dictionary = triple[i]
+		var nm := String(rune["name"])
+		var chosen: bool = rune_set and staged == nm
+		# BATCH HE §4 — no scope band; HO §1 — a crest rune says whose it is.
+		var label := nm
+		if Runes.is_party_rune(rune):
+			label = "%s  (for %s)" % [nm, Run.rune_for_label(rune)]
+		var b := Button.new()
+		b.text = ("▸ " if chosen else "") + label
+		b.custom_minimum_size = Vector2(DRAFT_COL_W - 38, 28)
+		b.add_theme_font_size_override("font_size", 13)
+		b.add_theme_color_override("font_color",
+			Color(1.0, 0.9, 0.5) if chosen else Runes.RUNE_TINT)
+		if chosen:
+			b.modulate = Color(1.15, 1.1, 0.85)
+		b.pressed.connect(Music.click)
+		b.pressed.connect(_stage_draft_rune.bind(idx, nm))
+		list.add_child(b)
+		var text := Label.new()
+		text.text = Runes.shown_desc(rune)
+		text.add_theme_font_size_override("font_size", 11)
+		text.add_theme_color_override("font_color",
+			Color(0.8, 0.76, 0.66) if chosen else Color(0.62, 0.6, 0.57))
+		text.custom_minimum_size = Vector2(DRAFT_COL_W - 38, 0)
+		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		list.add_child(text)
+
+	# BATCH GV / HC §5 — WHAT THE CACHE HOLDS BACK, SAID RATHER THAN HIDDEN: a rune that
+	# waits on an engine being equipped, or one that needs the companion the equipped
+	# dismisser sends away. Held, not spent: equipping (or unequipping) brings it back.
+	var withheld: Array = Run.rune_choice_withheld(member)
+	var wh_held: Array = Run.held_engines(member)
+	var wh_pet: Array = withheld.filter(func(c): return Runes.pet_holds_back(
+		String((c as Dictionary).get("id", "")), wh_held))
+	var wh_engine: Array = withheld.filter(func(c): return not Runes.pet_holds_back(
+		String((c as Dictionary).get("id", "")), wh_held))
+	var waits_on: String = Runes.waited_on(wh_engine.map(
+		func(c): return String((c as Dictionary).get("id", ""))))
+	var pet_line := "The cache holds %d more that need%s a companion, which the %s dismisses." % [
+		wh_pet.size(), "s" if wh_pet.size() == 1 else "", Runes.dismisser_name(wh_held)]
+	var notes := PackedStringArray()
+	if not triple.is_empty():
+		if not wh_engine.is_empty():
+			notes.append("The cache holds %d more that wait%s on %s being equipped." % [
+				wh_engine.size(), "s" if wh_engine.size() == 1 else "", waits_on])
+		if not wh_pet.is_empty():
+			notes.append(pet_line)
+	elif not withheld.is_empty():
+		# BATCH FM §3 / GV — A CACHE EMPTIED BY WHAT HE HAS EQUIPPED IS NOT "NOTHING CAN
+		# ARRIVE": the pouch's own button fills it, so it is said, and letting it go spends it.
+		if wh_engine.is_empty():
+			notes.append("The cache holds nothing this hero can take while the %s is equipped, which dismisses the companion they need.\nUnequip it and the cache's runes return; letting the pick go spends it." % \
+				Runes.dismisser_name(wh_held))
+		else:
+			notes.append("The cache holds nothing this hero can take while %s is not equipped.\nEquip it and the cache's runes return; letting the pick go spends it." % \
+				waits_on)
+			if not wh_pet.is_empty():
+				notes.append(pet_line)
+	else:
+		# BATCH FM §3 — A TRIPLE THAT REPAIRED TO NOTHING: the pick is spent rather than
+		# held, because nothing can arrive to fill it.
+		notes.append("The cache holds nothing this hero can take — %s.\nThe pick is spent rather than held: nothing can arrive to fill it." % \
+			Runes.empty_offer_reason(member, Run.party_rune_names()))
+	if not notes.is_empty():
+		var more := Label.new()
+		more.text = "\n".join(notes)
+		more.add_theme_font_size_override("font_size", 11)
+		more.add_theme_color_override("font_color", Color(0.72, 0.68, 0.62))
+		more.custom_minimum_size = Vector2(DRAFT_COL_W - 38, 0)
+		more.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		list.add_child(more)
+	if triple.is_empty():
+		var let_go := Button.new()
+		let_go.text = ("▸ " if rune_set else "") + "Let it go"
+		let_go.custom_minimum_size = Vector2(DRAFT_COL_W - 16, 26)
+		let_go.add_theme_font_size_override("font_size", 12)
+		let_go.add_theme_color_override("font_color",
+			Color(1.0, 0.9, 0.5) if rune_set else Color(0.7, 0.68, 0.65))
+		let_go.pressed.connect(Music.click)
+		let_go.pressed.connect(_stage_draft_rune.bind(idx, ""))
+		box.add_child(let_go)
+
+	var state := Label.new()
+	if not rune_set:
+		state.text = "— undecided —"
+	elif staged == "":
+		state.text = "lets the cache go"
+	else:
+		state.text = "takes %s" % staged
+	state.add_theme_font_size_override("font_size", 12)
+	state.add_theme_color_override("font_color",
+		Color(0.6, 0.85, 0.6) if rune_set else Color(0.55, 0.53, 0.5))
+	state.custom_minimum_size = Vector2(DRAFT_COL_W - 16, 16)
+	state.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(state)
+
+
+# LATER: nothing is committed, both picks stay owed and marked on his card, and the
+# arrival walk goes on without bringing this screen back on this arrival.
+func _close_hero_draft() -> void:
+	var idx := _hero_draft_for
+	_shut_hero_draft()
+	if idx >= 0:
+		_arrival_dismissed(idx, "draft")
+
+
+func _shut_hero_draft() -> void:
 	if _draft_overlay != null and is_instance_valid(_draft_overlay):
 		_draft_overlay.queue_free()
 	_draft_overlay = null
-	_draft_stage.clear()
+	_draft_stage.erase(_hero_draft_for)
+	_hero_draft_for = -1
 
 
-# THE ONE COMMIT. Every column resolves here, through the same two doors the
-# single-hero overlay calls — `Run.take_draft_ability` and `Run.decline_draft`
-# — so the cap, the bench, the no-return ledger and the "already known" refusal
-# are the run's rules and not this screen's. It saves ONCE afterwards.
-func _confirm_party_draft() -> void:
-	var took := PackedStringArray()
-	for idx in _draft_columns():
-		var i := int(idx)
-		if not _draft_decided(i):
-			continue
-		var member: Dictionary = Run.party[i]
-		var st: Dictionary = _draft_stage.get(i, {})
-		if bool(st.get("declined", false)):
+# THE ONE COMMIT FOR HIS WHOLE DECISION. The ability resolves through the two doors BX's
+# screen called — `Run.take_draft_ability` and `Run.decline_draft` — and the rune through
+# the cache's own (`_take_rune_pick`, `_spend_rune_pick`), so the cap, the bench, the
+# no-return ledger and every re-asked offer are the run's rules and not this screen's.
+# It saves ONCE afterwards.
+func _confirm_hero_draft() -> void:
+	var idx := _hero_draft_for
+	if idx < 0 or idx >= Run.party.size() or not _hero_draft_decided(idx):
+		return
+	var member: Dictionary = Run.party[idx]
+	var st := _stage_of(idx)
+	var who := String(member["key"]).capitalize()
+	var said := PackedStringArray()
+	if Run.pick_owed(member, "draft") > 0:
+		if bool(st["declined"]):
 			Run.decline_draft(member)
-			continue
-		var card := String(st.get("card", ""))
-		var refused := Run.take_draft_ability(member, card, String(st.get("drop", "")))
-		if refused != "":
-			_toast("%s: %s" % [String(member["key"]).capitalize(), refused])
-			continue
-		took.append("%s takes %s" % [String(member["key"]).capitalize(), card])
-	_close_party_draft()
+			said.append("%s keeps the kit as it is" % who)
+		else:
+			var card := String(st["card"])
+			var refused := Run.take_draft_ability(member, card, String(st["drop"]))
+			said.append("%s: %s" % [who, refused] if refused != "" else "%s takes %s" % [who, card])
+	var landed := ""
+	if Run.pick_owed(member, "rune") > 0:
+		var took: Dictionary = _spend_rune_pick(idx) if String(st["rune"]) == "" \
+			else _take_rune_pick(idx, String(st["rune"]))
+		landed = String(took.get("landed", ""))
+		if String(took.get("text", "")) != "":
+			said.append(String(took["text"]))
+	_shut_hero_draft()
 	Run.save_run()
 	_draw_screen()
-	if took.is_empty():
-		_toast("The heroes keep their kits as they are.")
-	else:
-		_toast(" · ".join(took))
-	# BATCH CT §3: the same elite victory that owed this draft can also have
-	# queued a swap offer (the spoils grant a consumable too, and the Gravelight
-	# Lantern grants a second). CHAINED off the draft closing rather than opened
-	# beside it — see _maybe_open_party_draft.
-	_check_item_offers()
+	if not said.is_empty():
+		_toast(" · ".join(said))
+	if landed == "pending":
+		_check_rune_drops()
+	_arrival_next.call_deferred()
+
+
+# ══ BATCH FM §3 — SPENDING A PICK THAT HAS NOTHING TO SPEND ON ══════════════
+#
+# The counterpart to `_take_rune_pick`, and it asks the SAME door first for the same
+# reason: `rune_choice` is what decides whether this triple has anything left, so a
+# spend that did not ask it could eat a live pick. The screen draws the button that
+# stages it only when the triple came back empty. Returns what the toast says.
+func _spend_rune_pick(idx: int) -> Dictionary:
+	var member: Dictionary = Run.party[idx]
+	var queue: Array = member.get("rune_candidates", [])
+	if int(member.get("rune_picks_owed", 0)) < 1 or queue.is_empty():
+		return {}
+	if not (Run.rune_choice(member) as Array).is_empty():
+		return {}
+	queue.pop_front()
+	member["rune_candidates"] = queue
+	member["rune_picks_owed"] = int(member.get("rune_picks_owed", 0)) - 1
+	return {"landed": "spent", "text": "%s: the cache had nothing left to offer. The pick is spent." % \
+		String(member["key"]).capitalize()}
+
+
+# The rune cache's pick, answered: the rune by its name, out of the list the screen drew
+# (`Run.rune_choice`, FD §1 — idempotent, so this re-reads the same array rather than
+# repairing a second time, and a triple that repaired to nothing is refused here).
+# Returns where it landed and what the toast says.
+func _take_rune_pick(idx: int, rune_name: String) -> Dictionary:
+	var member: Dictionary = Run.party[idx]
+	var live: Array = Run.rune_choice(member)
+	var queue: Array = member.get("rune_candidates", [])
+	var choice := -1
+	for i in live.size():
+		if String((live[i] as Dictionary).get("name", "")) == rune_name:
+			choice = i
+	if int(member.get("rune_picks_owed", 0)) < 1 or queue.is_empty() or choice < 0:
+		return {}
+	queue.pop_front()
+	member["rune_candidates"] = queue
+	# BATCH GV — THE LIST THE BUTTONS WERE BUILT FROM, NOT THE STORED TRIPLE: a candidate
+	# reading an engine he has not equipped SITS OUT of what `rune_choice` returns and
+	# stays stored.
+	var rune: Dictionary = live[choice]
+	# Auto-equip while a slot is free — the pick already happens here; save the extra
+	# click. **BATCH HK §2 — ASKED, AND `hold_rune` DECIDES BY KIND**: an ordinary rune
+	# takes one of his three slots, a party rune the party slot, each only while one is
+	# free; anything else is held unworn — on him (HR §1), or in the bag for a crest rune
+	# — and a full holding queues it for the panel.
+	#
+	# **BATCH HL §1 — A CORE RUNE IS NOT ASKED FOR.** A slotted engine brings its enabler,
+	# so asking here put a card in the kit beside the rune the player chose: one pick, two
+	# things. It is held unworn, and its card joins the kit when he slots it on the hero's
+	# panel — an act of his own, as HK made every other equip.
+	var is_core := String(rune.get("engine", "")) != ""
+	rune["equipped"] = not is_core
+	# BATCH GK — THE ONE DOOR.
+	var landed: String = Run.hold_rune(member, rune)
+	member["rune_picks_owed"] = int(member.get("rune_picks_owed", 0)) - 1
+	var text := ""
+	if landed == "held" and is_core:
+		# THE WORDS HL §1 PROPOSED, RULED AT HN §2 — and since HR §1 the rune waits on the
+		# hero, not in the bag, so the place in them is his.
+		text = "%s waits with the %s — slot it on the hero's rune panel to use it.%s" % [
+			String(rune["name"]), Run.nameplate(member), pet_clause(member, rune)]
+	elif landed == "held":
+		text = "%s waits with the %s — every slot it fits is filled." % [
+			String(rune["name"]), Run.nameplate(member)]
+	elif landed == "bag":
+		# HO §1's words for a crest rune with the crest filled.
+		text = "%s goes into the bag — every slot it fits is filled." % String(rune["name"])
+	elif landed == "worn" and Runes.is_party_rune(rune):
+		# BATCH HO §1 — A PICK FROM ONE HERO'S CACHE THAT EVERY HERO NOW WEARS IS SAID.
+		text = "%s fills the crest — every hero wears it." % String(rune["name"])
+	return {"landed": landed, "text": text}
 
 
 func _pick_upgrade(idx: int, choice: int) -> void:
@@ -1983,93 +2220,7 @@ func _pick_upgrade(idx: int, choice: int) -> void:
 	_draw_screen()
 	_toast("%s: %s is now %s." % [String(member["key"]).capitalize(),
 		String(up["ability"]), Run.upgrade_name(String(up["id"]))])
-
-
-# ══ BATCH FM §3 — SPENDING A PICK THAT HAS NOTHING TO SPEND ON ══════════════
-#
-# The counterpart to `_pick_rune`, and it asks the SAME door first for the same
-# reason: `rune_choice` is what decides whether this triple has anything left,
-# so a dismiss that did not ask it could eat a live pick if it were ever
-# reached from anywhere but the empty overlay. It cannot be today — the button
-# is only built when the triple came back empty — and the guard is here for the
-# rule this project already has about that.
-func _dismiss_rune_pick(idx: int) -> void:
-	var member: Dictionary = Run.party[idx]
-	var queue: Array = member.get("rune_candidates", [])
-	if int(member.get("rune_picks_owed", 0)) < 1 or queue.is_empty():
-		return
-	if not (Run.rune_choice(member) as Array).is_empty():
-		return
-	queue.pop_front()
-	member["rune_candidates"] = queue
-	member["rune_picks_owed"] = int(member.get("rune_picks_owed", 0)) - 1
-	Run.save_run()
-	_draw_screen()
-	_toast("%s: the cache had nothing left to offer. The pick is spent." % [
-		String(member["key"]).capitalize()])
-
-
-func _pick_rune(idx: int, choice: int) -> void:
-	var member: Dictionary = Run.party[idx]
-	# BATCH FD §1 — THE SAME DOOR THE OVERLAY DREW FROM, CALLED AGAIN.
-	# `rune_choice` is idempotent (it writes its repair back), so calling it
-	# here re-reads the array the buttons were built from rather than repairing
-	# a second time — and a triple that repaired to NOTHING is refused here
-	# rather than indexing an empty array. **THAT STATE IS REACHABLE** (FM §3
-	# measured it: buy the cache's runes from the Peddler, then open the card),
-	# and since GV a cache whose every rune reads an engine he has not equipped
-	# comes back empty too; the overlay offers "Let it go" there, never a button
-	# that reaches this line.
-	var live: Array = Run.rune_choice(member)
-	var queue: Array = member.get("rune_candidates", [])
-	if int(member.get("rune_picks_owed", 0)) < 1 or queue.is_empty() \
-			or live.is_empty():
-		return
-	queue.pop_front()
-	member["rune_candidates"] = queue
-	# BATCH GV — THE LIST THE BUTTONS WERE BUILT FROM, NOT THE STORED TRIPLE.
-	# The two were one array until GV: a candidate reading an engine he has not
-	# equipped now SITS OUT of what `rune_choice` returns and stays stored, so
-	# index `choice` names a rune in `live` and not in the stored triple.
-	# `_pick_upgrade` indexes its own live offer the same way (FE §2).
-	var rune: Dictionary = live[clampi(choice, 0, live.size() - 1)]
-	# Auto-equip while a slot is free — the pick already happens here; save
-	# the extra click. **BATCH HK §2 — ASKED, AND `hold_rune` DECIDES BY KIND**:
-	# an ordinary rune takes one of his three slots, a party rune the party slot,
-	# each only while one is free; anything else is held unworn — on him (HR §1), or
-	# in the bag for a crest rune — and a full holding queues it for the panel below.
-	#
-	# **BATCH HL §1 — A CORE RUNE IS NOT ASKED FOR.** A slotted engine brings its
-	# enabler, so asking here put a card in the kit beside the rune the player
-	# chose: one pick, two things. It is held unworn, and its card joins the kit
-	# when he slots it on the hero's panel — an act of his own, as HK made every
-	# other equip.
-	var is_core := String(rune.get("engine", "")) != ""
-	rune["equipped"] = not is_core
-	# BATCH GK — THE ONE DOOR.
-	var landed: String = Run.hold_rune(member, rune)
-	member["rune_picks_owed"] = int(member.get("rune_picks_owed", 0)) - 1
-	Run.save_run()
-	_draw_screen()
-	if landed == "held" and is_core:
-		# THE WORDS HL §1 PROPOSED, RULED AT HN §2 — and since HR §1 the rune waits
-		# on the hero, not in the bag, so the place in them is his.
-		_toast("%s waits with the %s — slot it on the hero's rune panel to use it.%s" % [
-			String(rune["name"]), Run.nameplate(member), pet_clause(member, rune)])
-	elif landed == "held":
-		_toast("%s waits with the %s — every slot it fits is filled." % [
-			String(rune["name"]), Run.nameplate(member)])
-	elif landed == "bag":
-		# HO §1's words for a crest rune with the crest filled — its one slot is the
-		# crest, so *every slot it fits* is still the sentence.
-		_toast("%s goes into the bag — every slot it fits is filled." % String(rune["name"]))
-	elif landed == "pending":
-		_check_rune_drops()
-	elif landed == "worn" and Runes.is_party_rune(rune):
-		# BATCH HO §1 — A PICK FROM ONE HERO'S CACHE THAT EVERY HERO NOW WEARS IS
-		# SAID (HL §1's rule: one choice is never two things with no announcement).
-		# PROPOSED WORDS.
-		_toast("%s fills the crest — every hero wears it." % String(rune["name"]))
+	_arrival_next.call_deferred()
 
 
 # ---------- the rune pouch overlay ----------
@@ -2187,7 +2338,9 @@ func _open_rune_panel(idx: int) -> void:
 	for _empty in maxi(Run.ENGINE_SLOTS - worn_engines, 0):
 		# AN EMPTY SLOT IS DRAWN AND SAYS SO IN THE MAP CARD'S OWN WORD for one — the
 		# slot is the thing shown; HN §2.6's line below says where a core rune comes from.
-		_pouch_note(list, "— empty core slot —", Color(0.5, 0.48, 0.52), true)
+		# **IB §0.3 (ruled): *— empty —*, not *— empty core slot —* — A ROW DOES NOT
+		# REPEAT ITS SECTION'S HEAD**, which already says CORE and counts the slots.
+		_pouch_note(list, "— empty —", Color(0.5, 0.48, 0.52), true)
 	if erows.is_empty():
 		# BATCH HN §2 — RULED BY THE DESIGNER: HL's line read as though a core rune
 		# arrives ATTACHED TO another rune — the confusion HL §1a closed — so the
@@ -3199,6 +3352,7 @@ func _take_pending_drop(drop_idx: int, overlay: Control) -> void:
 	else:
 		_toast("%s is dropped. %s goes into the bag." % [gone, incoming])
 	_check_rune_drops()
+	_arrival_next.call_deferred()   # BATCH IB §1 — a panel the walk waited on has closed
 
 
 func _decline_pending_drop(overlay: Control) -> void:
@@ -3209,6 +3363,7 @@ func _decline_pending_drop(overlay: Control) -> void:
 	if not let_go.is_empty():
 		_toast("%s is left on the road." % String(let_go.get("name", "")))
 	_check_rune_drops()
+	_arrival_next.call_deferred()   # BATCH IB §1 — a panel the walk waited on has closed
 
 
 # BATCH CT §4: four items now have no meaning outside a fight. Each stays in

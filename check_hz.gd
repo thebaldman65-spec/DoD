@@ -220,6 +220,15 @@ func _previews(screen: Node) -> Array:
 	return out
 
 
+# The button bound to `method` with exactly `args`, pressed; false when none is drawn.
+func _press_bound(n: Node, method: String, args: Array) -> bool:
+	var b: Button = Gate.bound_button(n, method, args) if n != null else null
+	if b == null:
+		return false
+	b.emit_signal("pressed")
+	return true
+
+
 func _kit_button(n: Node, idx: int) -> Button:
 	var btns: Array = []
 	Gate.buttons(n, btns)
@@ -1050,11 +1059,10 @@ func _s1b_the_preview() -> void:
 	mg["rune_candidates"] = [[plain_rune]]
 	mg["rune_picks_owed"] = 1
 	var mp2 := await _to("res://scenes/map.tscn")
-	var choose: Button = Gate.bound_button(mp2, "_open_pick_overlay", [1])
-	if choose != null:
-		choose.emit_signal("pressed")
-		await process_frame
-	var pick_ov: Node = Gate.overlay(current_scene, 60)
+	# BATCH IB §1/§2 — RE-POINTED, THE QUESTION UNMOVED: the rune cache's pick is the hero's
+	# own draft screen now, put up as the party arrives (its RUNES section; the Mage owes
+	# no card), and the kit button rides it as it rode the overlay.
+	var pick_ov: Node = Gate.hero_draft(mp2)
 	var kb2 := _kit_button(pick_ov, 1) if pick_ov != null else null
 	ok(kb2 != null, "§1b: the rune cache's pick carries no kit button")
 	if kb2 != null:
@@ -1066,8 +1074,12 @@ func _s1b_the_preview() -> void:
 		if pv2.size() == 1:
 			Gate.press(pv2[0], ["✕  Close"])
 			await Gate.frames(self, 2)
-	pick_ov = Gate.overlay(current_scene, 60)
-	var took2 := Gate.press(pick_ov, [String(plain_rune.get("name", "?"))]) if pick_ov != null else ""
+	pick_ov = Gate.hero_draft(current_scene)
+	var took2 := ""
+	if pick_ov != null and _press_bound(pick_ov, "_stage_draft_rune", [1, String(plain_rune.get("name", "?"))]):
+		await process_frame
+		if _press_bound(Gate.hero_draft(current_scene), "_confirm_hero_draft", []):
+			took2 = String(plain_rune.get("name", "?"))
 	await Gate.frames(self, 3)
 	var held: bool = (mg.get("runes", []) as Array).any(func(r): return String(r.get("name", "")) == String(plain_rune.get("name", "")))
 	ok(took2 != "" and held, "§1b: the rune picked after the preview did not land on the Mage (%s)" % took2)
@@ -1147,12 +1159,14 @@ func _s3_the_toast() -> void:
 		h["rune_candidates"] = [[core]]
 		h["rune_picks_owed"] = 1
 		var mp := await _to("res://scenes/map.tscn")
-		var choose: Button = Gate.bound_button(mp, "_open_pick_overlay", [3])
-		if choose != null:
-			choose.emit_signal("pressed")
+		# BATCH IB §1/§2 — the cache's pick is the Hunter's own draft screen, put up as the
+		# party arrives: the core rune pressed through its own button, then the Confirm.
+		var ov: Node = Gate.hero_draft(mp)
+		var took := ""
+		if ov != null and _press_bound(ov, "_stage_draft_rune", [3, String(core.get("name", "?"))]):
 			await process_frame
-		var ov: Node = Gate.overlay(current_scene, 60)
-		var took := Gate.press(ov, [String(core.get("name", "?"))]) if ov != null else ""
+			if _press_bound(Gate.hero_draft(current_scene), "_confirm_hero_draft", []):
+				took = String(core.get("name", "?"))
 		await process_frame
 		var toast := _toast_text(current_scene)
 		ok(took != "" and toast.contains("waits with the"), "§3 (%s): the pick put up no waiting toast (`%s`)" % [arm[0], toast])

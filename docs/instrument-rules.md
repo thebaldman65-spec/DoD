@@ -262,7 +262,7 @@ comment saying "so the next bump does not fail a map test either" — and BK is 
 - **The refusal floor is a SEPARATE assertion and it is fine to pin** — `if save_version < 10:` is a
   real invariant about what this build will load, not a moving number.
 - **THE SAME DISEASE, THIRD DOOR: `test_batch_bx` pinned the SOURCE TEXT of a guard.** CT split
-  `if Run.sim_run or _draft_columns().is_empty():` into two guards so §3's chaining had somewhere to
+  the draft's one guard — a sim, or no column owed — into two guards so §3's chaining had somewhere to
   live; the behaviour is identical. Re-pointed and **SCOPED TO THE FUNCTION BODY** — strictly
   stronger than the global `contains` it replaced, which would have passed on either of the two
   `if Run.sim_run:` lines elsewhere in that file. **A source-grep suite should scope to the function
@@ -855,6 +855,11 @@ gives you N, all born wrong, none of them diffed against anything.
   the gate FILES are run standalone against a new gate when it is written**: `check_da`,
   `check_ea`, `check_ec`, `check_ed`, `check_ek`, `check_es`, `check_ff`, `check_gw`, `check_parse`
   and `test_batch_cd`.
+- **AND THE PICK SURFACES' ROAD WALKER WAS FOUR COPIES OF ONE HELPER (FOUND AT HZ), SO ONE NEW BUTTON STOPPED FOUR
+  ROADS. SINCE IB §6a IT IS ONE ANSWER IN `gate_fixture.gd`** — `Gate.answer_hero_draft`, `Gate.pick_choices`,
+  `Gate.bound_buttons` — **and the game marks its choices**: a pick overlay's choice carries a `choice` meta, and every
+  button of the hero's draft screen is found by its binding. A walker asks for those, never for every button whose words
+  are not *Not yet*; what each road records stays its own.
 - **THE DIFFERENCES THAT ARE REAL BECOME NAMED ARGUMENTS**, not invisible edits inside a copy:
   `deterministic`, `items`, `run`.
 - **A BASE CLASS IS THE RIGHT SHAPE AND IT DOES NOT COMPILE.** `extends GateBase` on a `--script`
@@ -1237,6 +1242,10 @@ being re-taken.
   pointing at it. It located the whole delta in one `_int_restore` assertion **before**
   `baselines.json` moved, which is the difference between a baseline written off the arithmetic and
   one written off whatever the code happened to do.
+- **A RE-POINT OPENS THE LONGEST CASE, NOT THE SHORTEST (IA §8b's lesson, a standing rule since IB).** `check_gt`'s first
+  re-point at IA walked only panels with every slot filled and missed that an empty slot is a row, so the gate no longer
+  opened what `CLAUDE.md` said it opened. **For every walk a batch re-points, name the longest and the emptiest
+  configuration it now opens, and drive both**: a layout change can move which state is the extreme one.
 
 ## STANDING RULE — A GATE THAT WRITES THE STATE ITS ASSERTION IS ABOUT CANNOT FAIL WHEN THE DOOR THAT WRITES IT BREAKS (Batch GW §2)
 
@@ -1576,6 +1585,11 @@ a census is taken.
 - **IF THE SESSION REFUSES THE MOVE, THE BATCH SAYS SO AND DOES NOT PURSUE IT ANOTHER WAY** — it reports the count and
   leaves the clearing to the designer. HN's move of four hundred and sixty was refused; HO's of HN's eighteen was not.
 - **`../save-backups/` IS NEVER TOUCHED BY IT.** A batch adds its own backup there and removes nothing.
+- **THE MOVE IS RETIRED FROM THE BRIEF (IB §4, the designer's): A BATCH NO LONGER ATTEMPTS IT.** It was refused at HN
+  and again at IA, and each refusal cost a section to report. **The clearing step is a report and a command**: the count
+  and the disk of every spent batch's folders, and ONE command clearing every spent prefix at once, which the designer
+  runs when he likes. The batch names its own folders and leaves them; the live *"Dawn of Decay"* folder and the backups
+  stay untouched. The naming, the batch's own staying and the backups above stand.
 
 ## STANDING RULE — AN INSTRUMENT PUTS A RUNE DOWN THROUGH `Run.hold_rune`, AND A SCOPE WALK NAMES EVERY BAND (Batch HO §1)
 > **A gate or a suite that needs a rune held that it did not NAME — a rolled one, a granted one, a bought one — hands

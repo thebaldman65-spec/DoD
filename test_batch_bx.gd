@@ -504,22 +504,25 @@ func _screen_source() -> void:
 	var map := _code("res://scripts/map_screen.gd")
 	# ONE DRAFT RENDERER, NOT TWO (§1's instruction). BO's single-hero branch is
 	# DELETED rather than left unreachable, and the card's CHOOSE button routes
-	# to the party screen.
-	ok(map.count("func _open_party_draft(") == 1,
-		"§2: exactly one party-wide draft screen")
+	# to the draft screen. **BATCH IB §2 — THE SCREEN IS THE HERO'S OWN NOW (ruled by
+	# the designer: each class drafts separately, runes and abilities together), and
+	# the party-wide one it replaced is GONE rather than left beside it**: still one
+	# renderer, a hero at a time.
+	ok(map.count("func _open_hero_draft(") == 1 and not map.contains("func _open_party_draft("),
+		"§2: exactly one draft screen — the hero's own — and no party-wide one beside it")
 	ok(not map.contains("\"draft\": \"THE DRAFT\""),
 		"§2: BO's single-hero draft branch is DELETED from the pick overlay")
 	ok(not map.contains("func _pick_draft(") and not map.contains("func _decline_draft("),
 		"§2: ...and its two committing helpers went with it")
-	ok(map.contains("if kind == \"draft\":\n\t\t_open_party_draft()"),
-		"§2: the card's CHOOSE button opens the party screen")
-	# ONE DROP STEP, TWO CONSUMERS — the party screen STAGES, the boss pick
+	ok(map.contains("if kind == \"draft\" or kind == \"rune\":\n\t\t_open_hero_draft(idx)"),
+		"§2: the card's CHOOSE button opens the hero's own screen, for a draft and a rune cache alike")
+	# ONE DROP STEP, TWO CONSUMERS — the draft screen STAGES, the boss pick
 	# COMMITS, and the difference is one Callable rather than a second answer to
 	# what may be dropped.
 	ok(map.count("func _open_drop_overlay(") == 1,
 		"§2: still exactly one drop step")
 	ok(map.contains("on_drop := Callable()"),
-		"§2: ...and the party screen stages through it rather than forking it")
+		"§2: ...and the draft screen stages through it rather than forking it")
 	# **RE-POINTED AT BATCH EG §2, ONE TO TWO, WITH BOTH SITES NAMED.** BX's
 	# question is that the SCREEN owns no rule of its own; two screens calling
 	# one door is that property holding, and a third caller has to move this
@@ -533,35 +536,40 @@ func _screen_source() -> void:
 	ok(map.count("Run.take_draft_ability(") == 1
 		and map.count("Run.decline_draft(") == 1,
 		"§2: the screen commits through the run's two doors and no others")
-	ok(map.contains("_maybe_open_party_draft()"),
+	# **BATCH IB §1 — IT OPENS ON ARRIVING AT THE MAP, WITH EVERY OTHER PICK OWED**
+	# (`_begin_arrival`, from `_ready`; BX's `_maybe_open_party_draft` opened the draft
+	# alone). This suite owns the INVARIANT — the draft never opens in a sim, and never
+	# with nothing to offer — not the one-line FORMULATION of it (BK §6's precedent, and
+	# CT's). SCOPED TO EACH FUNCTION'S BODY, strictly stronger than a global `contains`.
+	ok(map.contains("_begin_arrival()"),
 		"§2: the screen opens on arriving at the map after an elite")
-	# BATCH CT re-pointed this IN PLACE, on BK §6's precedent and for the same
-	# reason the save-version pins were re-pointed: **this suite owns the
-	# INVARIANT — the draft never opens in a sim, and never with nothing to
-	# offer — not the one-line FORMULATION of it.** CT split the combined
-	# condition into two guards so that "nothing owed" could chain into the
-	# pouch's own owed pick (§3), which the combined form had no room for. The
-	# behaviour is unchanged: a sim still returns before anything opens.
-	#
-	# SCOPED TO THE FUNCTION BODY, which makes it STRICTLY STRONGER than the
-	# global `contains` it replaces — that one would have passed on either guard
-	# appearing anywhere else in a 2,000-line file.
-	var mopd_at := map.find("func _maybe_open_party_draft(")
-	var mopd_end := map.find("\nfunc ", mopd_at + 1)
-	var mopd := map.substr(mopd_at, mopd_end - mopd_at) if mopd_at >= 0 else ""
-	ok(mopd.contains("if Run.sim_run:"),
+	var ba := _body(map, "func _begin_arrival(")
+	ok(ba.contains("if Run.sim_run:"),
 		"§2: ...never in a sim")
-	ok(mopd.contains("_draft_columns().is_empty()"),
+	var ohd := _body(map, "func _open_hero_draft(")
+	ok(ohd.contains("if not has_card and not has_rune:"),
 		"§2: ...and never with nothing to offer")
-	ok(mopd.contains("_open_party_draft()"),
-		"§2: ...and it is still the party screen it opens when there IS something")
+	var an := _body(map, "func _arrival_next(")
+	ok(an.contains("_open_hero_draft(i)"),
+		"§2: ...and it is still the draft screen it opens when there IS something")
+
+
+# One function's body out of a source with its comments stripped.
+func _body(src: String, header: String) -> String:
+	var at := src.find(header)
+	if at < 0:
+		return ""
+	var end := src.find("\nfunc ", at + 1)
+	return src.substr(at, (end if end >= 0 else src.length()) - at)
 
 
 func _live_one_action() -> void:
 	# THE DISCRIMINATING ASSERTION IS TAKEN BEFORE THE CONFIRM. A screen that
-	# committed each column as it was clicked passes every "the card landed"
-	# check below and fails this one: with all four columns decided, NOTHING on
-	# any member may have moved yet.
+	# committed a choice as it was clicked passes every "the card landed" check below
+	# and fails this one: with all four heroes' cards chosen, NOTHING on any member may
+	# have moved yet. **BATCH IB §2 — EACH HERO DRAFTS ALONE (ruled), so the one action
+	# is the HERO's**: his screen opens on him, his Confirm commits his decision, and it
+	# commits nobody else's.
 	var run := _party(["berserker", "cryomancer", "occultist", "mystic"])
 	for m in run.party:
 		run.award_draft_pick(m)
@@ -569,18 +577,13 @@ func _live_one_action() -> void:
 	var map: Node = (load("res://scenes/map.tscn") as PackedScene).instantiate()
 	root.add_child(map)
 	await process_frame
-	ok((map.get("_draft_columns") != null) or true, "")   # keep the count honest
-	checks -= 1
-	var cols: Array = map.call("_draft_columns")
-	ok(cols.size() == 4, "§2: the screen builds FOUR columns (got %d)" % cols.size())
-	map.call("_open_party_draft")
-	await process_frame
 
 	var staged := {}
-	for idx in cols:
-		var i := int(idx)
+	for i in run.party.size():
+		map.call("_open_hero_draft", i)
+		ok(int(map.get("_hero_draft_for")) == i, "§2: hero %d's screen opens on him" % i)
 		ok(not map.call("_draft_decided", i),
-			"§2: column %d opens UNDECIDED" % i)
+			"§2: hero %d's screen opens UNDECIDED" % i)
 		var offer: Array = (run.party[i]["draft_candidates"] as Array)[0]
 		staged[i] = String(offer[0])
 		map.call("_stage_draft", i, String(offer[0]))
@@ -597,7 +600,7 @@ func _live_one_action() -> void:
 			moved += 1
 	ok(moved == 0,
 		"§2: with all four chosen, NOTHING has been committed yet (%d moved)" % moved)
-	# Clicking a staged card again takes the column back to undecided, so a
+	# Clicking a staged card again takes the section back to undecided, so a
 	# misclick never has to be paid for with a decline.
 	map.call("_stage_draft", 0, staged[0])
 	ok(not map.call("_draft_decided", 0),
@@ -605,13 +608,24 @@ func _live_one_action() -> void:
 	map.call("_stage_draft", 0, staged[0])
 	# ONE DECLINE AMONG FOUR TAKES: independent, per hero.
 	map.call("_stage_draft_decline", 2)
-	ok(map.call("_draft_decided", 2), "§2: a declined column is decided")
+	ok(map.call("_draft_decided", 2), "§2: a declined section is decided")
 
-	map.call("_confirm_party_draft")
+	# HIS CONFIRM COMMITS HIS DECISION AND NOBODY ELSE'S.
+	map.call("_open_hero_draft", 0)
+	map.call("_confirm_hero_draft")
 	await process_frame
+	var others_owed := 0
+	for i in [1, 2, 3]:
+		others_owed += int(run.party[i].get("draft_picks_owed", 0))
+	ok(int(run.party[0].get("draft_picks_owed", 0)) == 0 and others_owed == 3,
+		"§2: hero 0's Confirm did not commit hero 0's decision alone (%d of the others still owed)" % others_owed)
+	for i in [1, 2, 3]:
+		map.call("_open_hero_draft", i)
+		map.call("_confirm_hero_draft")
+		await process_frame
 	for i in run.party.size():
 		ok(int(run.party[i].get("draft_picks_owed", 0)) == 0,
-			"§2: hero %d's pick is spent by the ONE confirmation" % i)
+			"§2: hero %d's pick is spent by his own confirmation" % i)
 	for i in [0, 1, 3]:
 		ok((run.party[i]["bm_abilities"] as Array).has(staged[i]),
 			"§2: hero %d took %s" % [i, staged[i]])
@@ -628,10 +642,10 @@ func _live_one_action() -> void:
 	await process_frame
 
 	# THE CAP, DRIVEN THROUGH THE SCREEN RATHER THAN THROUGH THE DOOR. The door
-	# is checked in `_cap_and_drop`; what this adds is that the COLUMN refuses
+	# is checked in `_cap_and_drop`; what this adds is that the SECTION refuses
 	# to count as decided until a replacement is named, and that the staged
 	# replacement survives the confirm. The two are different failures: a screen
-	# that let a capped column resolve would call `take_draft_ability` with no
+	# that let a capped section resolve would call `take_draft_ability` with no
 	# drop, get a refusal string back, and silently spend the pick.
 	var run2 := _party(["swordmaster", "arcanist", "holy", "sharpshooter"])
 	var capped: Dictionary = run2.party[0]
@@ -647,19 +661,17 @@ func _live_one_action() -> void:
 	var map2: Node = (load("res://scenes/map.tscn") as PackedScene).instantiate()
 	root.add_child(map2)
 	await process_frame
-	map2.call("_open_party_draft")
+	map2.call("_open_hero_draft", 0)
 	await process_frame
 	var incoming := String((capped["draft_candidates"] as Array)[0][0])
 	map2.call("_stage_draft", 0, incoming)
 	ok(not map2.call("_draft_decided", 0),
-		"§2: a capped column is NOT decided by choosing a card alone")
+		"§2: a capped section is NOT decided by choosing a card alone")
 	var drop := String((capped["bm_abilities"] as Array)[0])
 	map2.call("_stage_draft_drop", 0, drop)
 	ok(map2.call("_draft_decided", 0),
 		"§2: ...and IS the moment the replacement is named")
-	for i in [1, 2, 3]:
-		map2.call("_stage_draft_decline", i)
-	map2.call("_confirm_party_draft")
+	map2.call("_confirm_hero_draft")
 	await process_frame
 	ok((capped["bm_abilities"] as Array).has(incoming),
 		"§2: the capped hero's card landed on confirm")

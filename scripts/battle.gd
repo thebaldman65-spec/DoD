@@ -28194,9 +28194,8 @@ func _check_end() -> void:
 			# to explain — which is the same split the Peddler draws.
 			var candidates: Array = Run.roll_rune_candidates(looter)
 			if not candidates.is_empty():
-				looter["rune_candidates"] = looter.get("rune_candidates", []) + [candidates]
-				looter["rune_picks_owed"] = int(looter.get("rune_picks_owed", 0)) + 1
-				spoils += "\nRUNE CACHE: the %s may choose one of %d\non their card." % [
+				Run.queue_rune_pick(looter, candidates)
+				spoils +="\nRUNE CACHE: the %s may choose one of %d\non their card." % [
 					String(looter["key"]).capitalize(), candidates.size()]
 			elif Run.runes_mode() != "off":
 				spoils += "\nRUNE CACHE: nothing in it for the %s —\n%s." % [

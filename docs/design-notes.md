@@ -4,6 +4,41 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The draft appears, and each hero drafts alone (Batch IB) — 2026-10-12
+
+**Why every owed pick opens by itself, and a holding never does.** The designer's complaint was that it was hard to tell when a
+hero had a rune or ability draft waiting, and HR's nameplate mark was the first answer and not enough. The draft already opened on
+arrival; the boss's ability, the upgrade and the rune cache waited behind a card's button. Now every unmade pick opens as the
+heroes arrive. The line that keeps it a reminder rather than a nag is the difference between a pick and a holding: a rune held and
+not worn is a standing choice the player may never make, and a screen that opened for it would open at every arrival for the rest
+of the run. So the trigger reads the four pick counters and nothing else.
+
+**Why dismissing loses nothing, and why it is once an arrival.** A feature that took away the *Not yet* would be worse than no
+feature: the player who wants to read his sheet before choosing must still be able to. So Later leaves the pick owed and marked on
+the card, and the same pick does not come back until the heroes arrive again — not when another screen closes, and not when he
+returns from the hero sheet, because that is a visit, not an arrival. A screen that returns the moment it is closed is a modal loop.
+
+**Why the order is the order earned.** Two heroes can each come out of one fight with a pick, and a pick deferred from an earlier
+arrival can wait beside a new one. Each pick is stamped as it is awarded, so they appear in the order the player earned them; the
+stamp rides the hero, which an older build keeps, so the order costs no save version.
+
+**Why one screen a hero is a layout and not a reward change.** The four columns were already four picks — each hero's own offer,
+pool, ledger and take — so splitting them into four screens moves nothing a fight pays. The brief's own stop clause was there for
+the other reading, and the code ruled it out. The rune cache joins the hero's screen because the elite pays both at once: a rune cache
+is an elite's spoils (and a bargain's), not a map node, so the looter carries a card and a rune out of every elite. One screen
+holding both, with one Confirm, is exactly the case the designer asked for.
+
+**Why the panel scrolls and the bar pages.** A pager is for a row of equal choices the player must find one of under time
+pressure; the ability bar is that. The rune panel is a document of three sections read between fights, and the sections are its
+navigation — a page break inside one cuts the player's own model of it in half. The panel already spans the screen and is 1.4
+screens at its longest. What the scroll owes is to look like a scroll, and its bar is drawn exactly where it scrolls.
+
+**Why the save version stays.** A bump is for a key an older build would write away; the slot count is no save's field, so an older
+build reads it generously and loses nothing. A bump would turn a cosmetic *3 of 2 slots filled* into a session that cannot be saved.
+
+**Why an empty slot reads *— empty —*.** The section's heading already says CORE and counts the slots; a row that repeats its
+heading is the rot of saying one thing twice, in miniature.
+
 ## The third core slot, and the bag (Batch IA) — 2026-10-11
 
 **Why a figure paid or printed off a blow is the blow that landed.** HY spent a batch making the frame name whoever a site

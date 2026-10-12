@@ -17,11 +17,11 @@
 # the game.
 #
 #   §1 IS DRIVEN THROUGH THE REAL SCREEN, not through a re-implementation of
-#     it. A gate that inlines `_pick_rune`'s body proves its own copy correct
+#     it. A gate that inlines the pick's body proves its own copy correct
 #     and says nothing about the one the player presses — so the map screen is
-#     instantiated, a poisoned triple is queued, the pick overlay is OPENED and
-#     its rendered button labels are read, and the pick is taken through the
-#     real handler.
+#     instantiated, a poisoned triple is queued, the hero's draft screen is OPENED
+#     (the rune cache's since IB §2) and its rendered button labels are read, and
+#     the pick is taken through the screen's own rune button and Confirm.
 #   §2 DECAYS SILENTLY IN ONE DIRECTION ONLY. Nothing gates on BREAK today, so
 #     the demotion is free today; the day a rune is authored against a BREAK
 #     threshold it can never be met, and the assertion that says so is here.
@@ -300,7 +300,7 @@ func _s1_the_offer_sites() -> void:
 		# **BATCH HO §1 — THE FIRST PICK IS PUT DOWN AS THE MAP PUTS IT DOWN.** It was
 		# written straight onto the hero's list, so a crest rune (two of his pool,
 		# every hero's) was hand-landed where no run can put one and the exclusion
-		# proved was the pouch's. `map_screen._pick_rune` asks for every kind but a
+		# proved was the pouch's. `map_screen._take_rune_pick` asks for every kind but a
 		# core rune and hands it to `Run.hold_rune`: a class rune is worn, a crest
 		# rune fills the crest, a core rune waits in the bag — and the second offer
 		# must leave out all three.
@@ -396,18 +396,29 @@ func _s1e_the_live_screen() -> void:
 		if rune_names.has(s):
 			offered.append(s)
 	ok(not offered.is_empty(),
-		"§1e: the rune overlay drew NO pick buttons — the drive read nothing")
+		"§1e: the hero's screen drew NO rune buttons — the drive read nothing")
 	var handed: Array = (run.rune_choice(member) as Array).map(func(r): return String(r["name"]))
 	ok(offered.size() == handed.size(),
-		"§1e: the overlay was handed %s and the drive read %s — a button the locator cannot read" % [handed, offered])
+		"§1e: the screen was handed %s and the drive read %s — a button the locator cannot read" % [handed, offered])
 	ok(not offered.has("Heavy Bolts"),
-		"§1e: the overlay OFFERED a rune the hero is wearing — %s" % [offered])
+		"§1e: the screen OFFERED a rune the hero is wearing — %s" % [offered])
 	ok(not offered.has("Rune of the Deep Sight"),
-		"§1e: the overlay OFFERED a retired rune — %s" % [offered])
-	print("    the overlay drew: %s" % [offered])
+		"§1e: the screen OFFERED a retired rune — %s" % [offered])
+	print("    the screen drew: %s" % [offered])
 
-	# AND THE PICK ITSELF, THROUGH THE REAL HANDLER.
-	screen.call("_pick_rune", 3, 0)
+	# AND THE PICK ITSELF, THROUGH THE REAL SCREEN. BATCH IB §2 — the rune cache is the
+	# hero's own draft screen: the rune is its button there, found by its binding
+	# (`_stage_draft_rune`), and the pick is the screen's Confirm (`_confirm_hero_draft`),
+	# which takes the rune through `_take_rune_pick` — the handler `_pick_rune` was.
+	var rb: Array = Gate.bound_buttons(Gate.hero_draft(screen), "_stage_draft_rune")
+	ok(not rb.is_empty(), "§1e: the hero's draft screen drew no rune button to press")
+	if not rb.is_empty():
+		(rb[0] as Button).emit_signal("pressed")
+		await process_frame
+	var conf: Array = Gate.bound_buttons(Gate.hero_draft(screen), "_confirm_hero_draft")
+	ok(not conf.is_empty(), "§1e: the rune was chosen and the hero's screen would not confirm")
+	if not conf.is_empty():
+		(conf[0] as Button).emit_signal("pressed")
 	await process_frame
 	var pouch: Array = []
 	for r in member.get("runes", []):

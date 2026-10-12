@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-10-11 (Batch IA &mdash; the third core slot, and the bag)</b></p>
+<p align="right"><b>Last updated: 2026-10-12 (Batch IB &mdash; the draft appears, and each hero drafts alone)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -263,7 +263,7 @@ upgrade</b> (§6a). <b>The offer precedes
 it</b> (§3a). <b>Bosses</b> remain fixed encounters: no modifier, no offer.</p>
 <p><b>Elites are the snowball engine.</b> An elite kill drops a
 <b>rune cache</b> for a random hero (three candidates rolled at the kill, one chosen on that
-hero's card), plus a random consumable and a bigger gold purse (80&ndash;100). Six stand in a
+hero's own draft screen), plus a random consumable and a bigger gold purse (80&ndash;100). Six stand in a
 zone and a route meets two to four of them.</p>
 <p><b>Blacksmith</b> and <b>Merchant</b> are §8's trade nodes. <b>Event (???)</b> is §3b.</p>
 
@@ -366,7 +366,7 @@ entry &mdash; so authoring a ninth boon does not make boons commoner.</p>
 applied at battle spawn) / item / random_item / revive_pct (the fallen
 return) / relic_grant (random inactive relic; +40 gold when slots are full) / <b>rune_grant</b>
 (a rune through the same door the elite cache uses, worn when a slot is free and otherwise held unworn by the hero it is for, or in the bag for a crest rune) /
-<b>ability_draft</b> (the three-card offer itself, resolved on the hero's card like any
+<b>ability_draft</b> (the three-card offer itself, answered on the hero's own draft screen like any
 other owed pick) —
 aimed by <b>target selectors</b> (<code>party</code>, random, lowest_hp, class:&lt;key&gt;) and gated by
 <b>requirement conditions</b> (min_gold, max_gold, zone_slot, has_item, <code>spec_in_party</code>,
@@ -441,11 +441,15 @@ not wear &mdash; it opens the same panel, and it is drawn only while he holds on
 moment the last is equipped, sold or dropped, and opening the panel does not clear it &mdash; an <b>&#9670;N
 ability-upgrade count</b> (hidden at zero; hovering it lists them as "Overpower — Honed", one
 per line — it takes no click of its own), and an unspent-talent badge; <b>clicking a card
-opens that hero's talent tree and full sheet</b>. An owed ability pick, ability upgrade or
-rune pick puts a <b>CHOOSE</b> button on the card which opens a <b>three-choice overlay</b>
-— the card lost 74 pixels of height in the move to the left edge and three choice buttons no
-longer fit inside it, and the overlay is the pattern the rune pouch already set. Each choice
-shows its full description under it rather than behind a hover.
+opens that hero's talent tree and full sheet</b>. <b>Every pick a hero is owed opens by itself
+when the heroes arrive at the map</b> &mdash; after a fight, an event, a shop or a load, never on a return
+from the hero sheet &mdash; one after another, in the order the picks were earned: a hero's draft and his
+rune cache on <b>his own draft screen</b>, a zone boss's ability and a mini-boss's upgrade on a
+<b>three-choice overlay</b>, then a full pouch's offer and a full holding's panel. Each choice shows its
+full description under it rather than behind a hover. <b>Not yet</b> and <b>Later</b> leave the pick owed:
+the card keeps a <b>&#9670; N</b> badge naming it and a <b>CHOOSE</b> button that opens it again, and it
+opens by itself again the next time the heroes arrive. A rune held and not worn never opens anything
+&mdash; the &#10022;N marker shows it.
 <br><b>Under the pouch sits the rune bag's row</b>: the bag's count out of six, a <b>&#10022;N
 marker</b> counting the crest runes waiting in it, a drop waiting on it if one is, and the Crest's
 rune or "&mdash; empty &mdash;". Either opens the bag, which lists the Crest's slot and every rune in
@@ -1591,7 +1595,7 @@ the ladder are set out in full further down this section.
 <table border="1" cellpadding="4">
 <tr><th>Source</th><th>Offer</th></tr>
 <tr><td><b>Elite</b></td><td><b>Always</b>, on victory — <b>to every living hero</b>, each
-from their own pool, on <b>one screen of four columns</b>. Six elites stand in every zone, so drafts
+from their own pool, each on <b>a draft screen of his own</b>. Six elites stand in every zone, so drafts
 are <b>route-dependent</b>: a greedy route drafts far more than a cautious one.</td></tr>
 <tr><td><b>Event</b></td><td>Some events trade for one — the Ancient Training Grounds sells a
 new form for 200 gold, and the Echo of the Warden teaches one for a hero's health.</td></tr>
@@ -1608,17 +1612,19 @@ withdrawn. <b>A draft pick is earned and never bought.</b> The three sources abo
 on, so a later batch that wants a paid draft back does not re-derive the ladder. The sim never
 bought one, so no measured figure in the economy report moves.</p>
 
-<p><b>The elite draft screen.</b> An elite victory offers a draft to <b>every living hero at
-once</b>, on <b>one screen with four columns</b> rather than four screens in sequence. Each
-hero draws <b>their own three cards</b> from their class's one pool — a Pyromancer is never
-shown a Warden card, and is shown the Cryomancer's and the Arcanist's — less what the engine gate
-keeps from him. A hero who <b>fell</b>
-during the fight is back on their feet before the screen opens (every won battle returns the
+<p><b>The hero's draft screen.</b> An elite victory offers a draft to <b>every living hero</b>, and
+<b>each hero drafts alone, on one screen of his own</b>: the screens open by themselves when the heroes
+reach the map, one hero after another. Each hero draws <b>their own three cards</b> from their class's
+one pool — a Pyromancer is never shown a Warden card, and is shown the Cryomancer's and the Arcanist's —
+less what the engine gate keeps from him. <b>The elite's rune cache goes to one of them, and he answers
+it on the same screen</b>: a screen shows an <b>ABILITIES</b> section for a draft and a <b>RUNES</b>
+section for a cache, each only when it is owed, so a bargain's rune comes alone. A hero who
+<b>fell</b> during the fight is back on their feet before the screen opens (every won battle returns the
 fallen at 20% of maximum), so they draft like anyone else. A hero whose pool has nothing left
-to show simply has no column.</p>
+to show is simply not offered one.</p>
 <ul>
-<li><b>Every column carries See the kit</b>, as does a single hero's pick (a zone boss's card, a rune
-cache): a <b>read-only preview</b> of that hero's carried cards and runes &mdash; his opening kit, the
+<li><b>Every draft screen carries See the kit</b>, as does a zone boss's card and an upgrade, and it
+opens on that hero: a <b>read-only preview</b> of that hero's carried cards and runes &mdash; his opening kit, the
 cards he carries, what sits out and what is benched, and his runes in the hero sheet's own words &mdash;
 over the screen. It changes nothing, and closing it leaves the choice exactly as it was.</li>
 <li><b>Declining is per hero and always allowed.</b> One hero taking a card does not commit the
@@ -1626,19 +1632,18 @@ others, and a settled kit is a legitimate end state.</li>
 <li><b>A card held back is not a button.</b> The cards are drawn when the elite falls and chosen later,
 and a hero can unequip an engine in between. A card that reads an engine he has not equipped at the moment
 he chooses &mdash; or needs a companion the Rune of the Sharpshooter (core) has dismissed &mdash; stays in his offer
-but is not shown as a card to take: the column says how many it holds and which rune brings them back, and
+but is not shown as a card to take: the section says how many it holds and which rune brings them back, and
 equipping that rune returns them. A card he has already taken from an earlier offer is not shown again
-either. <b>Declining still refuses the whole offer</b>, held cards with it, and the column says so.</li>
+either. <b>Declining still refuses the whole offer</b>, held cards with it, and the section says so.</li>
 <li><b>A declined card does not come back that run</b>, for <i>that hero</i>. The
 no-return ledger is <b>per hero</b>: refusing a card for the Pyromancer never hides it from
 anyone else. <b>Benching one is not declining it</b> — a benched card is kept.</li>
-<li><b>The slot cap holds per column.</b> A hero already at the cap must name what the
-incoming card replaces before their column counts as decided. The named ability is
+<li><b>The slot cap holds per hero.</b> A hero already at the cap must name what the
+incoming card replaces before his ABILITIES section counts as decided. The named ability is
 <b>benched, not lost</b>.</li>
-<li><b>The screen resolves as one action.</b> All four columns are chosen, then the whole
-screen is confirmed — so filling the Devout's last slot can still be reconsidered before the
-Warden's pick is locked. Leaving the screen commits nothing; the picks stay owed on the hero
-cards.</li>
+<li><b>A hero's screen resolves as one action.</b> His card and his rune are chosen, then the
+screen is confirmed — so either can be reconsidered until then. <b>Later</b> commits nothing: both picks
+stay owed on his card and open again the next time the heroes reach the map.</li>
 <li><b>EVERY CARD SHOWS ITS NUMBERS, NOT JUST ITS DESCRIPTION.</b> Under each card's sentence
 sit its <b>damage</b> (as a share of Attack, with its school), its <b>Break damage</b>, its
 <b>hit count</b> where it strikes more than once, its <b>heal</b>, its <b>cost</b>, its

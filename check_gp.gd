@@ -901,60 +901,43 @@ func _record(m: Dictionary) -> void:
 			_offers[key] = seen
 
 
-# The draft, answered through the run's OWN doors — the two the screen's
-# `_confirm_party_draft` calls, so the cap, the bench and the no-return ledger
-# are the run's rules. TAKING, not declining: the brief asks for a run drafting
-# throughout, and a declined offer does not move what is left the same way.
+# BATCH IB §6a — THE DRAFT, ANSWERED ON THE HERO'S OWN SCREEN THROUGH ITS OWN BUTTONS
+# (`Gate.answer_hero_draft`, the one helper). It was answered through the run's doors from
+# here — the two BX's party screen called — and the screen's buttons go through the same
+# two (`Run.take_draft_ability`, `Run.decline_draft`), so the cap, the bench and the
+# no-return ledger are the run's rules either way. TAKING, as this road always took: the
+# first card the screen draws is the first the run's door accepts (it draws
+# `Run.draft_choice`), and at the cap the first card the bench step offers is the first
+# EARNED card he carries — the one this road benched — because a road never re-equips, so
+# `bm_equipped` is `bm_abilities` less what is benched. His rune cache, which this road
+# took off the card's overlay, is the first rune on the same screen. The offer is
+# recorded before it is answered.
 func _answer_the_draft(s: Node) -> void:
-	for idx in _run.party.size():
-		var m: Dictionary = _run.party[idx]
-		_record(m)
-		var guard := 0
-		while int(m.get("draft_picks_owed", 0)) > 0 and guard < 8:
-			guard += 1
-			var queue: Array = m.get("draft_candidates", [])
-			var offer: Array = queue[0] if not queue.is_empty() else []
-			var took := false
-			for card in offer:
-				var bench := ""
-				if _run.ability_slots_full(m):
-					var earned: Array = _run.earned_ability_names(m)
-					var carried: Array = _run.equipped_ability_names(m)
-					for e in earned:
-						if carried.has(e):
-							bench = String(e)
-							break
-					if bench == "":
-						break
-				if _run.take_draft_ability(m, String(card), bench) == "":
-					took = true
-					break
-			if not took:
-				_run.decline_draft(m)
-	if s != null and s.has_method("_close_party_draft"):
-		s.call("_close_party_draft")
+	var ov: Node = Gate.hero_draft(s)
+	if ov != null:
+		_record(_run.party[int(ov.get_meta("hero_draft"))])
+	var a: Dictionary = await Gate.answer_hero_draft(self, s, true)
+	if not bool(a.get("confirmed", false)):
+		_dead.append("the draft screen at %s would not confirm" % _where())
+		if s != null and s.has_method("_close_hero_draft"):
+			s.call("_close_hero_draft")
 	await Gate.frames(self, 2)
 
 
+# A pick owed on a hero card: the overlay the arrival put up, or else the card's own
+# CHOOSE, and then the first choice the overlay MARKS (IB §6a).
 func _answer_a_pick(s: Node, idx: int) -> void:
 	var m: Dictionary = _run.party[idx]
-	var choose: Button = Gate.bound_button(s, "_open_pick_overlay", [idx])
-	var ov: Node = null
-	if choose != null:
-		choose.emit_signal("pressed")
-		await process_frame
+	var ov: Node = Gate.overlay(s, 60)
+	if Gate.pick_choices(ov).is_empty():
+		var choose: Button = Gate.bound_button(s, "_open_pick_overlay", [idx])
+		if choose != null:
+			choose.emit_signal("pressed")
+			await process_frame
+		if Gate.hero_draft(s) != null:
+			return   # a draft or a rune cache: his own screen, answered on the next step
 		ov = Gate.overlay(s, 60)
-	var live: Array = []
-	if ov != null:
-		var btns: Array = []
-		Gate.buttons(ov, btns)
-		for b in btns:
-			# BATCH HZ §1b — the overlay carries the kit preview's button under its
-			# title since HZ: it opens the hero's kit and answers nothing, so it is
-			# never the pick. Found by the meta the game sets on it, not by its words.
-			if String((b as Button).text) != "Not yet" and not (b as Button).disabled \
-					and not (b as Button).has_meta("kit_preview"):
-				live.append(b)
+	var live: Array = Gate.pick_choices(ov)
 	if live.is_empty():
 		_dead.append("hero %d owed a pick at %s and no live choice could be pressed" % [idx, _where()])
 		for k in ["bm_picks_owed", "up_picks_owed", "rune_picks_owed"]:
@@ -965,20 +948,21 @@ func _answer_a_pick(s: Node, idx: int) -> void:
 		return
 	(live[0] as Button).emit_signal("pressed")
 	await Gate.frames(self, 2)
-	var still: Node = Gate.overlay(s, 60)
-	if still != null:
-		still.queue_free()
+	# A press that left its own overlay up did nothing; the next pick's overlay, which
+	# the arrival opens as this one resolves, is left for the next step.
+	if is_instance_valid(ov) and not ov.is_queued_for_deletion():
+		ov.queue_free()
 		await process_frame
 
 
 func _step_map(s: Node) -> String:
-	if Gate.overlay(s, 62) != null:
+	if Gate.hero_draft(s) != null:
 		await _answer_the_draft(s)
 		return "draft"
 	for idx in _run.party.size():
 		var m: Dictionary = _run.party[idx]
 		if int(m.get("bm_picks_owed", 0)) > 0 or int(m.get("up_picks_owed", 0)) > 0 \
-				or int(m.get("rune_picks_owed", 0)) > 0:
+				or int(m.get("rune_picks_owed", 0)) > 0 or int(m.get("draft_picks_owed", 0)) > 0:
 			await _answer_a_pick(s, idx)
 			return "pick"
 	_maps_read += 1

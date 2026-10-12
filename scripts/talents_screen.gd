@@ -96,6 +96,7 @@ func _on_back() -> void:
 	# Back to wherever makes sense: the map when a run is in flight, the menu
 	# otherwise. One button, no dead end.
 	if Run.active:
+		Run.map_reentry = true   # BATCH IB §1 — a return, not an arrival
 		get_tree().change_scene_to_file("res://scenes/map.tscn")
 	else:
 		get_tree().change_scene_to_file("res://scenes/main_menu.tscn")

@@ -16,6 +16,46 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-12 &mdash; Batch IB: THE DRAFT APPEARS, AND EACH HERO DRAFTS ALONE</h2>
+<p><b>Every pick a hero is owed now opens by itself when the heroes reach the map, and each hero answers his draft and his rune
+cache on one screen of his own.</b> IA's five questions were answered too, and one line of the rune panel changed. Full working:
+<code>docs/reports/IB.md</code>. The next letter is IC.</p>
+
+<p><b>&sect;0 &mdash; IA's FIVE QUESTIONS, ANSWERED (the designer's).</b> The rune panel keeps its scroll rather than paging: a pager
+is for a row of equal choices found under time pressure, like the ability bar, and the panel is a document of three sections read
+between fights &mdash; and its scroll bar already shows where the panel scrolls and nowhere else. The save version stays: a newer save
+opened in an older build reads <i>3 of 2 slots filled</i> and loses nothing. An empty core slot now reads <i>&mdash; empty &mdash;</i>.
+An event's core rune is held, not slotted, as IA built it. And the problem with figures printed and paid off a blow that a vow
+silenced is the next batch's.</p>
+
+<p><b>&sect;1 &mdash; A WAITING PICK OPENS BY ITSELF.</b> The draft already opened when the heroes reached the map; now a zone boss's new
+ability, a mini-boss's upgrade and an elite's or a bargain's rune cache do too &mdash; one after another, in the order they were earned,
+after a fight, an event, a shop or a load. <b>A rune held and not worn never opens anything</b>: that is a standing choice, and the mark
+on the hero's nameplate already shows it. <b>Not yet</b> and <b>Later</b> lose nothing: the pick stays on the hero's card, marked, with
+its CHOOSE button, and it opens again the next time the heroes arrive &mdash; but not when they come back from a hero's sheet, which is
+not an arrival.</p>
+
+<p><b>&sect;2 &mdash; EACH HERO DRAFTS ALONE.</b> The four-column draft screen is now one screen per hero, one after another, each with its
+own Confirm. An elite's rune cache goes to one hero, and he answers it on the same screen as his card: the screen shows an
+<b>ABILITIES</b> section for a draft and a <b>RUNES</b> section for a cache, each only when it is owed. Nothing about what a fight pays
+changed &mdash; the four columns were already four separate picks. <b>See the kit</b> opens on the hero whose screen it is.</p>
+
+<p><b>&sect;3 &mdash; ONE LINE OF THE RUNE PANEL.</b> An empty core slot reads <i>&mdash; empty &mdash;</i> where it read <i>&mdash; empty core
+slot &mdash;</i>: the heading above it already says CORE.</p>
+
+<p><b>&sect;4 &mdash; THE SCRATCH COPIES.</b> A batch no longer tries to move the last batch's leftover user-data folders to the Trash; the
+report counts them and gives one command that clears them all.</p>
+
+<p><b>The checks.</b> A new check, <code>check_ib</code>, drives each of these on the real map: four heroes holding runes and owing nothing
+(nothing opens), each kind of pick opening on its screen, four picks earned out of the party's order appearing in the order earned, the
+first dismissed and the second taken, a return from the hero sheet opening nothing and the next arrival opening it again, nothing opening
+over another overlay or over the first-run card, the two marks on a hero's card, the order surviving a save, each hero's screen holding
+only his own offer, the one Confirm, an empty cache let go, the bench at the cap, the kit preview, the crest's runes kept out of a hero's
+pick, the rune panel's scroll bar, the empty slot's words, and the walkers' shared helper on the longest screen (the looter at the cap) and
+the emptiest (an empty cache). The checks that walk whole runs through the real screens answer each hero's screen and each pick through
+that one helper now, finding every choice by what the game binds or marks it with rather than by its words, and each prints what its run met;
+the checks that opened the four-column screen or a rune cache's old overlay open the hero's own screen.</p>
+
 <h2>2026-10-11 &mdash; Batch IA: THE THIRD CORE SLOT, AND THE BAG</h2>
 <p><b>Every hero now carries three core slots, and his rune panel shows them in three sections.</b> One line in the damage path
 was also fixed, HZ's seven questions were answered, and one stale sentence in the instrument rules was repaired. Full working:
