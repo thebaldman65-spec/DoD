@@ -673,9 +673,13 @@ func _s1b_the_longest() -> void:
 	ok(_run.upgrade_choice(e).is_empty(), "§1b: the premise — an upgrade offer with nothing left to take")
 	var mpe := await _to_map()
 	var tx: Array = _texts(Gate.hero_draft(mpe))
-	ok(tx.has("Nothing further left to offer this run.") and tx.has("nothing to take now — the pick stays owed")
-			and _confirm(mpe) != null and _confirm(mpe).disabled,
-		"§1b: the emptiest screen does not say it has nothing and stays owed (%s)" % [tx])
+	# RE-POINTED BY BATCH IE §5 (ruled at IE §0.3): an offer with nothing left at all cannot refill, so it
+	# is SPENT, in the cache's words, rather than left owed — the screen says so and offers Let it go;
+	# the Confirm waits on that one decision. `check_ie` §5 drives the spend to the card.
+	ok(tx.has(mpe.get("UPGRADE_SPENT_NOTE")) and not tx.has("nothing to take now — the pick stays owed")
+			and Gate.bound_buttons(Gate.hero_draft(mpe), "_stage_spend").size() == 1
+			and _confirm(mpe) != null and _confirm(mpe).disabled and _confirm(mpe).text == "One choice still to make",
+		"§1b: the emptiest screen does not say its pick is spent and offer Let it go (%s)" % [tx])
 	mpe.call("_shut_hero_draft")
 
 
@@ -744,9 +748,14 @@ func _s2_the_words() -> void:
 		var t := _title(mp)
 		var line := _owed_line(mp)
 		var who := String(_run.nameplate(m))
-		var want_title := "THE DRAFT" if kinds.has("draft") or kinds.has("boss") else (
-			"THE UPGRADE AND THE CACHE" if kinds.has("upgrade") and kinds.has("rune") else (
-			"THE UPGRADE" if kinds.has("upgrade") else "THE CACHE"))
+		# BATCH IE §0.4 — THE ABILITY: a zone boss's pick without the draft names itself, and the
+		# non-draft kinds join as the owed line joins (*A, B and C*); a draft still takes THE DRAFT.
+		var tn: Array = []
+		for kn in [["boss", "THE ABILITY"], ["upgrade", "THE UPGRADE"], ["rune", "THE CACHE"]]:
+			if kinds.has(kn[0]):
+				tn.append(kn[1])
+		var want_title: String = "THE DRAFT" if kinds.has("draft") else (String(tn[0]) if tn.size() == 1
+			else "%s AND %s" % [", ".join(tn.slice(0, tn.size() - 1)), tn[tn.size() - 1]])
 		ok(t == "%s — %s" % [want_title, who], "§2 %s: the title reads '%s'" % [kinds, t])
 		seen_titles[want_title] = true
 		# The owed line: what he is owed, as one sentence, then the one tail.
@@ -774,7 +783,7 @@ func _s2_the_words() -> void:
 		var a: Dictionary = await Gate.answer_hero_draft(self, mp, true)
 		# (answered: the Confirm's face just before it was pressed is the noun's — read it on a fresh screen below)
 		ok(bool(a["confirmed"]), "§2 %s: the screen would not confirm once every section was decided" % [kinds])
-	ok(seen_titles.size() == 4, "§2: the four titles were not all met: %s" % [seen_titles.keys()])
+	ok(seen_titles.size() == 8, "§2: the eight titles (THE DRAFT and the seven joins of the other three) were not all met: %s" % [seen_titles.keys()])
 	# THE CONFIRM's DECIDED FACE, AND THE HEADS: four owed, every section decided, before the press.
 	_new_run()
 	var m2: Dictionary = _run.party[0]
@@ -812,13 +821,15 @@ func _s2_the_words() -> void:
 
 const DIAMOND := "◆"
 const ARROW := "↑"
+const STAR := "✦"  # BATCH IE §4 — ✦ names a rune (§3a's third glyph)
 
 
 func _s3a_the_sweep() -> void:
-	print("\n§3a — the glyph sweep: every ◆ and ↑ in the game's scripts and data")
+	print("\n§3a — the glyph sweep: every ◆, ↑ and ✦ in the game's scripts and data")
 	var census := {}
 	var code_diamonds: Array = []
 	var code_arrows: Array = []
+	var code_stars: Array = []
 	var dir := DirAccess.open("res://scripts")
 	for f in dir.get_files():
 		if not f.ends_with(".gd"):
@@ -832,11 +843,13 @@ func _s3a_the_sweep() -> void:
 				code_diamonds.append("%s: %s" % [f, String(ln).strip_edges()])
 			if String(ln).contains(ARROW):
 				code_arrows.append("%s: %s" % [f, String(ln).strip_edges()])
+			if String(ln).contains(STAR):
+				code_stars.append("%s: %s" % [f, String(ln).strip_edges()])
 	var data_hits: Array = []
 	var dd := DirAccess.open("res://data")
 	for f2 in dd.get_files():
 		var raw2 := FileAccess.get_file_as_string("res://data/" + f2)
-		if raw2.contains(DIAMOND) or raw2.contains(ARROW):
+		if raw2.contains(DIAMOND) or raw2.contains(ARROW) or raw2.contains(STAR):
 			data_hits.append(f2)
 	print("    per script [◆, ↑] including comments: %s" % [census])
 	print("    in code, comments stripped — ◆: %d line(s), ↑: %d line(s); data files carrying either: %s" % [
@@ -856,7 +869,35 @@ func _s3a_the_sweep() -> void:
 			other.append(l2)
 	ok(other.is_empty() and where.values().all(func(v): return int(v) == 1),
 		"§3a: ↑ is not drawn once on each of the four upgrade surfaces and nowhere else: %s %s" % [where, other])
-	ok(data_hits.is_empty(), "§3a: a data file carries ◆ or ↑: %s" % [data_hits])
+	# BATCH IE §4 (ruled at IE §0.1) — ✦ NAMES A RUNE: every ✦ left in the game's code is a rune's mark or a
+	# count of runes held unworn — the battle's rune chip, the crest panel's worn crest rune, the nameplate's
+	# count, the bag's crest count and the kit preview's prose — and nothing else. ONE NAMED EXCEPTION, IE's
+	# finding and not its build: the loadout panel marks a CARRIED CARD with it (its two lines), because that
+	# panel carries no section head and no state column — it is the rune panel before IA §3.
+	var star_lines := {
+		"rune mark — the battle's rune chip": "^battle\\.gd: const RUNE_CHIP_TAG := \"✦\"$",
+		"rune count — the kit preview's prose": "^kit_preview\\.gd: _line\\(\"   ✦ %d held, not worn",
+		"rune count — the nameplate": "^map_screen\\.gd: mark\\.text = \"✦ %d\" % waiting$",
+		"rune count — the bag's crest runes": "^map_screen\\.gd: \"  ✦ %d\" % crest_waiting if crest_waiting > 0",
+		"rune mark — the crest panel's worn crest rune": "^map_screen\\.gd: plbl\\.text = .*\"✦ \" if p_on",
+		"FINDING — the loadout panel's carried card": "^map_screen\\.gd: (lbl\\.text = \"%s%s%s\" % \\[\"✦ \" if is_on|lbl\\.text = \"✦ %s — %s\")",
+	}
+	var met := {}
+	var stray_star: Array = []
+	for l3 in code_stars:
+		var named := ""
+		for what in star_lines:
+			if RegEx.create_from_string(String(star_lines[what])).search(String(l3)) != null:
+				named = String(what)
+		if named == "":
+			stray_star.append(l3)
+		else:
+			met[named] = int(met.get(named, 0)) + 1
+	print("    ✦ in code, comments stripped: %d line(s) — %s" % [code_stars.size(), met])
+	ok(stray_star.is_empty() and met.size() == star_lines.size() and int(met.get("FINDING — the loadout panel's carried card", 0)) == 2
+			and code_stars.size() == star_lines.size() + 1,
+		"§3a: ✦ is drawn for something that is not a rune's mark, a rune count or the named finding: %s (met %s)" % [stray_star, met])
+	ok(data_hits.is_empty(), "§3a: a data file carries ◆, ↑ or ✦: %s" % [data_hits])
 
 
 # ── §3b — EACH SURFACE APART ────────────────────────────────────────────────────────────────

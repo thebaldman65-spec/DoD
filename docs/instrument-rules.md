@@ -863,6 +863,8 @@ gives you N, all born wrong, none of them diffed against anything.
   (the pick overlay is retired), so the helper answers its four sections, and the two the overlay held — the zone boss's
   ability and the upgrade — are one helper of their own (`Gate.answer_boss_and_upgrade`) that `answer_hero_draft` and the
   one walker with its own draft half (`check_fh`, which reads each card's tag line) both call: one answer, not two.
+  **Since IE §5 a spent section is answered too**: where the boss's or the upgrade's offer is empty and draws its *Let it go*
+  (`_stage_spend`), the helper presses it, as it lets an empty cache go, and its census counts *a spent … let go*.
 - **THE DIFFERENCES THAT ARE REAL BECOME NAMED ARGUMENTS**, not invisible edits inside a copy:
   `deterministic`, `items`, `run`.
 - **A BASE CLASS IS THE RIGHT SHAPE AND IT DOES NOT COMPILE.** `extends GateBase` on a `--script`
@@ -1873,3 +1875,30 @@ a detail to note — it is the ruling being wrong.
   totals, so the census can be re-run where it cannot be re-read.
 - **IT BINDS FROM ID ON**: ID §3's glyph sweep (every ◆, ↑ and ✦ in every tracked script, document and data file, by
   class — ID's report, §3) and §1's census of the retired overlay at its deletion are its first two.
+
+## STANDING RULE — A BRIEF STATES WHAT A BATCH INTENDS TO TOUCH, NEVER WHAT IT DOES NOT (Batch IE §0.6, ruled by the designer)
+> **A brief states what a batch intends to touch, never what it does not.** The blast radius is the batch's to establish
+> and the recon's shape follows from it — **so a brief that wants one recon says *confirm nothing reaches the damage path,
+> then take one recon*, and a batch that finds otherwise takes two and says so.**
+
+- **THE CASE: ID's PREMISE 25 — *nothing in this batch is in the damage path* — WAS FALSE, AND IT CHOSE THE VERIFICATION's
+  SHAPE.** A display chip (the class passive's) was laid as a status, so deleting it took four Sanctity events and four
+  dice out of every battle's opening, and one recon of HEAD's battery against all of ID's code had to carry both causes.
+  A premise about what a batch does NOT touch cannot be checked by the brief's author, who has not read the code the
+  batch will move; the batch can, by reading every door its change passes.
+- **SO THE BATCH CONFIRMS THE BLAST RADIUS BEFORE IT SETS THE RECON, AND SAYS WHAT IT FOUND.** One recon when the change
+  reaches no seeded die and no shared door; one recon per cause when it does — the first cause alone, then all of the
+  batch's code — so each move is attributed to one cause by a stub rather than argued apart afterwards. IE's §2a moved the
+  spawn path (an engine chip was a status, a float and a die), so IE took two.
+
+## STANDING RULE — THE LITERAL SWEEP RUNS BEFORE THE PREDICTION, NOT AFTER IT (Batch IE §0.5, ruled by the designer)
+> **The literal sweep — every gate and suite literal present in HEAD's game files and gone from the new ones, and every
+> shorter one at its own length — runs before a recon's prediction is written, and the prediction names every needle it
+> lists.** A grep for the functions a batch moved finds the readers that call them and none of the readers that quote them.
+
+- **THE CASE: ID's PREDICTION WAS WRITTEN OFF A FUNCTION-NAME GREP AND MISSED THREE REDS** — `test_batch_bx`'s two source
+  needles, `test_batch_bo`'s third and `check_ed`'s manifest pin — **and the sweep, run afterwards, listed all three.** A
+  needle that names no function is invisible to a grep for function names, and a suite that reads a game file's text pins
+  whatever lines it quotes.
+- **THE PREDICTION CARRIES THE SWEEP's OUTPUT**: each LOST needle with its owner, each GAINED one a negative assertion could
+  read, each short flip — beside the gates the function census found, so a red the sweep listed is never a surprise.

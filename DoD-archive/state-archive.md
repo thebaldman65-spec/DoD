@@ -17,6 +17,46 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT IE — 2026-10-13, FROM `docs/state.md` AS ID LEFT IT (`027de47`)
+
+**What came here**: ID's rulings, all four answered in IE's brief; FOUND AT ID's engine-chip item (built at IE §2a); and the
+roadmap's IE line — the Cleric's regen measured and not moved (IE §1), the Mage's fire repaired (IE §3). The roadmap's IF, IG and
+IH lines were rewritten in place; FOUND AT ID keeps its other two items. Each was read against IE's tree before it moved;
+everything else in the live file stayed.
+
+### ~~ID's RULINGS OWED~~ — **ALL FOUR ANSWERED IN IE's BRIEF: ✦ NAMES A RUNE (1, BUILT AT IE §4 — THE LOADOUT PANEL AND THE CREST PANEL FOUND); A CHIP IS NOT A STATUS (2, THE ENGINE CHIPS BUILT AT IE §2a, SANCTITY RE-MEASURED AT §2b); AN OFFER THAT CANNOT REFILL IS SPENT, ONE HELD BACK STAYS OWED (3, MEASURED AND BUILT AT IE §5); THE TITLES CONFIRMED, WITH A FOURTH NOUN — THE ABILITY (4, BUILT AT IE §5)**
+
+
+Full working: `docs/reports/ID.md`, NEEDS A RULING.
+
+1. **✦ CARRIES FOUR MEANINGS, AND IC's RULE SAYS ONE (§3)** — *✦ counts what is held and unworn* (IC §0.4) holds on the nameplate and
+   the crest's bag; ✦ also marks a worn rune or a carried card on three panels (the loadout panel, the crest bag, the hero sheet), a
+   rune's chip in battle, and the Empower toggle. None is a pick, so ◆'s rule holds. Keep the other meanings, give ✦ its one, or
+   letter the worn marks.
+2. **THE CLASS PASSIVE's CHIP WAS A STATUS, AND ITS DELETION MOVED THE HIEROPHANT's SANCTITY (§3c)** — laid through `add_status`, it
+   booked a Sanctity event and floated a label (a die) on every hero at every spawn; the deletion takes four of each from every
+   battle's opening. The engine chips (★) are laid the same way and still book. A display chip counts as a status landing, or it
+   does not (and the Sanctity rate is re-measured)?
+3. **AN OFFER THAT COMES BACK EMPTY STILL STRANDS ITS PICK (§1a)** — a zone boss's or an upgrade offer with nothing left stays owed
+   with nothing to press, as on the retired overlay; the screen now says so. FM §3 spent the rune cache's (*Let it go*). Spend it,
+   or keep it owed?
+4. **THE TITLE FOR AN UPGRADE, AND AN UPGRADE WITH A RUNE (§2)** — *THE UPGRADE* and *THE UPGRADE AND THE CACHE*, each naming what is on
+   it (the rule names only THE DRAFT and THE CACHE). Confirm, or name them.
+
+### FOUND AT ID AND NOT FIXED — ITS CLOSED ITEMS (archived at IE; the section stays in `docs/state.md`)
+
+- **THE ENGINE CHIPS (★) ARE STATUSES TOO** — laid through `add_status` at the spawn, one per engine a hero holds, each a Sanctity
+  event and a die (ruling 2's other half).
+
+### THE PLAYTEST'S OTHER FINDINGS — ITS CLOSED ITEMS (archived at IE; the section stays in `docs/state.md`)
+
+- **IE — THE CLERIC's REGEN AND THE MAGE's FIRE, AND THAT IS FINAL (ID's brief §6).** The last two of the zone-one findings still
+  open. They have lost the queue four times — IB at HW's roadmap, IC at HY's, ID at IB's, and **ID itself, which was the batch that
+  was supposed to be them and was the fold and the glyphs instead.** The regen against a census of everything that returns Mana to a
+  Cleric; **more Burn appliers in the Mage's pool.**
+
+---
+
 ## ARCHIVED AT ID — 2026-10-12, FROM `docs/state.md` AS IC LEFT IT (`db68ab7`)
 
 **What came here**: IC's rulings, all five answered in ID's brief; FOUND AT IA's Kit button item (fixed at ID §4); and the roadmap's

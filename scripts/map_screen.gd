@@ -1375,7 +1375,7 @@ func _stage_of(idx: int) -> Dictionary:
 	for k in ["card", "drop", "rune", "bcard", "bdrop", "upgrade"]:
 		if not st.has(k):
 			st[k] = ""
-	for k in ["declined", "rune_set"]:
+	for k in ["declined", "rune_set", "bspent", "uspent"]:
 		if not st.has(k):
 			st[k] = false
 	_draft_stage[idx] = st
@@ -1400,6 +1400,8 @@ func _draft_decided(idx: int) -> bool:
 # bench named. It has no decline: a zone-boss award always pays (EA §1).
 func _boss_decided(idx: int) -> bool:
 	var st := _stage_of(idx)
+	if bool(st["bspent"]):
+		return true
 	if String(st["bcard"]) == "":
 		return false
 	if _bench_needed(idx, "boss"):
@@ -1410,7 +1412,7 @@ func _boss_decided(idx: int) -> bool:
 # The UPGRADES section is DECIDED when an upgrade is chosen; it has no decline (the pick overlay
 # had none).
 func _upgrade_decided(idx: int) -> bool:
-	return String(_stage_of(idx)["upgrade"]) != ""
+	return String(_stage_of(idx)["upgrade"]) != "" or bool(_stage_of(idx)["uspent"])
 
 
 # The RUNES section is DECIDED when a rune is chosen, or an empty cache is let go.
@@ -1449,18 +1451,72 @@ func _bench_for(idx: int, which: String) -> String:
 	return String(_stage_of(idx)["drop" if which == "draft" else "bdrop"])
 
 
+# ══ BATCH IE §5 — A PICK THAT CANNOT BE ANSWERED AND CANNOT BECOME ANSWERABLE IS SPENT ══════════
+#
+# **◆ MAY NOT STAND ON A PICK THAT CANNOT BE ANSWERED AND CANNOT BECOME ANSWERABLE** (IE §0.3, the
+# designer's). Measured at IE: an offer re-asked to nothing is written back empty, and every later
+# re-ask returns the empty list unchanged — `Run.ability_choice` and `Run.upgrade_choice` top up only
+# for a candidate they DROP — so neither the zone boss's nor the mini-boss's can refill, whatever
+# the hero equips or drafts after. Such a pick is SPENT in FM §3's shape (*Let it go*), as the rune
+# cache's is. **A boss's offer HELD BACK is not empty**: its cards are stored and an engine or the
+# pet brings them back, so it stays owed and says so.
+func _boss_spent(idx: int) -> bool:
+	var member: Dictionary = Run.party[idx]
+	return Run.pick_owed(member, "ability") > 0 and Run.ability_choice(member).is_empty() \
+		and Run.ability_choice_withheld(member).is_empty()
+
+
+func _upgrade_spent(idx: int) -> bool:
+	var member: Dictionary = Run.party[idx]
+	return Run.pick_owed(member, "upgrade") > 0 and Run.upgrade_choice(member).is_empty()
+
+
+# The zone boss's pick, let go: it asks the same doors first (`_boss_spent`), so a spend can never
+# eat a pick with a card left in it or one held back. Returns the toast's words.
+const BOSS_SPENT_NOTE := "The zone boss's offer holds nothing this hero can take — every card it held is already this hero's, and none is left to draw.\nThe pick is spent rather than held: nothing can arrive to fill it."
+const UPGRADE_SPENT_NOTE := "The mini-boss's offer holds nothing this hero can take — every upgrade it held is taken, and none left fits a card this hero holds.\nThe pick is spent rather than held: nothing can arrive to fill it."
+
+
+func _spend_boss_pick(idx: int) -> String:
+	if not _boss_spent(idx):
+		return ""
+	var member: Dictionary = Run.party[idx]
+	var queue: Array = member.get("bm_candidates", [])
+	if not queue.is_empty():
+		queue.pop_front()
+		member["bm_candidates"] = queue
+	member["bm_picks_owed"] = int(member.get("bm_picks_owed", 0)) - 1
+	return "%s: the zone boss had nothing left to offer. The pick is spent." % String(member["key"]).capitalize()
+
+
+func _spend_upgrade_pick(idx: int) -> String:
+	if not _upgrade_spent(idx):
+		return ""
+	var member: Dictionary = Run.party[idx]
+	var queue: Array = member.get("up_candidates", [])
+	if not queue.is_empty():
+		queue.pop_front()
+		member["up_candidates"] = queue
+	member["up_picks_owed"] = int(member.get("up_picks_owed", 0)) - 1
+	return "%s: the mini-boss had nothing left to offer. The pick is spent." % String(member["key"]).capitalize()
+
+
 # **WHAT HE CAN ANSWER NOW.** A section is ANSWERABLE when the Confirm could commit it today: the
 # draft always (Decline is always a button), the runes always (an empty cache is let go), the
-# boss's offer and the upgrade only while their live list holds a choice. One that is not says
-# why on the screen and stays owed; it does not hold the Confirm.
+# boss's offer and the upgrade while their live list holds a choice — **and since IE §5 while it
+# holds nothing at all, which is let go** (`_boss_spent`, `_upgrade_spent`). A boss's offer
+# whose every card is HELD BACK for an engine or the pet says so on the screen and stays owed;
+# it does not hold the Confirm.
 func _answerable(idx: int) -> Array:
 	var member: Dictionary = Run.party[idx]
 	var out: Array = []
 	if Run.pick_owed(member, "draft") > 0:
 		out.append("draft")
-	if Run.pick_owed(member, "ability") > 0 and not Run.ability_choice(member).is_empty():
+	if Run.pick_owed(member, "ability") > 0 and (not Run.ability_choice(member).is_empty() \
+			or _boss_spent(idx)):
 		out.append("boss")
-	if Run.pick_owed(member, "upgrade") > 0 and not Run.upgrade_choice(member).is_empty():
+	if Run.pick_owed(member, "upgrade") > 0 and (not Run.upgrade_choice(member).is_empty() \
+			or _upgrade_spent(idx)):
 		out.append("upgrade")
 	if Run.pick_owed(member, "rune") > 0:
 		out.append("rune")
@@ -1486,19 +1542,37 @@ func _hero_draft_decided(idx: int) -> bool:
 # ══ BATCH ID §2 — THE WORDS ══════════════════════════════════════════════════════════════
 #
 # **THE TITLE NAMES WHAT IS ON THE SCREEN AND NEVER MISNAMES IT** (IC §0.2, the designer's):
-# *THE DRAFT* whenever an ability is on it — the draft's or the zone boss's, both in ABILITIES —
-# and otherwise the picks it holds by their own nouns: *THE CACHE* for a rune alone, *THE
-# UPGRADE* for an upgrade alone, *THE UPGRADE AND THE CACHE* for the two. The Confirm says the
-# same noun, so it cannot misname it either.
+# *THE DRAFT* whenever the draft is on it, and otherwise the picks it holds by their own nouns:
+# *THE ABILITY* for the zone boss's (IE §0.4; it read THE DRAFT until IE), *THE UPGRADE*, *THE
+# CACHE*, joined — *THE ABILITY, THE UPGRADE AND THE CACHE*. The Confirm says the same noun, so it
+# cannot misname it either.
+#
+# **BATCH IE §0.4 — THE ABILITY, THE FOURTH NOUN (the designer's).** A zone boss's ability alone read
+# THE DRAFT, and the screen's own section calls that pick *from the zone boss*. A draft on the screen
+# still takes THE DRAFT — the more specific door, and the two share ABILITIES; otherwise the title
+# names the kinds on the screen, joined the way the owed line joins them (`_joined`): *the title
+# names the kinds on the screen, joined; the owed line enumerates them precisely.*
 func _screen_name(idx: int) -> String:
 	var member: Dictionary = Run.party[idx]
-	if Run.pick_owed(member, "draft") > 0 or Run.pick_owed(member, "ability") > 0:
+	if Run.pick_owed(member, "draft") > 0:
 		return "THE DRAFT"
-	var up := Run.pick_owed(member, "upgrade") > 0
-	var rune := Run.pick_owed(member, "rune") > 0
-	if up and rune:
-		return "THE UPGRADE AND THE CACHE"
-	return "THE UPGRADE" if up else "THE CACHE"
+	var kinds := PackedStringArray()
+	if Run.pick_owed(member, "ability") > 0:
+		kinds.append("THE ABILITY")
+	if Run.pick_owed(member, "upgrade") > 0:
+		kinds.append("THE UPGRADE")
+	if Run.pick_owed(member, "rune") > 0:
+		kinds.append("THE CACHE")
+	if kinds.is_empty():
+		return "THE CACHE"
+	return _joined(kinds, "AND")
+
+
+# ID's joiner, one place: *A*, *A and B*, *A, B and C* — the title and the owed line both ask it.
+static func _joined(items: PackedStringArray, and_word: String) -> String:
+	if items.size() <= 1:
+		return "" if items.is_empty() else items[0]
+	return "%s %s %s" % [", ".join(items.slice(0, items.size() - 1)), and_word, items[items.size() - 1]]
 
 
 # **THE OWED LINE IS WHAT HE IS OWED, AS ONE SENTENCE, THEN ONE CONSTANT TAIL.** Each pick its
@@ -1520,11 +1594,7 @@ func _owed_line(idx: int) -> String:
 		items.append("an ability upgrade")
 	if Run.pick_owed(member, "rune") > 0:
 		items.append("a rune from the cache")
-	var said := ""
-	if items.size() == 1:
-		said = items[0]
-	elif items.size() > 1:
-		said = "%s and %s" % [", ".join(items.slice(0, items.size() - 1)), items[items.size() - 1]]
+	var said := _joined(items, "and")
 	if said == "":
 		return OWED_TAIL
 	return "%s. %s" % [said[0].to_upper() + said.substr(1), OWED_TAIL]
@@ -1823,10 +1893,14 @@ func _ability_offer(row: HBoxContainer, idx: int, which: String) -> void:
 	# back for an engine is not a pool that ran dry, and the line above names it.
 	# **ID §1 — THE ZONE BOSS'S FILLS SHORT ONLY WHEN BOTH ITS TIERS ARE SPENT** (`ability_choice`
 	# tops it up), so its line is drawn only when nothing at all is left to take or hold back.
-	if (is_draft and stored.size() < 3) or (not is_draft and offer.is_empty() and held_back.is_empty()):
+	var boss_spent := not is_draft and _boss_spent(idx)
+	if (is_draft and stored.size() < 3) or boss_spent:
 		var short := Label.new()
 		short.text = "Nothing further left to offer this run." if stored.is_empty() \
 				or not is_draft else "The pool holds no more to offer this run."
+		# BATCH IE §5 — AN EMPTY BOSS OFFER IS SPENT, in the cache's words (FM §3).
+		if boss_spent:
+			short.text = BOSS_SPENT_NOTE
 		short.add_theme_font_size_override("font_size", 11)
 		short.add_theme_color_override("font_color", Color(0.55, 0.53, 0.5))
 		short.custom_minimum_size = Vector2(DRAFT_COL_W - 38, 0)
@@ -1858,6 +1932,18 @@ func _ability_offer(row: HBoxContainer, idx: int, which: String) -> void:
 			[other_bench] if other_bench != "" else []))
 		col.add_child(drop_btn)
 
+	if boss_spent:
+		var let_b := Button.new()
+		let_b.text = ("▸ " if bool(st["bspent"]) else "") + "Let it go"
+		let_b.custom_minimum_size = Vector2(DRAFT_COL_W - 16, 26)
+		let_b.add_theme_font_size_override("font_size", 12)
+		let_b.add_theme_color_override("font_color",
+			Color(1.0, 0.9, 0.5) if bool(st["bspent"]) else Color(0.7, 0.68, 0.65))
+		let_b.set_meta("let_go", "boss")
+		let_b.pressed.connect(Music.click)
+		let_b.pressed.connect(_stage_spend.bind(idx, "bspent"))
+		col.add_child(let_b)
+
 	if is_draft:
 		# DECLINING IS ALWAYS ALLOWED, PER HERO, INDEPENDENTLY. One hero taking a
 		# card does not commit the others, and a settled kit is a legitimate end
@@ -1877,6 +1963,8 @@ func _ability_offer(row: HBoxContainer, idx: int, which: String) -> void:
 	var state := Label.new()
 	if declined:
 		state.text = "keeps the kit as it is"
+	elif boss_spent:
+		state.text = "lets the pick go" if bool(st["bspent"]) else "— undecided —"
 	elif not is_draft and offer.is_empty():
 		state.text = "nothing to take now — the pick stays owed"
 	elif staged == "":
@@ -2066,7 +2154,8 @@ func _upgrade_section(overlay: Control, idx: int, at: Vector2) -> void:
 			list.add_child(nums)
 	if offer.is_empty():
 		var none := Label.new()
-		none.text = "Nothing further left to offer this run."
+		# BATCH IE §5 — an empty upgrade offer cannot refill, so it is spent (FM §3's words).
+		none.text = UPGRADE_SPENT_NOTE
 		none.add_theme_font_size_override("font_size", 11)
 		none.add_theme_color_override("font_color", Color(0.55, 0.53, 0.5))
 		none.custom_minimum_size = Vector2(DRAFT_COL_W - 38, 0)
@@ -2077,16 +2166,28 @@ func _upgrade_section(overlay: Control, idx: int, at: Vector2) -> void:
 	for up in offer:
 		if String((up as Dictionary).get("id", "")) == staged:
 			picked = up
+	var u_spent := bool(_stage_of(idx)["uspent"])
+	if offer.is_empty():
+		var let_u := Button.new()
+		let_u.text = ("▸ " if u_spent else "") + "Let it go"
+		let_u.custom_minimum_size = Vector2(DRAFT_COL_W - 16, 26)
+		let_u.add_theme_font_size_override("font_size", 12)
+		let_u.add_theme_color_override("font_color",
+			Color(1.0, 0.9, 0.5) if u_spent else Color(0.7, 0.68, 0.65))
+		let_u.set_meta("let_go", "upgrade")
+		let_u.pressed.connect(Music.click)
+		let_u.pressed.connect(_stage_spend.bind(idx, "uspent"))
+		box.add_child(let_u)
 	var state := Label.new()
 	if offer.is_empty():
-		state.text = "nothing to take now — the pick stays owed"
+		state.text = "lets the pick go" if u_spent else "— undecided —"
 	elif picked.is_empty():
 		state.text = "— undecided —"
 	else:
 		state.text = "takes %s: %s" % [String(picked.get("ability", "")), Run.upgrade_name(staged)]
 	state.add_theme_font_size_override("font_size", 12)
 	state.add_theme_color_override("font_color",
-		Color(0.6, 0.85, 0.6) if not picked.is_empty() else Color(0.55, 0.53, 0.5))
+		Color(0.6, 0.85, 0.6) if not picked.is_empty() or u_spent else Color(0.55, 0.53, 0.5))
 	state.custom_minimum_size = Vector2(DRAFT_COL_W - 16, 16)
 	state.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(state)
@@ -2145,6 +2246,14 @@ func _stage_boss_drop(idx: int, drop_name: String) -> void:
 func _stage_upgrade(idx: int, uid: String) -> void:
 	var st := _stage_of(idx)
 	st["upgrade"] = "" if String(st["upgrade"]) == uid else uid
+	_open_hero_draft(idx)
+
+
+# BATCH IE §5 — an empty boss or upgrade offer let go (`key` "bspent" or "uspent"); the same
+# press again unstages it.
+func _stage_spend(idx: int, key: String) -> void:
+	var st := _stage_of(idx)
+	st[key] = not bool(st[key])
 	_open_hero_draft(idx)
 
 
@@ -2341,7 +2450,9 @@ func _confirm_hero_draft() -> void:
 			var card := String(st["card"])
 			var refused := Run.take_draft_ability(member, card, draft_bench)
 			said.append("%s: %s" % [who, refused] if refused != "" else "%s takes %s" % [who, card])
-	if can.has("boss"):
+	if can.has("boss") and bool(st["bspent"]) and _boss_spent(idx):
+		said.append(_spend_boss_pick(idx))
+	elif can.has("boss"):
 		var bcard := String(st["bcard"])
 		var refused_b := _pick_ability(idx, bcard, boss_bench)
 		if refused_b != "":
@@ -2350,7 +2461,9 @@ func _confirm_hero_draft() -> void:
 			said.append("%s carries %s instead of %s" % [who, bcard, boss_bench])
 		else:
 			said.append("%s learns %s" % [who, bcard])
-	if can.has("upgrade"):
+	if can.has("upgrade") and bool(st["uspent"]) and _upgrade_spent(idx):
+		said.append(_spend_upgrade_pick(idx))
+	elif can.has("upgrade"):
 		var live: Array = Run.upgrade_choice(member)
 		var at := -1
 		for i in live.size():

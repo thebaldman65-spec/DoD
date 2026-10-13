@@ -4,6 +4,43 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The resources, and the Mage's fire (Batch IE) — 2026-10-13
+
+**Why a chip is not a status.** A chip is drawn to tell the player something; it is not an event in the fiction. Sanctity claims
+to count statuses — things done to bodies — and every engine chip laid through the status door was counted as one, so a
+Hierophant opened every fight with free events toward his steps that nobody had earned. The engine chips are drawn the way the rune chips are now:
+nothing ticks, dispels or counts them. The other display chips still laid through that door are a census owed the same answer.
+
+**Why the Cleric's Mana rate did not move.** The finding was *the Cleric always has full Mana; his regen is too powerful*, and the
+direction — lower one class's number — was ruled. Measured before anything moved, the sim did not show a Cleric who never runs
+dry: his base drip is the Hunter's (12; the Mage's is 22), and on the sim's default build he runs dry about as often as the other
+two, while on the designer's own untalented build he runs dry more often than the Mage. Lowering his rate moves him away from
+the shape the batch was asked to reach (dry sometimes, but less than the Mage and the Hunter); only a higher rate reaches it. A
+batch that lowered the number anyway would have shipped the opposite of the pass condition, so the rate stands and the curve goes
+to the designer, with the play conditions the sim does not carry (a relic that refills the Cleric and the Mage after every
+victory, and no talents) named beside it.
+
+**Why Stoke and Cinderfall were given Burn, and Pyroblast was not.** The Mage's pool held eleven cards that read Burn and three
+that laid it without his engine. A card that deals fire and lays nothing is the gap's likeliest cause, and giving such a card its
+Burn repairs it without authoring anything. Stoke and Cinderfall did nothing at all on a cold enemy, so lighting one changes only
+the case that was empty; their figures are the kit's own — a Fireball's three turns for one enemy, Flamewave's two for an area.
+Pyroblast was the third such card, and it was left: its bonus reads the very Burn it would lay and it has no cooldown, so its
+repair would also make every repeat cast half again stronger — a damage change, not a supply repair.
+
+**Why ✦ left the hero sheet and the Empower toggle, and stayed on the loadout panel.** ◆ means a decision waits, ↑ names an upgrade,
+✦ names a rune. Beside a column that already says WORN the mark said one thing twice, and the Empower toggle is no rune at all.
+The loadout panel has no section head and no state column — it is the rune panel before IA sectioned it — so taking the mark off
+there would leave its rows saying less; that panel is a finding, not a deletion.
+
+**Why an empty pick is spent and a held-back one is not.** ◆ may not stand on a pick that cannot be answered and cannot become
+answerable. A zone boss's offer whose cards all wait on an engine can come back — equip it and they return — so it waits. An offer
+with nothing left at all cannot: the re-ask writes the empty list back and never draws again, which was measured before the spend
+was built. It is spent in the words the rune cache already used, so one kind of empty pick reads one way.
+
+**Why THE ABILITY.** A zone boss's pick alone read THE DRAFT, and the screen's own section calls that pick *from the zone boss*. The
+title names the kinds on the screen, joined; the owed line enumerates them precisely; a draft on the screen still takes THE DRAFT,
+the more specific door.
+
 ## One surface, and the glyphs (Batch ID) — 2026-10-12
 
 **Why every pick is a section of one screen.** The zone boss's ability and the mini-boss's upgrade opened on an overlay of their

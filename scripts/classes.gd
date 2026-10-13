@@ -3640,14 +3640,15 @@ static func draft_ability(display_name: String) -> Ability:
 				"description": "REQUIRES THE DEFENSIVE GUARD.\nRead the attack and answer it before it\nlands: one enemy loses its next turn.\nIt deals nothing at all — the turn IS\nthe payload.\nA BOSS RESISTS UNTIL BROKEN."})
 		# ----- PYROMANCER: different answers to how do you commit -----
 		# AXIS: spending wide instead of deep. Detonation empties one bank;
-		# this skims every bank, and Overburn refunds every turn it takes.
+		# this skims every bank, and Overburn refunds every turn it takes. Since
+		# IE §3b what is not alight catches (`battle.CINDERFALL_LIGHT_TURNS`).
 		"Cinderfall":
 			return Ability.make({"display_name": "Cinderfall", "dmg_type": "fire",
 				"cost": 30, "damage": 20, "pressure": 8, "delay": 3.0,
 				"cooldown": 3, "aoe": true, "anim": "attack03",
 				"special": "cinderfall",
 				"perfect_id": "", "perfect_text": "Takes 3 turns of Burn from each",
-				"description": "Rake the whole field for 20% of Attack,\nthen tear 2 turns of Burn from EACH\nburning enemy to deal that much again\nto it. Overburn refunds every turn taken."})
+				"description": "Rake the whole field for 20% of Attack,\nthen tear 2 turns of Burn from EACH\nburning enemy to deal that much again\nto it; an enemy not alight is set\nBurning for 2 turns. Overburn refunds\nevery turn taken."})
 		# AXIS: PAID BEFORE IT BURNS (BATCH BS §4, re-authored). Its old axis was
 		# "commitment without the bill" — an exemption from Overburn's Mana
 		# drain — and BS deleted the drain, so the card's whole second sentence
@@ -4280,7 +4281,8 @@ static func draft_ability(display_name: String) -> Ability:
 				"description": "Bank the fire: for 4 turns the Burn on\nEVERY enemy stops counting down. It\nstill burns for its full damage — it\njust never gets shorter.\nThe mark rides enemies not yet alight,\nso fire laid inside the window holds too."})
 		# AXIS: the bank multiplies instead of growing. Backdraft ADDS turns and
 		# Ember Debt LAYS them; this one doubles what is already there, so it is
-		# worth exactly as much as the stack he built and nothing on an empty one.
+		# worth as much as the stack he built — and since IE §3b an empty target
+		# is lit (`battle.STOKE_LIGHT_TURNS`) rather than left cold.
 		# SYNERGY: Detonation pays 250% of the bank's remaining damage (325%
 		# with Focused Flame), so doubling a deep stack is the largest single
 		# swing available to him. Pairs directly with SLOW BURN — stall, double,
@@ -4292,7 +4294,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"cost": 20, "damage": 25, "pressure": 8, "delay": 2.0,
 				"cooldown": 3, "anim": "attack02",
 				"perfect_id": "", "perfect_text": "Burn turns TRIPLED",
-				"description": "Feed the coals: 25% of Attack, and if\nthe target is Burning its remaining\nBurn turns are DOUBLED. Nothing extra\nagainst an enemy that is not alight.\nOverburn reads the field BEFORE the\ndoubling — later casts collect on it."})
+				"description": "Feed the coals: 25% of Attack, and if\nthe target is Burning its remaining\nBurn turns are DOUBLED; an enemy not\nalight is set Burning for 3 turns.\nOverburn reads the field BEFORE the\ndoubling — later casts collect on it."})
 		# AXIS: fire converted into survival rather than into damage — the only
 		# card in his kit that does it, and the Inferno build's cash-in where
 		# Detonation is the Detonation build's.

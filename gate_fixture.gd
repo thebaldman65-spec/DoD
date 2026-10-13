@@ -590,7 +590,8 @@ static func hero_draft(screen: Node) -> Node:
 # the cap the first card its bench step offers; **the zone boss's first card** — it has no
 # decline — and its bench step's first card where the cap asks one; **the first upgrade**; the
 # first rune (or an empty cache let go); then the Confirm. Returns what was pressed —
-# {hero, card, bench, declined, boss, boss_bench, upgrade, rune, let_go, confirmed} — for the
+# {hero, card, bench, declined, boss, boss_bench, upgrade, rune, let_go, confirmed, and since IE §5
+# boss_let_go and upgrade_let_go} — for the
 # walker to record. A screen whose Confirm would not press is left up and says so
 # (`confirmed` false).
 static func answer_hero_draft(tree: SceneTree, screen: Node, take_card: bool) -> Dictionary:
@@ -599,7 +600,8 @@ static func answer_hero_draft(tree: SceneTree, screen: Node, take_card: bool) ->
 		return {}
 	var idx := int(ov.get_meta("hero_draft"))
 	var out := {"hero": idx, "card": "", "bench": "", "declined": false, "boss": "",
-		"boss_bench": "", "upgrade": "", "rune": "", "let_go": false, "confirmed": false}
+		"boss_bench": "", "upgrade": "", "rune": "", "let_go": false, "confirmed": false,
+		"boss_let_go": false, "upgrade_let_go": false}
 	var dec: Array = bound_buttons(ov, "_stage_draft_decline")
 	var shape := PackedStringArray()
 	if not dec.is_empty():
@@ -627,6 +629,8 @@ static func answer_hero_draft(tree: SceneTree, screen: Node, take_card: bool) ->
 	out["boss"] = bu["boss"]
 	out["boss_bench"] = bu["boss_bench"]
 	out["upgrade"] = bu["upgrade"]
+	out["boss_let_go"] = bu["boss_let_go"]
+	out["upgrade_let_go"] = bu["upgrade_let_go"]
 	var runes: Array = bound_buttons(hero_draft(screen), "_stage_draft_rune")
 	if not runes.is_empty():
 		out["rune"] = String(bound_args(runes[0], "_stage_draft_rune")[1])
@@ -664,9 +668,11 @@ static func clear_picks(party: Array, idx: int) -> void:
 # own buttons: the zone boss's first card (`_stage_boss`; it has no decline) and its bench step's
 # first card where the cap asks one, then the first upgrade (`_stage_upgrade`). `answer_hero_draft`
 # calls it, and so does `check_fh`, whose own draft half reads each card's tag line — one answer
-# to these two, not two. Returns {boss, boss_bench, upgrade}.
+# to these two, not two. **BATCH IE §5 — AN EMPTY OFFER IS SPENT**: where a section has no card
+# and draws its *Let it go* (`_stage_spend`), that is pressed, as an empty cache's is. Returns
+# {boss, boss_bench, upgrade, boss_let_go, upgrade_let_go}.
 static func answer_boss_and_upgrade(tree: SceneTree, screen: Node) -> Dictionary:
-	var out := {"boss": "", "boss_bench": "", "upgrade": ""}
+	var out := {"boss": "", "boss_bench": "", "upgrade": "", "boss_let_go": false, "upgrade_let_go": false}
 	var bcards: Array = bound_buttons(hero_draft(screen), "_stage_boss")
 	if not bcards.is_empty():
 		out["boss"] = String(bound_args(bcards[0], "_stage_boss")[1])
@@ -678,6 +684,16 @@ static func answer_boss_and_upgrade(tree: SceneTree, screen: Node) -> Dictionary
 		out["upgrade"] = String(bound_args(ups[0], "_stage_upgrade")[1])
 		(ups[0] as Button).emit_signal("pressed")
 		await frames(tree, 1)
+	# Each press redraws the screen, so each spend is looked up on the screen as it stands.
+	for which in ["bspent", "uspent"]:
+		for sp in bound_buttons(hero_draft(screen), "_stage_spend"):
+			if String(bound_args(sp, "_stage_spend")[1]) != which:
+				continue
+			(sp as Button).emit_signal("pressed")
+			await frames(tree, 1)
+			out["boss_let_go" if which == "bspent" else "upgrade_let_go"] = true
+			_census("a spent %s let go" % ("boss pick" if which == "bspent" else "upgrade"))
+			break
 	return out
 
 

@@ -641,17 +641,23 @@ func _live_stoke() -> void:
 	ok(int(b.get_status("burn").get("turns", 0)) == 14,
 		"...and 7 to 14, which no flat addition does (got %d)" % \
 			int(b.get_status("burn").get("turns", 0)))
-	# THE EMPTY CASE. A flat addition would still fire here and light a fire
-	# that was never lit, so this is what tells a multiplier from an adder.
+	# THE EMPTY CASE. RE-POINTED IN PLACE BY BATCH IE §3b, AND IT IS AN INVERSION: Stoke lit
+	# nothing here until IE gave it its Burn (the Mage's fire was read by more cards than laid it,
+	# the designer's finding). What told a multiplier from an adder is the two depths above —
+	# 3 to 6 and 7 to 14 — and they stand; on a cold enemy it now LIGHTS, at its own figure.
 	var c: BattleUnit = foes[0]
 	c.remove_status("burn")
 	_seeded()
 	var hp_before: int = c.hp
 	await scene.call("_resolve", py, _card("Stoke"), c, "good")
-	ok(not c.has_status("burn"),
-		"Stoke lights NOTHING on an enemy that is not alight")
-	ok(c.hp < hp_before, "...but its 25% of Attack still lands")
-	# THE PERFECT TRIPLES rather than doubling twice.
+	var lit_turns := int(c.get_status("burn").get("turns", 0))
+	ok(lit_turns == int(scene.get("STOKE_LIGHT_TURNS")) and lit_turns > 0,
+		"Stoke sets an enemy that is not alight Burning for its own %d turns (got %d)" % [
+			int(scene.get("STOKE_LIGHT_TURNS")), lit_turns])
+	ok(c.hp < hp_before, "...and its 25% of Attack still lands")
+	# THE PERFECT TRIPLES rather than doubling twice — on a bank of 4 laid fresh (the light above is cleared
+	# first, since a Burn re-laid ADDS its turns).
+	c.remove_status("burn")
 	scene.call("_apply_status", c, "burn", 4, 0, 6, py)
 	_seeded()
 	await scene.call("_resolve", py, _card("Stoke"), c, "perfect")

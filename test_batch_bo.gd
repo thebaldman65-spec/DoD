@@ -1018,8 +1018,10 @@ func _live_pyromancer() -> void:
 	await scene.call("_resolve", pyro, fb, foes[1], "good")
 	ok(pyro.resource >= 40 - fb.cost,
 		"§5: ...and a second, unmarked fire bills him nothing to hold")
-	# CINDERFALL — wide, and it skims every bank.
-	var before_burn := int(scene.call("_total_burn_turns"))
+	# CINDERFALL — wide, and it skims every bank. RE-POINTED BY BATCH IE §3b: it read the FIELD's
+	# total falling, and since IE an enemy not alight catches (`CINDERFALL_LIGHT_TURNS`), so the total
+	# can rise while every bank is skimmed. The question is asked of the bank it read: Ember Debt's.
+	var bank_before := int(foes[0].get_status("burn").get("turns", 0))
 	var hp_before: Array = [foes[0].hp, foes[1].hp, foes[2].hp]
 	var cf: Ability = scene.call("_find_ability", pyro, "Cinderfall")
 	await scene.call("_resolve", pyro, cf, foes[0], "good")
@@ -1028,9 +1030,9 @@ func _live_pyromancer() -> void:
 		if foes[i].hp < hp_before[i]:
 			struck += 1
 	ok(struck == 3, "§5: Cinderfall hits the whole field (%d of 3)" % struck)
-	ok(int(scene.call("_total_burn_turns")) < before_burn,
-		"§5: ...and skims Burn from the banks it hits (%d -> %d)" % [
-			before_burn, int(scene.call("_total_burn_turns"))])
+	var bank_after := int(foes[0].get_status("burn").get("turns", 0))
+	ok(bank_before > 0 and bank_after < bank_before,
+		"§5: ...and skims Burn from the banks it hits (%d -> %d)" % [bank_before, bank_after])
 	await _drop(scene)
 
 

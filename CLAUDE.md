@@ -116,7 +116,7 @@ into this file changes it.
 the equality rule travel with their parent. **Eight of the rows are FF §2's**, and they are the
 residue: rules written into this file AFTER the seam was taken, which the seam's own test puts on
 the other side of it. **Every row after those eight was written straight into the reference rather
-than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two and ID's one —
+than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one and IE's two —
 and GW §2's, written there at GW and given its row only at HX (HV §3e found it missing; `check_hx` §1a now reds on one) —
 and two more are MOVED, FF §2's way: HG–HJ's census and supersession blocks, written back into this file after the seam
 was taken and sent over at HY §4 by the designer's ruling, byte for byte (`check_hx` §1c reds on a new block written here):
@@ -176,6 +176,8 @@ was taken and sent over at HY §4 by the designer's ruling, byte for byte (`chec
 | A BATCH RE-READS THE REFERENCE CLAIMS THAT NAME WHAT IT TOUCHED | HY §6 |
 | A LIVE COUNT IN A REFERENCE POINTS AT THE INSTRUMENT THAT PRINTS IT, OR CARRIES ITS BATCH | HY §6 |
 | A CENSUS A LATER BATCH WILL BE PRICED AGAINST IS KEPT, NOT JUST COUNTED | ID §0.6 |
+| A BRIEF STATES WHAT A BATCH INTENDS TO TOUCH, NEVER WHAT IT DOES NOT | IE §0.6 |
+| THE LITERAL SWEEP RUNS BEFORE THE PREDICTION, NOT AFTER IT | IE §0.5 |
 
 ## THE COMBAT RULES LIVE IN `docs/combat-rules.md` (STANDING, SET AT GR §2, RULED BY THE DESIGNER)
 > **THIS FILE IS STILL THE ONE A BATCH MUST READ. `docs/combat-rules.md` IS A REFERENCE IT POINTS AT,
@@ -2202,8 +2204,15 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
     its *Class:* line — and the class-selection card's, and four permanent chips in a row whose job is *what changed* is
     noise. **It was laid through `add_status`, so it was a Sanctity event and a float on every hero at every spawn**: its
     going takes four events and four dice from every battle's opening (measured at ID and reported, not compensated). **A
-    display chip laid through the status door is a status to everything that counts statuses** — the engine chips (★)
-    still are; a chip that is not a status is drawn as the rune chips are (`set_rune_chips`).
+    display chip laid through the status door is a status to everything that counts statuses** — so a chip is drawn as
+    the rune chips are (`set_rune_chips`) and never laid through that door.
+  · **A CHIP IS NOT A STATUS (IE §0.2, the designer's): a chip is drawn to tell the player something; it is not an event
+    in the fiction**, and Sanctity claims to count statuses. **The engine chips (★) are drawn so since IE §2a** — one a
+    held engine, in `BattleUnit.engine_chips` (`set_engine_chip`, read by `engine_chip`), first in the plate's row;
+    nothing ticks, dispels or counts them, and they book no Sanctity event and float no die. Up to twelve of them had
+    fed a Hierophant before anyone acted. **Every other display chip still laid through the status door is IE's kept
+    census** (`docs/reports/IE.md` §2: the sweep's rule, command and output), owed the same answer chip by chip;
+    `check_ie` §2 drives the engine chips and prints the sweep.
   · **THE VOW'S CHIP SAYS WHAT IT SILENCES THAT HE HOLDS (ID §4)** — his ground's reflect, the Ruin draught his blows would
     drink, Suffering's heal — each named only while he holds what pays it, the heal figure read off his payload; IN EFFECT
     while one is live (his ground laid, a Ruined enemy standing), ARMED otherwise.
@@ -4332,20 +4341,36 @@ fact that they are.
   all four, in the order they are drawn. **The cap is counted across the two offers in that order** (`_bench_needed`): the
   draft's card takes a free slot first, and a card one offer benches is not offered to the other; a card in both offers is
   drawn in the second dead. **A section with nothing he can take now does not hold the Confirm** — it says why and stays
-  owed, as the overlay's *Not yet* left it. **THE WIDEST SCREEN IS FOUR COLUMNS, 1,220 PX OF 1,280**, each column's text
+  owed, as the overlay's *Not yet* left it — **while what it holds can come back: an offer with NOTHING LEFT AT ALL IS
+  SPENT (IE §0.3, the designer's)**, in FM §3's shape and words (*Let it go*), which the rune cache already used.
+  **◆ MAY NOT STAND ON A PICK THAT CANNOT BE ANSWERED AND CANNOT BECOME ANSWERABLE**: a mark that says a decision waits, on
+  a card where none is possible for the rest of the run, is the lie the glyph rules exist to prevent. Measured before it
+  was built (IE §5): an offer re-asked to nothing is written back empty and every later re-ask returns it unchanged — the
+  zone boss's and the mini-boss's top up only for a candidate they drop — so neither refills; a boss offer HELD BACK for
+  an engine or the pet is not empty and stays owed (`map_screen._boss_spent`, `_upgrade_spent`; `check_ie` §5). **THE WIDEST SCREEN IS FOUR COLUMNS, 1,220 PX OF 1,280**, each column's text
   in its own scroller with Godot's bar, the Confirm and Later outside every scroller (`check_id` §1b measures it).
-  · **THE WORDS (IC §0.2, ID §2)**: the title is *THE DRAFT* whenever an ability is on the screen and otherwise names what
-    is — *THE CACHE*, *THE UPGRADE*, *THE UPGRADE AND THE CACHE* — **and never misnames its own screen**; the owed line is
-    what he is owed as one sentence, then *Decide, then confirm.*; the counter counts to four in words with no
-    parenthesis — **four is its ceiling, one choice a kind** — and the Confirm says the title's noun.
-- **◆ MEANS A DECISION WAITS, AND NOTHING ELSE, ANYWHERE (IC §0.4, the designer's). ✦ counts what is held and unworn, and
-  a holding and a pick never share a glyph** — a mark exists so the player sees at a glance whether he owes something.
+  · **THE WORDS (IC §0.2, ID §2, IE §0.4)**: the title is *THE DRAFT* whenever the draft is on the screen — the more
+    specific door — and otherwise names what is, joined as the owed line joins: *THE ABILITY* (a zone boss's pick, which
+    read THE DRAFT until IE), *THE UPGRADE*, *THE CACHE* — *THE ABILITY, THE UPGRADE AND THE CACHE* — **and never misnames
+    its own screen**. **The title names the kinds on the screen, joined; the owed line enumerates them precisely** (IE
+    §0.4, the designer's): the title is a header and the line the statement, which is not the duplication the glyph and
+    count rules forbid. The owed line is what he is owed as one sentence, then *Decide, then confirm.*; the counter counts
+    to four in words with no parenthesis — **four is its ceiling, one choice a kind** — and the Confirm says the title's noun.
+- **◆ MEANS A DECISION WAITS. ↑ NAMES AN UPGRADE. ✦ NAMES A RUNE (IE §0.1, the designer's; ◆ from IC §0.4, ↑ from ID §0.1).
+  Three glyphs, three meanings, and nothing else uses them; a holding and a pick never share a glyph** — a mark exists so
+  the player sees at a glance whether he owes something.
   **↑ NAMES AN UPGRADE, WHEREVER ONE APPEARS (ID §0.1, the designer's)** — the map card's corner (↑N, IC §3), an upgraded
   ability's battle button and hero-sheet chip, and the Blacksmith's offer, which is not a holding: one glyph for the thing,
   learned once. **Built at ID §3, and asserted** (`check_id` §3a): in the game's code every ◆ is a pending pick's badge
   and ↑ is drawn on those four surfaces and nowhere else; the class passive's ◆ chip is deleted (the chip bullet under
-  *A CHIP SAYS WHAT PAYS NOW*), and a rare relic reads the word RARE on the shelf and in the picker. *✦ also marks a worn
-  rune or a carried card on three panels, a rune's chip in battle and the Empower toggle — FOUND AT ID, its ruling owed.*
+  *A CHIP SAYS WHAT PAYS NOW*), and a rare relic reads the word RARE on the shelf and in the picker. **✦ STAYS WHERE IT
+  NAMES A RUNE** — the battle's rune chip (`RUNE_CHIP_TAG`) and a count of the runes a hero holds unworn (the nameplate's
+  and the bag's `✦ N`, each labelled, and the kit preview's prose) — **AND GOES WHEREVER IT DUPLICATES A STATE THE SURFACE
+  ALREADY STATES** (IA §3's rule): off the hero sheet's worn row, beside a column that says WORN, and off the Empower
+  toggle, which is no rune (IE §4). Asserted (`check_id` §3a): every ✦ in the game's code is a rune's mark or a rune
+  count — **but the loadout panel's carried card, named there: that panel has no section head and no state column, the
+  rune panel before IA, and the crest panel marks its worn crest rune in a section that mixes worn and bagged** (FOUND AT
+  IE, not its build).
 - **THE CREST RUNE STAYS OUT OF A HERO'S PICK (HW §1c), AND A SCREEN A HERO IS WHERE IT WOULD QUIETLY RE-MERGE**: the
   RUNES section draws `Run.rune_choice`, which repairs a crest rune out of a queued triple, and the crest's bag is not
   touched by a hero's answer (`check_ib` §2d).

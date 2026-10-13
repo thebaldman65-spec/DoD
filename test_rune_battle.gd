@@ -450,7 +450,7 @@ func _pass(mage_spec: String, cleric_spec: String) -> void:
 			scene.call("_apply_status", lit_foe, "burn", 3, 0, 6)
 		var lit: int = scene.call("_total_burn_turns")
 		scene.call("_update_talent_chips")
-		var chip := String(py.get_status("spec_passive").get("desc", ""))
+		var chip := String(py.engine_chip("overburn").get("desc", ""))  # IE §2a: a chip, not a status
 		ok(chip.find("Overburn") >= 0,
 			"pyromancer: the passive chip does not name Overburn (%s)" % chip)
 		ok(lit > 0 and chip.find("+%d%%" % (lit * 2)) >= 0,

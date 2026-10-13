@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-10-12 (Batch ID &mdash; one surface, and the glyphs)</b></p>
+<p align="right"><b>Last updated: 2026-10-13 (Batch IE &mdash; the resources, and the Mage's fire)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1157,7 +1157,7 @@ converts an assembled TOTAL, and both can fire on one blow. Spent by Coup de Gr�
 hero falls below 50% health (any damage source; crossings count each time). Each
 stack held: <b>+5% healing done and 5% less damage taken</b> &mdash; 25% at the five the bar holds. Stacks are SPENT on Hymn of Hope (1), Divine Plea (2),
 and Resurrection (1) — costs are paid before the cast resolves, so a spender heals with
-what remains — or on <b>Empowerment</b>: the ✦ Empower toggle (hotkey C) arms the next
+what remains — or on <b>Empowerment</b>: the Empower toggle (hotkey C) arms the next
 supporting cast for +1 extra stack and a bonus effect. <b>Empowered casts forgo their
 perfect bonus.</b> At maximum stacks a
 further crossing is wasted unless <b>Alms</b> holds, which turns it into a ward for the
@@ -1625,8 +1625,9 @@ where it came from (<i>from the elite</i>, <i>from an event</i>, <i>from the zon
 <b>UPGRADES</b> section for a mini-boss's upgrade, naming each choice <i>card: upgrade</i> with what the upgrade
 does and the figures it moves on that card (<i>Damage: 35% &rarr; 52%</i>), and a <b>RUNES</b> section for a
 cache, each only when it is owed, so a bargain's rune comes alone. Its title names what is on it &mdash;
-<b>THE DRAFT</b> whenever an ability is, else <b>THE CACHE</b>, <b>THE UPGRADE</b> or <b>THE UPGRADE AND THE
-CACHE</b> &mdash; and the line under it says what he is owed in one sentence, then <i>Decide, then confirm.</i>
+<b>THE DRAFT</b> whenever the draft is on it, and otherwise the kinds it holds, joined &mdash; <b>THE ABILITY</b>
+(a zone boss's), <b>THE UPGRADE</b> and <b>THE CACHE</b>, as in <b>THE ABILITY, THE UPGRADE AND THE CACHE</b> &mdash;
+and the line under it says what he is owed in one sentence, then <i>Decide, then confirm.</i>
 The widest screen, all four owed, is four columns side by side, each scrolling with a visible bar where its
 text runs long. A hero who
 <b>fell</b> during the fight is back on their feet before the screen opens (every won battle returns the
@@ -1653,7 +1654,11 @@ incoming card replaces before his ABILITIES section counts as decided. The named
 first and the boss's then names what it replaces if none is left; a card one names is not offered to the other,
 and a card in both offers can be taken from only one.</li>
 <li><b>A zone boss's ability is never declined</b> &mdash; the award always pays &mdash; but an offer whose every card
-waits on a core rune he has unequipped says so and stays owed, and does not hold up the rest of his screen.</li>
+waits on a core rune he has unequipped says so and stays owed, and does not hold up the rest of his screen.
+<b>An offer with nothing left in it at all</b> &mdash; every card it held already his, and nothing left to draw, or a
+mini-boss's upgrades all taken with none left that fits a card he holds &mdash; cannot fill again, so it is
+<b>spent</b>: the section says so and offers <b>Let it go</b>, as an empty rune cache does, and the pick and its
+mark leave his card.</li>
 <li><b>A hero's screen resolves as one action.</b> Every section is chosen, then the screen is confirmed — so
 any can be reconsidered until then; the Confirm counts what is still to choose (<i>Two choices still to
 make</i>). <b>Later</b> commits nothing: every pick stays owed on his card and opens again the next time the
@@ -1917,10 +1922,10 @@ beside. A card that appears in nobody's build plan is a card that fills a slot.<
 <tr><td><b>Recompense</b></td><td>20 Rage, 1.0, 4cd, self</td><td>For 6 turns, whenever Blocking resets his Heavy Plating bonus he <b>gains Rage equal to the percentage points lost</b> — a reset from +32% pays 32 Rage. <b>Anvil prevents those resets, so the two do not stack.</b></td><td>Getting paid for the cruelty instead of preventing it. The deeper the climb was, the larger the payout, so the term that makes the sawtooth hurt is the term that makes this good.<br><b>Anvil and Recompense actively fight each other, and that is intended</b> — they are two answers to the same cruelty, not a stack.<br><b>Builds with:</b> everything he spends Rage on: <b>Shield Slam</b>, <b>Vendetta</b>, <b>Eye of the Storm</b> and <b>Aegis Wall</b>.</td></tr>
 <tr><td><b>Turn the Blade</b></td><td>25 Rage, 1.0, 4cd, self</td><td>For 4 turns, <b>every attack he BLOCKS deals Break damage to the attacker equal to half the damage the block refused</b>. <b>A blow that gets through pays nothing</b> — only a block.</td><td>The block pointed outward. A block negates an attack entirely and paid him nothing beyond that; Aegis Wall made it worth something to the heroes, and this makes it cost something to the enemy that threw it.<br><b>Builds with:</b> the <b>Occultist's Breaking Darkness</b>, which lands every point of it 25% harder — this makes <b>three specs across three classes</b> generating Break that it amplifies. <b>Anvil</b>, <b>Shieldwall</b> and <b>Interpose</b> buy the blocks that scale it.</td></tr>
 <tr><td colspan="4"><b>Pyromancer</b> — <i>different answers to how do you commit</i></td></tr>
-<tr><td><b>Cinderfall</b></td><td>30 Mana, 3.0, 3cd, all enemies</td><td>20% of Attack across the field, then tears 2 turns of Burn from each burning enemy to deal that much again to it (Perfect: 3 turns). Overburn refunds every turn taken.</td><td>Spending wide instead of deep — Detonation empties one bank, this skims them all.</td></tr>
+<tr><td><b>Cinderfall</b></td><td>30 Mana, 3.0, 3cd, all enemies</td><td>20% of Attack across the field, then tears 2 turns of Burn from each burning enemy to deal that much again to it (Perfect: 3 turns); <b>each enemy it rakes that was not alight is set Burning for 2 turns</b>. Overburn refunds every turn taken.</td><td>Spending wide instead of deep — Detonation empties one bank, this skims them all, and what was cold catches.</td></tr>
 <tr><td><b>Ember Debt</b></td><td>20 Mana, 2.0, 4cd, one enemy</td><td>No damage. 12 turns of Burn, and <b>Overburn refunds every one of those turns immediately</b>, as though he had already consumed them. The fire still burns its full term.</td><td>Paid before it burns — every other Burn payout empties the bank; this one does not.</td></tr>
 <tr><td><b>Slow Burn</b></td><td>15 Mana, 1.5, 4cd, no target</td><td>For 4 turns, the Burn on <b>every enemy stops counting down</b>. It still burns for its full damage each turn — it just never gets shorter. The mark rides enemies not yet alight, so fire laid inside the window is held too.</td><td>Time, bought. Every payoff he owns reads a bank that is shrinking under him, and nothing in his kit could slow it.<br><b>Builds with:</b> <b>Firestorm</b> above all — it is strongest straight after one, which lays 12–16 burn-turns in one cast.</td></tr>
-<tr><td><b>Stoke</b></td><td>20 Mana, 2.0, 3cd, one enemy</td><td>25% of Attack, and if the target is Burning its <b>remaining Burn turns are DOUBLED</b> (Perfect: tripled). Nothing extra against an enemy that is not alight. Overburn reads the field <i>before</i> the doubling, so later casts are what collect on it.</td><td>The bank multiplies instead of growing — worth exactly as much as the stack he built, and nothing on an empty one.<br><b>Builds with:</b> <b>Detonation</b> (250% of the bank), so doubling a deep stack is his largest single swing; and <b>Slow Burn</b> — stall, double, detonate.</td></tr>
+<tr><td><b>Stoke</b></td><td>20 Mana, 2.0, 3cd, one enemy</td><td>25% of Attack, and if the target is Burning its <b>remaining Burn turns are DOUBLED</b> (Perfect: tripled). <b>An enemy that is not alight is set Burning for 3 turns.</b> Overburn reads the field <i>before</i> the doubling, so later casts are what collect on it.</td><td>The bank multiplies instead of growing — worth as much as the stack he built, and on a cold enemy it lights one.<br><b>Builds with:</b> <b>Detonation</b> (250% of the bank), so doubling a deep stack is his largest single swing; and <b>Slow Burn</b> — stall, double, detonate.</td></tr>
 <tr><td><b>Funeral Pyre</b></td><td>25 Mana, 2.5, 4cd, one enemy</td><td>Consumes <b>all</b> Burn on the target and grants a shield worth <b>200% of the damage that Burn would still have dealt</b>, for 3 turns. Overburn refunds every turn consumed. Unusable with nothing alight.</td><td>The only card in his kit that converts fire into survival — the defensive cash-in, where Detonation is the offensive one.<br><b>Builds with:</b> <b>Immolate</b>, a percentage cut where this is the flat term. Overburn's refund pays 1 Mana a turn, so a deep stack cashed here is a shield <i>and</i> a pool.</td></tr>
 <tr><td><b>Firedraw</b></td><td>25 Mana, 2.5, 4cd, one enemy</td><td>Consumes <b>6 turns of Burn from every OTHER enemy</b> and adds all of it to this one. It takes what is there <b>or 6, whichever is less</b> — an enemy holding 2 gives 2, not a debt — and it <b>never touches the target's own Burn</b>. Unusable with nothing alight.</td><td>The bank consolidated. Detonation pays 250% of <i>one</i> enemy's remaining Burn, so a field of shallow fires is worth far less than one deep one — and until now the only way to build a deep stack was to keep casting at the same body.<br><b>Builds with:</b> <b>Detonation</b>, which pays on the deep stack it builds. It is the deliberate counterpart to <b>Cinderfall</b>, which spreads the spend where this concentrates it — and under <b>Emberkeep</b> the fire it delivers arrives doubled.</td></tr>
 <tr><td><b>Pyre Wake</b></td><td>25 Mana, 2.5, 4cd, one enemy</td><td>Consumes <b>ALL</b> its Burn. <b>For each turn consumed</b>, a random enemy is set Burning for 1 turn and takes 8% of Attack (Perfect: 12%). Overburn refunds every turn consumed. Unusable with nothing alight.</td><td>The bank scattered rather than cashed. A twelve-turn stack becomes twelve small fires and 96% of Attack spread across the board — <b>the only card in the game that converts depth into width</b>, and the natural answer when the deep target is about to die anyway.<br><b>Builds with:</b> <b>Slow Burn</b> — scatter, then stop the tick-down. Overburn's refund pays 1 Mana a turn.</td></tr>
@@ -3464,7 +3469,7 @@ so: "✕ Cancel (X)").</li>
 Items" button opens the same window): Tab cycles the usable items, Space uses the
 highlighted one, X closes. One item per hero per turn, and items never consume the
 turn.</li>
-<li><b>C — Empower (Holy Cleric):</b> toggles the ✦ Empower button on the action bar
+<li><b>C — Empower (Holy Cleric):</b> toggles the Empower button on the action bar
 while at least 1 Mercy is held — the next
 Heal / Renewal / Hymn / Resurrection / Divine Plea spends +1 Mercy for its bonus effect
 (and forgoes its perfect bonus). The toggle disarms after the cast and at the start of

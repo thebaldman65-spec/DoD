@@ -1123,7 +1123,7 @@ func _live_chip() -> void:
 		return
 	var lit := _light(scene, 4)
 	scene.call("_update_talent_chips")
-	var chip: Dictionary = py.get_status("spec_passive")
+	var chip: Dictionary = py.engine_chip("overburn")  # BATCH IE §2a: the chip is not a status
 	ok(not chip.is_empty(), "the Pyromancer carries a passive chip")
 	var desc := String(chip.get("desc", ""))
 	ok(desc.contains("Overburn"), "the chip names Overburn (%s)" % desc)

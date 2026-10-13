@@ -1434,7 +1434,16 @@ func _live_aegis_wall() -> void:
 		"and the same %d to an ally with no healing multiplier (got %d)" % [
 			expected, heroes[1].hp - before[1]])
 	# BLOCK FORCED OFF — the same blow, landing. This is the clause.
-	wd.block_chance = 0.0
+	# BATCH IE — CONSTRUCTED, NOT DEALT. A field of zero does not turn a Warden's
+	# Block off — Heavy Plating's slice (its 15% and its climb, `_plating_slice`)
+	# stands on top of it, and the miss roll stood too — so whether this blow got
+	# through was the dice's: HEAD's landed it, and IE's, one die shorter at every
+	# spawn once the engine chip left the status door, Blocked it and the wall
+	# paid. A NEGATIVE field is what disables it (`check_cm_live`'s own lesson),
+	# and the raider cannot miss (`no_cover`, the miss roll's own bypass, put back
+	# after); the blow is asserted to land, so a pass cannot be a miss.
+	wd.block_chance = -1.0
+	raider.no_cover = 1
 	wd.hp = 100
 	for h in heroes:
 		h.hp = 100
@@ -1442,12 +1451,16 @@ func _live_aegis_wall() -> void:
 	for h in heroes:
 		before_hit.append(h.hp)
 	await scene.call("_resolve", raider, swing, wd, "good")
+	ok(wd.hp < before_hit[heroes.find(wd)],
+		"the blow lands on the Warden with no Block anywhere (%d -> %d)" % [
+			before_hit[heroes.find(wd)], wd.hp])
 	var paid_on_hit := false
 	for i in heroes.size():
 		if heroes[i] != wd and heroes[i].hp > before_hit[i]:
 			paid_on_hit = true
 	ok(not paid_on_hit,
 		"AND A HIT THAT GETS THROUGH PAYS NOTHING — it reads BLOCKS, not damage")
+	raider.no_cover = 0
 	# THE LIVE MAXIMUM. Tenacity grows it +15 a block, so the heal must grow with
 	# it — a cast-time snapshot pays the old number forever. FX: the Tenacity
 	# node is deleted and `tenacity` has no live writer; the maximum is moved by

@@ -125,7 +125,16 @@ const SRC_FLOOR := 107
 # with it. It was a HERO-SIDE self-status and passed no source, so `with_src` stays
 # 115 and the unstamped remainder goes 105 -> 104. Found by running this gate
 # unmodified against HZ's code, before it was touched.
-const CALL_SITES := 219
+#
+# **BATCH IE MOVED IT 219 -> 221, AND SAYS WHY. Net +2, two arrivals.** Stoke sets
+# an enemy that is not alight Burning (`STOKE_LIGHT_TURNS`) and Cinderfall sets
+# every enemy it rakes that was not alight Burning (`CINDERFALL_LIGHT_TURNS`) —
+# IE §3b's repair of two fire cards that laid no Burn. Both land on an ENEMY and
+# pass the Mage as the source, DI's rule, so `with_src` moves 115 -> 117 and the
+# unstamped remainder stays 104. Found by running this gate unmodified against
+# IE's code in the reconnaissance, where its prediction did not name it: a pin
+# that is a number is one no literal sweep can see.
+const CALL_SITES := 221
 
 # Four plain afflictions: all in `DEBUFF_IDS`, none sticky, none on the boss
 # immunity list, so `_harvest_yield` counts all four and `purge_debuffs` takes

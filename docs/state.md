@@ -29,63 +29,127 @@ never have fired: **an alarm set above the failure level is not an alarm.** `che
 sentence every battery: over it is a warning, and past it by more than one batch at the record is a failure — the largest
 single-batch growth on record is **+13.38 KiB** (ES's +13,700 B). *In the preamble for the archive pointer's reason.*
 
-*Last rewritten: 2026-10-12 (Batch ID).*
+*Last rewritten: 2026-10-13 (Batch IE).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: ID — ONE SURFACE, AND THE GLYPHS.** IMPLEMENT ONLY. **Game code changed in eight files** — `map_screen.gd` (the fold,
-  its words, the Kit button), `run_state.gd` (the draft's source, the upgrade's preview, Mirrorbound's line), `events.gd` (an event's
-  draft says so), `battle.gd` (↑ on the button, the class passive's chip deleted, the vow's chip), `party_screen.gd`,
-  `blacksmith_screen.gd`, `relics_screen.gd` and `draft_screen.gd` (the glyphs). Full working: **`docs/reports/ID.md`**. **The next
-  letter is IE** — the Cleric's regen and the Mage's fire (the roadmap, below).
-- **§0 — IC's FIVE RULINGS, ANSWERED (the designer's).** ◆ moved off everything that is not a waiting decision (built, §3). The vow
-  stays as it is — its trade is a real build decision, worst for the damage-flavoured Occultist, which is right; *it improves as the
-  run goes on* is on the watch list. The recoil floor stays — *the floor is the bargain's, not the blow's* (`docs/combat-rules.md`).
-  A silenced hit marks and does not shake — *the shake is damage's* (the same block). ABILITIES holds a draft and a boss's card (§1).
-  **A census a later batch is priced against is kept** (`docs/instrument-rules.md`, §0.6).
-- **§1 — ONE SCREEN, AND THE PICK OVERLAY IS RETIRED.** Every pick a hero is owed is a section of his own screen: **ABILITIES** — the
-  draft's offer and the zone boss's side by side, each labelled with its door (*from the elite*, *from an event*, *from the zone
-  boss*), the boss's cards with their numbers — **UPGRADES** (each choice *card: upgrade*, its sentence and the figures it moves on
-  that card) and **RUNES**. One Confirm commits all four; the cap is counted across the two ability offers; a section with nothing
-  to take now says so and stays owed. **The longest screen**, a hero owing all four at the cap with both bench steps, is four
-  columns, 1,220 px of 1,280, measured before the sections were written; every column scrolls with Godot's bar where it outgrows.
-- **§2 — THE WORDS.** The title never misnames its screen (THE DRAFT / THE CACHE / THE UPGRADE / THE UPGRADE AND THE CACHE); the owed
-  line is one sentence and *Decide, then confirm.*; the counter counts to four in words.
-- **§3 — THE GLYPHS.** ↑ names an upgrade on the battle button, the sheet's chip, the Blacksmith's offer and the map's corner; the
-  class passive's chip is deleted (the passive reads on the sheet); a rare relic says RARE; **every ◆ left in the game's code is a
-  pick's badge** — the sweep kept (rule, command, output) in the report. ✦ was found carrying four meanings (ID's ruling 1).
-- **§4 — THREE LINES MADE TRUE.** The vow's chip names what it silences that he holds; Mirrorbound's card says the floor and both
-  sides; the map card's Kit button sits inside the card.
-- **THE INSTRUMENTS.** `check_id` is new. It drives the fold on the real map — each kind of pick opening its own section, both ability offers labelled with their doors, the cap counted across them and the zone boss's commit door alone, the longest screen (four kinds at the cap with both benches) and the emptiest measured, the words for all fifteen combinations, every ◆ a pick's badge and ↑ on its four surfaces, the vow's chip off his payload, Mirrorbound's card on a real board and the Kit button inside its card (209 checks). **Eighteen gates and suites were re-pointed off the retired overlay** — the five road walkers through the one helper, grown to answer the boss's and the upgrade's sections — each to the question it asked and each at its row; **`check_gt` was re-pointed off the sheet's old mark**. **`check_gp` moved 458 → 442, and it is the class passive's deleted chip — its four dice a spawn — not the fold**: an ok() trace and a stub that puts the three spawn lines back read HEAD's trace message for message. `check_parse` 219 (one target more).
-- **THE VERIFICATION.** The saves were backed up first and verified by hash (`../save-backups/ID-20261012-213521`): byte-identical to IC's backup — and to every backup since HW's, so nothing has been played since 2026-10-08. **One recon of HEAD's whole battery against all of ID's game code, predicted first** (143 targets, 21:58:49 to 23:28:09, `check_de` 589 / 31 / 1 notice): every red the prediction named — the gates that call the deleted overlay read SHORT rather than silent, six of seven — and three it missed, `test_batch_bx`'s two source needles, `test_batch_bo`'s third and `check_ed`, which the literal sweep run after named. **`check_gp` 458 → 442 is the chip's dice**, by an ok() trace and a stub. **Thirty controls**, each in its own clone: every planted defect red at its arm, the baseline green, HEAD's game code under ID's gates red at every arm; one (C25) found a hole and `check_id` closed it. **The 59 document readers** first, on the final documents in two isolated lanes, every one at its row. **The pre-pass**: 144 targets in an isolated copy proved equal to the tree (527 files, the project name aside), seeded from the backup, 23:42:18 to 01:03:13 — `check_de` 593 / 0 / 0, every target at its row, as predicted. **The acceptance run in the repository**: 144 targets, 23:42:18 to 01:03:15 (80 min 57 s, beside the pre-pass), `ps` read by rows every 15 s — 324 readings, 623 Godot rows across the two batteries, every one `--headless`, no game window — `check_de` 593 / 0 / 0, as predicted. The tree was byte-identical before and after (527 files, tracked and untracked) and the player's four files untouched. **Then the final tree**: these post-run lines, written after the run at a fixed point (this file states its own size), swept against every gate literal, and the four gates that open this file with the two manifest instruments re-run on it in an isolated copy, each at its acceptance reading.
-- **`CLAUDE.md` IS 459,773 B = 449.00 KiB AGAINST ITS 510 KiB CEILING — 61.00 KiB UNDER** (+3,566 B at ID): the re-measure's reading — 7.5 batches at EZ's record (62,467 ÷ 8,293), 17.5 at ID's own rate.
-- **`docs/state.md` IS 347,830 B = 339.68 KiB AGAINST ITS 380 KiB CEILING — 40.32 KiB UNDER** (+952 B at ID, this line included; IC's closed entries went to the archive): 7.0 batches at IA's +5,860 B (41,290 ÷ 5,860), 7.5 at HO–HW's +5,528 mean. **It still binds: 7.0 to 7.5 batches at its own rates against `CLAUDE.md`'s 7.5 at EZ's record — the re-measure is IG's**
-- **No save version moved**: the draft's source rides the member's `pick_sources`, which the save carries whole.
+- **Last batch: IE — THE RESOURCES, AND THE MAGE'S FIRE.** IMPLEMENT ONLY. **Game code changed in five files** — `battle.gd` (the
+  engine chips off the status door, Stoke's and Cinderfall's Burn, the Empower toggle's glyph), `unit.gd` (the engine chip's own
+  list and writer), `classes.gd` (Stoke's and Cinderfall's words), `map_screen.gd` (a spent pick, THE ABILITY) and `party_screen.gd`
+  (the sheet's worn row). Full working: **`docs/reports/IE.md`**. **The next letter is IF** — IC's remainder (the roadmap, below).
+- **§0 — ID's FOUR RULINGS, ANSWERED (the designer's).** ◆ means a decision waits, ↑ names an upgrade, ✦ names a rune. A chip is
+  not a status. An offer that can come back stays owed; one that cannot is spent. A zone boss's ability alone is THE ABILITY.
+  **Two rules recorded** in `docs/instrument-rules.md`: a brief states what a batch intends to touch, never what it does not; the
+  literal sweep runs before the prediction.
+- **§1 — THE CLERIC's MANA, MEASURED AND NOT MOVED.** His drip is the Hunter's (12; the Mage's 22). On the sim's default build he is
+  dry about as often as the other two; untalented, more often than the Mage. Only a HIGHER rate meets the shape he was to be
+  tuned to, so the rate stays at 12 and the curve is the designer's (THE CLERIC's MANA RATE, below; IE's ruling 1).
+- **§2 — A CHIP IS NOT A STATUS.** The engine chips (★) are drawn as the rune chips are — nothing ticks, dispels or counts them, and
+  they book no Sanctity event and float no die. A Hierophant's steps come about one of his turns later (ruling 2, nothing
+  authored). Every other display chip still laid as a status is IE's kept census (ruling 5).
+- **§3 — THE MAGE's FIRE.** **Stoke** sets a cold enemy Burning for 3 turns and still doubles a fire that stands; **Cinderfall** sets
+  what it rakes cold Burning for 2 and still skims what burns. A draft of readers with one applier now has Burn on most of its
+  turns; a draft with none falls just short; **Pyroblast** is the one left (ruling 3). No card authored.
+- **§4 — ✦.** Off the hero sheet's worn row and the Empower toggle; kept on the rune chip and the counts; the loadout panel and the
+  crest panel are found (ruling 4).
+- **§5 — TWO SMALL THINGS.** An offer that cannot refill — measured: neither the zone boss's nor the mini-boss's ever does — is let
+  go (*Let it go*), its ◆ gone; one held back stays owed. A zone boss's pick alone is **THE ABILITY**, joined with the others.
+- **THE INSTRUMENTS.** `check_ie` is new (§1's dry turn, §2a's chips, §3's fire and its census at a cold board, §4's surfaces, §5's
+  refill, spend, held-back and title). **Re-pointed to the question each asked**: the engine chip read through its own door
+  (`check_go`, `test_rune_battle`, `test_batch_ar`), `check_hu` §2a's census, Stoke's empty case (`test_batch_bt`), Cinderfall's
+  skim (`test_batch_bo`), the status door's call count (`check_di`, 221: the two lights), the sheet's worn row (`check_gx`),
+  `check_id`'s emptiest screen, its fifteen titles and its glyph sweep (✦ now asserted), and the walkers' helper (it presses Let
+  it go). **`check_gp` reads 469 where it read 442**: its
+  road's Mage casts Cinderfall, which now lights what it rakes cold, so the road's dice moved and its party was offered more cards
+  (attributed by an `ok()` trace and a stub; the engine chips move nothing on that road). **Two more readings the engine chips'
+  dice moved**, both traced to them by a stub that gives HEAD's figures back: `test_batch_bw`'s *a hit that gets through pays
+  nothing* had its hit decided by the dice — a Block field of zero leaves Heavy Plating's slice standing — and constructs it now (513,
+  +1: the blow is asserted to land); and `check_cm_live`'s owed red carries a fifth arm, a coin flip between two bot rolls, as 4 to 5.
+- **THE VERIFICATION.** **Two recons, because §2a moved the spawn path** (§0.6's rule): HEAD's battery on §2a alone (`check_de` 593 / 6 / 0)
+  and on all of IE's game code (593 / 11 / 1 notice), each predicted after its literal sweep. Every red was named but four — two coin
+  flips the spawn's dice turned over, `check_di`'s integer pin, and `check_gp`'s road — and each is attributed by an `ok()` trace or a
+  stub. **Twenty-three controls**, each in its own clone, every one biting; HEAD's game code under IE's gates reds or reads short.
+  **The pre-pass and the acceptance, 145 targets, each `check_de` 597 / 0 / 0, as predicted** (the acceptance 79 min 18 s, every
+  `ps` row headless, the tree byte-identical before and after, the player's four files untouched) — `docs/reports/IE.md` §8.
+- **`CLAUDE.md` IS 462,598 B = 451.76 KiB AGAINST ITS 510 KiB CEILING — 58.24 KiB UNDER** (+2,825 B at IE): the re-measure's reading — 7.2 batches at EZ's record (59,642 ÷ 8,293), 21.1 at IE's own rate.
+- **`docs/state.md` IS 351,747 B = 343.50 KiB AGAINST ITS 380 KiB CEILING — 36.50 KiB UNDER** (+3,917 B at IE, this line included): 6.4 batches at IA's +5,860 B (37,373 ÷ 5,860), 6.8 at HO–HW's +5,528 mean. **It still binds: 6.4 to 6.8 batches at its own rates against `CLAUDE.md`'s 7.2 at EZ's record — the re-measure is IG's**
+- **No save version moved**: nothing IE added rides the save.
 - **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in a build
   older than HL**: HL's ceiling refuses a newer save from HL's build on — HR's v15 is the first bump it has guarded — and HJ's and
   HK's builds, and `main`, carry no ceiling.
-- **Next letter: IE — the Cleric's regen and the Mage's fire** (the roadmap, below).
+- **Next letter: IF — IC's remainder** (the roadmap, below).
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### ID's RULINGS OWED — **FOUR; THE FIRST AND THE THIRD ARE PLAYER-VISIBLE, NONE BLOCKS**
+### IE's RULINGS OWED — **FIVE; THE FIRST THREE ARE PLAYER-VISIBLE, NONE BLOCKS**
 
-Full working: `docs/reports/ID.md`, NEEDS A RULING.
+Full working: `docs/reports/IE.md`, NEEDS A RULING.
 
-1. **✦ CARRIES FOUR MEANINGS, AND IC's RULE SAYS ONE (§3)** — *✦ counts what is held and unworn* (IC §0.4) holds on the nameplate and
-   the crest's bag; ✦ also marks a worn rune or a carried card on three panels (the loadout panel, the crest bag, the hero sheet), a
-   rune's chip in battle, and the Empower toggle. None is a pick, so ◆'s rule holds. Keep the other meanings, give ✦ its one, or
-   letter the worn marks.
-2. **THE CLASS PASSIVE's CHIP WAS A STATUS, AND ITS DELETION MOVED THE HIEROPHANT's SANCTITY (§3c)** — laid through `add_status`, it
-   booked a Sanctity event and floated a label (a die) on every hero at every spawn; the deletion takes four of each from every
-   battle's opening. The engine chips (★) are laid the same way and still book. A display chip counts as a status landing, or it
-   does not (and the Sanctity rate is re-measured)?
-3. **AN OFFER THAT COMES BACK EMPTY STILL STRANDS ITS PICK (§1a)** — a zone boss's or an upgrade offer with nothing left stays owed
-   with nothing to press, as on the retired overlay; the screen now says so. FM §3 spent the rune cache's (*Let it go*). Spend it,
-   or keep it owed?
-4. **THE TITLE FOR AN UPGRADE, AND AN UPGRADE WITH A RUNE (§2)** — *THE UPGRADE* and *THE UPGRADE AND THE CACHE*, each naming what is on
-   it (the rule names only THE DRAFT and THE CACHE). Confirm, or name them.
+1. **THE CLERIC's MANA RATE DID NOT MOVE — THE SIM DOES NOT SHOW A CLERIC WHO NEVER RUNS DRY (§1).** His drip is the Hunter's, 12
+   (the Mage's 22). Dry on the sim's default build: Cleric 4.1%, Mage 4.5%, Hunter 3.9% of their turns (±0.6, 0.9, 0.5); untalented
+   — the designer's own profile has no talents — 26.8%, 18.3%, 33.8%. **Lowering him moves away from the shape** (8 reads 11.6%, 10
+   reads 6.9%); **only 14 reaches it** (1.5% under the Mage's 2.3% and the Hunter's 3.9%). Two play conditions the sim lacks are
+   named: the **Cracked Hourglass** (unlocked in the designer's profile) refills the Mage and the Cleric 30% after every victory and
+   the Hunter not at all — **with it in the party the shape already holds at 12** (0.7%, 1.7%, 4.1%) and the Cleric sits nearest
+   full, which is the finding as the designer saw it — and the sim wears all 27 talent nodes where the designer wears none. Re-rule the rate, the shape, or the
+   conditions it is measured under (THE CLERIC's MANA RATE, below, holds the curve).
+2. **SANCTITY's STEPS NOW COME ABOUT ONE OF HIS TURNS LATER (§2b) — NOTHING AUTHORED.** A Hierophant's fight ended on 49.3 events
+   at HEAD and 42.6 after §2a (default build; zone one 41.5 → 36.5); his first step came at his turn 1.12 and now 1.90, his second
+   at 3.08 (83.5% of fights) and now 4.04 (67.1%). `SANCTITY_PER_STEP` (16) was set at FV §3 to reach about half the cap (80) by a
+   normal fight's end on untalented rung-1 fights; untalented, a fight now ends on 42.7 events at a normal fight's end where HEAD read 50.5 — 2.19 steps where it read 2.61, from just over half
+   the cap to just under it (1,372 fights and 1,325). The threshold is the designer's.
+3. **THE FIRE REPAIRS REACH THE SHAPE WITH ONE APPLIER HELD, AND FALL JUST SHORT WITH NONE (§3).** Stoke and Cinderfall lay their
+   Burn (figures the kit already uses). On fixed drafts, a Cryomancer with no Overburn: Fireball and four readers 27.2% → 62.9% of
+   his turns with Burn standing; every reader and no applier 1.9% → 48.7%; a control holding no repaired card 84.2% → 84.9%.
+   **Pyroblast is the one fire card left without Burn**: its ×1.5 reads the Burn it would lay and it has no cooldown, so its
+   repair would make every repeat cast half again stronger — with it the longest case reads 53.8%. Repair it, or let a new card
+   carry the gap: **a card that lays Burn on a cold enemy without consuming it, on a short cooldown, on a shelf a Mage without
+   Overburn draws** — one Fireball held is what lifts a draft of readers from 27% to 63%.
+4. **✦ ON TWO PANELS THAT ARE THE RUNE PANEL BEFORE IA (§4).** The loadout panel marks a carried CARD with ✦ and has no section
+   head and no state column; the crest panel marks its worn crest rune inside a section that also lists the bag's. Section them
+   as IA sectioned the rune panel (and the marks go), or keep the marks.
+5. **THE OTHER DISPLAY CHIPS STILL LAID AS STATUSES (§2) — IE's KEPT CENSUS.** Among them Faith, Loyalty, Iron Will, the Capacitor,
+   Deadfall, the Berserker's and the Feint's counters: each still books a Sanctity event when it lands (and one when it leaves).
+   Convert each as the engine chips were, or rule which of them are statuses.
+
+### THE CLERIC's MANA RATE — **12, UNMOVED (IE §1); THE TUNING HANDLE AND THE FIGURES IT WAS MEASURED AGAINST**
+
+**The drip is `battle._mana_regen`'s `12 + u.mana_regen_bonus`, one base for every Mana hero; the Mage's Evocation adds 10.** A
+Cleric's own rate is that base — no lineage moves it, and no live rune, relic or node raises it. **The figures** (IE's probe: 20
+sim runs for each of the nine Mana lineages, rung 1; DRY = a turn on which the card the bot would cast with a full bar costs more
+than he holds; per-run mean ± SE):
+
+| Cleric's base | build | Cleric | Mage | Hunter |
+|---|---|---|---|---|
+| 8 | default (27 nodes) | 11.6 ± 1.0 | 4.5 ± 1.0 | 2.9 ± 0.5 |
+| 10 | default | 6.9 ± 0.9 | 3.3 ± 0.8 | 4.0 ± 0.6 |
+| **12 (HEAD)** | default | **4.1 ± 0.6** | 4.5 ± 0.9 | 3.9 ± 0.5 |
+| 14 | default | 1.5 ± 0.3 | 2.3 ± 0.7 | 3.9 ± 0.5 |
+| 12 (HEAD) | untalented | 26.8 ± 1.7 | 18.3 ± 2.8 | 33.8 ± 2.1 |
+| 8 | untalented | 50.5 ± 1.5 | 14.9 ± 2.5 | 36.8 ± 1.8 |
+| 14 | untalented | 18.5 ± 1.3 | 21.6 ± 3.3 | 33.0 ± 1.9 |
+**The shape the designer set**: the Cleric dry sometimes, and less than the Mage and the Hunter. **It holds at 14 on both builds
+(within the error), and at no rate at or below 12.** **With the Cracked Hourglass in the party, at 12, it already holds**: Cleric 0.7 ± 0.2%, Mage 1.7 ±
+0.5%, Hunter 4.1 ± 0.7% dry on the default build (13.1 / 14.5 / 36.0% untalented) — and the Cleric is then the hero who sits
+nearest full (93 of 120 at a turn's start). The relic refills the Mage and the Cleric, never the Hunter, and the designer's
+profile has it unlocked. The next change to the rate is the designer's.
+
+### FOUND AT IE AND NOT FIXED
+
+- **THE SIM's BOT NEVER CASTS A DRAFTED FIREBALL, AND STOKE AND CINDERFALL RARELY** — Fireball (with Frostbolt and Arcane Explosion)
+  is one of GS's returned cards the drafted hook cannot see, and a Mage reaches that hook only when Magic Burst and Magic Missiles are
+  both unavailable; Stoke and Cinderfall are in no rotation arm (one cast in sixty runs, though `check_gp`'s seeded road meets a
+  Cinderfall eight times). Every sim figure on a Mage's Burn is the bot's
+  rotation's — Firestorm, Flamewave, Immolate — and understates a player who casts what he drafted. One case each, the bot's.
+- **THE CRACKED HOURGLASS SAYS *EVERY HERO* RECOVERS 30% MANA; `Run.restore_mana` REFILLS THE MAGE AND THE CLERIC** — the Hunter, who
+  spends Mana too, gets nothing, and the member's `max_mana` is a fixed 100, so a 120 bar is refilled to 100. A card-versus-code line.
+- **CHOKING SMOKE's CARD CALLS ITS BURN *fuel for a Pyromancer's Ember Debt*** — Ember Debt lays Burn and consumes none.
+- **`DISPEL_NEVER` KEEPS `spec_passive` AND `spec_passive_2`**, inert since §2a (no status carries either); `check_el` and
+  `test_batch_bq` pin them.
+- **THE CENSUS's OWN, READ AND NOT DRIVEN**: Ember Leap's half-the-turns fires on Ember Debt's refund, which consumes nothing; eight
+  Cleric rotation arms test `ab.cost` where the door uses `_eff_cost` (under Warded he can pick a card he cannot afford); two
+  stale comments (`battle.gd`'s *Frostbolt the mark* — slot 0 is Magic Bolt — and Firedraw's *UP TO 4*, which takes 6).
 
 ### BOIL OVER'S RATE — **0.8% AND THE 40% FLOOR STAND (IA §0.1, the designer's); THE TENSION IS RECORDED HERE AND THE LEVER IS UNBUILT**
 
@@ -140,8 +204,6 @@ block.
   names 24 handlers — Feint, Kill Command, Suffering among them) recoils only where its handler runs a strike back through
   `_resolve`. A player reads every damaging card as an attack. ID's rewording made the card true of the floor and of both sides; this
   scope is one word on the card or one door in the code — the designer's.
-- **THE ENGINE CHIPS (★) ARE STATUSES TOO** — laid through `add_status` at the spawn, one per engine a hero holds, each a Sanctity
-  event and a die (ruling 2's other half).
 - **`check_fh` KEEPS ITS OWN DRAFT HALF** — IB kept it because it reads each card's tag line off the screen; the zone boss's offer and
   the upgrade on the same screen go through the walkers' shared helper (`Gate.answer_boss_and_upgrade`), so there is one answer to
   those two and IB's two to a draft card.
@@ -257,11 +319,7 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
   batch of each other (the WHERE block's two readings, each with its arithmetic), so a re-measure that waits finishes as the room
   runs out. **The block index and HV's pilot still wait on it.**
   **THE ORDER:**
-- **IE — THE CLERIC's REGEN AND THE MAGE's FIRE, AND THAT IS FINAL (ID's brief §6).** The last two of the zone-one findings still
-  open. They have lost the queue four times — IB at HW's roadmap, IC at HY's, ID at IB's, and **ID itself, which was the batch that
-  was supposed to be them and was the fold and the glyphs instead.** The regen against a census of everything that returns Mana to a
-  Cleric; **more Burn appliers in the Mage's pool.**
-- **IF — IC's REMAINDER**: the rest of the silenced-figure family — three door calls (the damage-over-time tick's line, Blight the
+- **IF — IC's REMAINDER, AND IT IS NEXT**: the rest of the silenced-figure family — three door calls (the damage-over-time tick's line, Blight the
   Well's line and credit, the bleedout burst's float and line) and **two frames that name the wrong dealer**: Blight the Well's on
   the Old Gods' holder, so a vowed Cleric who drafts it without that engine is not silenced at all — **a live hole in the vow IC
   repaired, not cosmetic** — and Umbral Sigil's echo on the striker, against DI's rule; and a tick credited by name (FOUND AT IC).
@@ -270,9 +328,12 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
   other (the WHERE block's two readings).
 - **IH — THE CLAIMS**: HX's 87 stand at **86** — the per-batch re-read stops the backlog growing and does not retire it, so it is a
   batch of its own (FOUND AT HX, FOUND AT IA).
-- **MANA STAYS (ruled).** The Mage and the Hunter run dry and plan around it; only the Cleric is always full, so it is one
-  class's regen and not the resource. **Channel's tempo payout — Mana spent buys speed — is alive and still owed.**
-- **Unchanged, and said so**: `CONJUNCTIONS` keeps its one row and `RUPTURE_BREAK_PER_TICK` stays at 10, still unfelt; a meter is
+- **MANA STAYS (ruled).** The finding was that the Mage and the Hunter run dry and only the Cleric is always full; **measured at IE
+  the sim does not show it** (IE's ruling 1, and THE CLERIC's MANA RATE above), so the rate is unmoved and the next word is the
+  designer's. **Channel's tempo payout — Mana spent buys speed — is alive and still owed.**
+- **Unchanged, and said so**: `CONJUNCTIONS` keeps its one row and `RUPTURE_BREAK_PER_TICK` stays at 10, still unfelt — **and IE §3a
+  says why it could not have been**: a Rupture stood at the start of 0.7% to 4.5% of a Mage's turns (by lineage) at HEAD, because
+  the pool without Overburn laid Burn on 2% of a reader-only draft's turns; a meter is
   not a conjunction half; Marrowfire becomes Sunder + Burn pending the design pass; the Occultist's Break card is CE §3's ask;
   the Skirmisher and the Tracker are ruled and unbuilt, with Volley's and Ambusher's core slots and both names owed; whether a
   fallen hero stays down between fights; Tithe's read site; **no page key and no targeted debug card pick** — each available if
@@ -3807,7 +3868,7 @@ reach `bp` §7 at all: it is a Warrior flow.**
   the victory card's gold is the gold that arrived, and the card leaves out the Tollkeeper's Bell (FOUND AT GN, above);
   GN's code moved the gate's seeded run onto the Bell. HEAD's code with the Bell forced reds the same arm. It goes back
   to zero the batch that fixes the card, and its row in `baselines.json` says so.
-- **`check_cm_live` reports 4 failures. THIS IS THE OLDER OF THE TWO REDS THAT ARE ON PURPOSE.** Identical on
+- **`check_cm_live` reports 4 failures — 4 TO 5 SINCE IE. THIS IS THE OLDER OF THE TWO REDS THAT ARE ON PURPOSE.** Identical on
   unmodified HEAD, recorded as owed in the gate itself. **DB confirmed the four are byte-identical
   before and after the gate consolidation; DC through DR confirm them again.** It is the only thing
   that presses the defensive bar.
@@ -3822,6 +3883,9 @@ reach `bp` §7 at all: it is a Warrior flow.**
   display server**, and `check_fh` §7 drives the bar itself instead (`_run_skill_check(false,
   "defensive")` grades, says INCOMING and carries no Cancel) while asserting `_nobody_can_press()`
   is TRUE, so the day that stops being true the gate says so and these four are re-derived.
+  **AND THE FACT REACHES A FIFTH ARM AS A COIN FLIP (IE)**: *a Perfect brace takes less damage than no brace* compares the same two
+  bot rolls, so it passes whenever the dice make the braced total the smaller — ID's 911 against 926, and not IE's 924 against 911,
+  once the engine chips stopped spending a die at every spawn. Its row carries the failures as a band, 4 to 5.
 
 ### FIVE MORE THINGS FH FOUND AND DID NOT FIX — **THE SIXTH WAS THE SAVE, AND FI TOOK IT**
 

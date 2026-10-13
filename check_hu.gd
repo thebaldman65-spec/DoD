@@ -705,7 +705,9 @@ func _s2a_the_source() -> void:
 		for id in ["burn", "chilled"]:
 			lit_writes += String(src).count("add_status(\"%s\"" % id)
 	ok(lit_writes == 0, "§2a: %d add_status calls write a Burn or a Chilled by name, around the status door" % lit_writes)
-	# Every add_status whose id is not a literal: the door's, and the engine chip's — no other.
+	# Every add_status whose id is not a literal: the door's — no other. BATCH IE §2a took the engine
+	# chip off the status door (a chip is not a status), so the second entry this list held is gone and
+	# the chip is laid by its own writer, asserted beside it.
 	var re := RegEx.new()
 	re.compile("(?<!func )add_status\\(\\s*([^\"\\s][^,]*),")
 	var variable: Array = []
@@ -713,8 +715,10 @@ func _s2a_the_source() -> void:
 		for m in re.search_all(String(src2)):
 			variable.append(m.get_string(1).strip_edges())
 	variable.sort()
-	ok(variable == ["id", "u.engine_chip_id(String(pid))"],
-		"§2a: the add_status calls with a variable id are %s — want the status door's and the engine chip's" % [variable])
+	ok(variable == ["id"],
+		"§2a: the add_status calls with a variable id are %s — want the status door's alone" % [variable])
+	ok(b.contains("u.set_engine_chip(String(pid)"),
+		"§2a: the spawn does not lay each engine's chip through `set_engine_chip`")
 	# The door: the arriving status is added, then the composition is asked, before any return.
 	var at := b.find("target.add_status(id, info[0], info[1], info[2], eff_turns, info[3], power, tick)")
 	var conj := b.find("_conjoin(target, id, src)", at)
@@ -823,7 +827,7 @@ func _s2c_the_carriers() -> void:
 	var a: BattleUnit = foes[0]
 	var b: BattleUnit = foes[1]
 	var c: BattleUnit = foes[2]
-	# The second variable-id add_status (§2a) names an engine chip, never a status a
+	# An engine chip's id (off the status door since IE §2a, `set_engine_chip`) is never a status a
 	# conjunction is made of — asked of a hero holding one engine and of one holding none.
 	var chip_ids: Array = [mage.engine_chip_id("permafrost"), war.engine_chip_id("nothing")]
 	ok(chip_ids.all(func(x): return String(x).begins_with("spec_passive")),

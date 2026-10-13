@@ -16,6 +16,52 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-13 &mdash; Batch IE: THE RESOURCES, AND THE MAGE'S FIRE</h2>
+<p><b>Stoke and Cinderfall now set a cold enemy Burning</b>, the engine chips stop counting as statuses, an offer with
+nothing left in it is let go rather than left owed, a zone boss's pick alone is titled <b>THE ABILITY</b>, and &#10022; stays
+only where it names a rune. <b>The Cleric's Mana rate did not move</b>: measured, it does not do what the finding says, and the
+figures are the designer's to rule on. ID's four questions were answered. Full working: <code>docs/reports/IE.md</code>. The next
+letter is IF.</p>
+
+<p><b>&sect;0 &mdash; ID's FOUR QUESTIONS, ANSWERED (the designer's).</b> &#9670; means a decision waits, &#8593; names an upgrade,
+&#10022; names a rune. A chip is drawn to tell the player something and is not a status. An offer that can come back stays owed; one
+that cannot is spent. A zone boss's ability alone is THE ABILITY.</p>
+
+<p><b>&sect;1 &mdash; THE CLERIC's MANA, MEASURED AND NOT MOVED.</b> His drip is 12 a turn, the Hunter's (the Mage's is 22), and
+what else refills him is small &mdash; a Devout's trickle off a Faith release, Recant aimed at himself &mdash; or refills
+another hero too. Over sixty sim runs of each kind he was out of Mana for the
+card he wanted about as often as the Mage and the Hunter on the default build, and more often than the Mage untalented &mdash; so
+lowering his rate moves him away from <i>dry sometimes, but less than the other two</i>, and only raising it reaches that. <b>With the
+Cracked Hourglass in the party it already holds</b> &mdash; the relic refills the Mage and the Cleric after every victory and never the
+Hunter, and with it the Cleric is the hero who sits nearest full. The rate stays at 12 and the curve is in the report for the
+designer to rule on.</p>
+
+<p><b>&sect;2 &mdash; THE ENGINE CHIPS ARE NOT STATUSES.</b> The &#9733; chip each core rune puts on a hero's plate is drawn as a
+rune's chip is: nothing ticks, dispels or counts it, and it no longer floats a label or feeds the Hierophant's Sanctity at the start
+of every fight. His steps now come about one of his turns later; the threshold is not changed.</p>
+
+<p><b>&sect;3 &mdash; THE MAGE's FIRE.</b> <b>Stoke</b> still doubles a fire that stands, and now sets an enemy that is not alight
+Burning for 3 turns. <b>Cinderfall</b> still rakes the field and skims what burns, and now sets every enemy it hits that was not
+alight Burning for 2 turns. No card was added.</p>
+
+<p><b>&sect;4 &mdash; &#10022; NAMES A RUNE.</b> The hero sheet's worn rune no longer carries &#10022; beside the column that says WORN,
+and the Empower toggle reads <i>Empower (C)</i>. The battle's rune chip and the count of runes a hero holds unworn keep it.</p>
+
+<p><b>&sect;5 &mdash; TWO SMALL THINGS.</b> A zone boss's or a mini-boss's offer with nothing left in it at all says so and offers
+<b>Let it go</b>, as an empty rune cache does, and its mark leaves the card; one whose cards wait on a core rune still waits. The
+screen for a zone boss's pick reads <b>THE ABILITY</b>, and the other kinds join it &mdash; <i>THE ABILITY, THE UPGRADE AND THE
+CACHE</i>; a draft on the screen still makes it THE DRAFT.</p>
+
+<p><b>The checks.</b> A new check, <code>check_ie</code>, drives a Cleric on the turn he cannot afford his heal, every engine chip
+off the status list and out of the Sanctity ledger, Stoke and Cinderfall lighting through the status door, every fire card a Mage
+can hold on a cold board, each &#10022; surface apart, an empty offer that cannot refill, the spend through Let it go, a held-back
+offer still owed, and the title. The checks that read an engine chip through the status list read its own door now; the ones that
+read Stoke's empty case, Cinderfall's skim, the count of calls through the status door, the hero sheet's worn row, the emptiest screen and the fifteen titles read what is true
+now. <b>Three readings moved with the dice</b> &mdash; an engine chip spent one at every spawn &mdash; and each was
+traced: a seeded road's count (<code>check_gp</code>, 469 where 442, and its Mage's Cinderfall); the Aegis Wall's <i>a hit that gets
+through pays nothing</i>, whose hit the dice had decided and which <code>test_batch_bw</code> now constructs (a Block field below
+zero, no miss); and a fifth arm of <code>check_cm_live</code>'s owed red, which compares two bot rolls and is carried as 4 to 5.</p>
+
 <h2>2026-10-12 &mdash; Batch ID: ONE SURFACE, AND THE GLYPHS</h2>
 <p><b>Every pick a hero is owed is now a section of his own screen</b> &mdash; the zone boss's ability and the mini-boss's upgrade
 joined his draft and his rune cache there, and the three-choice overlay is gone. <b>&#8593; marks an upgrade wherever one

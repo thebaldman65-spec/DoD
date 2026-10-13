@@ -575,7 +575,10 @@ func _screen_pass(controlled: bool) -> void:
 			var ck3: String = h.hero_key
 			var pid3 := String(Runes.config(String(takes[ck3])).get("engine", ""))
 			var want: Array = [Classes.kit(ck3)[0].display_name] + Classes.class_kit_names(ck3)
-			var chip: Dictionary = h.get_status(h.engine_chip_id(pid3))
+			# BATCH IE §2a — AN ENGINE CHIP IS NOT A STATUS (`BattleUnit.engine_chips`), so every arm in this
+			# gate that reads one asks its own door, `engine_chip`, where it asked `get_status` — the question
+			# (named for its noun, reading the live figure) is unchanged.
+			var chip: Dictionary = h.engine_chip(pid3)
 			ok(h.engines == [pid3] and _names(h.abilities) == want
 					and String(chip.get("label", "")) == String(NOUNS[pid3]),
 				"§1: the %s who took the Rune of the %s fights his first battle on his basic and his kit, the chip named %s (%s)"
@@ -668,7 +671,7 @@ func _reaver_arm(s: Node, tag: String) -> void:
 	ok(is_equal_approx(W.reaver_bonus(), 0.30 * Classes.REAVER_KILL_PCT),
 		"§2 (%s): thirty kills are thirty steps — no cap (%.2f)" % [tag, W.reaver_bonus()])
 	W.refresh_bars()
-	var chip: Dictionary = W.get_status(W.engine_chip_id("savage_assault"))
+	var chip: Dictionary = W.engine_chip("savage_assault")
 	ok(String(chip.get("label", "")) == "Reaver"
 			and String(chip.get("short", "")) == "+%d%%" % (30 * Classes.REAVER_KILL_PCT),
 		"§2 (%s): the chip is named Reaver and reads the live bonus (%s)" % [tag, chip.get("short", "")])
@@ -843,7 +846,7 @@ func _bastion_arm(s: Node, tag: String) -> void:
 		"§3 (%s): a basic attack that misses keeps the bank (%.1f)" % [tag, W.redoubt_bank])
 	W.redoubt_bank = 12.4
 	W.refresh_bars()
-	var chip: Dictionary = W.get_status(W.engine_chip_id("redoubt"))
+	var chip: Dictionary = W.engine_chip("redoubt")
 	ok(String(chip.get("label", "")) == "Bastion" and String(chip.get("short", "")) == "Bank 12",
 		"§3 (%s): the chip is named Bastion and shows the bank (%s)" % [tag, chip.get("short", "")])
 	W.redoubt_bank = 0.0
@@ -957,7 +960,7 @@ func _weaver_arm(s: Node, tag: String) -> void:
 	elif tag == "beside Overburn":
 		ok(false, "§4 (%s): the Mage holds Detonation" % tag)
 	M.refresh_bars()
-	var chip: Dictionary = M.get_status(M.engine_chip_id("cast_echo"))
+	var chip: Dictionary = M.engine_chip("cast_echo")
 	ok(String(chip.get("label", "")) == "Weaver",
 		"§4 (%s): the chip is named Weaver (%s)" % [tag, chip.get("label", "")])
 	M.attack = 100
@@ -1050,7 +1053,7 @@ func _leech_arm(s: Node, tag: String) -> void:
 	ok(M.resource == 30 and M.hp == hp_was,
 		"§5 (%s): a tick is paid the same way (%d Mana, %d health lost)" % [tag, M.resource, hp_was - M.hp])
 	M.refresh_bars()
-	var chip: Dictionary = M.get_status(M.engine_chip_id("siphon"))
+	var chip: Dictionary = M.engine_chip("siphon")
 	ok(String(chip.get("label", "")) == "Leech", "§5 (%s): the chip is named Leech" % tag)
 	print("    %s: %d dealt returned %d Mana; a %d blow paid in Mana, 5 Mana covered 5, none covered none" % [
 		tag, dealt["with"], mana["with"], whole])
@@ -1109,7 +1112,7 @@ func _oath_arm(s: Node, tag: String) -> void:
 		"§6 (%s): the Cleric opens bound to the %s, the hero with the lowest maximum health (%d)"
 			% [tag, lowest.unit_name, lowest.max_hp])
 	C.refresh_bars()
-	var chip: Dictionary = C.get_status(C.engine_chip_id("covenant_oath"))
+	var chip: Dictionary = C.engine_chip("covenant_oath")
 	ok(String(chip.get("label", "")) == "Oathkeeper" and String(chip.get("desc", "")).contains(lowest.unit_name),
 		"§6 (%s): the chip is named Oathkeeper and names the bound hero" % tag)
 	ok(M == lowest, "§6 (%s): on this board that is the Mage" % tag)
@@ -1473,7 +1476,7 @@ func _skirmisher_arm(s: Node, tag: String) -> void:
 	s._rule_engine_turn(H)
 	ok(H.opening_armed, "§9 (%s): the second quiet turn brings it back" % tag)
 	H.refresh_bars()
-	var chip: Dictionary = H.get_status(H.engine_chip_id("opening_strike"))
+	var chip: Dictionary = H.engine_chip("opening_strike")
 	ok(String(chip.get("label", "")) == "Skirmisher" and String(chip.get("short", "")) == "READY",
 		"§9 (%s): the chip is named Skirmisher and reads READY (%s)" % [tag, chip.get("short", "")])
 	# A BLOW THAT REACHES HIM STARTS THE COUNT AGAIN — a blocked one too.
@@ -1590,7 +1593,7 @@ func _medic_arm(s: Node, tag: String) -> void:
 	elif tag == "beside Trapper":
 		ok(false, "§10 (%s): the Hunter holds Shrapnel Charge" % tag)
 	H.refresh_bars()
-	var chip: Dictionary = H.get_status(H.engine_chip_id("field_kit"))
+	var chip: Dictionary = H.engine_chip("field_kit")
 	ok(String(chip.get("label", "")) == "Medic", "§10 (%s): the chip is named Medic" % tag)
 
 
@@ -1792,7 +1795,7 @@ func _stretch(tag: String, specs: Array, engines: Array) -> void:
 				if not Classes.is_rule_engine(String(pid4)):
 					continue
 				held += 1
-				var chip: Dictionary = h.get_status(h.engine_chip_id(String(pid4)))
+				var chip: Dictionary = h.engine_chip(String(pid4))
 				var ctext := "%s %s %s" % [chip.get("label", ""), chip.get("short", ""), chip.get("desc", "")]
 				if not chip.is_empty():
 					chips += 1

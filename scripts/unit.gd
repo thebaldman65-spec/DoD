@@ -1805,6 +1805,13 @@ var stalking_next := 0        # Stalking Horse: which affliction the NEXT attack
 # Active statuses: {id, label, short, color, turns}
 var statuses: Array = []
 
+# BATCH IE §2a — A CHIP IS NOT A STATUS (ID's ruling 2, the designer's). An engine's chip
+# (★) is drawn to tell the player what his engine is doing, so it lives here and never in
+# `statuses`: nothing ticks, dispels or counts it, it books no Sanctity event and floats
+# nothing. Same shape as an entry in `statuses` (id, label, short, color, turns -1, desc),
+# so the chip row draws both; `set_engine_chip` is its one writer, `engine_chip` its reader.
+var engine_chips: Array = []
+
 # Battle-log hook (set by the battle scene) so talent procs that happen
 # inside this unit (Enraged, Unrelenting Assault) reach the combat log.
 var log_proc := Callable()
@@ -2027,6 +2034,43 @@ func has_engine(pid: String) -> bool:
 func engine_chip_id(pid: String) -> String:
 	var at := engines.find(pid)
 	return "spec_passive" if at <= 0 else "spec_passive_%d" % (at + 1)
+
+
+# BATCH IE §2a — THE ENGINE CHIP's ONE WRITER. It lays the chip in `engine_chips` and draws
+# the row: no `note_status_event`, no `float_text` — the two things the status door does for a
+# status ARRIVING, which a chip is not.
+func set_engine_chip(pid: String, label: String, short: String, color: Color,
+		desc := "") -> void:
+	var id := engine_chip_id(pid)
+	var s := engine_chip(pid)
+	if s.is_empty():
+		engine_chips.append({"id": id, "label": label, "short": short, "color": color,
+			"turns": -1, "desc": desc})
+	else:
+		s.label = label
+		s.short = short
+		s.color = color
+		s.desc = desc
+	_refresh_chips()
+
+
+func engine_chip(pid: String) -> Dictionary:
+	var id := engine_chip_id(pid)
+	for s in engine_chips:
+		if s.id == id:
+			return s
+	return {}
+
+
+# Rewrites a standing engine chip's words; false when he holds no chip for that engine.
+func update_engine_chip(pid: String, short: String, desc: String) -> bool:
+	var s := engine_chip(pid)
+	if s.is_empty():
+		return false
+	s.short = short
+	s.desc = desc
+	_refresh_chips()
+	return true
 
 
 func _sync_engine_switches() -> void:
@@ -2917,7 +2961,7 @@ func refresh_bars() -> void:
 		else:
 			_res2_text.text = "%s %d/%d" % [second_resource_name, second_resource, second_max]
 	if has_engine("bloodrage"):
-		for s in statuses:
+		for s in engine_chips:
 			if s.id == engine_chip_id("bloodrage"):
 				var step := 2.0 + bloodrage_step_bonus + rune_bloodrage_step_bonus
 				var live := frenzy_bonus() * 100.0
@@ -2941,7 +2985,7 @@ func refresh_bars() -> void:
 	# Heavy Plating chip shows the LIVE total Block chance — the whole value
 	# of the pity ramp is the player watching it climb toward the next Block.
 	if has_engine("heavy_plating"):
-		for s in statuses:
+		for s in engine_chips:
 			if s.id == engine_chip_id("heavy_plating"):
 				# Shieldwall's stance rides the same slice of the roll, so the
 				# live total has to carry it or the readout lies while it holds.
@@ -2965,7 +3009,7 @@ func refresh_bars() -> void:
 	# watching it climb toward the next critical. The rule is `Classes.engine_desc`'s
 	# and is not restated; the live line sits under it (GO's rule-engine shape).
 	if has_engine("lethal_aim"):
-		for s in statuses:
+		for s in engine_chips:
 			if s.id == engine_chip_id("lethal_aim"):
 				var pity_pct := int(round(crit_pity * 100.0))
 				s.short = "Aim +%d%%" % pity_pct
@@ -2976,7 +3020,7 @@ func refresh_bars() -> void:
 	# Seasoned Fighter chip shows which guard is live; the tooltip carries
 	# both stances' numbers so the swap is an informed choice.
 	if has_engine("seasoned"):
-		for s in statuses:
+		for s in engine_chips:
 			if s.id == engine_chip_id("seasoned"):
 				var aggressive := stance == "aggressive"
 				var off_pct := int(round((SEASONED_AGG_DEALT + seasoned_off_bonus
@@ -2998,7 +3042,7 @@ func refresh_bars() -> void:
 	# thirty lines up) has been printing these same two figures from these same
 	# two functions all along.
 	if has_engine("resonance"):
-		for s in statuses:
+		for s in engine_chips:
 			if s.id == engine_chip_id("resonance"):
 				var dmg_pct := resonance_dmg_bonus() * 100.0
 				var taken_pct := resonance_taken_bonus() * 100.0
@@ -3023,7 +3067,7 @@ func refresh_bars() -> void:
 		var re_live: Array = _rule_engine_live(String(re_pid))
 		if re_live.is_empty():
 			continue
-		for s in statuses:
+		for s in engine_chips:
 			if s.id == engine_chip_id(String(re_pid)):
 				s.short = String(re_live[0])
 				s.desc = "%s\n%s" % [Classes.engine_desc(String(re_pid)), String(re_live[1])]
@@ -3821,13 +3865,16 @@ func _refresh_chips() -> void:
 					pct, n, "" if n == 1 else "s"]
 	for child in _chips_root.get_children():
 		child.queue_free()
-	var count := statuses.size()
+	# BATCH IE §2a — the engine chips are drawn first, where they stood when the spawn laid
+	# them as the first statuses; they are not statuses (`engine_chips`).
+	var row: Array = engine_chips + statuses
+	var count := row.size()
 	if count == 0:
 		return
 	# Left-aligned inside the nameplate's chip row.
 	var x := 0.0
 	for i in count:
-		var s: Dictionary = statuses[i]
+		var s: Dictionary = row[i]
 		var chip_w := 12.0 if String(s.short).length() <= 2 else 26.0
 		var chip := ColorRect.new()
 		chip.position = Vector2(x, 0)

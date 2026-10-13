@@ -485,7 +485,7 @@ func _s3_the_three_surfaces() -> void:
 				continue
 			# BATCH IA §3 — RE-TUNED, THE QUESTION UNMOVED: the pouch's rows carry no ✦ any
 			# more — the WORN section says what is worn — so a row is the rune's name and then
-			# its rule, or GX's sentence in its place. The hero sheet keeps its ✦ (§3's sheet arm).
+			# its rule, or GX's sentence in its place. The hero sheet's row lost its ✦ too, at IE §4.
 			var told: Label = _label_with(ov, "%s — %s" % [rname, GT_HEAD])
 			var ordinary: Label = _label_with(ov, "%s — %s" % [
 				rname, Runes.shown_desc(Runes.build(rid))])
@@ -582,8 +582,11 @@ func _s3b_the_hero_sheet(seat: int) -> void:
 			await Gate.frames(self, 6)
 			var sheet: Node = current_scene
 			var arm := "engine in" if engine_in else "engine out"
-			var row: Label = _label_with(sheet, "✦ %s — " % rname)
-			ok(row != null, "§3 %s (%s): the hero sheet does not draw the worn rune's row" % [rid2, arm])
+			# BATCH IE §4 — RE-TUNED, THE QUESTION UNMOVED: the sheet's worn row carries no ✦ any more —
+			# its state column says WORN — so the row is the rune's name and then its rule.
+			var row: Label = _label_with(sheet, "%s — " % rname)
+			ok(row != null and String(row.text).begins_with(rname),
+				"§3 %s (%s): the hero sheet does not draw the worn rune's row, its name first" % [rid2, arm])
 			if row == null:
 				continue
 			var state: Label = _label_exact(sheet, "sits out")

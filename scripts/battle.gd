@@ -1672,14 +1672,18 @@ func _spawn_units() -> void:
 		u.heal_above_half_cb = _on_hero_healed_above_half
 		# BATCH GK — ONE CHIP PER HELD ENGINE, in slot order; the first keeps the
 		# id the one spec passive always used (`engine_chip_id`).
+		# BATCH IE §2a — A CHIP IS NOT A STATUS (ID's ruling 2): laid through the status door it
+		# was a Sanctity event and a float (a die) for every engine a hero held, at every spawn.
+		# It is drawn now as the rune chips are — nothing ticks, dispels or counts it
+		# (`BattleUnit.set_engine_chip`).
 		for pid in u.engines:
 			# BATCH CL §1 — resolved against the unit that was just spawned. Four
 			# specs overwrite this chip live in `refresh_bars` (bloodrage, heavy
 			# plating, seasoned and now resonance); the other eight read THIS
 			# string for the whole fight, so its tokens have to resolve here or
 			# they never resolve at all.
-			u.add_status(u.engine_chip_id(String(pid)), Classes.engine_title(String(pid)), "★",
-				Color(0.9, 0.78, 0.4), -1, Classes.resolve_values(
+			u.set_engine_chip(String(pid), Classes.engine_title(String(pid)), "★",
+				Color(0.9, 0.78, 0.4), Classes.resolve_values(
 					Classes.engine_desc(String(pid)),
 					Classes.value_ctx_from_unit(u)))
 		# BATCH ID §3 — THE CLASS PASSIVE'S CHIP IS DELETED (ID §0.1, the designer's). It was a
@@ -3955,7 +3959,7 @@ func _update_talent_chips() -> void:
 		if h.dead or not h.has_engine("overburn"):
 			continue
 		var ob_pct := int(round((_overburn_mult(h, burn_turns) - 1.0) * 100.0))
-		h.update_status(h.engine_chip_id("overburn"), "+%d%%" % ob_pct,
+		h.update_engine_chip("overburn", "+%d%%" % ob_pct,
 			"Overburn: +%d%% damage for every turn of Burn\non the enemy team, up to +%d%%.\nCurrently +%d%% (%d Burn turns standing).\nEvery turn of Burn you CONSUME refunds Mana." % [
 				int(OVERBURN_STEP), int(OVERBURN_CAP), ob_pct, burn_turns])
 	# Seeding Embers: harvest burning deaths (once per corpse).
@@ -6192,7 +6196,9 @@ func _show_actions(u: BattleUnit) -> void:
 		var emp_btn := Button.new()
 		emp_btn.toggle_mode = true
 		emp_btn.button_pressed = empower_armed
-		emp_btn.text = "✦ Empower (C)"
+		# BATCH IE §4 — NO GLYPH: ✦ names a rune (ID's ruling 1, answered at IE §0.1), and this
+		# toggle is neither a rune nor a count of runes.
+		emp_btn.text = "Empower (C)"
 		emp_btn.custom_minimum_size = Vector2(112, 32)
 		emp_btn.add_theme_font_size_override("font_size", 13)
 		emp_btn.disabled = u.second_resource < 1 and u.avatar_of_mercy <= 0
@@ -13033,9 +13039,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# move that board.
 		#
 		# STOKE doubles the target's REMAINING Burn turns — the clock, not the
-		# tick — and does nothing at all to an enemy that is not alight, which is
-		# what keeps it a multiplier on a bank he built rather than a second
-		# Backdraft (which ADDS a flat +2 to every burning enemy). Overburn read
+		# tick — so on a fire that stands it multiplies and never adds, which keeps
+		# it a multiplier on a bank he built rather than a second Backdraft (which
+		# ADDS a flat +2 to every burning enemy). An enemy not alight is set
+		# Burning (IE §3b). Overburn read
 		# the field BEFORE this line (`inferno_turns` is captured at the top of
 		# each strike), so THIS cast is not paid for the turns it just created and
 		# every later one is — the ordering rule Detonation has followed since
@@ -13055,8 +13062,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					sk_left * sk_mult,
 					" [PERFECT]" if is_perfect else ""], "#e08850")
 			else:
-				_log("   → Stoke finds no fire on %s to feed" % target.unit_name,
-					"#909090")
+				# BATCH IE §3b — an enemy not alight is set Burning rather than left as it was.
+				_apply_status(target, "burn", STOKE_LIGHT_TURNS,
+					int(round((CRIT_CHANCE + attacker.crit_bonus) * 100)),
+					_dot_tick("burn", attacker), attacker)
+				_note_debuff_applied(attacker, "burn")
+				_log("   → Stoke finds no fire on %s, and lights one" % target.unit_name,
+					"#e08850")
 		# ARCANE BOLT HALVES HIS STACKS *AFTER* THE BLOW, never before: the raw
 		# block above multiplied by the meter he walked in with, and halving first
 		# would quietly pay him for half of what the card promises. Integer
@@ -15008,11 +15020,19 @@ const DETONATE_AT := 4
 # RATHER THAN AN ADDITION on purpose — Backdraft already ADDS a flat +2 turns to
 # every burning enemy, so an additive Stoke would have been Backdraft aimed at
 # one body, and BD §4's Deadfall/Snare Trap finding is what that rule exists to
-# prevent. Doubling is worth exactly as much as the stack he built and nothing
-# at all on an empty one, which is the deferred-damage spine stated as a card.
+# prevent. Doubling is worth exactly as much as the stack he built, which is the
+# deferred-damage spine stated as a card; an empty target is lit since IE §3b.
 const SLOW_BURN_TURNS := 3
 const STOKE_MULT := 2
 const STOKE_MULT_PERFECT := 3
+# BATCH IE §3b — THE MAGE'S FIRE WAS READ BY MORE CARDS THAN LAID IT (the designer's finding), and
+# two cards that deal fire and laid nothing are given their Burn: a repair, not a new card. STOKE
+# sets an enemy that is not alight Burning (a Fireball's turns, the single-target figure the kit
+# already uses) and still multiplies a fire that stands; CINDERFALL sets every enemy it rakes that
+# was not alight Burning (Flamewave's and Choking Smoke's area figure) and still skims what burns.
+# Both lay it through the status door, so Emberkeep, Downwind and a Rupture see it as any Burn.
+const STOKE_LIGHT_TURNS := 3
+const CINDERFALL_LIGHT_TURNS := 2
 # FUNERAL PYRE: the share of the Burn's REMAINING damage that becomes a shield,
 # and how long that shield stands. 3 turns matches Magic Barrier, the other
 # Mage-side ward, so the two wards read the same way on the bar.
@@ -19816,6 +19836,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var cf_binfo: Array = STATUS_INFO["burn"]
 			var cf_total := 0
 			var cf_turns := 0
+			var cf_lit := 0
 			for foe in enemies:
 				if foe.dead:
 					continue
@@ -19851,11 +19872,18 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					_message("%s falls!" % foe.unit_name)
 					_log("† %s dies" % foe.unit_name, "#e05050")
 					_on_enemy_death(foe)
+				elif cf_left <= 0:
+					# BATCH IE §3b — what was not alight catches: the cinders set it Burning.
+					_apply_status(foe, "burn", CINDERFALL_LIGHT_TURNS,
+						int(round((CRIT_CHANCE + attacker.crit_bonus) * 100)),
+						_dot_tick("burn", attacker), attacker)
+					_note_debuff_applied(attacker, "burn")
+					cf_lit += 1
 			_sfx("bomb", -8.0, 0.9)
 			_message("%s rains cinders across the field!" % attacker.unit_name)
-			_log("%s: Cinderfall — %d damage across the field, %d turn%s of Burn skimmed%s" % [
+			_log("%s: Cinderfall — %d damage across the field, %d turn%s of Burn skimmed, %d set Burning%s" % [
 				attacker.unit_name, cf_total, cf_turns,
-				"" if cf_turns == 1 else "s", " [PERFECT]" if is_perfect else ""],
+				"" if cf_turns == 1 else "s", cf_lit, " [PERFECT]" if is_perfect else ""],
 				"#e08850")
 			# The refund is the PASSIVE's, through the one door Detonation and
 			# Wildfire already share — this ability carries no copy of it.
