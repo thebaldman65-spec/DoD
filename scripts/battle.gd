@@ -9476,6 +9476,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					if attacker.dead:
 						break
 					continue
+			# BATCH IC §1b — THE VOW IS ASKED ONCE A STRIKE, HERE, ABOVE THE COMPUTATION, under
+			# the frame that credits this blow (the attacker's: `_resolve` sets it and every
+			# site below that borrows it puts it back before the door). A blow it silences is a
+			# zero blow from the one branch above the credit down — the credit, `total_dealt`,
+			# the Ruin leech, the door, the float and the line all read the blow that landed —
+			# so no reader below asks late. A site inside the swing that deals under another
+			# frame (a retaliation, the ground's reflect) asks for itself (HY §1c).
+			var silenced := _vow_silences(strike_target)
 			# BATCH HF — GRUDGE'S FOE IS WHOEVER'S BLOW LAST REACHED HIM, recorded
 			# at the door Opening and Momentum read "an enemy struck him" off — the
 			# blow-met line just below, past both miss rolls and above the Block roll
@@ -11532,8 +11540,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# without the zeroing a multi-hit ability would pay it three times.
 			if attacker.aegis_bonus > 0 and ab.damage > 0 and not wall_parry:
 				final += attacker.aegis_bonus
-				_log("   → Aegis Reversal: the unspent shield lands as %d bonus damage" % \
-					attacker.aegis_bonus, "#e0c060")
+				# BATCH IC §1b — a figure the vow will silence is not printed as landing.
+				if silenced:
+					_log("   → Aegis Reversal: the unspent shield is spent, and %s silences it" % \
+						_vow_name(), "#e0c060")
+				else:
+					_log("   → Aegis Reversal: the unspent shield lands as %d bonus damage" % \
+						attacker.aegis_bonus, "#e0c060")
 				attacker.aegis_bonus = 0
 			# BATCH GO — REDOUBT'S BANK IS SPENT HERE, ON AEGIS REVERSAL'S MODEL ONE
 			# BLOCK UP AND FOR ITS REASON: what was banked is damage that did not
@@ -11682,6 +11695,18 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			_stat("attack_landed")
 			if is_crit:
 				_stat("attack_crit")
+			# BATCH IC §1b — THE ONE BRANCH. A blow the vow silences lands nothing, so from
+			# here down it is a zero blow: the credit and `total_dealt` (the card's and the
+			# rune's lifesteal, Siphon and recoil after the loop) sum what landed, the Ruin
+			# leech drinks off what landed, the door is handed what lands, and the float and
+			# the line say SILENT with no figure. Break damage rides `pr` and is untouched.
+			# `connected` is the blow reaching its body — not missed, blocked or parried to
+			# nothing — which a hit-count rider reads (Anointing's Ruin, below): a silenced
+			# hit still connects, and its Break still lands.
+			var connected := final > 0
+			var refused := silenced and final > 0
+			if refused:
+				final = 0
 			if attacker.is_hero:
 				_stat("dmg_hero_" + attacker.unit_name, final)
 			else:
@@ -11971,7 +11996,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_log("   → Talent: On the Edge — %s draws power from the brink" % \
 					strike_target.unit_name, "#b0a8e0")
 				_gain_resonance(strike_target, oe_gain)
-			if is_crit:
+			# BATCH IC §1c — SILENT STANDS ALONE: a refused blow floats no figure beside it.
+			if refused:
+				_sfx(_impact_sfx(attacker, ab))
+				_float_silent(strike_target)
+			elif is_crit:
 				_sfx("crit", -3.0)
 				strike_target.float_text("%d!" % final, Color(1.0, 0.45, 0.15), true)
 				_shake()
@@ -11988,16 +12017,26 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			elif resist_cut < 0:
 				# Weakness: the hit lands 25%+ harder — call it out loudly.
 				resist_tag = " (WEAK! +%d)" % -resist_cut
-				strike_target.float_text("WEAK!", Color(1.0, 0.55, 0.15))
+				if not refused:
+					strike_target.float_text("WEAK!", Color(1.0, 0.55, 0.15))
 			if armor_cut > 0:
 				resist_tag += " (armor -%d)" % armor_cut
 			if parried:
 				resist_tag += " (parried — UNTOUCHABLE)" if wall_parry \
 					else " (parried -75%% — %s)" % parry_source
-			_log("%s: %s on %s — %d %s dmg%s%s, +%d BD%s" % [attacker.unit_name,
-				ab.display_name, strike_target.unit_name, final, ab.dmg_type,
-				" CRIT" if is_crit else "", resist_tag, result.get("bd", pr), grade_tag],
-				"#d8d2c4" if attacker.is_hero else "#e0a0a0")
+			# BATCH IC §1c — A BLOW THAT LANDED NOTHING PRINTS NO FIGURE: not the one computed,
+			# and not a 0 — the line says the vow refused it, and what it did land, its Break.
+			if refused:
+				_log("%s: %s on %s — silenced by %s, +%d BD%s%s%s" % [attacker.unit_name,
+					ab.display_name, strike_target.unit_name, _vow_name(),
+					result.get("bd", pr), " CRIT" if is_crit else "",
+					(" (parried -75%% — %s)" % parry_source) if parried else "", grade_tag],
+					"#d8d2c4")
+			else:
+				_log("%s: %s on %s — %d %s dmg%s%s, +%d BD%s" % [attacker.unit_name,
+					ab.display_name, strike_target.unit_name, final, ab.dmg_type,
+					" CRIT" if is_crit else "", resist_tag, result.get("bd", pr), grade_tag],
+					"#d8d2c4" if attacker.is_hero else "#e0a0a0")
 			# Consecrated Ground: the holy footing bites back. Righteous
 			# Fire deepens the reflect; Lifewell turns it into party
 			# healing; Judgement adds Sunder + Break pressure on top.
@@ -12940,7 +12979,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# `_gain_ruin` refuses a hero target and returns without a living
 			# Occultist, so the anointing on a party with no Occultist standing
 			# is inert by construction rather than by a second check here.
-			if attacker.is_hero and ab.damage > 0 and final > 0 \
+			#
+			# BATCH IC §1b — IT READS `connected`, NOT THE FIGURE: a hit the vow silences
+			# still reaches its body (its Break lands), so it still marks, as it did.
+			if attacker.is_hero and ab.damage > 0 and connected \
 					and not strike_target.is_hero \
 					and attacker.has_status("anointed"):
 				_gain_ruin(strike_target, 1)
@@ -18095,11 +18137,16 @@ func _detonate_ruin(target: BattleUnit) -> void:
 	var dr_was_label := _dmg_label
 	var dr_was_name := _dmg_src_name
 	_dmg_frame(occ, String(STATUS_INFO["ruin"][0]), occ.unit_name)
+	# BATCH IC §2 — asked under the detonation's own frame, before its door: a blast his vow
+	# refuses is booked and printed as what it landed. The feast below is paid off the blast
+	# itself, not off its figure, and is untouched.
+	var det_land := _landed(target, det_dmg)
 	var det_died := target.take_tick_damage(det_dmg, "-%d RUIN" % det_dmg,
 		Color(0.8, 0.3, 0.9))
-	_stat("dmg_hero_" + occ.unit_name, det_dmg)
-	_log("%s: Wrath of the Old Gods — Ruin detonates on %s for %d shadow" % [
-		occ.unit_name, target.unit_name, det_dmg], "#c060d0")
+	_stat("dmg_hero_" + occ.unit_name, det_land)
+	_log("%s: Wrath of the Old Gods — Ruin detonates on %s for %s" % [
+		occ.unit_name, target.unit_name,
+		("%d shadow" % det_land) if det_land > 0 else "nothing (silenced by %s)" % _vow_name()], "#c060d0")
 	for h in heroes.filter(func(he): return not he.dead and not he.is_companion):
 		var rw_heal := maxi(int(round(occ.max_hp * 0.25)), 1)
 		var rw_got: int = h.heal_amount(rw_heal, h != occ)
@@ -22182,10 +22229,14 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				rq_raw *= 1.0 - float(target.resists.get("shadow", 0.0))
 				var rq_final := maxi(int(round(rq_raw
 					* (1.0 - target.effective_armor()))), 1)
+				# BATCH IC §2 — what lands is what is booked, floated and printed; the mending is
+				# paid off the stacks sung out, not off the blow, so it is untouched.
+				var rq_land := _landed(target, rq_final)
 				var rq_hit: Dictionary = target.take_hit(rq_final, ab.pressure)
-				_stat("dmg_hero_" + attacker.unit_name, rq_final)
+				_stat("dmg_hero_" + attacker.unit_name, rq_land)
 				_stat_bd(attacker, ab.pressure)
-				target.float_text("%d" % rq_final, Color(0.75, 0.45, 0.85))
+				if rq_land > 0:
+					target.float_text("%d" % rq_land, Color(0.75, 0.45, 0.85))
 				var rq_share := maxi(int(round(attacker.max_hp * 0.02
 					* rq_stacks)), 1)
 				# BOOKED AS WHAT LANDED RATHER THAN WHAT WAS ASKED FOR. An ally
@@ -22207,9 +22258,10 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_sfx("crit", -7.0, 0.5)
 				_message("%s sings the ruin out of %s" % [attacker.unit_name,
 					target.unit_name])
-				_log("%s: Requiem — %d stacks of Ruin consumed for %d shadow, and %d hero(es) mended %d in all (2%% of his maximum a stack)%s" % [
-					attacker.unit_name, rq_stacks, rq_final, rq_paid, rq_total,
-					" [PERFECT]" if is_perfect else ""], "#a050b0")
+				_log("%s: Requiem — %d stacks of Ruin consumed for %s, and %d hero(es) mended %d in all (2%% of his maximum a stack)%s" % [
+					attacker.unit_name, rq_stacks,
+					("%d shadow" % rq_land) if rq_land > 0 else "nothing (silenced by %s)" % _vow_name(),
+					rq_paid, rq_total, " [PERFECT]" if is_perfect else ""], "#a050b0")
 				if rq_hit.died:
 					_stat("enemy_deaths")
 					_sfx("death", -4.0)
@@ -23974,15 +24026,19 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				rp_raw *= 1.0 - float(target.resists.get("holy", 0.0))
 				var rp_final := maxi(int(round(rp_raw
 					* (1.0 - target.effective_armor()))), 1)
+				# BATCH IC §2 — what lands is what is booked, floated and printed.
+				var rp_land := _landed(target, rp_final)
 				var rp_hit: Dictionary = target.take_hit(rp_final, ab.pressure)
-				_stat("dmg_hero_" + attacker.unit_name, rp_final)
+				_stat("dmg_hero_" + attacker.unit_name, rp_land)
 				_stat_bd(attacker, ab.pressure)
-				target.float_text("%d" % rp_final, Color(0.98, 0.90, 0.55))
+				if rp_land > 0:
+					target.float_text("%d" % rp_land, Color(0.98, 0.90, 0.55))
 				_sfx("crit", -7.0, 1.2)
 				_message("%s answers for the wounded!" % attacker.unit_name)
-				_log("%s: Reprisal — %d damage, %d%% of the %d she healed in the last two turns%s" % [
-					attacker.unit_name, rp_final, int(round(rp_share * 100)),
-					rp_healed, " [PERFECT]" if is_perfect else ""], "#70d878")
+				_log("%s: Reprisal — %s, %d%% of the %d she healed in the last two turns%s" % [
+					attacker.unit_name,
+					("%d damage" % rp_land) if rp_land > 0 else "silenced by %s" % _vow_name(),
+					int(round(rp_share * 100)), rp_healed, " [PERFECT]" if is_perfect else ""], "#70d878")
 				if rp_hit.died:
 					_stat("enemy_deaths")
 					_sfx("death", -4.0)
@@ -24100,19 +24156,29 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			su_raw *= 1.0 - float(target.resists.get("shadow", 0.0))
 			var su_final := maxi(int(round(su_raw
 				* (1.0 - target.effective_armor()))), 1)
+			# BATCH IC §2 — THE HEAL IS THE WHOLE OF WHAT LANDED, and a blow the vow refuses
+			# landed nothing: it heals nothing and prints no figure.
+			var su_land := _landed(target, su_final)
 			var su_hit: Dictionary = target.take_hit(su_final, ab.pressure)
-			_stat("dmg_hero_" + attacker.unit_name, su_final)
+			_stat("dmg_hero_" + attacker.unit_name, su_land)
 			_stat_bd(attacker, ab.pressure)
-			target.float_text("%d" % su_final, Color(0.75, 0.45, 0.85))
-			var su_got: int = attacker.heal_amount(su_final)
-			attacker.float_text("+%d" % su_got, Color(0.4, 0.9, 0.45))
-			_stat_heal(attacker, su_got, attacker)
+			var su_got := 0
+			if su_land > 0:
+				target.float_text("%d" % su_land, Color(0.75, 0.45, 0.85))
+				su_got = attacker.heal_amount(su_land)
+				attacker.float_text("+%d" % su_got, Color(0.4, 0.9, 0.45))
+				_stat_heal(attacker, su_got, attacker)
 			attacker.refresh_bars()
 			_sfx("crit", -7.0, 0.6)
 			_message("%s opens a wound that thinks" % attacker.unit_name)
-			_log("%s: Suffering — %d damage to %s and %d healed (the whole of it)%s" % [
-				attacker.unit_name, su_final, target.unit_name, su_got,
-				" [PERFECT]" if is_perfect else ""], "#a050b0")
+			if su_land > 0:
+				_log("%s: Suffering — %d damage to %s and %d healed (the whole of it)%s" % [
+					attacker.unit_name, su_land, target.unit_name, su_got,
+					" [PERFECT]" if is_perfect else ""], "#a050b0")
+			else:
+				_log("%s: Suffering on %s — silenced by %s, and nothing healed%s" % [
+					attacker.unit_name, target.unit_name, _vow_name(),
+					" [PERFECT]" if is_perfect else ""], "#a050b0")
 			if su_hit.died:
 				_stat("enemy_deaths")
 				_sfx("death", -4.0)
@@ -29854,8 +29920,26 @@ func _dmg_frame(src: BattleUnit, label: String, src_name := "") -> void:
 func _deal_gate(victim: BattleUnit, amount: int) -> int:
 	if amount <= 0 or not _vow_silences(victim):
 		return amount
-	victim.float_text("SILENT", Color(0.85, 0.85, 0.75))
+	_float_silent(victim)
 	return 0
+
+
+# BATCH IC §1c — THE VOW'S ONE WORD ON A BODY, floated by the gate at the two doors and by
+# the strike loop for a blow it refused above the door (`refused`): one word, one colour.
+func _float_silent(victim: BattleUnit) -> void:
+	victim.float_text("SILENT", Color(0.85, 0.85, 0.75))
+
+
+# BATCH IC §2 — WHAT A DOOR CALL WILL LAND, ASKED BEFORE IT IS MADE: the figure, or 0 when the
+# vow refuses it under the frame standing now — the frame the door's gate will read. A site that
+# prints or pays its own figure prints and pays this, so it cannot disagree with the door.
+func _landed(victim: BattleUnit, amount: int) -> int:
+	return 0 if amount > 0 and _vow_silences(victim) else amount
+
+
+# The vow's name, for a line that says it refused a blow.
+func _vow_name() -> String:
+	return String(Runes.config("vow_of_silence").get("name", ""))
 
 
 # BATCH IA §1 — THE GATE'S ANSWER, WITH NOTHING DRAWN: does the frame credit a blow on
@@ -30020,17 +30104,22 @@ func _on_damage_taken(victim: BattleUnit, lost: int, hp_before: int) -> void:
 		var pn_was_label := _dmg_label
 		var pn_was_name := _dmg_src_name
 		_dmg_frame(null, "Penance", pn_owner)
+		# BATCH IC §2 — asked under Penance's frame, before the door: a mirror its setter's vow
+		# refuses is credited and printed as what it landed.
+		var pn_land := _landed(pn_owed, pn_share)
 		# IT CREDITS THE OCCULTIST WHO SET IT, resolved through the `src_name`
 		# the status carries rather than through a live unit — a dead caster
 		# credits nobody and the penance goes on being paid, which is honest
 		# rather than wrong (the mark is on the enemy, not on him).
 		if pn_owner != "":
-			_stat("dmg_hero_" + pn_owner, pn_share)
+			_stat("dmg_hero_" + pn_owner, pn_land)
 		_sfx("hit", -14.0, 0.7)
 		pn_owed.take_tick_damage(pn_share, "-%d PENANCE" % pn_share,
 			Color(0.70, 0.38, 0.78))
-		_log("   → Penance: %s pays for the blow — %d shadow damage%s" % [
-			pn_owed.unit_name, pn_share, pn_tag], "#a050b0")
+		_log("   → Penance: %s pays for the blow — %s%s" % [
+			pn_owed.unit_name,
+			("%d shadow damage" % pn_land) if pn_land > 0 else "silenced by %s" % _vow_name(),
+			pn_tag if pn_land > 0 else ""], "#a050b0")
 		if pn_owed.dead:
 			# NO `_on_enemy_death` CALL, and that is the consistency the tick had
 			# before it: every non-strike damage site in this file reports the

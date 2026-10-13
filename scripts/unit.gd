@@ -4730,8 +4730,15 @@ func set_ruin_stacks(n: int) -> void:
 func take_tick_damage(amount: int, label: String, color: Color) -> bool:
 	# BATCH HF — VOW OF SILENCE, as in `take_hit`: a tick its source may not
 	# deal is not dealt.
+	#
+	# BATCH IC §1c — AND ITS LABEL IS NOT FLOATED. The caller built `label` above this
+	# door, so it carries the figure computed (`-N Reflect`); the label carries what
+	# landed, and a tick the gate refused landed nothing — the gate's SILENT stands
+	# alone. The gate answers all or nothing, so 0 after a positive figure is a refusal.
+	var silenced := false
 	if amount > 0 and deal_gate_cb.is_valid():
 		amount = int(deal_gate_cb.call(self, amount))
+		silenced = amount <= 0
 	# BATCH GO — COVENANT AND SIPHON READ "DAMAGE TAKEN", AND A TICK IS DAMAGE
 	# TAKEN. Both run here too, in `take_hit`'s order. The half a bond hands the
 	# other body arrives through THIS function with the receiver's guard up, so it
@@ -4760,7 +4767,8 @@ func take_tick_damage(amount: int, label: String, color: Color) -> bool:
 	# Blood Frenzy v2: tick-driven dives bank their floor too.
 	if has_engine("bloodrage") and not dead:
 		frenzy_bonus()
-	float_text(label, color)
+	if not silenced:
+		float_text(label, color)
 	if hp <= 0:
 		_die()
 	refresh_bars()

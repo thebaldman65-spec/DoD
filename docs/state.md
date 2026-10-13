@@ -29,79 +29,73 @@ never have fired: **an alarm set above the failure level is not an alarm.** `che
 sentence every battery: over it is a warning, and past it by more than one batch at the record is a failure — the largest
 single-batch growth on record is **+13.38 KiB** (ES's +13,700 B). *In the preamble for the archive pointer's reason.*
 
-*Last rewritten: 2026-10-12 (Batch IB).*
+*Last rewritten: 2026-10-12 (Batch IC).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: IB — THE DRAFT APPEARS, AND EACH HERO DRAFTS ALONE.** IMPLEMENT ONLY. **Game code changed in five files** —
-  `map_screen.gd` (the arrival and the hero's draft screen), `run_state.gd` (the order and the return), `battle.gd` (the rune
-  cache's one door), `party_screen.gd` and `talents_screen.gd` (a return is not an arrival) — and the glossary's draft entry.
-  Full working: **`docs/reports/IB.md`**. **The next letter is IC.**
-- **§0 — IA's FIVE RULINGS, ANSWERED (the designer's).** Two moved a line: **an empty core slot reads *— empty —*** (a row does
-  not repeat its section's head; HN §2.6's line unchanged), and **the event verb's core rune is held** — confirmed, its fallback
-  recorded as an unauthored source of core runes (TO WATCH IN PLAY). Three are confirmations with their reasons written: **the rune
-  panel keeps GT §1's scroll** — HU §1 governs a bar of peers under time pressure, GT §1 a sectioned document read between fights
-  (`CLAUDE.md`'s GT §1 block) — and its scroller already draws its bar where it scrolls and nowhere else (measured at the Cleric's
-  815 px and a bare panel, `check_ib` §4); **the save version stays** — a bump is for a key an older build writes away, not a value
-  it reads generously (`CLAUDE.md`'s VERSIONS bullet; the asymmetry is on the save line below); **the family is IC's**, its scope set.
-- **§1 — A PICK OWED OPENS ITSELF WHEN THE PARTY ARRIVES.** The draft did since BX; **the zone boss's ability, the mini-boss's
-  upgrade and the rune cache now do too**, one after another **in the order earned** (`Run.pending_picks`; a serial is stamped at
-  every award door), then the pouch's swap offers and the full holdings as before. **A holding never opens** — HR's ✦ N shows it.
-  Later and Not yet lose nothing, the pick stays marked on its card (the border, `◆ N kind`, CHOOSE), nothing dismissed opens again
-  on that arrival, and **a return from the hero sheet or the talents is not an arrival** (`Run.map_reentry`). It starts in `_ready`
-  after the map is drawn, behind the framing card, and never opens over an overlay.
-- **§2 — EACH HERO DRAFTS ALONE, HIS CARD AND HIS RUNE ON ONE SCREEN** (`map_screen._open_hero_draft`). The four columns were
-  four picks already, so it is a layout and no reward moved. A section only while owed: **the elite's looter owes both at every
-  elite** (a rune cache is an elite's spoils and a bargain's reward, not a map node); one Confirm, live once every section is
-  decided. The kit preview opens on him without walking; the crest stays out of his pick and its bag is untouched. The boss's
-  ability and the upgrade keep the pick overlay (IB's ruling 1).
-- **§3 — *— empty —*.** **§4 — THE CLEARING STEP IS RETIRED** (the designer's): a report and one command, beside HO §5's item
-  (FOUND AT HX, below).
-- **THE ROAD WALKERS ARE ONE ANSWER (FOUND AT HZ, paid)**: `Gate.answer_hero_draft`, `Gate.pick_choices` and the game's own
-  `choice` mark — `check_gj`, `check_gp`, `check_gv`, `check_hk` and `check_fh` answer a hero's screen and a pick by binding and
-  mark, never by words, each recording what it always recorded, and each printing what its run met.
-- **THE INSTRUMENTS.** `check_ib` is new. `check_fd` (+2), `check_fm` (+1), `check_fh` (+1) and `test_batch_bx` (+4) moved, each
-  attributed by an `ok()` trace; `check_he`, `check_hz`, `check_ho`, `check_hl`, `check_ia`, `check_map_screen`, `test_batch_bo` and
-  `check_gv` §2c were re-pointed at their counts; `check_parse` counts `check_ib` (`baselines.json` names each, with HEAD's reading).
-- **THE VERIFICATION.** The saves were backed up first and verified by hash (`../save-backups/IB-20261012-103914`): byte-identical
-  to IA's backup, so nothing has been played for four batches. **One recon of HEAD's whole battery against all of IB's code, predicted
-  first** (IB moved no damage path): `check_de` 581 / 30, every red in a gate the prediction named — fifteen of the seventeen named red,
-  `check_fe` and `test_batch_ah_battle` green, the possible `check_hk` red — each repaired to intent and every moved count attributed by
-  an `ok()` trace; the re-pointed `check_gv`, run alone, then showed its §2c still on the old overlay, and §2c was re-pointed too.
-  **Thirty-seven controls**, every defect red at its line, the baseline green, and the repairs red against HEAD's game code. **The
-  pre-pass** — 142 targets in an isolated copy proved equal to the tree, 12:39:20 to 13:57:51 — read `check_de` 585 / 0 / 0. **The
-  acceptance run in the repository** — 142 targets, 13:58:25 to 15:16:42, `ps` read by rows every 15 s with no game window in 312
-  readings — read `check_de` 585 / 0 / 0. The tree was byte-identical before and after (603 files) and the player's four files
-  untouched. **Then the final tree**: this line written after the run, swept against every gate literal, and the readers of this file
-  with the document instruments re-run on it in an isolated copy, each at its acceptance reading.
-- **`CLAUDE.md` IS 454,754 B = 444.10 KiB AGAINST ITS 510 KiB CEILING — 65.90 KiB UNDER** (+5,200 B at IB): the re-measure's first
-  reading — 8.1 batches at EZ's record, 13.0 at IB's own rate.
-- **`docs/state.md` IS 344,874 B = 336.79 KiB AGAINST ITS 380 KiB CEILING — 43.21 KiB UNDER** (−238 B at IB, this line included;
-  IA's closed entries went to the archive): the re-measure's second reading — 7.6 batches at IA's +5,860 B, 8.0 at HO–HW's
-  +5,528 mean. **It still binds**: 7.6 to 8.0 batches at its own rates against `CLAUDE.md`'s 8.1 at EZ's record and 13.0 at
-  IB's — by a hair at the record.
-- **No save version moved**: the pick order rides the members, which the save carries whole.
+- **Last batch: IC — THE SILENCED FIGURE.** IMPLEMENT ONLY. **Game code changed in three files** — `battle.gd` (the strike asks
+  the vow once; five door calls print and pay what landed), `unit.gd` (a tick the gate refuses floats no label) and
+  `map_screen.gd` (the held-upgrade mark; the arrival's tail goes on). Full working: **`docs/reports/IC.md`**. **The next letter
+  is ID.**
+- **§0 — IB's FOUR RULINGS, ANSWERED (the designer's).** **The fold is ruled and is ID's**: the zone boss's ability and the
+  mini-boss's upgrade move onto the hero's own screen and the pick overlay retires, its design on the roadmap below (with one
+  premise found false: a deferred draft and a boss's ability CAN be owed together). **The words are ID's**, with three changes
+  set. **A return from a screen the player chose to open is not an arrival** — confirmed and generalised (`CLAUDE.md`'s arrival
+  block); a load is. **◆ means a decision waits and nothing else, anywhere** — recorded; the map card's held upgrades moved to
+  ↑N, and **six other surfaces still draw ◆ for something else, RULED, NOT BUILT** (IC's ruling 1).
+- **§1 — THE VOW IS LIVE, AND A BLOW IT REFUSES PRINTS AND PAYS NOTHING.** Vow of Silence is in every Cleric lineage's pool and
+  offered at all four doors; nothing retired it. `_resolve` asks `_vow_silences` once a strike, above the computation, and one
+  branch makes a silenced blow a zero blow for every reader below it — the credit, `total_dealt`, the Ruin leech, the door, the
+  float (SILENT alone) and the line (*silenced by Vow of Silence, +N BD*). Aegis Reversal's line asks the same answer; Anointing
+  still marks a silenced hit (`connected`); `take_tick_damage` floats its label only for a tick that landed.
+- **§1d — THE VOW'S PRICE, MEASURED, NOT RULED** (IC's ruling 2): it gives +50% heals (Ministration 40 → 60 on a board); it costs
+  every blow he lands; **of the four payouts the brief named, three cannot pay a Cleric in a run played forward** (no card carries
+  `lifesteal`, nothing writes `siphon_ranks`, the rune lifesteal's only writer is the retired Vampiric Rune) **and the fourth,
+  recoil, is a cost the fix makes cheaper**; the live payouts IC removes are a vowed Occultist's — the Ruin leech, 1–9 a blow at
+  1–9 Ruin, and Suffering's heal of the whole figure, 20 on the board (`check_ic` §1c, §1d and §2 print them).
+- **§2 — THE DOOR CALLS, PARTITIONED, FIVE REPAIRED.** IA's 43 does not reproduce (its sweep was not kept); at its stated rule
+  the sweep reads 46, 55 with a tick's own label. Group 1 — a blow the vow can refuse — is 15 of the 55, 3 covered by §1, 4
+  dormant, **8 open; IC repaired 5** (Suffering, which healed the whole of a figure that never landed; Requiem; Reprisal; the Ruin
+  detonation; Penance's mirror) and **three are left, with two frame findings** (FOUND AT IC).
+- **§3 — ↑N AND THE TAIL.** The map card's held upgrades read ↑N; the word does not fit the 40-px corner (65 px). A pouch offer
+  that finds room on arrival no longer ends the arrival's tail.
+- **THE INSTRUMENTS.** `check_ic` is new (132 checks). `test_batch_bu` is re-tuned on one needle — Suffering heals off what LANDED — its count unmoved at 458 (a source needle the pin manifest cannot see, and the red recon 2 found that its prediction had not named); `check_gp`'s row moved 443 → 458, its seeded road's dice (the road's Cleric wears the vow, and a refused blow floats one label fewer), attributed by an `ok()` trace and a stub whose trace is byte-identical to HEAD's; `check_parse` counts `check_ic` (`baselines.json`
+  names each, with HEAD's reading); the pin manifest is rebuilt (1,751 pins).
+- **THE VERIFICATION.** The saves were backed up first and verified by hash (`../save-backups/IC-20261012-171924`): byte-identical
+  to IB's backup — and to every backup since HW's, so nothing has been played since 2026-10-08. **Two recons of HEAD's whole
+  battery, each predicted first**: §1 alone (142 targets, 17:34:57 to 18:53:34, `check_de` 585 / 0 / 1 notice — nothing moved but `check_gp`'s seeded road, at 458), then all of IC's code (18:00:20 to 19:18:44, 585 / 1 / 1 — `check_gp` again, and `test_batch_bu`'s Suffering needle, the one red the prediction missed). **Twenty-three controls**, every defect red at the arm it aims at, the baseline green, and HEAD's game code under `check_ic` red at every vowed arm and green at every unvowed one — so the unvowed arms read byte for byte what they read at IB. **The pre-pass**:
+  143 targets in an isolated copy proved equal to the tree (525 files, the project name aside), seeded from the backup, 19:36:52 to 20:57:28 — `check_de` 589 / 0 / 0, every target at its row, as predicted. **The acceptance run in the repository**: 143 targets, 19:37:14 to 20:57:41 (80 min 27 s, beside the pre-pass), `ps` read by rows every 15 s — 322 readings, 616 Godot rows across the two batteries, every one `--headless`, no game window — `check_de` 589 / 0 / 0, as predicted. The tree was byte-identical before and after (525 files, tracked and untracked) and the player's four files untouched. **Then the final tree**: these post-run lines, written after the run at a fixed point (this file states its own size), swept against every gate literal, and the four gates that open this file with the two manifest instruments re-run on it in an isolated copy, each at its acceptance reading.
+- **`CLAUDE.md` IS 456,207 B = 445.51 KiB AGAINST ITS 510 KiB CEILING — 64.49 KiB UNDER** (+1,453 B
+  at IC): the re-measure's first reading — 8.0 batches at EZ's record, 45.4 at IC's own rate.
+- **`docs/state.md` IS 346,878 B = 338.75 KiB AGAINST ITS 380 KiB CEILING — 41.25 KiB UNDER** (+2,004 B
+  at IC, this line included; IB's closed entries went to the archive): the re-measure's second reading — 7.2 batches at
+  IA's +5,860 B, 7.6 at HO–HW's +5,528 mean. **It still binds**: 7.2 to 7.6 batches at its own rates against `CLAUDE.md`'s 8.0 at EZ's record — so the two run out within a batch of each other, as the brief said, and `docs/state.md` first.
+- **No save version moved**: IC writes nothing a save carries.
 - **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in a build
   older than HL**: HL's ceiling refuses a newer save from HL's build on — HR's v15 is the first bump it has guarded — and HJ's and
   HK's builds, and `main`, carry no ceiling.
-- **Next letter: IC — the silenced-figure family** (the roadmap, below).
+- **Next letter: ID — the fold, its words, the Cleric's regen and the Mage's fire** (the roadmap, below).
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### IB's RULINGS OWED — **FOUR; ALL PLAYER-VISIBLE, NONE BLOCKS**
+### IC's RULINGS OWED — **FIVE; THE FIRST TWO ARE PLAYER-VISIBLE, NONE BLOCKS**
 
-Full working: `docs/reports/IB.md`, NEEDS A RULING.
+Full working: `docs/reports/IC.md`, NEEDS A RULING.
 
-1. **THE BOSS'S ABILITY AND THE UPGRADE KEEP THE PICK OVERLAY (§2)** — a hero's own screen holds his draft and his rune cache;
-   the zone boss's card and the mini-boss's upgrade open on the pick overlay, in the same order-earned walk. Fold them into his
-   screen as sections, or keep two surfaces.
-2. **THE WORDS ON THE HERO'S SCREEN (§2), PROPOSED**: *THE DRAFT — <hero>*; a line saying what he is owed; the heads ABILITIES and
-   RUNES; *N choice(s) still to make* on the Confirm until it is live; *lets the cache go* for an empty cache let go. Confirm, or word it.
-3. **A RETURN FROM THE HERO SHEET OPENS NOTHING (§1)** — until IB the draft reopened when the player came back from a hero's sheet;
-   now a pick dismissed on an arrival waits on its card's CHOOSE until the party next arrives. Confirm.
-4. **THE ◆ MARKS A PICK AND A HOLDING (§1d)** — a pending pick reads `◆ 1 upgrade` under the slots; the upgrades a hero already holds
-   read `◆3` at the card's corner. Neither is mistaken for HR's ✦, but the ◆ names both. Keep, or give held upgrades another mark.
+1. **◆ STILL MARKS SIX THINGS THAT ARE NOT A WAITING DECISION (§3)** — the rule is recorded and the map card's corner moved to ↑N;
+   an upgraded ability's battle button and its hero-sheet chip (held upgrades), the Blacksmith's upgrade on offer, the class
+   passive's chip, and a rare relic on the relic shelf and the run's relic picker still draw ◆. Proposed: ↑ for the three
+   upgrade surfaces; the passive's chip its own letters; a rare relic the word RARE alone. Move them, or word them.
+2. **IS THE VOW STILL WORTH WEARING? (§1d, the designer's by the brief)** — +50% heals against every blow he lands; the refused
+   blows paid a vowed Occultist a Ruin draught (1–9 a blow) and Suffering's whole heal, and nothing else in a run played forward.
+3. **A REFUSED CAST STILL RECOILS THE FLOOR OF 1 UNDER MIRRORBOUND (§1)** — the floor every cast that dealt nothing pays (a blocked
+   one). Keep it, or exempt a cast whose whole figure the vow refused.
+4. **A SILENCED HIT STILL MARKS, AND IT IS MUTED (§1b)** — Anointing's Ruin reads whether the blow reached its body, not its figure,
+   as Break does; it floats SILENT, plays the plain impact and does not shake the screen, even on a crit. Confirm, or rule otherwise.
+5. **ID's FOLD: A DRAFT AND A BOSS'S ABILITY CAN BE OWED TOGETHER (§0.1)** — no one fight awards both, but dismissing loses nothing,
+   so a draft deferred past the zone boss (or one the event verb grants) waits beside the boss's ability. ABILITIES holds both,
+   or the boss's ability takes its own section — the brief's own fallback.
 
 ### BOIL OVER'S RATE — **0.8% AND THE 40% FLOOR STAND (IA §0.1, the designer's); THE TENSION IS RECORDED HERE AND THE LEVER IS UNBUILT**
 
@@ -149,22 +143,24 @@ block.
   writes, the three pay for a few turns of a fight; if a fall lasted they would pay for whole fights. **That item is no longer only a
   difficulty ruling — it sets the value of three of four crest runes, and it is owed before any of them is re-cut.**
 
-### FOUND AT IB AND NOT FIXED
+### FOUND AT IC AND NOT FIXED
 
-- **A POUCH OFFER THAT FINDS ROOM ENDS THE ARRIVAL'S TAIL** — `map_screen._check_item_offers` takes an offer silently when a
-  discard has made room, and returns without opening the next offer or the full-holding panel; they open at the next arrival.
-  HEAD's own (CT §3), met while building the walk; not moved (outside the brief).
+- **THE REST OF THE SILENCED-FIGURE FAMILY: THREE DOOR CALLS AND TWO FRAMES** (IC §2's partition, `docs/reports/IC.md` §2). Three
+  live sites still print or book a figure the vow refuses: **a damage-over-time tick's log line** (*takes N damage*, `_dot_pass`,
+  reached by a Cleric through Returned Burden's re-laid Burn or Poison), **Blight the Well's turned heal** (its line and its
+  credit, `_on_blight_heal`) and **the bleedout burst** (its float and its line, reached under the Bloodletting bargain). **Two
+  frames name the wrong dealer**: Blight the Well's damage is framed on the Old Gods' holder, not the Cleric who laid it, so a
+  vowed Cleric without that engine is not silenced; and Umbral Sigil's echo is framed on the striker, not the sigil's caster (DI's
+  rule). Each owes its own control; **its own letter.**
+- **A DAMAGE-OVER-TIME TICK IS CREDITED BY NAME, NOT BY LAYER** (`_dot_pass`): a Burn credits the hero named *Pyromancer* and a
+  Poison the one named *Survivalist* whoever laid it, so a Cleric's re-laid Burn books to the Mage. BL §2's, met at IC §2.
+- **FIVE MEMBERS THE PARTITION FOUND DORMANT** — Overkill (`overkill`), Temporal Rift (`temporal_ranks`), Spite (`spite_ranks`),
+  Blowback (`blowback`) and Forge Body (`forge_body_pct`): no writer in `scripts/` or `data/`. Overkill reads the strike's zeroed
+  `final` now; Temporal Rift's floor of 1 would echo 1 off a refused crit, and the other three would print a refused figure,
+  the day a writer returns.
 
 ### FOUND AT IA AND NOT FIXED
 
-- **THE FAMILY §0.6 NAMES: A FIGURE PRINTED OR PAID ABOVE THE GATE THAT COULD REFUSE IT** (the rule is in `docs/combat-rules.md`'s
-  frame block; the census is `docs/reports/IA.md` §1). Only a vowed hero's damage is refused, and the vow is a Cleric rune, so the
-  members a vow reaches today are a Cleric's: **the strike loop's `final`** — its damage float and its log line print the blow as
-  computed, and `total_dealt`, summed above the door, pays the card's lifesteal, the rune's, siphon and recoil off it — and **the
-  Ruin leech**, which heals off `final` above the door for any hero striking a Ruined enemy. **Every `take_tick_damage` label is
-  built above the gate too**, so a silenced reflect still floats *-N Reflect* beside SILENT. Beyond those, 43 door calls print or
-  pay the figure they hand the door within fourteen lines; most are other classes' cards no vow reaches. **Its own batch** (FZ's
-  pricing rule): each repair is a different arm owing its own control.
 - **THE MAP CARD'S `Kit n/7` BUTTON RUNS PAST THE CARD** — HEAD's own, measured at IA: x 304–344 on every card, whose right edge is
   308, because its width is `CARD_W - 24 - 3 × 96`, which is below zero, so the button takes its text's width from x 304. Not moved
   here (outside the brief); one constant or one position when the card is next touched.
@@ -213,8 +209,8 @@ block.
   this line.* **HO §5's CLEARING STEP IS RETIRED FROM THE BRIEF (IB §4, the designer's — so no batch reinstates it)**: the move
   was refused at HN and at IA, so a batch no longer attempts it; it reports the count and the disk and prints ONE command that
   clears every spent prefix at once, which the designer runs when he likes (the rule's own block, `docs/instrument-rules.md`, says
-  so). **HZ's fifteen (6,312 KiB) and IA's fourteen stand beside the older ones**; IB's count and its command are in
-  `docs/reports/IB.md` §4.
+  so). **HZ's fifteen, IA's fourteen and IB's twelve stand beside the older ones**; IC's count and its command are in
+  `docs/reports/IC.md` §4.
 - **THE TWO REFERENCES HOLD 87 STALE CLAIMS AFTER HX — COUNTED BY A CENSUS (HX §1d), NOT FIXED.** 824 present-tense claims
   (the instrument file's 569, the combat file's 255), 735 of them mechanically checkable; **90 of the 735 were stale at HW's HEAD**
   — 70 in the instrument file, 20 in the combat file — and counts rot fastest (31 of 106). HX repaired the one passage its own work
@@ -257,18 +253,27 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
 - **`run_battery.sh` STILL DOES NOT ASK WHETHER THE GAME IS OPEN, AND A PLAIN `kill` STILL DOES NOT STOP IT** (HT's two, carried).
 ### THE PLAYTEST'S OTHER FINDINGS — **LATER BATCHES BY RULING (HW's brief §5); THE ROADMAP HOLDS THE ORDER**
 
-- **THE RE-MEASURE IS NOT RUN AT IB**: five batches have elapsed since HV, and the brief keeps it waiting; **the block index and
-  HV's pilot still wait on it.** Its two readings are in the WHERE block, one line each with its arithmetic — **and since IA
-  `docs/state.md` is the tighter of the two, so it is the file the re-measure waits on.** **THE ORDER:**
-- **IC — THE SILENCED-FIGURE FAMILY (IB §0.5, its scope set before the brief)**: a live Cleric rune that does not cost what it
-  says, in the one path HY, HZ and IA each edited, so it goes before resources and before the claims. **§1 is the five readers of
-  the strike loop** — the damage float, the log line, `total_dealt` (which pays the card's lifesteal, the rune's, Siphon and recoil
-  off a refused blow), the Ruin leech and the `take_tick_damage` labels; **§2 is the 43 door calls that print or pay within
-  fourteen lines, and droppable** (FZ's pricing rule). The census is `docs/reports/IA.md` §1b and FOUND AT IA.
-- **ID — resources and fire**: the Cleric's regen, against a census of everything that returns Mana to a Cleric; **more Burn
-  appliers in the Mage's pool.**
+- **THE RE-MEASURE IS SCHEDULED, NOT PARKED (IC §5, the designer's)** — six batches since HV, and both ceilings now run out within
+  half a batch of each other at about eight (the WHERE block's two readings, each with its arithmetic), so a re-measure that waits
+  finishes as the room runs out. Its letter is the designer's to give; **the block index and HV's pilot still wait on it.**
+  **THE ORDER:**
+- **ID — THE FOLD, ITS WORDS, AND THE CLERIC's REGEN AND THE MAGE's FIRE.**
+  · **The fold (IC §0.1, ruled; RULED, NOT BUILT)**: the zone boss's ability goes in the hero's ABILITIES section, the mini-boss's
+    upgrade in a section of its own (it changes a card he holds rather than adding one), and **the pick overlay retires** — its
+    census is exactly those two picks — with `check_fe`, `check_fm` and HZ's longest-and-emptiest arms re-pointed at the hero's
+    screen. **One premise is false (IC's ruling 5)**: a deferred draft and a boss's ability CAN be owed together, so ABILITIES
+    holds both or the boss's ability takes its own section.
+  · **The words (IC §0.2, ruled)**: the title *THE DRAFT — <hero>* whenever an ability is on the screen and *THE CACHE — <hero>*
+    for a rune alone; the owed line is what he is owed — *A new ability and a rune from the cache.* / *A new ability.* / *A rune
+    from the cache.* — and one constant tail, *Decide, then confirm.*; the Confirm reads *One choice still to make* / *Two choices
+    still to make*; ABILITIES, RUNES and *lets the cache go* confirmed.
+  · **The Cleric's regen and the Mage's fire — NOT BUMPED AGAIN (IC §5, the designer's)**: the last two of the zone-one findings
+    still open, and they have lost the queue before (IB at HW's roadmap, IC at HY's, ID at IB's). The regen against a census of
+    everything that returns Mana to a Cleric; **more Burn appliers in the Mage's pool.**
 - **IE — THE CLAIMS**: HX's 87 stand at **86** — the per-batch re-read stops the backlog growing and does not retire it, so it is a
   batch of its own (FOUND AT HX, FOUND AT IA).
+- **THE REST OF THE SILENCED-FIGURE FAMILY** — three door calls and two frames (FOUND AT IC): its own letter, each repair owing its
+  own control.
 - **MANA STAYS (ruled).** The Mage and the Hunter run dry and plan around it; only the Cleric is always full, so it is one
   class's regen and not the resource. **Channel's tempo payout — Mana spent buys speed — is alive and still owed.**
 - **Unchanged, and said so**: `CONJUNCTIONS` keeps its one row and `RUPTURE_BREAK_PER_TICK` stays at 10, still unfelt; a meter is

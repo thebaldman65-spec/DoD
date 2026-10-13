@@ -922,9 +922,9 @@ whole stack — six Health Potions are one slot, not six. **4 → 5 → 6 by zon
   a fight's loss bank (`battle._bank_party_losses`, GH) write counts directly too, and every one of
   them leaves the key standing at zero.
 - **TWO WALLS, AND THEY MUST NEVER BE CONFLATED: NO ROOM IS A CHOICE, A FULL STACK IS A WALL.**
-  A grant with no slot becomes a **swap offer** queued on `Run.pending_item_offers` and resolved by
-  the map's owed-pick overlay (take it and give up a named stack, or **decline** — declining is
-  always a button). A grant over the **per-type stack cap** is still **refused with a message**,
+  A grant with no slot becomes a **swap offer** queued on `Run.pending_item_offers` and resolved on
+  the map's arrival tail (take it and give up a named stack, or **decline** — declining is
+  always a button; an offer that finds room by then is taken quietly and the tail goes on, IC §3). A grant over the **per-type stack cap** is still **refused with a message**,
   which is Batch AN §6 standing unchanged. `needs_slot()` answers the first; `item_full()` the
   second. **Ask `needs_slot()` BEFORE `add_item()`** or a choice is printed as a refusal.
 - **STACK CAPS ARE PER TYPE NOW** (`ITEM_STACK_CAPS`, default `ITEM_CAP` = 6): Cleansing Draught 4,
@@ -3203,7 +3203,9 @@ runes have always carried their own.
   later batch adds is silenced without a list to keep. **It answers for enemies only** (a health cost he pays is not
   damage he deals, and a frame left standing from his action can never silence an enemy's blow on a hero), **and it
   leaves Break damage alone** — its own word in this game. A new damage path that sets no frame leaks past the vow as
-  it leaks past the recap: BL's rule, one reader more.
+  it leaks past the recap: BL's rule, one reader more. **And a refused blow prints and pays nothing (IA §0.6, IC §1):** a
+  strike learns it is silenced before it computes and zeroes itself above every reader; the rule is the combat file's
+  frame block, and the door calls outside the strike that still print their own figure are IC §2's partition.
 - **A RUNE THAT ANOTHER RUNE HE WEARS CANCELS SITS OUT, VISIBLY (HF §5, on HC §5's ruling for Pack Bond beside
   Lethal Aim).** `Runes.CANCELLED_BY` is the table (Burning Ground: Vow of Silence), `Runes.cancelled_by` the one
   answer, asked by `Runes.sits_out` off the ids of the ordinary runes he has EQUIPPED (`Run.worn_rune_ids`) — never
@@ -4291,8 +4293,11 @@ fact that they are.
   every arrival for the rest of the run.
 - **DISMISSING LOSES NOTHING, AND IT IS ONCE AN ARRIVAL.** Later and Not yet leave the pick owed, its offer stored and
   its card marked — the border, `◆ N kind` and CHOOSE, never HR's ✦ — and nothing dismissed opens again until the party
-  next arrives. **A return from the hero sheet or the talents is not an arrival** (`Run.map_reentry`, set as each
-  returns); every other way into the map is one by default, a load included.
+  next arrives. **A RETURN FROM A SCREEN THE PLAYER CHOSE TO OPEN IS NOT AN ARRIVAL (IC §0.3, the designer's)** — the
+  hero sheet and the talents today (`Run.map_reentry`, set as each returns), and any screen a later batch lets him open
+  from the map: a pick pushed back at a player who left on purpose is the nag the predicate above forbids, and its card
+  still holds it. **A load IS an arrival** — the one moment he needs telling what is outstanding; every other way into
+  the map is one by default.
 - **IT NEVER COVERS ANOTHER CHOICE.** The walk starts in the map's `_ready`, after the map is drawn and behind the
   framing card, and every next step waits until no overlay is up (`map_screen._modal_open`).
 - **THE ORDER IS STAMPED AS A PICK IS EARNED** (`Run.note_pick_earned`, a serial on the member's `pick_serials`), so **A
@@ -4302,8 +4307,14 @@ fact that they are.
 - **EACH HERO DRAFTS ALONE, AND THAT IS A LAYOUT.** The four columns were already four picks — each hero his own offer,
   pool, ledger and take — so a screen a hero moved no reward. **A section with nothing owed is absent, not empty**, and
   the elite's looter owes both at every elite. The rules stay `run_state.gd`'s; the screen is
-  `map_screen._open_hero_draft`, its rune half `_take_rune_pick`. **The boss's ability and the upgrade keep the pick
-  overlay**; whether they join the hero's screen is owed (`docs/state.md`).
+  `map_screen._open_hero_draft`, its rune half `_take_rune_pick`. **The boss's ability and the upgrade still open on the
+  pick overlay — FOLDED INTO THE HERO'S SCREEN, RULED, NOT BUILT (IC §0.1, the designer's; ID's, its design on
+  `docs/state.md`'s roadmap)**: two screens doing one job, chosen by which enemy fell, is the rot; the overlay retires.
+- **◆ MEANS A DECISION WAITS, AND NOTHING ELSE, ANYWHERE (IC §0.4, the designer's). ✦ counts what is held and unworn, and
+  a holding and a pick never share a glyph** — a mark exists so the player sees at a glance whether he owes something.
+  The map card's held upgrades read ↑N since IC §3. **Six surfaces still draw ◆ for something that is not a waiting
+  decision — RULED, NOT BUILT** (IC's ruling owed): an upgraded ability's battle button and hero-sheet chip, the
+  Blacksmith's upgrade, the class passive's chip, and a rare relic on the relic shelf and the run's relic picker.
 - **THE CREST RUNE STAYS OUT OF A HERO'S PICK (HW §1c), AND A SCREEN A HERO IS WHERE IT WOULD QUIETLY RE-MERGE**: the
   RUNES section draws `Run.rune_choice`, which repairs a crest rune out of a queued triple, and the crest's bag is not
   touched by a hero's answer (`check_ib` §2d).

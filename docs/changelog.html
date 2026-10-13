@@ -16,6 +16,34 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-12 &mdash; Batch IC: THE SILENCED FIGURE</h2>
+<p><b>A blow that Vow of Silence refuses now shows and pays nothing.</b> The map card's held upgrades take a mark of their own,
+and a rune waiting on a full holding is no longer skipped after a pouch offer. IB's four questions were answered. Full working:
+<code>docs/reports/IC.md</code>. The next letter is ID.</p>
+
+<p><b>&sect;0 &mdash; IB's FOUR QUESTIONS, ANSWERED (the designer's).</b> The zone boss's new ability and the mini-boss's upgrade
+will move onto the hero's own draft screen and the three-choice overlay will retire &mdash; that is the next batch's, with the
+words for the hero's screen. Coming back from a hero's sheet opens nothing, and that now holds for any screen the player chose to
+open; loading a save still counts as arriving. And the &#9670; mark means a decision is waiting and nothing else.</p>
+
+<p><b>&sect;1 &mdash; THE VOW, IN FULL.</b> Vow of Silence can be found in a run: it is in every Cleric's rune pool and offered by the
+fight's drop, the elite's cache, the Peddler and the event. Its gate already stopped a vowed Cleric's damage from landing, but five
+things read the blow's number before the gate: the floating number, the battle log's line, the sum that pays lifesteal, Siphon and
+recoil, the Occultist's Ruin draught, and every damage tick's label. <b>Now a vowed Cleric's blow floats SILENT alone, his log line
+says it was silenced (and the Break damage it still deals), his Ruin draught drinks nothing, and nothing that pays off damage dealt
+is paid off it.</b> A tick he is credited with floats SILENT alone too. A hit he lands still Breaks and still carries an Anointing's
+Ruin, because it reached its target.</p>
+
+<p><b>&sect;3 &mdash; TWO SMALL THINGS.</b> A hero card's held upgrades read <b>&#8593;N</b> in its corner where they read &#9670;N
+&mdash; &#9670; on the map now marks only a pick waiting. And when a pouch offer finds room on arrival and is taken quietly, the
+arrival carries on to the next offer and to a full holding's rune, where it used to stop.</p>
+
+<p><b>The checks.</b> A new check, <code>check_ic</code>, finds the vow in each Cleric's pool and at each of the four places it is
+offered, wears it in a fight, and drives each of the five readers with the vow and without it on one board &mdash; including one blow
+that would have paid the card's lifesteal, the rune's lifesteal, Siphon and recoil at once &mdash; plus Aegis Reversal's line,
+Anointing's mark and Umbral Sigil's echo; it prints what the vow gives and costs per Cleric lineage; and it drives the map card's
+three marks apart and the arrival's tail whole.</p>
+
 <h2>2026-10-12 &mdash; Batch IB: THE DRAFT APPEARS, AND EACH HERO DRAFTS ALONE</h2>
 <p><b>Every pick a hero is owed now opens by itself when the heroes reach the map, and each hero answers his draft and his rune
 cache on one screen of his own.</b> IA's five questions were answered too, and one line of the rune panel changed. Full working:

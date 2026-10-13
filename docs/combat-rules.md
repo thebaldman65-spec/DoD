@@ -210,8 +210,20 @@ A new damage source goes through one of the two functions; a new direct cost cal
     vow's gate, so a reflect its layer's vow silenced still printed *reflects N* and still watered the
     party. **Both read what passes the gate now**, asked under the ground's own frame through the gate's
     own predicate (`battle._vow_silences`, which `_deal_gate` asks at the two doors) — one answer, so the
-    line, the heal and the door cannot disagree. **The rest of the family is reported, not repaired here**
-    (IA's report, §1, holds the census): every other reader of a figure computed above that gate is its own batch.
+    line, the heal and the door cannot disagree.
+  - **AND THE CHEAPEST WAY TO OBEY IT IS TO KNOW BEFORE YOU COMPUTE (IC §1b, the designer's; it completes the rule
+    above).** `_resolve` asks `_vow_silences` ONCE a strike, above the computation, under the frame that credits the
+    blow — the attacker's, which every site in the swing that borrows it has put back by the door — and one branch
+    above the first reader turns a silenced blow into a zero blow for everything below it: the recap's credit,
+    `total_dealt` (the card's lifesteal, the rune's, Siphon and recoil after the loop), the Ruin leech, the door, the
+    float (SILENT alone) and the line (*silenced by Vow of Silence, +N BD* — no figure, not a 0). Readers each
+    asking late is how the defect got the five members IA's census found. **A site inside the swing that deals under
+    another frame asks for itself** and never inherits the strike's answer (the reflect, HY §1c). **WHETHER A BLOW
+    REACHED ITS BODY IS NOT ITS FIGURE** (`connected`): a silenced hit was not missed, blocked or parried to nothing —
+    its Break lands and a hit-count rider still fires on it (Anointing's Ruin). `take_tick_damage` floats its caller's
+    label only for a tick the gate let land. **A DOOR CALL OUTSIDE THE STRIKE THAT PRINTS OR PAYS ITS OWN FIGURE ASKS
+    `battle._landed` BEFORE ITS DOOR** — the figure, or 0 when the vow will refuse it under the frame standing then —
+    and prints and pays that; the sites that still do not are partitioned in IC's report, §2.
   **A NEW DAMAGE SITE SAYS WHOSE FRAME IT DEALS UNDER**: `check_hy` §6 holds the census of every function
   that deals damage, reds on one it does not know, and reds on a borrowed frame the function that borrowed it
   never puts back.

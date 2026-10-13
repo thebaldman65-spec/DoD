@@ -879,7 +879,11 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 			up_lines.append("%s — %s" % [String(up.get("ability", "")),
 				Run.upgrade_name(String(up.get("id", "")))])
 		var up_badge := Label.new()
-		up_badge.text = "◆%d" % ups.size()
+		# BATCH IC §3 — ◆ MEANS A DECISION WAITS (the designer's, at IC §0.4), so a HOLDING
+		# takes another mark: ↑, which nothing else in the game draws. The word does not fit
+		# here, measured: this corner is 40 px at font 12 and "3 upgrades" is 65 (`check_ic`
+		# §3 re-measures it); the tooltip below names every one.
+		up_badge.text = "↑%d" % ups.size()
 		up_badge.add_theme_font_size_override("font_size", 12)
 		up_badge.add_theme_color_override("font_color", Color(1.0, 0.9, 0.5))
 		up_badge.tooltip_text = "Ability upgrades\n%s" % "\n".join(up_lines)
@@ -3542,6 +3546,9 @@ func _check_item_offers() -> void:
 			_toast("+1 %s" % Run.ITEM_INFO[id][0])
 		Run.save_run()
 		_draw_screen()
+		# BATCH IC §3 — AND THE TAIL GOES ON: the next offer, or the full holdings after the
+		# last. Returning here ended the arrival, so both waited for the next one.
+		_check_item_offers()
 		return
 	var overlay := Control.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)

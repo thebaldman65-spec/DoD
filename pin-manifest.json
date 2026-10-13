@@ -2,14 +2,14 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1742,
-  "source": 1307,
+  "total": 1751,
+  "source": 1316,
   "other": 113,
   "document": 322
  },
  "source_residency": {
   "narrow": 44,
-  "code": 793,
+  "code": 802,
   "absent": 317,
   "runtime": 101,
   "unresolved": 3,
@@ -6077,6 +6077,105 @@
    "k": "literal",
    "how": "derived",
    "g": "check_ib.gd#302"
+  },
+  {
+   "s": "check_ic.gd",
+   "fn": "_s1b_one_question",
+   "h": "scripts/battle.gd",
+   "n": "\nfunc ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ic.gd#220"
+  },
+  {
+   "s": "check_ic.gd",
+   "fn": "_s1b_one_question",
+   "h": "scripts/battle.gd",
+   "n": "\nfunc _resolve(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ic.gd#219"
+  },
+  {
+   "s": "check_ic.gd",
+   "fn": "_s1b_one_question",
+   "h": "scripts/battle.gd",
+   "n": "_vow_silences(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_ic.gd#228"
+  },
+  {
+   "s": "check_ic.gd",
+   "fn": "_s1b_one_question",
+   "h": "scripts/battle.gd",
+   "n": "strike_target.has_status(\"ruin\") and not attacker.dead",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_ic.gd#226"
+  },
+  {
+   "s": "check_ic.gd",
+   "fn": "_s1b_one_question",
+   "h": "scripts/battle.gd",
+   "n": "strike_target.take_hit(final, pr)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_ic.gd#227"
+  },
+  {
+   "s": "check_ic.gd",
+   "fn": "_s1b_one_question",
+   "h": "scripts/battle.gd",
+   "n": "total_dealt += final",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_ic.gd#225"
+  },
+  {
+   "s": "check_ic.gd",
+   "fn": "_s1b_one_question",
+   "h": "scripts/battle.gd",
+   "n": "var final := 0 if wall_parry",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_ic.gd#223"
+  },
+  {
+   "s": "check_ic.gd",
+   "fn": "_s1b_one_question",
+   "h": "scripts/battle.gd",
+   "n": "var refused := silenced and final > 0",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_ic.gd#224"
+  },
+  {
+   "s": "check_ic.gd",
+   "fn": "_s1b_one_question",
+   "h": "scripts/battle.gd",
+   "n": "var silenced := _vow_silences(strike_target)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_ic.gd#222"
   },
   {
    "s": "test_batch_ah.gd",

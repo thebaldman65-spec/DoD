@@ -457,8 +457,11 @@ func _source_rules() -> void:
 		"the slice starts AT the match case, not at the STATUS_INFO entry")
 	ok(not su_body.contains("RUIN_LEECH_CAP"),
 		"Suffering's heal does NOT go through the 40% lifesteal door")
-	ok(su_body.contains("heal_amount(su_final)"),
-		"Suffering heals off the damage THIS cast dealt")
+	# BATCH IC §2 — off the damage this cast LANDED: `su_land` is the figure, or 0 when the vow
+	# refuses the blow, asked before the door (`_landed`). One assertion still, its intent the same.
+	ok(su_body.contains("heal_amount(su_land)")
+		and su_body.contains("var su_land := _landed(target, su_final)"),
+		"Suffering heals off the damage THIS cast landed")
 	# TRANSFERENCE MOVES, IT DOES NOT GAIN.
 	var at_tf := code.find('\t\t"transference":')
 	ok(at_tf > 0, "the Transference branch is anchored at its own match case")

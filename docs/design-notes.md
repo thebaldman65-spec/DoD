@@ -4,6 +4,35 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The silenced figure (Batch IC) — 2026-10-12
+
+**Why a refused blow now prints and pays nothing.** Vow of Silence says the Cleric deals no damage, and the gate at the two
+doors already refused it. But five things read the blow's figure before it reached the door: its floating number, its log line,
+the sum that later pays lifesteal, Siphon and recoil, the Occultist's Ruin draught, and every damage tick's label. So a vowed
+Occultist striking a Ruined enemy still drank from a blow that never landed, and the screen showed a number beside SILENT. The
+rule was already the designer's — a figure printed or paid off a blow is the blow that landed — and this is the strike obeying it.
+
+**Why the strike asks once, before it computes.** Each of the five could have been patched to ask the vow late, which is how the
+defect got five members in the first place. The question has one answer for the whole strike — whose frame the blow is credited
+to, and whether the body is an enemy — so the strike asks it at the top and makes a silenced blow a zero blow from one line down.
+The computation itself still runs: it spends statuses and banks that belong to the cast, and only the figure is withheld. A
+retaliation inside the swing is a different dealer's blow and asks for itself.
+
+**Why a silenced hit still marks.** A blow the vow silences was not missed, blocked or parried to nothing — it reached its body,
+and its Break still lands. Anointing marks every hit that reaches a body, so it still marks a silenced one. That is the line
+between a blow's figure and whether it connected, and only the figure is the vow's.
+
+**Why the log says *silenced* and not *0 dmg*.** A line reading 24 when nothing landed was a lie; one reading 0 would be another,
+because nothing was rolled down to zero — the vow refused it. The line names the vow and the Break that did land.
+
+**Why held upgrades read ↑ and not ◆.** On the map card ◆ said both *a decision waits* and *you hold three*, in the same glyph on
+the same card. ◆ is the decision; ✦ counts runes held. An upgrade held is neither, so it takes a mark of its own, and the word
+itself does not fit the corner. The other places ◆ still marks something that is not a decision are the designer's to re-mark.
+
+**Why the arrival's tail goes on after a pouch offer finds room.** A swap offer that found room was taken quietly and the walk
+stopped there, so a rune waiting on a full holding was not offered until the next arrival. The offer is still taken quietly; the
+walk now goes on to what is next.
+
 ## The draft appears, and each hero drafts alone (Batch IB) — 2026-10-12
 
 **Why every owed pick opens by itself, and a holding never does.** The designer's complaint was that it was hard to tell when a

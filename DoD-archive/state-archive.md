@@ -17,6 +17,53 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT IC — 2026-10-12, FROM `docs/state.md` AS IB LEFT IT (`0e21a95`)
+
+**What came here**: IB's rulings, all four answered in IC's brief; FOUND AT IB's one item (the pouch offer's tail, fixed at IC §3);
+FOUND AT IA's family item (§1's five readers repaired at IC §1, the door calls partitioned and five repaired at IC §2 — what is left
+is FOUND AT IC); and the roadmap's IC line (built at IC). The roadmap's re-measure line and its ID line were rewritten in place —
+the re-measure is scheduled (IC §5) and ID carries the fold, its words, the regen and the fire. Each was read against IC's tree
+before it moved; everything else in the live file stayed.
+
+### ~~IB's RULINGS OWED~~ — **ALL FOUR ANSWERED IN IC's BRIEF: THE FOLD IS RULED AND IS ID's (1, ITS DESIGN ON THE ROADMAP); THE WORDS ARE ID's WITH THREE CHANGES (2); A RETURN FROM A SCREEN THE PLAYER CHOSE TO OPEN IS NOT AN ARRIVAL (3, CONFIRMED AND GENERALISED); ◆ MEANS A DECISION WAITS — HELD UPGRADES READ ↑N (4, BUILT AT IC §3 ON THE MAP CARD)**
+
+Full working: `docs/reports/IB.md`, NEEDS A RULING.
+
+1. **THE BOSS'S ABILITY AND THE UPGRADE KEEP THE PICK OVERLAY (§2)** — a hero's own screen holds his draft and his rune cache;
+   the zone boss's card and the mini-boss's upgrade open on the pick overlay, in the same order-earned walk. Fold them into his
+   screen as sections, or keep two surfaces.
+2. **THE WORDS ON THE HERO'S SCREEN (§2), PROPOSED**: *THE DRAFT — <hero>*; a line saying what he is owed; the heads ABILITIES and
+   RUNES; *N choice(s) still to make* on the Confirm until it is live; *lets the cache go* for an empty cache let go. Confirm, or word it.
+3. **A RETURN FROM THE HERO SHEET OPENS NOTHING (§1)** — until IB the draft reopened when the player came back from a hero's sheet;
+   now a pick dismissed on an arrival waits on its card's CHOOSE until the party next arrives. Confirm.
+4. **THE ◆ MARKS A PICK AND A HOLDING (§1d)** — a pending pick reads `◆ 1 upgrade` under the slots; the upgrades a hero already holds
+   read `◆3` at the card's corner. Neither is mistaken for HR's ✦, but the ◆ names both. Keep, or give held upgrades another mark.
+
+### ~~FOUND AT IB AND NOT FIXED~~ — **ITS ONE ITEM FIXED AT IC §3: THE ARRIVAL'S TAIL GOES ON AFTER A POUCH OFFER THAT FINDS ROOM**
+
+- **A POUCH OFFER THAT FINDS ROOM ENDS THE ARRIVAL'S TAIL** — `map_screen._check_item_offers` takes an offer silently when a
+  discard has made room, and returns without opening the next offer or the full-holding panel; they open at the next arrival.
+  HEAD's own (CT §3), met while building the walk; not moved (outside the brief).
+
+### FOUND AT IA AND NOT FIXED — ITS CLOSED ITEMS (archived at IC; the section stays in `docs/state.md`)
+
+- **THE FAMILY §0.6 NAMES: A FIGURE PRINTED OR PAID ABOVE THE GATE THAT COULD REFUSE IT** (the rule is in `docs/combat-rules.md`'s
+  frame block; the census is `docs/reports/IA.md` §1). Only a vowed hero's damage is refused, and the vow is a Cleric rune, so the
+  members a vow reaches today are a Cleric's: **the strike loop's `final`** — its damage float and its log line print the blow as
+  computed, and `total_dealt`, summed above the door, pays the card's lifesteal, the rune's, siphon and recoil off it — and **the
+  Ruin leech**, which heals off `final` above the door for any hero striking a Ruined enemy. **Every `take_tick_damage` label is
+  built above the gate too**, so a silenced reflect still floats *-N Reflect* beside SILENT. Beyond those, 43 door calls print or
+  pay the figure they hand the door within fourteen lines; most are other classes' cards no vow reaches. **Its own batch** (FZ's
+  pricing rule): each repair is a different arm owing its own control.
+
+### THE PLAYTEST'S OTHER FINDINGS — ITS CLOSED ITEMS (archived at IC; the section stays in `docs/state.md`)
+
+- **IC — THE SILENCED-FIGURE FAMILY (IB §0.5, its scope set before the brief)**: a live Cleric rune that does not cost what it
+  says, in the one path HY, HZ and IA each edited, so it goes before resources and before the claims. **§1 is the five readers of
+  the strike loop** — the damage float, the log line, `total_dealt` (which pays the card's lifesteal, the rune's, Siphon and recoil
+  off a refused blow), the Ruin leech and the `take_tick_damage` labels; **§2 is the 43 door calls that print or pay within
+  fourteen lines, and droppable** (FZ's pricing rule). The census is `docs/reports/IA.md` §1b and FOUND AT IA.
+
 ## ARCHIVED AT IB — 2026-10-12, FROM `docs/state.md` AS IA LEFT IT (`ae4ee06`)
 
 **What came here**: IA's rulings, all five answered in IB's brief; the closed items of three sections that stay live — the
