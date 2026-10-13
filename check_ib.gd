@@ -4,14 +4,14 @@
 #       a  WHAT COUNTS IS AN UNMADE PICK, NEVER AN UNEQUIPPED HOLDING — four heroes each
 #          holding runes unworn and owing nothing: the arrival opens nothing, and the
 #          nameplate's ✦ N is drawn; a pick owed beside the same holding opens.
-#       b  every kind opens on its own screen: a draft and a rune cache on the hero's
-#          draft screen, the zone boss's ability and the mini-boss's upgrade on the pick
-#          overlay, each naming its kind.
+#       b  every kind opens on arrival as its own section of the hero's screen — a draft and the
+#          zone boss's ability in ABILITIES, an upgrade in UPGRADES, a rune cache in RUNES (since
+#          ID §1; the boss's ability and the upgrade opened the pick overlay until then).
 #       c  SEVERAL WAITING APPEAR ONE AFTER ANOTHER, IN THE ORDER EARNED, which is not the
 #          party's order here (a draft for the fourth hero earned first).
 #       d  DISMISSING LOSES NOTHING: the first dismissed, the second taken; nothing reopens on
 #          that arrival; the dismissed pick is still owed, its offer the same, its card still
-#          marked, and it is made later from the card's CHOOSE. A pick overlay's Not yet too.
+#          marked, and it is made later from the card's CHOOSE. An upgrade's Later too.
 #       e  ONCE PER ARRIVAL: back from the hero sheet through its own button, nothing opens;
 #          the next arrival opens the dismissed pick again.
 #       f  IT NEVER COVERS ANOTHER CHOICE: it runs from `_ready` after the map is drawn, it
@@ -162,18 +162,24 @@ func _modals(mp: Node) -> Array:
 
 
 # What the arrival has up, read off the game's own marks: the hero's draft screen by its
-# `hero_draft` meta, a pick overlay by the handler its choices are marked with.
+# `hero_draft` meta. **BATCH ID §1 — IT IS THE ONLY SCREEN A PICK OPENS** (the pick overlay that
+# took the boss's ability and the upgrade is retired), so what the arrival opened is told apart by
+# the sections the screen holds — its `kind` is their names joined: *draft*, *boss* (the zone
+# boss's offer in ABILITIES), *upgrade*, *rune* — read off the metas the game sets, never words.
 func _up(mp: Node) -> Dictionary:
 	var hd: Node = Gate.hero_draft(mp)
-	if hd != null:
-		return {"hero": int(hd.get_meta("hero_draft")), "kind": "draft", "node": hd}
-	var ov: Node = Gate.overlay(mp, 60)
-	var ch: Array = Gate.pick_choices(ov)
-	if not ch.is_empty():
-		var meta: Array = (ch[0] as Button).get_meta("choice")
-		var kind: String = {"_pick_ability": "ability", "_pick_upgrade": "upgrade"}.get(String(meta[0]), String(meta[0]))
-		return {"hero": int((meta[1] as Array)[0]), "kind": kind, "node": ov}
-	return {}
+	if hd == null:
+		return {}
+	var parts := PackedStringArray()
+	if not Gate.bound_buttons(hd, "_stage_draft_decline").is_empty():
+		parts.append("draft")
+	if Gate._has_offer(hd, "boss"):
+		parts.append("boss")
+	if Gate._has_section(hd, "upgrades"):
+		parts.append("upgrade")
+	if not Gate.bound_buttons(hd, "_stage_draft_rune").is_empty():
+		parts.append("rune")
+	return {"hero": int(hd.get_meta("hero_draft")), "kind": " + ".join(parts), "node": hd}
 
 
 # One pick of `kind` awarded through the run's own door for it.
@@ -270,8 +276,11 @@ func _s1a_a_holding_opens_nothing() -> void:
 
 # ── §1b — EVERY KIND OPENS ON ITS OWN SCREEN ─────────────────────────────────
 func _s1b_every_kind() -> void:
-	print("\n§1b — every kind of pick opens on arrival, on its own screen")
-	var heads := {"ability": "NEW ABILITY", "upgrade": "ABILITY UPGRADE"}
+	print("\n§1b — every kind of pick opens on arrival, a section of his own screen")
+	# BATCH ID §1 — RE-POINTED, THE QUESTION UNMOVED: each kind still opens on arrival, and since the
+	# fold it opens as its own section of the hero's screen — the boss's ability an offer in
+	# ABILITIES, the upgrade UPGRADES — where it opened the pick overlay until ID.
+	var sect := {"draft": "draft", "rune": "rune", "ability": "boss", "upgrade": "upgrade"}
 	for kind in ["draft", "rune", "ability", "upgrade"]:
 		_new_run()
 		var m: Dictionary = _run.party[1]
@@ -279,7 +288,7 @@ func _s1b_every_kind() -> void:
 		ok(made and int(_run.pick_owed(m, kind)) == 1, "§1b (%s): the premise — the pick was not awarded" % kind)
 		var mp := await _to_map()
 		var up := _up(mp)
-		var want_kind: String = "draft" if kind == "draft" or kind == "rune" else String(kind)
+		var want_kind: String = String(sect[kind])
 		ok(not up.is_empty() and int(up["hero"]) == 1 and String(up["kind"]) == want_kind,
 			"§1b (%s): the arrival did not open the Mage's pick on its screen (%s)" % [kind, up])
 		if not up.is_empty():
@@ -290,9 +299,13 @@ func _s1b_every_kind() -> void:
 			elif kind == "rune":
 				ok(Gate.has_text(node, "RUNES") and not Gate.has_text(node, "ABILITIES"),
 					"§1b (rune): the screen is not his RUNES section alone")
+			elif kind == "ability":
+				ok(Gate.has_text(node, "ABILITIES") and Gate.has_text(node, "from the zone boss") and not Gate.has_text(node, "RUNES"),
+					"§1b (ability): the screen is not his ABILITIES section holding the zone boss's offer alone")
 			else:
-				ok(Gate.has_text(node, String(heads[kind])), "§1b (%s): the overlay does not say %s" % [kind, heads[kind]])
-	print("    a draft, a rune cache, a boss's ability and an upgrade each opened on arrival")
+				ok(Gate.has_text(node, "UPGRADES") and not Gate.has_text(node, "ABILITIES") and not Gate.has_text(node, "RUNES"),
+					"§1b (upgrade): the screen is not his UPGRADES section alone")
+	print("    a draft, a rune cache, a boss's ability and an upgrade each opened on arrival, each its section")
 
 
 # ── §1c — IN THE ORDER EARNED ─────────────────────────────────────────────────
@@ -316,14 +329,11 @@ func _s1c_the_order() -> void:
 		if up.is_empty():
 			break
 		seen.append("%d:%s" % [int(up["hero"]), String(up["kind"])])
-		if String(up["kind"]) == "draft":
-			await Gate.answer_hero_draft(self, mp, false)
-		else:
-			(Gate.pick_choices(up["node"])[0] as Button).emit_signal("pressed")
-			await Gate.frames(self, 3)
-	ok(seen == ["3:draft", "0:upgrade", "1:ability", "2:draft"],
+		# BATCH ID §1 — every screen is the hero's own, answered through the one helper.
+		await Gate.answer_hero_draft(self, mp, false)
+	ok(seen == ["3:draft", "0:upgrade", "1:boss", "2:rune"],
 		"§1c: the screens came %s, not in the order earned (the fourth hero's draft first)" % [seen])
-	ok(seen != ["0:upgrade", "1:ability", "2:draft", "3:draft"],
+	ok(seen != ["0:upgrade", "1:boss", "2:rune", "3:draft"],
 		"§1c: the screens came in the party's order, not the order earned")
 	var left := 0
 	for m in p:
@@ -360,7 +370,7 @@ func _s1d_dismissing() -> void:
 	ok(int(m1["draft_picks_owed"]) == 1, "§1d: the dismissed draft is no longer owed (%d)" % int(m1["draft_picks_owed"]))
 	ok((m1["draft_candidates"] as Array)[0] == offer1 and _run.draft_refused(m1) == refused1,
 		"§1d: dismissing changed the offer or wrote the no-return ledger — dismissing LOST something")
-	var choose: Button = Gate.bound_button(mp, "_open_pick_overlay", [1])
+	var choose: Button = Gate.bound_button(mp, "_open_hero_draft", [1])
 	ok(choose != null and Gate.has_text(mp, "◆ 1 draft"), "§1d: the dismissed draft is not marked on the Mage's card")
 	if choose != null:
 		choose.emit_signal("pressed")
@@ -372,7 +382,8 @@ func _s1d_dismissing() -> void:
 		ok(bool(a2.get("confirmed", false)) and int(m1["draft_picks_owed"]) == 0
 				and offer1.has(String(a2.get("card", ""))),
 			"§1d: the dismissed draft could not be made later from the card (%s)" % [a2])
-	# A PICK OVERLAY'S NOT YET IS THE SAME DISMISSAL.
+	# AN UPGRADE's LATER IS THE SAME DISMISSAL (BATCH ID §1: the upgrade is a section of the hero's
+	# screen, whose Later is the dismissal the pick overlay's *Not yet* was until ID).
 	_new_run()
 	_run.award_upgrade_pick(_run.party[0])
 	_run.award_upgrade_pick(_run.party[3])
@@ -380,15 +391,15 @@ func _s1d_dismissing() -> void:
 	var u0 := _up(mp2)
 	ok(not u0.is_empty() and int(u0["hero"]) == 0 and String(u0["kind"]) == "upgrade",
 		"§1d: the Warrior's upgrade did not open first (%s)" % [u0])
-	ok(Gate.press(Gate.overlay(mp2, 60), ["Not yet"]) == "Not yet", "§1d: the upgrade overlay drew no Not yet")
+	ok(_press_bound(Gate.hero_draft(mp2), "_close_hero_draft", []), "§1d: the upgrade's screen drew no Later")
 	await Gate.frames(self, 3)
 	var u3 := _up(mp2)
-	ok(not u3.is_empty() and int(u3["hero"]) == 3, "§1d: Not yet did not bring the Hunter's upgrade (%s)" % [u3])
+	ok(not u3.is_empty() and int(u3["hero"]) == 3, "§1d: Later did not bring the Hunter's upgrade (%s)" % [u3])
 	if not u3.is_empty():
-		(Gate.pick_choices(u3["node"])[0] as Button).emit_signal("pressed")
+		await Gate.answer_hero_draft(self, mp2, true)
 		await Gate.frames(self, 4)
 	ok(_modals(mp2).is_empty() and int(_run.party[0]["up_picks_owed"]) == 1 and int(_run.party[3]["up_picks_owed"]) == 0,
-		"§1d: after Not yet and a take, the Warrior's upgrade is not still owed and closed, or the Hunter's not taken")
+		"§1d: after Later and a take, the Warrior's upgrade is not still owed and closed, or the Hunter's not taken")
 
 
 # ── §1e — ONCE AN ARRIVAL ─────────────────────────────────────────────────────
@@ -494,7 +505,7 @@ func _s1g_the_mark() -> void:
 			marks[at] = String((b as Button).text)
 	var choose := {}
 	for i in 4:
-		choose[i] = Gate.bound_button(mp, "_open_pick_overlay", [i]) != null
+		choose[i] = Gate.bound_button(mp, "_open_hero_draft", [i]) != null
 	print("    held marks %s, CHOOSE on %s" % [marks, choose])
 	ok(marks.has(0) and not bool(choose[0]), "§1g: a holding alone did not read as ✦ alone (✦ %s, CHOOSE %s)" % [marks.has(0), choose[0]])
 	ok(not marks.has(1) and bool(choose[1]), "§1g: a pick alone did not read as its mark alone (✦ %s, CHOOSE %s)" % [marks.has(1), choose[1]])

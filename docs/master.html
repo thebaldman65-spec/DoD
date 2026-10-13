@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-10-12 (Batch IC &mdash; the silenced figure)</b></p>
+<p align="right"><b>Last updated: 2026-10-12 (Batch ID &mdash; one surface, and the glyphs)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -319,8 +319,8 @@ Basic attacks are unaffected.</td></tr>
 tick.</td></tr>
 <tr><td>Bloodletting</td><td>4</td><td>Every hit opens a wound. All attacks add 15 Bleed, on
 both sides.</td></tr>
-<tr><td>Mirrorbound</td><td>4</td><td>A quarter of the damage you deal comes back on
-you.</td></tr>
+<tr><td>Mirrorbound</td><td>4</td><td>An attack that does not miss sends a quarter of the damage it deals
+back on its attacker &mdash; at least 1, even when it deals none. On both sides.</td></tr>
 <tr><td>Rot</td><td>4</td><td>Everyone's maximum health is halved, on both sides. It lasts the
 fight and no longer.</td></tr>
 </table>
@@ -443,12 +443,12 @@ ability-upgrade count</b> in its top corner (hidden at zero; hovering it lists t
 per line — it takes no click of its own), and an unspent-talent badge; <b>clicking a card
 opens that hero's talent tree and full sheet</b>. <b>Every pick a hero is owed opens by itself
 when the heroes arrive at the map</b> &mdash; after a fight, an event, a shop or a load, never on a return
-from the hero sheet &mdash; one after another, in the order the picks were earned: a hero's draft and his
-rune cache on <b>his own draft screen</b>, a zone boss's ability and a mini-boss's upgrade on a
-<b>three-choice overlay</b>, then a full pouch's offer and a full holding's panel. Each choice shows its
-full description under it rather than behind a hover. <b>Not yet</b> and <b>Later</b> leave the pick owed:
-the card keeps a <b>&#9670; N</b> badge naming it and a <b>CHOOSE</b> button that opens it again, and it
-opens by itself again the next time the heroes arrive. A rune held and not worn never opens anything
+from the hero sheet &mdash; one after another, in the order the picks were earned: <b>every pick a hero is owed
+is a section of his own screen</b> &mdash; a draft and a zone boss's ability, a mini-boss's upgrade, a rune
+cache &mdash; then a full pouch's offer and a full holding's panel. Each choice shows its full description under
+it rather than behind a hover. <b>Later</b> leaves every pick on the screen owed: the card keeps a
+<b>&#9670; N</b> badge naming it and a <b>CHOOSE</b> button that opens the screen again, and it opens by itself
+again the next time the heroes arrive. A rune held and not worn never opens anything
 &mdash; the &#10022;N marker shows it.
 <br><b>Under the pouch sits the rune bag's row</b>: the bag's count out of six, a <b>&#10022;N
 marker</b> counting the crest runes waiting in it, a drop waiting on it if one is, and the Crest's
@@ -1129,7 +1129,8 @@ UNCAPPED, holding Lethal Aim)</td></tr>
 </table>
 <h3>5.0 Class passives</h3>
 <p>Each CLASS carries one passive, active for every spec of that class (and before
-awakening). Shown as a ◆ chip in battle and on the hero sheet.</p>
+awakening). Shown on the hero sheet (its <i>Class:</i> line) and on the class-selection card; it is always on,
+so it carries no chip in battle.</p>
 <ul>
 <li><b>Warrior — Threatening Presence:</b> enemies are 20% more likely to attack the
 Warrior (weighted into their random target picks).</li>
@@ -1501,14 +1502,15 @@ the upgrade their build wanted.</b> That is the variety working, not a fault.</p
 payload can <i>set</i> an ability's field rather than add to it, so an upgrade applied first
 would be silently overwritten. Upgrades go last and always win. The hero sheet assembles the kit the
 same way, so the numbers on the sheet are the numbers in the fight.</p>
-<p><b>Where you can see them.</b> An ability carrying any upgrade wears a gold
-<b>&#9670;</b> on its label &mdash; on its battle action button <i>and</i> on its hero-sheet
+<p><b>Where you can see them.</b> <b>&#8593; names an upgrade wherever one appears.</b> An ability carrying any
+upgrade wears a gold <b>&#8593;</b> on its label &mdash; on its battle action button <i>and</i> on its hero-sheet
 chip &mdash; and hovering either ends with a line naming the upgrades ("Honed · Swift"). Names
 only: the magnitudes are already in the numbers above, which reflect the upgrade. Outside a
 fight, each map hero card carries an <b>&#8593;N</b> count in its top corner whose hover
-lists them one per line &mdash; never the &#9670;, which on the map marks only a pick still to make. A run awards three upgrades to every hero, twelve across the four,
-and before these three surfaces existed all twelve were discoverable only by hovering ability
-buttons mid-fight.</p>
+lists them one per line, and the Blacksmith's counter marks each upgrade it sells with the same <b>&#8593;</b>.
+The <b>&#9670;</b> marks only a pick still to make, and nothing else in the game draws it. A run awards three
+upgrades to every hero, twelve across the four, and before these surfaces existed all twelve were discoverable
+only by hovering ability buttons mid-fight.</p>
 <p><b>The SPEC pool</b> holds what only that spec can earn, among them its own vaulted ones. The
 "Opens with" column is what the spec's engine rune brings beyond the class basic and class kit
 every hero holds (&sect;6.0); the lineage's other cards are drafted from its shelf of the class
@@ -1617,14 +1619,21 @@ bought one, so no measured figure in the economy report moves.</p>
 reach the map, one hero after another. Each hero draws <b>their own three cards</b> from their class's
 one pool — a Pyromancer is never shown a Warden card, and is shown the Cryomancer's and the Arcanist's —
 less what the engine gate keeps from him. <b>The elite's rune cache goes to one of them, and he answers
-it on the same screen</b>: a screen shows an <b>ABILITIES</b> section for a draft and a <b>RUNES</b>
-section for a cache, each only when it is owed, so a bargain's rune comes alone. A hero who
+it on the same screen</b>, and so is <b>every other pick he is owed</b>: a screen shows an <b>ABILITIES</b>
+section for a draft <i>and</i> for a zone boss's ability &mdash; two offers side by side in one section, each saying
+where it came from (<i>from the elite</i>, <i>from an event</i>, <i>from the zone boss</i>) &mdash; an
+<b>UPGRADES</b> section for a mini-boss's upgrade, naming each choice <i>card: upgrade</i> with what the upgrade
+does and the figures it moves on that card (<i>Damage: 35% &rarr; 52%</i>), and a <b>RUNES</b> section for a
+cache, each only when it is owed, so a bargain's rune comes alone. Its title names what is on it &mdash;
+<b>THE DRAFT</b> whenever an ability is, else <b>THE CACHE</b>, <b>THE UPGRADE</b> or <b>THE UPGRADE AND THE
+CACHE</b> &mdash; and the line under it says what he is owed in one sentence, then <i>Decide, then confirm.</i>
+The widest screen, all four owed, is four columns side by side, each scrolling with a visible bar where its
+text runs long. A hero who
 <b>fell</b> during the fight is back on their feet before the screen opens (every won battle returns the
 fallen at 20% of maximum), so they draft like anyone else. A hero whose pool has nothing left
 to show is simply not offered one.</p>
 <ul>
-<li><b>Every draft screen carries See the kit</b>, as does a zone boss's card and an upgrade, and it
-opens on that hero: a <b>read-only preview</b> of that hero's carried cards and runes &mdash; his opening kit, the
+<li><b>Every hero's screen carries See the kit</b>, and it opens on that hero: a <b>read-only preview</b> of that hero's carried cards and runes &mdash; his opening kit, the
 cards he carries, what sits out and what is benched, and his runes in the hero sheet's own words &mdash;
 over the screen. It changes nothing, and closing it leaves the choice exactly as it was.</li>
 <li><b>Declining is per hero and always allowed.</b> One hero taking a card does not commit the
@@ -1640,10 +1649,15 @@ no-return ledger is <b>per hero</b>: refusing a card for the Pyromancer never hi
 anyone else. <b>Benching one is not declining it</b> — a benched card is kept.</li>
 <li><b>The slot cap holds per hero.</b> A hero already at the cap must name what the
 incoming card replaces before his ABILITIES section counts as decided. The named ability is
-<b>benched, not lost</b>.</li>
-<li><b>A hero's screen resolves as one action.</b> His card and his rune are chosen, then the
-screen is confirmed — so either can be reconsidered until then. <b>Later</b> commits nothing: both picks
-stay owed on his card and open again the next time the heroes reach the map.</li>
+<b>benched, not lost</b>. With both a draft's card and a zone boss's card chosen, the draft's takes a free slot
+first and the boss's then names what it replaces if none is left; a card one names is not offered to the other,
+and a card in both offers can be taken from only one.</li>
+<li><b>A zone boss's ability is never declined</b> &mdash; the award always pays &mdash; but an offer whose every card
+waits on a core rune he has unequipped says so and stays owed, and does not hold up the rest of his screen.</li>
+<li><b>A hero's screen resolves as one action.</b> Every section is chosen, then the screen is confirmed — so
+any can be reconsidered until then; the Confirm counts what is still to choose (<i>Two choices still to
+make</i>). <b>Later</b> commits nothing: every pick stays owed on his card and opens again the next time the
+heroes reach the map.</li>
 <li><b>EVERY CARD SHOWS ITS NUMBERS, NOT JUST ITS DESCRIPTION.</b> Under each card's sentence
 sit its <b>damage</b> (as a share of Attack, with its school), its <b>Break damage</b>, its
 <b>hit count</b> where it strikes more than once, its <b>heal</b>, its <b>cost</b>, its
@@ -1651,8 +1665,8 @@ sit its <b>damage</b> (as a share of Attack, with its school), its <b>Break dama
 the glossary are the two surfaces
 <a href="text-standard.html">the text standard</a> allows arithmetic on, and this is the screen
 whose whole purpose is comparing cards — 30 of the 66 damaging abilities never state their
-damage in prose, so before this they drafted blind. <b>The offer / drop picker on the same
-screen deliberately does NOT do this</b>: it is read in the same breath as a fight, so the
+damage in prose, so before this they drafted blind. A zone boss's cards show the same. <b>The bench step on
+the same screen deliberately does NOT do this</b>: it is read in the same breath as a fight, so the
 no-arithmetic tier binds it, and it shows the description alone.</li>
 </ul>
 <p>This is <b>four times as much drafting</b> as one hero per elite. <b>Since Batch GP every hero
@@ -3234,7 +3248,7 @@ start, battle SPAWN (base stats, before turn one), the victory screen, gold awar
 and elite spoils, 25 in all, and six of the hooks are read at more than one. The category
 `relics.gd` declares OUT — on-kill and per-turn procs, revive-on-death, enemy auras, DoT and
 Break multipliers — is exactly the in-combat one, and the talent tree is the only permanent
-layer that reaches a turn as it resolves. <b>Pool: 25 relics — 17 common, 8 rare (◆)</b> — every
+layer that reaches a turn as it resolves. <b>Pool: 25 relics — 17 common, 8 rare (marked RARE on the shelf and in the picker)</b> — every
 effect expressed through an audited <b>hook vocabulary</b> (18 hooks, listed atop relics.gd:
 run-start gold/items, per-hero stat boosts at battle spawn — attack, typed damage, max
 HP, armor, speed, crit, Constitution, resistances, resource floor — victory heal/mana/gold,
@@ -3402,9 +3416,10 @@ with the rune mark &#10022;, bright while it pays and dim while it waits on its 
 which, and for what it pays, every figure read off the rune itself. <b>The Crest's rune is one chip on
 the CREST strip above the heroes' plates</b>, never one on every hero. Chipped: the Crest's rune, a
 hero's rune that carries a condition, <b>Pay a Lethal Hit out of Your Resource Pool</b> (paying below a
-quarter's health while the Rage bar holds any), and Consecrated Ground laid by a Cleric who wears Vow
-of Silence (that ground reflects nothing, for anybody). A rune that always pays is on the hero sheet,
-not in the row. <b>Hovering a plate (or a body while targeting) shows the unit's resist card</b> — what
+quarter's health while the Rage bar holds any), and <b>Vow of Silence</b> on a Cleric who holds something it
+silences &mdash; it names each: his own ground's reflect (for anybody standing on it), the Ruin his blows would
+drink off a Ruined enemy, Suffering's heal &mdash; with the vow's heal figure; it is in effect while his ground is
+laid or a Ruined enemy stands. A rune that always pays is on the hero sheet, not in the row. <b>Hovering a plate (or a body while targeting) shows the unit's resist card</b> — what
 it resists and what it is vulnerable to — so counterplay is never hidden information. <b>Hovering an
 enemy's intent line shows what it is about to do</b> (§4.9).
 <b>The battle UI is deliberately compact</b> (144px plates, 240px log,
@@ -3512,7 +3527,7 @@ spawn math: Constitution uses the spec's value and Attack/HP include node
 scaling — the class passive + one line for each engine held
 (or "none held"), ability chips (hover shows real
 numbers AND the "% of Attack" scaling; a chip carrying an <b>ability upgrade</b> wears a gold
-<b>&#9670;</b> and names its upgrades on the last line of its hover), a <b>read-only</b> rune list (three flat slots and the three engine slots, each row's state in a column of its
+<b>&#8593;</b> and names its upgrades on the last line of its hover), a <b>read-only</b> rune list (three flat slots and the three engine slots, each row's state in a column of its
 own &mdash; CREST, CORE, WORN or held;
 equipping happens on the map card, so one place writes it), and the class's talent tree:
 three tiers of nine, READ-ONLY, with every node the hero wears lit and each node's text on its

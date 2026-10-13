@@ -224,6 +224,17 @@ A new damage source goes through one of the two functions; a new direct cost cal
     label only for a tick the gate let land. **A DOOR CALL OUTSIDE THE STRIKE THAT PRINTS OR PAYS ITS OWN FIGURE ASKS
     `battle._landed` BEFORE ITS DOOR** — the figure, or 0 when the vow will refuse it under the frame standing then —
     and prints and pays that; the sites that still do not are partitioned in IC's report, §2.
+  - **THE SHAKE IS DAMAGE'S. A BLOW THAT LANDS NO DAMAGE DOES NOT SHAKE, EVEN A CRIT (ID §0.4, the designer's; it
+    generalises the rule above from figures to feel).** A shake on a silenced crit promises damage that never happened —
+    the same lie as a figure beside SILENT. *A silenced hit carries nothing* was REJECTED: its Break landed and the crit
+    made that Break bigger, so its CRIT tag on the line and its Break figure are what the player keeps — a silenced hit
+    floats SILENT, plays the plain impact and does not shake.
+  - **A RECOIL'S FLOOR IS THE BARGAIN'S, NOT THE BLOW'S: IT BILLS FOR TAKING THE ACTION, NOT FOR LANDING IT (ID §0.3, the
+    designer's).** `recoil = maxi(round(total_dealt × pct), 1)` bills 1 to an attack that dealt nothing — a blocked
+    one, an absolute parry, a blow the vow refused — so a bargain's cost cannot be dodged by dealing nothing; **an
+    exception list on a bargain's cost is how a bargain stops meaning anything**, and none is written. Only an attack that
+    reaches the strike loop pays it: a single-target miss does not, and a card resolved as a `special` never recoils.
+    Mirrorbound's card says the floor and both sides since ID §4.
   **A NEW DAMAGE SITE SAYS WHOSE FRAME IT DEALS UNDER**: `check_hy` §6 holds the census of every function
   that deals damage, reds on one it does not know, and reds on a borrowed frame the function that borrowed it
   never puts back.

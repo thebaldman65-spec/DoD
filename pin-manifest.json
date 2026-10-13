@@ -2,16 +2,16 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1751,
-  "source": 1316,
-  "other": 113,
+  "total": 1768,
+  "source": 1324,
+  "other": 122,
   "document": 322
  },
  "source_residency": {
   "narrow": 44,
-  "code": 802,
-  "absent": 317,
-  "runtime": 101,
+  "code": 807,
+  "absent": 318,
+  "runtime": 103,
   "unresolved": 3,
   "comment": 46,
   "alt-sibling": 3
@@ -2368,7 +2368,7 @@
    "s": "check_fe.gd",
    "fn": "_s2_the_idiom_population",
    "h": "scripts/map_screen.gd",
-   "n": "for pool_name in ab_live:",
+   "n": "for card in offer:",
    "p": "+",
    "r": "code",
    "k": "literal",
@@ -2412,17 +2412,6 @@
    "s": "check_fe.gd",
    "fn": "_s2_the_idiom_population",
    "h": "scripts/map_screen.gd",
-   "n": "var ab_live: Array = Run.ability_choice(member)",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "read",
-   "g": "check_fe.gd#116"
-  },
-  {
-   "s": "check_fe.gd",
-   "fn": "_s2_the_idiom_population",
-   "h": "scripts/map_screen.gd",
    "n": "var live: Array = Run.ability_choice(member)",
    "p": "+",
    "r": "code",
@@ -2451,6 +2440,17 @@
    "k": "literal",
    "how": "read",
    "g": "check_fe.gd#114"
+  },
+  {
+   "s": "check_fe.gd",
+   "fn": "_s2_the_idiom_population",
+   "h": "scripts/map_screen.gd",
+   "n": "var offer: Array = Run.draft_choice(member) if is_draft else Run.ability_choice(member)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_fe.gd#116"
   },
   {
    "s": "check_fe.gd",
@@ -2651,7 +2651,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fh.gd#1393"
+   "g": "check_fh.gd#1398"
   },
   {
    "s": "check_fh.gd",
@@ -2662,7 +2662,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fh.gd#772"
+   "g": "check_fh.gd#765"
   },
   {
    "s": "check_fh.gd",
@@ -2673,7 +2673,7 @@
    "r": "unresolved",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_fh.gd#775"
+   "g": "check_fh.gd#768"
   },
   {
    "s": "check_fh.gd",
@@ -2684,7 +2684,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_fh.gd#775"
+   "g": "check_fh.gd#768"
   },
   {
    "s": "check_fh.gd",
@@ -2695,7 +2695,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_fh.gd#775"
+   "g": "check_fh.gd#768"
   },
   {
    "s": "check_fi.gd",
@@ -6032,7 +6032,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ib.gd#300"
+   "g": "check_ib.gd#301"
   },
   {
    "s": "check_ib.gd",
@@ -6043,7 +6043,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ib.gd#301"
+   "g": "check_ib.gd#302"
   },
   {
    "s": "check_ib.gd",
@@ -6054,7 +6054,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ib.gd#301"
+   "g": "check_ib.gd#302"
   },
   {
    "s": "check_ib.gd",
@@ -6065,7 +6065,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ib.gd#299"
+   "g": "check_ib.gd#300"
   },
   {
    "s": "check_ib.gd",
@@ -6076,7 +6076,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ib.gd#302"
+   "g": "check_ib.gd#303"
   },
   {
    "s": "check_ic.gd",
@@ -6176,6 +6176,192 @@
    "k": "literal",
    "how": "derived",
    "g": "check_ic.gd#222"
+  },
+  {
+   "s": "check_id.gd",
+   "fn": "_s1a_the_overlay_is_gone",
+   "h": "scripts/",
+   "n": "_finish_take",
+   "p": "+",
+   "r": "missing-file",
+   "k": "loop-list",
+   "how": "read",
+   "g": "check_id.gd#193"
+  },
+  {
+   "s": "check_id.gd",
+   "fn": "_s1a_the_overlay_is_gone",
+   "h": "scripts/",
+   "n": "_open_pick_overlay",
+   "p": "+",
+   "r": "missing-file",
+   "k": "loop-list",
+   "how": "read",
+   "g": "check_id.gd#193"
+  },
+  {
+   "s": "check_id.gd",
+   "fn": "_s1a_the_overlay_is_gone",
+   "h": "scripts/",
+   "n": "_pick_group",
+   "p": "+",
+   "r": "missing-file",
+   "k": "loop-list",
+   "how": "read",
+   "g": "check_id.gd#193"
+  },
+  {
+   "s": "check_id.gd",
+   "fn": "_s1a_the_overlay_is_gone",
+   "h": "scripts/map_screen.gd",
+   "n": "func _open_hero_draft(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_id.gd#197"
+  },
+  {
+   "s": "check_id.gd",
+   "fn": "_s1a_the_overlay_is_gone",
+   "h": "scripts/map_screen.gd",
+   "n": "pick_btn.pressed.connect(_open_hero_draft.bind(idx))",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_id.gd#197"
+  },
+  {
+   "s": "check_id.gd",
+   "fn": "_s2_the_words",
+   "h": "scripts/map_screen.gd",
+   "n": "\"Ability upgrades\\n%s\"",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_id.gd#582"
+  },
+  {
+   "s": "check_id.gd",
+   "fn": "_s2_the_words",
+   "h": "scripts/battle.gd",
+   "n": "ABILITY UPGRADE: %s may choose one",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_id.gd#582"
+  },
+  {
+   "s": "check_id.gd",
+   "fn": "_s3a_the_sweep",
+   "h": "data/",
+   "n": null,
+   "p": "+",
+   "r": "missing-file",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_id.gd#607",
+   "alt": true,
+   "expr": "DIAMOND"
+  },
+  {
+   "s": "check_id.gd",
+   "fn": "_s3a_the_sweep",
+   "h": "data/",
+   "n": null,
+   "p": "+",
+   "r": "missing-file",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_id.gd#607",
+   "alt": true,
+   "expr": "ARROW"
+  },
+  {
+   "s": "check_id.gd",
+   "fn": "_s3a_the_sweep",
+   "h": "scripts/",
+   "n": null,
+   "p": "+",
+   "r": "missing-file",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_id.gd#595",
+   "alt": true,
+   "expr": "DIAMOND"
+  },
+  {
+   "s": "check_id.gd",
+   "fn": "_s3a_the_sweep",
+   "h": "scripts/",
+   "n": null,
+   "p": "+",
+   "r": "missing-file",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_id.gd#595",
+   "alt": true,
+   "expr": "ARROW"
+  },
+  {
+   "s": "check_id.gd",
+   "fn": "_s3a_the_sweep",
+   "h": "scripts/",
+   "n": null,
+   "p": "+",
+   "r": "missing-file",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_id.gd#596",
+   "expr": "DIAMOND"
+  },
+  {
+   "s": "check_id.gd",
+   "fn": "_s3a_the_sweep",
+   "h": "scripts/",
+   "n": null,
+   "p": "+",
+   "r": "missing-file",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_id.gd#596",
+   "expr": "ARROW"
+  },
+  {
+   "s": "check_id.gd",
+   "fn": "_s3c_the_passive_and_the_relics",
+   "h": "scripts/spec_choice_screen.gd",
+   "n": "\"Class Passive — ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "inline",
+   "g": "check_id.gd#713"
+  },
+  {
+   "s": "check_id.gd",
+   "fn": "_s4b_mirrorbound",
+   "h": "scripts/battle.gd",
+   "n": "u.mod_recoil = 0.25",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_id.gd#792"
+  },
+  {
+   "s": "check_id.gd",
+   "fn": "_s4b_mirrorbound",
+   "h": "scripts/battle.gd",
+   "n": "var recoil := maxi(int(round(total_dealt * recoil_pct)), 1)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_id.gd#792"
   },
   {
    "s": "test_batch_ah.gd",
@@ -15022,6 +15208,17 @@
   {
    "s": "test_batch_bo.gd",
    "fn": "_sources",
+   "h": "scripts/map_screen.gd",
+   "n": "drop_btn.pressed.connect(_open_drop_overlay.bind(idx, \"draft\" if is_draft else \"ability\",",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "test_batch_bo.gd#291"
+  },
+  {
+   "s": "test_batch_bo.gd",
+   "fn": "_sources",
    "h": "scripts/run_sim.gd",
    "n": "for d_m in run.party:",
    "p": "+",
@@ -15050,7 +15247,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bo.gd#299"
+   "g": "test_batch_bo.gd#297"
   },
   {
    "s": "test_batch_bo.gd",
@@ -15068,8 +15265,8 @@
    "fn": "_sources",
    "h": "scripts/map_screen.gd",
    "n": "func _open_pick_overlay(",
-   "p": "+",
-   "r": "code",
+   "p": "-",
+   "r": "absent",
    "k": "literal",
    "how": "read",
    "g": "test_batch_bo.gd#297"
@@ -15089,23 +15286,12 @@
    "s": "test_batch_bo.gd",
    "fn": "_sources",
    "h": "scripts/map_screen.gd",
-   "n": "if bench_name == \"\" and Run.ability_slots_full(member):\n\t\t_open_drop_overlay(idx, \"ability\", pool_name)",
+   "n": "if Run.ability_slots_full(member):\n\t\tif bench_name == \"\":\n\t\t\treturn \"the kit is full — name an ability to bench\"",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
    "g": "test_batch_bo.gd#291"
-  },
-  {
-   "s": "test_batch_bo.gd",
-   "fn": "_sources",
-   "h": "scripts/map_screen.gd",
-   "n": "if kind == \"draft\" or kind == \"rune\":\n\t\t_open_hero_draft(idx)",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "read",
-   "g": "test_batch_bo.gd#299"
   },
   {
    "s": "test_batch_bo.gd",
@@ -15139,6 +15325,17 @@
    "k": "literal",
    "how": "read",
    "g": "test_batch_bo.gd#295"
+  },
+  {
+   "s": "test_batch_bo.gd",
+   "fn": "_sources",
+   "h": "scripts/map_screen.gd",
+   "n": "pick_btn.pressed.connect(_open_hero_draft.bind(idx))",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "test_batch_bo.gd#299"
   },
   {
    "s": "test_batch_bo.gd",
@@ -17830,7 +18027,7 @@
    "h": "docs/master.html",
    "n": "four columns",
    "p": "+",
-   "r": "alt-sibling",
+   "r": "code",
    "k": "literal",
    "how": "derived",
    "g": "test_batch_bx.gd#573",
@@ -18193,23 +18390,23 @@
    "s": "test_batch_bx.gd",
    "fn": "_screen_source",
    "h": "scripts/map_screen.gd",
-   "n": "if kind == \"draft\" or kind == \"rune\":\n\t\t_open_hero_draft(idx)",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "read",
-   "g": "test_batch_bx.gd#244"
-  },
-  {
-   "s": "test_batch_bx.gd",
-   "fn": "_screen_source",
-   "h": "scripts/map_screen.gd",
    "n": "on_drop := Callable()",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
    "g": "test_batch_bx.gd#246"
+  },
+  {
+   "s": "test_batch_bx.gd",
+   "fn": "_screen_source",
+   "h": "scripts/map_screen.gd",
+   "n": "pick_btn.pressed.connect(_open_hero_draft.bind(idx))",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "test_batch_bx.gd#244"
   },
   {
    "s": "test_batch_cb.gd",

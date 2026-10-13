@@ -198,7 +198,7 @@ func _draw_detail() -> void:
 	# otherwise overwrite the upgrade. The sheet has to show the numbers the
 	# fight will use.
 	# Batch AQ §5A: the RETURN is captured now instead of discarded — it names
-	# what actually LANDED, so the sheet's ◆ carries the same guarantee the
+	# what actually LANDED, so the sheet's ↑ carries the same guarantee the
 	# battle tooltip has and can never advertise an upgrade that did not apply.
 	# Batch AU §1's talent fallbacks ride the same call, so the sheet shows the
 	# upgraded numbers a collided node actually bought.
@@ -372,11 +372,12 @@ func _draw_detail() -> void:
 			cost_note = "  (%d)" % ab.cost
 		elif ab.faith_cost > 0:
 			cost_note = "  (%dF)" % ab.faith_cost
-		# Batch AQ §5A: the same ◆ mark and the same gold the battle action
+		# Batch AQ §5A: the same mark and the same gold the battle action
 		# button wears, off the same source of truth (what apply_upgrades said
 		# landed). Twelve upgrades a run were invisible outside a fight.
+		# BATCH ID §3 — the mark is ↑, which names an upgrade wherever one appears.
 		var ups: Array = landed_upgrades.get(ab.display_name, [])
-		chip_label.text = "%s%s%s" % ["◆ " if not ups.is_empty() else "",
+		chip_label.text = "%s%s%s" % ["↑ " if not ups.is_empty() else "",
 			ab.display_name, cost_note]
 		chip_label.add_theme_font_size_override("font_size", 13)
 		if not ups.is_empty():

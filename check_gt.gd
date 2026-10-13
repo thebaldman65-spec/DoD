@@ -1167,15 +1167,18 @@ func _screens_say_why(pid: String, seat: int, rows: Array, undone: Array = []) -
 		ok(chip != null and tip == _run.sits_out_note(String(card)) and tip.contains(rune_name),
 			"§3 %s: the hero sheet does not show %s sitting out with its reason (%s)" % [pid, card, tip])
 		# AND NOT ALSO AS A CARD THE FIGHT WILL SEAT: an ordinary chip reads the
-		# name, or the name and its cost, with no "sits out".
+		# name, or the name and its cost, with no "sits out". **BATCH ID §3 — RE-POINTED, THE
+		# QUESTION UNMOVED: an upgraded card's chip leads with ↑ now, where it led with ◆**, so the
+		# mark trimmed is the one the sheet draws; trimming the old one left an upgraded card's chip
+		# unread here, and this negative arm passing for it by construction.
 		var as_seated := sheet_labels.filter(func(l):
-			var t := String((l as Label).text).trim_prefix("◆ ")
+			var t := String((l as Label).text).trim_prefix("↑ ")
 			return t == String(card) or t.begins_with(String(card) + "  ("))
 		ok(as_seated.is_empty(), "§3 %s: the hero sheet also shows %s as a seated card" % [pid, card])
 	# BATCH HF §7 — AN UNDONE ROW IS SHOWN SEATED, AND NOT AS SITTING OUT.
 	for cardu in undone:
 		var as_seated_u := sheet_labels.filter(func(l):
-			var t := String((l as Label).text).trim_prefix("◆ ")
+			var t := String((l as Label).text).trim_prefix("↑ ")
 			return t == String(cardu) or t.begins_with(String(cardu) + "  ("))
 		ok(_label_with(current_scene, "%s — sits out" % cardu) == null and not as_seated_u.is_empty(),
 			"§3 %s: the hero sheet does not show %s as a seated card with the engine dropped" % [pid, cardu])

@@ -406,7 +406,7 @@ static func apply(run: Node, fx: Dictionary) -> String:
 			# reachable today and not a theoretical guard.
 			var drafted := PackedStringArray()
 			for m in _targets(run, fx):
-				if run.award_draft_pick(m):
+				if run.award_draft_pick(m, "event"):
 					drafted.append(_who(m))
 			if drafted.is_empty():
 				return ""

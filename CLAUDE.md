@@ -116,7 +116,7 @@ into this file changes it.
 the equality rule travel with their parent. **Eight of the rows are FF §2's**, and they are the
 residue: rules written into this file AFTER the seam was taken, which the seam's own test puts on
 the other side of it. **Every row after those eight was written straight into the reference rather
-than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two and HY's two —
+than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two and ID's one —
 and GW §2's, written there at GW and given its row only at HX (HV §3e found it missing; `check_hx` §1a now reds on one) —
 and two more are MOVED, FF §2's way: HG–HJ's census and supersession blocks, written back into this file after the seam
 was taken and sent over at HY §4 by the designer's ruling, byte for byte (`check_hx` §1c reds on a new block written here):
@@ -175,6 +175,7 @@ was taken and sent over at HY §4 by the designer's ruling, byte for byte (`chec
 | A SUPERSESSION IS A CLAIM, AND IT IS DRIVEN LIKE ONE | HG §2a / HH / HI / HJ |
 | A BATCH RE-READS THE REFERENCE CLAIMS THAT NAME WHAT IT TOUCHED | HY §6 |
 | A LIVE COUNT IN A REFERENCE POINTS AT THE INSTRUMENT THAT PRINTS IT, OR CARRIES ITS BATCH | HY §6 |
+| A CENSUS A LATER BATCH WILL BE PRICED AGAINST IS KEPT, NOT JUST COUNTED | ID §0.6 |
 
 ## THE COMBAT RULES LIVE IN `docs/combat-rules.md` (STANDING, SET AT GR §2, RULED BY THE DESIGNER)
 > **THIS FILE IS STILL THE ONE A BATCH MUST READ. `docs/combat-rules.md` IS A REFERENCE IT POINTS AT,
@@ -2197,6 +2198,15 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
     THAT TURNS ON AND OFF.** So Tithe's chip, which has no condition and reads PAYING whenever worn, is the strip's and
     breaks nothing above. Drawing it only as it pays was rejected: a chip that appears and vanishes at every Break is
     noise, on the most common event in the game.
+  · **THE CLASS PASSIVE'S CHIP IS DELETED (ID §3, the designer's): a class passive is always on**, so it is the sheet's —
+    its *Class:* line — and the class-selection card's, and four permanent chips in a row whose job is *what changed* is
+    noise. **It was laid through `add_status`, so it was a Sanctity event and a float on every hero at every spawn**: its
+    going takes four events and four dice from every battle's opening (measured at ID and reported, not compensated). **A
+    display chip laid through the status door is a status to everything that counts statuses** — the engine chips (★)
+    still are; a chip that is not a status is drawn as the rune chips are (`set_rune_chips`).
+  · **THE VOW'S CHIP SAYS WHAT IT SILENCES THAT HE HOLDS (ID §4)** — his ground's reflect, the Ruin draught his blows would
+    drink, Suffering's heal — each named only while he holds what pays it, the heal figure read off his payload; IN EFFECT
+    while one is live (his ground laid, a Ruined enemy standing), ARMED otherwise.
 
 ## STANDING RULE — A CARD OR A RUNE THAT CANNOT PAY WITHOUT ITS ENGINE SITS OUT WHILE THE ENGINE IS GONE (Batch GT §3 for a card, GX §1 for a rune, ruled by the designer)
 > **An earned card the usability door refuses on every board without its engine is left out of every fight while
@@ -2435,8 +2445,9 @@ the block left out, spend what they were paid.
     outlives the engine it was chosen with**, so the boss went on offering cards needing an engine the hero no longer
     held. It asks the whole of `Classes.offerable`, as every other door does. **A triple rolled before the pet was
     dismissed, or the engine unslotted, is filtered at its answer** (`Run.ability_choice`), never repaired away (GV's
-    rule for a state the player can undo), and the overlay says what it holds back and which rune brings it back — the
-    rune cache's words for an engine, the empty-offer sentence's for the pet (`check_hc` §5, `check_he` §4).
+    rule for a state the player can undo), and the hero's screen (the pick overlay until ID §1) says what it holds back
+    and which rune brings it back — the rune cache's words for an engine, the empty-offer sentence's for the pet
+    (`check_hc` §5, `check_he` §4).
   · **AND AN ENGINE THAT NEEDS THE PET SITS OUT BESIDE THE ONE THAT DISMISSES IT (HC §5, ruled: LEGAL, AND VISIBLE).**
     Pack Bond slotted beside Lethal Aim (`Classes.PET_ENGINES`, `Runes.needs_companion`) is still offered, held and
     slotted, and says it sits out with GX's sentence, word for word, on GX's four surfaces — the pouch's engine row, the
@@ -2735,11 +2746,14 @@ count), heal, cost, cooldown, initiative and **Perfect**. Its two callers:
 **A LATER BATCH CHANGING THE BLOCK CHANGES BOTH SCREENS. That shared path is the point** — before
 CK the sheet held the only copy, which is exactly why the draft card had none and thirty damaging
 cards drafted with no damage figure at all.
-- **THE DRAFT CARD IS AN ARITHMETIC-ALLOWED SURFACE AND THE OFFER PICKER IN THE SAME FILE IS NOT.**
-  `map_screen._pick_button` (the zone boss's and the mini-boss's offers and the drop step) renders
-  `description` alone BY DESIGN — it is read in the same breath as a fight, so the standard's
-  mid-combat tier binds it; the rune cache's offer, on the hero's own draft screen since IB §2, renders a rune's text alone
-  the same way. **`map_screen.gd` renders both tiers. Do not "make them consistent".**
+- **THE DRAFT CARD IS AN ARITHMETIC-ALLOWED SURFACE AND THE BENCH STEP IN THE SAME FILE IS NOT.**
+  `map_screen._pick_button` (the bench step's choices) renders `description` alone BY DESIGN — it is read in the same
+  breath as a fight, so the standard's mid-combat tier binds it; the rune cache's offer, on the hero's own draft screen
+  since IB §2, renders a rune's text alone the same way. **`map_screen.gd` renders both tiers. Do not "make them
+  consistent".** *The zone boss's and the mini-boss's offers were the picker's until ID §1 retired the pick overlay: the
+  boss's cards draw through the draft card's builder now — a draft and a boss's card are one kind of thing (ID §0.5), so
+  they read one way — and an offered upgrade shows its sentence and the figures it moves on its card, old → new
+  (`Run.upgrade_preview`, off this block's builder).*
 - **THE THIRD COPY IS `battle._ability_tooltip` AND IT IS DELIBERATELY NOT FOLDED IN.** It reads a
   live `BattleUnit`: Surge, Empower and the Resonance curve multiply its damage and it prints
   "(ready in N)" off that unit's cooldown clock. It is a mid-combat tooltip with live state in it,
@@ -4210,7 +4224,8 @@ lets a boss pool empty below its own depth.**
   reason for driving it thousands of times is kept and pointed at what replaced it: a class-wide
   card must still REACH a hero, and with no seam the only thing that can hide one is the shuffle.
 · **THE UI IS ONE RENDERER, AND IT IS THE HERO'S OWN SCREEN (IB §2).** BO reused the pick overlay and BX built a
-  party screen of four columns; each was the one draft renderer of its day, and there is still exactly one.
+  party screen of four columns; each was the one draft renderer of its day, and there is still exactly one — **and since
+  ID §1 it is the one surface for every owed pick**, the pick overlay retired.
 
 **THE TWELVE PROTECTED CORES — `Classes.PROTECTED_CORES`, AND THE `enablers` COLUMN IS THE THING A
 LATER BATCH WOULD MOST EASILY BREAK.** It is AUTHORED rather than derived, and `test_batch_bo`
@@ -4291,8 +4306,8 @@ fact that they are.
 - **AN UNMADE PICK, NEVER AN UNEQUIPPED HOLDING — THE ONE PREDICATE THAT KEEPS A REMINDER FROM BECOMING A NAG.**
   `Run.pending_picks` reads the four pick counters and nothing else; a holding that opened a screen would open it at
   every arrival for the rest of the run.
-- **DISMISSING LOSES NOTHING, AND IT IS ONCE AN ARRIVAL.** Later and Not yet leave the pick owed, its offer stored and
-  its card marked — the border, `◆ N kind` and CHOOSE, never HR's ✦ — and nothing dismissed opens again until the party
+- **DISMISSING LOSES NOTHING, AND IT IS ONCE AN ARRIVAL.** Later leaves every pick on the screen owed, its offer stored
+  and its card marked — the border, `◆ N kind` and CHOOSE, never HR's ✦ — and nothing dismissed opens again until the party
   next arrives. **A RETURN FROM A SCREEN THE PLAYER CHOSE TO OPEN IS NOT AN ARRIVAL (IC §0.3, the designer's)** — the
   hero sheet and the talents today (`Run.map_reentry`, set as each returns), and any screen a later batch lets him open
   from the map: a pick pushed back at a player who left on purpose is the nag the predicate above forbids, and its card
@@ -4307,14 +4322,30 @@ fact that they are.
 - **EACH HERO DRAFTS ALONE, AND THAT IS A LAYOUT.** The four columns were already four picks — each hero his own offer,
   pool, ledger and take — so a screen a hero moved no reward. **A section with nothing owed is absent, not empty**, and
   the elite's looter owes both at every elite. The rules stay `run_state.gd`'s; the screen is
-  `map_screen._open_hero_draft`, its rune half `_take_rune_pick`. **The boss's ability and the upgrade still open on the
-  pick overlay — FOLDED INTO THE HERO'S SCREEN, RULED, NOT BUILT (IC §0.1, the designer's; ID's, its design on
-  `docs/state.md`'s roadmap)**: two screens doing one job, chosen by which enemy fell, is the rot; the overlay retires.
+  `map_screen._open_hero_draft`, its rune half `_take_rune_pick`.
+- **EVERY PICK HE IS OWED IS A SECTION OF THAT SCREEN, AND THE PICK OVERLAY IS RETIRED (ID §1, ruled at IC §0.1 and ID
+  §0.5)**: two screens doing one job, chosen by which enemy fell, is the rot. **ABILITIES holds the draft's offer and the
+  zone boss's**, two labelled offers in one section, each a column and each saying its door (*from the elite*, *from an
+  event*, *from the zone boss* — `Run.pick_source`, kept with the pick's serial): a draft and a boss's card are one kind of
+  decision, and two sections would teach otherwise. **UPGRADES is its own** — it changes a card he holds — naming each
+  choice *card: upgrade*, its sentence and the figures it moves on that card. **RUNES is unchanged.** One Confirm commits
+  all four, in the order they are drawn. **The cap is counted across the two offers in that order** (`_bench_needed`): the
+  draft's card takes a free slot first, and a card one offer benches is not offered to the other; a card in both offers is
+  drawn in the second dead. **A section with nothing he can take now does not hold the Confirm** — it says why and stays
+  owed, as the overlay's *Not yet* left it. **THE WIDEST SCREEN IS FOUR COLUMNS, 1,220 PX OF 1,280**, each column's text
+  in its own scroller with Godot's bar, the Confirm and Later outside every scroller (`check_id` §1b measures it).
+  · **THE WORDS (IC §0.2, ID §2)**: the title is *THE DRAFT* whenever an ability is on the screen and otherwise names what
+    is — *THE CACHE*, *THE UPGRADE*, *THE UPGRADE AND THE CACHE* — **and never misnames its own screen**; the owed line is
+    what he is owed as one sentence, then *Decide, then confirm.*; the counter counts to four in words with no
+    parenthesis — **four is its ceiling, one choice a kind** — and the Confirm says the title's noun.
 - **◆ MEANS A DECISION WAITS, AND NOTHING ELSE, ANYWHERE (IC §0.4, the designer's). ✦ counts what is held and unworn, and
   a holding and a pick never share a glyph** — a mark exists so the player sees at a glance whether he owes something.
-  The map card's held upgrades read ↑N since IC §3. **Six surfaces still draw ◆ for something that is not a waiting
-  decision — RULED, NOT BUILT** (IC's ruling owed): an upgraded ability's battle button and hero-sheet chip, the
-  Blacksmith's upgrade, the class passive's chip, and a rare relic on the relic shelf and the run's relic picker.
+  **↑ NAMES AN UPGRADE, WHEREVER ONE APPEARS (ID §0.1, the designer's)** — the map card's corner (↑N, IC §3), an upgraded
+  ability's battle button and hero-sheet chip, and the Blacksmith's offer, which is not a holding: one glyph for the thing,
+  learned once. **Built at ID §3, and asserted** (`check_id` §3a): in the game's code every ◆ is a pending pick's badge
+  and ↑ is drawn on those four surfaces and nowhere else; the class passive's ◆ chip is deleted (the chip bullet under
+  *A CHIP SAYS WHAT PAYS NOW*), and a rare relic reads the word RARE on the shelf and in the picker. *✦ also marks a worn
+  rune or a carried card on three panels, a rune's chip in battle and the Empower toggle — FOUND AT ID, its ruling owed.*
 - **THE CREST RUNE STAYS OUT OF A HERO'S PICK (HW §1c), AND A SCREEN A HERO IS WHERE IT WOULD QUIETLY RE-MERGE**: the
   RUNES section draws `Run.rune_choice`, which repairs a crest rune out of a queued triple, and the crest's bag is not
   touched by a hero's answer (`check_ib` §2d).

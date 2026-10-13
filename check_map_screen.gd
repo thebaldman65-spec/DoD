@@ -60,8 +60,10 @@ func _process(_d: float) -> void:
 			_open("boss next, every hero owed one")
 		3:
 			var before: int = _tally(map_scene)["all"]
-			map_scene._open_pick_overlay(0)
-			print("  pick overlay added %d nodes" % (int(_tally(map_scene)["all"]) - before))
+			# BATCH ID §1 — the upgrade owed opens the hero's own screen (its UPGRADES section);
+			# the pick overlay that drew it until ID is retired.
+			map_scene._open_hero_draft(0)
+			print("  the hero's screen added %d nodes" % (int(_tally(map_scene)["all"]) - before))
 			map_scene._open_rune_panel(1)
 			print("  rune pouch opened without error")
 			# **BATCH EG §2 — THE LOADOUT PANEL, DRAWN NOWHERE ELSE.** It is the

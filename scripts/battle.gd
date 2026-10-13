@@ -1682,9 +1682,13 @@ func _spawn_units() -> void:
 				Color(0.9, 0.78, 0.4), -1, Classes.resolve_values(
 					Classes.engine_desc(String(pid)),
 					Classes.value_ctx_from_unit(u)))
-		var class_passive: Dictionary = Classes.CLASS_PASSIVES[hero_keys[i]]
-		u.add_status("class_passive", class_passive["name"], "◆",
-			Color(0.65, 0.75, 0.9), -1, class_passive["desc"])
+		# BATCH ID §3 — THE CLASS PASSIVE'S CHIP IS DELETED (ID §0.1, the designer's). It was a
+		# status laid on every hero at the spawn, tagged ◆, for a payout that never turns off; a
+		# chip is for a payout that turns on and off (HZ §1d), and the passive is read where it
+		# always was — the hero sheet's *Class:* line and the class-selection card. **Laid as a
+		# status it was also a Sanctity event and a float on every hero at every spawn** (four
+		# events and four `randf_range` a battle), so its going moves the Hierophant's count and
+		# every seeded die by those four — measured and reported at ID, not compensated.
 		# Always-on talent buffs carry permanent chips with live counters
 		# (Iron Will refreshes in unit.gd, Crushing Blows in _update_talent_chips).
 		if u.iron_will_ranks > 0:
@@ -7716,16 +7720,21 @@ func _ability_tooltip(u: BattleUnit, ab: Ability) -> String:
 # Batch AQ §5A. AP put the upgrade names on the tooltip and NOWHERE ELSE — a
 # full run awards three upgrades to every hero, twelve across the party, all
 # of them discoverable only by hovering forty buttons mid-fight. An upgraded
-# ability wears a ◆ now, in the gold the map card's unspent-pick badges use.
+# ability wears a mark now, in the gold the map card's unspent-pick badges use.
 # It reads `ability_upgrades`, which is fed from apply_upgrades' RETURN, so it
 # can only ever mark an upgrade that really applied.
+#
+# **BATCH ID §3 — THE MARK IS ↑, WHICH NAMES AN UPGRADE WHEREVER ONE APPEARS (ID §0.1, the
+# designer's).** It was ◆ from AQ to IC, and ◆ means a decision waits and nothing else (IC §0.4):
+# a held upgrade reads ↑ on this button, on the hero sheet's chip, on the Blacksmith's offer and
+# on the map card's corner, so the player learns the one glyph once.
 const UPGRADE_GOLD := Color(1.0, 0.9, 0.5)
 
 
 func _mark_upgraded(btn: Button, u: BattleUnit, ab: Ability) -> void:
 	if (u.ability_upgrades.get(ab.display_name, []) as Array).is_empty():
 		return
-	btn.text = "◆ " + btn.text
+	btn.text = "↑ " + btn.text
 	btn.add_theme_color_override("font_color", UPGRADE_GOLD)
 	btn.add_theme_color_override("font_hover_color", UPGRADE_GOLD)
 	btn.add_theme_color_override("font_pressed_color", UPGRADE_GOLD)
@@ -27822,8 +27831,9 @@ func _live_recompute(u: BattleUnit, field: String) -> void:
 #   · a hero's own rune carrying a `condition`, on his plate;
 #   · the tier-3 node that pays a lethal hit out of Rage (`last_rites_window`), which Boil
 #     Over's dump turns off — allowed, and visible here;
-#   · Consecrated Ground's reflect while its layer wears Vow of Silence (HY's ruling 3, the
-#     trap: his own vow silences his ground's reflect, for anybody).
+#   · Vow of Silence, on its wearer, for what it silences that he holds (ID §4): his ground's
+#     reflect, for anybody (HY's ruling 3, the trap), the Ruin draught his blows would drink, and
+#     Suffering's heal (the Occultist's trap, IC §1d's measurement).
 # **Every magnitude is read off the payload it describes**, never off a rune's authored line,
 # which carries its own copy of the figure. The state is the live door's own (`_live_stamps`).
 const RUNE_CHIP_TAG := "✦"
@@ -27880,14 +27890,35 @@ func _refresh_rune_chips() -> void:
 			else:
 				lr_tip += "Below a quarter's health, each wound is\npaid out of Rage first, %d a point." % hu.last_rites
 			per_hero[hu].append({"name": lr_name, "tag": RUNE_CHIP_TAG, "paying": lr_on, "tip": lr_tip})
-		# THE GROUND UNDER A VOW — in effect while a ground he laid stands on anybody.
-		var cg: Ability = _find_ability(hu, "Consecrated Ground")
-		if hu.rune_vow_of_silence > 0.0 and cg != null:
-			var laid := heroes.any(func(x): return not x.dead and x.has_status("cons_ground") \
-				and String(x.get_status("cons_ground").get("src_name", "")) == hu.unit_name)
-			var cg_tip := "%s and %s — %s\n" % [vow_name, cg.display_name, "IN EFFECT" if laid else "ARMED"]
-			cg_tip += "His vow silences his own ground: it\nreflects nothing, for anybody standing on it."
-			per_hero[hu].append({"name": vow_name, "tag": RUNE_CHIP_TAG, "paying": laid, "tip": cg_tip})
+		# THE VOW — WHAT IT SILENCES THAT HE HOLDS (HY's ruling 3 for his ground; ID §4 for the rest,
+		# the designer's: *a vowed Occultist loses his draught and Suffering's heal and nothing tells
+		# him*). His ground's reflect, the Ruin draught his blows would drink while an Old Gods holder
+		# stands, and Suffering's heal — each named only while he holds what pays it, the heal bonus
+		# read off his payload (`rune_vow_of_silence`), never off the rune's line. IN EFFECT while one
+		# is live now — his ground laid, or a Ruined enemy standing for the draught — ARMED otherwise.
+		if hu.rune_vow_of_silence > 0.0:
+			var cg: Ability = _find_ability(hu, "Consecrated Ground")
+			var su: Ability = _find_ability(hu, "Suffering")
+			var occ := _living_occultist()
+			var gone := PackedStringArray()
+			var live := false
+			if cg != null:
+				gone.append("his own ground, which reflects nothing for anybody standing on it")
+				live = live or heroes.any(func(x): return not x.dead and x.has_status("cons_ground") \
+					and String(x.get_status("cons_ground").get("src_name", "")) == hu.unit_name)
+			if occ != null:
+				gone.append("the Ruin his blows would drink off a Ruined enemy")
+				live = live or enemies.any(func(e): return not e.dead and e.has_status("ruin"))
+			if su != null:
+				gone.append("%s's heal" % su.display_name)
+			if not gone.is_empty():
+				var said := gone[0] if gone.size() == 1 else "%s; and %s" % [
+					"; ".join(gone.slice(0, gone.size() - 1)), gone[gone.size() - 1]]
+				var v_lines := PackedStringArray(["%s — %s" % [vow_name, "IN EFFECT" if live else "ARMED"]])
+				v_lines.append_array(_wrap_words("His heals are %d%% stronger, and every blow he lands deals nothing, so it silences %s." % [
+					int(round(hu.rune_vow_of_silence * 100.0)), said]))
+				per_hero[hu].append({"name": vow_name, "tag": RUNE_CHIP_TAG, "paying": live,
+					"tip": "\n".join(v_lines)})
 	for h3 in per_hero:
 		(h3 as BattleUnit).set_rune_chips(per_hero[h3])
 	_draw_crest_strip(crest)

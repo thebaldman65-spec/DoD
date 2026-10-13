@@ -872,7 +872,11 @@ func _sources() -> void:
 		"§3: ...through the function it always used")
 	# THE CAP BINDS THE BOSS PICK TOO — it is a rule about a KIT, not about one
 	# pool, and a boss pick that walked past it would not be a cap at all.
-	ok(map.contains("if bench_name == \"\" and Run.ability_slots_full(member):\n\t\t_open_drop_overlay(idx, \"ability\", pool_name)"),
+	# **BATCH ID §1 — RE-POINTED, THE QUESTION UNMOVED.** The boss's pick is an offer of the hero's
+	# screen now (the pick overlay is retired): at the cap its card opens the same drop step the
+	# draft's does — one bench step, two offers — and its commit door refuses a take with no bench.
+	ok(map.contains("drop_btn.pressed.connect(_open_drop_overlay.bind(idx, \"draft\" if is_draft else \"ability\",")
+			and map.contains("if Run.ability_slots_full(member):\n\t\tif bench_name == \"\":\n\t\t\treturn \"the kit is full — name an ability to bench\""),
 		"§3: a boss pick at the cap opens the same drop step")
 	# ONE DOOR PER QUESTION, so a rule cannot be applied in one path and
 	# forgotten in the other. **RE-POINTED AT BATCH EG §2 AND THE COUNT MOVED
@@ -897,9 +901,12 @@ func _sources() -> void:
 	ok(map.count("member[\"bm_abilities\"] = ") == 0
 			and map.count("Run.hold_ability(") == 1,
 		"§2: ...which the map screen calls rather than writing the list itself")
-	# THE OVERLAY IS REUSED, NOT REBUILT (§1's instruction).
-	ok(map.count("func _open_pick_overlay(") == 1,
-		"§3: there is still exactly ONE pick overlay")
+	# THE OVERLAY IS REUSED, NOT REBUILT (§1's instruction). **RE-POINTED AT BATCH ID §1, AND IT IS
+	# THE SAME QUESTION ONE STEP ON: ONE SURFACE ANSWERS AN OWED PICK.** The pick overlay is retired —
+	# the boss's ability and the upgrade are sections of the hero's own screen — so the question is
+	# that no second pick surface stands beside it.
+	ok(map.count("func _open_pick_overlay(") == 0 and map.count("func _open_hero_draft(") == 1,
+		"§3: an owed pick has more than ONE surface — the retired pick overlay is back beside the hero's screen")
 	# RE-POINTED AT BATCH BX §2, AND IT IS AN INVERSION. BO's question was "is
 	# the draft reusing the overlay rather than building a second one", and the
 	# answer moved: an elite drafts for FOUR heroes now, which is a screen the
@@ -912,8 +919,11 @@ func _sources() -> void:
 	# class drafts separately, runes and abilities together).** The question is the same:
 	# exactly one draft renderer, the one CHOOSE routes to, and the party screen it
 	# replaced is gone rather than left beside it.
+	# **AND RE-POINTED AT BATCH ID §1, THE QUESTION UNMOVED**: the CHOOSE opens the hero's screen
+	# itself — every kind of pick is a section of it — where it routed a draft or a rune there through
+	# the pick overlay until ID retired that overlay.
 	ok(map.count("func _open_hero_draft(") == 1 and not map.contains("func _open_party_draft(")
-		and map.contains("if kind == \"draft\" or kind == \"rune\":\n\t\t_open_hero_draft(idx)"),
+		and map.contains("pick_btn.pressed.connect(_open_hero_draft.bind(idx))"),
 		"§3: ...and the draft has exactly one renderer, which CHOOSE routes to")
 
 

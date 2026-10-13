@@ -531,6 +531,13 @@ static func bound_button(n: Node, method: String, args: Array) -> Button:
 # `_stage_draft_rune`, Decline by `_stage_draft_decline`, the bench step by
 # `_open_drop_overlay`, the Confirm by `_confirm_hero_draft`, and a pick overlay's
 # choices by the `choice` meta `map_screen._pick_button` sets on each.
+#
+# **BATCH ID §1c — THE PICK OVERLAY IS RETIRED AND THIS HELPER ABSORBS ITS TWO PICKS.** The
+# zone boss's ability and the mini-boss's upgrade are sections of the hero's screen now, so
+# every walker that pressed the overlay's first choice meets the hero's screen instead: the
+# boss's card by `_stage_boss` (and its bench step, `_open_drop_overlay` bound with
+# `"ability"`), the upgrade by `_stage_upgrade`. `pick_choices` keeps one surface — the bench
+# step's overlay (z 64), whose choices `_pick_button` still marks.
 
 # The ENABLED buttons of `n` whose press is bound to `method`, whatever the
 # arguments, in the order they are drawn.
@@ -558,7 +565,8 @@ static func bound_args(b: Button, method: String) -> Array:
 
 
 # The buttons a pick overlay marks as its choices, in the order they are drawn: what a
-# player can choose, and nothing that only closes, previews or lets the pick go.
+# player can choose, and nothing that only closes, previews or lets the pick go. Since ID §1
+# the bench step's overlay (z 64) is the one surface that marks them.
 static func pick_choices(ov: Node) -> Array:
 	var out: Array = []
 	if ov == null:
@@ -578,43 +586,47 @@ static func hero_draft(screen: Node) -> Node:
 
 
 # A hero's draft screen answered the way a player answers it, through its own buttons:
-# the first card (or Decline, when `take_card` is false or nothing can be taken), at the
-# cap the first card the bench step offers, the first rune (or an empty cache let go),
-# then the Confirm. Returns what was pressed — {hero, card, bench, declined, rune,
-# let_go, confirmed} — for the walker to record. A screen whose Confirm would not press
-# is left up and says so (`confirmed` false).
+# the draft's first card (or Decline, when `take_card` is false or nothing can be taken), at
+# the cap the first card its bench step offers; **the zone boss's first card** — it has no
+# decline — and its bench step's first card where the cap asks one; **the first upgrade**; the
+# first rune (or an empty cache let go); then the Confirm. Returns what was pressed —
+# {hero, card, bench, declined, boss, boss_bench, upgrade, rune, let_go, confirmed} — for the
+# walker to record. A screen whose Confirm would not press is left up and says so
+# (`confirmed` false).
 static func answer_hero_draft(tree: SceneTree, screen: Node, take_card: bool) -> Dictionary:
 	var ov: Node = hero_draft(screen)
 	if ov == null:
 		return {}
 	var idx := int(ov.get_meta("hero_draft"))
-	var out := {"hero": idx, "card": "", "bench": "", "declined": false, "rune": "",
-		"let_go": false, "confirmed": false}
+	var out := {"hero": idx, "card": "", "bench": "", "declined": false, "boss": "",
+		"boss_bench": "", "upgrade": "", "rune": "", "let_go": false, "confirmed": false}
 	var dec: Array = bound_buttons(ov, "_stage_draft_decline")
-	var has_card := not dec.is_empty()
-	var has_rune := not bound_buttons(ov, "_stage_draft_rune").is_empty()
+	var shape := PackedStringArray()
+	if not dec.is_empty():
+		shape.append("draft")
+	if _has_offer(ov, "boss"):
+		shape.append("boss")
+	if _has_section(ov, "upgrades"):
+		shape.append("upgrade")
+	if not bound_buttons(ov, "_stage_draft_rune").is_empty():
+		shape.append("rune")
 	_census("screens")
-	_census("both sections" if has_card and has_rune else ("a card alone" if has_card else "a rune alone"))
+	_census(" + ".join(shape) if not shape.is_empty() else "nothing to take")
 	if not dec.is_empty():
 		var cards: Array = bound_buttons(ov, "_stage_draft")
 		if take_card and not cards.is_empty():
 			out["card"] = String(bound_args(cards[0], "_stage_draft")[1])
 			(cards[0] as Button).emit_signal("pressed")
 			await frames(tree, 1)
-			var step: Array = bound_buttons(hero_draft(screen), "_open_drop_overlay")
-			if not step.is_empty():
-				(step[0] as Button).emit_signal("pressed")
-				await frames(tree, 1)
-				var bench: Array = pick_choices(overlay(screen, 64))
-				if not bench.is_empty():
-					var meta: Array = (bench[0] as Button).get_meta("choice")
-					out["bench"] = String((meta[1] as Array)[1])
-					(bench[0] as Button).emit_signal("pressed")
-					await frames(tree, 1)
+			out["bench"] = await _bench(tree, screen, "draft")
 		else:
 			out["declined"] = true
 			(dec[0] as Button).emit_signal("pressed")
 			await frames(tree, 1)
+	var bu: Dictionary = await answer_boss_and_upgrade(tree, screen)
+	out["boss"] = bu["boss"]
+	out["boss_bench"] = bu["boss_bench"]
+	out["upgrade"] = bu["upgrade"]
 	var runes: Array = bound_buttons(hero_draft(screen), "_stage_draft_rune")
 	if not runes.is_empty():
 		out["rune"] = String(bound_args(runes[0], "_stage_draft_rune")[1])
@@ -625,8 +637,10 @@ static func answer_hero_draft(tree: SceneTree, screen: Node, take_card: bool) ->
 	if not conf.is_empty():
 		(conf[0] as Button).emit_signal("pressed")
 		out["confirmed"] = true
-	if String(out["bench"]) != "":
+	if String(out["bench"]) != "" or String(out["boss_bench"]) != "":
 		_census("at the cap, a card benched")
+	if String(out["bench"]) != "" and String(out["boss_bench"]) != "":
+		_census("at the cap, both offers benched")
 	if bool(out["let_go"]):
 		_census("an empty cache let go")
 	if not bool(out["confirmed"]):
@@ -635,10 +649,82 @@ static func answer_hero_draft(tree: SceneTree, screen: Node, take_card: bool) ->
 	return out
 
 
-# WHAT THE ONE HELPER MET (IB §6a). A road deals the screens a walker answers, so the
-# LONGEST (both sections, at the cap: the bench step) and the EMPTIEST (a rune alone, an
-# empty cache let go) are counted where they are answered, and `report` prints the count
-# beside the verdict — a walk that never met one of them says so in its own log.
+# A hero's every owed pick cleared — what a walker does with a screen it could not confirm or
+# a CHOOSE that opened nothing, after recording it, so the CHOOSE does not reopen the same
+# screen on its next step (the pick overlay's *no live choice* branch did this, per walker, until
+# ID §1c; one copy here, not four).
+static func clear_picks(party: Array, idx: int) -> void:
+	if idx < 0 or idx >= party.size():
+		return
+	for k in ["bm_picks_owed", "up_picks_owed", "rune_picks_owed", "draft_picks_owed"]:
+		(party[idx] as Dictionary)[k] = 0
+
+
+# THE TWO SECTIONS THE PICK OVERLAY HELD UNTIL ID §1, answered on the hero's screen through their
+# own buttons: the zone boss's first card (`_stage_boss`; it has no decline) and its bench step's
+# first card where the cap asks one, then the first upgrade (`_stage_upgrade`). `answer_hero_draft`
+# calls it, and so does `check_fh`, whose own draft half reads each card's tag line — one answer
+# to these two, not two. Returns {boss, boss_bench, upgrade}.
+static func answer_boss_and_upgrade(tree: SceneTree, screen: Node) -> Dictionary:
+	var out := {"boss": "", "boss_bench": "", "upgrade": ""}
+	var bcards: Array = bound_buttons(hero_draft(screen), "_stage_boss")
+	if not bcards.is_empty():
+		out["boss"] = String(bound_args(bcards[0], "_stage_boss")[1])
+		(bcards[0] as Button).emit_signal("pressed")
+		await frames(tree, 1)
+		out["boss_bench"] = await _bench(tree, screen, "ability")
+	var ups: Array = bound_buttons(hero_draft(screen), "_stage_upgrade")
+	if not ups.is_empty():
+		out["upgrade"] = String(bound_args(ups[0], "_stage_upgrade")[1])
+		(ups[0] as Button).emit_signal("pressed")
+		await frames(tree, 1)
+	return out
+
+
+# The bench step of the offer `kind` ("draft" or "ability", the boss's) where the screen asks
+# one: pressed, and its first card benched. Returns the card benched, or "".
+static func _bench(tree: SceneTree, screen: Node, kind: String) -> String:
+	for step in bound_buttons(hero_draft(screen), "_open_drop_overlay"):
+		if String(bound_args(step, "_open_drop_overlay")[1]) != kind:
+			continue
+		(step as Button).emit_signal("pressed")
+		await frames(tree, 1)
+		var bench: Array = pick_choices(overlay(screen, 64))
+		if bench.is_empty():
+			return ""
+		var meta: Array = (bench[0] as Button).get_meta("choice")
+		(bench[0] as Button).emit_signal("pressed")
+		await frames(tree, 1)
+		return String((meta[1] as Array)[1])
+	return ""
+
+
+# Whether the hero's screen draws the ABILITIES offer `which` ("draft" / "boss") or the section
+# `name` ("upgrades"), by the metas the game sets on them — never by their words.
+static func _has_offer(ov: Node, which: String) -> bool:
+	return _first_with_meta(ov, "offer", which) != null
+
+
+static func _has_section(ov: Node, name: String) -> bool:
+	return _first_with_meta(ov, "section", name) != null
+
+
+static func _first_with_meta(n: Node, key: String, value: String) -> Node:
+	var stack: Array = [n]
+	while not stack.is_empty():
+		var cur: Node = stack.pop_back()
+		if cur.has_meta(key) and String(cur.get_meta(key)) == value:
+			return cur
+		for c in cur.get_children():
+			stack.append(c)
+	return null
+
+
+# WHAT THE ONE HELPER MET (IB §6a; by shape since ID §1c — the sections a screen held, joined:
+# *draft + rune*, *boss*, *draft + boss + upgrade + rune*). A road deals the screens a walker
+# answers, so the LONGEST (four sections, at the cap: both bench steps) and the EMPTIEST (a
+# rune alone, an empty cache let go) are counted where they are answered, and `report` prints
+# the count beside the verdict — a walk that never met one of them says so in its own log.
 static var draft_census := {}
 
 

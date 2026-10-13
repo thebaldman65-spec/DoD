@@ -7,7 +7,7 @@
 # Run.roll_blacksmith_offer, which reuses AP §3's eligibility filter (never
 # Honed on a Heal, never Effortless on a free ability) and writes into the
 # SAME `member["upgrades"]` list the mini-boss pick writes — so a bought
-# upgrade lands, wears the ◆ on the card and hovers exactly like an awarded
+# upgrade lands, wears the ↑ on the card (◆ until ID §3) and hovers exactly like an awarded
 # one. Nothing here is a parallel implementation of anything.
 #
 # ONE PURCHASE ENDS THE VISIT. This is not a shop you clear: the choice is
@@ -116,7 +116,9 @@ func _draw_pairing(i: int, price: int) -> void:
 	vbox.add_child(hero)
 
 	var upgrade := Label.new()
-	upgrade.text = "◆ %s" % Run.upgrade_name(String(pairing["id"]))
+	# BATCH ID §3 — ↑ NAMES AN UPGRADE WHEREVER ONE APPEARS, on a counter as on a card it is
+	# held on: ◆ means a decision waits, and nothing else (IC §0.4).
+	upgrade.text = "↑ %s" % Run.upgrade_name(String(pairing["id"]))
 	upgrade.add_theme_font_override("font", NAME_FONT)
 	upgrade.add_theme_font_size_override("font_size", 28)
 	upgrade.add_theme_color_override("font_color", Color(1.0, 0.9, 0.5))

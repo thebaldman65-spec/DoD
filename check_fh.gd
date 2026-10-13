@@ -722,6 +722,28 @@ func _answer_the_draft(s: Node, overlay: Node) -> void:
 						(benches[0] as Button).emit_signal("pressed")
 						_bump("benches pressed")
 					await process_frame
+	# BATCH ID §1 — THE ZONE BOSS's ABILITY AND THE MINI-BOSS's UPGRADE ARE SECTIONS OF THIS SCREEN
+	# (the pick overlay that took them is retired), answered through the walkers' one helper for the
+	# two (`Gate.answer_boss_and_upgrade`): the boss's first card and its bench where the cap asks,
+	# the first upgrade. A section that drew nothing to press is the overlay's old STRANDED finding.
+	var owed_boss := int(m.get("bm_picks_owed", 0)) > 0
+	var owed_up := int(m.get("up_picks_owed", 0)) > 0
+	if owed_boss or owed_up:
+		var bu: Dictionary = await Gate.answer_boss_and_upgrade(self, s)
+		if owed_boss:
+			if String(bu["boss"]) == "":
+				note("an ability pick was owed on hero %d and the screen drew NO card to press — the pick is STRANDED" % i)
+				_dead_buttons.append("ability section hero %d: %s" % [i, _labels(Gate.hero_draft(s))])
+			else:
+				_bump("picks answered: ability")
+				if String(bu["boss_bench"]) != "":
+					_bump("benches pressed")
+		if owed_up:
+			if String(bu["upgrade"]) == "":
+				note("an upgrade pick was owed on hero %d and the screen drew NO upgrade to press — the pick is STRANDED" % i)
+				_dead_buttons.append("upgrade section hero %d: %s" % [i, _labels(Gate.hero_draft(s))])
+			else:
+				_bump("picks answered: upgrade")
 	if int(m.get("rune_picks_owed", 0)) > 0:
 		var rbtns: Array = Gate.bound_buttons(Gate.hero_draft(s), "_stage_draft_rune")
 		if rbtns.is_empty():
@@ -745,6 +767,8 @@ func _answer_the_draft(s: Node, overlay: Node) -> void:
 	if conf.is_empty():
 		note("hero %d's draft screen would not confirm with every section decided" % i)
 		_dead_buttons.append("draft screen hero %d: %s" % [i, _labels(Gate.hero_draft(s))])
+		# Drop the picks so the drive can go on, as the stranded overlay did (ID §1c).
+		Gate.clear_picks(_run.party, i)
 		if Gate.hero_draft(s) != null:
 			s.call("_close_hero_draft")
 	else:
@@ -765,50 +789,19 @@ func _decline_on_screen(s: Node, i: int) -> void:
 
 # ── A PICK OWED ON A HERO CARD ───────────────────────────────────────────────
 #
-# The ability pick and the upgrade pick come through the z=60 overlay
-# `_open_pick_overlay` builds, opened by the arrival or by the card's CHOOSE; a draft or
-# a rune cache through the hero's own screen (IB §2), answered on the next step. **EVERY
-# CHOICE IT DRAWS MUST BE LIVE** — the fault this exists to catch is a button that does
-# nothing when pressed, which no assertion on the pouch can see — and a choice is what
-# the game MARKS as one (IB §6a), so a button that only previews or closes never is.
+# **BATCH ID §1 — EVERY KIND IS A SECTION OF THE HERO's OWN SCREEN**: the ability pick and the
+# upgrade pick came through the z=60 pick overlay until ID, which is retired. A pick the arrival
+# did not put up is opened from the card's CHOOSE (`_open_hero_draft`) and answered on the next
+# step, by `_answer_the_draft`, where **EVERY CHOICE IT DRAWS MUST BE LIVE** still holds: a section
+# that draws nothing to press is noted STRANDED there. A CHOOSE that opens nothing is noted here.
 func _answer_a_pick(s: Node, idx: int) -> bool:
-	var m: Dictionary = _run.party[idx]
-	var kind := ""
-	if int(m.get("bm_picks_owed", 0)) > 0:
-		kind = "ability"
-	elif int(m.get("up_picks_owed", 0)) > 0:
-		kind = "upgrade"
-	var ov: Node = _overlay(s, 60)
-	if Gate.pick_choices(ov).is_empty():
-		s.call("_open_pick_overlay", idx)
-		await process_frame
-		if Gate.hero_draft(s) != null:
-			return true   # his own draft screen: answered on the next step
-		ov = _overlay(s, 60)
-	if ov == null:
-		note("a %s pick was owed on hero %d and NO overlay opened — the pick is STRANDED"
-			% [kind, idx])
-		# Drop the pick so the drive can go on; the observation is the finding.
-		m["%s_picks_owed" % ("bm" if kind == "ability" else "up")] = 0
-		return true
-	var live: Array = Gate.pick_choices(ov)
-	if live.is_empty():
-		note("the %s overlay for hero %d drew NO pick buttons — the pick is STRANDED"
-			% [kind, idx])
-		_dead_buttons.append("%s overlay hero %d: %s" % [kind, idx, _labels(ov)])
-		m["%s_picks_owed" % ("bm" if kind == "ability" else "up")] = 0
-		ov.queue_free()
-		await process_frame
-		return true
-	_bump("picks answered: " + kind)
-	(live[0] as Button).emit_signal("pressed")
+	s.call("_open_hero_draft", idx)
 	await process_frame
-	await process_frame
-	# A press that left its own overlay up did nothing; the next pick's overlay, which
-	# the arrival opens as this one resolves, is left for the next step.
-	if is_instance_valid(ov) and not ov.is_queued_for_deletion():
-		ov.queue_free()
-		await process_frame
+	if Gate.hero_draft(s) != null:
+		return true   # his own screen: answered on the next step
+	note("a pick was owed on hero %d and his CHOOSE opened NO screen — the pick is STRANDED" % idx)
+	# Drop the picks so the drive can go on; the observation is the finding.
+	Gate.clear_picks(_run.party, idx)
 	return true
 
 
@@ -1591,22 +1584,36 @@ func _s6_the_exhausted_pool() -> void:
 		"§6: the class fallback offered a card that is not in the class pool — %s" % [outside])
 	print("    tier 2 (the class pool) offered %d: %s" % [offer.size(), offer])
 	# AND IT IS ANSWERABLE ON THE REAL CARD. A tier that pays an offer nobody
-	# can press is the same silence with more steps.
-	s.call("_open_pick_overlay", 2)
+	# can press is the same silence with more steps. **BATCH ID §1 — ON THE HERO's OWN
+	# SCREEN**, the zone boss's offer in ABILITIES (the pick overlay is retired): its card staged
+	# by its own button, the bench named where the cap asks one, and the screen's Confirm.
+	s.call("_open_hero_draft", 2)
 	await process_frame
-	var ov: Node = _overlay(s, 60)
-	ok(ov != null, "§6: the fallback award drew no pick overlay")
+	var ov: Node = Gate.hero_draft(s)
+	ok(ov != null, "§6: the fallback award drew no offer on the hero's screen")
 	if ov != null:
-		var live: Array = []
-		for l in _labels(ov):
-			if String(l) != "Not yet":
-				live.append(String(l))
+		var live: Array = Gate.bound_buttons(ov, "_stage_boss").map(
+			func(b): return String(Gate.bound_args(b, "_stage_boss")[1]))
 		ok(live.size() >= offer.size(),
-			"§6: the overlay drew %d live buttons for a %d-card fallback offer" % [
+			"§6: the screen drew %d live buttons for a %d-card fallback offer" % [
 				live.size(), offer.size()])
 		var held_before: int = int((hero["bm_abilities"] as Array).size())
-		ok(_press_exact(ov, String(offer[0])),
-			"§6: the fallback card `%s` drew no pressable button" % String(offer[0]))
+		var cb: Button = Gate.bound_button(ov, "_stage_boss", [2, String(offer[0])])
+		ok(cb != null, "§6: the fallback card `%s` drew no pressable button" % String(offer[0]))
+		if cb != null:
+			cb.emit_signal("pressed")
+			await process_frame
+			for step in Gate.bound_buttons(Gate.hero_draft(s), "_open_drop_overlay"):
+				if String(Gate.bound_args(step, "_open_drop_overlay")[1]) == "ability":
+					(step as Button).emit_signal("pressed")
+					await process_frame
+					var bench: Array = Gate.pick_choices(_overlay(s, 64))
+					if not bench.is_empty():
+						(bench[0] as Button).emit_signal("pressed")
+						await process_frame
+			var conf: Array = Gate.bound_buttons(Gate.hero_draft(s), "_confirm_hero_draft")
+			if not conf.is_empty():
+				(conf[0] as Button).emit_signal("pressed")
 		await process_frame
 		await process_frame
 		ok(int((hero["bm_abilities"] as Array).size()) == held_before + 1,
@@ -2008,18 +2015,18 @@ func _s9_every_button() -> void:
 					_census(d2, "the draft, one card staged")
 		s.call("_close_hero_draft")
 		await process_frame
-	# The card's CHOOSE button resolves in a fixed precedence — ability, draft,
-	# upgrade, rune — so a draft still owed from the block above would open the
-	# draft screen again rather than the upgrade overlay.
+	# BATCH ID §1 — THE UPGRADE IS A SECTION OF THE HERO's SCREEN NOW (the pick overlay is
+	# retired), so the draft still owed from the block above is cleared first and the screen
+	# censused holds the upgrade alone.
 	m0["draft_picks_owed"] = 0
 	m0["draft_candidates"] = []
 	_run.award_upgrade_pick(m0)
-	s.call("_open_pick_overlay", 0)
+	s.call("_open_hero_draft", 0)
 	await process_frame
-	var up: Node = _overlay(s, 60)
+	var up: Node = _overlay(s, 62)
 	if up != null:
-		_census(up, "the upgrade pick overlay")
-		up.queue_free()
+		_census(up, "the hero's screen, an upgrade alone")
+		s.call("_shut_hero_draft")
 		await process_frame
 	# **A PANEL WITH NOTHING IN IT DRAWS ONE BUTTON, AND THAT IS A VACUOUS
 	# CENSUS.** Both are stocked first — through the run's own doors — so the

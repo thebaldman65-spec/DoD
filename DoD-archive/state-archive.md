@@ -17,6 +17,55 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT ID — 2026-10-12, FROM `docs/state.md` AS IC LEFT IT (`db68ab7`)
+
+**What came here**: IC's rulings, all five answered in ID's brief; FOUND AT IA's Kit button item (fixed at ID §4); and the roadmap's
+ID line — the fold and its words built at ID §1 and §2, the Cleric's regen and the Mage's fire re-lettered IE (the live roadmap says
+so). The roadmap's IE, IF, IG and IH lines were rewritten in place; FOUND AT IC stays, now IF's. Each was read against ID's tree
+before it moved; everything else in the live file stayed.
+
+### ~~IC's RULINGS OWED~~ — **ALL FIVE ANSWERED IN ID's BRIEF: ◆ MOVED OFF EVERYTHING BUT A PICK (1, BUILT AT ID §3); THE VOW STAYS AS IT IS (2, CONFIRMED, ITS WATCH ITEM RECORDED); THE FLOOR STAYS (3, CONFIRMED, ITS MEANING WRITTEN); A SILENCED HIT MARKS AND DOES NOT SHAKE (4, CONFIRMED, THE SHAKE's REASON WRITTEN); ABILITIES HOLDS BOTH (5, BUILT AT ID §1)**
+
+Full working: `docs/reports/IC.md`, NEEDS A RULING.
+
+1. **◆ STILL MARKS SIX THINGS THAT ARE NOT A WAITING DECISION (§3)** — the rule is recorded and the map card's corner moved to ↑N;
+   an upgraded ability's battle button and its hero-sheet chip (held upgrades), the Blacksmith's upgrade on offer, the class
+   passive's chip, and a rare relic on the relic shelf and the run's relic picker still draw ◆. Proposed: ↑ for the three
+   upgrade surfaces; the passive's chip its own letters; a rare relic the word RARE alone. Move them, or word them.
+2. **IS THE VOW STILL WORTH WEARING? (§1d, the designer's by the brief)** — +50% heals against every blow he lands; the refused
+   blows paid a vowed Occultist a Ruin draught (1–9 a blow) and Suffering's whole heal, and nothing else in a run played forward.
+3. **A REFUSED CAST STILL RECOILS THE FLOOR OF 1 UNDER MIRRORBOUND (§1)** — the floor every cast that dealt nothing pays (a blocked
+   one). Keep it, or exempt a cast whose whole figure the vow refused.
+4. **A SILENCED HIT STILL MARKS, AND IT IS MUTED (§1b)** — Anointing's Ruin reads whether the blow reached its body, not its figure,
+   as Break does; it floats SILENT, plays the plain impact and does not shake the screen, even on a crit. Confirm, or rule otherwise.
+5. **ID's FOLD: A DRAFT AND A BOSS'S ABILITY CAN BE OWED TOGETHER (§0.1)** — no one fight awards both, but dismissing loses nothing,
+   so a draft deferred past the zone boss (or one the event verb grants) waits beside the boss's ability. ABILITIES holds both,
+   or the boss's ability takes its own section — the brief's own fallback.
+
+### FOUND AT IA AND NOT FIXED — ITS CLOSED ITEMS (archived at ID; the section stays in `docs/state.md`)
+
+- **THE MAP CARD'S `Kit n/7` BUTTON RUNS PAST THE CARD** — HEAD's own, measured at IA: x 304–344 on every card, whose right edge is
+  308, because its width is `CARD_W - 24 - 3 × 96`, which is below zero, so the button takes its text's width from x 304. Not moved
+  here (outside the brief); one constant or one position when the card is next touched.
+
+### THE PLAYTEST'S OTHER FINDINGS — ITS CLOSED ITEMS (archived at ID; the section stays in `docs/state.md`)
+
+- **ID — THE FOLD, ITS WORDS, AND THE CLERIC's REGEN AND THE MAGE's FIRE.**
+  · **The fold (IC §0.1, ruled; RULED, NOT BUILT)**: the zone boss's ability goes in the hero's ABILITIES section, the mini-boss's
+    upgrade in a section of its own (it changes a card he holds rather than adding one), and **the pick overlay retires** — its
+    census is exactly those two picks — with `check_fe`, `check_fm` and HZ's longest-and-emptiest arms re-pointed at the hero's
+    screen. **One premise is false (IC's ruling 5)**: a deferred draft and a boss's ability CAN be owed together, so ABILITIES
+    holds both or the boss's ability takes its own section.
+  · **The words (IC §0.2, ruled)**: the title *THE DRAFT — <hero>* whenever an ability is on the screen and *THE CACHE — <hero>*
+    for a rune alone; the owed line is what he is owed — *A new ability and a rune from the cache.* / *A new ability.* / *A rune
+    from the cache.* — and one constant tail, *Decide, then confirm.*; the Confirm reads *One choice still to make* / *Two choices
+    still to make*; ABILITIES, RUNES and *lets the cache go* confirmed.
+  · **The Cleric's regen and the Mage's fire — NOT BUMPED AGAIN (IC §5, the designer's)**: the last two of the zone-one findings
+    still open, and they have lost the queue before (IB at HW's roadmap, IC at HY's, ID at IB's). The regen against a census of
+    everything that returns Mana to a Cleric; **more Burn appliers in the Mage's pool.**
+
+---
+
 ## ARCHIVED AT IC — 2026-10-12, FROM `docs/state.md` AS IB LEFT IT (`0e21a95`)
 
 **What came here**: IB's rulings, all four answered in IC's brief; FOUND AT IB's one item (the pouch offer's tail, fixed at IC §3);

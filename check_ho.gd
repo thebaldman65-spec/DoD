@@ -517,7 +517,7 @@ func _open_cache(seat: int) -> Node:
 	var mp := await _to("res://scenes/map.tscn")
 	var hd: Node = Gate.hero_draft(mp)
 	if hd == null or int(hd.get_meta("hero_draft")) != seat:
-		var choose: Button = Gate.bound_button(mp, "_open_pick_overlay", [seat])
+		var choose: Button = Gate.bound_button(mp, "_open_hero_draft", [seat])
 		if choose != null:
 			choose.emit_signal("pressed")
 			await process_frame

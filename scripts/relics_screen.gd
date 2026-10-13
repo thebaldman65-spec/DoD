@@ -36,7 +36,7 @@ func _ready() -> void:
 	add_child(hint)
 
 	Relics.load_data()
-	# 25 relics need a scrolling shelf; commons first, rares (◆) after.
+	# 25 relics need a scrolling shelf; commons first, rares after.
 	var scroll := ScrollContainer.new()
 	scroll.position = Vector2(140, 150)
 	scroll.custom_minimum_size = Vector2(1020, 470)
@@ -59,7 +59,9 @@ func _ready() -> void:
 		grid.add_child(panel)
 		var label := Label.new()
 		var info: Dictionary = Relics.POOL[id]
-		var tier_tag := "  ◆ RARE" if String(info.get("tier", "common")) == "rare" else ""
+		# BATCH ID §3 — THE WORD, NOT THE GLYPH: ◆ means a decision waits (IC §0.4), and the
+		# shelf's tag already said RARE beside it.
+		var tier_tag := "  RARE" if String(info.get("tier", "common")) == "rare" else ""
 		label.text = "%s\n\n%s" % [(info["name"] + tier_tag) if owned else "? ? ?",
 			info["desc"] if owned else "A shape lost to the Decay.\nSlay a boss to recover it."]
 		label.add_theme_font_size_override("font_size", 14)

@@ -113,7 +113,10 @@ func _draw_screen() -> void:
 		var info: Dictionary = Relics.POOL[id]
 		var rbtn := Button.new()
 		var on: bool = relic_picks.has(id)
-		var tier_tag := " ◆" if String(info.get("tier", "common")) == "rare" else ""
+		# BATCH ID §3 — THE WORD: ◆ means a decision waits (IC §0.4), and a glyph that only
+		# went would leave a rare relic unmarked here. *RARE* fits the row (`check_id` §3c
+		# measures the widest name with it, the [ON] prefix included).
+		var tier_tag := "  RARE" if String(info.get("tier", "common")) == "rare" else ""
 		rbtn.text = ("[ON]  " if on else "") + info["name"] + tier_tag
 		rbtn.custom_minimum_size = Vector2(305, 40)
 		rbtn.tooltip_text = "%s\n%s" % [String(info.get("tier", "common")).to_upper(),

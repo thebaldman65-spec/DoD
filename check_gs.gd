@@ -720,7 +720,7 @@ func _s4b_the_surfaces(ids: Array) -> void:
 			_run.party[idx2]["rune_picks_owed"] = 1
 			_close_overlays(mp)
 			await Gate.frames(self, 2)
-			mp._open_pick_overlay(idx2)
+			mp._open_hero_draft(idx2)  # BATCH ID §1 — the CHOOSE door; the pick overlay is retired
 			await Gate.frames(self, 3)
 			var bottom := 0
 			for rr in trip:

@@ -446,8 +446,10 @@ func _test_owed_badges() -> void:
 			choose_buttons += 1
 	ok(choose_buttons == 2,
 		"both owed heroes show a CHOOSE button ON their card (got %d)" % choose_buttons)
-	# ...and the overlay it opens really does hold that hero's three offers.
-	map_scene._open_pick_overlay(0)
+	# ...and the screen it opens really does hold that hero's three offers. **BATCH ID §1 —
+	# RE-POINTED, THE QUESTION UNMOVED: the CHOOSE opens the hero's own screen**, the zone boss's
+	# offer a labelled section of it, where it opened the pick overlay until ID retired it.
+	map_scene._open_hero_draft(0)
 	await process_frame
 	var heading_found := false
 	var offer_buttons := 0
@@ -458,11 +460,11 @@ func _test_owed_badges() -> void:
 		var n2: Node = walk.pop_back()
 		for c2 in n2.get_children():
 			walk.append(c2)
-		if n2 is Label and String(n2.get("text")).contains("NEW ABILITY"):
+		if n2 is Label and String(n2.get("text")) == "from the zone boss":
 			heading_found = true
 		if n2 is Button and names.has(String(n2.get("text"))):
 			offer_buttons += 1
-	ok(heading_found, "the overlay names the pick")
+	ok(heading_found, "the screen names the pick (the zone boss's offer)")
 	ok(offer_buttons == names.size(),
 		"...and offers all %d candidates (got %d)" % [names.size(), offer_buttons])
 	# The badge line names the count on each owed card.

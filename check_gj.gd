@@ -265,40 +265,26 @@ func _answer_the_draft(s: Node) -> void:
 	var a: Dictionary = await Gate.answer_hero_draft(self, s, false)
 	if not bool(a.get("confirmed", false)):
 		_dead.append("the draft screen at %s would not confirm" % _where())
+		# ID §1c — a screen that cannot be confirmed (a section with nothing to take, the overlay's
+		# old *no live choice*) is recorded and its picks cleared, or the CHOOSE would reopen it.
+		Gate.clear_picks(_run.party, int(a.get("hero", -1)))
 		s.call("_close_hero_draft")
 		await Gate.frames(self, 2)
 
 
-# A pick owed on a hero card: the overlay the arrival put up, or else the card's own
-# CHOOSE, and then the first choice the overlay MARKS (IB §6a: the game marks its
-# choices, so a button that only previews or closes is never pressed).
+# A pick owed on a hero card that the arrival did not put up: the card's own CHOOSE opens his
+# screen — every kind of pick is a section of it since ID §1, the pick overlay retired — and
+# the screen is answered on the next step, through the one helper.
 func _answer_a_pick(s: Node, idx: int) -> void:
-	var m: Dictionary = _run.party[idx]
-	var ov: Node = Gate.overlay(s, 60)
-	if Gate.pick_choices(ov).is_empty():
-		var choose: Button = Gate.bound_button(s, "_open_pick_overlay", [idx])
-		if choose != null:
-			choose.emit_signal("pressed")
-			await process_frame
-		if Gate.hero_draft(s) != null:
-			return   # a draft or a rune cache: his own screen, answered on the next step
-		ov = Gate.overlay(s, 60)
-	var live: Array = Gate.pick_choices(ov)
-	if live.is_empty():
-		_dead.append("hero %d owed a pick at %s and no live choice could be pressed" % [idx, _where()])
-		for k in ["bm_picks_owed", "up_picks_owed", "rune_picks_owed"]:
-			m[k] = 0
-		if ov != null:
-			ov.queue_free()
+	var choose: Button = Gate.bound_button(s, "_open_hero_draft", [idx])
+	if choose != null:
+		choose.emit_signal("pressed")
 		await process_frame
-		return
-	(live[0] as Button).emit_signal("pressed")
-	await Gate.frames(self, 2)
-	# A press that left its own overlay up did nothing; the next pick's overlay, which
-	# the arrival opens as this one resolves, is left for the next step.
-	if is_instance_valid(ov) and not ov.is_queued_for_deletion():
-		ov.queue_free()
-		await process_frame
+	if Gate.hero_draft(s) != null:
+		return   # his own screen, answered on the next step
+	_dead.append("hero %d owed a pick at %s and his CHOOSE opened nothing" % [idx, _where()])
+	Gate.clear_picks(_run.party, idx)
+	await process_frame
 
 
 # One press on the map: what the arrival put up and the owed picks first, as the

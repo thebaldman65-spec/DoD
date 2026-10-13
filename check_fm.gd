@@ -562,11 +562,11 @@ func _s3_the_re_ask() -> void:
 	ok((hero.get("rune_candidates", []) as Array).is_empty(),
 		"§3: the empty triple is still queued on the member")
 	# **AND THE RUN IS NOT BLOCKED**, which is the whole question §3 asks. The
-	# card's own CHOOSE door is asked again: `_open_pick_overlay` returns before
-	# it builds anything when nothing is owed, so a screen that grew is a pick
-	# that survived being spent.
+	# card's own CHOOSE door is asked again: `_open_hero_draft` (the pick overlay's
+	# until ID §1 retired it) returns before it builds anything when nothing is owed,
+	# so a screen that grew is a pick that survived being spent.
 	var after_open := _live_children(map)
-	map.call("_open_pick_overlay", idx)
+	map.call("_open_hero_draft", idx)
 	await process_frame
 	ok(_live_children(map) == after_open,
 		"§3: the card still opens a rune pick after the pick was spent")
@@ -582,7 +582,7 @@ func _s3_the_re_ask() -> void:
 	m2["rune_candidates"] = m2.get("rune_candidates", []) + [c2]
 	m2["rune_picks_owed"] = 1
 	var b3 := _live_children(map)
-	map.call("_open_pick_overlay", other)
+	map.call("_open_hero_draft", other)
 	await process_frame
 	ok(_live_children(map) > b3, "§3: the control overlay opened nothing")
 	var ov2: Node = map.get_child(map.get_child_count() - 1)

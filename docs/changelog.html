@@ -16,6 +16,48 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-12 &mdash; Batch ID: ONE SURFACE, AND THE GLYPHS</h2>
+<p><b>Every pick a hero is owed is now a section of his own screen</b> &mdash; the zone boss's ability and the mini-boss's upgrade
+joined his draft and his rune cache there, and the three-choice overlay is gone. <b>&#8593; marks an upgrade wherever one
+appears</b>, &#9670; marks only a pick still to make, a rare relic says RARE, and three lines that were not true are. IC's five
+questions were answered. Full working: <code>docs/reports/ID.md</code>. The next letter is IE.</p>
+
+<p><b>&sect;0 &mdash; IC's FIVE QUESTIONS, ANSWERED (the designer's).</b> Move every &#9670; that is not a waiting decision (built
+here). Vow of Silence stays as it is: it trades the Cleric's blows for 50% more healing, and is worst for the damage-minded
+Occultist, which is right for a vow of silence. The 1-point recoil floor under Mirrorbound stays: it bills for taking the action,
+not for landing it. A silenced hit still marks and does not shake the screen, even on a crit. And a draft and a zone boss's
+ability are one kind of choice, so one section holds both.</p>
+
+<p><b>&sect;1 &mdash; ONE SCREEN.</b> A hero's screen now holds up to four sections, each only while it is owed: <b>ABILITIES</b>
+&mdash; the draft's three cards and the zone boss's three side by side, each labelled <i>from the elite</i>, <i>from an event</i> or
+<i>from the zone boss</i>, every card with its numbers &mdash; <b>UPGRADES</b>, naming each choice <i>card: upgrade</i> with what it
+does to that card, and <b>RUNES</b>. One Confirm takes them all. At the slot cap, with both cards chosen, the draft's card takes a
+free slot first and the boss's then names what it replaces; a card the one benches is not offered to the other, and a card in both
+offers can be taken once. A boss offer whose every card waits on an unequipped core rune says so and waits, without holding up the
+rest. The three-choice overlay and its <i>Not yet</i> are gone; <i>Later</i> leaves everything owed.</p>
+
+<p><b>&sect;2 &mdash; ITS WORDS.</b> The title says what is on the screen: <i>THE DRAFT</i> whenever an ability is, else <i>THE
+CACHE</i>, <i>THE UPGRADE</i> or <i>THE UPGRADE AND THE CACHE</i>. The line under it says what he is owed in one sentence &mdash;
+<i>Two new abilities, an ability upgrade and a rune from the cache. Decide, then confirm.</i> &mdash; and the Confirm counts what is
+left, in words, up to <i>Four choices still to make</i>.</p>
+
+<p><b>&sect;3 &mdash; THE MARKS.</b> An upgraded ability's battle button and hero-sheet chip, and the Blacksmith's offer, wear
+<b>&#8593;</b> where they wore &#9670;, as the map card's corner already did. The class passive's battle chip is gone &mdash; the
+passive is always on, and it is on the hero sheet and the class-selection card. A rare relic reads <b>RARE</b> on the relic shelf and
+in the run's relic picker. &#9670; now marks only a pick waiting, everywhere.</p>
+
+<p><b>&sect;4 &mdash; THREE LINES THAT WERE NOT TRUE.</b> Vow of Silence's chip now names everything the vow silences that the
+Cleric holds &mdash; his ground's reflect, the Ruin draught his blows would drink, Suffering's heal &mdash; beside the healing it
+gives. Mirrorbound's card now says that an attack that deals nothing still pays 1, and that it works on both sides. And the map
+card's <i>Kit</i> button sits inside the card, at its bottom-right, where it ran past the card's edge.</p>
+
+<p><b>The checks.</b> A new check, <code>check_id</code>, opens each kind of pick on the real map, drives every section, the labels,
+the cap across two offers, the zone boss's commit door on its own, a held-back offer and a card in both offers, measures the longest screen &mdash; a hero owing all four at
+the cap with both bench steps &mdash; and the emptiest, answers both through the walkers' one helper, reads the words for every
+combination of the four, sweeps every &#9670; and &#8593; in the game, drives each mark on its surface, and reads the vow's chip,
+Mirrorbound's card on a real board and the Kit button inside its card. The checks that answered the old overlay answer the hero's
+screen now, and the one that read the hero sheet's old mark reads &#8593;.</p>
+
 <h2>2026-10-12 &mdash; Batch IC: THE SILENCED FIGURE</h2>
 <p><b>A blow that Vow of Silence refuses now shows and pays nothing.</b> The map card's held upgrades take a mark of their own,
 and a rune waiting on a full holding is no longer skipped after a pouch offer. IB's four questions were answered. Full working:

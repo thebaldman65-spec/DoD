@@ -514,7 +514,10 @@ func _screen_source() -> void:
 		"§2: BO's single-hero draft branch is DELETED from the pick overlay")
 	ok(not map.contains("func _pick_draft(") and not map.contains("func _decline_draft("),
 		"§2: ...and its two committing helpers went with it")
-	ok(map.contains("if kind == \"draft\" or kind == \"rune\":\n\t\t_open_hero_draft(idx)"),
+	# **BATCH ID §1 — RE-POINTED, THE QUESTION UNMOVED**: the CHOOSE opens the hero's own screen for
+	# every kind now (the boss's ability and the upgrade are sections of it), bound straight to it,
+	# where the pick overlay routed a draft and a cache there until ID retired that overlay.
+	ok(map.contains("pick_btn.pressed.connect(_open_hero_draft.bind(idx))"),
 		"§2: the card's CHOOSE button opens the hero's own screen, for a draft and a rune cache alike")
 	# ONE DROP STEP, TWO CONSUMERS — the draft screen STAGES, the boss pick
 	# COMMITS, and the difference is one Callable rather than a second answer to
@@ -547,7 +550,8 @@ func _screen_source() -> void:
 	ok(ba.contains("if Run.sim_run:"),
 		"§2: ...never in a sim")
 	var ohd := _body(map, "func _open_hero_draft(")
-	ok(ohd.contains("if not has_card and not has_rune:"),
+	# BATCH ID §1 — four kinds to ask now, the screen's four sections.
+	ok(ohd.contains("if not (has_draft or has_boss or has_up or has_rune):"),
 		"§2: ...and never with nothing to offer")
 	var an := _body(map, "func _arrival_next(")
 	ok(an.contains("_open_hero_draft(i)"),

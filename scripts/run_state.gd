@@ -3349,11 +3349,16 @@ func roll_draft_offer(member: Dictionary) -> Array:
 # `award_ability_pick` makes for the boss pick. Returns false when there is
 # nothing left to offer, which is a fact the roll knows and no caller has to
 # guess at.
-func award_draft_pick(member: Dictionary) -> bool:
+#
+# **BATCH ID §1 — AND IT SAYS WHERE IT CAME FROM** (`source`, kept with the pick's serial by
+# `note_pick_earned`): the hero's screen labels each offer in its ABILITIES section with
+# its door, and a draft has two — the elite's spoils (the default, the battle's call) and
+# the event verb (`"event"`).
+func award_draft_pick(member: Dictionary, source := "elite") -> bool:
 	var offer := roll_draft_offer(member)
 	if offer.is_empty():
 		return false
-	note_pick_earned(member, "draft")
+	note_pick_earned(member, "draft", source)
 	member["draft_candidates"] = member.get("draft_candidates", []) + [offer]
 	member["draft_picks_owed"] = int(member.get("draft_picks_owed", 0)) + 1
 	return true
@@ -3386,7 +3391,12 @@ func pick_owed(member: Dictionary, kind: String) -> int:
 
 
 # Called by every door that awards a pick, BEFORE its counter rises.
-func note_pick_earned(member: Dictionary, kind: String) -> void:
+#
+# **BATCH ID §1 — `source` IS KEPT BESIDE THE SERIAL** (`pick_sources`, the serial's text
+# its key), because the hero's screen labels an offer with the door it came from and a draft
+# has two. A serial the counters no longer reach takes its source with it, so the record
+# holds only what is owed. It rides the member, as the serial does: no version moved.
+func note_pick_earned(member: Dictionary, kind: String, source := "") -> void:
 	var serials: Dictionary = member.get("pick_serials", {})
 	var mine: Array = serials.get(kind, [])
 	mine = mine.slice(maxi(0, mine.size() - pick_owed(member, kind)))
@@ -3399,6 +3409,33 @@ func note_pick_earned(member: Dictionary, kind: String) -> void:
 	mine.append(top + 1)
 	serials[kind] = mine
 	member["pick_serials"] = serials
+	var sources: Dictionary = member.get("pick_sources", {})
+	var live := {}
+	for k in serials:
+		for s in serials[k]:
+			live[str(int(s))] = true
+	for key in sources.keys():
+		if not live.has(String(key)):
+			sources.erase(key)
+	if source != "":
+		sources[str(top + 1)] = source
+	if not sources.is_empty() or member.has("pick_sources"):
+		member["pick_sources"] = sources
+
+
+# **BATCH ID §1 — WHERE THE PICK OF `kind` THE SCREEN SHOWS CAME FROM**: the oldest owed,
+# which is the head of its queue. "" when the record cannot say — a pick stamped by a build
+# before ID, or one a fixture set by hand (fewer serials than picks owed: the unstamped are
+# the oldest, IB's own reading) — and the screen then names both of a draft's doors.
+func pick_source(member: Dictionary, kind: String) -> String:
+	var owed := pick_owed(member, kind)
+	if owed <= 0:
+		return ""
+	var mine: Array = (member.get("pick_serials", {}) as Dictionary).get(kind, [])
+	if mine.size() < owed:
+		return ""
+	mine = mine.slice(mine.size() - owed)
+	return String((member.get("pick_sources", {}) as Dictionary).get(str(int(mine[0])), ""))
 
 
 # Every pick owed, oldest first: `{hero, kind, serial}`.
@@ -4336,7 +4373,7 @@ const MODIFIERS := {
 	"bloodletting": {"name": "Bloodletting", "severity": 4,
 		"desc": "Every hit opens a wound. All attacks add 15 Bleed, on both sides."},
 	"mirrorbound": {"name": "Mirrorbound", "severity": 4,
-		"desc": "A quarter of the damage you deal comes back on you."},
+		"desc": "An attack that does not miss sends a quarter of the damage it deals back on its attacker — at least 1, even when it deals none. On both sides."},
 	# ---- severity 4 (Batch BB §5, AQ's authored fourth) ----
 	"rot": {"name": "Rot", "severity": 4,
 		"desc": "Everyone's maximum health is halved, on both sides. It lasts the fight and no longer."},
@@ -5007,13 +5044,95 @@ func upgrade_desc(id: String) -> String:
 	return String(ABILITY_UPGRADES.get(id, {}).get("desc", ""))
 
 
+# ══ BATCH ID §1a — WHAT AN OFFERED UPGRADE DOES TO THE CARD IT NAMES ══════════════════
+#
+# **THE UPGRADES SECTION SHOWS THE CARD BEING UPGRADED AND WHAT THE UPGRADE DOES TO IT.**
+# `upgrade_desc` says what an upgrade does to any card (*+50% damage.*); this says what it
+# does to THIS one, in the figures the draft card already prints: the card's computed block
+# (`Classes.computed_block`, the one builder) with every upgrade the hero already holds on
+# it, then again with this one — and each line that moved, as the line's own words with the
+# changed figures shown old → new (*Damage: 35% → 52%*, *Cooldown: 4 turns → 2 turns*). A
+# line the upgrade takes away reads `→ none`. **"" when nothing the block prints moves**
+# (Piercing and Certain change a figure the block does not show), and the section then
+# shows the upgrade's own sentence alone. Stamped through `_stamp_upgrade`, the one writer,
+# on copies the hero's kit never sees.
+func upgrade_preview(member: Dictionary, up: Dictionary) -> String:
+	var name := String(up.get("ability", ""))
+	var id := String(up.get("id", ""))
+	var base: Ability = Classes.pool_ability(name)
+	if base == null or not ABILITY_UPGRADES.has(id):
+		return ""
+	var res := String(Classes.hero_config(String(member.get("key", ""))).get("resource_name", ""))
+	# `pool_ability` builds a fresh card at every call (an `Ability` is not a Resource and has no
+	# `duplicate`), so the two copies are two calls, each stamped with what he holds on it.
+	var now: Ability = base
+	var after: Ability = Classes.pool_ability(name)
+	for held in member.get("upgrades", []):
+		if String((held as Dictionary).get("ability", "")) == name:
+			_stamp_upgrade(String((held as Dictionary).get("id", "")), now)
+			_stamp_upgrade(String((held as Dictionary).get("id", "")), after)
+	_stamp_upgrade(id, after)
+	var a: PackedStringArray = Classes.computed_block(now, 0, res).split("\n")
+	var b: PackedStringArray = Classes.computed_block(after, 0, res).split("\n")
+	var out := PackedStringArray()
+	var used := {}
+	for line in a:
+		var head := String(line).get_slice(":", 0) if String(line).contains(":") \
+			else String(line).get_slice(" ", 0)
+		var match_line := ""
+		for j in b.size():
+			var other := String(b[j])
+			var oh := other.get_slice(":", 0) if other.contains(":") else other.get_slice(" ", 0)
+			if oh == head and not used.has(j):
+				match_line = other
+				used[j] = true
+				break
+		if match_line == String(line):
+			continue
+		if match_line == "":
+			out.append("%s → none" % String(line))
+		else:
+			out.append(_changed_tokens(String(line), match_line))
+	for j in b.size():
+		if not used.has(j) and not a.has(b[j]):
+			out.append("none → %s" % String(b[j]))
+	return "\n".join(out)
+
+
+# One line of the block before and after, shown as the label the change sits under and only
+# the figures that differ, old → new: the first and last differing words bound the change, and
+# the label is the nearest word ending in a colon before it (with the word before that, when
+# it is one — *Initiative cost:*), so *BD: 16 → 32* reads apart from the damage beside it.
+static func _changed_tokens(was: String, now: String) -> String:
+	var x := was.split(" ", false)
+	var y := now.split(" ", false)
+	var lo := 0
+	while lo < x.size() and lo < y.size() and x[lo] == y[lo]:
+		lo += 1
+	var hx := x.size() - 1
+	var hy := y.size() - 1
+	while hx >= lo and hy >= lo and x[hx] == y[hy]:
+		hx -= 1
+		hy -= 1
+	var k := lo - 1
+	while k > 0 and not String(x[k]).ends_with(":"):
+		k -= 1
+	k = maxi(k, 0)
+	if k > 0 and String(x[k]).ends_with(":") and String(x[k - 1]).is_valid_identifier():
+		k -= 1
+	var head := " ".join(x.slice(k, lo))
+	var olds := " ".join(x.slice(lo, hx + 1))
+	var news := " ".join(y.slice(lo, hy + 1))
+	return ("%s %s → %s" % [head, olds, news]).strip_edges()
+
+
 # Has this hero already taken this upgrade, on any ability? THIS IS AP'S
 # ONCE-PER-RUN RULE and it has exactly two consumers, `roll_upgrade_offer` and
 # `upgrade_choice` — i.e. the MINI-BOSS PICK POOL.
 #
 # BATCH BK: A BOUGHT UPGRADE IS SKIPPED HERE. The blacksmith writes into the
 # same `member["upgrades"]` list on purpose (one list is what makes a bought
-# upgrade land, wear its ◆ and hover exactly like an awarded one), and if this
+# upgrade land, wear its ↑ and hover exactly like an awarded one), and if this
 # function counted those entries then buying Honed in zone 1 would quietly
 # delete Honed from that hero's mini-boss offers for the rest of the run —
 # a purchase eating out of the award economy, which is the subtler half of
@@ -5082,7 +5201,7 @@ func award_upgrade_pick(member: Dictionary) -> bool:
 # 13.6 shop-rune refusals a run for no free slot against 6.8 for the reserve —
 # slots are what binds, not prices, so more shop stock could never have fixed
 # it. A BLACKSMITH CONSUMES NO SLOT. It sells the ability upgrade Batch AP
-# already wired, filtered by AP §3's eligibility rules, marked with the same ◆
+# already wired, filtered by AP §3's eligibility rules, marked with the same ↑
 # on the same chip. This is that system with a price tag on it and no new
 # machinery underneath.
 #
@@ -5156,7 +5275,7 @@ func roll_blacksmith_offer() -> Array:
 
 # Take the gold and stamp the purchase onto the member's own `upgrades` list —
 # the SAME list the mini-boss pick writes and the same one `apply_upgrades`
-# reads, so a bought upgrade lands, shows its ◆ and hovers exactly like an
+# reads, so a bought upgrade lands, shows its ↑ and hovers exactly like an
 # awarded one. False when the party cannot pay.
 func buy_blacksmith(pairing: Dictionary) -> bool:
 	var price := blacksmith_price()

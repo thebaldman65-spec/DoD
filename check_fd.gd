@@ -372,7 +372,9 @@ func _s1e_the_live_screen() -> void:
 	root.add_child(screen)
 	await process_frame
 	await process_frame
-	screen.call("_open_pick_overlay", 3)
+	# BATCH ID §1 — the card's CHOOSE door is the hero's own screen (`_open_hero_draft`); the pick
+	# overlay that routed a cache there until ID is retired.
+	screen.call("_open_hero_draft", 3)
 	await process_frame
 	var labels: Array = []
 	_button_labels(screen, labels)

@@ -857,9 +857,12 @@ gives you N, all born wrong, none of them diffed against anything.
   and `test_batch_cd`.
 - **AND THE PICK SURFACES' ROAD WALKER WAS FOUR COPIES OF ONE HELPER (FOUND AT HZ), SO ONE NEW BUTTON STOPPED FOUR
   ROADS. SINCE IB §6a IT IS ONE ANSWER IN `gate_fixture.gd`** — `Gate.answer_hero_draft`, `Gate.pick_choices`,
-  `Gate.bound_buttons` — **and the game marks its choices**: a pick overlay's choice carries a `choice` meta, and every
-  button of the hero's draft screen is found by its binding. A walker asks for those, never for every button whose words
-  are not *Not yet*; what each road records stays its own.
+  `Gate.bound_buttons` — **and the game marks its choices**: the bench step's choice carries a `choice` meta, and every
+  button of the hero's draft screen is found by its binding. A walker asks for those, never for every button by its
+  words; what each road records stays its own. **Since ID §1 the hero's screen is the one surface an owed pick opens**
+  (the pick overlay is retired), so the helper answers its four sections, and the two the overlay held — the zone boss's
+  ability and the upgrade — are one helper of their own (`Gate.answer_boss_and_upgrade`) that `answer_hero_draft` and the
+  one walker with its own draft half (`check_fh`, which reads each card's tag line) both call: one answer, not two.
 - **THE DIFFERENCES THAT ARE REAL BECOME NAMED ARGUMENTS**, not invisible edits inside a copy:
   `deterministic`, `items`, `run`.
 - **A BASE CLASS IS THE RIGHT SHAPE AND IT DOES NOT COMPILE.** `extends GateBase` on a `--script`
@@ -1120,7 +1123,8 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
 - **`check_map_screen.tscn` (Batch BK) is the only thing that EXECUTES the
   lattice draw.** The scene-parse gate loads map.tscn with no active run, so
   it bounces to the main menu and never draws a node. This builds the screen
-  against a real in-flight run at three positions and opens both overlays.
+  against a real in-flight run at three positions and opens its overlays — the hero's own screen (every pick
+  a section of it since ID §1), the rune panel, the loadout panel and the bench step.
   It is a SCENE run, not `--script`: **autoloads (`Run`) do not resolve in a
   `--script` SceneTree.**
 - **`test_batch_bl.gd` NEEDS `--fixed-fps 12`, AND IT IS NOT THE `sim.sh` FLAG** (which passes
@@ -1852,3 +1856,20 @@ a detail to note — it is the ruling being wrong.
   would have kept out had it stood from the start. They are not repaired by the rule: the 87 are a batch of their own, by
   ruling, and each is repaired there with its literal sweep.
 - **IT LOOKS FORWARD**, as HO §0 does: a count written into either reference from here on obeys it.
+
+## STANDING RULE — A CENSUS A LATER BATCH WILL BE PRICED AGAINST IS KEPT, NOT JUST COUNTED (Batch ID §0.6, ruled by the designer)
+> **A census a later batch will be priced against is kept, not just counted.** The sweep's rule, its command and its
+> output go in the report or the scratchpad, so the next batch re-reads it instead of re-deriving it.
+
+- **THE CASE: IA COUNTED 43 DOOR CALLS AND IC COULD NOT REPRODUCE THE NUMBER.** The sweep was in neither IA's report nor
+  its scratchpad, so IC re-derived it from IA's one-line description, read 46 — 55 counting a tick's own label — found
+  the first sweep's four blind spots, and widened it: an hour paid twice, and a figure the brief had priced against that
+  nobody could check.
+- **THE RULE, THE COMMAND AND THE OUTPUT ARE THREE THINGS, AND A COUNT IS NONE OF THEM.** The rule says what is matched
+  and what is not (the population, the classes a hit falls into, what is excluded and why); the command is the one line
+  that runs it; the output is every hit, not the total. A total with no output is IA's 43.
+- **A SCRATCHPAD IS NOT THE TREE.** It lives under `/private/tmp` on one machine and is not the record; when the output is
+  long it may stay there, and the report names the session and the path and carries the rule, the command and the
+  totals, so the census can be re-run where it cannot be re-read.
+- **IT BINDS FROM ID ON**: ID §3's glyph sweep (every ◆, ↑ and ✦ in every tracked script, document and data file, by
+  class — ID's report, §3) and §1's census of the retired overlay at its deletion are its first two.

@@ -4,6 +4,45 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## One surface, and the glyphs (Batch ID) — 2026-10-12
+
+**Why every pick is a section of one screen.** The zone boss's ability and the mini-boss's upgrade opened on an overlay of their
+own while the draft and the rune cache opened on the hero's screen — two screens doing one job, chosen by which enemy fell. A
+player who owes four things now sees them together, decides them together and confirms once.
+
+**Why the boss's card sits beside the draft's in ABILITIES, not in a section of its own.** Both are *pick a card*. Two sections
+would teach that a boss's card is a different kind of thing than a drafted one, and it is not — so the boss's cards are drawn the
+way a draft's are, numbers included, and each offer only carries a line saying where it came from. The overlay drew the boss's
+cards as bare sentences; side by side with the draft's, two renderings would have taught the same wrong lesson.
+
+**Why the upgrade has its own section.** An upgrade changes a card he already holds rather than adding one, so the section names
+the card and shows what the upgrade does to it in the card's own figures — *Damage: 35% → 52%* — not only what it does to any card.
+
+**Why the cap is counted across the two ability offers.** One Confirm takes both cards, so the screen has to know the second card
+needs a bench before it is pressed. The draft's card takes the free slot first because it is drawn first and committed first; a
+card one offer benches cannot be benched again by the other.
+
+**Why a boss offer with nothing to take does not hold the screen.** A zone boss's award has no decline — it always pays — and every
+card in it can be waiting on a core rune he unequipped. The overlay's *Not yet* left that pick owed; on one screen it would have
+held the draft and the rune hostage, so it says why and stays owed while the rest confirms.
+
+**Why ↑ names an upgrade everywhere.** ◆ means a decision waits and nothing else; an upgrade held on a button, a chip or a card,
+and one on the Blacksmith's counter, are all *an upgrade*, so one glyph names the thing and the player learns it once.
+
+**Why the class passive's chip went.** A chip is for a payout that turns on and off, and a class passive never turns off; it is on
+the hero sheet and the class-selection card. Four permanent chips in a row whose job is *what changed* is noise. The chip was laid
+as a status, so it was quietly a Sanctity event and a floating label on every hero at every spawn; that went with it.
+
+**Why a rare relic says RARE.** The glyph alone, gone, would have left the picker's rare relic unmarked; the word fits.
+
+**Why the vow's chip names what it silences.** A vowed Occultist gives up his Ruin draught and Suffering's heal to gain healing,
+and nothing told him. The chip already warned that the vow silences his own ground; it now names everything it silences that he
+holds, with the heal figure read off his rune.
+
+**Why Mirrorbound's card says the floor.** It billed 1 for an attack that dealt nothing while saying *a quarter of the damage you
+deal*. The floor is the bargain's — it bills for taking the action, not for landing it — so the card says so, and that the enemies
+pay it too.
+
 ## The silenced figure (Batch IC) — 2026-10-12
 
 **Why a refused blow now prints and pays nothing.** Vow of Silence says the Cleric deals no damage, and the gate at the two

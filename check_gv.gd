@@ -1343,7 +1343,7 @@ func _s2c_the_screen(rolled: Array) -> void:
 	var screen: Node = load("res://scenes/map.tscn").instantiate()
 	root.add_child(screen)
 	await Gate.frames(self, 3)
-	screen.call("_open_pick_overlay", 2)
+	screen.call("_open_hero_draft", 2)  # BATCH ID §1 — the CHOOSE door; the pick overlay is retired
 	await Gate.frames(self, 2)
 	var ov: Node = Gate.hero_draft(screen)
 	ok(ov != null and int(ov.get_meta("hero_draft")) == 2, "§2c: the Occultist's draft screen did not open")
@@ -1370,7 +1370,7 @@ func _s2c_the_screen(rolled: Array) -> void:
 	ok(int(m.get("rune_picks_owed", 0)) == 1, "§2c: closing the screen spent the pick")
 	# EQUIPPED AGAIN: the three are buttons, and the pressed one is handed over.
 	(m["engines"][0] as Dictionary)["equipped"] = true
-	screen.call("_open_pick_overlay", 2)
+	screen.call("_open_hero_draft", 2)  # BATCH ID §1 — the CHOOSE door; the pick overlay is retired
 	await Gate.frames(self, 2)
 	var ov2: Node = Gate.hero_draft(screen)
 	if ov2 != null:
@@ -1400,7 +1400,7 @@ func _s2c_the_screen(rolled: Array) -> void:
 		Runes.build("long_watch")]]
 	bz["rune_picks_owed"] = 1
 	(bz["engines"][0] as Dictionary)["equipped"] = false
-	screen.call("_open_pick_overlay", 0)
+	screen.call("_open_hero_draft", 0)  # BATCH ID §1 — the CHOOSE door
 	await Gate.frames(self, 2)
 	var ov3: Node = Gate.hero_draft(screen)
 	var pressed_name := ""
@@ -1729,40 +1729,27 @@ func _answer_draft(s: Node) -> void:
 	var a: Dictionary = await Gate.answer_hero_draft(self, s, true)
 	if not bool(a.get("confirmed", false)):
 		_stall = "the draft screen at %s would not confirm" % _where()
+		# ID §1c — a screen that cannot be confirmed (a section with nothing to take, the overlay's
+		# old *no live choice*) is recorded and its picks cleared, or the CHOOSE would reopen it.
+		Gate.clear_picks(_run.party, int(a.get("hero", -1)))
 		if s.has_method("_close_hero_draft"):
 			s.call("_close_hero_draft")
 	await Gate.frames(self, 2)
 
 
-# A pick owed on a hero card: the overlay the arrival put up, or else the card's own
-# CHOOSE, and then the first choice the overlay MARKS (IB §6a).
+# A pick owed on a hero card that the arrival did not put up: the card's own CHOOSE opens his
+# screen — every kind of pick is a section of it since ID §1, the pick overlay retired — and
+# the screen is answered on the next step, through the one helper.
 func _answer_pick(s: Node, idx: int) -> void:
-	var m: Dictionary = _run.party[idx]
-	var ov: Node = Gate.overlay(s, 60)
-	if Gate.pick_choices(ov).is_empty():
-		var choose: Button = Gate.bound_button(s, "_open_pick_overlay", [idx])
-		if choose != null:
-			choose.emit_signal("pressed")
-			await process_frame
-		if Gate.hero_draft(s) != null:
-			return   # a draft or a rune cache: his own screen, answered on the next step
-		ov = Gate.overlay(s, 60)
-	var live: Array = Gate.pick_choices(ov)
-	if live.is_empty():
-		_stall = "hero %d owed a pick at %s and nothing could be pressed" % [idx, _where()]
-		for k in ["bm_picks_owed", "up_picks_owed", "rune_picks_owed"]:
-			m[k] = 0
-		if ov != null:
-			ov.queue_free()
+	var choose: Button = Gate.bound_button(s, "_open_hero_draft", [idx])
+	if choose != null:
+		choose.emit_signal("pressed")
 		await process_frame
-		return
-	(live[0] as Button).emit_signal("pressed")
-	await Gate.frames(self, 2)
-	# A press that left its own overlay up did nothing; the next pick's overlay, which
-	# the arrival opens as this one resolves, is left for the next step.
-	if is_instance_valid(ov) and not ov.is_queued_for_deletion():
-		ov.queue_free()
-		await process_frame
+	if Gate.hero_draft(s) != null:
+		return   # his own screen, answered on the next step
+	_stall = "hero %d owed a pick at %s and his CHOOSE opened nothing" % [idx, _where()]
+	Gate.clear_picks(_run.party, idx)
+	await process_frame
 
 
 func _step_map(s: Node) -> String:

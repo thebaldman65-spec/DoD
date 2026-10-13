@@ -314,19 +314,24 @@ func _s2_the_idiom_population() -> void:
 		"§2: `_pick_upgrade` no longer comes through `upgrade_choice`")
 	# THE RENDER AND THE HANDLER MUST READ THE SAME DOOR. `_pick_upgrade` takes
 	# an INDEX, so a render that read the raw member while the handler repaired
-	# would hand the player the button beside the one they pressed.
+	# would hand the player the button beside the one they pressed. (BATCH ID §1: the
+	# render is the hero's UPGRADES section, and its Confirm finds the staged upgrade's
+	# index in the same door's list before it calls the handler.)
 	ok(m.contains("var offer: Array = Run.upgrade_choice(member)"),
-		"§2: the upgrade OVERLAY no longer renders through `upgrade_choice` — its index and the handler's have come apart")
+		"§2: the UPGRADES section no longer renders through `upgrade_choice` — its index and the handler's have come apart")
 	# **BATCH HC §5 — THE LIST IS HELD IN A LOCAL NOW, AND THE PIN IS SPLIT IN
 	# TWO.** The overlay reads `ability_choice` once and draws its buttons off
 	# that list, because it also says how many cards the offer holds back for a
 	# dismissed pet and whether any is live. The question is unchanged: the
 	# buttons are the list the door handed over. Two arms, each naming its own
 	# break.
-	ok(m.contains("var ab_live: Array = Run.ability_choice(member)"),
-		"§2: the ability OVERLAY no longer takes its list from `ability_choice`")
-	ok(m.contains("for pool_name in ab_live:"),
-		"§2: the ability OVERLAY no longer draws its buttons from the list `ability_choice` handed over")
+	# **BATCH ID §1 — RE-POINTED, THE QUESTION UNMOVED.** The pick overlay is retired; the zone
+	# boss's offer is an offer of the hero's ABILITIES section, drawn by the draft's own builder,
+	# and its list is still the one `ability_choice` hands over.
+	ok(m.contains("var offer: Array = Run.draft_choice(member) if is_draft else Run.ability_choice(member)"),
+		"§2: the zone boss's offer no longer takes its list from `ability_choice`")
+	ok(m.contains("for card in offer:"),
+		"§2: the zone boss's offer no longer draws its buttons from the list `ability_choice` handed over")
 	# AND THE OLD GUARD IS GONE RATHER THAN SITTING BESIDE THE NEW ONE.
 	ok(not m.contains('or pool_name in member.get("bm_abilities", []):'),
 		"§2: `_pick_ability`'s old refuse-and-return guard is still there — the dead button it drew is still drawn")
@@ -555,8 +560,12 @@ func _s2c_upgrade_choice() -> void:
 #
 # **FD §1e's RULE: A GATE THAT RE-IMPLEMENTS THE HANDLER PROVES ITS OWN COPY
 # CORRECT.** The map screen is instantiated, two picks of each kind are queued
-# without either being answered, the overlay is OPENED and its rendered button
-# labels are read, and the picks are taken through the real handlers.
+# without either being answered, the screen is OPENED and its rendered buttons
+# are read, and the picks are taken through the real buttons and the real Confirm.
+# **BATCH ID §1 — THE SCREEN IS THE HERO'S OWN**: the zone boss's ability an offer of its
+# ABILITIES section, the upgrade its UPGRADES section (the pick overlay that drew both until
+# ID is retired); a choice is pressed by its binding (`_stage_boss`, `_stage_upgrade`) and
+# committed by `_confirm_hero_draft`, which calls the handlers this section always drove.
 func _s2d_the_live_screen() -> void:
 	print("\n§2d — both picks, driven on the real map screen")
 	var run: Node = root.get_node("/root/Run")
@@ -586,34 +595,22 @@ func _s2d_the_live_screen() -> void:
 	var answered := 0
 	var empty_overlay := 0
 	for pick in 3:
-		screen.call("_open_pick_overlay", 2)
+		screen.call("_open_hero_draft", 2)
 		await process_frame
-		# **THE BUTTONS MUST BE READ OFF THE OVERLAY, NOT OFF THE SCREEN.** The
-		# map screen is covered in buttons of its own — map nodes, hero cards —
-		# and a walk of the whole tree picks those up and reads them as offers.
-		# The overlay is the `z_index = 60` Control `_open_pick_overlay` adds,
-		# and a queue_free'd one is still IN the tree for a frame, so the
-		# doomed ones are skipped rather than counted.
-		var overlay: Node = null
-		for c in screen.get_children():
-			if c is Control and (c as Control).z_index == 60 \
-					and not c.is_queued_for_deletion():
-				overlay = c
+		# **THE BUTTONS MUST BE READ OFF THE SCREEN, NOT OFF THE MAP.** The map is
+		# covered in buttons of its own — map nodes, hero cards — and a walk of the
+		# whole tree picks those up and reads them as offers. The screen is the
+		# `hero_draft` Control the map adds; a queue_free'd one is skipped.
+		var overlay: Node = Gate.hero_draft(screen)
 		ok(overlay != null,
-			"§2d: the pick overlay was not opened on pick %d — the drive read nothing" % (pick + 1))
+			"§2d: the hero's screen was not opened on pick %d — the drive read nothing" % (pick + 1))
 		if overlay == null:
 			break
-		var labels: Array = []
-		_button_labels(overlay, labels)
-		var offered: Array = []
-		for l in labels:
-			var s := String(l)
-			if s == "Not yet":
-				continue
-			offered.append(s)
+		var offered: Array = Gate.bound_buttons(overlay, "_stage_boss").map(
+			func(btn): return String(Gate.bound_args(btn, "_stage_boss")[1]))
 		if offered.is_empty():
 			empty_overlay += 1
-			overlay.queue_free()
+			screen.call("_shut_hero_draft")
 			await process_frame
 			break
 		# Every drawn button must be LIVE — the fault was a button that did
@@ -624,14 +621,17 @@ func _s2d_the_live_screen() -> void:
 			if owned.has(String(o)):
 				dead.append(String(o))
 		ok(dead.is_empty(),
-			"§2d: the overlay drew %s, which the hero already holds — a button that does NOTHING when pressed" % [dead])
-		screen.call("_pick_ability", 2, String(offered[0]))
-		overlay.queue_free()
+			"§2d: the screen drew %s, which the hero already holds — a button that does NOTHING when pressed" % [dead])
+		(Gate.bound_button(overlay, "_stage_boss", [2, String(offered[0])]) as Button).emit_signal("pressed")
+		await process_frame
+		var conf: Array = Gate.bound_buttons(Gate.hero_draft(screen), "_confirm_hero_draft")
+		if not conf.is_empty():
+			(conf[0] as Button).emit_signal("pressed")
 		await process_frame
 		await process_frame
 		answered += 1
 	ok(empty_overlay == 0,
-		"§2d: the overlay drew no pick buttons at all on pick %d — the pick is STRANDED" % (answered + 1))
+		"§2d: the screen drew no pick buttons at all on pick %d — the pick is STRANDED" % (answered + 1))
 	ok(answered == 3,
 		"§2d: only %d of 3 deferred zone-boss picks could be answered through the real screen" % answered)
 	var held: Array = inq["bm_abilities"]
@@ -661,17 +661,17 @@ func _s2d_the_live_screen() -> void:
 		uq[1] = (uq[0] as Array).duplicate(true)
 		m0["up_candidates"] = uq
 	for pick2 in 2:
-		screen.call("_open_pick_overlay", 0)
+		screen.call("_open_hero_draft", 0)
 		await process_frame
-		var ov2: Node = null
-		for c2 in screen.get_children():
-			if c2 is Control and (c2 as Control).z_index == 60 \
-					and not c2.is_queued_for_deletion():
-				ov2 = c2
-		ok(ov2 != null, "§2d: the upgrade overlay was not opened on pick %d" % (pick2 + 1))
-		screen.call("_pick_upgrade", 0, 0)
-		if ov2 != null:
-			ov2.queue_free()
+		var ov2: Node = Gate.hero_draft(screen)
+		var ups: Array = Gate.bound_buttons(ov2, "_stage_upgrade") if ov2 != null else []
+		ok(not ups.is_empty(), "§2d: the hero's screen drew no upgrade on pick %d" % (pick2 + 1))
+		if not ups.is_empty():
+			(ups[0] as Button).emit_signal("pressed")
+			await process_frame
+			var conf2: Array = Gate.bound_buttons(Gate.hero_draft(screen), "_confirm_hero_draft")
+			if not conf2.is_empty():
+				(conf2[0] as Button).emit_signal("pressed")
 		await process_frame
 		await process_frame
 	var ups: Array = m0["upgrades"]
@@ -690,14 +690,3 @@ func _s2d_the_live_screen() -> void:
 	print("    Berserker took %s through the screen" % [ups])
 	screen.queue_free()
 	await process_frame
-
-
-# BATCH HZ §1b — THE KIT PREVIEW'S BUTTON IS NOT A PICK. Since HZ the pick overlay
-# carries it under its title (`map_screen._kit_preview_button`): it opens the hero's
-# kit and answers nothing, so the offer read off the labels is every OTHER button.
-# Skipped by the meta the game sets on it, never by its words.
-func _button_labels(node: Node, out: Array) -> void:
-	if node is Button and not node.has_meta("kit_preview"):
-		out.append(String((node as Button).text))
-	for c in node.get_children():
-		_button_labels(c, out)

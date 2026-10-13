@@ -1199,39 +1199,26 @@ func _road_decline_draft(s: Node) -> void:
 	var a: Dictionary = await Gate.answer_hero_draft(self, s, false)
 	if not bool(a.get("confirmed", false)):
 		_road_dead.append("the draft screen would not confirm")
+		# ID §1c — a screen that cannot be confirmed (a section with nothing to take, the overlay's
+		# old *no live choice*) is recorded and its picks cleared, or the CHOOSE would reopen it.
+		Gate.clear_picks(_run.party, int(a.get("hero", -1)))
 		s.call("_close_hero_draft")
 		await Gate.frames(self, 2)
 
 
-# A pick owed on a hero card: the overlay the arrival put up, or else the card's own
-# CHOOSE, and then the first choice the overlay MARKS (IB §6a).
+# A pick owed on a hero card that the arrival did not put up: the card's own CHOOSE opens his
+# screen — every kind of pick is a section of it since ID §1, the pick overlay retired — and
+# the screen is answered on the next step, through the one helper.
 func _road_answer_pick(s: Node, idx: int) -> void:
-	var m: Dictionary = _run.party[idx]
-	var ov: Node = Gate.overlay(s, 60)
-	if Gate.pick_choices(ov).is_empty():
-		var choose: Button = Gate.bound_button(s, "_open_pick_overlay", [idx])
-		if choose != null:
-			choose.emit_signal("pressed")
-			await process_frame
-		if Gate.hero_draft(s) != null:
-			return   # a draft or a rune cache: his own screen, answered on the next step
-		ov = Gate.overlay(s, 60)
-	var live: Array = Gate.pick_choices(ov)
-	if live.is_empty():
-		_road_dead.append("hero %d owed a pick and no live choice could be pressed" % idx)
-		for k in ["bm_picks_owed", "up_picks_owed", "rune_picks_owed"]:
-			m[k] = 0
-		if ov != null:
-			ov.queue_free()
+	var choose: Button = Gate.bound_button(s, "_open_hero_draft", [idx])
+	if choose != null:
+		choose.emit_signal("pressed")
 		await process_frame
-		return
-	(live[0] as Button).emit_signal("pressed")
-	await Gate.frames(self, 2)
-	# A press that left its own overlay up did nothing; the next pick's overlay, which
-	# the arrival opens as this one resolves, is left for the next step.
-	if is_instance_valid(ov) and not ov.is_queued_for_deletion():
-		ov.queue_free()
-		await process_frame
+	if Gate.hero_draft(s) != null:
+		return   # his own screen, answered on the next step
+	_road_dead.append("hero %d owed a pick and his CHOOSE opened nothing" % idx)
+	Gate.clear_picks(_run.party, idx)
+	await process_frame
 
 
 func _road_shop(s: Node) -> String:

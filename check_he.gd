@@ -659,7 +659,9 @@ func _s4_the_zone_boss() -> void:
 				eng, live, held, (m["bm_candidates"] as Array)[0]])
 		(m["engines"][0] as Dictionary)["equipped"] = true
 		ok((_run.ability_choice(m) as Array).has(card), "§4: %s slotted again, the boss does not hand %s back" % [eng, card])
-	# THE OVERLAY'S WORDS, ON THE REAL MAP: the Swordmaster's Lunge, stored.
+	# THE OVERLAY'S WORDS, ON THE REAL MAP: the Swordmaster's Lunge, stored. **BATCH ID §1 — RE-POINTED,
+	# THE QUESTION UNMOVED: the zone boss's offer is a section of the hero's own screen now** (the pick
+	# overlay is retired), its card drawn by the same door and held back in the same words.
 	for slotted in [false, true]:
 		var tag := "the Stances in" if slotted else "the Stances out"
 		_seat_party({0: {"spec": "swordmaster", "engines": [_eng("seasoned", slotted)],
@@ -669,22 +671,22 @@ func _s4_the_zone_boss() -> void:
 		var mp: Node = current_scene
 		_close_overlays(mp)
 		await Gate.frames(self, 2)
-		mp._open_pick_overlay(0)
+		mp._open_hero_draft(0)
 		await Gate.frames(self, 3)
-		var ov: Node = Gate.overlay(mp, 60)
-		ok(ov != null, "§4 (%s): the zone boss's pick overlay did not open" % tag)
+		var ov: Node = Gate.hero_draft(mp)
+		ok(ov != null, "§4 (%s): the hero's screen did not open with the zone boss's offer" % tag)
 		if ov == null:
 			continue
 		var has_btn: bool = _button_texts(ov).has("Lunge")
 		# BATCH HL §2: the rune's name wears "(core)", read off the data.
 		var says: Array = _labels_with(ov, "wait%s on the Rune of the Swordmaster (core) being equipped" % "s")
 		ok(has_btn == slotted and (not says.is_empty()) == (not slotted),
-			"§4 (%s): the overlay %s Lunge button and %s the engine — %s" % [tag,
+			"§4 (%s): the boss's offer %s Lunge button and %s the engine — %s" % [tag,
 				"draws a" if has_btn else "draws no", "names" if not says.is_empty() else "does not name",
 				"slotted, the card is offered and nothing is held back" if slotted
 				else "unslotted, the card is held back and the sentence names the rune that brings it back"])
-		ok(_button_texts(ov).has("Execute"), "§4 (%s): the overlay drew no button for Execute — the positive arm" % tag)
-		print("    the boss overlay, %s: Lunge button %s, the sentence %s" % [tag, has_btn, not says.is_empty()])
+		ok(_button_texts(ov).has("Execute"), "§4 (%s): the boss's offer drew no button for Execute — the positive arm" % tag)
+		print("    the boss's offer, %s: Lunge button %s, the sentence %s" % [tag, has_btn, not says.is_empty()])
 		_close_overlays(mp)
 		await Gate.frames(self, 2)
 	_run.active = false
@@ -842,7 +844,7 @@ func _s6_the_band() -> void:
 	var mp: Node = current_scene
 	_close_overlays(mp)
 	await Gate.frames(self, 2)
-	mp._open_pick_overlay(0)
+	mp._open_hero_draft(0)  # BATCH ID §1 — the CHOOSE door; the pick overlay is retired
 	await Gate.frames(self, 3)
 	# BATCH IB §2 — a cache's buttons are on the hero's own draft screen, its RUNES section.
 	var ov: Node = Gate.hero_draft(mp)

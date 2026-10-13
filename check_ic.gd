@@ -881,11 +881,16 @@ func _s3a_the_corner() -> void:
 	ok(held == [3, 0, 2, 1] and _run.held_count(p[3]) == 1,
 		"§3a: the premise — upgrades held %s (want [3, 0, 2, 1]) and one rune held by the Hunter" % [held])
 	var mp := await _to_map()
+	# BATCH ID §1 — RE-POINTED, THE QUESTION UNMOVED: an upgrade owed opens the hero's own screen (its
+	# UPGRADES section), dismissed by its Later, where it opened the pick overlay's *Not yet* until ID.
 	for k in 3:
-		var ov: Node = Gate.overlay(mp, 60)
-		if ov == null:
+		var hd: Node = Gate.hero_draft(mp)
+		if hd == null:
 			break
-		Gate.press(ov, ["Not yet"])
+		var later: Array = Gate.bound_buttons(hd, "_close_hero_draft")
+		if later.is_empty():
+			break
+		(later[0] as Button).emit_signal("pressed")
 		await Gate.frames(self, 3)
 	ok(_modals(mp).is_empty(), "§3a: the premise — the two upgrade picks the arrival opened were dismissed")
 	var corner := {}
@@ -910,7 +915,7 @@ func _s3a_the_corner() -> void:
 	var mark := {}
 	var mark_btn := {}
 	for i in 4:
-		choose[i] = Gate.bound_button(mp, "_open_pick_overlay", [i]) != null
+		choose[i] = Gate.bound_button(mp, "_open_hero_draft", [i]) != null
 	var btns: Array = []
 	Gate.buttons(mp, btns)
 	for b in btns:

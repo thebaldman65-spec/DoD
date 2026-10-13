@@ -194,7 +194,7 @@ func _kit_read(m: Dictionary) -> Array:
 func _take_from_cache(mp: Node, idx: int, rune_name: String) -> String:
 	var hd: Node = Gate.hero_draft(mp)
 	if hd == null:
-		var choose: Button = Gate.bound_button(mp, "_open_pick_overlay", [idx])
+		var choose: Button = Gate.bound_button(mp, "_open_hero_draft", [idx])
 		if choose != null:
 			choose.emit_signal("pressed")
 			await process_frame
