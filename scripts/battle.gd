@@ -1702,12 +1702,13 @@ func _spawn_units() -> void:
 		# every seeded die by those four — measured and reported at ID, not compensated.
 		# Always-on talent buffs carry permanent chips with live counters
 		# (Iron Will refreshes in unit.gd, Crushing Blows in _update_talent_chips).
+		# BATCH IG §1 — both are display chips: drawn, never laid through the status door.
 		if u.iron_will_ranks > 0:
-			u.add_status("iron_will", "Iron Will", "-0%",
-				Color(0.82, 0.58, 0.36), -1, "")
+			u.set_display_chip("iron_will", "Iron Will", "-0%",
+				Color(0.82, 0.58, 0.36), "")
 		if u.crushing_blows_ranks > 0:
-			u.add_status("crushing_blows", "Crushing Blows", "+0%",
-				Color(0.86, 0.44, 0.30), -1, "")
+			u.set_display_chip("crushing_blows", "Crushing Blows", "+0%",
+				Color(0.86, 0.44, 0.30), "")
 		if Run.active and i < Run.party.size():
 			# BATCH GH — A HERO WHO FELL IN THIS FIGHT AND WAS QUIT AWAY FROM COMES
 			# BACK DOWN. The floor of 1 stays for the spawn itself, so every stamp
@@ -3083,9 +3084,8 @@ func _dot_pass(u: BattleUnit) -> void:
 						u.melted += 0.01 * h.melt_ranks
 						var melt_pct := int(round(u.melted * 100))
 						var melt_desc := "Melt Armor: %d%% armor burned away\nfor the rest of the battle." % melt_pct
-						if not u.update_status("melted", "-%d%%" % melt_pct, melt_desc):
-							u.add_status("melted", "Melt Armor", "-%d%%" % melt_pct,
-								Color(1.0, 0.5, 0.2), -1, melt_desc)
+						u.set_display_chip("melted", "Melt Armor", "-%d%%" % melt_pct,
+							Color(1.0, 0.5, 0.2), melt_desc)
 			await _wait(0.5)
 			if dot_died:
 				_message("%s succumbs to %s!" % [u.unit_name, info[0]])
@@ -3778,7 +3778,7 @@ func _run_battle() -> void:
 		if u.endurance_ranks > 0:
 			if u.healed_externally:
 				u.endurance_stacks = 0
-				u.remove_status("endurance")
+				u.remove_display_chip("endurance")
 				_log("   → Talent: Endurance resets (%s was healed)" % u.unit_name,
 					"#b0a8e0")
 			else:
@@ -3788,9 +3788,8 @@ func _run_battle() -> void:
 				var e_pct := mini(3 * u.endurance_ranks * u.endurance_stacks, 75)
 				var e_desc := "Endurance: +%d%% armor for every turn\nwithout an external heal (cap +75%%).\nCurrently +%d%% armor (%d-turn streak)." % [
 					3 * u.endurance_ranks, e_pct, u.endurance_stacks]
-				if not u.update_status("endurance", "+%d%%" % e_pct, e_desc):
-					u.add_status("endurance", "Endurance", "+%d%%" % e_pct,
-						Color(0.76, 0.68, 0.48), -1, e_desc)
+				u.set_display_chip("endurance", "Endurance", "+%d%%" % e_pct,
+					Color(0.76, 0.68, 0.48), e_desc)
 				_log("   → Talent: Endurance — %s hardens (+%d%% armor)" % [
 					u.unit_name, e_pct], "#b0a8e0")
 			u.healed_externally = false
@@ -3943,12 +3942,11 @@ func _update_talent_chips() -> void:
 		if ee_bonus > 0.0:
 			var ee_pct := int(round(ee_bonus * 100))
 			var ee_desc := "Eagle Eyes: Aguila's bond watches over\nthe heroes — +%d%% crit chance." % ee_pct
-			if not h.update_status("keen_eyes", "+%d%%" % ee_pct, ee_desc, ee_pct):
-				var ee_info: Array = STATUS_INFO["keen_eyes"]
-				h.add_status("keen_eyes", ee_info[0], "+%d%%" % ee_pct,
-					ee_info[2], -1, ee_desc, ee_pct)
-		elif h.has_status("keen_eyes"):
-			h.remove_status("keen_eyes")
+			var ee_info: Array = STATUS_INFO["keen_eyes"]
+			h.set_display_chip("keen_eyes", ee_info[0], "+%d%%" % ee_pct,
+				ee_info[2], ee_desc, ee_pct)
+		else:
+			h.remove_display_chip("keen_eyes")
 	var party_bleed := 0
 	for foe in enemies:
 		if not foe.dead:
@@ -3958,7 +3956,7 @@ func _update_talent_chips() -> void:
 			continue
 		var cb_step := _crushing_step(h)
 		var pen: int = 9 * int(party_bleed / float(cb_step))
-		h.update_status("crushing_blows", "+%d%%" % pen,
+		h.update_display_chip("crushing_blows", "+%d%%" % pen,
 			"Crushing Blows: +9%% armor penetration for\nevery %d bloodloss on the enemy team.\nCurrently +%d%% (%d total bloodloss)." % [
 				cb_step, pen, party_bleed])
 	# OVERBURN's live chip. BATCH BS §2 took the drain out of it with the drain
@@ -4030,10 +4028,9 @@ func _update_talent_chips() -> void:
 		var sc_pct: int = 10 * h.scent_ranks * h.bleedouts_this_battle
 		var sc_desc := "Scent of Blood: +%d%% damage per enemy\nbled out this battle. Currently +%d%%\n(%d bleedouts)." % [
 			10 * h.scent_ranks, sc_pct, h.bleedouts_this_battle]
-		if not h.update_status("scent", "+%d%%" % sc_pct, sc_desc, sc_pct):
-			var sc_info: Array = STATUS_INFO["scent"]
-			h.add_status("scent", sc_info[0], "+%d%%" % sc_pct, sc_info[2], -1,
-				sc_desc, sc_pct)
+		var sc_info: Array = STATUS_INFO["scent"]
+		h.set_display_chip("scent", sc_info[0], "+%d%%" % sc_pct, sc_info[2],
+			sc_desc, sc_pct)
 	# Deathwish / Undying Rage: edge-state chips that light while the
 	# Berserker rides low health.
 	for h in heroes:
@@ -4043,44 +4040,43 @@ func _update_talent_chips() -> void:
 			if h.hp < h.max_hp * 0.35:
 				var dw_pct: int = 25 * h.deathwish_ranks
 				var dw_desc := "Deathwish: +%d%% damage while below\n35%% health." % dw_pct
-				if not h.update_status("deathwish", "+%d%%" % dw_pct, dw_desc, dw_pct):
-					var dw_info: Array = STATUS_INFO["deathwish"]
-					h.add_status("deathwish", dw_info[0], "+%d%%" % dw_pct,
-						dw_info[2], -1, dw_desc, dw_pct)
-			elif h.has_status("deathwish"):
-				h.remove_status("deathwish")
+				var dw_info: Array = STATUS_INFO["deathwish"]
+				h.set_display_chip("deathwish", dw_info[0], "+%d%%" % dw_pct,
+					dw_info[2], dw_desc, dw_pct)
+			else:
+				h.remove_display_chip("deathwish")
 		if h.undying_rage > 0:
 			if not h.undying_rage_used and h.hp < h.max_hp * 0.25:
-				if not h.has_status("undying_rage"):
+				if not h.has_display_chip("undying_rage"):
 					var ur_info: Array = STATUS_INFO["undying_rage"]
-					h.add_status("undying_rage", ur_info[0], "UNDYING", ur_info[2],
-						-1, ur_info[3])
-			elif h.has_status("undying_rage"):
-				h.remove_status("undying_rage")
+					h.set_display_chip("undying_rage", ur_info[0], "UNDYING", ur_info[2],
+						ur_info[3])
+			else:
+				h.remove_display_chip("undying_rage")
 		# Killing Edge / Bracing: stance-keyed chips that follow the
 		# Swordmaster's guard (the add logs once per lighting).
 		if h.killing_edge_ranks > 0:
 			if h.stance == "aggressive":
-				if not h.has_status("killing_edge"):
+				if not h.has_display_chip("killing_edge"):
 					var ke_pct: int = 15 * h.killing_edge_ranks
 					var ke_info: Array = STATUS_INFO["killing_edge"]
-					h.add_status("killing_edge", ke_info[0], "+%d%%" % ke_pct,
-						ke_info[2], -1, ke_info[3])
+					h.set_display_chip("killing_edge", ke_info[0], "+%d%%" % ke_pct,
+						ke_info[2], ke_info[3])
 					_log("   → Talent: Killing Edge — +%d%% crit while the Aggressive guard holds" % \
 						ke_pct, "#b0a8e0")
-			elif h.has_status("killing_edge"):
-				h.remove_status("killing_edge")
+			else:
+				h.remove_display_chip("killing_edge")
 		if h.bracing_ranks > 0:
 			if h.stance == "defensive":
-				if not h.has_status("bracing"):
+				if not h.has_display_chip("bracing"):
 					var br_con: int = 30 * h.bracing_ranks
 					var br_info: Array = STATUS_INFO["bracing"]
-					h.add_status("bracing", br_info[0], "+%d" % br_con,
-						br_info[2], -1, br_info[3])
+					h.set_display_chip("bracing", br_info[0], "+%d" % br_con,
+						br_info[2], br_info[3])
 					_log("   → Talent: Bracing — +%d Constitution while the guard holds" % \
 						br_con, "#b0a8e0")
-			elif h.has_status("bracing"):
-				h.remove_status("bracing")
+			else:
+				h.remove_display_chip("bracing")
 
 
 # BATCH BM §2 — THE FIVE ROW-8 NODES THAT FIRE AT A HERO'S TURN START, in
@@ -4097,9 +4093,8 @@ func _row8_turn_start(u: BattleUnit) -> void:
 		if not u.damaged_since_turn and u.banked_guards < u.waiting_guard:
 			u.banked_guards += 1
 			var wg_desc := "Banked Guards: %d — each parries one attack outright." % u.banked_guards
-			if not u.update_status("waiting_guard", "%d" % u.banked_guards, wg_desc):
-				u.add_status("waiting_guard", "Waiting Guard", "%d" % u.banked_guards,
-					Color(0.5, 0.8, 0.95), -1, wg_desc)
+			u.set_display_chip("waiting_guard", "Waiting Guard", "%d" % u.banked_guards,
+				Color(0.5, 0.8, 0.95), wg_desc)
 			_log("   → Talent: Waiting Guard — %s banks a parry (%d held)" % [
 				u.unit_name, u.banked_guards], "#b0a8e0")
 		u.damaged_since_turn = false
@@ -8893,10 +8888,10 @@ func _roll_parry(defender: BattleUnit) -> String:
 	# never wasted covering a parry he would have made anyway.
 	if defender.banked_guards > 0:
 		defender.banked_guards -= 1
-		defender.update_status("waiting_guard", "%d" % defender.banked_guards,
+		defender.update_display_chip("waiting_guard", "%d" % defender.banked_guards,
 			"Banked Guards: %d — each parries one attack outright." % defender.banked_guards)
 		if defender.banked_guards <= 0:
-			defender.remove_status("waiting_guard")
+			defender.remove_display_chip("waiting_guard")
 		return "Waiting Guard"
 	# BATCH BP — FEINT'S CHARGES, SPENT BELOW WAITING GUARD'S AND THAT ORDER IS
 	# A DECISION. Both are guaranteed parries spent before the roll for the same
@@ -16600,9 +16595,9 @@ func _stamp_loyalty_chip(hunter: BattleUnit, comp: BattleUnit) -> void:
 	if fell > 0:
 		l_desc += "\nBoon at its limit: %d stack%s pay%s the\nstrike step instead." % [
 			fell, "" if fell == 1 else "s", "s" if fell == 1 else ""]
+	# BATCH IG §1 — a display chip, on the COMPANION's body: the meter is its hunter's dict.
 	var info: Array = STATUS_INFO["loyalty"]
-	if not comp.update_status("loyalty", "L%d" % stacks, l_desc, stacks):
-		comp.add_status("loyalty", info[0], "L%d" % stacks, info[2], -1, l_desc, stacks)
+	comp.set_display_chip("loyalty", info[0], "L%d" % stacks, info[2], l_desc, stacks)
 
 
 # BATCH HF — APER'S RHYTHM CHIP. The count since its last stun, and how many more
@@ -16618,9 +16613,8 @@ func _stamp_aper_rhythm(comp: BattleUnit) -> void:
 	var ar_desc := "Every third charge STUNS its target\nfor 1 turn. A BOSS RESISTS UNTIL\nBROKEN. %s" % (
 		"The next charge stuns." if ar_left == 1 else "%d charges to the next stun." % ar_left)
 	var ar_short := "%d/%d" % [ar_at, APER_STUN_EVERY]
-	if not comp.update_status("aper_rhythm", ar_short, ar_desc, ar_at):
-		var ar_info: Array = STATUS_INFO["aper_rhythm"]
-		comp.add_status("aper_rhythm", ar_info[0], ar_short, ar_info[2], -1, ar_desc, ar_at)
+	var ar_info: Array = STATUS_INFO["aper_rhythm"]
+	comp.set_display_chip("aper_rhythm", ar_info[0], ar_short, ar_info[2], ar_desc, ar_at)
 
 
 # The party's crit bonus from Aguila's bond (best tier among pack heroes:
@@ -16794,9 +16788,8 @@ func _bank_overheal(caster: BattleUnit, target: BattleUnit) -> void:
 		return
 	caster.stored_overheal += banked
 	var cap_desc := "Holy Capacitor: %d overhealing stored,\nreleased by the next Heal." % caster.stored_overheal
-	if not caster.update_status("capacitor", "%d" % caster.stored_overheal, cap_desc):
-		caster.add_status("capacitor", "Holy Capacitor", "%d" % caster.stored_overheal,
-			Color(0.95, 0.9, 0.6), -1, cap_desc)
+	caster.set_display_chip("capacitor", "Holy Capacitor", "%d" % caster.stored_overheal,
+		Color(0.95, 0.9, 0.6), cap_desc)
 	_log("   → Talent: Holy Capacitor banks %d overhealing (%d stored)" % [
 		banked, caster.stored_overheal], "#b0a8e0")
 
@@ -17636,15 +17629,13 @@ func _swordmaster_switch(u: BattleUnit) -> void:
 # that eventually disagrees with the counter behind it.
 func _stamp_feint_chip(u: BattleUnit) -> void:
 	if u.feint_guards <= 0:
-		u.remove_status("feint_guard")
+		u.remove_display_chip("feint_guard")
 		return
 	var fg_desc := "Feint: %d charge(s). Each parries one\nattack outright and returns its damage\nto the attacker. They wait until spent." % \
 		u.feint_guards
-	if not u.update_status("feint_guard", "Fg%d" % u.feint_guards, fg_desc,
-			u.feint_guards):
-		var fi: Array = STATUS_INFO["feint_guard"]
-		u.add_status("feint_guard", fi[0], "Fg%d" % u.feint_guards, fi[2], -1,
-			fg_desc, u.feint_guards)
+	var fi: Array = STATUS_INFO["feint_guard"]
+	u.set_display_chip("feint_guard", fi[0], "Fg%d" % u.feint_guards, fi[2],
+		fg_desc, u.feint_guards)
 
 
 # BATCH BW — BERSERK's doubled strikes, rendered. Same rule as every other bank
@@ -17655,15 +17646,13 @@ func _stamp_feint_chip(u: BattleUnit) -> void:
 # clock — and it is the half of the card that is NOT the 3-turn `berserk_risk`.
 func _stamp_berserk_chip(u: BattleUnit) -> void:
 	if u.berserk_strikes <= 0:
-		u.remove_status("berserk")
+		u.remove_display_chip("berserk")
 		return
 	var bk_desc := "Berserk: %d strike(s) banked. Each one\nlands TWICE. They count HITS, not casts,\nso a multi-hit blow spends one a strike —\nand they wait until they are spent." % \
 		u.berserk_strikes
-	if not u.update_status("berserk", "Bk%d" % u.berserk_strikes, bk_desc,
-			u.berserk_strikes):
-		var bi: Array = STATUS_INFO["berserk"]
-		u.add_status("berserk", bi[0], "Bk%d" % u.berserk_strikes, bi[2], -1,
-			bk_desc, u.berserk_strikes)
+	var bi: Array = STATUS_INFO["berserk"]
+	u.set_display_chip("berserk", bi[0], "Bk%d" % u.berserk_strikes, bi[2],
+		bk_desc, u.berserk_strikes)
 
 
 # THE ONE ANSWER TO "what is this unit's Block chance right now", and the whole
@@ -18464,9 +18453,9 @@ func _refresh_faith_chip(u: BattleUnit, devout: BattleUnit) -> void:
 		u.faith_stacks, u.faith_peak,
 		_faith_pct_text(FAITH_MITIGATION_PCT * mult * u.faith_peak),
 		_faith_pct_text(FAITH_DAMAGE_PCT * mult * u.faith_peak), f_tail]
-	if not u.update_status("faith", "Fa%d" % u.faith_stacks, f_desc):
-		u.add_status("faith", "Faith", "Fa%d" % u.faith_stacks,
-			Color(0.98, 0.85, 0.45), -1, f_desc)
+	# BATCH IG §1 — a display chip, on the body that holds the Faith (the ally, or the Devout).
+	u.set_display_chip("faith", "Faith", "Fa%d" % u.faith_stacks,
+		Color(0.98, 0.85, 0.45), f_desc)
 
 
 # BATCH BI §2 — THE ONE DOOR FAITH IS BOOKED THROUGH, on `_devout_heal`'s
@@ -18504,7 +18493,7 @@ func _reset_faith_meters() -> void:
 	for h in heroes:
 		h.faith_stacks = 0
 		h.faith_peak = 0
-		h.remove_status("faith")
+		h.remove_display_chip("faith")
 
 
 # BATCH CG §2 — `_raise_faith_peak` IS DELETED, NOT LEFT UNREACHABLE. It was
@@ -22911,7 +22900,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					# Perfect: the fire takes nothing with it.
 					if not is_perfect:
 						attacker.loyalty[ps_comp.companion_kind] = 0
-						ps_comp.remove_status("loyalty")
+						ps_comp.remove_display_chip("loyalty")
 					else:
 						_stamp_loyalty_chip(attacker, ps_comp)
 				if ps_total > 0:
@@ -23830,7 +23819,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("   → Talent: Holy Capacitor releases %d stored healing" % \
 					attacker.stored_overheal, "#b0a8e0")
 				attacker.stored_overheal = 0
-				attacker.remove_status("capacitor")
+				attacker.remove_display_chip("capacitor")
 			_sfx("heal", -6.0)
 			var hh_got: int = target.heal_amount(hh_amt, target != attacker)
 			target.float_text("+%d%s" % [hh_got, "!" if hh_crit > 1.0 else ""],
@@ -25907,7 +25896,7 @@ func _deadfall_tick(u: BattleUnit) -> void:
 # NOTE the chip's VISIBLE text is `short`, not `label` (the AT gotcha).
 func _stamp_deadfall_chip(h: BattleUnit) -> void:
 	if h.deadfall_armed <= 0:
-		h.remove_status("deadfall")
+		h.remove_display_chip("deadfall")
 		return
 	var short := "DF%d" % h.deadfall_armed
 	var desc := "A deadfall lies in the path: %d spring(s) left.\nThe next enemy to act takes %d%% of Attack\nas nature damage and is Stunned 1 turn.\nIt holds a trap slot until it is spent." % [
@@ -25915,9 +25904,8 @@ func _stamp_deadfall_chip(h: BattleUnit) -> void:
 	if h.deadfall_dormant > 0:
 		short = "DF%d·%d" % [h.deadfall_armed, h.deadfall_dormant]
 		desc += "\nRESTING: it cannot spring for %d more turn(s)." % h.deadfall_dormant
-	if not h.update_status("deadfall", short, desc, h.deadfall_armed):
-		h.add_status("deadfall", "Deadfall", short, Color(0.75, 0.65, 0.30), -1,
-			desc, h.deadfall_armed)
+	h.set_display_chip("deadfall", "Deadfall", short, Color(0.75, 0.65, 0.30),
+		desc, h.deadfall_armed)
 
 
 func _spring_trap(placer: BattleUnit, victim: BattleUnit, dmg: float,
@@ -27677,6 +27665,8 @@ func _bank_party_losses() -> void:
 		m["hp"] = 0 if h.dead else h.hp
 		if h.resource_name == "Mana":
 			m["mana"] = h.resource
+			# BATCH IG §4 — the bar's own maximum rides with it, as the victory's sync writes it.
+			m["max_mana"] = h.max_resource
 		# A beast at zero is FALLING, not standing: the damage door reports below
 		# every refusal but above `_die()`, so the blow that kills it is written
 		# here while `dead` is still false. Read as standing, a quit on that blow

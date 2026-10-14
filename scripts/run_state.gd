@@ -1532,9 +1532,11 @@ func sync_spec_hp(idx: int) -> void:
 # Mana and the guard was never moved, so the Cracked Hourglass — whose card says
 # *every hero* — refilled two of the three Mana heroes. The test is the class's own
 # opening bar now (`HERO_BASE`: the Warrior's is 0, he holds Rage). **AND IT NEVER
-# TAKES MANA AWAY**: a bar above the member's `max_mana` (a +20 node carries a hero
-# past 100 out of a fight) is left where it stands rather than cut to the cap, so
-# *recovers* is never a loss.
+# TAKES MANA AWAY**: a bar above the member's `max_mana` is left where it stands rather
+# than cut to the cap, so *recovers* is never a loss. BATCH IG §4 — the member carries
+# the bar's true maximum from his first fight's end (`sync_victory_state`), so a +20
+# node's bar is restored against 120, not cut at 100; the guard stays for any bar a
+# later door carries past it.
 func restore_mana(pct: float) -> void:
 	for member in party:
 		if int((HERO_BASE.get(String(member["key"]), {}) as Dictionary).get("mana", 0)) <= 0:

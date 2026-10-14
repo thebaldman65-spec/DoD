@@ -4,6 +4,39 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Every chip, and Sanctity (Batch IG) — 2026-10-13
+
+**Why every chip, and not the nine a run reaches.** A chip is drawn to tell the player something; it is not an event in the
+fiction, and Sanctity claims to count events. Laid through the status door, each chip was a status to everything that counts
+statuses — the ledger, the floats that spend a die, the cleanse that walks a body's list. The ten no run reaches cost nothing
+to convert, and a dormant chip left as a status is a trap for whoever writes its next writer: the day a node writes Endurance
+again, it would arrive booking Sanctity events nobody priced. So the subject is closed whole, and the rule that closes it is a
+check — every `add_status` left in the game is the status door's or an effect a line reads back for its payout.
+
+**Why the Faith chip was not the big one.** It was expected to churn an event at every release; it does not — a release has
+refreshed the chip rather than removing it since the peak began to pay (BI), so it lands once a body a fight — and Faith is a
+Devout's, while the ledger is a Hierophant's, and one party holds one Cleric. The chip a Hierophant's count actually carried was
+Iron Will: a node every hero of the default build wears, laid on four heroes at every spawn. The designer's own build buys no
+node, so on it the fall is Loyalty and Faith, about one event a fight.
+
+**Why the step moved back to FV's target and not further.** The target was ruled at FV and not reopened: about half the cap by a
+normal fight's end, on untalented rung-1 fights. The number moves because the count under it was inflated, not because the
+target changed — so the same population is read again on the honest count and the step is the one that lands nearest the
+target. A boss fight still reaches the cap more often than a normal one, as it did before; that is the boss being long, not
+the step being wrong. The designer's play is what confirms it, and the readout carries his steps a fight.
+
+**Why STARTING KIT and not KIT.** CORE names a core rune on three surfaces, and one word may not name two kinds of thing.
+KIT was the designer's first word and the bare word was looked at on the real screen: the map card's own button, *Kit n/m*,
+counts the starting cards and the carried ones together, so a section called KIT inside it would name the whole and one part,
+directly above the Bench buttons of the cards it would seem to include. STARTING KIT says what the section holds — the cards
+he opened with, against the ones he earned.
+
+**Why the member carries the true maximum.** A node called *A Bigger Resource Pool* bought twenty points a hero could reach by
+regenerating inside a fight and never keep: every door between fights — the Hourglass, a zone's refill, a potion on the map,
+an event — read a fixed 100. That is not a tuning question; it is the node doing what its name says. The maximum is built at
+the spawn and nothing in a fight writes it, so the fight's end carries it out whole. The save already held the key, and an
+older build reads it and writes it back, so no version moves.
+
 ## The readout, a card, and two panels (Batch IF) — 2026-10-13
 
 **Why a readout, and why a file.** Five rulings wait on figures no census can produce — Boil Over's rate, Rupture's number,

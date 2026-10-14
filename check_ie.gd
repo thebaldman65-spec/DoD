@@ -331,8 +331,9 @@ func _s2a_a_chip_is_not_a_status() -> void:
 		for c in (u2.get("_chips_root") as Node).get_children():
 			if c is ColorRect and not c.is_queued_for_deletion():
 				drawn += 1
-		ok(drawn == u2.engine_chips.size() + u2.statuses.size(),
-			"§2a (%s): the row draws %d chips for %d engine chips and %d statuses" % [u2.hero_key, drawn, u2.engine_chips.size(), u2.statuses.size()])
+		# BATCH IG §1 — the row draws the display chips too (a talent's or a card's), between the two.
+		ok(drawn == u2.engine_chips.size() + u2.display_chips.size() + u2.statuses.size(),
+			"§2a (%s): the row draws %d chips for %d engine chips, %d display chips and %d statuses" % [u2.hero_key, drawn, u2.engine_chips.size(), u2.display_chips.size(), u2.statuses.size()])
 	# NONE BOOKED A SANCTITY EVENT AT THE SPAWN — the ledger's own keys, read — BESIDE a status that does.
 	var booked: Array = BattleUnit._sanctity_seen.keys().filter(func(k): return String(k).contains(":spec_passive"))
 	ok(booked.is_empty(), "§2a: an engine's chip booked a Sanctity event: %s" % [booked])

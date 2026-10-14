@@ -588,7 +588,7 @@ func _names_swept() -> void:
 		and Classes.pool_ability("Iron Will") == null,
 		"§1 (CK §2): the resolver answers to Ironclad and no longer to Iron Will")
 	var battle_src := _src("res://scripts/battle.gd")
-	ok(battle_src.contains('u.add_status("iron_will", "Iron Will"'),
+	ok(battle_src.contains('u.set_display_chip("iron_will", "Iron Will"'),
 		"§1: the NODE's chip keeps the label and keeps the id `iron_will`")
 	ok(battle_src.contains('"ironclad": ["Ironclad"'),
 		"§1 (CK §2, INVERTED): the ABILITY's chip reads Ironclad, off the id it always had")

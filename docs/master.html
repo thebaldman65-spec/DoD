@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-10-13 (Batch IF &mdash; the readout, a card, and two panels)</b></p>
+<p align="right"><b>Last updated: 2026-10-13 (Batch IG &mdash; every chip, and Sanctity)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -987,6 +987,13 @@ its timer (4 turns, on the Survivalist).</td></tr>
 </table>
 <p>Statuses tick down at the start of the affected unit's turn; negative durations last the
 whole battle.</p>
+<p><b>Some chips on a nameplate are not statuses.</b> A chip that shows a figure the hero already holds &mdash; Iron Will,
+Refuse Death's <i>UNDYING</i>, Eagle Eyes, Loyalty and Aper's Rhythm on a companion, Faith, Feint's and Berserk's banked
+charges, Deadfall, and the dormant Crushing Blows, Melt Armor, Endurance, Scent of Blood, Deathwish, Killing Edge, Bracing,
+Waiting Guard, Enraged and Holy Capacitor &mdash; is <b>drawn</b> on the plate, after the core rune's &#9733; chip and before the
+statuses: it never ticks down, no cleanse or Dispel takes it, nothing that counts statuses or debuffs counts it, and it is
+no Sanctity event. Its figure comes off the hero (his banked charges, his Faith, his companion's Loyalty), and it goes
+when that figure does, or when the body falls.</p>
 <p><b>CONJUNCTIONS &mdash; two afflictions meeting on one body make a third.</b> A pair the game
 knows becomes ONE status with one chip, which says what it is made of: a status built from two
 is <b>second-degree</b>, from three <b>third-degree</b>, each stronger than the last &mdash; Rupture is a
@@ -1396,7 +1403,8 @@ rule engine has no lineage, and opens with his class's basic attack and his clas
 <p><b>The three class engines</b> carry no spec: <b>Momentum</b> makes a Warrior's later turns in a
 fight quicker for every exchange — a turn that deals damage and is met by the fight; <b>Channel</b>
 adds to a Mage's non-physical damage for every 42 Mana spent in a fight; <b>Sanctity</b> lengthens
-every status a Cleric applies for every 16 statuses landing on or leaving a unit in a fight.</p>
+every status a Cleric applies for every 13 statuses landing on or leaving a unit in a fight (a chip drawn on a nameplate
+is not a status, and counts toward none), to five steps.</p>
 <p><b>The nine rule engines</b> carry no spec either, and each is a rule rather than a meter. <b>The
 engine names in the table are internal: a player sees only the rune's name</b>, and every chip, card,
 float and log line says <i>Reaver</i>, <i>Bastion</i> and so on. Every figure below is read from
@@ -1700,7 +1708,7 @@ takes is kept for the rest of the run. What the cap limits is how many of them a
 <b>carried</b> into a fight — the rest sit on the bench, and <b>swapping between them costs
 nothing</b> and can be done at any time from the hero card on the map. A pick is a loadout
 decision, not a commitment. <b>The card's Kit button opens his loadout in four sections</b>, separated, as
-the rune panel is: <b>CORE</b> (the kit he opened with, never benched), <b>ENABLERS</b> (the cards his core
+the rune panel is: <b>STARTING KIT</b> (the kit he opened with, never benched), <b>ENABLERS</b> (the cards his core
 runes bring, outside the slot count), <b>CARRIED</b> (each with Bench) and <b>BENCHED</b> (each with Carry);
 a row carries no mark of its state, because its section says it, and an empty section says so.</p>
 <p><b>At the cap, an offer becomes take-one-and-bench-one:</b> pick the incoming ability, then
@@ -2770,10 +2778,11 @@ Break dealt, armor penetration, the crit riders, <i>Kill What Is Down</i> and <i
 an ability's hit and not inside an ability that resolves through its own special handling.
 <i>Heal More When Low</i> and <i>We Do Not Break</i> reach <b>every hero</b>: the highest holder
 among the heroes is stamped on every hero when the battle opens, so two heroes holding either do
-not stack. <i>A Bigger Resource Pool</i> is read inside a battle only; between fights a Mana
-hero's carried Mana still refills to 100.</p>
+not stack. <i>A Bigger Resource Pool</i>'s twenty points are kept between fights: from a Mana hero's first fight's
+end his bar's maximum rides with him, so the Cracked Hourglass restores 30% of it, a new zone refills him to it, and a
+Mana Potion used on the map or an event's Mana reads it too. A hero with no node reads 100 through every one of them.</p>
 <p>Talent visibility: every talent proc is written to the combat log with a
-"Talent:" tag, and stateful talent effects display as status chips with live counters —
+"Talent:" tag, and stateful talent effects display as chips with live counters —
 the per-debuff mitigation chip shows its current cut, and the Devoutness chip names the Break
 reduction every hero carries.</p>
 <h2>8. Economy</h2>

@@ -854,8 +854,8 @@ func _s2_aper() -> void:
 			await _clear(s)
 			continue
 		var aper: BattleUnit = beasts[0]
-		ok(String(aper.get_status("aper_rhythm").get("short", "")) == "0/3",
-			"§2 (%s): Aper arrives showing %s — its rhythm at 0 of 3" % [arm[0], aper.get_status("aper_rhythm").get("short", "none")])
+		ok(String(aper.display_chip("aper_rhythm").get("short", "")) == "0/3",
+			"§2 (%s): Aper arrives showing %s — its rhythm at 0 of 3" % [arm[0], aper.display_chip("aper_rhythm").get("short", "none")])
 		if (arm[1] as Array).size() > 0:
 			s._gain_loyalty(h, "aper", 9)
 		var prey: BattleUnit = _foes(s)[0]
@@ -865,7 +865,7 @@ func _s2_aper() -> void:
 			prey.remove_status("stunned")
 			await s._companion_strike(aper, prey, 1.0, false)
 			stuns.append(prey.has_status("stunned"))
-			chips.append(String(aper.get_status("aper_rhythm").get("short", "")))
+			chips.append(String(aper.display_chip("aper_rhythm").get("short", "")))
 		ok(stuns == [false, false, true, false, false, true],
 			"§2 (%s): six charges stunned %s — every third, never sooner" % [arm[0], stuns])
 		ok(chips == ["1/3", "2/3", "0/3", "1/3", "2/3", "0/3"],

@@ -190,7 +190,7 @@ func _stat_of(scene: Node, key: String) -> float:
 func _isolate(scene: Node, target: BattleUnit, stacks: int) -> void:
 	for h in scene.get("heroes"):
 		h.faith_stacks = 0
-		h.remove_status("faith")
+		h.remove_display_chip("faith")
 		h.hp = h.max_hp
 	target.faith_stacks = stacks
 

@@ -1094,6 +1094,12 @@ func sync_victory_state(member: Dictionary) -> void:
 	member["max_hp"] = save_max
 	if resource_name == "Mana":
 		member["mana"] = resource
+		# BATCH IG §4 — AND THE MAXIMUM THE BAR WAS BUILT TO (IF's ruling 5, the designer's): the
+		# member's `max_mana` was a fixed 100, so a +20 node's twenty points were reachable in a fight
+		# and clipped at every door between fights — the Hourglass's restore, a new zone's refill, a
+		# map potion, an event. `max_resource` is built at the spawn from the class, the nodes and the
+		# runes, and nothing in a fight writes it, so it carries out whole. A hero with no node reads 100.
+		member["max_mana"] = max_resource
 	# BATCH FK — THE RUNE OF THE RESONANT CORE BANKS ITS SHARE HERE, at the one
 	# site a battle's end writes anything back onto the party member. It is
 	# written beside `mana` because it is the same kind of fact — a meter that
@@ -1812,6 +1818,16 @@ var statuses: Array = []
 # so the chip row draws both; `set_engine_chip` is its one writer, `engine_chip` its reader.
 var engine_chips: Array = []
 
+# BATCH IG §1 — AND EVERY OTHER DISPLAY CHIP IS DRAWN THE SAME WAY (IF's ruling 5, the designer's).
+# A display chip is one whose status nothing read for its payout: the payout is a unit field
+# (`iron_will_ranks`, `berserk_strikes`, `faith_peak` …) and the chip only draws it. Laid through
+# the status door, each was a Sanctity event arriving and leaving and a float that spent a die;
+# drawn here, nothing ticks, dispels, cleanses or counts one, and none books an event or floats.
+# Same shape as a status entry (id, label, short, color, turns, desc, power), so the row draws all
+# three lists; `set_display_chip` is the one writer, `display_chip` the reader. A chip's `turns`
+# is shown and never counted down here — its owner's field is the clock (Enraged's timer).
+var display_chips: Array = []
+
 # Battle-log hook (set by the battle scene) so talent procs that happen
 # inside this unit (Enraged, Unrelenting Assault) reach the combat log.
 var log_proc := Callable()
@@ -2073,6 +2089,61 @@ func update_engine_chip(pid: String, short: String, desc: String) -> bool:
 	return true
 
 
+# BATCH IG §1 — THE DISPLAY CHIP's ONE WRITER: lays it, or rewrites the one standing, and draws the
+# row. No `note_status_event`, no `float_text` — the status door's two acts for a status arriving.
+func set_display_chip(id: String, label: String, short: String, color: Color, desc := "",
+		power := 0, turns := -1) -> void:
+	var s := display_chip(id)
+	if s.is_empty():
+		display_chips.append({"id": id, "label": label, "short": short, "color": color,
+			"turns": turns, "desc": desc, "power": power})
+	else:
+		s.label = label
+		s.short = short
+		s.color = color
+		s.desc = desc
+		s.power = power
+		s.turns = turns
+	_refresh_chips()
+
+
+func display_chip(id: String) -> Dictionary:
+	for s in display_chips:
+		if s.id == id:
+			return s
+	return {}
+
+
+func has_display_chip(id: String) -> bool:
+	return not display_chip(id).is_empty()
+
+
+# Rewrites a standing display chip's words (and its power or shown turns, when given) — false when
+# none stands, `update_status`'s contract, so a caller that lays one on a miss reads as it did.
+func update_display_chip(id: String, short: String, desc: String, power := -1,
+		turns := 0) -> bool:
+	var s := display_chip(id)
+	if s.is_empty():
+		return false
+	s.short = short
+	s.desc = desc
+	if power >= 0:
+		s.power = power
+	if turns > 0:
+		s.turns = turns
+	_refresh_chips()
+	return true
+
+
+# Takes a display chip off the row; nothing when none stands. It books nothing: a chip leaving is
+# not a status leaving.
+func remove_display_chip(id: String) -> void:
+	var before := display_chips.size()
+	display_chips = display_chips.filter(func(s): return s.id != id)
+	if display_chips.size() < before:
+		_refresh_chips()
+
+
 func _sync_engine_switches() -> void:
 	momentum_active = engines.has("momentum")
 	channel_active = engines.has("channel")
@@ -2212,7 +2283,15 @@ var momentum_met := 0      # blows that REACHED him since his last turn (FV §1)
 # potency half lands this number is owed a re-reading rather than trust. The
 # reading, the spread between the specs and what each half can reach are in
 # `docs/reports/FV.md` §3.
-const SANCTITY_PER_STEP := 16
+#
+# BATCH IG §2 — RE-SET TO FV §3's OWN TARGET ON THE HONEST COUNT. FV's figure was
+# read while display chips were statuses, so the ledger counted a talent's chip
+# landing on four heroes at every spawn and a companion's at every call; IE took
+# the engine chips off it and IG the other nineteen, and the same population (a
+# Hierophant beside the default lineages, untalented, rung 1, a normal fight's
+# end) is read again in `docs/reports/IG.md` §2. IG moved it 16 → 13. It is the
+# designer's to confirm from play: the readout carries his steps a fight.
+const SANCTITY_PER_STEP := 13
 const SANCTITY_MAX_STEPS := 5
 const SANCTITY_STEP_TURNS := 1
 static var sanctity_events := 0
@@ -3738,8 +3817,14 @@ func tick_cooldowns() -> void:
 		enraged_timer -= 1
 		if enraged_timer == 0:
 			enraged_stacks = 0
-			remove_status("enraged")
+			remove_display_chip("enraged")
 			float_text("Enraged fades", Color(0.7, 0.5, 0.4))
+		else:
+			# BATCH IG §1 — the chip shows the timer that governs the payout.
+			var ec := display_chip("enraged")
+			if not ec.is_empty():
+				ec.turns = enraged_timer
+				_refresh_chips()
 
 
 func ability_ready(ab: Ability) -> bool:
@@ -3855,19 +3940,21 @@ func _refresh_chips() -> void:
 	# status change, so the readout can never go stale).
 	# BATCH FX — the chip no longer says "the Warden": the counter is written
 	# by a node every class can buy, and the chip rides the counter.
+	# BATCH IG §1 — it is a display chip, so it is read off `display_chips`.
 	if iron_will_ranks > 0:
-		for s in statuses:
-			if s.id == "iron_will":
-				var n := count_debuffs()
-				var pct := 12 * iron_will_ranks * n
-				s.short = "-%d%%" % pct
-				s.desc = "Iron Will: takes 12%% less damage\nfor every debuff carried.\nCurrently -%d%% (%d debuff%s)." % [
-					pct, n, "" if n == 1 else "s"]
+		var iw := display_chip("iron_will")
+		if not iw.is_empty():
+			var n := count_debuffs()
+			var pct := 12 * iron_will_ranks * n
+			iw.short = "-%d%%" % pct
+			iw.desc = "Iron Will: takes 12%% less damage\nfor every debuff carried.\nCurrently -%d%% (%d debuff%s)." % [
+				pct, n, "" if n == 1 else "s"]
 	for child in _chips_root.get_children():
 		child.queue_free()
 	# BATCH IE §2a — the engine chips are drawn first, where they stood when the spawn laid
 	# them as the first statuses; they are not statuses (`engine_chips`).
-	var row: Array = engine_chips + statuses
+	# BATCH IG §1 — the display chips next, ahead of every status: none of them is one.
+	var row: Array = engine_chips + display_chips + statuses
 	var count := row.size()
 	if count == 0:
 		return
@@ -4497,11 +4584,11 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		var enr_pct := 12 * enraged_ranks * enraged_stacks
 		var enr_desc := "Enraged: +12%% damage per stack, gained\nby dropping below half health\n(max 3 stacks). Currently +%d%% (x%d)." % [
 			enr_pct, enraged_stacks]
-		if update_status("enraged", "+%d%%" % enr_pct, enr_desc, -1, 5):
+		if update_display_chip("enraged", "+%d%%" % enr_pct, enr_desc, -1, 5):
 			float_text("ENRAGED x%d" % enraged_stacks, Color(0.9, 0.35, 0.3))
 		else:
-			add_status("enraged", "Enraged", "+%d%%" % enr_pct,
-				Color(0.9, 0.35, 0.3), 5, enr_desc)
+			set_display_chip("enraged", "Enraged", "+%d%%" % enr_pct,
+				Color(0.9, 0.35, 0.3), enr_desc, 0, 5)
 		_proc_log("Talent: Enraged — %s rages (+%d%% damage, stack %d)" % [
 			unit_name, enr_pct, enraged_stacks])
 	# Unrelenting Assault (talent): dropping below 25% HP grants Constitution
@@ -4849,6 +4936,8 @@ func _die() -> void:
 		if comp.has("parts"):
 			_proc_log("   → %s ends on %s — the body died" % [String(comp.label), unit_name])
 	statuses.clear()
+	# BATCH IG §1 — the display chips go with the body, as they did while they were statuses.
+	display_chips.clear()
 	_refresh_chips()
 	if _plate_root != null:
 		_plate_root.modulate = Color(0.52, 0.47, 0.55)

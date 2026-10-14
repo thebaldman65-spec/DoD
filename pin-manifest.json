@@ -4732,7 +4732,7 @@
    "s": "check_hp.gd",
    "fn": "_s1b_the_fields",
    "h": "scripts/battle.gd",
-   "n": "if u.iron_will_ranks > 0:\n\t\t\tu.add_status(\"iron_will\"",
+   "n": "if u.iron_will_ranks > 0:\n\t\t\tu.set_display_chip(\"iron_will\"",
    "p": "+",
    "r": "code",
    "k": "literal",
@@ -5601,7 +5601,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_hu.gd#867"
+   "g": "check_hu.gd#864"
   },
   {
    "s": "check_hu.gd",
@@ -5700,7 +5700,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hu.gd#876"
+   "g": "check_hu.gd#873"
   },
   {
    "s": "check_hv.gd",
@@ -6418,7 +6418,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_if.gd#392",
+   "g": "check_if.gd#401",
    "expr": "n"
   },
   {
@@ -6430,7 +6430,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_if.gd#420"
+   "g": "check_if.gd#429"
   },
   {
    "s": "check_if.gd",
@@ -6441,7 +6441,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_if.gd#399"
+   "g": "check_if.gd#408"
   },
   {
    "s": "check_if.gd",
@@ -6452,7 +6452,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_if.gd#421"
+   "g": "check_if.gd#430"
   },
   {
    "s": "check_if.gd",
@@ -6463,7 +6463,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_if.gd#419"
+   "g": "check_if.gd#428"
   },
   {
    "s": "check_if.gd",
@@ -6474,7 +6474,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "derived",
-   "g": "check_if.gd#421"
+   "g": "check_if.gd#430"
   },
   {
    "s": "check_if.gd",
@@ -6485,7 +6485,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_if.gd#399"
+   "g": "check_if.gd#408"
   },
   {
    "s": "test_batch_ah.gd",
@@ -16461,7 +16461,7 @@
    "s": "test_batch_br.gd",
    "fn": "_names_swept",
    "h": "scripts/battle.gd",
-   "n": "u.add_status(\"iron_will\", \"Iron Will\"",
+   "n": "u.set_display_chip(\"iron_will\", \"Iron Will\"",
    "p": "+",
    "r": "code",
    "k": "literal",

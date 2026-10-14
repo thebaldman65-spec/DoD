@@ -559,7 +559,7 @@ func _s7_the_chip(scene: Node, bm: BattleUnit, comp: BattleUnit) -> void:
 
 	bm.loyalty[kind] = point * 2
 	scene._stamp_loyalty_chip(bm, comp)
-	var full := String(comp.get_status("loyalty").get("desc", ""))
+	var full := String(comp.display_chip("loyalty").get("desc", ""))
 	ok(full.contains("Boon at its limit"),
 		"§7: the chip names the fallback where it fires")
 	ok(full.contains("%d stacks pay" % (point * 2 - point)),
@@ -577,7 +577,7 @@ func _s7_the_chip(scene: Node, bm: BattleUnit, comp: BattleUnit) -> void:
 	# legibility — and EU's own CONVERTS line must survive underneath it.
 	bm.loyalty[kind] = 9
 	scene._stamp_loyalty_chip(bm, comp)
-	var window := String(comp.get_status("loyalty").get("desc", ""))
+	var window := String(comp.display_chip("loyalty").get("desc", ""))
 	ok(not window.contains("Boon at its limit"),
 		"§7: at the one-stack window the line is ABSENT — nothing fell back")
 	ok(window.contains("CONVERTS at %d" % point) and window.contains("(1 converted)"),

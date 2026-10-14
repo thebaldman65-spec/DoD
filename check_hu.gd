@@ -1086,10 +1086,8 @@ func _s4_chips_and_broken() -> void:
 	war.take_hit(0, 999)
 	ok(war.broken and war.has_status("broken"), "§4b: the Warden did not Break")
 	ok(war.count_debuffs() == 0, "§4b: a Broken Warden with nothing else on him counts %d debuffs" % war.count_debuffs())
-	var chip := ""
-	for st6 in war.statuses:
-		if String(st6.id) == "iron_will":
-			chip = String(st6.short)
+	# BATCH IG §1 — the Iron Will chip is a display chip, read where it is drawn from.
+	var chip := String(war.display_chip("iron_will").get("short", ""))
 	ok(chip == "-0%", "§4b: the Iron Will chip on a Broken Warden reads '%s', want '-0%%'" % chip)
 	s._apply_status(war, "dazed", 3)
 	ok(war.count_debuffs() == 1, "§4b: Broken and Dazed count %d — want the Dazed alone" % war.count_debuffs())
@@ -1154,14 +1152,17 @@ func _stem(tag: String) -> String:
 # with a literal id, a counter's (`%d` after its letters) or a fixed one's — and unit.gd's own
 # counters on `.short`, keyed by the status it belongs to. Comments stripped first. A tag
 # written here and not in `STATUS_INFO` (Anointed's) is as visible as one written there.
+# BATCH IG §1 — A DISPLAY CHIP IS NO STATUS, AND ITS TAG IS STILL ONE A PLAYER READS ON THE ROW: its
+# writers (`set_display_chip`, `update_display_chip`) are walked beside the status door's, in the
+# same shapes, so Faith's `Fa%d` and every converted chip's letters stay in the tag walk.
 func _counter_families() -> Dictionary:
 	var out := {}
 	# add_status names its label before the short (any expression without a comma);
 	# update_status leads with the short.
 	var re_add := RegEx.new()
-	re_add.compile("(?<!func )add_status\\(\\s*\"(\\w+)\"\\s*,\\s*[^,]+,\\s*\"([^\"]*)\"")
+	re_add.compile("(?<!func )(?:add_status|set_display_chip)\\(\\s*\"(\\w+)\"\\s*,\\s*[^,]+,\\s*\"([^\"]*)\"")
 	var re_upd := RegEx.new()
-	re_upd.compile("(?<!func )update_status\\(\\s*\"(\\w+)\"\\s*,\\s*\"([^\"]*)\"")
+	re_upd.compile("(?<!func )(?:update_status|update_display_chip)\\(\\s*\"(\\w+)\"\\s*,\\s*\"([^\"]*)\"")
 	for path in ["res://scripts/battle.gd", "res://scripts/unit.gd"]:
 		var src := Gate.strip_comments(FileAccess.get_file_as_string(path))
 		for re in [re_add, re_upd]:

@@ -17,6 +17,41 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT IG — 2026-10-13, FROM `docs/state.md` AS IF LEFT IT (`fd83ae7`)
+
+**What came here**: IF's rulings, all five answered in IG's brief (the first, the designer's play, is still owed and is carried as
+IG's ruling 1); and FOUND AT IF's Hourglass-cap item (built at IG §4 — the member carries the bar's true maximum). The roadmap's IG
+line was rewritten in place (IC's remainder is IH's now and the re-measure II's, by IG's brief §6); FOUND AT IF keeps its other three
+items. Each was read against IG's tree before it moved; everything else in the live file stayed.
+
+### ~~IF's RULINGS OWED~~ — **ALL FIVE ANSWERED IN IG's BRIEF: THE ASK IS MADE (1, CARRIED AS IG's RULING 1); THE RATE STAYS 12 (2); SMOULDER's THREE FIGURES STAND (3); THE HEADS STAND BUT CORE, WHICH READS STARTING KIT (4, BUILT AT IG §3); THE MEMBER CARRIES THE TRUE MAXIMUM (5, BUILT AT IG §4)**
+
+Full working: `docs/reports/IF.md`, NEEDS A RULING.
+
+1. **PLAY ONE ZONE AND SEND THE FILE (§1).** `user://readout/` holds one file a run (the designer's folder: `~/Library/Application
+   Support/Godot/app_userdata/Dawn of Decay/readout/`). It answers Boil Over's rate, Rupture's number, the vow's worth, Sanctity's
+   threshold and the Cleric's Mana — the last ruled *after* the readout and the Hourglass (IF's brief §0.1b).
+2. **THE CLERIC's MANA, WITH THE HOURGLASS REACHING EVERY MANA HERO (§0.1b).** Held, default build: Cleric 1.6%, Mage 3.4%, Hunter 0.9%
+   dry; untalented 11.5%, 16.4%, 20.9% (THE CLERIC's MANA RATE, below). With the relic the Hunter is the hero least often short on
+   the default build; untalented the Cleric is. The rate is the designer's, after the file.
+3. **SMOULDER's OTHER FIGURES (§2)** — the damage is 10% of Attack (Fireball 20%), set here as the brief asked; **the Break (8) and the
+   Perfect (12%) are figures the brief did not name** and were set here too (Stoke's Break; the generic Perfect); **its 10 Mana ties
+   Blink** — the brief's *below every costed card* holds of the fire cards, and nothing can go under 10 (`check_ft` §5h's Channel floor).
+4. **THE PANELS' WORDS (§3)** — *CORE — never benched*, *ENABLERS — brought by a core rune*, *CARRIED — n*, *BENCHED — n, kept for the run*;
+   THE CREST and IN THE BAG kept. The Kit panel's empty line named the Peddler as a draft source; it reads *after an elite or at an
+   event* now.
+5. **THE HOURGLASS's CAP (§0.1b, FOUND AT IF)** — a bar carried past 100 by a node recovers 30 (30% of the member's fixed 100) and stops at
+   100; the zone's refill stops there too. Recovering is never a loss now; whether the member carries the hero's true maximum is the
+   designer's.
+
+### FOUND AT IF AND NOT FIXED — ITS CLOSED ITEMS (archived at IG; the section stays in `docs/state.md`)
+
+- **THE HOURGLASS's CAP** — `Run.restore_mana` refills 30% of the member's `max_mana`, a fixed 100, and stops there; a +20 node's bar
+  (120) recovers 30 and stops at 100, and `advance_zone`'s refill stops at 100 too. IF made the recovery never a loss; the true maximum
+  is IF's ruling 5.
+
+---
+
 ## ARCHIVED AT IF — 2026-10-13, FROM `docs/state.md` AS IE LEFT IT (`7c4f256`)
 
 **What came here**: IE's rulings, all five answered in IF's brief; and FOUND AT IE's Cracked Hourglass item (fixed at IF §0.1b — the

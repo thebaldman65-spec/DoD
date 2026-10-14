@@ -398,7 +398,7 @@ func _s4_the_chip(scene: Node, bm: BattleUnit) -> void:
 
 	bm.loyalty[kind] = point - 3
 	scene._stamp_loyalty_chip(bm, comp)
-	var below := String(comp.get_status("loyalty").get("desc", ""))
+	var below := String(comp.display_chip("loyalty").get("desc", ""))
 	ok(below.contains("CONVERTS at %d" % point),
 		"§4: the chip names the point BELOW it — the player learns the phase before reaching it")
 	ok(not below.contains("converted)"),
@@ -406,7 +406,7 @@ func _s4_the_chip(scene: Node, bm: BattleUnit) -> void:
 
 	bm.loyalty[kind] = point + 5
 	scene._stamp_loyalty_chip(bm, comp)
-	var above := String(comp.get_status("loyalty").get("desc", ""))
+	var above := String(comp.display_chip("loyalty").get("desc", ""))
 	ok(above.contains("(5 converted)"),
 		"§4: the chip counts the converted stacks ABOVE the point")
 	# AND THE STRIKE FIGURE ON THE CHIP MUST AGREE WITH THE BLOW. A chip still
@@ -419,7 +419,7 @@ func _s4_the_chip(scene: Node, bm: BattleUnit) -> void:
 		"§4: the chip's strike figure reads the PAID half (+%d%%)" % (step * point))
 	bm.loyalty[kind] = point
 	scene._stamp_loyalty_chip(bm, comp)
-	var at := String(comp.get_status("loyalty").get("desc", ""))
+	var at := String(comp.display_chip("loyalty").get("desc", ""))
 	ok(at.split("\n")[0] == above.split("\n")[0].replace(
 			"Loyalty %d" % (point + 5), "Loyalty %d" % point),
 		"§4: ...and it is the same figure at the point as five stacks past it")

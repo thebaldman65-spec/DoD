@@ -3105,7 +3105,7 @@ func _open_loadout_panel(idx: int) -> void:
 	box.add_child(title)
 
 	var note := Label.new()
-	note.text = "Benching costs nothing and a benched card is KEPT for the rest of the run.\nThe protected core can never be benched. Slots grow on every zone boss."
+	note.text = "Benching costs nothing and a benched card is KEPT for the rest of the run.\nThe starting kit can never be benched. Slots grow on every zone boss."
 	note.add_theme_font_size_override("font_size", 12)
 	note.add_theme_color_override("font_color", Color(0.6, 0.58, 0.55))
 	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -3164,8 +3164,8 @@ func _open_loadout_panel(idx: int) -> void:
 
 	# ══ BATCH IF §3 — THE KIT IN FOUR SECTIONS, IA §3's SHAPE (IE's ruling 4, the designer's) ══
 	#
-	# **THE SECTIONS ARE THE STATE**, as on the rune panel: CORE — the protected kit, never
-	# benched — ENABLERS — what his core runes bring, outside the slot count — CARRIED and
+	# **THE SECTIONS ARE THE STATE**, as on the rune panel: STARTING KIT (CORE until IG §3) — the
+	# protected kit, never benched — ENABLERS — what his core runes bring, outside the slot count — CARRIED and
 	# BENCHED, each with the head saying what every row under it is. So a carried card's row
 	# no longer leads with ✦ (✦ names a rune, never a card), and a kit row no longer carries
 	# CORE or ENABLER in a column of its own: a list sectioned by state that also prints the
@@ -3185,11 +3185,15 @@ func _open_loadout_panel(idx: int) -> void:
 			kit_core.append(String(pname))
 	var on_names: Array = earned.filter(func(n): return carried.has(n))
 	var off_names: Array = earned.filter(func(n): return not carried.has(n))
-	_pouch_head(rows, "CORE — never benched", Color(0.55, 0.62, 0.85))
+	# BATCH IG §3 — STARTING KIT, NEVER CORE (IF's ruling 4, the designer's): CORE names a core rune on the
+	# rune panel, the hero sheet and the kit preview, and one word may not name two kinds of thing on two
+	# panels. Not the bare KIT: the map card's own button counts this panel's starting cards AND its carried
+	# ones as the kit (`Kit n/m`), so KIT here would name the whole and one part of it.
+	_pouch_head(rows, "STARTING KIT — never benched", Color(0.55, 0.62, 0.85))
 	for pname in kit_core:
 		_loadout_kit_row(rows, String(pname))
 	if kit_core.is_empty():
-		_pouch_note(rows, "No core card.", Color(0.6, 0.57, 0.55), false)
+		_pouch_note(rows, "No card in the starting kit.", Color(0.6, 0.57, 0.55), false)
 	rows.add_child(HSeparator.new())
 	_pouch_head(rows, "ENABLERS — brought by a core rune", Color(0.55, 0.62, 0.85))
 	for pname in kit_enablers:

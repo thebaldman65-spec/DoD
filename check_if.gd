@@ -283,6 +283,18 @@ func _section(seq: Array, head_prefix: String) -> Dictionary:
 	return {"found": found, "rows": rows, "notes": notes}
 
 
+# Every Label under a node, in tree order (BATCH IG §3: the Kit panel's words read whole, the note above the sections too).
+func _labels(n: Node) -> Array:
+	var out: Array = []
+	if n == null:
+		return out
+	for c in n.get_children():
+		if c is Label and not c.is_queued_for_deletion():
+			out.append(c)
+		out.append_array(_labels(c))
+	return out
+
+
 func _row_names(sec: Dictionary) -> Array:
 	return (sec["rows"] as Array).map(func(r): return String(r[0]).get_slice(" — ", 0).get_slice("  (", 0))
 
@@ -663,7 +675,7 @@ func _s2_smoulder() -> void:
 # ── §3a — THE LOADOUT PANEL ───────────────────────────────────────────────────────
 
 func _s3a_the_loadout_panel() -> void:
-	print("\n§3a — the loadout panel: CORE, ENABLERS, CARRIED, BENCHED — the sections are the state")
+	print("\n§3a — the loadout panel: STARTING KIT, ENABLERS, CARRIED, BENCHED — the sections are the state")
 	_fresh_meta()
 	_new_run()
 	# The Mage holds his class's first engine; a card that sits out without the Cryomancer's engine is carried too.
@@ -697,23 +709,24 @@ func _s3a_the_loadout_panel() -> void:
 	var heads: Array = []
 	for e5 in seq:
 		var t5 := String(e5)
-		if t5.begins_with("CORE —") or t5.begins_with("ENABLERS —") or t5.begins_with("CARRIED —") or t5.begins_with("BENCHED —"):
+		# BATCH IG §3 — the kit's head is STARTING KIT (IF's ruling 4): CORE names a core rune.
+		if t5.begins_with("STARTING KIT —") or t5.begins_with("ENABLERS —") or t5.begins_with("CARRIED —") or t5.begins_with("BENCHED —"):
 			heads.append(t5.get_slice(" —", 0))
 	print("    heads %s, separators %d" % [heads, seq.count("<sep>")])
-	ok(heads == ["CORE", "ENABLERS", "CARRIED", "BENCHED"] and seq.count("<sep>") == 3,
-		"§3a: the panel's sections are not CORE, ENABLERS, CARRIED and BENCHED in that order, each separated: %s" % [seq])
+	ok(heads == ["STARTING KIT", "ENABLERS", "CARRIED", "BENCHED"] and seq.count("<sep>") == 3,
+		"§3a: the panel's sections are not STARTING KIT, ENABLERS, CARRIED and BENCHED in that order, each separated: %s" % [seq])
 	var enablers: Array = []
 	for pid in held:
 		enablers.append_array(Classes.engine_enablers(String(pid)))
 	var kit: Array = _run.opening_kit_names(m)
 	var core_want: Array = kit.filter(func(n): return not enablers.has(n))
 	var en_want: Array = kit.filter(func(n): return enablers.has(n))
-	var core := _section(seq, "CORE —")
+	var core := _section(seq, "STARTING KIT —")
 	var ens := _section(seq, "ENABLERS —")
 	var carried := _section(seq, "CARRIED —")
 	var benched := _section(seq, "BENCHED —")
 	ok(_row_names(core) == core_want and _row_names(ens) == en_want,
-		"§3a: CORE holds %s and ENABLERS %s — want the kit %s and its enablers %s" % [_row_names(core), _row_names(ens), core_want, en_want])
+		"§3a: STARTING KIT holds %s and ENABLERS %s — want the kit %s and its enablers %s" % [_row_names(core), _row_names(ens), core_want, en_want])
 	ok(_row_names(carried) == [on, sit] and _row_names(benched) == [off],
 		"§3a: CARRIED holds %s and BENCHED %s — want [%s, %s] and [%s]" % [_row_names(carried), _row_names(benched), on, sit, off])
 	var bench_btns: Array = (carried["rows"] as Array).map(func(r): return String(r[1]))
@@ -726,7 +739,7 @@ func _s3a_the_loadout_panel() -> void:
 	var marked: Array = []
 	for r4 in (core["rows"] as Array) + (ens["rows"] as Array) + (carried["rows"] as Array) + (benched["rows"] as Array):
 		var t := String(r4[0])
-		if t.contains(STAR) or t.begins_with("CORE") or t.begins_with("ENABLER") or t.contains("(carried)") or t.contains("(benched)"):
+		if t.contains(STAR) or t.begins_with("CORE") or t.begins_with("STARTING KIT") or t.begins_with("ENABLER") or t.contains("(carried)") or t.contains("(benched)"):
 			marked.append(t)
 	ok(marked.is_empty(), "§3a: a row states its state again beside its section's head: %s" % [marked])
 	# BENCH MOVES IT DOWN, read off the panel the press re-opens.
@@ -858,9 +871,15 @@ func _s3c_no_row_twice() -> void:
 		_run.hold_ability(m, String(earned[1]), false)
 	var mp: Node = await _to_map()
 	var words := [STAR, "(held)", "(in the bag)", "(carried)", "(benched)", "(worn)"]
-	var heads := ["CORE", "ENABLER", "WORN", "HELD", "CARRIED", "BENCHED", "THE CREST", "IN THE BAG"]
+	var heads := ["CORE", "STARTING KIT", "ENABLER", "WORN", "HELD", "CARRIED", "BENCHED", "THE CREST", "IN THE BAG"]
 	var swept := 0
 	var twice: Array = []
+	# BATCH IG §3 — ONE WORD, ONE KIND OF THING, ON EVERY PANEL (IF's ruling 4, the designer's). Each panel's section
+	# heads are read off the real screen with the kind of thing its rows list: the rune panel and the crest's bag list
+	# runes, the Kit panel lists cards. No head word may stand over runes on one panel and cards on another, CORE
+	# heads a section of core runes and nothing else, and every *core* the Kit panel prints names a core rune.
+	var head_kinds := {}
+	var kit_core_words: Array = []
 	for which in ["_open_rune_panel", "_open_loadout_panel", "_open_bag_panel"]:
 		_close_overlays(mp)
 		await Gate.frames(self, 2)
@@ -869,7 +888,26 @@ func _s3c_no_row_twice() -> void:
 		else:
 			mp.call(which, 0)
 		await Gate.frames(self, 3)
-		for e in _sequence(Gate.overlay(mp, 60)):
+		var kind := "card" if which == "_open_loadout_panel" else "rune"
+		var ov := Gate.overlay(mp, 60)
+		for e0 in _sequence(ov):
+			var t0 := String(e0)
+			if t0 == "<sep>" or t0.begins_with("row:"):
+				continue
+			var word := t0.get_slice(" —", 0).strip_edges()
+			if word == word.to_upper() and word.length() >= 3 and word.to_lower() != word:
+				if not head_kinds.has(word):
+					head_kinds[word] = {}
+				head_kinds[word]["%s:%s" % [kind, which]] = true
+		if which == "_open_loadout_panel":
+			for lb in _labels(ov):
+				var lt := String((lb as Label).text).to_lower().replace("\n", " ")
+				var at := lt.find("core")
+				while at >= 0:
+					if not lt.substr(at, 9).begins_with("core rune"):
+						kit_core_words.append(String((lb as Label).text).left(70))
+					at = lt.find("core", at + 4)
+		for e in _sequence(ov):
 			if not String(e).begins_with("row:"):
 				continue
 			swept += 1
@@ -885,6 +923,19 @@ func _s3c_no_row_twice() -> void:
 	print("    CHECKED %d rows across the three panels" % swept)
 	ok(swept >= 10, "§3c: the sweep read %d rows — the panels were not dressed" % swept)
 	ok(twice.is_empty(), "§3c: a row states the state its section's head already gives: %s" % [twice])
+	var two_kinds: Array = []
+	for w2 in head_kinds:
+		var kinds := {}
+		for k2 in head_kinds[w2]:
+			kinds[String(k2).get_slice(":", 0)] = true
+		if kinds.size() > 1:
+			two_kinds.append("%s: %s" % [w2, str(head_kinds[w2].keys())])
+	print("    CHECKED %d head words across the three panels: %s" % [head_kinds.size(), str(head_kinds.keys())])
+	ok(head_kinds.size() >= 6, "§3c: the head walk read %d head words — the panels were not drawn" % head_kinds.size())
+	ok(two_kinds.is_empty(), "§3c: one head word names a rune on one panel and a card on another: %s" % [two_kinds])
+	ok(head_kinds.has("CORE") and (head_kinds["CORE"] as Dictionary).keys() == ["rune:_open_rune_panel"],
+		"§3c: CORE does not head the rune panel's core runes alone: %s" % [head_kinds.get("CORE", {})])
+	ok(kit_core_words.is_empty(), "§3c: the Kit panel prints *core* for something that is not a core rune: %s" % [kit_core_words])
 
 
 # ── §4 — THE CRACKED HOURGLASS ────────────────────────────────────────────────────
@@ -923,11 +974,24 @@ func _s4_the_hourglass() -> void:
 		"§4: the Mage and the Cleric did not recover %d (%s)" % [gain, got])
 	ok(int(got.get("hunter", -1)) == 20 + gain, "§4: the Hunter, who holds Mana, did not recover %d (%d) — the relic's card says every hero" % [gain, int(got.get("hunter", -1))])
 	ok(int(got.get("warrior", -1)) == 0, "§4: the Warrior's member gained Mana he does not hold (%d)" % int(got.get("warrior", -1)))
-	# A BAR ABOVE THE CAP IS NOT CUT: a +20 bar at 110 stays 110; one at 70 of 120 is raised to the member's cap.
+	# BATCH IG §4 — A +20 BAR IS RESTORED AGAINST ITS OWN 120, NOT CUT AT THE MEMBER's OLD FIXED 100: the victory writes
+	# the bar's true maximum onto the member before the relic reads it, so 110 of 120 rises to 120 and 70 of 120 gains
+	# 30% of 120 (it read 110 → 110 and 70 → 100 while the member's maximum was a fixed 100).
+	var gain2 := int(120 * pct)
 	var got2 := await _victory_with_hourglass({"mage": [110, 120], "cleric": [70, 120]})
-	print("    from 110 of 120 and 70 of 120: %s" % [got2])
-	ok(int(got2.get("mage", -1)) == 110, "§4: the relic cut a bar above the member's cap (110 -> %d) — recovering is never a loss" % int(got2.get("mage", -1)))
-	ok(int(got2.get("cleric", -1)) == 100, "§4: the positive arm — a bar below the cap is raised to it (70 -> %d)" % int(got2.get("cleric", -1)))
+	print("    from 110 of 120 and 70 of 120: %s (the recovery %d of 120)" % [got2, gain2])
+	ok(int(got2.get("mage", -1)) == mini(110 + gain2, 120), "§4: a +20 bar at 110 did not rise to its own 120 (110 -> %d)" % int(got2.get("mage", -1)))
+	ok(int(got2.get("cleric", -1)) == 70 + gain2, "§4: a +20 bar at 70 did not recover %d of its own 120 (70 -> %d)" % [gain2, int(got2.get("cleric", -1))])
+	# AND RECOVERING IS STILL NEVER A LOSS: a bar a door carries past the member's maximum is left where it stands.
+	var mg: Dictionary = _run.party[1]
+	var was_mana := int(mg["mana"])
+	var was_max := int(mg["max_mana"])
+	mg["max_mana"] = 120
+	mg["mana"] = 130
+	_run.restore_mana(pct)
+	ok(int(mg["mana"]) == 130, "§4: the relic cut a bar above the member's maximum (130 -> %d) — recovering is never a loss" % int(mg["mana"]))
+	mg["mana"] = was_mana
+	mg["max_mana"] = was_max
 
 
 # ── §9 ───────────────────────────────────────────────────────────────────────────

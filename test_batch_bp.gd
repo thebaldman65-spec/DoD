@@ -847,7 +847,7 @@ func _live_swordmaster_feint() -> void:
 			before, untouched.hp])
 	ok(sm.feint_guards == 2,
 		"§3: ...it banks 2 charges (got %d)" % sm.feint_guards)
-	ok(sm.has_status("feint_guard"),
+	ok(sm.has_display_chip("feint_guard"),
 		"§3: ...with a chip that says so")
 	ok(sm.stance == "aggressive", "§3: ...and it switches the stance too")
 	# THE CHARGES WAIT UNTIL SPENT, not for a number of turns.
@@ -881,7 +881,7 @@ func _live_swordmaster_feint() -> void:
 	await scene.call("_resolve", striker, enemy_basic, sm, "good")
 	ok(sm.feint_guards == 0,
 		"§3: the second charge answers as well (got %d)" % sm.feint_guards)
-	ok(not sm.has_status("feint_guard"),
+	ok(not sm.has_display_chip("feint_guard"),
 		"§3: ...and the chip goes with the last of them")
 	var sm_hp2: int = sm.hp
 	await scene.call("_resolve", striker, enemy_basic, sm, "good")
@@ -894,7 +894,7 @@ func _live_swordmaster_feint() -> void:
 	sm.feint_guards = 1
 	scene.call("_stamp_feint_chip", sm)
 	sm.banked_guards = 1
-	sm.update_status("waiting_guard", "1", "Banked Guards: 1")
+	sm.update_display_chip("waiting_guard", "1", "Banked Guards: 1")
 	await scene.call("_resolve", striker, enemy_basic, sm, "good")
 	ok(sm.banked_guards == 0 and sm.feint_guards == 1,
 		"§3: WAITING GUARD SPENDS FIRST — the free bank goes before the paid charge (wg=%d, feint=%d)" % [

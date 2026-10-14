@@ -232,7 +232,7 @@ func _neutral(scene: Node) -> void:
 		# never falls on its own — so a measurement arm that did not clear it
 		# would carry the previous arm's stacks into this one's control.
 		u.faith_peak = 0
-		u.remove_status("faith")
+		u.remove_display_chip("faith")
 		u.purge_debuffs()
 
 
@@ -483,15 +483,15 @@ func _live_release_still_consumes() -> void:
 	# release now, so a chip that vanished would hide a live benefit — the
 	# player would see nothing on the bar and still be taking 10% less damage.
 	# The chip therefore STAYS, at zero stacks, stating the peak.
-	ok(ally.has_status("faith"),
+	ok(ally.has_display_chip("faith"),
 		"§2/BI: ...and the chip STAYS, because the peak keeps paying")
 	# BATCH HU §4 — RE-POINTED, THE QUESTION UNCHANGED: Faith's counter reads `Fa` before its
 	# count now, because Burn's chip is `F` and a burning hero carrying Faith showed `F` beside
 	# `F3` — the sweep the designer asked for past the two shared tags found it. The chip still
 	# shows the count.
-	ok(String(ally.get_status("faith").get("short", "")) == "Fa0",
+	ok(String(ally.display_chip("faith").get("short", "")) == "Fa0",
 		"§2/BI: ...showing a count of zero (got \"%s\")" % \
-			String(ally.get_status("faith").get("short", "")))
+			String(ally.display_chip("faith").get("short", "")))
 	ok(_stat_of(scene, "faith_releases") == 1.0,
 		"§2: one release banked, not a stream (%.0f)" % _stat_of(scene, "faith_releases"))
 	# And the stream itself: under the old node, five further gains meant five
@@ -538,7 +538,7 @@ func _live_the_chip_states_the_doubled_numbers() -> void:
 	# cleared with the count or a previous test's peak would be rendered here.
 	ally.faith_peak = 0
 	scene.call("_gain_faith", ally, HELD_MAX, "absorb")
-	var s: Dictionary = ally.get_status("faith")
+	var s: Dictionary = ally.display_chip("faith")
 	var desc := String(s.get("desc", ""))
 	ok(desc.contains("%d%% damage mitigation" % (BASE_MITIGATION * APOSTLE_MULT * HELD_MAX)),
 		"§2: the chip at two stacks reads its doubled mitigation (got \"%s\")" % desc)
@@ -554,7 +554,7 @@ func _live_the_chip_states_the_doubled_numbers() -> void:
 	ally.faith_stacks = 0
 	ally.faith_peak = 0
 	scene.call("_gain_faith", ally, HELD_MAX, "absorb")
-	desc = String(ally.get_status("faith").get("desc", ""))
+	desc = String(ally.display_chip("faith").get("desc", ""))
 	ok(desc.contains("%d%% damage mitigation" % (BASE_MITIGATION * HELD_MAX)),
 		"§2: without Apostle the same chip reads the undoubled rate (got \"%s\")" % desc)
 	await _kill(scene)
@@ -594,7 +594,7 @@ func _live_communion_still_rolls_for_the_carrier() -> void:
 	for _i in TRIALS:
 		for h in heroes:
 			h.faith_stacks = 0
-			h.remove_status("faith")
+			h.remove_display_chip("faith")
 			h.hp = h.max_hp
 		ally.faith_stacks = 2
 		war.faith_stacks = 0

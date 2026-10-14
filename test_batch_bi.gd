@@ -212,7 +212,7 @@ func _neutral(scene: Node) -> void:
 		u.second_resource = 0
 		u.faith_stacks = 0
 		u.faith_peak = 0
-		u.remove_status("faith")
+		u.remove_display_chip("faith")
 		u.remove_status("cons_ground")
 		u.purge_debuffs()
 
@@ -489,7 +489,7 @@ func _live_the_peak_survives_a_release() -> void:
 		"§1: ...the COUNT resets to zero (left at %d)" % ally.faith_stacks)
 	ok(ally.faith_peak == RELEASE,
 		"§1: ...and the PEAK does not fall with it (reads %d)" % ally.faith_peak)
-	ok(ally.has_status("faith"),
+	ok(ally.has_display_chip("faith"),
 		"§1: ...and the chip stays up, because the peak still pays")
 	_report.append("release: count %d, peak %d" % [ally.faith_stacks, ally.faith_peak])
 	await _kill(scene)
@@ -555,7 +555,7 @@ func _live_the_peak_resets_at_battle_start() -> void:
 	for h in scene.get("heroes"):
 		peaks += h.faith_peak
 		counts += h.faith_stacks
-		if h.has_status("faith"):
+		if h.has_display_chip("faith"):
 			peaks += 100
 	ok(peaks == 0,
 		"§1: NEGATIVE CONTROL — no peak survives the battle boundary (sum %d)" % peaks)

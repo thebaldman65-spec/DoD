@@ -16,6 +16,46 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-13 &mdash; Batch IG: EVERY CHIP, AND SANCTITY</h2>
+<p><b>Every chip on a nameplate that shows a figure the hero holds is drawn, not laid as a status</b>, so a Hierophant's Sanctity
+counts statuses and nothing else; <b>Sanctity's step moves from 16 to 13</b> to bring him back to about half its cap by a normal
+fight's end on the honest count; <b>the Kit panel's first section reads STARTING KIT</b>, because CORE means a core rune; and
+<b>A Bigger Resource Pool's twenty points are kept between fights</b>. IF's five questions were answered. Full working:
+<code>docs/reports/IG.md</code>. The next letter is IH.</p>
+
+<p><b>&sect;0 &mdash; IF's FIVE QUESTIONS, ANSWERED (the designer's).</b> The designer plays one zone and sends the file. The
+Cleric's rate stays 12. Smoulder's three figures stand. The Kit panel's heads stand but CORE, which is a core rune's word. The
+member carries the hero's true maximum.</p>
+
+<p><b>&sect;1 &mdash; EVERY DISPLAY CHIP.</b> Nineteen chips were laid as statuses though nothing read them as one &mdash; each showed a
+figure the hero already held (his Iron Will, his Faith, his banked Berserk strikes, his companion's Loyalty, and ten no run
+reaches any more). Each was a Sanctity event arriving and leaving and a float that spent a die. They are drawn now, after the core
+rune's &#9733; chip and before the statuses: nothing ticks one down, no cleanse or Dispel takes one, nothing that counts statuses
+counts one, and a body that falls takes its chips with it. Faith stays on the ally who holds it and Loyalty on the companion.
+<b>Every status the game still lays directly is one the game reads back for what it pays</b>, and a check now says so.</p>
+
+<p><b>&sect;2 &mdash; SANCTITY's STEP, 16 &rarr; 13.</b> Read on the Hierophant beside the default lineages, untalented, rung 1,
+sixty runs a party: a normal fight's end reads 2.58 steps of the 5 at 13 (2.06 at 16 on the honest count, 2.14 at 16 before it).
+A boss fight reaches the cap in about four in ten (about two in ten at 16), so a boss could already max the ladder and now does
+it more often. The designer's play confirms it: the readout carries his steps a fight.</p>
+
+<p><b>&sect;3 &mdash; STARTING KIT.</b> The Kit panel's first section read CORE, and CORE is a core rune on the rune panel, the hero
+sheet and the kit preview. It reads <b>STARTING KIT &mdash; never benched</b> now, and the note above it says <i>the starting kit
+can never be benched</i>. The bare KIT was looked at on the screen and not taken: the map card's own <i>Kit n/m</i> button counts
+the starting cards and the carried ones together.</p>
+
+<p><b>&sect;4 &mdash; THE NODE's TWENTY POINTS ARE KEPT.</b> A hero's Mana maximum between fights was a fixed 100, so a hero holding
+<i>A Bigger Resource Pool</i> reached 120 inside a fight and was clipped at every door after it. From his first fight's end the
+maximum his bar was built to rides with him: the Cracked Hourglass restores 30% of it, a new zone refills him to it, and a potion
+on the map and an event read it. A hero with no node &mdash; the designer's own profile buys none &mdash; reads 100 through every
+one of them. The save already carried the figure, so no save version moved.</p>
+
+<p><b>The checks.</b> A new check, <code>check_ig</code>, sweeps every status the game lays directly and holds each to a named
+effect or the status door, drives the chips through their real writers &mdash; Faith released on three allies in one turn among
+them &mdash; and shows none is a status, an event or a float; pins Sanctity's step in one place; and drives the member's maximum
+with the node and without it. <code>check_if</code> reads every panel's heads and fails on a word heading runes on one panel and
+cards on another. The checks that read a chip as a status read it where it is drawn now.</p>
+
 <h2>2026-10-13 &mdash; Batch IF: THE READOUT, A CARD, AND TWO PANELS</h2>
 <p><b>The game now writes a playtest readout</b> &mdash; one file a run, beside the save, that records what each fight did &mdash;
 so one zone of the designer's own play can answer five questions the sim cannot. <b>Smoulder</b>, the designer's card, joins the

@@ -215,7 +215,7 @@ func _neutral(scene: Node) -> void:
 		# BATCH BI §1: the damage sites read the PEAK, which never falls on its
 		# own — an arm that left it set would carry into the next arm's control.
 		u.faith_peak = 0
-		u.remove_status("faith")
+		u.remove_display_chip("faith")
 		u.remove_status("cons_ground")
 		u.purge_debuffs()
 
@@ -907,10 +907,10 @@ func _live_his_own_faith_never_releases() -> void:
 	ok(dv.max_hp == hp_before,
 		"§2: ...so Conviction's principal never grows off his own meter (%d -> %d)"
 			% [hp_before, dv.max_hp])
-	ok(dv.has_status("faith"),
+	ok(dv.has_display_chip("faith"),
 		"§2: ...and the chip is there, showing what he holds")
 	var chip_desc := ""
-	for s in dv.statuses:
+	for s in dv.display_chips:
 		if s.id == "faith":
 			chip_desc = String(s.get("desc", ""))
 	ok(chip_desc.to_lower().contains("never releases"),
@@ -943,7 +943,7 @@ func _live_an_ally_release_resets_to_zero() -> void:
 	# BATCH BI §1 INVERTED THIS, as it did BG's identical check. The COUNT goes
 	# to zero; the PEAK does not, and it keeps paying — so a chip that vanished
 	# would hide a live benefit rather than report an empty meter.
-	ok(ally.has_status("faith"),
+	ok(ally.has_display_chip("faith"),
 		"§2/BI: ...and the chip STAYS, at zero stacks, because the peak pays on")
 	ok(ally.faith_peak == RELEASE,
 		"§2/BI: ...with the peak standing at the threshold (reads %d)" % ally.faith_peak)

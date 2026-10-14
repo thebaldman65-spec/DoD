@@ -939,9 +939,9 @@ func _live_berserk() -> void:
 	ok(bz.berserk_strikes == BERSERK_STRIKES_TEST,
 		"Berserk banks %d strikes (got %d)" % [
 			BERSERK_STRIKES_TEST, bz.berserk_strikes])
-	ok(bz.has_status("berserk"),
+	ok(bz.has_display_chip("berserk"),
 		"and the bank wears a chip, so the player can see what is owed")
-	ok(bz.status_power("berserk") == BERSERK_STRIKES_TEST,
+	ok(int(bz.display_chip("berserk").get("power", -1)) == BERSERK_STRIKES_TEST,
 		"the chip's power IS the count — one place writes it")
 	ok(bz.has_status("berserk_risk")
 		and bz.status_power("berserk_risk") == BERSERK_RISK_PCT_TEST,
@@ -967,7 +967,7 @@ func _live_berserk() -> void:
 		ok(bz.berserk_strikes == BERSERK_STRIKES_TEST - 3,
 			"a THREE-HIT ability spends exactly three charges, %d -> %d (got %d)" % [
 				BERSERK_STRIKES_TEST, BERSERK_STRIKES_TEST - 3, bz.berserk_strikes])
-		ok(bz.has_status("berserk"),
+		ok(bz.has_display_chip("berserk"),
 			"and the chip stands while a charge is left")
 	# THE TWO CLOCKS ARE SEPARATE. Aged past the 3-turn window, the RISK is gone
 	# and any unspent CHARGES stand — a single-status version fails one of these
@@ -986,7 +986,7 @@ func _live_berserk() -> void:
 		bz.tick_statuses()
 	ok(not bz.has_status("berserk_risk"),
 		"the 30% risk expires on its own 3-turn clock")
-	ok(bz.berserk_strikes == banked and banked > 0 and bz.has_status("berserk"),
+	ok(bz.berserk_strikes == banked and banked > 0 and bz.has_display_chip("berserk"),
 		"while the CHARGES survive the same ticks — they wait until spent (%d, still %d)"
 			% [banked, bz.berserk_strikes])
 	# THE RISK IS REAL DAMAGE TAKEN. Amplified, ratio with open ground.

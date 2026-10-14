@@ -2210,9 +2210,13 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
     in the fiction**, and Sanctity claims to count statuses. **The engine chips (★) are drawn so since IE §2a** — one a
     held engine, in `BattleUnit.engine_chips` (`set_engine_chip`, read by `engine_chip`), first in the plate's row;
     nothing ticks, dispels or counts them, and they book no Sanctity event and float no die. Up to twelve of them had
-    fed a Hierophant before anyone acted. **Every other display chip still laid through the status door is IE's kept
-    census** (`docs/reports/IE.md` §2: the sweep's rule, command and output), owed the same answer chip by chip;
-    `check_ie` §2 drives the engine chips and prints the sweep.
+    fed a Hierophant before anyone acted; `check_ie` §2 drives them. **AND SINCE IG §1 EVERY DISPLAY CHIP IS DRAWN SO (IF's
+    ruling 5, the designer's)** — the nineteen of IE's kept census (`docs/reports/IE.md` §2), nine a run reaches and ten
+    dormant, in `BattleUnit.display_chips` (`set_display_chip`, read by `display_chip`), between the engine chips and the
+    statuses on the row: each draws a payout a unit field holds, so nothing ticks, dispels, purges or counts one, none
+    books a Sanctity event or floats a label, and a body that dies takes them with it. **Every `add_status` left in the
+    game is the status door's or one of fifteen named EFFECTS a line reads back for its payout** (`check_ig` §1a), so a
+    literal call nobody sorted reds: **a new chip is drawn by `set_display_chip`, never laid through the status door.**
   · **THE VOW'S CHIP SAYS WHAT IT SILENCES THAT HE HOLDS (ID §4)** — his ground's reflect, the Ruin draught his blows would
     drink, Suffering's heal — each named only while he holds what pays it, the heal figure read off his payload; IN EFFECT
     while one is live (his ground laid, a Ruined enemy standing), ARMED otherwise.
@@ -2604,6 +2608,11 @@ UNDER WHICH IT IS RE-READ (FV §2, §3).**
   IT IN THE SAME BATCH.** `SANCTITY_PER_STEP` puts the three Cleric parties near half the cap with
   duration as the only payout; once potency exists a step buys more on every application that
   carries a magnitude, and a rate left alone would be set against a payout that no longer exists.
+  **IG §2 re-set it on the honest count**: FV's reading was taken while display chips were statuses (a talent's chip on
+  four heroes at every spawn, a companion's at every call), so with every chip drawn (IG §1) the same population — a
+  Hierophant beside the default lineages, untalented, rung 1, a normal fight's end — was read again and the step moved
+  back to FV's target, about half the cap. The figures are in IG's report (§2) and the handle is in `docs/state.md`;
+  the designer's play confirms it, and the readout carries his steps a fight.
   **And the potency half is worth almost nothing to two of the three Clerics until two things change
   that are not rates**: the Devout's Divine Shield barrier is applied WITHOUT a `src`, so no payout
   keyed on the applier can reach it, and the Occultist's Ruin is battle-long and carries no magnitude
@@ -3818,7 +3827,7 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
     ✦ count stays — the map's one glance at a holding, outside the panel. A rune moved by Equip, Unequip or Swap
     re-opens the panel in its new section. **The crest's bag is sectioned the same way since IF §3** — THE CREST (its one
     slot, drawn when empty) then IN THE BAG (each rune once, a crest rune's Equip beside its Drop) — and so is the map's
-    Kit panel (CORE, ENABLERS, CARRIED, BENCHED); `check_if` §3 drives both. **AN EMPTY
+    Kit panel (STARTING KIT, ENABLERS, CARRIED, BENCHED — CORE until IG §3); `check_if` §3 drives both. **AN EMPTY
     CORE SLOT IS A ROW, SO FEWER SLOTTED IS TALLER**: the panel is longest with every slot empty and the holding full,
     and a hero holding his six with a slot empty can scroll — GT §1's scroll, Close pinned, RULED at IB §0.1 (GT §1's
     block); `check_gt` §1 walks every slot count. **An empty slot's row reads *— empty —* (IB §0.3): a row does not
@@ -4398,7 +4407,13 @@ fact that they are.
   and both marks went with the sections. THE RULE IS FINISHED — NO PANEL IN THE GAME STATES A ROW'S STATE TWICE** (IA the
   rune panel, IE the hero sheet's worn row, IF the last two); `check_if` §3c sweeps the three sectioned panels' rows for a
   state the head already gives, and `check_id` §3a holds ✦ to the four rune lines. A new panel listing things by state is
-  sectioned by it from the start.
+  sectioned by it from the start. **AND NO WORD NAMES TWO KINDS OF THING ON TWO PANELS (IG §3, IF's ruling 4, the
+  designer's): CORE IS A CORE RUNE WHEREVER IT APPEARS** — the rune panel's section, the hero sheet's and the kit
+  preview's state column — so the Kit panel's first section is STARTING KIT, the cards he opened with against the ones he
+  earned. The bare KIT was weighed on the real screen and not taken: the map card's own *Kit n/m* button counts the
+  starting cards and the carried ones, so KIT would name the whole and one part of it, above CARRIED's Bench buttons.
+  `check_if` §3c reads every panel's heads with the kind of thing each lists, and reds on a word heading runes on one
+  panel and cards on another, on CORE heading anything but core runes, and on a *core* the Kit panel prints for a card.
 - **THE CREST RUNE STAYS OUT OF A HERO'S PICK (HW §1c), AND A SCREEN A HERO IS WHERE IT WOULD QUIETLY RE-MERGE**: the
   RUNES section draws `Run.rune_choice`, which repairs a crest rune out of a queued triple, and the crest's bag is not
   touched by a hero's answer (`check_ib` §2d).

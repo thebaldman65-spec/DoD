@@ -319,7 +319,7 @@ func _live_three_springs_then_nothing() -> void:
 				sprung += 1
 		ok(sprung == 4, "exactly four springs, then nothing (read %d)" % sprung)
 		ok(sv.deadfall_armed == 0, "the charges are spent")
-		ok(not sv.has_status("deadfall"), "and the chip is gone with them")
+		ok(not sv.has_display_chip("deadfall"), "and the chip is gone with them")
 		_report.append("springs from one ordinary cast: %d" % sprung)
 	await _kill(scene)
 	_live_ran += 1
@@ -526,12 +526,12 @@ func _live_chip_shows_charges_and_rest() -> void:
 	var foe: BattleUnit = scene.get("enemies")[0]
 	if sv != null:
 		await _arm(scene, sv)
-		var ready_txt := String(sv.get_status("deadfall").get("short", ""))
+		var ready_txt := String(sv.display_chip("deadfall").get("short", ""))
 		ok(ready_txt == "DF4",
 			"armed and ready reads the charge count (reads '%s')" % ready_txt)
 		foe.hp = foe.max_hp
 		scene.call("_deadfall_tick", foe)
-		var st: Dictionary = sv.get_status("deadfall")
+		var st: Dictionary = sv.display_chip("deadfall")
 		var rest_txt := String(st.get("short", ""))
 		# Three charges left, two turns of rest — the chip has to carry both.
 		ok(rest_txt == "DF3\u00b72",
