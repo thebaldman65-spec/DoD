@@ -31,8 +31,8 @@ played. Nothing needs switching on. Five rulings come off it.
    Peddler is no draft source (FD §1), so it reads *a card is drafted after an elite or at an event* now — confirm the words.
 5. **THE HOURGLASS's CAP (FOUND AT IF)** — it restores 30% of the member's `max_mana`, a fixed 100, and stops at 100: a hero carried to a
    120 bar by a node recovers 30 and is capped at 100 (and a new zone refills him to 100). IF made recovering never a loss; whether the
-   member should carry the hero's true maximum is a magnitude, so it is yours. The designer's own profile buys no node, so his bars are
-   100 and the cap never reaches him.
+   member should carry the hero's true maximum is a magnitude, so it is yours. The designer's own profile buys no node, so their heroes' bars are
+   100 and the cap never reaches them.
 
 ## THE BRIEF'S PREMISES, CHECKED
 
@@ -124,8 +124,8 @@ Not a screen — no panel, no toast; the deliverable is the file. **It does not 
 
 **On by default in the designer's own game, harmless, and off in every other process.** The decision is `Readout.wanted(env, active,
 player)` — FI's split, assertable both ways: the player's process is the one whose save path is the player's (`Run._init`'s redirect),
-so every `--script` gate, every scene target, every sim and every probe reads *off*. **`DOD_READOUT=0` turns it off** in his game;
-`DOD_READOUT=1` turns it on in a harness, which writes `user://readout_harness/`, never his folder (`check_if` removes its own).
+so every `--script` gate, every scene target, every sim and every probe reads *off*. **`DOD_READOUT=0` turns it off** in the designer's game;
+`DOD_READOUT=1` turns it on in a harness, which writes `user://readout_harness/`, never the player's folder (`check_if` removes its own).
 
 ### §1d — IT MOVES NOTHING — THE PASS CONDITION, DRIVEN
 
@@ -435,4 +435,4 @@ reads every label in a row now (joined by ` ¦ `); C16 reads 80 / 3 on the repai
 
 ### §8h — THE CLOSE
 
-**The post-run lines** — `docs/state.md`'s verification line and its two readings — were written after the run, the second at a fixed point (the file states its own size: 351,983 B). **Their needle proof**: every gate literal against the copy the battery read and the final file — **no flip** among 20,393. **The four gates that open `docs/state.md` and the two manifest instruments, re-run on the final tree in an isolated copy** (*Dawn of Decay IF final*): `check_es` 57 / 0, `check_fg` 30 / 0, `check_hp` 171 / 0, `check_hx` 39 / 0, `check_ec` 24 / 0, `check_ed` 18 / 0 — each at its acceptance reading. **The player's four files, re-read at the close**: byte-identical to `../save-backups/IF-20261013-152812` by md5, `run_save.bin` 42,200 B last written 2026-10-08 09:23 — **nothing has been played for ten batches**, so the readout has not yet run in the designer's game and their folder holds no readout. **This report was written last**, out of the scratchpad, with no template token left. The push and its `ls-remote` check follow the commit that carries it.
+**The post-run lines** — `docs/state.md`'s verification line and its two readings — were written after the run, the second at a fixed point (the file states its own size: 351,983 B). **Their needle proof**: every gate literal against the copy the battery read and the final file — **no flip** among 20,393. **The four gates that open `docs/state.md` and the two manifest instruments, re-run on the final tree in an isolated copy** (*Dawn of Decay IF final*): `check_es` 57 / 0, `check_fg` 30 / 0, `check_hp` 171 / 0, `check_hx` 39 / 0, `check_ec` 24 / 0, `check_ed` 18 / 0 — each at its acceptance reading. **The player's four files, re-read at the close**: byte-identical to `../save-backups/IF-20261013-152812` by md5, `run_save.bin` 42,200 B last written 2026-10-08 09:23 — **nothing has been played for ten batches**, so the readout has not yet run in the designer's game and their folder holds no readout. **This report was written last**, out of the scratchpad, with no template token left. The push and its `ls-remote` check follow the commit that carries it. **After the first push** (`661183d`), two sentences in `docs/design-notes.md` and three in this report that gave the designer a pronoun were re-worded; the needle proof over `design-notes.md` read no flip among 20,393 literals, and the six gates that open it (`check_es` 57, `check_ec` 24, `check_fr` 25, `test_batch_bn` 80, `test_batch_bs` 246, `test_batch_ce` 931) re-ran on a clone proved equal to the tree, each 0 failures at its acceptance reading.

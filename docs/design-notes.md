@@ -17,9 +17,9 @@ engine chips were decoration that spent a die at every spawn and moved three gat
 null test, the readout names no autoload and writes nothing the game reads, and the proof is a run, not an argument: one seeded zone
 played twice, the readout on and off, compared save by save, log line by log line and die by die.
 
-**Why it is on in the designer's game and off everywhere else.** A readout he has to remember to enable is a readout that will be
+**Why it is on in the designer's game and off everywhere else.** A readout the designer has to remember to enable is a readout that will be
 off. The decision rides the one fact that already tells the player's process from a test's — the save path — so no check and no sim
-writes a file into his folder, and a harness that asks for it writes its own folder.
+writes a file into the player's folder, and a harness that asks for it writes its own folder.
 
 **Why Smoulder buys the Burn and not the hit.** IE's repairs left a draft of every Burn reader with no applier just short of having
 Burn standing on most of its turns, and Pyroblast could not be the answer — a card that supplies its own prerequisite has none. So
