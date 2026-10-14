@@ -370,7 +370,12 @@ const SPEC_DRAFT_POOLS := {
 		# BATCH GS §1 — OUT OF THE OPENING KIT: the engine brings Flamewave and
 		# nothing else. Fireball was the lineage's Magic Bolt and is a free attack
 		# drafted beside it now (`basic_override_ability`).
-		"Fireball", "Detonation", "Wildfire"],
+		"Fireball", "Detonation", "Wildfire",
+		# BATCH IF §2 — the second Burn applier a draft without Overburn reaches when
+		# Fireball does not come; authored on this shelf because it is a fire card (the
+		# class-wide shelf's rule keeps a lineage's element off it), drawn by every Mage
+		# because the pool is one (GP) and no `ENGINE_READ` row gates it.
+		"Smoulder"],
 	# BATCH DR — FLASH FREEZE IS RETIRED. DQ's Finding 1: comments and cosmetics
 	# stripped, its handler and Glacial Prison's were the same three steps in the
 	# same order, and Glacial Prison is cheaper (25 v 30), shorter on cooldown
@@ -548,8 +553,10 @@ const SPEC_DRAFT_POOLS := {
 # `test_batch_cd.PER_CLASS_DEPTH` — for the same reason the spec half became
 # one at DO. **DO NOT WRITE `4 * 6` AGAIN.**
 #
-# **THE DRAFT IS 179 AS OF BATCH HB (159 spec + 20 class-wide), AND NOTHING IS
-# OWED.** HB §2 put Tripwire on the Survivalist's shelf when Summon Companion
+# **THE DRAFT IS 179 AS OF BATCH IF (159 spec + 20 class-wide), AND NOTHING IS
+# OWED.** IF §2 put Smoulder, the designer's card, on the Pyromancer's shelf; it
+# was 178 from HL §1, when Guard Change began travelling with the Stances again;
+# HB §2 put Tripwire on the Survivalist's shelf when Summon Companion
 # took its class-kit slot; it was 178 at GS (158 + 20), when GS §1 put the 29
 # cards that stopped travelling with an engine on their
 # lineages' shelves, none of them authored; it was 149 of 149 at GN (129 + 20).
@@ -667,17 +674,18 @@ const CLASS_DRAFT_POOLS := {
 # channel reads which. THE MERGE JOINED THE DRAFT'S TWO, NOT THE GAME'S THREE.
 #
 # **THE DEPTHS, DERIVED** (`check_gp` §1 derives them again every battery, and
-# no figure here is authored twice): Warrior 43, Mage 51, Cleric 43, Hunter 42
+# no figure here is authored twice): Warrior 42, Mage 52, Cleric 43, Hunter 42
 # — 179, which is `SPEC_DRAFT_POOLS`' 159 plus `CLASS_DRAFT_POOLS`' 20 with no
 # card in both. **GP's merge made them 38 / 41 / 34 / 36 and GS §1 added the 29
 # cards that stopped travelling with an engine** — 5 / 10 / 9 / 5 — each on the
 # shelf of the lineage that opened with it; **HB §2 added Tripwire to the
-# Hunter's** when it left his class kit. A hero drew from 13 to 18 before the
+# Hunter's** when it left his class kit; HL §1 took Guard Change off the
+# Warrior's (it travels with the Stances); **IF §2 added Smoulder to the Mage's**. A hero drew from 13 to 18 before the
 # merge (his lineage's shelf plus his class's) and a spine-taker from 3 to 6.
 # **AND WHAT HE CAN BE OFFERED IS NARROWER THAN THE POOL**, because of the gate
-# below: holding no engine at all he is offered 38 of the Warrior's 43 (40 until
-# HD §1 ruled Guard Change and Lunge the Stances holder's), 38 of
-# the Mage's 51, 29 of the Cleric's 43 and 35 of the Hunter's 42 — and a
+# below: holding no engine at all he is offered 38 of the Warrior's 42 (40 until
+# HD §1 ruled Guard Change and Lunge the Stances holder's), 39 of
+# the Mage's 52, 29 of the Cleric's 43 and 35 of the Hunter's 42 — and a
 # Sharpshooter, who fields no companion (HB §4), fewer again (`COMPANION_READ`).
 static func draft_pool(class_key: String) -> Array:
 	var out: Array = []
@@ -1825,6 +1833,8 @@ const CARD_TAGS := {
 	"Pyre Wake": ["DEBUFF", "BREAK"],
 	"Pyroblast": ["DEBUFF", "BREAK"],
 	"Slow Burn": ["DEBUFF", "BREAK"],
+	# BATCH IF §2 — Fireball's tags: it lays Burn on a landing hit, and Break rides it.
+	"Smoulder": ["DEBUFF", "BREAK"],
 	"Stoke": ["DEBUFF", "BREAK"],
 	# --- spec:sharpshooter ---
 	"Calibrating Shot": ["OFFENSE", "BREAK"],
@@ -2835,7 +2845,10 @@ static func talent_granted_names() -> Array:
 	return out
 
 
-# -- THE DRAFTED ABILITIES — ONE HUNDRED AND SEVENTY-EIGHT OF A TARGET 178 (BO..HL) --
+# -- THE DRAFTED ABILITIES — ONE HUNDRED AND SEVENTY-NINE OF A TARGET 179 (BO..IF) --
+#
+# BATCH IF §2 — 179: Smoulder joined the Pyromancer's shelf (178 from HL §1, when
+# Guard Change left the Swordmaster's to travel with the Stances).
 #
 # BATCH HB §2 — 179: Tripwire joined the Survivalist's shelf when Summon Companion
 # took its class-kit slot, and its one definition stays in `spec_abilities`.
@@ -4295,6 +4308,24 @@ static func draft_ability(display_name: String) -> Ability:
 				"cooldown": 3, "anim": "attack02",
 				"perfect_id": "", "perfect_text": "Burn turns TRIPLED",
 				"description": "Feed the coals: 25% of Attack, and if\nthe target is Burning its remaining\nBurn turns are DOUBLED; an enemy not\nalight is set Burning for 3 turns.\nOverburn reads the field BEFORE the\ndoubling — later casts collect on it."})
+		# BATCH IF §2 — SMOULDER, THE DESIGNER'S CARD (IE's ruling 3, authored in IF's brief).
+		# AXIS: Burn supply that buys the Burn, not the hit — the cheapest card that
+		# lights a cold enemy and consumes nothing, so a Mage without Overburn keeps a
+		# fire standing between the casts that spend it. Its Burn outlasts Fireball's by
+		# a turn, so a recast every second turn never lets it lapse; its damage is half
+		# Fireball's (the brief: well under it), the price below every costed card.
+		# SYNERGY: RUPTURE — a Cryomancer's Frostbolt and Smoulder on one body make the
+		# conjunction, which nothing cheap could light before; Stoke doubles what it
+		# leaves, Detonation, Backdraft and Wildfire spend it, Slow Burn holds it, and it
+		# lays through the status door, so Emberkeep doubles it and a Survivalist's
+		# Downwind carries it to a second enemy.
+		"Smoulder":
+			return Ability.make({"display_name": "Smoulder", "dmg_type": "fire",
+				"cost": 10, "damage": 10, "pressure": 8, "delay": 2.0,
+				"cooldown": 2, "anim": "attack01",
+				"applies_status": {"id": "burn", "turns": 4},
+				"perfect_id": "", "perfect_text": "Deals {atk:12}",
+				"description": "A low fire that keeps: deals fire\ndamage and leaves the target Burning\nfor 4 turns. It consumes nothing\nalready alight; reapplying extends\nthe Burn."})
 		# AXIS: fire converted into survival rather than into damage — the only
 		# card in his kit that does it, and the Inferno build's cash-in where
 		# Detonation is the Detonation build's.

@@ -3162,76 +3162,54 @@ func _open_loadout_panel(idx: int) -> void:
 	rows.custom_minimum_size = Vector2(630, 0)
 	scroll.add_child(rows)
 
-	# THE PROTECTED CORE FIRST, AS ROWS THAT CANNOT MOVE. Read off
-	# `Classes.protected_names` rather than counted off `core_slots`: those two
-	# are different units and disagree on every one of the twelve specs (a
-	# Beastmaster is SIX names in three slots), and a list wants the names.
-	# BATCH GK — THE KIT THIS HERO ACTUALLY OPENS WITH, engines included: an
-	# enabler travels with its engine and SITS OUTSIDE THE SLOT COUNT, so its row
-	# says ENABLER rather than CORE.
+	# ══ BATCH IF §3 — THE KIT IN FOUR SECTIONS, IA §3's SHAPE (IE's ruling 4, the designer's) ══
+	#
+	# **THE SECTIONS ARE THE STATE**, as on the rune panel: CORE — the protected kit, never
+	# benched — ENABLERS — what his core runes bring, outside the slot count — CARRIED and
+	# BENCHED, each with the head saying what every row under it is. So a carried card's row
+	# no longer leads with ✦ (✦ names a rune, never a card), and a kit row no longer carries
+	# CORE or ENABLER in a column of its own: a list sectioned by state that also prints the
+	# state on every row says one thing twice. Every section is drawn, an empty one with the
+	# line that says so (IA's emptiest state). The protected core is read off
+	# `Run.opening_kit_names` — names, not `core_slots`, which counts slots — and an enabler
+	# travels with its engine (GK).
 	var enabler_names: Array = []
 	for pid in Runes.held_engines(member):
 		enabler_names.append_array(Classes.engine_enablers(String(pid)))
+	var kit_core: Array = []
+	var kit_enablers: Array = []
 	for pname in Run.opening_kit_names(member):
-		var prow := HBoxContainer.new()
-		prow.add_theme_constant_override("separation", 10)
-		rows.add_child(prow)
-		var plock := Label.new()
-		plock.text = "ENABLER" if enabler_names.has(String(pname)) else "CORE"
-		plock.custom_minimum_size = Vector2(84, 26)
-		plock.add_theme_font_size_override("font_size", 11)
-		plock.add_theme_color_override("font_color", Color(0.55, 0.62, 0.85))
-		prow.add_child(plock)
-		var plbl := Label.new()
-		plbl.text = String(pname)
-		plbl.add_theme_font_size_override("font_size", 12)
-		plbl.add_theme_color_override("font_color", Color(0.72, 0.78, 0.9))
-		plbl.custom_minimum_size = Vector2(520, 20)
-		prow.add_child(plbl)
-
-	if earned.is_empty():
-		var none := Label.new()
-		none.text = "Nothing earned yet. The draft comes from elites and the Peddler,\nand a zone boss pays a pick of three."
-		none.add_theme_font_size_override("font_size", 13)
-		none.add_theme_color_override("font_color", Color(0.6, 0.57, 0.55))
-		none.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		rows.add_child(none)
-	for i in earned.size():
-		var aname := String(earned[i])
-		var is_on: bool = carried.has(aname)
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 10)
-		rows.add_child(row)
-		var toggle := Button.new()
-		toggle.text = "Bench" if is_on else "Carry"
-		toggle.custom_minimum_size = Vector2(84, 26)
-		toggle.add_theme_font_size_override("font_size", 11)
-		# A benched card cannot be carried while the slots are full. The
-		# refusal is the DISABLED button plus its reason, never a silent no-op.
-		toggle.disabled = not is_on and Run.ability_slots_full(member)
-		if toggle.disabled:
-			toggle.tooltip_text = "Every slot is carried. Bench one first."
-		toggle.pressed.connect(Music.click)
-		toggle.pressed.connect(_toggle_loadout.bind(idx, aname, overlay))
-		row.add_child(toggle)
-		var lbl := Label.new()
-		var ab: Ability = Classes.pool_ability(aname)
-		lbl.text = "%s%s%s" % ["✦ " if is_on else "", aname,
-			"" if ab == null or ab.description == ""
-			else " — %s" % Classes.resolve_values(ab.description)]
-		lbl.add_theme_font_size_override("font_size", 12)
-		lbl.add_theme_color_override("font_color",
-			Color(0.45, 0.9, 0.5) if is_on else Color(0.62, 0.6, 0.57))
-		# BATCH GT §3 — CARRIED, AND SITTING OUT. The row says so in place of
-		# the card's own text, because this is the panel where the slot it
-		# still holds can be freed; the sentence is the hero sheet's, one door.
-		if is_on and sitting.has(aname):
-			lbl.text = "✦ %s — %s" % [aname, Run.sits_out_note(aname,
-				Run.held_engines(member)).replace("\n", " ")]
-			lbl.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
-		lbl.custom_minimum_size = Vector2(520, 20)
-		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		row.add_child(lbl)
+		if enabler_names.has(String(pname)):
+			kit_enablers.append(String(pname))
+		else:
+			kit_core.append(String(pname))
+	var on_names: Array = earned.filter(func(n): return carried.has(n))
+	var off_names: Array = earned.filter(func(n): return not carried.has(n))
+	_pouch_head(rows, "CORE — never benched", Color(0.55, 0.62, 0.85))
+	for pname in kit_core:
+		_loadout_kit_row(rows, String(pname))
+	if kit_core.is_empty():
+		_pouch_note(rows, "No core card.", Color(0.6, 0.57, 0.55), false)
+	rows.add_child(HSeparator.new())
+	_pouch_head(rows, "ENABLERS — brought by a core rune", Color(0.55, 0.62, 0.85))
+	for pname in kit_enablers:
+		_loadout_kit_row(rows, String(pname))
+	if kit_enablers.is_empty():
+		_pouch_note(rows, "None: no slotted core rune brings a card.", Color(0.6, 0.57, 0.55), false)
+	rows.add_child(HSeparator.new())
+	_pouch_head(rows, "CARRIED — %d" % on_names.size(), Color(0.45, 0.9, 0.5))
+	for aname in on_names:
+		_loadout_earned_row(rows, idx, member, String(aname), true, sitting, overlay)
+	if on_names.is_empty():
+		_pouch_note(rows, "Nothing earned yet. A card is drafted after an elite or at an event,\nand a zone boss pays a pick of three."
+			if earned.is_empty() else "Nothing carried. A benched card is carried again from below.",
+			Color(0.6, 0.57, 0.55), false)
+	rows.add_child(HSeparator.new())
+	_pouch_head(rows, "BENCHED — %d, kept for the run" % off_names.size(), Color(0.62, 0.6, 0.57))
+	for aname in off_names:
+		_loadout_earned_row(rows, idx, member, String(aname), false, sitting, overlay)
+	if off_names.is_empty():
+		_pouch_note(rows, "Nothing benched.", Color(0.6, 0.57, 0.55), false)
 
 	var close := Button.new()
 	close.text = "Close"
@@ -3241,6 +3219,61 @@ func _open_loadout_panel(idx: int) -> void:
 		_loadout_panel_for = -1
 		overlay.queue_free())
 	box.add_child(close)
+
+
+# BATCH IF §3 — a kit card's row in CORE or ENABLERS: its name, behind a blank where an
+# earned row's button stands, so every name in the panel starts in one column.
+func _loadout_kit_row(rows: VBoxContainer, pname: String) -> void:
+	var prow := HBoxContainer.new()
+	prow.add_theme_constant_override("separation", 10)
+	rows.add_child(prow)
+	var gap := Control.new()
+	gap.custom_minimum_size = Vector2(84, 26)
+	prow.add_child(gap)
+	var plbl := Label.new()
+	plbl.text = pname
+	plbl.add_theme_font_size_override("font_size", 12)
+	plbl.add_theme_color_override("font_color", Color(0.72, 0.78, 0.9))
+	plbl.custom_minimum_size = Vector2(520, 20)
+	prow.add_child(plbl)
+
+
+# BATCH IF §3 — an earned card's row in CARRIED or BENCHED: Bench or Carry, then its name
+# and its text. The section says which; the row does not say it again.
+func _loadout_earned_row(rows: VBoxContainer, idx: int, member: Dictionary, aname: String,
+		is_on: bool, sitting: Array, overlay: Control) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	rows.add_child(row)
+	var toggle := Button.new()
+	toggle.text = "Bench" if is_on else "Carry"
+	toggle.custom_minimum_size = Vector2(84, 26)
+	toggle.add_theme_font_size_override("font_size", 11)
+	# A benched card cannot be carried while the slots are full. The
+	# refusal is the DISABLED button plus its reason, never a silent no-op.
+	toggle.disabled = not is_on and Run.ability_slots_full(member)
+	if toggle.disabled:
+		toggle.tooltip_text = "Every slot is carried. Bench one first."
+	toggle.pressed.connect(Music.click)
+	toggle.pressed.connect(_toggle_loadout.bind(idx, aname, overlay))
+	row.add_child(toggle)
+	var lbl := Label.new()
+	var ab: Ability = Classes.pool_ability(aname)
+	lbl.text = "%s%s" % [aname, "" if ab == null or ab.description == ""
+		else " — %s" % Classes.resolve_values(ab.description)]
+	lbl.add_theme_font_size_override("font_size", 12)
+	lbl.add_theme_color_override("font_color",
+		Color(0.45, 0.9, 0.5) if is_on else Color(0.62, 0.6, 0.57))
+	# BATCH GT §3 — CARRIED, AND SITTING OUT. The row says so in place of
+	# the card's own text, because this is the panel where the slot it
+	# still holds can be freed; the sentence is the hero sheet's, one door.
+	if is_on and sitting.has(aname):
+		lbl.text = "%s — %s" % [aname, Run.sits_out_note(aname,
+			Run.held_engines(member)).replace("\n", " ")]
+		lbl.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
+	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	lbl.custom_minimum_size = Vector2(520, 20)
+	row.add_child(lbl)
 
 
 # The overlay defaults to null so the panel can be driven without one —
@@ -3437,7 +3470,15 @@ func _open_bag_panel() -> void:
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(list)
 
-	# ── THE PARTY SLOT (HK §4) ──────────────────────────────────────────────
+	# ══ BATCH IF §3 — THE CREST SPLITS, THE RUNE PANEL's CORE / WORN / HELD LOGIC (IE's ruling 4) ══
+	#
+	# THE CREST holds the one worn crest rune — its slot drawn when empty, as a core slot
+	# is (IA) — and IN THE BAG holds every rune the bag holds, a crest rune with Equip (or
+	# Swap, the crest filled) beside its Drop. Until IF a bagged crest rune was listed
+	# twice, under THE CREST marked *(in the bag)* and again under IN THE BAG, and the worn
+	# one carried ✦ as the only mark of *worn*: the sections are the state now, and a row
+	# says it once. Each Equip still presses `_toggle_party_rune` by its index in
+	# `Run.party_rune_rows()`, the one list the door reads.
 	var prows: Array = Run.party_rune_rows()
 	var p_head := Label.new()
 	p_head.text = "THE CREST — %d of %d filled" % [Run.party_runes.size(), Run.PARTY_RUNE_SLOTS]
@@ -3445,44 +3486,30 @@ func _open_bag_panel() -> void:
 	p_head.add_theme_color_override("font_color", Color(0.95, 0.75, 0.45))
 	p_head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	list.add_child(p_head)
-	if prows.is_empty():
-		var no_p := Label.new()
-		no_p.text = "No crest rune held. A rune in the crest is worn by every hero at once."
-		no_p.add_theme_font_size_override("font_size", 12)
-		no_p.add_theme_color_override("font_color", Color(0.6, 0.57, 0.55))
-		no_p.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		list.add_child(no_p)
+	var bag_at := {}
 	for pi in prows.size():
 		var pr_d: Dictionary = prows[pi]
+		if not bool(pr_d["worn"]):
+			bag_at[int(pr_d["at"])] = pi
+			continue
 		var pr: Dictionary = pr_d["rune"]
 		var prow := HBoxContainer.new()
 		prow.add_theme_constant_override("separation", 10)
 		list.add_child(prow)
-		var pb := Button.new()
-		pb.custom_minimum_size = Vector2(84, 26)
-		pb.add_theme_font_size_override("font_size", 11)
-		pb.pressed.connect(Music.click)
-		var p_on: bool = bool(pr_d["worn"])
-		if not p_on and Run.party_runes.size() >= Run.PARTY_RUNE_SLOTS:
-			pb.text = "Swap"
-			pb.tooltip_text = "The crest is filled. Swap this rune\nfor the one it holds."
-			pb.pressed.connect(_open_swap_chooser.bind(-1, "party", pi, overlay))
-		else:
-			pb.text = "Unequip" if p_on else "Equip"
-			var p_why: String = Run.party_toggle_refusal(pi)
-			pb.disabled = p_why != ""
-			if p_why != "":
-				pb.tooltip_text = p_why
-			pb.pressed.connect(_toggle_party_rune.bind(pi, overlay))
-		prow.add_child(pb)
+		prow.add_child(_crest_toggle(pi, true, overlay))
 		var plbl := Label.new()
-		plbl.text = "%s%s — %s%s" % ["✦ " if p_on else "", String(pr.get("name", "")),
-			Runes.shown_desc(pr), "   (in the bag)" if not p_on else ""]
+		plbl.text = "%s — %s" % [String(pr.get("name", "")), Runes.shown_desc(pr)]
 		plbl.add_theme_font_size_override("font_size", 12)
-		plbl.add_theme_color_override("font_color", Color(0.45, 0.9, 0.5) if p_on else Runes.RUNE_TINT)
-		plbl.custom_minimum_size = Vector2(POUCH_TEXT_W, 20)
+		plbl.add_theme_color_override("font_color", Color(0.45, 0.9, 0.5))
 		plbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		plbl.custom_minimum_size = Vector2(POUCH_TEXT_W, 20)
 		prow.add_child(plbl)
+	for _empty in maxi(Run.PARTY_RUNE_SLOTS - Run.party_runes.size(), 0):
+		_pouch_note(list, "— empty —", Color(0.5, 0.48, 0.52), true)
+	if prows.is_empty():
+		_pouch_note(list, "No crest rune held. A rune in the crest is worn by every hero at once.",
+			Color(0.6, 0.57, 0.55), false)
+	list.add_child(HSeparator.new())
 
 	# ── THE BAG ─────────────────────────────────────────────────────────────
 	var b_head := Label.new()
@@ -3503,6 +3530,9 @@ func _open_bag_panel() -> void:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 10)
 		list.add_child(row)
+		var crest_row: bool = bag_at.has(bi)
+		if crest_row:
+			row.add_child(_crest_toggle(int(bag_at[bi]), false, overlay))
 		var nm := String(r.get("name", ""))
 		var armed: bool = _bag_drop_armed == nm
 		var db := Button.new()
@@ -3521,8 +3551,8 @@ func _open_bag_panel() -> void:
 			_stray_note(r), Runes.shown_desc(r)]
 		lbl.add_theme_font_size_override("font_size", 12)
 		lbl.add_theme_color_override("font_color", Runes.RUNE_TINT)
-		lbl.custom_minimum_size = Vector2(POUCH_TEXT_W, 20)
 		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		lbl.custom_minimum_size = Vector2(POUCH_TEXT_W - (94 if crest_row else 0), 20)
 		row.add_child(lbl)
 
 	var close := Button.new()
@@ -3534,6 +3564,27 @@ func _open_bag_panel() -> void:
 		_bag_drop_armed = ""
 		overlay.queue_free())
 	box.add_child(close)
+
+
+# BATCH IF §3 — a crest rune's toggle, worn or in the bag: Unequip, Equip, or Swap when
+# the crest is filled. `pi` indexes `Run.party_rune_rows()`, which the door reads.
+func _crest_toggle(pi: int, p_on: bool, overlay: Control) -> Button:
+	var pb := Button.new()
+	pb.custom_minimum_size = Vector2(84, 26)
+	pb.add_theme_font_size_override("font_size", 11)
+	pb.pressed.connect(Music.click)
+	if not p_on and Run.party_runes.size() >= Run.PARTY_RUNE_SLOTS:
+		pb.text = "Swap"
+		pb.tooltip_text = "The crest is filled. Swap this rune\nfor the one it holds."
+		pb.pressed.connect(_open_swap_chooser.bind(-1, "party", pi, overlay))
+	else:
+		pb.text = "Unequip" if p_on else "Equip"
+		var p_why: String = Run.party_toggle_refusal(pi)
+		pb.disabled = p_why != ""
+		if p_why != "":
+			pb.tooltip_text = p_why
+		pb.pressed.connect(_toggle_party_rune.bind(pi, overlay))
+	return pb
 
 
 # BATCH HR §1 — a rune in the bag that is not a crest rune is a save's whose class

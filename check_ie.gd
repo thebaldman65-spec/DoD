@@ -19,7 +19,8 @@
 #       named reason, or is refused with nothing alight; a new fire card reds until it is named.
 #   §4  ✦ NAMES A RUNE, EACH SURFACE APART: the hero sheet's worn row carries no ✦ beside its state column; the
 #       nameplate's ✦ N is labelled with what it counts; the Empower toggle carries no glyph; the battle's rune
-#       chip is ✦; the loadout panel's carried card keeps its ✦ — IE's finding, not its build.
+#       chip is ✦; the loadout panel's carried card carries none — IE's finding, built at IF §3 (its sections are
+#       `check_if` §3a's).
 #   §5a THE REFILL, MEASURED BEFORE THE SPEND WAS BUILT: a zone boss's offer re-asked to nothing stays nothing
 #       after the engine its pool waited on is equipped; a mini-boss's stays nothing after he holds a card an
 #       untaken upgrade fits.
@@ -57,6 +58,8 @@ const FIRE_TABLE := {
 	"Ember Debt": "lays",
 	"Stoke": "lays",
 	"Cinderfall": "lays",
+	# BATCH IF §2 — the designer's card: it lays Burn on a cold enemy and consumes nothing.
+	"Smoulder": "lays",
 	"Immolate": "lays Burn on whoever strikes him, not at the cast",
 	"Detonation": "lays Burn on a Perfect only, after it consumes the bank",
 	"Pyroblast": "a payoff: half again on a target already Burning",
@@ -538,8 +541,8 @@ func _s4_each_surface() -> void:
 	ok(marks.size() == 1 and String((marks[0] as Button).text) == "%s 1" % STAR
 			and String((marks[0] as Button).tooltip_text).contains("held, not worn"),
 		"§4: the nameplate's count is not ✦ 1 labelled 'held, not worn' (%s)" % [marks.map(func(b): return [(b as Button).text, (b as Button).tooltip_text])])
-	# THE LOADOUT PANEL — IE's finding, unchanged: a carried card's row still leads with ✦ (no section head, no
-	# state column), so the mark is reported rather than built away.
+	# THE LOADOUT PANEL — IE's finding, built at IF §3: the panel is sectioned (CORE, ENABLERS, CARRIED, BENCHED,
+	# `check_if` §3a), so a carried card's row is its name under CARRIED and carries no ✦.
 	var m3: Dictionary = _run.party[0]
 	var card := ""
 	for n in Classes.offerable(Classes.draft_pool("warrior"), _run.held_engines(m3)):
@@ -549,9 +552,9 @@ func _s4_each_surface() -> void:
 	_run.hold_ability(m3, card, true)
 	mp.call("_open_loadout_panel", 0)
 	await Gate.frames(self, 3)
-	var kit_tx: Array = _texts(mp)
-	ok(kit_tx.any(func(t): return String(t).begins_with("%s %s" % [STAR, card])),
-		"§4: the loadout panel's carried card no longer leads with ✦ — the finding the report names has moved")
+	var kit_tx: Array = _texts(Gate.overlay(mp, 60))
+	ok(kit_tx.any(func(t): return String(t).begins_with("%s — " % card)) and not kit_tx.any(func(t): return String(t).contains(STAR)),
+		"§4: the loadout panel's carried card is not its name, or a label on the panel carries ✦ — ✦ names a rune")
 	# THE BATTLE: the Empower toggle carries no glyph; the rune chip's mark is ✦.
 	var s: Node = await _board(["warden", "pyromancer", "holy", "mystic"])
 	var cl := _hero(s, "cleric")

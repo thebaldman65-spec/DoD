@@ -16,6 +16,52 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-13 &mdash; Batch IF: THE READOUT, A CARD, AND TWO PANELS</h2>
+<p><b>The game now writes a playtest readout</b> &mdash; one file a run, beside the save, that records what each fight did &mdash;
+so one zone of the designer's own play can answer five questions the sim cannot. <b>Smoulder</b>, the designer's card, joins the
+Mage's pool. <b>The Kit panel and the rune bag are sectioned</b>, as the rune panel is, and &#10022; is left only where it names a
+rune. <b>The Cracked Hourglass reaches the Hunter</b>, as its card always said. Full working: <code>docs/reports/IF.md</code>. The
+next letter is IG.</p>
+
+<p><b>&sect;1 &mdash; THE READOUT.</b> At every fight's end the game appends one line to
+<code>user://readout/run-&lt;date&gt;-&lt;time&gt;.jsonl</code> (in the same folder as the save, never inside it): the fight's zone,
+slot and kind, the bargain, the turns it took and who fell; for every hero, how many turns he opened with a full bar, how many he
+began unable to afford every costed card he carried and how many unable to afford at least one, and his lowest bar; every
+conjunction that formed &mdash; its degree, its ingredients, the turns it stood and the Break it ground out; every Boil Over &mdash;
+the Rage poured, the damage it did, whether the Berserker's core was on, and his best ordinary turn of that fight; the Vow of
+Silence's added healing and refused damage; and a Hierophant's Sanctity. The file opens with one line describing the run &mdash;
+the classes and lineages, the core and ordinary runes, the nodes, the relics and the rung. <b>It is on in the designer's own game
+and off everywhere else</b> (every check and sim); setting <code>DOD_READOUT=0</code> turns it off. A run's file stops growing at
+2 MiB; one zone writes about 19 KB. <b>It changes nothing in the game</b>: the same seeded zone played with it on and off reads the
+same save after every step, the same combat log line for line and the same dice.</p>
+
+<p><b>&sect;2 &mdash; SMOULDER</b> (10 Mana, cooldown 2, on the Pyromancer's shelf; every Mage draws it). <i>A low fire that
+keeps.</i> 10% of Attack in fire, and the target Burning for 4 turns &mdash; one longer than Fireball's, so a recast every second
+turn keeps it lit; it consumes nothing, so on a burning enemy its turns are added. It lays its Burn through the status door, so
+Emberkeep doubles it and Downwind carries it, and a chilled enemy it lights becomes a Rupture. <b>Builds with:</b> a Cryomancer's
+chill (Rupture), Stoke, Detonation, Backdraft, Wildfire, Emberkeep and Downwind. On IE's fixed drafts a Cryomancer holding every
+card that reads Burn and no other light now has Burn standing on two thirds of his turns, where IE's repairs reached just under
+half. The draft is 179; the Mage's pool is 52.</p>
+
+<p><b>&sect;3 &mdash; TWO PANELS.</b> <b>The Kit panel</b> reads in four sections &mdash; CORE (never benched), ENABLERS (brought by a
+core rune), CARRIED and BENCHED &mdash; and a carried card no longer carries &#10022;. <b>The rune bag</b> reads THE CREST (its one
+slot, the worn crest rune or <i>&mdash; empty &mdash;</i>) then IN THE BAG (every rune in the bag once, a crest rune with Equip or
+Swap beside its Drop); the worn rune lost its &#10022; and a bagged crest rune is no longer listed twice. <b>No panel in the game
+states a row's state twice now</b>, and the count markers (&#10022; N) keep their glyph and their tooltips.</p>
+
+<p><b>&sect;0.1b &mdash; THE CRACKED HOURGLASS.</b> Its card says <i>every hero</i> recovers 30% Mana after a victory; it refilled the
+Mage and the Cleric only, because the line that chose them was written when the Hunter ran on Focus and was never moved when he
+was put on Mana. It now refills every hero who holds Mana, and it never lowers a bar that sits above the cap. With the relic held
+the Hunter is the hero least often short of Mana on the default build, and the Cleric's own rate is the designer's to rule on with
+those figures (in the report).</p>
+
+<p><b>The checks.</b> A new check, <code>check_if</code>, plays one seeded fight three times with the readout off, on and off again
+and compares them byte for byte, reads the file it wrote, builds a fight holding a Rupture, a Boil Over, a vowed Hierophant and
+reads each off the line, sweeps the readout's own code for anything that could change the game, drives Smoulder through the status
+door, both panels' sections and their emptiest states, and the Hourglass through a real victory. The glyph sweep
+(<code>check_id</code>) now has no exception left. The checks that read the old panels, the fire census, the price table and the
+draft's depth table read what is true now.</p>
+
 <h2>2026-10-13 &mdash; Batch IE: THE RESOURCES, AND THE MAGE'S FIRE</h2>
 <p><b>Stoke and Cinderfall now set a cold enemy Burning</b>, the engine chips stop counting as statuses, an offer with
 nothing left in it is let go rather than left owed, a zone boss's pick alone is titled <b>THE ABILITY</b>, and &#10022; stays

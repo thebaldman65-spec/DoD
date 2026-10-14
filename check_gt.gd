@@ -1191,13 +1191,15 @@ func _screens_say_why(pid: String, seat: int, rows: Array, undone: Array = []) -
 	mp._open_loadout_panel(seat)
 	await Gate.frames(self, 3)
 	var ov: Node = Gate.overlay(mp, 60)
+	# BATCH IF §3 — the Kit panel is sectioned and a carried card's row is its name under CARRIED, with no ✦
+	# (✦ names a rune): the needles read the row as it is drawn now.
 	for card2 in rows:
-		var l: Label = _label_with(ov, "✦ %s — Sits out" % card2) if ov != null else null
+		var l: Label = _label_with(ov, "%s — Sits out" % card2) if ov != null else null
 		ok(l != null and String(l.text).contains(rune_name),
 			"§3 %s: the Kit panel does not say %s sits out, or which rune brings it back" % [pid, card2])
 	for cardu2 in undone:
 		# Carried and seated, the row reads its own text; sitting out, the sentence.
-		var lu: Label = _label_with(ov, "✦ %s — " % cardu2) if ov != null else null
+		var lu: Label = _label_with(ov, "%s — " % cardu2) if ov != null else null
 		ok(lu != null and not String(lu.text).contains("Sits out"),
 			"§3 %s: the Kit panel does not show %s carried and seated with the engine dropped — HF §7 undid its row (%s)" % [
 				pid, cardu2, String(lu.text) if lu != null else "no row"])

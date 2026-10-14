@@ -284,6 +284,26 @@ func argv_is_harness(args: PackedStringArray, main_scene: String) -> bool:
 			return true
 	return false
 
+
+# BATCH IF §1 — THE READOUT'S STATE FOR THIS RUN, AND IT IS NEVER SAVED. Which file the
+# run's fights are appended to (`path`), whether the run began in this process
+# (`fresh` — a resumed run appends to the file the pointer names), and how many
+# fights it has written. `save_run` names its keys one by one and this is not one
+# of them, so the save does not carry a byte of it (IF §1b).
+var readout := {}
+
+
+# Whether a battle in this process writes the readout: the player's own game, unless
+# `DOD_READOUT=0`; a harness only when `DOD_READOUT=1` asks (`scripts/readout.gd`).
+func readout_wanted() -> bool:
+	return bool(load("res://scripts/readout.gd").wanted(
+		OS.get_environment("DOD_READOUT"), active, readout_is_player()))
+
+
+# The player's process is the one whose save path is the player's (`_init`).
+func readout_is_player() -> bool:
+	return save_path == SAVE_PATH
+
 # Zone rotation (Batch 37): a run is SLOT_COUNT zone slots and each
 # slot draws ONE zone from its authored candidate pool — zones are
 # designed FOR a position (openers are not finales), so pools are
@@ -627,6 +647,7 @@ func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []
 	specs_chosen = false
 	difficulty = difficulty_id(diff)
 	active_relics = relics.slice(0, 3)
+	readout = {"fresh": true}
 	clear_save()
 	party = []
 	for key in keys:
@@ -1504,11 +1525,22 @@ func sync_spec_hp(idx: int) -> void:
 		member["hp"] = int(member["hp"]) + delta
 
 
-# Restores spirit (Mage/Cleric mana pools).
+# Restores spirit: every hero who holds Mana.
+#
+# BATCH IF §0.1b — THE HUNTER WAS LEFT OUT BY A GUARD THAT OUTLIVED ITS PREMISE. The
+# Mage-and-Cleric test was written when the Hunter ran on Focus; Batch 28 put him on
+# Mana and the guard was never moved, so the Cracked Hourglass — whose card says
+# *every hero* — refilled two of the three Mana heroes. The test is the class's own
+# opening bar now (`HERO_BASE`: the Warrior's is 0, he holds Rage). **AND IT NEVER
+# TAKES MANA AWAY**: a bar above the member's `max_mana` (a +20 node carries a hero
+# past 100 out of a fight) is left where it stands rather than cut to the cap, so
+# *recovers* is never a loss.
 func restore_mana(pct: float) -> void:
 	for member in party:
-		if member["key"] == "mage" or member["key"] == "cleric":
-			member["mana"] = mini(member["mana"] + int(member["max_mana"] * pct), member["max_mana"])
+		if int((HERO_BASE.get(String(member["key"]), {}) as Dictionary).get("mana", 0)) <= 0:
+			continue
+		var held := int(member["mana"])
+		member["mana"] = maxi(held, mini(held + int(member["max_mana"] * pct), int(member["max_mana"])))
 
 
 func random_loot() -> String:
@@ -3971,6 +4003,7 @@ func load_run() -> bool:
 	load_notes = []
 	_hand_out_the_bag()
 	_refresh_rune_names()
+	readout = {}
 	active = true
 	return true
 

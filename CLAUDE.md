@@ -2660,11 +2660,35 @@ sim/autoplay/sim_run).
   `DOD_SIM_DEBUG` (echo the combat log in sim mode — the hang discriminator).
 · ENV FLAGS, non-sim: `DOD_AUTOPLAY` (1 debug battle, echoes "[LOG]"; never exits on its own —
   timeout/kill it), `DOD_DEBUG` (above), `DOD_ENEMIES_OFF` (above), `DOD_ZONE_ROTATION`
-  (randomize zone draws within slot pools).
+  (randomize zone draws within slot pools), `DOD_READOUT` (IF §1: `0` turns the playtest readout off in the player's
+  game; `1` turns it on in a harness, which then writes `user://readout_harness/` — the block *THE READOUT IS A READ*).
 · RETIRED, and **the record lives in `sim.sh`'s header and master.html — the sim prints no
   retired line and `scripts/` names none of them**: `DOD_SIM_MAP`, `DOD_SIM_MINIBOSS`,
   `DOD_SIM_START_RUNE`, `DOD_SIM_SPEC_OPENING` (Batch AN, with their features). ED corrected
   the report-header claim.
+
+## STANDING RULE — THE READOUT IS A READ, AND IT IS THE PLAYER'S (Batch IF §1, the designer's)
+> **The playtest readout (`scripts/readout.gd`) appends one JSON line a fight to `user://readout/run-<date>-<time>.jsonl` —
+> beside the save, never inside it — in the player's own game, and in no other process. It may not move a figure or spend
+> a die.** The five rulings it exists for are read off the designer's play, and an instrument that changes the game it
+> measures measures nothing (IE's engine chips: decoration that spent a die at every spawn and moved three gates).
+
+- **EVERY HOOK IS A READ BEHIND `if _readout != null`.** `battle.gd` holds one `_readout` (null unless
+  `Run.readout_wanted()`), and each hook is one call under its null test — no status, float, log line, `randf`, or field
+  written on a unit or the run. The readout is a `RefCounted` that names no autoload (the run node is handed in) and keeps
+  its run-long state in `Run.readout`, which `save_run` does not name. **A hook added later obeys the same shape**:
+  `check_if` §1e sweeps the readout's source for anything that spends a die or writes the game and holds every
+  `_readout.` line in `battle.gd` behind its null test.
+- **ON BY DEFAULT IN THE PLAYER'S GAME, OFF IN EVERY HARNESS — THE SAVE PATH DECIDES** (`Readout.wanted`, FI's split):
+  the player's process is the one whose save path is the player's. `DOD_READOUT=0` turns it off; `=1` turns it on in a
+  harness, which writes `user://readout_harness/`, never the player's folder. A gate that turns it on removes its file.
+- **THE PROOF IS A RUN, NOT AN ARGUMENT.** `check_if` §1b fights one seeded fight off, on and off again and compares the
+  combat log, every unit's figures, the run, the save and the next die; IF's own pass condition played a seeded zone through
+  the real map both ways (`docs/reports/IF.md` §1). **A change to the readout re-runs that comparison, at a fixed frame
+  step** (`--fixed-fps`): unfixed, a read of the save in a fight's first frames races the save that fight writes in flight
+  (GH), and two arms differ for the clock's sake, not the readout's.
+- **A NEW FIGURE IS A NEW KEY ON THE LINE, AND THE LINE'S OWN KEYS ARE NOT REUSED** — the frame's node kind is `encounter`
+  because `kind` names the line (IF lost it to a merge once).
 
 ## STANDING REFERENCE — THE UNCAPPED-METER GOVERNOR TABLE (Batch BJ §3b)
 The ratcheting accumulators are below, and each governor was VERIFIED AT ITS SITE when its row
@@ -3792,7 +3816,9 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
     STATE**: no row prints a worn mark or *(held)*, because a list sectioned by state that also says the state on
     every row says one thing twice; and the panel counts what he holds once, in that section's head. The nameplate's
     ✦ count stays — the map's one glance at a holding, outside the panel. A rune moved by Equip, Unequip or Swap
-    re-opens the panel in its new section. **The crest's bag is not sectioned**: its rows are the crest's. **AN EMPTY
+    re-opens the panel in its new section. **The crest's bag is sectioned the same way since IF §3** — THE CREST (its one
+    slot, drawn when empty) then IN THE BAG (each rune once, a crest rune's Equip beside its Drop) — and so is the map's
+    Kit panel (CORE, ENABLERS, CARRIED, BENCHED); `check_if` §3 drives both. **AN EMPTY
     CORE SLOT IS A ROW, SO FEWER SLOTTED IS TALLER**: the panel is longest with every slot empty and the holding full,
     and a hero holding his six with a slot empty can scroll — GT §1's scroll, Close pinned, RULED at IB §0.1 (GT §1's
     block); `check_gt` §1 walks every slot count. **An empty slot's row reads *— empty —* (IB §0.3): a row does not
@@ -4250,8 +4276,8 @@ lineage, `Classes.opening_kit` hands them to any hero of the class who holds tha
 out when it is not held, and they sit OUTSIDE the slot count (`Classes.lineage_slots` is `slots` less
 the enablers).
 
-**THE DRAFT IS COMPLETE AND NOTHING IS OWED: 178 of 178, 158 spec + 20 class-wide (179 / 159 until HL §1) — FOUR POOLS OF
-42 / 51 / 43 / 42 SINCE HL §1** (Guard Change left the Warrior's for the Stances; 43 from HB) (GP's merge made them 38 / 41 / 34 / 36 of 149, GS §1 put the 29 cards
+**THE DRAFT IS COMPLETE AND NOTHING IS OWED: 179 of 179, 159 spec + 20 class-wide (178 / 158 from HL §1 to IF §2) — FOUR POOLS OF
+42 / 52 / 43 / 42 SINCE IF §2** (Smoulder, the designer's card, joined the Pyromancer's shelf; Guard Change left the Warrior's for the Stances at HL §1; 43 from HB) (GP's merge made them 38 / 41 / 34 / 36 of 149, GS §1 put the 29 cards
 that stopped travelling with an engine on their lineages' shelves, and HB §2 put Tripwire on the
 Survivalist's when Summon Companion took its class-kit slot). All twelve lineage shelves hold at least TEN; the
 Warrior and Hunter class-wide shelves hold six, the Mage's five and the Cleric's three, since GN
@@ -4368,16 +4394,18 @@ fact that they are.
   and the bag's `✦ N`, each labelled, and the kit preview's prose) — **AND GOES WHEREVER IT DUPLICATES A STATE THE SURFACE
   ALREADY STATES** (IA §3's rule): off the hero sheet's worn row, beside a column that says WORN, and off the Empower
   toggle, which is no rune (IE §4). Asserted (`check_id` §3a): every ✦ in the game's code is a rune's mark or a rune
-  count — **but the loadout panel's carried card, named there: that panel has no section head and no state column, the
-  rune panel before IA, and the crest panel marks its worn crest rune in a section that mixes worn and bagged** (FOUND AT
-  IE, not its build).
+  count, **with no exception left: IF §3 sectioned the loadout panel and the crest panel as IA sectioned the rune panel,
+  and both marks went with the sections. THE RULE IS FINISHED — NO PANEL IN THE GAME STATES A ROW'S STATE TWICE** (IA the
+  rune panel, IE the hero sheet's worn row, IF the last two); `check_if` §3c sweeps the three sectioned panels' rows for a
+  state the head already gives, and `check_id` §3a holds ✦ to the four rune lines. A new panel listing things by state is
+  sectioned by it from the start.
 - **THE CREST RUNE STAYS OUT OF A HERO'S PICK (HW §1c), AND A SCREEN A HERO IS WHERE IT WOULD QUIETLY RE-MERGE**: the
   RUNES section draws `Run.rune_choice`, which repairs a crest rune out of a queued triple, and the crest's bag is not
   touched by a hero's answer (`check_ib` §2d).
 
 ## STANDING RULE — ONE DRAFT POOL A CLASS, AND A CARD THAT READS AN ENGINE IS OFFERED ONLY TO ITS HOLDER (Batch GP §1/§2)
 > **The three lineage shelves and the class-wide shelf of a class are ONE POOL. A hero draws from
-> all of it — 42 / 51 / 43 / 42 since HL §1 — and `Classes.draft_pool(class_key)` is the only thing a draw may
+> all of it — 42 / 52 / 43 / 42 since IF §2 — and `Classes.draft_pool(class_key)` is the only thing a draw may
 > read.** `spec_draft_pool()` and `class_draft_pool()` return what they always returned and are
 > SHELVES now: where a card was authored, not a channel it is drawn from. **A reader that takes
 > `spec_draft_pool(his spec)` for "what this hero can be offered" is wrong and still passes.**

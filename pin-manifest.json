@@ -2,16 +2,16 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1772,
-  "source": 1327,
+  "total": 1779,
+  "source": 1334,
   "other": 123,
   "document": 322
  },
  "source_residency": {
-  "narrow": 44,
-  "code": 809,
+  "narrow": 45,
+  "code": 814,
   "absent": 319,
-  "runtime": 103,
+  "runtime": 104,
   "unresolved": 3,
   "comment": 46,
   "alt-sibling": 3
@@ -6408,6 +6408,84 @@
    "k": "literal",
    "how": "read",
    "g": "check_ie.gd#225"
+  },
+  {
+   "s": "check_if.gd",
+   "fn": "_s1e_the_sweep",
+   "h": "scripts/readout.gd",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_if.gd#392",
+   "expr": "n"
+  },
+  {
+   "s": "check_if.gd",
+   "fn": "_s1e_the_sweep",
+   "h": "scripts/run_state.gd",
+   "n": "\nfunc ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_if.gd#420"
+  },
+  {
+   "s": "check_if.gd",
+   "fn": "_s1e_the_sweep",
+   "h": "scripts/readout.gd",
+   "n": "FileAccess.open(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_if.gd#399"
+  },
+  {
+   "s": "check_if.gd",
+   "fn": "_s1e_the_sweep",
+   "h": "scripts/run_state.gd",
+   "n": "file.store_var(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_if.gd#421"
+  },
+  {
+   "s": "check_if.gd",
+   "fn": "_s1e_the_sweep",
+   "h": "scripts/run_state.gd",
+   "n": "func save_run()",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_if.gd#419"
+  },
+  {
+   "s": "check_if.gd",
+   "fn": "_s1e_the_sweep",
+   "h": "scripts/run_state.gd",
+   "n": "readout",
+   "p": "-",
+   "r": "narrow",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_if.gd#421"
+  },
+  {
+   "s": "check_if.gd",
+   "fn": "_s1e_the_sweep",
+   "h": "scripts/readout.gd",
+   "n": "store_line(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_if.gd#399"
   },
   {
    "s": "test_batch_ah.gd",

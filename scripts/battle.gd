@@ -1001,6 +1001,10 @@ var _b_sig := {}
 # damage share. Written only when `sim` is false — RunSim keeps its own
 # stats path and must never double-count.
 var _run_slice := {}
+# BATCH IF §1 — THE READOUT (`scripts/readout.gd`): null in every process but the
+# player's own game. Every call below is a read — `check_if` §1 runs a seeded fight
+# with it on and off and reads the two byte for byte.
+var _readout = null
 # BATCH BL §2 — the recap's three battle-local slices, banked into Run.tally at
 # _check_end beside `_run_slice` and under the SAME rule: real play only. Their
 # shapes are the tally's own (hero -> key -> amount, and a list of records), so
@@ -1120,6 +1124,9 @@ func _ready() -> void:
 	_build_ui()
 	_build_sfx_pool()
 	_spawn_units()
+	if Run.readout_wanted():
+		_readout = load("res://scripts/readout.gd").new()
+		_readout.begin(Run, self, heroes, Run.readout_is_player())
 	if run_sim:
 		# Measure both sides as spawned — talents, scaling and slot
 		# multiplier live (the run report's power table).
@@ -2759,6 +2766,8 @@ func _do_forfeit(reason_id: String, reason_label: String) -> void:
 		return
 	_close_forfeit_confirm()
 	battle_over = true
+	if _readout != null:
+		_readout.finish(false, false, reason_label)
 	Profile.note_forfeit(Run.chronicle_keys())
 	# BATCH BL §2: a forfeit never reaches `_check_end`, so the fight being
 	# walked away from would be missing from the recap entirely — and §2 says
@@ -3234,6 +3243,8 @@ func _run_battle() -> void:
 		# UP THE OATHKEEPER'S BOND, for Momentum's reason: the span is "since this
 		# unit's last turn", so it ends when the unit is chosen to act.
 		_rule_engine_turn(u)
+		if _readout != null:
+			_readout.unit_turn(u)
 		if sim:
 			if u.is_hero and not u.is_companion:
 				_cy_turns += 1
@@ -3809,6 +3820,8 @@ func _run_battle() -> void:
 			continue
 		if u.is_hero:
 			await _player_turn(u)
+			if _readout != null:
+				_readout.turn_close(u)
 		else:
 			await _enemy_turn(u)
 			# BATCH BL §1 — DECLARE ON SCHEDULE. The turn is over, so the next
@@ -4155,6 +4168,8 @@ func _player_turn(u: BattleUnit) -> void:
 	# DRIP and nothing else — attacks that BUILD resource are untouched, which
 	# is why a Rage hero survives it better than a Mage. That asymmetry is the
 	# modifier, not a hole in it.
+	if _readout != null:
+		_readout.turn_open(u)
 	if not u.mod_no_regen:
 		if u.resource_name == "Mana":
 			# Evocation (Mage class passive) adds mana_regen_bonus.
@@ -4228,6 +4243,8 @@ func _player_turn(u: BattleUnit) -> void:
 		_log("Item: Health Potion — %s +%d HP (bot)" % [u.unit_name, drank],
 			"#e0c060")
 		RunSim.items_used += 1
+	if _readout != null:
+		_readout.turn_choose(u)
 	_show_actions(u)
 	var ab: Ability
 	var auto_target: BattleUnit = null
@@ -9012,6 +9029,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		bo_spent = attacker.resource
 		attacker.resource = 0
 		attacker.note_resource_spent(bo_spent)
+		if _readout != null:
+			_readout.boil_over(attacker, bo_spent)
 		attacker.refresh_bars()
 		attacker.float_text("-%d %s" % [bo_spent, attacker.resource_name], Color(1.0, 0.5, 0.4))
 		_log("   → Boil Over: %s pours out the whole bar — %d %s" % [attacker.unit_name, bo_spent,
@@ -11721,6 +11740,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			var connected := final > 0
 			var refused := silenced and final > 0
 			if refused:
+				if _readout != null:
+					_readout.vow_refused(attacker, final)
 				final = 0
 			if attacker.is_hero:
 				_stat("dmg_hero_" + attacker.unit_name, final)
@@ -14734,6 +14755,9 @@ func _conjoin(target: BattleUnit, id: String, src: BattleUnit) -> void:
 		var met: Dictionary = target.get_status(partner)
 		var a_name := String(arrived.get("label", id))
 		var m_name := String(met.get("label", partner))
+		if _readout != null:
+			_readout.conj_formed(target, made, String(cinfo[0]), a_name, m_name,
+				src.unit_name if src != null else "")
 		var clock := BattleUnit.composition_turns(made)
 		var a_t := int(arrived.get("turns", 0))
 		var m_t := int(met.get("turns", 0))
@@ -14815,10 +14839,14 @@ func _dot_tick_rider(u: BattleUnit) -> void:
 	# A Broken body takes no Break (Decay's shape), and the log says so rather than
 	# leaving the tick's second half to read as missing (HS §5).
 	if u.broken:
+		if _readout != null:
+			_readout.conj_tick(u, String(comp.id), 0, false)
 		_log("   → %s's %s ticks — the Break: none, while %s is Broken" % [u.unit_name,
 			String(comp.label), u.unit_name], "#d090e0")
 		return
 	var rp_result: Dictionary = u.take_hit(0, bd)
+	if _readout != null:
+		_readout.conj_tick(u, String(comp.id), int(rp_result.get("bd", 0)), bool(rp_result.broke))
 	_stat_bd(String(comp.get("src_name", "")), bd)
 	u.float_text("+%d BD" % rp_result.get("bd", 0), STATUS_INFO[String(comp.id)][2])
 	_log("   → %s's %s ticks — the Break: +%d Break damage" % [u.unit_name,
@@ -15808,6 +15836,8 @@ func _rule_engines_on_damage(victim: BattleUnit, lost: int) -> void:
 func _on_unit_died(u: BattleUnit) -> void:
 	if u == null:
 		return
+	if _readout != null and u.is_hero:
+		_readout.hero_fell(u)
 	if not u.is_hero:
 		# SAVAGE ASSAULT — the enemy's death is the Reaver's when the frame that
 		# killed it names him: his strike, his handler, his echo or a tick he laid.
@@ -28049,6 +28079,8 @@ func _check_end() -> void:
 	if not victory and not defeat:
 		return
 	battle_over = true
+	if _readout != null:
+		_readout.finish(victory, stalemate)
 	if sim:
 		sim_done += 1
 		_stat("battles")
@@ -29735,6 +29767,8 @@ func _sig(passive: String, n := 1) -> void:
 
 # One stat counter, accumulated across all simulated battles.
 func _stat(key: String, amount := 1.0) -> void:
+	if _readout != null:
+		_readout.credit(key, amount, _dmg_label)
 	# BATCH FT — MOMENTUM'S DEALT LEDGER RIDES THIS ONE DOOR, and it is ABOVE
 	# the `sim` branch on purpose. Everything below books into one of two
 	# places depending on which bot is driving; a per-turn ledger a passive
@@ -29814,6 +29848,8 @@ func _prev(owner, cut: float) -> void:
 # debuff grants credits the debuffer, not the striker. Always feeds the
 # old aggregate "healing" stat so that line stays comparable.
 func _stat_heal(owner, amount: float, healed: BattleUnit = null) -> void:
+	if _readout != null:
+		_readout.healed(owner, amount)
 	_stat("healing", amount)
 	# BATCH BU — REPRISAL'S LEDGER RIDES THIS DOOR AND SITS ABOVE THE `sim`
 	# GUARD ON PURPOSE. Everything below this line is measurement; the ledger is
@@ -29979,6 +30015,8 @@ func _dmg_frame(src: BattleUnit, label: String, src_name := "") -> void:
 func _deal_gate(victim: BattleUnit, amount: int) -> int:
 	if amount <= 0 or not _vow_silences(victim):
 		return amount
+	if _readout != null:
+		_readout.vow_refused_at_door(amount)
 	_float_silent(victim)
 	return 0
 

@@ -91,6 +91,10 @@ const BELOW := {
 		"why": "its speed is the card: nothing else a Warrior holds arrives as fast, and its numbers were the designer's call"},
 	"Kindled Mind": {"kit": ["Magic Burst", "Magic Missiles"], "group": "point",
 		"why": "a cantrip: under half the damage of either kit card, bought for tempo"},
+	# BATCH IF §2 — SMOULDER, THE DESIGNER'S CARD, SORTED IN THE BATCH THAT AUTHORED IT: below both
+	# damage kit cards on price, and that is the card — it buys the Burn, not the hit.
+	"Smoulder": {"kit": ["Magic Burst", "Magic Missiles"], "group": "point",
+		"why": "the light that buys the Burn, not the hit: a longer Burn than Fireball's for less than its damage, on its cooldown, cheaper than every other fire card (IF §2)"},
 	"Primal Surge": {"kit": ["Powershot"], "group": "point",
 		"why": "paid in Loyalty, all of it, and it sits out without Pack Bond"},
 	# BATCH HB — SUMMON COMPANION JOINED THE HUNTER KIT (in Tripwire's slot) AND
@@ -408,6 +412,12 @@ func _ground(nm: String, group: String, kits: Array) -> void:
 						ok(_per_cast(a) * 2 < _per_cast(_ab(String(kn2))),
 							"§2: Kindled Mind deals %d%% a cast against %s's %d%% — not the cantrip its row says" % [
 								_per_cast(a), kn2, _per_cast(_ab(String(kn2)))])
+				"Smoulder":
+					var fb := _ab("Fireball")
+					ok(String(a.applies_status.get("id", "")) == "burn" and fb != null
+							and int(a.applies_status.get("turns", 0)) > int(fb.applies_status.get("turns", 0))
+							and a.damage < fb.damage,
+						"§2: Smoulder no longer buys a longer Burn than Fireball's for less damage — its point is gone")
 				"Primal Surge":
 					ok(Classes.sits_out_engine(nm) == "pack",
 						"§2: Primal Surge no longer sits out without Pack Bond — its price is not paid in Loyalty alone")

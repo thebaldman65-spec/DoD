@@ -215,6 +215,9 @@ const KNOWN_BLOCKS := [
 	"STANDING RULE — A RETIRED RUNE'S NAME IS NOT FREE, AND THE LIVE POOL'S NAMES ARE BARE",
 	# BATCH IB §1/§2 — a game rule (what the map opens and the shape of a hero's draft), so it binds this file.
 	"STANDING RULE — A PICK OWED OPENS ITSELF WHEN THE PARTY ARRIVES, AND EACH HERO DRAFTS ALONE",
+	# BATCH IF §1 — a game rule (what the playtest readout may do inside the game, and where the game writes it), so it
+	# binds this file; its proof is a run, and the run's shape is said there because a later hook must repeat it.
+	"STANDING RULE — THE READOUT IS A READ, AND IT IS THE PLAYER'S",
 ]
 
 # §1c — THE INSTRUMENT RULES WRITTEN BACK AFTER THE SEAM WAS TAKEN (HV §3e), named and left until a ruling

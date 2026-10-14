@@ -870,17 +870,16 @@ func _s3a_the_sweep() -> void:
 	ok(other.is_empty() and where.values().all(func(v): return int(v) == 1),
 		"§3a: ↑ is not drawn once on each of the four upgrade surfaces and nowhere else: %s %s" % [where, other])
 	# BATCH IE §4 (ruled at IE §0.1) — ✦ NAMES A RUNE: every ✦ left in the game's code is a rune's mark or a
-	# count of runes held unworn — the battle's rune chip, the crest panel's worn crest rune, the nameplate's
-	# count, the bag's crest count and the kit preview's prose — and nothing else. ONE NAMED EXCEPTION, IE's
-	# finding and not its build: the loadout panel marks a CARRIED CARD with it (its two lines), because that
-	# panel carries no section head and no state column — it is the rune panel before IA §3.
+	# count of runes held unworn — the battle's rune chip, the nameplate's count, the bag's crest count and the kit
+	# preview's prose — and nothing else. **AND SINCE IF §3 THE RULE IS FINISHED, WITH NO EXCEPTION LEFT**: the
+	# loadout panel's two lines (IE's finding — a CARRIED CARD marked ✦) and the crest panel's worn rune are gone
+	# with the sections each panel now draws, so no panel in the game states a row's state twice (`check_if` §3c
+	# sweeps the three sectioned panels for it).
 	var star_lines := {
 		"rune mark — the battle's rune chip": "^battle\\.gd: const RUNE_CHIP_TAG := \"✦\"$",
 		"rune count — the kit preview's prose": "^kit_preview\\.gd: _line\\(\"   ✦ %d held, not worn",
 		"rune count — the nameplate": "^map_screen\\.gd: mark\\.text = \"✦ %d\" % waiting$",
 		"rune count — the bag's crest runes": "^map_screen\\.gd: \"  ✦ %d\" % crest_waiting if crest_waiting > 0",
-		"rune mark — the crest panel's worn crest rune": "^map_screen\\.gd: plbl\\.text = .*\"✦ \" if p_on",
-		"FINDING — the loadout panel's carried card": "^map_screen\\.gd: (lbl\\.text = \"%s%s%s\" % \\[\"✦ \" if is_on|lbl\\.text = \"✦ %s — %s\")",
 	}
 	var met := {}
 	var stray_star: Array = []
@@ -894,9 +893,8 @@ func _s3a_the_sweep() -> void:
 		else:
 			met[named] = int(met.get(named, 0)) + 1
 	print("    ✦ in code, comments stripped: %d line(s) — %s" % [code_stars.size(), met])
-	ok(stray_star.is_empty() and met.size() == star_lines.size() and int(met.get("FINDING — the loadout panel's carried card", 0)) == 2
-			and code_stars.size() == star_lines.size() + 1,
-		"§3a: ✦ is drawn for something that is not a rune's mark, a rune count or the named finding: %s (met %s)" % [stray_star, met])
+	ok(stray_star.is_empty() and met.size() == star_lines.size() and code_stars.size() == star_lines.size(),
+		"§3a: ✦ is drawn for something that is not a rune's mark or a rune count: %s (met %s)" % [stray_star, met])
 	ok(data_hits.is_empty(), "§3a: a data file carries ◆, ↑ or ✦: %s" % [data_hits])
 
 

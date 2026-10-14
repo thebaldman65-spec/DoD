@@ -404,11 +404,13 @@ const TAG_DOOR := "loadout_condition_met"
 # the three live crest runes for its tag row and its shape row — the owed row EK §1
 # requires of any new rune. **It changes no behaviour and it is not exempted; it is
 # listed.**
+# **BATCH IF ADDED `check_if.gd`, LISTED BEFORE THE BATTERY.** Its §2 asks that Smoulder, the card IF authored, has
+# its `CARD_TAGS` row — a card without one is a card the draft's tag line cannot draw — so it names the surface.
 const TAG_CHECKERS := ["check_ek.gd", "check_el.gd", "check_es.gd",
 	"check_ez.gd", "check_fd.gd", "check_fe.gd", "check_fh.gd",
 	"check_fk.gd", "check_fn.gd", "check_fo.gd", "check_gn.gd",
 	"check_go.gd", "check_gu.gd", "check_hf.gd", "check_ho.gd", "check_hp.gd",
-	"check_map_screen.gd", "test_batch_ar.gd"]
+	"check_if.gd", "check_map_screen.gd", "test_batch_ar.gd"]
 
 # The files a MECHANIC would have to live in. Asserted at ZERO separately from
 # the set above, because "the set is exactly these five" and "battle.gd holds

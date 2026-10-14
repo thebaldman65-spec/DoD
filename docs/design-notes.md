@@ -4,6 +4,39 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The readout, a card, and two panels (Batch IF) — 2026-10-13
+
+**Why a readout, and why a file.** Five rulings wait on figures no census can produce — Boil Over's rate, Rupture's number,
+the vow's worth, Sanctity's threshold and the Cleric's Mana — and every one was measured against the sim's bot, which heals when
+hurt where a player heals when it matters, never casts a drafted Fireball, and made a Rupture by accident. The right instrument is
+the designer's own play; what was missing was not a screen but a file that crosses between the game and the batch. One line a
+fight, appended, so a quit or a crash keeps every finished fight and nothing already written is ever re-read and rewritten.
+
+**Why it may not move a figure, and how that is known.** An instrument that changes the game it measures measures nothing — IE's
+engine chips were decoration that spent a die at every spawn and moved three gates. So every hook in the battle is a read behind a
+null test, the readout names no autoload and writes nothing the game reads, and the proof is a run, not an argument: one seeded zone
+played twice, the readout on and off, compared save by save, log line by log line and die by die.
+
+**Why it is on in the designer's game and off everywhere else.** A readout he has to remember to enable is a readout that will be
+off. The decision rides the one fact that already tells the player's process from a test's — the save path — so no check and no sim
+writes a file into his folder, and a harness that asks for it writes its own folder.
+
+**Why Smoulder buys the Burn and not the hit.** IE's repairs left a draft of every Burn reader with no applier just short of having
+Burn standing on most of its turns, and Pyroblast could not be the answer — a card that supplies its own prerequisite has none. So
+the gap is a card: the cheapest fire card, half Fireball's damage, a Burn one turn longer than Fireball's on Fireball's cooldown so
+that a recast every second turn never lets it lapse. It is on the Pyromancer's shelf because a fire card is a lineage's element,
+which the class-wide shelf's own rule keeps off it; every Mage draws it because the pool is one. It is also what a Cryomancer needs
+to light the body he chills, which is the only way Rupture has ever been reachable on purpose.
+
+**Why the panels are sectioned rather than marked.** ✦ names a rune. On the loadout panel it marked a carried card, which was the
+glyph used for the wrong kind of thing; on the crest panel it was the only mark of *worn*, because the section mixed the worn rune
+with the bagged ones. The rune panel already answered this at IA: a list sectioned by state does not print the state on every row.
+So both panels take that shape, and the rule is finished — no panel states a row's state twice.
+
+**Why the Hourglass reaches the Hunter.** Its card says every hero, and the line that picked the Mage and the Cleric was written
+when the Hunter ran on Focus; he has run on Mana since, and nothing ever ruled him out. A skip that is an accident is repaired toward
+the card. And a recovery that cuts a bar above the member's cap is a loss, which *recovers* never is — so it never lowers one.
+
 ## The resources, and the Mage's fire (Batch IE) — 2026-10-13
 
 **Why a chip is not a status.** A chip is drawn to tell the player something; it is not an event in the fiction. Sanctity claims

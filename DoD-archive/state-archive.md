@@ -17,6 +17,51 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT IF — 2026-10-13, FROM `docs/state.md` AS IE LEFT IT (`7c4f256`)
+
+**What came here**: IE's rulings, all five answered in IF's brief; and FOUND AT IE's Cracked Hourglass item (fixed at IF §0.1b — the
+relic refills every Mana hero and never lowers a bar; the member's fixed cap it also named is FOUND AT IF). The roadmap's IF line was
+rewritten in place (the readout came first by ruling, and IC's remainder is II's); FOUND AT IE keeps its other four items. Each was
+read against IF's tree before it moved; everything else in the live file stayed.
+
+### ~~IE's RULINGS OWED~~ — **ALL FIVE ANSWERED IN IF's BRIEF: THE RATE STAYS AT 12 AND IE's PASS CONDITION IS WITHDRAWN (1, THE HOURGLASS's REACH REPAIRED AT IF §0.1b, THE RATE RULED AFTER THE READOUT); FV §3's INTENT STANDS AND ITS NUMBER IS IG's, AFTER THE CHIPS (2); PYROBLAST STAYS AND THE DESIGNER AUTHORED SMOULDER (3, BUILT AT IF §2); BOTH PANELS SECTIONED (4, BUILT AT IF §3); EVERY DISPLAY CHIP CONVERTS (5, IG's)**
+
+Full working: `docs/reports/IE.md`, NEEDS A RULING.
+
+1. **THE CLERIC's MANA RATE DID NOT MOVE — THE SIM DOES NOT SHOW A CLERIC WHO NEVER RUNS DRY (§1).** His drip is the Hunter's, 12
+   (the Mage's 22). Dry on the sim's default build: Cleric 4.1%, Mage 4.5%, Hunter 3.9% of their turns (±0.6, 0.9, 0.5); untalented
+   — the designer's own profile has no talents — 26.8%, 18.3%, 33.8%. **Lowering him moves away from the shape** (8 reads 11.6%, 10
+   reads 6.9%); **only 14 reaches it** (1.5% under the Mage's 2.3% and the Hunter's 3.9%). Two play conditions the sim lacks are
+   named: the **Cracked Hourglass** (unlocked in the designer's profile) refills the Mage and the Cleric 30% after every victory and
+   the Hunter not at all — **with it in the party the shape already holds at 12** (0.7%, 1.7%, 4.1%) and the Cleric sits nearest
+   full, which is the finding as the designer saw it — and the sim wears all 27 talent nodes where the designer wears none. Re-rule the rate, the shape, or the
+   conditions it is measured under (THE CLERIC's MANA RATE, below, holds the curve).
+2. **SANCTITY's STEPS NOW COME ABOUT ONE OF HIS TURNS LATER (§2b) — NOTHING AUTHORED.** A Hierophant's fight ended on 49.3 events
+   at HEAD and 42.6 after §2a (default build; zone one 41.5 → 36.5); his first step came at his turn 1.12 and now 1.90, his second
+   at 3.08 (83.5% of fights) and now 4.04 (67.1%). `SANCTITY_PER_STEP` (16) was set at FV §3 to reach about half the cap (80) by a
+   normal fight's end on untalented rung-1 fights; untalented, a fight now ends on 42.7 events at a normal fight's end where HEAD read 50.5 — 2.19 steps where it read 2.61, from just over half
+   the cap to just under it (1,372 fights and 1,325). The threshold is the designer's.
+3. **THE FIRE REPAIRS REACH THE SHAPE WITH ONE APPLIER HELD, AND FALL JUST SHORT WITH NONE (§3).** Stoke and Cinderfall lay their
+   Burn (figures the kit already uses). On fixed drafts, a Cryomancer with no Overburn: Fireball and four readers 27.2% → 62.9% of
+   his turns with Burn standing; every reader and no applier 1.9% → 48.7%; a control holding no repaired card 84.2% → 84.9%.
+   **Pyroblast is the one fire card left without Burn**: its ×1.5 reads the Burn it would lay and it has no cooldown, so its
+   repair would make every repeat cast half again stronger — with it the longest case reads 53.8%. Repair it, or let a new card
+   carry the gap: **a card that lays Burn on a cold enemy without consuming it, on a short cooldown, on a shelf a Mage without
+   Overburn draws** — one Fireball held is what lifts a draft of readers from 27% to 63%.
+4. **✦ ON TWO PANELS THAT ARE THE RUNE PANEL BEFORE IA (§4).** The loadout panel marks a carried CARD with ✦ and has no section
+   head and no state column; the crest panel marks its worn crest rune inside a section that also lists the bag's. Section them
+   as IA sectioned the rune panel (and the marks go), or keep the marks.
+5. **THE OTHER DISPLAY CHIPS STILL LAID AS STATUSES (§2) — IE's KEPT CENSUS.** Among them Faith, Loyalty, Iron Will, the Capacitor,
+   Deadfall, the Berserker's and the Feint's counters: each still books a Sanctity event when it lands (and one when it leaves).
+   Convert each as the engine chips were, or rule which of them are statuses.
+
+### FOUND AT IE AND NOT FIXED — ITS CLOSED ITEMS (archived at IF; the section stays in `docs/state.md`)
+
+- **THE CRACKED HOURGLASS SAYS *EVERY HERO* RECOVERS 30% MANA; `Run.restore_mana` REFILLS THE MAGE AND THE CLERIC** — the Hunter, who
+  spends Mana too, gets nothing, and the member's `max_mana` is a fixed 100, so a 120 bar is refilled to 100. A card-versus-code line.
+
+---
+
 ## ARCHIVED AT IE — 2026-10-13, FROM `docs/state.md` AS ID LEFT IT (`027de47`)
 
 **What came here**: ID's rulings, all four answered in IE's brief; FOUND AT ID's engine-chip item (built at IE §2a); and the
