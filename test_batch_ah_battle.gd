@@ -331,20 +331,20 @@ func _test_party_sheet() -> void:
 	run.party[0]["bm_abilities"] = ["Blood Price", "Cleave", "Rallying Shout"]
 	run.specs_chosen = true
 	run.active = true
-	var scene: Node = load("res://scenes/party.tscn").instantiate()
+	# BATCH IH §3 — THE CARDS LEFT THE HERO SHEET FOR THE MAP's KIT PANEL (the designer's: the sheet
+	# shows what he is, the panels what he wears), so the earned list is read where it is drawn now.
+	var scene: Node = load("res://scenes/map.tscn").instantiate()
 	root.add_child(scene)
 	for _i in 8:
 		await process_frame
-	# The screen opens on the hero LIST (Batch AE); the sheet is one click in.
-	scene.selected = 0
-	scene._draw_screen()
-	for _i in 8:
+	scene._open_loadout_panel(0)
+	for _i in 4:
 		await process_frame
 	var opened: Array = Classes.opening_kit("warrior", String(run.party[0]["spec"]),
 		run.held_engines(run.party[0])).map(func(a): return a.display_name)
 	for earned_nm in run.party[0]["bm_abilities"]:
 		ok(not opened.has(String(earned_nm)),
-			"%s is not in this Warrior's opening kit %s — the sheet can show it only off the earned list" % [
+			"%s is not in this Warrior's opening kit %s — the Kit panel can show it only off the earned list" % [
 				earned_nm, str(opened)])
 	var found := {"Blood Price": false, "Cleave": false, "Rallying Shout": false}
 	var walk: Array = [scene]
@@ -358,7 +358,7 @@ func _test_party_sheet() -> void:
 				if txt.contains(name):
 					found[name] = true
 	for name in found:
-		ok(found[name], "the Party sheet shows the earned %s" % name)
+		ok(found[name], "the Kit panel shows the earned %s" % name)
 	scene.free()
 
 

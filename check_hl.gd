@@ -1355,9 +1355,15 @@ func _s6_party_condition() -> void:
 	ok(not Talents.condition_met({"heroes_include_class": "cleric"}, {"member": {}}),
 		"§6: a party key with no party read true")
 	ok(Talents.condition_met({}, {}), "§6: an empty condition read false")
-	for f2 in ["res://scripts/battle.gd", "res://scripts/party_screen.gd"]:
-		ok(Gate.strip_comments(FileAccess.get_file_as_string(f2)).contains("\"party\": Run.party"),
-			"§6: %s does not hand the party to the payload's condition" % f2)
+	ok(Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/battle.gd")).contains("\"party\": Run.party"),
+		"§6: res://scripts/battle.gd does not hand the party to the payload's condition")
+	# BATCH IH §5 — the hero sheet's prologue is `Run.hero_live_config` now, inside the run node, so the
+	# party it hands is the node's own.
+	var _rs_src := Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/run_state.gd"))
+	var _hl_at := _rs_src.find("func hero_live_config(")
+	var hlc := _rs_src.substr(_hl_at, _rs_src.find("\nfunc ", _hl_at + 5) - _hl_at) if _hl_at >= 0 else ""
+	ok(hlc.contains("\"party\": party}"),
+		"§6: the hero sheet's prologue (`Run.hero_live_config`) does not hand the party to the payload's condition")
 	Runes._load().erase(CREST_FX)
 	ok(not Runes.ids().has(CREST_FX), "§6: the fixture crest rune was left in the loaded table")
 	print("    %d of %d conditions work both ways" % [works, cases.size()])

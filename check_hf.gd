@@ -1226,27 +1226,28 @@ func _s4b_the_screens() -> void:
 			ok(not cut or vw_row.size() == 1, "§4b (%s): the vow's pouch row does not show its own rule" % arm[0])
 		_close_overlays(mp)
 		await Gate.frames(self, 2)
-		# THE HERO SHEET.
-		_run.hero_screen_idx = seat
-		change_scene_to_file("res://scenes/party.tscn")
-		await Gate.frames(self, 6)
-		var sheet: Node = current_scene
+		# THE KIT PREVIEW — the hero sheet's rune block until IH §3: the line carries the state
+		# itself, and the sentence hangs on the line that says it sits out.
+		var kp: Node = mp.call("_open_kit_preview", seat)
+		await Gate.frames(self, 2)
 		var sl: Array = []
-		_labels(sheet, sl)
+		_labels(kp, sl)
 		var bg_row: Array = sl.filter(func(l): return String((l as Label).text).contains("%s — " % bg))
-		var states: Array = sl.filter(func(l): return String((l as Label).text) == "sits out")
-		ok(bg_row.size() == 1, "§4b (%s): the hero sheet draws %d rows for Burning Ground" % [arm[0], bg_row.size()])
+		var states: Array = sl.filter(func(l): return String((l as Label).text).strip_edges().begins_with("sits out"))
+		ok(bg_row.size() == 1, "§4b (%s): the kit preview draws %d lines for Burning Ground" % [arm[0], bg_row.size()])
 		if bg_row.size() == 1:
 			ok(String((bg_row[0] as Label).tooltip_text) == (note if cut else ""),
-				"§4b (%s): the sheet's Burning Ground row %s the sentence" % [arm[0],
+				"§4b (%s): the kit preview's Burning Ground line %s the sentence" % [arm[0],
 					"does not hang" if cut else "hangs"])
 			ok(String((bg_row[0] as Label).text).contains(Runes.shown_desc(Runes.build("burning_ground"))),
-				"§4b (%s): the sheet dropped Burning Ground's own rule" % arm[0])
+				"§4b (%s): the kit preview dropped Burning Ground's own rule" % arm[0])
 		ok(states.size() == (1 if cut else 0) and (not cut or String((states[0] as Label).tooltip_text) == note),
-			"§4b (%s): the sheet's state column reads `sits out` %d times — %s" % [arm[0], states.size(),
+			"§4b (%s): the kit preview reads `sits out` %d times — %s" % [arm[0], states.size(),
 				"once, for Burning Ground, with the sentence" if cut else "never"])
-		print("    %s: slot `%s`, pouch %s, sheet `sits out` x%d" % [arm[0],
+		print("    %s: slot `%s`, pouch %s, kit preview `sits out` x%d" % [arm[0],
 			face_text, "says it" if cut else "its rule", states.size()])
+		kp.queue_free()
+		await Gate.frames(self, 1)
 		change_scene_to_file("res://scenes/map.tscn")
 		await Gate.frames(self, 4)
 	_run.active = false

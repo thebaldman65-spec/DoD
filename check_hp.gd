@@ -416,8 +416,14 @@ func _s1a_the_keys_and_the_doors() -> void:
 		"§1a: the live re-read hands the heroes' standing without their engines")
 	ok(bs.contains("engines = Runes.held_engines(Run.party[i])\n"),
 		"§1a: a hero's `engines` are no longer `Runes.held_engines` of his member — the re-read and the spawn may disagree")
-	ok(not Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/party_screen.gd")).contains("LIVE_DOOR"),
-		"§1a: the hero sheet hands `LIVE_DOOR`, so it would show a live rune paying nothing at the opening")
+	# BATCH IH §5 — the sheet's prologue is `Run.hero_live_config` now (moved, unchanged), read by its own
+	# body; the sheet calling it is the positive half.
+	var _rs_src := Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/run_state.gd"))
+	var _hl_at := _rs_src.find("func hero_live_config(")
+	var hlc := _rs_src.substr(_hl_at, _rs_src.find("\nfunc ", _hl_at + 5) - _hl_at) if _hl_at >= 0 else ""
+	ok(hlc != "" and not hlc.contains("LIVE_DOOR")
+			and Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/party_screen.gd")).contains("Run.hero_live_config(member)"),
+		"§1a: the hero sheet's prologue hands `LIVE_DOOR`, so it would show a live rune paying nothing at the opening")
 
 
 # ── §1b — THE FIELDS A LIVE PAYLOAD MAY WRITE ───────────────────────────────
@@ -831,10 +837,13 @@ func _battle_on(payload: Dictionary, engines: Array) -> Node:
 
 func _s1g_the_sheet() -> void:
 	print("\n§1g — the hero sheet stamps a live payload as the opening would")
-	var ps := Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/party_screen.gd"))
-	ok(ps.contains("var pay_ctx := {\"learned\": member.get(\"talents\", {}), \"member\": member, \"party\": Run.party}")
-			and ps.contains("Talents.apply_payload(cfg, (pr as Dictionary).get(\"payload\", {}), 1, pay_ctx)"),
-		"§1g: the hero sheet no longer stamps the crest with the four in its ctx")
+	# BATCH IH §5 — the sheet's prologue moved, unchanged, to `Run.hero_live_config`, which the sheet calls.
+	var _rs_src := Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/run_state.gd"))
+	var _hl_at := _rs_src.find("func hero_live_config(")
+	var hlc := _rs_src.substr(_hl_at, _rs_src.find("\nfunc ", _hl_at + 5) - _hl_at) if _hl_at >= 0 else ""
+	ok(hlc.contains("var pay_ctx := {\"learned\": member.get(\"talents\", {}), \"member\": member, \"party\": party}")
+			and hlc.contains("Talents.apply_payload(cfg, (pr as Dictionary).get(\"payload\", {}), 1, pay_ctx)"),
+		"§1g: the hero sheet's prologue no longer stamps the crest with the four in its ctx")
 	# THE SAME DOOR, BOTH WAYS: with all four standing Dirge's condition does not hold,
 	# and with the Mage down it does.
 	var pay: Dictionary = Runes.config("dirge").get("payload", {})

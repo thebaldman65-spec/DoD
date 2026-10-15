@@ -1210,10 +1210,22 @@ const ENEMY_LAYOUTS := {
 		Vector2(905, 555), Vector2(985, 600)],
 }
 # Nameplate stacks: plate i belongs to party slot i (companion = 5th hero slot).
+# BATCH IH §6 — PITCHED TO THE PLATES THEY HOLD, so no plate runs into the next (the designer's rule):
+# a hero's plate is 86 px with two resource bars (73 with one), so the heroes' stack steps 90 from
+# 170 — six plates (four heroes and The Pack's two beasts) end at 706, under the turn strip (it ends
+# at 88) and the crest strip above plate 0. An enemy's is 74 — 87 for the two that carry Rage (the
+# Orc Chief, the Ash-Wrought Tyrant) — and a warband never grows mid-fight, so its stack is laid by
+# each plate's own height (`_stack_enemy_plates`) from 200, clear of the combat log above (to ~168),
+# with `ENEMY_PLATE_GAP` between: six at 74 end at 664, above the DEBUG button (678) they ran into at
+# 82 from 210. The width is the plate's own (`BattleUnit.PLATE_W`).
 const HERO_PLATE_X := 8.0
-const ENEMY_PLATE_X := 1128.0  # 1280 - 8 - plate width (144)
-const PLATE_TOP := 210.0
-const PLATE_STEP := 82.0
+const ENEMY_PLATE_X := 1280.0 - 8.0 - BattleUnit.PLATE_W
+const PLATE_TOP := 170.0
+const PLATE_STEP := 90.0
+const ENEMY_PLATE_TOP := 200.0
+const ENEMY_PLATE_GAP := 4.0
+const ENEMY_PLATE_STEP := 80.0  # the provisional pitch a plate is built at, before the stack is laid
+const PLATE_FLOOR := 712.0      # no plate's foot passes this
 
 # Specs with their own battle art (everyone else shares the Soldier sheet +
 # slot tint). Values are config overrides; own-art heroes render untinted.
@@ -1980,13 +1992,14 @@ func _spawn_units() -> void:
 			# Deeper zones keep their scorched warpaint.
 			tint = tint.lerp(Color(1.0, 0.6, 0.45), 0.35)
 		var eu := _make_unit(cfg, layout[i], tint,
-			Vector2(ENEMY_PLATE_X, PLATE_TOP + i * PLATE_STEP))
+			Vector2(ENEMY_PLATE_X, ENEMY_PLATE_TOP + i * ENEMY_PLATE_STEP))
 		# BATCH FK — the Glass Prison's shatter hook. Wired on every enemy at
 		# the spawn rather than at the seal, because a body that is never sealed
 		# never sets `glass_hold` and so never calls it — one wiring site beats
 		# a conditional one that a later seal path could forget.
 		eu.glass_cb = _on_glass_shatter
 		enemies.append(eu)
+	_stack_enemy_plates()
 	# BATCH HW §1d — the warband stands where the layout put it: fit each one's click zone.
 	_fit_enemy_target_zones(enemies)
 
@@ -2288,6 +2301,9 @@ func _make_unit(config: Dictionary, pos: Vector2, tint: Color,
 	# BATCH HF — VOW OF SILENCE'S DOOR, stamped where every unit passes for the
 	# same reason as the four above: any body can be struck.
 	u.deal_gate_cb = _deal_gate
+	# BATCH IH §0.2 — A CONJUNCTION's END, stamped where every unit passes for the same reason:
+	# a composition can stand on any body, and the readout reads why it left.
+	u.conj_end_cb = _on_conj_end
 	# The nameplate is a sibling (not a child) so lunges/knockback never move it.
 	var plate := Node2D.new()
 	plate.position = plate_pos
@@ -2297,6 +2313,22 @@ func _make_unit(config: Dictionary, pos: Vector2, tint: Color,
 	u.clicked.connect(func(): _target_picked.emit(u))
 	u.refresh_bars()
 	return u
+
+
+# BATCH IH §6 — the warband's plates, laid one under the next by their own heights, so a taller plate
+# (a Rage bar) never runs into the next. From `ENEMY_PLATE_TOP`, lifted only as far as a stack too tall
+# for the screen needs (never above the combat log's foot).
+func _stack_enemy_plates() -> void:
+	var total := 0.0
+	for e in enemies:
+		total += (e as BattleUnit).plate_height() + ENEMY_PLATE_GAP
+	total -= ENEMY_PLATE_GAP
+	var y := ENEMY_PLATE_TOP
+	if y + total > PLATE_FLOOR:
+		y = maxf(176.0, PLATE_FLOOR - total)
+	for e2 in enemies:
+		(e2 as BattleUnit).place_plate(Vector2(ENEMY_PLATE_X, y))
+		y += (e2 as BattleUnit).plate_height() + ENEMY_PLATE_GAP
 
 
 func _hero_plate_pos(slot: int) -> Vector2:
@@ -2372,14 +2404,14 @@ func _build_ui() -> void:
 	# never take a click from a live skill check, and it does NOT gate
 	# _modal_open(). Hidden until the fight has run absurdly long.
 	_forfeit_nudge = Label.new()
-	_forfeit_nudge.position = Vector2(56, 52)
-	_forfeit_nudge.size = Vector2(700, 20)
 	_forfeit_nudge.visible = false
 	_forfeit_nudge.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_forfeit_nudge.add_theme_font_size_override("font_size", 13)
 	_forfeit_nudge.add_theme_color_override("font_color", Color(0.85, 0.7, 0.4))
 	_forfeit_nudge.text = "This fight is not resolving — Forfeit Run is in the ☰ menu."
-	ui.add_child(_forfeit_nudge)
+	# BATCH IH §6 — UNDER THE TURN STRIP, NOT ACROSS IT: at y 52 its line lay over the strip's
+	# portraits (the strip runs to y 88), and it was sized before it was parented (22 px, not 18).
+	BattleUnit._put(ui, _forfeit_nudge, Vector2(56, 92), Vector2(700, 18))
 
 
 	_build_skill_check_ui()
@@ -2394,17 +2426,18 @@ func _build_skill_check_ui() -> void:
 	sc_root.visible = false
 	ui.add_child(sc_root)
 
+	# BATCH IH §6 — its two lines are parented before they are sized (sized first, each took the
+	# default font's 22-px line), each as tall as its own line (font 11 → 16, font 12 → 17), and the
+	# panel holds the result line under the cursor's foot (it ran 7 px past the 59-px panel).
 	var bg := Panel.new()
-	bg.size = Vector2(352, 59)
+	bg.size = Vector2(352, 64)
 	sc_root.add_child(bg)
 
 	sc_hint = Label.new()
 	sc_hint.text = SC_HINT_NORMAL
-	sc_hint.position = Vector2(0, 3)
-	sc_hint.size = Vector2(352, 14)
 	sc_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sc_hint.add_theme_font_size_override("font_size", 11)
-	sc_root.add_child(sc_hint)
+	BattleUnit._put(sc_root, sc_hint, Vector2(0, 3), Vector2(352, 16))
 
 	var track := ColorRect.new()
 	track.position = Vector2(8, 27)
@@ -2423,18 +2456,18 @@ func _build_skill_check_ui() -> void:
 	sc_perfect_zone.color = Color(0.9, 0.8, 0.3)
 	sc_root.add_child(sc_perfect_zone)
 
+	# BATCH IH §6 — THE NEEDLE RUNS INSIDE ITS TRACK, as the zones do: it stood 3 px proud above and
+	# below the 16-px track and across the result line's top.
 	sc_cursor = ColorRect.new()
-	sc_cursor.size = Vector2(4, 22)
-	sc_cursor.position = Vector2(8, 24)
+	sc_cursor.size = Vector2(4, 16)
+	sc_cursor.position = Vector2(8, 27)
 	sc_cursor.color = Color.WHITE
 	sc_root.add_child(sc_cursor)
 
 	sc_result = Label.new()
-	sc_result.position = Vector2(0, 44)
-	sc_result.size = Vector2(352, 14)
 	sc_result.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sc_result.add_theme_font_size_override("font_size", 12)
-	sc_root.add_child(sc_result)
+	BattleUnit._put(sc_root, sc_result, Vector2(0, 46), Vector2(352, 17))
 
 	# The zones exist with a size from the very first frame, before any cast
 	# has handed the bar a profile. Nothing grades against this — it only means
@@ -2523,6 +2556,9 @@ func _on_debug_menu(id: int) -> void:
 	# dispatch): every battle debug item trips the flag from here, so the
 	# run summary can never claim a debug-touched run is clean data.
 	Run.debug_used = true
+	# BATCH IH §0.2 — AND THE READOUT IS TOLD, NAMING THE ACTION, before the action runs: a Kill
+	# All ends the fight inside its own call, and the fight's line must already know.
+	Run.note_debug(_debug_action_name(id), "in the fight")
 	if id == 0:
 		_debug_full_restore()
 		return
@@ -2558,6 +2594,31 @@ func _on_debug_menu(id: int) -> void:
 			% hero.unit_name, "#e0a050")
 	else:
 		_log("DEBUG: turn lock released", "#e0a050")
+
+
+# BATCH IH §0.2 — THE BATTLE MENU's ITEMS BY NAME, as the menu prints them, and the state a
+# check item or a turn lock moves to (read before the dispatch below flips it).
+func _debug_action_name(id: int) -> String:
+	match id:
+		0:
+			return "Full Restore"
+		3:
+			return "Kill All Enemies"
+		2:
+			return "Cooldowns OFF" if not debug_cooldowns_off else "Cooldowns back on"
+		1:
+			return "Enemy attacks OFF" if not debug_enemies_off else "Enemy attacks back on"
+	var i := id - 10
+	if i >= 0 and i < heroes.size():
+		return "Turn lock released" if debug_locked_hero == heroes[i] \
+			else "Turn lock → %s" % heroes[i].unit_name
+	return "debug item %d" % id
+
+
+# BATCH IH §0.2 — THE READOUT HEARS WHY A CONJUNCTION ENDED, off the body's own hook.
+func _on_conj_end(u: BattleUnit, comp_id: String, why: String) -> void:
+	if _readout != null:
+		_readout.conj_ended(u, comp_id, why)
 
 
 func _debug_full_restore() -> void:
@@ -27987,11 +28048,11 @@ func _draw_crest_strip(chips: Array) -> void:
 	lbl.text = "CREST"
 	lbl.add_theme_font_size_override("font_size", 9)
 	lbl.add_theme_color_override("font_color", BattleUnit.RUNE_CHIP_PAYING)
-	lbl.position = Vector2(0, -1)
-	lbl.size = Vector2(40, 12)
 	lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_crest_strip.add_child(lbl)
-	var x := 40.0
+	# BATCH IH §6 — parented, then sized: a font-9 line is 13 px, and sized first it took the default
+	# font's 50 × 22 and lay over its first chip and into the plate below.
+	BattleUnit._put(_crest_strip, lbl, Vector2(0, -1), Vector2(40, 13))
+	var x := 44.0
 	for rc in chips:
 		var chip := BattleUnit.rune_chip(rc)
 		chip.position = Vector2(x, 0)

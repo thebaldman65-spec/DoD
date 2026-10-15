@@ -2101,7 +2101,7 @@ const SPINE_INFO := {
 	"channel": {"class": "mage", "name": "Channel",
 		"passive_desc": "Channel: every 42 Mana the Mage spends this battle adds\n+3% damage to non-physical attacks, up to 6 steps. Every\ncast counts as at least 10 Mana spent."},
 	"sanctity": {"class": "cleric", "name": "Sanctity",
-		"passive_desc": "Sanctity: every 16 changes to the statuses on the field\nthis battle — one landing on a unit or removed from one,\nfrom any source; a status running out does not count —\nadd 1 turn to each status the Cleric applies, up to 5."},
+		"passive_desc": "Sanctity: every %d changes to the statuses on the field\nthis battle — one landing on a unit or removed from one,\nfrom any source; a status running out does not count —\nadd 1 turn to each status the Cleric applies, up to %d."},
 }
 
 
@@ -2263,6 +2263,11 @@ static func engine_title(pid: String) -> String:
 
 static func engine_desc(pid: String) -> String:
 	if SPINE_INFO.has(pid):
+		# BATCH IH — SANCTITY's TWO FIGURES ARE ITS CONSTANTS', read here: IG moved the step and its
+		# rule text went on naming the old one. The engine's own figures, filled at the one door.
+		if pid == "sanctity":
+			return String(SPINE_INFO[pid]["passive_desc"]) % [BattleUnit.SANCTITY_PER_STEP,
+				BattleUnit.SANCTITY_MAX_STEPS]
 		return String(SPINE_INFO[pid]["passive_desc"])
 	if RULE_ENGINES.has(pid):
 		return _rule_engine_desc(pid)
@@ -2435,10 +2440,10 @@ static func rage_dump_pct(spent: int) -> float:
 
 # ---------- THE COMPUTED BLOCK (Batch CK §1) ----------
 #
-# ONE BUILDER, TWO SURFACES, AND THAT IS THE WHOLE POINT OF IT LIVING HERE.
-# The draft card (`map_screen._draft_column`) and the hero sheet
-# (`party_screen._draw_detail`) both put an ability's numbers under its
-# description. Before CK the sheet held the only copy, so the draft card showed
+# ONE BUILDER FOR EVERY STATIC SURFACE, AND THAT IS THE WHOLE POINT OF IT LIVING HERE.
+# The draft card (`map_screen._draft_column`) and the ability hover
+# (`Run.ability_hover` — the hero sheet's chips until IH §3; the Kit panel and the
+# kit preview since) both put an ability's numbers under its description. Before CK the sheet held the only copy, so the draft card showed
 # the description ALONE — and 30 of the 66 damaging abilities never state their
 # damage in prose, because every other surface computes it (audit §2.1). Ice
 # Lance was the sharpest: `damage: 35` in the dict and a card that reads only

@@ -661,6 +661,14 @@ const CARD_STEP := 158.0
 # BATCH HR §2 — the nameplate marker's width: "✦ 8" at font 13 with the button's
 # own margins, between the name and the upgrades badge.
 const NAMEPLATE_MARK_W := 44.0
+# BATCH IH §6 — the card's lines, each as tall as the line its text needs (measured at IH, Open Sans
+# SemiBold: font 14 → 20 px, font 11 → 16, font 8 → 12).
+const CARD_NAME_H := 20.0
+const CARD_HP_BAR_H := 16.0
+const CARD_RES_BAR_H := 12.0
+# The ✦ marker is a 26-px button at y 4 (font 13, its margins), so the bars start under its foot.
+const CARD_HP_Y := 31.0
+const CARD_RES_Y := 49.0
 # BATCH ID §4 — THE KIT BUTTON's WIDTH, and its place: the card's bottom-right, on the CHOOSE
 # row. It sat after the rune slots from EG, sized `CARD_W - 24 - 3 × 96` — below zero once the
 # slots were three, so it took its text's width from x 304 and ran 36 px past the card's 300
@@ -668,6 +676,13 @@ const NAMEPLATE_MARK_W := 44.0
 # with the button's margins, and the rune row leaves 8 — the three slots keep their 92 px (GX §2's
 # marker needs them) — so it takes its own place, and CHOOSE and the core-rune line give it room.
 const KIT_BTN_W := 56.0
+# BATCH IH §2 — THE RUNES BUTTON's WIDTH, beside Kit on the same row: the room the core-rune line
+# gave up. Measured at IH at font 10 with the button's margins: *Runes 6/6* is 56 px — KIT_BTN_W —
+# and *○ Runes 6/6*, the face a core rune that sits out gives it, 65. It takes the wider, so the
+# face can change and the button cannot move.
+const RUNES_BTN_W := 65.0
+# The gap between Runes and Kit: at 4 the two dark faces read as one box on the real screen (IH §2).
+const ROW_BTN_GAP := 6.0
 
 
 func _draw_hero_cards() -> void:
@@ -676,6 +691,19 @@ func _draw_hero_cards() -> void:
 
 
 func _draw_hero_card(idx: int, at: Vector2) -> void:
+	# BATCH IH §6 — every control this card draws is tagged with its seat (`hero_card`), so a check can
+	# hold the card's own parts to the rule that nothing on it is drawn over anything else on it.
+	var first_child := get_child_count()
+	_draw_hero_card_parts(idx, at)
+	for k in range(first_child, get_child_count()):
+		get_child(k).set_meta("hero_card", idx)
+
+
+# BATCH IH §6 — NOTHING ON A CARD IS DRAWN OVER ANYTHING ELSE ON IT (the designer's rule). The portrait
+# keeps its 44-px column (expand mode before size: it drew at its texture's own size, the Berserker's
+# 64-px bust over his name and his Rage line); every label is parented before it is sized (sized first
+# it takes the default font's 22-px line); a bar's value is drawn in a bar as tall as its line.
+func _draw_hero_card_parts(idx: int, at: Vector2) -> void:
 	var member: Dictionary = Run.party[idx]
 	var key := String(member["key"])
 	var spec := String(member.get("spec", ""))
@@ -716,12 +744,12 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 	add_child(open)
 
 	var portrait := TextureRect.new()
+	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	portrait.texture = Classes.class_icon(key, spec)
 	portrait.position = at + Vector2(8, 8)
 	portrait.custom_minimum_size = Vector2(44, 44)
 	portrait.size = Vector2(44, 44)
-	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if not Classes.SPEC_PORTRAITS.has(spec):
 		portrait.modulate = Classes.HERO_TINTS[idx % Classes.HERO_TINTS.size()]
@@ -733,10 +761,12 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 			else "%s — Unawakened" % key.capitalize())
 	name_lbl.add_theme_font_size_override("font_size", 14)
 	name_lbl.add_theme_color_override("font_color", Color(0.9, 0.86, 0.76))
-	name_lbl.position = at + Vector2(58, 7)
-	name_lbl.size = Vector2(CARD_W - 108, 18)
+	name_lbl.clip_text = true
+	name_lbl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(name_lbl)
+	name_lbl.position = at + Vector2(58, 5)
+	name_lbl.size = Vector2(CARD_W - 108, CARD_NAME_H)
 	# ══ BATCH HR §2 — THE NAMEPLATE SAYS A RUNE IS WAITING (ruled) ═══════════════
 	#
 	# **THE COUNT OF RUNES THIS HERO HOLDS AND DOES NOT WEAR**, on his nameplate, so
@@ -749,14 +779,13 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 	# badge, and the name gives up the room it takes only while it is shown.
 	var waiting: int = Run.held_count(member)
 	if waiting > 0:
-		name_lbl.size = Vector2(CARD_W - 110 - NAMEPLATE_MARK_W, 18)
+		name_lbl.size = Vector2(CARD_W - 110 - NAMEPLATE_MARK_W, CARD_NAME_H)
 		var mark := Button.new()
+		mark.add_theme_font_size_override("font_size", 13)
 		mark.text = "✦ %d" % waiting
 		mark.flat = true
 		mark.position = at + Vector2(CARD_W - 52 - NAMEPLATE_MARK_W, 4)
 		mark.custom_minimum_size = Vector2(NAMEPLATE_MARK_W, 22)
-		mark.size = Vector2(NAMEPLATE_MARK_W, 22)
-		mark.add_theme_font_size_override("font_size", 13)
 		mark.add_theme_color_override("font_color", Color(0.85, 0.6, 1.0))
 		mark.tooltip_text = "%d rune%s held, not worn. Click to equip\n%s from the %s's rune panel." % [
 			waiting, "" if waiting == 1 else "s", "it" if waiting == 1 else "them",
@@ -765,20 +794,25 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 		mark.pressed.connect(Music.click)
 		mark.pressed.connect(_open_rune_panel.bind(idx))
 		add_child(mark)
+	# BATCH IH §6 — A NAME LONGER THAN ITS BOX TAKES A SIZE DOWN (font 12, a 17-px line, inside the 20),
+	# so it is read whole rather than cut: *Warrior — Unawakened* beside a ✦ marker is 160 px at 14.
+	if name_lbl.get_theme_font("font").get_string_size(name_lbl.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x \
+			> name_lbl.size.x:
+		name_lbl.add_theme_font_size_override("font_size", 12)
 
 	# HP bar with numbers, then the resource bar under it.
 	var hp: int = int(member["hp"])
 	var max_hp: int = maxi(int(member["max_hp"]), 1)
-	_bar(at + Vector2(58, 27), CARD_W - 66, 15,
+	_bar(at + Vector2(58, CARD_HP_Y), CARD_W - 66, CARD_HP_BAR_H,
 		float(hp) / float(max_hp),
 		Color(0.75, 0.25, 0.28) if hp > 0 else Color(0.35, 0.2, 0.22),
-		"%d / %d" % [hp, max_hp])
+		"%d / %d" % [hp, max_hp], 11)
 	var cfg := Classes.hero_config(key)
 	var res_name := String(cfg.get("resource_name", "Mana"))
 	if res_name == "Mana":
-		_bar(at + Vector2(58, 45), CARD_W - 66, 11,
+		_bar(at + Vector2(58, CARD_RES_Y), CARD_W - 66, CARD_RES_BAR_H,
 			float(member["mana"]) / float(maxi(int(member["max_mana"]), 1)),
-			Color(0.3, 0.45, 0.85), "%s %d" % [res_name, int(member["mana"])])
+			Color(0.3, 0.45, 0.85), "%s %d" % [res_name, int(member["mana"])], 8)
 	else:
 		# Rage and its kin build in combat and carry nothing between fights;
 		# an empty bar every time would be a lie about the resource.
@@ -786,7 +820,7 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 		res_lbl.text = "%s — builds in combat" % res_name
 		res_lbl.add_theme_font_size_override("font_size", 10)
 		res_lbl.add_theme_color_override("font_color", Color(0.6, 0.57, 0.55))
-		res_lbl.position = at + Vector2(58, 44)
+		res_lbl.position = at + Vector2(58, CARD_RES_Y - 1)
 		res_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(res_lbl)
 
@@ -830,7 +864,7 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 			# the button, and the three slots are pitched 96 apart — an
 			# overflowing one would lie over its neighbour rather than clip.
 			# `check_gx` §2 re-measures all four forms and the drawn button.
-			# **The sentence itself is the pouch's and the hero sheet's own,
+			# **The sentence itself is the pouch's and the kit preview's own,
 			# in the tooltip, which has the room.**
 			if sitting_runes.has(String(rune["name"])):
 				slot_btn.text = "○ %s" % String(rune["name"])
@@ -846,17 +880,18 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 
 	# BATCH EG §2 — THE SWAP NEEDS A PLACE TO HAPPEN, AND THIS IS IT.
 	# It is on the MAP CARD and not on the party sheet for the reason the runes
-	# are: one writer. `party_screen.gd`'s rune block says so in as many words —
-	# "equipping happens on the map card, so there is one place that writes
-	# `equipped`" — and a loadout with two writers is the same defect wearing a
-	# different field name. The sheet SHOWS the loadout and the bench count; this
-	# button is what moves them.
+	# are: one writer — a loadout with two writers is the same defect as a rune
+	# with two. Since IH §3 the sheet shows neither the loadout nor the runes: the
+	# panel this button opens shows and moves the cards, and the Runes button
+	# beside it opens the panel that shows and moves the runes.
 	#
 	# It sits at the card's bottom-right, on the CHOOSE row (ID §4; it sat after the rune slots
 	# until then and ran past the card). It reads the ladder rather than a number, so it cannot
 	# drift from `ABILITY_SLOTS_BY_BOSS`.
 	var has_kit := spec != "" or bool(member.get("awakened", false))
-	var row_w: float = CARD_W - 16 - (KIT_BTN_W + 4 if has_kit else 0.0)
+	# BATCH IH §2 — THE ROW HOLDS KIT AND RUNES AT ITS RIGHT, CHOOSE AT ITS LEFT; the core-rune line
+	# that stood where CHOOSE does when nothing is owed is gone (the designer's).
+	var row_w: float = CARD_W - 16 - ((KIT_BTN_W + ROW_BTN_GAP + RUNES_BTN_W + ROW_BTN_GAP) if has_kit else 0.0)
 	if has_kit:
 		var load_btn := Button.new()
 		load_btn.position = at + Vector2(CARD_W - 8 - KIT_BTN_W, 114)
@@ -874,6 +909,7 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 		load_btn.pressed.connect(Music.click)
 		load_btn.pressed.connect(_open_loadout_panel.bind(idx))
 		add_child(load_btn)
+		_runes_button(idx, member, at)
 
 	# Batch AQ §5C: the ability-upgrade count, sitting alongside the rune slots
 	# — runes already get exactly this treatment here and upgrades got nothing,
@@ -897,11 +933,11 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 		up_badge.add_theme_font_size_override("font_size", 12)
 		up_badge.add_theme_color_override("font_color", Color(1.0, 0.9, 0.5))
 		up_badge.tooltip_text = "Ability upgrades\n%s" % "\n".join(up_lines)
-		up_badge.position = Vector2(CARD_W - 48, 6)
-		up_badge.size = Vector2(40, 18)
 		up_badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		up_badge.mouse_filter = Control.MOUSE_FILTER_PASS
 		open.add_child(up_badge)
+		up_badge.position = Vector2(CARD_W - 48, 4)
+		up_badge.size = Vector2(40, 18)
 
 	# The badges: any owed pick, stated on the card rather than behind a
 	# click. BATCH BM removed the unspent-points badge with the purse.
@@ -919,10 +955,10 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 		badge.text = "  ".join(badges)
 		badge.add_theme_font_size_override("font_size", 12)
 		badge.add_theme_color_override("font_color", Color(1.0, 0.9, 0.5))
-		badge.position = at + Vector2(8, 92)
-		badge.size = Vector2(CARD_W - 16, 16)
 		badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(badge)
+		badge.position = at + Vector2(8, 92)
+		badge.size = Vector2(CARD_W - 16, 18)
 
 	# An owed pick opens the hero's own screen (ID §1: every kind is a section of it). It
 	# stays ON THE CARD in the sense that matters — the player never has to know which
@@ -939,56 +975,56 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 		pick_btn.pressed.connect(Music.click)
 		pick_btn.pressed.connect(_open_hero_draft.bind(idx))
 		add_child(pick_btn)
-	else:
-		var hint := Label.new()
-		# BATCH GK — THE CARD NAMES THE ENGINES HELD, or says there are none: a
-		# hero with no engine is a legal state and should read as one.
-		var held: Array = Runes.held_engines(member)
-		var held_titles := PackedStringArray()
-		# BATCH HC §5 — AN ENGINE THAT SITS OUT IS MARKED ON THE CARD, as a worn rune
-		# is on its slot (GX): the marker in the text and the line in the same amber.
-		# This line is the map's one place an engine is named without opening
-		# anything. **The sentence goes on the card's own tooltip**, which is what a
-		# hover over this line shows: the line stays click-through, so a press on
-		# it still opens the sheet, where the engine's row carries the sentence too.
-		var eng_sits: Array = Run.sitting_out_rune_names(member)
-		var eng_note := ""
-		for er in member.get("engines", []):
-			var erd: Dictionary = er
-			if not bool(erd.get("equipped", false)):
-				continue
-			var e_title := Classes.engine_title(String(erd.get("engine", "")))
-			if eng_sits.has(String(erd.get("name", ""))):
-				held_titles.append("○ %s" % e_title)
-				eng_note = Run.rune_sits_out_note(String(erd.get("id", "")), held)
-			else:
-				held_titles.append(e_title)
-		hint.text = "core runes: %s — click the card for the sheet" % (
-			" + ".join(held_titles) if not held.is_empty() else "none")
-		hint.add_theme_font_size_override("font_size", 11)
-		hint.add_theme_color_override("font_color", Color(0.5, 0.48, 0.52))
-		if eng_note != "":
-			hint.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
-			open.tooltip_text += "\n\n%s" % eng_note
-		# BATCH IA §2 — THE LINE WRAPS, AND IT HAS THE ROOM TO. It was one line in a
-		# 284-px box, and two titles already ran past the card's edges — measured at
-		# font 11: the widest pair 372 px, the widest set of three 442 — so it is laid
-		# out bottom-up in the room the badges and the pick button take only when a
-		# pick is owed, which is exactly when this line is not drawn.
-		# Wrapping is switched on BEFORE the box is sized: a label that cannot wrap grows
-		# its box to its one-line width the moment a size is set, and keeps it. Since ID §4 the
-		# box leaves the Kit button its room at the right (`row_w`), and wraps a line sooner.
-		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		hint.position = at + Vector2(8, 94)
-		hint.size = Vector2(row_w, 54)
-		hint.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
-		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		add_child(hint)
+	# BATCH IH §2 — THE CORE-RUNE LINE STOOD HERE, NAMING HIS CORE RUNES AND POINTING AT THE SHEET,
+	# AND IT IS GONE WHOLE, the list and the hint both (the designer's). His core runes are counted
+	# on the Runes button beside Kit, and named on the panel it opens; a core rune that sits out
+	# marks that button (HC §5's tell, which this line carried).
+
+
+# ══ BATCH IH §2 — THE RUNES BUTTON, BESIDE KIT ═══════════════════════════════════════════════
+#
+# **`Runes n/6`, mirroring `Kit n/m`**: n the runes he wears — his slotted core runes and his worn
+# ordinary ones — and 6 the two slot counts the panel heads (CORE and WORN). The panel tells the two
+# apart; the button does not have to. It is the way into his rune panel that is always there; the
+# ✦ marker on his nameplate stays the glance that says something waits, and each rune slot above
+# still opens the same panel. **HC §5's tell rides it now**: a slotted core rune that sits out marks
+# the face (○), turns it amber and puts the sentence on its hover — the map's one place a core rune
+# that pays nothing is said without opening anything, which the core-rune line was until IH.
+# `runes_button` meta: `check_gx` §3 reads every other `_open_rune_panel` button as a rune slot.
+func _runes_button(idx: int, member: Dictionary, at: Vector2) -> Button:
+	var worn: int = Run.engines_worn(member) + Run.runes_worn(member)
+	var slots: int = Run.ENGINE_SLOTS + Run.rune_slots()
+	var held: Array = Runes.held_engines(member)
+	var sits: Array = Run.sitting_out_rune_names(member)
+	var note := ""
+	for er in member.get("engines", []):
+		var erd: Dictionary = er
+		if bool(erd.get("equipped", false)) and sits.has(String(erd.get("name", ""))):
+			note = Run.rune_sits_out_note(String(erd.get("id", "")), held)
+			break
+	var b := Button.new()
+	# THE FONT BEFORE ANY SIZE: a size set first is clamped to the face at the default font and kept
+	# (IA's label trap, met here at IH and caught by `check_id` §4c — it ran 85 px, under Kit).
+	b.add_theme_font_size_override("font_size", 10)
+	b.text = ("○ " if note != "" else "") + "Runes %d/%d" % [worn, slots]
+	b.position = at + Vector2(CARD_W - 8 - KIT_BTN_W - ROW_BTN_GAP - RUNES_BTN_W, 114)
+	b.custom_minimum_size = Vector2(RUNES_BTN_W, 30)
+	b.tooltip_text = "%s wears %d of %d core runes and %d of %d runes; %d held, not worn.\nClick to manage them." % [
+		Run.nameplate(member), Run.engines_worn(member), Run.ENGINE_SLOTS, Run.runes_worn(member),
+		Run.rune_slots(), Run.held_count(member)]
+	b.add_theme_color_override("font_color", Color(0.62, 0.6, 0.57))
+	if note != "":
+		b.tooltip_text += "\n\n%s" % note
+		b.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
+	b.set_meta("runes_button", idx)
+	b.pressed.connect(Music.click)
+	b.pressed.connect(_open_rune_panel.bind(idx))
+	add_child(b)
+	return b
 
 
 func _bar(at: Vector2, w: float, h: float, frac: float, fill: Color,
-		text: String) -> void:
+		text: String, font_px: int) -> void:
 	var back := ColorRect.new()
 	back.position = at
 	back.size = Vector2(w, h)
@@ -1003,16 +1039,18 @@ func _bar(at: Vector2, w: float, h: float, frac: float, fill: Color,
 	add_child(bar)
 	var lbl := Label.new()
 	lbl.text = text
-	lbl.add_theme_font_size_override("font_size", int(h) - 4)
+	# BATCH IH §6 — THE VALUE's FONT IS NAMED BY THE CALLER, whose bar is as tall as its line (it was
+	# `h - 4`: a font-11 line of 16 px in a 15-px bar), and the label is parented before it is sized.
+	lbl.add_theme_font_size_override("font_size", font_px)
 	lbl.add_theme_color_override("font_color", Color(0.95, 0.93, 0.9))
 	lbl.add_theme_constant_override("outline_size", 3)
 	lbl.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
-	lbl.position = at
-	lbl.size = Vector2(w, h)
 	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(lbl)
+	lbl.position = at
+	lbl.size = Vector2(w, h)
 
 
 # ---------- the owed-pick overlay: RETIRED AT BATCH ID §1 ----------
@@ -2011,7 +2049,7 @@ func _offer_card(cards: VBoxContainer, card_name: String, chosen: bool, on_press
 	# vocabulary are different kinds of writing, and only one of them is
 	# text the designer wrote. Its own tint keeps them apart at a glance.
 	#
-	# **`Classes.card_tag_line` IS THE ONE BUILDER** — the hero sheet, the
+	# **`Classes.card_tag_line` IS THE ONE BUILDER** — the Kit panel, the
 	# battle tooltip and the rune offer all render a different surface, and
 	# when one of them takes tags on it must not draw them a second way.
 	#
@@ -2035,7 +2073,7 @@ func _offer_card(cards: VBoxContainer, card_name: String, chosen: bool, on_press
 		var text := Label.new()
 		# BATCH CL §1 — NO CTX ON PURPOSE. The map screen has no live hero to
 		# resolve against (the same reason `computed_block` prints a scaling
-		# percentage here and a range on the sheet), so every token falls
+		# percentage here and a range on the Kit panel's hover), so every token falls
 		# through to its bare percentage: no parenthetical, no placeholder,
 		# no dash. Resolving is still CALLED, because an unresolved token
 		# must never reach a label.
@@ -3115,9 +3153,9 @@ func _open_loadout_panel(idx: int) -> void:
 	#
 	# **A SILENT THRESHOLD IS A STAT NOBODY KNOWS THEY HAVE.** A rune reading
 	# "hold 2+ of a tag" is only a decision if the player can see the count, see
-	# it move, and see which card moved it — so the census sits on THIS panel and
-	# not only on the sheet, because this is the one screen where the number is
-	# under the player's hand. `_toggle_loadout` re-opens the panel after every
+	# it move, and see which card moved it — so the census sits on THIS panel (and
+	# since IH §3 only here: the sheet shows what the hero is), because this is the
+	# one screen where the number is under the player's hand. `_toggle_loadout` re-opens the panel after every
 	# bench and carry, so the line is redrawn from the live loadout each time and
 	# cannot go stale: there is no cached count here to invalidate.
 	#
@@ -3173,6 +3211,11 @@ func _open_loadout_panel(idx: int) -> void:
 	# line that says so (IA's emptiest state). The protected core is read off
 	# `Run.opening_kit_names` — names, not `core_slots`, which counts slots — and an enabler
 	# travels with its engine (GK).
+	# BATCH IH §5 — THE HOVER THE HERO SHEET's CHIPS CARRIED, MOVED HERE: every ability row reads
+	# `Run.ability_hover` off one live config built once for the panel (the sheet's own prologue,
+	# moved to `Run.hero_live_config`), and wears ↑ when an upgrade landed on it (ID's glyph, which
+	# the sheet's chip wore). A section's head or note is not an ability and carries no hover.
+	var live: Dictionary = Run.hero_live_config(member)
 	var enabler_names: Array = []
 	for pid in Runes.held_engines(member):
 		enabler_names.append_array(Classes.engine_enablers(String(pid)))
@@ -3186,24 +3229,24 @@ func _open_loadout_panel(idx: int) -> void:
 	var on_names: Array = earned.filter(func(n): return carried.has(n))
 	var off_names: Array = earned.filter(func(n): return not carried.has(n))
 	# BATCH IG §3 — STARTING KIT, NEVER CORE (IF's ruling 4, the designer's): CORE names a core rune on the
-	# rune panel, the hero sheet and the kit preview, and one word may not name two kinds of thing on two
+	# rune panel and the kit preview, and one word may not name two kinds of thing on two
 	# panels. Not the bare KIT: the map card's own button counts this panel's starting cards AND its carried
 	# ones as the kit (`Kit n/m`), so KIT here would name the whole and one part of it.
 	_pouch_head(rows, "STARTING KIT — never benched", Color(0.55, 0.62, 0.85))
 	for pname in kit_core:
-		_loadout_kit_row(rows, String(pname))
+		_loadout_kit_row(rows, member, String(pname), live)
 	if kit_core.is_empty():
 		_pouch_note(rows, "No card in the starting kit.", Color(0.6, 0.57, 0.55), false)
 	rows.add_child(HSeparator.new())
 	_pouch_head(rows, "ENABLERS — brought by a core rune", Color(0.55, 0.62, 0.85))
 	for pname in kit_enablers:
-		_loadout_kit_row(rows, String(pname))
+		_loadout_kit_row(rows, member, String(pname), live)
 	if kit_enablers.is_empty():
 		_pouch_note(rows, "None: no slotted core rune brings a card.", Color(0.6, 0.57, 0.55), false)
 	rows.add_child(HSeparator.new())
 	_pouch_head(rows, "CARRIED — %d" % on_names.size(), Color(0.45, 0.9, 0.5))
 	for aname in on_names:
-		_loadout_earned_row(rows, idx, member, String(aname), true, sitting, overlay)
+		_loadout_earned_row(rows, idx, member, String(aname), true, sitting, overlay, live)
 	if on_names.is_empty():
 		_pouch_note(rows, "Nothing earned yet. A card is drafted after an elite or at an event,\nand a zone boss pays a pick of three."
 			if earned.is_empty() else "Nothing carried. A benched card is carried again from below.",
@@ -3211,7 +3254,7 @@ func _open_loadout_panel(idx: int) -> void:
 	rows.add_child(HSeparator.new())
 	_pouch_head(rows, "BENCHED — %d, kept for the run" % off_names.size(), Color(0.62, 0.6, 0.57))
 	for aname in off_names:
-		_loadout_earned_row(rows, idx, member, String(aname), false, sitting, overlay)
+		_loadout_earned_row(rows, idx, member, String(aname), false, sitting, overlay, live)
 	if off_names.is_empty():
 		_pouch_note(rows, "Nothing benched.", Color(0.6, 0.57, 0.55), false)
 
@@ -3227,7 +3270,8 @@ func _open_loadout_panel(idx: int) -> void:
 
 # BATCH IF §3 — a kit card's row in CORE or ENABLERS: its name, behind a blank where an
 # earned row's button stands, so every name in the panel starts in one column.
-func _loadout_kit_row(rows: VBoxContainer, pname: String) -> void:
+func _loadout_kit_row(rows: VBoxContainer, member: Dictionary, pname: String,
+		live: Dictionary) -> void:
 	var prow := HBoxContainer.new()
 	prow.add_theme_constant_override("separation", 10)
 	rows.add_child(prow)
@@ -3235,7 +3279,8 @@ func _loadout_kit_row(rows: VBoxContainer, pname: String) -> void:
 	gap.custom_minimum_size = Vector2(84, 26)
 	prow.add_child(gap)
 	var plbl := Label.new()
-	plbl.text = pname
+	plbl.text = _upgraded_mark(member, pname, live) + pname
+	_hover(plbl, Run.ability_hover(member, pname, live))
 	plbl.add_theme_font_size_override("font_size", 12)
 	plbl.add_theme_color_override("font_color", Color(0.72, 0.78, 0.9))
 	plbl.custom_minimum_size = Vector2(520, 20)
@@ -3245,7 +3290,7 @@ func _loadout_kit_row(rows: VBoxContainer, pname: String) -> void:
 # BATCH IF §3 — an earned card's row in CARRIED or BENCHED: Bench or Carry, then its name
 # and its text. The section says which; the row does not say it again.
 func _loadout_earned_row(rows: VBoxContainer, idx: int, member: Dictionary, aname: String,
-		is_on: bool, sitting: Array, overlay: Control) -> void:
+		is_on: bool, sitting: Array, overlay: Control, live: Dictionary = {}) -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 10)
 	rows.add_child(row)
@@ -3263,21 +3308,38 @@ func _loadout_earned_row(rows: VBoxContainer, idx: int, member: Dictionary, anam
 	row.add_child(toggle)
 	var lbl := Label.new()
 	var ab: Ability = Classes.pool_ability(aname)
-	lbl.text = "%s%s" % [aname, "" if ab == null or ab.description == ""
-		else " — %s" % Classes.resolve_values(ab.description)]
+	lbl.text = "%s%s%s" % [_upgraded_mark(member, aname, live), aname,
+		"" if ab == null or ab.description == "" else " — %s" % Classes.resolve_values(ab.description)]
 	lbl.add_theme_font_size_override("font_size", 12)
 	lbl.add_theme_color_override("font_color",
 		Color(0.45, 0.9, 0.5) if is_on else Color(0.62, 0.6, 0.57))
 	# BATCH GT §3 — CARRIED, AND SITTING OUT. The row says so in place of
 	# the card's own text, because this is the panel where the slot it
-	# still holds can be freed; the sentence is the hero sheet's, one door.
+	# still holds can be freed; the sentence is `Run.sits_out_note`'s, one door.
 	if is_on and sitting.has(aname):
 		lbl.text = "%s — %s" % [aname, Run.sits_out_note(aname,
 			Run.held_engines(member)).replace("\n", " ")]
 		lbl.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
 	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	lbl.custom_minimum_size = Vector2(520, 20)
+	_hover(lbl, Run.ability_hover(member, aname, live))
 	row.add_child(lbl)
+
+
+# BATCH IH §5 — a row's hover, on the Label that names the card: a Label ignores the mouse by
+# default and a tooltip on one that ignores it is never shown; it PASSES rather than stops, so
+# the wheel still reaches the panel's scroller over a row.
+func _hover(lbl: Label, tip: String) -> void:
+	if tip == "":
+		return
+	lbl.tooltip_text = tip
+	lbl.mouse_filter = Control.MOUSE_FILTER_PASS
+
+
+# BATCH IH §5 — ↑ when an upgrade LANDED on the card (`Run.ability_landed`), as the sheet's chip
+# wore it until IH §3 and the battle's button wears it (ID §3: ↑ names an upgrade wherever one appears).
+func _upgraded_mark(member: Dictionary, card_name: String, live: Dictionary) -> String:
+	return "↑ " if not Run.ability_landed(member, card_name, live).is_empty() else ""
 
 
 # The overlay defaults to null so the panel can be driven without one —
@@ -4149,6 +4211,8 @@ func _on_burger(id: int) -> void:
 		if not Run.debug_enabled() or Run.sim_run:
 			return
 		Run.debug_used = true
+		# BATCH IH §0.2 — the readout is told, naming the action, before it runs.
+		Run.note_debug(_debug_action_name(id), "on the map")
 	match id:
 		0:
 			Run.clear_save()
@@ -4225,6 +4289,44 @@ func _on_burger(id: int) -> void:
 				var pick := id - PICKER_ID_BASE
 				if pick < ids.size():
 					_summon_event(String(ids[pick]))
+
+
+# BATCH IH §0.2 — THE MAP's DEBUG ITEMS BY WHAT EACH DOES, for the readout — the talent grant by
+# its toast's words, a check item by the state it moves to (read before the dispatch flips it).
+func _debug_action_name(id: int) -> String:
+	match id:
+		10:
+			return "+200 Gold"
+		11:
+			return "60 talent points to every class, every tier open"
+		12:
+			return "Full Heal Heroes"
+		13:
+			return "Jump to Boss Slot"
+		14:
+			return "Advance to Next Zone"
+		15:
+			return "Reroll Specs"
+		16:
+			return "All Class Abilities Unlocked: %s" % ("off" if Run.debug_grant_all else "on")
+		20:
+			return "Free Travel: %s" % ("off" if Run.debug_free_travel else "on")
+		21:
+			return "Test a node: Shop"
+		23:
+			return "Test a node: ??? Event (the picker)"
+		24:
+			return "Test a node: Fight"
+		25:
+			return "Test a node: Elite"
+		26:
+			return "Test a node: Mini-boss"
+	if id >= PICKER_ID_BASE:
+		var ids := _event_picker_ids()
+		var pick := id - PICKER_ID_BASE
+		if pick < ids.size():
+			return "Test a node: event %s" % String(Events.config(ids[pick]).get("title", ids[pick]))
+	return "debug item %d" % id
 
 
 # Debug spec swap: clear the specs and re-awaken. BATCH BM removed the refund

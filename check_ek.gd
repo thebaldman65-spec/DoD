@@ -279,8 +279,11 @@ const TAG_SURFACE := ["CARD_TAGS", "card_tags", "card_tag_primary",
 # both are still DISPLAYS and both are still here. **The tags are player-facing
 # and are not conditions** — that is EK's whole point and it survives the
 # retirement untouched.
-const TAG_DEFINERS := ["scripts/classes.gd", "scripts/map_screen.gd",
-	"scripts/party_screen.gd", "scripts/runes.gd"]
+#
+# **BATCH IH §3 — AND THE HERO SHEET LEFT IT.** The sheet shows what the hero is, and its
+# `CARRIED BY TAG` census went with the cards to the loadout panel, which is the one display
+# now; `party_screen.gd` names no tag surface and is held in `NO_TAG_FILES` below.
+const TAG_DEFINERS := ["scripts/classes.gd", "scripts/map_screen.gd", "scripts/runes.gd"]
 
 # ── BATCH EZ — A THIRD CATEGORY, BECAUSE §3's CLAIM CHANGED AND SAYING SO IS
 # THE WHOLE JOB OF THIS SECTION ────────────────────────────────────────────
@@ -426,7 +429,7 @@ const TAG_CHECKERS := ["check_ek.gd", "check_el.gd", "check_es.gd",
 # EZ because it named the one door; the door is gone, so it names nothing again.
 const NO_TAG_FILES := ["scripts/battle.gd", "scripts/unit.gd",
 	"scripts/run_state.gd", "scripts/run_sim.gd",
-	"scripts/ability.gd", "scripts/talents.gd"]
+	"scripts/ability.gd", "scripts/talents.gd", "scripts/party_screen.gd"]
 
 func _s3_inertness() -> void:
 	print("--- EK §3: inertness ---")
@@ -512,7 +515,7 @@ func _s3_inertness() -> void:
 	# `TAG_ORDER` — which is what a census display does — never does. The
 	# population is `TAG_ORDER` itself rather than a list, so an eighth tag is
 	# covered by doing nothing.
-	for f2 in ["scripts/map_screen.gd", "scripts/party_screen.gd"]:
+	for f2 in ["scripts/map_screen.gd"]:
 		var disp := Gate.strip_comments(FileAccess.get_file_as_string("res://" + f2))
 		var named: Array = []
 		for tw in Classes.TAG_ORDER:

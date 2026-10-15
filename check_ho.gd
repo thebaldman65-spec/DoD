@@ -1321,11 +1321,16 @@ func _s5c_fellowship() -> void:
 
 func _s5d_the_sheet() -> void:
 	print("\n§5d — the hero sheet applies the crest as the spawn does")
+	# BATCH IH §5 — the sheet's prologue moved, unchanged, to `Run.hero_live_config`, which the sheet calls.
 	var ps := Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/party_screen.gd"))
-	ok(ps.contains("for pr in Run.party_runes:") and ps.contains("Talents.apply_payload(cfg, (pr as Dictionary).get(\"payload\", {}), 1, pay_ctx)"),
+	var _rs_src := Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/run_state.gd"))
+	var _hl_at := _rs_src.find("func hero_live_config(")
+	var hlc := _rs_src.substr(_hl_at, _rs_src.find("\nfunc ", _hl_at + 5) - _hl_at) if _hl_at >= 0 else ""
+	ok(ps.contains("Run.hero_live_config(member)") and hlc.contains("for pr in party_runes:")
+			and hlc.contains("Talents.apply_payload(cfg, (pr as Dictionary).get(\"payload\", {}), 1, pay_ctx)"),
 		"§5d: the hero sheet no longer stamps the crest's payload on the hero it shows")
 	# And the sheet's config is the spawn's: both come through `Classes.hero_config`.
-	ok(ps.contains("Classes.hero_config(key)"), "§5d: the hero sheet builds its config somewhere else")
+	ok(hlc.contains("Classes.hero_config(key)"), "§5d: the hero sheet builds its config somewhere else")
 
 
 # ── §5e — BR §1: THE FIVE NAMES ─────────────────────────────────────────────

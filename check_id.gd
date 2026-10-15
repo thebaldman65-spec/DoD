@@ -33,7 +33,8 @@
 #       three, wears it.
 #   §4b MIRRORBOUND's CARD AGAINST ITS CODE: a quarter, the floor of 1 on an attack that deals nothing, both
 #       sides — each read off the line and driven on a real board.
-#   §4c THE MAP CARD's KIT BUTTON IS INSIDE ITS CARD, at its widest face, and clear of CHOOSE and the core-rune line.
+#   §4c THE MAP CARD's KIT BUTTON IS INSIDE ITS CARD, at its widest face, and clear of CHOOSE and of the Runes
+#       button beside it (IH §2 — the core-rune line that stood there is gone).
 #   §9  The player's files are as this gate found them.
 #
 # **WHAT THIS GATE CANNOT SEE, SAID FIRST.** Whether the sections read well is a playtest question; this
@@ -858,8 +859,11 @@ func _s3a_the_sweep() -> void:
 	var stray: Array = code_diamonds.filter(func(l):
 		return not RegEx.create_from_string("^map_screen\\.gd: badges\\.append\\(\"◆ %d (ability|draft|upgrade|rune)\" % owed_[a-z]+\\)$").search(String(l)))
 	ok(code_diamonds.size() == 4 and stray.is_empty(), "§3a: ◆ is drawn for something that is not a pick's badge: %s" % [stray if not stray.is_empty() else code_diamonds])
-	# ↑ IS DRAWN AT THE FOUR UPGRADE SURFACES AND NOWHERE ELSE (a fifth line is the preview's arrow, →, not ↑).
-	var where := {"battle.gd": 0, "party_screen.gd": 0, "blacksmith_screen.gd": 0, "map_screen.gd": 0}
+	# ↑ IS DRAWN AT THE FOUR UPGRADE SURFACES AND NOWHERE ELSE (a fifth line is the preview's arrow, →, not ↑):
+	# the battle button, the Blacksmith's offer, and on the map the card's corner and — since IH §5, where the
+	# hero sheet's chip carried it until IH §3 — the Kit panel's row.
+	var where := {"battle.gd": 0, "blacksmith_screen.gd": 0, "map_screen.gd": 0}
+	var want_where := {"battle.gd": 1, "blacksmith_screen.gd": 1, "map_screen.gd": 2}
 	var other: Array = []
 	for l2 in code_arrows:
 		var f3 := String(l2).get_slice(":", 0)
@@ -867,7 +871,7 @@ func _s3a_the_sweep() -> void:
 			where[f3] += 1
 		else:
 			other.append(l2)
-	ok(other.is_empty() and where.values().all(func(v): return int(v) == 1),
+	ok(other.is_empty() and where == want_where,
 		"§3a: ↑ is not drawn once on each of the four upgrade surfaces and nowhere else: %s %s" % [where, other])
 	# BATCH IE §4 (ruled at IE §0.1) — ✦ NAMES A RUNE: every ✦ left in the game's code is a rune's mark or a
 	# count of runes held unworn — the battle's rune chip, the nameplate's count, the bag's crest count and the kit
@@ -901,7 +905,7 @@ func _s3a_the_sweep() -> void:
 # ── §3b — EACH SURFACE APART ────────────────────────────────────────────────────────────────
 
 func _s3b_each_surface() -> void:
-	print("\n§3b — a held upgrade reads ↑ on the button, the sheet, the Blacksmith and the corner; a pick ◆; a held rune ✦")
+	print("\n§3b — a held upgrade reads ↑ on the button, the Kit panel's row, the Blacksmith and the corner; a pick ◆; a held rune ✦")
 	# THE BATTLE BUTTON: the Cleric's basic carries Honed; his other buttons carry nothing.
 	var s: Node = await _board(["warden", "pyromancer", "inquisitor", "mystic"],
 		{2: {"upgrades": [{"ability": "Smite", "id": "up_damage"}]}})
@@ -932,21 +936,25 @@ func _s3b_each_surface() -> void:
 		ok(not wfaces.any(func(t): return String(t).contains(ARROW) or String(t).contains(DIAMOND)),
 			"§3b: a hero holding no upgrade draws a mark: %s" % [wfaces])
 	await _clear(s)
-	# THE HERO SHEET's CHIP.
+	# THE KIT PANEL's ROW — BATCH IH §5: the hero sheet's chip carried ↑ until IH §3 took the cards off
+	# the sheet; the row that names the card on the Kit panel carries it now, and its hover names the
+	# upgrade that landed, as the battle button's does.
 	_new_run()
 	_run.party[2]["upgrades"] = [{"ability": "Smite", "id": "up_damage"}]
-	_run.hero_screen_idx = 2
-	change_scene_to_file("res://scenes/party.tscn")
+	change_scene_to_file("res://scenes/map.tscn")
 	await Gate.frames(self, 6)
-	var sheet: Array = _all(current_scene, "Label").map(func(l): return String((l as Label).text))
-	var chip: Array = sheet.filter(func(t): return String(t).begins_with(ARROW + " Smite"))
-	ok(chip.size() == 1 and not sheet.any(func(t): return String(t).contains(DIAMOND)),
-		"§3b: the sheet's chip does not read ↑ Smite, or the sheet draws ◆: %s" % [chip])
-	for l in _all(current_scene, "Label"):
+	current_scene.call("_open_loadout_panel", 2)
+	await Gate.frames(self, 2)
+	var kov: Node = Gate.overlay(current_scene, 60)
+	var kit_labels: Array = _all(kov, "Label") if kov != null else []
+	var kit: Array = kit_labels.map(func(l): return String((l as Label).text))
+	var chip: Array = kit.filter(func(t): return String(t).begins_with(ARROW + " Smite"))
+	ok(chip.size() == 1 and not kit.any(func(t): return String(t).contains(DIAMOND)),
+		"§3b: the Kit panel's row does not read ↑ Smite, or the panel draws ◆: %s" % [chip])
+	for l in kit_labels:
 		if String((l as Label).text).begins_with(ARROW + " Smite"):
-			var cw: float = ThemeDB.fallback_font.get_string_size((l as Label).text, HORIZONTAL_ALIGNMENT_LEFT, -1, 13).x
-			print("    the sheet's chip '%s': %.0f px in its 195-px chip" % [(l as Label).text, cw])
-			ok(cw <= 195.0, "§3b: the sheet's ↑ chip runs past its 195 px")
+			ok(String((l as Label).tooltip_text).ends_with(String(_run.upgrade_name("up_damage"))),
+				"§3b: the Kit panel's ↑ Smite row does not name its upgrade on its hover: '%s'" % (l as Label).tooltip_text)
 	# THE BLACKSMITH's OFFER.
 	_new_run()
 	change_scene_to_file("res://scenes/blacksmith.tscn")
@@ -1200,9 +1208,16 @@ func _s4c_the_kit_button() -> void:
 		var choose: Button = Gate.bound_button(mp, "_open_hero_draft", [i])
 		if choose != null:
 			ok(not choose.get_global_rect().intersects(kit.get_global_rect()), "§4c: card %d's CHOOSE lies over its Kit button" % i)
-		for l in _all(mp, "Label"):
-			if String((l as Label).text).begins_with("core runes:") and card.encloses((l as Label).get_global_rect()):
-				ok(not (l as Label).get_global_rect().intersects(kit.get_global_rect()), "§4c: card %d's core-rune line lies over its Kit button" % i)
+		# BATCH IH §2 — the Runes button took the core-rune line's room on this row: inside the card, and
+		# over neither Kit nor CHOOSE.
+		var rb: Button = null
+		for b in Gate.bound_buttons(mp, "_open_rune_panel"):
+			if (b as Button).has_meta("runes_button") and int((b as Button).get_meta("runes_button")) == i:
+				rb = b
+		ok(rb != null and card.encloses(rb.get_global_rect()) and not rb.get_global_rect().intersects(kit.get_global_rect())
+				and (choose == null or not rb.get_global_rect().intersects(choose.get_global_rect())),
+			"§4c: card %d's Runes button runs past its card or lies over Kit or CHOOSE (%s)" % [i,
+				rb.get_global_rect() if rb != null else "none"])
 	ok(faces.has("Kit 10/10"), "§4c: the premise — a card at its widest face, Kit 10/10 (%s)" % [faces])
 	print("    the Kit faces %s, each inside its card" % [faces])
 	_run.zone_bosses_cleared = 0

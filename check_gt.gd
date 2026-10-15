@@ -1155,33 +1155,34 @@ func _bar(seat: int, m: Dictionary, run_it := false) -> Array:
 
 func _screens_say_why(pid: String, seat: int, rows: Array, undone: Array = []) -> void:
 	var rune_name := String(Runes.config(Runes.engine_rune_id(pid))["name"])
-	# THE HERO SHEET.
-	_run.hero_screen_idx = seat
-	change_scene_to_file("res://scenes/party.tscn")
-	await Gate.frames(self, 6)
-	var sheet_labels: Array = []
-	_labels(current_scene, sheet_labels)
+	# THE KIT PREVIEW — the read-only list of what he carries, which says a card sits out with its
+	# reason on the line itself. The hero sheet was this surface until IH §3 took the cards off it.
+	change_scene_to_file("res://scenes/map.tscn")
+	await Gate.frames(self, 8)
+	var kp: Node = current_scene.call("_open_kit_preview", seat)
+	await Gate.frames(self, 3)
+	var kp_labels: Array = []
+	_labels(kp, kp_labels)
 	for card in rows:
-		var chip: Label = _label_with(current_scene, "%s — sits out" % card)
-		var tip := String((chip.get_parent() as Control).tooltip_text) if chip != null else ""
+		var chip: Label = _label_with(kp, "%s — sits out" % card)
+		var tip := String(chip.tooltip_text) if chip != null else ""
 		ok(chip != null and tip == _run.sits_out_note(String(card)) and tip.contains(rune_name),
-			"§3 %s: the hero sheet does not show %s sitting out with its reason (%s)" % [pid, card, tip])
-		# AND NOT ALSO AS A CARD THE FIGHT WILL SEAT: an ordinary chip reads the
-		# name, or the name and its cost, with no "sits out". **BATCH ID §3 — RE-POINTED, THE
-		# QUESTION UNMOVED: an upgraded card's chip leads with ↑ now, where it led with ◆**, so the
-		# mark trimmed is the one the sheet draws; trimming the old one left an upgraded card's chip
-		# unread here, and this negative arm passing for it by construction.
-		var as_seated := sheet_labels.filter(func(l):
-			var t := String((l as Label).text).trim_prefix("↑ ")
+			"§3 %s: the kit preview does not show %s sitting out with its reason (%s)" % [pid, card, tip])
+		# AND NOT ALSO AS A CARD THE FIGHT WILL SEAT: a seated line reads the name, or the name and
+		# its cost, with no "sits out".
+		var as_seated := kp_labels.filter(func(l):
+			var t := String((l as Label).text).strip_edges()
 			return t == String(card) or t.begins_with(String(card) + "  ("))
-		ok(as_seated.is_empty(), "§3 %s: the hero sheet also shows %s as a seated card" % [pid, card])
+		ok(as_seated.is_empty(), "§3 %s: the kit preview also shows %s as a seated card" % [pid, card])
 	# BATCH HF §7 — AN UNDONE ROW IS SHOWN SEATED, AND NOT AS SITTING OUT.
 	for cardu in undone:
-		var as_seated_u := sheet_labels.filter(func(l):
-			var t := String((l as Label).text).trim_prefix("↑ ")
+		var as_seated_u := kp_labels.filter(func(l):
+			var t := String((l as Label).text).strip_edges()
 			return t == String(cardu) or t.begins_with(String(cardu) + "  ("))
-		ok(_label_with(current_scene, "%s — sits out" % cardu) == null and not as_seated_u.is_empty(),
-			"§3 %s: the hero sheet does not show %s as a seated card with the engine dropped" % [pid, cardu])
+		ok(_label_with(kp, "%s — sits out" % cardu) == null and not as_seated_u.is_empty(),
+			"§3 %s: the kit preview does not show %s as a seated card with the engine dropped" % [pid, cardu])
+	kp.queue_free()
+	await Gate.frames(self, 1)
 	# THE KIT PANEL ON THE MAP.
 	change_scene_to_file("res://scenes/map.tscn")
 	await Gate.frames(self, 8)

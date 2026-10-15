@@ -16,6 +16,57 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-14 &mdash; Batch IH: THE CARD, THE SHEET, AND EVERY PLATE THAT OVERLAPS ITSELF</h2>
+<p><b>The designer played, and this batch is what he asked for after.</b> The hero sheet shows what the hero is and the
+panels what he wears: <b>the map card's core-rune line is gone and a <i>Runes n/6</i> button stands beside <i>Kit</i></b>; the
+sheet keeps his stats, his class passive, his lineage's engine and his talents, and its abilities, tag count and runes are on
+their panels, <b>the abilities' hover moving with them to the Kit panel</b>. <b>Nothing on a plate or a card is drawn over
+anything else on it any more</b> &mdash; on every battle plate, the map's cards and the bargain's &mdash; and a check holds it.
+<b>The readout now says when a fight is not play.</b> Full working: <code>docs/reports/IH.md</code>. The next letter is II.</p>
+
+<p><b>&sect;0.2 &mdash; THE READOUT.</b> The designer's first file is in: four fights of a fresh run, played with the debug menu
+&mdash; every card unlocked from the second fight, and fights ended from the menu &mdash; and nothing in it said so. <b>Every
+debug action is named now</b>: on the file's first line when it came before the first fight ended, as a line of its own the
+moment it is taken after that, and on every fight it touched, a switch left on as a fight opened included. <b>A fight that
+names one prices nothing.</b> A Rupture (or any conjunction) says why it ended &mdash; its clock, a cleanse, an ingredient
+consumed, its body dying, or the fight ending with it standing. Each hero's lineage is written with its name beside it (the
+Devout's is kept as <i>inquisitor</i>), and each core rune says whether it is a lineage's, the class's own or a rule engine's
+&mdash; the Mage in the file had none, being on the class's own engine. <b>The file's Rupture ground 13 Break where its constant
+says 10: the Orc Slinger's Constitution is 80</b>, and the meter divides by it.</p>
+
+<p><b>&sect;2 &mdash; THE CARD.</b> The line <i>core runes: &hellip; &mdash; click the card for the sheet</i> is gone. <b>A
+<i>Runes n/6</i> button stands beside <i>Kit</i></b>: the runes he wears, core and ordinary, of the six slots, opening that
+hero's rune panel. A core rune that pays nothing marks it with &#9675;, amber, and says why on its hover, as the line did.</p>
+
+<p><b>&sect;3 &mdash; THE SHEET.</b> It shows the blurb, the live stats, the class passive and his lineage's own engine, and the
+talent tree. <b>The ability chips, the tag count and the rune list are gone from it</b>; another core rune's rule is on the rune
+panel, where it is worn. The passive block has the room now and no scroller. <b>The Stances line read +15% damage while the fight
+paid +30%</b>; it reads the fight's figure.</p>
+
+<p><b>&sect;4 &mdash; THE RUNE PANEL</b> is unchanged: looked at on the screen, its CORE and WORN sections read apart. It opens
+from the new button, the &#10022; on the nameplate while a rune waits, and each rune slot.</p>
+
+<p><b>&sect;5 &mdash; THE KIT PANEL's HOVER.</b> Every ability row on the Kit panel shows the hover the sheet's chips did &mdash;
+the card's words and its numbers at the hero's real Attack &mdash; moved, not copied, and the kit preview shows the same one. An
+upgraded card wears &uarr;; a card that sits out says why.</p>
+
+<p><b>&sect;6 &mdash; NOTHING DRAWN OVER ANYTHING ELSE.</b> Every number on a battle plate was drawn through its bar, the
+Berserker's portrait sat over his name and his Rage line, the Sharpshooter's Focus line ran off its plate, an enemy's intent
+line started under its portrait, and a tan box under two portraits cut its own words. <b>One cause behind nearly all of it</b>:
+a box sized before it was on the screen took a larger font's size and kept it. Every plate is wider now, with the portrait in its
+own column, each bar as tall as its number, the chips as wide as their words and a <i>+N</i> chip for the rest, and the stacks
+spaced to fit. The map's cards, the crest strip, the skill-check bar, the bargain's cards and the sheet's text follow the same
+rules. <b>The Berserker's and the Pyromancer's portraits are the art that differs</b> &mdash; two illustrations beside ten small
+figures &mdash; and which art a lineage wears is the designer's.</p>
+
+<p><b>&sect;7 &mdash; THE CORE RUNE IS SLOTTED.</b> A hero's dealt core rune is worn from the start; the three empty buttons on
+the card are his ordinary rune slots. <b>Sanctity's rule text said 16 after the step became 13</b>; it reads its own figures now.</p>
+
+<p><b>The checks.</b> A new check, <code>check_ih</code>, reads the readout's debug lines and a conjunction's end by each door,
+drives the card's button and the sheet, the rune panel's doors and the Kit panel's hover, and <b>walks every plate and card in
+every state, failing on anything drawn over anything else</b>. Sixteen checks that read the sheet's removed blocks read the
+surface that shows each thing now.</p>
+
 <h2>2026-10-13 &mdash; Batch IG: EVERY CHIP, AND SANCTITY</h2>
 <p><b>Every chip on a nameplate that shows a figure the hero holds is drawn, not laid as a status</b>, so a Hierophant's Sanctity
 counts statuses and nothing else; <b>Sanctity's step moves from 16 to 13</b> to bring him back to about half its cap by a normal

@@ -1363,18 +1363,17 @@ func _s4_bench_a_condition() -> void:
 		await process_frame
 	ok(_census_needle(hero) == before,
 		"§4: the benched cards were carried again and the census did NOT come back")
-	# THE HERO SHEET CARRIES THE CENSUS TOO — one vocabulary, two surfaces — and
-	# it carries no condition line either.
+	# BATCH IH §3 — THE CENSUS IS THE KIT PANEL's ALONE: the sheet shows what the hero is, and the
+	# panel above — where the bench happens, driven both ways — is the one screen that counts his
+	# cards by tag. The sheet carrying none is the negative half of that.
 	_run.hero_screen_idx = 0
 	change_scene_to_file("res://scenes/party.tscn")
 	for _i in 5:
 		await process_frame
 	var sheet: Node = current_scene
 	ok(_scene_name() == "Party", "§4: the hero sheet did not open (got %s)" % _scene_name())
-	ok(_has_text(sheet, "CARRIED BY TAG"),
-		"§4: the hero sheet lost its `CARRIED BY TAG` census")
-	ok(not _has_text(sheet, "RUNE CONDITIONS"),
-		"§4: the hero sheet still draws a `RUNE CONDITIONS` line")
+	ok(not _has_text(sheet, "CARRIED BY TAG"),
+		"§4: the hero sheet still draws a `CARRIED BY TAG` census — it is the Kit panel's (IH §3)")
 	print("    %s pulled, %d cards benched and carried back, and the census followed both ways" % [
 		tag, benched.size()])
 
@@ -2211,15 +2210,20 @@ func _s9b_the_numbers() -> void:
 	print("    the four grants: %s" % ", ".join(grants))
 	var worn: int = int(_run.runes_worn(m0))
 	ok(worn >= 1, "§9b: four grants left the hero wearing no rune — the line is read against nothing")
-	_run.hero_screen_idx = 0
-	change_scene_to_file("res://scenes/party.tscn")
+	# BATCH IH §2 — the count is the map card's Runes button now (the sheet's rune line left it at
+	# IH §3): his slotted core runes and his worn runes, of both slot counts.
+	var face := "Runes %d/%d" % [worn + int(_run.engines_worn(m0)),
+		int(_run.ENGINE_SLOTS) + int(_run.rune_slots())]
+	change_scene_to_file("res://scenes/map.tscn")
 	for _i in 4:
 		await process_frame
-	var sheet: Node = current_scene
-	ok(_has_text(sheet, "RUNES  (%d/%d equipped" % [worn, int(_run.rune_slots())]),
-		"§9b: the hero sheet does not say `RUNES  (%d/%d equipped`" % [
-			worn, int(_run.rune_slots())])
-	print("    gold, pouch, hero HP, the shop's refresh and the sheet's rune line all agree")
+	var on_card := ""
+	for b in Gate.bound_buttons(current_scene, "_open_rune_panel"):
+		if (b as Button).has_meta("runes_button") and int((b as Button).get_meta("runes_button")) == 0:
+			on_card = String((b as Button).text)
+	ok(on_card.ends_with(face),
+		"§9b: the first card's Runes button reads '%s' — want `%s`, the run's own count" % [on_card, face])
+	print("    gold, pouch, hero HP, the shop's refresh and the card's rune count all agree")
 
 
 func _s10_the_observations() -> void:

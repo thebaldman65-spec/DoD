@@ -17,6 +17,24 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT IH — 2026-10-14, FROM `docs/state.md` AS IG LEFT IT (`29407e8`)
+
+**What came here**: IG's rulings, both carried into IH's (the designer played and sent the file, which is debug-touched, so the ask
+stands as IH's ruling 1 without the debug menu; Sanctity's step is still owed and is IH's ruling 2). The roadmap's IH line was
+rewritten in place (IC's remainder waits on its letter: IH was the designer's play's asks). Each was read against IH's tree before it
+moved; everything else in the live file stayed.
+
+### ~~IG's RULINGS OWED~~ — **BOTH CARRIED INTO IH's: THE FILE CAME AND IS DEBUG-TOUCHED (1, IH's RULING 1 — PLAY AGAIN WITHOUT THE DEBUG MENU); SANCTITY's STEP AT 13 (2, IH's RULING 2)**
+
+Full working: `docs/reports/IG.md`, NEEDS A RULING.
+
+1. **PLAY ONE ZONE AND SEND THE FILE — STILL NOT PLAYED.** `run_save.bin` was last written 2026-10-08 09:23 at IG's start and close,
+   and there is no `readout/` in the designer's folder, so the readout has never run in his game. **His file will be the
+   confirmation of IG's step, not the before**: played on IG's build, its Sanctity lines read 13 a step on a ledger with no chip
+   in it. It answers Boil Over's rate, Rupture's number, the vow's worth, Sanctity's step and the Cleric's Mana.
+2. **SANCTITY's STEP AT 13 (§2) — CONFIRM THE NUMBER.** It lands a normal fight's end at 2.58 steps (14 would read 2.38); a boss
+   fight now reaches the cap in about four in ten (about two in ten at 16). The handle is below; the readout is what confirms it.
+
 ## ARCHIVED AT IG — 2026-10-13, FROM `docs/state.md` AS IF LEFT IT (`fd83ae7`)
 
 **What came here**: IF's rulings, all five answered in IG's brief (the first, the designer's play, is still owed and is carried as

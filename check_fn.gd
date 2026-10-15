@@ -7,7 +7,8 @@
 #       seven that STAY asserted PRESENT, because a gate that only checked
 #       absence passes on a file somebody emptied
 #   §3  THE TWO SCREENS, DRIVEN — the `CARRIED BY TAG` census stays and the
-#       `RUNE CONDITIONS` line goes, on the loadout panel and the hero sheet
+#       `RUNE CONDITIONS` line goes, on the loadout panel; and since IH §3 the
+#       hero sheet carries no census at all (the panels show what he wears)
 #   §4  EACH OF THE EIGHT, ON A LOADOUT THAT WOULD HAVE FAILED ITS OLD
 #       CONDITION — through the payload door and through a REAL SPAWN, each
 #       arm paired with the retired predicate re-implemented here as its
@@ -523,7 +524,7 @@ func _s2_the_machinery_is_gone() -> void:
 # ═══ §3 — THE TWO SCREENS ════════════════════════════════════════════════════
 
 func _s3_the_two_screens() -> void:
-	print("\n§3 — the loadout panel and the hero sheet, driven")
+	print("\n§3 — the loadout panel carries the census; the hero sheet carries none (IH §3), driven")
 	_run.sim_run = false
 	_run.new_run(["warrior", "mage", "cleric", "hunter"], [], "wanderer")
 	var party_specs := ["warden", "occultist", "holy", "sharpshooter"]
@@ -585,13 +586,11 @@ func _s3_the_two_screens() -> void:
 	ok(sheet != null and String(sheet.name).contains("Party"),
 		"§3: the hero sheet did not open (got %s)" % [
 			"<none>" if sheet == null else sheet.name])
+	# BATCH IH §3 — THE SHEET CARRIES NO CENSUS: the loadout panel above is its one screen (the
+	# positive arm, read first), and the sheet shows what the hero is, not what he carries.
 	if sheet != null:
-		ok(_has_text(sheet, "CARRIED BY TAG"),
-			"§3: the hero sheet lost its `CARRIED BY TAG` census")
-		ok(not _has_text(sheet, "RUNE CONDITIONS"),
-			"§3: the hero sheet still draws a `RUNE CONDITIONS` line")
-		ok(not _has_text(sheet, "peak "),
-			"§3: ...and it still draws the breadth line under it")
+		ok(not _has_text(sheet, "CARRIED BY TAG"),
+			"§3: the hero sheet still draws a `CARRIED BY TAG` census — it is the loadout panel's (IH §3)")
 	# **LEAVE A MAP BEHIND, NOT A HERO SHEET.** §4 spawns a battle as a child of
 	# `root` while `current_scene` stays whatever this section left; a sheet
 	# holding a party dict that `new_run` is about to replace is a state no run

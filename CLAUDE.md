@@ -2130,7 +2130,8 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   `Engine:` prefix; `ENGINE_READ`, `has_engine` and every identifier keep *engine*. **A rune's name is the data's**:
   `Run._refresh_rune_names` gives a saved rune today's name on load, because every roll excludes by name.
 - **A NEW SURFACE THAT SHOWS A RUNE'S TEXT ASKS THE DOOR**, and `check_gs` §4 drives the Peddler, the pouch, an offer
-  and the hero sheet with all twenty-four and sweeps the game's scripts for a rune's `desc` read anywhere else.
+  and the kit preview (the hero sheet until IH §3 took its rune block off it) with all twenty-four and sweeps the game's
+  scripts for a rune's `desc` read anywhere else.
 
 ## STANDING RULE — A CONTROL THE PLAYER NEEDS TO LEAVE NEVER MOVES WITH TEXT (Batch GT §1, ruled by the designer)
 > **Text whose height depends on what it says lives inside a bounded scroller, and the control that closes or leaves
@@ -2180,8 +2181,10 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
 - **THE KIT PREVIEW IS READ-ONLY, AN OVERLAY, AND ONE FLAT LIST** (`scripts/kit_preview.gd`). It opens
   from every draft surface on the hero whose decision it is, and from the Peddler on the first hero, walking all four —
   the purse is the party's. **A preview that can equip is the rune panel**, and one that loses the staged choice under
-  it is worse than none: it frees only itself. It reads the hero sheet's doors in the sheet's own words — the state
-  column, the `(core)` suffix, HR's ✦ marker — and its text scrolls inside a bounded frame with Close outside it (GT
+  it is worse than none: it frees only itself. It reads the doors the hero sheet read, in the words the sheet's rune block
+  used until IH §3 took it off — the state column (GX's sentence on the hover of a rune that sits out), the `(core)`
+  suffix, HR's ✦ marker — its cards' hover is the Kit panel's, one builder (`Run.ability_hover`, IH §5), and its text
+  scrolls inside a bounded frame with Close outside it (GT
   §1's shape; it lists no buttons, so HU §1's pager is not its rule). **IA §3 sectioned the hero's rune panel and left
   this list flat, keeping its state column**: the panel is where a rune is moved, the preview is read, and a read-only
   list is a different surface — the chip bullet's distinction, applied again.
@@ -2221,6 +2224,48 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
     drink, Suffering's heal — each named only while he holds what pays it, the heal figure read off his payload; IN EFFECT
     while one is live (his ground laid, a Ruined enemy standing), ARMED otherwise.
 
+## STANDING RULE — THE SHEET SHOWS WHAT THE HERO IS; THE PANELS SHOW WHAT HE WEARS (Batch IH §0, the designer's)
+> **The hero sheet holds what the hero IS: his live stats, his class passive, his lineage's own engine and his talents.
+> What he WEARS is on its panel: his cards on the map's Kit panel, his runes on the Runes panel, behind a button of its
+> own.** It decides where a new thing is drawn before it is drawn.
+
+- **WHAT LEFT THE SHEET AT IH §3, AND WHERE IT IS.** The ability chips → the Kit panel's rows, their hover moved with them,
+  not copied (`Run.ability_hover`, read off `Run.hero_live_config` — the sheet's own prologue, moved — IH §5); the tag
+  census → the Kit panel's; the rune block → the Runes panel; a worn core rune's rule that is not his lineage's own → the
+  Runes panel's CORE row (`Runes.shown_desc`, GS §3's door).
+- **THE PASSIVE BLOCK IS THE CLASS PASSIVE AND THE LINEAGE's OWN ENGINE** (`Classes.engine_of_spec(spec)`) while its core
+  rune is slotted, with no scroller. A hero awakened on his class's spine or a rule engine has no lineage, so his block
+  is his class passive alone.
+- **THE CARD COUNTS, THE PANEL NAMES.** `Runes n/6` beside `Kit n/m` — his slotted core runes and his worn runes, of
+  both slot counts. Its doors: the button, always; the ✦ marker, while something waits; each rune slot. A core rune that
+  sits out marks the button — ○, amber, GX's sentence on its hover (HC §5's tell). The button carries `runes_button`, so a
+  sweep of rune slots leaves it out (`check_gx` §3); `check_ih` §2–§5 drive the card, the sheet, the doors and the hover.
+
+## STANDING RULE — NOTHING ON A PLATE OR A CARD IS DRAWN OVER ANYTHING ELSE ON IT (Batch IH §0, the designer's)
+> **A portrait reserves its own column and the text begins where it ends. The one sanctioned overlap is a value drawn
+> inside its own bar — and only if the bar contains it ENTIRELY, top and bottom. A value that will not fit inside its bar
+> sits beside it or under it, never across it, and a plate is as wide as its longest line or the line wraps.**
+
+- **ASSERTED, NOT ONLY FIXED (`check_ih` §6).** Every battle plate — every class, lineage and enemy kind, as spawned, at its
+  longest values, with its chip row full, with no intent, with a hero fallen — the turn strip's slots, the crest strip,
+  the skill-check bar, every map card in every state and every bargain card: no two drawn rects meet but a value inside
+  its own bar (or a fill in its track), none runs past its container, no line is wider than its box. **A Label's rect is
+  its LINE BOX, never its ink.** A new plate or card joins that walk, and the walk names its fullest and its emptiest.
+- **THREE GODOT FACTS MADE EVERY ONE OF IH's FINDINGS, AND THEY BIND EVERY CONTROL BUILT IN CODE.** (1) A Control's theme
+  overrides reach its minimum size only once it is in the tree, so **a `size` set before `add_child` is clamped to the
+  default 16-px font's line and never shrinks back** — parent it, then place and size it (`BattleUnit._put`); (2) a
+  TextureRect's minimum is its texture until `expand_mode` is IGNORE_SIZE — **set the expand mode before any size**;
+  (3) a wrapping Label given its words before its width breaks them at every word and keeps that height — **size it, then
+  give it its text**. A control a Container lays out is laid out by its minimum size and escapes all three.
+- **THE PLATE, MEASURED (IH §6).** Open Sans SemiBold's line is 12 px at font 8, 13 at 9 and 16 at 11; Pirata One 11's is
+  16. A plate is `BattleUnit.PLATE_W` wide, its portrait a 34-px column, each bar a font-8 value's line tall; a value too
+  wide for its bar takes the next size down inside it; a chip is as wide as its tag, and the row stops short of the rune
+  chips with a last `+N` chip whose hover names the rest. The heroes' stack is pitched to its tallest plate; the
+  warband's is laid by each plate's own height.
+- **THE WARRIOR's PORTRAIT WAS THE ART AND THE LAYOUT BOTH (IH §6b).** The Berserker's bust and the Pyromancer's frame are
+  illustrations beside ten lineages that share the Soldier sheet's small figure; the column holds any of them now, and
+  which art a lineage wears is the designer's question.
+
 ## STANDING RULE — A CARD OR A RUNE THAT CANNOT PAY WITHOUT ITS ENGINE SITS OUT WHILE THE ENGINE IS GONE (Batch GT §3 for a card, GX §1 for a rune, ruled by the designer)
 > **An earned card the usability door refuses on every board without its engine is left out of every fight while
 > none of the hero's slotted engines is its own, and is seated again the moment one is. It is never destroyed**: a
@@ -2228,7 +2273,8 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
 
 - **`ENGINE_READ` GATES THE OFFER; `Classes.SITS_OUT` GATES THE SEAT.** Each row names its engine and its `why`, and a
   card in both tables names one engine in both. **`Run.seated_ability_names` is the ONE door**: the battle spawn and
-  the hero sheet both ask it, so the two cannot disagree.
+  the hero's live config (`Run.hero_live_config` — the sheet's prologue, moved at IH §5; the sheet, the Kit panel's
+  hover and the kit preview read it) both ask it, so the two cannot disagree.
 - **THE POPULATION IS DERIVED AT THE DOOR, NEVER FROM A FIELD OR A `why`.** Every card a hero of the class can earn —
   the draft pool and every lineage's zone-boss pool — is asked `_ability_usable` with no engine, on a board dressed
   to allow everything an engine does not give. **A card another CARD or the board can open is never a row**: Battle
@@ -2253,13 +2299,14 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   card's, and benching it is the player's door to the slot, free and reversible (EG). **Sitting out is not
   benching**: freeing the slot would leave a kit over its cap the day the engine returns, and what happens then is a
   ruling, not a tidy-up.
-- **THE SCREENS SAY WHY, IN ONE SENTENCE** (`Run.sits_out_note`): the hero sheet greys the card as sitting out and the
-  map's Kit panel names the rune that brings it back. A card that leaves the bar with no reason reads as a bug (CO §3).
+- **THE SCREENS SAY WHY, IN ONE SENTENCE** (`Run.sits_out_note`): the map's Kit panel names the rune that brings it
+  back, on the row and on its hover, and the kit preview greys the card as sitting out with the sentence on its hover
+  (the hero sheet's chip did until IH §3 took the cards off the sheet). A card that leaves the bar with no reason reads as a bug (CO §3).
 - **AND THE RUNE LAYER TAKES THE SAME ANSWER, WITH ITS OWN NOUNS (GX §1).** `Runes.ENGINE_READ` gates the OFFER;
   `Runes.sits_out` — the same predicate through the same `engine_read`, asked of a rune he already holds — gates
   whether a WORN rune pays, and `Run.sitting_out_rune_names` is the one door every surface asks. **FOUR SAY IT**: the
-  pouch row and the map's rune slot, which the card layer has no counterpart for, the hero sheet's state column, and
-  the battle log's opening roll call — **a rune that sits out is still equipped, so the spawn was naming it in the log
+  pouch row and the map's rune slot, which the card layer has no counterpart for, the kit preview's line (the hero
+  sheet's state column until IH §3), and the battle log's opening roll call — **a rune that sits out is still equipped, so the spawn was naming it in the log
   of a fight it paid nothing in**, where a card that sits out is simply absent. The log line takes the note's first
   sentence (`Run.note_first_sentence`; its first two lines until HL §2 gave a core rune's name a line of its own)
   rather than wording it again. **The offer surfaces get nothing**: see the bullet below. **NOTHING IS WRITTEN HERE EITHER** — the rune stays equipped, its slot stays filled and its payload is still
@@ -2272,8 +2319,8 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   takes the rune's sentence unchanged**, an engine slot being worn, filled and freed as an ordinary one is. **A second
   phrasing of one idea is a second thing to keep in step** —
   `check_gx` §5 asserts the shared clause in both and the divergent clauses apart in both directions, so collapsing
-  them or rewording either reds. Both are hand-broken at 44 characters because the sheet renders them as a tooltip and
-  a tooltip does not wrap.
+  them or rewording either reds. Both are hand-broken at 44 characters because the map's slot, the Kit panel and the kit
+  preview render them as a tooltip (the sheet did until IH §3) and a tooltip does not wrap.
 - **THE PEDDLER AND A CACHE GET NO TELL, AND THAT IS A RULING RATHER THAN AN OMISSION.** A gated rune cannot be
   OFFERED while the engine is out, so a tell on an offer surface could never render; a cache already says what it is
   holding back, in GV's words. **Add a tell where a rune the player ALREADY HOLDS is shown, and nowhere else.**
@@ -2464,7 +2511,8 @@ the block left out, spend what they were paid.
   · **AND AN ENGINE THAT NEEDS THE PET SITS OUT BESIDE THE ONE THAT DISMISSES IT (HC §5, ruled: LEGAL, AND VISIBLE).**
     Pack Bond slotted beside Lethal Aim (`Classes.PET_ENGINES`, `Runes.needs_companion`) is still offered, held and
     slotted, and says it sits out with GX's sentence, word for word, on GX's four surfaces — the pouch's engine row, the
-    map card's engine line (marked `○`, the sentence on the card's hover), the hero sheet's state column and the battle
+    map card's Runes button (marked `○` and amber, the sentence on its hover; the card's core-rune line carried the tell
+    until IH §2 took the line off), the kit preview's line (the hero sheet's state column until IH §3) and the battle
     log's roll call (`check_hc` §6). **It is not a `COMPANION_READ` row**, which the OFFER reads.
   · **AND MARK OF THE HUNT IS OFFERED TO EVERY HUNTER WITH A PET, AND SITS OUT BESIDE A DISMISSER (HF §7, ruled by the
     designer, undoing HE §2's Pack Bond gate).** Its hunter's halves (+25% on the marked prey, and the Mana his strikes on
@@ -2639,7 +2687,7 @@ and GUERILLA were never disease and are untouched by the rule.
 Half of these were documented only in changelog entries; this is the record. Not for deletion.
 **Gate for every UI surface: `Run.debug_enabled()`** = dev build OR `DOD_DEBUG=1` (exported),
 and `DOD_DEBUG=0` FORCES it shut; every use trips `Run.debug_used` → the run summary's "not a
-clean data point" line. Sims can never reach the UI surfaces (`_debug_allowed()` excludes
+clean data point" line — and names itself to the playtest readout (`Run.note_debug`, IH §0.2). Sims can never reach the UI surfaces (`_debug_allowed()` excludes
 sim/autoplay/sim_run).
 · MAP BURGER debug items (map_screen, ids 10-16/20-26): +200 Gold | 60 Talent Points to every class, every tier open |
   Full Heal Heroes | Jump to Boss Slot | Advance to Next Zone | Reroll Specs | "All Class
@@ -2698,6 +2746,18 @@ sim/autoplay/sim_run).
   (GH), and two arms differ for the clock's sake, not the readout's.
 - **A NEW FIGURE IS A NEW KEY ON THE LINE, AND THE LINE'S OWN KEYS ARE NOT REUSED** — the frame's node kind is `encounter`
   because `kind` names the line (IF lost it to a merge once).
+- **IT SAYS WHEN A FIGHT IS NOT PLAY (IH §0.2: the designer's first file was read as play for ten minutes).** A debug
+  action is named the moment it is taken (`Run.note_debug`, beside each of the two `debug_used` writes): on the header
+  (`debug_used`, `debug`) when it came before the run's file existed, as a `debug` line of its own after, and on the
+  `debug` list of every fight it touched — on the map since the last fight, in that fight, or a switch in force as it
+  opened (a pre-granted kit, a summoned node, enemy attacks off, free travel). **A fight whose list is not empty prices
+  nothing.**
+- **A CONJUNCTION SAYS WHY IT ENDED** (`ended`, `ended_turn`): its clock, a cleanse, a consumer, its body dying — the
+  reason each of the four doors a composition leaves a body by already logs (`BattleUnit.conj_end_cb`) — or the fight
+  ending with it standing. Its `break` is what its ticks put on the meter, after the body's Constitution.
+- **THE LINEAGE IS `spec`, AS `Run.awaken` WROTE IT** — "" for a hero awakened on his class's spine or a rule engine —
+  with `lineage_name` beside it (the Devout's key is `inquisitor`) and each core rune's `core_kind` (lineage, spine,
+  rule): a census by lineage misses a spine hero.
 
 ## STANDING REFERENCE — THE UNCAPPED-METER GOVERNOR TABLE (Batch BJ §3b)
 The ratcheting accumulators are below, and each governor was VERIFIED AT ITS SITE when its row
@@ -2776,16 +2836,20 @@ was written. No meter is ungoverned. meter | what governs it | where the governo
   count and peak together at battle start, before the opening oath; one ratchet site in
   `_gain_faith` | battle.gd.
 
-## STANDING REFERENCE — THE COMPUTED BLOCK: ONE BUILDER, TWO SCREENS, AND THE THIRD COPY THAT STAYS (Batch CK §1)
+## STANDING REFERENCE — THE COMPUTED BLOCK: ONE BUILDER FOR EVERY STATIC SURFACE, AND THE THIRD COPY THAT STAYS (Batch CK §1, IH §5)
 **`Classes.computed_block(ab, attack, resource)` IS THE ONLY BUILDER OF AN ABILITY'S NUMBERS FOR
-A STATIC SURFACE, AND TWO SCREENS SHARE IT.** It emits damage (with school, Break damage and hit
-count), heal, cost, cooldown, initiative and **Perfect**. Its two callers:
+A STATIC SURFACE, AND EVERY STATIC SURFACE SHARES IT.** It emits damage (with school, Break damage and hit
+count), heal, cost, cooldown, initiative and **Perfect**. Its callers:
 - **The DRAFT CARD** (`map_screen._draft_column`) — passes `attack = 0`, so it prints the
   ability's **scaling percentage** ("Damage: 35% of Attack (Frost)   BD: 10").
-- **The HERO SHEET** (`party_screen._draw_detail`) — passes the hero's live Attack, so it prints
-  the **real range**, and keeps its own `Scaling: N% of Attack` line OUTSIDE the block (on the
-  draft card that line and the block's damage line would be the same figure twice).
-**A LATER BATCH CHANGING THE BLOCK CHANGES BOTH SCREENS. That shared path is the point** — before
+- **The ABILITY HOVER** (`Run.ability_hover` — the hero sheet's chip tooltip until IH §3, moved at IH §5 with
+  the sheet's live prologue, `Run.hero_live_config`; the map's Kit panel rows and the kit preview read it) — passes
+  the hero's live Attack, so it prints the **real range**, and keeps its own `Scaling: N% of Attack` line OUTSIDE the
+  block (on the draft card that line and the block's damage line would be the same figure twice). **One hover for
+  every static surface that lists a hero's cards: a second copy is how a figure rots in one place and not the
+  other** (`check_ih` §5 reads the Kit panel's and the preview's string for string).
+- **An offered upgrade's figures** (`Run.upgrade_preview`, old → new) read the same block.
+**A LATER BATCH CHANGING THE BLOCK CHANGES EVERY SURFACE. That shared path is the point** — before
 CK the sheet held the only copy, which is exactly why the draft card had none and thirty damaging
 cards drafted with no damage figure at all.
 - **THE DRAFT CARD IS AN ARITHMETIC-ALLOWED SURFACE AND THE BENCH STEP IN THE SAME FILE IS NOT.**
@@ -2802,14 +2866,14 @@ cards drafted with no damage figure at all.
   not a static card, and merging it would move numbers inside a fight. **Since HZ §1a its damage line
   is `battle._damage_line`, lifted out unchanged so the enemy's telegraph quotes the same line** — one
   copy, two readers, still not the block.
-- **OWED: THE LIVE-ATTACK PROLOGUE IS WRITTEN TWICE AND THE MAP SCREEN HAS NONE OF THEM.**
-  `party_screen._draw_detail` and the battle spawn each build a hero's live Attack with their own
-  sixty-line sequence (hero_config, kit overrides, passive, spec stats, tree, runes, upgrades,
-  node scaling). **Extracting that into one helper is its own batch** —
-  CK did not do it, because a fourth copy on the map screen would be a worse duplication than the
-  one §1 existed to prevent, and because the hero sheet's agreement with the battle spawn is
-  load-bearing. **When it lands, the draft card gets a real damage range by changing ONE
-  ARGUMENT** — `Classes.computed_block(ab, <live attack>, res_name)` — and nothing else moves.
+- **OWED: THE LIVE-ATTACK PROLOGUE IS WRITTEN TWICE.** The sheet's copy is `Run.hero_live_config`
+  since IH §5 — moved unchanged out of `party_screen._draw_detail`, so the map screen reads it (the Kit
+  panel's hover, the kit preview) without a third copy — and the battle spawn builds a hero's live
+  Attack with its own sixty-line sequence (hero_config, kit overrides, passive, spec stats, tree, runes,
+  upgrades, node scaling). **Folding the spawn into the one helper is its own batch**: the hero
+  sheet's agreement with the battle spawn is load-bearing. **The draft card gets a real damage range by
+  changing ONE ARGUMENT** — `Classes.computed_block(ab, <live attack>, res_name)`, the attack off
+  `Run.hero_live_config` — and nothing else moves.
 - **LAYOUT, MEASURED AT CK AND NOT PAPERED OVER.** The draft column's content went from
   313–389px to **557–671px** against a **388px** scroll viewport (+225 to +282px, 12–14 block
   lines over three cards) — and **three of the four columns were already at or over that viewport
@@ -3303,8 +3367,8 @@ decision: **you can swap to switch a rune on or off, so the loadout becomes a le
   of the kit's one OFFENSE / BREAK card). A rune asking 2+ BREAK is on from the first fight for
   almost everyone and no swap turns it off. `check_es` §4 prints the per-spec table every battery run.
 · **THE COUNT MUST BE VISIBLE AND MUST MOVE ON A SWAP.** A silent threshold is a stat nobody knows
-  they have. It is drawn on the loadout panel (where the swap happens) and on the hero sheet, and
-  **both are driven** — `check_es` §4 through the real equip/unequip doors, `check_map_screen`
+  they have. It is drawn on the loadout panel, where the swap happens (on the hero sheet too until IH
+  §3), and **it is driven** — `check_es` §4 through the real equip/unequip doors, `check_map_screen`
   through the real screen.
 · **WHEN A RUNE FINALLY READS IT IN A FIGHT, THE PLACE IS THE SPAWN AND NOT THE STRIKE LOOP.** The
   loadout cannot change during a battle, so the count is a per-hero constant for the whole fight.
@@ -3372,8 +3436,8 @@ Heavy Bolts, 0–4% for the Wide Rite — and two were UNREACHABLE at a full sev
   zero to an Occultist holding Avatar of Ruin** (`mini(5, 8)` is 5), and **the Wide Watch is worth
   exactly zero to a Sharpshooter holding Overkill**, whose node text carries the rune's own clause.
   **Read every read site before assuming the label is the whole condition.**
-- **WHAT THE TAGS STILL ARE.** Player-facing on the draft card, counted on the loadout panel and
-  the hero sheet, and read by nothing else — EK's inertness claim, restored by the retirement
+- **WHAT THE TAGS STILL ARE.** Player-facing on the draft card, counted on the loadout panel (and
+  on the hero sheet until IH §3), and read by nothing else — EK's inertness claim, restored by the retirement
   rather than re-asserted. **ES §4's absolute-count shapes (`tag_threshold_met`, `breadth_met`)
   are KEPT and are the door a future tag-reading rune comes back through.**
 - **THE RULE THAT STOOD HERE IS KEPT AS THE RECORD OF WHAT WAS RETIRED, WHERE THE SUBSECTION BELOW SAYS**, so a later batch
@@ -4245,8 +4309,8 @@ columns from BX to IA), each hero drawing from their OWN pool and keeping their 
 (`Classes.draft_pool` is the pool, GP);
 `SPEC_POOLS` is what a ZONE BOSS offers. **Sharing one pool would re-weight every boss offer in
 the game**, which is what "the existing pick, unchanged" forbids. **A drafted ability lands in
-`member["bm_abilities"]`, the SAME list a boss pick writes**, so the battle spawn, the hero sheet,
-`Talents.ability_names`, the rune filter and the upgrade pairing all pick it up with no new
+`member["bm_abilities"]`, the SAME list a boss pick writes**, so the battle spawn, the hero's live config
+(`Run.hero_live_config`, which the sheet and the Kit panel read), `Talents.ability_names`, the rune filter and the upgrade pairing all pick it up with no new
 plumbing — **NO SAVE VERSION MOVED FOR THE DRAFT ITSELF** (EG moved it for the slot ladder, which
 is run state rather than a member key); the member keys (`draft_candidates`, `draft_picks_owed`,
 `draft_refused`, and **`bm_equipped` since EG**) ride the party dict, which is saved wholesale.
@@ -4395,9 +4459,10 @@ fact that they are.
   Three glyphs, three meanings, and nothing else uses them; a holding and a pick never share a glyph** — a mark exists so
   the player sees at a glance whether he owes something.
   **↑ NAMES AN UPGRADE, WHEREVER ONE APPEARS (ID §0.1, the designer's)** — the map card's corner (↑N, IC §3), an upgraded
-  ability's battle button and hero-sheet chip, and the Blacksmith's offer, which is not a holding: one glyph for the thing,
-  learned once. **Built at ID §3, and asserted** (`check_id` §3a): in the game's code every ◆ is a pending pick's badge
-  and ↑ is drawn on those four surfaces and nowhere else; the class passive's ◆ chip is deleted (the chip bullet under
+  ability's battle button and its row on the Kit panel (the hero sheet's chip until IH §3; IH §5 moved the chip's hover
+  and its ↑ there), and the Blacksmith's offer, which is not a holding: one glyph for the thing, learned once. **Built at
+  ID §3, and asserted** (`check_id` §3a): in the game's code every ◆ is a pending pick's badge and ↑ is drawn on those
+  four surfaces and nowhere else; the class passive's ◆ chip is deleted (the chip bullet under
   *A CHIP SAYS WHAT PAYS NOW*), and a rare relic reads the word RARE on the shelf and in the picker. **✦ STAYS WHERE IT
   NAMES A RUNE** — the battle's rune chip (`RUNE_CHIP_TAG`) and a count of the runes a hero holds unworn (the nameplate's
   and the bag's `✦ N`, each labelled, and the kit preview's prose) — **AND GOES WHEREVER IT DUPLICATES A STATE THE SURFACE
@@ -4408,8 +4473,8 @@ fact that they are.
   rune panel, IE the hero sheet's worn row, IF the last two); `check_if` §3c sweeps the three sectioned panels' rows for a
   state the head already gives, and `check_id` §3a holds ✦ to the four rune lines. A new panel listing things by state is
   sectioned by it from the start. **AND NO WORD NAMES TWO KINDS OF THING ON TWO PANELS (IG §3, IF's ruling 4, the
-  designer's): CORE IS A CORE RUNE WHEREVER IT APPEARS** — the rune panel's section, the hero sheet's and the kit
-  preview's state column — so the Kit panel's first section is STARTING KIT, the cards he opened with against the ones he
+  designer's): CORE IS A CORE RUNE WHEREVER IT APPEARS** — the rune panel's section and the kit preview's state column
+  (the hero sheet's too until IH §3) — so the Kit panel's first section is STARTING KIT, the cards he opened with against the ones he
   earned. The bare KIT was weighed on the real screen and not taken: the map card's own *Kit n/m* button counts the
   starting cards and the carried ones, so KIT would name the whole and one part of it, above CARRIED's Bench buttons.
   `check_if` §3c reads every panel's heads with the kind of thing each lists, and reds on a word heading runes on one
@@ -4554,7 +4619,8 @@ same breath as the removal. `run_sim` never bought one, so no measured figure mo
 - **WHICH SET A READER WANTS IS DECIDED BY THE QUESTION, AND THERE ARE THREE QUESTIONS (THE THIRD
   SINCE GT §3).** *What does this hero CARRY?* → the loadout (`Run.equipped_ability_names`) — the
   slot count, the Kit panel and the bench. *What will the next fight SEAT?* → the loadout less what
-  sits out (`Run.seated_ability_names`) — the battle spawn and the hero sheet, and nothing else.
+  sits out (`Run.seated_ability_names`) — the battle spawn and the hero's live config (`Run.hero_live_config`: the
+  sheet, the Kit panel's hover and the kit preview), and nothing else.
   *What does this hero OWN, so he is not offered it again?* → the
   pool (`bm_abilities`) — `Runes.kit_names` → `Talents.ability_names` → `Run.owned_ability_names`,
   and through it the draft, the boss award and its fallback. **READING THE LOADOUT FOR THE SECOND

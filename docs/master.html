@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-10-13 (Batch IG &mdash; every chip, and Sanctity)</b></p>
+<p align="right"><b>Last updated: 2026-10-14 (Batch IH &mdash; the card, the sheet, and every plate that overlaps itself)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -438,7 +438,9 @@ separated: his <b>core slots</b>, every one drawn and an empty one marked so; th
 Unequip, a Drop that asks twice on a rune he holds, and a Swap when every slot of its kind is full; a
 row carries no mark of its state, because its section says it), a <b>&#10022;N marker on his nameplate</b> counting the runes he holds and does
 not wear &mdash; it opens the same panel, and it is drawn only while he holds one, so it goes the
-moment the last is equipped, sold or dropped, and opening the panel does not clear it &mdash; an <b>&#8593;N
+moment the last is equipped, sold or dropped, and opening the panel does not clear it &mdash; a <b>Runes n/6</b> button
+beside his <b>Kit</b> button at the card's foot, counting the runes he wears (his core runes and his ordinary ones) of his six
+slots, which opens the same panel; a core rune that pays nothing marks it with &#9675; in amber and its hover says why &mdash; an <b>&#8593;N
 ability-upgrade count</b> in its top corner (hidden at zero; hovering it lists them as "Overpower — Honed", one
 per line — it takes no click of its own), and an unspent-talent badge; <b>clicking a card
 opens that hero's talent tree and full sheet</b>. <b>Every pick a hero is owed opens by itself
@@ -1312,9 +1314,9 @@ Savage Sweep, Bestial Wrath, Spirit Bond, Ghostpack, Call the Wilds, Unleash and
 companion, and its hunter's half is Pack Bond's, which sits out beside the Rune of the Sharpshooter (core). Without
 Pack Bond, a Hunter with a companion fights with it, and its companion's half pays.
 <b>A card that sits out is kept, still
-carried and still counted in the ability slots</b>; benching it on the map frees the slot. The hero
-sheet shows it greyed as &ldquo;sits out&rdquo; and the map's Kit panel says which rune brings it
-back. A card that opens without any engine &mdash; Battle Poise and Counter Time on a stance swap,
+carried and still counted in the ability slots</b>; benching it on the map frees the slot. The map's
+Kit panel says which rune brings it back, on its row and on its hover, and the kit preview shows it greyed as
+&ldquo;sits out&rdquo;. A card that opens without any engine &mdash; Battle Poise and Counter Time on a stance swap,
 Kill Command and the companion cards on the companion every Hunter but the Sharpshooter summons
 &mdash; always fights.</li>
 <li><b>A rune that reads an engine is offered only while that engine is equipped.</b> Forty-two of
@@ -1344,8 +1346,8 @@ left to offer, the Peddler, the cache, the bargain and the event name the engine
 equipped as the reason. <b>A rune already bought is never taken away, and everything that shows it says it is
 sitting out</b> &mdash; it stays in its slot, is still worn, and pays nothing until the engine is equipped again.
 Four places say so, each naming the engine rune that brings it back: the rune pouch, whose row shows the reason in
-place of the rune's own rule; the map's rune slot, which marks the slot and gives the reason on hover; the hero
-sheet, which reads &ldquo;sits out&rdquo; in the column that says whether a rune is worn; and the combat log's
+place of the rune's own rule; the map's rune slot, which marks the slot and gives the reason on hover; the kit
+preview, which reads &ldquo;sits out&rdquo; in the column that says whether a rune is worn, with the reason on its hover; and the combat log's
 opening roll call, as the fight starts. <b>Unequipping the rune frees the slot, and nothing does it for him</b>.
 <b>A rune another rune he wears cancels sits out the same way</b>: <b>Burning Ground beside Vow of Silence</b>,
 which forbids every point of damage he deals, when all Burning Ground does is deal damage. Both are offered and
@@ -1353,8 +1355,8 @@ both can be worn together; the four places say Burning Ground sits out while the
 the ground does not burn.
 <b>An engine rune can sit out the same way</b>: the Rune of the Beastmaster (core) slotted beside the Rune of the
 Sharpshooter has no companion and so no bond to deepen, and the same four places say it sits out, in the same
-words &mdash; the pouch's engine row, the map card's engine line (marked &#9675;, the reason on the card's hover),
-the hero sheet and the roll call. The pairing is allowed and is the player's to make, and <b>nothing of the
+words &mdash; the pouch's engine row, the map card's Runes button (marked &#9675; in amber, the reason on its hover),
+the kit preview and the roll call. The pairing is allowed and is the player's to make, and <b>nothing of the
 Rune of the Beastmaster (core) pays beside it</b>: Mark of the Hunt, whose hunter's half it pays, sits out there too.</li>
 <li><b>The enabler travels.</b> An engine's enablers — the abilities it cannot work without, the
 "needs" column of the table in §6b — come with the rune to any hero of the class who holds it, in
@@ -1511,11 +1513,11 @@ one of them appears about half as often: <b>a hero can finish a run having never
 the upgrade their build wanted.</b> That is the variety working, not a fault.</p>
 <p><b>Upgrades apply at battle spawn, after talents and runes.</b> The order matters: a
 payload can <i>set</i> an ability's field rather than add to it, so an upgrade applied first
-would be silently overwritten. Upgrades go last and always win. The hero sheet assembles the kit the
-same way, so the numbers on the sheet are the numbers in the fight.</p>
+would be silently overwritten. Upgrades go last and always win. The hero sheet and the Kit panel's hover assemble
+the kit the same way, so the numbers they show are the numbers in the fight.</p>
 <p><b>Where you can see them.</b> <b>&#8593; names an upgrade wherever one appears.</b> An ability carrying any
-upgrade wears a gold <b>&#8593;</b> on its label &mdash; on its battle action button <i>and</i> on its hero-sheet
-chip &mdash; and hovering either ends with a line naming the upgrades ("Honed · Swift"). Names
+upgrade wears a gold <b>&#8593;</b> on its label &mdash; on its battle action button <i>and</i> on its row in the map's
+Kit panel &mdash; and hovering either ends with a line naming the upgrades ("Honed · Swift"). Names
 only: the magnitudes are already in the numbers above, which reflect the upgrade. Outside a
 fight, each map hero card carries an <b>&#8593;N</b> count in its top corner whose hover
 lists them one per line, and the Blacksmith's counter marks each upgrade it sells with the same <b>&#8593;</b>.
@@ -1646,8 +1648,8 @@ fallen at 20% of maximum), so they draft like anyone else. A hero whose pool has
 to show is simply not offered one.</p>
 <ul>
 <li><b>Every hero's screen carries See the kit</b>, and it opens on that hero: a <b>read-only preview</b> of that hero's carried cards and runes &mdash; his opening kit, the
-cards he carries, what sits out and what is benched, and his runes in the hero sheet's own words &mdash;
-over the screen. It changes nothing, and closing it leaves the choice exactly as it was.</li>
+cards he carries (each card's hover the Kit panel's), what sits out and what is benched, and his runes with their
+state &mdash; core, worn, held or sits out &mdash; over the screen. It changes nothing, and closing it leaves the choice exactly as it was.</li>
 <li><b>Declining is per hero and always allowed.</b> One hero taking a card does not commit the
 others, and a settled kit is a legitimate end state.</li>
 <li><b>A card held back is not a button.</b> The cards are drawn when the elite falls and chosen later,
@@ -2108,12 +2110,10 @@ the Hunt, Reacquire, Blood Debt, Vendetta, Covenant of Ash and Arcane Echo lead 
 Snare Line and Feint carry it second.</p>
 <p><b>NO RUNE READS A TAG. THE TAGS ARE A VOCABULARY THE PLAYER READS, AND NOTHING BRANCHES ON
 ONE.</b> No ability, talent, relic or rune reads a tag count; the draft card shows the words and
-the two loadout screens count them, and that is the whole of it. <b>The count is shown to the
-player on two screens</b> &mdash; the <b>loadout panel</b>, where the swap happens, and the
-<b>hero sheet</b>, the one screen where a whole loadout is read at once. Each is recomputed from
-the live loadout on every draw, so it moves the instant a card is benched.
-<code>check_ek</code> &sect;3 sweeps every script in the repo and asserts the set of files naming
-a tag is exactly four &mdash; two that define the tables and two that display them.</p>
+the loadout panel counts them, and that is the whole of it. <b>The count is shown to the player on the
+loadout panel</b>, where the swap happens, recomputed from the live loadout on every draw, so it moves the
+instant a card is benched. <code>check_ek</code> &sect;3 sweeps every script in the repo and asserts the set
+of files naming a tag is exactly three &mdash; two that define the tables and one that displays them.</p>
 <p><b>THE READING MACHINERY IS STILL THERE AND STILL READS NOTHING.</b> A rune CAN ask how many
 equipped cards of a tag its holder carries (<code>Runes.tag_threshold_met</code>) or how many
 different tags his bar spans (<code>Runes.breadth_met</code>), both over
@@ -3428,11 +3428,14 @@ read smaller from here means new background art at the template density. Burger 
 top-left; initiative bar beside it; combat log top-right (scrolling, color-coded, with a
 small <b>– / Log</b> button to hide or restore it); action bar bottom-center on the acting
 hero's turn. <b>Each side is grouped tight</b> (heroes ~x350–430, enemies ~x905–990) and
-every unit's readouts live on a <b>144px nameplate</b> in a stack behind its side —
-heroes' plates along the LEFT edge, enemies' along the RIGHT. A plate holds a
-<b>portrait</b> (dedicated art if the unit has it — the Berserker does — else a sprite
+every unit's readouts live on a <b>172px nameplate</b> in a stack behind its side —
+heroes' plates along the LEFT edge, enemies' along the RIGHT, each stack spaced so no plate reaches the next. A plate holds a
+<b>portrait</b> in a column of its own (dedicated art if the unit has it — the Berserker does — else a sprite
 close-up), the unit's name, HP bar, resource bar(s), Break meter with numeric x/100
-readout, and its status chips (hover for tooltips; Bleed buildup is a chip). <b>A rune whose
+readout, and its status chips (hover for tooltips; Bleed buildup is a chip). <b>Nothing on a plate is drawn
+over anything else on it</b>: every figure sits inside its own bar, whole, and a figure too wide for its bar
+is set a size smaller inside it; each chip is as wide as its letters, and a row with more chips than room ends
+in a <b>+N</b> chip whose hover names the rest. <b>A rune whose
 payout turns on and off has a rune chip</b> at the right end of the same row &mdash; an outlined chip
 with the rune mark &#10022;, bright while it pays and dim while it waits on its condition; hover it for
 which, and for what it pays, every figure read off the rune itself. <b>The Crest's rune is one chip on
@@ -3441,10 +3444,10 @@ hero's rune that carries a condition, <b>Pay a Lethal Hit out of Your Resource P
 quarter's health while the Rage bar holds any), and <b>Vow of Silence</b> on a Cleric who holds something it
 silences &mdash; it names each: his own ground's reflect (for anybody standing on it), the Ruin his blows would
 drink off a Ruined enemy, Suffering's heal &mdash; with the vow's heal figure; it is in effect while his ground is
-laid or a Ruined enemy stands. A rune that always pays is on the hero sheet, not in the row. <b>Hovering a plate (or a body while targeting) shows the unit's resist card</b> — what
+laid or a Ruined enemy stands. A rune that always pays is read in the hero's numbers and on his Runes panel, not in the row. <b>Hovering a plate (or a body while targeting) shows the unit's resist card</b> — what
 it resists and what it is vulnerable to — so counterplay is never hidden information. <b>Hovering an
 enemy's intent line shows what it is about to do</b> (§4.9).
-<b>The battle UI is deliberately compact</b> (144px plates, 240px log,
+<b>The battle UI is deliberately compact</b> (172px plates, 240px log,
 compact action bar and initiative portraits) so the field dominates the screen.
 <b>The acting unit's plate glows with a gold border — that IS the turn
 indicator</b>; hovering or Tab-targeting a unit lights its plate too, and
@@ -3546,14 +3549,13 @@ pure tanks additionally show their <b>Block %</b>; the <b>Attack</b> row explain
 scaling and hovering <b>Resistances</b> lists all seven schools, physical included).
 Stats mirror the battle
 spawn math: Constitution uses the spec's value and Attack/HP include node
-scaling — the class passive + one line for each engine held
-(or "none held"), ability chips (hover shows real
-numbers AND the "% of Attack" scaling; a chip carrying an <b>ability upgrade</b> wears a gold
-<b>&#8593;</b> and names its upgrades on the last line of its hover), a <b>read-only</b> rune list (three flat slots and the three engine slots, each row's state in a column of its
-own &mdash; CREST, CORE, WORN or held;
-equipping happens on the map card, so one place writes it), and the class's talent tree:
+scaling — the class passive and his lineage's own engine while its core rune is slotted (a hero on his class's
+own engine shows the class passive alone), and the class's talent tree:
 three tiers of nine, READ-ONLY, with every node the hero wears lit and each node's text on its
-tooltip. Talents are bought between runs on the build screen. Owed ability, upgrade and rune
+tooltip. Talents are bought between runs on the build screen. <b>The sheet shows what the hero is; what he
+wears is on the map</b>: his cards on the <b>Kit panel</b> (each ability row's hover shows real numbers AND the
+"% of Attack" scaling; a card carrying an <b>ability upgrade</b> wears a gold <b>&#8593;</b> and names its upgrades
+on the last line of its hover) and his runes on the <b>Runes panel</b>. Owed ability, upgrade and rune
 picks are resolved on the map card, not here.</li>
 <li><b>Class selection screen:</b> shows the CLASS PASSIVE in a line under the title (it rides
 along on every engine the class can take); the three engine runes dealt, each card its rune's name,
@@ -3701,9 +3703,13 @@ inside it &mdash; one JSON line for the run (each hero's lineage, core and ordin
 relics, the rung), then one line at every fight's end: the fight's frame (zone, slot, the encounter, the
 bargain, the turns it took, who fell), every hero's resource as play can read it (turns opened at a full
 bar, turns on which every costed card cost more than he held and turns on which one did, the lowest bar),
-every conjunction that formed (its degree, its ingredients, the turns it stood, the Break it ground out),
+every conjunction that formed (its degree, its ingredients, the turns it stood, the Break its ticks put on the meter, and
+why it ended &mdash; its clock, a cleanse, an ingredient consumed, its body dying, or the fight ending with it standing),
 every Boil Over (the Rage poured, its damage, the core, his best ordinary turn), the Vow of Silence (the
-healing it added, the damage it refused) and a Hierophant's Sanctity. On in the player's own game, off
+healing it added, the damage it refused) and a Hierophant's Sanctity. <b>Every debug action is named</b> &mdash; on the
+run's line when it came first, on a line of its own the moment it is taken after that, and on every fight it touched (a
+switch left on as the fight opened included) &mdash; and a fight that names one is not play. Each hero's lineage is written
+with its name beside it, and each core rune says whether it is a lineage's, the class's own or a rule engine's. On in the player's own game, off
 in every test process; DOD_READOUT=0 turns it off. A resumed run appends to its file; a run's file stops
 growing at 2 MiB. It reads the game and changes nothing in it.</li>
 <li><b>Balance tooling:</b> DOD_AUTOPLAY=1 (one bot battle with debug prints), DOD_SIM=N

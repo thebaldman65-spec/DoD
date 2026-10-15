@@ -1,5 +1,11 @@
-# The HERO SHEET: one compact page showing a hero's stats, class
-# explanation, abilities, runes and their spec's talent tree.
+# The HERO SHEET: one compact page showing what a hero IS — his live stats,
+# his class passive and his lineage's engine, and his class's talent tree.
+#
+# BATCH IH §3 — WHAT HE WEARS IS ON THE PANELS (the designer's): his cards on the
+# map's Kit panel, his runes on its Runes panel. The ABILITIES chips, the CARRIED
+# BY TAG census and the RUNES block left this page; the chips' hover moved to the
+# Kit panel's rows (`Run.ability_hover`, IH §5), and the prologue that builds his
+# numbers moved with it (`Run.hero_live_config`), so the two read one builder.
 #
 # BATCH AN DELETED THE LIST VIEW. The map screen carries all four hero cards
 # now, so it IS the party list — this page is only ever entered for a
@@ -116,8 +122,10 @@ func _passive_desc_live(cfg: Dictionary, pid: String) -> String:
 	var desc: String = Classes.engine_desc(pid)
 	match pid:
 		"seasoned":
-			desc = "Seasoned Fighter: fights in one of two stances.\nAGGRESSIVE — +%d%% damage dealt, +10%% damage taken.\nDEFENSIVE — %d%% less damage taken, -10%% damage dealt.\nStarts each battle Aggressive; the earnable\nGuard Change swaps." % [
-				int(round((0.15 + float(cfg.get("seasoned_off_bonus", 0.0))
+			# BATCH IH §3 — the upside is the fight's own constant (0.30 by ruling since HL §3; this
+			# line read 0.15 until IH), and Guard Change travels with the Stances (HL §1).
+			desc = "Seasoned Fighter: fights in one of two stances.\nAGGRESSIVE — +%d%% damage dealt, +10%% damage taken.\nDEFENSIVE — %d%% less damage taken, -10%% damage dealt.\nStarts each battle Aggressive; Guard Change swaps." % [
+				int(round((BattleUnit.SEASONED_AGG_DEALT + float(cfg.get("seasoned_off_bonus", 0.0))
 					+ float(cfg.get("rune_seasoned_off_bonus", 0.0))) * 100)),
 				int(round((0.15 + float(cfg.get("seasoned_def_bonus", 0.0))
 					+ float(cfg.get("rune_seasoned_def_bonus", 0.0))) * 100))]
@@ -143,103 +151,34 @@ func _passive_desc_live(cfg: Dictionary, pid: String) -> String:
 func _draw_detail() -> void:
 	var member: Dictionary = Run.party[selected]
 	var key: String = member["key"]
-	var cfg := Classes.hero_config(key)
-	var base_hp: int = cfg["max_hp"]  # node scaling works off the base
-	var spec: String = member.get("spec", "")
-	var awake: bool = spec != "" or bool(member.get("awakened", false))
-	# BATCH GK — THE OPENING KIT IS THE ENGINES' AS WELL AS THE LINEAGE'S, off the
-	# one builder the battle spawn reads, so the sheet and the fight cannot
-	# disagree about what an enabler that travelled or left has done to the kit.
-	var engines: Array = Runes.held_engines(member)
-	cfg["engines"] = engines
-	cfg["abilities"] = Classes.opening_kit(key, spec, engines)
-	if spec != "":
-		Classes.apply_passive(cfg, spec)
-		# Specced heroes use their spec's stat block — the SAME helper the
-		# battle spawn calls, so sheet and nameplate can never drift.
-		Classes.apply_spec_stats(cfg, spec)
-		# Spec blocks may override max_hp (Berserker 175): re-read the
-		# scaling baseline after the block, mirroring the battle spawn.
-		base_hp = cfg["max_hp"]
-	if awake:
-		# Earned abilities (Batch AH) — BEFORE the tree, exactly as the
-		# battle spawn orders them, so a talent that modifies a pool-bought
-		# ability shows the same numbers here that it will in the fight.
-		# Six of a full kit's ten come from here; the sheet has to show them.
-		#
-		# BATCH EG §2 — THE LOADOUT, NOT THE POOL, and for the reason this
-		# whole page exists: the sheet's promise is that its numbers are the
-		# fight's numbers, so it must read exactly what `battle.gd`'s spawn
-		# reads. A benched card is listed below the runes instead.
-		#
-		# BATCH GT §3 — AND LESS WHAT SITS OUT, THROUGH THE SAME DOOR THE SPAWN
-		# ASKS (`Run.seated_ability_names`). A card that sits out is drawn
-		# below the seated ones as its own greyed chip, saying why.
-		for bm_name in Run.seated_ability_names(member):
-			var bm_ab := Classes.spec_pool_ability(spec, String(bm_name))
-			if bm_ab != null and not cfg["abilities"].any(
-					func(a): return a.display_name == bm_ab.display_name):
-				cfg["abilities"] = cfg["abilities"] + [bm_ab]
-		Talents.apply_from_tree(cfg, member.get("tree", []), member.get("talents", {}),
-			member)
-	# BATCH HL §6 — the four in the ctx, exactly as the spawn hands them, so a
-	# payload's party condition reads the same party here as in the fight.
-	var pay_ctx := {"learned": member.get("talents", {}), "member": member, "party": Run.party}
-	for rune in member.get("runes", []):
-		if rune.get("equipped", false):
-			Talents.apply_payload(cfg, rune["payload"], 1, pay_ctx)
-	# BATCH HK §4 — AND THE PARTY SLOT'S RUNE, ON EVERY HERO, EXACTLY AS THE SPAWN
-	# APPLIES IT: the sheet shows the numbers the fight will use.
-	for pr in Run.party_runes:
-		if (pr as Dictionary).get("equipped", false):
-			Talents.apply_payload(cfg, (pr as Dictionary).get("payload", {}), 1, pay_ctx)
-	# Mini-boss ability upgrades (Batch AP), LAST — same order as the battle
-	# spawn, and for the same reason: a talent that SETS a field would
-	# otherwise overwrite the upgrade. The sheet has to show the numbers the
-	# fight will use.
-	# Batch AQ §5A: the RETURN is captured now instead of discarded — it names
-	# what actually LANDED, so the sheet's ↑ carries the same guarantee the
-	# battle tooltip has and can never advertise an upgrade that did not apply.
-	# Batch AU §1's talent fallbacks ride the same call, so the sheet shows the
-	# upgraded numbers a collided node actually bought.
-	var landed_upgrades: Dictionary = Run.apply_upgrades(member, cfg["abilities"],
-		cfg.get(Talents.FALLBACK_KEY, []))
-	# Ashen Skin (Pyromancer, BATCH BS §3 — the clause moved down the lane from
-	# Kiln-Forged, which refuses death now): mirrors the battle spawn, because
-	# the Resistances row below reads cfg["resists"] and a sheet that omitted
-	# this would quietly disagree with the fight.
-	if int(cfg.get("ashen_skin", 0)) > 0:
-		var ash_res: Dictionary = cfg.get("resists", {})
-		ash_res["fire"] = float(ash_res.get("fire", 0.0)) \
-			+ 0.01 * int(cfg["ashen_skin"])
-		cfg["resists"] = ash_res
-	cfg["max_hp"] = int(round(cfg["max_hp"] * (1.0 + cfg.get("max_hp_pct", 0.0))))
-	# Toughness (Warden talent): Constitution grows with bulk — same order as
-	# battle spawn (after every max-HP bonus has landed).
-	if cfg.get("toughness_ranks", 0) > 0:
-		cfg["constitution"] = int(cfg.get("constitution", 100)
-			+ 0.05 * cfg["toughness_ranks"] * cfg["max_hp"])
-	# Node scaling (mirrors battle spawn): +2% of base Attack & HP per win.
-	var base_attack: int = cfg.get("attack", 100)
-	if Run.combat_wins > 0:
-		cfg["attack"] = int(round(base_attack * (1.0 + 0.02 * Run.combat_wins)))
-		cfg["max_hp"] = int(cfg["max_hp"]) \
-			+ int(round(base_hp * 0.02 * Run.combat_wins))
+	# BATCH IH §5 — THE PROLOGUE IS `Run.hero_live_config`, moved there unchanged so the Kit
+	# panel's ability hover reads the numbers this page shows: kit, passive, spec stats, earned
+	# cards, tree, runes, the crest's rune, upgrades, Ashen Skin, max health, Toughness and node
+	# scaling, in the battle spawn's order.
+	var live: Dictionary = Run.hero_live_config(member)
+	var cfg: Dictionary = live["cfg"]
+	var spec: String = live["spec"]
+	var awake: bool = live["awake"]
+	var engines: Array = live["engines"]
+	var base_attack: int = live["base_attack"]
 	var spec_label: String = Classes.SPEC_INFO[spec]["name"] if spec != "" \
 		else (String(cfg["unit_name"]) if awake else "Unawakened")
 	# Awakened heroes are titled by spec; the class name only shows pre-spec —
 	# and, since GK, on a hero whose engine carried no spec.
 	_title(spec_label if awake else "%s — Unawakened" % cfg["unit_name"], 6, 30)
 
-	# Left column: class blurb, stats, abilities (compact chips, hover detail).
+	# Left column: class blurb, stats, the passive block (IH §3: nothing he wears).
 	var blurb := Label.new()
-	blurb.text = Classes.CLASS_BLURBS[key]
 	blurb.add_theme_font_size_override("font_size", 13)
 	blurb.add_theme_color_override("font_color", Color(0.65, 0.6, 0.55))
-	blurb.position = Vector2(60, 80)
-	blurb.size = Vector2(400, 44)
+	# BATCH IH §6 — WRAP, PARENT, SIZE, AND ONLY THEN THE TEXT: sized before it is parented, a label takes
+	# the default font's line; given its words before its width, a wrapping label breaks them at every
+	# word and keeps that height. Its text, set last, is broken at the width it already has.
 	blurb.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	add_child(blurb)
+	blurb.position = Vector2(60, 80)
+	blurb.size = Vector2(400, 44)
+	blurb.text = Classes.CLASS_BLURBS[key]
 
 	# Each stat is its own label so hovering explains just that stat.
 	var crit_pct := int(round((0.10 + cfg.get("crit_bonus", 0.0)) * 100))
@@ -299,273 +238,29 @@ func _draw_detail() -> void:
 	var class_p: Dictionary = Classes.CLASS_PASSIVES[key]
 	var passive_lines := PackedStringArray(
 		["Class: %s — %s" % [class_p["name"], class_p["desc"]]])
-	# BATCH GK — ONE LINE PER HELD ENGINE, and "none" said out loud: a hero with
-	# no engine is a legal state, and the sheet names it rather than going quiet.
-	for pid in engines:
-		passive_lines.append(_passive_desc_live(cfg, String(pid)))
-	if engines.is_empty() and awake:
-		passive_lines.append("Core rune: none held.")
+	# BATCH IH §3 — WHAT HE IS: the class passive, and his LINEAGE's own engine while its core
+	# rune is slotted — the one `Run.awaken` set his lineage from. Any other core rune he wears
+	# (another lineage's engine, the class's spine, a rule engine) is something he wears, so its
+	# rule is on the Runes panel's CORE row (`Runes.shown_desc`, GS §3's one door) and not here;
+	# and "none held" is that panel's to say. A hero awakened on the spine has no lineage, and
+	# his block is his class passive alone.
+	var own_pid := Classes.engine_of_spec(spec) if spec != "" else ""
+	if own_pid != "" and engines.has(own_pid):
+		passive_lines.append(_passive_desc_live(cfg, own_pid))
 	var passive_label := Label.new()
-	passive_label.text = "\n".join(passive_lines)
+	# AUTOWRAP, PARENT, SIZE, THEN TEXT: a label that cannot wrap takes its one-line width the moment a
+	# size is set, one sized before it is in the tree takes the default font's, and one given its words
+	# before its width keeps the height of every word on its own line (IA's trap, and IH §6's three).
+	# No scroller since IH §3 — the three blocks that left freed the column, and a scroller around a
+	# few lines hid its own last one.
+	passive_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	passive_label.add_theme_font_size_override("font_size", 13)
 	passive_label.add_theme_color_override("font_color", Color(0.88, 0.85, 0.78))
-	passive_label.custom_minimum_size = Vector2(390, 0)
-	passive_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	# Several engines' text can outgrow the footprint one passive had, so the block
-	# scrolls rather than running into the ability header (EG's scroller rule).
-	var passive_scroll := ScrollContainer.new()
-	passive_scroll.position = Vector2(60, 132 + stat_rows.size() * 22)
-	passive_scroll.size = Vector2(400, 80)
-	passive_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	add_child(passive_scroll)
-	passive_scroll.add_child(passive_label)
-
-	var ability_header := Label.new()
-	# BATCH EG §1/§2 — THE HEADER CARRIES THE LADDER AND THE BENCH. The cap is
-	# not seven any more and it is not a constant, so a page that showed a kit
-	# without saying how many slots it fills would be the one screen the player
-	# compares builds on and the one that cannot answer "have I room for
-	# another". The bench clause only appears when something is benched.
-	var bench: Array = Run.benched_ability_names(member) if awake else []
-	ability_header.text = "ABILITIES  (hover for details)" if not awake \
-		else "ABILITIES  %d of %d slots%s  (hover for details)" % [
-			Run.ability_slots_used(member), Run.ability_slot_cap(),
-			"  —  %d benched, swap them on the map" % bench.size() \
-				if not bench.is_empty() else ""]
-	ability_header.add_theme_font_size_override("font_size", 15)
-	ability_header.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
-	ability_header.position = Vector2(60, 296)
-	ability_header.size = Vector2(450, 20)
-	add_child(ability_header)
-
-	# **BATCH EG §1 — THE CHIPS LIVE IN A SCROLLER NOW, AND THE OVERFLOW IS
-	# OLDER THAN THIS BATCH.** They were laid out absolutely at
-	# `324 + (i / 2) * 46`, which puts a fifth row at y=508 — straight through
-	# the RUNES header at 520 and into its scroller at 544. **A BEASTMASTER
-	# ALREADY REACHED FIVE ROWS AT HEAD**: his protected core is SIX display
-	# names in three slots, so six plus four earned is ten chips at the old flat
-	# cap, before a rune or a talent grants an eleventh. EG makes it ordinary
-	# rather than creating it — every spec reaches eleven at cap 10. The fix is
-	# the runes' own, quoted from their block below: a list that can outgrow the
-	# page lives in a scroller, so every ability renders and none is silently
-	# cut. Four rows sit in the footprint the absolute layout used; the rest
-	# scroll.
-	var ab_scroll := ScrollContainer.new()
-	ab_scroll.position = Vector2(55, 318)
-	ab_scroll.size = Vector2(460, 196)
-	ab_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	add_child(ab_scroll)
-	var ab_grid := GridContainer.new()
-	ab_grid.columns = 2
-	ab_grid.add_theme_constant_override("h_separation", 10)
-	ab_grid.add_theme_constant_override("v_separation", 8)
-	ab_scroll.add_child(ab_grid)
-
-	var abilities: Array = cfg["abilities"]
-	for i in abilities.size():
-		var ab: Ability = abilities[i]
-		var chip := PanelContainer.new()
-		chip.custom_minimum_size = Vector2(195, 38)
-		var chip_label := Label.new()
-		var cost_note := ""
-		if ab.cost > 0:
-			cost_note = "  (%d)" % ab.cost
-		elif ab.faith_cost > 0:
-			cost_note = "  (%dF)" % ab.faith_cost
-		# Batch AQ §5A: the same mark and the same gold the battle action
-		# button wears, off the same source of truth (what apply_upgrades said
-		# landed). Twelve upgrades a run were invisible outside a fight.
-		# BATCH ID §3 — the mark is ↑, which names an upgrade wherever one appears.
-		var ups: Array = landed_upgrades.get(ab.display_name, [])
-		chip_label.text = "%s%s%s" % ["↑ " if not ups.is_empty() else "",
-			ab.display_name, cost_note]
-		chip_label.add_theme_font_size_override("font_size", 13)
-		if not ups.is_empty():
-			chip_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.5))
-		chip_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		chip.add_child(chip_label)
-		# BATCH CL §1 — the sheet resolves its own tokens. `cfg` is post-prologue
-		# here, so these are the numbers the fight will use, and `member` adds
-		# the live current health the config cannot carry.
-		var vctx := Classes.value_ctx_from_config(cfg, member)
-		var tip := Classes.resolve_values(ab.description, vctx)
-		# BATCH CK §1: the computed lines are `Classes.computed_block` now, and
-		# the draft card renders the SAME function's output. This screen was the
-		# only copy of them, which is why the draft card had none — the fix was
-		# one builder, not a second copy of this one. It passes the hero's live
-		# Attack, so it gets the real range where the draft card gets the
-		# scaling percentage. It also gains the cost, cooldown and initiative
-		# lines the block carries; each is a number this sheet already had and
-		# was not showing.
-		tip += "\n%s" % Classes.computed_block(ab, int(cfg.get("attack", 100)),
-			String(cfg.get("resource_name", "Mana")), vctx)
-		# THE SCALING LINE STAYS HERE AND IS NOT IN THE BLOCK. The sheet is the
-		# page where numbers are studied, so it shows both the range and what
-		# produced it; the draft card would be showing the same figure twice,
-		# since with no live Attack the block's own damage line IS the scaling.
-		if ab.damage > 0:
-			tip += "\nScaling: %d%% of Attack" % ab.damage
-		# Trailing line, names only — the same line and the same place the
-		# battle button's tooltip puts it. The magnitudes are already in the
-		# numbers above, which reflect the upgrade.
-		if not ups.is_empty():
-			tip += "\n%s" % " · ".join(PackedStringArray(ups))
-		chip.tooltip_text = tip
-		ab_grid.add_child(chip)
-
-	# BATCH GT §3 — A CARRIED CARD THAT SITS OUT, SHOWN AND EXPLAINED. It is not
-	# in `cfg["abilities"]`, because the fight will not seat it; it is still the
-	# hero's and still counted in the header's slots, so leaving it off this page
-	# would hide a slot the player is paying for.
-	for so_name in (Run.sitting_out_names(member) if awake else []):
-		var so_chip := PanelContainer.new()
-		so_chip.custom_minimum_size = Vector2(195, 38)
-		var so_label := Label.new()
-		so_label.text = "%s — sits out" % String(so_name)
-		so_label.add_theme_font_size_override("font_size", 13)
-		so_label.add_theme_color_override("font_color", Color(0.55, 0.53, 0.5))
-		so_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		so_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		so_chip.add_child(so_label)
-		so_chip.tooltip_text = Run.sits_out_note(String(so_name), Run.held_engines(member))
-		ab_grid.add_child(so_chip)
-
-	# ── BATCH ES §4 — THE TAG CENSUS ON THE HERO SHEET ─────────────────────
-	#
-	# **THIS IS THE ONE SCREEN WHERE A PLAYER READS A WHOLE LOADOUT AT ONCE**,
-	# which is why `docs/state.md` has recommended it as the tags' surface since
-	# EK. The panel where the swap HAPPENS carries the same line
-	# (`map_screen._open_loadout_panel`), so the count is visible both where it
-	# is changed and where it is studied.
-	#
-	# **IT READS THE SAME DOOR EVERYTHING ELSE DOES** —
-	# `Run.loadout_ability_names` through `Classes.tag_census` — so the sheet's
-	# promise holds here as it does for every other number on this page: what it
-	# shows is what a clause would read. Drawn on every `_draw_detail`, so a
-	# bench on the map card is reflected the next time this page opens; there is
-	# no cached count to go stale.
-	var lo_names: Array = Run.loadout_ability_names(member)
-	var lo_census: Dictionary = Classes.tag_census(lo_names)
-	var lo_parts: Array = []
-	for tag in Classes.TAG_ORDER:
-		lo_parts.append("%s %d" % [String(tag), int(lo_census[String(tag)])])
-	var tag_header := Label.new()
-	tag_header.text = "CARRIED BY TAG  (%d cards)   %s   breadth %d of %d" % [
-		lo_names.size(), "  ".join(lo_parts), Classes.tag_breadth(lo_names),
-		Classes.TAG_ORDER.size()]
-	tag_header.add_theme_font_size_override("font_size", 12)
-	tag_header.add_theme_color_override("font_color", Color(0.72, 0.68, 0.85))
-	tag_header.position = Vector2(60, 498)
-	tag_header.size = Vector2(452, 18)
-	add_child(tag_header)
-
-	# ── BATCH FN — THE `RUNE CONDITIONS` LINE STOOD HERE AND IT IS GONE ──────
-	#
-	# **EZ §0 drew a second line under the census showing where this hero stood
-	# against the two loadout conditions** — the drafted half only, primary tag
-	# only, as a fraction — because ES required the state be visible and a
-	# player who cannot see he is one card away cannot use the lever.
-	# **FN retired both conditions**, so the line was a number that decided
-	# nothing: no rune reads a fraction of the drafted cards any more.
-	#
-	# **THE CENSUS ABOVE IS UNTOUCHED AND THAT IS THE WHOLE DISTINCTION.** The
-	# tags themselves are player-facing on the draft card and are not conditions
-	# (EK), so `CARRIED BY TAG` stays exactly as it was. `check_fn` §3 asserts
-	# the pair on this screen — the census present, the condition line absent —
-	# so a re-introduction is caught rather than silently re-drawn.
-
-	# Runes: THREE SLOTS FLAT from run start (Batch AN §9 — the 2/3/4 growth
-	# ladder is gone). READ-ONLY here: equipping happens on the map card, so
-	# there is one place that writes `equipped` and this page can be what it
-	# is good at — showing the numbers those runes are already producing in
-	# the stat block above.
-	var runes: Array = member.get("runes", [])
-	var slot_cap := Run.rune_slots()
-	var rune_header := Label.new()
-	var equipped_count := 0
-	for rune in runes:
-		if rune.get("equipped", false):
-			equipped_count += 1
-	# BATCH GK — the engine slots are counted beside the three ordinary ones.
-	var held_engines: Array = member.get("engines", [])
-	rune_header.text = "RUNES  (%d/%d equipped, %d/%d core — swap them on the map)" % [
-		equipped_count, slot_cap, engines.size(), Run.ENGINE_SLOTS]
-
-	rune_header.add_theme_font_size_override("font_size", 15)
-	rune_header.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
-	rune_header.position = Vector2(60, 520)
-	add_child(rune_header)
-	if runes.is_empty():
-		var none := Label.new()
-		none.text = "None worn — a rune drops after every fight, and the Peddler sells them."
-		none.add_theme_font_size_override("font_size", 12)
-		none.add_theme_color_override("font_color", Color(0.55, 0.52, 0.5))
-		none.position = Vector2(60, 548)
-		add_child(none)
-	# The pouch can outgrow the page (elite drops have no cap), so the rows
-	# live in a scroller — every owned rune renders, never a silent cut.
-	var rune_scroll := ScrollContainer.new()
-	rune_scroll.position = Vector2(55, 544)
-	rune_scroll.size = Vector2(450, 720 - 544 - 8)
-	rune_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	add_child(rune_scroll)
-	var rune_rows := VBoxContainer.new()
-	rune_rows.add_theme_constant_override("separation", 6)
-	rune_scroll.add_child(rune_rows)
-	# BATCH GX — WHICH WORN RUNES THE NEXT FIGHT WILL NOT PAY, through the same
-	# door the pouch and the map's slot buttons ask, so the three cannot
-	# disagree. Redrawn on every `_draw_detail`, so an engine unequipped on the
-	# map is reflected the next time this page opens; there is no cached set.
-	var sitting_runes: Array = Run.sitting_out_rune_names(member) if awake else []
-	# BATCH HK §4 — THE PARTY SLOT'S RUNE IS ON THIS HERO'S NUMBERS TOO, so it is
-	# listed here beside his own, its state reading CREST. (BATCH HR §1 — a rune he
-	# holds and does not wear is on his own lists again, and reads HELD here; the bag
-	# holds the crest's runes, which the map shows.)
-	for rune_entry in Run.party_runes + held_engines + runes:
-		var rune: Dictionary = rune_entry
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 10)
-		rune_rows.add_child(row)
-		var state := Label.new()
-		var is_on: bool = rune.get("equipped", false)
-		var sits: bool = is_on and sitting_runes.has(String(rune["name"]))
-		# BATCH IA §4 — THE PLAYER'S WORD IS CORE (HL §2's rename, finished on the two
-		# surfaces that still said ENGINE: this column and the kit preview, which reads it).
-		state.text = ("CREST" if Runes.is_party_rune(rune) else ("CORE" if rune.has("engine")
-			else "WORN")) if is_on else "held"
-		state.custom_minimum_size = Vector2(56, 20)
-		state.add_theme_font_size_override("font_size", 11)
-		state.add_theme_color_override("font_color",
-			Color(0.45, 0.9, 0.5) if is_on else Color(0.5, 0.48, 0.5))
-		row.add_child(state)
-		var rune_label := Label.new()
-		# BATCH IE §4 — NO ✦ BESIDE THE STATE COLUMN: the column already says WORN, CORE or CREST,
-		# and a mark beside it said it twice (IA §3's rule, applied to this panel).
-		rune_label.text = "%s — %s" % [rune["name"], Runes.shown_desc(rune)]
-		rune_label.add_theme_font_size_override("font_size", 12)
-		rune_label.add_theme_color_override("font_color",
-			Color(0.45, 0.9, 0.5) if is_on
-			else Runes.RUNE_TINT)  # HE §4 — no scope band; one tint
-		# BATCH GX — **GT §3'S SHEET, ONE LAYER UP.** A carried card that sits
-		# out is a greyed chip reading `— sits out` with the sentence as its
-		# tooltip; a worn rune that sits out reads the same two words in the
-		# column that already carries its state, and the sentence hangs off the
-		# row. **The state column is where this page says what a rune IS**, so
-		# a second chip beside it would be a second place to say one thing.
-		# The rune's own rule stays on the row: unlike the pouch, this page is
-		# read to study a loadout rather than to change one, so the text it
-		# came for is not replaced.
-		if sits:
-			state.text = "sits out"
-			state.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
-			rune_label.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
-			var note := Run.rune_sits_out_note(String(rune.get("id", "")), Run.held_engines(member),
-				Run.worn_rune_ids(member))
-			state.tooltip_text = note
-			rune_label.tooltip_text = note
-		rune_label.custom_minimum_size = Vector2(354, 20)
-		rune_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		row.add_child(rune_label)
+	passive_label.set_meta("passive_block", true)
+	add_child(passive_label)
+	passive_label.position = Vector2(60, 138 + stat_rows.size() * 22)
+	passive_label.size = Vector2(400, 0)
+	passive_label.text = "\n".join(passive_lines)  # last — the blurb's reason, above
 
 	# Right side: the chosen spec's talent tree lives on this same page.
 	var tree_header := Label.new()

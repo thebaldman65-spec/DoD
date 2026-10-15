@@ -256,7 +256,7 @@ func _slot_buttons(mp: Node, seat: int) -> Array:
 	_buttons(mp, all)
 	var out: Array = []
 	for b in all:
-		if (b as Button).has_meta("held_marker"):
+		if (b as Button).has_meta("held_marker") or (b as Button).has_meta("runes_button"):
 			continue
 		for c in (b as Button).pressed.get_connections():
 			var cb: Callable = c["callable"]
@@ -557,11 +557,15 @@ func _s3_the_three_surfaces() -> void:
 		"§3: the unequipped gated rune is not drawn in the pouch at all")
 	_close_overlays(mp)
 	await Gate.frames(self, 2)
-	# THE HERO SHEET, ONE RUNE PER ENGINE, BOTH ARMS.
-	await _s3b_the_hero_sheet(seat)
+	# THE KIT PREVIEW, ONE RUNE PER ENGINE, BOTH ARMS — the hero sheet's rune block until IH §3.
+	await _s3b_the_kit_preview(seat)
 
 
-func _s3b_the_hero_sheet(seat: int) -> void:
+# BATCH IH §3 — RE-POINTED, THE QUESTION UNMOVED: the read-only list of his runes says a worn rune
+# sits out, with GX's sentence, and stays quiet while it pays. The hero sheet's rune block was that
+# list until IH §3; the kit preview carries the state on the line itself, so a line's state and its
+# reason are one line, and its sentence hangs on that line.
+func _s3b_the_kit_preview(seat: int) -> void:
 	var per_engine := {}
 	for rid in _gated:
 		var pid := Runes.engine_read(rid)
@@ -577,42 +581,39 @@ func _s3b_the_hero_sheet(seat: int) -> void:
 		var note: String = _run.rune_sits_out_note(rid2)
 		for engine_in in [false, true]:
 			_dress(seat, rid2, engine_in)
-			_run.hero_screen_idx = seat
-			change_scene_to_file("res://scenes/party.tscn")
+			change_scene_to_file("res://scenes/map.tscn")
 			await Gate.frames(self, 6)
-			var sheet: Node = current_scene
+			var kp: Node = current_scene.call("_open_kit_preview", seat)
+			await Gate.frames(self, 2)
 			var arm := "engine in" if engine_in else "engine out"
-			# BATCH IE §4 — RE-TUNED, THE QUESTION UNMOVED: the sheet's worn row carries no ✦ any more —
-			# its state column says WORN — so the row is the rune's name and then its rule.
-			var row: Label = _label_with(sheet, "%s — " % rname)
-			ok(row != null and String(row.text).begins_with(rname),
-				"§3 %s (%s): the hero sheet does not draw the worn rune's row, its name first" % [rid2, arm])
+			var row: Label = _label_with(kp, "%s — " % rname)
+			var line := String(row.text).strip_edges() if row != null else ""
+			ok(row != null and (line.begins_with("WORN") or line.begins_with("sits out")) and line.contains(rname),
+				"§3 %s (%s): the kit preview does not draw the worn rune's line, its state first" % [rid2, arm])
 			if row == null:
+				kp.queue_free()
 				continue
-			var state: Label = _label_exact(sheet, "sits out")
+			var sits := line.begins_with("sits out")
 			if engine_in:
-				ok(state == null, "§3 %s (%s): the sheet says a paying rune sits out" % [rid2, arm])
+				ok(not sits, "§3 %s (%s): the kit preview says a paying rune sits out" % [rid2, arm])
 				ok(String(row.tooltip_text) == "",
-					"§3 %s (%s): the sheet hangs a sits-out note on a paying rune" % [rid2, arm])
-				if state == null:
+					"§3 %s (%s): the kit preview hangs a sits-out note on a paying rune" % [rid2, arm])
+				if not sits:
 					quiet += 1
 			else:
-				ok(state != null and String(state.text) == "sits out",
-					"§3 %s (%s): the sheet's state column does not read `sits out`" % [rid2, arm])
+				ok(sits, "§3 %s (%s): the kit preview's line does not read `sits out`" % [rid2, arm])
 				ok(String(row.tooltip_text) == note and note.contains(ername),
-					"§3 %s (%s): the sheet's row does not carry the sentence naming %s" % [rid2, arm, ername])
-				ok(state != null and String(state.tooltip_text) == note,
-					"§3 %s (%s): the sheet's state column carries no reason" % [rid2, arm])
-				# THE ROW STILL SHOWS THE RUNE'S OWN RULE — this page is read to
-				# study a loadout, so the text the player came for is not
-				# replaced the way the pouch's is.
+					"§3 %s (%s): the kit preview's line does not carry the sentence naming %s" % [rid2, arm, ername])
+				# THE LINE STILL SHOWS THE RUNE'S OWN RULE — the list is read to study a loadout.
 				ok(String(row.text).contains(Runes.shown_desc(Runes.build(rid2))),
-					"§3 %s: the sheet dropped the rune's own rule" % rid2)
-				if state != null:
+					"§3 %s: the kit preview dropped the rune's own rule" % rid2)
+				if sits:
 					said += 1
+			kp.queue_free()
+			await Gate.frames(self, 1)
 	ok(said == 12 and quiet == 12,
-		"§3: the hero sheet said it for %d of 12 engines and stayed quiet for %d of 12" % [said, quiet])
-	print("    the pouch, the map's slot and the sheet each said it in the engine-out arm and stayed quiet in the engine-in arm")
+		"§3: the kit preview said it for %d of 12 engines and stayed quiet for %d of 12" % [said, quiet])
+	print("    the pouch, the map's slot and the kit preview each said it in the engine-out arm and stayed quiet in the engine-in arm")
 
 
 # ── §3c — THE BATTLE LOG'S ROLL CALL ────────────────────────────

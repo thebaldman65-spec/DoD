@@ -304,6 +304,13 @@ func readout_wanted() -> bool:
 func readout_is_player() -> bool:
 	return save_path == SAVE_PATH
 
+
+# BATCH IH §0.2 — A DEBUG ACTION, TOLD TO THE READOUT BY NAME, at the two dispatches that write
+# `debug_used` (which stay its only writers). `taken` says where: "on the map" or "in the fight".
+# The readout keeps it in `readout` and, once the run's file exists, writes its line at once.
+func note_debug(action: String, taken: String) -> void:
+	load("res://scripts/readout.gd").note_debug(self, action, taken)
+
 # Zone rotation (Batch 37): a run is SLOT_COUNT zone slots and each
 # slot draws ONE zone from its authored candidate pool — zones are
 # designed FOR a position (openers are not finales), so pools are
@@ -3061,8 +3068,8 @@ func loadout_ability_names(member: Dictionary) -> Array:
 	return out
 
 
-# Benched: held, and not carried. The hero sheet, the map's Kit button and the
-# run summary read it.
+# Benched: held, and not carried. The map's Kit button and panel and the run
+# summary read it.
 func benched_ability_names(member: Dictionary) -> Array:
 	var carried: Array = equipped_ability_names(member)
 	return earned_ability_names(member).filter(
@@ -3097,11 +3104,11 @@ func sitting_out_names(member: Dictionary) -> Array:
 		func(n): return Classes.sits_out(String(n), held))
 
 
-# **THE ONE SENTENCE, BECAUSE TWO SCREENS SAY IT** (the hero sheet's chip and the
-# map's Kit panel): which rune brings the card back, and what it still costs. A
-# card that vanishes from the bar with no reason reads as a bug (CO §3). Broken
-# by hand at 44 characters, because the sheet shows it as a tooltip and a
-# tooltip does not wrap.
+# **THE ONE SENTENCE, BECAUSE SEVERAL SCREENS SAY IT** (the map's Kit panel, on the
+# row and its hover, and the kit preview — the hero sheet's chip until IH §3): which
+# rune brings the card back, and what it still costs. A card that vanishes from the
+# bar with no reason reads as a bug (CO §3). Broken by hand at 44 characters,
+# because a tooltip shows it and a tooltip does not wrap.
 #
 # **BATCH HB §4 — AND A SECOND CAUSE, WITH THE SAME OPENING CLAUSE.** A card that
 # needs a companion sits out while the hero holds the engine that dismisses the
@@ -3141,6 +3148,153 @@ func sits_out_note(card_name: String, engines: Array = []) -> String:
 # companion the card or rune needs, broken at 44 for the tooltip.
 func _dismisser_clause(engines: Array) -> String:
 	return "%s is equipped,\nwhich dismisses the companion it needs." % Runes.dismisser_name(engines)
+
+
+# ══ BATCH IH §5 — THE HERO's LIVE CONFIG AND AN ABILITY's HOVER, MOVED OFF THE SHEET ══════
+#
+# **THE SHEET's PROLOGUE, MOVED HERE UNCHANGED**, so the screens that show a hero's numbers
+# outside a fight read one builder: the hero sheet's stats, and the ability hover the sheet's
+# chips carried until IH §3 took them off it — on the map's Kit panel now (IH §5) and on the
+# kit preview. Its order is the battle spawn's (kit, passive, spec stats, earned cards, tree,
+# runes, the crest's rune, upgrades LAST, Ashen Skin, max-health, Toughness, node scaling): the
+# sheet's promise is that its numbers are the fight's, and that promise moved with it. **The
+# battle spawn keeps its own copy** — CK §1's owed helper is that one, and it is not this batch's.
+#
+# `extra_seated` seats cards the fight would not (a benched one), so its hover reads what it
+# would do carried, through the same doors. Returns the config and what the sheet read beside it.
+func hero_live_config(member: Dictionary, extra_seated: Array = []) -> Dictionary:
+	var key: String = member["key"]
+	var cfg := Classes.hero_config(key)
+	var base_hp: int = cfg["max_hp"]  # node scaling works off the base
+	var spec: String = member.get("spec", "")
+	var awake: bool = spec != "" or bool(member.get("awakened", false))
+	# BATCH GK — THE OPENING KIT IS THE ENGINES' AS WELL AS THE LINEAGE'S, off the
+	# one builder the battle spawn reads, so the sheet and the fight cannot
+	# disagree about what an enabler that travelled or left has done to the kit.
+	var engines: Array = Runes.held_engines(member)
+	cfg["engines"] = engines
+	cfg["abilities"] = Classes.opening_kit(key, spec, engines)
+	if spec != "":
+		Classes.apply_passive(cfg, spec)
+		# Specced heroes use their spec's stat block — the SAME helper the
+		# battle spawn calls, so sheet and nameplate can never drift.
+		Classes.apply_spec_stats(cfg, spec)
+		# Spec blocks may override max_hp (Berserker 175): re-read the
+		# scaling baseline after the block, mirroring the battle spawn.
+		base_hp = cfg["max_hp"]
+	if awake:
+		# Earned abilities (Batch AH) — BEFORE the tree, exactly as the battle
+		# spawn orders them, so a talent that modifies a pool-bought ability shows
+		# the same numbers here that it will in the fight. BATCH EG §2 — THE
+		# LOADOUT, NOT THE POOL; BATCH GT §3 — AND LESS WHAT SITS OUT, THROUGH THE
+		# SAME DOOR THE SPAWN ASKS (`seated_ability_names`).
+		for bm_name in seated_ability_names(member) + extra_seated:
+			var bm_ab := Classes.spec_pool_ability(spec, String(bm_name))
+			if bm_ab != null and not cfg["abilities"].any(
+					func(a): return a.display_name == bm_ab.display_name):
+				cfg["abilities"] = cfg["abilities"] + [bm_ab]
+		Talents.apply_from_tree(cfg, member.get("tree", []), member.get("talents", {}),
+			member)
+	# BATCH HL §6 — the four in the ctx, exactly as the spawn hands them, so a
+	# payload's party condition reads the same party here as in the fight.
+	var pay_ctx := {"learned": member.get("talents", {}), "member": member, "party": party}
+	for rune in member.get("runes", []):
+		if rune.get("equipped", false):
+			Talents.apply_payload(cfg, rune["payload"], 1, pay_ctx)
+	# BATCH HK §4 — AND THE PARTY SLOT'S RUNE, ON EVERY HERO, EXACTLY AS THE SPAWN
+	# APPLIES IT: the sheet shows the numbers the fight will use.
+	for pr in party_runes:
+		if (pr as Dictionary).get("equipped", false):
+			Talents.apply_payload(cfg, (pr as Dictionary).get("payload", {}), 1, pay_ctx)
+	# Mini-boss ability upgrades (Batch AP), LAST — same order as the battle
+	# spawn: a talent that SETS a field would otherwise overwrite the upgrade.
+	# Batch AQ §5A: the RETURN names what actually LANDED, so the ↑ carries the
+	# battle tooltip's guarantee; Batch AU §1's talent fallbacks ride the same call.
+	var landed_upgrades: Dictionary = apply_upgrades(member, cfg["abilities"],
+		cfg.get(Talents.FALLBACK_KEY, []))
+	# Ashen Skin (Pyromancer, BATCH BS §3): mirrors the battle spawn, because the
+	# Resistances row reads cfg["resists"].
+	if int(cfg.get("ashen_skin", 0)) > 0:
+		var ash_res: Dictionary = cfg.get("resists", {})
+		ash_res["fire"] = float(ash_res.get("fire", 0.0)) \
+			+ 0.01 * int(cfg["ashen_skin"])
+		cfg["resists"] = ash_res
+	cfg["max_hp"] = int(round(cfg["max_hp"] * (1.0 + cfg.get("max_hp_pct", 0.0))))
+	# Toughness (Warden talent): Constitution grows with bulk — same order as
+	# battle spawn (after every max-HP bonus has landed).
+	if cfg.get("toughness_ranks", 0) > 0:
+		cfg["constitution"] = int(cfg.get("constitution", 100)
+			+ 0.05 * cfg["toughness_ranks"] * cfg["max_hp"])
+	# Node scaling (mirrors battle spawn): +2% of base Attack & HP per win.
+	var base_attack: int = cfg.get("attack", 100)
+	if combat_wins > 0:
+		cfg["attack"] = int(round(base_attack * (1.0 + 0.02 * combat_wins)))
+		cfg["max_hp"] = int(cfg["max_hp"]) \
+			+ int(round(base_hp * 0.02 * combat_wins))
+	return {"cfg": cfg, "base_attack": base_attack, "landed": landed_upgrades,
+		"engines": engines, "awake": awake, "spec": spec}
+
+
+# **THE HOVER, ONE BUILDER (IH §5): the hero sheet's chip tooltip, moved, not copied.** The
+# ability's own words resolved against the hero's live numbers, `Classes.computed_block` at his
+# live Attack (CK §1's shared block), the scaling line the sheet kept outside the block, and the
+# names of the upgrades that landed. A carried card that sits out reads its sentence instead
+# (GT §3's, the sheet's sits-out chip). `live` is `hero_live_config(member)` when the caller has
+# it; a card the live config does not seat (a benched one) is read seated, through the same doors.
+# "" for a name that is no ability of his.
+func ability_hover(member: Dictionary, card_name: String, live: Dictionary = {}) -> String:
+	if live.is_empty():
+		live = hero_live_config(member)
+	if bool(live.get("awake", false)) and sitting_out_names(member).has(card_name):
+		return sits_out_note(card_name, held_engines(member))
+	var seat: Dictionary = _seated_for(member, card_name, live)
+	if seat.is_empty():
+		return ""
+	var ab: Ability = _live_ability(seat, card_name)
+	var cfg: Dictionary = seat["cfg"]
+	# BATCH CL §1 — the tokens resolve against the post-prologue config, and `member` adds the
+	# live current health the config cannot carry.
+	var vctx := Classes.value_ctx_from_config(cfg, member)
+	var tip := Classes.resolve_values(ab.description, vctx)
+	tip += "\n%s" % Classes.computed_block(ab, int(cfg.get("attack", 100)),
+		String(cfg.get("resource_name", "Mana")), vctx)
+	# THE SCALING LINE STAYS OUTSIDE THE BLOCK (CK §1): the range and what produced it.
+	if ab.damage > 0:
+		tip += "\nScaling: %d%% of Attack" % ab.damage
+	# Trailing line, names only — the battle button's tooltip puts it in the same place.
+	var ups: Array = (seat["landed"] as Dictionary).get(ab.display_name, [])
+	if not ups.is_empty():
+		tip += "\n%s" % " · ".join(PackedStringArray(ups))
+	return tip
+
+
+# The upgrades that LANDED on a card of his, by name, read where its hover reads them (AQ §5A: a
+# mark that can only say what applied). The ↑ beside a Kit-panel row is this list's (IH §5).
+func ability_landed(member: Dictionary, card_name: String, live: Dictionary = {}) -> Array:
+	if live.is_empty():
+		live = hero_live_config(member)
+	var seat: Dictionary = _seated_for(member, card_name, live)
+	return [] if seat.is_empty() else (seat["landed"] as Dictionary).get(card_name, [])
+
+
+# The live config in which `card_name` is seated: his own when the fight seats it, one with it
+# seated when he holds it benched, {} when it is no ability of his or it sits out.
+func _seated_for(member: Dictionary, card_name: String, live: Dictionary) -> Dictionary:
+	if _live_ability(live, card_name) != null:
+		return live
+	if bool(live.get("awake", false)) and earned_ability_names(member).has(card_name) \
+			and not sitting_out_names(member).has(card_name):
+		var benched := hero_live_config(member, [card_name])
+		if _live_ability(benched, card_name) != null:
+			return benched
+	return {}
+
+
+func _live_ability(live: Dictionary, card_name: String) -> Ability:
+	for a in (live["cfg"] as Dictionary).get("abilities", []):
+		if a != null and String((a as Ability).display_name) == card_name:
+			return a
+	return null
 
 
 # ══ BATCH GX — AND THE SAME THING ONE LAYER UP, FOR A RUNE ══════════════════
@@ -3191,14 +3345,14 @@ func worn_rune_ids(member: Dictionary) -> Array:
 
 
 # **THE ONE SENTENCE, BECAUSE FOUR SURFACES SAY IT** (the pouch's row, the
-# map's rune slot, the hero sheet's row and the battle log's opening roll call,
+# map's rune slot, the kit preview's line and the battle log's opening roll call,
 # which takes its first two lines): which engine rune brings it back,
 # and what it still costs him. **It is GT's sentence with the nouns its own
 # surfaces use** — a rune is WORN rather than carried and UNEQUIPPED rather than
 # benched, and the pouch counts slots FILLED rather than counted — because a
 # second phrasing of the same idea is a second thing to keep in step. Broken by
-# hand at 44 characters, for GT's reason: the sheet shows it as a tooltip and a
-# tooltip does not wrap.
+# hand at 44 characters, for GT's reason: a tooltip shows it and a tooltip does
+# not wrap.
 #
 # **BATCH HB §4 — THE PET'S CAUSE, ON THE RUNE'S NOUNS.** `engines` is the card
 # note's argument above, for the same reason.
@@ -4928,7 +5082,8 @@ func upgrade_fits(id: String, ab: Ability) -> bool:
 # ever advertise an upgrade that really applied.
 #
 # CALLED FROM EXACTLY TWO SITES, the two that assemble a kit: the hero spawn
-# in battle.gd and the sheet assembly in party_screen.gd. (RunSim reloads the
+# in battle.gd and the hero's live config (`hero_live_config`, the sheet's
+# assembly, moved out of party_screen.gd at IH §5). (RunSim reloads the
 # battle scene, so it inherits the battle.gd site and needs no third call.)
 #
 # ORDER IS LOAD-BEARING: this runs AFTER `Talents.apply_from_tree` and after

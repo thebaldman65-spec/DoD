@@ -756,7 +756,7 @@ func _close_on_screen(ov: Node) -> bool:
 # ── §4 — THE PLAYER'S WORD IS CORE ─────────────────────────────────────────
 
 func _s4_the_word() -> void:
-	print("\n§4 — the hero sheet's state column and the kit preview say CORE")
+	print("\n§4 — the rune panel and the kit preview say CORE; the sheet carries no rune state at all (IH §3)")
 	_new_run()
 	_run.hero_screen_idx = 0
 	change_scene_to_file("res://scenes/party.tscn")
@@ -769,9 +769,22 @@ func _s4_the_word() -> void:
 			core_state += 1
 		if String(t) == "ENGINE" or String(t).begins_with("ENGINE "):
 			engine_word += 1
-	ok(core_state == 1 and engine_word == 0,
-		"§4: the sheet's state column reads CORE %d time(s) and ENGINE %d — the Warrior's one slotted core rune" % [core_state, engine_word])
+	# BATCH IH §3 — THE SHEET's RUNE BLOCK LEFT IT, state column and all: the negative half here, the
+	# word's positive halves on the rune panel (CORE heads the core runes) and the kit preview below.
+	ok(core_state == 0 and engine_word == 0,
+		"§4: the sheet reads CORE %d time(s) and ENGINE %d — it carries no rune state since IH §3" % [core_state, engine_word])
 	var mp := await _to_map()
+	mp.call("_open_rune_panel", 0)
+	await Gate.frames(self, 2)
+	var rp: Node = Gate.overlay(mp, 60)
+	var rpt: Array = Gate.texts(rp) if rp != null else []
+	ok(rpt.filter(func(t): return String(t).begins_with("CORE — ")).size() == 1
+			and not rpt.any(func(t): return String(t).contains("ENGINE")),
+		"§4: the rune panel does not head its core runes CORE, once, with no ENGINE: %s" % [rpt.slice(0, 6)])
+	if rp != null:
+		rp.queue_free()
+	mp.set("_rune_panel_for", -1)
+	await Gate.frames(self, 1)
 	var kp: Control = mp.call("_open_kit_preview", 0)
 	await Gate.frames(self, 2)
 	var kt := "\n".join(PackedStringArray(Gate.texts(kp))) if kp != null else ""
@@ -804,10 +817,10 @@ func _s5_the_claim() -> void:
 	print("  the walk is spelled at %d sites of `battle.gd` (check_dm §1 prints it every battery)" % src.count(walk))
 
 
-# ── §6 — THE MAP CARD'S CORE LINE WRAPS ────────────────────────────────────
+# ── §6 — THE MAP CARD SAYS WHAT HE WEARS, INSIDE THE CARD (the core line until IH §2) ─────
 
 func _s6_the_card_line() -> void:
-	print("\n§6 — the map card's core line: three titles, inside the card")
+	print("\n§6 — three core runes: counted on the card's Runes button, inside the card, and named on its panel")
 	_new_run()
 	var hi := 3
 	var titles: Array = Classes.class_engines("hunter").map(func(p): return Classes.engine_title(String(p)))
@@ -829,30 +842,40 @@ func _s6_the_card_line() -> void:
 			eng.append(_rune(String(six[k])))
 	_run.party[hi]["engines"] = eng
 	var mp := await _to_map()
+	# BATCH IH §2 — THE LINE IS GONE (the designer's), so the question IA asked of it — does the card
+	# say what he wears, inside the card — is asked of the button that took its room: the widest set
+	# of three core runes, counted on the Runes button inside its card and named on the panel it opens.
 	var line: Label = null
+	var btn: Button = null
 	var stack: Array = [mp]
 	while not stack.is_empty():
 		var n: Node = stack.pop_back()
-		if n is Label and String((n as Label).text).begins_with("core runes:") \
-				and String((n as Label).text).contains(String(titles[best[0]])):
+		if n is Label and String((n as Label).text).begins_with("core runes:"):
 			line = n
+		if n is Button and (n as Button).has_meta("runes_button") and int((n as Button).get_meta("runes_button")) == hi:
+			btn = n
 		for k2 in n.get_children():
 			stack.append(k2)
-	ok(line != null, "§6: the Hunter's card drew no core-rune line")
-	if line == null:
+	ok(line == null, "§6: a card still draws the core-rune line: '%s'" % (line.text if line != null else ""))
+	ok(btn != null and String(btn.text).ends_with("Runes 3/6"),
+		"§6: the Hunter's card does not count three slotted core runes on its Runes button ('%s')" % (btn.text if btn != null else "none"))
+	if btn == null:
 		return
 	var card := Rect2(Vector2(8.0, 84.0 + hi * 158.0), Vector2(300.0, 152.0))
-	var r := line.get_global_rect()
-	var all_named := true
+	var r := btn.get_global_rect()
+	ok(card.encloses(r) and btn.get_combined_minimum_size().x <= r.size.x + 0.5,
+		"§6: the Runes button runs out of its card or its face out of the button (%s in %s, needs %.0f px)" % [
+			str(r), str(card), btn.get_combined_minimum_size().x])
+	btn.emit_signal("pressed")
+	await Gate.frames(self, 2)
+	var rp: Node = Gate.overlay(mp, 60)
+	var named := 0
+	var rpt := "\n".join(PackedStringArray(Gate.texts(rp))) if rp != null else ""
 	for k3 in best:
-		if not String(line.text).contains(String(titles[k3])):
-			all_named = false
-	ok(all_named, "§6: the card's line does not name all three: '%s'" % line.text)
-	ok(best_w > r.size.x, "§6: the widest set (%.0f px) fits one line of %.0f — the arm reads no overflow" % [best_w, r.size.x])
-	ok(card.encloses(r) and line.get_combined_minimum_size().y <= r.size.y + 0.5 and line.get_line_count() >= 2,
-		"§6: the line runs out of its card (%s in %s, %d lines, needs %.0f px of %.0f)" % [
-			str(r), str(card), line.get_line_count(), line.get_combined_minimum_size().y, r.size.y])
-	print("  the widest three (%.0f px on one line) wrap to %d lines inside the card" % [best_w, line.get_line_count()])
+		if rpt.contains(String(Runes.config(String(six[k3])).get("name", "?"))):
+			named += 1
+	ok(named == 3, "§6: the panel the button opens names %d of the three core runes" % named)
+	print("  the widest three (%.0f px as the old line) are counted on the button (%s) and named on its panel" % [best_w, btn.text])
 
 
 # ── §9 — THE PLAYER'S FILES ────────────────────────────────────────────────

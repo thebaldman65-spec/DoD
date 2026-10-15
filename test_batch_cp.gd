@@ -406,16 +406,21 @@ func _ironclad_rename() -> void:
 
 func _computed_block() -> void:
 	print("\n§3 the draft card renders the computed block")
-	# CK §1: ONE builder, TWO screens. The draft card passes attack = 0 so it
-	# prints the SCALING PERCENTAGE; the hero sheet passes live Attack so it
-	# prints a real range. Before CK the sheet held the only copy, which is
+	# CK §1: ONE builder. The draft card passes attack = 0 so it prints the
+	# SCALING PERCENTAGE; the hover the hero sheet carried until IH passes live
+	# Attack so it prints a real range. Before CK the sheet held the only copy, which is
 	# exactly why thirty damaging cards drafted with no damage figure at all.
+	# BATCH IH §5 — the hero sheet's chips left it at IH §3, and their hover moved, builder and all, to
+	# `Run.ability_hover` (the Kit panel's rows and the kit preview read it): the live-Attack caller is
+	# that function now, read by its own body.
 	var map_src := FileAccess.get_file_as_string("res://scripts/map_screen.gd")
-	var sheet_src := FileAccess.get_file_as_string("res://scripts/party_screen.gd")
+	var rs_src := FileAccess.get_file_as_string("res://scripts/run_state.gd")
+	var hv_at := rs_src.find("func ability_hover(")
+	var hover_src := rs_src.substr(hv_at, rs_src.find("\nfunc ", hv_at + 10) - hv_at) if hv_at >= 0 else ""
 	ok(map_src.contains("Classes.computed_block("),
 		"the draft card calls Classes.computed_block")
-	ok(sheet_src.contains("Classes.computed_block("),
-		"the hero sheet calls the SAME builder")
+	ok(hover_src.contains("Classes.computed_block("),
+		"the moved hover (`Run.ability_hover`) calls the SAME builder")
 	# Damage and Perfect are both present for a card that has them.
 	var ab := Classes.pool_ability("Boil Over")
 	ok(ab != null, "Boil Over resolves")

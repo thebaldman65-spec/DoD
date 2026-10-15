@@ -642,7 +642,9 @@ func _s4_the_rule_everywhere() -> void:
 	# named `rune`, `er`, `r` or `offer["rune"]` at its render site; the positive
 	# arm is the door's own six calls.
 	var calls := 0
-	for f in ["shop_screen.gd", "map_screen.gd", "party_screen.gd", "spec_choice_screen.gd"]:
+	# BATCH IH §3 — the hero sheet's rune block left it, and the kit preview — which shows a rune's
+	# text read-only, as that block did — is the fourth screen swept in its place.
+	for f in ["shop_screen.gd", "map_screen.gd", "kit_preview.gd", "spec_choice_screen.gd"]:
 		var code := Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/" + f))
 		calls += code.count("Runes.shown_desc(")
 		for needle in ['rune["desc"]', 'er["desc"]', 'rune.get("desc"', 'er.get("desc"']:
@@ -674,7 +676,7 @@ func _s4b_the_surfaces(ids: Array) -> void:
 	var shop: Node = current_scene
 	ok(Gate.scene_name(self) == "Shop", "§4: the Peddler is not on screen (%s)" % Gate.scene_name(self))
 	var fit := {"shop": [], "pouch": [], "offer": []}
-	var shown := {"shop": 0, "pouch": 0, "offer": 0, "sheet": 0, "bag": 0, "full": 0, "sale": 0}
+	var shown := {"shop": 0, "pouch": 0, "offer": 0, "preview": 0, "bag": 0, "full": 0, "sale": 0}
 	for id in ids:
 		var cls := Classes.engine_class(String(Runes.config(String(id))["engine"]))
 		var r: Dictionary = Runes.build(String(id))
@@ -733,19 +735,21 @@ func _s4b_the_surfaces(ids: Array) -> void:
 			_run.party[idx2]["rune_picks_owed"] = 0
 			_run.party[idx2]["rune_candidates"] = []
 	_close_overlays(mp)
-	# THE HERO SHEET.
+	# THE KIT PREVIEW — the read-only list of a hero's runes; the hero sheet was this surface
+	# until IH §3 took its rune block off it (the panels show what he wears).
 	for id4 in ids:
 		var cls4 := Classes.engine_class(String(Runes.config(String(id4))["engine"]))
 		var idx4 := SEATS.find(cls4)
 		var r4: Dictionary = Runes.build(String(id4))
 		r4["equipped"] = true
 		_run.party[idx4]["engines"] = [r4]
-		_run.hero_screen_idx = idx4
-		change_scene_to_file("res://scenes/party.tscn")
-		await Gate.frames(self, 6)
-		var l4: Label = _label_with(current_scene, String(r4["name"]) + " — ")
-		if _shows(l4, String(id4), "the hero sheet"):
-			shown["sheet"] += 1
+		var kp: Node = mp.call("_open_kit_preview", idx4)
+		await Gate.frames(self, 3)
+		var l4: Label = _label_with(kp, String(r4["name"]) + " — ")
+		if _shows(l4, String(id4), "the kit preview"):
+			shown["preview"] += 1
+		kp.queue_free()
+		await Gate.frames(self, 1)
 		_run.party[idx4]["engines"] = []
 	# ── BATCH HK §2/§3 — THE BAG'S THREE SURFACES, ASKED THE SAME QUESTION ─────
 	# An engine rune in the bag, one waiting on the full-bag panel, and one on the
@@ -828,8 +832,8 @@ func _s4b_the_surfaces(ids: Array) -> void:
 	_run.rune_bag = []
 	for k in shown:
 		ok(int(shown[k]) == 24, "§4: %s showed the rule for %d of 24 engine runes" % [k, shown[k]])
-	print("    the rule, and no placeholder: the Peddler %d, the pouch %d, an offer %d, the hero sheet %d, the bag %d, the full-bag panel %d, the Peddler's sale rows %d — of 24 each" % [
-		shown["shop"], shown["pouch"], shown["offer"], shown["sheet"], shown["bag"], shown["full"], shown["sale"]])
+	print("    the rule, and no placeholder: the Peddler %d, the pouch %d, an offer %d, the kit preview %d, the bag %d, the full-bag panel %d, the Peddler's sale rows %d — of 24 each" % [
+		shown["shop"], shown["pouch"], shown["offer"], shown["preview"], shown["bag"], shown["full"], shown["sale"]])
 	# THE FIT, MEASURED AND PRINTED — the brief asked for the measurement, not a repair.
 	var over_shop := 0
 	var worst_shop := ["", 0]

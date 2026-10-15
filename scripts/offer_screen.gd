@@ -145,7 +145,28 @@ func _warband_line() -> String:
 		", ".join(parts)]
 
 
+# BATCH IH §6 — NOTHING ON A CARD IS DRAWN OVER ANYTHING ELSE ON IT (the designer's rule), and a card's
+# text stays in its card: every label is parented before it is sized (sized first, it takes the default
+# font's one-line width — a description drew as one line through the next card) and wraps before it
+# is. Every part is tagged with its card's index (`bargain_card`) so a check can hold the card to it.
 func _draw_option(idx: int, at: Vector2) -> void:
+	var first_child := get_child_count()
+	_draw_option_parts(idx, at)
+	for k in range(first_child, get_child_count()):
+		get_child(k).set_meta("bargain_card", idx)
+
+
+# `text` is set LAST for a label: given its words before its width, a wrapping label breaks them at
+# every word and keeps that height.
+func _put(c: Control, pos: Vector2, sz: Vector2, text := "") -> void:
+	add_child(c)
+	c.position = pos
+	c.size = sz
+	if text != "" and c is Label:
+		(c as Label).text = text
+
+
+func _draw_option_parts(idx: int, at: Vector2) -> void:
 	var option: Dictionary = offer[idx]
 	var mod_id := String(option["modifier"])
 	var cfg: Dictionary = Run.MODIFIERS[mod_id]
@@ -167,10 +188,8 @@ func _draw_option(idx: int, at: Vector2) -> void:
 	sev_lbl.text = "SEVERITY %d" % sev
 	sev_lbl.add_theme_font_size_override("font_size", 13)
 	sev_lbl.add_theme_color_override("font_color", tint)
-	sev_lbl.position = at + Vector2(0, 16)
-	sev_lbl.size = Vector2(350, 18)
 	sev_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	add_child(sev_lbl)
+	_put(sev_lbl, at + Vector2(0, 16), Vector2(350, 18))
 
 	# The severity pips: four boxes, `sev` of them lit. A number is precise,
 	# a bar is comparable, and the choice between three cards is a comparison.
@@ -186,20 +205,15 @@ func _draw_option(idx: int, at: Vector2) -> void:
 	name_lbl.add_theme_font_override("font", NAME_FONT)
 	name_lbl.add_theme_font_size_override("font_size", 32)
 	name_lbl.add_theme_color_override("font_color", Color(0.9, 0.86, 0.78))
-	name_lbl.position = at + Vector2(0, 54)
-	name_lbl.size = Vector2(350, 40)
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	add_child(name_lbl)
+	_put(name_lbl, at + Vector2(0, 54), Vector2(350, 42))
 
 	var desc := Label.new()
-	desc.text = String(cfg["desc"])
 	desc.add_theme_font_size_override("font_size", 15)
 	desc.add_theme_color_override("font_color", Color(0.84, 0.81, 0.75))
-	desc.position = at + Vector2(20, 104)
-	desc.size = Vector2(310, 90)
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	add_child(desc)
+	_put(desc, at + Vector2(20, 104), Vector2(310, 90), String(cfg["desc"]))
 
 	var rule := ColorRect.new()
 	rule.position = at + Vector2(40, 210)
@@ -211,20 +225,15 @@ func _draw_option(idx: int, at: Vector2) -> void:
 	pay_head.text = "PAYS"
 	pay_head.add_theme_font_size_override("font_size", 12)
 	pay_head.add_theme_color_override("font_color", Color(0.6, 0.57, 0.55))
-	pay_head.position = at + Vector2(0, 224)
-	pay_head.size = Vector2(350, 16)
 	pay_head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	add_child(pay_head)
+	_put(pay_head, at + Vector2(0, 224), Vector2(350, 17))
 
 	var reward := Label.new()
-	reward.text = Run.reward_text(option["reward"])
 	reward.add_theme_font_size_override("font_size", 20)
 	reward.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
-	reward.position = at + Vector2(20, 244)
-	reward.size = Vector2(310, 60)
 	reward.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	reward.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	add_child(reward)
+	_put(reward, at + Vector2(20, 244), Vector2(310, 60), Run.reward_text(option["reward"]))
 
 	var take := Button.new()
 	take.text = "Take this bargain"

@@ -4,6 +4,31 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The card, the sheet, and every plate that overlaps itself (Batch IH) — 2026-10-14
+
+**Why the sheet lost three blocks.** The designer's four changes are one idea: the sheet shows what the hero is, and the
+panels show what he wears. A card he carries and a rune he wears can change between two fights; his class passive, his
+lineage and his talents cannot change inside a run. Reading both on one page made the page answer two questions, and the
+answer to the second was already a panel away, where it can be changed. So the abilities, the tag count and the rune list
+moved to the panels that move them, and the hover that explained a card went with the card rather than being written twice
+— a second copy of a tooltip is how a figure goes stale in one place and not the other.
+
+**Why the Runes button counts both kinds of slot.** It mirrors *Kit n/m*: one number the player can read at a glance and a
+panel that separates the core runes from the rest. The core-rune line it replaces was the card's only mark that a core rune
+pays nothing; the mark moved onto the button rather than being lost with the line.
+
+**Why nothing may be drawn over anything else, and why a gate.** Four batches in a row a person found text drawn over text
+and no check found it once. The cause was mostly one fact of the engine — a box sized before it is on the screen takes a
+larger font's size and keeps it — so every plate and card that followed the obvious order of statements inherited it. A rule
+stated as a fix is fixed once; stated as an assertion over every plate and card, the next one built the obvious way is caught.
+
+**Why a fight touched by the debug menu prices nothing.** The readout exists to price five rulings from real play. A fight
+ended from the menu, or played with every card unlocked, measures the menu. The file has to be able to say so, or the next
+person to read it does what IH's brief did: read three ended fights as play.
+
+**Why a conjunction says why it ended.** Whether a Rupture runs its clock or dies with its body is the whole design question
+of a conjunction's length, and the two read the same in a count of the turns it stood.
+
 ## Every chip, and Sanctity (Batch IG) — 2026-10-13
 
 **Why every chip, and not the nine a run reaches.** A chip is drawn to tell the player something; it is not an event in the

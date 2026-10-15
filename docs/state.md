@@ -29,61 +29,75 @@ never have fired: **an alarm set above the failure level is not an alarm.** `che
 sentence every battery: over it is a warning, and past it by more than one batch at the record is a failure — the largest
 single-batch growth on record is **+13.38 KiB** (ES's +13,700 B). *In the preamble for the archive pointer's reason.*
 
-*Last rewritten: 2026-10-13 (Batch IG).*
+*Last rewritten: 2026-10-14 (Batch IH).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: IG — EVERY CHIP, AND SANCTITY.** IMPLEMENT ONLY. **Game code changed in four files** — `unit.gd` (the display
-  chips' writer and reader; Sanctity's step 16 → 13; the member's Mana maximum carried out of a won fight), `battle.gd` (the nineteen
-  chip sites; the maximum in the fight's in-flight bank), `map_screen.gd` (the Kit panel's STARTING KIT, its note and its empty line)
-  and `run_state.gd` (a comment). Full working: **`docs/reports/IG.md`**. **The next letter is IH** — IC's remainder (the roadmap).
-- **§0 — IF's FIVE RULINGS, ANSWERED (the designer's).** The ask is made (play one zone, send the file — IG's ruling 1); the rate
-  stays 12; Smoulder's three figures stand; the panels' heads stand but CORE, which is a core rune's word; the member carries the
-  hero's true maximum.
-- **§1 — EVERY DISPLAY CHIP IS DRAWN.** The nineteen of IE's census — nine a run reaches, ten dormant — are drawn by
-  `set_display_chip` into `display_chips`, between the engine chips and the statuses: no tick, no cleanse or Dispel, no count, no
-  Sanctity event, no float; a body that falls takes its chips. **Every `add_status` left is the door's or one of fifteen named
-  effects** (`check_ig` §1a). On the default build the chips had booked 4.87 events a fight — **Iron Will 4.00 of them** (a node
-  every default hero wears, four landings a spawn), Loyalty 0.42, Faith 0.25 — and 1.04 untalented (Loyalty 0.55, Faith 0.33).
-- **§2 — SANCTITY's STEP IS 13** (16 until IG). On the population FV §3 set it on (a Hierophant beside the default lineages,
-  untalented, rung 1), a normal fight's end reads 2.58 steps of 5 on the honest count (2.06 at 16; 2.14 at 16 before §1). The
-  handle and its figures: SANCTITY's STEP, below.
-- **§3 — STARTING KIT.** The Kit panel's first section reads *STARTING KIT — never benched*; CORE is a core rune wherever it appears
-  (`check_if` §3c reads every panel's heads with what each lists).
-- **§4 — THE MEMBER CARRIES THE BAR's TRUE MAXIMUM.** From his first fight's end a Mana hero's `max_mana` is the bar's own (120 with
-  *A Bigger Resource Pool*): the Hourglass restores 30% of it, a new zone refills him to it, a map potion and an event read it. A
-  hero with no node reads 100 everywhere. The save already carried the key: **no version moved**.
-- **THE INSTRUMENTS.** `check_ig` is new. **Re-pointed to the question each asked**: every gate and suite that read a chip through a
-  status verb reads it where it is drawn (`check_eu`, `check_ev`, `check_hf`, `check_hp`, `check_hu`, `check_ie`, `test_batch_bd`,
-  `be`, `bf`, `bg`, `bh`, `bi`, `bp`, `br`, `bw`); `check_if` §3 reads STARTING KIT and §3c the one-word rule, §4 the true maximum.
-- **THE VERIFICATION.** Two recons of HEAD's battery, each predicted after its literal sweep: **§1 alone, `check_de` 601 / 13** and **all of IG's
-  code, 601 / 14** — every red named but one (`check_ed`: the two lost needles are pin-manifest pins, rebuilt). **No seeded count
-  moved; the dice moved inside four roads**, and a stub putting the chips' landings back reads HEAD's logs. **Twenty controls and
-  HEAD's code**, each in its own clone, every one biting — one found a hole in `check_ig` §4 (the in-flight bank masked the
-  victory's write), repaired and proved two-armed. **The pre-pass and the acceptance, 147 targets, each `check_de` 605 / 0 / 0, as
-  predicted** (the acceptance 81 min 36 s, all 622 `ps` rows headless, the tree byte-identical before and after, the player's four
-  files untouched) — `docs/reports/IG.md` §8.
-- **`CLAUDE.md` IS 467,620 B = 456.66 KiB AGAINST ITS 510 KiB CEILING — 53.34 KiB UNDER** (+1,938 B at IG): the re-measure's reading — 6.6 batches at EZ's record (54,620 ÷ 8,293), 28.2 at IG's own rate.
-- **`docs/state.md` IS 353,523 B = 345.24 KiB AGAINST ITS 380 KiB CEILING — 34.76 KiB UNDER** (+1,540 B at IG, this line included): 6.1 batches at IA's +5,860 B (35,597 ÷ 5,860) — **the worst case, and not the rate to plan against**; the honest rate is ID +952 B, IE +3,917, IF +236, IG +1,540 — a mean of 1,661 B over the four, **21.4 batches at it, and the room is planned against that one** (IG's report, §6). The re-measure is II's.
-- **No save version moved**: the display chips are not saved, the member's `max_mana` was a saved key already.
+- **Last batch: IH — THE CARD, THE SHEET, AND EVERY PLATE THAT OVERLAPS ITSELF.** IMPLEMENT ONLY, the designer's asks after his
+  play. **Game code changed in nine files** — `readout.gd`, `unit.gd`, `battle.gd`, `run_state.gd`, `party_screen.gd`, `map_screen.gd`,
+  `kit_preview.gd`, `offer_screen.gd`, `classes.gd`. Full working: **`docs/reports/IH.md`**. **The next letter is II** — the re-measure
+  (the roadmap, below); IC's remainder, which IG's brief gave IH, waits on its letter.
+- **THE DESIGNER PLAYED.** `readout/run-20261014-134942.jsonl` — four fights of a fresh rung-2 run (Warden, a Mage on the class's
+  spine, Devout, Sharpshooter) — backed up with the four player files (`../save-backups/IH-20261014-144644`, md5-verified). **It is
+  debug-touched**: every hero holds the class's whole pool from fight 2 (the unlock-all) and the fights read as ended from the menu.
+  `run_save.bin` moved for the first time since 2026-10-08: 40,284 B at 14:30 — **a second, fresh rung-1 run** (Berserker,
+  Pyromancer, Devout, Sharpshooter) standing at its first node, no fight finished, so no file of its own yet.
+- **§0.2 — THE READOUT SAYS WHEN A FIGHT IS NOT PLAY.** Every debug action is named: on the header when it came first, as a line of
+  its own after, and on every fight it touched (a switch in force as the fight opened counts); a conjunction says why it ended; the
+  lineage field is `spec` as `Run.awaken` wrote it, with its name and each core rune's kind beside it. **The Rupture's 13 is the
+  Orc Slinger's Constitution (80) on the constant's 10** — the tick reads the constant, and the meter divides by the body.
+- **§2 — THE CARD.** The core-rune line is gone; `Runes n/6` stands beside `Kit n/m` and opens that hero's panel; a core rune that sits
+  out marks it (○, amber, the sentence on its hover).
+- **§3 — THE SHEET.** Stats, the class passive and the lineage's own engine, talents — nothing he wears; no scroller. **The Stances line
+  reads the fight's 30%** (it read 15 since HL).
+- **§4 — THE RUNES PANEL.** Unchanged: its CORE and WORN read apart on the real screen. Three doors — the button, the ✦ marker, the slots.
+- **§5 — THE HOVER.** The sheet's chip tooltip moved with its prologue (`Run.hero_live_config`, `Run.ability_hover`) onto every Kit-panel
+  ability row and the kit preview — one builder, string for string — and an upgraded row wears ↑.
+- **§6 — NOTHING DRAWN OVER ANYTHING ELSE.** Three Godot sizing traps made every finding (a size set before the control is in the tree, an
+  expand mode set after the size, a wrapped label given its words before its width). Plates 172 wide with a portrait column, bars as
+  tall as their values' lines, chips fitted to their tags with a `+N`, the stacks re-pitched; the map card, the crest strip, the
+  skill-check bar, the long-fight nudge, the bargain card and the sheet's wrapped labels by the same rules.
+- **§7a — THE DEALT CORE RUNE IS SLOTTED** (the designer's save: every engine `equipped: true`); the card's three empty buttons are the
+  ordinary rune slots. **Sanctity's rule text reads its constants** (it said 16 after IG set 13).
+- **THE INSTRUMENTS.** `check_ih` is new (§0, §2–§6, §9). **Re-pointed to the surface that answers each question**: the sheet's readers
+  (`check_fh`, `check_fn`, `check_gs`, `check_gt`, `check_gx`, `check_hc`, `check_hf`, `check_ia`, `check_id`, `check_ie`, `check_ek`,
+  `test_batch_cp`, `test_batch_ah_battle`) and the prologue's (`check_hl` §6, `check_hp` §1a/§1g, `check_ho` §5d).
+- **THE VERIFICATION.** A recon of HEAD's battery on IH's code, predicted after its literal sweep and census 1a: **`check_de` 605 / 23** — every red named
+  but one (`check_fr`: the recon's clone carried no `.git`), and the recon one code change short (the readout's fallback), swept and
+  run. **No seeded count moved and no die moved**: the seeded roads read IG's acceptance logs line for line. **Twenty-six controls
+  and HEAD's code**, each in its own clone, every one biting. **The pre-pass and the acceptance, 148 targets, each `check_de` 609 / 0
+  / 0, as predicted** (the acceptance 82 min 22 s, its 641 `ps` rows every one a headless target, the tree byte-identical before and after, the player's
+  four files and the readout untouched) — `docs/reports/IH.md` §9.
+- **`CLAUDE.md` IS 474,769 B = 463.64 KiB AGAINST ITS 510 KiB CEILING — 46.36 KiB UNDER** (+7,149 B at IH): the re-measure's reading — 5.7 batches at EZ's record (47,471 ÷ 8,293), 6.6 at IH's own rate.
+- **`docs/state.md` IS 356,044 B = 347.70 KiB AGAINST ITS 380 KiB CEILING — 32.30 KiB UNDER** (+2,521 B at IH, this line included):
+  5.6 batches at IA's +5,860 B (33,076 ÷ 5,860) — **the worst case, and not the rate to plan against**; the honest rate is ID +952 B, IE +3,917, IF +236, IG +1,540, IH +2,521 — a mean of 1,833 B over the five, **18.0 batches at it, and the room is planned against that one** (IH's report, §9g). The re-measure is II's.
+- **No save version moved**: nothing IH changed is saved; the readout's new keys are its own file's.
 - **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in a build
   older than HL**: HL's ceiling refuses a newer save from HL's build on — HR's v15 is the first bump it has guarded — and HJ's and
   HK's builds, and `main`, carry no ceiling.
-- **Next letter: IH — IC's remainder** (the roadmap, below).
+- **Next letter: II — the re-measure** (the roadmap, below).
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### IG's RULINGS OWED — **TWO; THE FIRST IS THE DESIGNER's PLAY, AND IT IS STILL THE ONE THAT MATTERS MOST**
+### IH's RULINGS OWED — **SIX; THE FIRST IS STILL THE DESIGNER's PLAY, NOW WITHOUT THE DEBUG MENU**
 
-Full working: `docs/reports/IG.md`, NEEDS A RULING.
+Full working: `docs/reports/IH.md`, NEEDS A RULING.
 
-1. **PLAY ONE ZONE AND SEND THE FILE — STILL NOT PLAYED.** `run_save.bin` was last written 2026-10-08 09:23 at IG's start and close,
-   and there is no `readout/` in the designer's folder, so the readout has never run in his game. **His file will be the
-   confirmation of IG's step, not the before**: played on IG's build, its Sanctity lines read 13 a step on a ledger with no chip
-   in it. It answers Boil Over's rate, Rupture's number, the vow's worth, Sanctity's step and the Cleric's Mana.
-2. **SANCTITY's STEP AT 13 (§2) — CONFIRM THE NUMBER.** It lands a normal fight's end at 2.58 steps (14 would read 2.38); a boss
-   fight now reaches the cap in about four in ten (about two in ten at 16). The handle is below; the readout is what confirms it.
+1. **PLAY ONE ZONE WITHOUT THE DEBUG MENU, AND SEND THE FILE.** The first file came (IG's ruling 1) and it is debug-touched, so it
+   prices nothing; the readout now names every debug action, so a file that names none is play. It answers Boil Over's rate,
+   Rupture's number, the vow's worth, Sanctity's step and the Cleric's Mana — and a Cleric on the Hierophant's rune for Sanctity.
+2. **SANCTITY's STEP AT 13 (IG §2) — CONFIRM THE NUMBER** (IG's ruling 2, carried: the first file holds no Hierophant). It lands a
+   normal fight's end at 2.58 steps (14 would read 2.38); a boss fight reaches the cap in about four in ten. The handle is below.
+3. **THE BERSERKER's AND THE PYROMANCER's ART (§6b).** Two lineages wear illustrations; ten share the Soldier sheet's small figure.
+   The layout holds either in the portrait's column now — **which art a lineage wears is yours.**
+4. **THE CORE RUNE's TELL MOVED ONTO THE RUNES BUTTON (§2).** A core rune that sits out marked the card's line (HC §5); the line is gone,
+   so the button wears the ○, the amber and the sentence. **Confirm, or say where the tell goes.**
+5. **TWO SHAPES §6 CHOSE WHERE THE RULE LEFT A CHOICE.** A chip row that would run past the plate stops and a `+N` chip names the rest
+   on its hover (a wrapping row would grow the plate into the next one); a value too wide for its bar takes the next font size down
+   inside it (Resonance and Focus have no ceiling). **Confirm both.**
+6. **THE FREED ROOM (§7b).** The card keeps a 26-px band empty between its rune slots and its buttons, and the sheet's left column below
+   the passive block; IH moved nothing into either. Proposals are in the report.
 
 ### THE CLERIC's MANA RATE — **12, UNMOVED (IE §1); THE TUNING HANDLE AND THE FIGURES IT WAS MEASURED AGAINST**
 
@@ -138,6 +152,15 @@ runs a party at HEAD, 60 at §1 untalented; events at a fight's end):
 
 Untalented 1,391 fights at HEAD and 3,988 at §1; default 1,658 and 1,697. **The readout carries his steps a fight; the designer's
 play is what confirms it** (IG's ruling 2).
+
+### FOUND AT IH AND NOT FIXED
+
+- **THE MAP BURGER's DEBUG ITEM READS *+200 Talent Points (all)* AND GRANTS 60 TO EVERY CLASS**, every tier open — its toast says so
+  and the readout names it by what it does (IH §0.2); the menu label is BM's, unchanged.
+- **THE FULL-SCREEN ART IS SIZED BEFORE ITS EXPAND MODE** (census 1b): the map's and the event's backgrounds (1122 × 1402) draw at
+  1280 × 1402 and show their upper part, not their centre — behind the cards, not on them.
+- **THE BATTLE SPAWN STILL BUILDS ITS OWN LIVE PROLOGUE** — the sheet's moved to `Run.hero_live_config` (IH §5) and the spawn's did not
+  (CK §1's owed helper, still one copy short).
 
 ### FOUND AT IG AND NOT FIXED
 
@@ -343,7 +366,8 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
   a batch of each other at the worst rate and far later at the honest one (the WHERE block's two readings, each with both rates), so
   a re-measure that waits finishes as the room runs out. **The block index and HV's pilot still wait on it.**
   **THE ORDER:**
-- **IH — IC's REMAINDER, MOVED UP THE QUEUE (IG's brief §6) — IT IS CORRECTNESS**: the rest of the silenced-figure family — three
+- **IC's REMAINDER — IG's brief §6 gave it IH, and IH was the designer's play's asks instead; it waits on its letter. IT IS
+  CORRECTNESS**: the rest of the silenced-figure family — three
   door calls (the damage-over-time tick's line, Blight the Well's line and credit, the bleedout burst's float and line) and **two
   frames that name the wrong dealer**: Blight the Well's on the Old Gods' holder, so a vowed Cleric who drafts it without that
   engine is not silenced at all — **a live hole in the vow IC repaired, not cosmetic** — and Umbral Sigil's echo on the striker,
@@ -356,7 +380,7 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
   (repaired, IF §0.1b); the rate is unmoved and is ruled after the readout (IF's rulings 1 and 2). **Channel's tempo payout — Mana
   spent buys speed — is alive and still owed.**
 - **Unchanged, and said so**: `CONJUNCTIONS` keeps its one row and `RUPTURE_BREAK_PER_TICK` stays at 10, unfelt until the designer's
-  play is read — **IE §3a said why it could not have been** (a Rupture at 0.7% to 4.5% of a Mage's turns at IE's HEAD), and **IF
+  play is read (IH §0.2 read one, debug-touched: it stood one turn, and its tick's 13 is an Orc Slinger's Constitution on the 10) — **IE §3a said why it could not have been** (a Rupture at 0.7% to 4.5% of a Mage's turns at IE's HEAD), and **IF
   made it reachable and readable**: Smoulder lights a chilled body (a Cryomancer holding it stands a Rupture at 15% of his turns,
   IF §2) and the readout writes every one that forms, its ticks and its Break (IF §1); a meter is
   not a conjunction half; Marrowfire becomes Sunder + Burn pending the design pass; the Occultist's Break card is CE §3's ask;

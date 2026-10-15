@@ -82,9 +82,11 @@ class basic's and class kit's <code>description</code></td><td><b>Attack</b> onl
 rule at the base Attack of the lineage the rune carries, the kit below at the class's own, which is
 a hero's holding no engine. Nothing is chosen yet, so there is no maximum health that stays true
 after the choice</td></tr>
-<tr><td>Hero sheet (<code>party_screen.gd</code>)</td><td><code>description</code> + the same
-computed block; <code>passive_desc</code> in its own block</td><td>the post-prologue
-<code>cfg</code> <b>and</b> the member's live current health</td></tr>
+<tr><td>Ability hover on the Kit panel and the kit preview (<code>Run.ability_hover</code>)</td><td><code>description</code> + the same
+computed block</td><td>the post-prologue
+<code>cfg</code> (<code>Run.hero_live_config</code>) <b>and</b> the member's live current health</td></tr>
+<tr><td>Hero sheet (<code>party_screen.gd</code>)</td><td><code>passive_desc</code> in its own block</td><td>the post-prologue
+<code>cfg</code></td></tr>
 <tr><td>Battle button tooltip (<code>battle.gd</code>)</td><td><code>description</code> + live
 damage/BD + cooldown with turns remaining + initiative + Perfect</td><td><b>the live
 <code>BattleUnit</code> — the richest ctx in the game</b></td></tr>
@@ -214,7 +216,7 @@ stating, because applying it blindly would break the battle tooltip.</b></p>
 <p>Nothing in the project overrides <code>make_custom_tooltip</code>, so every tooltip is
 Godot's default — <b>and Godot's default tooltip does not autowrap.</b> It grows to fit the
 longest line. The authored <code>\n</code> in an ability description is therefore
-load-bearing on the battle button, the hero sheet and the rune slot: strip it and a 322-character
+load-bearing on the battle button, the Kit panel's rows, the kit preview and the rune slot: strip it and a 322-character
 description renders as one line roughly two thousand pixels wide.</p>
 <ul>
 <li><b><code>passive_desc</code> — the rule applies AT THE RENDERER, NOT IN THE FIELD, and
@@ -297,7 +299,7 @@ carries an arithmetic claim about the code.</p>
 
 <h3>4.8b A TAG CENSUS IS A READOUT, NOT PROSE, AND THE SAME EXEMPTION COVERS IT (SET AT BATCH ES &sect;4)</h3>
 <p><b>&sect;4.8a's exemption is about SHAPE, not about that one line, and the census inherits it
-for the same three reasons.</b> The loadout panel and the hero sheet each draw a line naming every
+for the same three reasons.</b> The loadout panel draws a line naming every
 tag in <code>Classes.TAG_ORDER</code> with the number of equipped cards carrying it. It is composed
 at render time from the same table, it carries <b>no authored break</b>, and the Label it renders
 into autowraps &mdash; so there is nothing for a 44-character ceiling to clip at a point an author
@@ -434,7 +436,7 @@ player reading a rune and a card is reading one vocabulary.</li>
 panel each carried a <code>RUNE CONDITIONS</code> line &mdash; <i>&ldquo;4 of 7 &mdash;
 DEBUFF&rdquo;</i> &mdash; that moved the moment a card was benched. The card said what the rune
 asked; the screen said where you stood. <b>Both lines were removed at FN with the conditions they
-displayed.</b> The <code>CARRIED BY TAG</code> census beside them is untouched and is live text:
+displayed.</b> The <code>CARRIED BY TAG</code> census is live text, on the loadout panel:
 the tags are player-facing on the draft card and are not conditions.</li>
 <li><b>THE ONE CLAUSE THAT IS STILL LIVE TEXT, AND IT IS THE ONE A TRIM WOULD HAVE EATEN.</b>
 Bracing Line reads <i>&ldquo;Allies take 5% less damage while his Heavy Plating bonus stands at

@@ -27,6 +27,15 @@
 # scene target never writes here. `DOD_READOUT=0` turns it off; `=1` turns it on
 # in a harness, which then writes `user://readout_harness/` and never the
 # player's folder.
+#
+# **BATCH IH §0.2 — IT SAYS WHEN A FIGHT IS NOT PLAY.** The designer's first file
+# held three fights ended from the debug menu and nothing in it said so, so they
+# were read as play. A debug action is named the moment it is taken: a `debug`
+# line of its own once the run's file exists (the header's `debug` list before
+# then — a written line is never rewritten), and on the `debug` list of every
+# fight it touched, beside the switches in force as that fight opened. **A fight
+# whose list is not empty prices nothing.** And a conjunction says why it ended
+# (`ended`): its clock, a cleanse, a consumer, its body dying, or the fight ending.
 extends RefCounted
 
 const VERSION := 1
@@ -56,6 +65,15 @@ var _turns := 0                 # every unit's turn
 var _hero_turns := 0
 var _frame := {}
 var _done := false
+var _in_force: Array = []      # the debug switches on as the fight opened (IH §0.2)
+
+# BATCH IH §0.2 — the words a conjunction's end is recorded in, keyed by the reason the
+# body's own log line gives (`BattleUnit._dissolve`, `remove_status`, `purge_debuffs_taken`,
+# `_die`), and the one the readout adds when the fight ends with it standing.
+const ENDED := {"the clock": "its clock ran out", "a cleanse": "it was cleansed",
+	"a consumer": "an ingredient was consumed", "the body died": "its body died"}
+const ENDED_AT_FIGHT_END := "the fight ended"
+const UNHEARD := "it left by a door the readout does not hear"
 
 
 # ── THE DECISION, SPLIT SO BOTH DIRECTIONS CAN BE ASSERTED (FI's shape) ───────
@@ -93,6 +111,47 @@ func begin(run: Node, battle: Node, heroes: Array, player: bool) -> void:
 		"encounter": String(enc.get("type", "fight")), "theme": String(enc.get("theme", "")),
 		"enemies": (enc.get("enemies", []) as Array).duplicate(),
 		"bargain": String(run.get("pending_modifier"))}
+	_in_force = switches_in_force(run, battle)
+
+
+# BATCH IH §0.2 — THE DEBUG SWITCHES ON AS A FIGHT OPENS, each a debug action that touches
+# it: a pre-granted kit, a summoned node, enemy attacks off (the menu's, or the environment's).
+static func switches_in_force(run: Node, battle: Node) -> Array:
+	var out: Array = []
+	if bool(run.get("debug_grant_all")):
+		out.append({"action": "All Class Abilities Unlocked", "taken": "in force"})
+	if bool(run.get("debug_summon")):
+		out.append({"action": "Test a node (this fight was summoned)", "taken": "in force"})
+	if bool(run.get("debug_free_travel")):
+		out.append({"action": "Free Travel", "taken": "in force"})
+	if battle != null and bool(battle.get("debug_enemies_off")):
+		out.append({"action": "Enemy attacks OFF", "taken": "in force"})
+	return out
+
+
+# BATCH IH §0.2 — A DEBUG ACTION, NAMED (`Run.note_debug`, from the two dispatches). Kept in
+# the run's readout state — every action of the run for a header not yet written, and those
+# since the last fight's line for the next one — and written as its own line at once when
+# the run's file already exists. The file is never re-read and a line never rewritten.
+static func note_debug(run: Node, action: String, taken: String) -> void:
+	var st = run.get("readout")
+	if not (st is Dictionary):
+		return
+	var state: Dictionary = st
+	var entry := {"action": action, "taken": taken}
+	var all: Array = state.get("debug", [])
+	if all.size() < MAX_ROWS:
+		all.append(entry)
+	state["debug"] = all
+	var pending: Array = state.get("debug_pending", [])
+	if pending.size() < MAX_ROWS:
+		pending.append(entry)
+	state["debug_pending"] = pending
+	var path := String(state.get("path", ""))
+	if path != "" and FileAccess.file_exists(path):
+		_append(path, {"kind": "debug", "action": action, "taken": taken,
+			"after_fight": int(state.get("fights", 0)),
+			"written": Time.get_datetime_string_from_system()})
 
 
 # Any unit is chosen to act. A conjunction's turns are the afflicted body's own.
@@ -104,7 +163,7 @@ func unit_turn(u) -> void:
 			if _standing(c):
 				c["stood"] = int(c["stood"]) + 1
 			else:
-				c["open"] = false
+				_close(c, "")
 
 
 # His turn opens, BEFORE the drip — IE's *opens full* is read here.
@@ -234,7 +293,31 @@ func conj_formed(body, made: Dictionary, label: String, a: String, b: String, by
 	_conj.append({"iid": body.get_instance_id(), "open": true, "id": String(made.get("id", "")),
 		"name": label, "degree": BattleUnit.tier_ordinal(BattleUnit.tier_of(made)),
 		"ingredients": [a, b], "on": String(body.unit_name), "by": by,
-		"formed_turn": _turns, "stood": 0, "ticks": 0, "break": 0, "broke": false})
+		"formed_turn": _turns, "stood": 0, "ticks": 0, "break": 0, "broke": false,
+		"ended": "", "ended_turn": -1})
+
+
+# BATCH IH §0.2 — it leaves its body (the body's `conj_end_cb`, through `battle._on_conj_end`),
+# and `why` is the reason the body's own log line gives.
+func conj_ended(body, comp_id: String, why: String) -> void:
+	var iid: int = body.get_instance_id()
+	for c in _conj:
+		if int(c["iid"]) == iid and String(c["id"]) == comp_id and bool(c["open"]):
+			_close(c, String(ENDED.get(why, why)))
+			return
+
+
+# A conjunction's end, once. A close with no reason heard (`why` "") says so rather than guessing
+# one: every door a composition leaves a body by hands its reason over (`conj_end_cb`), so an
+# unheard end is a door the readout does not hear, and `check_ih` §0b holds there to be none.
+func _close(c: Dictionary, why: String) -> void:
+	c["open"] = false
+	if String(c.get("ended", "")) != "":
+		return
+	if why == "":
+		why = UNHEARD
+	c["ended"] = why
+	c["ended_turn"] = _turns
 
 
 # Its tick: the Break it ground out (0 on a Broken body).
@@ -268,12 +351,14 @@ func finish(victory: bool, stalemate: bool, forfeit := "") -> void:
 			return
 	var n := int(state.get("fights", 0)) + 1
 	state["fights"] = n
-	_append(path, _fight_line(n, victory, stalemate, forfeit))
+	var line := _fight_line(n, victory, stalemate, forfeit, state.get("debug_pending", []))
+	state["debug_pending"] = []
+	_append(path, line)
 
 
 # ── THE RECORDS ───────────────────────────────────────────────────────────────
 
-func _fight_line(n: int, victory: bool, stalemate: bool, forfeit: String) -> Dictionary:
+func _fight_line(n: int, victory: bool, stalemate: bool, forfeit: String, pending: Array) -> Dictionary:
 	var heroes: Array = []
 	for i in _seats.size():
 		var u = _seats[i]
@@ -299,17 +384,26 @@ func _fight_line(n: int, victory: bool, stalemate: bool, forfeit: String) -> Dic
 			"best_ordinary_turn": int(round(float(_best[int(b["seat"])])))})
 	var conj: Array = []
 	for c in _conj:
+		var standing := bool(c["open"]) and _standing(c)
+		if bool(c["open"]):
+			_close(c, ENDED_AT_FIGHT_END if standing else "")
 		conj.append({"name": c["name"], "degree": c["degree"], "ingredients": c["ingredients"],
 			"on": c["on"], "by": c["by"], "formed_turn": c["formed_turn"],
 			"stood": c["stood"], "ticks": c["ticks"], "break": c["break"], "broke": c["broke"],
-			"standing_at_end": bool(c["open"]) and _standing(c)})
+			"standing_at_end": standing, "ended": c["ended"], "ended_turn": c["ended_turn"]})
+	# BATCH IH §0.2 — every debug action that touched this fight: those taken since the last
+	# fight's line (on the map, or in this fight), then the switches in force as it opened.
+	var debug: Array = (pending as Array).duplicate()
+	for sw in _in_force:
+		debug.append(sw)
 	var outcome := "stalemate" if stalemate else ("victory" if victory else "defeat")
 	if forfeit != "":
 		outcome = "forfeit: " + forfeit
 	var line := {"kind": "fight", "n": n, "outcome": outcome,
 		"turns": _turns, "hero_turns": _hero_turns,
 		"rounds": snappedf(float(_hero_turns) / maxf(float(_seats.size()), 1.0), 0.1),
-		"fell": _fell, "heroes": heroes, "conjunctions": conj, "boil_over": boil}
+		"fell": _fell, "heroes": heroes, "conjunctions": conj, "boil_over": boil,
+		"debug": debug}
 	# The frame's keys are its own (`encounter` is the node's kind — fight, elite, boss —
 	# since `kind` names the line), so nothing here is dropped by the merge.
 	line.merge(_frame)
@@ -325,10 +419,14 @@ func _header(resumed: bool) -> Dictionary:
 	var crest: Array = []
 	for r in _run.get("party_runes"):
 		crest.append(_rune_name(r))
+	var state: Dictionary = _run.get("readout")
 	return {"kind": "run", "readout": VERSION,
 		"written": Time.get_datetime_string_from_system(), "resumed": resumed,
 		"rung": int(_run.call("difficulty_rung")), "difficulty": String(_run.get("difficulty")),
 		"relics": relics, "crest": crest, "party": _loadout(true),
+		# BATCH IH §0.2 — the run's own flag (it rides the save, so a resumed run carries it) and
+		# every debug action taken before this header was written.
+		"debug_used": bool(_run.get("debug_used")), "debug": (state.get("debug", []) as Array).duplicate(),
 		"legend": {
 			"opened_full": "turns he opened at a full bar, read before the turn's drip",
 			"hard_dry": "turns on which every costed card in his bar cost more than he held",
@@ -337,7 +435,9 @@ func _header(resumed: bool) -> Dictionary:
 			"low_water": "his lowest bar this fight, as a fraction of its maximum",
 			"best_ordinary_turn": "his most damage in one turn without a Boil Over",
 			"vow": "Vow of Silence: the healing its term added, and what it refused",
-			"conjunctions": "stood = the afflicted body's own turns it stood; break = what its ticks ground out"}}
+			"conjunctions": "stood = the afflicted body's own turns it stood; break = what its ticks ground out on the meter, after the body's Constitution; ended = why it left the body",
+			"debug": "a debug action that touched the fight: on the map since the last fight, in this fight, or a switch in force as it opened; a fight that names one prices nothing",
+			"lineage": "the lineage's key (the Devout's is inquisitor); empty for a hero whose core rune is his class's spine or a rule engine, which carry none — core_kind says which"}}
 
 
 # The party as it stands: lineage and worn engines and runes — and, in the header
@@ -348,15 +448,24 @@ func _loadout(with_nodes: bool) -> Array:
 	for i in party.size():
 		var m: Dictionary = party[i]
 		var engines: Array = []
+		var kinds: Array = []
 		for e in m.get("engines", []):
 			if e is Dictionary and bool(e.get("equipped", false)):
 				engines.append(_rune_name(e))
+				kinds.append(core_kind(String((e as Dictionary).get("engine", ""))))
 		var runes: Array = []
 		for r in m.get("runes", []):
 			if r is Dictionary and bool(r.get("equipped", false)):
 				runes.append(_rune_name(r))
-		var row := {"seat": i, "class": String(m.get("key", "")), "lineage": String(m.get("spec", "")),
-			"core": engines, "runes": runes}
+		# BATCH IH §0.2 — THE LINEAGE IS `spec`, set once at awakening from the core rune taken
+		# (`Run.awaken`): a lineage's own engine sets it, and the class's spine or a rule engine
+		# sets "" — a hero awakened on one has no lineage. Its key is not always its name (the
+		# Devout's is `inquisitor`), so the name rides beside it, and each core rune says which
+		# kind it is: a census by lineage reads `lineage`, and one by core rune reads `core_kind`.
+		var spec := String(m.get("spec", ""))
+		var row := {"seat": i, "class": String(m.get("key", "")), "lineage": spec,
+			"lineage_name": String(Classes.SPEC_INFO[spec]["name"]) if Classes.SPEC_INFO.has(spec) else "",
+			"core": engines, "core_kind": kinds, "runes": runes}
 		if with_nodes:
 			var nodes: Array = []
 			var talents: Dictionary = m.get("talents", {})
@@ -366,6 +475,15 @@ func _loadout(with_nodes: bool) -> Array:
 			row["nodes"] = nodes
 		out.append(row)
 	return out
+
+
+# BATCH IH §0.2 — a core rune's engine: a lineage's own, the class's spine, or a rule engine.
+static func core_kind(pid: String) -> String:
+	if Classes.SPINE_INFO.has(pid):
+		return "spine"
+	if Classes.RULE_ENGINES.has(pid):
+		return "rule"
+	return "lineage" if Classes.engine_spec(pid) != "" else "unknown"
 
 
 func _bar(u) -> Array:
@@ -404,12 +522,15 @@ func _claim_file(state: Dictionary) -> String:
 		if pw != null:
 			pw.store_string(path)
 	else:
-		_append(path, {"kind": "resume", "written": Time.get_datetime_string_from_system()})
+		# BATCH IH §0.2 — a resumed run's flag rides its save, so the resume line carries it.
+		_append(path, {"kind": "resume", "written": Time.get_datetime_string_from_system(),
+			"debug_used": bool(_run.get("debug_used")),
+			"debug": (state.get("debug", []) as Array).duplicate()})
 	state["path"] = path
 	return path
 
 
-func _append(path: String, rec: Dictionary) -> bool:
+static func _append(path: String, rec: Dictionary) -> bool:
 	var f: FileAccess = null
 	if FileAccess.file_exists(path):
 		f = FileAccess.open(path, FileAccess.READ_WRITE)

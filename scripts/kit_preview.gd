@@ -15,11 +15,13 @@
 #   screen and frees only itself, so a staged draft, an open pick and a half-made
 #   purchase are exactly as they were when it closes. Its dim stops every click, so the
 #   choice underneath cannot be pressed through it.
-# - **IT DOES NOT INVENT IA's LAYOUT.** The cards read as the hero sheet reads them and
-#   the runes in the sheet's own words — the state it shows (CREST, CORE, WORN, held,
-#   sits out), the `(core)` suffix the rune data carries (HL §2) and HR's nameplate marker
-#   (✦ N held, not worn). IA built the three sections on the hero's rune panel; this
-#   stays one flat list with its state column — a read-only list, a different surface.
+# - **IT DOES NOT INVENT IA's LAYOUT.** The cards read as the Kit panel's rows do — the
+#   same hover, off one builder (`Run.ability_hover`, IH §5) — and the runes in the words
+#   the hero sheet used until IH §3 took its rune block off it: the state (CREST, CORE,
+#   WORN, held, sits out, with the sentence on a rune that sits out), the `(core)` suffix
+#   the rune data carries (HL §2) and HR's nameplate marker (✦ N held, not worn). IA built
+#   the three sections on the hero's rune panel; this stays one flat list with its state
+#   column — a read-only list, a different surface.
 #
 # It reads the doors the hero sheet and the battle spawn read — the opening kit off
 # `Classes.opening_kit`, the seated cards off `Run.seated_ability_names`, what sits out
@@ -154,9 +156,11 @@ func _fill() -> void:
 	_title.text = "%s %d — the kit" % [Run.nameplate(member), hero_idx + 1]
 	var res_name := String(Classes.hero_config(key).get("resource_name", "Mana"))
 	var engines: Array = Runes.held_engines(member)
+	# BATCH IH §5 — one live config for every card's hover, built once.
+	var live: Dictionary = Run.hero_live_config(member)
 
-	# THE CARDS — the opening kit, then every carried card the next fight seats, as the
-	# hero sheet lists them, and what sits out below them with its reason.
+	# THE CARDS — the opening kit, then every carried card the next fight seats, and what
+	# sits out below them with its reason.
 	_line("CARDS", 15, Color(0.85, 0.82, 0.75))
 	var shown: Array = []
 	var cards: Array = Classes.opening_kit(key, spec, engines)
@@ -173,11 +177,11 @@ func _fill() -> void:
 			cost = "  (%d %s)" % [a.cost, res_name]
 		elif a.faith_cost > 0:
 			cost = "  (%d Mercy)" % a.faith_cost
-		var tip := Classes.resolve_values(a.description)
-		var block := Classes.computed_block(a, 0, res_name)
-		if block != "":
-			tip += ("\n" if tip != "" else "") + block
-		_line("   %s%s" % [a.display_name, cost], 13, Color(0.9, 0.86, 0.76), tip)
+		# BATCH IH §5 — THE HOVER IS THE KIT PANEL's, string for string: `Run.ability_hover`, the
+		# hero sheet's chip tooltip moved off the sheet (his live Attack, the block, the scaling
+		# line, the upgrades that landed). Until IH this list built its own at no Attack.
+		_line("   %s%s" % [a.display_name, cost], 13, Color(0.9, 0.86, 0.76),
+			Run.ability_hover(member, a.display_name, live))
 	for so in (Run.sitting_out_names(member) if awake else []):
 		_line("   %s — sits out" % String(so), 13, Color(0.55, 0.53, 0.5),
 			Run.sits_out_note(String(so), engines))
@@ -186,9 +190,10 @@ func _fill() -> void:
 		_line("   Benched: %s" % ", ".join(PackedStringArray(benched)), 12,
 			Color(0.6, 0.58, 0.55))
 
-	# THE RUNES — in the sheet's own reading: the crest's rune first, then the core runes
-	# (their names carry `(core)`), then his own; each with the state the sheet shows, and
-	# HR's marker for what he holds and does not wear.
+	# THE RUNES — the crest's rune first, then the core runes (their names carry `(core)`), then
+	# his own; each with its state, and HR's marker for what he holds and does not wear. A worn
+	# rune that sits out carries GX's sentence on its hover, as the sheet's state column did until
+	# IH §3 (`Run.rune_sits_out_note`, the one door).
 	_line("", 6, Color(0, 0, 0))
 	_line("RUNES", 15, Color(0.85, 0.82, 0.75))
 	var all_runes: Array = Run.party_runes + member.get("engines", []) + member.get("runes", [])
@@ -201,10 +206,12 @@ func _fill() -> void:
 		var on: bool = rune.get("equipped", false)
 		var state := ("CREST" if Runes.is_party_rune(rune) else ("CORE" if rune.has("engine")
 			else "WORN")) if on else "held"
+		var why := ""
 		if on and sitting.has(String(rune.get("name", ""))):
 			state = "sits out"
+			why = Run.rune_sits_out_note(String(rune.get("id", "")), engines, Run.worn_rune_ids(member))
 		_line("   %s %s — %s" % [state.rpad(8), String(rune.get("name", "")), Runes.shown_desc(rune)], 12,
-			Color(0.45, 0.9, 0.5) if on and state != "sits out" else Color(0.62, 0.6, 0.66))
+			Color(0.45, 0.9, 0.5) if on and state != "sits out" else Color(0.62, 0.6, 0.66), why)
 	var waiting: int = Run.held_count(member)
 	if waiting > 0:
 		_line("   ✦ %d held, not worn — equipped from the %s's rune panel on the map." % [

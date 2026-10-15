@@ -1837,6 +1837,11 @@ var log_proc := Callable()
 # so a handler may safely apply new statuses (Lingering Torment).
 var status_expired_cb := Callable()
 
+# BATCH IH §0.2 — A CONJUNCTION's END, AND WHY (set by the battle scene): fires once when a
+# composition leaves this body, with its id and the reason the log line already names — the
+# clock, a cleanse, a consumer, the body dying. The playtest readout keeps it; nothing else reads it.
+var conj_end_cb := Callable()
+
 # Mercy hook (set by the battle scene on heroes): fires when this unit
 # crosses below 50% health, from any damage source.
 var below_half_cb := Callable()
@@ -2665,9 +2670,38 @@ func _build_sphere_sprite(sprite_scale: float) -> void:
 
 
 # Nameplate dimensions (plain styling until final UI assets arrive).
-const PLATE_W := 144.0
-const PLATE_BAR_W := 96.0
-const PLATE_BAR_X := 42.0  # bars sit right of the 34px portrait column
+#
+# ══ BATCH IH §6 — NOTHING ON A PLATE IS DRAWN OVER ANYTHING ELSE ON IT (the designer's) ═════
+# **A portrait reserves its own column and the text begins where it ends; a value is drawn inside
+# its own bar only because the bar holds its whole line, top and bottom; a line that would not fit
+# the plate's width is given the width.** Until IH: every value was a font-8 line (12 px) laid in a
+# 9–10 px bar — and sized before its font, so it centred on a 22-px box and hung under its bar; the
+# portrait was sized before its expand mode and drew at its texture's own size (the Berserker's
+# 64-px bust over his name and his Rage line); the name's 16-px line sat in 14; the Focus readout
+# (95–113 px) ran past a 98-px bar; and the intent line started under the portrait. MEASURED at IH
+# (Open Sans SemiBold): a font-8 line is 12 px, font 9 13, Pirata One 11 16.
+const PLATE_W := 172.0
+const PLATE_BAR_W := 124.0   # the fill; the track is two wider
+const PLATE_BAR_X := 42.0    # bars sit right of the portrait column
+const PLATE_BAR_H := 12.0    # a font-8 value's whole line
+const PLATE_NAME_H := 16.0   # Pirata One 11's line
+const PLATE_FACE := Vector2(34, 34)
+const PLATE_FACE_POS := Vector2(4, 18)
+const PLATE_VALUE_FONT := 8
+const PLATE_INTENT_FONT := 9
+const PLATE_INTENT_H := 13.0
+const PLATE_CHIP_H := 12.0
+const PLATE_PAD := 5.0       # the chip row's inset either side
+
+
+# BATCH IH §6 — the plate's height as built, and its place in its stack (the battle lays the warband's).
+func plate_height() -> float:
+	return _plate_panel.size.y if _plate_panel != null and is_instance_valid(_plate_panel) else 0.0
+
+
+func place_plate(pos: Vector2) -> void:
+	if _plate_root != null and is_instance_valid(_plate_root):
+		_plate_root.position = pos
 
 
 # Frees the sibling nameplate along with the unit — companion cleanup:
@@ -2704,91 +2738,87 @@ func build_plate(root: Node2D) -> void:
 	_plate_panel.gui_input.connect(_on_plate_input)
 	root.add_child(_plate_panel)
 
+	# EVERY CONTROL ON THE PLATE IS PARENTED BEFORE IT IS SIZED (`_put`): a Control's theme overrides
+	# reach its minimum size only once it is in the tree, so a size set before then is clamped to the
+	# default 16-px font's 22-px line and kept — every value under its bar until IH §6.
 	var name_label := Label.new()
-	name_label.text = unit_name
 	name_label.add_theme_font_override("font", NAME_FONT)
 	name_label.add_theme_font_size_override("font_size", 11)
 	name_label.add_theme_color_override("font_color", Color(0.92, 0.88, 0.78))
-	name_label.position = Vector2(5, 1)
-	name_label.size = Vector2(PLATE_W - 10, 14)
+	name_label.text = unit_name
+	name_label.clip_text = true
+	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_plate_panel.add_child(name_label)
+	_put(_plate_panel, name_label, Vector2(5, 1), Vector2(PLATE_W - 10, PLATE_NAME_H))
 
+	# THE PORTRAIT's COLUMN — expand mode BEFORE the size, so the texture scales into the column
+	# whatever its own size (a 64-px bust, a 236-px frame's crop) and never draws past it.
 	var face := TextureRect.new()
-	face.texture = portrait()
-	face.position = Vector2(3, 16)
-	face.custom_minimum_size = Vector2(34, 34)
-	face.size = Vector2(34, 34)
 	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	face.texture = portrait()
+	face.position = PLATE_FACE_POS
+	face.custom_minimum_size = PLATE_FACE
+	face.size = PLATE_FACE
 	face.flip_h = not is_hero
 	face.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	face.set_meta("plate_portrait", true)
 	_plate_panel.add_child(face)
 
-	var y := 17.0
-	_plate_panel.add_child(_make_bar_bg(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 10)))
-	_hp_fill = _make_fill(Vector2(PLATE_BAR_X + 1, y + 1), Vector2(PLATE_BAR_W, 8),
+	var y := PLATE_FACE_POS.y
+	var track := Vector2(PLATE_BAR_W + 2, PLATE_BAR_H)
+	var fill_h := PLATE_BAR_H - 2
+	_plate_panel.add_child(_make_bar_bg(Vector2(PLATE_BAR_X, y), track))
+	_hp_fill = _make_fill(Vector2(PLATE_BAR_X + 1, y + 1), Vector2(PLATE_BAR_W, fill_h),
 		Color(0.30, 0.78, 0.32))
 	_plate_panel.add_child(_hp_fill)
-	_hp_text = _make_bar_text(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 10), 8)
-	_plate_panel.add_child(_hp_text)
-	y += 12.0
+	_hp_text = _make_bar_text(Vector2(PLATE_BAR_X, y), track, PLATE_VALUE_FONT)
+	y += PLATE_BAR_H + 1
 	if resource_name != "":
-		_plate_panel.add_child(_make_bar_bg(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 9)))
+		_plate_panel.add_child(_make_bar_bg(Vector2(PLATE_BAR_X, y), track))
 		var res_color := Color(0.85, 0.30, 0.25) if resource_name == "Rage" else \
 			(Color(0.55, 0.85, 0.40) if resource_name == "Focus" else Color(0.30, 0.50, 0.90))
-		_res_fill = _make_fill(Vector2(PLATE_BAR_X + 1, y + 1), Vector2(PLATE_BAR_W, 7), res_color)
+		_res_fill = _make_fill(Vector2(PLATE_BAR_X + 1, y + 1), Vector2(PLATE_BAR_W, fill_h), res_color)
 		_plate_panel.add_child(_res_fill)
-		_res_text = _make_bar_text(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 9), 8)
-		_plate_panel.add_child(_res_text)
-		y += 11.0
+		_res_text = _make_bar_text(Vector2(PLATE_BAR_X, y), track, PLATE_VALUE_FONT)
+		y += PLATE_BAR_H + 1
 	if second_resource_name != "":
-		_plate_panel.add_child(_make_bar_bg(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 9)))
+		_plate_panel.add_child(_make_bar_bg(Vector2(PLATE_BAR_X, y), track))
 		var res2_color := Color(0.95, 0.80, 0.30) if second_resource_name == "Mercy" \
 			else (Color(0.55, 0.85, 0.40) if second_resource_name == "Focus" \
 			else Color(0.75, 0.40, 0.95))
-		_res2_fill = _make_fill(Vector2(PLATE_BAR_X + 1, y + 1), Vector2(PLATE_BAR_W, 7), res2_color)
+		_res2_fill = _make_fill(Vector2(PLATE_BAR_X + 1, y + 1), Vector2(PLATE_BAR_W, fill_h), res2_color)
 		_plate_panel.add_child(_res2_fill)
-		_res2_text = _make_bar_text(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 9), 8)
-		_plate_panel.add_child(_res2_text)
-		y += 11.0
-	_plate_panel.add_child(_make_bar_bg(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 9)))
-	_pressure_fill = _make_fill(Vector2(PLATE_BAR_X + 1, y + 1), Vector2(PLATE_BAR_W, 7),
+		_res2_text = _make_bar_text(Vector2(PLATE_BAR_X, y), track, PLATE_VALUE_FONT)
+		y += PLATE_BAR_H + 1
+	_plate_panel.add_child(_make_bar_bg(Vector2(PLATE_BAR_X, y), track))
+	_pressure_fill = _make_fill(Vector2(PLATE_BAR_X + 1, y + 1), Vector2(PLATE_BAR_W, fill_h),
 		Color(0.80, 0.35, 1.0))
 	_plate_panel.add_child(_pressure_fill)
-	_pressure_text = _make_bar_text(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 9), 8)
-	_plate_panel.add_child(_pressure_text)
-	y += 11.0
+	_pressure_text = _make_bar_text(Vector2(PLATE_BAR_X, y), track, PLATE_VALUE_FONT)
+	y += PLATE_BAR_H + 1
 
-	# BATCH BL §1 — THE INTENT LINE, above the chips and below the bars. It sits
-	# on the plate rather than only in the turn bar for the reason §1 gives: a
-	# player watching the battlefield should not have to read the bar to know
-	# what is coming.
-	#
-	# ENEMIES ONLY, and that is a layout constraint rather than a preference. A
-	# hero's next action is the player's own choice, so the row would always be
-	# blank on one — and reserving its 12px on a hero carrying two resource bars
-	# takes the plate from 79px to 91px against a PLATE_STEP of 82, which stacks
-	# the party's plates into each other. An enemy plate has spare room in the
-	# same place because it carries no resource bars.
+	# BATCH BL §1 — THE INTENT LINE, below the bars and above the chips. ENEMIES ONLY: a hero's next
+	# action is the player's own choice, so the row would always be blank on one. BATCH IH §6 — it
+	# starts where the bars do, right of the portrait's column, and takes their width.
 	if not is_hero:
 		_intent_label = Label.new()
-		_intent_label.position = Vector2(4, y)
-		_intent_label.size = Vector2(PLATE_W - 8, 12)
-		_intent_label.add_theme_font_size_override("font_size", 9)
+		_intent_label.add_theme_font_size_override("font_size", PLATE_INTENT_FONT)
 		_intent_label.add_theme_constant_override("outline_size", 2)
 		_intent_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
+		_intent_label.clip_text = true
+		_intent_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		_intent_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_intent_label.visible = false
-		_plate_panel.add_child(_intent_label)
-		y += 12.0
+		_put(_plate_panel, _intent_label, Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, PLATE_INTENT_H))
+		y += PLATE_INTENT_H + 1
 
-	# Chips run full width under the portrait + bars.
-	var chips_y := maxf(y, 52.0)
+	# Chips run full width under the portrait's column and the bars.
+	var chips_y := maxf(y, PLATE_FACE_POS.y + PLATE_FACE.y) + 1.0
 	_chips_root = Node2D.new()
-	_chips_root.position = Vector2(5, chips_y + 2.0)
+	_chips_root.position = Vector2(PLATE_PAD, chips_y)
 	_plate_panel.add_child(_chips_root)
-	_plate_panel.size = Vector2(PLATE_W, chips_y + 17.0)
+	_plate_panel.size = Vector2(PLATE_W, chips_y + PLATE_CHIP_H + 3.0)
 
 
 # BATCH BL §1 — the intent line's ONE writer. Blank text hides the row outright
@@ -2868,11 +2898,10 @@ func _update_plate_border() -> void:
 		_plate_style.bg_color = Color(0.08, 0.06, 0.10, 0.88)
 
 
-# Text label sized exactly to its bar so centering is pixel-true.
+# Text label sized exactly to its bar so centering is pixel-true. BATCH IH §6 — PARENTED, THEN SIZED
+# (`_put`, below): sized first it took the default font's 22-px line and hung below its bar.
 func _make_bar_text(pos: Vector2, bar_size: Vector2, font_size: int) -> Label:
 	var label := Label.new()
-	label.position = pos
-	label.size = bar_size
 	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", Color(1, 1, 1))
 	label.add_theme_constant_override("outline_size", 2)
@@ -2880,6 +2909,7 @@ func _make_bar_text(pos: Vector2, bar_size: Vector2, font_size: int) -> Label:
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_put(_plate_panel, label, pos, bar_size)
 	return label
 
 
@@ -2993,6 +3023,15 @@ func set_targetable(on: bool) -> void:
 		_set_plate_hover(false)
 
 
+# BATCH IH §6 — PARENT, THEN PLACE. A Control's theme overrides reach its minimum size only once it is
+# in the tree; a size set before that is clamped to the default font's and never shrinks back. Every
+# label on a plate goes through here.
+static func _put(parent: Node, c: Control, pos: Vector2, sz: Vector2) -> void:
+	parent.add_child(c)
+	c.position = pos
+	c.size = sz
+
+
 func _make_bar_bg(pos: Vector2, bar_size: Vector2) -> ColorRect:
 	var r := ColorRect.new()
 	r.position = pos
@@ -3009,12 +3048,27 @@ func _make_fill(pos: Vector2, bar_size: Vector2, color: Color) -> ColorRect:
 	return r
 
 
+# BATCH IH §6 — A VALUE STAYS INSIDE ITS BAR WHATEVER IT SAYS: at the plate's font while its line fits
+# the bar's width, a size down (font 7, an 11-px line, still inside the 12-px bar) when it does not —
+# the uncapped meters' readouts (Resonance, Focus) grow without a ceiling.
+func _fit_bar_text(label: Label) -> void:
+	if label == null:
+		return
+	var font: Font = label.get_theme_font("font")
+	var fs := PLATE_VALUE_FONT
+	if font.get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > PLATE_BAR_W:
+		fs = PLATE_VALUE_FONT - 1
+	label.add_theme_font_size_override("font_size", fs)
+
+
 func refresh_bars() -> void:
 	_hp_fill.size.x = PLATE_BAR_W * clampf(hp / float(max_hp), 0.0, 1.0)
 	_hp_text.text = "%d/%d" % [hp, max_hp]
+	_fit_bar_text(_hp_text)
 	if _res_fill != null:
 		_res_fill.size.x = PLATE_BAR_W * clampf(resource / float(max_resource), 0.0, 1.0)
 		_res_text.text = "%s %d/%d" % [resource_name, resource, max_resource]
+		_fit_bar_text(_res_text)
 	if _res2_fill != null:
 		# Resonance has NO MAXIMUM (Batch AT), so the bar cannot read against
 		# one: it fills toward RESONANCE_BAR_REF and pins there. The number
@@ -3039,6 +3093,7 @@ func refresh_bars() -> void:
 				String.num(lethal_crit_mult(), 2)]
 		else:
 			_res2_text.text = "%s %d/%d" % [second_resource_name, second_resource, second_max]
+		_fit_bar_text(_res2_text)
 	if has_engine("bloodrage"):
 		for s in engine_chips:
 			if s.id == engine_chip_id("bloodrage"):
@@ -3155,6 +3210,7 @@ func refresh_bars() -> void:
 	var pressure_ratio := clampf(pressure / float(stability), 0.0, 1.0)
 	_pressure_fill.size.x = PLATE_BAR_W * pressure_ratio
 	_pressure_text.text = "Break %d/%d" % [pressure, stability]
+	_fit_bar_text(_pressure_text)
 	# Shifts toward hot pink as the unit gets close to Breaking.
 	_pressure_fill.color = Color(0.80, 0.35, 1.0).lerp(Color(1.0, 0.25, 0.55), pressure_ratio)
 
@@ -3395,6 +3451,8 @@ func _dissolve(comp: Dictionary, gone_ids: Array, why: String) -> Dictionary:
 	_proc_log("   → %s ends on %s — %s: its %s %s%s" % [String(comp.label), unit_name, why,
 		" and ".join(gone_labels), "ran out" if why == "the clock" \
 			else ("is lifted" if why == "a cleanse" else "is consumed"), tail])
+	if conj_end_cb.is_valid():
+		conj_end_cb.call(self, String(comp.id), why)
 	return survivor
 
 
@@ -3562,6 +3620,8 @@ func remove_status(id: String, why := "a consumer") -> void:
 				note_status_event(self, String(b.id))
 			_proc_log("   → %s ends on %s — lifted whole (%s)" % [String(whole.label),
 				unit_name, " and ".join(bases_of(whole).map(func(b): return String(b.label)))])
+			if conj_end_cb.is_valid():
+				conj_end_cb.call(self, String(whole.id), why)
 	_refresh_chips()
 
 
@@ -3635,6 +3695,8 @@ func purge_debuffs_taken() -> Array:
 		if (t as Dictionary).has("parts"):
 			_proc_log("   → %s ends on %s — lifted whole (%s)" % [String(t.label),
 				unit_name, " and ".join(bases_of(t).map(func(b): return String(b.label)))])
+			if conj_end_cb.is_valid():
+				conj_end_cb.call(self, String(t.id), "a cleanse")
 	_refresh_chips()
 	return taken
 
@@ -3958,41 +4020,86 @@ func _refresh_chips() -> void:
 	var count := row.size()
 	if count == 0:
 		return
-	# Left-aligned inside the nameplate's chip row.
-	var x := 0.0
+	# Left-aligned inside the nameplate's chip row. BATCH IH §6 — EACH CHIP IS AS WIDE AS ITS TAG (a tag
+	# wider than its chip drew outside it: Blood Frenzy's *+0% (floor 0%)* in a 26-px box), its tag is
+	# parented before it is sized, and THE ROW NEVER RUNS PAST THE PLATE: it stops where the rune chips'
+	# room begins, and a last chip, *+N*, carries the ones that did not fit — its hover names each.
+	var limit := PLATE_W - 2.0 * PLATE_PAD - _rune_chip_room()
+	var widths: Array = []
 	for i in count:
+		widths.append(_chip_width(String((row[i] as Dictionary).short)))
+	var shown := count
+	var used := 0.0
+	for i in count:
+		used += float(widths[i]) + (2.0 if i > 0 else 0.0)
+	if used > limit:
+		shown = 0
+		var x0 := 0.0
+		for i in count:
+			var more_w := _chip_width("+%d" % (count - i - 1)) + 2.0 if i < count - 1 else 0.0
+			if x0 + float(widths[i]) + more_w > limit:
+				break
+			x0 += float(widths[i]) + 2.0
+			shown = i + 1
+	var x := 0.0
+	for i in shown:
 		var s: Dictionary = row[i]
-		var chip_w := 12.0 if String(s.short).length() <= 2 else 26.0
-		var chip := ColorRect.new()
-		chip.position = Vector2(x, 0)
-		chip.size = Vector2(chip_w, 12)
-		chip.color = s.color
-		chip.mouse_filter = Control.MOUSE_FILTER_STOP
-		# BATCH HZ §1c — a chip stops the mouse for its tooltip, so a click on it
-		# during targeting is answered as the plate's own (`_on_plate_input`).
-		chip.gui_input.connect(_on_plate_input)
-		chip.tooltip_text = "%s (%s turn%s left)\n%s" % [
-			s.label, s.turns, "" if s.turns == 1 else "s", s.desc]
+		var tip := "%s (%s turn%s left)\n%s" % [s.label, s.turns, "" if s.turns == 1 else "s", s.desc]
 		if s.id == "broken" or s.turns < 0:
-			chip.tooltip_text = "%s\n%s" % [s.label, s.desc]
+			tip = "%s\n%s" % [s.label, s.desc]
 		# Batch Z: a chip surfaces its glossary line when it has one and the
 		# chip's own text doesn't already say the same thing — the highest-
 		# value contextual door into the glossary.
 		var gl_short := Glossary.status_short(String(s.id))
 		if gl_short != "" and gl_short != String(s.desc):
-			chip.tooltip_text += "\n— %s (see Glossary)" % gl_short
-		_chips_root.add_child(chip)
-		var tag := Label.new()
-		tag.text = s.short
-		tag.add_theme_font_size_override("font_size", 7 if chip_w > 12.0 else 8)
-		tag.add_theme_color_override("font_color", Color(0.05, 0.05, 0.08))
-		tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		tag.position = chip.position
-		tag.size = Vector2(chip_w, 12)
-		tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		tag.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		_chips_root.add_child(tag)
-		x += chip_w + 2.0
+			tip += "\n— %s (see Glossary)" % gl_short
+		x += _draw_chip(String(s.short), s.color, tip, x, float(widths[i])) + 2.0
+	if shown < count:
+		var hidden := PackedStringArray()
+		for i2 in range(shown, count):
+			hidden.append(String((row[i2] as Dictionary).label))
+		var more := "+%d" % (count - shown)
+		_draw_chip(more, Color(0.62, 0.6, 0.66), "%d more:\n%s" % [count - shown, "\n".join(hidden)],
+			x, _chip_width(more))
+
+
+# BATCH IH §6 — a chip's width is its tag's at the chip's font, with a margin; never under 12.
+const CHIP_FONT_SHORT := 8   # a tag of two letters or fewer
+const CHIP_FONT_LONG := 7
+
+
+func _chip_width(tag: String) -> float:
+	var fs := CHIP_FONT_SHORT if tag.length() <= 2 else CHIP_FONT_LONG
+	var font: Font = _plate_panel.get_theme_font("font", "Label") if _plate_panel != null \
+		else ThemeDB.fallback_font
+	var w := font.get_string_size(tag, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+	return maxf(12.0, ceilf(w) + 4.0)
+
+
+# One chip on the row: a filled box and its tag, the tag parented before it is sized. Returns its width.
+func _draw_chip(tag_text: String, color: Color, tip: String, x: float, w: float) -> float:
+	var chip := ColorRect.new()
+	chip.color = color
+	chip.mouse_filter = Control.MOUSE_FILTER_STOP
+	# BATCH HZ §1c — a chip stops the mouse for its tooltip, so a click on it
+	# during targeting is answered as the plate's own (`_on_plate_input`).
+	chip.gui_input.connect(_on_plate_input)
+	chip.tooltip_text = tip
+	_put(_chips_root, chip, Vector2(x, 0), Vector2(w, PLATE_CHIP_H))
+	var tag := Label.new()
+	tag.add_theme_font_size_override("font_size", CHIP_FONT_LONG if tag_text.length() > 2 else CHIP_FONT_SHORT)
+	tag.add_theme_color_override("font_color", Color(0.05, 0.05, 0.08))
+	tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	tag.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	tag.text = tag_text
+	_put(_chips_root, tag, Vector2(x, 0), Vector2(w, PLATE_CHIP_H))
+	return w
+
+
+# The room the rune chips take at the row's right end, with the gap that keeps the statuses off them.
+func _rune_chip_room() -> float:
+	return 0.0 if _rune_chip_n == 0 else _rune_chip_n * (RUNE_CHIP_W + 2.0) + 4.0
 
 
 # BATCH HZ §1d — LAST RITES' WINDOW, ASKED IN ONE PLACE: the node's field, a Rage bar,
@@ -4017,17 +4124,22 @@ const RUNE_CHIP_W := 14.0
 const RUNE_CHIP_PAYING := Color(0.85, 0.6, 1.0)
 const RUNE_CHIP_ARMED := Color(0.42, 0.36, 0.50)
 var _rune_chip_root: Node2D = null
+var _rune_chip_n := 0   # BATCH IH §6 — how many the row's right end holds; the statuses stop short of them
 
 
 func set_rune_chips(chips: Array) -> void:
 	if _rune_chip_root != null and is_instance_valid(_rune_chip_root):
 		_rune_chip_root.queue_free()
 	_rune_chip_root = null
+	var was := _rune_chip_n
+	_rune_chip_n = 0 if chips.is_empty() or _chips_root == null else chips.size()
+	if _rune_chip_n != was and _chips_root != null:
+		_refresh_chips()
 	if chips.is_empty() or _plate_panel == null or not is_instance_valid(_plate_panel) \
 			or _chips_root == null:
 		return
 	_rune_chip_root = Node2D.new()
-	_rune_chip_root.position = Vector2(PLATE_W - 5.0, _chips_root.position.y)
+	_rune_chip_root.position = Vector2(PLATE_W - PLATE_PAD, _chips_root.position.y)
 	_plate_panel.add_child(_rune_chip_root)
 	var x := 0.0
 	for i in range(chips.size() - 1, -1, -1):
@@ -4057,16 +4169,17 @@ static func rune_chip(rc: Dictionary) -> Panel:
 	chip.set_meta("paying", on)
 	var tag := Label.new()
 	tag.text = String(rc.get("tag", ""))
-	tag.add_theme_font_size_override("font_size", 9)
+	# BATCH IH §6 — THE MARK IS DRAWN INSIDE ITS CHIP. HZ §1d gave the glyph an 18-px line lifted 4 px
+	# above the chip, measured on a label sized before it was parented — the default font's clamp,
+	# not the glyph's line. Parented, the ✦ at font 8 is a 12-px line: the chip's own height. The label
+	# fills its chip by anchors, because this builder returns the chip before anything parents it.
+	tag.add_theme_font_size_override("font_size", 8)
 	tag.add_theme_color_override("font_color", RUNE_CHIP_PAYING if on else RUNE_CHIP_ARMED)
 	tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	# The glyph comes from a fallback font whose line is taller than the chip, so the label
-	# is given that line and lifted to centre the mark in the 12px box (measured, HZ §1d).
-	tag.position = Vector2(0, -4)
-	tag.size = Vector2(RUNE_CHIP_W, 18)
 	tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	tag.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	chip.add_child(tag)
+	tag.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	return chip
 
 
@@ -4935,6 +5048,8 @@ func _die() -> void:
 	for comp in statuses:
 		if comp.has("parts"):
 			_proc_log("   → %s ends on %s — the body died" % [String(comp.label), unit_name])
+			if conj_end_cb.is_valid():
+				conj_end_cb.call(self, String(comp.id), "the body died")
 	statuses.clear()
 	# BATCH IG §1 — the display chips go with the body, as they did while they were statuses.
 	display_chips.clear()

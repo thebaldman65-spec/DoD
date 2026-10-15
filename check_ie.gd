@@ -515,23 +515,26 @@ func _s3b_the_fire_census() -> void:
 # ── §4 — ✦ NAMES A RUNE, EACH SURFACE APART ──────────────────────────────────────
 
 func _s4_each_surface() -> void:
-	print("\n§4 — ✦: no mark beside the sheet's state column; the count labelled; no glyph on Empower; the rune chip ✦")
-	# THE HERO SHEET: a worn rune's row is its name, the state column says WORN, and no label carries ✦.
+	print("\n§4 — ✦: no mark beside the kit preview's state; the count labelled; no glyph on Empower; the rune chip ✦")
+	# THE KIT PREVIEW — the hero sheet's rune block until IH §3: a worn rune's line is its state, WORN, then
+	# its name, and no rune line carries ✦ (the preview's own ✦ is its count of runes held unworn, below them).
 	_new_run()
 	var m: Dictionary = _run.party[2]
 	var rid := _class_rune(m)
 	ok(rid != "", "§4: the premise — a Cleric rune to wear")
 	m["runes"] = [_rune(rid, true)]
-	_run.hero_screen_idx = 2
-	change_scene_to_file("res://scenes/party.tscn")
-	await Gate.frames(self, 6)
-	var sheet_tx: Array = _texts(current_scene)
+	var mp0 := await _to_map()
+	var kp: Node = mp0.call("_open_kit_preview", 2)
+	await Gate.frames(self, 2)
+	var kp_tx: Array = _texts(kp)
 	var rname := String(Runes.config(rid).get("name", ""))
-	var row: Array = sheet_tx.filter(func(t): return String(t).begins_with(rname + " — "))
-	ok(row.size() == 1 and sheet_tx.has("WORN") and not sheet_tx.any(func(t): return String(t).contains(STAR)),
-		"§4: the sheet's worn row is not its name beside WORN, or a label on the sheet carries ✦ (%s)" % [row])
-	ok(not sheet_tx.any(func(t): return int(String(t).contains(STAR)) + int(String(t).contains(DIAMOND)) + int(String(t).contains(ARROW)) > 1),
-		"§4: a label on the sheet carries two of ✦, ◆ and ↑")
+	var row: Array = kp_tx.filter(func(t): return String(t).strip_edges().begins_with("WORN") and String(t).contains(rname + " — "))
+	ok(row.size() == 1 and not row.any(func(t): return String(t).contains(STAR)),
+		"§4: the kit preview's worn line is not WORN beside its name, or it carries ✦ (%s)" % [row])
+	ok(not kp_tx.any(func(t): return int(String(t).contains(STAR)) + int(String(t).contains(DIAMOND)) + int(String(t).contains(ARROW)) > 1),
+		"§4: a line on the kit preview carries two of ✦, ◆ and ↑")
+	kp.queue_free()
+	await Gate.frames(self, 1)
 	# THE NAMEPLATE: ✦ N, and its tooltip says what the count counts.
 	_new_run()
 	var m2: Dictionary = _run.party[2]

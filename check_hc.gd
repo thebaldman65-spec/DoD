@@ -21,8 +21,9 @@
 #       Aim leaves the slots
 #   §6  PACK BOND BESIDE LETHAL AIM SITS OUT, VISIBLY — the predicate in both
 #       orders and not with either out; the pairing still offered; GX's sentence,
-#       word for word, on the pouch's engine row, the map card's engine line and its
-#       hover, the hero sheet's state column and the battle log's roll call — and
+#       word for word, on the pouch's engine row, the map card's Runes button and its
+#       hover (the card's engine line until IH §2), the kit preview's line (the hero
+#       sheet's state column until IH §3) and the battle log's roll call — and
 #       none of it with Lethal Aim out
 #   §7  THE PLAYER'S FILES
 #
@@ -190,7 +191,10 @@ func _s1_the_scope() -> void:
 	var readers: Array = []
 	var askers := 0
 	var tinted := 0
-	for f in ["scripts/shop_screen.gd", "scripts/map_screen.gd", "scripts/party_screen.gd"]:
+	# BATCH IH §3 — the hero sheet draws no rune since IH §3; the kit preview, which lists a hero's
+	# runes read-only as the sheet's block did, is the third screen read for a band in its place. It
+	# draws its lines in their state's colours (HZ §1b), so the tint is the two others'.
+	for f in ["scripts/shop_screen.gd", "scripts/map_screen.gd", "scripts/kit_preview.gd"]:
 		var src := Gate.strip_comments(FileAccess.get_file_as_string("res://" + String(f)))
 		ok(src != "", "§1: %s read back empty" % f)
 		if src.contains("[\"scope_label\"]") or src.contains("[\"scope_color\"]") \
@@ -198,11 +202,11 @@ func _s1_the_scope() -> void:
 			readers.append(f)
 		if src.contains("shown_scope(") or src.contains("scope_band("):
 			askers += 1
-		if src.contains("Runes.RUNE_TINT"):
+		if src.contains("Runes.RUNE_TINT") and not String(f).ends_with("kit_preview.gd"):
 			tinted += 1
 	ok(readers.is_empty(), "§1: %s read a rune's band off the instance, which rides the save" % [readers])
 	ok(askers == 0, "§1: %d of the three screens ask for a rune's band — HE §4 dropped it from every surface" % askers)
-	ok(tinted == 3, "§1: %d of the three screens draw a rune in `Runes.RUNE_TINT` — the band's tint went, the rune did not" % tinted)
+	ok(tinted == 2, "§1: %d of the two tinted screens draw a rune in `Runes.RUNE_TINT` — the band's tint went, the rune did not" % tinted)
 
 
 # ── §2 — LAYERED AEGIS AT A CACHE'S ANSWER ──────────────────────────────────
@@ -445,20 +449,20 @@ func _s6_pack_beside_lethal() -> void:
 		change_scene_to_file("res://scenes/map.tscn")
 		await Gate.frames(self, 6)
 		var mp: Node = current_scene
-		# THE MAP CARD'S ENGINE LINE.
+		# THE MAP CARD's RUNES BUTTON — BATCH IH §2: the card's engine line is gone, and HC §5's tell
+		# rides the button beside Kit that opens his rune panel: the ○ in its face, the amber, and
+		# the sentence on its hover (below).
 		var seen := {"card": "none", "row": "none"}
-		var line: Label = null
-		# BATCH HL §2: the card's line says *core runes:* (the player's word), where it
-		# said *engines:*; the rune named on it is still the Beastmaster's.
-		for l in _labels_with(mp, "core runes:"):
-			if String((l as Label).text).contains("Beastmaster"):
-				line = l
-		ok(line != null, "§6 (%s): the Hunter's card drew no engine line" % tag)
+		var line: Button = null
+		for b0 in Gate.bound_buttons(mp, "_open_rune_panel"):
+			if (b0 as Button).has_meta("runes_button") and int((b0 as Button).get_meta("runes_button")) == 3:
+				line = b0
+		ok(line != null, "§6 (%s): the Hunter's card drew no Runes button" % tag)
 		if line != null:
-			var marked: bool = String(line.text).contains("○")
+			var marked: bool = String(line.text).begins_with("○ ")
 			var amber: bool = line.get_theme_color("font_color").is_equal_approx(AMBER)
 			ok(marked == lethal_in and amber == lethal_in,
-				"§6 (%s): the card's engine line reads '%s' (marked %s, amber %s)" % [tag, line.text, marked, amber])
+				"§6 (%s): the card's Runes button reads '%s' (marked %s, amber %s)" % [tag, line.text, marked, amber])
 			seen["card"] = "marked, amber" if marked and amber else ("plain" if not marked and not amber else "mixed")
 		# ITS HOVER.
 		var hover := 0
@@ -486,16 +490,18 @@ func _s6_pack_beside_lethal() -> void:
 		if ov != null:
 			ov.queue_free()
 		await Gate.frames(self, 2)
-		# THE HERO SHEET'S STATE COLUMN.
-		_run.hero_screen_idx = 3
-		change_scene_to_file("res://scenes/party.tscn")
-		await Gate.frames(self, 6)
-		var sheet: Node = current_scene
+		# THE KIT PREVIEW's STATE — the hero sheet's state column until IH §3: the line says it
+		# sits out, and the sentence hangs on that line.
+		var kp: Node = mp.call("_open_kit_preview", 3)
+		await Gate.frames(self, 2)
 		var state_n := 0
-		for l3 in _labels_with(sheet, "sits out"):
-			if String((l3 as Label).text) == "sits out" and String((l3 as Label).tooltip_text) == note:
+		for l3 in _labels_with(kp, "sits out"):
+			if String((l3 as Label).text).strip_edges().begins_with("sits out " + bm_name) \
+					and String((l3 as Label).tooltip_text) == note:
 				state_n += 1
-		ok(state_n == (1 if lethal_in else 0), "§6 (%s): the sheet's state column says `sits out` with the sentence %d times" % [tag, state_n])
+		ok(state_n == (1 if lethal_in else 0), "§6 (%s): the kit preview says `sits out` with the sentence %d times" % [tag, state_n])
+		kp.queue_free()
+		await Gate.frames(self, 1)
 		_run.active = false
 		# THE BATTLE LOG'S ROLL CALL.
 		var over := {3: {"engines": [_eng("pack"), _eng("lethal_aim", lethal_in)]}}
@@ -516,7 +522,7 @@ func _s6_pack_beside_lethal() -> void:
 			if String(rc).ends_with(want_tail):
 				called += 1
 		ok(called == (1 if lethal_in else 0), "§6 (%s): the roll call said it %d times" % [tag, called])
-		print("    %s: card line %s, hover %d, pouch row %s, sheet %d, roll call %d" % [tag,
+		print("    %s: card's Runes button %s, hover %d, pouch row %s, kit preview %d, roll call %d" % [tag,
 			seen["card"], hover, seen["row"], state_n, called])
 		await _clear(s)
 
