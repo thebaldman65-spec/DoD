@@ -17,6 +17,54 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT II — 2026-10-14, FROM `docs/state.md` AS IH LEFT IT (`dc35849`)
+
+**What came here**: IH's six rulings, all answered in II's brief (the first carried as II's ruling 1 — the designer's play, still
+owed); FOUND AT IC's first two items, fixed at II §1–§3 (the three sites, the two frames, the tick's credit), the section staying for
+its five dormant members; and the roadmap's IC-remainder line, done at II. The roadmap's II and IJ lines were rewritten in place (the
+re-measure is IK's, the claims IL's, and IJ is the text-against-constant sweep). Each was read against II's tree before it moved;
+everything else in the live file stayed.
+
+### ~~IH's RULINGS OWED~~ — **ALL SIX ANSWERED IN II's BRIEF: PLAY WITHOUT THE DEBUG MENU (1, CARRIED AS II's RULING 1); SANCTITY's 13 CONFIRMED (2); ONE KIND OF FACE — THE SHARED CROP (3, BUILT AT II §0.3); THE TELL RIDES THE BUTTON AND ○ IS THE FOURTH GLYPH (4, BUILT AT II §0.4); THE `+N` AND THE SIZE DOWN CONFIRMED, WITH A FLOOR (5, BUILT AT II §0.5); THE CARD LEFT, THE STATS ONE SIZE LARGER (6, BUILT AT II §0.6)**
+
+Full working: `docs/reports/IH.md`, NEEDS A RULING.
+
+1. **PLAY ONE ZONE WITHOUT THE DEBUG MENU, AND SEND THE FILE.** The first file came (IG's ruling 1) and it is debug-touched, so it
+   prices nothing; the readout now names every debug action, so a file that names none is play. It answers Boil Over's rate,
+   Rupture's number, the vow's worth, Sanctity's step and the Cleric's Mana — and a Cleric on the Hierophant's rune for Sanctity.
+2. **SANCTITY's STEP AT 13 (IG §2) — CONFIRM THE NUMBER** (IG's ruling 2, carried: the first file holds no Hierophant). It lands a
+   normal fight's end at 2.58 steps (14 would read 2.38); a boss fight reaches the cap in about four in ten. The handle is below.
+3. **THE BERSERKER's AND THE PYROMANCER's ART (§6b).** Two lineages wear illustrations; ten share the Soldier sheet's small figure.
+   The layout holds either in the portrait's column now — **which art a lineage wears is yours.**
+4. **THE CORE RUNE's TELL MOVED ONTO THE RUNES BUTTON (§2).** A core rune that sits out marked the card's line (HC §5); the line is gone,
+   so the button wears the ○, the amber and the sentence. **Confirm, or say where the tell goes.**
+5. **TWO SHAPES §6 CHOSE WHERE THE RULE LEFT A CHOICE.** A chip row that would run past the plate stops and a `+N` chip names the rest
+   on its hover (a wrapping row would grow the plate into the next one); a value too wide for its bar takes the next font size down
+   inside it (Resonance and Focus have no ceiling). **Confirm both.**
+6. **THE FREED ROOM (§7b).** The card keeps a 26-px band empty between its rune slots and its buttons, and the sheet's left column below
+   the passive block; IH moved nothing into either. Proposals are in the report.
+
+### FOUND AT IC AND NOT FIXED — ITS CLOSED ITEMS (archived at II; the section stays in `docs/state.md`)
+
+- **THE REST OF THE SILENCED-FIGURE FAMILY: THREE DOOR CALLS AND TWO FRAMES** (IC §2's partition, `docs/reports/IC.md` §2). Three
+  live sites still print or book a figure the vow refuses: **a damage-over-time tick's log line** (*takes N damage*, `_dot_pass`,
+  reached by a Cleric through Returned Burden's re-laid Burn or Poison), **Blight the Well's turned heal** (its line and its
+  credit, `_on_blight_heal`) and **the bleedout burst** (its float and its line, reached under the Bloodletting bargain). **Two
+  frames name the wrong dealer**: Blight the Well's damage is framed on the Old Gods' holder, not the Cleric who laid it, so a
+  vowed Cleric without that engine is not silenced; and Umbral Sigil's echo is framed on the striker, not the sigil's caster (DI's
+  rule). Each owes its own control; **its own letter.**
+- **A DAMAGE-OVER-TIME TICK IS CREDITED BY NAME, NOT BY LAYER** (`_dot_pass`): a Burn credits the hero named *Pyromancer* and a
+  Poison the one named *Survivalist* whoever laid it, so a Cleric's re-laid Burn books to the Mage. BL §2's, met at IC §2.
+
+### THE PLAYTEST'S OTHER FINDINGS — ITS CLOSED ITEMS (archived at II; the section stays in `docs/state.md`)
+
+- **IC's REMAINDER — IG's brief §6 gave it IH, and IH was the designer's play's asks instead; it waits on its letter. IT IS
+  CORRECTNESS**: the rest of the silenced-figure family — three
+  door calls (the damage-over-time tick's line, Blight the Well's line and credit, the bleedout burst's float and line) and **two
+  frames that name the wrong dealer**: Blight the Well's on the Old Gods' holder, so a vowed Cleric who drafts it without that
+  engine is not silenced at all — **a live hole in the vow IC repaired, not cosmetic** — and Umbral Sigil's echo on the striker,
+  against DI's rule; and a tick credited by name (FOUND AT IC). Each repair owes its own control.
+
 ## ARCHIVED AT IH — 2026-10-14, FROM `docs/state.md` AS IG LEFT IT (`29407e8`)
 
 **What came here**: IG's rulings, both carried into IH's (the designer played and sent the file, which is debug-touched, so the ask

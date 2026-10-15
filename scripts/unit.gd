@@ -3051,14 +3051,37 @@ func _make_fill(pos: Vector2, bar_size: Vector2, color: Color) -> ColorRect:
 # BATCH IH §6 — A VALUE STAYS INSIDE ITS BAR WHATEVER IT SAYS: at the plate's font while its line fits
 # the bar's width, a size down (font 7, an 11-px line, still inside the 12-px bar) when it does not —
 # the uncapped meters' readouts (Resonance, Focus) grow without a ceiling.
+# BATCH II §0.5 — AND THE FONT HAS A FLOOR, BECAUSE THE METERS HAVE NONE (the designer's): font 7 is the
+# last size. A value still wider than its bar at the floor DROPS ITS PARENTHETICAL — the count stands,
+# at the plate's own font, and the label's hover carries the whole line — rather than shrinking into a
+# size nobody can read. The hover stops the mouse only while it carries something, and a click on it
+# is the plate's (`_on_plate_input`, the chips' route).
+const PLATE_VALUE_FLOOR := 7
+
+
 func _fit_bar_text(label: Label) -> void:
 	if label == null:
 		return
 	var font: Font = label.get_theme_font("font")
+	var full := label.text
 	var fs := PLATE_VALUE_FONT
-	if font.get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > PLATE_BAR_W:
-		fs = PLATE_VALUE_FONT - 1
+	if font.get_string_size(full, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > PLATE_BAR_W:
+		fs = PLATE_VALUE_FLOOR
+	var shown := full
+	if font.get_string_size(full, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > PLATE_BAR_W and full.contains(" ("):
+		shown = full.substr(0, full.find(" ("))
+		fs = PLATE_VALUE_FONT if font.get_string_size(shown, HORIZONTAL_ALIGNMENT_LEFT, -1,
+			PLATE_VALUE_FONT).x <= PLATE_BAR_W else PLATE_VALUE_FLOOR
+	label.text = shown
 	label.add_theme_font_size_override("font_size", fs)
+	if shown != full:
+		label.tooltip_text = full
+		label.mouse_filter = Control.MOUSE_FILTER_STOP
+		if not label.gui_input.is_connected(_on_plate_input):
+			label.gui_input.connect(_on_plate_input)
+	else:
+		label.tooltip_text = ""
+		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
 func refresh_bars() -> void:
@@ -4186,7 +4209,12 @@ static func rune_chip(rc: Dictionary) -> Panel:
 # Portrait for the initiative bar and nameplate: dedicated art when the unit
 # has it, otherwise a close-up crop of the idle frame (which is mostly empty
 # space around a small figure). Crop scales with frame size.
+# BATCH II §0.3 — A HERO WEARS HIS CLASS SHEET's SHARED CROP, WHATEVER HIS BATTLE ART (the designer's):
+# the Berserker's and the Pyromancer's own sheets still draw their figures on the field, and their faces
+# here are the crop the other ten lineages wear (`Classes.class_icon`, the map card's face too).
 func portrait() -> Texture2D:
+	if is_hero and not is_companion and hero_key != "":
+		return Classes.class_icon(hero_key)
 	if portrait_path != "" and FileAccess.file_exists(portrait_path):
 		return load(portrait_path)
 	var src := _idle_texture as AtlasTexture

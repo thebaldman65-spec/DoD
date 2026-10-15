@@ -164,7 +164,9 @@ A new damage source goes through one of the two functions; a new direct cost cal
 · **ATTRIBUTION IS A FRAME**, `_dmg_frame(src, label, src_name)`, set at **`_resolve`'s entry** —
   one site covering the strike, its splash, echoes and the recoil it costs — **re-established after
   each nested `await _resolve`** (a counter leaves the frame pointing at itself) and set explicitly at
-  the DoT tick loop, from the status's `src_name`, because the applier may be dead. **SELF-INFLICTED IS
+  the DoT tick loop, from the status's `src_name`, because the applier may be dead — **and since II §3 the tick's
+  credit reads the same name** (`battle._layer_credit_name`: the hero who laid it, a companion's hunter, or nobody),
+  where BL §2's line had booked a Burn to the hero named *Pyromancer* and a Poison to the one named *Survivalist*. **SELF-INFLICTED IS
   DECIDED BY IDENTITY** (`victim == _dmg_src`), which covers recoil and any self-cost that passes the
   door in one rule and cannot go stale the way a name list would; the five direct costs reach it
   through `_book_self_cost`, which frames the payer and the card around the one booking and restores
@@ -179,7 +181,9 @@ A new damage source goes through one of the two functions; a new direct cost cal
     bite at a cast's own line, and every retaliation dealt inside an enemy's swing — a Tripwire, a
     Feint's return, a Mirror Guard return, Consecrated Ground's reflect (its LAYER's, by the status's
     `src_name`), Spite and the Whole Forest's bite — deal under their owner's frame and hand the swing
-    its own back. Left standing, a borrowed frame gave its borrower the rest of the swing: HY found the
+    its own back. **Since II §2 two more borrow under a LAYER's frame**: Blight the Well's turned heal (the blight's
+    `src_name`, where it stood on the Old Gods' holder) and Umbral Sigil's echo (`_umbral_sigil_echo`, the sigil's
+    caster's, where it stood on the striker). Left standing, a borrowed frame gave its borrower the rest of the swing: HY found the
     vow's share giving the Devout an Orc Raider's, so his Vow of Silence blanked a teammate's Tripwire
     and the reflect, and Penance's mirror stopped paying.
   - **THE VOW'S SHARE BORROWS NOTHING: THE HALF THE DEVOUT CARRIES IS THE DEALER'S WOUND ON A SECOND
@@ -201,8 +205,8 @@ A new damage source goes through one of the two functions; a new direct cost cal
     LAYER'S.** An item's damage is the party's — nobody in the frame and nobody in the ledger, and the
     two must agree; naming the thrower would hand his own Vow of Silence the party's bombs. And a laid
     status pays as its layer wherever it lands — Consecrated Ground's reflect, Snare Line's spring, the
-    Deadfall and Burning Ground alike (DI's rule) — so a vowed Cleric's ground reflects nothing for
-    anybody, which is the trap the rune chips show (`battle._refresh_rune_chips`).
+    Deadfall and Burning Ground alike (DI's rule), and since II §2 Blight the Well and Umbral Sigil's echo — so a vowed
+    Cleric's ground reflects nothing for anybody, which is the trap the rune chips show (`battle._refresh_rune_chips`).
   - **A FIGURE PRINTED OR PAID OFF A BLOW IS THE BLOW THAT LANDED, NEVER THE BLOW THAT WAS COMPUTED (IA
     §0.6, the designer's; it generalises this frame's rule).** A reader that takes a damage figure above the
     gate that could refuse it pays, or prints, a blow that never landed — the frame's defect one layer out.
@@ -223,7 +227,9 @@ A new damage source goes through one of the two functions; a new direct cost cal
     its Break lands and a hit-count rider still fires on it (Anointing's Ruin). `take_tick_damage` floats its caller's
     label only for a tick the gate let land. **A DOOR CALL OUTSIDE THE STRIKE THAT PRINTS OR PAYS ITS OWN FIGURE ASKS
     `battle._landed` BEFORE ITS DOOR** — the figure, or 0 when the vow will refuse it under the frame standing then —
-    and prints and pays that; the sites that still do not are partitioned in IC's report, §2.
+    and prints and pays that. IC's report, §2, partitioned the sites and left three live; **II §1 closed them** — the
+    damage-over-time tick's line, Blight the Well's line and credit, the bleedout burst's float and line — and its five
+    dormant members are still listed there.
   - **THE SHAKE IS DAMAGE'S. A BLOW THAT LANDS NO DAMAGE DOES NOT SHAKE, EVEN A CRIT (ID §0.4, the designer's; it
     generalises the rule above from figures to feel).** A shake on a silenced crit promises damage that never happened —
     the same lie as a figure beside SILENT. *A silenced hit carries nothing* was REJECTED: its Break landed and the crit

@@ -2,14 +2,14 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1795,
-  "source": 1350,
-  "other": 123,
-  "document": 322
+  "total": 1809,
+  "source": 1352,
+  "other": 124,
+  "document": 333
  },
  "source_residency": {
-  "narrow": 45,
-  "code": 826,
+  "narrow": 46,
+  "code": 827,
   "absent": 323,
   "runtime": 104,
   "unresolved": 3,
@@ -6008,7 +6008,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hy.gd#583"
+   "g": "check_hy.gd#615"
   },
   {
    "s": "check_hy.gd",
@@ -6019,7 +6019,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hy.gd#577"
+   "g": "check_hy.gd#609"
   },
   {
    "s": "check_hy.gd",
@@ -6030,7 +6030,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hy.gd#582"
+   "g": "check_hy.gd#614"
   },
   {
    "s": "check_hy.gd",
@@ -6041,7 +6041,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hy.gd#576"
+   "g": "check_hy.gd#608"
   },
   {
    "s": "check_hy.gd",
@@ -6052,7 +6052,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hy.gd#581"
+   "g": "check_hy.gd#613"
   },
   {
    "s": "check_ia.gd",
@@ -6373,7 +6373,7 @@
    "r": "missing-file",
    "k": "non-literal",
    "how": "read",
-   "g": "check_id.gd#615",
+   "g": "check_id.gd#623",
    "alt": true,
    "expr": "DIAMOND"
   },
@@ -6386,7 +6386,7 @@
    "r": "missing-file",
    "k": "non-literal",
    "how": "read",
-   "g": "check_id.gd#615",
+   "g": "check_id.gd#623",
    "alt": true,
    "expr": "ARROW"
   },
@@ -6399,20 +6399,33 @@
    "r": "missing-file",
    "k": "non-literal",
    "how": "read",
-   "g": "check_id.gd#615",
+   "g": "check_id.gd#623",
    "alt": true,
    "expr": "STAR"
   },
   {
    "s": "check_id.gd",
    "fn": "_s3a_the_sweep",
+   "h": "data/",
+   "n": null,
+   "p": "+",
+   "r": "missing-file",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_id.gd#623",
+   "alt": true,
+   "expr": "CIRCLE"
+  },
+  {
+   "s": "check_id.gd",
+   "fn": "_s3a_the_sweep",
    "h": "scripts/",
    "n": null,
    "p": "+",
    "r": "missing-file",
    "k": "non-literal",
    "how": "read",
-   "g": "check_id.gd#601",
+   "g": "check_id.gd#604",
    "alt": true,
    "expr": "DIAMOND"
   },
@@ -6425,7 +6438,7 @@
    "r": "missing-file",
    "k": "non-literal",
    "how": "read",
-   "g": "check_id.gd#601",
+   "g": "check_id.gd#604",
    "alt": true,
    "expr": "ARROW"
   },
@@ -6438,7 +6451,7 @@
    "r": "missing-file",
    "k": "non-literal",
    "how": "read",
-   "g": "check_id.gd#602",
+   "g": "check_id.gd#605",
    "expr": "DIAMOND"
   },
   {
@@ -6450,7 +6463,7 @@
    "r": "missing-file",
    "k": "non-literal",
    "how": "read",
-   "g": "check_id.gd#602",
+   "g": "check_id.gd#605",
    "expr": "ARROW"
   },
   {
@@ -6462,7 +6475,7 @@
    "r": "code",
    "k": "literal",
    "how": "inline",
-   "g": "check_id.gd#737"
+   "g": "check_id.gd#760"
   },
   {
    "s": "check_id.gd",
@@ -6473,7 +6486,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_id.gd#816"
+   "g": "check_id.gd#839"
   },
   {
    "s": "check_id.gd",
@@ -6484,7 +6497,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_id.gd#816"
+   "g": "check_id.gd#839"
   },
   {
    "s": "check_ie.gd",
@@ -6640,6 +6653,152 @@
    "k": "literal",
    "how": "read",
    "g": "check_ih.gd#646"
+  },
+  {
+   "s": "check_ii.gd",
+   "fn": "_s03_one_kind_of_face",
+   "h": "scripts/classes.gd",
+   "n": "SPEC_PORTRAITS",
+   "p": "-",
+   "r": "narrow",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_ii.gd#242"
+  },
+  {
+   "s": "check_ii.gd",
+   "fn": "_s03_one_kind_of_face",
+   "h": "scripts/classes.gd",
+   "n": "static func class_icon(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ii.gd#241"
+  },
+  {
+   "s": "check_ii.gd",
+   "fn": "_s4_the_documents",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ii.gd#785",
+   "expr": "String"
+  },
+  {
+   "s": "check_ii.gd",
+   "fn": "_s4_the_documents",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ii.gd#785",
+   "expr": "String"
+  },
+  {
+   "s": "check_ii.gd",
+   "fn": "_s4_the_documents",
+   "h": "docs/instrument-rules.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ii.gd#785",
+   "expr": "String"
+  },
+  {
+   "s": "check_ii.gd",
+   "fn": "_s4_the_documents",
+   "h": "docs/combat-rules.md",
+   "n": "(`battle._layer_credit_name`: the hero who laid it",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ii.gd#794"
+  },
+  {
+   "s": "check_ii.gd",
+   "fn": "_s4_the_documents",
+   "h": "CLAUDE.md",
+   "n": "Every batch that writes a standing rule here asks",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ii.gd#783"
+  },
+  {
+   "s": "check_ii.gd",
+   "fn": "_s4_the_documents",
+   "h": "CLAUDE.md",
+   "n": "Four glyphs, four meanings",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ii.gd#793"
+  },
+  {
+   "s": "check_ii.gd",
+   "fn": "_s4_the_documents",
+   "h": "CLAUDE.md",
+   "n": "WHAT A BATCH CLOSES HERE MOVES OUT, AS WHAT `docs/state.md` CLOSES DOES",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ii.gd#783"
+  },
+  {
+   "s": "check_ii.gd",
+   "fn": "_s4_the_documents",
+   "h": "docs/combat-rules.md",
+   "n": "damage-over-time tick's line, Blight the Well's line and credit, the bleedout burst's float and line",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ii.gd#794"
+  },
+  {
+   "s": "check_ii.gd",
+   "fn": "_s4_the_documents",
+   "h": "docs/combat-rules.md",
+   "n": "two more borrow under a LAYER's frame",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ii.gd#794"
+  },
+  {
+   "s": "check_ii.gd",
+   "fn": "_s4_the_documents",
+   "h": "CLAUDE.md",
+   "n": "whether the block it supersedes can move to a reference.",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ii.gd#783"
+  },
+  {
+   "s": "check_ii.gd",
+   "fn": "_s4_the_documents",
+   "h": "CLAUDE.md",
+   "n": "○ — A THING YOU WEAR IS PAYING NOTHING — IS THE FOURTH",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ii.gd#793"
   },
   {
    "s": "test_batch_ah.gd",

@@ -4,6 +4,36 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The family's remainder, one kind of face, and the stats sheet (Batch II) — 2026-10-14
+
+**Why a laid status's damage is its layer's, at the last two sites too.** The frame is what the vow, Penance, Judgment, the
+marks, the Reaver and the ledgers all read to ask *who dealt this*. A frame that names a bystander does not only mis-file a
+recap row: it lets one hero's vow fail to silence his own blight, and lets another hero's Siphon and kill count collect on a
+wound the Occultist dealt. Blight the Well and Umbral Sigil were the two places the answer was still *whoever happened to be
+nearby*.
+
+**Why a tick is credited by who laid it and not by a name.** The name was bookkeeping from a game in which only one lineage
+laid each status. The merge put Burn and Poison in more hands, and a name that is no longer unique is a guess; the status
+already carries who laid it.
+
+**Why every lineage wears the shared face.** At the size a plate and a card can give a portrait, a bust reads as a face and
+the shared figure as a small man, so a party of two kinds read as two faces and two little men. One kind of face is consistent
+today; busts for all twelve are a commission, and the two illustrations are kept for the screen that would show one at size.
+
+**Why ○ is a glyph and not a colour.** The mark sits on the way in to the thing that wants attention, as ◆ does on a card.
+Four marks, four meanings, and the player learns each once.
+
+**Why a figure drops its words before it shrinks further.** Resonance has no ceiling, so a font that keeps shrinking has no
+floor; at some value it is unreadable. The count is what a glance needs, and the hover keeps the rest.
+
+**Why the stats grew and the talent board did not.** The sheet is a stats sheet now; the board is locked for the run and read
+as reference, so room spent widening it is spent on the one thing the sheet does not do.
+
+**Why the rules file archives what a batch closes, and why the first pass moved so little.** The state file holds steady
+because closed items leave it; the rules file only grew. The census found the file is almost all live rule — seven closed
+blocks in 126 — so the practice slows the growth at the margin and does not reverse it. That is the measurement the
+re-measure needed.
+
 ## The card, the sheet, and every plate that overlaps itself (Batch IH) — 2026-10-14
 
 **Why the sheet lost three blocks.** The designer's four changes are one idea: the sheet shows what the hero is, and the

@@ -20,17 +20,20 @@ const CLASS_PASSIVES := {
 }
 
 
-# Dedicated spec portrait art (shown untinted, original colors).
+# Dedicated spec portrait art, KEPT AND DRAWN NOWHERE (BATCH II §0.3, the designer's): every
+# lineage wears the class sheet's shared crop on the battle plates and the map cards — at 44 px
+# on a card and 34 on a plate a bust reads as a face and the shared figure as a small figure, so a
+# party of two kinds read as two faces and two little men. The illustration is the art for a
+# surface that shows a portrait at size, and none does today. Busts for all twelve are the other
+# path: a commission, and the designer's.
 const SPEC_PORTRAITS := {
 	"berserker": "res://assets/sprites/berserker/Berserker_Portrait.png",
 }
 
 
-# List icon: the spec's portrait when it has one, else a cropped close-up
-# of the class's idle sprite.
+# List icon: a cropped close-up of the class's idle sprite — THE SHARED CROP every lineage wears
+# (II §0.3). `spec` is accepted and chooses nothing: the plate and the card read one kind of face.
 static func class_icon(key: String, spec := "") -> Texture2D:
-	if spec != "" and SPEC_PORTRAITS.has(spec):
-		return load(SPEC_PORTRAITS[spec])
 	var sheet_dir: String = hero_config(key)["sheet_dir"]
 	var prefix: String = sheet_dir.get_file().capitalize()
 	var tex: Texture2D = load("%s/%s_Idle.png" % [sheet_dir, prefix])

@@ -19,7 +19,9 @@
 #       silences it either way); a bomb is the pouch's (no vow blanks it, no ledger books it).
 #   §4  THE OTHER CALLBACKS, AND THE KILLING COLD — Rite of Return, Bloodbond, Bear the Brunt, Blight the Well
 #       and the rune's own bite each put the frame back; the Killing Cold's cast is booked under the cast and
-#       the Weaver's repeat sees it.
+#       the Weaver's repeat sees it. **Since II §2 Blight the Well deals under its LAYER's frame** — opened on a
+#       vowed Devout who cast it without the Old Gods, which it silences — **and Umbral Sigil's echo under its
+#       caster's**, put back after it inside the striker's swing.
 #   §5  THE RETALIATIONS INSIDE AN ENEMY'S SWING ARE THEIR OWNERS' (GO's and HF's items): the Tripwire and the
 #       Whole Forest lay the Tracker's mark, Feint, Mirror Guard and Spite credit the Reaver's kill, and the
 #       Consecrated Ground reflect judges for the Arbiter — and its layer's own vow silences it.
@@ -84,6 +86,7 @@ const DAMAGE_FUNCS := {
 	"battle.gd::_forest_bite": "BORROWS (HY §1c; no writer of its field since FX)",
 	"battle.gd::_spring_trap": "CALLER — Snare Line's and the Deadfall's ticks set the trap's frame; the snare's spring deals none",
 	"battle.gd::_add_bleed_with_burst": "ACTION",
+	"battle.gd::_umbral_sigil_echo": "BORROWS (II §2) — the sigil's echo is its caster's, inside the striker's swing",
 	"battle.gd::_on_damage_taken": "BORROWS — Frostbind's and Penance's mirrors",
 	"unit.gd::take_hit": "DEALER — One Soul's split of a wound among the bond, under the wound's own frame",
 }
@@ -553,28 +556,72 @@ func _s4_the_other_callbacks() -> void:
 		print("  %-14s %s stands at %d, %s paid %d; the frame is %s" % [arm, victim.unit_name, victim.hp,
 			payer.unit_name, p0 - payer.hp, _frame_str(s3)])
 		await _clear(s3)
-	# BLIGHT THE WELL — a heal on a blighted raider, inside another enemy's mending.
-	var s4: Node = await _board(["warden", "pyromancer", "occultist", "mystic"], {})
-	var occ := _hero(s4, "cleric")
-	var bf := _melee(s4)
-	var mender := _melee(s4, [bf])
-	if [occ, bf, mender].any(func(x): return x == null):
-		ok(false, "§4: the blight's board seats an Occultist and two raiders")
-	else:
-		s4._apply_status(bf, "blight", 3, 0, 0, occ)
+	# BLIGHT THE WELL — a heal on a blighted raider, inside another enemy's mending. **RE-TUNED AT II §2: THE BLIGHT
+	# DEALS UNDER ITS LAYER's FRAME**, read off the status's `src_name`; it stood on the Old Gods' holder, and the card
+	# carries no engine row, so a Cleric who drafted it without that engine dealt it under the victim's own frame and
+	# his vow never reached it. **The arms open with the case the defect lived in** — a vowed Devout (no Old Gods)
+	# who cast the card himself — then the same Devout unvowed, then HY's Occultist with Old Gods, whose reading
+	# did not move. In every arm the mending's frame is back after the bill.
+	for arm in [["vowed, no Old Gods", "inquisitor", true], ["no vow, no Old Gods", "inquisitor", false],
+			["the Occultist, Old Gods", "occultist", false]]:
+		var b_over := {"bm_abilities": ["Blight the Well"], "bm_equipped": ["Blight the Well"]}
+		if bool(arm[2]):
+			b_over["runes"] = [_rune("vow_of_silence")]
+		var s4: Node = await _board(["warden", "pyromancer", String(arm[1]), "mystic"], {2: b_over})
+		var layer := _hero(s4, "cleric")
+		var bf := _melee(s4)
+		var mender := _melee(s4, [bf])
+		var card: Ability = null
+		if layer != null:
+			for a in layer.abilities:
+				if (a as Ability).display_name == "Blight the Well":
+					card = a
+		if [layer, bf, mender, card].any(func(x): return x == null):
+			ok(false, "§4 (%s): the blight's board seats a Cleric holding Blight the Well and two raiders" % arm[0])
+			await _clear(s4)
+			continue
+		ok(layer.has_engine("old_gods") == (String(arm[1]) == "occultist")
+			and (float(layer.rune_vow_of_silence) > 0.0) == bool(arm[2]),
+			"§4 (%s): the premise — Old Gods %s, vow %s" % [arm[0], layer.has_engine("old_gods"), layer.rune_vow_of_silence])
+		await s4._resolve(layer, card, bf, "good")
+		ok(bf.has_status("blight") and String(bf.get_status("blight").get("src_name", "")) == layer.unit_name,
+			"§4 (%s): the card did not lay its blight under %s's name" % [arm[0], layer.unit_name])
 		bf.hp = bf.max_hp - 40
 		s4._dmg_frame(mender, "Cleansing Rite")
 		var b0 := bf.hp
-		var bl0 := float(_dealt(s4, occ).get("Blight the Well", 0.0))
+		var bl0 := float(_dealt(s4, layer).get("Blight the Well", 0.0))
 		bf.heal_amount(20)
 		var fr4 := _frame(s4)
 		ok(fr4[0] == mender and fr4[1] == "Cleansing Rite",
-			"§4: after Blight the Well turned the heal, the frame is %s — the mending's own should be back" % _frame_str(s4))
-		ok(b0 - bf.hp == 20 and int(round(float(_dealt(s4, occ).get("Blight the Well", 0.0)) - bl0)) == 20,
-			"§4: the blighted heal dealt %d and booked the Occultist %d" % [b0 - bf.hp,
-				int(round(float(_dealt(s4, occ).get("Blight the Well", 0.0)) - bl0))])
-		print("  Blight the Well: the heal dealt %d; the frame is %s" % [b0 - bf.hp, _frame_str(s4)])
-	await _clear(s4)
+			"§4 (%s): after Blight the Well turned the heal, the frame is %s — the mending's own should be back" % [arm[0], _frame_str(s4)])
+		var booked := int(round(float(_dealt(s4, layer).get("Blight the Well", 0.0)) - bl0))
+		var want := 0 if bool(arm[2]) else 20
+		ok(b0 - bf.hp == want and booked == want,
+			"§4 (%s): the blighted heal dealt %d and booked %s %d — the layer's frame lands %d" % [arm[0], b0 - bf.hp,
+				layer.unit_name, booked, want])
+		print("  Blight the Well (%s): the heal dealt %d, booked %d to %s; the frame is %s" % [arm[0], b0 - bf.hp, booked,
+			layer.unit_name, _frame_str(s4)])
+		await _clear(s4)
+	# UMBRAL SIGIL — II §2: the echo is its caster's, borrowed inside the striker's swing and put back.
+	var s6: Node = await _board(["warden", "pyromancer", "occultist", "mystic"], {})
+	var w6 := _hero(s6, "warrior")
+	var occ6 := _hero(s6, "cleric")
+	var br6 := _melee(s6)
+	if [w6, occ6, br6].any(func(x): return x == null) or _foes(s6).size() < 2:
+		ok(false, "§4: the sigil's board seats a Warden, an Occultist and a warband of two or more")
+	else:
+		s6._apply_status(br6, "umbral_sigil", 4, 0, 0, occ6)
+		var sg0 := float(_dealt(s6, occ6).get("Umbral Sigil", 0.0))
+		br6.hp = br6.max_hp
+		seed(SEED)
+		await s6._resolve(w6, w6.abilities[0], br6, "good")
+		var fr6 := _frame(s6)
+		var sg := int(round(float(_dealt(s6, occ6).get("Umbral Sigil", 0.0)) - sg0))
+		ok(fr6[0] == w6 and fr6[1] == (w6.abilities[0] as Ability).display_name,
+			"§4: after the sigil echoed, the frame is %s — the Warden's own strike should be back" % _frame_str(s6))
+		ok(sg > 0, "§4: the echo booked %d to the Occultist who laid the sigil — the echo is his" % sg)
+		print("  Umbral Sigil: the echo booked %d to %s; the frame is %s" % [sg, occ6.unit_name, _frame_str(s6)])
+	await _clear(s6)
 	# THE KILLING COLD — it bites at the cast's own line, before the strike; the strike and the Weaver's
 	# repeat must read the cast's frame after it.
 	var s5: Node = await _board(["warden", "cryomancer", "inquisitor", "mystic"],

@@ -16,6 +16,10 @@
 extends Node2D
 
 const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
+# BATCH II §0.6 — the stats, one size up from IH's 15, a row a line (24 px at 17, measured).
+const STAT_FONT := 17
+const STAT_PITCH := 24
+const STAT_TOP := 132
 
 var selected := 0  # party index; always a real hero now
 
@@ -206,8 +210,8 @@ func _draw_detail() -> void:
 		[["Armor: %d%%" % int(round(cfg["armor"] * 100)),
 			"Armor — % of incoming physical damage blocked."],
 		["Resistances", "Resistances — like armor, but per damage type:\n%s\n%s" % [
-			" / ".join(resist_lines.slice(0, 4)), " / ".join(resist_lines.slice(4, 7))]],
-		["Speed: %d" % int(cfg["speed"]),
+			" / ".join(resist_lines.slice(0, 4)), " / ".join(resist_lines.slice(4, 7))]]],
+		[["Speed: %d" % int(cfg["speed"]),
 			"Speed — how quickly turns arrive (100 = average)."],
 		["Constitution: %d" % cfg.get("constitution", 100),
 			"Constitution — Break resistance: incoming Break damage is\nscaled by 100/Constitution (100 = neutral, higher = tougher\nto Break)."]],
@@ -220,17 +224,22 @@ func _draw_detail() -> void:
 	]
 	# Only pure tanks carry a Block stat (the Warden, for now).
 	if cfg.get("block_chance", 0.0) > 0.0:
-		stat_rows[3].append(["Block: %d%%" % int(round(cfg["block_chance"] * 100)),
+		stat_rows[stat_rows.size() - 1].append(["Block: %d%%" % int(round(cfg["block_chance"] * 100)),
 			"Block — chance to fully negate an incoming attack:\nno damage, no Break damage, no effects.\nHeavy Plating adds another +15% in battle, and every\nunblocked hit adds +8% more (cap +40%) until a\nBlock lands and resets the climb."])
+	# BATCH II §0.6 — THE STATS ONE SIZE LARGER (the designer's): the sheet is a stats sheet since IH §3, so
+	# the stats are the biggest thing on it and they take the column the removed blocks freed. At STAT_FONT
+	# the four-stat row ran 484 px from x 60, past the talent board at x 500 (measured), so Armor and
+	# Resistances stand on one row and Speed and Constitution on the next; the widest row is the Warden's
+	# Crit / Parry / Block, 372 px.
 	for r in stat_rows.size():
 		var row := HBoxContainer.new()
-		row.position = Vector2(60, 132 + r * 22)
+		row.position = Vector2(60, STAT_TOP + r * STAT_PITCH)
 		row.add_theme_constant_override("separation", 24)
 		add_child(row)
 		for seg in stat_rows[r]:
 			var stat_label := Label.new()
 			stat_label.text = seg[0]
-			stat_label.add_theme_font_size_override("font_size", 15)
+			stat_label.add_theme_font_size_override("font_size", STAT_FONT)
 			stat_label.add_theme_color_override("font_color", Color(0.88, 0.85, 0.78))
 			stat_label.mouse_filter = Control.MOUSE_FILTER_STOP
 			stat_label.tooltip_text = seg[1]
@@ -258,7 +267,7 @@ func _draw_detail() -> void:
 	passive_label.add_theme_color_override("font_color", Color(0.88, 0.85, 0.78))
 	passive_label.set_meta("passive_block", true)
 	add_child(passive_label)
-	passive_label.position = Vector2(60, 138 + stat_rows.size() * 22)
+	passive_label.position = Vector2(60, STAT_TOP + 6 + stat_rows.size() * STAT_PITCH)
 	passive_label.size = Vector2(400, 0)
 	passive_label.text = "\n".join(passive_lines)  # last — the blurb's reason, above
 

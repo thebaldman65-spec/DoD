@@ -50,6 +50,14 @@ an instruction. Cite the batch that set it in parentheses for provenance, and st
 not measured as a share of anything, and it does not state its own live size: writing that number
 into this file changes it.
 
+**WHAT A BATCH CLOSES HERE MOVES OUT, AS WHAT `docs/state.md` CLOSES DOES (STANDING, SET AT II §4, RULED BY THE DESIGNER).**
+A block whose subject is settled and asserted, a block a later ruling superseded, or a record of a decision nobody will
+reopen moves byte for byte to the reference it belongs in, with its index row, in the batch that closes it — and **a
+supersession is recorded, never deleted** (HY §2's rule for HN §1). **Every batch that writes a standing rule here asks
+whether the block it supersedes can move to a reference.** The unit is a whole block; the reasoning beside a live rule
+stays with it (GY §1, in the ceiling block). A closed block whose subject no reference holds stays here until the designer
+names its place — five of II's first seven did (`docs/reports/II.md` §4).
+
 **A RULING RECORDED BEFORE IT IS BUILT SAYS SO (STANDING, SET AT GC, RULED BY THE DESIGNER).**
 > **`CLAUDE.md` states what the game IS; a decision taken and not yet implemented is marked
 > RULED, NOT BUILT until it is. A batch reads the present tense as a fact.**
@@ -116,10 +124,12 @@ into this file changes it.
 the equality rule travel with their parent. **Eight of the rows are FF §2's**, and they are the
 residue: rules written into this file AFTER the seam was taken, which the seam's own test puts on
 the other side of it. **Every row after those eight was written straight into the reference rather
-than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one and IE's two —
+than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one, IE's two and II's two —
 and GW §2's, written there at GW and given its row only at HX (HV §3e found it missing; `check_hx` §1a now reds on one) —
-and two more are MOVED, FF §2's way: HG–HJ's census and supersession blocks, written back into this file after the seam
-was taken and sent over at HY §4 by the designer's ruling, byte for byte (`check_hx` §1c reds on a new block written here):
+and four more are MOVED, FF §2's way: HG–HJ's census and supersession blocks, written back into this file after the seam
+was taken and sent over at HY §4 by the designer's ruling, and II §4's two, the archive practice's first pass — CP §3's
+literal-digit baseline and EK's inertness claim, each settled and asserted — each byte for byte (`check_hx` §1c reds on a
+new block written here):
 
 | | |
 |---|---|
@@ -178,6 +188,10 @@ was taken and sent over at HY §4 by the designer's ruling, byte for byte (`chec
 | A CENSUS A LATER BATCH WILL BE PRICED AGAINST IS KEPT, NOT JUST COUNTED | ID §0.6 |
 | A BRIEF STATES WHAT A BATCH INTENDS TO TOUCH, NEVER WHAT IT DOES NOT | IE §0.6 |
 | THE LITERAL SWEEP RUNS BEFORE THE PREDICTION, NOT AFTER IT | IE §0.5 |
+| THE LITERAL-DIGIT RULE IS A BASELINE, NOT A GATE | CP §3, moved at II §4 |
+| EK'S INERTNESS CLAIM ENDED AT EZ AND CAME BACK AT FN | EZ / FN, moved at II §4 |
+| A CENSUS OF READERS COVERS WHAT A BATCH MOVES, NOT ONLY WHAT IT DELETES | II §0.7 |
+| PLAYER-FACING TEXT THAT STATES A NUMBER READS IT OFF THE CONSTANT, OR AN INSTRUMENT ASSERTS THE TWO AGREE | II §0.7 |
 
 ## THE COMBAT RULES LIVE IN `docs/combat-rules.md` (STANDING, SET AT GR §2, RULED BY THE DESIGNER)
 > **THIS FILE IS STILL THE ONE A BATCH MUST READ. `docs/combat-rules.md` IS A REFERENCE IT POINTS AT,
@@ -1121,26 +1135,6 @@ becoming `X` says which kind of thing just changed. CN's criterion answered *doe
 still grade?* correctly 113 times; **it never asked what the orphaned bonus should become**, and
 folding was assumed because folding preserves the most. Three of CR's seven cards are that gap:
 Bewitch's free enemy attack, and Flash Freeze and Snare Trap deleting a game-wide immunity rule.
-
-## THE LITERAL-DIGIT RULE IS A BASELINE, NOT A GATE (STANDING, CP §3)
-CL §1's rule is that a parenthetical is COMPUTED and never authored. **Swept at CP over every authored
-field, the corpus held 89 across 979 fields — not the ~200 CP's brief assumed — and CL was RIGHT
-to make it a report**: most are legitimate prose that is not a resolved value (`(max 5)`,
-`(0-100)`, `(2 on a crit)`, `(cap 100)`), so **asserting zero fails against correct text.**
-`test_batch_cp` pins the **ability-level offenders EXACTLY** (the surface CL's rule was
-about, and the one CK taught the draft card to render) and the corpus count as a **CEILING**. A new
-authored digit trips either way. CP recorded its fourteen as OWED rather than rewritten, because
-rewriting shipped player-facing text is authoring; CQ §5 rewrote thirteen of them, and the named set
-now is DW §2's.
-**AND THE PERFECT RULE IS NOT A BICONDITIONAL.** CN's enforceable direction — runs no check ⇒ no
-Perfect — holds at **ZERO violations**. The converse fails for a NAMED set (`CHECK_WITHOUT_PERFECT`) whose
-bars still multiply damage. CP found five (Called Shot, Coup de Grâce, Pinning Shot, Powershot,
-Rampage), and **git showed all five had had an empty `perfect_text` since long before CN** — an
-authoring pattern, not a regression. The set is NAMED so a new one trips.
-**CK's MISSING WIDTH MEASUREMENT (`check_ck_width.gd`): 195 abilities, 725 block lines, mean 3.72
-a card (the brief's "five" is 3.72), and 8 lines (1.1%) exceed the 258px card — worst +94px
-(Feint's Perfect).** So the block costs the column its LINE COUNT, which CK already measured; it is
-NOT a wrapping problem.
 
 ## A PASSIVE PAID IN DAMAGE TAKEN INVERTS AGAINST EVERY BATCH THAT HELPS THE PARTY (STANDING, CZ §1)
 > **A passive paid in what the party is trying to prevent needs a SECOND TERM the hero controls.
@@ -2233,12 +2227,16 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   not copied (`Run.ability_hover`, read off `Run.hero_live_config` — the sheet's own prologue, moved — IH §5); the tag
   census → the Kit panel's; the rune block → the Runes panel; a worn core rune's rule that is not his lineage's own → the
   Runes panel's CORE row (`Runes.shown_desc`, GS §3's door).
+- **THE STATS ARE THE BIGGEST THING ON IT (II §0.6, the designer's)** — one size up from the body text, a row a line
+  (`party_screen.STAT_FONT`, `STAT_PITCH`), in the column the removed blocks freed; a row too wide for the column splits
+  rather than reaching the talent board. **The talent board is not widened**: it is locked for the run and read as
+  reference, so room spent on it is spent on the one thing the sheet does not do.
 - **THE PASSIVE BLOCK IS THE CLASS PASSIVE AND THE LINEAGE's OWN ENGINE** (`Classes.engine_of_spec(spec)`) while its core
   rune is slotted, with no scroller. A hero awakened on his class's spine or a rule engine has no lineage, so his block
   is his class passive alone.
 - **THE CARD COUNTS, THE PANEL NAMES.** `Runes n/6` beside `Kit n/m` — his slotted core runes and his worn runes, of
   both slot counts. Its doors: the button, always; the ✦ marker, while something waits; each rune slot. A core rune that
-  sits out marks the button — ○, amber, GX's sentence on its hover (HC §5's tell). The button carries `runes_button`, so a
+  sits out marks the button — ○, amber, GX's sentence on its hover (HC §5's tell; confirmed at II §0.4). The button carries `runes_button`, so a
   sweep of rune slots leaves it out (`check_gx` §3); `check_ih` §2–§5 drive the card, the sheet, the doors and the hover.
 
 ## STANDING RULE — NOTHING ON A PLATE OR A CARD IS DRAWN OVER ANYTHING ELSE ON IT (Batch IH §0, the designer's)
@@ -2259,12 +2257,18 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   give it its text**. A control a Container lays out is laid out by its minimum size and escapes all three.
 - **THE PLATE, MEASURED (IH §6).** Open Sans SemiBold's line is 12 px at font 8, 13 at 9 and 16 at 11; Pirata One 11's is
   16. A plate is `BattleUnit.PLATE_W` wide, its portrait a 34-px column, each bar a font-8 value's line tall; a value too
-  wide for its bar takes the next size down inside it; a chip is as wide as its tag, and the row stops short of the rune
-  chips with a last `+N` chip whose hover names the rest. The heroes' stack is pitched to its tallest plate; the
+  wide for its bar takes the next size down inside it, **AND THAT SIZE IS THE FLOOR (II §0.5, the designer's)**: a value
+  still wider at `BattleUnit.PLATE_VALUE_FLOOR` drops its parenthetical, the count standing, and its hover carries the
+  whole line — never a font nobody can read. A chip is as wide as its tag, and the row stops short of the rune chips with
+  a last `+N` chip whose hover names EVERY ONE of the rest, whole (II §0.5; `check_ii` §0.5 drives both). The heroes' stack is pitched to its tallest plate; the
   warband's is laid by each plate's own height.
 - **THE WARRIOR's PORTRAIT WAS THE ART AND THE LAYOUT BOTH (IH §6b).** The Berserker's bust and the Pyromancer's frame are
   illustrations beside ten lineages that share the Soldier sheet's small figure; the column holds any of them now, and
-  which art a lineage wears is the designer's question.
+  which art a lineage wears is the designer's question. **ANSWERED AT II §0.3 (the designer's): ONE KIND OF FACE.** Every
+  lineage wears its class sheet's shared crop on the plates, the turn strip and the cards (`Classes.class_icon`,
+  `BattleUnit.portrait`) — at 44 px and 34 a bust reads as a face and the shared figure as a small man, a mismatch of
+  kind. The two illustrations are KEPT, drawn nowhere as a face, for a surface that shows a portrait at size (none does
+  today); busts for all twelve are the other path, and a commission.
 
 ## STANDING RULE — A CARD OR A RUNE THAT CANNOT PAY WITHOUT ITS ENGINE SITS OUT WHILE THE ENGINE IS GONE (Batch GT §3 for a card, GX §1 for a rune, ruled by the designer)
 > **An earned card the usability door refuses on every board without its engine is left out of every fight while
@@ -3770,24 +3774,6 @@ removal would have destroyed the one thing the word is on the card for.
     `check_fe` §1b asserts the inertness in both directions — the table populated, the condition
     census at zero — so the day a condition reads `RUNE_TAGS` the gate says so.
 
-## STANDING RULE — EK'S INERTNESS CLAIM ENDED AT EZ AND CAME BACK AT FN (Batch EZ, deliberately; Batch FN, by ruling)
-
-> **`check_ek` §3's claim was "nothing reads a tag for anything but DISPLAY". That ended at EZ, on
-> purpose — it did not decay, it was spent. FN retired both rune conditions and it is TRUE AGAIN,
-> for a different reason: not that nothing has been built, but that what was built was ruled out.**
-
-- **THE GATE GREW A THIRD CATEGORY RATHER THAN LOSING A CLAIM, AND THE CATEGORY IS KEPT AT ZERO.**
-  `TAG_DEFINERS` is still the four files that define or display the tables; `TAG_CHECKERS` is the
-  gates; and **`TAG_CONSUMERS` is a file that reaches the machinery through the one door without
-  holding any of it.** `talents.gd` was its only member, asserted to name **EXACTLY the door** and
-  no other word of the surface and no tag WORD at all — a tighter bound than "none", not a looser
-  one. **FN removed the door, so that file names nothing again and moves back into
-  `NO_TAG_FILES`**, which is tighter still. **The empty category stays**: the day a rune asks a
-  loadout question, the file that asks is listed there rather than the list being invented again.
-- **`battle.gd` STILL HOLDS ZERO AND THAT IS THE ONE THAT MATTERS.** It is what says ES §4's "read
-  at the SPAWN, never in the strike loop" is still obeyed. A per-hit recount would be 84 multiplier
-  terms' worth of work for a number that cannot move.
-
 ## STANDING RULE — THE COMPANION'S BLOW READS ELEVEN TERMS, NOT EIGHTY-FOUR, AND THE RULING SAID "EVERYTHING" (Batch EZ §4 — a DIVERGENCE, recorded)
 
 > **The ruling on the Shared Hide was "the companion inherits EVERYTHING — the full hero
@@ -4456,8 +4442,12 @@ fact that they are.
     count rules forbid. The owed line is what he is owed as one sentence, then *Decide, then confirm.*; the counter counts
     to four in words with no parenthesis — **four is its ceiling, one choice a kind** — and the Confirm says the title's noun.
 - **◆ MEANS A DECISION WAITS. ↑ NAMES AN UPGRADE. ✦ NAMES A RUNE (IE §0.1, the designer's; ◆ from IC §0.4, ↑ from ID §0.1).
-  Three glyphs, three meanings, and nothing else uses them; a holding and a pick never share a glyph** — a mark exists so
-  the player sees at a glance whether he owes something.
+  ○ — A THING YOU WEAR IS PAYING NOTHING — IS THE FOURTH (II §0.4, the designer's). Four glyphs, four meanings (three until
+  II), and nothing else uses them; a holding and a pick never share a glyph** — a mark exists so the player sees at a
+  glance whether he owes something. **○ stands on the way in to the thing that wants attention, as ◆ does on a card**: the
+  map card's Runes button for a slotted core rune that sits out (HC §5's tell, there since IH §2) and a rune slot whose worn
+  rune sits out (GX §1's marker, older than the glyph rules); `check_id` §3a holds every ○ to those two and no line to two
+  of the four.
   **↑ NAMES AN UPGRADE, WHEREVER ONE APPEARS (ID §0.1, the designer's)** — the map card's corner (↑N, IC §3), an upgraded
   ability's battle button and its row on the Kit panel (the hero sheet's chip until IH §3; IH §5 moved the chip's hover
   and its ↑ there), and the Blacksmith's offer, which is not a holding: one glyph for the thing, learned once. **Built at

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-10-14 (Batch IH &mdash; the card, the sheet, and every plate that overlaps itself)</b></p>
+<p align="right"><b>Last updated: 2026-10-14 (Batch II &mdash; the family's remainder, one kind of face, and the stats sheet)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1125,7 +1125,7 @@ spec by spec. <b>Own art in-game so far</b> (specs listed in battle.gd's SPEC_AR
 always shown untinted in original colors): the <b>Pyromancer</b> — a hooded torch-bearer at
 the OFFICIAL template size (236px frames, 1:1 scale; static east-facing pose until his
 animations exist) — and the <b>Berserker</b> — a fur-cloaked axeman with idle / walk /
-attack animations and his own portrait, at the legacy 124px @1.25× size until re-generated
+attack animations and a bust portrait (kept in the repo; no screen draws it), at the legacy 124px @1.25× size until re-generated
 at the template (his hurt, death, and extra attack clips are also pending; the game falls
 back gracefully meanwhile). The Pyromancer's density is the template standard for all
 character art (see §12).</p>
@@ -1521,7 +1521,8 @@ Kit panel &mdash; and hovering either ends with a line naming the upgrades ("Hon
 only: the magnitudes are already in the numbers above, which reflect the upgrade. Outside a
 fight, each map hero card carries an <b>&#8593;N</b> count in its top corner whose hover
 lists them one per line, and the Blacksmith's counter marks each upgrade it sells with the same <b>&#8593;</b>.
-The <b>&#9670;</b> marks only a pick still to make, and nothing else in the game draws it. A run awards three
+The <b>&#9670;</b> marks only a pick still to make, and nothing else in the game draws it; <b>&#9675;</b> marks only
+a thing a hero wears that is paying nothing &mdash; on his card's Runes button and on a rune slot. A run awards three
 upgrades to every hero, twelve across the four, and before these surfaces existed all twelve were discoverable
 only by hovering ability buttons mid-fight.</p>
 <p><b>The SPEC pool</b> holds what only that spec can earn, among them its own vaulted ones. The
@@ -2921,7 +2922,8 @@ Consecration holds, every enemy takes holy damage equal to 5% of his maximum hea
 resistance; <b>Eleventh Hour</b> (Ministration) &mdash; twice the heal on an ally below a quarter health;
 <b>Vow of Silence</b> (passive, a tradeoff) &mdash; his heals are 50% stronger, Consecration's included, and no
 damage he deals lands, though his Break damage does: a blow of his floats SILENT with no figure, and nothing that
-pays off damage dealt is paid off it. <b>Mage:</b> <b>Unravel</b> (Magic Burst) &mdash; its
+pays off damage dealt is paid off it &mdash; the ticks of a status he laid, the heal his Blight the Well turns, a
+bleedout his blow bursts and the echo of an Umbral Sigil he laid each name the vow and print no figure. <b>Mage:</b> <b>Unravel</b> (Magic Burst) &mdash; its
 Elemental Weakness lands on every enemy; <b>Seeking Missiles</b> (Magic Missiles) &mdash; one more missile
 for each enemy under Elemental Weakness, each flying at the enemy it was counted for, after the volley's
 own three; <b>Detonating Ward</b> (Nexus Ward) &mdash; when the ward breaks or its time runs out, it deals
@@ -3430,12 +3432,13 @@ small <b>– / Log</b> button to hide or restore it); action bar bottom-center o
 hero's turn. <b>Each side is grouped tight</b> (heroes ~x350–430, enemies ~x905–990) and
 every unit's readouts live on a <b>172px nameplate</b> in a stack behind its side —
 heroes' plates along the LEFT edge, enemies' along the RIGHT, each stack spaced so no plate reaches the next. A plate holds a
-<b>portrait</b> in a column of its own (dedicated art if the unit has it — the Berserker does — else a sprite
-close-up), the unit's name, HP bar, resource bar(s), Break meter with numeric x/100
+<b>portrait</b> in a column of its own (for every hero the close-up of his class sheet's figure, whatever
+his battle art, so every hero wears one kind of face; an enemy's from its own sprite), the unit's name, HP bar, resource bar(s), Break meter with numeric x/100
 readout, and its status chips (hover for tooltips; Bleed buildup is a chip). <b>Nothing on a plate is drawn
 over anything else on it</b>: every figure sits inside its own bar, whole, and a figure too wide for its bar
-is set a size smaller inside it; each chip is as wide as its letters, and a row with more chips than room ends
-in a <b>+N</b> chip whose hover names the rest. <b>A rune whose
+is set a size smaller inside it &mdash; one size, no further: a figure still too wide at that size (a deep
+Resonance) shows its count alone and carries the whole line on its hover; each chip is as wide as its letters,
+and a row with more chips than room ends in a <b>+N</b> chip whose hover names every one of the rest. <b>A rune whose
 payout turns on and off has a rune chip</b> at the right end of the same row &mdash; an outlined chip
 with the rune mark &#10022;, bright while it pays and dim while it waits on its condition; hover it for
 which, and for what it pays, every figure read off the rune itself. <b>The Crest's rune is one chip on
@@ -3543,7 +3546,7 @@ dedicated impact clips.</li>
 the map's four cards are the hero list): a row of four buttons flips between heroes without
 returning to the map. <b>Awakened heroes are titled by their SPEC name</b> ("Berserker", not "Warrior"); the class name only shows while
 unawakened, or when the rune taken at class selection carried no spec — the same rule applies to battle nameplates, the initiative bar, and the combat
-log. Detail page per hero: stats — <b>each stat is its own hover tooltip explaining just
+log. Detail page per hero: stats — <b>the largest text on the page, a row a line</b>, and <b>each stat is its own hover tooltip explaining just
 that stat</b> (talent points are NOT listed here; the count sits above the talent tree;
 pure tanks additionally show their <b>Block %</b>; the <b>Attack</b> row explains node
 scaling and hovering <b>Resistances</b> lists all seven schools, physical included).
@@ -3652,7 +3655,8 @@ reads distinctly from "Wiped", in its own colour, and carries the <b>reason</b> 
 picked), the final battle (type, theme, and lineup &mdash; a lineup that is only the creature its theme
 names, which is the end boss, is named once: "The END BOSS &mdash; The Hollow Crown.") and which heroes fell,
 the heroes as they stood (per hero: spec, talent count with its <b>tier spread</b>, runes
-equipped, abilities earned), <b>damage share per hero across the whole run</b>, the three
+equipped, abilities earned), <b>damage share per hero across the whole run</b> (a status's ticks count for the
+hero who laid it, a sigil's echo for its caster), the three
 breakdowns below, the run economy
 (battles won, elites and mini-bosses taken, gold earned / spent / unspent, events seen,
 relics carried), and a chronicle line — cycles survived, cycles lost, and cycles abandoned once
@@ -3867,7 +3871,8 @@ flowing. The battle scene also runs standalone
 frame_size config — the Berserker sheet is 124×124, the Pyromancer 236×236). Partial sheets
 are fine: missing Attack02/03 replay Attack01, missing Hurt/Death hold the idle frame, and a
 single-frame Idle (the Pyromancer today) simply stands. Dedicated portraits are
-Name_Portrait.png (used on the nameplate, initiative bar, and hero list). New assets arrive
+Name_Portrait.png, kept for a screen that shows a portrait at size; the nameplate, the initiative bar and the map
+card show every hero the close-up of his class sheet's figure. New assets arrive
 in "imported files/" (animated GIFs get converted to strips; 8-direction rotation GIFs — the
 east-facing frame is extracted).</li>
 <li><b>Resolution template:</b> all character art matches the Pyromancer — a standing

@@ -751,8 +751,8 @@ func _draw_hero_card_parts(idx: int, at: Vector2) -> void:
 	portrait.custom_minimum_size = Vector2(44, 44)
 	portrait.size = Vector2(44, 44)
 	portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if not Classes.SPEC_PORTRAITS.has(spec):
-		portrait.modulate = Classes.HERO_TINTS[idx % Classes.HERO_TINTS.size()]
+	# BATCH II §0.3 — the shared crop, tinted by seat, for every lineage (the Berserker's bust is kept and drawn nowhere).
+	portrait.modulate = Classes.HERO_TINTS[idx % Classes.HERO_TINTS.size()]
 	add_child(portrait)
 
 	var name_lbl := Label.new()

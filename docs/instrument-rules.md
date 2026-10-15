@@ -1902,3 +1902,64 @@ a detail to note — it is the ruling being wrong.
   whatever lines it quotes.
 - **THE PREDICTION CARRIES THE SWEEP's OUTPUT**: each LOST needle with its owner, each GAINED one a negative assertion could
   read, each short flip — beside the gates the function census found, so a red the sweep listed is never a surprise.
+
+## THE LITERAL-DIGIT RULE IS A BASELINE, NOT A GATE (STANDING, CP §3)
+CL §1's rule is that a parenthetical is COMPUTED and never authored. **Swept at CP over every authored
+field, the corpus held 89 across 979 fields — not the ~200 CP's brief assumed — and CL was RIGHT
+to make it a report**: most are legitimate prose that is not a resolved value (`(max 5)`,
+`(0-100)`, `(2 on a crit)`, `(cap 100)`), so **asserting zero fails against correct text.**
+`test_batch_cp` pins the **ability-level offenders EXACTLY** (the surface CL's rule was
+about, and the one CK taught the draft card to render) and the corpus count as a **CEILING**. A new
+authored digit trips either way. CP recorded its fourteen as OWED rather than rewritten, because
+rewriting shipped player-facing text is authoring; CQ §5 rewrote thirteen of them, and the named set
+now is DW §2's.
+**AND THE PERFECT RULE IS NOT A BICONDITIONAL.** CN's enforceable direction — runs no check ⇒ no
+Perfect — holds at **ZERO violations**. The converse fails for a NAMED set (`CHECK_WITHOUT_PERFECT`) whose
+bars still multiply damage. CP found five (Called Shot, Coup de Grâce, Pinning Shot, Powershot,
+Rampage), and **git showed all five had had an empty `perfect_text` since long before CN** — an
+authoring pattern, not a regression. The set is NAMED so a new one trips.
+**CK's MISSING WIDTH MEASUREMENT (`check_ck_width.gd`): 195 abilities, 725 block lines, mean 3.72
+a card (the brief's "five" is 3.72), and 8 lines (1.1%) exceed the 258px card — worst +94px
+(Feint's Perfect).** So the block costs the column its LINE COUNT, which CK already measured; it is
+NOT a wrapping problem.
+
+## STANDING RULE — EK'S INERTNESS CLAIM ENDED AT EZ AND CAME BACK AT FN (Batch EZ, deliberately; Batch FN, by ruling)
+
+> **`check_ek` §3's claim was "nothing reads a tag for anything but DISPLAY". That ended at EZ, on
+> purpose — it did not decay, it was spent. FN retired both rune conditions and it is TRUE AGAIN,
+> for a different reason: not that nothing has been built, but that what was built was ruled out.**
+
+- **THE GATE GREW A THIRD CATEGORY RATHER THAN LOSING A CLAIM, AND THE CATEGORY IS KEPT AT ZERO.**
+  `TAG_DEFINERS` is still the four files that define or display the tables; `TAG_CHECKERS` is the
+  gates; and **`TAG_CONSUMERS` is a file that reaches the machinery through the one door without
+  holding any of it.** `talents.gd` was its only member, asserted to name **EXACTLY the door** and
+  no other word of the surface and no tag WORD at all — a tighter bound than "none", not a looser
+  one. **FN removed the door, so that file names nothing again and moves back into
+  `NO_TAG_FILES`**, which is tighter still. **The empty category stays**: the day a rune asks a
+  loadout question, the file that asks is listed there rather than the list being invented again.
+- **`battle.gd` STILL HOLDS ZERO AND THAT IS THE ONE THAT MATTERS.** It is what says ES §4's "read
+  at the SPAWN, never in the strike loop" is still obeyed. A per-hit recount would be 84 multiplier
+  terms' worth of work for a number that cannot move.
+
+## STANDING RULE — A CENSUS OF READERS COVERS WHAT A BATCH MOVES, NOT ONLY WHAT IT DELETES (Batch II §0.7, ruled by the designer)
+> **A function, a block or a line a batch moves keeps every reader the old place had, and they break the way a deletion's
+> do.** A census of a change's readers walks the needles of what moved — code and prose alike — beside what was deleted,
+> before the prediction is written.
+
+- **THE CASE: IH's CENSUS READ 47 ARMS IN 14 FILES AND MISSED FOUR**, and all four read the hero sheet's prologue — sixty
+  lines IH moved into `Run.hero_live_config` rather than removed. The census filed them as readers of kept code; `check_hl`
+  found them by going red, and one of them, an absence pin, would have passed with nothing to read.
+- **A BLOCK MOVED BETWEEN RULE FILES IS THE SAME SHAPE.** Every needle in it is a pin in the manifest and a literal in some
+  gate: the literal sweep runs over each document the move touches, and the prediction names `check_ed` and `check_hx`
+  before either moves.
+
+## STANDING RULE — PLAYER-FACING TEXT THAT STATES A NUMBER READS IT OFF THE CONSTANT, OR AN INSTRUMENT ASSERTS THE TWO AGREE (Batch II §0.7, ruled by the designer)
+> **A number the player reads — on a card, a rune, a chip, a rule line, a sheet, a tooltip — is formatted from the constant
+> the fight uses, or a gate asserts that the text and the constant agree.** HZ §1d ruled it for chips (the magnitude off the
+> payload); this is the same rule on every surface, and it is how `CLAUDE.md`'s HO §0 block is verified.
+
+- **SIX OF ONE SHAPE.** IH found the fifth and the sixth by hand and fixed both to read their constants: Sanctity's rule
+  text said 16 after IG set the step to 13, and the Swordmaster's Stances line said +15% where the fight pays 30%
+  (`check_ih` §0d and §3 hold each).
+- **THE SWEEP FOR THE REST IS OWED A BATCH OF ITS OWN, IJ's — RULED, NOT BUILT.** Until it runs, a batch that writes a
+  number into player-facing text formats it from the constant in the same change.

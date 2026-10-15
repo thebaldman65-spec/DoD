@@ -1232,9 +1232,10 @@ const PLATE_FLOOR := 712.0      # no plate's foot passes this
 # The Pyromancer is a SIZE TEST: native 236px frame at 1:1 — intentionally
 # larger than the Berserker template so the two can be compared in-game.
 const SPEC_ART := {
+	# BATCH II §0.3 — no `portrait_path`: a hero's face is his class's shared crop (`unit.portrait`); the
+	# bust is kept in `Classes.SPEC_PORTRAITS` and drawn nowhere.
 	"berserker": {"sheet_dir": "res://assets/sprites/berserker", "frame_size": 124,
 		"sprite_scale": 1.25,
-		"portrait_path": "res://assets/sprites/berserker/Berserker_Portrait.png",
 		"walks_to_target": true},
 	"pyromancer": {"sheet_dir": "res://assets/sprites/pyromancer", "frame_size": 236,
 		"sprite_scale": 1.0},
@@ -3074,24 +3075,6 @@ func _dot_pass(u: BattleUnit) -> void:
 				if fire_resist != 0.0:
 					dot_dmg = maxi(int(round(dot_dmg * (1.0 - fire_resist))), 0)
 					stack_tag += " (resisted)" if fire_resist > 0.0 else " (WEAK!)"
-			# Bookkeeping: tick damage credits the spec that owns the
-			# lane (heroes never poison/burn each other, so the status
-			# names its owner: poison = Survivalist, burn = Pyromancer).
-			#
-			# BATCH BL §2 DROPPED THE `sim and` GUARD THAT USED TO OPEN THIS
-			# BRANCH, and it was a real hole rather than a tidy-up: in REAL
-			# PLAY a Pyromancer's Burn and a Survivalist's Poison reached
-			# neither the run summary's damage share nor anything else, so
-			# two specs whose whole lane is damage-over-time read as doing
-			# less than they did. Sim totals are untouched — that path
-			# already counted these ticks — so no baseline moves.
-			if not u.is_hero and dot_dmg > 0:
-				var dot_owner := "Survivalist" if dot_id == "poison" else "Pyromancer"
-				for dh in heroes:
-					if dh.unit_name == dot_owner:
-						_dmg_frame(dh, String(STATUS_INFO[dot_id][0]))
-						_stat("dmg_hero_" + dot_owner, dot_dmg)
-						break
 			var info: Array = STATUS_INFO[dot_id]
 			# BATCH BL §2 — a status tick is attributed to WHOEVER APPLIED
 			# IT, which `_apply_status` already stamps on the status as
@@ -3099,6 +3082,21 @@ func _dot_pass(u: BattleUnit) -> void:
 			# its Ashblade), so the name is carried rather than the unit.
 			var dot_src := String(u.get_status(dot_id).get("src_name", ""))
 			_dmg_frame(null, String(info[0]), dot_src)
+			# BATCH II §1 — WHAT THE TICK LANDS, asked under its layer's frame before its door (IC §2's
+			# `_landed`): the line and the credit print and book this, so neither can disagree with the door.
+			var dot_land := _landed(u, dot_dmg)
+			# BATCH II §3 — THE TICK IS CREDITED TO ITS LAYER, read off the frame above, never by a
+			# lineage's name. BL §2's line stood here: it booked a Burn to the hero NAMED *Pyromancer* and
+			# a Poison to the one named *Survivalist* — sim bookkeeping from when only those two laid
+			# either, given to real play when BL §2 dropped its `sim and` guard so the run summary's
+			# damage share counted the ticks — whoever laid the status. The name was used for credit and
+			# nothing else (the frame it set was replaced before the door), so a Cleric's re-laid Burn
+			# booked to the Mage, and a Mage on his class's spine (named *Mage*) booked his to nobody.
+			# The label is the status's, as it was, so the recap's rows read as before.
+			if not u.is_hero and dot_dmg > 0:
+				var dot_by := _layer_credit_name(dot_src)
+				if dot_by != "":
+					_stat("dmg_hero_" + dot_by, dot_land)
 			_sfx("hit", -14.0, 0.8)
 			# READ BEFORE THE TICK LANDS, and Ashen Skin below is why: a tick
 			# that KILLS its victim takes the status with the body, so a read
@@ -3109,9 +3107,18 @@ func _dot_pass(u: BattleUnit) -> void:
 			# the composition with the body.
 			var dot_comp: Dictionary = u.composition_of(dot_id)
 			var dot_died: bool = u.take_tick_damage(dot_dmg, "-%d %s" % [dot_dmg, info[0]], info[2])
+			# A tick its layer's vow refuses names the vow and no figure (IC §1c's wording): nothing was
+			# rolled down to zero, so *0 damage* would be a second lie.
+			var dot_silenced := dot_dmg > 0 and dot_land == 0
 			if dot_comp.is_empty():
-				_log("%s takes %d %s damage%s" % [u.unit_name, dot_dmg, info[0],
-					stack_tag], "#e08850")
+				if dot_silenced:
+					_log("%s's %s tick — silenced by %s" % [u.unit_name, info[0], _vow_name()], "#e08850")
+				else:
+					_log("%s takes %d %s damage%s" % [u.unit_name, dot_dmg, info[0],
+						stack_tag], "#e08850")
+			elif dot_silenced:
+				_log("%s's %s ticks — the %s: silenced by %s" % [u.unit_name,
+					String(dot_comp.label), info[0], _vow_name()], "#e08850")
 			else:
 				_log("%s's %s ticks — the %s: %d damage%s" % [u.unit_name,
 					String(dot_comp.label), info[0], dot_dmg, stack_tag], "#e08850")
@@ -12193,24 +12200,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# VAULTED — Echo passive (kept for future return):
 			# if attacker.passive_id == "echo" and not result.died and randf() < 0.20:
 			#     echo_dmg = max(int(final * 0.25), 1); strike again + "ECHO!" fanfare.
-			# Umbral Sigil: the branded foe's pain echoes through its warband.
-			if not strike_target.is_hero and final > 0 \
-					and strike_target.has_status("umbral_sigil"):
-				var echo := maxi(int(round(final * 0.5)), 1)
-				var echoed := false
-				for fellow in enemies:
-					if fellow.dead or fellow == strike_target:
-						continue
-					echoed = true
-					var echo_result: Dictionary = fellow.take_hit(echo, 0)
-					fellow.float_text("-%d Sigil" % echo, Color(0.65, 0.35, 0.80))
-					if echo_result.died:
-						_stat("enemy_deaths")
-						_sfx("death", -4.0)
-						_message("%s falls!" % fellow.unit_name)
-						_log("† %s dies" % fellow.unit_name, "#e05050")
-				if echoed:
-					_log("   → Umbral Sigil echoes %d to the warband" % echo, "#b070d0")
+			# Umbral Sigil: the branded foe's pain echoes through its warband — half of what landed.
+			_umbral_sigil_echo(strike_target, final)
 			# Temporal Rift (talent): the crit tears a seam — an echo lashes out.
 			# BATCH AT MADE IT CERTAIN, not a roll: temporal_ranks is the echo's
 			# PERCENTAGE of the crit now, and the chance clause is gone. A coin
@@ -15597,6 +15588,51 @@ func _crossfire_splash(attacker: BattleUnit, struck: BattleUnit,
 # STRUCK, deliberately: the card reads "every damaging HIT you land anywhere",
 # and carving out the obvious case would make focusing the mark worse than
 # hitting anything else — the exact opposite of the only reason he has to focus.
+# BATCH II §2 — UMBRAL SIGIL's ECHO IS ITS CASTER's, NOT THE STRIKER's. The brand is a status the
+# Occultist laid, and a laid status's damage is its layer's (DI's rule; HY §1c, IC §0.3): the echo
+# deals under the sigil's `src_name`, borrowed inside the striker's swing and put back, so every
+# reader of the frame reads the caster — his Vow of Silence silences it, and a Reaver's kill credit,
+# a Mage's Siphon, a penanced striker's mirror and the Weaver's tally no longer collect on a wound
+# the Occultist dealt. **The echo is HALF OF WHAT LANDED** on the branded body (`landed`, the strike's
+# zeroed figure since IC §1b), so a blow the striker's own vow refused echoes nothing. It is booked to
+# the caster as the frame names him: the frame and the ledger agree (HZ: a bomb names nobody in
+# either), where the echo booked to nobody until II.
+func _umbral_sigil_echo(branded: BattleUnit, landed: int) -> void:
+	if branded.is_hero or landed <= 0 or not branded.has_status("umbral_sigil"):
+		return
+	var echo := maxi(int(round(landed * 0.5)), 1)
+	var sg_by := String(branded.get_status("umbral_sigil").get("src_name", ""))
+	var sg_was_src := _dmg_src
+	var sg_was_label := _dmg_label
+	var sg_was_name := _dmg_src_name
+	_dmg_frame(_hero_named(sg_by), "Umbral Sigil", sg_by)
+	var sg_credit := _layer_credit_name(sg_by)
+	var echoed := false
+	var sg_landed := false
+	for fellow in enemies:
+		if fellow.dead or fellow == branded:
+			continue
+		echoed = true
+		var sg_land := _landed(fellow, echo)
+		if sg_credit != "":
+			_stat("dmg_hero_" + sg_credit, sg_land)
+		var echo_result: Dictionary = fellow.take_hit(echo, 0)
+		if sg_land > 0:
+			sg_landed = true
+			fellow.float_text("-%d Sigil" % echo, Color(0.65, 0.35, 0.80))
+		if echo_result.died:
+			_stat("enemy_deaths")
+			_sfx("death", -4.0)
+			_message("%s falls!" % fellow.unit_name)
+			_log("† %s dies" % fellow.unit_name, "#e05050")
+	if echoed:
+		if sg_landed:
+			_log("   → Umbral Sigil echoes %d to the warband" % echo, "#b070d0")
+		else:
+			_log("   → Umbral Sigil echoes to the warband — silenced by %s" % _vow_name(), "#b070d0")
+	_dmg_frame(sg_was_src, sg_was_label, sg_was_name)
+
+
 func _arcane_echo_repeat(attacker: BattleUnit, ab: Ability, final: int) -> void:
 	if _echoing or not attacker.is_hero or attacker.is_companion or final <= 0:
 		return
@@ -17361,18 +17397,28 @@ func _grant_free_action(u: BattleUnit, label: String, why: String) -> void:
 func _on_blight_heal(victim: BattleUnit, amount: int) -> void:
 	if amount <= 0 or victim.dead:
 		return
-	var occ := _living_occultist()
+	# BATCH II §2 — IT DEALS UNDER ITS LAYER's FRAME (DI's rule: a laid status's damage is its
+	# layer's), read off the `src_name` the blight carries. It stood on the Old Gods' holder until
+	# II, and the card carries no engine row, so a Cleric who drafted it without that engine dealt
+	# it under the victim's own frame — and his Vow of Silence never reached it.
+	var bw_by := String(victim.get_status("blight").get("src_name", ""))
 	# BATCH HY §1a — borrowed for the bill and put back: the heal it turns is
 	# usually another unit's action (a mender's rite), whose frame resumes after.
 	var bw_was_src := _dmg_src
 	var bw_was_label := _dmg_label
 	var bw_was_name := _dmg_src_name
-	_dmg_frame(occ if occ != null else victim, "Blight the Well",
-		occ.unit_name if occ != null else "")
-	_log("   → Blight the Well: the mending turns on %s for %d" % [
-		victim.unit_name, amount], "#a050b0")
-	if occ != null:
-		_stat("dmg_hero_" + occ.unit_name, amount)
+	_dmg_frame(_hero_named(bw_by), "Blight the Well", bw_by)
+	# BATCH II §1 — what the turned heal lands, asked before its door: the line and the credit read it.
+	var bw_land := _landed(victim, amount)
+	if bw_land > 0:
+		_log("   → Blight the Well: the mending turns on %s for %d" % [
+			victim.unit_name, amount], "#a050b0")
+	else:
+		_log("   → Blight the Well: the mending turns on %s — silenced by %s" % [
+			victim.unit_name, _vow_name()], "#a050b0")
+	var bw_credit := _layer_credit_name(bw_by)
+	if bw_credit != "":
+		_stat("dmg_hero_" + bw_credit, bw_land)
 	if victim.take_tick_damage(amount, "-%d" % amount, Color(0.7, 0.3, 0.6)):
 		if not victim.is_hero:
 			_stat("enemy_deaths")
@@ -26753,8 +26799,13 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int,
 		# the card). A bleedout that kills its bearer clears the body inside `take_hit`, so a read after
 		# it found no mark and *every time it bleeds out* skipped the one the Berserker most wants paid.
 		var debt_mark: Dictionary = victim.get_status("blood_debt").duplicate()
+		# BATCH II §1 — WHAT THE BURST LANDS, asked under the frame standing at its door (the strike's that
+		# filled the meter — under the Bloodletting bargain a vowed Cleric's own): its float and its line
+		# read it. A burst the vow refuses floats the door's SILENT alone and names the vow, not a figure.
+		var bleed_land := _landed(victim, bleed_dmg)
 		var bleed_result: Dictionary = victim.take_hit(bleed_dmg, 0)
-		victim.float_text("BLEEDOUT %d" % bleed_dmg, Color(0.9, 0.15, 0.2), true)
+		if bleed_land > 0:
+			victim.float_text("BLEEDOUT %d" % bleed_dmg, Color(0.9, 0.15, 0.2), true)
 		if not victim.is_hero:
 			# The battle's bleedout tally — every hero carries the counter
 			# (Scent of Blood reads it attacker-side).
@@ -26851,7 +26902,10 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int,
 						10 * sc_h.scent_ranks * sc_h.bleedouts_this_battle,
 						sc_h.bleedouts_this_battle], "#b0a8e0")
 		_sfx("crit", -5.0, 0.8)
-		_log("   → %s BLEEDS OUT for %d" % [victim.unit_name, bleed_dmg], "#e05050")
+		if bleed_land > 0:
+			_log("   → %s BLEEDS OUT for %d" % [victim.unit_name, bleed_dmg], "#e05050")
+		else:
+			_log("   → %s BLEEDS OUT — silenced by %s" % [victim.unit_name, _vow_name()], "#e05050")
 		if bleed_result.died:
 			_stat("hero_deaths" if victim.is_hero else "enemy_deaths")
 			_sfx("death", -4.0)
@@ -30032,6 +30086,23 @@ func _hero_named(name: String) -> BattleUnit:
 		if h.unit_name == name and not h.is_companion:
 			return h
 	return null
+
+
+# BATCH II §3 — WHOSE CREDIT A LAID STATUS's DAMAGE IS, by the `src_name` it carries: the hero
+# who laid it, fallen or standing (a Burn outlives its layer, so the name is read, never a live
+# unit); a companion's to its hunter (`_contrib_name`, Batch W); and NOBODY's when the name is no
+# one of the party's — an enemy's, or none at all (an item's, a bargain's: HZ's *a bomb names
+# nobody*). "" books nothing.
+func _layer_credit_name(src_name: String) -> String:
+	if src_name == "":
+		return ""
+	for h in heroes:
+		if h.unit_name == src_name and not h.is_companion:
+			return h.unit_name
+	for c in companions:
+		if c.unit_name == src_name:
+			return _contrib_name(c)
+	return ""
 
 
 # ---------- BATCH BL §2: the damage-taken ledger ----------

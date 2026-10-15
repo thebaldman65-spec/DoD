@@ -22,7 +22,11 @@
 #       with no parenthesis; the Confirm says the title's noun; ABILITIES, UPGRADES and RUNES are the heads.
 #   §3a THE GLYPH SWEEP, KEPT: every ◆ and ↑ in the game's scripts and data, counted by file; in the
 #       game's code (comments stripped) every ◆ is a pending pick's badge and ↑ is drawn at the four upgrade
-#       surfaces and nowhere else; no data file carries either.
+#       surfaces and nowhere else; no data file carries either. **AND ○, THE FOURTH (II §0.4, the
+#       designer's): ◆ a decision waits · ↑ an upgrade · ✦ a rune · ○ a thing you wear is paying nothing** —
+#       every ○ in the game's code is the map card's Runes button (HC §5's tell, on it since IH §2) or a
+#       rune slot's face for a worn rune that sits out (GX §1's marker, older than the glyph rules); no line
+#       carries two of the four, and no data file carries ○.
 #   §3b EACH SURFACE APART: a held upgrade reads ↑ on the battle button, the hero sheet's chip, the
 #       Blacksmith's offer and the map card's corner; a pick reads ◆ and nothing else; a held rune ✦; none
 #       of the three where another is meant; the room each surface gives the glyph, measured.
@@ -823,14 +827,17 @@ func _s2_the_words() -> void:
 const DIAMOND := "◆"
 const ARROW := "↑"
 const STAR := "✦"  # BATCH IE §4 — ✦ names a rune (§3a's third glyph)
+const CIRCLE := "○"  # BATCH II §0.4 — ○ a thing you wear is paying nothing (§3a's fourth glyph)
 
 
 func _s3a_the_sweep() -> void:
-	print("\n§3a — the glyph sweep: every ◆, ↑ and ✦ in the game's scripts and data")
+	print("\n§3a — the glyph sweep: every ◆, ↑, ✦ and ○ in the game's scripts and data")
 	var census := {}
 	var code_diamonds: Array = []
 	var code_arrows: Array = []
 	var code_stars: Array = []
+	var code_circles: Array = []
+	var two_glyphs: Array = []
 	var dir := DirAccess.open("res://scripts")
 	for f in dir.get_files():
 		if not f.ends_with(".gd"):
@@ -846,11 +853,16 @@ func _s3a_the_sweep() -> void:
 				code_arrows.append("%s: %s" % [f, String(ln).strip_edges()])
 			if String(ln).contains(STAR):
 				code_stars.append("%s: %s" % [f, String(ln).strip_edges()])
+			if String(ln).contains(CIRCLE):
+				code_circles.append("%s: %s" % [f, String(ln).strip_edges()])
+			var kinds := [DIAMOND, ARROW, STAR, CIRCLE].filter(func(gl): return String(ln).contains(gl))
+			if kinds.size() > 1:
+				two_glyphs.append("%s: %s" % [f, String(ln).strip_edges()])
 	var data_hits: Array = []
 	var dd := DirAccess.open("res://data")
 	for f2 in dd.get_files():
 		var raw2 := FileAccess.get_file_as_string("res://data/" + f2)
-		if raw2.contains(DIAMOND) or raw2.contains(ARROW) or raw2.contains(STAR):
+		if raw2.contains(DIAMOND) or raw2.contains(ARROW) or raw2.contains(STAR) or raw2.contains(CIRCLE):
 			data_hits.append(f2)
 	print("    per script [◆, ↑] including comments: %s" % [census])
 	print("    in code, comments stripped — ◆: %d line(s), ↑: %d line(s); data files carrying either: %s" % [
@@ -899,7 +911,29 @@ func _s3a_the_sweep() -> void:
 	print("    ✦ in code, comments stripped: %d line(s) — %s" % [code_stars.size(), met])
 	ok(stray_star.is_empty() and met.size() == star_lines.size() and code_stars.size() == star_lines.size(),
 		"§3a: ✦ is drawn for something that is not a rune's mark or a rune count: %s (met %s)" % [stray_star, met])
-	ok(data_hits.is_empty(), "§3a: a data file carries ◆, ↑ or ✦: %s" % [data_hits])
+	# BATCH II §0.4 — ○ IS THE FOURTH GLYPH: A THING YOU WEAR IS PAYING NOTHING. It marks the way in to the thing that
+	# wants attention, as ◆ does a card — the Runes button for a slotted core rune that sits out (HC §5's tell, moved
+	# onto it at IH §2), and the card's rune slot for a worn rune that sits out (GX §1's marker) — and nothing else.
+	var circle_lines := {
+		"the Runes button — a core rune he wears pays nothing": "^map_screen\\.gd: b\\.text = \\(\"○ \" if note != \"\" else \"\"\\) \\+ \"Runes %d/%d\" % \\[worn, slots\\]$",
+		"a rune slot — a rune he wears pays nothing": "^map_screen\\.gd: slot_btn\\.text = \"○ %s\" % String\\(rune\\[\"name\"\\]\\)$",
+	}
+	var met_c := {}
+	var stray_c: Array = []
+	for l4 in code_circles:
+		var named_c := ""
+		for what_c in circle_lines:
+			if RegEx.create_from_string(String(circle_lines[what_c])).search(String(l4)) != null:
+				named_c = String(what_c)
+		if named_c == "":
+			stray_c.append(l4)
+		else:
+			met_c[named_c] = int(met_c.get(named_c, 0)) + 1
+	print("    ○ in code, comments stripped: %d line(s) — %s" % [code_circles.size(), met_c])
+	ok(stray_c.is_empty() and met_c.size() == circle_lines.size() and code_circles.size() == circle_lines.size(),
+		"§3a: ○ is drawn for something that is not a thing he wears paying nothing: %s (met %s)" % [stray_c, met_c])
+	ok(two_glyphs.is_empty(), "§3a: a line of the game's code carries two of the four glyphs: %s" % [two_glyphs])
+	ok(data_hits.is_empty(), "§3a: a data file carries ◆, ↑, ✦ or ○: %s" % [data_hits])
 
 
 # ── §3b — EACH SURFACE APART ────────────────────────────────────────────────────────────────
