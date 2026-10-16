@@ -51,6 +51,10 @@ func _ready() -> void:
 	ordered.sort_custom(func(a, b): return String(Relics.POOL[a].get("tier", "common")) \
 		< String(Relics.POOL[b].get("tier", "common")))
 	for id in ordered:
+		# BATCH IK §6: a suspended relic is not shelved — an entry for an effect nothing in the
+		# game can produce is worse than none (GG's ruling for the glossary, applied to the shelf).
+		if Relics.is_suspended(String(id)):
+			continue
 		var owned: bool = Relics.unlocked.has(id)
 		var panel := PanelContainer.new()
 		panel.custom_minimum_size = Vector2(320, 128)

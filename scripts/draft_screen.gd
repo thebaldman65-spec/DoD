@@ -90,7 +90,8 @@ func _draw_screen() -> void:
 	# Relic assignment (up to 3 from the earned collection).
 	var relic_header := Label.new()
 	relic_header.text = ("ASSIGN RELICS  (%d/3)" % relic_picks.size()) \
-		if not Relics.unlocked.is_empty() else "RELICS - none earned yet (slay zone bosses)"
+		if Relics.unlocked.any(func(r): return not Relics.is_suspended(String(r))) \
+		else "RELICS - none earned yet (slay zone bosses)"
 	relic_header.add_theme_font_size_override("font_size", 16)
 	relic_header.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
 	relic_header.position = Vector2(0, 386)
@@ -110,6 +111,9 @@ func _draw_screen() -> void:
 	grid.add_theme_constant_override("v_separation", 10)
 	scroll.add_child(grid)
 	for id in Relics.unlocked:
+		# BATCH IK §6: a suspended relic is not assigned to a run — it would pay nothing.
+		if Relics.is_suspended(String(id)):
+			continue
 		var info: Dictionary = Relics.POOL[id]
 		var rbtn := Button.new()
 		var on: bool = relic_picks.has(id)

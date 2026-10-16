@@ -4527,7 +4527,7 @@ const MODIFIERS := {
 	"overgrown": {"name": "Overgrown", "severity": 1,
 		"desc": "Both parties begin the fight at 70% health at most."},
 	"tinderbox": {"name": "Tinderbox", "severity": 2,
-		"desc": "All fire damage +25%, whoever deals it."},
+		"desc": "All fire strike damage +25%, whoever deals it."},
 	"frenzied": {"name": "Frenzied", "severity": 2,
 		"desc": "Everyone acts 30% faster. Cooldowns are unchanged."},
 	"brittle": {"name": "Brittle", "severity": 3,

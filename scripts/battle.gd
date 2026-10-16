@@ -237,7 +237,7 @@ const STATUS_INFO := {
 		"-15% damage dealt, for the\nrest of the battle."],
 	"retaliate": ["Retaliation", "Rt", Color(0.95, 0.6, 0.25), "Counters attackers with a basic strike."],
 	"dazed": ["Dazed", "Dz", Color(0.95, 0.7, 0.35), "Attacks are 20% more likely to miss."],
-	"shielded": ["Shielded", "Sh", Color(0.95, 0.65, 0.25), "Takes 25% less damage\n(a Shieldmaster's ward, or the\nHollow Crown's Regalia)."],
+	"shielded": ["Shielded", "Sh", Color(0.95, 0.65, 0.25), "Takes 25% less strike damage\n(a Shieldmaster's ward, or the\nHollow Crown's Regalia)."],
 	"wrath": ["Divine Wrath", "DW", Color(1.0, 0.85, 0.35), "+15% damage dealt and +15% speed."],
 	"umbral_sigil": ["Umbral Sigil", "US", Color(0.55, 0.30, 0.70), "Branded: half of every strike this\nunit takes echoes to its whole\nwarband."],
 	# BATCH CK §3 — THIS FALLBACK CARRIES NO MAGNITUDE ON PURPOSE, AND THAT IS
@@ -4516,6 +4516,13 @@ func _player_turn(u: BattleUnit) -> void:
 					pool = pool.filter(func(a): return a != u and not a.is_companion)
 			else:
 				pool = enemies.filter(func(e): return not e.dead)
+				# BATCH IK §2 — EXECUTE OFFERS ONLY WHAT QUALIFIES. The door lights the button when ANY
+				# enemy is below the line or Broken; the pick is narrowed to exactly those, by the same
+				# answer (`_execute_qualifies`), so a full-health enemy can no longer be felled because
+				# something else in the room is bleeding. Every other enemy-target card keeps the whole
+				# living warband (IK's census: eight others gate on the board and offer every enemy).
+				if ab.display_name == "Execute":
+					pool = pool.filter(func(e): return _execute_qualifies(u, e))
 				# Upgraded Execute he cannot actually pay for: the button is
 				# lit by the FREE cast, so the pick narrows to the targets
 				# that discount covers (Batch AK). Without this the two
@@ -4527,7 +4534,7 @@ func _player_turn(u: BattleUnit) -> void:
 				target = pool[0]
 			else:
 				used_targeting = true
-				target = await _pick_target(pool)
+				target = await _pick_target(pool, _target_refusals(u, ab, pool))
 		# Dual/triple-choice abilities pick extra, different enemies (the bot
 		# skips the clicks and lets _resolve pick its extras randomly).
 		# Aguila's Kill Command strikes two chosen targets.
@@ -5333,12 +5340,11 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 					# _ability_usable already priced the cast (the upgraded
 					# copy is free against a Broken target) and checked the
 					# threshold, so the bot only picks a legal victim — a
-					# Broken one when full price is out of reach.
-					var sm_thr := 0.35 if u.execute_upgraded > 0 else 0.2
+					# Broken one when full price is out of reach. BATCH IK §2: the line is
+					# `_execute_qualifies`', the picker's own answer.
 					var sm_prey: Array = (foes.filter(func(e): return e.broken) \
 						if u.resource < sm_exec.cost \
-						else foes.filter(func(e): return e.broken \
-							or e.hp < e.max_hp * sm_thr))
+						else foes.filter(func(e): return _execute_qualifies(u, e)))
 					if not sm_prey.is_empty():
 						return [sm_exec, _lowest_hp(sm_prey)]
 				var sm_shatter := _find_ability(u, "Shatterpoint")
@@ -7070,11 +7076,10 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 		return false
 	# Execute: needs an enemy below 20% health — or a Broken one; the
 	# Bruiser's own loop sets up his finisher. The upgraded copy raises the
-	# threshold to 35%.
-	var exec_thr := 0.35 if u.execute_upgraded > 0 else 0.2
+	# threshold to 35%. BATCH IK §2 — ASKED OF `_execute_qualifies`, THE ONE ANSWER the
+	# picker offers by, so the button and the pick cannot disagree about who qualifies.
 	if ab.display_name == "Execute" \
-			and not enemies.any(func(e): return not e.dead \
-			and (e.hp < e.max_hp * exec_thr or e.broken)):
+			and not enemies.any(func(e): return _execute_qualifies(u, e)):
 		return false
 	# Shatter (Batch AS): it is the MASS RELEASE now, so it needs a hold to
 	# break, not merely someone chilled. Cryoclasm needs one for the same
@@ -7931,9 +7936,14 @@ func _confirm_item(i: int) -> void:
 	_use_item(id)
 
 
-func _pick_target(pool: Array) -> BattleUnit:
+# BATCH IK §2 — `refusals` is {unit: why}: a living body the card cannot name, whose hover says
+# why while the pick is open (`BattleUnit.set_target_refusal`) and whose click does nothing — the
+# hover being where every other refusal is explained. Empty for every card but Execute today.
+func _pick_target(pool: Array, refusals := {}) -> BattleUnit:
 	for t in pool:
 		t.set_targetable(true)
+	for r in refusals:
+		(r as BattleUnit).set_target_refusal(String(refusals[r]))
 	# Tab cycles through the pool, Space/Enter confirms (see _input).
 	_kb_pool = pool
 	_kb_idx = -1
@@ -7950,8 +7960,39 @@ func _pick_target(pool: Array) -> BattleUnit:
 	for t in pool:
 		t.set_targetable(false)
 		t.set_highlight(false)
+	for r in refusals:
+		if is_instance_valid(r):
+			(r as BattleUnit).set_target_refusal("")
 	cancel.queue_free()
 	return chosen
+
+
+# BATCH IK §2 — EXECUTE's LINE AND WHO MEETS IT: the one answer the door (`_ability_usable`), the
+# picker, its refusal hover and the bot all ask. The upgraded copy draws the line higher.
+func _execute_line(u: BattleUnit) -> float:
+	return 0.35 if u.execute_upgraded > 0 else 0.2
+
+
+func _execute_qualifies(u: BattleUnit, e: BattleUnit) -> bool:
+	return not e.dead and (e.hp < e.max_hp * _execute_line(u) or e.broken)
+
+
+# What the picker's hover says on a living enemy it does not offer: for Execute, the line it is
+# above (read off `_execute_line`, never typed), or — the upgraded copy he cannot pay for, which only
+# a Broken body makes free — that it is not Broken. Empty for any other card.
+func _target_refusals(u: BattleUnit, ab: Ability, pool: Array) -> Dictionary:
+	var out := {}
+	if ab.display_name != "Execute":
+		return out
+	for e in enemies:
+		if e.dead or pool.has(e):
+			continue
+		if _execute_qualifies(u, e):
+			out[e] = "Execute: only a Broken enemy is free,\nand %s cannot pay its Rage." % u.unit_name
+		else:
+			out[e] = "Execute: %s is not below %d%% health\nand not Broken, so it cannot be chosen." % [
+				e.unit_name, int(round(_execute_line(u) * 100.0))]
+	return out
 
 
 # ---------- BATCH BL §1: enemy intent ----------
@@ -9068,8 +9109,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	if hf_spell and attacker.rune_clarity > 0.0 \
 			and cz_res_before >= attacker.max_resource:
 		hf_clarity_mult = 1.0 + attacker.rune_clarity
-		_log("   → Rune: Clarity — %s casts at full Mana; the spell lands %d%% harder" % [
-			attacker.unit_name, int(round(attacker.rune_clarity * 100.0))], "#8fc8e0")
+		# BATCH IK §5 — THE LINE SAYS STRIKE, AND ONLY A SPELL THAT STRIKES PRINTS IT: the multiplier
+		# is read in the strike loop alone, which a spell carrying a `special` or a heal never
+		# reaches (`_resolve`'s own branch below), so a Killing Frost at full Mana is paid nothing
+		# and is told nothing.
+		if ab.special == "" and ab.heal <= 0:
+			_log("   → Rune: Clarity — %s casts at full Mana; its strikes land %d%% harder" % [
+				attacker.unit_name, int(round(attacker.rune_clarity * 100.0))], "#8fc8e0")
 	var hf_profligate_mult := 1.0
 	if hf_spell and attacker.rune_profligate > 0.0:
 		hf_profligate_mult = 1.0 + attacker.rune_profligate
@@ -11282,7 +11328,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					var pv_was := raw
 					raw *= maxf(1.0 - 0.01 * iw_pct, 0.1)
 					_prev(strike_target, pv_was - raw)
-					_log("   → Talent: Mitigation per Debuff You Carry — -%d%% (%d debuffs)" % [
+					_log("   → Talent: Iron Will — -%d%% (%d debuffs)" % [
 						int(round(100.0 * (pv_was - raw) / pv_was)) if pv_was > 0.0 else iw_pct,
 						iw_n], "#b0a8e0")
 			# Shared Vigil (WARDEN, Banner row 6): the line holds while he
@@ -13762,6 +13808,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# than an exception this ability would have to carve out.
 			if ab.display_name == "Kindled Mind":
 				res_gain += 3 if is_perfect else 2
+			# BATCH IK §3b — REALITY FRACTURE's PERFECT BANKS THE ENGINE's GRANT A SECOND TIME. The
+			# Resonance a damaging cast builds — the `else 1` that opens this block, which every grade
+			# of every card is paid — is banked once more on this card's Perfect, so an Arcanist who
+			# Perfects it banks two where any other grade banks one. No new figure: the 1 is the
+			# engine's own, written again here, and nothing above it moved. A hero without the
+			# meter banks nothing, as his base cast does (`_gain_resonance` refuses him).
+			if ab.display_name == "Reality Fracture" and is_perfect:
+				res_gain += 1
 			if attacker.second_resource_name == "Resonance":
 				attacker.res_cast_this_turn = true
 			# BATCH FK — THE RUNE OF THE OVERTONE, and it is a DOUBLING of the
@@ -15860,6 +15914,19 @@ func _mark_destination(fallen: BattleUnit) -> BattleUnit:
 	var best: BattleUnit = null
 	for e in enemies:
 		if e == fallen or e.dead or e.hp <= 0:
+			continue
+		if best == null or e.hp > best.hp:
+			best = e
+	return best
+
+
+# BATCH IK §1 — WHO PAYS A BLOOD DEBT: the living enemy with the most health left, the first in the
+# warband on a tie — the standing order a moving mark already uses (`_mark_destination`), and no die.
+# Null when no enemy stands. Its one caller is Blood Price's arm in `_resolve_special`.
+func _blood_debt_payer() -> BattleUnit:
+	var best: BattleUnit = null
+	for e in enemies:
+		if e.dead or e.hp <= 0:
 			continue
 		if best == null or e.hp > best.hp:
 			best = e
@@ -23060,8 +23127,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s: Mark of the Hunt — %s is marked (%d turns)" % [
 					attacker.unit_name, target.unit_name, mk_turns], "#e0a050")
 		"blood_price":
-			# Blood for fury: pays 15% of CURRENT health (half on a perfect),
-			# clamped so the price can never kill him. Cost scales with what
+			# Blood for fury: pays 7.5% of CURRENT health (the card runs no skill
+			# check, so no grade moves it), clamped so the price can never kill him. Cost scales with what
 			# he has — cheap opener, real gamble when low. This is how the
 			# Berserker CHOOSES when Blood Frenzy wakes instead of waiting
 			# for the enemy to decide it.
@@ -23069,7 +23136,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# BATCH FK — THE RUNE OF BLOOD DEBT SENDS THE BILL THE OTHER WAY.
 			# The card's whole safety argument is that the price is a share of
 			# his CURRENT health and cannot reach zero; the rune keeps the shape
-			# and changes the payer, so the cost is a share of the TARGET's
+			# and changes the payer, so the cost is a share of the PAYER's
 			# current health, clamped the same way and by the same line.
 			#
 			# **AND THEIR MISSING HEALTH BECOMES HIS FRENZY STEPS, WHICH IS THE
@@ -23083,28 +23150,49 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# `frenzy_bonus()` is still called for its ratchet, exactly as the
 			# unruned cast calls it — the floor is banked at the moment of
 			# payment either way (Batch A's rule).
-			var bp_debt: bool = attacker.rune_blood_debt > 0 and target != null \
-				and not target.dead and not target.is_hero
+			#
+			# BATCH IK §1 — THE BILL GOES TO THE ENEMY WITH THE MOST HEALTH, BECAUSE THE CARD HAS NO
+			# ENEMY TO NAME. Blood Price is a self-cast — `_player_turn`'s no-target list hands it the
+			# Berserker, and so does the bot — so FK's read of `target` met the caster on every cast and
+			# the rune never fired (IJ's census, N023). **The card's shape does not change**: no picker,
+			# no enemy target. The game chooses, deterministically (`_blood_debt_payer`: no die), and
+			# the payer's share is the same 7.5% of ITS current health FK wrote, so no magnitude moved.
+			# **IT IS HIS DAMAGE, UNDER HIS FRAME** — `_resolve`'s entry set it on him, so it is his on
+			# the recap, the Reaver counts a kill it lands, and the damage door's readers see him as the
+			# dealer — **AND IT IS NOT A STRIKE**: `take_hit` takes the share as it stands, so no school
+			# bonus, no Blood Price +25% and no armor touch it. The figure the float, the credit and the
+			# line read is what the vow lets land (`_landed`, IC's rule), asked before the door.
+			var bp_payer: BattleUnit = _blood_debt_payer() if attacker.rune_blood_debt > 0 else null
+			var bp_debt: bool = bp_payer != null
 			if bp_debt:
-				var bd_cost := maxi(int(round(target.hp * 0.075)), 1)
-				var bd_res: Dictionary = target.take_hit(bd_cost, 0)
-				target.float_text("-%d Blood Debt" % bd_cost, Color(0.9, 0.15, 0.2))
-				_stat("dmg_hero_" + attacker.unit_name, bd_cost)
+				var bd_cost := maxi(int(round(bp_payer.hp * 0.075)), 1)
+				var bd_land := _landed(bp_payer, bd_cost)
+				var bd_res: Dictionary = bp_payer.take_hit(bd_cost, 0)
+				if bd_land > 0:
+					bp_payer.float_text("-%d Blood Debt" % bd_land, Color(0.9, 0.15, 0.2))
+					_stat("dmg_hero_" + _contrib_name(attacker), bd_land)
 				# Rage-equivalent: their MISSING health as a share of their
 				# maximum, priced at the same 5 Rage a step the passive uses, so
 				# a target at half health is worth ten steps' worth of spend.
-				var bd_missing: float = 1.0 - target.hp / float(maxi(target.max_hp, 1))
+				var bd_missing: float = 1.0 - bp_payer.hp / float(maxi(bp_payer.max_hp, 1))
 				var bd_steps := int(bd_missing * 100.0 / 5.0)
 				attacker.note_resource_spent(bd_steps * BattleUnit.FRENZY_RAGE_PER_STEP)
-				_log("   → Rune: Blood Debt — %s pays %d, and %d%% missing is %d Frenzy step%s" % [
-					target.unit_name, bd_cost, int(round(bd_missing * 100.0)),
-					bd_steps, "" if bd_steps == 1 else "s"], "#e05050")
+				if bd_land > 0:
+					_log("   → Rune: Blood Debt — %s pays %d, and %d%% missing is %d Frenzy step%s" % [
+						bp_payer.unit_name, bd_land, int(round(bd_missing * 100.0)),
+						bd_steps, "" if bd_steps == 1 else "s"], "#e05050")
+				else:
+					_log("   → Rune: Blood Debt — %s's bill is silenced by %s, and %d%% missing is %d Frenzy step%s" % [
+						bp_payer.unit_name, _vow_name(), int(round(bd_missing * 100.0)),
+						bd_steps, "" if bd_steps == 1 else "s"], "#e05050")
+				# HIS KILL: `_die()` read his frame for the Reaver as the share landed, and the kill
+				# hooks every hero's kill pays fire here, as they did for FK's branch.
 				if bd_res["died"]:
 					_stat("kills")
 					_sfx("death", -4.0)
-					_message("%s falls!" % target.unit_name)
-					_log("† %s dies" % target.unit_name, "#e05050")
-					_on_enemy_death(target)
+					_message("%s falls!" % bp_payer.unit_name)
+					_log("† %s dies" % bp_payer.unit_name, "#e05050")
+					_on_enemy_death(bp_payer)
 			else:
 				var bp_before: int = attacker.hp
 				attacker.hp = maxi(attacker.hp - bp_cost, 1)
@@ -23118,10 +23206,19 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			attacker.resource = mini(attacker.resource + 30, attacker.max_resource)
 			attacker.float_text("+30 Rage", Color(1.0, 0.5, 0.4))
 			_apply_status(attacker, "blood_price", 2)
+			# BATCH IK §1 — THE CHIP SAYS WHOSE BLOOD PAID. Its words are the status's own with the
+			# payer's name for *his own*: the +25% is his either way (only the cost moves), and a chip
+			# reading *paid in his own blood* over a debt an enemy paid would be the census's defect.
+			if bp_debt:
+				var bp_info: Array = STATUS_INFO["blood_price"]
+				attacker.update_status("blood_price", String(bp_info[1]),
+					String(bp_info[3]).replace("his own blood", "%s's blood" % bp_payer.unit_name))
 			attacker.refresh_bars()
 			_message("%s pays the Blood Price!" % attacker.unit_name)
-			_log("%s: Blood Price — bleeds %d HP for 30 Rage and +25%% damage (2 turns)" % [
-				attacker.unit_name, bp_cost], "#e05050")
+			var bp_paid := ("%s pays the debt" % bp_payer.unit_name) if bp_debt \
+				else ("bleeds %d HP" % bp_cost)
+			_log("%s: Blood Price — %s for 30 Rage and +25%% damage (2 turns)" % [
+				attacker.unit_name, bp_paid], "#e05050")
 		"battle_shout":
 			# Batch AG: a real warcry — a flat base for the WHOLE party, with
 			# the enemy party's bloodloss on top. Companions don't hear it.
@@ -27003,8 +27100,12 @@ func _apply_perfect_bonus(attacker: BattleUnit, target: BattleUnit, ab: Ability,
 			attacker.float_text("+%d" % sh_got, Color(0.4, 0.9, 0.45))
 			_log("   → %s recovers %d HP" % [attacker.unit_name, sh_got], "#b0a8e0")
 		"sunder":
+			# BATCH IK §3a — A PERFECT SEVER's ARM, AND SUNDER AT ITS OWN STEP AND DURATION: one deep
+			# (power 0, the depth a base application lays) for `SUNDER_TURNS`, the turns Crushing Blow
+			# lays — so the blow lands and the body it cut takes Sunder. It laid a typed 2 while no
+			# card named it; Sever is the one card that does.
 			if not target_died:
-				_apply_status(target, "sunder", 2, 0, 0, attacker)
+				_apply_status(target, "sunder", BattleUnit.SUNDER_TURNS, 0, 0, attacker)
 		"burn":
 			if not target_died:
 				_apply_status(target, "burn", 2, 0, _dot_tick("burn", attacker),

@@ -372,7 +372,7 @@ func _ironclad_rename() -> void:
 	ok(Classes.pool_ability("Ironclad") != null,
 		"`Ironclad` resolves to an ability")
 	ok(Classes.pool_ability("Iron Will") == null,
-		"`Iron Will` resolves to NO ability — since FX the name survives only on the `iron_will` status chip")
+		"`Iron Will` resolves to NO ability — the name is the talent's and its `iron_will` chip's, never a card's")
 	# BATCH FX — THE NODE IS THE ONE TREE'S NOW, AND THE WALK IS ONE WALK.
 	# `wd_iron_will` went with the twelve spec trees; its field AND its magnitude
 	# (`iron_will_ranks` 1) are carried by `tn_iron_will`, whose comment in
@@ -384,9 +384,10 @@ func _ironclad_rename() -> void:
 	# THE NAME PIN IS RE-POINTED TO WHAT IT WAS STANDING IN FOR. It read
 	# `name == "Iron Will"`: the TALENT's half of CK's settlement — the ability
 	# took `Ironclad`, and the talent kept a name no ability answers to. FX named
-	# every node for what it does, so the talent is no longer called Iron Will
-	# (the `iron_will` STATUS chip still is, in `battle.gd`). The settlement is
-	# asserted as it stands now: the talent carrying `iron_will_ranks` is named,
+	# every node for what it does, so the talent stopped being called Iron Will
+	# until IK §4 gave it the name back (the name wins; FX's label opens its words),
+	# and the `iron_will` STATUS chip wore it throughout. The settlement is
+	# asserted as it stands: the talent carrying `iron_will_ranks` is named,
 	# and no ABILITY answers to that name — so the collision CK fixed still cannot
 	# come back from the talent's side. `Iron Will` resolving to no ability is
 	# asserted just above, unchanged.

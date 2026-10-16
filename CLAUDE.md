@@ -126,7 +126,7 @@ block stood and never a new file. II's four were struck so at IJ, each report re
 the equality rule travel with their parent. **Eight of the rows are FF §2's**, and they are the
 residue: rules written into this file AFTER the seam was taken, which the seam's own test puts on
 the other side of it. **Every row after those eight was written straight into the reference rather
-than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one, IE's two, II's two and IJ's one —
+than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one, IE's two, II's two, IJ's one and IK's one —
 and GW §2's, written there at GW and given its row only at HX (HV §3e found it missing; `check_hx` §1a now reds on one) —
 and four more are MOVED, FF §2's way: HG–HJ's census and supersession blocks, written back into this file after the seam
 was taken and sent over at HY §4 by the designer's ruling, and II §4's two, the archive practice's first pass — CP §3's
@@ -195,6 +195,7 @@ new block written here):
 | A CENSUS OF READERS COVERS WHAT A BATCH MOVES, NOT ONLY WHAT IT DELETES | II §0.7 |
 | PLAYER-FACING TEXT THAT STATES A NUMBER READS IT OFF THE CONSTANT, OR AN INSTRUMENT ASSERTS THE TWO AGREE | II §0.7 |
 | A NEW GATE's OWN SOURCE IS READ BY THE GATE-SOURCE READERS BEFORE THE ACCEPTANCE, NOT BY IT | IJ §0.4 |
+| AN INSTRUMENT THAT CANNOT READ A DEFECT IS NOT AN INSTRUMENT | IK §0.12 |
 
 ## THE COMBAT RULES LIVE IN `docs/combat-rules.md` (STANDING, SET AT GR §2, RULED BY THE DESIGNER)
 > **THIS FILE IS STILL THE ONE A BATCH MUST READ. `docs/combat-rules.md` IS A REFERENCE IT POINTS AT,
@@ -1740,8 +1741,9 @@ merged.** A Berserker wears the Warrior's cells.
     Glut).
   - DR §1's cooldown callers, and CZ §4's Instinctive Rotation.
   - BR §1's Rally and Iron Will label collisions, and CK's note that the Warden talent keeps the
-    name Iron Will. The `iron_will` chip keeps the name; the node that writes the field is
-    *Mitigation per Debuff You Carry*.
+    name Iron Will. The `iron_will` chip keeps the name, and the node that writes the field wears
+    it again — Iron Will, FX's *Mitigation per Debuff You Carry* its words' first line (IK §4, the
+    designer's: the name wins).
   - FO §1's floor for Deepening Hex (`RUIN_FLOOR` 3, priced as Avatar of Ruin's 5 − 2) and FO §2's
     Wide Watch retirement (Overkill already kept Focus whole). **Both reasons went with their
     nodes, and BOTH WERE RULED AT FY** (the designer): the floor was re-derived against the live
@@ -2308,6 +2310,13 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
 - **THE PEDDLER AND A CACHE GET NO TELL, AND THAT IS A RULING RATHER THAN AN OMISSION.** A gated rune cannot be
   OFFERED while the engine is out, so a tell on an offer surface could never render; a cache already says what it is
   holding back, in GV's words. **Add a tell where a rune the player ALREADY HOLDS is shown, and nowhere else.**
+- **A RUNE WHOSE BRANCH NEEDS AN ENGINE IS NEVER DRAFTED DEAD, AND WORN WITHOUT IT, IT WEARS ○ (IK §0.2, the designer's).**
+  `Runes.ENGINE_READ` gates the offer, so a rune that pays only through an engine's branch is offered only while that engine
+  is slotted; if the engine later leaves its slot, the worn rune sits out — GX's sentence on its hover, ○ on its slot, the
+  fourth glyph II §0.4 put on every slot whose rune pays nothing. **So its words describe the rune as it is drafted and as
+  it pays, and a text that reads false only without its engine is not false**: IJ's census read seven that way — N010,
+  N026, N027, N030, N033, N036 and N043 — and they stand as written. A census reads a rune's words beside the engine its
+  row names, never bare.
 
 ## STANDING RULE — A STATUS IS SPENT WHERE IT PAYS, NEVER WHERE AN ENGINE READS IT (Batch GM §1)
 > **A status, charge or bank a card lays is spent under the gate its payout is read under. Its countdown or its
@@ -5144,9 +5153,10 @@ call and one string).
   as an ability (tranche 1, BO). It is **BATTLE TRANCE**.
 · **REPORTED, NOT RESOLVED — RALLY** is also a Warden talent node (Banner row 2) and a live `rally`
   status label. The ability needs no status of its own, so nothing can overwrite anything.
-· **REPORTED, NOT RESOLVED — IRON WILL is the worst collision the project has had.** It is a Warden
-  talent node (Threat row 3) AND a live status with that exact label, and it is a WARRIOR class
-  card — so **same class, same spec reachable**: a Warden holding the node can draft the card.
+· **REPORTED, NOT RESOLVED — IRON WILL is the worst collision the project has had** (resolved since: CK §2
+  renamed the card Ironclad, and the node is the one tree's Iron Will since IK §4). It was a Warden
+  talent node (Threat row 3) AND a live status with that exact label, and it was a WARRIOR class
+  card — so **same class, same spec reachable**: a Warden holding the node could draft the card.
   Worse than BP's Precision Strike (same spec, but a node against a SPEC card). Nothing breaks, and
   **the ability's status is `ironclad` with its own chip** precisely so a Warden holding both never
   sees two chips reading the same word.

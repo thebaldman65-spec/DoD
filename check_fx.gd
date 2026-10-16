@@ -775,7 +775,7 @@ func _drive(scene: Node, fields: Dictionary) -> void:
 	ok(hl1 == int(round(hl0 * (1.0 + 0.01 * float(v["last_hope_pct"])))),
 		"§4b: tn_last_hope — a 100 heal under a quarter's health gave %d with it and %d without" % [hl1, hl0])
 	paid += 1
-	# Mitigation per Debuff You Carry.
+	# Iron Will (FX named it Mitigation per Debuff You Carry; the name came back at IK §4).
 	war.statuses.clear()
 	scene._apply_status(war, "dazed", 5)
 	scene._apply_status(war, "cripple", 5)
@@ -874,7 +874,7 @@ func _drive(scene: Node, fields: Dictionary) -> void:
 	ok(int(s1["bd"]) > int(s0["bd"]), "§4b: tn_crack_guards — a crit's Break read %d with it and %d without" % [
 		int(s1["bd"]), int(s0["bd"])])
 	paid += 1
-	# Refuse Death Once, and its rider.
+	# Undying Rage (FX's Refuse Death Once until IK §4), and its rider.
 	war.hp = 5
 	war.dead = false
 	war.undying_rage = int(v["undying_rage"])

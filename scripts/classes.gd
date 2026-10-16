@@ -3189,7 +3189,7 @@ static func draft_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Sever", "cost": 25,
 				"damage": 40, "pressure": 15, "delay": 2.5, "cooldown": 4,
 				"anim": "attack03",
-				"perfect_id": "", "perfect_text": "Deals {atk:{=@damage*Ability.GRADE_DMG_MULT.perfect}}",
+				"perfect_id": "sunder", "perfect_text": "Sunders armor by {=Unit.SUNDER_STEP*100}% for {=Unit.SUNDER_TURNS} turns",
 				"description": "REQUIRES THE AGGRESSIVE GUARD.\nCut deep for {=@damage}% of Attack. If the\ntarget is BROKEN this ability's\ncooldown is cleared outright, so the\nwindow can be swung through again\nand again."})
 		# BATCH DR §3 — THE DEFENSIVE GUARD NOW BUYS SOMETHING, AND THAT IS WHAT
 		# ENDS DQ's FINDING 2. Its stance requirement was pure cost with nothing
@@ -6280,7 +6280,7 @@ static func vault_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Reality Fracture",
 				"dmg_type": "arcane", "cost": 20, "damage": 15, "pressure": 14,
 				"delay": 2.0, "anim": "attack03", "delay_push": 6.0, "cooldown": 3,
-				"perfect_id": "", "perfect_text": "Deals {atk:{=@damage*Ability.GRADE_DMG_MULT.perfect}}",
+				"perfect_id": "", "perfect_text": "An Arcanist banks +1 Resonance",
 				"description": "Shove the target far down the\ninitiative order."})
 		# PHOENIX REBIRTH IS NOT HERE ANY MORE. Batch AR made it the
 		# Pyromancer's Inferno capstone, so the TREE owns the only copy and
@@ -6881,7 +6881,7 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 43,
 					"pressure": 20, "delay": 3.0, "anim": "attack03", "resource_gain": 10,
 					"cooldown": 2,
-					"applies_status": {"id": "sunder", "turns": 3},
+					"applies_status": {"id": "sunder", "turns": BattleUnit.SUNDER_TURNS},
 					"perfect_id": "", "perfect_text": "+5 bonus BD",
 					"description": "Moderate damage. Sunders armor by\n{=Unit.SUNDER_STEP*100}% for {=@applies_status.turns} turns. Builds {=@resource_gain} Rage."}),
 				# Shieldwall graduated from the talent tree (Batch G): his one

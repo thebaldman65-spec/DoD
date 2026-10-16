@@ -631,10 +631,12 @@ const CLASH_EXEMPT := {
 	# Mark's comment above says this list exists to record rather than to hide.
 	# **AND ALL FIVE NAMES ARE THE DESIGNER'S** — the brief's own labels — so a
 	# rename is queued as a ruling, not taken by this batch.
+	# **BATCH IK §4 TOOK THAT RULING FOR THE DEBUFF ONE**: the node is Iron Will again (the name wins;
+	# FX's label opens its words, which this sweep does not read), so DEBUFF collides with nothing and
+	# its row is gone — an equality left naming it would red on the repair. Four remain, all ruled ships.
 	"BREAK": ["node:We Do Not Break", "node:You Break Harder"],
 	"RESOURCE": ["node:A Bigger Resource Pool",
 		"node:Pay a Lethal Hit out of Your Resource Pool"],
-	"DEBUFF": ["node:Mitigation per Debuff You Carry"],
 }
 
 func _s4_name_sweep() -> void:

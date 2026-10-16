@@ -4,6 +4,33 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## What the census found in the code (Batch IK) — 2026-10-16
+
+**Why Blood Debt bills the enemy with the most health, and not a chosen one.** Blood Price is a self-cast, and a picker on a
+card that has never had one changes the card's shape depending on a rune worn. So the game chooses, and it chooses with no
+die, because a rune that moves a cost should not also move the dice every later roll reads. The fullest enemy is the body a
+share of current health costs most, which is the rune's whole point. A tie goes to the first in the warband, the same order a
+moving mark already uses.
+
+**Why the bill is his damage but not a strike.** If the cost reached an enemy and booked nobody, a Reaver could not count the
+kill it lands and the recap could not say where the damage came from. That is the frame's whole job, and the rune deals
+inside the cast's own frame, so it needs no new site. But a strike's bonuses are paid for the blow a card lands, and a
+redirected cost is no blow. Letting the +25% the same cast lays, or a school relic, raise it would make one rune worth more
+the more strike bonuses a Berserker carries.
+
+**Why Execute narrows its picker and the other eight do not.** Execute's own words name the target (*only usable against
+targets below 20% health*), so a picker that offers a full-health enemy contradicts the card. Cull, Requiem and the other six
+read the board the same way and offer every enemy, but their words do not promise a target. Narrowing them would be a change
+to eight cards nobody asked about, so they are named in the report instead.
+
+**Why a strike gets a word and the payouts do not widen.** Widening every strike bonus to ticks and handlers would change
+every school and every status at once. It would also move Burn, which IF only just made real. That is a measurement, not a
+repair. The wrong word, though, could be repaired today, and one glossary term lets eight texts be true in one word each.
+
+**Why Cairnmoss is suspended and not deleted.** A relic that cannot be drawn costs nothing to keep, and its re-cut is already
+ruled: it rides the post-fight recovery. Deleting it would delete the record of what it is meant to become. It waits on the
+same ruling as the Cairn of the Fallen: whether a fallen hero stays down between fights.
+
 ## Text against its constant (Batch IJ) — 2026-10-15
 
 **Why the words moved and the code did not.** A text that disagrees with its code has two possible repairs. Changing the code

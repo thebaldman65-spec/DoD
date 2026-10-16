@@ -17,6 +17,59 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT IK — 2026-10-16, FROM `docs/state.md` AS IJ LEFT IT (`739ef88`)
+
+**What came here**: IJ's ten rulings, every one answered in IK's brief — the play carried (IK's ruling 1); Blood Debt, Cairnmoss
+Poultice, Execute's picker, the two Perfects, the Iron Will chip and the strike loop's word built at IK §1–§6; the Ruin rung and
+Sanctity's source gap ruled the code's defect and moved to IL (the roadmap's IL line in the live file holds both conditions); the
+ten repairs of the designer's words confirmed — and the bomb's surface line, owed since HZ and paid at IK §6 (FOUND AT IJ, FOUND AT
+HZ). Everything else in the live file stayed; the roadmap was re-lettered in place (IL, IM, IN) and the fallen-hero items name
+Cairnmoss Poultice beside the Cairn of the Fallen.
+
+
+### ~~IJ's RULINGS OWED~~ — **ALL TEN ANSWERED IN IK's BRIEF: THE PLAY CARRIED (1, IK's RULING 1); BLOOD DEBT, CAIRNMOSS, EXECUTE, THE TWO PERFECTS, THE TWO NAMES AND THE STRIKE's WORD BUILT AT IK (2, 3, 5, 6, 7, 8); THE RUIN RUNG AND SANCTITY's GAP RULED, IL's (4, 9); THE TEN REPAIRS CONFIRMED (10)**
+
+Full working: `docs/reports/IJ.md`, NEEDS A RULING.
+
+1. **PLAY ONE ZONE WITHOUT THE DEBUG MENU, AND SEND THE FILE** (IH's ruling 1, carried — II §0.1, IJ §0.1). The readout names every
+   debug action, so a file that names none is play. It answers Boil Over's rate, Rupture's number, the vow's worth and the Cleric's
+   Mana, and **its first Hierophant confirms Sanctity's step** (13).
+2. **BLOOD DEBT NEVER FIRES** (census N023). Blood Price is a self-cast, so its target is always the Berserker, and the rune's
+   branch needs an enemy target (`check_gv` passes only because it calls `_resolve` with one directly). Repaired, the words would
+   describe a rune that does nothing. **Its target is yours.**
+3. **CAIRNMOSS POULTICE DOES NOTHING** (R064). Its whole effect was the retired rest node's (`rest_heal_add`, read nowhere since
+   rests left the map); the words were left, since an honest text would describe a relic with no effect.
+4. **THE RUIN RUNG's *HARSHER BARGAINS*** (R091, and the glossary's road entry, G084L) — the code is the defect: Ruin's offers come
+   out milder than Warden's (mean severity 2.31 against 3.29, EP §1, owed). Both texts left.
+5. **EXECUTE's TARGET** (C070). The card's rule is the code's; the player's picker offers every enemy once one qualifies. The
+   picker is the defect.
+6. **TWO PERFECTS WITH NOTHING OF THEIR OWN: SEVER's AND REALITY FRACTURE's.** Sever's promised an armor strip nothing pays, and
+   Reality Fracture's a Resonance paid at every grade (BJ pinned it as a later decision); **both now state the blow a Perfect lands**,
+   the grade's ×1.15, as every Perfect without an arm does. A Perfect of their own is yours to author.
+7. **THE IRON WILL CHIP** (B0020). The node it pays for was renamed *Mitigation per Debuff You Carry* at FX; the chip keeps CK §2's
+   label, which `test_batch_br` pins as the node's. Rename it with the node, or keep it.
+8. **THE STRIKE LOOP's REACH — ONE RULING FOR ALL OF THESE.** No word a player reads separates a strike-loop blow from a
+   handler's: the school relics (Emberheart, Frostbound Sigil, Nightbloom) and Tinderbox raise `type_dmg_bonus` at the strike only;
+   Clarity and Profligate pay strike-loop spells only (Profligate still doubles a Killing Frost's price); Shielding's and the
+   Regalia's ×0.75 is read in the strike loop only. **Name the strike loop in the words, or widen the payouts.**
+9. **SANCTITY's *each status the Cleric applies*** (R016). Only the 110 of 214 `_apply_status` calls that pass a source are
+   lengthened (FT §3's owed gap); an honest sentence would describe a population the player cannot see.
+10. **WORDS OF YOURS IJ REPAIRED, FOR CONFIRMATION.** Each said something the code does not do: HF's Abundance (*His* healing beyond
+    an ally's missing health) and Vow of Silence (*not those Faith and Ruin pay*), HN's Forbearance (*Heroes* hold one more stack),
+    HW's Snare Line (*Stun* and all, where it read *Break*) and the glossary's three HW proposed (Runes, the Peddler, Severity), and
+    HC's empty event line (*no rune is left that any hero can take*). The report quotes each, old and new.
+
+### FOUND AT IJ AND NOT FIXED — ITS CLOSED ITEMS (archived at IK; the section stays in `docs/state.md`)
+
+- **THE BOMB's LINE (FOUND AT HZ) CAME DUE AND WAS NOT PAID.** IJ touched the item texts; the line is new wording, not a repair.
+
+### FOUND AT HZ AND NOT FIXED — ITS CLOSED ITEMS (archived at IK; the section stays in `docs/state.md`)
+
+- **A BOMB NEVER MARKS, NEVER FEEDS SIPHON, IS NEVER JUDGED, AND CANNOT BE A REAVER'S KILLING BLOW** — HY's ruling 2 confirmed:
+  an item's damage is the party's, nobody's in the frame and the ledger alike. **A player holding a Reaver should not finish with
+  a bomb**: a line of surface text owed the next time the item surface is touched, not before. **IJ §2 touched the item texts and did not
+  write it** (FOUND AT IJ).
+
 ## ARCHIVED AT IJ — 2026-10-15, FROM `docs/state.md` AS II LEFT IT (`03f8f94`)
 
 **What came here**: II's two rulings, both answered in IJ's brief (the first carried as IJ's ruling 1 — the designer's play, still

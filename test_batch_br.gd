@@ -577,10 +577,15 @@ func _names_swept() -> void:
 	# which would re-open the collision from the card's side. The card end is
 	# the next check, unchanged; the word itself lives on as the node's CHIP
 	# label, pinned below.
+	# **RE-POINTED BY IK §4, BY THE DESIGNER's RULING: THE NAME WINS.** FX's label was a description
+	# that climbed into the name field, and the chip went on wearing Iron Will — so the node is called
+	# Iron Will again, CK §2's settlement exactly, and its label opens its words. BOTH ENDS STILL: the
+	# node `tn_iron_will` pays iron_will_ranks AND is named Iron Will (renaming the wrong half fails
+	# here), no node is Ironclad (the card's side of the collision), and the card end is next, unchanged.
 	var iw_node: Dictionary = Talents.node_in_tree(Talents.tree(), "tn_iron_will")
 	ok(iw_node.get("payload", {}).get("stat", {}).has("iron_will_ranks")
-		and not node_names.has("Iron Will") and not node_names.has("Ironclad"),
-		"§1 (FX): the Warden's Iron Will is tn_iron_will in the one tree ('%s', still iron_will_ranks) — and no node is called Iron Will or Ironclad" % String(iw_node.get("name", "")))
+		and String(iw_node.get("name", "")) == "Iron Will" and not node_names.has("Ironclad"),
+		"§1 (IK §4): the Warden's Iron Will is tn_iron_will in the one tree, named Iron Will ('%s', still iron_will_ranks) — and no node is called Ironclad" % String(iw_node.get("name", "")))
 	ok(not Classes.class_draft_pool("warrior").has("Iron Will")
 		and Classes.class_draft_pool("warrior").has("Ironclad"),
 		"§1 (CK §2): ...and no longer a Warrior card — that card is Ironclad")

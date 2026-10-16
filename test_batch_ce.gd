@@ -721,8 +721,13 @@ func _docs() -> void:
 	# nothing runs twice, the shorter clock) and `status_rupture` (a chip on the board,
 	# "Ru", that a player has nowhere else to learn is a Burn and a Chill joined).
 	# HS's brief: the glossary is the recipe book until there are enough to need a screen.
-	ok(gj != null and gj.size() == 100,
-		"the glossary holds 100 entries (98 + HS's conjunctions and status_rupture)")
+	# BATCH IK §5 — ONE HUNDRED AND ONE. **THE PIN IS BUMPED, NOT LOOSENED**, and the one entry is
+	# `strike_damage`: eight texts now say *strike damage* (three relics, a bargain, two runes, two enemy
+	# wards), and a player has nowhere else to learn which damage a strike is — that a tick, a detonation,
+	# a burst, a reflection and a bomb are not, nor a card's own rule's blow, so a bonus to strike damage
+	# does not reach them. One entry for a word the game was already using and never defined.
+	ok(gj != null and gj.size() == 101,
+		"the glossary holds 101 entries (98 + HS's conjunctions and status_rupture + IK's strike_damage)")
 	# RE-POINTED AT THE ARCHIVE BY BATCH CX. The live changelog passed CW's 400 KB
 	# threshold, so CX cut it at the CN/CO boundary: Batch CE — with everything
 	# from BP to CN — moved OUT OF THE REPO into `changelog-archive.html`. The old

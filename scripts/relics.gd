@@ -50,13 +50,13 @@ const POOL := {
 		"desc": "Every hero heals {=@hooks.victory_heal_pct*100}% after every victory.",
 		"hooks": {"victory_heal_pct": 0.10}},
 	"emberheart": {"name": "Emberheart", "tier": "common",
-		"desc": "Fire and Holy damage +{=@hooks.dmg_type_mult.fire*100}%.",
+		"desc": "Fire and Holy strike damage +{=@hooks.dmg_type_mult.fire*100}%.",
 		"hooks": {"dmg_type_mult": {"fire": 0.20, "holy": 0.20}}},
 	"frostsigil": {"name": "Frostbound Sigil", "tier": "common",
-		"desc": "Frost and Arcane damage +{=@hooks.dmg_type_mult.frost*100}%.",
+		"desc": "Frost and Arcane strike damage +{=@hooks.dmg_type_mult.frost*100}%.",
 		"hooks": {"dmg_type_mult": {"frost": 0.20, "arcane": 0.20}}},
 	"nightbloom": {"name": "Nightbloom Charm", "tier": "common",
-		"desc": "Shadow and Nature damage +{=@hooks.dmg_type_mult.shadow*100}%.",
+		"desc": "Shadow and Nature strike damage +{=@hooks.dmg_type_mult.shadow*100}%.",
 		"hooks": {"dmg_type_mult": {"shadow": 0.20, "nature": 0.20}}},
 	"packcharm": {"name": "Packmother's Satchel", "tier": "common",
 		"desc": "Begin each run with {=@hooks.start_items.health} extra Health Potions\nand {=@hooks.start_items.mana} extra Mana Potion.",
@@ -64,9 +64,13 @@ const POOL := {
 	"lodestone": {"name": "Peddler's Lodestone", "tier": "common",
 		"desc": "Shop prices reduced {=@hooks.shop_discount*100}%.",
 		"hooks": {"shop_discount": 0.20}},
+	# BATCH IK §6 — SUSPENDED, NOT DELETED: its one hook was the rest node's, and rest nodes left the
+	# map at AN §6, so it paid nothing. `is_suspended` keeps it out of every draw and every list a player
+	# picks from; its entry, its words and the player's unlock stay, for the re-cut that brings it back.
 	"cairnmoss": {"name": "Cairnmoss Poultice", "tier": "common",
 		"desc": "Rest nodes restore 45% instead of 30%.",
-		"hooks": {"rest_heal_add": 0.15}},
+		"hooks": {"rest_heal_add": 0.15},
+		"suspended": "IK §6: its whole effect was the rest node's (rest_heal_add), and rest nodes were deleted at AN §6, so it pays nothing. It returns when its re-cut ships: it rides the post-fight recovery, at a number set by the ruling on whether a fallen hero stays down between fights."},
 	"lantern": {"name": "Gravelight Lantern", "tier": "common",
 		"desc": "Elite spoils include one extra consumable.",
 		"hooks": {"loot_extra": 1}},
@@ -163,12 +167,20 @@ static func desc_of(id: String) -> String:
 	return Classes.resolve_figures(String(POOL[id]["desc"]), POOL[id])
 
 
+# BATCH IK §6 — A SUSPENDED RELIC IS KEPT AND SAID TO BE KEPT (the Melted Armor contract, EO §3): its
+# entry resolves, its words stand and an unlock of it is never dropped (`load_data` keeps every POOL
+# id), but no draw reaches it and no list a player picks from shows it — the boss's unlock below, an
+# event's relic grant, the draft's assignment and the shelf. The string names what is lost.
+static func is_suspended(id: String) -> bool:
+	return String(POOL.get(id, {}).get("suspended", "")) != ""
+
+
 # Unlocks one random still-locked relic; returns its info, or {} if all owned.
 static func unlock_random() -> Dictionary:
 	load_data()
 	var locked: Array = []
 	for id in POOL:
-		if not unlocked.has(id):
+		if not unlocked.has(id) and not is_suspended(String(id)):
 			locked.append(id)
 	if locked.is_empty():
 		return {}

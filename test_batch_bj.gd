@@ -230,11 +230,14 @@ func _initialize() -> void:
 	# DISAGREEMENT REPAIRED**: the +1 Resonance is paid at every grade, so the words
 	# moved to the Perfect the strike does pay — the grade's harder blow. A Perfect of
 	# its own is still the designer's to make (IJ's report names the card).
+	# **AND IK §3b MADE IT, BY RULING — THE LATER DECISION THIS PIN WAS WAITING FOR.** The Perfect
+	# banks the engine's grant a second time, so the pin is re-pointed to the decision: the words
+	# say it, and battle.gd's Resonance block carries the one line that pays it, on a Perfect only.
 	var rf_perfect := _card_words("Reality Fracture", true)
-	ok(rf_perfect.begins_with("Deals ") and not rf_perfect.contains("Resonance"),
-		"§2 PINNED: Reality Fracture's perfect states the blow the strike pays, not the inert Resonance...")
-	ok(not bsrc.contains("Reality Fracture"),
-		"§2 PINNED: ...and battle.gd still has NO handler for it — the clause is inert (reported, not implemented)")
+	ok(rf_perfect.contains("Arcanist") and rf_perfect.contains("Resonance"),
+		"§2 PINNED: Reality Fracture's perfect states the Resonance it banks (IK §3b)...")
+	ok(bsrc.contains('if ab.display_name == "Reality Fracture" and is_perfect:'),
+		"§2 PINNED: ...and battle.gd pays it on a Perfect, and only there (IK §3b)")
 	# The ability descs corrected toward the code.
 	# Since IJ §2 the drip's figure is a token, so the words are read as the card shows them.
 	ok(_card_words("Consecrated Ground", false).contains("kindled 1 Faith"),

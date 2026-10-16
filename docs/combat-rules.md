@@ -159,6 +159,8 @@ back AND file a refused death as a killing blow. **Five `_resolve_special` branc
 hero's own health directly** (`phoenix`, `dark_pact`, `blood_offering`, `blood_price`,
 `shared_grief`) — a price paid, not a wound dealt, so none may feed an on-damage rider — **and each
 books the delta through `_book_self_cost`, which reaches the recap's ledger and nothing else (GF).**
+**Blood Price's price moves with the Blood Debt rune worn (IK §1)**: it is dealt through `take_hit` to the enemy with the
+most health, under the Berserker's own frame — a wound he deals, with every reader of the frame reading him — and he pays nothing.
 A new damage source goes through one of the two functions; a new direct cost calls
 `_book_self_cost`. Anything else reports nothing.
 · **ATTRIBUTION IS A FRAME**, `_dmg_frame(src, label, src_name)`, set at **`_resolve`'s entry** —

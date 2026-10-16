@@ -178,8 +178,11 @@ const TREE := [
 		"payload": {"stat": {"last_hope_pct": 40}}},
 	# PRECEDENT: Iron Will (wd_iron_will) — iron_will_ranks 1, which the read
 	# site multiplies by 12. Not one of the 43: a REFERENCE, a live node.
-	{"id": "tn_iron_will", "name": "Mitigation per Debuff You Carry", "tier": 2,
-		"desc": "Takes 12% less damage for every debuff currently carried, to a maximum of 90%.",
+	# BATCH IK §4 — THE NAME WINS AND THE DESCRIPTION IS THE LINE UNDER IT (the designer's): FX took the
+	# brief's label for the name, *Mitigation per Debuff You Carry*, and the chip went on wearing Iron Will;
+	# the node is Iron Will again — the name CK §2 left it — and the label opens its words.
+	{"id": "tn_iron_will", "name": "Iron Will", "tier": 2,
+		"desc": "Mitigation per debuff you carry. Takes 12% less damage for every debuff currently carried, to a maximum of 90%.",
 		"payload": {"stat": {"iron_will_ranks": 1}}},
 	# PRECEDENT: Armor Piercer (ss_piercer) — pierce_bonus 0.30. TAKEN.
 	{"id": "tn_pierce", "name": "Armor Penetration", "tier": 2,
@@ -208,8 +211,9 @@ const TREE := [
 	# the refusal is spent (`battle.gd`'s strike loop) — so the text states it.
 	# AND THE REFUSAL ITSELF IS NOT GATED ON HEALTH, which the old text implied:
 	# `unit.gd` refuses the killing hit whatever health it landed on.
-	{"id": "tn_refuse_death", "name": "Refuse Death Once", "tier": 3,
-		"desc": "Once per battle, the hit that would kill leaves 1 HP instead. Until that happens, deals 50% more damage below 25% health.",
+	# BATCH IK §4 — Undying Rage again, the name its chip and float always wore; FX's label opens its words.
+	{"id": "tn_refuse_death", "name": "Undying Rage", "tier": 3,
+		"desc": "Refuse death once. Once per battle, the hit that would kill leaves 1 HP instead. Until that happens, deals 50% more damage below 25% health.",
 		"payload": {"stat": {"undying_rage": 1}}},
 	# PRECEDENTS, ONE PER CURRENCY: Last Rites (bz_last_rites) — last_rites 1,
 	# the Rage form — and Conversion (ar_conversion) — conversion_ranks 30, the

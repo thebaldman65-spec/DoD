@@ -769,7 +769,7 @@ func _no_defence() -> void:
 	# least five, which was a lane's size. The claim that survives the lane is
 	# BS's own — his defence is EARNED IN THE TREE, not opened in the kit — and
 	# the tree he wears is the one class tree now, whose mitigation is its own
-	# (Less Damage Taken; Mitigation per Debuff You Carry). So the floor asks that
+	# (Less Damage Taken; Iron Will — FX's *Mitigation per Debuff You Carry*). So the floor asks that
 	# it is there at all: 5 -> 1, moved because its subject (a lane's size) is
 	# deleted, not because of what the sweep happens to count today.
 	var mitigating := 0

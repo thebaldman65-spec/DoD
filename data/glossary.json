@@ -71,6 +71,17 @@
   ]
  },
  {
+  "id": "strike_damage",
+  "term": "Strike Damage",
+  "category": "combat",
+  "short": "The damage an ability deals as its blow lands.",
+  "long": "A strike is the damage an ability deals as its blow lands. A status's tick, a detonation, a bleedout burst, a reflection and a bomb are not strikes, and a bonus to strike damage does not reach them. Nor does such a bonus, or a ward against strikes, reach a strike a card deals by a rule of its own, as a Killing Frost does; and a ward does not lessen a companion's blow.",
+  "see_also": [
+   "hits_not_casts",
+   "dmg_schools"
+  ]
+ },
+ {
   "id": "miss",
   "term": "Missing",
   "category": "combat",
@@ -808,7 +819,7 @@
   "term": "Consumables",
   "category": "gear",
   "short": "The heroes' shared pouch: eight kinds of item, all usable in battle and two on the map.",
-  "long": "Eight kinds of item, shared by all four heroes and carried in the pouch's slots (see Pouch Slots). In battle press ALT or use the Items action: a Health Potion restores {=Run.HEALTH_POTION_PCT*100}% of one hero's maximum health; a Mana Potion {=Run.MANA_POTION_PCT*100}% of one hero's maximum Mana or Rage; a Bomb deals {=Run.BOMB_BASE_DAMAGE} damage to every enemy, {=Run.BOMB_WIN_SCALE*100}% more for each victory this run; a Revive Potion raises a fallen hero at 50% health; a Defense Potion gives every living hero +10% armor for 3 turns; a Cleansing Draught removes every debuff from one hero but Broken, Bleed and a poison that refuses every cleanse; a Cursed Visage hexes every living enemy for the rest of the battle; and a Resonating Hourglass sends one hero to the front of the turn order. Health and Mana Potions work on the map too, where a Mana Potion refills Mana and not Rage. Shops, elite spoils, bargains and some events refill the pouch.",
+  "long": "Eight kinds of item, shared by all four heroes and carried in the pouch's slots (see Pouch Slots). In battle press ALT or use the Items action: a Health Potion restores {=Run.HEALTH_POTION_PCT*100}% of one hero's maximum health; a Mana Potion {=Run.MANA_POTION_PCT*100}% of one hero's maximum Mana or Rage; a Bomb deals {=Run.BOMB_BASE_DAMAGE} damage to every enemy, {=Run.BOMB_WIN_SCALE*100}% more for each victory this run; a Revive Potion raises a fallen hero at 50% health; a Defense Potion gives every living hero +10% armor for 3 turns; a Cleansing Draught removes every debuff from one hero but Broken, Bleed and a poison that refuses every cleanse; a Cursed Visage hexes every living enemy for the rest of the battle; and a Resonating Hourglass sends one hero to the front of the turn order. No one deals a bomb's damage — it marks nothing, feeds nothing, and claims no kill. Health and Mana Potions work on the map too, where a Mana Potion refills Mana and not Rage. Shops, elite spoils, bargains and some events refill the pouch.",
   "see_also": [
    "fallen",
    "node_types"

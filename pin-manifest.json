@@ -2,15 +2,15 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1814,
+  "total": 1842,
   "source": 1343,
-  "other": 123,
-  "document": 348
+  "other": 125,
+  "document": 374
  },
  "source_residency": {
   "narrow": 46,
-  "code": 821,
-  "absent": 323,
+  "code": 822,
+  "absent": 322,
   "runtime": 101,
   "unresolved": 3,
   "comment": 46,
@@ -3297,7 +3297,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_gv.gd#549"
+   "g": "check_gv.gd#554"
   },
   {
    "s": "check_gv.gd",
@@ -3308,7 +3308,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_gv.gd#543",
+   "g": "check_gv.gd#548",
    "alt": true
   },
   {
@@ -3320,7 +3320,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_gv.gd#544"
+   "g": "check_gv.gd#549"
   },
   {
    "s": "check_gv.gd",
@@ -3331,7 +3331,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_gv.gd#549"
+   "g": "check_gv.gd#554"
   },
   {
    "s": "check_gv.gd",
@@ -3342,7 +3342,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_gv.gd#543",
+   "g": "check_gv.gd#548",
    "alt": true
   },
   {
@@ -3354,7 +3354,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_gv.gd#544"
+   "g": "check_gv.gd#549"
   },
   {
    "s": "check_gv.gd",
@@ -3365,7 +3365,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_gv.gd#544"
+   "g": "check_gv.gd#549"
   },
   {
    "s": "check_gv.gd",
@@ -3376,7 +3376,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_gv.gd#543",
+   "g": "check_gv.gd#548",
    "alt": true
   },
   {
@@ -3388,7 +3388,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_gv.gd#543",
+   "g": "check_gv.gd#548",
    "alt": true
   },
   {
@@ -6863,18 +6863,6 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ij.gd#343",
-   "expr": "FIGURE_RULE"
-  },
-  {
-   "s": "check_ij.gd",
-   "fn": "_s4_rules",
-   "h": "CLAUDE.md",
-   "n": null,
-   "p": "+",
-   "r": "runtime",
-   "k": "non-literal",
-   "how": "read",
    "g": "check_ij.gd#345",
    "expr": "FIGURE_RULE"
   },
@@ -6887,7 +6875,19 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ij.gd#366",
+   "g": "check_ij.gd#347",
+   "expr": "FIGURE_RULE"
+  },
+  {
+   "s": "check_ij.gd",
+   "fn": "_s4_rules",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ij.gd#368",
    "expr": "SWEEP_ROW"
   },
   {
@@ -6899,7 +6899,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ij.gd#343",
+   "g": "check_ij.gd#345",
    "expr": "FIGURE_RULE"
   },
   {
@@ -6911,7 +6911,327 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ij.gd#347"
+   "g": "check_ij.gd#349"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ik.gd#139",
+   "expr": "seven"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ik.gd#142",
+   "expr": "seven"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ik.gd#147",
+   "expr": "ally"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ik.gd#147",
+   "expr": "ally"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ik.gd#153",
+   "expr": "row"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ik.gd#154",
+   "expr": "blk_head"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ik.gd#147",
+   "expr": "ally"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ik.gd#147",
+   "expr": "ally"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ik.gd#152",
+   "expr": "blk_head"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ik.gd#155",
+   "expr": "blk_head"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "docs/text-standard.html",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ik.gd#147",
+   "expr": "ally"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "CLAUDE.md",
+   "n": "\n## ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ik.gd#141"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "CLAUDE.md",
+   "n": "## STANDING RULE — A CARD OR A RUNE THAT CANNOT PAY WITHOUT ITS ENGINE SITS OUT",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ik.gd#140"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "Every alternative in a needle is live, or it is deleted",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_ik.gd#156"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "docs/text-standard.html",
+   "n": "MEANS WARBAND",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ik.gd#148"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "CLAUDE.md",
+   "n": "N010",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "slice",
+   "g": "check_ik.gd#145"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "CLAUDE.md",
+   "n": "N026",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "slice",
+   "g": "check_ik.gd#145"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "CLAUDE.md",
+   "n": "N027",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "slice",
+   "g": "check_ik.gd#145"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "CLAUDE.md",
+   "n": "N030",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "slice",
+   "g": "check_ik.gd#145"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "CLAUDE.md",
+   "n": "N033",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "slice",
+   "g": "check_ik.gd#145"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "CLAUDE.md",
+   "n": "N036",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "slice",
+   "g": "check_ik.gd#145"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "CLAUDE.md",
+   "n": "N043",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "slice",
+   "g": "check_ik.gd#145"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s0_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "zero is indistinguishable",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_ik.gd#157"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s4_names",
+   "h": "docs/master.html",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ik.gd#530",
+   "expr": "String"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s4_names",
+   "h": "docs/master.html",
+   "n": "<td>%s</td><td>%s",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_ik.gd#529"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s5_strike",
+   "h": "docs/master.html",
+   "n": "All fire strike damage +25%, whoever deals it.",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "read",
+   "g": "check_ik.gd#581"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s5_strike",
+   "h": "docs/master.html",
+   "n": "Takes 25% less strike damage",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "read",
+   "g": "check_ik.gd#581"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s5_strike",
+   "h": "docs/master.html",
+   "n": "more strike damage",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "read",
+   "g": "check_ik.gd#581"
   },
   {
    "s": "test_batch_ah.gd",
@@ -13489,17 +13809,6 @@
    "s": "test_batch_bj.gd",
    "fn": "_initialize",
    "h": "scripts/battle.gd",
-   "n": "Reality Fracture",
-   "p": "-",
-   "r": "absent",
-   "k": "literal",
-   "how": "read",
-   "g": "test_batch_bj.gd#95"
-  },
-  {
-   "s": "test_batch_bj.gd",
-   "fn": "_initialize",
-   "h": "scripts/battle.gd",
    "n": "Rests taken: %d",
    "p": "-",
    "r": "runtime",
@@ -13694,6 +14003,17 @@
    "k": "literal",
    "how": "read",
    "g": "test_batch_bj.gd#45"
+  },
+  {
+   "s": "test_batch_bj.gd",
+   "fn": "_initialize",
+   "h": "scripts/battle.gd",
+   "n": "if ab.display_name == \"Reality Fracture\" and is_perfect:",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "test_batch_bj.gd#95"
   },
   {
    "s": "test_batch_bj.gd",

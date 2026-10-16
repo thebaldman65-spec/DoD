@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-10-15 (Batch IJ &mdash; text against its constant)</b></p>
+<p align="right"><b>Last updated: 2026-10-16 (Batch IK &mdash; what the census found in the code)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -300,7 +300,7 @@ slower to come round again.</td></tr>
 <tr><td>Dull Edge</td><td>1</td><td>Critical chance -5%, for everyone.</td></tr>
 <tr><td>Muffled</td><td>1</td><td>All Break damage is reduced 25%. Meters fill slowly.</td></tr>
 <tr><td>Hoarfrost</td><td>1</td><td>Everyone begins the fight Chilled.</td></tr>
-<tr><td>Tinderbox</td><td>2</td><td>All fire damage +25%, whoever deals it.</td></tr>
+<tr><td>Tinderbox</td><td>2</td><td>All fire strike damage +25%, whoever deals it.</td></tr>
 <tr><td>Frenzied</td><td>2</td><td>Everyone acts 30% faster. Cooldowns are unchanged.</td></tr>
 <tr><td>Fleeting</td><td>2</td><td>Every status applied lasts one turn less (never below
 one).</td></tr>
@@ -698,7 +698,7 @@ light hits 1–2, heavies/AoE 2–5, Resurrection 3. The remaining cooldown
 shows on the ability button ("CD n") and in its tooltip. <b>Enemies do not use cooldowns at
 all</b> — their kits are gated by resources and AI conditions instead.</li>
 <li><b>Buff / Debuff (keywords):</b> a DEBUFF is any negative status effect, a BUFF any
-positive one. The talent that counts debuffs (the tree's Mitigation per Debuff You Carry)
+positive one. The talent that counts debuffs (the tree's Iron Will)
 uses this classification &mdash; and <b>Broken</b>, the Break meter's state rather than an affliction
 anyone lays, is not one of the debuffs it counts, as it is not one any breadth count reads.</li>
 <li><b>Crit:</b> 10% base + 25% vs Broken targets + 1% per Arcanist Resonance stack + talent/spec
@@ -727,6 +727,10 @@ Attack. <b>Neither Arcane Cannon nor Magi's Wrath
 carries a per-stack damage term</b> — the passive compounds, and an ability-side per-stack
 multiplier on top of it would square the escalation. Both keep their Break terms, which
 ride stacks on a different axis.</li>
+<li><b>A STRIKE is the damage an ability deals as its blow lands, and the list above is what a strike reads.</b>
+A status's tick, a detonation, a bleedout burst, a reflection and a bomb are not strikes, and a bonus to strike
+damage does not reach them; nor does it, or the Shieldmaster's ward, reach a strike a card deals by a rule of its
+own (a Killing Frost's). The school relics, Tinderbox, Clarity, Profligate and the ward each say <i>strike</i>.</li>
 <li><b>A companion's blows resolve on their own path and read almost none of that list.</b> They
 carry their own damage roll and their own flat critical, and of the strike loop's terms they read
 <b>Mark of the Hunt</b>, the ownerless <b>Hunter's Mark</b>, the Tracker's mark (&sect;6.0) and &mdash; since
@@ -830,8 +834,9 @@ armor).</td></tr>
 its Bestial Wrath strikes 2 turns).</td></tr>
 <tr><td>Elusiveness</td><td>Canis and Aguila are always Elusive: enemies are 25% more
 likely to miss them.</td></tr>
-<tr><td>Shielded</td><td>Takes 25% less damage — the Orc Shieldmaster's single-ally
-ward, or the Hollow Crown's Regalia.</td></tr>
+<tr><td>Shielded</td><td>Takes 25% less strike damage — the Orc Shieldmaster's single-ally
+ward, or the Hollow Crown's Regalia. A tick, a reflection, a card's own-rule damage and a companion's
+blow land whole.</td></tr>
 <tr><td>Ruin</td><td>The Old Gods' mark (Occultist passive, NO maximum, and it does not wear
 off — only an enemy mender's Cleansing Rite, Harvest, Cull, Requiem, Transference (which moves it to another enemy) and the Open Wound rune take it
 away):
@@ -879,8 +884,8 @@ damage (the Warrior class-wide <b>ability</b>, chip tag <code>Ir</code>). The Br
 <b>cap, not an immunity</b>: the meter fills to 99 and no further. Timed, and it carries no
 live counter.</td></tr>
 <tr><td>Iron Will</td><td>Takes 12% LESS damage per debuff carried, to a maximum of 90% (the
-talent tree's <b>Mitigation per Debuff You Carry</b> node, which every class can buy; the chip
-keeps this name); a permanent chip whose value follows the live debuff count. <b>Broken is not
+talent tree's <b>Iron Will</b> node, which every class can buy; the node and its chip wear one
+name); a permanent chip whose value follows the live debuff count. <b>Broken is not
 one of the debuffs it counts</b> &mdash; it is the Break meter's state, not an affliction.
 <b>A different mechanic from Ironclad above, and the only one of the two that wears this
 name.</b></td></tr>
@@ -1034,7 +1039,8 @@ to zero, which is greyed rather than hidden.</p>
 <tr><td><b>Mana Potion</b></td><td><b>40% of the target's maximum Mana/Rage</b> (= the old flat
 40 at the base maximum of 100).</td><td>6</td></tr>
 <tr><td><b>Bomb</b></td><td><b>50 damage to all enemies, +2% per combat win this run</b> — the
-heroes' own scaling rate, so a run opens unchanged at 50.</td><td>6</td></tr>
+heroes' own scaling rate, so a run opens unchanged at 50. No one deals a bomb's damage &mdash; it marks
+nothing, feeds nothing, and claims no kill.</td><td>6</td></tr>
 <tr><td><b>Revive Potion</b></td><td>Fallen hero returns at 50% HP, re-slotted onto the timeline.</td><td>6</td></tr>
 <tr><td><b>Defense Potion</b></td><td>Every hero gains Fortify (3 turns).</td><td>6</td></tr>
 <tr><td><b>Cleansing Draught</b></td><td>Removes <b>every debuff</b> from one chosen hero — the
@@ -1910,7 +1916,7 @@ beside. A card that appears in nobody's build plan is a card that fills a slot.<
 <tr><td><b>Blood Offering</b></td><td>0 Rage, 1.5, 3cd, self</td><td>He loses <b>20% of his CURRENT health</b> and gains 60 Rage. Because it is a share of what is left rather than of his maximum, it can never take him below 1 — and it costs less the lower he is.</td><td>Buying the frenzy band on purpose. Blood Frenzy pays for missing health and he has never controlled when he gets there.</td></tr>
 <tr><td><b>Gut Rip</b></td><td>30 Rage, 2.5, 4cd, one enemy</td><td><b>Bleeds the target out at once</b> whatever its buildup, plus 6% of Attack for every 10 points consumed (Perfect: 9%). It fires the real bleedout, so everything that answers a bleedout answers it.</td><td>The bleedout stops being the enemy's clock.</td></tr>
 <tr><td><b>Reckless Abandon</b></td><td>0 Rage, 1.5, 4cd, self</td><td>He spends <b>ALL his Rage</b>. For 3 turns he deals <b>+2% damage for every 10 points SPENT</b> (Perfect: 3%). A full 100-Rage bar is +20%; a half-empty one is half that, because it scales off what was actually spent and not off his maximum. At zero Rage it is refused outright rather than paying nothing.</td><td>The dump. Rage is spent in 20-to-35 point sips and nothing ever asked what a full bar is worth at once — and the three turns with nothing left to cast <b>are</b> the price.<br><b>Builds with:</b> <b>Blood Offering</b> (40 Rage out of his own health, so he can pay for the dump on demand).</td></tr>
-<tr><td><b>Berserk</b></td><td>25 Rage, 1.0, 5cd, self</td><td><b>His next 4 STRIKES each land twice</b>, and he <b>takes 30% more damage for 3 turns</b>.<br><b>Two different clocks:</b> the strikes are <b>charges</b> and wait until spent; the 30% is an ordinary 3-turn window.<br><b>They count HITS, not casts</b>, so a three-hit ability such as Hack and Slash spends the whole bank in one cast and lands six blows.</td><td>The risk dial at maximum, and <b>the drawback is the payoff</b> — Blood Frenzy scales his damage with missing health, so taking 30% more drives him into his own power band.<br><b>Builds with:</b> <b>Hack and Slash</b> and <b>Wildstrikes</b> (multi-hit and area blows that empty the bank at once, every doubled strike carrying his bleed buildup into <b>Gut Rip</b> and <b>Blood Debt</b>), and with the talent tree's <b>Refuse Death Once</b>, which pays again once the risk has taken him low.</td></tr>
+<tr><td><b>Berserk</b></td><td>25 Rage, 1.0, 5cd, self</td><td><b>His next 4 STRIKES each land twice</b>, and he <b>takes 30% more damage for 3 turns</b>.<br><b>Two different clocks:</b> the strikes are <b>charges</b> and wait until spent; the 30% is an ordinary 3-turn window.<br><b>They count HITS, not casts</b>, so a three-hit ability such as Hack and Slash spends the whole bank in one cast and lands six blows.</td><td>The risk dial at maximum, and <b>the drawback is the payoff</b> — Blood Frenzy scales his damage with missing health, so taking 30% more drives him into his own power band.<br><b>Builds with:</b> <b>Hack and Slash</b> and <b>Wildstrikes</b> (multi-hit and area blows that empty the bank at once, every doubled strike carrying his bleed buildup into <b>Gut Rip</b> and <b>Blood Debt</b>), and with the talent tree's <b>Undying Rage</b>, which pays again once the risk has taken him low.</td></tr>
 <tr><td><b>Blood Debt</b></td><td>20 Rage, 2.0, 4cd, one enemy (10 BD)</td><td>Strikes for 30% of Attack and <b>marks the enemy for the rest of the battle</b>. Every time that enemy <b>bleeds out</b> &mdash; the bleedout that kills it included &mdash; the Berserker heals <b>25% of his maximum health</b> (Perfect: 35%).<br><b>The mark survives the bleedout it pays for</b>, so a re-opened wound pays again.</td><td>A reason to survive being low. Blood Frenzy pays him for missing health and nothing in his kit paid him back — this fills the sustain hole out of his own engine rather than with a heal.<br><b>Builds with:</b> <b>Gut Rip</b>, which cashes it on demand.</td></tr>
 <tr><td><b>Unslaked</b></td><td>30 Rage, 1.0, 5cd, self</td><td>For 4 turns, <b>Blood Frenzy's floor captures the FULL bonus he reaches</b> rather than half of it. The floor is the half of his passive that keeps paying after he is healed back up — so the play pattern is cast this, <i>then</i> dive, and what he banks at the bottom is his for the rest of the battle.</td><td>The ratchet rate. This is the first card in the game that touches the passive's floor at all, and it is a <b>window</b> rather than a permanent raise.<br><b>Builds with:</b> <b>Blood Offering</b>, the dive he controls, so the two are a two-card combo that banks a floor on his own schedule instead of waiting for an enemy to grant one. <b>Berserk</b> lands him deeper still.</td></tr>
 <tr><td><b>Spite</b></td><td>20 Rage, 1.0, 4cd, self</td><td>For 6 turns, he takes <b>1% less damage for every 5% of maximum health MISSING</b>, up to 40%. <b>It is mitigation and never healing</b> — it keeps him inside the frenzy band instead of lifting him out of it.</td><td>Surviving the band he is paid for standing in. A card that healed him here would fight his own passive: it would take back the missing health Blood Frenzy pays for, so it would cancel itself.<br><b>Builds with:</b> <b>Blood Frenzy</b> itself, which reads the same missing health — every point that makes this bigger makes his damage bigger too. <b>Berserk</b> invites the damage it refuses; <b>Blood Debt</b> is the deliberate opposite number (take that one to leave the band, this one to live in it).</td></tr>
@@ -1918,7 +1924,7 @@ beside. A card that appears in nobody's build plan is a card that fills a slot.<
 <tr><td colspan="4"><b>Swordmaster</b> — <i>what is a stance worth</i>. There are now <b>two kinds of stance card, and the distinction is the rule</b>: <b>READERS BRANCH AND FLIP</b> — Precision Strike and Feint read the stance, buy what the stance they leave him <b>arriving</b> in wants, and then switch it, so he is never stranded. <b>GATED CARDS REQUIRE AND STAY</b> — Sever and Battle Poise are <b>refused outright</b> in the wrong guard (unavailable, not weaker) and casting them moves nothing. Feigned Guard is the seam between the two.</td></tr>
 <tr><td><b>Precision Strike</b></td><td>20 Rage, 2.0, 3cd, one enemy</td><td><b>From Aggressive:</b> strikes <b>twice</b> for 20% of Attack each (6 BD a strike), and grants <b>+25% parry chance for 4 turns</b> — the defence the Defensive guard he lands in wants.<br><b>From Defensive:</b> strikes <b>once</b> for 15% of Attack with 15 BD, and <b>his attacks ignore ALL armor for 4 turns</b> — the offence the Aggressive guard he lands in wants.<br>Either way the stance then switches. Perfect: the stance it grants holds 5 turns.</td><td>The same blade, two intentions. Armor is bypassed outright rather than penetrated by a percentage, which against an unarmoured enemy would have been a clause that does nothing.</td></tr>
 <tr><td><b>Feint</b></td><td>25 Rage, 2.0, 4cd, one enemy</td><td><b>From Aggressive:</b> strikes for 35% of Attack (12 BD), and <b>that enemy's next attack lands on one of its own allies</b> (Perfect: 45%).<br><b>From Defensive:</b> no strike at all — he banks <b>2 charges</b> (Perfect: 3), each of which parries a melee blow against him outright (never an area attack, nor while he is Broken) and deals its damage to the attacker instead.<br>Either way the stance then switches.<br><b>Charges, not turns:</b> both halves wait until spent, so a Feint cast into a lull is not wasted and cannot be dodged by an enemy simply not swinging.</td><td>Their swing lands somewhere they did not intend. From the front foot he tricks them into a friend; from the back foot into themselves.</td></tr>
-<tr><td><b>Sever</b></td><td>25 Rage, 2.5, 4cd, one enemy (15 BD) — <b>requires Aggressive</b></td><td>Cuts for <b>40% of Attack</b>. <b>If the target is Broken this ability's cooldown is cleared outright</b>, so he can swing through the same window again immediately.<br><b>Stance-GATED:</b> in the Defensive guard the card is unavailable, not weaker — and casting it does not move his stance.</td><td>The Break window rewards aggression. A Break opens a one-turn window and nothing let him swing repeatedly inside it.<br><b>Builds with:</b> <b>Shatterpoint</b> to open the window on demand.</td></tr>
+<tr><td><b>Sever</b></td><td>25 Rage, 2.5, 4cd, one enemy (15 BD) — <b>requires Aggressive</b></td><td>Cuts for <b>40% of Attack</b>. <b>If the target is Broken this ability's cooldown is cleared outright</b>, so he can swing through the same window again immediately.<br><b>Perfect:</b> the body it cut takes <b>Sunder</b> — −35% armor for 3 turns, Crushing Blow's own, one deep.<br><b>Stance-GATED:</b> in the Defensive guard the card is unavailable, not weaker — and casting it does not move his stance.</td><td>The Break window rewards aggression. A Break opens a one-turn window and nothing let him swing repeatedly inside it.<br><b>Builds with:</b> <b>Shatterpoint</b> to open the window on demand.</td></tr>
 <tr><td><b>Battle Poise</b></td><td>25 Rage, 1.0, 4cd, self — <b>requires Defensive</b></td><td>For 4 turns, <b>every attack he parries takes a turn off all of his other cooldowns</b>. It pays <b>per parry</b>, so two parries in one turn are worth two turns. It does not shorten its own recast. <b>And ONCE A TURN a parry also buys a free GUARD CHANGE</b> — the pivot alone, costing no action, and it still respects that ability&#x27;s own 1-turn cooldown and is refused while <b>Formless</b> holds.<br><b>Stance-GATED:</b> in the Aggressive guard it is unavailable, and casting it does not move his stance.</td><td>Defence buys tempo — and, since Batch DR, the guard requirement buys something too. Until then its Defensive gate was <i>pure cost</i>, which is why Answering Steel held its whole payload as a subset and there was no board on which this was the better pick. He is the only parry-<b>stat</b> hero in the game and all of it merely made hits smaller.<br><b>Builds with:</b> the talent tree's <b>Parry More</b>, because the card pays per parry. What it buys back is <b>Sever</b>, <b>Shatterpoint</b>, <b>Execute</b> and <b>Guard Change</b>.</td></tr>
 <tr><td><b>Feigned Guard</b></td><td>20 Rage, 1.0, 3cd, self</td><td>For 3 turns his <b>abilities resolve as though cast from the other stance — and satisfy that stance's requirement</b> — while he keeps the guard he is actually standing in. <b>It does NOT switch his stance</b>, and his passive keeps reading the guard he really holds.</td><td>The only card in the game that lets a build have both halves of its own toggle. The gate-satisfying clause is what makes it worth a slot: without it this is a minor modifier.<br><b>Builds with:</b> every other stance card. An <b>Aggressive</b> build gets <b>Battle Poise</b> plus Precision Strike's armor bypass and Feint's counter charges <i>while keeping Aggressive's damage bonus</i>; a <b>Defensive</b> build gets <b>Sever</b> and Precision Strike's double hit while keeping Seasoned Fighter's mitigation.</td></tr>
 <tr><td><b>Discipline</b></td><td>25 Rage, 1.0, 5cd, self</td><td>For 7 turns, <b>each consecutive turn held in the SAME stance strengthens that stance's own effect by 4%</b>, to a ceiling of 15%. <b>A Guard Change resets the accumulation to nothing</b> — and so does any card that switches him.</td><td>Paying him for refusing to switch. His whole spec is built on the pivot and nothing has ever rewarded standing still.<br><b>It fights his own readers and his own gated cards, and that is the tension:</b> Precision Strike and Feint both flip him, and Sever and Battle Poise each demand a specific guard.<br><b>Builds with:</b> <b>Seasoned Fighter</b>, whose two numbers it deepens, and <b>Feigned Guard</b>, which resolves the whole tension — it satisfies the other stance's requirement <i>without</i> switching him, so a Discipline build can still cast Sever or Battle Poise.</td></tr>
@@ -2153,10 +2159,14 @@ it, so his fury never fully cools. The floor banks on every hit taken, even one 
 to build 25 Bleed (a full flurry can bleed a target out), builds 10 Rage
 (Perfect: the Bleed lands on every one of the three strikes).<br>
 <i>Earnable (§6a):</i> Blood Price — 0 Rage, 1.5, 3cd; a self-buff that casts
-with no target selection: pays
-15% of CURRENT health (never lethal — the cost stops at 1 HP) for 30 Rage and +25%
-damage dealt for 2 turns; the chip shows the buff and turns remaining
-(Perfect: the health cost is halved).<br>
+with no target selection and runs no skill check: pays
+7.5% of CURRENT health (never lethal — the cost stops at 1 HP) for 30 Rage and +25%
+damage dealt for 2 turns; the chip shows the buff and turns remaining. <b>With the Blood
+Debt rune worn the cost is not his</b>: 7.5% of the current health of the enemy with the most
+health is dealt to it instead — the first in the warband on a tie, chosen with no die — and he
+pays nothing. It is <b>his damage</b> (the recap books it under Blood Price, the Reaver counts a
+kill it lands, a judged enemy's wound heals every ally), <b>not a strike</b> (no bonus to strike
+damage touches it), and the chip says whose blood paid.<br>
 <i>Earnable (§6a) or drafted:</i> Battle Shout — 15 Rage, 1.5, 2cd;
 EVERY HERO (companions excluded)
 gains +8% damage, plus 1% for every 20 points of blood buildup on the warband, for
@@ -2237,7 +2247,9 @@ overreach and the recovery leaves the whole line off balance. <b>Shatterpoint
 keeps its place among his heaviest single Break blows at 40.</b>
 Execute — 30 Rage, 55 dmg / 50 BD, 2.0, 3cd, usable against
 targets below 20% health OR against a Broken target — the loop sets up his own finisher
-(Perfect: guaranteed crit). <b>Both sit in the spec draft pool AND the boss-pick pool; no
+(Perfect: guaranteed crit). <b>Only those can be chosen</b>: the button lights when one stands,
+the target picker offers exactly those, and a hover on any other enemy says why it cannot be
+picked. <b>Both sit in the spec draft pool AND the boss-pick pool; no
 talent grants either any more (Batch DO), so the node UPGRADES they used to collide with are
 read-only-zero</b> — the branches stand and nothing writes them.</li>
 </ul>
@@ -2755,11 +2767,11 @@ and says plainly that it cannot be changed.</p>
 <tr><td>2</td><td>Kill What Is Down</td><td>+40% damage against Broken enemies.</td></tr>
 <tr><td>2</td><td>Cleanse Debuffs Each Turn</td><td>At the start of this hero&#x27;s turn, cleanse 2 debuffs from random allies.</td></tr>
 <tr><td>2</td><td>Heal More When Low</td><td>Heroes under 25% of their maximum health receive 40% more healing.</td></tr>
-<tr><td>2</td><td>Mitigation per Debuff You Carry</td><td>Takes 12% less damage for every debuff currently carried, to a maximum of 90%.</td></tr>
+<tr><td>2</td><td>Iron Will</td><td>Mitigation per debuff you carry. Takes 12% less damage for every debuff currently carried, to a maximum of 90%.</td></tr>
 <tr><td>2</td><td>Armor Penetration</td><td>Attacks ignore 30% of the target&#x27;s armor.</td></tr>
 <tr><td>2</td><td>Deflection</td><td>This hero&#x27;s Parry works against ranged attacks too.</td></tr>
 <tr><td>3</td><td>A Crit Pays</td><td>Every critical strike raises Attack by 3 for the rest of the battle.</td></tr>
-<tr><td>3</td><td>Refuse Death Once</td><td>Once per battle, the hit that would kill leaves 1 HP instead. Until that happens, deals 50% more damage below 25% health.</td></tr>
+<tr><td>3</td><td>Undying Rage</td><td>Refuse death once. Once per battle, the hit that would kill leaves 1 HP instead. Until that happens, deals 50% more damage below 25% health.</td></tr>
 <tr><td>3</td><td>Pay a Lethal Hit out of Your Resource Pool</td><td>Rage: below 25% health, damage is paid out of Rage first, 1 Rage a point, and reaches health only once the Rage is gone. Mana: 30% of all damage taken is paid as Mana instead of health.</td></tr>
 <tr><td>3</td><td>You Cannot Miss</td><td>Attacks cannot be made to miss: Blind and Dazed do not affect them, and Elusive does not protect against them.</td></tr>
 <tr><td>3</td><td>We Do Not Break</td><td>Every hero takes 20% less Break damage.</td></tr>
@@ -2922,8 +2934,8 @@ Elemental Weakness lands on every enemy; <b>Seeking Missiles</b> (Magic Missiles
 for each enemy under Elemental Weakness, each flying at the enemy it was counted for, after the volley's
 own three; <b>Detonating Ward</b> (Nexus Ward) &mdash; when the ward breaks or its time runs out, it deals
 every enemy the damage it absorbed; <b>Clarity</b> (passive) &mdash; a spell cast with the Mana bar full deals
-50% more damage; <b>Profligate</b> (passive, a tradeoff) &mdash; his spells deal 40% more damage and cost
-twice the Mana. A spell is an ability with a Mana price, so the free basic attack is not one. <b>Warrior:</b>
+50% more strike damage; <b>Profligate</b> (passive, a tradeoff) &mdash; his spells deal 40% more strike damage and cost
+twice the Mana, so a Killing Frost, which strikes by its own rule, costs double and is paid nothing. A spell is an ability with a Mana price, so the free basic attack is not one. <b>Warrior:</b>
 <b>Goading Roar</b> (Mocking Blow) &mdash; an enemy his taunt binds deals 25% less damage;
 <b>Rending Blows</b> (Crushing Blow) &mdash; Crushing Blow on an enemy already Sundered deepens the Sunder,
 up to three deep: each depth takes 35% of the enemy's armor, so three leave it none; <b>Grudge</b>
@@ -3266,17 +3278,16 @@ start, battle SPAWN (base stats, before turn one), the victory screen, gold awar
 and elite spoils, 25 in all, and six of the hooks are read at more than one. The category
 `relics.gd` declares OUT — on-kill and per-turn procs, revive-on-death, enemy auras, DoT and
 Break multipliers — is exactly the in-combat one, and the talent tree is the only permanent
-layer that reaches a turn as it resolves. <b>Pool: 25 relics — 17 common, 8 rare (marked RARE on the shelf and in the picker)</b> — every
+layer that reaches a turn as it resolves. <b>Pool: 24 relics — 16 common, 8 rare (marked RARE on the shelf and in the picker)</b> — every
 effect expressed through an audited <b>hook vocabulary</b> (18 hooks, listed atop relics.gd:
 run-start gold/items, per-hero stat boosts at battle spawn — attack, typed damage, max
 HP, armor, speed, crit, Constitution, resistances, resource floor — victory heal/mana/gold,
 gold-find, shop discount, elite loot; the <code>rest_heal_add</code> hook has no reader, because
-the map has no rest node, so Cairnmoss Poultice pays nothing and Martyr's Knucklebone pays only
-its victory heal, both pending a design pass). Scalar hooks SUM and dict hooks merge
+the map has no rest node, so Martyr's Knucklebone pays only its victory heal, pending a design pass). Scalar hooks SUM and dict hooks merge
 across the equipped set, so stacking is well-defined. Adding a relic on an existing hook is
 pure data. Highlights: Waystone Shard opens the run with a potion of each kind; the elemental trio
-(Emberheart / Frostbound Sigil / Nightbloom Charm) covers all six non-physical damage
-schools; Prism Veil
+(Emberheart / Frostbound Sigil / Nightbloom Charm) raises strike damage in all six non-physical
+damage schools; Prism Veil
 gives 10% resistance to every element; The King's Ledger compounds gold.</li>
 <li><b>Persistent profile</b> (user://profile.json, outside the run save): counts runs
 started/completed/wiped/<b>forfeited</b> per spec, bosses killed by kind, events seen (with

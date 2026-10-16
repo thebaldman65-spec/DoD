@@ -53,7 +53,9 @@ const SCRATCH_RELICS := "user://hf_relics.json"
 # no line changing here is a change nobody ruled. **TWO MOVED AT IJ §2, WHICH THE
 # DESIGNER RULED** (every text the code contradicts is repaired): Abundance's
 # overheal is HIS healing's alone, and the Vow's +50% skips the heals Faith and Ruin
-# pay. IJ's report names both.
+# pay. IJ's report names both. **AND TWO MORE AT IK §5, WHICH THE DESIGNER RULED** (the
+# eight texts that mean a strike say so): Clarity's and Profligate's bonus is strike
+# damage, and Profligate names the one spell it does not reach. IK's report names both.
 const HF_RUNES := {
 	"abundance": ["cleric", "Abundance", ["PASSIVE"],
 		"His healing beyond an ally's missing health becomes a shield on them."],
@@ -72,9 +74,9 @@ const HF_RUNES := {
 	"detonating_ward": ["mage", "Detonating Ward", ["ABILITY"],
 		"When it breaks or ends, it deals the damage it absorbed to every enemy."],
 	"clarity": ["mage", "Clarity", ["PASSIVE"],
-		"A spell cast at full Mana deals 50% more damage."],
+		"A spell cast at full Mana deals 50% more strike damage."],
 	"profligate": ["mage", "Profligate", ["PASSIVE", "TRADEOFF"],
-		"His spells deal 40% more damage and cost twice the Mana."],
+		"His spells deal 40% more strike damage and cost twice the Mana: a Killing Frost costs double and is paid nothing."],
 	"goading_roar": ["warrior", "Goading Roar", ["ABILITY"],
 		"Taunted enemies deal 25% less damage while they must attack him."],
 	"rending_blows": ["warrior", "Rending Blows", ["ABILITY"],

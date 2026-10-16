@@ -419,7 +419,9 @@ static func apply(run: Node, fx: Dictionary) -> String:
 				run.set("gold", int(run.get("gold")) + 40)
 				return "relic slots full — +40 gold instead"
 			var want_tier := String(fx.get("tier", ""))
+			# BATCH IK §6: a suspended relic is never granted (`Relics.is_suspended`).
 			var pool: Array = Relics.POOL.keys().filter(func(id): return not active.has(id) \
+				and not Relics.is_suspended(String(id)) \
 				and (want_tier == "" or String(Relics.POOL[id].get("tier", "common")) == want_tier))
 			if pool.is_empty():
 				run.set("gold", int(run.get("gold")) + 40)

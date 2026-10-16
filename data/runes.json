@@ -918,13 +918,13 @@
 	"clarity": {
 		"name": "Clarity", "scope": "class:mage",
 		"price": 150,
-		"desc": "A spell cast at full Mana deals {=@payload.stat.rune_clarity*100}% more damage.",
+		"desc": "A spell cast at full Mana deals {=@payload.stat.rune_clarity*100}% more strike damage.",
 		"payload": {"stat": {"rune_clarity": 0.5}}
 	},
 	"profligate": {
 		"name": "Profligate", "scope": "class:mage",
 		"price": 150,
-		"desc": "His spells deal {=@payload.stat.rune_profligate*100}% more damage and cost twice the Mana.",
+		"desc": "His spells deal {=@payload.stat.rune_profligate*100}% more strike damage and cost twice the Mana: a Killing Frost costs double and is paid nothing.",
 		"payload": {"stat": {"rune_profligate": 0.4}}
 	},
 	"goading_roar": {

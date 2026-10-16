@@ -1981,3 +1981,19 @@ NOT a wrapping problem.
   under it from a list; all are cheap, so all run. A target that loads another gate by its own path reads a named file,
   never a new one, and is not this population. Each reads its count with no failure before the acceptance, and the new
   gate's own reading is taken in the same pass.
+
+## STANDING RULE — AN INSTRUMENT THAT CANNOT READ A DEFECT IS NOT AN INSTRUMENT (Batch IK §0.12, ruled by the designer)
+> **AN INSTRUMENT THAT CANNOT READ A DEFECT IS NOT AN INSTRUMENT.** A sweep that reads nothing of everything has failed until
+> it is shown to bite, because zero is indistinguishable from a clean tree; and **a needle that offers alternatives passes on
+> the dead one and hides the loss of the live one. Every alternative in a needle is live, or it is deleted.**
+
+- **THE TWO CASES ARE IJ's.** Its literal sweep read nothing lost and nothing gained on its first run — zsh handed the
+  twenty-five paths over as one argument, so it swept a file that did not exist — and the empty result was the tell. And
+  `check_fm` §2a accepted a retired sentence as one side of an alternation: the dead text satisfied the needle, so the live
+  text could have gone missing under a green read.
+- **AND THE THIRD, BITING A THIRD TIME, WAS `check_gv`'s BLOOD DEBT ARM**: it handed `_resolve` an enemy target the game
+  never gives Blood Price, so it passed on a rune no player could fire (IJ's census row N023). It casts on the card's real
+  target since IK §1, and `check_ik` §1 drives the player's own turn.
+- **SO AN INSTRUMENT SAYS HOW IT BIT.** A sweep prints what it read and over how many, and is run once against a planted hit
+  it must find; a needle is one phrase standing in the text today, never a choice between an old phrase and a new one; and
+  an arm reaches its subject the way the game does, never through a call the game cannot make.

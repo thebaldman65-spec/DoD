@@ -1976,7 +1976,7 @@ func _proc_log(text: String) -> void:
 # BATCH HU §4 — BROKEN IS NOT A DEBUFF IT COUNTS (RULED BY THE DESIGNER), matching the
 # breadth count (`battle._status_count`), which has excluded it by rule since it was
 # written. Broken is a meter state with a chip, not an affliction anybody laid (HT §2e),
-# and this count is what *Mitigation per Debuff You Carry* pays on: counting it, a Broken
+# and this count is what *Iron Will* pays on (the node's name again since IK §4): counting it, a Broken
 # hero holding the node took one debuff's worth less damage for being Broken.
 func count_debuffs() -> int:
 	var n := 0
@@ -3023,6 +3023,33 @@ func set_targetable(on: bool) -> void:
 		_set_plate_hover(false)
 
 
+# BATCH IK §2 — A BODY THE OPEN PICK CANNOT NAME SAYS WHY ON ITS HOVER. It covers the click zone
+# with a Control that carries the reason as its tooltip and takes no press, so hovering shows the
+# refusal and clicking does nothing; it draws no marker, and it is not the target button, so the
+# keyboard's pool, the plate's click and `clicked` never see it. "" takes it down.
+var _refusal_zone: Control = null
+
+
+func set_target_refusal(reason: String) -> void:
+	if reason == "":
+		if _refusal_zone != null:
+			_refusal_zone.visible = false
+			_refusal_zone.tooltip_text = ""
+		return
+	if _refusal_zone == null:
+		_refusal_zone = Control.new()
+		_refusal_zone.mouse_filter = Control.MOUSE_FILTER_STOP
+		add_child(_refusal_zone)
+	_refusal_zone.position = _target_btn.position
+	_refusal_zone.size = _target_btn.size
+	_refusal_zone.tooltip_text = reason
+	_refusal_zone.visible = true
+
+
+func target_refusal() -> String:
+	return _refusal_zone.tooltip_text if _refusal_zone != null and _refusal_zone.visible else ""
+
+
 # BATCH IH §6 — PARENT, THEN PLACE. A Control's theme overrides reach its minimum size only once it is
 # in the tree; a size set before that is clamped to the default font's and never shrinks back. Every
 # label on a plate goes through here.
@@ -4008,6 +4035,9 @@ func effective_armor() -> float:
 # stands (1 unless a Rending Blows Crushing Blow deepened it). THE ONE ANSWER:
 # the armor line above and the chip `battle.gd` stamps both read it.
 const SUNDER_STEP := 0.35
+# BATCH IK §3a — SUNDER's OWN DURATION: what its base application lays — Crushing Blow, the card every
+# Warrior holds — and what a Perfect Sever lays on the body it cut, read here by both, never retyped.
+const SUNDER_TURNS := 3
 func sunder_depth() -> int:
 	if not has_status("sunder"):
 		return 0
@@ -4706,7 +4736,7 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		undying_rage_used = true
 		hp = 1
 		float_text("UNDYING RAGE", Color(0.95, 0.25, 0.2), true)
-		_proc_log("Talent: Refuse Death Once — %s refuses to die (1 HP; the rage ends)" % unit_name)
+		_proc_log("Talent: Undying Rage — %s refuses to die (1 HP; the rage ends)" % unit_name)
 	_ashes_guard()
 	_holy_reversal()
 	# BATCH BL §2 — BOOKED BELOW ALL FOUR DEATH-REFUSALS (Hold the Line, Undying
@@ -5034,7 +5064,7 @@ func take_tick_damage(amount: int, label: String, color: Color) -> bool:
 		undying_rage_used = true
 		hp = 1
 		float_text("UNDYING RAGE", Color(0.95, 0.25, 0.2), true)
-		_proc_log("Talent: Refuse Death Once — %s refuses to die (1 HP; the rage ends)" % unit_name)
+		_proc_log("Talent: Undying Rage — %s refuses to die (1 HP; the rage ends)" % unit_name)
 	_ashes_guard()
 	_holy_reversal()
 	# BATCH BL §2 — same rule as take_hit: below every death-refusal.

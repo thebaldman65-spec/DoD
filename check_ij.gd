@@ -394,7 +394,9 @@ const REPAIRS := [
 	["card:Precision Strike:desc", "for 4 turns.", "for 3 turns."],
 	["card:Precision Strike:desc", "for 4 turns.", "for 3 turns."],
 	["card:Precision Strike:perfect", "holds 5 turns", "holds 4 turns"],
-	["card:Sever:perfect", "Deals {atk:46}", "Also strips 35% armor for 3 turns"],
+	# BATCH IK §3a — RE-POINTED: the Perfect is the designer's now (it lays Sunder), so IJ's interim words
+	# moved to the ruled ones; the clause the census found false stays absent.
+	["card:Sever:perfect", "Sunders armor by 35% for 3 turns", "Also strips 35% armor for 3 turns"],
 	["card:Battle Poise:desc", "his other cooldowns", "his cooldowns"],
 	["card:Answering Steel:desc", "your other cooldowns.", "your cooldowns."],
 	["card:Firestorm:desc", "of Burn in", "of drain in"],
@@ -411,7 +413,8 @@ const REPAIRS := [
 	["card:Inner Arcane:desc", "still ALIVE —", "ALIVE, plus one"],
 	["card:Inner Arcane:desc", "health — plus one.", "half health. Widest"],
 	["card:Arcane Echo:desc", "Cinderfall, Killing Frost, Pyre Wake, Wildfire and Winter's Toll do not echo. A six-bolt Barrage echoes SIX", "A three-bolt Barrage echoes THREE"],
-	["card:Reality Fracture:perfect", "Deals {atk:17.25}", "An Arcanist also banks 1 Resonance"],
+	# BATCH IK §3b — RE-POINTED for its reason: the Perfect banks the second Resonance now.
+	["card:Reality Fracture:perfect", "An Arcanist banks +1 Resonance", "An Arcanist also banks 1 Resonance"],
 	["card:Renewal:desc", "A hero heals", "Ally heals"],
 	["card:Hymn of Hope:desc", "ALL heroes for", "ALL allies for"],
 	["card:Resurrection:desc", "fallen hero to", "fallen ally to"],
@@ -656,7 +659,7 @@ const REPAIRS := [
 	["status:divine_presence", "on which no hero fell below the window", "no ally fell"],
 	["engine:conviction", "the hero is healed for", "the ally is healed for"],
 	["lit:data/enemies.json", "Mends the most wounded of its warband", "Mends the most wounded ally", 2],
-	["lit:data/enemies.json", "Wards one of its warband: 25% less damage taken", "Wards an ally"],
+	["lit:data/enemies.json", "Wards one of its warband: 25% less strike damage taken", "Wards an ally"],  # IK §5: the strike named
 	["lit:data/enemies.json", "Heals one of its warband for 20%", "Heals an ally for 20%"],
 	["lit:data/enemies.json", "Strips one harmful effect from each of its warband", "from each ally"],
 	["lit:data/enemies.json", "for every one of its warband fallen this battle", "for every ally that has fallen"],
@@ -817,7 +820,8 @@ const PINS := [
 	["card:Sweeping Strikes:perfect", "+25% crit", "scripts/battle.gd", "_resolve", "crit_chance += 0.25"],
 	["card:Shatterpoint:perfect", "+15 bonus BD", "scripts/battle.gd", "_resolve", "pr += 15"],
 	["card:Lunge:desc", "3 turns either way", "scripts/battle.gd", "_resolve", "_apply_status(strike_target, lunge_status, 3"],
-	["card:Execute:desc", "below 20% health", "scripts/battle.gd", "_ability_usable", "exec_thr := 0.35 if u.execute_upgraded > 0 else 0.2"],
+	# BATCH IK §2 — RE-POINTED: the line moved out of the door into the one answer the door, the picker and the bot ask.
+	["card:Execute:desc", "below 20% health", "scripts/battle.gd", "_execute_line", "return 0.35 if u.execute_upgraded > 0 else 0.2"],
 	["card:Precision Strike:desc", "strike TWICE", "scripts/battle.gd", "_resolve_special", "ps_hits := 2 if ps_aggressive else 1"],
 	["card:Feint:perfect", "A third charge", "scripts/battle.gd", "_resolve_special", "FEINT_GUARDS + (1 if is_perfect else 0)"],
 	["card:Feint:perfect", "45% in Aggressive", "scripts/battle.gd", "_resolve_special", "ft_pct := 45 if is_perfect"],
@@ -1364,8 +1368,9 @@ const PINS := [
 	["glossary:recast_refused:long", "Nexus Ward a fifth", "scripts/battle.gd", "_resolve_special", "var mb_pct := 0.20"],
 	["lit:data/enemies.json", "for 25% of their max HP", "scripts/battle.gd", "_resolve_special", "var wave_heal := maxi(int(round(target.max_hp * 0.25)), 1)"],
 	["lit:data/enemies.json", "heals 25% of max health", "scripts/battle.gd", "_resolve_special", "var wave_heal := maxi(int(round(target.max_hp * 0.25)), 1)"],
-	["lit:data/enemies.json", "Wards one of its warband: 25% less damage taken for 3 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"shielded\", 3)"],
-	["lit:data/enemies.json", "The Crown wards itself: 25% less damage taken for 3 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"shielded\", 3)"],
+	# BATCH IK §5 — the two wards name the strike; the figure and its code are unmoved.
+	["lit:data/enemies.json", "Wards one of its warband: 25% less strike damage taken for 3 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"shielded\", 3)"],
+	["lit:data/enemies.json", "The Crown wards itself: 25% less strike damage taken for 3 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"shielded\", 3)"],
 	["lit:data/enemies.json", "for 20% of their max health", "scripts/battle.gd", "_resolve_special", "var growth := maxi(int(round(target.max_hp * 0.20)), 1)"],
 	["lit:data/enemies.json", "It lands next turn", "scripts/battle.gd", "_resolve_special", "\"ability\": ab, \"target\": null, \"turns\": 1, \"support\": false"],
 	["lit:data/enemies.json", "regains 6% of their maximum health", "scripts/battle.gd", "_resolve_special", "var tp_amt := maxi(int(round(tp_a.max_hp * 0.06)), 1)"],

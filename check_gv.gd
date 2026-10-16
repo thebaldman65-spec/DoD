@@ -157,7 +157,7 @@ const ROWS := {
 const GROUPS := {
 	"glass_prison": ["HALF", "a second body frozen either way; a second PRISON only with the engine"],
 	"open_line": ["HALF", "Formless opens both stance gates either way; its numbers only with the engine"],
-	"blood_debt_rune": ["HALF", "the target pays and he does not either way; the Frenzy steps only with the engine"],
+	"blood_debt_rune": ["HALF", "the fullest enemy pays and he does not either way; the Frenzy steps only with the engine"],
 	"second_whistle": ["HALF", "a companion arrives holding 3 Loyalty either way; the Pack Bond boon only with the engine"],
 	"ashfall": ["CARD", "Funeral Pyre"],
 	"chain_fire": ["CARD", "Firedraw"],
@@ -701,11 +701,22 @@ func _drive(id: String, s: Node) -> Dictionary:
 				if other2 != u and not other2.dead and other2.next_time <= u.next_time:
 					first = false
 			return {"first": first}
+		# BATCH IK §1 — RE-POINTED TO THE CAST THE GAME PRODUCES. Blood Price is a self-cast: the
+		# player's turn hands it the Berserker (`_player_turn`'s no-target list) and so does the bot,
+		# so this arm passing an ENEMY to `_resolve` drove a rune the game could never fire, and
+		# passed (IJ's census, N023; the third note biting a third time). It casts on HIM now, and
+		# reads what every enemy lost, because the rune chooses who pays (the fullest — `check_ik` §1
+		# drives the choice through the real turn).
 		"blood_debt_rune":
-			var fwas := f0.hp
+			var foes_was := 0
+			for fe in _foes(s):
+				foes_was += fe.hp
 			var uwas := u.hp
-			await _cast(s, u, "Blood Price", f0)
-			return {"foe": fwas - f0.hp, "self": uwas - u.hp}
+			await _cast(s, u, "Blood Price", u)
+			var foes_now := 0
+			for fe2 in _foes(s):
+				foes_now += fe2.hp
+			return {"foe": foes_was - foes_now, "self": uwas - u.hp}
 		"butchers_bill":
 			var extra := 0
 			for k5 in 8:
@@ -1136,7 +1147,7 @@ func _s1c_the_half() -> void:
 	for equip5 in [true, false]:
 		var s5: Node = await _board("blood_debt_rune", equip5, true)
 		var u5: BattleUnit = _hero(s5, "warrior")
-		await _cast(s5, u5, "Blood Price", _foes(s5)[0])
+		await _cast(s5, u5, "Blood Price", u5)  # BATCH IK §1: the target the game hands it, its caster
 		steps[equip5] = int(round(u5.frenzy_bonus() * 100.0)) if u5.has_engine("bloodrage") else 0
 		await _clear(s5)
 	print("    [Blood Debt] Blood Frenzy after the bill: +%d%% equipped, +%d%% owned" % [steps[true], steps[false]])
