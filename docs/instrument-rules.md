@@ -1961,5 +1961,23 @@ NOT a wrapping problem.
 - **SIX OF ONE SHAPE.** IH found the fifth and the sixth by hand and fixed both to read their constants: Sanctity's rule
   text said 16 after IG set the step to 13, and the Swordmaster's Stances line said +15% where the fight pays 30%
   (`check_ih` §0d and §3 hold each).
-- **THE SWEEP FOR THE REST IS OWED A BATCH OF ITS OWN, IJ's — RULED, NOT BUILT.** Until it runs, a batch that writes a
-  number into player-facing text formats it from the constant in the same change.
+- **THE SWEEP FOR THE REST WAS BUILT AT IJ: EVERY PLAYER-FACING STRING READ AGAINST THE CODE, ITS LITERALS CONVERTED TO
+  READ THEIR CONSTANTS, ITS DISAGREEMENTS REPAIRED, AND WHAT NO CONSTANT DECIDES PINNED** (the census and its counts are
+  IJ's report). `CLAUDE.md`'s text standard says how a token is written and where it is read; `check_ij` §2 asserts no
+  surface reads one raw and §3 ties each pinned figure to the code that decides it. A batch that writes a number into
+  player-facing text formats it from the constant in the same change, or adds its row to `check_ij` §3.
+
+## STANDING RULE — A NEW GATE's OWN SOURCE IS READ BY THE GATE-SOURCE READERS BEFORE THE ACCEPTANCE, NOT BY IT (Batch IJ §0.4, ruled by the designer)
+> **A NEW GATE's OWN SOURCE IS READ BY THE GATE-SOURCE READERS BEFORE THE ACCEPTANCE, NOT BY IT.** The population is the
+> targets that open `"res://"` — II §9g names nineteen of them — and running them over the new gate costs minutes where the
+> acceptance costs eighty.
+
+- **WHY: A NEW GATE IS NOT IN HEAD's BATTERY, SO NO RECON CAN SEE IT** — a recon runs HEAD's targets, and every target that
+  reads gate source meets the new gate for the first time in the acceptance. **The case is II's own `check_ii`**, which
+  pinned a batch code in a needle: `check_ea` §3 read it 397 / 2 in the first acceptance, which neither recon could have
+  shown, and the repair was right and cost a second whole acceptance.
+- **THE POPULATION IS DERIVED ON THE BATCH's TREE, NEVER QUOTED**: `grep -l '"res://"'` over the battery's targets —
+  nineteen at II, and the new gate among them the day it opens the root itself. Some walk the root and some build a path
+  under it from a list; all are cheap, so all run. A target that loads another gate by its own path reads a named file,
+  never a new one, and is not this population. Each reads its count with no failure before the acceptance, and the new
+  gate's own reading is taken in the same pass.

@@ -139,9 +139,11 @@ const NARROW := {
 # `NARROW` pins above still assert each walks the four, so the half of the
 # ruling that is about the game is still asked. The three CARD texts below (War
 # Stomp twice, Rallying Shout) are ability descriptions in `classes.gd`.
+# BATCH IJ §2 — WAR STOMP's TWO SAY *OTHER* HEROES: its loop skips the caster, and IJ repaired every text
+# the code contradicts. Still `hero`, which is DK's claim. Read as shown (`_shown`), since IJ's tokens.
 const TEXT_IS_HERO := [
-	"Heroes regain 20% of their resource",
-	"and 15 BD each. Heroes regain 10%",
+	"Other heroes regain 20% of resource",
+	"and 15 BD each. Other heroes regain 10%",
 	"every other hero\\nregains 30% of their resource.",
 	"Every hero takes 20% less Break damage.",
 	"Heroes under 25% of their maximum health receive 40% more healing.",
@@ -414,8 +416,11 @@ func _texts() -> void:
 	var tal := FileAccess.get_file_as_string("res://scripts/talents.gd")
 	var cls := FileAccess.get_file_as_string("res://scripts/classes.gd")
 	ok(tal != "" and cls != "", "talents.gd and classes.gd are readable")
+	# BATCH IJ §2 — READ AS A SURFACE SHOWS THEM: IJ wrote the figures as tokens, resolved at `Ability.make`
+	# and `Talents.desc_for`, so each needle is looked for in the shown words (line breaks in source form).
+	var shown := _shown()
 	for t in TEXT_IS_HERO:
-		ok(tal.contains(t) or cls.contains(t),
+		ok(shown.contains(t),
 			"a DK §2 text no longer says `hero`: %s" % t)
 	# AND THE FOUR THAT KEEP "ALLY", which are only correct because §1 widened.
 	# BATCH DO — THE HOLD THE LINE NEEDLE FOLLOWED ITS TEXT INTO `classes.gd`.
@@ -438,11 +443,11 @@ func _texts() -> void:
 		"tn_cleanse (was sv_medic Field Medic)": "cleanse 2 debuffs from random allies",
 	}
 	for what in allies:
-		ok(tal.contains(allies[what]),
+		ok(shown.contains(allies[what]),
 			"%s stopped saying `ally`, but its read site still reaches companions" % what)
-	ok(cls.contains("Embolden every ally: 50% less Break"),
+	ok(shown.contains("Embolden every ally: 50% less Break"),
 		"Hold the Line stopped saying `ally`, but its read site still reaches companions")
-	ok(cls.contains("Ground made safe: every ally heals"),
+	ok(shown.contains("Ground made safe: every ally heals"),
 		"sanctuary Sanctuary stopped saying `ally`, but its read site still reaches companions")
 	# NO §2 TEXT MAY STILL CARRY THE OLD WORD. The seven were moved one at a
 	# time and a half-moved text is the failure this catches.
@@ -451,6 +456,18 @@ func _texts() -> void:
 			"Every ally takes {v}%", "Allies under 25%"]:
 		ok(not tal.contains(stale) and not cls.contains(stale),
 			"a DK §2 text still carries its pre-DK `ally` wording: %s" % stale)
+
+
+# Every card's words and Perfect, and every talent's words at rank 1, as a surface shows them — a line
+# break written `\n`, as the needles above are.
+func _shown() -> String:
+	var out := PackedStringArray()
+	for ab in Classes.ability_corpus():
+		out.append(String(ab.description).replace("\n", "\\n"))
+		out.append(String(ab.perfect_text).replace("\n", "\\n"))
+	for node in Talents.TREE:
+		out.append(Talents.desc_for(node, 1).replace("\n", "\\n"))
+	return "\n".join(out)
 
 
 # ── §6 — THE PROSE ──────────────────────────────────────────────────────────

@@ -110,10 +110,13 @@ const BOMB_WIN_SCALE := 0.02      # +2% per combat win — the heroes' own rate
 const ITEM_IDS := ["health", "mana", "bomb", "revive", "defense",
 	"cleanse", "visage", "hourglass"]
 const ITEM_INFO := {
-	"health": ["Health Potion", "Restores 20% of one ally's maximum health."],
-	"mana": ["Mana Potion", "Restores 40% of one ally's maximum Mana (or Rage)."],
-	"bomb": ["Bomb", "Deals 50 damage to all enemies, +2% per victory this run."],
-	"revive": ["Revive Potion", "Revives a fallen ally at 50% HP."],
+	"health": ["Health Potion", "Restores %d%% of one hero's maximum health."
+		% [int(round(HEALTH_POTION_PCT * 100))]],
+	"mana": ["Mana Potion", "Restores %d%% of one hero's maximum Mana (or Rage)."
+		% [int(round(MANA_POTION_PCT * 100))]],
+	"bomb": ["Bomb", "Deals %d damage to all enemies, +%d%% per victory this run."
+		% [BOMB_BASE_DAMAGE, int(round(BOMB_WIN_SCALE * 100))]],
+	"revive": ["Revive Potion", "Revives a fallen hero at 50% HP."],
 	"defense": ["Defense Potion", "+10% armor to every living hero for 3 turns."],
 	# BATCH CT §4 — the three new ones. All BATTLE ONLY: on the map they sit
 	# in the pouch with a disabled button that says why, which is the BOMB's
@@ -4522,7 +4525,7 @@ func bomb_damage() -> int:
 # max-HP runaway in its history (Batch W).
 const MODIFIERS := {
 	"overgrown": {"name": "Overgrown", "severity": 1,
-		"desc": "Both parties begin the fight at 70% health."},
+		"desc": "Both parties begin the fight at 70% health at most."},
 	"tinderbox": {"name": "Tinderbox", "severity": 2,
 		"desc": "All fire damage +25%, whoever deals it."},
 	"frenzied": {"name": "Frenzied", "severity": 2,
@@ -4535,11 +4538,11 @@ const MODIFIERS := {
 		"desc": "No healing for anyone. Bleed and damage-over-time still tick."},
 	# ---- severity 1 (Batch AQ) ----
 	"parched": {"name": "Parched", "severity": 1,
-		"desc": "Both parties begin the fight at half resource."},
+		"desc": "Both parties begin the fight at half resource at most."},
 	"slick": {"name": "Slick Footing", "severity": 1,
 		"desc": "Every ability costs +0.5 initiative. Everyone is slower to come round again."},
 	"dulledge": {"name": "Dull Edge", "severity": 1,
-		"desc": "Critical chance is halved, for everyone."},
+		"desc": "Critical chance -5%, for everyone."},
 	"muffled": {"name": "Muffled", "severity": 1,
 		"desc": "All Break damage is reduced 25%. Meters fill slowly."},
 	"hoarfrost": {"name": "Hoarfrost", "severity": 1,
@@ -4555,7 +4558,7 @@ const MODIFIERS := {
 		"desc": "All healing received is halved."},
 	# ---- severity 3 (Batch AQ) ----
 	"thinair": {"name": "Thin Air", "severity": 3,
-		"desc": "No resource returns at the start of a turn. What you have is what you get."},
+		"desc": "No resource returns at the start of a turn. Anything else that builds it still does."},
 	"encumbered": {"name": "Encumbered", "severity": 3,
 		"desc": "Every ability with a cooldown costs two more turns of it. Basic attacks are unaffected."},
 	# ---- severity 4 (Batch AQ) ----
@@ -4599,9 +4602,9 @@ func reward_text(reward: Dictionary) -> String:
 		"gold":
 			return "%d gold" % int(reward.get("amount", 0))
 		"potion":
-			return "A random potion"
+			return "A random consumable"
 		"rune":
-			return "A random rune"
+			return "A rune pick for one hero"
 		"shop":
 			return "A merchant follows the fight"
 	return ""
@@ -5004,7 +5007,7 @@ const ABILITY_UPGRADES := {
 	"up_damage": {"name": "Honed", "desc": "+50% damage."},
 	"up_cooldown": {"name": "Quickened", "desc": "-2 turns cooldown (minimum 0)."},
 	"up_free": {"name": "Effortless",
-		"desc": "Costs no Rage / Mana / Focus (Mercy is unaffected)."},
+		"desc": "Costs no Rage / Mana (Mercy is unaffected)."},
 	"up_speed": {"name": "Swift", "desc": "Arrives 25% sooner."},
 	"up_break": {"name": "Weighted", "desc": "Break damage doubled."},
 	"up_wide": {"name": "Widened",

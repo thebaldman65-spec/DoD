@@ -473,7 +473,8 @@ func _s1a_the_telegraph() -> void:
 		ok(lines.has(_call(s, "_damage_line", [foe, with_status], "<no damage line>")),
 			"§1a: the hover's band is not the damage line the ability's own data gives: %s" % [lines])
 		ok(lines.has(want_applies), "§1a: the hover does not say `%s`: %s" % [want_applies, lines])
-		ok(lines.has("Hits one hero"), "§1a: the hover does not say how many it hits: %s" % [lines])
+		# BATCH IJ §2 — ALLY: an enemy declares against `_hero_side()`, companions included, so IJ repaired the word.
+		ok(lines.has("Hits one ally"), "§1a: the hover does not say how many it hits: %s" % [lines])
 		var named: Array = heroes.filter(func(h): return txt.contains(h.unit_name))
 		ok(named.is_empty(), "§1a: the hover names %s — it says what the attack does, never whom it is aimed at" % [
 			named.map(func(h): return h.unit_name)])
@@ -549,7 +550,7 @@ func _s1a_the_telegraph() -> void:
 		elif heroes.any(func(h): return t.contains(h.unit_name)):
 			why = "names a hero"
 		elif ab.target != Ability.Target.ALLY and (ab.damage > 0 or ab.pressure > 0) \
-				and not (t.contains("Hits every hero") or t.contains("Hits one hero") or t.contains("Hits ")):
+				and not (t.contains("Hits every ally") or t.contains("Hits one ally") or t.contains("Hits ")):
 			why = "no reach"
 		if why != "":
 			bad.append("%s (%s)" % [ab.display_name, why])

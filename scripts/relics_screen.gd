@@ -63,7 +63,7 @@ func _ready() -> void:
 		# shelf's tag already said RARE beside it.
 		var tier_tag := "  RARE" if String(info.get("tier", "common")) == "rare" else ""
 		label.text = "%s\n\n%s" % [(info["name"] + tier_tag) if owned else "? ? ?",
-			info["desc"] if owned else "A shape lost to the Decay.\nSlay a boss to recover it."]
+			Relics.desc_of(id) if owned else "A shape lost to the Decay.\nSlay a boss to recover it."]
 		label.add_theme_font_size_override("font_size", 14)
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		panel.add_child(label)

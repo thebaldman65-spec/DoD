@@ -50,10 +50,13 @@ const SCRATCH_RELICS := "user://hf_relics.json"
 
 # THE FIFTEEN AS THE DESIGNER AUTHORED THEM (HF §1-§4): id -> [class, name,
 # shape, text]. The ruling's population, carried here so a rune that moved with
-# no line changing here is a change nobody ruled.
+# no line changing here is a change nobody ruled. **TWO MOVED AT IJ §2, WHICH THE
+# DESIGNER RULED** (every text the code contradicts is repaired): Abundance's
+# overheal is HIS healing's alone, and the Vow's +50% skips the heals Faith and Ruin
+# pay. IJ's report names both.
 const HF_RUNES := {
 	"abundance": ["cleric", "Abundance", ["PASSIVE"],
-		"Healing beyond an ally's missing health becomes a shield on them."],
+		"His healing beyond an ally's missing health becomes a shield on them."],
 	"returned_burden": ["cleric", "Returned Burden", ["ABILITY"],
 		"Every harmful effect Unburden removes is cast onto an enemy."],
 	"burning_ground": ["cleric", "Burning Ground", ["ABILITY"],
@@ -61,7 +64,7 @@ const HF_RUNES := {
 	"eleventh_hour": ["cleric", "Eleventh Hour", ["ABILITY"],
 		"Ministration heals twice as much on an ally below 25% health."],
 	"vow_of_silence": ["cleric", "Vow of Silence", ["PASSIVE", "TRADEOFF"],
-		"His heals are 50% stronger, and he deals no damage."],
+		"His heals are 50% stronger (not those Faith and Ruin pay), and he deals no damage."],
 	"unravel": ["mage", "Unravel", ["ABILITY"],
 		"Elemental Weakness spreads to every enemy, not just the target."],
 	"seeking_missiles": ["mage", "Seeking Missiles", ["ABILITY"],

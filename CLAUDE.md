@@ -55,8 +55,10 @@ A block whose subject is settled and asserted, a block a later ruling superseded
 reopen moves byte for byte to the reference it belongs in, with its index row, in the batch that closes it — and **a
 supersession is recorded, never deleted** (HY §2's rule for HN §1). **Every batch that writes a standing rule here asks
 whether the block it supersedes can move to a reference.** The unit is a whole block; the reasoning beside a live rule
-stays with it (GY §1, in the ceiling block). A closed block whose subject no reference holds stays here until the designer
-names its place — five of II's first seven did (`docs/reports/II.md` §4).
+stays with it (GY §1, in the ceiling block). **A CLOSED BLOCK NO REFERENCE HOLDS IS STRUCK TO A LINE THAT NAMES WHAT CLOSED
+IT AND WHICH REPORT HOLDS THE RECORD — after reading that report. A block whose record stands nowhere else stays whole (IJ
+§0.2, the designer's).** This file is the rules; `docs/reports/` is the archive, so the line is a struck heading where the
+block stood and never a new file. II's four were struck so at IJ, each report read first (IJ's report, §0.2).
 
 **A RULING RECORDED BEFORE IT IS BUILT SAYS SO (STANDING, SET AT GC, RULED BY THE DESIGNER).**
 > **`CLAUDE.md` states what the game IS; a decision taken and not yet implemented is marked
@@ -124,7 +126,7 @@ names its place — five of II's first seven did (`docs/reports/II.md` §4).
 the equality rule travel with their parent. **Eight of the rows are FF §2's**, and they are the
 residue: rules written into this file AFTER the seam was taken, which the seam's own test puts on
 the other side of it. **Every row after those eight was written straight into the reference rather
-than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one, IE's two and II's two —
+than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one, IE's two, II's two and IJ's one —
 and GW §2's, written there at GW and given its row only at HX (HV §3e found it missing; `check_hx` §1a now reds on one) —
 and four more are MOVED, FF §2's way: HG–HJ's census and supersession blocks, written back into this file after the seam
 was taken and sent over at HY §4 by the designer's ruling, and II §4's two, the archive practice's first pass — CP §3's
@@ -192,6 +194,7 @@ new block written here):
 | EK'S INERTNESS CLAIM ENDED AT EZ AND CAME BACK AT FN | EZ / FN, moved at II §4 |
 | A CENSUS OF READERS COVERS WHAT A BATCH MOVES, NOT ONLY WHAT IT DELETES | II §0.7 |
 | PLAYER-FACING TEXT THAT STATES A NUMBER READS IT OFF THE CONSTANT, OR AN INSTRUMENT ASSERTS THE TWO AGREE | II §0.7 |
+| A NEW GATE's OWN SOURCE IS READ BY THE GATE-SOURCE READERS BEFORE THE ACCEPTANCE, NOT BY IT | IJ §0.4 |
 
 ## THE COMBAT RULES LIVE IN `docs/combat-rules.md` (STANDING, SET AT GR §2, RULED BY THE DESIGNER)
 > **THIS FILE IS STILL THE ONE A BATCH MUST READ. `docs/combat-rules.md` IS A REFERENCE IT POINTS AT,
@@ -320,6 +323,14 @@ new block written here):
     against (glossary, a draft card with no target) the percentage stands alone with **no
     placeholder and no dash**; and resolution follows **the owner the prose names**, which is
     why §4.2's name-the-owner rule has to be right before the wiring is.
+  · **A FIGURE THE CODE HOLDS IS READ, NEVER RETYPED (IJ §2).** An authored text that states a
+    number a constant or its own entry holds writes a token — `{=Battle.VESPERS_PCT*100}`,
+    `{=@damage}`, `{=@damage*Ability.GRADE_DMG_MULT.perfect}` — and `Classes.resolve_figures` reads
+    it at the door a surface reads the text by: `Ability.make`, `Runes._load`, `Glossary._load`,
+    `Classes.engine_desc`, `Talents.desc_for` and `Relics.desc_of`. A table the code holds formats
+    its figure inside its `const`. **A token anywhere else prints raw; one naming nothing stays
+    visible and errors.** A figure no constant decides is pinned to the code that does
+    (`check_ij` §3). HO §0's rule below is untouched: a card still names no OTHER rule's figure.
   · **The player must never be asked to do math while choosing an action.** This half of the
     old rule SURVIVES CL and is the reason the parenthetical exists. The battle tooltip already
     computes damage/BD/cooldown/initiative/Perfect, so a description restating them in
@@ -881,9 +892,7 @@ working — a PARTIAL arrival reads as working too, which is the same failure on
   §4b keeps **"PARTY" IS RETIRED FROM PLAYER-FACING TEXT** over a wider file set. **Each was
   shown to bite before it was trusted.**
 
-## STANDING RULE — THE UNIT OF A HERO/ALLY RULING IS THE CLAUSE, NOT THE ABILITY (Batch DL §1)
-> **Read a card clause by clause. Two clauses under one word can have two different answers, and
-> the one that carries neither word is the one no sweep will find.**
+## ~~THE UNIT OF A HERO/ALLY RULING IS THE CLAUSE~~ — DL §1, folded into the hero/ally block above by DZ; the record is `docs/reports/DL.md`
 
 ## THE ALLY/HERO THREAD IS CLOSED (Batch DM §3) — RULE ON CLAUSES, NOT ON ABILITIES
 > **A card can carry two clauses of different shape under one word, and a sweep that reads the
@@ -1247,7 +1256,7 @@ places** — the cap on the count, the release branch, and Communion's "still bu
 - **DF §1's RULE ABOVE SAYS TO SWEEP THE NUMBER WHEN A CONSTANT MOVES; THIS ONE SAYS NOT TO WRITE IT, SO THERE IS
   NOTHING TO SWEEP.** It was ruled on the fourth kind of text one threshold move left stale: a card, the comments on
   two handlers, and two rows of `docs/master.html` each went on speaking `FAITH_RELEASE`'s old figure.
-- **THE WORKED EXAMPLE IS ELEVATION'S CARD**: *"An ally who reaches the cap with it RELEASES on the spot"*, chosen over
+- **THE WORKED EXAMPLE IS ELEVATION'S CARD**: *"A hero who reaches the cap with it RELEASES on the spot"*, chosen over
   *"within two stacks of the threshold"*, which still spoke the GRANT. It survives a move of the threshold and a move
   of the grant alike. `check_ho` §7 holds the card's words and asserts the only figure in them is its own.
 - **A CARD STATING ITS OWN COST AND PAYOUT IS WHAT A CARD IS (CONFIRMED AT HP §0, the designer's).** The rule binds a
@@ -1487,24 +1496,7 @@ than the candidates for it.** The bot's list is the other half of that question 
   genuinely restores charges and clears the rest. **Derive the exact condition from the handler;
   the bot only tells you where to look.**
 
-### THE VAULT'S EXIT IS THE POOLS, AND A VAULT ENTRY IS OWED ONE (Batch DY §3)
-> **`Classes.vault_ability()` holds the ONE definition of ten live cards. Its exit is the draft and
-> boss pools, and nothing else. A definition here that no pool names is reachable by NOTHING.**
-
-`vault_ability()`'s own header promised for eighteen batches that its entries *"return as earnable
-picks without a line of new mechanics"*. **THE PROMISE WAS TRUE AND THE EXIT WAS SHUT**: the only
-route out was `CLASS_POOLS`, and AN §4 closed the draw that read it. Seven finished abilities sat
-there, and **DK, DL and DM each spent measured engineering on one of them** — a widened heal driven
-on a live bear, a widened Pressure clause with a new guard authored for it, a two-clause card read
-in a scope audit — with nothing anywhere saying the cards were unreachable.
-- **THE COST OF AN UNREACHABLE DEFINITION IS PAID BY EVERY SWEEP, SILENTLY.** All seven were in
-  `ability_corpus()`, so the width gates, the text rules, `check_cn`'s bar criterion and
-  `check_dw`'s two populations had all been auditing cards no player could obtain.
-- **SO: A NEW VAULT ENTRY IS OWED A POOL IN THE SAME BATCH.** The header says so at the site.
-  DY §1/§2 re-homed all seven and `CLASS_POOLS` was deleted behind them.
-- **AND THE VAULT IS KEPT, BECAUSE IT IS NOT A HOLDING PEN ANY MORE.** It is the single-source
-  definition table those ten cards resolve through; a second copy in a pool is the drift the
-  resolver exists to prevent.
+### ~~THE VAULT'S EXIT IS THE POOLS~~ — DY §3, settled and asserted by `check_dv` §1; the record is `docs/reports/DY.md` §3 (its finding, `docs/reports/DX.md`)
 
 ### ESTABLISH WHY A STRUCTURE IS DEAD BEFORE DELETING IT (Batch DV §1)
 > **Dead code is deleted rather than zeroed — but a structure ORPHANED by a later change is a LOST
@@ -1823,19 +1815,7 @@ UNBUILT** — see the relic block in `docs/state.md`, and note that four hooks (
 `victory_mana_pct`, `rest_heal_add` (which nothing reads), `resource_floor_pct`) need a ruling before any of it, and that
 the draft assigns relics before there are specs to assign them to.
 
-## STANDING RULE — WHAT MAKES A ROW-8 NODE (Batch BM §2), AND BH'S FIFTEEN POINTS
-**RETIRED WITH ITS SUBJECT AT FX: THE ONE TALENT TREE HAS NO LANES AND NO ROWS.** Row 8 was the
-node that only mattered once the rest of its LANE was bought, and BH's fifteen-point
-leave-one-out read a LANE's headline; neither a lane nor a row exists any more, and Harmonic
-Convergence — the lane it was owed on — went with the twelve trees. **BH §2's own block went on
-standing further down this file, written as a live rule, until GC deleted it (ruled by the
-designer):** its text and its three caveats on reading a lane's grid are in the file as GB left it
-(`fce040c`), and BI §1's rule, which the third caveat pointed at, stands on its own. **What
-survives of both is the property that made them rules: NO NODE MAY BE A LARGER MAGNITUDE OF
-ANOTHER.** A shared field is
-still the signature of a re-skin (BC diagnosed it, BH proved it), and in the one tree it is
-asserted over the whole tree rather than a lane: no two nodes write one field (`check_fx` §1). **A
-batch that authors a second node on a field the tree already writes has authored the re-skin.**
+## ~~WHAT MAKES A ROW-8 NODE, AND BH'S FIFTEEN POINTS~~ — BM §2, retired with the lanes at FX and BH §2 deleted at GC; the record is `docs/reports/FX.md` §3 and `docs/reports/GC.md` §1 (BM's own rule: the changelog archive's BM entry)
 
 ## STANDING REFERENCE — THE DIFFICULTY LADDER AND THE END BOSS (Batch BM §5/§6)
 **`Run.difficulty` WAS REUSED, NOT SHADOWED** — it was already a saved String var chosen at the
@@ -2693,8 +2673,8 @@ Half of these were documented only in changelog entries; this is the record. Not
 and `DOD_DEBUG=0` FORCES it shut; every use trips `Run.debug_used` → the run summary's "not a
 clean data point" line — and names itself to the playtest readout (`Run.note_debug`, IH §0.2). Sims can never reach the UI surfaces (`_debug_allowed()` excludes
 sim/autoplay/sim_run).
-· MAP BURGER debug items (map_screen, ids 10-16/20-26): +200 Gold | 60 Talent Points to every class, every tier open |
-  Full Heal Heroes | Jump to Boss Slot | Advance to Next Zone | Reroll Specs | "All Class
+· MAP BURGER debug items (map_screen, ids 10-16/20-26): +200 Gold | Talent Points to 60 (all) — every tier's end-boss gate open,
+  the spend gate still applies | Full Heal Standing Heroes | Jump to Boss Slot | Advance to Next Zone | Reroll Specs | "All Class
   Abilities Unlocked" check = `Run.debug_grant_all`, the PRE-GRANT toggle — **the hero's CLASS
   pool and his lineage's boss pool (HJ §3, ruled by the designer; it granted one lineage's shelf
   and boss pool from AU §5 until the draft pools merged; the NAME is HJ's proposal, the
@@ -3444,21 +3424,11 @@ Heavy Bolts, 0–4% for the Wide Rite — and two were UNREACHABLE at a full sev
   on the hero sheet until IH §3), and read by nothing else — EK's inertness claim, restored by the retirement
   rather than re-asserted. **ES §4's absolute-count shapes (`tag_threshold_met`, `breadth_met`)
   are KEPT and are the door a future tag-reading rune comes back through.**
-- **THE RULE THAT STOOD HERE IS KEPT AS THE RECORD OF WHAT WAS RETIRED, WHERE THE SUBSECTION BELOW SAYS**, so a later batch
+- **THE RULE THAT STOOD HERE IS KEPT AS THE RECORD OF WHAT WAS RETIRED, WHERE THE STRUCK LINE BELOW SAYS**, so a later batch
   meeting a tag and a rune in the same sentence does not re-derive EZ's arithmetic from scratch and
   re-propose it as a discovery.
 
-### WHERE THE RETIRED RULE ITSELF IS KEPT, AND WHY IT IS NOT KEPT HERE
-
-**EZ §0's two fractions — *THRESHOLD: at least HALF the hero's DRAFTED cards carry the named tag*
-and *BREADTH: NO tag exceeds a THIRD of them*, both counting the PRIMARY only over the drafted half
-that is EQUIPPED — stood in this place for six batches with a page of reasoning under it.** It is
-**not** reproduced here. This file holds what binds a batch, and that rule binds nothing: the two
-transferable halves are the bullets above, and the rest is a mechanism that no longer exists.
-**Its full text and its reasoning are in `docs/reports/EZ.md` §0 and in `docs/reports/FN.md` §2**,
-and the ungating itself is in `docs/changelog.html`'s FN entry. **A retired rule kept at length in
-the rules file is a rule a future batch reads as live** — the same fault as a ruling kept only in a
-closed report (the *Working agreement*'s step (3), which FN also closed), pointed the other way.
+### ~~WHERE THE RETIRED RULE ITSELF IS KEPT~~ — FN's pointer, closed with the rule; the rule is `docs/reports/EZ.md` §0 and its retirement `docs/reports/FN.md` §2
 
 ## STANDING RULE — A FLOOR ON A BUDGET IS NOT A FLOOR ON A COUNT (Batch FA §2b)
 

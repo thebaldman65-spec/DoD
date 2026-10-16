@@ -374,7 +374,7 @@
         "weight": 10,
         "choices": [
             {
-                "label": "Help them (one hero risks the rot)",
+                "label": "Help them (one hero takes the rot)",
                 "effects": [
                     {
                         "effect": "damage_pct",
@@ -519,7 +519,7 @@
                         "amount": 1
                     }
                 ],
-                "outcome": "It speaks through one of you, and leaves something written on the inside."
+                "outcome": "It speaks through one of you, and leaves something written behind."
             },
             {
                 "label": "Listen until it teaches (one hero -30% health, and a new ability)",

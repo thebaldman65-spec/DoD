@@ -223,7 +223,7 @@ func _maybe_show_framing() -> bool:
 	vbox.add_child(title)
 	var body := Label.new()
 	body.text = ("A run is 49 encounters — three zones of sixteen, and then\nthe end boss. A zone is a\n" +
-		"MAP, not a road: three ways forward at a time, reading LEFT TO\n" +
+		"MAP, not a road: up to three ways forward, reading LEFT TO\n" +
 		"RIGHT, converging on the MINI-BOSS in the middle and the BOSS at\n" +
 		"the end. Scroll it and read the whole zone before you step.\n\n" +
 		"Nothing is guaranteed on a route. Step down a row and the corridor\n" +
@@ -234,10 +234,11 @@ func _maybe_show_framing() -> bool:
 		"on the road, and you will not know what until you stand on it.\n\n" +
 		"Before every elite and mini-boss you are offered THREE BARGAINS: a\n" +
 		"condition that binds both sides of the battle, and what clearing it\n" +
-		"under that condition pays — one of the three is always survivable.\n\n" +
-		"Clearing any encounter heals every hero 15%. There is no resting.\n" +
+		"under that condition pays — one of the three is always a mild one.\n\n" +
+		"Winning any fight heals every hero %d%%. There is no resting.\n" % int(round(Run.SLOT_HEAL_PCT * 100)) +
 		"Death ends the run and takes everything, but every boss you fell\n" +
-		"leaves a RELIC behind, unlocked forever.")
+		"leaves a RELIC behind, unlocked forever, and every zone boss a\n" +
+		"talent point for each class among the heroes, banked as it falls.")
 	body.add_theme_font_size_override("font_size", 15)
 	body.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
 	vbox.add_child(body)
@@ -357,8 +358,8 @@ func _draw_header() -> void:
 	if Run.debug_enabled():
 		bpop.add_separator("DEBUG")
 		bpop.add_item("+200 Gold", 10)
-		bpop.add_item("+200 Talent Points (all)", 11)
-		bpop.add_item("Full Heal Heroes", 12)
+		bpop.add_item("Talent Points to 60 (all)", 11)
+		bpop.add_item("Full Heal Standing Heroes", 12)
 		bpop.add_item("Jump to Boss Slot", 13)
 		bpop.add_item("Advance to Next Zone", 14)
 		bpop.add_item("Reroll Specs", 15)
@@ -582,7 +583,11 @@ func _node_tooltip(node: Dictionary, s: int, reachable_still: bool) -> String:
 		var what := "A mini-boss holds the middle of the zone." if ty == "miniboss" \
 			else "The zone's boss. Nothing goes around it."
 		var tail := "\n\nA bargain is offered before it." if ty == "miniboss" else ""
-		return "%s\nYou will not know which until you meet it.%s" % [what, tail]
+		# The zone's boss is fixed by the zone and the header already names it, so only
+		# the mini-boss keeps its identity back.
+		var know := "You will not know which until you meet it." if ty == "miniboss" \
+			else "It is the %s." % Enemies.name_after_the(Run.boss_kind())
+		return "%s\n%s%s" % [what, know, tail]
 	# BATCH GI — PROPOSED, AND THE DESIGNER CONFIRMS IT. The zone boss's two
 	# sentences, for the one boss that is always the same creature (its node is
 	# never composed) and after which there is no road.
@@ -2784,7 +2789,7 @@ func _open_rune_panel(idx: int) -> void:
 			any_held = true
 			_pouch_rune_row(list, idx, member, rows, i, equipped, sitting_runes, overlay)
 	if not any_held:
-		_pouch_note(list, "Nothing held. A rune drops after every fight, and the Peddler sells them.",
+		_pouch_note(list, "Nothing held. A rune drops after every normal fight, and the Peddler sells them.",
 			Color(0.6, 0.57, 0.55), false)
 
 	# BELOW THE SCROLLER, NEVER INSIDE IT: the one control the player needs to
@@ -3248,7 +3253,7 @@ func _open_loadout_panel(idx: int) -> void:
 	for aname in on_names:
 		_loadout_earned_row(rows, idx, member, String(aname), true, sitting, overlay, live)
 	if on_names.is_empty():
-		_pouch_note(rows, "Nothing earned yet. A card is drafted after an elite or at an event,\nand a zone boss pays a pick of three."
+		_pouch_note(rows, "Nothing earned yet. A card is drafted after an elite or at an event,\nand a zone boss pays a pick of up to three."
 			if earned.is_empty() else "Nothing carried. A benched card is carried again from below.",
 			Color(0.6, 0.57, 0.55), false)
 	rows.add_child(HSeparator.new())
@@ -3899,7 +3904,7 @@ func _use_item(id: String) -> void:
 	if id == "defense":
 		# Party-wide and battle-scoped: there is no "3 turns" on the map, so
 		# it is refused here rather than half-applied.
-		_toast("The Defense Potion only means something in a fight.")
+		_toast("The %s only means something in a fight." % Run.ITEM_INFO["defense"][0])
 		return
 	if eligible.is_empty():
 		_toast("No one to use the %s on." % Run.ITEM_INFO[id][0])
@@ -4233,10 +4238,10 @@ func _on_burger(id: int) -> void:
 			# BATCH BM: there is no in-run purse to fill. The tester's
 			# equivalent is a META grant — 60 points to every class (FX: the
 			# purse keys to the class), past the 54 the whole tree costs —
-			# plus every tier open.
+			# plus every tier's end-boss gate open (the spend gate still applies).
 			Profile.debug_grant_meta()
 			_draw_screen()
-			_toast("DEBUG: 60 talent points to every class, every tier open")
+			_toast("DEBUG: 60 talent points to every class, every tier's end-boss gate open")
 		12:
 			Run.heal_party(1.0)
 			Run.restore_mana(1.0)
@@ -4271,7 +4276,7 @@ func _on_burger(id: int) -> void:
 		20:
 			Run.debug_free_travel = not Run.debug_free_travel
 			_draw_screen()
-			_toast("DEBUG: free travel %s" % ("ON — every slot is clickable"
+			_toast("DEBUG: free travel %s" % ("ON — every node in the next column is clickable"
 				if Run.debug_free_travel else "off"))
 		21:
 			_summon("shop")
@@ -4298,7 +4303,7 @@ func _debug_action_name(id: int) -> String:
 		10:
 			return "+200 Gold"
 		11:
-			return "60 talent points to every class, every tier open"
+			return "60 talent points to every class, every tier's end-boss gate open"
 		12:
 			return "Full Heal Heroes"
 		13:

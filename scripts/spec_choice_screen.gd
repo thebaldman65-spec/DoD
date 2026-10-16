@@ -74,8 +74,8 @@ func _draw_screen() -> void:
 	# PROPOSED WORDS (GK). The old line promised the choice was "permanent for
 	# the run", which the charter makes false: an engine can be dropped or swapped.
 	var subtitle := Label.new()
-	subtitle.text = "Take one of three core runes — a second can join it later, and either can be dropped (hero %d of %d)" % [
-		idx + 1, Run.party.size()]
+	subtitle.text = "Take one of three core runes — %d more can join it later, and any can be dropped (hero %d of %d)" % [
+		Run.ENGINE_SLOTS - 1, idx + 1, Run.party.size()]
 	subtitle.add_theme_font_size_override("font_size", 15)
 	subtitle.add_theme_color_override("font_color", Color(0.6, 0.55, 0.5))
 	subtitle.position = Vector2(0, 86)

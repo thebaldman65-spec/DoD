@@ -371,7 +371,8 @@ func _the_two_texts_state_the_peak_rule() -> void:
 	# and the break now falls inside the phrase. The sentence is unchanged.
 	ok(j > 0 and csrc.substr(j, 700).replace("\\n", " ").contains("HIGHEST COUNT HELD THIS BATTLE"),
 		"§1: ...and so does Conviction's passive block")
-	ok(csrc.substr(j, 700).contains("2 a hit"),
+	# Since IJ §2 the rate is a token (`Battle.FAITH_PER_ABSORB`), so it is read where the rule is shown.
+	ok(Classes.engine_desc("conviction").contains("2 a hit"),
 		"§1: ...which also states §2's new absorb rate")
 	# **BATCH FX — THE TWO NODE TEXTS ARE DELETED WITH THEIR SUBJECT (DG §2). 4
 	# CHECKS REMOVED HERE.** This section read the descs of `dv_fervor` and

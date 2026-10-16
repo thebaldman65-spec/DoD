@@ -102,7 +102,7 @@ const LITERAL_MISSES := {
 }
 
 # §7 — the card's words, ruled at HO §0, as the screen breaks them.
-const ELEVATION_WORDS := "Raise them up: every ally gains 2\nstacks of Faith.\nAn ally who reaches the cap with it\nRELEASES on the spot — and their peak\ndoes not fall for it."
+const ELEVATION_WORDS := "Raise them up: every hero gains 2\nstacks of Faith.\nA hero who reaches the cap with it\nRELEASES on the spot — and their peak\ndoes not fall for it."
 
 var _g := Gate.new()
 var _run: Node = null

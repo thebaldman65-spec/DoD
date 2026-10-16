@@ -144,10 +144,16 @@ func _passive_desc_live(cfg: Dictionary, pid: String) -> String:
 			# this function is called after that.
 			var br_keep: int = [50, 85, 100][clampi(
 				int(cfg.get("scar_tissue_ranks", 0)), 0, 2)]
-			desc = "Blood Frenzy: +%s%% damage for every 5%% of health\nmissing. %d%% of the highest bonus reached in a\nbattle is kept as a floor for the rest of it." % [
-				String.num(2.0 + float(cfg.get("bloodrage_step_bonus", 0.0))
-					+ float(cfg.get("rune_bloodrage_step_bonus", 0.0)), 1),
-				br_keep]
+			# BATCH IJ §2 — AND BOTH TERMS AND THE CAP, as the battle chip states them: the
+			# steps of health missing and of Rage spent (doubled under the Open Vein) share
+			# one band, clamped at `FRENZY_MAX_STEPS` (`unit.frenzy_bonus`).
+			var br_step: float = 2.0 + float(cfg.get("bloodrage_step_bonus", 0.0)) \
+				+ float(cfg.get("rune_bloodrage_step_bonus", 0.0))
+			var br_rage: float = float(BattleUnit.FRENZY_RAGE_PER_STEP) \
+				/ (2.0 if int(cfg.get("rune_open_vein", 0)) > 0 else 1.0)
+			desc = "Blood Frenzy: +%s%% damage for every 5%% of health\nmissing and every %s Rage spent, to at most +%s%%.\n%d%% of the highest bonus reached in a\nbattle is kept as a floor for the rest of it." % [
+				String.num(br_step, 1), Classes.figure_text(br_rage),
+				String.num(br_step * BattleUnit.FRENZY_MAX_STEPS, 1), br_keep]
 	return Classes.resolve_values(desc,
 		Classes.value_ctx_from_config(cfg)).replace("\n", " ")
 
@@ -208,7 +214,7 @@ func _draw_detail() -> void:
 			else "builds in combat"],
 			resource_tips.get(cfg["resource_name"], "")]],
 		[["Armor: %d%%" % int(round(cfg["armor"] * 100)),
-			"Armor — % of incoming physical damage blocked."],
+			"Armor — % of incoming damage blocked, of any type."],
 		["Resistances", "Resistances — like armor, but per damage type:\n%s\n%s" % [
 			" / ".join(resist_lines.slice(0, 4)), " / ".join(resist_lines.slice(4, 7))]]],
 		[["Speed: %d" % int(cfg["speed"]),
@@ -280,7 +286,7 @@ func _draw_detail() -> void:
 	add_child(tree_header)
 
 	if not awake:
-		tree_header.text = "TALENTS — the %s awakens after your first victory." % key.capitalize()
+		tree_header.text = "TALENTS — the %s awakens on taking a core rune." % key.capitalize()
 		return
 	# BATCH BM: the in-run tree is READ-ONLY and says so. Talents are bought
 	# between runs on the build screen and lock the moment a spec is

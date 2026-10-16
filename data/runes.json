@@ -469,13 +469,13 @@
 	"deepening_hex": {
 		"name": "Deepening Hex", "scope": "class:cleric", "written_for": "occultist",
 		"price": 150,
-		"desc": "Ruin detonates TWO stacks sooner, whatever the threshold is \u2014 every 8th instead of every 10th, and never sooner than every 8th.",
+		"desc": "Ruin detonates TWO stacks sooner, whatever the threshold is \u2014 every 8th instead of every {=Battle.RUIN_THRESHOLD}th, and never sooner than every {=Battle.RUIN_FLOOR}th.",
 		"payload": {"stat": {"rune_hex_deepen": 2}}
 	},
 	"standing_mark": {
 		"name": "Standing Mark", "scope": "class:cleric", "written_for": "occultist",
 		"price": 150,
-		"desc": "Ruin's lifesteal cap rises from 40% to 60%.",
+		"desc": "Ruin's lifesteal cap rises from {=Battle.RUIN_LEECH_CAP*100}% to 60%.",
 		"payload": {"stat": {"rune_ruin_leech_cap": 0.20}}
 	},
 	"split_tongue": {
@@ -489,13 +489,13 @@
 	"shared_ruin": {
 		"name": "Shared Ruin", "scope": "class:cleric", "written_for": "occultist",
 		"price": 150,
-		"desc": "When Ruin detonates, HALF the stacks that survive the blast leap to the enemy carrying the most Ruin.",
+		"desc": "When Ruin detonates, unless a leap primed it, HALF the stacks that survive the blast leap to the enemy carrying the most Ruin.",
 		"payload": {"stat": {"rune_shared_ruin": 1}}
 	},
 	"wide_rite": {
 		"name": "Wide Rite", "scope": "class:cleric", "written_for": "occultist",
 		"price": 150,
-		"desc": "Every debuff he applies marks 1 MORE Ruin.",
+		"desc": "Every debuff he applies marks {=@payload.stat.rune_wide_rite} MORE Ruin.",
 		"payload": {"stat": {"rune_wide_rite": 1}}
 	},
 	"open_wound": {
@@ -514,7 +514,7 @@
 	"bracing_line": {
 		"name": "Bracing Line", "scope": "class:warrior", "written_for": "warden",
 		"price": 150,
-		"desc": "Allies take 5% less damage while his Heavy Plating bonus stands at +32% or higher.",
+		"desc": "Other heroes take {=@payload.stat.rune_bracing_line}% less damage while his Heavy Plating bonus stands at +{=Battle.BRACING_LINE_LEVEL}% or higher.",
 		"payload": {"stat": {"rune_bracing_line": 5}}
 	},
 	"split_shield": {
@@ -533,7 +533,7 @@
 	"bared_plate": {
 		"name": "Bared Plate", "scope": "class:warrior", "written_for": "warden",
 		"price": 150,
-		"desc": "+25% Break damage — but he can no longer Block.",
+		"desc": "+{=@payload.stat.rune_bared_plate_bd*100}% Break damage — but he can no longer Block.",
 		"payload": {"stat": {"rune_bared_plate_bd": 0.25, "rune_no_block": 1}}
 	},
 	"keen_focus": {
@@ -545,14 +545,14 @@
 	"heavy_bolts": {
 		"name": "Heavy Bolts", "scope": "class:hunter", "written_for": "sharpshooter",
 		"price": 150,
-		"desc": "His patience turns into force at 80 Focus rather than 100.",
+		"desc": "His patience turns into force at 80 Focus rather than {=Unit.FOCUS_CONVERT}.",
 		"payload": {"stat": {"rune_heavy_bolts": 20}}
 	},
 	"ambush": {
 		"name": "Ambush", "scope": "class:hunter", "written_for": "sharpshooter",
 		"price": 150,
 		"requires_ability": "Called Volley",
-		"desc": "Called Volley strikes 0.5% harder for every point of Focus he is holding, and still does not clear it.",
+		"desc": "Called Volley strikes {=Unit.FOCUS_STEP*100}% harder for every point of Focus he is holding, and still does not clear it.",
 		"payload": {"stat": {"rune_ambush": 1}}
 	},
 	"wide_watch": {
@@ -565,25 +565,25 @@
 	"shared_mark": {
 		"name": "Shared Mark", "scope": "class:hunter", "written_for": "sharpshooter",
 		"price": 150,
-		"desc": "An ally attacking the enemy he last attacked builds him 5 Focus.",
+		"desc": "An ally attacking the enemy he last attacked builds him {=Battle.SHARED_MARK_FOCUS} Focus.",
 		"payload": {"stat": {"rune_shared_mark": 1}}
 	},
 	"long_draw_press": {
 		"name": "Long Draw", "scope": "class:hunter", "written_for": "sharpshooter",
 		"price": 150,
-		"desc": "His basic attack runs one EXTRA press at every stage — but a missed press drains 16 Focus.",
+		"desc": "His basic attack runs one EXTRA press at every stage — but a missed press drains {=Battle.SS_SEQ_MISS_DRAIN} Focus.",
 		"payload": {"stat": {"rune_long_draw_presses": 1}}
 	},
 	"long_leash": {
 		"name": "Long Leash", "scope": "class:hunter", "written_for": "beastmaster",
 		"price": 150,
-		"desc": "The Loyalty split point moves from 8 to 11 — three more stacks buy the companion's strike step before the boon takes over.",
+		"desc": "The Loyalty split point moves from {=Battle.BOND_CONVERT} to 11 — three more stacks buy the companion's strike step before the boon takes over.",
 		"payload": {"stat": {"rune_long_leash": 3}}
 	},
 	"shared_hide": {
 		"name": "Shared Hide", "scope": "class:hunter", "written_for": "beastmaster",
 		"price": 150,
-		"desc": "The companion's blows finally read the damage buffs it is already wearing — and the two the hunter carries for a bond that broke.",
+		"desc": "The companion's blows read every damage buff it wears but Blessing of Zeal — and the two the hunter carries for a bond that broke.",
 		"payload": {"stat": {"rune_shared_hide": 1}}
 	},
 	"answering_pack": {
@@ -595,7 +595,7 @@
 	"second_whistle": {
 		"name": "Second Whistle", "scope": "class:hunter", "written_for": "beastmaster",
 		"price": 150,
-		"desc": "Summon Companion fields each of the three companions with 3 Loyalty already earned.",
+		"desc": "Summon Companion fields each of the three companions with {=@payload.stat.rune_second_whistle} Loyalty already earned.",
 		"payload": {"stat": {"rune_second_whistle": 3}}
 	},
 	"shared_scent": {
@@ -607,7 +607,7 @@
 	"bared_fang": {
 		"name": "Bared Fang", "scope": "class:hunter", "written_for": "beastmaster",
 		"price": 150,
-		"desc": "+30% companion damage — but the companion can no longer be healed.",
+		"desc": "+{=@payload.stat.rune_bared_fang*100}% companion damage — but the companion can no longer be healed.",
 		"payload": {"stat": {"rune_bared_fang": 0.30}}
 	},
 
@@ -628,13 +628,13 @@
 		"name": "Butcher's Bill", "scope": "class:warrior", "written_for": "berserker",
 		"price": 150,
 		"requires_ability": "Hack and Slash",
-		"desc": "Landing a Bleed with Hack and Slash has a 50% chance to add another strike — once a cast.",
+		"desc": "Landing a Bleed with Hack and Slash has a {=@payload.stat.rune_butchers_bill}% chance to add another strike — once a cast.",
 		"payload": {"stat": {"rune_butchers_bill": 50}}
 	},
 	"open_vein": {
 		"name": "Open Vein", "scope": "class:warrior", "written_for": "berserker",
 		"price": 150,
-		"desc": "Rage he spends counts DOUBLE toward Blood Frenzy. The band still caps at 20 steps — it fills sooner, never deeper.",
+		"desc": "Rage he spends counts DOUBLE toward Blood Frenzy. The band still caps at {=Unit.FRENZY_MAX_STEPS} steps — it fills sooner, never deeper.",
 		"payload": {"stat": {"rune_open_vein": 1}}
 	},
 	"slaughterhouse_rune": {
@@ -654,7 +654,7 @@
 		"name": "Ashfall", "scope": "class:mage", "written_for": "pyromancer",
 		"price": 150,
 		"requires_ability": "Funeral Pyre",
-		"desc": "Funeral Pyre shields for what the Burn would still deal WITHOUT consuming it — and so refunds no Mana.",
+		"desc": "Funeral Pyre shields for {=Battle.PYRE_SHARE_PERFECT*100}% of the Burn still to deal, WITHOUT consuming it — and so refunds no Mana.",
 		"payload": {"stat": {"rune_ashfall": 1}}
 	},
 	"chain_fire": {
@@ -686,7 +686,7 @@
 	"killing_cold_fk": {
 		"name": "Killing Cold", "scope": "class:mage", "written_for": "cryomancer",
 		"price": 150,
-		"desc": "An enemy at maximum Chill takes 5% of its maximum health per Chilled stack whenever he casts.",
+		"desc": "An enemy at maximum Chill takes {=@payload.stat.rune_killing_cold}% of its maximum health per Chilled stack whenever he casts.",
 		"payload": {"stat": {"rune_killing_cold": 5}}
 	},
 	"glass_prison": {
@@ -745,7 +745,7 @@
 	"whetstone": {
 		"name": "Whetstone", "scope": "class:warrior", "written_for": "swordmaster",
 		"price": 150,
-		"desc": "The Aggressive bonus grows 3% for each turn he stays in it, and resets on a switch.",
+		"desc": "The Aggressive bonus grows {=@payload.stat.rune_seasoned_off_bonus*100}% at once and {=@payload.stat.rune_seasoned_off_bonus*100}% more for each turn he stays in it, and resets on a switch.",
 		"payload": {"stat": {"rune_growing_edge": 1, "rune_seasoned_off_bonus": 0.03}}
 	},
 	"mirror_guard": {
@@ -758,7 +758,7 @@
 		"name": "Open Line", "scope": "class:warrior", "written_for": "swordmaster",
 		"price": 150,
 		"requires_ability": "Guard Change",
-		"desc": "Guard Change no longer switches stance — it grants BOTH stances' upsides for a turn, and no recoil.",
+		"desc": "Guard Change no longer switches stance — it grants BOTH stances' upsides for 2 turns, and no recoil.",
 		"payload": {"stat": {"rune_open_line": 1}}
 	},
 	"long_blade": {
@@ -778,14 +778,14 @@
 	"vigil": {
 		"name": "Vigil", "scope": "class:cleric", "written_for": "holy",
 		"price": 150,
-		"desc": "Mercy also accrues when an ally is healed from below half back above it.",
+		"desc": "Mercy also accrues when a hero is healed from below half back above it.",
 		"payload": {"stat": {"rune_vigil": 1}}
 	},
 	"open_hand_fk": {
 		"name": "Open Hand", "scope": "class:cleric", "written_for": "holy",
 		"price": 150,
 		"requires_ability": "Divine Plea",
-		"desc": "Divine Plea heals EVERY ally below half to full, not only one.",
+		"desc": "Divine Plea heals EVERY hero below half to full, not only one.",
 		"payload": {"stat": {"rune_open_hand": 1}}
 	},
 	"long_watch_holy": {
@@ -812,38 +812,38 @@
 		"name": "Layered Aegis", "scope": "class:cleric", "written_for": "inquisitor",
 		"price": 150,
 		"requires_ability": "Divine Shield",
-		"desc": "Divine Shield holds on TWO allies instead of one — the second is whoever is lowest.",
+		"desc": "Divine Shield holds on TWO allies instead of one — the second is whichever other hero has the least health.",
 		"payload": {"stat": {"rune_layered_aegis": 1}}
 	},
 	"deep_absorb": {
 		"name": "Deep Absorb", "scope": "class:cleric", "written_for": "inquisitor",
 		"price": 150,
-		"desc": "An absorb grants 3 Faith instead of 2.",
+		"desc": "An absorb grants 3 Faith instead of {=Battle.FAITH_PER_ABSORB}.",
 		"payload": {"stat": {"rune_deep_absorb": 1}}
 	},
 	"fourth_stack": {
 		"name": "Forbearance", "scope": "class:cleric", "written_for": "inquisitor",
 		"price": 150,
-		"desc": "Allies hold one more stack of Faith before releasing.",
+		"desc": "Heroes hold one more stack of Faith before releasing.",
 		"payload": {"stat": {"rune_fourth_stack": 1}}
 	},
 	"bare_altar": {
 		"name": "Bare Altar", "scope": "class:cleric", "written_for": "inquisitor",
 		"price": 150,
-		"desc": "Faith builds TWICE as fast — and Divine Shield absorbs half as much.",
+		"desc": "An absorb grants TWICE the Faith — and Divine Shield absorbs half as much.",
 		"payload": {"stat": {"rune_bare_altar": 1}}
 	},
 
 	"long_poison": {
 		"name": "Long Poison", "scope": "class:hunter", "written_for": "mystic",
 		"price": 150,
-		"desc": "His Poison never expires. It can still be cleansed.",
+		"desc": "His Poison never expires (not the barb's or Explosive Shot's). It can still be cleansed.",
 		"payload": {"stat": {"rune_long_poison": 1}}
 	},
 	"second_barb": {
 		"name": "Second Barb", "scope": "class:hunter", "written_for": "mystic",
 		"price": 150,
-		"desc": "An enemy that strikes him takes a DIFFERENT affliction each time, cycling as Stalking Horse does.",
+		"desc": "Each time the barb fires, the enemy that struck him takes a DIFFERENT affliction, cycling as Stalking Horse does.",
 		"payload": {"stat": {"rune_second_barb": 1}}
 	},
 	"full_board": {
@@ -870,7 +870,7 @@
 	"abundance": {
 		"name": "Abundance", "scope": "class:cleric",
 		"price": 150,
-		"desc": "Healing beyond an ally's missing health becomes a shield on them.",
+		"desc": "His healing beyond an ally's missing health becomes a shield on them.",
 		"payload": {"stat": {"rune_abundance": 1.0}}
 	},
 	"returned_burden": {
@@ -888,13 +888,13 @@
 	"eleventh_hour": {
 		"name": "Eleventh Hour", "scope": "class:cleric",
 		"price": 150,
-		"desc": "Ministration heals twice as much on an ally below 25% health.",
+		"desc": "Ministration heals twice as much on an ally below {=Battle.ELEVENTH_HOUR_AT*100}% health.",
 		"payload": {"stat": {"rune_eleventh_hour": 1.0}}
 	},
 	"vow_of_silence": {
 		"name": "Vow of Silence", "scope": "class:cleric",
 		"price": 150,
-		"desc": "His heals are 50% stronger, and he deals no damage.",
+		"desc": "His heals are {=@payload.stat.rune_vow_of_silence*100}% stronger (not those Faith and Ruin pay), and he deals no damage.",
 		"payload": {"stat": {"rune_vow_of_silence": 0.5}}
 	},
 	"unravel": {
@@ -918,19 +918,19 @@
 	"clarity": {
 		"name": "Clarity", "scope": "class:mage",
 		"price": 150,
-		"desc": "A spell cast at full Mana deals 50% more damage.",
+		"desc": "A spell cast at full Mana deals {=@payload.stat.rune_clarity*100}% more damage.",
 		"payload": {"stat": {"rune_clarity": 0.5}}
 	},
 	"profligate": {
 		"name": "Profligate", "scope": "class:mage",
 		"price": 150,
-		"desc": "His spells deal 40% more damage and cost twice the Mana.",
+		"desc": "His spells deal {=@payload.stat.rune_profligate*100}% more damage and cost twice the Mana.",
 		"payload": {"stat": {"rune_profligate": 0.4}}
 	},
 	"goading_roar": {
 		"name": "Goading Roar", "scope": "class:warrior",
 		"price": 150,
-		"desc": "Taunted enemies deal 25% less damage while they must attack him.",
+		"desc": "Taunted enemies deal {=@payload.stat.rune_goading_roar*100}% less damage while they must attack him.",
 		"payload": {"stat": {"rune_goading_roar": 0.25}}
 	},
 	"rending_blows": {
@@ -942,7 +942,7 @@
 	"grudge": {
 		"name": "Grudge", "scope": "class:warrior",
 		"price": 150,
-		"desc": "He deals 40% more damage to the last enemy that struck him, and 20% less to every other.",
+		"desc": "He deals {=@payload.stat.rune_grudge_struck*100}% more damage to the last enemy that struck him, and {=@payload.stat.rune_grudge_rest*-100}% less to every other.",
 		"payload": {"stat": {"rune_grudge_struck": 0.4, "rune_grudge_rest": -0.2}}
 	},
 	"opportunist": {
@@ -961,7 +961,7 @@
 	"tithe": {
 		"name": "Tithe", "scope": "party",
 		"price": 150,
-		"desc": "A hero's attack that lands Break heals\nthe hero furthest from full, for 30% of it.",
+		"desc": "A hero's attack that lands Break heals\nthe hero furthest from full, for {=@payload.stat.rune_blood_communion}% of it.",
 		"payload": {"stat": {"rune_blood_communion": 30}}
 	},
 	"fellowship": {
@@ -974,19 +974,19 @@
 	"empty_pulpit": {
 		"name": "Empty Pulpit", "scope": "party",
 		"price": 150,
-		"desc": "While no Cleric stands, every hero takes\n50% less damage.",
+		"desc": "While no Cleric stands, every hero takes\n{=@payload.stat.dmg_taken_bonus*-100}% less damage.",
 		"payload": {"stat": {"dmg_taken_bonus": -0.5}, "condition": {"heroes_lack_class": "cleric"}}
 	},
 	"dead_air": {
 		"name": "Dead Air", "scope": "party",
 		"price": 150,
-		"desc": "While no Mage stands, every hero deals\n75% more damage.",
+		"desc": "While no Mage stands, every hero deals\n{=@payload.stat.dmg_bonus*100}% more damage.",
 		"payload": {"stat": {"dmg_bonus": 0.75}, "condition": {"heroes_lack_class": "mage"}}
 	},
 	"dirge": {
 		"name": "Dirge", "scope": "party",
 		"price": 150,
-		"desc": "While a hero lies fallen, the rest deal\n45% more damage.",
+		"desc": "While a hero lies fallen, the rest deal\n{=@payload.stat.dmg_bonus*100}% more damage.",
 		"payload": {"stat": {"dmg_bonus": 0.45}, "condition": {"heroes_all_standing": false}}
 	},
 

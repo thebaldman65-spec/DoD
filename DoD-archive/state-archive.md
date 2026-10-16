@@ -17,6 +17,90 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT IJ — 2026-10-15, FROM `docs/state.md` AS II LEFT IT (`03f8f94`)
+
+**What came here**: II's two rulings, both answered in IJ's brief (the first carried as IJ's ruling 1 — the designer's play, still
+owed; the second built at IJ §0.2); and the items IJ's repairs closed, each read against IJ's tree before it moved — the burger's
+debug label (FOUND AT IH), Choking Smoke's *Ember Debt* (FOUND AT IE), the roadmap's IJ line, `master.html`'s two change-history
+words (FOUND AT HT), the event verb's empty line (FOUND AT HC, the section with it), free travel's toast (FOUND AT GB), the
+orientation card's *every action* and the Cracked Hourglass (FOUND AT FW; the second was fixed at IF and only read here), five of
+the six ally-worded texts, and Bloodbond's registry *half*. Everything else in the live file stayed; what IJ changed only in part
+was amended in place.
+
+### ~~II's RULINGS OWED~~ — **BOTH ANSWERED IN IJ's BRIEF: PLAY WITHOUT THE DEBUG MENU (1, CARRIED AS IJ's RULING 1); THE FOUR CLOSED BLOCKS EACH STRUCK TO ONE LINE NAMING ITS RECORD (2, BUILT AT IJ §0.2)**
+
+Full working: `docs/reports/II.md`, NEEDS A RULING.
+
+1. **PLAY ONE ZONE WITHOUT THE DEBUG MENU, AND SEND THE FILE** (IH's ruling 1, carried — II §0.1). The readout names every debug
+   action, so a file that names none is play. It answers Boil Over's rate, Rupture's number, the vow's worth and the Cleric's Mana,
+   and **its first Hierophant confirms Sanctity's step** (13, confirmed in II's brief: a boss runs about 1.55 times a normal fight's
+   steps, so half the cap in a normal fight implies a boss near it).
+2. **WHERE THE FOUR CLOSED BLOCKS GO THAT NO REFERENCE HOLDS (§4).** DL §1's clause-unit heading (265 B, superseded into the hero/ally
+   block), BM §2's row-8 node (1,153 B, retired at FX), DY §3's vault exit (1,508 B, settled and asserted by `check_dv`) and FN's
+   pointer to where the retired rule is kept (965 B) — 3,891 B, each about what the game may contain. **An archive in this file's
+   shape would take them** (`DoD-archive/`, a pointer in `CLAUDE.md`'s charter); leaving them is the other answer.
+
+### FOUND AT IH AND NOT FIXED — ITS CLOSED ITEMS (archived at IJ; the section stays in `docs/state.md`)
+
+- **THE MAP BURGER's DEBUG ITEM READS *+200 Talent Points (all)* AND GRANTS 60 TO EVERY CLASS**, every tier open — its toast says so
+  and the readout names it by what it does (IH §0.2); the menu label is BM's, unchanged.
+
+### FOUND AT IE AND NOT FIXED — ITS CLOSED ITEMS (archived at IJ; the section stays in `docs/state.md`)
+
+- **CHOKING SMOKE's CARD CALLS ITS BURN *fuel for a Pyromancer's Ember Debt*** — Ember Debt lays Burn and consumes none.
+
+### THE PLAYTEST'S OTHER FINDINGS — ITS CLOSED ITEMS (archived at IJ; the section stays in `docs/state.md`)
+
+- **IJ — THE TEXT-AGAINST-CONSTANT SWEEP** (II §0.7's second rule, in the instrument rules; RULED, NOT BUILT): every number
+  player-facing text states, read against the constant the fight uses — IH repaired the fifth and the sixth by hand.
+
+### FOUND AT HT AND NOT FIXED — ITS CLOSED ITEMS (archived at IJ; the section stays in `docs/state.md`)
+
+- **`master.html`'s ITEM ROWS CARRY TWO CHANGE-HISTORY WORDS** (*Unchanged.* on the Revive and Defense Potions) — the document
+  shows only what is in the game. One-word deletions for the batch that touches the items.
+
+### ~~FOUND AT HC AND NOT FIXED~~ — **ITS ONE ITEM REWORDED AT IJ §2: THE EVENT VERB's EMPTY LINE SAYS *no rune is left that any hero can take***
+
+- **THE EVENT VERB'S EMPTY LINE IS FALSE MORE OFTEN NOW.** When no hero can take a rune, `events.gd` prints *"RUNE:
+  nothing answers — every hero already carries every rune written for them."* — its own sentence, not the door the
+  four other sites share (`Runes.empty_offer_reason`). It was already false whenever a pool was empty for want of a card
+  or an engine; at the class scope that is the ordinary case (a hero's class holds rows for engines he has not
+  slotted). Player-visible; not reworded — a new phrasing is the designer's.
+
+### FOUND AT GB AND NOT FIXED — ITS CLOSED ITEMS (archived at IJ; the section stays in `docs/state.md`)
+
+- **DEBUG: FREE TRAVEL OPENS ONLY THE NEXT SLOT**, while its toast says every slot is clickable.
+
+### FOUND AT FW AND NOT FIXED — ITS CLOSED ITEMS (archived at IJ; the section stays in `docs/state.md`)
+
+- **PLAYER-FACING:** the first-bar orientation card says *"Every action runs a timing check"* (`battle.gd`)
+  — false since CN took the bar off basics, pure buffs, shields and debuff appliers.
+- **PLAYER-FACING:** Cracked Hourglass says *"every hero recovers 30% Mana"*, and `Run.restore_mana` refills only
+  the mage and cleric keys — the Hunter, a Mana user, gets nothing.
+
+### THE FIVE ALLY-WORDED TEXTS, RE-DERIVED AT DM AND RULED ON NOWHERE — ITS CLOSED ITEMS (archived at IJ; the section stays in `docs/state.md`)
+
+- **The Warrior's Rally** — *"Shout one ALLY forward"*. Its picker filters `not a.is_companion` at
+  **three** sites, so it cannot even be aimed at one. It also carries **two clauses of different
+  shape**: a turn hand-off and a resource refill.
+- **Health / Mana / Revive Potion** — `_use_item` picks from `heroes.filter(not dead)`.
+- **Shared Grief's log** — *"%d ally below half"*. Walks `heroes`, skips companions.
+- **Glacial Hold's *"+15% damage from EVERY source"*** — `_hold_window_mult()` has **exactly one
+  caller**, in the hero strike loop. DL corrected the glossary's "party-wide"; the card's own claim
+  is still owed.
+- **AND THE GLOSSARY'S `res_faith` SAYS *ally* IN FOUR MORE PLACES** — the Devout's allies, the
+  shielded allies in its `short`, an ally's release at 3, a shielded ally holding. **Faith is
+  heroes-only outright by text-standard §4.9's binding rule**, so all four are wrong; **DM corrected
+  only the Consecrated Ground clause, because that clause was in scope and the rest are a sweep.**
+
+### Carried from the code, reported and deliberately not fixed — ITS CLOSED ITEMS (archived at IJ; the section stays in `docs/state.md`)
+
+- **`STATUS_INFO["bloodbond"]`'s REGISTRY TEXT SAYS *HALF* WHERE THE CARD, THE DOCUMENT AND THE
+  CODE ALL SAY A QUARTER (EQ §6).** The cast in `battle.gd` passes its own computed
+  description (`bb_pct = 25`), so the registry string has no live consumer today. **It is a trap
+  rather than a defect**: the next batch that adds a second `add_status("bloodbond", …)` without a
+  custom description ships the wrong number.
+
 ## ARCHIVED AT II — 2026-10-14, FROM `docs/state.md` AS IH LEFT IT (`dc35849`)
 
 **What came here**: IH's six rulings, all answered in II's brief (the first carried as II's ruling 1 — the designer's play, still

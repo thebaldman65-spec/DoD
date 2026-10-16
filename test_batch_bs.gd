@@ -251,9 +251,9 @@ func _lane_shape() -> void:
 	# RE-POINTED BY FX — BM's mechanical test for a re-skin, which this section
 	# ran on ROW 8 against its seven lane-mates because this batch re-authored
 	# every field in the lane. Row 8 went with the rows; the property that made
-	# it a rule survives and is asked over the WHOLE tree (CLAUDE.md, the row-8
-	# block, "RETIRED WITH ITS SUBJECT AT FX"): no node writes a field another
-	# node writes. ONE CHECK PER NODE, naming it, so a re-skin says which node it
+	# it a rule survives and is asked over the WHOLE tree (CLAUDE.md's one-tree
+	# block, "NO TWO NODES WRITE ONE FIELD"; the row-8 block is a struck line since
+	# IJ): no node writes a field another node writes. ONE CHECK PER NODE, naming it, so a re-skin says which node it
 	# is — which is why the count here is the tree's 27 where it was row 8's 7.
 	for n in tree:
 		var shared: Array = []

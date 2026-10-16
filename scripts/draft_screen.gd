@@ -120,7 +120,7 @@ func _draw_screen() -> void:
 		rbtn.text = ("[ON]  " if on else "") + info["name"] + tier_tag
 		rbtn.custom_minimum_size = Vector2(305, 40)
 		rbtn.tooltip_text = "%s\n%s" % [String(info.get("tier", "common")).to_upper(),
-			info["desc"]]
+			Relics.desc_of(id)]
 		if on:
 			rbtn.modulate = Color(1.0, 0.9, 0.5)
 		elif relic_picks.size() >= 3:
@@ -149,10 +149,16 @@ func _draw_screen() -> void:
 		# ONE OF THEM: `Run.end_boss_mult` floors the rung at 1.0. PROPOSED WORDS.
 		var strength := "Enemies at %d%% strength." % int(round(float(def["mult"]) * 100))
 		if float(def["mult"]) < 1.0:
-			strength = "Enemies at %d%% strength, the end boss at full." \
+			strength = "Enemies strike at %d%% strength, the end boss at full." \
 				% int(round(float(def["mult"]) * 100))
-		dbtn.tooltip_text = "%s\n%s\nBeating the end boss here opens talent tier %d." % [
-			def["blurb"], strength, Talents.tiers_open(int(def["rung"]))]
+		# The difficulty gate is the end boss's; a tier above the first also needs the spend
+		# gate (`Talents.TIER_SPEND_MIN` cells of the tier below), and the line says so.
+		var t_open := Talents.tiers_open(int(def["rung"]))
+		var t_line := "Beating the end boss here opens talent tier %d." % t_open
+		if t_open > 1:
+			t_line = "Beating the end boss here opens talent tier %d\nonce %d cells of tier %d are owned." % [
+				t_open, Talents.TIER_SPEND_MIN, t_open - 1]
+		dbtn.tooltip_text = "%s\n%s\n%s" % [def["blurb"], strength, t_line]
 		dbtn.custom_minimum_size = Vector2(140, 40)
 		dbtn.position = Vector2(dx, 640)
 		dbtn.add_theme_font_size_override("font_size", 13)

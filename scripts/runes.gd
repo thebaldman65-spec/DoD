@@ -860,6 +860,12 @@ static func _load() -> Dictionary:
 		# LOADS, not at the spawn: an entry whose condition is read as the fight runs
 		# and whose stat is consumed once is an authoring fault, and the first process
 		# that reads this file says so (`Talents.live_refusal`, the one answer).
+		# BATCH IJ §2 — A RUNE's WORDS READ THEIR FIGURES HERE, ONCE (`Classes.resolve_figures`: a
+		# token names a constant or one of the entry's own fields, `{=@payload.stat.x}`).
+		for rid0 in _data:
+			var e: Dictionary = _data[rid0]
+			if e.has("desc"):
+				e["desc"] = Classes.resolve_figures(String(e["desc"]), e)
 		for rid in _data:
 			var why := Talents.live_refusal((_data[rid] as Dictionary).get("payload", {}))
 			if why != "":
@@ -1649,12 +1655,12 @@ static func _empty_offer_base(member: Dictionary, held: Array = []) -> String:
 	var by_engine := locked_by_engine(member, held)
 	var by_kit := not locked_by_kit(member, held).is_empty()
 	if not by_engine.is_empty() and by_kit:
-		return "the runes left for that class wait on abilities they have not earned, or on %s being equipped" % \
+		return "the runes left for that class wait on abilities not yet in their kit, or on %s being equipped" % \
 			waited_on(by_engine)
 	if not by_engine.is_empty():
 		return "the runes left for that class wait on %s being equipped" % waited_on(by_engine)
 	if by_kit:
-		return "the runes left for that class wait on abilities they have not earned"
+		return "the runes left for that class wait on abilities not yet in their kit"
 	return "they already carry every rune written for that class"
 
 

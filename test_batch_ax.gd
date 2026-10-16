@@ -540,10 +540,9 @@ func _boss_legibility() -> void:
 		ok(ab != null and ab.description.contains("BROKEN"),
 			"%s's CARD states the boss rule" % card)
 	# THE GLOSSARY says it, and NAMES BREAK AS THE KEY.
-	var gsrc := FileAccess.get_file_as_string("res://data/glossary.json")
-	var gloss: Array = JSON.parse_string(gsrc)
+	# Read through the door the glossary is shown by: since IJ §2 its figures are tokens `Glossary._load` resolves.
 	var by_id := {}
-	for e in gloss:
+	for e in Glossary.entries():
 		by_id[String(e.get("id", ""))] = e
 	for gid in ["status_psychosis", "status_bewitch", "status_hysteria"]:
 		var long := String(by_id.get(gid, {}).get("long", ""))

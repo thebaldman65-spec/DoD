@@ -224,15 +224,20 @@ func _initialize() -> void:
 	# deleted), and the one BJ pinned as a SHAPE is still pinned just below.
 	ok(bsrc.contains("if u.unbroken_watch > 0 and not tick_b.damaged_since_turn:"),
 		"§2: Unbroken Watch's read site is still the gate-only shape BJ corrected its desc to (dormant since FX)")
-	# Reality Fracture's perfect is INERT and pinned as such (the White Flame
+	# Reality Fracture's perfect was INERT and pinned as such (the White Flame
 	# pattern): implementing it is a design decision a later batch must make
-	# against this check, not a drive-by.
-	ok(csrc.contains("\"perfect_id\": \"\", \"perfect_text\": \"An Arcanist also banks 1 Resonance\""),
-		"§2 PINNED: Reality Fracture's perfect text stands as authored...")
+	# against this check, not a drive-by. **RE-POINTED AT IJ §2, WHICH RULED EVERY
+	# DISAGREEMENT REPAIRED**: the +1 Resonance is paid at every grade, so the words
+	# moved to the Perfect the strike does pay — the grade's harder blow. A Perfect of
+	# its own is still the designer's to make (IJ's report names the card).
+	var rf_perfect := _card_words("Reality Fracture", true)
+	ok(rf_perfect.begins_with("Deals ") and not rf_perfect.contains("Resonance"),
+		"§2 PINNED: Reality Fracture's perfect states the blow the strike pays, not the inert Resonance...")
 	ok(not bsrc.contains("Reality Fracture"),
 		"§2 PINNED: ...and battle.gd still has NO handler for it — the clause is inert (reported, not implemented)")
 	# The ability descs corrected toward the code.
-	ok(csrc.contains("kindled 1 Faith"),
+	# Since IJ §2 the drip's figure is a token, so the words are read as the card shows them.
+	ok(_card_words("Consecrated Ground", false).contains("kindled 1 Faith"),
 		"§2: Consecrated Ground's tooltip states its Faith drip")
 	# BATCH CQ §3 — CL's LIVE VALUES, NOT A FOLD. Explosive Shot still runs a
 	# check and still states a perfect; CL replaced the authored "12% of
@@ -241,7 +246,7 @@ func _initialize() -> void:
 	# not one of CN's 105 — its perfect survives.
 	ok(csrc.contains("\"perfect_text\": \"Deals {atk:12}\""),
 		"§2: Explosive Shot's perfect states its unit through CL's token")
-	ok(csrc.contains("20% of Attack as nature"),
+	ok(_card_words("Shrapnel Charge", false).contains("20% of Attack as nature"),
 		"§2: Shrapnel Charge states its unit")
 	# RE-POINTED AT BATCH BX §4 (prose only — "beasts" became "companions").
 	# BJ's question survives whole: the desc must not go back to claiming 15%
@@ -276,7 +281,11 @@ func _initialize() -> void:
 	# was a band of three ROWS ("rows 1-3 cost 1 point"); the one tree has no
 	# rows, and `talent_cost` prices the TIER itself now. Same question, same
 	# label — the needle moved with the economy's new noun.
-	ok(glossary.contains("tier 1 cells cost 1 point"),
+	# Since IJ §2 the tier prices are tokens `Glossary._load` resolves, so this one is read as shown.
+	var gloss_shown := ""
+	for ge in Glossary.entries():
+		gloss_shown += String(ge.get("short", "")) + "\n" + String(ge.get("long", "")) + "\n"
+	ok(gloss_shown.contains("tier 1 cells cost 1 point"),
 		"§2: talent_cost describes the TIER pricing")
 	ok(not glossary.contains("ceil(N/3)"),
 		"§2: ...and the AI-era curve is gone from it")
@@ -291,3 +300,11 @@ func _initialize() -> void:
 
 	print("test_batch_bj: %d checks, %d failures" % [checks, fails])
 	quit(1 if fails > 0 else 0)
+
+
+# A card's words as a surface shows them (its tokens resolved at `Ability.make`), line breaks read as spaces.
+func _card_words(card: String, perfect: bool) -> String:
+	for ab in Classes.ability_corpus():
+		if ab.display_name == card:
+			return String(ab.perfect_text if perfect else ab.description).replace("\n", " ")
+	return ""

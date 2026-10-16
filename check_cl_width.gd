@@ -69,8 +69,9 @@ func _initialize() -> void:
 	# card at all, so the 44 ceiling is not its budget. Reported for the record.
 	var pd_worst := 0
 	for spec in Classes.SPEC_INFO:
+		# BATCH IJ §2 — its figures are tokens since IJ, so it is measured as the rule's door resolves it.
 		var pd := Classes.resolve_values(
-			String(Classes.SPEC_INFO[spec]["passive_desc"]), ctxs[0])
+			Classes.resolve_figures(String(Classes.SPEC_INFO[spec]["passive_desc"])), ctxs[0])
 		for line in pd.split("\n"):
 			pd_worst = maxi(pd_worst, line.length())
 	print("  passive_desc widest authored line: %d chars (not draft-card text;" % pd_worst)

@@ -113,9 +113,13 @@ const AUTHORED_DIGIT_CORPUS_CEILING := 89
 # nothing left to shorten. It still runs the gated check — a Sloppy loses the cast — and its
 # Perfect still lands the grade's harder blow, as every strike's does. Authoring it a new
 # Perfect would be a magnitude nobody ruled, so the list grows by the card and a TENTH trips.
+# BATCH IJ §2 — AND THE THREE CLASS BASICS, WHOSE PERFECT NONE CAN REACH. Strike, Magic Bolt and
+# Smite sit in slot 0, which resolves at a fixed Good, so the Perfect each advertised never paid;
+# IJ repaired every text the code contradicts and cleared the three. They keep the bar flag, so
+# the list grows by three, named rather than suppressed, and a THIRTEENTH trips.
 const CHECK_WITHOUT_PERFECT := ["Arcane Explosion", "Boil Over", "Called Shot",
-	"Coup de Grâce", "Death Ray", "Pinning Shot", "Powershot", "Pyroblast",
-	"Rampage"]
+	"Coup de Grâce", "Death Ray", "Magic Bolt", "Pinning Shot", "Powershot", "Pyroblast",
+	"Rampage", "Smite", "Strike"]
 
 
 func _initialize() -> void:

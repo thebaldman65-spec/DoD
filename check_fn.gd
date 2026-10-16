@@ -403,7 +403,8 @@ func _s1_the_eight_are_ungated() -> void:
 				clause_left.append("%s: %s" % [id4, c])
 	ok(clause_left.is_empty(),
 		"§1d: a rune's desc still states a retired condition (%s)" % [clause_left])
-	var bl := String((data["bracing_line"] as Dictionary).get("desc", ""))
+	# BATCH IJ §2 — read through the door a surface reads it by: its figures are tokens since IJ.
+	var bl := String(Runes.config("bracing_line").get("desc", ""))
 	ok(bl.contains("Heavy Plating") and bl.contains("+32%"),
 		"§1d: Bracing Line's SURVIVING gate came off its card too — reads `%s`" % bl)
 	# THE CODE HALF OF THAT SAME GATE, so the card and the fight agree.

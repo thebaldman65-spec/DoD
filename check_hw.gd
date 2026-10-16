@@ -584,7 +584,8 @@ func _s3d_the_words() -> void:
 		"§3d: Counter Time's card does not say one turn")
 	ok(sl != null and not String(sl.description).contains("CHILLED") and not String(sl.description).contains("not 1"),
 		"§3d: Snare Line's card still promises a chilled two-turn hold")
-	ok(sl != null and String(sl.description).contains("teeth, Break and all"), "§3d: Snare Line's card lost its own clause with the cut")
+	# BATCH IJ §2 — a sprung trap stuns: IJ repaired *Break* to *Stun*, the clause HW kept with the cut.
+	ok(sl != null and String(sl.description).contains("teeth, Stun and all"), "§3d: Snare Line's card lost its own clause with the cut")
 	var s: Node = await _board("swordmaster")
 	ok(int(s.COUNTER_TIME_TURNS) == 2 and int(s.SNARE_LINE_COLD_STUN) == 2,
 		"§3d: a magnitude moved with the words (Counter Time %d, Snare Line's chill %d)" % [int(s.COUNTER_TIME_TURNS), int(s.SNARE_LINE_COLD_STUN)])

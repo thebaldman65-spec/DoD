@@ -576,7 +576,7 @@ func _s3_the_panel() -> void:
 	var want_bare := ["CORE — 0 of %d slots" % int(_run.ENGINE_SLOTS), EMPTY_SLOT, EMPTY_SLOT, EMPTY_SLOT, HN_LINE, "<sep>",
 		"WORN — 0 of %d slots" % int(_run.rune_slots()), "No rune worn.", "<sep>",
 		"HELD, NOT WORN — 0 of %d" % int(_run.HERO_HOLD_CAP), "A rune taken off stays with him; Drop lets one go for good.",
-		"Nothing held. A rune drops after every fight, and the Peddler sells them."]
+		"Nothing held. A rune drops after every normal fight, and the Peddler sells them."]
 	ok(seq == want_bare, "§3a: a hero holding nothing draws %s" % [seq])
 	var why := _illegible(ov)
 	ok(why == "", "§3a: a label of the bare panel is not legible — %s" % why)

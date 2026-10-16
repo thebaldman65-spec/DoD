@@ -654,7 +654,8 @@ func _kit() -> void:
 	# The passive id moved, and everything keys on it.
 	ok(String(Classes.SPEC_INFO["pyromancer"]["passive"]) == "overburn",
 		"the Pyromancer's passive id is overburn")
-	var pdesc := String(Classes.SPEC_INFO["pyromancer"]["passive_desc"])
+	# Read through the door the rule is shown by: since IJ §2 its figures are tokens for `Classes.resolve_figures`.
+	var pdesc := Classes.engine_desc("overburn")
 	ok(pdesc.contains("Overburn"), "the passive is named Overburn")
 	ok(pdesc.contains("+2%"), "...its reward is stated")
 	ok(pdesc.contains("+40%"), "...its cap is stated")

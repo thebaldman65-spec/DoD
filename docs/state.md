@@ -29,64 +29,83 @@ never have fired: **an alarm set above the failure level is not an alarm.** `che
 sentence every battery: over it is a warning, and past it by more than one batch at the record is a failure — the largest
 single-batch growth on record is **+13.38 KiB** (ES's +13,700 B). *In the preamble for the archive pointer's reason.*
 
-*Last rewritten: 2026-10-14 (Batch II).*
+*Last rewritten: 2026-10-15 (Batch IJ).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: II — THE FAMILY'S REMAINDER, AND `CLAUDE.md` LEARNS TO ARCHIVE.** IMPLEMENT ONLY. **Game code changed in five
-  files** — `battle.gd`, `unit.gd`, `classes.gd`, `map_screen.gd`, `party_screen.gd`. Full working: **`docs/reports/II.md`**. **The
-  next letter is IJ** — the text-against-constant sweep (the roadmap, below).
+- **Last batch: IJ — TEXT AGAINST ITS CONSTANT.** IMPLEMENT ONLY. **Every string a player reads was read against the code that
+  decides it; the words moved and no magnitude did** (15 scripts and 4 data files: text, and the doors that resolve it). Full working:
+  **`docs/reports/IJ.md`**, and the census beside it, **`docs/reports/IJ-census.tsv`**. **The next letter is IK** — the
+  re-measure (the roadmap, below).
 - **THE DESIGNER HAS NOT PLAYED SINCE IH.** `run_save.bin` is 40,284 B at 2026-10-14 14:30 (IH's second, fresh rung-1 run at its first
   node) and `readout/` holds the one debug-touched file of four fights — both unmoved, backed up with the four player files
-  (`../save-backups/II-20261014-212446`, md5-verified).
-- **§1 — THE THREE LAST SITES.** A damage-over-time tick's line, Blight the Well's line and credit, and the bleedout burst's float and
-  line each ask `battle._landed` under their own frame before the door: silenced, the vow is named and no figure printed; unvowed,
-  HEAD's line character for character (`check_ii` §1).
-- **§2 — TWO FRAMES.** Blight the Well deals under its layer's frame (the blight's `src_name`), Umbral Sigil's echo under its
-  caster's (`_umbral_sigil_echo`, borrowed inside the striker's swing and put back) — every reader of the frame driven (`check_ii`
-  §2). **Both are reachable**: Umbral Sigil at an Occultist's every zone-boss roll (150 of 150 at a fresh run), Blight the Well in any
-  Cleric's draft (17 of 150 for a Devout, who holds no Old Gods).
-- **§3 — A TICK IS ITS LAYER's** (`battle._layer_credit_name`): BL §2's line credited the hero named *Pyromancer* or *Survivalist*.
-- **§0 — IH's RULINGS, ANSWERED.** One kind of face — the class sheet's shared crop on the plates, the strip and the cards; the
-  Berserker's bust and the Pyromancer's sheet kept. ○ is the fourth glyph (`check_id` §3a: the Runes button and a rune slot). The
-  floor: one size down (font 7) and no further — past it a value drops its parenthetical, the hover carrying the whole line
-  (Resonance at 365 stacks; Focus never needs the smaller size up to 2000); a full row's `+N` names every one of the rest. The sheet's
-  stats at font 17, five rows; the talent board unchanged.
-- **§4 — THE ARCHIVE PASS.** A census of all 126 blocks of `CLAUDE.md`: seven closed, 8,222 B. **Two moved** byte for byte to
-  `docs/instrument-rules.md` with their rows (CP §3's literal-digit baseline, EK's inertness claim — 3,105 B); **four have no
-  reference that holds their subject** (3,891 B — the designer's, ruling 2); the seventh (FK §6's `for i in n`) still binds any loop
-  and stayed. The practice is a standing step in `CLAUDE.md`'s charter; §0.7's first two rules are in the instrument rules.
-- **THE INSTRUMENTS.** `check_ii` is new; `check_hy` re-tuned (§4's blight opens on a vowed Devout without the Old Gods, §6 knows
-  `_umbral_sigil_echo`); `check_id` §3a holds ○; `check_hx` §1c's population lost the two moved blocks.
-- **THE VERIFICATION.** Two recons (§1–§3 alone, then all of II's code with §4's documents), the controls, the pre-pass and the
-  acceptance — `docs/reports/II.md` §9.
-- **`CLAUDE.md` IS 474,713 B = 463.59 KiB AGAINST ITS 510 KiB CEILING — 46.41 KiB UNDER** (−56 B at II: the pass moved 3,105 B out
-  and II's rules wrote 3,049 back): 5.7 batches at EZ's record (47,527 ÷ 8,293), 15.9 at the mean of IE–II (2,988 B).
-- **`docs/state.md` IS 354,059 B = 345.76 KiB AGAINST ITS 380 KiB CEILING — 34.24 KiB UNDER** (−1,985 B at II, this
-  line included): 6.0 batches at IA's +5,860 B, **the worst case**; the honest rate is IE +3,917 B, IF +236, IG +1,540, IH +2,521,
-  II −1,985 — a mean of 1,246 B over the five, **28.1 batches at it**. **`CLAUDE.md` binds first at every rate** (the
-  brief's §4), and §4 does not move the re-measure back: it is IK's.
-- **No save version moved**: nothing II changed is saved.
+  (`../save-backups/IJ-20261015-105653`, md5-verified).
+- **§1 — THE CENSUS.** 4,550 strings; 3,501 reach a player (61 of them debug); 2,640 state a fact the code decides. **Of 4,196
+  literal facts, 3,910 agree with the code, 283 disagree — in 249 strings — and 3 stay unverified.**
+- **§2 — REPAIRED, AND READ OFF THE CODE.** **227 of the 249 now say what the code does** (and 14 more the census missed, found by the
+  state file's queue, `master.html`'s repair and the pins); **22 are left** — 15 for a ruling (IJ's, below) and 7 the census's
+  over-reach. **402 typed figures read their constant**: a token `Classes.resolve_figures` resolves at six doors (`Ability.make`,
+  `Runes._load`, `Glossary._load`, `Classes.engine_desc`, `Talents.desc_for`, `Relics.desc_of` — 422 tokens), or a `%` format inside
+  a code-held table. 486 stay literal (FOUND AT IJ). The strike's grade multipliers are `Ability.GRADE_DMG_MULT` and
+  `GRADE_BD_MULT`, read by the strike and every Perfect text alike.
+- **§3 — PINNED.** 610 typed figures a player acts on, decided inline with no constant, are each tied to their code in `check_ij`
+  §3 (618 rows); 87 could not be — the deciding line not unique in its function, spread over sites, derived, or a
+  constant's that the resolver cannot print (a multiplier less one).
+- **§0 — THE RULES FILE.** II's four closed blocks are each one struck line naming what closed it and the report that holds the
+  record, and the rule stands in `CLAUDE.md`'s charter. A new gate's own source is read by the gate-source readers before the
+  acceptance (`docs/instrument-rules.md`). **`master.html`** carries 113 repaired clauses.
+- **THE INSTRUMENTS.** `check_ij` is new (48 checks: the resolver, no token on any surface, every token resolving, the
+  repairs, the pins); 25 gates and suites re-pointed to read the repaired words where a surface reads them.
+- **THE VERIFICATION.** Two recons (HEAD's battery on IJ's code, then the complete tree), the twenty gate-source readers over
+  `check_ij` before the acceptance (IJ §0.4), the controls — HEAD's code and HEAD's documents among them — the pre-pass and the
+  acceptance: `docs/reports/IJ.md` §9.
+- **`CLAUDE.md` IS 472,766 B = 461.69 KiB AGAINST ITS 510 KiB CEILING — 48.31 KiB UNDER** (−1,947 B at IJ): 6.0
+  batches at EZ's record (8,293 B), 24.3 at the mean of IF–IJ (2,034 B).
+- **`docs/state.md` IS 357,414 B = 349.04 KiB AGAINST ITS 380 KiB CEILING — 30.96 KiB UNDER** (+3,355 B at IJ, this
+  line included): 5.4 batches at IA's +5,860 B, **the worst case**; the honest rate is IF +236, IG +1,540, IH +2,521,
+  II −1,985, IJ +3,355 — a mean of 1,133 B over the five, **28.0 batches at it**. **At the worst rates this file now runs out
+  first** (5.4 batches against `CLAUDE.md`'s 6.0, where II read `CLAUDE.md` first at every rate); **at the honest rates
+  `CLAUDE.md` still does** (24.3 against 28.0). The re-measure is IK's.
+- **No save version moved**: nothing IJ changed is saved.
 - **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in a build
   older than HL**: HL's ceiling refuses a newer save from HL's build on — HR's v15 is the first bump it has guarded — and HJ's and
   HK's builds, and `main`, carry no ceiling.
-- **Next letter: IJ — the text-against-constant sweep** (the roadmap, below).
+- **Next letter: IK — the re-measure** (the roadmap, below).
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### II's RULINGS OWED — **TWO; THE FIRST IS STILL THE DESIGNER's PLAY, WITHOUT THE DEBUG MENU**
+### IJ's RULINGS OWED — **TEN; THE FIRST IS STILL THE DESIGNER's PLAY, WITHOUT THE DEBUG MENU, AND THE OTHER NINE ARE TEXTS IJ LEFT OR CHANGED**
 
-Full working: `docs/reports/II.md`, NEEDS A RULING.
+Full working: `docs/reports/IJ.md`, NEEDS A RULING.
 
-1. **PLAY ONE ZONE WITHOUT THE DEBUG MENU, AND SEND THE FILE** (IH's ruling 1, carried — II §0.1). The readout names every debug
-   action, so a file that names none is play. It answers Boil Over's rate, Rupture's number, the vow's worth and the Cleric's Mana,
-   and **its first Hierophant confirms Sanctity's step** (13, confirmed in II's brief: a boss runs about 1.55 times a normal fight's
-   steps, so half the cap in a normal fight implies a boss near it).
-2. **WHERE THE FOUR CLOSED BLOCKS GO THAT NO REFERENCE HOLDS (§4).** DL §1's clause-unit heading (265 B, superseded into the hero/ally
-   block), BM §2's row-8 node (1,153 B, retired at FX), DY §3's vault exit (1,508 B, settled and asserted by `check_dv`) and FN's
-   pointer to where the retired rule is kept (965 B) — 3,891 B, each about what the game may contain. **An archive in this file's
-   shape would take them** (`DoD-archive/`, a pointer in `CLAUDE.md`'s charter); leaving them is the other answer.
+1. **PLAY ONE ZONE WITHOUT THE DEBUG MENU, AND SEND THE FILE** (IH's ruling 1, carried — II §0.1, IJ §0.1). The readout names every
+   debug action, so a file that names none is play. It answers Boil Over's rate, Rupture's number, the vow's worth and the Cleric's
+   Mana, and **its first Hierophant confirms Sanctity's step** (13).
+2. **BLOOD DEBT NEVER FIRES** (census N023). Blood Price is a self-cast, so its target is always the Berserker, and the rune's
+   branch needs an enemy target (`check_gv` passes only because it calls `_resolve` with one directly). Repaired, the words would
+   describe a rune that does nothing. **Its target is yours.**
+3. **CAIRNMOSS POULTICE DOES NOTHING** (R064). Its whole effect was the retired rest node's (`rest_heal_add`, read nowhere since
+   rests left the map); the words were left, since an honest text would describe a relic with no effect.
+4. **THE RUIN RUNG's *HARSHER BARGAINS*** (R091, and the glossary's road entry, G084L) — the code is the defect: Ruin's offers come
+   out milder than Warden's (mean severity 2.31 against 3.29, EP §1, owed). Both texts left.
+5. **EXECUTE's TARGET** (C070). The card's rule is the code's; the player's picker offers every enemy once one qualifies. The
+   picker is the defect.
+6. **TWO PERFECTS WITH NOTHING OF THEIR OWN: SEVER's AND REALITY FRACTURE's.** Sever's promised an armor strip nothing pays, and
+   Reality Fracture's a Resonance paid at every grade (BJ pinned it as a later decision); **both now state the blow a Perfect lands**,
+   the grade's ×1.15, as every Perfect without an arm does. A Perfect of their own is yours to author.
+7. **THE IRON WILL CHIP** (B0020). The node it pays for was renamed *Mitigation per Debuff You Carry* at FX; the chip keeps CK §2's
+   label, which `test_batch_br` pins as the node's. Rename it with the node, or keep it.
+8. **THE STRIKE LOOP's REACH — ONE RULING FOR ALL OF THESE.** No word a player reads separates a strike-loop blow from a
+   handler's: the school relics (Emberheart, Frostbound Sigil, Nightbloom) and Tinderbox raise `type_dmg_bonus` at the strike only;
+   Clarity and Profligate pay strike-loop spells only (Profligate still doubles a Killing Frost's price); Shielding's and the
+   Regalia's ×0.75 is read in the strike loop only. **Name the strike loop in the words, or widen the payouts.**
+9. **SANCTITY's *each status the Cleric applies*** (R016). Only the 110 of 214 `_apply_status` calls that pass a source are
+   lengthened (FT §3's owed gap); an honest sentence would describe a population the player cannot see.
+10. **WORDS OF YOURS IJ REPAIRED, FOR CONFIRMATION.** Each said something the code does not do: HF's Abundance (*His* healing beyond
+    an ally's missing health) and Vow of Silence (*not those Faith and Ruin pay*), HN's Forbearance (*Heroes* hold one more stack),
+    HW's Snare Line (*Stun* and all, where it read *Break*) and the glossary's three HW proposed (Runes, the Peddler, Severity), and
+    HC's empty event line (*no rune is left that any hero can take*). The report quotes each, old and new.
 
 ### THE CLERIC's MANA RATE — **12, UNMOVED (IE §1); THE TUNING HANDLE AND THE FIGURES IT WAS MEASURED AGAINST**
 
@@ -142,6 +161,28 @@ runs a party at HEAD, 60 at §1 untalented; events at a fight's end):
 Untalented 1,391 fights at HEAD and 3,988 at §1; default 1,658 and 1,697. **The readout carries his steps a fight; the first
 Hierophant run of the designer's play confirms it** (II's ruling 1).
 
+### FOUND AT IJ AND NOT FIXED
+
+- **THE LITERAL FACTS THAT STAY LITERAL, AND WHY** (`docs/reports/IJ.md` §2, every one listed in `docs/reports/IJ-census.tsv`). A
+  figure written as a word (*a quarter*, *twice*, *three bolts*: a token prints digits, so converting it would change what the
+  player reads); a figure no door reaches; and quoted facts that carry no figure (a condition, a name, a scope).
+- **LOYALTY's REGISTRY TEXT KEEPS *Past 8* AS A LITERAL.** The live chip names the point through `_bond_convert(hunter)`, which a
+  Long Leash moves to 11; EU reserves the constant to that one reader (`check_eu` §0), so the registry's fallback keeps the base
+  figure written out.
+- **THE SKILL-CHECK HINT's *half Break*** is a word for `Ability.GRADE_BD_MULT`'s Sloppy 0.5, left written (the hint's three
+  figures read the table since IJ).
+- **THE BOMB's LINE (FOUND AT HZ) CAME DUE AND WAS NOT PAID.** IJ touched the item texts; the line is new wording, not a repair.
+- **VESPERS IN THE GLOSSARY's `mercy_window`** — *the blow that would take an ally below the line*: whether a companion's window
+  counts is not settled by reading; left as written.
+- **WHAT `master.html`'s REPAIR LEFT UNSURE** (IJ's report §2): the Parry Up row (Guard Change's figures beside the chip's
+  Precision Strike +25%); the potions on the map; the §4.6 Poison row's *never ticks on the turn it lands*; Answering Steel's
+  *two turns off everything he holds* (each card skips its own cooldown); Firedraw's reason column; Mercy's row against the
+  glossary's exceptions. None was changed.
+- **SIEGE STONE's *heavy damage to every ally*** is the one enemy text that says *ally* for the heroes' side; whether its
+  throw reaches a companion was not read. The other enemy texts say *warband* for their own side since IJ.
+- **THE READOUT STILL NAMES DEBUG ACTION 12 *Full Heal Heroes*** where the menu reads *Full Heal Standing Heroes* — a record key
+  `check_ih` pins, so it stayed.
+
 ### FOUND AT II AND NOT FIXED
 
 - **`docs/combat-rules.md`'s HEADER CLAIM IS STALER AGAIN** — II wrote into the frame block (the two layer-framed sites, the closed
@@ -156,8 +197,6 @@ Hierophant run of the designer's play confirms it** (II's ruling 1).
 
 ### FOUND AT IH AND NOT FIXED
 
-- **THE MAP BURGER's DEBUG ITEM READS *+200 Talent Points (all)* AND GRANTS 60 TO EVERY CLASS**, every tier open — its toast says so
-  and the readout names it by what it does (IH §0.2); the menu label is BM's, unchanged.
 - **THE FULL-SCREEN ART IS SIZED BEFORE ITS EXPAND MODE** (census 1b): the map's and the event's backgrounds (1122 × 1402) draw at
   1280 × 1402 and show their upper part, not their centre — behind the cards, not on them.
 - **THE BATTLE SPAWN STILL BUILDS ITS OWN LIVE PROLOGUE** — the sheet's moved to `Run.hero_live_config` (IH §5) and the spawn's did not
@@ -192,7 +231,6 @@ Hierophant run of the designer's play confirms it** (II's ruling 1).
   both unavailable; Stoke and Cinderfall are in no rotation arm (one cast in sixty runs, though `check_gp`'s seeded road meets a
   Cinderfall eight times). Every sim figure on a Mage's Burn is the bot's
   rotation's — Firestorm, Flamewave, Immolate — and understates a player who casts what he drafted. One case each, the bot's.
-- **CHOKING SMOKE's CARD CALLS ITS BURN *fuel for a Pyromancer's Ember Debt*** — Ember Debt lays Burn and consumes none.
 - **`DISPEL_NEVER` KEEPS `spec_passive` AND `spec_passive_2`**, inert since §2a (no status carries either); `check_el` and
   `test_batch_bq` pin them.
 - **THE CENSUS's OWN, READ AND NOT DRIVEN**: Ember Leap's half-the-turns fires on Ember Debt's refund, which consumes nothing; eight
@@ -289,7 +327,8 @@ block.
 
 - **A BOMB NEVER MARKS, NEVER FEEDS SIPHON, IS NEVER JUDGED, AND CANNOT BE A REAVER'S KILLING BLOW** — HY's ruling 2 confirmed:
   an item's damage is the party's, nobody's in the frame and the ledger alike. **A player holding a Reaver should not finish with
-  a bomb**: a line of surface text owed the next time the item surface is touched, not before.
+  a bomb**: a line of surface text owed the next time the item surface is touched, not before. **IJ §2 touched the item texts and did not
+  write it** (FOUND AT IJ).
 - **THE `boil_over` STATUS HAS NO WRITER SINCE HZ §2** — `unit.frenzy_bonus()` still reads it, `STATUS_INFO` keeps its row and
   `check_hw` §1a prints it; kept, the `spite_ranks` and `whole_forest` shape.
 - **`docs/combat-rules.md`'s HEADER CLAIM, *every block below is byte-identical to what stood in `CLAUDE.md`*, IS STALER** — HZ
@@ -335,7 +374,8 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
    its second turn back is the stun-length system, ruled out of this batch.
 5. **THE WORDS, PROPOSED**: Charge's *DAZED for 2 turns* (Perfect: *Dazed for 3 turns*); Counter Time's *loses its next
    turn*, on the card and in its log line; Snare Line's card without its chilled clause; the glossary's three (Runes, the
-   Peddler, Severity); `master.html`'s rows (the partner-spec table is eight).
+   Peddler, Severity); `master.html`'s rows (the partner-spec table is eight). **IJ §2 has since moved Snare Line's (*Stun*,
+   not *Break*) and all three glossary entries'** — what waits for confirmation is IJ's words now (IJ's ruling 10).
 6. **WHICH DRAFT IS *THE CLASS RUNE DRAFT* (§1c).** Read as a hero's own pick of three — the elite's rune cache and the
    bargain's rune (one roll, `Run.roll_rune_candidates`) — the only rune draft a hero answers himself. If the brief's *the caches
    are right* meant the elite's cache keeps crest runes, the scope comes off that roll and the defect has no other door.
@@ -348,21 +388,25 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
   in play.
 - **THE VENOM LANE DOES NOT RIDE TRAPPER'S PLAIN BARB OR EXPLOSIVE SHOT**: both lay their Poison at the status door with
   `_dot_tick`, never through `_apply_poison` (Potent Toxins, Virulence, the stamps) — `_apply_poison`'s *every Survivalist
-  poison flows through here* was not so, and the comment says so now. Routing them moves magnitudes; the designer's.
-- **A THIN BLOOD POISON'S CHIP STILL READS *3 nature damage per stack*** (`STATUS_INFO`'s text, HT §2f's stale row) where it
-  deals nothing; a second stack's re-written line reads 0. Owed with Poison's stale row.
+  poison flows through here* was not so, and the comment says so now. Routing them moves magnitudes; the designer's. Since IJ §2 the Long Poison rune's words name the exclusion (*not the
+  barb's or Explosive Shot's*).
+- **A THIN BLOOD POISON'S CHIP STILL STATES A FIGURE WHERE IT DEALS NOTHING** (`STATUS_INFO`'s text): since IJ §2 the row reads
+  *3% of the applier's Attack as nature damage per stack* (HT §2f's stale *3 nature damage* repaired), which a Thin Blood poison
+  does not deal; a second stack's re-written line reads 0.
 - **`run_battery.sh` STILL DOES NOT ASK WHETHER THE GAME IS OPEN, AND A PLAIN `kill` STILL DOES NOT STOP IT** (HT's two, carried).
 ### THE PLAYTEST'S OTHER FINDINGS — **LATER BATCHES BY RULING (HW's brief §5); THE ROADMAP HOLDS THE ORDER**
 
 - **THE RE-MEASURE IS SCHEDULED, NOT PARKED (IC §5, the designer's) — IT IS IK (II's brief §6; IG's brief gave it II, and II's
   brief gave II the family's remainder)** — both ceilings run out within a batch of each other at the worst rate and far later at
   the honest one (the WHERE block's two readings, each with both rates), so a re-measure that waits finishes as the room runs out;
-  **II §4's archive pass did not move it back** (`CLAUDE.md` −56 B at II). **The block index and HV's pilot still wait on it.**
+  **II §4's archive pass did not move it back** (`CLAUDE.md` −56 B at II),
+  **nor did IJ's struck lines** (`CLAUDE.md` −1,947 B at IJ). **The block index and HV's pilot still wait on it.**
   **THE ORDER:**
-- **IJ — THE TEXT-AGAINST-CONSTANT SWEEP** (II §0.7's second rule, in the instrument rules; RULED, NOT BUILT): every number
-  player-facing text states, read against the constant the fight uses — IH repaired the fifth and the sixth by hand.
-- **IK — THE RE-MEASURE**: `CLAUDE.md` binds first at every rate now (II's brief §4), and the room is planned against the honest
-  rate (`docs/reports/II.md` §9).
+- **IK — THE RE-MEASURE**: `CLAUDE.md` binds first at the honest rates (II's brief §4 read it first at every rate; at IJ's close
+  this file runs out first at the worst ones — the WHERE block), and the room is planned against the honest rate
+  (`docs/reports/IJ.md` §9). **119 of 126 blocks bind. So archiving will never SHRINK CLAUDE.md — it can only stop it
+  growing, and II proved it at the margin: 3,105 B out, 3,049 B written back, 56 B net. The next byte comes from the file's
+  SHAPE, not from its contents** (IJ's brief §0.3, the designer's).
 - **IL — THE CLAIMS**: HX's 87 stand at **86** — the per-batch re-read stops the backlog growing and does not retire it, so it is a
   batch of its own (FOUND AT HX, FOUND AT IA).
 - **MANA STAYS (ruled).** The finding was that the Mage and the Hunter run dry and only the Cleric is always full; **measured at IE
@@ -401,12 +445,10 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
   a non-headless Godot holds the project closes it; not taken (outside the brief).
 - **THE RITE'S SECOND ID READ IS THE SAME SHAPE AS THE ONE §1.4 FIXED**: a stripped `ruin` takes `ruin_primed` too — correct while
   Ruin is no ingredient; Reckoning's batch owes it the lookup, beside `log_bleed_chip` and `set_ruin_stacks` (HS).
-- **`master.html`'s ITEM ROWS CARRY TWO CHANGE-HISTORY WORDS** (*Unchanged.* on the Revive and Defense Potions) — the document
-  shows only what is in the game. One-word deletions for the batch that touches the items.
 - **A PLAIN `kill` DOES NOT STOP THE BATTERY**: `run_battery.sh`'s `trap 'rmdir "$LOCK"' EXIT INT TERM` runs on TERM and the loop
   goes on — with its lock gone, so a second battery could start writing the same `$OUT` (CP's data fault). An `exit` in the
   INT/TERM trap closes it; not taken (outside the brief). Stop a battery with `kill -9` on its shell, then its Godot.
-- **THE CENSUS'S OWN FINDINGS (`docs/reports/HT.md` §2f), NONE TOUCHED**: card text the code does not pay (ruling 5); rules that
+- **THE CENSUS'S OWN FINDINGS (`docs/reports/HT.md` §2f), ONE TOUCHED AT IJ §2 (Poison's chip row)**: card text the code does not pay (ruling 5); rules that
   meet badly — a re-applied Poison SETS its clock (it can shorten, and ends a permanent Long Poison), a fresh Poison skips its
   first tick, a purge takes Bleed's chip and leaves its meter (Cull and Harvest paid for a bleed that stays), a Downwind copy of
   Ruin can skip a detonation, a primed body emptied of Ruin still detonates, Downwind's bare copies (a partner-less Frostbind, a
@@ -414,8 +456,8 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
   HV §2: the snare and Vendetta's lock are not carried, the Ruin stack and the poison take their route, the Frostbind is owed a
   ruling**), Frostbind's partner found by name, ~~two shared chip tags~~ (**re-tagged at HU §4**, with eleven
   more the sweep found); stale text — Ruin's row
-  and chip under the Open Wound and Deepening Hex runes, the primer's *next acts*, Poison's *3 nature damage per stack* and
-  *refresh*, Rime's *every stack*, `VENDETTA_CUT` read by nothing, comments on the dormant Whole Room, on Bewitch's Daze, on
+  and chip under the Open Wound and Deepening Hex runes, the primer's *next acts*, Poison's *refresh* (its *3 nature damage per stack* repaired at
+  IJ §2), Rime's *every stack*, `VENDETTA_CUT` read by nothing, comments on the dormant Whole Room, on Bewitch's Daze, on
   Lingering Torment and on deleted talent nodes; twenty-odd dormant appliers and six dead branches, listed there.
 ### FOUND AT HS AND NOT FIXED
 
@@ -484,7 +526,7 @@ game — HO caught one. `CLAUDE.md`'s rule-engine block carries the same marker.
   fight's own banking (`battle._bank_party_losses`), which stops once a fight is decided, and every victory then writes
   at least a fifth. **0 of 3,957 events drawn across HO's measurement runs**, where each of the other nineteen was drawn
   at least 18 times. `map_screen._use_item` offers a Revive Potion *the fallen* and can only answer *"No one to use the
-  Revive Potion on."*
+  Revive Potion on."* Since IJ §2 the glossary no longer says a Revive Potion works on the map.
 - **TITHE'S RULE PAYS AT LEAST 1 A BLOW, EVEN ON A BLOW THAT APPLIED NO BREAK, AND A PARTY AT FULL HEALTH PAYS THE
   WARRIOR** (ties go to seat order) and wastes it. Both are the talent's read site, unchanged (the owed rebalance, HP).
 - **THE TALENT *Cleanse Debuffs Each Turn* CAN CLEAR THE BLEED WARNING CHIP**, which comes back on the next hit
@@ -562,7 +604,7 @@ WHERE block.
 
 ### FOUND AT HL AND NOT FIXED
 
-- **THREE CARD TEXTS USE *ENGINE* AS A WORD FOR A RULE** (`classes.gd:3891`, `:5624`, `:6944`) — card text, left as
+- **THREE CARD TEXTS USE *ENGINE* AS A WORD FOR A RULE** (`classes.gd:4059`, `:5822`, `:7142` at IJ, which tokenised two of the three and kept the word) — card text, left as
   authored (ruled at HN: the designer's); a player reads *core rune* on every screen and *engine* on three cards.
 - **AN OLD SAVE WHOSE SWORDMASTER DRAFTED GUARD CHANGE HOLDS IT TWICE** and pays a slot for the earned copy until he
   benches it. None on disk.
@@ -655,13 +697,6 @@ Full working: `docs/reports/HD.md`, NEEDS A RULING.
    Built both ways (`docs/reports/HD.md` §3); confirm that is what was meant. **HE's brief did not answer it, so it is
    still owed**; the rune floor has since moved (HE §1).
 
-### FOUND AT HC AND NOT FIXED
-
-- **THE EVENT VERB'S EMPTY LINE IS FALSE MORE OFTEN NOW.** When no hero can take a rune, `events.gd` prints *"RUNE:
-  nothing answers — every hero already carries every rune written for them."* — its own sentence, not the door the
-  four other sites share (`Runes.empty_offer_reason`). It was already false whenever a pool was empty for want of a card
-  or an engine; at the class scope that is the ordinary case (a hero's class holds rows for engines he has not
-  slotted). Player-visible; not reworded — a new phrasing is the designer's.
 ### HA's RULINGS OWED — **TWO LEFT, BOTH ABOUT `main`; THE FIRST IS ANSWERED BY HB's SEQUENCE AND ALL FIVE OF THE SECOND WERE RULED FOR HD**
 
 **AMENDED AT HG.** Ruling 1's second half named *"HE (HA's HC): the other seventy-five tier-2 arms in 36 targets"*.
@@ -716,7 +751,8 @@ Full working: `docs/reports/HA.md`, NEEDS A RULING.
   lineage half (`check_gm:378`, `check_gn:197`). Correct while `lineage_slots` is zero for every lineage.
 - **THREE GATES CHECK TWELVE ENGINES' TEXT WHERE THERE ARE TWENTY-FOUR** (`check_cl_resolver`, `check_cl_width`,
   `check_do` §4), reaching it through `SPEC_INFO[s]["passive_desc"]`; the spines' and the rule engines' texts are never
-  checked. None carries a token today.
+  checked. None carries CL's value token; since IJ §2 their figures are `{=…}` tokens `Classes.engine_desc` resolves
+  (`check_cl_width` reads them resolved, `check_cl_resolver` and `check_do` §4 the raw text).
 - **SMALL AND DEAD:** `check_di:391`'s `_hero(scene, "pack_bond")` can never match (the id is `pack`); `test_batch_cp`'s
   `PASSIVE_OF` maps the Beastmaster to `"loyalty"`; `check_cy`'s sweep always casts from the first living hero, so its
   two-party reason is never exercised.
@@ -950,7 +986,9 @@ Full working: `docs/reports/GT.md`, NEEDS A RULING.
   with Overpower or Pommel Strike read fields nothing writes since FX.
 - **FOUR ENGINE RULE TEXTS NAME CARDS THAT NO LONGER TRAVEL WITH THEM**, and every rune surface shows those texts now:
   Seasoned Fighter's *"Guard Change swaps"*, Glacial Hold's Ice Lance, Shatter and Blizzard, Mercy's *"Stacks pay for
-  Hymn of Hope"*, Conviction's *"doubled under Blessing of Zeal"*. No engine text moved (§4).
+  Hymn of Hope"*, Conviction's *"doubled under Blessing of Zeal"*. No engine text moved (§4). **IJ §2 moved six core-rune
+  texts**: Mercy's now names Hymn of Hope, Resurrection and Divine Plea; Seasoned Fighter's, Glacial Hold's and Conviction's
+  clauses stand.
 - **THE SIM BOT CANNOT CAST MOST OF THE 29 OUTSIDE THEIR OWN ROTATIONS.** `_bot_drafted_pick` casts a card only if
   `Classes.draft_ability` resolves it, and none of the 29 is defined there (their one definitions are the lineages' and
   `basic_override_ability`'s) — GM's Mana Shield finding, twenty-nine cards wide. The four drafted basics are never
@@ -1186,17 +1224,21 @@ Full working: `docs/reports/GM.md`, NEEDS A RULING.
   (`battle.gd:12059-12079`); Pinning Shot's Daze and Called Shot's rider inside Lethal Aim's (12214-12227).
 - **DIVINE SHIELD'S RECAST PROPOSAL IGNORES THE BARE ALTAR RUNE**, which halves the cast (`battle.gd:17157-17158`); the
   table proposes the full 35% (6064), so a wasted recast reads as an improvement. CR §3's rule, one live rune along.
-- **PLAYER-FACING: THE CLASS BASICS ADVERTISE A PERFECT NONE OF THEM CAN REACH** — Strike, Magic Bolt, Smite, Quick Shot
-  and the overrides in slot 0 (none since GS §1: the four are drafted, sit past slot 0 and run the bar) resolve at a fixed Good (`battle.gd:4118-4119`), while the battle tooltip and the hero
-  sheet print their Perfect lines. A Lethal Aim holder's Quick Shot is the one exception. **`test_batch_bo` §5 passes
-  them**, because it asks `runs_skill_check()` and the cast path asks slot 0.
+- **PLAYER-FACING: QUICK SHOT ADVERTISES A PERFECT ONLY A LETHAL AIM HOLDER CAN REACH** — slot 0 resolves at a fixed Good
+  (`battle.gd`), so a Beastmaster's or a Mystic's Quick Shot never pays its *+10 bonus Mana*; the Sharpshooter's bar is real, and
+  the card is one object the three share. **IJ §2 cleared the other three class basics' Perfect lines** (Strike, Magic Bolt,
+  Smite), which no hero could reach. `test_batch_bo` §5 passes them, because it asks `runs_skill_check()` and the cast path asks
+  slot 0.
 - **PLAYER-FACING: CARD TEXTS THE CODE CONTRADICTS**, each in its class section of the recon: Charge's one-turn Daze
   never acts (it ticks off at the target's turn start, `battle.gd:3295`, before any miss roll) and its Perfect has no
   code; Cleave's Perfect has no code; Battle Trance and Mana Well pay three turns in four (their ticks run after
   `tick_statuses`); Chastise's Perfect says 30 Break damage and pays 25; Frostbolt's, Razor Ice's and Blizzard's
   "hold" is the engine's; Divine Shield names "the Devout's" health and Dark Pact "the Occultist"; Hymn of Hope, Dark
   Pact and Resurrection say *ally* and reach heroes only; Renewal and Undying Vigil on a companion do nothing; Kill
-  Command's "both companions" names a mode nothing writes (`the_pack`); Arcane Explosion's "Builds 1 Resonance".
+  Command's "both companions" names a mode nothing writes (`the_pack`); Arcane Explosion's "Builds 1 Resonance". **IJ §2
+  repaired Cleave's and Chastise's Perfects, Frostbolt's hold, Dark Pact's *the Occultist* and the *ally* of Hymn of Hope, Dark Pact,
+  Resurrection, Renewal and Undying Vigil. IJ's census read the rest as agreeing** — each an engine's own rule (HO §0), or, for
+  Kill Command, *The Pack* talent's name — a reading that differs from GL's, owed a look.
 - **A PARTY DAMAGE BUFF PAYS ON ORDINARY STRIKES ONLY.** Warcry, Exhortation, Blessing of Zeal and Hunter's Mark are
   read in the strike path (`battle.gd:9689, 8423-8425, 9240, 9892`); a card resolving in its own `special` handler
   reads none of them. True of all four; recorded once.
@@ -1211,7 +1253,8 @@ Full working: `docs/reports/GK.md`, NEEDS A RULING.
 1. **The three spine runes' names** — the Rune of the Vanguard, the Invoker, the Hierophant.
 2. **The three spines' rule texts** (`Classes.SPINE_INFO`), which no player read before GK.
 3. **The class-selection words** — *"Take one of three engine runes — a second can join it later, and either can be
-   dropped"*.
+   dropped"*. Since IJ §2: *"Take one of three core runes — 2 more can join it later, and any can be dropped"* (the count read
+   off `Run.ENGINE_SLOTS`).
 4. **An engine rune's cost** — the flat rune price until one is set: 150 gold since HK §3, 100 until then.
 5. **The lineage interim** — a hero who drops his lineage's engine keeps its name, stats and pools. **GL found what
    else he keeps**: Death Ray, Resurrection and Kill Command, which can then never be cast, a Hold Breath that never
@@ -1269,7 +1312,8 @@ Full working: `docs/reports/GK.md`, NEEDS A RULING.
    health against 2,490, Attack 334 against 434). It is one line either way (`Run.end_boss_mult`).
 2. **THE RUNG-1 WORDS ARE PROPOSED.** The draft screen's Wanderer tooltip reads *"Enemies at 50% strength, the end
    boss at full."* where it read *"Enemies at 50% strength."*, and the glossary's road entry *"its enemies hit half
-   as hard - all but the END BOSS - "*. Each was a claim §3 made false.
+   as hard - all but the END BOSS - "*. Each was a claim §3 made false. **IJ §2 moved the tooltip to *Enemies strike at 50%
+   strength*** — the rung discounts the attack path, never health (`Run.zone_base_mult` against `maxf(mult, 1.0)`).
 3. **THE END BOSS'S TOOLTIP AND ITS READOUT NAME (GI) ARE STILL OWED A CONFIRMATION.** GJ's brief confirmed the END
    BOSS label; it said nothing of the tooltip or of the readout's *"— the Hollow Crown waits"*.
 
@@ -1330,9 +1374,9 @@ Full working: `docs/reports/GK.md`, NEEDS A RULING.
   `second_max = 99` says Resonance has no ceiling at all, and the header of Runaway Resonance's first clause says
   nothing removes it. Arcane Arrows' handler comment says five is what the card promises, beside an
   `ARCANE_ARROW_CHARGES` of 5 that nothing reads; the card and the handler pay six, and so does the glossary now. None
-  of these is player-facing.
+  of these is player-facing. IJ §2's player-facing words name the three removers (Arcane Bolt, Stabilize, Threshold).
 - **WHAT THE GLOSSARY CENSUS LEFT AS IT IS.** Nine claims no code can settle (intent, such as the class-wide cards
-  being weaker on purpose) stand as written. **Decay and Elemental Weakness were RETIRED at GG**, by the designer's
+  being weaker on purpose) stand as written — that one *as written* since IJ §2. **Decay and Elemental Weakness were RETIRED at GG**, by the designer's
   ruling (`docs/reports/GG.md` §3). **Melted Armor and Caught Fast are the same case and are OWED A RULING**:
   nothing applies either (`melt_ranks` and `caught_fast` have no writer), their entries annotate themselves, and
   the ruling named two. Card and chip text still uses group
@@ -1550,7 +1594,6 @@ code, and some of what it found lives elsewhere. **The tables are in `docs/repor
 - **NOTHING STOPS `DOD_SIM_RUNES` CHANGING A REAL GAME.** `runes_mode()` reads the environment with no `sim_run` gate,
   and the `test_runes` assertion a `run_state.gd` comment claimed for it never existed: the purity arm covers the
   economy and power flags only. *Stats* or *off* left exported in a player's shell changes a real run.
-- **DEBUG: FREE TRAVEL OPENS ONLY THE NEXT SLOT**, while its toast says every slot is clickable.
 - **STALE COMMENTS AND PRINTS OUTSIDE THE THREE FILES.** Each is an asserted surface, so each owes the source literal
   sweep:
   - `battle.gd`: two comments cite *"CLAUDE.md's hang mode (1)"*, which no longer exists; one says
@@ -1615,17 +1658,14 @@ code, and some of what it found lives elsewhere. **The tables are in `docs/repor
   - §12's "talent-gated abilities".
 ### FOUND AT FW AND NOT FIXED — **A REPORT TOUCHES NO CODE; THE FIRST THREE ARE PLAYER-FACING**
 
-- **PLAYER-FACING:** the first-bar orientation card says *"Every action runs a timing check"* (`battle.gd`)
-  — false since CN took the bar off basics, pure buffs, shields and debuff appliers.
-- **PLAYER-FACING:** Cracked Hourglass says *"every hero recovers 30% Mana"*, and `Run.restore_mana` refills only
-  the mage and cleric keys — the Hunter, a Mana user, gets nothing.
 - **The sim bot's Health Potion heals a flat 40** (`battle.gd:3778-3788`), not `Run.health_potion_heal`'s 20% of
   maximum — against `CLAUDE.md`'s CT §6 (*"battle and map both CALL them"*), so every sim item-economy figure
   measures a different potion from the player's.
 - **`relics.gd`'s header says every hook is read at exactly one site** — `gold_find_mult` is read at two,
   `shop_discount` at four, and **`rest_heal_add` at none**, so Cairnmoss Poultice pays nothing and
   neither does Martyr's Knucklebone's *"rest nodes restore 10% more"* (GB). **`docs/master.html`'s copy of the claim was
-  corrected at GE §2**, where six hooks read at more than one site were counted; this header still owes its own.
+  corrected at GE §2**, where six hooks read at more than one site were counted; this header still owes its own. **IJ §2
+  dropped the rest clause from Martyr's Knucklebone's words**; Cairnmoss Poultice is IJ's ruling 3.
 - **`CLAUDE.md`'s "four death-refusals"** are four call lines holding six refusals, with four more lethal refusals
   above the subtraction that ticks never reach. **~~Its CV §1 cites `tick_statuses` at `unit.gd:2171`~~ — CLOSED AT
   GB §4: the line number is dropped.**
@@ -2074,7 +2114,7 @@ instrument batch rather than an emergency.
 **Full evidence: `docs/reports/EK.md` (the derivation), `docs/reports/EL.md` (the names and the
 seventh) and `docs/reports/ES.md` §4 (the reading machinery).** The vocabulary is
 `DEBUFF · DEFENSE · BREAK · RESOURCE · OFFENSE · TEMPO · MARK`, it is on every ability in the corpus
-and every authored rune, and the draft card shows it.
+and every authored rune but the core runes (the glossary's words since IJ §2), and the draft card shows it.
 
 - **FROM BATCH EZ UNTIL FN THE INERTNESS WAS OVER AND THE CLAIM BELOW WAS SUPERSEDED. EIGHT RUNES
   ASKED.** Deepening Hex, Bracing Line, Heavy Bolts and the Answering Pack read a THRESHOLD; the
@@ -2301,7 +2341,8 @@ figures live in the EU report — do not quote a number from this file.**
 - **THE TEXT COST WAS SMALLER THAN ANY FLATTENING'S, EXACTLY AS ER PREDICTED**, because the meter
   stays uncapped: the surfaces needed the second phase NAMED, not the *"no ceiling"* promise
   retracted. Chip, status tooltip, Pack Bond passive text, `master.html`'s Beastmaster block and
-  chip row, and both glossary entries.
+  chip row, and both glossary entries. **IJ §2 retracted it in the status registry's text** (*until the boon reaches its
+  limit*), the limit EV §1's line names on the live chip.
 - **`CY_METERS`' 5 WAS DELIBERATELY NOT REPOINTED AT `BOND_CONVERT`.** It means *where the boon
   reads x2*, which is still true and is the denominator every arrival figure from EQ, ER and EU is
   quoted against. The two numbers answer different questions and the header there now says so.
@@ -2727,7 +2768,7 @@ first raised).** DZ measured and ruled on nothing.
   comparison that does is Hold the Line at the same initiative for double the Mana and double the
   cooldown.** For scale, the corpus holds 37 abilities at 3.0 and 19 above it.
 - **(3) SANCTUARY OVERLAPS HYMN OF HOPE, HOLY'S PROTECTED CORE PARTY-HEAL, AND THAT IS UNTOUCHED
-  SINCE DY.** Hymn: 0 Mana + 1 Mercy, all allies 20% of max (35% empowered), initiative 3.5,
+  SINCE DY.** Hymn: 0 Mana + 1 Mercy, all heroes 20% of max (35% empowered; *heroes* on the card since IJ §2), initiative 3.5,
   cooldown 2. Sanctuary: 30 Mana, no Mercy, every ally 12% (18% on a Perfect), initiative 3.5,
   cooldown 4. **It clears the LETTER of the no-duplication rule** — that rule forbids a strictly
   BETTER card in the same pool, and Sanctuary is strictly worse on magnitude and pays a different
@@ -2865,20 +2906,9 @@ repair.** Both are reported and neither was taken.
 read site means *hero*, on an effect that already behaves correctly. **Every read site was
 re-derived from the source at DM; not one was moved.**
 
-- **The Warrior's Rally** — *"Shout one ALLY forward"*. Its picker filters `not a.is_companion` at
-  **three** sites, so it cannot even be aimed at one. It also carries **two clauses of different
-  shape**: a turn hand-off and a resource refill.
-- **Health / Mana / Revive Potion** — `_use_item` picks from `heroes.filter(not dead)`.
-- **Shared Grief's log** — *"%d ally below half"*. Walks `heroes`, skips companions.
 - **The Mercy `passive_desc` and the glossary's `mercy_window`** — `unit._check_below_half` gates
-  on `is_hero and not is_companion`.
-- **Glacial Hold's *"+15% damage from EVERY source"*** — `_hold_window_mult()` has **exactly one
-  caller**, in the hero strike loop. DL corrected the glossary's "party-wide"; the card's own claim
-  is still owed.
-- **AND THE GLOSSARY'S `res_faith` SAYS *ally* IN FOUR MORE PLACES** — the Devout's allies, the
-  shielded allies in its `short`, an ally's release at 3, a shielded ally holding. **Faith is
-  heroes-only outright by text-standard §4.9's binding rule**, so all four are wrong; **DM corrected
-  only the Consecrated Ground clause, because that clause was in scope and the rest are a sweep.**
+  on `is_hero and not is_companion`. **IJ §2 moved both to *hero*, with Alms's ward and Divine Presence's watch**; the
+  glossary's Vespers clause (*an ally below the line*) is FOUND AT IJ.
 
 ### Small, and still owed
 
@@ -3176,11 +3206,6 @@ re-derived from the source at DM; not one was moved.**
   re-authored `bm_devoted_fury` onto Kill Command's cost and cooldown, and `test_batch_ay`
   asserts the counter absent. **Same family as `icy_resolve_ranks` above.** Deleting a read site is
   a mechanic deletion and is not proposed.
-- **`STATUS_INFO["bloodbond"]`'s REGISTRY TEXT SAYS *HALF* WHERE THE CARD, THE DOCUMENT AND THE
-  CODE ALL SAY A QUARTER (EQ §6).** The cast in `battle.gd` passes its own computed
-  description (`bb_pct = 25`), so the registry string has no live consumer today. **It is a trap
-  rather than a defect**: the next batch that adds a second `add_status("bloodbond", …)` without a
-  custom description ships the wrong number.
 - **~~`CLAUDE.md`'s UNCAPPED-METER GOVERNOR TABLE HAS STALE ADDRESSES FOR LOYALTY~~ — CLOSED AT GB §4:**
   the table names the function and the constant and cites no line numbers now.
 

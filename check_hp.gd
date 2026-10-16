@@ -1241,7 +1241,8 @@ func _s4_tithe() -> void:
 	for n in Talents.tree():
 		if String((n as Dictionary).get("id", "")) == "tn_break_heal":
 			node_pct = int((((n as Dictionary).get("payload", {}) as Dictionary).get("stat", {}) as Dictionary).get("blood_communion", 0))
-			node_desc = String((n as Dictionary).get("desc", ""))
+			# BATCH IJ §2 — the figure is a token since IJ, so the words are read as the board shows them.
+			node_desc = Talents.desc_for(n as Dictionary, 1)
 	print("    Breaking Heals a Hero (%d%%): '%s'" % [node_pct, node_desc])
 	ok(node_pct > 0 and node_desc == TALENT_WORDS % node_pct,
 		"§4: Breaking Heals a Hero reads '%s', not the read site's words" % node_desc)

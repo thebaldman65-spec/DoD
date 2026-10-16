@@ -481,7 +481,8 @@ func _authored_fallbacks() -> void:
 	ok(Classes.draft_pool("cleric").has("Bulwark of Fortitude"),
 		"...while the card itself is drafted off the Cleric's one pool")
 	var card: Ability = Classes.pending_talent_ability("Bulwark of Fortitude")
-	ok(card != null and card.description.contains("{mhp:5}"),
+	# IJ §2: the heal is 5% of each hero's own maximum, which `{mhp:5}` (the caster's) did not say.
+	ok(card != null and card.description.contains("heals them 5% of max health"),
 		"CV'S RULING SURVIVES THE MOVE: the cast still heals every hero 5% at once")
 	# CORRECTION TO THE BATCH BRIEF, reported rather than glossed: §5 calls this
 	# "the first capstone in the game that grants an ability and therefore needs

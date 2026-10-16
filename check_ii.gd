@@ -1100,10 +1100,13 @@ func _s4_the_documents() -> void:
 			"§4: '%s' does not stand once in the instrument rules, and nowhere else" % String(h2).substr(0, 70))
 	var owed := ""
 	for line in ir.split("\n"):
-		if String(line).contains("THE SWEEP FOR THE REST IS OWED"):
+		if String(line).contains("THE SWEEP FOR THE REST"):
 			owed = String(line)
-	ok(owed.contains("RULED, NOT BUILT"),
-		"§4: the text-against-constant sweep is not recorded as owed, RULED, NOT BUILT")
+	# IJ built the sweep §0.7 ruled owed, so its bullet says BUILT and names the gate (re-pointed at IJ).
+	ok(owed.contains("THE SWEEP FOR THE REST WAS BUILT"), "§4: the text-against-constant sweep is not recorded as built")
+	ok(not owed.contains("RULED, NOT BUILT"), "§4: the sweep's bullet still says it is RULED, NOT BUILT")
+	ok(ir.contains("surface reads one raw and §3 ties each pinned figure to the code that decides it"),
+		"§4: the sweep's bullet does not name the gate that holds it")
 	# §0.4 — FOUR GLYPHS.
 	ok(cm.contains("○ — A THING YOU WEAR IS PAYING NOTHING — IS THE FOURTH") and cm.contains("Four glyphs, four meanings"),
 		"§4: CLAUDE.md's glyph rule does not name ○ as the fourth")

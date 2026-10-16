@@ -1560,7 +1560,8 @@ func _docs() -> void:
 	var glossary := _src("res://data/glossary.json")
 	ok(glossary.contains("hits_not_casts"),
 		"§5: glossary.json carries §1's hits-not-casts rule")
-	ok(glossary.contains("ALL FOUR CLASS POOLS ARE WRITTEN"),
+	# IJ §2 rewrote the entry to the one pool a class draws from; the claim BR pinned stands in its words.
+	ok(glossary.contains("ALL FOUR CLASSES HAVE THEM"),
 		"§5: ...and the class-draft entry no longer says two are owed")
 	var claude := _src("res://CLAUDE.md")
 	# RE-POINTED AT BATCH DF. THE OLD CHECK CANNOT PASS AND MUST NOT: CW §1 split

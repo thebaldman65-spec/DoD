@@ -86,55 +86,55 @@ const TREE := [
 	# PRECEDENT: Woodcraft (sv_woodcraft) and Unwavering Faith (dv_unwavering),
 	# which were the same node twice — max_hp_pct 0.20. TAKEN.
 	{"id": "tn_health", "name": "More Health", "tier": 1,
-		"desc": "+20% maximum Health.",
+		"desc": "+{=@payload.stat.max_hp_pct*100}% maximum Health.",
 		"payload": {"stat": {"max_hp_pct": 0.20}}},
 	# NO PRECEDENT: no node ever wrote `attack`. PROPOSED at +10, priced against
 	# the party Attack boons two events pay (+10%, Blood Altar and Training
 	# Grounds), which is +10 on a base-100 hero.
 	{"id": "tn_attack", "name": "More Attack", "tier": 1,
-		"desc": "+10 Attack.",
+		"desc": "+{=@payload.stat.attack} Attack.",
 		"payload": {"stat": {"attack": 10}}},
 	# NO PRECEDENT: no node ever wrote `armor`. PROPOSED at +0.05, the relic
 	# layer's own armor hook (`hero_armor_add`, 0.05) — the one permanent armor
 	# bonus that ships.
 	{"id": "tn_armor", "name": "More Armor", "tier": 1,
-		"desc": "+5% armor.",
+		"desc": "+{=@payload.stat.armor*100}% armor.",
 		"payload": {"stat": {"armor": 0.05}}},
 	# PRECEDENT: Steady Hands (ss_steady) — crit_bonus 0.15. TAKEN.
 	{"id": "tn_crit", "name": "More Crit Chance", "tier": 1,
-		"desc": "+15% critical chance.",
+		"desc": "+{=@payload.stat.crit_bonus*100}% critical chance.",
 		"payload": {"stat": {"crit_bonus": 0.15}}},
 	# PRECEDENT: Fletcher's Speed (ss_fletcher) — speed 18. TAKEN.
 	{"id": "tn_speed", "name": "More Speed", "tier": 1,
-		"desc": "+18 Speed.",
+		"desc": "+{=@payload.stat.speed} Speed.",
 		"payload": {"stat": {"speed": 18.0}}},
 	# PRECEDENT: Sword Mastery (sm_sword_mastery) — parry_bonus 0.12. TAKEN.
 	{"id": "tn_parry", "name": "Parry More", "tier": 1,
-		"desc": "+12% parry chance.",
+		"desc": "+{=@payload.stat.parry_bonus*100}% parry chance.",
 		"payload": {"stat": {"parry_bonus": 0.12}}},
 	# NO PRECEDENT: no node ever wrote `max_resource`. PROPOSED at +20, priced
 	# against Woodcraft's +20% maximum Health, taken as the same share of a
 	# 100-point pool.
 	{"id": "tn_pool", "name": "A Bigger Resource Pool", "tier": 1,
-		"desc": "+20 maximum Rage or Mana.",
+		"desc": "+{=@payload.stat.max_resource} maximum Rage or Mana.",
 		"payload": {"stat": {"max_resource": 20}}},
 	# NO SURVIVING PRECEDENT: Reckless Fury paid +20% WITH +15% damage taken and
 	# is not one of the 43. PROPOSED at +10%, the relic hook `hero_attack_mult`
 	# (0.10), which lands in this same field at the spawn.
 	{"id": "tn_damage", "name": "More Damage Dealt", "tier": 1,
-		"desc": "+10% damage dealt.",
+		"desc": "+{=@payload.stat.dmg_bonus*100}% damage dealt.",
 		"payload": {"stat": {"dmg_bonus": 0.10}}},
 	# NO SURVIVING PRECEDENT: Measured Rage paid 20% as a row-6 node conditional
 	# on Reckless Fury, and is not one of the 43. PROPOSED at 10%, the mirror of
 	# More Damage Dealt.
 	{"id": "tn_guard", "name": "Less Damage Taken", "tier": 1,
-		"desc": "10% less damage taken.",
+		"desc": "{=@payload.stat.dmg_taken_bonus*-100}% less damage taken.",
 		"payload": {"stat": {"dmg_taken_bonus": -0.10}}},
 
 	# ── TIER 2 — two points each. Each reads a condition rather than adding a number. ──
 	# PRECEDENT: Broken Will (oc_broken_will) — broken_will_ranks 25. TAKEN.
 	{"id": "tn_break", "name": "You Break Harder", "tier": 2,
-		"desc": "Deals 25% more Break damage.",
+		"desc": "Deals {=@payload.stat.broken_will_ranks}% more Break damage.",
 		"payload": {"stat": {"broken_will_ranks": 25}}},
 	# ALTERNATE, IN THE PLACE OF *REGENERATE MORE RESOURCE* (see the header).
 	# PRECEDENT: Blood Communion (oc_blood_communion) — blood_communion 20. TAKEN.
@@ -152,29 +152,29 @@ const TREE := [
 	# different heroes under the two readings. Tithe's words say the same since HR.
 	# The site is NOT widened — that is the owed talent rebalance (`docs/state.md`).
 	{"id": "tn_break_heal", "name": "Breaking Heals a Hero", "tier": 2,
-		"desc": "An attack that lands Break heals the hero furthest from full for 20% of it.",
+		"desc": "An attack that lands Break heals the hero furthest from full for {=@payload.stat.blood_communion}% of it.",
 		"payload": {"stat": {"blood_communion": 20}}},
 	# PRECEDENT: Follow-Through (ss_follow) — follow_through 2. TAKEN.
 	{"id": "tn_crit_cooldown", "name": "A Cooldown Ticks on a Crit", "tier": 2,
-		"desc": "Critical hits reduce ALL cooldowns by 2.",
+		"desc": "Critical hits reduce ALL cooldowns by {=@payload.stat.follow_through}.",
 		"payload": {"stat": {"follow_through": 2}}},
 	# ALTERNATE, IN THE PLACE OF *DEBUFFS ON YOU EXPIRE SOONER* (see the header).
 	# PRECEDENT: Bonecracker (ss_bonecracker) — bonecracker_ranks 40. TAKEN.
 	{"id": "tn_kill_down", "name": "Kill What Is Down", "tier": 2,
-		"desc": "+40% damage against Broken enemies.",
+		"desc": "+{=@payload.stat.bonecracker_ranks}% damage against Broken enemies.",
 		"payload": {"stat": {"bonecracker_ranks": 40}}},
 	# PRECEDENT: Field Medic (sv_medic) — field_medic 2. TAKEN, and it is TWO:
 	# the brief's label said "one", and the precedent's magnitude is the answer
 	# (FX §3), so the name carries no number rather than the wrong one.
 	{"id": "tn_cleanse", "name": "Cleanse Debuffs Each Turn", "tier": 2,
-		"desc": "At the start of this hero's turn, cleanse 2 debuffs from random allies.",
+		"desc": "At the start of this hero's turn, cleanse {=@payload.stat.field_medic} debuffs from random allies.",
 		"payload": {"stat": {"field_medic": 2}}},
 	# PRECEDENT: Last Hope (hl_last_hope) — last_hope_pct 40. Not one of the 43,
 	# so it is a REFERENCE rather than salvage; a live node whose number has run.
 	# PARTY-WIDE BY ITS READ SITE: the spawn stamps the best holder's figure on
 	# every hero, so two holders in one party do not stack.
 	{"id": "tn_last_hope", "name": "Heal More When Low", "tier": 2,
-		"desc": "Heroes under 25% of their maximum health receive 40% more healing.",
+		"desc": "Heroes under 25% of their maximum health receive {=@payload.stat.last_hope_pct}% more healing.",
 		"payload": {"stat": {"last_hope_pct": 40}}},
 	# PRECEDENT: Iron Will (wd_iron_will) — iron_will_ranks 1, which the read
 	# site multiplies by 12. Not one of the 43: a REFERENCE, a live node.
@@ -183,7 +183,7 @@ const TREE := [
 		"payload": {"stat": {"iron_will_ranks": 1}}},
 	# PRECEDENT: Armor Piercer (ss_piercer) — pierce_bonus 0.30. TAKEN.
 	{"id": "tn_pierce", "name": "Armor Penetration", "tier": 2,
-		"desc": "Attacks ignore 30% of the target's armor.",
+		"desc": "Attacks ignore {=@payload.stat.pierce_bonus*100}% of the target's armor.",
 		"payload": {"stat": {"pierce_bonus": 0.30}}},
 	# IN THE CELL ENEMIES LOOK PAST YOU FILLED UNTIL GB RETIRED IT BY RULING: its
 	# text was false whenever it was not the only holder (FY §1), and in one tree
@@ -200,7 +200,7 @@ const TREE := [
 	# ALTERNATE, IN THE PLACE OF *A PERFECT PAYS* (see the header).
 	# PRECEDENT: Whetstone (sm_whetstone) — whetstone 3. TAKEN.
 	{"id": "tn_crit_pays", "name": "A Crit Pays", "tier": 3,
-		"desc": "Every critical strike raises Attack by 3 for the rest of the battle.",
+		"desc": "Every critical strike raises Attack by {=@payload.stat.whetstone} for the rest of the battle.",
 		"payload": {"stat": {"whetstone": 3}}},
 	# PRECEDENT: Undying Rage (bz_undying) — undying_rage 1. Not one of the 43:
 	# a REFERENCE, a live node. Its field carries a rider the read site pays and
@@ -216,7 +216,7 @@ const TREE := [
 	# Mana form. BOTH TAKEN. Each read site tests `resource_name`, so the node
 	# writes both fields and every hero is paid in the one he holds.
 	{"id": "tn_resource_ward", "name": "Pay a Lethal Hit out of Your Resource Pool", "tier": 3,
-		"desc": "Rage: below 25% health, damage is paid out of Rage first, 1 Rage a point, and reaches health only once the Rage is gone. Mana: 30% of all damage taken is paid as Mana instead of health.",
+		"desc": "Rage: below 25% health, damage is paid out of Rage first, {=@payload.stat.last_rites} Rage a point, and reaches health only once the Rage is gone. Mana: {=@payload.stat.conversion_ranks}% of all damage taken is paid as Mana instead of health.",
 		"payload": {"stat": {"last_rites": 1, "conversion_ranks": 30}}},
 	# PRECEDENT: No Cover (ss_no_cover) — no_cover 1. TAKEN.
 	{"id": "tn_no_miss", "name": "You Cannot Miss", "tier": 3,
@@ -227,11 +227,11 @@ const TREE := [
 	# one of the 43: a REFERENCE, a live node. PARTY-WIDE BY ITS READ SITE, like
 	# Last Hope: the best holder's figure is stamped on every hero.
 	{"id": "tn_unbreaking", "name": "We Do Not Break", "tier": 3,
-		"desc": "Every hero takes 20% less Break damage.",
+		"desc": "Every hero takes {=@payload.stat.devoutness_ranks}% less Break damage.",
 		"payload": {"stat": {"devoutness_ranks": 20}}},
 	# PRECEDENT: Sundering Shot (ss_sundering) — sundering_shot 45. TAKEN.
 	{"id": "tn_crack_guards", "name": "Your Crits Crack Guards", "tier": 3,
-		"desc": "Critical hits deal 45 Break damage.",
+		"desc": "Critical hits deal {=@payload.stat.sundering_shot} Break damage.",
 		"payload": {"stat": {"sundering_shot": 45}}},
 	# PRECEDENT: No Quarter (sm_perfect_form) — no_quarter_ranks 1, which the
 	# read site multiplies by 45. TAKEN. It refills whatever pool the hero has,
@@ -241,12 +241,12 @@ const TREE := [
 		"payload": {"stat": {"no_quarter_ranks": 1}}},
 	# PRECEDENT: Rapid Fire (ss_rapid) — rapid_fire 50. TAKEN.
 	{"id": "tn_skip_cooldown", "name": "A Chance to Skip a Cooldown Entirely", "tier": 3,
-		"desc": "Each ability used has a 50% chance not to start its cooldown.",
+		"desc": "Each ability used has a {=@payload.stat.rapid_fire}% chance not to start its cooldown.",
 		"payload": {"stat": {"rapid_fire": 50}}},
 	# PRECEDENT: Snap Shot (ss_snap) — snap_shot 2. TAKEN. The read site counts
 	# only an ability that costs something, and the text says so.
 	{"id": "tn_free_casts", "name": "Your First Casts of a Fight Are Free", "tier": 3,
-		"desc": "Each fight, the first 2 abilities that cost anything cost nothing and start no cooldown.",
+		"desc": "Each fight, the first {=@payload.stat.snap_shot} abilities that cost anything cost nothing and start no cooldown.",
 		"payload": {"stat": {"snap_shot": 2}}},
 ]
 
@@ -700,8 +700,12 @@ static func node_in_tree(tree_nodes: Array, id: String) -> Dictionary:
 # Tooltip text for a node: "{v}" in the desc becomes scale.base +
 # scale.step. Since Batch AI every node is a single rank, so this renders
 # the one value the node will ever have — learned or not.
+# BATCH IJ §2 — A NODE's WORDS READ THEIR FIGURES HERE, AND ONLY HERE
+# (`Classes.resolve_figures`): this is the one place a node's text is read, so a
+# token names the node's own payload (`{=@payload.stat.max_hp_pct*100}`) and every
+# surface that shows the node reads the resolved words.
 static func desc_for(node: Dictionary, ranks: int) -> String:
-	var desc: String = node["desc"]
+	var desc: String = Classes.resolve_figures(String(node["desc"]), node)
 	if node.has("scale"):
 		var sc: Dictionary = node["scale"]
 		var val := float(sc.get("base", 0.0)) \

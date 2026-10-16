@@ -3151,8 +3151,8 @@ func refresh_bars() -> void:
 					wall = 0.01 * maxi(status_power("shieldwall"), 0)
 				var wall_line := ""
 				if wall > 0.0:
-					wall_line = "\nShieldwall's stance adds +%d%% while it holds." % \
-						int(round(wall * 100.0))
+					wall_line = "\n%s's stance adds +%d%% while it holds." % [
+						String(get_status("shieldwall").get("label", "")), int(round(wall * 100.0))]
 				var total := (block_chance + 0.15 + plating_bonus + wall) * 100.0
 				s.short = "Block %d%%" % int(round(total))
 				s.desc = "Heavy Plating: +15%% Block chance on top of the\n%d%% base. Every unblocked attack adds +8%% for the\nrest of the battle (now +%d%%, cap +40%%); Blocking\nresets the bonus.%s\nTotal Block chance: %d%%." % [
@@ -3209,8 +3209,8 @@ func refresh_bars() -> void:
 				var crit_pct := (1.0 + arcane_mastery_ranks) * second_resource
 				s.short = "+%d%%/+%d%%" % [int(round(dmg_pct)),
 					int(round(taken_pct))]
-				s.desc = "Runaway Resonance: %d stack%s held.\nDamaging casts build them (2 on a crit), with\nNO MAXIMUM, and nothing removes them.\nThe bonuses COMPOUND — now +%d%% damage and\n+%d%% damage taken — and each stack adds\n+%d%% critical chance on top." % [
-					second_resource, "" if second_resource == 1 else "s",
+				s.desc = "Runaway Resonance: %d stack%s held.\nDamaging casts build them (2 on a crit), up\nto %d; only Arcane Bolt, Stabilize and\nThreshold ever lower them.\nThe bonuses COMPOUND — now +%d%% damage and\n+%d%% damage taken — and each stack adds\n+%d%% critical chance on top." % [
+					second_resource, "" if second_resource == 1 else "s", second_max,
 					int(round(dmg_pct)), int(round(taken_pct)),
 					int(round(crit_pct))]
 				_refresh_chips()

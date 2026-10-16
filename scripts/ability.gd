@@ -95,6 +95,12 @@ const BUFF_DELAY_CAP := BASIC_DELAY * 0.5
 # capstone-adjacent node exists to grant.
 const DELAY_FLOOR := BUFF_DELAY_CAP * 0.5
 
+# BATCH IJ §2 — WHAT A GRADE MULTIPLIES, NAMED. They were two literals at the strike (`battle.gd`'s
+# `dmg_mult` and `pr_mult`) and a card's Perfect text restated them by hand; the strike reads them
+# here and a Perfect text reads them through its token, so the two cannot come to disagree.
+const GRADE_DMG_MULT := {"perfect": 1.15, "good": 1.0, "fail": 0.6}
+const GRADE_BD_MULT := {"perfect": 1.25, "good": 1.0, "fail": 0.5}
+
 # ---------- WHICH ABILITIES ARE PURE BUFFS ----------
 #
 # **DERIVED BY WALKING `battle._resolve_special`'S CALL GRAPH, NOT BY READING
@@ -344,4 +350,8 @@ static func make(d: Dictionary):
 	# never be capped by two different rules.
 	if takes_delay_cap(a.special):
 		a.delay = minf(a.delay, BUFF_DELAY_CAP)
+	# BATCH IJ §2 — A CARD's WORDS READ THEIR FIGURES HERE, THE ONE DOOR EVERY DEFINITION PASSES
+	# (`Classes.resolve_figures`): a token names a constant or one of this card's own fields.
+	a.description = Classes.resolve_figures(a.description, d)
+	a.perfect_text = Classes.resolve_figures(a.perfect_text, d)
 	return a

@@ -916,7 +916,7 @@ func _live_alms() -> void:
 		% holy.second_resource)
 	ok(not ally.has_status("barrier"),
 		"...and nothing is given away")
-	# AT THE CAP the wasted stack becomes a ward on the ally who earned it.
+	# AT THE CAP the wasted stack becomes a ward on the hero who earned it.
 	holy.second_resource = holy.second_max
 	ally2.hp = int(ally2.max_hp * 0.4)
 	scene.call("_on_hero_below_half", ally2)

@@ -62,7 +62,9 @@ const CREST_HP := 9
 
 # §2 — the ruled name and the ruled line, each the designer's.
 const RULED_NAME := "Forbearance"
-const RULED_WORDS := "Allies hold one more stack of Faith before releasing."
+# BATCH IJ §2 — HEROES: Faith is a hero's, so the code reaches no companion, and IJ repaired every text the
+# code contradicts. The designer's sentence otherwise stands word for word (IJ's report names the change).
+const RULED_WORDS := "Heroes hold one more stack of Faith before releasing."
 const POUCH_EMPTY := "No core rune held. Core runes are found in play, alongside the others."
 
 # §3a — the fields a crest can stamp that pay EVERY hero, each at a delta it can

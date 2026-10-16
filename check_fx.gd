@@ -232,7 +232,9 @@ func _s1_shape() -> void:
 			var row: Array = TEXT[field]
 			var n := int(round(float(st[f]) * float(row[0])))
 			var phrase := String(row[1]).replace("%d", str(n))
-			ok(desc.contains(phrase),
+			# BATCH IJ §2 — THE FIGURE IS A TOKEN NOW, read off this payload at `Talents.desc_for`, so the
+			# phrase is looked for in the words the board shows. The digit arm above still reads the authored text.
+			ok(Talents.desc_for(t, 1).contains(phrase),
 				"§1: %s's text does not say `%s` — its payload pays %s" % [id, phrase, str(st[f])])
 			stated += 1
 	u.free()

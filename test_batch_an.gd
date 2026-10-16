@@ -177,9 +177,10 @@ func _test_offer(RunState) -> void:
 	ok(run.MODIFIERS.has("rot"), "rot is in the pool (Batch BB reinstated it)")
 	ok(run.modifier_severity("rot") == 4, "rot is severity 4")
 	# The AN six, exactly as AN shipped them.
+	# IJ §2 repaired it to the code (a body already below 70% is not raised): *at most*.
 	ok(String(run.MODIFIERS["overgrown"]["desc"])
-		== "Both parties begin the fight at 70% health.",
-		"Overgrown's text is untouched")
+		== "Both parties begin the fight at 70% health at most.",
+		"Overgrown's text is AN's, with IJ's *at most*")
 	ok(String(run.MODIFIERS["bloodless"]["name"]) == "Bloodless",
 		"Bloodless keeps its name")
 	for id in want:

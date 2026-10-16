@@ -182,7 +182,7 @@ const STATUS_INFO := {
 	"slow": ["Slowed", "Sl", Color(0.55, 0.65, 0.9), "-25% speed; turns arrive later."],
 	"chilled": ["Chilled", "Ch", Color(0.5, 0.75, 1.0), "Stacking frost: 1 = -25% speed,\n2 = -50%, 3 = also -15% damage;\n4 stacks FREEZE the victim."],  # 4 = a HOLD when he applied them
 	"frozen": ["Frozen", "Fz", Color(0.65, 0.88, 1.0), "Frozen solid: skips their turns until\nthe ice thaws. A Cryomancer's freeze is a\nHOLD — it never thaws on its own."],
-	"burn": ["Burn", "F", Color(1.0, 0.55, 0.2), "Burning: takes damage at the start of each\nturn (6% of the applier's Attack).\nReapplying Burn extends the duration."],
+	"burn": ["Burn", "F", Color(1.0, 0.55, 0.2), "Burning: takes damage at the start of each\nturn (%d%% of the applier's Attack).\nReapplying Burn extends the duration." % [DOT_STATUSES["burn"]]],
 	# BATCH HS §3 — THE FIRST CONJUNCTION. A composed status's row is its words, as
 	# every status's is; what it is MADE of is `CONJUNCTIONS` (below DOT_STATUSES),
 	# and the chip's tooltip is re-built off its ingredients as they stand
@@ -192,7 +192,7 @@ const STATUS_INFO := {
 	# ("bleed" had a registry row here until Batch BJ §1 — never applied by any
 	# path and never displayed: the bleed chip is synthesized from bleed_buildup
 	# in unit.gd with its own label and colour. Deleted, not left unreachable.)
-	"sunder": ["Sunder", "D", Color(0.7, 0.7, 0.7), "-35% armor."],
+	"sunder": ["Sunder", "D", Color(0.7, 0.7, 0.7), "-%d%% armor." % [int(round(BattleUnit.SUNDER_STEP * 100))]],
 	"ward": ["Ward", "W", Color(1.0, 0.85, 0.4), "Takes 50% less Break damage."],
 	"fortify": ["Fortify", "+D", Color(0.55, 0.8, 0.9), "+10% armor."],
 	"barrier": ["Barrier", "Ba", Color(0.40, 0.85, 0.95), "Absorbs incoming damage."],
@@ -200,20 +200,20 @@ const STATUS_INFO := {
 	"renewal": ["Renewal", "R+", Color(0.45, 0.90, 0.50), "Restores HP at the start of each\nturn (15% of the caster's max\nhealth, set when cast)."],
 	"surge": ["Surge", "A+", Color(0.80, 0.50, 1.0), "+20% attack."],
 	"mocked": ["Mocked", "M!", Color(0.95, 0.5, 0.3), "Must attack the taunter."],
-	"poison": ["Poison", "P", Color(0.45, 0.8, 0.3), "Takes 3 nature damage per stack at the\nstart of each turn; new stacks refresh\nthe timer."],
+	"poison": ["Poison", "P", Color(0.45, 0.8, 0.3), "Takes %d%% of the applier's Attack as\nnature damage per stack at the start\nof each turn; new stacks refresh the\ntimer." % [DOT_STATUSES["poison"]]],
 	"quickdraw": ["Quick Draw", "QD", Color(0.55, 0.85, 0.40), "All abilities act 50% faster;\nturns arrive sooner."],
-	"parry_up": ["Parry Up", "P+", Color(0.4, 0.9, 1.0), "+15% parry chance."],
+	"parry_up": ["Parry Up", "P+", Color(0.4, 0.9, 1.0), "+%d%% parry chance." % [PRECISION_PARRY_PCT]],
 	"mana_shield": ["Mana Shield", "MS", Color(0.35, 0.6, 1.0), "50% of damage taken converts\ninto Mana."],
 	"rampage": ["Rampage", "Rp", Color(0.9, 0.3, 0.3), "+1% damage per 10 Bleed buildup\non the enemy warband (at cast time)."],
-	"unity": ["Unity", "Un", Color(0.95, 0.85, 0.4), "Souls bound: all damage received is\nsplit evenly among the heroes."],
+	"unity": ["Unity", "Un", Color(0.95, 0.85, 0.4), "Souls bound: the damage of every blow,\nrecoil and bleedout is split evenly\namong the heroes."],
 	"bewitch": ["Bewitched", "Bw", Color(0.75, 0.35, 0.85), "Charmed: basic-attacks its own\nallies, Dazing them with every\nstrike."],
 	"psychosis": ["Psychosis", "Py", Color(0.82, 0.42, 0.92), "Madness: 50% each turn to turn on\nits own — attacking a fellow, or\ncasting its helpful magic on the\nenemy side."],
 	"decay": ["Decay", "Dc", Color(0.62, 0.52, 0.35), "Rotting: takes 10 Break damage at\nthe start of each turn."],
-	"ruin": ["Ruin", "R1", Color(0.72, 0.32, 0.82), "Marked by the Old Gods: takes 2%\nmore damage per stack; heroes\nstriking this unit heal. No ceiling,\ndoes not wear off; detonates every\n10th stack."],
+	"ruin": ["Ruin", "R1", Color(0.72, 0.32, 0.82), "Marked by the Old Gods: takes 2%%\nmore damage per stack; heroes\nstriking this unit heal. No ceiling,\ndoes not wear off; detonates every\n%dth stack." % [RUIN_THRESHOLD]],
 	"ruin_primed": ["Ruin (primed)", "R!", Color(0.9, 0.3, 0.9), "The Old Gods reach through: Ruin\ndetonates when this unit next\nacts — and the stacks REMAIN."],
 	"hysteria": ["Mass Hysteria", "MH", Color(0.9, 0.5, 0.9), "Next turn: strikes a fellow with\nDOUBLE Break damage, Sundering\nthem."],
 	"invig": ["Invigoration", "Iv", Color(0.45, 0.6, 0.95), "Restores Mana at the start of\neach turn (Dark Pact talent)."],
-	"devotion": ["Devotion Aura", "DA", Color(0.95, 0.8, 0.45), "The Devout's presence: takes 15%\nless Break damage."],
+	"devotion": ["Devotion Aura", "DA", Color(0.95, 0.8, 0.45), "We Do Not Break: takes less Break\ndamage."],
 	"tripwire": ["Tripwire", "TW", Color(0.8, 0.65, 0.35), "Retaliates against every attacking\nmelee enemy for 75% of their damage."],
 	"stunned": ["Stunned", "St", Color(0.95, 0.9, 0.4), "Loses their next turn."],
 	# Batch AB: the Warden's stance. The old percentage ward of the same id
@@ -237,7 +237,7 @@ const STATUS_INFO := {
 		"-15% damage dealt, for the\nrest of the battle."],
 	"retaliate": ["Retaliation", "Rt", Color(0.95, 0.6, 0.25), "Counters attackers with a basic strike."],
 	"dazed": ["Dazed", "Dz", Color(0.95, 0.7, 0.35), "Attacks are 20% more likely to miss."],
-	"shielded": ["Shielded", "Sh", Color(0.95, 0.65, 0.25), "Takes 25% less damage\n(a Shieldmaster's ward)."],
+	"shielded": ["Shielded", "Sh", Color(0.95, 0.65, 0.25), "Takes 25% less damage\n(a Shieldmaster's ward, or the\nHollow Crown's Regalia)."],
 	"wrath": ["Divine Wrath", "DW", Color(1.0, 0.85, 0.35), "+15% damage dealt and +15% speed."],
 	"umbral_sigil": ["Umbral Sigil", "US", Color(0.55, 0.30, 0.70), "Branded: half of every strike this\nunit takes echoes to its whole\nwarband."],
 	# BATCH CK §3 — THIS FALLBACK CARRIES NO MAGNITUDE ON PURPOSE, AND THAT IS
@@ -280,9 +280,9 @@ const STATUS_INFO := {
 	# grant rides the same Heavy Plating slice of the block roll his own
 	# stance does, so what it buys is real Block, not a separate ward.
 	"bulwark_line": ["Bulwark Line", "Bu", Color(0.72, 0.8, 0.95),
-		"+10% Block chance (the Warden's Shieldwall)."],
+		"+%d%% Block chance (the Warden's Shieldwall)." % [SHIELDWALL_BLOCK / 2]],
 	"rally_heal": ["Rallied", "Rl", Color(0.95, 0.75, 0.45), "+30% healing received\n(the Warden's Rally)."],
-	"immolate": ["Immolate", "IM", Color(1.0, 0.55, 0.25), "Wrapped in his own fire: he takes 20%\nless damage, and anything that strikes\nhim is set Burning (3 turns)."],
+	"immolate": ["Immolate", "IM", Color(1.0, 0.55, 0.25), "Wrapped in his own fire: he takes %d%%\nless damage, and anything that strikes\nhim is set Burning (3 turns)." % [int(round(IMMOLATE_CUT * 100))]],
 	"seeding": ["Seeding Embers", "SE", Color(1.0, 0.65, 0.3), "Empowered by a burning death:\nbonus damage on the next turn."],
 	"rime": ["Rime", "Ri", Color(0.75, 0.9, 1.0), "Rimed: every stack of Chilled this\nenemy gains also chills one other\nrandom enemy."],
 	# ---------- BATCH BT: THE MAGE NINE ----------
@@ -295,13 +295,13 @@ const STATUS_INFO := {
 	# already a severity-1 battle modifier in Run.MODIFIERS, and two things
 	# wearing one word is how a chip starts lying about which one is up.
 	"rimeguard": ["Hoarfrost Armor", "HA", Color(0.62, 0.85, 1.0),
-		"Sheathed in ice: takes 25% less\ndamage, and anything that strikes him\ngains 2 stacks of Chilled."],
+		"Sheathed in ice: takes %d%% less\ndamage, and anything that strikes him\ngains %d stacks of Chilled." % [int(round(HOARFROST_CUT * 100)), HOARFROST_STACKS]],
 	# ARCANE ECHO is a MARK, so it is deliberately absent from DEBUFF_IDS —
 	# the `quarry`/`snare_line`/`feinted` rule. It carries the caster's name in
 	# `src_name`, because the echo is HIS and a second Arcanist must not spend
 	# the first one's mark.
 	"arcane_echo": ["Arcane Echo", "AE", Color(0.72, 0.55, 1.0),
-		"Resonating: every damaging HIT its\nmarker lands anywhere repeats at 30%\nagainst this enemy. A three-bolt\nBarrage echoes three times."],
+		"Resonating: every damaging HIT its\nmarker lands anywhere repeats at %d%%\nagainst this enemy. A Barrage\nechoes once for every bolt." % [int(round(ARCANE_ECHO_SHARE * 100))]],
 	# BATCH BU — SUFFERING's drip. It is a GENUINE DEBUFF and is listed as one in
 	# DEBUFF_IDS, which makes it cleansable by a mender's Cleansing Rite —
 	# BT's `slow_burn` and BO's `blight` precedent, and the counterplay rather
@@ -325,11 +325,11 @@ const STATUS_INFO := {
 	# a BUFF laid on an ally, so it joins the other two Holy statuses OUT of
 	# DEBUFF_IDS — and `anathema` is `breaking_darkness`.
 	"divine_presence": ["Divine Presence", "DP", Color(0.95, 0.88, 0.62),
-		"The watch kept: 2 Mercy at the start\nof every SECOND turn of hers on which\nno ally fell below the window. A fall\nbreaks that watch — the passive pays\ninstead."],
+		"The watch kept: %d Mercy at the start\nof every SECOND turn of hers on which\nno hero fell below the window. A fall\nbreaks that watch — the passive pays\ninstead." % [DIVINE_PRESENCE_MERCY]],
 	"alms": ["Alms", "Al", Color(0.95, 0.85, 0.55),
-		"What will not fit is given away:\nMercy earned at the CAP wards the ally\nwho earned it instead of being lost."],
+		"What will not fit is given away:\nMercy earned at the CAP wards the hero\nwho earned it instead of being lost."],
 	"vespers": ["Vespers", "Vs", Color(0.98, 0.80, 0.50),
-		"The evening office said over them:\nthe next blow that would take them\nbelow the window is absorbed. It fires\nONCE — and a crossing that never\nhappens earns her no Mercy."],
+		"The evening office said over them:\nthe next blow that would take them\nbelow the window is absorbed, up to %d%%\nof her maximum health. It fires ONCE —\nand a crossing that never happens earns\nher no Mercy." % [int(round(VESPERS_PCT * 100))]],
 	# THE ABBREVIATION IS `Dk!` AND MUST NOT BE `BD`. "BD" is this game's
 	# shorthand for BREAK DAMAGE in every log line and tooltip it has, and a
 	# chip reading BD beside a meter filling with BD is the one abbreviation
@@ -366,7 +366,7 @@ const STATUS_INFO := {
 	"zeal": ["Blessing of Zeal", "Z+", Color(1.0, 0.78, 0.35), "+15% damage dealt; Faith gain\nis doubled."],
 	"bulwark": ["Bulwark of Fortitude", "BF", Color(0.85, 0.9, 1.0), "The unbreakable stand: NO Break\ndamage taken, armor increased by\n50%, and 10% max health regained\neach turn."],
 	"roar": ["Guardian's Roar", "GR", Color(0.85, 0.60, 0.30), "The bear stands firm: takes 25%\nless damage."],
-	"loyalty": ["Loyalty", "L", Color(0.95, 0.75, 0.30), "Devotion to the Beastmaster: +5%\nstrike damage per stack, plus this\ncompanion's own gift. The Pack Bond boon\nclimbs 20% a stack, with NO CEILING.\nPast 8 the meter CONVERTS: further stacks\nfeed the boon instead of the strike.\nLost when the companion dies."],
+	"loyalty": ["Loyalty", "L", Color(0.95, 0.75, 0.30), "Devotion to the Beastmaster: +5%%\nstrike damage per stack, plus this\ncompanion's own gift. The Pack Bond boon\nclimbs %d%% a stack. Past 8 the meter\nCONVERTS: further stacks feed the boon\ninstead of the strike, until the boon\nreaches its limit. Lost when the\ncompanion dies." % [int(round(BOND_STEP * 100))]],
 	"blind": ["Blind", "Bd", Color(0.55, 0.55, 0.65), "Attacks are 50% more likely\nto miss."],
 	"elusive": ["Elusiveness", "El", Color(0.55, 0.85, 0.75), "Hard to pin down: enemies are 25%\nmore likely to miss this companion."],
 	"instinct": ["Hunter's Instinct", "HI", Color(0.85, 0.75, 0.35), "The next Quick Shots deal +10% of\nthe hunter's Attack and mend the\ncompanion for 15% of its max health."],
@@ -383,7 +383,7 @@ const STATUS_INFO := {
 	# BATCH HF — Aper's rhythm, on the boar itself: how many charges since its last
 	# stun, so the player sees which charge stuns and can hold Powershot for it.
 	# A hero-side chip that is not a buff anyone cast, so nothing else reads it.
-	"aper_rhythm": ["Rhythm", "0/3", Color(0.62, 0.45, 0.28), "Every third charge STUNS its target\nfor 1 turn. A BOSS RESISTS UNTIL\nBROKEN."],
+	"aper_rhythm": ["Rhythm", "0/3", Color(0.62, 0.45, 0.28), "Every third charge STUNS its target\nfor %d turn%s. A BOSS RESISTS UNTIL\nBROKEN." % [APER_STUN_TURNS, "" if APER_STUN_TURNS == 1 else "s"]],
 	"caught": ["Caught Fast", "Ct", Color(0.75, 0.55, 0.25), "The trap's teeth hold the wound\nopen: cannot be healed."],
 	"venom_coat": ["Venom Coating", "VC", Color(0.45, 0.80, 0.30), "Coated arrows: every attack applies\nPoison and refreshes its timer."],
 	# ---- BATCH BO §5: the drafted abilities' statuses ----
@@ -404,9 +404,9 @@ const STATUS_INFO := {
 	# carry nothing. `bloodbond` is applied BATTLE-LONG (-1 turns) on purpose:
 	# it is a guard that waits until it FIRES, not a window that expires, so a
 	# turn count would be a second rule the card never promised.
-	"bloodbond": ["Bloodbond", "Bb", Color(0.85, 0.30, 0.35), "Sworn to the bond: the next blow that\nwould fell a companion is refused, and\nthe hunter takes HALF of it instead.\nIt waits until it is needed — and the\nhalf he takes can kill him."],
-	"ghostpack": ["Ghostpack", "Gp", Color(0.60, 0.70, 0.90), "The whole pack runs, living and lost:\nEVERY companion summoned this battle\nstrikes alongside his attacks for 40%,\nincluding the ones no longer standing."],
-	"crossfire": ["Crossfire", "Cf", Color(0.95, 0.55, 0.25), "The lines are laid: every CRITICAL hit\nhe lands also strikes 2 other enemies\nfor 40% of that crit's damage."],
+	"bloodbond": ["Bloodbond", "Bb", Color(0.85, 0.30, 0.35), "Sworn to the bond: the next blow that\nwould fell a companion is refused, and\nthe hunter takes a share of it instead.\nIt waits until it is needed — and the\nshare he takes can kill him."],
+	"ghostpack": ["Ghostpack", "Gp", Color(0.60, 0.70, 0.90), "The whole pack runs, living and lost:\nEVERY companion summoned this battle\nstrikes alongside his attacks for %d%%,\nincluding the ones no longer standing." % [int(round(GHOSTPACK_SHARE * 100))]],
+	"crossfire": ["Crossfire", "Cf", Color(0.95, 0.55, 0.25), "The lines are laid: every CRITICAL hit\nhe lands also strikes 2 other enemies\nfor %d%% of that crit's damage." % [int(round(CROSSFIRE_SHARE * 100))]],
 	# ---- BATCH DS: the Hunter draft's defensive statuses ----
 	# SIX FOR SIX ABILITIES, and five of the six sit on the HERO — which is why
 	# only ONE of them (`heads_down`) is in `DEBUFF_IDS`. §4 of the brief asked
@@ -430,7 +430,7 @@ const STATUS_INFO := {
 	# a number stored at cast would be a second copy that could disagree with
 	# the bill. `thick_hide`'s power IS used, for the per-affliction RATE the
 	# perfect raises; the cap is a constant.
-	"dug_in": ["Dug In", "DI", Color(0.55, 0.70, 0.85), "Feet set: he takes less damage the\ndeeper his Focus stands — a quarter of\nit, up to 25% less. Breaking the mark\nbreaks the cover with it."],
+	"dug_in": ["Dug In", "DI", Color(0.55, 0.70, 0.85), "Feet set: he takes less damage the\ndeeper his Focus stands — a quarter of\nit, up to %d%% less. Breaking the mark\nbreaks the cover with it." % [DUG_IN_CAP]],
 	"heads_down": ["Heads Down", "HD", Color(0.70, 0.60, 0.45), "Pinned by fire: it can bring NOTHING\nbut its basic attack to bear. It still\nacts — it simply cannot reach for\nanything better."],
 	"thick_hide": ["Thick Hide", "TH", Color(0.60, 0.72, 0.45), "Toughened by his own trade: he takes\nless damage for every DIFFERENT\naffliction standing on whoever is\nstriking him."],
 	"salve": ["Salve", "Sv", Color(0.50, 0.85, 0.60), "Distilled from what he laid: he heals\nat the start of his turn for every\nDIFFERENT affliction standing on the\nenemies. Nothing is consumed."],
@@ -446,9 +446,9 @@ const STATUS_INFO := {
 	# reason `feinted` is not (a battle-long entry there is cleansed first every
 	# single time a mender stands). Sever and Shield Slam resolve inside the
 	# cast that fires them and carry nothing.
-	"reckless_abandon": ["Reckless Abandon", "RA", Color(0.95, 0.35, 0.30), "Everything thrown at it: deals more\ndamage for every 10 Rage that was\nspent to buy this — and there is none\nleft to cast with."],
+	"reckless_abandon": ["Reckless Abandon", "RA", Color(0.95, 0.35, 0.30), "Everything thrown at it: deals more\ndamage for every %d Rage that was\nspent to buy this — and there is none\nleft to cast with." % [RECKLESS_STEP]],
 	"berserk": ["Berserk", "Bk", Color(0.90, 0.25, 0.25), "Strikes banked: each of these lands\nTWICE. They count HITS, not casts, so\na multi-hit blow spends one a strike —\nand they wait until they are spent."],
-	"berserk_risk": ["Berserk", "Bk!", Color(0.75, 0.20, 0.25), "Nothing held back: takes 30% MORE\ndamage. Blood Frenzy pays for missing\nhealth, so this is the way into his\nown power band."],
+	"berserk_risk": ["Berserk", "Bk!", Color(0.75, 0.20, 0.25), "Nothing held back: takes %d%% MORE\ndamage. Blood Frenzy pays for missing\nhealth, so this is the way into his\nown power band." % [BERSERK_RISK_PCT]],
 	"blood_debt": ["Blood Debt", "BD!", Color(0.85, 0.20, 0.30), "The debt is named: every time this\nenemy BLEEDS OUT the Berserker heals.\nThe mark SURVIVES the bleedout, so a\nre-opened wound pays again."],
 	"battle_poise": ["Battle Poise", "BP", Color(0.45, 0.88, 1.0), "The blade is answering: every attack\nhe PARRIES takes a turn off all of his\ncooldowns, and ONCE A TURN a parry also\nbuys a free GUARD CHANGE — the pivot\nalone, and it still respects that\nability's own cooldown."],
 	"feigned_guard": ["Feigned Guard", "Fe", Color(0.60, 0.80, 1.0), "Showing the wrong guard: his ABILITIES\nresolve as though cast from the OTHER\nstance, and satisfy that stance's\nrequirement. His actual guard — and\neverything his passive reads — has not\nmoved."],
@@ -473,7 +473,7 @@ const STATUS_INFO := {
 	"turn_the_blade": ["Turn the Blade", "TB", Color(0.80, 0.55, 0.95), "The block answers: every attack he\nBLOCKS deals Break damage back to the\nattacker, scaling on how much damage\nthe block refused."],
 	"discipline": ["Discipline", "Ds", Color(0.50, 0.85, 1.0), "Held: each consecutive turn in the\nSAME stance strengthens that stance's\neffect, to a ceiling. A GUARD CHANGE\nresets the accumulation to nothing."],
 	"answering_steel": ["Answering Steel", "AS", Color(0.55, 0.90, 1.0), "The blade answers: parry chance is\nraised, and every successful PARRY\ngrants Rage and takes a turn off all\nhis cooldowns. It pays TEMPO, not\ndamage."],
-	"formless": ["Formless", "Fm", Color(0.65, 0.95, 1.0), "Neither guard and both: he deals MORE\ndamage AND takes less, counts as BOTH\nstances for anything that requires one,\nand cannot Guard Change — there is no\nstance to change. When it ends he pays\nboth downsides."],
+	"formless": ["Formless", "Fm", Color(0.65, 0.95, 1.0), "Neither guard and both: he deals MORE\ndamage AND takes less, counts as BOTH\nstances for anything that requires one,\nand cannot Guard Change — there is no\nstance to change. When it ends no\nrecoil follows."],
 	"formless_recoil": ["Formless", "Fm!", Color(0.55, 0.65, 0.80), "The form is paid for: he suffers BOTH\nstances' downsides at once — more\ndamage taken and less dealt — for two\nturns."],
 	# ---- BATCH DR §4: WHEELING CUT's two arrivals ----
 	# TWO CHIPS FOR ONE CARD, on FORMLESS's precedent directly above: the two
@@ -489,7 +489,7 @@ const STATUS_INFO := {
 	"feinted": ["Feinted", "Fn", Color(0.55, 0.80, 0.95), "Sold an opening: this unit's NEXT\nattack lands on one of its own allies\ninstead. It waits until spent."],
 	"feint_guard": ["Feint", "Fg", Color(0.45, 0.85, 1.0), "Charges banked: each parries one\nattack outright and returns its damage\nto the attacker. They wait until spent."],
 	"covering_guard": ["Covering Guard", "Cv", Color(0.70, 0.78, 0.95), "Covered by the Warden: HIS Block\nchance is rolled against attacks aimed\nhere, and a success stops the blow\ndead. Nothing moves to him."],
-	"eye_storm": ["Eye of the Storm", "ES", Color(0.85, 0.80, 0.95), "The whole field is his: damage taken\nis reduced by 8% for every enemy he\ntaunted."],
+	"eye_storm": ["Eye of the Storm", "ES", Color(0.85, 0.80, 0.95), "The whole field is his: damage taken\nis reduced by %d%% for every enemy he\ntaunted." % [EYE_STORM_CUT_PCT]],
 	# ---- BATCH BQ: the class-wide draft's statuses ----
 	# Four of the twelve carry one of their own. Magic Barrier rides the
 	# EXISTING `barrier` (the same absorb pipeline Divine Shield and the vaulted
@@ -502,9 +502,9 @@ const STATUS_INFO := {
 	"mana_well": ["Mana Well", "MW", Color(0.45, 0.65, 0.95), "The well is open: Mana regeneration\nis DOUBLED while it holds."],
 	"mirror": ["Mirror Image", "MI", Color(0.70, 0.75, 0.95), "Images stand in his place: the next\nsingle-target attacks against him miss\noutright — ONE PER HIT, so a multi-hit\nblow spends one an arrow. Area attacks\nnever miss and spend none. They wait\nuntil spent."],
 	"exhorted": ["Exhortation", "Ex", Color(0.98, 0.88, 0.55), "Called on: their NEXT attack deals\nbonus damage. It is BANKED — it waits\nfor the swing, however long they take."],
-	"consecration": ["Consecration", "Cs", Color(0.95, 0.88, 0.60), "Blessed ground: regains 5% of maximum\nhealth at the start of each turn."],
+	"consecration": ["Consecration", "Cs", Color(0.95, 0.88, 0.60), "Blessed ground: regains %d%% of maximum\nhealth at the start of each turn." % [int(round(CONSECRATION_PCT * 100))]],
 	"unburdened": ["Unburdened", "Ub", Color(0.85, 0.92, 0.70), "The weight is lifted: takes 20% less\ndamage."],
-	"vigil": ["Undying Vigil", "UV", Color(0.95, 0.90, 0.70), "Watched over: every heal this ally\nreceives, from ANY source, also heals\na second ally on lower health for half\nas much."],
+	"vigil": ["Undying Vigil", "UV", Color(0.95, 0.90, 0.70), "Watched over: every heal this ally\nreceives, from ANY source, also heals\na second hero on lower health for half\nas much."],
 	# ---- BATCH BR: the Hunter and Warrior class-wide draft's statuses ----
 	# Six of the twelve carry one. Field Dressing, Aimed Volley, Charge and
 	# Cleave resolve and are done; Bola rides the EXISTING `slow` and `cripple`
@@ -517,17 +517,17 @@ const STATUS_INFO := {
 	# Arrows is battle-long (-1 turns) because it waits until SPENT; Camouflage
 	# carries a clock because it is time it buys.
 	"arrows": ["Arcane Arrows", "AA", Color(0.72, 0.62, 0.95), "Quenched in raw magic: each attack\nalso strikes an additional random\nenemy for half damage. ONE CHARGE PER\nHIT — a three-shot volley spends\nthree. They wait until spent."],
-	"camouflage": ["Camouflage", "Cm", Color(0.55, 0.72, 0.50), "Gone to ground: enemies are far less\nlikely to aim here. It stacks with\nGhillie Suit rather than replacing it."],
-	"party_mark": ["Hunter's Mark", "HM", Color(0.85, 0.60, 0.30), "Called out: EVERY ALLY deals 15% more\ndamage to this enemy — heroes and\ncompanions alike, not just the one who\nmarked it."],
-	"battle_trance": ["Battle Trance", "BT", Color(0.90, 0.55, 0.40), "Somewhere the pain cannot follow: at\nthe start of each turn, heals 3% of\nmaximum health PLUS HALF the damage\ntaken since the last one. It arrives\nAFTER the beating, never before."],
-	"warcry": ["Warcry", "Wc", Color(0.95, 0.60, 0.35), "The line is on the front foot:\n+20% damage dealt."],
+	"camouflage": ["Camouflage", "Cm", Color(0.55, 0.72, 0.50), "Gone to ground: enemies are far less\nlikely to aim here."],
+	"party_mark": ["Hunter's Mark", "HM", Color(0.85, 0.60, 0.30), "Called out: EVERY ALLY deals %d%% more\ndamage to this enemy — heroes and\ncompanions alike, not just the one who\nmarked it." % [PARTY_MARK_PCT]],
+	"battle_trance": ["Battle Trance", "BT", Color(0.90, 0.55, 0.40), "Somewhere the pain cannot follow: at\nthe start of each turn, heals %d%% of\nmaximum health PLUS HALF the damage\ntaken since the last one. It arrives\nAFTER the beating, never before." % [int(round(BATTLE_TRANCE_FLOOR * 100))]],
+	"warcry": ["Warcry", "Wc", Color(0.95, 0.60, 0.35), "The line is on the front foot:\n+%d%% damage dealt." % [WARCRY_PCT]],
 	# BATCH CK §2: the label and the tag follow the id now. This chip read "Iron
 	# Will" / "IW" while the WARDEN'S TALENT chip read "Iron Will" too, off a
 	# different id (`iron_will`, set in the hero-spawn block) and a different
 	# mechanic — the one collision in the game that was not deliberate. THE TAG
 	# IS "Ir" AND NOT "Ic" BECAUSE `intercession` ALREADY HOLDS "IC", and two
 	# chips a case-change apart is the collision again in two characters.
-	"ironclad": ["Ironclad", "Ir", Color(0.80, 0.80, 0.88), "Teeth set: cannot be Stunned, Frozen,\nDazed or Broken, and takes 15% less\ndamage. The Break meter still fills —\nto 99, and no further."],
+	"ironclad": ["Ironclad", "Ir", Color(0.80, 0.80, 0.88), "Teeth set: cannot be Stunned, Frozen,\nDazed or Broken, and takes %d%% less\ndamage. The Break meter still fills —\nto 99, and no further." % [IRONCLAD_CUT_PCT]],
 	# ---- BATCH CB: the Mage draft's tranche-3 statuses ----
 	# FIVE FOR NINE ABILITIES. Firedraw, Pyre Wake, Deep Winter and Cold Iron all
 	# resolve inside the cast that fires them and carry nothing.
@@ -547,7 +547,7 @@ const STATUS_INFO := {
 	# the share is computed at the attacker block off the Arcanist's LIVE meter,
 	# so stamping a value here would freeze it at cast time and delete the card.
 	"emberkeep": ["Emberkeep", "Ek", Color(1.0, 0.68, 0.30), "The embers are kept: every Burn ANY\nHERO applies lands at DOUBLE duration.\nIt changes what ARRIVES — fire already\nstanding on the board is untouched."],
-	"frostbind": ["Frostbind", "Bn", Color(0.55, 0.80, 1.0), "Chained to another: Chilled landing on\neither lands on both, and damage dealt\nto one is dealt to the other at 40%.\nThe mirrored blow does not mirror back.\nIf both reach the threshold, the pair\nfreezes together."],
+	"frostbind": ["Frostbind", "Bn", Color(0.55, 0.80, 1.0), "Chained to another: Chilled landing on\neither lands on both, and damage dealt\nto one is dealt to the other at %d%%.\nThe mirrored blow does not mirror back.\nIf both reach the threshold, the pair\nfreezes together." % [int(round(FROSTBIND_SHARE * 100))]],
 	"unmade": ["Unmaking", "Um", Color(0.75, 0.45, 0.95), "Coming apart: this enemy cannot be\nhealed by anything at all."],
 	"resonant_field": ["Resonant Field", "RF", Color(0.80, 0.55, 1.0), "Tuned to the storm: deals bonus damage\nequal to HALF the Arcanist's CURRENT\nResonance bonus. It reads his meter\nlive — as he climbs, so does this."],
 	"threshold_lock": ["Threshold", "Lk", Color(0.65, 0.50, 0.90), "Bought and spent: his Resonance was\nset outright, and he can gain no more\nwhile this holds. Nothing raises it —\nnot a cast, not a crit, not a kill."],
@@ -1790,7 +1790,8 @@ func _spawn_units() -> void:
 		for h in heroes:
 			_apply_status(h, "devotion", -1, dvn_pct)
 			h.update_status("devotion", "DA",
-				"We Do Not Break: takes %d%% less\nBreak damage." % dvn_pct,
+				"%s: takes %d%% less\nBreak damage." % [String(Talents.node_in_tree(
+					Talents.TREE, "tn_unbreaking").get("name", "")), dvn_pct],
 				dvn_pct)
 			# BATCH BF §1: the aura's Break cut is now a per-hero column, so it
 			# needs a name to sit under. Stamped straight onto the status rather
@@ -4009,7 +4010,8 @@ func _update_talent_chips() -> void:
 			continue
 		if ee_bonus > 0.0:
 			var ee_pct := int(round(ee_bonus * 100))
-			var ee_desc := "Eagle Eyes: Aguila's bond watches over\nthe heroes — +%d%% crit chance." % ee_pct
+			var ee_desc := "%s: Aguila's bond watches over\nthe heroes — +%d%% crit chance." % [
+				STATUS_INFO["keen_eyes"][0], ee_pct]
 			var ee_info: Array = STATUS_INFO["keen_eyes"]
 			h.set_display_chip("keen_eyes", ee_info[0], "+%d%%" % ee_pct,
 				ee_info[2], ee_desc, ee_pct)
@@ -6247,8 +6249,8 @@ func _show_actions(u: BattleUnit) -> void:
 			if swapping:
 				# BATCH HB — the +1 Loyalty is Pack Bond's (`_gain_loyalty`), and every
 				# Hunter swaps since HB, so the tooltip says it only to its holder.
-				group_btn.tooltip_text = "Swap the active companion (10 %s, 1.0 int,\nshared 3-turn cooldown). The newcomer\narrives with its swap effect%s." % [
-					u.resource_name, " and\n+1 Loyalty" if u.has_engine("pack") else ""]
+				group_btn.tooltip_text = "Swap the active companion (10 %s, 1.0 int,\nshared %d-turn cooldown). The newcomer\narrives with its swap effect%s." % [
+					u.resource_name, SWAP_COOLDOWN, " and\n+1 Loyalty" if u.has_engine("pack") else ""]
 				if u.the_pack > 0:
 					group_btn.tooltip_text += "\nThe newcomer replaces whichever companion\nholds LESS Loyalty (ties: the older)."
 				if u.cooldowns.get("Swap Companion", 0) > 0:
@@ -7275,7 +7277,7 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 			and _beasts(u).is_empty():
 		ab_btn.tooltip_text += "\n(No living companion)"
 	if ab.special == "resurrection" and not heroes.any(func(h): return h.dead):
-		ab_btn.tooltip_text += "\n(No fallen allies)"
+		ab_btn.tooltip_text += "\n(No fallen heroes)"
 	if ab.special == "stabilize" and u.second_resource <= 2 + u.still_mind_ranks:
 		ab_btn.tooltip_text += "\n(Requires more than %d Resonance)" % (2 + u.still_mind_ranks)
 	if ab.special == "overcharge" and not u.overcharge_ready():
@@ -7336,7 +7338,8 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 	# BATCH HB §4 — a summon the dismissed pet refuses says so, on the same rule
 	# as every line above: a darkened button explains itself.
 	if ab.special in ["summon", "call_wilds"] and Classes.dismisses_pet(u.engines):
-		ab_btn.tooltip_text += "\n(The Sharpshooter fields no companion)"
+		ab_btn.tooltip_text += "\n(The %s fields no companion)" % Classes.engine_title(String(
+			Classes.PET_DISMISSERS.filter(func(p): return u.engines.has(String(p)))[0]))
 	if ab.display_name == "Hunt" and not enemies.any(func(e): \
 			return not e.dead and _status_count(e) > 0):
 		ab_btn.tooltip_text += "\n(Nothing on the field is afflicted)"
@@ -7490,8 +7493,8 @@ func _open_summon_picker(u: BattleUnit) -> void:
 		_summon_opts = []
 		for a in calls:
 			var beast: String = a.display_name.get_slice(" ", 1)
-			var swap_desc := "Swap the pack: %s arrives with its\nswap effect%s.\nShared cooldown: 3 turns." % [
-				beast, " and +1 Loyalty" if u.has_engine("pack") else ""]
+			var swap_desc := "Swap the pack: %s arrives with its\nswap effect%s.\nShared cooldown: %d turns." % [
+				beast, " and +1 Loyalty" if u.has_engine("pack") else "", SWAP_COOLDOWN]
 			if u.the_pack > 0:
 				swap_desc += "\nReplaces whichever companion holds LESS\nLoyalty (ties: the older)."
 			_summon_opts.append(Ability.make({"display_name": "Swap " + beast,
@@ -7634,7 +7637,7 @@ func _open_called_picker(ab: Ability) -> void:
 	title.add_theme_font_size_override("font_size", 12)
 	title.add_theme_color_override("font_color", Color(0.85, 0.80, 0.68))
 	box.add_child(title)
-	var modes := [["sunder", "Armor — Sunder (-35%, 2 turns)"],
+	var modes := [["sunder", "Armor — Sunder (-%d%%, 2 turns)" % int(round(BattleUnit.SUNDER_STEP * 100))],
 		["break", "Break — +30 Break damage"],
 		["exposed", "Flesh — Exposed (3 turns)"]]
 	for m in modes:
@@ -7742,13 +7745,13 @@ func _intent_hover_text(u: BattleUnit) -> String:
 	# side says its reach in its own description, which is printed above.
 	if ab.target != Ability.Target.ALLY and (ab.damage > 0 or ab.pressure > 0 or sid != ""):
 		if ab.aoe:
-			lines.append("Hits every hero")
+			lines.append("Hits every ally")
 		elif ab.random_hits > 0:
 			lines.append("Hits %d times, each at random" % ab.random_hits)
 		elif ab.multi_hits > 0:
-			lines.append("Hits one hero %d times" % ab.multi_hits)
+			lines.append("Hits one ally %d times" % ab.multi_hits)
 		else:
-			lines.append("Hits one hero")
+			lines.append("Hits one ally")
 	return "\n".join(lines)
 
 
@@ -9167,8 +9170,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			_log("   → Talent: Terminal Velocity — Death Ray has no cooldown", "#b0a8e0")
 		else:
 			attacker.start_cooldown(ab)
-	var dmg_mult := {"perfect": 1.15, "good": 1.0, "fail": 0.6}[grade] as float
-	var pr_mult := {"perfect": 1.25, "good": 1.0, "fail": 0.5}[grade] as float
+	var dmg_mult := Ability.GRADE_DMG_MULT[grade] as float
+	var pr_mult := Ability.GRADE_BD_MULT[grade] as float
 	var is_perfect := grade == "perfect"
 	# Shatter perfect: the echo of the blast comes back sooner (4cd).
 	if is_perfect and ab.display_name == "Shatter" and not debug_cooldowns_off:
@@ -11280,7 +11283,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					raw *= maxf(1.0 - 0.01 * iw_pct, 0.1)
 					_prev(strike_target, pv_was - raw)
 					_log("   → Talent: Mitigation per Debuff You Carry — -%d%% (%d debuffs)" % [
-						iw_pct, iw_n], "#b0a8e0")
+						int(round(100.0 * (pv_was - raw) / pv_was)) if pv_was > 0.0 else iw_pct,
+						iw_n], "#b0a8e0")
 			# Shared Vigil (WARDEN, Banner row 6): the line holds while he
 			# stands tall — allies take less while he is above half health.
 			# NAME COLLISION, FLAGGED NOT SILENT: Batch AV gave the Holy
@@ -12121,7 +12125,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if armor_cut > 0:
 				resist_tag += " (armor -%d)" % armor_cut
 			if parried:
-				resist_tag += " (parried — UNTOUCHABLE)" if wall_parry \
+				resist_tag += (" (parried — %s)" % ("FEINT" if parry_source == "Feint"
+					else "UNTOUCHABLE")) if wall_parry \
 					else " (parried -75%% — %s)" % parry_source
 			# BATCH IC §1c — A BLOW THAT LANDED NOTHING PRINTS NO FIGURE: not the one computed,
 			# and not a 0 — the line says the vow refused it, and what it did land, its Break.
@@ -13494,8 +13499,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						target.unit_name,
 						" [PERFECT]" if is_perfect else ""], "#7ba8e8")
 				else:
-					_log("   → Calibrating Shot: %s was unhurt when the shot left, so the range pays nothing" % \
-						target.unit_name, "#909090")
+					_log("   → Calibrating Shot: %s %s, so the range pays nothing" % [
+						target.unit_name, "was unhurt when the shot left" if cs_missing <= 0
+						else "had lost only %d health when the shot left" % cs_missing], "#909090")
 			if ab.display_name == "Pinning Shot" and not target.dead:
 				_apply_status(target, "dazed", 3, 0, 0, attacker)
 			if ab.display_name == "Called Shot" and not target.dead:
@@ -13927,12 +13933,12 @@ func _is_held(u: BattleUnit) -> bool:
 # so a rule change that forgets this line shows up as a lie on screen.
 func _hold_tooltip(timed: bool) -> String:
 	var out := "HELD by Glacial Hold: off the turn order entirely,\n"
-	out += "and takes +%d%% damage from EVERY source.\n" % (
+	out += "and takes +%d%% damage from every hero's strike.\n" % (
 		HOLD_WINDOW + _max_hero_rank("killing_frost"))
 	if timed:
 		out += "A boss shrugs the ice off after one turn."
 	else:
-		out += "It thaws only when the Cryomancer lets it:\n"
+		out += "It thaws only when the Cryomancer lets it or falls:\n"
 		out += "Ice Lance, Shatter, or a new freeze past his limit.\n"
 		out += "Ally damage, his own Blizzard and time do NOTHING.\n"
 		# Batch AT §8: the chip counts, so the tooltip has to say what the
@@ -14085,8 +14091,9 @@ func _hold_freeze(target: BattleUnit, src: BattleUnit, force := false) -> void:
 		# Off the timeline entirely: it is not going to act, and §4's empty
 		# slot in the turn bar is this line made visible.
 		target.next_time = INF
-	_log("   → %s is HELD in the ice — only the Cryomancer can release it" % \
-		target.unit_name, "#7cc8f0")
+	_log("   → %s is HELD in the ice — %s" % [target.unit_name,
+		("a boss shrugs it off after %d turn%s" % [frozen_turns, "" if frozen_turns == 1 else "s"])
+		if timed else "it holds until the Cryomancer releases it or falls"], "#7cc8f0")
 	target.float_text("HELD", Color(0.65, 0.88, 1.0))
 	# §4's other half: the nameplate says HELD, not "Fz", and the tooltip
 	# names every door out. A player who cannot see why an enemy stopped
@@ -14736,7 +14743,7 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 			return
 		var pile := target.get_status("chilled")
 		if int(pile.get("turns", 3)) < 0:
-			_log("   → Chilled on %s (x%d — Permafrost: never thaws)" % [target.unit_name,
+			_log("   → Chilled on %s (x%d — Glacial Hold: never thaws)" % [target.unit_name,
 				target.status_stacks("chilled")], "#7cc8f0")
 		else:
 			_log("   → Chilled on %s (x%d, 3-turn clock reset)" % [target.unit_name,
@@ -15389,7 +15396,7 @@ func _stamp_mirror_chip(u: BattleUnit, n: int) -> void:
 		u.remove_status("mirror")
 		return
 	u.update_status("mirror", "MI%d" % n,
-		"Mirror Image: %d image%s standing.\nThe next %d single-target HIT%s against\nhim MISS — a multi-hit blow spends one\nper strike. Area attacks never miss, so\nthey spend none, and the images wait\nuntil they are spent." % [
+		"Mirror Image: %d image%s standing.\nThe next %d single-target HIT%s against\nhim MISS — a multi-hit blow spends one\nper strike. Area attacks and blows that\nhit at random never miss, so they spend\nnone, and the images wait until they\nare spent." % [
 			n, "" if n == 1 else "s", n, "" if n == 1 else "s"], n)
 
 
@@ -16707,8 +16714,9 @@ func _stamp_aper_rhythm(comp: BattleUnit) -> void:
 		return
 	var ar_at := comp.aper_strikes % APER_STUN_EVERY
 	var ar_left := APER_STUN_EVERY - ar_at
-	var ar_desc := "Every third charge STUNS its target\nfor 1 turn. A BOSS RESISTS UNTIL\nBROKEN. %s" % (
-		"The next charge stuns." if ar_left == 1 else "%d charges to the next stun." % ar_left)
+	var ar_desc := "Every third charge STUNS its target\nfor %d turn%s. A BOSS RESISTS UNTIL\nBROKEN. %s" % [
+		APER_STUN_TURNS, "" if APER_STUN_TURNS == 1 else "s",
+		"The next charge stuns." if ar_left == 1 else "%d charges to the next stun." % ar_left]
 	var ar_short := "%d/%d" % [ar_at, APER_STUN_EVERY]
 	var ar_info: Array = STATUS_INFO["aper_rhythm"]
 	comp.set_display_chip("aper_rhythm", ar_info[0], ar_short, ar_info[2], ar_desc, ar_at)
@@ -17033,7 +17041,7 @@ func _divine_presence_tick(u: BattleUnit) -> void:
 		return
 	if dp_broken:
 		u.float_text("watch broken", Color(0.7, 0.68, 0.6))
-		_log("   → Divine Presence: the watch is broken — an ally fell, and the passive paid instead",
+		_log("   → Divine Presence: the watch is broken — a hero dropped below half health, and the passive paid instead",
 			"#909090")
 		return
 	if u.second_resource_name != "Mercy":
@@ -17085,7 +17093,7 @@ func _on_intercession_save(saved: BattleUnit) -> bool:
 	cleric.refresh_bars()
 	for h in heroes:
 		h.remove_status("intercession")
-	_log("   → Talent: Intercession — death is refused; %s survives at 1 HP (%s spends 1 Mercy)" % [
+	_log("   → Intercession — death is refused; %s survives at 1 HP (%s spends 1 Mercy)" % [
 		saved.unit_name, cleric.unit_name], "#b0a8e0")
 	_sig("mercy_b")  # BJ §3a: a PAID refusal is Holy's second signature moment
 	return true
@@ -17738,7 +17746,7 @@ func _stamp_feint_chip(u: BattleUnit) -> void:
 	if u.feint_guards <= 0:
 		u.remove_display_chip("feint_guard")
 		return
-	var fg_desc := "Feint: %d charge(s). Each parries one\nattack outright and returns its damage\nto the attacker. They wait until spent." % \
+	var fg_desc := "Feint: %d charge(s). Each parries one\nmelee blow outright (never an area\nattack, nor while he is Broken) and\nreturns its damage to the attacker.\nThey wait until spent." % \
 		u.feint_guards
 	var fi: Array = STATUS_INFO["feint_guard"]
 	u.set_display_chip("feint_guard", fi[0], "Fg%d" % u.feint_guards, fi[2],
@@ -19427,8 +19435,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				h.resource = mini(h.resource + gain, h.max_resource)
 				h.float_text("+%d %s" % [gain, h.resource_name], Color(0.5, 0.8, 1.0))
 				h.refresh_bars()
-			_log("%s: Rallying Shout — allies -%d Pressure, heroes +%d%% resource" % [
-				attacker.unit_name, pressure_cut, int(res_pct * 100)], "#70d878")
+			_log("%s: Rallying Shout — allies -%d Pressure, heroes +%d%% resource (all but %s)" % [
+				attacker.unit_name, pressure_cut, int(res_pct * 100), attacker.unit_name], "#70d878")
 		"barrier":
 			var power := 50 if is_perfect else int(35 * mult)
 			_sfx("parry", -8.0, 0.7)
@@ -19755,7 +19763,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_apply_status(target, "bewitch", 3, 0, 0, attacker)
 			_gain_ruin(target, _old_gods_mark())
 			_message("%s bewitches %s!" % [attacker.unit_name, target.unit_name])
-			_log("%s: Bewitch — %s will turn on its allies (3 turns)" % [
+			_log(("%s: Bewitch — %s will turn on its allies (3 turns)" if target.has_status("bewitch")
+				else "%s: Bewitch — %s resists the charm") % [
 				attacker.unit_name, target.unit_name], "#c070e0")
 			# BATCH CR §2 — THE INSTANT STRIKE IS REMOVED. It was the PERFECT's
 			# half; CN took this card's bar away (the whole of its damage sat
@@ -19806,7 +19815,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.float_text("+5 Mana", Color(0.5, 0.7, 1.0))
 				attacker.refresh_bars()
 			_message("%s seals the Dark Pact!" % attacker.unit_name)
-			_log("%s: Dark Pact — bleeds %d; the heroes heal %d%% of max health" % [
+			_log("%s: Dark Pact — bleeds %d; the other heroes heal %d%% of max health" % [
 				attacker.unit_name, pact_cost, int(round(pact_heal_pct * 100))], "#b070d0")
 		"hysteria":
 			_sfx("break", -6.0, 1.2)
@@ -20503,8 +20512,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_apply_status(attacker, "reckless_abandon", ra_turns, ra_pct)
 				if ra_pct >= ra_had:
 					attacker.update_status("reckless_abandon", "+%d%%" % ra_pct,
-						"Reckless Abandon: +%d%% damage for %d turns —\n%d Rage was spent to buy it, at %d%%\nper 10. There is nothing left to cast." % [
-							ra_pct, ra_turns, ra_spent, ra_step], ra_pct)
+						"Reckless Abandon: +%d%% damage for %d turns —\n%d Rage was spent to buy it, at %d%%\nper %d. There is nothing left to cast." % [
+							ra_pct, ra_turns, ra_spent, ra_step, RECKLESS_STEP], ra_pct)
 			_sfx("crit", -7.0, 0.7)
 			attacker.float_text("-%d %s" % [ra_spent, attacker.resource_name],
 				Color(1.0, 0.5, 0.4))
@@ -20580,9 +20589,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					attacker.unit_name,
 					"Aggressive" if ps_aggressive else "Defensive",
 					("two cuts at %d%% and +%d%% parry for %d turns" % [
-						ps_pct, PRECISION_PARRY_PCT, ps_turns]) if ps_aggressive \
+						ps_pct, PRECISION_PARRY_PCT, ps_turns + 1]) if ps_aggressive \
 					else ("one cut at %d%% and his attacks ignore ALL armor for %d turns" % [
-						ps_pct, ps_turns]),
+						ps_pct, ps_turns + 1]),
 					" [PERFECT]" if is_perfect else ""], "#7cc8f0")
 				for ps_i in ps_hits:
 					if target.dead:
@@ -20690,7 +20699,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_sfx("parry", -7.0, 0.9)
 			attacker.float_text("BATTLE POISE", Color(0.45, 0.88, 1.0))
 			_message("%s settles into the guard" % attacker.unit_name)
-			_log("%s: Battle Poise — for %d turns every attack he PARRIES takes a turn off all his cooldowns, and once a turn buys a free Guard Change" % [
+			_log("%s: Battle Poise — for %d turns every attack he PARRIES takes a turn off all his other cooldowns, and once a turn buys a free Guard Change" % [
 				attacker.unit_name, bp_turns], "#7cc8f0")
 		"feigned_guard":
 			# AXIS: the only card in the game that lets a build have BOTH HALVES
@@ -20884,7 +20893,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_sfx("parry", -7.0, 0.6)
 			attacker.float_text("AEGIS WALL", Color(0.70, 0.85, 0.95), true)
 			_message("%s raises the wall for everyone" % attacker.unit_name)
-			_log("%s: Aegis Wall — for %d turns every attack he BLOCKS heals all allies %d%% of his maximum health (%d right now)" % [
+			_log("%s: Aegis Wall — for %d turns every attack he BLOCKS heals every hero %d%% of his maximum health (%d right now)" % [
 				attacker.unit_name, aw_turns,
 				int(round(AEGIS_WALL_PCT * 100.0)),
 				maxi(int(round(attacker.max_hp * AEGIS_WALL_PCT)), 1)], "#8c9cc8")
@@ -21031,13 +21040,13 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var an2_pct := ANSWERING_PERFECT_PARRY
 			_apply_status(attacker, "answering_steel", an2_turns, an2_pct)
 			attacker.update_status("answering_steel", "+%d%%" % an2_pct,
-				"Answering Steel: +%d%% parry for %d more\nturn(s), and every attack he PARRIES\ngrants %d %s and takes a turn off all\nhis cooldowns. It pays tempo, not\ndamage." % [
+				"Answering Steel: +%d%% parry for %d more\nturn(s), and every attack he PARRIES\ngrants %d %s and takes a turn off all\nhis other cooldowns. It pays tempo,\nnot damage." % [
 					an2_pct, an2_turns, ANSWERING_RAGE, attacker.resource_name],
 				an2_pct)
 			_sfx("parry", -6.0, 0.8)
 			attacker.float_text("ANSWERING STEEL", Color(0.55, 0.90, 1.0), true)
 			_message("%s lets the blade answer" % attacker.unit_name)
-			_log("%s: Answering Steel — for %d turns parry chance +%d%%, and every parry grants %d %s and takes a turn off every cooldown" % [
+			_log("%s: Answering Steel — for %d turns parry chance +%d%%, and every parry grants %d %s and takes a turn off every other cooldown" % [
 				attacker.unit_name, an2_turns, an2_pct, ANSWERING_RAGE,
 				attacker.resource_name], "#7cc8f0")
 		"formless":
@@ -21151,7 +21160,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_message("%s answers before the blow lands!" % attacker.unit_name)
 				# HW §3 — the words say one turn: the turn loop strips a stun whole at the
 				# first turn it costs, so the stun's length is not what the enemy loses.
-				_log("%s: Counter Time — %s loses its next turn" % [
+				_log(("%s: Counter Time — %s loses its next turn" if target.has_status("stunned")
+					else "%s: Counter Time — %s resists the stun") % [
 					attacker.unit_name, target.unit_name], "#7cc8f0")
 		# ============ BATCH BQ: THE CLASS-WIDE TWELVE ============
 		# TEN OF THE TWELVE RESOLVE HERE. Magic Missiles and Chastise are
@@ -21361,7 +21371,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s consecrates the ground" % attacker.unit_name)
 			_log("%s: Consecration — %d %s 5%% of maximum health each turn for %d turns" % [
 				attacker.unit_name, cn_n,
-				"ally regains" if cn_n == 1 else "allies regain", cn_turns], "#70d878")
+				"hero regains" if cn_n == 1 else "heroes regain", cn_turns], "#70d878")
 		"unburden":
 			# AXIS: cleanse with a tail. THE TAIL IS THE POINT — a pure cleanse
 			# is a dead card against a warband that applies nothing, and the
@@ -21428,7 +21438,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				target.float_text("VIGIL", Color(0.95, 0.90, 0.70))
 				_message("%s keeps vigil over %s" % [attacker.unit_name,
 					target.unit_name])
-				_log("%s: Undying Vigil — every heal on %s also mends a second ally for half, %d turns" % [
+				_log("%s: Undying Vigil — every heal on %s also mends a second hero on lower health for half, %d turns" % [
 					attacker.unit_name, target.unit_name, uv_turns], "#70d878")
 		# ====== BATCH BR: THE HUNTER AND WARRIOR CLASS-WIDE TWELVE ======
 		# EIGHT OF THE TWELVE RESOLVE HERE. Aimed Volley, Charge and Cleave are
@@ -21555,8 +21565,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					target.float_text("+%d %s" % [rl_gain, target.resource_name],
 						Color(0.95, 0.80, 0.35))
 					target.refresh_bars()
-					_log("   → a perfect shout: %s regains %d %s" % [
-						target.unit_name, rl_gain, target.resource_name],
+					_log("   → %s: %s regains %d %s" % [
+						ab.display_name, target.unit_name, rl_gain, target.resource_name],
 						"#e8c860")
 		"warcry":
 			# AXIS: the party buff the class lacks — nothing a Warrior does
@@ -22102,8 +22112,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s: Resonant Field — he holds no Resonance, so there is nothing to share" % \
 					attacker.unit_name, "#909090")
 			else:
-				_log("%s: Resonant Field — %d all%s deal +%d%% for %d turns (half his own +%d%% at %d stacks, read LIVE)" % [
-					attacker.unit_name, rf_n, "y" if rf_n == 1 else "ies", rf_share,
+				_log("%s: Resonant Field — %d %s +%d%% for %d turns (half his own +%d%% at %d stacks, read LIVE)" % [
+					attacker.unit_name, rf_n, "hero deals" if rf_n == 1 else "heroes deal", rf_share,
 					rf_turns, int(round(attacker.resonance_dmg_bonus() * 100.0)),
 					attacker.second_resource], "#b085e0")
 		"threshold":
@@ -22206,8 +22216,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_sfx("heal", -9.0, 0.9)
 				_message("%s says the evening office over %s" % [
 					attacker.unit_name, target.unit_name])
-				_log("%s: Vespers — for %d turns, or until it fires, the next blow that would take %s below the window is absorbed for %d (20%% of their own maximum)" % [
-					attacker.unit_name, vs_turns, target.unit_name, vs_power], "#e8c860")
+				_log("%s: Vespers — for %d turns, or until it fires, the next blow that would take %s below the window is absorbed for %d (%d%% of %s's maximum)" % [
+					attacker.unit_name, vs_turns, target.unit_name, vs_power,
+					int(round(VESPERS_PCT * 100)), attacker.unit_name], "#e8c860")
 		"elevation":
 			# BATCH CG §2 — IT GRANTS REAL FAITH NOW. CE's version wrote
 			# `faith_peak` and never `faith_stacks`, so nobody held anything and
@@ -22250,7 +22261,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				else:
 					_sfx("perfect", -8.0, 0.7)
 					_message("%s raises them up" % attacker.unit_name)
-					_log("%s: Elevation — %d ally(s) gain %d stacks of Faith" % [
+					_log("%s: Elevation — %d hero(es) gain %d stacks of Faith" % [
 						attacker.unit_name, el_n, el_stacks], "#c8b880")
 		# BATCH CG §2 — JUBILEE IS DISPLAYED AS "BLESSING OF THE FAITHFUL". The
 		# SPECIAL ID SURVIVES THE RENAME, which is this project's own convention
@@ -22749,7 +22760,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_apply_status(attacker, "venom_coat", 4)
 			_sfx("heal", -9.0, 0.7)
 			_message("%s coats their arrows" % attacker.unit_name)
-			_log("%s: Venom Coating — every attack Poisons for 4 turns" % \
+			_log("%s: Venom Coating — for 4 turns every attack Poisons" % \
 				attacker.unit_name, "#70d878")
 		"harvest":
 			if target != null and not target.dead:
@@ -23211,8 +23222,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			if attacker.rune_open_line > 0:
 				_apply_status(attacker, "formless", 2)
 				attacker.float_text("OPEN LINE", Color(0.65, 0.95, 1.0))
-				_log("%s: Rune: the Open Line — no guard changes; he holds BOTH guards for a turn" % \
-					attacker.unit_name, "#7cc8f0")
+				_log("%s: Rune: the Open Line — no guard changes; he holds BOTH guards for %d turns" % [
+					attacker.unit_name, int(attacker.get_status("formless").get("turns", 0))], "#7cc8f0")
 			else:
 				_swordmaster_switch(attacker)
 			# The pivot presses the opening he already made: 15 BD to the
@@ -23386,7 +23397,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					sw_total)
 				h.float_text("COVERED", Color(0.75, 0.8, 0.95))
 			_message("%s covers the line!" % attacker.unit_name)
-			_log("%s: Interpose — every ally gains a shield charge, the Warden included" % \
+			_log("%s: Interpose — every hero gains a shield charge, the Warden included" % \
 				attacker.unit_name, "#8c9cc8")
 		"hold_the_line":
 			# UPGRADED (Batch AL — the wd_hold_line capstone landing on a
@@ -23656,7 +23667,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				if tp_got > 0:
 					tp_a.float_text("+%d" % tp_got, Color(0.55, 0.5, 0.75))
 			_message("%s pulses with dark vigil..." % attacker.unit_name)
-			_log("%s: Dark Vigil — every ally regains 6%% of its own health (%d in all)" % [
+			_log("%s: Dark Vigil — its whole warband regains 6%% of its own health (%d in all)" % [
 				attacker.unit_name, tp_total], "#70d878")
 		"wildfire":
 			# Batch AG: the wide payoff, and Batch AR's WIDE RELEASE VALVE —
@@ -23791,7 +23802,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# every other freeze in the game.
 			_sfx("break", -9.0, 0.8)
 			_message("%s seals %s in ice!" % [attacker.unit_name, target.unit_name])
-			_log("%s: Glacial Prison closes on %s" % [attacker.unit_name,
+			_log("%s: Glacial Prison reaches for %s" % [attacker.unit_name,
 				target.unit_name], "#7cc8f0")
 			if not target.has_status("chilled"):
 				_apply_status(target, "chilled", 3, 0, 0, attacker)
@@ -23826,7 +23837,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 						_note_debuff_applied(attacker, "chilled")
 					_hold_freeze(gp_second, attacker)
 					gp_second.glass_hold = true
-					_log("   → Rune: the Glass Prison — %s is sealed as well, and BOTH cells are glass" % \
+					_log(("   → Rune: the Glass Prison — %s is sealed as well, and BOTH cells are glass"
+						if _is_held(gp_second) else "   → Rune: the Glass Prison — %s resists the seal") % \
 						gp_second.unit_name, "#7cc8f0")
 		"cryoclasm":
 			# Thaw row 4: CONTROL AS A VERB — the lockdown relocates without
@@ -23845,7 +23857,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_sfx("break", -9.0, 1.1)
 				_message("%s hurls the ice from %s onto %s!" % [attacker.unit_name,
 					cc_from.unit_name, target.unit_name])
-				_log("%s: Cryoclasm — the prison moves to %s (x%d Chilled travels)" % [
+				_log("%s: Cryoclasm — the prison is hurled at %s (x%d Chilled travels)" % [
 					attacker.unit_name, target.unit_name, cc_stacks], "#7cc8f0")
 				_holds.erase(cc_from)
 				cc_from.remove_status("frozen")
@@ -24171,9 +24183,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s: Shared Grief — %d health for %d Mercy (%d/%d)%s" % [
 					attacker.unit_name, sg_cost, sg_got,
 					attacker.second_resource, attacker.second_max,
-					" — %d ally below half, and the grief is shared" % sg_low \
+					" — %d other hero below half, and the grief is shared" % sg_low \
 						if sg_low == 1 else \
-					(" — %d allies below half, and the grief is shared" % sg_low \
+					(" — %d other heroes below half, and the grief is shared" % sg_low \
 						if sg_low > 1 else "")], "#e8c860")
 		"reprisal":
 			# HEALING LANDED IN THE LAST TWO TURNS, read off the ledger
@@ -24299,12 +24311,14 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("   → Reliquary: %s is paid for a peak of %d Faith (+%d)" % [
 					rq_h.unit_name, rq_h.faith_peak, rq_got], "#c8b880")
 			if rq_paid == 0:
-				_log("%s: Reliquary — nobody has carried any Faith yet" % \
-					attacker.unit_name, "#909090")
+				var rq_carried := heroes.any(func(rq_x): return not rq_x.dead and not rq_x.is_companion and rq_x.faith_peak > 0)
+				_log("%s: Reliquary — %s" % [attacker.unit_name,
+					"the heroes who carried Faith take no healing from it" if rq_carried
+					else "nobody has carried any Faith yet"], "#909090")
 			else:
 				_sfx("heal", -7.0, 0.7)
 				_message("%s opens the reliquary" % attacker.unit_name)
-				_log("%s: Reliquary — %d ally(s) paid %.1f%% of his maximum per point of PEAK Faith%s" % [
+				_log("%s: Reliquary — %d hero(es) paid %.1f%% of his maximum per point of PEAK Faith%s" % [
 					attacker.unit_name, rq_paid, rq_pct * 100.0, " [PERFECT]" if is_perfect else ""],
 					"#c8b880")
 		"suffering":
@@ -24436,7 +24450,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				an_n += 1
 			_sfx("break", -9.0, 1.2)
 			_message("%s anoints the heroes' blades" % attacker.unit_name)
-			_log("%s: Anointing — %d allies' attacks apply 1 Ruin per HIT for %d turns" % [
+			_log("%s: Anointing — %d heroes' attacks apply 1 Ruin per HIT for %d turns" % [
 				attacker.unit_name, an_n, an_turns], "#a050b0")
 		# ========== BATCH BV: THE HUNTER FOUR THAT ARE PURE EFFECT ==========
 		# The other five carry no `special` at all and ride the ordinary attack
@@ -26841,7 +26855,7 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int,
 					and not butcher_rune.free_action_taken:
 				butcher_rune.free_action_taken = true
 				_grant_free_action(butcher_rune, "SLAUGHTERHOUSE",
-					"Rune: the Slaughterhouse — the kill is an opening")
+					"Rune: the Slaughterhouse — the bleedout is an opening")
 			# BATCH BW — BLOOD DEBT COLLECTS, and it sits beside Bloodcraze
 			# because it is the marked version of the same idea at much larger
 			# scale (holding both is a real sustain build).
@@ -27315,11 +27329,14 @@ func _show_skill_check_hint() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(title)
 	var body := Label.new()
-	body.text = ("Every action runs a timing check: a marker sweeps the bar\n" +
+	body.text = ("Attacks and heals run a timing check: a marker sweeps the bar\n" +
 		"below — press SPACE or CLICK to stop it.\n\n" +
-		"    Gold center  =  PERFECT: +15% damage, +25% Break, bonus effects\n" +
+		("    Gold center  =  PERFECT: +%d%% damage, +%d%% Break, bonus effects\n" % [
+			int(round((float(Ability.GRADE_DMG_MULT["perfect"]) - 1.0) * 100.0)),
+			int(round((float(Ability.GRADE_BD_MULT["perfect"]) - 1.0) * 100.0))]) +
 		"    Green band   =  Good: full effect\n" +
-		"    Outside      =  Sloppy: only 60% damage, half Break\n\n" +
+		("    Outside      =  Sloppy: only %d%% damage, half Break\n\n" %
+			int(round(float(Ability.GRADE_DMG_MULT["fail"]) * 100.0))) +
 		"Your timing decides as much as your build does.")
 	body.add_theme_font_size_override("font_size", 15)
 	vbox.add_child(body)
@@ -27368,8 +27385,8 @@ func _show_defensive_check_hint() -> void:
 	var body := Label.new()
 	body.text = ("Defensive heroes answer an incoming attack with a timing\n" +
 		"check of their own, so the bar appears on the ENEMY'S turn.\n\n" +
-		"    Gold center  =  PERFECT: the blow lands for 15% less,\n" +
-		"                    and its Break damage for 25% less\n" +
+		("    Gold center  =  PERFECT: the blow lands for %d%% less,\n" % int(round((1.0 - DEF_PERFECT_DMG) * 100.0))) +
+		("                    and its Break damage for %d%% less\n" % int(round((1.0 - DEF_PERFECT_BD) * 100.0))) +
 		"    Anywhere else  =  the blow lands unchanged\n\n" +
 		"It can only ever reduce the blow, never increase it, so there\n" +
 		"is nothing to lose by trying — and no Cancel button, because\n" +

@@ -92,7 +92,9 @@ const KNOWN_STATEMENTS := [
 
 # §1c — EVERY BLOCK OF `CLAUDE.md`, BY ITS HEADING'S RULE TEXT (the trailing
 # provenance parenthesis off, a wrapped heading joined). **II §4 moved two out** — CP §3's literal-digit baseline and
-# EK's inertness claim, the archive practice's first pass — and their lines left with them.
+# EK's inertness claim, the archive practice's first pass — and their lines left with them. **IJ §0.2 struck four to a
+# line each** (the designer's ruling: a closed block no reference holds is struck to a line naming what closed it and
+# which report holds the record), so each of the four keys below is its struck heading — a line that binds nothing.
 const KNOWN_BLOCKS := [
 	"WHAT THIS FILE IS, AND WHAT IT IS NOT",
 	"THE INSTRUMENT RULES LIVE IN `docs/instrument-rules.md`",
@@ -106,7 +108,7 @@ const KNOWN_BLOCKS := [
 	"WHERE THE CHECK COMES OFF",
 	"A DURATION IS STATED AS APPLIED",
 	"HERO AND ALLY ARE THE ONLY TWO WORDS",
-	"STANDING RULE — THE UNIT OF A HERO/ALLY RULING IS THE CLAUSE, NOT THE ABILITY",
+	"~~THE UNIT OF A HERO/ALLY RULING IS THE CLAUSE~~ — DL §1, folded into the hero/ally block above by DZ; the record is `docs/reports/DL.md`",
 	"THE ALLY/HERO THREAD IS CLOSED (Batch DM §3) — RULE ON CLAUSES, NOT ON ABILITIES",
 	"NEVER `preload` A SCRIPT THAT NAMES AN AUTOLOAD",
 	"THE POUCH IS SLOT-LIMITED",
@@ -128,7 +130,7 @@ const KNOWN_BLOCKS := [
 	"A recast that would not improve is REFUSED",
 	"ADDING A NAME TO A TABLE IS NOT A CHANGE UNTIL THE MACHINERY REACHES ITS SHAPE",
 	"THE AUTOPLAY HEURISTIC'S REFUSAL LIST IS AN ORACLE FOR PLAYER-DOOR GAPS",
-	"THE VAULT'S EXIT IS THE POOLS, AND A VAULT ENTRY IS OWED ONE",
+	"~~THE VAULT'S EXIT IS THE POOLS~~ — DY §3, settled and asserted by `check_dv` §1; the record is `docs/reports/DY.md` §3",
 	"ESTABLISH WHY A STRUCTURE IS DEAD BEFORE DELETING IT",
 	"THE TRAPS — RULES THAT WERE BURIED IN BATCH BLOCKS",
 	"A DOCUMENTED EXCEPTION THAT OUTLIVES ITS JUSTIFICATIONS",
@@ -137,7 +139,7 @@ const KNOWN_BLOCKS := [
 	"STANDING RULES — TALENTS ARE META PROGRESSION",
 	"STANDING RULE — ONE TALENT TREE, KEYED TO THE CLASS",
 	"STANDING RULE — A RELIC SETS UP THE RUN; A TALENT CHANGES WHAT A CLASS DOES IN A FIGHT; ONLY A RUNE KNOWS THE SPEC",
-	"STANDING RULE — WHAT MAKES A ROW-8 NODE (Batch BM §2), AND BH'S FIFTEEN POINTS",
+	"~~WHAT MAKES A ROW-8 NODE, AND BH'S FIFTEEN POINTS~~ — BM §2, retired with the lanes at FX and BH §2 deleted at GC; the record is `docs/reports/FX.md` §3 and `docs/reports/GC.md` §1",
 	"STANDING REFERENCE — THE DIFFICULTY LADDER AND THE END BOSS",
 	"THE STARTER RUNG IS A META-PROGRESSION GATE AND MAY NOT BE REMOVED AS A BALANCE CHANGE",
 	"STANDING RULE — HELD VALUE AND SPEND FREQUENCY ARE ANTAGONISTIC ON A SINGLE METER",
@@ -175,7 +177,7 @@ const KNOWN_BLOCKS := [
 	"STANDING RULE — A NO-ENGINE RUNE READS ONLY WHAT EVERY HERO OF ITS CLASS HAS",
 	"STANDING RULE — A RUNE READS ITS HOLDER'S EQUIPPED CARDS, NEVER HIS POOL",
 	"STANDING RULE — A GATED RUNE AT A FLAT PRICE IS STRICTLY WORSE THAN A BARE ONE",
-	"WHERE THE RETIRED RULE ITSELF IS KEPT, AND WHY IT IS NOT KEPT HERE",
+	"~~WHERE THE RETIRED RULE ITSELF IS KEPT~~ — FN's pointer, closed with the rule; the rule is `docs/reports/EZ.md` §0 and its retirement `docs/reports/FN.md` §2",
 	"STANDING RULE — A FLOOR ON A BUDGET IS NOT A FLOOR ON A COUNT",
 	"STANDING RULE — A SUBTRACTION IS OPEN AT THE BOTTOM WHERE AN ASSIGNMENT IS NOT",
 	"STANDING RULE — AN OFFER FROZEN AT DROP TIME IS RE-ASKED AT RESOLUTION",

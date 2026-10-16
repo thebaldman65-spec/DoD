@@ -142,7 +142,8 @@ func _s1_data() -> void:
 	# §1), and a subtraction with an invisible bottom is exactly that. BATCH FY:
 	# the floor is 8 now, and the card states the number the code floors at —
 	# the needle is built off FLOOR so the card and the constant cannot part.
-	var d := String(e.get("desc", ""))
+	# BATCH IJ §2 — read through the door a surface reads it by: its figures are tokens since IJ.
+	var d := String(Runes.config("deepening_hex").get("desc", ""))
 	ok(d.contains("TWO stacks sooner"),
 		"§1b: the card no longer states the SUBTRACTION — reads `%s`" % d)
 	ok(d.contains("never sooner than every %s" % _ordinal(FLOOR)),
@@ -540,7 +541,8 @@ func _s2_data() -> void:
 		"§2c: `rune_shared_mark` is not in `STAT_INT_KEYS` — JSON's float would throw at spawn")
 	ok(usrc.contains("var rune_shared_mark"),
 		"§2c: `rune_shared_mark` is not declared on BattleUnit")
-	var d := String(sm.get("desc", ""))
+	# BATCH IJ §2 — read through the door a surface reads it by: its figure is a token since IJ.
+	var d := String(Runes.config("shared_mark").get("desc", ""))
 	ok(d.contains("5 Focus"),
 		"§2c: the card does not state what an ally's blow is worth — reads `%s`" % d)
 	ok(d.contains("ally"),

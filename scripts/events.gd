@@ -390,7 +390,7 @@ static func apply(run: Node, fx: Dictionary) -> String:
 				# keeps the silence: there is no rune layer to explain.
 				if run.runes_mode() == "off" or any_payable:
 					return ""
-				return "RUNE: nothing answers — every hero already carries every rune written for them."
+				return "RUNE: nothing answers — no rune is left that any hero can take."
 			return "RUNE: %s" % ", ".join(granted)
 		"ability_draft":
 			# BATCH BO §3 — SOME EVENTS OFFER A DRAFT AS A TRADE, the fourth

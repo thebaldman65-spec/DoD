@@ -35,6 +35,10 @@ static func _load() -> void:
 	if data is Array:
 		_entries = data
 		for e in _entries:
+			# BATCH IJ §2 — AN ENTRY's WORDS READ THEIR FIGURES HERE, ONCE (`Classes.resolve_figures`).
+			for f in ["short", "long"]:
+				if (e as Dictionary).has(f):
+					e[f] = Classes.resolve_figures(String(e[f]), e)
 			_by_id[String(e["id"])] = e
 	else:
 		push_error("glossary: %s did not parse to an Array" % DATA_PATH)

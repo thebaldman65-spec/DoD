@@ -170,8 +170,9 @@ func _s2_perfectless_population() -> void:
 				", ".join(PackedStringArray(named))])
 	# BATCH HZ §2 — NINE: DW's eight and Boil Over, whose Perfect went with the
 	# recovery the dump removed (`test_batch_cp.CHECK_WITHOUT_PERFECT` names it).
-	ok(live.size() == 9,
-		"§2: the population is %d, not the nine HZ measured (DW's eight and Boil Over) — %s"
+	# BATCH IJ §2 — TWELVE: and the three class basics, whose unreachable Perfect IJ cleared.
+	ok(live.size() == 12,
+		"§2: the population is %d, not the twelve IJ measured (DW's eight, Boil Over and the three class basics) — %s"
 			% [live.size(), ", ".join(PackedStringArray(live))])
 	# THE ONE WORTH NAMING. The others are pool cards; this is a hero's
 	# BASIC ATTACK, so it is the timing bar a player sees most often with no
@@ -200,9 +201,13 @@ func _s3_the_overrun_was_two_sites() -> void:
 	# THE DIVERGENCE GUARD, AND IT IS THE POINT OF THE SECTION. Two authored
 	# copies of one string is what made this a two-site repair; asserting they
 	# AGREE is what stops the next batch fixing one of them.
-	ok(sr.perfect_text == sm.perfect_text,
-		"§3: Shadowrend's Perfect and Smite's have diverged — `%s` against `%s`"
-			% [sr.perfect_text, sm.perfect_text])
+	# **RE-POINTED AT IJ §2 — THE TWO COPIES PARTED ON PURPOSE, SO THE GUARD HOLDS EACH HALF.** Smite
+	# stands in slot 0, which resolves at a fixed Good, so its Perfect never paid and IJ cleared it.
+	# Shadowrend left slot 0 at GS and is graded wherever it is drafted, so its Perfect pays and stays.
+	ok(sr.perfect_text == "{mhp:5}" and sr.perfect_id == "self_heal",
+		"§3: Shadowrend's Perfect no longer states the heal its `self_heal` pays — `%s`" % sr.perfect_text)
+	ok(sm.perfect_text == "",
+		"§3: Smite's Perfect is back — slot 0 resolves at a fixed Good, so it can never pay — `%s`" % sm.perfect_text)
 	var cc := Classes.hero_config("cleric")
 	var ctx := Classes.value_ctx_from_config(cc, {"hp": int(cc["max_hp"] * 0.7)})
 	for pair in [[sr, "Shadowrend"], [sm, "Smite"]]:

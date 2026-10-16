@@ -605,7 +605,8 @@ func _test_perfects() -> void:
 		"Blizzard": "Two stacks of Chilled on every enemy.",
 		"Pommel Strike": "The Stun lands even on a boss.",
 		"Firestorm": "Every enemy takes an even share.",
-		"Arcane Barrage": "No two bolts strike the same enemy.",
+		# IJ §2 repaired the words to the code: the bolts are an even split, which can put two on one enemy.
+		"Arcane Barrage": "Each target takes an even share.",
 		"Triple Shot": "One arrow is a guaranteed critical.",
 	}
 	# INVERTED BY BATCH CP §1, NOT DELETED — SNARE TRAP AND DEADFALL LOST THEIR

@@ -227,9 +227,11 @@ func _texts() -> void:
 	ok(bat.contains("Rallying Shout — allies -%d Pressure, heroes +%d%% resource"),
 		"the Rallying Shout log line no longer carries both words")
 	# AND THE STANDING RULE IS WRITTEN DOWN. A ruling with no rule behind it is
-	# re-litigated by the next author who trips on it.
+	# re-litigated by the next author who trips on it. DZ folded DL §1's heading into
+	# the hero/ally block's bullet and IJ struck the heading to a line naming its
+	# record, so the needle is the bullet that binds — never the struck line.
 	var claude := FileAccess.get_file_as_string("res://CLAUDE.md")
-	ok(claude.contains("THE UNIT OF A HERO/ALLY RULING IS THE CLAUSE, NOT THE ABILITY"),
+	ok(claude.contains("THE UNIT OF A RULING IS THE CLAUSE, NOT THE ABILITY"),
 		"CLAUDE.md no longer carries DL §1's standing rule")
 
 

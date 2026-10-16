@@ -175,7 +175,7 @@
     "delay": 2.5,
     "anim": "attack02",
     "target": "ally",
-    "description": "Mends the most wounded ally under 40%\nhealth for 25% of their max HP."
+    "description": "Mends the most wounded of its warband\nunder 40% health for 25% of their\nmax HP (tanks and supports first)."
    }
   ]
  },
@@ -273,7 +273,7 @@
     "delay": 2.5,
     "anim": "attack02",
     "target": "ally",
-    "description": "Wards an ally: 25% less damage taken for 3 turns."
+    "description": "Wards one of its warband: 25% less damage taken for 3 turns."
    }
   ]
  },
@@ -323,7 +323,7 @@
     "delay": 2.5,
     "anim": "attack02",
     "target": "ally",
-    "description": "Mends the most wounded ally under 40%\nhealth for 25% of their max HP\n(tanks and healers first)."
+    "description": "Mends the most wounded of its warband\nunder 40% health for 25% of their\nmax HP (tanks and supports first)."
    }
   ]
  },
@@ -762,7 +762,7 @@
     "delay": 2.5,
     "anim": "attack02",
     "target": "ally",
-    "description": "Heals an ally for 20% of their max health."
+    "description": "Heals one of its warband for 20% of their max health."
    }
   ]
  },
@@ -881,7 +881,7 @@
     "delay": 3.0,
     "anim": "attack02",
     "target": "ally",
-    "description": "Strips one harmful effect from each\nally (the longest-lasting one; Chilled\nthaws one stack at a time)."
+    "description": "Strips one harmful effect from each of\nits warband (the longest-lasting one;\nChilled thaws one stack at a time)."
    }
   ]
  },
@@ -980,7 +980,7 @@
     "delay": 2.5,
     "anim": "attack02",
     "dmg_type": "shadow",
-    "description": "Grows stronger for every ally that\nhas fallen this battle."
+    "description": "Grows stronger for every one of its\nwarband fallen this battle."
    }
   ]
  },
@@ -1035,7 +1035,7 @@
     "delay": 2.5,
     "anim": "attack02",
     "target": "ally",
-    "description": "Every ally regains 6% of their\nmaximum health."
+    "description": "Its whole warband regains 6% of\ntheir maximum health."
    }
   ]
  },

@@ -4,6 +4,24 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Text against its constant (Batch IJ) — 2026-10-15
+
+**Why the words moved and the code did not.** A text that disagrees with its code has two possible repairs. Changing the code
+changes the game, and that is a design decision made by accident. Changing the text makes the game say what it already does,
+and the player has been playing that game all along. So every repair moved the words, and a case where the code looked like the
+defect (Blood Debt, Cairnmoss Poultice, the Ruin rung's bargains) was left for a ruling, not repaired in either direction.
+
+**Why a figure is read rather than checked.** A checked copy is still a copy: the check reds when the two drift, and someone
+has to choose which one is right. A text that reads the constant cannot drift, so there is nothing to choose. A check is kept for
+the figures with no constant to read, where the number is written inline at the one line that decides it.
+
+**Why a token is resolved at the door and not at the screen.** Each text reaches its many screens through one function: a card
+through `Ability.make`, a rune through its loader. Resolving it there means no screen can show the raw token, and no new screen
+has to remember to resolve it.
+
+**Why some figures stayed words.** *A quarter*, *twice* and *three bolts* are figures too, but a token prints digits. Turning
+them into numerals to make them readable by the code would change what the player reads, and IJ changed only what was false.
+
 ## The family's remainder, one kind of face, and the stats sheet (Batch II) — 2026-10-14
 
 **Why a laid status's damage is its layer's, at the last two sites too.** The frame is what the vow, Penance, Judgment, the

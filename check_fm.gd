@@ -321,15 +321,15 @@ func _s2a_the_peddler() -> void:
 	# class scope a drained hero is not holding his class's OTHER lineages' rows —
 	# they wait on engines he has not slotted — so the case he meets is the
 	# engine's (and *"wait on cards they have not drafted"*, the other needle, was
-	# a phrasing the door has not printed since FM: it says *abilities they have
-	# not earned*). So the arm asks the door what each hero's reason IS and
+	# a phrasing the door has not printed since FM: it said *abilities they have
+	# not earned* until IJ §2 repaired it to *abilities not yet in their kit*). So the arm asks the door what each hero's reason IS and
 	# requires the column to print it, and requires it to be one of the door's
 	# causes, so an empty or garbled reason cannot pass by matching itself.
 	var reasons := 0
 	for mi in _run.party.size():
 		var why: String = Runes.empty_offer_reason(_run.party[mi])
 		if (why.contains("already carry every rune written for that class")
-				or why.contains("wait on abilities they have not earned")
+				or why.contains("wait on abilities not yet in their kit")
 				or why.contains("being equipped") or why.contains("need a companion")) \
 				and _has_text(shop2, why):
 			reasons += 1
