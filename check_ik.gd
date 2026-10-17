@@ -538,7 +538,11 @@ func _s2_execute() -> void:
 	var src := _src("scripts/battle.gd")
 	ok(src.count("0.35 if u.execute_upgraded > 0 else 0.2") == 1, "§2e: Execute's line is written %d times" % src.count("0.35 if u.execute_upgraded > 0 else 0.2"))
 	ok(_body("scripts/battle.gd", "_ability_usable").contains("_execute_qualifies(u, e)"), "§2e: the door does not ask `_execute_qualifies`")
-	ok(_body("scripts/battle.gd", "_player_turn").contains("_execute_qualifies(u, e)"), "§2e: the picker does not ask `_execute_qualifies`")
+	# BATCH IL §3 RE-POINTED THIS ROW: the picker's narrowing moved into `_enemy_pick_pool`, the one answer the
+	# bot's drafted hook asks too, so the picker asks the qualifier through it — both halves read, both printed.
+	var pk_calls := _body("scripts/battle.gd", "_player_turn").contains("pool = _enemy_pick_pool(u, ab, pool)")
+	var pk_asks := _body("scripts/battle.gd", "_enemy_pick_pool").contains("_execute_qualifies(u, e)")
+	ok(pk_calls and pk_asks, "§2e: the picker does not ask `_execute_qualifies` (the picker calls `_enemy_pick_pool`: %s; it asks the qualifier: %s)" % [pk_calls, pk_asks])
 	ok(src.count("_execute_qualifies(u, e)") >= 3, "§2e: the bot does not ask `_execute_qualifies` (%d askers)" % src.count("_execute_qualifies(u, e)"))
 	# (f) THE EIGHT OTHERS SHARE THE PATH AND OFFER EVERY ENEMY: each is a single-target enemy pick off the
 	# no-target list, the narrowing names Execute alone, and Requiem driven offers all six.
@@ -558,9 +562,10 @@ func _s2_execute() -> void:
 		ok((s.call("_target_refusals", u, ab, []) as Dictionary).is_empty(),
 			"§2f: %s's pick is narrowed — the fix reached a card it is not about" % ab.display_name)
 	ok(met == BOARD_GATED.size(), "§2f: the census met %d of the %d cards it names" % [met, BOARD_GATED.size()])
-	var narrow := _body("scripts/battle.gd", "_player_turn")
-	ok(narrow.contains("if ab.display_name == \"Execute\":\n\t\t\t\t\tpool = pool.filter(func(e): return _execute_qualifies(u, e))"),
-		"§2f: the pool's narrowing is not keyed on Execute alone")
+	# BATCH IL §3 RE-POINTED THIS ROW to where the narrowing lives now (`_enemy_pick_pool`), still keyed on Execute alone.
+	var narrow := _body("scripts/battle.gd", "_enemy_pick_pool")
+	ok(narrow.contains("if ab.display_name != \"Execute\":\n\t\treturn pool\n\tvar out: Array = pool.filter(func(e): return _execute_qualifies(u, e))"),
+		"§2f: the pool's narrowing is not keyed on Execute alone (`_enemy_pick_pool` reads %d chars)" % narrow.length())
 	await _clear(s)
 	var s2: Node = await _six_room(["swordmaster", "pyromancer", "occultist", "mystic"],
 		{2: {"bm_abilities": ["Requiem"], "bm_equipped": ["Requiem"]}})

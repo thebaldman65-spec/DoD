@@ -77,17 +77,18 @@ const SUMMON_COPIED := ["attack", "armor", "speed", "stability", "constitution",
 # §2 — the three, by id: the condition key each is ruled to read, the hero whose fall
 # makes it hold (by seat), the field it writes, its words with the figure left out,
 # and the figure the designer RULED at HQ §1 (Dirge and Empty Pulpit confirmed as HP
-# proposed them; Dead Air moved 0.50 -> 0.75).
+# proposed them; Dead Air moved 0.50 -> 0.75). BATCH IL §0.3 — THE WORDS SAY *STRIKE*
+# DAMAGE: both fields are read in the strike loop alone, so a true word is not a re-cut.
 const THREE := {
 	"empty_pulpit": {"name": "Empty Pulpit", "key": ["heroes_lack_class", "cleric"], "falls": 2,
 		"field": "dmg_taken_bonus", "sign": -1, "ruled": -0.50,
-		"words": "While no Cleric stands, every hero takes\n%d%% less damage."},
+		"words": "While no Cleric stands, every hero takes\n%d%% less strike damage."},
 	"dead_air": {"name": "Dead Air", "key": ["heroes_lack_class", "mage"], "falls": 1,
 		"field": "dmg_bonus", "sign": 1, "ruled": 0.75,
-		"words": "While no Mage stands, every hero deals\n%d%% more damage."},
+		"words": "While no Mage stands, every hero deals\n%d%% more strike damage."},
 	"dirge": {"name": "Dirge", "key": ["heroes_all_standing", false], "falls": 0,
 		"field": "dmg_bonus", "sign": 1, "ruled": 0.45,
-		"words": "While a hero lies fallen, the rest deal\n%d%% more damage."},
+		"words": "While a hero lies fallen, the rest deal\n%d%% more strike damage."},
 }
 # §2e — BR §1: the shared-word near-misses each name is known to have, compared as an
 # EQUALITY (EK's `CLASH_EXEMPT` shape), so a new one reds.

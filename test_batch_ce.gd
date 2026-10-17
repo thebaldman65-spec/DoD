@@ -726,8 +726,11 @@ func _docs() -> void:
 	# wards), and a player has nowhere else to learn which damage a strike is — that a tick, a detonation,
 	# a burst, a reflection and a bomb are not, nor a card's own rule's blow, so a bonus to strike damage
 	# does not reach them. One entry for a word the game was already using and never defined.
-	ok(gj != null and gj.size() == 101,
-		"the glossary holds 101 entries (98 + HS's conjunctions and status_rupture + IK's strike_damage)")
+	# BATCH IL §0.4 — ONE HUNDRED AND TWO, BUMPED THE SAME WAY, and the entry is `most_health`: the Blood
+	# Debt rune names its payer as the enemy with the most health, as the Tracker's and the Arbiter's moving
+	# marks already did, and the tie rule (the first in the warband) goes in the glossary, not on the rune.
+	ok(gj != null and gj.size() == 102,
+		"the glossary holds 102 entries (98 + HS's conjunctions and status_rupture + IK's strike_damage + IL's most_health)")
 	# RE-POINTED AT THE ARCHIVE BY BATCH CX. The live changelog passed CW's 400 KB
 	# threshold, so CX cut it at the CN/CO boundary: Batch CE — with everything
 	# from BP to CN — moved OUT OF THE REPO into `changelog-archive.html`. The old

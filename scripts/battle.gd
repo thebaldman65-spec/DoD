@@ -4516,20 +4516,9 @@ func _player_turn(u: BattleUnit) -> void:
 					pool = pool.filter(func(a): return a != u and not a.is_companion)
 			else:
 				pool = enemies.filter(func(e): return not e.dead)
-				# BATCH IK §2 — EXECUTE OFFERS ONLY WHAT QUALIFIES. The door lights the button when ANY
-				# enemy is below the line or Broken; the pick is narrowed to exactly those, by the same
-				# answer (`_execute_qualifies`), so a full-health enemy can no longer be felled because
-				# something else in the room is bleeding. Every other enemy-target card keeps the whole
-				# living warband (IK's census: eight others gate on the board and offer every enemy).
-				if ab.display_name == "Execute":
-					pool = pool.filter(func(e): return _execute_qualifies(u, e))
-				# Upgraded Execute he cannot actually pay for: the button is
-				# lit by the FREE cast, so the pick narrows to the targets
-				# that discount covers (Batch AK). Without this the two
-				# checks could disagree and quietly zero his Rage.
-				if ab.display_name == "Execute" and u.execute_upgraded > 0 \
-						and ab.cost > u.resource:
-					pool = pool.filter(func(e): return e.broken)
+				# BATCH IK §2 — EXECUTE OFFERS ONLY WHAT QUALIFIES, and since IL §3 the narrowing is
+				# `_enemy_pick_pool`'s, the one answer the bot's drafted hook asks too.
+				pool = _enemy_pick_pool(u, ab, pool)
 			if pool.size() == 1:
 				target = pool[0]
 			else:
@@ -4942,7 +4931,6 @@ func _bot_drafted_pick(u: BattleUnit) -> Array:
 	if foes.is_empty():
 		return []
 	var allies := heroes.filter(func(h): return not h.dead and not h.is_companion)
-	var mark: BattleUnit = _lowest_hp(foes)
 	for ab in u.abilities:
 		# BATCH HB — TRIPWIRE IS DRAFTED SINCE HB AND ITS ONE DEFINITION STAYS IN
 		# THE SURVIVALIST'S TABLE, which `draft_ability` does not read — the reason
@@ -5277,7 +5265,18 @@ func _bot_drafted_pick(u: BattleUnit) -> Array:
 				if um_e.hp > um_pick.hp:
 					um_pick = um_e
 			return [ab, um_pick]
-		return [ab, mark]
+		# BATCH IL §3 — THE BOT AIMS WHERE THE PLAYER's PICKER WOULD LET HIM, NEVER ELSEWHERE.
+		# It aimed every card it had no case for at the lowest-health enemy, so a drafted Execute
+		# struck a body above the line and not Broken while another body made the door light — a
+		# cast the player cannot make. The pool is `_enemy_pick_pool`'s, the picker's own answer,
+		# and for every card without a qualifier it is the whole warband, so the lowest-health enemy
+		# it aims at is the one it always aimed at (the `mark` the cases above are written against).
+		# A pool with nobody in it skips the card — the next drafted one, or the rotation's basic —
+		# which cannot happen while the door is lit (it lights only for a body the pool keeps).
+		var pick_pool := _enemy_pick_pool(u, ab, foes)
+		if pick_pool.is_empty():
+			continue
+		return [ab, _lowest_hp(pick_pool)]
 	return []
 
 
@@ -5340,11 +5339,10 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 					# _ability_usable already priced the cast (the upgraded
 					# copy is free against a Broken target) and checked the
 					# threshold, so the bot only picks a legal victim — a
-					# Broken one when full price is out of reach. BATCH IK §2: the line is
-					# `_execute_qualifies`', the picker's own answer.
-					var sm_prey: Array = (foes.filter(func(e): return e.broken) \
-						if u.resource < sm_exec.cost \
-						else foes.filter(func(e): return _execute_qualifies(u, e)))
+					# Broken one when full price is out of reach. BATCH IL §3: the pool is
+					# `_enemy_pick_pool`'s, the picker's own answer — this rotation and the
+					# drafted hook are the two places the bot aims an Execute, and both ask it.
+					var sm_prey: Array = _enemy_pick_pool(u, sm_exec, foes)
 					if not sm_prey.is_empty():
 						return [sm_exec, _lowest_hp(sm_prey)]
 				var sm_shatter := _find_ability(u, "Shatterpoint")
@@ -6578,11 +6576,11 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 		"alms":
 			if u.second_resource_name != "Mercy":
 				return []
-			return [{"id": "alms", "turns": 4, "power": ALMS_WARD_PCT}]
+			return [{"id": "alms", "turns": 4, "power": ALMS_WARD_PCT, "door": true}]
 		"divine_presence":
 			if u.second_resource_name != "Mercy":
 				return []
-			return [{"id": "divine_presence", "turns": 4, "power": 0}]
+			return [{"id": "divine_presence", "turns": 4, "power": 0, "door": true}]
 		# THREE BANKED COUNTERS THAT PRE-MAX AGAINST WHAT IS HELD, so a recast
 		# tops the pile back up and only a FULL pile refuses. The arithmetic is
 		# the handler's own, read from the same status it will overwrite.
@@ -6640,13 +6638,13 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 		"warcry":
 			return [{"id": "warcry", "turns": 4, "power": WARCRY_PCT}]
 		"unity":
-			return [{"id": "unity", "turns": 4 + u.resolve_extra_turns, "power": 0}]
+			return [{"id": "unity", "turns": 4 + u.resolve_extra_turns, "power": 0, "door": true}]
 		"divine_wrath":
-			return [{"id": "wrath", "turns": 4, "power": 0}]
+			return [{"id": "wrath", "turns": 4, "power": 0, "door": true}]
 		"cons_ground":
-			return [{"id": "cons_ground", "turns": 3, "power": 0}]
+			return [{"id": "cons_ground", "turns": 3, "power": 0, "door": true}]
 		"consecration":
-			return [{"id": "consecration", "turns": 4, "power": 0}]
+			return [{"id": "consecration", "turns": 4, "power": 0, "door": true}]
 		"anointing":
 			return [{"id": "anointed", "turns": 4, "power": 0}]
 		"resonant_field":
@@ -6661,16 +6659,16 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 		"covering_guard":
 			return [{"id": "covering_guard", "turns": 4, "power": 0}]
 		"undying_vigil":
-			return [{"id": "vigil", "turns": 4, "power": 0}]
+			return [{"id": "vigil", "turns": 4, "power": 0, "door": true}]
 		"vow_suffering":
-			return [{"id": "vow", "turns": 4, "power": 0}]
+			return [{"id": "vow", "turns": 4, "power": 0, "door": true}]
 		"rite_of_return":
-			return [{"id": "rite_return", "turns": 4, "power": 0}]
+			return [{"id": "rite_return", "turns": 4, "power": 0, "door": true}]
 		"umbral_sigil":
-			return [{"id": "umbral_sigil", "turns": 4, "power": 0}]
+			return [{"id": "umbral_sigil", "turns": 4, "power": 0, "door": true}]
 		"penance":
 			return [{"id": "penance", "turns": 4,
-				"power": int(round(PENANCE_MIRROR * 100.0))}]
+				"power": int(round(PENANCE_MIRROR * 100.0)), "door": true}]
 		"rime":
 			return [{"id": "rime", "turns": 4 + u.icy_resolve_ranks, "power": 0},
 				{"id": "frostbite", "turns": 2, "power": 0}]
@@ -6720,7 +6718,7 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 			return [{"id": "stunned", "turns": COUNTER_TIME_TURNS, "power": 0}]
 		"vespers":
 			return [{"id": "vespers", "turns": 4,
-				"power": maxi(int(round(u.max_hp * VESPERS_PCT)), 1)}]
+				"power": maxi(int(round(u.max_hp * VESPERS_PCT)), 1), "door": true}]
 		# THE TWO DIVINE BARRIER WRITERS, AND THEY CARRY RIDERS. `barrier` is a
 		# SHARED status: `_grant_divine_shield` stamps `divine`, Blessed Barrier,
 		# Afterglow, Warded Robes and Unyielding onto it, and Mantle adds its
@@ -6771,11 +6769,22 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 # A NEGATIVE COUNT IS A PERMANENCE FLAG RATHER THAN A DURATION — add_status says
 # so at the top — so it reads as longer than any real number, and a battle-long
 # status can never be lengthened by anything.
-func _status_write_improves(t: BattleUnit, w: Dictionary) -> bool:
+#
+# BATCH IL §1 — AND SANCTITY IS ADDED HERE, AHEAD OF FLEETING, BECAUSE THE DOOR ADDS
+# IT THERE. `_apply_status` lengthens a status its source lays while that source holds
+# Sanctity, so a Hierophant's recast lands its base turns PLUS his steps; a proposal
+# without them reads a standing lengthened status as unbeatable and refuses a recast
+# that would lengthen it (CR §3: a duration declared twice owes both copies the edit).
+# A write is marked `door` where its cast passes the caster through that door — a
+# Cleric's — and only those carry the term: Anointing writes around the door.
+func _status_write_improves(t: BattleUnit, w: Dictionary, caster: BattleUnit = null) -> bool:
 	var held: Dictionary = t.get_status(String(w["id"]))
 	if held.is_empty():
 		return true
 	var want_turns := int(w["turns"])
+	if want_turns > 0 and bool(w.get("door", false)) and caster != null \
+			and caster.sanctity_active:
+		want_turns += caster.sanctity_turn_bonus()
 	if want_turns > 0:
 		want_turns = maxi(want_turns + t.mod_status_turns, 1)
 	var have_turns := int(held.get("turns", 0))
@@ -6801,7 +6810,7 @@ func _recast_refused(u: BattleUnit, ab: Ability) -> bool:
 	for t in pool:
 		for w in _recast_writes(u, ab, t):
 			saw_write = true
-			if _status_write_improves(t, w):
+			if _status_write_improves(t, w, u):
 				return false
 	# A CAST THAT PROPOSES NOTHING ANYWHERE IS NOT THIS GATE'S QUESTION. Alms and
 	# Divine Presence write nothing in a kit that holds no Mercy — the sim hands
@@ -7348,6 +7357,14 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 	if ab.display_name == "Hunt" and not enemies.any(func(e): \
 			return not e.dead and _status_count(e) > 0):
 		ab_btn.tooltip_text += "\n(Nothing on the field is afflicted)"
+	# BATCH IL §0.2 — EXECUTE's GATE SAYS SO, IN THE VOICE THE OTHERS USE, its line read off
+	# `_execute_line` — the door, the picker and the hover's answer — so the upgraded copy says 35%.
+	# A RAGE GATE IS NOT A TARGET GATE: while he cannot pay, the button keeps the cost's own reason
+	# (its price), and this line is not written — he cannot cast it at all, the stronger fact.
+	if ab.display_name == "Execute" and _eff_cost(u, ab) <= u.resource \
+			and not enemies.any(func(e): return _execute_qualifies(u, e)):
+		ab_btn.tooltip_text += "\n(No enemy is below %d%% health or Broken)" % \
+			int(round(_execute_line(u) * 100.0))
 	if ab.special == "preparation" and u.prep_pending > 0:
 		ab_btn.tooltip_text += "\n(An extra turn is already pending)"
 	# BATCH DV §3 — THE PHOENIX SAYS WHY, and it is TWO reasons rather than one.
@@ -7975,6 +7992,23 @@ func _execute_line(u: BattleUnit) -> float:
 
 func _execute_qualifies(u: BattleUnit, e: BattleUnit) -> bool:
 	return not e.dead and (e.hp < e.max_hp * _execute_line(u) or e.broken)
+
+
+# BATCH IL §3 — WHICH LIVING ENEMIES A CARD's PICK OFFERS: the player's picker (`_player_turn`) and the
+# bot's drafted hook both ask this, so the bot cannot aim where the player cannot (IL's ruling: a sim
+# whose bot can do what the player cannot produces figures that do not describe the game). A card whose
+# pick has a qualifier narrows here and nowhere else — Execute alone today (IK §2): the door lights the
+# button when ANY enemy is below the line or Broken, and the pick is exactly those, so a full-health
+# enemy cannot be felled because something else in the room is bleeding; and the upgraded copy he
+# cannot pay for, lit by its FREE cast, narrows to the Broken that discount covers (Batch AK), or the
+# two checks could disagree and quietly zero his Rage. Every other card's pool comes back as it went in.
+func _enemy_pick_pool(u: BattleUnit, ab: Ability, pool: Array) -> Array:
+	if ab.display_name != "Execute":
+		return pool
+	var out: Array = pool.filter(func(e): return _execute_qualifies(u, e))
+	if u.execute_upgraded > 0 and ab.cost > u.resource:
+		out = out.filter(func(e): return e.broken)
+	return out
 
 
 # What the picker's hover says on a living enemy it does not offer: for Execute, the line it is
@@ -14575,12 +14609,15 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 	# number nothing downstream understands and quietly un-permanent a
 	# battle-long status.
 	#
-	# **AND THIS REACHES 110 OF THE 214 SITES, WHICH IS SAID OUT LOUD RATHER
-	# THAN LEFT TO BE DISCOVERED.** 104 `_apply_status` calls pass no `src` at
-	# all and the 36 direct `add_status` calls have no source parameter — so 93
-	# real-duration applications in the game cannot see this line. `check_ft`
-	# §3 asserts that population rather than describing it, and
-	# `docs/reports/FT.md` §3 carries the census.
+	# **AND WHAT IT REACHES IS COUNTED, NOT DESCRIBED.** A call that passes no
+	# `src` and a direct `add_status` (which has no source parameter) cannot see
+	# this line. **BATCH IL §1 PARTITIONED THE SOURCELESS CALLS** by whether a
+	# Cleric can be their source, and passed him at every live one he can — so
+	# a status a Cleric lays reaches here with him as its source, but for four
+	# kept apart on purpose: two items (the pouch is the party's), a charmed
+	# enemy's Daze (an ambiguous source, DI's rule) and the Ruin primer (the
+	# engine's own clock). `check_ft` §3i and `check_di`
+	# §1 print the live counts; `docs/reports/IL-partition.tsv` carries the partition, a row a site.
 	if eff_turns > 0 and src != null and src.sanctity_active:
 		eff_turns += src.sanctity_turn_bonus()
 	# BATCH HS §2g — WHAT A RE-APPLICATION FINDS, READ BEFORE IT LANDS: a status
@@ -17062,7 +17099,7 @@ func _alms_spill(cleric: BattleUnit, low_ally: BattleUnit) -> void:
 		return
 	var al_power := maxi(int(round(cleric.max_hp * 0.01
 		* maxi(cleric.status_power("alms"), 1))), 1)
-	_apply_status(low_ally, "barrier", -1, al_power)
+	_apply_status(low_ally, "barrier", -1, al_power, 0, cleric)
 	var al_stat: Dictionary = low_ally.get_status("barrier")
 	if not al_stat.is_empty():
 		al_stat["src"] = cleric.unit_name  # Batch W: absorbs credit the caster
@@ -17561,7 +17598,7 @@ func _grant_divine_shield(devout: BattleUnit, target: BattleUnit, power: int) ->
 		var held := target.get_status("barrier")
 		if not held.is_empty() and bool(held.get("divine", false)):
 			power += int(held.get("power", 0))
-	_apply_status(target, "barrier", -1, power)
+	_apply_status(target, "barrier", -1, power, 0, devout)
 	var bstat := target.get_status("barrier")
 	if bstat.is_empty():
 		return
@@ -19730,7 +19767,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# refuse it — which is why the card is pinned by its APPLY and its
 			# SPLIT together in `check_dm` §1 rather than by either one.
 			for h in heroes.filter(func(he): return not he.dead):
-				_apply_status(h, "unity", res_turns)
+				_apply_status(h, "unity", res_turns, 0, 0, attacker)
 			_message("%s binds the heroes as one!" % attacker.unit_name)
 			_log("%s: Sacred Resolve — the heroes' souls are bound (%d turns)" % [
 				attacker.unit_name, res_turns], "#70d878")
@@ -19757,7 +19794,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.unit_name, 3], "#c8b880")
 		"zeal":
 			_sfx("heal", -6.0, 1.2)
-			_apply_status(target, "zeal", 4)
+			_apply_status(target, "zeal", 4, 0, 0, attacker)
 			# Crusade: the cast-time cooldown tick digs deeper.
 			var zeal_ticks := 1 + attacker.crusade_ranks
 			# BATCH BQ: one implementation (`_tick_cooldowns`). Its return is
@@ -19810,7 +19847,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# `heroes.append` is reached at exactly one site and a summon goes to
 			# `companions`, so the COLLECTION is what excludes here.
 			for h in heroes.filter(func(he): return not he.dead and not he.is_companion):
-				_apply_status(h, "bulwark", bw_turns)
+				_apply_status(h, "bulwark", bw_turns, 0, 0, attacker)
 				# BATCH BF §1: three turns of NO Break damage, party-wide, and
 				# until this batch it was counted nowhere in the game. The
 				# caster's name rides the status so the refused points land in
@@ -20213,7 +20250,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# STATUS is the one answer to "is the promise live", so it expires
 			# by itself and no flag can outlive it (Intercession's rule).
 			if target != null and not target.dead:
-				_apply_status(target, "rite_return", 4)
+				_apply_status(target, "rite_return", 4, 0, 0, attacker)
 				_sfx("heal", -9.0, 0.6)
 				_message("%s promises %s the road back" % [attacker.unit_name,
 					target.unit_name])
@@ -20224,7 +20261,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# amount; this has no cap at all — what bounds it is the Devout's
 			# own health, which is the trade.
 			if target != null and not target.dead:
-				_apply_status(target, "vow", 4)
+				_apply_status(target, "vow", 4, 0, 0, attacker)
 				var vw_st := target.get_status("vow")
 				if not vw_st.is_empty():
 					vw_st["src_name"] = attacker.unit_name
@@ -21422,14 +21459,16 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			for cn_h in heroes:
 				if cn_h.dead or cn_h.is_companion:
 					continue
-				_apply_status(cn_h, "consecration", cn_turns)
-				# THE CASTER IS STAMPED STRAIGHT ONTO THE STATUS rather than
-				# passed as `_apply_status`'s `src`, and the reason is the same
-				# one the Devoutness block gives: `src` also bumps the `st/b`
-				# DEBUFF counter, and a blessing laid on an ally is not a debuff
-				# landed on an enemy. The three ally-facing cards below do the
-				# same. What the stamp buys is that the drip's healing books to
-				# the Cleric who paid for it.
+				_apply_status(cn_h, "consecration", cn_turns, 0, 0, attacker)
+				# BATCH IL §1 — THE CASTER IS PASSED AS `src` NOW, AS EVERY STATUS A
+				# CLERIC LAYS IS (the Hierophant's *each status the Cleric applies*,
+				# IJ's ruling 9): the door lengthens it for a Sanctity holder. The
+				# stamp below is kept and names the same Cleric, so the drip's
+				# healing still books to the one who paid for it. Until IL it was
+				# stamped INSTEAD of passed, because `src` also bumps the `st/b`
+				# column; that column counts every status a hero lands on another
+				# body (the door's own words — Renewal and Consecrated Ground were
+				# counted already), so it counts these too, and reads the move.
 				var cn_st: Dictionary = cn_h.get_status("consecration")
 				if not cn_st.is_empty():
 					cn_st["src_name"] = attacker.unit_name
@@ -21453,7 +21492,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var ub_removed := ub_taken.size()
 				if attacker.rune_returned_burden > 0.0 and not ub_taken.is_empty():
 					_return_burden(attacker, target, ub_taken)
-				_apply_status(target, "unburdened", ub_turns)
+				_apply_status(target, "unburdened", ub_turns, 0, 0, attacker)
 				var ub_st := target.get_status("unburdened")
 				if not ub_st.is_empty():
 					ub_st["src_name"] = attacker.unit_name
@@ -21479,7 +21518,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				# A held Exhortation is never downgraded by a second cast.
 				var ex_have: int = ex_h.status_power("exhorted")
 				var ex_val: int = maxi(ex_pct, ex_have)
-				_apply_status(ex_h, "exhorted", -1, ex_val)
+				_apply_status(ex_h, "exhorted", -1, ex_val, 0, attacker)
 				_stamp_exhort_chip(ex_h, ex_val)
 				ex_h.float_text("+%d%% next hit" % ex_val, Color(0.98, 0.88, 0.55))
 				ex_n += 1
@@ -21497,7 +21536,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# abilities somebody has to keep up to date.
 			if target != null and not target.dead:
 				var uv_turns := 4
-				_apply_status(target, "vigil", uv_turns)
+				_apply_status(target, "vigil", uv_turns, 0, 0, attacker)
 				var uv_st := target.get_status("vigil")
 				if not uv_st.is_empty():
 					uv_st["src_name"] = attacker.unit_name
@@ -22239,7 +22278,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				# where the decision disappears. CG had already flagged this card
 				# at 100% uptime before the fold widened it.
 				var mt_turns := 4
-				_apply_status(attacker, "divine_presence", mt_turns)
+				_apply_status(attacker, "divine_presence", mt_turns, 0, 0, attacker)
 				_sfx("heal", -9.0, 0.8)
 				_message("%s keeps the watch" % attacker.unit_name)
 				_log("%s: Divine Presence — for %d turns she gains %d Mercy at the start of every %s turn of hers on which nobody fell" % [
@@ -22256,7 +22295,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				# THE PERCENTAGE RIDES THE STATUS POWER, so the chip a player
 				# reads and the ward `_alms_spill` lays are ONE number. Batch BP's
 				# Eye of the Storm is what two copies of one figure costs.
-				_apply_status(attacker, "alms", al_turns, ALMS_WARD_PCT)
+				_apply_status(attacker, "alms", al_turns, ALMS_WARD_PCT, 0, attacker)
 				_sfx("heal", -9.0, 0.6)
 				_message("%s gives away what will not fit" % attacker.unit_name)
 				_log("%s: Alms — for %d turns Mercy earned at the cap wards the ally who earned it (%d%% of her maximum)" % [
@@ -23606,7 +23645,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# `check_dm` §2 MEASURES both rather than asserting them.
 			_sfx("heal", -5.0, 0.85)
 			for h in heroes.filter(func(he): return not he.dead):
-				_apply_status(h, "wrath", 4)
+				_apply_status(h, "wrath", 4, 0, 0, attacker)
 			_message("%s calls down Divine Wrath!" % attacker.unit_name)
 			_log("%s: Divine Wrath — the heroes deal +15%% damage, +15%% speed" % \
 				attacker.unit_name, "#70d878")
@@ -24080,7 +24119,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var ic_turns := 2 + attacker.intercession_long + (1 if is_perfect else 0)
 			_sfx("heal", -6.0, 0.55)
 			for ic_h in heroes.filter(func(he): return not he.dead and not he.is_companion):
-				_apply_status(ic_h, "intercession", ic_turns)
+				_apply_status(ic_h, "intercession", ic_turns, 0, 0, attacker)
 			_message("%s intercedes!" % attacker.unit_name)
 			_log("%s: Intercession — for %d turns the next lethal blow on any hero is refused (1 Mercy, on trigger)%s" % [
 				attacker.unit_name, ic_turns,
@@ -24122,7 +24161,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var dp_note := ""
 			if empowered:
 				var dp_purged := target.purge_debuffs()
-				_apply_status(target, "sanctified", 3)
+				_apply_status(target, "sanctified", 3, 0, 0, attacker)
 				dp_note = " — cleansed %d and Hallowed 3 turns (Empowered)" % dp_purged
 			# BATCH CE — INDEPENDENT `if` RATHER THAN `elif`, AND IT IS A
 			# BEHAVIOURAL NO-OP TODAY. An Empowered cast has ALWAYS zeroed
@@ -28249,11 +28288,13 @@ func _rune_effect_words(payload: Dictionary) -> String:
 	for f in stat:
 		var v := float(stat[f])
 		match String(f):
+			# BATCH IL §0.3 — BOTH FIELDS ARE READ IN THE STRIKE LOOP ALONE (the glossary's Strike
+			# Damage), so the chip says so, as the crest runes' own words do.
 			"dmg_taken_bonus":
-				parts.append("every hero takes %d%% %s damage" % [int(round(absf(v) * 100.0)),
+				parts.append("every hero takes %d%% %s strike damage" % [int(round(absf(v) * 100.0)),
 					"less" if v < 0.0 else "more"])
 			"dmg_bonus":
-				parts.append("every hero deals %d%% %s damage" % [int(round(absf(v) * 100.0)),
+				parts.append("every hero deals %d%% %s strike damage" % [int(round(absf(v) * 100.0)),
 					"more" if v > 0.0 else "less"])
 			"rune_blood_communion":
 				parts.append("a hero's attack that lands Break heals the hero furthest from full for %d%% of it" % int(round(v)))
@@ -30129,7 +30170,7 @@ func _abundance_shield(owner, healed: BattleUnit) -> void:
 			and int(healed.get_status("barrier").get("turns", 0)) < 0:
 		ab_turns = -1
 	var ab_had := maxi(healed.status_power("barrier"), 0)
-	_apply_status(healed, "barrier", ab_turns, ab_had + ab_add)
+	_apply_status(healed, "barrier", ab_turns, ab_had + ab_add, 0, ab_h)
 	var ab_st := healed.get_status("barrier")
 	if not ab_st.is_empty() and String(ab_st.get("src", "")) == "":
 		ab_st["src"] = ab_h.unit_name

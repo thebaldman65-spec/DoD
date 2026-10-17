@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-10-16 (Batch IK &mdash; what the census found in the code)</b></p>
+<p align="right"><b>Last updated: 2026-10-16 (Batch IL &mdash; the two measured defects)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -2249,7 +2249,9 @@ Execute — 30 Rage, 55 dmg / 50 BD, 2.0, 3cd, usable against
 targets below 20% health OR against a Broken target — the loop sets up his own finisher
 (Perfect: guaranteed crit). <b>Only those can be chosen</b>: the button lights when one stands,
 the target picker offers exactly those, and a hover on any other enemy says why it cannot be
-picked. <b>Both sit in the spec draft pool AND the boss-pick pool; no
+picked; while none stands, his darkened button says <i>No enemy is below 20% health or Broken</i> (35% for the
+upgraded copy), unless the Rage is what he lacks &mdash; then the button keeps the cost's reason. The sim's bot aims an Execute
+only where the picker would let him, through the same narrowing, at both places it casts one. <b>Both sit in the spec draft pool AND the boss-pick pool; no
 talent grants either any more (Batch DO), so the node UPGRADES they used to collide with are
 read-only-zero</b> — the branches stand and nothing writes them.</li>
 </ul>
@@ -2877,8 +2879,9 @@ standing lowest by share of maximum health. It reads the
 Break an ordinary attack applies as it lands &mdash; none into an enemy already Broken, and nothing for Break dealt by a
 card's own effect, a trap, a companion, a talent's proc or the Long Watch's carry &mdash; and it is added to the talent
 tree's <i>Breaking Heals a Hero</i> for a hero who wears both. <b><i>Empty Pulpit</i></b>: while no Cleric stands, every
-hero takes 50% less damage. <b><i>Dead Air</i></b>: while no Mage stands, every hero deals 75% more damage.
-<b><i>Dirge</i></b>: while a hero lies fallen, the rest deal 45% more damage. <b>A crest rune drops and is sold as any
+hero takes 50% less strike damage. <b><i>Dead Air</i></b>: while no Mage stands, every hero deals 75% more strike
+damage. <b><i>Dirge</i></b>: while a hero lies fallen, the rest deal 45% more strike damage &mdash; all three read the
+strike, as the glossary defines it, and nothing else. <b>A crest rune drops and is sold as any
 other rune is, and sits in the bag while the Crest does not wear it</b>; it belongs to no class, and wears no marker on its name: the Peddler's row
 and an event's line say <i>for the crest</i> beside one. <b>It is never in a hero's own pick of three</b> &mdash; the elite's
 rune cache and the bargain's rune hold his class's runes alone.
@@ -2982,8 +2985,8 @@ side.
 <br><b>A CONDITIONAL RUNE PAYS MORE THAN THE BARE EQUIVALENT.</b> A gated rune at a flat price
 would be strictly WORSE than a bare one &mdash; the price does not fall to pay for the clause
 &mdash; so a rune that pays only while its condition holds pays more than any bare writer of the
-same effect: <i>Dead Air</i>'s 75% and <i>Dirge</i>'s 45% more damage dealt against the talent
-tree's 10%, <i>Empty Pulpit</i>'s 50% less damage taken against its 10%. <code>check_fn</code>
+same effect: <i>Dead Air</i>'s 75% and <i>Dirge</i>'s 45% more strike damage dealt against the talent
+tree's 10% on the same field, <i>Empty Pulpit</i>'s 50% less strike damage taken against its 10%. <code>check_fn</code>
 &sect;1b asserts that relation over every live rune with a condition. <b>No rune carries a
 condition on a hero's tags</b>: THRESHOLD and BREADTH are gone from the file, from the code and
 from the screens, and <code>check_fn</code> &sect;1b asserts their keys absent across all 171

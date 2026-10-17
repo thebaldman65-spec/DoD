@@ -2,10 +2,10 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1842,
+  "total": 1848,
   "source": 1343,
-  "other": 125,
-  "document": 374
+  "other": 129,
+  "document": 376
  },
  "source_residency": {
   "narrow": 46,
@@ -6003,7 +6003,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_ia.gd#605",
+   "g": "check_ia.gd#607",
    "expr": "walk"
   },
   {
@@ -6015,7 +6015,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ia.gd#612",
+   "g": "check_ia.gd#614",
    "expr": "walk"
   },
   {
@@ -6027,7 +6027,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ia.gd#602"
+   "g": "check_ia.gd#604"
   },
   {
    "s": "check_ia.gd",
@@ -6038,7 +6038,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ia.gd#606"
+   "g": "check_ia.gd#608"
   },
   {
    "s": "check_ia.gd",
@@ -6049,7 +6049,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ia.gd#606"
+   "g": "check_ia.gd#608"
   },
   {
    "s": "check_ia.gd",
@@ -6060,7 +6060,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ia.gd#607"
+   "g": "check_ia.gd#609"
   },
   {
    "s": "check_ia.gd",
@@ -6071,7 +6071,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ia.gd#607"
+   "g": "check_ia.gd#609"
   },
   {
    "s": "check_ib.gd",
@@ -6856,6 +6856,39 @@
   },
   {
    "s": "check_ij.gd",
+   "fn": "_s04_new_gate_rule",
+   "h": "",
+   "n": "\"res://\"",
+   "p": "+",
+   "r": "missing-file",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ij.gd#117"
+  },
+  {
+   "s": "check_ij.gd",
+   "fn": "_s04_new_gate_rule",
+   "h": "",
+   "n": "\"res://%s.gd\"",
+   "p": "+",
+   "r": "missing-file",
+   "k": "format",
+   "how": "read",
+   "g": "check_ij.gd#118"
+  },
+  {
+   "s": "check_ij.gd",
+   "fn": "_s04_new_gate_rule",
+   "h": "",
+   "n": "res://run_battery.sh",
+   "p": "+",
+   "r": "missing-file",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ij.gd#118"
+  },
+  {
+   "s": "check_ij.gd",
    "fn": "_s4_rules",
    "h": "CLAUDE.md",
    "n": null,
@@ -6863,7 +6896,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ij.gd#345",
+   "g": "check_ij.gd#356",
    "expr": "FIGURE_RULE"
   },
   {
@@ -6875,7 +6908,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ij.gd#347",
+   "g": "check_ij.gd#358",
    "expr": "FIGURE_RULE"
   },
   {
@@ -6887,7 +6920,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ij.gd#368",
+   "g": "check_ij.gd#379",
    "expr": "SWEEP_ROW"
   },
   {
@@ -6899,7 +6932,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ij.gd#345",
+   "g": "check_ij.gd#356",
    "expr": "FIGURE_RULE"
   },
   {
@@ -6911,7 +6944,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ij.gd#349"
+   "g": "check_ij.gd#360"
   },
   {
    "s": "check_ik.gd",
@@ -7186,7 +7219,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ik.gd#530",
+   "g": "check_ik.gd#532",
    "expr": "String"
   },
   {
@@ -7198,7 +7231,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_ik.gd#529"
+   "g": "check_ik.gd#531"
   },
   {
    "s": "check_ik.gd",
@@ -7209,7 +7242,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "read",
-   "g": "check_ik.gd#581"
+   "g": "check_ik.gd#583"
   },
   {
    "s": "check_ik.gd",
@@ -7220,7 +7253,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "read",
-   "g": "check_ik.gd#581"
+   "g": "check_ik.gd#583"
   },
   {
    "s": "check_ik.gd",
@@ -7231,7 +7264,42 @@
    "r": "code",
    "k": "loop-list",
    "how": "read",
-   "g": "check_ik.gd#581"
+   "g": "check_ik.gd#583"
+  },
+  {
+   "s": "check_il.gd",
+   "fn": "_s06_the_derivation",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_il.gd#299",
+   "expr": "WIDE_DERIVATION"
+  },
+  {
+   "s": "check_il.gd",
+   "fn": "_s06_the_derivation",
+   "h": "docs/instrument-rules.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_il.gd#298",
+   "expr": "WIDE_DERIVATION"
+  },
+  {
+   "s": "check_il.gd",
+   "fn": "_s1a_partition",
+   "h": "data/runes.json",
+   "n": "\"%s\"",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_il.gd#363"
   },
   {
    "s": "test_batch_ah.gd",

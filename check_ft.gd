@@ -924,9 +924,11 @@ func _s3_sanctity() -> void:
 	cleric.sanctity_active = false
 
 	# (i) THE REACHABLE POPULATION, COUNTED AND PRINTED. The payout is read off
-	# `src`, and 104 of the 214 `_apply_status` calls pass none — so this line
-	# reaches a MEASURED fraction of the game's status applications and the
-	# figure is asserted rather than described. **CHECKED n OF m**, because a
+	# `src`, and a call that passes none cannot see it — 104 of the 214 at FT's
+	# reading; since IL every live call a Cleric can source passes him, and the
+	# rest are partitioned in IL's report, §1 — so this line reaches a
+	# MEASURED fraction of the game's status applications and the figure is
+	# asserted rather than described. **CHECKED n OF m**, because a
 	# walk that silently matched nothing prints exactly like a clean one.
 	var battle_src := Gate.strip_comments(
 		FileAccess.get_file_as_string("res://scripts/battle.gd"))

@@ -29,73 +29,95 @@ never have fired: **an alarm set above the failure level is not an alarm.** `che
 sentence every battery: over it is a warning, and past it by more than one batch at the record is a failure — the largest
 single-batch growth on record is **+13.38 KiB** (ES's +13,700 B). *In the preamble for the archive pointer's reason.*
 
-*Last rewritten: 2026-10-16 (Batch IK).*
+*Last rewritten: 2026-10-16 (Batch IL).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: IK — WHAT THE CENSUS FOUND IN THE CODE.** IMPLEMENT ONLY. **Of the nine places IJ's census found the code at fault
-  rather than the words, the small ones are repaired** — Blood Debt, Execute's picker, two Perfects, two talent names, the strike's
-  word and Cairnmoss Poultice — **and the two that move a measured figure, Sanctity's source gap and the Ruin rung's severity, are
-  IL's.** Full working: **`docs/reports/IK.md`**. **The next letter is IL** (the roadmap, below).
+- **Last batch: IL — THE TWO MEASURED DEFECTS.** IMPLEMENT ONLY. **Sanctity's source gap is repaired and the step re-measured:
+  it stays 13. The Ruin rung's bargains are measured and left alone, two contradictions reported.** The bot reads the picker's
+  pool, and four of IK's rulings are built. Full working: **`docs/reports/IL.md`**. **The next letter is IM** (the roadmap, below).
 - **THE DESIGNER HAS NOT PLAYED SINCE IH.** `run_save.bin` is 40,284 B at 2026-10-14 14:30 and `readout/` holds IH's one
   debug-touched file — both unmoved, **and no newer file has appeared** — backed up with the four player files
-  (`../save-backups/IK-20261016-102016`, md5-verified).
-- **§1 — BLOOD DEBT FIRES.** With the rune worn, Blood Price's cost — 7.5% of current health — is the fullest enemy's, the first in
-  the warband on a tie, chosen with no die (`battle._blood_debt_payer`); the Berserker pays nothing. It is his damage under his own
-  frame and not a strike; what it prints and pays is what the vow lets land; the +25% chip names whose blood paid.
-- **§2 — EXECUTE OFFERS ONLY WHAT QUALIFIES.** The door, the picker, its refusal hover and the bot ask one answer
-  (`battle._execute_qualifies`); a body the picker will not name says why on its hover. Eight other cards gate on the board and
-  offer every enemy, unchanged (IK's census; ruling 2).
-- **§3 — TWO PERFECTS.** Sever's lays Sunder one deep for `BattleUnit.SUNDER_TURNS` — Crushing Blow's duration, one constant both
-  read; Reality Fracture's banks the engine's grant a second time (an Arcanist: 2 where any other grade banks 1).
-- **§4 — THE NAMES.** The nodes are Iron Will and Undying Rage again; FX's labels open their words.
-- **§5 — A STRIKE, NAMED ONCE.** The glossary's *Strike Damage* (one hundred and one entries), and eight texts and the ward's chip
-  saying it; no payout widened.
-- **§6 — CAIRNMOSS POULTICE SUSPENDED; THE BOMB's LINE WRITTEN.** `Relics.is_suspended` keeps it out of the boss's unlock, an
-  event's grant, the draft and the shelf — the entry and the player's unlock kept; the items entry carries the bomb's sentence.
-- **§0 — THE RULINGS WRITTEN WHERE EACH BINDS**: the seven over-read runes beside GX's sentence (`CLAUDE.md`), the writing rule for
-  *ally* (the text standard), and the rule that an instrument which cannot read a defect is not one (the instrument rules).
-- **THE INSTRUMENTS.** `check_ik` is new (251 checks); re-pointed where IK moved what they read: `check_gv` §1 (Blood Debt through the player's own cast), `check_ij` §2e and §3 (Sever's and Reality Fracture's Perfects, the two wards, Execute's line), `check_hf` §0 (Clarity's and Profligate's words), `test_batch_bj` §2, `test_batch_br` §1, `check_ek` §4 (the DEBUFF tag's exemption, retired with the label) and `test_batch_ce` (the glossary's 101); `check_fx`, `test_batch_ar` and `test_batch_cp` carry a corrected comment.
-- **THE VERIFICATION.** Two recons (HEAD's battery on IK's code and data, then the complete tree), the twenty-one gate-source readers and `check_gw` over `check_ik` before the acceptance (IJ §0.4), twenty-one controls, two re-tunes and HEAD's code and HEAD's documents under IK's gates, the pre-pass and the acceptance — `docs/reports/IK.md` §9.
-- **`CLAUDE.md` IS 473,839 B = 462.73 KiB AGAINST ITS 510 KiB CEILING — 47.27 KiB UNDER** (+1,073 B at IK):
-  5.8 batches at EZ's record (8,293 B), 29.7 at the mean of IG–IK (1,631 B).
-- **`docs/state.md` IS 359,525 B = 351.10 KiB AGAINST ITS 380 KiB CEILING — 28.90 KiB UNDER** (+2,111 B at IK, this
-  line included): 5.1 batches at IA's +5,860 B, **the worst case**; the honest rate is IG +1,540, IH +2,521, II −1,985,
-  IJ +3,355, IK +2,111 — a mean of 1,508 B over the five, **19.6 batches at it**. **At the worst rates this file runs out first** (5.1 batches against 5.8); **at the honest rates this file does** (19.6 against 29.7). The re-measure is IM's.
-- **No save version moved**: nothing IK changed is saved (a suspended relic's unlock stays in `relics.json` as it was).
+  (`../save-backups/IL-20261016-190213`, md5-verified).
+- **§1 — SANCTITY's SOURCE GAP.** IL re-derived the census — 221 `_apply_status` calls, 117 passing a source and 104 not — and
+  partitioned the 104: **17 a Cleric can source, now passing him** (every one a blessing, a ward or a barrier); **83 no Cleric
+  can source** (another class's card, rune or helper 66, an enemy's 1, a companion's 1, no actor 2, no card or field reaching
+  it 11, and two Cleric clauses nothing reaches today — Dark Pact's Invigoration, Blessed Vestments' ward); **4 a Cleric can
+  cause and that pass nobody, on purpose** — two items, a charmed enemy's Daze, the Ruin primer. The recast gate adds a Hierophant's
+  steps to a Cleric card's proposal, as the door adds them to the write. **The step stays 13**: the rule's events count every
+  status from any source, so the repair cannot raise them — on the same seeds an untalented normal fight ends at 41.55 events and 2.62 steps against HEAD's
+  41.51 and 2.58, inside a standard error, and the default build at 2.47 against 2.48; the door lengthens 5.32 applications a
+  fight where it lengthened 1.18 (SANCTITY's STEP, below).
+- **§2 — THE RUIN RUNG, MEASURED, NOT MOVED.** Ruin and Warden draw one modifier table; Ruin's floor (severity 4) is the table's
+  top, so all three options come from the whole table (mean 2.30 against Warden's 3.29). The offer pool is not the cause, and
+  a full step above Warden's is 4.29, past the table's highest severity — no weighting of this table can meet the condition.
+  Reported, nothing re-weighted (IL's ruling 3).
+- **§3 — THE BOT PLAYS BY THE PLAYER's RULES.** A card's pick narrows in `battle._enemy_pick_pool`, which the picker, the
+  bot's drafted hook and the Swordmaster's rotation (most of the sim's Executes) all ask; Execute's is the only qualifier.
+  **HEAD's bot never aimed an illegal Execute** (513 casts in 5,609 seeded fights), **but the rotation's own copy was stricter
+  than the picker**: with his Rage below the price and the cast free (the tree's *Your First Casts of a Fight Are Free*), it
+  waited for a Broken enemy. A fully talented Swordmaster casts those now — 4 of his party's 20 seeded default runs move (262
+  Executes to 272, no run's outcome) and nothing untalented; §1 beside it moves the same four the same way.
+- **§0 — THE RULINGS BUILT.** Execute's darkened button says *No enemy is below 20% health or Broken* (its line read off
+  `_execute_line`; the cost's reason wins); Empty Pulpit, Dead Air **and Dirge** say *strike damage* (the crest chip too); Blood
+  Debt names *the enemy with the most health*, the tie rule in the glossary's new `most_health` (one hundred and two entries);
+  the gate-source derivation reads both routes (twenty-three at IL: `check_gw` by the list, `check_il` among the root's); slot 0's dead Perfects are asserted.
+  **Found against the brief**: the Cairn of the Fallen is an EVENT (its weight 8 is true — no relic carries one); the strike's
+  shape has five more texts the census graded true (IL's ruling 2).
+- **THE INSTRUMENTS.** `check_il` is new (86 checks); re-pointed where IL moved what they read: `check_ij` §0.4 (both
+  routes) and §3 (five Cleric durations), `check_dm` §1 (three anchors), `check_ik` §2e and §2f (the picker's pool), `check_hp`
+  §2a (the crest words), `test_batch_ce` (the glossary's 102) and `check_ia` §2d (the event's ordinary rune is one it can hand
+  over — a pick by shown words that Blood Debt's new words turned over, found by recon 1); `check_di`'s comment records the move.
+- **THE VERIFICATION.** Two recons (HEAD's battery on IL's code and data, then the complete tree), the gate-source
+  readers (twenty-three, `check_il` among them) over `check_il` before the acceptance, the controls, HEAD's code under IL's
+  gate, the pre-pass and the acceptance — `docs/reports/IL.md` §9.
+- **`CLAUDE.md` IS 475,705 B = 464.56 KiB AGAINST ITS 510 KiB CEILING — 45.44 KiB UNDER** (+1,866 B at IL):
+  5.6 batches at EZ's record (8,293 B), 28.8 at the mean of IH–IL (1,617 B).
+- **`docs/state.md` IS 365,112 B = 356.55 KiB AGAINST ITS 380 KiB CEILING — 23.45 KiB UNDER** (+5,587 B at IL, this
+  line included): 4.1 batches at IA's +5,860 B, **the worst case**; the honest rate is IH +2,521, II −1,985, IJ +3,355, IK +2,111, IL +5,587 — a mean of 2,318 B over
+  the five, **10.4 batches at it — BELOW FIFTEEN, THE ALARM IL's BRIEF NAMED, AND THE ARCHIVE PRACTICE IS ITS FIRST ANSWER,
+  NOT THE RE-MEASURE** (IL's ruling 7). IL moved what it closed (the archive's IL block) and grew the file by its rulings, its
+  re-measure and its finds. **At the worst rates this file runs out first** (4.1 batches against 5.6); **at the honest rates this file does** (10.4 against 28.8). The re-measure is IN's.
+- **No save version moved**: nothing IL changed is saved.
 - **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in a build
   older than HL**: HL's ceiling refuses a newer save from HL's build on — HR's v15 is the first bump it has guarded — and HJ's and
   HK's builds, and `main`, carry no ceiling.
-- **Next letter: IL — Sanctity's source gap and the Ruin rung's severity, each measured before and after** (the roadmap, below).
+- **Next letter: IM — the eight cards' partition, `master.html`'s sweep and the picker's remainder** (the roadmap, below).
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### IK's RULINGS OWED — **SEVEN; THE FIRST IS STILL THE DESIGNER's PLAY, WITHOUT THE DEBUG MENU, AND THE REST ARE WHAT IK's CENSUSES FOUND BESIDE ITS REPAIRS**
+### IL's RULINGS OWED — **SEVEN; THE FIRST IS STILL THE DESIGNER's PLAY, AND THE REST ARE WHAT IL's MEASUREMENTS AND RE-DERIVATIONS FOUND**
 
-Full working: `docs/reports/IK.md`, NEEDS A RULING.
+Full working: `docs/reports/IL.md`, NEEDS A RULING.
 
-1. **PLAY ONE ZONE WITHOUT THE DEBUG MENU, AND SEND THE FILE** (IH's ruling 1, carried — II §0.1, IJ §0.1, IK §0.1: four batches
-   old). The readout names every debug action, so a file that names none is play. It answers Boil Over's rate, Rupture's number, the
-   vow's worth and the Cleric's Mana, and **its first Hierophant confirms Sanctity's step** (13) — on IL's repaired code, once IL
-   lands.
-2. **EIGHT OTHER CARDS GATE ON THE BOARD AND OFFER EVERY ENEMY, AS EXECUTE DID** (IK §2's census). Cull, Requiem, Funeral Pyre and
-   Pyre Wake consume what the TARGET carries, and Hunt reads the target's afflictions, so a pick of a bare enemy is a dud or a
-   floor; Firedraw, Transference and Cryoclasm move something ONTO the target from elsewhere, so a pick of the one body that holds
-   it moves nothing. **None of their words names a target**, which is why Execute's fix did not reach them; narrowing any is a
-   change to that card.
-3. **THE BOT AIMS A DRAFTED EXECUTE AT THE LOWEST-HEALTH ENEMY** (`battle._bot_drafted_pick`), which can be above the line and not
-   Broken; the Swordmaster's own rotation picks a legal victim through `_execute_qualifies`. Any other Warrior who drafts it is the
-   case. Narrowing the hook is a sim policy, and it moves sim figures.
-4. **EXECUTE's DARKENED BUTTON SAYS NOTHING.** Every other gate on the board adds its reason to the button (*Nothing is Burning*,
-   *No Ruin on the field to consume*); Execute's has none — one line of new wording.
-5. **TWO MORE CENSUS ROWS OF THE STRIKE's SHAPE** (IK §5's re-read, closed by the census): N077 Empty Pulpit's *50% less damage*
-   and N078 Dead Air's *75% more damage* are read in the strike loop alone (`dmg_taken_bonus`, `dmg_bonus`) — the census graded the
-   figures and noted the scope. Crest runes, which IK's brief left untouched (§8); the word waits on the crest's own batch.
-6. **WHICH TWO RELICS THE FALLEN-HERO RULING PRICES** (IK's brief §6: *three crest runes and two relics*): IK reads them as
-   Cairnmoss Poultice and Martyr's Knucklebone, the two whose hooks carry `rest_heal_add` — the brief names only the first.
-7. **THE BLOOD DEBT RUNE's WORDS DO NOT SAY WHICH ENEMY PAYS** (*Costs the ENEMY's health instead of his*). The brief ruled them
-   literally true once the rune fires, and they stand; naming *the enemy with the most health* is one clause if wanted.
+1. **PLAY ONE ZONE WITHOUT THE DEBUG MENU, AND SEND THE FILE** (IH's ruling 1, carried — II §0.1, IJ §0.1, IK §0.1, IL §0.1:
+   five batches old). The readout names every debug action, so a file that names none is play. It prices Boil Over's rate,
+   Rupture's number and clock, the vow's worth and the Cleric's Mana, and **its first Hierophant confirms Sanctity's 13 on IL's
+   repaired code**.
+2. **FOUR MORE TEXTS OF THE STRIKE's SHAPE** (§0.3's re-derivation): N077 and N078 were the brief's ninth and tenth; **Dirge
+   (N079) reads the same field at the same line and took the word with them** — its chip and theirs are one builder, and a
+   crest rune's true word is not a re-cut (the brief's own ruling). **Still saying bare damage, each read in the strike loop
+   alone through the same two fields**: the tree's *More Damage Dealt* and *Less Damage Taken* (R036, R037) and the Dragonbone
+   Idol and the Horn of the First War (R073, R078) — IJ's census graded all four true. One word each, and no payout widens.
+3. **THE RUIN RUNG's CONDITION CANNOT BE MET, AND ITS LEVER IS NOT THE POOL** (§2; the brief's own stop condition). Ruin and
+   Warden draw one table; the difference is the floor, which at severity 4 is the table's top, so no gamble pool stands above
+   it and all three options come from the whole table. **A full step above Warden's 3.29 is 4.29, past the table's highest
+   severity of 4.** What a lever over this table would buy, off its counts (6 / 6 / 4 / 4), the safe slot left drawing the whole
+   table: Ruin's two gambles from severity 3–4 — about 3.10, still below Warden; from severity 4 alone — about 3.43, 0.14
+   above; every option severity 4 — 4.00, 0.71 above, the most any weighting gives. The condition, the lever or the table is yours; G080L's *weighted toward the mild end* still holds.
+4. **THE CAIRN OF THE FALLEN IS AN EVENT, AND ITS WEIGHT IS TRUE** (§0.5): events draw by weight and the Cairn's is 8; no relic
+   carries a weight, and IK's premise 27 stands. **Nothing was retired, and the claims stay at 86.** The fallen-hero ruling
+   prices three crest runes, two relics, the event and the map's Revive Potion (THE CREST POOL, below).
+5. **A CHARMED ENEMY's DAZE AND THE POUCH's TWO STATUSES STAY SOURCELESS BY RULE** (§1's kept-apart four, with the Ruin
+   primer). DI §2 left the Daze unstamped as an ambiguous source — *an enemy applying to an enemy* — though `battle.gd` calls it
+   the Occultist's work, and the potions are the party's. Making either the Cleric's lengthens it for a Hierophant, lets
+   Downwind copy the Daze and counts it as his in the recap: yours.
+6. **THE SIM's `st/b` COLUMN NOW COUNTS THE CLERIC's BLESSINGS** (§1's move). The door counts every status a hero lands on
+   another body, and the seventeen are such statuses — Renewal and Consecrated Ground already counted. BF had called it a debuff
+   counter; whether it should count afflictions alone is a change to the door's tally, not made.
+7. **THIS FILE's HONEST RATE IS BELOW FIFTEEN BATCHES** (WHERE, above). The archive practice is the first answer: IL moved what
+   it closed, and the next pass — a census of the live file's closed blocks, not a batch's own closings — is yours to schedule.
 
 ### THE CLERIC's MANA RATE — **12, UNMOVED (IE §1); THE TUNING HANDLE AND THE FIGURES IT WAS MEASURED AGAINST**
 
@@ -132,24 +154,45 @@ caveat the sim cannot close (the bot heals when hurt, a player when it matters) 
 member's maximum was a fixed 100 (IG §4 changes that for a node-holder; the untalented rows hold no node) — re-read at IG §4c
 on the default build with the relic held: dry 0.7 / 2.9 / 0.3%, opening a fight full 39.2 / 42.5 / 35.6% (24.1 / 36.5 / 15.4% before).
 
-### SANCTITY's STEP — **13 (IG §2), CONFIRMED IN II's BRIEF (§0.2); THE TUNING HANDLE AND THE FIGURES IT WAS SET ON**
+### SANCTITY's STEP — **13 (IG §2), CONFIRMED IN II's BRIEF (§0.2), RE-MEASURED ON THE REPAIRED CODE AT IL §1c AND UNMOVED; THE TUNING HANDLE AND THE FIGURES IT WAS SET ON**
 
 **`BattleUnit.SANCTITY_PER_STEP` is 13 events a step, `SANCTITY_MAX_STEPS` 5** (16 from FV §3 to IG). `check_ig` §2 pins the step in
 one place, so a re-tune from play moves the constant and that line. **The target is FV §3's and was not reopened**: about half the
-cap by a normal fight's end on untalented rung-1 fights. **The figures** (IE's probe: a Hierophant beside the default lineages, 20
-runs a party at HEAD, 60 at §1 untalented; events at a fight's end):
-
-| | HEAD (IF's code, chips as statuses) | §1 (every chip drawn) |
-|---|---|---|
-| Default build: events a fight (zone 1 / 2 / 3) | 43.7 (36.6 / 44.2 / 49.6) | 38.5 (31.4 / 39.7 / 43.9) |
-| Default: a normal fight / an elite / a boss, events | 43.2 / 39.5 / 59.1 | 39.3 / 34.1 / 51.0 |
-| Untalented: a normal fight, events — steps at 16 | 42.3 — 2.14 | 41.0 — 2.06 |
-| **Untalented: a normal fight, steps at 13** | — | **2.58** (14: 2.38) |
-| Untalented: a boss, steps at 13 — at the cap | — | 4.04 — 42.8% (at 16: 3.37 — 17.6%; HEAD at 16: 20.3%) |
-| Untalented: his first / second step at 13, by his turn | — | 3.04 (92.5%) / 5.13 (68.3%) |
-
-Untalented 1,391 fights at HEAD and 3,988 at §1; default 1,658 and 1,697. **The readout carries his steps a fight; the first
+cap by a normal fight's end on untalented rung-1 fights. **IG's figures, the ones the step was set on** (IE's probe on IF's code against every chip drawn — 2.58 steps
+untalented and 2.51 default at 13, a boss 4.04) **are archived at IL**: IL's HEAD arm, below, reproduces them on seeds. **The readout carries his steps a fight; the first
 Hierophant run of the designer's play confirms it** (II's ruling 1).
+
+**RE-MEASURED AT IL §1c, ON THE REPAIRED CODE, AND THE STEP STAYS 13** — the measurement does not ask for a move. IG's probe
+(the same three parties, the Cleric awakened with the Hierophant's rune, rung 1), **every run seeded so HEAD and the repair
+played the same seeds**; untalented 60 runs a party an arm, the default build 20; IL's code arm is §1 alone:
+
+| | HEAD (IK's code) | IL §1 alone |
+|---|---|---|
+| Untalented: events at a normal fight's end — steps at 13 (14) | 41.51 — **2.58** (2.40) | 41.55 — **2.62** (2.43) |
+| Untalented: a boss — steps at 13, at the cap | 3.99, 38.3% | 3.97, 40.8% |
+| Untalented: his first / second step, by his turn | 2.99 (93.0%) / 5.09 (70.2%) | 2.96 (92.7%) / 5.02 (70.2%) |
+| Default: events at a normal fight's end — steps at 13 | 38.56 — **2.48** | 38.34 — **2.47** |
+| Default: a boss — steps at 13, at the cap | 3.42, 18.3% | 3.29, 15.0% |
+| **Applications the door lengthened, a fight (turns added)** — untalented / default | 1.18 (2.59) / 2.19 (4.27) | **5.32 (12.70) / 5.16 (10.84)** |
+| Untalented: runs completed (paired: completed only in this arm) | 64 of 180 (28) | 76 of 180 (40) |
+
+Untalented 3,946 fights at HEAD and 4,053 at §1; default 1,663 and 1,686. **The events did not rise because they cannot**: the
+ledger counts every status landing on or leaving any body from any source, so naming the Cleric changes how long his
+statuses last, not whether they count. The 0.04 rise in steps is inside one standard error (±0.03 an arm), and 13 and 14
+straddle 2.5 at both readings. **What the repair moved is the payout's reach** — four and a half times the lengthened
+applications on the designer's build — and the completions it bought are not significant at this n (28 against 40 runs).
+
+### FOUND AT IL AND NOT FIXED
+
+- **TWO CLERIC CLAUSES LAY A STATUS WITH NO SOURCE AND ARE DORMANT** — Dark Pact's Invigoration (`invigoration_ranks`) and
+  Blessed Vestments' ward (`vestments_pct`): no writer in the tree, so no fight reaches either, and IL §1 left both. Each owes
+  the Cleric as its source the day its field is written; `check_il` §1a reds that day, naming the field.
+- **`docs/combat-rules.md`'s HEADER CLAIM IS STALER AGAIN** — IL wrote into its DI block (*a status is applied with its `src`*).
+  Among the 86, IO's (FOUND AT HZ).
+- **UNDER WARDED, THE UPGRADED EXECUTE's POOL READS THE LIST PRICE** (read off the code, not driven). `_enemy_pick_pool` keeps
+  the Broken alone when `ab.cost > u.resource`, and the ward prices a cast at 1.25 times that; with his Rage between the two and a
+  Broken enemy lighting the button, the pick offers an unbroken body below the line that the ward's price puts out of his reach —
+  the disagreement IK's comment names. One test a body (`_eff_cost(u, ab, e)`) closes it; IK's picker, so left.
 
 ### FOUND AT IK AND NOT FIXED
 
@@ -157,11 +200,6 @@ Hierophant run of the designer's play confirms it** (II's ruling 1).
   and the other sites lay Sunder for a figure of their own: Called Shot's *Armor* spot 2, Mass Hysteria's turned blow 3, the
   enemies' Sundering Strike and Tyrant's Verdict 2 (`data/enemies.json`), and Consecrated Ground's Judgement 2 (a field nothing
   writes since FX, so dormant). Each is its card's figure, stated where it stands; none reads the constant.
-- **THE GATE-SOURCE READERS' DERIVATION MISSES A GATE THAT READS THE BATTERY's LIST.** IJ §0.4's population is the
-  targets whose source opens the root (`check_ij` §0.4, twenty-one at IK); `check_gw` §2 reads every battery target's source
-  through `run_battery.sh`'s list instead, so the derivation leaves it out — and recon 2 read it red on a new gate's one hand-set
-  field (97 sites against its 96; `check_ik`'s vow is seated through the spawn since, 96). IK ran it beside the readers before the
-  acceptance. **Widening the derivation to a target that reads the battery's sources is `check_ij`'s change, owed.**
 
 ### FOUND AT IJ AND NOT FIXED
 
@@ -280,10 +318,20 @@ block.
   unconditional — a narrow design for the one slot the party shares. **The direction out**: `heroes_hold_core` has been live since
   HQ and is a condition that is not a death, so a crest rune keyed on what the party CARRIES is buildable today against HO §3's
   census. **Authoring one is the designer's.**
-- **WHAT NOW PRICES THEM: WHETHER A FALLEN HERO STAYS DOWN BETWEEN FIGHTS** (FOUND AT HO) — **and since IK §6 two relics with them**:
-  Cairnmoss Poultice's re-cut rides the post-fight recovery at a number that ruling sets, beside the Cairn of the Fallen and the map's Revive Potion. Brought back at the fifth every victory
-  writes, the three pay for a few turns of a fight; if a fall lasted they would pay for whole fights. **That item is no longer only a
-  difficulty ruling — it sets the value of three of four crest runes, and it is owed before any of them is re-cut.**
+- **WHAT NOW PRICES THEM: WHETHER A FALLEN HERO STAYS DOWN BETWEEN FIGHTS** (FOUND AT HO). Brought back at the fifth every
+  victory writes, the three pay for a few turns of a fight; if a fall lasted they would pay for whole fights. **That item is no
+  longer only a difficulty ruling — it sets the value of three of four crest runes, and it is owed before any of them is re-cut.**
+  **It decides four other things, each a different thing (IL's brief §0.5, corrected at IL: the Cairn is an event, not a relic)**:
+  - **The Cairn of the Fallen — an EVENT that cannot be drawn at all.** Its `fallen_hero` requirement is a member at 0 health
+    between fights, which nothing holds (FOUND AT HO). If a fall persists the requirement becomes reachable and the event lives
+    with no change. Events draw by weight and its weight of 8 is true; no RELIC carries a weight (IK's premise 27 stands).
+  - **Cairnmoss Poultice — a relic, suspended since IK §6.** Its whole effect was the retired rest node's; its new effect rides
+    the post-fight recovery at the number that ruling sets.
+  - **Martyr's Knucklebone — a relic that works, one clause short.** It kept its victory heal and lost the dead rest clause
+    (`rest_heal_add`); whether the lost clause is replaced, and with what, is the ruling's. It is the mildest of the three and may
+    need nothing. `master.html`'s hook paragraph names it alone, and is right to: the other relic is suspended and the Cairn is an
+    event the document does not list.
+  - **The map's Revive Potion**, which has nobody to raise on the map (FOUND AT HO).
 
 ### FOUND AT ID AND NOT FIXED
 
@@ -394,26 +442,29 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
 - **`run_battery.sh` STILL DOES NOT ASK WHETHER THE GAME IS OPEN, AND A PLAIN `kill` STILL DOES NOT STOP IT** (HT's two, carried).
 ### THE PLAYTEST'S OTHER FINDINGS — **LATER BATCHES BY RULING (HW's brief §5); THE ROADMAP HOLDS THE ORDER**
 
-- **THE RE-MEASURE IS SCHEDULED, NOT PARKED (IC §5, the designer's) — IT IS IM (IK's brief §8; II's brief gave it IK, and IK's
-  brief gave IK the census's code defects and IL two measured magnitudes)** — both ceilings run out within a batch of each other at the worst rate and far later at
+- **THE RE-MEASURE IS SCHEDULED, NOT PARKED (IC §5, the designer's) — IT IS IN (IL's brief §5; IK's brief gave it IM, and IL's
+  gave IM the eight cards' partition and `master.html`'s sweep)** — both ceilings run out within a batch of each other at the worst rate and far later at
   the honest one (the WHERE block's two readings, each with both rates), so a re-measure that waits finishes as the room runs out;
   **II §4's archive pass did not move it back** (`CLAUDE.md` −56 B at II),
   **nor did IJ's struck lines** (`CLAUDE.md` −1,947 B at IJ). **The block index and HV's pilot still wait on it.**
   **THE ORDER:**
-- **IL — SANCTITY's SOURCE GAP AND THE RUIN RUNG's SEVERITY, EACH A MAGNITUDE MEASURED BEFORE AND AFTER (IK's brief §0.5,
-  §0.10).** **Sanctity**: 104 of the 214 `_apply_status` calls pass no source and lengthen nothing (FT §3's gap); IL partitions
-  them by whether a Cleric can be the source, repairs the ones that can, and re-measures the step (13 at IG) on the repaired code
-  — **R016's words stand.** **The Ruin rung**: Ruin's mean severity at 2.31 against Warden's 3.29 is the defect (EP §1); the
-  condition the designer set is **Ruin's mean above Warden's by at least a full step at the census's own sample**, and **the lever
-  is Ruin's OFFER POOL, never the severity values** (Warden, the merchant and the map read them). **R091's and the glossary's road
-  entry stand, and *weighted toward the mild end* (G080L) agrees with the code today and stays.**
-- **IM — THE RE-MEASURE**: `CLAUDE.md` binds first at the honest rates (II's brief §4 read it first at every rate; this file runs
+- **IM — THE EIGHT CARDS' PARTITION, `master.html`'s SWEEP AND THE PICKER's REMAINDER (IL's brief §0.7, §0.10).** **The
+  cards**: Firedraw, Transference and Cryoclasm move a thing onto the target, so the one body already holding it is a dud and is
+  refused as Execute's are, a reason on its hover; Cull, Requiem, Funeral Pyre, Pyre Wake and Hunt read what the target carries,
+  and IM partitions the five by the rubric the designer ruled — **a pick that can produce nothing is refused with a reason; a
+  pick that produces less is offered** (`CLAUDE.md`, beside the bot's rule, RULED, NOT BUILT). A narrowing lives in
+  `battle._enemy_pick_pool`, so the bot reads it the day it is written (IL §3). **`master.html`**: a surface the census did not
+  cover and carrying false facts (IK found Blood Price's row); IM sweeps it with IJ's rubric and IJ's resolver where a figure has
+  a door. **Ruled at IL, before IM: the Ruin rung's condition is unmeetable over this table and its lever is not the pool — a
+  re-ruling is owed first (IL's ruling 3).**
+- **IN — THE RE-MEASURE**: `CLAUDE.md` binds first at the honest rates (II's brief §4 read it first at every rate; this file runs
   out first at the worst ones — the WHERE block), and the room is planned against the honest rate. **119 of 126 blocks bind. So
   archiving will never SHRINK CLAUDE.md — it can only stop it growing, and II proved it at the margin: 3,105 B out, 3,049 B
   written back, 56 B net. The next byte comes from the file's SHAPE, not from its contents** (IJ's brief §0.3, the designer's).
   The two readings go beside the record with the honest rate, and say which file runs out first at which rate (IK's brief §8).
-- **IN — THE CLAIMS**: HX's 87 stand at **86** — the per-batch re-read stops the backlog growing and does not retire it, so it is a
-  batch of its own (FOUND AT HX, FOUND AT IA).
+- **IO — THE CLAIMS**: HX's 87 stand at **86** — the per-batch re-read stops the backlog growing and does not retire it, so it is a
+  batch of its own (FOUND AT HX, FOUND AT IA). **The Cairn's *weight 8* is not one of them and is true** (an event's weight; IL
+  §0.5), so the figure does not fall for it.
 - **MANA STAYS (ruled).** The finding was that the Mage and the Hunter run dry and only the Cleric is always full; **measured at IE
   the sim does not show it**, and IF found the cause the designer saw — the Cracked Hourglass refilled the Cleric and not the Hunter
   (repaired, IF §0.1b); the rate is unmoved and is ruled after the readout (IF's rulings 1 and 2). **Channel's tempo payout — Mana
@@ -424,7 +475,7 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
   IF §2) and the readout writes every one that forms, its ticks and its Break (IF §1); a meter is
   not a conjunction half; Marrowfire becomes Sunder + Burn pending the design pass; the Occultist's Break card is CE §3's ask;
   the Skirmisher and the Tracker are ruled and unbuilt, with Volley's and Ambusher's core slots and both names owed; whether a
-  fallen hero stays down between fights (it prices three crest runes and two relics since IK §6); Tithe's read site; **the strike
+  fallen hero stays down between fights (it prices three crest runes, two relics, an event and the map's Revive Potion — IL §0.5); Tithe's read site; **the strike
   payouts' widening, a measurement — and whether Profligate's price narrows with its payout, a magnitude (both IK §5)**; **no page key and no targeted debug card pick** — each available if
   the designer asks (HU; recorded nowhere in this file until HX).
 ### FOUND AT HV AND NOT FIXED
@@ -527,7 +578,7 @@ game — HO caught one. `CLAUDE.md`'s rule-engine block carries the same marker.
   A RULING: WHETHER A FALLEN HERO STAYS DOWN BETWEEN FIGHTS (still open, not decided at HP, HP §7).** It is a difficulty
   ruling — **and since IA §0.2 (the designer's) it prices three of the four crest runes**, which pay for a few turns while a fall
   lasts a fight and would pay for whole fights if a fall lasted longer: it is owed before any of them is re-cut (THE CREST POOL,
-  above). HP's ruling 1 had decoupled it from the runes' authoring. `fallen_cairn` (weight 8)
+  above). HP's ruling 1 had decoupled it from the runes' authoring. `fallen_cairn` (an event's weight 8, true — IL §0.5)
   requires a member at 0 health and raises the fallen at 35%; **Cairnmoss Poultice waits on the same ruling since IK §6** (suspended
   from every draw, its re-cut riding the post-fight recovery); the one line that writes a member's health to 0 is the
   fight's own banking (`battle._bank_party_losses`), which stops once a fight is decided, and every victory then writes
@@ -1767,9 +1818,10 @@ constant, so each ruling is a one-line change. Full working and the measurements
   steps (Devout / Holy / Occultist). **Owed a re-reading the day the potency half lands** — `CLAUDE.md`
   binds the potency batch to re-measure it in that same batch.
   - **AND TWO THINGS THAT ARE NOT RATES DECIDE WHAT POTENCY WOULD BE WORTH, BOTH FOUND AT FV §3:** the
-    Devout's Divine Shield barrier is applied WITHOUT a `src`, so no payout keyed on the applier reaches
-    his shields; and the Occultist's Ruin is battle-long and magnitude-free at the funnel. **Neither is
-    owed until a potency half exists; both are what that batch meets first.**
+    Devout's Divine Shield barrier was applied WITHOUT a `src` — **it carries the Devout since IL §1**, and
+    it is battle-long, so the duration payout cannot lengthen it; and the Occultist's Ruin is battle-long
+    and magnitude-free at the funnel. **Neither is owed until a potency half exists; both are what that
+    batch meets first.**
 - **AND THE ONE THAT IS NOT A NUMBER: HOW A SECOND METER DISPLAYS.** The nameplate bar is ONE fill,
   ONE colour chosen by a ternary on the NAME and ONE label, and it breaks by construction under two
   currencies. **The game already answered this three times and never widened the bar** — Faith,
@@ -2939,7 +2991,11 @@ re-derived from the source at DM; not one was moved.**
   this is owed rather than settled.
 - **`_apply_status`'s `src` COVERAGE IS PARTIAL, AND THE REST ARE OWED.** DI stamped the
   36 sites that can apply a status **Harvest reads** and DJ added the seven companion sites; the
-  rest apply buffs, marks and hero-side wards, so **nothing currently mis-credits off them**.
+  rest apply buffs, marks and hero-side wards, so **nothing currently mis-credits off them** —
+  **but Sanctity's payout reads the source too (FT), and IL §1 partitioned the 104 sourceless calls
+  by whether a Cleric can be their source and passed him at the seventeen he can; the partition is
+  `docs/reports/IL.md` §1, and the 87 left are another class's, an enemy's, a companion's, no actor's,
+  dormant, or kept apart by DI's rule (`check_il` §1a).**
   **Do not quote coverage without re-deriving it** — `check_di` §1 walks the file and PRINTS the
   live count on every battery run. **DP MOVED THE DENOMINATOR AND NOT THE NUMERATOR**: the
   re-pointed Spread of Madness deleted `_apply_status(infected, "psychosis", 3)`, an UNSTAMPED

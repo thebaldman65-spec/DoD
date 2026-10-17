@@ -1981,6 +1981,11 @@ NOT a wrapping problem.
   under it from a list; all are cheap, so all run. A target that loads another gate by its own path reads a named file,
   never a new one, and is not this population. Each reads its count with no failure before the acceptance, and the new
   gate's own reading is taken in the same pass.
+- **AND IT IS EVERY ROUTE A TARGET READS ANOTHER TARGET's SOURCE BY, NOT THE ONE IJ DERIVED (IL §0.6 — IJ §0.4's own
+  defect, the designer's).** Two routes stand: the targets that open the root, and the targets that read the battery's own list off `run_battery.sh` and open each target it names. `check_gw` §2 takes the second, so the first alone missed it, and IK's recon 2 read it red on a new
+  gate's one hand-set field where every reader had read green. **Twenty-three at IL** — the twenty-two that open the root,
+  `check_il` the new one among them, and `check_gw`; `check_parse` takes both — and `check_ij` §0.4 derives both routes off the tree and prints the count. A
+  route found later joins that derivation in the batch that finds it, and its readers run with the rest.
 
 ## STANDING RULE — AN INSTRUMENT THAT CANNOT READ A DEFECT IS NOT AN INSTRUMENT (Batch IK §0.12, ruled by the designer)
 > **AN INSTRUMENT THAT CANNOT READ A DEFECT IS NOT AN INSTRUMENT.** A sweep that reads nothing of everything has failed until

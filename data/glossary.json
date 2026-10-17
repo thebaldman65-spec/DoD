@@ -82,6 +82,17 @@
   ]
  },
  {
+  "id": "most_health",
+  "term": "The Enemy With the Most Health",
+  "category": "combat",
+  "short": "Where a rule picks an enemy for you, it is the one with the most health left - the first in the warband on a tie.",
+  "long": "Some rules choose the enemy themselves: the Blood Debt rune bills the enemy with the most health for Blood Price, and the Tracker's and the Arbiter's marks, when the enemy wearing one falls, move to the enemy with the most health. It is the living enemy with the most health LEFT, counted in points rather than as a share - so a large enemy at half health is picked over a small one untouched. On a tie it is the first in the warband, the order the enemies stand in. No die is rolled, so the pick can be planned around.",
+  "see_also": [
+   "hero_vs_ally",
+   "frenzy_floor"
+  ]
+ },
+ {
   "id": "miss",
   "term": "Missing",
   "category": "combat",

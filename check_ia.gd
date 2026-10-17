@@ -546,9 +546,15 @@ func _s2d_the_event_door() -> void:
 		"§2d: the event slotted the core rune it handed over — one choice handing over two things")
 	ok(line.contains("held, not worn"), "§2d: the event's line does not say the core rune is held: '%s'" % line)
 	# THE POSITIVE ARM: an ordinary rune the verb hands over with a slot free is still worn.
+	# BATCH IL — THE RUNE IS ONE THE VERB CAN HAND OVER. The longest by its shown words was Whetstone until IL gave
+	# Blood Debt words with no token in them (the payer named), and Blood Debt asks for Blood Price, which a fresh run's
+	# Warrior does not hold — so the arm parked everything but a rune no door could give, and read *nothing answers*.
+	# The arm is about the verb wearing what it hands over, so it takes the longest one the Warrior can be offered.
 	_new_run()
 	var w2: Dictionary = _run.party[0]
-	var ord: String = _ordinary("warrior")[0]
+	var can_now := _offerable_now()
+	var ords: Array = _ordinary("warrior").filter(func(id): return can_now.has(String(id)))
+	var ord: String = String(ords[0]) if not ords.is_empty() else ""
 	_park_all_but([ord])
 	var line2: String = Events.apply(_run, {"effect": "rune_grant", "amount": 1})
 	_run.pending_rune_drops = []
@@ -557,7 +563,7 @@ func _s2d_the_event_door() -> void:
 		if String((r2 as Dictionary).get("id", "")) == ord and bool((r2 as Dictionary).get("equipped", false)):
 			worn2 = true
 	ok(worn2 and not line2.contains("held, not worn"),
-		"§2d: an ordinary rune the event handed over with a slot free was not worn ('%s')" % line2)
+		"§2d: an ordinary rune (%s) the event handed over with a slot free was not worn ('%s')" % [ord if ord != "" else "none offerable", line2])
 	print("  the event door: a core rune held ('%s'); an ordinary one worn ('%s')" % [line, line2])
 
 

@@ -47,18 +47,22 @@ const Gate = preload("res://gate_fixture.gd")
 # [label, CLAUSE line (the unique anchor), the WALK above it, the largest gap
 # allowed between them]. The gap is what makes it a pin on the CLAUSE rather
 # than on the neighbourhood: a clause lifted out of its loop moves past it.
+# BATCH IL §1 RE-POINTED THREE ANCHORS, AND THE WALKS DID NOT MOVE: Bulwark's, Divine
+# Wrath's and Sacred Resolve's applies pass the Cleric as their source now (the
+# Hierophant's *each status the Cleric applies*), so each anchor carries the
+# `, 0, 0, attacker` Consecrated Ground's always did. The collection is the pin.
 const CLAUSES := [
 	["Bulwark of Fortitude — the three receivable clauses share ONE collection",
-		"_apply_status(h, \"bulwark\", bw_turns)",
+		"_apply_status(h, \"bulwark\", bw_turns, 0, 0, attacker)",
 		"for h in heroes.filter(func(he): return not he.dead and not he.is_companion):", 120],
 	["Consecrated Ground — mitigation and reflect, the same one collection",
 		"_apply_status(h, \"cons_ground\", 3, 0, 0, attacker)",
 		"for h in heroes.filter(func(he): return not he.dead and not he.is_companion):", 120],
 	["Divine Wrath — one apply for BOTH of its clauses",
-		"_apply_status(h, \"wrath\", 4)",
+		"_apply_status(h, \"wrath\", 4, 0, 0, attacker)",
 		"for h in heroes.filter(func(he): return not he.dead):", 120],
 	["Sacred Resolve — the split's apply",
-		"_apply_status(h, \"unity\", res_turns)",
+		"_apply_status(h, \"unity\", res_turns, 0, 0, attacker)",
 		"for h in heroes.filter(func(he): return not he.dead):", 120],
 	["Battle Shout — the GROUP clause",
 		"_apply_status(h, \"battle_shout\", shout_turns, shout_pct)",

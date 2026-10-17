@@ -76,7 +76,7 @@ GATES=(check_parse check_flow check_map check_cl_resolver check_cl_width
        check_hi check_hk check_hl check_hn check_ho check_hp check_hr check_hs
        check_ht check_hu check_hv check_hw check_hx check_hy check_hz check_ia
        check_ib check_ic check_id check_ie check_if check_ig check_ih check_ii
-       check_ij check_ik)
+       check_ij check_ik check_il)
 
 [[ $# -gt 0 ]] && { SUITES=(); for a in "$@"; do SUITES+=("test_batch_$a"); done }
 

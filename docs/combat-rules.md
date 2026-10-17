@@ -382,6 +382,14 @@ be found by counting call sites, never by playing.
 · **AND MEASURE COVERAGE WITH A WALK, NOT A `grep`** — see the second standing rule below, which
   DJ earned from this. `check_di` §1 balances parens, skips comments, and PRINTS the live figure
   on every battery run.
+· **AND A STATUS A CLERIC LAYS ON HIS OWN SIDE CARRIES HIM AS WELL (IL §1; the Hierophant's *each status the
+  Cleric applies*, IJ's ruling 9).** The batches after DI left hero-side grants unstamped because nothing read their
+  source — not Harvest, not the debuffer's tally — and that stopped being true at FT, when Sanctity's payout began
+  reading the applier at this door. **IL partitioned the hundred and four sourceless calls by whether a Cleric can be
+  the source**, and passed him at every live call he can source: seventeen, every one a grant, a ward or a barrier.
+  **Four a Cleric can cause stay sourceless under this block's ambiguity rule**: the Defense Potion's and the Cursed
+  Visage's (the party uses items), a charmed enemy's Daze (DI §2's own row) and the Ruin primer (the engine's own
+  clock). The partition and its command are IL's report, §1; `check_il` §1a holds it.
 
 ## STANDING RULE — `heroes` DOES NOT CONTAIN THE COMPANIONS; `companions` DOES (Batch DJ §1)
 > **Any loop implementing the *ally* convention must read BOTH.** A loop over `heroes` alone

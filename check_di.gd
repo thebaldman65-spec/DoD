@@ -134,6 +134,16 @@ const SRC_FLOOR := 107
 # unstamped remainder stays 104. Found by running this gate unmodified against
 # IE's code in the reconnaissance, where its prediction did not name it: a pin
 # that is a number is one no literal sweep can see.
+#
+# **BATCH IL DID NOT MOVE IT — 221 STILL — AND MOVED THE SPLIT, AND SAYS WHY.** No site
+# arrived or left; seventeen that passed no source pass the Cleric now, so `with_src`
+# moves 117 -> 134 and the unstamped remainder 104 -> 87. **They are HERO-SIDE grants, and
+# the reading above that called such a grant *correctly unstamped* stopped holding at FT**:
+# nothing Harvest reads and nothing `_note_debuff_applied` counts was true, but Sanctity's
+# payout reads the applier at the door, and the Hierophant's words say *each status the
+# Cleric applies* (IJ's ruling 9, IL §1). The four he can cause and that stay unstamped are
+# this gate's own DI §2 rule — the potions, the charmed Daze — and the Ruin primer.
+# `SRC_FLOOR` is a ratchet and did not have to move; `check_il` §1a holds the seventeen.
 const CALL_SITES := 221
 
 # Four plain afflictions: all in `DEBUFF_IDS`, none sticky, none on the boss

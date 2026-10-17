@@ -4,6 +4,35 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The two measured defects (Batch IL) — 2026-10-16
+
+**Why the Cleric is passed as the source of his own blessings.** The Hierophant's rune says it lengthens each status the
+Cleric applies, and the door that lengthens a status reads who laid it. Most of the Cleric's own cards laid their statuses
+without saying who laid them, so the rune lengthened his debuffs and almost none of his blessings. The text was the design,
+so the code moved. A status the game lays with no hero behind it, an item from the shared pouch, and a charmed enemy's Daze
+stay without a source, because naming the wrong source is worse than naming none.
+
+**Why the step did not move.** The rule's events count every status that lands on or leaves anyone, from any source. Telling
+the door who laid a status changes how long it lasts, not whether it counts as an event. So the repair could not raise the
+events a fight, and the step stands where IG set it, with the measurement beside it.
+
+**Why the Ruin rung was measured and left alone.** Ruin and Warden draw their bargains from the same table. What makes
+Ruin's milder is its floor: at severity 4 the floor is the top of the table, so every modifier counts as "mild" and all three
+options come from the whole table. Re-weighting an offer pool would not touch that. And the target the designer set, a full
+step above Warden's 3.29, is beyond the table's top severity of 4, so no weighting of this table can reach it. Both facts go
+back to the designer instead of a guess.
+
+**Why the bot asks the picker's question.** A sim bot that can cast where the player cannot measures a game nobody plays. The
+pick's narrowing lives in one function now, and the player's picker, the bot's drafted hook and the Swordmaster's rotation
+all ask it. The old bot never aimed where the player could not — 513 seeded casts, none wrong — but the rotation's own copy was
+stricter than the player, holding a free Execute back for a Broken enemy; one answer fixes both directions at once, and the
+figures that moved are the ones that now describe a player's Swordmaster.
+
+**Why Blood Debt says "the enemy with the most health" and not "the fullest".** The game already uses "the enemy with the
+most health" for the Tracker's and the Arbiter's moving marks, and it uses "full" for a share of maximum health elsewhere
+(Tithe's "the hero furthest from full"). The payer is chosen by points, so a large enemy at half health pays before a small
+one untouched. "Fullest" would have named the small one.
+
 ## What the census found in the code (Batch IK) — 2026-10-16
 
 **Why Blood Debt bills the enemy with the most health, and not a chosen one.** Blood Price is a self-cast, and a picker on a

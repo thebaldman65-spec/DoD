@@ -621,7 +621,7 @@
 		"name": "Blood Debt", "scope": "class:warrior", "written_for": "berserker",
 		"price": 150,
 		"requires_ability": "Blood Price",
-		"desc": "Blood Price costs the ENEMY's health instead of his — and their missing health becomes his Frenzy steps.",
+		"desc": "The enemy with the most health pays Blood Price's health cost instead of him — and their missing health becomes his Frenzy steps.",
 		"payload": {"stat": {"rune_blood_debt": 1}}
 	},
 	"butchers_bill": {
@@ -974,19 +974,19 @@
 	"empty_pulpit": {
 		"name": "Empty Pulpit", "scope": "party",
 		"price": 150,
-		"desc": "While no Cleric stands, every hero takes\n{=@payload.stat.dmg_taken_bonus*-100}% less damage.",
+		"desc": "While no Cleric stands, every hero takes\n{=@payload.stat.dmg_taken_bonus*-100}% less strike damage.",
 		"payload": {"stat": {"dmg_taken_bonus": -0.5}, "condition": {"heroes_lack_class": "cleric"}}
 	},
 	"dead_air": {
 		"name": "Dead Air", "scope": "party",
 		"price": 150,
-		"desc": "While no Mage stands, every hero deals\n{=@payload.stat.dmg_bonus*100}% more damage.",
+		"desc": "While no Mage stands, every hero deals\n{=@payload.stat.dmg_bonus*100}% more strike damage.",
 		"payload": {"stat": {"dmg_bonus": 0.75}, "condition": {"heroes_lack_class": "mage"}}
 	},
 	"dirge": {
 		"name": "Dirge", "scope": "party",
 		"price": 150,
-		"desc": "While a hero lies fallen, the rest deal\n{=@payload.stat.dmg_bonus*100}% more damage.",
+		"desc": "While a hero lies fallen, the rest deal\n{=@payload.stat.dmg_bonus*100}% more strike damage.",
 		"payload": {"stat": {"dmg_bonus": 0.45}, "condition": {"heroes_all_standing": false}}
 	},
 

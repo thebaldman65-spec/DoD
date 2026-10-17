@@ -1496,6 +1496,19 @@ than the candidates for it.** The bot's list is the other half of that question 
   `deadfall_armed <= 0` also refuses a part-spent or DORMANT deadfall, and a recast on either
   genuinely restores charges and clears the rest. **Derive the exact condition from the handler;
   the bot only tells you where to look.**
+- **AND THE OTHER DIRECTION IS A DEFECT IN THE BOT: IT PLAYS BY THE PLAYER's RULES (IL §3, the designer's).** *A sim whose
+  bot can do what the player cannot produces figures that do not describe the game* — not different figures, wrong ones.
+  **A card whose pick has a qualifier narrows in `battle._enemy_pick_pool`**, which the player's picker and every place the
+  bot aims the card ask — the drafted hook, and for Execute the Swordmaster's rotation too — so the bot aims where the picker
+  would let him and a qualifier written anywhere else is one the bot cannot see. Execute's is the only one today (`check_il`
+  §3 walks the corpus for any other, and holds the qualifier to the door, the button, the pool and the hover). A card the bot
+  could aim nowhere is skipped, never cast at a body the player could not choose.
+  · **A PICK THAT CAN PRODUCE NOTHING IS REFUSED WITH A REASON. A PICK THAT PRODUCES LESS IS OFFERED (IL §0.7, the
+    designer's) — RULED, NOT BUILT for the eight cards IK's census found** (Firedraw, Transference and Cryoclasm move a
+    thing onto the target, so the one body already holding it is a dud and is refused as Execute's are, on its hover;
+    Cull, Requiem, Funeral Pyre, Pyre Wake and Hunt read what the target carries, and each is refused or offered by
+    which it is). **A weaker choice is the player's to make**: a game that refuses every suboptimal pick plays itself.
+    The partition is IM's.
 
 ### ~~THE VAULT'S EXIT IS THE POOLS~~ — DY §3, settled and asserted by `check_dv` §1; the record is `docs/reports/DY.md` §3 (its finding, `docs/reports/DX.md`)
 
@@ -2653,11 +2666,13 @@ UNDER WHICH IT IS RE-READ (FV §2, §3).**
   four heroes at every spawn, a companion's at every call), so with every chip drawn (IG §1) the same population — a
   Hierophant beside the default lineages, untalented, rung 1, a normal fight's end — was read again and the step moved
   back to FV's target, about half the cap. The figures are in IG's report (§2) and the handle is in `docs/state.md`;
-  the designer's play confirms it, and the readout carries his steps a fight.
+  the designer's play confirms it, and the readout carries his steps a fight. **IL §1 re-measured it once the Cleric was passed
+  as the source of every live status he lays (IJ's ruling 9), and it stands**: the events read no source, so the repair moved
+  none and the steps sat inside their noise, while the duration payout reached four and a half times the applications (IL's
+  report, §1c). **A rate is re-read when what it counts moves, not when what it pays moves.**
   **And the potency half is worth almost nothing to two of the three Clerics until two things change
-  that are not rates**: the Devout's Divine Shield barrier is applied WITHOUT a `src`, so no payout
-  keyed on the applier can reach it, and the Occultist's Ruin is battle-long and carries no magnitude
-  at the funnel.
+  that are not rates**: the Devout's Divine Shield barrier carries its `src` since IL §1 but is battle-long, so the
+  duration payout cannot lengthen it, and the Occultist's Ruin is battle-long and carries no magnitude at the funnel.
 - **THE SPREAD BETWEEN SPECS IS REPORTED AND NEVER CLOSED WITH A PER-SPEC RATE** — FU's rule for
   Channel, held for both of these. A class core with a rate per spec is a spec engine.
 

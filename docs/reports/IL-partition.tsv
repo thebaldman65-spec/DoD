@@ -1,0 +1,110 @@
+# IL §1a — the partition of the `_apply_status` calls that passed no source at HEAD (`4199b7b`). One row a call site.
+# RULE: A = a Cleric can be the source and the call should pass him (repaired at IL); B = a Cleric can never be the source;
+# C = a Cleric can cause it and the call should NOT pass him (kept apart, with the reason). Lines are HEAD's battle.gd.
+# COMMAND: check_ft §3i's walk (comment-stripped, one site a line, args by paren depth, the 6th arg the source), each site's
+# function and `_resolve_special` arm, the arm's cards read off Classes' corpus by class; check_il §1a re-walks it live.
+line	function	arm	status	group	why
+1791	_spawn_units		devotion	B	Devoutness — the tree's stamp on all four at the spawn, the best holder's figure, no actor
+2222	_stamp_modifier		chilled	B	the Hoarfrost bargain's chill — a battle modifier, no actor (DI §2)
+3761	_run_battle		formless_recoil	B	Formless's recoil (the Warrior's)
+4090	_update_talent_chips		burn	B	Chain Ignition (the Pyromancer's) — `ember_wind` has no writer
+6078	_use_item		fortify	C	the Defense Potion: the pouch is the party's (an item at a hero's turn is no hero's card)
+6140	_use_item		hexed	C	the Cursed Visage: the party uses items (DI §2's own row)
+9310	_resolve		ward	B	a heal's `ward` Perfect — no card carries the perfect_id
+10108	_resolve		high_guard	B	High Guard — `high_guard` has no writer
+12305	_resolve		ab.applies_status["id"]	B	Umbral Mirror's rebound — `mirror_ranks` has no writer; an enemy's own debuff (DI §2: no single hero owns it)
+12649	_resolve		empower	B	Tank and Spank — `tank_spank_ranks` has no writer
+17027	_vestments_ward		barrier	B	Blessed Vestments' ward (the Cleric's) — `vestments_pct` has no writer: dormant, owed the Cleric the day it is written
+17065	_alms_spill		barrier	A	Alms' spill — the Mercy she cannot hold wards an ally
+17564	_grant_divine_shield		barrier	A	Divine Shield (and Mantle) — the Devout's barrier
+17801	_swordmaster_switch		tempo	B	Pivot (the Warrior's; `tempo_ranks` has no writer)
+17922	_bewitched_strike		dazed	C	a charmed enemy's Daze on a fellow enemy: an ambiguous source (DI §2's own row)
+18195	_gain_ruin		ruin_primed	C	the Ruin primer: the engine's own clock, laid at a threshold and consumed as the bearer next acts
+19510	_resolve_special	barrier	barrier	B	the `barrier` arm — no card carries the special
+19519	_resolve_special	focus	focus	B	the `focus` arm — no card carries the special
+19543	_resolve_special	surge	surge	B	mage's Arcane Surge
+19598	_resolve_special	quickdraw	quickdraw	B	hunter's Quick Draw
+19603	_resolve_special	retaliate	retaliate	B	warrior's Retaliation
+19733	_resolve_special	unity	unity	A	the Cleric's Sacred Resolve
+19760	_resolve_special	zeal	zeal	A	the Cleric's Blessing of Zeal
+19813	_resolve_special	bulwark	bulwark	A	the Cleric's Bulwark of Fortitude
+19879	_resolve_special	dark_pact	invig	B	Dark Pact's Invigoration (the Cleric's) — `invigoration_ranks` has no writer: dormant, owed the Cleric the day it is written
+19901	_resolve_special	rampage	rampage	B	the `rampage` arm — no card carries the special (Rampage's card has none)
+19907	_resolve_special	mana_shield	mana_shield	B	mage's Mana Shield
+19914	_resolve_special	tripwire	tripwire	B	hunter's Tripwire
+19918	_resolve_special	tripwire	tripwire	B	hunter's Tripwire
+20182	_resolve_special	null_field	null_field	B	mage's Null Field
+20216	_resolve_special	rite_of_return	rite_return	A	the Cleric's Rite of Return
+20227	_resolve_special	vow_suffering	vow	A	the Cleric's Vow of Suffering
+20579	_resolve_special	reckless_abandon	reckless_abandon	B	warrior's Reckless Abandon
+20617	_resolve_special	berserk	berserk_risk	B	warrior's Berserk
+20650	_resolve_special	precision_strike	parry_up	B	warrior's Precision Strike
+20653	_resolve_special	precision_strike	open_guard	B	warrior's Precision Strike
+20765	_resolve_special	battle_poise	battle_poise	B	warrior's Battle Poise
+20786	_resolve_special	feigned_guard	feigned_guard	B	warrior's Feigned Guard
+20852	_resolve_special	eye_of_storm	eye_storm	B	warrior's Eye of the Storm
+20955	_resolve_special	aegis_wall	aegis_wall	B	warrior's Aegis Wall
+20986	_resolve_special	unslaked	unslaked	B	warrior's Unslaked
+21007	_resolve_special	spite	spite	B	warrior's Spite
+21028	_resolve_special	anvil	anvil	B	warrior's Anvil
+21048	_resolve_special	recompense	recompense	B	warrior's Recompense
+21066	_resolve_special	turn_the_blade	turn_the_blade	B	warrior's Turn the Blade
+21089	_resolve_special	discipline	discipline	B	warrior's Discipline
+21108	_resolve_special	answering_steel	answering_steel	B	warrior's Answering Steel
+21138	_resolve_special	formless	formless	B	warrior's Formless
+21178	_resolve_special	wheeling_cut	wheeling_guard	B	warrior's Wheeling Cut
+21181	_resolve_special	wheeling_cut	wheeling_edge	B	warrior's Wheeling Cut
+21259	_resolve_special	magic_barrier	barrier	B	the `barrier` arm — no card carries the special
+21282	_resolve_special	mirror_image	mirror	B	mage's Mirror Image
+21297	_resolve_special	mana_well	mana_well	B	mage's Mana Well
+21425	_resolve_special	consecration	consecration	A	the Cleric's Consecration
+21456	_resolve_special	unburden	unburdened	A	the Cleric's Unburden
+21482	_resolve_special	exhortation	exhorted	A	the Cleric's Exhortation
+21500	_resolve_special	undying_vigil	vigil	A	the Cleric's Undying Vigil
+21540	_resolve_special	camouflage	camouflage	B	hunter's Camouflage
+21597	_resolve_special	arcane_arrows	arrows	B	hunter's Arcane Arrows
+21611	_resolve_special	battle_trance	battle_trance	B	warrior's Battle Trance
+21658	_resolve_special	warcry	warcry	B	warrior's Warcry
+21679	_resolve_special	ironclad	ironclad	B	warrior's Ironclad
+21755	_resolve_special	funeral_pyre	barrier	B	the `barrier` arm — no card carries the special
+21843	_resolve_special	hoarfrost_armor	rimeguard	B	mage's Hoarfrost Armor
+22044	_resolve_special	emberkeep	emberkeep	B	mage's Emberkeep
+22214	_resolve_special	threshold	threshold_lock	B	mage's Threshold
+22242	_resolve_special	divine_presence	divine_presence	A	the Cleric's Divine Presence
+22259	_resolve_special	alms	alms	A	the Cleric's Alms
+22541	_resolve_special	last_howl	last_howl	B	hunter's Last Howl
+22551	_resolve_special	succession	succession	B	hunter's Succession
+22631	_resolve_special	fault_line	fault_line	B	hunter's Fault Line
+22643	_resolve_special	stalking_horse	stalking_horse	B	hunter's Stalking Horse
+22650	_resolve_special	downwind	downwind	B	hunter's Downwind
+22778	_resolve_special	bring_it_down	bring_it_down	B	hunter's Bring It Down
+22795	_resolve_special	dug_in	dug_in	B	hunter's Dug In
+22807	_resolve_special	thick_hide	thick_hide	B	hunter's Thick Hide
+22820	_resolve_special	salve	salve	B	hunter's Salve
+22827	_resolve_special	venom_coat	venom_coat	B	hunter's Venom Coating
+22993	_resolve_special	bestial	bestial	B	hunter's Bestial Wrath
+23045	_resolve_special	spirit_bond	spirit_heal	B	hunter's Spirit Bond
+23047	_resolve_special	spirit_bond	spirit_mana	B	hunter's Spirit Bond
+23054	_resolve_special	spirit_bond	spirit_heal	B	hunter's Spirit Bond
+23064	_resolve_special	spirit_bond	vigor	B	hunter's Spirit Bond
+23092	_resolve_special	primal_surge	primal_surge	B	hunter's Primal Surge
+23123	_resolve_special	mark_hunt	hunt_mark	B	hunter's Mark of the Hunt
+23208	_resolve_special	blood_price	blood_price	B	warrior's Blood Price
+23262	_resolve_special	battle_shout	battle_shout	B	warrior's Battle Shout
+23320	_resolve_special	guard_change	formless	B	warrior's Guard Change
+23380	_resolve_special	guard_change	parry_up	B	warrior's Guard Change
+23535	_resolve_special	hold_the_line	hold_bd	B	warrior's Hold the Line
+23552	_resolve_special	hold_the_line	undying	B	warrior's Hold the Line
+23609	_resolve_special	divine_wrath	wrath	A	the Cleric's Divine Wrath
+23632	_resolve_special	enemy_shield	shielded	B	an enemy's Shielding (data/enemies.json)
+23857	_resolve_special	immolate	immolate	B	mage's Immolate
+23888	_resolve_special	rime	rime	B	mage's Rime
+23991	_resolve_special	stabilize	stabilized	B	mage's Stabilize
+24020	_resolve_special	overcharge	overcharged	B	mage's Overcharge
+24083	_resolve_special	intercession	intercession	A	the Cleric's Intercession
+24125	_resolve_special	divine_plea	sanctified	A	the Cleric's Divine Plea
+25145	_arrival_for_kind		roar	B	a companion's arrival (the bear's Roar)
+25853	_hit_and_run		elusive	B	Hit and Run (the Hunter's; `hit_and_run` has no writer)
+26755	_on_beast_death		vengeance	B	Vengeance on a fallen companion (the Hunter's)
+27057	_add_bleed_with_burst		cripple	B	Hemorrhage — `hemorrhage_ranks` has no writer
+30132	_abundance_shield		barrier	A	the Abundance rune — a Cleric's overheal becomes a shield

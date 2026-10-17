@@ -17,6 +17,79 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT IL — 2026-10-16, FROM `docs/state.md` AS IK LEFT IT (`4199b7b`)
+
+**What came here**: IK's seven rulings, every one answered in IL's brief — the play carried (IL's ruling 1); the eight
+board-gated cards' principle ruled (*a pick that can produce nothing is refused with a reason; a pick that produces less is
+offered*) and their partition moved to IM; the bot's Execute, Execute's button line, the two crest runes' word (Dirge with them)
+and Blood Debt's payer built at IL §3, §0.2, §0.3 and §0.4; the relics IK named, which the brief made three and IL found to be
+two relics and an event (IL's ruling 4). FOUND AT IK's derivation item, closed at IL §0.6 (`check_ij` §0.4 reads both routes),
+the roadmap's IL line, built, and SANCTITY's STEP's table of IG's figures, superseded by IL §1c's re-measure (whose HEAD
+arm reproduces them). Everything else in the live file stayed; the roadmap was re-lettered in place (IM, IN, IO).
+
+
+### ~~IK's RULINGS OWED~~ — **ALL SEVEN ANSWERED IN IL's BRIEF: THE PLAY CARRIED (1, IL's RULING 1); THE EIGHT CARDS' PRINCIPLE RULED AND THEIR PARTITION IM's (2); THE BOT, EXECUTE's BUTTON, THE CREST WORDS AND BLOOD DEBT's PAYER BUILT AT IL (3, 4, 5, 7 — DIRGE WITH THE TWO); THE RELICS ARE THREE THINGS, ONE OF THEM AN EVENT (6, IL's RULING 4)**
+
+Full working: `docs/reports/IK.md`, NEEDS A RULING.
+
+1. **PLAY ONE ZONE WITHOUT THE DEBUG MENU, AND SEND THE FILE** (IH's ruling 1, carried — II §0.1, IJ §0.1, IK §0.1: four batches
+   old). The readout names every debug action, so a file that names none is play. It answers Boil Over's rate, Rupture's number, the
+   vow's worth and the Cleric's Mana, and **its first Hierophant confirms Sanctity's step** (13) — on IL's repaired code, once IL
+   lands.
+2. **EIGHT OTHER CARDS GATE ON THE BOARD AND OFFER EVERY ENEMY, AS EXECUTE DID** (IK §2's census). Cull, Requiem, Funeral Pyre and
+   Pyre Wake consume what the TARGET carries, and Hunt reads the target's afflictions, so a pick of a bare enemy is a dud or a
+   floor; Firedraw, Transference and Cryoclasm move something ONTO the target from elsewhere, so a pick of the one body that holds
+   it moves nothing. **None of their words names a target**, which is why Execute's fix did not reach them; narrowing any is a
+   change to that card.
+3. **THE BOT AIMS A DRAFTED EXECUTE AT THE LOWEST-HEALTH ENEMY** (`battle._bot_drafted_pick`), which can be above the line and not
+   Broken; the Swordmaster's own rotation picks a legal victim through `_execute_qualifies`. Any other Warrior who drafts it is the
+   case. Narrowing the hook is a sim policy, and it moves sim figures.
+4. **EXECUTE's DARKENED BUTTON SAYS NOTHING.** Every other gate on the board adds its reason to the button (*Nothing is Burning*,
+   *No Ruin on the field to consume*); Execute's has none — one line of new wording.
+5. **TWO MORE CENSUS ROWS OF THE STRIKE's SHAPE** (IK §5's re-read, closed by the census): N077 Empty Pulpit's *50% less damage*
+   and N078 Dead Air's *75% more damage* are read in the strike loop alone (`dmg_taken_bonus`, `dmg_bonus`) — the census graded the
+   figures and noted the scope. Crest runes, which IK's brief left untouched (§8); the word waits on the crest's own batch.
+6. **WHICH TWO RELICS THE FALLEN-HERO RULING PRICES** (IK's brief §6: *three crest runes and two relics*): IK reads them as
+   Cairnmoss Poultice and Martyr's Knucklebone, the two whose hooks carry `rest_heal_add` — the brief names only the first.
+7. **THE BLOOD DEBT RUNE's WORDS DO NOT SAY WHICH ENEMY PAYS** (*Costs the ENEMY's health instead of his*). The brief ruled them
+   literally true once the rune fires, and they stand; naming *the enemy with the most health* is one clause if wanted.
+
+### FOUND AT IK AND NOT FIXED — ITS CLOSED ITEMS (archived at IL; the section stays in `docs/state.md`)
+
+- **THE GATE-SOURCE READERS' DERIVATION MISSES A GATE THAT READS THE BATTERY's LIST.** IJ §0.4's population is the
+  targets whose source opens the root (`check_ij` §0.4, twenty-one at IK); `check_gw` §2 reads every battery target's source
+  through `run_battery.sh`'s list instead, so the derivation leaves it out — and recon 2 read it red on a new gate's one hand-set
+  field (97 sites against its 96; `check_ik`'s vow is seated through the spawn since, 96). IK ran it beside the readers before the
+  acceptance. **Widening the derivation to a target that reads the battery's sources is `check_ij`'s change, owed.**
+
+### THE PLAYTEST'S OTHER FINDINGS — ITS CLOSED ITEMS (archived at IL; the section stays in `docs/state.md`)
+
+- **IL — SANCTITY's SOURCE GAP AND THE RUIN RUNG's SEVERITY, EACH A MAGNITUDE MEASURED BEFORE AND AFTER (IK's brief §0.5,
+  §0.10).** **Sanctity**: 104 of the 214 `_apply_status` calls pass no source and lengthen nothing (FT §3's gap); IL partitions
+  them by whether a Cleric can be the source, repairs the ones that can, and re-measures the step (13 at IG) on the repaired code
+  — **R016's words stand.** **The Ruin rung**: Ruin's mean severity at 2.31 against Warden's 3.29 is the defect (EP §1); the
+  condition the designer set is **Ruin's mean above Warden's by at least a full step at the census's own sample**, and **the lever
+  is Ruin's OFFER POOL, never the severity values** (Warden, the merchant and the map read them). **R091's and the glossary's road
+  entry stand, and *weighted toward the mild end* (G080L) agrees with the code today and stays.**
+
+
+### SANCTITY's STEP — IG §2's FIGURES, THE ONES THE STEP WAS SET ON (superseded by IL §1c's re-measure, its HEAD arm reproducing them)
+
+**The figures** (IE's probe: a Hierophant beside the default lineages, 20
+runs a party at HEAD, 60 at §1 untalented; events at a fight's end):
+
+| | HEAD (IF's code, chips as statuses) | §1 (every chip drawn) |
+|---|---|---|
+| Default build: events a fight (zone 1 / 2 / 3) | 43.7 (36.6 / 44.2 / 49.6) | 38.5 (31.4 / 39.7 / 43.9) |
+| Default: a normal fight / an elite / a boss, events | 43.2 / 39.5 / 59.1 | 39.3 / 34.1 / 51.0 |
+| Untalented: a normal fight, events — steps at 16 | 42.3 — 2.14 | 41.0 — 2.06 |
+| **Untalented: a normal fight, steps at 13** | — | **2.58** (14: 2.38) |
+| Untalented: a boss, steps at 13 — at the cap | — | 4.04 — 42.8% (at 16: 3.37 — 17.6%; HEAD at 16: 20.3%) |
+| Untalented: his first / second step at 13, by his turn | — | 3.04 (92.5%) / 5.13 (68.3%) |
+
+Untalented 1,391 fights at HEAD and 3,988 at §1; default 1,658 and 1,697.
+
+
 ## ARCHIVED AT IK — 2026-10-16, FROM `docs/state.md` AS IJ LEFT IT (`739ef88`)
 
 **What came here**: IJ's ten rulings, every one answered in IK's brief — the play carried (IK's ruling 1); Blood Debt, Cairnmoss

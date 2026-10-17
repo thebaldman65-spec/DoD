@@ -4,7 +4,8 @@
 #        where it stood, naming what closed it and a report that holds the record (the report is in the tree); its old
 #        heading is gone; and CLAUDE.md's charter states the rule beside the archive practice.
 #   §0.4 A NEW GATE's SOURCE IS READ BEFORE THE ACCEPTANCE: the rule stands once in the instrument rules with its row,
-#        and the population it names — the targets that open "res://" — is derived here, this gate among them.
+#        and the population it names — the targets that open "res://", and since IL §0.6 the targets that read
+#        the battery's own list and open each target it names (`check_gw`) — is derived here, this gate among them.
 #   §2a THE RESOLVER: a constant token, a field token, a product, a scale and a token that names nothing, each through
 #        `Classes.resolve_figures`; every source `FIGURE_SOURCES` names loads.
 #   §2b NO TOKEN ON ANY SURFACE: every card's words and Perfect, every rune, every glossary entry, every core rune's
@@ -177,18 +178,34 @@ func _s04_new_gate_rule() -> void:
 	ok(ir.count(NEW_GATE_RULE) == 1 and not cm.contains(NEW_GATE_RULE),
 		"§0.4: the rule does not stand once in the instrument rules and nowhere in CLAUDE.md")
 	ok(cm.count(NEW_GATE_ROW) == 1, "§0.4: the rule's row is not in CLAUDE.md's instrument index, once")
-	# THE POPULATION, DERIVED HERE AS THE RULE SAYS: the targets whose source opens "res://".
+	# THE POPULATION, DERIVED HERE AS THE RULE SAYS — BY EVERY ROUTE A TARGET READS ANOTHER's SOURCE
+	# (BATCH IL §0.6, IJ §0.4's own defect): the targets whose source opens the root ("res://"), and the
+	# targets that read the battery's own list off `run_battery.sh` and open each target it names
+	# ("res://%s.gd"). IJ derived the first alone and missed `check_gw`, which takes the second route and
+	# read IK's recon 2 red; `check_parse` takes both.
 	var dir := DirAccess.open("res://")
 	var pop: Array = []
+	var by_root := 0
+	var by_list: Array = []
 	if dir != null:
 		for f in dir.get_files():
 			if f.ends_with(".gd") and (f.begins_with("check_") or f.begins_with("test_")):
-				if FileAccess.get_file_as_string("res://" + f).contains("\"res://\""):
+				var tsrc := FileAccess.get_file_as_string("res://" + f)
+				var opens_root := tsrc.contains("\"res://\"")
+				var reads_list := tsrc.contains("res://run_battery.sh") and tsrc.contains("\"res://%s.gd\"")
+				if opens_root:
+					by_root += 1
+				if reads_list:
+					by_list.append(f.get_basename())
+				if opens_root or reads_list:
 					pop.append(f.get_basename())
 	pop.sort()
-	ok(pop.size() >= 19, "§0.4: only %d targets open the root — II read nineteen; the derivation has moved" % pop.size())
+	by_list.sort()
+	ok(pop.size() >= 23, "§0.4: only %d targets read another's source — IL read twenty-three; the derivation has moved" % pop.size())
 	ok(pop.has("check_ij"), "§0.4: this gate opens the root and is not in its own population")
-	print("    %d gate-source readers: %s" % [pop.size(), ", ".join(PackedStringArray(pop))])
+	ok(by_list.has("check_gw"), "§0.4: the battery-list route finds %s, not `check_gw`" % str(by_list))
+	print("    %d gate-source readers (%d open the root; %d read the battery's list: %s): %s" % [pop.size(), by_root,
+		by_list.size(), ", ".join(PackedStringArray(by_list)), ", ".join(PackedStringArray(pop))])
 
 
 # ── §2a — THE RESOLVER ──────────────────────────────────────────────────────
@@ -901,7 +918,7 @@ const PINS := [
 	["card:Resurrection:desc", "with 25%", "scripts/battle.gd", "_resolve_special", "var rez_frac := 0.25"],
 	["card:Resurrection:desc", "(+1 Mercy)", "scripts/battle.gd", "_consume_empower", "attacker.second_resource -= 1"],
 	["card:Resurrection:desc", "full health", "scripts/battle.gd", "_resolve_special", "rez_frac = 1.0"],
-	["card:Divine Plea:desc", "for 3 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"sanctified\", 3)"],
+	["card:Divine Plea:desc", "for 3 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"sanctified\", 3, 0, 0, attacker)"],
 	["card:Divine Plea:desc", "1 more Mercy", "scripts/battle.gd", "_consume_empower", "attacker.second_resource -= 1"],
 	["card:Dawnbreak:desc", "ally 40", "scripts/battle.gd", "_resolve_special", "(55 if is_perfect else 40)"],
 	["card:Dawnbreak:perfect", "Heals 55", "scripts/battle.gd", "_resolve_special", "(55 if is_perfect else 40)"],
@@ -909,7 +926,7 @@ const PINS := [
 	["card:Sanctuary:perfect", "Heals 18%", "scripts/battle.gd", "_resolve_special", "(0.18 if is_perfect else 0.12)"],
 	["card:Second Wind:desc", "up to 40%", "scripts/battle.gd", "_resolve_special", "var sw_cap_pct := 0.55 if is_perfect else 0.40"],
 	["card:Second Wind:perfect", "{mhp:55|ally}", "scripts/battle.gd", "_resolve_special", "var sw_cap_pct := 0.55 if is_perfect else 0.40"],
-	["card:Rite of Return:desc", "for 4\\nturns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"rite_return\", 4)"],
+	["card:Rite of Return:desc", "for 4\\nturns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"rite_return\", 4, 0, 0, attacker)"],
 	["card:Rite of Return:desc", "loses 30%", "scripts/battle.gd", "_on_rite_return", "var toll := maxi(int(round(cleric.max_hp * 0.30)), 1)"],
 	["card:Rite of Return:desc", "to 50%", "scripts/battle.gd", "_on_rite_return", "saved.hp = maxi(int(saved.max_hp * 0.5), 1)"],
 	["card:Recant:desc", "regains 40%", "scripts/battle.gd", "_resolve_special", "var rc_pct := 0.40"],
@@ -926,7 +943,7 @@ const PINS := [
 	["card:Divine Shield:desc", "absorbs 35%", "scripts/battle.gd", "_resolve_special", "var ds_pct := 0.35 + 0.01 * attacker.stalwart_step"],
 	["card:Consecrated Ground:desc", "for 3\\nturns", "scripts/battle.gd", "_resolve_special", "_apply_status(h, \"cons_ground\", 3, 0, 0, attacker)"],
 	["card:Consecrated Ground:desc", "reflects 10%", "scripts/battle.gd", "_resolve", "var cg_pct := 0.10"],
-	["card:Blessing of Zeal:desc", "for\\n4 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"zeal\", 4)"],
+	["card:Blessing of Zeal:desc", "for\\n4 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"zeal\", 4, 0, 0, attacker)"],
 	["card:Blessing of Zeal:desc", "doubled", "scripts/battle.gd", "_gain_faith", "n *= 2"],
 	["card:Blessing of Zeal:desc", "1 turn NOW", "scripts/battle.gd", "_resolve_special", "var zeal_ticks := 1 + attacker.crusade_ranks"],
 	["card:Sacred Resolve:desc", "for 4 turns", "scripts/battle.gd", "_resolve_special", "var res_turns := 4 + attacker.resolve_extra_turns"],
@@ -934,7 +951,7 @@ const PINS := [
 	["card:Bulwark of Fortitude:desc", "heals 10%", "scripts/battle.gd", "_run_battle", "var bw_amt := maxi(int(round(u.max_hp * 0.10)), 1)"],
 	["card:Bulwark of Fortitude:desc", "by 50%", "scripts/unit.gd", "effective_armor", "a *= 1.5"],
 	["card:Bulwark of Fortitude:desc", "them 5% of max health", "scripts/battle.gd", "_resolve_special", "var bw_heal := maxi(int(round(h.max_hp * 0.05)), 1)"],
-	["card:Vow of Suffering:desc", "for 4\\nturns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"vow\", 4)"],
+	["card:Vow of Suffering:desc", "for 4\\nturns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"vow\", 4, 0, 0, attacker)"],
 	["card:Vow of Suffering:desc", "HALF", "scripts/unit.gd", "take_hit", "vow_cb.call(self, amount / 2)"],
 	["card:Vow of Suffering:desc", "hero\\n1 Faith", "scripts/battle.gd", "_on_vow_share", "_gain_faith(ally, 1, \"vow\")"],
 	["card:Aegis Reversal:desc", "half again", "scripts/battle.gd", "_resolve_special", "var ag_bonus: int = int(round(ag_left * 1.5))"],
@@ -946,7 +963,7 @@ const PINS := [
 	["card:Blessing of the Faithful:desc", "and 3% of", "scripts/battle.gd", "_resolve_special", "var jb_mana := maxi(int(round(attacker.max_resource * 0.03"],
 	["card:Blessing of the Faithful:desc", "6% of your", "scripts/battle.gd", "_resolve_special", "var jb_pct := 0.08 if is_perfect else 0.06"],
 	["card:Blessing of the Faithful:perfect", "{mhp:8}", "scripts/battle.gd", "_resolve_special", "var jb_pct := 0.08 if is_perfect else 0.06"],
-	["card:Divine Wrath:desc", "for 4 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(h, \"wrath\", 4)"],
+	["card:Divine Wrath:desc", "for 4 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(h, \"wrath\", 4, 0, 0, attacker)"],
 	["card:Divine Wrath:desc", "15% faster", "scripts/unit.gd", "effective_speed", "s *= 1.15"],
 	["card:Bewitch:desc", "for 3 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"bewitch\", 3, 0, 0, attacker)"],
 	["card:Dark Pact:desc", "heals 15%", "scripts/battle.gd", "_resolve_special", "var pact_heal_pct := 0.15 + 0.01 * attacker.barter_step"],
