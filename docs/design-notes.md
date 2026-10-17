@@ -4,6 +4,31 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The Ruin rung, and the picker's remainder (Batch IM) — 2026-10-17
+
+**Why two bands and not a better floor.** One number was doing two jobs: it said which bargains count as the safe one and
+where the gambles begin. A number like that runs out of table at the top rung — there is nothing left above it — and the code
+that caught that case quietly turned the hardest road's bargains into the mildest. No floor value could fix it, because the
+fault was the doubling-up, not the number. With each road naming its safe band and its gamble band, nothing has to fall back,
+and Ruin can say *there is no mild option* by putting its safe band where Warden's gambles live.
+
+**Why half a step and not a full one.** The designer's target was a full step above Warden. The table stops at severity 4, so
+the most any dealing of it can give Ruin is 4.00 a card; with the safe slot at 3–4 it reads 3.83. The rest needs harsher
+modifiers that only Ruin can draw, which is new content and the designer's, not a weighting a batch should invent.
+
+**Why Wanderer and Warden were held still to the last offer.** They were the control. Their bands are exactly the split the old
+floor made, and the cards are dealt from the same dice in the same order, so their offers come out identical; if either had
+moved by a hundredth, the bands would have been mis-specified.
+
+**Why the picker refuses only a pick that does nothing.** A card aimed at an enemy that gives it nothing to work with is not a
+choice, it is a misclick the game let happen, so that enemy is not offered and its hover says why. A pick that only does less
+is a real decision — Hunt on a clean enemy still strikes and still breaks — so it stays offered. A game that refused every
+weaker pick would be playing itself.
+
+**Why the four texts say "strike".** Each of their bonuses is read only where a blow lands, so a Burn's tick, a detonation, a
+reflection or a card that computes its own damage was never touched. The honest word makes a smaller promise; for most heroes
+it is nearly the whole of their damage, and for the damage-over-time heroes and the Beastmaster it is the part that is not.
+
 ## The two measured defects (Batch IL) — 2026-10-16
 
 **Why the Cleric is passed as the source of his own blessings.** The Hierophant's rune says it lengthens each status the

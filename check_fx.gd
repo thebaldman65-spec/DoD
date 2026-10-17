@@ -77,8 +77,10 @@ const TEXT := {
 	"speed": [1.0, "+%d Speed"],
 	"parry_bonus": [100.0, "+%d% parry chance"],
 	"max_resource": [1.0, "+%d maximum Rage or Mana"],
-	"dmg_bonus": [100.0, "+%d% damage dealt"],
-	"dmg_taken_bonus": [-100.0, "%d% less damage taken"],
+	# BATCH IM §2 — both fields are read in the strike loop alone, so the two nodes say *strike damage*, as the
+	# thirteen texts of that shape before them do; the number still sits in the words.
+	"dmg_bonus": [100.0, "+%d% strike damage dealt"],
+	"dmg_taken_bonus": [-100.0, "%d% less strike damage taken"],
 	"broken_will_ranks": [1.0, "%d% more Break damage"],
 	# BATCH HQ §1 — *Breaking Heals a Hero*'s words narrowed to its read site, as Tithe's
 	# were (*an attack that lands Break … for N% of it.*); the number still sits in them.

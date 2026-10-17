@@ -611,11 +611,13 @@ func _end_boss_and_ladder() -> void:
 	_check(rs.contains('const LEGACY_DIFFICULTY := {"standard": "warden"}'),
 		"Batch Y's 'standard' still resolves, at the rung it was tuned for")
 	# Each rung above 1 carries a NAMED TWIST as well as scaling.
-	_check(rs.contains('"severity_floor": 2') and rs.contains('"severity_floor": 3')
-		and rs.contains('"severity_floor": 4'),
-		"the severity floor rises with the rung")
-	_check(rs.contains("var floor_sev := int(difficulty_def()[\"severity_floor\"])"),
-		"roll_offer reads the rung's floor rather than a constant 2")
+	# BATCH IM §1 RE-POINTED THESE TWO: the one floor that split the bargain table is two bands a rung now (its safe
+	# slot's and its gambles'), and what they ask is unchanged — the safe slot gets less mild with every rung, and
+	# `roll_offer` reads the rung rather than a constant.
+	_check(rs.count('"safe_band": [') == 3 and rs.count('"gamble_band": [') == 3,
+		"each rung names its safe slot's band and its gambles' (how far each rises is check_im's)")
+	_check(rs.contains("var safe_band: Array = difficulty_def()[\"safe_band\"]"),
+		"roll_offer reads the rung's bands rather than a constant 2")
 	_check(rs.contains("func arm_fixed_modifier(node_type: String) -> void:"),
 		"rung 3 puts a modifier on the encounters a route cannot duck")
 	_check(rs.contains('const FIXED_MODIFIER_NODES := ["miniboss", "boss", "endboss"]'),

@@ -16,6 +16,48 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-17 &mdash; Batch IM: THE RUIN RUNG, AND THE PICKER's REMAINDER</h2>
+<p><b>The hardest difficulty offered the mildest bargains, and IL found why. IM fixed the cause.</b> The target picker now also
+refuses a pick that would do nothing for seven more cards, and four more texts say <i>strike damage</i>. Full working:
+<code>docs/reports/IM.md</code>.</p>
+
+<p><b>&sect;1 &mdash; THE RUIN RUNG's BARGAINS ARE THE HARSHEST.</b> One number decided two things: which bargains count as
+the safe one, and where the two gambles start. On Ruin that number was the top of the table, so nothing was left above it and
+all three options came from the whole table. <b>Each road now names two bands</b>: Wanderer deals its safe option from severity
+1&ndash;2 and its gambles from 3&ndash;4, Warden from 1&ndash;3 and at 4, and <b>Ruin from 3&ndash;4 and at 4, so on Ruin there
+is no mild option</b>. Nothing falls back to another band. Over 400 offers a road, Wanderer and Warden are dealt exactly the
+offers they were (2.82 and 3.28), and Ruin rises from 2.24 to <b>3.82</b>, half a step above Warden. That half step is as far as a
+table that stops at severity 4 can go; a full step needs harsher bargains, and authoring those is the designer's. Ruin's
+bargains now pay more (140 or 220 gold, or a rune) and never the merchant. The glossary's severity, modifier and ladder entries
+say so.</p>
+
+<p><b>&sect;2 &mdash; FOUR MORE TEXTS SAY <i>STRIKE DAMAGE</i>.</b> The talent tree's <b>More Damage Dealt</b> and <b>Less Damage
+Taken</b>, the <b>Dragonbone Idol</b> and the <b>Horn of the First War</b> only ever touched strikes, and now say so. Nothing they
+pay changed. For a Pyromancer on the default build about a sixth of his damage is not strike damage (his Burn's ticks), for a
+Survivalist about the same, and for a Beastmaster about three tenths (his companions' blows). For a Berserker, a Swordmaster or
+a Warden it is under one percent.</p>
+
+<p><b>&sect;3 &mdash; THE PICKER REFUSES A PICK THAT WOULD DO NOTHING.</b> <b>Firedraw, Transference and Cryoclasm</b> move
+something onto the enemy you pick from another enemy, so the one enemy already holding it is not offered. <b>Cull, Requiem,
+Funeral Pyre and Pyre Wake</b> use up what the enemy you pick carries, so an enemy carrying none is not offered. Hovering a
+refused enemy says why. <b>Hunt</b> is still offered on any enemy, because on a clean one it still strikes and deals its Break
+damage. If the last enemy standing is the one holding the fire, the mark or the prison, the button is dark and says so. The
+sim's bot follows the same rule. And the upgraded Execute now checks the real price of each target, so under the Warded
+modifier it no longer offers a target he cannot pay for.</p>
+
+<p><b>&sect;0 &mdash; THE SMALL RULINGS.</b> The items entry states the pouch's one rule: <i>no one deals a bomb's damage and no
+one lays a potion's status</i>. A false comment calling a charmed enemy's Daze <i>the Occultist's work</i> is corrected. The
+sim report's <code>st/b</code> column is described as what it counts (every status a hero lays on another body) everywhere it
+is named; its numbers did not move. Three instrument rules are recorded. <b>Corrected against the brief</b>: the pouch's rule
+said <i>the party's</i>, a word the game's text no longer uses, so the player reads <i>the pouch belongs to all four heroes</i>.</p>
+
+<p><b>&sect;0.7 &mdash; THE STATE FILE's TABLES.</b> Measurement tables that already stand in their batch's report were replaced
+in <code>docs/state.md</code> by the conclusion and a pointer to the report. Tables whose report does not hold them stay.</p>
+
+<p><b>The instruments.</b> <code>check_im</code> is new. <code>check_il</code>, <code>check_ik</code>, <code>check_ij</code>,
+<code>check_fx</code>, <code>test_batch_bm</code> and <code>test_batch_bn</code> are re-pointed where IM moved what they read.
+No save version moved.</p>
+
 <h2>2026-10-16 &mdash; Batch IL: THE TWO MEASURED DEFECTS</h2>
 <p><b>IK left two defects that could only be fixed by moving a number, so IL measured each before and after.</b> Sanctity's
 missing sources are fixed and its step stays where it was. The Ruin rung's bargains were measured and left alone, because the

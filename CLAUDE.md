@@ -126,7 +126,7 @@ block stood and never a new file. II's four were struck so at IJ, each report re
 the equality rule travel with their parent. **Eight of the rows are FF §2's**, and they are the
 residue: rules written into this file AFTER the seam was taken, which the seam's own test puts on
 the other side of it. **Every row after those eight was written straight into the reference rather
-than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one, IE's two, II's two, IJ's one and IK's one —
+than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one, IE's two, II's two, IJ's one, IK's one and IM's three —
 and GW §2's, written there at GW and given its row only at HX (HV §3e found it missing; `check_hx` §1a now reds on one) —
 and four more are MOVED, FF §2's way: HG–HJ's census and supersession blocks, written back into this file after the seam
 was taken and sent over at HY §4 by the designer's ruling, and II §4's two, the archive practice's first pass — CP §3's
@@ -196,6 +196,9 @@ new block written here):
 | PLAYER-FACING TEXT THAT STATES A NUMBER READS IT OFF THE CONSTANT, OR AN INSTRUMENT ASSERTS THE TWO AGREE | II §0.7 |
 | A NEW GATE's OWN SOURCE IS READ BY THE GATE-SOURCE READERS BEFORE THE ACCEPTANCE, NOT BY IT | IJ §0.4 |
 | AN INSTRUMENT THAT CANNOT READ A DEFECT IS NOT AN INSTRUMENT | IK §0.12 |
+| RETIRING A TRUE CLAIM IS THE SAME DEFECT AS KEEPING A FALSE ONE | IM §0.4 |
+| A FACT ABOUT A FIELD's REACH IS READ AT THE FIELD's READ SITES, NEVER AT ITS WRITES | IM §0.2 |
+| A GATE THAT SELECTS ITS SUBJECT BY A SUPERLATIVE NAMES THE SUBJECT IT PICKED | IM §0.8 |
 
 ## THE COMBAT RULES LIVE IN `docs/combat-rules.md` (STANDING, SET AT GR §2, RULED BY THE DESIGNER)
 > **THIS FILE IS STILL THE ONE A BATCH MUST READ. `docs/combat-rules.md` IS A REFERENCE IT POINTS AT,
@@ -1500,15 +1503,18 @@ than the candidates for it.** The bot's list is the other half of that question 
   bot can do what the player cannot produces figures that do not describe the game* — not different figures, wrong ones.
   **A card whose pick has a qualifier narrows in `battle._enemy_pick_pool`**, which the player's picker and every place the
   bot aims the card ask — the drafted hook, and for Execute the Swordmaster's rotation too — so the bot aims where the picker
-  would let him and a qualifier written anywhere else is one the bot cannot see. Execute's is the only one today (`check_il`
-  §3 walks the corpus for any other, and holds the qualifier to the door, the button, the pool and the hover). A card the bot
-  could aim nowhere is skipped, never cast at a body the player could not choose.
+  would let him and a qualifier written anywhere else is one the bot cannot see. Execute's and seven cards' since IM §3b
+  (`check_im` §3b walks the corpus for any other, and `check_il` §3 holds Execute's qualifier to the door, the button, the
+  pool and the hover). A card the bot could aim nowhere is skipped, never cast at a body the player could not choose.
   · **A PICK THAT CAN PRODUCE NOTHING IS REFUSED WITH A REASON. A PICK THAT PRODUCES LESS IS OFFERED (IL §0.7, the
-    designer's) — RULED, NOT BUILT for the eight cards IK's census found** (Firedraw, Transference and Cryoclasm move a
-    thing onto the target, so the one body already holding it is a dud and is refused as Execute's are, on its hover;
-    Cull, Requiem, Funeral Pyre, Pyre Wake and Hunt read what the target carries, and each is refused or offered by
-    which it is). **A weaker choice is the player's to make**: a game that refuses every suboptimal pick plays itself.
-    The partition is IM's.
+    designer's; built at IM §3b).** `battle._pick_dud` says why a body would produce nothing — each arm asks what its
+    handler asks — and `_enemy_pick_pool` offers the rest. **Firedraw, Transference and Cryoclasm** move a thing onto the
+    body picked from another enemy, so the one body holding it is refused; **Cull, Requiem, Funeral Pyre and Pyre Wake**
+    consume what the body carries, so a body carrying none is refused; **Hunt** strikes a clean body for the floor of 1 and
+    its Break damage — its base paid — and is offered. **The door asks the pool too** (`_ability_usable`): a card that moves
+    a thing from another enemy offers nobody when the last one standing holds it, and is not cast. **A weaker choice is the
+    player's to make**: a game that refuses every suboptimal pick plays itself. **A card whose handler grows a case that
+    produces nothing owes `_pick_dud` its arm in the batch that writes it.**
 
 ### ~~THE VAULT'S EXIT IS THE POOLS~~ — DY §3, settled and asserted by `check_dv` §1; the record is `docs/reports/DY.md` §3 (its finding, `docs/reports/DX.md`)
 
@@ -1850,9 +1856,12 @@ decision and the STRUCTURE is what shipped.
   — 55 points across one step — so 70% sits in an unsampled gap and 0.50 is "the nearest
   sampled value", not a number to defend to three figures.**
 · **rung 2 Warden x1.00** — the present balance BYTE FOR BYTE, so every BK row still describes
-  it. Twist: **the severity floor rises** (`roll_offer` reads `difficulty_def().severity_floor`
-  instead of a constant 2), so the guaranteed mild bargain option may be severity 3.
-· **rung 3 Ruin x1.30** — floor rises again, plus **FIXED ENCOUNTERS CARRY A MODIFIER**
+  it. Twist: **the safe bargain gets less mild** — each rung names the severity band its safe slot is
+  dealt from and the band its gambles are (`safe_band`, `gamble_band`; IM §1), so the guaranteed
+  mild option may be severity 3.
+· **rung 3 Ruin x1.30** — **no mild option at all** (its safe slot is dealt from severity 3–4, its
+  gambles from 4; IM §1 — one field split the table until then, and at Ruin it saturated, so the
+  hardest rung dealt the mildest bargains), plus **FIXED ENCOUNTERS CARRY A MODIFIER**
   (`Run.arm_fixed_modifier`, armed at BOTH walk sites): the mini-boss and every boss, the nodes
   a route cannot duck. It is NOT a bargain — no offer, no choice, NO REWARD.
 **THE END BOSS is a 17th slot on the FINAL ZONE'S BOARD, so a run is 49 encounters** (BK settled
@@ -3064,9 +3073,14 @@ health never poses the question.
   unaffected by construction.
 · **THE END BOSS IS THE ONE ENCOUNTER THE DAMAGE DISCOUNT DOES NOT REACH (GJ, ruled).** Its spawn
   takes the health path's floor for Attack too; the BM reference block records it and why.
-· **THE LADDER CARRIES EXACTLY FOUR FIELDS WITH A CONSEQUENCE**, and a fifth added without a
+· **THE LADDER CARRIES EXACTLY FIVE FIELDS WITH A CONSEQUENCE**, and a sixth added without a
   reader is a field that lies: `rung` (the meta gate and the enemy-ability filter), `mult`,
-  `severity_floor` (the bargain floor) and `fixed_modifier` (rung 3's unduckable nodes).
+  `safe_band` and `gamble_band` (the bargain's two bands — one field, the floor, did both jobs
+  until IM §1) and `fixed_modifier` (rung 3's unduckable nodes). **A field that does two jobs
+  saturates where one of them runs out of table, and a fallback then turns the setting into its
+  opposite**: the floor at Ruin stood at the table's top, both gambles fell back to the whole table,
+  and the hardest rung was the mildest (IL §2, IM §1). **No band falls back; every band is
+  non-empty over `MODIFIERS` by construction, and `check_im` §1 holds it.**
   **Nothing else in the game reads the difficulty** — encounter counts, elite and boss
   composition, gold and the relic ladder are rung-independent, and `Run.difficulty` outside that
   block is display and save only.

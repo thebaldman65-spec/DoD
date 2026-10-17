@@ -29,124 +29,103 @@ never have fired: **an alarm set above the failure level is not an alarm.** `che
 sentence every battery: over it is a warning, and past it by more than one batch at the record is a failure — the largest
 single-batch growth on record is **+13.38 KiB** (ES's +13,700 B). *In the preamble for the archive pointer's reason.*
 
-*Last rewritten: 2026-10-16 (Batch IL).*
+*Last rewritten: 2026-10-17 (Batch IM).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: IL — THE TWO MEASURED DEFECTS.** IMPLEMENT ONLY. **Sanctity's source gap is repaired and the step re-measured:
-  it stays 13. The Ruin rung's bargains are measured and left alone, two contradictions reported.** The bot reads the picker's
-  pool, and four of IK's rulings are built. Full working: **`docs/reports/IL.md`**. **The next letter is IM** (the roadmap, below).
+- **Last batch: IM — THE RUIN RUNG, AND THE PICKER's REMAINDER.** IMPLEMENT ONLY. **The Ruin rung's bargain mechanism is
+  repaired, the picker refuses a pick that would produce nothing for seven cards more, and four texts say *strike damage*.** Full
+  working: **`docs/reports/IM.md`**. **The next letter is IN** (the roadmap, below).
 - **THE DESIGNER HAS NOT PLAYED SINCE IH.** `run_save.bin` is 40,284 B at 2026-10-14 14:30 and `readout/` holds IH's one
   debug-touched file — both unmoved, **and no newer file has appeared** — backed up with the four player files
-  (`../save-backups/IL-20261016-190213`, md5-verified).
-- **§1 — SANCTITY's SOURCE GAP.** IL re-derived the census — 221 `_apply_status` calls, 117 passing a source and 104 not — and
-  partitioned the 104: **17 a Cleric can source, now passing him** (every one a blessing, a ward or a barrier); **83 no Cleric
-  can source** (another class's card, rune or helper 66, an enemy's 1, a companion's 1, no actor 2, no card or field reaching
-  it 11, and two Cleric clauses nothing reaches today — Dark Pact's Invigoration, Blessed Vestments' ward); **4 a Cleric can
-  cause and that pass nobody, on purpose** — two items, a charmed enemy's Daze, the Ruin primer. The recast gate adds a Hierophant's
-  steps to a Cleric card's proposal, as the door adds them to the write. **The step stays 13**: the rule's events count every
-  status from any source, so the repair cannot raise them — on the same seeds an untalented normal fight ends at 41.55 events and 2.62 steps against HEAD's
-  41.51 and 2.58, inside a standard error, and the default build at 2.47 against 2.48; the door lengthens 5.32 applications a
-  fight where it lengthened 1.18 (SANCTITY's STEP, below).
-- **§2 — THE RUIN RUNG, MEASURED, NOT MOVED.** Ruin and Warden draw one modifier table; Ruin's floor (severity 4) is the table's
-  top, so all three options come from the whole table (mean 2.30 against Warden's 3.29). The offer pool is not the cause, and
-  a full step above Warden's is 4.29, past the table's highest severity — no weighting of this table can meet the condition.
-  Reported, nothing re-weighted (IL's ruling 3).
-- **§3 — THE BOT PLAYS BY THE PLAYER's RULES.** A card's pick narrows in `battle._enemy_pick_pool`, which the picker, the
-  bot's drafted hook and the Swordmaster's rotation (most of the sim's Executes) all ask; Execute's is the only qualifier.
-  **HEAD's bot never aimed an illegal Execute** (513 casts in 5,609 seeded fights), **but the rotation's own copy was stricter
-  than the picker**: with his Rage below the price and the cast free (the tree's *Your First Casts of a Fight Are Free*), it
-  waited for a Broken enemy. A fully talented Swordmaster casts those now — 4 of his party's 20 seeded default runs move (262
-  Executes to 272, no run's outcome) and nothing untalented; §1 beside it moves the same four the same way.
-- **§0 — THE RULINGS BUILT.** Execute's darkened button says *No enemy is below 20% health or Broken* (its line read off
-  `_execute_line`; the cost's reason wins); Empty Pulpit, Dead Air **and Dirge** say *strike damage* (the crest chip too); Blood
-  Debt names *the enemy with the most health*, the tie rule in the glossary's new `most_health` (one hundred and two entries);
-  the gate-source derivation reads both routes (twenty-three at IL: `check_gw` by the list, `check_il` among the root's); slot 0's dead Perfects are asserted.
-  **Found against the brief**: the Cairn of the Fallen is an EVENT (its weight 8 is true — no relic carries one); the strike's
-  shape has five more texts the census graded true (IL's ruling 2).
-- **THE INSTRUMENTS.** `check_il` is new (86 checks); re-pointed where IL moved what they read: `check_ij` §0.4 (both
-  routes) and §3 (five Cleric durations), `check_dm` §1 (three anchors), `check_ik` §2e and §2f (the picker's pool), `check_hp`
-  §2a (the crest words), `test_batch_ce` (the glossary's 102) and `check_ia` §2d (the event's ordinary rune is one it can hand
-  over — a pick by shown words that Blood Debt's new words turned over, found by recon 1); `check_di`'s comment records the move.
-- **THE VERIFICATION.** Two recons (HEAD's battery on IL's code and data, then the complete tree), the gate-source
-  readers (twenty-three, `check_il` among them) over `check_il` before the acceptance, the controls, HEAD's code under IL's
-  gate, the pre-pass and the acceptance — `docs/reports/IL.md` §9.
-- **`CLAUDE.md` IS 475,705 B = 464.56 KiB AGAINST ITS 510 KiB CEILING — 45.44 KiB UNDER** (+1,866 B at IL):
-  5.6 batches at EZ's record (8,293 B), 28.8 at the mean of IH–IL (1,617 B).
-- **`docs/state.md` IS 365,112 B = 356.55 KiB AGAINST ITS 380 KiB CEILING — 23.45 KiB UNDER** (+5,587 B at IL, this
-  line included): 4.1 batches at IA's +5,860 B, **the worst case**; the honest rate is IH +2,521, II −1,985, IJ +3,355, IK +2,111, IL +5,587 — a mean of 2,318 B over
-  the five, **10.4 batches at it — BELOW FIFTEEN, THE ALARM IL's BRIEF NAMED, AND THE ARCHIVE PRACTICE IS ITS FIRST ANSWER,
-  NOT THE RE-MEASURE** (IL's ruling 7). IL moved what it closed (the archive's IL block) and grew the file by its rulings, its
-  re-measure and its finds. **At the worst rates this file runs out first** (4.1 batches against 5.6); **at the honest rates this file does** (10.4 against 28.8). The re-measure is IN's.
-- **No save version moved**: nothing IL changed is saved.
+  (`../save-backups/IM-20261017-105223`, md5-identical to IL's).
+- **§1 — THE RUIN RUNG: TWO BANDS A RUNG, AND NO FALLBACK.** One field, `severity_floor`, said both what the safe slot is dealt
+  from and where the gambles start; at Ruin it stood at the table's top, both gambles fell back to the whole table, and the
+  hardest rung dealt the mildest bargains. **Each rung now names both bands** (`Run.DIFFICULTIES`' `safe_band` and
+  `gamble_band`): Wanderer 1–2 and 3–4, Warden 1–3 and 4, **Ruin 3–4 and 4 — no mild option**; every band is non-empty over the
+  table and nothing falls back. **At EP's sample** (400 offers a rung through the real roll, seeded, past the shop gate):
+  **Wanderer 2.82 and Warden 3.28, dealt offer for offer as the floor dealt them** (the control), **Ruin 3.82, from IL's 2.24**
+  — half a step above Warden, the table's ceiling. The glossary's severity, modifier and ladder entries read the bands; R091's
+  *harsher bargains* is true.
+- **§2 — FOUR MORE TEXTS SAY STRIKE DAMAGE**: the tree's More Damage Dealt and Less Damage Taken, the Dragonbone Idol and the Horn
+  of the First War, whose fields are read in the strike loop alone. **What they visibly do not touch**, measured twice a build:
+  on the default build a Pyromancer's damage is about 17% not strike (Burn's ticks, Pyre Wake), a Survivalist's 17–23%, a
+  Beastmaster's 30–33% (his companions' blows); untalented 21%, 27–29% and 37–44%; under 1% for a Berserker, a Swordmaster or a
+  Warden on the default build. And a third of the health a hero loses on the default build is lost outside the strike, a fifth
+  untalented (`docs/reports/IM.md` §2).
+- **§3 — THE PICKER's REMAINDER.** The upgraded Execute's pick tests each body's own price (`_eff_cost`), so under Warded it
+  offers only what he can pay for — dormant in play (FOUND AT IM). **Seven cards refuse a body that would produce nothing, with
+  the reason on its hover** (`battle._pick_dud`, asked by `_enemy_pick_pool`): Firedraw, Transference and Cryoclasm the one body
+  holding what they move; Cull, Requiem, Funeral Pyre and Pyre Wake a body carrying nothing to consume. Hunt is offered (a clean
+  pick pays its base). The door refuses a move card whose pick offers nobody — the last enemy standing holds it — and says why;
+  the bot's three aims at them ask the pool.
+- **§0 — THE RULINGS BUILT.** The pouch's one rule in the items entry (no one deals a bomb's damage and no one lays a potion's
+  status); the charmed Daze's comment repaired (the striker is the charmed enemy, the source deliberately nobody — DI §2); the
+  `st/b` column named for what it counts, its output unmoved; three instrument rules — a field's reach is read at its read sites,
+  retiring a true claim is a defect, a superlative pick names itself (57 battery sites of that shape, 34 that do not in every
+  FAIL line). **Nothing was retired, and the claims stand at 86.**
+- **§0.7 — A MEASUREMENT's TABLE LIVES IN ITS REPORT.** Every table and figure series here was read against its report first;
+  those the report holds became a line naming the conclusion and the report — the Cleric's two Mana tables (IE, IF), IL's
+  Sanctity table, and DA's, FV's, ER's and EQ's fight-length and Loyalty figures, EF's split costs: **2,684 B recovered**.
+  Five stayed whole because their report does not hold them (FU's elite and boss rounds, EO's talented rung-1 row, EP's per-kind
+  samples and its talented pair, DA's rung-3 Loyalty). What IM closed went to the archive.
+- **THE INSTRUMENTS.** `check_im` is new (122 checks); re-pointed where IM moved what they read: `check_il` §2 and §3,
+  `check_ik` §2f and §6, `check_ij` §3 (three rows), `check_fx` §1 (two phrases), `test_batch_bm` (two) and `test_batch_bn`
+  (three). The gate-source readers are **twenty-four** by the two routes (`check_im` opens the root); no third route reads a new
+  gate's source.
+- **THE VERIFICATION.** Two recons (HEAD's battery on IM's code and data, then the complete tree), the gate-source readers over
+  `check_im` before the acceptance, the controls, HEAD's code under IM's gates, the pre-pass and the acceptance —
+  `docs/reports/IM.md` §9.
+- **`CLAUDE.md` IS 477,181 B = 466.00 KiB AGAINST ITS 510 KiB CEILING — 44.00 KiB UNDER** (+1,476 B at IM): 5.4 batches at
+  EZ's record (8,293 B), 93.4 at the mean of II–IM (482 B).
+- **`docs/state.md` IS 361,066 B = 352.60 KiB AGAINST ITS 380 KiB CEILING — 27.40 KiB UNDER** (−4,046 B at IM, this line
+  included): 4.8 batches at IA's +5,860 B, the worst case; the honest rate is II −1,985, IJ +3,355, IK +2,111, IL +5,587,
+  IM −4,046 — a mean of 1,004 B over the five, **27.9 batches at it**. **ABOVE EIGHT, SO §0.7's ESCALATION DOES NOT FIRE**: IN's census is its own work, not a first section before it.
+- **No save version moved**: nothing IM changed is saved.
 - **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in a build
   older than HL**: HL's ceiling refuses a newer save from HL's build on — HR's v15 is the first bump it has guarded — and HJ's and
   HK's builds, and `main`, carry no ceiling.
-- **Next letter: IM — the eight cards' partition, `master.html`'s sweep and the picker's remainder** (the roadmap, below).
+- **Next letter: IN — `master.html`'s sweep and this file's closed-block census** (the roadmap, below).
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### IL's RULINGS OWED — **SEVEN; THE FIRST IS STILL THE DESIGNER's PLAY, AND THE REST ARE WHAT IL's MEASUREMENTS AND RE-DERIVATIONS FOUND**
+### IM's RULINGS OWED — **SIX; THE FIRST IS STILL THE DESIGNER's PLAY, AND THE REST ARE WHAT IM's BUILD AND MEASUREMENTS LEFT**
 
-Full working: `docs/reports/IL.md`, NEEDS A RULING.
+Full working: `docs/reports/IM.md`, NEEDS A RULING.
 
-1. **PLAY ONE ZONE WITHOUT THE DEBUG MENU, AND SEND THE FILE** (IH's ruling 1, carried — II §0.1, IJ §0.1, IK §0.1, IL §0.1:
-   five batches old). The readout names every debug action, so a file that names none is play. It prices Boil Over's rate,
-   Rupture's number and clock, the vow's worth and the Cleric's Mana, and **its first Hierophant confirms Sanctity's 13 on IL's
-   repaired code**.
-2. **FOUR MORE TEXTS OF THE STRIKE's SHAPE** (§0.3's re-derivation): N077 and N078 were the brief's ninth and tenth; **Dirge
-   (N079) reads the same field at the same line and took the word with them** — its chip and theirs are one builder, and a
-   crest rune's true word is not a re-cut (the brief's own ruling). **Still saying bare damage, each read in the strike loop
-   alone through the same two fields**: the tree's *More Damage Dealt* and *Less Damage Taken* (R036, R037) and the Dragonbone
-   Idol and the Horn of the First War (R073, R078) — IJ's census graded all four true. One word each, and no payout widens.
-3. **THE RUIN RUNG's CONDITION CANNOT BE MET, AND ITS LEVER IS NOT THE POOL** (§2; the brief's own stop condition). Ruin and
-   Warden draw one table; the difference is the floor, which at severity 4 is the table's top, so no gamble pool stands above
-   it and all three options come from the whole table. **A full step above Warden's 3.29 is 4.29, past the table's highest
-   severity of 4.** What a lever over this table would buy, off its counts (6 / 6 / 4 / 4), the safe slot left drawing the whole
-   table: Ruin's two gambles from severity 3–4 — about 3.10, still below Warden; from severity 4 alone — about 3.43, 0.14
-   above; every option severity 4 — 4.00, 0.71 above, the most any weighting gives. The condition, the lever or the table is yours; G080L's *weighted toward the mild end* still holds.
-4. **THE CAIRN OF THE FALLEN IS AN EVENT, AND ITS WEIGHT IS TRUE** (§0.5): events draw by weight and the Cairn's is 8; no relic
-   carries a weight, and IK's premise 27 stands. **Nothing was retired, and the claims stay at 86.** The fallen-hero ruling
-   prices three crest runes, two relics, the event and the map's Revive Potion (THE CREST POOL, below).
-5. **A CHARMED ENEMY's DAZE AND THE POUCH's TWO STATUSES STAY SOURCELESS BY RULE** (§1's kept-apart four, with the Ruin
-   primer). DI §2 left the Daze unstamped as an ambiguous source — *an enemy applying to an enemy* — though `battle.gd` calls it
-   the Occultist's work, and the potions are the party's. Making either the Cleric's lengthens it for a Hierophant, lets
-   Downwind copy the Daze and counts it as his in the recap: yours.
-6. **THE SIM's `st/b` COLUMN NOW COUNTS THE CLERIC's BLESSINGS** (§1's move). The door counts every status a hero lands on
-   another body, and the seventeen are such statuses — Renewal and Consecrated Ground already counted. BF had called it a debuff
-   counter; whether it should count afflictions alone is a change to the door's tally, not made.
-7. **THIS FILE's HONEST RATE IS BELOW FIFTEEN BATCHES** (WHERE, above). The archive practice is the first answer: IL moved what
-   it closed, and the next pass — a census of the live file's closed blocks, not a batch's own closings — is yours to schedule.
+1. **PLAY ONE ZONE WITHOUT THE DEBUG MENU, AND SEND THE FILE** (IH's ruling 1 — asked at II, IJ, IK, IL and IM §0.1). The readout
+   names every debug action, so a file that names none is play. Its first Hierophant confirms Sanctity's 13 on the repaired code; it
+   still prices Boil Over's rate, Rupture's number and clock, the vow's worth and the Cleric's Mana. Nothing in the queue waits on
+   it and no batch can do it.
+2. **A SEVERITY-5 BAND IS AUTHORING, AND IT IS YOURS** (IM's brief §1). Ruin now stands **0.54 above Warden** at EP's sample (3.82
+   against 3.28): half a step, the ceiling of a table whose top is severity 4. A full step needs bargains Ruin alone can draw —
+   content, not a weighting — and nothing was invented.
+3. **A RUIN BARGAIN NOW PAYS MORE, AND NEVER THE MERCHANT** (§1's consequence, read off `REWARDS`). The reward reads severity, so
+   every Ruin option pays 140 or 220 gold or a rune, and severity 1 — where the merchant stands (HW §2) — is outside both of
+   Ruin's bands. *Harsher bargains* buys richer rewards by the table's own rule; whether Ruin should be the rung with no bought
+   merchant is yours.
+4. **THE POUCH's RULE IN THE PLAYER's WORDS SAYS *the pouch belongs to all four heroes*, NOT *the party's*** (§0.5). The brief's
+   sentence carried a word retired from player-facing text (`CLAUDE.md`'s hero/ally block), so the items entry and
+   `master.html` say the same rule without it. Confirm the words.
+5. **58 READS OF A LIST PRICE STAND IN `battle.gd` WHERE AN EFFECTIVE ONE IS MEANT** (§3a's sweep): 55 in the bot's rotation
+   (`_autoplay_pick_kit`), which can choose a card under Warded it cannot pay for, and 3 enemy-side. The picker's was repaired;
+   repairing the rotation moves the bot's figures, so it is a batch of its own — yours to schedule.
+6. **57 BATTERY SITES PICK THEIR SUBJECT BY A SUPERLATIVE, AND 34 DO NOT NAME THEIR PICK IN EVERY FAIL LINE** (§0.8's census,
+   one row a site in the report). The rule binds a gate written or repaired from IM on; whether the 34 are repaired as each is
+   next touched, or as a batch, is yours.
 
 ### THE CLERIC's MANA RATE — **12, UNMOVED (IE §1); THE TUNING HANDLE AND THE FIGURES IT WAS MEASURED AGAINST**
 
 **The drip is `battle._mana_regen`'s `12 + u.mana_regen_bonus`, one base for every Mana hero; the Mage's Evocation adds 10.** A
-Cleric's own rate is that base — no lineage moves it, and no live rune, relic or node raises it. **The figures** (IE's probe: 20
-sim runs for each of the nine Mana lineages, rung 1; DRY = a turn on which the card the bot would cast with a full bar costs more
-than he holds; per-run mean ± SE):
-
-| Cleric's base | build | Cleric | Mage | Hunter |
-|---|---|---|---|---|
-| 8 | default (27 nodes) | 11.6 ± 1.0 | 4.5 ± 1.0 | 2.9 ± 0.5 |
-| 10 | default | 6.9 ± 0.9 | 3.3 ± 0.8 | 4.0 ± 0.6 |
-| **12 (HEAD)** | default | **4.1 ± 0.6** | 4.5 ± 0.9 | 3.9 ± 0.5 |
-| 14 | default | 1.5 ± 0.3 | 2.3 ± 0.7 | 3.9 ± 0.5 |
-| 12 (HEAD) | untalented | 26.8 ± 1.7 | 18.3 ± 2.8 | 33.8 ± 2.1 |
-| 8 | untalented | 50.5 ± 1.5 | 14.9 ± 2.5 | 36.8 ± 1.8 |
-| 14 | untalented | 18.5 ± 1.3 | 21.6 ± 3.3 | 33.0 ± 1.9 |
-**IE's shape** (the Cleric dry sometimes, and less than the Mage and the Hunter) **is WITHDRAWN** (IF's brief §0.1): it asked for a
-higher rate while the finding pointed down. **THE HOURGLASS, RE-READ AT IF** — its reach repaired (every Mana hero, never lowering a
-bar above the cap), the same probe, 20 runs a lineage, rung 1, rate 12:
-
-| arm | build | Cleric | Mage | Hunter | opens full (C / M / H) |
-|---|---|---|---|---|---|
-| relic held (IF) | default | 1.6 ± 0.3 | 3.4 ± 0.8 | 0.9 ± 0.2 | 20.0 / 32.4 / 16.0% |
-| relic held (IE's, the Hunter skipped) | default | 0.7 ± 0.2 | 1.7 ± 0.5 | 4.1 ± 0.7 | — |
-| no relic (IF) | default | 3.5 ± 0.5 | 4.1 ± 0.9 | 3.6 ± 0.5 | 19.9 / 29.3 / 10.1% |
-| relic held (IF) | untalented | 11.5 ± 1.1 | 16.4 ± 3.0 | 20.9 ± 1.4 | 7.7 / 10.9 / 3.7% |
-| relic held (IE's) | untalented | 13.1 ± 1.0 | 14.5 ± 2.8 | 36.0 ± 1.6 | — |
-| no relic (IF) | untalented | 27.2 ± 1.4 | 17.9 ± 2.8 | 35.3 ± 1.6 | 4.6 / 6.1 / 1.6% |
+Cleric's own rate is that base — no lineage moves it, and no live rune, relic or node raises it. **The two tables it was measured
+against live in their reports (IM §0.7)**: IE's probe — the share of his turns a hero is dry (the card the bot would cast with a full
+bar costs more than he holds), 20 sim runs for each of the nine Mana lineages, rung 1, at bases 8 / 10 / 12 / 14, default and
+untalented — in `docs/reports/IE.md` §1b; IF's re-read with the Cracked Hourglass's reach repaired (every Mana hero, never lowering a
+bar above the cap), relic held and not, in `docs/reports/IF.md` §0.1b. **What each concludes, the figures the rate is priced by**: at
+12 on the default build the Cleric is dry **4.1%** of his turns (the Mage 4.5%, the Hunter 3.9%), untalented **26.8%** (18.3%,
+33.8%); with the Hourglass held, untalented, **11.5%** (16.4%, 20.9%). **IE's shape** (the Cleric dry sometimes, and less than the
+Mage and the Hunter) **is WITHDRAWN** (IF's brief §0.1): it asked for a higher rate while the finding pointed down.
 
 With the relic, at a turn's start the bars read 91 / 97 / 95 of 120 (default). **THE RATE STAYS 12, CONFIRMED (IG's brief §0.2):**
 untalented — the designer's build — the Cleric is dry 11.5% of his turns with the relic, below the Mage's and the Hunter's, and the
@@ -163,24 +142,28 @@ untalented and 2.51 default at 13, a boss 4.04) **are archived at IL**: IL's HEA
 Hierophant run of the designer's play confirms it** (II's ruling 1).
 
 **RE-MEASURED AT IL §1c, ON THE REPAIRED CODE, AND THE STEP STAYS 13** — the measurement does not ask for a move. IG's probe
-(the same three parties, the Cleric awakened with the Hierophant's rune, rung 1), **every run seeded so HEAD and the repair
-played the same seeds**; untalented 60 runs a party an arm, the default build 20; IL's code arm is §1 alone:
+(the same three parties, the Cleric awakened with the Hierophant's rune, rung 1), every run seeded so HEAD and the repair played the
+same seeds; **its table is `docs/reports/IL.md` §1c (IM §0.7)**. The figures a re-tune from play is priced against: at a normal
+fight's end, untalented, **2.58 steps at 13 on HEAD and 2.62 on the repair** (±0.03 an arm; 2.40 and 2.43 at 14), on 41.51 and
+41.55 events; the default build **2.48 and 2.47**; a boss untalented **3.99 and 3.97**, 38.3% and 40.8% at the cap. **The events did
+not rise because they cannot**: the ledger counts every status landing on or leaving any body from any source, so naming the
+Cleric changes how long his statuses last, not whether they count. **What the repair moved is the payout's reach** — the door
+lengthened **5.32 applications a fight where it lengthened 1.18** untalented (5.16 against 2.19 on the default build) — and the
+completions it bought are not significant at this n (28 against 40 runs completed only in one arm).
 
-| | HEAD (IK's code) | IL §1 alone |
-|---|---|---|
-| Untalented: events at a normal fight's end — steps at 13 (14) | 41.51 — **2.58** (2.40) | 41.55 — **2.62** (2.43) |
-| Untalented: a boss — steps at 13, at the cap | 3.99, 38.3% | 3.97, 40.8% |
-| Untalented: his first / second step, by his turn | 2.99 (93.0%) / 5.09 (70.2%) | 2.96 (92.7%) / 5.02 (70.2%) |
-| Default: events at a normal fight's end — steps at 13 | 38.56 — **2.48** | 38.34 — **2.47** |
-| Default: a boss — steps at 13, at the cap | 3.42, 18.3% | 3.29, 15.0% |
-| **Applications the door lengthened, a fight (turns added)** — untalented / default | 1.18 (2.59) / 2.19 (4.27) | **5.32 (12.70) / 5.16 (10.84)** |
-| Untalented: runs completed (paired: completed only in this arm) | 64 of 180 (28) | 76 of 180 (40) |
+### FOUND AT IM AND NOT FIXED
 
-Untalented 3,946 fights at HEAD and 4,053 at §1; default 1,663 and 1,686. **The events did not rise because they cannot**: the
-ledger counts every status landing on or leaving any body from any source, so naming the Cleric changes how long his
-statuses last, not whether they count. The 0.04 rise in steps is inside one standard error (±0.03 an arm), and 13 and 14
-straddle 2.5 at both readings. **What the repair moved is the payout's reach** — four and a half times the lengthened
-applications on the designer's build — and the completions it bought are not significant at this n (28 against 40 runs).
+- **THE UPGRADED EXECUTE's FIX IS DORMANT IN PLAY**: nothing in `scripts/` or `data/` writes `execute_upgraded` (its node grant
+  went with the twelve trees — DO's read-only-zero fields), so IM §3a's price test is driven with the field set by hand
+  (`check_im` §3a) and reaches no fight until a writer returns.
+- **THE `st/b` SPLIT IS PARKED, NOT SCHEDULED (IM's brief §0.6)**: afflictions landed on enemies and blessings landed on allies are
+  two facts in one column, and the split is owed the next time the sim report itself is touched — measured before and after like
+  any instrument change. Not before: IL §1c's Sanctity figures read through that door.
+- **TWO GATES THE SUPERLATIVE CENSUS MET IN PASSING**: `check_gn` §4 computes the highest-health enemy (`hp_top`) and never reads it;
+  `check_ew` §4 asserts `cap < 1.0 or cap >= 1.0`, which cannot fail — a printed figure wearing an `ok()`.
+- **THE BOT CAN NO LONGER CAST A FIREDRAW ON THE ONE ENEMY ALIGHT**: the drafted hook aims Firedraw at the ripest fire, and with one
+  enemy burning that body is the one the pick refuses, so the hook skips it (§3b). The rotation never cast Firedraw; whether the
+  hook should draw a lone fire onto another body instead is a bot policy, not the pick's rule.
 
 ### FOUND AT IL AND NOT FIXED
 
@@ -189,11 +172,6 @@ applications on the designer's build — and the completions it bought are not s
   the Cleric as its source the day its field is written; `check_il` §1a reds that day, naming the field.
 - **`docs/combat-rules.md`'s HEADER CLAIM IS STALER AGAIN** — IL wrote into its DI block (*a status is applied with its `src`*).
   Among the 86, IO's (FOUND AT HZ).
-- **UNDER WARDED, THE UPGRADED EXECUTE's POOL READS THE LIST PRICE** (read off the code, not driven). `_enemy_pick_pool` keeps
-  the Broken alone when `ab.cost > u.resource`, and the ward prices a cast at 1.25 times that; with his Rage between the two and a
-  Broken enemy lighting the button, the pick offers an unbroken body below the line that the ward's price puts out of his reach —
-  the disagreement IK's comment names. One test a body (`_eff_cost(u, ab, e)`) closes it; IK's picker, so left.
-
 ### FOUND AT IK AND NOT FIXED
 
 - **OTHER SUNDERS LAY THEIR OWN DURATIONS.** `BattleUnit.SUNDER_TURNS` is Sunder's own — Crushing Blow's and a Perfect Sever's —
@@ -442,27 +420,24 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
 - **`run_battery.sh` STILL DOES NOT ASK WHETHER THE GAME IS OPEN, AND A PLAIN `kill` STILL DOES NOT STOP IT** (HT's two, carried).
 ### THE PLAYTEST'S OTHER FINDINGS — **LATER BATCHES BY RULING (HW's brief §5); THE ROADMAP HOLDS THE ORDER**
 
-- **THE RE-MEASURE IS SCHEDULED, NOT PARKED (IC §5, the designer's) — IT IS IN (IL's brief §5; IK's brief gave it IM, and IL's
-  gave IM the eight cards' partition and `master.html`'s sweep)** — both ceilings run out within a batch of each other at the worst rate and far later at
+- **THE RE-MEASURE IS SCHEDULED, NOT PARKED (IC §5, the designer's) — IT IS IO, AND ITS SCOPE IS IN QUESTION (IM's brief §5)**: it
+  was priced for `CLAUDE.md`, and the file that binds is this one; if IN's census reads this file as mostly binding, the
+  re-measure's subject is both files and it moves up — both ceilings run out within a batch of each other at the worst rate and far later at
   the honest one (the WHERE block's two readings, each with both rates), so a re-measure that waits finishes as the room runs out;
   **II §4's archive pass did not move it back** (`CLAUDE.md` −56 B at II),
   **nor did IJ's struck lines** (`CLAUDE.md` −1,947 B at IJ). **The block index and HV's pilot still wait on it.**
   **THE ORDER:**
-- **IM — THE EIGHT CARDS' PARTITION, `master.html`'s SWEEP AND THE PICKER's REMAINDER (IL's brief §0.7, §0.10).** **The
-  cards**: Firedraw, Transference and Cryoclasm move a thing onto the target, so the one body already holding it is a dud and is
-  refused as Execute's are, a reason on its hover; Cull, Requiem, Funeral Pyre, Pyre Wake and Hunt read what the target carries,
-  and IM partitions the five by the rubric the designer ruled — **a pick that can produce nothing is refused with a reason; a
-  pick that produces less is offered** (`CLAUDE.md`, beside the bot's rule, RULED, NOT BUILT). A narrowing lives in
-  `battle._enemy_pick_pool`, so the bot reads it the day it is written (IL §3). **`master.html`**: a surface the census did not
-  cover and carrying false facts (IK found Blood Price's row); IM sweeps it with IJ's rubric and IJ's resolver where a figure has
-  a door. **Ruled at IL, before IM: the Ruin rung's condition is unmeetable over this table and its lever is not the pool — a
-  re-ruling is owed first (IL's ruling 3).**
-- **IN — THE RE-MEASURE**: `CLAUDE.md` binds first at the honest rates (II's brief §4 read it first at every rate; this file runs
+- **IN — `master.html`'s SWEEP AND THIS FILE's CLOSED-BLOCK CENSUS (IM's brief §5).** **`master.html`**: a surface the census did not
+  cover and carrying false facts (IK found Blood Price's row); IN sweeps it with IJ's rubric and IJ's resolver where a figure has a
+  door. **This file**: a census of the live file's closed blocks — IM §0.7 took the one cut that needed none (a measurement's table
+  lives in its report). **AND THE ESCALATION (IM's brief §0.7): if the honest rate reads below eight batches at IM's close, IN's
+  first section is the census and the cut, before its own work** — the WHERE block's reading says which.
+- **IO — THE RE-MEASURE**: `CLAUDE.md` binds first at the honest rates (II's brief §4 read it first at every rate; this file runs
   out first at the worst ones — the WHERE block), and the room is planned against the honest rate. **119 of 126 blocks bind. So
   archiving will never SHRINK CLAUDE.md — it can only stop it growing, and II proved it at the margin: 3,105 B out, 3,049 B
   written back, 56 B net. The next byte comes from the file's SHAPE, not from its contents** (IJ's brief §0.3, the designer's).
   The two readings go beside the record with the honest rate, and say which file runs out first at which rate (IK's brief §8).
-- **IO — THE CLAIMS**: HX's 87 stand at **86** — the per-batch re-read stops the backlog growing and does not retire it, so it is a
+- **IP — THE CLAIMS**: HX's 87 stand at **86** — the per-batch re-read stops the backlog growing and does not retire it, so it is a
   batch of its own (FOUND AT HX, FOUND AT IA). **The Cairn's *weight 8* is not one of them and is true** (an event's weight; IL
   §0.5), so the figure does not fall for it.
 - **MANA STAYS (ruled).** The finding was that the Mage and the Hunter run dry and only the Cleric is always full; **measured at IE
@@ -2138,20 +2113,11 @@ ability field is unchanged. **Five options were costed and the designer has rule
   participate in — because it settles with no implementation and would otherwise be lost when this
   file is next rewritten.
 - **A IS THE ONE TO AVOID**, exactly as EP warns: not to be stacked on an unplayed ×0.50.
-- **E IS REAL BUT IT IS RUNG 3's.** *"Fix E separately whenever convenient."* See the item below.
+- **E WAS REAL AND IT WAS RUNG 3's — FIXED AT IM §1** (*"fix E separately whenever convenient"*): each rung names two bands and
+  nothing falls back, so Ruin's bargains are the harshest (its item is archived).
 
 **WHAT IS STILL THE DESIGNER'S INSIDE C:** which abilities, on which enemies, at which rung.
 **Rune and ability content is content and this file does not invent it.**
-
-### RUNG 3'S BARGAIN TWIST INVERTS — **MEASURED AT EP §1, AND IT IS NOT THIS BRIEF'S RUNG**
-
-`roll_offer` draws one option from the pool at or below `severity_floor` and two from above it.
-At rung 3's floor of 4 there is nothing above it, both gambles fall through the guard clause, and
-all three options come from the whole twenty-modifier table. **Measured over 400 offers a rung,
-mean severity offered is 2.83 / 3.29 / 2.31 — the top rung's bargains are MILDER than the starter
-rung's.** The high pool holds **8 / 4 / 0**. **The stale comment that said otherwise is corrected;
-the behaviour is untouched.** **RULED AFTER EP: it is a real defect and it is rung 3's — *"fix E
-separately whenever convenient."* It is not bundled into the rung-2 work above.**
 
 ### THE RUN REPORT'S WIPE TABLE IS BANDED FOR A TWELVE-SLOT ZONE — **NAMED AT EP §1c, NOT FIXED; GJ GAVE THE END BOSS ITS OWN COLUMN**
 
@@ -3714,28 +3680,14 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
   elite 7.27 / 7.79 / 7.33, boss 10.87 / 10.07 / 10.50. **The Cryomancer party IS the default party,
   and EO read 9.1–9.2 on it** — so the "~9 rounds since EO" a brief quoted is about a round long now.
   The ROWS=3 and ROWS=9 tables below were not re-run.
-- **FV READ THE SAME CELL ON FIVE PARTIES (`DOD_SIM_ROWS=0`, rung 1, `--run 100` each).** Trash rounds
-  **8.47** on the default party itself (Berserker / Cryomancer / Devout / Beastmaster, n = 1,206, SD
-  2.62) — FU's 8.23 on the same party is 0.24 rounds away, about 2.3 combined standard errors at FV's
-  spread, with nothing that plays changed between the two batches — and **10.44** with
-  the Warden in the Berserker's seat, **9.11** with the Swordmaster, **7.71** with the Holy in the
-  Devout's and **6.10** with the Occultist. **A fight's length is a property of the PARTY**, so a
-  rounds figure travels only beside the party it was taken on.
+- **FV READ THE SAME CELL ON FIVE PARTIES** (`DOD_SIM_ROWS=0`, rung 1, `--run 100` each): trash rounds ran from about 6 to
+  about 10.5 across them, the default party's about a quarter-round from FU's reading — **a fight's length is a property of the
+  PARTY**, so a rounds figure travels only beside the party it was taken on. The five figures are `docs/reports/FV.md`'s premise
+  table (IM §0.7).
 - **Rounds to resolution, measured as TURNS PER LIVING PARTY MEMBER** (companions excluded from
-  both halves), over four `--run 25` sims, **after DA** — **DB through DG ran no sim and these are
-  carried unchanged**:
-
-  | party / rung | trash | elite | boss |
-  |---|---|---|---|
-  | 1 wanderer | 3.8 | 3.4 | 4.0 |
-  | 2 warden | 4.4 | 3.6 | 5.3 |
-  | 3 ruin | 4.4 | 4.4 | 4.4 |
-  | 2 warden, Sharpshooter | 5.5 | 4.9 | 6.0 |
-
-  **A fight is still three to six turns per hero** — the ROUNDS column is the half DK and DL do not
-  move, because companions are excluded from both halves of that ratio. **The healing and Break
-  columns are the stale ones.**
-  - **RE-MEASURED AT EN, `--run 30` A RUNG ON THE LIVE TREE, AND THE ROUNDS TABLE ABOVE IS
+  both halves), over four `--run 25` sims **after DA**: three to six turns per hero at every rung and kind. **DA's table is
+  `docs/reports/DA.md`'s (IM §0.7), and EN's below supersedes it.**
+  - **RE-MEASURED AT EN, `--run 30` A RUNG ON THE LIVE TREE, AND DA's ROUNDS TABLE IS
     SUPERSEDED BY THIS ONE:**
 
     | party / rung | trash | elite | boss |
@@ -3788,19 +3740,15 @@ REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
   | Sharpshooter | Focus (of 100) | — | — | — | 128.2 |
 
   **Loyalty and Focus still over-arrive and have not been touched.**
-  - **THE LOYALTY ROW WAS RE-MEASURED AT EQ AND AGAIN AT ER; THE 21.2 IS A `rows=9` FIGURE.**
-    Live at ER, per-battle deepest single bond over every battle a Beastmaster stood in, rung 2:
-    **untalented 6.64 ±0.09 (n=1391), rows 1–3 10.08 ±0.12 (n=1947), fully talented 18.98 ±0.17
-    (n=2649)** — **every arm reproducing EQ within its standard error**, and a fourth arm reading
-    the rows 1–3 meter at 10.2 (n=2030). EQ's rung-1 arm (11.26 ±0.10, n=2674) was not re-run.
-    **The rung makes the meter SHALLOWER**, because its governor is the companion's death and rung
-    2 kills companions three times as often. **Do not quote 21.2 as the meter's level — quote the
-    loadout with it.** **The deepest single bond ever observed is 90** (ER, rows 1–9).
-- **THE FAITH DECOMPOSITION AT RUNG 2, AFTER DA — AND STALE SINCE DK for the healing row:** absorbs **3.90**, ground drip **8.01**, total
-  **12.27** a battle, of which **2.21** lands on the Devout's own held meter. **Faith per absorb
-  ACTUALLY LANDED is 1.56 against the 2 the constant promises.** Ground up on **49% of hero turns**
-  (8.1 of 16.5). Devout healing a battle: **74 / 133 / 130 / 184** across the four arms — **STALE: Sanctuary, Rally
-  and the Field Medic now reach a fifth body, so every one of those four will rise.**
+  - **THE LOYALTY ROW WAS RE-MEASURED AT EQ AND AGAIN AT ER; THE 21.2 IS A `rows=9` FIGURE.** ER's arms (the per-battle
+    deepest bond, rung 2, untalented / rows 1–3 / fully talented, each reproducing EQ within its standard error) are
+    `docs/reports/ER.md`'s, EQ's rung-1 arm `docs/reports/EQ.md`'s (IM §0.7); the two the Loyalty curve was priced on stand in
+    its own section above. **The rung makes the meter SHALLOWER**, because its governor is the companion's death and rung
+    2 kills companions three times as often. **Do not quote 21.2 as the meter's level — quote the loadout with it.**
+- **THE FAITH DECOMPOSITION AT RUNG 2, AFTER DA — AND STALE SINCE DK for the healing row**: its figures (absorbs, the ground's
+  drip, what lands on the Devout's own meter, the ground's uptime and the Devout's healing a battle across four arms) are
+  `docs/reports/DA.md`'s (IM §0.7). **Faith per absorb ACTUALLY LANDED was 1.56 against the 2 the constant promises.** The
+  healing row is stale: Sanctuary, Rally and the Field Medic now reach a fifth body, so every arm of it will rise.
 - **TWO CONFOUNDERS ON EVERY FIGURE ABOVE: the sim party is FULLY TALENTED (`rows=9 of 9`)**, and
   **it wears each tree's FIRST lane — 24 of 36 lanes have never been measured at all.**
 - **AND THE INSTRUMENT'S OWN CAVEAT: the `conviction` row samples the DEVOUT'S OWN meter, which
@@ -3923,14 +3871,9 @@ the number.*
   three with no bar for an instrument to hold it to** — `check_fr` §5 prints its size every battery
   against nothing, because FG's rule says a bar worth stating is a bar something must read, and the
   converse is that a file with no bar has nothing to read against.
-  - **THE SPLIT COST 7,984 B OF ITS OWN** — the index block, the new file's header, two section
-    headings and four repairs to blocks that stayed. **The two halves together read 245.30 KiB
-    against 237.50 before.** About one and three quarter batches of growth, to buy thirteen.
-  - **AND THE TWO HALVES DO NOT GROW AT THE SAME RATE, WHICH IS NOW MEASURED RATHER THAN ASSUMED.**
-    Over the nineteen prune-free steps DK→EE the MAIN half grew **+2,867 B/batch** (median +3,214,
-    max +6,448 at DR) against the instrument half's **+1,630** (median +653, max +5,118 at DX). Over
-    the five post-prune batches DZ→EE it is **+1,890 against +3,623.** **Both are real and they point
-    opposite ways; the recent one is what five instrument batches in a row look like.**
+  - **THE SPLIT COST ABOUT A BATCH AND THREE QUARTERS OF GROWTH, TO BUY THIRTEEN, AND THE TWO HALVES DO NOT GROW AT THE SAME
+    RATE** — measured, not assumed; the bytes and the per-batch rates over DK→EE and DZ→EE are `docs/reports/EF.md` §2's (IM §0.7).
+    The recent rate is what five instrument batches in a row look like.
   - **FOR THE RECORD, AND NOT AS A TARGET: the retired ratio has not been re-derived at EF and is not
     worth re-deriving.** Its numerator is now spread over two files and its denominator gained both,
     which is the third way the same measurement can move without anything about density changing.

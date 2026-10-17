@@ -175,17 +175,19 @@ func _difficulty_table() -> void:
 	ok(int(run.difficulty_rung()) == 3, "§2: ...and is still rung 3")
 	# The two twists are not this batch's either.
 	run.difficulty = "wanderer"
-	ok(int(run.difficulty_def()["severity_floor"]) == 2
+	# BATCH IM §1 RE-POINTED THESE THREE: the floor is two bands a rung (the safe slot's, the gambles'); rung 1's and
+	# rung 2's are the floor's own split, so their twists are unchanged, and rung 3's safe slot is the one IM moved.
+	ok(run.difficulty_def()["safe_band"] == [1, 2] and run.difficulty_def()["gamble_band"] == [3, 4]
 			and not bool(run.difficulty_def()["fixed_modifier"]),
-		"§2: rung 1's twists are unchanged (floor 2, no fixed modifier)")
+		"§2: rung 1's twists are unchanged (the floor's split at 2, no fixed modifier)")
 	run.difficulty = "warden"
-	ok(int(run.difficulty_def()["severity_floor"]) == 3
+	ok(run.difficulty_def()["safe_band"] == [1, 3] and run.difficulty_def()["gamble_band"] == [4, 4]
 			and not bool(run.difficulty_def()["fixed_modifier"]),
-		"§2: rung 2's twists are unchanged (floor 3)")
+		"§2: rung 2's twists are unchanged (the floor's split at 3)")
 	run.difficulty = "ruin"
-	ok(int(run.difficulty_def()["severity_floor"]) == 4
+	ok(int((run.difficulty_def()["safe_band"] as Array)[0]) >= 3
 			and bool(run.difficulty_def()["fixed_modifier"]),
-		"§2: rung 3's twists are unchanged (floor 4, fixed modifier on)")
+		"§2: rung 3's twists stand (its safe slot never mild since IM, fixed modifier on)")
 	# DOD_SIM_DIFFICULTY still arms each rung — that is the env read, and it
 	# goes through difficulty_id, which is also what makes Batch Y's ids resolve.
 	ok(String(run.difficulty_id("wanderer")) == "wanderer"

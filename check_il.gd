@@ -13,9 +13,11 @@
 #        Hierophant's repaired statuses land his steps longer, through the spawn; the recast gate adds the same steps.
 #   §2   THE RUIN RUNG's BARGAINS: the census's own sample, read — one modifier table split by the rung's floor, the
 #        floor at Ruin the table's top, and the ruled condition beyond any weighting of this table; the merchant at
-#        severity 1; the glossary's *weighted toward the mild end* still the table's shape.
+#        severity 1; the glossary's *weighted toward the mild end* still the table's shape. (Re-pointed at IM §1: the
+#        table is dealt by each rung's two bands, Ruin's gambles at the top; `check_im` §1 holds the bands.)
 #   §3   THE BOT AIMS WHERE THE PICKER WOULD: the drafted hook asks `_enemy_pick_pool`, the picker's answer, so a
-#        drafted Execute strikes a body that qualifies; the narrowing reaches Execute and no other card.
+#        drafted Execute strikes a body that qualifies; the narrowing reaches Execute and no other card (and since
+#        IM §3b, seven cards more by their own rule — `check_im` §3b drives them).
 #   §9   The player's files are as this gate found them.
 #
 # **WHAT THIS GATE CANNOT SEE, SAID FIRST.** §1 drives twelve of the seventeen repaired sites live and reads the other
@@ -631,11 +633,16 @@ func _s2_ruin_rung() -> void:
 		else:
 			high += 1
 	var body := _body("scripts/run_state.gd", "roll_offer")
-	ok(body.contains("for id in MODIFIERS:") and body.contains("difficulty_def()[\"severity_floor\"]") and not body.contains("difficulty_rung"),
-		"§2: `roll_offer` no longer draws one table split by the rung's floor — the premise IL reported has moved")
-	ok(int(_run.DIFFICULTIES["ruin"]["severity_floor"]) >= top,
-		"§2: Ruin's floor (%d) is below the table's top severity (%d) — a modifier stands above it now" % [
-			int(_run.DIFFICULTIES["ruin"]["severity_floor"]), top])
+	# BATCH IM §1 RE-POINTED THESE TWO ROWS: the floor that split the table is gone, and each rung names the band its safe
+	# slot is dealt from and the band its gambles are. What they still ask of IL's premise: ONE table, dealt by the rung's
+	# own fields — and Ruin's gambles reach the table's top, so nothing stands above them (`check_im` §1 holds the rest).
+	ok(body.contains("for id in MODIFIERS:") and body.contains("difficulty_def()[\"safe_band\"]")
+			and body.contains("difficulty_def()[\"gamble_band\"]") and not body.contains("difficulty_rung"),
+		"§2: `roll_offer` no longer deals one table by the rung's two bands — the premise IM built on has moved")
+	var ruin_gb: Array = (_run.DIFFICULTIES["ruin"] as Dictionary).get("gamble_band", [0, 0])
+	ok(int(ruin_gb[1]) >= top,
+		"§2: Ruin's gamble band (%s) stops below the table's top severity (%d) — a modifier stands above it now" % [
+			str(ruin_gb), top])
 	ok(float(means["warden"]) + 1.0 > float(top),
 		"§2: Warden's mean (%.2f) plus a full step no longer passes the table's top severity (%d) — the condition can be met" % [
 			means["warden"], top])
@@ -701,9 +708,14 @@ func _s3_bot_aims() -> void:
 			narrowed.append(ab.display_name)
 	(foes[2] as BattleUnit).hp = 100
 	var ex_pool: Array = s.call("_enemy_pick_pool", u, ex, _foes(s))
-	ok(narrowed == ["Execute"] and ex_pool == [foes[2]] and read >= 100,
-		"§3: the pick pool narrows %s on a clean board (want Execute alone), and Execute's with one low enemy is %s (%d cards read)" % [
-			str(narrowed), str(ex_pool.map(func(e): return (e as BattleUnit).unit_name)), read])
+	# BATCH IM §3b RE-POINTED THIS ROW: the pick that can produce nothing is refused for seven cards more (IL §0.7's
+	# rubric, the designer's), and on a clean board — nothing on the field that any of them reads — each narrows to nobody.
+	var narrowed_sorted := narrowed.duplicate()
+	narrowed_sorted.sort()
+	ok(narrowed_sorted == ["Cryoclasm", "Cull", "Execute", "Firedraw", "Funeral Pyre", "Pyre Wake", "Requiem", "Transference"]
+			and ex_pool == [foes[2]] and read >= 100,
+		"§3: the pick pool narrows %s on a clean board (want Execute and IM's seven), and Execute's with one low enemy is %s (%d cards read)" % [
+			str(narrowed_sorted), str(ex_pool.map(func(e): return (e as BattleUnit).unit_name)), read])
 	ok(_body("scripts/battle.gd", "_bot_drafted_pick").contains("_enemy_pick_pool(u, ab, foes)"),
 		"§3: the drafted hook does not ask `_enemy_pick_pool`")
 	# THE SECOND BOT SITE: the Swordmaster's rotation aims his own Execute (most of the sim's casts), and it asks the

@@ -1127,7 +1127,8 @@ const PINS := [
 	["rune:thin_blood", "a quarter", "scripts/battle.gd", "_resolve", "or randf() < 0.25)"],
 	["src:scripts/draft_screen.gd:_draw_screen", "four heroes (%d/4)", "scripts/draft_screen.gd", "_toggle_hero", "elif picks.size() < 4:"],
 	["src:scripts/draft_screen.gd:_draw_screen", "(%d/3)", "scripts/draft_screen.gd", "_toggle_relic", "elif relic_picks.size() < 3:"],
-	["src:scripts/map_screen.gd:_maybe_show_framing", "THREE BARGAINS", "scripts/run_state.gd", "roll_offer", "while picked.size() < 3 and not rest.is_empty():"],
+	# BATCH IM §1 RE-POINTED THIS ROW: the three are dealt by the gamble loop's own stop now, the fallback gone.
+	["src:scripts/map_screen.gd:_maybe_show_framing", "THREE BARGAINS", "scripts/run_state.gd", "roll_offer", "if picked.size() >= 3:"],
 	["src:scripts/map_screen.gd:_node_tooltip", "Three ability upgrades", "scripts/run_state.gd", "roll_blacksmith_offer", "if offer.size() == 3:"],
 	["src:scripts/relics_screen.gd:_ready", "up to 3", "scripts/draft_screen.gd", "_toggle_relic", "elif relic_picks.size() < 3:"],
 	["item:revive", "at 50% HP", "scripts/battle.gd", "_use_item", "target.revive(0.5)"],
@@ -1367,8 +1368,10 @@ const PINS := [
 	["glossary:elites:long", "picks from up to three runes", "scripts/run_state.gd", "roll_rune_candidates", "while out.size() < 3:"],
 	["glossary:elites:long", "80-100 gold", "scripts/run_state.gd", "award_gold", "randi_range(80, 100)"],
 	["glossary:blacksmith:long", "Three pairings on the counter", "scripts/run_state.gd", "roll_blacksmith_offer", "if offer.size() == 3:"],
-	["glossary:bargain:short", "Three offers", "scripts/run_state.gd", "roll_offer", "while picked.size() < 3 and not rest.is_empty():"],
-	["glossary:bargain:long", "offers three bargains", "scripts/run_state.gd", "roll_offer", "while picked.size() < 3 and not rest.is_empty():"],
+	# BATCH IM §1 RE-POINTED THIS ROW: the three are dealt by the gamble loop's own stop now, the fallback gone.
+	["glossary:bargain:short", "Three offers", "scripts/run_state.gd", "roll_offer", "if picked.size() >= 3:"],
+	# BATCH IM §1 RE-POINTED THIS ROW: the three are dealt by the gamble loop's own stop now, the fallback gone.
+	["glossary:bargain:long", "offers three bargains", "scripts/run_state.gd", "roll_offer", "if picked.size() >= 3:"],
 	["glossary:modifier:long", "deals 25% more damage", "scripts/battle.gd", "_stamp_modifier", "u.attack = int(round(u.attack * 1.25))"],
 	["glossary:end_boss:long", "a talent point apiece", "scripts/profile.gd", "award_zone_boss_points", "int(purse.get(cls, 0)) + 1"],
 	["glossary:pouch_slots:long", "for the whole fight", "scripts/battle.gd", "_use_item", "_apply_status(vs_e, \"hexed\", -1)"],

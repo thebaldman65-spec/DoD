@@ -2,15 +2,15 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1848,
-  "source": 1343,
+  "total": 1855,
+  "source": 1347,
   "other": 129,
-  "document": 376
+  "document": 379
  },
  "source_residency": {
   "narrow": 46,
   "code": 822,
-  "absent": 322,
+  "absent": 326,
   "runtime": 101,
   "unresolved": 3,
   "comment": 46,
@@ -7219,7 +7219,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ik.gd#532",
+   "g": "check_ik.gd#537",
    "expr": "String"
   },
   {
@@ -7231,7 +7231,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_ik.gd#531"
+   "g": "check_ik.gd#536"
   },
   {
    "s": "check_ik.gd",
@@ -7242,7 +7242,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "read",
-   "g": "check_ik.gd#583"
+   "g": "check_ik.gd#588"
   },
   {
    "s": "check_ik.gd",
@@ -7253,7 +7253,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "read",
-   "g": "check_ik.gd#583"
+   "g": "check_ik.gd#588"
   },
   {
    "s": "check_ik.gd",
@@ -7264,7 +7264,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "read",
-   "g": "check_ik.gd#583"
+   "g": "check_ik.gd#588"
   },
   {
    "s": "check_il.gd",
@@ -7300,6 +7300,94 @@
    "k": "format",
    "how": "read",
    "g": "check_il.gd#363"
+  },
+  {
+   "s": "check_im.gd",
+   "fn": "_s0_rulings",
+   "h": "scripts/battle.gd",
+   "n": "\nfunc _bewitched_strike(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_im.gd#577"
+  },
+  {
+   "s": "check_im.gd",
+   "fn": "_s0_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "A FACT ABOUT A FIELD's REACH IS READ AT THE FIELD's READ SITES, NEVER AT ITS WRITES",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "read",
+   "g": "check_im.gd#584"
+  },
+  {
+   "s": "check_im.gd",
+   "fn": "_s0_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "A GATE THAT SELECTS ITS SUBJECT BY A SUPERLATIVE NAMES THE SUBJECT IT PICKED",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "read",
+   "g": "check_im.gd#584"
+  },
+  {
+   "s": "check_im.gd",
+   "fn": "_s0_rulings",
+   "h": "scripts/battle.gd",
+   "n": "Occultist-attributed",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_im.gd#574"
+  },
+  {
+   "s": "check_im.gd",
+   "fn": "_s0_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "RETIRING A TRUE CLAIM IS THE SAME DEFECT AS KEEPING A FALSE ONE",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "read",
+   "g": "check_im.gd#584"
+  },
+  {
+   "s": "check_im.gd",
+   "fn": "_s0_rulings",
+   "h": "scripts/battle.gd",
+   "n": "debuff counter",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_im.gd#579"
+  },
+  {
+   "s": "check_im.gd",
+   "fn": "_s0_rulings",
+   "h": "scripts/battle.gd",
+   "n": "the Daze is\n\t# the Occultist's work",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_im.gd#574"
+  },
+  {
+   "s": "check_im.gd",
+   "fn": "_s0_rulings",
+   "h": "scripts/battle.gd",
+   "n": "the debuffer's ledger",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_im.gd#579"
   },
   {
    "s": "test_batch_ah.gd",
@@ -15069,6 +15157,17 @@
    "s": "test_batch_bm.gd",
    "fn": "_end_boss_and_ladder",
    "h": "scripts/run_state.gd",
+   "n": "\"gamble_band\": [",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "test_batch_bm.gd#322"
+  },
+  {
+   "s": "test_batch_bm.gd",
+   "fn": "_end_boss_and_ladder",
+   "h": "scripts/run_state.gd",
    "n": "\"mult\": 0.50",
    "p": "+",
    "r": "code",
@@ -15102,29 +15201,7 @@
    "s": "test_batch_bm.gd",
    "fn": "_end_boss_and_ladder",
    "h": "scripts/run_state.gd",
-   "n": "\"severity_floor\": 2",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "read",
-   "g": "test_batch_bm.gd#322"
-  },
-  {
-   "s": "test_batch_bm.gd",
-   "fn": "_end_boss_and_ladder",
-   "h": "scripts/run_state.gd",
-   "n": "\"severity_floor\": 3",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "read",
-   "g": "test_batch_bm.gd#322"
-  },
-  {
-   "s": "test_batch_bm.gd",
-   "fn": "_end_boss_and_ladder",
-   "h": "scripts/run_state.gd",
-   "n": "\"severity_floor\": 4",
+   "n": "\"safe_band\": [",
    "p": "+",
    "r": "code",
    "k": "literal",
@@ -15256,7 +15333,7 @@
    "s": "test_batch_bm.gd",
    "fn": "_end_boss_and_ladder",
    "h": "scripts/run_state.gd",
-   "n": "var floor_sev := int(difficulty_def()[\"severity_floor\"])",
+   "n": "var safe_band: Array = difficulty_def()[\"safe_band\"]",
    "p": "+",
    "r": "code",
    "k": "literal",

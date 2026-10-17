@@ -1238,20 +1238,34 @@ const ZONE_BASE_MULTS := [1.0, 1.5, 2.2]
 # EACH RUNG ABOVE 1 ADDS A NAMED TWIST as well as scaling, on the
 # ascension-ladder principle: stat inflation alone is a wall, a named twist
 # is a ladder. Both twists REUSE existing machinery rather than building new.
-#   severity_floor  — the guaranteed mild bargain option gets less mild:
-#                     roll_offer draws its safe slot from severity <= N.
+#   safe_band /     — the two severity bands a bargain is dealt from, each
+#   gamble_band       [lowest, highest] and inclusive: roll_offer draws the
+#                     safe slot from the first and the two gambles from the
+#                     second. Rung by rung the safe slot gets less mild.
 #   fixed_modifier  — the mini-boss, the zone bosses and the end boss carry
 #                     a modifier.
+#
+# BATCH IM §1 — TWO BANDS A RUNG, AND NO FALLBACK. The ladder carried ONE
+# field here, `severity_floor`, and it did two jobs: it said what the safe slot
+# draws from (severity <= N) and where the gambles start (severity > N). At Ruin
+# the floor was the table's top, so no gamble stood above it, both gambles fell
+# back to the whole table, and the hardest rung dealt the mildest bargains in
+# the game (2.30 against Warden's 3.29 — IL §2). Each rung now names both bands,
+# every band is non-empty over MODIFIERS by construction (`check_im` §1 holds it),
+# and nothing falls back. Wanderer's and Warden's bands are the floor's own split,
+# so their offers are dealt exactly as before; Ruin's safe slot is drawn from the
+# band Warden's gambles come out of and the band below it — AT RUIN THERE IS NO
+# MILD OPTION.
 const DIFFICULTIES := {
 	"wanderer": {"rung": 1, "name": "Wanderer", "mult": 0.50,
 		"blurb": "The Decay is thin here. No twist.",
-		"severity_floor": 2, "fixed_modifier": false},
+		"safe_band": [1, 2], "gamble_band": [3, 4], "fixed_modifier": false},
 	"warden": {"rung": 2, "name": "Warden", "mult": 1.00,
 		"blurb": "The guaranteed mild bargain gets less mild.",
-		"severity_floor": 3, "fixed_modifier": false},
+		"safe_band": [1, 3], "gamble_band": [4, 4], "fixed_modifier": false},
 	"ruin": {"rung": 3, "name": "Ruin", "mult": 1.30,
 		"blurb": "Harsher bargains, and fixed encounters carry a modifier.",
-		"severity_floor": 4, "fixed_modifier": true},
+		"safe_band": [3, 4], "gamble_band": [4, 4], "fixed_modifier": true},
 }
 const DIFFICULTY_ORDER := ["wanderer", "warden", "ruin"]
 # Batch Y's two ids, kept resolvable so a saved run and every DOD_SIM_
@@ -4612,10 +4626,10 @@ func reward_text(reward: Dictionary) -> String:
 
 # Three distinct modifiers, each paired with one reward its severity allows.
 #
-# THE FLOOR IS THE POINT: every offer holds at least one option from the rung's
-# mild pool, so a party down to its last few HP always has a survivable choice.
-# It is enforced by CONSTRUCTION (the first draw comes from the low pool)
-# rather than by rejecting rolls, so it cannot fail on an unlucky table.
+# THE SAFE SLOT IS THE POINT: every offer holds one option from the rung's safe
+# band, so a wounded party always has the mildest choice the road allows. It is
+# enforced by CONSTRUCTION (the first draw comes from that band) rather than by
+# rejecting rolls, so it cannot fail on an unlucky table.
 #
 # BATCH AQ §2: the other two slots came from the severity 3-4 pool ALONE.
 # They used to draw from low + high together, which was tolerable at six
@@ -4623,42 +4637,45 @@ func reward_text(reward: Dictionary) -> String:
 # offers would have come out as three cheap options paying three cheap
 # rewards. The pool would have got deeper and the decision blander. Filling
 # from the high pool made every offer read the same way: ONE SAFE OPTION,
-# TWO GAMBLES. The floor still guarantees the safe one, so a wounded party is
-# never cornered.
-# BATCH BM §5, TWIST ONE: THE SEVERITY FLOOR RISES WITH THE RUNG. The
-# guaranteed mild option is still guaranteed — the floor is still enforced by
-# construction rather than by rejecting rolls — but "mild" means severity <=
-# 2 at rung 1, <= 3 at rung 2 and <= 4 at rung 3, so by the top rung the safe
-# slot is only nominally safe.
+# TWO GAMBLES.
+# BATCH BM §5, TWIST ONE: THE SAFE SLOT GETS LESS MILD WITH THE RUNG.
+# BATCH IM §1 — EACH RUNG NAMES BOTH BANDS (`safe_band`, `gamble_band`, the
+# ladder's own fields), AND NOTHING FALLS BACK. One field split the table here
+# until IM, and at Ruin it stood at the table's top: nothing was left above it,
+# both gambles fell back to the whole table, and the hardest rung dealt the
+# mildest bargains (2.30 against Warden's 3.29 — EP §1 measured it, IL §2 found
+# why). A fallback that turns a rung's hardest setting into its softest is the
+# defect, not a safety net, so it is gone: every band is non-empty over
+# MODIFIERS by construction and `check_im` §1 holds it. Where the two bands
+# overlap (Ruin's safe band holds the severity-4 gambles too) a gamble skips the
+# modifier the safe slot already took, so the three stay distinct. The draws
+# are made exactly as the floor made them — both bands built in table order,
+# shuffled safe then gamble — so a rung whose bands are the floor's own split
+# (Wanderer, Warden) is dealt the same offer from the same dice.
 func roll_offer() -> Array:
-	var floor_sev := int(difficulty_def()["severity_floor"])
-	var low: Array = []
-	var rest: Array = []
+	var safe_band: Array = difficulty_def()["safe_band"]
+	var gamble_band: Array = difficulty_def()["gamble_band"]
+	var safe: Array = []
+	var gambles: Array = []
 	for id in MODIFIERS:
-		if modifier_severity(String(id)) <= floor_sev:
-			low.append(String(id))
-		else:
-			rest.append(String(id))
-	low.shuffle()
-	rest.shuffle()
+		var sev := modifier_severity(String(id))
+		if sev >= int(safe_band[0]) and sev <= int(safe_band[1]):
+			safe.append(String(id))
+		if sev >= int(gamble_band[0]) and sev <= int(gamble_band[1]):
+			gambles.append(String(id))
+	safe.shuffle()
+	gambles.shuffle()
 	var picked: Array = []
-	if not low.is_empty():
-		picked.append(low.pop_front())
-	while picked.size() < 3 and not rest.is_empty():
-		picked.append(rest.pop_front())
-	# BATCH EP §1 — THIS IS A PATH AT RUNG 3, AND THE SENTENCE THAT STOOD HERE
-	# SAID IT COULD NOT BE. It read "it holds seven and needs to supply two, so
-	# this is a guard, not a path." The high pool holds EIGHT at rung 1, FOUR at
-	# rung 2 and ZERO at rung 3 — the severity floor is what splits the table,
-	# so a floor of 4 leaves nothing above it and BOTH gambles fall through to
-	# here and are drawn from the whole twenty. Measured over 400 offers a rung,
-	# mean severity offered is 2.83 / 3.29 / 2.31: RUNG 3'S BARGAINS COME OUT
-	# MILDER THAN RUNG 1'S. Reported at EP §1 and ruled on after it: a real
-	# defect, rung 3's, to be fixed separately — that brief is rung 2's.
-	# An offer short of three options would still be worse than a
-	# second low one, which is why the clause itself is correct and stays.
-	while picked.size() < 3 and not low.is_empty():
-		picked.append(low.pop_front())
+	if not safe.is_empty():
+		picked.append(safe.pop_front())
+	for id in gambles:
+		if picked.size() >= 3:
+			break
+		if not picked.has(id):
+			picked.append(id)
+	if picked.size() < 3:
+		push_error("roll_offer: the %s rung's bands deal %d options, not three — a band is short over MODIFIERS" % [
+			String(difficulty_def()["name"]), picked.size()])
 	var offer: Array = []
 	for id in picked:
 		var sev := modifier_severity(String(id))

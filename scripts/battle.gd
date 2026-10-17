@@ -1796,7 +1796,7 @@ func _spawn_units() -> void:
 			# BATCH BF §1: the aura's Break cut is now a per-hero column, so it
 			# needs a name to sit under. Stamped straight onto the status rather
 			# than passed as `_apply_status`'s `src`, which would also bump the
-			# `st/b` debuff counter and move a column this batch is holding still.
+			# `st/b` column (statuses landed on others) and move a column this batch is holding still.
 			var dvn_st: Dictionary = h.get_status("devotion")
 			if not dvn_st.is_empty():
 				dvn_st["src_name"] = dvn_src
@@ -5098,11 +5098,10 @@ func _bot_drafted_pick(u: BattleUnit) -> Array:
 			# Transference must not name its own source: moving a pile onto the
 			# body it already sits on is a no-op the ability refuses anyway, and
 			# the bot should not spend the turn discovering that.
-			if ab.special == "transference":
-				var bu_others := foes.filter(func(e): \
-					return e != bu_pick and e.status_stacks("ruin") > 0)
-				if bu_others.is_empty():
-					continue
+			# BATCH IM §3b — the pick's one answer, `_enemy_pick_pool`: a body the picker offers is one another
+			# enemy's mark can move onto, so the highest health is aimed at only while it is such a body.
+			if ab.special == "transference" and not _enemy_pick_pool(u, ab, foes).has(bu_pick):
+				continue
 			return [ab, bu_pick]
 		# BATCH CE — THREE MORE, and each closes a case where the DEFAULT mark
 		# makes the card read as inert in a smoke.
@@ -5229,7 +5228,10 @@ func _bot_drafted_pick(u: BattleUnit) -> Array:
 				if cb_left > cb_turns:
 					cb_turns = cb_left
 					cb_ripest = cb_e
-			if cb_ripest != null:
+			# BATCH IM §3b — the ripest body only while the picker offers it (`_enemy_pick_pool`): a
+			# Firedraw aimed at the one enemy alight draws nothing onto it, and the bot skips rather than
+			# cast it there. A Pyre Wake's ripest always carries Burn, so its aim does not move.
+			if cb_ripest != null and _enemy_pick_pool(u, ab, foes).has(cb_ripest):
 				return [ab, cb_ripest]
 			continue
 		# COLD IRON DOUBLES AGAINST A FROZEN TARGET and its whole point is
@@ -5614,9 +5616,11 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 			# Cryoclasm moves the lockdown onto whatever became the bigger
 			# problem while he was holding the old one.
 			var clasp := _find_ability(u, "Cryoclasm")
+			# BATCH IM §3b — and only at a body the picker offers (`_enemy_pick_pool`): never the prison it moves.
 			if clasp != null and u.resource >= clasp.cost and u.ability_ready(clasp) \
 					and _ability_usable(u, clasp) and cryo_mark != null \
-					and not _holds.is_empty() and cryo_mark.attack > _holds[0].attack:
+					and not _holds.is_empty() and cryo_mark.attack > _holds[0].attack \
+					and _enemy_pick_pool(u, clasp, foes).has(cryo_mark):
 				return [clasp, cryo_mark]
 			if u.has_engine("permafrost") and cryo_mark != null:
 				return [u.abilities[0], cryo_mark]       # Frostbolt the mark
@@ -7247,6 +7251,14 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	if ab.special == "ashes" \
 			and (u.ashes_used or u.ashes_return >= ASHES_RETURN_PERFECT):
 		return false
+	# BATCH IM §3b — A CARD WHOSE PICK OFFERS NOBODY IS NOT CAST. The board gates above light the seven of
+	# `PICK_DUD_SPECIALS` when the field holds what each reads; the pick then offers only the bodies a cast
+	# would do something to (`_enemy_pick_pool`). A card that moves a thing from ANOTHER enemy — Firedraw,
+	# Transference, Cryoclasm — produces nothing on any body when the last enemy standing is the one holding
+	# it, so the door asks the pool too and the button, the picker and the bot never disagree.
+	if ab.special in PICK_DUD_SPECIALS and _enemy_pick_pool(u, ab,
+			enemies.filter(func(e): return not e.dead)).is_empty():
+		return false
 	# ---- BATCH CO — THE RECAST THAT WOULD DO NOTHING ----
 	# LAST, AND DELIBERATELY LAST: every gate above answers "can this be cast at
 	# all", and this one answers "would casting it change anything". Asking the
@@ -7365,6 +7377,24 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 			and not enemies.any(func(e): return _execute_qualifies(u, e)):
 		ab_btn.tooltip_text += "\n(No enemy is below %d%% health or Broken)" % \
 			int(round(_execute_line(u) * 100.0))
+	# BATCH IM §3b — EVERY REFUSAL OF THE SEVEN SAYS WHY. Cull's and Cryoclasm's board gates darkened their
+	# buttons with no line (the others' are above); and the door refuses a card that moves a thing from
+	# ANOTHER enemy while the last one standing holds it, because its pick then offers nobody.
+	if ab.special == "cull" and not enemies.any(func(e): \
+			return not e.dead and _harvest_yield(e) > 0):
+		ab_btn.tooltip_text += "\n(Nothing on the field can be reaped)"
+	if ab.special == "cryoclasm" and _cryoclasm_source() == null:
+		ab_btn.tooltip_text += "\n(No enemy is held in a prison)"
+	if ab.special in ["firedraw", "transference", "cryoclasm"]:
+		var pl_live: Array = enemies.filter(func(e): return not e.dead)
+		if pl_live.size() == 1 and _enemy_pick_pool(u, ab, pl_live).is_empty():
+			var pl_last: BattleUnit = pl_live[0]
+			if ab.special == "firedraw" and _burn_turns_on(pl_last) > 0:
+				ab_btn.tooltip_text += "\n(The last enemy standing carries the only fire)"
+			elif ab.special == "transference" and pl_last.status_stacks("ruin") > 0:
+				ab_btn.tooltip_text += "\n(The last enemy standing carries the only Ruin)"
+			elif ab.special == "cryoclasm" and _cryoclasm_source() == pl_last:
+				ab_btn.tooltip_text += "\n(The last enemy standing is the only prison)"
 	if ab.special == "preparation" and u.prep_pending > 0:
 		ab_btn.tooltip_text += "\n(An extra turn is already pending)"
 	# BATCH DV §3 — THE PHOENIX SAYS WHY, and it is TWO reasons rather than one.
@@ -8002,20 +8032,107 @@ func _execute_qualifies(u: BattleUnit, e: BattleUnit) -> bool:
 # enemy cannot be felled because something else in the room is bleeding; and the upgraded copy he
 # cannot pay for, lit by its FREE cast, narrows to the Broken that discount covers (Batch AK), or the
 # two checks could disagree and quietly zero his Rage. Every other card's pool comes back as it went in.
+#
+# BATCH IM §3a — THE UPGRADED COPY TESTS EACH BODY's OWN PRICE. It kept the Broken alone when `ab.cost`
+# — the LIST price — was more than his Rage, while every modifier that scales a cost scales it after:
+# under Warded a cast costs 1.25 times the list (`mod_cost_mult`), so with his Rage between the two and
+# a Broken enemy lighting the button, the pick offered an unbroken body below the line that the ward's
+# price put out of his reach. `_eff_cost(u, ab, e)` is the price the door charges for that body —
+# nothing for a Broken one, the ward's figure for any other, nothing at all under Snap Shot — so the pool
+# is the bodies he can pay for, and agrees with the door whatever modifies the price.
+#
+# BATCH IM §3b — A PICK THAT CAN PRODUCE NOTHING IS REFUSED WITH A REASON; A PICK THAT PRODUCES LESS IS
+# OFFERED (IL §0.7, the designer's). The seven cards in `PICK_DUD_SPECIALS` gate on the board, as Execute
+# did, and their handlers do nothing at all to some bodies the board still lights: those bodies are not
+# offered, and `_pick_dud` says why, on the hover `_target_refusals` builds. Every other card's pool comes
+# back as it went in — Hunt's among them: against a clean body it strikes the floor of 1 and its Break
+# damage, its base paid, so a weaker pick is the player's to make.
 func _enemy_pick_pool(u: BattleUnit, ab: Ability, pool: Array) -> Array:
-	if ab.display_name != "Execute":
-		return pool
-	var out: Array = pool.filter(func(e): return _execute_qualifies(u, e))
-	if u.execute_upgraded > 0 and ab.cost > u.resource:
-		out = out.filter(func(e): return e.broken)
-	return out
+	if ab.display_name == "Execute":
+		var out: Array = pool.filter(func(e): return _execute_qualifies(u, e))
+		if u.execute_upgraded > 0:
+			out = out.filter(func(e): return _eff_cost(u, ab, e) <= u.resource)
+		return out
+	if ab.special in PICK_DUD_SPECIALS:
+		return pool.filter(func(e): return _pick_dud(u, ab, e) == "")
+	return pool
+
+
+# BATCH IM §3b — THE SEVEN CARDS WHOSE PICK CAN PRODUCE NOTHING, each read off its own handler in
+# `_resolve_special` (the arm named for it): three MOVE a thing onto the body picked from elsewhere, so a
+# body that is the only one holding it moves nothing — Firedraw (Burn from every OTHER enemy), Transference
+# (the deepest OTHER mark) and Cryoclasm (the oldest living prison, which cannot be driven onto itself);
+# four CONSUME what the body picked carries, so a body carrying none of it is consumed for nothing —
+# Cull (`_harvest_yield`), Requiem (Ruin), Funeral Pyre and Pyre Wake (Burn's turns).
+const PICK_DUD_SPECIALS := ["firedraw", "transference", "cryoclasm", "cull", "requiem", "funeral_pyre",
+	"pyre_wake"]
+
+
+# Why a pick of `e` for `ab` would produce nothing at all — "" when it produces something. Each arm asks
+# what its handler asks, in its handler's words (`check_im` §3b casts every card on every body both ways).
+func _pick_dud(_u: BattleUnit, ab: Ability, e: BattleUnit) -> String:
+	# Written as a chain with the special FIRST, so no `"<special>":` spelling stands here ahead of the handler it
+	# reads — a `match` arm and `sp == "x":` both carry it, and gates find each handler by its first occurrence.
+	var sp := String(ab.special)
+	if "firedraw" == sp:
+		if enemies.any(func(o): return not o.dead and o != e and _burn_turns_on(o) > 0):
+			return ""
+		return "Firedraw: no other enemy is Burning,\nso no fire would be drawn onto %s." % e.unit_name
+	if "transference" == sp:
+		if enemies.any(func(o): return not o.dead and o != e and o.status_stacks("ruin") > 0):
+			return ""
+		return "Transference: no other enemy carries\nRuin, so no mark would move onto %s." % e.unit_name
+	if "cryoclasm" == sp:
+		var pd_from := _cryoclasm_source()
+		if pd_from != null and pd_from != e:
+			return ""
+		if pd_from == null:
+			return "Cryoclasm: no enemy is held,\nso there is no prison to move."
+		return "Cryoclasm: %s is the prison it\nwould move, so it cannot take it." % e.unit_name
+	if "cull" == sp:
+		if _harvest_yield(e) > 0:
+			return ""
+		return "Cull: nothing on %s can be reaped,\nso it would consume nothing." % e.unit_name
+	if "requiem" == sp:
+		if e.status_stacks("ruin") > 0:
+			return ""
+		return "Requiem: %s carries no Ruin,\nso there is no mark to sing out." % e.unit_name
+	if "funeral_pyre" == sp:
+		if _burn_turns_on(e) > 0:
+			return ""
+		return "Funeral Pyre: %s is not Burning,\nso there is no fire to smother." % e.unit_name
+	if "pyre_wake" == sp:
+		if _burn_turns_on(e) > 0:
+			return ""
+		return "Pyre Wake: %s is not Burning,\nso there is no pyre to scatter." % e.unit_name
+	return ""
+
+
+# The turns of Burn on a body as the Burn handlers read them (Firedraw's, Funeral Pyre's, Pyre Wake's).
+func _burn_turns_on(e: BattleUnit) -> int:
+	return maxi(int(e.get_status("burn").get("turns", 0)), 0)
+
+
+# The prison Cryoclasm moves: the OLDEST living hold, as its handler takes it.
+func _cryoclasm_source() -> BattleUnit:
+	for h in _holds:
+		if not h.dead:
+			return h
+	return null
 
 
 # What the picker's hover says on a living enemy it does not offer: for Execute, the line it is
 # above (read off `_execute_line`, never typed), or — the upgraded copy he cannot pay for, which only
-# a Broken body makes free — that it is not Broken. Empty for any other card.
+# a Broken body makes free — that it is not Broken; for the seven of `PICK_DUD_SPECIALS`, `_pick_dud`'s
+# reason. Empty for any other card.
 func _target_refusals(u: BattleUnit, ab: Ability, pool: Array) -> Dictionary:
 	var out := {}
+	if ab.special in PICK_DUD_SPECIALS:
+		for e in enemies:
+			if e.dead or pool.has(e):
+				continue
+			out[e] = _pick_dud(u, ab, e)
+		return out
 	if ab.display_name != "Execute":
 		return out
 	for e in enemies:
@@ -8344,8 +8461,10 @@ func _enemy_turn(u: BattleUnit) -> void:
 			await _wait(0.4)
 			await _resolve(u, hys_copy, hys_target, "good")
 			return
-	# Bewitch: the charmed basic-attack their own, Dazing them (the Daze is
-	# the Occultist's work — it feeds Ruin).
+	# Bewitch: the charmed basic-attack their own, Dazing them. BATCH IM §0.5 — THE STRIKER IS THE CHARMED
+	# ENEMY AND THE DAZE's SOURCE IS DELIBERATELY NOBODY (DI §2: an enemy applying to an enemy under the
+	# party's influence is an ambiguous source). The attribution frame names whoever dealt the blow, the
+	# charmed body, and a Cleric's source would lengthen an enemy's action for a Hierophant (`_bewitched_strike`).
 	if u.has_status("bewitch"):
 		if await _bewitched_strike(u):
 			_intent_hijacked(u)
@@ -14643,8 +14762,10 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 		var hw_ps: Dictionary = target.get_status("poison")
 		if not hw_ps.is_empty():
 			hw_ps["zero_tick"] = true
-	# Batch W: the debuffer's ledger — statuses a hero lands on OTHERS
-	# (only sites that pass src are counted; the changelog owns the list).
+	# Batch W: the sim report's `st/b` column — every status a hero lands on another body, an affliction
+	# on an enemy and a blessing on an ally alike (only sites that pass src are counted; the changelog owns
+	# the list). BATCH IM §0.6 — NAMED FOR WHAT IT COUNTS: BF's label called it a count of debuffs, which the
+	# tally never was, and it is renamed, not narrowed — IL §1c's Sanctity figures read through it.
 	# The src name also rides the status so mitigation it later performs
 	# (Interpose charges, barrier absorbs) can credit its caster.
 	if src != null:
@@ -17943,7 +18064,14 @@ func _cheapest_attack(u: BattleUnit) -> Ability:
 
 
 # Bewitch: the charmed strike a fellow with their basic attack, Dazing
-# them (an Occultist-attributed debuff → Ruin). Returns true if it acted.
+# them and laying a stack of Ruin. Returns true if it acted.
+#
+# BATCH IM §0.5 — THE DAZE IS NOBODY's, AND THAT IS DI §2's RULING, NOT A GAP. The charmed enemy swung the
+# blow, so the attribution frame names it, and it has no Sanctity and no ledger; the Occultist charmed the
+# body and dealt nothing. DI §2 ruled an enemy laying a status on an enemy under the party's influence an
+# AMBIGUOUS source and left it unstamped, so `_apply_status` passes no source here on purpose: a Cleric's
+# would feed a Hierophant off an enemy's action, let Downwind copy it and book it to him (IL §1a's kept-
+# apart four). The Ruin stack is laid on its own line below, through `_gain_ruin`; the Daze feeds nothing.
 func _bewitched_strike(u: BattleUnit) -> bool:
 	var fellows := enemies.filter(func(e): return not e.dead and e != u)
 	var basic := _cheapest_attack(u)

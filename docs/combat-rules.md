@@ -384,7 +384,7 @@ be found by counting call sites, never by playing.
   on every battery run.
 · **AND A STATUS A CLERIC LAYS ON HIS OWN SIDE CARRIES HIM AS WELL (IL §1; the Hierophant's *each status the
   Cleric applies*, IJ's ruling 9).** The batches after DI left hero-side grants unstamped because nothing read their
-  source — not Harvest, not the debuffer's tally — and that stopped being true at FT, when Sanctity's payout began
+  source — not Harvest, not the sim report's `st/b` column of statuses landed on others — and that stopped being true at FT, when Sanctity's payout began
   reading the applier at this door. **IL partitioned the hundred and four sourceless calls by whether a Cleric can be
   the source**, and passed him at every live call he can source: seventeen, every one a grant, a ward or a barrier.
   **Four a Cleric can cause stay sourceless under this block's ambiguity rule**: the Defense Potion's and the Cursed

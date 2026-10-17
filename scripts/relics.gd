@@ -97,7 +97,7 @@ const POOL := {
 		"hooks": {"hero_con_add": 15}},
 	# ---------- rare ----------
 	"dragonbone": {"name": "Dragonbone Idol", "tier": "rare",
-		"desc": "All heroes deal +{=@hooks.hero_attack_mult*100}% damage.",
+		"desc": "All heroes deal +{=@hooks.hero_attack_mult*100}% strike damage.",
 		"hooks": {"hero_attack_mult": 0.10}},
 	"runedplate": {"name": "Runed Bulwark", "tier": "rare",
 		"desc": "All heroes: {=@hooks.hero_resist_add.physical*100}% physical resistance.",
@@ -115,7 +115,7 @@ const POOL := {
 	# BATCH BM: same re-spec, same reason. Its damage clause is untouched and
 	# the vacated half became more of it.
 	"warhorn": {"name": "Horn of the First War", "tier": "rare",
-		"desc": "Every hero deals +{=@hooks.hero_attack_mult*100}% damage.",
+		"desc": "Every hero deals +{=@hooks.hero_attack_mult*100}% strike damage.",
 		"hooks": {"hero_attack_mult": 0.12}},
 	"martyrbone": {"name": "Martyr's Knucklebone", "tier": "rare",
 		"desc": "Every hero heals {=@hooks.victory_heal_pct*100}% after every victory.",

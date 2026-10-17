@@ -544,8 +544,9 @@ func _s2_execute() -> void:
 	var pk_asks := _body("scripts/battle.gd", "_enemy_pick_pool").contains("_execute_qualifies(u, e)")
 	ok(pk_calls and pk_asks, "§2e: the picker does not ask `_execute_qualifies` (the picker calls `_enemy_pick_pool`: %s; it asks the qualifier: %s)" % [pk_calls, pk_asks])
 	ok(src.count("_execute_qualifies(u, e)") >= 3, "§2e: the bot does not ask `_execute_qualifies` (%d askers)" % src.count("_execute_qualifies(u, e)"))
-	# (f) THE EIGHT OTHERS SHARE THE PATH AND OFFER EVERY ENEMY: each is a single-target enemy pick off the
-	# no-target list, the narrowing names Execute alone, and Requiem driven offers all six.
+	# (f) THE EIGHT OTHERS SHARE THE PATH: each is a single-target enemy pick off the no-target list, and the narrowing
+	# Execute's branch makes is keyed on Execute alone. SINCE IM §3b seven of them narrow by their own rule (a body that
+	# would produce nothing), Hunt offers every enemy, and Requiem driven offers the bodies carrying Ruin.
 	var pt := src.find("func _player_turn(")
 	var open := src.find("elif ab.special in [", pt)
 	var close := src.find("]:", open)
@@ -559,12 +560,18 @@ func _s2_execute() -> void:
 		ok(ab.target == Ability.Target.ENEMY and not ab.aoe and ab.random_hits == 0
 				and (ab.special == "" or not self_list.contains("\"%s\"" % ab.special)),
 			"§2f: %s is not a single-target enemy pick — it does not share Execute's path" % ab.display_name)
-		ok((s.call("_target_refusals", u, ab, []) as Dictionary).is_empty(),
-			"§2f: %s's pick is narrowed — the fix reached a card it is not about" % ab.display_name)
+		# BATCH IM §3b RE-POINTED THIS ROW: seven of the eight refuse a body that would produce nothing (IL §0.7's
+		# rubric, the designer's), each with its own reason; Hunt pays its base and refuses nobody. What it still asks:
+		# Execute's narrowing reached none of them — every refusal any of them gives is in its own name.
+		var rf: Dictionary = s.call("_target_refusals", u, ab, [])
+		var own := rf.values().all(func(w): return String(w).begins_with(ab.display_name + ":"))
+		ok(own and (ab.display_name != "Hunt" or rf.is_empty()),
+			"§2f: %s's pick is narrowed by a reason not its own — Execute's fix reached it (%s)" % [ab.display_name, str(rf.values())])
 	ok(met == BOARD_GATED.size(), "§2f: the census met %d of the %d cards it names" % [met, BOARD_GATED.size()])
 	# BATCH IL §3 RE-POINTED THIS ROW to where the narrowing lives now (`_enemy_pick_pool`), still keyed on Execute alone.
+	# BATCH IM §3b RE-POINTED IT AGAIN: Execute's branch is keyed on Execute alone, beside the seven's.
 	var narrow := _body("scripts/battle.gd", "_enemy_pick_pool")
-	ok(narrow.contains("if ab.display_name != \"Execute\":\n\t\treturn pool\n\tvar out: Array = pool.filter(func(e): return _execute_qualifies(u, e))"),
+	ok(narrow.contains("if ab.display_name == \"Execute\":\n\t\tvar out: Array = pool.filter(func(e): return _execute_qualifies(u, e))"),
 		"§2f: the pool's narrowing is not keyed on Execute alone (`_enemy_pick_pool` reads %d chars)" % narrow.length())
 	await _clear(s)
 	var s2: Node = await _six_room(["swordmaster", "pyromancer", "occultist", "mystic"],
@@ -574,14 +581,20 @@ func _s2_execute() -> void:
 	var f2: Array = _foes(s2) if s2 != null else []
 	ok(c != null and rq != null and f2.size() == 6, "§2f: the room seats an Occultist holding Requiem against six")
 	if c != null and rq != null and f2.size() == 6:
-		var ruin_one := func():
+		# BATCH IM §3b RE-POINTED THIS DRIVE: Requiem offers the bodies carrying Ruin and refuses the rest with its own
+		# reason. And the mark is LAID now — `set_ruin_stacks` rewrites a mark that stands and lays none on a body that
+		# carries none, so IK's setup put Ruin nowhere and drove a cast the door refuses (found at IM).
+		var ruin_two := func():
 			_calm(s2, 100000)
-			(f2[2] as BattleUnit).set_ruin_stacks(3)
-		var r5: Dictionary = await _turn(s2, c, rq, ruin_one, 2)
-		ok(bool(r5["prompted"]) and (r5["pool"] as Array).size() == 6 and (r5["refused"] as Dictionary).is_empty(),
-			"§2f: Requiem's pick prompted %s, offered %d of six and refused %d — Execute's narrowing reached it" % [
-				r5["prompted"], (r5["pool"] as Array).size(), (r5["refused"] as Dictionary).size()])
-		print("    Requiem, gated on the board as Execute is: offered %d of six" % (r5["pool"] as Array).size())
+			for rb in [f2[1], f2[2]]:
+				s2.call("_apply_status", rb, "ruin", -1, 0, 0, c)
+				(rb as BattleUnit).set_ruin_stacks(3)
+		var r5: Dictionary = await _turn(s2, c, rq, ruin_two, 1)
+		var rq_own := (r5["refused"] as Dictionary).values().all(func(w): return String(w).begins_with("Requiem:"))
+		ok(bool(r5["prompted"]) and (r5["pool"] as Array) == [f2[1], f2[2]] and (r5["refused"] as Dictionary).size() == 4 and rq_own,
+			"§2f: Requiem's pick prompted %s, offered %d of six (want the two carrying Ruin) and refused %d in its own words %s" % [
+				r5["prompted"], (r5["pool"] as Array).size(), (r5["refused"] as Dictionary).size(), rq_own])
+		print("    Requiem, gated on the board as Execute is: offered %d of six, the two carrying Ruin" % (r5["pool"] as Array).size())
 	await _clear(s2)
 
 
@@ -959,7 +972,9 @@ func _s6_cairnmoss_and_the_bomb() -> void:
 		if FileAccess.file_exists(p):
 			DirAccess.remove_absolute(ProjectSettings.globalize_path(p))
 	# THE BOMB's LINE, IN THE ITEMS ENTRY — and true: a bomb's kill is no one's, it marks nothing and feeds nothing.
-	var line := "No one deals a bomb's damage — it marks nothing, feeds nothing, and claims no kill."
+	# BATCH IM §0.5 RE-POINTED THIS ROW: the line is the pouch's one rule now, the potions' statuses beside the bomb's
+	# damage (IL's ruling 5, the designer's), and it still says the bomb marks, feeds and claims nothing.
+	var line := "No one deals a bomb's damage and no one lays a potion's status — the pouch belongs to all four heroes: a bomb marks nothing, feeds nothing and claims no kill"
 	ok(String(Glossary.entry("consumables").get("long", "")).count(line) == 1, "§6: the items entry does not carry the bomb's line once")
 	var s: Node = await _board(["berserker", "arcanist", "holy", "mystic"],
 		{0: {"engines": _engines(["bloodrage", "savage_assault"])}, 1: {"engines": _engines(["siphon"])},

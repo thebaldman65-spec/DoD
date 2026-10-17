@@ -122,13 +122,13 @@ const TREE := [
 	# is not one of the 43. PROPOSED at +10%, the relic hook `hero_attack_mult`
 	# (0.10), which lands in this same field at the spawn.
 	{"id": "tn_damage", "name": "More Damage Dealt", "tier": 1,
-		"desc": "+{=@payload.stat.dmg_bonus*100}% damage dealt.",
+		"desc": "+{=@payload.stat.dmg_bonus*100}% strike damage dealt.",
 		"payload": {"stat": {"dmg_bonus": 0.10}}},
 	# NO SURVIVING PRECEDENT: Measured Rage paid 20% as a row-6 node conditional
 	# on Reckless Fury, and is not one of the 43. PROPOSED at 10%, the mirror of
 	# More Damage Dealt.
 	{"id": "tn_guard", "name": "Less Damage Taken", "tier": 1,
-		"desc": "{=@payload.stat.dmg_taken_bonus*-100}% less damage taken.",
+		"desc": "{=@payload.stat.dmg_taken_bonus*-100}% less strike damage taken.",
 		"payload": {"stat": {"dmg_taken_bonus": -0.10}}},
 
 	# ── TIER 2 — two points each. Each reads a condition rather than adding a number. ──

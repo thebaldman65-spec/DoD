@@ -1859,6 +1859,17 @@ a detail to note — it is the ruling being wrong.
   ruling, and each is repaired there with its literal sweep.
 - **IT LOOKS FORWARD**, as HO §0 does: a count written into either reference from here on obeys it.
 
+## STANDING RULE — RETIRING A TRUE CLAIM IS THE SAME DEFECT AS KEEPING A FALSE ONE (Batch IM §0.4, ruled by the designer)
+> **And it is harder to find afterwards. A claim is retired against the code that decides it, never against a
+> neighbouring finding.**
+
+- **THE CASE IS IL's BRIEF.** IK's premise 27 said *no relic carries a weight*, and it was true of relics; the brief
+  applied it to the Cairn of the Fallen, which is an EVENT — events draw by weight, and its 8 is true. IL read the event
+  table before striking anything and retired nothing, so the claims stood at 86 (IL's report, premise 12).
+- **WHY IT IS HARDER TO FIND**: a false claim that is kept is read, and the next re-read of the code it names catches it;
+  a true claim that is retired is gone, and no re-read meets an absence. **So the retirement is the step that needs the
+  code read**, at the line that decides the claim — the same reading HY §6's re-read asks of a claim the batch touched.
+
 ## STANDING RULE — A CENSUS A LATER BATCH WILL BE PRICED AGAINST IS KEPT, NOT JUST COUNTED (Batch ID §0.6, ruled by the designer)
 > **A census a later batch will be priced against is kept, not just counted.** The sweep's rule, its command and its
 > output go in the report or the scratchpad, so the next batch re-reads it instead of re-deriving it.
@@ -2002,3 +2013,32 @@ NOT a wrapping problem.
 - **SO AN INSTRUMENT SAYS HOW IT BIT.** A sweep prints what it read and over how many, and is run once against a planted hit
   it must find; a needle is one phrase standing in the text today, never a choice between an old phrase and a new one; and
   an arm reaches its subject the way the game does, never through a call the game cannot make.
+
+## STANDING RULE — A FACT ABOUT A FIELD's REACH IS READ AT THE FIELD's READ SITES, NEVER AT ITS WRITES (Batch IM §0.2, ruled by the designer)
+> **A text that names a field is graded against where the field is READ.** Where it is written answers only whether it is
+> written; what it reaches is a property of the lines that read it (EU's rule: the read site is the line).
+
+- **THE CASE IS IJ's CENSUS, AND IT GRADED FOUR TEXTS TRUE THAT WERE NOT.** The tree's *More Damage Dealt* and *Less Damage
+  Taken* (R036, R037), the Dragonbone Idol and the Horn of the First War (R073, R078) each said bare *damage*; each writes
+  `dmg_bonus` or `dmg_taken_bonus` (the relics through the spawn's `hero_attack_mult`), and both fields are read in the strike
+  loop alone. The census's reader found the write, matched the figure and stopped. IL's re-read named them and IM gave each
+  the word *strike*. **Two of the four are talent nodes every class can buy**, so the narrower reach had stood on the tree.
+- **HOW IT IS APPLIED**: every read site of the field is traced — and a field read under a guard, or only on one branch of
+  a loop, is read there — and the claim is graded against what those lines together reach. A census row records the read
+  site it graded against, never the write.
+
+## STANDING RULE — A GATE THAT SELECTS ITS SUBJECT BY A SUPERLATIVE NAMES THE SUBJECT IT PICKED (Batch IM §0.8, ruled by the designer)
+> **In its FAIL line.** A gate that picks its subject by *longest*, *widest*, *first*, *most* or *fewest* re-selects it
+> whenever any text or datum in the population changes, **and no literal sweep can see a sort order move** — nothing is
+> lost and nothing gained; the ranking moved. The FAIL line says which subject the gate picked, so the next batch that
+> moves a text sees which subject moved with it.
+
+- **THE CASE IS `check_ia` §2d AT IL.** It took the Warrior's ordinary rune with the longest shown words, and Blood Debt's
+  new sentence made Blood Debt that rune — one asking for a card a fresh Warrior does not hold, so the event verb could
+  hand it to nobody. No literal moved; recon 1 read it red. Its FAIL line names the rune since.
+- **IM's CENSUS OF THE BATTERY: 57 SITES OF THE SHAPE** — 17 ranked by a measure, 40 the first or last found in a data
+  or roll order — and **23 name their pick in every FAIL line, 11 in some, 23 in none** (IM's report, §0.8, holds
+  the list, one row a site). The rule binds a gate written or repaired from IM on; a site that does not name its pick
+  is repaired in the batch that next touches it.
+- **AND IT IS A VERIFICATION STEP, NOT ONLY A SHAPE**: before a batch writes its prediction, it finds every superlative
+  pick whose population its diff touches and names each one's pick on HEAD's tree and on its own.

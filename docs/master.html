@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-10-16 (Batch IL &mdash; the two measured defects)</b></p>
+<p align="right"><b>Last updated: 2026-10-17 (Batch IM &mdash; the Ruin rung, and the picker's remainder)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -58,11 +58,11 @@ ladder. <b>Every scaling number below is provisional and is the designer's to se
 <table border="1" cellpadding="4">
 <tr><th>Rung</th><th>Enemies</th><th>Twist</th><th>Opens</th></tr>
 <tr><td><b>1 — Wanderer</b></td><td>×0.50 <b>damage only</b><br>(full health; <b>never the end boss</b>, which meets rung 1 at rung 2's strength)</td><td>none</td><td>talent tier 1</td></tr>
-<tr><td><b>2 — Warden</b></td><td>×1.00 <b>damage</b><br>(health <b>identical to rung 1</b>)</td><td>the severity floor rises: the guaranteed
-mild bargain option may be severity 3</td><td>talent tier 2</td></tr>
-<tr><td><b>3 — Ruin</b></td><td>×1.30</td><td>the floor rises again (severity 4), and
-<b>fixed encounters carry a modifier</b> — the mini-boss, the zone bosses and the end boss,
-which today never do</td><td>talent tier 3</td></tr>
+<tr><td><b>2 — Warden</b></td><td>×1.00 <b>damage</b><br>(health <b>identical to rung 1</b>)</td><td>the safe bargain gets less mild: its safe option
+is dealt from severity 1&ndash;3 and its gambles at severity 4</td><td>talent tier 2</td></tr>
+<tr><td><b>3 — Ruin</b></td><td>×1.30</td><td><b>no mild option</b>: its safe option is dealt from severity 3&ndash;4 and its
+gambles at severity 4, and <b>fixed encounters carry a modifier</b> — the mini-boss, the zone
+bosses and the end boss, which today never do</td><td>talent tier 3</td></tr>
 </table>
 <b>Rung 1 is deliberately tuned BELOW the balance every prior measurement was taken at</b>,
 because it is the rung played with zero talents. Rung 2 IS that balance, byte for byte.
@@ -281,16 +281,20 @@ modifier means authoring one number, not a pairing. Severity is <b>flat</b>, aut
 modifier, and <b>deliberately ignores which heroes you drafted</b>: a modifier that happens to be
 cheap for your build is a good deal you earned by building that way. A modifier binds every
 combatant on the field, including a <b>companion summoned mid-battle</b>.</p>
-<p><b>How the three cards are dealt.</b> The first comes from the <b>severity 1&ndash;2</b>
-pool and the other two from the <b>severity 3&ndash;4</b> pool, so <b>every offer reads the
-same way: one safe option, two gambles</b>. The floor &mdash; at least one option of severity
-1 or 2 &mdash; is therefore guaranteed by construction rather than by rejecting rolls, and a
-wounded roster is never cornered.</p>
+<p><b>How the three cards are dealt.</b> Each rung names two bands of severity: the first card
+comes from its <b>safe band</b> and the other two from its <b>gamble band</b>, so <b>every offer
+reads the same way: one safe option, two gambles</b>. <b>Wanderer</b> deals its safe option from
+severity 1&ndash;2 and its gambles from 3&ndash;4; <b>Warden</b> from 1&ndash;3 and at 4;
+<b>Ruin</b> from 3&ndash;4 and at 4 &mdash; <b>on Ruin there is no mild option</b>, its mildest
+bargain the harshest Warden's safe slot can show. The safe option is guaranteed by construction
+rather than by rejecting rolls, and no band ever falls back to another: every band holds
+modifiers enough for its slots. Over 400 offers a rung the mean severity offered read <b>2.82 /
+3.28 / 3.82</b> at Batch IM (<code>check_im</code> §1 prints the live sample).</p>
 <p>The reward pays <b>on victory</b>: the modifier is the price, and the reward is what
 clearing the fight under it bought.</p>
-<p><b>The pool is 20, weighted low.</b> Because the safe slot on every card is served by the
-1&ndash;2 pool alone, that is the end a run actually sees repeatedly &mdash; so it is the end
-that is authored deepest.</p>
+<p><b>The pool is 20, weighted low.</b> Because the safe slot on Wanderer's and Warden's cards
+is served mostly from the mild end, that is the end a run actually sees repeatedly &mdash; so it
+is the end that is authored deepest.</p>
 <table border="1" cellpadding="4">
 <tr><th>Modifier</th><th>Severity</th><th>Effect (both parties)</th></tr>
 <tr><td>Overgrown</td><td>1</td><td>Both parties begin the fight at 70% health at most.</td></tr>
@@ -1039,8 +1043,9 @@ to zero, which is greyed rather than hidden.</p>
 <tr><td><b>Mana Potion</b></td><td><b>40% of the target's maximum Mana/Rage</b> (= the old flat
 40 at the base maximum of 100).</td><td>6</td></tr>
 <tr><td><b>Bomb</b></td><td><b>50 damage to all enemies, +2% per combat win this run</b> — the
-heroes' own scaling rate, so a run opens unchanged at 50. No one deals a bomb's damage &mdash; it marks
-nothing, feeds nothing, and claims no kill.</td><td>6</td></tr>
+heroes' own scaling rate, so a run opens unchanged at 50. No one deals a bomb's damage and no one lays a
+potion's status &mdash; the pouch belongs to all four heroes: a bomb marks nothing, feeds nothing and claims no
+kill, and a Defense Potion's armor or a Cursed Visage's hex is no hero's to lengthen.</td><td>6</td></tr>
 <tr><td><b>Revive Potion</b></td><td>Fallen hero returns at 50% HP, re-slotted onto the timeline.</td><td>6</td></tr>
 <tr><td><b>Defense Potion</b></td><td>Every hero gains Fortify (3 turns).</td><td>6</td></tr>
 <tr><td><b>Cleansing Draught</b></td><td>Removes <b>every debuff</b> from one chosen hero — the
@@ -2761,8 +2766,8 @@ and says plainly that it cannot be changed.</p>
 <tr><td>1</td><td>More Speed</td><td>+18 Speed.</td></tr>
 <tr><td>1</td><td>Parry More</td><td>+12% parry chance.</td></tr>
 <tr><td>1</td><td>A Bigger Resource Pool</td><td>+20 maximum Rage or Mana.</td></tr>
-<tr><td>1</td><td>More Damage Dealt</td><td>+10% damage dealt.</td></tr>
-<tr><td>1</td><td>Less Damage Taken</td><td>10% less damage taken.</td></tr>
+<tr><td>1</td><td>More Damage Dealt</td><td>+10% strike damage dealt.</td></tr>
+<tr><td>1</td><td>Less Damage Taken</td><td>10% less strike damage taken.</td></tr>
 <tr><td>2</td><td>You Break Harder</td><td>Deals 25% more Break damage.</td></tr>
 <tr><td>2</td><td>Breaking Heals a Hero</td><td>An attack that lands Break heals the hero furthest from full for 20% of it.</td></tr>
 <tr><td>2</td><td>A Cooldown Ticks on a Crit</td><td>Critical hits reduce ALL cooldowns by 2.</td></tr>
@@ -3528,7 +3533,13 @@ non-blocking note appears saying the fight is not resolving and that Forfeit Run
 menu. It appears once and changes nothing about the battle — no HP, no outcome.</li>
 <li><b>Targeting:</b> click a highlighted unit <b>or its nameplate</b> &mdash; the plate, a chip on it
 or its intent line (cancel button available); single-target abilities auto-target when only one
-candidate lives. Outside targeting a click on a plate does nothing.</li>
+candidate lives. Outside targeting a click on a plate does nothing. <b>A pick that would produce
+nothing is not offered</b>, and a hover on that body says why: Execute's (above), and seven cards
+that read the body they are aimed at &mdash; Firedraw, Transference and Cryoclasm move a thing
+onto it from another enemy, so the one body holding it is not offered (and with the last enemy
+standing holding it the card is not cast); Cull, Requiem, Funeral Pyre and Pyre Wake consume
+what it carries, so a body carrying none is not offered. A pick that produces less is still
+offered &mdash; Hunt on a clean enemy strikes for its floor and its Break damage.</li>
 <li><b>Skill check controls: Spacebar or Left Click.</b></li>
 <li><b>Feedback:</b> floating damage text (crit pop-ups), hit flash + knockback, screen shake,
 attack movement (units with real locomotion art — the Berserker — <b>walk</b> to melee range

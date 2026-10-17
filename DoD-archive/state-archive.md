@@ -2640,3 +2640,75 @@ evidence is the reader's, against `d7c0a98`; every cited line was re-read (`docs
 | S89.I03 | THE BATTERY CANNOT REACH THE PLAYER'S RUN SAVE — **REPAIRED  | SUPERSEDED | `docs/instrument-rules.md:1446` "AN END-STATE CENSUS CANNOT SEE WHAT A TARGET PUTS BACK (Batch FI §1)" | The same 24 / 67 / 43 / 42 / 25 figures are restated in the rule. |
 | S89.I04 | THE BATTERY CANNOT REACH THE PLAYER'S RUN SAVE — **REPAIRED  | NOTHING-OWED | `scripts/run_state.gd:237` "`_init`, NOT `_ready`, AND THAT DISTINCTION WAS MEASURED" | The mechanism is in place, `SAVE_PATH` is still a const (`:216`), and `check_fi.gd:85` asserts it. But `instrument-rules.md:1424` wrongly says `_ready()` (surprise 4). |
 | S89.I05 | THE BATTERY CANNOT REACH THE PLAYER'S RUN SAVE — **REPAIRED  | NOTHING-OWED | `check_fi.gd:44` `const NAMES_IT_LEGALLY := ["scripts/run_state.gd"]` | The §5 sweep prints CHECKED n of m (`check_fi.gd:219`), and only `run_state.gd` names the player's save path. |
+
+## ARCHIVED AT IM — 2026-10-17, FROM `docs/state.md` AS IL LEFT IT (`5319d32`)
+
+**What came here**: IL's seven rulings, every one answered in IM's brief — the play carried (IM's ruling 1); the four texts of the
+strike's shape given the word at IM §2; the Ruin rung's mechanism repaired at IM §1 (two bands a rung, no fallback); the Cairn's
+weight confirmed true and the fallen-hero ruling's things named (IM §0.4); the pouch's rule written and the charmed Daze's comment
+repaired (IM §0.5); the `st/b` column renamed, not narrowed (IM §0.6); and this file's tables cut to their reports (IM §0.7).
+FOUND AT IL's Warded item, closed at IM §3a (each body's own price); RUNG 3's BARGAIN TWIST INVERTS, closed at IM §1; and the
+roadmap's IM line, built (`master.html`'s sweep moved to IN by IM's brief). Everything else in the live file stayed, and the
+tables §0.7 struck live in their reports, not here (IM's report, §0.7).
+
+
+### ~~IL's RULINGS OWED~~ — **ALL SEVEN ANSWERED IN IM's BRIEF: THE PLAY CARRIED (1); THE FOUR TEXTS GIVEN THE WORD AT IM §2 (2); THE RUIN RUNG's MECHANISM REPAIRED AT IM §1 (3); THE CAIRN TRUE AND THE SIX THINGS NAMED (4); THE POUCH's RULE AND THE DAZE's COMMENT AT IM §0.5 (5); THE COLUMN RENAMED AT IM §0.6 (6); THE CUT AT IM §0.7 (7)**
+
+Full working: `docs/reports/IL.md`, NEEDS A RULING.
+
+1. **PLAY ONE ZONE WITHOUT THE DEBUG MENU, AND SEND THE FILE** (IH's ruling 1, carried — II §0.1, IJ §0.1, IK §0.1, IL §0.1:
+   five batches old). The readout names every debug action, so a file that names none is play. It prices Boil Over's rate,
+   Rupture's number and clock, the vow's worth and the Cleric's Mana, and **its first Hierophant confirms Sanctity's 13 on IL's
+   repaired code**.
+2. **FOUR MORE TEXTS OF THE STRIKE's SHAPE** (§0.3's re-derivation): N077 and N078 were the brief's ninth and tenth; **Dirge
+   (N079) reads the same field at the same line and took the word with them** — its chip and theirs are one builder, and a
+   crest rune's true word is not a re-cut (the brief's own ruling). **Still saying bare damage, each read in the strike loop
+   alone through the same two fields**: the tree's *More Damage Dealt* and *Less Damage Taken* (R036, R037) and the Dragonbone
+   Idol and the Horn of the First War (R073, R078) — IJ's census graded all four true. One word each, and no payout widens.
+3. **THE RUIN RUNG's CONDITION CANNOT BE MET, AND ITS LEVER IS NOT THE POOL** (§2; the brief's own stop condition). Ruin and
+   Warden draw one table; the difference is the floor, which at severity 4 is the table's top, so no gamble pool stands above
+   it and all three options come from the whole table. **A full step above Warden's 3.29 is 4.29, past the table's highest
+   severity of 4.** What a lever over this table would buy, off its counts (6 / 6 / 4 / 4), the safe slot left drawing the whole
+   table: Ruin's two gambles from severity 3–4 — about 3.10, still below Warden; from severity 4 alone — about 3.43, 0.14
+   above; every option severity 4 — 4.00, 0.71 above, the most any weighting gives. The condition, the lever or the table is yours; G080L's *weighted toward the mild end* still holds.
+4. **THE CAIRN OF THE FALLEN IS AN EVENT, AND ITS WEIGHT IS TRUE** (§0.5): events draw by weight and the Cairn's is 8; no relic
+   carries a weight, and IK's premise 27 stands. **Nothing was retired, and the claims stay at 86.** The fallen-hero ruling
+   prices three crest runes, two relics, the event and the map's Revive Potion (THE CREST POOL, below).
+5. **A CHARMED ENEMY's DAZE AND THE POUCH's TWO STATUSES STAY SOURCELESS BY RULE** (§1's kept-apart four, with the Ruin
+   primer). DI §2 left the Daze unstamped as an ambiguous source — *an enemy applying to an enemy* — though `battle.gd` calls it
+   the Occultist's work, and the potions are the party's. Making either the Cleric's lengthens it for a Hierophant, lets
+   Downwind copy the Daze and counts it as his in the recap: yours.
+6. **THE SIM's `st/b` COLUMN NOW COUNTS THE CLERIC's BLESSINGS** (§1's move). The door counts every status a hero lands on
+   another body, and the seventeen are such statuses — Renewal and Consecrated Ground already counted. BF had called it a debuff
+   counter; whether it should count afflictions alone is a change to the door's tally, not made.
+7. **THIS FILE's HONEST RATE IS BELOW FIFTEEN BATCHES** (WHERE, above). The archive practice is the first answer: IL moved what
+   it closed, and the next pass — a census of the live file's closed blocks, not a batch's own closings — is yours to schedule.
+
+### FOUND AT IL AND NOT FIXED — ITS CLOSED ITEMS (archived at IM; the section stays in `docs/state.md`)
+
+- **UNDER WARDED, THE UPGRADED EXECUTE's POOL READS THE LIST PRICE** (read off the code, not driven). `_enemy_pick_pool` keeps
+  the Broken alone when `ab.cost > u.resource`, and the ward prices a cast at 1.25 times that; with his Rage between the two and a
+  Broken enemy lighting the button, the pick offers an unbroken body below the line that the ward's price puts out of his reach —
+  the disagreement IK's comment names. One test a body (`_eff_cost(u, ab, e)`) closes it; IK's picker, so left. **CLOSED AT IM §3a**: the pool tests `_eff_cost(u, ab, e)`.
+
+### ~~RUNG 3'S BARGAIN TWIST INVERTS~~ — **FIXED AT IM §1: EACH RUNG NAMES TWO BANDS AND NOTHING FALLS BACK (RUIN 3.82 AT EP's SAMPLE)**
+
+`roll_offer` draws one option from the pool at or below `severity_floor` and two from above it.
+At rung 3's floor of 4 there is nothing above it, both gambles fall through the guard clause, and
+all three options come from the whole twenty-modifier table. **Measured over 400 offers a rung,
+mean severity offered is 2.83 / 3.29 / 2.31 — the top rung's bargains are MILDER than the starter
+rung's.** The high pool holds **8 / 4 / 0**. **The stale comment that said otherwise is corrected;
+the behaviour is untouched.** **RULED AFTER EP: it is a real defect and it is rung 3's — *"fix E
+separately whenever convenient."* It is not bundled into the rung-2 work above.**
+
+### THE PLAYTEST'S OTHER FINDINGS — ITS CLOSED ITEMS (archived at IM; the section stays in `docs/state.md`)
+
+- **IM — THE EIGHT CARDS' PARTITION, `master.html`'s SWEEP AND THE PICKER's REMAINDER (IL's brief §0.7, §0.10).** **The
+  cards**: Firedraw, Transference and Cryoclasm move a thing onto the target, so the one body already holding it is a dud and is
+  refused as Execute's are, a reason on its hover; Cull, Requiem, Funeral Pyre, Pyre Wake and Hunt read what the target carries,
+  and IM partitions the five by the rubric the designer ruled — **a pick that can produce nothing is refused with a reason; a
+  pick that produces less is offered** (`CLAUDE.md`, beside the bot's rule, RULED, NOT BUILT). A narrowing lives in
+  `battle._enemy_pick_pool`, so the bot reads it the day it is written (IL §3). **`master.html`**: a surface the census did not
+  cover and carrying false facts (IK found Blood Price's row); IM sweeps it with IJ's rubric and IJ's resolver where a figure has
+  a door. **Ruled at IL, before IM: the Ruin rung's condition is unmeetable over this table and its lever is not the pool — a
+  re-ruling is owed first (IL's ruling 3).** **BUILT AT IM**: the picker's remainder at IM §3, the Ruin rung's mechanism at IM §1; `master.html`'s sweep is IN's (IM's brief §5).
