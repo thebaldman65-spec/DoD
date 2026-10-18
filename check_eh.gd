@@ -448,15 +448,21 @@ func _s3_the_record() -> void:
 	var m3 := {"key": "warrior", "spec": "berserker",
 		"bm_abilities": [], "bm_equipped": []}
 	var card := String(Classes.spec_draft_pool("berserker")[0])
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the card is the FIRST on the
+	# Berserker's shelf in authored order, so a shelf edit re-selects it in
+	# silence; every FAIL line about it names the card it took.
+	var pick_s := "the card is %s, the first on the Berserker's shelf" % (
+		card if card != "" else "none")
 	run.hold_ability(m3, card, true)
-	ok(run.equipped_ability_names(m3).has(card), "§3: the card was not taken")
-	ok(run.unequip_earned_ability(m3, card), "§3: the card could not be benched")
+	ok(run.equipped_ability_names(m3).has(card), "§3: the card was not taken — %s" % pick_s)
+	ok(run.unequip_earned_ability(m3, card), "§3: the card could not be benched — %s" % pick_s)
 	ok(run.draft_refused(m3).is_empty(),
-		"§3: BENCHING wrote the no-return ledger — a benched card is being refused, not kept")
+		"§3: BENCHING wrote the no-return ledger — a benched card is being refused, not kept — %s"
+			% pick_s)
 	ok((m3["bm_abilities"] as Array).has(card),
-		"§3: benching removed the card from the POOL — a bench is a drop again")
+		"§3: benching removed the card from the POOL — a bench is a drop again — %s" % pick_s)
 	ok(run.owned_ability_names(m3).has(card),
-		"§3: a benched card is no longer OWNED — it can be offered back as new")
+		"§3: a benched card is no longer OWNED — it can be offered back as new — %s" % pick_s)
 
 
 # ── §4 — THE `master.html` SWEEP: COULD IT BE AN INSTRUMENT? ────────────────

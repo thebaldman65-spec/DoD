@@ -162,8 +162,11 @@ func _hooks(run: Node) -> void:
 	# unchanged: owns_ability reads the starting kit, not just talents.
 	var kit_piece := String(Classes.opening_kit(String(m["key"]), String(m["spec"]),
 		Runes.held_engines(m)).back().display_name)
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the piece is the LAST card of the
+	# opening kit `Classes.opening_kit` builds; its line names it.
+	var kit_piece_pick := "%s, the last card of the Berserker's opening kit" % kit_piece
 	ok(Talents.owns_ability(m, kit_piece),
-		"owns_ability: true for a STARTING KIT piece (any source, not just talents)")
+		"owns_ability: true for a STARTING KIT piece (any source, not just talents) — %s" % kit_piece_pick)
 	ok(not Talents.owns_ability(m, "Not An Ability"), "owns_ability: false for a stranger")
 	ok(not Talents.owns_ability({}, "Battle Shout"), "owns_ability: safe on an empty member")
 	# An earned pool pick counts too — that is the whole point of reading the

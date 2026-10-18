@@ -544,7 +544,8 @@ const REPAIRS := [
 	["glossary:merchant:long", "(a crest rune goes to the bag)", "bought -"],
 	["glossary:severity:short", "what decides the reward.", "the only thing the reward reads."],
 	["glossary:severity:long", "SEVERITY, NOT YOUR HEROES:", "SEVERITY AND NOTHING ELSE:"],
-	["glossary:severity:long", "In the run's first 3 steps, where no merchant is offered, a 1 pays the gold alone.", "rune. Severity"],
+	# BATCH IN §2 RE-POINTED THIS ROW: the merchant rides the road's mildest severity, so the gated sentence says *it*.
+	["glossary:severity:long", "In the run's first 3 steps, where no merchant is offered, it pays its own reward alone.", "rune. Severity"],
 	["glossary:pouch_slots:long", "but Broken, Bleed and a poison that refuses every cleanse", "hero and"],
 	["glossary:archetype_tags:long", "but the core runes", "rune carries"],
 	["glossary:archetype_tags:long", "panel counts them", "and the hero sheet count"],

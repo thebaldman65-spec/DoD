@@ -5,7 +5,9 @@
 #        three distinct with the safe pick; `roll_offer` reads both bands and falls back to nothing. Measured at EP's
 #        sample through the real roll: Wanderer and Warden dealt offer for offer as the floor dealt them (the
 #        control), Ruin's mean above Warden's, Ruin's safe slot never below Warden's safe slot's top, the merchant at
-#        severity 1 and paid nowhere else; the glossary's three entries read against the bands.
+#        the rung's mildest dealt severity and paid nowhere else (re-pointed at IN §2: severity 1 until IN); the
+#        glossary's three entries read against the bands. (Re-pointed at IN §1: the table Wanderer and Warden deal from
+#        is the twenty below Ruin's severity-5 gambles, and IM's reference model deals over those twenty.)
 #   §2   THE FOUR TEXTS SAY STRIKE DAMAGE: the tree's More Damage Dealt and Less Damage Taken, the Dragonbone Idol and
 #        the Horn of the First War — each figure read off its own field, both fields read in the strike loop alone,
 #        and each text measured at the surfaces that draw it.
@@ -239,12 +241,15 @@ func _s1_the_bands() -> void:
 			int(ruin_sb[0]), int(ward_sb[1])])
 	# THE FIRST TWO RUNGS ARE THE FLOOR's OWN SPLIT: the safe band runs from the table's bottom to the old floor and the
 	# gambles from the next severity to the top, so their offers are dealt exactly as before (the sample below proves it).
+	# BATCH IN §1 — THE TABLE THEY DEAL FROM IS THE TWENTY: Ruin's gambles stand above it at severity 5, which no
+	# Wanderer or Warden band reaches, so the split is of the severities below Ruin's gamble band.
+	var top20 := int(((_run.DIFFICULTIES["ruin"] as Dictionary).get("gamble_band", [top + 1, top + 1]) as Array)[0]) - 1
 	for d2 in ["wanderer", "warden"]:
 		var sb2: Array = (_run.DIFFICULTIES[d2] as Dictionary).get("safe_band", [0, 0])
 		var gb2: Array = (_run.DIFFICULTIES[d2] as Dictionary).get("gamble_band", [0, 0])
-		ok(int(sb2[0]) == bottom and int(gb2[0]) == int(sb2[1]) + 1 and int(gb2[1]) == top,
-			"§1: %s's bands %s / %s are not a floor's split of the table (%d..%d) — its offers would move" % [
-				d2, str(sb2), str(gb2), bottom, top])
+		ok(int(sb2[0]) == bottom and int(gb2[0]) == int(sb2[1]) + 1 and int(gb2[1]) == top20,
+			"§1: %s's bands %s / %s are not a floor's split of the table they deal from (%d..%d) — its offers would move" % [
+				d2, str(sb2), str(gb2), bottom, top20])
 	# CONDITION 4: NO FALLBACK REMAINS — the roll reads both bands, draws the safe slot once and never draws from the
 	# safe band again.
 	var body := _body("scripts/run_state.gd", "roll_offer")
@@ -265,7 +270,11 @@ func _s1_the_bands() -> void:
 func _floor_offer(floor_sev: int) -> Array:
 	var low: Array = []
 	var rest: Array = []
+	# BATCH IN §1 — IM's table was the twenty: Ruin's severity-5 four stand above every band this model deals.
+	var top20 := int(((_run.DIFFICULTIES["ruin"] as Dictionary)["gamble_band"] as Array)[0]) - 1
 	for id in _run.MODIFIERS:
+		if int(_run.modifier_severity(String(id))) > top20:
+			continue
 		if int(_run.modifier_severity(String(id))) <= floor_sev:
 			low.append(String(id))
 		else:
@@ -282,7 +291,10 @@ func _floor_offer(floor_sev: int) -> Array:
 	var offer: Array = []
 	for id in picked:
 		var sev := int(_run.modifier_severity(String(id)))
-		var choices: Array = _run.REWARDS.get(sev, _run.REWARDS[1])
+		# BATCH IN §2 — the merchant stood behind severity 1's gold in IM's table; the model keeps it there.
+		var choices: Array = (_run.REWARDS.get(sev, _run.REWARDS[1]) as Array).duplicate()
+		if sev == 1:
+			choices.append({"kind": "shop"})
 		if _run.shop_gated(int(_run.slot_idx) + 1):
 			choices = choices.filter(func(r): return String(r.get("kind", "")) != "shop")
 		offer.append({"modifier": String(id), "reward": (choices.pick_random() as Dictionary).duplicate()})
@@ -324,7 +336,9 @@ func _s1_the_sample() -> void:
 		means[d] = float(sum) / maxf(float(n), 1.0)
 		mins[d] = lo
 		shops[d] = sh
-		ok(at_shop.all(func(v): return int(v) == 1), "§1: %s paid the merchant at severities %s, want 1 alone" % [d, str(at_shop)])
+		ok(at_shop.all(func(v): return int(v) == int(_run.mildest_dealt_severity())),
+			"§1: %s paid the merchant at severities %s, want its mildest dealt, %d, alone (IN §2)" % [
+				d, str(at_shop), _run.mildest_dealt_severity()])
 		print("    %-8s mean severity %.2f over %d options — by severity %d / %d / %d / %d — the merchant on %d" % [
 			d, means[d], n, dist[1], dist[2], dist[3], dist[4], sh])
 		# THE CONTROL: a rung whose bands are the floor's split is dealt the floor's own offer, offer for offer.
@@ -356,14 +370,16 @@ func _s1_the_sample() -> void:
 	var ward_top := int(((_run.DIFFICULTIES["warden"] as Dictionary).get("safe_band", [0, 0]) as Array)[1])
 	ok(int(mins["ruin"]) >= ward_top,
 		"§1: Ruin dealt a severity-%d option, below the top of Warden's safe band (%d)" % [mins["ruin"], ward_top])
-	# THE MERCHANT STAYS AT SEVERITY 1 (HW §2) AND PAYS NOWHERE ELSE.
+	# THE MERCHANT IS NO SEVERITY's ROW (IN §2, re-pointed from HW §2's severity 1): `rewards_for` puts it behind the
+	# gold of the rung's mildest dealt severity, and the table itself holds it nowhere.
 	var shop_at: Array = []
 	for sv2 in _run.REWARDS:
 		for r in _run.REWARDS[sv2]:
 			if String(r.get("kind", "")) == "shop":
 				shop_at.append(int(sv2))
-	ok(shop_at == [1], "§1: the merchant pays at severity %s, want 1 alone (HW §2)" % str(shop_at))
-	print("    Ruin above Warden by %.2f — %.2f of a full step; the merchant never reaches a Ruin bargain (%d)" % [
+	ok(shop_at.is_empty() and _body("scripts/run_state.gd", "rewards_for").contains("mildest_dealt_severity()"),
+		"§1: the table holds the merchant at severity %s, or `rewards_for` does not read the mildest dealt (IN §2)" % str(shop_at))
+	print("    Ruin above Warden by %.2f — %.2f of a full step; the merchant on a Ruin bargain: %d" % [
 		float(means["ruin"]) - float(means["warden"]), float(means["ruin"]) - float(means["warden"]), shops["ruin"]])
 
 
@@ -391,17 +407,22 @@ func _s1_the_words() -> void:
 			"§1: the severity entry says %s's gambles are dealt at one severity, and its band is %s" % [d2, str(gb)])
 	ok(sev_e.contains("there is no mild option"), "§1: the severity entry does not say Ruin has no mild option")
 	# G080L — *weighted toward the mild end* still describes the table; its reason names the rungs it is true of.
+	# BATCH IN §1 — THE TWENTY ARE WHAT THE SENTENCE IS ABOUT: the entry says *the twenty are weighted toward the mild
+	# end*, and Ruin's four at severity 5 are counted apart.
 	var low := 0
 	var high := 0
+	var top_20 := int(((_run.DIFFICULTIES["ruin"] as Dictionary)["gamble_band"] as Array)[0]) - 1
 	for sv in _table_sevs():
+		if int(sv) > top_20:
+			continue
 		if int(sv) <= 2:
 			low += 1
 		else:
 			high += 1
 	var mod_e := String(Glossary.entry("modifier").get("long", ""))
-	ok(low > high and mod_e.contains("weighted toward the mild end"),
-		"§1: G080L — the table holds %d at severity 1-2 and %d at 3-4; the entry says it is weighted toward the mild end: %s" % [
-			low, high, mod_e.contains("weighted toward the mild end")])
+	ok(low > high and mod_e.contains("The twenty are weighted toward the mild end"),
+		"§1: G080L — the twenty hold %d at severity 1-2 and %d at 3-%d; the entry says the twenty are weighted toward the mild end: %s" % [
+			low, high, top_20, mod_e.contains("The twenty are weighted toward the mild end")])
 	ok(mod_e.contains("the safe slot on Wanderer's and Warden's bargains draws from that end")
 			and not mod_e.contains("the safe slot on every bargain"),
 		"§1: the modifier entry still says every bargain's safe slot draws from the mild end — Ruin's does not")

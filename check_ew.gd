@@ -270,12 +270,21 @@ func _s3_not_focus(scene: Node) -> void:
 	# ordinary damaging card of his takes the same twelve-term assembly through
 	# the same strike loop with a fixed draw count.
 	var ab: Ability = null
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the card driven is the FIRST
+	# ordinary damaging card in his slot order after the basic, so a kit or a
+	# datum that moves re-selects it in silence; every FAIL line about it names
+	# the card and the slot it was found in.
+	var ab_slot := -1
 	for i in range(1, ss.abilities.size()):
 		if ss.abilities[i] != null and ss.abilities[i].damage > 0 \
 				and not ss.abilities[i].gated and ss.abilities[i].multi_hits == 0:
 			ab = ss.abilities[i]
+			ab_slot = i
 			break
-	ok(ab != null, "§3: the Sharpshooter has an ordinary damaging card to drive")
+	var pick_s: String = ("driven with %s, the first ordinary damaging card in his slot order (slot %d)"
+		% [ab.display_name, ab_slot]) if ab != null \
+		else "none of his %d slots after the basic holds one" % maxi(ss.abilities.size() - 1, 0)
+	ok(ab != null, "§3: the Sharpshooter has an ordinary damaging card to drive — %s" % pick_s)
 	if ab == null:
 		return
 	# **THE METER IS RESET AT THE HEAD OF EACH ARM AND THAT IS NOT HOUSEKEEPING.**
@@ -312,7 +321,8 @@ func _s3_not_focus(scene: Node) -> void:
 	ss.crit_bonus = 0.0
 	ss.second_resource = 0
 	ok(rises == 3,
-		"§3: a hero BELOW Focus's point converts the TOTAL's surplus, and deeper pays more —%s" % reads)
+		"§3: a hero BELOW Focus's point converts the TOTAL's surplus, and deeper pays more —%s — %s"
+			% [reads, pick_s])
 
 
 # ── §4 — THE THREE THIN ROLL SITES ─────────────────────────────────────────

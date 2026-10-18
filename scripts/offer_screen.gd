@@ -28,6 +28,7 @@ const SEVERITY_COLORS := {
 	2: Color(0.85, 0.82, 0.45),
 	3: Color(0.95, 0.6, 0.35),
 	4: Color(0.95, 0.35, 0.4),
+	5: Color(0.78, 0.32, 0.82),
 }
 
 var offer: Array = []
@@ -191,11 +192,17 @@ func _draw_option_parts(idx: int, at: Vector2) -> void:
 	sev_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_put(sev_lbl, at + Vector2(0, 16), Vector2(350, 18))
 
-	# The severity pips: four boxes, `sev` of them lit. A number is precise,
-	# a bar is comparable, and the choice between three cards is a comparison.
-	for p in 4:
+	# The severity pips: one box a severity of the table, `sev` of them lit. A number is
+	# precise, a bar is comparable, and the choice between three cards is a comparison.
+	# BATCH IN §1 — the table tops at 5 now (Ruin's gambles), so every card draws five,
+	# read off the table and centred on the card, and a Warden card reads its 4 of 5.
+	var pip_n := 0
+	for m_id in Run.MODIFIERS:
+		pip_n = maxi(pip_n, Run.modifier_severity(String(m_id)))
+	var pip_x0 := 175.0 - (pip_n * 22.0 - 6.0) / 2.0
+	for p in pip_n:
 		var pip := ColorRect.new()
-		pip.position = at + Vector2(133.0 + p * 22.0, 38.0)
+		pip.position = at + Vector2(pip_x0 + p * 22.0, 38.0)
 		pip.size = Vector2(16, 6)
 		pip.color = tint if p < sev else Color(0.22, 0.21, 0.25)
 		add_child(pip)

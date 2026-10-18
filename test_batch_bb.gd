@@ -548,12 +548,15 @@ func _rot_pool() -> void:
 	ok(String(run.MODIFIERS["rot"]["name"]) == "Rot", "§5: ...named Rot")
 	ok(String(run.MODIFIERS["rot"]["desc"]).contains("halved"),
 		"§5: ...and its text says what it does")
-	var by_sev := {1: 0, 2: 0, 3: 0, 4: 0}
+	# BATCH IN §1 RE-POINTED IN PLACE: severity 5 holds Ruin's four beside the twenty, so the pool is twenty-four and the
+	# tally reads a fifth severity.
+	var by_sev := {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
 	for mid in run.MODIFIERS:
 		by_sev[run.modifier_severity(String(mid))] += 1
 	ok(by_sev[4] == 4,
 		"§5: THE SEVERITY-4 POOL IS FOUR — AQ's stated target (got %d)" % by_sev[4])
-	ok(run.MODIFIERS.size() == 20, "§5: twenty modifiers (was nineteen)")
+	ok(run.MODIFIERS.size() == 24 and by_sev[5] == 4,
+		"§5: twenty-four modifiers — the twenty and Ruin's four at severity 5 (got %d, %d at 5)" % [run.MODIFIERS.size(), by_sev[5]])
 	# The floor still holds by construction with a bigger high pool.
 	var misses := 0
 	for _i in 400:
@@ -908,8 +911,9 @@ func _docs() -> void:
 		"§7: the glossary's Poison entry states the clock rule that survives FX, and no longer teaches Creeping Death's retired split")
 	ok(gl.contains("HE FIELDS ONE COMPANION AT A TIME"),
 		"§7: the Pack Bond entry states the rule that superseded The Pack's swap — one companion at a time")
-	ok(gl.contains("There are twenty, weighted toward the mild end"),
-		"§7: the Modifier entry counts twenty")
+	# BATCH IN §1 RE-POINTED IN PLACE: the entry counts the twenty every road deals, and Ruin's four apart.
+	ok(gl.contains("The twenty are weighted toward the mild end"),
+		"§7: the Modifier entry counts the twenty every road deals")
 	# §7 asked for "a Rot entry IF the modifier list is enumerated there". IT IS
 	# NOT — the glossary teaches the SYSTEM (bargain / modifier / severity) and
 	# names Feverish and Bloodless only as examples, and not one of the twenty

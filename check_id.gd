@@ -1060,9 +1060,13 @@ func _s3c_the_passive_and_the_relics() -> void:
 	var shelf: Array = _all(current_scene, "Label").map(func(l): return String((l as Label).text))
 	var rare_name := String(Relics.POOL[rares[0]]["name"])
 	var common_name := String(Relics.POOL[commons[0]]["name"])
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the shelf's two relics are the first rare and the first common in
+	# `Relics.POOL`'s key order; the shelf's line names both.
+	var relic_pick := "the first rare relic in the pool's order, %s (%s), and the first common, %s (%s)" % [
+		rare_name, String(rares[0]), common_name, String(commons[0])]
 	ok(shelf.any(func(t): return String(t).begins_with(rare_name + "  RARE\n")) and not shelf.any(func(t): return String(t).contains(DIAMOND))
 			and not shelf.any(func(t): return String(t).begins_with(common_name + "  RARE")),
-		"§3c: the shelf does not read '%s  RARE' alone for the rare one, or draws ◆" % rare_name)
+		"§3c: the shelf does not read '%s  RARE' alone for the rare one, or draws ◆ — %s" % [rare_name, relic_pick])
 	var widest := ""
 	var wpx := 0.0
 	for id in rares:

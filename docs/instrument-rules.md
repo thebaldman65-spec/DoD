@@ -1294,6 +1294,22 @@ the rune was wired, because it was supplying the one input the defect was in.
   target list every run and fails only when it GROWS — a batch adding a legitimate hand-set raises
   the ceiling and says why in its report.
 
+## STANDING RULE — A DRIVE IS A PROOF OF THE PREDICATE ONLY WHEN THE PREDICATE CHOOSES WHAT IT DRIVES (Batch IN §0.7, ruled by the designer)
+> **A DRIVE IS A PROOF OF THE PREDICATE ONLY WHEN THE PREDICATE CHOOSES WHAT IT DRIVES.** An arm that casts on a body the
+> gate named tests the handler's arithmetic on that body; it says nothing about whether the predicate would have chosen
+> it. **A control that passes on an inverted subject is testing the gate's arithmetic and not the game's.**
+
+- **THE CASE IS IM's CONTROL C10.** `check_im` §3b's driven arms cast each of the seven pick-refusing cards on bodies the
+  gate named, so Funeral Pyre's predicate inverted against its handler left both driven arms GREEN and only the pool rows
+  red. Once the arms cast on a body the predicate refuses and one it offers — the bodies taken from the predicate's own
+  answer — C10b read both (`docs/reports/IM.md` §9).
+- **IT IS THE BLOCK ABOVE SEEN FROM THE OTHER SIDE.** That one says do not seat what you assert; this one says assert what
+  your own predicate seated. Both close the same gap: an arm whose subject the gate chose cannot fail when the game's
+  choice of subject breaks.
+- **AND IT BINDS A CONTROL AS WELL AS AN ARM.** A control that makes a gate fail makes it fail on the subject the gate
+  itself picked, never on a subject the control named — so a control on a superlative pick (IM §0.8's rule) reads the
+  FAIL line the gate prints for its own pick (IN §4's controls).
+
 ## STANDING RULE — AN EXACT COUNTERFACTUAL IS EXACT ABOUT THE PAIRING, NOT ABOUT THE ESTIMATE (Batch EX §1b)
 
 > **A counterfactual that consumes no randomness removes the difference BETWEEN THE ARMS. It does
@@ -2037,8 +2053,10 @@ NOT a wrapping problem.
   new sentence made Blood Debt that rune — one asking for a card a fresh Warrior does not hold, so the event verb could
   hand it to nobody. No literal moved; recon 1 read it red. Its FAIL line names the rune since.
 - **IM's CENSUS OF THE BATTERY: 57 SITES OF THE SHAPE** — 17 ranked by a measure, 40 the first or last found in a data
-  or roll order — and **23 name their pick in every FAIL line, 11 in some, 23 in none** (IM's report, §0.8, holds
-  the list, one row a site). The rule binds a gate written or repaired from IM on; a site that does not name its pick
-  is repaired in the batch that next touches it.
+  or roll order — and 23 named their pick in every FAIL line at IM, 11 in some and 23 in none (IM's report, §0.8, holds
+  the list, one row a site). **IN §4 repaired the 34 as a batch, the designer's** — *as each is next touched* would leave
+  them blind for exactly as long as nobody touches them, and the defect is that an UNRELATED batch re-selects them — so
+  all 57 name their pick at IN (`check_in` §4 holds the 34; IN's report, §4, the census again). A new site of the shape
+  names its pick in the batch that writes it.
 - **AND IT IS A VERIFICATION STEP, NOT ONLY A SHAPE**: before a batch writes its prediction, it finds every superlative
   pick whose population its diff touches and names each one's pick on HEAD's tree and on its own.

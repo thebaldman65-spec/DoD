@@ -475,6 +475,12 @@ func _s1c_the_purchase() -> void:
 	var o0: Dictionary = offers[buy_at]
 	var for_idx := int(o0["member_idx"])
 	var nm := String((o0["rune"] as Dictionary)["name"])
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the counter's first row, in the order the Peddler rolled it, whose rune
+	# is not a crest rune — the rune this arm buys, holds, counts on its hero's nameplate and equips.
+	var buy_pick := "the first non-crest row on the counter in roll order, index %d of %d rows: %s for the %s (seat %d)" % [
+		buy_at, offers.size(), nm,
+		(String((_run.party[for_idx] as Dictionary).get("key", "")) if for_idx >= 0 and for_idx < _run.party.size() else "?"),
+		for_idx]
 	ok(Gate.has_text(shop, "held by him; equip it on the map"),
 		"§1c: the counter does not say where a bought rune goes")
 	var buy_btn: Button = Gate.bound_button(shop, "_buy_rune", [buy_at])
@@ -484,11 +490,11 @@ func _s1c_the_purchase() -> void:
 		buy_btn.emit_signal("pressed")
 	await Gate.frames(self, 2)
 	ok(bought != "" and _run.gold == 1000 - int(_run.rune_price(o0["rune"])),
-		"§1c: the Buy took %dg" % (1000 - int(_run.gold)))
+		"§1c: the Buy took %dg — %s" % [1000 - int(_run.gold), buy_pick])
 	# BATCH HR §1/§2 — HELD BY THE HERO IT WAS BOUGHT FOR, AND THE MAP SHOWS IT ON HIS
 	# NAMEPLATE: HL's complaint was a purchase that appeared nowhere on the map, and HK
 	# answered it with the bag's row; the marker answers it against the hero.
-	ok(_hr_unworn(_run.party[for_idx]).has(nm), "§1c: the rune bought is not held by its hero — gold spent, nothing received")
+	ok(_hr_unworn(_run.party[for_idx]).has(nm), "§1c: the rune bought is not held by its hero — gold spent, nothing received — %s" % buy_pick)
 	var mp := await _to_map()
 	var marker: Button = null
 	var mb: Array = []
@@ -500,7 +506,7 @@ func _s1c_the_purchase() -> void:
 					and cb.get_bound_arguments() == [for_idx]:
 				marker = b
 	ok(marker != null and String(marker.text) == "✦ %d" % _run.held_count(_run.party[for_idx]),
-		"§1c: the hero's nameplate does not count the rune bought")
+		"§1c: the hero's nameplate does not count the rune bought — %s" % buy_pick)
 	mp.call("_open_rune_panel", for_idx)
 	await process_frame
 	var ov: Node = Gate.overlay(current_scene, 60)
@@ -511,13 +517,13 @@ func _s1c_the_purchase() -> void:
 		if not bool(rows[ri]["worn"]) and String((rows[ri]["rune"] as Dictionary).get("name", "")) == nm:
 			row = ri
 	var eq: Button = Gate.bound_button(ov, "_toggle_rune", [for_idx, row, ov]) if ov != null else null
-	ok(eq != null and String(eq.text) == "Equip", "§1c: the hero's panel drew no Equip for the rune bought")
+	ok(eq != null and String(eq.text) == "Equip", "§1c: the hero's panel drew no Equip for the rune bought — %s" % buy_pick)
 	if eq != null:
 		eq.emit_signal("pressed")
 		await Gate.frames(self, 3)
 	ok(_names(m.get("runes", []).filter(func(r): return bool((r as Dictionary).get("equipped", false)))).has(nm)
 			and not _hr_unworn(m).has(nm),
-		"§1c: Equip did not put the rune bought on the hero")
+		"§1c: Equip did not put the rune bought on the hero — %s" % buy_pick)
 
 
 # ── §1d — THE STANCES CAN BE CHANGED ────────────────────────────────────────

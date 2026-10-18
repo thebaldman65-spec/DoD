@@ -4,6 +4,50 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The severity-5 band, and two blind spots (Batch IN) — 2026-10-17
+
+**Why Ruin needed new bargains rather than a new weighting.** The table stopped at severity 4, so no way of dealing it could
+put Ruin a full step above Warden; the step had to come from bargains only Ruin is dealt. Four were authored at severity 5,
+one system each, and Ruin's gambles come from them alone. Wanderer and Warden draw exactly what they drew before, card for
+card, because their bands never reach 5 — they are the control, and they did not move.
+
+**Why the four bind one side when the twenty bind both.** The twenty are changes to the fight that both sides live under,
+which is why a modifier was never allowed to be "your heroes have it worse". Ruin's four are the road leaning on the heroes,
+the harshest bargains in the game and the best paid. The line they do not cross is a class's whole kit: a modifier that makes
+one hero's hand dead is not harsh, it is unplayable — so the pouch they seal belongs to all four heroes, the clock reaches
+every hero alike, the Dark is answered by burst, and Cruel Order changes no card.
+
+**Why the authored ROT is called Wasting.** Rot is already a bargain's name, the severity-4 one that halves maximum health,
+and on Ruin both could sit on one offer. A player choosing between two cards called Rot would be choosing blind.
+
+**Why Wasting is a tick and not a cost.** It is damage that is not a strike, so it goes through the door every tick goes
+through: no ward, no armor and no Less Damage Taken reaches it — which the word *strike* on Less Damage Taken already tells
+the player — and it can fell a hero, which is what makes it a clock.
+
+**Why a round means a swing's length.** The game has no rounds; turns come up on a timeline. "Every enemy before any hero, each
+round" is read on that timeline in spans of one ordinary swing at the average speed, so the warband goes first within each
+span and speed still decides who comes round again sooner. The loop and the turn bar ask the same question, so the bar never
+shows an order the fight does not keep.
+
+**Why severity 5 pays 300.** The gold steps were 40, 60 and 80, not one slope, so the row took the largest step the table
+already had rather than an invented figure.
+
+**Why the four were not tuned when the sim found them mild.** At their starting values they cost the sim's bot less than
+the severity-4 band Ruin dealt before, so Ruin's bargains ended with the party healthier. A batch that moved the figures toward
+a target would be choosing magnitudes nobody ruled, and the bot cannot price Famine at all, so the figures went to the designer
+as measured.
+
+**Why the merchant follows the mildest bargain a road deals.** It was meant as a weak reward on a weak twist, and pinning it
+to severity 1 broke that on Ruin, which never deals a 1 and so had no merchant at all while paying the most gold. Reading the
+road's own bands keeps Wanderer and Warden exactly as they were and gives Ruin its merchant on its mildest bargain.
+
+**Why the bot now reads the real price.** A bot that can pick a card the player's button refuses is playing a different
+game, and every figure it produces under a cost-changing rule describes nothing. It now asks the same price the door
+charges.
+
+**Why the gates now name what they picked.** A check that picks "the longest rune" or "the first card" silently re-picks when
+an unrelated change moves a text, and a failure that does not say which one it picked hides what moved.
+
 ## The Ruin rung, and the picker's remainder (Batch IM) — 2026-10-17
 
 **Why two bands and not a better floor.** One number was doing two jobs: it said which bargains count as the safe one and

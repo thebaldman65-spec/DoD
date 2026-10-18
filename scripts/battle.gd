@@ -2267,6 +2267,20 @@ func _stamp_modifier(u: BattleUnit, mod_id: String, inherited := false) -> void:
 			u.rot_hp_lost += rot_lost
 			u.hp = clampi(u.hp, 1, u.max_hp)
 			u.refresh_bars()
+		# BATCH IN §1 — THE SEVERITY-5 FOUR STAMP NOTHING ON A UNIT. Each binds one side
+		# through one door of the battle, which asks `_modifier_is` where it acts: the
+		# pouch (`_pouch_sealed`), a hero's turn's end (`_wasting_tick`), BL's damage door
+		# (`_dark_feeds`) and the turn order (`_turn_key`). Listed so the table's every
+		# id has its arm here, and a reader looking for one finds where it lives.
+		"famine", "wasting", "hungering_dark", "cruel_order":
+			pass
+
+
+# BATCH IN §1 — IS THIS MODIFIER THE ONE THE FIGHT IS FOUGHT UNDER? Asked live at each
+# door, off `_active_modifier`, so a gate that arms a bargain and drives one door reads
+# the same answer the fight does.
+func _modifier_is(mod_id: String) -> bool:
+	return _active_modifier() == mod_id
 
 
 func _make_unit(config: Dictionary, pos: Vector2, tint: Color,
@@ -2959,6 +2973,9 @@ func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability
 		return
 	var intent_shown := {}   # BATCH BL §1: one icon per enemy, first slot only
 	var sim: Array = alive.map(func(u): return {"unit": u, "t": u.next_time})
+	# BATCH IN §1 — THE BAR ORDERS AS THE LOOP DOES (`_turn_before`), or under Cruel Order it
+	# would draw a turn order the fight does not honour.
+	var cruel := _modifier_is("cruel_order")
 	if preview_unit != null and preview_ability != null:
 		for entry in sim:
 			if entry.unit == preview_unit:
@@ -2972,7 +2989,7 @@ func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability
 	for i in 14:
 		var best: Dictionary = sim[0]
 		for entry in sim:
-			if entry.t < best.t:
+			if _turn_before(entry.unit, entry.t, best.unit, best.t, cruel):
 				best = entry
 		var u: BattleUnit = best.unit
 		var is_ghost: bool = preview_unit != null and u == preview_unit \
@@ -3723,6 +3740,9 @@ func _run_battle() -> void:
 			u.tick_cooldowns()
 			await _wait(0.8)
 			u.next_time += BASIC_DELAY * 100.0 / u.effective_speed()
+			# BATCH IN §1 — and Wasting's clock: a lost turn is still his turn.
+			if _wasting_tick(u):
+				_check_end()
 			continue
 		if u.has_status("frozen"):
 			u.float_text("FROZEN", Color(0.65, 0.88, 1.0))
@@ -3742,6 +3762,8 @@ func _run_battle() -> void:
 			u.tick_cooldowns()
 			await _wait(0.8)
 			u.next_time += BASIC_DELAY * 100.0 / u.effective_speed()
+			if _wasting_tick(u):
+				_check_end()
 			continue
 		u.tick_statuses()
 		u.tick_cooldowns()
@@ -3885,11 +3907,14 @@ func _run_battle() -> void:
 					_log("   → Capstone: Guard Breaker — %s's meter refills to 50" % \
 						u.unit_name, "#c070e0")
 			u.next_time += BASIC_DELAY * 100.0 / u.effective_speed()
+			if _wasting_tick(u):
+				_check_end()
 			continue
 		if u.is_hero:
 			await _player_turn(u)
 			if _readout != null:
 				_readout.turn_close(u)
+			_wasting_tick(u)
 		else:
 			await _enemy_turn(u)
 			# BATCH BL §1 — DECLARE ON SCHEDULE. The turn is over, so the next
@@ -3945,6 +3970,49 @@ func _grace_echo(u: BattleUnit) -> void:
 		int(round(ge_pct * 100.0)), "#70d878")
 
 
+# ══ BATCH IN §1 — WASTING: A CLOCK ON THE FIGHT ═══════════════════════════════
+#
+# **At the end of every hero's turn, that hero loses `Run.WASTING_PCT` of his maximum
+# health** — the turn he took, and a turn a stun, a freeze or a Break cost him, which
+# still counts here as every timer's turn does. Its own function for the AR trap's
+# reason (`_run_battle` cannot be driven headlessly), and called at each of the four
+# places a hero's turn ends.
+#
+# **IT IS NOT A STRIKE, SO IT GOES THROUGH THE TICK DOOR** (`take_tick_damage`), which
+# no barrier, no armor and no *Less Damage Taken* reaches — the last says *strike damage*
+# since IM. What reads every damage a body takes does read it, as it reads a Burn tick:
+# the recap, the party's save, Second Wind's and Battle Trance's ledgers, Momentum's taken
+# half, and the two rule engines that split or pay for damage taken (the Oathkeeper's
+# covenant, the Leech's siphon). **It names nobody**: the frame carries the modifier's
+# name and no source, so it is no hero's and no enemy's to be credited or fed by. It can
+# fell a hero, as a tick can. Returns whether he fell.
+func _wasting_tick(u: BattleUnit) -> bool:
+	if u == null or u.dead or not u.is_hero or u.is_companion or battle_over:
+		return false
+	# A turn that won the fight ends nothing: the clock stops with the last enemy, before the loop decides the end.
+	if enemies.all(func(e): return e.dead):
+		return false
+	if not _modifier_is("wasting"):
+		return false
+	var ws_name := String(Run.MODIFIERS["wasting"]["name"])
+	var ws_amt := maxi(int(round(u.max_hp * Run.WASTING_PCT)), 1)
+	var ws_was_src := _dmg_src
+	var ws_was_label := _dmg_label
+	var ws_was_name := _dmg_src_name
+	_dmg_frame(null, ws_name, ws_name)
+	var ws_before := u.hp
+	var ws_died: bool = u.take_tick_damage(ws_amt, "-%d %s" % [ws_amt, ws_name.to_upper()],
+		Color(0.62, 0.66, 0.42))
+	_dmg_frame(ws_was_src, ws_was_label, ws_was_name)
+	_log("%s wastes — %d health lost as the turn ends (%s)" % [u.unit_name,
+		ws_before - u.hp, ws_name], "#a8a868")
+	if ws_died:
+		_stat("hero_deaths")
+		_message("%s succumbs to %s!" % [u.unit_name, ws_name])
+		_log("† %s dies" % u.unit_name, "#e05050")
+	return ws_died
+
+
 # WATCHTOWER's own function (the `_run_battle`-cannot-be-driven-headlessly
 # rule): it pulls the Cleric to the front of the timeline when a hero crosses
 # the line. `watchtower_used` is cleared at the top of each of HER turns, so
@@ -3977,11 +4045,37 @@ func _next_unit() -> BattleUnit:
 	var alive := (heroes + enemies).filter(func(u): return not u.dead)
 	if alive.is_empty():
 		return null
+	var cruel := _modifier_is("cruel_order")
 	var best: BattleUnit = alive[0]
 	for u in alive:
-		if u.next_time < best.next_time:
+		if _turn_before(u, u.next_time, best, best.next_time, cruel):
 			best = u
 	return best
+
+
+# ══ BATCH IN §1 — CRUEL ORDER: EVERY ENEMY ACTS BEFORE ANY HERO, EACH ROUND ═══════════
+#
+# **The turn order is a timeline, not rounds**: a unit acts when its `next_time` comes up,
+# and a turn pushes it on by `delay * 100 / speed`. **A ROUND IS `ROUND_TICKS` of that
+# timeline — the span a basic swing takes a unit at the average speed (100)** — so the
+# timeline is read in rounds of it, and under Cruel Order every enemy due in a round acts
+# before any hero due in the same round, each side in its own order. Speed still counts
+# across rounds. **Two places order turns and both ask this**, so the loop and the turn bar
+# cannot disagree; with any other modifier it is `next_time` alone, as it always was.
+# A turn placed before the fight's first round — the Tracker's, the Hunter's class
+# passive, at -0.01 — stays before it.
+const ROUND_TICKS := BASIC_DELAY
+
+
+func _turn_before(a: BattleUnit, ta: float, b: BattleUnit, tb: float, cruel: bool) -> bool:
+	if cruel:
+		var ra := floorf(ta / ROUND_TICKS)
+		var rb := floorf(tb / ROUND_TICKS)
+		if ra != rb:
+			return ra < rb
+		if a.is_hero != b.is_hero:
+			return not a.is_hero
+	return ta < tb
 
 
 # Everything enemies can target / allies can help: heroes plus living companions.
@@ -4300,6 +4394,7 @@ func _player_turn(u: BattleUnit) -> void:
 	# the effect stays attributable. Run sims only (RunSim.items_on):
 	# standalone and sweep battles stay dry to keep the R/S baselines.
 	if autoplay and RunSim.active and RunSim.items_on and not u.is_companion \
+			and not _pouch_sealed() \
 			and u.hp < u.max_hp * 0.35 and int(items["health"][1]) > 0:
 		items["health"][1] -= 1
 		item_used = true
@@ -5303,17 +5398,17 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 						and u.resource < 60 and u.hp > u.max_hp * 0.4:
 					return [bprice, u]
 				var wild := _find_ability(u, "Wildstrikes")
-				if wild != null and u.resource >= wild.cost and u.ability_ready(wild) \
+				if wild != null and u.resource >= _eff_cost(u, wild) and u.ability_ready(wild) \
 						and foes.size() >= 3:
 					return [wild, target_foe]
 				var ramp := _find_ability(u, "Rampage")
-				if ramp != null and u.resource >= ramp.cost and u.ability_ready(ramp):
+				if ramp != null and u.resource >= _eff_cost(u, ramp) and u.ability_ready(ramp):
 					return [ramp, target_foe]
 				var bz_hack := _find_ability(u, "Hack and Slash")
-				if bz_hack != null and u.resource >= bz_hack.cost and u.ability_ready(bz_hack):
+				if bz_hack != null and u.resource >= _eff_cost(u, bz_hack) and u.ability_ready(bz_hack):
 					return [bz_hack, target_foe]
 				var blust := _find_ability(u, "Bloodlust")
-				if blust != null and u.resource >= blust.cost and u.ability_ready(blust) \
+				if blust != null and u.resource >= _eff_cost(u, blust) and u.ability_ready(blust) \
 						and u.hp < u.max_hp * 0.5:
 					return [blust, target_foe]
 				return [u.abilities[0], target_foe]  # Strike
@@ -5348,26 +5443,26 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 					if not sm_prey.is_empty():
 						return [sm_exec, _lowest_hp(sm_prey)]
 				var sm_shatter := _find_ability(u, "Shatterpoint")
-				if sm_shatter != null and u.resource >= sm_shatter.cost \
+				if sm_shatter != null and u.resource >= _eff_cost(u, sm_shatter) \
 						and u.ability_ready(sm_shatter) and not target_foe.broken \
 						and target_foe.pressure >= 55:
 					return [sm_shatter, target_foe]
 				var sm_pommel := _find_ability(u, "Pommel Strike")
-				if sm_pommel != null and u.resource >= sm_pommel.cost \
+				if sm_pommel != null and u.resource >= _eff_cost(u, sm_pommel) \
 						and u.ability_ready(sm_pommel) \
 						and not (target_foe.is_boss and not target_foe.broken):
 					return [sm_pommel, target_foe]
 				var sm_over := _find_ability(u, "Overpower")
-				if sm_over != null and u.resource >= sm_over.cost \
+				if sm_over != null and u.resource >= _eff_cost(u, sm_over) \
 						and u.ability_ready(sm_over) \
 						and (target_foe.pressure >= 40 or target_foe.broken):
 					return [sm_over, target_foe]
 				var sm_lunge := _find_ability(u, "Lunge")
-				if sm_lunge != null and u.resource >= sm_lunge.cost \
+				if sm_lunge != null and u.resource >= _eff_cost(u, sm_lunge) \
 						and u.ability_ready(sm_lunge):
 					return [sm_lunge, target_foe]
 				var sm_sweep := _find_ability(u, "Sweeping Strikes")
-				if sm_sweep != null and u.resource >= sm_sweep.cost \
+				if sm_sweep != null and u.resource >= _eff_cost(u, sm_sweep) \
 						and u.ability_ready(sm_sweep) and foes.size() >= 3:
 					return [sm_sweep, target_foe]
 				return [u.abilities[0], target_foe]  # Strike
@@ -5378,13 +5473,13 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 			if u.has_engine("heavy_plating"):
 				var wd_idx := heroes.find(u)
 				var wd_inter := _find_ability(u, "Interpose")
-				if wd_inter != null and u.resource >= wd_inter.cost \
+				if wd_inter != null and u.resource >= _eff_cost(u, wd_inter) \
 						and u.ability_ready(wd_inter) \
 						and allies.filter(func(h): return not h.is_companion \
 						and h != u and h.hp < h.max_hp * 0.6).size() >= 2:
 					return [wd_inter, u]
 				var wd_wall := _find_ability(u, "Shieldwall")
-				if wd_wall != null and u.resource >= wd_wall.cost \
+				if wd_wall != null and u.resource >= _eff_cost(u, wd_wall) \
 						and u.ability_ready(wd_wall) \
 						and (u.hp < u.max_hp * 0.5 or foes.size() >= 3):
 					# BATCH GM §3 — with the Split Shield held the wall names an
@@ -5401,12 +5496,12 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 						and e.status_power("mocked") == wd_idx):
 					return [wd_mock, target_foe]
 				var wd_crush := _find_ability(u, "Crushing Blow")
-				if wd_crush != null and u.resource >= wd_crush.cost \
+				if wd_crush != null and u.resource >= _eff_cost(u, wd_crush) \
 						and u.ability_ready(wd_crush) \
 						and not target_foe.has_status("sunder"):
 					return [wd_crush, target_foe]
 				var wd_stomp := _find_ability(u, "War Stomp")
-				if wd_stomp != null and u.resource >= wd_stomp.cost \
+				if wd_stomp != null and u.resource >= _eff_cost(u, wd_stomp) \
 						and u.ability_ready(wd_stomp) \
 						and allies.filter(func(h): return h != u \
 						and h.resource_name != "" \
@@ -5414,21 +5509,21 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 					return [wd_stomp, target_foe]
 				return [u.abilities[0], target_foe]  # Strike
 			var pommel := _find_ability(u, "Pommel Strike")
-			if pommel != null and u.resource >= pommel.cost and u.ability_ready(pommel) and randf() < 0.35:
+			if pommel != null and u.resource >= _eff_cost(u, pommel) and u.ability_ready(pommel) and randf() < 0.35:
 				return [pommel, target_foe]
 			var hack := _find_ability(u, "Hack and Slash")
-			if hack != null and u.resource >= hack.cost and u.ability_ready(hack) and randf() < 0.4:
+			if hack != null and u.resource >= _eff_cost(u, hack) and u.ability_ready(hack) and randf() < 0.4:
 				return [hack, target_foe]
 			var stomp := _find_ability(u, "War Stomp")
-			if stomp != null and u.resource >= stomp.cost and u.ability_ready(stomp) \
+			if stomp != null and u.resource >= _eff_cost(u, stomp) and u.ability_ready(stomp) \
 					and foes.size() >= 2 and randf() < 0.35:
 				return [stomp, target_foe]
 			var crushing := _find_ability(u, "Crushing Blow")
-			if crushing != null and u.resource >= crushing.cost and u.ability_ready(crushing) \
+			if crushing != null and u.resource >= _eff_cost(u, crushing) and u.ability_ready(crushing) \
 					and not target_foe.has_status("sunder"):
 				return [crushing, target_foe]
 			var overpower := _find_ability(u, "Overpower")
-			if overpower != null and u.resource >= overpower.cost and u.ability_ready(overpower):
+			if overpower != null and u.resource >= _eff_cost(u, overpower) and u.ability_ready(overpower):
 				return [overpower, target_foe]
 			return [u.abilities[0], target_foe]          # Strike
 		"mage":
@@ -5443,7 +5538,7 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 			var ashes := _find_ability(u, "Ashes of Al'ar")
 			if ashes != null and u.ashes_return <= 0 and not u.ashes_used \
 					and u.hp < u.max_hp * 0.4 \
-					and u.resource >= ashes.cost and u.ability_ready(ashes):
+					and u.resource >= _eff_cost(u, ashes) and u.ability_ready(ashes):
 				return [ashes, u]
 			# Pyromancer (Batch N loop, Batch AG rework, BATCH BS'S REPLACEMENT
 			# RULE). AR's first rule was CONSUME WHEN THE DRAIN EXCEEDS THE
@@ -5467,44 +5562,44 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 			var det := _find_ability(u, "Detonation")
 			var wfire := _find_ability(u, "Wildfire")
 			if det != null and ripest != null and ripest_turns >= DETONATE_AT \
-					and u.resource >= det.cost and u.ability_ready(det):
+					and u.resource >= _eff_cost(u, det) and u.ability_ready(det):
 				return [det, ripest]
 			if wfire != null and not burning_foes.is_empty() \
 					and (det == null or not u.ability_ready(det)) \
-					and u.resource >= wfire.cost and u.ability_ready(wfire):
+					and u.resource >= _eff_cost(u, wfire) and u.ability_ready(wfire):
 				return [wfire, u]
 			# BATCH BS §3: Immolate is a DEFENSIVE card now (mitigation plus a
 			# retaliation burn), so the bot arms it when there is something to
 			# retaliate against rather than when the field is already alight.
 			var immolate := _find_ability(u, "Immolate")
-			if immolate != null and u.resource >= immolate.cost \
+			if immolate != null and u.resource >= _eff_cost(u, immolate) \
 					and u.ability_ready(immolate) and not u.has_status("immolate") \
 					and not foes.is_empty():
 				return [immolate, u]
 			var fwave := _find_ability(u, "Flamewave")
-			if fwave != null and u.resource >= fwave.cost and u.ability_ready(fwave) \
+			if fwave != null and u.resource >= _eff_cost(u, fwave) and u.ability_ready(fwave) \
 					and unburnt >= 2:
 				return [fwave, target_foe]
 			# Wildfire is the wide payoff: it wants a line already alight, not one
 			# deep fire to copy. Held to 3+ so Detonation still gets its
 			# single-target cash-out on a field it could have eaten.
-			if wfire != null and u.resource >= wfire.cost and u.ability_ready(wfire) \
+			if wfire != null and u.resource >= _eff_cost(u, wfire) and u.ability_ready(wfire) \
 					and burning_foes.size() >= 3:
 				return [wfire, u]
-			if det != null and u.resource >= det.cost and u.ability_ready(det) \
+			if det != null and u.resource >= _eff_cost(u, det) and u.ability_ready(det) \
 					and ripest_turns >= 3:
 				return [det, ripest]
 			var pblast := _find_ability(u, "Pyroblast")
-			if pblast != null and u.resource >= pblast.cost and u.ability_ready(pblast) \
+			if pblast != null and u.resource >= _eff_cost(u, pblast) and u.ability_ready(pblast) \
 					and target_foe.has_status("burn"):
 				return [pblast, target_foe]
 			var backdraft := _find_ability(u, "Backdraft")
-			if backdraft != null and u.resource >= backdraft.cost \
+			if backdraft != null and u.resource >= _eff_cost(u, backdraft) \
 					and u.ability_ready(backdraft) \
 					and burning_foes.size() >= 2:
 				return [backdraft, u]
 			var fstorm := _find_ability(u, "Firestorm")
-			if fstorm != null and u.resource >= fstorm.cost and u.ability_ready(fstorm):
+			if fstorm != null and u.resource >= _eff_cost(u, fstorm) and u.ability_ready(fstorm):
 				return [fstorm, target_foe]
 			# ARCANIST (Batch AT §6): the rotation is built on one rule —
 			# **NEVER COME DOWN.** The old policy vented at 4+ stacks below 80%
@@ -5517,25 +5612,25 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 			# IN THIS BATCH — a single-spec re-author has no honest control row,
 			# which AJ, AK, AL, AR and AS each recorded.
 			var dray := _find_ability(u, "Death Ray")
-			if dray != null and u.resource >= dray.cost and u.ability_ready(dray) \
+			if dray != null and u.resource >= _eff_cost(u, dray) and u.ability_ready(dray) \
 					and u.second_resource >= DEATH_RAY_STACKS:
 				return [dray, target_foe]
 			var wrath := _find_ability(u, "Magi's Wrath")
-			if wrath != null and u.resource >= wrath.cost and u.ability_ready(wrath) \
+			if wrath != null and u.resource >= _eff_cost(u, wrath) and u.ability_ready(wrath) \
 					and foes.size() >= 3:
 				return [wrath, target_foe]
 			# Overcharge pays HALF of what he holds, so spending it early throws
 			# the button away. The bot holds it until the ramp is deep enough
 			# that it is worth a turn, then spends it once.
 			var ocharge := _find_ability(u, "Overcharge")
-			if ocharge != null and u.resource >= ocharge.cost and u.ability_ready(ocharge) \
+			if ocharge != null and u.resource >= _eff_cost(u, ocharge) and u.ability_ready(ocharge) \
 					and u.overcharge_ready() and u.second_resource >= OVERCHARGE_BOT_STACKS:
 				return [ocharge, u]
 			var cannon := _find_ability(u, "Arcane Cannon")
-			if cannon != null and u.resource >= cannon.cost and u.ability_ready(cannon):
+			if cannon != null and u.resource >= _eff_cost(u, cannon) and u.ability_ready(cannon):
 				return [cannon, target_foe]
 			var barrage := _find_ability(u, "Arcane Barrage")
-			if barrage != null and u.resource >= barrage.cost and u.ability_ready(barrage) and foes.size() >= 2:
+			if barrage != null and u.resource >= _eff_cost(u, barrage) and u.ability_ready(barrage) and foes.size() >= 2:
 				return [barrage, target_foe]
 			# NOTE THE ABSENCE, and do not "fix" it: Stabilize is deliberately
 			# NOT in this rotation. If a player earns it out of the spec pool it
@@ -5563,11 +5658,11 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 			# Glacial Prison on cooldown, against the highest-Attack UNHELD
 			# enemy — it needs no build, so it never waits on one.
 			var prison := _find_ability(u, "Glacial Prison")
-			if prison != null and u.resource >= prison.cost \
+			if prison != null and u.resource >= _eff_cost(u, prison) \
 					and u.ability_ready(prison) and cryo_mark != null:
 				return [prison, cryo_mark]
 			var lance := _find_ability(u, "Ice Lance")
-			var lance_up: bool = lance != null and u.resource >= lance.cost \
+			var lance_up: bool = lance != null and u.resource >= _eff_cost(u, lance) \
 				and u.ability_ready(lance)
 			# SHATTER, AND IT COMES BEFORE THE LANCE (Batch AT §8). It used to sit
 			# below the Lance behind a `_holds.size() >= 2` gate, which is why
@@ -5577,7 +5672,7 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 			# enough — below the crossover the Lance is still the better button,
 			# above it the Lance can never catch up.
 			var shat := _find_ability(u, "Shatter")
-			if shat != null and u.resource >= shat.cost and u.ability_ready(shat) \
+			if shat != null and u.resource >= _eff_cost(u, shat) and u.ability_ready(shat) \
 					and _ability_usable(u, shat) \
 					and _holds.any(func(e): return e.hold_turns >= SHATTER_BOT_TURNS):
 				return [shat, _holds[0]]
@@ -5593,23 +5688,23 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 				lance_up = false
 			if lance_up and not _holds.is_empty():
 				var replaceable: bool = (prison != null and u.ability_ready(prison) \
-					and u.resource >= prison.cost + lance.cost and cryo_mark != null) \
+					and u.resource >= _eff_cost(u, prison) + _eff_cost(u, lance) and cryo_mark != null) \
 					or (most_chilled != null and most_chilled.status_stacks("chilled") >= 3)
 				if unheld.is_empty() or replaceable:
 					return [lance, _holds[0]]
 			var razor := _find_ability(u, "Razor Ice")
-			if razor != null and u.resource >= razor.cost and u.ability_ready(razor) \
+			if razor != null and u.resource >= _eff_cost(u, razor) and u.ability_ready(razor) \
 					and cryo_mark != null:
 				return [razor, cryo_mark]
 			if lance_up and most_chilled != null \
 					and most_chilled.status_stacks("chilled") >= 3:
 				return [lance, most_chilled]
 			var bliz := _find_ability(u, "Blizzard")
-			if bliz != null and u.resource >= bliz.cost and u.ability_ready(bliz) \
+			if bliz != null and u.resource >= _eff_cost(u, bliz) and u.ability_ready(bliz) \
 					and unheld.filter(func(e): return e.status_stacks("chilled") < 2).size() >= 3:
 				return [bliz, target_foe]
 			var rime_ab := _find_ability(u, "Rime")
-			if rime_ab != null and u.resource >= rime_ab.cost and u.ability_ready(rime_ab):
+			if rime_ab != null and u.resource >= _eff_cost(u, rime_ab) and u.ability_ready(rime_ab):
 				var rime_t: BattleUnit = most_chilled if most_chilled != null else cryo_mark
 				if rime_t != null and not rime_t.has_status("rime"):
 					return [rime_ab, rime_t]
@@ -5617,7 +5712,7 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 			# problem while he was holding the old one.
 			var clasp := _find_ability(u, "Cryoclasm")
 			# BATCH IM §3b — and only at a body the picker offers (`_enemy_pick_pool`): never the prison it moves.
-			if clasp != null and u.resource >= clasp.cost and u.ability_ready(clasp) \
+			if clasp != null and u.resource >= _eff_cost(u, clasp) and u.ability_ready(clasp) \
 					and _ability_usable(u, clasp) and cryo_mark != null \
 					and not _holds.is_empty() and cryo_mark.attack > _holds[0].attack \
 					and _enemy_pick_pool(u, clasp, foes).has(cryo_mark):
@@ -5680,18 +5775,18 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 					return [_summon_choice(u, best_in), u]
 			# Spirit Bond when the pack is hurting.
 			var sbond := _find_ability(u, "Spirit Bond")
-			if sbond != null and u.resource >= sbond.cost and u.ability_ready(sbond) \
+			if sbond != null and u.resource >= _eff_cost(u, sbond) and u.ability_ready(sbond) \
 					and not bot_beasts.is_empty() \
 					and (u.hp < u.max_hp * 0.6 \
 					or bot_beasts.any(func(b): return b.hp < b.max_hp * 0.5)):
 				return [sbond, u]
 			# Unleash the beasts, then give the big order.
 			var bw := _find_ability(u, "Bestial Wrath")
-			if bw != null and u.resource >= bw.cost and u.ability_ready(bw) \
+			if bw != null and u.resource >= _eff_cost(u, bw) and u.ability_ready(bw) \
 					and bot_beasts.any(func(b): return not b.has_status("bestial")):
 				return [bw, u]
 			var kill_cmd := _find_ability(u, "Kill Command")
-			if kill_cmd != null and u.resource >= kill_cmd.cost and u.ability_ready(kill_cmd) \
+			if kill_cmd != null and u.resource >= _eff_cost(u, kill_cmd) and u.ability_ready(kill_cmd) \
 					and not bot_beasts.is_empty():
 				return [kill_cmd, target_foe]
 			# Boss trophies, when owned: surge a deep bond, call the pack
@@ -5711,7 +5806,7 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 				return [mk, target_foe]
 			# Hunter's Instinct: keep the empowered shots rolling.
 			var hi := _find_ability(u, "Hunter's Instinct")
-			if hi != null and u.resource >= hi.cost and u.ability_ready(hi) \
+			if hi != null and u.resource >= _eff_cost(u, hi) and u.ability_ready(hi) \
 					and not u.has_status("instinct"):
 				return [hi, u]
 			# Sharpshooter: work one target — hold the breath, then spend it.
@@ -5747,11 +5842,11 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 					and u.ability_ready(aimed):
 				return [aimed, ss_t]
 			var parrow := _find_ability(u, "Poisoned Arrow")
-			if parrow != null and u.resource >= parrow.cost and u.ability_ready(parrow) and randf() < 0.4 \
+			if parrow != null and u.resource >= _eff_cost(u, parrow) and u.ability_ready(parrow) and randf() < 0.4 \
 					and not target_foe.has_status("poison"):
 				return [parrow, target_foe]
 			var shrapnel := _find_ability(u, "Shrapnel Charge")
-			if shrapnel != null and u.resource >= shrapnel.cost and u.ability_ready(shrapnel) and foes.size() >= 2:
+			if shrapnel != null and u.resource >= _eff_cost(u, shrapnel) and u.ability_ready(shrapnel) and foes.size() >= 2:
 				return [shrapnel, target_foe]
 			# SURVIVALIST — BREADTH BEFORE DEPTH (Batch BA §8). His damage is the
 			# COUNT of distinct statuses on the target, not the size of any one
@@ -5849,12 +5944,12 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 				return [hheal, weakest_ally]
 			# Devout: the Conviction toolkit.
 			var bulwark_ab := _find_ability(u, "Bulwark of Fortitude")
-			if bulwark_ab != null and u.resource >= bulwark_ab.cost \
+			if bulwark_ab != null and u.resource >= _eff_cost(u, bulwark_ab) \
 					and u.ability_ready(bulwark_ab) \
 					and allies.filter(func(h): return h.hp < h.max_hp * 0.7).size() >= 2:
 				return [bulwark_ab, u]
 			var resolve_ab := _find_ability(u, "Sacred Resolve")
-			if resolve_ab != null and u.resource >= resolve_ab.cost \
+			if resolve_ab != null and u.resource >= _eff_cost(u, resolve_ab) \
 					and u.ability_ready(resolve_ab) \
 					and weakest_ally.hp < weakest_ally.max_hp * 0.7:
 				return [resolve_ab, u]
@@ -5881,7 +5976,7 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 				if not shield_t.has_status("barrier"):
 					return [shield_ab, shield_t]
 			var zeal_ab := _find_ability(u, "Blessing of Zeal")
-			if zeal_ab != null and u.resource >= zeal_ab.cost and u.ability_ready(zeal_ab):
+			if zeal_ab != null and u.resource >= _eff_cost(u, zeal_ab) and u.ability_ready(zeal_ab):
 				# Kindle whoever holds a Divine Shield — doubled Faith gain
 				# is worthless without absorbs to double (the old bot sent
 				# the shield to the weakest and the zeal to the hardest
@@ -5912,25 +6007,25 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 			var oc_t := _ruin_focus(foes, target_foe)
 			var oc_gated: bool = oc_t.is_boss and not oc_t.broken
 			var pact := _find_ability(u, "Dark Pact")
-			if pact != null and u.resource >= pact.cost and u.ability_ready(pact) \
+			if pact != null and u.resource >= _eff_cost(u, pact) and u.ability_ready(pact) \
 					and u.hp > u.max_hp * 0.5 \
 					and allies.filter(func(h): return h.hp < h.max_hp * 0.6).size() >= 2:
 				return [pact, u]
 			var hyst := _find_ability(u, "Mass Hysteria")
-			if hyst != null and u.resource >= hyst.cost and u.ability_ready(hyst) \
+			if hyst != null and u.resource >= _eff_cost(u, hyst) and u.ability_ready(hyst) \
 					and foes.size() >= 3 and not oc_gated:
 				return [hyst, u]
 			var mflay := _find_ability(u, "Mind Flay")
-			if mflay != null and u.resource >= mflay.cost and u.ability_ready(mflay) \
+			if mflay != null and u.resource >= _eff_cost(u, mflay) and u.ability_ready(mflay) \
 					and foes.size() >= 2 and not oc_gated:
 				return [mflay, oc_t]
 			var bwitch := _find_ability(u, "Bewitch")
-			if bwitch != null and u.resource >= bwitch.cost and u.ability_ready(bwitch) \
+			if bwitch != null and u.resource >= _eff_cost(u, bwitch) and u.ability_ready(bwitch) \
 					and foes.size() >= 2 and not oc_t.has_status("bewitch") \
 					and not oc_gated:
 				return [bwitch, oc_t]
 			var hex := _find_ability(u, "Hex of Ruin")
-			if hex != null and u.resource >= hex.cost and u.ability_ready(hex):
+			if hex != null and u.resource >= _eff_cost(u, hex) and u.ability_ready(hex):
 				return [hex, oc_t]
 			return [u.abilities[0], oc_t]                # Smite / Shadowrend
 	return [u.abilities[0], target_foe]
@@ -5961,7 +6056,7 @@ func _use_item(item_id: String) -> void:
 	# than a zero count. The picker only ever offers held slots, so this guard is
 	# for the hotkey path and for a test firing an id directly; it is the same
 	# belt-and-braces second gate the shop's buy button already carries.
-	if not items.has(item_id) or items[item_id][1] <= 0 or item_used:
+	if not items.has(item_id) or items[item_id][1] <= 0 or item_used or _pouch_sealed():
 		return
 	item_used = true
 	action_panel.visible = false
@@ -7887,11 +7982,23 @@ func _build_items_menu() -> Button:
 	btn.text = "[Alt] Items"
 	btn.custom_minimum_size = Vector2(76, 32)
 	btn.add_theme_font_size_override("font_size", 13)
-	btn.disabled = item_used
+	btn.disabled = item_used or _pouch_sealed()
 	btn.tooltip_text = "Already used an item this turn." if item_used \
 		else "Shared hero inventory.\nAlt opens · Tab cycles · Space uses · X closes."
+	# BATCH IN §1 — FAMINE: the button stays where it is and says why it is dark, in the
+	# modifier's own words (CO §3: a darkened button with no reason reads as a bug).
+	if _pouch_sealed():
+		var fam: Dictionary = Run.MODIFIERS["famine"]
+		btn.tooltip_text = "%s: %s" % [String(fam["name"]), String(fam["desc"])]
 	btn.pressed.connect(_open_item_picker)
 	return btn
+
+
+# BATCH IN §1 — FAMINE's ONE DOOR: the pouch is sealed for the fight. The button, the
+# picker, the use path and the bot's drink all ask it, so no route uses an item the
+# player cannot. The pouch belongs to all four heroes, so no class loses its own cards.
+func _pouch_sealed() -> bool:
+	return _modifier_is("famine")
 
 
 # ---------- item picker (Alt opens, Tab cycles, Space uses, X closes) ----------
@@ -7903,7 +8010,7 @@ var _item_idx := -1
 
 
 func _open_item_picker() -> void:
-	if current_hero == null or not action_panel.visible or item_used:
+	if current_hero == null or not action_panel.visible or item_used or _pouch_sealed():
 		return
 	_close_summon_picker()
 	_close_item_picker()
@@ -8361,7 +8468,7 @@ func _revalidate_intent(u: BattleUnit) -> Dictionary:
 func _intent_ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	if not u.abilities.has(ab):
 		return false
-	if ab.cost > u.resource:
+	if _eff_cost(u, ab) > u.resource:
 		return false
 	if int(u.cooldowns.get(ab.display_name, 0)) > 0:
 		return false
@@ -8601,7 +8708,7 @@ func _choose_enemy_action(u: BattleUnit) -> Dictionary:
 	# Only damaging, off-cooldown abilities count as attacks; support casts
 	# are chosen above.
 	var affordable: Array = u.abilities.filter(
-		func(a): return a.cost <= u.resource and a.damage > 0)
+		func(a): return _eff_cost(u, a) <= u.resource and a.damage > 0)
 	# BATCH BL §1: the ONE genuinely new line in this function. Selection used
 	# to run at the instant of acting, where every enemy in the roster has at
 	# least one free attack and the list could not be empty; a declaration made
@@ -18110,7 +18217,7 @@ func _psychotic_support(u: BattleUnit) -> Array:
 	if living.is_empty():
 		return []
 	for a in u.abilities:
-		if a.cost > u.resource:
+		if _eff_cost(u, a) > u.resource:
 			continue
 		match a.special:
 			"healing_wave", "wild_growth", "totem_pulse", "cleanse_allies":
@@ -30638,6 +30745,9 @@ func _on_damage_taken(victim: BattleUnit, lost: int, hp_before: int) -> void:
 			_log("† %s dies" % pn_owed.unit_name, "#e05050")
 		_dmg_frame(pn_was_src, pn_was_label, pn_was_name)
 		_penance_mirroring = false
+	# BATCH IN §1 — THE HUNGERING DARK READS THE DEALER, AS PENANCE DOES, AND ABOVE THE
+	# HERO GATE FOR PENANCE's REASON: its enemy feeds on whoever it hits.
+	_dark_feeds(victim, lost)
 	# BATCH GO — FOUR RULE ENGINES READ DAMAGE AN ALLY DEALS TO AN ENEMY, AND THIS
 	# IS THE DOOR THAT SEES ALL OF IT: a strike, a handler's own damage, a splash, an
 	# echo and a tick arrive here alike. Above the hero gate for Frostbind's
@@ -30666,6 +30776,34 @@ func _on_damage_taken(victim: BattleUnit, lost: int, hp_before: int) -> void:
 	if sim:
 		return
 	_book_taken(victim, lost, hp_before)
+
+
+# ══ BATCH IN §1 — THE HUNGERING DARK: EVERY ENEMY HEALS A SHARE OF THE DAMAGE IT DEALS ═══
+#
+# **It rides BL's one damage door** (`_on_damage_taken`), so every blow an enemy deals —
+# its strike, its splash, its handler's own damage, on a hero, a companion or a body of
+# its own warband a charm turned — feeds it `Run.HUNGERING_DARK_PCT` of the health that
+# left, below every death refusal. **The dealer is the frame's live unit**: an enemy's
+# damage-over-time ticks under a frame that names its layer and no unit, so a tick feeds
+# nothing, and a body that deals damage to itself (a recoil) is not fed by it. **The heal
+# goes through `heal_amount`**, so every refusal a heal meets meets it — Bloodless, Caught
+# Fast, Unmaking — which is the player's answer to it, and it is the damage race the
+# modifier is about: it punishes chip and rewards burst.
+func _dark_feeds(victim: BattleUnit, lost: int) -> void:
+	if lost <= 0 or victim == null or not _modifier_is("hungering_dark"):
+		return
+	var dk: BattleUnit = _dmg_src
+	if dk == null or not is_instance_valid(dk) or dk.is_hero or dk.dead or dk == victim:
+		return
+	var dk_amt := int(round(lost * Run.HUNGERING_DARK_PCT))
+	if dk_amt <= 0:
+		return
+	var dk_got: int = dk.heal_amount(dk_amt)
+	if dk_got <= 0:
+		return
+	dk.float_text("+%d" % dk_got, Color(0.58, 0.40, 0.70))
+	_log("   → %s: %s feeds on the blow — +%d health" % [
+		String(Run.MODIFIERS["hungering_dark"]["name"]), dk.unit_name, dk_got], "#9a78c0")
 
 
 # BATCH GF — THE RECAP'S TAKEN LEDGER, LIFTED OUT OF THE DOOR ABOVE SO THAT A

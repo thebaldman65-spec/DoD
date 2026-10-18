@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-10-17 (Batch IM &mdash; the Ruin rung, and the picker's remainder)</b></p>
+<p align="right"><b>Last updated: 2026-10-17 (Batch IN &mdash; the severity-5 band, and two blind spots)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -61,8 +61,9 @@ ladder. <b>Every scaling number below is provisional and is the designer's to se
 <tr><td><b>2 — Warden</b></td><td>×1.00 <b>damage</b><br>(health <b>identical to rung 1</b>)</td><td>the safe bargain gets less mild: its safe option
 is dealt from severity 1&ndash;3 and its gambles at severity 4</td><td>talent tier 2</td></tr>
 <tr><td><b>3 — Ruin</b></td><td>×1.30</td><td><b>no mild option</b>: its safe option is dealt from severity 3&ndash;4 and its
-gambles at severity 4, and <b>fixed encounters carry a modifier</b> — the mini-boss, the zone
-bosses and the end boss, which today never do</td><td>talent tier 3</td></tr>
+gambles at <b>severity 5</b> &mdash; four bargains no other rung deals &mdash; and <b>fixed encounters carry a
+modifier</b> of severity 3&ndash;4 — the mini-boss, the zone bosses and the end boss, which on the other rungs never
+do</td><td>talent tier 3</td></tr>
 </table>
 <b>Rung 1 is deliberately tuned BELOW the balance every prior measurement was taken at</b>,
 because it is the rung played with zero talents. Rung 2 IS that balance, byte for byte.
@@ -275,8 +276,9 @@ rather than a fixed four, because elites are routed to rather than placed: measu
 elites the route reached, and how far the run got). The bargain is an event on the
 road, not a gate in front of every battle. Each option is one <b>modifier</b> plus one
 <b>reward</b>, both visible before choosing. There is no decline.</p>
-<p>A modifier is a condition that <b>binds both parties</b> for that battle. Each carries a
-<b>severity of 1&ndash;4</b>, and <b>the reward table reads that severity</b> — so authoring a
+<p>A modifier is a condition on that battle. <b>The twenty every rung deals bind both sides</b>;
+<b>Ruin's four, at severity 5, bind one</b> &mdash; the road leaning on the heroes. Each carries a
+<b>severity of 1&ndash;5</b>, and <b>the reward table reads that severity</b> — so authoring a
 modifier means authoring one number, not a pairing. Severity is <b>flat</b>, authored per
 modifier, and <b>deliberately ignores which heroes you drafted</b>: a modifier that happens to be
 cheap for your build is a good deal you earned by building that way. A modifier binds every
@@ -285,16 +287,18 @@ combatant on the field, including a <b>companion summoned mid-battle</b>.</p>
 comes from its <b>safe band</b> and the other two from its <b>gamble band</b>, so <b>every offer
 reads the same way: one safe option, two gambles</b>. <b>Wanderer</b> deals its safe option from
 severity 1&ndash;2 and its gambles from 3&ndash;4; <b>Warden</b> from 1&ndash;3 and at 4;
-<b>Ruin</b> from 3&ndash;4 and at 4 &mdash; <b>on Ruin there is no mild option</b>, its mildest
-bargain the harshest Warden's safe slot can show. The safe option is guaranteed by construction
+<b>Ruin</b> from 3&ndash;4 and at 5 &mdash; <b>on Ruin there is no mild option</b>, its mildest
+bargain the harshest Warden's safe slot can show, and its gambles are the four severity-5 bargains,
+which no other rung is ever dealt. The safe option is guaranteed by construction
 rather than by rejecting rolls, and no band ever falls back to another: every band holds
 modifiers enough for its slots. Over 400 offers a rung the mean severity offered read <b>2.82 /
-3.28 / 3.82</b> at Batch IM (<code>check_im</code> §1 prints the live sample).</p>
+3.28 / 4.49</b> at Batch IN (<code>check_in</code> §1b prints the live sample) &mdash; Ruin a full
+step above Warden.</p>
 <p>The reward pays <b>on victory</b>: the modifier is the price, and the reward is what
 clearing the fight under it bought.</p>
-<p><b>The pool is 20, weighted low.</b> Because the safe slot on Wanderer's and Warden's cards
-is served mostly from the mild end, that is the end a run actually sees repeatedly &mdash; so it
-is the end that is authored deepest.</p>
+<p><b>The pool is 24: the twenty every rung deals, weighted low, and Ruin's four.</b> Because the
+safe slot on Wanderer's and Warden's cards is served mostly from the mild end, that is the end a run
+actually sees repeatedly &mdash; so it is the end that is authored deepest.</p>
 <table border="1" cellpadding="4">
 <tr><th>Modifier</th><th>Severity</th><th>Effect (both parties)</th></tr>
 <tr><td>Overgrown</td><td>1</td><td>Both parties begin the fight at 70% health at most.</td></tr>
@@ -327,7 +331,20 @@ both sides.</td></tr>
 back on its attacker &mdash; at least 1, even when it deals none. On both sides.</td></tr>
 <tr><td>Rot</td><td>4</td><td>Everyone's maximum health is halved, on both sides. It lasts the
 fight and no longer.</td></tr>
+<tr><th>Ruin's four</th><th>Severity</th><th>Effect (one side)</th></tr>
+<tr><td>Famine</td><td>5</td><td>The pouch is sealed: no item may be used this fight.</td></tr>
+<tr><td>Wasting</td><td>5</td><td>At the end of every hero's turn, that hero loses 5% of maximum health &mdash; a turn
+a stun, a freeze or a Break costs him included. It is not a strike: no ward, no armor and no Less Damage Taken
+reaches it, and it can fell a hero.</td></tr>
+<tr><td>The Hungering Dark</td><td>5</td><td>Every enemy heals 25% of the damage it deals &mdash; its blows,
+not the ticks of what it lays. A heal the game refuses (Caught Fast, Unmaking) is refused here too.</td></tr>
+<tr><td>Cruel Order</td><td>5</td><td>Every enemy acts before any hero, each round. The turn order is a
+timeline; a round is the time an ordinary swing takes at the average speed, and in each one the warband's turns come
+first. The turn bar shows the order the fight keeps.</td></tr>
 </table>
+<p><b>None of the four zeroes a class's kit</b> &mdash; a modifier that makes one hero's whole hand dead is not harsh,
+it is unplayable. The pouch belongs to all four heroes, so Famine costs no class its own cards; Wasting reaches every
+hero alike; the Hungering Dark is answered by burst; and Cruel Order leaves every card as it was.</p>
 <p><b>Rot is not excluded from anything that reads maximum health.</b> The
 below-half Mercy window, Conviction's growth and the Devout's whole kit are ratios of the
 maximum, so they all scale with the smaller pool &mdash; consistent with every other modifier
@@ -336,18 +353,21 @@ and is undone when it ends: nothing a bargain does to maximum health may follow 
 of the battle that charged for it.</p>
 <table border="1" cellpadding="4">
 <tr><th>Severity</th><th>Reward (one of these, rolled)</th></tr>
-<tr><td>1</td><td>40 gold, <b>or</b> a merchant follows the fight &mdash; never at an elite among the
-run's first three nodes, where it pays the gold</td></tr>
+<tr><td>1</td><td>40 gold</td></tr>
 <tr><td>2</td><td>80 gold, <b>or</b> a random consumable</td></tr>
 <tr><td>3</td><td>140 gold, <b>or</b> a rune pick for one hero from the current pool</td></tr>
 <tr><td>4</td><td>220 gold, <b>or</b> a rune pick for one hero</td></tr>
+<tr><td>5</td><td>300 gold, <b>or</b> a rune pick for one hero</td></tr>
 </table>
+<p><b>The merchant is the reward of the rung's mildest severity.</b> Beside its own reward, the mildest severity a rung
+deals may pay "a merchant follows the fight" &mdash; severity 1 on Wanderer and Warden, severity 3 on Ruin &mdash; and
+no other severity ever does. Never at an elite among the run's first three nodes, where the option pays its own reward.</p>
 
 <h3>3b. Events &mdash; resource conversions in three kinds</h3>
 <p><b>Nothing rolls behind a cleared fight any more.</b> The 40%-with-a-floor merchant roll
 and the 25% event roll are <b>deleted</b>: both are map nodes now, so the player can see one
-coming and plan to arrive with gold. The one exception is the severity-1 bargain reward
-"a merchant follows the fight", which is <i>bought</i> rather than rolled.</p>
+coming and plan to arrive with gold. The one exception is the bargain reward at a rung's
+mildest severity, "a merchant follows the fight", which is <i>bought</i> rather than rolled.</p>
 <p>An event node draws one of <b>three kinds, all sharing ONE icon (???)</b> and one colour.
 The player knows an event is there; they do not know which kind. A visibly-bad node is a wall
 with extra steps, not a gamble.</p>

@@ -665,16 +665,21 @@ func _s3_the_panel() -> void:
 	var cm: Dictionary = _run.party[1]
 	cm["engines"] = _built(six, 3)
 	cm["runes"] = _built(ords.slice(0, 8), 3)
-	ok(_run.held_count(cm) == int(_run.HERO_HOLD_CAP), "§3d: the Mage holds %d unworn, not the cap" % _run.held_count(cm))
+	# BATCH IN §4 — THE PICK, NAMED IN EVERY LINE BELOW (IM §0.8): the eight ordinary runes this arm ranked
+	# longest by their shown words, with the length the eighth won its place by, and the six core runes.
+	var cap_pick := "the Mage's eight longest shown ordinary runes (%d to %d characters: %s) beside his six core runes" % [
+		Runes.shown_desc(Runes.build(String(ords[mini(7, ords.size() - 1)]))).length(),
+		Runes.shown_desc(Runes.build(String(ords[0]))).length(), ", ".join(PackedStringArray(_names(cm["runes"])))]
+	ok(_run.held_count(cm) == int(_run.HERO_HOLD_CAP), "§3d: the Mage holds %d unworn, not the cap — %s" % [_run.held_count(cm), cap_pick])
 	mp = await _to_map()
 	ov = await _open_panel(mp, 1)
 	seq = _sequence(ov)
 	var rows_n: int = seq.filter(func(e): return String(e).begins_with("row:")).size()
 	var sc := _scroller(ov)
 	var content: float = (sc.get_child(0) as Control).get_combined_minimum_size().y if sc != null else 0.0
-	ok(rows_n == 14, "§3d: the panel at the holding cap drew %d rune rows, not 14" % rows_n)
-	ok(_close_outside_scroller(ov), "§3d: at the holding cap Close is inside the scroller — GT §1's pin")
-	ok(_close_on_screen(ov), "§3d: at the holding cap Close is not wholly on the screen")
+	ok(rows_n == 14, "§3d: the panel at the holding cap drew %d rune rows, not 14 — %s" % [rows_n, cap_pick])
+	ok(_close_outside_scroller(ov), "§3d: at the holding cap Close is inside the scroller — GT §1's pin — %s" % cap_pick)
+	ok(_close_on_screen(ov), "§3d: at the holding cap Close is not wholly on the screen — %s" % cap_pick)
 	print("    [record] at the holding cap the panel lists %d runes in %.0f px against a %.0f px scroller — %s; HU §1's pager is the designer's call (GT §1 rules this panel's scroller)" % [
 		rows_n, content, sc.size.y if sc != null else 0.0, "it scrolls" if sc != null and content > sc.size.y + 0.5 else "it fits"])
 	# (e) THE CREST'S BAG IS UNTOUCHED, AND (f) THE NAMEPLATE'S MARKER SURVIVES.
@@ -842,6 +847,10 @@ func _s6_the_card_line() -> void:
 					best_w = wd
 					best = [a, b, c]
 	var six := _six("hunter")
+	# BATCH IN §4 — THE PICK, NAMED IN EVERY LINE BELOW (IM §0.8): the three titles this arm ranked widest, and
+	# the width they won by.
+	var widest := "the widest three core-rune titles, %s (%.0f px)" % [
+		" + ".join(PackedStringArray(best.map(func(i): return String(titles[i])))), best_w]
 	var eng: Array = []
 	for k in six.size():
 		if best.has(k):
@@ -862,16 +871,17 @@ func _s6_the_card_line() -> void:
 			btn = n
 		for k2 in n.get_children():
 			stack.append(k2)
-	ok(line == null, "§6: a card still draws the core-rune line: '%s'" % (line.text if line != null else ""))
+	ok(line == null, "§6: a card still draws the core-rune line: '%s' — %s" % [line.text if line != null else "", widest])
 	ok(btn != null and String(btn.text).ends_with("Runes 3/6"),
-		"§6: the Hunter's card does not count three slotted core runes on its Runes button ('%s')" % (btn.text if btn != null else "none"))
+		"§6: the Hunter's card does not count three slotted core runes on its Runes button ('%s') — %s" % [
+			btn.text if btn != null else "none", widest])
 	if btn == null:
 		return
 	var card := Rect2(Vector2(8.0, 84.0 + hi * 158.0), Vector2(300.0, 152.0))
 	var r := btn.get_global_rect()
 	ok(card.encloses(r) and btn.get_combined_minimum_size().x <= r.size.x + 0.5,
-		"§6: the Runes button runs out of its card or its face out of the button (%s in %s, needs %.0f px)" % [
-			str(r), str(card), btn.get_combined_minimum_size().x])
+		"§6: the Runes button runs out of its card or its face out of the button (%s in %s, needs %.0f px) — %s" % [
+			str(r), str(card), btn.get_combined_minimum_size().x, widest])
 	btn.emit_signal("pressed")
 	await Gate.frames(self, 2)
 	var rp: Node = Gate.overlay(mp, 60)
@@ -880,7 +890,7 @@ func _s6_the_card_line() -> void:
 	for k3 in best:
 		if rpt.contains(String(Runes.config(String(six[k3])).get("name", "?"))):
 			named += 1
-	ok(named == 3, "§6: the panel the button opens names %d of the three core runes" % named)
+	ok(named == 3, "§6: the panel the button opens names %d of the three core runes — %s" % [named, widest])
 	print("  the widest three (%.0f px as the old line) are counted on the button (%s) and named on its panel" % [best_w, btn.text])
 
 

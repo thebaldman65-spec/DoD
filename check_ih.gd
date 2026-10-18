@@ -891,6 +891,7 @@ var _sanctioned := 0        # values read inside their own bars (the positive ar
 var _bad: Array = []        # every breach, named
 var _most := {}            # family -> [where, drawn rects]
 var _least := {}
+var _longest_intents: Array = []   # each field's longest enemy ability name, as `_walk_field` picked it
 
 
 # Every drawn rect under `nodes`, each [kind, global rect, node]. A flat button with no text draws nothing.
@@ -1073,7 +1074,8 @@ func _s6_nothing_over_anything() -> void:
 	print("    values read inside their own bars: %d" % _sanctioned)
 	for bline in _bad.slice(0, 400):
 		print("    BREACH %s" % bline)
-	ok(_bad.is_empty(), "§6: %d drawn rects over another or past their container — %s" % [_bad.size(), _bad.slice(0, 5)])
+	ok(_bad.is_empty(), "§6: %d drawn rects over another or past their container — %s — the longest enemy ability name set as every intent, field by field: %s" % [
+		_bad.size(), _bad.slice(0, 5), _longest_intents])
 	var total := 0
 	for f in _configs:
 		total += int(_configs[f])
@@ -1160,6 +1162,10 @@ func _walk_field(s: Node) -> void:
 		for ab in (e2 as BattleUnit).abilities:
 			if longest_ab == null or String(ab.display_name).length() > String(longest_ab.display_name).length():
 				longest_ab = ab
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the warband's longest enemy ability name, the first of its length in
+	# the warband's order, set as every enemy's intent below; §6's walk verdict names each field's.
+	_longest_intents.append(("'%s' (%d characters)" % [String(longest_ab.display_name), String(longest_ab.display_name).length()])
+		if longest_ab != null else "none — no enemy on the field holds an ability")
 	for u in heroes + (s.get("companions") as Array) + enemies:
 		var bu: BattleUnit = u
 		bu.max_hp = 9999

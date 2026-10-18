@@ -540,6 +540,12 @@ func _s2c_upgrade_choice() -> void:
 		if t != null and run.upgrade_fits("up_break", t) and t.pressure > 0:
 			target = nm
 			break
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the card measured is the FIRST in
+	# corpus order that Weighted fits and that carries Break damage, so a card
+	# added or re-pressured ahead of it re-selects it in silence; every FAIL line
+	# about the stack names the card it measured. The empty arm says so already.
+	var pick_s := "measured on %s, the first card in corpus order Weighted fits" % (
+		target if target != "" else "none")
 	ok(target != "", "§2c: no ability fits `up_break` — the stack arm has nothing to measure")
 	if target != "":
 		var a0: Ability = Classes.pool_ability(target)
@@ -549,9 +555,9 @@ func _s2c_upgrade_choice() -> void:
 		run.apply_upgrades({"upgrades": [{"id": "up_break", "ability": target},
 			{"id": "up_break", "ability": target}]}, [a2])
 		ok(a1.pressure == a0.pressure * 2,
-			"§2c: Weighted no longer doubles (%d from %d)" % [a1.pressure, a0.pressure])
+			"§2c: Weighted no longer doubles (%d from %d) — %s" % [a1.pressure, a0.pressure, pick_s])
 		ok(a2.pressure == a0.pressure * 4,
-			"§2c: `_stamp_upgrade` has become IDEMPOTENT for up_break (%d twice, %d once) — the guard above is now belt-and-braces and this section should say so" % [a2.pressure, a1.pressure])
+			"§2c: `_stamp_upgrade` has become IDEMPOTENT for up_break (%d twice, %d once) — the guard above is now belt-and-braces and this section should say so — %s" % [a2.pressure, a1.pressure, pick_s])
 		print("    %s pressure: raw %d, once %d, twice %d — the stack the guard prevents"
 			% [target, a0.pressure, a1.pressure, a2.pressure])
 

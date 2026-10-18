@@ -447,6 +447,10 @@ func _s1b_the_drop() -> void:
 		if not Runes.is_party_rune(Runes.build(String(id))) and not Runes.is_engine_rune(String(id)):
 			one_class = String(id)
 			break
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the first class rune the drop's own union offers, in the order the
+	# four's rolls list it (party order, then the data file's) — the one class rune the crest rune is weighed against.
+	var class_pick := ("the first offerable class rune in the drop's own order, %s (`%s`)" % [
+		String(Runes.config(one_class).get("name", "")), one_class]) if one_class != "" else "no offerable class rune was found"
 	_park_all_but(["tithe", one_class])
 	var crest_n := 0
 	var rolls := 400
@@ -456,7 +460,7 @@ func _s1b_the_drop() -> void:
 	_unpark()
 	print("    a pool of one crest rune and one class rune: the crest rune in %d of %d drops" % [crest_n, rolls])
 	ok(one_class != "" and crest_n > rolls * 0.35 and crest_n < rolls * 0.65,
-		"§1b: the crest rune took %d of %d drops against one class rune — it is not one entry in the pool" % [crest_n, rolls])
+		"§1b: the crest rune took %d of %d drops against one class rune — it is not one entry in the pool — %s" % [crest_n, rolls, class_pick])
 
 
 # ── §1c — THE PEDDLER'S REAL COUNTER ────────────────────────────────────────
@@ -1513,23 +1517,30 @@ func _s6_the_blacksmith_arm() -> void:
 		elif homes.size() > 1 and many == "":
 			many = String(id)
 	print("    CHECKED %d upgrade types; with one home in this party: %s" % [(_run.ABILITY_UPGRADES as Dictionary).size(), lone])
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the first upgrade type in `ABILITY_UPGRADES` order with exactly one home
+	# in this party (and that home), and the first with several (and, once read below, its first home) — the two
+	# pairings every counter below is built of.
+	var up_pick := "the first upgrade with one home in `ABILITY_UPGRADES` order, %s; the first with several, %s" % [
+		(("`%s` on %s" % [lone[0][0], lone[0][1]]) if not lone.is_empty() else "none"),
+		(("`%s`" % many) if many != "" else "none")]
 	ok(not lone.is_empty() and many != "",
-		"§6: no upgrade type fits exactly one card in this party any more — the flake's state is gone, and this arm has nothing to build")
+		"§6: no upgrade type fits exactly one card in this party any more — the flake's state is gone, and this arm has nothing to build — %s" % up_pick)
 	if lone.is_empty() or many == "":
 		return
 	var many_homes: Array = SuiteFx.upgrade_homes(_run, many)
 	var bad := {"member_idx": 1, "id": lone[0][0], "ability": lone[0][1]}
 	var good := {"member_idx": 0, "id": many, "ability": String(many_homes[0])}
+	up_pick += " on %s, its first home" % String(many_homes[0])
 	# THE COUNTER THAT USED TO FAIL: the lone pairing first. HEAD's arm bought
 	# `offer[0]`; the repaired arm buys the first with another home.
 	ok(SuiteFx.pairing_with_another_home(_run, [bad, good]) == 1,
-		"§6: with %s on %s first on the counter, the arm would buy pairing %d — the one whose type has no other card" % [
-			bad["id"], bad["ability"], SuiteFx.pairing_with_another_home(_run, [bad, good])])
+		"§6: with %s on %s first on the counter, the arm would buy pairing %d — the one whose type has no other card — %s" % [
+			bad["id"], bad["ability"], SuiteFx.pairing_with_another_home(_run, [bad, good]), up_pick])
 	# THE COUNTER THAT NEVER DID: nothing moves.
 	ok(SuiteFx.pairing_with_another_home(_run, [good, bad]) == 0,
-		"§6: with a many-homed pairing first, the arm no longer buys the first")
+		"§6: with a many-homed pairing first, the arm no longer buys the first — %s" % up_pick)
 	# AND A COUNTER OF LONE PAIRINGS ONLY HAS NOTHING TO ASK, AND SAYS SO.
-	ok(SuiteFx.pairing_with_another_home(_run, [bad]) == -1, "§6: a counter holding only the lone pairing was given a pairing to buy")
+	ok(SuiteFx.pairing_with_another_home(_run, [bad]) == -1, "§6: a counter holding only the lone pairing was given a pairing to buy — %s" % up_pick)
 	# The suite itself calls the helper where it bought the first pairing.
 	var bk := Gate.strip_comments(FileAccess.get_file_as_string("res://test_batch_bk.gd"))
 	ok(bk.contains("var buy_at: int = SuiteFx.pairing_with_another_home(run, offer)")

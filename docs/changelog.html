@@ -16,6 +16,48 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-17 &mdash; Batch IN: THE SEVERITY-5 BAND, AND TWO BLIND SPOTS</h2>
+<p><b>Ruin gets four bargains no other road deals, its merchant back, the sim's bot pays the price the game charges, and the
+checks that pick "the longest" or "the first" now say what they picked.</b> Full working: <code>docs/reports/IN.md</code>.</p>
+
+<p><b>&sect;1 &mdash; FOUR BARGAINS ONLY RUIN EVER SEES.</b> Four modifiers stand at <b>severity 5</b>, and Ruin's two gambles
+are dealt from them alone; its safe option stays at severity 3&ndash;4. <b>Famine</b>: the pouch is sealed, no item may be used
+this fight. <b>Wasting</b>: at the end of every hero's turn, that hero loses 5% of maximum health &mdash; it is not a strike, so no
+ward, armor or Less Damage Taken reaches it, and it can fell a hero. <b>The Hungering Dark</b>: every enemy heals 25% of the
+damage it deals. <b>Cruel Order</b>: every enemy acts before any hero, each round. These four bind <b>one side</b>, where the
+twenty every road deals bind both; none of them makes a class's cards dead. Over 400 offers a road, Wanderer and Warden are
+dealt exactly the offers they were (2.82 and 3.28), and <b>Ruin reads 4.49, from 3.82 &mdash; a full step above Warden</b>. A
+severity-5 bargain pays <b>300 gold or a rune</b>. Ruin's mini-boss and bosses still fight under a severity 3&ndash;4 modifier.
+<b>Renamed against the brief</b>: the brief's ROT shares its name with the severity-4 Rot (maximum health halved), and both could
+sit on one Ruin offer, so it is <b>Wasting</b>. <b>Measured, the four are survivable &mdash; and they do not make Ruin harder for the sim's bot.</b> Forced on every bargain,
+Wasting costs the party the most health and Cruel Order the most runs; the Dark costs little, and Famine nothing to a bot that
+barely drinks. Taken as the bot takes them, Ruin's bargains now end with the party <i>healthier</i> than before (0.911 of its
+health against 0.794) and Ruin completes 58 runs of 60 against 50, because the four cost it less than Bloodless and Mirrorbound
+did. The brief asked for Ruin's fight to be measurably harder than Warden's; on the default build it is longer and not harder.
+Nothing was tuned: it is the designer's ruling.</p>
+
+<p><b>&sect;2 &mdash; THE MERCHANT FOLLOWS THE MILDEST BARGAIN A ROAD DEALS.</b> It was pinned to severity 1, which Ruin never
+deals, so Ruin had no bought merchant at all. It now rides each road's mildest severity: <b>1 on Wanderer and Warden</b>, exactly as
+before (112 and 78 merchants in the same 1,200 options), <b>3 on Ruin</b>, where 76 of 1,200 options now pay one.</p>
+
+<p><b>&sect;3 &mdash; THE SIM's BOT PAYS THE PRICE THE GAME CHARGES.</b> Fifty-eight places where the bot (55) and the enemy (3)
+compared a card's listed cost with its resource now read the price actually charged, so under Warded (+25% costs) the bot no
+longer picks a card the button would refuse. Warded rides about 2% of the sim's fights, but the bot also mispriced a Mage wearing Profligate, and paid less than the price
+on 0.35% of its casts (about 2% untalented). The repair moves the sim's runs (55 of 60 at rung 1 with no result changed; 79 of
+180 untalented, 48 results changed). In the player's game, the enemy's three choices now refuse a move the ward priced out of
+reach &mdash; the Ash Tyrant and the Chief carry priced moves.</p>
+
+<p><b>&sect;4 &mdash; THE CHECKS NAME WHAT THEY PICKED.</b> Thirty-four checks that pick their subject as "the longest rune" or "the
+first card" now name it, and how it won, in every failure message, so the next change that re-picks one shows which.</p>
+
+<p><b>&sect;0.</b> An instrument rule is recorded: <i>a drive is a proof of the predicate only when the predicate chooses what it
+drives</i>. The merchant's rule is written into <code>CLAUDE.md</code>.</p>
+
+<p><b>The instruments.</b> <code>check_in</code> is new. <code>check_im</code>, <code>check_il</code>, <code>check_hw</code>,
+<code>check_ij</code>, <code>check_hy</code>, <code>test_batch_an</code> and <code>test_batch_bb</code> are re-pointed where IN moved what they
+read; <code>check_gp</code> reads fifteen checks more because its seeded road now meets the bot &sect;3 repaired; the 34 gates of &sect;4
+changed only their failure messages. No save version moved.</p>
+
 <h2>2026-10-17 &mdash; Batch IM: THE RUIN RUNG, AND THE PICKER's REMAINDER</h2>
 <p><b>The hardest difficulty offered the mildest bargains, and IL found why. IM fixed the cause.</b> The target picker now also
 refuses a pick that would do nothing for seven more cards, and four more texts say <i>strike damage</i>. Full working:

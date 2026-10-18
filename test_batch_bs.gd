@@ -954,6 +954,10 @@ func _live_ash_lung() -> void:
 		if ab.damage > 0:
 			det = ab
 			break
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the dealt half is measured with
+	# the first damaging card in the Pyromancer's kit order; its line names it.
+	var det_pick := ("measured with %s, the first damaging card in the Pyromancer's kit order" % String(det.display_name)) \
+		if det != null else "no damaging card in the Pyromancer's kit"
 	ok(det != null, "he holds a damaging ability to measure with")
 	if det != null:
 		foes[1].remove_status("burn")
@@ -974,8 +978,8 @@ func _live_ash_lung() -> void:
 		# half goes +20% -> +60%, a ratio of ~1.33 against a noise floor of ~1.0.
 		var dealt_ratio := float(dealt_three) / maxf(float(dealt_one), 1.0)
 		ok(dealt_ratio > 1.15,
-			"the DEALT half deepens too (%d at 3 vs %d at 1 = %.2f)" % [
-				dealt_three, dealt_one, dealt_ratio])
+			"the DEALT half deepens too (%d at 3 vs %d at 1 = %.2f) — %s" % [
+				dealt_three, dealt_one, dealt_ratio, det_pick])
 	py.ash_lung_pct = 4
 	ok(py.ash_lung_pct == 4, "the shipped magnitude is put back after the measurement")
 	# UNCAPPED, asserted at the read sites rather than by piling on bodies: a

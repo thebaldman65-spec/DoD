@@ -521,6 +521,10 @@ func _s4_each_surface() -> void:
 	_new_run()
 	var m: Dictionary = _run.party[2]
 	var rid := _class_rune(m)
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the first rune the roll's own door offers the Cleric that is neither a
+	# core rune nor a crest rune, in the data file's order — the rune this arm wears and reads back on the kit preview.
+	var rune_pick := ("the first eligible Cleric rune in data order, %s (`%s`)" % [
+		String(Runes.config(rid).get("name", "")), rid]) if rid != "" else "no eligible Cleric rune was found"
 	ok(rid != "", "§4: the premise — a Cleric rune to wear")
 	m["runes"] = [_rune(rid, true)]
 	var mp0 := await _to_map()
@@ -530,21 +534,25 @@ func _s4_each_surface() -> void:
 	var rname := String(Runes.config(rid).get("name", ""))
 	var row: Array = kp_tx.filter(func(t): return String(t).strip_edges().begins_with("WORN") and String(t).contains(rname + " — "))
 	ok(row.size() == 1 and not row.any(func(t): return String(t).contains(STAR)),
-		"§4: the kit preview's worn line is not WORN beside its name, or it carries ✦ (%s)" % [row])
+		"§4: the kit preview's worn line is not WORN beside its name, or it carries ✦ (%s) — %s" % [row, rune_pick])
 	ok(not kp_tx.any(func(t): return int(String(t).contains(STAR)) + int(String(t).contains(DIAMOND)) + int(String(t).contains(ARROW)) > 1),
-		"§4: a line on the kit preview carries two of ✦, ◆ and ↑")
+		"§4: a line on the kit preview carries two of ✦, ◆ and ↑ — %s" % rune_pick)
 	kp.queue_free()
 	await Gate.frames(self, 1)
 	# THE NAMEPLATE: ✦ N, and its tooltip says what the count counts.
 	_new_run()
 	var m2: Dictionary = _run.party[2]
 	var rid2 := _class_rune(m2)
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the same first eligible Cleric rune, picked again on a fresh run and held
+	# unworn — the one the nameplate's ✦ 1 counts.
+	var held_pick := ("the first eligible Cleric rune in data order, %s (`%s`), held unworn" % [
+		String(Runes.config(rid2).get("name", "")), rid2]) if rid2 != "" else "no eligible Cleric rune was found"
 	m2["runes"] = [_rune(rid2, false)]
 	var mp := await _to_map()
 	var marks: Array = _all(mp, "Button").filter(func(b): return (b as Button).has_meta("held_marker"))
 	ok(marks.size() == 1 and String((marks[0] as Button).text) == "%s 1" % STAR
 			and String((marks[0] as Button).tooltip_text).contains("held, not worn"),
-		"§4: the nameplate's count is not ✦ 1 labelled 'held, not worn' (%s)" % [marks.map(func(b): return [(b as Button).text, (b as Button).tooltip_text])])
+		"§4: the nameplate's count is not ✦ 1 labelled 'held, not worn' (%s) — %s" % [marks.map(func(b): return [(b as Button).text, (b as Button).tooltip_text]), held_pick])
 	# THE LOADOUT PANEL — IE's finding, built at IF §3: the panel is sectioned (CORE, ENABLERS, CARRIED, BENCHED,
 	# `check_if` §3a), so a carried card's row is its name under CARRIED and carries no ✦.
 	var m3: Dictionary = _run.party[0]
@@ -553,12 +561,15 @@ func _s4_each_surface() -> void:
 		if not _run.owned_ability_names(m3).has(String(n)):
 			card = String(n)
 			break
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the first card of the Warrior's pool, in the pool's order, that the
+	# engines he holds let him be offered and he does not own — the card this arm carries onto the loadout panel.
+	var card_pick := ("the first offerable unowned Warrior card in pool order, %s" % card) if card != "" else "no offerable unowned Warrior card was found"
 	_run.hold_ability(m3, card, true)
 	mp.call("_open_loadout_panel", 0)
 	await Gate.frames(self, 3)
 	var kit_tx: Array = _texts(Gate.overlay(mp, 60))
 	ok(kit_tx.any(func(t): return String(t).begins_with("%s — " % card)) and not kit_tx.any(func(t): return String(t).contains(STAR)),
-		"§4: the loadout panel's carried card is not its name, or a label on the panel carries ✦ — ✦ names a rune")
+		"§4: the loadout panel's carried card is not its name, or a label on the panel carries ✦ — ✦ names a rune — %s" % card_pick)
 	# THE BATTLE: the Empower toggle carries no glyph; the rune chip's mark is ✦.
 	var s: Node = await _board(["warden", "pyromancer", "holy", "mystic"])
 	var cl := _hero(s, "cleric")
@@ -592,6 +603,10 @@ func _s5a_the_refill() -> void:
 			gated = String(n)
 			gate_engine = e
 			break
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the first card of the Cleric's pool — his class pool, then his lineage's
+	# boss pool, in their order — gated on a Cleric engine he has not slotted: the card the boss's offer is re-asked around.
+	var gated_pick := ("the first card of his pool gated on an unslotted engine, %s (on `%s`)" % [gated, gate_engine]) \
+			if gated != "" else "no gated card was found"
 	ok(gated != "", "§5a: the premise — a card of his pool gated on an engine he has not slotted")
 	for n2 in pool:
 		if String(n2) != gated and not _run.owned_ability_names(m).has(String(n2)):
@@ -606,9 +621,9 @@ func _s5a_the_refill() -> void:
 	var after: Array = _run.ability_choice(m)
 	print("    the boss's: re-asked %s (held back %s); with %s equipped the draw holds %s, the offer %s" % [
 		before, withheld_before, gate_engine, drawable, after])
-	ok(before.is_empty() and withheld_before.is_empty(), "§5a: the premise — the boss's offer re-asked to nothing (%s, held back %s)" % [before, withheld_before])
+	ok(before.is_empty() and withheld_before.is_empty(), "§5a: the premise — the boss's offer re-asked to nothing (%s, held back %s) — %s" % [before, withheld_before, gated_pick])
 	ok(drawable.has(gated) and after.is_empty(),
-		"§5a: the boss's offer refilled, or the engine did not open the card to the draw (draw %s, offer %s)" % [drawable, after])
+		"§5a: the boss's offer refilled, or the engine did not open the card to the draw (draw %s, offer %s) — %s" % [drawable, after, gated_pick])
 	# THE MINI-BOSS's: every upgrade taken but one that fits nothing he holds; then he holds a card it fits.
 	_new_run()
 	var w: Dictionary = _run.party[0]
@@ -630,6 +645,10 @@ func _s5a_the_refill() -> void:
 				break
 		if spare != "":
 			break
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the first upgrade in `ABILITY_UPGRADES` order that fits nothing he holds,
+	# and the first card of his pool, in the pool's order, it fits — the pair the mini-boss's offer is re-asked around.
+	var spare_pick := ("the first spare upgrade in `ABILITY_UPGRADES` order, `%s`, and the first card it fits, %s" % [spare, spare_card]) \
+			if spare != "" else "no spare upgrade was found"
 	ok(spare != "", "§5a: the premise — an upgrade that fits nothing he holds and fits a card he could hold")
 	var taken: Array = []
 	for uid2 in _run.ABILITY_UPGRADES:
@@ -643,9 +662,9 @@ func _s5a_the_refill() -> void:
 	var u_draw: Array = _run.roll_upgrade_offer(w)
 	var u_after: Array = _run.upgrade_choice(w)
 	print("    the mini-boss's: re-asked %s; holding %s, the draw holds %s, the offer %s" % [u_before, spare_card, u_draw, u_after])
-	ok(u_before.is_empty(), "§5a: the premise — the upgrade offer re-asked to nothing (%s)" % [u_before])
+	ok(u_before.is_empty(), "§5a: the premise — the upgrade offer re-asked to nothing (%s) — %s" % [u_before, spare_pick])
 	ok(u_draw.any(func(c): return String((c as Dictionary).get("id", "")) == spare) and u_after.is_empty(),
-		"§5a: the upgrade offer refilled, or the new card did not open the upgrade to the draw (draw %s, offer %s)" % [u_draw, u_after])
+		"§5a: the upgrade offer refilled, or the new card did not open the upgrade to the draw (draw %s, offer %s) — %s" % [u_draw, u_after, spare_pick])
 
 
 # ── §5b — A SPENT PICK ───────────────────────────────────────────────────────────

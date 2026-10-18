@@ -626,17 +626,33 @@ func _s4_on_a_failing_loadout() -> void:
 	# silently (`spec_pool_ability` returns null), which would leave the live
 	# arm below driving a hero carrying nothing.
 	var bars := {}
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8). `_spec_bar` picks each spec's bar
+	# by a superlative: the first tag in TAG_ORDER with five primaries in his own
+	# pool, else the tallest stack. A datum that moves one card's primary
+	# re-selects it with no literal moving, so every FAIL line about a bar names
+	# the tag it picked, what it won by and the cards it holds. Read off the bar
+	# already built; nothing here changes what is picked.
+	var bar_pick := {}
 	for sp in DRIVE_ORDER:
 		bars[sp] = _spec_bar(String(sp), _threshold_tag_of(String(sp)))
+		var won: Array = bars[sp]
+		var won_tag: String = Classes.card_tag_primary(String(won[0])) \
+			if not won.is_empty() else "none"
+		var won_by: String = "the first tag in TAG_ORDER with five primaries in his pool" \
+			if won.size() >= 5 else ("the tallest stack in his pool, %d cards (no tag reaches five)"
+				% won.size() if not won.is_empty() else "no tag stacks two in his pool")
+		bar_pick[sp] = "%s's bar is %s, %s %s" % [sp, won_tag, won_by, won]
 		ok((bars[sp] as Array).size() == int(SHORT_BAR.get(sp, 5)),
-			"§4: %s — no %d-card single-tag bar exists in his own pool (%d)"
-				% [sp, int(SHORT_BAR.get(sp, 5)), (bars[sp] as Array).size()])
+			"§4: %s — no %d-card single-tag bar exists in his own pool (%d) — %s"
+				% [sp, int(SHORT_BAR.get(sp, 5)), (bars[sp] as Array).size(), bar_pick[sp]])
+	var all_picks := "; ".join(PackedStringArray(bar_pick.values()))
 
 	var landed := 0
 	var proved := 0
 	for id in UNGATED:
 		var cond: Dictionary = OLD_CONDITION[id]
 		var fail_bar: Array = bars.get(_spec_of(String(id)), [])
+		var fail_pick := String(bar_pick.get(_spec_of(String(id)), "no bar was built for it"))
 		if fail_bar.size() < 2:
 			continue
 		# **THE CONTROL, AND IT RUNS FIRST.** The retired predicate,
@@ -644,8 +660,8 @@ func _s4_on_a_failing_loadout() -> void:
 		# arm that skipped this would pass on a loadout that met the condition
 		# all along and would prove nothing about the ungating.
 		ok(not _old_condition_met(cond, fail_bar),
-			"§4: %s — the `failing` loadout MEETS the retired condition %s; the arm proves nothing"
-				% [id, cond])
+			"§4: %s — the `failing` loadout MEETS the retired condition %s; the arm proves nothing — %s"
+				% [id, cond, fail_pick])
 		proved += 1
 		var member := {"key": _class_of(id), "spec": _spec_of(id), "runes": [],
 			"abilities": [], "bm_abilities": fail_bar.duplicate(),
@@ -658,11 +674,14 @@ func _s4_on_a_failing_loadout() -> void:
 		if cfg.has(field) and int(cfg[field]) == want:
 			landed += 1
 		ok(cfg.has(field),
-			"§4: %s — `%s` did not land on a loadout that used to refuse it" % [id, field])
+			"§4: %s — `%s` did not land on a loadout that used to refuse it — %s"
+				% [id, field, fail_pick])
 		ok(cfg.get(field, 0) == want,
-			"§4: %s — `%s` landed as %s, not %d" % [id, field, cfg.get(field, "<absent>"), want])
-	ok(landed == 8, "§4: %d of 8 payloads landed on a failing loadout" % landed)
-	ok(proved == 8, "§4: only %d of 8 arms were proved to fail the retired rule" % proved)
+			"§4: %s — `%s` landed as %s, not %d — %s"
+				% [id, field, cfg.get(field, "<absent>"), want, fail_pick])
+	ok(landed == 8, "§4: %d of 8 payloads landed on a failing loadout — %s" % [landed, all_picks])
+	ok(proved == 8, "§4: only %d of 8 arms were proved to fail the retired rule — %s"
+		% [proved, all_picks])
 
 	# ── AND THE SAME EIGHT THROUGH A REAL SPAWN ─────────────────────────────
 	#
@@ -704,10 +723,11 @@ func _s4_on_a_failing_loadout() -> void:
 		if got == want2:
 			on_unit += 1
 		ok(got == want2,
-			"§4: %s — the live %s reads %s on `%s`, not %d" % [
-				id3, sp3, got, field2, want2])
+			"§4: %s — the live %s reads %s on `%s`, not %d — %s" % [
+				id3, sp3, got, field2, want2,
+				String(bar_pick.get(sp3, "no bar was built for it"))])
 	ok(on_unit == 8,
-		"§4: %d of 8 reached a live BattleUnit through the real spawn" % on_unit)
+		"§4: %d of 8 reached a live BattleUnit through the real spawn — %s" % [on_unit, all_picks])
 	scene.queue_free()
 	await process_frame
 	print("    %d payloads land on loadouts that fail the retired rule; %d reach a live unit"

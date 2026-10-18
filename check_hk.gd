@@ -600,8 +600,13 @@ func _s3_the_peddler() -> void:
 	_clear_bag()
 	_new_run()
 	var live := Runes.build(String(Runes.ids().filter(func(x): return not Runes.is_retired(String(x)))[0]))
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the rune priced is the FIRST live rune in
+	# `Runes.ids()`'s order, so a rune added, retired or re-ordered in the data re-selects
+	# it; every line about its price names it.
+	var live_s := "the first live rune in data order, %s (%s)" % [
+		String(live.get("name", "")), String(live.get("id", ""))]
 	ok(int(_run.rune_price(live)) == 150 and int(_run.rune_sell_value(live)) == 50,
-		"§3: a rune is %dg and sells for %dg, not 150 and 50" % [int(_run.rune_price(live)), int(_run.rune_sell_value(live))])
+		"§3: a rune is %dg and sells for %dg, not 150 and 50 — %s" % [int(_run.rune_price(live)), int(_run.rune_sell_value(live)), live_s])
 	ok(is_equal_approx(float(_run.RUNE_SELL_FRACTION), 1.0 / 3.0), "§3: the sale is not a third")
 	# THE DISCOUNT CUTS BOTH, so the two cannot be arbitraged.
 	_run.active_relics = ["lodestone"]
@@ -609,7 +614,7 @@ func _s3_the_peddler() -> void:
 	var disc_s: int = _run.rune_sell_value(live)
 	_run.active_relics = []
 	ok(disc_p < 150 and disc_s == int(round(disc_p / 3.0)) and disc_s < disc_p,
-		"§3: under the shop discount the rune is %dg and sells for %dg — the sale does not follow the price" % [disc_p, disc_s])
+		"§3: under the shop discount the rune is %dg and sells for %dg — the sale does not follow the price — %s" % [disc_p, disc_s, live_s])
 	# (a) A PURCHASE LANDS ON THE HERO IT WAS ROLLED FOR, UNWORN — through the Buy button.
 	# BATCH HR §1 — RE-POINTED: HK sent it into the bag and asked that the hero's lists did
 	# not move; the hero holds it now, and a crest rune would still go to the bag, so the
@@ -625,22 +630,28 @@ func _s3_the_peddler() -> void:
 	var for_idx := int(o0["member_idx"])
 	var o_name := String((o0["rune"] as Dictionary)["name"])
 	var o_crest := Runes.is_party_rune(o0["rune"])
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the rune bought is the counter's FIRST offer, as
+	# the Peddler rolled it, so a change to the roll re-selects it; every line about the
+	# purchase and the sale names the rune and the hero it was rolled for. Read off the
+	# offer the gate already holds — nothing is rolled again to name it.
+	var o0_s := "the counter's first offer, %s (%s), rolled for seat %d" % [
+		o_name, String((o0.get("rune", {}) as Dictionary).get("id", "")), for_idx]
 	var bought := Gate.press(shop, ["Buy — 150g"])
 	await Gate.frames(self, 2)
-	ok(bought == "Buy — 150g" and _run.gold == 850, "§3a: a Buy took %dg, not 150" % (1000 - int(_run.gold)))
+	ok(bought == "Buy — 150g" and _run.gold == 850, "§3a: a Buy took %dg, not 150 — %s" % [1000 - int(_run.gold), o0_s])
 	ok(_places(o_name) == 1 and (_names(_run.rune_bag).has(o_name) if o_crest else _unworn(_run.party[for_idx]).has(o_name)),
-		"§3a: the rune bought is not held where its kind lands (crest: %s)" % o_crest)
+		"§3a: the rune bought is not held where its kind lands (crest: %s) — %s" % [o_crest, o0_s])
 	ok(o_crest or not _names(_run.rune_bag).has(o_name),
-		"§3a: ...and it went into the bag, not to the hero it was rolled for")
+		"§3a: ...and it went into the bag, not to the hero it was rolled for — %s" % o0_s)
 	# (b) TWO PRESSES SELL IT BACK FOR A THIRD.
 	shop = current_scene
 	var g1: int = _run.gold
 	Gate.press(shop, ["Sell +50g"])
 	await Gate.frames(self, 2)
-	ok(_run.gold == g1 and _places(o_name) == 1, "§3b: one press on Sell sold the rune")
+	ok(_run.gold == g1 and _places(o_name) == 1, "§3b: one press on Sell sold the rune — %s" % o0_s)
 	Gate.press(current_scene, ["Sure? +50g"])
 	await Gate.frames(self, 2)
-	ok(_run.gold == g1 + 50 and _places(o_name) == 0, "§3b: the second press did not sell it for 50")
+	ok(_run.gold == g1 + 50 and _places(o_name) == 0, "§3b: the second press did not sell it for 50 — %s" % o0_s)
 	# (c) A FULL HOLDING GREYS THAT HERO'S BUY AND SAYS SO — and one sale opens it. The
 	# other heroes' Buys stay live: the wall is his, not the counter's.
 	_fill_holding(_run.party[0], int(_run.HERO_HOLD_CAP))

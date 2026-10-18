@@ -88,6 +88,7 @@ const DAMAGE_FUNCS := {
 	"battle.gd::_add_bleed_with_burst": "ACTION",
 	"battle.gd::_umbral_sigil_echo": "BORROWS (II §2) — the sigil's echo is its caster's, inside the striker's swing",
 	"battle.gd::_on_damage_taken": "BORROWS — Frostbind's and Penance's mirrors",
+	"battle.gd::_wasting_tick": "BORROWS — Wasting's tick at a hero's turn's end, under a frame naming the modifier and no source; it puts back the one it found (IN §1)",
 	"unit.gd::take_hit": "DEALER — One Soul's split of a wound among the bond, under the wound's own frame",
 }
 

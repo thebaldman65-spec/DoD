@@ -333,8 +333,13 @@ func _s0_the_carried_half() -> void:
 				and ab.target != Ability.Target.ALLY and ab.special == "":
 			rider = ab
 			break
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the riders' swing is the first enemy ability, kinds sorted by name and
+	# each kind's abilities in its order, that always lands its status on one body and deals damage; every §0c line names it.
+	var rider_pick := ("the riders' swing, %s (applying %s) — the first enemy ability in kind order that always lands a status" % [
+		String(rider.display_name), String(rider.applies_status.get("id", ""))]) if rider != null \
+		else "no enemy ability in kind order always lands a status on one body"
 	if [w3, c3, foe3, rider].any(func(x): return x == null):
-		ok(false, "§0c: the board and an always-landing status attack for the riders' arm (%s)" % [rider])
+		ok(false, "§0c: the board and an always-landing status attack for the riders' arm (%s) — %s" % [rider, rider_pick])
 	else:
 		var sid := String(rider.applies_status.get("id", ""))
 		var leech: Ability = Ability.make({"display_name": rider.display_name, "damage": rider.damage,
@@ -352,10 +357,10 @@ func _s0_the_carried_half() -> void:
 		var lines := _log_text(s3).substr(log0)
 		var leeches := lines.count("leeches")
 		ok(w3.has_status(sid) and not c3.has_status(sid),
-			"§0c: the swing's %s landed on the Warden %s and on the Devout %s — once, on the struck body" % [
-				sid, w3.has_status(sid), c3.has_status(sid)])
-		ok(leeches == 1, "§0c: the swing's lifesteal fired %d time(s) — once, on the swing's result" % leeches)
-		ok(c3.pressure == cp0, "§0c: the Devout's Break moved %d → %d — Break stays on the struck body" % [cp0, c3.pressure])
+			"§0c: the swing's %s landed on the Warden %s and on the Devout %s — once, on the struck body — %s" % [
+				sid, w3.has_status(sid), c3.has_status(sid), rider_pick])
+		ok(leeches == 1, "§0c: the swing's lifesteal fired %d time(s) — once, on the swing's result — %s" % [leeches, rider_pick])
+		ok(c3.pressure == cp0, "§0c: the Devout's Break moved %d → %d — Break stays on the struck body — %s" % [cp0, c3.pressure, rider_pick])
 		print("  (c) %s on the vowed Warden: the status on the Warden %s / the Devout %s; lifesteal lines %d; the Devout's Break %d → %d" % [
 			rider.display_name, w3.has_status(sid), c3.has_status(sid), leeches, cp0, c3.pressure])
 	await _clear(s3)

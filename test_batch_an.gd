@@ -155,11 +155,16 @@ func _test_offer(RunState) -> void:
 		# BATCH BB §5 re-pointed this block IN PLACE: `rot` is AQ's authored
 		# fourth severity-4 bargain and it SHIPS now, so the pool is twenty.
 		"rot": 4}
-	ok(run.MODIFIERS.size() == 20, "twenty authored modifiers (was six, then AQ's nineteen)")
-	ok(run.MODIFIERS.size() == want.size(), "...and the test knows all of them")
+	# BATCH IN §1 RE-POINTED THESE TWO IN PLACE, THE COUNT UNMOVED: Ruin's four stand at severity 5 beside the twenty
+	# every rung deals, so the pool is twenty-four, and the test knows the four by name and grade.
+	var ruin_four := {"famine": 5, "wasting": 5, "hungering_dark": 5, "cruel_order": 5}
+	ok(run.MODIFIERS.size() == 24, "twenty-four authored modifiers (the twenty every rung deals, and Ruin's four — IN §1)")
+	ok(run.MODIFIERS.size() == want.size() + ruin_four.size()
+			and ruin_four.keys().all(func(k): return run.modifier_severity(String(k)) == int(ruin_four[k])),
+		"...and the test knows all of them")
 	# The pool is WEIGHTED LOW on purpose: every offer's safe slot is served
 	# by the 1-2 pool alone, so that is the end that actually repeats.
-	var by_sev := {1: 0, 2: 0, 3: 0, 4: 0}
+	var by_sev := {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
 	for mid in run.MODIFIERS:
 		by_sev[run.modifier_severity(String(mid))] += 1
 	ok(by_sev[1] == 6, "six severity-1 modifiers (got %d)" % by_sev[1])
@@ -200,11 +205,13 @@ func _test_offer(RunState) -> void:
 	# BATCH HW §2 — RE-POINTED TO THE RULING, THE COUNT UNMOVED: the merchant is an easy
 	# fight's reward, so severity 1 pays its 40 gold or a merchant and severity 4 its
 	# gold or a rune (it stood in severity 4's list until HW).
-	ok(run.REWARDS[1].size() == 2, "severity 1 pays two ways (40 gold, or a merchant)")
+	# BATCH IN §2 RE-POINTED THESE IN PLACE: the merchant is the reward of the rung's mildest dealt severity, no row of
+	# the table — `rewards_for` puts it behind the gold, and on this run's rung the mildest is 1.
+	ok(run.rewards_for(1).size() == 2, "severity 1 pays two ways (40 gold, or a merchant)")
 	ok(int(run.REWARDS[1][0]["amount"]) == 40, "...and its gold is 40")
 	ok(run.REWARDS[4].size() == 2, "severity 4 pays two ways")
 	var sev1_kinds: Array = []
-	for r1 in run.REWARDS[1]:
+	for r1 in run.rewards_for(1):
 		sev1_kinds.append(String(r1["kind"]))
 	var sev4_kinds: Array = []
 	for r in run.REWARDS[4]:
@@ -233,7 +240,7 @@ func _test_offer(RunState) -> void:
 				low += 1
 			# The reward must be one this severity is allowed to pay.
 			var legal := false
-			for allowed in run.REWARDS[sev]:
+			for allowed in run.rewards_for(sev):
 				if String(allowed["kind"]) == String(option["reward"]["kind"]):
 					legal = true
 			if not legal:
@@ -250,9 +257,18 @@ func _test_offer(RunState) -> void:
 	ok(two_low == 0,
 		"§2: NO offer holds two low options — one safe, two gambles (%d of 2000)"
 		% two_low)
-	ok(seen_mods.size() == run.MODIFIERS.size(),
-		"all %d modifiers reach the offer screen over 2000 rolls (saw %d)"
-		% [run.MODIFIERS.size(), seen_mods.size()])
+	# BATCH IN §1 RE-POINTED IN PLACE: severity 5 is Ruin's alone, so every modifier THIS RUNG's bands deal reaches the
+	# offer screen — and none it does not deal.
+	var dealt_here := 0
+	for mid2 in run.MODIFIERS:
+		var sv2: int = run.modifier_severity(String(mid2))
+		var sb2: Array = run.difficulty_def()["safe_band"]
+		var gb2: Array = run.difficulty_def()["gamble_band"]
+		if (sv2 >= int(sb2[0]) and sv2 <= int(sb2[1])) or (sv2 >= int(gb2[0]) and sv2 <= int(gb2[1])):
+			dealt_here += 1
+	ok(seen_mods.size() == dealt_here and dealt_here < run.MODIFIERS.size(),
+		"all %d modifiers this rung deals reach the offer screen over 2000 rolls, and no other (saw %d of %d)"
+		% [dealt_here, seen_mods.size(), run.MODIFIERS.size()])
 	# Accepting arms exactly one battle's worth of state.
 	var one: Array = run.roll_offer()
 	run.accept_offer(one[0])

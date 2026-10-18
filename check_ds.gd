@@ -485,6 +485,10 @@ func _fallback(scene: Node, ss: BattleUnit, foe: BattleUnit) -> void:
 		"%s holds no second zero-cost ability to declare, so the drive is not exercising the fault" % foe.unit_name)
 	if better == null:
 		return
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the declared ability is the first zero-cost one in the foe's kit
+	# order that is not its basic attack; the lines below about the drive name it.
+	var better_pick := "the declared ability, %s — %s's first zero-cost ability in kit order other than its basic attack, %s" % [
+		String(better.display_name), String(foe.unit_name), String(basic.display_name)]
 	foe.statuses.clear()
 	await scene._resolve(ss, Classes.draft_ability("Heads Down"), foe, "good")
 	ok(foe.has_status("heads_down"), "the drive arm is not silenced")
@@ -494,11 +498,11 @@ func _fallback(scene: Node, ss: BattleUnit, foe: BattleUnit) -> void:
 	var decl: Dictionary = scene._revalidate_intent(foe)
 	var after: float = float(scene.sim_stats.get("intent_fallback", 0.0))
 	ok(not decl.is_empty(),
-		"the silenced enemy declared NOTHING — it must still act, and a lost turn is the thing this card is written not to be")
+		"the silenced enemy declared NOTHING — it must still act, and a lost turn is the thing this card is written not to be — %s" % better_pick)
 	ok(decl.get("ability") == basic,
 		"the silenced enemy still brings `%s` to bear" % better.display_name)
 	ok(after - before == 1.0,
-		"`intent_fallback` moved by %.0f — the card promises it reuses the shipped announcement rather than inventing a second one" % (after - before))
+		"`intent_fallback` moved by %.0f — the card promises it reuses the shipped announcement rather than inventing a second one — %s" % [after - before, better_pick])
 	print("  HEADS DOWN  declared `%s`, resolved `%s`, intent_fallback +%.0f" % [
 		better.display_name, String(decl.get("ability").display_name), after - before])
 	foe.statuses.clear()

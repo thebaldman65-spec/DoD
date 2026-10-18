@@ -14,7 +14,9 @@
 #   §2   THE RUIN RUNG's BARGAINS: the census's own sample, read — one modifier table split by the rung's floor, the
 #        floor at Ruin the table's top, and the ruled condition beyond any weighting of this table; the merchant at
 #        severity 1; the glossary's *weighted toward the mild end* still the table's shape. (Re-pointed at IM §1: the
-#        table is dealt by each rung's two bands, Ruin's gambles at the top; `check_im` §1 holds the bands.)
+#        table is dealt by each rung's two bands, Ruin's gambles at the top; `check_im` §1 holds the bands. Re-pointed
+#        at IN: the condition is met — severity 5 is Ruin's — the merchant rides the rung's mildest dealt severity, and
+#        *weighted toward the mild end* is the twenty's; `check_in` §1 and §2 hold the rest.)
 #   §3   THE BOT AIMS WHERE THE PICKER WOULD: the drafted hook asks `_enemy_pick_pool`, the picker's answer, so a
 #        drafted Execute strikes a body that qualifies; the narrowing reaches Execute and no other card (and since
 #        IM §3b, seven cards more by their own rule — `check_im` §3b drives them).
@@ -625,9 +627,13 @@ func _s2_ruin_rung() -> void:
 	var top := 0
 	var low := 0
 	var high := 0
+	# BATCH IN §1 — *weighted toward the mild end* is said of the twenty every rung deals; Ruin's four stand above them.
+	var top20 := int(((_run.DIFFICULTIES["ruin"] as Dictionary).get("gamble_band", [99, 99]) as Array)[0]) - 1
 	for id in table:
 		var sv: int = int(table[id]["severity"])
 		top = maxi(top, sv)
+		if sv > top20:
+			continue
 		if sv <= 2:
 			low += 1
 		else:
@@ -643,16 +649,20 @@ func _s2_ruin_rung() -> void:
 	ok(int(ruin_gb[1]) >= top,
 		"§2: Ruin's gamble band (%s) stops below the table's top severity (%d) — a modifier stands above it now" % [
 			str(ruin_gb), top])
-	ok(float(means["warden"]) + 1.0 > float(top),
-		"§2: Warden's mean (%.2f) plus a full step no longer passes the table's top severity (%d) — the condition can be met" % [
-			means["warden"], top])
+	# BATCH IN §1 RE-POINTED THIS ROW: IL read the ruled condition — Ruin a full step above Warden — beyond any weighting of
+	# a table topping at 4. IN's severity-5 band is what reaches it, so the row asks that it is met.
+	ok(float(top) >= float(means["warden"]) + 1.0 and float(means["ruin"]) >= float(means["warden"]) + 1.0,
+		"§2: Ruin's mean (%.2f) is not a full step above Warden's (%.2f), or the table's top (%d) does not reach it" % [
+			means["ruin"], means["warden"], top])
 	var shop_at: Array = []
 	for sv2 in _run.REWARDS:
 		for r in _run.REWARDS[sv2]:
 			if String(r.get("kind", "")) == "shop":
 				shop_at.append(int(sv2))
-	ok(shop_at == [1], "§2: the merchant pays at severity %s, want severity 1 alone (HW §2)" % str(shop_at))
-	ok(low > high, "§2: the table is no longer weighted toward the mild end (%d at severity 1-2, %d at 3-4) — G080L is false" % [low, high])
+	# BATCH IN §2 RE-POINTED THIS ROW: the merchant is no severity's row; it rides the rung's mildest dealt severity.
+	ok(shop_at.is_empty() and _body("scripts/run_state.gd", "rewards_for").contains("mildest_dealt_severity()"),
+		"§2: the table holds the merchant at severity %s, or `rewards_for` does not read the mildest dealt (IN §2)" % str(shop_at))
+	ok(low > high, "§2: the twenty are no longer weighted toward the mild end (%d at severity 1-2, %d at 3-%d) — G080L is false" % [low, high, top20])
 
 
 # ── §3 — THE BOT AIMS WHERE THE PICKER WOULD ────────────────────────────────

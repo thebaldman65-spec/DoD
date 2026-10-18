@@ -542,19 +542,23 @@ func _s3_the_three_surfaces() -> void:
 	# is not marked either: the tell is about a slot that is paying nothing.
 	var unworn: Dictionary = Runes.build(_gated[0])
 	unworn["equipped"] = false
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the rune is the FIRST of the gated by id, so a
+	# row added to or dropped from GV's table re-selects it; every line about it names it.
+	var unworn_s := "the first gated rune by id, %s (%s)" % [
+		(String(_gated[0]) if not _gated.is_empty() else "none"), String(unworn.get("name", ""))]
 	_run.party[seat]["engines"] = []
 	_run.party[seat]["runes"] = [unworn]
 	ok((_run.sitting_out_rune_names(_run.party[seat]) as Array).is_empty(),
-		"§3: a gated rune sitting in the pouch unequipped is reported as sitting out")
+		"§3: a gated rune sitting in the pouch unequipped is reported as sitting out — %s" % unworn_s)
 	_close_overlays(mp)
 	await Gate.frames(self, 2)
 	mp._open_rune_panel(seat)
 	await Gate.frames(self, 3)
 	var uov: Node = Gate.overlay(mp, 60)
 	ok(uov != null and _label_with(uov, GT_HEAD) == null,
-		"§3: an unequipped gated rune is told it sits out")
+		"§3: an unequipped gated rune is told it sits out — %s" % unworn_s)
 	ok(uov != null and _label_with(uov, String(unworn["name"]) + " — ") != null,
-		"§3: the unequipped gated rune is not drawn in the pouch at all")
+		"§3: the unequipped gated rune is not drawn in the pouch at all — %s" % unworn_s)
 	_close_overlays(mp)
 	await Gate.frames(self, 2)
 	# THE KIT PREVIEW, ONE RUNE PER ENGINE, BOTH ARMS — the hero sheet's rune block until IH §3.
@@ -725,9 +729,15 @@ func _s4_the_pouch_with_six_held() -> void:
 	for rid in _gated:
 		if Runes.engine_read(rid) == "old_gods" and gated_two.size() < 2:
 			gated_two.append(rid)
-	ok(gated_two.size() == 2, "§4: %d Occultist runes found for the two sitting out" % gated_two.size())
+	# BATCH IN §4 — THE PICKS, NAMED (IM §0.8): the two sitting out are the FIRST two gated
+	# runes by id that read old_gods, and the filler the FIRST four ungated by id, so a
+	# rune added, dropped or re-gated re-selects them — and every rune's text is part of
+	# what the pouch measures. Every line about the six says which six they are.
+	var gated_two_s := "the first two gated runes by id that read old_gods, %s" % str(gated_two)
+	ok(gated_two.size() == 2, "§4: %d Occultist runes found for the two sitting out — %s" % [gated_two.size(), gated_two_s])
 	var others: Array = _ungated.slice(0, 4)
-	ok(others.size() == 4, "§4: %d filler runes — four expected" % others.size())
+	var pick_s := "%s; the first four ungated by id, %s" % [gated_two_s, str(others)]
+	ok(others.size() == 4, "§4: %d filler runes — four expected — %s" % [others.size(), pick_s])
 	var pinned := Rect2()
 	var have_pin := false
 	var rows := {}
@@ -746,24 +756,24 @@ func _s4_the_pouch_with_six_held() -> void:
 			held.append(o)
 		_run.party[seat]["engines"] = [er]
 		_run.party[seat]["runes"] = held
-		ok(held.size() == 6, "§4: %d runes held — six expected" % held.size())
+		ok(held.size() == 6, "§4: %d runes held — six expected — %s" % [held.size(), pick_s])
 		var sitting: Array = _run.sitting_out_rune_names(_run.party[seat])
 		ok(sitting.size() == (0 if engine_in else 2),
-			"§4: %d runes sit out with the engine %s — %d expected" % [
-				sitting.size(), "in" if engine_in else "out", 0 if engine_in else 2])
+			"§4: %d runes sit out with the engine %s — %d expected — %s" % [
+				sitting.size(), "in" if engine_in else "out", 0 if engine_in else 2, pick_s])
 		_close_overlays(mp)
 		await Gate.frames(self, 2)
 		mp._open_rune_panel(seat)
 		await Gate.frames(self, 4)
 		var ov: Node = Gate.overlay(mp, 60)
-		ok(ov != null, "§4: the pouch did not open with six held")
+		ok(ov != null, "§4: the pouch did not open with six held — %s" % pick_s)
 		if ov == null:
 			continue
 		var arm := "engine in" if engine_in else "engine out"
 		# CLOSE IS GT'S RULE AND IT STILL HOLDS: on the screen, in one place,
 		# and not inside the scroller where text can carry it off.
 		var close: Button = _button(ov, "Close")
-		ok(close != null, "§4 (%s): the pouch drew no Close button" % arm)
+		ok(close != null, "§4 (%s): the pouch drew no Close button — %s" % [arm, pick_s])
 		if close == null:
 			continue
 		var cr := close.get_global_rect()
@@ -771,9 +781,9 @@ func _s4_the_pouch_with_six_held() -> void:
 			pinned = cr
 			have_pin = true
 		ok(cr.position.x >= 0.0 and cr.position.y >= 0.0 and cr.end.x <= 1280.0 and cr.end.y <= 720.0,
-			"§4 (%s): Close is not wholly on the 1280 x 720 screen (%s)" % [arm, str(cr)])
-		ok(cr == pinned, "§4 (%s): Close moved to %s from %s" % [arm, str(cr), str(pinned)])
-		ok(not _inside_scroll(close), "§4 (%s): Close is inside a scroller" % arm)
+			"§4 (%s): Close is not wholly on the 1280 x 720 screen (%s) — %s" % [arm, str(cr), pick_s])
+		ok(cr == pinned, "§4 (%s): Close moved to %s from %s — %s" % [arm, str(cr), str(pinned), pick_s])
+		ok(not _inside_scroll(close), "§4 (%s): Close is inside a scroller — %s" % [arm, pick_s])
 		# AND THE PLAYER LEAVES THROUGH IT.
 		var sc: ScrollContainer = _first_scroll(ov)
 		var content_h := 0.0
@@ -783,7 +793,7 @@ func _s4_the_pouch_with_six_held() -> void:
 		close.emit_signal("pressed")
 		await Gate.frames(self, 2)
 		ok(Gate.overlay(mp, 60) == null and int(mp._rune_panel_for) == -1,
-			"§4 (%s): pressing Close did not close the pouch" % arm)
+			"§4 (%s): pressing Close did not close the pouch — %s" % [arm, pick_s])
 	# THE MEASUREMENT THE BRIEF ASKED FOR, PRINTED RATHER THAN ASSERTED — a
 	# height is a reading, and pinning it would red on any later layout change.
 	for a2 in ["engine in", "engine out"]:
@@ -824,7 +834,12 @@ func _s4b_the_panels_worst_case(mp: Node, seat: int, gated_two: Array, others: A
 	for g in _gated:
 		if Runes.engine_read(g) == "resonance" and res.size() < 2:
 			res.append(g)
-	ok(res.size() == 2, "§4: %d Resonance runes found" % res.size())
+	# BATCH IN §4 — THE PICKS, NAMED (IM §0.8): the two sitting out are the FIRST two gated
+	# runes by id that read resonance, beside §4's first four ungated, so a rune added,
+	# dropped or re-gated re-selects them; every line about the panel says which they are.
+	var pick_s := "the first two gated runes by id that read resonance, %s; the first four ungated by id, %s" % [
+		str(res), str(others)]
+	ok(res.size() == 2, "§4: %d Resonance runes found — %s" % [res.size(), pick_s])
 	var arc := Runes.engine_rune_id("resonance")
 	for e in engines:
 		if String((e as Dictionary).get("id", "")) == arc:
@@ -842,24 +857,24 @@ func _s4b_the_panels_worst_case(mp: Node, seat: int, gated_two: Array, others: A
 	_run.party[seat]["runes"] = runes
 	var sitting: Array = _run.sitting_out_rune_names(_run.party[seat])
 	ok(sitting.size() == 2,
-		"§4: %d runes sit out on the panel's worst case — two expected" % sitting.size())
+		"§4: %d runes sit out on the panel's worst case — two expected — %s" % [sitting.size(), pick_s])
 	_close_overlays(mp)
 	await Gate.frames(self, 2)
 	mp._open_rune_panel(seat)
 	await Gate.frames(self, 5)
 	var ov: Node = Gate.overlay(mp, 60)
-	ok(ov != null, "§4: the pouch did not open on the worst case")
+	ok(ov != null, "§4: the pouch did not open on the worst case — %s" % pick_s)
 	if ov == null:
 		return
 	var close: Button = _button(ov, "Close")
-	ok(close != null, "§4 (worst case): the pouch drew no Close button")
+	ok(close != null, "§4 (worst case): the pouch drew no Close button — %s" % pick_s)
 	if close == null:
 		return
 	var cr := close.get_global_rect()
 	ok(cr.position.x >= 0.0 and cr.position.y >= 0.0 and cr.end.x <= 1280.0 and cr.end.y <= 720.0,
-		"§4 (worst case): Close is not wholly on the 1280 x 720 screen (%s)" % str(cr))
-	ok(cr == pinned, "§4 (worst case): Close moved to %s from %s" % [str(cr), str(pinned)])
-	ok(not _inside_scroll(close), "§4 (worst case): Close is inside a scroller")
+		"§4 (worst case): Close is not wholly on the 1280 x 720 screen (%s) — %s" % [str(cr), pick_s])
+	ok(cr == pinned, "§4 (worst case): Close moved to %s from %s — %s" % [str(cr), str(pinned), pick_s])
+	ok(not _inside_scroll(close), "§4 (worst case): Close is inside a scroller — %s" % pick_s)
 	# THE TELL IS DRAWN, WHOLE, INSIDE THE SCROLLER — the paired positive, so
 	# "Close is fine" cannot be satisfied by a panel that drew no tell at all.
 	var told := 0
@@ -873,7 +888,7 @@ func _s4b_the_panels_worst_case(mp: Node, seat: int, gated_two: Array, others: A
 			"§4 (worst case): %s's tell is drawn at size %d, not 12 — the text was shrunk" % [
 				nm, l.get_theme_font_size("font_size")])
 		told += 1
-	ok(told == 2, "§4 (worst case): %d of 2 tells drawn" % told)
+	ok(told == 2, "§4 (worst case): %d of 2 tells drawn — %s" % [told, pick_s])
 	var sc: ScrollContainer = _first_scroll(ov)
 	var content_h := 0.0
 	if sc != null and sc.get_child_count() == 1:
@@ -885,7 +900,7 @@ func _s4b_the_panels_worst_case(mp: Node, seat: int, gated_two: Array, others: A
 	close.emit_signal("pressed")
 	await Gate.frames(self, 2)
 	ok(Gate.overlay(mp, 60) == null and int(mp._rune_panel_for) == -1,
-		"§4 (worst case): pressing Close did not close the pouch")
+		"§4 (worst case): pressing Close did not close the pouch — %s" % pick_s)
 
 
 # ── §5 — THE SENTENCE IS GT'S, AND THERE IS ONLY ONE OF IT ──────────────────
@@ -958,7 +973,11 @@ func _s6_nothing_was_retuned() -> void:
 		if Runes.engine_read(g) == "old_gods":
 			rid = g
 			break
-	ok(rid != "", "§6: no Occultist rune found")
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the rune is the FIRST gated rune by id that
+	# reads old_gods, so a rune added, dropped or re-gated re-selects it; every line about
+	# it names it.
+	var pick_s := "the first gated rune by id that reads old_gods, %s" % (rid if rid != "" else "none")
+	ok(rid != "", "§6: no Occultist rune found — %s" % pick_s)
 	if rid == "":
 		return
 	for engine_in in [true, false]:
@@ -967,12 +986,12 @@ func _s6_nothing_was_retuned() -> void:
 		var arm := "engine in" if engine_in else "engine out"
 		# THE RUNE IS STILL EQUIPPED AND STILL FILLS ITS SLOT.
 		ok(bool((m["runes"][0] as Dictionary).get("equipped", false)),
-			"§6 (%s): the rune was unequipped" % arm)
+			"§6 (%s): the rune was unequipped — %s" % [arm, pick_s])
 		var worn := 0
 		for r in m.get("runes", []):
 			if bool((r as Dictionary).get("equipped", false)):
 				worn += 1
-		ok(worn == 1, "§6 (%s): %d runes worn — the slot did not stay filled" % [arm, worn])
+		ok(worn == 1, "§6 (%s): %d runes worn — the slot did not stay filled — %s" % [arm, worn, pick_s])
 		# ITS PAYLOAD IS STILL APPLIED — the refusal is inside the read site,
 		# where GV put it, and this batch did not move it to the spawn.
 		var cfg := {"unit_name": "probe", "max_hp": 100, "attack": 100}
@@ -983,7 +1002,7 @@ func _s6_nothing_was_retuned() -> void:
 			if String(k).begins_with("rune_"):
 				fields.append(String(k))
 		ok(not fields.is_empty(),
-			"§6 (%s): the rune's payload wrote no `rune_` field — the spawn stopped applying it" % arm)
+			"§6 (%s): the rune's payload wrote no `rune_` field — the spawn stopped applying it — %s" % [arm, pick_s])
 		# AND ITS AUTHORED TERMS ARE BYTE-UNCHANGED.
 		var e: Dictionary = Runes.config(rid)
 		var built: Dictionary = Runes.build(rid)
@@ -993,7 +1012,7 @@ func _s6_nothing_was_retuned() -> void:
 	# the engine out and offerable with it in, which is GV's gate, not GX's.
 	var pid := Runes.engine_read(rid)
 	ok(not Runes.offerable(rid, []) and Runes.offerable(rid, [pid]),
-		"§6: GV's offer gate reads differently under GX")
+		"§6: GV's offer gate reads differently under GX — %s" % pick_s)
 	# THE PEDDLER AND THE CACHE NEED NO TELL AND GOT NONE — a gated rune cannot
 	# be OFFERED while the engine is out, so a tell there could never render.
 	# Asserted through the doors themselves rather than by reading the screens.
@@ -1005,8 +1024,8 @@ func _s6_nothing_was_retuned() -> void:
 		if elig.has(g2):
 			leaked.append(g2)
 	ok(leaked.is_empty(),
-		"§6: the offer pool hands %d gated runes to a hero with no engine slotted (%s)" % [
-			leaked.size(), str(leaked.slice(0, 3))])
+		"§6: the offer pool hands %d gated runes to a hero with no engine slotted (%s) — %s" % [
+			leaked.size(), str(leaked.slice(0, 3)), pick_s])
 	# PAIRED POSITIVE: with the engine in, its own runes ARE in the pool, so the
 	# emptiness above is the gate and not an empty pool.
 	_dress(seat, rid, true)
@@ -1017,7 +1036,7 @@ func _s6_nothing_was_retuned() -> void:
 	for g3 in _gated:
 		if elig2.has(g3):
 			back += 1
-	ok(back > 0, "§6: with the engine slotted no gated rune is offerable either — the arm proves nothing")
+	ok(back > 0, "§6: with the engine slotted no gated rune is offerable either — the arm proves nothing — %s" % pick_s)
 	print("    the rune stays worn, its slot stays filled, its payload still applies, and GV's offer gate is unmoved")
 	print("    the offer pool holds %d gated runes with the engine out and %d with it in" % [leaked.size(), back])
 

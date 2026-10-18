@@ -1297,6 +1297,13 @@ func _s4_bench_a_condition() -> void:
 	ok(tag != "", "§4: no tag reached two drafted cards on a full Berserker kit")
 	if tag == "":
 		return
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the tag pulled on is the FIRST in
+	# TAG_ORDER that two of his carried cards hold after a seeded run of drafts,
+	# and each card benched is the first carried one that holds it — so a card or
+	# a tag row that moves re-selects both in silence. Every FAIL line about the
+	# bench names the tag, its count and (once there are any) the cards benched.
+	var pick_s := "pulling on %s, the first tag in TAG_ORDER two carried cards hold (%d of them)" % [
+		tag, int(Classes.tag_count(_run.equipped_ability_names(hero), tag))]
 	# THE PANEL, AND ITS LINE. The needle is the WHOLE joined census exactly as
 	# `map_screen` builds it, not one `TAG n` pair: at ten carried cards a count
 	# of 1 is a substring of a count of 13, and a needle that can match a
@@ -1339,11 +1346,11 @@ func _s4_bench_a_condition() -> void:
 		await process_frame
 		if _census_needle(hero) != before:
 			break
-	ok(not benched.is_empty(), "§4: nothing could be benched to move the census")
+	ok(not benched.is_empty(), "§4: nothing could be benched to move the census — %s" % pick_s)
 	var after := _census_needle(hero)
 	ok(after != before,
-		"§4: %d %s cards were benched and the census did not move (`%s`)" % [
-			benched.size(), tag, after])
+		"§4: %d %s cards were benched and the census did not move (`%s`) — %s; benched %s" % [
+			benched.size(), tag, after, pick_s, benched])
 	# AND THE SCREEN SAYS SO, on the panel the press landed on.
 	var ov2: Node = _overlay(s, 60)
 	if ov2 == null:
@@ -1351,9 +1358,11 @@ func _s4_bench_a_condition() -> void:
 		await process_frame
 		ov2 = _overlay(s, 60)
 	ok(ov2 != null and _has_text(ov2, after),
-		"§4: the panel does not show the census `%s` after the bench" % after)
+		"§4: the panel does not show the census `%s` after the bench — %s; benched %s"
+			% [after, pick_s, benched])
 	ok(ov2 != null and not _has_text(ov2, before),
-		"§4: the panel still shows the census it had BEFORE the bench — there is a cached count")
+		"§4: the panel still shows the census it had BEFORE the bench — there is a cached count — %s; benched %s"
+			% [pick_s, benched])
 	# AND BACK ON. The lever works in both directions or it is not a lever.
 	for b in benched:
 		var back_ov: Node = _overlay(s, 60)
@@ -1362,7 +1371,8 @@ func _s4_bench_a_condition() -> void:
 		await process_frame
 		await process_frame
 	ok(_census_needle(hero) == before,
-		"§4: the benched cards were carried again and the census did NOT come back")
+		"§4: the benched cards were carried again and the census did NOT come back — %s; benched %s"
+			% [pick_s, benched])
 	# BATCH IH §3 — THE CENSUS IS THE KIT PANEL's ALONE: the sheet shows what the hero is, and the
 	# panel above — where the bench happens, driven both ways — is the one screen that counts his
 	# cards by tag. The sheet carrying none is the negative half of that.
@@ -1503,13 +1513,19 @@ func _s5_the_pouch() -> void:
 			spare = String(id3)
 			break
 	if spare != "":
+		# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the arriving kind is the FIRST
+		# in `ITEM_INFO`'s order the filled pouch does not hold, so an item added
+		# or moved there re-selects it in silence; every FAIL line about the
+		# arrival names it.
+		var pick_s := "the arrival is `%s`, the first kind in ITEM_INFO order the pouch (%d kinds) does not hold" % [
+			spare, filled]
 		var queued_before: int = int(_run.pending_item_offers.size())
 		var landed: bool = bool(_run.offer_item(spare))
-		ok(landed, "§5: a NEW kind arriving at a full pouch was not queued as a choice")
+		ok(landed, "§5: a NEW kind arriving at a full pouch was not queued as a choice — %s" % pick_s)
 		ok(int(_run.pending_item_offers.size()) == queued_before + 1,
-			"§5: the no-slot arrival queued no swap offer")
+			"§5: the no-slot arrival queued no swap offer — %s" % pick_s)
 		ok(not _run.items.has(spare),
-			"§5: the no-slot arrival was taken anyway, over the slot cap")
+			"§5: the no-slot arrival was taken anyway, over the slot cap — %s" % pick_s)
 		print("    the pouch filled at %d kinds; `%s` queued as a CHOICE, not refused"
 			% [filled, spare])
 
@@ -1681,6 +1697,19 @@ func _s7_the_skill_check() -> void:
 					if not h3.is_companion and gated_owner == null:
 						gated_owner = h3
 				break
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the gated card is the FIRST one
+	# found in the seated heroes' kits (hero order, then slot order), else the
+	# first of the pool list above that is gated — so a kit or a gated flag that
+	# moves re-selects it in silence. Every FAIL line about the gated failure
+	# names the card, its owner and which of the two routes found it (a kit card
+	# is the very object its owner holds; the pool's is a fresh copy).
+	var gated_pick: String = "none" if gated_ab == null else (
+		"the gated card is %s on the %s, the first gated card in the seated kits"
+			% [gated_ab.display_name, gated_owner.unit_name]
+		if gated_owner != null and gated_owner.abilities.has(gated_ab)
+		else "the gated card is %s, the first gated card of the pool list (no seated kit holds one), driven on the %s"
+			% [gated_ab.display_name,
+				(gated_owner.unit_name if gated_owner != null else "nobody")])
 	ok(gated_ab != null,
 		"§7: no gated ability could be found in the pool — the case cannot be driven")
 	if gated_ab != null:
@@ -1694,13 +1723,15 @@ func _s7_the_skill_check() -> void:
 		var res_before: float = float(gated_owner.resource)
 		var cd_before: int = int(gated_owner.cooldowns.get(gated_ab.display_name, 0))
 		ok(res_before > 0.0 and cd_before > 0,
-			"§7: the gated arms are standing on a zero meter and no cooldown — they cannot fall")
+			"§7: the gated arms are standing on a zero meter and no cooldown — they cannot fall — %s"
+				% gated_pick)
 		await scene._gated_failure(gated_owner, gated_ab)
 		ok(is_equal_approx(float(gated_owner.resource), res_before),
-			"§7: A GATED FAILURE SPENT THE RESOURCE — %s → %s. Nothing is spent but the turn."
-				% [res_before, float(gated_owner.resource)])
+			"§7: A GATED FAILURE SPENT THE RESOURCE — %s → %s. Nothing is spent but the turn. — %s"
+				% [res_before, float(gated_owner.resource), gated_pick])
 		ok(int(gated_owner.cooldowns.get(gated_ab.display_name, 0)) == cd_before,
-			"§7: a gated failure started the cooldown — nothing is spent but the turn")
+			"§7: a gated failure started the cooldown — nothing is spent but the turn — %s"
+				% gated_pick)
 		print("    gated: `%s` lost on a Sloppy; %s and cooldown both unspent" % [
 			gated_ab.display_name, gated_owner.resource_name])
 	# (4) THE SHARPSHOOTER'S SEQUENCE. **HIS BAR IS HARDER IN SECONDS AND WIDER

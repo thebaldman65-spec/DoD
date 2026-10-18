@@ -1256,6 +1256,11 @@ const ZONE_BASE_MULTS := [1.0, 1.5, 2.2]
 # so their offers are dealt exactly as before; Ruin's safe slot is drawn from the
 # band Warden's gambles come out of and the band below it — AT RUIN THERE IS NO
 # MILD OPTION.
+#
+# BATCH IN §1 — RUIN's GAMBLES ARE SEVERITY 5, AND NO OTHER RUNG's BANDS REACH IT.
+# Four bargains stand at severity 5 (`MODIFIERS`' foot), so a severity-5 modifier
+# is one Wanderer and Warden are never offered; Ruin's safe slot stays 3–4. The
+# band holds four and two are drawn without replacement, as Warden's four at 4.
 const DIFFICULTIES := {
 	"wanderer": {"rung": 1, "name": "Wanderer", "mult": 0.50,
 		"blurb": "The Decay is thin here. No twist.",
@@ -1265,7 +1270,7 @@ const DIFFICULTIES := {
 		"safe_band": [1, 3], "gamble_band": [4, 4], "fixed_modifier": false},
 	"ruin": {"rung": 3, "name": "Ruin", "mult": 1.30,
 		"blurb": "Harsher bargains, and fixed encounters carry a modifier.",
-		"safe_band": [3, 4], "gamble_band": [4, 4], "fixed_modifier": true},
+		"safe_band": [3, 4], "gamble_band": [5, 5], "fixed_modifier": true},
 }
 const DIFFICULTY_ORDER := ["wanderer", "warden", "ruin"]
 # Batch Y's two ids, kept resolvable so a saved run and every DOD_SIM_
@@ -4523,7 +4528,9 @@ func bomb_damage() -> int:
 # THE POOL IS WEIGHTED LOW, DELIBERATELY. Every offer's first draw comes from
 # the rung's mild pool, so the safe slot on every card all run is served by
 # that pool alone; the harsh end already rotates and the low end is what
-# actually repeats. Counts: 6 / 6 / 4 / 4 across severities 1-4.
+# actually repeats. Counts: 6 / 6 / 4 / 4 across severities 1-4, and four more
+# at severity 5 since IN §1 — dealt at Ruin alone (its gamble band), so the table
+# Wanderer and Warden draw from is the twenty it always was.
 #
 # SEVERITY 4 IS FOUR AGAIN (Batch BB §5). `rot` — maximum health halved for
 # everyone — was authored by AQ, implemented, and DROPPED there: the battle-end
@@ -4537,6 +4544,23 @@ func bomb_damage() -> int:
 # (Batch BJ §1), carries all three fields now, and the ordering is stated there
 # because this is the site with a five-figure
 # max-HP runaway in its history (Batch W).
+#
+# BATCH IN §1 — FOUR BARGAINS ONLY RUIN EVER SEES (severity 5, the designer's).
+# One sentence each, one system each, and NONE ZEROES A CLASS's KIT — a modifier
+# that makes one hero's whole hand dead is not harsh, it is unplayable. AND EACH
+# BINDS ONE SIDE: the twenty above bind both parties (AQ's rule), and these four
+# are the first that do not — the designer's, at IN. Their two figures are read
+# off the constants below (II §0.7: a figure the code holds is read, never retyped)
+# and are STARTING VALUES, measured at IN (CQ §6) and the designer's to tune.
+#   famine          the pouch          — `battle._pouch_sealed`
+#   wasting         a clock on the fight — `battle._wasting_tick`, at a hero's
+#                   turn's end, through the tick door: not a strike, so no ward,
+#                   no armor and no Less Damage Taken reaches it. Authored as
+#                   ROT; the severity-4 `rot` above holds the name (BR §1).
+#   hungering_dark  the damage race    — BL's one damage door (`battle._dark_feeds`)
+#   cruel_order     the turn order     — `battle._turn_before`
+const WASTING_PCT := 0.05
+const HUNGERING_DARK_PCT := 0.25
 const MODIFIERS := {
 	"overgrown": {"name": "Overgrown", "severity": 1,
 		"desc": "Both parties begin the fight at 70% health at most."},
@@ -4583,11 +4607,22 @@ const MODIFIERS := {
 	# ---- severity 4 (Batch BB §5, AQ's authored fourth) ----
 	"rot": {"name": "Rot", "severity": 4,
 		"desc": "Everyone's maximum health is halved, on both sides. It lasts the fight and no longer."},
+	# ---- severity 5 (Batch IN §1): Ruin's gambles, one side each ----
+	"famine": {"name": "Famine", "severity": 5,
+		"desc": "The pouch is sealed: no item may be used this fight."},
+	"wasting": {"name": "Wasting", "severity": 5,
+		"desc": "At the end of every hero's turn, that hero loses %d%% of maximum health."
+			% [int(round(WASTING_PCT * 100))]},
+	"hungering_dark": {"name": "The Hungering Dark", "severity": 5,
+		"desc": "Every enemy heals %d%% of the damage it deals."
+			% [int(round(HUNGERING_DARK_PCT * 100))]},
+	"cruel_order": {"name": "Cruel Order", "severity": 5,
+		"desc": "Every enemy acts before any hero, each round."},
 }
 
 # The reward table reads severity and nothing else. Each entry is the list
 # of reward KINDS that severity may pay; the offer picks one at random, so
-# a severity-1 option is sometimes gold and sometimes the merchant.
+# the mildest option a rung deals is sometimes gold and sometimes the merchant.
 #   gold   {amount}      flat gold on victory
 #   potion {}            one random consumable
 #   rune   {}            one rune from the current pool, for a random hero
@@ -4599,16 +4634,56 @@ const MODIFIERS := {
 # severity 4 pays its gold or a rune — what it already paid where the merchant
 # was gated (HS §0c). The gate below reads every severity's list, so it still
 # holds the merchant out of the run's first three nodes.
+#
+# **BATCH IN §1 — SEVERITY 5 IS ONE STEP FURTHER ON THE LADDER, NOT A NEW FIGURE.**
+# The gold reads 40 → 80 → 140 → 220: steps of 40, 60 and 80, not one slope (each
+# step 20 more than the last), so the row takes the largest step the table already
+# has, 80 — 300 gold — and pays it or a rune, as severity 4 does.
+#
+# **BATCH IN §2 — THE MERCHANT IS THE REWARD OF A RUNG's MILDEST DEALT SEVERITY, NOT
+# OF SEVERITY 1 ABSOLUTELY (the designer's).** HW §2's intent was the merchant on
+# the mildest bargain on offer, a weak reward on a weak twist; pinned to severity 1,
+# it left Ruin — whose bands never deal a 1 — the one rung with no bought merchant,
+# though it pays the most gold of any. So the merchant is no severity's row: it is
+# `MERCHANT_REWARD`, which `rewards_for` puts beside the gold of the one severity
+# `mildest_dealt_severity` names — 1 on Wanderer and Warden, so nothing there moves
+# (it is appended where it stood, behind the 40 gold, and the roll picks from a list
+# of the same two in the same order), and 3 on Ruin. Read off the rung's bands,
+# never off its name.
 const REWARDS := {
-	1: [{"kind": "gold", "amount": 40}, {"kind": "shop"}],
+	1: [{"kind": "gold", "amount": 40}],
 	2: [{"kind": "gold", "amount": 80}, {"kind": "potion"}],
 	3: [{"kind": "gold", "amount": 140}, {"kind": "rune"}],
 	4: [{"kind": "gold", "amount": 220}, {"kind": "rune"}],
+	5: [{"kind": "gold", "amount": 300}, {"kind": "rune"}],
 }
+const MERCHANT_REWARD := {"kind": "shop"}
 
 
 func modifier_severity(id: String) -> int:
 	return int(MODIFIERS.get(id, {}).get("severity", 0))
+
+
+# The mildest severity the rung in play deals: the lowest severity of any modifier
+# inside its safe band or its gamble band.
+func mildest_dealt_severity() -> int:
+	var def := difficulty_def()
+	var lo := 0
+	for id in MODIFIERS:
+		var sev := modifier_severity(String(id))
+		for band in [def["safe_band"], def["gamble_band"]]:
+			if sev >= int(band[0]) and sev <= int(band[1]) and (lo == 0 or sev < lo):
+				lo = sev
+	return lo
+
+
+# What an option of severity `sev` may pay on the rung in play: its row of the table,
+# and the merchant behind it where `sev` is the rung's mildest dealt severity (§2).
+func rewards_for(sev: int) -> Array:
+	var choices: Array = (REWARDS.get(sev, REWARDS[1]) as Array).duplicate()
+	if sev == mildest_dealt_severity():
+		choices.append(MERCHANT_REWARD)
+	return choices
 
 
 func reward_text(reward: Dictionary) -> String:
@@ -4679,13 +4754,13 @@ func roll_offer() -> Array:
 	var offer: Array = []
 	for id in picked:
 		var sev := modifier_severity(String(id))
-		var choices: Array = REWARDS.get(sev, REWARDS[1])
+		var choices: Array = rewards_for(sev)
 		# BATCH HS §0 — THE BARGAIN'S BOUGHT MERCHANT IS GATED WITH THE MAP'S (ruled):
 		# a player who traded a bargain's gold FOR a merchant is the lowest-gold case
 		# in the game, and a merchant he cannot shop at is no reward. At an elite in
 		# the run's first `SHOP_GATE_NODES` nodes the option still comes, and pays
-		# from what is left of its severity's list — at severity 1, where the merchant
-		# stands since HW §2, its 40 gold.
+		# from what is left of its severity's list — at the rung's mildest severity,
+		# where the merchant stands since IN §2 (severity 1 from HW §2), its gold.
 		if shop_gated(slot_idx + 1):
 			choices = choices.filter(func(r): return String(r.get("kind", "")) != "shop")
 		offer.append({"modifier": String(id),
@@ -4701,6 +4776,12 @@ func roll_offer() -> Array:
 # It is NOT a bargain: there is no offer, no choice and NO REWARD — the
 # modifier is the rung's, not something the player bought. Rung 3 only.
 const FIXED_MODIFIER_NODES := ["miniboss", "boss", "endboss"]
+# BATCH IN §1 — THE SEVERITIES A FIXED ENCOUNTER DRAWS FROM, STATED AS A BAND. It read
+# `>= 3` while the table topped at 4, so it drew from 3–4; the severity-5 four are a
+# BARGAIN's — priced with a reward a fixed encounter never pays — and the band keeps
+# Ruin's mini-boss and bosses on the eight they always drew from. Whether they should
+# reach the severity-5 four is the designer's (IN's report).
+const FIXED_MODIFIER_BAND := [3, 4]
 
 
 func arm_fixed_modifier(node_type: String) -> void:
@@ -4712,7 +4793,8 @@ func arm_fixed_modifier(node_type: String) -> void:
 		return  # a bargain already armed one; never stack two
 	var pool: Array = []
 	for id in MODIFIERS:
-		if modifier_severity(String(id)) >= 3:
+		var fx_sev := modifier_severity(String(id))
+		if fx_sev >= int(FIXED_MODIFIER_BAND[0]) and fx_sev <= int(FIXED_MODIFIER_BAND[1]):
 			pool.append(String(id))
 	if pool.is_empty():
 		return
@@ -4848,7 +4930,7 @@ func claim_reward() -> Dictionary:
 #
 # THE ONE SURVIVOR is the bargain's "a merchant follows the fight" reward,
 # and it survives because it is BOUGHT rather than rolled: the player took a
-# bargain's modifier to get it (a severity-1 one since HW §2). One boolean, not a queue.
+# bargain's modifier to get it (the rung's mildest since IN §2). One boolean, not a queue.
 var pending_shop := false
 
 

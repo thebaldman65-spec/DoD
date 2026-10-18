@@ -748,7 +748,12 @@ func _s2d_the_crest() -> void:
 			crest_id = String(id)
 			break
 	var cls: Array = _ordinary_for(m)
-	ok(crest_id != "" and not cls.is_empty(), "§2d: the premise — no live crest rune or no class rune to offer")
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the first live crest rune the party does not hold, in the data file's id
+	# order, and the first ordinary class rune the roll's own door offers this hero — the pre-HW triple's two runes.
+	var crest_pick := "the first live crest rune not held, in id order, %s; the first class rune offered him, %s" % [
+		(("%s (`%s`)" % [String(Runes.config(crest_id).get("name", "")), crest_id]) if crest_id != "" else "none"),
+		(("%s (`%s`)" % [String(Runes.config(String(cls[0])).get("name", "")), String(cls[0])]) if not cls.is_empty() else "none")]
+	ok(crest_id != "" and not cls.is_empty(), "§2d: the premise — no live crest rune or no class rune to offer — %s" % crest_pick)
 	# A triple from before HW: a crest rune beside a class rune.
 	_run.queue_rune_pick(m, [Runes.build(crest_id), Runes.build(String(cls[0]))])
 	var bag0: Array = _run.rune_bag.duplicate(true)
@@ -758,9 +763,9 @@ func _s2d_the_crest() -> void:
 	var drawn: Array = Gate.bound_buttons(hd, "_stage_draft_rune").map(func(b): return String(Gate.bound_args(b, "_stage_draft_rune")[1]))
 	var crest_name := Runes.display_name(Runes.config(crest_id))
 	ok(not drawn.is_empty() and not drawn.has(crest_name) and drawn.has(Runes.display_name(Runes.config(String(cls[0])))),
-		"§2d: the hero's screen drew %s — a crest rune in his pick, or not his class rune" % [drawn])
+		"§2d: the hero's screen drew %s — a crest rune in his pick, or not his class rune — %s" % [drawn, crest_pick])
 	await Gate.answer_hero_draft(self, mp, false)
-	ok(_run.rune_bag == bag0 and _run.party_runes == crest0, "§2d: answering a hero's cache moved the crest's bag or its slot")
+	ok(_run.rune_bag == bag0 and _run.party_runes == crest0, "§2d: answering a hero's cache moved the crest's bag or its slot — %s" % crest_pick)
 
 
 # ── §2e — THE SCREEN FITS ─────────────────────────────────────────────────────
@@ -839,13 +844,20 @@ func _s4_the_scroll() -> void:
 		k4 += 1
 	m["engines"] = held_e
 	m["runes"] = worn + held_o
-	ok(_run.held_engines(m).is_empty() and _run.holding_full(m), "§4: the premise — every core slot empty and the holding full")
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the Cleric's ordinary runes this arm ranked longest by their authored
+	# words — three worn, the rest held to the cap — with the length the last one won its place by.
+	var longest_pick := "the Cleric's longest ordinary runes, %d to %d characters (worn %s; held %s) beside his six core runes" % [
+		String(Runes.config(String(ords[maxi(k4 - 1, 0)])).get("desc", "")).length(),
+		String(Runes.config(String(ords[0])).get("desc", "")).length(),
+		str(worn.map(func(x): return String(x["name"]))), str(held_o.map(func(x): return String(x["name"])))]
+	ok(_run.held_engines(m).is_empty() and _run.holding_full(m), "§4: the premise — every core slot empty and the holding full — %s" % longest_pick)
 	mp.call("_open_rune_panel", idx)
 	await Gate.frames(self, 4)
 	var sc: ScrollContainer = _scroller(Gate.overlay(mp, 60))
 	var content: float = sc.get_child(0).get_combined_minimum_size().y if sc != null and sc.get_child_count() > 0 else 0.0
 	ok(sc != null and content > sc.size.y and sc.get_v_scroll_bar().visible and sc.get_v_scroll_bar().size.x > 0.0,
-		"§4: at its longest (%.0f px in %.0f) the panel scrolls and shows no bar" % [content, sc.size.y if sc != null else 0.0])
+		"§4: at its longest (%.0f px in %.0f) the panel scrolls and shows no bar — %s" % [
+			content, sc.size.y if sc != null else 0.0, longest_pick])
 	print("    the longest: %.0f px in a %.0f px scroller — the bar drawn %.0f px wide" % [
 		content, sc.size.y if sc != null else 0.0, sc.get_v_scroll_bar().size.x if sc != null else 0.0])
 	# AND WHERE IT FITS, NO BAR.

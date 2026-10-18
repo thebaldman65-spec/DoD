@@ -509,6 +509,13 @@ func _s1_to_s4_the_elite() -> void:
 	if pick < offer.size():
 		took = String((offer[pick] as Dictionary).get("modifier", ""))
 		took_reward = ((offer[pick] as Dictionary).get("reward", {}) as Dictionary).duplicate()
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the bargain taken is the FIRST in the roll's
+	# order whose reward is not a merchant (the first of all when none is), so a change to
+	# the roll re-selects it; every line about it says which bargain it took.
+	var pick_s := "the bargain taken, '%s' paying %s (index %d of %d in the roll's order, %s)" % [
+		took, str(took_reward.get("kind", "nothing")), pick, offer.size(),
+		("the first of all: none avoids a merchant" if str(took_reward.get("kind", "")) == "shop"
+			else "the first not paying a merchant")]
 	var takes: Array = []
 	var ob: Array = []
 	_buttons(current_scene, ob)
@@ -516,32 +523,32 @@ func _s1_to_s4_the_elite() -> void:
 		if String((b as Button).text) == "Take this bargain":
 			takes.append(b)
 	ok(takes.size() == offer.size() and pick < takes.size(),
-		"§3: the offer drew %d bargain buttons for %d bargains" % [takes.size(), offer.size()])
+		"§3: the offer drew %d bargain buttons for %d bargains — %s" % [takes.size(), offer.size(), pick_s])
 	if pick < takes.size():
 		(takes[pick] as Button).emit_signal("pressed")
 	await _frames(6)
-	ok(_scene_name() == "Battle", "§3: taking the bargain opened %s, not the fight" % _scene_name())
+	ok(_scene_name() == "Battle", "§3: taking the bargain opened %s, not the fight — %s" % [_scene_name(), pick_s])
 	var d3 := _disk()
 	var enc3: Dictionary = d3.get("encounter", {})
 	ok(String((enc3.get("bargain", {}) as Dictionary).get("modifier", "")) == took,
-		"§3: the save does not record the bargain taken (%s)" % str(enc3.get("bargain", "<absent>")))
+		"§3: the save does not record the bargain taken (%s) — %s" % [str(enc3.get("bargain", "<absent>")), pick_s])
 	ok(String(d3.get("pending_modifier", "")) == took,
-		"§3: the save does not carry the armed modifier (%s)" % str(d3.get("pending_modifier", "<absent>")))
+		"§3: the save does not carry the armed modifier (%s) — %s" % [str(d3.get("pending_modifier", "<absent>")), pick_s])
 	await _fight_until_hurt(current_scene, hp_at_step)
-	ok(_is_battle(current_scene) and not bool(current_scene.get("battle_over")), "§3: the fight ended before the quit could be made inside it")
+	ok(_is_battle(current_scene) and not bool(current_scene.get("battle_over")), "§3: the fight ended before the quit could be made inside it — %s" % pick_s)
 	await _quit(true)
 	var left3 := _disk_hp()
 	landed = await _continue()
 	ok(landed == "Battle", "§3: Continue opened %s, not the elite's fight" % landed)
 	ok(landed != "Offer", "§3: Continue opened the OFFER again — the terms of one fight could be chosen twice")
 	ok(String(_run.pending_modifier) == took, "§3: the resumed fight is not under the bargain taken ('%s', took '%s')" % [String(_run.pending_modifier), took])
-	ok(Dictionary(_run.pending_reward) == took_reward, "§3: the resumed fight does not owe the bargain's reward")
+	ok(Dictionary(_run.pending_reward) == took_reward, "§3: the resumed fight does not owe the bargain's reward — %s" % pick_s)
 	ok(_kinds(current_scene) == warband, "§3: the resumed fight is not the elite's warband (%s)" % str(_kinds(current_scene)))
 	# BATCH GH — THE PARTY COMES BACK AS THE QUIT LEFT IT, NOT AS IT STEPPED ON. It
 	# asked for the health at the step until GH, which is the free retry the ruling
 	# closes. THE PAIR: the health the quit left, and never the step's; and the
 	# precondition that a loss reached the save, or both read the same.
-	ok(left3 != hp_at_step, "§3: no loss had reached the save when the quit was made — the carry cannot be read (%s)" % str(left3))
+	ok(left3 != hp_at_step, "§3: no loss had reached the save when the quit was made — the carry cannot be read (%s) — %s" % [str(left3), pick_s])
 	ok(_loaded_hp == left3, "§3: the resumed party's health is %s, not the %s the quit left on disk" % [str(_loaded_hp), str(left3)])
 	ok(_loaded_hp != hp_at_step, "§3: the quit handed back the health the fight took (%s) — the free retry the ruling closes" % str(hp_at_step))
 

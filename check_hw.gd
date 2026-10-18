@@ -420,8 +420,14 @@ func _s2_the_merchant() -> void:
 	for sev in _run.REWARDS:
 		kinds[int(sev)] = (_run.REWARDS[sev] as Array).map(func(r): return String(r.get("kind", "")))
 	print("    the reward table: %s" % str(kinds))
-	ok((kinds[1] as Array).has("shop") and (kinds[1] as Array).has("gold"),
-		"§2: severity 1 does not pay its gold or the merchant: %s" % str(kinds[1]))
+	# BATCH IN §2 RE-POINTED THIS ROW: the merchant is no severity's row since IN — `rewards_for` puts it behind the gold of
+	# the rung's mildest dealt severity, which on Wanderer (and Warden) is 1, so HW's easy fight still pays it there.
+	var was_d := String(_run.difficulty)
+	_run.difficulty = "wanderer"
+	var k1: Array = (_run.rewards_for(1) as Array).map(func(r): return String(r.get("kind", "")))
+	_run.difficulty = was_d
+	ok(k1.has("shop") and k1.has("gold") and not (kinds[1] as Array).has("shop"),
+		"§2: on Wanderer severity 1 does not pay its gold or the merchant (%s), or the table's own row holds it (%s)" % [str(k1), str(kinds[1])])
 	ok(not (kinds[4] as Array).has("shop") and (kinds[4] as Array).has("gold") and (kinds[4] as Array).has("rune"),
 		"§2: severity 4 does not pay exactly its gold or a rune: %s" % str(kinds[4]))
 	for sev2 in [2, 3, 4]:
@@ -435,6 +441,8 @@ func _s2_the_merchant() -> void:
 			_run.slot_idx = int(col[1])
 			seed(SEED + int(col[1]) + 100 * int(col[0]) + rung.length())
 			var key := "%s z%d c%d" % [rung, int(col[0]) + 1, int(col[1]) + 1]
+			# BATCH IN §2 — *an easy fight* is the rung's mildest dealt severity (1 on Wanderer and Warden, 3 on Ruin).
+			var mild: int = _run.mildest_dealt_severity()
 			var c := {"shop": 0, "shop_not_sev1": 0, "sev1": 0, "sev1_gold": 0}
 			for _k in OFFER_ROLLS:
 				for opt in _run.roll_offer():
@@ -442,9 +450,9 @@ func _s2_the_merchant() -> void:
 					var kind := String((opt["reward"] as Dictionary).get("kind", ""))
 					if kind == "shop":
 						c["shop"] += 1
-						if sev3 != 1:
+						if sev3 != mild:
 							c["shop_not_sev1"] += 1
-					if sev3 == 1:
+					if sev3 == mild:
 						c["sev1"] += 1
 						if kind == "gold":
 							c["sev1_gold"] += 1
@@ -464,9 +472,9 @@ func _s2_the_merchant() -> void:
 			gated_pay += int(counts[key2]["sev1_gold"])
 		else:
 			open += int(counts[key2]["shop"])
-	ok(wrong == 0, "§2: a merchant came with a modifier above severity 1 (%d times)" % wrong)
+	ok(wrong == 0, "§2: a merchant came with a modifier above its rung's mildest dealt severity (%d times)" % wrong)
 	ok(gated == 0, "§2: the bargain offered a merchant in the run's first three nodes (%d)" % gated)
-	ok(gated_pay > 0, "§2: a gated severity-1 option paid no gold — the gate emptied it")
+	ok(gated_pay > 0, "§2: a gated option at its rung's mildest severity paid no gold — the gate emptied it")
 	ok(open > 0, "§2: no merchant was offered from node 4 on or in zone 2 — the reward is gone, not moved")
 	_run.pending_reward = {"kind": "shop"}
 	var paid: Dictionary = _run.claim_reward()

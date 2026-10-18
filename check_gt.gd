@@ -450,7 +450,9 @@ func _s1_the_pouch() -> void:
 			await Gate.frames(self, 2)
 			mp._open_rune_panel(idx)
 			await Gate.frames(self, 3)
-			var label := "%s, %s" % [c[0], "the pouch empty" if ordinary == "" else "one ordinary rune"]
+			# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the ordinary rune is his class's longest; the label says which.
+			var label := "%s, %s" % [c[0], "the pouch empty" if ordinary == "" \
+				else "one ordinary rune (%s, his class's longest)" % String(Runes.config(_longest_ordinary(String(c[1]))).get("name", "?"))]
 			var ov: Node = Gate.overlay(mp, 60)
 			var close: Button = _button(ov, "Close") if ov != null else null
 			ok(close != null, "§1: %s — the pouch drew no Close button" % label)
@@ -661,7 +663,12 @@ func _s1_a_bag_of_twenty(mp: Node, pinned: Rect2, slots_n: int) -> void:
 		await Gate.frames(self, 2)
 		mp._open_rune_panel(idx)
 		await Gate.frames(self, 3)
-		var label := "the %s holding %d of his class's runes, %d slotted" % [key, bagged.size(), slots_n]
+		# BATCH IN §4 — THE PICK, NAMED (IM §0.8): every line below carries the label, and the label names the
+		# runes this arm ranked longest by their authored words — the three worn and the ordinary ones held — and
+		# the other class's two in the bag.
+		var label := "the %s holding %d of his class's runes, %d slotted (longest worn %s; held %s; the %s's in the bag %s)" % [
+			key, bagged.size(), slots_n, str(worn.map(func(x): return String(x["name"]))),
+			str(held_o.map(func(x): return String(x["name"]))), other_key, str(others.map(func(x): return String(x["name"])))]
 		ok(_run.held_count(_run.party[idx]) == int(_run.HERO_HOLD_CAP) and _run.holding_full(_run.party[idx])
 				and not others.is_empty(),
 			"§1: %s — his holding is not full (%d), or the bag holds no other class's rune (%d) for the stray arm to find" % [
@@ -752,6 +759,9 @@ func _s2_the_peddler() -> void:
 		var offers: Array = []
 		for i in 4:
 			offers.append({"member_idx": i, "rune": Runes.build(String(deal[1][i]))})
+		# BATCH IN §4 — THE PICK, NAMED (IM §0.8): every line below names the deal by the four runes this arm ranked
+		# by their words, a seat each, where it named the deal by its rule alone.
+		var dl := "%s (%s)" % [deal[0], ", ".join(PackedStringArray(offers.map(func(o): return String(o["rune"]["name"]))))]
 		shop.offers = offers
 		# The four offers alone: a seat the roll found nothing for would add its
 		# sentence under them, which is a different deal from the one measured.
@@ -761,15 +771,15 @@ func _s2_the_peddler() -> void:
 		await Gate.frames(self, 4)
 		var sc: ScrollContainer = _scroll_holding(shop, "Buy — ")
 		var leave: Button = _button(shop, "Leave the Shop")
-		ok(sc != null and leave != null, "§2: %s — no rune scroller (%s) or no Leave button (%s)" % [deal[0], sc, leave])
+		ok(sc != null and leave != null, "§2: %s — no rune scroller (%s) or no Leave button (%s)" % [dl, sc, leave])
 		if sc == null or leave == null:
 			continue
 		var sr := sc.get_global_rect()
 		var lr := leave.get_global_rect()
-		ok(not _inside_scroll(leave), "§2: %s — Leave is inside a scroller" % deal[0])
-		ok(lr.end.y <= 720.0 and lr.position.y >= 0.0, "§2: %s — Leave is off the screen (%s)" % [deal[0], str(lr)])
+		ok(not _inside_scroll(leave), "§2: %s — Leave is inside a scroller" % dl)
+		ok(lr.end.y <= 720.0 and lr.position.y >= 0.0, "§2: %s — Leave is off the screen (%s)" % [dl, str(lr)])
 		ok(sr.end.y <= lr.position.y and sr.end.y <= 720.0 and sr.end.x <= 1280.0,
-			"§2: %s — the rune column (%s) runs under Leave (%s) or off the screen" % [deal[0], str(sr), str(lr)])
+			"§2: %s — the rune column (%s) runs under Leave (%s) or off the screen" % [dl, str(sr), str(lr)])
 		var list: Control = sc.get_child(0)
 		# EVERY OFFER'S PANEL, WHEREVER IT IS DRAWN — so a column laid at a fixed
 		# pitch is read as the overlap it is, not merely as a missing scroller.
@@ -783,28 +793,28 @@ func _s2_the_peddler() -> void:
 				continue
 			for ch3 in cur.get_children():
 				stack.append(ch3)
-		ok(panels.size() == 4, "§2: %s — %d offer panels drawn for four offers" % [deal[0], panels.size()])
+		ok(panels.size() == 4, "§2: %s — %d offer panels drawn for four offers" % [dl, panels.size()])
 		for a in panels.size():
 			for b in range(a + 1, panels.size()):
 				ok(not (panels[a] as Control).get_global_rect().intersects((panels[b] as Control).get_global_rect()),
-					"§2: %s — offers %d and %d overlap" % [deal[0], a, b])
+					"§2: %s — offers %d and %d overlap" % [dl, a, b])
 		var buys := _buttons_from(shop, "Buy — ")
-		ok(buys.size() == 4, "§2: %s — %d Buy buttons" % [deal[0], buys.size()])
+		ok(buys.size() == 4, "§2: %s — %d Buy buttons" % [dl, buys.size()])
 		for bi in buys.size():
 			var bb: Button = buys[bi]
-			ok(_inside_scroll(bb), "§2: %s — Buy %d is outside the column's scroller" % [deal[0], bi])
+			ok(_inside_scroll(bb), "§2: %s — Buy %d is outside the column's scroller" % [dl, bi])
 			sc.ensure_control_visible(bb)
 			await Gate.frames(self, 2)
 			ok(sc.get_global_rect().encloses(bb.get_global_rect()),
 				"§2: %s — Buy %d cannot be scrolled wholly into view (%s in %s)" % [
-					deal[0], bi, str(bb.get_global_rect()), str(sc.get_global_rect())])
+					dl, bi, str(bb.get_global_rect()), str(sc.get_global_rect())])
 		var content_h := list.get_combined_minimum_size().y
 		var scrolls: bool = content_h > sc.size.y + 0.5
 		print("    %s: the offers stack %d px in a %d px column%s" % [deal[0], int(content_h), int(sc.size.y),
 			" — it scrolls" if scrolls else ", unscrolled"])
 		if deal[1] == ordinary:
-			ok(not scrolls, "§2: four ordinary offers — every seat's longest — no longer fit unscrolled (%d in %d)" % [
-				int(content_h), int(sc.size.y)])
+			ok(not scrolls, "§2: four ordinary offers — every seat's longest — no longer fit unscrolled (%d in %d) — %s" % [
+				int(content_h), int(sc.size.y), dl])
 		# EVERY BUY, PRESSED, BUYS ITS OWN HERO'S RUNE — the lowest first, scrolled
 		# to it, through the button.
 		for _k in 4:
@@ -817,7 +827,7 @@ func _s2_the_peddler() -> void:
 			var sc2: ScrollContainer = _scroll_holding(shop, "Buy — ")
 			var b2: Array = _buttons_from(shop, "Buy — ")
 			if sc2 == null or b2.size() != live.size():
-				ok(false, "§2: %s — %d Buy buttons for %d offers" % [deal[0], b2.size(), live.size()])
+				ok(false, "§2: %s — %d Buy buttons for %d offers" % [dl, b2.size(), live.size()])
 				break
 			sc2.ensure_control_visible(b2[last])
 			await Gate.frames(self, 2)
@@ -834,7 +844,7 @@ func _s2_the_peddler() -> void:
 			var left: Array = (shop.get("offers") as Array).map(func(o): return String(o["rune"]["id"]))
 			ok(held_ids.has(rune_id) and not _bag_ids().has(rune_id) and not left.has(rune_id),
 				"§2: %s — the Buy for %s (rolled for hero %d) did not leave it held by him, unworn (bag %s, held %s)" % [
-					deal[0], rune_id, mi, str(_bag_ids()), str(held_ids)])
+					dl, rune_id, mi, str(_bag_ids()), str(held_ids)])
 		for i2 in _run.party.size():
 			_run.party[i2]["engines"] = []
 			_run.party[i2]["runes"] = []

@@ -126,7 +126,7 @@ block stood and never a new file. II's four were struck so at IJ, each report re
 the equality rule travel with their parent. **Eight of the rows are FF §2's**, and they are the
 residue: rules written into this file AFTER the seam was taken, which the seam's own test puts on
 the other side of it. **Every row after those eight was written straight into the reference rather
-than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one, IE's two, II's two, IJ's one, IK's one and IM's three —
+than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one, IE's two, II's two, IJ's one, IK's one, IM's three and IN's one —
 and GW §2's, written there at GW and given its row only at HX (HV §3e found it missing; `check_hx` §1a now reds on one) —
 and four more are MOVED, FF §2's way: HG–HJ's census and supersession blocks, written back into this file after the seam
 was taken and sent over at HY §4 by the designer's ruling, and II §4's two, the archive practice's first pass — CP §3's
@@ -199,6 +199,7 @@ new block written here):
 | RETIRING A TRUE CLAIM IS THE SAME DEFECT AS KEEPING A FALSE ONE | IM §0.4 |
 | A FACT ABOUT A FIELD's REACH IS READ AT THE FIELD's READ SITES, NEVER AT ITS WRITES | IM §0.2 |
 | A GATE THAT SELECTS ITS SUBJECT BY A SUPERLATIVE NAMES THE SUBJECT IT PICKED | IM §0.8 |
+| A DRIVE IS A PROOF OF THE PREDICATE ONLY WHEN THE PREDICATE CHOOSES WHAT IT DRIVES | IN §0.7 |
 
 ## THE COMBAT RULES LIVE IN `docs/combat-rules.md` (STANDING, SET AT GR §2, RULED BY THE DESIGNER)
 > **THIS FILE IS STILL THE ONE A BATCH MUST READ. `docs/combat-rules.md` IS A REFERENCE IT POINTS AT,
@@ -1506,6 +1507,9 @@ than the candidates for it.** The bot's list is the other half of that question 
   would let him and a qualifier written anywhere else is one the bot cannot see. Execute's and seven cards' since IM §3b
   (`check_im` §3b walks the corpus for any other, and `check_il` §3 holds Execute's qualifier to the door, the button, the
   pool and the hover). A card the bot could aim nowhere is skipped, never cast at a body the player could not choose.
+  **And the bot pays the price the door charges (IN §3)**: every arm of the rotation and the enemy's three choices test
+  `_eff_cost`, never a card's list price, so under Warded the bot never picks a card the door would not let him pay
+  (`check_in` §3 drives every lineage at every resource level).
   · **A PICK THAT CAN PRODUCE NOTHING IS REFUSED WITH A REASON. A PICK THAT PRODUCES LESS IS OFFERED (IL §0.7, the
     designer's; built at IM §3b).** `battle._pick_dud` says why a body would produce nothing — each arm asks what its
     handler asks — and `_enemy_pick_pool` offers the rest. **Firedraw, Transference and Cryoclasm** move a thing onto the
@@ -1860,10 +1864,18 @@ decision and the STRUCTURE is what shipped.
   dealt from and the band its gambles are (`safe_band`, `gamble_band`; IM §1), so the guaranteed
   mild option may be severity 3.
 · **rung 3 Ruin x1.30** — **no mild option at all** (its safe slot is dealt from severity 3–4, its
-  gambles from 4; IM §1 — one field split the table until then, and at Ruin it saturated, so the
+  gambles from 5; IM §1 — one field split the table until then, and at Ruin it saturated, so the
   hardest rung dealt the mildest bargains), plus **FIXED ENCOUNTERS CARRY A MODIFIER**
   (`Run.arm_fixed_modifier`, armed at BOTH walk sites): the mini-boss and every boss, the nodes
-  a route cannot duck. It is NOT a bargain — no offer, no choice, NO REWARD.
+  a route cannot duck. It is NOT a bargain — no offer, no choice, NO REWARD — **and it draws from
+  `Run.FIXED_MODIFIER_BAND`, the eight of severity 3–4, never from severity 5 (IN §1)**: a severity-5
+  modifier is priced with a reward a fixed encounter never pays.
+· **SEVERITY 5 IS RUIN's ALONE, AND NONE OF ITS MODIFIERS ZEROES A CLASS's KIT (IN §1, the designer's).**
+  No other rung's band reaches it, so a severity-5 modifier is one Wanderer and Warden are never offered —
+  `check_in` §1 asserts that over the data, not only through the means. **A modifier that makes one hero's
+  whole hand dead is not harsh, it is unplayable, and that is the line severity 5 does not cross**: one
+  sentence, one system each. **And the four bind ONE side** (the road leaning on the heroes) where the
+  twenty bind both — AQ's binds-both-parties shape holds for the twenty and is not severity 5's.
 **THE END BOSS is a 17th slot on the FINAL ZONE'S BOARD, so a run is 49 encounters** (BK settled
 on 48). `END_BOSS_SLOT` / `END_BOSS_KIND` / `total_slots()`. It is **FIXED, not composed** (the
 one node whose lineup does not come out of the budget system), so it can be learned, and it
@@ -3922,8 +3934,11 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
 - **THE BARGAIN'S BOUGHT MERCHANT IS GATED AT THE SAME NODES (HS §0, ruled)**: a player who traded a bargain's gold FOR a
   merchant is the lowest-gold case in the game, and a merchant he cannot shop at is no reward. `Run.roll_offer` drops the
   merchant from a severity's rewards there, so the option still comes and pays from what is left. **The merchant is an
-  easy fight's reward (HW §2, ruled)**: severity 1 pays its 40 gold or the merchant — at a gated elite, the gold — and
-  severity 4 pays its gold or a rune everywhere.
+  easy fight's reward (HW §2, ruled)** — **AND THE MERCHANT IS THE REWARD OF A RUNG's MILDEST DEALT SEVERITY, NOT OF
+  SEVERITY 1 ABSOLUTELY (IN §2, the designer's)**: pinned to 1, it left Ruin — whose bands never deal a 1 — the one rung
+  with no bought merchant, though it pays the most gold. It is no severity's row of `Run.REWARDS`; `Run.rewards_for`
+  puts `MERCHANT_REWARD` behind the gold of the severity `Run.mildest_dealt_severity` reads off the rung's bands (1 on
+  Wanderer and Warden, 3 on Ruin), never off the rung's name — at a gated elite, that severity's own reward.
 
 ## STANDING RULE — THE PARTY SCOPE, AND THE RUNES IT HOLDS; ITS SCREEN WORD IS THE CREST (Batch HK §4, ruled by the designer; the word confirmed in HL's brief; the runes HO §3's and HP §2's)
 

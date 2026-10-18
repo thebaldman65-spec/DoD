@@ -677,7 +677,13 @@ func _s2_momentum() -> void:
 		if cand != null and cand.delay > 0.0:
 			ab2 = cand
 			break
-	ok(ab2 != null, "§2h: the Berserker holds a card with a delay to schedule")
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the card driven is the FIRST of his bar, in
+	# kit order, with a delay, so a card added, moved or re-timed re-selects it; every
+	# line about the drive says which card it drove.
+	var pick_s := "the first Berserker card with a delay, in kit order: %s" % (
+		("%s (delay %.2f)" % [ab2.display_name, ab2.delay]) if ab2 != null
+		else ("none of %d" % bz.abilities.size()))
+	ok(ab2 != null, "§2h: the Berserker holds a card with a delay to schedule — %s" % pick_s)
 	if ab2 != null:
 		var foe2: BattleUnit = scene.get("enemies")[0]
 		foe2.max_hp = 500000
@@ -692,13 +698,13 @@ func _s2_momentum() -> void:
 		var ratio := fast_delta / maxf(slow_delta, 0.0001)
 		print("  §2h: %s — next turn scheduled %.4f later with an empty engine, %.4f with a full one (x%.4f)"
 			% [ab2.display_name, slow_delta, fast_delta, ratio])
-		ok(slow_delta > 0.0, "§2h: the control cast pushed his next turn out by %.4f" % slow_delta)
+		ok(slow_delta > 0.0, "§2h: the control cast pushed his next turn out by %.4f — %s" % [slow_delta, pick_s])
 		ok(fast_delta < slow_delta,
-			"§2h: a full meter brings it in to %.4f — the payout reaches the timeline" % fast_delta)
+			"§2h: a full meter brings it in to %.4f — the payout reaches the timeline — %s" % [fast_delta, pick_s])
 		ok(absf(ratio - (1.0 - BattleUnit.MOMENTUM_MAX_STEPS
 				* BattleUnit.MOMENTUM_STEP_HASTE)) < 0.001,
-			"§2h: ...and the LIVE delta is exactly the multiplier, x%.4f — one write site, not two"
-				% ratio)
+			"§2h: ...and the LIVE delta is exactly the multiplier, x%.4f — one write site, not two — %s"
+				% [ratio, pick_s])
 
 	# (g) ONE FUNCTION, THREE READ SITES, AND `effective_speed` UNTOUCHED. A
 	# second writer of turn order is a second set of rules for one question, so

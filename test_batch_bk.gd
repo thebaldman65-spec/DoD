@@ -378,19 +378,26 @@ func _section_blacksmith(rsrc: String) -> void:
 	ok(buy_at >= 0,
 		"§3: no pairing on the counter has a type that fits another card — the once-per-run arm below has nothing to ask (%s)" % [offer])
 	var bought: Dictionary = offer[maxi(buy_at, 0)]
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the pairing bought is the first on the
+	# unseeded counter whose type fits another card; every line below about the
+	# purchase names it, and the place it held on the counter.
+	var bought_pick := "the pairing bought, %s on %s (hero %d) — %s" % [String(bought.get("id", "?")),
+		String(bought.get("ability", "?")), int(bought.get("member_idx", -1)),
+		("the first of the counter's %d whose type fits another card, at place %d" % [offer.size(), buy_at + 1]) if buy_at >= 0
+			else "the counter's first, since none of its %d has a type that fits another card" % offer.size()]
 	# The purchase: gold out, upgrade onto the member's own list, and the
 	# ◆ badge the map card reads comes off that same list.
 	run.gold = 500
 	var buyer: Dictionary = run.party[int(bought["member_idx"])]
 	var before: int = buyer.get("upgrades", []).size()
-	ok(run.buy_blacksmith(bought), "§3: the purchase clears at 500 gold")
-	ok(run.gold == 350, "§3: 150 gold deducted (%d left)" % run.gold)
+	ok(run.buy_blacksmith(bought), "§3: the purchase clears at 500 gold — %s" % bought_pick)
+	ok(run.gold == 350, "§3: 150 gold deducted (%d left) — %s" % [run.gold, bought_pick])
 	ok(buyer.get("upgrades", []).size() == before + 1,
-		"§3: the upgrade lands on the hero's own `upgrades` list — the same one the mini-boss pick writes")
+		"§3: the upgrade lands on the hero's own `upgrades` list — the same one the mini-boss pick writes — %s" % bought_pick)
 	var landed: Dictionary = buyer["upgrades"][before]
 	ok(String(landed["id"]) == String(bought["id"])
 		and String(landed["ability"]) == String(bought["ability"]),
-		"§3: ...and it is the pairing that was bought")
+		"§3: ...and it is the pairing that was bought — %s" % bought_pick)
 
 	# AP'S ONCE-PER-RUN RULE IS NOT CONSULTED. That rule governs the MINI-BOSS
 	# PICK POOL; a blacksmith is not that pool. Buying Honed here must leave
@@ -403,7 +410,7 @@ func _section_blacksmith(rsrc: String) -> void:
 					and String(p3["ability"]) != String(landed["ability"]):
 				still_offered = true
 	ok(still_offered,
-		"§3: the same upgrade type is still offered on a DIFFERENT ability — AP's once-per-run rule does not reach the blacksmith")
+		"§3: the same upgrade type is still offered on a DIFFERENT ability — AP's once-per-run rule does not reach the blacksmith — %s" % bought_pick)
 	# ...but NEVER TWICE ON ONE ABILITY.
 	var repeat := 0
 	for trial3 in 300:
@@ -412,7 +419,7 @@ func _section_blacksmith(rsrc: String) -> void:
 					and String(p4["ability"]) == String(landed["ability"]):
 				repeat += 1
 	ok(repeat == 0,
-		"§3: the same upgrade is never re-offered on the ability that already carries it (%d times)" % repeat)
+		"§3: the same upgrade is never re-offered on the ability that already carries it (%d times) — %s" % [repeat, bought_pick])
 
 	# THE SUBTLER HALF OF §9's LAST NEGATIVE CONTROL. The blacksmith writes
 	# into the same `upgrades` list the mini-boss pick writes, and
@@ -421,19 +428,19 @@ func _section_blacksmith(rsrc: String) -> void:
 	# this hero's mini-boss offers for the rest of the run. They share a LIST,
 	# not a POOL, and this is the check that says which.
 	ok(not run.has_upgrade(buyer, bought_id),
-		"§3: has_upgrade SKIPS a bought upgrade — AP's once-per-run pool is untouched by a purchase")
+		"§3: has_upgrade SKIPS a bought upgrade — AP's once-per-run pool is untouched by a purchase — %s" % bought_pick)
 	var mini_can_still_offer := false
 	for trial4 in 200:
 		for cand in run.roll_upgrade_offer(buyer):
 			if String(cand["id"]) == bought_id:
 				mini_can_still_offer = true
 	ok(mini_can_still_offer,
-		"§3: ...and the mini-boss can still award the upgrade the party bought")
+		"§3: ...and the mini-boss can still award the upgrade the party bought — %s" % bought_pick)
 	var landed_names := PackedStringArray()
 	for up in buyer["upgrades"]:
 		landed_names.append(Run_upgrade_key(up))
 	ok(landed_names.size() == before + 1,
-		"§3: one list, one entry — a bought upgrade is not filed somewhere else")
+		"§3: one list, one entry — a bought upgrade is not filed somewhere else — %s" % bought_pick)
 
 	ok(rsrc.contains("func roll_blacksmith_offer") and rsrc.contains("func buy_blacksmith"),
 		"§3: the blacksmith lives in run_state beside the system it sells")

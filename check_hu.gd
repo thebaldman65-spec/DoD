@@ -289,6 +289,10 @@ func _s1_the_bar_pages() -> void:
 		"§1a: page one is not exactly the keyed rows — %d of its %d rows keyed, the next row's key '%s'" % [
 			keyed, page, String(probe._hotkey_name(page + 1))])
 	var widest := _widest_normal_menu()
+	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the walk's widest normal menu, the first of its width in class,
+	# lineage and core-rune order; every §1b line about the bar built to match it names it.
+	var widest_pick := "the walk's widest normal menu, %d entries (%s), the first of that width in class, lineage and core-rune order" % [
+		int(widest.get("entries", 0)), String(widest.get("what", ""))]
 	print("    the widest menu in normal play: %d entries (%s), over %d shapes; a page and the basic hold %d" % [
 		int(widest["entries"]), widest["what"], int(widest["shapes"]), page + 1])
 	ok(int(widest["shapes"]) >= 100, "§1a: the ceiling walk read %d hero shapes" % int(widest["shapes"]))
@@ -321,10 +325,10 @@ func _s1_the_bar_pages() -> void:
 			c_unkeyed += 1
 	print("    the ceiling bar on the real scene: %d entries, %d rows" % [c_entries.size(), c_rows.size()])
 	ok(c_entries.size() == int(widest["entries"]),
-		"§1b: the constructed ceiling bar raised %d entries, the walk's widest is %d" % [c_entries.size(), int(widest["entries"])])
-	ok(_pager(ceiling) == null, "§1b: the widest normal bar (%d entries) built a pager" % c_entries.size())
-	ok(c_off == 0, "§1b: %d of the widest normal bar's rows sit above the screen" % c_off)
-	ok(c_unkeyed == 0, "§1b: %d of the widest normal bar's rows have no key" % c_unkeyed)
+		"§1b: the constructed ceiling bar raised %d entries, the walk's widest is %d — %s" % [c_entries.size(), int(widest["entries"]), widest_pick])
+	ok(_pager(ceiling) == null, "§1b: the widest normal bar (%d entries) built a pager — %s" % [c_entries.size(), widest_pick])
+	ok(c_off == 0, "§1b: %d of the widest normal bar's rows sit above the screen — %s" % [c_off, widest_pick])
+	ok(c_unkeyed == 0, "§1b: %d of the widest normal bar's rows have no key — %s" % [c_unkeyed, widest_pick])
 	await _clear(ceiling)
 	# §1c — unlock-all overflows, and the list pages.
 	_run.debug_grant_all = true
