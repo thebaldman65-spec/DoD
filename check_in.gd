@@ -9,7 +9,9 @@
 #        reward row is one step further on the table's own growing slope; the fixed encounters keep severity 3–4. Each
 #        re-cut door is DRIVEN both ways — Wasting's tick at every unit's turn's end through the tick door, the Hungering
 #        Dark's feed at BL's one damage door — the two removed doors are asserted gone where they acted, and the texts
-#        and the rung texts are read against the band.
+#        and the rung texts are read against the band. **RE-POINTED AGAIN AT IP**: the Hungering Dark is REMOVED (IP §1a —
+#        two-sidedness did not make it even), so §1g asserts it gone where it acted, as §1e and §1h assert Famine and Cruel
+#        Order; and severity 5 is the cliff, three deep (IP §1b), so the counts read 6 / 6 / 4 / 4 / 3.
 #   §2   THE MERCHANT IS THE REWARD OF A RUNG's MILDEST DEALT SEVERITY: no row of the table holds it; `rewards_for` puts
 #        it beside the gold of the one severity `mildest_dealt_severity` names, read off the bands and never the rung's
 #        name; Wanderer's and Warden's merchants dealt as IM dealt them, Ruin's at its mildest and nowhere else, and none
@@ -39,12 +41,14 @@ var _strip := {}
 
 # §1 — IN's four, by id: [name, the constant its figure is read off ("" for none)]. RE-POINTED AT IO §1: Famine and Cruel
 # Order are REMOVED (AQ's rule — a modifier that binds one side is a difficulty slider), so they are asserted gone; Wasting
-# and the Dark stay, bound to both sides, at whatever grade IO's measurement gave them.
-const FOUR := {"wasting": ["Wasting", "WASTING_PCT"], "hungering_dark": ["The Hungering Dark", "HUNGERING_DARK_PCT"]}
-const REMOVED := {"famine": "Famine", "cruel_order": "Cruel Order"}
+# and the Dark stay, bound to both sides, at whatever grade IO's measurement gave them. RE-POINTED AT IP §1a: the Dark is
+# REMOVED too (two-sidedness did not make it even), so Wasting is the one of IN's four that stands.
+const FOUR := {"wasting": ["Wasting", "WASTING_PCT"]}
+const REMOVED := {"famine": "Famine", "cruel_order": "Cruel Order", "hungering_dark": "The Hungering Dark"}
 # §1 — the grade counts the bands are built on. IN's *no existing modifier's severity moves* (its brief §6) held for IN; IO §2
-# re-graded the deck by measurement, at these counts, which do not change (IO's brief §2, constraint 1).
-const GRADE_COUNTS := {1: 6, 2: 6, 3: 4, 4: 4, 5: 4}
+# re-graded the deck by measurement, at these counts (IO's brief §2, constraint 1) — and IP §1b cut the top at the cliff the
+# measurement shows, three deep, the counts below it the table's own.
+const GRADE_COUNTS := {1: 6, 2: 6, 3: 4, 4: 4, 5: 3}
 
 
 func ok(cond: bool, what: String) -> void:
@@ -180,13 +184,13 @@ func _im_offer(floor_sev: int) -> Array:
 # ── §1a — THE TABLE AND THE BAND ────────────────────────────────────────────
 
 func _s1a_the_table() -> void:
-	print("\n§1a — four modifiers at severity 5, and Ruin's gambles dealt from 5 alone")
+	print("\n§1a — the severity-5 modifiers, and Ruin's gambles dealt from 5 alone")
 	for id in FOUR:
 		var cfg: Dictionary = (_run.MODIFIERS as Dictionary).get(id, {})
 		ok(int(cfg.get("severity", 0)) >= 1 and String(cfg.get("name", "")) == String(FOUR[id][0]) and String(cfg.get("desc", "")) != "",
 			"§1a: `%s` is not a modifier named %s with a rule and a grade (%s)" % [id, FOUR[id][0], str(cfg)])
 	for id1 in REMOVED:
-		ok(not (_run.MODIFIERS as Dictionary).has(id1), "§1a: `%s` (%s) is still in the deck — IO §1 removed it" % [id1, REMOVED[id1]])
+		ok(not (_run.MODIFIERS as Dictionary).has(id1), "§1a: `%s` (%s) is still in the deck — it was removed (IO §1, IP §1a)" % [id1, REMOVED[id1]])
 	var counts := {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
 	for id2 in _run.MODIFIERS:
 		var sv0 := int(_run.modifier_severity(String(id2)))
@@ -359,7 +363,8 @@ func _s1e_famine() -> void:
 		s.call("_close_item_picker")
 		if not (lit and opened):
 			sealed.append("'%s' (button %s, picker %s)" % [mid, lit, opened])
-	ok(sealed.is_empty() and ids.size() == 25, "§1e: the pouch was sealed under %s of %d fights' terms" % [str(sealed), ids.size()])
+	ok(sealed.is_empty() and ids.size() == (_run.MODIFIERS as Dictionary).size() + 1 and ids.size() >= 20,
+		"§1e: the pouch was sealed under %s of %d fights' terms" % [str(sealed), ids.size()])
 	var b := _src("scripts/battle.gd")
 	ok(not b.contains("_pouch_sealed") and not b.contains("\"famine\""), "§1e: Famine's door is still in `battle.gd`")
 	# THE USE PATH asks the stock and the turn's one item, nothing about the fight's terms (it awaits a target pick for a
@@ -428,10 +433,14 @@ func _s1f_wasting() -> void:
 	await _clear(s)
 
 
-# ── §1g — THE HUNGERING DARK: EVERY ENEMY HEALS A SHARE OF THE DAMAGE IT DEALS ──
-
+# ── §1g — THE HUNGERING DARK — RE-POINTED AT IP §1a: IT IS REMOVED, AND NO DEALER IS FED ──
+#
+# IN built the Dark to feed the warband; IO fed both sides; IP removed it — two-sidedness did not make it even, the heroes
+# dealing about six times what a warband does. The arms are IN's, re-pointed as §1e's and §1h's were for the two IO removed:
+# under the id a pre-IP save can carry, no dealer on either side is fed, a tick feeds nobody, and the door is gone where it
+# acted — BL's damage door calls no feed, and the heal door takes no third parameter.
 func _s1g_the_hungering_dark() -> void:
-	print("\n§1g — the Hungering Dark: whoever deals damage is fed its share (both sides since IO §1), at BL's one damage door")
+	print("\n§1g — the Hungering Dark is removed (IP §1a): under its id no dealer is fed, and its doors are gone")
 	var s: Node = await _board(["warden", "pyromancer", "holy", "mystic"], {})
 	var h := _hero(s, "warrior") if s != null else null
 	var foes := _foes(s) if s != null else []
@@ -443,43 +452,26 @@ func _s1g_the_hungering_dark() -> void:
 	e.max_hp = 1000
 	h.max_hp = 5000
 	h.armor = 0.0
-	var arms := [["", e, false], ["hungering_dark", e, true], ["hungering_dark", h, false]]
-	for arm in arms:
+	# [the fight's terms, the dealer]: no modifier, and the removed id under an enemy dealer and a hero dealer.
+	for arm in [["", e], ["hungering_dark", e], ["hungering_dark", h]]:
 		e.hp = 500
 		h.hp = 4000
 		_run.pending_modifier = String(arm[0])
-		s.call("_dmg_frame", arm[1], "probe")
-		var before := h.hp
-		h.take_tick_damage(200, "-200", Color.WHITE)
-		var lost := before - h.hp
-		var fed := e.hp - 500
-		var want := int(round(lost * float(_run.HUNGERING_DARK_PCT))) if bool(arm[2]) else 0
-		ok(lost > 0 and fed == want, "§1g: modifier '%s', dealer %s: the hero lost %d and the enemy healed %d — want %d" % [
-			arm[0], (arm[1] as BattleUnit).unit_name, lost, fed, want])
-	# A HERO WHO DEALS THE BLOW IS FED TOO, SINCE IO §1 (AQ's rule — IN's Dark fed the warband alone, and control C08 found
-	# the arms above never set a hero as the dealer of a blow on an enemy). The arm IN wrote to read a hero NOT fed is
-	# re-pointed to read him fed his share.
-	e.hp = 900
-	h.hp = 3000
-	_run.pending_modifier = "hungering_dark"
-	s.call("_dmg_frame", h, "probe")
-	var e_was := e.hp
-	e.take_tick_damage(200, "-200", Color.WHITE)
-	var h_want := int(round((e_was - e.hp) * float(_run.HUNGERING_DARK_PCT)))
-	ok(e.hp < e_was and h.hp == 3000 + h_want, "§1g: %s dealt %d to an enemy under the Dark and was fed %d — want %d (both sides since IO §1)" % [
-		h.unit_name, e_was - e.hp, h.hp - 3000, h_want])
-	# A HEAL REFUSED IS REFUSED: Caught Fast on the dealer.
-	e.hp = 500
-	_run.pending_modifier = "hungering_dark"
-	s.call("_apply_status", e, "caught", 2)
-	s.call("_dmg_frame", e, "probe")
-	h.take_tick_damage(200, "-200", Color.WHITE)
-	ok(e.hp == 500, "§1g: a Caught Fast enemy was fed %d — the heal door's refusals bind the feed" % (e.hp - 500))
+		var dealer: BattleUnit = arm[1]
+		var victim: BattleUnit = h if dealer == e else e
+		s.call("_dmg_frame", dealer, "probe")
+		var d_before := dealer.hp
+		var v_before := victim.hp
+		victim.take_tick_damage(200, "-200", Color.WHITE)
+		ok(v_before > victim.hp and dealer.hp == d_before, "§1g: terms '%s', %s dealing %d to %s was fed %d — want none" % [
+			arm[0], dealer.unit_name, v_before - victim.hp, victim.unit_name, dealer.hp - d_before])
+	ok(not (_run.MODIFIERS as Dictionary).has("hungering_dark") and _run.get("HUNGERING_DARK_PCT") == null,
+		"§1g: the Dark's row or its constant still stands")
 	s.call("_dmg_frame", null, "")
-	ok(_body("scripts/battle.gd", "_on_damage_taken").contains("_dark_feeds(victim, lost)")
-			and _body("scripts/battle.gd", "_dark_feeds").contains("heal_amount("),
-		"§1g: the feed is not at BL's door, or does not heal through `heal_amount`")
-	s.call("_dmg_frame", null, "")
+	ok(not _body("scripts/battle.gd", "_on_damage_taken").contains("_dark_feeds(") and _body("scripts/battle.gd", "_dark_feeds") == ""
+			and _src("scripts/unit.gd").contains("func heal_amount(amount: int, external := false) -> int:"),
+		"§1g: the feed is still at BL's door, or the heal door still takes the Dark's third parameter")
+	_run.pending_modifier = ""
 	await _clear(s)
 
 
@@ -519,7 +511,7 @@ func _s1h_cruel_order() -> void:
 # ── §1i — THE WORDS ─────────────────────────────────────────────────────────
 
 func _s1i_the_words() -> void:
-	print("\n§1i — the four texts, and the rung texts read against the band")
+	print("\n§1i — the text of IN's four that stands, and the rung texts read against the band")
 	for id in FOUR:
 		var desc := String((_run.MODIFIERS[id] as Dictionary)["desc"])
 		var konst := String(FOUR[id][1])

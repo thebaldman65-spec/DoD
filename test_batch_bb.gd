@@ -551,14 +551,15 @@ func _rot_pool() -> void:
 	ok(String(run.MODIFIERS["rot"]["desc"]).contains("halved"),
 		"§5: ...and its text says what it does")
 	# BATCH IN §1 RE-POINTED IN PLACE: severity 5 holds Ruin's four beside the twenty, so the pool is twenty-four and the
-	# tally reads a fifth severity.
+	# tally reads a fifth severity. RE-POINTED AGAIN AT IP §1: the Hungering Dark is removed and severity 5 is the cliff,
+	# three deep, so the pool is twenty-three and severity 5 holds three.
 	var by_sev := {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
 	for mid in run.MODIFIERS:
 		by_sev[run.modifier_severity(String(mid))] += 1
 	ok(by_sev[4] == 4,
 		"§5: THE SEVERITY-4 POOL IS FOUR — AQ's stated target (got %d)" % by_sev[4])
-	ok(run.MODIFIERS.size() == 24 and by_sev[5] == 4,
-		"§5: twenty-four modifiers — the twenty and Ruin's four at severity 5 (got %d, %d at 5)" % [run.MODIFIERS.size(), by_sev[5]])
+	ok(run.MODIFIERS.size() == 23 and by_sev[5] == 3,
+		"§5: twenty-three modifiers — the twenty and Ruin's three at severity 5 (got %d, %d at 5)" % [run.MODIFIERS.size(), by_sev[5]])
 	# The floor still holds by construction with a bigger high pool.
 	var misses := 0
 	for _i in 400:

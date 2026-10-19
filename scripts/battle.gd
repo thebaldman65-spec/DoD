@@ -2288,11 +2288,10 @@ func _stamp_modifier(u: BattleUnit, mod_id: String, inherited := false) -> void:
 			else:
 				var ls_basic := _cheapest_attack(u)
 				u.silence_basic = ls_basic.display_name if ls_basic != null else ""
-		# BATCH IN §1, re-cut at IO §1 — WASTING AND THE HUNGERING DARK STAMP NOTHING ON A
-		# UNIT. Each binds both sides through one door of the battle, which asks
-		# `_modifier_is` where it acts: the end of a turn (`_wasting_tick`) and BL's damage
-		# door (`_dark_feeds`). Listed so the table's every id has its arm here.
-		"wasting", "hungering_dark":
+		# BATCH IN §1, re-cut at IO §1 — WASTING STAMPS NOTHING ON A UNIT. It binds both
+		# sides through one door of the battle, which asks `_modifier_is` where it acts:
+		# the end of a turn (`_wasting_tick`). Listed so the table's every id has its arm here.
+		"wasting":
 			pass
 
 
@@ -4395,11 +4394,15 @@ func _player_turn(u: BattleUnit) -> void:
 	# carried Health Potion before any other action — nothing cleverer, so
 	# the effect stays attributable. Run sims only (RunSim.items_on):
 	# standalone and sweep battles stay dry to keep the R/S baselines.
+	# BATCH IP §2 — AND THE POTION IT DRINKS IS THE PLAYER's: `Run.health_potion_heal` of its own maximum
+	# (CT §6), read where the player's use path reads it. The bot drank a flat 40 from CT to IP — another
+	# potion than the one the game has, so every measurement that turns on healing measured that one.
+	# The POLICY (below 35%, before acting) is the bot's and unchanged; the potion is the game's.
 	if autoplay and RunSim.active and RunSim.items_on and not u.is_companion \
 			and u.hp < u.max_hp * 0.35 and int(items["health"][1]) > 0:
 		items["health"][1] -= 1
 		item_used = true
-		var drank: int = u.heal_amount(40, true)
+		var drank: int = u.heal_amount(Run.health_potion_heal(u.max_hp), true)
 		u.float_text("+%d" % drank, Color(0.4, 0.9, 0.45))
 		_log("Item: Health Potion — %s +%d HP (bot)" % [u.unit_name, drank],
 			"#e0c060")
@@ -30860,9 +30863,6 @@ func _on_damage_taken(victim: BattleUnit, lost: int, hp_before: int) -> void:
 			_log("† %s dies" % pn_owed.unit_name, "#e05050")
 		_dmg_frame(pn_was_src, pn_was_label, pn_was_name)
 		_penance_mirroring = false
-	# BATCH IN §1 — THE HUNGERING DARK READS THE DEALER, AS PENANCE DOES, AND ABOVE THE
-	# HERO GATE FOR PENANCE's REASON: whoever deals damage feeds on whoever it hits.
-	_dark_feeds(victim, lost)
 	# BATCH GO — FOUR RULE ENGINES READ DAMAGE AN ALLY DEALS TO AN ENEMY, AND THIS
 	# IS THE DOOR THAT SEES ALL OF IT: a strike, a handler's own damage, a splash, an
 	# echo and a tick arrive here alike. Above the hero gate for Frostbind's
@@ -30891,40 +30891,6 @@ func _on_damage_taken(victim: BattleUnit, lost: int, hp_before: int) -> void:
 	if sim:
 		return
 	_book_taken(victim, lost, hp_before)
-
-
-# ══ BATCH IN §1 — THE HUNGERING DARK: WHOEVER DEALS DAMAGE HEALS A SHARE OF IT — BOTH SIDES SINCE IO §1 ═══
-#
-# **It rides BL's one damage door** (`_on_damage_taken`), so every blow a unit deals — its
-# strike, its splash, its handler's own damage, on any body but its own — feeds it
-# `Run.HUNGERING_DARK_PCT` of the health that left, below every death refusal. **Both sides
-# since IO §1** (AQ's rule): a hero, a companion and an enemy are each fed what they deal.
-# **The dealer is the frame's live unit**: a damage-over-time tick runs under a frame that
-# names its layer and no unit, so a tick feeds nothing on either side; a body that deals
-# damage to itself (a recoil) is not fed by it; and a companion's blow struck inside its
-# hunter's cast feeds the hunter, whom the frame names, as every reader of the frame credits him.
-#
-# **AND THE HEAL IS NOBODY's HEALING (IO §1b)** — no unit performed it. It goes through
-# `heal_amount`, so every refusal and every multiplier a heal meets meets it (Bloodless,
-# Caught Fast, Unmaking, Miasma's halving, a Blighted body's inversion) — the player's answer
-# to it — but by its `unowned` door, which no rider reads: not the Covenant's healing half,
-# not Undying Vigil's fork, not the Last Word's re-arm, not the Vigil's Mercy. And it books
-# nothing: no `_stat_heal`, so no healing ledger, no Reprisal, no Abundance, no readout line.
-func _dark_feeds(victim: BattleUnit, lost: int) -> void:
-	if lost <= 0 or victim == null or not _modifier_is("hungering_dark"):
-		return
-	var dk: BattleUnit = _dmg_src
-	if dk == null or not is_instance_valid(dk) or dk.dead or dk == victim:
-		return
-	var dk_amt := int(round(lost * Run.HUNGERING_DARK_PCT))
-	if dk_amt <= 0:
-		return
-	var dk_got: int = dk.heal_amount(dk_amt, false, true)
-	if dk_got <= 0:
-		return
-	dk.float_text("+%d" % dk_got, Color(0.58, 0.40, 0.70))
-	_log("   → %s: %s feeds on the blow — +%d health" % [
-		String(Run.MODIFIERS["hungering_dark"]["name"]), dk.unit_name, dk_got], "#9a78c0")
 
 
 # BATCH GF — THE RECAP'S TAKEN LEDGER, LIFTED OUT OF THE DOOR ABOVE SO THAT A

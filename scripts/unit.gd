@@ -5173,11 +5173,7 @@ func recover_from_break() -> void:
 # (+15% while Rallied), and Frostbite (-50%). `external` marks heals from
 # another unit or an item — the Warden's Endurance talent resets on them.
 # Returns the healing that actually landed (after multipliers).
-# BATCH IO §1b — `unowned`: A HEAL NO UNIT PERFORMED (the Hungering Dark's drink, and only it). It meets
-# every refusal and every multiplier below — the player's answer to it — and NO RIDER: not the Covenant's
-# healing half, not Undying Vigil's fork, not the Last Word's re-arm, not the Vigil's Mercy, and it stamps
-# no overheal for Abundance or Font of Light to read. A heal-triggered rule reads a heal somebody did.
-func heal_amount(amount: int, external := false, unowned := false) -> int:
+func heal_amount(amount: int, external := false) -> int:
 	# Bloodless (Batch AN): no healing for anyone. It sits at the top of the
 	# heal pipeline with the other absolute refusals — Bleed and every
 	# damage-over-time run through take_hit and are untouched by it, which is
@@ -5269,7 +5265,7 @@ func heal_amount(amount: int, external := false, unowned := false) -> int:
 	# takes its half through its OWN pipeline — the other's refusals, multipliers
 	# and clamp included. What the other body refused comes back to this one (the
 	# Vow's rule, pointed at a heal).
-	if amount > 1 and not unowned and not _covenant_guard and covenant_partner() != null \
+	if amount > 1 and not _covenant_guard and covenant_partner() != null \
 			and covenant_heal_cb.is_valid():
 		var heal_half := int(amount * Classes.COVENANT_SHARE)
 		if heal_half > 0:
@@ -5303,9 +5299,8 @@ func heal_amount(amount: int, external := false, unowned := false) -> int:
 	# on. Both are read at the bottom of this function, below the clamp.
 	var heal_was_below_mercy := hp <= max_hp * mercy_threshold
 	var heal_was_below_quarter := hp <= max_hp * LAST_WORD_AT
-	if not unowned:
-		last_overheal = maxi(final - (max_hp - hp), 0)
-		overheal_shielded = false
+	last_overheal = maxi(final - (max_hp - hp), 0)
+	overheal_shielded = false
 	# BATCH BM §2 — FONT OF LIGHT (Holy, Radiance row 8). Overhealing is the
 	# lane's waste product and seven rows make more of it; here it becomes the
 	# resource that pays for casting. The field is on the CASTER, so battle.gd
@@ -5315,9 +5310,6 @@ func heal_amount(amount: int, external := false, unowned := false) -> int:
 	if external and final > 0:
 		healed_externally = true
 	refresh_bars()
-	# BATCH IO §1b — A HEAL NO UNIT PERFORMED STOPS HERE: every rider below reads a heal somebody did.
-	if unowned:
-		return final
 	# BATCH BQ — UNDYING VIGIL. It fires HERE, at the bottom of the one function
 	# every heal in the game passes through, and that position is what makes
 	# "healed BY ANY SOURCE" true rather than "healed by the abilities we

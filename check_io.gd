@@ -1,14 +1,14 @@
 # BATCH IO — THE BARGAIN DECK, MEASURED AND RE-CUT.
 #
 #   §1   THE DECK RE-CUT TO AQ's RULE: nothing binds one side. Famine and Cruel Order are REMOVED, not disabled — no row,
-#        no door, no word left in the game's code or data. Wasting and the Hungering Dark bind both sides, each DRIVEN both
-#        ways: Wasting's tick at every unit's turn's end through the tick door, a unit it fells killed by nobody; the Dark's
-#        feed off any dealer's blow, a heal NO UNIT PERFORMED (`heal_amount`'s `unowned` door), which reaches no rider and
-#        books no healing. The Thin Veil is Feverish's door at its own figure; the Long Silence refuses a second use of any
+#        no door, no word left in the game's code or data. Wasting binds both sides, DRIVEN both ways: its tick at every
+#        unit's turn's end through the tick door, a unit it fells killed by nobody. **The Hungering Dark bound both sides
+#        too, and is REMOVED at IP §1a** (two-sidedness did not make it even — `CLAUDE.md`'s ladder block): §1c holds its
+#        absence, as §1a holds Famine's and Cruel Order's. The Thin Veil is Feverish's door at its own figure; the Long Silence refuses a second use of any
 #        ability but a unit's basic attack, at the hero's button, the bot's every pick and the enemy's re-validation. The
 #        texts are read against the text standard; EP's sample deals Wanderer and Warden offer for offer as the floor's
 #        split deals them, and no severity-5 modifier reaches either; no modifier zeroes a class's kit.
-#   §2   THE LADDER IS GRADED BY MEASUREMENT: the grade counts the bands are built on (6 / 6 / 4 / 4 / 4), every band
+#   §2   THE LADDER IS GRADED BY MEASUREMENT: the grade counts the bands are built on (6 / 6 / 4 / 4 / 3 since IP §1b), every band
 #        non-empty and severity 5 Ruin's gambles alone, the fixed encounters on severity 3–4 and the merchant at each rung's
 #        mildest. **NO GRADE IS PINNED HERE**: the grades are IO's measurement (its report, §2), and a re-grade that keeps
 #        the counts leaves this gate green — the measurement, not this file, decides a modifier's severity.
@@ -26,7 +26,7 @@
 #   §9   The player's files are as this gate found them.
 #
 # **WHAT THIS GATE CANNOT SEE, SAID FIRST.** What a modifier COSTS a party is the sim's (IO's report, §2: each of the
-# twenty-four forced on every bargain of a Ruin run); this gate holds the shape the measurement was cut into and the doors
+# twenty-four forced on every bargain of a Ruin run; IP's, §1b, for the twenty-three left); this gate holds the shape the measurement was cut into and the doors
 # each modifier acts through. §5 drives the strip on a board this gate lays out; that a player reads it is play's.
 #
 #   /Applications/Godot.app/Contents/MacOS/Godot --headless --path . --script check_io.gd
@@ -39,14 +39,17 @@ var _run: Node = null
 var _player := {}
 var _strip := {}
 
-# §1 — the four of severity 5 as §1 built them, by id: [name, the constant its figure is read off ("" for none)].
-const RECUT := {"wasting": ["Wasting", "WASTING_PCT"], "hungering_dark": ["The Hungering Dark", "HUNGERING_DARK_PCT"],
+# §1 — the four of severity 5 as §1 built them, by id: [name, the constant its figure is read off ("" for none)] — less the
+# Hungering Dark, removed at IP §1a (it stands in GONE below).
+const RECUT := {"wasting": ["Wasting", "WASTING_PCT"],
 	"thin_veil": ["The Thin Veil", "THIN_VEIL_PCT"], "long_silence": ["The Long Silence", ""]}
-# §1 — the two that left the deck, and every name their doors went by.
-const GONE := ["famine", "cruel_order"]
-const GONE_WORDS := ["famine", "Famine", "cruel_order", "Cruel Order", "_pouch_sealed", "_turn_before", "ROUND_TICKS"]
-# §2 — the sizes the bands are built on (IO's brief §2, constraint 1): six at 1, six at 2, four at 3, four at 4, four at 5.
-const GRADE_COUNTS := {1: 6, 2: 6, 3: 4, 4: 4, 5: 4}
+# §1 — the three that left the deck, and every name their doors went by (the Dark's since IP §1a).
+const GONE := ["famine", "cruel_order", "hungering_dark"]
+const GONE_WORDS := ["famine", "Famine", "cruel_order", "Cruel Order", "_pouch_sealed", "_turn_before", "ROUND_TICKS",
+	"hungering_dark", "Hungering Dark", "HUNGERING_DARK_PCT", "_dark_feeds"]
+# §2 — the sizes the bands are built on: six at 1, six at 2, four at 3, four at 4, and three at 5 since IP §1b (four
+# from IO's brief §2, constraint 1, until the top was cut at the cliff).
+const GRADE_COUNTS := {1: 6, 2: 6, 3: 4, 4: 4, 5: 3}
 # §5 — the four glyphs, each meaning one thing (IE §0.1, II §0.4); a bargain's chip is none of them.
 const GLYPHS := ["◆", "↑", "✦", "○"]
 
@@ -184,9 +187,9 @@ func _floor_offer(floor_sev: int) -> Array:
 # ── §1a — THE DECK, RE-CUT ──────────────────────────────────────────────────
 
 func _s1a_the_deck() -> void:
-	print("\n§1a — the deck re-cut to AQ's rule: two removed, two bind both sides, two new")
+	print("\n§1a — the deck re-cut to AQ's rule: three removed, one binds both sides, two new")
 	var mods: Dictionary = _run.MODIFIERS
-	ok(mods.size() == 24, "§1a: the deck holds %d modifiers — twenty, and four at severity 5" % mods.size())
+	ok(mods.size() == 23, "§1a: the deck holds %d modifiers — twenty, and three at severity 5" % mods.size())
 	for id in GONE:
 		ok(not mods.has(id), "§1a: `%s` is still in the deck" % id)
 	for id2 in RECUT:
@@ -209,13 +212,13 @@ func _s1a_the_deck() -> void:
 		if not String(df).ends_with(".json"):
 			continue
 		var dsrc := FileAccess.get_file_as_string("res://data/" + String(df))
-		for w2 in ["famine", "Famine", "cruel_order", "Cruel Order"]:
+		for w2 in ["famine", "Famine", "cruel_order", "Cruel Order", "hungering_dark", "Hungering Dark"]:
 			if dsrc.contains(String(w2)):
 				left.append("%s in data/%s" % [w2, df])
-	ok(left.is_empty(), "§1a: the removed pair is still named: %s" % str(left))
+	ok(left.is_empty(), "§1a: the removed three are still named: %s" % str(left))
 	var b := _src("scripts/battle.gd")
-	ok(b.contains("\"thin_veil\":") and b.contains("\"long_silence\":") and b.contains("\"wasting\", \"hungering_dark\":"),
-		"§1a: `_stamp_modifier` has no arm for the Thin Veil, the Long Silence, or the two that stamp nothing")
+	ok(b.contains("\"thin_veil\":") and b.contains("\"long_silence\":") and b.contains("\"wasting\":\n\t\t\tpass"),
+		"§1a: `_stamp_modifier` has no arm for the Thin Veil, the Long Silence, or Wasting, which stamps nothing")
 	print("    the deck: %d modifiers; removed %s; re-cut %s" % [mods.size(), str(GONE), str(RECUT.keys())])
 
 
@@ -318,11 +321,15 @@ func _s1b_wasting() -> void:
 	await _clear(s)
 
 
-# ── §1c — THE HUNGERING DARK: EVERY DEALER IS FED, AND THE HEAL IS NOBODY's ────
-
+# ── §1c — THE HUNGERING DARK, REMOVED AT IP §1a: NO DEALER IS FED, AND THE HEAL DOOR IS ONE DOOR AGAIN ────
+#
+# Re-pointed at IP in place of IO's arms that fed both sides: two-sidedness did not make the Dark even (`CLAUDE.md`'s ladder
+# block), so it left the deck with its door and the heal door's `unowned` parameter, which nothing else reached. A save
+# written before IP can still carry its id as the bargain in force: the fight reads the deck for it, so a blow under it
+# feeds neither side. The POSITIVE arm keeps IO's: an ordinary heal still forks and re-arms (the riders are live), so the
+# heal door the Dark had its own way through is the one every heal takes.
 func _s1c_the_hungering_dark() -> void:
-	print("\n§1c — the Hungering Dark: whoever deals damage is fed its share at BL's door, by a heal nobody performed")
-	# The Warrior WEARS the Last Word (a rune that re-arms on any heal crossing his quarter): the spawn writes its field.
+	print("\n§1c — the Hungering Dark, removed: no dealer fed, on either side; the heal door is the one door every heal takes")
 	var lw := Runes.build("last_word")
 	lw["equipped"] = true
 	var s: Node = await _board(["warden", "pyromancer", "holy", "mystic"], {0: {"runes": [lw]}})
@@ -337,82 +344,41 @@ func _s1c_the_hungering_dark() -> void:
 	e.max_hp = 2000
 	h.max_hp = 5000
 	h.armor = 0.0
-	var pct := float(_run.HUNGERING_DARK_PCT)
-	# BOTH WAYS: [modifier, dealer, victim, fed?]. A hero feeding off an enemy is the arm IN's Dark refused.
-	var arms := [["", e, h, false], ["hungering_dark", e, h, true], ["hungering_dark", h, e, true],
-		["hungering_dark", h, h, false]]
-	for arm in arms:
+	# BOTH WAYS, under the id a pre-IP save can carry: [dealer, victim]. Neither dealer is fed.
+	for arm in [[e, h], [h, e]]:
 		e.hp = 1000
 		h.hp = 3000
-		_run.pending_modifier = String(arm[0])
-		var dealer: BattleUnit = arm[1]
-		var victim: BattleUnit = arm[2]
+		_run.pending_modifier = "hungering_dark"
+		var dealer: BattleUnit = arm[0]
+		var victim: BattleUnit = arm[1]
 		s.call("_dmg_frame", dealer, "probe")
 		var d_before := dealer.hp
 		var v_before := victim.hp
 		victim.take_tick_damage(200, "-200", Color.WHITE)
-		var lost := v_before - victim.hp if dealer != victim else d_before - dealer.hp
-		var fed := (dealer.hp - d_before) if dealer != victim else 0
-		var wantf := int(round(lost * pct)) if bool(arm[3]) else 0
-		ok(lost > 0 and fed == wantf, "§1c: modifier '%s', %s dealing to %s: %d lost, the dealer fed %d — want %d (%d%% off `HUNGERING_DARK_PCT`)" % [
-			arm[0], dealer.unit_name, victim.unit_name, lost, fed, wantf, int(round(pct * 100))])
-	# A TICK FEEDS NOTHING: its frame names a layer and no live unit, on either side.
-	_run.pending_modifier = "hungering_dark"
-	e.hp = 1000
-	h.hp = 3000
-	s.call("_dmg_frame", null, "Burn", h.unit_name)
-	e.take_tick_damage(200, "-200", Color.WHITE)
-	ok(h.hp == 3000, "§1c: a Burn tick laid by %s fed him %d — a tick names no live unit" % [h.unit_name, h.hp - 3000])
-	# A HEAL REFUSED IS REFUSED: Caught Fast on the dealer — on the hero's side now too.
-	h.hp = 3000
-	s.call("_apply_status", h, "caught", 2)
-	s.call("_dmg_frame", h, "probe")
-	e.take_tick_damage(200, "-200", Color.WHITE)
-	ok(h.hp == 3000, "§1c: a Caught Fast hero was fed %d — the heal door's refusals bind the feed" % (h.hp - 3000))
-	h.remove_status("caught")
-	# THE HEAL IS NOBODY's (IO §1b): it books no healing — Reprisal's ledger and the Sanctity ledger unmoved — and no rider
-	# reads it: Undying Vigil does not fork it to a lower hero, the Last Word does not re-arm on it.
-	# The Mage sits BELOW the Warrior's share after the drink, so a fork would reach her; the Warrior sits ONE POINT under
-	# the Last Word's line (`BattleUnit.LAST_WORD_AT`, read, never typed), so any heal at all crosses it and re-arms the rune —
-	# whatever `HUNGERING_DARK_PCT` reads (IO's re-tune control R02 found the arm tuned to a half).
+		ok(v_before > victim.hp and dealer.hp == d_before, "§1c: under a pre-IP save's `hungering_dark`, %s dealing %d to %s was fed %d — the Dark is gone" % [
+			dealer.unit_name, v_before - victim.hp, victim.unit_name, dealer.hp - d_before])
+	ok(String(s.call("_active_modifier")) == "", "§1c: the removed id is read as the modifier in force ('%s')" % String(s.call("_active_modifier")))
+	_run.pending_modifier = ""
+	# THE POSITIVE ARM (IO's): an ordinary heal of a Warrior one point under the Last Word's line, the Mage below his share,
+	# forks to her and re-arms the rune — every heal takes the riders now, there being no door around them.
 	var vig_hp := 100
 	m.max_hp = 1000
 	m.hp = vig_hp
-	h.max_hp = 5000
 	s.call("_apply_status", h, "vigil", 3, 0, 0, h)
 	ok(h.rune_last_word > 0, "§1c: the premise — the Warrior wears the Last Word (its field %s)" % str(h.rune_last_word))
-	h.last_word_armed = false
 	h.hp = int(h.max_hp * BattleUnit.LAST_WORD_AT) - 1
-	var ev_before := int(BattleUnit.sanctity_events)
-	var led_before := int(h.healing_done_recent())
-	s.call("_dmg_frame", h, "probe")
-	var hb := h.hp
-	e.hp = 1000
-	e.take_tick_damage(600, "-600", Color.WHITE)
-	var drank := h.hp - hb
-	ok(drank > 0 and m.hp == vig_hp and not h.last_word_armed and int(h.healing_done_recent()) == led_before
-			and int(BattleUnit.sanctity_events) == ev_before,
-		"§1c: the Dark's drink of %d on %s: the Mage %d → %d (Vigil's fork), the Last Word armed %s, Reprisal's ledger %d → %d, Sanctity's events %d → %d — a heal nobody performed reaches none of them" % [
-			drank, h.unit_name, vig_hp, m.hp, str(h.last_word_armed), led_before, int(h.healing_done_recent()), ev_before,
-			int(BattleUnit.sanctity_events)])
-	# THE POSITIVE ARM: an ordinary heal of the same size forks and re-arms (the riders are live, so the arm above is not
-	# green for want of them).
-	h.hp = int(h.max_hp * BattleUnit.LAST_WORD_AT) - 1
-	m.hp = vig_hp
 	h.last_word_armed = false
-	h.heal_amount(drank)
-	ok(m.hp > vig_hp and h.last_word_armed, "§1c: an ordinary heal of %d did not fork to the Mage (%d) or re-arm the Last Word (%s) — the riders the arm above reads are not live" % [
-		drank, m.hp, str(h.last_word_armed)])
+	h.heal_amount(150)
+	ok(m.hp > vig_hp and h.last_word_armed, "§1c: an ordinary heal of 150 did not fork to the Mage (%d) or re-arm the Last Word (%s) — the riders are not live" % [
+		m.hp, str(h.last_word_armed)])
 	h.remove_status("vigil")
 	s.call("_dmg_frame", null, "")
-	var df := _body("scripts/battle.gd", "_dark_feeds")
-	ok(df.contains("heal_amount(dk_amt, false, true)") and not df.contains("_stat_heal(") and not df.contains("dk.is_hero"),
-		"§1c: the feed does not heal through the unowned door, books healing, or still reads one side")
+	ok(_body("scripts/battle.gd", "_on_damage_taken").contains("_rule_engines_on_damage(victim, lost)")
+			and _body("scripts/battle.gd", "_dark_feeds") == "",
+		"§1c: BL's damage door was not found, or the Dark's feed still stands")
 	var ha := _body("scripts/unit.gd", "heal_amount")
-	var stop := ha.find("if unowned:\n\t\treturn final")
-	ok(stop > 0 and stop < ha.find("has_status(\"vigil\")") and stop < ha.find("rune_last_word > 0")
-			and stop < ha.find("heal_above_half_cb.is_valid()") and ha.contains("not unowned and not _covenant_guard"),
-		"§1c: `heal_amount`'s unowned door does not stand above every rider, or the Covenant's half still reads it")
+	ok(ha.begins_with("\nfunc heal_amount(amount: int, external := false) -> int:") and not ha.contains("unowned"),
+		"§1c: `heal_amount` is not the two-parameter door, or still names the `unowned` door")
 	await _clear(s)
 
 
@@ -589,8 +555,8 @@ func _s1f_the_words() -> void:
 		var pron: Array = [" his ", " her ", " he ", " she ", " him ", " their ", " they ", " you ", " your "].filter(func(w): return low.contains(w))
 		var retired: Array = ["party", "ally", "allies", "beast"].filter(func(w): return low.contains(" " + w))
 		ok(pron.is_empty() and retired.is_empty(), "§1f: `%s` carries %s — '%s'" % [id, str(pron + retired), desc])
-	# BOTH SIDES SAID ON EACH TWO-SIDED RULE THAT HAD ONE SIDE.
-	for id2 in ["wasting", "hungering_dark"]:
+	# BOTH SIDES SAID ON EACH TWO-SIDED RULE THAT HAD ONE SIDE (Wasting; the Dark's text went with it at IP §1a).
+	for id2 in ["wasting"]:
 		ok(String((_run.MODIFIERS[id2] as Dictionary)["desc"]).contains("heroes and enemies alike"),
 			"§1f: `%s` does not say it binds both sides" % id2)
 	var mod_e := String(Glossary.entry("modifier").get("long", ""))
@@ -607,7 +573,7 @@ func _s1f_the_words() -> void:
 		if not mh.contains("<td>%s</td><td>%d</td>" % [String(cfg["name"]), int(cfg["severity"])]):
 			rows_bad.append("%s %d" % [cfg["name"], cfg["severity"]])
 	ok(rows_bad.is_empty(), "§1f: `master.html`'s modifier table has no row at its grade for %s" % str(rows_bad))
-	for gone in ["Famine", "Cruel Order"]:
+	for gone in ["Famine", "Cruel Order", "The Hungering Dark"]:
 		ok(not mh.contains("<td>%s</td>" % gone), "§1f: `master.html` still has a row for %s" % gone)
 
 
@@ -690,11 +656,13 @@ func _s1h_no_kit_zeroed() -> void:
 				fell.append("%s (%s)" % [hu.unit_name, hu.abilities[0].display_name])
 		await _clear(s)
 	ok(stood == 12 and fell.is_empty(), "§1h: with every card spent under the Silence, %d of 12 heroes kept their basic: %s" % [stood, str(fell)])
-	# The other three act through doors no kit reads: no class, lineage or engine test in any of them.
-	for fn in ["_wasting_tick", "_dark_feeds"]:
+	# The other two act through doors no kit reads: no class, lineage or engine test in either. Wasting's door is read here;
+	# the Dark's went with it at IP §1a, and a door that is not found is not a door that reads nothing (IP's census found the
+	# arm passing on the deleted body's empty string).
+	for fn in ["_wasting_tick"]:
 		var bd := _body("scripts/battle.gd", fn)
-		ok(not bd.contains("has_engine(") and not bd.contains("hero_key") and not bd.contains("hero_spec"),
-			"§1h: `%s` reads a class, a lineage or an engine" % fn)
+		ok(bd != "" and not bd.contains("has_engine(") and not bd.contains("hero_key") and not bd.contains("hero_spec"),
+			"§1h: `%s` was not found, or reads a class, a lineage or an engine" % fn)
 
 
 # ── §2 — THE LADDER, GRADED BY MEASUREMENT ──────────────────────────────────
@@ -965,7 +933,8 @@ func _s5_the_chip() -> void:
 					var rj: Rect2 = rects[j][1]
 					if ri.intersects(rj):
 						bad.append("%s: %s over %s" % [id2, rects[i][0], rects[j][0]])
-	ok(drawn == 48 and bad.is_empty(), "§5: %d strips drawn over the 24 modifiers bought and imposed — %s" % [drawn, str(bad.slice(0, 8))])
+	ok(drawn == 2 * (_run.MODIFIERS as Dictionary).size() and bad.is_empty(), "§5: %d strips drawn over the %d modifiers bought and imposed — %s" % [
+		drawn, (_run.MODIFIERS as Dictionary).size(), str(bad.slice(0, 8))])
 	print("    %d strips drawn, each clear of the turn strip and the log" % drawn)
 	await _clear(s)
 
@@ -1070,7 +1039,8 @@ func _s7_the_archive() -> void:
 		if String(codes[i]) >= String(codes[i - 1]):
 			out_of_order.append("%s after %s" % [codes[i], codes[i - 1]])
 	ok(codes.size() >= 10 and out_of_order.is_empty(), "§7: the archive's %d cuts are not newest first: %s" % [codes.size(), str(out_of_order)])
-	ok(not codes.is_empty() and String(codes[0]) == "IO", "§7: the archive's first cut is %s — IO's own goes at the top" % (str(codes[0]) if not codes.is_empty() else "none"))
+	# IO's cut went at the top, and a later batch's goes above it (re-pointed at IP, whose own gate holds its cut at the top).
+	ok(not codes.is_empty() and String(codes[0]) >= "IO", "§7: the archive's first cut is %s — IO's own or a later batch's goes at the top" % (str(codes[0]) if not codes.is_empty() else "none"))
 	print("    cuts, newest first: %s" % " ".join(PackedStringArray(codes.slice(0, 6))))
 
 

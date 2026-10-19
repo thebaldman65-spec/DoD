@@ -1339,6 +1339,43 @@ the rune was wired, because it was supplying the one input the defect was in.
 - **IT IS ASSERTED, NOT REMEMBERED**: `check_io` §7 reads every cut heading and reds unless the codes run newest first and
   the batch that writes this rule's latest cut stands at the top.
 
+## STANDING RULE — A CUT INSIDE TWO STANDARD ERRORS IS NOT A MEASUREMENT, IT IS A TIE (Batch IP §0.4, ruled by the designer)
+> **A CUT INSIDE TWO STANDARD ERRORS IS NOT A MEASUREMENT, IT IS A TIE.** A tie gets a second seed block, or it is named
+> as arbitrary in the file. **It does not get recorded as a measured grade.**
+
+- **THE CASE IS IO's RE-GRADE.** Three of its cuts sat inside two standard errors of the difference and were recorded as
+  the sort put them, with the noise said in the report and nowhere a reader of the grades would meet it. IP measured the
+  cuts again on a second seed block (IP's report, §1b): one became a measurement and two stayed ties, and the two are
+  named arbitrary beside the grade table in `docs/state.md`.
+- **THE PAIR IS THE TWO MEMBERS EITHER SIDE OF A CUT, ON THE INSTRUMENT IN FORCE — NEVER A LIST CARRIED FROM AN EARLIER
+  CUT.** A removal from the deck shifts every cut one place, and a repaired instrument moves the members themselves: IP's
+  brief named IO's three pairs, and on IP's table none of them stood at a cut — the re-measure took the pairs that did. A
+  tie re-measured off a stale list measures pairs no grade depends on.
+- **A TIE IS NAMED WHERE THE GRADES ARE READ, NOT ONLY IN A REPORT.** The grade a tie hands out is still a grade the deck
+  deals, so the sort's order stands; what changes is that the file holding the grades says which cuts the measurement
+  could not make, so nobody reads a coin flip as a ranking.
+
+## STANDING RULE — AN INSTRUMENT'S OWN FIDELITY IS A PREMISE OF EVERY MEASUREMENT IT TAKES (Batch IP §2, ruled by the designer)
+> **AN INSTRUMENT'S OWN FIDELITY IS A PREMISE OF EVERY MEASUREMENT IT TAKES.** A defect known in the instrument is
+> measured with anyway, correctly — *an instrument does not move in the batch that reads it* — **but the batch after it
+> repairs the instrument and re-takes what the defect could have moved.** Not everything: what the defect touches, named
+> by mechanism, and the baseline every figure is read against.
+
+- **THE CASE IS THE SIM BOT's HEALTH POTION.** From CT to IP the bot drank a flat 40 where the player's potion heals
+  `Run.HEALTH_POTION_PCT` of the drinker's maximum: another potion than the one the game has. IN found it, IO graded the
+  deck with it on purpose, and IP repaired it — the bot reads `Run.health_potion_heal`, as the player's use path does —
+  then re-took the five arms the potion could move, on both builds: **Bloodless** (it refuses healing), **Miasma** (it
+  halves it), **Wasting** and **the Thin Veil** (they decide how often a potion is drunk) and **the arm with no
+  modifier**. Two of the five moved by more than two standard errors, and one of them moved a grade (IP's report, §2).
+- **THE MECHANISM IS THE POPULATION, NOT A GUESS.** A re-take that reads every arm is a new measurement, not a repair; one
+  that reads only the arms somebody suspects is a guess. The re-taken arms are the ones whose door the defect sits behind,
+  and the baseline beside them says whether the rest moved — at IP it moved inside its noise.
+- **AND THE SECOND CASE CANNOT BE REPAIRED: THE BOT IS NOT A PLAYER.** The designer's first clean playthrough booked 18.33
+  status events a normal fight on the Hierophant's ledger where the bot books 40.43 on IO's rung-1 road — the bot books
+  2.2 times a player's — so a grade that turns on statuses laid carries that error, and no repair removes it. **A
+  measurement names which of its figures turn on such a quantity**, beside the figures, where the next reader meets them
+  (`docs/state.md`'s grade table carries the deck's).
+
 ## STANDING RULE — AN EXACT COUNTERFACTUAL IS EXACT ABOUT THE PAIRING, NOT ABOUT THE ESTIMATE (Batch EX §1b)
 
 > **A counterfactual that consumes no randomness removes the difference BETWEEN THE ARMS. It does
@@ -2090,3 +2127,8 @@ NOT a wrapping problem.
   rest of its sites (IO's report, §6; `check_io` §6). A new site of the shape names its pick in the batch that writes it.
 - **AND IT IS A VERIFICATION STEP, NOT ONLY A SHAPE**: before a batch writes its prediction, it finds every superlative
   pick whose population its diff touches and names each one's pick on HEAD's tree and on its own.
+- **A PICK IS A SITE WHEN THE ASSERTION's VERDICT DEPENDS ON WHICH MEMBER WAS PICKED (IO's ruling 8, the designer's).** A
+  pick whose verdict holds for nearly any member — a filler, the first body of a warband, a hero's slot 0 — cannot be
+  invalidated by a re-selection, **which is the only failure this rule exists to catch**, so a filler is listed and not
+  repaired: IO's census lists 321 (the WEAK rows of IO's census file, docs/reports/IO-census.tsv). **The test is asked of
+  every pick a census finds, so the next census does not re-ask whether a filler is a site.**

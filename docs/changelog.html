@@ -16,6 +16,48 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-19 &mdash; Batch IP: THE DECK's LAST CUT, AND THE INSTRUMENT's OWN DEFECT</h2>
+<p><b>The Hungering Dark leaves the game, the top severity is cut where the measurement's cliff is, and the sim's bot now drinks
+the player's potion &mdash; with every grade the old potion could have moved measured again.</b> Full working:
+<code>docs/reports/IP.md</code>.</p>
+
+<p><b>&sect;0 &mdash; THE FIRST CLEAN PLAYTHROUGH IS IN.</b> Ten fights at Warden, zone one through its boss, no debug action
+anywhere &mdash; the first clean file the project has had. It is read and recorded in <code>docs/state.md</code> and nothing
+is built from it: <b>Rupture is unreachable rather than mis-tuned</b> (the one that formed stood none of its body's turns,
+because the Cryomancer that chilled it froze it); <b>Sanctity</b> booked 18.33 events a normal fight against the bot's 40.43,
+and a boss 2.78 times a normal fight; <b>the vow paid 2.2 to 1</b> (322 damage refused for 707 healing); <b>the Cleric was the
+driest hero</b>, the Mage and the Hunter never dry; <b>Boil Over was never drafted</b>; and the Sharpshooter dealt 42.2% of the
+run's damage while the Berserker's Rage sat at zero in every fight. Each is the designer's to rule on.</p>
+
+<p><b>&sect;1a &mdash; THE HUNGERING DARK IS REMOVED.</b> Made to feed both sides at IO, it fed whoever dealt more damage &mdash; the
+heroes, six to one &mdash; so a bargain under it ended healthier than no bargain at all. No figure fixes that, so the modifier,
+its door and the heal door's extra parameter are gone, not switched off; its shape and what it measured are kept in the design
+notes, and the lesson &mdash; <i>binding both sides does not make a rule even</i> &mdash; is a rule now.</p>
+
+<p><b>&sect;1b &mdash; SEVERITY 5 IS THE CLIFF, THREE DEEP.</b> Twenty-three bargains, cut six, six, four, four and three by what each
+costs a party: <b>Bloodless, Wasting and Mirrorbound</b> are Ruin's gambles. <b>Six moved</b>: Overgrown 5 &rarr; 4, Parched 2 &rarr; 1,
+Brittle 3 &rarr; 2, Deadened 4 &rarr; 3, the Thin Veil 4 &rarr; 3 and Rot 3 &rarr; 4. The cuts that measured as coin flips were measured
+again; two are still too close to call, and the state file says so beside the grades. The roads deal the same average severity
+as before (Wanderer 2.82, Warden 3.28, Ruin 4.50); Warden's gambles are now Overgrown, Miasma, Thin Air and Rot, and Ruin's
+mini-boss and bosses fight under Overgrown, Feverish, Deadened, Miasma, Thin Air, Rot, the Thin Veil or the Long Silence.
+In the sim, with the bot choosing every bargain, every road's bargain fights get a little harder: Wanderer's end at 0.956 of
+the party's health (was 0.971), Warden's at 0.908 (0.936) and Ruin's at 0.687 (0.741); the new potion alone moves none of them.</p>
+
+<p><b>&sect;2 &mdash; THE SIM's BOT DRINKS THE PLAYER's POTION.</b> It drank a flat 40 where a player's potion heals a fifth of the
+drinker's maximum; it drinks the game's potion now. The modifiers whose cost the potion decides &mdash; Bloodless, Miasma, Wasting
+and the Thin Veil &mdash; and the no-modifier baseline were measured again on both builds: the Thin Veil and Wasting moved past
+their noise, and the Thin Veil crossed a grade.</p>
+
+<p><b>&sect;0 &mdash; RULES RECORDED.</b> Binding both sides does not make a rule even (<code>CLAUDE.md</code>); a cut inside two standard
+errors is a tie, and an instrument's own fidelity is a premise of every measurement it takes; a pick is a site only when the
+verdict depends on which member was picked (<code>docs/instrument-rules.md</code>).</p>
+
+<p><b>The instruments.</b> <code>check_ip</code> is new. Re-pointed where IP moved what they read: <code>check_io</code> and
+<code>check_in</code> (the Dark's arms now assert its removal; the counts read three at severity 5),
+<code>test_batch_an</code> and <code>test_batch_bb</code> (twenty-three modifiers). <code>check_gp</code>'s count
+moved 438 &rarr; 439 because its seeded road now meets different bargains, and <code>check_gj</code>'s known red reads new figures.
+No save version moved.</p>
+
 <h2>2026-10-18 &mdash; Batch IO: THE BARGAIN DECK, MEASURED AND RE-CUT</h2>
 <p><b>Every bargain binds both sides again, two new ones join, and every modifier's severity is now a measurement of what it
 costs a party.</b> The battle screen shows the bargain in force. Full working: <code>docs/reports/IO.md</code>.</p>

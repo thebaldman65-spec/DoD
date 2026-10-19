@@ -126,7 +126,7 @@ block stood and never a new file. II's four were struck so at IJ, each report re
 the equality rule travel with their parent. **Eight of the rows are FF §2's**, and they are the
 residue: rules written into this file AFTER the seam was taken, which the seam's own test puts on
 the other side of it. **Every row after those eight was written straight into the reference rather
-than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one, IE's two, II's two, IJ's one, IK's one, IM's three, IN's one and IO's two —
+than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one, IE's two, II's two, IJ's one, IK's one, IM's three, IN's one, IO's two and IP's two —
 and GW §2's, written there at GW and given its row only at HX (HV §3e found it missing; `check_hx` §1a now reds on one) —
 and four more are MOVED, FF §2's way: HG–HJ's census and supersession blocks, written back into this file after the seam
 was taken and sent over at HY §4 by the designer's ruling, and II §4's two, the archive practice's first pass — CP §3's
@@ -202,6 +202,8 @@ new block written here):
 | A DRIVE IS A PROOF OF THE PREDICATE ONLY WHEN THE PREDICATE CHOOSES WHAT IT DRIVES | IN §0.7 |
 | A CENSUS BUILT FROM A SWEEP IS BOUNDED BY THE SWEEP's PATTERNS, AND IT IS RE-RUN AFTER ITS REPAIR PASS | IO §0.10 |
 | THE STATE ARCHIVE TAKES THE NEWEST CUT FIRST | IO §7 |
+| A CUT INSIDE TWO STANDARD ERRORS IS NOT A MEASUREMENT, IT IS A TIE | IP §0.4 |
+| AN INSTRUMENT'S OWN FIDELITY IS A PREMISE OF EVERY MEASUREMENT IT TAKES | IP §2 |
 
 ## THE COMBAT RULES LIVE IN `docs/combat-rules.md` (STANDING, SET AT GR §2, RULED BY THE DESIGNER)
 > **THIS FILE IS STILL THE ONE A BATCH MUST READ. `docs/combat-rules.md` IS A REFERENCE IT POINTS AT,
@@ -1885,9 +1887,19 @@ decision and the STRUCTURE is what shipped.
   fight, it does not change the odds.** AQ named *no items this fight* as deliberately not authored; IN built it as
   Famine, and IO removed it and Cruel Order — the two with no two-sided reading (enemies carry no pouch; *both sides
   first* is incoherent) — **removed, not disabled**, their built shape and IN's measurements kept in
-  `docs/design-notes.md` so neither is re-invented or re-measured if a home for a one-sided rule appears. Wasting and
-  the Hungering Dark bind both sides. **A new modifier is read against this before it is authored: name the reading
-  under which it binds both sides, or it is a difficulty slider.**
+  `docs/design-notes.md` so neither is re-invented or re-measured if a home for a one-sided rule appears. Wasting binds
+  both sides; the Hungering Dark bound both and is removed too, for the bullet below. **A new modifier is read against
+  this before it is authored: name the reading under which it binds both sides, or it is a difficulty slider.**
+· **TWO-SIDEDNESS DOES NOT MAKE A RULE EVEN (IP §0.2, the designer's — it qualifies AQ's rule, above).** **A RULE KEYED
+  ON A QUANTITY THE TWO SIDES DO NOT PRODUCE EQUALLY PAYS THE SIDE THAT PRODUCES MORE OF IT.** Damage dealt, statuses
+  laid, cards cast, healing received — each is lopsided, and a modifier keyed on one of them is a one-sided rule wearing
+  two-sided words. **The worked example is the Hungering Dark** — *whoever deals damage heals a share of it* — made
+  two-sided at IO to satisfy AQ: the heroes deal about six times what a warband does, so it fed them six to one and a
+  bargain under it ended healthier than one with no modifier at all. No figure fixes that shape, so it was **removed,
+  not disabled** (IP §1a), its shape and IO's measurements beside Famine's and Cruel Order's in `docs/design-notes.md`;
+  and the Cleric fed least of the four under it is the same lopsidedness inside the party. **So a new modifier names
+  the quantity it is keyed on and reads both sides' share of it before it is authored: binding both sides is the
+  floor, not the test.**
 · **A CLASS PASSIVE OUTRANKS A MODIFIER WHERE THEY CONTRADICT (IO §0.5, the designer's).** A hero's lineage is what
   he is; a modifier is what this fight is. **The thing he is wins.** The worked example is the Tracker's opening turn,
   kept before the first round under IN's Cruel Order (withdrawn at IO); the rule binds the next modifier that meets a
@@ -1895,13 +1907,18 @@ decision and the STRUCTURE is what shipped.
 · **A SEVERITY IS A RANK BY WHAT A MODIFIER COSTS A PARTY, NOT BY HOW IT READS (IO §2, the designer's).** The deck is
   sorted by the party's health at a bargain fight's end under each modifier forced on every bargain of a Ruin run (the
   sim's forced arm — immune to the bot taking the gamble), runs completed breaking a tie, and the sorted list is cut
-  into the five grades **at the counts the bands are built on** — six at 1, six at 2, four at 3, four at 4, four at 5
-  — which do not change. **A modifier the instrument cannot price is not ranked down**: one that reads near the
+  into the five grades **at the counts the bands are built on** — six at 1, six at 2, four at 3, four at 4 and three at
+  5 — which do not change by a lever. **THE TOP GRADE IS THE CLIFF THE MEASUREMENT SHOWS, AND IT IS THREE DEEP (IP §1b,
+  the designer's)**: four at 5 stood until IP, and the count of four reached below the cliff and took a modifier that
+  was never a 5 — the costliest three end a bargain fight a sixth of the party's health below the next. That one count
+  moved to the measurement's own cut, and **no count moves to make a rung read harder or milder, and no band is widened
+  to reach a grade it does not.** **A modifier the instrument cannot price is not ranked down**: one that reads near the
   baseline because the bot cannot use what it takes away keeps its grade, named with its reading beside the
   exemption. **A severity-5 slot belongs to whatever is hardest, never to whatever was authored for it**, and a
   modifier the sort moves leaves the bands that deal its old grade — Wanderer's and Warden's offers move with it, the
   one place they are expected to. **No grade moves by feel, and none to make a rung's mean read better.** The
-  measurement and its cut are IO's report, §2.
+  measurement and its cut are IO's report, §2, re-taken where IP's repaired instrument could move it and re-cut at IP
+  §1b (IP's report).
 **THE END BOSS is a 17th slot on the FINAL ZONE'S BOARD, so a run is 49 encounters** (BK settled
 on 48). `END_BOSS_SLOT` / `END_BOSS_KIND` / `total_slots()`. It is **FIXED, not composed** (the
 one node whose lineup does not come out of the budget system), so it can be learned, and it

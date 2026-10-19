@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-10-18 (Batch IO &mdash; the bargain deck, measured and re-cut)</b></p>
+<p align="right"><b>Last updated: 2026-10-19 (Batch IP &mdash; the deck's last cut, and the instrument's own defect)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -61,7 +61,7 @@ ladder. <b>Every scaling number below is provisional and is the designer's to se
 <tr><td><b>2 — Warden</b></td><td>×1.00 <b>damage</b><br>(health <b>identical to rung 1</b>)</td><td>the safe bargain gets less mild: its safe option
 is dealt from severity 1&ndash;3 and its gambles at severity 4</td><td>talent tier 2</td></tr>
 <tr><td><b>3 — Ruin</b></td><td>×1.30</td><td><b>no mild option</b>: its safe option is dealt from severity 3&ndash;4 and its
-gambles at <b>severity 5</b> &mdash; four bargains no other rung deals &mdash; and <b>fixed encounters carry a
+gambles at <b>severity 5</b> &mdash; three bargains no other rung deals &mdash; and <b>fixed encounters carry a
 modifier</b> of severity 3&ndash;4 — the mini-boss, the zone bosses and the end boss, which on the other rungs never
 do</td><td>talent tier 3</td></tr>
 </table>
@@ -280,7 +280,7 @@ road, not a gate in front of every battle. Each option is one <b>modifier</b> pl
 side: a modifier that leaned on one side would be a difficulty slider, and the rung is already that. Each carries a
 <b>severity of 1&ndash;5</b>, and <b>the reward table reads that severity</b>. <b>A severity is a rank by what a modifier costs the
 heroes</b>: every modifier was measured forced on every bargain of a Ruin run, the deck sorted by the heroes' health at a bargain
-fight's end and cut at <b>six, six, four, four and four</b> &mdash; so a grade says how hard a fight under it is, not how harsh its
+fight's end and cut at <b>six, six, four, four and three</b> &mdash; so a grade says how hard a fight under it is, not how harsh its
 words sound. Severity is <b>flat</b> and <b>deliberately ignores which heroes you drafted</b>: a modifier that happens to be cheap
 for your build is a good deal you earned by building that way. A modifier binds every combatant on the field, including a
 <b>companion summoned mid-battle</b>, and it stands at the top of the battle screen for the whole fight (&sect;10).</p>
@@ -289,26 +289,25 @@ comes from its <b>safe band</b> and the other two from its <b>gamble band</b>, s
 reads the same way: one safe option, two gambles</b>. <b>Wanderer</b> deals its safe option from
 severity 1&ndash;2 and its gambles from 3&ndash;4; <b>Warden</b> from 1&ndash;3 and at 4;
 <b>Ruin</b> from 3&ndash;4 and at 5 &mdash; <b>on Ruin there is no mild option</b>, its mildest
-bargain the harshest Warden's safe slot can show, and its gambles are the four severity-5 bargains,
+bargain the harshest Warden's safe slot can show, and its gambles are the three severity-5 bargains,
 which no other rung is ever dealt. The safe option is guaranteed by construction
 rather than by rejecting rolls, and no band ever falls back to another: every band holds
-modifiers enough for its slots. Over 400 offers a rung the mean severity offered read <b>2.84 /
-3.29 / 4.49</b> at Batch IO (<code>check_io</code> &sect;1g prints the live sample) &mdash; Ruin a full
+modifiers enough for its slots. Over 400 offers a rung the mean severity offered read <b>2.82 /
+3.28 / 4.50</b> at Batch IP (<code>check_ip</code> &sect;1b prints the live sample) &mdash; Ruin a full
 step above Warden.</p>
 <p>The reward pays <b>on victory</b>: the modifier is the price, and the reward is what
 clearing the fight under it bought.</p>
-<p><b>The pool is 24, weighted low</b>: six at severity 1, six at 2, four each at 3, 4 and 5. Because the
+<p><b>The pool is 23, weighted low</b>: six at severity 1, six at 2, four each at 3 and 4, and three at 5. Because the
 safe slot on Wanderer's and Warden's cards is served from the mild end, that is the end a run
 actually sees repeatedly.</p>
 <table border="1" cellpadding="4">
 <tr><th>Modifier</th><th>Severity</th><th>Effect (both sides)</th></tr>
-<tr><td>The Hungering Dark</td><td>1</td><td>Whoever deals damage heals 50% of it &mdash; heroes and enemies alike: a blow's damage, never a tick's. It is nobody's healing: it meets every refusal and every multiplier a heal meets (Bloodless, Caught Fast, Unmaking, Miasma) and feeds nothing that reads a heal.</td></tr>
 <tr><td>Hoarfrost</td><td>1</td><td>Everyone begins the fight Chilled.</td></tr>
 <tr><td>Dull Edge</td><td>1</td><td>Critical chance -5%, for everyone.</td></tr>
 <tr><td>Frenzied</td><td>1</td><td>Everyone acts 30% faster. Cooldowns are unchanged.</td></tr>
 <tr><td>Tinderbox</td><td>1</td><td>All fire strike damage +25%, whoever deals it.</td></tr>
 <tr><td>Warded</td><td>1</td><td>All abilities cost 25% more. Basic attacks are free. Every button and the summon picker show the price the fight charges.</td></tr>
-<tr><td>Parched</td><td>2</td><td>Both parties begin the fight at half resource at most.</td></tr>
+<tr><td>Parched</td><td>1</td><td>Both parties begin the fight at half resource at most.</td></tr>
 <tr><td>Slick Footing</td><td>2</td><td>Every ability costs +0.5 initiative. Everyone is
 slower to come round again.</td></tr>
 <tr><td>Muffled</td><td>2</td><td>All Break damage is reduced 25%. Meters fill slowly.</td></tr>
@@ -318,19 +317,19 @@ Basic attacks are unaffected.</td></tr>
 both sides.</td></tr>
 <tr><td>Fleeting</td><td>2</td><td>Every status applied lasts one turn less (never below
 one).</td></tr>
-<tr><td>Brittle</td><td>3</td><td>All attacks ignore armor, on both sides.</td></tr>
+<tr><td>Brittle</td><td>2</td><td>All attacks ignore armor, on both sides.</td></tr>
+<tr><td>The Long Silence</td><td>3</td><td>Nobody may use the same ability twice this fight. Basic attacks are exempt &mdash; a hero's first card, an enemy's cheapest attack &mdash; so nobody is ever left with nothing to do. A spent card's button goes dark and says why; an enemy whose move is spent falls back to its basic attack, and its declared move says so a turn ahead.</td></tr>
 <tr><td>Feverish</td><td>3</td><td>Everyone deals 25% more damage. Fights end quickly, one way
 or the other.</td></tr>
-<tr><td>The Long Silence</td><td>3</td><td>Nobody may use the same ability twice this fight. Basic attacks are exempt &mdash; a hero's first card, an enemy's cheapest attack &mdash; so nobody is ever left with nothing to do. A spent card's button goes dark and says why; an enemy whose move is spent falls back to its basic attack, and its declared move says so a turn ahead.</td></tr>
-<tr><td>Rot</td><td>3</td><td>Everyone's maximum health is halved, on both sides. It lasts the
-fight and no longer.</td></tr>
-<tr><td>Deadened</td><td>4</td><td>Nobody can be Broken. The Break meter does nothing this
+<tr><td>The Thin Veil</td><td>3</td><td>Everyone deals 50% more damage, blows and ticks alike, on both sides &mdash; Feverish's rule at twice the figure, as Bloodless is Miasma's.</td></tr>
+<tr><td>Deadened</td><td>3</td><td>Nobody can be Broken. The Break meter does nothing this
 fight.</td></tr>
+<tr><td>Rot</td><td>4</td><td>Everyone's maximum health is halved, on both sides. It lasts the
+fight and no longer.</td></tr>
 <tr><td>Thin Air</td><td>4</td><td>No resource returns at the start of a turn. Anything else that
 builds it still does.</td></tr>
-<tr><td>The Thin Veil</td><td>4</td><td>Everyone deals 50% more damage, blows and ticks alike, on both sides &mdash; Feverish's rule at twice the figure, as Bloodless is Miasma's.</td></tr>
 <tr><td>Miasma</td><td>4</td><td>All healing received is halved.</td></tr>
-<tr><td>Overgrown</td><td>5</td><td>Both parties begin the fight at 70% health at most.</td></tr>
+<tr><td>Overgrown</td><td>4</td><td>Both parties begin the fight at 70% health at most.</td></tr>
 <tr><td>Mirrorbound</td><td>5</td><td>An attack that does not miss sends a quarter of the damage it deals
 back on its attacker &mdash; at least 1, even when it deals none. On both sides.</td></tr>
 <tr><td>Wasting</td><td>5</td><td>At the end of every turn, whoever took it loses 8% of maximum health &mdash; heroes and enemies alike, and a turn a stun, a freeze or a Break costs included. It is not a strike: no ward, no armor and no Less Damage Taken reaches it, and it can fell either side. A body it fells was killed by nobody.</td></tr>
@@ -339,8 +338,7 @@ tick.</td></tr>
 </table>
 <p><b>No modifier zeroes a class's kit</b> &mdash; a modifier that makes one hero's whole hand dead is not harsh, it is
 unplayable. Wasting costs every unit alike, a share of its own maximum, and the Mage, with the smallest health and no heal
-of his own, feels it most; the Hungering Dark feeds the heroes as it feeds the warband, the Cleric least, since his heals are
-not damage; the Thin Veil shortens every fight and leaves least room to recover to the hero who heals; and under the Long
+of his own, feels it most; the Thin Veil shortens every fight and leaves least room to recover to the hero who heals; and under the Long
 Silence every card works once and the basic attack always, so a Cleric's heals and the Stances' one swap are each a single
 decision rather than a dead hand.</p>
 <p><b>Rot is not excluded from anything that reads maximum health.</b> The

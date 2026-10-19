@@ -4,6 +4,53 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The deck's last cut, and the instrument's own defect (Batch IP) — 2026-10-19
+
+**Why the Hungering Dark left the game rather than being re-tuned.** Making it bind both sides was meant to make it fair,
+and it made it a gift: a rule that pays out per damage dealt pays whoever deals more, and the heroes deal about six times
+what a warband does. No figure fixes that — at a quarter or at a tenth it still feeds the heroes most — so it was removed,
+not disabled, and the lesson is written beside AQ's rule in `CLAUDE.md`: *binding both sides* is the floor a modifier must
+clear, not proof that it is even. A rule keyed on damage dealt, statuses laid, cards cast or healing received is keyed on
+something the two sides do not produce equally, and the side that produces more is the side it helps.
+
+**The Hungering Dark, kept here so it is not re-invented or re-measured** (its row, its door and every word are gone from
+the game):
+- **The shape.** *Whoever deals damage heals half of it — heroes and enemies alike.* It rode the one damage door every blow
+  passes (`_dark_feeds`, called from BL's door), fed the dealer the attribution frame named — a blow's damage, never a
+  tick's, since a tick's frame names no unit — and healed through a door of its own: `heal_amount`'s third parameter,
+  `unowned`, a heal no unit performed, which met every refusal and multiplier a heal meets (Bloodless, Caught Fast, Miasma)
+  and reached no rider (the Covenant's half, Undying Vigil's fork, the Last Word's re-arm) and no healing ledger. IN built
+  it to feed enemies only, at a quarter; IO made it feed both sides, at a half.
+- **IN's measurement, enemies only at a quarter**: a bargain fight ended at 0.943 of the party's health against 0.952 —
+  it cost one point.
+- **IO's measurement, both sides at a half**, forced on every bargain of a Ruin run: **0.989** of the party's health at a
+  bargain fight's end against **0.951** with no modifier, 55 runs of 60 completed (untalented 0.748 against 0.535) — the
+  mildest modifier in the deck by a distance. Over IO's feed probe (twelve forced runs) the heroes were fed 117,266
+  health and the warband 19,336 — **6.06 to 1**.
+- **And the same lopsidedness inside the party**: over those runs the Cleric, whose heals are not damage, was fed
+  **5,349** health where the Pyromancer was fed **17,982**. The rule taxed the party's healer for healing rather than
+  hitting — a second reading of the same fact.
+
+**Why severity 5 is three, not four.** The measurement shows a cliff three deep: the three costliest modifiers end a
+bargain fight with about two thirds of the party's health left, the next a sixth of the party's health above them, and
+the five after that inside a few hundredths of each other. With four slots at the top, the fourth was filled by
+whatever stood next — Overgrown — which was never a severity 5; the count reached down and took it. Cutting the top at
+three keeps the table's own sizes below it, so the roads keep the means they were built for (Wanderer, Warden and Ruin
+deal the same average severity as before), and the cut sits where the costs actually change. The count moved once, to
+the measurement's own shape; no count moves to make a road harder.
+
+**Why the sim bot drinks the player's potion now.** The bot drank a flat 40 where the player's potion heals a fifth of the
+drinker's maximum, so every measurement that turned on healing measured a different potion from the game's. It was known
+two batches ago and left on purpose — an instrument is not repaired in the batch that reads with it — and repaired in the
+batch after, with the measurements it could have moved taken again: the modifiers that refuse, halve or call for healing,
+and the baseline. The repair moved two of them past their noise, and one of the two crossed a grade line, so the cut was
+built on the repaired figures, not on IO's.
+
+**Why the Warden's middle rung is not given its teeth back by moving a count.** Warden's bargains lost their bite at IO
+because the deck has no middle: between the cliff and the rest there is nothing, and the old Warden gambles were costly
+only because two brutal modifiers were mis-graded down into reach. The answer is four or five modifiers that cost between
+the two — the designer's to author — not a count moved or a band widened to reach the cliff.
+
 ## The bargain deck, measured and re-cut (Batch IO) — 2026-10-18
 
 **Why nothing in the deck binds one side.** A modifier that binds only one side is a difficulty slider, and the road the

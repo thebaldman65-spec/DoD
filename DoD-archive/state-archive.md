@@ -17,6 +17,73 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT IP — 2026-10-19, FROM `docs/state.md` AS IO LEFT IT (`9f9154d`)
+
+**What came here**: IO's twelve rulings, every one answered in IP's brief; two of FOUND AT IO's three items — IN's census short by
+seven (repaired at IO §6) and the FAIL lines that type today's pick (a site repaired at IO §6, a filler ruled not a site at IP
+§0.8); and the bot's flat-40 potion twice over, FOUND AT IN and FOUND AT FW (repaired at IP §2). Everything else in the live file
+stayed; the roadmap was re-lettered in place (the documents are IQ's, the claims IR's).
+
+
+### ~~IO's RULINGS OWED~~ — **ALL TWELVE ANSWERED IN IP's BRIEF (§0.1–§0.12): THE PLAY ARRIVED, CLEAN (1); THE HUNGERING DARK REMOVED AT IP §1a (2, 11); OVERGROWN TO SEVERITY 4 AT IP §1b (3); THE TIES MEASURED AGAIN AT IP §1b (4); THE DEFAULT BUILD GRADES, ITS LIMITS BESIDE THE TABLE (5); THE THIN VEIL's READING CONFIRMED, A RULE OF ITS OWN OWED (6); THE LONG SILENCE's SEVEN READINGS CONFIRMED (7); A FILLER IS NOT A SITE (8); THE POTION REPAIRED AT IP §2 (9); THE REFUND NOTED AND LEFT (10); THE BANDS AND GRADES STAND, THE MIDDLE OF THE DECK OWED (12)**
+
+
+Full working: `docs/reports/IO.md`, NEEDS A RULING.
+
+1. **PLAY ONE ZONE WITHOUT THE DEBUG MENU, AND SEND THE FILE** (IH's ruling 1 — asked at II through IO). The readout names every
+   debug action, so a file that names none is play. It prices Boil Over's rate, Rupture's number and clock, the vow's worth and the
+   Cleric's Mana, and confirms Sanctity's 13. Nothing in the queue waits on it and no batch can do it.
+2. **THE HUNGERING DARK HELPS THE HEROES, SO IT IS SEVERITY 1**: two-sided at a half it feeds them about six times what it feeds
+   the warband, and a bargain under it ends at 0.989 of the party's health against 0.951 with none. The figure was left (the brief:
+   do not tune it in this batch). Whether its figure or its shape moves is yours.
+3. **OVERGROWN IS SEVERITY 5 BY THE PARTY's HEALTH, NOT BY ITS RUNS**: it ends a bargain fight at 0.857 (the fifth-costliest) yet
+   completes 55 runs of 60, with severity 1–2's; its cost is paid at the fight's start, and the measure reads it whole. The rule
+   took health first; whether the measure stands is yours.
+4. **THREE CUTS SIT INSIDE TWO STANDARD ERRORS** — Warded | Parched (severity 1 | 2), Fleeting | Brittle (2 | 3), Rot | Deadened
+   (3 | 4): the measurement cannot tell those pairs apart. A second seed block would; the cut stands as the sort put it.
+5. **THE UNTALENTED READING GRADES EIGHT DIFFERENTLY** (Overgrown 3, Deadened 1, Muffled 1, the Thin Veil 5, Warded 3, the Long
+   Silence 4, Frenzied 2, Rot 4): the grades are the default build's — IN's table, its standard errors a tenth to a third of the
+   untalented's. Which build grades is yours.
+6. **THE THIN VEIL IS FEVERISH's RULE AT TWICE THE FIGURE**, on Feverish's Attack door (the ladder Miasma and Bloodless already
+   are); it measures one grade harsher (4 against 3). Confirm the reading, or name a rule of its own.
+7. **THE LONG SILENCE's READINGS**: a summon's calls count as separate abilities (a cooldown keys the same way); a counter, a
+   wind-up's release and Blood Tribute's strike are the cast completing, not a second use; a Psychosis turn's support pick obeys
+   it; an enemy's declared move names its basic a turn ahead once the move is spent. Confirm.
+8. **THE CENSUS's WEAK PICKS ARE LISTED, NOT REPAIRED** (321 — filler picks whose verdict holds for nearly any member, IN's
+   *four weaker* shape): the sites are repaired. Whether a filler pick is a site is yours (IO's report, §6).
+9. **THE BOT's POTION IS STILL A FLAT 40** (owed, not repaired — the instrument does not move in the batch that reads it): it is
+   why Famine read as nothing, and it distorts every measurement that turns on healing received — Bloodless refuses it, Miasma
+   halves it, and early in a run it heals more than the player's 20% while late it heals less.
+10. **THROUGH AND THROUGH's REFUND IS REPAIRED AND DORMANT**: nothing writes the field since FX. Whether a node or rune returns it
+    is yours.
+11. **THE CLERIC GAINS LEAST UNDER THE DARK** (his heals are not damage): fed 5,349 health where a Pyromancer was fed 17,982 over
+    the same runs — a tax on his share of the party's healing, not on his kit. Reported, the figure left.
+12. **THE RE-GRADE MAKES WARDEN's BARGAINS MUCH MILDER AND RUIN's MUCH HARDER**: in natural play a Warden bargain fight ends at
+    0.936 of the party's health against 0.846 (Wanderer 0.971 against 0.916, Ruin 0.753 against 0.876) — the four costliest are
+    Ruin's alone now, and the dealt means barely move because the counts did not. Whether Warden keeps one of the costliest four
+    (a fifth severity-4 slot, or a band reaching 5) is yours; the counts were held, so nothing moved.
+
+### FOUND AT IO AND NOT FIXED — ITS CLOSED ITEMS (archived at IP; the section stays in `docs/state.md`)
+
+- **IN's CLAIM THAT ALL 57 OF IM's SITES NAME THEIR PICK WAS SHORT BY SEVEN** (A5, A13, A14, B6, B17, B28, B30 named it in some
+  FAIL lines only): IO's census found them and §6 repaired them; `docs/instrument-rules.md`'s superlative block says so now.
+- **A FAIL LINE THAT TYPES TODAY's PICK** (*Slash*, *Smite*, *Magic Bolt*, *a Strike*, *Blood Frenzy:*, *the Mage*) names nothing:
+  it goes stale the moment the pick moves (IO's census, the risk it named first). Repaired where the row is a site; the rest are
+  among the weak picks (IO's ruling 8).
+
+### FOUND AT IN AND NOT FIXED — ITS CLOSED ITEMS (archived at IP; the section stays in `docs/state.md`)
+
+- **THE BOT's HEALTH POTION HEALS A FLAT 40** (`_player_turn`'s drink: `heal_amount(40, true)`), where the player's heals
+  `Run.HEALTH_POTION_PCT` of maximum (CT §6) — the bot plays another potion. **Owed, and not repaired at IO by ruling** (IO's
+  brief §8: an instrument does not move in the batch that reads it) — IO's ruling 9 says what it distorts.
+
+### FOUND AT FW AND NOT FIXED — **A REPORT TOUCHES NO CODE; THE FIRST THREE ARE PLAYER-FACING** — ITS CLOSED ITEMS (archived at IP; the section stays in `docs/state.md`)
+
+- **The sim bot's Health Potion heals a flat 40** (`battle.gd:3778-3788`), not `Run.health_potion_heal`'s 20% of
+  maximum — against `CLAUDE.md`'s CT §6 (*"battle and map both CALL them"*), so every sim item-economy figure
+  measures a different potion from the player's.
+
+
 ## ARCHIVED AT IO — 2026-10-18, FROM `docs/state.md` AS IN LEFT IT (`c986583`)
 
 **What came here**: IN's twelve rulings, every one answered in IO's brief; the Sanctity section's IL figures, superseded by IO §3's

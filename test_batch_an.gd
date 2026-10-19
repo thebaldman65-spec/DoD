@@ -160,9 +160,11 @@ func _test_offer(RunState) -> void:
 	# BATCH IN §1 RE-POINTED THESE TWO IN PLACE, THE COUNT UNMOVED: Ruin's four stand at severity 5 beside the twenty
 	# every rung deals, so the pool is twenty-four, and the test knows the four by name and grade. RE-POINTED AGAIN AT
 	# IO §1 AND §2: Famine and Cruel Order are removed, the Thin Veil and the Long Silence joined, and every grade is the
-	# measurement's — so the test knows the four by name, each at a grade the ladder holds.
-	var ruin_four := {"wasting": 5, "hungering_dark": 5, "thin_veil": 5, "long_silence": 5}
-	ok(run.MODIFIERS.size() == 24, "twenty-four authored modifiers (the twenty, and the four authored at severity 5 — IN §1, IO §1)")
+	# measurement's — so the test knows the four by name, each at a grade the ladder holds. RE-POINTED AGAIN AT IP §1a: the
+	# Hungering Dark is removed (two-sidedness did not make it even), so the pool is twenty-three and the test knows the three
+	# of the four that stand.
+	var ruin_four := {"wasting": 5, "thin_veil": 5, "long_silence": 5}
+	ok(run.MODIFIERS.size() == 23, "twenty-three authored modifiers (the twenty, and the three of the four authored at severity 5 that stand — IN §1, IO §1, IP §1a)")
 	ok(run.MODIFIERS.size() == want.size() + ruin_four.size()
 			and ruin_four.keys().all(func(k): return run.modifier_severity(String(k)) >= 1 and run.modifier_severity(String(k)) <= 5),
 		"...and the test knows all of them")

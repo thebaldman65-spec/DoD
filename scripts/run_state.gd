@@ -1258,10 +1258,10 @@ const ZONE_BASE_MULTS := [1.0, 1.5, 2.2]
 # MILD OPTION.
 #
 # BATCH IN §1 — RUIN's GAMBLES ARE SEVERITY 5, AND NO OTHER RUNG's BANDS REACH IT.
-# Four bargains stand at severity 5 — whichever four IO §2's measurement grades
-# hardest — so a severity-5 modifier is one Wanderer and Warden are never offered;
-# Ruin's safe slot stays 3–4. The band holds four and two are drawn without
-# replacement, as Warden's four at 4.
+# Three bargains stand at severity 5 — whichever three the measurement grades hardest
+# (four until IP §1b) — so a severity-5 modifier is one Wanderer and Warden are never
+# offered; Ruin's safe slot stays 3–4. The band holds three and two are drawn without
+# replacement.
 const DIFFICULTIES := {
 	"wanderer": {"rung": 1, "name": "Wanderer", "mult": 0.50,
 		"blurb": "The Decay is thin here. No twist.",
@@ -4529,15 +4529,20 @@ func bomb_damage() -> int:
 # THE POOL IS WEIGHTED LOW, DELIBERATELY. Every offer's first draw comes from
 # the rung's mild pool, so the safe slot on every card all run is served by
 # that pool alone; the harsh end already rotates and the low end is what
-# actually repeats. Counts: 6 / 6 / 4 / 4 across severities 1-4, and four more
-# at severity 5 since IN §1 — dealt at Ruin alone (its gamble band).
+# actually repeats. Counts: 6 / 6 / 4 / 4 across severities 1-4, and three more
+# at severity 5 — dealt at Ruin alone (its gamble band); four from IN §1 to IP §1b.
 #
 # **BATCH IO §2 — EVERY GRADE IN THE TABLE IS A MEASUREMENT (the designer's).** A
 # modifier's severity is its rank by what it costs a party, not by how it reads: the
 # twenty-four were forced one at a time on every bargain of a Ruin run, sorted by the
 # party's health at a bargain fight's end (runs completed breaking a tie) and cut at the
 # counts above, which do not change — the bands are built on them. Nineteen moved; which,
-# and why each cut sits where it does, is IO's report (§2). The section headers below say
+# and why each cut sits where it does, is IO's report (§2). **BATCH IP §1b — SEVERITY 5 IS
+# THE CLIFF, THREE DEEP (the designer's)**: with the Hungering Dark gone the deck is
+# twenty-three, the top grade holds the three the measurement sets a sixth of the party's
+# health below the rest, and the grades the repaired bot could move were re-taken on it and
+# the cuts that read as ties were measured again — six moved (IP's report, §1b and §2; two
+# cuts are still ties, named in `docs/state.md`). The section headers below say
 # where each modifier was AUTHORED, not where it is graded. A re-grade keeps the table's
 # order, so the dice deal by the same positions.
 #
@@ -4563,21 +4568,22 @@ func bomb_damage() -> int:
 # not change the odds. So Famine (the pouch — enemies carry none) and Cruel Order
 # (the warband first — *both sides first* is incoherent) are REMOVED, not disabled;
 # their built shape and IN's measurements are in `docs/design-notes.md`. Wasting
-# and the Hungering Dark bind both sides, and two two-sided rules replace the pair.
+# binds both sides, and two two-sided rules replace the pair. **BATCH IP §1a — THE
+# HUNGERING DARK IS REMOVED TOO, NOT DISABLED (the designer's)**: two-sided, it paid
+# whoever deals more damage, and the heroes deal about six times what a warband does,
+# so a bargain under it was a gift. Its shape, IO's measurements and the rule it
+# taught are in `docs/design-notes.md`.
 # Every figure is read off a constant below (II §0.7: a figure the code holds is
 # read, never retyped); each is a STARTING VALUE (CQ §6) and the designer's to tune.
 #   wasting         a clock on the fight — `battle._wasting_tick`, at the end of every
 #                   unit's turn, through the tick door: not a strike, so no ward, no
 #                   armor and no Less Damage Taken reaches it, and it names nobody.
 #                   Authored as ROT; the `rot` above holds the name (BR §1).
-#   hungering_dark  the damage race    — BL's one damage door (`battle._dark_feeds`), a
-#                   heal NO UNIT PERFORMED (`heal_amount`'s `unowned` door, IO §1b)
 #   thin_veil       every blow         — Feverish's door, the Attack every damage reads:
 #                   the harsh rung of the ladder Feverish starts, as Bloodless tops Miasma's
 #   long_silence    the hand           — `BattleUnit.silenced`, asked by `ability_ready`
 #                   and the enemy's re-validation; a unit's basic attack is exempt
 const WASTING_PCT := 0.08
-const HUNGERING_DARK_PCT := 0.5
 const THIN_VEIL_PCT := 0.5
 # BATCH IO §5 — EVERY MODIFIER CARRIES ITS OWN LETTERS (`tag`), for the battle's bargain chip, and HU §4's
 # rule binds them as it binds a status's: no two chips in the game show the same letters, case set aside,
@@ -4591,20 +4597,20 @@ const SEVERITY_COLORS := {
 	5: Color(0.78, 0.32, 0.82),
 }
 const MODIFIERS := {
-	"overgrown": {"name": "Overgrown", "tag": "Ov", "severity": 5,
+	"overgrown": {"name": "Overgrown", "tag": "Ov", "severity": 4,
 		"desc": "Both parties begin the fight at 70% health at most."},
 	"tinderbox": {"name": "Tinderbox", "tag": "Ti", "severity": 1,
 		"desc": "All fire strike damage +25%, whoever deals it."},
 	"frenzied": {"name": "Frenzied", "tag": "Fr", "severity": 1,
 		"desc": "Everyone acts 30% faster. Cooldowns are unchanged."},
-	"brittle": {"name": "Brittle", "tag": "Bi", "severity": 3,
+	"brittle": {"name": "Brittle", "tag": "Bi", "severity": 2,
 		"desc": "All attacks ignore armor, on both sides."},
 	"warded": {"name": "Warded", "tag": "Wa", "severity": 1,
 		"desc": "All abilities cost 25% more. Basic attacks are free."},
 	"bloodless": {"name": "Bloodless", "tag": "Nh", "severity": 5,
 		"desc": "No healing for anyone. Bleed and damage-over-time still tick."},
 	# ---- authored by AQ at severity 1 (every grade in this table is IO §2's measurement) ----
-	"parched": {"name": "Parched", "tag": "Pa", "severity": 2,
+	"parched": {"name": "Parched", "tag": "Pa", "severity": 1,
 		"desc": "Both parties begin the fight at half resource at most."},
 	"slick": {"name": "Slick Footing", "tag": "Sk", "severity": 2,
 		"desc": "Every ability costs +0.5 initiative. Everyone is slower to come round again."},
@@ -4619,7 +4625,7 @@ const MODIFIERS := {
 		"desc": "Every status applied lasts one turn less (never below one)."},
 	"feverish": {"name": "Feverish", "tag": "Fv", "severity": 3,
 		"desc": "Everyone deals 25% more damage. Fights end quickly, one way or the other."},
-	"deadened": {"name": "Deadened", "tag": "Dd", "severity": 4,
+	"deadened": {"name": "Deadened", "tag": "Dd", "severity": 3,
 		"desc": "Nobody can be Broken. The Break meter does nothing this fight."},
 	"miasma": {"name": "Miasma", "tag": "Ma", "severity": 4,
 		"desc": "All healing received is halved."},
@@ -4634,16 +4640,13 @@ const MODIFIERS := {
 	"mirrorbound": {"name": "Mirrorbound", "tag": "Mr", "severity": 5,
 		"desc": "An attack that does not miss sends a quarter of the damage it deals back on its attacker — at least 1, even when it deals none. On both sides."},
 	# ---- authored at severity 4 (Batch BB §5, AQ's authored fourth) ----
-	"rot": {"name": "Rot", "tag": "Ro", "severity": 3,
+	"rot": {"name": "Rot", "tag": "Ro", "severity": 4,
 		"desc": "Everyone's maximum health is halved, on both sides. It lasts the fight and no longer."},
 	# ---- authored at severity 5 (Batch IN §1, re-cut at IO §1), both sides each ----
 	"wasting": {"name": "Wasting", "tag": "Ws", "severity": 5,
 		"desc": "At the end of every turn, whoever took it loses %d%% of maximum health — heroes and enemies alike."
 			% [int(round(WASTING_PCT * 100))]},
-	"hungering_dark": {"name": "The Hungering Dark", "tag": "Hu", "severity": 1,
-		"desc": "Whoever deals damage heals %d%% of it — heroes and enemies alike."
-			% [int(round(HUNGERING_DARK_PCT * 100))]},
-	"thin_veil": {"name": "The Thin Veil", "tag": "Tv", "severity": 4,
+	"thin_veil": {"name": "The Thin Veil", "tag": "Tv", "severity": 3,
 		"desc": "Everyone deals %d%% more damage, blows and ticks alike, on both sides."
 			% [int(round(THIN_VEIL_PCT * 100))]},
 	"long_silence": {"name": "The Long Silence", "tag": "Ls", "severity": 3,
