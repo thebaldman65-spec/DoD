@@ -2156,6 +2156,8 @@ func _apply_battle_modifier() -> void:
 	var cfg: Dictionary = Run.MODIFIERS[mod_id]
 	_log("[b]%s[/b] — %s" % [String(cfg["name"]).to_upper(), String(cfg["desc"])],
 		"#d0a0e0")
+	# BATCH IO §5 — and it stands on the screen for the whole fight.
+	_draw_bargain_strip()
 
 
 # The modifier this battle is being fought under, or "" for none. One place
@@ -2260,19 +2262,37 @@ func _stamp_modifier(u: BattleUnit, mod_id: String, inherited := false) -> void:
 			# that is the design rather than an oversight: Unkillable's mend,
 			# the below-half Mercy window and the Devout's whole kit are RATIOS
 			# of the maximum, so they scale with the smaller pool exactly as
-			# every other modifier binding both parties does. It is why Rot is
-			# severity 4.
+			# every other modifier binding both parties does. It was why Rot was
+			# AUTHORED at severity 4; IO §2 grades it by what it costs, measured.
 			var rot_lost: int = u.max_hp - maxi(u.max_hp / 2, 1)
 			u.max_hp -= rot_lost
 			u.rot_hp_lost += rot_lost
 			u.hp = clampi(u.hp, 1, u.max_hp)
 			u.refresh_bars()
-		# BATCH IN §1 — THE SEVERITY-5 FOUR STAMP NOTHING ON A UNIT. Each binds one side
-		# through one door of the battle, which asks `_modifier_is` where it acts: the
-		# pouch (`_pouch_sealed`), a hero's turn's end (`_wasting_tick`), BL's damage door
-		# (`_dark_feeds`) and the turn order (`_turn_key`). Listed so the table's every
-		# id has its arm here, and a reader looking for one finds where it lives.
-		"famine", "wasting", "hungering_dark", "cruel_order":
+		# BATCH IO §1 — THE THIN VEIL IS FEVERISH's DOOR AT TWICE THE FIGURE: the Attack
+		# every damage reads — a blow's raw, a status's tick, a companion's (it arrives
+		# with its hunter's Attack already raised, hence `inherited`). The harsh rung of
+		# the ladder Feverish starts, as Bloodless tops Miasma's.
+		"thin_veil":
+			if not inherited:
+				u.attack = int(round(u.attack * (1.0 + Run.THIN_VEIL_PCT)))
+		# BATCH IO §1 — THE LONG SILENCE: every unit may use each ability once, and the
+		# one it may always use is its basic attack — a hero's slot 0, an enemy's cheapest
+		# attack (`_cheapest_attack`, the ability re-validation falls back to), so nobody
+		# is ever left with nothing to do. What it has used is booked at `_resolve`'s spend
+		# line; `BattleUnit.silenced` is the one answer, and `ability_ready` asks it.
+		"long_silence":
+			u.mod_silence = true
+			if u.is_hero:
+				u.silence_basic = u.abilities[0].display_name if not u.abilities.is_empty() else ""
+			else:
+				var ls_basic := _cheapest_attack(u)
+				u.silence_basic = ls_basic.display_name if ls_basic != null else ""
+		# BATCH IN §1, re-cut at IO §1 — WASTING AND THE HUNGERING DARK STAMP NOTHING ON A
+		# UNIT. Each binds both sides through one door of the battle, which asks
+		# `_modifier_is` where it acts: the end of a turn (`_wasting_tick`) and BL's damage
+		# door (`_dark_feeds`). Listed so the table's every id has its arm here.
+		"wasting", "hungering_dark":
 			pass
 
 
@@ -2973,9 +2993,6 @@ func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability
 		return
 	var intent_shown := {}   # BATCH BL §1: one icon per enemy, first slot only
 	var sim: Array = alive.map(func(u): return {"unit": u, "t": u.next_time})
-	# BATCH IN §1 — THE BAR ORDERS AS THE LOOP DOES (`_turn_before`), or under Cruel Order it
-	# would draw a turn order the fight does not honour.
-	var cruel := _modifier_is("cruel_order")
 	if preview_unit != null and preview_ability != null:
 		for entry in sim:
 			if entry.unit == preview_unit:
@@ -2989,7 +3006,7 @@ func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability
 	for i in 14:
 		var best: Dictionary = sim[0]
 		for entry in sim:
-			if _turn_before(entry.unit, entry.t, best.unit, best.t, cruel):
+			if entry.t < best.t:
 				best = entry
 		var u: BattleUnit = best.unit
 		var is_ghost: bool = preview_unit != null and u == preview_unit \
@@ -3740,7 +3757,7 @@ func _run_battle() -> void:
 			u.tick_cooldowns()
 			await _wait(0.8)
 			u.next_time += BASIC_DELAY * 100.0 / u.effective_speed()
-			# BATCH IN §1 — and Wasting's clock: a lost turn is still his turn.
+			# BATCH IN §1, both sides since IO §1 — and Wasting's clock: a lost turn is still a turn.
 			if _wasting_tick(u):
 				_check_end()
 			continue
@@ -3924,6 +3941,9 @@ func _run_battle() -> void:
 			# board guards) and a declaration owed on every one of them is a
 			# declaration owed by the CALLER.
 			_declare_intent(u)
+			# BATCH IO §1 — WASTING BINDS BOTH SIDES: an enemy's turn ends as a hero's does. Below the
+			# declaration, which BL §1 puts right after the turn; a body the clock fells never acts on it.
+			_wasting_tick(u)
 		# BATCH FK — THE RUNE OF THE GRACE PAYS HERE, at the end of the acting
 		# unit's turn, which is the position the rune's own sentence names.
 		# `_run_battle` cannot be driven headlessly, so the body is its own
@@ -3970,27 +3990,35 @@ func _grace_echo(u: BattleUnit) -> void:
 		int(round(ge_pct * 100.0)), "#70d878")
 
 
-# ══ BATCH IN §1 — WASTING: A CLOCK ON THE FIGHT ═══════════════════════════════
+# ══ BATCH IN §1 — WASTING: A CLOCK ON THE FIGHT — BOTH SIDES SINCE IO §1 ══════════════
 #
-# **At the end of every hero's turn, that hero loses `Run.WASTING_PCT` of his maximum
-# health** — the turn he took, and a turn a stun, a freeze or a Break cost him, which
-# still counts here as every timer's turn does. Its own function for the AR trap's
-# reason (`_run_battle` cannot be driven headlessly), and called at each of the four
-# places a hero's turn ends.
+# **At the end of every turn, whoever took it loses `Run.WASTING_PCT` of its maximum
+# health** — hero and enemy alike (IO §1: AQ's rule, every modifier binds both sides) —
+# the turn it took, and a turn a stun, a freeze or a Break cost it, which still counts
+# here as every timer's turn does. Its own function for the AR trap's reason
+# (`_run_battle` cannot be driven headlessly), and called at each of the five places a
+# turn ends: the hero's, the enemy's, and the three lost-turn branches either side meets.
+# **A companion never wastes**: it takes no turn (a summon carries `next_time = INF`), the
+# per-turn reason a companion receives no per-turn effect.
 #
 # **IT IS NOT A STRIKE, SO IT GOES THROUGH THE TICK DOOR** (`take_tick_damage`), which
 # no barrier, no armor and no *Less Damage Taken* reaches — the last says *strike damage*
 # since IM. What reads every damage a body takes does read it, as it reads a Burn tick:
-# the recap, the party's save, Second Wind's and Battle Trance's ledgers, Momentum's taken
-# half, and the two rule engines that split or pay for damage taken (the Oathkeeper's
-# covenant, the Leech's siphon). **It names nobody**: the frame carries the modifier's
-# name and no source, so it is no hero's and no enemy's to be credited or fed by. It can
-# fell a hero, as a tick can. Returns whether he fell.
+# on a hero, the recap, the party's save, Second Wind's and Battle Trance's ledgers,
+# Momentum's taken half, and the two rule engines that split or pay for damage taken (the
+# Oathkeeper's covenant, the Leech's siphon); on an enemy, Frostbind's mirror (the bond
+# pays out on any damage its body suffers) and nothing that reads a dealer. **It names
+# nobody**: the frame carries the modifier's name and no source, so it is no hero's and no
+# enemy's to be credited, fed or paid by — **A UNIT IT FELLS WAS KILLED BY NOBODY** (the
+# bomb's rule): no Reaver's kill, no damage-dealt credit, and, as at every non-strike
+# damage site, no on-death hook. It can fell either side, as a tick can. A turn that
+# decided the fight ends nothing — the clock stops with the last body of the other side.
+# Returns whether the unit fell.
 func _wasting_tick(u: BattleUnit) -> bool:
-	if u == null or u.dead or not u.is_hero or u.is_companion or battle_over:
+	if u == null or u.dead or u.is_companion or battle_over:
 		return false
-	# A turn that won the fight ends nothing: the clock stops with the last enemy, before the loop decides the end.
-	if enemies.all(func(e): return e.dead):
+	var ws_foes: Array = enemies if u.is_hero else heroes
+	if ws_foes.all(func(f): return f.dead):
 		return false
 	if not _modifier_is("wasting"):
 		return false
@@ -4007,7 +4035,7 @@ func _wasting_tick(u: BattleUnit) -> bool:
 	_log("%s wastes — %d health lost as the turn ends (%s)" % [u.unit_name,
 		ws_before - u.hp, ws_name], "#a8a868")
 	if ws_died:
-		_stat("hero_deaths")
+		_stat("hero_deaths" if u.is_hero else "enemy_deaths")
 		_message("%s succumbs to %s!" % [u.unit_name, ws_name])
 		_log("† %s dies" % u.unit_name, "#e05050")
 	return ws_died
@@ -4045,37 +4073,11 @@ func _next_unit() -> BattleUnit:
 	var alive := (heroes + enemies).filter(func(u): return not u.dead)
 	if alive.is_empty():
 		return null
-	var cruel := _modifier_is("cruel_order")
 	var best: BattleUnit = alive[0]
 	for u in alive:
-		if _turn_before(u, u.next_time, best, best.next_time, cruel):
+		if u.next_time < best.next_time:
 			best = u
 	return best
-
-
-# ══ BATCH IN §1 — CRUEL ORDER: EVERY ENEMY ACTS BEFORE ANY HERO, EACH ROUND ═══════════
-#
-# **The turn order is a timeline, not rounds**: a unit acts when its `next_time` comes up,
-# and a turn pushes it on by `delay * 100 / speed`. **A ROUND IS `ROUND_TICKS` of that
-# timeline — the span a basic swing takes a unit at the average speed (100)** — so the
-# timeline is read in rounds of it, and under Cruel Order every enemy due in a round acts
-# before any hero due in the same round, each side in its own order. Speed still counts
-# across rounds. **Two places order turns and both ask this**, so the loop and the turn bar
-# cannot disagree; with any other modifier it is `next_time` alone, as it always was.
-# A turn placed before the fight's first round — the Tracker's, the Hunter's class
-# passive, at -0.01 — stays before it.
-const ROUND_TICKS := BASIC_DELAY
-
-
-func _turn_before(a: BattleUnit, ta: float, b: BattleUnit, tb: float, cruel: bool) -> bool:
-	if cruel:
-		var ra := floorf(ta / ROUND_TICKS)
-		var rb := floorf(tb / ROUND_TICKS)
-		if ra != rb:
-			return ra < rb
-		if a.is_hero != b.is_hero:
-			return not a.is_hero
-	return ta < tb
 
 
 # Everything enemies can target / allies can help: heroes plus living companions.
@@ -4394,7 +4396,6 @@ func _player_turn(u: BattleUnit) -> void:
 	# the effect stays attributable. Run sims only (RunSim.items_on):
 	# standalone and sweep battles stay dry to keep the R/S baselines.
 	if autoplay and RunSim.active and RunSim.items_on and not u.is_companion \
-			and not _pouch_sealed() \
 			and u.hp < u.max_hp * 0.35 and int(items["health"][1]) > 0:
 		items["health"][1] -= 1
 		item_used = true
@@ -6056,7 +6057,7 @@ func _use_item(item_id: String) -> void:
 	# than a zero count. The picker only ever offers held slots, so this guard is
 	# for the hotkey path and for a test firing an id directly; it is the same
 	# belt-and-braces second gate the shop's buy button already carries.
-	if not items.has(item_id) or items[item_id][1] <= 0 or item_used or _pouch_sealed():
+	if not items.has(item_id) or items[item_id][1] <= 0 or item_used:
 		return
 	item_used = true
 	action_panel.visible = false
@@ -6941,6 +6942,10 @@ func _recast_refusal_note(u: BattleUnit, ab: Ability) -> String:
 func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	if _eff_cost(u, ab) > u.resource or ab.faith_cost > u.second_resource:
 		return false
+	# BATCH IO §1 — THE LONG SILENCE refuses a spent card here as well as through `ability_ready` below, so the
+	# free-summon clause (No Beast Left's, dormant since FX) can never pass a spent call.
+	if u.silenced(ab):
+		return false
 	if not u.ability_ready(ab) \
 			and not (ab.special == "summon" and u.free_summons > 0):
 		return false
@@ -7382,8 +7387,11 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 	var hk := _hotkey_name(key_idx)
 	if hk != "":
 		label = "[%s] %s" % [hk, label]
+	# BATCH IO §4 — THE BUTTON PRINTS THE PRICE THE DOOR CHARGES (`_eff_cost`), the one the
+	# usability door lights it by, so under Warded it reads 38 where it read the list's 30 and
+	# the number and the lit state can no longer disagree. A card with no list price shows none.
 	if ab.cost > 0:
-		label += "   %d %s" % [ab.cost, u.resource_name]
+		label += "   %d %s" % [_eff_cost(u, ab), u.resource_name]
 	elif ab.faith_cost > 0:
 		label += "   %d %s" % [ab.faith_cost, u.second_resource_name]
 	if u.cooldown_left(ab) > 0:
@@ -7673,7 +7681,8 @@ func _open_summon_picker(u: BattleUnit) -> void:
 	for i in _summon_opts.size():
 		var ab: Ability = _summon_opts[i]
 		var b := Button.new()
-		b.text = "%s   %d %s" % [ab.display_name, ab.cost, u.resource_name]
+		# BATCH IO §4 — the picker prints the door's price, as the ability button does.
+		b.text = "%s   %d %s" % [ab.display_name, _eff_cost(u, ab), u.resource_name]
 		b.custom_minimum_size = Vector2(256, 32)
 		b.add_theme_font_size_override("font_size", 13)
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -7943,6 +7952,11 @@ func _ability_tooltip(u: BattleUnit, ab: Ability) -> String:
 		var recast_note := _recast_refusal_note(u, ab)
 		if recast_note != "":
 			tip += "\n%s" % recast_note
+	# BATCH IO §1 — A CARD THE LONG SILENCE HAS SPENT LOOKS SPENT AND SAYS WHY (CO §3's rule):
+	# the usability door darkens it through `ability_ready`, and this is the line it reads.
+	if u.silenced(ab):
+		var ls_cfg: Dictionary = Run.MODIFIERS["long_silence"]
+		tip += "\nUsed this fight — %s: %s" % [String(ls_cfg["name"]), String(ls_cfg["desc"])]
 	# Mini-boss upgrades on this ability (Batch AP §4): NAMES ONLY. Every
 	# number above already reflects them — the upgrade was baked into the
 	# Ability at spawn — so repeating the magnitudes here would be a second
@@ -7982,23 +7996,11 @@ func _build_items_menu() -> Button:
 	btn.text = "[Alt] Items"
 	btn.custom_minimum_size = Vector2(76, 32)
 	btn.add_theme_font_size_override("font_size", 13)
-	btn.disabled = item_used or _pouch_sealed()
+	btn.disabled = item_used
 	btn.tooltip_text = "Already used an item this turn." if item_used \
 		else "Shared hero inventory.\nAlt opens · Tab cycles · Space uses · X closes."
-	# BATCH IN §1 — FAMINE: the button stays where it is and says why it is dark, in the
-	# modifier's own words (CO §3: a darkened button with no reason reads as a bug).
-	if _pouch_sealed():
-		var fam: Dictionary = Run.MODIFIERS["famine"]
-		btn.tooltip_text = "%s: %s" % [String(fam["name"]), String(fam["desc"])]
 	btn.pressed.connect(_open_item_picker)
 	return btn
-
-
-# BATCH IN §1 — FAMINE's ONE DOOR: the pouch is sealed for the fight. The button, the
-# picker, the use path and the bot's drink all ask it, so no route uses an item the
-# player cannot. The pouch belongs to all four heroes, so no class loses its own cards.
-func _pouch_sealed() -> bool:
-	return _modifier_is("famine")
 
 
 # ---------- item picker (Alt opens, Tab cycles, Space uses, X closes) ----------
@@ -8010,7 +8012,7 @@ var _item_idx := -1
 
 
 func _open_item_picker() -> void:
-	if current_hero == null or not action_panel.visible or item_used or _pouch_sealed():
+	if current_hero == null or not action_panel.visible or item_used:
 		return
 	_close_summon_picker()
 	_close_item_picker()
@@ -8359,6 +8361,22 @@ func _declare_intent(u: BattleUnit) -> void:
 		u.intent = {}
 		_refresh_intent_plate(u)
 		return
+	# BATCH IO §1 — THE LONG SILENCE TELLS THE TRUTH A TURN AHEAD. The selection is BL §1's,
+	# untouched; a choice the Silence would refuse at re-validation is declared as the basic
+	# attack it will fall back to, at the hero it chose — or, for a support cast, the most
+	# wounded hero (no die spent) — so the telegraph never shows a move the enemy can no longer make.
+	if u.silenced(chosen["ability"] as Ability):
+		var ls_basic := _cheapest_attack(u)
+		var ls_pool := _hero_side()
+		if ls_basic == null or ls_pool.is_empty():
+			u.intent = {}
+			_refresh_intent_plate(u)
+			return
+		var ls_t: Variant = chosen.get("target")
+		chosen = {"ability": ls_basic,
+			"target": ls_t if (ls_t != null and is_instance_valid(ls_t) and ls_pool.has(ls_t)) \
+				else _lowest_hp(ls_pool),
+			"support": false, "message": "", "logs": []}
 	var ab: Ability = chosen["ability"]
 	u.intent = {
 		"ability": ab, "target": chosen["target"], "turns": 1,
@@ -8501,6 +8519,11 @@ func _intent_ability_usable(u: BattleUnit, ab: Ability) -> bool:
 		var hd_basic := _cheapest_attack(u)
 		if hd_basic != null and ab != hd_basic:
 			return false
+	# BATCH IO §1 — THE LONG SILENCE, at re-validation, Heads Down's door: an ability this
+	# enemy has used falls back to its basic attack, which the Silence never refuses, with the
+	# shipped announcement.
+	if u.silenced(ab):
+		return false
 	return true
 
 
@@ -9379,7 +9402,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	var hf_profligate_mult := 1.0
 	if hf_spell and attacker.rune_profligate > 0.0:
 		hf_profligate_mult = 1.0 + attacker.rune_profligate
-	attacker.resource = clampi(attacker.resource - _eff_cost(attacker, ab, target) \
+	# BATCH IO §4 — THE PRICE THIS CAST PAID, read once off the door and kept, so a refund later
+	# in the cast (Through and Through) gives back what was charged and never the list price.
+	var io_paid := _eff_cost(attacker, ab, target)
+	attacker.resource = clampi(attacker.resource - io_paid \
 		+ ab.resource_gain, 0, attacker.max_resource)
 	# BATCH FU — AND THE DOOR IS TOLD WHETHER THIS WAS A CAST, which is how
 	# Channel counts a free cast as a floor value of Mana rather than zero.
@@ -9387,6 +9413,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	# Cold and the Overtone below read it the same way — so a retaliation books
 	# what it always did, and a Rage bar is untouched because the floor names Mana.
 	attacker.note_resource_spent(cz_res_before - attacker.resource, not is_counter)
+	# BATCH IO §1 — THE LONG SILENCE BOOKS A USE HERE, at the line every cast pays at and by
+	# its definition of a cast (`not is_counter`): a counter, a free retaliation or a riposte is
+	# not a use. What it books is the name `BattleUnit.silenced` reads.
+	if attacker.mod_silence and not is_counter:
+		attacker.silence_spent[ab.display_name] = true
 	attacker.refresh_bars()
 	# BATCH HZ §2 — BOIL OVER POURS OUT THE WHOLE BAR, HERE, beside the line every
 	# price is paid at and for the same reason: the bar leaves before the strike, so
@@ -12340,8 +12371,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_tick_cooldowns(attacker, attacker.follow_through)
 					_log("   → A Cooldown Ticks on a Crit: cooldowns tick %d" % \
 						attacker.follow_through, "#b0a8e0")
+				# BATCH IO §4 — the refund is the price this cast PAID (`io_paid`, the door's), not
+				# the list: a list refund after a waived or discounted charge paid out more than it
+				# took, and after Warded's dearer one gave back less. DORMANT IN PLAY — nothing writes
+				# `through_and_through` since FX (its node went with the twelve trees).
 				if attacker.through_and_through > 0 and ab.cost > 0:
-					attacker.resource = mini(attacker.resource + ab.cost,
+					attacker.resource = mini(attacker.resource + io_paid,
 						attacker.max_resource)
 					attacker.refresh_bars()
 				# BATCH BV — CROSSFIRE (Sharpshooter draft). IT SITS INSIDE THE
@@ -18218,6 +18253,9 @@ func _psychotic_support(u: BattleUnit) -> Array:
 		return []
 	for a in u.abilities:
 		if _eff_cost(u, a) > u.resource:
+			continue
+		# BATCH IO §1 — a Psychosis turn's support pick asks the Long Silence too: a spent ability is not re-used.
+		if u.silenced(a):
 			continue
 		match a.special:
 			"healing_wave", "wild_growth", "totem_pulse", "cleanse_allies":
@@ -28506,6 +28544,83 @@ func _draw_crest_strip(chips: Array) -> void:
 		x += BattleUnit.RUNE_CHIP_W + 2.0
 
 
+# ══ BATCH IO §5 — THE BARGAIN's CHIP: WHAT THIS FIGHT IS FOUGHT UNDER ═════════════════════
+#
+# **A thing acting on the fight is visible during the fight** (the sheet-and-panel discipline):
+# the opening log line scrolls away inside two turns, so the modifier in force stands in a strip of
+# its own at the top of the screen, right of the turn strip and clear of the combat log — a label
+# saying whether the fight's terms were bought (BARGAIN) or laid by Ruin's road on a node a route
+# cannot duck (IMPOSED, `Run.arm_fixed_modifier`: no offer, no choice, no reward), ONE chip wearing
+# the modifier's own letters (`Run.MODIFIERS`' `tag` — HU §4's rule: no other chip in the game shows
+# them), its severity pips as the offer card draws them, and its name. The hover is the one every chip
+# has carried since HZ: its name, its severity and its rule. **It is not a decision, an upgrade, a
+# rune or a thing paying nothing, so it wears none of the four glyphs (◆ ↑ ✦ ○)**: what marks it is the
+# offer card's own mark — its severity's tint and its pips. A fight with no modifier draws no strip.
+const BARGAIN_STRIP_POS := Vector2(660.0, 14.0)
+const BARGAIN_CHIP_H := 14.0
+var _bargain_strip: Node2D = null
+
+
+func _draw_bargain_strip() -> void:
+	if _bargain_strip != null and is_instance_valid(_bargain_strip):
+		_bargain_strip.queue_free()
+	_bargain_strip = null
+	var mod_id := _active_modifier()
+	if sim or mod_id == "":
+		return
+	var cfg: Dictionary = Run.MODIFIERS[mod_id]
+	var sev := int(cfg["severity"])
+	var top := 0
+	for m_id in Run.MODIFIERS:
+		top = maxi(top, Run.modifier_severity(String(m_id)))
+	var tint: Color = Run.SEVERITY_COLORS.get(sev, Color.WHITE)
+	var tip := "\n".join(PackedStringArray(["%s — severity %d of %d" % [String(cfg["name"]), sev, top]])
+		+ _wrap_words(String(cfg["desc"])))
+	_bargain_strip = Node2D.new()
+	_bargain_strip.position = BARGAIN_STRIP_POS
+	add_child(_bargain_strip)
+	var head := Label.new()
+	head.text = "BARGAIN" if not Run.pending_reward.is_empty() else "IMPOSED"
+	head.add_theme_font_size_override("font_size", 9)
+	head.add_theme_color_override("font_color", tint)
+	head.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# Parented, then sized (IH §6's three Godot facts): a font-9 line is 13 px.
+	BattleUnit._put(_bargain_strip, head, Vector2(0, 0), Vector2(60, 13))
+	var chip := Panel.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.06, 0.05, 0.08, 0.95)
+	sb.border_color = tint
+	sb.set_border_width_all(1)
+	sb.set_corner_radius_all(3)
+	chip.add_theme_stylebox_override("panel", sb)
+	chip.mouse_filter = Control.MOUSE_FILTER_STOP
+	chip.tooltip_text = tip
+	chip.set_meta("bargain_chip", mod_id)
+	BattleUnit._put(_bargain_strip, chip, Vector2(0, 16), Vector2(22, BARGAIN_CHIP_H))
+	var tag := Label.new()
+	tag.text = String(cfg.get("tag", ""))
+	tag.add_theme_font_size_override("font_size", 8)
+	tag.add_theme_color_override("font_color", tint)
+	tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	tag.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	chip.add_child(tag)
+	tag.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	for p in top:
+		var pip := ColorRect.new()
+		pip.color = tint if p < sev else Color(0.22, 0.21, 0.25)
+		pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		BattleUnit._put(_bargain_strip, pip, Vector2(28.0 + p * 11.0, 20.0), Vector2(8, 5))
+	var nm := Label.new()
+	nm.text = String(cfg["name"])
+	nm.add_theme_font_size_override("font_size", 11)
+	nm.add_theme_color_override("font_color", Color(0.9, 0.86, 0.78))
+	nm.mouse_filter = Control.MOUSE_FILTER_STOP
+	nm.tooltip_text = tip
+	# A font-11 line is 16 px; the name sits beside the pips, short of the combat log (x 1028).
+	BattleUnit._put(_bargain_strip, nm, Vector2(28.0 + top * 11.0 + 6.0, 15.0), Vector2(260, 16))
+
+
 # One rune's chip: its state and its words, every magnitude read off `payload`.
 func _rune_chip_for(name: String, whose: String, payload: Dictionary, on: bool) -> Dictionary:
 	var lines := PackedStringArray(["%s%s — %s" % [name, " (%s)" % whose if whose != "" else "",
@@ -30746,7 +30861,7 @@ func _on_damage_taken(victim: BattleUnit, lost: int, hp_before: int) -> void:
 		_dmg_frame(pn_was_src, pn_was_label, pn_was_name)
 		_penance_mirroring = false
 	# BATCH IN §1 — THE HUNGERING DARK READS THE DEALER, AS PENANCE DOES, AND ABOVE THE
-	# HERO GATE FOR PENANCE's REASON: its enemy feeds on whoever it hits.
+	# HERO GATE FOR PENANCE's REASON: whoever deals damage feeds on whoever it hits.
 	_dark_feeds(victim, lost)
 	# BATCH GO — FOUR RULE ENGINES READ DAMAGE AN ALLY DEALS TO AN ENEMY, AND THIS
 	# IS THE DOOR THAT SEES ALL OF IT: a strike, a handler's own damage, a splash, an
@@ -30778,27 +30893,33 @@ func _on_damage_taken(victim: BattleUnit, lost: int, hp_before: int) -> void:
 	_book_taken(victim, lost, hp_before)
 
 
-# ══ BATCH IN §1 — THE HUNGERING DARK: EVERY ENEMY HEALS A SHARE OF THE DAMAGE IT DEALS ═══
+# ══ BATCH IN §1 — THE HUNGERING DARK: WHOEVER DEALS DAMAGE HEALS A SHARE OF IT — BOTH SIDES SINCE IO §1 ═══
 #
-# **It rides BL's one damage door** (`_on_damage_taken`), so every blow an enemy deals —
-# its strike, its splash, its handler's own damage, on a hero, a companion or a body of
-# its own warband a charm turned — feeds it `Run.HUNGERING_DARK_PCT` of the health that
-# left, below every death refusal. **The dealer is the frame's live unit**: an enemy's
-# damage-over-time ticks under a frame that names its layer and no unit, so a tick feeds
-# nothing, and a body that deals damage to itself (a recoil) is not fed by it. **The heal
-# goes through `heal_amount`**, so every refusal a heal meets meets it — Bloodless, Caught
-# Fast, Unmaking — which is the player's answer to it, and it is the damage race the
-# modifier is about: it punishes chip and rewards burst.
+# **It rides BL's one damage door** (`_on_damage_taken`), so every blow a unit deals — its
+# strike, its splash, its handler's own damage, on any body but its own — feeds it
+# `Run.HUNGERING_DARK_PCT` of the health that left, below every death refusal. **Both sides
+# since IO §1** (AQ's rule): a hero, a companion and an enemy are each fed what they deal.
+# **The dealer is the frame's live unit**: a damage-over-time tick runs under a frame that
+# names its layer and no unit, so a tick feeds nothing on either side; a body that deals
+# damage to itself (a recoil) is not fed by it; and a companion's blow struck inside its
+# hunter's cast feeds the hunter, whom the frame names, as every reader of the frame credits him.
+#
+# **AND THE HEAL IS NOBODY's HEALING (IO §1b)** — no unit performed it. It goes through
+# `heal_amount`, so every refusal and every multiplier a heal meets meets it (Bloodless,
+# Caught Fast, Unmaking, Miasma's halving, a Blighted body's inversion) — the player's answer
+# to it — but by its `unowned` door, which no rider reads: not the Covenant's healing half,
+# not Undying Vigil's fork, not the Last Word's re-arm, not the Vigil's Mercy. And it books
+# nothing: no `_stat_heal`, so no healing ledger, no Reprisal, no Abundance, no readout line.
 func _dark_feeds(victim: BattleUnit, lost: int) -> void:
 	if lost <= 0 or victim == null or not _modifier_is("hungering_dark"):
 		return
 	var dk: BattleUnit = _dmg_src
-	if dk == null or not is_instance_valid(dk) or dk.is_hero or dk.dead or dk == victim:
+	if dk == null or not is_instance_valid(dk) or dk.dead or dk == victim:
 		return
 	var dk_amt := int(round(lost * Run.HUNGERING_DARK_PCT))
 	if dk_amt <= 0:
 		return
-	var dk_got: int = dk.heal_amount(dk_amt)
+	var dk_got: int = dk.heal_amount(dk_amt, false, true)
 	if dk_got <= 0:
 		return
 	dk.float_text("+%d" % dk_got, Color(0.58, 0.40, 0.70))

@@ -126,6 +126,7 @@ func _s1_mark_population() -> void:
 
 	# --- the CARDS, derived out of the apply sites ---
 	var owners := {}
+	var owner_from := {}
 	var unowned: Array = []
 	for m2 in marks:
 		if engine_marks.has(String(m2)):
@@ -140,6 +141,8 @@ func _s1_mark_population() -> void:
 				unowned.append("%s@%d" % [m2, at])
 			else:
 				owners[card] = true
+				owner_from["%s@%d" % [String(m2), int(at)]] = "%s from %s at offset %d" % [card, String(m2), int(at)]
+	var owners_s := "each card resolved by the anchor nearest above its apply site, an arm key to the first corpus card with that special: %s" % "; ".join(PackedStringArray(owner_from.values()))
 	ok(unowned.is_empty(),
 		"every mark's apply site resolves to a card (%s)" % ", ".join(unowned))
 	print("    %d cards lay a mark: %s" % [owners.size(),
@@ -147,7 +150,7 @@ func _s1_mark_population() -> void:
 	# **THE SWEEP ASSERTS ITS OWN POPULATION** (EA §5): a back-walk that
 	# resolved nothing would report a clean tree.
 	ok(owners.size() >= 10, "the derivation reached a real population (%d cards)"
-		% owners.size())
+		% owners.size() + " — %s" % owners_s)
 
 	# --- and the table must agree, in both directions ---
 	var untagged: Array = []
@@ -155,13 +158,13 @@ func _s1_mark_population() -> void:
 		if not Classes.card_tags(String(c)).has("MARK"):
 			untagged.append(String(c))
 	ok(untagged.is_empty(),
-		"every card that lays a mark carries MARK (%s)" % ", ".join(untagged))
+		"every card that lays a mark carries MARK (%s)" % ", ".join(untagged) + " — %s" % owners_s)
 	var stray: Array = []
 	for key in Classes.CARD_TAGS:
 		if (Classes.CARD_TAGS[key] as Array).has("MARK") and not owners.has(String(key)):
 			stray.append(String(key))
 	ok(stray.is_empty(),
-		"no card carries MARK without laying one (%s)" % ", ".join(stray))
+		"no card carries MARK without laying one (%s)" % ", ".join(stray) + " — %s" % owners_s)
 
 	# **EIGHT LEAD WITH IT AND TWO DO NOT, AND THAT IS THE RULING.** Snare Line
 	# marks the whole FIELD rather than one enemy and Feint marks on one of its

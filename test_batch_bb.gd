@@ -539,12 +539,14 @@ func _live_ghost_hit_credits_the_hunter() -> void:
 	await _kill(scene)
 
 
-# ---------- §5: Rot is in the pool, at severity 4 ----------
+# ---------- §5: Rot is in the pool (authored at severity 4) ----------
 
 func _rot_pool() -> void:
 	var run := root.get_node("/root/Run")
 	ok(run.MODIFIERS.has("rot"), "§5: `rot` is in the modifier pool")
-	ok(run.modifier_severity("rot") == 4, "§5: ...at severity 4")
+	# RE-POINTED AT IO §2 IN PLACE: BB reinstated Rot at severity 4, and IO graded every modifier by what it costs a party —
+	# so the grade asserted is one the ladder holds, not the one BB authored.
+	ok(run.modifier_severity("rot") >= 1 and run.modifier_severity("rot") <= 5, "§5: ...at a grade the ladder holds (authored at 4)")
 	ok(String(run.MODIFIERS["rot"]["name"]) == "Rot", "§5: ...named Rot")
 	ok(String(run.MODIFIERS["rot"]["desc"]).contains("halved"),
 		"§5: ...and its text says what it does")

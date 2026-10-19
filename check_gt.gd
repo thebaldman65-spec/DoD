@@ -527,8 +527,10 @@ func _s1_the_pouch() -> void:
 		scrolled.size(), str(scrolled.slice(0, 3))])
 	print("    [record] a six with a core slot empty scrolls in %d of %d, Close pinned in each — %s" % [
 		scrolled_open.size(), 2 * cap * SEATS.size(), ", ".join(PackedStringArray(scrolled_open))])
+	var ord_pick := "the ordinary rune each class's one-rune arm held, his class's longest by its authored desc length: %s" % str(
+		SEATS.map(func(k): return "%s=%s" % [k, String(Runes.config(_longest_ordinary(String(k))).get("name", "?"))]))
 	ok(seen == 2 * configs.size() and closed == 2 * configs.size(),
-		"§1: Close drawn in %d and pressed shut in %d of %d" % [seen, closed, 2 * configs.size()])
+		("§1: Close drawn in %d and pressed shut in %d of %d" % [seen, closed, 2 * configs.size()]) + " — %s" % ord_pick)
 	# BATCH HC §5 — THE ONE SLOTTED PAIRING THAT SITS OUT, AND ONLY IT: the Rune of
 	# the Beastmaster beside the Rune of the Sharpshooter, wherever both are slotted —
 	# one pair, and since IA four triples and the Hunter's six with two or three slotted
@@ -709,11 +711,14 @@ func _s1_a_bag_of_twenty(mp: Node, pinned: Rect2, slots_n: int) -> void:
 				slotted.size() + worn.size() + bagged.size(), bagged.size()])
 		if sc != null and not btns.is_empty():
 			var last: Button = btns[btns.size() - 1]
+			var last_pick := "%s on the '%s' row, the last button the scroller draws" % [String(last.text), ", ".join(PackedStringArray(
+				last.get_parent().get_children().filter(func(ch): return ch is Label).map(
+					func(ch): return String((ch as Label).text).get_slice(" — ", 0))))]
 			sc.ensure_control_visible(last)
 			await Gate.frames(self, 2)
 			ok(sc.get_global_rect().encloses(last.get_global_rect()),
-				"§1: %s — the last row's %s cannot be scrolled wholly into view (%s in %s)" % [
-					label, String(last.text), str(last.get_global_rect()), str(sc.get_global_rect())])
+				("§1: %s — the last row's %s cannot be scrolled wholly into view (%s in %s)" % [
+					label, String(last.text), str(last.get_global_rect()), str(sc.get_global_rect())]) + " — %s" % last_pick)
 			var content_h := (sc.get_child(0) as Control).get_combined_minimum_size().y
 			tall.append("%s (%d rows) %d px in %d" % [key, btns.size(), int(content_h), int(sc.size.y)])
 		if close != null:

@@ -397,6 +397,8 @@ func _s1a_the_sections() -> void:
 			if card == "" and ab != null and ab.damage > 0 and ab.cooldown > 0:
 				card = String(n)
 				m3 = hm
+	var card_pick := "%s on the %s, the first owned card with damage and a cooldown in party order, then each hero's owned-card order" % [
+		card, String(m3.get("key", ""))]
 	ok(card != "", "§1a: the premise — a hero carries a card with damage and a cooldown")
 	if card == "":
 		return
@@ -411,12 +413,12 @@ func _s1a_the_sections() -> void:
 	var quick := ("Cooldown: %d → %d" % [base.cooldown, base.cooldown - 2]) if base.cooldown > 2 \
 		else "Cooldown: %d turn%s → none" % [base.cooldown, "" if base.cooldown == 1 else "s"]
 	ok(card != "" and tx.has("%s: Honed" % card) and tx.has("%s: Quickened" % card) and tx.has("%s: Piercing" % card),
-		"§1a: the UPGRADES section does not name each choice as card: upgrade (%s)" % [tx])
+		("§1a: the UPGRADES section does not name each choice as card: upgrade (%s)" % [tx]) + " — %s" % card_pick)
 	ok(tx.has(_run.upgrade_desc("up_damage")) and tx.has(_run.upgrade_desc("up_pierce")),
-		"§1a: the UPGRADES section does not say what each upgrade does")
-	ok(tx.has(honed) and tx.has(quick), "§1a: the UPGRADES section does not show what Honed and Quickened do to %s ('%s', '%s' in %s)" % [card, honed, quick, tx])
+		"§1a: the UPGRADES section does not say what each upgrade does" + " — %s" % card_pick)
+	ok(tx.has(honed) and tx.has(quick), ("§1a: the UPGRADES section does not show what Honed and Quickened do to %s ('%s', '%s' in %s)" % [card, honed, quick, tx]) + " — %s" % card_pick)
 	ok(_run.upgrade_preview(m3, {"id": "up_pierce", "ability": card}) == "",
-		"§1a: Piercing moves a figure the card's block prints — the premise of a choice shown with its sentence alone")
+		"§1a: Piercing moves a figure the card's block prints — the premise of a choice shown with its sentence alone" + " — %s" % card_pick)
 	print("    %s: '%s', '%s', Piercing its sentence alone" % [card, honed, quick])
 	mp3.call("_shut_hero_draft")
 	# ONE CONFIRM COMMITS ALL FOUR, at the cap, both benches; the benched kept.

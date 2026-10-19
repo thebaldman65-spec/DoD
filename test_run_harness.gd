@@ -101,25 +101,25 @@ func _go() -> void:
 	quit(0 if fails == 0 else 1)
 
 
-func _check(label: String, got, want) -> void:
+func _check(label: String, got, want, pick := "") -> void:
 	checks += 1
 	if got == want:
 		print("  ok   %s (%s)" % [label, str(got)])
 	else:
 		fails += 1
-		print("  FAIL %s: got %s, want %s" % [label, str(got), str(want)])
+		print(("  FAIL %s: got %s, want %s" % [label, str(got), str(want)]) + ((" — %s" % pick) if pick != "" else ""))
 
 
 # Batch BK: a branching map turns several of this file's constants into
 # ranges. A range check states BOTH ends so it still fails on a real drift —
 # a bare "is it plausible" would be the check quietly giving up.
-func _check_range(label: String, got: float, lo: float, hi: float) -> void:
+func _check_range(label: String, got: float, lo: float, hi: float, pick := "") -> void:
 	checks += 1
 	if got >= lo and got <= hi:
 		print("  ok   %s (%s in [%s, %s])" % [label, str(got), str(lo), str(hi)])
 	else:
 		fails += 1
-		print("  FAIL %s: got %s, want [%s, %s]" % [label, str(got), str(lo), str(hi)])
+		print(("  FAIL %s: got %s, want [%s, %s]" % [label, str(got), str(lo), str(hi)]) + ((" — %s" % pick) if pick != "" else ""))
 
 
 # THE LAST STATEMENT OF EVERY GATE. Do not move it, do not make it
@@ -354,17 +354,19 @@ func _gate_talent_conservation() -> void:
 			var ty := String(run.current_node()["type"])
 			counts[ty] = int(counts.get(ty, 0)) + 1
 			walked += 1
+	var route_pick := "the route taking run.reachable()[0] at every step across the %d boards, each generated under _seeded(): %d encounters, crossing %s" % [
+		int(run.SLOT_COUNT), walked, str(counts)]
 	# A walk that met no elite proves nothing about elites, so the types are
 	# asserted PRESENT before the purse is asserted empty — otherwise "nothing
 	# paid" is satisfied by a board nobody crossed.
 	for ty in ["fight", "elite", "miniboss", "blacksmith", "merchant", "event"]:
-		_check("the walk crossed a %s" % ty, int(counts.get(ty, 0)) > 0, true)
+		_check("the walk crossed a %s" % ty, int(counts.get(ty, 0)) > 0, true, route_pick)
 	_check("the walk is 49 encounters", walked, 49)
 	_check("three ZONE bosses", int(counts.get("boss", 0)), 3)
 	_check("one END boss", int(counts.get("endboss", 0)), 1)
 	# An unsteered route takes what it is offered, so the ordinary-fight count
 	# is a RANGE. Both ends stated, so it still fails on a real drift.
-	_check_range("ordinary fights walked", float(counts.get("fight", 0)), 9.0, 33.0)
+	_check_range("ordinary fights walked", float(counts.get("fight", 0)), 9.0, 33.0, route_pick)
 	_check("the whole walk banked NOTHING", _purse_total(), 0)
 
 	# THE ONE DOOR. A SIM MUST NEVER OPEN IT — a simulated run that wrote the

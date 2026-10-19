@@ -299,6 +299,12 @@ var mod_no_break := false      # Deadened   — read in take_hit()'s Break block
 var mod_no_regen := false      # Thin Air   — read in battle._player_turn()
 var mod_bleed_add := 0         # Bloodletting — read at battle's on-hit bleed
 var mod_recoil := 0.0          # Mirrorbound  — read at battle's recoil site
+# BATCH IO §1 — THE LONG SILENCE, one flag and its two pieces of bookkeeping, all read in `silenced()`:
+# the abilities this unit has used this fight (booked at `battle._resolve`'s spend line, a cast and
+# never a counter) and the one it may always use, its basic attack (stamped with the flag).
+var mod_silence := false       # The Long Silence — read in silenced()
+var silence_spent := {}        # display_name -> true, this fight
+var silence_basic := ""        # the one ability the Silence never refuses
 # One Soul: EVERY member of the bond, self included — the hunter and each of
 # his living beasts. BATCH AY §1 made it an Array because The Pack fields two
 # beasts, so the bond spans THREE bodies and a single partner pointer could
@@ -3940,7 +3946,18 @@ func tick_cooldowns() -> void:
 
 
 func ability_ready(ab: Ability) -> bool:
+	if silenced(ab):
+		return false
 	return int(cooldowns.get(ab.display_name, 0)) <= 0
+
+
+# BATCH IO §1 — THE LONG SILENCE's ONE ANSWER: this unit has used this ability this fight and it is
+# not its basic attack. `ability_ready` asks it, so the hero's button, every arm of the bot and the
+# usability door read one answer; the enemy's re-validation asks it directly (`_intent_ability_usable`).
+# Keyed on the name, as a cooldown is — a summon's three calls are three names.
+func silenced(ab: Ability) -> bool:
+	return mod_silence and ab != null and silence_spent.has(ab.display_name) \
+		and ab.display_name != silence_basic
 
 
 func cooldown_left(ab: Ability) -> int:
@@ -5156,7 +5173,11 @@ func recover_from_break() -> void:
 # (+15% while Rallied), and Frostbite (-50%). `external` marks heals from
 # another unit or an item — the Warden's Endurance talent resets on them.
 # Returns the healing that actually landed (after multipliers).
-func heal_amount(amount: int, external := false) -> int:
+# BATCH IO §1b — `unowned`: A HEAL NO UNIT PERFORMED (the Hungering Dark's drink, and only it). It meets
+# every refusal and every multiplier below — the player's answer to it — and NO RIDER: not the Covenant's
+# healing half, not Undying Vigil's fork, not the Last Word's re-arm, not the Vigil's Mercy, and it stamps
+# no overheal for Abundance or Font of Light to read. A heal-triggered rule reads a heal somebody did.
+func heal_amount(amount: int, external := false, unowned := false) -> int:
 	# Bloodless (Batch AN): no healing for anyone. It sits at the top of the
 	# heal pipeline with the other absolute refusals — Bleed and every
 	# damage-over-time run through take_hit and are untouched by it, which is
@@ -5248,7 +5269,7 @@ func heal_amount(amount: int, external := false) -> int:
 	# takes its half through its OWN pipeline — the other's refusals, multipliers
 	# and clamp included. What the other body refused comes back to this one (the
 	# Vow's rule, pointed at a heal).
-	if amount > 1 and not _covenant_guard and covenant_partner() != null \
+	if amount > 1 and not unowned and not _covenant_guard and covenant_partner() != null \
 			and covenant_heal_cb.is_valid():
 		var heal_half := int(amount * Classes.COVENANT_SHARE)
 		if heal_half > 0:
@@ -5282,8 +5303,9 @@ func heal_amount(amount: int, external := false) -> int:
 	# on. Both are read at the bottom of this function, below the clamp.
 	var heal_was_below_mercy := hp <= max_hp * mercy_threshold
 	var heal_was_below_quarter := hp <= max_hp * LAST_WORD_AT
-	last_overheal = maxi(final - (max_hp - hp), 0)
-	overheal_shielded = false
+	if not unowned:
+		last_overheal = maxi(final - (max_hp - hp), 0)
+		overheal_shielded = false
 	# BATCH BM §2 — FONT OF LIGHT (Holy, Radiance row 8). Overhealing is the
 	# lane's waste product and seven rows make more of it; here it becomes the
 	# resource that pays for casting. The field is on the CASTER, so battle.gd
@@ -5293,6 +5315,9 @@ func heal_amount(amount: int, external := false) -> int:
 	if external and final > 0:
 		healed_externally = true
 	refresh_bars()
+	# BATCH IO §1b — A HEAL NO UNIT PERFORMED STOPS HERE: every rider below reads a heal somebody did.
+	if unowned:
+		return final
 	# BATCH BQ — UNDYING VIGIL. It fires HERE, at the bottom of the one function
 	# every heal in the game passes through, and that position is what makes
 	# "healed BY ANY SOURCE" true rather than "healed by the abilities we

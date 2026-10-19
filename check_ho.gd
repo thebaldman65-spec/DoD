@@ -544,6 +544,8 @@ func _s1d_the_cache() -> void:
 		if String(cfg0.get("scope", "")) == "class:mage" and not Runes.is_engine_rune(String(id0)):
 			cls = String(id0)
 			break
+	var cls_pick := ("the first offerable Mage class rune in the drop's own order, %s (`%s`)" % [
+		String(Runes.config(cls).get("name", "")), cls]) if cls != "" else "no offerable Mage class rune was found"
 	_park_all_but(CRESTS + [cls])
 	# THE ROLL IS THE GAME'S: the elite's cache and the bargain both call it.
 	var triple: Array = _run.roll_rune_candidates(mage)
@@ -551,14 +553,14 @@ func _s1d_the_cache() -> void:
 	var ids: Array = []
 	for c in triple:
 		ids.append(String((c as Dictionary).get("id", "")))
-	ok(cls != "" and ids == [cls], "§1d: the cache's roll offered the Mage %s — want the class rune %s alone" % [ids, cls])
+	ok(cls != "" and ids == [cls], ("§1d: the cache's roll offered the Mage %s — want the class rune %s alone" % [ids, cls]) + " — %s" % cls_pick)
 	var queued: Array = [Runes.build("tithe"), Runes.build(cls), Runes.build("dirge")]
 	mage["rune_candidates"] = [queued.duplicate(true)]
 	mage["rune_picks_owed"] = 1
 	var ov := await _open_cache(1)
 	var cls_name := String(Runes.config(cls).get("name", cls))
 	ok(ov != null and Gate.has_text(ov, cls_name) and not Gate.has_text(ov, "(for the crest)"),
-		"§1d: the Mage's cache shows a crest rune, or not the class rune left (%s)" % cls_name)
+		("§1d: the Mage's cache shows a crest rune, or not the class rune left (%s)" % cls_name) + " — %s" % cls_pick)
 	ok(ov != null and not Gate.has_text(ov, "Tithe") and not Gate.has_text(ov, "Dirge"),
 		"§1d: the Mage's cache names a crest rune queued before the scope")
 	# The class rune chosen on the screen, then its Confirm — the pick is the Confirm (IB §2).
@@ -572,11 +574,11 @@ func _s1d_the_cache() -> void:
 	var said_worn := Gate.has_text(current_scene, "fills the crest")
 	await Gate.frames(self, 3)
 	ok(took != "" and _names(mage.get("runes", [])).has(cls_name),
-		"§1d: the class rune taken from the Mage's cache is not his (%s)" % [_names(mage.get("runes", []))])
+		("§1d: the class rune taken from the Mage's cache is not his (%s)" % [_names(mage.get("runes", []))]) + " — %s" % cls_pick)
 	ok(not said_worn, "§1d: a pick from the Mage's own cache was announced as filling the crest")
 	ok(_run.party_runes.is_empty() and _run.rune_bag.is_empty(),
 		"§1d: the Mage's cache put %s in the crest / %s in the bag" % [_names(_run.party_runes), _names(_run.rune_bag)])
-	ok((mage.get("rune_candidates", []) as Array).is_empty(), "§1d: the answered cache is still queued")
+	ok((mage.get("rune_candidates", []) as Array).is_empty(), "§1d: the answered cache is still queued" + " — %s" % cls_pick)
 
 # ── §1e — THE EVENT VERB ────────────────────────────────────────────────────
 

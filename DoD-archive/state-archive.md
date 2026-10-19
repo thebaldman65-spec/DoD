@@ -17,6 +17,73 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT IO — 2026-10-18, FROM `docs/state.md` AS IN LEFT IT (`c986583`)
+
+**What came here**: IN's twelve rulings, every one answered in IO's brief; the Sanctity section's IL figures, superseded by IO §3's
+re-take on the repaired bot (the live section carries IO's); and three of FOUND AT IN's seven items — the list prices (repaired
+at IO §4), IM's cut at this file's foot (closed at IN, and asserted since IO §7) and IM's census short of its own shape (re-run at
+IO §6). Everything else in the live file stayed; the roadmap was re-lettered in place (the documents are IP's, the claims IQ's).
+
+
+### ~~IN's RULINGS OWED~~ — **ALL TWELVE ANSWERED IN IO's BRIEF (§0.1–§0.12): THE PLAY CARRIED (1); AQ's RULE STANDS, FAMINE AND CRUEL ORDER REMOVED AT IO §1 (2); WASTING CONFIRMED (3); THE FIXED ENCOUNTERS STAY AT 3–4 (4); `ROUND_TICKS` DELETED WITH CRUEL ORDER, THE CLASS-PASSIVE RULE RECORDED (5); WASTING 8% AND THE DARK A HALF (6); 320 GOLD (7); ONE IN THREE CONFIRMED (8); THE THREE PRICES REPAIRED AT IO §4 (9); THE CENSUS RE-RUN AT IO §6 (10); THE CHIP BUILT AT IO §5 (11); SANCTITY RE-TAKEN AT IO §3 (12)**
+
+Full working: `docs/reports/IN.md`, NEEDS A RULING.
+
+1. **PLAY ONE ZONE WITHOUT THE DEBUG MENU, AND SEND THE FILE** (IH's ruling 1 — asked at II through IN, six batches). The readout
+   names every debug action, so a file that names none is play. It prices Boil Over's rate, Rupture's number and clock, the vow's
+   worth and the Cleric's Mana, and confirms Sanctity's 13. Nothing in the queue waits on it and no batch can do it.
+2. **RUIN's FOUR BIND ONE SIDE** — AQ's rule (every modifier binds both sides, and *"no items this fight"* deliberately not
+   authored) is overturned for severity 5 by IN's brief; the glossary and `master.html` say the twenty bind both and the four one.
+   Confirm, or say which of the four should bind both.
+3. **THE BRIEF's ROT IS WASTING**: Rot is the severity-4 modifier's name, and on Ruin both are dealt. The name is yours.
+4. **RUIN's FIXED ENCOUNTERS DRAW FROM SEVERITY 3–4** (`Run.FIXED_MODIFIER_BAND`), never from the four, which pay a reward a
+   fixed encounter never pays. Whether they should reach severity 5 is yours.
+5. **CRUEL ORDER's ROUND IS ONE BASIC SWING AT THE AVERAGE SPEED** (`battle.ROUND_TICKS`) — the game's turns are a timeline — **and
+   the Hunter's Tracker keeps its opening turn**, placed before the first round. Confirm both.
+6. **WASTING's 5% AND THE DARK's QUARTER, MEASURED** (IN §1b): forced on every Ruin bargain, Wasting costs the party twelve points of health at a fight's
+   end and the Dark one, neither unsurvivable — **but the four as a band leave Ruin's bargains milder for the sim's bot than the
+   severity-4 band they replaced** (health at a bargain's end 0.794 → 0.911, runs 50 → 58 of 60), so the brief's fourth
+   condition is not met; nothing was tuned. Whether either rises is yours.
+7. **SEVERITY 5 PAYS 300**: the ladder's steps (40, 60, 80) are not one slope, so the row took the largest; growing by 20 again
+   would make it 320. Which slope the table has is yours.
+8. **RUIN's MERCHANT IS A THIRD CHOICE AT ITS SEVERITY 3** (gold, a rune or the merchant, one in three each), where Wanderer's and
+   Warden's severity 1 pays its gold or the merchant. Joining the list, not replacing in it, is the reading taken.
+9. **THE ABILITY BUTTON AND THE SUMMON PICKER PRINT THE LIST PRICE** (FOUND AT IN), and Through and Through refunds it.
+10. **IM's CENSUS MISSED SITES OF ITS OWN SHAPE**: nine more first- or last-found picks whose FAIL lines name nothing, and four weaker, in the 23 gates IN read; whether the battery is censused again and the
+    misses repaired as a batch is yours (§0.6's reasoning applies to them unchanged).
+11. **NO MODIFIER HAS A CHIP**: whether the bargain in force wants one is yours.
+12. **§3 WAS MATERIAL**: the bot paid below the door's price on 0.35% of its costed casts on the default build and about 2%
+    untalented (mostly a Mage wearing Profligate), and §3 moves 79 of IG's 180 untalented runs. IG's Sanctity step, IL §1c's
+    re-measure and IM's strike probes ran on that bot — named, not re-run. Whether IO re-takes the step on the repaired bot is
+    yours.
+
+### ~~SANCTITY's STEP — 13 (IG §2), CONFIRMED IN II's BRIEF (§0.2), RE-MEASURED ON THE REPAIRED CODE AT IL §1c AND UNMOVED~~ — **SUPERSEDED AT IO §3: RE-TAKEN ON THE BOT IN §3 REPAIRED, AND UNMOVED (the live section carries IO's figures)**
+
+**`BattleUnit.SANCTITY_PER_STEP` is 13 events a step, `SANCTITY_MAX_STEPS` 5** (16 from FV §3 to IG). `check_ig` §2 pins the step in
+one place, so a re-tune from play moves the constant and that line. **The target is FV §3's and was not reopened**: about half the
+cap by a normal fight's end on untalented rung-1 fights. **IG's figures, the ones the step was set on** (IE's probe on IF's code against every chip drawn — 2.58 steps
+untalented and 2.51 default at 13, a boss 4.04) **are archived at IL**: IL's HEAD arm, below, reproduces them on seeds. **The readout carries his steps a fight; the first
+Hierophant run of the designer's play confirms it** (II's ruling 1).
+
+**RE-MEASURED AT IL §1c, ON THE REPAIRED CODE, AND THE STEP STAYS 13** — the measurement does not ask for a move. IG's probe
+(the same three parties, the Cleric awakened with the Hierophant's rune, rung 1), every run seeded so HEAD and the repair played the
+same seeds; **its table is `docs/reports/IL.md` §1c (IM §0.7)**. The figures a re-tune from play is priced against: at a normal
+fight's end, untalented, **2.58 steps at 13 on HEAD and 2.62 on the repair** (±0.03 an arm; 2.40 and 2.43 at 14), on 41.51 and
+41.55 events; the default build **2.48 and 2.47**; a boss untalented **3.99 and 3.97**, 38.3% and 40.8% at the cap. **The events did
+not rise because they cannot**: the ledger counts every status landing on or leaving any body from any source, so naming the
+Cleric changes how long his statuses last, not whether they count. **What the repair moved is the payout's reach** — the door
+lengthened **5.32 applications a fight where it lengthened 1.18** untalented (5.16 against 2.19 on the default build) — and the
+completions it bought are not significant at this n (28 against 40 runs completed only in one arm).
+
+### FOUND AT IN AND NOT FIXED — ITS CLOSED ITEMS
+
+- **THE PLAYER IS SHOWN THE LIST PRICE**: `battle._ability_popup_button` and `_open_summon_picker` print `ab.cost`, where the door
+  charges `_eff_cost` — under Warded a button reads *30 Rage* for a cast the door charges 38, and is dark at 30–37; Through and
+  Through refunds `ab.cost`. Outside IN's 58 (displays and a payout, not a choice); IN's ruling 9.
+- **IM PUT ITS ARCHIVE CUT AT THE FOOT** of `DoD-archive/state-archive.md`, against that file's *newest cut first*; IN's cut is at
+  the top and IM's stands beneath it, moved whole.
+- **IM's CENSUS MISSED SITES OF ITS OWN SHAPE**, found by IN's repairs in the gates they read (IN's report, §4) — IN's ruling 10.
+
 ## ARCHIVED AT IN — 2026-10-17, FROM `docs/state.md` AS IM LEFT IT (`0743d15`)
 
 **What came here**: IM's six rulings, every one answered in IN's brief — the play carried (IN's ruling 1); the severity-5 band

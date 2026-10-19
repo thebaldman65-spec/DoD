@@ -1107,6 +1107,8 @@ func _oath_arm(s: Node, tag: String) -> void:
 	for h in [W, M, H]:
 		if lowest == null or h.max_hp < lowest.max_hp:
 			lowest = h
+	var low_pick := ("the %s, the lowest maximum health (%d) of the Warrior, the Mage and the Hunter, the first on a tie in that order"
+		% [lowest.unit_name, lowest.max_hp]) if lowest != null else "no hero was picked"
 	ok(C.covenant_partner() == lowest and lowest.covenant_partner() == C
 			and lowest.has_status("oathbound"),
 		"§6 (%s): the Cleric opens bound to the %s, the hero with the lowest maximum health (%d)"
@@ -1114,8 +1116,8 @@ func _oath_arm(s: Node, tag: String) -> void:
 	C.refresh_bars()
 	var chip: Dictionary = C.engine_chip("covenant_oath")
 	ok(String(chip.get("label", "")) == "Oathkeeper" and String(chip.get("desc", "")).contains(lowest.unit_name),
-		"§6 (%s): the chip is named Oathkeeper and names the bound hero" % tag)
-	ok(M == lowest, "§6 (%s): on this board that is the Mage" % tag)
+		("§6 (%s): the chip is named Oathkeeper and names the bound hero" % tag) + " — %s" % low_pick)
+	ok(M == lowest, ("§6 (%s): on this board that is the Mage" % tag) + " — %s" % low_pick)
 	# A BLOW ON EITHER BODY IS SPLIT BETWEEN THEM.
 	# Each blow below is taken on a deepened body, its own maximum put back after —
 	# a blow that fells the hero it measures would move the bond this arm reads.

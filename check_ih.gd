@@ -776,6 +776,8 @@ func _s5_the_hover() -> void:
 	var m: Dictionary = _run.party[seat]
 	var extra: Array = Classes.draft_pool(String(m["key"])).filter(func(n): return (String(n) != longest
 		and not _run.opening_kit_names(m).has(n) and not Classes.sits_out(String(n), Runes.held_engines(m)))).slice(0, 2)
+	var extra_pick := "%s, the first card in Classes.draft_pool(\"%s\") order that is not the longest text, not in the opening kit and does not sit out" % [
+		(String(extra[0]) if extra.size() > 0 else "none"), String(m["key"])]
 	m["bm_abilities"] = [longest] + extra
 	m["bm_equipped"] = [longest]
 	m["upgrades"] = [{"ability": longest, "id": "up_damage"}]
@@ -823,7 +825,7 @@ func _s5_the_hover() -> void:
 		"§5: the longest text's row is not ↑ %s with the whole description and its upgrade on its hover" % longest)
 	ok(brow != null and String(brow.tooltip_text) != "" and String(brow.tooltip_text).contains("Damage")
 			== (Classes.pool_ability(String(extra[0])).damage > 0) if extra.size() > 0 else true,
-		"§5: the benched card's row carries no hover, or not its numbers seated")
+		"§5: the benched card's row carries no hover, or not its numbers seated" + " — %s" % extra_pick)
 	# STRING FOR STRING THE KIT PREVIEW's, for every card both list.
 	_close_overlays(mp)
 	await Gate.frames(self, 1)
@@ -1084,6 +1086,7 @@ func _s6_nothing_over_anything() -> void:
 	ok(int(_configs.get("battle plates", 0)) >= 150 and int(_configs.get("map cards", 0)) >= 28
 			and int(_configs.get("bargain cards", 0)) >= 18 and int(_configs.get("turn strip", 0)) >= 4
 			and int(_configs.get("crest strip", 0)) >= 4 and int(_configs.get("skill-check bar", 0)) >= 4
+			and int(_configs.get("bargain strip", 0)) >= 4
 			and int(_configs.get("plate stacks", 0)) >= 40
 			and _sanctioned > 100,
 		"§6: the walk held too little to mean anything — %s, %d values in bars" % [_configs, _sanctioned])
@@ -1202,6 +1205,31 @@ func _walk_field(s: Node) -> void:
 		var p0: Control = (heroes[0] as BattleUnit).get("_plate_panel")
 		var room := Rect2(Vector2(0, 0), Vector2(1280, p0.get_global_rect().position.y))
 		_hold("crest strip", "the crest strip", room, strip.get_children())
+	# BATCH IO §5 — THE BARGAIN's STRIP, right of the turn strip and short of the combat log, wearing the modifier with
+	# the longest name (the strip's widest line), bought — so its head reads BARGAIN.
+	var ls_id := ""
+	for mid in _run.MODIFIERS:
+		if ls_id == "" or String((_run.MODIFIERS[mid] as Dictionary)["name"]).length() > String((_run.MODIFIERS[ls_id] as Dictionary)["name"]).length():
+			ls_id = String(mid)
+	var ls_pick := "%s, the modifier with the longest name (%d characters)" % [String((_run.MODIFIERS[ls_id] as Dictionary)["name"]),
+		String((_run.MODIFIERS[ls_id] as Dictionary)["name"]).length()]
+	_run.pending_modifier = ls_id
+	_run.pending_reward = {"kind": "gold", "amount": 40}
+	s.call("_draw_bargain_strip")
+	await Gate.frames(self, 1)
+	var bstrip: Node = s.get("_bargain_strip")
+	var bar_end := 0.0
+	var tb: Control = s.get("turn_bar")
+	if tb != null and tb.get_parent() is Control:
+		bar_end = (tb.get_parent() as Control).get_global_rect().end.x
+	var log_x := (s.get("history_panel") as Control).get_global_rect().position.x
+	ok(bstrip != null and bar_end > 0.0, "§6: the premise — the bargain strip drawn (%s) and the turn strip found" % ls_pick)
+	if bstrip != null:
+		_hold("bargain strip", "the bargain strip at %s" % ls_pick, Rect2(Vector2(bar_end, 0), Vector2(log_x - bar_end, 92)),
+			bstrip.get_children())
+	_run.pending_modifier = ""
+	_run.pending_reward = {}
+	s.call("_draw_bargain_strip")
 	# 4 — THE INTENT LINE ABSENT, the row emptied.
 	for u3 in heroes + (s.get("companions") as Array) + enemies:
 		(u3 as BattleUnit).statuses = []

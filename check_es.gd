@@ -649,11 +649,12 @@ func _s4_tags_are_read() -> void:
 	ok(two_tagged != "", "§4: no two-tag card in the table to measure against")
 	if two_tagged != "":
 		var pair: Array = Classes.card_tags(two_tagged)
+		var two_pick := "'%s' %s, the first two-tag card in CARD_TAGS order" % [two_tagged, pair]
 		ok(Classes.tag_count([two_tagged], String(pair[0])) == 1
 				and Classes.tag_count([two_tagged], String(pair[1])) == 1,
-			"§4: '%s' carries %s but does not count on both" % [two_tagged, pair])
+			("§4: '%s' carries %s but does not count on both" % [two_tagged, pair]) + " — %s" % two_pick)
 		ok(Classes.tag_breadth([two_tagged]) == 2,
-			"§4: a two-tag card reads breadth %d" % Classes.tag_breadth([two_tagged]))
+			("§4: a two-tag card reads breadth %d" % Classes.tag_breadth([two_tagged])) + " — %s" % two_pick)
 
 	# ── (5) THE SWAP, DRIVEN THROUGH THE REAL DOORS ──────────────────────────
 	# **THE COUNT MUST MOVE BY EXACTLY THE SWAPPED CARD'S OWN TAGS, IN BOTH
@@ -686,17 +687,19 @@ func _s4_tags_are_read() -> void:
 			break
 	ok(card != "", "§4: no tagged card the %s's draft offer could hold to swap (%d offered)" % [
 		spec3, offered_pool.size()])
+	var card_pick := "'%s' %s, the first tagged card of the %s's offered class pool (%d offered, draft_pool order)" % [
+		card, Classes.card_tags(card), spec3, offered_pool.size()]
 	run.hold_ability(m, card, true)
 	var carried: Dictionary = Classes.tag_census(run.loadout_ability_names(m))
 	ok(run.loadout_ability_names(m).has(card),
-		"§4: the carried card is not in the loadout list")
+		"§4: the carried card is not in the loadout list" + " — %s" % card_pick)
 
 	run.unequip_earned_ability(m, card)
 	var benched: Dictionary = Classes.tag_census(run.loadout_ability_names(m))
 	ok(not run.loadout_ability_names(m).has(card),
-		"§4: a BENCHED card is still in the loadout list")
+		"§4: a BENCHED card is still in the loadout list" + " — %s" % card_pick)
 	ok(run.earned_ability_names(m).has(card),
-		"§4: benching removed the card from the POOL — a bench is not a drop")
+		"§4: benching removed the card from the POOL — a bench is not a drop" + " — %s" % card_pick)
 
 	var moved: Array = []
 	for t6 in Classes.TAG_ORDER:
@@ -707,13 +710,13 @@ func _s4_tags_are_read() -> void:
 	for t7 in Classes.card_tags(card):
 		expect.append("%s +1" % t7)
 	ok(moved == expect,
-		"§4: benching '%s' (%s) moved the census by %s, expected %s" % [
-			card, Classes.card_tags(card), moved, expect])
+		("§4: benching '%s' (%s) moved the census by %s, expected %s" % [
+			card, Classes.card_tags(card), moved, expect]) + " — %s" % card_pick)
 
 	run.equip_earned_ability(m, card)
 	var again: Dictionary = Classes.tag_census(run.loadout_ability_names(m))
 	ok(again == carried,
-		"§4: carrying '%s' again did not restore the census" % card)
+		("§4: carrying '%s' again did not restore the census" % card) + " — %s" % card_pick)
 	print("    swap drive: '%s' %s — census moved %s and came back" % [
 		card, Classes.card_tags(card), moved])
 
@@ -946,12 +949,13 @@ func _s5_breadth() -> void:
 				one_of_each.append(String(nm))
 				break
 	var want: int = one_of_each.size()
+	var probe_pick := "%s, the first single-tag card of each tag in TAG_ORDER, in CARD_TAGS order" % [one_of_each]
 	ok(want >= 3, "§5: only %d tags have a single-tag card to build a probe from" % want)
 	ok(Classes.tag_breadth(one_of_each) == want,
-		"§5: %d single-tag cards read breadth %d" % [
-			want, Classes.tag_breadth(one_of_each)])
+		("§5: %d single-tag cards read breadth %d" % [
+			want, Classes.tag_breadth(one_of_each)]) + " — %s" % probe_pick)
 	ok(Runes.breadth_met(one_of_each, want),
-		"§5: a breadth test AT the live spread is not met")
+		"§5: a breadth test AT the live spread is not met" + " — %s" % probe_pick)
 	ok(not Runes.breadth_met(one_of_each, want + 1),
-		"§5: a breadth test ABOVE the live spread reads as met")
+		"§5: a breadth test ABOVE the live spread reads as met" + " — %s" % probe_pick)
 	ok(not Runes.breadth_met([], 1), "§5: an empty loadout meets a breadth test")

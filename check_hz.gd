@@ -458,6 +458,10 @@ func _s1a_the_telegraph() -> void:
 			with_status = ab
 		elif ab.damage > 0 and ab.applies_status.is_empty() and plain == null:
 			plain = ab
+	var ws_pick := ("%s (applies %s), the %s's first damaging ability that applies a status, in its kit order" % [
+		with_status.display_name, String(with_status.applies_status.get("id", "")), foe.unit_name]) if with_status != null else "none"
+	var plain_pick := ("%s, the %s's first damaging ability that applies nothing, in its kit order" % [
+		plain.display_name, foe.unit_name]) if plain != null else "none"
 	ok(with_status != null and plain != null,
 		"§1a: the raider carries an attack that applies a status and one that applies nothing")
 	# THE POSITIVE ARM — the attack that applies something, aimed at the Warden.
@@ -472,18 +476,18 @@ func _s1a_the_telegraph() -> void:
 		if with_status.status_chance < 1.0:
 			want_applies += " (%d%% chance)" % int(round(with_status.status_chance * 100.0))
 		ok(txt != "" and _intent_label(foe).mouse_filter == Control.MOUSE_FILTER_PASS,
-			"§1a: the intent line of a declaring enemy carries no hover (filter %d)" % _intent_label(foe).mouse_filter)
+			("§1a: the intent line of a declaring enemy carries no hover (filter %d)" % _intent_label(foe).mouse_filter) + " — %s" % ws_pick)
 		ok(lines.size() > 0 and lines[0] == with_status.display_name,
-			"§1a: the hover does not open on the attack's name: %s" % [lines])
+			("§1a: the hover does not open on the attack's name: %s" % [lines]) + " — %s" % ws_pick)
 		ok(lines.has(_call(s, "_damage_line", [foe, with_status], "<no damage line>")),
-			"§1a: the hover's band is not the damage line the ability's own data gives: %s" % [lines])
-		ok(lines.has(want_applies), "§1a: the hover does not say `%s`: %s" % [want_applies, lines])
+			("§1a: the hover's band is not the damage line the ability's own data gives: %s" % [lines]) + " — %s" % ws_pick)
+		ok(lines.has(want_applies), ("§1a: the hover does not say `%s`: %s" % [want_applies, lines]) + " — %s" % ws_pick)
 		# BATCH IJ §2 — ALLY: an enemy declares against `_hero_side()`, companions included, so IJ repaired the word.
-		ok(lines.has("Hits one ally"), "§1a: the hover does not say how many it hits: %s" % [lines])
+		ok(lines.has("Hits one ally"), ("§1a: the hover does not say how many it hits: %s" % [lines]) + " — %s" % ws_pick)
 		var named: Array = heroes.filter(func(h): return txt.contains(h.unit_name))
-		ok(named.is_empty(), "§1a: the hover names %s — it says what the attack does, never whom it is aimed at" % [
-			named.map(func(h): return h.unit_name)])
-		ok(not lines.has(""), "§1a: the hover prints an empty line: %s" % [lines])
+		ok(named.is_empty(), ("§1a: the hover names %s — it says what the attack does, never whom it is aimed at" % [
+			named.map(func(h): return h.unit_name)]) + " — %s" % ws_pick)
+		ok(not lines.has(""), ("§1a: the hover prints an empty line: %s" % [lines]) + " — %s" % ws_pick)
 		print("  declared %s at the %s → hover:\n      %s" % [with_status.display_name, w.unit_name,
 			"\n      ".join(lines)])
 	# THE NEGATIVE ARM — an attack that applies nothing prints no effect line.
@@ -491,9 +495,9 @@ func _s1a_the_telegraph() -> void:
 		_declare(s, foe, plain, w)
 		var txt2 := _hover(foe)
 		var lines2 := txt2.split("\n")
-		ok(txt2 != "" and lines2[0] == plain.display_name, "§1a: the plain attack's hover is %s" % [lines2])
+		ok(txt2 != "" and lines2[0] == plain.display_name, ("§1a: the plain attack's hover is %s" % [lines2]) + " — %s" % plain_pick)
 		ok(not txt2.contains("Applies") and not lines2.has(""),
-			"§1a: an attack that applies nothing printed an effect line or an empty one: %s" % [lines2])
+			("§1a: an attack that applies nothing printed an effect line or an empty one: %s" % [lines2]) + " — %s" % plain_pick)
 		print("  declared %s → hover: %s" % [plain.display_name, " | ".join(lines2)])
 	# THE ENEMY WITH NOTHING TO DETAIL — no declaration, no line, no hover.
 	foe.intent = {}
@@ -513,7 +517,7 @@ func _s1a_the_telegraph() -> void:
 		root.push_input(mv, true)
 		await process_frame
 		var hovered: Control = root.gui_get_hovered_control() if root.has_method("gui_get_hovered_control") else null
-		ok(hovered == lbl, "§1a: a pointer on the intent line hovers %s, not the line" % [hovered])
+		ok(hovered == lbl, ("§1a: a pointer on the intent line hovers %s, not the line" % [hovered]) + " — %s" % ws_pick)
 	# THE TURN BAR'S GLYPH IS THE SAME TELEGRAPH, AND CARRIES THE SAME DETAIL.
 	if with_status != null:
 		_declare(s, foe, with_status, w)
@@ -531,7 +535,7 @@ func _s1a_the_telegraph() -> void:
 			for k in cur.get_children():
 				stack.append(k)
 		ok(glyph_tip != "" and glyph_tip.contains(String(_call(s, "_intent_hover_text", [foe], "<no hover>"))),
-			"§1a: the turn bar's glyph does not carry the plate's detail (%s)" % glyph_tip.replace("\n", " | "))
+			("§1a: the turn bar's glyph does not carry the plate's detail (%s)" % glyph_tip.replace("\n", " | ")) + " — %s" % ws_pick)
 	# THE CENSUS — every enemy ability in the data, detailed off its own fields, never a target.
 	var n := 0
 	var bad: Array = []

@@ -919,6 +919,7 @@ func _s2_the_draft() -> void:
 		var ov3: Node = _overlay(s2, 62)
 		var q3: Array = hero.get("draft_candidates", [])
 		var incoming := String((q3[0] as Array)[0]) if not q3.is_empty() else ""
+		var in_pick := "%s, the first card of the rolled at-the-cap draft offer" % incoming
 		ok(ov3 != null and incoming != "", "§2: the at-the-cap draft screen did not open")
 		if ov3 != null and incoming != "":
 			_press_exact(ov3, incoming)
@@ -928,7 +929,7 @@ func _s2_the_draft() -> void:
 				"§2: the at-the-cap column drew no `Choose what %s replaces`" % incoming)
 			await process_frame
 			var drop: Node = _overlay(s2, 64)
-			ok(drop != null, "§2: the bench overlay did not open")
+			ok(drop != null, "§2: the bench overlay did not open" + " — %s" % in_pick)
 			var benched := ""
 			if drop != null:
 				# **THE PROTECTED CORE MUST NOT BE OFFERED.** A protected name
@@ -942,11 +943,13 @@ func _s2_the_draft() -> void:
 					if _press_exact(drop, "Bench %s" % String(dn)):
 						benched = String(dn)
 						break
+			var bench_pick := "%s, the first card of the hero's equipped list, in loadout order, the bench overlay offered" % (
+				benched if benched != "" else "none")
 			ok(benched != "", "§2: no `Bench …` button could be pressed")
 			await process_frame
 			var ov5: Node = _overlay(s2, 62)
 			ok(ov5 != null and _press(ov5, ["Confirm the draft"]) != "",
-				"§2: the confirm would not press with every column decided")
+				"§2: the confirm would not press with every column decided" + " — %s" % in_pick)
 			await process_frame
 			await process_frame
 			var after_loadout: Array = _run.loadout_ability_names(hero)
@@ -958,7 +961,7 @@ func _s2_the_draft() -> void:
 			# though the loadout did not, and that is the whole ruling.
 			ok(int(_run.owned_ability_names(hero).size()) == pool_before + 1,
 				"§2: the pool went %d → %d — a benched card was LOST, not kept" % [
-					pool_before, int(_run.owned_ability_names(hero).size())])
+					pool_before, int(_run.owned_ability_names(hero).size())] + " — %s" % bench_pick)
 			ok(_run.benched_ability_names(hero).has(benched),
 				"§2: `%s` is benched and does not read as benched" % benched)
 			print("    at cap %d: took %s, benched %s, loadout %d → %d, pool %d → %d" % [
@@ -991,6 +994,7 @@ func _s3_the_rune_offer() -> void:
 	ok(not offers.is_empty(), "§3: the Peddler offered NO rune to any hero")
 	var bought := 0
 	var owned_before: Array = []
+	var buy_pick := "no Peddler offer"
 	if not offers.is_empty():
 		# BATCH HR — THE ARM BUYS A CLASS RUNE WHEN THE COUNTER HOLDS ONE, through that
 		# row's own Buy: a crest rune's purchase cannot show a class rune sent the wrong
@@ -1004,6 +1008,9 @@ func _s3_the_rune_offer() -> void:
 		var first: Dictionary = offers[at]
 		var who: int = int(first["member_idx"])
 		var rune: Dictionary = first["rune"]
+		buy_pick = "%s (%s, a %s rune), offer %d of %d on the Peddler's rolled counter, the first that is not a crest rune (offer 0 when all are)" % [
+			String(rune.get("name", "")), String(rune.get("id", "")),
+			"crest" if Runes.is_party_rune(rune) else "class", at, offers.size()]
 		# BATCH GK — THE HERO'S POUCH IS BOTH LISTS, his runes and his engine runes.
 		# (From HK to HR a purchase landed in the BAG whatever its kind; since HR §1 a
 		# class or core rune is held by its hero — `Run.buy_rune` through `Run.hold_rune`.)
@@ -1047,16 +1054,16 @@ func _s3_the_rune_offer() -> void:
 			if Runes.is_party_rune(rune):
 				ok(bag_names.size() == bag_before + 1 and owned_after.size() == owned_before.size(),
 					"§3: a crest rune was bought for %dg and the bag did not grow by it alone (bag %d -> %d, hero %d -> %d)" % [
-						bought, bag_before, bag_names.size(), owned_before.size(), owned_after.size()])
-				ok(bag_names.has(rn), "§3: the crest rune bought was not the rune offered")
+						bought, bag_before, bag_names.size(), owned_before.size(), owned_after.size()] + " — %s" % buy_pick)
+				ok(bag_names.has(rn), "§3: the crest rune bought was not the rune offered" + " — %s" % buy_pick)
 			else:
 				ok(owned_after.size() == owned_before.size() + 1 and bag_names.size() == bag_before,
 					"§3: a class rune was bought for %dg and its hero's holding did not grow by it alone (bag %d -> %d, hero %d -> %d)" % [
-						bought, bag_before, bag_names.size(), owned_before.size(), owned_after.size()])
-				ok(held_after.has(rn), "§3: the class rune bought is not held, unworn, by the hero it was offered to")
+						bought, bag_before, bag_names.size(), owned_before.size(), owned_after.size()] + " — %s" % buy_pick)
+				ok(held_after.has(rn), "§3: the class rune bought is not held, unworn, by the hero it was offered to" + " — %s" % buy_pick)
 			print("    bought `%s` for %dg — a %s rune" % [rn, bought,
 				"crest" if Runes.is_party_rune(rune) else "class"])
-	ok(bought > 0, "§3: the Peddler's rune Buy button spent nothing")
+	ok(bought > 0, "§3: the Peddler's rune Buy button spent nothing" + " — %s" % buy_pick)
 	# **A PEDDLER OFFERS NO ABILITY DRAFT.** FD's defect, and the one thing on
 	# this screen a player already found.
 	#
@@ -1168,6 +1175,7 @@ func _s3_the_rune_offer() -> void:
 		var first_name := String(first.get("name", "?"))
 		var kind := "core" if String(first.get("engine", "")) != "" \
 			else ("crest" if Runes.is_party_rune(first) else "ordinary")
+		var cache_pick := "%s (a %s rune), the first of the Mage's rolled cache as Run.rune_choice orders it" % [first_name, kind]
 		# BATCH HR §1 — WHERE EACH KIND LANDS SINCE THE BAG SPLIT: an ordinary rune worn
 		# while a slot is free, a crest rune in the free crest, and otherwise HELD — a
 		# class or core rune by its hero, unworn (the bag until HR), a crest rune in the
@@ -1187,7 +1195,7 @@ func _s3_the_rune_offer() -> void:
 			(live[0] as Button).emit_signal("pressed")
 			await process_frame
 		var conf: Array = Gate.bound_buttons(Gate.hero_draft(s3), "_confirm_hero_draft")
-		ok(not conf.is_empty(), "§3: the cache's rune was chosen and the Mage's screen would not confirm")
+		ok(not conf.is_empty(), "§3: the cache's rune was chosen and the Mage's screen would not confirm" + " — %s" % cache_pick)
 		if not conf.is_empty():
 			(conf[0] as Button).emit_signal("pressed")
 		await process_frame
@@ -1220,7 +1228,7 @@ func _s3_the_rune_offer() -> void:
 			"§3: the cache's first rune %s, a %s rune, landed on %s, not %s" % [first_name, kind, got, want])
 		print("    the cache's first rune: %s, a %s rune — it went to %s" % [first_name, kind, got])
 		ok(int(looter.get("rune_picks_owed", 0)) == 0,
-			"§3: the cache pick was answered and is still owed")
+			"§3: the cache pick was answered and is still owed" + " — %s" % cache_pick)
 		print("    the cache was answered a node later: %d candidates, %d retired" % [
 			cands.size(), retired.size()])
 
@@ -1271,6 +1279,7 @@ func _s4_bench_a_condition() -> void:
 	# Give him cards through the run's own door, until the drafted half carries
 	# something a bench can actually move.
 	var tag := ""
+	var room_cards: Array = []
 	for _i in 14:
 		if not bool(_run.award_draft_pick(hero)):
 			break
@@ -1283,6 +1292,7 @@ func _s4_bench_a_condition() -> void:
 			var carried: Array = _run.equipped_ability_names(hero)
 			if carried.is_empty():
 				break
+			room_cards.append(String(carried[carried.size() - 1]))
 			if String(_run.take_draft_ability(hero, name0,
 					String(carried[carried.size() - 1]))) != "":
 				break
@@ -1294,7 +1304,9 @@ func _s4_bench_a_condition() -> void:
 				break
 		if tag != "":
 			break
-	ok(tag != "", "§4: no tag reached two drafted cards on a full Berserker kit")
+	var hand_s := "the drafted hand %s, the head card of each seeded rolled offer taken in turn, benching %s (the last carried card each time the kit was full) to make room" % [
+		str(_run.equipped_ability_names(hero)), str(room_cards)]
+	ok(tag != "", "§4: no tag reached two drafted cards on a full Berserker kit" + " — %s" % hand_s)
 	if tag == "":
 		return
 	# BATCH IN §4 — THE PICK, NAMED (IM §0.8): the tag pulled on is the FIRST in
@@ -1303,7 +1315,7 @@ func _s4_bench_a_condition() -> void:
 	# a tag row that moves re-selects both in silence. Every FAIL line about the
 	# bench names the tag, its count and (once there are any) the cards benched.
 	var pick_s := "pulling on %s, the first tag in TAG_ORDER two carried cards hold (%d of them)" % [
-		tag, int(Classes.tag_count(_run.equipped_ability_names(hero), tag))]
+		tag, int(Classes.tag_count(_run.equipped_ability_names(hero), tag))] + "; %s" % hand_s
 	# THE PANEL, AND ITS LINE. The needle is the WHOLE joined census exactly as
 	# `map_screen` builds it, not one `TAG n` pair: at ten carried cards a count
 	# of 1 is a substring of a count of 13, and a needle that can match a
@@ -1316,7 +1328,7 @@ func _s4_bench_a_condition() -> void:
 		return
 	var before := _census_needle(hero)
 	ok(_has_text(ov, before),
-		"§4: the loadout panel does not show its own census `%s`" % before)
+		"§4: the loadout panel does not show its own census `%s`" % before + " — %s" % pick_s)
 	ok(not _has_text(ov, "RUNE CONDITIONS"),
 		"§4: the loadout panel still draws a `RUNE CONDITIONS` line — FN retired both conditions")
 	# BENCH UNTIL THE CENSUS MOVES. Every bench is a real press on the panel's
@@ -1434,12 +1446,13 @@ func _s5_the_pouch() -> void:
 	var gold0: int = int(_run.gold)
 	var slots0: int = int(_run.slots_used())
 	var bought := _press(shop, ["Health"])
+	var health_pick := "%s, the first enabled shop button whose text begins `Health`" % (bought if bought != "" else "none")
 	ok(bought != "", "§5: the shop drew no consumable button to press")
 	await process_frame
 	await process_frame
-	ok(int(_run.gold) < gold0, "§5: a consumable was bought and no gold was spent")
-	ok(int(_run.items.get("health", 0)) >= 1, "§5: a Health Potion was bought and did not arrive")
-	ok(int(_run.slots_used()) == slots0 + 1, "§5: the purchase took no pouch slot")
+	ok(int(_run.gold) < gold0, "§5: a consumable was bought and no gold was spent" + " — %s" % health_pick)
+	ok(int(_run.items.get("health", 0)) >= 1, "§5: a Health Potion was bought and did not arrive" + " — %s" % health_pick)
+	ok(int(_run.slots_used()) == slots0 + 1, "§5: the purchase took no pouch slot" + " — %s" % health_pick)
 	# A FULL STACK IS A WALL. Buy until the cap, then buy once more.
 	var cap: int = int(_run.item_stack_cap("health"))
 	var passes := 0
@@ -1452,8 +1465,8 @@ func _s5_the_pouch() -> void:
 		await process_frame
 	ok(int(_run.items.get("health", 0)) == cap,
 		"§5: the stack could not be filled to its cap of %d (reached %d)" % [
-			cap, int(_run.items.get("health", 0))])
-	ok(bool(_run.item_full("health")), "§5: a full stack does not read as full")
+			cap, int(_run.items.get("health", 0))] + " — %s" % health_pick)
+	ok(bool(_run.item_full("health")), "§5: a full stack does not read as full" + " — %s" % health_pick)
 	var before_refusal: int = int(_run.gold)
 	var stack_before: int = int(_run.items.get("health", 0))
 	var shop3: Node = current_scene
@@ -1462,33 +1475,34 @@ func _s5_the_pouch() -> void:
 	await process_frame
 	ok(int(_run.items.get("health", 0)) == stack_before,
 		"§5: a FULL stack accepted another purchase — %d → %d" % [
-			stack_before, int(_run.items.get("health", 0))])
+			stack_before, int(_run.items.get("health", 0))] + " — %s" % health_pick)
 	ok(int(_run.gold) == before_refusal,
-		"§5: the refused purchase took %dg anyway" % (before_refusal - int(_run.gold)))
+		"§5: the refused purchase took %dg anyway" % (before_refusal - int(_run.gold)) + " — %s" % health_pick)
 	# THE SELL. Two presses — arm, then confirm — which is the screen's own
 	# guard against a mis-click selling a potion the player needs.
 	var shop4: Node = current_scene
 	var gold_b: int = int(_run.gold)
 	var have_b: int = int(_run.items.get("health", 0))
 	var armed := _press(shop4, ["Sell +"])
+	var sell_pick := "%s, the first enabled shop button whose text begins `Sell +`" % (armed if armed != "" else "none")
 	ok(armed != "", "§5: the shop drew no Sell button")
 	await process_frame
 	await process_frame
 	var shop5: Node = current_scene
 	ok(int(_run.items.get("health", 0)) == have_b,
-		"§5: the FIRST press of Sell sold the item — the confirm step is gone")
+		"§5: the FIRST press of Sell sold the item — the confirm step is gone" + " — %s" % sell_pick)
 	var sold := _press(shop5, ["Sure? +"])
-	ok(sold != "", "§5: the armed Sell drew no `Sure?` confirm")
+	ok(sold != "", "§5: the armed Sell drew no `Sure?` confirm" + " — %s" % sell_pick)
 	await process_frame
 	await process_frame
 	# **A SELL TAKES THE WHOLE STACK AND FREES THE SLOT** (CT §2: a partial
 	# stack cannot be split across slots, so there is no "sell three of six").
 	ok(int(_run.items.get("health", 0)) == 0 and not _run.items.has("health"),
 		"§5: the confirmed sell left %d in the pouch — the stack and its SLOT go together"
-			% int(_run.items.get("health", 0)))
+			% int(_run.items.get("health", 0)) + " — %s, confirmed by `%s`" % [sell_pick, sold])
 	ok(int(_run.slots_used()) == 0,
-		"§5: the sold stack did not free its slot (%d used)" % int(_run.slots_used()))
-	ok(int(_run.gold) > gold_b, "§5: the confirmed sell paid nothing")
+		"§5: the sold stack did not free its slot (%d used)" % int(_run.slots_used()) + " — %s, confirmed by `%s`" % [sell_pick, sold])
+	ok(int(_run.gold) > gold_b, "§5: the confirmed sell paid nothing" + " — %s, confirmed by `%s`" % [sell_pick, sold])
 	print("    bought %d to the cap, the refusal held, sold the stack for %dg" % [
 		have_b, int(_run.gold) - gold_b])
 	# NO SLOT IS A CHOICE, NOT A REFUSAL. Fill every slot with other kinds and
@@ -1614,6 +1628,7 @@ func _s6_the_exhausted_pool() -> void:
 				live.size(), offer.size()])
 		var held_before: int = int((hero["bm_abilities"] as Array).size())
 		var cb: Button = Gate.bound_button(ov, "_stage_boss", [2, String(offer[0])])
+		var fb_pick := "%s, the first card of the rolled class-pool fallback offer (%d cards)" % [String(offer[0]), offer.size()]
 		ok(cb != null, "§6: the fallback card `%s` drew no pressable button" % String(offer[0]))
 		if cb != null:
 			cb.emit_signal("pressed")
@@ -1632,7 +1647,7 @@ func _s6_the_exhausted_pool() -> void:
 		await process_frame
 		await process_frame
 		ok(int((hero["bm_abilities"] as Array).size()) == held_before + 1,
-			"§6: the fallback card was pressed and the hero did not gain it")
+			"§6: the fallback card was pressed and the hero did not gain it" + " — %s" % fb_pick)
 
 
 # ── §7 — THE SKILL CHECK, ALL FOUR CASES ────────────────────────────────────
@@ -1664,6 +1679,7 @@ func _s7_the_skill_check() -> void:
 	ok(ss != null, "§7: the party has no Sharpshooter")
 	if ss == null:
 		return
+	var ss_pick := "%s, the last seated hero holding lethal_aim" % ss.unit_name
 	# (1) THE ORDINARY CHECK. Dead centre is Perfect, 0.60 is a Good, the far
 	# end is a Sloppy — and the bar is VISIBLE while it grades.
 	var g_perfect := await _bar(scene, "", 0.5)
@@ -1749,18 +1765,18 @@ func _s7_the_skill_check() -> void:
 	print("    sharpshooter: good half %.4f of the track vs %.4f — but %.4f s vs %.4f s"
 		% [float(prof["good_half"]), float(base["good_half"]), ss_secs, base_secs])
 	ok(float(prof["good_half"]) > float(base["good_half"]),
-		"§7: the Sharpshooter's Good FRACTION is not wider than the default — the derivation moved")
+		"§7: the Sharpshooter's Good FRACTION is not wider than the default — the derivation moved" + " — %s" % ss_pick)
 	ok(ss_secs < base_secs,
 		"§7: the Sharpshooter's Good tolerance is %.4f s against the default %.4f s — his bar is not harder"
-			% [ss_secs, base_secs])
+			% [ss_secs, base_secs] + " — %s" % ss_pick)
 	ok(ss_p < base_p,
-		"§7: the Sharpshooter's Perfect tolerance is %.4f s against %.4f s" % [ss_p, base_p])
+		"§7: the Sharpshooter's Perfect tolerance is %.4f s against %.4f s" % [ss_p, base_p] + " — %s" % ss_pick)
 	var off: float = ss_secs / base_secs
 	ok(absf(off - (base_p / base_p * ss_p / base_p)) < 1.0,
-		"§7: the two halves take DIFFERENT offsets — the exception is a slope, not an offset")
+		"§7: the two halves take DIFFERENT offsets — the exception is a slope, not an offset" + " — %s" % ss_pick)
 	ok(absf((ss_p / base_p) - off) < 0.001,
 		"§7: Good is scaled %.4f and Perfect %.4f — a fixed offset scales both the same"
-			% [off, ss_p / base_p])
+			% [off, ss_p / base_p] + " — %s" % ss_pick)
 	# THE FOCUS METER IS `second_resource`, and the press count comes off it.
 	# The Focus meter is `second_resource`, and the press ladder is one press
 	# below 50 and then one per `SS_SEQ_STEP` — so the four-press case needs the
@@ -1773,21 +1789,21 @@ func _s7_the_skill_check() -> void:
 		int(ss.second_resource), presses, int(full.get("presses", 1))])
 	ok(presses > 1,
 		"§7: at full Focus the sequence is %d press — the multi-press case is unreachable"
-			% presses)
+			% presses + " — %s" % ss_pick)
 	var landed := await _sequence(scene, full, 0.5)
 	print("    every press centred: %d of %d landed" % [
 		int(landed["landed"]), int(landed["pressed"])])
 	ok(int(landed["pressed"]) == presses,
 		"§7: the bar asked for %d presses and %d were taken" % [
-			presses, int(landed["pressed"])])
+			presses, int(landed["pressed"])] + " — %s" % ss_pick)
 	ok(String(landed["grade"]) == "perfect",
-		"§7: every press was centred and the sequence graded %s" % String(landed["grade"]))
+		"§7: every press was centred and the sequence graded %s" % String(landed["grade"]) + " — %s" % ss_pick)
 	var partial := await _sequence(scene, full, 0.99)
 	ok(String(partial["grade"]) == "fail",
-		"§7: every press missed and the sequence graded %s" % String(partial["grade"]))
+		"§7: every press missed and the sequence graded %s" % String(partial["grade"]) + " — %s" % ss_pick)
 	ok(int(partial["pressed"]) == 1,
 		"§7: a Sloppy on the FIRST press did not end the sequence — %d presses were taken"
-			% int(partial["pressed"]))
+			% int(partial["pressed"]) + " — %s" % ss_pick)
 	# (3) THE DEFENSIVE CHECK. **ITS BAR IS DRIVEN AND ITS JOIN CANNOT BE.**
 	# `_defensive_brace` chooses between the bar and a bot roll on
 	# `_nobody_can_press()`, which is `sim or autoplay or headless` — so under
@@ -1812,9 +1828,11 @@ func _s7_the_skill_check() -> void:
 	ok(other != null, "§7: the party has no hero who is not the Warden")
 	if warden == null or other == null:
 		return
-	ok(bool(dscene._has_defensive_check(warden)), "§7: the Warden does not qualify to brace")
+	var warden_pick := "%s, the last seated hero holding heavy_plating; %s, the first seated hero who holds none" % [
+		warden.unit_name, other.unit_name]
+	ok(bool(dscene._has_defensive_check(warden)), "§7: the Warden does not qualify to brace" + " — %s" % warden_pick)
 	ok(not bool(dscene._has_defensive_check(other)),
-		"§7: a hero with no defensive passive qualifies to brace")
+		"§7: a hero with no defensive passive qualifies to brace" + " — %s" % warden_pick)
 	var d_perfect := await _bar(dscene, "defensive", 0.5)
 	ok(d_perfect == "perfect", "§7: a centred defensive press graded %s" % d_perfect)
 	ok(String(dscene.sc_hint.text).contains("INCOMING"),

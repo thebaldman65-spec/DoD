@@ -1310,6 +1310,35 @@ the rune was wired, because it was supplying the one input the defect was in.
   itself picked, never on a subject the control named — so a control on a superlative pick (IM §0.8's rule) reads the
   FAIL line the gate prints for its own pick (IN §4's controls).
 
+## STANDING RULE — A CENSUS BUILT FROM A SWEEP IS BOUNDED BY THE SWEEP's PATTERNS, AND IT IS RE-RUN AFTER ITS REPAIR PASS (Batch IO §0.10, ruled by the designer)
+> **A CENSUS BUILT FROM A SWEEP IS BOUNDED BY THE SWEEP's PATTERNS, AND REPAIRING WHAT IT FOUND FINDS MORE.** A census of
+> this kind is re-run AFTER its repair pass, not before: the repair pass reads code the sweep's patterns never matched, and
+> what it meets there is the census's own blind spot, named in its own shape.
+
+- **THE CASE IS IM's SUPERLATIVE CENSUS.** It named 57 sites from a sweep of variable names, sorts, argmax branches and
+  first-found breaks; the agents repairing 34 of them at IN, reading the gates around each, found nine more first- or
+  last-found picks of the same shape and four weaker — **in the 23 gate files they had to read anyway** — none of which any
+  of the sweep's patterns could match (an index into a rolled offer, a loop that keeps the LAST holder it meets, the first
+  button whose text matches). IO's re-census added the patterns the repair taught and read every target whole, so the
+  sweep was a checklist and not the population; it is the census of record (IO's report, §6). **Its own repair pass was then
+  asked what it met**: 21 picks outside its rows, every one a filler or the gate's own order, and all but four the census's
+  rows or logged rejects already.
+- **THE PATTERNS ARE PART OF THE CENSUS's TERRITORY** (EC §2's rule): a census that reports a count reports it over the
+  shapes it could see, and says which shapes those were, so the next census starts from them and adds the ones its own
+  repair finds.
+- **AND THE RE-RUN IS THE VERIFICATION, NOT A FORMALITY**: the census that follows a repair pass is the one whose silence
+  means something — the repair has read every site's neighbourhood once.
+
+## STANDING RULE — THE STATE ARCHIVE TAKES THE NEWEST CUT FIRST (Batch IO §7, ruled by the designer)
+> **`DoD-archive/state-archive.md` TAKES THE NEWEST CUT FIRST.** A batch's cut goes at the top, above the one before it,
+> under its own *ARCHIVED AT* heading — the file's own header says *newest cut first*, and a reader opening it
+> meets the latest closure first.
+
+- **THE CASE IS IM's CUT, PUT AT THE FOOT**, against the header; IN found it there and moved it whole (every line accounted
+  for, IM's cut byte-identical), and put its own at the top.
+- **IT IS ASSERTED, NOT REMEMBERED**: `check_io` §7 reads every cut heading and reds unless the codes run newest first and
+  the batch that writes this rule's latest cut stands at the top.
+
 ## STANDING RULE — AN EXACT COUNTERFACTUAL IS EXACT ABOUT THE PAIRING, NOT ABOUT THE ESTIMATE (Batch EX §1b)
 
 > **A counterfactual that consumes no randomness removes the difference BETWEEN THE ARMS. It does
@@ -2056,7 +2085,8 @@ NOT a wrapping problem.
   or roll order — and 23 named their pick in every FAIL line at IM, 11 in some and 23 in none (IM's report, §0.8, holds
   the list, one row a site). **IN §4 repaired the 34 as a batch, the designer's** — *as each is next touched* would leave
   them blind for exactly as long as nobody touches them, and the defect is that an UNRELATED batch re-selects them — so
-  all 57 name their pick at IN (`check_in` §4 holds the 34; IN's report, §4, the census again). A new site of the shape
-  names its pick in the batch that writes it.
+  all 57 name their pick at IN (`check_in` §4 holds the 34; IN's report, §4, the census again) — **SHORT BY SEVEN, FOUND AT IO**:
+  IO's re-census read A5, A13, A14, B6, B17, B28 and B30 naming their pick in some FAIL lines only, and repaired them with the
+  rest of its sites (IO's report, §6; `check_io` §6). A new site of the shape names its pick in the batch that writes it.
 - **AND IT IS A VERIFICATION STEP, NOT ONLY A SHAPE**: before a batch writes its prediction, it finds every superlative
   pick whose population its diff touches and names each one's pick on HEAD's tree and on its own.

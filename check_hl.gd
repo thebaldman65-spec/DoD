@@ -873,8 +873,13 @@ func _s2_core_runes() -> void:
 	_new_run()
 	change_scene_to_file("res://scenes/party.tscn")
 	await Gate.frames(self, 6)
+	var sheet_s := ("the sheet opens on hero %d, the %s, seated on %s by _new_run's default, the first of Classes.class_engines(key)" % [
+		int(_run.hero_screen_idx), String(_run.party[int(_run.hero_screen_idx)]["key"]),
+		str(_run.held_engines(_run.party[int(_run.hero_screen_idx)]))]) \
+		if int(_run.hero_screen_idx) >= 0 and int(_run.hero_screen_idx) < _run.party.size() \
+		else "the sheet opens on hero %d, no seat of the %d" % [int(_run.hero_screen_idx), _run.party.size()]
 	ok(not Gate.has_text(current_scene, "Engine:") and Gate.has_text(current_scene, "Blood Frenzy:"),
-		"§2b: the hero sheet still prefixes the rule, or does not show it")
+		"§2b: the hero sheet still prefixes the rule, or does not show it" + " — %s" % sheet_s)
 	# (c) NO PLAYER-FACING STRING CALLS IT AN ENGINE RUNE. The positive arm: the
 	# same sweep finds the new word.
 	var lits := _script_literals()

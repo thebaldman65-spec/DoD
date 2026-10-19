@@ -353,6 +353,8 @@ func _s1c_a_the_strike() -> void:
 			continue
 		ok((float(c.rune_vow_of_silence) > 0.0) == vowed, "§1c(a) (%s): the vow reads %.2f" % [tag, c.rune_vow_of_silence])
 		var ab: Ability = c.abilities[0]
+		var strike_pick := "%s's %s on %s, the card in slot 0 of the Devout's kit order" % [
+			c.unit_name, (ab.display_name if ab != null else "no card"), foe.unit_name]
 		foe.hp = foe.max_hp
 		var h0: int = foe.hp
 		var p0: int = foe.pressure
@@ -364,7 +366,7 @@ func _s1c_a_the_strike() -> void:
 		var head := "%s: %s on %s — " % [c.unit_name, ab.display_name, foe.unit_name]
 		r[vowed] = {"landed": h0 - foe.hp, "bd": foe.pressure - p0, "floats": _floated(foe),
 			"line": _line_with(_log_text(s).substr(log0), head), "booked": _booked(s, c) - d0,
-			"head": head, "type": ab.dmg_type}
+			"head": head, "type": ab.dmg_type, "pick": strike_pick}
 		print("    %-7s landed %d, Break %d, floats %s, booked %s; '%s'" % [tag, r[vowed]["landed"],
 			r[vowed]["bd"], r[vowed]["floats"], r[vowed]["booked"], r[vowed]["line"]])
 		await _clear(s)
@@ -372,22 +374,23 @@ func _s1c_a_the_strike() -> void:
 		return
 	var v: Dictionary = r[true]
 	var u: Dictionary = r[false]
-	ok(int(v["landed"]) == 0, "§1c(a) (vowed): the raider lost %d — the vow let a blow through" % v["landed"])
-	ok(int(u["landed"]) > 0, "§1c(a) (no vow): the raider lost nothing — the premise of every comparison")
+	ok(int(v["landed"]) == 0, ("§1c(a) (vowed): the raider lost %d — the vow let a blow through" % v["landed"]) + " — %s" % v["pick"])
+	ok(int(u["landed"]) > 0, "§1c(a) (no vow): the raider lost nothing — the premise of every comparison" + " — %s" % u["pick"])
 	ok(int(v["bd"]) > 0 and int(v["bd"]) == int(u["bd"]),
-		"§1c(a): the Break read %d vowed against %d — the vow leaves Break damage alone" % [v["bd"], u["bd"]])
+		("§1c(a): the Break read %d vowed against %d — the vow leaves Break damage alone" % [v["bd"], u["bd"]])
+			+ " — vowed, %s; no vow, %s" % [v["pick"], u["pick"]])
 	ok(String(v["line"]) == "%ssilenced by %s, +%d BD" % [v["head"], _vow_name, v["bd"]],
-		"§1c(a) (vowed): the line does not say the vow refused it and its Break, with no figure: '%s'" % v["line"])
-	ok(not String(v["line"]).contains(" dmg"), "§1c(a) (vowed): the line prints a damage figure: '%s'" % v["line"])
-	ok(v["floats"] == [SILENT], "§1c(a) (vowed): the raider floated %s — SILENT stands alone" % [v["floats"]])
-	ok(is_zero_approx(float(v["booked"])), "§1c(a) (vowed): the recap booked %s to him for a blow that landed nothing" % v["booked"])
+		("§1c(a) (vowed): the line does not say the vow refused it and its Break, with no figure: '%s'" % v["line"]) + " — %s" % v["pick"])
+	ok(not String(v["line"]).contains(" dmg"), ("§1c(a) (vowed): the line prints a damage figure: '%s'" % v["line"]) + " — %s" % v["pick"])
+	ok(v["floats"] == [SILENT], ("§1c(a) (vowed): the raider floated %s — SILENT stands alone" % [v["floats"]]) + " — %s" % v["pick"])
+	ok(is_zero_approx(float(v["booked"])), ("§1c(a) (vowed): the recap booked %s to him for a blow that landed nothing" % v["booked"]) + " — %s" % v["pick"])
 	ok(String(u["line"]).begins_with("%s%d %s dmg" % [u["head"], u["landed"], u["type"]])
 		and String(u["line"]).ends_with(", +%d BD" % u["bd"]),
-		"§1c(a) (no vow): the line is not the %d that landed: '%s'" % [u["landed"], u["line"]])
+		("§1c(a) (no vow): the line is not the %d that landed: '%s'" % [u["landed"], u["line"]]) + " — %s" % u["pick"])
 	ok((u["floats"] as Array).has(str(u["landed"])) and not (u["floats"] as Array).has(SILENT),
-		"§1c(a) (no vow): the raider floated %s, not the %d that landed" % [u["floats"], u["landed"]])
+		("§1c(a) (no vow): the raider floated %s, not the %d that landed" % [u["floats"], u["landed"]]) + " — %s" % u["pick"])
 	ok(is_equal_approx(float(u["booked"]), float(u["landed"])),
-		"§1c(a) (no vow): the recap booked %s against %d landed" % [u["booked"], u["landed"]])
+		("§1c(a) (no vow): the recap booked %s against %d landed" % [u["booked"], u["landed"]]) + " — %s" % u["pick"])
 
 
 # ── §1c(b) — `total_dealt`: THE LONGEST CASE ────────────────────────────────

@@ -526,8 +526,10 @@ func _read_screen(scene: Node, seat: int, key: String, deal: Array) -> Dictionar
 	# their words: the first introduces the kit, and any after it is the note.
 	var others: Array = below.filter(func(l): return not String(l.text).begins_with("• "))
 	others.sort_custom(func(a, b): return (a as Control).get_global_rect().position.y < (b as Control).get_global_rect().position.y)
+	var intro_pick := ("the topmost of the %d non-bullet lines below the cards by screen y, \"%s\"" % [
+		others.size(), String(others[0].text)]) if not others.is_empty() else "no line stands below the cards"
 	ok(others.size() >= 1 and String(others[0].text).contains(key.capitalize()),
-		"§2: %s — one line introduces the %s's kit (%d lines)" % [tag, key, others.size()])
+		("§2: %s — one line introduces the %s's kit (%d lines)" % [tag, key, others.size()]) + " — %s" % intro_pick)
 	if others.size() >= 1:
 		authored.append(String(others[0].text))
 
@@ -544,7 +546,8 @@ func _read_screen(scene: Node, seat: int, key: String, deal: Array) -> Dictionar
 			var pid3 := String(Runes.config(String(rid3)).get("engine", ""))
 			ok(nt.contains(Runes.display_name(Runes.config(String(rid3))))
 					and nt.contains("Attack to %d" % _atk_of(key, pid3)),
-				"§3: %s — the note names %s and the Attack it sets" % [tag, rid3])
+				("§3: %s — the note names %s and the Attack it sets" % [tag, rid3])
+					+ " — the note read, \"%s\", a line below %s" % [nt, intro_pick])
 	var raised := 0
 	for rid4 in deal:
 		var pid4 := String(Runes.config(String(rid4)).get("engine", ""))

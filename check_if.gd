@@ -700,6 +700,8 @@ func _s3a_the_loadout_panel() -> void:
 	_run.hold_ability(m, on, true)
 	_run.hold_ability(m, off, false)
 	_run.hold_ability(m, sit, true)
+	var card_pick := "carried %s and benched %s, the first two offerable cards not sitting out in Classes.draft_pool(\"mage\") order, and %s, its first that sits out under %s" % [
+		on, off, sit, str(held)]
 	var mp: Node = await _to_map()
 	_close_overlays(mp)
 	await Gate.frames(self, 2)
@@ -728,29 +730,29 @@ func _s3a_the_loadout_panel() -> void:
 	ok(_row_names(core) == core_want and _row_names(ens) == en_want,
 		"§3a: STARTING KIT holds %s and ENABLERS %s — want the kit %s and its enablers %s" % [_row_names(core), _row_names(ens), core_want, en_want])
 	ok(_row_names(carried) == [on, sit] and _row_names(benched) == [off],
-		"§3a: CARRIED holds %s and BENCHED %s — want [%s, %s] and [%s]" % [_row_names(carried), _row_names(benched), on, sit, off])
+		("§3a: CARRIED holds %s and BENCHED %s — want [%s, %s] and [%s]" % [_row_names(carried), _row_names(benched), on, sit, off]) + " — %s" % card_pick)
 	var bench_btns: Array = (carried["rows"] as Array).map(func(r): return String(r[1]))
 	var carry_btns: Array = (benched["rows"] as Array).map(func(r): return String(r[1]))
 	ok(bench_btns == ["Bench", "Bench"] and carry_btns == ["Carry"],
-		"§3a: a carried row does not offer Bench, or a benched one Carry (%s, %s)" % [bench_btns, carry_btns])
+		("§3a: a carried row does not offer Bench, or a benched one Carry (%s, %s)" % [bench_btns, carry_btns]) + " — %s" % card_pick)
 	var sit_row: Array = (carried["rows"] as Array).filter(func(r): return String(r[0]).begins_with(sit + " — "))
 	ok(sit_row.size() == 1 and String(sit_row[0][0]).contains("Sits out"),
-		"§3a: the card that sits out does not say so under CARRIED: %s" % [sit_row])
+		("§3a: the card that sits out does not say so under CARRIED: %s" % [sit_row]) + " — %s" % card_pick)
 	var marked: Array = []
 	for r4 in (core["rows"] as Array) + (ens["rows"] as Array) + (carried["rows"] as Array) + (benched["rows"] as Array):
 		var t := String(r4[0])
 		if t.contains(STAR) or t.begins_with("CORE") or t.begins_with("STARTING KIT") or t.begins_with("ENABLER") or t.contains("(carried)") or t.contains("(benched)"):
 			marked.append(t)
-	ok(marked.is_empty(), "§3a: a row states its state again beside its section's head: %s" % [marked])
+	ok(marked.is_empty(), ("§3a: a row states its state again beside its section's head: %s" % [marked]) + " — %s" % card_pick)
 	# BENCH MOVES IT DOWN, read off the panel the press re-opens.
 	var btn: Button = Gate.bound_button(mp, "_toggle_loadout", [seat, on, Gate.overlay(mp, 60)])
-	ok(btn != null and btn.text == "Bench", "§3a: the carried card's Bench is not bound to `_toggle_loadout`")
+	ok(btn != null and btn.text == "Bench", "§3a: the carried card's Bench is not bound to `_toggle_loadout`" + " — %s" % card_pick)
 	if btn != null:
 		btn.emit_signal("pressed")
 		await Gate.frames(self, 3)
 		var seq2 := _sequence(Gate.overlay(mp, 60))
 		ok(_row_names(_section(seq2, "BENCHED —")).has(on) and not _row_names(_section(seq2, "CARRIED —")).has(on),
-			"§3a: Bench did not move %s from CARRIED to BENCHED: %s" % [on, seq2])
+			("§3a: Bench did not move %s from CARRIED to BENCHED: %s" % [on, seq2]) + " — %s" % card_pick)
 	_close_overlays(mp)
 	await Gate.frames(self, 2)
 	# THE EMPTIEST PANEL: nothing earned — every section drawn, the two earned ones with their notes and no rows.

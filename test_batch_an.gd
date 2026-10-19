@@ -144,8 +144,10 @@ func _test_offer(RunState) -> void:
 	var run = RunState.new()
 	run.new_run()
 	# BATCH AQ authored the pool. The six AN placeholders are the first six
-	# entries here and are asserted UNCHANGED — ids, severities and text —
-	# because a save mid-run holds a pending modifier by id.
+	# entries here and are asserted UNCHANGED — ids and text — because a save
+	# mid-run holds a pending modifier by id. RE-POINTED AT IO §2: every grade is
+	# a measurement now (the designer's), so the grade asserted is one the ladder
+	# holds; the values below are the grades AQ AUTHORED, kept as the record.
 	var want := {"overgrown": 1, "tinderbox": 2, "frenzied": 2,
 		"brittle": 3, "warded": 3, "bloodless": 4,
 		"parched": 1, "slick": 1, "dulledge": 1, "muffled": 1, "hoarfrost": 1,
@@ -156,11 +158,13 @@ func _test_offer(RunState) -> void:
 		# fourth severity-4 bargain and it SHIPS now, so the pool is twenty.
 		"rot": 4}
 	# BATCH IN §1 RE-POINTED THESE TWO IN PLACE, THE COUNT UNMOVED: Ruin's four stand at severity 5 beside the twenty
-	# every rung deals, so the pool is twenty-four, and the test knows the four by name and grade.
-	var ruin_four := {"famine": 5, "wasting": 5, "hungering_dark": 5, "cruel_order": 5}
-	ok(run.MODIFIERS.size() == 24, "twenty-four authored modifiers (the twenty every rung deals, and Ruin's four — IN §1)")
+	# every rung deals, so the pool is twenty-four, and the test knows the four by name and grade. RE-POINTED AGAIN AT
+	# IO §1 AND §2: Famine and Cruel Order are removed, the Thin Veil and the Long Silence joined, and every grade is the
+	# measurement's — so the test knows the four by name, each at a grade the ladder holds.
+	var ruin_four := {"wasting": 5, "hungering_dark": 5, "thin_veil": 5, "long_silence": 5}
+	ok(run.MODIFIERS.size() == 24, "twenty-four authored modifiers (the twenty, and the four authored at severity 5 — IN §1, IO §1)")
 	ok(run.MODIFIERS.size() == want.size() + ruin_four.size()
-			and ruin_four.keys().all(func(k): return run.modifier_severity(String(k)) == int(ruin_four[k])),
+			and ruin_four.keys().all(func(k): return run.modifier_severity(String(k)) >= 1 and run.modifier_severity(String(k)) <= 5),
 		"...and the test knows all of them")
 	# The pool is WEIGHTED LOW on purpose: every offer's safe slot is served
 	# by the 1-2 pool alone, so that is the end that actually repeats.
@@ -180,7 +184,7 @@ func _test_offer(RunState) -> void:
 	# is not "rot came back" but "rot came back without its guard", and
 	# test_batch_bb owns that half.
 	ok(run.MODIFIERS.has("rot"), "rot is in the pool (Batch BB reinstated it)")
-	ok(run.modifier_severity("rot") == 4, "rot is severity 4")
+	ok(run.modifier_severity("rot") >= 1 and run.modifier_severity("rot") <= 5, "rot is graded (authored at 4; IO §2 measures it)")
 	# The AN six, exactly as AN shipped them.
 	# IJ §2 repaired it to the code (a body already below 70% is not raised): *at most*.
 	ok(String(run.MODIFIERS["overgrown"]["desc"])
@@ -190,16 +194,20 @@ func _test_offer(RunState) -> void:
 		"Bloodless keeps its name")
 	for id in want:
 		ok(run.MODIFIERS.has(id), "%s exists" % id)
-		ok(run.modifier_severity(id) == int(want[id]),
-			"%s is severity %d" % [id, int(want[id])])
+		ok(run.modifier_severity(id) >= 1 and run.modifier_severity(id) <= 5,
+			"%s is graded 1-5 (authored at %d; IO §2 measures it)" % [id, int(want[id])])
 		ok(String(run.MODIFIERS[id]["desc"]) != "", "%s states its effect" % id)
 	# Severity is FLAT: it must not read the party. Wreck the party and
-	# confirm every severity is unmoved.
+	# confirm every severity is unmoved. (RE-POINTED AT IO §2: unmoved from what it read before the wreck — the grade is
+	# the measurement's, so the authored value above is no longer the one to hold it to.)
+	var sev_before := {}
+	for id2 in want:
+		sev_before[id2] = run.modifier_severity(String(id2))
 	for m in run.party:
 		m["hp"] = 1
 		m["spec"] = "berserker"
 	for id2 in want:
-		ok(run.modifier_severity(String(id2)) == int(want[id2]),
+		ok(run.modifier_severity(String(id2)) == int(sev_before[id2]),
 			"%s severity ignores party composition" % id2)
 	# The reward table is keyed on severity and nothing else.
 	# BATCH HW §2 — RE-POINTED TO THE RULING, THE COUNT UNMOVED: the merchant is an easy

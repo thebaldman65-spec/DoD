@@ -480,7 +480,9 @@ func _s2c_the_swap_mid_run() -> void:
 	var w: Dictionary = _run.party[0]
 	var bz := Runes.engine_rune_id("bloodrage")
 	var st := Runes.engine_rune_id("seasoned")
-	ok(_run.held_engines(w) == ["bloodrage"], "§2c: the Warrior was not awakened on the Berserker's rune (%s)" % [_run.held_engines(w)])
+	var awake_pick := "the Warrior was awakened on %s, the first of Classes.class_engines(\"warrior\") as _new_run seats it; this arm names `%s` and `%s` by hand" % [
+		str(_run.held_engines(w)), bz, st]
+	ok(_run.held_engines(w) == ["bloodrage"], ("§2c: the Warrior was not awakened on the Berserker's rune (%s)" % [_run.held_engines(w)]) + " — %s" % awake_pick)
 	var held_st: Dictionary = Runes.build(st)
 	held_st["equipped"] = false
 	_run.hold_rune(w, held_st)
@@ -489,7 +491,7 @@ func _s2c_the_swap_mid_run() -> void:
 	var ov: Node = await _open_panel(mp, 0)
 	var si := _row_of(_run.engine_rows(w), st)
 	var eq: Button = Gate.bound_button(ov, "_toggle_engine", [0, si, ov]) if ov != null else null
-	ok(eq != null and eq.text == "Equip", "§2c: the Stances' rune drew no Equip")
+	ok(eq != null and eq.text == "Equip", "§2c: the Stances' rune drew no Equip" + " — %s" % awake_pick)
 	if eq != null:
 		eq.emit_signal("pressed")
 		await Gate.frames(self, 2)
@@ -500,7 +502,7 @@ func _s2c_the_swap_mid_run() -> void:
 		if String((r as Dictionary).get("id", "")) == st:
 			changed = bool((r as Dictionary).get("equipped", false))
 			(r as Dictionary)["equipped"] = false
-	ok(changed and after == before, "§2c: slotting a core rune on the map wrote more than its own `equipped` flag")
+	ok(changed and after == before, "§2c: slotting a core rune on the map wrote more than its own `equipped` flag" + " — %s" % awake_pick)
 	# THE SPAWN READS IT — the run's own battle.
 	Gate.enter_battle(self, {"type": "fight", "theme": "Warband", "enemies": ["raider", "raider", "archer"]})
 	await Gate.frames(self, 90)
@@ -508,13 +510,13 @@ func _s2c_the_swap_mid_run() -> void:
 	var wu := _hero(b, "warrior") if Gate.scene_name(self) == "Battle" else null
 	ok(wu != null and wu.has_engine("seasoned") and wu.has_engine("bloodrage")
 			and _ability(wu, "Guard Change") != null and _ability(wu, "Bloodlust") != null,
-		"§2c: the next fight did not seat both slotted engines and both enablers")
+		"§2c: the next fight did not seat both slotted engines and both enablers" + " — %s" % awake_pick)
 	# UNSLOT ONE, AND THE NEXT FIGHT LACKS IT.
 	mp = await _to_map()
 	var ov2: Node = await _open_panel(mp, 0)
 	var bi := _row_of(_run.engine_rows(w), bz)
 	var un: Button = Gate.bound_button(ov2, "_toggle_engine", [0, bi, ov2]) if ov2 != null else null
-	ok(un != null and un.text == "Unequip", "§2c: the Berserker's slotted rune drew no Unequip")
+	ok(un != null and un.text == "Unequip", "§2c: the Berserker's slotted rune drew no Unequip" + " — %s" % awake_pick)
 	if un != null:
 		un.emit_signal("pressed")
 		await Gate.frames(self, 2)
@@ -523,7 +525,7 @@ func _s2c_the_swap_mid_run() -> void:
 	var wu2 := _hero(current_scene, "warrior") if Gate.scene_name(self) == "Battle" else null
 	ok(wu2 != null and wu2.has_engine("seasoned") and not wu2.has_engine("bloodrage")
 			and _ability(wu2, "Guard Change") != null and _ability(wu2, "Bloodlust") == null,
-		"§2c: the fight after the unslot still seats the Berserker's engine or its card")
+		"§2c: the fight after the unslot still seats the Berserker's engine or its card" + " — %s" % awake_pick)
 	print("  a swap mid-run: slotted on the map (one flag), seated at the spawn; unslotted, gone from the next")
 	change_scene_to_file("res://scenes/map.tscn")
 	await Gate.frames(self, 4)

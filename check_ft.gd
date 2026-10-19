@@ -428,20 +428,22 @@ func _s1_channel() -> void:
 	if ab == null:
 		scene.queue_free()
 		return
+	var ab_pick := "%s (damage %d, %s), the hardest-hitting non-physical card on the %s bar, first on a tie in bar order" % [
+		ab.display_name, ab.damage, ab.dmg_type, mage.unit_name]
 	var full := BattleUnit.CHANNEL_MANA_PER_STEP * BattleUnit.CHANNEL_MAX_STEPS
 	var arcane := await _ab_pair(scene, mage, ab, foe, full)
 	var cold: int = int(arcane["cold"])
 	var hot: int = int(arcane["hot"])
 	print("  §1e: %s x6 — cold %d / hot %d (x%.4f)"
 		% [ab.display_name, cold, hot, float(hot) / maxf(float(cold), 1.0)])
-	ok(cold > 0, "§1e: six control strikes landed for %d in total" % cold)
+	ok(cold > 0, "§1e: six control strikes landed for %d in total" % cold + " — %s" % ab_pick)
 	var want := 1.0 + BattleUnit.CHANNEL_MAX_STEPS * BattleUnit.CHANNEL_STEP_BONUS
 	ok(hot > cold,
 		"§1e: the same six with a full meter land for %d — x%.4f"
-			% [hot, float(hot) / maxf(float(cold), 1.0)])
+			% [hot, float(hot) / maxf(float(cold), 1.0)] + " — %s" % ab_pick)
 	ok(absf(float(hot) / maxf(float(cold), 1.0) - want) < 0.01,
 		"§1e: ...and the LIVE pipeline reproduces the payout's own arithmetic — x%.4f against x%.4f"
-			% [float(hot) / maxf(float(cold), 1.0), want])
+			% [float(hot) / maxf(float(cold), 1.0), want] + " — %s" % ab_pick)
 
 	# (f) AND THE PHYSICAL ARM IS THE CONTROL THAT MAKES (e) MEAN SOMETHING. The
 	# *not physical* ruling has to reach the damage PIPELINE and not only the
@@ -465,11 +467,11 @@ func _s1_channel() -> void:
 	var ph: int = int(pair["hot"])
 	print("  §1f: the same card as physical x6 — cold %d / hot %d (x%.4f)"
 		% [pc, ph, float(ph) / maxf(float(pc), 1.0)])
-	ok(pc > 0, "§1f: six physical control strikes landed for %d" % pc)
+	ok(pc > 0, "§1f: six physical control strikes landed for %d" % pc + " — %s" % ab_pick)
 	ok(ph == pc,
 		"§1f: a full meter moves the SAME card, read as physical, by EXACTLY nothing (%d against %d) — the ruling reaches the pipeline"
-			% [ph, pc])
-	ok(ab.dmg_type == was_type, "§1f: ...and the card is put back the way it was found")
+			% [ph, pc] + " — %s" % ab_pick)
+	ok(ab.dmg_type == was_type, "§1f: ...and the card is put back the way it was found" + " — %s" % ab_pick)
 	scene.queue_free()
 	await process_frame
 
@@ -1253,6 +1255,9 @@ func _s5_the_floor() -> void:
 			scene.queue_free()
 			await process_frame
 			continue
+		var free_pick := "%s, the first free card on the %s Mage's bar" % [free_ab.display_name, spec]
+		var paid_pick := "%s (%d Mana), the cheapest card at or over the floor with no refund on the %s Mage's bar, first on a tie" % [
+			paid_ab.display_name, paid_c, spec]
 
 		# (a) A FREE CAST BOOKS EXACTLY THE FLOOR AND TAKES NOTHING OFF THE BAR.
 		# The floor is a nominal value on the LEDGER; the bar never sees it.
@@ -1261,7 +1266,7 @@ func _s5_the_floor() -> void:
 			"§5a %s: %s took %d off the bar, want 0 — a free cast spends nothing" % [
 				spec, free_ab.display_name, int(d["bar"])])
 		ok(int(d["mana"]) == fl,
-			"§5a %s: ...and the ledger reads %d, want the floor, %d" % [spec, int(d["mana"]), fl])
+			"§5a %s: ...and the ledger reads %d, want the floor, %d" % [spec, int(d["mana"]), fl] + " — %s" % free_pick)
 		free_books.append(int(d["mana"]))
 
 		# (b) A COSTED CAST BOOKS WHAT LEFT THE BAR, AND NOT THE FLOOR ON TOP.
@@ -1276,14 +1281,14 @@ func _s5_the_floor() -> void:
 		d = await _cast_delta(scene, mage, paid_ab, foe, false, fl - 1)
 		ok(int(d["mana"]) == fl,
 			"§5c %s: a cast that could only take %d reads %d, want the floor, %d — max(net, floor) is one term" % [
-				spec, fl - 1, int(d["mana"]), fl])
+				spec, fl - 1, int(d["mana"]), fl] + " — %s" % paid_pick)
 
 		# (d) A RETALIATION IS NOT A CAST. `_resolve`'s `is_counter` is the line's
 		# own definition — the Killing Cold and the Overtone read it the same way —
 		# and a counter that booked the floor would pay a Mage for being struck.
 		d = await _cast_delta(scene, mage, free_ab, foe, true, mage.max_resource)
 		ok(int(d["mana"]) == 0,
-			"§5d %s: a counter reads %d, want 0 — a retaliation is not a cast" % [spec, int(d["mana"])])
+			"§5d %s: a counter reads %d, want 0 — a retaliation is not a cast" % [spec, int(d["mana"])] + " — %s" % free_pick)
 
 		# (e) THE RAGE HALF IS UNTOUCHED. The same line books a Warrior's free
 		# basic, and the floor names Mana.

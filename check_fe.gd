@@ -378,14 +378,15 @@ func _s2b_ability_choice() -> void:
 	var triple: Array = (stale["bm_candidates"][0] as Array).duplicate()
 	ok(triple.size() >= 2, "§2b: the boss pool handed back %d names — the arm needs two" % triple.size())
 	var taken := String(triple[0])
+	var taken_s := "%s, the first of the rolled boss triple %s" % [taken, str(triple)]
 	run.hold_ability(stale, taken, true)
 	var repaired: Array = run.ability_choice(stale)
 	ok(not repaired.has(taken),
 		"§2b: the repaired triple STILL offers %s, which the hero now holds — %s" % [taken, repaired])
 	ok((stale["bm_candidates"][0] as Array) == repaired,
-		"§2b: the repair was not WRITTEN BACK — the buttons and the handler read different arrays")
+		"§2b: the repair was not WRITTEN BACK — the buttons and the handler read different arrays" + " — %s" % taken_s)
 	ok(run.ability_choice(stale) == repaired,
-		"§2b: a second call repaired again — it is a reroll, not a repair")
+		"§2b: a second call repaired again — it is a reroll, not a repair" + " — %s" % taken_s)
 	for n in repaired:
 		ok(not (run.owned_ability_names(stale) as Array).has(String(n)),
 			"§2b: the repaired triple offers %s, which the hero already owns" % n)
@@ -469,6 +470,7 @@ func _s2c_upgrade_choice() -> void:
 	ok(offer.size() >= 1, "§2c: the offer came back empty")
 	var head: Dictionary = offer[0]
 	var uid := String(head["id"])
+	var head_s := "%s on %s, the first of the rolled upgrade offer" % [uid, String(head["ability"])]
 	stale["upgrades"] = [{"id": uid, "ability": String(head["ability"])}]
 	ok(run.has_upgrade(stale, uid),
 		"§2c: the arm's premise is not set up — the hero does not hold %s" % uid)
@@ -480,9 +482,9 @@ func _s2c_upgrade_choice() -> void:
 	ok(still.is_empty(),
 		"§2c: the repaired offer STILL carries %s, which the hero has taken — AP's once-per-run rule is broken at the ANSWER" % uid)
 	ok((stale["up_candidates"][0] as Array) == repaired,
-		"§2c: the repair was not WRITTEN BACK — `_pick_upgrade` takes an INDEX and would hand over the wrong entry")
+		"§2c: the repair was not WRITTEN BACK — `_pick_upgrade` takes an INDEX and would hand over the wrong entry" + " — %s" % head_s)
 	ok(run.upgrade_choice(stale) == repaired,
-		"§2c: a second call repaired again — it is a reroll, not a repair")
+		"§2c: a second call repaired again — it is a reroll, not a repair" + " — %s" % head_s)
 	var ids := {}
 	var dup: Array = []
 	for c2 in repaired:
@@ -490,7 +492,7 @@ func _s2c_upgrade_choice() -> void:
 		if ids.has(i2):
 			dup.append(i2)
 		ids[i2] = true
-	ok(dup.is_empty(), "§2c: the repaired offer names the same upgrade twice — %s" % [dup])
+	ok(dup.is_empty(), "§2c: the repaired offer names the same upgrade twice — %s" % [dup] + " — %s" % head_s)
 
 	# (3) TWO QUEUED PICKS, ANSWERED IN SEQUENCE, NEVER WRITE ONE ID TWICE.
 	# This is the fault as the player meets it, rather than as a function call.

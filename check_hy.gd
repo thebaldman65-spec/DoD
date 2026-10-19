@@ -88,7 +88,7 @@ const DAMAGE_FUNCS := {
 	"battle.gd::_add_bleed_with_burst": "ACTION",
 	"battle.gd::_umbral_sigil_echo": "BORROWS (II §2) — the sigil's echo is its caster's, inside the striker's swing",
 	"battle.gd::_on_damage_taken": "BORROWS — Frostbind's and Penance's mirrors",
-	"battle.gd::_wasting_tick": "BORROWS — Wasting's tick at a hero's turn's end, under a frame naming the modifier and no source; it puts back the one it found (IN §1)",
+	"battle.gd::_wasting_tick": "BORROWS — Wasting's tick at every unit's turn's end (both sides since IO §1), under a frame naming the modifier and no source; it puts back the one it found (IN §1)",
 	"unit.gd::take_hit": "DEALER — One Soul's split of a wound among the bond, under the wound's own frame",
 }
 
@@ -284,6 +284,7 @@ func _s1_the_vow_share() -> void:
 		var wire := _label(s, "tripwire")
 		var slash: String = (foe.abilities[0] as Ability).display_name
 		var wound_key := "%s / %s" % [Enemies.unit_name(foe.enemy_kind), slash]
+		var slash_pick := "%s's %s, its first ability in data/enemies.json order" % [foe.unit_name, slash]
 		seed(SEED)
 		var line := "  %-30s" % arm[0]
 		for k in 3:
@@ -309,34 +310,34 @@ func _s1_the_vow_share() -> void:
 			var want_rf := 0 if vowed else maxi(int(round(blow * 0.10)), 1)
 			var fr := _frame(s)
 			ok(fr[0] == foe and fr[1] == slash,
-				"§1 (%s) blow %d: the frame after the raider's Slash is %s — it should be the raider's own Slash again" % [
-					arm[0], k + 1, _frame_str(s)])
+				("§1 (%s) blow %d: the frame after the raider's Slash is %s — it should be the raider's own Slash again" % [
+					arm[0], k + 1, _frame_str(s)]) + " — %s" % slash_pick)
 			ok(blow > 0 and (cl > 0) == share,
-				"§1 (%s) blow %d: the Warden lost %d and the Devout %d — the share should %s" % [
-					arm[0], k + 1, wl, cl, "carry half" if share else "carry nothing"])
-			ok(tw == want_tw, "§1 (%s) blow %d: the Survivalist's wire booked %d, the whole blow's wire is %d — silenced or mis-booked" % [
-				arm[0], k + 1, tw, want_tw])
-			ok(pn == want_pn and pn > 0, "§1 (%s) blow %d: Penance's mirror paid %d, on what each body lost (%d and %d) it is %d" % [
-				arm[0], k + 1, pn, wl, cl, want_pn])
+				("§1 (%s) blow %d: the Warden lost %d and the Devout %d — the share should %s" % [
+					arm[0], k + 1, wl, cl, "carry half" if share else "carry nothing"]) + " — %s" % slash_pick)
+			ok(tw == want_tw, ("§1 (%s) blow %d: the Survivalist's wire booked %d, the whole blow's wire is %d — silenced or mis-booked" % [
+				arm[0], k + 1, tw, want_tw]) + " — %s" % slash_pick)
+			ok(pn == want_pn and pn > 0, ("§1 (%s) blow %d: Penance's mirror paid %d, on what each body lost (%d and %d) it is %d" % [
+				arm[0], k + 1, pn, wl, cl, want_pn]) + " — %s" % slash_pick)
 			ok(pn - whole_pn >= 0 and pn - whole_pn <= (1 if cl > 0 else 0),
-				"§1 (%s) blow %d: the mirror on the bodies is %d against %d on the whole blow of %d — more than one body's rounding" % [
-					arm[0], k + 1, pn, whole_pn, blow])
+				("§1 (%s) blow %d: the mirror on the bodies is %d against %d on the whole blow of %d — more than one body's rounding" % [
+					arm[0], k + 1, pn, whole_pn, blow]) + " — %s" % slash_pick)
 			if pn != whole_pn:
 				splits.append("%s, blow %d: %d → %d + %d mirrors %d + %d = %d, the whole blow %d" % [
 					arm[0], k + 1, blow, wl, cl, _mirror(wl), _mirror(cl), pn, whole_pn])
 			ok(fl == pn + tw + want_rf,
-				"§1 (%s) blow %d: the raider lost %d — the mirror %d, the wire %d and the reflect %d make %d" % [
-					arm[0], k + 1, fl, pn, tw, want_rf, pn + tw + want_rf])
+				("§1 (%s) blow %d: the raider lost %d — the mirror %d, the wire %d and the reflect %d make %d" % [
+					arm[0], k + 1, fl, pn, tw, want_rf, pn + tw + want_rf]) + " — %s" % slash_pick)
 			line += "  %2d+%2d → %2d (%d/%d/%d)" % [wl, cl, fl, pn, tw, want_rf]
 			checked += 1
 		var wt := _taken(s, w)
-		ok(wt.keys() == [wound_key], "§1 (%s): the Warden's wounds are booked %s — every one is the raider's Slash" % [arm[0], wt])
+		ok(wt.keys() == [wound_key], ("§1 (%s): the Warden's wounds are booked %s — every one is the raider's Slash" % [arm[0], wt]) + " — %s" % slash_pick)
 		var dt := _dealt(s, h)
-		ok(dt.keys() == [wire], "§1 (%s): the Survivalist's dealt ledger reads %s — the wire is booked as the wire" % [arm[0], dt])
+		ok(dt.keys() == [wire], ("§1 (%s): the Survivalist's dealt ledger reads %s — the wire is booked as the wire" % [arm[0], dt]) + " — %s" % slash_pick)
 		if share:
 			var ct := _taken(s, c)
 			ok(ct.keys() == [wound_key],
-				"§1 (%s): the Devout's carried share is booked %s — it is the raider's wound on a second body (HZ §0.1)" % [arm[0], ct])
+				("§1 (%s): the Devout's carried share is booked %s — it is the raider's wound on a second body (HZ §0.1)" % [arm[0], ct]) + " — %s" % slash_pick)
 		print(line + "   [W+C → raider (mirror/wire/reflect)]")
 		await _clear(s)
 	ok(checked == 12, "§1: %d of 12 blows were read — the drive has gone vacuous" % checked)
@@ -508,11 +509,12 @@ func _s4_the_other_callbacks() -> void:
 		s._apply_status(w, "rite_return", 3, 0, 0, holy)
 		w.hp = 1
 		var hc0 := holy.hp
+		var swing_pick := "%s's %s, its first ability in data/enemies.json order" % [foe.unit_name, (foe.abilities[0] as Ability).display_name]
 		await s._resolve(foe, foe.abilities[0], w, "good")
-		ok(not w.dead and holy.hp < hc0, "§4: the rite did not answer the lethal blow (Warden %d, the Cleric paid %d)" % [w.hp, hc0 - holy.hp])
+		ok(not w.dead and holy.hp < hc0, ("§4: the rite did not answer the lethal blow (Warden %d, the Cleric paid %d)" % [w.hp, hc0 - holy.hp]) + " — %s" % swing_pick)
 		var fr := _frame(s)
 		ok(fr[0] == foe and fr[1] == (foe.abilities[0] as Ability).display_name,
-			"§4: after the rite answered, the frame is %s — it should be the raider's Slash" % _frame_str(s))
+			("§4: after the rite answered, the frame is %s — it should be the raider's Slash" % _frame_str(s)) + " — %s" % swing_pick)
 		print("  Rite of Return: the Warden stands at %d, the Cleric paid %d; the frame is %s" % [w.hp, hc0 - holy.hp, _frame_str(s)])
 	await _clear(s)
 	# BLOODBOND AND BEAR THE BRUNT — a Hunter with a companion, each guard under a lethal blow.
@@ -548,12 +550,13 @@ func _s4_the_other_callbacks() -> void:
 			payer = comp
 			h.hp = 1
 		var p0 := payer.hp
+		var swing3_pick := "%s's %s, its first ability in data/enemies.json order" % [foe3.unit_name, (foe3.abilities[0] as Ability).display_name]
 		await s3._resolve(foe3, foe3.abilities[0], victim, "good")
-		ok(not victim.dead and payer.hp < p0, "§4 (%s): the guard did not take the lethal blow (%s %d, the payer paid %d)" % [
-			arm, victim.unit_name, victim.hp, p0 - payer.hp])
+		ok(not victim.dead and payer.hp < p0, ("§4 (%s): the guard did not take the lethal blow (%s %d, the payer paid %d)" % [
+			arm, victim.unit_name, victim.hp, p0 - payer.hp]) + " — %s" % swing3_pick)
 		var fr3 := _frame(s3)
 		ok(fr3[0] == foe3 and fr3[1] == (foe3.abilities[0] as Ability).display_name,
-			"§4 (%s): after the guard paid, the frame is %s — it should be the raider's Slash" % [arm, _frame_str(s3)])
+			("§4 (%s): after the guard paid, the frame is %s — it should be the raider's Slash" % [arm, _frame_str(s3)]) + " — %s" % swing3_pick)
 		print("  %-14s %s stands at %d, %s paid %d; the frame is %s" % [arm, victim.unit_name, victim.hp,
 			payer.unit_name, p0 - payer.hp, _frame_str(s3)])
 		await _clear(s3)

@@ -446,6 +446,7 @@ func _cleric_five() -> void:
 	# ── VOW OF SILENCE: Smite deals nothing and still Breaks; heals 50% stronger,
 	# the Consecration drip included; a tick booked to him deals nothing.
 	var v := {}
+	var smite_pick := ""
 	for arm2 in [["worn", ["vow_of_silence"]], ["bare", []]]:
 		var s2: Node = await _fight({2: arm2[1]})
 		_sturdy(s2)
@@ -453,6 +454,7 @@ func _cleric_five() -> void:
 		var e0: BattleUnit = _foes(s2)[0]
 		var p_was := e0.pressure
 		var dmg: int = await _cast_dmg(s2, c2, c2.abilities[0], e0, DMG_SEED)
+		smite_pick = "%s, the Cleric's slot 0 in kit order" % String((c2.abilities[0] as Ability).display_name)
 		var bd := e0.pressure - p_was
 		var w2 := _hero(s2, "warrior")
 		w2.hp = int(w2.max_hp * 0.5)
@@ -475,9 +477,9 @@ func _cleric_five() -> void:
 			"drip_want": maxi(int(round(h2.max_hp * 0.05 * (1.5 if arm2[0] == "worn" else 1.0))), 1)}
 		await _clear(s2)
 	ok(int(v["worn"]["smite"]) == 0 and int(v["bare"]["smite"]) > 0,
-		"§1 Vow of Silence: Smite dealt %d worn against %d bare — he deals no damage" % [v["worn"]["smite"], v["bare"]["smite"]])
+		("§1 Vow of Silence: Smite dealt %d worn against %d bare — he deals no damage" % [v["worn"]["smite"], v["bare"]["smite"]]) + " — %s" % smite_pick)
 	ok(int(v["worn"]["bd"]) > 0 and int(v["worn"]["bd"]) == int(v["bare"]["bd"]),
-		"§1 Vow of Silence: Smite's Break damage read %d worn against %d bare — Break damage is its own word and still lands" % [v["worn"]["bd"], v["bare"]["bd"]])
+		("§1 Vow of Silence: Smite's Break damage read %d worn against %d bare — Break damage is its own word and still lands" % [v["worn"]["bd"], v["bare"]["bd"]]) + " — %s" % smite_pick)
 	ok(int(v["worn"]["mn"]) == int(v["worn"]["mn_want"]) and int(v["bare"]["mn"]) == int(v["bare"]["mn_want"]),
 		"§1 Vow of Silence: Ministration healed %d worn (want %d) and %d bare (want %d) — 50%% stronger" % [
 			v["worn"]["mn"], v["worn"]["mn_want"], v["bare"]["mn"], v["bare"]["mn_want"]])
@@ -673,6 +675,7 @@ func _mage_five() -> void:
 	# ── CLARITY AND PROFLIGATE: a spell is a cast with a Mana price; Clarity reads
 	# the bar before the price comes off; Profligate doubles the price.
 	var sp := {}
+	var bolt_pick := ""
 	for arm4 in [["bare", []], ["clarity", ["clarity"]], ["profligate", ["profligate"]]]:
 		for full in [true, false]:
 			var s4: Node = await _fight({1: arm4[1]})
@@ -684,6 +687,7 @@ func _mage_five() -> void:
 			var spent := res_was - m4.resource
 			m4.resource = m4.max_resource
 			var bolt: int = await _cast_dmg(s4, m4, m4.abilities[0], _foes(s4)[1], DMG_SEED)
+			bolt_pick = "%s, the Mage's slot 0 in kit order" % String((m4.abilities[0] as Ability).display_name)
 			sp["%s/%s" % [arm4[0], "full" if full else "short"]] = [dmg, spent, bolt]
 			await _clear(s4)
 	var b0 := int(sp["bare/full"][0])
@@ -692,12 +696,12 @@ func _mage_five() -> void:
 	ok(int(sp["clarity/short"][0]) == int(sp["bare/short"][0]),
 		"§1 Clarity: a spell cast one short of full dealt %d against %d bare — the bar must be full" % [sp["clarity/short"][0], sp["bare/short"][0]])
 	ok(int(sp["clarity/full"][2]) == int(sp["bare/full"][2]),
-		"§1 Clarity: Magic Bolt at full Mana dealt %d against %d bare — a free cast is not a spell" % [sp["clarity/full"][2], sp["bare/full"][2]])
+		("§1 Clarity: Magic Bolt at full Mana dealt %d against %d bare — a free cast is not a spell" % [sp["clarity/full"][2], sp["bare/full"][2]]) + " — %s" % bolt_pick)
 	ok(absi(int(sp["profligate/full"][0]) - int(round(b0 * 1.4))) <= 1 and int(sp["profligate/full"][1]) == 2 * int(sp["bare/full"][1]),
 		"§1 Profligate: Magic Burst dealt %d for %d Mana against %d for %d bare — 40%% more for twice the Mana" % [
 			sp["profligate/full"][0], sp["profligate/full"][1], b0, sp["bare/full"][1]])
 	ok(int(sp["profligate/full"][2]) == int(sp["bare/full"][2]),
-		"§1 Profligate: Magic Bolt dealt %d against %d bare — the free basic is not one of his spells" % [sp["profligate/full"][2], sp["bare/full"][2]])
+		("§1 Profligate: Magic Bolt dealt %d against %d bare — the free basic is not one of his spells" % [sp["profligate/full"][2], sp["bare/full"][2]]) + " — %s" % bolt_pick)
 	print("    Clarity / Profligate: Magic Burst full %d / %d / %d (bare / Clarity / Profligate), short %d / %d; Mana %d / %d; Magic Bolt %d / %d / %d" % [
 		b0, sp["clarity/full"][0], sp["profligate/full"][0], sp["bare/short"][0], sp["clarity/short"][0],
 		sp["bare/full"][1], sp["profligate/full"][1], sp["bare/full"][2], sp["clarity/full"][2], sp["profligate/full"][2]])

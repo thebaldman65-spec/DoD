@@ -1,13 +1,15 @@
 # BATCH IN — THE SEVERITY-5 BAND, AND TWO BLIND SPOTS.
 #
 #   §1   FOUR BARGAINS ONLY RUIN EVER SEES. Four modifiers stand at severity 5 and Ruin's gambles are dealt from 5
-#        alone; no Wanderer or Warden band reaches 5, and no band is empty or falls back. Measured at EP's sample through
-#        the real roll: Wanderer and Warden dealt offer for offer as IM dealt them (a reference model of IM's roll over
-#        the twenty, the merchant at 1), no severity-5 option in any of their 800 offers, Ruin a full step above Warden.
-#        The reward row is one step further on the table's own ladder; the fixed encounters keep the eight they drew.
-#        Each modifier's door is DRIVEN both ways — Famine's sealed pouch, Wasting's tick at a hero's turn's end through
-#        the tick door, the Hungering Dark's feed at BL's one damage door, Cruel Order's turn order in the loop and the
-#        bar — and the four texts and the rung texts are read against the band.
+#        alone (RE-POINTED AT IO: two of IN's four were removed and two re-cut to bind both sides, and the grades are IO's
+#        measurement — every arm below reads IO's deck, and the two removed are asserted gone where they acted); no
+#        Wanderer or Warden band reaches 5, and no band is empty or falls back. Measured at EP's sample through the real
+#        roll: Wanderer and Warden dealt offer for offer as IM dealt them (a reference model of IM's roll over the
+#        twenty, the merchant at 1), no severity-5 option in any of their 800 offers, Ruin a full step above Warden. The
+#        reward row is one step further on the table's own growing slope; the fixed encounters keep severity 3–4. Each
+#        re-cut door is DRIVEN both ways — Wasting's tick at every unit's turn's end through the tick door, the Hungering
+#        Dark's feed at BL's one damage door — the two removed doors are asserted gone where they acted, and the texts
+#        and the rung texts are read against the band.
 #   §2   THE MERCHANT IS THE REWARD OF A RUNG's MILDEST DEALT SEVERITY: no row of the table holds it; `rewards_for` puts
 #        it beside the gold of the one severity `mildest_dealt_severity` names, read off the bands and never the rung's
 #        name; Wanderer's and Warden's merchants dealt as IM dealt them, Ruin's at its mildest and nowhere else, and none
@@ -35,15 +37,14 @@ var _run: Node = null
 var _player := {}
 var _strip := {}
 
-# §1 — the four, by id: [name, the constant its figure is read off ("" for none)].
-const FOUR := {"famine": ["Famine", ""], "wasting": ["Wasting", "WASTING_PCT"],
-	"hungering_dark": ["The Hungering Dark", "HUNGERING_DARK_PCT"], "cruel_order": ["Cruel Order", ""]}
-# §1 — the twenty, at the grades they held at IM. NO EXISTING MODIFIER's SEVERITY MOVES (IN's brief §6): Warden is §1's
-# control, and re-grading one would move its readings.
-const TWENTY := {"overgrown": 1, "parched": 1, "slick": 1, "dulledge": 1, "muffled": 1, "hoarfrost": 1,
-	"tinderbox": 2, "frenzied": 2, "fleeting": 2, "feverish": 2, "deadened": 2, "miasma": 2,
-	"brittle": 3, "warded": 3, "thinair": 3, "encumbered": 3,
-	"bloodless": 4, "bloodletting": 4, "mirrorbound": 4, "rot": 4}
+# §1 — IN's four, by id: [name, the constant its figure is read off ("" for none)]. RE-POINTED AT IO §1: Famine and Cruel
+# Order are REMOVED (AQ's rule — a modifier that binds one side is a difficulty slider), so they are asserted gone; Wasting
+# and the Dark stay, bound to both sides, at whatever grade IO's measurement gave them.
+const FOUR := {"wasting": ["Wasting", "WASTING_PCT"], "hungering_dark": ["The Hungering Dark", "HUNGERING_DARK_PCT"]}
+const REMOVED := {"famine": "Famine", "cruel_order": "Cruel Order"}
+# §1 — the grade counts the bands are built on. IN's *no existing modifier's severity moves* (its brief §6) held for IN; IO §2
+# re-graded the deck by measurement, at these counts, which do not change (IO's brief §2, constraint 1).
+const GRADE_COUNTS := {1: 6, 2: 6, 3: 4, 4: 4, 5: 4}
 
 
 func ok(cond: bool, what: String) -> void:
@@ -143,12 +144,14 @@ func _mean_sev(ids: Array) -> float:
 # IM's roll — a REFERENCE MODEL of how IM dealt Wanderer's and Warden's offers: the floor's split over the TWENTY (no
 # severity-5 modifier stood in IM's table), the merchant beside severity 1's gold. It is the control §1 and §2 are read
 # against: a rung whose bands are the floor's own split is dealt this offer from the same dice, offer for offer.
+# RE-POINTED AT IO §2: the twenty are every modifier below severity 5, whatever its grade — the re-grade moves which
+# modifiers those are, never that the floor's split deals Wanderer's and Warden's offers.
 func _im_offer(floor_sev: int) -> Array:
 	var low: Array = []
 	var rest: Array = []
 	for id in _run.MODIFIERS:
 		var sv := int(_run.modifier_severity(String(id)))
-		if not TWENTY.has(String(id)):
+		if sv >= 5:
 			continue
 		if sv <= floor_sev:
 			low.append(String(id))
@@ -180,15 +183,17 @@ func _s1a_the_table() -> void:
 	print("\n§1a — four modifiers at severity 5, and Ruin's gambles dealt from 5 alone")
 	for id in FOUR:
 		var cfg: Dictionary = (_run.MODIFIERS as Dictionary).get(id, {})
-		ok(int(cfg.get("severity", 0)) == 5 and String(cfg.get("name", "")) == String(FOUR[id][0]) and String(cfg.get("desc", "")) != "",
-			"§1a: `%s` is not a severity-5 modifier named %s with a rule (%s)" % [id, FOUR[id][0], str(cfg)])
-	var moved: Array = []
-	for id2 in TWENTY:
-		if int(_run.modifier_severity(String(id2))) != int(TWENTY[id2]):
-			moved.append("%s %d→%d" % [id2, TWENTY[id2], _run.modifier_severity(String(id2))])
-	ok(moved.is_empty(), "§1a: an existing modifier's severity moved: %s" % str(moved))
+		ok(int(cfg.get("severity", 0)) >= 1 and String(cfg.get("name", "")) == String(FOUR[id][0]) and String(cfg.get("desc", "")) != "",
+			"§1a: `%s` is not a modifier named %s with a rule and a grade (%s)" % [id, FOUR[id][0], str(cfg)])
+	for id1 in REMOVED:
+		ok(not (_run.MODIFIERS as Dictionary).has(id1), "§1a: `%s` (%s) is still in the deck — IO §1 removed it" % [id1, REMOVED[id1]])
+	var counts := {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+	for id2 in _run.MODIFIERS:
+		var sv0 := int(_run.modifier_severity(String(id2)))
+		counts[sv0] = int(counts.get(sv0, 0)) + 1
+	ok(counts == GRADE_COUNTS, "§1a: the grades hold %s — the bands are built on %s" % [str(counts), str(GRADE_COUNTS)])
 	var at5 := _band_members([5, 5])
-	print("    severity 5: %s; the twenty at their grades" % str(at5))
+	print("    severity 5: %s; the grades at %s" % [str(at5), str(counts)])
 	# THE BANDS: Ruin's gambles at 5 alone; no Wanderer or Warden band reaches a severity-5 modifier — asserted
 	# directly over the data, not only through the means.
 	var ruin_gb: Array = (_run.DIFFICULTIES["ruin"] as Dictionary)["gamble_band"]
@@ -279,7 +284,7 @@ func _s1b_the_sample() -> void:
 # ── §1c — THE REWARD ROW: ONE STEP FURTHER ON THE TABLE's OWN LADDER ────────
 
 func _s1c_the_reward_row() -> void:
-	print("\n§1c — severity 5's reward: the largest step the ladder already has, added to severity 4's")
+	print("\n§1c — severity 5's reward: the ladder's next step on its own slope (RE-POINTED AT IO §0.7: the growing one)")
 	var gold := {}
 	for sv in [1, 2, 3, 4, 5]:
 		for r in (_run.REWARDS.get(sv, []) as Array):
@@ -288,18 +293,19 @@ func _s1c_the_reward_row() -> void:
 	var steps: Array = []
 	for sv2 in [2, 3, 4]:
 		steps.append(int(gold.get(sv2, 0)) - int(gold.get(sv2 - 1, 0)))
-	var big := 0
-	for st in steps:
-		big = maxi(big, int(st))
+	# IN took the largest existing step (80, so 300); IO §0.7 (the designer's) reads the steps' own growth — each twenty
+	# more than the last — so the next is 100 and the row 320. Derived off the table, never typed.
+	var growth := int(steps[2]) - int(steps[1])
+	var big := int(steps[2]) + growth
 	var regular: bool = steps.all(func(x): return int(x) == int(steps[0]))
-	ok(gold.has(5) and int(gold[5]) == int(gold.get(4, 0)) + big,
-		"§1c: severity 5 pays %s gold — the ladder's steps are %s, the largest %d, so %d" % [
-			str(gold.get(5, "none")), str(steps), big, int(gold.get(4, 0)) + big])
+	ok(gold.has(5) and int(steps[1]) - int(steps[0]) == growth and int(gold[5]) == int(gold.get(4, 0)) + big,
+		"§1c: severity 5 pays %s gold — the ladder's steps are %s, growing by %d, so the next is %d and the row %d" % [
+			str(gold.get(5, "none")), str(steps), growth, big, int(gold.get(4, 0)) + big])
 	var k4: Array = (_run.REWARDS.get(4, []) as Array).map(func(r): return String(r.get("kind", "")))
 	var k5: Array = (_run.REWARDS.get(5, []) as Array).map(func(r): return String(r.get("kind", "")))
 	ok(k5 == k4, "§1c: severity 5 pays %s where severity 4 pays %s — the row is one step further, not a new kind" % [str(k5), str(k4)])
-	print("    the gold reads %s, steps %s — %s; severity 5 takes the largest, %d: %d gold or a rune" % [
-		str([gold.get(1), gold.get(2), gold.get(3), gold.get(4)]), str(steps), "regular" if regular else "not one slope",
+	print("    the gold reads %s, steps %s — %s; severity 5 takes the next, %d: %d gold or a rune" % [
+		str([gold.get(1), gold.get(2), gold.get(3), gold.get(4)]), str(steps), "regular" if regular else "a growing slope",
 		big, int(gold.get(5, 0))])
 
 
@@ -327,55 +333,49 @@ func _s1d_the_fixed_band() -> void:
 		"§1d: a fixed encounter drew a severity-5 modifier — a bargain's, priced with a reward it never pays")
 
 
-# ── §1e — FAMINE: THE POUCH IS SEALED ───────────────────────────────────────
+# ── §1e — FAMINE: THE POUCH IS SEALED — RE-POINTED AT IO §1: FAMINE IS REMOVED, AND NO MODIFIER SEALS IT ──
 
 func _s1e_famine() -> void:
-	print("\n§1e — Famine: no item may be used this fight, by the button, the picker, the use path or the bot")
+	print("\n§1e — Famine is removed (IO §1): under every modifier the pouch opens, by the button, the picker and the use path")
 	var s: Node = await _board(["warden", "pyromancer", "holy", "mystic"], {}, {"items": {"health": 2, "bomb": 1}})
 	var h := _hero(s, "warrior") if s != null else null
 	ok(s != null and h != null, "§1e: the board seats a Warrior")
 	if s == null or h == null:
 		await _clear(s)
 		return
-	s.set("item_used", false)
-	s.set("current_hero", h)
 	(s.get("action_panel") as Control).visible = true
-	# THE POSITIVE ARM FIRST: no modifier, the pouch opens.
-	_run.pending_modifier = ""
-	var b0: Button = s.call("_build_items_menu")
-	ok(not bool(s.call("_pouch_sealed")) and not b0.disabled, "§1e: with no modifier the Items button is dark or the pouch reads sealed")
-	b0.free()
-	s.call("_open_item_picker")
-	ok(s.get("_item_picker") != null, "§1e: with no modifier the item picker did not open")
-	s.call("_close_item_picker")
-	# FAMINE.
-	_run.pending_modifier = "famine"
-	var b1: Button = s.call("_build_items_menu")
-	var fam: Dictionary = _run.MODIFIERS["famine"]
-	ok(bool(s.call("_pouch_sealed")) and b1.disabled and String(b1.tooltip_text).contains(String(fam["desc"])),
-		"§1e: under Famine the Items button is lit, or says nothing of why ('%s')" % b1.tooltip_text)
-	b1.free()
-	s.call("_open_item_picker")
-	ok(s.get("_item_picker") == null, "§1e: under Famine the item picker opened")
-	var items: Dictionary = s.get("items")
-	var hp_n := int((items["health"] as Array)[1])
-	s.call("_use_item", "health")
-	ok(int((items["health"] as Array)[1]) == hp_n and not bool(s.get("item_used")),
-		"§1e: under Famine `_use_item` spent a Health Potion (%d → %d)" % [hp_n, int((items["health"] as Array)[1])])
-	# THE BOT's DRINK asks the same door (RunSim's drink runs only inside a sim run, so it is read where it stands).
+	var sealed: Array = []
+	var ids: Array = [""] + (_run.MODIFIERS as Dictionary).keys()
+	for mid in ids:
+		_run.pending_modifier = String(mid)
+		s.set("item_used", false)
+		s.set("current_hero", h)
+		(s.get("action_panel") as Control).visible = true
+		var b0: Button = s.call("_build_items_menu")
+		var lit := not b0.disabled
+		b0.free()
+		s.call("_open_item_picker")
+		var opened: bool = s.get("_item_picker") != null
+		s.call("_close_item_picker")
+		if not (lit and opened):
+			sealed.append("'%s' (button %s, picker %s)" % [mid, lit, opened])
+	ok(sealed.is_empty() and ids.size() == 25, "§1e: the pouch was sealed under %s of %d fights' terms" % [str(sealed), ids.size()])
+	var b := _src("scripts/battle.gd")
+	ok(not b.contains("_pouch_sealed") and not b.contains("\"famine\""), "§1e: Famine's door is still in `battle.gd`")
+	# THE USE PATH asks the stock and the turn's one item, nothing about the fight's terms (it awaits a target pick for a
+	# potion, so it is read where it stands rather than driven headless).
+	ok(_body("scripts/battle.gd", "_use_item").contains("if not items.has(item_id) or items[item_id][1] <= 0 or item_used:"),
+		"§1e: `_use_item`'s guard asks something beyond the stock and the turn's one item")
 	var pt := _body("scripts/battle.gd", "_player_turn")
-	var drink := pt.substr(pt.find("autoplay and RunSim.active and RunSim.items_on"), 260)
-	ok(drink.contains("not _pouch_sealed()") and drink.contains("items[\"health\"]"),
-		"§1e: the bot's drink does not ask `_pouch_sealed`")
-	for fn in ["_use_item", "_open_item_picker", "_build_items_menu"]:
-		ok(_body("scripts/battle.gd", fn).contains("_pouch_sealed()"), "§1e: `%s` does not ask `_pouch_sealed`" % fn)
+	var drink := pt.substr(pt.find("autoplay and RunSim.active and RunSim.items_on"), 200)
+	ok(drink.contains("items[\"health\"]") and not drink.contains("_pouch"), "§1e: the bot's drink still asks a sealed pouch")
 	await _clear(s)
 
 
 # ── §1f — WASTING: A CLOCK ON THE FIGHT ─────────────────────────────────────
 
 func _s1f_wasting() -> void:
-	print("\n§1f — Wasting: a hero loses its share of his maximum at his turn's end; no ward, armor or Less Damage Taken reaches it")
+	print("\n§1f — Wasting: whoever took the turn loses its share of its maximum (both sides since IO §1); no ward, armor or Less Damage Taken reaches it")
 	var s: Node = await _board(["warden", "pyromancer", "holy", "mystic"], {})
 	var h := _hero(s, "warrior") if s != null else null
 	var foes := _foes(s) if s != null else []
@@ -401,10 +401,12 @@ func _s1f_wasting() -> void:
 			900 - h.hp, want, int(round(float(_run.WASTING_PCT) * 100))])
 	ok(h.get_status("barrier").get("power", 0) == 500, "§1f: Wasting ate into the barrier — it is not a strike")
 	ok(s.get("_dmg_src") == was_src, "§1f: the tick left its frame standing")
-	# ONE SIDE: an enemy's turn's end costs nothing.
+	# BOTH SIDES SINCE IO §1 (AQ's rule): an enemy's turn's end costs it its share as a hero's does.
 	var e: BattleUnit = foes[0]
 	var e_hp := e.hp
-	ok(not bool(s.call("_wasting_tick", e)) and e.hp == e_hp, "§1f: Wasting took %d from an enemy" % (e_hp - e.hp))
+	var e_want := maxi(int(round(e.max_hp * float(_run.WASTING_PCT))), 1)
+	s.call("_wasting_tick", e)
+	ok(e_hp - e.hp == mini(e_want, e_hp), "§1f: Wasting took %d from an enemy — want %d (both sides since IO §1)" % [e_hp - e.hp, e_want])
 	# A TURN THAT WON THE FIGHT ENDS NOTHING: with the warband down the clock has stopped.
 	var hp_won := h.hp
 	var alive_now: Array = foes.filter(func(x): return not (x as BattleUnit).dead)
@@ -417,9 +419,10 @@ func _s1f_wasting() -> void:
 	h.hp = 3
 	h.remove_status("barrier")
 	ok(bool(s.call("_wasting_tick", h)) and h.dead, "§1f: a hero at 3 health under Wasting did not fall")
-	# EVERY PLACE A HERO's TURN ENDS CALLS IT: the turn he took, and a turn a stun, a freeze or a Break cost him.
+	# EVERY PLACE A TURN ENDS CALLS IT: the hero's turn, the enemy's (since IO §1), and a turn a stun, a freeze or a Break
+	# cost either side.
 	var rb := _body("scripts/battle.gd", "_run_battle")
-	ok(rb.count("_wasting_tick(u)") == 4, "§1f: `_run_battle` calls the tick %d times, want 4 (the turn, stunned, frozen, Broken)" % rb.count("_wasting_tick(u)"))
+	ok(rb.count("_wasting_tick(u)") == 5, "§1f: `_run_battle` calls the tick %d times, want 5 (the hero's turn, the enemy's, stunned, frozen, Broken)" % rb.count("_wasting_tick(u)"))
 	ok(_body("scripts/battle.gd", "_wasting_tick").contains("take_tick_damage("),
 		"§1f: Wasting does not go through the tick door")
 	await _clear(s)
@@ -428,7 +431,7 @@ func _s1f_wasting() -> void:
 # ── §1g — THE HUNGERING DARK: EVERY ENEMY HEALS A SHARE OF THE DAMAGE IT DEALS ──
 
 func _s1g_the_hungering_dark() -> void:
-	print("\n§1g — the Hungering Dark: an enemy that deals damage is fed its share, at BL's one damage door")
+	print("\n§1g — the Hungering Dark: whoever deals damage is fed its share (both sides since IO §1), at BL's one damage door")
 	var s: Node = await _board(["warden", "pyromancer", "holy", "mystic"], {})
 	var h := _hero(s, "warrior") if s != null else null
 	var foes := _foes(s) if s != null else []
@@ -453,17 +456,18 @@ func _s1g_the_hungering_dark() -> void:
 		var want := int(round(lost * float(_run.HUNGERING_DARK_PCT))) if bool(arm[2]) else 0
 		ok(lost > 0 and fed == want, "§1g: modifier '%s', dealer %s: the hero lost %d and the enemy healed %d — want %d" % [
 			arm[0], (arm[1] as BattleUnit).unit_name, lost, fed, want])
-	# THE DARK FEEDS THE WARBAND ALONE: a hero who deals the blow is never fed. The arms above
-	# never set a hero as the dealer of a blow on an enemy, so a feed that forgot the hero's side
-	# read green on all of them (control C08 found it).
+	# A HERO WHO DEALS THE BLOW IS FED TOO, SINCE IO §1 (AQ's rule — IN's Dark fed the warband alone, and control C08 found
+	# the arms above never set a hero as the dealer of a blow on an enemy). The arm IN wrote to read a hero NOT fed is
+	# re-pointed to read him fed his share.
 	e.hp = 900
 	h.hp = 3000
 	_run.pending_modifier = "hungering_dark"
 	s.call("_dmg_frame", h, "probe")
 	var e_was := e.hp
 	e.take_tick_damage(200, "-200", Color.WHITE)
-	ok(e.hp < e_was and h.hp == 3000, "§1g: %s dealt %d to an enemy under the Dark and was fed %d — the Dark feeds the warband alone" % [
-		h.unit_name, e_was - e.hp, h.hp - 3000])
+	var h_want := int(round((e_was - e.hp) * float(_run.HUNGERING_DARK_PCT)))
+	ok(e.hp < e_was and h.hp == 3000 + h_want, "§1g: %s dealt %d to an enemy under the Dark and was fed %d — want %d (both sides since IO §1)" % [
+		h.unit_name, e_was - e.hp, h.hp - 3000, h_want])
 	# A HEAL REFUSED IS REFUSED: Caught Fast on the dealer.
 	e.hp = 500
 	_run.pending_modifier = "hungering_dark"
@@ -475,13 +479,14 @@ func _s1g_the_hungering_dark() -> void:
 	ok(_body("scripts/battle.gd", "_on_damage_taken").contains("_dark_feeds(victim, lost)")
 			and _body("scripts/battle.gd", "_dark_feeds").contains("heal_amount("),
 		"§1g: the feed is not at BL's door, or does not heal through `heal_amount`")
+	s.call("_dmg_frame", null, "")
 	await _clear(s)
 
 
-# ── §1h — CRUEL ORDER: EVERY ENEMY ACTS BEFORE ANY HERO, EACH ROUND ─────────
+# ── §1h — CRUEL ORDER — RE-POINTED AT IO §1: IT IS REMOVED, AND THE TURN ORDER IS `next_time` UNDER EVERY MODIFIER ──
 
 func _s1h_cruel_order() -> void:
-	print("\n§1h — Cruel Order: the timeline read in rounds, the warband first in each, in the loop and on the bar")
+	print("\n§1h — Cruel Order is removed (IO §1): under every modifier the loop and the bar order turns by the timeline alone")
 	var s: Node = await _board(["warden", "pyromancer", "holy", "sharpshooter"], {})
 	var h := _hero(s, "warrior") if s != null else null
 	var foes := _foes(s) if s != null else []
@@ -489,26 +494,24 @@ func _s1h_cruel_order() -> void:
 	if s == null or h == null or foes.is_empty():
 		await _clear(s)
 		return
-	var rt := float(s.get("ROUND_TICKS"))
 	var e: BattleUnit = foes[0]
 	for u in (s.get("heroes") as Array) + (s.get("enemies") as Array):
 		(u as BattleUnit).next_time = 1000.0
-	# ONE ROUND: the hero due first, the enemy later in the same round.
-	h.next_time = rt * 0.15
-	e.next_time = rt * 0.75
-	_run.pending_modifier = ""
-	ok(s.call("_next_unit") == h, "§1h: with no modifier the hero due first does not act first")
-	_run.pending_modifier = "cruel_order"
-	ok(s.call("_next_unit") == e, "§1h: under Cruel Order the hero acts before an enemy due in the same round")
-	# THE NEXT ROUND: speed still counts across rounds.
-	e.next_time = rt * 1.25
-	ok(s.call("_next_unit") == h, "§1h: under Cruel Order an enemy due next round acts before the hero due in this one")
-	# THE TRACKER's opening turn, placed before the first round, stays before it.
-	ok(bool(s.call("_turn_before", h, -0.01, e, rt * 0.10, true)),
-		"§1h: a turn placed before the first round (the Tracker's -0.01) no longer comes first")
-	ok(_body("scripts/battle.gd", "_next_unit").contains("_turn_before(")
-			and _body("scripts/battle.gd", "_rebuild_turn_bar").contains("_turn_before("),
-		"§1h: the loop and the bar do not both order turns through `_turn_before`")
+	# The hero due first, the enemy a hair later: the hero acts first whatever the fight's terms.
+	h.next_time = 0.3
+	e.next_time = 1.5
+	var out: Array = []
+	for mid in [""] + (_run.MODIFIERS as Dictionary).keys():
+		_run.pending_modifier = String(mid)
+		if s.call("_next_unit") != h:
+			out.append(String(mid))
+	ok(out.is_empty(), "§1h: the hero due first did not act first under %s" % str(out))
+	var b := _src("scripts/battle.gd")
+	ok(not b.contains("_turn_before") and not b.contains("ROUND_TICKS") and not b.contains("\"cruel_order\""),
+		"§1h: Cruel Order's door or its round is still in `battle.gd`")
+	ok(_body("scripts/battle.gd", "_next_unit").contains("if u.next_time < best.next_time:")
+			and _body("scripts/battle.gd", "_rebuild_turn_bar").contains("if entry.t < best.t:"),
+		"§1h: the loop and the bar do not both order turns by the timeline alone")
 	_run.pending_modifier = ""
 	await _clear(s)
 
@@ -538,18 +541,25 @@ func _s1i_the_words() -> void:
 	ok(sev.contains("its gambles at 5 alone") or sev.contains("gambles at {=Run.DIFFICULTIES.ruin.gamble_band.0} alone"),
 		"§1i: the severity entry does not say Ruin's gambles are dealt at 5")
 	ok(sev.contains("the mildest severity the road deals"), "§1i: the severity entry still pins the merchant to severity 1")
+	# RE-POINTED AT IO §1: the entry goes back to AQ's rule — every modifier binds both sides, nothing binds one — and names
+	# neither of the two IO removed.
 	var mod_e := String(Glossary.entry("modifier").get("long", ""))
-	ok(mod_e.contains("THE TWENTY EVERY ROAD DEALS BIND BOTH SIDES") and mod_e.contains("RUIN'S FOUR bind one side")
-			and not mod_e.contains("'no items this fight' is not a modifier"),
-		"§1i: the modifier entry still says every modifier binds both sides, or names Famine as one that cannot exist")
+	ok(mod_e.contains("EVERY MODIFIER BINDS BOTH SIDES") and not mod_e.contains("bind one side -")
+			and not mod_e.contains("Famine") and not mod_e.contains("Cruel Order"),
+		"§1i: the modifier entry says something binds one side, or names a modifier IO removed")
 	var lad := String(Glossary.entry("difficulty_ladder").get("long", ""))
 	ok(lad.contains("severity 5"), "§1i: the ladder entry does not say Ruin's gambles are severity 5")
+	# RE-POINTED AT IO §2: each of IN's two that stayed has its row at the grade the table gives it now, and the two removed
+	# have none.
 	var mh := FileAccess.get_file_as_string("res://docs/master.html")
 	var missing: Array = []
 	for id2 in FOUR:
-		if not mh.contains("<td>%s</td><td>5</td>" % String(FOUR[id2][0])):
+		if not mh.contains("<td>%s</td><td>%d</td>" % [String(FOUR[id2][0]), int(_run.modifier_severity(String(id2)))]):
 			missing.append(FOUR[id2][0])
-	ok(missing.is_empty(), "§1i: `master.html`'s modifier table has no severity-5 row for %s" % str(missing))
+	for id3 in REMOVED:
+		if mh.contains("<td>%s</td>" % String(REMOVED[id3])):
+			missing.append("%s (removed)" % REMOVED[id3])
+	ok(missing.is_empty(), "§1i: `master.html`'s modifier table has no row at its grade for %s" % str(missing))
 
 
 # ── §2 — THE MERCHANT ───────────────────────────────────────────────────────

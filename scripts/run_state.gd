@@ -1258,9 +1258,10 @@ const ZONE_BASE_MULTS := [1.0, 1.5, 2.2]
 # MILD OPTION.
 #
 # BATCH IN §1 — RUIN's GAMBLES ARE SEVERITY 5, AND NO OTHER RUNG's BANDS REACH IT.
-# Four bargains stand at severity 5 (`MODIFIERS`' foot), so a severity-5 modifier
-# is one Wanderer and Warden are never offered; Ruin's safe slot stays 3–4. The
-# band holds four and two are drawn without replacement, as Warden's four at 4.
+# Four bargains stand at severity 5 — whichever four IO §2's measurement grades
+# hardest — so a severity-5 modifier is one Wanderer and Warden are never offered;
+# Ruin's safe slot stays 3–4. The band holds four and two are drawn without
+# replacement, as Warden's four at 4.
 const DIFFICULTIES := {
 	"wanderer": {"rung": 1, "name": "Wanderer", "mult": 0.50,
 		"blurb": "The Decay is thin here. No twist.",
@@ -4529,8 +4530,16 @@ func bomb_damage() -> int:
 # the rung's mild pool, so the safe slot on every card all run is served by
 # that pool alone; the harsh end already rotates and the low end is what
 # actually repeats. Counts: 6 / 6 / 4 / 4 across severities 1-4, and four more
-# at severity 5 since IN §1 — dealt at Ruin alone (its gamble band), so the table
-# Wanderer and Warden draw from is the twenty it always was.
+# at severity 5 since IN §1 — dealt at Ruin alone (its gamble band).
+#
+# **BATCH IO §2 — EVERY GRADE IN THE TABLE IS A MEASUREMENT (the designer's).** A
+# modifier's severity is its rank by what it costs a party, not by how it reads: the
+# twenty-four were forced one at a time on every bargain of a Ruin run, sorted by the
+# party's health at a bargain fight's end (runs completed breaking a tie) and cut at the
+# counts above, which do not change — the bands are built on them. Nineteen moved; which,
+# and why each cut sits where it does, is IO's report (§2). The section headers below say
+# where each modifier was AUTHORED, not where it is graded. A re-grade keeps the table's
+# order, so the dice deal by the same positions.
 #
 # SEVERITY 4 IS FOUR AGAIN (Batch BB §5). `rot` — maximum health halved for
 # everyone — was authored by AQ, implemented, and DROPPED there: the battle-end
@@ -4547,77 +4556,98 @@ func bomb_damage() -> int:
 #
 # BATCH IN §1 — FOUR BARGAINS ONLY RUIN EVER SEES (severity 5, the designer's).
 # One sentence each, one system each, and NONE ZEROES A CLASS's KIT — a modifier
-# that makes one hero's whole hand dead is not harsh, it is unplayable. AND EACH
-# BINDS ONE SIDE: the twenty above bind both parties (AQ's rule), and these four
-# are the first that do not — the designer's, at IN. Their two figures are read
-# off the constants below (II §0.7: a figure the code holds is read, never retyped)
-# and are STARTING VALUES, measured at IN (CQ §6) and the designer's to tune.
-#   famine          the pouch          — `battle._pouch_sealed`
-#   wasting         a clock on the fight — `battle._wasting_tick`, at a hero's
-#                   turn's end, through the tick door: not a strike, so no ward,
-#                   no armor and no Less Damage Taken reaches it. Authored as
-#                   ROT; the severity-4 `rot` above holds the name (BR §1).
-#   hungering_dark  the damage race    — BL's one damage door (`battle._dark_feeds`)
-#   cruel_order     the turn order     — `battle._turn_before`
-const WASTING_PCT := 0.05
-const HUNGERING_DARK_PCT := 0.25
+# that makes one hero's whole hand dead is not harsh, it is unplayable.
+# **BATCH IO §1 RE-CUT THEM TO AQ's RULE, AND NOTHING IN THE DECK BINDS ONE SIDE
+# (the designer's).** A modifier that binds one side is a difficulty slider, and
+# the rung is already the difficulty slider: a bargain changes the fight, it does
+# not change the odds. So Famine (the pouch — enemies carry none) and Cruel Order
+# (the warband first — *both sides first* is incoherent) are REMOVED, not disabled;
+# their built shape and IN's measurements are in `docs/design-notes.md`. Wasting
+# and the Hungering Dark bind both sides, and two two-sided rules replace the pair.
+# Every figure is read off a constant below (II §0.7: a figure the code holds is
+# read, never retyped); each is a STARTING VALUE (CQ §6) and the designer's to tune.
+#   wasting         a clock on the fight — `battle._wasting_tick`, at the end of every
+#                   unit's turn, through the tick door: not a strike, so no ward, no
+#                   armor and no Less Damage Taken reaches it, and it names nobody.
+#                   Authored as ROT; the `rot` above holds the name (BR §1).
+#   hungering_dark  the damage race    — BL's one damage door (`battle._dark_feeds`), a
+#                   heal NO UNIT PERFORMED (`heal_amount`'s `unowned` door, IO §1b)
+#   thin_veil       every blow         — Feverish's door, the Attack every damage reads:
+#                   the harsh rung of the ladder Feverish starts, as Bloodless tops Miasma's
+#   long_silence    the hand           — `BattleUnit.silenced`, asked by `ability_ready`
+#                   and the enemy's re-validation; a unit's basic attack is exempt
+const WASTING_PCT := 0.08
+const HUNGERING_DARK_PCT := 0.5
+const THIN_VEIL_PCT := 0.5
+# BATCH IO §5 — EVERY MODIFIER CARRIES ITS OWN LETTERS (`tag`), for the battle's bargain chip, and HU §4's
+# rule binds them as it binds a status's: no two chips in the game show the same letters, case set aside,
+# and none is a status's tag or counter (`check_hu` §4a walks them with the statuses). The tints are the
+# offer card's, moved here so the card and the chip read one table.
+const SEVERITY_COLORS := {
+	1: Color(0.55, 0.85, 0.6),
+	2: Color(0.85, 0.82, 0.45),
+	3: Color(0.95, 0.6, 0.35),
+	4: Color(0.95, 0.35, 0.4),
+	5: Color(0.78, 0.32, 0.82),
+}
 const MODIFIERS := {
-	"overgrown": {"name": "Overgrown", "severity": 1,
+	"overgrown": {"name": "Overgrown", "tag": "Ov", "severity": 5,
 		"desc": "Both parties begin the fight at 70% health at most."},
-	"tinderbox": {"name": "Tinderbox", "severity": 2,
+	"tinderbox": {"name": "Tinderbox", "tag": "Ti", "severity": 1,
 		"desc": "All fire strike damage +25%, whoever deals it."},
-	"frenzied": {"name": "Frenzied", "severity": 2,
+	"frenzied": {"name": "Frenzied", "tag": "Fr", "severity": 1,
 		"desc": "Everyone acts 30% faster. Cooldowns are unchanged."},
-	"brittle": {"name": "Brittle", "severity": 3,
+	"brittle": {"name": "Brittle", "tag": "Bi", "severity": 3,
 		"desc": "All attacks ignore armor, on both sides."},
-	"warded": {"name": "Warded", "severity": 3,
+	"warded": {"name": "Warded", "tag": "Wa", "severity": 1,
 		"desc": "All abilities cost 25% more. Basic attacks are free."},
-	"bloodless": {"name": "Bloodless", "severity": 4,
+	"bloodless": {"name": "Bloodless", "tag": "Nh", "severity": 5,
 		"desc": "No healing for anyone. Bleed and damage-over-time still tick."},
-	# ---- severity 1 (Batch AQ) ----
-	"parched": {"name": "Parched", "severity": 1,
+	# ---- authored by AQ at severity 1 (every grade in this table is IO §2's measurement) ----
+	"parched": {"name": "Parched", "tag": "Pa", "severity": 2,
 		"desc": "Both parties begin the fight at half resource at most."},
-	"slick": {"name": "Slick Footing", "severity": 1,
+	"slick": {"name": "Slick Footing", "tag": "Sk", "severity": 2,
 		"desc": "Every ability costs +0.5 initiative. Everyone is slower to come round again."},
-	"dulledge": {"name": "Dull Edge", "severity": 1,
+	"dulledge": {"name": "Dull Edge", "tag": "De", "severity": 1,
 		"desc": "Critical chance -5%, for everyone."},
-	"muffled": {"name": "Muffled", "severity": 1,
+	"muffled": {"name": "Muffled", "tag": "Mu", "severity": 2,
 		"desc": "All Break damage is reduced 25%. Meters fill slowly."},
-	"hoarfrost": {"name": "Hoarfrost", "severity": 1,
+	"hoarfrost": {"name": "Hoarfrost", "tag": "Ho", "severity": 1,
 		"desc": "Everyone begins the fight Chilled."},
-	# ---- severity 2 (Batch AQ) ----
-	"fleeting": {"name": "Fleeting", "severity": 2,
+	# ---- authored by AQ at severity 2 ----
+	"fleeting": {"name": "Fleeting", "tag": "Ft", "severity": 2,
 		"desc": "Every status applied lasts one turn less (never below one)."},
-	"feverish": {"name": "Feverish", "severity": 2,
+	"feverish": {"name": "Feverish", "tag": "Fv", "severity": 3,
 		"desc": "Everyone deals 25% more damage. Fights end quickly, one way or the other."},
-	"deadened": {"name": "Deadened", "severity": 2,
+	"deadened": {"name": "Deadened", "tag": "Dd", "severity": 4,
 		"desc": "Nobody can be Broken. The Break meter does nothing this fight."},
-	"miasma": {"name": "Miasma", "severity": 2,
+	"miasma": {"name": "Miasma", "tag": "Ma", "severity": 4,
 		"desc": "All healing received is halved."},
-	# ---- severity 3 (Batch AQ) ----
-	"thinair": {"name": "Thin Air", "severity": 3,
+	# ---- authored by AQ at severity 3 ----
+	"thinair": {"name": "Thin Air", "tag": "Ta", "severity": 4,
 		"desc": "No resource returns at the start of a turn. Anything else that builds it still does."},
-	"encumbered": {"name": "Encumbered", "severity": 3,
+	"encumbered": {"name": "Encumbered", "tag": "En", "severity": 2,
 		"desc": "Every ability with a cooldown costs two more turns of it. Basic attacks are unaffected."},
-	# ---- severity 4 (Batch AQ) ----
-	"bloodletting": {"name": "Bloodletting", "severity": 4,
+	# ---- authored by AQ at severity 4 ----
+	"bloodletting": {"name": "Bloodletting", "tag": "Wo", "severity": 2,
 		"desc": "Every hit opens a wound. All attacks add 15 Bleed, on both sides."},
-	"mirrorbound": {"name": "Mirrorbound", "severity": 4,
+	"mirrorbound": {"name": "Mirrorbound", "tag": "Mr", "severity": 5,
 		"desc": "An attack that does not miss sends a quarter of the damage it deals back on its attacker — at least 1, even when it deals none. On both sides."},
-	# ---- severity 4 (Batch BB §5, AQ's authored fourth) ----
-	"rot": {"name": "Rot", "severity": 4,
+	# ---- authored at severity 4 (Batch BB §5, AQ's authored fourth) ----
+	"rot": {"name": "Rot", "tag": "Ro", "severity": 3,
 		"desc": "Everyone's maximum health is halved, on both sides. It lasts the fight and no longer."},
-	# ---- severity 5 (Batch IN §1): Ruin's gambles, one side each ----
-	"famine": {"name": "Famine", "severity": 5,
-		"desc": "The pouch is sealed: no item may be used this fight."},
-	"wasting": {"name": "Wasting", "severity": 5,
-		"desc": "At the end of every hero's turn, that hero loses %d%% of maximum health."
+	# ---- authored at severity 5 (Batch IN §1, re-cut at IO §1), both sides each ----
+	"wasting": {"name": "Wasting", "tag": "Ws", "severity": 5,
+		"desc": "At the end of every turn, whoever took it loses %d%% of maximum health — heroes and enemies alike."
 			% [int(round(WASTING_PCT * 100))]},
-	"hungering_dark": {"name": "The Hungering Dark", "severity": 5,
-		"desc": "Every enemy heals %d%% of the damage it deals."
+	"hungering_dark": {"name": "The Hungering Dark", "tag": "Hu", "severity": 1,
+		"desc": "Whoever deals damage heals %d%% of it — heroes and enemies alike."
 			% [int(round(HUNGERING_DARK_PCT * 100))]},
-	"cruel_order": {"name": "Cruel Order", "severity": 5,
-		"desc": "Every enemy acts before any hero, each round."},
+	"thin_veil": {"name": "The Thin Veil", "tag": "Tv", "severity": 4,
+		"desc": "Everyone deals %d%% more damage, blows and ticks alike, on both sides."
+			% [int(round(THIN_VEIL_PCT * 100))]},
+	"long_silence": {"name": "The Long Silence", "tag": "Ls", "severity": 3,
+		"desc": "Nobody may use the same ability twice this fight. Basic attacks are exempt."},
 }
 
 # The reward table reads severity and nothing else. Each entry is the list
@@ -4636,9 +4666,11 @@ const MODIFIERS := {
 # holds the merchant out of the run's first three nodes.
 #
 # **BATCH IN §1 — SEVERITY 5 IS ONE STEP FURTHER ON THE LADDER, NOT A NEW FIGURE.**
-# The gold reads 40 → 80 → 140 → 220: steps of 40, 60 and 80, not one slope (each
-# step 20 more than the last), so the row takes the largest step the table already
-# has, 80 — 300 gold — and pays it or a rune, as severity 4 does.
+# The gold reads 40 → 80 → 140 → 220: steps of 40, 60 and 80, each twenty more than
+# the last. IN's row took the largest step the table had, 80 — 300 gold; **IO §0.7
+# (the designer's) reads the slope as the growing one it is**, so the next step is 100
+# and the row is 320 — taking the largest existing step would flatten a curve the
+# table deliberately has. It pays that or a rune, as severity 4 does.
 #
 # **BATCH IN §2 — THE MERCHANT IS THE REWARD OF A RUNG's MILDEST DEALT SEVERITY, NOT
 # OF SEVERITY 1 ABSOLUTELY (the designer's).** HW §2's intent was the merchant on
@@ -4655,7 +4687,7 @@ const REWARDS := {
 	2: [{"kind": "gold", "amount": 80}, {"kind": "potion"}],
 	3: [{"kind": "gold", "amount": 140}, {"kind": "rune"}],
 	4: [{"kind": "gold", "amount": 220}, {"kind": "rune"}],
-	5: [{"kind": "gold", "amount": 300}, {"kind": "rune"}],
+	5: [{"kind": "gold", "amount": 320}, {"kind": "rune"}],
 }
 const MERCHANT_REWARD := {"kind": "shop"}
 
@@ -4779,8 +4811,9 @@ const FIXED_MODIFIER_NODES := ["miniboss", "boss", "endboss"]
 # BATCH IN §1 — THE SEVERITIES A FIXED ENCOUNTER DRAWS FROM, STATED AS A BAND. It read
 # `>= 3` while the table topped at 4, so it drew from 3–4; the severity-5 four are a
 # BARGAIN's — priced with a reward a fixed encounter never pays — and the band keeps
-# Ruin's mini-boss and bosses on the eight they always drew from. Whether they should
-# reach the severity-5 four is the designer's (IN's report).
+# Ruin's mini-boss and bosses on severity 3–4. **CONFIRMED AT IO §0.4 (the designer's)**:
+# a modifier with no reward is not a bargain. Which eight stand there is the grades', so
+# IO §2's re-grade moved the band's contents (IO's report says what it draws now).
 const FIXED_MODIFIER_BAND := [3, 4]
 
 

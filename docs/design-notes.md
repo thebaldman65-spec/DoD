@@ -4,6 +4,60 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The bargain deck, measured and re-cut (Batch IO) — 2026-10-18
+
+**Why nothing in the deck binds one side.** A modifier that binds only one side is a difficulty slider, and the road the
+player chose is already the difficulty slider. A bargain is meant to change the fight — what is cheap, what is dangerous,
+what a turn is worth — not the odds. Two of Ruin's four had a two-sided reading and were better for it; two did not, and
+they are gone.
+
+**Why Wasting is better on both sides, not milder.** A clock on every unit's turn helps the party against a body with a
+lot of health and hurts them in a long fight, which is a real decision about how to fight rather than a tax on the heroes.
+It still names nobody: a unit it fells was killed by no one, so it pays no kill reward and feeds no rule that reads a
+killer.
+
+**Why the Dark's heal is nobody's healing.** Half of every blow coming back to whoever struck it is a property of the fight,
+not a heal any unit performed. Heals in this game feed things — a Cleric's ledger, a rune that re-arms when a hero is
+healed past a line, a vigil that forks a heal to a weaker hero — and a heal nobody cast must not pay them. So it meets every
+refusal and every multiplier a heal meets, which is how a player answers it, and reaches none of the riders.
+
+**Why severity is measured now.** The grades were labels: a modifier's severity said how harsh its words sounded, and
+measured, the range inside one grade was wider than the range between them — two severity-4 bargains ended a fight at two
+thirds of the party's health and at nine tenths. A severity sets which road deals a bargain and what it pays, so a label
+that is wrong sends the wrong bargain to the wrong road at the wrong price. So every modifier was forced on every bargain of
+a run and the deck re-sorted by what it cost, then cut back into the same sizes the roads are built on, so the roads keep
+their shape and only the contents move. Two consequences are worth naming: the Hungering Dark, once it feeds both sides, helps
+the heroes — they deal far more damage than a warband does — and so it is now the mildest bargain in the deck; and Overgrown,
+which starts everyone at seven tenths of their health, is among the costliest by the health a party ends with, though not by
+how often a run fails. The measure is the party's health at a fight's end, and Overgrown's cost is paid all at once at the
+start; that is said in the report so the designer can rule on the measure if it reads wrong in play.
+
+**Why the Thin Veil is the harsh end of Feverish.** "Everyone deals half again as much" is Feverish's rule at twice the
+figure. The deck already holds one rule at two severities — Miasma halves healing, Bloodless ends it — and the Veil is the
+same shape: the mild version teaches the idea, the harsh one makes it the whole fight.
+
+**Why the Long Silence exempts the basic attack.** A rule that could leave a unit with nothing to do would zero a hand, and
+that is the line no modifier crosses. With the basic always free, every card works once and the fight becomes a question of
+order — which card is worth spending now, and which to keep for the moment it matters.
+
+**Why the bargain now has a chip.** Something acting on the whole fight should be visible during the whole fight. The line
+in the log at the opening scrolls away within two turns; a strip at the top of the screen with the bargain's letters, its
+pips and its name — and its rule on the hover — stays where the player can look at it when a number surprises them.
+
+**Why Famine and Cruel Order are kept here and not anywhere else.** They were removed, not disabled — dead code behind a
+flag is a liability — but the work and the measurement cost a sim pass, so their shape is recorded for the day a home for a
+one-sided rule appears:
+- **Famine** — *the pouch is sealed: no item may be used this fight.* One door (`_pouch_sealed`) asked by the Items button
+  (dark, its hover the modifier's words), the item picker, the use path and the bot's drink; the map's pouch untouched.
+  Measured at IN, forced on every bargain of a Ruin run: **0.952 of the party's health at a bargain fight's end and 59 runs
+  of 60 completed** — the same as no modifier, because the sim's bot drinks one Health Potion, below 35% health, at a flat
+  40, so sealing the pouch takes almost nothing from it. The instrument could not price it for a player.
+- **Cruel Order** — *every enemy acts before any hero, each round.* The game has no rounds, so the timeline was read in
+  spans of one basic swing at the average speed (`ROUND_TICKS`), and in each span the warband came first; the loop and the
+  turn bar asked one ordering function. The Hunter's opening turn kept its place before the first span — a class passive
+  outranks a modifier. Measured the same way: **0.932 of the party's health and 52 runs of 60** — the most runs lost of
+  IN's four.
+
 ## The severity-5 band, and two blind spots (Batch IN) — 2026-10-17
 
 **Why Ruin needed new bargains rather than a new weighting.** The table stopped at severity 4, so no way of dealing it could

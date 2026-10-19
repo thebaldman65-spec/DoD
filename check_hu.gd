@@ -512,14 +512,16 @@ func _s1_the_bar_pages() -> void:
 				break
 		ok(k_idx > 0, "§1f: %s's keyed slots hold no castable card aimed at an enemy" % kh.unit_name)
 		if k_idx > 0:
+			var key_pick := "key %s, %s, the first keyed slot of %s's bar holding a castable card aimed at an enemy" % [
+				s._hotkey_name(k_idx), ((k_entries[k_idx] as Dictionary)["ability"] as Ability).display_name, kh.unit_name]
 			var got := []
 			s._ability_picked.connect(func(ab): got.append(ab), CONNECT_ONE_SHOT)
 			s._try_ability_hotkey((s.ABILITY_KEYS as Array)[k_idx], false)
 			await Gate.frames(self, 2)
 			var want: Ability = (k_entries[k_idx] as Dictionary)["ability"]
 			ok(got.size() == 1 and got[0] == want,
-				"§1f: with page two showing, key %s handed over %s — want its own slot's %s" % [
-					s._hotkey_name(k_idx), str(got.map(func(x): return x.display_name)), want.display_name])
+				("§1f: with page two showing, key %s handed over %s — want its own slot's %s" % [
+					s._hotkey_name(k_idx), str(got.map(func(x): return x.display_name)), want.display_name]) + " — %s" % key_pick)
 			# BATCH HV §4 — READ THE MEMBER, THEN ASSERT IT. Cast straight to a Dictionary, a battle
 			# node without the page memory threw here where it should fail (HU §6d: HEAD's game read
 			# 102 checks and a SCRIPT ERROR); read first, it FAILS, loudly, and the count holds.
@@ -527,7 +529,7 @@ func _s1_the_bar_pages() -> void:
 			ok(k_page is Dictionary,
 				"§1f: the battle node keeps no page memory — `_bar_page` reads %s, not a Dictionary" % str(k_page))
 			ok(k_page is Dictionary and int((k_page as Dictionary).get(kh, -1)) == 1,
-				"§1f: the key turned the list off page two (the page memory reads %s)" % str(k_page))
+				("§1f: the key turned the list off page two (the page memory reads %s)" % str(k_page)) + " — %s" % key_pick)
 			print("    the keyboard: with page two showing, %s handed over %s, its own slot; the list stayed on page two" % [
 				s._hotkey_name(k_idx), want.display_name])
 			if not (s.get("_kb_pool") as Array).is_empty():
@@ -1035,6 +1037,16 @@ func _s4_chips_and_broken() -> void:
 		var st := _stem(String(info[sid][1]))
 		if st != "":
 			letters[String(sid)] = [st]
+	# BATCH IO §5 — A BARGAIN's CHIP SHOWS LETTERS TOO, AND HU §4's RULE BINDS THEM: each modifier's own (`tag` in
+	# `Run.MODIFIERS`), walked as owners beside the statuses, so a modifier's letters that a status already wears — or that
+	# another modifier wears — red here with the rest.
+	var mod_n := 0
+	for mid in _run.MODIFIERS:
+		var mst := _stem(String((_run.MODIFIERS[mid] as Dictionary).get("tag", "")))
+		if mst != "":
+			letters["modifier:" + String(mid)] = [mst]
+			mod_n += 1
+	ok(mod_n == (_run.MODIFIERS as Dictionary).size(), "§4a: %d of %d modifiers carry chip letters" % [mod_n, (_run.MODIFIERS as Dictionary).size()])
 	var counters := _counter_families()
 	for sid2 in counters:
 		if not letters.has(sid2):

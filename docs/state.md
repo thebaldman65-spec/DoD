@@ -29,93 +29,108 @@ never have fired: **an alarm set above the failure level is not an alarm.** `che
 sentence every battery: over it is a warning, and past it by more than one batch at the record is a failure — the largest
 single-batch growth on record is **+13.38 KiB** (ES's +13,700 B). *In the preamble for the archive pointer's reason.*
 
-*Last rewritten: 2026-10-17 (Batch IN).*
+*Last rewritten: 2026-10-18 (Batch IO).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: IN — THE SEVERITY-5 BAND, AND TWO BLIND SPOTS.** IMPLEMENT ONLY. **Ruin is dealt four bargains no other road
-  sees, it has its merchant back, the sim's bot pays the price the game charges, and the 34 battery sites that picked a subject
-  by a superlative without saying which name it.** Full working: **`docs/reports/IN.md`**. **The next letter is IO** (the roadmap,
-  below).
+- **Last batch: IO — THE BARGAIN DECK, MEASURED AND RE-CUT.** IMPLEMENT ONLY. **Nothing in the deck binds one side, two new
+  bargains join it, and every modifier's severity is now a measurement of what it costs a party; the battle screen shows the
+  bargain in force.** Full working: **`docs/reports/IO.md`**. **The next letter is IP** (the roadmap, below).
 - **THE DESIGNER HAS NOT PLAYED SINCE IH.** `run_save.bin` is 40,284 B at 2026-10-14 14:30 and `readout/` holds IH's one
   debug-touched file — both unmoved, **and no newer file has appeared** — backed up with the four player files
-  (`../save-backups/IN-20261017-195752`, md5-identical to IM's).
-- **§1 — FOUR BARGAINS ONLY RUIN EVER SEES.** Four modifiers stand at **severity 5** — **Famine** (no item this fight),
-  **Wasting** (each hero loses `Run.WASTING_PCT` of his maximum at his turn's end, through the tick door), **the Hungering Dark**
-  (each enemy heals `Run.HUNGERING_DARK_PCT` of the damage it deals, at BL's door) and **Cruel Order** (the warband first in every
-  round of the timeline) — and **Ruin's gambles are dealt from 5 alone** (`Run.DIFFICULTIES`). **They bind one side**, where the
-  twenty bind both, and none zeroes a class's kit. **At EP's sample Ruin reads 4.49, a full step above Warden's 3.28**, and
-  Wanderer and Warden are dealt offer for offer as IM dealt them. Severity 5 pays **300 gold or a rune** (the ladder's largest
-  step). **Ruin's fixed encounters keep the eight of severity 3–4** (`Run.FIXED_MODIFIER_BAND`). The brief's ROT is **Wasting**:
-  ROT is the severity-4 modifier's name. **But the sim's bot finds Ruin's bargains MILDER than before** — a bargain fight ends at 0.911 of the party's health
-  against 0.794, and Ruin completes 58 runs of 60 against 50 — because the four cost it less than the severity-4 band they
-  replaced: **the brief's fourth condition is not met on the default build**, and nothing was tuned (ruling 6). Forced, none of
-  the four is unsurvivable: Wasting costs the most health, Cruel Order the most runs, and Famine is invisible to a bot that barely
-  drinks.
-- **§2 — THE MERCHANT IS THE REWARD OF A RUNG's MILDEST DEALT SEVERITY** (`Run.rewards_for`, `Run.mildest_dealt_severity`):
-  1 on Wanderer and Warden — 112 and 78 merchants at EP's sample, as before — and **3 on Ruin, 76 of its 1,200 options**.
-- **§3 — THE BOT PAYS THE PRICE THE DOOR CHARGES.** The 58 list-price reads (55 in `_autoplay_pick_kit`, 3 enemy-side) read
-  `_eff_cost`. **It was material**: Warded rides 2% of the sim's fights at rung 1 and Ruin (0.12% at Warden), but the
-  bot paid below the door's price on 0.35% of its costed casts on the default build and about 2% untalented — mostly a Mage
-  wearing Profligate. Alone against HEAD it moves 55 of IG's 60 default runs (no outcome) and 79 of 180 untalented (48 outcomes,
-  75 → 70 completed). The enemy-side three are live. IG's Sanctity step, IL §1c's re-measure and IM's strike probes ran on the
-  old bot (ruling 12).
-- **§4 — THE 34 SITES NAME THEIR PICK**, so all 57 of IM's census do (`check_in` §4 holds the 34). Each of the 34 was re-run alone on the final tree and made to fail on the subject it
-  picked (`docs/reports/IN.md` §9). Reading the gates around them found nine more sites IM's census missed (ruling 10).
-- **§0 — THE RULINGS RECORDED**: §0.7's note in `docs/instrument-rules.md` (*a drive is a proof of the predicate only when the
-  predicate chooses what it drives*) beside GW §2's block, with its row; the merchant's rule in `CLAUDE.md`'s shop-gate block.
-  **The claims stand at 86.**
-- **THE INSTRUMENTS.** `check_in` is new; re-pointed where IN moved what they read: `check_im` §1, `check_il` §2, `check_hw` §2,
-  `check_ij` §2e (one row), `check_hy` §6 (Wasting's row in the damage census), `test_batch_an` §3 and `test_batch_bb` §5
-  and §7; `check_gp`'s row moved 444 → 459, §3's (its seeded road, traced). The gate-source readers are **twenty-five** by the two
-  routes (`check_in` opens the root); no third route reads a new gate's source.
-- **THE VERIFICATION.** Two recons, the gate-source readers over `check_in` before the acceptance, the controls, HEAD's code under
-  IN's gates, the pre-pass and the acceptance — `docs/reports/IN.md` §9.
-- **`CLAUDE.md` IS 478,835 B = 467.61 KiB AGAINST ITS 510 KiB CEILING — 42.39 KiB UNDER** (+1,654 B at IN): 5.2
-  batches at EZ's record (8,293 B), 52.7 at the mean of IJ–IN (824 B).
-- **`docs/state.md` IS 362,542 B = 354.04 KiB AGAINST ITS 380 KiB CEILING — 25.96 KiB UNDER** (+1,476 B at IN, this line
-  included): 4.5 batches at IA's +5,860 B, the worst case; the honest rate is IJ +3,355, IK +2,111, IL +5,587, IM −4,046,
-  IN +1,476 — a mean of 1,697 B over the five, **15.7 batches at it**. **Both files are comfortable at the honest rate** — `CLAUDE.md` 52.7 batches, this file 15.7 — **as at IM's close**.
-- **No save version moved**: nothing IN changed is saved.
+  (`../save-backups/IO-20261018-105321`, md5-identical to IN's).
+- **§1 — NOTHING IN THE DECK BINDS ONE SIDE (AQ's rule, the designer's at IO §0.2).** **Famine and Cruel Order are removed** —
+  their built shape and IN's measurements are in `docs/design-notes.md`. **Wasting** binds both sides at `Run.WASTING_PCT` (8%,
+  from 5%), every unit's turn's end, and a body it fells is killed by nobody; **the Hungering Dark** feeds every dealer
+  `Run.HUNGERING_DARK_PCT` (a half, from a quarter) by `heal_amount`'s `unowned` door — a heal nobody performed, which reaches no
+  rider and books no healing. **New: the Thin Veil** (`Run.THIN_VEIL_PCT`, Feverish's Attack door) **and the Long Silence**
+  (`BattleUnit.silenced`, asked by `ability_ready`, the usability door, the enemy's re-validation and a Psychosis turn's
+  support pick; the basic attack exempt). In the sim the bot and the warband cast a spent ability **0 times in 26,320 uses**.
+- **§2 — EVERY GRADE IS A MEASUREMENT (IO §2).** The twenty-four forced one at a time on every bargain of a Ruin run (IG's
+  population, seed block 21, the default build; untalented beside it on block 22), sorted by the party's health at a bargain
+  fight's end and cut at the counts the bands are built on (6 / 6 / 4 / 4 / 4). **Nineteen moved.** Severity 5 — Ruin's gambles
+  alone — is **Bloodless, Wasting, Mirrorbound and Overgrown**; **the Hungering Dark is severity 1**: two-sided it feeds the heroes
+  about six times what it feeds the warband, so a bargain under it ends healthier than none (0.989 against 0.951). **The brief's
+  diagnosis held**: inside the old severity 4 and 5 the party's health ranged 0.282 and 0.332, against 0.134 across all five grade
+  means. **No modifier was exempted** (none reads near the baseline for want of something the bot cannot use). EP's sample after:
+  **Wanderer 2.84, Warden 3.29, Ruin 4.49** (2.82 / 3.28 / 4.49 before), merchants **113 / 82 / 71** (112 / 78 / 76). Ruin's fixed
+  encounters draw Brittle, Deadened, Feverish, the Long Silence, Miasma, Rot, the Thin Veil or Thin Air. **Severity 5 pays 320
+  gold or a rune** (the growing slope, IO §0.7).
+- **§3 — SANCTITY's STEP STAYS 13, RE-TAKEN ON THE REPAIRED BOT** (SANCTITY's STEP, below).
+- **§4 — THE PLAYER IS SHOWN THE DOOR's PRICE**: the ability button and the summon picker print `_eff_cost`; Through and Through
+  refunds what the cast paid (dormant — nothing writes the field since FX). Every list-price read left in `battle.gd` is the
+  door's own, a call's definition, or a test of whether a card has a price (`check_io` §4).
+- **§5 — A BARGAIN's CHIP**: `battle._draw_bargain_strip`, at the top of the screen between the turn strip and the log —
+  BARGAIN or IMPOSED, the modifier's own letters (`Run.MODIFIERS`' `tag`, walked by `check_hu` §4a beside every status's), its
+  pips (`Run.SEVERITY_COLORS`, moved off the offer screen) and its name; the rule on the hover; none of the four glyphs.
+- **§6 — THE SUPERLATIVE CENSUS, RE-RUN AFTER ITS REPAIR**: fourteen readers read all 152 battery targets whole, the sweep a
+  checklist and not the population — **481 picks in 102 targets: 121 sites, 360 weak fillers.** IM's 57 all found, seven named
+  in some FAIL lines only (IN's *all 57 name their pick* was short by seven); IN's 13 all found. **Every site that named its pick
+  in no FAIL line or in some — 53 — names it now, and IN's I5 and I6 with them** (`check_io` §6's table); the 321 weak picks are
+  listed, not repaired (ruling 8). The repair's own readers met no site the census had not.
+- **§0 — THE RULINGS RECORDED**: the class passive outranks a modifier, nothing binds one side, a severity is a measured rank,
+  the fixed encounters stay at 3–4 (`CLAUDE.md`'s ladder block); the census note and the archive's order (`docs/instrument-rules.md`,
+  with their rows). **The claims stand at 86.**
+- **THE INSTRUMENTS.** `check_io` is new; re-pointed where IO moved what they read: `check_in` §1 (Famine's and Cruel Order's
+  arms assert their removal; Wasting and the Dark driven on both sides; §1c's growing slope; the bands, the rung texts and
+  `master.html`'s rows against the grades in force — 103 → 94), `check_hu` §4a (the modifiers' letters walked beside every
+  status's), `check_ih` §6 (the strip at its widest line on every board), `test_batch_an` §3 and `test_batch_bb` §5 (a grade
+  the ladder holds, never the authored one), `check_ie` §5a (IN's I6) and the 27 gate files whose 53 census sites name their pick;
+  `check_gp`'s row moved 459 → 438, §2's (its seeded road meets other bargains, traced).
+  The gate-source readers are **twenty-six** by the two routes (`check_io` opens the root); no third route reads a new gate's source.
+- **THE VERIFICATION** — `docs/reports/IO.md` §9.
+- **`CLAUDE.md` IS 481,686 B = 470.40 KiB AGAINST ITS 510 KiB CEILING — 39.60 KiB UNDER** (+2,851 B at IO): 4.9
+  batches at EZ's record (8,293 B), 22.7 at the mean of IK–IO (1,784 B).
+- **`docs/state.md` IS 364,256 B = 355.72 KiB AGAINST ITS 380 KiB CEILING — 24.28 KiB UNDER** (+1,714 B at IO, this line
+  included): 4.2 batches at IA's +5,860 B, the worst case; the honest rate is IK +2,111, IL +5,587, IM −4,046, IN +1,476,
+  IO +1,714 — a mean of 1,368 B over the five, **18.2 batches at it**. **Both files are comfortable at the honest rate** —
+  `CLAUDE.md` 22.7 batches, this file 18.2 — **as at IN's close**.
+- **No save version moved**: nothing IO changed is saved (a member's modifier rides `pending_modifier` by id, as before).
 - **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in a build
   older than HL**: HL's ceiling refuses a newer save from HL's build on — HR's v15 is the first bump it has guarded — and HJ's and
   HK's builds, and `main`, carry no ceiling.
-- **Next letter: IO — `master.html`'s sweep, this file's closed-block census and the re-measure, one batch** (the roadmap, below).
+- **Next letter: IP — `master.html`'s sweep, this file's closed-block census and the re-measure, one batch** (moved again by
+  IO's brief §8: the documents are the next batch's); **IQ — the claims** (the roadmap, below).
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### IN's RULINGS OWED — **TWELVE; THE FIRST IS STILL THE DESIGNER's PLAY, AND THE REST ARE WHAT IN's BUILD AND MEASUREMENTS LEFT**
+### IO's RULINGS OWED — **TWELVE; THE FIRST IS STILL THE DESIGNER's PLAY, AND THE REST ARE WHAT IO's MEASUREMENT FOUND**
 
-Full working: `docs/reports/IN.md`, NEEDS A RULING.
+Full working: `docs/reports/IO.md`, NEEDS A RULING.
 
-1. **PLAY ONE ZONE WITHOUT THE DEBUG MENU, AND SEND THE FILE** (IH's ruling 1 — asked at II through IN, six batches). The readout
-   names every debug action, so a file that names none is play. It prices Boil Over's rate, Rupture's number and clock, the vow's
-   worth and the Cleric's Mana, and confirms Sanctity's 13. Nothing in the queue waits on it and no batch can do it.
-2. **RUIN's FOUR BIND ONE SIDE** — AQ's rule (every modifier binds both sides, and *"no items this fight"* deliberately not
-   authored) is overturned for severity 5 by IN's brief; the glossary and `master.html` say the twenty bind both and the four one.
-   Confirm, or say which of the four should bind both.
-3. **THE BRIEF's ROT IS WASTING**: Rot is the severity-4 modifier's name, and on Ruin both are dealt. The name is yours.
-4. **RUIN's FIXED ENCOUNTERS DRAW FROM SEVERITY 3–4** (`Run.FIXED_MODIFIER_BAND`), never from the four, which pay a reward a
-   fixed encounter never pays. Whether they should reach severity 5 is yours.
-5. **CRUEL ORDER's ROUND IS ONE BASIC SWING AT THE AVERAGE SPEED** (`battle.ROUND_TICKS`) — the game's turns are a timeline — **and
-   the Hunter's Tracker keeps its opening turn**, placed before the first round. Confirm both.
-6. **WASTING's 5% AND THE DARK's QUARTER, MEASURED** (IN §1b): forced on every Ruin bargain, Wasting costs the party twelve points of health at a fight's
-   end and the Dark one, neither unsurvivable — **but the four as a band leave Ruin's bargains milder for the sim's bot than the
-   severity-4 band they replaced** (health at a bargain's end 0.794 → 0.911, runs 50 → 58 of 60), so the brief's fourth
-   condition is not met; nothing was tuned. Whether either rises is yours.
-7. **SEVERITY 5 PAYS 300**: the ladder's steps (40, 60, 80) are not one slope, so the row took the largest; growing by 20 again
-   would make it 320. Which slope the table has is yours.
-8. **RUIN's MERCHANT IS A THIRD CHOICE AT ITS SEVERITY 3** (gold, a rune or the merchant, one in three each), where Wanderer's and
-   Warden's severity 1 pays its gold or the merchant. Joining the list, not replacing in it, is the reading taken.
-9. **THE ABILITY BUTTON AND THE SUMMON PICKER PRINT THE LIST PRICE** (FOUND AT IN), and Through and Through refunds it.
-10. **IM's CENSUS MISSED SITES OF ITS OWN SHAPE**: nine more first- or last-found picks whose FAIL lines name nothing, and four weaker, in the 23 gates IN read; whether the battery is censused again and the
-    misses repaired as a batch is yours (§0.6's reasoning applies to them unchanged).
-11. **NO MODIFIER HAS A CHIP**: whether the bargain in force wants one is yours.
-12. **§3 WAS MATERIAL**: the bot paid below the door's price on 0.35% of its costed casts on the default build and about 2%
-    untalented (mostly a Mage wearing Profligate), and §3 moves 79 of IG's 180 untalented runs. IG's Sanctity step, IL §1c's
-    re-measure and IM's strike probes ran on that bot — named, not re-run. Whether IO re-takes the step on the repaired bot is
-    yours.
+1. **PLAY ONE ZONE WITHOUT THE DEBUG MENU, AND SEND THE FILE** (IH's ruling 1 — asked at II through IO). The readout names every
+   debug action, so a file that names none is play. It prices Boil Over's rate, Rupture's number and clock, the vow's worth and the
+   Cleric's Mana, and confirms Sanctity's 13. Nothing in the queue waits on it and no batch can do it.
+2. **THE HUNGERING DARK HELPS THE HEROES, SO IT IS SEVERITY 1**: two-sided at a half it feeds them about six times what it feeds
+   the warband, and a bargain under it ends at 0.989 of the party's health against 0.951 with none. The figure was left (the brief:
+   do not tune it in this batch). Whether its figure or its shape moves is yours.
+3. **OVERGROWN IS SEVERITY 5 BY THE PARTY's HEALTH, NOT BY ITS RUNS**: it ends a bargain fight at 0.857 (the fifth-costliest) yet
+   completes 55 runs of 60, with severity 1–2's; its cost is paid at the fight's start, and the measure reads it whole. The rule
+   took health first; whether the measure stands is yours.
+4. **THREE CUTS SIT INSIDE TWO STANDARD ERRORS** — Warded | Parched (severity 1 | 2), Fleeting | Brittle (2 | 3), Rot | Deadened
+   (3 | 4): the measurement cannot tell those pairs apart. A second seed block would; the cut stands as the sort put it.
+5. **THE UNTALENTED READING GRADES EIGHT DIFFERENTLY** (Overgrown 3, Deadened 1, Muffled 1, the Thin Veil 5, Warded 3, the Long
+   Silence 4, Frenzied 2, Rot 4): the grades are the default build's — IN's table, its standard errors a tenth to a third of the
+   untalented's. Which build grades is yours.
+6. **THE THIN VEIL IS FEVERISH's RULE AT TWICE THE FIGURE**, on Feverish's Attack door (the ladder Miasma and Bloodless already
+   are); it measures one grade harsher (4 against 3). Confirm the reading, or name a rule of its own.
+7. **THE LONG SILENCE's READINGS**: a summon's calls count as separate abilities (a cooldown keys the same way); a counter, a
+   wind-up's release and Blood Tribute's strike are the cast completing, not a second use; a Psychosis turn's support pick obeys
+   it; an enemy's declared move names its basic a turn ahead once the move is spent. Confirm.
+8. **THE CENSUS's WEAK PICKS ARE LISTED, NOT REPAIRED** (321 — filler picks whose verdict holds for nearly any member, IN's
+   *four weaker* shape): the sites are repaired. Whether a filler pick is a site is yours (IO's report, §6).
+9. **THE BOT's POTION IS STILL A FLAT 40** (owed, not repaired — the instrument does not move in the batch that reads it): it is
+   why Famine read as nothing, and it distorts every measurement that turns on healing received — Bloodless refuses it, Miasma
+   halves it, and early in a run it heals more than the player's 20% while late it heals less.
+10. **THROUGH AND THROUGH's REFUND IS REPAIRED AND DORMANT**: nothing writes the field since FX. Whether a node or rune returns it
+    is yours.
+11. **THE CLERIC GAINS LEAST UNDER THE DARK** (his heals are not damage): fed 5,349 health where a Pyromancer was fed 17,982 over
+    the same runs — a tax on his share of the party's healing, not on his kit. Reported, the figure left.
+12. **THE RE-GRADE MAKES WARDEN's BARGAINS MUCH MILDER AND RUIN's MUCH HARDER**: in natural play a Warden bargain fight ends at
+    0.936 of the party's health against 0.846 (Wanderer 0.971 against 0.916, Ruin 0.753 against 0.876) — the four costliest are
+    Ruin's alone now, and the dealt means barely move because the counts did not. Whether Warden keeps one of the costliest four
+    (a fifth severity-4 slot, or a band reaching 5) is yours; the counts were held, so nothing moved.
 
 ### THE CLERIC's MANA RATE — **12, UNMOVED (IE §1); THE TUNING HANDLE AND THE FIGURES IT WAS MEASURED AGAINST**
 
@@ -135,39 +150,42 @@ caveat the sim cannot close (the bot heals when hurt, a player when it matters) 
 member's maximum was a fixed 100 (IG §4 changes that for a node-holder; the untalented rows hold no node) — re-read at IG §4c
 on the default build with the relic held: dry 0.7 / 2.9 / 0.3%, opening a fight full 39.2 / 42.5 / 35.6% (24.1 / 36.5 / 15.4% before).
 
-### SANCTITY's STEP — **13 (IG §2), CONFIRMED IN II's BRIEF (§0.2), RE-MEASURED ON THE REPAIRED CODE AT IL §1c AND UNMOVED; THE TUNING HANDLE AND THE FIGURES IT WAS SET ON**
+### SANCTITY's STEP — **13 (IG §2), RE-TAKEN ON THE REPAIRED BOT AT IO §3 AND UNMOVED; THE TUNING HANDLE AND THE FIGURES IT STANDS ON**
 
-**`BattleUnit.SANCTITY_PER_STEP` is 13 events a step, `SANCTITY_MAX_STEPS` 5** (16 from FV §3 to IG). `check_ig` §2 pins the step in
-one place, so a re-tune from play moves the constant and that line. **The target is FV §3's and was not reopened**: about half the
-cap by a normal fight's end on untalented rung-1 fights. **IG's figures, the ones the step was set on** (IE's probe on IF's code against every chip drawn — 2.58 steps
-untalented and 2.51 default at 13, a boss 4.04) **are archived at IL**: IL's HEAD arm, below, reproduces them on seeds. **The readout carries his steps a fight; the first
+**`BattleUnit.SANCTITY_PER_STEP` is 13 events a step, `SANCTITY_MAX_STEPS` 5.** `check_ig` §2 pins the step in one place, so a
+re-tune from play moves the constant and that line. **The target is FV §3's and was not reopened**: about half the cap by a normal
+fight's end on untalented rung-1 fights. **RE-TAKEN AT IO §3 on the bot IN §3 repaired** (it had paid below the door's price on
+about 2% of its costed casts untalented) — IG's probe, IG's population, IL's seeds and IL's shape, the one thing changed the bot;
+**the step stays 13, and the measurement now asks for it outright**: a normal fight ends untalented at **2.56 steps at 13 and
+2.37 at 14** (±0.03), so 13 is the nearer to half the cap by 0.06 against 0.13 — at IL it tipped to 14 by 0.05. The default build
+**2.46**; a boss untalented **3.95, 38.9% at the cap**; the door lengthened **5.12 applications a fight** untalented (5.03 default).
+IL's table is `docs/reports/IL.md` §1c and IO's is `docs/reports/IO.md` §3. **The readout carries his steps a fight; the first
 Hierophant run of the designer's play confirms it** (II's ruling 1).
 
-**RE-MEASURED AT IL §1c, ON THE REPAIRED CODE, AND THE STEP STAYS 13** — the measurement does not ask for a move. IG's probe
-(the same three parties, the Cleric awakened with the Hierophant's rune, rung 1), every run seeded so HEAD and the repair played the
-same seeds; **its table is `docs/reports/IL.md` §1c (IM §0.7)**. The figures a re-tune from play is priced against: at a normal
-fight's end, untalented, **2.58 steps at 13 on HEAD and 2.62 on the repair** (±0.03 an arm; 2.40 and 2.43 at 14), on 41.51 and
-41.55 events; the default build **2.48 and 2.47**; a boss untalented **3.99 and 3.97**, 38.3% and 40.8% at the cap. **The events did
-not rise because they cannot**: the ledger counts every status landing on or leaving any body from any source, so naming the
-Cleric changes how long his statuses last, not whether they count. **What the repair moved is the payout's reach** — the door
-lengthened **5.32 applications a fight where it lengthened 1.18** untalented (5.16 against 2.19 on the default build) — and the
-completions it bought are not significant at this n (28 against 40 runs completed only in one arm).
+### FOUND AT IO AND NOT FIXED
+
+- **IN's CLAIM THAT ALL 57 OF IM's SITES NAME THEIR PICK WAS SHORT BY SEVEN** (A5, A13, A14, B6, B17, B28, B30 named it in some
+  FAIL lines only): IO's census found them and §6 repaired them; `docs/instrument-rules.md`'s superlative block says so now.
+- **A FAIL LINE THAT TYPES TODAY's PICK** (*Slash*, *Smite*, *Magic Bolt*, *a Strike*, *Blood Frenzy:*, *the Mage*) names nothing:
+  it goes stale the moment the pick moves (IO's census, the risk it named first). Repaired where the row is a site; the rest are
+  among the weak picks (IO's ruling 8).
+- **`battle._cheapest_attack` RETURNS THE FIRST FREE DAMAGING ABILITY, NOT THE CHEAPEST** (its name says *cheapest*; every enemy
+  kit's 0-cost attack comes first today, so the two agree on the live roster). The Long Silence's enemy exemption and Heads Down
+  read it.
 
 ### FOUND AT IN AND NOT FIXED
 
-- **THE PLAYER IS SHOWN THE LIST PRICE**: `battle._ability_popup_button` and `_open_summon_picker` print `ab.cost`, where the door
-  charges `_eff_cost` — under Warded a button reads *30 Rage* for a cast the door charges 38, and is dark at 30–37; Through and
-  Through refunds `ab.cost`. Outside IN's 58 (displays and a payout, not a choice); IN's ruling 9.
 - **THE BOT's HEALTH POTION HEALS A FLAT 40** (`_player_turn`'s drink: `heal_amount(40, true)`), where the player's heals
-  `Run.HEALTH_POTION_PCT` of maximum (CT §6) — the bot plays another potion.
+  `Run.HEALTH_POTION_PCT` of maximum (CT §6) — the bot plays another potion. **Owed, and not repaired at IO by ruling** (IO's
+  brief §8: an instrument does not move in the batch that reads it) — IO's ruling 9 says what it distorts.
 - **THE `enemies_alive_r3` SAMPLE NEVER SAMPLES ROUND THREE**: it fires at `next_time >= 200`, written for 100 ticks a round,
   and a swing at the average speed moves a unit 2 ticks (`BASIC_DELAY`), so it reads the fight's end state nearly always.
+  **Standing at IO**: Cruel Order's `ROUND_TICKS` was the honest reading of a round and is deleted with its one reader; the sample
+  never read it, so the deletion did not touch it.
 - **`run_sim._take_offer`'s COMMENT SAYS THE SAFE SLOT IS ALWAYS A 1 OR A 2**: false on Warden (1–3) since BM and on Ruin (3–4)
-  since IM.
-- **IM PUT ITS ARCHIVE CUT AT THE FOOT** of `DoD-archive/state-archive.md`, against that file's *newest cut first*; IN's cut is at
-  the top and IM's stands beneath it, moved whole.
-- **IM's CENSUS MISSED SITES OF ITS OWN SHAPE**, found by IN's repairs in the gates they read (IN's report, §4) — IN's ruling 10.
+  since IM. Standing at IO.
 - **`check_fh` §7's COMMENT SAYS THE FALLBACK PICKS *the card's own spec owner***; the code takes the first non-companion hero.
+  Standing at IO.
 
 ### FOUND AT IM AND NOT FIXED
 
@@ -434,23 +452,23 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
 - **`run_battery.sh` STILL DOES NOT ASK WHETHER THE GAME IS OPEN, AND A PLAIN `kill` STILL DOES NOT STOP IT** (HT's two, carried).
 ### THE PLAYTEST'S OTHER FINDINGS — **LATER BATCHES BY RULING (HW's brief §5); THE ROADMAP HOLDS THE ORDER**
 
-- **THE RE-MEASURE IS SCHEDULED, NOT PARKED (IC §5, the designer's) — IT IS IO, WITH THE TWO DOCUMENT CENSUSES (IN's brief §6)**: it
-  was priced for `CLAUDE.md`, and the file that binds is this one; if IO's census reads this file as mostly binding, the
+- **THE RE-MEASURE IS SCHEDULED, NOT PARKED (IC §5, the designer's) — IT IS IP, WITH THE TWO DOCUMENT CENSUSES (IN's brief §6; IO's §8)**: it
+  was priced for `CLAUDE.md`, and the file that binds is this one; if IP's census reads this file as mostly binding, the
   re-measure's subject is both files and it moves up — both ceilings run out within a batch of each other at the worst rate and far later at
   the honest one (the WHERE block's two readings, each with both rates), so a re-measure that waits finishes as the room runs out;
   **II §4's archive pass did not move it back** (`CLAUDE.md` −56 B at II),
   **nor did IJ's struck lines** (`CLAUDE.md` −1,947 B at IJ). **The block index and HV's pilot still wait on it.**
   **THE ORDER:**
-- **IO — `master.html`'s SWEEP, THIS FILE's CLOSED-BLOCK CENSUS AND THE RE-MEASURE: ONE BATCH, NOT THREE (IN's brief §6).** They
+- **IP — `master.html`'s SWEEP, THIS FILE's CLOSED-BLOCK CENSUS AND THE RE-MEASURE: ONE BATCH, NOT THREE (IN's brief §6; moved again by IO's brief §8 — the documents are the next batch's).** They
   were IN's until IN's brief moved them; **no longer urgent** — the alarm cleared at IM's 27.9 batches. **`master.html`**: a surface
-  the census did not cover and carrying false facts (IK found Blood Price's row); IO sweeps it with IJ's rubric and IJ's resolver
+  the census did not cover and carrying false facts (IK found Blood Price's row); IP sweeps it with IJ's rubric and IJ's resolver
   where a figure has a door. **This file**: a census of the live file's closed blocks — IM §0.7 took the one cut that needed none
   (a measurement's table lives in its report). **The re-measure**: `CLAUDE.md` binds first at the honest rates (II's brief §4 read it first at every rate; this file runs
   out first at the worst ones — the WHERE block), and the room is planned against the honest rate. **119 of 126 blocks bind. So
   archiving will never SHRINK CLAUDE.md — it can only stop it growing, and II proved it at the margin: 3,105 B out, 3,049 B
   written back, 56 B net. The next byte comes from the file's SHAPE, not from its contents** (IJ's brief §0.3, the designer's).
   The two readings go beside the record with the honest rate, and say which file runs out first at which rate (IK's brief §8).
-- **IP — THE CLAIMS**: HX's 87 stand at **86** — the per-batch re-read stops the backlog growing and does not retire it, so it is a
+- **IQ — THE CLAIMS**: HX's 87 stand at **86** — the per-batch re-read stops the backlog growing and does not retire it, so it is a
   batch of its own (FOUND AT HX, FOUND AT IA). **The Cairn's *weight 8* is not one of them and is true** (an event's weight; IL
   §0.5), so the figure does not fall for it.
 - **MANA STAYS (ruled).** The finding was that the Mage and the Hunter run dry and only the Cleric is always full; **measured at IE

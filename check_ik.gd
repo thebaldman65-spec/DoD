@@ -288,6 +288,8 @@ func _s1_blood_debt() -> void:
 	for e2 in foes:
 		if fullest == null or int(before[e2]) > int(before[fullest]):
 			fullest = e2
+	var fullest_pick := ("%s at %d, the fullest of the warband's %d, the first in the warband on a tie" % [
+		fullest.unit_name, int(before[fullest]), foes.size()]) if fullest != null else "no enemy was picked"
 	var share := maxi(int(round(int(before[fullest]) * 0.075)), 1)
 	var lost := {}
 	for e3 in foes:
@@ -298,12 +300,12 @@ func _s1_blood_debt() -> void:
 	for e4 in foes:
 		if e4 != fullest and int(lost[e4]) != 0:
 			others += 1
-	ok(others == 0, "§1a: %d enemies who are not the fullest lost health to the bill" % others)
+	ok(others == 0, ("§1a: %d enemies who are not the fullest lost health to the bill" % others) + " — %s" % fullest_pick)
 	var b_was := int(before.get("b", -1))
 	ok(b.hp == b_was, "§1a: the Berserker's health read %s before the bill and %d after — the rune sends the bill away" % [
 		str(before.get("b", "nothing (the turn never set the board)")), b.hp])
 	ok(String(r["log"]).contains("Rune: Blood Debt — %s pays %d" % [fullest.unit_name, share]),
-		"§1a: the log does not say the fullest enemy paid what it lost")
+		"§1a: the log does not say the fullest enemy paid what it lost" + " — %s" % fullest_pick)
 	var bp_line := ""
 	for ln in String(r["log"]).split("\n"):
 		if ln.contains("Blood Price —"):
@@ -312,7 +314,7 @@ func _s1_blood_debt() -> void:
 		"§1a: Blood Price's own line does not say the fullest enemy (%s) pays the debt ('%s')" % [fullest.unit_name, bp_line])
 	var chip: String = String(b.get_status("blood_price").get("desc", ""))
 	ok(chip.contains("%s's blood" % fullest.unit_name) and not chip.contains("his own blood"),
-		"§1a: the +25%% chip does not say whose blood paid ('%s')" % chip)
+		("§1a: the +25%% chip does not say whose blood paid ('%s')" % chip) + " — %s" % fullest_pick)
 	print("    the bill: %s at %d paid %d; the others lost nothing; he paid %d" % [fullest.unit_name, int(before[fullest]), share, b_was - b.hp])
 	# (b) A TIE GOES TO THE FIRST IN THE WARBAND, AND THE CHOICE SPENDS NO DIE.
 	for e5 in foes:

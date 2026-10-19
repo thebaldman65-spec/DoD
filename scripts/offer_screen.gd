@@ -23,13 +23,6 @@ const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
 
 # Severity wears a colour so the three cards sort themselves at a glance,
 # before a word of the text is read.
-const SEVERITY_COLORS := {
-	1: Color(0.55, 0.85, 0.6),
-	2: Color(0.85, 0.82, 0.45),
-	3: Color(0.95, 0.6, 0.35),
-	4: Color(0.95, 0.35, 0.4),
-	5: Color(0.78, 0.32, 0.82),
-}
 
 var offer: Array = []
 
@@ -172,7 +165,9 @@ func _draw_option_parts(idx: int, at: Vector2) -> void:
 	var mod_id := String(option["modifier"])
 	var cfg: Dictionary = Run.MODIFIERS[mod_id]
 	var sev := int(cfg["severity"])
-	var tint: Color = SEVERITY_COLORS.get(sev, Color.WHITE)
+	# BATCH IO §5 — the severity tints live on `Run` (`Run.SEVERITY_COLORS`), read here and by the battle's
+	# bargain chip, one copy for the two surfaces that show a bargain.
+	var tint: Color = Run.SEVERITY_COLORS.get(sev, Color.WHITE)
 
 	var panel := Panel.new()
 	panel.position = at

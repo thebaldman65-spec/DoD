@@ -291,11 +291,12 @@ func _s1_the_drop() -> void:
 	var crest_drop := Runes.is_party_rune(drop.get("rune", {}))
 	var hi := int(drop.get("hero", -1))
 	var says := "into the bag." if crest_drop else ("for the %s" % _run.nameplate(_run.party[hi]) if hi >= 0 else "<no hero>")
-	ok(dropped != "" and Gate.has_text(s, says), "§1a: the card does not say where the drop went (%s)" % says)
+	var drop_pick := "%s for seat %d, the rune the normal fight's victory rolled" % [dropped, hi]
+	ok(dropped != "" and Gate.has_text(s, says), ("§1a: the card does not say where the drop went (%s)" % says) + " — %s" % drop_pick)
 	ok(dropped != "" and (crest_drop and _names(_run.rune_bag).has(dropped)
 			or (not crest_drop and hi >= 0 and _unworn(_run.party[hi]).has(dropped)
 				and Runes.wearable_by(drop.get("rune", {}), _run.party[hi]))),
-		"§1a: the drop is not held where its kind lands — its hero unworn, or the bag for a crest rune")
+		"§1a: the drop is not held where its kind lands — its hero unworn, or the bag for a crest rune" + " — %s" % drop_pick)
 	# (b) AN ELITE WON DROPS NONE — and pays its own rune reward, the cache, beside it.
 	# BATCH HR §1 — counted over everything held, not the bag: a drop can land on a hero.
 	var bag0: int = _held().size()
@@ -383,23 +384,24 @@ func _s1_the_drop() -> void:
 	_new_run()
 	var mage: Dictionary = _run.party[1]
 	var mage_pid := String(Runes.held_engines(mage)[0])
+	var eng_pick := "%s, the Mage's one engine — his class's first, as a new run awakens him" % mage_pid
 	var rows_for := []
 	for id in Runes.ENGINE_READ:
 		if Runes.engine_read(String(id)) == mage_pid:
 			rows_for.append(String(id))
-	ok(not rows_for.is_empty(), "§1h: the Mage's first engine gates no rune — the gate cannot be asked here")
+	ok(not rows_for.is_empty(), "§1h: the Mage's first engine gates no rune — the gate cannot be asked here" + " — %s" % eng_pick)
 	var engine_idx := _row_where(_run.engine_rows(mage), "hero")
-	ok(_run.toggle_engine(mage, engine_idx), "§1h: the Mage's engine would not come out of its slot")
+	ok(_run.toggle_engine(mage, engine_idx), "§1h: the Mage's engine would not come out of its slot" + " — %s" % eng_pick)
 	var ungated := _union_offerable().filter(func(x): return not rows_for.has(String(x)))
 	_hold_all(ungated)
 	ok(_run.roll_fight_drop().is_empty(),
-		"§1h: with every ungated rune held and the engine out, a drop still came — the gate did not hold")
+		"§1h: with every ungated rune held and the engine out, a drop still came — the gate did not hold" + " — %s" % eng_pick)
 	var er: Array = _run.engine_rows(mage)
 	# BATCH HR §1 — the unslotted engine is held on him, not in the bag.
-	ok(_run.toggle_engine(mage, _row_held(er)), "§1h: the Mage's engine would not go back into its slot")
+	ok(_run.toggle_engine(mage, _row_held(er)), "§1h: the Mage's engine would not go back into its slot" + " — %s" % eng_pick)
 	var gated: Dictionary = _run.roll_fight_drop()
 	ok(rows_for.has(String(gated.get("id", ""))),
-		"§1h: ...and with it slotted, the drop was not one of its rows (%s) — the gate is shut, not a gate" % gated.get("id", "<nothing>"))
+		("§1h: ...and with it slotted, the drop was not one of its rows (%s) — the gate is shut, not a gate" % gated.get("id", "<nothing>")) + " — %s" % eng_pick)
 
 
 # ── §2 — THE BAG ────────────────────────────────────────────────────────────
@@ -429,19 +431,20 @@ func _s2_the_bag() -> void:
 			landed += 1
 	var wi := int(waited.get("hero", -1))
 	var waiting := String((waited.get("rune", {}) as Dictionary).get("name", ""))
+	var wait_pick := "%s for seat %d, the first seeded drop to find its hero holding eight" % [waiting, wi]
 	print("    %d drops landed before one found its hero full (%s)" % [landed, _run.nameplate(_run.party[wi]) if wi >= 0 else "none"])
 	ok(wi >= 0 and _run.held_count(_run.party[wi]) == int(_run.HERO_HOLD_CAP) and _run.pending_rune_drops.size() == 1,
-		"§2a: no drop found its hero holding eight and waited (%d drops)" % guard)
+		("§2a: no drop found its hero holding eight and waited (%d drops)" % guard) + " — %s" % wait_pick)
 	ok(wi >= 0 and _run.pending_holder(waited.get("rune", {})) == wi,
-		"§2a: the waiting rune is not bound for the hero who is full")
+		"§2a: the waiting rune is not bound for the hero who is full" + " — %s" % wait_pick)
 	ok(waiting != "" and _held().has(waiting) and _run.party_rune_names().has(waiting),
-		"§2a: the rune waiting on the panel is not the party's — it could be offered twice")
+		"§2a: the rune waiting on the panel is not the party's — it could be offered twice" + " — %s" % wait_pick)
 	# (b) THE PANEL, ON THE REAL MAP: shown beside his eight; a drop takes it.
 	var mp := await _to_map()
 	var fb: Node = Gate.overlay(mp, 74)
 	ok(fb != null and wi >= 0 and Gate.has_text(fb, "THE %s HOLDS ALL HE CAN" % _run.nameplate(_run.party[wi]).to_upper())
 			and Gate.has_text(fb, waiting),
-		"§2b: the map did not show the waiting drop on its hero's full-holding panel")
+		"§2b: the map did not show the waiting drop on its hero's full-holding panel" + " — %s" % wait_pick)
 	var drop_btns: Array = []
 	if fb != null:
 		var all_b: Array = []
@@ -449,7 +452,7 @@ func _s2_the_bag() -> void:
 		for b in all_b:
 			if String((b as Button).text) == "Drop this":
 				drop_btns.append(b)
-	ok(drop_btns.size() == int(_run.HERO_HOLD_CAP), "§2b: the panel offers %d runes to drop, not his eight" % drop_btns.size())
+	ok(drop_btns.size() == int(_run.HERO_HOLD_CAP), ("§2b: the panel offers %d runes to drop, not his eight" % drop_btns.size()) + " — %s" % wait_pick)
 	var victim := String((_run.held_rows(_run.party[wi])[3]["rune"] as Dictionary).get("name", "")) if wi >= 0 else ""
 	var b3: Button = Gate.bound_button(fb, "_take_pending_drop", [3, fb]) if fb != null else null
 	ok(b3 != null, "§2b: the fourth row's Drop button is not bound to its row")
@@ -457,7 +460,7 @@ func _s2_the_bag() -> void:
 		b3.emit_signal("pressed")
 		await Gate.frames(self, 4)
 	ok(wi >= 0 and _run.held_count(_run.party[wi]) == int(_run.HERO_HOLD_CAP) and _unworn(_run.party[wi]).has(waiting),
-		"§2b: dropping one did not put the waiting rune in his holding")
+		"§2b: dropping one did not put the waiting rune in his holding" + " — %s" % wait_pick)
 	ok(not _held().has(victim), "§2b: the rune dropped for it is still held — nothing was given up")
 	# (c) DECLINING THE DROP ITSELF IS ALLOWED.
 	var second := ""
@@ -469,6 +472,7 @@ func _s2_the_bag() -> void:
 			break
 		if String(d2.get("where", "")) == "pending":
 			second = String((d2.get("rune", {}) as Dictionary).get("name", ""))
+	var second_pick := "%s, the next seeded drop to find its hero full" % second
 	var held_total: int = 0
 	for m in _run.party:
 		held_total += _run.held_count(m)
@@ -479,9 +483,9 @@ func _s2_the_bag() -> void:
 	var held_after: int = 0
 	for m in _run.party:
 		held_after += _run.held_count(m)
-	ok(left == "Leave %s behind" % second, "§2c: the panel's decline did not name the drop (%s)" % left)
+	ok(left == "Leave %s behind" % second, ("§2c: the panel's decline did not name the drop (%s)" % left) + " — %s" % second_pick)
 	ok(_run.pending_rune_drops.is_empty() and not _held().has(second) and held_after == held_total,
-		"§2c: leaving the drop behind kept it, or took a rune from a hero")
+		"§2c: leaving the drop behind kept it, or took a rune from a hero" + " — %s" % second_pick)
 	# (d) A WORN RUNE DOES NOT COUNT: equip three of his held runes through the panel's
 	# own button, and five more fit before he holds eight.
 	_clear_bag()
@@ -539,12 +543,13 @@ func _s2_the_bag() -> void:
 		await process_frame
 	var ch: Node = Gate.overlay(current_scene, 80)
 	var worn_before: Array = _names(w["runes"].filter(func(r): return bool(r.get("equipped", false))))
+	var worn0_pick := ("%s, the first worn rune in the Warrior's runes order" % String(worn_before[0])) if not worn_before.is_empty() else "none worn"
 	var took := Gate.press(ch, [String(worn_before[0])]) if ch != null and not worn_before.is_empty() else ""
 	await Gate.frames(self, 3)
 	var worn_now: Array = _names(w["runes"].filter(func(r): return bool(r.get("equipped", false))))
 	ok(took != "" and _run.held_count(w) == int(_run.HERO_HOLD_CAP) and not worn_now.has(worn_before[0])
 			and _unworn(w).has(String(worn_before[0])),
-		"§2e: the swap did not put a held rune on in the worn one's place, his holding unchanged at eight")
+		"§2e: the swap did not put a held rune on in the worn one's place, his holding unchanged at eight" + " — %s" % worn0_pick)
 	# (f) UNEQUIP INTO HIS HOLDING, once there is room — the positive arm of (e).
 	_run.drop_held_rune(w, 0)
 	rows2 = _run.rune_rows(w)
@@ -737,13 +742,14 @@ func _s3_the_peddler() -> void:
 	_new_run()
 	var mage: Dictionary = _run.party[1]
 	var pid := String(Runes.held_engines(mage)[0])
+	var pid_pick := "%s, the Mage's one engine — his class's first, as a new run awakens him" % pid
 	var rows_for: Array = []
 	for id in Runes.ENGINE_READ:
 		if Runes.engine_read(String(id)) == pid:
 			rows_for.append(String(id))
-	ok(not rows_for.is_empty(), "§3e: the Mage's first engine gates no rune — the gate cannot be asked here")
+	ok(not rows_for.is_empty(), "§3e: the Mage's first engine gates no rune — the gate cannot be asked here" + " — %s" % pid_pick)
 	ok(_run.toggle_engine(mage, _row_where(_run.engine_rows(mage), "hero")),
-		"§3e: the Mage's engine would not come out of its slot")
+		"§3e: the Mage's engine would not come out of its slot" + " — %s" % pid_pick)
 	var m_ungated := Runes.eligible_ids(mage, Runes.owned_names(mage, _held())).filter(
 		func(x): return not rows_for.has(String(x)))
 	_hold_all(m_ungated)
@@ -753,16 +759,16 @@ func _s3_the_peddler() -> void:
 	for o in current_scene.get("offers"):
 		if int((o as Dictionary)["member_idx"]) == 1:
 			m_offer = String(((o as Dictionary)["rune"] as Dictionary)["id"])
-	ok(m_offer == "", "§3e: with his engine out, the Mage was offered %s — the gate did not hold at the Peddler" % m_offer)
+	ok(m_offer == "", ("§3e: with his engine out, the Mage was offered %s — the gate did not hold at the Peddler" % m_offer) + " — %s" % pid_pick)
 	ok(_run.toggle_engine(mage, _row_held(_run.engine_rows(mage))),
-		"§3e: the Mage's engine would not go back into its slot")
+		"§3e: the Mage's engine would not go back into its slot" + " — %s" % pid_pick)
 	change_scene_to_file("res://scenes/shop.tscn")
 	await Gate.frames(self, 6)
 	m_offer = ""
 	for o in current_scene.get("offers"):
 		if int((o as Dictionary)["member_idx"]) == 1:
 			m_offer = String(((o as Dictionary)["rune"] as Dictionary)["id"])
-	ok(rows_for.has(m_offer), "§3e: ...and with it slotted the Mage was offered '%s', not one of its rows — the gate is shut, not a gate" % m_offer)
+	ok(rows_for.has(m_offer), ("§3e: ...and with it slotted the Mage was offered '%s', not one of its rows — the gate is shut, not a gate" % m_offer) + " — %s" % pid_pick)
 
 
 # ── §4 — THE CREST ──────────────────────────────────────────────────────────

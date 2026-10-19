@@ -708,11 +708,12 @@ func _take_decline_drop() -> void:
 	ok(run.award_draft_pick(m), "§3: an offer is queued")
 	ok(int(m["draft_picks_owed"]) == 1, "§3: ...and one pick is owed")
 	var card := String(m["draft_candidates"][0][0])
-	ok(run.take_draft_ability(m, card) == "", "§2: the card is taken")
-	ok(m["bm_abilities"].has(card), "§2: ...and lands in the kit")
-	ok(int(m["draft_picks_owed"]) == 0, "§2: ...spending the pick")
+	var card_pick := "%s, the first card of the rolled draft offer %s" % [card, str(m["draft_candidates"][0])]
+	ok(run.take_draft_ability(m, card) == "", "§2: the card is taken" + " — %s" % card_pick)
+	ok(m["bm_abilities"].has(card), "§2: ...and lands in the kit" + " — %s" % card_pick)
+	ok(int(m["draft_picks_owed"]) == 0, "§2: ...spending the pick" + " — %s" % card_pick)
 	ok(m["draft_candidates"].is_empty(),
-		"§2: ...and the offer it came from, whole")
+		"§2: ...and the offer it came from, whole" + " — %s" % card_pick)
 	# THE OTHER CARDS OF A TAKEN OFFER ARE NOT REFUSED — only a DECLINE and a
 	# DROP write the no-return ledger, which is what the rule says.
 	ok(run.draft_refused(m).is_empty(),
@@ -761,27 +762,28 @@ func _take_decline_drop() -> void:
 		"§2: the Sharpshooter's kit is full at 7 — %d earned on the class kit's three-slot opening (GS)" % fill3)
 	ok(run.award_draft_pick(m3), "§2: a full kit is still offered a draft")
 	var c3 := String(m3["draft_candidates"][0][0])
+	var c3_pick := "%s, the first card of the rolled draft offer %s" % [c3, str(m3["draft_candidates"][0])]
 	ok(run.take_draft_ability(m3, c3) == "the kit is full — name an ability to bench",
-		"§2: taking at the cap REQUIRES a bench before it resolves (EG §2)")
-	ok(not m3["bm_abilities"].has(c3), "§2: ...and nothing landed")
-	ok(int(m3["draft_picks_owed"]) == 1, "§2: ...and the pick is still owed")
+		"§2: taking at the cap REQUIRES a bench before it resolves (EG §2)" + " — %s" % c3_pick)
+	ok(not m3["bm_abilities"].has(c3), "§2: ...and nothing landed" + " — %s" % c3_pick)
+	ok(int(m3["draft_picks_owed"]) == 1, "§2: ...and the pick is still owed" + " — %s" % c3_pick)
 	# BATCH GS — Aimed Shot is a card on his shelf now, so the PROTECTED name here is
 	# the class kit's Powershot — in `protected_names`, and in no pool.
 	ok(Classes.protected_names("sharpshooter").has("Powershot")
 			and run.take_draft_ability(m3, c3, "Powershot")
 			== "Powershot cannot be benched",
-		"§2: naming a PROTECTED ability as the bench is refused")
+		"§2: naming a PROTECTED ability as the bench is refused" + " — %s" % c3_pick)
 	ok(int(run.ability_slots_used(m3)) == CAP, "§2: ...leaving the kit at 7")
 	ok(run.take_draft_ability(m3, c3, "Pinning Shot") == "",
-		"§2: naming an EARNED ability resolves the offer")
+		"§2: naming an EARNED ability resolves the offer" + " — %s" % c3_pick)
 	# **INVERTED BY BATCH EG §2.** One in, one out of the LOADOUT — and nothing
 	# out of the POOL, which is the whole of the change. The slot arithmetic is
 	# identical; what moved is that the displaced card is still held.
 	ok(run.equipped_ability_names(m3).has(c3)
 			and not run.equipped_ability_names(m3).has("Pinning Shot"),
-		"§2: ...one in, one out of the LOADOUT")
+		"§2: ...one in, one out of the LOADOUT" + " — %s" % c3_pick)
 	ok(m3["bm_abilities"].has(c3) and m3["bm_abilities"].has("Pinning Shot"),
-		"§2: ...and BOTH are in the pool (EG §2)")
+		"§2: ...and BOTH are in the pool (EG §2)" + " — %s" % c3_pick)
 	ok(int(run.ability_slots_used(m3)) == CAP, "§2: ...and the cap still holds at 7")
 	ok(not run.draft_refused(m3).has("Pinning Shot"),
 		"§2: the benched ability does not enter the no-return ledger (EG §2)")

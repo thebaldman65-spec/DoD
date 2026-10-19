@@ -831,9 +831,11 @@ func _s1d_names_resolve(ir: String, cr: String) -> void:
 			decl.compile("(?m)^\\s*(?:static\\s+)?(?:const|var)\\s+" + name + "\\s*(?::\\s*\\w+\\s*)?:?=\\s*([^\\n]+)")
 			var d := decl.search(corpus)
 			var held := d.get_string(1).strip_edges() if d != null else "<declared nowhere>"
+			var decl_pick := ("the first declaration of %s in the corpus's walk order, `%s`" % [name, d.get_string(0).strip_edges()]) \
+				if d != null else "no declaration of %s in the corpus's walk order" % name
 			print("  [stated] %s: `%s` — declared %s" % [pair[0], m.get_string(0).trim_prefix("`").trim_suffix("`"), held])
 			if held != said:
-				wrong.append("%s: %s is %s in the script, %s in the reference" % [pair[0], name, held, said])
+				wrong.append(("%s: %s is %s in the script, %s in the reference" % [pair[0], name, held, said]) + " — %s" % decl_pick)
 	ok(wrong.is_empty(),
 		"§1d(b): %d constant value(s) in the references are not the declared ones: %s" % [
 			wrong.size(), " / ".join(PackedStringArray(wrong))])

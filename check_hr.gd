@@ -693,31 +693,32 @@ func _s2_the_nameplate() -> void:
 	ok(String(drop.get("where", "")) == "held" and hi >= 0 and _unworn(_run.party[hi]) == [nm],
 		"§2: the drop (%s) is not held by one hero, alone" % nm)
 	var plate: String = _run.nameplate(_run.party[hi]) if hi >= 0 else "?"
-	ok(Gate.has_text(card, "RUNE DROP: %s, for the %s" % [nm, plate]), "§2: the victory card does not name the drop and the %s" % plate)
+	var drop_pick := "%s for the %s (hero %d), the drop the seeded roll dealt after the map's first fight" % [nm, plate, hi]
+	ok(Gate.has_text(card, "RUNE DROP: %s, for the %s" % [nm, plate]), ("§2: the victory card does not name the drop and the %s" % plate) + " — %s" % drop_pick)
 	ok(Gate.press(card, ["Continue", "Walk on", "Onward"]) != "", "§2: the victory card drew nothing to press")
 	# AT TIME SCALE ONE: the toast fades in 1.9 s of game time, which `Gate.frames`'
 	# hundredfold scale spends in two frames.
 	await _arrive()
 	s = current_scene
 	ok(Gate.scene_name(self) == "Map", "§2: the card did not lead back to the map (%s)" % Gate.scene_name(self))
-	ok(Gate.has_text(s, "%s drops for the %s" % [nm, plate]), "§2: the map's toast does not name the drop and the %s" % plate)
+	ok(Gate.has_text(s, "%s drops for the %s" % [nm, plate]), ("§2: the map's toast does not name the drop and the %s" % plate) + " — %s" % drop_pick)
 	var mk: Button = _hero_marker(s, hi)
 	ok(mk != null and String(mk.text) == "✦ 1" and int(mk.get_meta("held_marker")) == 1,
-		"§2: the %s's nameplate does not mark one rune waiting (%s)" % [plate, mk.text if mk != null else "<no marker>"])
-	ok(_marker(s, "held_marker").size() == 1, "§2: ...and %d nameplates are marked — want only his" % _marker(s, "held_marker").size())
+		("§2: the %s's nameplate does not mark one rune waiting (%s)" % [plate, mk.text if mk != null else "<no marker>"]) + " — %s" % drop_pick)
+	ok(_marker(s, "held_marker").size() == 1, ("§2: ...and %d nameplates are marked — want only his" % _marker(s, "held_marker").size()) + " — %s" % drop_pick)
 	bag_m = _marker(s, "crest_marker")
 	ok(bag_m.size() == 1 and int((bag_m[0] as Button).get_meta("crest_marker")) == crest_n, "§2: a hero's drop moved the bag's marker")
 	# OPENING THE PANEL DOES NOT CLEAR IT: the count is the holding's, not a flag.
 	mk.emit_signal("pressed")
 	await process_frame
 	var ov: Node = Gate.overlay(current_scene, 60)
-	ok(ov != null and Gate.has_text(ov, nm), "§2: the marker did not open the %s's rune panel on the drop" % plate)
+	ok(ov != null and Gate.has_text(ov, nm), ("§2: the marker did not open the %s's rune panel on the drop" % plate) + " — %s" % drop_pick)
 	Gate.press(ov, ["Close"])
 	await Gate.frames(self, 2)
 	s.call("_draw_screen")
 	await process_frame
 	mk = _hero_marker(current_scene, hi)
-	ok(mk != null and String(mk.text) == "✦ 1", "§2: opening and closing the panel cleared the marker with the rune still waiting")
+	ok(mk != null and String(mk.text) == "✦ 1", "§2: opening and closing the panel cleared the marker with the rune still waiting" + " — %s" % drop_pick)
 	# EQUIP IT FROM THE PANEL, THROUGH ITS OWN BUTTON.
 	mk.emit_signal("pressed")
 	await process_frame
@@ -739,9 +740,9 @@ func _s2_the_nameplate() -> void:
 	if eq != null:
 		eq.emit_signal("pressed")
 		await Gate.frames(self, 3)
-	ok(_unworn(_run.party[hi]).is_empty(), "§2: the rune was not equipped")
+	ok(_unworn(_run.party[hi]).is_empty(), "§2: the rune was not equipped" + " — %s" % drop_pick)
 	ok(_hero_marker(current_scene, hi) == null and _marker(current_scene, "held_marker").is_empty(),
-		"§2: with nothing waiting the %s's marker is still drawn" % plate)
+		("§2: with nothing waiting the %s's marker is still drawn" % plate) + " — %s" % drop_pick)
 	var ov2: Node = Gate.overlay(current_scene, 60)
 	if ov2 != null:
 		Gate.press(ov2, ["Close"])
@@ -771,20 +772,21 @@ func _s2_the_nameplate() -> void:
 	card = await _fight_from_map(current_scene)
 	var cdrop: Dictionary = _run.last_drop
 	var cnm := String((cdrop.get("rune", {}) as Dictionary).get("name", ""))
+	var crest_pick := "%s, the crest rune the roll dealt from a crest-only pool" % cnm
 	ok(String(cdrop.get("where", "")) == "bag" and int(cdrop.get("hero", 0)) == -1 and _names(_run.rune_bag) == [cnm],
 		"§2b: a crest drop (%s) did not go into the bag" % cnm)
-	ok(Gate.has_text(card, "RUNE DROP: %s, for the crest" % cnm), "§2b: the card does not say the crest drop is the crest's")
+	ok(Gate.has_text(card, "RUNE DROP: %s, for the crest" % cnm), "§2b: the card does not say the crest drop is the crest's" + " — %s" % crest_pick)
 	Gate.press(card, ["Continue", "Walk on", "Onward"])
 	await _arrive()
 	var cm: Array = _marker(current_scene, "crest_marker")
-	ok(cm.size() == 1 and int((cm[0] as Button).get_meta("crest_marker")) == 1, "§2b: the bag's marker does not read the crest drop")
+	ok(cm.size() == 1 and int((cm[0] as Button).get_meta("crest_marker")) == 1, "§2b: the bag's marker does not read the crest drop" + " — %s" % crest_pick)
 	var moved := PackedStringArray()
 	for i in _run.party.size():
 		var mki: Button = _hero_marker(current_scene, i)
 		if mki == null or int(mki.get_meta("held_marker")) != int(marks0[i]):
 			moved.append(String(_run.party[i]["key"]))
-	ok(moved.is_empty(), "§2b: a crest drop moved the nameplate marker of %s" % [moved])
-	ok(Gate.has_text(current_scene, "%s drops for the crest" % cnm), "§2b: the map's toast does not say the drop is the crest's")
+	ok(moved.is_empty(), ("§2b: a crest drop moved the nameplate marker of %s" % [moved]) + " — %s" % crest_pick)
+	ok(Gate.has_text(current_scene, "%s drops for the crest" % cnm), "§2b: the map's toast does not say the drop is the crest's" + " — %s" % crest_pick)
 	OS.set_environment("DOD_AUTOPLAY", "")
 	OS.set_environment("DOD_ENEMIES_OFF", "")
 

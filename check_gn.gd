@@ -727,6 +727,8 @@ func _s2_elemental_weakness() -> void:
 				or ab.heal_missing > 0.0:
 			continue
 		probe[ab.dmg_type] = ab
+	var probe_s := "%s, the first plain single strike of each school in Classes.ability_corpus() order" % str(
+		probe.keys().map(func(k): return "%s=%s" % [k, (probe[k] as Ability).display_name]))
 	ok(probe.size() == schools.size(),
 		"§2: a plain single strike exists for every school (%s)" % str(probe.keys()))
 	M.attack = 1000
@@ -743,16 +745,16 @@ func _s2_elemental_weakness() -> void:
 			ab2.display_name, plain, weak, float(weak) / maxf(float(plain), 1.0), int(round(r * 100))])
 		if school == "physical":
 			ok(plain > 0 and weak == plain,
-				"§2: a physical hit (%s) is not raised (%d and %d)" % [ab2.display_name, plain, weak])
+				("§2: a physical hit (%s) is not raised (%d and %d)" % [ab2.display_name, plain, weak]) + " — %s" % probe_s)
 		else:
 			var want: float = (1.0 - r + 0.15) / (1.0 - r)
 			ok(plain > 0 and weak > plain and absf(float(weak) / float(plain) - want) <= 0.02,
-				"§2: a %s hit (%s) lands %.3f as hard, as 15 points off a %d%% resistance should (%d against %d)"
+				("§2: a %s hit (%s) lands %.3f as hard, as 15 points off a %d%% resistance should (%d against %d)"
 					% [school, ab2.display_name, float(weak) / maxf(float(plain), 1.0),
-						int(round(r * 100)), weak, plain])
+						int(round(r * 100)), weak, plain]) + " — %s" % probe_s)
 			if weak > plain:
 				raised += 1
-	ok(raised == 6, "§2: all six schools but physical are raised (%d)" % raised)
+	ok(raised == 6, ("§2: all six schools but physical are raised (%d)" % raised) + " — %s" % probe_s)
 	# FIFTEEN POINTS OF RESISTANCE, NOT A x1.15: a resisted school gains more
 	# and a weakness less, and each gains 15% of the blow before resistance.
 	if probe.has("arcane"):
@@ -764,8 +766,8 @@ func _s2_elemental_weakness() -> void:
 			e0.resists = saved
 			var want2: float = (1.0 - r2 + 0.15) / (1.0 - r2)
 			ok(p2 > 0 and absf(float(w2) / float(p2) - want2) <= 0.02,
-				"§2: against %d%% arcane resistance the weakened hit is x%.3f (want x%.3f; %d against %d)"
-					% [int(round(r2 * 100)), float(w2) / maxf(float(p2), 1.0), want2, w2, p2])
+				("§2: against %d%% arcane resistance the weakened hit is x%.3f (want x%.3f; %d against %d)"
+					% [int(round(r2 * 100)), float(w2) / maxf(float(p2), 1.0), want2, w2, p2]) + " — %s" % probe_s)
 			print("    arcane at %+d%% resistance: plain %d, weakened %d, x%.3f (15 points: x%.3f)" % [
 				int(round(r2 * 100)), p2, w2, float(w2) / maxf(float(p2), 1.0), want2])
 	await _clear(s)

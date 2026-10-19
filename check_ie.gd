@@ -612,6 +612,7 @@ func _s5a_the_refill() -> void:
 		if String(n2) != gated and not _run.owned_ability_names(m).has(String(n2)):
 			_run.hold_ability(m, String(n2), false)
 	var owned3: Array = _run.owned_ability_names(m).filter(func(n): return pool.has(n)).slice(0, 3)
+	var owned3_pick := "the boss's stored offer %s, the first three of Run.owned_ability_names(m) that sit in his pool" % str(owned3)
 	m["bm_candidates"] = [owned3]
 	m["bm_picks_owed"] = 1
 	var before: Array = _run.ability_choice(m)
@@ -621,9 +622,9 @@ func _s5a_the_refill() -> void:
 	var after: Array = _run.ability_choice(m)
 	print("    the boss's: re-asked %s (held back %s); with %s equipped the draw holds %s, the offer %s" % [
 		before, withheld_before, gate_engine, drawable, after])
-	ok(before.is_empty() and withheld_before.is_empty(), "§5a: the premise — the boss's offer re-asked to nothing (%s, held back %s) — %s" % [before, withheld_before, gated_pick])
+	ok(before.is_empty() and withheld_before.is_empty(), "§5a: the premise — the boss's offer re-asked to nothing (%s, held back %s) — %s — %s" % [before, withheld_before, gated_pick, owned3_pick])
 	ok(drawable.has(gated) and after.is_empty(),
-		"§5a: the boss's offer refilled, or the engine did not open the card to the draw (draw %s, offer %s) — %s" % [drawable, after, gated_pick])
+		"§5a: the boss's offer refilled, or the engine did not open the card to the draw (draw %s, offer %s) — %s — %s" % [drawable, after, gated_pick, owned3_pick])
 	# THE MINI-BOSS's: every upgrade taken but one that fits nothing he holds; then he holds a card it fits.
 	_new_run()
 	var w: Dictionary = _run.party[0]
@@ -656,15 +657,17 @@ func _s5a_the_refill() -> void:
 			taken.append({"id": String(uid2), "ability": "Strike"})
 	w["upgrades"] = taken
 	w["up_candidates"] = [[{"id": String(taken[0]["id"]), "ability": "Strike"}]]
+	var taken_pick := ("the mini-boss's stored offer `%s` on Strike, the first non-spare upgrade in ABILITY_UPGRADES order" % String(taken[0]["id"])) \
+			if not taken.is_empty() else "no stored upgrade"
 	w["up_picks_owed"] = 1
 	var u_before: Array = _run.upgrade_choice(w)
 	_run.hold_ability(w, spare_card, true)
 	var u_draw: Array = _run.roll_upgrade_offer(w)
 	var u_after: Array = _run.upgrade_choice(w)
 	print("    the mini-boss's: re-asked %s; holding %s, the draw holds %s, the offer %s" % [u_before, spare_card, u_draw, u_after])
-	ok(u_before.is_empty(), "§5a: the premise — the upgrade offer re-asked to nothing (%s) — %s" % [u_before, spare_pick])
+	ok(u_before.is_empty(), "§5a: the premise — the upgrade offer re-asked to nothing (%s) — %s — %s" % [u_before, spare_pick, taken_pick])
 	ok(u_draw.any(func(c): return String((c as Dictionary).get("id", "")) == spare) and u_after.is_empty(),
-		"§5a: the upgrade offer refilled, or the new card did not open the upgrade to the draw (draw %s, offer %s) — %s" % [u_draw, u_after, spare_pick])
+		"§5a: the upgrade offer refilled, or the new card did not open the upgrade to the draw (draw %s, offer %s) — %s — %s" % [u_draw, u_after, spare_pick, taken_pick])
 
 
 # ── §5b — A SPENT PICK ───────────────────────────────────────────────────────────

@@ -16,6 +16,52 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-18 &mdash; Batch IO: THE BARGAIN DECK, MEASURED AND RE-CUT</h2>
+<p><b>Every bargain binds both sides again, two new ones join, and every modifier's severity is now a measurement of what it
+costs a party.</b> The battle screen shows the bargain in force. Full working: <code>docs/reports/IO.md</code>.</p>
+
+<p><b>&sect;1 &mdash; THE DECK RE-CUT: NOTHING BINDS ONE SIDE.</b> A modifier that leaned on one side was a difficulty slider, and
+the road is already that, so <b>Famine</b> (no items this fight) and <b>Cruel Order</b> (the warband first every round) are
+<b>removed</b>; their shape and what they measured are kept in the design notes. <b>Wasting</b> now reaches everyone: at the end of
+every turn, whoever took it loses <b>8%</b> of maximum health (was 5%, heroes only), and a body it fells was killed by nobody.
+<b>The Hungering Dark</b> now feeds everyone: whoever deals damage heals <b>half</b> of it (was a quarter, enemies only) &mdash; and that
+heal is nobody's healing, so it meets every refusal a heal meets and feeds nothing that reads a heal. Two new two-sided
+bargains: <b>The Thin Veil</b> &mdash; everyone deals 50% more damage, blows and ticks alike &mdash; and <b>The Long Silence</b> &mdash; nobody
+may use the same ability twice this fight; basic attacks are exempt. A spent card goes dark and says why, the bot never casts
+one, and an enemy whose move is spent falls back to its basic attack and says so a turn ahead.</p>
+
+<p><b>&sect;2 &mdash; SEVERITY IS MEASURED.</b> All twenty-four were forced, one at a time, on every bargain of a Ruin run, and the deck
+was sorted by the party's health at a bargain fight's end and cut back into the same six, six, four, four and four. <b>Nineteen
+moved.</b> The hardest four, now severity 5 and Ruin's alone: <b>Bloodless, Wasting, Mirrorbound and Overgrown</b>. The mildest:
+<b>the Hungering Dark</b>, which in its two-sided form <i>helps</i> the heroes (they deal far more damage than they take), now
+severity 1. Wanderer's and Warden's offers move for the first time in three batches (mean severity 2.84 and 3.29; Ruin 4.49) &mdash; and in the sim their bargain fights get much milder (a Warden bargain fight ends at 0.936 of the party's health, was 0.846) while Ruin's get much harder (0.753, was 0.876), because the four costliest bargains are Ruin's alone now &mdash; and
+Ruin's mini-boss and bosses now fight under Brittle, Deadened, Feverish, the Long Silence, Miasma, Rot, the Thin Veil or Thin Air.
+<b>Severity 5 now pays 320 gold or a rune</b> (was 300): the reward steps grow by twenty each.</p>
+
+<p><b>&sect;3 &mdash; SANCTITY's STEP, RE-TAKEN, STAYS 13.</b> Re-measured on the sim's repaired bot: a normal fight ends at 2.56 steps
+untalented (2.37 at 14), so 13 is now plainly the nearer to half the cap.</p>
+
+<p><b>&sect;4 &mdash; THE BUTTONS SHOW THE PRICE THE FIGHT CHARGES.</b> Under Warded a 30-Rage card's button read its list price
+(30 Rage) while the cast cost 38, and was dark at 30&ndash;37; the button and the summon picker now print what the cast costs, so
+the number and the lit state agree. Through and Through's refund now gives back what the cast paid (it is dormant: nothing in
+the game grants it today).</p>
+
+<p><b>&sect;5 &mdash; THE BARGAIN HAS A CHIP.</b> A strip at the top of the battle screen names the bargain in force all fight: BARGAIN
+or IMPOSED, the modifier's own letters, its pips and its name, with its rule on the hover.</p>
+
+<p><b>&sect;6 &mdash; THE CHECKS NAME WHAT THEY PICKED, AGAIN.</b> The battery was re-censused with the patterns IN's repair taught, and
+every check that picks its subject without naming it in its failure messages now does.</p>
+
+<p><b>&sect;0.</b> Recorded: a class passive outranks a modifier where they contradict (<code>CLAUDE.md</code>); a census built from a
+sweep is re-run after its repair pass, and the state archive takes the newest cut first (<code>docs/instrument-rules.md</code>).</p>
+
+<p><b>The instruments.</b> <code>check_io</code> is new. Re-pointed where IO moved what they read: <code>check_in</code>,
+<code>check_hu</code> (the modifiers' letters join the tag walk), <code>check_ih</code> (the strip joins the layout walk),
+<code>test_batch_an</code> and <code>test_batch_bb</code> (a grade the ladder holds, not the one first authored), and
+<code>check_ie</code> with the 27 gates whose 53 census sites now name what they picked; <code>check_gp</code>'s count
+moved 459 &rarr; 438 because its seeded road now meets different bargains. No
+save version moved.</p>
+
 <h2>2026-10-17 &mdash; Batch IN: THE SEVERITY-5 BAND, AND TWO BLIND SPOTS</h2>
 <p><b>Ruin gets four bargains no other road deals, its merchant back, the sim's bot pays the price the game charges, and the
 checks that pick "the longest" or "the first" now say what they picked.</b> Full working: <code>docs/reports/IN.md</code>.</p>

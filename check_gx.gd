@@ -575,6 +575,7 @@ func _s3b_the_kit_preview(seat: int) -> void:
 		var pid := Runes.engine_read(rid)
 		if not per_engine.has(pid):
 			per_engine[pid] = rid
+	var per_s := "the first gated rune by id for each engine: %s" % str(per_engine)
 	ok(per_engine.size() == 12, "§3: %d engines in GV's table — twelve expected" % per_engine.size())
 	var said := 0
 	var quiet := 0
@@ -593,30 +594,30 @@ func _s3b_the_kit_preview(seat: int) -> void:
 			var row: Label = _label_with(kp, "%s — " % rname)
 			var line := String(row.text).strip_edges() if row != null else ""
 			ok(row != null and (line.begins_with("WORN") or line.begins_with("sits out")) and line.contains(rname),
-				"§3 %s (%s): the kit preview does not draw the worn rune's line, its state first" % [rid2, arm])
+				("§3 %s (%s): the kit preview does not draw the worn rune's line, its state first" % [rid2, arm]) + " — %s" % per_s)
 			if row == null:
 				kp.queue_free()
 				continue
 			var sits := line.begins_with("sits out")
 			if engine_in:
-				ok(not sits, "§3 %s (%s): the kit preview says a paying rune sits out" % [rid2, arm])
+				ok(not sits, ("§3 %s (%s): the kit preview says a paying rune sits out" % [rid2, arm]) + " — %s" % per_s)
 				ok(String(row.tooltip_text) == "",
-					"§3 %s (%s): the kit preview hangs a sits-out note on a paying rune" % [rid2, arm])
+					("§3 %s (%s): the kit preview hangs a sits-out note on a paying rune" % [rid2, arm]) + " — %s" % per_s)
 				if not sits:
 					quiet += 1
 			else:
-				ok(sits, "§3 %s (%s): the kit preview's line does not read `sits out`" % [rid2, arm])
+				ok(sits, ("§3 %s (%s): the kit preview's line does not read `sits out`" % [rid2, arm]) + " — %s" % per_s)
 				ok(String(row.tooltip_text) == note and note.contains(ername),
-					"§3 %s (%s): the kit preview's line does not carry the sentence naming %s" % [rid2, arm, ername])
+					("§3 %s (%s): the kit preview's line does not carry the sentence naming %s" % [rid2, arm, ername]) + " — %s" % per_s)
 				# THE LINE STILL SHOWS THE RUNE'S OWN RULE — the list is read to study a loadout.
 				ok(String(row.text).contains(Runes.shown_desc(Runes.build(rid2))),
-					"§3 %s: the kit preview dropped the rune's own rule" % rid2)
+					("§3 %s: the kit preview dropped the rune's own rule" % rid2) + " — %s" % per_s)
 				if sits:
 					said += 1
 			kp.queue_free()
 			await Gate.frames(self, 1)
 	ok(said == 12 and quiet == 12,
-		"§3: the kit preview said it for %d of 12 engines and stayed quiet for %d of 12" % [said, quiet])
+		("§3: the kit preview said it for %d of 12 engines and stayed quiet for %d of 12" % [said, quiet]) + " — %s" % per_s)
 	print("    the pouch, the map's slot and the kit preview each said it in the engine-out arm and stayed quiet in the engine-in arm")
 
 
@@ -640,6 +641,7 @@ func _s3c_the_battle_log() -> void:
 	if rid == "":
 		return
 	var rname := String(Runes.config(rid).get("name", ""))
+	var pick_s := "%s (%s), the first gated rune by id that reads old_gods" % [rid, rname]
 	var ername := _engine_rune_name(rid)
 	for engine_in in [false, true]:
 		var erid := Runes.engine_rune_id("old_gods")
@@ -653,7 +655,7 @@ func _s3c_the_battle_log() -> void:
 		var roll: Array = scene.get("_rune_roll_call")
 		var mine: Array = roll.filter(func(l): return String(l).contains(rname))
 		ok(mine.size() == 1,
-			"§3c %s: the roll call names %s %d times — once expected" % [arm, rname, mine.size()])
+			("§3c %s: the roll call names %s %d times — once expected" % [arm, rname, mine.size()]) + " — %s" % pick_s)
 		if mine.size() != 1:
 			scene.queue_free()
 			await Gate.frames(self, 2)
@@ -664,19 +666,19 @@ func _s3c_the_battle_log() -> void:
 			# has always been, so the arm below cannot pass on a log that simply
 			# stopped naming runes.
 			ok(line.ends_with(": " + rname),
-				"§3c %s: the roll call marks a rune that is paying (%s)" % [arm, line])
+				("§3c %s: the roll call marks a rune that is paying (%s)" % [arm, line]) + " — %s" % pick_s)
 			ok(not line.to_lower().contains("sits out"),
-				"§3c %s: the roll call says a paying rune sits out" % arm)
+				("§3c %s: the roll call says a paying rune sits out" % arm) + " — %s" % pick_s)
 		else:
 			# The note opens with a capital, so the needle is case-folded here
 			# and NOT in the paired arm above, where a bare line must contain
 			# no form of the words at all.
 			ok(line.to_lower().contains("sits out"),
-				"§3c %s: the roll call does not say the rune sits out (%s)" % [arm, line])
+				("§3c %s: the roll call does not say the rune sits out (%s)" % [arm, line]) + " — %s" % pick_s)
 			ok(line.contains(ername),
-				"§3c %s: the roll call does not name %s (%s)" % [arm, ername, line])
+				("§3c %s: the roll call does not name %s (%s)" % [arm, ername, line]) + " — %s" % pick_s)
 			ok(line.begins_with(String(scene.get("heroes")[0].unit_name) + ": " + rname),
-				"§3c %s: the roll call's line no longer opens `<hero>: <rune>` (%s)" % [arm, line])
+				("§3c %s: the roll call's line no longer opens `<hero>: <rune>` (%s)" % [arm, line]) + " — %s" % pick_s)
 			# **AND IT IS THE NOTE'S OWN WORDS, NOT A FOURTH PHRASING.** The
 			# tail is built from `rune_sits_out_note`; asserting it against
 			# that function is what makes the log part of the one sentence
@@ -697,7 +699,7 @@ func _s3c_the_battle_log() -> void:
 			var sentence := " ".join(first)
 			ok(line.ends_with(" — %s" % sentence) and sentence.contains(ername)
 					and sentence.ends_with("is not equipped."),
-				"§3c %s: the roll call's tail is not the note's first sentence (%s)" % [arm, line])
+				("§3c %s: the roll call's tail is not the note's first sentence (%s)" % [arm, line]) + " — %s" % pick_s)
 			print("    %s" % line)
 		scene.queue_free()
 		await Gate.frames(self, 2)
@@ -908,10 +910,11 @@ func _s4b_the_panels_worst_case(mp: Node, seat: int, gated_two: Array, others: A
 func _s5_the_sentence() -> void:
 	print("\n§5 — one phrasing, GT's, and the 44-character break it was written to")
 	var note: String = _run.rune_sits_out_note(_gated[0])
+	var note_s := "the note of %s, the first gated rune by id" % (String(_gated[0]) if not _gated.is_empty() else "none")
 	for line in GX_NOTE_LINES:
-		ok(note.contains(String(line)), "§5: the rune note has lost the line \"%s\"" % line)
+		ok(note.contains(String(line)), ("§5: the rune note has lost the line \"%s\"" % line) + " — %s" % note_s)
 	# IT OPENS WITH GT'S OWN CLAUSE, WORD FOR WORD.
-	ok(note.begins_with(GT_HEAD), "§5: the rune note does not open with GT's clause")
+	ok(note.begins_with(GT_HEAD), "§5: the rune note does not open with GT's clause" + " — %s" % note_s)
 	var card_note: String = _run.sits_out_note("Divine Plea")
 	ok(card_note.begins_with(GT_HEAD), "§5: GT's card note no longer opens with its own clause")
 	for line2 in GT_NOTE_LINES:
@@ -922,7 +925,7 @@ func _s5_the_sentence() -> void:
 	# that collapsed the two into one sentence reds, and so does one that
 	# reworded the shared half.
 	ok(not note.contains("Benching") and not note.contains("stays counted"),
-		"§5: the rune note carries the card's own nouns")
+		"§5: the rune note carries the card's own nouns" + " — %s" % note_s)
 	ok(not card_note.contains("Unequipping") and not card_note.contains("stays filled"),
 		"§5: the card note carries the rune's own nouns")
 	# EVERY LINE UNDER THE HAND-BROKEN CEILING, OVER EVERY ENGINE IN THE TABLE.
