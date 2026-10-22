@@ -16,6 +16,47 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-19 &mdash; Batch IQ: THE THREE DOCUMENTS, AND ONE CRASH</h2>
+<p><b>A save frozen on a bargain no longer takes the offer screen down, the state file's closed half is archived, the design document
+is checked fact by fact against the game, and the cost of reading the two big files is measured again.</b> Full working:
+<code>docs/reports/IQ.md</code>.</p>
+
+<p><b>&sect;4 &mdash; A SAVE THAT NAMES SOMETHING GONE.</b> A run saved on the offer screen carries the three bargains it was dealt,
+and three have left the deck since; loading such a save made the screen fail on the missing one. Now a bargain the deck no longer
+holds is dropped when the save is read &mdash; the offer shows one card fewer, the rest exactly as they were &mdash; and an offer left
+with none is dealt afresh. Nothing is rolled again and no die is spent. The same door now drops a removed item, zone, event,
+lineage or rune field a save could carry, every one of which would have crashed a screen, and a save naming a class the game does
+not have is refused, as a save too old to walk already is. Nothing in the designer's own save is affected: it names nothing gone.</p>
+
+<p><b>&sect;1 &mdash; THE STATE FILE, CENSUSED AND CUT.</b> Four readers classified every one of its 141 sections: 130 still bind.
+Nine closed sections and 95 closed items moved word for word to the state archive, each read against the report that records it
+first, and eight measurement tables were struck to their conclusion and a pointer. The file fell from 361 KiB to 273 KiB before
+this batch wrote a line.</p>
+
+<p><b>&sect;2 &mdash; THE DESIGN DOCUMENT, CHECKED FACT BY FACT.</b> Eight readers checked 5,157 facts in
+<code>master.html</code> against the code; 4,949 agreed, and 178 sentences that did not are rewritten to what the game does
+&mdash; counts that had moved, mechanisms two re-cuts old, figures retuned since their row was written. Seven of them
+described a game the code does not play where the code may be the thing that is wrong; those are the designer's. Every card's price in the
+document, the bargain deck, the rewards and the ladder are now checked against the game by an instrument, so the next drift is
+caught rather than found.</p>
+
+<p><b>&sect;3 &mdash; WHAT A BATCH READS, MEASURED AGAIN.</b> If each batch read a core of the rules and opened the rest on demand, it
+would read about 48% less of <code>CLAUDE.md</code> and 77% less of the state file. That is priced, not built; it is the designer's
+decision.</p>
+
+<p><b>&sect;7 &mdash; A SCRATCH COPY CHECKS ITS OWN NAME.</b> A new lane driver refuses to start Godot in a scratch copy that would run
+as the live project &mdash; and so write into the player's own save folder &mdash; which is how three of IP's copies ran in it until
+the slip was noticed.</p>
+
+<p><b>&sect;0 &mdash; RULES RECORDED.</b> A tie that survives a second measurement is a measurement that succeeded, and the pairs worth
+re-measuring are the ones at a cut; Warden's bargain fights should end between 0.80 and 0.85 of the party's health once the deck's
+middle is authored (<code>docs/state.md</code>); a key that comes off a save is a key the code did not choose
+(<code>CLAUDE.md</code>); a save's guard is proved both ways, and a scratch copy asserts its own name
+(<code>docs/instrument-rules.md</code>).</p>
+
+<p><b>The instruments.</b> <code>check_iq</code> is new. Re-pointed: <code>check_ip</code> &sect;7's top arm, which now reads <i>IP's own or a later batch's</i>, and its &sect;0.2,
+which read the design notes' newest entry and now reads IP's by its title. No save version moved.</p>
+
 <h2>2026-10-19 &mdash; Batch IP: THE DECK's LAST CUT, AND THE INSTRUMENT's OWN DEFECT</h2>
 <p><b>The Hungering Dark leaves the game, the top severity is cut where the measurement's cliff is, and the sim's bot now drinks
 the player's potion &mdash; with every grade the old potion could have moved measured again.</b> Full working:

@@ -4,6 +4,49 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The three documents, and one crash (Batch IQ) — 2026-10-19
+
+**Why a removed modifier owes the save a guard and not a re-ask.** A bargain's offer is rolled once for its encounter and
+saved with it, so a run saved on the offer screen carries the three ids it was dealt — and the deck has lost three since GF.
+Re-rolling the offer on load would change what the player was looking at when he quit, in a path no seed covers. So the load
+drops only the option the deck no longer holds and deals one fewer; only an offer left with nothing is dealt again, because
+an empty offer screen has no button to press. The load spends no die, so a seeded run reads the same numbers either side of it.
+
+**Why the guard sits at the load and not at the screen.** A key that comes off a save is a key the code did not choose; a key
+the code chose is the code's. Guarding the line that draws would swallow both — and an id the code itself put in an offer
+that the deck does not hold is a defect that must fail where it is read, loudly. So every filter runs once, in `load_run`,
+and the screen's read stays straight on purpose. The census behind it found 167 such reads in the game and 22 that a save
+naming something gone would take down; every one is guarded at the same door, and the ones that only show something wrong
+are listed rather than guarded, because none of them crashes.
+
+**Why a save naming a class this build lacks is refused rather than repaired.** Every other stale key has a fallback that
+leaves a playable run: an item is dropped, a zone takes its slot's first candidate, an event clears, a lineage is read again
+off the hero's engines. A hero's class has none — a party cannot field a hero of no class, and dropping him leaves a party of
+three, which nothing in the game is built for. So it goes down the path an unwalkable save already takes. It is the
+designer's to confirm, because the alternative — refuse and keep the file — is the shape a newer save gets.
+
+**Why `docs/state.md`'s census asked for a record as well as a settled subject.** This file is the open queue, so most of it is
+not supposed to close; a block that does close is often the only copy of a finding. The rubric therefore called a block
+CLOSED only when its subject was settled *and* its record stood in a report that was read — and two blocks that passed both
+tests stayed anyway, because each carried a practice or a do-not-re-propose ruling no rule file holds. The file came out at
+92.5% binding, so the room this cut bought came mostly from closed items inside open sections, not from whole sections.
+
+**Why `master.html`'s figures are now held by an instrument.** EH proved the document's prose was asserted by nothing: a false
+sentence put back left every reader green. The census read 5,157 facts against the code and found the false ones in the
+corners — counts that moved, mechanisms two re-cuts old, a figure retuned since its row was written. The words moved to the
+code. The figures a script can read on both sides — every card's price, the deck, the rewards, the ladder — are held by
+`check_iq` §2 so the next drift is red where the census found the last ones only by reading; a figure a handler writes as a
+literal has no door, and needs a constant before anything can hold it.
+
+**Why the block index is priced and not built.** The re-measure says the index beats one file with a moving ceiling, for both
+files, and by more than HV found; it cannot say a batch will open the right block, and the union of what twenty batches
+needed is four fifths of `CLAUDE.md`. That is a project and a ruling, not a section of a batch.
+
+**Why the lane driver asserts a name.** IP restored three scratch copies' tracked files, and with them the live project name,
+so their first trace runs ran in the player's own user-data folder until it was noticed — the player's files untouched only
+because every gate restores what it finds. A habit failed once; a check refuses every time, for about 20 ms, before Godot
+starts.
+
 ## The deck's last cut, and the instrument's own defect (Batch IP) — 2026-10-19
 
 **Why the Hungering Dark left the game rather than being re-tuned.** Making it bind both sides was meant to make it fair,

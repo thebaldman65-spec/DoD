@@ -1170,8 +1170,8 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
     quoted before it — BN's sweep, EN's, EO's and EP's arms and every one since — stops at encounter
     48 of 49. **The sim fights the end boss now and prints both off the same runs**: `completions=`
     is the end boss killed and `z3boss=` beside it is the old count. **A pre-GJ figure compares with
-    `z3boss=` only**, and the gap between the two is the end boss's fight. `docs/state.md` carries
-    the three rungs' untalented figures both ways.
+    `z3boss=` only**, and the gap between the two is the end boss's fight. `docs/reports/GJ.md` §1b
+    carries the three rungs' untalented figures both ways.
   · **A LANE ROW IS ONE FULLY-BUILT HERO MEASURED AGAINST THREE UNBUILT ONES.** Those rows are
     honest A/B comparisons of a spec's lanes against each other; they are NOT "how much of a
     real party's work this hero does". **A CONTRIBUTION SHARE INFLATES TWICE** — unbuilt allies
@@ -1350,10 +1350,20 @@ the rune was wired, because it was supplying the one input the defect was in.
 - **THE PAIR IS THE TWO MEMBERS EITHER SIDE OF A CUT, ON THE INSTRUMENT IN FORCE — NEVER A LIST CARRIED FROM AN EARLIER
   CUT.** A removal from the deck shifts every cut one place, and a repaired instrument moves the members themselves: IP's
   brief named IO's three pairs, and on IP's table none of them stood at a cut — the re-measure took the pairs that did. A
-  tie re-measured off a stale list measures pairs no grade depends on.
+  tie re-measured off a stale list measures pairs no grade depends on. **CONFIRMED AT IQ §0.3 (the designer's): a tie that
+  matters is a tie at a cut, and the cuts move when the deck does — so the pairs are derived at the cut, never listed in a
+  brief.**
 - **A TIE IS NAMED WHERE THE GRADES ARE READ, NOT ONLY IN A REPORT.** The grade a tie hands out is still a grade the deck
   deals, so the sort's order stands; what changes is that the file holding the grades says which cuts the measurement
   could not make, so nobody reads a coin flip as a ranking.
+- **AND A TIE THAT SURVIVES ITS SECOND BLOCK IS A MEASUREMENT THAT SUCCEEDED (IQ §0.2, the designer's — it qualifies the
+  rule above).** *Two modifiers that cost the same belong in the same grade, and a boundary between them is an artifact of
+  fixed counts, not a fact about the deck.* The cuts are made at fixed counts, and a deck that clusters guarantees an
+  arbitrary cut wherever a cluster meets one; **the bands read grades, not modifiers**, so such a cut moves one modifier
+  between two adjacent bands and nothing else. **So the tie gets no third block** — an hour spent ordering two modifiers the
+  measurement has already said are equivalent — the sort's order stands, the cut is named arbitrary, and the reasoning stands
+  beside the grades so nobody re-measures it. The case is IP's two: Deadened | Rot 0.0006 apart, Parched | Slick Footing
+  0.0026.
 
 ## STANDING RULE — AN INSTRUMENT'S OWN FIDELITY IS A PREMISE OF EVERY MEASUREMENT IT TAKES (Batch IP §2, ruled by the designer)
 > **AN INSTRUMENT'S OWN FIDELITY IS A PREMISE OF EVERY MEASUREMENT IT TAKES.** A defect known in the instrument is
@@ -1678,6 +1688,46 @@ a census is taken.
   and the disk of every spent batch's folders, and ONE command clearing every spent prefix at once, which the designer
   runs when he likes. The batch names its own folders and leaves them; the live *"Dawn of Decay"* folder and the backups
   stay untouched. The naming, the batch's own staying and the backups above stand.
+
+## STANDING RULE — A GUARD ON A KEY A SAVE BRINGS IN IS PROVED BY TWO ARMS (Batch IQ §4, ruled by the designer)
+> **A guard on a key that comes off a save is driven both ways: one arm reds on the UNGUARDED read, and one reds if the
+> guard swallows a key the CODE chose.** A guard that drops every unknown key passes the first arm and hides every typo in
+> a table the code indexes — the very defect a loud failure exists to show.
+
+- **THE CASE IS THE OFFER's.** `check_iq` §4 writes a save frozen on the offer screen naming the deck's removed ids, loads
+  it through the real door and opens the real screen: one stale option is dropped and two cards are drawn, three stale and
+  the screen deals a fresh offer, none and it loads as it was saved — and the load spends no die. Its second arm hands the
+  session's own offer an id the deck does not hold and asserts nothing filters it before the screen, which reads the deck
+  straight. HEAD's code under the gate reads seventeen red (IQ's report, §4).
+- **THE POPULATION IS EVERY READ OF SAVE DATA THROUGH A DATA TABLE, AND IT IS CENSUSED, NOT REMEMBERED.** IQ's census read
+  167 such sites in the shipped game — the run save's fields, a member's keys, the profile and the relic ledger — and found
+  133 guarded and 34 not: 22 that would crash on a save naming something gone, 9 that would show, pay or count something
+  false (one of them a screen with no way out) and 3 harmless. The crashers and the strand are guarded where the save is
+  read and driven in `check_iq` §4b, each against HEAD's code too; the rest are listed in IQ's report with why each does
+  not crash. **A field a batch adds to a save adds its reads to that population, in the same batch.**
+
+## STANDING RULE — A SCRATCH COPY ASSERTS ITS OWN PROJECT NAME BEFORE IT LAUNCHES ANYTHING (Batch IQ §7, ruled by the designer)
+> **A SCRATCH COPY THAT RESTORES ITS TRACKED FILES RESTORES ITS PROJECT NAME, AND A PROJECT NAME IS WHICH USER-DATA FOLDER IT
+> WRITES TO.** Every scratch copy asserts its own project name before it launches anything, and a copy whose name is the live
+> one does not run.
+
+- **THE CASE IS IP's THREE TRACE COPIES.** Each put HEAD's tracked files back with `git checkout HEAD -- .`, and `project.godot`
+  is a tracked file: its live name came back with the rest, so their first trace runs executed in the player's own folder, two at once.
+  Nothing was lost — the player's files were md5-identical when it was found, each gate restoring what it found — and it was
+  found only by reading failures neither tree had (`docs/reports/IP.md` §9). **The rename the block above describes is made once,
+  when a copy is made, and anything that rewrites the copy's tracked files can undo it** — a checkout, an rsync, a restore —
+  with nothing to say so.
+- **THE ASSERTION IS THE DRIVER's, NOT A HABIT: `lane.sh`, AT THE REPOSITORY's ROOT.** `check` reads the copy's `config/name`
+  and the live name — `config/name` in HEAD's committed `project.godot`, never a typed string — and refuses, exit 1 and one
+  line saying why, a copy named as the live project, a copy that names none, and the repository itself (which runs as the
+  live project on purpose, through `./run_battery.sh`). `make` clones a copy, renames it and checks it; `godot` and `battery`
+  launch nothing until the check passes. **Run the repository's own copy of the script**: it takes the directory it lives in
+  for the repository, so a lane's copy would take the lane for it.
+- **WHAT IT COSTS, MEASURED AT IQ**: one call a launch, about twenty milliseconds (`git show` and two `sed` reads), and the
+  batch's own tooling launches through it — a probe, a trace, a control and a recon each start with the check.
+- **IT IS HELD BY A DRIVE**: `check_iq` §7 runs the driver every battery on made-up copies — named as the live project
+  (refused, and its `godot` door refuses too), named as their own (runs), the repository (refused), unnamed (refused).
+- **WHAT IT CANNOT SEE**: a lane launched by hand, around the driver. The rule is that the driver is the one way a lane runs.
 
 ## STANDING RULE — AN INSTRUMENT PUTS A RUNE DOWN THROUGH `Run.hold_rune`, AND A SCOPE WALK NAMES EVERY BAND (Batch HO §1)
 > **A gate or a suite that needs a rune held that it did not NAME — a rolled one, a granted one, a bought one — hands

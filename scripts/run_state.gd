@@ -4100,6 +4100,14 @@ func load_run() -> bool:
 	if save_version < 10:
 		clear_save()
 		return false
+	# BATCH IQ §4 — A HERO OF A CLASS THIS BUILD DOES NOT HAVE IS A PARTY IT CANNOT FIELD. Every other
+	# key a save brings in that names something gone is dropped where the save is read (below); a hero
+	# cannot be dropped and a class cannot be invented, so this save takes the floor's path above. No
+	# class has ever been removed: it guards the day one is.
+	for m in data["party"]:
+		if not (m is Dictionary) or not HERO_BASE.has(String((m as Dictionary).get("key", ""))):
+			clear_save()
+			return false
 	party = data["party"]
 	items = data["items"]
 	gold = data["gold"]
@@ -4148,6 +4156,16 @@ func load_run() -> bool:
 			member["engines"] = Runes.engine_pouch_for_spec(String(member.get("spec", "")))
 			if String(member.get("spec", "")) != "":
 				member["awakened"] = true
+		# BATCH IQ §4 — A LINEAGE THIS BUILD DOES NOT HAVE is read again off the engines he holds, as
+		# `awaken` read it, or he has none: eight readers take `SPEC_INFO[spec]` on trust (the map's
+		# card first, every fight's spawn). His engines stay as he wore them.
+		var lineage := String(member.get("spec", ""))
+		if lineage != "" and not Classes.SPEC_INFO.has(lineage):
+			member["spec"] = ""
+			for e in member.get("engines", []):
+				if e is Dictionary and Classes.SPEC_INFO.has(Classes.engine_spec(String((e as Dictionary).get("engine", "")))):
+					member["spec"] = Classes.engine_spec(String((e as Dictionary).get("engine", "")))
+					break
 	_migrate_trees()
 	# A pre-AC (v4) save loaded with the honesty flag false — it predated
 	# every tool that could have set it — until the refusal above.
@@ -4166,9 +4184,11 @@ func load_run() -> bool:
 	pending_reward = saved_reward if saved_reward is Dictionary else {}
 	var saved_encounter: Variant = data.get("encounter", {})
 	encounter = saved_encounter if saved_encounter is Dictionary else {}
+	_drop_stale_offer_options()
 	# BATCH CT §3: a v10 save has no offers and loads with none, which is right —
 	# it was written by a build that could not create one.
 	pending_item_offers = data.get("pending_item_offers", [])
+	_drop_stale_save_keys()
 	# BATCH HK §2 — THE BAG, THE PARTY SLOT AND THE FULL-BAG QUEUE. A v13 save has
 	# none of the three and loads with all three empty (the version block in
 	# `save_run`).
@@ -4182,6 +4202,7 @@ func load_run() -> bool:
 	load_notes = []
 	_hand_out_the_bag()
 	_refresh_rune_names()
+	_drop_stale_payload_fields()
 	readout = {}
 	active = true
 	return true
@@ -4189,6 +4210,65 @@ func load_run() -> bool:
 
 func _array_or_empty(v: Variant) -> Array:
 	return v if v is Array else []
+
+
+# ══ BATCH IQ §4 — A REMOVAL OWES THE SAVE A GUARD, NOT A RE-ASK (the designer's) ══
+#
+# **A KEY THAT COMES OFF A SAVE IS A KEY THE CODE DID NOT CHOOSE.** A bargain's offer
+# is rolled once for its encounter and saved with it (GF), so a save frozen on the offer
+# screen carries three modifier ids from the deck it was rolled against — and a removal
+# since (Famine and Cruel Order at IO, the Hungering Dark at IP) leaves an id the deck
+# no longer holds, which the offer screen read straight into `MODIFIERS`.
+# - **An option naming an id the deck does not hold is DROPPED**; the offer is dealt one
+#   fewer, and the next save writes the repair back.
+# - **An offer left with no option is dropped whole** — the degenerate re-ask, and the one
+#   case that needs one: `encounter_offer` rolls it afresh when the screen opens.
+# - **No die is spent and nothing is re-rolled otherwise**: a re-roll on load changes what
+#   the player was shown while he was looking at it, in a path no seed covers.
+# - **The bargain already TAKEN needs nothing**: `battle._active_modifier` asks the deck.
+# **It runs where the save is read, and nowhere a key the code chose passes**: an offer
+# rolled in this session never meets it, so a typo in the deck still fails loudly at the
+# offer screen's read.
+func _drop_stale_offer_options() -> void:
+	var stored: Variant = encounter.get("offer")
+	if not (stored is Array):
+		return
+	var kept: Array = []
+	for option in stored:
+		if option is Dictionary and MODIFIERS.has(String((option as Dictionary).get("modifier", ""))):
+			kept.append(option)
+	if kept.size() == (stored as Array).size():
+		return
+	if kept.is_empty():
+		encounter.erase("offer")
+	else:
+		encounter["offer"] = kept
+
+
+# **AND EVERY OTHER KEY THE RUN SAVE BRINGS IN THAT A TABLE IS READ BY (IQ §4's census).** None of
+# these can be reached by a save that exists today — no item, zone or event has been removed since
+# its field was saved — and each is guarded all the same, because the ruling is about the next
+# removal, not the last: an id the table does not hold is dropped where the save is read.
+# - `pending_item_offers`, which the map's swap offer reads into `ITEM_INFO` on arrival, and the
+#   pouch's own keys, each a slot nothing draws and nothing can empty.
+# - `zone_draw`, which four `ZONE_DEFS` reads take on trust (the map's header first): an unknown
+#   zone takes its slot's first candidate, as an empty draw does, and the zone's name follows.
+# - `pending_event`: an id the event table does not hold opens a screen with no choice and no way
+#   out, so it is cleared and the node stays spent.
+func _drop_stale_save_keys() -> void:
+	pending_item_offers = pending_item_offers.filter(func(id): return ITEM_INFO.has(String(id)))
+	for id in items.keys():
+		if not ITEM_INFO.has(String(id)):
+			items.erase(id)
+	var reseeded := false
+	for slot in mini(zone_draw.size(), SLOT_COUNT):
+		if not ZONE_DEFS.has(String(zone_draw[slot])):
+			zone_draw[slot] = SLOT_POOLS[slot][0]
+			reseeded = true
+	if reseeded:
+		_enter_zone()
+	if pending_event != "" and not Events.ids().has(pending_event):
+		pending_event = ""
 
 
 # ══ BATCH HR §1 — THE MIGRATION: THE BAG IS HANDED OUT ════════════════════════
@@ -4268,6 +4348,40 @@ func _refresh_rune_names() -> int:
 				rd["name"] = nm
 				renamed += 1
 	return renamed
+
+
+# BATCH IQ §4 — A RUNE RIDES THE SAVE WITH THE PAYLOAD IT WAS BUILT WITH (HR §0), and an ability
+# payload's `add` reads the card's own property and adds to it (`Talents.apply_payload`): a property
+# a later build no longer has reads as nothing, and nothing plus a number stops the spawn. So a saved
+# rune's `add` names only properties a card has; one that names a property gone is dropped, and the
+# rest of the payload pays. A payload built fresh from the data is never filtered, so a typo in
+# `data/runes.json` still fails loudly where it is applied.
+func _drop_stale_payload_fields() -> void:
+	var props := {}
+	for p in Ability.new().get_property_list():
+		props[String(p["name"])] = true
+	var lists: Array = [rune_bag, party_runes, pending_rune_drops]
+	for m in party:
+		var md: Dictionary = m
+		lists.append(md.get("runes", []))
+		lists.append(md.get("engines", []))
+		for triple in md.get("rune_candidates", []):
+			lists.append(triple)
+	for lst in lists:
+		for r in lst:
+			if r is Dictionary and (r as Dictionary).get("payload") is Dictionary:
+				_drop_stale_add((r as Dictionary)["payload"], props)
+
+
+func _drop_stale_add(payload: Dictionary, props: Dictionary) -> void:
+	var add: Variant = payload.get("add")
+	if add is Dictionary:
+		for f in (add as Dictionary).keys():
+			if not props.has(String(f)):
+				(add as Dictionary).erase(f)
+	for extra in payload.get("also", []):
+		if extra is Dictionary:
+			_drop_stale_add(extra, props)
 
 
 # Trees are FIXED definitions in code: always swap the saved snapshot for

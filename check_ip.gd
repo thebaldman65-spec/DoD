@@ -398,10 +398,13 @@ func _s0_rulings() -> void:
 	var block := ir.substr(sup, (sup_end if sup_end > 0 else ir.length()) - sup)
 	ok(sup >= 0 and block.contains("A PICK IS A SITE WHEN THE ASSERTION's VERDICT DEPENDS ON WHICH MEMBER WAS PICKED"),
 		"§0.8: the site test does not stand in the superlative block")
-	var top := dn.find("\n## ")
-	var entry := dn.substr(top, dn.find("\n## ", top + 5) - top)
+	# IP's own entry, found by its title: the newest until a later batch wrote above it (re-pointed at IQ — a position pick,
+	# the newest entry, moved off IP's entry the day IQ's went on top; the subject is IP's entry wherever it stands).
+	var top := dn.find("\n## The deck's last cut, and the instrument's own defect")
+	var entry := dn.substr(top, dn.find("\n## ", top + 5) - top) if top >= 0 else ""
 	ok(entry.contains("The Hungering Dark") and entry.contains("0.989") and entry.contains("5,349"),
-		"§0.2: `docs/design-notes.md`'s newest entry does not carry the Dark's shape and IO's figures")
+		"§0.2: `docs/design-notes.md`'s entry on the deck's last cut (%s) does not carry the Dark's shape and IO's figures"
+		% ("found" if top >= 0 else "not found"))
 
 
 # ── §7 — THE ARCHIVE ────────────────────────────────────────────────────────
@@ -414,7 +417,8 @@ func _s7_the_archive() -> void:
 	rx.compile("(?m)^## ARCHIVED AT ([A-Z]{2})")
 	for m in rx.search_all(arch):
 		codes.append(m.get_string(1))
-	ok(not codes.is_empty() and String(codes[0]) == "IP", "§7: the archive's first cut is %s — IP's own goes at the top" % (str(codes[0]) if not codes.is_empty() else "none"))
+	# IP's cut went at the top, and a later batch's goes above it (re-pointed at IQ, whose own gate holds its cut at the top).
+	ok(not codes.is_empty() and String(codes[0]) >= "IP", "§7: the archive's first cut is %s — IP's own or a later batch's goes at the top" % (str(codes[0]) if not codes.is_empty() else "none"))
 	print("    cuts, newest first: %s" % " ".join(PackedStringArray(codes.slice(0, 4))))
 
 

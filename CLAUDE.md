@@ -126,7 +126,7 @@ block stood and never a new file. II's four were struck so at IJ, each report re
 the equality rule travel with their parent. **Eight of the rows are FF §2's**, and they are the
 residue: rules written into this file AFTER the seam was taken, which the seam's own test puts on
 the other side of it. **Every row after those eight was written straight into the reference rather
-than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one, IE's two, II's two, IJ's one, IK's one, IM's three, IN's one, IO's two and IP's two —
+than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one, IE's two, II's two, IJ's one, IK's one, IM's three, IN's one, IO's two, IP's two and IQ's two —
 and GW §2's, written there at GW and given its row only at HX (HV §3e found it missing; `check_hx` §1a now reds on one) —
 and four more are MOVED, FF §2's way: HG–HJ's census and supersession blocks, written back into this file after the seam
 was taken and sent over at HY §4 by the designer's ruling, and II §4's two, the archive practice's first pass — CP §3's
@@ -204,6 +204,8 @@ new block written here):
 | THE STATE ARCHIVE TAKES THE NEWEST CUT FIRST | IO §7 |
 | A CUT INSIDE TWO STANDARD ERRORS IS NOT A MEASUREMENT, IT IS A TIE | IP §0.4 |
 | AN INSTRUMENT'S OWN FIDELITY IS A PREMISE OF EVERY MEASUREMENT IT TAKES | IP §2 |
+| A GUARD ON A KEY A SAVE BRINGS IN IS PROVED BY TWO ARMS | IQ §4 |
+| A SCRATCH COPY ASSERTS ITS OWN PROJECT NAME BEFORE IT LAUNCHES ANYTHING | IQ §7 |
 
 ## THE COMBAT RULES LIVE IN `docs/combat-rules.md` (STANDING, SET AT GR §2, RULED BY THE DESIGNER)
 > **THIS FILE IS STILL THE ONE A BATCH MUST READ. `docs/combat-rules.md` IS A REFERENCE IT POINTS AT,
@@ -3614,6 +3616,18 @@ false of the cache, whose triple rides `member["rune_candidates"]` into the save
   candidate withheld because its engine is not equipped sits out of the answer and stays stored, so
   equipping the engine brings it back; written back, one toggle before an answer would cost the
   cache for good. It is not a reroll either: nothing is drawn.
+- **A REMOVAL OWES THE SAVE A GUARD, NOT A RE-ASK (IQ §4, the designer's) — A KEY THAT COMES OFF A SAVE IS A KEY THE CODE
+  DID NOT CHOOSE, AND EVERY READ OF ONE IS GUARDED.** A bargain's offer is rolled once and saved (GF), and the offer screen
+  read the saved ids straight into `Run.MODIFIERS`, so a save frozen on the offer before a modifier's removal took the
+  screen down. **An option naming an id the deck does not hold is dropped where the save is read, the offer dealt one
+  fewer; an offer left with none is dropped whole** and the screen deals a fresh one — the degenerate re-ask, and the only
+  one. **No die is spent and nothing is re-rolled otherwise**: a re-roll on load changes what the player was shown while he
+  was looking at it, in a path no seed covers. **The guard sits in `Run.load_run`, never at the line that draws**, so a key
+  the code chose that its table lacks still fails where it is read. IQ guarded there every such read its census found that
+  would crash — the pouch and its swap offers, the zone draw, the event in flight, a lineage, a saved rune's `add`, and a
+  class, whose save is refused down the floor's path because a hero cannot be dropped — and **a batch that removes or
+  renames anything a save can name owes the save that guard in the same batch.** A bargain already TAKEN needs nothing:
+  `battle._active_modifier` asks the deck.
 
 ### THE POPULATION IS FIVE, BOTH REMAINING HOLES WERE REACHABLE, AND A REFUSAL IS NOT A REPAIR (FE §2)
 
@@ -3766,7 +3780,7 @@ real screens on both branches and both read the same (`docs/reports/GF.md` §1).
   anything is lost rolls the opening again — the turn order and the enemies' first declared moves — and a quit
   clears the heroes' cooldowns and statuses along with the warband's. Closing either needs the fight itself
   captured, which is GG's project, and a quit already costs health, Mana, items and a death, which is the
-  substance. **Do not queue either as a defect**; `docs/state.md` records both as ACCEPTED with this reason.
+  substance. **Do not queue either as a defect**; `docs/reports/GI.md` §4 records both as ACCEPTED with this reason.
 - **A HERO WHO FELL IS A MEMBER AT 0 HEALTH**, the reading events' `revive_pct` already makes. The spawn
   keeps its floor of 1 for the opening and lays the fallen down once the field is built
   (`_lay_down_the_fallen`), so no stamp reads a hero dead that the opening read alive, and nothing of a

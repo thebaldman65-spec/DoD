@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-10-19 (Batch IP &mdash; the deck's last cut, and the instrument's own defect)</b></p>
+<p align="right"><b>Last updated: 2026-10-19 (Batch IQ &mdash; the three documents, and one crash)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -23,8 +23,8 @@ audit).</p>
 <p>A turn-based four-hero roguelike. The world is being consumed by <b>the Decay</b>; the player
 commands <b>the Untouched</b> — four heroes immune to it — through zone after zone of corrupted
 enemies. Runs are short, buildcrafted, and repeatable: draft four heroes, take each an engine
-rune, route a branching map of encounters, defeat the zone boss, descend deeper. Death ends the run but
-feeds a permanent relic collection (meta-progression). Combat is timeline-initiative with a
+rune, route a branching map of encounters, defeat the zone boss, descend deeper. Death ends the run, but
+what its bosses paid is kept: relic unlocks and talent points banked to the profile (meta-progression). Combat is timeline-initiative with a
 timing skill check on attacks and heals — the player's execution matters as much as their build.</p>
 
 <h2>2. Run Flow</h2>
@@ -34,8 +34,8 @@ timing skill check on attacks and heals — the player's execution matters as mu
 <b>Smith</b>, or <b>Trade</b>, or <b>???</b> — with <b>Offer</b> (three bargains) in front of
 every elite and mini-boss → back to the map → …
 → <b>Mini-boss</b> → … → <b>Zone Boss</b> → next zone (every hero fully restored) →
-<b>end boss</b> → run complete. Talents, runes and picks are all handled on the map's hero
-cards; there is no separate roster screen.</p>
+<b>end boss</b> → run complete. Runes and picks are handled on the map's hero
+cards, and a card opens the hero's sheet, which shows his talents but cannot change them (they are bought between runs); there is no separate roster screen.</p>
 <p>A run ends in one of three ways: <b>completion</b> (the final boss falls), a <b>wipe</b>
 (every hero down), or a <b>forfeit</b> — the player abandons the run from the battle burger
 menu, behind a confirmation. A forfeit ends the run <b>exactly as a wipe does</b> (save
@@ -43,11 +43,11 @@ cleared, heroes reset), so it carries no advantage; the player picks a reason fr
 list, and it is recorded as a forfeit rather than a defeat everywhere it is counted. All
 three route into the same <b>run summary</b> (§11a).</p>
 <ul>
-<li><b>Main menu:</b> New Game, Continue (enabled when a save exists), Relics (collection
+<li><b>Main menu:</b> New Game, Continue (enabled when a save exists), Talents (the build screen), Relics (collection
 viewer), Settings (master volume, fullscreen — persisted to user://settings.cfg), Exit.</li>
 <li><b>Draft:</b> heroes shown as sprite cards; click to select. Selection order = battle
-position (slot order also sets each hero's tint). One of each class — picking a duplicate moves
-it. Up to 3 unlocked relics may be equipped for the run. <b>The Road</b> picks the run's
+position (slot order also sets each hero's tint). One of each class — clicking a chosen hero takes him
+out of the order. Up to 3 unlocked relics may be equipped for the run. <b>The Road</b> picks the run's
 <b>DIFFICULTY RUNG</b>, and it is the run's most consequential choice: beating the END BOSS
 on a rung opens that tier of the meta talent tree for every spec (§7). Saved with the run.
 Also reachable from here: the <b>Talents</b> build screen, because talents are chosen
@@ -62,8 +62,8 @@ ladder. <b>Every scaling number below is provisional and is the designer's to se
 is dealt from severity 1&ndash;3 and its gambles at severity 4</td><td>talent tier 2</td></tr>
 <tr><td><b>3 — Ruin</b></td><td>×1.30</td><td><b>no mild option</b>: its safe option is dealt from severity 3&ndash;4 and its
 gambles at <b>severity 5</b> &mdash; three bargains no other rung deals &mdash; and <b>fixed encounters carry a
-modifier</b> of severity 3&ndash;4 — the mini-boss, the zone bosses and the end boss, which on the other rungs never
-do</td><td>talent tier 3</td></tr>
+modifier</b> of severity 3&ndash;4 — the zone bosses and the end boss, which on the other rungs never
+do; the mini-boss is fought under the bargain taken in front of it</td><td>talent tier 3</td></tr>
 </table>
 <b>Rung 1 is deliberately tuned BELOW the balance every prior measurement was taken at</b>,
 because it is the rung played with zero talents. Rung 2 IS that balance, byte for byte.
@@ -98,8 +98,8 @@ the end boss, untalented, 150 runs a rung, a balanced route and the standard fou
 0%</b> to the third zone boss off the same runs. The end boss stopped none of the runs that reached it &mdash; 140 at rung 1 and 8 at rung 2 &mdash; so counting it moves no rung's figure; at rung 3 no run reached it.
 <br><b>RUNG 1 IS A META-PROGRESSION GATE, NOT AN EASY MODE, AND REMOVING IT IS NOT A BALANCE
 CHANGE (Batch EN §3).</b> Beating the end boss on a rung sets <code>Profile.talent_tier</code> to
-that rung, and tier 0 — a fresh save — opens <b>no talent tier at all</b>: clearing rung 1 is the
-only thing in the game that opens tier 1 of the talent tree. <b>Re-measured at EN on the live
+that rung, and tier 0 — a fresh save — opens <b>no talent tier at all</b>: beating the end boss on
+any rung opens tier 1 of the talent tree, and rung 1 is the cheapest door to it. <b>Re-measured at EN on the live
 tree</b> (untalented, n=30 a rung): completion read <b>97% at rung 1, 3% at rung 2 and 0% at rung
 3</b> before Batch EO, and <b>77% / 0% / 0%</b> after it (rung 1 re-read at n=100: 92% &rarr; 73%). Removing rung 1 would move a player's
 first talent tier from a one-attempt clear to roughly a thirty-attempt one. The relic ladder would survive it — <code>Relics.unlock_random()</code>
@@ -129,7 +129,7 @@ point</b> except a zone boss's, which banks one for each class among the heroes 
 hands every hero a <b>generic ability upgrade, up to three offered</b>; <b>all three zone bosses</b>
 hand every hero an <b>ability pick, up to three offered</b>, and <b>one more ability slot</b>, drawn
 from that hero's spec pool first — and when that is spent, from his CLASS DRAFT POOL, so the
-award can never pay nothing (§6a). The <b>final boss</b> awards a relic unlock and big gold and <i>ends the run</i> — no
+award pays nothing only once he owns every card of that pool he can be offered (§6a). The <b>final boss</b> awards a relic unlock and big gold and <i>ends the run</i> — no
 ability pick, because nothing follows it to use one on. Fallen heroes return after a won
 battle at 20% max HP ("the Untouched refuse to stay down").</li>
 <li><b>Defeat:</b> the run ends, the save is cleared, back to a new draft. Quitting after the last
@@ -148,7 +148,13 @@ boss beaten on its card descends to the next zone, and a merchant a bargain boug
 is visited. The fight itself is never saved, so nothing it pays is paid until it is won. A
 Peddler or a forge left in the middle of a visit is gone. Loading swaps each member's saved tree
 snapshot for the live definition, so balance edits reach a run in flight, and drops any node
-that no longer exists. <b>The runes each hero holds unworn, the bag, the Crest and a drop waiting on
+that no longer exists. <b>Anything else the save names that the game no longer has is dropped where the save is
+read, and nothing is rolled again</b>: a bargain the deck no longer holds leaves its offer one card short, the rest as
+they were, and an offer left with none is dealt afresh; an item the pouch no longer has leaves the pouch and the swap
+queue; a zone that no longer exists takes its slot's first candidate, and its name; an event that no longer exists is
+cleared and the node stays spent; a lineage that no longer exists is read again off the hero's core runes; and a rune's
+change to a card field that no longer exists is dropped, the rest of the rune paying. A save that names a class the game
+no longer has is refused and cleared, as a save too old to walk is. <b>The runes each hero holds unworn, the bag, the Crest and a drop waiting on
 a full holding are saved with the run.</b> A v14 save's bag held every rune nobody wore; it loads with
 each class or core rune in that bag handed to the hero of its class, unworn, in the order the bag held
 them &mdash; past his eight if it must be, nothing dropped &mdash; while a crest rune stays in the bag,
@@ -186,7 +192,7 @@ ability pick, and banks <b>one meta talent point per class</b>.</td></tr>
 encounter (The Hollow Crown), so it can be learned: not drawn from a pool and not composed
 from the budget system. It <b>gains stats AND mechanics with difficulty</b> — one extra
 ability at rung 2 and another at rung 3, and <b>no rung softens it</b>: at rung 1 it has rung 2's
-health and Attack, and rung 3 raises both. It always awards a relic, awards <b>no talent
+health and Attack, and rung 3 raises both. It unlocks a relic while one is left to draw, awards <b>no talent
 points</b>, and beating it is what <b>opens the talent tree's tiers</b>. On the map it is the
 final board's seventeenth column, labelled <b>END BOSS</b>, one step past the zone boss.</td></tr>
 </table>
@@ -236,8 +242,8 @@ would strand a column are never in the bag) rather than by re-rolling.</li>
 <b>no blacksmith, no merchant and no event in the first three columns of the run's first zone</b>
 &mdash; the run's first three nodes teach combat before they offer shopping &mdash; and in no other
 zone's (a run opens with 60 gold and a rune or the smith's first upgrade costs 150, so a trade node
-there is one the heroes cannot use, and an event there pays no gold toward the first one); and
-<b>every entry node reaches at least one elite and at least one trade node</b>. What the first zone
+there is one the heroes cannot use); and
+<b>every entry node reaches at least one elite</b>, and in the run's first zone at least one trade node too. What the first zone
 keeps out of its first three columns stands further along it, every one of them: the zone still
 deals six blacksmiths, five merchants and five events, so those three columns hold fights, and an
 elite in column 2 or 3 on nearly every board.</li>
@@ -261,7 +267,7 @@ map's header already does.</p>
 a boss-tier health pool</b> (every enemy at 1.5&times; its usual maximum, attack untouched — a
 longer fight, not a harder-hitting one). It pays <b>elite gold (80&ndash;100)</b>, and its own spoil is a <b>generic ability
 upgrade</b> (§6a). <b>The offer precedes
-it</b> (§3a). <b>Bosses</b> remain fixed encounters: no modifier, no offer.</p>
+it</b> (§3a). <b>Bosses</b> remain fixed encounters: no offer, and no modifier except on Ruin, which lays one of severity 3&ndash;4 on each (§2).</p>
 <p><b>Elites are the snowball engine.</b> An elite kill drops a
 <b>rune cache</b> for a random hero (three candidates rolled at the kill, one chosen on that
 hero's own draft screen), plus a random consumable and a bigger gold purse (80&ndash;100). Six stand in a
@@ -270,8 +276,8 @@ zone and a route meets two to four of them.</p>
 
 <h3>3a. The offer &mdash; three bargains</h3>
 <p>Before every <b>elite and mini-boss</b> encounter — not plain fights, not bosses — the
-player is shown <b>3 options</b> and picks one. Since Batch BK that is <b>1&ndash;4 a zone</b>
-rather than a fixed four, because elites are routed to rather than placed: measured
+player is shown <b>3 options</b> and picks one. That is <b>1&ndash;7 a zone</b>
+(the mini-boss and every elite the route takes), because elites are routed to rather than placed: measured
 <b>8.4 a run greedy, 8.1 balanced, 3.8 cautious</b> (n=150 each; the count tracks how many
 elites the route reached, and how far the run got). The bargain is an event on the
 road, not a gate in front of every battle. Each option is one <b>modifier</b> plus one
@@ -462,7 +468,7 @@ moment the last is equipped, sold or dropped, and opening the panel does not cle
 beside his <b>Kit</b> button at the card's foot, counting the runes he wears (his core runes and his ordinary ones) of his six
 slots, which opens the same panel; a core rune that pays nothing marks it with &#9675; in amber and its hover says why &mdash; an <b>&#8593;N
 ability-upgrade count</b> in its top corner (hidden at zero; hovering it lists them as "Overpower — Honed", one
-per line — it takes no click of its own), and an unspent-talent badge; <b>clicking a card
+per line — it takes no click of its own); <b>clicking a card
 opens that hero's talent tree and full sheet</b>. <b>Every pick a hero is owed opens by itself
 when the heroes arrive at the map</b> &mdash; after a fight, an event, a shop or a load, never on a return
 from the hero sheet &mdash; one after another, in the order the picks were earned: <b>every pick a hero is owed
@@ -528,7 +534,7 @@ force everywhere but one ability</b> &mdash; ±0.045 Perfect, ±0.16 Good, centr
 1.00s, one press, no narrowing &mdash; and it is the numbers in the table below. <b>The
 Sharpshooter's basic attack is the only thing in the game that overrides it.</b></p>
 <p><b>THE NORMAL CHECK.</b> Every hero action runs one <b>except</b> the two classes of action
-below, which resolve at a fixed <b>Good</b>.</p>
+below and Call of the Wild, which resolve at a fixed <b>Good</b>.</p>
 <ul>
 <li><b>Actions with nothing for the grade to multiply.</b> An ability that deals no damage and
 no Break damage &mdash; a pure buff, a shield, a pure debuff applier &mdash; gets no bar,
@@ -573,7 +579,7 @@ as strongly, the button is dark and its tooltip names what is already standing.<
 casts</b> even when its buff would not improve, because that half is worth the turn on its own.
 <b>Funeral Pyre</b> still smothers a fire for Mana, <b>Stabilize</b> still vents Resonance and
 heals, <b>Battle Shout</b> still pays its Rage, <b>Reckless Abandon</b> still spends the bar, and
-<b>Blessing of Zeal</b> still ticks cooldowns. <b>58 abilities</b> are refusable &mdash; the pure
+<b>Blessing of Zeal</b> still ticks cooldowns. <b>63 abilities</b> are refusable &mdash; the pure
 buffs, wards and marks. One carve-out runs the other way and never refuses: <b>Interpose</b>, whose
 charges are additive.</p>
 <p><b>THE DEFENSIVE CHECK.</b> A timing bar on <b>incoming</b> attacks, for defensive heroes
@@ -676,12 +682,12 @@ ate — "(nature resist -8)" for resistances, "(armor -12)" for armor, and "(WEA
 a Weakness ADDED damage — alongside the parry/block source tags.</li>
 <li><b>Resistances (stat):</b> heroes carry a resistance per element — Fire, Frost,
 Nature, Holy, Shadow, Arcane — working exactly like armor but against that damage type
-(negative = weakness). Hover "Resistances" on the stat page to read them; per-spec values
-are being assigned class by class (all 0% until then).</li>
-<li><b>Miss:</b> 5% base chance (single-target, non-counter only, and never the few strikes an ability deals by its own rule &mdash; Shield Slam, Feint, Precision Strike); a <b>Dazed</b> attacker is
+(negative = weakness). Hover "Resistances" on the stat page to read them; every spec but the
+Swordmaster carries its own values.</li>
+<li><b>Miss:</b> 5% base chance (never an area attack or a counter, and never the few strikes an ability deals by its own rule &mdash; Shield Slam, Feint, Precision Strike); a <b>Dazed</b> attacker is
 20% more likely to miss, a <b>Blinded</b> one 50% more. Attacks against an <b>Elusive</b>
-target (Canis/Aguila) are 25% more likely to miss. AoE never misses/parries, and a blow that hits at random never misses. Multi-hit
-attacks roll miss <i>per strike</i> — a missed hit never cancels the follow-up
+target (Canis/Aguila) are 25% more likely to miss. AoE never misses/parries. Multi-hit,
+random-hit and chosen-target attacks roll miss <i>per strike</i> — a missed hit never cancels the follow-up
 strikes.</li>
 <li><b>Parry:</b> <b>only MELEE attacks can be parried</b> — ranged attackers (Hunter and
 Mage among heroes; Orc Archers and Shamans among enemies) sail past the blade, <b>unless the defender holds the talent tree's Deflection</b>, which lets that hero parry a ranged attack as it would a melee one. Baseline is
@@ -739,10 +745,10 @@ rises about <b>1.2%</b> at a fully-talented loadout and not measurably at all un
 individual blow that does land past a certainty is much larger.</li>
 <li><b>Attacker modifiers:</b> Resonance +1.5% × N(N+1)/2 at N stacks (a COMPOUNDING
 curve, not a per-stack slope — see §5.1); Surge +20%; Empower +25%; Cripple −25%; Hexed −15%;
-Blood Frenzy up to +40%, built from HP missing AND Rage spent; Seasoned Fighter +15% above half HP; the Reaver
+Blood Frenzy up to +40%, built from HP missing AND Rage spent; Seasoned Fighter +30% in the Aggressive stance and −10% in the Defensive one; the Reaver
 +10% for every enemy the hero has felled, and the Skirmisher +200% on the first attack (&sect;6.0); relic bonuses
 (global +10% dragonbone; fire/holy +20% emberheart); Powershot +2% per 1% of the target's
-EMPTY Break bar; Overpower +0.5 per point of target Break; Fireball perfects at 25% of
+Break bar already full; Overpower +0.5 per point of target Break; Fireball perfects at 25% of
 Attack. <b>Neither Arcane Cannon nor Magi's Wrath
 carries a per-stack damage term</b> — the passive compounds, and an ability-side per-stack
 multiplier on top of it would square the escalation. Both keep their Break terms, which
@@ -766,15 +772,15 @@ a talent rank, and a summoned companion has none of the three. <b>Cripple was th
 mattered</b>: two enemy abilities land it, an enemy aims at the whole hero side including the
 companion, and until DU a Crippled companion bit at full strength &mdash; a malus the chip
 promised and the arithmetic refused.</li>
-<li><b>Target modifiers:</b> Exposed +15%; Tracked +25% (&sect;6.0); Seasoned Fighter −15% at or
-below half HP; Arcanist Resonance +0.75% × N(N+1)/2 damage
+<li><b>Target modifiers:</b> Exposed +15%; Tracked +25% (&sect;6.0); Seasoned Fighter −15% in the
+Defensive stance and +10% in the Aggressive one; Arcanist Resonance +0.75% × N(N+1)/2 damage
 <i>taken</i> at N stacks — the same compounding curve at half the step, and uncapped
 (the glass-cannon risk, and the whole bargain); Stabilized −10% per stack
 consumed.</li>
 <li><b>Armor:</b> flat % damage reduction. Fortify +10%; Broken ×0.7; Sunder ×0.65; Armor
 Penetration ignores a fraction.</li>
 <li><b>Damage types (7):</b> physical, fire, frost, arcane, nature, shadow, holy. Every enemy
-kind carries a deliberate resist AND vulnerability profile (see the bestiary §9) — themes
+kind but three carries a deliberate resist AND vulnerability profile (the Orc Raider only resists; the Orc Whelp and the Orc Slinger are only soft; see the bestiary §9) — themes
 inherit them, so a warband reads strong against some damage types and soft to others, and
 the theme name carries tactical information.</li>
 <li><b>Vulnerabilities:</b> a unit can be soft to a damage type — a negative resist, typically
@@ -806,8 +812,8 @@ We Do Not Break node cuts it 20% for every hero; Bulwark of Fortitude negates it
 (Wildstrikes 35 at 50% per target; Hack and Slash 25 at 50% per hit). At 100 the target
 <b>bleeds out for 20% max HP</b> and the meter resets. <b>Bleedout damage ignores armor</b> entirely.</li>
 <li><b>Burn:</b> 6% of the applier's Attack (snapshotted when it lands; ≈6 at 100 Atk) at
-the start of the afflicted unit's turn; ticks can crit using the caster's snapshotted crit
-chance. <b>Burn counts as fire damage</b> — fire resists reduce the tick and fire
+the start of the afflicted unit's turn; ticks never crit.
+<b>Burn counts as fire damage</b> — fire resists reduce the tick and fire
 vulnerability raises it, exactly as nature does for Poison. <b>Reapplication extends
 duration</b> — every fresh Burn ADDS its applied turns to the running timer (a 3-turn
 Fireball on a burning target = +3 turns, announced with a "Burn +N turns" float).</li>
@@ -815,8 +821,9 @@ Fireball on a burning target = +3 turns, announced with a "Burn +N turns" float)
 start of the afflicted unit's turn, skipping the first after it lands.
 <b>Poison counts as nature damage</b> — nature resists reduce the tick (and nature
 vulnerability raises it). Stacks additively with no cap; every new application adds a stack
-AND refreshes the timer. Applied by Orc Archers' Poison Arrow (3 turns), the Withered Warden's
-Roots of Wrath (3 turns), and the Survivalist's Trapper passive (5 turns).</li>
+AND refreshes the timer. Applied by four enemy abilities — Orc Archers' Poison Arrow, the Rot Behemoth's
+Rotting Fist and the Withered Warden's Roots of Wrath (3 turns each) and the Hollow Crown's The Long Dark (4 turns) —
+by every Hunter's Snare Trap (4 turns), and by the Survivalist's Trapper passive (5 turns) and his cards.</li>
 <li><b>Renewal</b> (15% of the caster's max health, snapshotted at cast) and
 <b>Focus (status)</b> +10 Mana at turn start.</li>
 </ul>
@@ -948,18 +955,18 @@ the Devout recovers 3% max Mana, and the Devout's own maximum health rises 3% of
 for the rest of the battle (he is healed for that amount too).
 <b>The Devout carries Faith of his own, and his count never releases</b> — it holds at 8,
 paying him the same mitigation and damage it pays everyone else. The chip counts current
-stacks ("F3") and states the peak beside them; it stays up at F0 after a release, because
+stacks ("Fa3") and its tooltip states the peak; it stays up at Fa0 after a release, because
 the peak is still paying. The peak is per-battle and is zeroed when the next fight
 opens.</td></tr>
 <tr><td>Consecrated Ground</td><td>Takes 15% less damage and reflects 10% of damage
-taken to the attacker (Devout ability, 2–3 turns).</td></tr>
+taken to the attacker (Devout ability, 3 turns).</td></tr>
 <tr><td>Blessing of Zeal</td><td>+15% damage dealt; Faith gain doubled (Devout ability,
 4 turns).</td></tr>
 <tr><td>Bulwark of Fortitude</td><td>NO Break damage taken, armor increased by 50%, and
 10% max health regained each turn; the cast itself heals 5% at once (Devout ability,
 3 turns — every HERO, companions excluded).</td></tr>
-<tr><td>Holy Capacitor</td><td>Overhealing banked by the Rune of the Triage Ward, shown
-with a live counter; released by the next Heal.</td></tr>
+<tr><td>Holy Capacitor</td><td>Overhealing banked for the next Heal, shown
+with a live counter, and released by it (nothing in the game applies it at present).</td></tr>
 <tr><td>Intercession</td><td>The next lethal blow or tick against ANY hero is refused — they
 survive at 1 HP and the Cleric loses 1 Mercy. She must be holding one when it lands
 (Holy ability, 2 turns).</td></tr>
@@ -979,11 +986,10 @@ Cleansing Rite could take it &mdash; but a Mage's Dispel never can, which keeps 
 stripping their own work back off.</td></tr>
 <tr><td>Retaliation</td><td>Counters attackers with a basic strike.</td></tr>
 <tr><td>Parry Up</td><td>Raised parry chance for 2 turns, from a perfect Guard Change:
-+10% base and +5% more with the Rune of the Still
-Wrist. The chip carries the live number, which is exactly what the parry roll reads.</td></tr>
++10%. The chip carries the live number, which is exactly what the parry roll reads.</td></tr>
 <tr><td>Unity</td><td>The damage of every blow, recoil and bleedout is split evenly among living heroes (BD is
 not).</td></tr>
-<tr><td>Devoutness</td><td>Takes 20% less BD (battle-long, on every hero, from the talent
+<tr><td>Devotion Aura</td><td>Takes 20% less BD (battle-long, on every hero, from the talent
 tree's We Do Not Break node).</td></tr>
 <tr><td>Tripwire</td><td>Retaliates against every attacking melee enemy for 75% of their
 attack's damage.</td></tr>
@@ -993,11 +999,11 @@ attack's damage.</td></tr>
 damage per stack plus the companion's gift, and the Pack Bond boon grows 20% a stack. <b>Past 8 the meter CONVERTS</b> — further stacks stop adding to the strike step and feed
 the boon instead, until the boon reaches its limit, and the chip says so at every depth. Lost when the companion dies.</td></tr>
 <tr><td>Marked</td><td>Mark of the Hunt: the Beastmaster and their companion deal +25% damage
-to this enemy and their strikes on it restore the hunter's Mana (5 turns; kill resets the
+to this enemy and their strikes on it restore the hunter's Mana (7 turns; kill resets the
 mark's cooldown).</td></tr>
 <tr><td>Primal Surge</td><td>The Beastmaster spent the companion's Loyalty: +10% damage dealt
 (1 turn per stack spent).</td></tr>
-<tr><td>Vengeance</td><td>The Beastmaster's companion died: +30% damage and its Pack Bond boon
+<tr><td>Vengeance</td><td>The Beastmaster's companion died: its Pack Bond boon
 lives on at FULL strength for the rest of the battle
 (nothing in the game applies it at present).</td></tr>
 <tr><td>Held Breath</td><td>The Hunter's next attack is a GUARANTEED critical and
@@ -1014,7 +1020,7 @@ its timer (4 turns, on the Survivalist).</td></tr>
 <p>Statuses tick down at the start of the affected unit's turn; negative durations last the
 whole battle.</p>
 <p><b>Some chips on a nameplate are not statuses.</b> A chip that shows a figure the hero already holds &mdash; Iron Will,
-Refuse Death's <i>UNDYING</i>, Eagle Eyes, Loyalty and Aper's Rhythm on a companion, Faith, Feint's and Berserk's banked
+Undying Rage's <i>UNDYING</i>, Eagle Eyes, Loyalty and Aper's Rhythm on a companion, Faith, Feint's and Berserk's banked
 charges, Deadfall, and the dormant Crushing Blows, Melt Armor, Endurance, Scent of Blood, Deathwish, Killing Edge, Bracing,
 Waiting Guard, Enraged and Holy Capacitor &mdash; is <b>drawn</b> on the plate, after the core rune's &#9733; chip and before the
 statuses: it never ticks down, no cleanse or Dispel takes it, nothing that counts statuses or debuffs counts it, and it is
@@ -1035,7 +1041,7 @@ and the rest &mdash; so joining never costs breadth.</li>
 that tick's own half.</li>
 <li><b>Its clock is the shorter ingredient's.</b> When that one runs out, or a card consumes an
 ingredient (Detonation eats the Burn), the other goes back on the bar alone with what it had
-left. A cleanse &mdash; Dispel One, Unburden, the Cleansing Draught &mdash; takes
+left. A cleanse &mdash; Dispel, Unburden, the Cleansing Draught &mdash; takes
 the whole Rupture as one status. <b>An enemy mender's Cleansing Rite does not</b>: it thaws the chill inside one
 stack at a time, as it thaws any chill, so the Rupture stands until that chill's last stack goes and the Burn
 then stands alone.</li>
@@ -1141,7 +1147,7 @@ text. No banner text appears at the top of the battle.</p>
 <h2>5. Heroes</h2>
 <p><b>All ability damage is a % of the user's Attack</b> (see §4.3); the flat numbers in
 the kit lists below are the values at the class/spec base Attack, before node scaling.
-Shields stay flat, and <b>ability healing scales off the CASTER's max health</b> (Heal 40%,
+<b>Ability shields and healing scale off the CASTER's max health</b> (Nexus Ward 20%, Divine Shield 35%, Heal 40%,
 Renewal 15%/turn, Hymn of Hope reads each target's own health) — a beefier healer heals
 harder.</p>
 <p>All four classes are drafted every run (one of each). Sprites currently share the Soldier
@@ -1204,8 +1210,8 @@ spec has the bar, and the meter stops at 99. Three clauses:
 <li><b>No practical ceiling.</b> +1 per damaging cast, +2 on a crit (parry counters grant
 nothing), and <b>it does not decay</b> — nothing resets it before the battle ends, and only
 the three earned cards below take it away. Overcharge moves the
-build RATE, never a cap (once per battle, gain half your current stacks — all of them on a
-perfect cast).</li>
+build RATE, never a cap (once per battle, gain as many stacks as you already
+hold).</li>
 <li><b>The curve compounds.</b> At N stacks the damage bonus is <b>1.5% ×
 N(N+1)/2</b> and the damage <i>taken</i> penalty is <b>0.75% × N(N+1)/2</b> — the same
 triangular curve at half the step. Both ends uncapped, and nothing modifies either
@@ -1321,8 +1327,8 @@ of the next fight; with every engine slot full, one he holds can be swapped for 
 engine is a legal state</b>: his class basic and class kit, the abilities he has drafted and his
 runes still fight, and nothing an engine grants is there. A card he has drafted or earned is never
 lost when an engine is dropped. <b>A drop changes the next fight, never the one in
-progress.</b> The pouch lists his slotted engine runes and the engine runes he holds unworn, each with
-its engine's rule, above his other runes, in one list that scrolls; its
+progress.</b> The pouch is one list that scrolls, in three sections &mdash; <b>CORE</b> (his engine slots, an empty one drawn
+too), <b>WORN</b> (his ordinary slots) and <b>HELD, NOT WORN</b> (engine runes first) &mdash; each engine rune with its engine's rule; its
 <b>Close</b> button sits below that list, where no rule's length can move it.</li>
 <li><b>A card that cannot be cast without its engine sits out while the engine is gone.</b> Seventeen
 drafted or earned cards are refused on every board by a hero who does not hold their engine, and
@@ -1383,7 +1389,7 @@ the kit preview and the roll call. The pairing is allowed and is the player's to
 Rune of the Beastmaster (core) pays beside it</b>: Mark of the Hunt, whose hunter's half it pays, sits out there too.</li>
 <li><b>The enabler travels.</b> An engine's enablers — the abilities it cannot work without, the
 "needs" column of the table in §6b — come with the rune to any hero of the class who holds it, in
-either engine slot, sit <b>outside the ability slot count</b>, and leave when it leaves: Overburn
+any of his engine slots, sit <b>outside the ability slot count</b>, and leave when it leaves: Overburn
 brings Flamewave, Glacial Hold Razor Ice, Blood Frenzy Bloodlust,
 Conviction Divine Shield, Wrath of the Old Gods Hex of Ruin and the stances Guard Change. <b>Pack Bond brings nothing</b>: every
 Hunter but the Sharpshooter summons a companion from his class kit (&sect;5.2), and Pack Bond is what
@@ -1428,7 +1434,7 @@ rule engine has no lineage, and opens with his class's basic attack and his clas
 <p><b>The three class engines</b> carry no spec: <b>Momentum</b> makes a Warrior's later turns in a
 fight quicker for every exchange — a turn that deals damage and is met by the fight; <b>Channel</b>
 adds to a Mage's non-physical damage for every 42 Mana spent in a fight; <b>Sanctity</b> lengthens
-every status a Cleric applies for every 13 statuses landing on or leaving a unit in a fight (a chip drawn on a nameplate
+every status a Cleric applies for every 13 statuses landing on a unit or removed from one in a fight (a status running out does not count; a chip drawn on a nameplate
 is not a status, and counts toward none), to five steps.</p>
 <p><b>The nine rule engines</b> carry no spec either, and each is a rule rather than a meter. <b>The
 engine names in the table are internal: a player sees only the rune's name</b>, and every chip, card,
@@ -1476,7 +1482,7 @@ health and sheds one harmful effect.</li>
 </ul>
 
 <h3>6a. Ability progression</h3>
-<p>Every hero <b>opens a run with its core attack, its class kit's three abilities (&sect;5.2) and
+<p>Every hero <b>opens a run with its core attack, its class kit (&sect;5.2: three abilities, or two for a hero holding the Rune of the Sharpshooter (core)) and
 the enablers of every engine rune it holds</b> (&sect;6.0) — which sit outside the slot count (see
 the protected-core table in §6b) — and <b>earns one boss pick from each of the three zone
 bosses</b>. The end boss awards none: the run is over and the pick would be dead value.
@@ -1493,12 +1499,12 @@ to 52 cards of the hero's class. Spec boss pools are 2&ndash;5 deep, so an offer
 rather than padding &mdash; a hero deep into its pool may be offered two. The pick is resolved on that hero's map card, and the triple is rolled the
 moment the award drops — re-opening the card never rerolls it. <b>A hero holding the Rune of the
 Sharpshooter is never offered a card that needs a companion from his boss pool</b> (Bestial Wrath,
-Spirit Bond, Primal Surge), because that rune dismisses the pet; a triple rolled before he equipped it
+Spirit Bond, Primal Surge, Mark of the Hunt), because that rune dismisses the pet; a triple rolled before he equipped it
 holds those cards back while it is equipped, says so on the card, and offers them again if he
 unequips it. <b>And a card that reads an engine he has not equipped is not offered from his boss pool
 either</b> &mdash; Lunge (the Rune of the Swordmaster (core)), Shatter (the Rune of the Cryomancer (core)), Overcharge and
-Stabilize (the Rune of the Arcanist (core)), Divine Plea (the Rune of the Holy (core)), and Primal Surge and Mark of the
-Hunt (the Rune of the Beastmaster (core)). The boss pool is his lineage's, and the lineage stays with him after he
+Stabilize (the Rune of the Arcanist (core)), Divine Plea (the Rune of the Holy (core)), Primal Surge (the Rune of the Beastmaster (core)) and Venom
+Coating (the Rune of the Survivalist (core)). The boss pool is his lineage's, and the lineage stays with him after he
 unequips the engine it was chosen with, so the offer asks what he holds at the offer; a triple rolled while
 the engine was equipped holds the card back, names the rune that brings it back, and offers it again once
 that rune is equipped.</p>
@@ -1548,7 +1554,7 @@ The <b>&#9670;</b> marks only a pick still to make, and nothing else in the game
 a thing a hero wears that is paying nothing &mdash; on his card's Runes button and on a rune slot. A run awards three
 upgrades to every hero, twelve across the four, and before these surfaces existed all twelve were discoverable
 only by hovering ability buttons mid-fight.</p>
-<p><b>The SPEC pool</b> holds what only that spec can earn, among them its own vaulted ones. The
+<p><b>The SPEC pool</b> is what the lineage's zone bosses offer, among them its own vaulted ones; sixteen cards across the twelve pools are also on a shelf of their class's draft pool. The
 "Opens with" column is what the spec's engine rune brings beyond the class basic and class kit
 every hero holds (&sect;6.0); the lineage's other cards are drafted from its shelf of the class
 draft pool (&sect;6b).</p>
@@ -1556,7 +1562,7 @@ draft pool (&sect;6b).</p>
 <tr><th>Spec</th><th>Opens with</th><th>Spec pool (earnable)</th></tr>
 <tr><td><b>Berserker</b></td><td>Bloodlust</td><td>Blood Price, Battle Shout, Rampage</td></tr>
 <tr><td><b>Warden</b></td><td>—</td><td>War Stomp, Interpose, Hold the Line, Retaliation</td></tr>
-<tr><td><b>Swordmaster</b></td><td>—</td><td>Sweeping Strikes, Shatterpoint, Lunge, Execute</td></tr>
+<tr><td><b>Swordmaster</b></td><td>Guard Change</td><td>Sweeping Strikes, Shatterpoint, Lunge, Execute</td></tr>
 <tr><td><b>Pyromancer</b></td><td>Flamewave</td><td>Immolate, Firestorm, Ashes of Al'ar</td></tr>
 <tr><td><b>Cryomancer</b></td><td>Razor Ice</td><td>Rime, Shatter, Ashes of Al'ar</td></tr>
 <tr><td><b>Arcanist</b></td><td>—</td><td>Overcharge, Magi's Wrath, Stabilize, Ashes of Al'ar</td></tr>
@@ -1574,11 +1580,11 @@ three cards. <b>Batch AN retired that draw</b> — abilities are spec-locked —
 deleted the list</b>. It had held <b>seven finished abilities named in no other pool</b>, so they
 were unreachable by any run while every audit in the project kept measuring them; DY re-homed all
 seven into live draft and boss pools first and removed the container behind them.
-<b>The curation rule the list carried is not lost</b> — it governs the CLASS-WIDE DRAFT pools in
-§6b, which are live: an ability offered class-wide has to FUNCTION for a sibling, so anything
+<b>The curation rule the list carried is not lost</b> — it governs each class's CLASS-WIDE shelf in
+§6b: an ability authored there has to FUNCTION for a sibling, so anything
 costing a spec-exclusive resource (Mercy, Faith), reading a passive the taker will not have (Burn,
 Resonance, Loyalty, a living companion, the Swordmaster's stance), or carrying a spec's signature
-identity (Kill Command, Hex of Ruin) stays spec-only.</p>
+identity (Kill Command, Hex of Ruin) stays off it.</p>
 <p><b>A ZONE-BOSS AWARD ALWAYS PAYS, AND UNTIL BATCH EA IT COULD PAY NOTHING AT
 ALL.</b> A boss offer is the hero's spec pool minus what they already hold, and
 <b>both channels write the same earned list</b> — so a card taken in the draft
@@ -1587,9 +1593,9 @@ that way, and <b>the Devout is the sharp case</b>: his boss pool is two cards
 and both are also draftable, so all three of his awards could come up empty.
 <b>What happened then was not a small reward, it was silence</b> — the hero was
 skipped and the victory card did not name them. The award now falls back to a
-card from <b>that hero's own spec DRAFT pool that they do not already hold</b>,
+card from <b>his class's one draft pool (§6b) that he does not already hold and can be offered</b>,
 offered three at a time and announced exactly like any other award. It stays
-spec-locked, so nothing arrives that a sibling spec alone could reach.</p>
+class-locked: nothing arrives from another class.</p>
 <p><b>THERE WERE THREE TIERS UNTIL BATCH GP, AND THE POOL MERGE MADE THEM TWO.</b> Batch EA
 chose the spec-draft card <i>because</i> that pool could not empty: a hero carried at most
 four earned abilities (three for the Holy Cleric) against draft pools of ten to thirteen, so
@@ -1598,8 +1604,8 @@ later</b> — the cap became a ladder to ten, and a benched card is now KEPT, so
 holds is every card he has ever taken rather than every card he currently carries. The floor
 fell to three, and to two for the Occultist. Batch EH answered that with a third tier reading
 the class-wide pool; <b>Batch GP answered it with depth instead</b>, because the merge makes the
-second tier the hero's whole class pool — 43 for the Warrior, 51 for the Mage, 43 for the Cleric,
-41 for the Hunter — which holds everything both old tiers held. It is class-locked rather than
+second tier the hero's whole class pool — 42 for the Warrior, 52 for the Mage, 43 for the Cleric,
+42 for the Hunter — which holds everything both old tiers held. It is class-locked rather than
 spec-locked, which is the one thing the merge gives up, and it is not a re-opened class DRAW:
 it reads the live, curated shelves of §6b, not the 61-entry container Batch DY deleted.
 <b>What it does not do is make the chain unemptiable.</b> No sibling drains it, because every
@@ -1660,7 +1666,7 @@ it on the same screen</b>, and so is <b>every other pick he is owed</b>: a scree
 section for a draft <i>and</i> for a zone boss's ability &mdash; two offers side by side in one section, each saying
 where it came from (<i>from the elite</i>, <i>from an event</i>, <i>from the zone boss</i>) &mdash; an
 <b>UPGRADES</b> section for a mini-boss's upgrade, naming each choice <i>card: upgrade</i> with what the upgrade
-does and the figures it moves on that card (<i>Damage: 35% &rarr; 52%</i>), and a <b>RUNES</b> section for a
+does and the figures it moves on that card (<i>Damage: 35% &rarr; 53%</i>), and a <b>RUNES</b> section for a
 cache, each only when it is owed, so a bargain's rune comes alone. Its title names what is on it &mdash;
 <b>THE DRAFT</b> whenever the draft is on it, and otherwise the kinds it holds, joined &mdash; <b>THE ABILITY</b>
 (a zone boss's), <b>THE UPGRADE</b> and <b>THE CACHE</b>, as in <b>THE ABILITY, THE UPGRADE AND THE CACHE</b> &mdash;
@@ -1706,14 +1712,14 @@ sit its <b>damage</b> (as a share of Attack, with its school), its <b>Break dama
 <b>cooldown</b>, its <b>initiative cost</b> and its <b>Perfect bonus</b>. The draft screen and
 the glossary are the two surfaces
 <a href="text-standard.html">the text standard</a> allows arithmetic on, and this is the screen
-whose whole purpose is comparing cards — 30 of the 66 damaging abilities never state their
+whose whole purpose is comparing cards — many damaging abilities never state their
 damage in prose, so before this they drafted blind. A zone boss's cards show the same. <b>The bench step on
 the same screen deliberately does NOT do this</b>: it is read in the same breath as a fight, so the
 no-arithmetic tier binds it, and it shows the description alone.</li>
 </ul>
 <p>This is <b>four times as much drafting</b> as one hero per elite. <b>Since Batch GP every hero
-drafts from ONE pool, his class's</b> — 43 for the Warrior, 51 for the Mage, 43 for the Cleric and
-41 for the Hunter — where a lineage hero drew from 13 to 18 before and a hero who took a spine drew
+drafts from ONE pool, his class's</b> — 42 for the Warrior, 52 for the Mage, 43 for the Cleric and
+42 for the Hunter — where a lineage hero drew from 13 to 18 before and a hero who took a spine drew
 from 3 to 6. A run offers far more cards than a hero can carry, so the cap is what the draft is
 about. That is the intended shape: constant, meaningful decisions.</p>
 
@@ -1843,7 +1849,7 @@ below is part of one pool, its class's.</p>
 cards plus <b>20 class-wide</b> ones &mdash; and since Batch GP those are <b>four pools of 42, 52,
 43 and 42</b>; the Hunter's gained Tripwire when Summon Companion took its class-kit slot, Guard
 Change is the Rune of the Swordmaster (core)'s rather than the Warrior's pool's, and the Mage's gained
-Smoulder, on the Pyromancer's shelf. The class kits (&sect;5.2) hold five cards that are guaranteed rather than drawn, and
+Smoulder, on the Pyromancer's shelf. The class kits (&sect;5.2) hold twelve cards, three a class, that are guaranteed rather than drawn, and
 <b>a hero with no lineage draws the whole class pool</b> where he drew his class-wide shelf alone
 before &mdash; three cards for a Cleric, forty-three now.
 <b>BATCH DY EMPTIED THE VAULT AND IS WHAT TOOK IT PAST 149, WITHOUT AUTHORING A CARD.</b> Seven
@@ -1854,7 +1860,7 @@ class pool, and <b>DAWNBREAK</b> and <b>SANCTUARY</b> to the Holy Cleric's zone-
 which had held one card against three awards. Every one already had its handler, its card text and
 its Perfect; not a line of new mechanics was written for any of them.
 <b>THE CLASS HALF IS NO LONGER A FLAT MULTIPLE</b> — the Warrior and the Hunter draw six, the Mage five and the Cleric three —
-and <b>the shallowest spec pool in the game is ELEVEN</b>, the Warden's and the Survivalist's, where
+and <b>the shallowest spec pool in the game is ELEVEN</b>, the Warden's, where
 the Warden's nine had been the floor.
 <b>BATCH DS CLOSED THE HUNTER CLASS GAP AND IS WHAT TOOK IT PAST 143.</b> Its three specs held
 the three <b>shallowest pools in the game</b> (eight apiece), received <b>none</b> of DO&#x27;s
@@ -1876,8 +1882,9 @@ eight and nine specs were deeper, the Beastmaster, Sharpshooter and Survivalist 
 eight because their trees granted nothing to move. <b>DS and DY have since lifted the floor to
 TEN</b>; it stands at ELEVEN.
 <b>Nothing is owed.</b> A hero who has refused his way down can still be offered two cards or
-one: that is the ledger of refusals working, not the draft misbehaving, and it is now the only
-thing that can make an offer fill short.</p>
+one: that is the ledger of refusals working, not the draft misbehaving. An offer is dealt from his
+class pool less what he holds, what he has refused and what the engine gate keeps from him, and
+nothing else makes it fill short.</p>
 <p><b>EIGHT CARDS NAME A PARTNER SPEC, AND THAT IS THE ONLY PLACE THE ROSTER IS DRAFTED
 FOR.</b> Every card in the draft was authored inside its own spec, so for most of the draft's
 life the pools never referenced each other and a draft was a decision about <i>one hero</i>
@@ -1892,15 +1899,15 @@ named partner is dead most of the time.</p>
 <table>
 <tr><th>Card</th><th>Clause</th><th>What it reads, and who feeds it</th></tr>
 <tr><td><b>Choking Smoke</b> (Survivalist)</td><td>Also sets every enemy Burning 2 turns</td><td>Widens his own Trapper breadth (<code>burn</code> is in <code>DEBUFF_IDS</code>) <i>and</i> arms the <b>Pyromancer's</b> Overburn and Funeral Pyre, which read and consume Burn</td></tr>
-<tr><td><b>Harvest</b> (Survivalist)</td><td>Up to 18% of Attack a status, rising with the share an ally opened</td><td>Reads the <code>src_name</code> every status has carried since Batch W. <b>The hub stated outright</b> &mdash; he is paid for the allies working a target rather than for doing it alone. <b>ALLY means heroes AND companions (Batch DJ)</b>: the loop resolves against <code>heroes + companions</code>, so a wound <b>Aguila</b> opened pays the same bonus a hero&rsquo;s does. <b>A fallen hero&rsquo;s wound still pays</b> &mdash; neither half is filtered on <code>dead</code>, because he still opened it</td></tr>
+<tr><td><b>Harvest</b> (Survivalist)</td><td>Up to 18% of Attack a status, rising with the share an ally opened</td><td>Reads the <code>src_name</code> a status carries when the site that laid it names its caster; an unstamped status counts as no ally&rsquo;s. <b>The hub stated outright</b> &mdash; he is paid for the allies working a target rather than for doing it alone. <b>ALLY means heroes AND companions (Batch DJ)</b>: the loop resolves against <code>heroes + companions</code>, so a wound <b>Aguila</b> opened pays the same bonus a hero&rsquo;s does. <b>A fallen hero&rsquo;s wound still pays</b> &mdash; neither half is filtered on <code>dead</code>, because he still opened it</td></tr>
 <tr><td><b>Emberkeep</b> (Pyromancer)</td><td>Doubles Burn <i>any hero</i> applies, not only his own</td><td>He becomes the heroes' Burn amplifier — the consuming end of Choking Smoke above. Guarded on <code>src.is_hero</code>, so an enemy's fire still lands at its own length</td></tr>
 <tr><td><b>Firedraw</b> (Pyromancer)</td><td>Draws 9 turns, not 6, from an enemy carrying a debuff other than Burn</td><td>Reads the curated <code>DEBUFF_IDS</code> list minus his own vocabulary — a field the heroes have already worked gives up its fire faster</td></tr>
 <tr><td><b>Breaking Darkness</b> (Occultist)</td><td>Names its partners in the card text. <b>No mechanical change</b></td><td>The combo already existed and was found by accident: the <b>Sharpshooter's</b> Fault Line and the <b>Warden's</b> Turn the Blade both land harder under it. Discoverability, not a buff</td></tr>
 <tr><td><b>Suffering</b> (Occultist)</td><td>3 Ruin a turn when cast on a Broken enemy, not 2</td><td>Ties his Madness gate to <i>whoever is generating Break</i> — and CR made hard control Broken-gated, so Broken is already the axis the heroes work toward</td></tr>
-<tr><td><b>Savage Sweep</b> (Beastmaster)</td><td>The run opens 12 Bleed on each enemy, whichever companion runs it</td><td>Feeds the <b>Berserker's</b> Battle Shout (which pays per 20 of the warband's bleed buildup) and the Survivalist's Trapper. Canis already bled; <b>Ursus and Aguila are the gap this closes</b></td></tr>
+<tr><td><b>Savage Sweep</b> (Beastmaster)</td><td>The run opens 12 Bleed on each of the three lowest-health enemies, whichever companion runs it</td><td>Feeds the <b>Berserker's</b> Battle Shout (which pays per 20 of the warband's bleed buildup) and the Survivalist's Trapper. Canis already bled; <b>Ursus and Aguila are the gap this closes</b></td></tr>
 <tr><td><b>Shared Grief</b> (Holy)</td><td>+1 Mercy for every other hero already below half health</td><td><b>The best coupling in the batch, and the reason is structural.</b> Mercy accrues only on the <i>crossing</i> below half, so she is starved when the heroes are healthy — and the <b>Berserker's</b> entire Blood Frenzy band lives down there on purpose. The two specs whose engines are inverted become each other's fuel</td></tr>
 </table>
-<p><b>What the nine deliberately do not do.</b> No new abilities (the pools were complete when DH
+<p><b>What the eight deliberately do not do.</b> No new abilities (the pools were complete when DH
 wrote them and are complete at 179 now
 and a synergy card per spec would be twelve more), <b>no new statuses</b> (every coupling uses
 vocabulary already in the game), <b>no two-way pairs</b> (each clause runs one way into a hub,
@@ -1936,8 +1943,8 @@ beside. A card that appears in nobody's build plan is a card that fills a slot.<
 <tr><td colspan="4"><b>Berserker</b> — <i>how do you get low, and what do you do with the blood</i></td></tr>
 <tr><td><b>Blood Offering</b></td><td>0 Rage, 1.5, 3cd, self</td><td>He loses <b>20% of his CURRENT health</b> and gains 60 Rage. Because it is a share of what is left rather than of his maximum, it can never take him below 1 — and it costs less the lower he is.</td><td>Buying the frenzy band on purpose. Blood Frenzy pays for missing health and he has never controlled when he gets there.</td></tr>
 <tr><td><b>Gut Rip</b></td><td>30 Rage, 2.5, 4cd, one enemy</td><td><b>Bleeds the target out at once</b> whatever its buildup, plus 6% of Attack for every 10 points consumed (Perfect: 9%). It fires the real bleedout, so everything that answers a bleedout answers it.</td><td>The bleedout stops being the enemy's clock.</td></tr>
-<tr><td><b>Reckless Abandon</b></td><td>0 Rage, 1.5, 4cd, self</td><td>He spends <b>ALL his Rage</b>. For 3 turns he deals <b>+2% damage for every 10 points SPENT</b> (Perfect: 3%). A full 100-Rage bar is +20%; a half-empty one is half that, because it scales off what was actually spent and not off his maximum. At zero Rage it is refused outright rather than paying nothing.</td><td>The dump. Rage is spent in 20-to-35 point sips and nothing ever asked what a full bar is worth at once — and the three turns with nothing left to cast <b>are</b> the price.<br><b>Builds with:</b> <b>Blood Offering</b> (40 Rage out of his own health, so he can pay for the dump on demand).</td></tr>
-<tr><td><b>Berserk</b></td><td>25 Rage, 1.0, 5cd, self</td><td><b>His next 4 STRIKES each land twice</b>, and he <b>takes 30% more damage for 3 turns</b>.<br><b>Two different clocks:</b> the strikes are <b>charges</b> and wait until spent; the 30% is an ordinary 3-turn window.<br><b>They count HITS, not casts</b>, so a three-hit ability such as Hack and Slash spends the whole bank in one cast and lands six blows.</td><td>The risk dial at maximum, and <b>the drawback is the payoff</b> — Blood Frenzy scales his damage with missing health, so taking 30% more drives him into his own power band.<br><b>Builds with:</b> <b>Hack and Slash</b> and <b>Wildstrikes</b> (multi-hit and area blows that empty the bank at once, every doubled strike carrying his bleed buildup into <b>Gut Rip</b> and <b>Blood Debt</b>), and with the talent tree's <b>Undying Rage</b>, which pays again once the risk has taken him low.</td></tr>
+<tr><td><b>Reckless Abandon</b></td><td>0 Rage, 1.5, 4cd, self</td><td>He spends <b>ALL his Rage</b>. For 3 turns he deals <b>+2% damage for every 10 points SPENT</b> (Perfect: 3%). A full 100-Rage bar is +20%; a half-empty one is half that, because it scales off what was actually spent and not off his maximum. Below 10 Rage it is refused outright rather than paying nothing.</td><td>The dump. Rage is spent in 20-to-35 point sips and nothing ever asked what a full bar is worth at once — and the three turns with nothing left to cast <b>are</b> the price.<br><b>Builds with:</b> <b>Blood Offering</b> (60 Rage out of his own health, so he can pay for the dump on demand).</td></tr>
+<tr><td><b>Berserk</b></td><td>25 Rage, 1.0, 5cd, self</td><td><b>His next 4 STRIKES each land twice</b>, and he <b>takes 30% more damage for 3 turns</b>.<br><b>Two different clocks:</b> the strikes are <b>charges</b> and wait until spent; the 30% is an ordinary 3-turn window.<br><b>They count HITS, not casts</b>, so a three-hit ability such as Hack and Slash spends three of the four in one cast and lands six blows.</td><td>The risk dial at maximum, and <b>the drawback is the payoff</b> — Blood Frenzy scales his damage with missing health, so taking 30% more drives him into his own power band.<br><b>Builds with:</b> <b>Hack and Slash</b> and <b>Wildstrikes</b> (multi-hit and area blows that spend most or all of the bank at once, every doubled strike carrying his bleed buildup into <b>Gut Rip</b> and <b>Blood Debt</b>), and with the talent tree's <b>Undying Rage</b>, which pays again once the risk has taken him low.</td></tr>
 <tr><td><b>Blood Debt</b></td><td>20 Rage, 2.0, 4cd, one enemy (10 BD)</td><td>Strikes for 30% of Attack and <b>marks the enemy for the rest of the battle</b>. Every time that enemy <b>bleeds out</b> &mdash; the bleedout that kills it included &mdash; the Berserker heals <b>25% of his maximum health</b> (Perfect: 35%).<br><b>The mark survives the bleedout it pays for</b>, so a re-opened wound pays again.</td><td>A reason to survive being low. Blood Frenzy pays him for missing health and nothing in his kit paid him back — this fills the sustain hole out of his own engine rather than with a heal.<br><b>Builds with:</b> <b>Gut Rip</b>, which cashes it on demand.</td></tr>
 <tr><td><b>Unslaked</b></td><td>30 Rage, 1.0, 5cd, self</td><td>For 4 turns, <b>Blood Frenzy's floor captures the FULL bonus he reaches</b> rather than half of it. The floor is the half of his passive that keeps paying after he is healed back up — so the play pattern is cast this, <i>then</i> dive, and what he banks at the bottom is his for the rest of the battle.</td><td>The ratchet rate. This is the first card in the game that touches the passive's floor at all, and it is a <b>window</b> rather than a permanent raise.<br><b>Builds with:</b> <b>Blood Offering</b>, the dive he controls, so the two are a two-card combo that banks a floor on his own schedule instead of waiting for an enemy to grant one. <b>Berserk</b> lands him deeper still.</td></tr>
 <tr><td><b>Spite</b></td><td>20 Rage, 1.0, 4cd, self</td><td>For 6 turns, he takes <b>1% less damage for every 5% of maximum health MISSING</b>, up to 40%. <b>It is mitigation and never healing</b> — it keeps him inside the frenzy band instead of lifting him out of it.</td><td>Surviving the band he is paid for standing in. A card that healed him here would fight his own passive: it would take back the missing health Blood Frenzy pays for, so it would cancel itself.<br><b>Builds with:</b> <b>Blood Frenzy</b> itself, which reads the same missing health — every point that makes this bigger makes his damage bigger too. <b>Berserk</b> invites the damage it refuses; <b>Blood Debt</b> is the deliberate opposite number (take that one to leave the band, this one to live in it).</td></tr>
@@ -1947,17 +1954,17 @@ beside. A card that appears in nobody's build plan is a card that fills a slot.<
 <tr><td><b>Feint</b></td><td>25 Rage, 2.0, 4cd, one enemy</td><td><b>From Aggressive:</b> strikes for 35% of Attack (12 BD), and <b>that enemy's next attack lands on one of its own allies</b> (Perfect: 45%).<br><b>From Defensive:</b> no strike at all — he banks <b>2 charges</b> (Perfect: 3), each of which parries a melee blow against him outright (never an area attack, nor while he is Broken) and deals its damage to the attacker instead.<br>Either way the stance then switches.<br><b>Charges, not turns:</b> both halves wait until spent, so a Feint cast into a lull is not wasted and cannot be dodged by an enemy simply not swinging.</td><td>Their swing lands somewhere they did not intend. From the front foot he tricks them into a friend; from the back foot into themselves.</td></tr>
 <tr><td><b>Sever</b></td><td>25 Rage, 2.5, 4cd, one enemy (15 BD) — <b>requires Aggressive</b></td><td>Cuts for <b>40% of Attack</b>. <b>If the target is Broken this ability's cooldown is cleared outright</b>, so he can swing through the same window again immediately.<br><b>Perfect:</b> the body it cut takes <b>Sunder</b> — −35% armor for 3 turns, Crushing Blow's own, one deep.<br><b>Stance-GATED:</b> in the Defensive guard the card is unavailable, not weaker — and casting it does not move his stance.</td><td>The Break window rewards aggression. A Break opens a one-turn window and nothing let him swing repeatedly inside it.<br><b>Builds with:</b> <b>Shatterpoint</b> to open the window on demand.</td></tr>
 <tr><td><b>Battle Poise</b></td><td>25 Rage, 1.0, 4cd, self — <b>requires Defensive</b></td><td>For 4 turns, <b>every attack he parries takes a turn off all of his other cooldowns</b>. It pays <b>per parry</b>, so two parries in one turn are worth two turns. It does not shorten its own recast. <b>And ONCE A TURN a parry also buys a free GUARD CHANGE</b> — the pivot alone, costing no action, and it still respects that ability&#x27;s own 1-turn cooldown and is refused while <b>Formless</b> holds.<br><b>Stance-GATED:</b> in the Aggressive guard it is unavailable, and casting it does not move his stance.</td><td>Defence buys tempo — and, since Batch DR, the guard requirement buys something too. Until then its Defensive gate was <i>pure cost</i>, which is why Answering Steel held its whole payload as a subset and there was no board on which this was the better pick. He is the only parry-<b>stat</b> hero in the game and all of it merely made hits smaller.<br><b>Builds with:</b> the talent tree's <b>Parry More</b>, because the card pays per parry. What it buys back is <b>Sever</b>, <b>Shatterpoint</b>, <b>Execute</b> and <b>Guard Change</b>.</td></tr>
-<tr><td><b>Feigned Guard</b></td><td>20 Rage, 1.0, 3cd, self</td><td>For 3 turns his <b>abilities resolve as though cast from the other stance — and satisfy that stance's requirement</b> — while he keeps the guard he is actually standing in. <b>It does NOT switch his stance</b>, and his passive keeps reading the guard he really holds.</td><td>The only card in the game that lets a build have both halves of its own toggle. The gate-satisfying clause is what makes it worth a slot: without it this is a minor modifier.<br><b>Builds with:</b> every other stance card. An <b>Aggressive</b> build gets <b>Battle Poise</b> plus Precision Strike's armor bypass and Feint's counter charges <i>while keeping Aggressive's damage bonus</i>; a <b>Defensive</b> build gets <b>Sever</b> and Precision Strike's double hit while keeping Seasoned Fighter's mitigation.</td></tr>
+<tr><td><b>Feigned Guard</b></td><td>20 Rage, 1.0, 3cd, self</td><td>For 3 turns his <b>abilities resolve as though cast from the other stance — and satisfy that stance's requirement</b> — while he keeps the guard he is actually standing in. <b>It does NOT switch his stance</b>, and his passive keeps reading the guard he really holds.</td><td>Like <b>Formless</b>, it lets a build have both halves of its own toggle. The gate-satisfying clause is what makes it worth a slot: without it this is a minor modifier.<br><b>Builds with:</b> every other stance card. An <b>Aggressive</b> build gets <b>Battle Poise</b> plus Precision Strike's armor bypass and Feint's counter charges <i>while keeping Aggressive's damage bonus</i>; a <b>Defensive</b> build gets <b>Sever</b> and Precision Strike's double hit while keeping Seasoned Fighter's mitigation.</td></tr>
 <tr><td><b>Discipline</b></td><td>25 Rage, 1.0, 5cd, self</td><td>For 7 turns, <b>each consecutive turn held in the SAME stance strengthens that stance's own effect by 4%</b>, to a ceiling of 15%. <b>A Guard Change resets the accumulation to nothing</b> — and so does any card that switches him.</td><td>Paying him for refusing to switch. His whole spec is built on the pivot and nothing has ever rewarded standing still.<br><b>It fights his own readers and his own gated cards, and that is the tension:</b> Precision Strike and Feint both flip him, and Sever and Battle Poise each demand a specific guard.<br><b>Builds with:</b> <b>Seasoned Fighter</b>, whose two numbers it deepens, and <b>Feigned Guard</b>, which resolves the whole tension — it satisfies the other stance's requirement <i>without</i> switching him, so a Discipline build can still cast Sever or Battle Poise.</td></tr>
 <tr><td><b>Answering Steel</b></td><td>20 Rage, 1.0, 4cd, self</td><td>For 6 turns, <b>parry chance +20%</b>, and <b>every attack he PARRIES grants 15 Rage and takes a turn off all his other cooldowns</b>. It does not shorten its own recast.<br><b>It pays tempo, not damage</b>.</td><td>The parry stat finally buying something. He is the only parry-<b>stat</b> character in the game and this is the first card that reads it.<br><b>Builds with:</b> the talent tree's <b>Parry More</b> and <b>Feint</b>'s charges. <b>Battle Poise</b> is a stacking partner rather than a rival: both pay per parry, so one turned blade takes <i>two</i> turns off everything he holds.</td></tr>
-<tr><td><b>Formless</b></td><td>35 Rage, 1.0, 6cd, self</td><td>For 4 turns he holds <b>both stances' upsides and neither downside</b> — <b>+30% damage dealt AND 15% less damage taken</b> — and <b>counts as BOTH stances for anything that requires one</b>, so every stance-gated card in his kit is usable. <b>He cannot Guard Change while it holds</b>: there is no stance to change. When it ends he suffers <b>both downsides for 2 turns</b> (+10% damage taken, −10% dealt).</td><td>Being neither, and both. The stance is the spec's one binary and every card in his pool sits on one side of it; this refuses the question for three turns.<br><b>Builds with:</b> <b>Sever</b> and <b>Battle Poise</b>, the two cards it exists for — an Aggressive build gets the Defensive window and a Defensive build gets the Aggressive one, without giving up the guard his passive reads. <b>Feigned Guard</b> is the cheaper, narrower version of the same idea and the two compose.</td></tr>
+<tr><td><b>Formless</b></td><td>35 Rage, 1.0, 6cd, self</td><td>For 4 turns he holds <b>both stances' upsides and neither downside</b> — <b>+30% damage dealt AND 15% less damage taken</b> — and <b>counts as BOTH stances for anything that requires one</b>, so every stance-gated card in his kit is usable. <b>He cannot Guard Change while it holds</b>: there is no stance to change. When it ends he suffers <b>both downsides for 2 turns</b> (+10% damage taken, −10% dealt).</td><td>Being neither, and both. The stance is the spec's one binary and every card in his pool sits on one side of it; this refuses the question for four turns.<br><b>Builds with:</b> <b>Sever</b> and <b>Battle Poise</b>, the two cards it exists for — an Aggressive build gets the Defensive window and a Defensive build gets the Aggressive one, without giving up the guard his passive reads. <b>Feigned Guard</b> is the cheaper, narrower version of the same idea and the two compose.</td></tr>
 <tr><td><b>Wheeling Cut</b></td><td>30 Rage, 2.5, 4cd, <b>all enemies</b> (12 BD each)</td><td>Brings the blade all the way round: <b>every enemy takes 20% of Attack and 12 Break</b>, and the guard decides what he comes up holding. <b>FROM AGGRESSIVE</b> he lands Defensive, so he arrives covered &mdash; <b>20% less damage taken for 3 turns</b>. <b>FROM DEFENSIVE</b> he lands Aggressive, so he arrives on the front foot &mdash; <b>+20% damage dealt for 3 turns</b>. Either way <b>the stance then SWITCHES</b> (Perfect: both guards&#x27; gifts at once).</td><td>His pool had <b>no area damage at all</b> &mdash; his only field-wide option for a whole run was Cleave out of the Warrior class pool. A <b>reader</b>, so it branches and flips, and the arriving-stance principle decides which branch buys what: he is never stranded.<br><b>Builds with:</b> <b>Feigned Guard</b>, which changes which branch fires without moving his real guard. <b>Discipline</b> argues with it, which is the tension worth having: casting a reader throws the accumulation away.</td></tr>
 <tr><td><b>Counter Time</b></td><td>25 Rage, 2.0, 5cd, one enemy &mdash; <b>requires Defensive</b></td><td>Reads the attack and answers it before it lands: <b>one enemy loses its next turn</b>. It deals <b>nothing at all</b> &mdash; no damage, no Break, no Rage. <b>A boss resists until it is BROKEN.</b><br><b>Stance-GATED:</b> in the Aggressive guard it is unavailable, and casting it does not move his stance.</td><td>Taking the turn instead of the blow. His pool <b>could not take an enemy&#x27;s turn away at all</b> &mdash; Pommel Strike is his only Stun and it is protected core, so a whole run&#x27;s control was one core ability&#x27;s one-turn rider. <b>It is not a second Pommel Strike:</b> that card is cheaper, ungated, deals 25% of Attack, lands 30 Break, builds Rage and Stuns for one turn; this takes the same one turn with no blow to land &mdash; nothing to miss, parry or block &mdash; for a stance and a whole action that deals nothing.<br><b>Builds with:</b> the <b>Poise</b> lane, which is what makes the Defensive guard worth standing in, and <b>Battle Poise</b>&#x27;s free Guard Change, which is now how an Aggressive build reaches it without spending a turn. The stolen turn is the Breaker lane&#x27;s setup &mdash; a turn the enemy does not spend closing the window <b>Lunge</b> just opened.</td></tr>
 <tr><td colspan="4"><b>Warden</b> — <i>what does protection look like when it is not his own</i></td></tr>
 <tr><td><b>Covering Guard</b></td><td>25 Rage, 1.0, 4cd, one hero</td><td>For 4 turns, <b>his</b> Block chance is rolled against every attack aimed at that hero, and a success <b>negates the attack entirely</b>. It reads his Block <b>live</b>, so Shieldwall and Heavy Plating's climb both feed it. Cast on another hero only.</td><td>His stat protecting someone else. This is <b>not</b> redirection — nothing moves to him; the attack simply stops, which is what Block does and what nothing else in the game does.</td></tr>
 <tr><td><b>Eye of the Storm</b></td><td>20 Rage, 2.0, 4cd, self</td><td><b>Taunts every enemy</b> for 3 turns, and he takes <b>8% less damage per enemy taunted</b> while it holds.</td><td>Being outnumbered becomes the point — a defensive cooldown for every hero that costs him everything, and it is self-balancing: a bigger field is more mitigation as well as more incoming.</td></tr>
 <tr><td><b>Shield Slam</b></td><td>25 Rage, 2.5, 3cd, one enemy (40 BD)</td><td>Damage equal to <b>15% of his maximum health</b> (Perfect: 20%), plus <b>40 Break damage</b>. It reads that maximum <b>live</b>, so anything that raises it during the fight makes the next slam larger.</td><td>His bulk as a weapon — and the first offensive card he has ever had. The Break contributes to a Warrior build's central axis rather than to his own damage number.<br><b>Builds with:</b> anything that raises his maximum health, which is its damage stat; and its Break hands a Swordmaster's <b>Sever</b> the Broken target it wants.</td></tr>
-<tr><td><b>Vendetta</b></td><td>20 Rage, 1.5, 4cd, one enemy</td><td><b>For the rest of the battle that enemy can attack nobody but the Warden</b>, and he takes <b>30% less damage from it</b>. The lock <b>ends if the Warden falls</b>, though an enemy's cleanse can lift the taunt.</td><td>A permanent duel. Eye of the Storm taunts everything for two turns; this locks one thing forever, which is the opposite trade and the reason both are worth holding.<br><b>Builds with:</b> <b>Aegis Wall</b> — its attacks become the blocks that card feeds on.</td></tr>
+<tr><td><b>Vendetta</b></td><td>20 Rage, 1.5, 4cd, one enemy</td><td><b>For the rest of the battle that enemy can attack nobody but the Warden</b>, and he takes <b>30% less damage from it</b>. The lock <b>ends if the Warden falls</b>, though an enemy's cleanse can lift the taunt.</td><td>A permanent duel. Eye of the Storm taunts everything for three turns; this locks one thing forever, which is the opposite trade and the reason both are worth holding.<br><b>Builds with:</b> <b>Aegis Wall</b> — its attacks become the blocks that card feeds on.</td></tr>
 <tr><td><b>Aegis Wall</b></td><td>25 Rage, 1.0, 5cd, self</td><td>For 4 turns, <b>every attack he BLOCKS heals every hero for 8% of his maximum health</b>. It reads that maximum <b>live</b>. <b>A blow that gets through pays nothing</b> — only a block, from any source, Interpose's guaranteed charges included.</td><td>His signature stat feeds the heroes. Block negates an attack entirely and paid him nothing beyond that; this is the first thing that makes a block worth something to anyone else.<br><b>Builds with:</b> <b>Shieldwall</b> (more Block chance), <b>Interpose</b> (guaranteed charges the wall pays off outright), and <b>Eye of the Storm</b> or <b>Vendetta</b> to drag the attacks in that turn a Block chance into a heal rate.</td></tr>
 <tr><td><b>Anvil</b></td><td>25 Rage, 1.0, 5cd, self</td><td>For 4 turns, <b>Blocking no longer resets the Heavy Plating bonus</b>. The climb keeps everything it earns and the sawtooth becomes a staircase. <b>Recompense is paid nothing while this holds</b> — there is no reset left to pay it.</td><td>The sawtooth becomes a staircase. Heavy Plating's climb is bad-luck protection and a block throws the whole of it away, so the passive taxes him for the very thing the climb is meant to buy.<br><b>Builds with:</b> <b>Aegis Wall</b> and <b>Turn the Blade</b>, which both pay per block. Deliberate <b>anti-synergy with Recompense</b>.</td></tr>
 <tr><td><b>Recompense</b></td><td>20 Rage, 1.0, 4cd, self</td><td>For 6 turns, whenever Blocking resets his Heavy Plating bonus he <b>gains Rage equal to the percentage points lost</b> — a reset from +32% pays 32 Rage. <b>Anvil prevents those resets, so the two do not stack.</b></td><td>Getting paid for the cruelty instead of preventing it. The deeper the climb was, the larger the payout, so the term that makes the sawtooth hurt is the term that makes this good.<br><b>Anvil and Recompense actively fight each other, and that is intended</b> — they are two answers to the same cruelty, not a stack.<br><b>Builds with:</b> everything he spends Rage on: <b>Shield Slam</b>, <b>Vendetta</b>, <b>Eye of the Storm</b> and <b>Aegis Wall</b>.</td></tr>
@@ -1969,31 +1976,31 @@ beside. A card that appears in nobody's build plan is a card that fills a slot.<
 <tr><td><b>Stoke</b></td><td>20 Mana, 2.0, 3cd, one enemy</td><td>25% of Attack, and if the target is Burning its <b>remaining Burn turns are DOUBLED</b> (Perfect: tripled). <b>An enemy that is not alight is set Burning for 3 turns.</b> Overburn reads the field <i>before</i> the doubling, so later casts are what collect on it.</td><td>The bank multiplies instead of growing — worth as much as the stack he built, and on a cold enemy it lights one.<br><b>Builds with:</b> <b>Detonation</b> (250% of the bank), so doubling a deep stack is his largest single swing; and <b>Slow Burn</b> — stall, double, detonate.</td></tr>
 <tr><td><b>Funeral Pyre</b></td><td>25 Mana, 2.5, 4cd, one enemy</td><td>Consumes <b>all</b> Burn on the target and grants a shield worth <b>200% of the damage that Burn would still have dealt</b>, for 3 turns. Overburn refunds every turn consumed. Unusable with nothing alight.</td><td>The only card in his kit that converts fire into survival — the defensive cash-in, where Detonation is the offensive one.<br><b>Builds with:</b> <b>Immolate</b>, a percentage cut where this is the flat term. Overburn's refund pays 1 Mana a turn, so a deep stack cashed here is a shield <i>and</i> a pool.</td></tr>
 <tr><td><b>Firedraw</b></td><td>25 Mana, 2.5, 4cd, one enemy</td><td>Consumes <b>6 turns of Burn from every OTHER enemy</b> and adds all of it to this one. It takes what is there <b>or 6, whichever is less</b> — an enemy holding 2 gives 2, not a debt — and it <b>never touches the target's own Burn</b>. Unusable with nothing alight.</td><td>The bank consolidated. Detonation pays 250% of <i>one</i> enemy's remaining Burn, so a field of shallow fires is worth far less than one deep one — and until now the only way to build a deep stack was to keep casting at the same body.<br><b>Builds with:</b> <b>Detonation</b>, which pays on the deep stack it builds. It is the deliberate counterpart to <b>Cinderfall</b>, which spreads the spend where this concentrates it — and under <b>Emberkeep</b> the fire it delivers arrives doubled.</td></tr>
-<tr><td><b>Pyre Wake</b></td><td>25 Mana, 2.5, 4cd, one enemy</td><td>Consumes <b>ALL</b> its Burn. <b>For each turn consumed</b>, a random enemy is set Burning for 1 turn and takes 8% of Attack (Perfect: 12%). Overburn refunds every turn consumed. Unusable with nothing alight.</td><td>The bank scattered rather than cashed. A twelve-turn stack becomes twelve small fires and 96% of Attack spread across the board — <b>the only card in the game that converts depth into width</b>, and the natural answer when the deep target is about to die anyway.<br><b>Builds with:</b> <b>Slow Burn</b> — scatter, then stop the tick-down. Overburn's refund pays 1 Mana a turn.</td></tr>
+<tr><td><b>Pyre Wake</b></td><td>25 Mana, 2.5, 4cd, one enemy</td><td>Consumes <b>ALL</b> its Burn. <b>For each turn consumed</b>, a random enemy is set Burning for 1 turn and takes 8% of Attack (Perfect: 12%). Overburn refunds every turn consumed. Unusable with nothing alight.</td><td>The bank scattered rather than cashed. A twelve-turn stack becomes twelve small fires and 96% of Attack spread across the board — <b>the only card that scatters one enemy's Burn across the board</b>, and the natural answer when the deep target is about to die anyway.<br><b>Builds with:</b> <b>Slow Burn</b> — scatter, then stop the tick-down. Overburn's refund pays 1 Mana a turn.</td></tr>
 <tr><td><b>Emberkeep</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For 4 turns, <b>every Burn any hero applies lands at DOUBLE duration</b>. It doubles at <b>application</b> and is not retroactive — <b>fire already on the board is untouched</b>.</td><td>The multiplier on <i>getting</i> fire rather than on moving it. Everything else in his pool is downstream of already having a bank; this is the only card that changes how much arrives.<br><b>Builds with:</b> <b>Flamewave</b> lays 4 turns instead of 2 on every enemy not yet alight (one already burning
 is lengthened by 2, which the window does not double), and <b>Firestorm</b>'s 6–8 bolts each land 4 instead of 2 — <b>24 to 32 burn-turns from one cast</b>. Then <b>Slow Burn</b> freezes the tick-down and Detonation pays 250% of it. Fire already burning is <b>Stoke</b>'s job, not this one.</td></tr>
-<tr><td><b>Smoulder</b></td><td>10 Mana, 2.0, 2cd, one enemy</td><td>10% of Attack in fire, and <b>leaves the target Burning for 4 turns</b> (Perfect: 11.5% of Attack). <b>It consumes nothing already alight</b>: on a burning enemy its 4 turns are added to the Burn that stands.</td><td>The light that buys the Burn, not the hit &mdash; the cheapest fire card, a Burn a turn longer than Fireball's on Fireball's cooldown, so a recast every second turn keeps a fire standing.<br><b>Builds with:</b> a <b>Cryomancer</b>'s chill &mdash; it lights the chilled body, and the two make a <b>Rupture</b>; <b>Stoke</b> doubles what it leaves and <b>Detonation</b>, <b>Backdraft</b> and <b>Wildfire</b> spend it; it lays through the status door, so <b>Emberkeep</b> doubles it and a Survivalist's <b>Downwind</b> carries it to a second enemy.</td></tr>
+<tr><td><b>Smoulder</b></td><td>10 Mana, 2.0, 2cd, one enemy</td><td>10% of Attack in fire, and <b>leaves the target Burning for 4 turns</b> (Perfect: 11.5% of Attack). <b>It consumes nothing already alight</b>: on a burning enemy its 4 turns are added to the Burn that stands.</td><td>The light that buys the Burn, not the hit &mdash; the cheapest fire card, a Burn a turn longer than Fireball's on Fireball's cooldown, so a recast every second turn keeps a fire standing.<br><b>Builds with:</b> a <b>Cryomancer</b>'s chill &mdash; it lights the chilled body, and the two make a <b>Rupture</b>; <b>Stoke</b> doubles what it leaves, <b>Backdraft</b> deepens it, and <b>Detonation</b> and <b>Wildfire</b> spend it; it lays through the status door, so <b>Emberkeep</b> doubles it and a Survivalist's <b>Downwind</b> carries it to a second enemy.</td></tr>
 <tr><td colspan="4"><b>Cryomancer</b> — <i>what do you do with the time you bought</i></td></tr>
 <tr><td><b>Winter's Toll</b></td><td>25 Mana, 2.5, 4cd</td><td>The held enemy takes 8% of Attack per turn it has been held (Perfect: 12%). <b>The hold continues.</b> Unusable while he holds nothing.</td><td>Cashing in without releasing.</td></tr>
 <tr><td><b>Rimebinding</b></td><td>20 Mana, 2.0, 3cd, one enemy</td><td>Applies Chilled equal to the stacks on the held enemy, plus one.</td><td>The hold as a template — one deep prison becomes the next one.</td></tr>
 <tr><td><b>Killing Frost</b></td><td>20 Mana, 2.0, 3cd, all enemies</td><td>Every <b>Chilled</b> enemy takes 20% of Attack and gains <b>2 more stacks</b> of Chilled (Perfect: 3). Enemies that are not Chilled are untouched — and four stacks still put one in the ice.</td><td>The accumulation pays on its own. His stacks have only ever counted toward a freeze, so a fight where the freeze never lands is a fight where his build did nothing.<br><b>Builds with:</b> <b>Blizzard</b>, which spreads thin stacks wide — it is best straight after one.</td></tr>
-<tr><td><b>Hoarfrost Armor</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For 4 turns he takes <b>25% less damage</b>, and <b>anything that strikes him gains 2 stacks of Chilled</b>.</td><td>The only thing in his kit that builds stacks without spending a turn applying them — and the only defence he has that a boss cannot shrug, since the other one is a hold.<br><b>Builds with:</b> <b>Killing Frost</b>, which pays every Chilled enemy the pile this builds.</td></tr>
+<tr><td><b>Hoarfrost Armor</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For 4 turns he takes <b>25% less damage</b>, and <b>anything that strikes him gains 2 stacks of Chilled</b>.</td><td>The only thing in his kit that builds stacks without spending a turn applying them — and, unlike a hold, a defence a boss cannot shrug.<br><b>Builds with:</b> <b>Killing Frost</b>, which pays every Chilled enemy the pile this builds.</td></tr>
 <tr><td><b>Deep Winter</b></td><td>25 Mana, 2.5, 4cd, no target</td><td>Every enemy gains Chilled equal to <b>HALF the stacks on the held enemy</b>, rounded up. <b>Holding nothing, it does nothing</b> — and the combat log says so rather than fizzling silently.</td><td>The hold as a template, applied wide. <b>Rimebinding</b> copies the prison to one enemy; this copies it to all of them, so a deep prison finally pays for the whole field.<br><b>Builds with:</b> it sets up <b>Killing Frost</b>, which pays every Chilled enemy — and because the stacks go on one at a time, four of them still put an enemy in the ice.</td></tr>
 <tr><td><b>Cold Iron</b></td><td>20 Mana, 2.0, 3cd, one enemy (6 BD)</td><td>Deals 25% of Attack (Perfect: 28.75%). <b>Against a FROZEN target it deals DOUBLE and does NOT release the hold</b>, so the ice and the hero-wide damage window both stand.</td><td>Hitting the prisoner without opening the cell. The hold is a +15% damage window for every hero that only he can close — and until now nothing of his own could safely strike into it, because <b>Ice Lance is the release</b>.<br><b>Builds with:</b> <b>Winter's Toll</b> (which collects on a hold without releasing it — the same rule from the other side) and <b>Killing Frost</b>. It does not outclass Ice Lance: against a Frozen target the Lance lands 55% of Attack and <i>always</i> crits, for 15 Break.</td></tr>
 <tr><td><b>Frostbind</b></td><td>25 Mana, 2.5, 4cd, <b>two enemies</b></td><td>For 4 turns the two are <b>bound</b>: Chilled landing on either lands on both, and <b>damage dealt to one is dealt to the other at 40%</b>. <b>The mirrored blow does not mirror back.</b> If both partners reach the freeze threshold <b>the pair freezes together</b>, and a bound pair occupies <b>one</b> of his hold slots rather than two.</td><td>Two prisoners on one chain. It grants no second hold — it gives him a second body that <i>suffers with the first</i>, so everything he does to one happens twice.<br><b>Builds with:</b> <b>Killing Frost</b> hits both, <b>Rimebinding</b>'s copied stacks immediately double, <b>Razor Ice</b>'s three stacks become six across two enemies, and <b>Winter's Toll</b> collects on one while the other bleeds. It is how a one-hold Cryomancer comes to hold two.</td></tr>
 <tr><td colspan="4"><b>Arcanist</b> — <i>what carries you through the early game</i></td></tr>
 <tr><td><b>Null Field</b></td><td>25 Mana, 1.0, 4cd, self</td><td>For 4 turns, damage taken falls 5% per Resonance stack, <b>read live</b>.</td><td>The ramp defends itself — just 10% at 2 stacks, enormous at 12, so surviving <i>to</i> the late game becomes the reward for ramping.</td></tr>
 <tr><td><b>Kindled Mind</b></td><td>15 Mana, 1.5, 2cd, one enemy</td><td>15% of Attack, and it banks 3 Resonance instead of 1 (Perfect: 4).</td><td>Buying the ramp with tempo — his fastest early climb, and a card he would rather not cast late.</td></tr>
-<tr><td><b>Arcane Bolt</b></td><td>30 Mana, 2.5, 4cd, one enemy</td><td><b>15% of Attack for every Resonance stack he holds</b> (Perfect: 20%), and then his stacks are <b>halved</b>. At 6 stacks that is 90% of Attack; at 16 it is 240% and he lands on 8. Dark at zero stacks.</td><td>Cash the curve, or keep climbing — the question his kit has never asked him. It <b>halves</b> rather than venting to a floor, which is the distinction from Stabilize: the curve keeps compounding from where it lands, so spending is a change of slope rather than a reset.<br><b>Builds with:</b> <b>Inner Arcane</b>, which makes the climb back cheaper. Halving the stacks also halves the compounding <i>damage-taken</i> penalty, so it is an escape hatch that costs him his damage rather than a free one.</td></tr>
+<tr><td><b>Arcane Bolt</b></td><td>30 Mana, 2.5, 4cd, one enemy</td><td><b>15% of Attack for every Resonance stack he holds</b> (Perfect: 20%), and then his stacks are <b>halved</b>. At 6 stacks that is 90% of Attack; at 16 it is 240% and he lands on 8. Dark at zero stacks.</td><td>Cash the curve, or keep climbing — the question his kit has never asked him. It <b>halves</b> rather than venting to a floor, which is the distinction from Stabilize: the curve keeps compounding from where it lands, so spending is a change of slope rather than a reset.<br><b>Builds with:</b> <b>Inner Arcane</b>, which makes the climb back cheaper. Halving the stacks cuts the compounding <i>damage-taken</i> penalty by more than half (+102% at 16 stacks, +27% at 8), so it is an escape hatch that costs him his damage rather than a free one.</td></tr>
 <tr><td><b>Inner Arcane</b></td><td>15 Mana, 1.0, 3cd, self</td><td>Banks Resonance equal to the number of enemies <b>still alive</b>, <b>doubled while he is below half health</b>, plus one.</td><td>The ramp's opening move and its panic button in one card — widest on turn one, and worth most when he is nearly dead.<br><b>Builds with:</b> <b>Arcane Bolt</b>, which cashes the stacks it banks.</td></tr>
 <tr><td><b>Arcane Echo</b></td><td>25 Mana, 2.0, 4cd, one enemy</td><td>20% of Attack, and for 3 turns (Perfect: 4) <b>every damaging HIT he lands anywhere repeats at 30% against this target</b>. Cinderfall, Killing Frost, Pyre Wake, Wildfire and Winter's Toll do not echo. <b>It counts hits, not casts</b> — a six-bolt Barrage echoes six times. One mark at a time.</td><td>The only reason he has to focus one target. Worthless early (30% of a small number) and enormous once the passive is paying +117%, <b>because the echo carries his full multiplier</b>.<br><b>Builds with:</b> <b>Arcane Barrage</b>, because the echo counts hits.</td></tr>
-<tr><td><b>Resonant Field</b></td><td>25 Mana, 1.0, 4cd, no target</td><td>For 4 turns, <b>every ALLY deals bonus damage equal to HALF his current Resonance bonus</b>. It <b>reads the meter live</b> — if he keeps building during the window, their share climbs with him. He is not in his own field; a dead Arcanist pays nobody.</td><td>The curve arms the heroes — <b>the cross-spec card his pool does not have</b>. At 12 stacks he is at +117%, so allies get +58%: enormous, brief, and it makes a deep Arcanist a buff for everyone rather than a solo act.<br><b>Builds with:</b> <b>Threshold</b>, which gets him deep at once — the same stacks killing him now pay three other people.</td></tr>
+<tr><td><b>Resonant Field</b></td><td>25 Mana, 1.0, 4cd, no target</td><td>For 4 turns, <b>every other HERO deals bonus damage equal to HALF his current Resonance bonus</b>. It <b>reads the meter live</b> — if he keeps building during the window, their share climbs with him. He is not in his own field; a dead Arcanist pays nobody.</td><td>The curve arms the heroes — <b>the cross-spec card his pool does not have</b>. At 12 stacks he is at +117%, so the other heroes get +58%: enormous, brief, and it makes a deep Arcanist a buff for everyone rather than a solo act.<br><b>Builds with:</b> <b>Threshold</b>, which gets him deep at once — the same stacks killing him now pay three other people.</td></tr>
 <tr><td><b>Threshold</b></td><td>20 Mana, 1.5, 5cd, self</td><td>His Resonance is <b>SET to 15 immediately</b>, and he <b>cannot gain any more for 2 turns</b>. The lockout refuses <i>every</i> source — the passive's own build, Kindled Mind and Inner Arcane alike. <b>Cast above 15 it takes stacks away.</b></td><td>The late game bought early, at the cost of the ramp. Below 15 it is a huge jump; above 15 it is a nerf he would never take — so it rescues a slow start and becomes dead weight in a long fight, which is the right shape for an escalation spec's emergency. <b>The damage-taken penalty arrives with the stacks</b>: 15 stacks is +90% damage taken on the spot.<br><b>Builds with:</b> <b>Death Ray</b>, which gates at 8 — this reaches it at once. <b>Null Field</b> at 15 stacks is 75% mitigation.</td></tr>
 <tr><td><b>Unmaking</b></td><td>30 Mana, 3.0, 5cd, one enemy (8 BD)</td><td>Deals <b>10% of Attack per Resonance stack</b>. <b>The target's resistances and its armor are both ignored</b>, and it <b>cannot be healed for 3 turns</b> (Perfect: 4). It spends no stacks. Unusable below 1 Resonance.</td><td>The curve made unanswerable. His scaling damage is still checked by armor, resists and enemy healing, and a boss has all three. At 16 stacks this is <b>160% of Attack through everything</b>, and the heal lock holds while the rest of the heroes finish.<br><b>Builds with:</b> <b>Arcane Echo</b>, which repeats it at 30% <i>per hit</i>. It answers the same warband problem <b>Blight the Well</b> does from the Occultist's side, so heroes holding both lock a healer out completely.</td></tr>
 <tr><td colspan="4"><b>Holy</b> — <i>what does reversal cost you</i></td></tr>
 <tr><td><b>Second Wind</b></td><td>30 Mana, 2.5, 4cd, one ally</td><td>Heals for the damage that ally has taken in the last two turns on the turn order (a companion: all battle), up to 40% of their maximum (Perfect: 55%).</td><td>Undoing recent history rather than topping up — enormous on someone just spiked, worthless on someone healthy.</td></tr>
 <tr><td><b>Rite of Return</b></td><td>35 Mana, 1.0, 5cd, one hero</td><td>For 4 turns, the next blow or tick that would fell that hero restores them to 50% health instead — and Holy loses 30% of hers.</td><td>Reversal bought in advance rather than reacted to. Resurrection undoes a death and costs Mercy; this prevents one and costs her health.</td></tr>
-<tr><td><b>Recant</b></td><td>25 Mana, 2.0, 4cd, one ally</td><td>That ally regains <b>40% of their maximum Rage or Mana</b>. It reaches the resource they cast with and <b>never a spec meter</b> — Resonance, Mercy, Faith and Focus are all untouched.</td><td>Reversal of expenditure, the one form of undoing she does not have. <b>Its value is measured on somebody else's sheet</b>: a Pyromancer who just emptied himself into Detonation, an Arcanist halved by Arcane Bolt, a Berserker out of Rage before Gut Rip.<br><b>Builds with:</b> whichever ally is the run's engine — it is a different ability in every build.</td></tr>
+<tr><td><b>Recant</b></td><td>25 Mana, 2.0, 4cd, one ally</td><td>That ally regains <b>40% of their maximum Rage or Mana</b>. It reaches the resource they cast with and <b>never a spec meter</b> — Resonance, Mercy, Faith and Focus are all untouched.</td><td>Reversal of expenditure, the one form of undoing she does not have. <b>Its value is measured on somebody else's sheet</b>: a Pyromancer who just emptied himself into Detonation, an Arcanist who has spent his Mana on Arcane Bolt, a Berserker out of Rage before Gut Rip.<br><b>Builds with:</b> whichever ally is the run's engine — it is a different ability in every build.</td></tr>
 <tr><td><b>Shared Grief</b></td><td>20 Mana, 2.0, 4cd, self</td><td>She loses <b>25% of her maximum health</b> and gains <b>4 Mercy</b>. It can never take her below 1.</td><td>Martyrdom as an economy. Mercy arrives when somebody crosses below half health, so until now the only way to fill her meter was to let the heroes be hurt; this is her buying a stack with her own blood, on turn one, at a moment she chooses.<br><b>Builds with:</b> <b>Divine Plea</b> (2 Mercy) and Empower, which it pays for on turn one.</td></tr>
 <tr><td><b>Reprisal</b></td><td>25 Mana, 2.5, 3cd, one enemy, 6 BD</td><td>Holy damage equal to <b>50% of the healing she has LANDED in the last two turns on the turn order</b> (Perfect: 75%). <b>Overhealing is not healing</b> — only what actually closed a wound counts. Offered only once she has healed something.</td><td>Her healing becomes a weapon — her only offence, and the answer to the turn where nobody is hurt.<br><b>Builds with:</b> everything that raises her throughput, which feeds the same two-turn window this reads.</td></tr>
 <tr><td><b>Divine Presence</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For 4 turns she gains <b>2 Mercy at the start of every SECOND turn of hers on which no hero fell below the window</b> — so it fires twice, for 4 Mercy. A fall pays the passive instead and breaks that watch — and only that one. Two stacks arriving together <b>can cross the cap from below</b>, and the spare one spills into <b>Alms</b>.</td><td>Mercy on her own terms. Her meter is fuelled by the heroes being hurt, so she can play perfectly and be starved; this pays her on exactly the turns the passive did not. <b>The two sources are mutually exclusive by construction</b>, which is why it can never simply be better than waiting.<br><b>Builds with:</b> <b>Alms</b>: beside it this is the whole answer to the meter's two edges — and the first pair of her own draft cards that feed each other.</td></tr>
@@ -2002,10 +2009,10 @@ is lengthened by 2, which the window does not double), and <b>Firestorm</b>'s 6�
 <tr><td colspan="4"><b>Devout</b> — <i>what else can he lend</i></td></tr>
 <tr><td><b>Vow of Suffering</b></td><td>20 Mana, 1.0, 3cd, one hero</td><td>For 4 turns, half the damage that hero takes is redirected to the Devout — and every share he eats kindles that hero 1 Faith. The half he carries is the attacker's damage on him: the recap books it to the attacker, Penance's mirror pays on it, and an Oathkeeper's bond shares it.</td><td>Mitigation by relocation. Divine Shield absorbs a capped amount; this has no cap.</td></tr>
 <tr><td><b>Aegis Reversal</b></td><td>30 Mana, 2.5, 4cd, one hero</td><td>Consumes that hero's Divine Shield; their next attack deals bonus damage worth half again whatever the shield had left.</td><td>Unspent protection becomes offence — and it is the Devout dealing damage without attacking.</td></tr>
-<tr><td><b>Ordination</b></td><td>25 Mana, 2.0, 4cd</td><td>Grants <b>4 Faith</b> to the other hero holding the <b>LEAST</b> Faith. Not player-chosen: it always finds the floor.</td><td>Starting the engine without waiting to be hit. Every other Faith source he owns is reactive (an absorb) or slow (the ground's drip).<br><b>The grant carries its target toward the release</b>.<br><b>Builds with:</b> <b>Reliquary</b> below, which cashes the peaks this raises.</td></tr>
-<tr><td><b>Fortified Spirit</b></td><td>25 Mana, 2.0, 4cd, one hero</td><td>That hero's <b>maximum health rises by 30% of the Devout's</b> and they are healed for the same amount (Perfect: 40%). The loan then <b>decays by a tenth of his maximum at the start of each of their turns</b> — 30 → 20 → 10 → gone. <b>Current health clamps under it</b>, so a hero kept topped up loses real health on the way down while one sitting at half never notices.</td><td>Lending the number his whole kit is built on. Divine Shield absorbs 30% of his maximum — this is the first thing that lends the <i>figure itself</i>, and it stacks with a shield rather than duplicating one: a shield is a bucket that empties, this is a bigger bucket.<br><b>Builds with:</b> the talent tree's <b>More Health</b> (+20% his maximum), which enlarges every point of it.</td></tr>
+<tr><td><b>Ordination</b></td><td>25 Mana, 2.0, 4cd</td><td>Grants <b>4 Faith</b> to the other hero holding the <b>LEAST</b> Faith. Not player-chosen: it always finds the floor.</td><td>Starting the engine without waiting to be hit. Every other Faith source he owns but Elevation is reactive (an absorb) or slow (the ground's drip).<br><b>The grant carries its target toward the release</b>.<br><b>Builds with:</b> <b>Reliquary</b> below, which cashes the peaks this raises.</td></tr>
+<tr><td><b>Fortified Spirit</b></td><td>25 Mana, 2.0, 4cd, one ally</td><td>That ally's <b>maximum health rises by 30% of the Devout's</b> and they are healed for the same amount (Perfect: 40%). The loan then <b>decays by a tenth of his maximum at the start of each of their turns</b> — 30 → 20 → 10 → gone; a companion takes no turn of its own, so a loan on one never decays. <b>Current health clamps under it</b>, so a hero kept topped up loses real health on the way down while one sitting at half never notices.</td><td>Lending the number his whole kit is built on. Divine Shield absorbs 35% of his maximum — this is the first thing that lends the <i>figure itself</i>, and it stacks with a shield rather than duplicating one: a shield is a bucket that empties, this is a bigger bucket.<br><b>Builds with:</b> the talent tree's <b>More Health</b> (+20% his maximum), which enlarges every point of it.</td></tr>
 <tr><td><b>Reliquary</b></td><td>30 Mana, 2.5, 5cd, all allies</td><td>Every ally is healed for <b>2.5% of the Devout's maximum health per point of their PEAK Faith</b> this battle (Perfect: 3.5%). No release lowers the peak, so <b>an ally who released down to zero is still paid in full</b> for what they carried.</td><td>Cashing an accumulation nothing else reads. It grows all fight and pays most to whoever has <i>carried</i> the most faith — investment collecting on its own record.<br><b>Builds with:</b> the talent tree's <b>More Health</b> and Conviction's own growth enlarge every point; <b>Ordination</b> above raises the very peaks it reads.</td></tr>
-<tr><td><b>Elevation</b></td><td>35 Mana, 2.5, 5cd, all heroes</td><td><b>Every hero gains 2 stacks of Faith</b>, visible on the bar. <b>A hero who reaches the cap with it RELEASES on the spot</b> — healed 15% of their maximum, the count reset, the Devout paid 3% of his Mana. Their <b>peak is untouched by the release</b>, so it costs them nothing they were holding.</td><td>Both of his builders are slow drips — 2 a shielded hit, 1 an ally turn on the ground — and nothing in the game let him hand a stack over. This is a whole roster's worth at once.<br><b>Builds with:</b> <b>Reliquary</b>, which reads the peaks these stacks ratchet on their way up.</td></tr>
+<tr><td><b>Elevation</b></td><td>35 Mana, 2.5, 5cd, all heroes</td><td><b>Every hero gains 2 stacks of Faith</b>, visible on the bar. <b>Any hero but the Devout who reaches the cap with it RELEASES on the spot</b> — healed 15% of their maximum, the count reset, the Devout paid 3% of his Mana. Their <b>peak is untouched by the release</b>, so it costs them nothing they were holding.</td><td>Both of his builders are slow drips — 2 a shielded hit, 1 an ally turn on the ground — and nothing in the game let him hand a stack over. This is a whole roster's worth at once.<br><b>Builds with:</b> <b>Reliquary</b>, which reads the peaks these stacks ratchet on their way up.</td></tr>
 <tr><td><b>Blessing of the Faithful</b></td><td>20 Mana, 2.0, 4cd, self</td><td>Spends <b>ALL of his own Faith</b> for <b>6% of his maximum health and 3% of maximum Mana per stack</b> (Perfect: 8%). <b>Needs 3 held.</b> His <b>PEAK DROPS TO MATCH</b>: the mitigation and damage those stacks were buying for the rest of the fight are spent with them.</td><td>The payout that does not exist for him. An ally reaching the threshold is healed and hands him Mana; his own count holds there and never releases, so his Faith pools. <b>Needing 3 held is under half of what his count holds at the threshold</b>, so the card is castable long before his meter is full — and only by him, since an ally releases the moment they reach the threshold. This is what finally spends it — <b>burst sustain bought with permanent mitigation</b>, rather than a payout that costs nothing.<br><b>It is not a release and must never become one</b> — no principal growth.<br><b>Builds with:</b> <b>Consecrated Ground</b>'s drip onto its own caster, and the talent tree's <b>More Health</b>, which makes every point of the heal larger.</td></tr>
 <tr><td><b>Mantle</b></td><td>25 Mana, 1.0, 4cd, one ally</td><td>A <b>Divine Shield worth 25% of his maximum health</b> — and when it <b>breaks</b> it <b>passes to the hero on the lowest health</b>, three times. It never passes back to the body it just left. <b>Every hop is a real Divine Shield</b>, so every one of them builds Faith.</td><td>The absorb is the dry source of his whole engine — Conviction builds only on Divine Shield absorbs, and those were measured at 1.5 a battle. A shield that becomes three shields is three times the trigger.<br><b>Builds with:</b> <b>Blessing of Zeal</b>, which doubles the Faith every absorb pays.</td></tr>
 <tr><td colspan="4"><b>Occultist</b> — <i>what else can be corrupted</i></td></tr>
@@ -2014,14 +2021,14 @@ is lengthened by 2, which the window does not double), and <b>Firestorm</b>'s 6�
 <tr><td><b>Suffering</b></td><td>25 Mana, 2.5, 4cd, one enemy, 8 BD</td><td>20% of Attack, and he is healed for <b>ALL</b> of the damage it deals. For 4 turns the enemy gains <b>2 Ruin at the start of each of ITS turns</b> (Perfect: 3) — eight stacks bought with one turn of his.</td><td>Corruption that works on the enemy's clock rather than on his. The only generation in his kit that does not need his attention, and best on a boss, which is where his tenth-stack threshold lives.<br><b>Builds with:</b> the per-stack lifesteal, which scales with depth.</td></tr>
 <tr><td><b>Transference</b></td><td>20 Mana, 2.0, 3cd, one enemy</td><td><b>Every Ruin stack on the deepest-marked other enemy</b> travels to this one, plus 2 more on arrival. <b>Nothing detonates in transit</b> — the stacks arrive as the work they already were. Offered only when there is a mark to move.</td><td>Corruption relocated rather than spent. His worst case is a deep mark on something about to die — twelve stacks of work wasted when the heroes finish it.<br><b>Builds with:</b> <b>Covenant of Ash</b>, which runs the same round trip twice.</td></tr>
 <tr><td><b>Anointing</b></td><td>30 Mana, 1.0, 5cd</td><td>For 4 turns, <b>every hero's attacks apply 1 Ruin</b>. It counts <b>HITS, not casts</b> — a three-hit ability applies three.</td><td>The heroes mark for him. Ruin is his alone; three other heroes swing every turn and contribute nothing to the meter that is his entire spec. <b>The largest generation increase available to him, and the second card here whose value is measured on somebody else's sheet.</b><br><b>Builds with:</b> the per-stack lifesteal every hero gets and Ruin's own +2% damage taken a stack — so it makes every hero's damage larger, not only his. Pairs with <b>Suffering</b> above, so the enemy's clock and the heroes' both feed one pile.</td></tr>
-<tr><td><b>Breaking Darkness</b></td><td>25 Mana, 2.0, 4cd, one enemy (20 BD)</td><td>20 Break damage, and for 3 turns (Perfect: 4) <b>every source of Break damage lands on that enemy 25% harder</b>. The cast's own Break lands before the mark, so it does not amplify itself, and the amplifier sits above every reducer, so each defence still answers it.</td><td>Break is his gate. His madness cards are refused by a boss <b>until it is Broken</b>, and nothing in his pool ground the meter — <b>and nothing in the game had ever amplified Break damage at all</b>: everything else refuses or reduces it.<br><b>Builds with:</b> the <b>Warden's</b> Break cards above all — Shield Slam's 40 and Turn the Blade. On his own sheet, the talent tree's <b>You Break Harder</b> feeds the meter this multiplies, and <b>Bewitch</b>, <b>Mind Flay</b> and <b>Mass Hysteria</b> are what the open gate is for.</td></tr>
+<tr><td><b>Breaking Darkness</b></td><td>25 Mana, 2.0, 4cd, one enemy (20 BD)</td><td>20 Break damage, and for 3 turns (Perfect: 4) <b>every source of Break damage lands on that enemy 25% harder</b>. The cast's own Break lands before the mark, so it does not amplify itself, and the amplifier sits above every reducer, so each defence still answers it.</td><td>Break is his gate. His madness cards are refused by a boss <b>until it is Broken</b>, and nothing in his pool ground the meter — <b>and this is the one effect in the game that makes an enemy take Break damage harder</b>: everything else on the receiving end refuses or reduces it.<br><b>Builds with:</b> the <b>Warden's</b> Break cards above all — Shield Slam's 40 and Turn the Blade. On his own sheet, the talent tree's <b>You Break Harder</b> feeds the meter this multiplies, and <b>Bewitch</b>, <b>Mind Flay</b> and <b>Mass Hysteria</b> are what the open gate is for.</td></tr>
 <tr><td><b>Requiem</b></td><td>30 Mana, 3.0, 5cd, one enemy (8 BD)</td><td><b>Consumes every stack of Ruin on one enemy</b> for <b>8% of Attack each</b> (Perfect: 10%), and <b>every hero is healed 2% of his maximum health per stack</b>. Nothing detonates — the mark is spent, and its primer goes with it. Offered only while a mark stands somewhere.</td><td>Ruin detonates on every tenth stack and the stacks survive the blast, so a deep mark is an accumulation the game never lets him cash. <b>It is a bad trade most of the time and that is the design</b>: the pile he spends is +2% damage taken a stack for the rest of the battle. This is the answer to "I need it dead this turn".<br><b>Builds with:</b> <b>Transference</b> gathers every mark onto one body and this cashes it; <b>Covenant of Ash</b> doubles what the gathering is worth; <b>Anointing</b> and <b>Suffering</b> build the pile.</td></tr>
-<tr><td><b>Penance</b></td><td>25 Mana, 2.5, 4cd, one enemy</td><td>For 4 turns that enemy takes <b>shadow damage equal to 50% of the damage it deals</b>, whoever it hits — its own allies included. <b>An enemy that never swings never pays</b>: stunned, frozen, charmed or holding still, it costs nothing.</td><td>The free axis, aimed at the half of the game his spec cannot reach. <b>It is the only card of his that reads no Ruin at all</b> — no stacks, no threshold, no mark — so it still works in the trash fight that ends on round seven, which is exactly where his detonations measure zero.<br><b>Builds with:</b> <b>Blight the Well</b>, the other card of his that spends a turn doing nothing visible; and it is what to hold when <b>Breaking Darkness</b> has already named the body the heroes are grinding.</td></tr>
+<tr><td><b>Penance</b></td><td>25 Mana, 2.5, 4cd, one enemy</td><td>For 4 turns that enemy takes <b>shadow damage equal to 50% of the damage it deals</b>, whoever it hits — its own allies included. <b>An enemy that never swings never pays</b>: stunned, frozen or holding still, it costs nothing.</td><td>The free axis, aimed at the half of the game his spec cannot reach. <b>It reads no Ruin at all</b> — no stacks, no threshold, no mark — so it still works in the trash fight that ends on round seven, which is exactly where his detonations measure zero.<br><b>Builds with:</b> <b>Blight the Well</b>, the other card of his that spends a turn doing nothing visible; and it is what to hold when <b>Breaking Darkness</b> has already named the body the heroes are grinding.</td></tr>
 <tr><td colspan="4"><b>Beastmaster</b> — <i>what does the partnership give you</i></td></tr>
 <tr><td><b>Twin Hunt</b></td><td>25 Mana, 2.5, 3cd, one enemy</td><td>The Beastmaster and his companion strike together, each for 40% of Attack (Perfect: the companion lands 55%). If the companion's blow kills it, his next ability costs nothing.</td><td>The two bodies acting deliberately, where the rest of his kit has the companion on its own clock.</td></tr>
 <tr><td><b>Call the Wilds</b></td><td>20 Mana, 2.0, 5cd</td><td>Calls in the absent companion he is most bonded with, <b>keeping its Loyalty and paying no shared Swap cooldown</b>, and it strikes immediately (Perfect: twice).</td><td>Rotation without the tax — his central verb happens 0.05 times a trash battle.</td></tr>
 <tr><td><b>Bloodbond</b></td><td>20 Mana, 1.0, 4cd, self</td><td>The next blow that would <b>fell a companion is REFUSED</b> — and the hunter takes <b>a QUARTER of it</b> instead. It has <b>no duration and waits until it fires</b>. <b>The quarter he takes can kill him.</b></td><td>Protecting the single largest investment in the game. At 50 Loyalty a companion's death is the worst thing that happens to him, and he has no answer at all today.<br><b>Builds with:</b> <b>Bear the Brunt</b>, its exact inverse — the pair is meant to be read together.</td></tr>
-<tr><td><b>Savage Sweep</b></td><td>25 Mana, 2.5, 4cd, self</td><td>His companion immediately strikes the <b>three lowest-health enemies</b> and gains <b>3 Loyalty</b> (Perfect: 5). <i>Ursus mauls the enemies beside each target as it always does, so a bear sweep is wider still.</i></td><td>The partnership made wide. Every companion in the game is single-target and nothing in his kit changes that.<br><b>Builds with:</b> <b>Bestial Wrath</b>, which sharpens all three blows; and it is the field half of a two-card burst with <b>Twin Hunt</b>.</td></tr>
+<tr><td><b>Savage Sweep</b></td><td>25 Mana, 2.5, 4cd, self</td><td>His companion immediately strikes the <b>three lowest-health enemies</b> and gains <b>3 Loyalty</b> (Perfect: 5). <i>Ursus mauls the enemies beside each target as it always does, so a bear sweep is wider still.</i></td><td>The partnership made wide. A companion's ordinary strike finds one enemy, or one and its neighbours for the bear.<br><b>Builds with:</b> <b>Bestial Wrath</b>, which sharpens all three blows; and it is the field half of a two-card burst with <b>Twin Hunt</b>.</td></tr>
 <tr><td><b>Ghostpack</b></td><td>25 Mana, 1.0, 5cd, self</td><td>For 4 turns, <b>every companion he has summoned this battle</b> strikes alongside his attacks for <b>40%</b> — <b>including the ones no longer standing</b>. A hunter who has cycled all three gets three ghosts an attack; one who never swaps gets one.</td><td>What rotating actually buys. It pays a hunter who rotates and is near-worthless to one who never swaps.<br><b>Builds with:</b> <b>Succession</b> and <b>Call the Wilds</b>, which make cycling cheap — this is what cycling <i>pays</i>.</td></tr>
 <tr><td><b>Last Howl</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For the <b>rest of the battle</b>, every companion that falls pays the hunter <b>+3% strike damage per stack of Loyalty it had earned</b>. The meter breaks exactly as it always did — this is paid out of what it held, not instead of it.</td><td>The meter outliving the body. It is the only card of his that pays <i>because</i> the bond broke.<br><b>Builds with:</b> every Loyalty builder, because it pays per stack the fallen companion had earned.</td></tr>
 <tr><td><b>Succession</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For <b>6 turns</b> a swap hands the bond on: the arriving companion starts holding <b>half the Loyalty of the one it replaces</b>. It <b>raises, never lowers</b> — rotating into a deeper bond costs nothing.</td><td>Rotation stops costing the bond. BJ measured 0.05 swaps a trash battle; this removes the <i>depth</i> cost of a swap.<br><b>Builds with:</b> <b>Ghostpack</b>, which is what cycling pays.</td></tr>
@@ -2039,21 +2046,21 @@ binds exactly as often as it did before the conversion.<br><b>Builds with:</b> e
 <tr><td><b>Calibrating Shot</b></td><td>20 Mana, 1.5, 3cd, one enemy, 8 BD</td><td>20% of Attack, and he gains Focus equal to <b>10% of the target's MISSING health</b> (Perfect: 15%), read <i>before</i> this shot lands. <b>A fresh enemy pays nothing.</b></td><td>Patience rewarded for finishing what he started — it accelerates hardest exactly when the target is about to die and clear his meter.<br><b>Builds with:</b> <b>Coup de Grâce</b> reads missing health too and caps at 200 Focus, so this feeds the card that spends it. <b>Quarry's Mark</b> stacks on top of the ordinary gain.</td></tr>
 <tr><td><b>Trophy Shot</b></td><td>25 Mana, 2.5, 4cd, one enemy, 12 BD</td><td>35% of Attack (Perfect: 40.25%). <b>If this KILLS the target his Focus is not reduced at all</b> and carries whole to the next enemy he attacks. <b>If it does not kill, it is an ordinary shot</b> and the ordinary switch rules apply.</td><td>The kill stops costing him. A target dying is the most common event in a fight and it drops him to 50 retained — this is the only card that makes finishing a kill good for the meter.<br><b>Builds with:</b> the talent tree's <b>Kill What Is Down</b>, which helps it land the kill. It is the setup card for <b>Crossfire</b>.</td></tr>
 <tr><td><b>Reacquire</b></td><td>20 Mana, 1.5, 4cd, one enemy</td><td>Names one enemy for the <b>rest of the battle</b>. Leaving that target <b>BANKS his Focus</b> instead of clearing it, and returning to it hands the banked meter back whole. <b>Switching between any two OTHER targets still clears</b> exactly as it always did.</td><td>It prices the spec's central decision rather than removing it: he may juggle <i>two</i> enemies deliberately, and pays a card slot for the privilege.<br><b>Builds with:</b> <b>Trophy Shot</b> (it already carries Focus through a kill, so a marked enemy dying costs him nothing), <b>Quarry's Mark</b> (a second name on a second body), and <b>Crossfire</b>.</td></tr>
-<tr><td><b>Fault Line</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For <b>6 turns</b>, while his Focus stands <b>ABOVE the conversion point</b>, every attack he lands also deals <b>20 Break damage</b>. The card reads the live threshold, never a fixed 100.</td><td>Two gaps at once: the first card to read the half of his passive past the conversion point, and the <b>only Break lever the Hunter class has anywhere</b>.<br><b>Builds with:</b> across the roster, the Occultist's <b>Breaking Darkness</b>, which amplifies every source of Break — this one included.</td></tr>
-<tr><td><b>Drumfire</b></td><td>25 Mana, 3.0, 3cd, one enemy, 6 BD a shot</td><td>Three arrows at one mark, <b>14% of Attack each</b> (Perfect: a fourth) — and <b>EACH ONE counts separately for Focus</b>, where every other volley in the game counts once. A missed or blocked arrow feeds nothing.</td><td>The only thing that makes the meter's depth a function of what he <i>casts</i> rather than how many turns he stays.<br><b>Builds with:</b> <b>Quarry's Mark</b> (which doubles all three gains) and <b>Fault Line</b> above — three counted hits is the fastest way over its line. It points the opposite way to <b>Triple Shot</b>, which <i>spends</i> a deep meter where this <i>builds</i> one.</td></tr>
+<tr><td><b>Fault Line</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For <b>6 turns</b>, while his Focus stands <b>ABOVE the conversion point</b>, every attack he lands also deals <b>20 Break damage</b>. The card reads the live threshold, never a fixed 100.</td><td>Two gaps at once: the first card to read the half of his passive past the conversion point, and the <b>only card that adds Break to every attack he lands</b>.<br><b>Builds with:</b> across the roster, the Occultist's <b>Breaking Darkness</b>, which amplifies every source of Break — this one included.</td></tr>
+<tr><td><b>Drumfire</b></td><td>25 Mana, 3.0, 3cd, one enemy, 6 BD a shot</td><td>Three arrows at one mark, <b>14% of Attack each</b> (Perfect: a fourth) — and <b>EACH ONE counts separately for Focus</b>, where every other volley in the game counts once. A missed or blocked arrow feeds nothing.</td><td>The only thing that makes the meter's depth a function of what he <i>casts</i> rather than how many turns he stays.<br><b>Builds with:</b> <b>Quarry's Mark</b> (which doubles all three gains) and <b>Fault Line</b> above — three counted hits is the fastest way over its line. It points the opposite way to <b>Triple Shot</b>, which <i>reads</i> a deep meter where this <i>builds</i> one.</td></tr>
 <tr><td><b>Dug In</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For <b>4 turns</b> he takes <b>a QUARTER of whatever Focus stands when the blow lands</b> less damage, <b>up to 25%</b>. Read live, not at cast — so it rises as he commits and <b>falls to nothing when a switch breaks the meter</b>.</td><td>This spec&#x27;s cards offered him <b>nothing defensive at all</b> before it. It is deliberately <b>not evasion</b>: Camouflage already is, and a second copy would be the same card again.<br><b>Builds with:</b> <b>Reacquire</b> and <b>Trophy Shot</b>, the two cards that keep Focus across a switch — they are what stop the cover collapsing. <b>Drumfire</b> and <b>Quarry&#x27;s Mark</b> get him deep enough for it to matter.</td></tr>
-<tr><td><b>Heads Down</b></td><td>25 Mana, 2.0, 4cd, one enemy, 8 BD</td><td><b>20% of Attack</b>, and for <b>3 turns</b> (Perfect: 4) that enemy <b>can bring nothing but its basic attack to bear</b>. It still acts — it simply cannot reach for anything better.</td><td><b>The first silence in the project</b>, and control his pool did not have. Written as a <b>downgrade rather than a lost turn</b> so it is not a fourth Stun beside Bola, Deadfall and Pommel Strike — which is also why it needs no boss exception.<br><b>Builds with:</b> <b>Dug In</b> by construction — blunt what it can bring, then set your feet. The status is a real affliction, so a <b>Survivalist</b> alongside him counts it toward Trapper breadth.</td></tr>
+<tr><td><b>Heads Down</b></td><td>25 Mana, 2.0, 4cd, one enemy, 8 BD</td><td><b>20% of Attack</b>, and for <b>3 turns</b> (Perfect: 4) that enemy <b>can bring nothing but its basic attack to bear</b>. It still acts — it simply cannot reach for anything better.</td><td><b>The first silence in the project</b>, and control his pool did not have. Written as a <b>downgrade rather than a lost turn</b> so it is not one more Stun beside Snare Trap, Deadfall and Pommel Strike — which is also why it needs no boss exception.<br><b>Builds with:</b> <b>Dug In</b> by construction — blunt what it can bring, then set your feet. The status is a real affliction, so a <b>Survivalist</b> alongside him counts it toward Trapper breadth.</td></tr>
 <tr><td colspan="4"><b>Survivalist</b> — <i>what else can be worn down</i></td></tr>
-<tr><td><b>Choking Smoke</b></td><td>25 Mana, 2.5, 4cd, all enemies</td><td>Blinds every enemy for 3 turns — the existing Blind, +50% miss.</td><td>An affliction his kit does not otherwise have. Area attacks never miss, so it blanks single-target blows only.</td></tr>
+<tr><td><b>Choking Smoke</b></td><td>25 Mana, 2.5, 4cd, all enemies</td><td>Blinds every enemy for 3 turns — the existing Blind, +50% miss.</td><td>Blind on the whole field at once. Area attacks never miss, so it blanks single-target blows only.</td></tr>
 <tr><td><b>Snare Line</b></td><td>25 Mana, 2.5, 4cd</td><td>Every enemy that acts in the next two turns springs one of your traps where it stands — teeth, Stun and all. It fills no trap slot and spends no placed trap.</td><td>The traps stop waiting.</td></tr>
 <tr><td><b>Loaded Shot</b></td><td>20 Mana, 2.0, 4cd, one enemy, 8 BD</td><td>20% of Attack, and <b>every harmful effect on the target has its duration reset to full</b> — <b>the uncleansable ones too</b> (Perfect: it also lands 2 turns of Poison). It can only lengthen: a re-applied Burn already standing longer than it started is left alone, and a permanent affliction stays permanent.</td><td>Craft as maintenance, on a turn he would have been attacking anyway. His engine is breadth and breadth decays.<br><b>Builds with:</b> it holds up <b>Choking Smoke</b> and <b>Snare Line</b>, and it holds the count <b>Hunt</b> is paid on.</td></tr>
 <tr><td><b>Hunt</b></td><td>25 Mana, 2.5, 4cd, one enemy, 10 BD</td><td><b>15% of Attack for every DIFFERENT harmful effect</b> on the target (Perfect: 23%) — 60% at four afflictions, 90% at six. <b>Stacks do not count twice:</b> five stacks of Poison are one affliction. Dark against a clean field.</td><td>The count made into a weapon. His passive has always paid for breadth; this is the first thing that lets him <i>spend</i> it.<br><b>Builds with:</b> <b>Loaded Shot</b>, its maintenance card, and <b>Preparation</b>, which buys the turn a wide board costs to arm.</td></tr>
 <tr><td><b>Preparation</b></td><td>25 Mana, 2.0, 5cd, self</td><td><b>After his NEXT turn he immediately takes another one</b>, and it refunds 15 Mana. It is a <b>full turn and his own statuses tick again</b> — enemy statuses tick on enemy turns, so the board he armed is untouched. <b>Only one may be pending</b>, so it can never be cast on the turn it bought.</td><td>An extra action <i>is</i> extra breadth, for a spec where every status costs a whole cast. The delay is what makes it a setup card rather than "take two turns now".<br><b>Builds with:</b> everything of his that costs a turn — trap placement above all. It is the direct setup for <b>Loaded Shot</b> and <b>Hunt</b>.</td></tr>
 <tr><td><b>Stalking Horse</b></td><td>25 Mana, 1.0, 4cd, self</td><td>For <b>4 turns</b> enemies are drawn to swing at him, and <b>every attacker takes a DIFFERENT affliction</b> — Poison, then Cripple, Slowed, Exposed, Dazed and Blind, in turn. It reuses the existing draw (Savage Presence's), not a second taunt.</td><td>The taunt that builds his own engine. Trapper pays for <b>breadth</b> and nothing in his kit ever helped him get it except applying afflictions one at a time off his own turns.<br><b>Builds with:</b> <b>Hunt</b> and <b>Cull</b>, both priced on the count.</td></tr>
-<tr><td><b>Downwind</b></td><td>25 Mana, 1.0, 5cd, self</td><td>For <b>4 turns</b> every harmful effect <b>any hero</b> lands on an enemy is <b>copied onto a second enemy</b>, preferring one that does not already carry it. <b>A copied freeze is an ordinary one</b> &mdash; it thaws after the turn it costs, and it is never a Glacial Hold, which holds the one enemy it was laid on &mdash; and <b>a copy never carries a Perfect's way past a boss's immunity</b>: a Perfect Pommel Strike's copy is shrugged off by an unbroken boss. <b>A card's own bookkeeping is never copied</b> &mdash; a snare stays a trap on its own enemy, holding one of the Hunter's trap slots, and Vendetta's lock binds the one enemy it was sworn on &mdash; and <b>a copy takes its original's route</b>: a copied Ruin stack is a stack like any other, so it can prime its detonation and a Covenant of Ash takes its share, and a copied Poison keeps what its original's route gave it (one that cannot be cleansed is copied as one that cannot be cleansed).</td><td>He is the one spec in the game whose passive an ally can pay into — Trapper's breadth counts afflictions from <i>any</i> source — and this is the card that says so.<br><b>Builds with:</b> any ally who applies statuses in volume, the <b>Occultist</b> above all, then the <b>Cryomancer</b> and the <b>Pyromancer</b>; plus <b>Cull</b> below, which cashes what this spreads.</td></tr>
+<tr><td><b>Downwind</b></td><td>25 Mana, 1.0, 5cd, self</td><td>For <b>4 turns</b> every harmful effect <b>any hero</b> lands on an enemy is <b>copied onto a second enemy</b>, preferring one that does not already carry it. <b>A copied freeze is an ordinary one</b> &mdash; it thaws after the turn it costs, and it is never a Glacial Hold, which holds the one enemy it was laid on &mdash; and <b>a copy never carries a Perfect's way past a boss's immunity</b>: a Perfect Pommel Strike's copy is shrugged off by an unbroken boss. <b>A card's own bookkeeping is never copied</b> &mdash; a snare stays a trap on its own enemy, holding one of the Hunter's trap slots, and Vendetta's lock binds the one enemy it was sworn on &mdash; and <b>a copy takes its original's route</b>: a copied Ruin stack is a stack like any other, so it can prime its detonation and a Covenant of Ash takes its share, and a copied Poison keeps what its original's route gave it (one that cannot be cleansed is copied as one that cannot be cleansed).</td><td>His passive is one an ally can pay into — Trapper's breadth counts afflictions from <i>any</i> source — and this is the card that says so.<br><b>Builds with:</b> any ally who applies statuses in volume, the <b>Occultist</b> above all, then the <b>Cryomancer</b> and the <b>Pyromancer</b>; plus <b>Cull</b> below, which cashes what this spreads.</td></tr>
 <tr><td><b>Cull</b></td><td>30 Mana, 3.0, 5cd, one enemy</td><td><b>CONSUMES every affliction on one enemy</b>, and <b>EVERY</b> enemy takes <b>10% of Attack in nature damage per status removed</b> (Perfect: 12%). A poison that cannot be cleansed stays — and is not paid for.</td><td>Spending the breadth, and it <b>deliberately fights his own passive</b>: what Trapper spent the fight building is what this eats. That tension is the card.<br><b>Builds with:</b> <b>Downwind</b> above all (it spreads the board this cashes), and <b>Stalking Horse</b> (which builds it off enemy turns). It is <i>not</i> Harvest: that one empties one enemy and heals him; this bills the whole field and heals nothing.</td></tr>
 <tr><td><b>Thick Hide</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For <b>4 turns</b> he takes <b>6% less damage per DIFFERENT affliction standing on whoever is striking him</b>, <b>up to 30%</b>.</td><td>His passive pays him for <b>being struck</b> and Stalking Horse <b>pulls the field onto him</b>, and until now <b>nothing in his kit or pool supported being in the fray</b>. It is the first card that reads Trapper breadth <b>on the way in</b>.<br><b>Builds with:</b> <b>Stalking Horse</b> above everything — that card puts a different affliction on every attacker in turn, which is exactly the number this reads.</td></tr>
-<tr><td><b>Salve</b></td><td>25 Mana, 2.0, 5cd, self</td><td>For <b>3 turns</b> (Perfect: 4) he heals <b>2% of maximum health at the start of his turn per DIFFERENT affliction standing on the enemies</b>, <b>up to 10%</b>. Counted <b>once each across the field</b>, so a copied poison does not pay twice. <b>Nothing is consumed.</b></td><td><b>The first heal in any of the twenty-four Hunter spec cards.</b> The class was shortest of this axis by a distance — its only self-mending was one class card and a boss-pick Harvest.<br><b>Builds with:</b> <b>Harvest</b> as its <b>deliberate inverse</b> — that one burns the whole board for a burst and strips his own Trapper bonus; this drinks and leaves everything standing, so Hunt and Cull keep paying. <b>Choking Smoke</b> and <b>Downwind</b> are what make the board wide enough to drink from.</td></tr>
+<tr><td><b>Salve</b></td><td>25 Mana, 2.0, 5cd, self</td><td>For <b>3 turns</b> (Perfect: 4) he heals <b>2% of maximum health at the start of his turn per DIFFERENT affliction standing on the enemies</b>, <b>up to 10%</b>. Counted <b>once each across the field</b>, so a copied poison does not pay twice. <b>Nothing is consumed.</b></td><td><b>The only card on the three Hunter spec shelves that heals the Hunter himself.</b> The class was shortest of this axis by a distance — its only self-mending was one class card and a boss-pick Harvest.<br><b>Builds with:</b> <b>Harvest</b> as its <b>deliberate inverse</b> — that one empties one enemy for a burst and strips his own Trapper bonus; this drinks and leaves everything standing, so Hunt and Cull keep paying. <b>Choking Smoke</b> and <b>Downwind</b> are what make the board wide enough to drink from.</td></tr>
 <tr><td colspan="4"><b>Class-wide — MAGE</b> (all three specs) — <i>the tools every spine wants and no spine provides, because a spine that provided them would stop being a spine</i></td></tr>
 <tr><td><b>Mirror Image</b></td><td>20 Mana, 1.0, 4cd, self</td><td>The next <b>four single-target attacks</b> against him miss outright. Area attacks roll no miss at all, so they spend no image. The images <b>wait until spent</b>.</td><td>Evasion rather than absorption. Better than Nexus Ward, the kit's barrier, against three big hits, worse against a swarm — neither is a strict upgrade of the other.</td></tr>
 <tr><td><b>Mana Well</b></td><td>20 Mana, 1.0, 5cd, self</td><td>For 4 turns his <b>Mana regeneration is doubled</b> — the live figure, so Evocation and any rune are doubled with it.</td><td>Costs Mana to make Mana: net-positive only if the fight lasts, so it is a read on the fight rather than a free button.</td></tr>
@@ -2061,21 +2068,21 @@ binds exactly as often as it did before the conversion.<br><b>Builds with:</b> e
 <tr><td><b>Blink</b></td><td>10 Mana, 1.0, 3cd, self</td><td>Clears <b>two turns from every one of his cooldowns</b>. Its own is exempt.</td><td>Timing, not damage. Worth most to whoever has the most on cooldown, so it scales with kit size rather than with any spec.</td></tr>
 <tr><td colspan="4"><b>Class-wide — CLERIC</b> (all three specs) — <i>three support-shaped spines with enormous conditional power; the plain heal, the heal for every hero and the cleanse are every Cleric's class kit (&sect;5.2), so these are the rest</i></td></tr>
 <tr><td><b>Chastise</b></td><td>15 Mana, 2.0, 2cd, one enemy</td><td><b>25% of Attack</b> as holy damage and <b>20 Break damage</b> (Perfect: 25 BD).</td><td>Something to do with a turn. All three Clerics have turns where nobody needs healing and their engine is not ready.</td></tr>
-<tr><td><b>Exhortation</b></td><td>25 Mana, 1.0, 4cd, every hero</td><td><b>Every hero's next attack deals 35% more damage</b>. <b>Banked, not timed</b> — it waits for each hero's next swing rather than expiring on a turn count.</td><td>The only offensive group buff a Cleric has.</td></tr>
-<tr><td><b>Undying Vigil</b></td><td>25 Mana, 1.0, 4cd, one hero</td><td>For 4 turns, whenever that hero is healed <b>by any source</b>, a second hero on lower health is healed for half as much.</td><td>Making one heal into two. It is the one class ability that gets <i>better</i> the more spec-specific the build is — a deliberate inversion of the unconditional-floor role the other two play.</td></tr>
-<tr><td colspan="4"><b>Class-wide &mdash; HUNTER</b> (all three specs) &mdash; <i>three spines that are all conditional, in a class with no healing whatsoever and the thinnest defensive kit in the game</i></td></tr>
-<tr><td><b>Field Dressing</b></td><td>20 Mana, 2.0, 3cd, self</td><td>Heals <b>18% of maximum health</b> (Perfect: 24%) and removes <b>one</b> harmful effect.</td><td>The only <b>unconditional</b> self-heal a Hunter can get, and <b>Batch DS corrected this sentence rather than leaving it to rot</b>: it read &quot;the only self-heal a Hunter can get&quot; from BR until DS, and that was already false when it was written &mdash; <b>Harvest heals</b>, and it sits in the Survivalist's boss pool and in the Hunter class pool. DS's <b>Salve</b> is a second. <b>The tree half of the claim is true and is kept</b>: nothing in the talent tree heals unconditionally (Breaking Heals a Hero pays only for Break dealt, and Cleanse Debuffs Each Turn <i>cleanses</i>), so this really is the only one that needs nothing set up.</td></tr>
+<tr><td><b>Exhortation</b></td><td>25 Mana, 1.0, 4cd, every hero</td><td><b>Every hero's next attack deals 35% more damage</b>. <b>Banked, not timed</b> — it waits for each hero's next swing rather than expiring on a turn count.</td><td>The only class-wide offensive group buff a Cleric has.</td></tr>
+<tr><td><b>Undying Vigil</b></td><td>25 Mana, 1.0, 4cd, one ally</td><td>For 4 turns, whenever that ally is healed <b>by any source</b>, a second hero on lower health is healed for half as much. Laid on a companion it does nothing.</td><td>Making one heal into two. It is the one class ability that gets <i>better</i> the more spec-specific the build is — a deliberate inversion of the unconditional-floor role the other two play.</td></tr>
+<tr><td colspan="4"><b>Class-wide &mdash; HUNTER</b> (all three specs) &mdash; <i>three spines that are all conditional, in a class with one unconditional self-heal and the thinnest defensive kit in the game</i></td></tr>
+<tr><td><b>Field Dressing</b></td><td>20 Mana, 2.0, 3cd, self</td><td>Heals <b>18% of maximum health</b> (Perfect: 24%) and removes <b>one</b> harmful effect.</td><td>The only <b>unconditional</b> self-heal a Hunter can get, and <b>Batch DS corrected this sentence rather than leaving it to rot</b>: it read &quot;the only self-heal a Hunter can get&quot; from BR until DS, and that was already false when it was written &mdash; <b>Harvest heals</b>, and it sits in the Survivalist's boss pool. DS's <b>Salve</b> is a second. <b>The tree half of the claim is true and is kept</b>: nothing in the talent tree heals unconditionally (Breaking Heals a Hero pays only for Break dealt, and Cleanse Debuffs Each Turn <i>cleanses</i>), so this really is the only one that needs nothing set up.</td></tr>
 <tr><td><b>Camouflage</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For 3 turns enemies are <b>70% less likely to aim at him</b>.</td><td>Buying time rather than absorbing damage — the defensive shape the class does not have.</td></tr>
 <tr><td><b>Aimed Volley</b></td><td>20 Mana, 2.5, 3cd, one enemy</td><td><b>Three shots at 12% of Attack</b> each with <b>8 Break damage a shot</b> — 24 across the volley (Perfect: a fourth shot).</td><td>The reliable strike. Every Hunter kit is built on a conditional; this works when nothing is set up yet, and being multi-hit is what makes it play with a charge bank.</td></tr>
 <tr><td><b>Bola</b></td><td>15 Mana, 1.5, 3cd, one enemy</td><td>Applies <b>Slowed and Crippled for 4 turns</b>. No damage and no Break.</td><td>Two afflictions on one card and nothing else — the price of the breadth is that it is all it does.</td></tr>
-<tr><td><b>Hunter's Mark</b></td><td>15 Mana, 1.5, 4cd, one enemy</td><td>For 6 turns <b>every ally deals 15% more damage</b> to that enemy. One mark at a time.</td><td>Focus fire made explicit — the only amplifier for everyone the class has. Unlike the Beastmaster's Mark of the Hunt, the mark carries no owner: every hero and every companion reads it.</td></tr>
+<tr><td><b>Hunter's Mark</b></td><td>15 Mana, 1.5, 4cd, one enemy</td><td>For 6 turns <b>every ally deals 15% more damage</b> to that enemy. One mark at a time.</td><td>Focus fire made explicit. Unlike the Beastmaster's Mark of the Hunt, the mark carries no owner: every hero and every companion reads it.</td></tr>
 <tr><td><b>Arcane Arrows</b></td><td>25 Mana, 1.0, 5cd, self</td><td><b>6 charges</b>: each of his next six <b>hits</b> also strikes an additional random enemy for half that hit's damage. <b>Banked, not timed</b> — they wait until spent, and a three-shot volley spends three.</td><td>A charge bank, which the class has never had.</td></tr>
 <tr><td colspan="4"><b>Class-wide &mdash; WARRIOR</b> (all three specs) &mdash; <i>three spines that are all melee, all Rage-driven and all reactive: none can make something happen on turn one</i></td></tr>
 <tr><td><b>Battle Trance</b></td><td>15 Rage, 1.0, 4cd, self</td><td>For 4 turns, at the start of each of his turns he heals <b>3% of maximum health plus half of all damage taken since his last turn</b>.</td><td>Recovery that scales with the beating. It reads damage <i>taken</i>, not missing health — and it is delayed, so it is not mitigation and cannot save him from a killing blow.</td></tr>
 <tr><td><b>Rally</b></td><td>15 Rage, 1.5, 4cd, one hero</td><td>That hero <b>acts next</b>, jumping straight to the front of the initiative order, and regains 15% of their resource. It cannot target the caster.</td><td>Giving away tempo — the only ability in the game that hands a hero a turn, and the only tempo tool a class with none can have.</td></tr>
-<tr><td><b>Charge</b></td><td>20 Rage, <b>1.0</b>, 3cd, one enemy</td><td><b>25% of Attack</b> and <b>20 Break damage</b>; the target is <b>Dazed for 2 turns</b> (Perfect: 3). <b>Builds 30 Rage</b>, so it net-generates 10.</td><td>Reaching something now. The very fast initiative is the point — it is a Warrior's only answer to a caster winding up. It is also the one class-wide card in the game that generates its resource, and the one that beats the free basic rather than sitting under it: Strike wins only on net Rage and on having no cooldown.</td></tr>
+<tr><td><b>Charge</b></td><td>20 Rage, <b>1.0</b>, 3cd, one enemy</td><td><b>25% of Attack</b> and <b>20 Break damage</b>; the target is <b>Dazed for 2 turns</b> (Perfect: 3). <b>Builds 30 Rage</b>, so it net-generates 10.</td><td>Reaching something now. The very fast initiative is the point — it is a Warrior's only answer to a caster winding up. It is also the one class-wide card that builds its resource on cast, and the one that beats the free basic rather than sitting under it: Strike wins only on net Rage and on having no cooldown.</td></tr>
 <tr><td><b>Cleave</b></td><td>25 Rage, 2.5, 3cd, three chosen enemies</td><td><b>15% of Attack</b> (Perfect: 17.25%) and <b>15 Break damage</b> to each of three chosen enemies.</td><td>Breadth from a narrow class. Three <i>chosen</i> enemies rather than three random ones is what separates it from War Stomp.</td></tr>
-<tr><td><b>Warcry</b></td><td>20 Rage, 1.0, 5cd, every hero</td><td>Every hero deals <b>20% more damage for 4 turns</b>.</td><td>The group buff the class lacks — the Berserker's Battle Shout is the only other Warrior card that improves anyone else's numbers, and it is spec-locked where this is class-wide.</td></tr>
+<tr><td><b>Warcry</b></td><td>20 Rage, 1.0, 5cd, every hero</td><td>Every hero deals <b>20% more damage for 4 turns</b>.</td><td>A group buff — the Berserker's Battle Shout is the only other Warrior card that improves anyone else's numbers, and any Warrior can draw either.</td></tr>
 <tr><td><b>Ironclad</b></td><td>20 Rage, 1.0, 4cd, self</td><td>For 4 turns he <b>cannot be Stunned, Frozen, Dazed or Broken</b>, and takes <b>15% less damage</b>. The Break half is a <b>cap, not an immunity</b>: his meter fills to <b>99</b> and no further, so pressure still accumulates and simply cannot cross.</td><td>Refusing to be stopped. Every Warrior spine dies to losing a turn — and the cap makes it a delay rather than a negation: the moment it ends he is one hit from Broken.</td></tr>
 </table>
 
@@ -2152,7 +2159,7 @@ the cores instead of through the pool. The per-spec table is printed by <code>ch
 every battery run, so the day a core kit moves the baseline is re-measured rather than re-assumed.
 <b>And BREAK cannot carry one at all</b>: no card has a BREAK primary since Batch FD &sect;2, so a
 threshold counting primaries on BREAK could never be met by any hero, ever. <b>Do not author
-one.</b> <code>check_fd</code> &sect;2 asserts that no live rune carries a condition of any kind,
+one.</b> <code>check_fd</code> &sect;2 asserts that no live rune carries a tag condition,
 and names BREAK and OFFENSE &mdash; the two columns the demotion moved &mdash; separately.</p>
 
 <h3>6.1 Warrior</h3>
@@ -2196,7 +2203,7 @@ gains +8% damage, plus 1% for every 20 points of blood buildup on the warband, f
 &sect;1): the payload is unconditional since CN took this card's bar off, and the card now says so
 in its own sentence instead of inside <i>"a roar every hero answers"</i>. There is no Perfect. Rampage — 40 Rage, 3 × 20 physical +
 3 × 10 bloodloss / 3 × 10 BD, 4.0, 4cd; if the target dies, Rampage immediately recasts
-(free) on another enemy and can chain.</li>
+(free) on another enemy, once a turn.</li>
 <li><b>Warden (Tank)</b> — <b>Stat block:</b> 200 HP / 32% armor / <b>10% base Block</b>
 (the only Block-stat character) / Constitution 130 / +15% fire &amp; frost resist, −20%
 arcane (the wall: roughly double the Berserker's effective durability against physical and
@@ -2238,7 +2245,7 @@ Passive <i>Seasoned Fighter</i>: fights in one of <b>two stances the PLAYER cont
 AGGRESSIVE (+30% damage dealt, +10% damage taken) or DEFENSIVE (15% less damage taken,
 −10% damage dealt). Every battle opens Aggressive and <b>Guard Change swaps</b> — his only
 <i>unconditional</i> stance swap, which the Rune of the Swordmaster (core) brings with it; Precision
-Strike and Feint, drafted, switch it as well but cost Rage and carry cooldowns. The spec chip
+Strike, Feint and Wheeling Cut, drafted, switch it as well but cost Rage and carry cooldowns. The spec chip
 names the live stance (AGG/DEF) with both stances' numbers in its tooltip.<br>
 His kit is one loop: Break is the key, Stun is the door, and the Broken window is the
 room — build the meter, crack the guard, then walk in while it's down.<br>
@@ -2254,7 +2261,7 @@ the swordsman presses the opening he already made) and builds 15 Rage (Perfect: 
 parry chance for 2 turns). Deliberately not a free action: the swap does double duty —
 stance, pressure, refuel — at a bargain initiative instead.<br>
 <i>Earnable (§6a):</i> Shatterpoint — 30 Rage, 20 dmg / <b>40 BD</b> / 3.0, 4cd — one of his
-heaviest Break blows, the timing he chooses; if this hit BREAKS the target, the Swordmaster
+heaviest Break blows, the timing he chooses; if this hit BREAKS the target and he holds Overpower, the Swordmaster
 immediately casts <b>Overpower on it for FREE</b> (no Rage, no cooldown) — straight through
 the opening, into the rider that extends the window it just opened (Perfect: +15 bonus BD).<br>
 <i>Earnable (§6a):</i> Sweeping Strikes — 20 Rage, 2 strikes × 15 dmg / 12 BD,
@@ -2270,8 +2277,8 @@ Execute — 30 Rage, 55 dmg / 50 BD, 2.0, 3cd, usable against
 targets below 20% health OR against a Broken target — the loop sets up his own finisher
 (Perfect: guaranteed crit). <b>Only those can be chosen</b>: the button lights when one stands,
 the target picker offers exactly those, and a hover on any other enemy says why it cannot be
-picked; while none stands, his darkened button says <i>No enemy is below 20% health or Broken</i> (35% for the
-upgraded copy), unless the Rage is what he lacks &mdash; then the button keeps the cost's reason. The sim's bot aims an Execute
+picked; while none stands, his darkened button says <i>No enemy is below 20% health or Broken</i>,
+unless the Rage is what he lacks &mdash; then the button keeps the cost's reason. The sim's bot aims an Execute
 only where the picker would let him, through the same narrowing, at both places it casts one. <b>Both sit in the spec draft pool AND the boss-pick pool; no
 talent grants either any more (Batch DO), so the node UPGRADES they used to collide with are
 read-only-zero</b> — the branches stand and nothing writes them.</li>
@@ -2384,14 +2391,14 @@ A genuinely late button — dark until the ramp is deep, and then the only thing
 press. At a Mage's 22 Mana regeneration, 55 is most of three turns' saving with Cannon and
 Barrage competing for the same pool. It carries <b>no Break damage</b>.<br>
 <i>Earnable (spec pool):</i> Stabilize — free, 1.5, 3cd; consumes the Resonance stacks
-ABOVE 2: +5 Mana and +10% damage reduction (2 turns) per stack consumed. One of only two
-cards that remove Resonance (Arcane Bolt halves it), and the reason it is earned rather than
+ABOVE 2: +5 Mana and +10% damage reduction (2 turns) per stack consumed. One of three
+cards that remove Resonance (Arcane Bolt halves it; Threshold sets it to 15), and the reason it is earned rather than
 given: it is the
-escape hatch from the ramp, so taking it is a decision (Perfect: also heals 5% of max
-health).<br>
+escape hatch from the ramp, so taking it is a decision. Every cast also heals him 5% of his max
+health.<br>
 <i>Earnable (§6a) or drafted:</i> Overcharge — 20 Mana, 1.5, 5cd, once per battle: immediately gain
 Resonance equal to your FULL current stacks. At ten
-stacks it grants five. Magi's Wrath — 30 Mana, 15%
+stacks it grants ten. Magi's Wrath — 30 Mana, 15%
 Atk arcane to ALL enemies / 4.0, 4cd; BD = 2.5 × stacks; recoil 15% of damage dealt, −3%
 per enemy hit, and no per-stack damage term for the same reason Cannon has none (Perfect:
 costs 3.5 initiative instead).<br>
@@ -2401,8 +2408,8 @@ costs 3.5 initiative instead).<br>
 <p>Every Cleric holds the class kit &mdash; <b>Ministration, Unburden and Consecration</b> (&sect;5.2) &mdash; whatever engine he holds, and his basic attack is Smite.</p>
 <ul>
 <li><b>Holy (Healer)</b> — <b>Stat block:</b> 150 HP / 10% armor / +20% holy resist,
-−15% shadow (cloth and light: the least protection of the three, but a tall pool —
-her heals are percentages of her own maximum, so her health bar IS her throughput;
+−15% shadow (cloth and light: light armour and the smallest pool of the three —
+her Heal and Renewal are percentages of her own maximum, so her health bar IS their throughput;
 light turns aside light, and shadow finds her).<br>
 Passive <i>Mercy</i> (the stack mechanic itself; see §5.1).<br>
 <i>Drafted (§6b):</i> Heal — 20 Mana, 3.0, 1cd; heal an ally for 40% of the Cleric's max health. Empower
@@ -2431,8 +2438,8 @@ Mercy is paid ON TRIGGER, not on cast, so a Cleric holding none arms nothing.<br
 <b>Talents:</b> the one tree, bought with the Cleric's points — see §7.</li>
 <li><b>Devout (Warder)</b> — <b>Stat block:</b> 175 HP / 18% armor / +15% holy &amp;
 +10% fire resist, −10% shadow (the armoured priest, and the tallest health pool of the
-three BY DESIGN — Divine Shield and the Faith release both pay
-out percentages of HIS maximum: his own bulk is what he lends out).<br>
+three BY DESIGN — Divine Shield pays
+out a percentage of HIS maximum: his own bulk is what he lends out).<br>
 Passive <i>Conviction</i>: heroes build <b>Faith</b> whenever
 <b>Divine Shield absorbs damage for them</b> (2 per absorbed hit) and whenever they begin
 a turn standing on <b>Consecrated Ground</b> (1 per hero per turn) — max 8 stacks; doubled
@@ -2472,7 +2479,7 @@ and heals 10% of max health each turn, <b>and the cast itself heals every hero 5
 once</b> — unconditionally, since CQ folded what had been its Perfect.<br>
 <b>Talents:</b> the one tree, bought with the Cleric's points — see §7.</li>
 <li><b>Occultist (Pressure)</b> — <b>Stat block:</b> 155 HP / 8% armor / +25% shadow &amp;
-+10% nature resist, −20% fire (the least armour of the four — robes and appetite — but a
++10% nature resist, −20% fire (the least armour of the three — robes and appetite — but a
 real pool to spend from, because Dark Pact pays in his blood and his heals key off his
 maximum; deep shadow affinity, and cleansing flame finds the corrupt).<br>
 Passive <i>Wrath of the Old Gods</i>: every debuff the
@@ -2552,7 +2559,7 @@ nothing of theirs ever falls back. <b>The four cards that read the RAW stack cou
 do the three companion gifts and every threshold: the conversion touches the PAYOUT only and never
 the accrual.<br>
 <b>Summon-and-swap effects</b> fire whenever a companion is summoned OR swapped in — Ursus:
-<i>Guardian's Roar</i>, taunting the lowest-health enemy (preferring one not already taunted)
+<i>Guardian's Roar</i>, taunting the lowest-health enemy not already taunted (nobody, if every enemy is)
 while the bear takes 25% less damage for 2 turns; Canis: <i>Bloodhowl</i>, 15 Bleed to every
 enemy; Aguila: dives a chosen enemy for 15% of the hunter's Attack, Dazing them.<br>
 <b>Companions:</b> one at a time (placeholder sphere sprites:
@@ -2672,7 +2679,7 @@ Passive <i>Trapper</i>: enemies that strike the Hunter
 have a 25% chance to be Poisoned (5 turns), and the Survivalist's abilities deal <b>+8%
 damage per DIFFERENT status effect</b> afflicting the target (the curated debuff list only)
 — breadth of control IS the damage. Five different debuffs beat fifty stacks of one; his
-meter lives on the enemy. It is the one payoff in the game with a real ceiling, and that is
+meter lives on the enemy. It is a payoff with a real ceiling, and that is
 deliberate: breadth is bounded by how many distinct debuffs exist.<br>
 <i>Drafted (§6b):</i> Tripwire — 20 Mana, 1.0, 4cd, for 6 turns the Hunter retaliates against EVERY attacking
 melee enemy — regardless of who they hit.<br>
@@ -2696,7 +2703,7 @@ Hamstring — 25 Mana, 2.5, 3cd, 20% Atk: Cripple, Slowed AND Exposed — three 
 one cast (Perfect: 4 turns each).<br>
 Deadfall — 25 Mana, 1.0, 5cd: arm a deadfall in the path. The NEXT enemy to act takes 20%
 Atk nature damage and is Stunned 1 turn; the trap then lies dormant for 2 turns, re-arms
-itself and springs again — <b>three times in all</b> (Perfect: four). You never pick the
+itself and springs again — <b>four times in all</b>. You never pick the
 victim: it takes whoever walks the trail. Bosses shrug the stun unless Broken. <b>It holds
 one trap slot until its last spring is spent</b>, which is the cost of a trap that stays on
 the board.<br>
@@ -2704,7 +2711,7 @@ Harvest — 25 Mana, 3.0, 4cd: CONSUME every affliction on one enemy — 12% Atk
 REMOVED, <b>rising toward 18% with the share an ALLY opened</b>, healing yourself the same
 amount (Perfect: heals 150%). It is paid for what the cleanse actually took: a poison that
 cannot be cleansed stays on the body and is not billed for.
-<b>ALLY is heroes AND companions</b> — a wound the Beastmaster's eagle opened pays what a
+<b>ALLY is heroes AND companions</b> — a wound his own eagle opened pays what a
 hero's does, and a hero who has since fallen still opened his. Cashing out strips your own
 Trapper bonus from the target.<br>
 <b>Talents:</b> the one tree, bought with the Hunter's points — see §7.</li>
@@ -2727,8 +2734,8 @@ node is exclusive, so a cell bought is a cell worn</b> — there is no separate 
 every cell a class owns is on every hero of that class, every run.</p>
 <p><b>HERO AND ALLY ARE NOT INTERCHANGEABLE ON A CARD, AND AS OF BATCH DL THEY ARE THE ONLY
 TWO WORDS.</b> A <b>HERO</b> is one of your four. An <b>ALLY</b> is a hero or a
-Beastmaster's companion. <b>THERE IS NO THIRD WORD</b>: no player-facing text uses a vaguer
-one any more, because a vaguer word reads as EITHER — and that ambiguity is exactly what let
+Hunter's companion. <b>THERE IS NO THIRD WORD</b>: where a card says <i>everyone</i> (Aegis Wall, Hunter's
+Mark), its reach is still written as hero or ally, because a vaguer word reads as EITHER — and that ambiguity is exactly what let
 one card promise a shed to everyone standing and pay only the four, for the life of the
 project.</p>
 <p><b>The tree keeps that line.</b> <i>Cleanse Debuffs Each Turn</i> washes <b>allies</b>, so
@@ -2745,8 +2752,8 @@ different answers — so the card carries both words in a single sentence. Both 
 ABILITY and ruled on the ability; the clause that carried neither word was invisible to each.
 <b>Read a card clause by clause, not card by card.</b></p>
 <p><b>Earning: 1 talent point per class per ZONE BOSS defeated.</b> Three zone bosses, so
-<b>3 points per class per completed run</b> — and a run that dies in zone 2 still banks 1
-or 2. Only the classes among your heroes earn; a class that did not play banks nothing.
+<b>3 points per class per completed run</b> — and a run that dies in zone 2 still banks 1,
+and one that dies in zone 3 banks 2. Only the classes among your heroes earn; a class that did not play banks nothing.
 Points are per class and never transfer, and they bank without limit. <b>The end boss awards
 no points</b> — it awards a relic, and it opens a tier. At 3 a run, filling the tree for one
 class is 18 completions.</p>
@@ -2811,9 +2818,9 @@ among the heroes is stamped on every hero when the battle opens, so two heroes h
 not stack. <i>A Bigger Resource Pool</i>'s twenty points are kept between fights: from a Mana hero's first fight's
 end his bar's maximum rides with him, so the Cracked Hourglass restores 30% of it, a new zone refills him to it, and a
 Mana Potion used on the map or an event's Mana reads it too. A hero with no node reads 100 through every one of them.</p>
-<p>Talent visibility: every talent proc is written to the combat log with a
-"Talent:" tag, and stateful talent effects display as chips with live counters —
-the per-debuff mitigation chip shows its current cut, and the Devoutness chip names the Break
+<p>Talent visibility: most talent procs are written to the combat log under the node's name
+(A Crit Pays, Your Crits Crack Guards and Breaking Heals a Hero write nothing), and stateful talent effects display as chips with live counters —
+the per-debuff mitigation chip shows its current cut, and the Devotion Aura (DA) chip names the Break
 reduction every hero carries.</p>
 <h2>8. Economy</h2>
 <ul>
@@ -2829,17 +2836,16 @@ holding 150 or more. From the second zone on the gold is there, and the gate doe
 runs. Fights, elites and mini-bosses award no talent point at all, and neither does the end
 boss — it awards a relic and opens a talent tier. Every historical per-run figure is
 <b>superseded</b>, including 10.9 / 10.8 / 6.0 points per hero per run.</li>
-<li><b>Combat rewards, by node type:</b> a <b>fight</b> pays gold. An <b>elite</b> pays big
-gold, a rune cache and a consumable. A <b>mini-boss</b> pays big gold and an ability-upgrade
+<li><b>Combat rewards, by node type:</b> a <b>fight</b> pays gold and drops one random rune. An <b>elite</b> pays big
+gold, a rune cache, a consumable and a draft pick for every living hero. A <b>mini-boss</b> pays big gold and an ability-upgrade
 pick. A <b>ZONE BOSS</b> pays gold, a relic unlock, <b>one more ability slot</b>, an ability
-pick from the spec pool (falling back to that hero's spec draft pool and then to his
-class-wide draft pool when the pool above is spent, so the pick always lands), and banks
-<b>one meta talent point per class</b>. The <b>END BOSS</b> pays gold and a relic,
-always — no ability pick (nothing follows it), no slot and no points.</li>
+pick from the spec pool (falling back to his class draft pool when the spec pool is
+spent, so the pick always lands), and banks
+<b>one meta talent point per class</b>. The <b>END BOSS</b> pays gold and a relic unlock
+while one is left to draw — no ability pick (nothing follows it), no slot and no points.</li>
 <li><b>Abilities:</b> <b>three picks per run</b>, one from each zone boss, up to three
-offered each time and drawn from that hero's <b>spec pool</b> — or from his <b>spec draft
-pool</b> when the boss pool has been emptied, or his <b>class-wide draft pool</b> when that is
-empty too, so no award is ever silent (§6a). The end boss awards none.
+offered each time and drawn from that hero's <b>spec pool</b> — or from his <b>class draft
+pool</b> when the boss pool has been emptied, so no award is ever silent (§6a). The end boss awards none.
 Each <b>mini-boss</b> instead awards a <b>generic ability upgrade</b>, up to three offered — three a
 run (see §6a).</li>
 <li><b>Consumable prices:</b> Health 30, Mana 30, Bomb 45, Revive 80, Defense 40,
@@ -2879,7 +2885,7 @@ want of gold, which is a sink doing exactly what a sink is for. It converts <b>4
 all income</b> (931 gold greedy, 904 balanced, 508 cautious). <b>Unspent gold at run end falls
 from Batch BJ's 63% to 25&ndash;28%.</b></li>
 <li><b>Runes</b> (run-scoped gear, dropped after every normal fight, bought at the Peddler or chosen
-from elite caches — the in-run power source that scales with depth): an <b>authored pool</b> (data/runes.json).
+from elite caches — the in-run power source): an <b>authored pool</b> (data/runes.json).
 <br><b>A RUNE DROPS AFTER EVERY NORMAL FIGHT WON</b>: one, at random, always for a class among the
 heroes or for the Crest, never one they already hold, and never one that reads an engine not equipped &mdash; the rules
 every other way of getting a rune follows &mdash; and the victory card names it. An elite, a mini-boss
@@ -2897,7 +2903,7 @@ behind. A full holding refuses an unequip until there is room, and a swap &mdash
 once: its effect reaches all four in every fight. There is one crest slot. <b>FOUR CREST RUNES EXIST.
 <i>Tithe</i></b>: a hero's attack that lands Break heals the hero furthest from full, for 30% of it &mdash; the hero
 standing lowest by share of maximum health. It reads the
-Break an ordinary attack applies as it lands &mdash; none into an enemy already Broken, and nothing for Break dealt by a
+Break an ordinary attack applies as it lands &mdash; into an enemy already Broken it applies none and the heal falls to its 1-health floor, and nothing for Break dealt by a
 card's own effect, a trap, a companion, a talent's proc or the Long Watch's carry &mdash; and it is added to the talent
 tree's <i>Breaking Heals a Hero</i> for a hero who wears both. <b><i>Empty Pulpit</i></b>: while no Cleric stands, every
 hero takes 50% less strike damage. <b><i>Dead Air</i></b>: while no Mage stands, every hero deals 75% more strike
@@ -2920,7 +2926,7 @@ so every fight opens with all four standing unless it is resumed after a quit, w
 still down. A card a crest rune grants is on every hero's bar for the fight, priced in each hero's own resource, and is
 not kept after it.
 <br><b>ALL TWELVE SPECS ARE AUTHORED AS OF BATCH FK, AND FIFTEEN CLASS RUNES READ NO ENGINE.
-147 ORDINARY ENTRIES: 68 RETIRED AND 79 LIVE.</b> Sixty were written for a lineage &mdash; nine
+147 ORDINARY ENTRIES: 68 RETIRED AND 79 LIVE.</b> Sixty were written for a lineage &mdash; ten
 lineages have five, the Beastmaster six, and the Devout four &mdash; <b>fifteen were written for
 their class and read no engine</b> (below), and <b>four are the Crest's</b> (above). <b>The Devout's fifth is OWED, not missing</b>, and the reason is in
 <code>docs/reports/FK.md</code> &sect;7: the rune authored for that slot said
@@ -2931,7 +2937,7 @@ the day a batch narrows the ground to its caster the gate says the rune is autho
 <b>Batch FC retired the twenty-second &mdash; Split Tongue &mdash;
 and authored the Shared Ruin in its place</b>, so the file grew by one entry (a
 retirement is KEPT and said to be kept) while the live count of the day was unchanged. <b>65 of
-the 67 retirements are ET's and EO's; FC's and FO's are of a later vintage</b>, and the three walks that
+the 68 retirements are ET's and EO's; the other three are of a later vintage</b>, and the three walks that
 read &ldquo;retired&rdquo; as &ldquo;authored under the old one-rune-per-lane rule&rdquo; narrow
 their populations by <code>RUNE_SHAPES</code> membership rather than by an exemption. <b>PRICE IS 150g, FLAT, EVERY RUNE, AND THE PEDDLER BUYS BACK
 ANY RUNE NOBODY WEARS FOR A THIRD (50g)</b> &mdash; rarity is gone and price no longer signals power, so the
@@ -2972,8 +2978,7 @@ one holding the Rune of the Sharpshooter (core). <b>Burning Ground sits out besi
 <b>THRESHOLD and BREADTH are not authored again.</b> A gated rune at a flat price is strictly worse
 than a bare one &mdash; the price does not fall to pay for the condition &mdash; and FJ measured
 the constraints as unworkable besides: <b>BREAK can never carry a threshold anywhere in the game</b>
-(zero of the 227 tagged cards carry it as a PRIMARY), <b>the Devout can never satisfy a breadth</b>
-(his whole earnable pool holds two distinct primary tags), and <b>a condition can be live at one
+(zero of the 231 tagged cards carry it as a PRIMARY), and <b>a condition can be live at one
 rung of the ladder and dead at the next</b> (the Holy's breadth is satisfiable at exactly six
 drafted cards; the Swordmaster's fails at exactly five). <b>TRADEOFF SURVIVES</b> &mdash; a cost
 paired with a bigger upside is self-balancing and reads on the card &mdash; and <b>eight of FK's
@@ -3041,7 +3046,7 @@ threshold onto the floor, that arm names the rune.
 <br><b>THE WIDE WATCH IS RETIRED AND THE SHARED MARK HOLDS ITS PLACE.</b> It stays retired because
 its place in the Sharpshooter's set is filled: the Shared Mark took it one-for-one, and it builds the
 meter where the Wide Watch defended it. What the retirement costs is the rune's own clause &mdash; a
-kill leaves his Focus at the 50 retained, and nothing live keeps it whole. <b>Retired the way every retirement is: KEPT, and said
+kill leaves his Focus at the 50 retained, and only a kill by Trophy Shot keeps it whole. <b>Retired the way every retirement is: KEPT, and said
 to be kept</b> &mdash; the entry, the payload, the field and <b>the read site in
 <code>_sharpshooter_focus</code></b> all stay, so a saved run holding it still works and is still
 paid; only <code>eligible_ids</code> refuses it.
@@ -3073,10 +3078,7 @@ keyed to talent counters, which were rebuilt at DO and DP; and re-keyed onto run
 at EM. What survived all of that was the magnitudes, and the magnitudes were never the
 interesting part. <b>A pool authored to the real charter &mdash; threshold-gated, reading
 archetype tags on the holder's drafted cards &mdash; will be better than 53 patched ones.</b>
-<br><b>WHAT A RUN IS LIKE MEANWHILE: sparse, not broken.</b> Every rune offer is a generated
-stat stick, the three slots fill with them, and nothing else in the run changes. <b>That is
-accepted</b> &mdash; the designer will playtest against the first authored batch, not this one.
-<b>THERE ARE NO RARITY TIERS (Batch ES §1).</b> Common, Rare and Epic are gone, and with
+<br><b>THERE ARE NO RARITY TIERS (Batch ES §1).</b> Common, Rare and Epic are gone, and with
 them the prefixes (Cracked / Polished / Radiant), the tier colours, the &times;1/&times;2/&times;3
 magnitude ladder and the 50/100/160 tier price. <b>A rune wears its authored name.</b> What
 each tier used to <i>mean</i> — flat stats, an ability's numbers altered, an ability granted
@@ -3085,7 +3087,7 @@ on doing exactly what it did: the kind lived in the payload, never in the label.
 <br><b>OFFERS ARE FLAT ACROSS THE RUN.</b> The odds used to deepen with the zone slot —
 60/30/10 &rarr; 40/40/20 &rarr; 25/45/30 — which was <i>the only thing making a late offer
 differ from an early one</i>. <b>They do not, and there is nothing left for a zone to weight:
-every rune in an offer is an authored entry of the hero's class.</b> <code>check_es</code> §1 measures
+every rune in an offer is an authored entry of the hero's class or of the Crest.</b> <code>check_es</code> §1 measures
 the distribution at all three zone slots every battery run and prints it.
 <br><b>THE GENERATED STAT FAMILY IS OUT OF EVERY OFFER PATH (Batch FM §1, ruled by the
 designer).</b> There is no filler and no exhaustion floor: the Peddler, the elite cache, the
@@ -3115,11 +3117,11 @@ map card). Shop offers avoid duplicates per hero.
 <br><b>AN EXHAUSTED POOL RETURNS AN EMPTY OFFER, AND EVERY SITE SAYS SO IN AS MANY WORDS
 (Batch FM §2).</b> Each class has <b>eighteen to twenty</b> authored runes, and what a hero can
 reach is decided by his engines and by what he has earned &mdash; a hero holding no engine can reach
-<b>five</b> of the Warrior's at spawn and ten once he has earned what they name (eleven for a Berserker,
+<b>five</b> of the Warrior's at spawn and eight once he has earned what they name (nine for a Berserker,
 whose boss pool holds Blood Price), <b>five</b> of the Mage's at spawn and nine once he has earned
 theirs, <b>seven</b> of the Hunter's and then nine, and <b>five</b> of the Cleric's nineteen &mdash; the
-five that read no engine; every other one reads Mercy, Faith or Ruin. Seventeen live entries name a <code>requires_ability</code> and sixteen of those name
-something outside the spawn kit, so <b>a hero's rune pool DEEPENS as he earns abilities</b>. When there is nothing left, the
+five that read no engine; every other one reads Mercy, Faith or Ruin. Seventeen live entries name a <code>requires_ability</code>: fifteen name a card he must earn, and
+two an engine's enabler (Guard Change, Divine Shield), which his kit holds while that engine is equipped, so <b>a hero's rune pool DEEPENS as he earns abilities</b>. When there is nothing left, the
 Peddler names the hero and the reason, the elite cache and the bargain print a line instead of
 paying in silence, and the event verb says nothing answers. <b>A cache with one or two runes
 left offers one or two</b> rather than discarding them, and the spoils line reads the count off
@@ -3127,15 +3129,15 @@ the offer. <b>And an owed cache pick whose triple repairs to nothing can be SPEN
 hero's card &mdash; it cannot be filled, so holding it would strand the run.
 <br><b>EVERY LIVE RUNE IS SCOPED TO ITS CLASS, OR TO THE CREST</b>: the Warrior's eighteen, the Mage's
 twenty, the Cleric's nineteen and the Hunter's eighteen, retired entries scoped the same way, and the
-Crest's two, which belong to no class. The five universal entries are retired, and
+Crest's four, which belong to no class. The five universal entries are retired, and
 <code>_scope_ok</code> resolves the class, the Crest's scope and the universal band and nothing else.
 <br><b>PRICE WAS THE OPEN QUESTION RARITY LEFT BEHIND, AND IT IS ANSWERED: 150g, FLAT.</b>
 Every authored rune has always carried its own <code>price</code> and none moved — but those
 prices were written against a tier table that no longer exists. <b>SUPERSEDED AT EZ &sect;0 AND
 CORRECTED HERE AT FF &sect;3: the number IS ruled and the pool is NOT empty.</b> <b>Every live rune
 is 150g, flat</b> &mdash; the player pays for FIT rather than for magnitude. The
-<b>67 retired entries keep their authored prices unmoved</b>, and they run 100 &times;43, 75
-&times;14, 160 &times;6, 120 &times;3 and 50 &times;1, which is the record of what the old pool
+<b>68 retired entries keep their authored prices unmoved</b>, and they run 100 &times;43, 75
+&times;14, 160 &times;6, 120 &times;3, 150 &times;1 and 50 &times;1, which is the record of what the old pool
 charged rather than a second pricing rule. <b>The two sentences this replaces</b> &mdash; <i>"the
 53 ET retires"</i> and <i>"with the pool empty there is nothing left to price"</i> &mdash; <b>were
 true when ET wrote them, were superseded at EZ, and were named as stale by FD and left again by
@@ -3143,7 +3145,7 @@ FE.</b> A false claim in this document does not decay and is not caught; it is o
 someone looking.
 <br><b>Heroes begin the run with no ordinary runes and three empty slots</b> — and the engine
 rune each took at class selection, in the first of three engine slots of its own (§6.0). The first rune comes
-from the Peddler, an elite cache, or a bargain of severity 3 or more. Every pick-of-three is
+from whichever the run meets first: a normal fight won, an elite cache, or a bargain of severity 3 or more. Every pick-of-three is
 resolved on that hero's map card, and <b>the three are always distinct</b>: each candidate is
 drawn from a pool that already excludes the ones beside it, so a triple can never offer the
 same rune twice. A card whose hero owes a pick wears the rune-purple border until it is
@@ -3163,7 +3165,7 @@ also the shop's offer in <b>127 of 400</b>.
 Forty-two of the seventy-nine are in that table &mdash; every Ruin, Focus and Resonance rune, the Mercy
 and Faith runes and the one that adds to Divine Shield, both Heavy Plating runes and Bared Plate, both
 stance-number runes and Mirror Guard, two of the Pack Bond runes, two of the Trapper runes, both Overburn
-runes and Long Fuse, the Cryomancer's Killing Cold and Deep Cold, and the Berserker's Slaughterhouse
+runes and Long Fuse, the Glacial Hold rune and the Cryomancer's Killing Cold and Deep Cold, and the Blood Frenzy rune and the Berserker's Slaughterhouse
 &mdash; the last six because what each reads is its engine's: Burn, Chill, the Defensive guard, a bleedout,
 and the Block Bared Plate trades away. <b>Long Poison is not in it</b>: the Poison it reads is Snare
 Trap's, and every Hunter holds Snare Trap. <b>The roll asks first</b>, so none of them reaches the
@@ -3175,8 +3177,8 @@ A retired rune and a rune he already owns can never come back, so those are drop
 triple and the repair is saved; but <b>unequipping an engine is one press away from being undone</b>,
 so writing that repair back would let a moment's experiment before a cache is answered destroy those
 runes for good, and save the loss. <b>A state the player can undo is not a state to destroy.</b>
-<b>A hero with no engine equipped is offered only the runes that read none</b>: up to ten of the
-Warrior's eighteen (eleven with Blood Price earned), nine of the Mage's twenty, nine of the Hunter's
+<b>A hero with no engine equipped is offered only the runes that read none</b>: up to eight of the
+Warrior's eighteen (nine with Blood Price earned), nine of the Mage's twenty, nine of the Hunter's
 eighteen, and five of the Cleric's nineteen. <b>Each engine he equips adds its own runes</b>, and
 a second engine adds its runes too. The engine runes of his class are still offered to him, as they
 always were.
@@ -3222,8 +3224,8 @@ sits on a lane; splashes are always clean. <b>That rule no longer describes what
 DO, and ET §1 is the consequence taken to its end: the pool authored to it is retired whole
 rather than patched entry by entry.</b> <b>The 65 entries and their authoring structure are
 still here</b> &mdash; the count, the lanes and the one-costed-rune-per-set shape are unchanged,
-which is what makes them readable by the batch that writes the next pool; each is scoped to its class
-like every other entry, so the spec it was written for is carried by its lane and its words.
+which is what makes them readable by the batch that writes the next pool; sixty are scoped to their class
+and five are universal, and the spec a rune was written for is carried by its lane and its words.
 <br><b>AND "SCARRED" IS GONE AS A LABEL WHILE EVERY COST CLAUSE STAYS (Batch ES §3).</b>
 There is no flag, no crimson prefix and no crimson colour: <b>a rune that gives and takes is
 simply what that rune does</b>, and its negative terms are byte-unchanged. What recognises a
@@ -3257,7 +3259,7 @@ rune was worth more to a hero whose points went elsewhere than to one already de
 lane. <b>A rune with its own field is worth the same to every hero of its spec</b>, so that
 asymmetry is gone: <b>48 of the 65 runes were built on it</b> and the <b>12 splashes lose
 most</b>, since with no lanes to reach across a splash is three unrelated numbers in a
-bundle. The <b>36 `lane` fields are still authored and still shown</b>; they describe where
+bundle. The <b>36 `lane` fields are still authored, all on retired entries, and no screen shows them</b>; they describe where
 a rune came from, not what it now reaches.
 <br><b>AND TWELVE OF THEM ARE RETIRED (Batch EO §3): 65 authored, 53 OFFERABLE.</b>
 <b>(SUPERSEDED TWICE: ET §1 took it to 65 retired and 0 offerable, and EZ to 86 authored with
@@ -3276,7 +3278,7 @@ the most honest string in the game. Each entry stays in <code>data/runes.json</c
 <code>retired</code> string that names <b>what is lost</b>; <code>Runes.config</code>,
 <code>build</code> and <code>display_name</code> all still resolve it, so a saved run holding one
 keeps working and a later batch can point something at it again. <b>It is simply never
-offered</b>: both offer paths reach the authored pool through <code>Runes.eligible_ids</code> and
+offered</b>: every offer path reaches the authored pool through <code>Runes.eligible_ids</code> and
 nothing else. <b>An exhausted pool blanks the offer, and that is the ruling rather than a
 defect (Batch FM §1)</b> &mdash; there is no fall to the generated stat family and no tier to
 widen out of. Every offer site announces the empty rather than skipping it.</li>
@@ -3285,7 +3287,7 @@ user://relics.json; up to 3 equipped per run at the draft (scrolling shelf; even
 a run-scoped extra via relic_grant). <b>EVERY EQUIPPED RELIC APPLIES TO ALL FOUR HEROES, AND THE
 PER-HERO RULING IS STILL UNBUILT.</b> `Run.active_relics` is a flat list of up to 3 ids with no hero key, and
 both accessors (`Run.relic_add` / `relic_dict`) take a hook and nothing else — so every
-equipped relic reaches every hero, at all 25 read sites. The ruling that a relic is
+equipped relic reaches every hero, at all 22 read sites. The ruling that a relic is
 assigned to ONE hero at pickup stands and has never been started; CX scoped it and stopped,
 and it is a save-format change touching four signatures, both acquisition
 sites and 13 of the 25 relic descriptions, with four hooks still unruled. <b>The draft also
@@ -3297,9 +3299,9 @@ layer that can be tied to a SPEC. <b>No permanent layer is spec-specific.</b> A 
 at the draft, before any spec exists, and reaches all four heroes; the one talent tree is bought
 per class, and every node pays every class that can buy it, whichever spec wears it. An effect
 that must know which spec a hero is belongs on a rune, which one hero buys for one run and which
-is scoped to a spec or a class. Not one relic hook is read inside a turn — the read sites are run
+is scoped to his class and offered only while any engine it reads is equipped. Not one relic hook is read inside a turn — the read sites are run
 start, battle SPAWN (base stats, before turn one), the victory screen, gold awards, shop prices
-and elite spoils, 25 in all, and six of the hooks are read at more than one. The category
+and elite spoils, 22 in all, and three of the hooks are read at more than one. The category
 `relics.gd` declares OUT — on-kill and per-turn procs, revive-on-death, enemy auras, DoT and
 Break multipliers — is exactly the in-combat one, and the talent tree is the only permanent
 layer that reaches a turn as it resolves. <b>Pool: 24 relics — 16 common, 8 rare (marked RARE on the shelf and in the picker)</b> — every
@@ -3309,7 +3311,7 @@ HP, armor, speed, crit, Constitution, resistances, resource floor — victory he
 gold-find, shop discount, elite loot; the <code>rest_heal_add</code> hook has no reader, because
 the map has no rest node, so Martyr's Knucklebone pays only its victory heal, pending a design pass). Scalar hooks SUM and dict hooks merge
 across the equipped set, so stacking is well-defined. Adding a relic on an existing hook is
-pure data. Highlights: Waystone Shard opens the run with a potion of each kind; the elemental trio
+pure data. Highlights: Waystone Shard opens the run with a Health Potion, a Mana Potion and a Bomb; the elemental trio
 (Emberheart / Frostbound Sigil / Nightbloom Charm) raises strike damage in all six non-physical
 damage schools; Prism Veil
 gives 10% resistance to every element; The King's Ledger compounds gold.</li>
@@ -3317,7 +3319,7 @@ gives 10% resistance to every element; The King's Ledger compounds gold.</li>
 started/completed/wiped/<b>forfeited</b> per spec, bosses killed by kind, events seen (with
 repeats), and zones cleared. <b>Forfeits are their own bucket, never folded into wipes</b> —
 abandoning a run is not the same event as dying in one, and mixing them would make the
-wipe count unreadable the moment the exit gets used. <b>Chronicle only — it gates nothing</b>; the Relics screen shows the
+wipe count unreadable the moment the exit gets used. <b>Its chronicle gates nothing</b>; the profile also holds each class's talent points and cells, the talent tier the end boss opens and the one-shot teaching flags, and the Relics screen shows the
 tally ("Cycles survived / lost / Events witnessed"). It is the substrate for a future
 persistent-unlocks design pass (sketch: persistent-unlocks-sketch.md in the workspace);
 sims never write to it.
@@ -3335,7 +3337,7 @@ and a refused profile is every run the player has ever finished.</li>
 <p><b>The roster lives in data/enemies.json</b> (Batch 34): every kind declares its power,
 role tags, zone slots, stats, resists, tint, and kit; the Enemies class loads it, so adding
 an enemy is a data edit that automatically enrolls it in every theme wanting its roles.
-Role-based Attack matches heroes — <b>Damage 100 / Tank 75 / Support 50</b> — and ability
+Role-based Attack matches heroes — <b>Damage 100 (the Hollow Crown 115) / Tank 75 (the Withered Warden 100) / Support 50</b> — and ability
 damage is a % of it. <i>Art note: all kinds still share the orc sheet (tint + scale only),
 so new enemies read as tinted orcs until per-kind art lands — a known, accepted limit.</i></p>
 <table border="1" cellpadding="4">
@@ -3415,15 +3417,15 @@ lattice took a zone from 12 slots to 16 and the ramp was re-fitted to keep slot 
 3–5 and the last slot before the boss topping out at 8–10, rather than running the pre-boss
 slot into the boss's own band. <b>Elite fights never roll below 6</b> (the cheapest elite theme's price —
 an elite that can't afford an elite theme isn't one), and <b>the boss node keeps its own
-10–12 band</b>: the Escort composition is authored content, and the step up from tier 10
+10–12 band</b>: the Escort composition is authored content, and the step up from tier 15
 into the boss chamber is the zone's sharpest — by design. The field holds at most
-<b>6 enemies</b>. Power values now span <b>1, 2, 3, 4,
-and 7</b> — the power-3 bruisers filled the gap that made exact budgets repetitive.
+<b>6 enemies</b>. Composed warbands' power values span <b>1, 2, 3, 4,
+and 7</b> (the end boss, never composed, is 9) — the power-3 bruisers fill the gap that would make exact budgets repetitive.
 Generation is two-step: a <b>theme</b> is chosen, then the budget fills its <b>ROLE
 pools</b> — themes declare roles (skirmisher / sniper / bulwark / mender / hexer / brute /
 elite / boss), and any zone-legal enemy tagged with the role is eligible, so warbands vary
 run to run &mdash; except a zone boss's <b>boss</b> role, which is always that zone's own boss. min_weak counts units of power ≤ 1. <b>No warband ever fields more than two
-mender-tagged kinds</b>, counted by role tag no matter which pool claimed them — two heals
+mender-tagged units</b>, counted by role tag no matter which pool claimed them — two heals
 plus a cleanse is a wall rather than a question. The distinct
 warband count now exceeds <b>23,500</b> across the budget bands. Themes that cannot
 spend a given budget simply do not appear on that roll.</p>
@@ -3451,7 +3453,7 @@ Deeper-zone enemies keep their scorched tint.</p>
 <h2>10. Battle Screen &amp; Controls</h2>
 <ul>
 <li><b>Layout:</b> the camera shows the whole battle scene at 1:1 (legacy sprites scaled up
-to compensate — Soldier heroes ×3.2, Chief ×3.9, bosses ×4.4, Berserker ×1.25; the
+to compensate — Soldier heroes ×3.2, Chief ×3.9, zone bosses ×4.4, the end boss ×4.6, Berserker ×1.25; the
 Pyromancer's template-size art runs at true 1:1). The battlefield art (Forest / Scarlands)
 is zoomed out as far as the screen allows — the smallest scale that still fills the
 1280×720 view (+ shake margin); any smaller would show void at the edges, so making scenery
@@ -3508,7 +3510,7 @@ holds W, and the remaining abilities follow in kit order. The menu is the hero's
 <b>Shift + the same key in the same order</b> (10 = Shift+Q, 11 = Shift+W, … 18 = Shift+G).
 <b>The widest menu a hero can raise is thirteen entries</b> &mdash; a Mage holding Overburn and
 Glacial Hold, or a Cleric holding Conviction and Wrath of the Old Gods, opens with two enablers
-beside his basic and his class kit &mdash; so ⇧Q, ⇧W and ⇧E are reachable today and ⇧R through ⇧G
+beside his basic and his class kit &mdash; so ⇧Q, ⇧W, ⇧E and ⇧R are reachable and ⇧A through ⇧G
 are headroom. Each button shows its key, e.g.
 "[W] Bloodlust" or "[⇧Q] Blood Price". A hotkey is ignored when the ability is unaffordable
 or gated (Death Ray below 8 Resonance, Kill Command without a living companion,
@@ -3531,8 +3533,8 @@ while at least 1 Mercy is held — the next
 Heal / Renewal / Hymn / Resurrection / Divine Plea spends +1 Mercy for its bonus effect
 (and forgoes its perfect bonus). The toggle disarms after the cast and at the start of
 every turn.</li>
-<li><b>Space continues:</b> on a victory screen, Space (or Enter) presses the primary
-button — Continue / Descend / New Run. Defeat screens still require a click.</li>
+<li><b>Space continues:</b> on a victory screen or the run summary (where every wipe and forfeit ends), Space (or Enter) presses the primary
+button — Continue / Descend / New Run. Only the standalone battle scene's defeat panel still requires a click.</li>
 <li><b>Summon Companion</b> sits at the TOP of the Hunter's ability list (every Hunter's but the Sharpshooter's) on hotkey
 <b>W</b>. Selecting it (key or click) opens the <b>companion picker</b> — a small window listing
 Ursus / Canis / Aguila with costs: <b>Tab cycles</b> the options (unaffordable companions are
@@ -3566,14 +3568,13 @@ offered &mdash; Hunt on a clean enemy strikes for its floor and its Break damage
 attack movement (units with real locomotion art — the Berserker — <b>walk</b> to melee range
 and back with their walk animation, facing their direction of travel; everyone else does the
 short lunge), Break hitstop + fracture flash + camera punch, per-event SFX (bow users —
-the Hunter and Orc Archers — get dedicated attack / impact / blocked sounds; the rest is
+the Hunter and Orc Archers — get dedicated attack and impact sounds; the rest is
 placeholder procedural audio), and hover highlighting (outline shader + lit nameplate)
 linking the initiative bar, the plates, and the field.</li>
 <li><b>Music:</b> menu track (main menu, draft, settings, relics, and spec choice — roster
 setup stays on the menu theme), map track (map, hero sheet, shop — continues seamlessly between
-them; boosted +6 dB), battle track in combat. The boss-entry tune plays twice per zone arc:
-once over the fade to black after the final spec is confirmed (handing off to the map track),
-and once when a boss battle opens (capped at ~4s there, fading quickly into the battle track
+them; boosted +6 dB), battle track in combat. The boss-entry tune plays over the fade to black after the final spec is confirmed (handing off to the map track),
+and again when a zone boss's battle opens (capped at ~4s there, fading quickly into the battle track
 so the fight isn't kept waiting). Managed by the Music autoload; volume rides the master bus
 (Settings); the map track plays 6 dB hotter than the rest. Menu buttons share a click sound
 (Music.click()); potions have their own drink sound; Strike and Hack and Slash (per hit) have
@@ -3586,8 +3587,8 @@ dedicated impact clips.</li>
 the map's four cards are the hero list): a row of four buttons flips between heroes without
 returning to the map. <b>Awakened heroes are titled by their SPEC name</b> ("Berserker", not "Warrior"); the class name only shows while
 unawakened, or when the rune taken at class selection carried no spec — the same rule applies to battle nameplates, the initiative bar, and the combat
-log. Detail page per hero: stats — <b>the largest text on the page, a row a line</b>, and <b>each stat is its own hover tooltip explaining just
-that stat</b> (talent points are NOT listed here; the count sits above the talent tree;
+log. Detail page per hero: stats — <b>the largest text on the page after the title, a row a line</b>, and <b>each stat is its own hover tooltip explaining just
+that stat</b> (talent points are NOT listed here; each tier of the talent tree says how many of its nine he wears;
 pure tanks additionally show their <b>Block %</b>; the <b>Attack</b> row explains node
 scaling and hovering <b>Resistances</b> lists all seven schools, physical included).
 Stats mirror the battle
@@ -3615,11 +3616,11 @@ each hero holds unworn, named for him, and per rune in the bag, each sold for a 
 a Sell that asks twice; the offers
 stacked at their own heights in one column that scrolls and ends above the Leave button, so every
 offer's Buy button can be reached however long its rule;
-reached when a cleared fight or elite schedules one (§3b). A consumable already at its cap of
-6 greys its own button rather than taking the gold. <b>It sells no ability draft</b> (Batch FD
+reached as a Trade node on the map, or after an elite or mini-boss whose bargain paid "a merchant follows the fight" (§3a). A consumable already at its stack cap
+(6; 4 for the Cleansing Draught, 2 for the Cursed Visage and the Resonating Hourglass) greys its own button rather than taking the gold. <b>It sells no ability draft</b> (Batch FD
 §1); below the supplies stands the rune sale.</li>
 <li><b>Offer screen:</b> three bargain cards before every elite and mini-boss (§3a) — severity
-number, a four-pip severity bar, the modifier's name and effect, and what it pays on victory.
+number, a five-pip severity bar, the modifier's name and effect, and what it pays on victory.
 The heroes' HP and the warband being faced are both on screen, because choosing a
 severity-4 bargain at 30% health should be an informed decision.</li>
 <li><b>Relics screen:</b> collection viewer from the main menu.</li>
@@ -3645,7 +3646,7 @@ can produce is retired, not annotated:</b> it keeps its <code>id</code> and its 
 <code>retired</code> string saying what is lost, and the panel neither lists it nor links to it.</p>
 <p><b>Coverage — seven categories:</b> <b>Combat flow</b> (the initiative timeline and what
 delay does, the skill check, Pressure &amp; Break, crit / miss / parry, the fallen returning
-at 20%), <b>Statuses</b> (every debuff the battle code can apply, plus Quick Draw),
+at 20%), <b>Statuses</b> (every debuff the battle code can apply but Slow Burn, Heads Down, Unmaking, Breaking Darkness, Penance, Suffering and Blighted, plus Quick Draw),
 <b>Damage types</b> (all seven schools and how resists and vulnerabilities read),
 <b>Resources</b> (Rage and Mana, plus every spec resource: Resonance, Mercy, Empower, Faith,
 Focus, Loyalty, Ruin), <b>Progression</b> (the talent tree's three tiers and their two gates,
@@ -3655,9 +3656,8 @@ scaling),
 as its own entry — permanent-across-runs versus run-scoped is the single most confusable
 distinction in the game), and <b>The Run</b> (zones and tiers, node types, elites, <b>the
 bargain, modifiers and severity</b>, events, what a wipe costs, the difficulty choice). The
-bargain trio was added when the modifier pool went from six to nineteen: a system with
-nineteen faces needs one place that explains the system rather than nineteen descriptions
-that each explain one face.</p>
+bargain trio is there because a system with twenty-three faces needs one place that explains the
+system rather than twenty-three descriptions that each explain one face.</p>
 <p><b>Surfacing:</b> a panel from the map burger, the hero sheet, and the battle burger —
 a category tree on the left, the entry on the right with clickable cross-links. In battle it
 is inert: pure Control UI with no awaits or timers, and the battle scene suspends its own
@@ -3671,9 +3671,10 @@ worse than none — it would make a tester confidently wrong instead of merely u
 Where an entry and this document disagreed, the code won and the document was corrected.</p>
 
 <h2>11b. First-Run Orientation &amp; the Run Summary</h2>
-<p><b>Orientation</b> — two cards, neither a tutorial mode, both dismissible and both shown
+<p><b>Orientation</b> — three cards, none a tutorial mode, each dismissible and each shown
 <b>once ever</b> (gated on persistent Profile flags, set on dismissal, so a returning player
-is never re-taught):</p>
+is never re-taught). The third, at the first defensive check, says that bar comes on the enemy's
+turn and can only lessen the blow; the other two:</p>
 <ul>
 <li><b>The framing card,</b> on the first map of a first run: what a run <i>is</i> — 49
 encounters, three zones of sixteen and then the end boss; a zone is a MAP and not a road,
@@ -3681,7 +3682,7 @@ up to three ways forward converging on the mini-boss in the middle and the boss 
 end; stepping down a row closes the corridor above you; what an elite, the smith, the
 Peddler and ??? each are; the three bargains before every elite and mini-boss; winning
 any fight heals 15% and there is no resting; death ends the run, but a felled boss leaves a
-relic behind forever. <b>It names no ability pick</b> — the picks are taught by the offer
+relic behind forever. <b>Of the picks it names only the elite's draft pick</b> — the picks are taught by the offer
 overlay that hands them over.</li>
 <li><b>The skill-check pointer,</b> at the first timing bar of the first battle: the sweeping
 marker, the gold and green windows, and what each grade is worth (Perfect +15% damage and
@@ -3735,13 +3736,13 @@ whatever the bound does to the rows.</p>
 
 <h2>12. Technical Reference</h2>
 <ul>
-<li><b>Scenes:</b> main_menu, draft, spec_choice, map, battle, <code>party</code>, shop, settings, relics.
+<li><b>Scenes:</b> main_menu, draft, spec_choice, map, battle, <code>party</code>, shop, blacksmith, event, offer, talents, settings, relics_screen.
 All UI is built in code (no editor scenes).</li>
 <li><b>Autoloads:</b> Run (run state + saves), Settings, Music (looping stream player that
-survives scene changes; idempotent play()). Static data: Classes, Talents, Relics,
-Ability.</li>
+survives scene changes; idempotent play()). Static data: Classes, Talents, Relics, Runes,
+Enemies, Events, Glossary, Ability; Profile holds the persistent record.</li>
 <li><b>Saves:</b> user://run_save.bin (auto after every node; versioned dictionary),
-user://relics.json, user://settings.cfg.</li>
+user://relics.json, user://settings.cfg, user://profile.json (the persistent Profile).</li>
 <li><b>The playtest readout:</b> user://readout/run-&lt;date&gt;-&lt;time&gt;.jsonl, beside the save and never
 inside it &mdash; one JSON line for the run (each hero's lineage, core and ordinary runes and nodes, the
 relics, the rung), then one line at every fight's end: the fight's frame (zone, slot, the encounter, the
@@ -3763,8 +3764,7 @@ plays — order: warrior, mage, cleric, hunter),
 DOD_SIM_ENEMIES="boss,shieldmaster,shaman" (force the enemy lineup in autoplay/sim/standalone
 battles), DOD_SIM_TALENTS="tn_crit,tn_parry" (force-learn talent nodes on bot
 heroes by id), DOD_SIM_ABILITIES="Resurrection,Divine Plea"
-(append pending talent-gated abilities to the bot hero whose spec owns them — Holy only
-for now), DOD_ENEMIES_OFF=1 (arm the "Enemy attacks OFF" debug toggle from the
+(append each named card, found by name anywhere in the game, to every bot hero), DOD_ENEMIES_OFF=1 (arm the "Enemy attacks OFF" debug toggle from the
 environment). Autoplay debug runs echo every combat-log line to
 stdout as "[LOG] ..." so headless tests can grep them; status expiries print as
 "... fades from ..." lines.</li>
@@ -3784,7 +3784,7 @@ instead. A build that pays in Break (the Warden's Break cards, the Occultist's g
 talent tree's We Do Not Break node) reads low in <code>d+h+p%</code> by construction, and reading that as a
 weak build is the mistake the columns exist to prevent.
 <br>Beneath the table, <b>Break prevented per battle by source</b> — Devoutness (the label the We Do Not Break node's cut is booked under), Bulwark of
-Fortitude, Hold the Line and Ward — booked through one door, so the parts
+Fortitude, Hold the Line, Ward, Immovable, Bracing and the Defensive check — booked through one door, so the parts
 always sum to the <code>BDprev/b</code> column. Base Constitution is not booked (a stat
 block is not a contribution) and neither are the run modifiers Muffled and Deadened (nobody
 among the heroes did that).</li>
@@ -3842,11 +3842,11 @@ DOD_SIM_MINIBOSS, DOD_SIM_START_RUNE and DOD_SIM_SPEC_OPENING are retired</b> �
 dealt mini-boss row and the opening rune pick they controlled no longer exist, so a Matrix
 row reads <code>map=branch</code> (Batch BK; <code>map=line</code> is an AN-to-BJ row) and
 carries no such fields. <b>Rows from before Batch BK are not comparable with rows after it:</b>
-<code>depth</code> is out of 48 slots rather than 36, and <code>choice=</code> went from a
+<code>depth</code> is out of 49 slots rather than 36, and <code>choice=</code> went from a
 structural 0% to a measured one. Still excluded,
 stated in the output: bomb/revive/defense/mana items are never used in battle, no
-pre-emptive or offensive item use, routing sees one tier ahead only, and shop rune
-picks ignore build synergy. Simulated runs live entirely in memory (Run.sim_run): they
+pre-emptive or offensive item use, and shop rune
+picks ignore build synergy; routing also sees one tier ahead only, which the output does not say. Simulated runs live entirely in memory (Run.sim_run): they
 never touch the player's save, relic unlocks, or profile.</li>
 <li><b>Testing shortcuts:</b> debug tools are ALWAYS available in dev (unexported) builds;
 exported builds require DOD_DEBUG=1 (and DOD_DEBUG=0 forces the gate shut in a dev build,
@@ -3868,12 +3868,12 @@ as it would have. Nodes the toggle alone makes reachable are drawn as a fourth s
 separate from visited / reachable / unreachable: a desaturated fill inside a magenta debug
 outline, with a <code>[DEBUG]</code> tooltip prefix, and a <code>DEBUG: FREE TRAVEL</code>
 marker sits in the corner while it is on.
-<br><b>Test a node ▸</b> is a submenu — Shop, Rest, ??? Event, Fight, Elite — that runs one
+<br><b>Test a node ▸</b> is a submenu — Shop, ??? Event, Fight, Elite, Mini-boss — that runs one
 <b>in place</b>. A summoned node does not move the heroes, does not touch the tier, and does
 not mark anything visited; the board is exactly as it was when the tester returns.
 Everything else is real: a summoned shop has real offers and spends real gold, a summoned
-rest really heals, a summoned fight is a real battle at the current tier's scaling, with
-real rewards. (There is no Summon Boss: "Jump to Boss Tier" already goes there.)</li>
+fight is a real battle at the current tier's scaling, with
+real rewards. (There is no Summon Boss: "Jump to Boss Slot" already goes there.)</li>
 <li><b>Debug visits do not count.</b> A summoned node is excluded from the two records that
 are read as data: it never bumps the run ledger (battles, gold, elites, damage) and
 never books anything in the persistent Profile — including the wipe, if the heroes die in a
@@ -3951,8 +3951,7 @@ so far; draft/spec screens still show the Soldier.</li>
 <li><b>Design hook awaiting assignment:</b> Counter Attack (defined term; no talent or
 ability grants it yet). Weaknesses are assigned: every enemy kind but the Orc Raider is soft to at
 least one damage type (the roster in §9).</li>
-<li>The Withered Warden has its own kit; the Ash-Wrought Tyrant is still a Chief stand-in —
-unique kit + art planned. Boss art for both pending.</li>
+<li>The Withered Warden and the Ash-Wrought Tyrant have their own kits; boss art for both is pending.</li>
 <li>Boss tri-choice class modifiers deferred until 3+ zones exist.</li>
 <li><b>Designed BOSS-POOL abilities not yet written &mdash; FOUR, not six, and Batch DS
 corrected the list.</b> The Sharpshooter's <b>Disengage</b>, <b>Suppressing Fire</b> and
@@ -3960,8 +3959,8 @@ corrected the list.</b> The Sharpshooter's <b>Disengage</b>, <b>Suppressing Fire
 stale:</b> <b>Field Dressing</b> was written at BR &mdash; as a HUNTER CLASS-WIDE DRAFT card
 rather than as this pool's, so the name is spent and the boss pool still has nothing by it
 &mdash; and <b>Smoke Bomb</b>'s function shipped at BO as <b>Choking Smoke</b> in his draft
-pool. Both spec pools ship at five of their designed eight; the cross-fill rule keeps every
-offer at three without them. <b>DS deliberately did not spend the three Sharpshooter names</b>
+pool. Both spec pools ship at five of their designed eight, and a zone boss offers up to three of
+what is left in its pool. <b>DS deliberately did not spend the three Sharpshooter names</b>
 on its own two draft cards, which would have paid one debt by opening another.</li>
 <li>Difficulty tuning is pending an honest baseline: the old "~100% win rate" figure
 measured a single fixed unscaled lineup and carried no information. The sweep
@@ -3971,17 +3970,16 @@ encounters rather than 36, a route that can be walked well or badly, and elite p
 are now earned rather than issued — so the whole run curve wants re-reading before anything is
 tuned against it.</li>
 <li><b>Is the elite paid correctly?</b> The whole map exists to express the trade: three
-elites is three modifiers, three rune caches and three talent points against arriving at the
+elites is three modifiers, three rune caches and three drafts against arriving at the
 mini-boss wounded. Measured at n=150 a route, greedy and balanced are indistinguishable
 (0.70&sigma; on completions) and both beat cautious decisively (3.5&sigma; and 4.2&sigma;)
 &mdash; so ducking every elite is already the losing play, but whether <i>hunting</i> them is
 the winning one is below this instrument's resolution. It wants either a larger n or a policy
 pair further apart on the elite axis than greedy and balanced turned out to be (6.47 elites a
 run against 6.00).</li>
-<li><b>A rune has never been removed from a hero.</b> The equipped flag has one writer and
-the pouch only grows, which is why Batch BK's event vocabulary can grant a rune but not take
-one &mdash; and why the "trade a held rune for two of lower rarity" conversion is unwritten.
-Whenever a design wants that, the removal path is the piece to build carefully and once.
+<li><b>A rune leaves a hero only by the player's hand</b> &mdash; sold at the Peddler or dropped
+from his holding on the map. The event vocabulary can grant a rune but not take
+one, and the "trade a held rune for two of lower rarity" conversion is unwritten.
 <b>Since Batch ES that conversion needs re-specifying as well as building: there are no
 tiers, so there is no "lower rarity" to trade down to.</b></li>
 </ul>

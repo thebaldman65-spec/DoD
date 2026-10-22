@@ -17,6 +17,1042 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT IQ — 2026-10-19, FROM `docs/state.md` AS IP LEFT IT (`6897d73`)
+
+**What came here**: IP's six rulings, every one answered in IQ's brief; FOUND AT IP, both items — the stored offer guarded at IQ §4, and the brief's 1.55, a premise IP's report settled; the roadmap's two lines IQ ran — the re-measure, scheduled since IC, and IQ's own; and **IQ §1's census cut** — nine whole blocks and 95 closed items, each read against its record before it moved (`docs/reports/IQ-state-census.tsv` names every record), each under its section's heading where the section stays. Eight tables were struck to their conclusion and a pointer in the live file, not moved: each stands in its report. Everything else in the live file stayed.
+
+
+### ~~IP's RULINGS OWED~~ — **ALL SIX ANSWERED IN IQ's BRIEF (§0.1–§0.6): THE SECOND RUN CARRIED (1); THE TWO TIES STAND WITH NO THIRD BLOCK (2); THE PAIRS ARE THE CUT's, DERIVED THERE (3); THE MEASURED TABLE CONFIRMED (4); WARDEN's TARGET SET AT 0.80–0.85, NOT PURSUED (5); THE READ GUARDED AT IQ §4 (6)**
+
+Full working: `docs/reports/IP.md`, NEEDS A RULING.
+
+1. **A SECOND RUN, WITH A DIFFERENT PARTY** (IP's brief §3). The first clean file answered four of IH's five questions and found two
+   more (THE FIRST CLEAN PLAYTHROUGH, below); every figure in it is one run and one party. Nothing in the queue waits on it.
+2. **TWO CUTS ARE STILL TIES AFTER A SECOND SEED BLOCK** — Parched | Slick Footing (severity 1 | 2), 0.003 apart against two
+   standard errors of 0.007, and Deadened | Rot (3 | 4), 0.001 apart against 0.011. Named arbitrary beside the grade table (THE
+   BARGAIN DECK's GRADES, below); the sort's order stands. A third block, or your choice of order, is yours.
+3. **THE PAIRS RE-MEASURED WERE THE CUTS' OWN, NOT THE BRIEF's LIST.** The brief named Warded | Parched, Fleeting | Brittle and Rot |
+   Deadened as cuts at a grade boundary; with the Dark gone every cut moved one place, and on the brief's own table none of the
+   three stood at a cut. IP re-measured the six that straddled the cuts on the repaired instrument — Parched, Slick Footing,
+   Brittle, Feverish, Rot and Deadened; Warded and Fleeting, inside a grade either way, were not. Confirm the reading.
+4. **THE REPAIRED POTION MOVED A GRADE, SO SIX MOVED WHERE YOUR TABLE MOVED FOUR.** The Thin Veil read 0.908 on the player's potion
+   (0.887 on the flat 40) and rose from 4 to 3, and Rot fell from 3 to 4 by 0.0006 — a tie. Your four stand (Overgrown 5 → 4,
+   Parched 2 → 1, Brittle 3 → 2, Deadened 4 → 3), the cliff of three holds, and Warden's gambles are Overgrown, Miasma, Thin Air and
+   Rot. The measured table was built, as the brief said to; confirm it.
+5. **WHAT THE RE-CUT DOES TO PLAY** (IP's report, §1c — natural play, the bot choosing every bargain): every road's bargain fights get harder. **Wanderer's end at 0.956 of the party's health (0.971 at IO), Warden's at
+   0.908 with heroes down five times as often (0.936; 0.014 against 0.003) and one run of 60 lost, Ruin's at 0.687 (0.741)**; the
+   potion alone moves none of them (0.970, 0.938, 0.747). Warden has more teeth than IO left it (0.846 before IO's re-grade),
+   from Overgrown and Rot entering its gambles. Whether Warden
+   reads right is the middle of the deck's question, and the middle is yours to author.
+6. **A STORED OFFER THAT NAMES A REMOVED MODIFIER WOULD BREAK THE OFFER SCREEN** (FOUND AT IP): `offer_screen._draw_option_parts`
+   reads `Run.MODIFIERS[id]` with no guard, and a save written mid-offer before IP can hold `hungering_dark` (IO's two removals
+   carried the same exposure). **The live save holds none** — decoded at IP, it stands at zone two's start with no encounter.
+   Whether a removal owes the save a re-ask (FD §1's rule: an offer frozen at the drop is re-asked at the answer) is yours; a
+   bargain already TAKEN under a removed id is fought under no modifier, by `_active_modifier`'s guard.
+
+### ~~FOUND AT IP AND NOT FIXED~~ — **BOTH CLOSED: THE STORED OFFER GUARDED AT IQ §4 (THE DESIGNER's RULING); THE BRIEF's 1.55 A PREMISE IP's REPORT SETTLED, ASKING NOTHING**
+
+- **A STORED OFFER THAT NAMES A REMOVED MODIFIER WOULD BREAK THE OFFER SCREEN**: `offer_screen._draw_option_parts` reads
+  `Run.MODIFIERS[id]` unguarded, and an offer frozen on a save (GF: `encounter_offer` rolls once and the save carries it) before IP
+  can name `hungering_dark` — as one before IO could name Famine or Cruel Order. **The live save holds none.** IP's ruling 6.
+- **THE BRIEF's *FV's 1.55* IS II's BRIEF's, AND IT IS A RATIO OF STEPS**: IG's boss at 4.04 steps against a normal fight's 2.58.
+  FV measured EVENTS, a boss at 1.09–1.16 times a trash fight (`docs/reports/FV.md` §3a); the playthrough's 2.78 is events and its
+  2.57 steps. The conclusion the brief draws holds on either.
+
+### FOUND AT IJ AND NOT FIXED — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+- **THE LITERAL FACTS THAT STAY LITERAL, AND WHY** (`docs/reports/IJ.md` §2, every one listed in `docs/reports/IJ-census.tsv`). A
+  figure written as a word (*a quarter*, *twice*, *three bolts*: a token prints digits, so converting it would change what the
+  player reads); a figure no door reaches; and quoted facts that carry no figure (a condition, a name, a scope).
+- **LOYALTY's REGISTRY TEXT KEEPS *Past 8* AS A LITERAL.** The live chip names the point through `_bond_convert(hunter)`, which a
+  Long Leash moves to 11; EU reserves the constant to that one reader (`check_eu` §0), so the registry's fallback keeps the base
+  figure written out.
+- **THE SKILL-CHECK HINT's *half Break*** is a word for `Ability.GRADE_BD_MULT`'s Sloppy 0.5, left written (the hint's three
+  figures read the table since IJ).
+### FOUND AT IG AND NOT FIXED — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+- **THE KIT PANEL's NOTE CALLED THE KIT *the protected core* TOO** — *The protected core can never be benched* sat above the
+  sections the brief named; it reads *The starting kit can never be benched* now, and the section's empty line *No card in the
+  starting kit.* — the brief's *nothing else moves*, read against its own rule (IG §3).
+### THE PLAYTEST'S OTHER FINDINGS — **LATER BATCHES BY RULING (HW's brief §5); THE ROADMAP HOLDS THE ORDER** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+- **THE RE-MEASURE IS SCHEDULED, NOT PARKED (IC §5, the designer's) — IT IS IQ, WITH THE TWO DOCUMENT CENSUSES (IN's brief §6; IO's §8; IP's §4)**: it
+  was priced for `CLAUDE.md`, and the file that binds is this one; if IP's census reads this file as mostly binding, the
+  re-measure's subject is both files and it moves up — both ceilings run out within a batch of each other at the worst rate and far later at
+  the honest one (the WHERE block's two readings, each with both rates), so a re-measure that waits finishes as the room runs out;
+  **II §4's archive pass did not move it back** (`CLAUDE.md` −56 B at II),
+  **nor did IJ's struck lines** (`CLAUDE.md` −1,947 B at IJ). **The block index and HV's pilot still wait on it.**
+  **THE ORDER:**
+- **IQ — `master.html`'s SWEEP, THIS FILE's CLOSED-BLOCK CENSUS AND THE RE-MEASURE: ONE BATCH, NOT THREE (IN's brief §6; moved again by IO's brief §8 and IP's §4 — the documents and the claims are the last two batches).** They
+  were IN's until IN's brief moved them; **no longer urgent** — the alarm cleared at IM's 27.9 batches. **`master.html`**: a surface
+  the census did not cover and carrying false facts (IK found Blood Price's row); IQ sweeps it with IJ's rubric and IJ's resolver
+  where a figure has a door. **This file**: a census of the live file's closed blocks — IM §0.7 took the one cut that needed none
+  (a measurement's table lives in its report). **The re-measure**: `CLAUDE.md` binds first at the honest rates (II's brief §4 read it first at every rate; this file runs
+  out first at the worst ones — the WHERE block), and the room is planned against the honest rate. **119 of 126 blocks bind. So
+  archiving will never SHRINK CLAUDE.md — it can only stop it growing, and II proved it at the margin: 3,105 B out, 3,049 B
+  written back, 56 B net. The next byte comes from the file's SHAPE, not from its contents** (IJ's brief §0.3, the designer's).
+  The two readings go beside the record with the honest rate, and say which file runs out first at which rate (IK's brief §8).
+
+### FOUND AT HN AND NOT FIXED — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+  ~~`heroes_all_standing: false` as *someone has fallen*~~ is **built at HO §2**.
+### HD's RULINGS OWED — **ONE LEFT; THREE CLOSED AT HE (1 AND 2 RULED AND BUILT AT HE §3, 3 KEPT AT HE §5 AS THE REPRICE'S PINS)** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+1. ~~**LUNGE IS STILL OFFERED AT A SWORDMASTER'S ZONE BOSS WITHOUT THE STANCES.**~~ — **RULED AND BUILT AT HE §3**: the
+   boss asks the engine half of `offerable`, HC's reason for leaving it off overturned (the lineage outlives the engine);
+   0 in 400 unslotted now (`check_hd` §2, asserted). HD's record: it is on the Swordmaster's boss pool as
+   well as his shelf, and the boss's first tier asks the PET half of `offerable` and not the engine half (HC §5's
+   ruling: the engine half would move every engine's boss offer). So a Warrior of that lineage who unslots the Stances
+   is offered it there — **280 times in 400 rolls, the same as with them slotted** (`check_hd` §2, printed). It is the
+   shape Shatter, Overcharge and Divine Plea already had. Ask the engine half at that door (moves four boss offers),
+   take Lunge off the boss pool (a pool change), or let it stand.
+2. ~~**A DRAFT'S ANSWER RE-ASKS NO ENGINE, AND THE STANCE PIECES REACH IT NOW.**~~ — **RULED AND BUILT AT HE §3**:
+   `Run.draft_choice` re-asks `Classes.offerable` at the pick, and the screen draws no button for a held card. HC's finding, driven for them: a Guard
+   Change rolled with the Stances slotted is handed over after they are unslotted (`check_hd` §2, printed). The rune
+   cache and the boss offer filter at the answer; the draft does not. Whether it should is the designer's.
+3. ~~**`test_batch_br`'s CHARGE-AGAINST-STRIKE ARMS MEASURE A CLASS CARD AGAINST THE FREE BASIC — THE RETIRED RULE'S
+   FLOOR — AND WERE LEFT LIVE**~~ — **RULED AT HE §5: KEPT, AND RELABELLED AS THE REPRICE'S PINS** (five comparisons,
+   their anchor and the 30 Rage arm). HD's record: they were left live because they pin the designer's reprice of Charge (20 BD, 30 Rage) rather than
+   re-verifying *weaker*. Every other comparison in the two "weaker" sections is retired and printed. Retire these too,
+   or keep them as the reprice's pins.
+### HA's RULINGS OWED — **TWO LEFT, BOTH ABOUT `main`; THE FIRST IS ANSWERED BY HB's SEQUENCE AND ALL FIVE OF THE SECOND WERE RULED FOR HD** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+**AMENDED AT HG.** Ruling 1's second half named *"HE (HA's HC): the other seventy-five tier-2 arms in 36 targets"*.
+HE took the offers and the doors instead and HF took the runes; **HG derived that half and found SEVENTY arms in
+THIRTY-FOUR targets**, sorted 48 re-point / 5 retire / 17 superseded, and priced it at two batches of its own
+(HG's ruling 1). The paragraph below is HA's proposal as HA wrote it, kept as the record.
+1. **THE REPAIR OF THE MIDDLE GROUP IS PROPOSED AS TWO BATCHES — ANSWERED WITH HB's BRIEF: THEY ARE HD AND HE, BEHIND
+   HB's PET AND HC's RUNE SCOPES.** **HD (HA's HB): the twenty tier-1 arms first** — each cannot
+   fail as written or passes while the merged game contradicts it — **then the thirty-five FOLD arms** in eleven
+   suites, whose per-shelf and class-wide-shelf floors become one per-class floor through one shared helper (55 arms,
+   23 targets). **HE (HA's HC): the other seventy-five tier-2 arms in 36 targets**, with `check_ea` §1's four-arm
+   re-derivation over class × engines held and `check_dp` §1's status table re-keyed by class as the two that are more
+   than a re-point. **The report's §1d is the work list, arm by arm: file, line, relation, action and cost.**
+2. **~~FIVE CALLS ONLY THE DESIGNER CAN MAKE BEFORE THOSE ARMS ARE REPAIRED~~ — ALL FIVE RULED IN HD's BRIEF AND TAKEN
+   AT HD:** (a) Guard Change and Lunge are the Stances holder's (built, two ruled rows); (b) Immolate and Pyroblast stay
+   as GP left them, the checks repaired to that; (c) summoning is the Hunter class's (HB); (d) the "weaker" rule is
+   retired, and the checks that re-verified it with it; (e) the floor is both. HA's working, as it stood: (a) **Guard Change and Lunge** — every
+   Warrior is offered both since GP; retire `test_batch_ak:345`, or rule them holder-only (two `ENGINE_READ` rows);
+   (b) **Immolate and Pyroblast** — every Mage is offered both and neither reads an engine; retire
+   `test_batch_ar:684`/`:686`, or rule them holder-only; (c) **~~summoning~~ — RULED AT HB: THE HUNTER CLASS**, every
+   Hunter but the Sharpshooter, through the class kit's Summon Companion (`check_dr` §1 re-pointed, and `CLAUDE.md`'s
+   DR §1 block and FO §2 bullet with it); (d) **EB §1's "class-wide cards are weaker"** — GP recorded the
+   rebalance as owed; retire `test_batch_bq:344`/`:349` or re-point them over every Cleric who can draft Heal; (e) **the
+   floor the FOLD family asserts** — on `Classes.draft_pool(k)` (42 / 52 / 43 / 42 since IF §2; the Mage's 51 from HL §1, the Warrior's 43 from
+   HB), on the engine-free `Classes.offerable(draft_pool(k), [])` (38 / 39 / 29 / 35 since IF §2, the Warrior's 38 since HD), or both.
+### GZ's RULINGS OWED — **ONE LEFT, AND IT IS A GATE THAT PASSES WHEN IT SHOULD NOT; THE SECOND IS RULED AND TAKEN AT HA §4** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+2. ~~**NOTHING IN THE TREE OPENS `README.md`, AND IT SAT THREE CUTS STALE BECAUSE OF IT.**~~ — **RULED AND TAKEN AT HA §4:
+   STRIPPED TO WHAT CANNOT GO STALE, AND NO GATE.** The rule and its reason are in `CLAUDE.md`'s *WHAT THIS FILE IS* block. The
+   original finding: it named **Batch BP** as
+   the live file's first entry — the boundary BZ's first split left, written at `06e382c` and carried unchanged
+   through CX, DV and FG, **126 batches**. Corrected here, but **the class of defect is not**: the re-point debt
+   has always been counted over the files that OPEN the changelog, and a file no instrument reads is a file whose
+   claims can never go red. **GZ wrote the lesson into `docs/instrument-rules.md` under CW §4 and did not build the
+   instrument.** Whether `README.md` — and any other file in that class — is worth a gate that reads its factual
+   claims against the tree is the designer's; it is a different shape from every document gate now standing, all of
+   which read files something already asserts on.
+### GY's RULINGS OWED — **THREE; NONE IS PLAYER-VISIBLE, AND THE FIRST SHAPES THE NEXT BATCH** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+1. **~~`docs/changelog.html` HAS CROSSED ITS OWN THRESHOLD, AND THE CUT IS OWED AT THE NEXT BATCH BOUNDARY~~ —
+   TAKEN AT GZ, AT THE FS/FT BOUNDARY: 29 entries moved, 400,021 B → 144,527 B, and `check_fg` §1 stopped
+   warning.** The
+   file is **400,021 B against CW §4's 400,000 B bar — 21 bytes over** — and `check_fg` §1 printed its CEILING
+   WARNING on the acceptance run: *"The cut is owed AT THE NEXT BATCH BOUNDARY and this gate FAILS if it is not
+   taken."* **It is a WARNING and not a red by the gate's own design** (the file WITHOUT this batch's entry is
+   396,730 B, under the bar), which is FG's rule that the red never lands on a batch with no warning in front of it.
+   **GY is the batch that crossed it, so the next one owes the cut** and the one after that fails without it. The cut
+   is a batch of work by CW §4's procedure — a byte-for-byte split with a rejoin proof, which this project's rule
+   says must not share a diff with anything else — and it has been taken four times before (BZ at BO/BP, CX at
+   CN/CO, DV at DF/DG, FG at EP/EQ). **The entry was not trimmed to sit under the bar**: GY's is 3,291 B against a
+   2,871–4,838 B range over the last seven batches, so shrinking it to clear 21 bytes would have been writing to the
+   instrument rather than to the reader. Whether the next batch takes the cut or defers it is the designer's.
+### GX's RULINGS OWED — **ONE LEFT; THE SECOND AND THIRD ARE BOTH CLOSED AT GY** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+2. **~~`CLAUDE.md` IS AT 336.31 KiB WITH 3.69 KiB OF HEADROOM~~ — CLOSED AT GY §1: THE CEILING IS 410 KiB.** *(The figure in this item was GX's mid-write reading; its own FOUND section and `docs/reports/GX.md` §6 both carry the landed 336.63.)* GX
+   added 1.62 KiB by extending GT's sits-out block rather than opening a second one. `check_fg` §2 reads the file
+   under its ceiling and prints no warning. **The file's own FU §1 / GR §2 block says the next batch at this ceiling
+   is not looking for a seam**: what is left is card law, engine law and rune law, each written into by more batches
+   than combat law was, so both remaining moves are the designer's — split a subject batches read often (rune law is
+   named as the one that would come away cleanly) or re-derive the ceiling a second time. **The largest single-batch
+   growth on record is +8.10 KiB, which is more than the headroom**, so the batch that meets this is the one that
+   discovers it mid-write. Raised here rather than at the wall.
+3. **~~GV'S AND GW'S DESIGN-NOTES ENTRIES ARE AT THE BOTTOM~~ — CLOSED AT GY §2, AND THE INSTRUCTION THAT SENT THEM THERE IS REPAIRED.** *(GY's census found the number is 73 others, not four: see GY's ruling 2.)*
+   `docs/design-notes.md` carries two conventions: GP through GU sit at the top under `## <Title> (Batch XX) — <date>`,
+   while GK, GM, GN, GO, GV and GW were appended at the foot under `## Batch XX — <title>`, below 9,000 lines of
+   older notes. **The two instructions genuinely conflict** — the file's header says newest first and `CLAUDE.md`'s
+   working agreement says *append* — so this is a ruling rather than a slip. GX's entry is at the top, per the
+   header. **Moving the six is a pure block move and was not taken**: the brief asked for a small batch and said what
+   was deliberately not done. Nothing asserts on position (the three suites that read this file ask only that their
+   own batch's name is present), so the move is free whenever it is ruled.
+### GW's RULINGS OWED — **FOUR; THE FIRST TWO CHANGE WHAT A RUNE IS WORTH** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+1. **THE SHARED HIDE IS NOW WORTH WHAT EZ PRICED IT AT, AND NOTHING HAS EVER PAID THAT.** The brief ruled the copy, so
+   it is built — but what the ruling moves is a MAGNITUDE no player has ever felt. Driven in a real fight across EZ's
+   own three buff loadouts, a companion's blow reads **+26.5% / +57.6% / +138.3%**, against a rune that has paid
+   **+0.0%** since it shipped. The rune's text, price, terms and multiplier are byte-unchanged; a 100g rune has gone
+   from dead to the largest single damage swing a Beastmaster can buy, and whether that is the intended price is the
+   designer's.
+2. **THE TWO PRICES ARE OFF WITH THE ENGINE OUT, WHICH MAKES AN UNEQUIPPED ENGINE STRICTLY BETTER THAN IT WAS.** Ruled
+   by the brief and built. At the table: a Holy Cleric who unequips Mercy while wearing the Martyr can now be healed by
+   his party, and a Survivalist who unequips Trapper while wearing Thin Blood keeps his poison's damage. Neither buys
+   anything back — the payouts stay off — so each rune is **inert rather than negative**. Of GV's ruling 3's alternatives,
+   **the second is taken at GX §1** — four surfaces say it is sitting out — and unequipping the rune with
+   the engine is still untaken.
+### GV's RULINGS OWED — **THREE LEFT; THE FIRST AND THE FOURTH ARE ANSWERED AT GW** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+1. ~~**A QUEUED ROW SITS OUT OF A CACHE'S ANSWER RATHER THAN BEING REPAIRED AWAY**~~ — **RULED AT GW §4, AS GV BUILT IT**, and the reasoning now stands beside it on the player-facing side too (`docs/master.html`): a retirement can never be undone, an unequipped engine is one press from being undone, and a state the player can undo is not a state to destroy. The working that follows is kept because it is the pricing of the alternative. FD's rule is that a
+   frozen offer is re-asked at the answer and the repair is WRITTEN BACK; that is right for a candidate that can only
+   get worse (retired, owned). An unequipped engine is the player's own reversible choice, so the row is kept in the
+   stored triple, filtered out of the answer while the engine is out, and offered again when it is back — and
+   `map_screen._take_rune_pick` finds its rune in the list the buttons were built from. **The alternative is FD's literal form**: drop
+   the row, top the triple up, store that — under which one toggle before answering a cache costs it those runes for
+   good, and can spend the pick on nothing.
+3. ~~**A BOUGHT RUNE WHOSE ENGINE IS DROPPED KEEPS ITS SLOT AND PAYS NOTHING**~~ — **ANSWERED AT GX §1, AND THE
+   SECOND OF THE FOUR OPTIONS IS THE ONE TAKEN**: it sits out with a note, the way a card does. It still keeps its
+   slot and still pays nothing — GX moved no magnitude — but four surfaces now say so and name the engine rune that
+   brings it back, in GT's own sentence. **The other three stay untaken and stay priced below.** The original
+   finding: GT ruled it for a CARD: it sits out and
+   returns. A rune is bought with gold, and nothing was built for it here (§3 of the report): it stays equipped in one
+   of the three ordinary slots, pays nothing (measured), and nothing on any screen says why. **Two are worse than
+   nothing** — the Martyr still refuses every ally's heal and Thin Blood still stops his poison biting. The options,
+   priced and not taken: leave it (the player unequips it himself, free, on the map), sit it out with a note the way a
+   card does, unequip it automatically, or let it be sold.
+4. ~~**THE SHARED HIDE PAYS NOBODY ANYTHING, ENGINE OR NONE**~~ — **WIRED AT GW §1**, and `check_gv` §1 said so exactly as GV promised it would: the row read 18 against 15 on BOTH engine arms in GW's pre-pass, which is also what moved it out of the table's `DEAD` group and into `CARD`. What GW §1 now owes a ruling on is the MAGNITUDE it turned on — see GW's ruling 1. The original finding: Found by driving it: the rune's field
+   lands on the HUNTER and `_shared_hide_mult` reads the COMPANION, which never receives it, so a 100g rune multiplies
+   a companion's blow by exactly 1.0000 for every hero who has ever bought it. Not repaired: the fix moves a magnitude
+   (CQ §6). `check_gv` §1 asserts it dead in both arms, so the day it is wired the gate says so.
+5. ~~**THE RUNE LAYER HAS THE NARROWNESS THE CARD LAYER AVOIDED.**~~ **RULED AND BUILT AT HC: THE RUNES MERGED THE WAY
+   THE DRAFT POOLS DID** — class scope, three gates — and a second engine's runes arrive with it. The finding was: a
+   hero who unequips his engine is offered none of his own five runes on four lineages of twelve, and a hero holding
+   TWO engines is offered nothing of the second's lineage, because a rune's scope was the lineage.
+### GT's RULINGS OWED — **TWO LEFT; THE THIRD RULED AND THE FOURTH ANSWERED AT GU** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+3. ~~**BATTLE POISE AND SHATTERPOINT ARE A SEPARATE CASE, NOT THIS RULING'S.**~~ **RULED IN GU's BRIEF: both stay
+   as they are**, and `CLAUDE.md`'s sits-out block carries it. Both are cards (not runes), both cast and
+   do their own work with no engine, and only a second clause needs another card: driven on a Warrior with no engine,
+   Shatterpoint breaks its target either way and adds its free Overpower (68 damage against 16) only with Overpower
+   carried; Battle Poise, reached through a drafted Feint, pivots on a parry only with Guard Change carried. A card that
+   half-works is GM's untouched group. Paying the clause without the card would change what the card gives.
+4. ~~**THE SAME SHAPE ON THREE MORE RETURNING CARDS, OUTSIDE EB's CONTROL.**~~ **ANSWERED AT GU §1** — two former
+   basics and a swap whose quickness is its point, none retuned; what is still owed is GU's rulings 1 and 2. Under EB's control (same role, same
+   initiative) only the three are inverted. Dropping the role control, the other two former basics are cheaper and
+   shorter than a kit card at the same initiative — **Arcane Explosion** against Magic Missiles (an area attack against
+   a single-target one) and **Shadowrend** against Ministration (a strike against a heal); dropping the initiative
+   control, **Guard Change** (0 Rage, cooldown 1, 1.5) is cheaper, shorter and faster than Crushing Blow and Pommel
+   Strike. Not retuned — the ruling named three.
+### GR's RULINGS OWED — **ONE LEFT; THE SECOND IS CLOSED AT GY §1** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+2. **~~THE NEXT CEILING, AND BOTH MOVES LEFT FOR IT~~ — RULED AND TAKEN AT GY §1: THE CEILING IS RE-DERIVED, RUNE LAW STAYS.** At FF's +4,315 B a batch `CLAUDE.md` meets 340
+   again in about 5.1 batches, at the +2,247 B its main half has grown since FF in about 9.8. There
+   is no fourth seam that batches read rarely: card, engine and rune law are what is left, and each is written into by
+   more batches than combat law was. **Rune law would come away cleanly** — 14 of its 15 blocks, 34.25 KiB, bind
+   nothing else — **and the merge's rune step reads it every batch.** The other move is a second re-derivation of the
+   ceiling, which `CLAUDE.md` says moves with the file. **Better ruled with headroom than at the wall** (EF §2).
+### GQ's RULINGS OWED — **TWO LEFT, BOTH PLAYER-VISIBLE; THE THIRD RULED AND TAKEN AT GR** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+3. ~~**`CLAUDE.md` IS PAST ITS CEILING**~~ — **RULED BY THE DESIGNER AND TAKEN AT GR**: the subject seam, and combat
+   law moved to `docs/combat-rules.md` (GR's block above).
+### GO's RULINGS OWED — **TWELVE; ALL BUT THE LAST TWO ARE PLAYER-VISIBLE** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+4. **WHAT THE BASTION BANKS.** Every cut the prevented-damage ledger books while the strike names him, the block (the
+   whole nominal blow), any barrier's absorb, armor and resistance — whoever's work it was. A miss banks nothing; a
+   blow cut to nothing, an absolute parry and an absorbed blow each bank the whole blow. The bank lasts the fight, and
+   only a basic attack that lands spends it, after armor.
+### GN's RULINGS OWED — **EIGHT; THE FIRST FIVE ARE PLAYER-VISIBLE** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+8. **CRUSHING BLOW IS ON EVERY WARRIOR NOW, AND THE ORC CHIEF'S ABILITY SHARES ITS NAME** (`docs/text-audit.html`
+   §CK, a designer question since CK). Its dormant Elemental Weakness rider (`elem_weak_ranks`, no writer) stays
+   dormant.
+### GM's RULINGS OWED — **SEVEN, ALL PLAYER-VISIBLE** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+   - ~~**the earned cards the door refuses without their engine**~~ — **RULED AND BUILT AT GT §3: such a card SITS
+     OUT while its engine is gone.** GT asked the door about all 204 earnable cards: **seventeen** cannot be cast
+     without their engine (`Classes.SITS_OUT`), and GM's list was wider than that — Battle Poise and Counter Time open
+     on a drafted Guard Change, and the Beastmaster's companion cards on an earned Call the Wilds, so neither sits
+     out.
+2. **~~"EXACTLY AS ITS ENABLER DOES" HAS TWO MORE HALVES, AND NEITHER IS BUILT~~ — MOOT AT GS §1.** No lineage opens
+   with a bound card and no lineage takes a slot: Death Ray is a draft card offered to a Resonance holder of any
+   lineage, and an Arcanist opens at three slots like every hero. GM's record: an enabler travels to another hero who
+   takes the engine and sits outside the slot count, and a bound card did neither.
+3. **~~KILL COMMAND CAN BE CAST WITHOUT PACK BOND~~ — ANSWERED AT GS §1, BY THE SAME FACT.** An earned Call the Wilds
+   summons a companion with no engine, which opens Kill Command's door; GM sent it out with the engine because the
+   ruling named it. **It is a Beastmaster-shelf card now and is NOT gated**, so any Hunter can be offered it —
+   conditional on a card, GP's Battle Poise shape.
+### GK's RULINGS OWED — **NINE; THE NAMES, THE WORDS AND THE THIN KIT ARE PLAYER-VISIBLE** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+7. **~~A hero who takes a spine opens with his class's basic attack alone~~ — BUILT AT GN:** he opens with his basic
+   and his class kit of three, four abilities (`check_gn` §3 drives it from class selection into the first battle).
+8. **~~The Hunter is dealt all three of his three~~ — CLOSED AT GO:** every class deals three of six.
+### WHAT GK LEFT BROKEN
+
+- **Nothing it broke.** The repaired battery reads green but for `check_cm_live`'s standing sanctioned red (13 / 4, unchanged since before GK). Every row GK moved is in `baselines.json` with its reason.
+- **What GK left undone is not broken:** the nine engines, the pool merge, the engine-reading runes and cards, engine rune costs — `docs/reports/GK.md` §4 — and the rulings above.
+
+### A QUIT FIGHT RESTARTS AGAINST A RESET WARBAND, AND THE PARTY'S LOSSES CARRY — **GG's OPTION C, RULED AND BUILT AT GH; RAGE RULED AND THE TWO REMAINDERS ACCEPTED AT GI**
+
+- **~~RAGE RESETS; THE BRIEF LISTED IT AS CARRYING. OWED A RULING~~ — RULED BY THE DESIGNER, RECORDED AT GI: RAGE
+  RESETS.** Every fight opens it at nothing, plus First Blood's and Bottled Storm's floors, and carrying it through a
+  quit would hand the quitter the Rage the abandoned fight built.
+- **ACCEPTED, NOT OPEN — WHAT A QUIT STILL BUYS (RULED BY THE DESIGNER, RECORDED AT GI).** Both were driven at GH
+  (`docs/reports/GH.md` §4b):
+  - **A quit before anything is lost rolls the opening again**: the turn order and every enemy's declared first action.
+  - **A quit clears the heroes' cooldowns, once-a-fight refusals and statuses** along with the warband's, and every
+    meter — Rage, Focus, Faith and the rest — opens at nothing.
+
+  **The reason, kept with the ruling so neither is rediscovered as a defect:** closing either needs the fight itself
+  captured — GG's A or B, a project of several batches (`docs/reports/GG.md` §2d) — and a quit already costs health,
+  Mana, items and a death, which is the substance. **An accepted consequence and an open defect read identically in a
+  queue; these two are accepted.** `CLAUDE.md`'s GH block says the same where a batch reads the rule.
+- **Everything else is as it stood**: health, Mana, the pouch, a fallen hero, a standing companion's health.
+
+### THE TALENT LAYER IS BUILT (FX); FIVE THINGS IN IT, AND SEVEN OF FW'S EDGES, ARE THE DESIGNER'S — **OWED A RULING** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+6. **~~The Wide Watch's retirement has lost its reason~~ — RULED AT FY §3: it stays retired, because the Shared
+   Mark holds its place.** The retirement string says so and marks FO's reason void. `check_fo` §2a asserts the
+   current reason, the date, and FO's sentence absent.
+7. **~~Deepening Hex's floor has lost its derivation~~ — RULED AT FY §2: re-derived against the live game to 8**
+   (`10 - 2`, since nothing installs a shallower step). **FY read the brief's *"if nothing lowers the threshold"*
+   clause as not applying**, because the rune itself still does, and recorded that reading for confirmation.
+   **CONFIRMED AT GA: the floor stays at 8**, and its card wording is not touched. `check_fo` §1c pins the relation.
+8. **~~Five node names use a tag word~~ — RULED AT GB: ACCEPTABLE** (BREAK, RESOURCE, DEBUFF). All five stay
+   recorded in `check_ek`'s `CLASH_EXEMPT`, and the DEBUFF one uses the word differently.
+1. **~~THE DO CHARTER AGAINST THE LINE~~. RULED AT FX: THE LINE SUPERSEDES DO's PERMITTED LIST**, and
+   `CLAUDE.md`'s DO block now opens with that. FW's text: `CLAUDE.md` records as settled that a node may modify its spec's protected
+   core — *"worth 83 nodes"*, *"DO NOT RE-OPEN THIS AS AN OPEN QUESTION"* — and the line forbids touching any
+   ability. The 33 node payloads that edit an ability today were legal under DO and are all out under the line.
+7. **~~THE TREES' SIZE~~. RULED AT FX: ONE TREE OF 27, KEYED TO THE CLASS.** FW's text: 274 (281 under the line) assumes four trees of 81. At 81 a tree, today's machinery forces
+   at least 124 of the 324 nodes to be magnitude repeats; at 27 a tree it forces none. Nothing rules it.
+### THE CLASS MERGE ~~IS MEASURED AND UNRULED~~ WAS MEASURED AT FP AND IS RULED — **A PROJECT ON ITS OWN BRANCH SINCE FQ; STEPS 1–5 BUILT (3's NINE ENGINES AT GO, 4's POOL MERGE AT GP, 5 AT GP AND GV), AND THE RUNE SCOPES MERGED AT HC; STEP 6 CENSUSED AT HA, ITS FIRST HALF TAKEN AT HD, ITS RETIREMENTS AT HH AND ITS RE-POINTS AT HI AND HJ — **EVERY STEP OF THE RUNNING ORDER IS DONE** (BELOW)** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+- **THE PROFILE MIGRATION IS WRITTEN ONCE AND CANNOT BE ITERATED ON LIVE**, and the one part that
+  is a ruling rather than a programming step is **how twelve purses fold into four**: a player with
+  3 points on each of three Warrior specs has 9, and **sum rewards breadth while max rewards
+  mastery** — with the merged trees three times shallower, summing may hand a full tree on day one.
+  FP did not choose; **the designer ruled MAX at FX**, and `docs/reports/FX.md` §4 carries the driven probe.
+### THE THREE SPINES ARE BUILT AND ALL THREE RATES ARE SET (FU, FV); WHAT IS STILL FLAGGED — **OWED A RULING (FT)** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+- **~~SANCTITY'S RATE~~ — SET AT FV §3: 16 EVENTS A STEP, AGAINST HALF A PAYOUT.** FT's 6 put every
+  Cleric party at the cap in 78–97% of trash fights; 16 ends a normal fight at 3.03 / 2.06 / 2.28
+  steps (Devout / Holy / Occultist). **Owed a re-reading the day the potency half lands** — `CLAUDE.md`
+  binds the potency batch to re-measure it in that same batch.
+  - **AND TWO THINGS THAT ARE NOT RATES DECIDE WHAT POTENCY WOULD BE WORTH, BOTH FOUND AT FV §3:** the
+    Devout's Divine Shield barrier was applied WITHOUT a `src` — **it carries the Devout since IL §1**, and
+    it is battle-long, so the duration payout cannot lengthen it; and the Occultist's Ruin is battle-long
+    and magnitude-free at the funnel. **Neither is owed until a potency half exists; both are what that
+    batch meets first.**
+### THE MERGE'S RUNNING ORDER — **RECORDED AT FQ §3 SO THE SEQUENCE SURVIVES A COMPACTION** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+2. **~~THE TALENT LAYER~~. DONE AT BATCH FX: ONE TREE OF 27, KEYED TO THE CLASS, NOT 274 NODES.** The old plan
+   read: **THE TALENT LAYER — 274 new nodes by FP's count, 281 under the designer's line (FW)**, authored by the
+   designer and the assistant together. **The long pole. Its recon is `docs/systems-recon.html` (FW), and the
+   rulings in that document's §3 come before a node is written.**
+6. **~~THE GATES~~ — DONE AT HJ: CENSUSED AT HA; HD TOOK THE TWENTY HOLES AND THE FOLD, HG DERIVED AND SORTED THE OTHER SEVENTY, HH RETIRED TWENTY-ONE OF THEM, HI RE-POINTED TWENTY-SEVEN AND HJ THE LAST TWENTY-THREE — ALL 130 OF HA's ARMS DISPOSITIONED** (HB was the pet and HC the rune scopes; HE took the offers and the doors, and HF the fifteen no-engine runes). FP counted **52 engine-bound targets** carrying
+   71.6% of the battery's asserted checks, and GK repaired every red its own move caused. **HA read all 119 launched
+   targets arm by arm**: of FP's 52, **twenty are repaired and correct, thirty-one still ask a pre-merge question and one
+   is red on purpose** — and **the middle group is 42 targets and 130 arms, eleven of its targets outside FP's 52**,
+   because FP's band was the engine half of the merge and the middle group is mostly the offer, the kit and
+   ownership. **Twenty arms in fifteen targets cannot fail as written or pass against a false claim.** Priced, not
+   repaired: **HD takes the twenty and the fold family, HE the other seventy-five** — HA priced them as HB and HC
+   (`docs/reports/HA.md` §1–§2). **HG re-derived the remainder at seventy and sorted it 48 / 5 / 17; HH retired
+   twenty-one and found the twenty-second vacuous, so it went to HI; HI re-pointed twenty-seven and HJ the last
+   twenty-three**, both re-derivations among them (`docs/reports/HG.md` to `docs/reports/HJ.md`; HJ §4a tallies the 130).
+### **AND FP's `block_chance` FINDING TRAVELS WITH IT — RE-VERIFIED AT FQ, AND THE CODE SAYS IT OUT LOUD** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+- **AND AT HC IT REACHED A RUNE: BARED PLATE'S PRICE IS THE BLOCK ROLL** (*"he can no longer Block"*), and since the
+  rune is `class:warrior` a Warrior with no Warden lineage and no Heavy Plating pays it on a Block chance of 0.000
+  (driven) — HC's ruling 2.
+### FN HANDED OVER THREE DESIGN QUESTIONS — **FO TOOK TWO. ONE IS STILL OPEN.** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+- **~~DEEPENING HEX IS WORTH EXACTLY ZERO TO AN OCCULTIST HOLDING AVATAR OF RUIN~~ — CLOSED AT
+  FO §1. IT SUBTRACTS 2 NOW, UNDER A FLOOR OF 3 — RE-DERIVED TO 8 AT FY §2, THE BOTTOM OF THE LIVE GAME.** **The transferable half, which is why this item
+  is kept:** the `mini` was CORRECT and was written for a real reason, and **the correct behaviour
+  was what made the rune inert** — there was nothing to repair in the handler, only a decision to
+  take. **And the fix's own shape is the new hazard**: a subtraction is OPEN at the bottom where an
+  assignment is not, so at the floor the rune is worth zero again. `check_fo` §1e asserts a STRICT
+  inequality on every live step beside its property arm, because *never shallower* is satisfied by
+  `mini` itself.
+- **~~THE WIDE WATCH IS WORTH EXACTLY ZERO TO A SHARPSHOOTER HOLDING OVERKILL~~ — CLOSED AT FO §2.
+  RETIRED, KEPT, AND REPLACED BY THE SHARED MARK. FY §3 restated why it stays retired: its place is filled,
+  because FX deleted the node it duplicated.** **The transferable half:** the brief said the
+  two texts match *word for word* and they do not — **the longest shared phrase is `rather than`**
+  and the node's clause appears in zero rune `desc` strings. **The duplication was in the CODE and
+  is invisible to a text sweep**, which is FK §7's Standing Ground shape. Its read site, field,
+  payload and entry are all KEPT: a saved run holding it is still paid.
+### TEN OF FK'S RUNES HAVE NO SUITE COVERAGE — **REPORTED AT FK §3, RECORDED HERE AT FM §5, OWED**
+
+**`test_rune_battle` DRIVES NINE OF THE TWELVE SPECS AND NOT THE THREE WARRIORS.** Its passes are
+pyromancer/holy, cryomancer/occultist, arcanist/inquisitor and the three Hunter specs — and
+**FK put ten new runes on two of the three warriors.**
+FK's own throwaway probe covered them and was deleted; the SUITE
+does not. **It is a small, clearly-scoped instrument change and it is owed** — a fourth pass, or a
+rotation, in a batch that is allowed to spend a suite's runtime on it. Recorded here because a
+report is not a queue: FK named it in `docs/reports/FK.md` §3 and nothing carried it forward.
+
+### TWO INSTRUMENT OBSERVATIONS FROM FM — **ONE REPAIRED, ONE NOT** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+- **A GATE'S NEEDLE CAN BE COARSER THAN THE DEFECT IT GUARDS, AND `check_fh` §3's WAS.**
+  `_has_text(shop, "draft")` swept every Label on the shop screen for a bare substring, and **eight
+  live runes carry *"his drafted cards"* in their own `desc`.** It is SCOPED now — text a rune
+  brought with it is the rune's — with a second arm on BUTTONS that no rune text can excuse, and
+  **both arms were driven** (the excused text was really on the counter; an injected draft Label is
+  caught). **The source-level pins were never the loose ones** and are untouched: `check_fd` §1f and
+  `test_batch_bo` §3 hold three needles each. Repaired at FM; recorded because the SHAPE recurs —
+  a screen-level proxy for a source-level rule goes stale when the screen's content grows.
+  **AND AT FN THE REPAIR WENT DORMANT WITHOUT BEING WRONG.** The eight *"his drafted cards"*
+  clauses FM scoped around were the eight retired conditions, so **zero live runes name a draft
+  now** and the excusal has nothing to excuse. **It is not reverted**: the BUTTON arm is
+  unaffected, and the day a rune's text names a draft again the scoping is what stops a false red.
+  **A repair whose occasion disappears is not a repair that was wrong.**
+### THE SKILL CHECK'S DIFFICULTY IS RULED AND BUILT — **ONE OBSERVATION IS OWED FORWARD (EY)** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+- **AND GC §2 READ CS's CAP AGAINST IT.** On the same model the capped chain lands 98.8% of the time, so the cap
+  no longer rests on four being hard; a nine-press chain still lands 49.5%, so the bound is what it keeps. The cap is
+  amended — four, and a rune may raise it — and `CLAUDE.md`'s sequence block says why.
+- **DIFFICULTY IS BOUGHT WITH `sweep_time`, NOT WITH THE HALF-WIDTHS**, and the reason is a standing
+  rule in `CLAUDE.md` now: a half-width is a fraction of the TRACK, so widening it redraws what the
+  player is aiming at, while the sweep buys the same seconds and leaves every zone where it was.
+  **The alternative was priced and rejected — it is not a discovery.**
+### THE LADDER — WHAT RUNG 2 SHOULD ASK. **RULED BY THE DESIGNER AFTER EP. UNBUILT.** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+- **B IS REJECTED, ON ITS OWN MEASUREMENT.** A rung-aware Break gate becomes a **spec** gate.
+  **This is now a `CLAUDE.md` standing rule** — a rung may only scale a system every spec can
+  participate in — because it settles with no implementation and would otherwise be lost when this
+  file is next rewritten.
+- **E WAS REAL AND IT WAS RUNG 3's — FIXED AT IM §1** (*"fix E separately whenever convenient"*): each rung names two bands and
+  nothing falls back, so Ruin's bargains are the harshest (its item is archived).
+### THE DRAFT AUDIT — TWO FINDINGS RULED AT DR, THE REST STILL OPEN — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+- **THE TWO GRADE-2 FINDINGS ARE CLOSED.** Flash Freeze ← Glacial Prison was answered by
+  **retirement**; Battle Poise ← Answering Steel by **differentiation**. `check_dr` §4 and §6 pin
+  both, and §4 asserts the SURVIVOR of the pair is still there — retiring the wrong half would
+  pass every other assertion.
+- **THE COOLDOWN-ZERO QUESTION IS CLOSED AT DU §1, IN THE DRAFT CHANNEL ONLY.** **PYROBLAST KEEPS
+  COOLDOWN ZERO** and the rule is in `CLAUDE.md` **with its reasoning**, which is the half that
+  stops a later batch reading Lunge and Pyroblast as an inconsistency: *a repeatable draft card is a
+  legitimate shape when it is priced elsewhere.* **6.0 delay is the longest in the project and 45
+  mana the second-highest cost in the game; Death Ray costs more and carries cooldown 3.** DR's
+  reasoning did not transfer because Lunge was ordinary on both axes and Pyroblast is ordinary on
+  neither. **If a cooldown is ever taken anyway it is on the UNIQUENESS argument and it is 2, not
+  3.** `check_dr` §5 still prints the live draft list every run and still walks the DRAFT POOLS
+  ONLY, deliberately. `docs/draft-audit.html` carries the RESOLVED banner naming both halves.
+### THE LOYALTY CURVE — **BUILT AT EU, REPAIRED AT EV. IT CONVERTS AT 8, AND A CONVERTED STACK NEVER PAYS NOTHING.**
+
+**Full evidence: `docs/reports/EU.md` (the build, the measurements and the census), with
+`docs/reports/ER.md` §1 (the ruling priced) and `docs/reports/EQ.md` §1/§2 (the read-site census
+and the six shapes) behind it.** **The rule is in `CLAUDE.md`, `check_eu` is the gate, and the
+figures live in the EU report — do not quote a number from this file.**
+
+- **THE SHAPE, IN ONE LINE.** `BOND_CONVERT := 8` beside `BOND_STEP`. **The first 8 stacks buy the
+  companion's strike step; every stack past 8 stops adding to it and feeds the Pack Bond boon
+  instead**, so the boon climbs at double its step above the point. `_bond_convert()` is the one
+  place the split is decided (`focus_convert()`'s counterpart, taking the hunter so a later rune
+  moves one line); `_bond_paid` and `_bond_converted` are its two halves, and they are disjoint and
+  sum to the whole meter.
+- **BELOW THE POINT NOTHING MOVED, AND THAT IS ASSERTED RATHER THAN CLAIMED.** `test_batch_ay`'s
+  x2.0-at-five arm is unchanged and is the arm that proves it.
+- **WHY 8 AND NOT THE NOMINAL 5 — THE ONE MAGNITUDE THIS BATCH CHOSE.** Loyalty arrives at
+  10.08 ±0.12 at a first-clear loadout and 6.64 ±0.09 untalented (ER §6). A split at 5 converts
+  most of a typical meter; **a split at 8 bites only the tail that over-arrives.** **And 8 is
+  Kindred's own threshold**, so no lower point could put a row-8 node on the far side of a phase
+  change the player never chose.
+- **THE RATE NEVER MOVED.** `BOND_STEP` 0.20, the strike step 0.05, Wild Communion, Absolute
+  Devotion and Ancient Pact are all untouched. That is `CLAUDE.md`'s standing rule — move the
+  point, never the rate — and `check_eu` §0 asserts both rates at their source.
+- **THE ACCRUAL IS UNTOUCHED, WHICH IS THE PROPERTY THE SHAPE WAS RULED FOR.** Nothing is written
+  into `_gain_loyalty` or `_loyalty_cap`, so **Kindred still fires at 8, Lone Bond still seats at 6,
+  None Left Behind still seats at 5, Wild Rotation's cap of 3 is still the only ceiling** — and
+  **Unleash, Primal Surge, Last Howl and Bring It Down pay exactly what they paid before EU**,
+  because all four COUNT stacks and the split changes what a stack PAYS. `check_eu` §2 CASTS all
+  four on a live board rather than reading them, because a converted Unleash still fires, still
+  logs, still empties the meter and simply pays less.
+- **FIVE PAYOUT SITES CONVERT, AND ER'S OWN TABLE LISTED FOUR.** `_comp_dmg_mult` and
+  `_ghost_hit`'s strike step read the paid half; `_bond_mult` receives, carrying Ursus's
+  mitigation, Canis's wounded bonus, Savage Presence's taunt and Aguila's party crit with it.
+  **`_bot_boon_worth` is the fifth** — it recomputes the same curve so the bot can price a swap —
+  **and ER §1d omits it** (EQ §1's census has it). Left behind, it would have made the bot
+  under-value exactly the deep bonds the conversion pays most for.
+- **TWO FUNCTIONS HOLD BOTH KINDS OF READ IN ONE VARIABLE, AND THAT IS THE SHAPE TO LOOK FOR NEXT
+  TIME.** `_ghost_hit` pays its strike step off the paid half while Aguila's armor pierce beside it
+  reads the whole meter; `_companion_strike` likewise for Canis's Bleed. **The read site is the
+  line, not the function.**
+- **THE CLAMPS BIND HARDER, AND THAT SENTENCE WAS OWED.** `BOND_MITIGATION_MAX` 0.75 and Savage
+  Presence's taunt clamp of 1.0 both read `_bond_mult`, and EU feeds it. **Neither becomes a dead
+  constant**, which is what capping that half at nominal would have done. Binding rates before and
+  after, at three loadouts, are in the EU report.
+- **AND "BIND HARDER" HAS A FAR SIDE THE SENTENCE DID NOT CARRY, WHICH IS WHAT EV REPAIRS.** A clamp
+  that binds on *every* stack has stopped governing and started confiscating: at rows=9 both of
+  Ursus's were already full, so a converted stack bought nothing at all. **`_bond_fallback()` sits
+  beside `_bond_convert()` and hands those stacks back to the strike step**, and both halves read it
+  from ONE call so they remain disjoint and still sum to the meter. **It is per stack, it declines
+  the one-stack window at Loyalty 9, and the boon loses nothing to it** — over 228 measured ursus
+  blows the boon itself fell on 183 and the two terms it feeds differed on none. `check_ev` is the
+  gate; the figures are in `docs/reports/EV.md`.
+- **ONLY URSUS HAS A SATURATION POINT AND THAT IS A MEASUREMENT, NOT AN OMISSION.** Canis's
+  wounded-prey bonus and Aguila's shared crit are spent UNCLAMPED, so no stack of theirs can ever
+  pay nothing and nothing of theirs falls back. **Aguila's boon WAS wasted harder than the bear's is
+  clamped, and BATCH EW ANSWERED IT AT THE CEILING RATHER THAN AT THE BOON** — the assembled crit
+  total converts its own surplus into crit multiplier, so the eagle needed no special case and got
+  none. `_bond_fallback` is byte-unchanged.
+- **THE TEXT COST WAS SMALLER THAN ANY FLATTENING'S, EXACTLY AS ER PREDICTED**, because the meter
+  stays uncapped: the surfaces needed the second phase NAMED, not the *"no ceiling"* promise
+  retracted. Chip, status tooltip, Pack Bond passive text, `master.html`'s Beastmaster block and
+  chip row, and both glossary entries. **IJ §2 retracted it in the status registry's text** (*until the boon reaches its
+  limit*), the limit EV §1's line names on the live chip.
+- **`CY_METERS`' 5 WAS DELIBERATELY NOT REPOINTED AT `BOND_CONVERT`.** It means *where the boon
+  reads x2*, which is still true and is the denominator every arrival figure from EQ, ER and EU is
+  quoted against. The two numbers answer different questions and the header there now says so.
+- **~~WHAT IS STILL OPEN, AND IT IS THREE THINGS NOW: TWO CLAMP QUESTIONS (above) AND THE RUNE THAT
+  MOVES THE POINT~~ — ALL THREE ARE CLOSED (GB §4 census):** both clamp questions are answered above,
+  and the Long Leash rune moves the point UP, 8 to 11, which `_bond_convert` records as the
+  designer's direction. ER §2 established that the item a
+  re-authored Deep Bond would be is `Rune of the Deep Sight`'s exact shape and that its direction
+  was undecidable until the currency was chosen. **The currency is chosen now**, so the table in
+  ER §2c resolves: the converted half is worth MORE than the strike step at depth, so a Deep Bond
+  moves the point DOWN — Deep Focus's exact shape. **EU authors no rune** (ET §1 retired the pool
+  and rune content is written with the designer), and `_bond_convert`'s signature is the slot.
+
+### THE FOUR RUNE ITEMS — **THE THREE RE-AUTHORS ARE MOOT AT ET §1. THE MEASUREMENTS ARE KEPT.**
+
+**BATCH ET §1 RETIRED ALL 53 OFFERABLE RUNES, AND THE DEEP BOND, THE TURNING PACK AND THE SHARED
+WILD ARE ALL `spec:beastmaster`. ALL THREE RE-AUTHORS ARE MOOT AND THE QUEUE NO LONGER CARRIES THEM
+AS OWED.** The Bared Guard is retired with them and its standing rule in `CLAUDE.md` survives it —
+that rule is about **a rune that CHARGES**, which is what `Runes.is_cost` recognises, and `check_es`
+§3 still asserts the costed population over every entry.
+
+**EVERYTHING BELOW IS KEPT AND NONE OF IT IS STALE**, because every figure in it is a fact about a
+SYSTEM rather than about a rune: the Turning Pack's first clause being worth zero to any Beastmaster
+holding Quick Whistle is a fact about `SWAP_COOLDOWN` and a floor at 0; Feral Momentum's +8% being
+worth about +9.9% is a fact about how many different companions are fielded at a blow; the
+companion-death event at 0.22 a trash fight is a fact about companion durability. **The next pool is
+authored against the same systems, so these are the numbers it starts from.**
+
+*The original block follows, unedited.*
+
+**ER ADDED THE SHAPE THE DEEP BOND'S RE-AUTHOR FALLS OUT OF, AND BROKE TWO MORE OF THE PREMISES.**
+- **THE ITEM A RE-AUTHORED DEEP BOND WOULD BE IS ALREADY IN THIS GAME AND WAS RETIRED AT EO §3.**
+  **`Rune of the Deep Sight`** — 100g, and it was the same price and the same tier as the Deep Bond
+  when both had one (**ES §1 removed the tiers; both prices are unmoved**) — carried `rune_deep_focus: 8`
+  into `focus_convert()`, and its `retired` string names the loss exactly: *"the one item that
+  changes WHEN his patience converts rather than how much it pays."* **A Deep Bond that moves the
+  Loyalty split point keeps DEPTH as its axis, keeps rewarding NOT swapping, and mirrors no node.**
+  **Its DIRECTION cannot be chosen until the conversion's CURRENCY is** — down is a buff only if the
+  converted half is worth more — **which proves EQ's and ER's hold on this rune by construction.**
+  Four shapes are priced in `docs/reports/ER.md` §2d and none is authored.
+- **THE TURNING PACK'S CONCENTRATION PREMISE IS WRONG FOR THE THIRD TIME, RE-DERIVED.** Over all
+  twelve boss pools, **THREE carry no card with a `damage` field — Beastmaster 5, Holy 3, Devout 2
+  — and all three carry no `pressure` either.** By TAG the Beastmaster holds **six BREAK cards**,
+  mid-pack of twelve against a range of 0–11; **the spec with no Break at all is the Devout**, who
+  also holds the thinnest boss pool in the game at 2. **What survives is a better fact:
+  `_companion_hit` takes a Break argument and SIX OF ITS EIGHT CALL SITES PASS `pr = 0`**, including
+  every ordinary companion strike — so the companion's routine blow Breaks nothing, which is what a
+  Break re-author should be argued from.
+- **AND EQ'S TEMPO COUNT IS OFF BY ONE.** *"Eight of the twelve specs carry ZERO TEMPO cards"* is
+  **SEVEN** over EQ's own population, and **THREE** over the pool a player can reach since EH §1
+  opened the class-wide tier — with **two** specs beating the Beastmaster's one, not one.
+
+**Full evidence: `docs/reports/EP.md` §4 (the presentation) and `docs/reports/EQ.md` §3/§4
+(the measurements and the priced options).** The floors those batches measured were **65 authored,
+12 retired, 53 offerable; drawable 9 (Occultist), spec-scoped 2 (Cryomancer), against 3 rune slots**
+— **and ET §1 took every one of them to zero: 65 authored, 65 retired, 0 offerable.** They are kept
+as the record of what the pool was. **Nothing is authored here — rune content is content and it is
+the designer's.**
+
+- **EQ ADDED THE NUMBERS ALL THREE ARE PRICED AGAINST, AND ONE OF THEM CHANGES A RUNE'S VALUE TO
+  ZERO.** **The Turning Pack's first clause pays nothing to any Beastmaster holding Quick Whistle**
+  — `SWAP_COOLDOWN` is 3, the node shaves 3, and the read site floors at 0 — **and Quick Whistle is
+  pack row 1.** Swaps fall **0.38 → 0.21 → 0.02** a trash fight as the build deepens. **Feral
+  Momentum's own term reads a mean of 1.235 different companions at a blow**, so the +8% clause both
+  the Turning Pack and the Shared Wild carry is worth about **+9.9%**, not +24%. **The Shared Wild's
+  event is real** — 0.20–0.22 companion deaths a trash fight and 0.35–0.48 at a boss with rows 1–3
+  — and **its health clause is the only one of the six that can never be worth nothing.**
+- **AND THE CONCENTRATION FACT THE TURNING PACK'S RE-AUTHOR WAS AIMED AT IS WRONG IN BOTH
+  READINGS** — see the WHERE block. **Three boss pools carry no `damage` field, not one**, and on
+  the behaviour reading his does not qualify at all.
+
+- **RUNE OF THE DEEP BOND — THE DESIGNER RULED AFTER EQ'S BRIEF THAT IT KEEPS DEPTH, AND EQ
+  DID NOT AUTHOR IT.** The earlier ruling was *"its axis is the one thing measurement says not to
+  lean on: Loyalty already over-arrives at a 21.2 peak against a nominal 5"*; **the reasoning that
+  overturned it is that DEPTH is the rune's identity — it is the only one of the three that rewards
+  NOT swapping, which is what makes it the Turning Pack's exact opposite.** **EQ's measurement
+  says the meter is fixed rather than avoided, and that the two are one decision**: both its clauses
+  are PAYOUT readers sitting on the two steepest terms in the system, one of which Ancient Pact then
+  doubles. **21.2 was `rows=9`; live at that loadout it is 18.45 and at rows 1–3 it is 10.13.**
+  **AND THE REPLACEMENT AXIS IS NOT NAMED, WHICH IS THE OPEN HALF OF THIS RULING.** EP's argument
+  for authoring the pair at all was that **Deep Bond is the only one of the three that rewards NOT
+  swapping**, which makes it the exact opposite of the Turning Pack and gives the two a real
+  decision between them — and DEPTH was how it expressed that. **Dropping depth without replacing
+  the not-swapping identity collapses the pair into one idea**, so the axis that replaces it should
+  be chosen with the Turning Pack in view rather than on its own.
+- **RUNE OF THE TURNING PACK — RE-AUTHOR, AND EQ SHARPENED BOTH HALVES OF THE CASE AND BROKE
+  ONE OF ITS PREMISES.** The ruling was *"tempo is his thinnest axis, and his boss pool is the only
+  one in the game with no damaging card — so a version paying the swap in Break or a damage window
+  answers a concentration finding instead of deepening it."* **The swap figure's DIRECTION reproduces and its
+  MAGNITUDE does not** — per trash fight ER reads **0.28 (rows 0) → 0.22 / 0.23 (rows 1–3) → 0.01
+  (rows 1–9)**, against 0.35 at EP and 0.38 at EQ for the untalented arm. **The pool claim does not
+  survive: three pools carry no `damage` field and his holds the game's largest Loyalty payout by
+  volume.** And
+  **Tempo is his thinnest axis only inside his own kit** — eight of the twelve specs carry ZERO
+  TEMPO cards against his one. **Five options are priced in `docs/reports/EQ.md` §3 and none is
+  authored**; three of the five keep the opposition to the Deep Bond explicit and **one (paying the
+  swap in Loyalty) collapses the pair from the other direction.**
+- **RUNE OF THE SHARED WILD — SAFEST, KEPT CLOSEST TO AS-IS, AND EQ MEASURED THE EVENT.**
+  *"Companion durability is the one Beastmaster number nothing else touches, and 0.22 deaths a trash
+  fight is a real event."* **THE TRASH FIGURE IS ROCK STEADY ACROSS FIVE INDEPENDENT READINGS —
+  0.22 / 0.22 / 0.23 / 0.22 / 0.22.** **THE BOSS FIGURE IS NOT A MEASUREMENT AT ITS n AND THREE
+  BATCHES HAVE QUOTED IT AS IF IT WERE**: at the untalented arm it has read **0.39 (EP), 0.48 (EQ)
+  and 0.26 (ER)**, on **n ≈ 95 boss fights** each time, 2.5σ apart — the per-fight distribution is
+  over-dispersed and n ≈ 95 cannot resolve it to better than about ±0.1. **Read it as a band,
+  0.26–0.48, and price the rune against the trash figure.** The event nearly vanishes fully
+  talented (0.06/0.10 at ER). **Four options are priced in `docs/reports/ER.md` §4c and four more in
+  `docs/reports/EQ.md` §4; none is authored. The honest cost is stated and accepted:**
+  re-authoring a splash as one idea makes it a lane rune wearing a splash's name — **and the sim's
+  own rune policy makes that concrete, since `_pick_rune_candidate` prefers a candidate whose `lane`
+  matches the build's target lane, so a splash is already the last thing the bot reaches for.**
+- **RUNE OF THE BARED GUARD — KEPT, AND THE 80% REFUND IS ACCEPTED.** This one settles with no
+  implementation, so **it is a `CLAUDE.md` standing rule** rather than a queue item: paying a point
+  and a lane to soften a COSTED rune is a decision, which is what the cost is for. (**ES §3
+  relabelled that rule and did not weaken it** — there is no Scarred label; `Runes.is_cost` is what
+  recognises a cost, and the Bared Guard's −0.15 is byte-unchanged and still one of the 17.)
+
+### THE RUNE CHARTER — MECHANICS TAKEN AT EM, EVERY DESIGN QUESTION IN IT STILL OPEN — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+- **THE THREE CLAUSES WITH NO HOME ARE ANSWERED AT EN AND THIS QUESTION IS CLOSED.** EM priced
+  four options and authored none; **EN took option A** — `divine_presence_pct`, `entropy_ranks` and
+  `pleasure_pct` each have a `rune_` field of their own and each drip's EXISTING tick sums the
+  pair. **No second tick, because a hero holding both would be paid twice.** All three are payouts
+  with presence tests, read at their own sites; **AL's MAX rule has zero applications across all
+  59.** Driven live and seeded, before and after: **every reading reproduced exactly**, and the
+  control taking the node's half alone took all three to zero. `check_em` §4 asserts the CLOSURE
+  now, in both directions, over a live population of three. **Nothing else in the rune layer is
+  mechanically outstanding.**
+- **THE SIXTEEN THE CHARTER EMPTIED ARE RULED AT EO. TWELVE ARE RETIRED; FOUR WERE OPEN AS DESIGN
+  UNTIL ET §1 RETIRED THEM TOO.** The sixteen reproduce EM §3 **name for name** off `LANE_TREES` and
+  `runes.json` — **but only once a `UNIT_MATH` clause counts as a rune SURVIVING.** (EN recorded
+  this as *"with `check_em.UNIT_MATH` excluded"*; EO's first re-derivation read that as
+  *excluded from the denominator*, returned **twenty-two**, and swept in six runes EN's own
+  threshold table names as survivors. `still_wrist` carries `parry_bonus` beside its one
+  talent-keyed clause and is therefore still an item that does something no node does.)
+  **THE WHOLE POOL WAS RETIRED BY ET §1** (it was 12 retired and 53 offerable when the
+  reading below was taken, and the reading is kept because it is about the CLAUSES rather than about
+  what is drawable).
+  - **CLOSED AT ET §1: the three Beastmaster re-authors and the Bared Guard are all retired**, so
+    none is owed. The reasoning below is kept because the next pool is argued against the same
+    systems.
+  - **WHAT WAS OPEN, AND IS NOW THE NEXT POOL'S TO ANSWER:**
+    `docs/reports/EO.md` §3 carries all four — theme, axis, balance and synergy for each of the
+    three, and the Bared Guard's loss-and-gain reading — **and nothing is authored.** The Deep
+    Bond's axis is DEPTH and its risk is a Loyalty meter already over-arriving; the Turning Pack's
+    is BREADTH/TEMPO and its risk is a second non-damaging item in a pool with no boss damage; the
+    Shared Wild's is the companion's BODY and it is the only splash of the three, which is the half
+    the charter hurt most. **Retiring the three would leave no rune in the game touching a
+    companion, and the companion IS the spec.**
+  - **THE BARED GUARD WAS LIVE AND OFFERABLE UNTIL ET §1, AND RULED ON NOWHERE UNTIL EP.** §3's
+    brief ruled *retire the rest* and then ruled this one *reported separately and ruled on
+    nothing*; the specific instruction governs. Its two clauses ARE the trade (+10% Aggressive
+    Stance bought with −15% off Defensive Stance), so **retiring it removes the cost with the
+    upside** — it was the only item that let a Swordmaster buy commitment, and losing it would have
+    made him **the only spec in the game with no rune that charged for its upside.** (**ES §3
+    re-derived that population and it is a different 17 from the flag's** — see the WHERE block —
+    but the Warrior arithmetic is unaffected: `exsanguination` is the Berserker's and `anchor` is
+    universal.)
+  - **RETIRED MEANS KEPT — AND THE CONTRACT PAID FOR ITSELF IMMEDIATELY.** Each of the twelve keeps
+    its `runes.json` entry with a `retired` string naming what is lost; `config` / `build` /
+    `display_name` still resolve it. **`test_batch_bj` pins the Whispering Dark's own description
+    into that file, so a retirement that DELETED the entry would have taken a pin red.**
+  - **AND THE DISTRIBUTION EXPLAINS THE SHAPE OF THE RESULT.** All 59 clauses sat in the 48 spec
+    runes; the 5 universal and 12 class-wide carried none. Measured floors after the retirement are
+    **9 drawable, 2 spec-scoped, 5 on the rare shelf, against 3 rune slots** — the Occultist is
+    thinnest, and **the Beastmaster is the only spec whose pool did not shrink at all**, because his
+    three went to the re-author half.
+- **THREE RUNE-ONLY EFFECTS STILL ANNOUNCE THEMSELVES AS TALENTS** — `beacon_ranks`,
+  `capacitor_ranks`, `mindfulness_ranks`, none of which has a node of that name in any tree — **and
+  three more share a label with a node the holder may not own** (Grudge, Shared Vigil, On the Edge).
+  The *"→ Rune:"* convention already exists. **Reported at EJ §2b, not fixed; player-facing text,
+  and the charter makes it worse rather than better.** **GB's census: FX deleted Grudge, Shared Vigil
+  and On the Edge, and every writer of the six fields is a retired rune, so none of the six labels
+  can print in a new run.**
+- **`pyromaniac_ranks` IS STILL THE ONE CLAUSE THAT PAYS NOTHING.** The White Flame writes it and
+  nothing reads it — Inferno Master's per-turn step stopped existing at AR. `unit.gd` flags it and
+  AR §4 forbids inventing a read site. **A 120g rune with two live clauses of three.** It
+  was NOT in the 59 (nothing reads it, so no node counter is involved) and EM did not touch it.
+### THE BOSS-PICK POOLS — AUDITED AT DU §5, RULED ON NOWHERE — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+- **`CLASS_POOLS` IS DELETED AT DY §3 AND THE THREAD IS CLOSED.** DV ruled it a lost feature and
+  deleted nothing; DX priced the options and authored nothing; **DY took option B — re-home the
+  seven, retire the container.** 61 authored entries feeding an award AN §4 re-pointed eighteen
+  batches ago. **`pool_ability()` never read it, so nothing stopped resolving**; what was lost is
+  the manifest, and that is the point — they are no longer a group.
+  - **THE SEVEN WERE THE VAULT, AND ALL SEVEN HAVE HOMES NOW.** `Classes.vault_ability()` holds the
+    ONE definition of **TEN** live cards (not the 38 this file and DX §3 both recorded — counted off
+    its own `match` arms). Five went to draft pools and two to Holy's boss pool; the other three
+    were already in `SPEC_POOLS`. **Its header's promise — that its entries *"return as earnable
+    picks without a line of new mechanics"* — is history rather than a plan, and it cost exactly
+    that: not a line.**
+  - **THE STANDING RULE IT LEAVES, IN `CLAUDE.md`: A NEW VAULT ENTRY IS OWED A POOL IN THE SAME
+    BATCH.** A definition no pool names is reachable by nothing, which is the state that cost this
+    project eighteen batches of silent audit and three batches of measured engineering — DK widened
+    `sanctuary` and drove it on a live bear, DL widened Rallying Shout's Pressure clause and authored
+    a new guard for it, DM read Divine Wrath's two clauses. **Not one of them was wrong and not one
+    could have known.**
+  - **AND THE DELETION'S REAL COST WAS THE READERS.** **EIGHTEEN FILES read it and a grep for the
+    CONSTANT found only eleven** — `class_pool()`, its accessor, had callers whose lines never name
+    it. **Sweep for the accessor as well as the constant.** Every reader is re-pointed or inverted;
+    none was left to pass vacuously.
+  - **ONE DERIVED FIGURE MOVED FOR A REASON THAT IS NOT ABOUT THE GAME.** `check_dv` §5 counts the
+    abilities outside every pool and every class kit: **16 → 43**, because `CLASS_POOLS` was the only
+    structure naming the SIBLING SPECS' KIT ABILITIES as pool entries. **Nothing became less
+    reachable** — all of them were in their own spec's opening kit (since GS §1, on its shelf, or an enabler). `check_cz`'s set identity held
+    through the deletion, measured: the CL walk still reaches **223 of 227** and still misses exactly
+    the four kit overrides.
+- **AND EG §1/§2 MOVED THE ARITHMETIC UNDER ALL OF IT — THE ONE LIVE RULING THIS BATCH LEAVES.**
+  EA's guarantee rested on a hero holding at most `cap − core_slots` earned cards against pools of
+  ten to thirteen: a floor of SIX. **Both terms moved.** The cap is a ladder to ten, so the LOADOUT
+  bound alone takes the floor to **3 for several specs and 2 for the Occultist** — measured, and
+  `check_ea` §1 went RED on it. **And the POOL is unbounded**, because a benched card is kept and
+  `owned_ability_names` reads the pool, so the true worst case floors at **zero**.
+  - **THE ASSERTION WAS SPLIT RATHER THAN LOOSENED, WHICH IS DC's REPAIR-TO-INTENT RULE.** EA's one
+    check was asking two questions: the RULE is *an award always pays* (`floor >= 1`, still green on
+    all twelve) and `>= awards` is the stricter *every award offers a full three*. At a flat cap of
+    seven the floor was six everywhere and both held. **`check_ea` §1 asserts the first per spec and
+    pins the specs that can fill SHORT as a NAMED SET (`[occultist]`)**, so a thirteenth trips and
+    the Occultist leaving trips too. **The Occultist left it at GS**: every hero opens at three slots, so the
+    set is empty, and a spec that can fill short trips it again. **The POOL bound is PRINTED, not asserted.**
+  - **THE OPTION EA PRICED IS A CLASS-WIDE THIRD TIER, AND EH §1 TOOK IT.** EG did not, and the
+    sim read `nothing left to offer` at **0.00 per run in both samples** — reachable in principle
+    and not reached in fifty runs. **The chain is boss pool → spec draft pool → class-wide draft
+    pool now, the loadout-bound floor runs 8–13 across the twelve, and EA's second tier is
+    byte-unchanged.** **What EH did NOT take from EA's pricing is the word "completely"**: EA
+    recorded a class-wide card as closing the table, and it does so only under the LOADOUT bound.
+    See the WHERE block at the top of this file.
+  - **THE FIGURE NOBODY HAD PUT A NUMBER ON, DERIVED AT DZ §1: 14 OF THE GAME'S 36 ZONE-BOSS
+    AWARDS COULD PAY NOTHING**, in a run where every hero drafts against their own boss pool.
+    **EA §1 TOOK IT TO 0**, and the thinnest fallback pool in the game is the Occultist's.
+  - **WHAT HAPPENED BEFORE EA WAS NOT A WEAK REWARD, IT WAS NO ACKNOWLEDGEMENT AT ALL.**
+    `award_ability_pick` returned false and `_award_ability_picks` **silently skipped that hero**,
+    so the victory card did not name them. **That was the baseline the fallback was measured
+    against, and closing it is why EA's control reads the announcement off the end card's own
+    Label rather than asserting that `battle.gd` contains a line.**
+  - **THE FALLBACK QUESTION IS CLOSED AT EA §1: OPTION A WAS TAKEN.** The four candidates were
+    priced at 154 in `docs/reports/DZ.md` §1 (DV §2 priced them at 149, against a game that has
+    moved); **EA built the spec-draft card.** The pricing is kept because it records why the other
+    three were not taken:
+    - **A spec-draft card or a class-wide card closes the table completely** — 8 emptiable specs →
+      **0**, 14 lost awards → **0**. **THE FLOORS QUOTED HERE (SIX AND TWO) WERE DERIVED AT A FLAT
+      CAP OF SEVEN AND AGAINST A LOADOUT THAT WAS ALSO THE POOL. EG BROKE BOTH TERMS** — see the
+      live block above; they are kept as EA's working, not as current figures.
+    - **A rune has the lowest build cost of the four and it is measured rather than asserted** —
+      the grant is the same two fields the ability pick already uses (`rune_candidates` /
+      `rune_picks_owed` against `bm_candidates` / `bm_picks_owed`) and the map's owed-pick overlay
+      resolves both. **But `roll_rune_candidates` returns `[]` when runes are off or the pool is
+      exhausted, so this option needs its own fallback.** 3 rune slots a hero, 65 in the pool.
+    - **Gold does not move the table at all** — all fourteen are still lost as ABILITY awards. A
+      zone boss already pays `randi_range(110, 130)`.
+    - **AND A CLASS-WIDE CARD IS NOT THE THING DY §3 FORBADE.** That rule says do not re-create
+      `CLASS_POOLS`; its own next sentence says a re-opened class draw reads `CLASS_DRAFT_POOLS`,
+      which is what this option reads. **Worth naming, because it looks like a violation and
+      is not.**
+- **NO DOMINATION, AND THE NEAREST MISS IS THE INSTRUCTIVE PART.** Called Shot and Coup de Grâce
+  share cost, damage and Break, and Called Shot wins cooldown AND delay. **It does not dominate, and
+  only the READ SITE says so**: Coup de Grâce cashes the whole Focus meter for up to 200% of the
+  target's missing health. **An audit that scored them by their fields would have reported a
+  domination that is not there** — DQ's own discipline.
+- **THE CO-SHAPED DEFECT IS FIXED AT DV §3, AND IT IS NOT IN `RECAST_GATED`.** `ashes` writes an
+  integer FIELD, and that system reasons about STATUS writes — **driven live on a fully-armed Mage,
+  `_recast_targets` returns `[]` and `_recast_refused` returns FALSE**, so membership would have
+  been a string in a table and nothing else. It is a bespoke condition at `_ability_usable`, the one
+  door, with the reason on the darkened button. **`check_co` could not have found it: it saturates
+  the MEMBERS of `RECAST_GATED`, so it measures the list rather than the candidates for it.**
+- **~~THREE OF THE FIVE NODES NAMED AFTER LIVE ABILITIES SHARE A DRAW SPACE WITH THEIR NAMESAKE~~ —
+  MOOT AT FX** (GB §4 census): Killing Frost, Divine Presence and Rally went with the twelve trees, and
+  no node of the one tree carries a card's name.
+### THE TALENT CHARTER — SETTLED AT DO, ITS STATUS HALF RULED AT DP — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+- **DO's SIX PAIRS ARE RULED AND GONE.** All four Occultist Madness cells were re-pointed onto
+  Ruin, and FX deleted all four. **`check_dp` §1 asserts the property on every
+  battery run and prints the live count.**
+- **~~SIX PRE-EXISTING PAIRS REMAIN, REPORTED AND RULED ON NOWHERE~~ — FOUR WENT WITH THEIR NODES AT
+  FX, AND NO COVER'S TWO MOVED ONTO `tn_no_miss` (GB §4 census). FOUR WERE NOT BETS.**
+  `sm_guarded` (Crippled, Exposed) is the only real one and is a bonus clause gated on a
+  tree-internal node, beside an unconditional base clause. `sv_virulence` and `ss_exposed_nerve`
+  each APPLY the Exposed they read. `ss_no_cover` reads Blind and Dazed **on the hero**, applied by
+  enemies — an immunity, not a payoff. **Each is in `check_dp.KNOWN_PAIRS` with its reason**, so
+  the next batch reads why rather than re-deriving it.
+- **~~THE MAGNITUDES ARE THE ONE THING DP AUTHORED AND THEY ARE UNMEASURED~~ — MOOT AT FX (GB §4
+  census): the three nodes went with the twelve trees and no node writes their fields.** DP's text:
+  Spread of Madness
+  keeps 60/2 and Delirium keeps 3, so the Whispering Dark's +15/+1 keeps its proportion; Whispers's
+  +2 doubles a base of 2 as its old +45 nearly doubled a base of 50. **Spread and Whispers BOTH
+  feed generation and a player can hold both** (rows 1 and 2 of one lane), which is **the number
+  most worth a sim** — and no sim has run since DK, so every sim figure below was already stale.
+- **~~RUINED MIND IS SCOPED TO BEWITCH ALONE, AND WIDENING IT IS A DECISION~~ — DORMANT SINCE FX (GB §4
+  census): the node is gone and nothing writes `broken_mind`; the Bewitch-only gate stands.** Extending the boss
+  exception to Psychosis and Hysteria would be a BONUS rather than a bet (Bewitch carries the node
+  on its own) — but a clause the text does not state is DM's seventh family.
+- **TWO RUNE DESCS ARE OWED A SENTENCE.** Binding Souls and the Flayed Mind both open
+  "Grants …", which is wrong whenever the card was drafted. **The Rune of the Last Rites is the one
+  that says so honestly** ("She already knows Resurrection, so this hones it instead"), and it is
+  the model for the other two. One line each.
+- **~~FIVE NODES ARE NAMED AFTER LIVE ABILITIES AND DO ADDED NO SIXTH~~ — MOOT AT FX (GB §4 census): all
+  five went with the twelve trees.** DN's list: Second Wind, Spite, Rally,
+  Killing Frost, Divine Presence. That is the `wd_spiked`/Spite trap DN documented, and it is why
+  the Arcanist's row-4 Resonance cell is **Overdraw** rather than Overcharge. Renaming the existing
+  five is a save-format question and a separate pass.
+- **~~DN'S OTHER TWO FINDINGS ARE UNTOUCHED AND STILL OPEN~~ — BOTH CLOSED AT FX (GB §4 census): the one
+  tree superseded the three-lane restructure, and `Profile` carries a version, a refusal floor and a
+  migration now.** DN's text: (1) **The three-lane restructure needs
+  97 NEW nodes** — 30% of the layer — and **two specs hold a lane at zero** (the Cleric has no
+  offensive node in 27, the Sharpshooter no defensive one), which no shrinking of the tree rescues.
+  (2) **The saved-allocation drift is real, silent and cheap**: `Profile` is v2, the load is
+  TOLERANT, and there is no version a migration could hang on. **DO needed neither, because nothing
+  moved a cell** — but a restructure would need both.
+### THE FLAKES — **THE ONE HN FOUND IS REPAIRED AT HO §4, BY CONSTRUCTION AND NOT BY A SEED**
+
+**THE REPAIR.** The arm buys the first pairing on the counter whose upgrade type has another card to go on
+(`suite_fixture.pairing_with_another_home`), and says so if the counter holds none; `check_ho` §6 builds the counter that
+used to fail and the one that never did. A seed would have pinned one draw of a pool that moves with every card
+authored. Driven under the seed that failed (98) and one that passed (0): green under both. **What HN found, kept as the
+record:**
+
+**`test_batch_bk` §3's BLACKSMITH ARM FAILED WHENEVER ITS UNSEEDED FIRST PURCHASE WAS WIDENED ON MAGIC MISSILES — ABOUT 1
+IN 54 A RUN.** The arm buys `roll_blacksmith_offer()[0]` and then asks 200 more rolls to offer the same upgrade type on a
+DIFFERENT card. For §3's party (the four classes, lineages set, no core rune) the blacksmith's pool is 54 pairings, and
+Widened fits exactly one card in it — Magic Missiles — so a first pick of it can never recur and the arm must fail. It
+fired once, in HN's acceptance run (130 / 1), and read green in HN's recon and pre-pass and in all fourteen readings its
+row records. **Measured, not argued**: 43 of 2,000 seeds put Widened first, on HEAD's tree and on HN's alike, and the arm
+replayed under seed 98 fails and under seed 0 passes, on both. **Its row was NOT widened after the run** — a band written
+from the red is bookkeeping, not a check. **The repair is the arm's**: buy a pairing whose type fits another card (the
+question it asks needs one), or seed the roll. `docs/reports/HN.md` §7 carries the working.
+
+
+**`test_batch_at` §1 IS SEEDED AND CLOSED AT DY §4, AND IT SETTLED AT ZERO — SO IT WAS A FLAKE AND
+NOT A FINDING.** **THERE ARE NO UNSEEDED FLAKES LEFT IN THE PROJECT.**
+**AND THE CENSUS WAS TWO ROWS, NOT ONE — THIS FILE SAID ONE AND WAS WRONG.** DX recorded
+*"`test_batch_at` is the one row still carrying a `flake` field"*; **`test_rune_battle` carries one
+too**, and it is KEPT ON PURPOSE. DF §0 seeded that suite at the site that flakes, but its recorded
+rate is a RACE UNDER MACHINE LOAD — 2 red in 15, both under load — and **a seed does not fix a
+race**, so the field and the `[0,1]` band both stand. **ONE ROW CARRIES A `flake` FIELD NOW AND IT
+IS A SEEDED ONE.** Its own `what` text still read *"test_rune_battle calls `seed()` ZERO times"*,
+which DF made false and DT corrected in this file but not there; **DY corrected the record itself.**
+
+- **WHAT IT WAS.** §1's live damage-curve check sums ten casts of Arcane Explosion at 0 Resonance
+  against ten at 12 and asserts the ratio is `> 2.0 and < 2.35` against a table value of **2.17**. It
+  read **2.40** at DG and clean in every battery since — **twenty consecutive quiet readings at an
+  observed rate of about one in eighteen, which proves nothing.** **The file calls `seed()` in four
+  places and every one of them is DOWNSTREAM of this check.**
+- **THE FIX IS TWO LINES AND THEY ALREADY EXISTED TWELVE LINES BELOW.** The TAKEN half of the same
+  function has called `_seeded(_i)` before each of its two compared blows since DD; the DAMAGE half
+  never did. Per-PAIR, not per-loop: both arms draw one identical stream so the ±10% roll cancels,
+  and `_i` varies the draw across the ten pairs so the sum is still an average of ten variances.
+- **MEASURED, WITH THE STARTUP STREAM VARIED BETWEEN TRIALS: six unseeded readings spanned
+  2.1189–2.2463; six seeded readings all read 2.1799.** Exactly repeatable, and it lands on the
+  table's 2.17.
+- **THE BAND WAS NOT WIDENED — the band IS the question** (DD's rule). Opening it to swallow a 2.40
+  would delete the check rather than repair it.
+- **THE CHECK COUNT DID NOT MOVE: 467.** A seed is not an assertion.
+
+### **AND NO SWEEP OF THE SOURCE CAN CERTIFY THERE IS NO NEXT ONE — ONLY READINGS CAN (DX §2)**
+
+**A source sweep fails in BOTH directions and this is worth more than the answer it was asked for.**
+**TWENTY suites and gates make unseeded random draws and are perfectly stable** (`bk` and `an`
+generate whole maps), so `seed()`-count is not evidence of a flake. And **`test_batch_at` calls no
+RNG function at all** — the noise was `battle.gd`'s `randf_range(0.9, 1.1)` in the strike loop, which
+nothing in the suite tree can see. **THE INSTRUMENT THAT ANSWERS THIS QUESTION IS `baselines.json`:
+the rows carrying a `flake` field are the answer, and nothing else is.** Four rows have carried one
+in the project's history and **all four have been seeded** — `test_rune_battle` at DF §0, `bo` at
+DT, `harness_2` at DX and `test_batch_at` at DY. **THREE SETTLED AT ZERO AND HAD THEIR FIELD
+REMOVED; `test_rune_battle` KEEPS ITS FIELD AND ITS `[0,1]` BAND** because what it records is a race
+under machine load rather than an unseeded draw.
+
+### THE FIVE ALLY-WORDED TEXTS, RE-DERIVED AT DM AND RULED ON NOWHERE
+
+**None is a clause-level scope disagreement**; each is a single-shape text saying *ally* where its
+read site means *hero*, on an effect that already behaves correctly. **Every read site was
+re-derived from the source at DM; not one was moved.**
+
+- **The Mercy `passive_desc` and the glossary's `mercy_window`** — `unit._check_below_half` gates
+  on `is_hero and not is_companion`. **IJ §2 moved both to *hero*, with Alms's ward and Divine Presence's watch**; the
+  glossary's Vespers clause (*an ally below the line*) is FOUND AT IJ.
+
+### Small, and still owed — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+- **~~`master.html` SAYS GUARD CHANGE IS "the only stance swap in the game"~~ — CLOSED BY EH §2's SWEEP
+  (GB §4 census): both sites call it *his only unconditional stance swap* now. BP CORRECTED IT IN THE
+  CODE FIRST.** `PROTECTED_CORES`'s own `why` has read *the only UNCONDITIONAL stance swap* since BP —
+  Precision Strike and Feint both switch — and the document's protected-core table was never swept.
+  **One string, in a table two lines from what EG rewrote, and reported rather than fixed**: the
+  standing rule is that master.html is corrected TOWARD the code, so this is a correction the
+  designer should see rather than one a batch makes in passing.
+- **~~ONE PRE-EXISTING NAME NEAR-MISS IS REPORTED AND NOT FIXED~~ — MOOT AT FX (GB §4 census): the node
+  went with the twelve trees.** The Beastmaster's draft card **Ghostpack** and his own row-8 talent
+  node **Ghost Pack** differed by one space, on the same spec — a sixth member of the "five nodes
+  named after live abilities" list above, which records only exact matches. Found at DS.
+- **AND ONE SITE IS OUT OF REACH BY SHAPE RATHER THAN BY SCOPE.** `melted` is applied through
+  `unit.add_status`, which **accepts no source argument at all** — stamping it is a signature
+  change. **It is a Harvest-readable status applied outside `_apply_status`.**
+- **SITES WHOSE TRUE SOURCE IS AMBIGUOUS ARE DELIBERATELY UNSTAMPED**, and all of them are
+  named in `docs/reports/DI.md` §2. **Getting the source wrong is worse than leaving it absent.**
+- **`test_rune_battle` IS SEEDED AND THE BAND IS NOT TIGHTENED — AND DT'S BRIEF ASSERTED THE
+  OPPOSITE, SO THIS LINE IS LOAD-BEARING.** DT §3 was briefed to seed it as an unseeded suite
+  *"with `seed()` never called"*. **IT IS SEEDED**: DF §0 put `_seeded()` immediately before the
+  forced White Flame hit — **the exact site that flakes** — and nowhere else, and this row and the
+  `baselines.json` note both already said so. **Nothing was owed and nothing was done.** The one
+  stale artefact is a comment in `test_rune_battle.gd` still reading *"`seed()` zero times"*,
+  four lines above the fix that answers it; it is pre-DF prose inside DF's own header and was left
+  alone. **The check count is unchanged at 97.**
+  **Readings cannot retire a rate measured over fifteen on this evidence.** **The seed cannot fix a
+  race**, and the failure message now carries the state the forced hit happened in.
+- **`bo`'s FLAKE IS CLOSED AT DT, AND IT SETTLED AT ZERO RATHER THAN AT A RED — SO IT WAS A FLAKE
+  AND NOT A FINDING.** `test_batch_bo.gd` called `seed()` zero times; **`_nf_seeded()` is now called
+  immediately before EACH of §5's two compared blows with the same constant**, so both arms draw one
+  identical stream and the only difference left between them is the Resonance stack count. **The
+  other checks keep their own draw** — per-pair, not per-suite, which is DF's idiom and DD's
+  method, and the reason the band was not touched: **the band is the question.**
+  - **THE PAIR IS EXACTLY REPEATABLE NOW.** Six readings before the seed: shallow 18/16/23/18/28/17
+    against deep 10/10/11/11/9/10. Six after: **17 against 10, every time.** 1106 checks / 0
+    failures on all six.
+  - **AND THE DOCUMENTED CAUSE WAS INCOMPLETE, WHICH IS WORTH MORE THAN THE FIX.** The recorded
+    reason was the ±10% roll alone. **It spans 16.4–19.8 on a mean of 18 and cannot reach 28; a crit
+    is ×1.5 and reaches exactly there.** A second and larger coin was hiding behind a variance roll
+    that was taking all the blame — `at`'s shape precisely.
+  - **The change is FOUR lines of code**, proven with a comment-stripped diff against `HEAD`: a
+    two-line helper and its two call sites. The check count does not move.
+### Carried, and still awaiting a ruling — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+- **~~WHAT COVERS THE 915 SOURCE PINS — REPORTED AT EC §2, RULED ON NOWHERE~~ — RULED AT ED §2 (GB §4
+  census): the ruling is the manifest, `pin-manifest.json`, which `check_ed` enforces every battery.**
+  EC's text: Every document
+  instrument watches the four tracked documents; **915 assertions across 52 suites pin a literal
+  into a `.gd` file instead**, and **37 of them resolve only inside a COMMENT**, which is the
+  haystack EB reworded with four instruments green. Three options with their costs are in
+  `docs/reports/EC.md` §2: **extend the sweep to the edited sources** (it exists, it takes seconds,
+  it fires only on files a batch edits and cannot tell a needle from prose); **a manifest of pinned
+  literals** (a second place for the truth to rot); or **a rule forbidding source pins** (costs
+  nothing to run, **invalidates all 915**, and is a rewrite rather than a rule). **The decision is
+  the designer's, and the general shape is already in `CLAUDE.md` either way.**
+- **WHETHER 3% IS THE RIGHT TARGET — CLOSED. THE TARGET IS RETIRED (EE §1) AND THE SPLIT IS TAKEN
+  (EF §2), WHICH WAS THE FOURTH OF EC §3's FOUR OPTIONS.** This bullet is kept only because the
+  arithmetic behind the other three is still in `docs/reports/EC.md` §3 and a later batch reading
+  that page needs to know which one was taken. **The live ceiling and the per-half growth rates are
+  in the knowledge-sync section, and `check_fg` §2 and `check_fr` §5 print the live sizes every
+  battery; do not re-derive the ratio.**
+- **THE ARITHMETIC PROBES IN `bg`, `bh` AND `bi` STILL SIT ABOVE THE REACHABLE BAND.**
+  `STACKS := 4` is a **direct-write probe depth**, not a carry ceiling — those checks write
+  `faith_stacks`/`faith_peak` onto the unit, bypass `_gain_faith`'s clamp, and measure a per-stack
+  rate against **fixed percentage-point tolerances** (`< 2.0`, `< 2.5`, `> 2.5`). **Halving the
+  depth halves the effect size against tolerances that do not move with it**, across roughly thirty
+  currently-green live measurements. **Moving them down is a re-derivation of tolerances, which is a
+  ruling, not a repair.** **DF's eight threshold repairs in `bu` and `ce` were NOT this case** — they
+  involve no tolerances, only counts — which is why those could be taken and these cannot.
+### Carried from the code, reported and deliberately not fixed — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+- **`events.gd`'s RELIC-TIER COMMENT LOOKS LIKE A SITE ES §1 MISSED AND IS NOT ONE.** It reads
+  *"(Batch 39 tiering exists exactly so events can promise rarity)"* in `events.gd` and it is
+  about **RELIC** tiers — 17 common and 8 rare — which ES does not touch. **Named here because a
+  grep for `rarity` finds it and the next reader will assume it was overlooked.**
+- **~~THE SWAP CARD A PLAYER READS SAYS THE COOLDOWN IS 2 AND `SWAP_COOLDOWN` IS 3 (EQ §6)~~ — CLOSED (GB
+  §4 census): the card and the group button's tooltip both say 3 turns now.** EQ's text: Two
+  authored strings: `battle.gd:6397`, the swap picker card's own `description` (*"Shared cooldown:
+  2 turns."*), and `battle.gd:5305`, the group-button tooltip (*"shared 2-turn cooldown"*). A source
+  comment at `:5296` repeats it and one at `:16296` gets it right. **`docs/master.html` carried the
+  same 2 and is corrected toward the code at EQ; the two in-game strings are not, because that is a
+  source edit EQ's brief did not ask for.** Both replacements are the same width, so the 44-character
+  ceiling is not in the way. **It lands on the mechanism the Rune of the Turning Pack is priced
+  against.**
+- **~~`CLAUDE.md`'s UNCAPPED-METER GOVERNOR TABLE HAS STALE ADDRESSES FOR LOYALTY~~ — CLOSED AT GB §4:**
+  the table names the function and the constant and cites no line numbers now.
+- **`test_batch_bk`'s BASELINE ROW WAS WIDENED AT EJ, 129-130 -> 128-130, WHICH IS WHAT ITS OWN
+  NOTE SAID TO DO.** EJ's battery read **128 checks / 0 failures** there. **It is not a regression
+  and it is proved twice rather than argued:** EJ changed four files, all under `docs/`, and that
+  suite reads seven `res://` paths all under `scripts/` and `scenes/` — **the intersection is
+  EMPTY**; and **the count is stochastic by construction**, because `run._generate_map()` is
+  **never seeded in that suite** and the assertions loop over the nodes the roll produced.
+  **A FALL there is a thinner map, not a lost assertion** — which is why the failure count is the
+  half that matters and it read 0. Two standalone re-runs on the frozen tree read 129.
+  **`baselines.json` HAS EXACTLY ONE READER IN CODE** — `check_de.gd`, proved comment-stripped —
+  **so `check_de` alone re-certifies it**, and it read 346 / 0 / 0 after the widening.
+- **~~THE DEFAULT SIM BUILD HAS NEVER MEASURED A NON-FIRST LANE, FOR ANY OF THE TWELVE SPECS~~ — MOOT AT
+  FX (GB §4 census): there are no lanes, and a full-depth sim wears all twenty-seven nodes of the one
+  tree.**
+  `Talents.LANES` is **3** and there are twelve specs, so **24 of the project's 36 lanes have never
+  appeared in any measurement taken here** — Glacial Prison, Second Prison, Cold Snap, Glacial
+  Economy and Absolute Zero among them. Not a defect (a fixed default party is what makes arms
+  comparable across batches), but **no sim figure can be quoted about a card in a non-default lane**
+  and several have been. **DB made the sim print the count beside `builds=` so the caveat arrives
+  with the number.** DA ran one arm on `cryomancer:Deep Freeze`.
+- **~~`master.html` credits "the Warden's Crushing Blow talent"~~ — CLOSED (GB §4 census):** the phrase is
+  gone from the document, and the Crushing Blows node went with the twelve trees.
+### THE TEST TREE, AS OF EF — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+- **DM DID NOT MOVE `test_batch_bx`'S COUNT**: §4b keeps the retired word "party"
+  retired, over a WIDER file list than §4's "beast" sweep (it adds `relics.gd`, `relics_screen.gd`,
+  `events.gd`, `shop_screen.gd` and `blacksmith_screen.gd`, which "beast" never reached).
+- **DM RE-POINTED ONE OF `test_batch_al`'S NEEDLES WITHOUT MOVING ITS COUNT.**
+  Its §3 asserted the UPGRADED Hold the Line card contains "two turns"; DM's CV §1 correction moved
+  that string, **and the needle followed it** — to `"die\nfor 3 turns"`, which names its clause
+  rather than matching a bare number that also appears on the Break-cut line.
+- **master.html stamp: `Last updated: 2026-09-01 (Batch EL — the tags get their real names, and
+  MARK is the seventh)`.** **EL MOVED THE STAMP AND EDITED SEVEN SITES IN THAT DOCUMENT**: §6c's
+  tag table (all seven rows rewritten and a new paragraph on MARK and the ceiling), §7's
+  Sharpshooter lane header and the lanes line (`Tempo` → `Pace`), the three node rows (`Tempo` →
+  `Pivot`, `Shattered Tempo` → `Shockwave`, `Crusader's Tempo` → `Crusade`), and **Blink's *"Tempo,
+  not damage"* → *"Timing, not damage"***, which is the ordinary English word colliding with a tag
+  rather than a mechanic naming itself.
+  - **§6c IS ASSERTED NOW AND IT WAS NOT BEFORE.** `check_el` §2 parses the tag table and requires
+    its words, their order and their meanings to be `TAG_ORDER` and `TAG_INFO` word for word, and
+    the five retired words to be absent from the section. **EH proved with a two-armed control that
+    this document's factual prose is asserted by nothing** — that is one table's worth of it closed.
+  - **THE LITERAL-FLIP SWEEP READ 18 LOST AND EVERY ONE WAS TRACED.** 11,010 gate-and-suite string
+    literals against thirteen tracked documents: **17 of the 18 are in `docs/state.md`, which
+    NOTHING READ until FS** — every `.gd` mention of that path was a comment — and the
+    eighteenth is `spec_draft` leaving a `baselines.json` **`note` field**, which only `check_de`
+    opens and only as parsed JSON fields, never as prose. **0 LOST in `master.html`,
+    `text-standard.html`, `CLAUDE.md`, the glossary or the changelog.** `bx` reads green.
+### HOW LONG A FIGHT IS — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+  - **DA's "NO LONGER HOLDS AT RUNG 3" CAVEAT IS RETIRED — IT DOES NOT REPRODUCE.** DA read all
+    three kinds at 4.4; on the live tree the elite is **shortest at all three rungs again**, by
+    0.4–0.5 rounds. **And the finding is now ACCEPTED rather than open** (EN §5): elites are burst
+    checks by design and a ramp spec having least room where difficulty spikes is the intended
+    tension. It is recorded in `CLAUDE.md` beside CY's cap so it is not rediscovered a third time.
+    **The confounders are CY's, unchanged**: fully talented (`rows=9 of 9`), each tree's first
+    lane, companions excluded from both halves.
+### The changelog — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+- **IT HAS NO CEILING AND DOES NOT NEED ONE (GZ §5, REPORTED NOT RULED).** **A ceiling is a number with an answer
+  behind it.** The changelog's answer is *move it to the archive*; `CLAUDE.md`'s is *split it*; **the archive's
+  only possible answer is DELETE**, which CW §4 forbids in the same block that would state the bar. Its sync cost
+  is zero at any size because it is deselected by name, and its repo cost is git's. **It is a different kind of
+  file from the two that do have ceilings — they are read, and it is only ever reached.** What it is owed is a
+  READING in a file something asserts on, and it has one: the folder figure is in `CLAUDE.md`'s sync block and the
+  file figure is above.
+- **AND THE POPULATION THAT HAS NEVER BEEN COUNTED IS THE FILES THAT *STATE* THE BOUNDARY WITHOUT OPENING
+  ANYTHING.** `README.md` named **Batch BP** — BZ's boundary, never re-pointed through CX, DV or FG, **three cuts
+  and 126 batches stale** — plus a second claim one cut old; `CLAUDE.md` carried the count of cuts and the archive
+  folder's byte size. **All four corrected at GZ.** **Nothing in the tree opens `README.md`**: a file no instrument
+  reads is a file whose claims can never go red. Written into `docs/instrument-rules.md` under CW §4 as **sweep by
+  the CLAIM, not by the reader.**
+### FIVE MORE THINGS FH FOUND AND DID NOT FIX — **THE SIXTH WAS THE SAVE, AND FI TOOK IT** — ITS CLOSED ITEMS (archived at IQ; the section stays in `docs/state.md`)
+
+- **`test_batch_at` IS SEEDED THROUGHOUT AS OF DY §4** — §1's damage loop was the last unseeded
+  compared pair in the file, and every `_seeded()` call in it used to sit DOWNSTREAM of that check.
+  Its check count holds steady from run to run.
+- **`test_batch_bo`'s FLAKY ASSERTION IS FIXED AT DT AND THAT FIX MOVED NO COUNT. THE NUMBER THIS
+  LINE USED TO RESTATE (1106) WAS STALE BY FOUR BATCHES; the live figure is in `baselines.json` and
+  is not repeated here.**
+  §5's NULL FIELD check still requires `deep < shallow`; both blows are seeded per-pair now, so the
+  pair reads 17 against 10 on every run. **`test_batch_bo.gd` called `seed()` zero times before DT
+  and calls it twice now, both in `_nf_seeded()` at that one site.**
+  - **`bk` is NOT widened**, because it has not been exceeded: headroom goes where a reading demands
+    it. It read **129**.
+### Last measurements
+
+**IB's verification is in `docs/reports/IB.md` §6, written after the acceptance run.** IB moved no damage path, so HEAD's
+unmodified battery read all of IB's code once, predicted first, before any instrument moved, and `check_ib` drove what it moved on
+this tree and on HEAD's. **The figures live in the report and not here**, because this file is read by
+four gates — `check_es` §4, `check_fg` §4, `check_hp` §5 and `check_hx` §2 — and a cell written behind the run would owe a
+post-run proof of its own.
+
 ## ARCHIVED AT IP — 2026-10-19, FROM `docs/state.md` AS IO LEFT IT (`9f9154d`)
 
 **What came here**: IO's twelve rulings, every one answered in IP's brief; two of FOUND AT IO's three items — IN's census short by

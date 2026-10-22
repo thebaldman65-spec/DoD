@@ -163,6 +163,9 @@ func _put(c: Control, pos: Vector2, sz: Vector2, text := "") -> void:
 func _draw_option_parts(idx: int, at: Vector2) -> void:
 	var option: Dictionary = offer[idx]
 	var mod_id := String(option["modifier"])
+	# BATCH IQ §4 — READ STRAIGHT, ON PURPOSE: a stored offer's ids are filtered where the save is read
+	# (`Run._drop_stale_offer_options`), so every id reaching this line is one the deck holds — and an id
+	# the code chose that the deck does not hold is a defect that must fail here, loudly.
 	var cfg: Dictionary = Run.MODIFIERS[mod_id]
 	var sev := int(cfg["severity"])
 	# BATCH IO §5 — the severity tints live on `Run` (`Run.SEVERITY_COLORS`), read here and by the battle's

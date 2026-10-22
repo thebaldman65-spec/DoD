@@ -2,10 +2,10 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1879,
+  "total": 1897,
   "source": 1348,
-  "other": 131,
-  "document": 400
+  "other": 133,
+  "document": 416
  },
  "source_residency": {
   "narrow": 46,
@@ -7521,7 +7521,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#295"
+   "g": "check_ip.gd#296"
   },
   {
    "s": "check_ip.gd",
@@ -7533,6 +7533,17 @@
    "k": "literal",
    "how": "read",
    "g": "check_ip.gd#292"
+  },
+  {
+   "s": "check_ip.gd",
+   "fn": "_s0_rulings",
+   "h": "docs/design-notes.md",
+   "n": "\n## The deck's last cut, and the instrument's own defect",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ip.gd#295"
   },
   {
    "s": "check_ip.gd",
@@ -7656,6 +7667,196 @@
    "how": "read",
    "g": "check_ip.gd#169",
    "expr": "said"
+  },
+  {
+   "s": "check_iq.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "\n## ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iq.gd#209"
+  },
+  {
+   "s": "check_iq.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "A CUT INSIDE TWO STANDARD ERRORS IS NOT A MEASUREMENT, IT IS A TIE",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iq.gd#207"
+  },
+  {
+   "s": "check_iq.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "A GUARD ON A KEY A SAVE BRINGS IN IS PROVED BY TWO ARMS",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iq.gd#212"
+  },
+  {
+   "s": "check_iq.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "A REMOVAL OWES THE SAVE A GUARD, NOT A RE-ASK",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iq.gd#211"
+  },
+  {
+   "s": "check_iq.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "A SCRATCH COPY ASSERTS ITS OWN PROJECT NAME BEFORE IT LAUNCHES ANYTHING",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iq.gd#213"
+  },
+  {
+   "s": "check_iq.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "A TIE THAT SURVIVES ITS SECOND BLOCK",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iq.gd#208"
+  },
+  {
+   "s": "check_iq.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "A TIE THAT SURVIVES ITS SECOND BLOCK IS A MEASUREMENT THAT SUCCEEDED",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iq.gd#204"
+  },
+  {
+   "s": "check_iq.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "Two modifiers that cost the same belong in the same grade",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iq.gd#205"
+  },
+  {
+   "s": "check_iq.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "the cuts move when the deck does",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iq.gd#206"
+  },
+  {
+   "s": "check_iq.gd",
+   "fn": "_s1_the_cut",
+   "h": "DoD-archive/state-archive.md",
+   "n": "\n",
+   "p": "+",
+   "r": "runtime",
+   "k": "composed",
+   "how": "read",
+   "g": "check_iq.gd#221"
+  },
+  {
+   "s": "check_iq.gd",
+   "fn": "_s1_the_cut",
+   "h": "docs/state.md",
+   "n": "\n",
+   "p": "-",
+   "r": "runtime",
+   "k": "composed",
+   "how": "read",
+   "g": "check_iq.gd#222"
+  },
+  {
+   "s": "check_iq.gd",
+   "fn": "_s2_master_figures",
+   "h": "docs/master.html",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "derived",
+   "g": "check_iq.gd#290",
+   "expr": "String"
+  },
+  {
+   "s": "check_iq.gd",
+   "fn": "_s2_master_figures",
+   "h": "docs/master.html",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_iq.gd#346",
+   "expr": "said"
+  },
+  {
+   "s": "check_iq.gd",
+   "fn": "_s2_master_figures",
+   "h": "docs/master.html",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "derived",
+   "g": "check_iq.gd#355",
+   "expr": "mult"
+  },
+  {
+   "s": "check_iq.gd",
+   "fn": "_s2_master_figures",
+   "h": "docs/master.html",
+   "n": "</table>",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iq.gd#325"
+  },
+  {
+   "s": "check_iq.gd",
+   "fn": "_s2_master_figures",
+   "h": "docs/master.html",
+   "n": "<tr><th>Modifier</th><th>Severity</th>",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iq.gd#324"
+  },
+  {
+   "s": "check_iq.gd",
+   "fn": "_s2_master_figures",
+   "h": "docs/master.html",
+   "n": "The pool is %d",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_iq.gd#339"
   },
   {
    "s": "test_batch_ah.gd",
