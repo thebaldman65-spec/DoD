@@ -2,14 +2,14 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1897,
-  "source": 1348,
-  "other": 133,
+  "total": 1905,
+  "source": 1353,
+  "other": 136,
   "document": 416
  },
  "source_residency": {
   "narrow": 46,
-  "code": 823,
+  "code": 828,
   "absent": 326,
   "runtime": 101,
   "unresolved": 3,
@@ -4962,6 +4962,17 @@
    "s": "check_hp.gd",
    "fn": "_s4_tithe",
    "h": "scripts/battle.gd",
+   "n": "bc_bd * bc_pct / 100.0",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#817"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s4_tithe",
+   "h": "scripts/battle.gd",
    "n": "func _lowest_hp(",
    "p": "+",
    "r": "code",
@@ -4996,7 +5007,7 @@
    "s": "check_hp.gd",
    "fn": "_s4_tithe",
    "h": "scripts/battle.gd",
-   "n": "result.get(\"bd\", pr) * bc_pct / 100.0",
+   "n": "if bc_pct > 0 and bc_bd > 0:",
    "p": "+",
    "r": "code",
    "k": "literal",
@@ -5013,6 +5024,17 @@
    "k": "literal",
    "how": "read",
    "g": "check_hp.gd#828"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s4_tithe",
+   "h": "scripts/battle.gd",
+   "n": "var bc_bd := int(result.get(\"bd\", pr))",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#817"
   },
   {
    "s": "check_hp.gd",
@@ -7857,6 +7879,39 @@
    "k": "format",
    "how": "read",
    "g": "check_iq.gd#339"
+  },
+  {
+   "s": "check_ir.gd",
+   "fn": "_s1e_glossary",
+   "h": "data/glossary.json",
+   "n": "{=Battle.BREAKING_DARKNESS_BD_PCT}",
+   "p": "-",
+   "r": "narrow",
+   "k": "loop-list",
+   "how": "read",
+   "g": "check_ir.gd#489"
+  },
+  {
+   "s": "check_ir.gd",
+   "fn": "_s1e_glossary",
+   "h": "data/glossary.json",
+   "n": "{=Battle.PENANCE_MIRROR*100}",
+   "p": "-",
+   "r": "narrow",
+   "k": "loop-list",
+   "how": "read",
+   "g": "check_ir.gd#489"
+  },
+  {
+   "s": "check_ir.gd",
+   "fn": "_s1e_glossary",
+   "h": "data/glossary.json",
+   "n": "{=Battle.UNMAKING_LOCK_TURNS}",
+   "p": "-",
+   "r": "narrow",
+   "k": "loop-list",
+   "how": "read",
+   "g": "check_ir.gd#489"
   },
   {
    "s": "test_batch_ah.gd",
@@ -16994,7 +17049,18 @@
    "s": "test_batch_bp.gd",
    "fn": "_live_warden",
    "h": "scripts/battle.gd",
-   "n": "if ab.special == \"covering_guard\":\n\t\t\t\t\tpool = pool.filter(func(a): return a != u)",
+   "n": "if ab.special in [\"covering_guard\", \"rally_ally\"]:\n\t\tpool = pool.filter(func(a): return a != u)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "test_batch_bp.gd#432"
+  },
+  {
+   "s": "test_batch_bp.gd",
+   "fn": "_live_warden",
+   "h": "scripts/battle.gd",
+   "n": "pool = _ally_pick_pool(u, ab)",
    "p": "+",
    "r": "code",
    "k": "literal",
@@ -17667,6 +17733,17 @@
    "s": "test_batch_br.gd",
    "fn": "_live_rally",
    "h": "scripts/battle.gd",
+   "n": "\"rally_ally\", \"recant\"",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "test_batch_br.gd#526"
+  },
+  {
+   "s": "test_batch_br.gd",
+   "fn": "_live_rally",
+   "h": "scripts/battle.gd",
    "n": "func _rally_forward(caster: BattleUnit, ally: BattleUnit) -> void:",
    "p": "+",
    "r": "code",
@@ -17678,7 +17755,18 @@
    "s": "test_batch_br.gd",
    "fn": "_live_rally",
    "h": "scripts/battle.gd",
-   "n": "if ab.special == \"rally_ally\":\n\t\t\t\t\tpool = pool.filter(func(a): return a != u and not a.is_companion)",
+   "n": "if ab.special == \"rally_ally\":\n\t\tif not heroes.any(func(a): return a != u and not a.dead):\n\t\t\treturn false",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "test_batch_br.gd#527"
+  },
+  {
+   "s": "test_batch_br.gd",
+   "fn": "_live_rally",
+   "h": "scripts/battle.gd",
+   "n": "if ab.special in [\"covering_guard\", \"rally_ally\"]:\n\t\tpool = pool.filter(func(a): return a != u)",
    "p": "+",
    "r": "code",
    "k": "literal",
@@ -17689,12 +17777,12 @@
    "s": "test_batch_br.gd",
    "fn": "_live_rally",
    "h": "scripts/battle.gd",
-   "n": "if ab.special == \"rally_ally\":\n\t\tif not heroes.any(func(a): return a != u and not a.dead):\n\t\t\treturn false",
+   "n": "pool = _ally_pick_pool(u, ab)",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_br.gd#527"
+   "g": "test_batch_br.gd#526"
   },
   {
    "s": "test_batch_br.gd",

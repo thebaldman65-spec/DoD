@@ -729,8 +729,13 @@ func _docs() -> void:
 	# BATCH IL §0.4 — ONE HUNDRED AND TWO, BUMPED THE SAME WAY, and the entry is `most_health`: the Blood
 	# Debt rune names its payer as the enemy with the most health, as the Tracker's and the Arbiter's moving
 	# marks already did, and the tie rule (the first in the warband) goes in the glossary, not on the rune.
-	ok(gj != null and gj.size() == 102,
-		"the glossary holds 102 entries (98 + HS's conjunctions and status_rupture + IK's strike_damage + IL's most_health)")
+	# BATCH IR §1e — ONE HUNDRED AND NINE, BUMPED THE SAME WAY, and the seven are statuses the battle lays on an
+	# enemy that a player could read nowhere: `status_slow_burn`, `status_heads_down`, `status_unmade`,
+	# `status_breaking_darkness`, `status_penance`, `status_suffering` and `status_blight` — seven chips on the board
+	# with no entry behind them. `check_ir` §1e now reads every affliction the game lists against its entry, so the
+	# next status added without one reds there; this count still says that adding one was a decision.
+	ok(gj != null and gj.size() == 109,
+		"the glossary holds 109 entries (98 + HS's conjunctions and status_rupture + IK's strike_damage + IL's most_health + IR's seven statuses)")
 	# RE-POINTED AT THE ARCHIVE BY BATCH CX. The live changelog passed CW's 400 KB
 	# threshold, so CX cut it at the CN/CO boundary: Batch CE — with everything
 	# from BP to CN — moved OUT OF THE REPO into `changelog-archive.html`. The old

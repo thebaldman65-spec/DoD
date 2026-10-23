@@ -3379,7 +3379,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 5,
 				"anim": "attack03", "special": "aegis_wall",
 				"perfect_id": "", "perfect_text": "",
-				"description": "The wall answers for everyone: for 4\nturns every attack you BLOCK heals\nevery hero for {=Battle.AEGIS_WALL_PCT*100}% of your maximum\nhealth. A blow that gets through pays\nnothing — only a block."})
+				"description": "The wall answers for the heroes: for 4\nturns every attack you BLOCK heals\nevery hero for {=Battle.AEGIS_WALL_PCT*100}% of your maximum\nhealth. A blow that gets through pays\nnothing — only a block."})
 		# ===== BATCH CI — TRANCHE 3, THE WARRIOR NINE. THE DRAFT IS COMPLETE. =====
 		#
 		# A CONTIGUOUS BLOCK rather than interleaved with BP's and BW's entries
@@ -4189,13 +4189,13 @@ static func draft_ability(display_name: String) -> Ability:
 		# class has. It is the enemy that is marked, so every hero and every
 		# beast on the field reads it, which is what separates it from the
 		# Beastmaster's MARK OF THE HUNT (that one pays HIM and his beast 25%,
-		# and restores his Mana; this one pays EVERYONE 15% and nothing else).
+		# and restores his Mana; this one pays EVERY ALLY 15% and nothing else).
 		"Hunter's Mark":
 			return Ability.make({"display_name": "Hunter's Mark", "cost": 15,
 				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 4,
 				"anim": "attack01", "special": "hunters_mark",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Call the target out: for 6 turns EVERY\nALLY deals {=Battle.PARTY_MARK_PCT}% more damage to it. One\nmark at a time — the point is that\neveryone shoots the same thing."})
+				"description": "Call the target out: for 6 turns EVERY\nALLY deals {=Battle.PARTY_MARK_PCT}% more damage to it. One\nmark at a time — the point is that\nevery ally strikes the same thing."})
 		# AXIS: a charge BANK, which the class has never had. BANKED, NOT TIMED
 		# — the charges wait until spent, on the Interpose/`shield_charges`
 		# precedent BQ used for Mirror Image, so a cast into a lull is not
@@ -4822,7 +4822,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 2.0, "cooldown": 4, "anim": "attack02",
 				"special": "recant", "target": Ability.Target.ALLY,
 				"perfect_id": "", "perfect_text": "",
-				"description": "Unspend it: one ally regains 40% of\ntheir MAXIMUM Rage or Mana.\nIt reaches the resource they cast\nwith — never a spec meter like\nResonance, Mercy, Faith or Focus."})
+				"description": "Unspend it: one hero regains 40% of\ntheir MAXIMUM Rage or Mana.\nIt reaches the resource they cast\nwith — never a spec meter like\nResonance, Mercy, Faith or Focus."})
 		# AXIS: martyrdom as an economy. Mercy arrives when somebody crosses
 		# below half health, so until now the only way to fill her meter was to
 		# let the party be hurt. This is her buying a stack with her own blood,

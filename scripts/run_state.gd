@@ -4203,6 +4203,7 @@ func load_run() -> bool:
 	_hand_out_the_bag()
 	_refresh_rune_names()
 	_drop_stale_payload_fields()
+	_rename_saved_cards()
 	readout = {}
 	active = true
 	return true
@@ -4382,6 +4383,126 @@ func _drop_stale_add(payload: Dictionary, props: Dictionary) -> void:
 	for extra in payload.get("also", []):
 		if extra is Dictionary:
 			_drop_stale_add(extra, props)
+
+
+# ══ BATCH IR §2 — THE RENAME MAP, AT THE LOAD DOOR (the designer's) ═══════════════════════════════
+#
+# **A CARD A SAVE NAMES BY A NAME IT HAS SINCE LOST IS READ BY ITS NAME TODAY.** A save carries the
+# cards a hero holds, carries, was offered, refused and upgraded BY NAME, and a name renamed after BM's
+# v10 floor reaches four reads straight — a queued offer's card (a blank takeable button), the slot
+# count, `apply_upgrades` and `upgrade_choice` (an upgrade that never lands). **Nothing crashes, and
+# that is the ruling's reason, not its comfort: an invisible wrong outlives a crash, because nobody
+# reports it.** So every card name the save brings in is read through this map, where IQ's guards sit:
+# a hero's pool and loadout, both queued offers, the draft's refusals, the upgrades queued and held,
+# and the card a saved rune's payload names (`ability`, `grant_ability`, an `owns_ability` condition).
+#
+# **IT IS APPEND-ONLY, FOREVER**: a rename that crosses the save floor adds its row here, in the batch
+# that renames (`CLAUDE.md`'s FD §1 block). The rows are every card renamed since the floor — derived
+# from `classes.gd`'s history, not taken from a brief (IR's report, §2): CK's and GN's, and CG's three.
+# A card REMOVED since the floor (Flash Freeze at DR, Observance at CG) is no row — it has no name
+# today to be read by — and is reported, not mapped.
+#
+# **AND A NAME THAT WAS NEVER A CARD IS NOT SWALLOWED**: it is left exactly as the save holds it — no
+# guess, no drop — and said out loud (`push_error`, and `load_unknown_cards` for the instruments), so
+# a typo or a removal still fails where it is read, and loudly here. A row that read a name into a
+# card the hero already holds keeps one copy.
+const RENAMED_CARDS := {
+	"Iron Will": "Ironclad",                     # CK §2
+	"Anathema": "Breaking Darkness",             # CG §3
+	"Jubilee": "Blessing of the Faithful",       # CG §2
+	"Matins": "Divine Presence",                 # CG §1
+	"Magic Barrier": "Nexus Ward",               # GN
+}
+var load_unknown_cards: Array = []
+var _card_names := {}
+
+
+func _rename_saved_cards() -> void:
+	load_unknown_cards = []
+	# Every card the game holds, by the one enumeration (`Classes.ability_corpus`, CZ §0) — the
+	# class basics a rune's payload names (Strike, Smite, Quick Shot) are in it, and no pool has them.
+	_card_names = {}
+	for ab in Classes.ability_corpus():
+		_card_names[String(ab.display_name)] = true
+	for m in party:
+		var md: Dictionary = m
+		for key in ["bm_abilities", "bm_equipped", "draft_refused"]:
+			if md.get(key) is Array:
+				md[key] = _renamed_names(md[key])
+		for key in ["draft_candidates", "bm_candidates"]:
+			if md.get(key) is Array:
+				var queue: Array = md[key]
+				for i in queue.size():
+					if queue[i] is Array:
+						queue[i] = _renamed_names(queue[i])
+		if md.get("upgrades") is Array:
+			md["upgrades"] = _renamed_upgrades(md["upgrades"])
+		if md.get("up_candidates") is Array:
+			var uq: Array = md["up_candidates"]
+			for i in uq.size():
+				if uq[i] is Array:
+					uq[i] = _renamed_upgrades(uq[i])
+	var lists: Array = [rune_bag, party_runes, pending_rune_drops]
+	for m in party:
+		var md2: Dictionary = m
+		lists.append(md2.get("runes", []))
+		lists.append(md2.get("engines", []))
+		for triple in md2.get("rune_candidates", []):
+			lists.append(triple)
+	for lst in lists:
+		for r in lst:
+			if r is Dictionary and (r as Dictionary).get("payload") is Dictionary:
+				_rename_payload_cards((r as Dictionary)["payload"])
+
+
+# One saved card name, read today. A row's new name, or the name as it stands; a name no table holds
+# and no row maps is kept as it is and said out loud.
+func _renamed_card(name: String) -> String:
+	var now := String(RENAMED_CARDS.get(name, name))
+	if not _card_names.has(now) and not load_unknown_cards.has(now):
+		load_unknown_cards.append(now)
+		push_error("Run: the save names a card this build does not hold, and no rename row maps it: '%s'" % now)
+	return now
+
+
+func _renamed_names(names: Array) -> Array:
+	var out: Array = []
+	for n in names:
+		var now := _renamed_card(String(n))
+		if not out.has(now):
+			out.append(now)
+	return out
+
+
+func _renamed_upgrades(ups: Array) -> Array:
+	var out: Array = []
+	var seen := {}
+	for u in ups:
+		if not (u is Dictionary):
+			out.append(u)
+			continue
+		var ud: Dictionary = u
+		if ud.has("ability"):
+			ud["ability"] = _renamed_card(String(ud["ability"]))
+		var pair := "%s|%s" % [String(ud.get("id", "")), String(ud.get("ability", ""))]
+		if seen.has(pair):
+			continue
+		seen[pair] = true
+		out.append(ud)
+	return out
+
+
+func _rename_payload_cards(payload: Dictionary) -> void:
+	for k in ["ability", "grant_ability"]:
+		if payload.get(k) is String:
+			payload[k] = _renamed_card(String(payload[k]))
+	var cond: Variant = payload.get("condition")
+	if cond is Dictionary and (cond as Dictionary).get("owns_ability") is String:
+		(cond as Dictionary)["owns_ability"] = _renamed_card(String((cond as Dictionary)["owns_ability"]))
+	for k in ["also", "upgrade"]:
+		for extra in payload.get(k, []):
+			if extra is Dictionary:
+				_rename_payload_cards(extra)
 
 
 # Trees are FIXED definitions in code: always swap the saved snapshot for
@@ -4935,20 +5056,39 @@ const FIXED_MODIFIER_BAND := [3, 4]
 
 
 func arm_fixed_modifier(node_type: String) -> void:
-	if not bool(difficulty_def()["fixed_modifier"]):
+	if not arms_fixed_modifier(node_type):
 		return
-	if not node_type in FIXED_MODIFIER_NODES:
-		return
+	# Never stack two. Since IR §1a no node that arms one is offered a bargain, so nothing
+	# else can have armed a modifier here; the guard stays, so a second call is a no-op.
 	if pending_modifier != "":
-		return  # a bargain already armed one; never stack two
+		return
+	pending_modifier = String(_fixed_modifier_pool().pick_random())
+
+
+# The eight a fixed encounter draws from: the deck's severities inside `FIXED_MODIFIER_BAND`.
+func _fixed_modifier_pool() -> Array:
 	var pool: Array = []
 	for id in MODIFIERS:
 		var fx_sev := modifier_severity(String(id))
 		if fx_sev >= int(FIXED_MODIFIER_BAND[0]) and fx_sev <= int(FIXED_MODIFIER_BAND[1]):
 			pool.append(String(id))
-	if pool.is_empty():
-		return
-	pending_modifier = String(pool.pick_random())
+	return pool
+
+
+# BATCH IR §1a — A NODE THAT ARMS A FIXED MODIFIER OFFERS NO BARGAIN (the designer's). The two never
+# met: in play the map armed Ruin's mini-boss its modifier and `accept_offer` overwrote it with the
+# bargain taken, and the sim took the bargain first and the arm's never-stack guard skipped it, so a
+# Ruin mini-boss fought the bargain alone. **The meeting is removed, not arbitrated**: a fixed modifier
+# is difficulty with no reward and a bargain is a twist that pays — opposite things — and a precedence
+# would leave a dealt offer doing nothing. These two answers are the one question, asked by the map,
+# the sim and `resume_scene`; the mini-boss is the one node in both lists, and only on a rung that arms.
+func arms_fixed_modifier(node_type: String) -> bool:
+	return bool(difficulty_def()["fixed_modifier"]) and node_type in FIXED_MODIFIER_NODES \
+		and not _fixed_modifier_pool().is_empty()
+
+
+func offers_bargain(node_type: String) -> bool:
+	return node_type in BARGAIN_NODES and not arms_fixed_modifier(node_type)
 
 
 # The accepted option, armed for the battle about to start.
@@ -5120,7 +5260,9 @@ func resume_scene() -> String:
 	if pending_event != "":
 		return "res://scenes/event.tscn"
 	if encounter_pending():
-		if String(encounter.get("type", "")) in BARGAIN_NODES \
+		# BATCH IR §1a — the map's question, asked again: a node that armed its fixed modifier
+		# offers no bargain, so a resumed Ruin mini-boss goes back to its fight, not to an offer.
+		if offers_bargain(String(encounter.get("type", ""))) \
 				and not encounter.has("bargain"):
 			return "res://scenes/offer.tscn"
 		return "res://scenes/battle.tscn"

@@ -1290,7 +1290,10 @@ func _docs() -> void:
 		"...and the archive carries the Batch CB entry")
 	# AND THE GLOSSARY ENTRY THE BOND MADE NECESSARY — asserted through the
 	# resolver rather than by grepping the JSON, so a malformed entry trips too.
-	var bond: Dictionary = Glossary.entry("status_bound")
+	# BATCH IR §1e — RE-KEYED `status_bound` -> `status_frostbind`: a chip finds its glossary line at
+	# `"status_" + its status id` (`Glossary.status_short`), and the bond's id is `frostbind`, so the Frostbind
+	# chip never surfaced this entry. Same entry, same words; only the key moved to the door that reads it.
+	var bond: Dictionary = Glossary.entry("status_frostbind")
 	ok(not bond.is_empty(), "the glossary has an entry for the bond")
 	if bond.is_empty():
 		return

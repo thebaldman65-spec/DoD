@@ -1705,6 +1705,11 @@ a census is taken.
   false (one of them a screen with no way out) and 3 harmless. The crashers and the strand are guarded where the save is
   read and driven in `check_iq` §4b, each against HEAD's code too; the rest are listed in IQ's report with why each does
   not crash. **A field a batch adds to a save adds its reads to that population, in the same batch.**
+- **AND A RENAME MAP's TWO ARMS ARE THE SAME TWO (IR §2).** `check_ir` §2 writes a save carrying every renamed card's old
+  name in every place a save holds a card's name, loads it through the real door and asserts each is read by today's — on
+  HEAD's code every one stays old; and a save naming a card that never was loads with that name as it was saved and on the
+  load's error line, translated by nothing and dropped by nothing. **A map that translated an unknown name would pass the
+  first arm and hide every typo**, which is this block's reason one table along.
 
 ## STANDING RULE — A SCRATCH COPY ASSERTS ITS OWN PROJECT NAME BEFORE IT LAUNCHES ANYTHING (Batch IQ §7, ruled by the designer)
 > **A SCRATCH COPY THAT RESTORES ITS TRACKED FILES RESTORES ITS PROJECT NAME, AND A PROJECT NAME IS WHICH USER-DATA FOLDER IT
@@ -1728,6 +1733,19 @@ a census is taken.
 - **IT IS HELD BY A DRIVE**: `check_iq` §7 runs the driver every battery on made-up copies — named as the live project
   (refused, and its `godot` door refuses too), named as their own (runs), the repository (refused), unnamed (refused).
 - **WHAT IT CANNOT SEE**: a lane launched by hand, around the driver. The rule is that the driver is the one way a lane runs.
+
+## STANDING RULE — A CLOSE THAT IS GATED ON ITS OWN INSTRUMENT CAN DEADLOCK, AND A BATCH IS NOT DONE UNTIL ITS CLOSE HAS RUN (Batch IR §0.8, ruled by the designer)
+> **The close — the player's files read against their backup, the frozen tree against its hashes — is a batch's last
+> step, and a batch whose verification is complete is not done until it has run. THE REPORT CARRIES THE CLOSE's OWN
+> TIMESTAMP**, so a close that did not run shows in the report rather than in a silence.
+
+- **THE CASE IS IQ's LAUNCHER.** Its last `wait` also waited on its own `ps` logger, which stops only when the step after that
+  `wait` tells it to: the batteries finished at 23:37 and the script sat, its closing checks unrun, for three days. The
+  verification was complete and the batch was not, and nothing in the tree could say so (`docs/reports/IQ.md` §9).
+- **A LAUNCHER WAITS ON THE JOBS THAT END BY THEMSELVES, BY THEIR PIDS — NEVER A BARE `wait`** — or stops its watcher before the
+  step that waits. A watcher a batch starts is stopped by the batch.
+- **IT STANDS BESIDE THE LANE RULE ABOVE**, and for the same reason: both are about a batch's own tooling and the player's
+  folder. The lane driver refuses a copy that would write it; this refuses to call a batch done before the step that reads it.
 
 ## STANDING RULE — AN INSTRUMENT PUTS A RUNE DOWN THROUGH `Run.hold_rune`, AND A SCOPE WALK NAMES EVERY BAND (Batch HO §1)
 > **A gate or a suite that needs a rune held that it did not NAME — a rolled one, a granted one, a bought one — hands

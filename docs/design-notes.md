@@ -4,6 +4,29 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The seven the census found in the code, and the rename map (Batch IR) — 2026-10-22
+
+**Why the fixed modifier and the bargain never meet, rather than one winning.** On Ruin the mini-boss was both a node that
+carries a fixed modifier and a node that offers a bargain, and the two collided — the bargain overwrote the modifier in play,
+and the sim's bargain made the arm skip. A precedence rule would have left a dealt offer doing nothing, which is exactly the
+shape IQ had just finished guarding against. They are opposite things: a fixed modifier is difficulty with no reward, a bargain
+is a twist that pays. Removing the meeting makes the ladder block's sentence true and discards nothing. The cost is the player's:
+one offer for each mini-boss a Ruin run reaches.
+
+**Why ten cards were narrowed, not two.** The brief named Fortified Spirit and Undying Vigil, and asked for the family first. Every
+ally-target card was sorted by the words that name its pick: ten say *hero*, and each gives a companion nothing for a reason the
+companion carries — it takes no turn, holds no resource bar, makes no Block roll, or the effect is wired on the four. Narrowing
+the pick moves no magnitude; it takes a wasted (and for Aegis Reversal, a harmful) target off the picker, which the bot had never
+aimed at anyway.
+
+**Why a floor of 1 is gated on its share, not removed.** Tithe's floor is right for a blow that lands a little Break — a share of
+3 should not round to nothing — and wrong for a blow that lands none. The words say Break, so the payout follows the Break that
+landed. The census found the same shape once more, in Sacred Resolve's split, and nowhere else live.
+
+**Why the rename map keeps an unknown name rather than dropping it.** A map that translated or dropped a name it did not know
+would hide every typo and every removed card — the loud failure IQ's two-armed rule exists to keep. A removed card (Flash Freeze,
+Observance) has no name today to be read by, so it is no row; it stays where the save put it, and the load says so.
+
 ## The three documents, and one crash (Batch IQ) — 2026-10-19
 
 **Why a removed modifier owes the save a guard and not a re-ask.** A bargain's offer is rolled once for its encounter and

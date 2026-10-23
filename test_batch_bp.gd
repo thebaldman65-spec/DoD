@@ -951,7 +951,10 @@ func _live_warden() -> void:
 	ok(scene.call("_ability_usable", wd, cg),
 		"§4: Covering Guard is usable while an ally stands")
 	var battle_src := _src("res://scripts/battle.gd")
-	ok(battle_src.contains("if ab.special == \"covering_guard\":\n\t\t\t\t\tpool = pool.filter(func(a): return a != u)"),
+	# BATCH IR §1b — RE-POINTED: the picker's pool is `_ally_pick_pool`'s, the one answer the picker, the recast
+	# refusal and the button ask; it leaves him out, and since IR every companion too (a Block roll it never makes).
+	ok(battle_src.contains("pool = _ally_pick_pool(u, ab)")
+			and battle_src.contains("if ab.special in [\"covering_guard\", \"rally_ally\"]:\n\t\tpool = pool.filter(func(a): return a != u)"),
 		"§4: ...and the player's ally picker excludes him")
 	# AND THE ROLL ITSELF REFUSES A SELF-WARD, which is the behavioural half:
 	# even if a ward somehow landed on him, `_covering_warden` will not hand his

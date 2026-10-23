@@ -391,8 +391,8 @@ const STATUS_INFO := {
 	# write a field, or ride a status that already existed (Choking Smoke uses
 	# the EXISTING Blind — §5 says to use it, not to author a new one).
 	"null_field": ["Null Field", "NF", Color(0.75, 0.55, 0.95), "The storm folds inward: damage taken\nis reduced by 5% per RESONANCE STACK,\nread live — it deepens as he casts."],
-	"vow": ["Vow of Suffering", "Vw", Color(0.98, 0.85, 0.45), "The Devout carries half of it: half\nthe damage this ally takes is\nredirected to him — and every share\nhe eats kindles this ally 1 Faith."],
-	"rite_return": ["Rite of Return", "RR", Color(0.95, 0.90, 0.55), "Promised the road back: the next blow\nthat would fell this ally restores\nthem to 50% health instead, and costs\nHoly 30% of her own."],
+	"vow": ["Vow of Suffering", "Vw", Color(0.98, 0.85, 0.45), "The Devout carries half of it: half\nthe damage this hero takes is\nredirected to him — and every share\nhe eats kindles this hero 1 Faith."],
+	"rite_return": ["Rite of Return", "RR", Color(0.95, 0.90, 0.55), "Promised the road back: the next blow\nthat would fell this hero restores\nthem to 50% health instead, and costs\nHoly 30% of her own."],
 	"blight": ["Blighted", "Bg", Color(0.55, 0.25, 0.45), "The well is poisoned: any healing this\nenemy receives DAMAGES it for the\nsame amount instead."],
 	"covenant": ["Covenant of Ash", "CA", Color(0.60, 0.45, 0.50), "Bound to the ash: every stack of Ruin\napplied to ANY enemy also lands here."],
 	"quarry": ["Quarry", "Qy", Color(0.60, 0.85, 0.45), "Named the quarry: Focus gained from\nattacking this enemy is DOUBLED.\nSwitching away still clears him."],
@@ -453,7 +453,7 @@ const STATUS_INFO := {
 	"battle_poise": ["Battle Poise", "BP", Color(0.45, 0.88, 1.0), "The blade is answering: every attack\nhe PARRIES takes a turn off all of his\ncooldowns, and ONCE A TURN a parry also\nbuys a free GUARD CHANGE — the pivot\nalone, and it still respects that\nability's own cooldown."],
 	"feigned_guard": ["Feigned Guard", "Fe", Color(0.60, 0.80, 1.0), "Showing the wrong guard: his ABILITIES\nresolve as though cast from the OTHER\nstance, and satisfy that stance's\nrequirement. His actual guard — and\neverything his passive reads — has not\nmoved."],
 	"vendetta": ["Vendetta", "Vd", Color(0.90, 0.45, 0.35), "Sworn on: this enemy can attack the\nWarden and nobody else for the rest of\nthe battle, and he takes less damage\nfrom it. It ends only when one of them\ndoes."],
-	"aegis_wall": ["Aegis Wall", "AW", Color(0.70, 0.85, 0.95), "The wall answers for everyone: every\nattack he BLOCKS heals every hero for\na share of his maximum health. A blow\nthat gets THROUGH pays nothing."],
+	"aegis_wall": ["Aegis Wall", "AW", Color(0.70, 0.85, 0.95), "The wall answers for the heroes: every\nattack he BLOCKS heals every hero for\na share of his maximum health. A blow\nthat gets THROUGH pays nothing."],
 	# ---- BATCH CI: the tranche-3 Warrior's statuses ----
 	# TEN CHIPS FOR NINE ABILITIES AND EVERY ONE OF THEM SITS ON A HERO, so all
 	# ten are correctly ABSENT from `DEBUFF_IDS` — this is the first Warrior
@@ -504,7 +504,7 @@ const STATUS_INFO := {
 	"exhorted": ["Exhortation", "Ex", Color(0.98, 0.88, 0.55), "Called on: their NEXT attack deals\nbonus damage. It is BANKED — it waits\nfor the swing, however long they take."],
 	"consecration": ["Consecration", "Cs", Color(0.95, 0.88, 0.60), "Blessed ground: regains %d%% of maximum\nhealth at the start of each turn." % [int(round(CONSECRATION_PCT * 100))]],
 	"unburdened": ["Unburdened", "Ub", Color(0.85, 0.92, 0.70), "The weight is lifted: takes 20% less\ndamage."],
-	"vigil": ["Undying Vigil", "UV", Color(0.95, 0.90, 0.70), "Watched over: every heal this ally\nreceives, from ANY source, also heals\na second hero on lower health for half\nas much."],
+	"vigil": ["Undying Vigil", "UV", Color(0.95, 0.90, 0.70), "Watched over: every heal this hero\nreceives, from ANY source, also heals\na second hero on lower health for half\nas much."],
 	# ---- BATCH BR: the Hunter and Warrior class-wide draft's statuses ----
 	# Six of the twelve carry one. Field Dressing, Aimed Volley, Charge and
 	# Cleave resolve and are done; Bola rides the EXISTING `slow` and `cripple`
@@ -859,7 +859,7 @@ const SHIELD_SLAM_PCT := 0.15     # of his LIVE maximum health (0.20 perfect)
 const SHIELD_SLAM_PERFECT_PCT := 0.20
 const VENDETTA_CUT := 0.20        # damage he takes from the sworn enemy
 const VENDETTA_PERFECT_CUT := 0.30
-const AEGIS_WALL_PCT := 0.08      # of his LIVE maximum health, to every ally
+const AEGIS_WALL_PCT := 0.08      # of his LIVE maximum health, to every hero
 # ---- BATCH CI: the tranche-3 Warrior magnitudes, all read AWAY FROM THE CAST ----
 # Every one of these is read at a site the ability never touches — the passive's
 # own floor, a mitigation slice, a block, a parry, a stance multiplier — so a
@@ -913,7 +913,15 @@ const FORMLESS_RECOIL_TURNS := 2
 # turn-start tick and a callback — so they are named here rather than left as
 # literals two functions apart.
 const CONSECRATION_PCT := 0.05    # of the holder's OWN max health, each turn
-const VIGIL_SHARE := 0.5          # of the heal that forked, to the second ally
+const VIGIL_SHARE := 0.5          # of the heal that forked, to a second hero
+# ---- BATCH IR §1b: the ally-target cards whose words say HERO ----
+# The player's ally picker draws from `_hero_side()`, companions included; a card whose words say
+# *hero* offers only the heroes (`_ally_pick_pool`). The census found ten: the two the brief named,
+# Rally, which already narrowed, six more whose words said hero, and Recant, whose word said ally for a
+# bar a companion does not carry (IR's report, §1b). `check_ir` §1b re-derives the population from every
+# ally-target card's words every battery, so the next one is sorted by the gate.
+const HERO_PICKS := ["aegis_reversal", "covering_guard", "fortified_spirit", "rally_ally", "recant",
+	"renewal", "rite_of_return", "undying_vigil", "vow_suffering", "zeal"]
 # ---- BATCH HF: the fifteen runes' numbers that are not on the rune ----
 # Each rune carries its MAGNITUDE in its payload (`data/runes.json`), so a ruling
 # moves data. What is here is the brief's own fixed figures — the thresholds and
@@ -4596,23 +4604,9 @@ func _player_turn(u: BattleUnit) -> void:
 				pool = _hero_side()
 				pool.append_array(enemies.filter(func(e): return not e.dead))
 			elif ab.target == Ability.Target.ALLY:
-				pool = _hero_side()
-				# BATCH BP — COVERING GUARD IS FOR SOMEONE ELSE, AND THE POOL IS
-				# WHERE THAT IS MADE STRUCTURAL rather than left as a trap the
-				# tooltip warns about. He already rolls his own Block; warding
-				# himself would stack a second copy of it for no reason and read
-				# as a wasted cast. Narrowed here, on Execute's precedent, so the
-				# UI cannot offer the mistake and the bot cannot make it.
-				if ab.special == "covering_guard":
-					pool = pool.filter(func(a): return a != u)
-				# BATCH BR — RALLY IS FOR SOMEONE ELSE, AND THAT IS WHAT BOUNDS
-				# IT. Handing away a turn costs him his own, so a Warrior can
-				# never chain turns onto himself; excluding him here (and in the
-				# bot's pool, and in `_ability_usable`) is what makes "no hero
-				# gets unbounded consecutive turns" structural rather than a
-				# hope. Covering Guard's precedent, three sites, one rule.
-				if ab.special == "rally_ally":
-					pool = pool.filter(func(a): return a != u and not a.is_companion)
+				# BATCH IR §1b — the pool is `_ally_pick_pool`'s, the one answer the picker,
+				# the recast refusal and the button ask (below it, and why).
+				pool = _ally_pick_pool(u, ab)
 			else:
 				pool = enemies.filter(func(e): return not e.dead)
 				# BATCH IK §2 — EXECUTE OFFERS ONLY WHAT QUALIFIES, and since IL §3 the narrowing is
@@ -6588,11 +6582,10 @@ func _recast_targets(u: BattleUnit, ab: Ability) -> Array:
 		"hysteria", "slow_burn", "choking_smoke", "rime", "umbral_sigil", \
 				"penance", "bola", "counter_time", "glacial_prison":
 			return enemies.filter(func(e): return not e.dead)
-		"covering_guard":
-			return _hero_side().filter(func(h): return h != u)
-		"undying_vigil", "vow_suffering", "rite_of_return", "vespers", \
+		# BATCH IR §1b — the picker's own pool, so a recast is weighed over the bodies the picker offers.
+		"covering_guard", "undying_vigil", "vow_suffering", "rite_of_return", "vespers", \
 				"divine_shield", "mantle":
-			return _hero_side()
+			return _ally_pick_pool(u, ab)
 	return []
 
 
@@ -6969,9 +6962,11 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 		return false
 	# Aegis Reversal spends a DIVINE shield: any barrier will not do, because
 	# the clause is about the Devout's own unspent protection.
+	# BATCH IR §1b — over the picker's own pool (`_ally_pick_pool`): a shield on a companion lights no
+	# button the picker would then refuse to aim.
 	if ab.special == "aegis_reversal":
 		var ar_found := false
-		for ar_h in _hero_side():
+		for ar_h in _ally_pick_pool(u, ab):
 			if ar_h.dead:
 				continue
 			var ar_st: Dictionary = ar_h.get_status("barrier")
@@ -6989,10 +6984,10 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 			return false
 	# ---- BATCH BP: the Warrior draft's gates ----
 	# Covering Guard lends his Block to ANOTHER body; standing alone there is
-	# nobody to lend it to (the ally pool in `_player_turn` is narrowed the
-	# same way, so the button and the picker can never disagree).
+	# nobody to lend it to. BATCH IR §1b — the door asks the picker's own pool
+	# (`_ally_pick_pool`), so the button and the picker can never disagree.
 	if ab.special == "covering_guard":
-		if not _hero_side().any(func(a): return a != u and not a.dead):
+		if _ally_pick_pool(u, ab).is_empty():
 			return false
 	# ---- BATCH BR: the Hunter and Warrior class-wide draft's one gate ----
 	# Rally HANDS A TURN TO SOMEBODY ELSE; standing alone there is nobody to
@@ -8098,6 +8093,33 @@ func _confirm_item(i: int) -> void:
 # BATCH IK §2 — `refusals` is {unit: why}: a living body the card cannot name, whose hover says
 # why while the pick is open (`BattleUnit.set_target_refusal`) and whose click does nothing — the
 # hover being where every other refusal is explained. Empty for every card but Execute today.
+# ══ BATCH IR §1b — WHO AN ALLY-TARGET CARD's PICK OFFERS: the one answer ══════════════════════════
+# The player's picker (`_player_turn`), the recast refusal (`_recast_targets`) and the button
+# (`_ability_usable`) ask this, so the three cannot disagree. It is `_hero_side()` — the living heroes
+# and companions — narrowed where a card says so:
+# - **BATCH BP — COVERING GUARD IS FOR SOMEONE ELSE.** He already rolls his own Block; warding himself
+#   would stack a second copy of it for no reason and read as a wasted cast, so the UI cannot offer the
+#   mistake and the bot cannot make it (Execute's precedent).
+# - **BATCH BR — RALLY IS FOR SOMEONE ELSE, AND THAT IS WHAT BOUNDS IT.** Handing away a turn costs him
+#   his own, so a Warrior can never chain turns onto himself — excluded here, in the bot's pool and at
+#   the button: "no hero gets unbounded consecutive turns" is structural rather than a hope.
+# - **BATCH IR §1b — A CARD WHOSE WORDS SAY *HERO* OFFERS ONLY THE HEROES (`HERO_PICKS`).** Each gives
+#   a companion nothing, for a reason a companion carries: Fortified Spirit's loan sheds at its bearer's
+#   turn start and a companion takes no turn, so on one it never decayed; Undying Vigil's fork, Vow of
+#   Suffering's redirect and Rite of Return's save are wired on the four heroes alone; Renewal pays at
+#   its bearer's turn start; Blessing of Zeal's damage, cooldowns and Faith reach no companion; Recant
+#   refills a resource bar a companion does not have; Covering Guard lends a Block roll companions never
+#   make; and Aegis Reversal spent a companion's shield for an attack it never takes. The bot already
+#   aimed every one of them at a hero; the player's picker offered the companion too.
+func _ally_pick_pool(u: BattleUnit, ab: Ability) -> Array:
+	var pool: Array = _hero_side()
+	if ab.special in ["covering_guard", "rally_ally"]:
+		pool = pool.filter(func(a): return a != u)
+	if ab.special in HERO_PICKS:
+		pool = pool.filter(func(a): return not a.is_companion)
+	return pool
+
+
 func _pick_target(pool: Array, refusals := {}) -> BattleUnit:
 	for t in pool:
 		t.set_targetable(true)
@@ -9337,6 +9359,12 @@ func _uses_bow(u: BattleUnit) -> bool:
 	return u.hero_key == "hunter" or u.unit_name.begins_with("Orc Archer")
 
 
+# BATCH IR §1f — the sound a BLOCKED blow plays: the bow's own for a bow user, the
+# parry's for everyone else. The one answer the block branch asks.
+func _block_sfx(attacker: BattleUnit) -> String:
+	return "bow_blocked" if _uses_bow(attacker) else "parry"
+
+
 # Per-ability impact sounds; falls back to bow/generic hits.
 func _impact_sfx(attacker: BattleUnit, ab: Ability) -> String:
 	if ab.display_name == "Hack and Slash":
@@ -9615,8 +9643,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	# Magic Barrier. The short-circuit order matters: an image is spent BEFORE
 	# the dice are rolled, so a charge is never burnt on a blow that would have
 	# missed anyway.
+	#
+	# BATCH IR §1g — EVERY TARGETING KIND THAT ROLLS ITS MISS PER STRIKE IS NAMED HERE, so it
+	# never rolls one here first. `choose_three` was missing beside `choose_two`, so Cleave and
+	# Hex of Ruin rolled a whole-cast miss on their first target and then a miss per strike —
+	# two rolls on one blow. The kinds are `Ability`'s targeting fields (`aoe`, `multi_hits`,
+	# `random_hits` and every `choose_*`), and `check_ir` §1g reads this guard against them.
 	elif not is_counter and not ab.aoe and ab.multi_hits == 0 and ab.random_hits == 0 \
-			and not ab.choose_two \
+			and not ab.choose_two and not ab.choose_three \
 			and (_mirror_dodge(attacker, target) \
 				or randf() < _miss_chance(attacker, target)):
 		_stat("attacks")
@@ -10064,7 +10098,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						if strike_target.has_engine("redoubt"):
 							strike_target.redoubt_bank += ab.damage * 0.01 * attacker.attack
 							strike_target.refresh_bars()
-					_sfx("parry", -4.0, 0.6)
+					# BATCH IR §1f — A BOW USER's BLOCKED SHOT PLAYS ITS OWN SOUND, which the
+					# header of `_uses_bow` has promised since the three bow samples were
+					# loaded: an arrow stopped on a shield, never a parry's ring. One
+					# `_sfx` call either way, so the dice spent are the same.
+					_sfx(_block_sfx(attacker), -4.0, 1.0 if _uses_bow(attacker) else 0.6)
 					strike_target.float_text("BLOCK", Color(0.75, 0.8, 0.95))
 					_log("%s BLOCKS %s's %s (%s)" % [strike_target.unit_name,
 						attacker.unit_name, ab.display_name, block_source], "#8c9cc8")
@@ -12226,7 +12264,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if strike_target.is_hero and not strike_target.is_companion \
 					and strike_target.has_status("unity"):
 				var bound := heroes.filter(func(h): return not h.dead)
-				if bound.size() > 1:
+				# BATCH IR §1d — A SPLIT OF NOTHING IS NOTHING. A blow parried outright (a Feint
+				# charge, Untouchable) or otherwise zeroed above lands 0, and the floor below billed
+				# every bound hero 1 for it, the struck one too — where Sacred Resolve's words split
+				# the damage RECEIVED and Feint's parry lands none. Tithe's shape, found by its
+				# family's census (IR's report, §1d); the floor stays for a blow that lands any.
+				if bound.size() > 1 and final > 0:
 					var share := maxi(int(round(final / float(bound.size()))), 1)
 					_log("   → Unity splits %d damage: %d to each of %d souls" % [
 						final, share, bound.size()], "#e0d060")
@@ -12330,13 +12373,20 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				# guard sums the pair for the reason every re-keyed guard does. A
 				# PAYOUT SUMS: a hero wearing the node and the crest pays both shares.
 				var bc_pct: int = attacker.blood_communion + attacker.rune_blood_communion
-				if bc_pct > 0:
+				# BATCH IR §1d — IT PAYS ONLY FOR BREAK THAT LANDED. `pr` is the Break the
+				# blow carried; what the meter took is `result.bd`, and on an enemy three doors
+				# take it all — a Broken body, the Deadened bargain, and a blow so small its
+				# Constitution (or Muffled) rounds it to nothing. Gated on `pr` alone, the share
+				# of a zero fell to the floor of 1 below and an attack that landed no Break
+				# healed 1. The floor stays for a blow that lands any.
+				var bc_bd := int(result.get("bd", pr))
+				if bc_pct > 0 and bc_bd > 0:
 					var bc_pool := heroes.filter(
 						func(h): return not h.dead and not h.is_companion)
 					if not bc_pool.is_empty():
 						var bc_t := _lowest_hp(bc_pool)
 						var bc_amt := maxi(int(round(
-							result.get("bd", pr) * bc_pct / 100.0)), 1)
+							bc_bd * bc_pct / 100.0)), 1)
 						var bc_got: int = bc_t.heal_amount(bc_amt, bc_t != attacker)
 						if bc_got > 0:
 							bc_t.float_text("+%d" % bc_got, Color(0.7, 0.4, 0.9))
@@ -21272,7 +21322,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					maxi(int(round(attacker.max_hp * AEGIS_WALL_PCT)), 1)])
 			_sfx("parry", -7.0, 0.6)
 			attacker.float_text("AEGIS WALL", Color(0.70, 0.85, 0.95), true)
-			_message("%s raises the wall for everyone" % attacker.unit_name)
+			_message("%s raises the wall for the heroes" % attacker.unit_name)
 			_log("%s: Aegis Wall — for %d turns every attack he BLOCKS heals every hero %d%% of his maximum health (%d right now)" % [
 				attacker.unit_name, aw_turns,
 				int(round(AEGIS_WALL_PCT * 100.0)),
@@ -24687,7 +24737,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var fs_got: int = target.heal_amount(fs_lent, target != attacker)
 				target.add_status("fortified", "Fortified Spirit",
 					"FS%d" % fs_steps, Color(0.95, 0.88, 0.60), -1,
-					"Maximum health lent by the Devout.\nIt sheds a tenth of his maximum at the\nstart of each of this ally's turns —\ncurrent health clamps under it.")
+					"Maximum health lent by the Devout.\nIt sheds a tenth of his maximum at the\nstart of each of this hero's turns —\ncurrent health clamps under it.")
 				var fs_st := target.get_status("fortified")
 				fs_st["lent"] = fs_lent
 				fs_st["step"] = fs_step

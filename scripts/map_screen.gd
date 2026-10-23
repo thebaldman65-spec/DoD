@@ -232,9 +232,9 @@ func _maybe_show_framing() -> bool:
 		"pick and a rune cache, and cost you health. The SMITH sells ability\n" +
 		"upgrades for gold. TRADE is the Peddler. ??? is something standing\n" +
 		"on the road, and you will not know what until you stand on it.\n\n" +
-		"Before every elite and mini-boss you are offered THREE BARGAINS: a\n" +
-		"condition that binds both sides of the battle, and what clearing it\n" +
-		"under that condition pays — one of the three is always a mild one.\n\n" +
+		"Before every elite, and every mini-boss but Ruin's, THREE BARGAINS:\n" +
+		"a condition that binds both sides of the battle, and what clearing\n" +
+		"it pays — one always the safer deal. Ruin's mini-boss fights unpaid.\n\n" +
 		"Winning any fight heals every hero %d%%. There is no resting.\n" % int(round(Run.SLOT_HEAL_PCT * 100)) +
 		"Death ends the run and takes everything, but every boss you fell\n" +
 		"leaves a RELIC behind, unlocked forever, and every zone boss a\n" +
@@ -251,6 +251,10 @@ func _maybe_show_framing() -> bool:
 		dim.queue_free()
 		panel.queue_free())
 	vbox.add_child(btn)
+	# BATCH IR — THE CARD IS PLACED BY ITS OWN HEIGHT, SO ITS BUTTON IS ON THE SCREEN. It stood at y=150
+	# and measured 660 px tall, so "Take the road" — the one way past it — sat below the 720-px screen on a
+	# first run. Centred on what it holds (GT §1: make room for the text first, shrink nothing).
+	panel.position.y = maxf((720.0 - panel.get_combined_minimum_size().y) * 0.5, 0.0)
 	return true
 
 
@@ -582,7 +586,12 @@ func _node_tooltip(node: Dictionary, s: int, reachable_still: bool) -> String:
 	if ty in ["miniboss", "boss"]:
 		var what := "A mini-boss holds the middle of the zone." if ty == "miniboss" \
 			else "The zone's boss. Nothing goes around it."
-		var tail := "\n\nA bargain is offered before it." if ty == "miniboss" else ""
+		# BATCH IR §1a — on a rung that arms a fixed modifier the mini-boss offers no bargain,
+		# so the line says what the node does instead, asked through the one predicate.
+		var tail := ""
+		if ty == "miniboss":
+			tail = "\n\nA bargain is offered before it." if Run.offers_bargain(ty) \
+				else "\n\nIt fights under a modifier the road chooses, and no bargain is offered."
 		# The zone's boss is fixed by the zone and the header already names it, so only
 		# the mini-boss keeps its identity back.
 		var know := "You will not know which until you meet it." if ty == "miniboss" \
@@ -4191,7 +4200,9 @@ func _on_node_pressed(j: int) -> void:
 	# Batch AO §2: the offer is an EVENT, not a toll booth — fights and bosses
 	# walk straight in, elites and mini-bosses are preceded by the bargain.
 	# BATCH GF: the list is `Run.BARGAIN_NODES`, which `Run.resume_scene` reads too.
-	if ty in Run.BARGAIN_NODES:
+	# BATCH IR §1a — asked through `Run.offers_bargain`: a node that armed its fixed modifier
+	# above (Ruin's mini-boss) offers no bargain, and walks straight in.
+	if Run.offers_bargain(ty):
 		get_tree().change_scene_to_file("res://scenes/offer.tscn")
 	else:
 		get_tree().change_scene_to_file("res://scenes/battle.tscn")

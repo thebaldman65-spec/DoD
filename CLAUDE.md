@@ -126,7 +126,7 @@ block stood and never a new file. II's four were struck so at IJ, each report re
 the equality rule travel with their parent. **Eight of the rows are FF §2's**, and they are the
 residue: rules written into this file AFTER the seam was taken, which the seam's own test puts on
 the other side of it. **Every row after those eight was written straight into the reference rather
-than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one, IE's two, II's two, IJ's one, IK's one, IM's three, IN's one, IO's two, IP's two and IQ's two —
+than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one, IE's two, II's two, IJ's one, IK's one, IM's three, IN's one, IO's two, IP's two, IQ's two and IR's one —
 and GW §2's, written there at GW and given its row only at HX (HV §3e found it missing; `check_hx` §1a now reds on one) —
 and four more are MOVED, FF §2's way: HG–HJ's census and supersession blocks, written back into this file after the seam
 was taken and sent over at HY §4 by the designer's ruling, and II §4's two, the archive practice's first pass — CP §3's
@@ -206,6 +206,7 @@ new block written here):
 | AN INSTRUMENT'S OWN FIDELITY IS A PREMISE OF EVERY MEASUREMENT IT TAKES | IP §2 |
 | A GUARD ON A KEY A SAVE BRINGS IN IS PROVED BY TWO ARMS | IQ §4 |
 | A SCRATCH COPY ASSERTS ITS OWN PROJECT NAME BEFORE IT LAUNCHES ANYTHING | IQ §7 |
+| A CLOSE THAT IS GATED ON ITS OWN INSTRUMENT CAN DEADLOCK, AND A BATCH IS NOT DONE UNTIL ITS CLOSE HAS RUN | IR §0.8 |
 
 ## THE COMBAT RULES LIVE IN `docs/combat-rules.md` (STANDING, SET AT GR §2, RULED BY THE DESIGNER)
 > **THIS FILE IS STILL THE ONE A BATCH MUST READ. `docs/combat-rules.md` IS A REFERENCE IT POINTS AT,
@@ -289,6 +290,11 @@ new block written here):
 - master.html shows ONLY what is currently in the game (user rule 07-20):
   no vault lists, no "was/now/moved/reworked/renamed" notes, no decision
   dates — change history belongs in changelog.html alone.
+  - **`master.html` SAYS WHAT THE GAME IS. A CLAUSE ABOUT WHAT IT WAS, OR WHY, GOES TO `design-notes.md` OR
+    GOES (ruled at IR's brief §0.6, the designer's).** The stamp stays: it is the freshness marker, not history.
+    **The reason is where the rot comes from**: twenty of the thirty-one false facts IQ's sweep found were *was / now*
+    and *since* clauses — a sentence about what the game is gets re-read by every batch that touches its mechanic,
+    and one about what it was is re-read by nobody. A clause carrying reasoning worth keeping moves rather than dies.
 - Terminology: damage against the Break meter = "Break damage (BD)" everywhere.
 - **A FOLD, A RENAME OR A REFACTOR THAT CHANGES A MAGNITUDE IS A DESIGN CHANGE. IT GOES TO THE
   DESIGNER AS A REPORT AND IS NEVER APPLIED ON THE BATCH'S OWN JUDGMENT (STANDING, SET AT BATCH
@@ -883,6 +889,11 @@ working — a PARTIAL arrival reads as working too, which is the same failure on
 - **WHEN A CLAUSE MOVES, SWEEP THE CLAUSE ACROSS EVERY SURFACE, NOT THE CARD ACROSS ONE.** The
   card, `master.html` and the glossary each carry copies, and fixing one while the rest carry the
   old word is this project's oldest recurring defect.
+- **A CARD WHOSE WORDS SAY *HERO* OFFERS ONLY THE HEROES (IR §1b).** An ally-target card's pick is
+  `battle._ally_pick_pool`, the one answer the player's picker, the recast refusal and the button ask, and `HERO_PICKS`
+  narrows it to the four for every card whose words say hero — each for a reason a companion carries: no turn of its own, no
+  resource bar, a callback wired on the four, no Block roll. **A new ally-target card is sorted by the words that name its
+  pick in the batch that authors it.**
 - **THE SURVIVING USES OF "party" ARE IDENTIFIERS AND ARE NAMED**: `party_mark` (a status id), the
   `party` event target, `spec_in_party` (an event condition), `party.tscn`, and **the rune scope `party`
   (HK §4), which the screens call the CREST** — its slot is saved under `crest` for this rule's sake.
@@ -1878,6 +1889,12 @@ decision and the STRUCTURE is what shipped.
   designer's)**: a modifier with no reward is not a bargain, so a severity 5 there would be pure difficulty with no
   twist bought — AQ's rule arriving by a different door. **Which eight is the grades'**: a re-grade moves the band's
   contents with it, and the batch that re-grades says what the fixed encounters draw after.
+· **A NODE THAT ARMS A FIXED MODIFIER OFFERS NO BARGAIN (IR §1a, the designer's).** The mini-boss is the one node that is
+  both, and the two never met: in play `accept_offer` overwrote the armed modifier, and in the sim the bargain came first
+  and the arm's never-stack guard skipped it, so a Ruin mini-boss fought the bargain alone. **The meeting is removed, not
+  arbitrated**: a fixed modifier is difficulty with no reward and a bargain is a twist that pays — opposite things — and a
+  precedence would leave a dealt offer doing nothing. `Run.offers_bargain` is the one question the map's press, the sim and
+  `resume_scene` ask; a Ruin run loses one offer for each mini-boss it reaches.
 · **SEVERITY 5 IS RUIN's ALONE, AND NONE OF ITS MODIFIERS ZEROES A CLASS's KIT (IN §1, the designer's).**
   No other rung's band reaches it, so a severity-5 modifier is one Wanderer and Warden are never offered —
   `check_in` §1 asserts that over the data, not only through the means. **A modifier that makes one hero's
@@ -3625,9 +3642,18 @@ false of the cache, whose triple rides `member["rune_candidates"]` into the save
   was looking at it, in a path no seed covers. **The guard sits in `Run.load_run`, never at the line that draws**, so a key
   the code chose that its table lacks still fails where it is read. IQ guarded there every such read its census found that
   would crash — the pouch and its swap offers, the zone draw, the event in flight, a lineage, a saved rune's `add`, and a
-  class, whose save is refused down the floor's path because a hero cannot be dropped — and **a batch that removes or
-  renames anything a save can name owes the save that guard in the same batch.** A bargain already TAKEN needs nothing:
-  `battle._active_modifier` asks the deck.
+  class, whose save is refused down the floor's path because a hero cannot be dropped (CONFIRMED at IR's brief §0.3, the
+  designer's: a save that silently plays a different game is worse than one that refuses to load, and two reads would
+  default an unknown class to the Cleric) — and **a batch that removes or renames anything a save can name owes the save
+  that guard in the same batch.** A bargain already TAKEN needs nothing: `battle._active_modifier` asks the deck.
+- **A RENAME THAT CROSSES THE SAVE FLOOR ADDS A ROW TO THE LOAD DOOR's RENAME MAP, IN THE BATCH THAT RENAMES (IR §2, the
+  designer's).** A save carries a hero's cards BY NAME — his pool and loadout, both queued offers, the draft's refusals, the
+  upgrades queued and held, a saved rune's payload — and a card renamed after BM's v10 floor reached four reads straight: a
+  blank takeable button, a slot no card fills, an upgrade that never lands. **Nothing crashed, and that is the ruling's
+  reason, not its comfort: an invisible wrong outlives a crash, because nobody reports it.** `Run.RENAMED_CARDS` is read in
+  `load_run` beside IQ's guards — the same door, the same shape — and it is **append-only, forever**. **A name no row maps
+  and no table holds is kept as the save holds it and said out loud**, never guessed and never dropped; a card REMOVED has no
+  name today to be read by, so it is no row.
 
 ### THE POPULATION IS FIVE, BOTH REMAINING HOLES WERE REACHABLE, AND A REFUSAL IS NOT A REPAIR (FE §2)
 
@@ -4012,6 +4038,10 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
   `dmg_bonus`, unit math (`check_em.UNIT_MATH`). **Every magnitude is RULED**: Tithe 30 (HP §0); Dirge 45% and Empty
   Pulpit 50% as HP proposed them, Dead Air 75% (HQ §1, the designer's; `check_hp` §2a holds each). *Fellowship* is
   RETIRED (two bullets down). HK built the scope, the slot and every door over none.
+  · **TITHE PAYS FOR BREAK THAT LANDED, AND NOTHING FOR A BLOW THAT LANDED NONE (IR §1d, the designer's).** Its share is of the
+    Break the meter took, and a floor of 1 on a share pays only when there is something to share: a Broken body, the Deadened
+    bargain and a blow its Constitution rounds away heal nobody. **The same family's census found Sacred Resolve's split
+    billing every bound hero 1 for a blow parried outright**, repaired with it.
   · **A RUNE PAID WHILE A HERO IS MISSING IS PRICED BY WHAT IT REPLACES, AND ITS WORTH OVER A FIGHT IS THE STATE'S
     (HQ §1, the designer's).** Dirge's three at 1.45 out-damage four at 1.00, and it LOWERED falls and lengthened runs
     (party A 0.74 → 0.67 a normal fight, depth 19.4 → 22.3): **a dead hero still cannot act, cannot heal, and lengthens
@@ -5142,7 +5172,9 @@ READ HERE THAN TO REDISCOVER.**
   brief asked for all six of its statuses there; five sit on a HERO, and listing one puts the
   party's own work inside the cleansable set for a mender's Cleansing Rite. `unit.gd`'s list names
   five existing deliberate absences for this reason. **The one that did belong is the one that
-  lands on an enemy** — and being listed is what makes it feed a Survivalist's Trapper breadth.
+  lands on an enemy** — and being listed is what makes it feed a Survivalist's Trapper breadth. **AND EVERY AFFLICTION
+  LISTED THERE HAS A GLOSSARY ENTRY AT `status_<its id>` (IR §1e)**, the id the chip's tooltip reads
+  (`Glossary.status_short`): seven chips had none and Frostbind's stood under another id. Written with the status.
 · **AND A FOURTH DOOR, FOUND IN PLAY: A CARD WHOSE ARM READS NO TARGET IS ON THE HERO TURN'S NO-TARGET LIST (HL §1).**
   `_player_turn` sends every other `special` to the enemy picker, so a self-cast missing from it asks for an enemy its
   handler never reads — Preparation and nine more did until HL. `check_hl` §1e derives the population every battery.

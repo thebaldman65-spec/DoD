@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-10-19 (Batch IQ &mdash; the three documents, and one crash)</b></p>
+<p align="right"><b>Last updated: 2026-10-22 (Batch IR &mdash; the seven the census found in the code, and the rename map)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -32,7 +32,7 @@ timing skill check on attacks and heals — the player's execution matters as mu
 <b>Class Selection</b> (each hero is dealt three of his class's engine runes and takes one; heroes begin with <b>no ordinary runes</b> and three empty slots) →
 <b>Map</b> (a generated 16-slot lattice) → the node you route to: <b>Battle</b>, or
 <b>Smith</b>, or <b>Trade</b>, or <b>???</b> — with <b>Offer</b> (three bargains) in front of
-every elite and mini-boss → back to the map → …
+every elite and every mini-boss but Ruin's → back to the map → …
 → <b>Mini-boss</b> → … → <b>Zone Boss</b> → next zone (every hero fully restored) →
 <b>end boss</b> → run complete. Runes and picks are handled on the map's hero
 cards, and a card opens the hero's sheet, which shows his talents but cannot change them (they are bought between runs); there is no separate roster screen.</p>
@@ -62,8 +62,9 @@ ladder. <b>Every scaling number below is provisional and is the designer's to se
 is dealt from severity 1&ndash;3 and its gambles at severity 4</td><td>talent tier 2</td></tr>
 <tr><td><b>3 — Ruin</b></td><td>×1.30</td><td><b>no mild option</b>: its safe option is dealt from severity 3&ndash;4 and its
 gambles at <b>severity 5</b> &mdash; three bargains no other rung deals &mdash; and <b>fixed encounters carry a
-modifier</b> of severity 3&ndash;4 — the zone bosses and the end boss, which on the other rungs never
-do; the mini-boss is fought under the bargain taken in front of it</td><td>talent tier 3</td></tr>
+modifier</b> of severity 3&ndash;4 — the mini-boss, the zone bosses and the end boss, which on the other rungs
+never do; <b>a node that carries one offers no bargain</b>, so Ruin's mini-boss is fought under its fixed modifier,
+with no offer and no reward</td><td>talent tier 3</td></tr>
 </table>
 <b>Rung 1 is deliberately tuned BELOW the balance every prior measurement was taken at</b>,
 because it is the rung played with zero talents. Rung 2 IS that balance, byte for byte.
@@ -153,7 +154,11 @@ read, and nothing is rolled again</b>: a bargain the deck no longer holds leaves
 they were, and an offer left with none is dealt afresh; an item the pouch no longer has leaves the pouch and the swap
 queue; a zone that no longer exists takes its slot's first candidate, and its name; an event that no longer exists is
 cleared and the node stays spent; a lineage that no longer exists is read again off the hero's core runes; and a rune's
-change to a card field that no longer exists is dropped, the rest of the rune paying. A save that names a class the game
+change to a card field that no longer exists is dropped, the rest of the rune paying. <b>A card the save names by a name it
+has since lost is read by today's</b> &mdash; Iron Will as Ironclad, Magic Barrier as Nexus Ward, Matins as Divine Presence,
+Jubilee as Blessing of the Faithful and Anathema as Breaking Darkness &mdash; wherever the save holds it: a hero's cards,
+both queued offers, the draft's refusals, the upgrades queued and held, a rune's payload. A card name the game never had
+is kept as the save holds it. A save that names a class the game
 no longer has is refused and cleared, as a save too old to walk is. <b>The runes each hero holds unworn, the bag, the Crest and a drop waiting on
 a full holding are saved with the run.</b> A v14 save's bag held every rune nobody wore; it loads with
 each class or core rune in that bag handed to the hero of its class, unworn, in the order the bag held
@@ -267,7 +272,7 @@ map's header already does.</p>
 a boss-tier health pool</b> (every enemy at 1.5&times; its usual maximum, attack untouched — a
 longer fight, not a harder-hitting one). It pays <b>elite gold (80&ndash;100)</b>, and its own spoil is a <b>generic ability
 upgrade</b> (§6a). <b>The offer precedes
-it</b> (§3a). <b>Bosses</b> remain fixed encounters: no offer, and no modifier except on Ruin, which lays one of severity 3&ndash;4 on each (§2).</p>
+it</b> (§3a) &mdash; except on Ruin, where it carries a fixed modifier instead and no offer comes (§2). <b>Bosses</b> remain fixed encounters: no offer, and no modifier except on Ruin, which lays one of severity 3&ndash;4 on each (§2).</p>
 <p><b>Elites are the snowball engine.</b> An elite kill drops a
 <b>rune cache</b> for a random hero (three candidates rolled at the kill, one chosen on that
 hero's own draft screen), plus a random consumable and a bigger gold purse (80&ndash;100). Six stand in a
@@ -276,7 +281,8 @@ zone and a route meets two to four of them.</p>
 
 <h3>3a. The offer &mdash; three bargains</h3>
 <p>Before every <b>elite and mini-boss</b> encounter — not plain fights, not bosses — the
-player is shown <b>3 options</b> and picks one. That is <b>1&ndash;7 a zone</b>
+player is shown <b>3 options</b> and picks one. <b>On Ruin the mini-boss offers none</b>: it carries a fixed modifier
+(§2), and a node that carries one is never also a bargain, so a Ruin zone's offers are its elites'. That is <b>1&ndash;7 a zone</b>
 (the mini-boss and every elite the route takes), because elites are routed to rather than placed: measured
 <b>8.4 a run greedy, 8.1 balanced, 3.8 cautious</b> (n=150 each; the count tracks how many
 elites the route reached, and how far the run got). The bargain is an event on the
@@ -2000,7 +2006,7 @@ is lengthened by 2, which the window does not double), and <b>Firestorm</b>'s 6�
 <tr><td colspan="4"><b>Holy</b> — <i>what does reversal cost you</i></td></tr>
 <tr><td><b>Second Wind</b></td><td>30 Mana, 2.5, 4cd, one ally</td><td>Heals for the damage that ally has taken in the last two turns on the turn order (a companion: all battle), up to 40% of their maximum (Perfect: 55%).</td><td>Undoing recent history rather than topping up — enormous on someone just spiked, worthless on someone healthy.</td></tr>
 <tr><td><b>Rite of Return</b></td><td>35 Mana, 1.0, 5cd, one hero</td><td>For 4 turns, the next blow or tick that would fell that hero restores them to 50% health instead — and Holy loses 30% of hers.</td><td>Reversal bought in advance rather than reacted to. Resurrection undoes a death and costs Mercy; this prevents one and costs her health.</td></tr>
-<tr><td><b>Recant</b></td><td>25 Mana, 2.0, 4cd, one ally</td><td>That ally regains <b>40% of their maximum Rage or Mana</b>. It reaches the resource they cast with and <b>never a spec meter</b> — Resonance, Mercy, Faith and Focus are all untouched.</td><td>Reversal of expenditure, the one form of undoing she does not have. <b>Its value is measured on somebody else's sheet</b>: a Pyromancer who just emptied himself into Detonation, an Arcanist who has spent his Mana on Arcane Bolt, a Berserker out of Rage before Gut Rip.<br><b>Builds with:</b> whichever ally is the run's engine — it is a different ability in every build.</td></tr>
+<tr><td><b>Recant</b></td><td>25 Mana, 2.0, 4cd, one hero</td><td>That hero regains <b>40% of their maximum Rage or Mana</b>. It reaches the resource they cast with and <b>never a spec meter</b> — Resonance, Mercy, Faith and Focus are all untouched.</td><td>Reversal of expenditure, the one form of undoing she does not have. <b>Its value is measured on somebody else's sheet</b>: a Pyromancer who just emptied himself into Detonation, an Arcanist who has spent his Mana on Arcane Bolt, a Berserker out of Rage before Gut Rip.<br><b>Builds with:</b> whichever ally is the run's engine — it is a different ability in every build.</td></tr>
 <tr><td><b>Shared Grief</b></td><td>20 Mana, 2.0, 4cd, self</td><td>She loses <b>25% of her maximum health</b> and gains <b>4 Mercy</b>. It can never take her below 1.</td><td>Martyrdom as an economy. Mercy arrives when somebody crosses below half health, so until now the only way to fill her meter was to let the heroes be hurt; this is her buying a stack with her own blood, on turn one, at a moment she chooses.<br><b>Builds with:</b> <b>Divine Plea</b> (2 Mercy) and Empower, which it pays for on turn one.</td></tr>
 <tr><td><b>Reprisal</b></td><td>25 Mana, 2.5, 3cd, one enemy, 6 BD</td><td>Holy damage equal to <b>50% of the healing she has LANDED in the last two turns on the turn order</b> (Perfect: 75%). <b>Overhealing is not healing</b> — only what actually closed a wound counts. Offered only once she has healed something.</td><td>Her healing becomes a weapon — her only offence, and the answer to the turn where nobody is hurt.<br><b>Builds with:</b> everything that raises her throughput, which feeds the same two-turn window this reads.</td></tr>
 <tr><td><b>Divine Presence</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For 4 turns she gains <b>2 Mercy at the start of every SECOND turn of hers on which no hero fell below the window</b> — so it fires twice, for 4 Mercy. A fall pays the passive instead and breaks that watch — and only that one. Two stacks arriving together <b>can cross the cap from below</b>, and the spare one spills into <b>Alms</b>.</td><td>Mercy on her own terms. Her meter is fuelled by the heroes being hurt, so she can play perfectly and be starved; this pays her on exactly the turns the passive did not. <b>The two sources are mutually exclusive by construction</b>, which is why it can never simply be better than waiting.<br><b>Builds with:</b> <b>Alms</b>: beside it this is the whole answer to the meter's two edges — and the first pair of her own draft cards that feed each other.</td></tr>
@@ -2010,7 +2016,7 @@ is lengthened by 2, which the window does not double), and <b>Firestorm</b>'s 6�
 <tr><td><b>Vow of Suffering</b></td><td>20 Mana, 1.0, 3cd, one hero</td><td>For 4 turns, half the damage that hero takes is redirected to the Devout — and every share he eats kindles that hero 1 Faith. The half he carries is the attacker's damage on him: the recap books it to the attacker, Penance's mirror pays on it, and an Oathkeeper's bond shares it.</td><td>Mitigation by relocation. Divine Shield absorbs a capped amount; this has no cap.</td></tr>
 <tr><td><b>Aegis Reversal</b></td><td>30 Mana, 2.5, 4cd, one hero</td><td>Consumes that hero's Divine Shield; their next attack deals bonus damage worth half again whatever the shield had left.</td><td>Unspent protection becomes offence — and it is the Devout dealing damage without attacking.</td></tr>
 <tr><td><b>Ordination</b></td><td>25 Mana, 2.0, 4cd</td><td>Grants <b>4 Faith</b> to the other hero holding the <b>LEAST</b> Faith. Not player-chosen: it always finds the floor.</td><td>Starting the engine without waiting to be hit. Every other Faith source he owns but Elevation is reactive (an absorb) or slow (the ground's drip).<br><b>The grant carries its target toward the release</b>.<br><b>Builds with:</b> <b>Reliquary</b> below, which cashes the peaks this raises.</td></tr>
-<tr><td><b>Fortified Spirit</b></td><td>25 Mana, 2.0, 4cd, one ally</td><td>That ally's <b>maximum health rises by 30% of the Devout's</b> and they are healed for the same amount (Perfect: 40%). The loan then <b>decays by a tenth of his maximum at the start of each of their turns</b> — 30 → 20 → 10 → gone; a companion takes no turn of its own, so a loan on one never decays. <b>Current health clamps under it</b>, so a hero kept topped up loses real health on the way down while one sitting at half never notices.</td><td>Lending the number his whole kit is built on. Divine Shield absorbs 35% of his maximum — this is the first thing that lends the <i>figure itself</i>, and it stacks with a shield rather than duplicating one: a shield is a bucket that empties, this is a bigger bucket.<br><b>Builds with:</b> the talent tree's <b>More Health</b> (+20% his maximum), which enlarges every point of it.</td></tr>
+<tr><td><b>Fortified Spirit</b></td><td>25 Mana, 2.0, 4cd, one hero</td><td>That hero's <b>maximum health rises by 30% of the Devout's</b> and they are healed for the same amount (Perfect: 40%). The loan then <b>decays by a tenth of his maximum at the start of each of their turns</b> — 30 → 20 → 10 → gone. It offers only the heroes: a companion takes no turn of its own to shed it on. <b>Current health clamps under it</b>, so a hero kept topped up loses real health on the way down while one sitting at half never notices.</td><td>Lending the number his whole kit is built on. Divine Shield absorbs 35% of his maximum — this is the first thing that lends the <i>figure itself</i>, and it stacks with a shield rather than duplicating one: a shield is a bucket that empties, this is a bigger bucket.<br><b>Builds with:</b> the talent tree's <b>More Health</b> (+20% his maximum), which enlarges every point of it.</td></tr>
 <tr><td><b>Reliquary</b></td><td>30 Mana, 2.5, 5cd, all allies</td><td>Every ally is healed for <b>2.5% of the Devout's maximum health per point of their PEAK Faith</b> this battle (Perfect: 3.5%). No release lowers the peak, so <b>an ally who released down to zero is still paid in full</b> for what they carried.</td><td>Cashing an accumulation nothing else reads. It grows all fight and pays most to whoever has <i>carried</i> the most faith — investment collecting on its own record.<br><b>Builds with:</b> the talent tree's <b>More Health</b> and Conviction's own growth enlarge every point; <b>Ordination</b> above raises the very peaks it reads.</td></tr>
 <tr><td><b>Elevation</b></td><td>35 Mana, 2.5, 5cd, all heroes</td><td><b>Every hero gains 2 stacks of Faith</b>, visible on the bar. <b>Any hero but the Devout who reaches the cap with it RELEASES on the spot</b> — healed 15% of their maximum, the count reset, the Devout paid 3% of his Mana. Their <b>peak is untouched by the release</b>, so it costs them nothing they were holding.</td><td>Both of his builders are slow drips — 2 a shielded hit, 1 an ally turn on the ground — and nothing in the game let him hand a stack over. This is a whole roster's worth at once.<br><b>Builds with:</b> <b>Reliquary</b>, which reads the peaks these stacks ratchet on their way up.</td></tr>
 <tr><td><b>Blessing of the Faithful</b></td><td>20 Mana, 2.0, 4cd, self</td><td>Spends <b>ALL of his own Faith</b> for <b>6% of his maximum health and 3% of maximum Mana per stack</b> (Perfect: 8%). <b>Needs 3 held.</b> His <b>PEAK DROPS TO MATCH</b>: the mitigation and damage those stacks were buying for the rest of the fight are spent with them.</td><td>The payout that does not exist for him. An ally reaching the threshold is healed and hands him Mana; his own count holds there and never releases, so his Faith pools. <b>Needing 3 held is under half of what his count holds at the threshold</b>, so the card is castable long before his meter is full — and only by him, since an ally releases the moment they reach the threshold. This is what finally spends it — <b>burst sustain bought with permanent mitigation</b>, rather than a payout that costs nothing.<br><b>It is not a release and must never become one</b> — no principal growth.<br><b>Builds with:</b> <b>Consecrated Ground</b>'s drip onto its own caster, and the talent tree's <b>More Health</b>, which makes every point of the heal larger.</td></tr>
@@ -2069,7 +2075,7 @@ binds exactly as often as it did before the conversion.<br><b>Builds with:</b> e
 <tr><td colspan="4"><b>Class-wide — CLERIC</b> (all three specs) — <i>three support-shaped spines with enormous conditional power; the plain heal, the heal for every hero and the cleanse are every Cleric's class kit (&sect;5.2), so these are the rest</i></td></tr>
 <tr><td><b>Chastise</b></td><td>15 Mana, 2.0, 2cd, one enemy</td><td><b>25% of Attack</b> as holy damage and <b>20 Break damage</b> (Perfect: 25 BD).</td><td>Something to do with a turn. All three Clerics have turns where nobody needs healing and their engine is not ready.</td></tr>
 <tr><td><b>Exhortation</b></td><td>25 Mana, 1.0, 4cd, every hero</td><td><b>Every hero's next attack deals 35% more damage</b>. <b>Banked, not timed</b> — it waits for each hero's next swing rather than expiring on a turn count.</td><td>The only class-wide offensive group buff a Cleric has.</td></tr>
-<tr><td><b>Undying Vigil</b></td><td>25 Mana, 1.0, 4cd, one ally</td><td>For 4 turns, whenever that ally is healed <b>by any source</b>, a second hero on lower health is healed for half as much. Laid on a companion it does nothing.</td><td>Making one heal into two. It is the one class ability that gets <i>better</i> the more spec-specific the build is — a deliberate inversion of the unconditional-floor role the other two play.</td></tr>
+<tr><td><b>Undying Vigil</b></td><td>25 Mana, 1.0, 4cd, one hero</td><td>For 4 turns, whenever that hero is healed <b>by any source</b>, a second hero on lower health is healed for half as much. It offers only the heroes: the fork is wired on the four.</td><td>Making one heal into two. It is the one class ability that gets <i>better</i> the more spec-specific the build is — a deliberate inversion of the unconditional-floor role the other two play.</td></tr>
 <tr><td colspan="4"><b>Class-wide &mdash; HUNTER</b> (all three specs) &mdash; <i>three spines that are all conditional, in a class with one unconditional self-heal and the thinnest defensive kit in the game</i></td></tr>
 <tr><td><b>Field Dressing</b></td><td>20 Mana, 2.0, 3cd, self</td><td>Heals <b>18% of maximum health</b> (Perfect: 24%) and removes <b>one</b> harmful effect.</td><td>The only <b>unconditional</b> self-heal a Hunter can get, and <b>Batch DS corrected this sentence rather than leaving it to rot</b>: it read &quot;the only self-heal a Hunter can get&quot; from BR until DS, and that was already false when it was written &mdash; <b>Harvest heals</b>, and it sits in the Survivalist's boss pool. DS's <b>Salve</b> is a second. <b>The tree half of the claim is true and is kept</b>: nothing in the talent tree heals unconditionally (Breaking Heals a Hero pays only for Break dealt, and Cleanse Debuffs Each Turn <i>cleanses</i>), so this really is the only one that needs nothing set up.</td></tr>
 <tr><td><b>Camouflage</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For 3 turns enemies are <b>70% less likely to aim at him</b>.</td><td>Buying time rather than absorbing damage — the defensive shape the class does not have.</td></tr>
@@ -2734,8 +2740,8 @@ node is exclusive, so a cell bought is a cell worn</b> — there is no separate 
 every cell a class owns is on every hero of that class, every run.</p>
 <p><b>HERO AND ALLY ARE NOT INTERCHANGEABLE ON A CARD, AND AS OF BATCH DL THEY ARE THE ONLY
 TWO WORDS.</b> A <b>HERO</b> is one of your four. An <b>ALLY</b> is a hero or a
-Hunter's companion. <b>THERE IS NO THIRD WORD</b>: where a card says <i>everyone</i> (Aegis Wall, Hunter's
-Mark), its reach is still written as hero or ally, because a vaguer word reads as EITHER — and that ambiguity is exactly what let
+Hunter's companion. <b>THERE IS NO THIRD WORD</b>: no card says <i>everyone</i> &mdash; Aegis Wall answers for the heroes and
+Hunter's Mark for every ally &mdash; because a vaguer word reads as EITHER, and that ambiguity is exactly what let
 one card promise a shed to everyone standing and pay only the four, for the life of the
 project.</p>
 <p><b>The tree keeps that line.</b> <i>Cleanse Debuffs Each Turn</i> washes <b>allies</b>, so
@@ -2903,7 +2909,7 @@ behind. A full holding refuses an unequip until there is room, and a swap &mdash
 once: its effect reaches all four in every fight. There is one crest slot. <b>FOUR CREST RUNES EXIST.
 <i>Tithe</i></b>: a hero's attack that lands Break heals the hero furthest from full, for 30% of it &mdash; the hero
 standing lowest by share of maximum health. It reads the
-Break an ordinary attack applies as it lands &mdash; into an enemy already Broken it applies none and the heal falls to its 1-health floor, and nothing for Break dealt by a
+Break an ordinary attack applies as it lands &mdash; an attack that lands none (into an enemy already Broken, under Deadened, or a blow its Constitution rounds away) heals nobody, and nothing for Break dealt by a
 card's own effect, a trap, a companion, a talent's proc or the Long Watch's carry &mdash; and it is added to the talent
 tree's <i>Breaking Heals a Hero</i> for a hero who wears both. <b><i>Empty Pulpit</i></b>: while no Cleric stands, every
 hero takes 50% less strike damage. <b><i>Dead Air</i></b>: while no Mage stands, every hero deals 75% more strike
@@ -3568,7 +3574,7 @@ offered &mdash; Hunt on a clean enemy strikes for its floor and its Break damage
 attack movement (units with real locomotion art — the Berserker — <b>walk</b> to melee range
 and back with their walk animation, facing their direction of travel; everyone else does the
 short lunge), Break hitstop + fracture flash + camera punch, per-event SFX (bow users —
-the Hunter and Orc Archers — get dedicated attack and impact sounds; the rest is
+the Hunter and Orc Archers — get dedicated attack, impact and blocked sounds; the rest is
 placeholder procedural audio), and hover highlighting (outline shader + lit nameplate)
 linking the initiative bar, the plates, and the field.</li>
 <li><b>Music:</b> menu track (main menu, draft, settings, relics, and spec choice — roster
@@ -3619,7 +3625,7 @@ offer's Buy button can be reached however long its rule;
 reached as a Trade node on the map, or after an elite or mini-boss whose bargain paid "a merchant follows the fight" (§3a). A consumable already at its stack cap
 (6; 4 for the Cleansing Draught, 2 for the Cursed Visage and the Resonating Hourglass) greys its own button rather than taking the gold. <b>It sells no ability draft</b> (Batch FD
 §1); below the supplies stands the rune sale.</li>
-<li><b>Offer screen:</b> three bargain cards before every elite and mini-boss (§3a) — severity
+<li><b>Offer screen:</b> three bargain cards before every elite and every mini-boss but Ruin's (§3a) — severity
 number, a five-pip severity bar, the modifier's name and effect, and what it pays on victory.
 The heroes' HP and the warband being faced are both on screen, because choosing a
 severity-4 bargain at 30% health should be an informed decision.</li>
@@ -3646,7 +3652,7 @@ can produce is retired, not annotated:</b> it keeps its <code>id</code> and its 
 <code>retired</code> string saying what is lost, and the panel neither lists it nor links to it.</p>
 <p><b>Coverage — seven categories:</b> <b>Combat flow</b> (the initiative timeline and what
 delay does, the skill check, Pressure &amp; Break, crit / miss / parry, the fallen returning
-at 20%), <b>Statuses</b> (every debuff the battle code can apply but Slow Burn, Heads Down, Unmaking, Breaking Darkness, Penance, Suffering and Blighted, plus Quick Draw),
+at 20%), <b>Statuses</b> (every debuff the battle code can apply, each under its chip's own id, plus Quick Draw),
 <b>Damage types</b> (all seven schools and how resists and vulnerabilities read),
 <b>Resources</b> (Rage and Mana, plus every spec resource: Resonance, Mercy, Empower, Faith,
 Focus, Loyalty, Ruin), <b>Progression</b> (the talent tree's three tiers and their two gates,
@@ -3680,7 +3686,7 @@ turn and can only lessen the blow; the other two:</p>
 encounters, three zones of sixteen and then the end boss; a zone is a MAP and not a road,
 up to three ways forward converging on the mini-boss in the middle and the boss at the
 end; stepping down a row closes the corridor above you; what an elite, the smith, the
-Peddler and ??? each are; the three bargains before every elite and mini-boss; winning
+Peddler and ??? each are; the three bargains before every elite and every mini-boss but Ruin's; winning
 any fight heals 15% and there is no resting; death ends the run, but a felled boss leaves a
 relic behind forever. <b>Of the picks it names only the elite's draft pick</b> — the picks are taught by the offer
 overlay that hands them over.</li>

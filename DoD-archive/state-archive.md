@@ -17,6 +17,78 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT IR — 2026-10-22, FROM `docs/state.md` AS IQ LEFT IT (`11ef9fa`)
+
+**What came here**: IQ's seven rulings, every one answered in IR's brief; FOUND AT IQ's nine items IR closed — the Ruin mini-boss's
+fixed modifier (§1a), a save's pre-rename card names and the latent payload half (§2; the field half found live and carried as IR's
+ruling 4), the choose-three miss (§1g), Fortified Spirit and Undying Vigil (§1b), the two *everyone* cards (§1c), Tithe's floor
+(§1d), the block sound (§1f) and the seven statuses (§1e); and the roadmap's IR line, superseded by IR's brief (the claims stay the
+last batch). Everything else in the live file stayed.
+
+
+### ~~IQ's RULINGS OWED~~ — **ALL SEVEN ANSWERED IN IR's BRIEF (§0.1–§0.7): THE SECOND RUN CARRIED (1); THE INDEX A PILOT, ON `docs/state.md` ALONE, IS's (2); THE CLASS REFUSAL CONFIRMED (3); THE RENAME MAP BUILT AT IR §2 (4); ALL SEVEN CODE FINDINGS CHANGED AT IR §1 (5); THE HISTORY STRIP RULED, IS's (6); THE EIGHTY CONSTANTS A LATER BATCH's (7)**
+
+Full working: `docs/reports/IQ.md`, NEEDS A RULING.
+
+1. **A SECOND RUN, WITH A DIFFERENT PARTY** (carried from IP's ruling 1, IQ's brief §0.1). The readout's clean file is md5-identical at
+   IQ's open and close — the run has not been played on — every figure in THE FIRST CLEAN PLAYTHROUGH (below) is one run and one party.
+2. **THE BLOCK INDEX, PRICED ON BOTH FILES (IQ §3).** A core read whole, a 250-B index row for every other block, each batch opening
+   what it needs: **`CLAUDE.md` read at about 245 KiB of 472 — 48% less (HV found 38%)**, **this file at about 85 KiB of HEAD's 361 —
+   77% less** — and on IQ's own, cut file about 80 KiB of 278, 71% less. Over twenty batches the union of what they needed is 82% of `CLAUDE.md`, so the saving is per batch and the
+   index must route each batch to its own few; a batch on a wrong premise because it did not open a block is not measurable before
+   it happens. **Building it re-points 144 pins in 42 gates (`CLAUDE.md`) and 7 in 4 (this file), and its rows are written by hand.**
+   Build it for both files, for one, a pilot first (HV §3f's), or not.
+3. **A SAVE THAT NAMES A CLASS THIS BUILD DOES NOT HAVE IS REFUSED AND CLEARED (IQ §4b)** — the floor's path, chosen by IQ: a hero
+   cannot be dropped from a party and a class cannot be invented, and two reads of an unknown class default to the Cleric. The
+   alternative is HL's newer-save shape, refused and KEPT. No class has ever been removed, so no save has met it. Confirm, or keep it.
+4. **A CARD A SAVE NAMES BY ITS OLD NAME (FOUND AT IQ).** CK renamed the Warrior's Iron Will to Ironclad and GN Magic Barrier to Nexus
+   Ward, both after the v10 floor, so a save from before either can carry the old name: it holds a slot, shows as a blank takeable
+   button in a queued offer, or carries an upgrade that never lands. **Nothing crashes**; the narrowest repair is a rename map at the
+   load door. Build it, or leave it.
+5. **SEVEN PLACES `master.html` DESCRIBED A GAME THE CODE DOES NOT PLAY, WHERE THE CODE LOOKS LIKE THE THING THAT IS WRONG (FOUND AT
+   IQ)**: the Ruin mini-boss's fixed modifier, overwritten by the bargain taken; Fortified Spirit and Undying Vigil, which the picker
+   lets fall on a companion, where the loan never decays and the fork never fires; two cards that say *everyone* (Aegis Wall, Hunter's
+   Mark); Tithe healing 1 for an attack into a Broken enemy that lands no Break; a block sound loaded and never played; and seven
+   statuses the glossary has no entry for. **Each sentence now says what the code does**; which of them the code should change is yours.
+6. **185 OF `master.html`'s 871 UNITS CARRY A HISTORY OR RATIONALE CLAUSE, AND IT NAMES A BATCH 117 TIMES** (the stamp aside) — batch
+   provenance, *was / now* and *since* notes and dated measurements, against the rule that it shows only what is in the game (the user
+   rule of 07-20). IQ repaired what was false and stripped a clause only where it stood inside a repair; stripping the rest is one pass
+   of its own. Strip them, or leave them.
+7. **ABOUT 80 OF THE CATALOGUE's BEHAVIOUR FIGURES HAVE NO DOOR**: window lengths, Perfect figures and rates written as literals in
+   their handlers (`aw_turns := 4`, Blood Offering's 0.20 and 60, Second Wind's 0.40 and 0.55, …). `check_iq` §2 holds every figure
+   that has a door; these need a named constant first — a code batch, and a census of its own.
+
+### FOUND AT IQ AND NOT FIXED — ITS CLOSED ITEMS (archived at IR; the section stays in `docs/state.md`)
+
+- **THE RUIN MINI-BOSS NEVER FIGHTS ITS FIXED MODIFIER.** In play `map_screen` arms one (`Run.arm_fixed_modifier`, the severity 3–4
+  band) before the bargain, and `Run.accept_offer` overwrites `pending_modifier` with the bargain taken; the sim takes the bargain
+  first and the arm's *never stack two* guard skips it. Either way a Ruin mini-boss fights the bargain alone, where `CLAUDE.md`'s
+  ladder block names it among the fixed encounters that carry a modifier with no reward. `master.html` now says what the code does;
+  which is meant is IQ's ruling 5.
+- **A CARD A SAVE NAMES BY ITS PRE-RENAME NAME** (Iron Will, Magic Barrier): four reads take it straight — `map_screen._offer_card`'s
+  queued offer, the slot count, `Run.apply_upgrades` and `Run.upgrade_choice` — and none crashes. IQ's ruling 4.
+- **LATENT, AND WRONG, NOT A CRASH**: a saved stat payload naming a unit field since renamed pays nothing (`set()` drops it), and a
+  payload naming a card since renamed adds nothing (IQ §4b's census).
+- **A CHOOSE-THREE CARD ROLLS ITS MISS TWICE.** `_resolve`'s single-target miss guard excludes `choose_two` and not `choose_three`, so
+  Cleave and Hex of Ruin roll a whole-cast miss on their first target and then a miss per strike (`master.html`'s miss line now says
+  what a player meets: chosen-target attacks roll per strike).
+- **FORTIFIED SPIRIT AND UNDYING VIGIL TAKE A COMPANION AND DO NOTHING ON ONE.** Both pick from `_hero_side()`, companions included,
+  where Covering Guard and Rally narrow the same pool: Fortified Spirit's loan decays at its bearer's turn start, which a companion never
+  takes, so a loan on one never decays; the Vigil's fork is wired on the four heroes only. IQ's ruling 5.
+- **TWO CARDS SAY *EVERYONE*** — Aegis Wall and Hunter's Mark, beside the *hero* or *ally* each also states — against `CLAUDE.md`'s
+  *there is no third word*. IQ's ruling 5.
+- **TITHE HEALS 1 FOR AN ATTACK THAT LANDS NO BREAK** — into a Broken enemy (or under Bulwark, Immovable or Ironclad's cap) the heal falls
+  to its 1-health floor, where its words say an attack that lands Break. IQ's ruling 5.
+- **THE BLOCK SOUND IS LOADED AND NEVER PLAYED** (`bow_blocked`; a block plays the parry's), and a comment still promises it. IQ's ruling 5.
+- **SEVEN STATUSES THE BATTLE APPLIES HAVE NO GLOSSARY ENTRY** — Slow Burn, Heads Down, Unmaking, Breaking Darkness, Penance, Suffering
+  and Blighted — where `master.html`'s glossary section said every debuff had one. IQ's ruling 5.
+
+### THE PLAYTEST'S OTHER FINDINGS — **LATER BATCHES BY RULING (HW's brief §5); THE ROADMAP HOLDS THE ORDER** — ITS CLOSED ITEMS (archived at IR; the section stays in `docs/state.md`)
+
+- **IR — THE CLAIMS**: HX's 87 stand at **86** — the per-batch re-read stops the backlog growing and does not retire it, so it is a
+  batch of its own (FOUND AT HX, FOUND AT IA). **The Cairn's *weight 8* is not one of them and is true** (an event's weight; IL
+  §0.5), so the figure does not fall for it.
+
 ## ARCHIVED AT IQ — 2026-10-19, FROM `docs/state.md` AS IP LEFT IT (`6897d73`)
 
 **What came here**: IP's six rulings, every one answered in IQ's brief; FOUND AT IP, both items — the stored offer guarded at IQ §4, and the brief's 1.55, a premise IP's report settled; the roadmap's two lines IQ ran — the re-measure, scheduled since IC, and IQ's own; and **IQ §1's census cut** — nine whole blocks and 95 closed items, each read against its record before it moved (`docs/reports/IQ-state-census.tsv` names every record), each under its section's heading where the section stays. Eight tables were struck to their conclusion and a pointer in the live file, not moved: each stands in its report. Everything else in the live file stayed.

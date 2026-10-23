@@ -29,94 +29,117 @@ never have fired: **an alarm set above the failure level is not an alarm.** `che
 sentence every battery: over it is a warning, and past it by more than one batch at the record is a failure — the largest
 single-batch growth on record is **+13.38 KiB** (ES's +13,700 B). *In the preamble for the archive pointer's reason.*
 
-*Last rewritten: 2026-10-19 (Batch IQ).*
+*Last rewritten: 2026-10-22 (Batch IR).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: IQ — THE THREE DOCUMENTS, AND ONE CRASH.** IMPLEMENT ONLY. **This file's closed blocks are in the archive,
-  `master.html` is swept against the code, the re-measure is priced on both files, and a save naming something gone no longer
-  takes a screen down.** Full working: **`docs/reports/IQ.md`**. **The next letter is IR** (the roadmap, below).
-- **THE DESIGNER's FILES, READ AND UNTOUCHED.** The readout holds what it held at IP: IH's debug-touched first file and the clean
-  one, `readout/run-20261018-194229.jsonl`, which `latest.txt` names — 24,340 B, md5 `610bcd8c2b43f97703e63053e86728fa` at IQ's
-  open and at its close, **still the one run, zone one through its boss: it has not grown, and no newer file has appeared**.
-  `run_save.bin` (55,264 B) still holds that run at zone two's start — v15, and **no key in it names anything gone** (§4 read it, a
-  copy in a lane). Both backed up with the player's files (`../save-backups/IQ-20261019-143844`). **A second run with a different
-  party is still asked for** (IQ's ruling 1).
-- **§1 — THIS FILE's CENSUS: 130 OF 141 BLOCKS BIND, 92.5% OF IT BY BYTES** (II's shape: four readers, one rubric, a frozen copy, each
-  reader's bytes matching its slice). **The cut, every record read first (IJ §0.2)**: nine whole blocks and 95 closed items moved word
-  for word to `DoD-archive/state-archive.md` (IQ's cut at its top), eight tables struck to their conclusion and a pointer (IM §0.7);
-  two CLOSED verdicts overruled and kept — `BOND_MITIGATION_MAX` (a do-not-re-propose ruling no rule file holds) and THE SUITE REDS
-  (two practices no rule file holds). **370,043 → 279,425 B before IQ wrote a line.** The census is kept: `docs/reports/IQ-state-census.tsv`.
-- **§2 — `master.html` SWEPT, FACT BY FACT (IJ's rubric, eight readers)**: 871 units, 5,157 facts —
-  4,949 agree, 171 disagree, 37 unread. **Every disagreement re-verified at its line and repaired, the words moved to
-  the code** — 178 edits, 8 of them unread facts settled false — one finding rejected as true, and **7 where the code looks wrong**:
-  each sentence now says what the code does, and the question is FOUND AT IQ. **The figures with a door are held**: `check_iq` §2 reads
-  every card's price in the draft catalogue and in the class sections' statlines, the bargain deck, the rewards and the ladder
-  against the code, 695 figures. Kept: `docs/reports/IQ-master-census.tsv`.
-- **§3 — THE RE-MEASURE, PRICED, NOT BUILT.** HV §3b's census over HW–IP, both files: a core read whole, a 250-B index row for every
-  other block, each batch opening what it needs. **`CLAUDE.md`: a batch reads about 245 KiB of 472 — 48% less, where HV found 38%**;
-  **this file: about 85 KiB of HEAD's 361, 77% less** (and on IQ's own cut file about 80 KiB of 278, 71% less). Building it re-points 144 pins in 42 gates for `CLAUDE.md`
-  and 7 in 4 for this file. **IQ's ruling 2.**
-- **§4 — THE STALE OFFER, GUARDED (the designer's).** `Run.load_run` drops an offered modifier the deck does not hold, and an offer
-  left empty whole; no die, no re-roll; the draw site reads the deck straight on purpose. **The family, censused: 167 reads of save
-  data through a data table, 133 guarded, 34 not — 22 would crash, 9 would be wrong, 3 harmless.** Every crasher, and the event
-  that strands a run, is guarded at the load door; a class this build lacks refuses the save down the floor's path (IQ's ruling 3);
-  the reachable WRONG four — a card a save names by its pre-rename name — are FOUND AT IQ (IQ's ruling 4).
-- **§7 — THE LANE DRIVER.** `lane.sh` reads the live name off HEAD's `project.godot` and refuses a copy that runs as it, the
-  repository, and a copy with no name — **IP's slip, as a check**, about 20 ms a launch. Every Godot process IQ ran in a lane went
-  through it.
-- **§0 — THE RULINGS RECORDED**: *no third block* and *a tie that matters is a tie at a cut* (`docs/instrument-rules.md`, beside
-  the tie rule), the Warden target (THE BARGAIN DECK's GRADES), *a key that comes off a save is a key the code did not choose*
-  (`CLAUDE.md`'s FD §1 block), and two instrument rules with their rows — the guard's two arms and the lane's name.
-- **THE INSTRUMENTS.** `check_iq` is new (§0, §1, §2, §4, §4b, §7, §9). Re-pointed: `check_ip` §7's top arm (*IP's own or a later
-  batch's*) and its §0.2, which read the newest entry of `docs/design-notes.md` — a position pick, IQ's entry on top now — and reads IP's by its title. The gate-source readers read `check_iq`'s final source before the acceptance (twenty-eight by `check_ij` §0.4's derivation, `check_iq` among them only because its §7 hands the root's path to the driver — it reads no gate's source).
-- **THE VERIFICATION** — `docs/reports/IQ.md` §9.
-- **`CLAUDE.md` IS 485,156 B = 473.79 KiB AGAINST ITS 510 KiB CEILING — 36.21 KiB UNDER** (+1,562 B at IQ): 4.5
-  batches at EZ's record (8,293 B), 19.6 at the mean of IM–IQ (1,890 B).
-- **`docs/state.md` IS 284,849 B = 278.17 KiB AGAINST ITS 380 KiB CEILING — 101.83 KiB UNDER** (−85,194 B at IQ,
-  this line included; the census's cut −90,618, IQ's own writing +5,424): 17.8 batches at IA's +5,860 B, the worst case; the
-  honest rate, IQ's own writing beside IM–IP's — IM −4,046, IN +1,476, IO +1,714, IP +5,787 and IQ's own +5,424, a mean of 2,071 B over the five — **50.3 batches at it**. **The cut bought the room the
-  practice was meant to keep**: at IP's close this file was 18.63 KiB under.
-- **No save version moved**: every guard reads what v15 carries and writes nothing an older build would lose.
+- **Last batch: IR — THE SEVEN THE CENSUS FOUND IN THE CODE, AND THE RENAME MAP.** IMPLEMENT ONLY. **Every one of IQ's seven
+  code findings is changed in the code, each family censused before its two were fixed, and a card a save names by an old name
+  is read by today's.** Full working: **`docs/reports/IR.md`**. **The next letter is IS** (the roadmap, below).
+- **THE DESIGNER's FILES, READ AND UNTOUCHED.** The readout holds what it held at IQ: IH's debug-touched first file and the clean
+  one, `readout/run-20261018-194229.jsonl`, which `latest.txt` names — 24,340 B, md5 `610bcd8c2b43f97703e63053e86728fa` at IR's
+  open and at its close, **still the one run, zone one through its boss: it has not grown**. `run_save.bin` (55,264 B, md5
+  `fcb20c91…`) still holds that run at zone two's start. Both backed up with the player's files (`../save-backups/IR-20261022-151943`).
+  **A second run with a different party is still asked for** (IR's ruling 1).
+- **§1a — A NODE THAT ARMS A FIXED MODIFIER OFFERS NO BARGAIN (the designer's).** `Run.offers_bargain` and `Run.arms_fixed_modifier`
+  are the one question the map's press, the sim and `resume_scene` ask; the mini-boss is the one node in both lists, and only on
+  Ruin. **Ruin's mini-boss walks straight into its fight under a modifier of the fixed band, no offer and no reward** — driven
+  through the real map, which nothing had done. **What it costs the player: one offer a mini-boss reached — 3.0 a Ruin run at the
+  default party** (11.3 → 8.3 bargains, `--run 40` on each tree). The map's hover, the first run's framing card and the glossary's
+  bargain and ladder entries say so; the framing card is placed by its own height now — its one button stood below the screen.
+- **§1b — A CARD WHOSE WORDS SAY *HERO* OFFERS ONLY THE HEROES.** The family, censused before its two were fixed: twenty ally-target
+  cards — **ten say hero** (the brief's two, Rally, six more whose pick took a companion and gave it nothing, and Recant, whose *ally*
+  refilled a bar no companion carries and says *hero* now), nine say ally, and Resurrection asks the fallen. `battle._ally_pick_pool`
+  is the one answer the picker, the recast refusal and two buttons ask; the bot already aimed every one at a hero. Mantle's pick
+  names nobody (IR's ruling 2).
+- **§1c — NO CARD SAYS *EVERYONE***: Aegis Wall answers for *the heroes* (its heal walks the four) and Hunter's Mark for *every ally*
+  (a companion's blow reads it); its chip and its battle line with it.
+- **§1d — A FLOOR PAYS ONLY WHEN WHAT IT IS A SHARE OF IS THERE.** Tithe heals nothing for an attack that lands no Break — on an enemy
+  that is a Broken body, Deadened, or a blow its Constitution rounds away; Bulwark, Immovable and Ironclad's cap are heroes' and never
+  reach it. **Measured on HEAD: 29.9% of Tithe's blows landed no Break, and each healed 1.** The family: 323 literal floors, two of the
+  shape — Tithe, and Sacred Resolve's split, which billed every bound hero 1 for a blow parried outright; both fixed.
+- **§1e — EVERY AFFLICTION HAS ITS GLOSSARY LINE AT THE CHIP's DOOR**: the seven written (the glossary is 109), Frostbind's entry moved
+  to the id its chip reads (`status_frostbind`, the eighth the population found), and `check_ir` §1e reads all of `DEBUFF_IDS` through
+  `Glossary.status_short`, so the next status written without one reds.
+- **§1f — A BOW USER's BLOCKED SHOT PLAYS `bow_blocked`**, the sample its comment promised (one `_sfx` call either way; no die moves).
+- **§1g — `choose_three` IS IN THE SINGLE-TARGET MISS GUARD**: the targeting kinds are `Ability`'s own fields — `aoe`, `multi_hits`,
+  `random_hits`, `choose_two`, `choose_three` — and every one is named; no fourth waits (the Cold Snap's widening and Kill Command's
+  Aguila pair are not kinds).
+- **§2 — THE RENAME MAP, AT THE LOAD DOOR (the designer's).** Five rows — CK's Iron Will, GN's Magic Barrier and CG's Matins, Jubilee and
+  Anathema — derived from `classes.gd`'s history, where the brief named two; every card name a save carries is read by today's, and a
+  name that was never a card is kept as saved and said out loud. **Append-only: a rename that crosses the save floor adds its row in
+  the batch that renames** (`CLAUDE.md`'s FD §1 block).
+- **§0 — THE RULINGS RECORDED**: the index pilot is IS's, on this file alone, with its four conditions (below); the class refusal
+  confirmed; the history strip ruled and IS's (`CLAUDE.md`'s working agreement); the eighty constants a later batch's; and the close
+  note beside the lane rule (`docs/instrument-rules.md`).
+- **THE INSTRUMENTS.** `check_ir` is new (§0, §1a–§1g, §2, §9). Re-pointed: `check_ij` §2e and §3, `check_hp` §4, `test_batch_bp` §4 and
+  `test_batch_br` §6 (each pinned a line IR moved), `test_batch_ce`'s glossary count (102 → 109) and `test_batch_cb`'s bond entry
+  (`status_frostbind`). The gate-source readers read `check_ir`'s final source before the acceptance.
+- **THE VERIFICATION** — `docs/reports/IR.md` §9.
+- **THE CLAIMS, COUNTED: 87 STAND, NOT 88** — HX's 87 less IA §5's and one HY §4 made true by moving the HG blocks (CR01, uncounted
+  until IR), plus IQ's two. Not repaired; the claims are the last batch (the roadmap).
+- **`CLAUDE.md` IS 488,879 B = 477.42 KiB AGAINST ITS 510 KiB CEILING — 32.58 KiB UNDER** (+3,723 B at IR): 4.0
+  batches at EZ's record (8,293 B), 14.3 at the mean of IN–IR (2,340 B).
+- **`docs/state.md` IS 286,737 B = 280.02 KiB AGAINST ITS 380 KiB CEILING — 99.98 KiB UNDER** (+1,888 B at IR, this line
+  included: IR's own writing +8,273, the archive's cut −6,385): 12.4 batches at IR's own writing, now the worst case
+  (IA's +5,860 B was, until IR); 22.6 at the honest rate (4,535 B, the mean of IN–IR's own writing).
+- **No save version moved**: the rename map reads names v15 already carries and writes nothing an older build would lose.
 - **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in a build
   older than HL**: HL's ceiling refuses a newer save from HL's build on — HR's v15 is the first bump it has guarded — and HJ's and
   HK's builds, and `main`, carry no ceiling.
-- **Next letter: IR — the claims** (the roadmap, below): HX's 87, standing at 86.
+- **Next letter: IS — the index pilot on this file, and `master.html`'s history strip** (the roadmap, below).
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### IQ's RULINGS OWED — **SEVEN; THE SECOND DECIDES THE SHAPE OF BOTH FILES, AND THE FIFTH TO SEVENTH ARE `master.html`'s**
+### IR's RULINGS OWED — **SIX; THE FIRST IS CARRIED, THE NEXT FOUR ARE WHAT IR's CENSUSES FOUND BESIDE THE SEVEN, AND THE LAST IS A REPAIR TO CONFIRM**
 
-Full working: `docs/reports/IQ.md`, NEEDS A RULING.
+Full working: `docs/reports/IR.md`, NEEDS A RULING.
 
-1. **A SECOND RUN, WITH A DIFFERENT PARTY** (carried from IP's ruling 1, IQ's brief §0.1). The readout's clean file is md5-identical at
-   IQ's open and close — the run has not been played on — every figure in THE FIRST CLEAN PLAYTHROUGH (below) is one run and one party.
-2. **THE BLOCK INDEX, PRICED ON BOTH FILES (IQ §3).** A core read whole, a 250-B index row for every other block, each batch opening
-   what it needs: **`CLAUDE.md` read at about 245 KiB of 472 — 48% less (HV found 38%)**, **this file at about 85 KiB of HEAD's 361 —
-   77% less** — and on IQ's own, cut file about 80 KiB of 278, 71% less. Over twenty batches the union of what they needed is 82% of `CLAUDE.md`, so the saving is per batch and the
-   index must route each batch to its own few; a batch on a wrong premise because it did not open a block is not measurable before
-   it happens. **Building it re-points 144 pins in 42 gates (`CLAUDE.md`) and 7 in 4 (this file), and its rows are written by hand.**
-   Build it for both files, for one, a pilot first (HV §3f's), or not.
-3. **A SAVE THAT NAMES A CLASS THIS BUILD DOES NOT HAVE IS REFUSED AND CLEARED (IQ §4b)** — the floor's path, chosen by IQ: a hero
-   cannot be dropped from a party and a class cannot be invented, and two reads of an unknown class default to the Cleric. The
-   alternative is HL's newer-save shape, refused and KEPT. No class has ever been removed, so no save has met it. Confirm, or keep it.
-4. **A CARD A SAVE NAMES BY ITS OLD NAME (FOUND AT IQ).** CK renamed the Warrior's Iron Will to Ironclad and GN Magic Barrier to Nexus
-   Ward, both after the v10 floor, so a save from before either can carry the old name: it holds a slot, shows as a blank takeable
-   button in a queued offer, or carries an upgrade that never lands. **Nothing crashes**; the narrowest repair is a rename map at the
-   load door. Build it, or leave it.
-5. **SEVEN PLACES `master.html` DESCRIBED A GAME THE CODE DOES NOT PLAY, WHERE THE CODE LOOKS LIKE THE THING THAT IS WRONG (FOUND AT
-   IQ)**: the Ruin mini-boss's fixed modifier, overwritten by the bargain taken; Fortified Spirit and Undying Vigil, which the picker
-   lets fall on a companion, where the loan never decays and the fork never fires; two cards that say *everyone* (Aegis Wall, Hunter's
-   Mark); Tithe healing 1 for an attack into a Broken enemy that lands no Break; a block sound loaded and never played; and seven
-   statuses the glossary has no entry for. **Each sentence now says what the code does**; which of them the code should change is yours.
-6. **185 OF `master.html`'s 871 UNITS CARRY A HISTORY OR RATIONALE CLAUSE, AND IT NAMES A BATCH 117 TIMES** (the stamp aside) — batch
-   provenance, *was / now* and *since* notes and dated measurements, against the rule that it shows only what is in the game (the user
-   rule of 07-20). IQ repaired what was false and stripped a clause only where it stood inside a repair; stripping the rest is one pass
-   of its own. Strip them, or leave them.
-7. **ABOUT 80 OF THE CATALOGUE's BEHAVIOUR FIGURES HAVE NO DOOR**: window lengths, Perfect figures and rates written as literals in
-   their handlers (`aw_turns := 4`, Blood Offering's 0.20 and 60, Second Wind's 0.40 and 0.55, …). `check_iq` §2 holds every figure
-   that has a door; these need a named constant first — a code batch, and a census of its own.
+1. **A SECOND RUN, WITH A DIFFERENT PARTY** (carried from IQ's ruling 1, IR's brief §0.1). The readout's clean file is md5-identical at
+   IR's open and close — the run has not been played on — so every figure in THE FIRST CLEAN PLAYTHROUGH (below) is one run and one party.
+2. **MANTLE's PICK NAMES NOBODY** (IR §1b's census). Its words name no target for the first shield — *Lay the mantle: a Divine Shield* —
+   so it stays an ally card: the shield lands on a companion and works. Its pass walks the heroes, and *every one of them builds Faith
+   like the first* is false when a companion held the first (Faith is heroes-only). Keep it an ally card, or narrow it to the heroes.
+3. **A CARD REMOVED SINCE THE SAVE FLOOR HAS NO ROW** (IR §2's census): Flash Freeze (retired at DR) and Observance (deleted at CG, Vespers
+   took its slot) have no name today to be read by, so a save from before either still holds a card the game does not have — a slot
+   taken and a blank button. **It is no longer silent**: the load door keeps it as saved and says so (`push_error`). Drop it at the load,
+   freeing the slot, or keep it loud.
+4. **A SAVED RUNE's PAYLOAD THAT NAMES A RENAMED FIELD** (IQ's latent WRONG, found live at IR §2): Deepening Hex wrote
+   `rune_hex_threshold: 8` from EZ until FO renamed the field `rune_hex_deepen` **and changed what it means** (it installed a threshold of
+   8; it now subtracts 2), so no name map can repair a save from that window — the rune pays nothing there (`set()` drops the field).
+   Rebuild a stale payload from today's data at the load, or keep HR §0's rule that a payload rides the save as it was built.
+5. **SPLIT SHIELD's WORDS SAY *THE ALLY HE SETS IT IN FRONT OF*** and its picker offers the heroes alone (`_split_shield_allies`; a
+   companion makes no Block roll), so the word is *hero* — rune text is yours to change (IR §1b's census, beside the family).
+6. **THE FRAMING CARD's BUTTON STOOD BELOW THE SCREEN** — 660 px tall from y=150 on a 720-px screen, so *Take the road*, the one way
+   past a first run's first map, was drawn at y≈780. IR places the card by its own height (GT §1's rule: make room, shrink nothing).
+   Measured, not seen in play: confirm it on screen.
+
+### THE INDEX PILOT IS IS's — **ON THIS FILE ALONE, NOT `CLAUDE.md` AND NOT YET (IR's brief §0.2, the designer's)**
+
+**WHY A PILOT AT ALL.** IQ §3 priced the block index at 47.4–48.6% off `CLAUDE.md`'s read and 71.2% off this file's: not room but a
+batch's cost — HN's objection, answered — and 833 KiB read against 333 is a different project to work in. **WHY THIS FILE AND NOT
+`CLAUDE.md`**: (1) its build costs 7 pins in 4 targets where `CLAUDE.md`'s costs 144 in 42 gates, a fifth seam file and `check_hx` §1's
+four checks — a pilot that costs 7 answers the question one that costs 144 does; (2) the failure is survivable here and not there — a
+batch that misses a FOUND AT block forty batches old loses a line of context, one that misses a standing rule ships a defect, and
+premise-checking against the rule file whole is this project's main defence; (3) the premise is strongest here — a batch needs a mean
+of 14.4% of this file, and 35.4% of its blocks were needed by no batch in twenty (IQ §3).
+
+**ITS JOB IS TO MEASURE WHAT IQ SAID IS NOT MEASURABLE**: a batch on a wrong premise because it did not open a block. It becomes
+measurable after the fact — every report already says what it quoted, cited and depended on — so a pilot run for a few batches is read
+against what each batch turned out to need.
+
+**THE FOUR CONDITIONS, SET BY THE DESIGNER SO IS HAS THEM:**
+- **Reversible by construction**: the file is loaded whole again by deleting the index's own routing, and nothing leaves the repository.
+- **Every index row carries the triggers that route a batch to it** (HV §3f's 250 B), and **the core keeps every block seven of nine
+  batches needed** — the measurement's own membership, not a judgment.
+- **Each report says which blocks it opened and which it turned out to need** — the pilot's instrument, a paragraph a batch.
+- **`CLAUDE.md` waits**, and can: if the pilot shows batches route correctly it is next; if a batch misses a block, that was learned for 7
+  pins.
+
+**AND IS's SECOND HALF: `master.html`'s HISTORY STRIP (IR's brief §0.6, the designer's)** — 185 units, 117 batch names, one pass of its
+own; a clause carrying reasoning worth keeping MOVES to `docs/design-notes.md` rather than dying. The rule is `CLAUDE.md`'s, in the
+working agreement: *`master.html` says what the game is.*
 
 ### THE FIRST CLEAN PLAYTHROUGH — **2026-10-18, WARDEN, ZONE ONE THROUGH ITS BOSS; SIX FINDINGS, ALL THE DESIGNER's TO RULE OR AUTHOR, NOTHING BUILT FROM THEM (IP §0.1, §4)**
 
@@ -228,46 +251,42 @@ IL's table is `docs/reports/IL.md` §1c and IO's is `docs/reports/IO.md` §3. **
 IS THE DESIGNER's TO RE-RULE (IP §0.1)**: a normal fight booked 18.33 events and 1.17 steps, the boss 51 — THE FIRST CLEAN
 PLAYTHROUGH, above.
 
+### FOUND AT IR AND NOT FIXED
+
+- **THE CLAIMS STAND AT 87, AND THE COUNT CARRIES NOTES FOR THE BATCH THAT REPAIRS THEM** (the recount, `docs/reports/IR-claims-census.md`,
+  one row a claim against today's file and code): **CR04 is false for a new reason** — four of its six named banks are display chips
+  since IG §1 and never touch `update_status`, so *seven* would be as wrong as *six*: its population is re-derived, not re-counted;
+  **CR12's count grew** (five sites store Burn's power since IE §3b); **eleven rows are a batch's measurement in the present tense**
+  (IR03, IR04, IR14–IR20, IR58, IR62), where HY §6's rule may want the past tense rather than a new figure; and two claims have copies
+  outside the references (`baselines.json`'s `check_cm_live` note, IR41; `check_fg.gd`'s header, IR05).
+- **FOUR LATENT FLOOR SHAPES NOTHING WRITES TODAY** (IR §1d's census, `docs/reports/IR-floor-census.md`): Sacred Covenant's Faith floor is
+  gated on the heal field, not the Faith; Slow Acting would lift Thin Blood's zero poison tick back to 1; Sacred Resolve's RECOIL split
+  would bill 1 each if Blowback ever zeroed a recoil; and the temporal rift reads a blow's damage with no zero test. Each pays the floor
+  of a zero the day its field gets a writer.
+- **SACRED RESOLVE's SPLIT ROUNDS A SMALL BLOW UP** — a 1-damage blow on four bound heroes bills 4 in all, each share floored at 1. Not
+  the zero shape (the total is not zero); the designer's if it matters.
+- **THREE FLOORS READ, NOT DRIVEN** (the census's uncertain rows): Shatter's and Winter's Toll's `maxi(hold_turns, 1)` (classed guarded,
+  because every turn adds one before anyone acts); Cull's and Harvest's guard and payout counting two ways around the purge; and
+  Returned Burden re-laying an effect lifted at 0 turns for 1.
+
 ### FOUND AT IQ AND NOT FIXED
 
-- **THE RUIN MINI-BOSS NEVER FIGHTS ITS FIXED MODIFIER.** In play `map_screen` arms one (`Run.arm_fixed_modifier`, the severity 3–4
-  band) before the bargain, and `Run.accept_offer` overwrites `pending_modifier` with the bargain taken; the sim takes the bargain
-  first and the arm's *never stack two* guard skips it. Either way a Ruin mini-boss fights the bargain alone, where `CLAUDE.md`'s
-  ladder block names it among the fixed encounters that carry a modifier with no reward. `master.html` now says what the code does;
-  which is meant is IQ's ruling 5.
-- **A CARD A SAVE NAMES BY ITS PRE-RENAME NAME** (Iron Will, Magic Barrier): four reads take it straight — `map_screen._offer_card`'s
-  queued offer, the slot count, `Run.apply_upgrades` and `Run.upgrade_choice` — and none crashes. IQ's ruling 4.
-- **LATENT, AND WRONG, NOT A CRASH**: a saved stat payload naming a unit field since renamed pays nothing (`set()` drops it), and a
-  payload naming a card since renamed adds nothing (IQ §4b's census).
 - **`CLAUDE.md`'s STARTER-RUNG BLOCK SAYS CLEARING RUNG 1 IS THE ONLY THING THAT OPENS TIER 1** — beating the end boss on any rung opens
   it (`Profile.note_end_boss` sets the tier to the rung beaten, and `Talents.tier_open` opens every tier at or below it), and the
-  draft deals all three rungs with no gate. `master.html`'s copy is repaired; the rule file's is a claim for IR, and `talents.gd`'s
+  draft deals all three rungs with no gate. `master.html`'s copy is repaired; the rule file's is a claim, counted at IR and left for the claims batch, and `talents.gd`'s
   comment at its head repeats it.
 - **THE FORMLESS CHIP SAYS NO RECOIL FOLLOWS, AND ONE DOES** — `battle.gd`'s `formless` status text against the recoil its expiry
   applies: a player-facing sentence the census found beside `master.html`, not repaired here.
-- **A CHOOSE-THREE CARD ROLLS ITS MISS TWICE.** `_resolve`'s single-target miss guard excludes `choose_two` and not `choose_three`, so
-  Cleave and Hex of Ruin roll a whole-cast miss on their first target and then a miss per strike (`master.html`'s miss line now says
-  what a player meets: chosen-target attacks roll per strike).
 - **CODE COMMENTS REPEATING WHAT THE CENSUS FOUND FALSE** — an asserted surface (DF §1), each repaired with its subject: `talents.gd`'s
   head (*rung 1 is the only door*), `run_state.gd`'s *an event pays no gold* and *`pending_event` is not saved*, *35% → 52%* (Honed
   makes 53%), Mark of the Hunt named as an engine-gated boss card, `battle.gd`'s *59* recast-gated abilities (63 refuse), Blood
   Offering's *40* Rage (60), Berserk's *4 on a perfect* and *spends all three* (four charges, always), and *converts depth into width*
   in two places.
 - **`master.html` HOLDS 185 UNITS WITH A HISTORY OR RATIONALE CLAUSE, AND NAMES A BATCH 117 TIMES** (the stamp aside) — IQ's
-  ruling 6. **And its zone-boss heading still reads *a zone-boss award always pays*** inside the history it narrates, while its own
+  ruling 6, **ruled at IR's brief §0.6: stripped, in a pass of its own, IS's** (THE INDEX PILOT IS IS's, above). **And its zone-boss heading still reads *a zone-boss award always pays*** inside the history it narrates, while its own
   paragraph says the chain can empty; the sentence that stated the claim as a fact is repaired.
-- **FORTIFIED SPIRIT AND UNDYING VIGIL TAKE A COMPANION AND DO NOTHING ON ONE.** Both pick from `_hero_side()`, companions included,
-  where Covering Guard and Rally narrow the same pool: Fortified Spirit's loan decays at its bearer's turn start, which a companion never
-  takes, so a loan on one never decays; the Vigil's fork is wired on the four heroes only. IQ's ruling 5.
-- **TWO CARDS SAY *EVERYONE*** — Aegis Wall and Hunter's Mark, beside the *hero* or *ally* each also states — against `CLAUDE.md`'s
-  *there is no third word*. IQ's ruling 5.
-- **TITHE HEALS 1 FOR AN ATTACK THAT LANDS NO BREAK** — into a Broken enemy (or under Bulwark, Immovable or Ironclad's cap) the heal falls
-  to its 1-health floor, where its words say an attack that lands Break. IQ's ruling 5.
-- **THE BLOCK SOUND IS LOADED AND NEVER PLAYED** (`bow_blocked`; a block plays the parry's), and a comment still promises it. IQ's ruling 5.
-- **SEVEN STATUSES THE BATTLE APPLIES HAVE NO GLOSSARY ENTRY** — Slow Burn, Heads Down, Unmaking, Breaking Darkness, Penance, Suffering
-  and Blighted — where `master.html`'s glossary section said every debuff had one. IQ's ruling 5.
-- **`CLAUDE.md`'s RELIC BLOCK COUNTS 25 READ SITES** of `relic_add` and `relic_dict`; the game holds 22, 26 with the sim's. A claim for IR,
-  beside the starter-rung one.
+- **`CLAUDE.md`'s RELIC BLOCK COUNTS 25 READ SITES** of `relic_add` and `relic_dict`; the game holds 22, 26 with the sim's. A claim, counted at IR
+  beside the starter-rung one and left for the claims batch.
 - **`check_hn` §2a's WORN ARM READS THE BAG's RUNE** (IQ's position census, read and not driven): `got_worn` keeps the last *Fourth
   Stack* on the Cleric's list, and since HR §1's hand-out the bag's copy lands there after the worn one, so the worn rune's rename is
   asserted by no arm — an instrument defect older than IQ.
@@ -552,9 +571,16 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
   **Whether to build the block index, for which file, or HV's pilot first, is IQ's ruling 2: nothing waits on another
   measurement.**
   **THE ORDER:**
-- **IR — THE CLAIMS**: HX's 87 stand at **86** — the per-batch re-read stops the backlog growing and does not retire it, so it is a
-  batch of its own (FOUND AT HX, FOUND AT IA). **The Cairn's *weight 8* is not one of them and is true** (an event's weight; IL
-  §0.5), so the figure does not fall for it.
+- **IS — THE INDEX PILOT, ON THIS FILE ALONE, AND `master.html`'s HISTORY STRIP** (IR's brief §0.2 and §0.6, the designer's): the
+  pilot's four conditions and the strip's rule are above (THE INDEX PILOT IS IS's).
+- **THEN, A BATCH OF ITS OWN — THE EIGHTY CONSTANTS** (IR's brief §0.7): about 80 of the catalogue's behaviour figures are literals in
+  their handlers (`aw_turns := 4`, Blood Offering's 0.20 and 60, Second Wind's 0.40 and 0.55, …). **Name them, then give the catalogue's
+  figures a door, then widen `check_iq` §2 from 695 to hold them** — IJ's rule arriving at the other side, and the machinery that stops
+  the next thirty-one false facts. Not urgent, and no live defect.
+- **THE CLAIMS ARE STILL THE LAST BATCH: 87 STAND** — counted at IR (FOUND AT IR, above): HX's 87 less IA §5's and HY §4's, plus IQ's
+  two (`CLAUDE.md`'s starter-rung block, *clearing rung 1 is the only door*, and its relic block's 25 read sites against the game's 22).
+  The per-batch re-read stops the backlog growing and does not retire it. **The Cairn's *weight 8* is not one of them and is true** (an
+  event's weight; IL §0.5).
 - **MANA STAYS (ruled).** The finding was that the Mage and the Hunter run dry and only the Cleric is always full; **measured at IE
   the sim does not show it**, and IF found the cause the designer saw — the Cracked Hourglass refilled the Cleric and not the Hunter
   (repaired, IF §0.1b); the rate is unmoved and is ruled after the readout (IF's rulings 1 and 2). **Channel's tempo payout — Mana

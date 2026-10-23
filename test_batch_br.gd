@@ -1222,7 +1222,11 @@ func _live_rally() -> void:
 	# the caster is excluded from the pool at all three sites, and handing away
 	# a turn costs him his own.
 	var battle_src := _src("res://scripts/battle.gd")
-	ok(battle_src.contains('if ab.special == "rally_ally":\n\t\t\t\t\tpool = pool.filter(func(a): return a != u and not a.is_companion)'),
+	# BATCH IR §1b — RE-POINTED: the picker's pool is `_ally_pick_pool`'s; it leaves the caster out, and Rally is a
+	# `HERO_PICKS` card, so a companion is left out too, as this line's own filter did.
+	ok(battle_src.contains("pool = _ally_pick_pool(u, ab)")
+			and battle_src.contains('if ab.special in ["covering_guard", "rally_ally"]:\n\t\tpool = pool.filter(func(a): return a != u)')
+			and battle_src.contains('"rally_ally", "recant"'),
 		"§6: the player's picker excludes the caster")
 	ok(battle_src.contains('if ab.special == "rally_ally":\n\t\tif not heroes.any(func(a): return a != u and not a.dead):\n\t\t\treturn false'),
 		"§6: `_ability_usable` refuses the cast when he is the last one standing")

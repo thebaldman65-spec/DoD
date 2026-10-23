@@ -16,6 +16,51 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-22 &mdash; Batch IR: THE SEVEN THE CENSUS FOUND IN THE CODE, AND THE RENAME MAP</h2>
+<p><b>The seven places IQ found the game doing something its own words do not say are changed in the game, each family checked
+whole before its first two were fixed, and an old save that names a card by a name it has since lost now reads it by today's.</b>
+Full working: <code>docs/reports/IR.md</code>.</p>
+
+<p><b>&sect;1a &mdash; RUIN's MINI-BOSS CARRIES ITS MODIFIER, AND NO BARGAIN.</b> On Ruin the mini-boss was meant to fight under a fixed
+modifier and was also offered a bargain, and the bargain quietly replaced the modifier. A node that carries a fixed modifier now offers
+no bargain at all: Ruin's mini-boss is fought under its modifier, with no offer and no reward. A Ruin run loses one offer for each
+mini-boss it reaches &mdash; three in a full run. The map's hover, the first run's framing card and the glossary say so, and the framing
+card now sits on the screen: its one button had been drawn below it.</p>
+
+<p><b>&sect;1b &mdash; A CARD THAT SAYS <i>HERO</i> OFFERS ONLY THE HEROES.</b> Ten support cards could be aimed at a Hunter's companion
+and gave it nothing &mdash; Fortified Spirit's loan never shed on one, Undying Vigil never forked, and Aegis Reversal threw a companion's
+shield away. Their target picker now offers only the four heroes. Recant, which refills a resource bar a companion does not have, says
+<i>hero</i> now too.</p>
+
+<p><b>&sect;1c &mdash; NO CARD SAYS <i>EVERYONE</i>.</b> Aegis Wall answers for the heroes and Hunter's Mark for every ally &mdash; each word
+the one its effect reaches.</p>
+
+<p><b>&sect;1d &mdash; TITHE PAYS FOR BREAK THAT LANDED.</b> An attack into a Broken enemy (or one that landed no Break for any other reason)
+still healed 1 &mdash; nearly a third of Tithe's blows. It heals nothing now. The same check found Sacred Resolve billing every bound hero 1
+health for a blow that was parried outright; a parried blow costs nobody anything now.</p>
+
+<p><b>&sect;1e &mdash; SEVEN STATUSES GET THEIR GLOSSARY ENTRIES.</b> Slow Burn, Heads Down, Unmaking, Breaking Darkness, Penance, Suffering and
+Blighted each have an entry, and Frostbind's chip now finds the entry it already had. An instrument reads every status the game lists
+against the glossary, so the next one written without an entry is caught.</p>
+
+<p><b>&sect;1f &mdash; A BLOCKED ARROW SOUNDS LIKE ONE.</b> A Hunter's or an Orc Archer's blocked shot plays the bow's own blocked sound.</p>
+
+<p><b>&sect;1g &mdash; CLEAVE AND HEX OF RUIN ROLL ONE MISS A TARGET.</b> They rolled a miss for the whole cast on the first target and then
+one per strike; now each target rolls once.</p>
+
+<p><b>&sect;2 &mdash; AN OLD SAVE's OLD CARD NAMES.</b> Five cards have been renamed since the oldest save the game can load &mdash; Iron Will,
+Magic Barrier, Matins, Jubilee and Anathema. A save naming one now reads it as Ironclad, Nexus Ward, Divine Presence, Blessing of the
+Faithful or Breaking Darkness wherever it holds it; before, it showed a blank button, held a slot, or carried an upgrade that never
+landed. A future rename adds its row in the batch that renames.</p>
+
+<p><b>&sect;0 &mdash; RULES RECORDED.</b> The block index is piloted on <code>docs/state.md</code> alone, by IS; a clause in
+<code>master.html</code> about what the game was, or why, goes to the design notes or goes (<code>CLAUDE.md</code>); a batch is not done
+until its close has run, and its report carries the close's timestamp (<code>docs/instrument-rules.md</code>).</p>
+
+<p><b>The instruments.</b> <code>check_ir</code> is new. Re-pointed: <code>check_ij</code>, <code>check_hp</code>, <code>test_batch_bp</code> and
+<code>test_batch_br</code>, each at a line IR moved; <code>test_batch_ce</code>'s glossary count (109) and <code>test_batch_cb</code>'s
+Frostbind entry. No save version moved.</p>
+
 <h2>2026-10-19 &mdash; Batch IQ: THE THREE DOCUMENTS, AND ONE CRASH</h2>
 <p><b>A save frozen on a bargain no longer takes the offer screen down, the state file's closed half is archived, the design document
 is checked fact by fact against the game, and the cost of reading the two big files is measured again.</b> Full working:

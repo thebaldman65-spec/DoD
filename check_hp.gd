@@ -1231,8 +1231,12 @@ func _s4_tithe() -> void:
 	# THE READ SITE THE WORDS DESCRIBE, AND IT IS NOT WIDENED: one sum, on the Break the
 	# blow applied, inside the strike loop's hero-on-enemy branch.
 	var bs := Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/battle.gd"))
+	# BATCH IR §1d — RE-POINTED: the share is still of the Break the blow applied, now read once into `bc_bd` and
+	# paid only when it is above zero (a blow that lands no Break heals nobody — the floor below no longer pays it).
 	ok(bs.count("attacker.blood_communion + attacker.rune_blood_communion") == 1
-			and bs.contains("result.get(\"bd\", pr) * bc_pct / 100.0"),
+			and bs.contains("var bc_bd := int(result.get(\"bd\", pr))")
+			and bs.contains("if bc_pct > 0 and bc_bd > 0:")
+			and bs.contains("bc_bd * bc_pct / 100.0"),
 		"§4: Tithe's read site moved, or reads something but the Break the blow applied")
 	# HQ §1 — THE TALENT OVER THE SAME SITE SAYS WHAT IT READS. *Breaking Heals a Hero*
 	# said *every point of Break damage dealt*; the site reads the Break an attack lands,

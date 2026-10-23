@@ -489,7 +489,9 @@ const REPAIRS := [
 	["glossary:parry:long", "base, the Swordmaster 12%", "at base (enemies"],
 	["glossary:stance:long", "The stances are the Swordmaster's: only his Seasoned Fighter pays their terms, though a drafted guard card reads and flips any Warrior's. He", "Only the Swordmaster has stances, and he"],
 	["glossary:hero_vs_ally:long", "(each pays the OTHER heroes and not the caster, and a", "RESOURCE clause (a companion has"],
-	["glossary:hero_vs_ally:long", "companion (Rally excepted: it hands its slot to a HERO),", "a companion, so"],
+	# BATCH IR §1b — RE-POINTED: IJ's repair said a hand-aimed support card CAN take a companion, Rally excepted, and IR
+	# narrowed every card whose words say hero to the heroes (`_ally_pick_pool`), so the entry says which do and why.
+	["glossary:hero_vs_ally:long", "offers only the heroes - Rally, Covering Guard, Fortified Spirit and the rest -", "a companion, so"],
 	["glossary:status_slow:long", "turn booked while it holds", "coming turn"],
 	["glossary:status_slow:long", "timeline - the turn already waiting when it lands keeps its place.", "initiative timeline. It"],
 	["glossary:status_chilled:long", "enemy (only an enemy mender's Cleansing Rite thaws it, a stack at a time, and never breaks the hold),", "the enemy, and"],
@@ -651,7 +653,9 @@ const REPAIRS := [
 	["lit:scripts/draft_screen.gd:_draw_screen", "once %d cells of tier %d are owned.", ""],
 	["lit:scripts/events.gd:apply", "no rune is left that any hero can take.", "every hero already carries every rune written for them."],
 	["lit:scripts/map_screen.gd:_maybe_show_framing", "up to three ways forward,", "three ways forward at a time,"],
-	["lit:scripts/map_screen.gd:_maybe_show_framing", "a mild one. Winning any fight", "survivable. Clearing any encounter"],
+	# BATCH IR §1a — RE-POINTED: the card's bargain sentence names Ruin's mini-boss, which offers none, and *always a mild
+	# one* was false on Ruin (no mild option there); the safe option is the safer deal on every rung. IJ's false clause stays absent.
+	["lit:scripts/map_screen.gd:_maybe_show_framing", "always the safer deal. Ruin's mini-boss fights unpaid. Winning any fight", "survivable. Clearing any encounter"],
 	["lit:scripts/map_screen.gd:_maybe_show_framing", "every zone boss a talent point for each class", ""],
 	["lit:scripts/map_screen.gd:_node_tooltip", "It is the %s.", ""],
 	["lit:scripts/map_screen.gd:_open_rune_panel", "A rune drops after every normal fight,", "A rune drops after every fight,"],
@@ -1087,7 +1091,8 @@ const PINS := [
 	["status:snared", "for 1 turn", "scripts/battle.gd", "_spring_trap", "_apply_status(victim, \"stunned\", 1"],
 	["status:null_field", "by 5% per", "scripts/battle.gd", "_resolve", "minf(0.05 * strike_target.second_resource, 0.95)"],
 	["status:vow", "half\\nthe damage", "scripts/unit.gd", "take_hit", "int(vow_cb.call(self, amount / 2))"],
-	["status:vow", "ally 1 Faith", "scripts/battle.gd", "_on_vow_share", "_gain_faith(ally, 1, \"vow\")"],
+	# BATCH IR §1b — RE-POINTED: the vow is a hero's (`HERO_PICKS`), so its chip says hero; the code it pins did not move.
+	["status:vow", "hero 1 Faith", "scripts/battle.gd", "_on_vow_share", "_gain_faith(ally, 1, \"vow\")"],
 	["status:rite_return", "Holy 30%", "scripts/battle.gd", "_on_rite_return", "maxi(int(round(cleric.max_hp * 0.30)), 1)"],
 	["status:rite_return", "to 50% health", "scripts/battle.gd", "_on_rite_return", "saved.hp = maxi(int(saved.max_hp * 0.5), 1)"],
 	["status:quarry", "is DOUBLED", "scripts/battle.gd", "_sharpshooter_focus", "gain *= 2"],

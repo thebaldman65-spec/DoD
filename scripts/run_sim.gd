@@ -365,7 +365,9 @@ static func walk_to_next_fight(run: Node) -> bool:
 		# is hurt — the crudest policy that exercises both ends of the severity
 		# table, and the one a cautious human most resembles. It is a policy, not
 		# a recommendation.
-		if ty in ["elite", "miniboss"]:
+		# BATCH IR §1a — the map's question, through the one predicate: a node that arms a
+		# fixed modifier (Ruin's mini-boss) offers no bargain, so the bot takes none there.
+		if run.offers_bargain(ty):
 			_take_offer(run)
 		var warband: Array = node.get("enemies", [])
 		if warband.is_empty():
