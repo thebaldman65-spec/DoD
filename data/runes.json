@@ -521,7 +521,7 @@
 		"name": "Split Shield", "scope": "class:warrior", "written_for": "warden",
 		"price": 150,
 		"requires_ability": "Shieldwall",
-		"desc": "Shieldwall is split in two: half its Block for him, and that same half for the ally he sets it in front of.",
+		"desc": "Shieldwall is split in two: half its Block for him, and that same half for the hero he sets it in front of.",
 		"payload": {"stat": {"rune_split_shield": 1}}
 	},
 	"long_watch": {

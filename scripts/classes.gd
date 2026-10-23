@@ -5494,7 +5494,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": Ability.BUFF_DELAY_CAP, "cooldown": 4, "anim": "attack03",
 				"special": "mantle", "target": Ability.Target.ALLY,
 				"perfect_id": "", "perfect_text": "",
-				"description": "Lay the mantle: a Divine Shield worth\n{=Battle.MANTLE_PCT*100}% of your maximum health — and when\nit BREAKS it passes to the hero on the\nlowest health, three times. Every one\nof them builds Faith like the first."})
+				"description": "Lay the mantle: a Divine Shield worth\n{=Battle.MANTLE_PCT*100}% of your maximum health — and when\nit BREAKS it passes to the hero on the\nlowest health, three times. Every hero\nwho holds it builds Faith from it."})
 		# ----- OCCULTIST: he is the boss specialist by construction and the
 		# boss refuses half his kit. Ruin detonates on every tenth stack and
 		# never washes off, so trash dies before the mark matters; meanwhile the

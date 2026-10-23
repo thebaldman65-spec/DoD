@@ -2,16 +2,16 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1905,
-  "source": 1353,
-  "other": 136,
-  "document": 416
+  "total": 1924,
+  "source": 1354,
+  "other": 146,
+  "document": 424
  },
  "source_residency": {
   "narrow": 46,
   "code": 828,
   "absent": 326,
-  "runtime": 101,
+  "runtime": 102,
   "unresolved": 3,
   "comment": 46,
   "alt-sibling": 3
@@ -3846,7 +3846,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hl.gd#819"
+   "g": "check_hl.gd#824"
   },
   {
    "s": "check_hl.gd",
@@ -3857,7 +3857,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hl.gd#819"
+   "g": "check_hl.gd#824"
   },
   {
    "s": "check_hl.gd",
@@ -3868,7 +3868,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hl.gd#1009"
+   "g": "check_hl.gd#1014"
   },
   {
    "s": "check_hl.gd",
@@ -3879,7 +3879,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_hl.gd#1010"
+   "g": "check_hl.gd#1015"
   },
   {
    "s": "check_hl.gd",
@@ -3890,7 +3890,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hl.gd#1008"
+   "g": "check_hl.gd#1013"
   },
   {
    "s": "check_hn.gd",
@@ -3967,7 +3967,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_hn.gd#263"
+   "g": "check_hn.gd#268"
   },
   {
    "s": "check_hn.gd",
@@ -3978,7 +3978,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_hn.gd#264"
+   "g": "check_hn.gd#269"
   },
   {
    "s": "check_hn.gd",
@@ -3989,7 +3989,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hn.gd#298"
+   "g": "check_hn.gd#303"
   },
   {
    "s": "check_hn.gd",
@@ -4000,7 +4000,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hn.gd#478"
+   "g": "check_hn.gd#483"
   },
   {
    "s": "check_hn.gd",
@@ -4011,7 +4011,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hn.gd#477"
+   "g": "check_hn.gd#482"
   },
   {
    "s": "check_hn.gd",
@@ -4022,7 +4022,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_hn.gd#589",
+   "g": "check_hn.gd#594",
    "expr": "anchor"
   },
   {
@@ -4034,7 +4034,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_hn.gd#590",
+   "g": "check_hn.gd#595",
    "expr": "anchor"
   },
   {
@@ -4046,7 +4046,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_hn.gd#597"
+   "g": "check_hn.gd#602"
   },
   {
    "s": "check_hn.gd",
@@ -4057,7 +4057,7 @@
    "r": "comment",
    "k": "literal",
    "how": "derived",
-   "g": "check_hn.gd#593"
+   "g": "check_hn.gd#598"
   },
   {
    "s": "check_hn.gd",
@@ -4068,7 +4068,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_hn.gd#591"
+   "g": "check_hn.gd#596"
   },
   {
    "s": "check_ho.gd",
@@ -7699,7 +7699,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iq.gd#209"
+   "g": "check_iq.gd#210"
   },
   {
    "s": "check_iq.gd",
@@ -7710,7 +7710,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iq.gd#207"
+   "g": "check_iq.gd#208"
   },
   {
    "s": "check_iq.gd",
@@ -7721,7 +7721,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iq.gd#212"
+   "g": "check_iq.gd#213"
   },
   {
    "s": "check_iq.gd",
@@ -7732,7 +7732,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iq.gd#211"
+   "g": "check_iq.gd#212"
   },
   {
    "s": "check_iq.gd",
@@ -7743,7 +7743,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iq.gd#213"
+   "g": "check_iq.gd#214"
   },
   {
    "s": "check_iq.gd",
@@ -7754,7 +7754,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iq.gd#208"
+   "g": "check_iq.gd#209"
   },
   {
    "s": "check_iq.gd",
@@ -7765,7 +7765,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iq.gd#204"
+   "g": "check_iq.gd#205"
   },
   {
    "s": "check_iq.gd",
@@ -7776,7 +7776,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iq.gd#205"
+   "g": "check_iq.gd#206"
   },
   {
    "s": "check_iq.gd",
@@ -7787,7 +7787,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iq.gd#206"
+   "g": "check_iq.gd#207"
   },
   {
    "s": "check_iq.gd",
@@ -7798,7 +7798,7 @@
    "r": "runtime",
    "k": "composed",
    "how": "read",
-   "g": "check_iq.gd#221"
+   "g": "check_iq.gd#222"
   },
   {
    "s": "check_iq.gd",
@@ -7809,7 +7809,7 @@
    "r": "runtime",
    "k": "composed",
    "how": "read",
-   "g": "check_iq.gd#222"
+   "g": "check_iq.gd#223"
   },
   {
    "s": "check_iq.gd",
@@ -7820,7 +7820,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_iq.gd#290",
+   "g": "check_iq.gd#291",
    "expr": "String"
   },
   {
@@ -7832,7 +7832,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iq.gd#346",
+   "g": "check_iq.gd#347",
    "expr": "said"
   },
   {
@@ -7844,7 +7844,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_iq.gd#355",
+   "g": "check_iq.gd#356",
    "expr": "mult"
   },
   {
@@ -7856,7 +7856,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iq.gd#325"
+   "g": "check_iq.gd#326"
   },
   {
    "s": "check_iq.gd",
@@ -7867,7 +7867,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iq.gd#324"
+   "g": "check_iq.gd#325"
   },
   {
    "s": "check_iq.gd",
@@ -7878,7 +7878,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_iq.gd#339"
+   "g": "check_iq.gd#340"
   },
   {
    "s": "check_ir.gd",
@@ -7912,6 +7912,221 @@
    "k": "loop-list",
    "how": "read",
    "g": "check_ir.gd#489"
+  },
+  {
+   "s": "check_is.gd",
+   "fn": "_s3b_the_three_rows",
+   "h": "data/runes.json",
+   "n": "\"%s\"",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_is.gd#479"
+  },
+  {
+   "s": "check_is.gd",
+   "fn": "_s4_words_and_picks",
+   "h": "scripts/talents.gd",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_is.gd#623",
+   "expr": "_pick_words"
+  },
+  {
+   "s": "check_is.gd",
+   "fn": "_s5_the_index_pilot",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_is.gd#647",
+   "expr": "INDEX_BEGIN"
+  },
+  {
+   "s": "check_is.gd",
+   "fn": "_s5_the_index_pilot",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_is.gd#648",
+   "expr": "INDEX_END"
+  },
+  {
+   "s": "check_is.gd",
+   "fn": "_s5_the_index_pilot",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_is.gd#649",
+   "expr": "INDEX_BEGIN"
+  },
+  {
+   "s": "check_is.gd",
+   "fn": "_s5_the_index_pilot",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_is.gd#649",
+   "expr": "INDEX_END"
+  },
+  {
+   "s": "check_is.gd",
+   "fn": "_s5_the_index_pilot",
+   "h": "docs/state.md",
+   "n": "\n## WHERE THE PROJECT IS",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_is.gd#663"
+  },
+  {
+   "s": "check_is.gd",
+   "fn": "_s5_the_index_pilot",
+   "h": "docs/state.md",
+   "n": "THE PILOT ASKS WHETHER A BOUNDED READ IS A SUFFICIENT READ",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "derived",
+   "g": "check_is.gd#665"
+  },
+  {
+   "s": "check_is.gd",
+   "fn": "_s5_the_index_pilot",
+   "h": "docs/state.md",
+   "n": "delete this section",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "derived",
+   "g": "check_is.gd#665"
+  },
+  {
+   "s": "check_is.gd",
+   "fn": "_s5_the_index_pilot",
+   "h": "docs/state.md",
+   "n": "needed",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "derived",
+   "g": "check_is.gd#665"
+  },
+  {
+   "s": "check_is.gd",
+   "fn": "_s5_the_index_pilot",
+   "h": "docs/state.md",
+   "n": "opened",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "derived",
+   "g": "check_is.gd#665"
+  },
+  {
+   "s": "check_is.gd",
+   "fn": "_s6_the_history_strip",
+   "h": "docs/design-notes.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_is.gd#737",
+   "expr": "MOVED_HEADING"
+  },
+  {
+   "s": "check_is.gd",
+   "fn": "_s6_the_history_strip",
+   "h": "docs/design-notes.md",
+   "n": "\n## ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_is.gd#738"
+  },
+  {
+   "s": "check_is.gd",
+   "fn": "_s6_the_history_strip",
+   "h": "docs/design-notes.md",
+   "n": "\n**",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_is.gd#739"
+  },
+  {
+   "s": "check_is.gd",
+   "fn": "_s6_the_history_strip",
+   "h": "docs/master.html",
+   "n": "(Batch ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "slice",
+   "g": "check_is.gd#720"
+  },
+  {
+   "s": "check_is.gd",
+   "fn": "_s6_the_history_strip",
+   "h": "docs/master.html",
+   "n": "</p>",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_is.gd#719"
+  },
+  {
+   "s": "check_is.gd",
+   "fn": "_s6_the_history_strip",
+   "h": "docs/master.html",
+   "n": "Last updated",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_is.gd#719"
+  },
+  {
+   "s": "check_is.gd",
+   "fn": "_s6_the_history_strip",
+   "h": "docs/master.html",
+   "n": "Mantle",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_is.gd#740"
+  },
+  {
+   "s": "check_is.gd",
+   "fn": "_s6_the_history_strip",
+   "h": "docs/master.html",
+   "n": "Sacred Resolve",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_is.gd#740"
   },
   {
    "s": "test_batch_ah.gd",

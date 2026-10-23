@@ -4202,7 +4202,7 @@ func load_run() -> bool:
 	load_notes = []
 	_hand_out_the_bag()
 	_refresh_rune_names()
-	_drop_stale_payload_fields()
+	_rebuild_stale_payloads()
 	_rename_saved_cards()
 	readout = {}
 	active = true
@@ -4351,38 +4351,135 @@ func _refresh_rune_names() -> int:
 	return renamed
 
 
-# BATCH IQ §4 — A RUNE RIDES THE SAVE WITH THE PAYLOAD IT WAS BUILT WITH (HR §0), and an ability
-# payload's `add` reads the card's own property and adds to it (`Talents.apply_payload`): a property
-# a later build no longer has reads as nothing, and nothing plus a number stops the spawn. So a saved
-# rune's `add` names only properties a card has; one that names a property gone is dropped, and the
-# rest of the payload pays. A payload built fresh from the data is never filtered, so a typo in
-# `data/runes.json` still fails loudly where it is applied.
-func _drop_stale_payload_fields() -> void:
-	var props := {}
-	for p in Ability.new().get_property_list():
-		props[String(p["name"])] = true
-	var lists: Array = [rune_bag, party_runes, pending_rune_drops]
+# ══ BATCH IS §2 — THE LOAD DOOR's FIVE ANSWERS (the designer's, IS's brief §0.3 and §0.4) ════════════
+#
+# **A DOOR's WHOLE VALUE IS THAT ITS ANSWERS ARE EXHAUSTIVE**, so the five are one population, named here,
+# and every thing a save carries that names the game's content is sorted into one of them where the save
+# is read: a card's name by `_card_answer`, a rune by `_rune_answer`. `check_is` §2 holds the five and reds
+# on a sixth kind of thing a save can carry that nobody sorted.
+const LOAD_DOOR_ANSWERS := {
+	"take": "a name today's game has, or a payload whose every field today's definition names — read as it is",
+	"translate": "a name the rename map translates — read by today's (IR §2)",
+	"drop": "a name the removal map names, or a rune today's game defines nowhere — dropped, its slot freed, and said where the player can see it",
+	"keep": "a name in neither map and in no table — kept as saved and said out loud (IR §2: it is evidence)",
+	"rebuild": "a payload naming a field today's definition does not name — rebuilt from today's definition, and said",
+}
+# The places a save carries a card's name, on each member — the rename map's walk (IR §2), one more
+# answer since IS — and the places it carries a rune or a rune's id. The two walks below name exactly these,
+# and `check_is` §2 sorts every key a save carries against them, so a new place reds until it is walked.
+const LOAD_DOOR_CARD_KEYS := ["bm_abilities", "bm_equipped", "draft_refused", "draft_candidates",
+	"bm_candidates", "upgrades", "up_candidates"]
+const LOAD_DOOR_RUNE_KEYS := ["runes", "engines", "rune_candidates", "engine_offer"]
+var load_dropped_cards: Array = []   # [{hero, card}] — the instruments' record of every drop
+var load_rebuilt_runes: Array = []   # [{hero, rune, stale}] — every payload rebuilt, and the paths that were stale
+var load_dropped_runes: Array = []   # [{hero, rune}] — every rune today's game defines nowhere
+
+
+# **A PAYLOAD TODAY's GAME CANNOT READ IS REBUILT FROM TODAY's DEFINITION, AND IT IS DERIVED, NOT MAPPED
+# (IS's brief §0.4).** HR §0's rule stands for a payload the game can read — it rides the save as built, so
+# the run you resume is the run you were playing, and a rune you took when it was weak does not turn strong
+# under you. It never said anything about one the game cannot read: Deepening Hex wrote
+# `rune_hex_threshold: 8` until FO renamed the field AND changed what it means (an installed threshold of 8;
+# a subtraction of 2 now), so no name map can convert it, and `set()` drops the field — the rune paid
+# nothing, in a bag, reported by nobody. **So the door asks today's definition**: a saved payload naming a
+# field path `Runes.definition` does not name is rebuilt whole from it (`Runes.payload_fields`, keys and
+# never values — a magnitude re-tuned since is not stale), and the rebuild is said where the player reads.
+# **That catches the next one with no batch remembering to add a row.** A rune today's game defines nowhere
+# is the removed card's case: dropped, and said. **IQ §4's `_drop_stale_payload_fields` stood here and is
+# SUPERSEDED, not lost**: it dropped an `add` naming a property a card no longer has, and a property gone
+# from `Ability` is gone from today's definition too, so every payload it repaired is stale by this test and
+# is rebuilt — the whole payload from today's data, where it kept the rest as built.
+func _rebuild_stale_payloads() -> void:
+	load_rebuilt_runes = []
+	load_dropped_runes = []
+	rune_bag = _rebuilt_rune_list(rune_bag, "")
+	party_runes = _rebuilt_rune_list(party_runes, "")
+	pending_rune_drops = _rebuilt_rune_list(pending_rune_drops, "")
 	for m in party:
 		var md: Dictionary = m
-		lists.append(md.get("runes", []))
-		lists.append(md.get("engines", []))
-		for triple in md.get("rune_candidates", []):
-			lists.append(triple)
-	for lst in lists:
-		for r in lst:
-			if r is Dictionary and (r as Dictionary).get("payload") is Dictionary:
-				_drop_stale_add((r as Dictionary)["payload"], props)
+		var who := nameplate(md)
+		for key in ["runes", "engines"]:
+			if md.get(key) is Array:
+				md[key] = _rebuilt_rune_list(md[key], who)
+		if md.get("rune_candidates") is Array:
+			var queue: Array = md["rune_candidates"]
+			for i in queue.size():
+				if queue[i] is Array:
+					queue[i] = _rebuilt_rune_list(queue[i], who)
+		# The class-selection deal rides the member as engine rune IDS (`deal_engines`, frozen there) and
+		# `Runes.build` reads each one on trust: an id today's game defines nowhere is dropped, and the deal
+		# is three again the moment it is empty (`deal_engines` deals afresh only when nothing is frozen).
+		if md.get("engine_offer") is Array:
+			var dealt: Array = []
+			for id in md["engine_offer"]:
+				if bool(Runes.definition(String(id))["defined"]):
+					dealt.append(id)
+				else:
+					load_dropped_runes.append({"hero": who, "rune": String(id)})
+					load_notes.append("%s is no longer in the game: it leaves the %s's offer." % [String(id), who])
+			md["engine_offer"] = dealt
 
 
-func _drop_stale_add(payload: Dictionary, props: Dictionary) -> void:
-	var add: Variant = payload.get("add")
-	if add is Dictionary:
-		for f in (add as Dictionary).keys():
-			if not props.has(String(f)):
-				(add as Dictionary).erase(f)
-	for extra in payload.get("also", []):
-		if extra is Dictionary:
-			_drop_stale_add(extra, props)
+func _rebuilt_rune_list(runes: Array, who: String) -> Array:
+	var out: Array = []
+	for r in runes:
+		if not (r is Dictionary):
+			out.append(r)
+			continue
+		var rd: Dictionary = r
+		match _rune_answer(rd):
+			"drop":
+				load_dropped_runes.append({"hero": who, "rune": String(rd.get("id", ""))})
+				load_notes.append("%s is no longer in the game: it is gone from %s." % [
+					String(rd.get("name", rd.get("id", ""))), ("the %s's runes" % who) if who != "" else "the crest"])
+				continue
+			"rebuild":
+				var stale := _stale_paths(rd)
+				rd["payload"] = (Runes.definition(String(rd.get("id", "")))["payload"] as Dictionary).duplicate(true)
+				load_rebuilt_runes.append({"hero": who, "rune": String(rd.get("id", "")), "stale": stale})
+				load_notes.append("%s is rebuilt to work as it does now: the save held an older version." % \
+					String(rd.get("name", rd.get("id", ""))))
+		out.append(rd)
+	return out
+
+
+# A rune, sorted: a rune today's game defines nowhere is dropped; one whose payload names a field path
+# today's definition does not is rebuilt; every other rides the save as built. No id is no question asked —
+# every rune a save from the floor on carries was built with one (Batch X).
+func _rune_answer(rune: Dictionary) -> String:
+	var id := String(rune.get("id", ""))
+	if id == "":
+		return "take"
+	if not bool(Runes.definition(id)["defined"]):
+		return "drop"
+	return "rebuild" if not _stale_paths(rune).is_empty() else "take"
+
+
+# What makes a saved payload one today's game cannot read: every field path today's definition does not
+# name, and every card it names that the removal map holds (today's definitions name none, so such a
+# payload is not today's, whatever its fields).
+func _stale_paths(rune: Dictionary) -> Array:
+	var today := Runes.payload_fields(Runes.definition(String(rune.get("id", "")))["payload"])
+	var stale: Array = []
+	for path in Runes.payload_fields(rune.get("payload", {})):
+		if not today.has(path):
+			stale.append(String(path))
+	_removed_cards_named(rune.get("payload", {}), stale)
+	return stale
+
+
+func _removed_cards_named(p: Variant, out: Array) -> void:
+	if p is Dictionary:
+		for k in (p as Dictionary).keys():
+			var v: Variant = (p as Dictionary)[k]
+			if v is String and String(k) in ["ability", "grant_ability", "owns_ability"] \
+					and REMOVED_CARDS.has(String(RENAMED_CARDS.get(String(v), String(v)))):
+				out.append("%s: %s" % [String(k), String(v)])
+			else:
+				_removed_cards_named(v, out)
+	elif p is Array:
+		for v in p:
+			_removed_cards_named(v, out)
 
 
 # ══ BATCH IR §2 — THE RENAME MAP, AT THE LOAD DOOR (the designer's) ═══════════════════════════════
@@ -4399,8 +4496,8 @@ func _drop_stale_add(payload: Dictionary, props: Dictionary) -> void:
 # **IT IS APPEND-ONLY, FOREVER**: a rename that crosses the save floor adds its row here, in the batch
 # that renames (`CLAUDE.md`'s FD §1 block). The rows are every card renamed since the floor — derived
 # from `classes.gd`'s history, not taken from a brief (IR's report, §2): CK's and GN's, and CG's three.
-# A card REMOVED since the floor (Flash Freeze at DR, Observance at CG) is no row — it has no name
-# today to be read by — and is reported, not mapped.
+# A card REMOVED since the floor is no row here — it has no name today to be read by — and since IS it is a
+# row of `REMOVED_CARDS`, below: the fourth answer this walk gives.
 #
 # **AND A NAME THAT WAS NEVER A CARD IS NOT SWALLOWED**: it is left exactly as the save holds it — no
 # guess, no drop — and said out loud (`push_error`, and `load_unknown_cards` for the instruments), so
@@ -4413,12 +4510,48 @@ const RENAMED_CARDS := {
 	"Matins": "Divine Presence",                 # CG §1
 	"Magic Barrier": "Nexus Ward",               # GN
 }
+# ══ BATCH IS §2a — THE REMOVAL MAP (the designer's, IS's brief §0.3) ═════════════════════════════════
+#
+# **A REMOVED CARD IS A CARD THE PLAYER NO LONGER HAS EITHER WAY.** Kept, it holds a slot and shows a button
+# that does nothing — the invisible wrong the rename map was built against — so it is DROPPED where the save
+# is read: out of his pool and his loadout, which frees the slot (a loadout is a list, never a fixed array,
+# so a drop leaves no hole), out of both queued offers (an offer dealt one fewer; one left with nothing is
+# spent, as any offer emptied is), out of the draft's refusals, and every upgrade queued or held on it with
+# it. **And the drop is said where the player can see it**: the map's arrival toast, the surface a load
+# already speaks through (`load_notes`, HR §1). **It is a different case from IR's keep-and-say-out-loud,
+# which stands**: IR could not tell a card removed on purpose from a name a defect wrote, so keeping it kept
+# the evidence; a name this map holds is a removal the repository can point at a commit for, so there is no
+# evidence to keep, and a name in neither map is still evidence and still kept.
+#
+# **THE ROWS ARE DERIVED, NOT TAKEN FROM A BRIEF**: every `display_name` gone from `classes.gd` since BM's v10
+# floor — the walk widened to `battle.gd`, `talents.gd` and `data/runes.json` found the same seven — less the
+# five the rename map translates. Each was read at the commit that removed it (IS's report, §2a). **A CARD
+# REMOVED AFTER THE SAVE FLOOR ADDS ITS ROW HERE, IN THE BATCH THAT REMOVES IT — APPEND-ONLY, FOREVER**, as
+# the rename map is. The value is the batch that removed it: provenance, never said to the player.
+const REMOVED_CARDS := {
+	"Flash Freeze": "DR §2",   # retired: Glacial Prison was the same three steps, cheaper (843e928)
+	"Observance": "CG §1",     # deleted with its status; Vespers took its slot — a new card, not a rename (f99d282)
+}
 var load_unknown_cards: Array = []
 var _card_names := {}
+var _drop_hero := ""
+var _dropped_here: Array = []
+
+
+# One saved card name, sorted: TAKE (a card today), TRANSLATE (a rename row), DROP (a removal row) or
+# KEEP (neither, and no table holds it). A rename that lands on a removed card is a drop.
+func _card_answer(name: String) -> String:
+	var now := String(RENAMED_CARDS.get(name, name))
+	if REMOVED_CARDS.has(now):
+		return "drop"
+	if not _card_names.has(now):
+		return "keep"
+	return "translate" if now != name else "take"
 
 
 func _rename_saved_cards() -> void:
 	load_unknown_cards = []
+	load_dropped_cards = []
 	# Every card the game holds, by the one enumeration (`Classes.ability_corpus`, CZ §0) — the
 	# class basics a rune's payload names (Strike, Smite, Quick Shot) are in it, and no pool has them.
 	_card_names = {}
@@ -4426,6 +4559,9 @@ func _rename_saved_cards() -> void:
 		_card_names[String(ab.display_name)] = true
 	for m in party:
 		var md: Dictionary = m
+		_drop_hero = nameplate(md)
+		_dropped_here = []
+		var carried: Array = equipped_ability_names(md)
 		for key in ["bm_abilities", "bm_equipped", "draft_refused"]:
 			if md.get(key) is Array:
 				md[key] = _renamed_names(md[key])
@@ -4442,6 +4578,11 @@ func _rename_saved_cards() -> void:
 			for i in uq.size():
 				if uq[i] is Array:
 					uq[i] = _renamed_upgrades(uq[i])
+		for gone in _dropped_here:
+			load_dropped_cards.append({"hero": _drop_hero, "card": gone})
+			load_notes.append("%s is no longer in the game: it is gone from the %s's cards%s." % [
+				gone, _drop_hero, ", and its slot is free" if carried.has(gone) else ""])
+	_drop_hero = ""
 	var lists: Array = [rune_bag, party_runes, pending_rune_drops]
 	for m in party:
 		var md2: Dictionary = m
@@ -4455,11 +4596,16 @@ func _rename_saved_cards() -> void:
 				_rename_payload_cards((r as Dictionary)["payload"])
 
 
-# One saved card name, read today. A row's new name, or the name as it stands; a name no table holds
-# and no row maps is kept as it is and said out loud.
+# One saved card name, read today: a row's new name, or the name as it stands; "" for a removed card,
+# which the caller drops; a name no table holds and no row maps is kept as it is and said out loud.
 func _renamed_card(name: String) -> String:
+	var answer := _card_answer(name)
+	if answer == "drop":
+		if not _dropped_here.has(String(RENAMED_CARDS.get(name, name))):
+			_dropped_here.append(String(RENAMED_CARDS.get(name, name)))
+		return ""
 	var now := String(RENAMED_CARDS.get(name, name))
-	if not _card_names.has(now) and not load_unknown_cards.has(now):
+	if answer == "keep" and not load_unknown_cards.has(now):
 		load_unknown_cards.append(now)
 		push_error("Run: the save names a card this build does not hold, and no rename row maps it: '%s'" % now)
 	return now
@@ -4469,7 +4615,7 @@ func _renamed_names(names: Array) -> Array:
 	var out: Array = []
 	for n in names:
 		var now := _renamed_card(String(n))
-		if not out.has(now):
+		if now != "" and not out.has(now):
 			out.append(now)
 	return out
 
@@ -4483,7 +4629,10 @@ func _renamed_upgrades(ups: Array) -> Array:
 			continue
 		var ud: Dictionary = u
 		if ud.has("ability"):
-			ud["ability"] = _renamed_card(String(ud["ability"]))
+			var now := _renamed_card(String(ud["ability"]))
+			if now == "":
+				continue   # an upgrade on a removed card goes with the card
+			ud["ability"] = now
 		var pair := "%s|%s" % [String(ud.get("id", "")), String(ud.get("ability", ""))]
 		if seen.has(pair):
 			continue
@@ -4492,13 +4641,19 @@ func _renamed_upgrades(ups: Array) -> Array:
 	return out
 
 
+# A payload's card, read today. A payload naming a REMOVED card never reaches here — `_rune_answer` sorts it
+# REBUILD, because today's definitions name no removed card — so a removal row read here keeps the name.
 func _rename_payload_cards(payload: Dictionary) -> void:
 	for k in ["ability", "grant_ability"]:
 		if payload.get(k) is String:
-			payload[k] = _renamed_card(String(payload[k]))
+			var now := _renamed_card(String(payload[k]))
+			if now != "":
+				payload[k] = now
 	var cond: Variant = payload.get("condition")
 	if cond is Dictionary and (cond as Dictionary).get("owns_ability") is String:
-		(cond as Dictionary)["owns_ability"] = _renamed_card(String((cond as Dictionary)["owns_ability"]))
+		var own := _renamed_card(String((cond as Dictionary)["owns_ability"]))
+		if own != "":
+			(cond as Dictionary)["owns_ability"] = own
 	for k in ["also", "upgrade"]:
 		for extra in payload.get(k, []):
 			if extra is Dictionary:

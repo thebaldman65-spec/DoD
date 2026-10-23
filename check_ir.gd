@@ -810,10 +810,15 @@ func _s2_rename_map() -> void:
 	m["up_candidates"] = [[{"id": "up_damage", "ability": "Iron Will"}]]
 	m["upgrades"] = [{"id": "up_speed", "ability": "Matins"}, {"id": "up_speed", "ability": "Divine Presence"}]
 	m["draft_refused"] = ["Jubilee"]
-	var rune: Dictionary = Runes.build("tithe")
-	rune["payload"] = {"ability": "Iron Will", "add": {"cooldown": -1}, "also": [{"grant_ability": "Anathema"}],
-		"condition": {"owns_ability": "Magic Barrier"}}
-	m["runes"] = [rune]
+	# RE-POINTED AT IS §2b: a payload rides the save as built only where today's definition names every field it names, so
+	# the fixture is two real runes as built with an old card name in a field their definitions carry — a hand-built payload
+	# Tithe's definition does not describe is rebuilt from it now. No definition carries an `owns_ability` condition today,
+	# so that branch has nothing a save can carry for it to translate.
+	var rune: Dictionary = Runes.build("split_tongue")
+	rune["payload"]["ability"] = "Iron Will"
+	var grant: Dictionary = Runes.build("binding_souls")
+	grant["payload"]["grant_ability"] = "Anathema"
+	m["runes"] = [rune, grant]
 	seed(2026102201)
 	var before := randi()
 	seed(2026102201)
@@ -836,10 +841,10 @@ func _s2_rename_map() -> void:
 	var ups: Array = p.get("upgrades", [])
 	ok(ups.size() == 1 and String((ups[0] as Dictionary).get("ability", "")) == "Divine Presence",
 		"§2: the held upgrades loaded as %s — one Swift on Divine Presence wanted (the old name's copy read into the new one's)" % str(ups))
-	var pay: Dictionary = (p.get("runes", [{}]) as Array)[0].get("payload", {})
-	ok(String(pay.get("ability", "")) == "Ironclad" and String(((pay.get("also", [{}]) as Array)[0] as Dictionary).get("grant_ability", "")) == "Breaking Darkness"
-			and String((pay.get("condition", {}) as Dictionary).get("owns_ability", "")) == "Nexus Ward",
-		"§2: a saved rune's payload names %s" % str(pay))
+	var pay: Dictionary = (p.get("runes", [{}, {}]) as Array)[0].get("payload", {})
+	var pay2: Dictionary = (p.get("runes", [{}, {}]) as Array)[1].get("payload", {})
+	ok(String(pay.get("ability", "")) == "Ironclad" and String(pay2.get("grant_ability", "")) == "Breaking Darkness",
+		"§2: a saved rune's payload names %s / %s" % [str(pay), str(pay2)])
 	var unknown: Array = _run.get("load_unknown_cards") if _run.get("load_unknown_cards") is Array else ["<no ledger>"]
 	ok(unknown.is_empty(), "§2: a renamed save reported unknown cards %s" % str(unknown))
 	# THE FOUR READS THAT TOOK AN OLD NAME STRAIGHT: each resolves today's card.

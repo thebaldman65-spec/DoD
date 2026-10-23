@@ -53,7 +53,7 @@ Card text lives in `scripts/classes.gd` (`desc` line given). Status chips live i
 
 **Conditional note.** If the hunter wears Bared Fang, his companion carries `no_heals` (a rune's price), so the heal cards (Second Wind, Ministration, Dawnbreak, Divine Plea, Heal) are refused on that companion. That is by design, not structural.
 
-## Table B: the other PICK sites that read `_hero_side()` (population (b), picks)
+## Table B: the other PICK sites that read `_hero_side()` (population (b), picks) — *and, since IS §4, Split Shield's, which reads `heroes`; `check_is` §4 holds every pick and every hero-side pool builder as one population*
 
 | Effect | Site | Pool | Pick | Words | Companion pickable? | Arrives? | VERDICT |
 |---|---|---|---|---|---|---|---|
@@ -65,6 +65,7 @@ Card text lives in `scripts/classes.gd` (`desc` line given). Status chips live i
 | Enemy target selection | `_choose_enemy_action` :8699 (+ `_lowest_hp`, `_threat_pick`, taunt narrowings) | `_hero_side()` | lowest health or a threat pick | No enemy ability text in data/enemies.json says *hero* (swept) | YES (by design, DU §2) | YES | NO-WORD |
 | Enemy `random_hits` shards | `_resolve` :9832 | `_hero_side()` | `pick_random()` per shard | none | YES | YES | NO-WORD. **Dormant**: no enemy ability in data/enemies.json carries `random_hits`. |
 | Psychosis: a maddened support casts on the hero side | `_psychotic_support` :18254 | `_hero_side()` | `_lowest_hp` or random | chip :210 "casting its helpful magic on the enemy side" (no hero word) | YES | YES | NO-WORD |
+| **Split Shield's hero (added at IS §4 — the pick the census found beside the family, and the one the population widened to)** | `_split_shield_allies` (reads `heroes`, not `_hero_side()`) | the heroes less the caster | the player's click; the bot's named pick when it is one | runes.json "the **hero** he sets it in front of" (it said *ally* until IS §4) | NO | — (a companion makes no Block roll) | HERO-WORD-OK since IS |
 
 ## Table C: `_hero_side()` call sites that are WALKS or door tests, not picks (population (b))
 

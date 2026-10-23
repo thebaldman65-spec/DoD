@@ -4,6 +4,240 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The load door's five answers, the pilot, and the history strip (Batch IS) — 2026-10-22
+
+**Why a removed card is dropped, when IR kept a name it did not know.** A card the game no longer has is a card the player no
+longer has either way; kept, it holds a slot and shows a button that does nothing — the invisible wrong the rename map was built
+against. IR kept every unknown name because it could not tell a card removed on purpose from a name a defect wrote, and keeping
+it kept the evidence. The removal map separates the two: a name it holds is a removal the repository can point at a commit for
+(Flash Freeze at DR, Observance at CG), so there is nothing to preserve; a name in neither map is still evidence and is still kept.
+The drop is said on the map's arrival, the surface a load already speaks through — which is why the toast learned to wrap: it
+was one line, and a second note ran off both ends of the screen.
+
+**Why a stale payload is rebuilt from today's definition rather than mapped.** HR §0's rule is right — a payload rides the save
+as built, so the run you resume is the run you were playing — and its reason is narrower than its words: it protects a payload
+the game can read. Deepening Hex's old field cannot be read and cannot be converted (a threshold of 8 is not a subtraction of
+2), so it paid nothing in silence. A card's name has no pointer to its successor, so it needs a row; a payload's field can be
+checked against today's definition, which names its own fields — so the door needs no map, and catches the next one without a
+batch remembering to add a row. IQ's guard on a payload's `add` was one case of this, and the derived test took its place.
+
+**Why a split hands out a remainder instead of rounding each share.** Three readings were on the table: floor each share at 1
+(a 1-damage blow on four bound heroes bills 4 — a fourfold multiplier on small blows, against the party), floor nothing (a blow
+under the bind count costs nobody anything — a gift to the side dealing small blows, which is the warband), or distribute exactly.
+Only the third is true to *split evenly* and cannot be gamed either way. The remainder goes to the body it fell on first, then in
+party order — deterministic, so the gates read it again, and no die. One Soul's split and Chain Ignition's already worked so.
+
+**Why Mantle keeps its pick and changes one word.** The ten narrowings at IR were never about the word: each was a cast on a body
+that could take nothing from it. Mantle's cast arrives on a companion — the shield absorbs and still passes to the hero on the
+lowest health — so laying it there is a trade the player can choose: protect the summon, give up one Faith event. A pick is
+offered where the cast pays; where it pays less, that is the player's call. The sentence that said every holder builds Faith was
+the defect, and it says *hero* now, in the card and in the glossary.
+
+**Why the bot's ally pools were left heroes-only.** It is a real divergence from the player's picker, but every grade in the
+severity ladder, every band and every band's mean was measured through this bot. A constant bias cancels in a comparison;
+changing it mid-ladder does not. The batch that widens the pools re-measures the ladder with it, or retires it.
+
+**Why the index pilot keeps every block where it stands.** The pilot asks whether a bounded read is a sufficient read, and it
+must be undone by deleting one section. A block moved, merged or summarised for the index would make the pilot a restructure.
+So the file is whole, a routing section at its top sends a batch to the core and the rows, and the report says what it opened,
+what it needed and — read in full at the close — what bore on the work and was not opened. That third list is the measurement.
+
+### Moved from master.html at IS — the history strip (IS §6)
+
+*What `master.html` said about what the game WAS, or why a figure or a rule moved, left it at IS by the designer's ruling (*`master.html` says what the game is*). The reasoning worth keeping stands here, under the mechanic it explains; the bookkeeping — batch names, *was / now* notes, dated readings with no reason attached — went. In document order.*
+
+**Difficulty ladder — rung 2 and the pre-ladder balance.** Rung 2 is the balance every prior measurement was taken at, byte for byte; rung 1 is deliberately tuned below it because it is the rung played with zero talents.
+
+**Difficulty ladder — rung 1's x0.50 damage scale.** Rung 1's ×0.50 was chosen by measurement (Batch BN §2): untalented heroes on a balanced route completed 83% of runs at it (n=100), against 13% / 28% / 95% at ×0.70 / ×0.60 / ×0.40. The aim is a first run won in one or two attempts; 70% would be 1.4 attempts and 83% is 1.2. The curve is a cliff between ×0.60 and ×0.50, so 70% sat in an unsampled gap and ×0.50 was the nearest sampled value rather than a number defended to three figures.
+
+**Difficulty ladder — the rung scales damage, not health.** Until Batch EO §2 the rung multiplier discounted enemy health as well as enemy damage.
+
+**Difficulty ladder — the rung scales damage, not health.** Under the old rule, halving the health pool ended the fight before the heroes could reach the Break gate, and took the 2.5–4.0 telegraphs, the statuses worth cleansing and the turn of pressure an item is for with it. Measured untalented, n=30 a rung: a rung-1 trash fight ran 5.7 rounds against rung 2's 7.8, and after EO ran 9.2. Untalented completion at rung 1 moved 97% → 77% at n=30, and a two-armed re-run at n=100 read 92% → 73% with trash rounds 5.7 → 9.1 over ~1,130 fights an arm — 19 points at 3.7 standard errors. Rungs 2 and 3 did not move, by construction — the health multiplier floors the rung at 1.0, so rung 2's ×1.00 and rung 3's ×1.30 stayed bit-identical. The ×0.50 damage scale itself was not tuned at EO and is the designer's.
+
+**End boss — no rung discount.** After the end boss stopped taking the rung-1 discount (Batch GJ), heroes at 1 health still beat it at rung 1 — in 7 of 7 driven runs, as in 7 of 7 on the code before — because it opens with Regalia, a ward, and is Broken and held before it has acted three times.
+
+**Difficulty ladder — what a completion figure counts.** The completion figures taken before Batch GJ count runs that killed the third zone boss, not the end boss: the simulator that took them ended a run there. Measured to the end boss, untalented, 150 runs a rung, a balanced route and the standard four specs: 93% / 5% / 0% at rungs 1 / 2 / 3, against 93% / 5% / 0% to the third zone boss off the same runs. The end boss stopped none of the runs that reached it — 140 at rung 1 and 8 at rung 2 — so counting it moved no rung's figure; at rung 3 no run reached it.
+
+**Difficulty ladder — rung 1 as the talent-tier door.** Re-measured at Batch EN on the live tree (untalented, n=30 a rung): completion read 97% at rung 1, 3% at rung 2 and 0% at rung 3 before Batch EO, and 77% / 0% / 0% after it (rung 1 re-read at n=100: 92% → 73%). On those readings, removing rung 1 would move a player's first talent tier from a one-attempt clear to roughly a thirty-attempt one.
+
+**Difficulty ladder — the step from rung 1 to rung 2.** Batch EP §1 measured the rung-1 and rung-2 fights as the same length: rounds to resolution 7.8 against 7.4 on the same loadout.
+
+**Saves — the v10 floor.** The final zone gained a seventeenth slot at save format v10, which is why a v9 save's final-zone map has no position to walk onto after its boss and saves older than v10 are refused and cleared rather than migrated.
+
+**Saves — refusing old formats.** Batch BK made the same call about pre-v8 saves — a flat 12-slot line has no honest place on a lattice — Batch AN about pre-v7, and Batch AI about ranked talent purchases: a wipe that says so beats a migration that invents state.
+
+**Map generation — decisions per run.** Against the lattice's 19.0 real choices a run, Batch AN's line measured 0 of 2,764 on the identical definition (a step counts only if two or more nodes are reachable and they are not all the same type).
+
+**The offer — severity bands.** At Batch IP, over 400 offers a rung, the mean severity offered read 2.82 / 3.28 / 4.50 on Wanderer / Warden / Ruin (check_ip §1b prints the live sample) — Ruin a full step above Warden.
+
+**Map — merchants and events as nodes.** Merchants and events used to roll behind a cleared fight — a 40%-with-a-floor merchant roll and a 25% event roll. Both rolls were deleted when merchants and events became map nodes, so the player can see one coming and plan to arrive with gold.
+
+**Companions — the strike terms a companion's blow reads.** Batch DU added Cripple and Chilled to the terms a companion's blow reads. Cripple was the one that mattered: two enemy abilities land it, an enemy aims at the whole hero side including the companion, and until DU a Crippled companion bit at full strength — a malus the chip promised and the arithmetic refused.
+
+**Items in battle — why every pouch value is a percentage or scales.** The Mana Potion restores 40% of the target's maximum Mana/Rage, which equals the old flat 40 at the base maximum of 100.
+
+**Items in battle — why every pouch value is a percentage or scales.** Every item value became a percentage or a figure that scales with run depth because a flat number in the pouch decays against heroes who grow: the victory heal is 15% of maximum and heroes gain +2% base HP per win, so a flat 40 was worth less every fight while the shop kept charging 30 gold for it.
+
+**Arcanist — Runaway Resonance: why the curve compounds.** Runaway Resonance compounds (1.5% x N(N+1)/2) where the Arcanist's bonus was once a flat +15% per stack. At five stacks the compounding Arcanist is weaker than the flat +15%/stack Arcanist was; by twelve he has roughly doubled. That is the trade the curve was chosen for: a linear per-stack term is a slope, a compounding one is a curve, and the difference makes him nothing early and everything late.
+
+**Zone-boss award — the fallback chain (spec pool, then class draft pool).** Batch GP merged the draft's two pools into one, so the zone-boss award chain lost the third tier it had rather than losing what that tier offered: the fallback reads every card of the hero's class.
+
+**Mini-boss ability upgrades — the pool of eight and where upgrades are shown.** The mini-boss upgrade pool grew from four to eight. Three are drawn from eight rather than from four, so any one upgrade appears about half as often as it did, and a hero can finish a run having never been offered the upgrade his build wanted. That was accepted as the variety working, not a fault.
+
+**Mini-boss ability upgrades — the pool of eight and where upgrades are shown.** A run awards three upgrades to every hero, twelve across the four. Before the upgrade surfaces existed (the gold up-arrow on the battle button and the Kit-panel row, the up-arrow N count on each map hero card, the Blacksmith's marks), all twelve were discoverable only by hovering ability buttons mid-fight; that is why the surfaces were built.
+
+**Zone-boss award — the retired CLASS pool and the vault.** A CLASS pool stood beside the spec pool from Batch AH: one list per class, holding the sibling specs' abilities plus the class's vaulted ones, from which the zone-boss award drew two of every three cards. Batch AN retired that draw (abilities are spec-locked) and Batch DY deleted the list. It had held seven finished abilities named in no other pool, so they were unreachable by any run while every audit in the project kept measuring them; DY re-homed all seven into live draft and boss pools first and removed the container behind them. The curation rule the list carried was not lost: it governs each class's CLASS-WIDE shelf in master.html section 6b.
+
+**Zone-boss award — the fallback chain (spec pool, then class draft pool).** Until Batch EA a zone-boss award could pay nothing at all. A boss offer is the hero's spec pool minus what he already holds, and the draft writes the same earned list, so eight of the twelve specs could be emptied; the Devout was the sharp case, with a two-card boss pool whose cards are both draftable, so all three of his awards could come up empty. What happened then was not a small reward, it was silence: the hero was skipped and the victory card did not name him. EA gave the award a fallback card, offered three at a time and announced like any other award (at EA it read the spec draft pool; since GP it reads the class's one draft pool).
+
+**Zone-boss award — the fallback chain (spec pool, then class draft pool).** There were three tiers until Batch GP, and the pool merge made them two. Batch EA chose the spec-draft card because that pool could not empty: a hero carried at most four earned abilities (three for the Holy Cleric) against draft pools of ten to thirteen, so the fallback floored at six. Batch EG broke both halves of that arithmetic one batch later: the cap became a ladder to ten, and a benched card became KEPT, so what a hero holds is every card he has ever taken rather than every card he currently carries. The floor fell to three, and to two for the Occultist. Batch EH answered that with a third tier reading the class-wide pool; Batch GP answered it with depth instead, because the merge made the second tier the hero's whole class pool (42 for the Warrior, 52 for the Mage, 43 for the Cleric, 42 for the Hunter), which holds everything both old tiers held. Being class-locked rather than spec-locked is the one thing the merge gave up, and it is not a re-opened class DRAW: it reads the live, curated shelves of section 6b, not the 61-entry container Batch DY deleted.
+
+**Ability draft: where picks come from (the paid draft pick, withdrawn).** Batch BO §3 built a fourth draft source: a draft pick bought from the merchant for 120 / 180 / 240 by zone. Batch FD §1 withdrew it on the designer's ruling that a draft pick is earned and never bought. The three earned sources (elite, event, zone boss) were left as they were. `Run.draft_price()` was kept with no caller, on the same contract a retired rune is kept on, so a later batch that wants a paid draft back does not have to re-derive the price ladder. The sim never bought a pick, so no measured figure in the economy report moved.
+
+**Ability draft: one pool a class (how far the merge widened the draw).** Batch GP merged each class's draft shelves into one pool, so every hero drafts from his class's whole pool (42 / 52 / 43 / 42 for Warrior / Mage / Cleric / Hunter at Batch IR). Before the merge a lineage hero drew from 13 to 18 cards, and a hero who took a spine from 3 to 6.
+
+**Ability draft: pool counts (how the four pools reached 42 / 52 / 43 / 42).** Since Batch GP's merge the draft has been four class pools (42 / 52 / 43 / 42 at Batch IR). The Hunter's pool gained Tripwire when Summon Companion took its class-kit slot, and the Mage's gained Smoulder, on the Pyromancer's shelf.
+
+**Ability draft: a hero with no lineage.** Before the one-pool merge (Batch GP) a hero with no lineage drew his class-wide shelf alone: three cards for a Cleric. Since the merge he draws the whole class pool (forty-three cards for a Cleric at Batch IR).
+
+**Ability draft: the class-wide boss vault emptied (Batch DY).** Batch DY took the draft past 149 without authoring a card, by emptying the vault. Seven finished abilities had sat in a class-wide BOSS pool that no run could reach since Batch AN closed the class draw. DY sent RALLYING SHOUT to the Warden, ARCANE SURGE and REALITY FRACTURE to the Arcanist, DIVINE WRATH to the Devout, MANA SHIELD to the Mage class pool, and DAWNBREAK and SANCTUARY to the Holy Cleric's zone-boss pool (§6a), which had held one card against three awards. Every one already had its handler, its card text and its Perfect, and no new mechanics were written for any of them.
+
+**Ability draft: pool depth floor.** Before Batch DY's vault moves the class half of the draft (the class-wide shelves) was a flat multiple across the four classes, and the Warden's nine cards had been the floor of the spec pools.
+
+**Ability draft: the Hunter class gap (Batch DS).** Batch DS closed the Hunter class gap and took the draft past 143. The Hunter's three specs held the three shallowest pools in the game (eight apiece) and received none of Batch DO's twenty-two talent-tree cards, and not one of their twenty-four cards was a heal, a shield or hero-side mitigation: a hunter's whole defensive option set for a run was two of the six Hunter class cards. After DS all three read eleven or more, and each spec's defence is shaped by its own engine: the companion pays for the Beastmaster, the Focus meter for the Sharpshooter, the affliction board for the Survivalist.
+
+**Ability draft: Flash Freeze retired (Batch DR).** Batch DR moved the draft total twice in one batch, for a net of +1: Flash Freeze was retired from the Cryomancer's pool as an exact duplicate of Glacial Prison at a worse price, and the Swordmaster gained Wheeling Cut and Counter Time.
+
+**Talents: no talent grants an ability (the twenty-two cards that moved to the draft, Batch DO).** Twenty-two of the spec draft cards arrived from the talent trees at Batch DO, when talents stopped granting abilities. The twenty-two cards those nodes granted were authored, working content, so they moved into their spec's draft pool rather than being deleted, and every one of the twenty-two talent cells was re-authored to modify something the hero owns in every run. No pool lost anything at DO: the floor stood at eight and nine specs were deeper, the Beastmaster, Sharpshooter and Survivalist reading exactly eight because their trees granted nothing to move. DS and DY later lifted the floor to ten, and it stood at eleven at Batch IR.
+
+**Ability draft: partner-spec couplings (Batch DH).** Every card in the draft was authored inside its own spec, so for most of the draft's life the pools never referenced each other and a draft was a decision about one hero rather than about the warband. Two accidental exceptions showed the shape worked (Fault Line hands the Sharpshooter the Break that Breaking Darkness amplifies, and Downwind copies whatever debuff an ally applied), and both are among the most interesting cards in their pools. Batch DH made the couplings deliberate: eight cards name a partner spec.
+
+**Ability draft: why every card names a Builds with.** While a draft pool held two cards the question a card answered was what gap it filled. At eight cards the question became whether a build can be assembled, so each card names what it is meant to be played beside.
+
+**Swordmaster: Battle Poise's Defensive gate.** Since Batch DR Battle Poise's guard requirement buys something too. Until then its Defensive gate was pure cost: Answering Steel held its whole payload as a subset, and there was no board on which Battle Poise was the better pick.
+
+**Swordmaster: Wheeling Cut (why it was added).** Before Wheeling Cut the Swordmaster's pool had no area damage at all: his only field-wide option for a whole run was Cleave out of the Warrior class pool.
+
+**Swordmaster: Counter Time (why it was added).** Before Counter Time the Swordmaster's pool could not take an enemy's turn away at all: Pommel Strike is his only Stun and it is protected core, so a whole run's control was one core ability's one-turn rider.
+
+**Pyromancer: Firedraw (why it was added).** Until Firedraw the only way for the Pyromancer to build a deep Burn stack was to keep casting at the same body.
+
+**Cryomancer: Cold Iron (why it was added).** Until Cold Iron nothing of the Cryomancer's own could safely strike into his hold, because Ice Lance is the release.
+
+**Holy: Shared Grief (why it was added).** Until Shared Grief the only way to fill the Holy Cleric's Mercy meter was to let the heroes be hurt, because Mercy arrives when somebody crosses below half health.
+
+**Devout: Conviction's absorb rate (Mantle).** Divine Shield absorbs, the only thing Conviction builds on, were measured at 1.5 a battle; Mantle, a shield that becomes three shields, is three times the trigger.
+
+**Beastmaster: Bloodbond (why it was added).** Before Bloodbond the Beastmaster had no answer at all to a companion's death, the worst thing that happens to him at 50 Loyalty.
+
+**Beastmaster: companion swap rate (Succession).** Batch BJ measured 0.05 companion swaps a trash battle; Succession removes the depth cost of a swap.
+
+**Beastmaster: Pack Bond conversion and the raw-stack cards (Unleash).** Batch EU's conversion does not reach Unleash: the split changes what a Loyalty stack pays, and Unleash counts stacks (20% of Attack a stack, never through the Pack Bond curve).
+
+**Beastmaster: Bear the Brunt (why it was added).** Before Bear the Brunt the Beastmaster's pool had no mitigation of any kind.
+
+**Beastmaster: Bring It Down (why it was added).** Bring It Down was the answer to a Beastmaster pool that was 8 of 8 on one engine: it makes the other three heroes care what the Loyalty meter reads.
+
+**Beastmaster: Loyalty depth by loadout (Bring It Down's cap).** Measured at Batch ER: a deepest bond of 10.1 Loyalty stacks with the three talent rows a first rung-1 clear opens, and 19.0 fully talented. Bring It Down's cap is 10 stacks, so it binds about where the meter sits early and far below it later.
+
+**Beastmaster: Pack Bond conversion and the raw-stack cards (Bring It Down).** Batch EU's split at 8 did not move Bring It Down: the card reads the raw Loyalty stack count, so its cap binds exactly as often as it did before the conversion.
+
+**Sharpshooter: Dug In (why it was added).** Before Dug In the Sharpshooter's spec cards offered him nothing defensive at all.
+
+**Survivalist: Thick Hide (why it was added).** His passive pays him for being struck and Stalking Horse pulls the field onto him, and until Thick Hide nothing in his kit or pool supported being in the fray.
+
+**Hunter: self-healing (why Salve was added).** Before Salve the Hunter class was shortest of the self-healing axis by a distance: its only self-mending was one class card and a boss-pick Harvest.
+
+**Archetype tags — BREAK is a secondary tag only.** Batch FD §2 demoted BREAK from a primary tag to a secondary-only one. BREAK was the only one of the seven tags naming a mechanic where the other six name a role, so demoting it made the primary vocabulary uniform. It was demoted rather than removed: it stayed as the secondary, so a Break build is still visible on the draft card.
+
+**Archetype tags — BREAK is a secondary tag only.** The census of Batch FD §2's demotion: fifty-four card rows moved and fifty-three became OFFENSE · BREAK — the primary spread went BREAK 54 → 0 and OFFENSE 16 → 70 over a corpus of 227 both sides, and the cards carrying BREAK at all went 46 → 99. The fifty-fourth was Feint, where EL §2 had already ruled the second slot to MARK: it reads OFFENSE · MARK, the one card of the 54 where the demotion became a removal. Thirty rows lost a secondary to make room (18 RESOURCE, 9 DEBUFF, 2 DEFENSE, 1 TEMPO; 20 had none to lose and 3 already read OFFENSE second), and that was cheap because a secondary feeds no condition — and since Batch FN nothing does: no rune reads a tag at all, so a displaced secondary moves a screen and nothing else.
+
+**Archetype tags — BREAK is a secondary tag only (the rune table).** The BREAK demotion was carried into Runes.RUNE_TAGS: the five rune rows that led with BREAK (long_watch and bared_plate live, comet, seventh_bolt and shattered_guard retired) all came to read OFFENSE · BREAK, so the primary vocabulary is uniform across cards and runes. Four of the five carried BREAK as their only tag and cost nothing to move; bared_plate displaced a DEFENSE that RUNE_SHAPES already records as its TRADEOFF.
+
+**Archetype tags — BREAK is a secondary tag only (the rune table).** Moving the RUNE_TAGS rows changed no behaviour, and that was measured rather than assumed: the chain RUNE_TAGS → rune_tags() → rune_tag_line() ends in no caller, and no rune condition exists to read the table (Batch FN retired both).
+
+**Hold the Line — companions included.** Hold the Line's Break cut and no-death window have reached companions since Batch DK (its read site is _hero_side()). DK measured it on a summoned bear: a 40-BD blow banked 20 under the base cut against an unheld 40, and a lethal blow left it at 1 HP.
+
+**Lunge — re-authored onto Break.** When Batch DR re-authored Lunge onto Break (Aggressive puts 15 more Break into its one enemy; Defensive puts 12 Break on every other enemy), Shatterpoint kept its place among the Swordmaster's heaviest single Break blows at 40.
+
+**Lunge and Execute — out of the talent trees.** Lunge and Execute were talent grants until Batch DO; once no talent granted either, the node upgrades they used to collide with became read-only-zero — the branches stand and nothing writes them.
+
+**Survivalist spec pool — the designed eight.** Of the Survivalist's designed eight spec-pool cards, two were spent elsewhere: Smoke Bomb's function shipped (at BO) as Choking Smoke in his draft pool, and Field Dressing shipped (at BR) as a Hunter class-wide draft card, so both names are spent — which is why, of the three not in his spec pool, only Blight is still owed.
+
+**Hero and ally — why there is no third word.** There is no third word on a card (no card says everyone) because a vaguer word reads as either — and that ambiguity is exactly what had let one card promise a shed to everyone standing and pay only the four, for the life of the project.
+
+**Hero and ally — rule on clauses, not abilities.** Rallying Shout was the worked example of what hid from two sweeps: one card, two clauses, two shapes. Both sweeps read the ability and ruled on the ability; the clause that carried neither word was invisible to each — which is why a card is read clause by clause, not card by card.
+
+**Starting inventory and the zone-1 pouch.** The Defense Potion was dropped from the opening inventory so that the four starting types (2 Health, 1 Mana, 1 Bomb, 1 Revive) fit the four slots a zone-1 pouch holds; it is sold at every merchant instead.
+
+**Consumable slots as a second currency.** Before the pouch had a slot cap, gold was the only ceiling and everything in reach was worth buying; with 4–6 slots the merchant asks what the player will give up — which is why slots are called a second currency.
+
+**Blacksmith — why a gold sink that takes no slot.** Batch BK added the blacksmith as the run's gold sink. Batch BJ had measured 63% of every run's gold going unspent, with 13.6 shop-rune refusals a run for no free slot against 6.8 for the gold reserve: slots were the binding constraint, not prices, so no amount of extra shop stock could have fixed it — which is why a blacksmith consumes no slot.
+
+**Blacksmith prices (150 / 225 / 300).** The arithmetic behind the blacksmith's zone prices (Batch BK), recorded so a later batch can argue with it rather than re-derive it: 2386 earned and 881 spent a run at 36 encounters was 1505 dead gold; at 48 encounters that scaled to ~2050 before the merchant's frequency change made it worse; six visits at these prices is 1350.
+
+**Blacksmith — measured effect on unspent gold (Batch BK).** Measured at Batch BK (n=150 per policy, all three of which rank the blacksmith at the top of their non-elite order so the question has an answer): the route walked 6.5–7.9 blacksmiths a run and bought 2.4–4.1 of them — the rest refused for want of gold, which is a sink doing exactly what a sink is for. It converted 41–47% of all income (931 gold greedy, 904 balanced, 508 cautious). Unspent gold at run end fell from Batch BJ's 63% to 25–28%.
+
+**The Devout's owed fifth rune.** The Devout's fifth lineage rune is owed, not missing (Batch FK; docs/reports/FK.md §7): the rune authored for that slot said 'Consecrated Ground grants Faith to allies standing in it, not only to its caster', and that has been the base kit since Batch AW §2, so it would have shipped 100% inert. check_fk §6 asserts the absence AND the two code facts that cause it, so the day a batch narrows the ground to its caster the gate says the rune is authorable.
+
+**Rune pool — the retired entries.** 65 of the 68 retired rune entries are ET's and EO's; the other three are of a later vintage. The three walks that read 'retired' as 'authored under the old one-rune-per-lane rule' narrow their populations by RUNE_SHAPES membership rather than by an exemption.
+
+**Rune secondaries — THRESHOLD and BREADTH retired (Batch FK).** Batch FK (ruled by the designer) retired the two gated secondaries going forward: THRESHOLD and BREADTH are not authored again. A gated rune at a flat price is strictly worse than a bare one — the price does not fall to pay for the condition — and FJ measured the constraints as unworkable besides: BREAK can never carry a threshold anywhere in the game (zero of the 231 tagged cards carried it as a PRIMARY), and a condition can be live at one rung of the ladder and dead at the next (the Holy's breadth was satisfiable at exactly six drafted cards; the Swordmaster's failed at exactly five). TRADEOFF survived — a cost paired with a bigger upside is self-balancing and reads on the card — and eight of FK's thirty-nine carried one, against the four the first twenty-one had.
+
+**Rune secondaries — the eight gated runes ungated (Batch FN).** At Batch FN (ruled by the designer) the eight already-shipped gated runes came off their conditions. They were eight, not six — four THRESHOLD (Deepening Hex, Bracing Line, Heavy Bolts, the Answering Pack) and four BREADTH (the Wide Rite, the Long Watch, the Wide Watch, the Shared Scent) — and every one became unconditional: the payload condition and the label came off together, and the clause came off the card. With no entry in the file carrying a condition on a hero's tags, the reading machinery had no reader left and went with them. check_fk §2 had asserted those eight were still gated, so 'none is authored' could not be satisfied by quietly ungating the ones that were owed a fix; that arm was inverted to assert none of the eight carries a condition, which keeps the same question alive pointed the other way.
+
+**Rune secondaries — what the conditions cost (Batch FN).** What the THRESHOLD/BREADTH conditions were actually costing was measured before they went (Batch FN). Read as the share of a spec's reachable loadouts that satisfied the clause at each rung of the slot ladder, the eight ranged from Deepening Hex at 69–86% — near enough a free clause — down to Heavy Bolts at 0–8% and the Wide Rite at 0–4%. Two of them were unreachable at a full bar: Heavy Bolts' MARK threshold could not be met by a Sharpshooter carrying seven drafted cards (his whole pool held three MARK primaries against the four the fraction needed), and the Wide Rite's breadth could not be met by an Occultist at five or at seven. Full per-rune table in docs/reports/FN.md §1.
+
+**Deepening Hex and the Wide Watch — the FO rulings.** Two of the eight ungated runes were still worth exactly zero to a hero holding one talent node; both were ruled at Batch FO (by the designer). Ungating them had not changed that: FN measured it and flagged it without retuning. The rulings: Deepening Hex subtracts 2 from the Ruin threshold rather than setting it to 8, and the Wide Watch is retired with the Shared Mark in its place.
+
+**Deepening Hex — why a subtraction (Batch FO).** Deepening Hex used to set the Ruin threshold with mini(step, 8). The mini was correct and deliberate (it stopped the rune pushing detonation BACK), and a subtraction keeps that property while working for every build.
+
+**The Wide Watch retired, the Shared Mark in its place (Batch FO).** The Wide Watch is retired and the Shared Mark holds its place. It stays retired because its place in the Sharpshooter's set is filled: the Shared Mark took it one-for-one, and it builds the meter where the Wide Watch defended it. What the retirement cost is the rune's own clause — a kill leaves his Focus at the 50 retained, and only a kill by Trophy Shot keeps it whole. It was retired the way every retirement is: kept, and said to be kept — the entry, the payload, the field and the read site in _sharpshooter_focus all stay, so a saved run holding it still works and is still paid; only eligible_ids refuses it.
+
+**The 65 runes retired at EO and ET.** Batch EO §3 retired twelve runes and Batch ET §1 the other fifty-three; they are still retired and still unreachable. They were retired the way the twelve already were — kept, and said to be kept: every entry keeps its name, its price, its payload and its desc, still resolves through config / build / display_name so a saved run holding one keeps working, and each carries a string naming what is lost. Nothing was authored, nothing deleted, and no payload, price, desc, lane or scope moved — the whole data diff was 53 added lines. Why: the pool was authored to the one-rune-per-talent-lane rule, which was replaced; keyed to talent counters, which were rebuilt at DO and DP; and re-keyed onto rune-owned fields at EM. What survived all of that was the magnitudes, and the magnitudes were never the interesting part. A pool authored to the real charter — threshold-gated, reading archetype tags on the holder's drafted cards — would be better than 53 patched ones.
+
+**Rune rarity tiers removed (Batch ES §1).** Batch ES §1 removed rune rarity: Common, Rare and Epic went, and with them the prefixes (Cracked / Polished / Radiant), the tier colours, the ×1/×2/×3 magnitude ladder and the 50/100/160 tier price. What each tier used to mean — flat stats, an ability's numbers altered, an ability granted or a rule inverted — was an authoring convention rather than a behaviour, and every rune went on doing exactly what it did: the kind lived in the payload, never in the label.
+
+**Rune offer odds by zone.** The rune offer odds used to deepen with the zone slot — 60/30/10 → 40/40/20 → 25/45/30 — which was the only thing making a late offer differ from an early one. With the tiers gone, they do not.
+
+**The generated stat family kept dormant (Batch FM §1).** The six generated stat-family entries are kept — Runes.TEMPLATES, template_rune and _template_markers all still stand and still resolve, at their authored magnitudes and one price (+10 max HP / +2% armor / +4 Speed / +12 Constitution / +2% crit / +8 max Mana, 50g), so restoring a floor is one line rather than a family being re-authored. The one thing that still reaches them is the simulator's DOD_SIM_RUNES=stats arm, whose whole purpose is to measure that family.
+
+**Rune price — 150g flat.** Price was the open question rarity left behind, and it was answered: 150g, flat. Every authored rune had always carried its own price and none moved — but those prices were written against a tier table that no longer exists. Superseded at EZ §0 and corrected at FF §3: the number is ruled and the pool is not empty. Every live rune is 150g, flat — the player pays for fit rather than for magnitude. The 68 retired entries keep their authored prices unmoved, and they run 100 ×43, 75 ×14, 160 ×6, 120 ×3, 150 ×1 and 50 ×1, which is the record of what the old pool charged rather than a second pricing rule. The two sentences FF §3 replaced — 'the 53 ET retires' and 'with the pool empty there is nothing left to price' — were true when ET wrote them, were superseded at EZ, and were named as stale by FD and left again by FE. A false claim in master.html does not decay and is not caught; it is only ever found by someone looking.
+
+**Rune cache re-asked at the answer (Batch FD §1).** Measured before the cache re-ask was built (Batch FD §1): two triples queued before either was answered shared a name in 265 of 400 trials, and a queued candidate was also the shop's offer in 127 of 400. The re-ask is not a reroll — a triple with nothing wrong with it is returned untouched, which was Batch X's rule.
+
+**Zone-boss pick re-asked at the answer (Batch FE §2).** Before Batch FE §2 the zone-boss pick did not re-ask at the answer: a name the hero had taken since the triple was rolled was drawn as a button that did nothing — and where a hero's boss pool was smaller than the number of picks he had saved up, every button was dead and the pick could never be spent at all. The Devout's boss pool is two, which was the sharp case.
+
+**Mini-boss upgrade pick — once-per-run at the answer (Batch FE §2).** Before Batch FE §2, taking one mini-boss upgrade twice was possible and it stacked: Honed is +50% damage applied twice, Weighted doubles Break damage twice, Quickened takes four turns off a cooldown rather than two. Run.upgrade_choice enforces the once-per-run rule at the answer as well as at the roll.
+
+**The retired rune pool's authoring structure.** The retired pool's authoring structure is history and not the live shape (corrected at FF §3, and again at FR §2). The live pool is 79 ordinary runes, every one scoped to its class or to the Crest — there is no universal rune in the game. The 65 ET retired were 5 universal, 3 class-wide for each of the four classes, and 4 spec runes for every one of the twelve specs; the headline that stood in master.html read 'Spec coverage: 65 authored runes' with nothing marking it as the retired half, and the file holds 171 entries. Each retired set was authored to one rule: one rune per talent lane, plus one splash that carries a term from every lane and pays for reaching outside one. Exactly one rune per set charges for its upside, and it sits on a lane; splashes are always clean. That rule no longer describes what the runes do, and ET §1 was the consequence taken to its end: the pool authored to it was retired whole rather than patched entry by entry. The 65 entries and their authoring structure are still in the file — the count, the lanes and the one-costed-rune-per-set shape unchanged, which is what makes them readable by the batch that writes the next pool; sixty are scoped to their class and five are universal, and the spec a rune was written for is carried by its lane and its words.
+
+**'Scarred' removed as a rune label (Batch ES §3).** Batch ES §3 removed 'Scarred' as a label while every cost clause stayed: no flag, no crimson prefix and no crimson colour; a rune's negative terms were byte-unchanged. What recognises a cost is Runes.is_cost — a field name and a sign — the same function that holds a cost at its authored value under the sim's power probe, so no clause quietly became pure upside. The flag and the behaviour had never agreed, and removing the flag is what showed it: both were 17 and they were different 17s. The Rune of Exsanguination was flagged and has no payload term to find — its promise (veins open at 85) and its price (the bleedout tears 15% instead of 20%) are two behaviours of one field at one read site. And the Anchor Rune carried a real −10 Speed and was never flagged, because the old schema forbade a 'scarred common' and it was the one common in the file — a rarity rule was hiding a cost.
+
+**The rune charter — runes off the talent counters (Batches EJ, EM, EN).** The charter (a rune is disconnected from the talent trees) was taken at Batch EM. EJ measured the gap at 59 of 135 clauses across 32 of the 65 runes; EM re-keyed 56 of them onto rune-owned fields read beside the node's at the same site, so a rune pays its advertised number to a hero who holds the node and to one who does not, and the two still stack. Not one magnitude moved. Batch EN took the last three and the charter was complete at 59 of 59: Divine Presence, Entropy and Pleasure from Pain were per-turn drips that existed only as their node, so EM had nothing to re-point onto and priced four options; EN gave each a field of its own and made the drip's existing tick sum the pair. There is no second tick — a hero holding the rune and the node would otherwise be paid twice. Driven live before and after on seeded battles, every reading reproduced exactly: the rune-only hero's drip fired 81 / 130 / 76 times for the same totals on both sides, and a control reading the node's half alone took all three to zero while leaving the node's own arm untouched.
+
+**The rune charter — what it cost the per-lane rule.** What the charter cost, recorded because it was measured rather than overlooked: the per-lane rule is what made a rune a build decision rather than a power increment — the same rune was worth more to a hero whose points went elsewhere than to one already deep in that lane. A rune with its own field is worth the same to every hero of its spec, so that asymmetry went: 48 of the 65 runes were built on it and the 12 splashes lost most, since with no lanes to reach across a splash is three unrelated numbers in a bundle. The 36 `lane` fields are still authored, all on retired entries, and no screen shows them; they describe where a rune came from, not what it reaches.
+
+**The twelve runes retired at Batch EO §3.** Batch EO §3 retired twelve runes: 65 authored, 53 offerable (superseded twice: ET §1 took it to 65 retired and 0 offerable, and EZ to 86 authored with 21 offerable — this is EO's reading of its own twelve, kept because it is the reasoning the next retirement is argued against). The charter emptied sixteen runes whose every clause was talent-keyed — after the re-key each was mechanically whole and had lost the argument for existing, because each was 'your lane, but more'. Three were held back for re-authoring (the Beastmaster's Deep Bond, Shared Wild and Turning Pack: retiring them would have left no rune in the game touching a companion, and the companion IS the spec), one was flagged and left untouched (the Rune of the Bared Guard, whose two clauses ARE the trade, so retiring it would remove the cost with the upside), and the other twelve were retired.
+
+**Per-hero relics — the unbuilt ruling (Batch CX).** Batch CX scoped the per-hero relic ruling (a relic assigned to ONE hero at pickup) and stopped: it is a save-format change touching four signatures, both acquisition sites and 13 of the 25 relic descriptions, with four hooks still unruled.
+
+**Fight budget ramp — the 5/14 slope (Batch BK).** The fight budget's slope is 5/14 and not a half because Batch BK's lattice took a zone from 12 slots to 16 and the ramp was re-fitted to keep slot 1 opening at 3–5 and the last slot before the boss topping out at 8–10, rather than running the pre-boss slot into the boss's own band.
+
+**Sim knobs retired at Batch BK; Matrix row comparability.** DOD_SIM_MAP, DOD_SIM_MINIBOSS, DOD_SIM_START_RUNE and DOD_SIM_SPEC_OPENING are retired — the dealt mini-boss row and the opening rune pick they controlled no longer exist, so a Matrix row reads map=branch (Batch BK; map=line is an AN-to-BJ row) and carries no such fields. Rows from before Batch BK are not comparable with rows after it: depth is out of 49 slots rather than 36, and choice= went from a structural 0% to a measured one.
+
+**Rung ladder vs the old talent layer.** The only rung-matched reading on record — 0% at rung 2 and 18% at rung 3, against a clean, monotone power ratio of 1.26 / 0.91 / 0.67 — came from a talent layer with rows and capstones, which the one talent tree does not have, so it does not describe it. Moving a rung was not the first fix — those ratios said the ladder was not what was wrong.
+
+**Provisional magnitudes — Waystone Shard, Horn of the First War, three events.** The Waystone Shard, Horn of the First War and three events were re-specced and carry provisional magnitudes: they were re-pointed because the currency they paid in was deleted, not because anyone priced them.
+
+**Boss-pool abilities owed — Sharpshooter and Survivalist (Batch DS).** Batch DS corrected the list of designed boss-pool abilities not yet written to four, not six. Two entries were stale: Field Dressing was written at BR — as a Hunter class-wide draft card rather than as this pool's, so the name is spent and the boss pool still has nothing by it — and Smoke Bomb's function shipped at BO as Choking Smoke in his draft pool.
+
+**Boss-pool abilities owed — Sharpshooter and Survivalist (Batch DS).** DS deliberately did not spend the three Sharpshooter names on its own two draft cards, which would have paid one debt by opening another.
+
+**Difficulty baseline — the old ~100% figure.** The old '~100% win rate' difficulty figure measured a single fixed unscaled lineup and carried no information; the per-budget sweep (./sim.sh --sweep) is the reading tuning designs against, with playtests.
+
+**Run-level baselines reset (Batch BK).** Batch BK reset every run-level baseline — 48 encounters rather than 36, a route that can be walked well or badly, and elite payouts that are earned rather than issued — so the whole run curve wanted re-reading before anything was tuned against it.
+
 ## The seven the census found in the code, and the rename map (Batch IR) — 2026-10-22
 
 **Why the fixed modifier and the bargain never meet, rather than one winning.** On Ruin the mini-boss was both a node that

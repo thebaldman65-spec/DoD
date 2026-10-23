@@ -4550,19 +4550,24 @@ func _type_counts_line(units_by_type: Dictionary) -> String:
 	return ", ".join(parts)
 
 
+# BATCH IS §2a — A TOAST WRAPS. It was one line, 1,280 px wide with no wrap, so a sentence past the screen's width
+# was cut at both ends — and the arrival toast joins every note a load had to say (`_announce_arrival`), which is
+# where a card the game no longer has is said. A short toast reads as it always did; a long one takes a second
+# line instead of losing its ends (GT §1: make room, shrink nothing). IH §0's order: parent it, size it, then words.
 func _toast(text: String) -> void:
 	var label := Label.new()
 	label.set_meta("toast", true)
-	label.text = text
 	label.add_theme_font_size_override("font_size", 20)
 	label.add_theme_color_override("font_color", Color(0.9, 0.85, 0.6))
 	label.add_theme_constant_override("outline_size", 4)
 	label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
-	label.position = Vector2(0, 100)
-	label.size = Vector2(1280, 26)
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.z_index = 50
 	add_child(label)
+	label.position = Vector2(40, 100)
+	label.size = Vector2(1200, 26)
+	label.text = text
 	var tween := create_tween()
 	tween.tween_interval(1.4)
 	tween.tween_property(label, "modulate:a", 0.0, 0.5)

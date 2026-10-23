@@ -266,22 +266,26 @@ func _s4b_the_other_keys() -> void:
 	_run.party[1]["key"] = "iq_gone_class"
 	ok(not _roundtrip() and not FileAccess.file_exists(path),
 		"§4b class: a save holding a class this build does not have was loaded, or kept")
-	# A saved rune's ability payload adding to a property a card does not have: the field is dropped, the rest pays.
+	# A saved rune's ability payload adding to a property a card does not have: the field does not reach the spawn.
+	# RE-POINTED AT IS §2b: IQ's guard dropped the field and kept the rest as built; IS's derived door rebuilds a payload
+	# naming a field today's definition does not name, whole, from today's definition — which names no property gone. The
+	# fixture is a real ability rune (Warrior's Edge) as built, plus the property a later build lost; it loads as today's.
 	_new_run()
-	var r := Runes.build(String(Runes.ids()[0]))
-	r["payload"] = {"ability": "Strike", "add": {"iq_gone_field": 3, "cost": -1},
-		"also": [{"ability": "Strike", "add": {"iq_gone_two": 1}}]}
+	var r := Runes.build("warriors_edge")
+	(r["payload"]["add"] as Dictionary)["iq_gone_field"] = 3
 	r["equipped"] = true
 	(_run.party[0]["runes"] as Array).append(r)
 	ok(_roundtrip(), "§4b payload: the save did not load")
 	var lp: Dictionary = ((_run.party[0]["runes"] as Array).back() as Dictionary)["payload"]
-	ok(lp.get("add") == {"cost": -1} and ((lp.get("also") as Array)[0] as Dictionary).get("add") == {},
-		"§4b payload: the load kept a field a card does not have on '%s' — add %s, also %s"
-		% [String(((_run.party[0]["runes"] as Array).back() as Dictionary).get("id", "")), str(lp.get("add")), str(lp.get("also"))])
+	var today: Dictionary = (Runes.config("warriors_edge") as Dictionary).get("payload", {})
+	ok(not (lp.get("add", {}) as Dictionary).has("iq_gone_field") and (lp.get("add", {}) as Dictionary).size() == (today.get("add", {}) as Dictionary).size()
+			and String(lp.get("ability", "")) == String(today.get("ability", "")),
+		"§4b payload: the load kept a field a card does not have on '%s', or lost the rest — add %s, today's %s"
+		% [String(((_run.party[0]["runes"] as Array).back() as Dictionary).get("id", "")), str(lp.get("add")), str(today.get("add"))])
 	# EVERY FILTER RUNS WHERE THE SAVE IS READ, AND ONLY THERE: a key the code chose never meets one.
 	var rs := _src("scripts/run_state.gd")
 	var lr := _body("scripts/run_state.gd", "load_run")
-	for fn in ["_drop_stale_save_keys", "_drop_stale_payload_fields"]:
+	for fn in ["_drop_stale_save_keys", "_rebuild_stale_payloads"]:  # the second IQ's `_drop_stale_payload_fields` until IS §2b
 		var n := rs.count(fn + "()") - rs.count("func " + fn + "()")
 		ok(n == 1 and lr.contains(fn + "()"), "§4b: `%s` is called %d times, or not from the load door" % [fn, n])
 	_run.active = false

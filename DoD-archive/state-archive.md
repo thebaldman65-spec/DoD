@@ -17,6 +17,118 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT IS — 2026-10-22, FROM `docs/state.md` AS IR LEFT IT (`6ce7183`)
+
+**What came here**: IR's six rulings, every one answered in IS's brief; the index pilot's block, built at IS §5; FOUND AT IR's three items IS closed (the split's rounding, the three floors read and not driven, and the four latent shapes' item, whose three remaining shapes stay live); FOUND AT IQ's history-clause item, done at IS §6; FOUND AT GB's mini-boss item, closed at IR §1a and left standing; GM's fourth ruling's first half (Split Shield's word, answered at IS §4) and FOUND AT GE's sweep-residue item as it stood (its twenty-two-cards half done at IS §6), each found by IS's close-read; and the roadmap's IS line. Everything else in the live file stayed.
+
+
+### ~~IR's RULINGS OWED~~ — **ALL SIX ANSWERED IN IS's BRIEF (§0.1–§0.5): THE SECOND RUN AND THE FRAMING CARD CARRIED TO THE LOOK-LIST (1, 6); MANTLE KEEPS ITS PICK AND SAYS *HERO* (2); A REMOVED CARD DROPPED AT THE LOAD (3); A STALE PAYLOAD REBUILT FROM TODAY's DEFINITION (4); SPLIT SHIELD SAYS *HERO* (5)** — WAS: **SIX; THE FIRST IS CARRIED, THE NEXT FOUR ARE WHAT IR's CENSUSES FOUND BESIDE THE SEVEN, AND THE LAST IS A REPAIR TO CONFIRM**
+
+Full working: `docs/reports/IR.md`, NEEDS A RULING.
+
+1. **A SECOND RUN, WITH A DIFFERENT PARTY** (carried from IQ's ruling 1, IR's brief §0.1). The readout's clean file is md5-identical at
+   IR's open and close — the run has not been played on — so every figure in THE FIRST CLEAN PLAYTHROUGH (below) is one run and one party.
+2. **MANTLE's PICK NAMES NOBODY** (IR §1b's census). Its words name no target for the first shield — *Lay the mantle: a Divine Shield* —
+   so it stays an ally card: the shield lands on a companion and works. Its pass walks the heroes, and *every one of them builds Faith
+   like the first* is false when a companion held the first (Faith is heroes-only). Keep it an ally card, or narrow it to the heroes.
+3. **A CARD REMOVED SINCE THE SAVE FLOOR HAS NO ROW** (IR §2's census): Flash Freeze (retired at DR) and Observance (deleted at CG, Vespers
+   took its slot) have no name today to be read by, so a save from before either still holds a card the game does not have — a slot
+   taken and a blank button. **It is no longer silent**: the load door keeps it as saved and says so (`push_error`). Drop it at the load,
+   freeing the slot, or keep it loud.
+4. **A SAVED RUNE's PAYLOAD THAT NAMES A RENAMED FIELD** (IQ's latent WRONG, found live at IR §2): Deepening Hex wrote
+   `rune_hex_threshold: 8` from EZ until FO renamed the field `rune_hex_deepen` **and changed what it means** (it installed a threshold of
+   8; it now subtracts 2), so no name map can repair a save from that window — the rune pays nothing there (`set()` drops the field).
+   Rebuild a stale payload from today's data at the load, or keep HR §0's rule that a payload rides the save as it was built.
+5. **SPLIT SHIELD's WORDS SAY *THE ALLY HE SETS IT IN FRONT OF*** and its picker offers the heroes alone (`_split_shield_allies`; a
+   companion makes no Block roll), so the word is *hero* — rune text is yours to change (IR §1b's census, beside the family).
+6. **THE FRAMING CARD's BUTTON STOOD BELOW THE SCREEN** — 660 px tall from y=150 on a 720-px screen, so *Take the road*, the one way
+   past a first run's first map, was drawn at y≈780. IR places the card by its own height (GT §1's rule: make room, shrink nothing).
+   Measured, not seen in play: confirm it on screen.
+
+
+### ~~THE INDEX PILOT IS IS's~~ — **BUILT AT IS §5: THE INDEX AT THE TOP OF THE FILE; ITS FOUR CONDITIONS ARE THE ROUTING's** — WAS: THE INDEX PILOT IS IS's — **ON THIS FILE ALONE, NOT `CLAUDE.md` AND NOT YET (IR's brief §0.2, the designer's)**
+
+**WHY A PILOT AT ALL.** IQ §3 priced the block index at 47.4–48.6% off `CLAUDE.md`'s read and 71.2% off this file's: not room but a
+batch's cost — HN's objection, answered — and 833 KiB read against 333 is a different project to work in. **WHY THIS FILE AND NOT
+`CLAUDE.md`**: (1) its build costs 7 pins in 4 targets where `CLAUDE.md`'s costs 144 in 42 gates, a fifth seam file and `check_hx` §1's
+four checks — a pilot that costs 7 answers the question one that costs 144 does; (2) the failure is survivable here and not there — a
+batch that misses a FOUND AT block forty batches old loses a line of context, one that misses a standing rule ships a defect, and
+premise-checking against the rule file whole is this project's main defence; (3) the premise is strongest here — a batch needs a mean
+of 14.4% of this file, and 35.4% of its blocks were needed by no batch in twenty (IQ §3).
+
+**ITS JOB IS TO MEASURE WHAT IQ SAID IS NOT MEASURABLE**: a batch on a wrong premise because it did not open a block. It becomes
+measurable after the fact — every report already says what it quoted, cited and depended on — so a pilot run for a few batches is read
+against what each batch turned out to need.
+
+**THE FOUR CONDITIONS, SET BY THE DESIGNER SO IS HAS THEM:**
+- **Reversible by construction**: the file is loaded whole again by deleting the index's own routing, and nothing leaves the repository.
+- **Every index row carries the triggers that route a batch to it** (HV §3f's 250 B), and **the core keeps every block seven of nine
+  batches needed** — the measurement's own membership, not a judgment.
+- **Each report says which blocks it opened and which it turned out to need** — the pilot's instrument, a paragraph a batch.
+- **`CLAUDE.md` waits**, and can: if the pilot shows batches route correctly it is next; if a batch misses a block, that was learned for 7
+  pins.
+
+**AND IS's SECOND HALF: `master.html`'s HISTORY STRIP (IR's brief §0.6, the designer's)** — 185 units, 117 batch names, one pass of its
+own; a clause carrying reasoning worth keeping MOVES to `docs/design-notes.md` rather than dying. The rule is `CLAUDE.md`'s, in the
+working agreement: *`master.html` says what the game is.*
+
+
+### FOUND AT IR AND NOT FIXED — ITS CLOSED ITEMS (archived at IS; the section stays in `docs/state.md`)
+
+*The split's rounding and the recoil split's zero: closed by IS §3a. The three floors read and not driven: driven to verdicts at IS §3b, each GUARDED, and amended in the census. The four latent shapes' item is archived whole and the live file carries the three that remain.*
+
+- **SACRED RESOLVE's SPLIT ROUNDS A SMALL BLOW UP** — a 1-damage blow on four bound heroes bills 4 in all, each share floored at 1. Not
+  the zero shape (the total is not zero); the designer's if it matters.
+- **THREE FLOORS READ, NOT DRIVEN** (the census's uncertain rows): Shatter's and Winter's Toll's `maxi(hold_turns, 1)` (classed guarded,
+  because every turn adds one before anyone acts); Cull's and Harvest's guard and payout counting two ways around the purge; and
+  Returned Burden re-laying an effect lifted at 0 turns for 1.
+- **FOUR LATENT FLOOR SHAPES NOTHING WRITES TODAY** (IR §1d's census, `docs/reports/IR-floor-census.md`): Sacred Covenant's Faith floor is
+  gated on the heal field, not the Faith; Slow Acting would lift Thin Blood's zero poison tick back to 1; Sacred Resolve's RECOIL split
+  would bill 1 each if Blowback ever zeroed a recoil; and the temporal rift reads a blow's damage with no zero test. Each pays the floor
+  of a zero the day its field gets a writer.
+
+### FOUND AT IQ AND NOT FIXED — ITS CLOSED ITEMS (archived at IS; the section stays in `docs/state.md`)
+
+*Done at IS §6: the history strip.*
+
+- **`master.html` HOLDS 185 UNITS WITH A HISTORY OR RATIONALE CLAUSE, AND NAMES A BATCH 117 TIMES** (the stamp aside) — IQ's
+  ruling 6, **ruled at IR's brief §0.6: stripped, in a pass of its own, IS's** (THE INDEX PILOT IS IS's, above). **And its zone-boss heading still reads *a zone-boss award always pays*** inside the history it narrates, while its own
+  paragraph says the chain can empty; the sentence that stated the claim as a fact is repaired.
+
+### FOUND AT GB AND NOT FIXED — ITS CLOSED ITEMS (closed at IR §1a, archived at IS; the section stays in `docs/state.md`)
+
+*IR §1a removed the meeting: a node that arms a fixed modifier offers no bargain, so Ruin's mini-boss fights its modifier.*
+
+- **THE FIXED MODIFIER NEVER REACHES A MINI-BOSS.** At rung 3 `arm_fixed_modifier` arms the mini-boss on entry, and
+  the bargain that always follows overwrites it (`accept_offer`); RunSim takes the bargain first, so the guard skips
+  arming. The mini-boss entry in the fixed list is dead in both flows.
+
+### THE PLAYTEST'S OTHER FINDINGS — ITS CLOSED ITEMS (archived at IS; the section stays in `docs/state.md`)
+
+*Built at IS: the index pilot (§5) and the history strip (§6).*
+
+- **IS — THE INDEX PILOT, ON THIS FILE ALONE, AND `master.html`'s HISTORY STRIP** (IR's brief §0.2 and §0.6, the designer's): the
+  pilot's four conditions and the strip's rule are above (THE INDEX PILOT IS IS's).
+
+### GM's RULINGS OWED — ITS ANSWERED HALF (answered at IS §4, archived at IS; the section stays in `docs/state.md`)
+
+*IR's ruling 5 asked it again and IS §4 answered it: Split Shield's words say* hero*. The item's second half — the half's name — stays.*
+
+4. **THE SPLIT SHIELD ASKS FOR A HERO, AND ITS HALF IS CALLED "BULWARK LINE".** With the rune Shieldwall names another
+   living hero; the rune says *ally*, and a companion never rolls Block. The half is EZ's `bulwark_line` status, whose
+   chip and block log read *Bulwark Line*, a node deleted at FX; the chip's own line reads *"Split Shield: …"*.
+
+### FOUND AT GE AND NOT FIXED — ITS DONE HALF (done at IS §6, archived at IS; the section stays in `docs/state.md`)
+
+*The history strip moved DO's twenty-two-cards paragraph to `design-notes.md`; the charter line's *"the talent trees"* and the §2 pricing stay.*
+
+- **THE §2 SWEEP'S RESIDUE, ALL OF IT ALREADY QUEUED UNDER GC:** `docs/master.html` still says *"the talent trees"* in
+  two places (the rune-condition door and EM's charter line), still prices talent points the pre-BM way in §2, and
+  still carries DO's move of twenty-two cards as history; `CLAUDE.md`'s name-sweep block still cites deleted Warden
+  nodes. None of them says a talent is tied to a spec; each is the census's other direction.
+
+---
+
 ## ARCHIVED AT IR — 2026-10-22, FROM `docs/state.md` AS IQ LEFT IT (`11ef9fa`)
 
 **What came here**: IQ's seven rulings, every one answered in IR's brief; FOUND AT IQ's nine items IR closed — the Ruin mini-boss's

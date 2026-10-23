@@ -4434,8 +4434,8 @@ func _player_turn(u: BattleUnit) -> void:
 	var grade := "good"
 	while true:
 		var used_targeting := false
-		# BATCH GM §3 — WITH THE SPLIT SHIELD HELD, SHIELDWALL NAMES AN ALLY. The
-		# rune's half goes to "the ally he sets it in front of", which is a choice,
+		# BATCH GM §3 — WITH THE SPLIT SHIELD HELD, SHIELDWALL NAMES A HERO. The
+		# rune's half goes to "the hero he sets it in front of" (its word since IS §4), a choice,
 		# so the self-cast below does not apply: the picker offers the other living
 		# heroes (`_split_shield_allies`), the bot takes whatever its rotation
 		# named when that is one of them, and a Warden standing alone sets it in
@@ -5023,6 +5023,10 @@ func _bot_drafted_pick(u: BattleUnit) -> Array:
 	var foes := enemies.filter(func(e): return not e.dead)
 	if foes.is_empty():
 		return []
+	# BATCH IS §4 — THE BOT's ALLY POOLS ARE HEROES-ONLY WHERE THE PLAYER's PICKER ADMITS A COMPANION, AND THAT IS
+	# NOT REPAIRED HERE: every grade of the severity ladder, every band and every band's mean was measured through
+	# this bot, and a constant bias cancels in a comparison where a change mid-ladder does not. The batch that
+	# widens these pools re-measures the ladder in the same batch, or retires it (`CLAUDE.md`'s ladder block).
 	var allies := heroes.filter(func(h): return not h.dead and not h.is_companion)
 	for ab in u.abilities:
 		# BATCH HB — TRIPWIRE IS DRAFTED SINCE HB AND ITS ONE DEFINITION STAYS IN
@@ -12269,12 +12273,21 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				# every bound hero 1 for it, the struck one too — where Sacred Resolve's words split
 				# the damage RECEIVED and Feint's parry lands none. Tithe's shape, found by its
 				# family's census (IR's report, §1d); the floor stays for a blow that lands any.
+				# BATCH IS §3a — AND A SPLIT OF ANYTHING IS THAT THING, EXACTLY: the shares sum to the blow, the
+				# remainder staying with the hero it struck (`_split_shares`). Each share rounded and floored at 1
+				# billed four bound heroes 4 for a 1-damage blow.
 				if bound.size() > 1 and final > 0:
-					var share := maxi(int(round(final / float(bound.size()))), 1)
-					_log("   → Unity splits %d damage: %d to each of %d souls" % [
-						final, share, bound.size()], "#e0d060")
-					for h in bound:
+					var ua_shares := _split_shares(final, bound, strike_target)
+					_log("   → Unity splits %d damage across %d souls: %s" % [
+						final, bound.size(), _shares_text(ua_shares)], "#e0d060")
+					var ua_own := 0
+					for ua_sh in ua_shares:
+						var h: BattleUnit = ua_sh[0]
+						var share: int = ua_sh[1]
 						if h == strike_target:
+							ua_own = share
+							continue
+						if share <= 0:
 							continue
 						var shared: Dictionary = h.take_hit(share, 0)
 						h.float_text("-%d Unity" % share, Color(0.95, 0.85, 0.4))
@@ -12283,7 +12296,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							_sfx("death", -4.0)
 							_message("%s falls!" % h.unit_name)
 							_log("† %s dies" % h.unit_name, "#e05050")
-					final = share
+					final = ua_own
 			# Steadfast (Warden talent): what would fell an ally, he takes on
 			# himself — 60%/rank of a blow that would leave them below 20%
 			# health is absorbed instead (Pressure still lands on the struck
@@ -13642,31 +13655,45 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var bl_targets := enemies.filter(func(e): return not e.dead)
 				if out > 0 and not bl_targets.is_empty():
 					recoil -= out
-					var each := maxi(int(round(out / float(bl_targets.size()))), 1)
-					for bl_e in bl_targets:
+					# BATCH IS §3a — the fourth split of the shape, dormant (no writer of `blowback`): what goes
+					# outward is what was taken off the recoil, exactly, in the warband's order.
+					var bl_shares := _split_shares(out, bl_targets, null)
+					for bl_sh in bl_shares:
+						var bl_e: BattleUnit = bl_sh[0]
+						var each: int = bl_sh[1]
+						if each <= 0:
+							continue
 						_dmg_frame(attacker, "Blowback", attacker.unit_name)
 						bl_e.take_tick_damage(each, "-%d" % each, Color(0.8, 0.5, 1.0))
 						_stat("dmg_hero_%s" % attacker.unit_name, each)
 						if bl_e.dead:
 							_on_enemy_death(bl_e)
 					_dmg_frame(attacker, ab.display_name)
-					_log("   → Talent: Blowback — the recoil goes outward (%d each)" % \
-						each, "#b0a8e0")
+					_log("   → Talent: Blowback — the recoil goes outward (%s)" % \
+						_shares_text(bl_shares), "#b0a8e0")
 				if recoil <= 0:
 					recoil = 0
-			# Unity binds recoil too: the backlash splits across the party.
+			# Unity binds recoil too: the backlash splits across the party — exactly (IS §3a), the remainder
+			# staying with the hero who recoils, and a recoil of nothing is nothing for everyone.
 			if attacker.has_status("unity"):
 				var bound := heroes.filter(func(h): return not h.dead)
 				if bound.size() > 1:
-					recoil = maxi(int(round(recoil / float(bound.size()))), 1)
-					for h in bound:
+					var ur_shares := _split_shares(recoil, bound, attacker)
+					var ur_own := 0
+					for ur_sh in ur_shares:
+						var h: BattleUnit = ur_sh[0]
+						var ur_share: int = ur_sh[1]
 						if h == attacker:
+							ur_own = ur_share
 							continue
-						if h.take_tick_damage(recoil, "-%d Unity" % recoil,
+						if ur_share <= 0:
+							continue
+						if h.take_tick_damage(ur_share, "-%d Unity" % ur_share,
 								Color(0.95, 0.85, 0.4)):
 							_stat("hero_deaths")
 							_sfx("death", -4.0)
 							_log("† %s dies" % h.unit_name, "#e05050")
+					recoil = ur_own
 			# Feedback Loop (talent): part of the backlash is paid as Mana
 			# instead of health (pairs with Conversion — self-harm into fuel).
 			# ADDITIVE — the counter is percentage POINTS of the recoil.
@@ -18218,6 +18245,44 @@ func _live_block_chance(u: BattleUnit) -> float:
 # companion outright, so a slice laid on one would pay nothing.
 func _split_shield_allies(u: BattleUnit) -> Array:
 	return heroes.filter(func(h): return not h.dead and h != u)
+
+
+# ══ BATCH IS §3a — A SPLIT DISTRIBUTES WHAT IT IS GIVEN AND NEVER MULTIPLIES IT (the designer's) ══
+#
+# **THE SHARES SUM TO WHAT IS SPLIT, FOR EVERY AMOUNT AND EVERY COUNT OF BOUND BODIES.** Integer-divide, then
+# hand the remainder out one at a time: to `first` (the body the thing fell on — the hero struck, the one who
+# recoils, the one who bleeds out) and then down `bodies` in their order. Deterministic, so a gate can read it
+# again, and no die is spent. **The three readings, and why this is the one that survives**: a share rounded
+# and floored at 1 billed four bound heroes 4 for a 1-damage blow — wrong by *split evenly*, and against the
+# party; no floor and no distribution makes a blow under the bind count cost nobody anything — a gift, and the
+# Hungering Dark's lesson is that a rule keyed on a quantity pays the side that produces more of it, which for
+# small blows is the warband; distributing is exact and cannot be gamed either way. One Soul's split and Chain
+# Ignition's already had this shape. **Every split in the game is this function** (`check_is` §3a): the Unity
+# strike, its recoil and its bleedout, and Blowback's, which nothing writes today. Returns `[body, share]`
+# pairs in hand-out order; a share may be 0, and a caller bills nobody a 0.
+func _split_shares(total: int, bodies: Array, first: BattleUnit) -> Array:
+	var order: Array = []
+	if first != null and bodies.has(first):
+		order.append(first)
+	for b in bodies:
+		if b != first:
+			order.append(b)
+	var out: Array = []
+	if order.is_empty():
+		return out
+	var whole := maxi(total, 0)
+	var each: int = whole / order.size()
+	var rem: int = whole % order.size()
+	for i in order.size():
+		out.append([order[i], each + (1 if i < rem else 0)])
+	return out
+
+
+func _shares_text(shares: Array) -> String:
+	var parts := PackedStringArray()
+	for sh in shares:
+		parts.append("%s %d" % [String((sh[0] as BattleUnit).unit_name), int(sh[1])])
+	return ", ".join(parts)
 
 
 # Heavy Plating's slice of the block roll: the passive's 15% plus its climb,
@@ -27261,16 +27326,23 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int,
 		if victim.is_hero and not victim.is_companion and victim.has_status("unity"):
 			var bound := heroes.filter(func(h): return not h.dead)
 			if bound.size() > 1:
-				bleed_dmg = maxi(int(round(bleed_dmg / float(bound.size()))), 1)
-				_log("   → Unity splits the bleedout: %d to each of %d souls" % [
-					bleed_dmg, bound.size()], "#e0d060")
-				for h in bound:
+				# BATCH IS §3a — exactly, the remainder staying with the hero who bleeds out.
+				var ub_shares := _split_shares(bleed_dmg, bound, victim)
+				_log("   → Unity splits the bleedout's %d across %d souls: %s" % [
+					bleed_dmg, bound.size(), _shares_text(ub_shares)], "#e0d060")
+				var ub_own := 0
+				for ub_sh in ub_shares:
+					var h: BattleUnit = ub_sh[0]
 					if h == victim:
+						ub_own = ub_sh[1]
 						continue
-					if h.take_hit(bleed_dmg, 0).died:
+					if int(ub_sh[1]) <= 0:
+						continue
+					if h.take_hit(int(ub_sh[1]), 0).died:
 						_stat("hero_deaths")
 						_sfx("death", -4.0)
 						_log("† %s dies" % h.unit_name, "#e05050")
+				bleed_dmg = ub_own
 		# BATCH HW §3 — BLOOD DEBT'S MARK IS READ BEFORE THE BLEEDOUT LANDS (ruled: the code goes to
 		# the card). A bleedout that kills its bearer clears the body inside `take_hit`, so a read after
 		# it found no mark and *every time it bleeds out* skipped the one the Berserker most wants paid.

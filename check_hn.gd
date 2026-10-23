@@ -359,7 +359,7 @@ func _s2a_forbearance() -> void:
 	ok(in_files == ["runes.json x1"], "§2a: the word stands in %s — it should be the one entry's name alone" % [in_files])
 	# THE SAVE CARRIES IT (HL §2e's door, `Run._refresh_rune_names`): a rune saved
 	# under the name HL left and one saved under the long shape the brief wrote it
-	# in both load as today's; a rune the data does not hold keeps its own.
+	# in both load as today's; a rune the data does not hold is dropped and said (IS §2b).
 	_new_run(SEATS, ENG4)
 	var cl: Dictionary = _run.party[2]
 	var worn := Runes.build("fourth_stack")
@@ -393,7 +393,15 @@ func _s2a_forbearance() -> void:
 			got_tpl = String(r2["name"])
 	ok(got_worn == RULED_NAME, "§2a: a saved rune named 'Fourth Stack' loaded as '%s', not '%s'" % [got_worn, RULED_NAME])
 	ok(got_bag == RULED_NAME, "§2a: a saved rune named 'Rune of the Fourth Stack' loaded as '%s', not '%s'" % [got_bag, RULED_NAME])
-	ok(got_tpl == "Rune of Might", "§2a: a rune the data does not hold was renamed to '%s'" % got_tpl)
+	# BATCH IS §2b — RE-POINTED, NOT DELETED: a rune today's game defines nowhere is DROPPED at the
+	# load door and said (`Run._rebuild_stale_payloads`, the designer's ruling), so the rename question
+	# is read off what the load says: the rune is gone, and the note names it by its saved name.
+	var tpl_said := false
+	for n in _run.load_notes:
+		if String(n).begins_with("Rune of Might is no longer in the game"):
+			tpl_said = true
+	ok(got_tpl == "", "§2a: a rune the data does not hold rode the load as '%s' — the door drops it" % got_tpl)
+	ok(tpl_said, "§2a: the load did not say 'Rune of Might is no longer in the game' — its drop was silent or renamed")
 
 
 # ── §2b — THE EMPTY POUCH ───────────────────────────────────────────────────

@@ -1823,6 +1823,44 @@ static func template_rune(class_key: String, noun := "",
 # display slots ES gave the scope band: no surface draws a band. The payload,
 # the price and the desc are byte-unchanged, so what the rune DOES and what it
 # COSTS are exactly what they were.
+# ══ BATCH IS §2b — WHAT TODAY's GAME SAYS A RUNE IS (the load door's derived answer, the designer's) ══
+#
+# **A FIELD CAN BE DERIVED WHERE A NAME CANNOT.** A save's *Iron Will* holds no pointer to today's
+# *Ironclad*, so a card's name needs a row written by hand (`Run.RENAMED_CARDS`); a rune's payload needs
+# none, because today's definition names its own fields. `definition` is the one answer to "what does
+# today's game say this rune's payload is": an authored entry's payload as `build` types it, or a
+# generated TEMPLATE rune's (`tpl_<noun>`, at its noun's stat and authored base) — and `defined` false
+# for an id today's game defines nowhere, which the load door drops and says out loud.
+static func definition(id: String) -> Dictionary:
+	if _load().has(id):
+		return {"defined": true, "payload": _typed_payload((_load()[id] as Dictionary).get("payload", {}))}
+	for t in TEMPLATES:
+		if "tpl_%s" % String(t["noun"]).to_lower() == id:
+			return {"defined": true, "payload": {"stat": {t["stat"]: t["base"]}}}
+	return {"defined": false, "payload": {}}
+
+
+# Every field a payload names, as a path — `stat.rune_hex_deepen`, `add.cooldown`, `also[].grant_ability` —
+# keys and never values, and a list's members under one `[]`, so an order is not a field. A saved payload
+# whose paths today's definition all names rides the save as built (HR §0: the rune you resume is the rune
+# you were playing); one naming a path today's definition does not is stale (`Run._rebuild_stale_payloads`).
+static func payload_fields(p: Variant) -> Dictionary:
+	var out := {}
+	_payload_paths(p, "", out)
+	return out
+
+
+static func _payload_paths(p: Variant, prefix: String, out: Dictionary) -> void:
+	if p is Dictionary:
+		for k in (p as Dictionary).keys():
+			var path := String(k) if prefix == "" else "%s.%s" % [prefix, String(k)]
+			out[path] = true
+			_payload_paths((p as Dictionary)[k], path, out)
+	elif p is Array:
+		for v in p:
+			_payload_paths(v, prefix + "[]", out)
+
+
 static func build(id: String) -> Dictionary:
 	var e: Dictionary = _load()[id]
 	var scope := String(e.get("scope", "universal"))

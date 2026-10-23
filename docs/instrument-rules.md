@@ -2037,6 +2037,20 @@ a detail to note — it is the ruling being wrong.
 - **IT BINDS FROM ID ON**: ID §3's glyph sweep (every ◆, ↑ and ✦ in every tracked script, document and data file, by
   class — ID's report, §3) and §1's census of the retired overlay at its deletion are its first two.
 
+## STANDING RULE — A CENSUS's OWN LESS-THAN-FULL-CONFIDENCE ROWS ARE DRIVEN BY THE NEXT BATCH THAT TOUCHES THAT CENSUS (Batch IS §3b, ruled by the designer)
+> **A CENSUS's OWN LESS-THAN-FULL-CONFIDENCE ROWS ARE DRIVEN BY THE NEXT BATCH THAT TOUCHES THAT CENSUS, NOT PARKED.** A census
+> kept as the record of a population with *I believe* rows in it is a record with soft spots, and every batch priced against
+> it inherits them. **Each closes to a verdict with its drive named, and the census file is amended in place** — it is kept
+> as the record, so the amendment belongs in it, stamped with the batch that drove it.
+
+- **THE CASE: IR's FLOOR CENSUS KEPT THREE ROWS IT READ AND DID NOT DRIVE** — Shatter's and Winter's Toll's floor on the turns held,
+  Cull's and Harvest's guard and payout counting two ways, and Returned Burden's re-lay of an effect lifted at 0 turns. IS
+  drove all three (its report, §3b) and amended the census where the rows stand: each GUARDED, each with the drive that says so.
+- **A DRIVE IS NOT A SEARCH.** *Settle it by enumeration*: name every route the row's state can be reached by — every call
+  that resolves a cast inside one turn, every source that lays the status — and construct the state where the code allows it,
+  so the verdict rests on the population and not on not having found one. **A row GUARDED by a dormant field carries a
+  liveness arm** that reds the day the field gets a writer (`check_is` §3b holds the Cryomancer's upkeep so).
+
 ## STANDING RULE — A BRIEF STATES WHAT A BATCH INTENDS TO TOUCH, NEVER WHAT IT DOES NOT (Batch IE §0.6, ruled by the designer)
 > **A brief states what a batch intends to touch, never what it does not.** The blast radius is the batch's to establish
 > and the recon's shape follows from it — **so a brief that wants one recon says *confirm nothing reaches the damage path,

@@ -126,7 +126,7 @@ block stood and never a new file. II's four were struck so at IJ, each report re
 the equality rule travel with their parent. **Eight of the rows are FF §2's**, and they are the
 residue: rules written into this file AFTER the seam was taken, which the seam's own test puts on
 the other side of it. **Every row after those eight was written straight into the reference rather
-than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one, IE's two, II's two, IJ's one, IK's one, IM's three, IN's one, IO's two, IP's two, IQ's two and IR's one —
+than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one, IE's two, II's two, IJ's one, IK's one, IM's three, IN's one, IO's two, IP's two, IQ's two, IR's one and IS's one —
 and GW §2's, written there at GW and given its row only at HX (HV §3e found it missing; `check_hx` §1a now reds on one) —
 and four more are MOVED, FF §2's way: HG–HJ's census and supersession blocks, written back into this file after the seam
 was taken and sent over at HY §4 by the designer's ruling, and II §4's two, the archive practice's first pass — CP §3's
@@ -207,6 +207,7 @@ new block written here):
 | A GUARD ON A KEY A SAVE BRINGS IN IS PROVED BY TWO ARMS | IQ §4 |
 | A SCRATCH COPY ASSERTS ITS OWN PROJECT NAME BEFORE IT LAUNCHES ANYTHING | IQ §7 |
 | A CLOSE THAT IS GATED ON ITS OWN INSTRUMENT CAN DEADLOCK, AND A BATCH IS NOT DONE UNTIL ITS CLOSE HAS RUN | IR §0.8 |
+| A CENSUS's OWN LESS-THAN-FULL-CONFIDENCE ROWS ARE DRIVEN BY THE NEXT BATCH THAT TOUCHES THAT CENSUS | IS §3b |
 
 ## THE COMBAT RULES LIVE IN `docs/combat-rules.md` (STANDING, SET AT GR §2, RULED BY THE DESIGNER)
 > **THIS FILE IS STILL THE ONE A BATCH MUST READ. `docs/combat-rules.md` IS A REFERENCE IT POINTS AT,
@@ -292,9 +293,11 @@ new block written here):
   dates — change history belongs in changelog.html alone.
   - **`master.html` SAYS WHAT THE GAME IS. A CLAUSE ABOUT WHAT IT WAS, OR WHY, GOES TO `design-notes.md` OR
     GOES (ruled at IR's brief §0.6, the designer's).** The stamp stays: it is the freshness marker, not history.
-    **The reason is where the rot comes from**: twenty of the thirty-one false facts IQ's sweep found were *was / now*
-    and *since* clauses — a sentence about what the game is gets re-read by every batch that touches its mechanic,
-    and one about what it was is re-read by nobody. A clause carrying reasoning worth keeping moves rather than dies.
+    **The reason is the shape, not a count**: a sentence about what the game is gets re-read by every batch that touches
+    its mechanic, and one about what it was is re-read by nobody, so it rots by construction. *(The figure this line gave
+    until IS — twenty of thirty-one — was in no report; measured at IS §6, 10 of IQ's 171 false facts sat inside a history
+    clause, 22 counting a present-tense fact stamped* now *or* since*.)* A clause carrying reasoning worth keeping moves
+    rather than dies (IS §6 took the strip; the moved reasoning stands in `design-notes.md`).
 - Terminology: damage against the Break meter = "Break damage (BD)" everywhere.
 - **A FOLD, A RENAME OR A REFACTOR THAT CHANGES A MAGNITUDE IS A DESIGN CHANGE. IT GOES TO THE
   DESIGNER AS A REPORT AND IS NEVER APPLIED ON THE BATCH'S OWN JUDGMENT (STANDING, SET AT BATCH
@@ -894,6 +897,14 @@ working — a PARTIAL arrival reads as working too, which is the same failure on
   narrows it to the four for every card whose words say hero — each for a reason a companion carries: no turn of its own, no
   resource bar, a callback wired on the four, no Block roll. **A new ally-target card is sorted by the words that name its
   pick in the batch that authors it.**
+- **A PICK IS OFFERED WHERE THE CAST PAYS. WHERE IT PAYS LESS, THAT IS THE PLAYER's CHOICE TO MAKE; WHERE IT PAYS NOTHING,
+  THE PICK WAS NEVER AN OFFER (IS's brief §0.2, the designer's).** The ten narrowings were never about the word: each was a
+  cast on a body that could take nothing from it. **Mantle stays an ally card** — laid on a companion the shield arrives and
+  absorbs, and passes to the hero on the lowest health when it breaks; what is lost is one Faith event, a trade the player can
+  choose — **so the words say *hero* at the clause a companion cannot receive** (Mantle's Faith, the glossary's) and the pick
+  keeps its sort. **AND THE POPULATION IS EVERY PICK, NOT EVERY CARD (IS §4)**: a rune's or a talent's pick that offers a body
+  on the hero side — Split Shield's, Dispel's ally half, the cleanse talent's — is sorted by its words like a card's, and every
+  function that builds a pool on the hero side is sorted (`check_is` §4), so the next one is sorted in the batch that writes it.
 - **THE SURVIVING USES OF "party" ARE IDENTIFIERS AND ARE NAMED**: `party_mark` (a status id), the
   `party` event target, `spec_in_party` (an event condition), `party.tscn`, and **the rune scope `party`
   (HK §4), which the screens call the CREST** — its slot is saved under `crest` for this rule's sake.
@@ -1938,6 +1949,11 @@ decision and the STRUCTURE is what shipped.
   one place they are expected to. **No grade moves by feel, and none to make a rung's mean read better.** The
   measurement and its cut are IO's report, §2, re-taken where IP's repaired instrument could move it and re-cut at IP
   §1b (IP's report).
+· **THE BOT's ALLY POOLS ARE A KNOWN CONSTANT BIAS. THE BATCH THAT CHANGES THEM RE-MEASURES THE LADDER IN THE SAME BATCH, OR IT
+  RETIRES THE LADDER (IS §4, the designer's).** Every bot ally pool is heroes-only where the player's picker admits a companion
+  (`battle._bot_drafted_pick`, `_bot_class_kit_pick`, `_autoplay_pick_kit`), and every grade, band and band's mean above was
+  measured through this bot: **a constant bias cancels in a comparison; changing it mid-ladder does not.** So the divergence is
+  not a defect to fix on noticing it — the comment at the drafted pick says so where a batch would notice.
 **THE END BOSS is a 17th slot on the FINAL ZONE'S BOARD, so a run is 49 encounters** (BK settled
 on 48). `END_BOSS_SLOT` / `END_BOSS_KIND` / `total_slots()`. It is **FIXED, not composed** (the
 one node whose lineup does not come out of the budget system), so it can be learned, and it
@@ -3641,7 +3657,7 @@ false of the cache, whose triple rides `member["rune_candidates"]` into the save
   one. **No die is spent and nothing is re-rolled otherwise**: a re-roll on load changes what the player was shown while he
   was looking at it, in a path no seed covers. **The guard sits in `Run.load_run`, never at the line that draws**, so a key
   the code chose that its table lacks still fails where it is read. IQ guarded there every such read its census found that
-  would crash — the pouch and its swap offers, the zone draw, the event in flight, a lineage, a saved rune's `add`, and a
+  would crash — the pouch and its swap offers, the zone draw, the event in flight, a lineage, a saved rune's `add` (rebuilt whole since IS §2b, below), and a
   class, whose save is refused down the floor's path because a hero cannot be dropped (CONFIRMED at IR's brief §0.3, the
   designer's: a save that silently plays a different game is worse than one that refuses to load, and two reads would
   default an unknown class to the Cleric) — and **a batch that removes or renames anything a save can name owes the save
@@ -3653,7 +3669,24 @@ false of the cache, whose triple rides `member["rune_candidates"]` into the save
   reason, not its comfort: an invisible wrong outlives a crash, because nobody reports it.** `Run.RENAMED_CARDS` is read in
   `load_run` beside IQ's guards — the same door, the same shape — and it is **append-only, forever**. **A name no row maps
   and no table holds is kept as the save holds it and said out loud**, never guessed and never dropped; a card REMOVED has no
-  name today to be read by, so it is no row.
+  name today to be read by, so it is no row here — it is a row of the removal map (the bullet below).
+- **A CARD REMOVED AFTER THE SAVE FLOOR ADDS A ROW TO THE LOAD DOOR's REMOVAL MAP, IN THE BATCH THAT REMOVES IT (IS §2a, the
+  designer's)** — append-only forever, as the rename map is. **A removed card is a card the player no longer has either way**:
+  kept, it holds a slot and shows a button that does nothing, the invisible wrong the rename map was built against — so
+  `Run.REMOVED_CARDS` drops it where the save is read, from every place the rename walk reads (his pool and loadout, which frees
+  the slot; both queued offers; the draft's refusals; every upgrade queued or held on it), and the map's arrival says so
+  (`Run.load_notes`, the one surface a load already speaks through). **It is not the keep-and-say case, which stands**: a name in
+  neither map may be a defect's, so it is kept as evidence; a name this map holds is a removal the repository can point at a
+  commit for. **The five answers are one population** (`Run.LOAD_DOOR_ANSWERS`: take, translate, drop, keep, rebuild) and every
+  key a save carries is sorted against them or against the guard that answers it (`check_is` §2) — **a new kind of thing a
+  save can carry is sorted in the batch that adds it.**
+- **A PAYLOAD TODAY's GAME CANNOT READ IS REBUILT FROM TODAY's DEFINITION, AND IT IS DERIVED, NOT MAPPED (IS §2b, the
+  designer's).** HR §0's rule — a payload rides the save as built, so a rune taken weak does not turn strong under the player
+  — holds for a payload the game can read. **One naming a field path today's definition does not name is rebuilt whole from
+  it** (`Runes.definition`, `Runes.payload_fields` — keys, never values, so a magnitude re-tuned since is not stale) and the
+  rebuild is said; a rune today's game defines nowhere is dropped and said. A field can be derived where a card's name cannot,
+  so this needs no row and catches the next one with no batch remembering. **A BATCH THAT CHANGES WHAT A PAYLOAD FIELD
+  *MEANS* RECORDS THAT IT DID**, in its report and beside the field, so the door's rebuild is a repair and not a surprise.
 
 ### THE POPULATION IS FIVE, BOTH REMAINING HOLES WERE REACHABLE, AND A REFUSAL IS NOT A REPAIR (FE §2)
 
@@ -4042,6 +4075,13 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
     Break the meter took, and a floor of 1 on a share pays only when there is something to share: a Broken body, the Deadened
     bargain and a blow its Constitution rounds away heal nobody. **The same family's census found Sacred Resolve's split
     billing every bound hero 1 for a blow parried outright**, repaired with it.
+  · **A SPLIT DISTRIBUTES WHAT IT IS GIVEN AND NEVER MULTIPLIES IT. THE SHARES SUM TO WHAT IS SPLIT, FOR EVERY AMOUNT AND EVERY
+    COUNT OF BOUND BODIES (IS §3a, the designer's).** Each share rounded and floored at 1 billed four bound heroes 4 for a
+    1-damage blow; flooring nothing would make a blow under the bind count cost nobody anything — a gift, and the side that
+    deals more small blows is the warband. **Integer-divide, then hand the remainder out deterministically** (to the body it
+    fell on, then in order; never a roll): `battle._split_shares` is every split in the game — the Unity blow, its recoil and
+    its bleedout, and Blowback's, which nothing writes — and `check_is` §3a asserts the invariant, never a number. A new split
+    is that function.
   · **A RUNE PAID WHILE A HERO IS MISSING IS PRICED BY WHAT IT REPLACES, AND ITS WORTH OVER A FIGHT IS THE STATE'S
     (HQ §1, the designer's).** Dirge's three at 1.45 out-damage four at 1.00, and it LOWERED falls and lengthened runs
     (party A 0.74 → 0.67 a normal fight, depth 19.4 → 22.3): **a dead hero still cannot act, cannot heal, and lengthens
@@ -4393,7 +4433,7 @@ remains open is design and is in `docs/state.md`: whether the lane rule is repla
 · **THE `lane` FIELDS ARE STILL AUTHORED, NOTHING SHOWS THEM ANY MORE, AND THEY DESCRIBE HISTORY.** 36 lane
   runes and 12 splashes were built on *"worth more to a hero whose points went elsewhere"*; a rune
   with its own field is worth the same to every hero of its spec. **That was measured, not
-  overlooked** — see `docs/design-notes.md` and `docs/master.html`.
+  overlooked** — see `docs/design-notes.md`.
 
 
 ## STANDING REFERENCE — THE ABILITY DRAFT, THE SLOT LADDER AND THE TWELVE PROTECTED CORES (Batch BO, reach rewritten at BX, the cap and the loadout at EG)

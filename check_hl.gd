@@ -929,7 +929,7 @@ func _s2_core_runes() -> void:
 	ok(gated > 20 and named == gated,
 		"§2d: %d of %d gated runes' first sentence names its core rune and ends 'is not equipped.'" % [named, gated])
 	# (e) A SAVE HOLDING THE OLD NAME LOADS WITH TODAY'S — and an entry the data
-	# does not hold keeps its own.
+	# does not hold is dropped and said (IS §2b; it kept its own until IS).
 	_new_run()
 	var mage: Dictionary = _run.party[1]
 	var old_rune: Dictionary = (mage["engines"] as Array)[0]
@@ -951,7 +951,16 @@ func _s2_core_runes() -> void:
 	for r in places:
 		if String((r as Dictionary).get("id", "")) == "tpl:Might":
 			tpl_name = String((r as Dictionary)["name"])
-	ok(tpl_name == "Rune of Might", "§2e: a rune the data does not hold was renamed ('%s')" % tpl_name)
+	# BATCH IS §2b — RE-POINTED, NOT DELETED: a rune today's game defines nowhere is DROPPED at the
+	# load door and said (`Run._rebuild_stale_payloads`, the designer's ruling), so the arm's question —
+	# the load never gives a rune the data does not hold a name of its own making — is read off what
+	# the load says: the rune is gone, and the note names it by the name the save held.
+	var tpl_said := false
+	for n in _run.load_notes:
+		if String(n).begins_with("Rune of Might is no longer in the game"):
+			tpl_said = true
+	ok(tpl_name == "", "§2e: a rune the data does not hold rode the load as '%s' — the door drops it" % tpl_name)
+	ok(tpl_said, "§2e: the load did not say 'Rune of Might is no longer in the game' — its drop was silent or renamed")
 
 
 # ── §3 — THE FOUR MAGNITUDES ────────────────────────────────────────────────
