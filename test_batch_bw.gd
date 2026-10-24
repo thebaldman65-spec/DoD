@@ -73,6 +73,7 @@ extends SceneTree
 # 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
 # This suite keeps its own SIGNATURE and delegates, so not one call site moved.
 const Fixture = preload("res://suite_fixture.gd")
+const Gate = preload("res://gate_fixture.gd")   # IT §3b: the one window helper (`block`, `within`, `comment_above`)
 
 
 # Mirrored from battle.gd so each check states what it depends on.
@@ -420,8 +421,11 @@ func _synergy_rule() -> void:
 		ok(at > 0, "%s is defined in classes.gd" % n)
 		if at <= 0:
 			continue
-		# The 2600 characters above the entry are its comment.
-		var lead := src.substr(maxi(at - 2600, 0), mini(at, 2600))
+		# BATCH IT §3b — RE-POINTED: "the 2600 characters above the entry" started inside the PREVIOUS card's case or comment
+		# for most of the tranche, so a card whose own comment lost its line would have passed on its neighbour's. The lead
+		# is the entry's OWN comment — the comment lines directly above its key — and the window asserts it is nothing else.
+		var lead := Gate.comment_above(src, at)
+		ok(Gate.is_comment(lead), "%s: the lead read is the entry's own comment and nothing else (%d chars)" % [n, lead.length()])
 		ok(lead.contains("SYNERGY:"), "%s names what it combos with" % n)
 		ok(lead.contains("AXIS:"), "%s names its axis" % n)
 
@@ -632,8 +636,15 @@ func _source_rules() -> void:
 	# AND `_stance_satisfies` STILL GOES THROUGH `_eff_stance`, which is what
 	# keeps Feigned Guard working underneath Formless rather than being shadowed
 	# by it. Asserted, because a later batch could make Formless the only reader.
+	# BATCH IT §3b — EVERY FIXED WINDOW BELOW IS RE-POINTED AT ITS OWN SUBJECT. Each read a byte count — 240, 900, 1600,
+	# 3000 — and each ran past its function or its case into the next one's text (the Vendetta slice 584 characters into
+	# Aegis Wall's while its message said it stopped inside the case), so an absence was asked of text the suite never
+	# chose and a presence could be met by a neighbour. A WINDOW ASSERTS IT ENDS INSIDE ITS OWN SUBJECT: each is its
+	# subject's block now (`Gate.block`, cut where the indentation returns) and says so.
 	var at_sat := code.find("func _stance_satisfies(")
-	ok(at_sat > 0 and code.substr(at_sat, 240).contains("_eff_stance("),
+	var sat_body := Gate.block(code, at_sat)
+	ok(Gate.within(code, at_sat, sat_body), "the `_stance_satisfies` slice ends inside the function")
+	ok(at_sat > 0 and sat_body.contains("_eff_stance("),
 		"...and `_stance_satisfies` still resolves through `_eff_stance`")
 	# BOTH GATES SIT INSIDE `_ability_usable`, not somewhere that only the bot or
 	# only the button reads. One door, three affordances.
@@ -657,7 +668,8 @@ func _source_rules() -> void:
 	# for the same reason.
 	var at_fg := code.find('\t\t"feigned_guard":')
 	ok(at_fg > 0, "the Feigned Guard special exists at its own indent")
-	var fg_body := code.substr(at_fg, 900)
+	var fg_body := Gate.block(code, at_fg)
+	ok(Gate.within(code, at_fg, fg_body), "the Feigned Guard slice ends inside its case")
 	ok(fg_body.contains("feigned_guard"),
 		"and the slice really covers the Feigned Guard case")
 	ok(not fg_body.contains("_swordmaster_switch"),
@@ -665,9 +677,13 @@ func _source_rules() -> void:
 	# AND THE TWO READERS STILL DO — the pivot is what makes them readers.
 	var at_ps := code.find('\t\t"precision_strike":')
 	var at_ft := code.find('\t\t"feint":')
-	ok(at_ps > 0 and code.substr(at_ps, 3000).contains("_swordmaster_switch"),
+	var ps_body := Gate.block(code, at_ps)
+	var ft_body := Gate.block(code, at_ft)
+	ok(Gate.within(code, at_ps, ps_body) and Gate.within(code, at_ft, ft_body),
+		"the Precision Strike and Feint slices each end inside their own case")
+	ok(at_ps > 0 and ps_body.contains("_swordmaster_switch"),
 		"Precision Strike still flips the stance")
-	ok(at_ft > 0 and code.substr(at_ft, 3000).contains("_swordmaster_switch"),
+	ok(at_ft > 0 and ft_body.contains("_swordmaster_switch"),
 		"Feint still flips the stance")
 	# `_eff_stance` IS SCOPED TO ABILITIES. The Swordmaster's PASSIVE must keep
 	# reading his real guard, or a Feigned Guard would silently hand an
@@ -696,7 +712,8 @@ func _source_rules() -> void:
 	# anchored on (`victim.has_status`) is gone with that read, and the anchor is the payout's own.
 	var at_bd := code.find('if not debt_mark.is_empty():')
 	ok(at_bd > 0, "the Blood Debt payout hook exists")
-	var bd_body := code.substr(at_bd, 900)
+	var bd_body := Gate.block(code, at_bd)
+	ok(Gate.within(code, at_bd, bd_body), "the Blood Debt payout slice ends inside the payout")
 	ok(bd_body.length() > 400, "and the slice around it is a real region")
 	ok(not bd_body.contains('remove_status("blood_debt")'),
 		"the payout does NOT consume the mark — that is the whole card")
@@ -715,7 +732,8 @@ func _source_rules() -> void:
 	# §4 named, and `mocked` at -1 turns is the shape The Whole Room installs.
 	var at_vd := code.find('\t\t"vendetta":')
 	ok(at_vd > 0, "the Vendetta special exists at its own indent")
-	var vd_body := code.substr(at_vd, 1600)
+	var vd_body := Gate.block(code, at_vd)
+	ok(Gate.within(code, at_vd, vd_body), "the Vendetta slice ends inside its case — it does not run into Aegis Wall's")
 	ok(vd_body.contains('"mocked", -1'),
 		"Vendetta taunts through the EXISTING system, battle-long")
 	ok(not vd_body.contains("func "),
@@ -725,7 +743,8 @@ func _source_rules() -> void:
 	# would still read as working on a single-target ability.
 	var at_bk := code.find("attacker.berserk_strikes > 0")
 	ok(at_bk > 0, "the Berserk doubling hook exists")
-	var bk_body := code.substr(at_bk, 900)
+	var bk_body := Gate.block(code, at_bk)
+	ok(Gate.within(code, at_bk, bk_body), "the Berserk slice ends inside the doubling block")
 	ok(bk_body.contains("mini(total_hits, attacker.berserk_strikes)"),
 		"it spends one charge PER HIT, capped by what he is holding")
 	ok(bk_body.contains("bk_expanded"),

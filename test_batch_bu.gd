@@ -65,6 +65,7 @@ extends SceneTree
 # 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
 # This suite keeps its own SIGNATURE and delegates, so not one call site moved.
 const Fixture = preload("res://suite_fixture.gd")
+const Gate = preload("res://gate_fixture.gd")   # IT §3b: the one window helper (`block`, `within`, `comment_above`)
 
 
 # Mirrored from battle.gd so each check states what it depends on.
@@ -320,8 +321,11 @@ func _synergy_rule() -> void:
 		ok(at > 0, "%s sits inside the BU block" % n)
 		if at <= 0:
 			continue
-		# The 2600 characters above the entry are its comment.
-		var lead := block.substr(maxi(at - 2600, 0), mini(at, 2600))
+		# BATCH IT §3b — RE-POINTED: "the 2600 characters above the entry" started inside the PREVIOUS card's case or comment
+		# for most of the tranche, so a card whose own comment lost its line would have passed on its neighbour's. The lead
+		# is the entry's OWN comment — the comment lines directly above its key — and the window asserts it is nothing else.
+		var lead := Gate.comment_above(block, at)
+		ok(Gate.is_comment(lead), "%s: the lead read is the entry's own comment and nothing else (%d chars)" % [n, lead.length()])
 		ok(lead.contains("SYNERGY:"), "%s names what it combos with" % n)
 		ok(lead.contains("AXIS:"), "%s names its axis" % n)
 
@@ -439,7 +443,13 @@ func _source_rules() -> void:
 	# three signs are counted rather than described, so a fourth would trip.
 	var at_sync := unit_code.find("func sync_victory_state")
 	ok(at_sync > 0, "the victory sync is one implementation")
-	var sync_body := unit_code.substr(at_sync, 700)
+	# BATCH IT §3b — EVERY FIXED WINDOW IN THIS SECTION IS RE-POINTED AT ITS OWN SUBJECT. The sync's 700 characters ran 65
+	# into the next function, whose own signature `func expire_fortified_spirit()` holds the needle the first arm asks for
+	# — so deleting the call would have stayed green; Suffering's 2000 ran into Transference, Transference's through
+	# Anointing into Bloodbond, the drip's 500 into `_battle_trance_tick`. A WINDOW ASSERTS IT ENDS INSIDE ITS OWN SUBJECT:
+	# each is its subject's block now (`Gate.block`, cut where the indentation returns) and says so.
+	var sync_body := Gate.block(unit_code, at_sync)
+	ok(Gate.within(unit_code, at_sync, sync_body), "the victory sync's slice ends inside the function")
 	ok(sync_body.contains("expire_fortified_spirit()"),
 		"the sync forces the loan to expire before it reads max_hp")
 	ok(sync_body.contains("tenacity_hp_gained")
@@ -452,7 +462,8 @@ func _source_rules() -> void:
 	# exactly once as a clamp, and never inside the Suffering branch.
 	var at_su := code.find('\t\t"suffering":')
 	ok(at_su > 0, "the Suffering branch is anchored at its own match case")
-	var su_body := code.substr(at_su, 2000)
+	var su_body := Gate.block(code, at_su)
+	ok(Gate.within(code, at_su, su_body), "the Suffering slice ends inside its case — it does not run into Transference's")
 	ok(su_body.begins_with('\t\t"suffering":'),
 		"the slice starts AT the match case, not at the STATUS_INFO entry")
 	ok(not su_body.contains("RUIN_LEECH_CAP"),
@@ -465,7 +476,8 @@ func _source_rules() -> void:
 	# TRANSFERENCE MOVES, IT DOES NOT GAIN.
 	var at_tf := code.find('\t\t"transference":')
 	ok(at_tf > 0, "the Transference branch is anchored at its own match case")
-	var tf_body := code.substr(at_tf, 2000)
+	var tf_body := Gate.block(code, at_tf)
+	ok(Gate.within(code, at_tf, tf_body), "the Transference slice ends inside its case — it does not run into Anointing's")
 	ok(tf_body.contains("set_ruin_stacks"),
 		"Transference relocates through the MOVE door")
 	ok(not tf_body.contains("_gain_ruin("),
@@ -473,7 +485,9 @@ func _source_rules() -> void:
 	# SUFFERING'S DRIP DOES, WHICH IS THE OPPOSITE RULE AND THE OPPOSITE DOOR.
 	var at_tick := code.find("func _suffering_tick")
 	ok(at_tick > 0, "the drip is its own function (the _run_battle rule)")
-	ok(code.substr(at_tick, 500).contains("_gain_ruin("),
+	var tick_body := Gate.block(code, at_tick)
+	ok(Gate.within(code, at_tick, tick_body), "the drip's slice ends inside `_suffering_tick`")
+	ok(tick_body.contains("_gain_ruin("),
 		"the drip GAINS stacks, so they arm the threshold like any other")
 	# RECANT NEVER TOUCHES THE SECOND METER.
 	var at_rc := code.find('\t\t"recant":')

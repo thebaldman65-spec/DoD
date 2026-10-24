@@ -180,7 +180,7 @@ const MINIBOSS_HP_MULT := 1.5
 # `check_hu` §4a walks every tag). The rarer status of a colliding pair is the one re-tagged.
 const STATUS_INFO := {
 	"slow": ["Slowed", "Sl", Color(0.55, 0.65, 0.9), "-25% speed; turns arrive later."],
-	"chilled": ["Chilled", "Ch", Color(0.5, 0.75, 1.0), "Stacking frost: 1 = -25% speed,\n2 = -50%, 3 = also -15% damage;\n4 stacks FREEZE the victim."],  # 4 = a HOLD when he applied them
+	"chilled": ["Chilled", "Ch", Color(0.5, 0.75, 1.0), "Stacking frost: 1 = -25% speed,\n2 = -50%, 3 = also -15% damage;\n4 stacks FREEZE the victim."],  # 4 = a HOLD when he applied them. IT §2: this figure is BattleUnit.CHILLED_FREEZE_STACKS and is PINNED to it (check_it §2), not read — a const here naming BattleUnit's const does not parse under the battle/unit cycle
 	"frozen": ["Frozen", "Fz", Color(0.65, 0.88, 1.0), "Frozen solid: skips their turns until\nthe ice thaws. A Cryomancer's freeze is a\nHOLD — it never thaws on its own."],
 	"burn": ["Burn", "F", Color(1.0, 0.55, 0.2), "Burning: takes damage at the start of each\nturn (%d%% of the applier's Attack).\nReapplying Burn extends the duration." % [DOT_STATUSES["burn"]]],
 	# BATCH HS §3 — THE FIRST CONJUNCTION. A composed status's row is its words, as
@@ -367,7 +367,7 @@ const STATUS_INFO := {
 	"bulwark": ["Bulwark of Fortitude", "BF", Color(0.85, 0.9, 1.0), "The unbreakable stand: NO Break\ndamage taken, armor increased by\n50%, and 10% max health regained\neach turn."],
 	"roar": ["Guardian's Roar", "GR", Color(0.85, 0.60, 0.30), "The bear stands firm: takes 25%\nless damage."],
 	"loyalty": ["Loyalty", "L", Color(0.95, 0.75, 0.30), "Devotion to the Beastmaster: +5%%\nstrike damage per stack, plus this\ncompanion's own gift. The Pack Bond boon\nclimbs %d%% a stack. Past 8 the meter\nCONVERTS: further stacks feed the boon\ninstead of the strike, until the boon\nreaches its limit. Lost when the\ncompanion dies." % [int(round(BOND_STEP * 100))]],
-	"blind": ["Blind", "Bd", Color(0.55, 0.55, 0.65), "Attacks are 50% more likely\nto miss."],
+	"blind": ["Blind", "Bd", Color(0.55, 0.55, 0.65), "Attacks are %d%% more likely\nto miss." % [int(round(BLIND_MISS_PCT * 100))]],
 	"elusive": ["Elusiveness", "El", Color(0.55, 0.85, 0.75), "Hard to pin down: enemies are 25%\nmore likely to miss this companion."],
 	"instinct": ["Hunter's Instinct", "HI", Color(0.85, 0.75, 0.35), "The next Quick Shots deal +10% of\nthe hunter's Attack and mend the\ncompanion for 15% of its max health."],
 	"bestial": ["Bestial Wrath", "Wr", Color(0.95, 0.40, 0.25), "The companion is unleashed — Ursus:\ndoubled health and +50% armor;\nCanis: +50% damage, +10 Bleed;\nAguila: +25% damage, strikes Blind."],
@@ -379,7 +379,7 @@ const STATUS_INFO := {
 	"hunt_mark": ["Marked", "Mk", Color(0.90, 0.50, 0.20), "Marked by the hunt: the Beastmaster\nand their companion deal +25% damage to\nthis enemy, and their strikes on it\nrestore the hunter's Mana."],
 	"vengeance": ["Vengeance", "Vn", Color(0.85, 0.35, 0.30), "The fallen companion's boon lives on in\nthe hunter at FULL strength for the\nrest of the battle, and he strikes\nharder for the loss."],
 	"held_breath": ["Held Breath", "HB", Color(0.70, 0.90, 0.60), "The next attack is a GUARANTEED\ncritical and ignores all armor."],
-	"snared": ["Snared", "Sn", Color(0.75, 0.65, 0.30), "A trap waits underfoot: the next\ntime this enemy acts it is STUNNED\nfor 1 turn and Poisoned."],
+	"snared": ["Snared", "Sn", Color(0.75, 0.65, 0.30), "A trap waits underfoot: the next\ntime this enemy acts it is STUNNED\nfor %d turn%s and Poisoned." % [TRAP_STUN_TURNS, "" if TRAP_STUN_TURNS == 1 else "s"]],
 	# BATCH HF — Aper's rhythm, on the boar itself: how many charges since its last
 	# stun, so the player sees which charge stuns and can hold Powershot for it.
 	# A hero-side chip that is not a buff anyone cast, so nothing else reads it.
@@ -390,9 +390,9 @@ const STATUS_INFO := {
 	# Six of the eighteen carry one. The other twelve either damage outright,
 	# write a field, or ride a status that already existed (Choking Smoke uses
 	# the EXISTING Blind — §5 says to use it, not to author a new one).
-	"null_field": ["Null Field", "NF", Color(0.75, 0.55, 0.95), "The storm folds inward: damage taken\nis reduced by 5% per RESONANCE STACK,\nread live — it deepens as he casts."],
-	"vow": ["Vow of Suffering", "Vw", Color(0.98, 0.85, 0.45), "The Devout carries half of it: half\nthe damage this hero takes is\nredirected to him — and every share\nhe eats kindles this hero 1 Faith."],
-	"rite_return": ["Rite of Return", "RR", Color(0.95, 0.90, 0.55), "Promised the road back: the next blow\nthat would fell this hero restores\nthem to 50% health instead, and costs\nHoly 30% of her own."],
+	"null_field": ["Null Field", "NF", Color(0.75, 0.55, 0.95), "The storm folds inward: damage taken\nis reduced by %d%% per RESONANCE STACK,\nread live — it deepens as he casts." % [int(round(NULL_FIELD_PCT_PER_STACK * 100))]],
+	"vow": ["Vow of Suffering", "Vw", Color(0.98, 0.85, 0.45), "The Devout carries half of it: half\nthe damage this hero takes is\nredirected to him — and every share\nhe eats kindles this hero %d Faith." % [VOW_OF_SUFFERING_FAITH]],
+	"rite_return": ["Rite of Return", "RR", Color(0.95, 0.90, 0.55), "Promised the road back: the next blow\nthat would fell this hero restores\nthem to %d%% health instead, and costs\nHoly %d%% of her own." % [int(round(RITE_OF_RETURN_RESTORE_PCT * 100)), int(round(RITE_OF_RETURN_TOLL_PCT * 100))]],
 	"blight": ["Blighted", "Bg", Color(0.55, 0.25, 0.45), "The well is poisoned: any healing this\nenemy receives DAMAGES it for the\nsame amount instead."],
 	"covenant": ["Covenant of Ash", "CA", Color(0.60, 0.45, 0.50), "Bound to the ash: every stack of Ruin\napplied to ANY enemy also lands here."],
 	"quarry": ["Quarry", "Qy", Color(0.60, 0.85, 0.45), "Named the quarry: Focus gained from\nattacking this enemy is DOUBLED.\nSwitching away still clears him."],
@@ -406,7 +406,7 @@ const STATUS_INFO := {
 	# turn count would be a second rule the card never promised.
 	"bloodbond": ["Bloodbond", "Bb", Color(0.85, 0.30, 0.35), "Sworn to the bond: the next blow that\nwould fell a companion is refused, and\nthe hunter takes a share of it instead.\nIt waits until it is needed — and the\nshare he takes can kill him."],
 	"ghostpack": ["Ghostpack", "Gp", Color(0.60, 0.70, 0.90), "The whole pack runs, living and lost:\nEVERY companion summoned this battle\nstrikes alongside his attacks for %d%%,\nincluding the ones no longer standing." % [int(round(GHOSTPACK_SHARE * 100))]],
-	"crossfire": ["Crossfire", "Cf", Color(0.95, 0.55, 0.25), "The lines are laid: every CRITICAL hit\nhe lands also strikes 2 other enemies\nfor %d%% of that crit's damage." % [int(round(CROSSFIRE_SHARE * 100))]],
+	"crossfire": ["Crossfire", "Cf", Color(0.95, 0.55, 0.25), "The lines are laid: every CRITICAL hit\nhe lands also strikes %d other enemies\nfor %d%% of that crit's damage." % [CROSSFIRE_SPLASH_TARGETS, int(round(CROSSFIRE_SHARE * 100))]],
 	# ---- BATCH DS: the Hunter draft's defensive statuses ----
 	# SIX FOR SIX ABILITIES, and five of the six sit on the HERO — which is why
 	# only ONE of them (`heads_down`) is in `DEBUFF_IDS`. §4 of the brief asked
@@ -503,7 +503,7 @@ const STATUS_INFO := {
 	"mirror": ["Mirror Image", "MI", Color(0.70, 0.75, 0.95), "Images stand in his place: the next\nsingle-target attacks against him miss\noutright — ONE PER HIT, so a multi-hit\nblow spends one an arrow. Area attacks\nnever miss and spend none. They wait\nuntil spent."],
 	"exhorted": ["Exhortation", "Ex", Color(0.98, 0.88, 0.55), "Called on: their NEXT attack deals\nbonus damage. It is BANKED — it waits\nfor the swing, however long they take."],
 	"consecration": ["Consecration", "Cs", Color(0.95, 0.88, 0.60), "Blessed ground: regains %d%% of maximum\nhealth at the start of each turn." % [int(round(CONSECRATION_PCT * 100))]],
-	"unburdened": ["Unburdened", "Ub", Color(0.85, 0.92, 0.70), "The weight is lifted: takes 20% less\ndamage."],
+	"unburdened": ["Unburdened", "Ub", Color(0.85, 0.92, 0.70), "The weight is lifted: takes %d%% less\ndamage." % [int(round(UNBURDEN_CUT * 100))]],
 	"vigil": ["Undying Vigil", "UV", Color(0.95, 0.90, 0.70), "Watched over: every heal this hero\nreceives, from ANY source, also heals\na second hero on lower health for half\nas much."],
 	# ---- BATCH BR: the Hunter and Warrior class-wide draft's statuses ----
 	# Six of the twelve carry one. Field Dressing, Aimed Volley, Charge and
@@ -942,7 +942,7 @@ const APER_BOON_PCT := 0.15       # Aper: Pack Bond's boon, charge damage a curv
 # silently won.
 const CAMOUFLAGE_PCT := 70        # less likely to be TARGETED, while it holds
 const PARTY_MARK_PCT := 15        # more damage from the WHOLE party, per hit
-const ARCANE_ARROW_CHARGES := 5   # banked, spent ONE PER HIT (§1)
+const ARCANE_ARROW_CHARGES := 6   # banked, spent ONE PER HIT (§1)
 const ARCANE_ARROW_SPLASH := 0.5  # of the hit's damage, to a random other enemy
 const BATTLE_TRANCE_FLOOR := 0.03 # of maximum health, the tick's floor
 const BATTLE_TRANCE_SHARE := 0.5  # of the damage taken since his last turn
@@ -986,6 +986,169 @@ const SALVE_CAP := 10            # the most one turn-start can heal, in points
 const DEF_PERFECT_DMG := 0.85     # of incoming damage, on a Perfect brace
 const DEF_PERFECT_BD := 0.75      # of incoming Break damage, on a Perfect brace
 const DEF_BOT_PERFECT := 0.20     # the bot's Perfect rate (§3), matching its own
+# ---- BATCH IT §2: THE CATALOGUE's FIGURES, NAMED ----
+# Every figure the master document's card catalogue states that a handler decided with a literal (IT's report, §2b,
+# holds the derivation and its kept table): named here, read where the handler read the literal, and read by every text
+# that states it (a figure token naming it, or a format inside the table that holds the text). **TWO LITERALS WITH THE
+# SAME VALUE ARE ONE CONSTANT ONLY IF A RE-TUNE WOULD MOVE BOTH** — a Good and a Perfect figure are two; a recast
+# table's copy of the same write is the same one. The name says what the figure IS, the card first.
+const CRUSHING_BLOW_PERFECT_BD := 5           # Crushing Blow
+const POMMEL_STRIKE_CRIT := 0.25              # Pommel Strike
+const MOCKING_BLOW_EXTRA_TAUNTS := 1          # Mocking Blow
+const MOCKING_BLOW_TURNS := 4                 # Mocking Blow
+const MOCKING_BLOW_PERFECT_TURNS := 5         # Mocking Blow
+const NEXUS_WARD_PCT := 0.20                  # Nexus Ward
+const NEXUS_WARD_TURNS := 3                   # Nexus Ward
+const PERFECT_EXTRA_HITS := 1                 # Magic Missiles: the Perfect's extra missile
+const MINISTRATION_PCT := 0.20                # Ministration
+const MINISTRATION_PERFECT_PCT := 0.26        # Ministration
+const UNBURDEN_CUT := 0.20                    # Unburden: the cut in damage taken (the strike reads 1.0 less it)
+const UNBURDEN_TURNS := 3                     # Unburden
+const CONSECRATION_TURNS := 4                 # Consecration
+const POWERSHOT_PCT_PER_POINT := 2.0          # Powershot
+const TRAP_STUN_TURNS := 1                    # Snare Trap
+const SNARE_TRAP_POISON_TURNS := 4            # Snare Trap
+const BLOOD_OFFERING_PCT := 0.20              # Blood Offering
+const BLOOD_OFFERING_RAGE := 60               # Blood Offering
+const BLOOD_OFFERING_HP_FLOOR := 1            # Blood Offering
+const GUT_RIP_STEP := 10.0                    # Gut Rip
+const GUT_RIP_PERFECT_PCT := 9                # Gut Rip
+const RECKLESS_TURNS := 3                     # Reckless Abandon
+const BERSERK_RISK_TURNS := 3                 # Berserk
+const UNSLAKED_TURNS := 4                     # Unslaked
+const SPITE_TURNS := 6                        # Spite
+const SPITE_STEP_PCT := 5.0                   # Spite
+const PRECISION_AGGRO_HITS := 2               # Precision Strike
+const PRECISION_GRANT_TURNS := 3              # Precision Strike
+const PRECISION_DEF_HITS := 1                 # Precision Strike
+const PRECISION_PERFECT_GRANT_TURNS := 4      # Precision Strike
+const FEINT_PERFECT_PCT := 45                 # Feint
+const BATTLE_POISE_TURNS := 4                 # Battle Poise
+const FEIGNED_GUARD_TURNS := 3                # Feigned Guard
+const DISCIPLINE_TURNS := 7                   # Discipline
+const ANSWERING_TURNS := 6                    # Answering Steel
+const FORMLESS_TURNS := 4                     # Formless
+const COVERING_GUARD_TURNS := 4               # Covering Guard
+const EYE_STORM_TURNS := 3                    # Eye of the Storm
+const AEGIS_WALL_TURNS := 4                   # Aegis Wall
+const ANVIL_TURNS := 4                        # Anvil
+const RECOMPENSE_TURNS := 6                   # Recompense
+const TURN_THE_BLADE_TURNS := 4               # Turn the Blade
+const CINDERFALL_TAKE := 2                    # Cinderfall
+const CINDERFALL_SKIM_MULT := 2               # Cinderfall
+const CINDERFALL_PERFECT_TAKE := 3            # Cinderfall
+const EMBER_DEBT_TURNS := 12                  # Ember Debt
+const PYRE_WAKE_PERFECT_PCT := 12             # Pyre Wake
+const WINTERS_TOLL_PERFECT_PCT := 12          # Winter's Toll
+const RIMEBINDING_BONUS_STACKS := 1           # Rimebinding
+const NULL_FIELD_TURNS := 4                   # Null Field
+const NULL_FIELD_PCT_PER_STACK := 0.05        # Null Field
+const KINDLED_MIND_RESONANCE := 2             # Kindled Mind
+const RESONANCE_PER_CAST := 1                 # Kindled Mind
+const KINDLED_MIND_PERFECT_RESONANCE := 3     # Kindled Mind
+const ARCANE_BOLT_PERFECT_PCT := 0.20         # Arcane Bolt
+const ARCANE_BOLT_MIN_STACKS := 1             # Arcane Bolt
+const INNER_ARCANE_LOW_MULT := 2              # Inner Arcane
+const INNER_ARCANE_LOW_AT := 2                # Inner Arcane
+const UNMAKING_MIN_STACKS := 1                # Unmaking
+const SECOND_WIND_CAP_PCT := 0.40             # Second Wind
+const SECOND_WIND_PERFECT_CAP_PCT := 0.55     # Second Wind
+const RITE_OF_RETURN_TURNS := 4               # Rite of Return
+const RITE_OF_RETURN_RESTORE_PCT := 0.5       # Rite of Return
+const RITE_OF_RETURN_TOLL_PCT := 0.30         # Rite of Return
+const RECANT_PCT := 0.40                      # Recant
+const SHARED_GRIEF_COST_PCT := 0.25           # Shared Grief
+const SHARED_GRIEF_MERCY := 4                 # Shared Grief
+const SHARED_GRIEF_HP_FLOOR := 1              # Shared Grief
+const REPRISAL_SHARE := 0.50                  # Reprisal
+const REPRISAL_PERFECT_SHARE := 0.75          # Reprisal
+const DIVINE_PRESENCE_TURNS := 4              # Divine Presence
+const ALMS_TURNS := 4                         # Alms
+const VESPERS_TURNS := 4                      # Vespers
+const VOW_OF_SUFFERING_TURNS := 4             # Vow of Suffering
+const VOW_OF_SUFFERING_FAITH := 1             # Vow of Suffering
+const AEGIS_REVERSAL_MULT := 1.5              # Aegis Reversal
+const ORDINATION_FAITH := 4                   # Ordination
+const FORTIFIED_SPIRIT_STEPS := 3             # Fortified Spirit
+const FORTIFIED_SPIRIT_PERFECT_STEPS := 4     # Fortified Spirit
+const FORTIFIED_SPIRIT_STEP_PCT := 0.10       # Fortified Spirit
+const RELIQUARY_PCT := 0.025                  # Reliquary
+const RELIQUARY_PERFECT_PCT := 0.035          # Reliquary
+const FAITH_RELEASE_HEAL := 0.15              # Elevation
+const FAITH_RELEASE_MANA := 0.03              # Elevation
+const BLESSING_OF_THE_FAITHFUL_PCT := 0.06    # Blessing of the Faithful
+const BLESSING_OF_THE_FAITHFUL_MANA_PCT := 0.03  # Blessing of the Faithful
+const BLESSING_OF_THE_FAITHFUL_PERFECT_PCT := 0.08  # Blessing of the Faithful
+const BLIGHT_THE_WELL_TURNS := 6              # Blight the Well
+const SUFFERING_TURNS := 4                    # Suffering
+const SUFFERING_RUIN := 2                     # Suffering
+const SUFFERING_PERFECT_RUIN := 3             # Suffering
+const TRANSFERENCE_BONUS := 2                 # Transference
+const ANOINTING_TURNS := 4                    # Anointing
+const ANOINTING_RUIN := 1                     # Anointing
+const BREAKING_DARKNESS_TURNS := 3            # Breaking Darkness
+const BREAKING_DARKNESS_PERFECT_TURNS := 4    # Breaking Darkness
+const REQUIEM_PERFECT_PER_STACK := 0.10       # Requiem
+const REQUIEM_HEAL_PCT := 0.02                # Requiem
+const PENANCE_TURNS := 4                      # Penance
+const TWIN_HUNT_COMPANION_PCT := 0.40         # Twin Hunt (the companion's blow)
+const TWIN_HUNT_COMPANION_PERFECT_PCT := 0.55  # Twin Hunt
+const BLOODBOND_PCT := 25                     # Bloodbond
+const SAVAGE_SWEEP_TARGETS := 3               # Savage Sweep
+const SAVAGE_SWEEP_LOYALTY := 3               # Savage Sweep
+const SAVAGE_SWEEP_PERFECT_LOYALTY := 5       # Savage Sweep
+const GHOSTPACK_TURNS := 4                    # Ghostpack
+const LAST_HOWL_PCT_PER_STACK := 3            # Last Howl
+const SUCCESSION_TURNS := 6                   # Succession
+const UNLEASH_PCT_PER_STACK := 0.20           # Unleash
+const UNLEASH_PERFECT_PCT_PER_STACK := 0.25   # Unleash (Perfect)
+const BRING_IT_DOWN_TURNS := 4                # Bring It Down
+const QUARRYS_MARK_FOCUS_MULT := 2            # Quarry's Mark
+const CROSSFIRE_TURNS := 3                    # Crossfire
+const CROSSFIRE_PERFECT_TURNS := 4            # Crossfire (Perfect)
+const CROSSFIRE_SPLASH_TARGETS := 2           # Crossfire: the other enemies it reaches
+const CALIBRATING_SHOT_PCT := 0.10            # Calibrating Shot
+const CALIBRATING_SHOT_PERFECT_PCT := 0.15    # Calibrating Shot (Perfect)
+const FAULT_LINE_TURNS := 6                   # Fault Line
+const DUG_IN_TURNS := 4                       # Dug In
+const HEADS_DOWN_TURNS := 3                   # Heads Down
+const HEADS_DOWN_PERFECT_TURNS := 4           # Heads Down (Perfect)
+const CHOKING_SMOKE_TURNS := 3                # Choking Smoke
+const BLIND_MISS_PCT := 0.50                  # Choking Smoke: the miss chance it adds
+const SNARE_LINE_TURNS := 2                   # Snare Line
+const LOADED_SHOT_PERFECT_POISON_TURNS := 2   # Loaded Shot: the Poison's turns (Perfect)
+const HUNT_PERFECT_PCT := 0.20                # Hunt (Perfect)
+const PREPARATION_DELAY := 2                  # Preparation: the turn it pays on
+const PREPARATION_MANA := 15                  # Preparation: the Mana it pays
+const STALKING_HORSE_TURNS := 4               # Stalking Horse
+const DOWNWIND_TURNS := 4                     # Downwind
+const CULL_PCT := 0.10                        # Cull
+const CULL_PERFECT_PCT := 0.12                # Cull (Perfect)
+const THICK_HIDE_TURNS := 4                   # Thick Hide
+const SALVE_TURNS := 3                        # Salve
+const SALVE_PERFECT_TURNS := 4                # Salve (Perfect)
+const MIRROR_IMAGE_IMAGES := 4                # Mirror Image
+const MANA_WELL_TURNS := 4                    # Mana Well
+const MANA_WELL_REGEN_MULT := 2               # Mana Well
+const DISPEL_COUNT := 3                       # Dispel (harmful effects, from an ally)
+const BLINK_TURNS := 2                        # Blink
+const EXHORTATION_PCT := 35                   # Exhortation
+const UNDYING_VIGIL_TURNS := 4                # Undying Vigil
+const FIELD_DRESSING_PCT := 0.18              # Field Dressing
+const FIELD_DRESSING_PERFECT_PCT := 0.24      # Field Dressing (Perfect)
+const CAMOUFLAGE_TURNS := 3                   # Camouflage
+const BOLA_TURNS := 4                         # Bola
+const HUNTERS_MARK_TURNS := 6                 # Hunter's Mark
+const BATTLE_TRANCE_TURNS := 4                # Battle Trance
+const RALLY_RESOURCE_PCT := 0.15              # Rally
+const WARCRY_TURNS := 4                       # Warcry
+const IRONCLAD_TURNS := 4                     # Ironclad
+const SUMMON_SWAP_COST := 10                  # Summon Companion: the swap's price, to the player
+const SUMMON_SWAP_DELAY := 1.0                # Summon Companion: the swap's initiative
+const DEEP_WINTER_DIVISOR := 2                # Deep Winter: the deepest pile divided by it, rounded up
+const INNER_ARCANE_BONUS := 1                 # Inner Arcane: the bonus
+const ARCANE_ECHO_PERFECT_TURNS := ARCANE_ECHO_TURNS + 1  # Arcane Echo: a Perfect holds the mark longer
+const UNMAKING_LOCK_PERFECT_TURNS := UNMAKING_LOCK_TURNS + 1  # Unmaking: a Perfect locks longer
 # Batch W: this battle's dmg/heal/prevented per hero — banked into the
 # per-spec share pools at battle end (rotation needs "share of the battles
 # this spec was IN", which the stage totals can't give).
@@ -1842,7 +2005,7 @@ func _spawn_units() -> void:
 		lh_pct = maxi(lh_pct, h.last_hope_pct + h.rune_last_hope_pct)
 	if ga_step > 0 or lh_pct > 0:
 		for h in heroes:
-			h.mercy_threshold = 0.5 + 0.01 * ga_step
+			h.mercy_threshold = BattleUnit.MERCY_WINDOW_AT + 0.01 * ga_step
 			h.last_hope_bonus = lh_pct
 
 	# Intercession and Martyrdom (Batch AV): the party carries the Cleric's
@@ -3723,9 +3886,9 @@ func _run_battle() -> void:
 					u.unit_name], "#c8a860")
 				# BATCH CR §1 — THE SPRING NO LONGER FORCES ITS STUN. A boss
 				# shrugs it off until BROKEN, through the one check in
-				# `_apply_status`; the Poison is a flat 4 turns either way.
+				# `_apply_status`; the Poison is laid for its full turns either way.
 				_spring_trap(heroes[sn_idx], u, 0.0)
-				_apply_poison(heroes[sn_idx], u, 4)
+				_apply_poison(heroes[sn_idx], u, SNARE_TRAP_POISON_TURNS)
 		# BATCH BO §5 — SNARE LINE, beside the snare it mirrors. Its body is its own
 		# function since HY §1b (`_deadfall_tick`'s reason: `_run_battle` cannot be
 		# driven headlessly, and the spring now owes a frame a gate must read).
@@ -5691,7 +5854,7 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 			if lance_up and not _holds.is_empty():
 				var replaceable: bool = (prison != null and u.ability_ready(prison) \
 					and u.resource >= _eff_cost(u, prison) + _eff_cost(u, lance) and cryo_mark != null) \
-					or (most_chilled != null and most_chilled.status_stacks("chilled") >= 3)
+					or (most_chilled != null and most_chilled.status_stacks("chilled") >= BattleUnit.CHILLED_FREEZE_STACKS - 1)
 				if unheld.is_empty() or replaceable:
 					return [lance, _holds[0]]
 			var razor := _find_ability(u, "Razor Ice")
@@ -5699,7 +5862,7 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 					and cryo_mark != null:
 				return [razor, cryo_mark]
 			if lance_up and most_chilled != null \
-					and most_chilled.status_stacks("chilled") >= 3:
+					and most_chilled.status_stacks("chilled") >= BattleUnit.CHILLED_FREEZE_STACKS - 1:
 				return [lance, most_chilled]
 			var bliz := _find_ability(u, "Blizzard")
 			if bliz != null and u.resource >= _eff_cost(u, bliz) and u.ability_ready(bliz) \
@@ -6354,8 +6517,8 @@ func _show_actions(u: BattleUnit) -> void:
 			if swapping:
 				# BATCH HB — the +1 Loyalty is Pack Bond's (`_gain_loyalty`), and every
 				# Hunter swaps since HB, so the tooltip says it only to its holder.
-				group_btn.tooltip_text = "Swap the active companion (10 %s, 1.0 int,\nshared %d-turn cooldown). The newcomer\narrives with its swap effect%s." % [
-					u.resource_name, SWAP_COOLDOWN, " and\n+1 Loyalty" if u.has_engine("pack") else ""]
+				group_btn.tooltip_text = "Swap the active companion (%d %s, %.1f int,\nshared %d-turn cooldown). The newcomer\narrives with its swap effect%s." % [SUMMON_SWAP_COST,
+					u.resource_name, SUMMON_SWAP_DELAY, SWAP_COOLDOWN, " and\n+1 Loyalty" if u.has_engine("pack") else ""]
 				if u.the_pack > 0:
 					group_btn.tooltip_text += "\nThe newcomer replaces whichever companion\nholds LESS Loyalty (ties: the older)."
 				if u.cooldowns.get("Swap Companion", 0) > 0:
@@ -6545,15 +6708,15 @@ const RECAST_GATED := ["aegis_wall", "alms", "anointing", "answering_steel",
 # data because forty match arms that each return one dictionary is the same
 # table written forty times, and a table is the thing `check_co.gd` can walk.
 const RECAST_SELF_PLAIN := {
-	"aegis_wall": ["aegis_wall", 4], "anvil": ["anvil", 4],
-	"battle_poise": ["battle_poise", 4], "downwind": ["downwind", 4],
-	"feigned_guard": ["feigned_guard", 3], "formless": ["formless", 4],
-	"ghostpack": ["ghostpack", 4], "immolate": ["immolate", 4],
-	"ironclad": ["ironclad", 4], "mana_shield": ["mana_shield", 3],
-	"mana_well": ["mana_well", 4], "null_field": ["null_field", 4],
-	"quickdraw": ["quickdraw", 6], "recompense": ["recompense", 6],
-	"retaliate": ["retaliate", 4], "turn_the_blade": ["turn_the_blade", 4],
-	"unslaked": ["unslaked", 4], "venom_coat": ["venom_coat", 4],
+	"aegis_wall": ["aegis_wall", AEGIS_WALL_TURNS], "anvil": ["anvil", ANVIL_TURNS],
+	"battle_poise": ["battle_poise", BATTLE_POISE_TURNS], "downwind": ["downwind", DOWNWIND_TURNS],
+	"feigned_guard": ["feigned_guard", FEIGNED_GUARD_TURNS], "formless": ["formless", FORMLESS_TURNS],
+	"ghostpack": ["ghostpack", GHOSTPACK_TURNS], "immolate": ["immolate", 4],
+	"ironclad": ["ironclad", IRONCLAD_TURNS], "mana_shield": ["mana_shield", 3],
+	"mana_well": ["mana_well", MANA_WELL_TURNS], "null_field": ["null_field", NULL_FIELD_TURNS],
+	"quickdraw": ["quickdraw", 6], "recompense": ["recompense", RECOMPENSE_TURNS],
+	"retaliate": ["retaliate", 4], "turn_the_blade": ["turn_the_blade", TURN_THE_BLADE_TURNS],
+	"unslaked": ["unslaked", UNSLAKED_TURNS], "venom_coat": ["venom_coat", 4],
 }
 
 # The specials in the set that write to the caster and to nobody else.
@@ -6620,11 +6783,11 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 			return [{"id": "tripwire", "turns": -1 if u.whole_forest > 0 else 6,
 				"power": 0}]
 		"succession":
-			return [{"id": "succession", "turns": 6, "power": SUCCESSION_SHARE}]
+			return [{"id": "succession", "turns": SUCCESSION_TURNS, "power": SUCCESSION_SHARE}]
 		"stalking_horse":
-			return [{"id": "stalking_horse", "turns": 4, "power": STALKING_PULL}]
+			return [{"id": "stalking_horse", "turns": STALKING_HORSE_TURNS, "power": STALKING_PULL}]
 		"camouflage":
-			return [{"id": "camouflage", "turns": 3, "power": CAMOUFLAGE_PCT}]
+			return [{"id": "camouflage", "turns": CAMOUFLAGE_TURNS, "power": CAMOUFLAGE_PCT}]
 		# BATCH DS — THE FOUR DS SELF-BUFFS THAT CARRY A POWER GET ARMS HERE
 		# RATHER THAN A ROW IN `RECAST_SELF_PLAIN`, for the reason the three
 		# above them do: that table writes `power: 0`, and every one of these
@@ -6647,20 +6810,20 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 		"bear_brunt":
 			return [{"id": "bear_brunt", "turns": -1, "power": BRUNT_SHARE}]
 		"dug_in":
-			return [{"id": "dug_in", "turns": 4, "power": DUG_IN_CAP}]
+			return [{"id": "dug_in", "turns": DUG_IN_TURNS, "power": DUG_IN_CAP}]
 		"thick_hide":
-			return [{"id": "thick_hide", "turns": 4, "power": THICK_HIDE_PER}]
+			return [{"id": "thick_hide", "turns": THICK_HIDE_TURNS, "power": THICK_HIDE_PER}]
 		"salve":
-			return [{"id": "salve", "turns": 3, "power": SALVE_PER}]
+			return [{"id": "salve", "turns": SALVE_TURNS, "power": SALVE_PER}]
 		"spite":
-			return [{"id": "spite", "turns": 6, "power": SPITE_PERFECT_CAP}]
+			return [{"id": "spite", "turns": SPITE_TURNS, "power": SPITE_PERFECT_CAP}]
 		"answering_steel":
-			return [{"id": "answering_steel", "turns": 6,
+			return [{"id": "answering_steel", "turns": ANSWERING_TURNS,
 				"power": ANSWERING_PERFECT_PARRY}]
 		"last_howl":
-			return [{"id": "last_howl", "turns": -1, "power": 3}]
+			return [{"id": "last_howl", "turns": -1, "power": LAST_HOWL_PCT_PER_STACK}]
 		"bloodbond":
-			return [{"id": "bloodbond", "turns": -1, "power": 25}]
+			return [{"id": "bloodbond", "turns": -1, "power": BLOODBOND_PCT}]
 		# Alms and Divine Presence are Mercy cards and REFUSE THEMSELVES in a kit
 		# that holds none — the handler says so and applies nothing, so the gate
 		# must agree rather than protect a status that never lands.
@@ -6676,11 +6839,11 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 		"alms":
 			if u.second_resource_name != "Mercy":
 				return []
-			return [{"id": "alms", "turns": 4, "power": ALMS_WARD_PCT, "door": true}]
+			return [{"id": "alms", "turns": ALMS_TURNS, "power": ALMS_WARD_PCT, "door": true}]
 		"divine_presence":
 			if u.second_resource_name != "Mercy":
 				return []
-			return [{"id": "divine_presence", "turns": 4, "power": 0, "door": true}]
+			return [{"id": "divine_presence", "turns": DIVINE_PRESENCE_TURNS, "power": 0, "door": true}]
 		# THREE BANKED COUNTERS THAT PRE-MAX AGAINST WHAT IS HELD, so a recast
 		# tops the pile back up and only a FULL pile refuses. The arithmetic is
 		# the handler's own, read from the same status it will overwrite.
@@ -6689,21 +6852,21 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 				"power": u.instinctive if u.instinctive > 0 else 3}]
 		"mirror_image":
 			return [{"id": "mirror", "turns": -1,
-				"power": maxi(4, u.status_power("mirror"))}]
+				"power": maxi(MIRROR_IMAGE_IMAGES, u.status_power("mirror"))}]
 		"arcane_arrows":
 			return [{"id": "arrows", "turns": -1,
-				"power": maxi(6, u.status_power("arrows"))}]
+				"power": maxi(ARCANE_ARROW_CHARGES, u.status_power("arrows"))}]
 		"exhortation":
 			return [{"id": "exhorted", "turns": -1,
-				"power": maxi(35, t.status_power("exhorted"))}]
+				"power": maxi(EXHORTATION_PCT, t.status_power("exhorted"))}]
 		"interpose":
 			var ip_held: int = maxi(t.status_power("shield_charges"), 0) \
 				if t.has_status("shield_charges") else 0
 			return [{"id": "shield_charges", "turns": -1,
 				"power": ip_held + 1}]
 		"magic_barrier":
-			return [{"id": "barrier", "turns": 3,
-				"power": maxi(int(round(u.max_hp * 0.20)), 1)}]
+			return [{"id": "barrier", "turns": NEXUS_WARD_TURNS,
+				"power": maxi(int(round(u.max_hp * NEXUS_WARD_PCT)), 1)}]
 		"shield_block":
 			var sw_turns := 3 + 2 * u.shield_mastery_ranks
 			# BATCH EZ §2 — THE SPLIT SHIELD, AND ITS BRIEF'S PREMISE DID NOT
@@ -6736,7 +6899,7 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 					"power": u.bulwark_ally_block}]
 			return []
 		"warcry":
-			return [{"id": "warcry", "turns": 4, "power": WARCRY_PCT}]
+			return [{"id": "warcry", "turns": WARCRY_TURNS, "power": WARCRY_PCT}]
 		"unity":
 			return [{"id": "unity", "turns": 4 + u.resolve_extra_turns, "power": 0, "door": true}]
 		"divine_wrath":
@@ -6744,9 +6907,9 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 		"cons_ground":
 			return [{"id": "cons_ground", "turns": 3, "power": 0, "door": true}]
 		"consecration":
-			return [{"id": "consecration", "turns": 4, "power": 0, "door": true}]
+			return [{"id": "consecration", "turns": CONSECRATION_TURNS, "power": 0, "door": true}]
 		"anointing":
-			return [{"id": "anointed", "turns": 4, "power": 0}]
+			return [{"id": "anointed", "turns": ANOINTING_TURNS, "power": 0}]
 		"resonant_field":
 			return [{"id": "resonant_field", "turns": RESONANT_FIELD_TURNS + 1,
 				"power": 0}]
@@ -6755,19 +6918,19 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 		"slow_burn":
 			return [{"id": "slow_burn", "turns": SLOW_BURN_TURNS + 1, "power": 0}]
 		"choking_smoke":
-			return [{"id": "blind", "turns": 3, "power": 0}]
+			return [{"id": "blind", "turns": CHOKING_SMOKE_TURNS, "power": 0}]
 		"covering_guard":
-			return [{"id": "covering_guard", "turns": 4, "power": 0}]
+			return [{"id": "covering_guard", "turns": COVERING_GUARD_TURNS, "power": 0}]
 		"undying_vigil":
-			return [{"id": "vigil", "turns": 4, "power": 0, "door": true}]
+			return [{"id": "vigil", "turns": UNDYING_VIGIL_TURNS, "power": 0, "door": true}]
 		"vow_suffering":
-			return [{"id": "vow", "turns": 4, "power": 0, "door": true}]
+			return [{"id": "vow", "turns": VOW_OF_SUFFERING_TURNS, "power": 0, "door": true}]
 		"rite_of_return":
-			return [{"id": "rite_return", "turns": 4, "power": 0, "door": true}]
+			return [{"id": "rite_return", "turns": RITE_OF_RETURN_TURNS, "power": 0, "door": true}]
 		"umbral_sigil":
 			return [{"id": "umbral_sigil", "turns": 4, "power": 0, "door": true}]
 		"penance":
-			return [{"id": "penance", "turns": 4,
+			return [{"id": "penance", "turns": PENANCE_TURNS,
 				"power": int(round(PENANCE_MIRROR * 100.0)), "door": true}]
 		"rime":
 			return [{"id": "rime", "turns": 4 + u.icy_resolve_ranks, "power": 0},
@@ -6812,12 +6975,12 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 			gp.append({"id": "frozen", "turns": _freeze_turns(t), "power": 0})
 			return gp
 		"bola":
-			return [{"id": "slow", "turns": 4, "power": 0},
-				{"id": "cripple", "turns": 4, "power": 0}]
+			return [{"id": "slow", "turns": BOLA_TURNS, "power": 0},
+				{"id": "cripple", "turns": BOLA_TURNS, "power": 0}]
 		"counter_time":
 			return [{"id": "stunned", "turns": COUNTER_TIME_TURNS, "power": 0}]
 		"vespers":
-			return [{"id": "vespers", "turns": 4,
+			return [{"id": "vespers", "turns": VESPERS_TURNS,
 				"power": maxi(int(round(u.max_hp * VESPERS_PCT)), 1), "door": true}]
 		# THE TWO DIVINE BARRIER WRITERS, AND THEY CARRY RIDERS. `barrier` is a
 		# SHARED status: `_grant_divine_shield` stamps `divine`, Blessed Barrier,
@@ -7227,9 +7390,9 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 			and not enemies.any(func(e): return not e.dead and e.has_status("chilled")):
 		return false
 	# Arcane Bolt pays per stack: at zero it is a 30-Mana cast for nothing.
-	# ONE stack is a real (small) blow, so the gate is at one and not higher —
+	# A single stack is a real (small) blow, so the gate is the smallest pile and no higher —
 	# choosing when to cash a shallow meter is the decision the card exists for.
-	if ab.display_name == "Arcane Bolt" and u.second_resource < 1:
+	if ab.display_name == "Arcane Bolt" and u.second_resource < ARCANE_BOLT_MIN_STACKS:
 		return false
 	# ---- BATCH CB: the Mage nine's gates (tranche 3) ----
 	# THREE OF THE NINE ARE GATED AND SIX ARE NOT, and each half is a decision.
@@ -7246,8 +7409,8 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 		return false
 	# UNMAKING pays per stack: at zero it is a 30-Mana cast for nothing, which is
 	# Arcane Bolt's gate five lines above and for its reason. ONE stack is a real
-	# (small) blow, so the gate is at one and not at the eight Death Ray uses.
-	if ab.display_name == "Unmaking" and u.second_resource < 1:
+	# (small) blow, so the gate is the smallest pile and not the depth Death Ray uses.
+	if ab.display_name == "Unmaking" and u.second_resource < UNMAKING_MIN_STACKS:
 		return false
 	# THE OTHER SIX ARE UNGATED, DELIBERATELY.
 	#   · DEEP WINTER with no hold does nothing and SAYS so — but Slow Burn's
@@ -7445,15 +7608,15 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 	if ab.special == "killing_frost" \
 			and not enemies.any(func(e): return not e.dead and e.has_status("chilled")):
 		ab_btn.tooltip_text += "\n(No Chilled enemy)"
-	if ab.display_name == "Arcane Bolt" and u.second_resource < 1:
-		ab_btn.tooltip_text += "\n(Requires at least 1 Resonance)"
+	if ab.display_name == "Arcane Bolt" and u.second_resource < ARCANE_BOLT_MIN_STACKS:
+		ab_btn.tooltip_text += "\n(Requires at least %d Resonance)" % ARCANE_BOLT_MIN_STACKS
 	# BATCH CB — the three tranche-3 gates say so too. A darkened button that
 	# does not explain itself is the same bug in a smaller form.
 	if ab.special in ["firedraw", "pyre_wake"] \
 			and not enemies.any(func(e): return not e.dead and e.has_status("burn")):
 		ab_btn.tooltip_text += "\n(Nothing is Burning)"
-	if ab.display_name == "Unmaking" and u.second_resource < 1:
-		ab_btn.tooltip_text += "\n(Requires at least 1 Resonance)"
+	if ab.display_name == "Unmaking" and u.second_resource < UNMAKING_MIN_STACKS:
+		ab_btn.tooltip_text += "\n(Requires at least %d Resonance)" % UNMAKING_MIN_STACKS
 	# BATCH BV — same rule again: every gate above SAYS so on the button it
 	# darkens, and Preparation's says it in the words of the mechanic rather than
 	# the field, because a player meeting the first extra turn in the game has
@@ -7655,7 +7818,7 @@ func _open_summon_picker(u: BattleUnit) -> void:
 			if u.the_pack > 0:
 				swap_desc += "\nReplaces whichever companion holds LESS\nLoyalty (ties: the older)."
 			_summon_opts.append(Ability.make({"display_name": "Swap " + beast,
-				"cooldown": 0, "cost": 10, "special": "summon", "delay": 1.0,
+				"cooldown": 0, "cost": SUMMON_SWAP_COST, "special": "summon", "delay": SUMMON_SWAP_DELAY,
 				"anim": "attack01",
 				"perfect_id": "", "perfect_text": "",
 				"description": swap_desc}))
@@ -9273,7 +9436,7 @@ func _miss_chance(attacker: BattleUnit, defender: BattleUnit = null) -> float:
 	if attacker.no_cover > 0:
 		return 0.0
 	var chance := MISS_CHANCE + (0.20 if attacker.has_status("dazed") else 0.0) \
-		+ (0.50 if attacker.has_status("blind") else 0.0)
+		+ (BLIND_MISS_PCT if attacker.has_status("blind") else 0.0)
 	# Numbing Veil: chilled fingers fumble the blow. THE NODE IS GONE (Batch AS
 	# gave its id to Glacial Prison) — this read site is KEPT because the Rune
 	# of the Killing Cold still writes the counter. ADDITIVE: percentage points.
@@ -9714,9 +9877,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					strike_targets.append(third)
 		var total_hits := strike_targets.size()
 		if ab.random_hits > 0:
-			total_hits = ab.random_hits + (1 if is_perfect and ab.perfect_extra_hit else 0)
+			total_hits = ab.random_hits + (PERFECT_EXTRA_HITS if is_perfect and ab.perfect_extra_hit else 0)
 		elif ab.multi_hits > 0:
-			total_hits = ab.multi_hits + (1 if is_perfect and ab.perfect_extra_hit else 0)
+			total_hits = ab.multi_hits + (PERFECT_EXTRA_HITS if is_perfect and ab.perfect_extra_hit else 0)
 		# Firestorm: 6-8 bolts from the sky. The perfect no longer adds a
 		# bolt (Batch AH) — it aims the ones you already have.
 		if ab.display_name == "Firestorm":
@@ -10546,8 +10709,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							_log("   → Battle Poise: the parry buys a free GUARD CHANGE — no action spent",
 								"#7cc8f0")
 							_swordmaster_switch(strike_target)
-			# Pommel Strike carries its own keen 25% crit base.
-			var crit_chance := (0.25 if ab.display_name == "Pommel Strike" else CRIT_CHANCE) \
+			# Pommel Strike carries its own keen crit base (`POMMEL_STRIKE_CRIT`).
+			var crit_chance := (POMMEL_STRIKE_CRIT if ab.display_name == "Pommel Strike" else CRIT_CHANCE) \
 				+ (0.25 if strike_target.broken else 0.0)
 			# RUNAWAY RESONANCE, CLAUSE 3: +1% crit per stack, LINEAR and
 			# deliberately so — one stable term a player can hold in their head
@@ -10844,7 +11007,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if ab.display_name == "Arcane Bolt" \
 					and attacker.second_resource_name == "Resonance":
 				if is_perfect:
-					raw = 0.20 * attacker.attack * randf_range(0.9, 1.1) * dmg_mult
+					raw = ARCANE_BOLT_PERFECT_PCT * attacker.attack * randf_range(0.9, 1.1) * dmg_mult
 				raw *= float(maxi(attacker.second_resource, 0))
 			# BATCH CB — UNMAKING (Arcanist draft, tranche 3): 10% of Attack PER
 			# Resonance stack, written on ARCANE BOLT's shape one clause above
@@ -10899,7 +11062,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if ab.display_name == "Hunt":
 				var hunt_n := _status_count(strike_target)
 				if is_perfect:
-					raw = 0.20 * attacker.attack * randf_range(0.9, 1.1) * dmg_mult
+					raw = HUNT_PERFECT_PCT * attacker.attack * randf_range(0.9, 1.1) * dmg_mult
 				raw *= float(hunt_n)
 				_log("   → Hunt reads %d different affliction%s on %s" % [
 					hunt_n, "" if hunt_n == 1 else "s",
@@ -10954,10 +11117,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# target's Break bar already FULL — the team breaks them, the
 			# marksman ends them (+4% with Opportunist's Aim).
 			if ab.display_name == "Powershot":
-				# ADDITIVE: `opp_aim_step` is the INCREASE on the 2% the kit pays
-				# without the node, so Opportunist's Aim TRIPLES the scaling by
-				# writing 4 rather than by setting 6 (the `_step` house form).
-				var ps_step := 2.0 + attacker.opp_aim_step
+				# ADDITIVE: `opp_aim_step` is the INCREASE on the kit's own rate
+				# (`POWERSHOT_PCT_PER_POINT`), so Opportunist's Aim raises the scaling by
+				# adding to it rather than by setting a total (the `_step` house form).
+				var ps_step := POWERSHOT_PCT_PER_POINT + attacker.opp_aim_step
 				raw *= 1.0 + ps_step * clampf(
 					strike_target.pressure / float(strike_target.stability), 0.0, 1.0)
 				# BATCH HF — OPPORTUNIST: double damage to a stunned enemy, whoever
@@ -11457,7 +11620,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				# the trap BOND_MITIGATION_MAX exists for on the other side of
 				# the file.
 				if strike_target.has_status("null_field"):
-					var nf_cut := minf(0.05 * strike_target.second_resource, 0.95)
+					var nf_cut := minf(NULL_FIELD_PCT_PER_STACK * strike_target.second_resource, 0.95)
 					var nf_saved := raw * nf_cut
 					raw -= nf_saved
 					_prev(strike_target, nf_saved)
@@ -11495,7 +11658,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# dying and needs no second bookkeeping.
 			if strike_target.has_status("unburdened"):
 				var ub_was := raw
-				raw *= 0.80
+				raw *= 1.0 - UNBURDEN_CUT
 				if strike_target.is_hero:
 					_prev(String(strike_target.get_status("unburdened").get(
 						"src_name", "")), ub_was - raw)
@@ -11851,7 +12014,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# get right.
 			if strike_target.has_status("spite"):
 				var sp_missing := int((1.0 - strike_target.hp
-					/ float(strike_target.max_hp)) * 100.0 / 5.0)
+					/ float(strike_target.max_hp)) * 100.0 / SPITE_STEP_PCT)
 				var sp_cap := maxi(strike_target.status_power("spite"), 0)
 				var sp_cut := mini(sp_missing * SPITE_PER_5_MISSING, sp_cap)
 				if sp_cut > 0:
@@ -12088,7 +12251,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					and ab.display_name != "Wildstrikes":
 				pr = int(pr * 1.5)
 			if is_perfect and ab.display_name == "Crushing Blow":
-				pr += 5
+				pr += CRUSHING_BLOW_PERFECT_BD
 			if is_perfect and ab.display_name == "Shatterpoint":
 				pr += 15
 			if is_perfect and ab.display_name == "Ice Lance":
@@ -12965,16 +13128,16 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if ab.display_name == "Mocking Blow" and not strike_target.dead:
 				var mocker_idx := heroes.find(attacker)
 				if mocker_idx >= 0:
-					var taunt_turns := 5 if is_perfect else 4
+					var taunt_turns := MOCKING_BLOW_PERFECT_TURNS if is_perfect else MOCKING_BLOW_TURNS
 					_apply_status(strike_target, "mocked", taunt_turns, mocker_idx,
 						0, attacker)
 					_note_debuff_applied(attacker, "mocked")
 					# Provoke widens the net: +2 taunted foes per rank on top
-					# of the one the base ability already drags in.
+					# of those the base ability already drags in.
 					var others := enemies.filter(
 						func(e): return not e.dead and e != strike_target)
 					others.shuffle()
-					var taunt_extra := mini(1 + 2 * attacker.provoke_ranks,
+					var taunt_extra := mini(MOCKING_BLOW_EXTRA_TAUNTS + 2 * attacker.provoke_ranks,
 						others.size())
 					for oi in taunt_extra:
 						_apply_status(others[oi], "mocked", taunt_turns, mocker_idx,
@@ -13480,7 +13643,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if attacker.is_hero and ab.damage > 0 and connected \
 					and not strike_target.is_hero \
 					and attacker.has_status("anointed"):
-				_gain_ruin(strike_target, 1)
+				_gain_ruin(strike_target, ANOINTING_RUIN)
 			# BATCH BT — ARCANE ECHO REPEATS HERE, INSIDE THE HIT LOOP, FOR THE
 			# SAME REASON ARCANE ARROWS SPLASHES HERE: BR §1's standing rule is
 			# that on-hit effects count HITS, not casts, so a three-bolt Barrage
@@ -13578,7 +13741,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			for ae_e in enemies:
 				if ae_e != target and ae_e.has_status("arcane_echo"):
 					ae_e.remove_status("arcane_echo")
-			var ae_turns := ARCANE_ECHO_TURNS + (1 if is_perfect else 0)
+			var ae_turns := ARCANE_ECHO_PERFECT_TURNS if is_perfect else ARCANE_ECHO_TURNS
 			_apply_status(target, "arcane_echo", ae_turns, 0, 0, attacker)
 			var ae_st := target.get_status("arcane_echo")
 			if not ae_st.is_empty():
@@ -13600,7 +13763,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# Weight of Ruin, and this is the same claim arriving from a card.
 		if ab.display_name == "Unmaking" and attacker.is_hero \
 				and target != null and not target.dead:
-			var um_turns := UNMAKING_LOCK_TURNS + (1 if is_perfect else 0)
+			var um_turns := UNMAKING_LOCK_PERFECT_TURNS if is_perfect else UNMAKING_LOCK_TURNS
 			_apply_status(target, "unmade", um_turns, 0, 0, attacker)
 			_note_debuff_applied(attacker, "unmade")
 			_log("   → Unmaking: %s cannot be healed for %d turns%s" % [
@@ -13805,7 +13968,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					continue
 				_loaded_shot_refresh(attacker, ls_t)
 				if is_perfect:
-					_apply_poison(attacker, ls_t, 2)
+					_apply_poison(attacker, ls_t, LOADED_SHOT_PERFECT_POISON_TURNS)
 		# BATCH BV — CROSSFIRE ARMS ITS OWN WINDOW, and like Loaded Shot below it is
 		# OUTSIDE the passive-gated block it first landed in, for the same reason:
 		# the window belongs to the ABILITY, not to whoever is holding a Focus
@@ -13814,10 +13977,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# been the half that quietly failed.
 		#
 		# APPLIED AFTER THE STRIKE THAT CARRIED IT, deliberately: the card promises
-		# the NEXT 3 turns of crits, and arming it before the loop would let its own
+		# its NEXT turns of crits, and arming it before the loop would let its own
 		# opening shot splash, which the description does not claim.
 		if ab.display_name == "Crossfire" and attacker.is_hero and not is_counter:
-			var cf_turns := 4 if is_perfect else 3
+			var cf_turns := CROSSFIRE_PERFECT_TURNS if is_perfect else CROSSFIRE_TURNS
 			var cf_info: Array = STATUS_INFO["crossfire"]
 			attacker.add_status("crossfire", cf_info[0], cf_info[1], cf_info[2],
 				cf_turns, cf_info[3])
@@ -13847,7 +14010,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		if ab.display_name == "Heads Down" and attacker.is_hero \
 				and not is_counter and target != null and not target.is_hero \
 				and not target.dead:
-			var hd_turns := 4 if is_perfect else 3
+			var hd_turns := HEADS_DOWN_PERFECT_TURNS if is_perfect else HEADS_DOWN_TURNS
 			_apply_status(target, "heads_down", hd_turns, 0, 0, attacker)
 			_log("   → Heads Down: for %d turns %s can bring nothing but its basic attack to bear%s" % [
 				hd_turns, target.unit_name,
@@ -13910,7 +14073,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# is added ON TOP of the ordinary engine above rather than replacing it,
 			# so Muscle Memory, Unwavering and Quarry's Mark all still pay.
 			if ab.display_name == "Calibrating Shot":
-				var cs_pct := 0.15 if is_perfect else 0.10
+				var cs_pct := CALIBRATING_SHOT_PERFECT_PCT if is_perfect else CALIBRATING_SHOT_PCT
 				var cs_missing := calib_missing
 				var cs_gain := int(round(cs_missing * cs_pct))
 				if cs_gain > 0:
@@ -14056,7 +14219,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# standing testing scope.
 			if pack_bond and attacker.has_status("ghostpack") and comp_target != null \
 					and not comp_target.dead:
-				for gpk in ["ursus", "canis", "aguila"]:
+				for gpk in Classes.COMPANION_KINDS:
 					if not attacker.kinds_summoned.has(gpk):
 						continue
 					if comp_target.dead:
@@ -14162,7 +14325,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# six, and the card says "instead of two" because that is the base
 			# it moves.
 			var res_gain := (2 + attacker.rune_overflow + attacker.attunement_crit
-				+ attacker.singularity_crit_build) if any_crit else 1
+				+ attacker.singularity_crit_build) if any_crit else RESONANCE_PER_CAST
 			if ab.display_name == "Arcane Explosion" and attacker.harmonics_ranks > 0:
 				res_gain += attacker.harmonics_ranks
 			if attacker.resonant_core_ranks + attacker.rune_resonant_core_ranks > 0 \
@@ -14176,13 +14339,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				res_gain += crit_mass_trips * attacker.critical_mass_stacks
 				_log("   → Talent: Critical Mass — the third crit detonates into Resonance",
 					"#b0a8e0")
-			# BATCH BO §5 — KINDLED MIND banks 3 instead of 1. ADDITIVE, like
-			# every other term in this block: +2 on the base of 1, so an
-			# ordinary cast reads exactly the 3 the card promises and a CRIT
+			# BATCH BO §5 — KINDLED MIND banks more than the base. ADDITIVE, like
+			# every other term in this block: its own grant on the base, so an
+			# ordinary cast reads exactly what the card promises and a CRIT
 			# still reads more, which is the general rule of the meter rather
 			# than an exception this ability would have to carve out.
 			if ab.display_name == "Kindled Mind":
-				res_gain += 3 if is_perfect else 2
+				res_gain += KINDLED_MIND_PERFECT_RESONANCE if is_perfect else KINDLED_MIND_RESONANCE
 			# BATCH IK §3b — REALITY FRACTURE's PERFECT BANKS THE ENGINE's GRANT A SECOND TIME. The
 			# Resonance a damaging cast builds — the `else 1` that opens this block, which every grade
 			# of every card is paid — is banked once more on this card's Perfect, so an Arcanist who
@@ -15172,7 +15335,7 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 		# Four stacks flash-freeze the victim — unless the ice already holds
 		# them (a boss just keeps sitting on its stacks until Broken). What
 		# the freeze BECOMES is _hold_freeze's decision, not this branch's.
-		if target.status_stacks("chilled") >= 4 and not target.has_status("frozen"):
+		if target.status_stacks("chilled") >= BattleUnit.CHILLED_FREEZE_STACKS and not target.has_status("frozen"):
 			_hold_freeze(target, src)
 			return
 		var pile := target.get_status("chilled")
@@ -15795,7 +15958,7 @@ func _frostbind_caster(u: BattleUnit) -> BattleUnit:
 func _mana_regen(u: BattleUnit) -> int:
 	var regen := 12 + u.mana_regen_bonus
 	if u.has_status("mana_well"):
-		regen *= 2
+		regen *= MANA_WELL_REGEN_MULT
 	return regen
 
 
@@ -15982,7 +16145,7 @@ func _crossfire_splash(attacker: BattleUnit, struck: BattleUnit,
 	if pool.is_empty():
 		return
 	var picks: Array = []
-	while picks.size() < 2 and not pool.is_empty():
+	while picks.size() < CROSSFIRE_SPLASH_TARGETS and not pool.is_empty():
 		var pick: BattleUnit = _lowest_hp(pool)
 		picks.append(pick)
 		pool.erase(pick)
@@ -17577,13 +17740,13 @@ func _on_rite_return(saved: BattleUnit) -> bool:
 	# (or the toll is billed against zero and marks her dead a line before the
 	# restore would have run), and only then bill.
 	saved.remove_status("rite_return")
-	saved.hp = maxi(int(saved.max_hp * 0.5), 1)
+	saved.hp = maxi(int(saved.max_hp * RITE_OF_RETURN_RESTORE_PCT), 1)
 	saved.float_text("RITE OF RETURN", Color(0.95, 0.9, 0.55), true)
-	# HER 30% IS A REAL COST AND IT GOES THROUGH take_tick_damage, so a rite
+	# HER TOLL IS A REAL COST AND IT GOES THROUGH take_tick_damage, so a rite
 	# that kills her is handled like any other lethal tick — including by the
 	# party's other refusals, which is the correct and slightly grim reading of
 	# a resurrection cult's arithmetic.
-	var toll := maxi(int(round(cleric.max_hp * 0.30)), 1)
+	var toll := maxi(int(round(cleric.max_hp * RITE_OF_RETURN_TOLL_PCT)), 1)
 	# BATCH HY §1a — THE FRAME IS BORROWED FOR THE BILL AND PUT BACK (Forge Body's
 	# shape). This runs inside the blow that would have killed `saved`, so the rest
 	# of that blow, and of its dealer's action, reads the dealer's frame again.
@@ -17626,7 +17789,7 @@ func _on_vow_share(ally: BattleUnit, share: int) -> int:
 	# Conviction's release is theirs. Its own source term, so BI §2's per-source
 	# table keeps summing to its total (a default would land it in the wrong
 	# bucket, which is why `_gain_faith` refuses to have one).
-	_gain_faith(ally, 1, "vow")
+	_gain_faith(ally, VOW_OF_SUFFERING_FAITH, "vow")
 	if devout.dead:
 		_log("† %s falls under the weight of the vow" % devout.unit_name, "#e05050")
 	return share
@@ -19056,7 +19219,7 @@ func _refresh_faith_chip(u: BattleUnit, devout: BattleUnit) -> void:
 	# three this batch and this chip is the one place a player is told what it
 	# is, so it quotes `FAITH_RELEASE` rather than a literal.
 	var f_tail := "At %d stacks: healed for %d%% max\nhealth and the count resets —\nthe PEAK keeps paying." % [
-		FAITH_RELEASE, 15 + devout.faithful_step + devout.rune_faithful_step]
+		FAITH_RELEASE, int(round(FAITH_RELEASE_HEAL * 100)) + devout.faithful_step + devout.rune_faithful_step]
 	if u == devout:
 		f_tail = "His own Faith HOLDS — the\ncount never releases."
 	var f_desc := "Conviction: Faith x%d (peak %d) —\n%s%% damage mitigation and +%s%%\ndamage dealt, paid on the PEAK.\n%s" % [
@@ -19292,7 +19455,7 @@ func _gain_faith(u: BattleUnit, n: int, source: String) -> void:
 	# on the bar — see `_refresh_faith_chip`.
 	u.faith_stacks = 0
 	_refresh_faith_chip(u, devout)
-	var f_heal := maxi(int(round(u.max_hp * (0.15 + 0.01 * (devout.faithful_step
+	var f_heal := maxi(int(round(u.max_hp * (FAITH_RELEASE_HEAL + 0.01 * (devout.faithful_step
 		+ devout.rune_faithful_step)))), 1)
 	var f_got: int = u.heal_amount(f_heal, u != devout)
 	u.float_text("FAITH +%d" % f_got, Color(0.98, 0.85, 0.45))
@@ -19306,7 +19469,7 @@ func _gain_faith(u: BattleUnit, n: int, source: String) -> void:
 	_stat("faith_releases")
 	_sig("conviction")  # BJ §3a: a release IS the Devout's signature moment
 	_devout_heal(devout, f_got, "release", u)
-	var d_mana := maxi(int(round(devout.max_resource * 0.03)), 1)
+	var d_mana := maxi(int(round(devout.max_resource * FAITH_RELEASE_MANA)), 1)
 	devout.resource = mini(devout.resource + d_mana, devout.max_resource)
 	devout.refresh_bars()
 	_log("   → Conviction: %s's Faith overflows — healed %d; %s recovers %d Mana" % [
@@ -20462,7 +20625,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# What differs is that this one HITS FIRST and only then skims,
 			# which is why it carries base damage where Wildfire carries none.
 			var cf_inferno := _overburn_mult(attacker, _total_burn_turns())
-			var cf_take := 3 if is_perfect else 2
+			var cf_take := CINDERFALL_PERFECT_TAKE if is_perfect else CINDERFALL_TAKE
 			var cf_binfo: Array = STATUS_INFO["burn"]
 			var cf_total := 0
 			var cf_turns := 0
@@ -20489,7 +20652,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					else:
 						foe.update_status("burn", cf_binfo[1], cf_binfo[3], -1,
 							cf_left - cf_spent)
-					cf_final *= 2
+					cf_final *= CINDERFALL_SKIM_MULT
 					cf_turns += cf_spent
 				var cf_hit: Dictionary = foe.take_hit(cf_final, ab.pressure)
 				_stat("dmg_hero_" + attacker.unit_name, cf_final)
@@ -20533,7 +20696,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# rule working: a FOURTH consumer arrived and inherited the refund
 			# (Crucible doubles this too) with no second implementation.
 			if target != null and not target.dead:
-				var ed_turns := 12
+				var ed_turns := EMBER_DEBT_TURNS
 				_apply_status(target, "burn", ed_turns, 0,
 					_dot_tick("burn", attacker), attacker)
 				_sfx("bomb", -9.0, 0.8)
@@ -20553,7 +20716,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			for held in _holds.duplicate():
 				if held.dead:
 					continue
-				var wt_step := 12 if is_perfect else ab.damage
+				var wt_step := WINTERS_TOLL_PERFECT_PCT if is_perfect else ab.damage
 				var wt_raw := 0.01 * wt_step * maxi(held.hold_turns, 1) \
 					* attacker.attack * mult * randf_range(0.9, 1.1)
 				wt_raw *= 1.0 - float(held.resists.get("frost", 0.0))
@@ -20590,7 +20753,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					_log("%s: Rimebinding — he holds nothing to copy" % \
 						attacker.unit_name, "#909090")
 				else:
-					var rb_n: int = rb_deepest + 1
+					var rb_n: int = rb_deepest + RIMEBINDING_BONUS_STACKS
 					_message("%s copies the prison onto %s" % [attacker.unit_name,
 						target.unit_name])
 					_log("%s: Rimebinding — %d stack%s of Chilled onto %s" % [
@@ -20607,12 +20770,12 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# and really does deepen as he keeps casting. Stamping the value
 			# here would freeze it at cast time and quietly delete the ability's
 			# whole axis.
-			_apply_status(attacker, "null_field", 4)
+			_apply_status(attacker, "null_field", NULL_FIELD_TURNS)
 			_sfx("parry", -8.0, 0.9)
 			_message("%s folds the storm inward" % attacker.unit_name)
 			_log("%s: Null Field — damage taken falls 5%% per Resonance stack (%d now: -%d%%)" % [
 				attacker.unit_name, attacker.second_resource,
-				mini(5 * attacker.second_resource, 95)], "#b070e0")
+				mini(int(round(NULL_FIELD_PCT_PER_STACK * 100)) * attacker.second_resource, 95)], "#b070e0")
 		"second_wind_holy":
 			# AXIS: undoing recent history rather than topping up. It reads the
 			# BL damage-taken door, which books what was actually removed below
@@ -20620,7 +20783,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# healed for the blow that never landed.
 			if target != null and not target.dead:
 				var sw_taken := target.damage_taken_recent()
-				var sw_cap_pct := 0.55 if is_perfect else 0.40
+				var sw_cap_pct := SECOND_WIND_PERFECT_CAP_PCT if is_perfect else SECOND_WIND_CAP_PCT
 				var sw_amount: int = mini(sw_taken,
 					int(round(target.max_hp * sw_cap_pct)))
 				sw_amount = int(round(sw_amount * _healing_done_mult(attacker)))
@@ -20641,18 +20804,18 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# STATUS is the one answer to "is the promise live", so it expires
 			# by itself and no flag can outlive it (Intercession's rule).
 			if target != null and not target.dead:
-				_apply_status(target, "rite_return", 4, 0, 0, attacker)
+				_apply_status(target, "rite_return", RITE_OF_RETURN_TURNS, 0, 0, attacker)
 				_sfx("heal", -9.0, 0.6)
 				_message("%s promises %s the road back" % [attacker.unit_name,
 					target.unit_name])
 				_log("%s: Rite of Return — the next blow that would fell %s returns them at 50%% instead (%d turns)" % [
-					attacker.unit_name, target.unit_name, 4], "#e0d070")
+					attacker.unit_name, target.unit_name, RITE_OF_RETURN_TURNS], "#e0d070")
 		"vow_suffering":
 			# AXIS: mitigation by relocation. Divine Shield absorbs a CAPPED
 			# amount; this has no cap at all — what bounds it is the Devout's
 			# own health, which is the trade.
 			if target != null and not target.dead:
-				_apply_status(target, "vow", 4, 0, 0, attacker)
+				_apply_status(target, "vow", VOW_OF_SUFFERING_TURNS, 0, 0, attacker)
 				var vw_st := target.get_status("vow")
 				if not vw_st.is_empty():
 					vw_st["src_name"] = attacker.unit_name
@@ -20660,7 +20823,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_message("%s takes %s's wounds as his own" % [attacker.unit_name,
 					target.unit_name])
 				_log("%s: Vow of Suffering — half of %s's wounds come to him for %d turns" % [
-					attacker.unit_name, target.unit_name, 4], "#e0c060")
+					attacker.unit_name, target.unit_name, VOW_OF_SUFFERING_TURNS], "#e0c060")
 		"aegis_reversal":
 			# AXIS: unspent protection becomes offence. His shields expire
 			# unspent constantly; this makes over-shielding a resource, and it
@@ -20674,7 +20837,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 						attacker.unit_name, target.unit_name], "#909090")
 				else:
 					target.remove_status("barrier")
-					var ag_bonus: int = int(round(ag_left * 1.5))
+					var ag_bonus: int = int(round(ag_left * AEGIS_REVERSAL_MULT))
 					target.aegis_bonus += ag_bonus
 					target.float_text("+%d next hit" % ag_bonus,
 						Color(0.95, 0.85, 0.45))
@@ -20686,7 +20849,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# AXIS: corrupting recovery. DELIBERATELY SITUATIONAL — near-dead
 			# against a warband with no healer, decisive against one with.
 			if target != null and not target.dead:
-				_apply_status(target, "blight", 6, 0, 0, attacker)
+				_apply_status(target, "blight", BLIGHT_THE_WELL_TURNS, 0, 0, attacker)
 				# It IS a debuff the Occultist applied, so the passive marks it
 				# — through the same call the generic hook makes, at the same
 				# magnitude, rather than a second rule of its own.
@@ -20696,7 +20859,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_message("%s poisons the well beneath %s" % [attacker.unit_name,
 					target.unit_name])
 				_log("%s: Blight the Well — healing on %s will damage it for %d turns" % [
-					attacker.unit_name, target.unit_name, 6], "#a050b0")
+					attacker.unit_name, target.unit_name, BLIGHT_THE_WELL_TURNS], "#a050b0")
 		"covenant_ash":
 			# AXIS: corruption that compounds onto a chosen target. ONE
 			# COVENANT AT A TIME — cleared off every other enemy first, so the
@@ -20745,7 +20908,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					# ability about the partnership rather than about a bigger
 					# number. It goes through `_companion_hit`, so Loyalty, the
 					# boon curve and every companion rider apply as usual.
-					var th_pct := 0.55 if is_perfect else 0.40
+					var th_pct := TWIN_HUNT_COMPANION_PERFECT_PCT if is_perfect else TWIN_HUNT_COMPANION_PCT
 					await _companion_hit(th_b, target,
 						th_pct * attacker.attack * _bestial_dmg_mult(th_b), 0)
 					if target.dead:
@@ -20840,7 +21003,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# a Pyromancer's Emberkeep see this fire at all (§2's clause reads
 			# the same door). The tick comes from `_dot_tick` so the smoke burns
 			# at the SURVIVALIST'S Attack, not at a literal.
-			var cs_turns := 3
+			var cs_turns := CHOKING_SMOKE_TURNS
 			var cs_burn := 2
 			var cs_hit := 0
 			var cs_lit := 0
@@ -20867,7 +21030,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# itself goes through `_spring_trap`, so Bone Breaker, Cruel
 			# Devices, Quick Rigging and Caught Fast all pay per spring exactly
 			# as they do on a snare.
-			var sl_turns := 2
+			var sl_turns := SNARE_LINE_TURNS
 			var sl_idx := heroes.find(attacker)
 			var sl_hit := 0
 			for foe5 in enemies:
@@ -20900,11 +21063,11 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# recap's damage-taken ledger is booked on its own, as his own
 			# cost, through `_book_self_cost` (BATCH GF — until GF it was
 			# skipped with the riders, and the recap never saw the price).
-			var bo_cost: int = maxi(int(round(attacker.hp * 0.20)), 1)
+			var bo_cost: int = maxi(int(round(attacker.hp * BLOOD_OFFERING_PCT)), 1)
 			var bo_before: int = attacker.hp
-			attacker.hp = maxi(attacker.hp - bo_cost, 1)
+			attacker.hp = maxi(attacker.hp - bo_cost, BLOOD_OFFERING_HP_FLOOR)
 			_book_self_cost(attacker, bo_before, ab.display_name)
-			var bo_rage := 60
+			var bo_rage := BLOOD_OFFERING_RAGE
 			attacker.resource = mini(attacker.resource + bo_rage,
 				attacker.max_resource)
 			attacker.refresh_bars()
@@ -20933,14 +21096,14 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				# Read the meter BEFORE the burst empties it — the damage is paid
 				# on what was CONSUMED, so it has to be captured first.
 				var gr_had: int = target.bleed_buildup
-				var gr_step := 9 if is_perfect else ab.damage
+				var gr_step := GUT_RIP_PERFECT_PCT if is_perfect else ab.damage
 				_message("%s tears the wound wide!" % attacker.unit_name)
 				_log("%s: Gut Rip — %s bleeds out on %d buildup%s" % [
 					attacker.unit_name, target.unit_name, gr_had,
 					" [PERFECT]" if is_perfect else ""], "#e05050")
 				_add_bleed_with_burst(target, 100 - gr_had)
 				if not target.dead:
-					var gr_raw := 0.01 * gr_step * (gr_had / 10.0) \
+					var gr_raw := 0.01 * gr_step * (gr_had / GUT_RIP_STEP) \
 						* attacker.attack * mult * randf_range(0.9, 1.1)
 					var gr_final := maxi(int(round(gr_raw
 						* (1.0 - target.effective_armor()))), 1) if gr_had > 0 else 0
@@ -20986,7 +21149,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var ra_step := RECKLESS_PERFECT_PER_10 if is_perfect \
 				else RECKLESS_PCT_PER_10
 			var ra_pct := (ra_spent / RECKLESS_STEP) * ra_step
-			var ra_turns := 3
+			var ra_turns := RECKLESS_TURNS
 			attacker.resource = 0
 			# BATCH CZ §1 — the whole bar left it, and the band is told. This
 			# is the Berserker card the second term was written for: the one
@@ -21042,15 +21205,15 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var bk_charges := BERSERK_STRIKES + 1
 			attacker.berserk_strikes += bk_charges
 			_stamp_berserk_chip(attacker)
-			_apply_status(attacker, "berserk_risk", 3, BERSERK_RISK_PCT)
+			_apply_status(attacker, "berserk_risk", BERSERK_RISK_TURNS, BERSERK_RISK_PCT)
 			attacker.update_status("berserk_risk", "+%d%%" % BERSERK_RISK_PCT,
-				"Berserk: he takes %d%% MORE damage for\n3 turns. Blood Frenzy pays for missing\nhealth, so this is the way into his own\npower band." % BERSERK_RISK_PCT,
+				"Berserk: he takes %d%% MORE damage for\n%d turns. Blood Frenzy pays for missing\nhealth, so this is the way into his own\npower band." % [BERSERK_RISK_PCT, BERSERK_RISK_TURNS],
 				BERSERK_RISK_PCT)
 			_sfx("crit", -5.0, 0.7)
 			attacker.float_text("BERSERK", Color(0.90, 0.25, 0.25), true)
 			_message("%s lets it take him!" % attacker.unit_name)
-			_log("%s: Berserk — his next %d STRIKES land twice (they wait until spent), and he takes %d%% more damage for 3 turns" % [
-				attacker.unit_name, attacker.berserk_strikes, BERSERK_RISK_PCT], "#e05050")
+			_log("%s: Berserk — his next %d STRIKES land twice (they wait until spent), and he takes %d%% more damage for %d turns" % [
+				attacker.unit_name, attacker.berserk_strikes, BERSERK_RISK_PCT, BERSERK_RISK_TURNS], "#e05050")
 		"precision_strike":
 			# AXIS: the same blade, two intentions — and THE BRANCH BUYS WHAT THE
 			# STANCE HE IS ARRIVING IN WANTS. Cast from Aggressive he lands in
@@ -21065,8 +21228,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				# his ABILITIES resolve from the other guard. The switch below
 				# still moves his REAL stance, so a reader still flips.
 				var ps_aggressive := _eff_stance(attacker) == "aggressive"
-				var ps_turns := 4 if is_perfect else 3
-				var ps_hits := 2 if ps_aggressive else 1
+				var ps_turns := PRECISION_PERFECT_GRANT_TURNS if is_perfect else PRECISION_GRANT_TURNS
+				var ps_hits := PRECISION_AGGRO_HITS if ps_aggressive else PRECISION_DEF_HITS
 				var ps_pct := PRECISION_AGGRO_PCT if ps_aggressive \
 					else PRECISION_DEF_PCT
 				var ps_bd := PRECISION_AGGRO_BD if ps_aggressive \
@@ -21132,7 +21295,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var ft_aggressive := _eff_stance(attacker) == "aggressive"
 			if ft_aggressive:
 				if target != null and not target.dead:
-					var ft_pct := 45 if is_perfect else FEINT_STRIKE_PCT
+					var ft_pct := FEINT_PERFECT_PCT if is_perfect else FEINT_STRIKE_PCT
 					var ft_raw := 0.01 * ft_pct * attacker.attack * mult \
 						* randf_range(0.9, 1.1)
 					var ft_final := maxi(int(round(ft_raw
@@ -21189,7 +21352,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# The card carries no number of its own beyond its duration; the
 			# work happens at the PARRY ROLL, where Riposte, Deflection and
 			# Waiting Guard all decide how often it fires.
-			var bp_turns := 4
+			var bp_turns := BATTLE_POISE_TURNS
 			_apply_status(attacker, "battle_poise", bp_turns)
 			_sfx("parry", -7.0, 0.9)
 			attacker.float_text("BATTLE POISE", Color(0.45, 0.88, 1.0))
@@ -21210,7 +21373,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# The gate-satisfying half is not written here at all: it lives in
 			# `_eff_stance`, which `_ability_usable` reads. That is the site that
 			# makes the card true, and it is a different site from this one.
-			var fg_turns := 3
+			var fg_turns := FEIGNED_GUARD_TURNS
 			_apply_status(attacker, "feigned_guard", fg_turns)
 			var fg_shown := "Defensive" if attacker.stance == "aggressive" \
 				else "Aggressive"
@@ -21232,7 +21395,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# here would have been a snapshot at cast time, which reads exactly
 			# like the ability working while quietly being worse than the card.
 			if target != null and not target.dead and target != attacker:
-				var cg_turns := 4
+				var cg_turns := COVERING_GUARD_TURNS
 				_apply_status(target, "covering_guard", cg_turns, 0, 0, attacker)
 				_sfx("parry", -8.0, 0.7)
 				target.float_text("COVERED", Color(0.70, 0.78, 0.95))
@@ -21253,7 +21416,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# gave. It is bounded by MAX_FIELD rather than by a cap of its own —
 			# six bodies is the most the board can hold.
 			var es_idx := heroes.find(attacker)
-			var es_turns := 3
+			var es_turns := EYE_STORM_TURNS
 			var es_n := 0
 			if es_idx >= 0:
 				for es_e in enemies:
@@ -21379,7 +21542,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# every point of maximum health Tenacity adds while the wall stands
 			# feed a wall raised turns earlier. Covering Guard's rule, applied to
 			# the other half of the same roll.
-			var aw_turns := 4
+			var aw_turns := AEGIS_WALL_TURNS
 			_apply_status(attacker, "aegis_wall", aw_turns)
 			attacker.update_status("aegis_wall", "AW",
 				"Aegis Wall: every attack he BLOCKS heals\nevery hero for %d%% of his maximum\nhealth (%d right now). A blow that gets\nTHROUGH pays nothing — only a block." % [
@@ -21410,7 +21573,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# the strike multiplier, the nameplate readout and the spec chip
 			# alike. A branch written at any one of those would have been true
 			# there and quietly false everywhere else.
-			var un_turns := 4
+			var un_turns := UNSLAKED_TURNS
 			_apply_status(attacker, "unslaked", un_turns)
 			attacker.update_status("unslaked", "Uk",
 				"Unslaked: for %d more turn(s) Blood\nFrenzy's floor keeps the FULL bonus he\nreaches instead of half. It stands at\n+%d%% right now — dive and it keeps all\nof what you reach." % [
@@ -21430,14 +21593,14 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# THE CAP RIDES THE STATUS POWER rather than a constant at the read
 			# site, because the perfect moves it (30 -> 40) and a figure stamped
 			# here could not be seen from there.
-			var sp_turns := 6
+			var sp_turns := SPITE_TURNS
 			var sp_cap := SPITE_PERFECT_CAP
 			_apply_status(attacker, "spite", sp_turns, sp_cap)
 			var sp_now := mini(int((1.0 - attacker.hp / float(attacker.max_hp))
-				* 100.0 / 5.0) * SPITE_PER_5_MISSING, sp_cap)
+				* 100.0 / SPITE_STEP_PCT) * SPITE_PER_5_MISSING, sp_cap)
 			attacker.update_status("spite", "-%d%%" % sp_now,
-				"Spite: %d%% less damage taken right now —\n%d%% for every 5%% of maximum health\nmissing, to a ceiling of %d%%. It is\nmitigation and never healing, so it\nkeeps him inside the frenzy band." % [
-					sp_now, SPITE_PER_5_MISSING, sp_cap], sp_cap)
+				"Spite: %d%% less damage taken right now —\n%d%% for every %d%% of maximum health\nmissing, to a ceiling of %d%%. It is\nmitigation and never healing, so it\nkeeps him inside the frenzy band." % [
+					sp_now, SPITE_PER_5_MISSING, int(SPITE_STEP_PCT), sp_cap], sp_cap)
 			_sfx("parry", -7.0, 0.6)
 			attacker.float_text("SPITE", Color(0.85, 0.40, 0.40), true)
 			_message("%s keeps his feet out of spite" % attacker.unit_name)
@@ -21452,7 +21615,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# ceiling and STAY there, this is potentially the strongest card in
 			# the batch. It ships as written and play prices it — BW's Berserk and
 			# CH's Fault Line got the same treatment for the same reason.
-			var an_turns := 4
+			var an_turns := ANVIL_TURNS
 			_apply_status(attacker, "anvil", an_turns)
 			attacker.update_status("anvil", "Av",
 				"Anvil: for %d more turn(s) BLOCKING does\nnot reset the Heavy Plating bonus (it\nstands at +%d%%). RECOMPENSE is paid\nnothing while this holds — there is no\nreset left to pay it." % [
@@ -21472,7 +21635,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# the description says so outright rather than leaving a Warden to
 			# find out by holding both. See the block roll, where the ordering
 			# makes it true without a special case.
-			var rp_turns := 6
+			var rp_turns := RECOMPENSE_TURNS
 			_apply_status(attacker, "recompense", rp_turns)
 			attacker.update_status("recompense", "Rc",
 				"Recompense: for %d more turn(s) every Heavy\nPlating reset returns %s equal to the\npercentage points it took. ANVIL prevents\nthose resets, so the two do not stack." % [
@@ -21490,7 +21653,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# THE SHARE AND THE BLOW IT READS ARE BOTH RESOLVED AT THE BLOCK, not
 			# here — Aegis Wall's and Covering Guard's rule — so a wall raised in
 			# round one prices a round-four swing correctly.
-			var tt_turns := 4
+			var tt_turns := TURN_THE_BLADE_TURNS
 			_apply_status(attacker, "turn_the_blade", tt_turns)
 			attacker.update_status("turn_the_blade", "TB",
 				"Turn the Blade: for %d more turn(s) every\nattack he BLOCKS deals Break damage to\nthe attacker equal to %d%% of the damage\nthe block refused. A blow that gets\nTHROUGH pays nothing." % [
@@ -21511,7 +21674,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# inside a standing window therefore RESTARTS the accumulation, which
 			# is the honest reading of a fresh vow and is worth knowing before
 			# pressing it twice.
-			var di_turns := 7
+			var di_turns := DISCIPLINE_TURNS
 			var di_step := DISCIPLINE_PERFECT_STEP
 			attacker.discipline_turns = 0
 			_apply_status(attacker, "discipline", di_turns, di_step)
@@ -21531,7 +21694,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# lives in the parry branch beside Battle Poise's; nothing in it
 			# touches damage, so a hero holding both gets the counter AND the
 			# tempo off one turned blade.
-			var an2_turns := 6
+			var an2_turns := ANSWERING_TURNS
 			var an2_pct := ANSWERING_PERFECT_PARRY
 			_apply_status(attacker, "answering_steel", an2_turns, an2_pct)
 			attacker.update_status("answering_steel", "+%d%%" % an2_pct,
@@ -21561,7 +21724,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# the turn loop beside Vigor's and Vengeance's just-expired checks. A
 			# recoil applied here with a longer duration would have been a second
 			# clock that could drift out of step with the first.
-			var fm_turns := 4
+			var fm_turns := FORMLESS_TURNS
 			attacker.formless_pending = 1
 			_apply_status(attacker, "formless", fm_turns)
 			attacker.update_status("formless", "Fm",
@@ -21671,7 +21834,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# DELIBERATELY NOT `divine`: Faith is the Devout's engine, and a
 			# Mage's ward feeding Conviction would be a spec mechanic leaking
 			# out through a class card.
-			var mb_pct := 0.20
+			var mb_pct := NEXUS_WARD_PCT
 			var mb_power := maxi(int(round(attacker.max_hp * mb_pct)), 1)
 			# BATCH HF — DETONATING WARD ARMS HERE. A ward cast over one that is
 			# already armed and standing is the same ward, refreshed, and keeps
@@ -21684,16 +21847,16 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# `add_status` already takes the MAX of power and turns on
 			# re-application, so a fresh ward can never be worth less than the
 			# one it replaces and this site needs no arithmetic of its own.
-			_apply_status(attacker, "barrier", 3, mb_power)
+			_apply_status(attacker, "barrier", NEXUS_WARD_TURNS, mb_power)
 			var mb_st := attacker.get_status("barrier")
 			if not mb_st.is_empty():
 				mb_st["src"] = attacker.unit_name
 			_sfx("parry", -8.0, 0.9)
 			attacker.float_text("BARRIER %d" % mb_power, Color(0.40, 0.85, 0.95))
 			_message("%s raises a ward of raw magic" % attacker.unit_name)
-			_log("%s: %s — absorbs %d (%d%% of maximum health) for 3 turns" % [
+			_log("%s: %s — absorbs %d (%d%% of maximum health) for %d turns" % [
 				attacker.unit_name, ab.display_name, mb_power,
-				int(round(mb_pct * 100))], "#70d878")
+				int(round(mb_pct * 100)), NEXUS_WARD_TURNS], "#70d878")
 		"mirror_image":
 			# AXIS: evasion rather than absorption. THE CHARGES LIVE IN THE
 			# STATUS'S POWER (the Interpose precedent) and the status is
@@ -21705,7 +21868,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# make the answer to "how do I survive this" a second copy of the
 			# same button. `_stamp_mirror_chip` is the ONE place the number is
 			# written, and the spend site calls the same function.
-			var mi_n: int = maxi(4,
+			var mi_n: int = maxi(MIRROR_IMAGE_IMAGES,
 				attacker.status_power("mirror"))
 			_apply_status(attacker, "mirror", -1, mi_n)
 			_stamp_mirror_chip(attacker, mi_n)
@@ -21721,7 +21884,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# (12 plus Evocation's 10 plus any rune), never a base it stopped
 			# reading. Doubling a stale constant here would be the classic
 			# silent no-op, and §6 names it as one of the five to check.
-			var mw_turns := 4
+			var mw_turns := MANA_WELL_TURNS
 			_apply_status(attacker, "mana_well", mw_turns)
 			_sfx("heal", -9.0, 1.1)
 			attacker.float_text("MANA WELL", Color(0.45, 0.65, 0.95))
@@ -21749,7 +21912,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# CU was written to avoid — a comment is not evidence. The count is
 			# correct now because CX put Regalia into `_enemy_support_action`;
 			# before that, "two of nineteen" should have read "one".
-			var dp_n := 3
+			var dp_n := DISPEL_COUNT
 			if target != null and not target.dead:
 				var dp_taken: Array = []
 				if target.is_hero:
@@ -21789,7 +21952,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# special case: the cooldown is started BEFORE `_resolve_special`
 			# runs, so without the skip Blink would refund a third of itself
 			# every cast — and a self-refunding cooldown is not a cooldown.
-			var bl_turns := 2
+			var bl_turns := BLINK_TURNS
 			var bl_n := _tick_cooldowns(attacker, bl_turns, ab.display_name)
 			_sfx("click", -8.0, 1.4)
 			if bl_n <= 0:
@@ -21804,11 +21967,11 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		"ministration":
 			# AXIS: the plain heal none of the three Clerics has. It reads the
 			# TARGET's maximum rather than the caster's, which is what keeps it
-			# the LESSER of it and Holy's Heal: 20% of the Warden's 200 is 40
-			# against Heal's 40% of her own 150, i.e. 60, and the same Mercy
+			# the LESSER of it and Holy's Heal — its share of the Warden's maximum
+			# against Heal's larger share of her own smaller one — and the same Mercy
 			# multiplier is applied to both so the gap survives every build.
 			if target != null and not target.dead:
-				var mn_pct := 0.26 if is_perfect else 0.20
+				var mn_pct := MINISTRATION_PERFECT_PCT if is_perfect else MINISTRATION_PCT
 				# BATCH HF — ELEVENTH HOUR: twice as much on an ally below a quarter
 				# health, read BEFORE the heal lands (after it, nobody is low). The
 				# rune's field is the increase, so 1.0 is twice; it multiplies the
@@ -21845,7 +22008,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# COMPANIONS ARE EXCLUDED, exactly as Healing Pulse excludes them:
 			# "the whole party" is the four heroes, and a beast that regenerates
 			# 5% of its own maximum every turn is a different ability.
-			var cn_turns := 4
+			var cn_turns := CONSECRATION_TURNS
 			var cn_n := 0
 			for cn_h in heroes:
 				if cn_h.dead or cn_h.is_companion:
@@ -21876,7 +22039,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# is the existing cleanse and its rules are unchanged: Broken is a
 			# METER STATE and stays, sticky poison refuses every cleanse.
 			if target != null and not target.dead:
-				var ub_turns := 3
+				var ub_turns := UNBURDEN_TURNS
 				# BATCH HF — the cleanse hands back what it took (one filter,
 				# `purge_debuffs_taken`), so Returned Burden can cast it onward.
 				var ub_taken: Array = target.purge_debuffs_taken()
@@ -21891,9 +22054,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				target.float_text("UNBURDENED", Color(0.85, 0.92, 0.70))
 				_message("%s lifts the weight from %s" % [attacker.unit_name,
 					target.unit_name])
-				_log("%s: Unburden — %d harmful effect%s lifted from %s, and they take 20%% less damage for %d turns" % [
+				_log("%s: Unburden — %d harmful effect%s lifted from %s, and they take %d%% less damage for %d turns" % [
 					attacker.unit_name, ub_removed,
-					"" if ub_removed == 1 else "s", target.unit_name, ub_turns], "#70d878")
+					"" if ub_removed == 1 else "s", target.unit_name, int(round(UNBURDEN_CUT * 100)), ub_turns], "#70d878")
 		"exhortation":
 			# AXIS: the only offensive party buff a Cleric has. BANKED, NOT
 			# TIMED, and the STATUS IS BATTLE-LONG (-1) precisely so that is
@@ -21901,7 +22064,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# take to take it, so a slow hero is not cheated of it. The share
 			# lives in the status's power — one number, in one place, and the
 			# chip reads the same field the damage site does.
-			var ex_pct := 35
+			var ex_pct := EXHORTATION_PCT
 			var ex_n := 0
 			for ex_h in heroes:
 				if ex_h.dead or ex_h.is_companion:
@@ -21926,7 +22089,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# it answers healing from ANY source rather than from a list of
 			# abilities somebody has to keep up to date.
 			if target != null and not target.dead:
-				var uv_turns := 4
+				var uv_turns := UNDYING_VIGIL_TURNS
 				_apply_status(target, "vigil", uv_turns, 0, 0, attacker)
 				var uv_st := target.get_status("vigil")
 				if not uv_st.is_empty():
@@ -21947,7 +22110,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# second walk of the status list, so "one harmful effect" means
 			# exactly what it already means everywhere else in the game (Broken
 			# excluded; it is a meter state, not a dispellable status).
-			var fd_pct := 0.24 if is_perfect else 0.18
+			var fd_pct := FIELD_DRESSING_PERFECT_PCT if is_perfect else FIELD_DRESSING_PCT
 			var fd_healed := attacker.heal_amount(
 				maxi(int(round(attacker.max_hp * fd_pct)), 1))
 			var fd_shed := attacker.dispel_one_debuff()
@@ -21966,7 +22129,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# in the status's POWER so the chip and `_evade_chance` read ONE
 			# number, and the clock is the point — this is the temporary half of
 			# a permanent talent, not a copy of it.
-			var cm_turns := 3
+			var cm_turns := CAMOUFLAGE_TURNS
 			_apply_status(attacker, "camouflage", cm_turns, CAMOUFLAGE_PCT)
 			attacker.update_status("camouflage", "-%d%%" % CAMOUFLAGE_PCT,
 				String(STATUS_INFO["camouflage"][3]), CAMOUFLAGE_PCT)
@@ -21981,7 +22144,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# Trapper's breadth term, every cleanse and every chip already
 			# understand them.
 			if target != null and not target.dead:
-				var bl_turns := 4
+				var bl_turns := BOLA_TURNS
 				_apply_status(target, "slow", bl_turns, 0, 0, attacker)
 				_apply_status(target, "cripple", bl_turns, 0, 0, attacker)
 				_sfx("hit", -6.0, 0.8)
@@ -22003,7 +22166,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				for hm_e in enemies:
 					if hm_e != target and hm_e.has_status("party_mark"):
 						hm_e.remove_status("party_mark")
-				var hm_turns := 6
+				var hm_turns := HUNTERS_MARK_TURNS
 				_apply_status(target, "party_mark", hm_turns, PARTY_MARK_PCT,
 					0, attacker)
 				_sfx("crit", -8.0, 1.15)
@@ -22019,10 +22182,10 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# power rather than in a field of its own.
 			#
 			# RE-CASTING TAKES THE HIGHER COUNT rather than adding, exactly as
-			# Mirror Image does: five is what the card promises, and stacking
-			# two casts to ten would make the answer to "how do I hit harder" a
-			# second copy of the same button.
-			var aa_n: int = maxi(6,
+			# Mirror Image does: the card promises `ARCANE_ARROW_CHARGES`, and
+			# stacking two casts to double it would make the answer to "how do I
+			# hit harder" a second copy of the same button.
+			var aa_n: int = maxi(ARCANE_ARROW_CHARGES,
 				attacker.status_power("arrows"))
 			_apply_status(attacker, "arrows", -1, aa_n)
 			_stamp_arrows_chip(attacker, aa_n)
@@ -22036,7 +22199,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# ZEROED AT THE CAST as well as at every tick, so the first tick pays
 			# for the damage taken since the trance began rather than for a wound
 			# he was already carrying — "since his last turn", read strictly.
-			var bt_turns := 4
+			var bt_turns := BATTLE_TRANCE_TURNS
 			attacker.trance_taken = 0
 			_apply_status(attacker, "battle_trance", bt_turns)
 			_sfx("heal", -9.0, 0.7)
@@ -22056,7 +22219,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			if target != null and not target.dead and target != attacker:
 				_rally_forward(attacker, target)
 				if target.resource_name != "":
-					var rl_gain := maxi(int(target.max_resource * 0.15), 1)
+					var rl_gain := maxi(int(target.max_resource * RALLY_RESOURCE_PCT), 1)
 					target.resource = mini(target.resource + rl_gain,
 						target.max_resource)
 					target.float_text("+%d %s" % [rl_gain, target.resource_name],
@@ -22079,7 +22242,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# needs a revert path, which is the shape that produced this
 			# project's ~127,000 max-HP runaway (Batch W). +20% damage dealt is
 			# the same number where it is felt and it cannot leak past a battle.
-			var wc_turns := 4
+			var wc_turns := WARCRY_TURNS
 			var wc_n := 0
 			for wc_h in heroes:
 				if wc_h.dead:
@@ -22105,7 +22268,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# THE BREAK HALF IS A CAP, NOT AN IMMUNITY, and the clamp lives in
 			# `unit.take_hit` BELOW the meter write and ABOVE the threshold, so
 			# it leaves him at 99. Read that block before touching this one.
-			var ic_turns := 4
+			var ic_turns := IRONCLAD_TURNS
 			_apply_status(attacker, "ironclad", ic_turns)
 			_sfx("parry", -7.0, 0.7)
 			attacker.float_text("IRONCLAD", Color(0.80, 0.80, 0.88))
@@ -22285,8 +22448,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# Convergence's build-reads-the-build clause pays on it exactly as
 			# it pays on every other gain rather than being carved out here.
 			var ia_alive := enemies.filter(func(e): return not e.dead).size()
-			var ia_low := attacker.hp * 2 <= attacker.max_hp
-			var ia_gain := ia_alive * (2 if ia_low else 1) + 1
+			var ia_low := attacker.hp * INNER_ARCANE_LOW_AT <= attacker.max_hp
+			var ia_gain := ia_alive * (INNER_ARCANE_LOW_MULT if ia_low else 1) + INNER_ARCANE_BONUS
 			_sfx("perfect", -8.0, 1.2)
 			# LOG HONESTY, found by watching a smoke (Batch BC's Blessed Barrier
 			# precedent): `_gain_resonance` REFUSES a unit that does not hold the
@@ -22405,7 +22568,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var pw_st: Dictionary = target.get_status("burn")
 				var pw_turns: int = maxi(int(pw_st.get("turns", 0)), 0)
 				target.remove_status("burn")
-				var pw_pct := 12 if is_perfect else ab.damage
+				var pw_pct := PYRE_WAKE_PERFECT_PCT if is_perfect else ab.damage
 				var pw_total := 0
 				var pw_lit := 0
 				for _pw_i in pw_turns:
@@ -22502,8 +22665,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				# HALF, ROUNDED DOWN. The perfect rounds UP instead, which is
 				# worth exactly one stack and only on an odd pile — a deliberate
 				# small perfect on a card whose base effect is already wide.
-				var dw_n: int = int(dw_deepest / 2)
-				dw_n = int((dw_deepest + 1) / 2)
+				var dw_n: int = int(dw_deepest / DEEP_WINTER_DIVISOR)
+				dw_n = int((dw_deepest + 1) / DEEP_WINTER_DIVISOR)
 				if dw_n < 1:
 					_log("%s: Deep Winter — the prison is only %d stack deep, so half of it is nothing" % [
 						attacker.unit_name, dw_deepest], "#909090")
@@ -22668,7 +22831,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				# resource every cycle, which is a real tradeoff; slack on top is
 				# where the decision disappears. CG had already flagged this card
 				# at 100% uptime before the fold widened it.
-				var mt_turns := 4
+				var mt_turns := DIVINE_PRESENCE_TURNS
 				_apply_status(attacker, "divine_presence", mt_turns, 0, 0, attacker)
 				_sfx("heal", -9.0, 0.8)
 				_message("%s keeps the watch" % attacker.unit_name)
@@ -22680,9 +22843,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s: Alms — he holds no Mercy to give away" % \
 					attacker.unit_name, "#909090")
 			else:
-				# BATCH CR §3 — 6 was the perfect's; 4 is the base, against a
-				# 4-turn cooldown. See `divine_presence` above for the ruling.
-				var al_turns := 4
+				# BATCH CR §3 — 6 was the perfect's; the base is `ALMS_TURNS`, against
+				# its cooldown. See `divine_presence` above for the ruling.
+				var al_turns := ALMS_TURNS
 				# THE PERCENTAGE RIDES THE STATUS POWER, so the chip a player
 				# reads and the ward `_alms_spill` lays are ONE number. Batch BP's
 				# Eye of the Storm is what two copies of one figure costs.
@@ -22701,11 +22864,11 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s: Vespers finds nobody to say it over" % \
 					attacker.unit_name, "#909090")
 			else:
-				# BATCH CR §3 — 6 was the perfect's; 4 is the base, against a
-				# 4-turn cooldown. THE ABSORB IS NOT TOUCHED: `VESPERS_PCT` has
+				# BATCH CR §3 — 6 was the perfect's; the base is `VESPERS_TURNS`, against
+				# its cooldown. THE ABSORB IS NOT TOUCHED: `VESPERS_PCT` has
 				# been 0.20 at CG, CK and HEAD and was never Perfect-gated, so
 				# there is nothing to revert on that half.
-				var vs_turns := 4
+				var vs_turns := VESPERS_TURNS
 				var vs_power := maxi(int(round(attacker.max_hp * VESPERS_PCT)), 1)
 				_apply_status(target, "vespers", vs_turns, vs_power, 0, attacker)
 				target.float_text("VESPERS %d" % vs_power,
@@ -22789,7 +22952,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					JUBILEE_MIN_FAITH], "#909090")
 			else:
 				var jb_stacks := attacker.faith_stacks
-				var jb_pct := 0.08 if is_perfect else 0.06
+				var jb_pct := BLESSING_OF_THE_FAITHFUL_PERFECT_PCT if is_perfect else BLESSING_OF_THE_FAITHFUL_PCT
 				var jb_peak_was := attacker.faith_peak
 				# BATCH CG §2 — THE PEAK DROPS TO MATCH THE COUNT, AND THAT IS
 				# THE POINT OF THE CHANGE. As CE shipped it the high-water mark
@@ -22812,7 +22975,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					* jb_stacks)), 1)
 				var jb_got: int = attacker.heal_amount(jb_heal)
 				_devout_heal(attacker, jb_got, "jubilee", attacker)
-				var jb_mana := maxi(int(round(attacker.max_resource * 0.03
+				var jb_mana := maxi(int(round(attacker.max_resource * BLESSING_OF_THE_FAITHFUL_MANA_PCT
 					* jb_stacks)), 1)
 				var jb_before := attacker.resource
 				attacker.resource = mini(attacker.resource + jb_mana,
@@ -22852,7 +23015,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s: Breaking Darkness finds nothing to name" % \
 					attacker.unit_name, "#909090")
 			else:
-				var an_turns := 4 if is_perfect else 3
+				var an_turns := BREAKING_DARKNESS_PERFECT_TURNS if is_perfect else BREAKING_DARKNESS_TURNS
 				# THE CAST'S OWN BREAK LANDS BEFORE THE MARK, so the card does
 				# not amplify itself. The mark is what the party's NEXT blows
 				# read; a self-amplifying opener would make the headline number
@@ -22881,7 +23044,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s: Requiem — there is no mark on it to sing out" % \
 					attacker.unit_name, "#909090")
 			else:
-				var rq_per := 0.10 if is_perfect else REQUIEM_PER_STACK
+				var rq_per := REQUIEM_PERFECT_PER_STACK if is_perfect else REQUIEM_PER_STACK
 				# THE PILE IS SPENT BEFORE THE BLOW LANDS, and that ordering is
 				# a decision rather than a convenience: Ruin is +2% damage taken
 				# a stack (+5% under Deeper Hex), so striking through the mark
@@ -22908,7 +23071,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_stat_bd(attacker, ab.pressure)
 				if rq_land > 0:
 					target.float_text("%d" % rq_land, Color(0.75, 0.45, 0.85))
-				var rq_share := maxi(int(round(attacker.max_hp * 0.02
+				var rq_share := maxi(int(round(attacker.max_hp * REQUIEM_HEAL_PCT
 					* rq_stacks)), 1)
 				# BOOKED AS WHAT LANDED RATHER THAN WHAT WAS ASKED FOR. An ally
 				# at full health takes none of it, and printing the headline
@@ -22944,7 +23107,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s: Penance finds nobody to set it on" % attacker.unit_name,
 					"#909090")
 			else:
-				var pn_turns := 4
+				var pn_turns := PENANCE_TURNS
 				# BATCH CG §3 — NOTHING IS SNAPSHOTTED AND NOTHING READS THE
 				# TARGET'S SHEET. The mark carries only its SHARE, as percentage
 				# points on the status power (the Alms/Breaking Darkness
@@ -22967,7 +23130,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		# on the status power: `_on_beast_death` is the one site that reads it,
 		# and that site is reached long after the cast is over.
 		"last_howl":
-			attacker.last_howl = 3
+			attacker.last_howl = LAST_HOWL_PCT_PER_STACK
 			_apply_status(attacker, "last_howl", -1, attacker.last_howl)
 			_sfx("heal", -9.0, 0.7)
 			_message("%s swears the last howl" % attacker.unit_name)
@@ -22977,7 +23140,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		# Darkness pattern), so `_do_summon` reads one number from one place and
 		# a hunter who dies does not take the window with him.
 		"succession":
-			var sc_turns := 6
+			var sc_turns := SUCCESSION_TURNS
 			_apply_status(attacker, "succession", sc_turns, SUCCESSION_SHARE)
 			_sfx("heal", -9.0, 0.7)
 			_message("%s prepares the handover" % attacker.unit_name)
@@ -23018,7 +23181,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 						# Primal Surge spending after its own blow is correct for
 						# the same reason. Emptying first is simply the honest
 						# order to log it in.
-						var ul_pct := 0.25 if is_perfect else 0.20
+						var ul_pct := UNLEASH_PERFECT_PCT_PER_STACK if is_perfect else UNLEASH_PCT_PER_STACK
 						attacker.loyalty[ul_kind] = 0
 						_stamp_loyalty_chip(attacker, ul_beast)
 						_log("%s: Unleash — %s spends its whole bond (%d)%s" % [
@@ -23057,7 +23220,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		# field, and the THRESHOLD is never stored: `focus_convert()` is read
 		# live at the strike, because Deep Focus moves it.
 		"fault_line":
-			var fl_turns := 6
+			var fl_turns := FAULT_LINE_TURNS
 			_apply_status(attacker, "fault_line", fl_turns, FAULT_LINE_BD)
 			_sfx("break", -9.0, 0.6)
 			_message("%s reads the fault" % attacker.unit_name)
@@ -23069,14 +23232,14 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		# attacker the same affliction twice, which is precisely the breadth the
 		# card exists to build. It resets at battle start with every other field.
 		"stalking_horse":
-			var sh_turns := 4
+			var sh_turns := STALKING_HORSE_TURNS
 			_apply_status(attacker, "stalking_horse", sh_turns, STALKING_PULL)
 			_sfx("heal", -9.0, 0.7)
 			_message("%s plays the stalking horse" % attacker.unit_name)
 			_log("%s: Stalking Horse — for %d turns enemies are drawn to him, and each attacker takes a DIFFERENT affliction" % [
 				attacker.unit_name, sh_turns], "#70d878")
 		"downwind":
-			var dw_turns := 4
+			var dw_turns := DOWNWIND_TURNS
 			_apply_status(attacker, "downwind", dw_turns)
 			_sfx("heal", -9.0, 0.7)
 			_message("%s puts the field downwind" % attacker.unit_name)
@@ -23118,7 +23281,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				else:
 					target.purge_debuffs()
 					cu_n = maxi(cu_before - _status_count(target), 0)
-				var cu_pct := 0.12 if is_perfect else 0.10
+				var cu_pct := CULL_PERFECT_PCT if is_perfect else CULL_PCT
 				_message("%s culls the field!" % attacker.unit_name)
 				_log("%s: Cull — %d afflictions consumed from %s, and every enemy pays for them%s" % [
 					attacker.unit_name, cu_n, target.unit_name,
@@ -23199,7 +23362,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				# five party-wide effects that would otherwise reach a fifth
 				# body in a Beastmaster party, and this one deliberately does
 				# not: the card says EVERY HERO.
-				var bid_turns := 4
+				var bid_turns := BRING_IT_DOWN_TURNS
 				var bid_n := 0
 				for bid_h in heroes:
 					if bid_h.dead:
@@ -23221,7 +23384,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# the raw-damage block — so there is exactly one number stored and
 			# it is the one the chip prints.
 			var di_cap: int = DUG_IN_CAP
-			var di_turns := 4
+			var di_turns := DUG_IN_TURNS
 			_apply_status(attacker, "dug_in", di_turns, di_cap)
 			_sfx("heal", -9.0, 0.7)
 			_message("%s sets his feet" % attacker.unit_name)
@@ -23233,7 +23396,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# the perfect buys a higher ceiling, here it buys REACHING the same
 			# ceiling on a narrower board (four afflictions instead of five).
 			var th2_per: int = THICK_HIDE_PER
-			var th2_turns := 4
+			var th2_turns := THICK_HIDE_TURNS
 			_apply_status(attacker, "thick_hide", th2_turns, th2_per)
 			_sfx("heal", -9.0, 0.7)
 			_message("%s toughens against the work" % attacker.unit_name)
@@ -23246,7 +23409,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# every affliction's tick: it asks the board ONE question, at the
 			# same place the rest of his turn-start bookkeeping is asked.
 			# NOTHING IS CONSUMED — it is Harvest's deliberate inverse.
-			var sv_turns := 4 if is_perfect else 3
+			var sv_turns := SALVE_PERFECT_TURNS if is_perfect else SALVE_TURNS
 			_apply_status(attacker, "salve", sv_turns, SALVE_PER)
 			_sfx("heal", -8.0, 0.8)
 			_message("%s distils a salve" % attacker.unit_name)
@@ -24627,7 +24790,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# converted half of Focus). This line never touches the second one,
 			# so an Arcanist cannot be handed his compounding curve back for 25
 			# Mana and Holy cannot refill her own Mercy with it.
-			var rc_pct := 0.40
+			var rc_pct := RECANT_PCT
 			if target == null or target.dead or target.resource_name == "" \
 					or target.max_resource <= 0:
 				_log("%s: Recant finds nothing to give back" % attacker.unit_name,
@@ -24662,7 +24825,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# below half health is exactly what GENERATES a Mercy stack, so a
 			# hit routed through `take_hit` would sometimes pay a fourth one and
 			# the card would stop paying "exactly 3".
-			var sg_cost := maxi(int(round(attacker.max_hp * 0.25)), 1)
+			var sg_cost := maxi(int(round(attacker.max_hp * SHARED_GRIEF_COST_PCT)), 1)
 			# BATCH DH §4 — THE BEST COUPLING IN THE BATCH, AND THE REASON IS
 			# STRUCTURAL. Mercy accrues on the CROSSING below half
 			# (`_check_below_half` fires once, on `was_above`), so a hero who
@@ -24689,9 +24852,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					continue
 				if sg_h.hp <= sg_h.max_hp * sg_h.mercy_threshold:
 					sg_low += 1
-			var sg_grant := 4 + sg_low * SHARED_GRIEF_PER_WOUNDED
+			var sg_grant := SHARED_GRIEF_MERCY + sg_low * SHARED_GRIEF_PER_WOUNDED
 			var sg_hp_before: int = attacker.hp
-			attacker.hp = maxi(attacker.hp - sg_cost, 1)
+			attacker.hp = maxi(attacker.hp - sg_cost, SHARED_GRIEF_HP_FLOOR)
 			_book_self_cost(attacker, sg_hp_before, ab.display_name)
 			attacker.refresh_bars()
 			attacker.float_text("-%d" % sg_cost, Color(0.85, 0.35, 0.35))
@@ -24719,7 +24882,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# `_book_healing` keeps — never off the contribution stat, which is
 			# sim-only and counts overheal.
 			var rp_healed := attacker.healing_done_recent()
-			var rp_share := 0.75 if is_perfect else 0.50
+			var rp_share := REPRISAL_PERFECT_SHARE if is_perfect else REPRISAL_SHARE
 			if rp_healed <= 0 or target == null or target.dead:
 				_log("%s: Reprisal — no healing in the last two turns to answer for" % \
 					attacker.unit_name, "#909090")
@@ -24757,7 +24920,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# THE CASTER IS EXCLUDED: his own Faith holds at the threshold and never
 			# releases (BH §2), so a stack spent on him buys held mitigation and
 			# none of the release engine this card exists to start.
-			var od_grant := 4
+			var od_grant := ORDINATION_FAITH
 			var od_pick: BattleUnit = null
 			for od_h in heroes:
 				if od_h.dead or od_h.is_companion or od_h == attacker:
@@ -24785,8 +24948,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# the generic status tick decrements and never touches `max_hp`, so
 			# a status expiring by itself would strand the lent health on the
 			# ally forever. One clock, one owner.
-			var fs_steps := 4 if is_perfect else 3
-			var fs_step := maxi(int(round(attacker.max_hp * 0.10)), 1)
+			var fs_steps := FORTIFIED_SPIRIT_PERFECT_STEPS if is_perfect else FORTIFIED_SPIRIT_STEPS
+			var fs_step := maxi(int(round(attacker.max_hp * FORTIFIED_SPIRIT_STEP_PCT)), 1)
 			var fs_lent := fs_step * fs_steps
 			if target == null or target.dead:
 				_log("%s: Fortified Spirit finds nobody to lend to" % \
@@ -24814,7 +24977,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					target.unit_name])
 				_log("%s: Fortified Spirit — %s's maximum rises %d (%d%% of his own) and heals %d; it sheds %d a turn%s" % [
 					attacker.unit_name, target.unit_name, fs_lent,
-					fs_steps * 10, fs_got, fs_step, " [PERFECT]" if is_perfect else ""], "#c8b880")
+					fs_steps * int(round(FORTIFIED_SPIRIT_STEP_PCT * 100)), fs_got, fs_step, " [PERFECT]" if is_perfect else ""], "#c8b880")
 		"reliquary":
 			# IT READS `faith_peak`, NOT `faith_stacks`. The peak is BI's
 			# high-water mark: it ratchets with the count and never falls inside
@@ -24822,7 +24985,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# full for what they carried. Reading the live count would pay most
 			# to whoever happens not to have cashed in yet, which is the exact
 			# antagonism BI introduced the field to remove.
-			var rq_pct := 0.035 if is_perfect else 0.025
+			var rq_pct := RELIQUARY_PERFECT_PCT if is_perfect else RELIQUARY_PCT
 			var rq_paid := 0
 			for rq_h in heroes:
 				if rq_h.dead or rq_h.is_companion or rq_h.faith_peak <= 0:
@@ -24909,10 +25072,10 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				# THE PERFECT AND THE BREAK STACK, and deliberately: a perfect
 				# cast into a broken body is the best this card has, and both
 				# halves are stated on the draft card.
-				var su_rate := 3 if is_perfect else 2
+				var su_rate := SUFFERING_PERFECT_RUIN if is_perfect else SUFFERING_RUIN
 				if target.broken:
 					su_rate += SUFFERING_BROKEN_BONUS
-				_apply_status(target, "suffering", 4, su_rate, 0, attacker)
+				_apply_status(target, "suffering", SUFFERING_TURNS, su_rate, 0, attacker)
 				_log("   → Suffering: %s gains %d Ruin at the start of each of its next 4 turns%s" % [
 					target.unit_name, su_rate,
 					" (the body is BROKEN — the wound runs deeper)" \
@@ -24939,7 +25102,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			else:
 				var tf_moved := tf_from.status_stacks("ruin")
 				var tf_have := target.status_stacks("ruin")
-				var tf_bonus := 2
+				var tf_bonus := TRANSFERENCE_BONUS
 				tf_from.set_ruin_stacks(0)
 				_stamp_ruin_chip(tf_from)
 				if tf_have <= 0:
@@ -24966,7 +25129,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# THE STATUS RIDES EACH HERO, so the hook in the strike loop asks
 			# the ATTACKER a question rather than searching the board, and an
 			# ally who dies simply stops carrying it.
-			var an_turns := 4
+			var an_turns := ANOINTING_TURNS
 			var an_n := 0
 			for an_h in heroes:
 				if an_h.dead or an_h.is_companion:
@@ -24991,7 +25154,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# so the chip a player reads and the bill the callback sends are one
 			# value — Batch BP's Eye of the Storm is what two copies of one
 			# number costs.
-			var bb_pct := 25
+			var bb_pct := BLOODBOND_PCT
 			var bb_info: Array = STATUS_INFO["bloodbond"]
 			attacker.add_status("bloodbond", bb_info[0], bb_info[1], bb_info[2],
 				-1,
@@ -25023,7 +25186,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			else:
 				var ss_marks: Array = []
 				var ss_pool: Array = enemies.filter(func(e): return not e.dead)
-				while ss_marks.size() < 3 and not ss_pool.is_empty():
+				while ss_marks.size() < SAVAGE_SWEEP_TARGETS and not ss_pool.is_empty():
 					var ss_pick: BattleUnit = _lowest_hp(ss_pool)
 					ss_marks.append(ss_pick)
 					ss_pool.erase(ss_pick)
@@ -25069,7 +25232,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					await _companion_strike(ss_b, ss_t, 1.0, false)
 					if not ss_t.dead:
 						_add_bleed_with_burst(ss_t, SAVAGE_SWEEP_BLEED)
-				var ss_gain := 5 if is_perfect else 3
+				var ss_gain := SAVAGE_SWEEP_PERFECT_LOYALTY if is_perfect else SAVAGE_SWEEP_LOYALTY
 				_gain_loyalty(attacker, ss_b.companion_kind, ss_gain)
 				_log("   → Savage Sweep: the run deepens the bond (+%d Loyalty on %s)%s" % [
 					ss_gain, ss_b.companion_kind.capitalize(),
@@ -25082,7 +25245,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# CREDITS THE HUNTER: BB §4 fixed that exact site after AY found it
 			# booking damage to nobody, and a second uncredited striker would
 			# undo the repair.
-			var gp_turns := 4
+			var gp_turns := GHOSTPACK_TURNS
 			var gp_info: Array = STATUS_INFO["ghostpack"]
 			attacker.add_status("ghostpack", gp_info[0], gp_info[1], gp_info[2],
 				gp_turns, gp_info[3])
@@ -25108,8 +25271,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# it bought. The refusal is load-bearing — without it the ability is
 			# an unbounded loop, i.e. a hang rather than a balance question — and
 			# test_batch_bv drives it as a negative control.
-			attacker.prep_pending = 2
-			var pr_mana := 15
+			attacker.prep_pending = PREPARATION_DELAY
+			var pr_mana := PREPARATION_MANA
 			attacker.resource = mini(attacker.resource + pr_mana,
 				attacker.max_resource)
 			attacker.refresh_bars()
@@ -26547,8 +26710,8 @@ func _stamp_deadfall_chip(h: BattleUnit) -> void:
 		h.remove_display_chip("deadfall")
 		return
 	var short := "DF%d" % h.deadfall_armed
-	var desc := "A deadfall lies in the path: %d spring(s) left.\nThe next enemy to act takes %d%% of Attack\nas nature damage and is Stunned 1 turn.\nIt holds a trap slot until it is spent." % [
-		h.deadfall_armed, int(round(DEADFALL_SPRING_PCT * 100.0))]
+	var desc := "A deadfall lies in the path: %d spring(s) left.\nThe next enemy to act takes %d%% of Attack\nas nature damage and is Stunned %d turn%s.\nIt holds a trap slot until it is spent." % [
+		h.deadfall_armed, int(round(DEADFALL_SPRING_PCT * 100.0)), TRAP_STUN_TURNS, "" if TRAP_STUN_TURNS == 1 else "s"]
 	if h.deadfall_dormant > 0:
 		short = "DF%d·%d" % [h.deadfall_armed, h.deadfall_dormant]
 		desc += "\nRESTING: it cannot spring for %d more turn(s)." % h.deadfall_dormant
@@ -26578,7 +26741,7 @@ func _spring_trap(placer: BattleUnit, victim: BattleUnit, dmg: float,
 			_log("† %s dies" % victim.unit_name, "#e05050")
 			_on_enemy_death(victim)
 			return
-	_apply_status(victim, "stunned", 1, 0, 0, placer, force_stun)
+	_apply_status(victim, "stunned", TRAP_STUN_TURNS, 0, 0, placer, force_stun)
 	if placer.quick_rigging > 0:
 		_apply_status(victim, "cripple", 3, 0, 0, placer)
 	# ADDITIVE (Batch BA): each counter IS the number its clause pays — Break
@@ -27010,7 +27173,7 @@ func _sharpshooter_focus(attacker: BattleUnit, victim: BattleUnit,
 				attacker.same_target_turns,
 				"turn" if attacker.same_target_turns == 1 else "turns"], "#b0a8e0")
 		if qm_mark:
-			gain *= 2
+			gain *= QUARRYS_MARK_FOCUS_MULT
 			_log("   → Quarry's Mark: the named quarry pays double (+%d Focus)" % \
 				gain, "#a0d060")
 		_gain_focus(attacker, gain)
@@ -30684,7 +30847,7 @@ func _book_healing(owner, amount: float, healed: BattleUnit) -> void:
 	u.heal_by_turn[u.battle_turn] = int(u.heal_by_turn.get(u.battle_turn, 0)) \
 		+ landed
 	for stale in u.heal_by_turn.keys():
-		if int(stale) < u.battle_turn - 1:
+		if int(stale) < u.battle_turn - (BattleUnit.REPRISAL_WINDOW_TURNS - 1):
 			u.heal_by_turn.erase(stale)
 
 

@@ -329,7 +329,10 @@ func _s3_the_record() -> void:
 	ok(not ubody.contains("protected_names"),
 		"§3: the CAP reads `protected_names` now — it is a NAME count and the cap is a SLOT count")
 	var capf := rs.find("func ability_slot_cap")
-	var cbody := rs.substr(capf, 200)
+	# BATCH IT §3b — RE-POINTED: every fixed slice here ran past its function (this one 66 into `note_zone_boss_cleared`,
+	# `decline_draft`'s 114 through `DRAFT_PRICES` into `draft_price`). Each is the function's own block now, and says so.
+	var cbody := Gate.block(rs, capf)
+	ok(Gate.within(rs, capf, cbody), "§3: the ladder's slice ends inside `ability_slot_cap`")
 	ok(not cbody.contains("core_slots") and not cbody.contains("protected_names"),
 		"§3: the LADDER reads a core count — it is indexed by zone bosses cleared and nothing else")
 	# AND THE READERS OF THE OTHER ARE A NAMED SET. It was TWO live readers from
@@ -442,7 +445,8 @@ func _s3_the_record() -> void:
 	ok(rs.count("_refuse_draft(") == 2,
 		"§3: `_refuse_draft` has %d mentions in the stripped source — one definition and one caller is the rule" % rs.count("_refuse_draft("))
 	var dec := rs.find("func decline_draft")
-	var dbody := rs.substr(dec, 500)
+	var dbody := Gate.block(rs, dec)
+	ok(Gate.within(rs, dec, dbody), "§3: the decline's slice ends inside `decline_draft`")
 	ok(dbody.contains("_refuse_draft("),
 		"§3: `decline_draft` no longer writes the ledger")
 	var m3 := {"key": "warrior", "spec": "berserker",

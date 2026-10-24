@@ -1243,7 +1243,10 @@ func _s3_the_rune_offer() -> void:
 	var src := Gate.strip_comments(
 		FileAccess.get_file_as_string("res://scripts/battle.gd"))
 	var at := src.find("func _resolve_boss")
-	var body := src.substr(at, 4000) if at >= 0 else ""
+	# BATCH IT §3b — RE-POINTED: 4000 characters ran 1806 past `_resolve_boss` through seven functions, so 45% of what the
+	# absence below read was not the function it names. The slice is the function's own block, and it says so.
+	var body := Gate.block(src, at) if at >= 0 else ""
+	ok(Gate.within(src, at, body), "§3(c): the slice ends inside `_resolve_boss`")
 	# BATCH IB §1 — `Run.queue_rune_pick` is the one door a rune cache's pick is queued
 	# through since IB (the elite's spoils wrote `rune_picks_owed` here by hand until then).
 	for door in ["roll_rune_candidates", "grant_rune", "queue_rune_pick"]:

@@ -16,6 +16,32 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-23 &mdash; Batch IT: THE STRIKE, THE EIGHTY LITERALS NAMED, THE POSITIONAL FAMILY, AND THE ALARM's FENCE</h2>
+<p><b>Nothing a player sees moved: every card, rune, glossary entry, status chip and table reads exactly as it did. Underneath, the
+numbers the cards state are now named in the code they come from, the design document's card catalogue is checked against them,
+the project's rule file is lighter by its closed history, and the test gates that read code by position now read it by what it
+is.</b> Full working: <code>docs/reports/IT.md</code>.</p>
+
+<p><b>&sect;1 &mdash; THE STRIKE.</b> Fifty-four closed items &mdash; what happened and past measurements, each with its record
+in a batch report or the archive, checked before the cut &mdash; left <code>CLAUDE.md</code>. Two whose record was not where it was
+said to be stayed, and go to the next batch with the twenty-two that assert something about the code.</p>
+
+<p><b>&sect;2 &mdash; THE FIGURES NAMED.</b> 173 figures the design document's card tables state were decided by a bare number in the
+code that resolves the card; 164 named constants hold them now, and the cards, the glossary and the status chips that state them
+read those constants. A test that changes one constant moves exactly the texts that state it, and each constant's own line names
+the card it belongs to without repeating its number, so a change leaves nothing beside it to go stale. The design document's card
+catalogue is read against them every run: a figure written there that nothing in the code decides fails the check.</p>
+
+<p><b>&sect;3 &mdash; THE GATES THAT READ BY POSITION.</b> Every test that read code by where it sat &mdash; a first match, or a fixed
+number of characters after an anchor &mdash; was listed (489 reads); the 58 that were reading the wrong thing now read their real
+subject, cut at its own end, and the other 20 are recorded.</p>
+
+<p><b>&sect;4 &mdash; THE SIZE ALARM.</b> The state file's growth record returns to its real one: the last batch's index section is
+structure, fenced and named, and is not counted as a batch's writing.</p>
+
+<p><b>&sect;5 &mdash; THE INDEX STAMPED.</b> Every row of the state file's index carries a fingerprint of the section it names, so a
+batch that changes a section and forgets its row is caught.</p>
+
 <h2>2026-10-22 &mdash; Batch IS: THE LOAD DOOR's FIVE ANSWERS, THE PILOT, AND THE HISTORY STRIP</h2>
 <p><b>An old save that holds a card the game no longer has now loads without it, its slot free, and the map says so; a rune saved
 in a shape the game can no longer read is rebuilt to today's; a cost split across bound heroes now bills exactly what was split;

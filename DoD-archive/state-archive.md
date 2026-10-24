@@ -17,6 +17,66 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT IT — 2026-10-23, FROM `docs/state.md` AS IS LEFT IT (`73e71a0`)
+
+**What came here**: IS's two rulings, both answered in IT's brief and built at IT (§1, §0.2); FOUND AT IS's three items IT closed — the fixed window's shape (censused and repaired, IT §3), the five positional picks (repaired, IT §3b) and the record `check_fg` §4's bar read (ES's again, IT §4); FOUND AT IQ's `check_ho` §8 window, repaired at IT §3b; the roadmap's IT entry, done; and half an item each of FOUND AT GQ (Nexus Ward's and Ministration's plain 20%) and FOUND AT GF (Arcane Arrows' stale constant), both closed at IT §2 and found by the pilot's close-read.
+
+
+### ~~IS's RULINGS OWED~~ — **BOTH ANSWERED IN IT's BRIEF (§0.1, §0.2): FIFTY-SIX STRUCK UNDER RULES THAT ALREADY EXIST, THE OTHER 22 TO THE CLAIMS (1, BUILT AT IT §1 — 54 STRUCK, TWO NOT); THE STRIP's READING CONFIRMED (2, WRITTEN AT IT §0.2)** — WAS: **TWO, AND THE SECOND RUN AND THE FRAMING CARD ARE ON THE LOOK-LIST NOW (THE ROADMAP, BELOW)**
+
+Full working: `docs/reports/IS.md`, NEEDS A RULING.
+
+1. **`CLAUDE.md`'s CLOSED MATTER, PRICED (IS §1).** None of its 121 blocks closes whole (117 bind; the four II closed are struck
+   to their pointers already). Inside the live blocks are **78 closed items, 18,380 B — 3.8% of the file**: 40 history, 16 a past
+   measurement, 12 superseded clauses kept in place, 10 things the text calls owed that are built; 76 of them (17,945 B) have their
+   record in a report or the archive, two (435 B) stand nowhere else. Struck, they would buy about eight batches of headroom once,
+   at the IN–IR mean — a fifth of what `docs/state.md`'s census found in it at IQ (61,137 B of closed items in 16.5% of the file).
+   **Strike them (each to the record the census names), or leave them** — and the index decision for this file is IW's either way.
+2. **WHAT THE STRIP TOOK AS *WHY* (IS §6).** The ruling says a clause about what the game was, *or why*, leaves `master.html`. The
+   strip took history and the reasoning attached to it (why a figure moved, what a past measurement showed) and left
+   present-tense design reasoning — a card's design role and its *Builds with:* line, which say what the game is for. **Confirm
+   that reading, or rule that the role column leaves too.**
+
+### FOUND AT IS AND NOT FIXED — ITS CLOSED ITEMS (archived at IT; the section stays in `docs/state.md`)
+
+- **THE FIXED WINDOW HAS A SHAPE NOW, AND IT WAITS (IS's brief §8)**: *a fixed-length window must assert it ends inside its own
+  subject* — `check_ho` §8's 2,400 characters past its 2,288-character block (FOUND AT IQ), `test_batch_bx` §5's 3,000 characters
+  after the draft entry and `test_batch_bw`'s Vendetta window. A census of every fixed window is what would close it.
+- **FIVE POSITIONAL PICKS MISS THEIR SUBJECT ON BOTH TREES** (IS's superlative census found them; none is IS's doing): `test_batch_bc`
+  §0's order assertion reads `94953 > -1`, its `rfind` anchor absent from its window; `check_dr` §5's first `"counter_time":` is a
+  status-table row, not the handler's arm; `check_hu` §2a's first `return` after the door's add is a lambda's; and `test_batch_ay` §7
+  and `test_batch_az` §7 take the first `"hunter":`, in `_bot_class_kit_pick` rather than the rotation. Each passes and none asks its
+  question (`as`'s, `at`'s and `aw`'s exclusive-pair windows are the vacuous siblings already on record, below). The fixed-window
+  census above would read them with the rest.
+- **THE RECORD `check_fg` §4's FAILURE BAR READS IS IS's NOW, AND MOST OF IT IS THE INDEX** — the bar is the ceiling plus the
+  record, so IS's own writing raised it by about twenty-two KiB (the preamble carries the record). If IW reverts
+  the pilot, the section's bytes leave the file and the record does not: the batch that reverts re-measures the record without the
+  section, rather than keep a bar the file can no longer reach.
+
+### FOUND AT IQ AND NOT FIXED — ITS CLOSED ITEMS (archived at IT; the section stays in `docs/state.md`)
+
+- **`check_ho` §8 READS A FIXED 2,400 CHARACTERS AFTER ITS HEADING, PAST ITS 2,288-CHARACTER BLOCK**: its tail now reads IQ's new block's
+  heading where it read HO §1's. Every needle it holds sits inside the block, so the verdict holds — the *fixed window runs past its arm*
+  shape, waiting for a needle that does not.
+
+### THE PLAYTEST'S OTHER FINDINGS — ITS CLOSED ITEMS (archived at IT; the section stays in `docs/state.md`)
+
+- **IT — A BATCH OF ITS OWN: THE EIGHTY CONSTANTS** (IR's brief §0.7, IS's brief §8): about 80 of the catalogue's behaviour figures are literals in
+  their handlers (`aw_turns := 4`, Blood Offering's 0.20 and 60, Second Wind's 0.40 and 0.55, …). **Name them, then give the catalogue's
+  figures a door, then widen `check_iq` §2 from 695 to hold them** — IJ's rule arriving at the other side, and the machinery that stops
+  the next thirty-one false facts. Not urgent, and no live defect.
+
+### FOUND AT GQ AND NOT FIXED — ITS CLOSED ITEMS (half of an item, closed at IT §2; the section stays in `docs/state.md`)
+
+- **Nexus Ward's and Ministration's 20% are plain text, not tokens**, so no surface resolves either to a number. *(Closed at IT §2: both texts read their constants.)*
+
+### FOUND AT GF AND NOT FIXED — ITS CLOSED ITEMS (half of an item, closed at IT §2; the section stays in `docs/state.md`)
+
+- Arcane Arrows' handler comment says five is what the card promises, beside an
+  `ARCANE_ARROW_CHARGES` of 5 that nothing reads; the card and the handler pay six, and so does the glossary now. *(Closed at IT §2: the constant is six and read, and the comment names it.)*
+
+---
+
 ## ARCHIVED AT IS — 2026-10-22, FROM `docs/state.md` AS IR LEFT IT (`6ce7183`)
 
 **What came here**: IR's six rulings, every one answered in IS's brief; the index pilot's block, built at IS §5; FOUND AT IR's three items IS closed (the split's rounding, the three floors read and not driven, and the four latent shapes' item, whose three remaining shapes stay live); FOUND AT IQ's history-clause item, done at IS §6; FOUND AT GB's mini-boss item, closed at IR §1a and left standing; GM's fourth ruling's first half (Split Shield's word, answered at IS §4) and FOUND AT GE's sweep-residue item as it stood (its twenty-two-cards half done at IS §6), each found by IS's close-read; and the roadmap's IS line. Everything else in the live file stayed.

@@ -5,7 +5,9 @@
 #   §1   `docs/state.md`'s closed blocks stand in the archive and not in the live file, the archive's newest cut on top.
 #   §2   `docs/master.html`'s figures that have a door, read on both sides: every card's price in the draft catalogue and in
 #        the class sections' statlines against the card's own fields, the bargain deck against `Run.MODIFIERS`, the rewards
-#        against `Run.REWARDS` and the ladder against `Run.DIFFICULTIES`.
+#        against `Run.REWARDS` and the ladder against `Run.DIFFICULTIES` — and since IT §2f every figure the catalogue's
+#        "What it does" cells state, against the field or the constant that decides it; a figure stated there with no door
+#        reds.
 #   §4   A REMOVAL OWES THE SAVE A GUARD, NOT A RE-ASK (the designer's). A bargain's offer is rolled once for its
 #        encounter and saved with it (GF), so a save frozen on the offer screen carries modifier ids the deck may no
 #        longer hold. DRIVEN through the real save, the real load door and the real offer screen: an option naming an id
@@ -510,11 +512,525 @@ func _s2_master_figures() -> void:
 		var said := "dealt from severity %d–%d and its gambles at severity %d" % [int(sb[0]), int(sb[1]), int((d["gamble_band"] as Array)[0])]
 		if not plain.contains(said):
 			wrong.append("§2e: the ladder's %s twist does not read '%s'" % [String(d["name"]), said])
+	# §2f — the catalogue's own figures, every one through its door (IT §2).
+	var cat: Array = _s2f_catalogue_figures(doc, cards, wrong)
 	for w in wrong:
 		print("    " + String(w))
 	ok(wrong.is_empty(), "§2: %d of master.html's figures disagree with their doors — %s" % [wrong.size(), "; ".join(PackedStringArray(wrong.slice(0, 3)))])
 	print("    CHECKED: the catalogue %d figures over %d rows, the prose %d figures over %d statlines, the deck's %d rows, %d rewards, three rungs"
 		% [figs_a, priced, figs_b, lines, listed.size(), paid])
+	# IQ's count was 695: the price column, the statlines, the deck both ways and its size, the rewards and the ladder. IT §2
+	# adds the catalogue's "What it does" figures and words read through a door.
+	var iq_held := figs_a + figs_b + 2 * listed.size() + 1 + paid + 9
+	print("    CHECKED: the catalogue's own %d stated figures — %d through a door, %d a worked example's input (named) — and %d words; §2 holds %d figures (IQ's %d + IT's %d)"
+		% [int(cat[3]), int(cat[0]), int(cat[2]), int(cat[1]), iq_held + int(cat[0]) + int(cat[1]), iq_held, int(cat[0]) + int(cat[1])])
+
+
+# ── §2f — THE CATALOGUE's OWN FIGURES (BATCH IT §2) ─────────────────────────
+#
+# The catalogue is `docs/master.html`'s two card tables — §5.2's class kit and §6b's draft — one row a card. §2a reads
+# each row's price cell; this reads its "What it does" cell, every figure in it, against the door that decides it: the
+# card's own field (`ab.`), a named constant (`Battle.`, `Unit.`, `Classes.`, `Ability.`), another card's field
+# (`cards[...]`), the class's own config (`warrior[...]`), or arithmetic over those where the cell states a product (a
+# Perfect's grade multiplier, a bar's worth). Each door is a GDScript `Expression` over the scripts' constant maps,
+# evaluated live, so a re-tune moves the figure the door reads and the cell reds until it is moved too. **IT named the
+# 157 handler literals this needed first** (`battle.gd`'s IT §2 block); before IT, 173 of the catalogue's 398 figures
+# had no door (IT's report, §2b).
+# **AND A FIGURE WITH NO DOOR REDS**: every number the cells state is held by a row here — through its door, or as a
+# worked example's input the text chooses, NAMED with why — so a cell that states a new figure reds until the figure
+# is given its row. Words are held where a constant or a field decides them; a word that only counts the card's own
+# structure (*one mark at a time*, *a second enemy*) has no figure to read and is not held.
+const CATALOGUE_HEADS := ["<tr><th>Class</th><th>Class kit</th><th>Cost, initiative, cooldown, target</th><th>What it does</th></tr>",
+	"<tr><th>Ability</th><th>Cost / init / cd</th><th>What it does</th><th>Axis</th></tr>"]
+const CATALOGUE_ENTITIES := {"&mdash;": "—", "&ndash;": "–", "&sect;": "§", "&amp;": "&", "&times;": "×", "&minus;": "−",
+	"&nbsp;": " ", "&rarr;": "→", "&lt;": "<", "&gt;": ">", "&hellip;": "…", "&rsquo;": "’", "&#x27;": "'", "&#39;": "'"}
+# [card, needle in its cell, the figure as written, its door]
+const CATALOGUE_FIGURES := [
+	["Crushing Blow", "43% of", "43%", "ab.damage"],
+	["Crushing Blow", "20 Break", "20", "ab.pressure"],
+	["Crushing Blow", "(−35% armor)", "−35%", "Unit.SUNDER_STEP*100"],
+	["Crushing Blow", "3 turns.", "3", "ab.applies_status[\"turns\"]"],
+	["Crushing Blow", "10 Rage", "10", "ab.resource_gain"],
+	["Crushing Blow", "+5 bonus", "+5", "Battle.CRUSHING_BLOW_PERFECT_BD"],
+	["Pommel Strike", "25% of", "25%", "ab.damage"],
+	["Pommel Strike", "30 Break", "30", "ab.pressure"],
+	["Pommel Strike", "25% crit", "25%", "Battle.POMMEL_STRIKE_CRIT*100"],
+	["Pommel Strike", "1 turn,", "1", "ab.applies_status[\"turns\"]"],
+	["Pommel Strike", "10 Rage", "10", "ab.resource_gain"],
+	["Mocking Blow", "27% of", "27%", "ab.damage"],
+	["Mocking Blow", "15 Break", "15", "ab.pressure"],
+	["Mocking Blow", "4 turns.", "4", "Battle.MOCKING_BLOW_TURNS"],
+	["Mocking Blow", "10 Rage", "10", "ab.resource_gain"],
+	["Mocking Blow", "5 turns).", "5", "Battle.MOCKING_BLOW_PERFECT_TURNS"],
+	["Magic Burst", "40% of", "40%", "ab.damage"],
+	["Magic Burst", "15 Break", "15", "ab.pressure"],
+	["Magic Burst", "3 turns:", "3", "Battle.ELEM_WEAK_TURNS"],
+	["Magic Burst", "15% lower", "15%", "Battle.ELEM_WEAK_PCT"],
+	["Magic Burst", "the 3 turns", "3", "Battle.ELEM_WEAK_TURNS"],
+	["Nexus Ward", "20% of", "20%", "Battle.NEXUS_WARD_PCT*100"],
+	["Nexus Ward", "3 turns.", "3", "Battle.NEXUS_WARD_TURNS"],
+	["Magic Missiles", "12% of", "12%", "ab.damage"],
+	["Magic Missiles", "3 BD", "3", "ab.pressure"],
+	["Ministration", "20% of", "20%", "Battle.MINISTRATION_PCT*100"],
+	["Ministration", "26%).", "26%", "Battle.MINISTRATION_PERFECT_PCT*100"],
+	["Unburden", "20% less", "20%", "Battle.UNBURDEN_CUT*100"],
+	["Unburden", "3 turns.", "3", "Battle.UNBURDEN_TURNS"],
+	["Consecration", "4 turns", "4", "Battle.CONSECRATION_TURNS"],
+	["Consecration", "5% of", "5%", "Battle.CONSECRATION_PCT*100"],
+	["Powershot", "20% of", "20%", "ab.damage"],
+	["Powershot", "20 Break", "20", "ab.pressure"],
+	["Powershot", "+2% damage", "+2%", "Battle.POWERSHOT_PCT_PER_POINT"],
+	["Snare Trap", "1 turn", "1", "Battle.TRAP_STUN_TURNS"],
+	["Snare Trap", "4. A", "4", "Battle.SNARE_TRAP_POISON_TURNS"],
+	["Summon Companion", "3-turn", "3", "Battle.SWAP_COOLDOWN"],
+	["Blood Offering", "20% of", "20%", "Battle.BLOOD_OFFERING_PCT*100"],
+	["Blood Offering", "60 Rage.", "60", "Battle.BLOOD_OFFERING_RAGE"],
+	["Blood Offering", "1 —", "1", "Battle.BLOOD_OFFERING_HP_FLOOR"],
+	["Gut Rip", "6% of", "6%", "ab.damage"],
+	["Gut Rip", "10 points", "10", "Battle.GUT_RIP_STEP"],
+	["Gut Rip", "9%).", "9%", "Battle.GUT_RIP_PERFECT_PCT"],
+	["Reckless Abandon", "3 turns", "3", "Battle.RECKLESS_TURNS"],
+	["Reckless Abandon", "+2% damage", "+2%", "Battle.RECKLESS_PCT_PER_10"],
+	["Reckless Abandon", "10 points", "10", "Battle.RECKLESS_STEP"],
+	["Reckless Abandon", "3%).", "3%", "Battle.RECKLESS_PERFECT_PER_10"],
+	["Reckless Abandon", "10 Rage", "10", "Battle.RECKLESS_STEP"],
+	["Berserk", "30% more", "30%", "Battle.BERSERK_RISK_PCT"],
+	["Berserk", "3 turns.Two", "3", "Battle.BERSERK_RISK_TURNS"],
+	["Berserk", "30% is", "30%", "Battle.BERSERK_RISK_PCT"],
+	["Berserk", "3-turn", "3", "Battle.BERSERK_RISK_TURNS"],
+	["Blood Debt", "30% of", "30%", "ab.damage"],
+	["Blood Debt", "25% of", "25%", "Battle.BLOOD_DEBT_HEAL*100"],
+	["Blood Debt", "35%).The", "35%", "Battle.BLOOD_DEBT_PERFECT_HEAL*100"],
+	["Unslaked", "4 turns,", "4", "Battle.UNSLAKED_TURNS"],
+	["Spite", "6 turns,", "6", "Battle.SPITE_TURNS"],
+	["Spite", "1% less", "1%", "Battle.SPITE_PER_5_MISSING"],
+	["Spite", "5% of", "5%", "Battle.SPITE_STEP_PCT"],
+	["Spite", "40%. It", "40%", "Battle.SPITE_PERFECT_CAP"],
+	["Boil Over", "0.8% of", "0.8%", "Classes.BOIL_OVER_PCT_PER_RAGE"],
+	["Boil Over", "40% of", "40%", "Classes.BOIL_OVER_MIN_BAR*100"],
+	["Precision Strike", "20% of", "20%", "Battle.PRECISION_AGGRO_PCT"],
+	["Precision Strike", "(6 BD", "6", "Battle.PRECISION_AGGRO_BD"],
+	["Precision Strike", "+25% parry", "+25%", "Battle.PRECISION_PARRY_PCT"],
+	["Precision Strike", "15% of", "15%", "Battle.PRECISION_DEF_PCT"],
+	["Precision Strike", "15 BD,", "15", "Battle.PRECISION_DEF_BD"],
+	["Feint", "35% of", "35%", "Battle.FEINT_STRIKE_PCT"],
+	["Feint", "(12 BD),", "12", "Battle.FEINT_BD"],
+	["Feint", "45%).From", "45%", "Battle.FEINT_PERFECT_PCT"],
+	["Feint", "2 charges", "2", "Battle.FEINT_GUARDS"],
+	["Sever", "40% of", "40%", "ab.damage"],
+	["Sever", "−35% armor", "−35%", "Unit.SUNDER_STEP*100"],
+	["Sever", "3 turns,", "3", "Unit.SUNDER_TURNS"],
+	["Battle Poise", "4 turns,", "4", "Battle.BATTLE_POISE_TURNS"],
+	["Feigned Guard", "3 turns", "3", "Battle.FEIGNED_GUARD_TURNS"],
+	["Discipline", "7 turns,", "7", "Battle.DISCIPLINE_TURNS"],
+	["Discipline", "4%, to", "4%", "Battle.DISCIPLINE_PERFECT_STEP"],
+	["Discipline", "15%. A", "15%", "Battle.DISCIPLINE_CAP"],
+	["Answering Steel", "6 turns,", "6", "Battle.ANSWERING_TURNS"],
+	["Answering Steel", "+20%, and", "+20%", "Battle.ANSWERING_PERFECT_PARRY"],
+	["Answering Steel", "15 Rage", "15", "Battle.ANSWERING_RAGE"],
+	["Formless", "4 turns", "4", "Battle.FORMLESS_TURNS"],
+	["Formless", "2 turns", "2", "Battle.FORMLESS_RECOIL_TURNS"],
+	["Wheeling Cut", "20% of", "20%", "ab.damage"],
+	["Wheeling Cut", "20% less", "20%", "Battle.WHEELING_GUARD_PCT"],
+	["Wheeling Cut", "for 3 turns. FROM", "3", "Battle.WHEELING_GRANT_TURNS"],
+	["Wheeling Cut", "+20% damage", "+20%", "Battle.WHEELING_EDGE_PCT"],
+	["Wheeling Cut", "for 3 turns. Either", "3", "Battle.WHEELING_GRANT_TURNS"],
+	["Covering Guard", "4 turns,", "4", "Battle.COVERING_GUARD_TURNS"],
+	["Eye of the Storm", "3 turns,", "3", "Battle.EYE_STORM_TURNS"],
+	["Eye of the Storm", "8% less", "8%", "Battle.EYE_STORM_CUT_PCT"],
+	["Shield Slam", "15% of", "15%", "Battle.SHIELD_SLAM_PCT*100"],
+	["Shield Slam", "20%),", "20%", "Battle.SHIELD_SLAM_PERFECT_PCT*100"],
+	["Vendetta", "30% less", "30%", "Battle.VENDETTA_PERFECT_CUT*100"],
+	["Aegis Wall", "4 turns,", "4", "Battle.AEGIS_WALL_TURNS"],
+	["Aegis Wall", "8% of", "8%", "Battle.AEGIS_WALL_PCT*100"],
+	["Anvil", "4 turns,", "4", "Battle.ANVIL_TURNS"],
+	["Recompense", "6 turns,", "6", "Battle.RECOMPENSE_TURNS"],
+	["Turn the Blade", "4 turns,", "4", "Battle.TURN_THE_BLADE_TURNS"],
+	["Cinderfall", "20% of", "20%", "ab.damage"],
+	["Cinderfall", "tears 2 turns", "2", "Battle.CINDERFALL_TAKE"],
+	["Cinderfall", "3 turns);", "3", "Battle.CINDERFALL_PERFECT_TAKE"],
+	["Cinderfall", "2 turns.", "2", "Battle.CINDERFALL_LIGHT_TURNS"],
+	["Ember Debt", "12 turns", "12", "Battle.EMBER_DEBT_TURNS"],
+	["Stoke", "25% of", "25%", "ab.damage"],
+	["Stoke", "3 turns.", "3", "Battle.STOKE_LIGHT_TURNS"],
+	["Funeral Pyre", "200% of", "200%", "Battle.PYRE_SHARE_PERFECT*100"],
+	["Funeral Pyre", "3 turns.", "3", "Battle.PYRE_SHIELD_TURNS"],
+	["Firedraw", "6 turns", "6", "Battle.FIREDRAW_TAKE_PERFECT"],
+	["Firedraw", "6, whichever", "6", "Battle.FIREDRAW_TAKE_PERFECT"],
+	["Pyre Wake", "1 turn", "1", "Battle.PYRE_WAKE_TURNS"],
+	["Pyre Wake", "8% of", "8%", "ab.damage"],
+	["Pyre Wake", "12%).", "12%", "Battle.PYRE_WAKE_PERFECT_PCT"],
+	["Smoulder", "10% of", "10%", "ab.damage"],
+	["Smoulder", "for 4 turns", "4", "ab.applies_status[\"turns\"]"],
+	["Smoulder", "its 4 turns", "4", "ab.applies_status[\"turns\"]"],
+	["Winter's Toll", "8% of", "8%", "ab.damage"],
+	["Winter's Toll", "12%).", "12%", "Battle.WINTERS_TOLL_PERFECT_PCT"],
+	["Killing Frost", "20% of", "20%", "ab.damage"],
+	["Killing Frost", "2 more", "2", "Battle.KILLING_FROST_STACKS"],
+	["Killing Frost", "3).", "3", "Battle.KILLING_FROST_STACKS_PERFECT"],
+	["Hoarfrost Armor", "25% less", "25%", "Battle.HOARFROST_CUT*100"],
+	["Hoarfrost Armor", "2 stacks", "2", "Battle.HOARFROST_STACKS"],
+	["Cold Iron", "25% of", "25%", "ab.damage"],
+	["Frostbind", "40%. The", "40%", "Battle.FROSTBIND_SHARE*100"],
+	["Null Field", "4 turns,", "4", "Battle.NULL_FIELD_TURNS"],
+	["Null Field", "5% per", "5%", "Battle.NULL_FIELD_PCT_PER_STACK*100"],
+	["Kindled Mind", "15% of", "15%", "ab.damage"],
+	["Kindled Mind", "1 (Perfect:", "1", "Battle.RESONANCE_PER_CAST"],
+	["Arcane Bolt", "15% of", "15%", "ab.damage"],
+	["Arcane Bolt", "20%),", "20%", "Battle.ARCANE_BOLT_PERFECT_PCT*100"],
+	["Arcane Echo", "20% of", "20%", "ab.damage"],
+	["Arcane Echo", "3 turns", "3", "Battle.ARCANE_ECHO_TURNS"],
+	["Arcane Echo", "30% against", "30%", "Battle.ARCANE_ECHO_SHARE*100"],
+	["Threshold", "15 immediately,", "15", "Battle.THRESHOLD_STACKS"],
+	["Threshold", "2 turns.", "2", "Battle.THRESHOLD_LOCK_TURNS_PERFECT"],
+	["Threshold", "15 it", "15", "Battle.THRESHOLD_STACKS"],
+	["Unmaking", "10% of", "10%", "ab.damage"],
+	["Unmaking", "3 turns", "3", "Battle.UNMAKING_LOCK_TURNS"],
+	["Unmaking", "1 Resonance.", "1", "Battle.UNMAKING_MIN_STACKS"],
+	["Second Wind", "40% of", "40%", "Battle.SECOND_WIND_CAP_PCT*100"],
+	["Second Wind", "55%).", "55%", "Battle.SECOND_WIND_PERFECT_CAP_PCT*100"],
+	["Rite of Return", "4 turns,", "4", "Battle.RITE_OF_RETURN_TURNS"],
+	["Rite of Return", "50% health", "50%", "Battle.RITE_OF_RETURN_RESTORE_PCT*100"],
+	["Rite of Return", "30% of", "30%", "Battle.RITE_OF_RETURN_TOLL_PCT*100"],
+	["Recant", "40% of", "40%", "Battle.RECANT_PCT*100"],
+	["Shared Grief", "25% of", "25%", "Battle.SHARED_GRIEF_COST_PCT*100"],
+	["Shared Grief", "4 Mercy.", "4", "Battle.SHARED_GRIEF_MERCY"],
+	["Shared Grief", "below 1.", "1", "Battle.SHARED_GRIEF_HP_FLOOR"],
+	["Reprisal", "50% of", "50%", "Battle.REPRISAL_SHARE*100"],
+	["Reprisal", "75%).", "75%", "Battle.REPRISAL_PERFECT_SHARE*100"],
+	["Divine Presence", "4 turns", "4", "Battle.DIVINE_PRESENCE_TURNS"],
+	["Divine Presence", "2 Mercy", "2", "Battle.DIVINE_PRESENCE_MERCY"],
+	["Divine Presence", "4 Mercy.", "4", "2 * Battle.DIVINE_PRESENCE_MERCY"],
+	["Alms", "4 turns,", "4", "Battle.ALMS_TURNS"],
+	["Alms", "12% of", "12%", "Battle.ALMS_WARD_PCT"],
+	["Vespers", "4 turns,", "4", "Battle.VESPERS_TURNS"],
+	["Vespers", "20% of", "20%", "Battle.VESPERS_PCT*100"],
+	["Vow of Suffering", "4 turns,", "4", "Battle.VOW_OF_SUFFERING_TURNS"],
+	["Vow of Suffering", "1 Faith.", "1", "Battle.VOW_OF_SUFFERING_FAITH"],
+	["Ordination", "4 Faith", "4", "Battle.ORDINATION_FAITH"],
+	["Reliquary", "2.5% of", "2.5%", "Battle.RELIQUARY_PCT*100"],
+	["Reliquary", "3.5%).", "3.5%", "Battle.RELIQUARY_PERFECT_PCT*100"],
+	["Elevation", "2 stacks", "2", "Battle.ELEVATION_STACKS"],
+	["Elevation", "15% of", "15%", "Battle.FAITH_RELEASE_HEAL*100"],
+	["Elevation", "3% of", "3%", "Battle.FAITH_RELEASE_MANA*100"],
+	["Blessing of the Faithful", "6% of", "6%", "Battle.BLESSING_OF_THE_FAITHFUL_PCT*100"],
+	["Blessing of the Faithful", "3% of", "3%", "Battle.BLESSING_OF_THE_FAITHFUL_MANA_PCT*100"],
+	["Blessing of the Faithful", "8%).", "8%", "Battle.BLESSING_OF_THE_FAITHFUL_PERFECT_PCT*100"],
+	["Blessing of the Faithful", "3 held.", "3", "Battle.JUBILEE_MIN_FAITH"],
+	["Mantle", "25% of", "25%", "Battle.MANTLE_PCT*100"],
+	["Blight the Well", "6 turns,", "6", "Battle.BLIGHT_THE_WELL_TURNS"],
+	["Suffering", "20% of", "20%", "ab.damage"],
+	["Suffering", "4 turns", "4", "Battle.SUFFERING_TURNS"],
+	["Suffering", "2 Ruin", "2", "Battle.SUFFERING_RUIN"],
+	["Suffering", "3) —", "3", "Battle.SUFFERING_PERFECT_RUIN"],
+	["Transference", "2 more", "2", "Battle.TRANSFERENCE_BONUS"],
+	["Anointing", "4 turns,", "4", "Battle.ANOINTING_TURNS"],
+	["Anointing", "1 Ruin.", "1", "Battle.ANOINTING_RUIN"],
+	["Breaking Darkness", "3 turns", "3", "Battle.BREAKING_DARKNESS_TURNS"],
+	["Breaking Darkness", "25% harder.", "25%", "Battle.BREAKING_DARKNESS_BD_PCT"],
+	["Requiem", "8% of", "8%", "Battle.REQUIEM_PER_STACK*100"],
+	["Requiem", "10%),", "10%", "Battle.REQUIEM_PERFECT_PER_STACK*100"],
+	["Requiem", "2% of", "2%", "Battle.REQUIEM_HEAL_PCT*100"],
+	["Penance", "4 turns", "4", "Battle.PENANCE_TURNS"],
+	["Penance", "50% of", "50%", "Battle.PENANCE_MIRROR*100"],
+	["Twin Hunt", "40% of", "40%", "ab.damage"],
+	["Twin Hunt", "55%).", "55%", "Battle.TWIN_HUNT_COMPANION_PERFECT_PCT*100"],
+	["Savage Sweep", "3 Loyalty", "3", "Battle.SAVAGE_SWEEP_LOYALTY"],
+	["Savage Sweep", "5).", "5", "Battle.SAVAGE_SWEEP_PERFECT_LOYALTY"],
+	["Ghostpack", "4 turns,", "4", "Battle.GHOSTPACK_TURNS"],
+	["Ghostpack", "40% —", "40%", "Battle.GHOSTPACK_SHARE*100"],
+	["Last Howl", "+3% strike", "+3%", "Battle.LAST_HOWL_PCT_PER_STACK"],
+	["Succession", "6 turns", "6", "Battle.SUCCESSION_TURNS"],
+	["Unleash", "20% of", "20%", "Battle.UNLEASH_PCT_PER_STACK*100"],
+	["Unleash", "25%),", "25%", "Battle.UNLEASH_PERFECT_PCT_PER_STACK*100"],
+	["Bring It Down", "4 turns", "4", "Battle.BRING_IT_DOWN_TURNS"],
+	["Bring It Down", "2% more", "2%", "Battle.BRING_IT_DOWN_PER"],
+	["Bring It Down", "+20%. The", "+20%", "Battle.BRING_IT_DOWN_CAP"],
+	["Called Volley", "20% of", "20%", "ab.damage"],
+	["Crossfire", "30% of", "30%", "ab.damage"],
+	["Crossfire", "3 turns", "3", "Battle.CROSSFIRE_TURNS"],
+	["Crossfire", "4) every", "4", "Battle.CROSSFIRE_PERFECT_TURNS"],
+	["Crossfire", "2 other", "2", "Battle.CROSSFIRE_SPLASH_TARGETS"],
+	["Crossfire", "40% of", "40%", "Battle.CROSSFIRE_SHARE*100"],
+	["Calibrating Shot", "20% of", "20%", "ab.damage"],
+	["Calibrating Shot", "10% of", "10%", "Battle.CALIBRATING_SHOT_PCT*100"],
+	["Calibrating Shot", "15%),", "15%", "Battle.CALIBRATING_SHOT_PERFECT_PCT*100"],
+	["Trophy Shot", "35% of", "35%", "ab.damage"],
+	["Fault Line", "6 turns,", "6", "Battle.FAULT_LINE_TURNS"],
+	["Fault Line", "20 Break", "20", "Battle.FAULT_LINE_BD"],
+	["Fault Line", "fixed 100.", "100", "Unit.FOCUS_CONVERT"],
+	["Drumfire", "14% of", "14%", "ab.damage"],
+	["Dug In", "4 turns", "4", "Battle.DUG_IN_TURNS"],
+	["Dug In", "25%. Read", "25%", "Battle.DUG_IN_CAP"],
+	["Heads Down", "20% of", "20%", "ab.damage"],
+	["Heads Down", "3 turns", "3", "Battle.HEADS_DOWN_TURNS"],
+	["Heads Down", "4) that", "4", "Battle.HEADS_DOWN_PERFECT_TURNS"],
+	["Choking Smoke", "3 turns", "3", "Battle.CHOKING_SMOKE_TURNS"],
+	["Loaded Shot", "20% of", "20%", "ab.cost"],
+	["Loaded Shot", "2 turns", "2", "Battle.LOADED_SHOT_PERFECT_POISON_TURNS"],
+	["Hunt", "15% of", "15%", "ab.damage"],
+	["Preparation", "15 Mana.", "15", "Battle.PREPARATION_MANA"],
+	["Stalking Horse", "4 turns", "4", "Battle.STALKING_HORSE_TURNS"],
+	["Downwind", "4 turns", "4", "Battle.DOWNWIND_TURNS"],
+	["Cull", "10% of", "10%", "Battle.CULL_PCT*100"],
+	["Cull", "12%).", "12%", "Battle.CULL_PERFECT_PCT*100"],
+	["Thick Hide", "4 turns", "4", "Battle.THICK_HIDE_TURNS"],
+	["Thick Hide", "6% less", "6%", "Battle.THICK_HIDE_PER"],
+	["Thick Hide", "to 30%.", "30%", "Battle.THICK_HIDE_CAP"],
+	["Salve", "3 turns", "3", "Battle.SALVE_TURNS"],
+	["Salve", "4) he", "4", "Battle.SALVE_PERFECT_TURNS"],
+	["Salve", "2% of", "2%", "Battle.SALVE_PER"],
+	["Salve", "10%. Counted", "10%", "Battle.SALVE_CAP"],
+	["Mana Well", "4 turns", "4", "Battle.MANA_WELL_TURNS"],
+	["Chastise", "25% of", "25%", "ab.damage"],
+	["Chastise", "20 Break", "20", "ab.pressure"],
+	["Exhortation", "35% more", "35%", "Battle.EXHORTATION_PCT"],
+	["Undying Vigil", "4 turns,", "4", "Battle.UNDYING_VIGIL_TURNS"],
+	["Field Dressing", "18% of", "18%", "Battle.FIELD_DRESSING_PCT*100"],
+	["Field Dressing", "24%) and", "24%", "Battle.FIELD_DRESSING_PERFECT_PCT*100"],
+	["Camouflage", "3 turns", "3", "Battle.CAMOUFLAGE_TURNS"],
+	["Camouflage", "70% less", "70%", "Battle.CAMOUFLAGE_PCT"],
+	["Aimed Volley", "12% of", "12%", "ab.damage"],
+	["Aimed Volley", "8 Break", "8", "ab.pressure"],
+	["Bola", "4 turns.", "4", "Battle.BOLA_TURNS"],
+	["Hunter's Mark", "6 turns", "6", "Battle.HUNTERS_MARK_TURNS"],
+	["Hunter's Mark", "15% more", "15%", "Battle.PARTY_MARK_PCT"],
+	["Battle Trance", "4 turns,", "4", "Battle.BATTLE_TRANCE_TURNS"],
+	["Battle Trance", "3% of", "3%", "Battle.BATTLE_TRANCE_FLOOR*100"],
+	["Rally", "15% of", "15%", "Battle.RALLY_RESOURCE_PCT*100"],
+	["Charge", "25% of", "25%", "ab.damage"],
+	["Charge", "20 Break", "20", "ab.pressure"],
+	["Charge", "2 turns", "2", "ab.applies_status[\"turns\"]"],
+	["Charge", "30 Rage,", "30", "ab.resource_gain"],
+	["Cleave", "15% of", "15%", "ab.damage"],
+	["Cleave", "15 Break", "15", "ab.damage"],
+	["Warcry", "20% more", "20%", "Battle.WARCRY_PCT"],
+	["Warcry", "4 turns.", "4", "Battle.WARCRY_TURNS"],
+	["Ironclad", "4 turns", "4", "Battle.IRONCLAD_TURNS"],
+	["Ironclad", "15% less", "15%", "Battle.IRONCLAD_CUT_PCT"],
+	["Magic Burst", "46% of", "46%", "ab.damage * Ability.GRADE_DMG_MULT[\"perfect\"]"],
+	["Summon Companion", "10 Mana,", "10", "Battle.SUMMON_SWAP_COST"],
+	["Summon Companion", "1.0 initiative,", "1.0", "Battle.SUMMON_SWAP_DELAY"],
+	["Reckless Abandon", "100-Rage", "100", "warrior[\"max_resource\"]"],
+	["Reckless Abandon", "+20%; a", "+20%", "warrior[\"max_resource\"] / Battle.RECKLESS_STEP * Battle.RECKLESS_PCT_PER_10"],
+	["Berserk", "4 STRIKES", "4", "Battle.BERSERK_STRIKES + 1"],
+	["Boil Over", "100 is", "100", "warrior[\"max_resource\"]"],
+	["Boil Over", "80%. It", "80%", "Classes.BOIL_OVER_PCT_PER_RAGE * warrior[\"max_resource\"]"],
+	["Precision Strike", "chance for 4 turns —", "4", "Battle.PRECISION_GRANT_TURNS + 1"],
+	["Precision Strike", "armor for 4 turns —", "4", "Battle.PRECISION_GRANT_TURNS + 1"],
+	["Precision Strike", "5 turns.", "5", "Battle.PRECISION_PERFECT_GRANT_TURNS + 1"],
+	["Feint", "3),", "3", "Battle.FEINT_GUARDS + 1"],
+	["Battle Poise", "1-turn", "1", "cards[\"Guard Change\"].cooldown"],
+	["Formless", "+30% damage", "+30%", "(Battle.FORMLESS_DEALT - 1.0) * 100"],
+	["Formless", "15% less", "15%", "(1.0 - Battle.FORMLESS_TAKEN) * 100"],
+	["Formless", "(+10% damage", "+10%", "(Battle.FORMLESS_RECOIL_TAKEN - 1.0) * 100"],
+	["Formless", "−10% dealt).", "−10%", "(1.0 - Battle.FORMLESS_RECOIL_DEALT) * 100"],
+	["Wheeling Cut", "12 Break,", "12", "ab.pressure"],
+	["Shield Slam", "40 Break", "40", "ab.pressure"],
+	["Slow Burn", "4 turns,", "4", "Battle.SLOW_BURN_TURNS + 1"],
+	["Firedraw", "2, not", "2", "mini(2, Battle.FIREDRAW_TAKE)"],
+	["Emberkeep", "4 turns,", "4", "Battle.EMBERKEEP_TURNS + 1"],
+	["Smoulder", "11.5% of", "11.5%", "ab.damage * Ability.GRADE_DMG_MULT[\"perfect\"]"],
+	["Hoarfrost Armor", "4 turns", "4", "Battle.HOARFROST_TURNS + 1"],
+	["Cold Iron", "28.75%).", "28.75%", "ab.damage * Ability.GRADE_DMG_MULT[\"perfect\"]"],
+	["Frostbind", "4 turns", "4", "Battle.FROSTBIND_TURNS + 1"],
+	["Kindled Mind", "3 Resonance", "3", "Battle.RESONANCE_PER_CAST + Battle.KINDLED_MIND_RESONANCE"],
+	["Kindled Mind", "4).", "4", "Battle.RESONANCE_PER_CAST + Battle.KINDLED_MIND_PERFECT_RESONANCE"],
+	["Arcane Bolt", "90% of", "90%", "6 * ab.damage"],
+	["Arcane Bolt", "240% and", "240%", "16 * ab.damage"],
+	["Arcane Bolt", "8. Dark", "8", "16 * Battle.ARCANE_BOLT_KEEP"],
+	["Arcane Echo", "4) every", "4", "Battle.ARCANE_ECHO_PERFECT_TURNS"],
+	["Resonant Field", "4 turns,", "4", "Battle.RESONANT_FIELD_TURNS + 1"],
+	["Unmaking", "4).", "4", "Battle.UNMAKING_LOCK_PERFECT_TURNS"],
+	["Fortified Spirit", "30% of", "30%", "Battle.FORTIFIED_SPIRIT_STEPS * Battle.FORTIFIED_SPIRIT_STEP_PCT * 100"],
+	["Fortified Spirit", "40%).", "40%", "Battle.FORTIFIED_SPIRIT_PERFECT_STEPS * Battle.FORTIFIED_SPIRIT_STEP_PCT * 100"],
+	["Fortified Spirit", "30 →", "30", "Battle.FORTIFIED_SPIRIT_STEPS * Battle.FORTIFIED_SPIRIT_STEP_PCT * 100"],
+	["Fortified Spirit", "20 →", "20", "(Battle.FORTIFIED_SPIRIT_STEPS - 1) * Battle.FORTIFIED_SPIRIT_STEP_PCT * 100"],
+	["Fortified Spirit", "10 →", "10", "(Battle.FORTIFIED_SPIRIT_STEPS - 2) * Battle.FORTIFIED_SPIRIT_STEP_PCT * 100"],
+	["Breaking Darkness", "20 Break", "20", "ab.pressure"],
+	["Breaking Darkness", "4) every", "4", "Battle.BREAKING_DARKNESS_PERFECT_TURNS"],
+	["Called Volley", "23%),", "23%", "ab.damage * Ability.GRADE_DMG_MULT[\"perfect\"]"],
+	["Trophy Shot", "40.25%).", "40.25%", "ab.damage * Ability.GRADE_DMG_MULT[\"perfect\"]"],
+	["Choking Smoke", "+50% miss.", "+50%", "Battle.BLIND_MISS_PCT * 100"],
+	["Hunt", "23%) —", "23%", "Battle.HUNT_PERFECT_PCT * Ability.GRADE_DMG_MULT[\"perfect\"] * 100"],
+	["Hunt", "60% at", "60%", "ab.damage * 4"],
+	["Hunt", "90% at", "90%", "ab.damage * 6"],
+	["Chastise", "25 BD).", "25", "ab.pressure * Ability.GRADE_BD_MULT[\"perfect\"]"],
+	["Aimed Volley", "24 across", "24", "ab.pressure * ab.multi_hits"],
+	["Arcane Arrows", "6 charges:", "6", "Battle.ARCANE_ARROW_CHARGES"],
+	["Charge", "3).", "3", "ab.applies_status[\"turns\"] + 1"],
+	["Charge", "net-generates 10.", "10", "ab.resource_gain - ab.cost"],
+	["Cleave", "17.25%) and", "17.25%", "ab.damage * Ability.GRADE_DMG_MULT[\"perfect\"]"],
+	["Ironclad", "99 and", "99", "warrior[\"stability\"] - 1"],
+]
+# [card, needle, the figure, why it is no door's] — a worked example's input, which the text picks
+const CATALOGUE_EXAMPLES := [
+	["Recompense", "+32% pays", "+32%", "a worked example's input: any plating figure a reset could lose"],
+	["Recompense", "32 Rage.", "32", "a worked example's output: 1 Rage a point lost, the rule's unit (no rate to name)"],
+	["Firedraw", "2 gives", "2", "a worked example's input: any enemy's Burn below the take"],
+	["Arcane Bolt", "6 stacks", "6", "a worked example's input: a stack count the text picks"],
+	["Arcane Bolt", "16 it", "16", "a worked example's input: a stack count the text picks"],
+]
+# [card, needle, the word, its door]
+const CATALOGUE_WORDS := [
+	["Mocking Blow", "one other", "one", "Battle.MOCKING_BLOW_EXTRA_TAUNTS"],
+	["Magic Missiles", "Three bolts", "three", "ab.multi_hits"],
+	["Magic Missiles", "fourth bolt).", "fourth", "ab.multi_hits + Battle.PERFECT_EXTRA_HITS"],
+	["Berserk", "three-hit ability", "three", "cards[\"Hack and Slash\"].multi_hits"],
+	["Unslaked", "FULL bonus", "full", "Unit.UNSLAKED_KEEP"],
+	["Unslaked", "than half of", "half", "Unit.FRENZY_FLOOR_KEEP"],
+	["Precision Strike", "twice for", "twice", "Battle.PRECISION_AGGRO_HITS"],
+	["Precision Strike", "once for", "once", "Battle.PRECISION_DEF_HITS"],
+	["Battle Poise", "a turn", "a turn", "Battle.BATTLE_POISE_TICK"],
+	["Answering Steel", "a turn", "a turn", "Battle.ANSWERING_TICK"],
+	["Turn the Blade", "half the", "half", "Battle.TURN_THE_BLADE_SHARE"],
+	["Cinderfall", "again to", "again", "Battle.CINDERFALL_SKIM_MULT"],
+	["Stoke", "DOUBLED (Perfect:", "doubled", "Battle.STOKE_MULT"],
+	["Stoke", "tripled). An", "tripled", "Battle.STOKE_MULT_PERFECT"],
+	["Emberkeep", "DOUBLE duration.", "double", "Battle.EMBERKEEP_MULT"],
+	["Rimebinding", "plus one.", "one", "Battle.RIMEBINDING_BONUS_STACKS"],
+	["Killing Frost", "four stacks", "four", "Unit.CHILLED_FREEZE_STACKS"],
+	["Deep Winter", "HALF the", "half", "1.0 / Battle.DEEP_WINTER_DIVISOR"],
+	["Cold Iron", "DOUBLE and", "double", "Battle.COLD_IRON_FROZEN_MULT"],
+	["Arcane Bolt", "halved. At", "halved", "Battle.ARCANE_BOLT_KEEP"],
+	["Arcane Bolt", "zero stacks.", "zero", "Battle.ARCANE_BOLT_MIN_STACKS - 1"],
+	["Inner Arcane", "doubled while", "doubled", "Battle.INNER_ARCANE_LOW_MULT"],
+	["Inner Arcane", "half health,", "half", "1.0 / Battle.INNER_ARCANE_LOW_AT"],
+	["Inner Arcane", "plus one.", "one", "Battle.INNER_ARCANE_BONUS"],
+	["Resonant Field", "HALF his", "half", "Battle.RESONANT_FIELD_SHARE"],
+	["Second Wind", "two turns", "two", "Unit.SECOND_WIND_WINDOW_TURNS"],
+	["Reprisal", "two turns", "two", "Unit.REPRISAL_WINDOW_TURNS"],
+	["Divine Presence", "SECOND turn", "second", "Battle.DIVINE_PRESENCE_EVERY"],
+	["Vespers", "half health", "half", "Unit.MERCY_WINDOW_AT"],
+	["Vow of Suffering", "half the", "half", "1.0 / Unit.VOW_OF_SUFFERING_SHARE"],
+	["Aegis Reversal", "half again", "half again", "Battle.AEGIS_REVERSAL_MULT"],
+	["Fortified Spirit", "a tenth", "a tenth", "Battle.FORTIFIED_SPIRIT_STEP_PCT"],
+	["Bloodbond", "a QUARTER", "a quarter", "Battle.BLOODBOND_PCT / 100.0"],
+	["Savage Sweep", "three lowest-health", "three", "Battle.SAVAGE_SWEEP_TARGETS"],
+	["Ghostpack", "all three", "three", "Classes.COMPANION_KINDS.size()"],
+	["Ghostpack", "three ghosts", "three", "Classes.COMPANION_KINDS.size()"],
+	["Succession", "half the", "half", "Battle.SUCCESSION_SHARE / 100.0"],
+	["Bear the Brunt", "all of it", "all of it", "Battle.BRUNT_SHARE / 100.0"],
+	["Quarry's Mark", "doubled. One", "doubled", "Battle.QUARRYS_MARK_FOCUS_MULT"],
+	["Drumfire", "Three arrows", "three", "ab.multi_hits"],
+	["Dug In", "a QUARTER", "a quarter", "1.0 / Battle.DUG_IN_DIVISOR"],
+	["Snare Line", "two turns", "two", "Battle.SNARE_LINE_TURNS"],
+	["Preparation", "NEXT turn", "next", "Battle.PREPARATION_DELAY - 1"],
+	["Mirror Image", "four single-target", "four", "Battle.MIRROR_IMAGE_IMAGES"],
+	["Mana Well", "doubled —", "doubled", "Battle.MANA_WELL_REGEN_MULT"],
+	["Dispel", "three harmful", "three", "Battle.DISPEL_COUNT"],
+	["Dispel", "three beneficial", "three", "Battle.DISPEL_COUNT"],
+	["Blink", "two turns", "two", "Battle.BLINK_TURNS"],
+	["Undying Vigil", "half as", "half", "Battle.VIGIL_SHARE"],
+	["Aimed Volley", "Three shots", "three", "ab.multi_hits"],
+	["Arcane Arrows", "six hits", "six", "Battle.ARCANE_ARROW_CHARGES"],
+	["Arcane Arrows", "half that", "half", "Battle.ARCANE_ARROW_SPLASH"],
+	["Battle Trance", "half of", "half", "Battle.BATTLE_TRANCE_SHARE"],
+	["Downwind", "the turn it costs", "the turn", "Battle.ORDINARY_FREEZE_TURNS"],
+]
+const CATALOGUE_WORD_VALUE := {"zero": 0, "one": 1, "once": 1, "a turn": 1, "the turn": 1, "next": 1, "full": 1, "all of it": 1, "two": 2, "twice": 2, "second": 2, "double": 2, "doubled": 2, "again": 2, "three": 3, "tripled": 3, "four": 4, "fourth": 4, "six": 6, "half": 0.5, "halved": 0.5, "a quarter": 0.25, "a tenth": 0.1, "half again": 1.5}
+
+
+# A catalogue cell flat: tags out, the entities the tables use decoded, spaces collapsed.
+func _catalogue_flat(s: String) -> String:
+	s = RegEx.create_from_string("<[^>]+>").sub(s.replace("\n", " "), "", true)
+	for k in CATALOGUE_ENTITIES:
+		s = s.replace(k, CATALOGUE_ENTITIES[k])
+	return RegEx.create_from_string(" {2,}").sub(s, " ", true).strip_edges()
+
+
+func _catalogue_cells(doc: String) -> Dictionary:
+	var out := {}
+	for h in CATALOGUE_HEADS:
+		var t0 := doc.find(h)
+		var t1 := doc.find("</table>", t0)
+		ok(t0 >= 0 and doc.count(h) == 1 and t1 > t0, "§2f: the catalogue table headed %s is not in the document once" % h.substr(0, 40))
+		if t0 < 0 or t1 < 0:
+			continue
+		for line in doc.substr(t0 + h.length(), t1 - t0 - h.length()).split("<tr>").slice(1):
+			var a := line.find("<td><b>")
+			var b := line.find("</b></td><td>", a)
+			if a < 0 or b < 0:
+				continue
+			var p0 := b + "</b></td><td>".length()
+			var p1 := line.find("</td><td>", p0)
+			var d1 := line.find("</td>", p1 + 9)
+			out[line.substr(a + 7, b - a - 7)] = _catalogue_flat(line.substr(p1 + 9, d1 - p1 - 9))
+	return out
+
+
+# A door: an `Expression` over the card, the cards, the Warrior's config and the four scripts' constant maps.
+var _warrior_cfg := {}
+
+
+func _catalogue_door(expr: String, ab: Variant, cards: Dictionary, maps: Array) -> Variant:
+	if _warrior_cfg.is_empty():
+		_warrior_cfg = Classes.hero_config("warrior")
+	return Gate.eval_door(expr, ["ab", "cards", "warrior", "Battle", "Unit", "Classes", "Ability"], [ab, cards, _warrior_cfg] + maps)
+
+
+func _s2f_catalogue_figures(doc: String, cards: Dictionary, wrong: Array) -> Array:
+	var cells := _catalogue_cells(doc)
+	ok(cells.size() >= 135, "§2f: the catalogue's tables read %d cards — the parse lost rows" % cells.size())
+	var maps: Array = []
+	for p in ["res://scripts/battle.gd", "res://scripts/unit.gd", "res://scripts/classes.gd", "res://scripts/ability.gd"]:
+		maps.append((load(p) as Script).get_script_constant_map())
+	var tok := RegEx.create_from_string("(?<![A-Za-z0-9_.§])[x×+−-]?\\d+(?:\\.\\d+)?%?")
+	var digits := RegEx.create_from_string("\\d+(?:\\.\\d+)?")
+	var held := {}
+	var read := 0
+	for tab in [CATALOGUE_FIGURES, CATALOGUE_EXAMPLES]:
+		for r in tab:
+			var card := String(r[0])
+			var cell := String(cells.get(card, ""))
+			var nd := String(r[1])
+			if cell.count(nd) != 1:
+				wrong.append("§2f: %s's cell holds '%s' %d times — the row has no subject" % [card, nd, cell.count(nd)])
+				continue
+			var at := -1
+			for m in tok.search_all(nd):
+				if m.get_string() == String(r[2]):
+					at = cell.find(nd) + m.get_start()
+					break
+			if at < 0:
+				wrong.append("§2f: %s's needle '%s' does not state %s" % [card, nd, r[2]])
+				continue
+			held[card + "@" + str(at)] = true
+			if tab == CATALOGUE_EXAMPLES:
+				continue
+			read += 1
+			var v = _catalogue_door(String(r[3]), cards.get(card), cards, maps)
+			var dm := digits.search(String(r[2]))
+			var dec := dm.get_string().split(".")[1].length() if dm.get_string().contains(".") else 0
+			var scale := pow(10.0, dec)
+			if v == null:
+				wrong.append("§2f: %s's door `%s` reads nothing" % [card, r[3]])
+			elif roundf(absf(float(v)) * scale + 0.000001) != roundf(float(dm.get_string()) * scale):
+				wrong.append("§2f: %s's cell says %s ('%s'), its door `%s` reads %s" % [card, r[2], nd, r[3], str(v)])
+	var unheld: Array = []
+	var stated := 0
+	for card in cells:
+		for m in tok.search_all(String(cells[card])):
+			stated += 1
+			if not held.has(card + "@" + str(m.get_start())):
+				unheld.append("%s '%s'" % [card, m.get_string()])
+	for u in unheld:
+		wrong.append("§2f: the catalogue states a figure with no door: %s" % u)
+	var words := 0
+	for r in CATALOGUE_WORDS:
+		var card := String(r[0])
+		var cell := String(cells.get(card, ""))
+		if cell.count(String(r[1])) != 1 or not String(r[1]).to_lower().contains(String(r[2])):
+			wrong.append("§2f: %s's cell does not hold '%s' once, naming '%s'" % [card, r[1], r[2]])
+			continue
+		words += 1
+		var v = _catalogue_door(String(r[3]), cards.get(card), cards, maps)
+		if v == null or absf(float(v) - float(CATALOGUE_WORD_VALUE[String(r[2])])) > 0.000001:
+			wrong.append("§2f: %s's '%s' says %s, its door `%s` reads %s" % [card, r[1], CATALOGUE_WORD_VALUE[String(r[2])], r[3], str(v)])
+	ok(stated == CATALOGUE_FIGURES.size() + CATALOGUE_EXAMPLES.size() and unheld.is_empty(),
+		"§2f: the catalogue states %d figures and %d are held — %d have no door" % [stated, held.size(), unheld.size()])
+	ok(read >= 316 and words >= 54, "§2f: only %d figures and %d words read through a door — the table lost rows" % [read, words])
+	return [read, words, CATALOGUE_EXAMPLES.size(), stated]
 
 
 # ── §7 — THE LANE DRIVER ────────────────────────────────────────────────────

@@ -172,9 +172,14 @@ func _clause_in_walk(src: String, label: String, anchor: String, other: String,
 	ok(src.find(anchor, at + 1) < 0,
 		"the clause line is no longer unique, so this pin cannot name one clause: %s" % label)
 	var found := src.rfind(other, at) if backward else src.find(other, at)
-	ok(found >= 0 and absi(at - found) <= gap,
-		"%s — its own read line is %d characters from the clause (gap %d)" % [
-			label, absi(at - found) if found >= 0 else -1, gap])
+	# BATCH IT §3b — RE-POINTED: "its own read line" was read as a fixed gap from the clause, and for the two SELF clauses
+	# the gap ran past the clause's arm into the next one (the refund line they look for stands in FOUR arms). The read
+	# line must stand in the clause's OWN arm — the match arm the clause sits in, cut where its indentation returns.
+	var arm_at := src.rfind("\n\t\t\"", at) + 1
+	var arm := Gate.block(src, arm_at)
+	ok(found >= arm_at and found < arm_at + arm.length() and absi(at - found) <= gap,
+		"%s — its own read line is not in the clause's own arm: %d characters from the clause (gap %d), the arm %d..%d" % [
+			label, absi(at - found) if found >= 0 else -1, gap, arm_at, arm_at + arm.length()])
 
 
 func _count(hay: String, needle: String) -> int:

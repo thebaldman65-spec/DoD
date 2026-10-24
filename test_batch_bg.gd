@@ -39,6 +39,7 @@ extends SceneTree
 # 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
 # This suite keeps its own SIGNATURE and delegates, so not one call site moved.
 const Fixture = preload("res://suite_fixture.gd")
+const Gate = preload("res://gate_fixture.gd")   # IT §3b: the one window helper (`block`, `within`, `comment_above`)
 
 
 # §2's design numbers, in one place.
@@ -364,7 +365,10 @@ func _the_chip_and_the_passive_name_the_doubling() -> void:
 	# the same rule the arithmetic uses", so it is asked of the rule that
 	# CHANGED. The capstone's own doubling is still named in the passive block
 	# below, and is checked on `dv_apostle`'s own text further up.
-	var chip := bsrc.substr(i, 400)
+	# BATCH IT §3b — RE-POINTED: 400 characters ran 128 into the `cons_ground` entry (this comment's own "260 characters"
+	# is the entry), and the passive's 600 ran 47 into the Devout's `blurb`. Each slice is its entry's own block now.
+	var chip := Gate.block(bsrc, i)
+	ok(Gate.within(bsrc, i, chip), "§2: the Faith status slice ends inside its own entry")
 	ok(chip.contains("HIGHEST count held this battle") \
 			and chip.contains("the peak keeps paying"),
 		"§2/BI: the Faith status default states the peak rule")
@@ -376,13 +380,15 @@ func _the_chip_and_the_passive_name_the_doubling() -> void:
 	# nothing writes them. The question this asked, "does the player read the
 	# rule the arithmetic uses", now has the answer "the passive names neither
 	# share", so the block is asked not to promise one a player cannot buy.
-	ok(not csrc.substr(j, 600).contains("Apostle") and not csrc.substr(j, 600).contains("Fervor"),
+	var passive := Gate.block(csrc, j)
+	ok(Gate.within(csrc, j, passive) and passive.ends_with("\","), "§2: the passive slice is the Devout's `passive_desc` string, whole and alone")
+	ok(not passive.contains("Apostle") and not passive.contains("Fervor"),
 		"§2: ...and the passive block no longer names Apostle or Fervor, which FX deleted")
 	# BATCH CQ §3 — FLATTENED BEFORE THE READ. CL's prose pass re-wrapped the
 	# Devout's passive block and the line break now falls between "HELD" and
 	# "THIS BATTLE", so a raw substring search misses a sentence that is still
 	# there and still says exactly what this asserts. Not a fold consequence.
-	ok(csrc.substr(j, 600).replace("\\n", " ").contains("HIGHEST COUNT HELD THIS BATTLE"),
+	ok(passive.replace("\\n", " ").contains("HIGHEST COUNT HELD THIS BATTLE"),
 		"§2/BI: ...and the peak rule as well")
 
 

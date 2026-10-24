@@ -4,7 +4,8 @@
 #   §2  `CLAUDE.md` against EE §1's ceiling, READ OUT OF THE RULE
 #   §3  the rule and this gate cannot drift apart, and the standing rule that
 #       generalises them is where it says it is
-#   §4  `docs/state.md` against HY §3's ceiling, READ OUT OF ITS OWN PREAMBLE
+#   §4  `docs/state.md` against HY §3's ceiling, READ OUT OF ITS OWN PREAMBLE — and since IT §4 the record its
+#       deadline reads counts no batch's FENCED structure: a claim names its fence, and the fence must stand
 #
 # **WHY THIS GATE EXISTS.** CW §4 wrote a threshold and a whole cut procedure
 # and **nothing was ever built to notice the threshold being crossed.** It was
@@ -329,3 +330,51 @@ func _s4_the_state_file() -> void:
 	ok(size <= deadline,
 		"§4: docs/state.md is %.2f KiB, past its ceiling by more than the largest single batch on record (%.2f KiB) — what was closed stayed; archive it" % [
 			size / 1024.0, grow])
+	_s4b_fenced_structure(st_raw, st, grow)
+
+
+# ── §4b — A FENCED SECTION IS STRUCTURE, NOT A BATCH's WRITING (IT §4, the designer's) ─
+#
+# **AN ALARM's BAR IS SET BY THE THING IT IS ALARMING ABOUT. A ONE-TIME STRUCTURAL SECTION IS NOT THAT THING.** IS's index
+# section made IS the record — +36,759 B net, 36,315 B of it the index — and the deadline above reads the record, so a batch
+# had set the bar its own alarm reads. The exclusion is MECHANICAL, never a judgement: the bytes between a NAMED fence
+# (`<!-- INDEX:BEGIN (<label>) -->` … `<!-- INDEX:END -->`) are structure, and a batch that wants its growth excused fences
+# it, names it and makes it revertible — and the preamble says so beside the record, which this arm parses:
+# *<BATCH>'s +<net> B net held **<fenced> B of fenced structure** (fence `INDEX (<label>)` …)*. Three things are asserted
+# of every claim: its fence stands in the file, once, closed after it (a section a gate cannot identify is not structural,
+# whatever a batch calls it); the record does not count the claimed batch's structure (record < its net); and its writing
+# outside the fences does not beat the record (net − fenced ≤ record), so the record is still the largest batch's WRITING.
+const FENCE_OPEN := "<!-- INDEX:BEGIN ("
+const FENCE_CLOSE := "<!-- INDEX:END -->"
+
+
+func _s4b_fenced_structure(st_raw: String, st: String, grow_kib: float) -> void:
+	var rx := RegEx.create_from_string(
+		"([A-Z]{2})'s \\+([0-9,]+) B net held \\*\\*([0-9,]+) B of fenced structure\\*\\* \\(fence `INDEX \\(([^)`]+)\\)`")
+	var claims := rx.search_all(st)
+	# THE POSITIVE ARM: the one claim this file carries since IT (IS's index) is read, so an arm that finds nothing is a
+	# sentence that moved — never a clean file.
+	ok(claims.size() >= 1, "§4b: the preamble claims no fenced structure in the form this gate reads — IS's index section is uncounted")
+	var record := grow_kib * 1024.0
+	for m in claims:
+		var who := m.get_string(1)
+		var net := int(m.get_string(2).replace(",", ""))
+		var fenced := int(m.get_string(3).replace(",", ""))
+		var label := m.get_string(4)
+		var open := FENCE_OPEN + label + ") -->"
+		var at := st_raw.find(open)
+		var close := st_raw.find(FENCE_CLOSE, at + open.length()) if at >= 0 else -1
+		ok(st_raw.count(open) == 1 and close > at,
+			"§4b: %s's %d B are claimed as structure behind fence (%s), which the file does not hold once and closed (%d opens) — a section a gate cannot identify is not structure" % [
+				who, fenced, label, st_raw.count(open)])
+		if close > at:
+			var live := st_raw.substr(at, close + FENCE_CLOSE.length() - at).to_utf8_buffer().size()
+			ok(st_raw.substr(at, close - at).contains("\n## "),
+				"§4b: fence (%s) closes on nothing — no section stands between its two fences" % label)
+			print("    fence (%s): %d B between its fences today; claimed at %s as %d B of its +%d B net" % [label, live, who, fenced, net])
+		ok(record < float(net),
+			"§4b: the record (%.2f KiB = %.0f B) is %s's net growth (+%d B), which holds %d B of fenced structure — the record counts no batch's structure" % [
+				grow_kib, record, who, net, fenced])
+		ok(float(net - fenced) <= record + 1.0,
+			"§4b: %s wrote +%d B outside its fences, more than the record (%.0f B) — the record is %s's writing, not the figure the preamble names" % [
+				who, net - fenced, record, who])

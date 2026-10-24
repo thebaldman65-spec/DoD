@@ -803,7 +803,11 @@ func _s4_documents_agree(met_at_two: Dictionary) -> void:
 	# phrase; 200 covers it with room and is short enough that two claims in one
 	# file cannot fall inside one window and hide the second — which is how a
 	# greedy window loses a conjunction.
-	claim.compile("2\\+ threshold(.{0,200})")
+	# BATCH IT §3b — RE-POINTED: in `master.html` the claim's sentence ends 122 characters from the phrase and the fixed 200
+	# ran 78 into the next one, so the pairs were also read in text the claim does not make. The window ends at the claim's
+	# own sentence — the first full stop within 200 characters — and only a sentence longer than that keeps the cap, which
+	# still ends inside it; each document asserts no window holds a sentence break short of its end.
+	claim.compile("2\\+ threshold(.{0,200}?\\.(?= |<|$)|.{0,200})")
 	var pair := RegEx.new()
 	pair.compile("([A-Z]{4,8}) for ([a-zA-Z]+)")
 	# **ONE ASSERTION PER DOCUMENT, NOT ONE PER FIGURE, AND THE REASON IS THIS
@@ -840,6 +844,13 @@ func _s4_documents_agree(met_at_two: Dictionary) -> void:
 					wrong.append("%s for %s (the census says %d)"
 						% [tag, m.get_string(2), int(met_at_two[tag])])
 		total_windows += here
+		var spill := 0
+		for w2 in claim.search_all(flat):
+			var t2 := w2.get_string(1)
+			var brk := t2.find(". ")
+			if brk >= 0 and brk < t2.length() - 1:
+				spill += 1
+		ok(spill == 0, "§4: %d claim windows in %s run past the claim's own sentence" % [spill, path])
 		ok(wrong.is_empty(),
 			"§4: %s disagrees with the census THIS GATE JUST PRINTED: %s"
 				% [path, ", ".join(PackedStringArray(wrong))])

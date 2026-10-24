@@ -50,6 +50,7 @@ extends SceneTree
 # 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
 # This suite keeps its own SIGNATURE and delegates, so not one call site moved.
 const Fixture = preload("res://suite_fixture.gd")
+const Gate = preload("res://gate_fixture.gd")   # IT §3b: the one window helper (`block`, `within`, `comment_above`)
 
 
 # The eight FAITH nodes, in row order. THE LEAVE-ONE-OUT TABLE IS KEYED ON
@@ -273,9 +274,18 @@ func _harness_is_per_hero() -> void:
 		"§0: the filter tree is the hero being built, not the measured one")
 	ok(src.contains("if not Talents.node_in_tree(t_tree, bits[0]).is_empty():"),
 		"§0: an id lands only where that hero's own tree holds it")
-	var head := src.substr(0, src.find("var env_talents"))
-	ok(head.rfind("for i in hero_keys.size():") > head.rfind("heroes.append(u)"),
-		"§0: the force-learn is inside the per-hero spawn loop")
+	# BATCH IT §3b — RE-POINTED: this read `head.rfind(loop) > head.rfind(append)` over the text BEFORE the force-learn,
+	# and `heroes.append(u)` stands after it (it closes the loop) — so it read `94953 > -1` and asked nothing. The loop is
+	# picked inside `_spawn_units`, and the assertion names what it picked: the force-learn stands after that loop's
+	# header and before the loop's own `heroes.append(u)`, with no second loop header between them.
+	var su := src.find("func _spawn_units(")
+	var fl := src.find("var env_talents", su) if su >= 0 else -1
+	var loop_at := src.rfind("for i in hero_keys.size():", fl) if fl > 0 else -1
+	var app := src.find("heroes.append(u)", fl) if fl > 0 else -1
+	var su_end := src.find("\nfunc ", su + 1) if su >= 0 else -1
+	ok(su >= 0 and loop_at > su and fl > loop_at and app > fl and app < su_end
+		and src.substr(loop_at, app - loop_at).count("for i in hero_keys.size():") == 1,
+		"§0: the force-learn is inside the per-hero spawn loop — `_spawn_units`' loop at %d, the force-learn at %d, the loop's append at %d" % [loop_at, fl, app])
 
 
 # §2 — `_faith_lane_shape` — DELETED AT BATCH FX, TWO CHECKS, WITH ITS SUBJECT
@@ -444,7 +454,14 @@ func _break_is_not_damage() -> void:
 	var src := _src("res://scripts/battle.gd")
 	ok(src.contains("_stat(\"faith_break_cut\", float(amount))"),
 		"§1: the Break cut has its own counter")
-	var handler := src.substr(src.find("func _on_unit_credit("), 500)
+	# BATCH IT §3b — RE-POINTED: 500 characters from the handler's head ran past the Break term's arm into BF §1's `bd_` arm,
+	# so `not contains("_prev(")` was asked of the `bd_` arm as well. These two assertions name the Break TERM, so the
+	# slice is that arm's own block — `if term == "devoutness_break":` to where the indentation returns — and says so.
+	var h_at := src.find("func _on_unit_credit(")
+	var arm_at := src.find("if term == \"devoutness_break\":", h_at) if h_at >= 0 else -1
+	var handler := Gate.block(src, arm_at)
+	ok(Gate.within(src, arm_at, handler) and handler.contains("faith_break_cut"),
+		"§1: the slice is the Break term's own arm of `_on_unit_credit`, whole and alone (%d chars)" % handler.length())
 	ok(handler.contains("return"),
 		"§1: the Break term returns before the heal path")
 	ok(not handler.contains("_prev(") ,

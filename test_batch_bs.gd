@@ -69,6 +69,7 @@ extends SceneTree
 # 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
 # This suite keeps its own SIGNATURE and delegates, so not one call site moved.
 const Fixture = preload("res://suite_fixture.gd")
+const Gate = preload("res://gate_fixture.gd")   # IT §3b: the one window helper (`block`, `within`, `comment_above`)
 
 
 # Backblast's arming threshold, mirrored from battle.gd so the check states
@@ -889,8 +890,10 @@ func _live_kiln_forged() -> void:
 	# slice and the negative below passes while reading nothing.
 	var tick_at := src.find("func take_tick_damage")
 	ok(tick_at >= 0, "take_tick_damage is findable, so the tick slice is real")
-	var tick_body := src.substr(tick_at)
-	tick_body = tick_body.substr(0, 2000)
+	# BATCH IT §3b — RE-POINTED: 2000 characters ran 61 past `take_tick_damage` into `_die()`, so the negative was asked
+	# partly of `_die`'s text. The slice is the function's own block now (`Gate.block`), and it says so.
+	var tick_body := Gate.block(src, tick_at)
+	ok(Gate.within(src, tick_at, tick_body), "the tick slice ends inside `take_tick_damage` — it does not run into `_die()`")
 	ok(not tick_body.contains("kiln_forged_at"),
 		"a Burn tick is not a hit — take_tick_damage carries no copy of it")
 	scene.queue_free()

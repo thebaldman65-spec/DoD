@@ -315,7 +315,8 @@ func _s4_retired() -> void:
 		"the suspension comment is still in classes.gd — DR §2 deletes it, it does not update it")
 	# THE MECHANIC IT WAS NOT: four Chilled stacks still flash-freeze, which is
 	# `_apply_status`'s branch and belongs to no card.
-	ok(bcode.contains("status_stacks(\"chilled\") >= 4"),
+	# BATCH IT §2 — RE-POINTED: the literal this read is a named constant now; the needle names it.
+	ok(bcode.contains("status_stacks(\"chilled\") >= BattleUnit.CHILLED_FREEZE_STACKS"),
 		"the Chilled-4 auto-freeze went with the card — that is a MECHANIC, not the ability")
 
 
@@ -380,10 +381,15 @@ func _s5_new_axes() -> void:
 	# every X there is — the shape that let two of `test_batch_bg`'s checks pass
 	# while reading nothing at all. The anchor resolves today; unguarded, it goes
 	# silent the day somebody renames the special.
-	var ct_at := code.find("\"counter_time\":")
-	ok(ct_at >= 0, "the `counter_time` arm is findable, so the slice below is real")
-	var ct := code.substr(ct_at)
-	ct = ct.substr(0, ct.find("\n\t\t\"") if ct.find("\n\t\t\"") > 0 else ct.length())
+	# BATCH IT §3b — RE-POINTED: the first `"counter_time":` in the file is `_recast_writes`' status-table row, eleven
+	# thousand lines above the cast, so the slice was the table's one line and the absence below was asked of it. The arm
+	# is taken inside `_resolve_special`, cut at its own end, and the pick names what it picked: the cast that lays the stun.
+	var rs_at := code.find("func _resolve_special(")
+	var ct_at := code.find("\n\t\t\"counter_time\":", rs_at) if rs_at >= 0 else -1
+	ok(ct_at > rs_at and rs_at >= 0, "the `counter_time` CAST arm is findable in `_resolve_special`, so the slice below is real")
+	var ct := Gate.subject(code, ct_at + 1 if ct_at >= 0 else -1, "\n\t\t\"")
+	ok(ct.contains("_apply_status(target, \"stunned\", COUNTER_TIME_TURNS") and Gate.ends_inside(ct, "\n\t\t\""),
+		"the slice is not Counter Time's cast arm, whole and alone (it does not lay the stun, or runs past the arm): %d chars at %d" % [ct.length(), ct_at])
 	ok(not ct.contains("_swordmaster_switch"),
 		"Counter Time SWITCHES the stance — it is a GATED card and must require and stay")
 
@@ -409,8 +415,11 @@ func _s6_battle_poise() -> void:
 	# THE PIVOT AND NOT THE ABILITY: Guard Change's own payload stays on Guard
 	# Change. A Defensive Swordmaster holding Sunder Guard and parrying twice a
 	# turn would otherwise land 80 free Break damage across the field each turn.
-	var bp := code.substr(code.find("has_status(\"battle_poise\")"))
-	bp = bp.substr(0, 2000)
+	# BATCH IT §3b — RE-POINTED: 2000 characters from the hook ran 1327 past the `if` block into the crit-chance computation,
+	# so the negative was asked of the strike resolution too. The slice is the block itself, and it says so.
+	var bp_at := code.find("has_status(\"battle_poise\")")
+	var bp := Gate.block(code, bp_at)
+	ok(Gate.within(code, bp_at, bp), "the free pivot's slice ends inside its own `if` block")
 	ok(not bp.contains("guard_change_bd"),
 		"the free pivot pays Sunder Guard — it must be `_swordmaster_switch` alone")
 	ok(bp.contains("_swordmaster_switch(strike_target)"),

@@ -79,6 +79,7 @@ extends SceneTree
 # 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
 # This suite keeps its own SIGNATURE and delegates, so not one call site moved.
 const Fixture = preload("res://suite_fixture.gd")
+const Gate = preload("res://gate_fixture.gd")   # IT §3b: the one window helper (`block`, `within`, `comment_above`)
 
 
 # Mirrored from battle.gd so each check states what it depends on.
@@ -428,8 +429,11 @@ func _synergy_rule() -> void:
 		ok(at > 0, "%s sits inside the BV block" % n)
 		if at <= 0:
 			continue
-		# The 3000 characters above the entry are its comment.
-		var lead := block.substr(maxi(at - 3000, 0), mini(at, 3000))
+		# BATCH IT §3b — RE-POINTED: "the 3000 characters above the entry" started inside the PREVIOUS card's case or comment
+		# for most of the tranche, so a card whose own comment lost its line would have passed on its neighbour's. The lead
+		# is the entry's OWN comment — the comment lines directly above its key — and the window asserts it is nothing else.
+		var lead := Gate.comment_above(block, at)
+		ok(Gate.is_comment(lead), "%s: the lead read is the entry's own comment and nothing else (%d chars)" % [n, lead.length()])
 		ok(lead.contains("SYNERGY:"), "%s names what it combos with" % n)
 		ok(lead.contains("AXIS:"), "%s names its axis" % n)
 
@@ -568,7 +572,13 @@ func _source_rules() -> void:
 	# wrong region and sweep a check across half the file.
 	var at_gp := code.find('has_status("ghostpack")')
 	ok(at_gp > 0, "the Ghostpack strike hook exists")
-	var gp_body := code.substr(at_gp, 500)
+	# BATCH IT §3b — EVERY FIXED WINDOW IN THIS SECTION IS RE-POINTED AT ITS OWN SUBJECT. Ghostpack's 500 characters ran
+	# 184 past its block into the living-beast loop and ended 86 short of that loop's `_companion_strike(` — the very call
+	# the negative forbids; Hunt's 400 overhung both ends of its block; Loaded Shot's 900 ran into `_harvest_yield`, the
+	# purge walk this section says the refresh must not borrow. A WINDOW ASSERTS IT ENDS INSIDE ITS OWN SUBJECT: each is
+	# its subject's block now (`Gate.block`, cut where the indentation returns) and says so.
+	var gp_body := Gate.block(code, at_gp)
+	ok(Gate.within(code, at_gp, gp_body), "the Ghostpack slice ends inside its block — it does not run into the living-beast loop")
 	ok(gp_body.length() > 300, "and the slice around it is a real region")
 	ok(gp_body.contains("_ghost_hit("),
 		"Ghostpack strikes through `_ghost_hit`, the credited door")
@@ -595,7 +605,10 @@ func _source_rules() -> void:
 	# fail for reasons that have nothing to do with the damage block.
 	var at_hunt := code.find("var hunt_n := _status_count(strike_target)")
 	ok(at_hunt > 0, "the Hunt scaling exists in the raw-damage block")
-	var hunt_body := code.substr(maxi(at_hunt - 60, 0), 400)
+	var hunt_if := code.rfind("\n", code.rfind("\n", at_hunt - 1) - 1) + 1 if at_hunt > 0 else -1
+	var hunt_body := Gate.block(code, hunt_if)
+	ok(hunt_body.begins_with("\t\t\tif ab.display_name == \"Hunt\":") and Gate.within(code, hunt_if, hunt_body),
+		"the Hunt slice is Hunt's own block, whole and alone — not Cold Iron's line above it nor the Inferno set-up below")
 	ok(hunt_body.contains("_status_count(strike_target)"),
 		"Hunt reads `_status_count`, the Trapper passive's own function")
 	ok(not hunt_body.contains("status_stacks"),
@@ -606,7 +619,8 @@ func _source_rules() -> void:
 	# and Perfected Toxin poison — the exact ones the card names.
 	var at_ls := code.find("func _loaded_shot_refresh")
 	ok(at_ls > 0, "the Loaded Shot refresh is its own function")
-	var ls_body := code.substr(at_ls, 900)
+	var ls_body := Gate.block(code, at_ls)
+	ok(Gate.within(code, at_ls, ls_body), "the Loaded Shot slice ends inside `_loaded_shot_refresh` — it does not run into `_harvest_yield`")
 	ok(not ls_body.contains("sticky"),
 		"the refresh does NOT skip sticky statuses — it names them on purpose")
 	ok(ls_body.contains("full_turns"), "it reads the full_turns ledger")
@@ -655,7 +669,8 @@ func _source_rules() -> void:
 	ok(code.count("prep_pending -= 1") == 1,
 		"`prep_pending` decrements in exactly ONE place (got %d)"
 			% code.count("prep_pending -= 1"))
-	ok(code.count("prep_pending = 2") == 1,
+	# BATCH IT §2 — RE-POINTED: the literal this read is a named constant now; the needle names it.
+	ok(code.count("prep_pending = PREPARATION_DELAY") == 1,
 		"and is armed in exactly ONE place")
 	# BLOODBOND'S REFUSAL IS ABOVE THE SUBTRACTION, with Event Horizon and
 	# Kiln-Forged, so nothing downstream ever sees a lethal number.

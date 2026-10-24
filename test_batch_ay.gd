@@ -67,6 +67,7 @@ extends SceneTree
 # 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
 # This suite keeps its own SIGNATURE and delegates, so not one call site moved.
 const Fixture = preload("res://suite_fixture.gd")
+const Gate = preload("res://gate_fixture.gd")   # IT §3b: the one window helper (`subject`, `ends_inside`)
 
 
 var checks := 0
@@ -706,10 +707,18 @@ func _bot_policy_source() -> void:
 		"BOT: the beast it would replace is the one `_do_summon` frees (`_swap_victim`)")
 	# The summon block must come FIRST in the hunter branch, or Loyalty never
 	# accrues and the sim measures a spec nobody plays.
-	var hunter_at := src.find("\t\t\"hunter\":")
-	var summon_at := src.find("if bot_beasts.size() < _beast_cap(u):", hunter_at)
-	var sbond_at := src.find("var sbond := _find_ability(u, \"Spirit Bond\")", hunter_at)
-	ok(hunter_at > 0 and summon_at > hunter_at and summon_at < sbond_at,
+	# BATCH IT §3b — RE-POINTED: the first `"hunter":` in battle.gd is `_bot_class_kit_pick`'s, not the rotation's, so this
+	# order was asked from the wrong branch's key (the later finds landed right only by being unique). The branch is taken
+	# inside `_autoplay_pick_kit`, cut at its own end, and the pick names what it picked before the order is read in it.
+	var kit_at := src.find("func _autoplay_pick_kit(")
+	var hunter_at := src.find("\t\t\"hunter\":", kit_at) if kit_at >= 0 else -1
+	var branch := Gate.subject(src, hunter_at, "\n\t\t\"")
+	ok(kit_at >= 0 and hunter_at > kit_at and Gate.ends_inside(branch, "\n\t\t\"")
+		and branch.contains("if bot_beasts.size() < _beast_cap(u):"),
+		"BOT: the branch read is not the rotation's hunter branch in `_autoplay_pick_kit`, whole and alone (at %d)" % hunter_at)
+	var summon_at := branch.find("if bot_beasts.size() < _beast_cap(u):")
+	var sbond_at := branch.find("var sbond := _find_ability(u, \"Spirit Bond\")")
+	ok(summon_at > 0 and summon_at < sbond_at,
 		"BOT: the summon block is the FIRST thing the hunter branch does")
 
 

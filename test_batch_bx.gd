@@ -56,6 +56,7 @@ extends SceneTree
 # 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
 # This suite keeps its own SIGNATURE and delegates, so not one call site moved.
 const Fixture = preload("res://suite_fixture.gd")
+const Gate = preload("res://gate_fixture.gd")   # IT §3b: the one window helper (`block`, `within`, `comment_above`)
 
 
 var checks := 0
@@ -1178,7 +1179,12 @@ func _docs() -> void:
 	var gloss := _src("res://data/glossary.json")
 	var at := gloss.find("\"id\": \"ability_draft\"")
 	ok(at > 0, "§5: the draft glossary entry exists")
-	var draft_entry := gloss.substr(at, 3000).to_lower()
+	# BATCH IT §3b — RE-POINTED: 3000 characters ran 932 past the entry's closing brace into `archetype_tags`, so all three
+	# phrases below could have been met by the next entry. The slice is the entry itself, up to its own closing brace, and
+	# it says so.
+	var entry_raw := Gate.subject(gloss, at, "\n }")
+	ok(Gate.ends_inside(entry_raw, "\n }"), "§5: the draft glossary slice ends inside its own entry (%d chars)" % entry_raw.length())
+	var draft_entry := entry_raw.to_lower()
 	ok(draft_entry.contains("every living hero") or draft_entry.contains("all four"),
 		"§5: ...and it states the party-wide offer")
 	ok(draft_entry.contains("one screen"), "§5: ...and that it is one screen")

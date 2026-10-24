@@ -341,7 +341,8 @@ func _s0_the_data() -> void:
 	ok(battle_src.contains("elif src.rune_long_poison > 0:")
 		and not battle_src.contains("src.rune_long_poison > 0 and src.has_engine"),
 		"§0: `_apply_poison` still asks an engine before Long Poison stops the clock")
-	ok(battle_src.contains("_apply_poison(heroes[sn_idx], u, 4)"),
+	# BATCH IT §2 — RE-POINTED: the literal this read is a named constant now; the needle names it.
+	ok(battle_src.contains("_apply_poison(heroes[sn_idx], u, SNARE_TRAP_POISON_TURNS)"),
 		"§0: the snare's spring no longer lays its Poison through `_apply_poison` with the Hunter as its source — Long Poison's premise")
 	var ruled_r: Array = []
 	for rid in Runes.ENGINE_READ:

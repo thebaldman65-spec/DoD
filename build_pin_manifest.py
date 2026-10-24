@@ -194,6 +194,11 @@ def scan_file(path):
                 b = re.match(r'\s*(\w+)\s*\.\s*(?:substr|replace|split|to_lower|strip_edges)', tail)
                 if b and b.group(1) in hold[r]:
                     hold[r][name] = (hold[r][b.group(1)][0], "derived")
+                # BATCH IT §3b — a window cut by its subject (`gate_fixture.gd`'s helpers) is a slice of its holder, as a
+                # `substr` was: the repairs that replaced fixed windows must not take their needles out of this manifest.
+                g = re.match(r'\s*Gate\s*\.\s*(?:block|subject|comment_above)\s*\(\s*(\w+)\s*,', tail)
+                if g and g.group(1) in hold[r]:
+                    hold[r][name] = (hold[r][g.group(1)][0], "derived")
             for m in re.finditer(r'^\s*(\w+)\s*\+=', text[r], re.M):
                 nm = m.group(1)
                 if nm in hold[r]:

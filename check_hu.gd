@@ -726,10 +726,18 @@ func _s2a_the_source() -> void:
 	ok(b.contains("u.set_engine_chip(String(pid)"),
 		"§2a: the spawn does not lay each engine's chip through `set_engine_chip`")
 	# The door: the arriving status is added, then the composition is asked, before any return.
+	# BATCH IT §3b — RE-POINTED: `b.find("return", at)` took the first `return` anywhere after the add, and that is a
+	# filter lambda's (`func(e): return not e.dead …`) three hundred characters before the door's own first return — so the
+	# arm asked whether `_conjoin` came before a lambda. A POSITIONAL PICK ASSERTS THAT WHAT IT PICKED IS WHAT ITS
+	# PREDICATE NAMES: the first return is a STATEMENT of the door's own body (a line that opens with it), or the door's end.
 	var at := b.find("target.add_status(id, info[0], info[1], info[2], eff_turns, info[3], power, tick)")
 	var conj := b.find("_conjoin(target, id, src)", at)
-	var ret := b.find("return", at)
-	ok(at > 0 and conj > at and (ret < 0 or conj < ret),
+	var door_end := b.find("\nfunc ", at) if at > 0 else -1
+	var rm := RegEx.create_from_string("\\n\\t+return\\b").search(b, at, door_end) if door_end > at else null
+	var ret := rm.get_start() if rm != null else door_end
+	ok(at > 0 and ret > at and ret <= door_end and b.substr(ret, 40).strip_edges().begins_with("return"),
+		"§2a: the return this arm reads is not a statement of the status door's own body (at %d, door ends %d)" % [ret, door_end])
+	ok(at > 0 and conj > at and conj < ret,
 		"§2a: the status door does not ask `_conjoin` between adding a status and its first return")
 	# A direct write into a body's status list: the door's own add, the composition's two, the bleed chip.
 	var appends := u.count("statuses.append(") + b.count("statuses.append(")

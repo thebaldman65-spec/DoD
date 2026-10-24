@@ -35,7 +35,6 @@ const Gate = preload("res://gate_fixture.gd")
 var _g := Gate.new()
 var _player := {}
 var _strip := {}
-var _bodies := {}
 
 
 func ok(cond: bool, what: String) -> void:
@@ -74,53 +73,14 @@ func _src(path: String) -> String:
 
 # A function's comment-stripped body: from its `func` line to the next top-level declaration.
 func _body(path: String, fn: String) -> String:
-	var key := path + "::" + fn
-	if _bodies.has(key):
-		return _bodies[key]
-	var lines := _src(path).split("\n")
-	var head := RegEx.new()
-	head.compile("^(static\\s+)?func\\s+" + fn + "\\s*\\(")
-	var top := RegEx.new()
-	top.compile("^((static\\s+)?func\\s+\\w+\\s*\\(|const\\b|var\\b|static var\\b|class_name\\b|extends\\b)")
-	var start := -1
-	for i in lines.size():
-		if head.search(lines[i]) != null:
-			start = i
-			break
-	var out := ""
-	if start >= 0:
-		var end := lines.size()
-		for j in range(start + 1, lines.size()):
-			if top.search(lines[j]) != null:
-				end = j
-				break
-		out = "\n".join(lines.slice(start, end))
-	_bodies[key] = out
-	return out
+	return Gate.fn_body(path, fn, _cache)
 
 
 # How many times `needle` stands in `hay` WHOLE: a needle that ends (or starts) on a digit is not counted where the
 # number carries on past it — a digit, or a point and a digit — so `:= 4` is not found inside `:= 40` or `:= 4.5`, and
 # `for 4` is found in `for 4. A BOSS`.
 static func _count_whole(hay: String, needle: String) -> int:
-	if needle == "":
-		return 0
-	var n := 0
-	var at := hay.find(needle)
-	var digits := "0123456789"
-	while at >= 0:
-		var good := true
-		var tail := at + needle.length()
-		if needle[needle.length() - 1] in digits and tail < hay.length():
-			if hay[tail] in digits or (hay[tail] == "." and tail + 1 < hay.length() and hay[tail + 1] in digits):
-				good = false
-		if needle[0] in digits and at > 0:
-			if hay[at - 1] in digits or (hay[at - 1] == "." and at > 1 and hay[at - 2] in digits):
-				good = false
-		if good:
-			n += 1
-		at = hay.find(needle, at + 1)
-	return n
+	return Gate.count_whole(hay, needle)
 # ── §0.2 — THE FOUR CLOSED BLOCKS, STRUCK ───────────────────────────────────
 # Each needle is the struck line's own words and the report it names — the record pointer is the line's whole job.
 const STRUCK := [
@@ -697,57 +657,16 @@ const REPAIRS := [
 # `engine:`, `passive:`, `glossary:<id>:short|long`, `upgrade:`, `lit:<data file>` (its string literals, as §2e reads them), or
 # `src:<file>:<function>` for words built in code (the needle then read in that function's comment-stripped source, in source
 # form).
-var _cards := {}
+# BATCH IT §2 — the holder reader, the bodies and the corpus by name live in `gate_fixture.gd` now, shared with
+# `check_it` §2; this is their cache.
+var _cache := {}
 
 
 func _holder_text(holder: String) -> Variant:
-	var p := holder.split(":", true, 2)
-	var kind := String(p[0])
-	if kind == "card":
-		if _cards.is_empty():
-			for ab in Classes.ability_corpus():
-				_cards[ab.display_name] = ab
-		if not _cards.has(p[1]):
-			return null
-		var ab = _cards[p[1]]
-		return String(ab.perfect_text) if p.size() > 2 and p[2] == "perfect" else String(ab.description)
-	if kind == "src":
-		return _body(String(p[1]), String(p[2])) if p.size() > 2 else null
-	if kind == "lit":
+	if holder.begins_with("lit:"):
+		var p := holder.split(":", true, 2)
 		return _lit_stream(String(p[1]), String(p[2]) if p.size() > 2 else "")
-	var key := String(p[1])
-	match kind:
-		"status":
-			var st: Dictionary = (load("res://scripts/battle.gd") as Script).get_script_constant_map()["STATUS_INFO"]
-			return String(st[key][3]) if st.has(key) else null
-		"rune":
-			return String(Runes.config(key).get("desc", "")) if Runes.config(key).size() > 0 else null
-		"relic":
-			return Relics.desc_of(key) if Relics.POOL.has(key) else null
-		"talent":
-			for node in Talents.TREE:
-				if String(node.get("id", "")) == key:
-					return Talents.desc_for(node, 1)
-			return null
-		"engine":
-			return Classes.engine_desc(key)
-		"passive":
-			return String(Classes.CLASS_PASSIVES[key]["desc"]) if Classes.CLASS_PASSIVES.has(key) else null
-		"glossary":
-			for e in Glossary.entries():
-				if String(e.get("id", "")) == key:
-					return String(e.get(String(p[2]) if p.size() > 2 else "long", ""))
-			return null
-		"upgrade":
-			var up: Dictionary = (load("res://scripts/run_state.gd") as Script).get_script_constant_map()["ABILITY_UPGRADES"]
-			return String(up[key].get("desc", "")) if up.has(key) else null
-		"item", "modifier", "difficulty":
-			var rs: Dictionary = (load("res://scripts/run_state.gd") as Script).get_script_constant_map()
-			var tab: Dictionary = rs[{"item": "ITEM_INFO", "modifier": "MODIFIERS", "difficulty": "DIFFICULTIES"}[kind]]
-			if not tab.has(key):
-				return null
-			return String(tab[key][1]) if kind == "item" else String(tab[key].get("desc", ""))
-	return null
+	return Gate.holder_text(holder, _cache)
 
 
 func _s3_pins() -> void:
@@ -776,6 +695,9 @@ func _s3_pins() -> void:
 		ok(false, "§3: a pinned figure's words are gone from its text — %s" % b)
 	for b in bad_code:
 		ok(false, "§3: a pinned figure's code no longer stands once, whole, where it is decided — %s" % b)
+	# BATCH IT §2 — 180 rows LEFT this table, each for `check_it` §2: IT named the literal each pinned, so the figure has
+	# a constant now and the pin's premise (no constant decides it) is gone. Each is held there against its intent — the
+	# text's figure against the constant's value, and the decision site reading the constant. The floor is IJ's 400.
 	ok(PINS.size() >= 400, "§3: only %d pins — the table has lost rows" % PINS.size())
 	print("    CHECKED %d pins: %d holders unread, %d texts moved, %d codes moved" % [
 		PINS.size(), bad_holder.size(), bad_text.size(), bad_code.size()])
@@ -783,22 +705,7 @@ func _s3_pins() -> void:
 
 
 const PINS := [
-	["card:Crushing Blow:perfect", "+5 bonus BD", "scripts/battle.gd", "_resolve", "pr += 5"],
-	["card:Pommel Strike:desc", "keen 25%", "scripts/battle.gd", "_resolve", "0.25 if ab.display_name == \"Pommel Strike\""],
-	["card:Mocking Blow:desc", "for 4 turns", "scripts/battle.gd", "_resolve", "taunt_turns := 5 if is_perfect else 4"],
-	["card:Mocking Blow:perfect", "last 5 turns", "scripts/battle.gd", "_resolve", "taunt_turns := 5 if is_perfect else 4"],
-	["card:Battle Trance:desc", "for 4 turns", "scripts/battle.gd", "_resolve_special", "bt_turns := 4"],
-	["card:Rally:desc", "regain 15% of", "scripts/battle.gd", "_resolve_special", "target.max_resource * 0.15"],
-	["card:Warcry:desc", "4 turns", "scripts/battle.gd", "_resolve_special", "wc_turns := 4"],
-	["card:Ironclad:desc", "for 4 turns", "scripts/battle.gd", "_resolve_special", "ic_turns := 4"],
-	["card:Nexus Ward:desc", "for 3 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(attacker, \"barrier\", 3, mb_power)"],
-	["card:Nexus Ward:desc", "20% of the", "scripts/battle.gd", "_resolve_special", "mb_pct := 0.20"],
-	["card:Mirror Image:desc", "next FOUR", "scripts/battle.gd", "_resolve_special", "mi_n: int = maxi(4,"],
 	["card:Mirror Image:desc", "wait until spent", "scripts/battle.gd", "_resolve_special", "_apply_status(attacker, \"mirror\", -1, mi_n)"],
-	["card:Mana Well:desc", "for 4 turns", "scripts/battle.gd", "_resolve_special", "mw_turns := 4"],
-	["card:Mana Well:desc", "DOUBLED", "scripts/battle.gd", "_mana_regen", "regen *= 2"],
-	["card:Dispel:desc", "strip THREE", "scripts/battle.gd", "_resolve_special", "dp_n := 3"],
-	["card:Blink:desc", "two turns", "scripts/battle.gd", "_resolve_special", "bl_turns := 2"],
 	["card:Mana Shield:desc", "for 3 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(attacker, \"mana_shield\", 3)"],
 	["card:Mana Shield:desc", "50% of damage", "scripts/unit.gd", "take_hit", "maxi(int(amount * 0.5), 1)"],
 	["card:Bloodlust:perfect", "Heals 45%", "scripts/battle.gd", "_resolve", "0.45 if is_perfect else ab.heal_missing"],
@@ -808,15 +715,7 @@ const PINS := [
 	["card:Battle Shout:desc", "Lasts 2 turns", "scripts/battle.gd", "_resolve_special", "shout_turns: int = [2, 3, 4]"],
 	["card:Battle Shout:desc", ": +8%", "scripts/battle.gd", "_resolve_special", "shout_base: int = [8, 12, 18]"],
 	["card:Battle Shout:desc", "1% per 20", "scripts/battle.gd", "_resolve_special", "shout_base + int(shout_bleed / 20.0)"],
-	["card:Blood Offering:desc", "gain 60 Rage", "scripts/battle.gd", "_resolve_special", "bo_rage := 60"],
-	["card:Blood Offering:desc", "lose 20% of", "scripts/battle.gd", "_resolve_special", "bo_cost: int = maxi(int(round(attacker.hp * 0.20)), 1)"],
-	["card:Gut Rip:perfect", "{atk:9}", "scripts/battle.gd", "_resolve_special", "gr_step := 9 if is_perfect"],
-	["card:Reckless Abandon:desc", "for 3 turns", "scripts/battle.gd", "_resolve_special", "ra_turns := 3"],
-	["card:Berserk:desc", "For 3 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(attacker, \"berserk_risk\", 3"],
 	["card:Blood Debt:desc", "rest of the battle", "scripts/battle.gd", "_resolve", "_apply_status(strike_target, \"blood_debt\", -1"],
-	["card:Unslaked:desc", "For 4 turns", "scripts/battle.gd", "_resolve_special", "un_turns := 4"],
-	["card:Unslaked:desc", "FULL bonus", "scripts/unit.gd", "frenzy_bonus", "keep = maxf(keep, 1.0)"],
-	["card:Spite:desc", "For 6 turns", "scripts/battle.gd", "_resolve_special", "sp_turns := 6"],
 	["card:Shieldwall:desc", "3 turns", "scripts/battle.gd", "_recast_writes", "sw_turns := 3 + 2 * u.shield_mastery_ranks"],
 	["card:War Stomp:desc", "regain 10%", "scripts/battle.gd", "_resolve", "stomp_pct := 0.20 if is_perfect else 0.10"],
 	["card:War Stomp:perfect", "regain 20%", "scripts/battle.gd", "_resolve", "stomp_pct := 0.20 if is_perfect else 0.10"],
@@ -825,12 +724,7 @@ const PINS := [
 	["card:Hold the Line:desc", "for 2 turns.", "scripts/battle.gd", "_resolve_special", "hl_undying := 3 if hl_up else 2"],
 	["card:Hold the Line:desc", "50% less Break", "scripts/battle.gd", "_resolve_special", "hl_cut := 80 if hl_up else 50"],
 	["card:Retaliation:desc", "for 4 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(attacker, \"retaliate\", 4)"],
-	["card:Covering Guard:desc", "for 4 turns", "scripts/battle.gd", "_resolve_special", "cg_turns := 4"],
-	["card:Eye of the Storm:desc", "for 3 turns", "scripts/battle.gd", "_resolve_special", "es_turns := 3"],
 	["card:Vendetta:desc", "REST OF THE", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"mocked\", -1, vd_idx"],
-	["card:Aegis Wall:desc", "for 4\\nturns", "scripts/battle.gd", "_resolve_special", "aw_turns := 4"],
-	["card:Recompense:desc", "For 6 turns", "scripts/battle.gd", "_resolve_special", "rp_turns := 6"],
-	["card:Turn the Blade:desc", "For 4 turns", "scripts/battle.gd", "_resolve_special", "tt_turns := 4"],
 	["card:Rallying Shout:desc", "sheds 30", "scripts/battle.gd", "_resolve_special", "pressure_cut := 30"],
 	["card:Rallying Shout:desc", "regains 30%", "scripts/battle.gd", "_resolve_special", "res_pct := 0.30"],
 	["card:Overpower:desc", "held Broken one", "scripts/battle.gd", "_resolve", "strike_target.broken_extra_turns += 1"],
@@ -844,14 +738,7 @@ const PINS := [
 	["card:Lunge:desc", "3 turns either way", "scripts/battle.gd", "_resolve", "_apply_status(strike_target, lunge_status, 3"],
 	# BATCH IK §2 — RE-POINTED: the line moved out of the door into the one answer the door, the picker and the bot ask.
 	["card:Execute:desc", "below 20% health", "scripts/battle.gd", "_execute_line", "return 0.35 if u.execute_upgraded > 0 else 0.2"],
-	["card:Precision Strike:desc", "strike TWICE", "scripts/battle.gd", "_resolve_special", "ps_hits := 2 if ps_aggressive else 1"],
 	["card:Feint:perfect", "A third charge", "scripts/battle.gd", "_resolve_special", "FEINT_GUARDS + (1 if is_perfect else 0)"],
-	["card:Feint:perfect", "45% in Aggressive", "scripts/battle.gd", "_resolve_special", "ft_pct := 45 if is_perfect"],
-	["card:Battle Poise:desc", "For 4 turns", "scripts/battle.gd", "_resolve_special", "bp_turns := 4"],
-	["card:Feigned Guard:desc", "For 3 turns", "scripts/battle.gd", "_resolve_special", "fg_turns := 3"],
-	["card:Discipline:desc", "For 7 turns", "scripts/battle.gd", "_resolve_special", "di_turns := 7"],
-	["card:Answering Steel:desc", "For 6 turns", "scripts/battle.gd", "_resolve_special", "an2_turns := 6"],
-	["card:Formless:desc", "For 4 turns", "scripts/battle.gd", "_resolve_special", "fm_turns := 4"],
 	["card:Detonation:desc", "250% of its", "scripts/battle.gd", "_resolve", "det_mult: float = (2.5 + 0.75 * attacker.focused_flame)"],
 	["card:Detonation:desc", "1 Mana for every", "scripts/battle.gd", "_overburn_refund", "rate := 2 if u.crucible > 0 else 1"],
 	["card:Detonation:perfect", "2 turns of Burn", "scripts/battle.gd", "_resolve", "_apply_status(strike_target, \"burn\", 2,"],
@@ -864,11 +751,6 @@ const PINS := [
 	["card:Immolate:desc", "for 4 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(attacker, \"immolate\", 4)"],
 	["card:Immolate:desc", "3 turns", "scripts/battle.gd", "_resolve", "_apply_status(attacker, \"burn\", 3,"],
 	["card:Firestorm:desc", "6-8 bolts", "scripts/battle.gd", "_resolve", "randi_range(6, 8)"],
-	["card:Cinderfall:desc", "that much again", "scripts/battle.gd", "_resolve_special", "cf_final *= 2"],
-	["card:Cinderfall:desc", "tear 2 turns", "scripts/battle.gd", "_resolve_special", "cf_take := 3 if is_perfect else 2"],
-	["card:Cinderfall:perfect", "Takes 3 turns", "scripts/battle.gd", "_resolve_special", "cf_take := 3 if is_perfect else 2"],
-	["card:Ember Debt:desc", "12 turns of Burn", "scripts/battle.gd", "_resolve_special", "ed_turns := 12"],
-	["card:Pyre Wake:perfect", "{atk:12}", "scripts/battle.gd", "_resolve_special", "pw_pct := 12 if is_perfect"],
 	["card:Backdraft:desc", "gains 2 more", "scripts/battle.gd", "_resolve_special", "bd_turns := 3 if is_perfect else 2"],
 	["card:Phoenix Rebirth:desc", "pay 15%", "scripts/battle.gd", "_resolve_special", "int(attacker.hp * 0.15)"],
 	["card:Blizzard:desc", "1-2 stacks", "scripts/battle.gd", "_resolve", "randi_range(1, 2)"],
@@ -879,12 +761,6 @@ const PINS := [
 	["card:Rime:desc", "for 2 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"frostbite\", 2"],
 	["card:Rime:desc", "50% less healing", "scripts/unit.gd", "heal_amount", "mult *= 0.5"],
 	["card:Shatter:perfect", "becomes 4", "scripts/battle.gd", "_resolve", "attacker.cooldowns[ab.display_name] = 5"],
-	["card:Winter's Toll:perfect", "{atk:12}", "scripts/battle.gd", "_resolve_special", "wt_step := 12 if is_perfect"],
-	["card:Rimebinding:desc", "Four", "scripts/battle.gd", "_apply_status", "target.status_stacks(\"chilled\") >= 4"],
-	["card:Rimebinding:desc", "plus one", "scripts/battle.gd", "_resolve_special", "rb_n: int = rb_deepest + 1"],
-	["card:Killing Frost:desc", "four stacks", "scripts/battle.gd", "_apply_status", "target.status_stacks(\"chilled\") >= 4"],
-	["card:Deep Winter:desc", "HALF the stacks", "scripts/battle.gd", "_resolve_special", "int((dw_deepest + 1) / 2)"],
-	["card:Frostbolt:desc", "Four stacks", "scripts/battle.gd", "_apply_status", "target.status_stacks(\"chilled\") >= 4"],
 	["card:Arcane Cannon:desc", "BD = 5 x", "scripts/battle.gd", "_resolve", "(5.0 + attacker.cannoneer_ranks)"],
 	["card:Overcharge:desc", "Once per battle", "scripts/unit.gd", "overcharge_ready", "overcharge_uses < 1 + overcharge_extra"],
 	["card:Overcharge:desc", "FULL stacks", "scripts/battle.gd", "_resolve_special", "overcharge_mult = 1.0"],
@@ -895,19 +771,8 @@ const PINS := [
 	["card:Stabilize:desc", "+5 Mana", "scripts/battle.gd", "_resolve_special", "st_mana := 5 * st_stacks"],
 	["card:Stabilize:desc", "ABOVE 2", "scripts/battle.gd", "_resolve_special", "st_floor := 2 + attacker.still_mind_ranks"],
 	["card:Stabilize:desc", "{mhp:5}", "scripts/battle.gd", "_resolve_special", "st_heal := maxi(int(round(attacker.max_hp * 0.05)), 1)"],
-	["card:Null Field:desc", "for 4 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(attacker, \"null_field\", 4)"],
-	["card:Null Field:desc", "5% less damage", "scripts/battle.gd", "_resolve", "minf(0.05 * strike_target.second_resource, 0.95)"],
-	["card:Inner Arcane:desc", "plus\\none", "scripts/battle.gd", "_resolve_special", "ia_alive * (2 if ia_low else 1) + 1"],
 	["card:Arcane Surge:desc", "your next turn", "scripts/battle.gd", "_resolve_special", "_apply_status(attacker, \"surge\", 2)"],
 	["card:Arcane Surge:desc", "banks 2 Resonance", "scripts/battle.gd", "_resolve_special", "_gain_resonance(attacker, 2)"],
-	["card:Arcane Explosion:desc", "Builds 1 Resonance", "scripts/battle.gd", "_resolve", "if any_crit else 1"],
-	["card:Ministration:desc", "for 20%", "scripts/battle.gd", "_resolve_special", "var mn_pct := 0.26 if is_perfect else 0.20"],
-	["card:Ministration:perfect", "{mhp:26|ally}", "scripts/battle.gd", "_resolve_special", "var mn_pct := 0.26 if is_perfect else 0.20"],
-	["card:Unburden:desc", "for 3 turns", "scripts/battle.gd", "_resolve_special", "var ub_turns := 3"],
-	["card:Unburden:desc", "take 20%", "scripts/battle.gd", "_resolve", "raw *= 0.80"],
-	["card:Consecration:desc", "for 4 turns", "scripts/battle.gd", "_resolve_special", "var cn_turns := 4"],
-	["card:Exhortation:desc", "35% more", "scripts/battle.gd", "_resolve_special", "var ex_pct := 35"],
-	["card:Undying Vigil:desc", "for 4 turns", "scripts/battle.gd", "_resolve_special", "var uv_turns := 4"],
 	["card:Heal:desc", "for 40%", "scripts/battle.gd", "_resolve_special", "var hh_amt := maxi(int(round(attacker.max_hp * 0.40"],
 	["card:Heal:desc", "for 1 Mercy", "scripts/battle.gd", "_consume_empower", "attacker.second_resource -= 1"],
 	["card:Heal:perfect", "{mhp:5}", "scripts/battle.gd", "_resolve_special", "var hh_self := maxi(int(round(attacker.max_hp * 0.05)), 1)"],
@@ -929,19 +794,6 @@ const PINS := [
 	["card:Dawnbreak:perfect", "Heals 55", "scripts/battle.gd", "_resolve_special", "(55 if is_perfect else 40)"],
 	["card:Sanctuary:desc", "heals\\n12%", "scripts/battle.gd", "_resolve_special", "(0.18 if is_perfect else 0.12)"],
 	["card:Sanctuary:perfect", "Heals 18%", "scripts/battle.gd", "_resolve_special", "(0.18 if is_perfect else 0.12)"],
-	["card:Second Wind:desc", "up to 40%", "scripts/battle.gd", "_resolve_special", "var sw_cap_pct := 0.55 if is_perfect else 0.40"],
-	["card:Second Wind:perfect", "{mhp:55|ally}", "scripts/battle.gd", "_resolve_special", "var sw_cap_pct := 0.55 if is_perfect else 0.40"],
-	["card:Rite of Return:desc", "for 4\\nturns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"rite_return\", 4, 0, 0, attacker)"],
-	["card:Rite of Return:desc", "loses 30%", "scripts/battle.gd", "_on_rite_return", "var toll := maxi(int(round(cleric.max_hp * 0.30)), 1)"],
-	["card:Rite of Return:desc", "to 50%", "scripts/battle.gd", "_on_rite_return", "saved.hp = maxi(int(saved.max_hp * 0.5), 1)"],
-	["card:Recant:desc", "regains 40%", "scripts/battle.gd", "_resolve_special", "var rc_pct := 0.40"],
-	["card:Shared Grief:desc", "gain 4 Mercy", "scripts/battle.gd", "_resolve_special", "var sg_grant := 4 + sg_low * SHARED_GRIEF_PER_WOUNDED"],
-	["card:Shared Grief:desc", "lose 25%", "scripts/battle.gd", "_resolve_special", "var sg_cost := maxi(int(round(attacker.max_hp * 0.25)), 1)"],
-	["card:Reprisal:desc", "to 50%", "scripts/battle.gd", "_resolve_special", "var rp_share := 0.75 if is_perfect else 0.50"],
-	["card:Reprisal:perfect", "75% of", "scripts/battle.gd", "_resolve_special", "var rp_share := 0.75 if is_perfect else 0.50"],
-	["card:Divine Presence:desc", "for 4 turns", "scripts/battle.gd", "_resolve_special", "var mt_turns := 4"],
-	["card:Alms:desc", "for 4\\nturns", "scripts/battle.gd", "_resolve_special", "var al_turns := 4"],
-	["card:Vespers:desc", "for 4\\nturns", "scripts/battle.gd", "_resolve_special", "var vs_turns := 4"],
 	["card:Intercession:desc", "For 2 turns", "scripts/battle.gd", "_resolve_special", "var ic_turns := 2 + attacker.intercession_long"],
 	["card:Intercession:desc", "loses 1 Mercy", "scripts/battle.gd", "_on_intercession_save", "cleric.second_resource -= 1"],
 	["card:Intercession:desc", "at 1 health", "scripts/unit.gd", "_holy_reversal", "hp = 1"],
@@ -956,18 +808,6 @@ const PINS := [
 	["card:Bulwark of Fortitude:desc", "heals 10%", "scripts/battle.gd", "_run_battle", "var bw_amt := maxi(int(round(u.max_hp * 0.10)), 1)"],
 	["card:Bulwark of Fortitude:desc", "by 50%", "scripts/unit.gd", "effective_armor", "a *= 1.5"],
 	["card:Bulwark of Fortitude:desc", "them 5% of max health", "scripts/battle.gd", "_resolve_special", "var bw_heal := maxi(int(round(h.max_hp * 0.05)), 1)"],
-	["card:Vow of Suffering:desc", "for 4\\nturns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"vow\", 4, 0, 0, attacker)"],
-	["card:Vow of Suffering:desc", "HALF", "scripts/unit.gd", "take_hit", "vow_cb.call(self, amount / 2)"],
-	["card:Vow of Suffering:desc", "hero\\n1 Faith", "scripts/battle.gd", "_on_vow_share", "_gain_faith(ally, 1, \"vow\")"],
-	["card:Aegis Reversal:desc", "half again", "scripts/battle.gd", "_resolve_special", "var ag_bonus: int = int(round(ag_left * 1.5))"],
-	["card:Ordination:desc", "grant 4 Faith", "scripts/battle.gd", "_resolve_special", "var od_grant := 4"],
-	["card:Fortified Spirit:desc", "over\\n3 turns", "scripts/battle.gd", "_resolve_special", "var fs_steps := 4 if is_perfect else 3"],
-	["card:Fortified Spirit:desc", "10 points", "scripts/battle.gd", "_resolve_special", "var fs_step := maxi(int(round(attacker.max_hp * 0.10)), 1)"],
-	["card:Reliquary:desc", "for 2.5%", "scripts/battle.gd", "_resolve_special", "var rq_pct := 0.035 if is_perfect else 0.025"],
-	["card:Reliquary:perfect", "3.5% per", "scripts/battle.gd", "_resolve_special", "var rq_pct := 0.035 if is_perfect else 0.025"],
-	["card:Blessing of the Faithful:desc", "and 3% of", "scripts/battle.gd", "_resolve_special", "var jb_mana := maxi(int(round(attacker.max_resource * 0.03"],
-	["card:Blessing of the Faithful:desc", "6% of your", "scripts/battle.gd", "_resolve_special", "var jb_pct := 0.08 if is_perfect else 0.06"],
-	["card:Blessing of the Faithful:perfect", "{mhp:8}", "scripts/battle.gd", "_resolve_special", "var jb_pct := 0.08 if is_perfect else 0.06"],
 	["card:Divine Wrath:desc", "for 4 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(h, \"wrath\", 4, 0, 0, attacker)"],
 	["card:Divine Wrath:desc", "15% faster", "scripts/unit.gd", "effective_speed", "s *= 1.15"],
 	["card:Bewitch:desc", "for 3 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"bewitch\", 3, 0, 0, attacker)"],
@@ -978,20 +818,9 @@ const PINS := [
 	["card:Mass Hysteria:desc", "DOUBLE", "scripts/battle.gd", "_enemy_turn", "\"pressure\": hys_basic.pressure * 2"],
 	["card:Umbral Sigil:desc", "for 4 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"umbral_sigil\", 4, 0, 0, attacker)"],
 	["card:Umbral Sigil:desc", "half of", "scripts/battle.gd", "_umbral_sigil_echo", "var echo := maxi(int(round(landed * 0.5)), 1)"],
-	["card:Blight the Well:desc", "for 6 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"blight\", 6, 0, 0, attacker)"],
 	["card:Covenant of Ash:desc", "Two Ruin", "scripts/battle.gd", "_resolve_special", "_gain_ruin(target, 2)"],
-	["card:Suffering:desc", "For 4 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"suffering\", 4, su_rate, 0, attacker)"],
-	["card:Suffering:desc", "gains 2 Ruin", "scripts/battle.gd", "_resolve_special", "var su_rate := 3 if is_perfect else 2"],
-	["card:Suffering:perfect", "3 Ruin", "scripts/battle.gd", "_resolve_special", "var su_rate := 3 if is_perfect else 2"],
-	["card:Transference:desc", "2 more", "scripts/battle.gd", "_resolve_special", "var tf_bonus := 2"],
-	["card:Breaking Darkness:desc", "for 3 turns", "scripts/battle.gd", "_resolve_special", "var an_turns := 4 if is_perfect else 3"],
-	["card:Breaking Darkness:perfect", "Holds 4 turns", "scripts/battle.gd", "_resolve_special", "var an_turns := 4 if is_perfect else 3"],
-	["card:Requiem:desc", "healed 2%", "scripts/battle.gd", "_resolve_special", "var rq_share := maxi(int(round(attacker.max_hp * 0.02"],
-	["card:Requiem:perfect", "{atk:10}", "scripts/battle.gd", "_resolve_special", "var rq_per := 0.10 if is_perfect else REQUIEM_PER_STACK"],
-	["card:Penance:desc", "for 4 turns", "scripts/battle.gd", "_resolve_special", "var pn_turns := 4"],
 	["card:Shadowrend:perfect", "{mhp:5}", "scripts/battle.gd", "_apply_perfect_bonus", "var sh_amt := maxi(int(round(attacker.max_hp * 0.05)), 1)"],
 	["engine:bloodrage", "+2% damage", "scripts/unit.gd", "frenzy_bonus", "var step := (2.0 + bloodrage_step_bonus"],
-	["engine:bloodrage", "Half the highest", "scripts/unit.gd", "frenzy_bonus", "var keep: float = [0.5, 0.85, 1.0]"],
 	["engine:heavy_plating", "up to +40%", "scripts/battle.gd", "_resolve", "strike_target.plating_bonus + wd_climb, 0.40)"],
 	["engine:heavy_plating", "+15% Block", "scripts/battle.gd", "_plating_slice", "var slice := (0.15 + u.plating_bonus)"],
 	["engine:heavy_plating", "by 8%", "scripts/battle.gd", "_resolve", "var wd_climb := 0.08"],
@@ -1004,8 +833,6 @@ const PINS := [
 	["engine:resonance", "+1% critical", "scripts/battle.gd", "_resolve", "crit_chance += (0.01 + 0.01 * attacker.arcane_mastery_ranks)"],
 	["engine:mercy", "(max 5)", "scripts/battle.gd", "_spawn_units", "cfg[\"second_max\"] = 5 + int(cfg.get(\"mercy_cap_bonus\", 0))"],
 	["engine:mercy", "+5% healing", "scripts/battle.gd", "_healing_done_mult", "m += 0.01 * (5 + caster.heavenly_step) * caster.second_resource"],
-	["engine:conviction", "{mhp:15|ally}", "scripts/battle.gd", "_gain_faith", "var f_heal := maxi(int(round(u.max_hp * (0.15 + 0.01 * (devout.faithful_step"],
-	["engine:conviction", "{res:3}", "scripts/battle.gd", "_gain_faith", "var d_mana := maxi(int(round(devout.max_resource * 0.03)), 1)"],
 	["engine:old_gods", "+2% damage", "scripts/battle.gd", "_resolve", "raw *= 1.0 + 0.01 * (2 + ruin_occ.deep_hex_step"],
 	["engine:old_gods", "90% of Attack", "scripts/battle.gd", "_detonate_ruin", "var det_raw := 0.90 * occ.attack"],
 	["engine:old_gods", "heal 2%", "scripts/battle.gd", "_resolve", "* (2 + occ_leech.soul_leech_step + occ_leech.rune_soul_leech_step"],
@@ -1021,12 +848,8 @@ const PINS := [
 	["passive:mage", "10 Mana", "scripts/battle.gd", "_spawn_units", "cfg[\"mana_regen_bonus\"] = 10"],
 	["src:scripts/classes.gd:computed_block", "int(hit * 0.9)", "scripts/battle.gd", "_resolve", "* 0.01 * attacker.attack * randf_range(0.9, 1.1) * dmg_mult"],
 	["src:scripts/classes.gd:computed_block", "round(hit * 1.1)", "scripts/battle.gd", "_resolve", "* 0.01 * attacker.attack * randf_range(0.9, 1.1) * dmg_mult"],
-	["src:scripts/battle.gd:_show_actions", "(10 %s", "scripts/battle.gd", "_open_summon_picker", "0, \"cost\": 10"],
-	["src:scripts/battle.gd:_show_actions", "1.0 int", "scripts/battle.gd", "_open_summon_picker", "summon\", \"delay\": 1.0"],
 	["src:scripts/battle.gd:_show_actions", "+1 Loyalty", "scripts/battle.gd", "_gain_loyalty", "amount := 1)"],
 	["src:scripts/battle.gd:_show_actions", "Spend +1 Mercy", "scripts/battle.gd", "_consume_empower", "attacker.second_resource -= 1"],
-	["src:scripts/battle.gd:_ability_popup_button", "at least 1 Resonance", "scripts/battle.gd", "_ability_usable", "ab.display_name == \"Arcane Bolt\" and u.second_resource < 1"],
-	["src:scripts/battle.gd:_ability_popup_button", "at least 1 Resonance", "scripts/battle.gd", "_ability_usable", "ab.display_name == \"Unmaking\" and u.second_resource < 1"],
 	["src:scripts/battle.gd:_open_summon_picker", "+1 Loyalty", "scripts/battle.gd", "_gain_loyalty", "amount := 1)"],
 	["src:scripts/battle.gd:_open_called_picker", "2 turns", "scripts/battle.gd", "_resolve", "_apply_status(target, \"sunder\", 2, 0, 0, attacker)"],
 	["src:scripts/battle.gd:_open_called_picker", "+30 Break", "scripts/battle.gd", "_resolve", "target.take_hit(0, 30)"],
@@ -1035,18 +858,11 @@ const PINS := [
 	["src:scripts/battle.gd:_stamp_loyalty_chip", "mini(20 * stacks, 100)", "scripts/battle.gd", "_companion_strike", "0.20 * l)"],
 	["src:scripts/battle.gd:_stamp_ruin_chip", "never clears", "scripts/battle.gd", "_gain_ruin", "_apply_status(target, \"ruin\", -1"],
 	["src:scripts/battle.gd:_stamp_ruin_chip", "2 + occ.deep_hex_step", "scripts/battle.gd", "_resolve", "0.01 * (2 + ruin_occ.deep_hex_step"],
-	["src:scripts/battle.gd:_refresh_faith_chip", "15 + devout.faithful_step", "scripts/battle.gd", "_gain_faith", "u.max_hp * (0.15 + 0.01 * (devout.faithful_step"],
 	["src:scripts/battle.gd:_resolve_special", "each turn (10%", "scripts/battle.gd", "_resolve_special", "pact_tick := maxi(int(round(attacker.max_hp * 0.10)), 1)"],
-	["src:scripts/battle.gd:_resolve_special", "3 turns. Blood", "scripts/battle.gd", "_resolve_special", "_apply_status(attacker, \"berserk_risk\", 3"],
-	["src:scripts/battle.gd:_resolve_special", "reaches instead of half", "scripts/unit.gd", "frenzy_bonus", "[0.5, 0.85, 1.0]"],
-	["src:scripts/battle.gd:_resolve_special", "for every 5%", "scripts/battle.gd", "_resolve", "/ float(strike_target.max_hp)) * 100.0 / 5.0)"],
 	["src:scripts/battle.gd:_resolve_special", "per 20 of the", "scripts/battle.gd", "_resolve_special", "shout_base + int(shout_bleed / 20.0)"],
 	["src:scripts/battle.gd:_resolve_special", "(10%% per Resonance", "scripts/battle.gd", "_resolve_special", "var st_dr := 10 * st_stacks"],
 	["src:scripts/battle.gd:_resolve_special", "turn (15%", "scripts/battle.gd", "_resolve_special", "var ren_tick := maxi(int(round(attacker.max_hp * 0.15"],
-	["src:scripts/battle.gd:_resolve_special", "sheds a tenth", "scripts/battle.gd", "_resolve_special", "fs_step := maxi(int(round(attacker.max_hp * 0.10)), 1)"],
-	["src:scripts/battle.gd:_stamp_deadfall_chip", "Stunned 1 turn", "scripts/battle.gd", "_spring_trap", "_apply_status(victim, \"stunned\", 1"],
 	["status:slow", "-25% speed", "scripts/unit.gd", "effective_speed", "0.75 if has_status(\"slow\")"],
-	["status:chilled", "4 stacks FREEZE", "scripts/battle.gd", "_apply_status", "target.status_stacks(\"chilled\") >= 4"],
 	["status:chilled", "1 = -25% speed", "scripts/unit.gd", "effective_speed", "s *= maxf(0.75 - frigid_bonus, 0.1)"],
 	["status:chilled", "2 = -50%", "scripts/unit.gd", "effective_speed", "s *= maxf(0.5 - frigid_bonus * chill, 0.1)"],
 	["status:fortify", "+10% armor", "scripts/unit.gd", "effective_armor", "a += 0.10"],
@@ -1074,7 +890,6 @@ const PINS := [
 	["status:bulwark", "10% max health", "scripts/battle.gd", "_run_battle", "var bw_amt := maxi(int(round(u.max_hp * 0.10)), 1)"],
 	["status:bulwark", "50%, and", "scripts/unit.gd", "effective_armor", "a *= 1.5"],
 	["status:loyalty", "+5%\\nstrike damage", "scripts/battle.gd", "_comp_dmg_mult", "var step := 0.05 + 0.01"],
-	["status:blind", "50% more likely", "scripts/battle.gd", "_miss_chance", "0.50 if attacker.has_status(\"blind\")"],
 	["status:elusive", "are 25%", "scripts/battle.gd", "_miss_chance", "chance += 0.25"],
 	["status:instinct", "+10% of", "scripts/battle.gd", "_resolve", "raw += 0.10 * attacker.attack"],
 	["status:instinct", "15% of its max health", "scripts/battle.gd", "_resolve", "hi_b.heal_amount(int(hi_b.max_hp * 0.15))"],
@@ -1088,18 +903,7 @@ const PINS := [
 	["status:vigor", "+10% max", "scripts/battle.gd", "_resolve_special", "sb_u.vigor_hp_bonus = int(sb_u.max_hp * 0.10)"],
 	["status:primal_surge", "+10% damage", "scripts/battle.gd", "_resolve", "raw *= 1.10"],
 	["status:hunt_mark", "+25% damage", "scripts/battle.gd", "_companion_hit", "raw *= 1.25"],
-	["status:snared", "for 1 turn", "scripts/battle.gd", "_spring_trap", "_apply_status(victim, \"stunned\", 1"],
-	["status:null_field", "by 5% per", "scripts/battle.gd", "_resolve", "minf(0.05 * strike_target.second_resource, 0.95)"],
-	["status:vow", "half\\nthe damage", "scripts/unit.gd", "take_hit", "int(vow_cb.call(self, amount / 2))"],
 	# BATCH IR §1b — RE-POINTED: the vow is a hero's (`HERO_PICKS`), so its chip says hero; the code it pins did not move.
-	["status:vow", "hero 1 Faith", "scripts/battle.gd", "_on_vow_share", "_gain_faith(ally, 1, \"vow\")"],
-	["status:rite_return", "Holy 30%", "scripts/battle.gd", "_on_rite_return", "maxi(int(round(cleric.max_hp * 0.30)), 1)"],
-	["status:rite_return", "to 50% health", "scripts/battle.gd", "_on_rite_return", "saved.hp = maxi(int(saved.max_hp * 0.5), 1)"],
-	["status:quarry", "is DOUBLED", "scripts/battle.gd", "_sharpshooter_focus", "gain *= 2"],
-	["status:crossfire", "2 other enemies", "scripts/battle.gd", "_crossfire_splash", "while picks.size() < 2"],
-	["status:unslaked", "of half of it", "scripts/unit.gd", "frenzy_bonus", "[0.5, 0.85, 1.0]"],
-	["status:mana_well", "is DOUBLED", "scripts/battle.gd", "_mana_regen", "regen *= 2"],
-	["status:unburdened", "takes 20%", "scripts/battle.gd", "_resolve", "raw *= 0.80"],
 	["src:scripts/unit.gd:refresh_bars", "damage per 5%", "scripts/unit.gd", "frenzy_bonus", "int((1.0 - hp / float(max_hp)) * 100.0 / 5.0)"],
 	["src:scripts/unit.gd:refresh_bars", "Heavy Plating: +15%", "scripts/battle.gd", "_plating_slice", "(0.15 + u.plating_bonus)"],
 	["src:scripts/unit.gd:refresh_bars", "adds +8%", "scripts/battle.gd", "_resolve", "var wd_climb := 0.08"],
@@ -1110,7 +914,6 @@ const PINS := [
 	["src:scripts/unit.gd:_chilled_desc", "-25% speed", "scripts/unit.gd", "effective_speed", "s *= maxf(0.75 - frigid_bonus, 0.1)"],
 	["src:scripts/unit.gd:_chilled_desc", "-50% speed\"", "scripts/unit.gd", "effective_speed", "s *= maxf(0.5 - frigid_bonus * chill, 0.1)"],
 	["src:scripts/unit.gd:_chilled_desc", "-50% speed,", "scripts/unit.gd", "effective_speed", "s *= maxf(0.5 - frigid_bonus * chill, 0.1)"],
-	["src:scripts/unit.gd:_chilled_desc", "at 4 stacks", "scripts/battle.gd", "_apply_status", "target.status_stacks(\"chilled\") >= 4"],
 	["src:scripts/unit.gd:log_bleed_chip", "20%% of max HP", "scripts/battle.gd", "_add_bleed_with_burst", "(0.15 if pact < 0 else 0.20)"],
 	["src:scripts/unit.gd:log_bleed_chip", "At 100 the target", "scripts/unit.gd", "add_bleed", "var bled := bleed_buildup >= 100"],
 	["src:scripts/unit.gd:_refresh_chips", "Iron Will: takes 12%", "scripts/battle.gd", "_resolve", "var iw_pct := 12 * strike_target.iron_will_ranks"],
@@ -1125,7 +928,6 @@ const PINS := [
 	["rune:ember_leap", "half the turns", "scripts/battle.gd", "_overburn_refund", "var el_half: int = turns_consumed / 2"],
 	["rune:pyre_debt", "refunds DOUBLE", "scripts/battle.gd", "_overburn_refund", "rate *= 2"],
 	["rune:killing_cold_fk", "at maximum Chill", "scripts/battle.gd", "_killing_cold_cast", "if kc_stacks < 4:"],
-	["rune:deep_cold", "cap at four", "scripts/unit.gd", "add_status", "s.stacks = mini(int(s.stacks), 4)"],
 	["rune:overtone", "DOUBLE Resonance", "scripts/battle.gd", "_resolve", "res_gain *= 2"],
 	["rune:dissonance", "TWICE his Resonance", "scripts/unit.gd", "resonance_curve", "(2 if rune_dissonance > 0 else 1)"],
 	["rune:overflow", "instead of two", "scripts/battle.gd", "_resolve", "var res_gain := (2 + attacker.rune_overflow"],
@@ -1158,15 +960,6 @@ const PINS := [
 	["talent:tn_iron_will", "12% less damage", "scripts/battle.gd", "_resolve", "var iw_pct := 12 * strike_target.iron_will_ranks"],
 	["talent:tn_iron_will", "maximum of 90%", "scripts/battle.gd", "_resolve", "raw *= maxf(1.0 - 0.01 * iw_pct, 0.1)"],
 	["talent:tn_break_refuel", "45 Rage", "scripts/battle.gd", "_resolve", "var nq_gain := 45 * attacker.no_quarter_ranks"],
-	["card:Powershot:desc", "+2% damage", "scripts/battle.gd", "_resolve", "ps_step := 2.0 + attacker.opp_aim_step"],
-	["card:Snare Trap:desc", "Poisoned for 4", "scripts/battle.gd", "_run_battle", "_apply_poison(heroes[sn_idx], u, 4)"],
-	["card:Snare Trap:desc", "for 1 turn", "scripts/battle.gd", "_spring_trap", "_apply_status(victim, \"stunned\", 1,"],
-	["card:Field Dressing:desc", "18% of", "scripts/battle.gd", "_resolve_special", "var fd_pct := 0.24 if is_perfect else 0.18"],
-	["card:Field Dressing:perfect", "{mhp:24}", "scripts/battle.gd", "_resolve_special", "var fd_pct := 0.24 if is_perfect else 0.18"],
-	["card:Camouflage:desc", "for 3 turns", "scripts/battle.gd", "_resolve_special", "var cm_turns := 3"],
-	["card:Bola:desc", "for 4\\nturns", "scripts/battle.gd", "_resolve_special", "var bl_turns := 4"],
-	["card:Hunter's Mark:desc", "for 6 turns", "scripts/battle.gd", "_resolve_special", "var hm_turns := 6"],
-	["card:Arcane Arrows:desc", "six arrows", "scripts/battle.gd", "_resolve_special", "var aa_n: int = maxi(6,"],
 	["card:Summon Ursus:desc", "for 2 turns", "scripts/battle.gd", "_arrival_for_kind", "_apply_status(body, \"roar\", 2)"],
 	["card:Summon Canis:desc", "15 Bleed", "scripts/battle.gd", "_arrival_for_kind", "30 if e in bloodiest else 15"],
 	["card:Summon Canis:desc", "+15% damage", "scripts/battle.gd", "_resolve", "raw *= 1.0 + 0.15 * bm_canis * bm_wounded"],
@@ -1200,17 +993,6 @@ const PINS := [
 	["card:Primal Surge:desc", "15% of", "scripts/battle.gd", "_resolve_special", "0.15 * ps_l * attacker.attack"],
 	["card:Call of the Wild:desc", "for 15%", "scripts/battle.gd", "_resolve_special", "0.15 * attacker.attack)"],
 	["card:Mark of the Hunt:desc", "for 7 turns", "scripts/battle.gd", "_resolve_special", "var mk_turns := 7"],
-	["card:Twin Hunt:perfect", "{atk:55}", "scripts/battle.gd", "_resolve_special", "var th_pct := 0.55 if is_perfect else 0.40"],
-	["card:Bloodbond:desc", "a QUARTER", "scripts/battle.gd", "_resolve_special", "var bb_pct := 25"],
-	["card:Savage Sweep:desc", "the THREE", "scripts/battle.gd", "_resolve_special", "while ss_marks.size() < 3"],
-	["card:Savage Sweep:desc", "3 Loyalty", "scripts/battle.gd", "_resolve_special", "var ss_gain := 5 if is_perfect else 3"],
-	["card:Savage Sweep:perfect", "5 Loyalty", "scripts/battle.gd", "_resolve_special", "var ss_gain := 5 if is_perfect else 3"],
-	["card:Ghostpack:desc", "for 4 turns", "scripts/battle.gd", "_resolve_special", "var gp_turns := 4"],
-	["card:Last Howl:desc", "+3% strike", "scripts/battle.gd", "_resolve_special", "attacker.last_howl = 3"],
-	["card:Succession:desc", "For 6 turns", "scripts/battle.gd", "_resolve_special", "var sc_turns := 6"],
-	["card:Unleash:desc", "20% of", "scripts/battle.gd", "_resolve_special", "var ul_pct := 0.25 if is_perfect else 0.20"],
-	["card:Unleash:perfect", "{atk:25}", "scripts/battle.gd", "_resolve_special", "var ul_pct := 0.25 if is_perfect else 0.20"],
-	["card:Bring It Down:desc", "for 4 turns", "scripts/battle.gd", "_resolve_special", "var bid_turns := 4"],
 	["card:Aimed Shot:perfect", "+20 Focus", "scripts/battle.gd", "_apply_perfect_bonus", "_gain_focus(attacker, 20)"],
 	["card:Hold Breath:desc", "next attack", "scripts/battle.gd", "_resolve_special", "attacker.second_nature if attacker.second_nature > 0 else 1"],
 	["card:Hold Breath:desc", "+40 Focus", "scripts/battle.gd", "_resolve_special", "_gain_focus(attacker, 40)"],
@@ -1221,43 +1003,19 @@ const PINS := [
 	["card:Called Shot:desc", "3 turns", "scripts/battle.gd", "_resolve", "_apply_status(target, \"exposed\", 3, 0, 0, attacker)"],
 	["card:Called Shot:desc", "2 turns", "scripts/battle.gd", "_resolve", "_apply_status(target, \"sunder\", 2, 0, 0, attacker)"],
 	["card:Called Shot:desc", "30 BD", "scripts/battle.gd", "_resolve", "target.take_hit(0, 30)"],
-	["card:Quarry's Mark:desc", "DOUBLED", "scripts/battle.gd", "_sharpshooter_focus", "gain *= 2"],
 	["card:Quarry's Mark:desc", "20 Focus", "scripts/battle.gd", "_resolve_special", "_gain_focus(attacker, 20)"],
-	["card:Crossfire:desc", "2 other", "scripts/battle.gd", "_crossfire_splash", "while picks.size() < 2"],
-	["card:Crossfire:desc", "for 3 turns", "scripts/battle.gd", "_resolve", "var cf_turns := 4 if is_perfect else 3"],
-	["card:Crossfire:perfect", "4th turn", "scripts/battle.gd", "_resolve", "var cf_turns := 4 if is_perfect else 3"],
-	["card:Calibrating Shot:desc", "10% of", "scripts/battle.gd", "_resolve", "var cs_pct := 0.15 if is_perfect else 0.10"],
-	["card:Calibrating Shot:perfect", "15% of", "scripts/battle.gd", "_resolve", "var cs_pct := 0.15 if is_perfect else 0.10"],
 	["card:Reacquire:desc", "25 Focus", "scripts/battle.gd", "_resolve_special", "_gain_focus(attacker, 25)"],
-	["card:Fault Line:desc", "For 6 turns", "scripts/battle.gd", "_resolve_special", "var fl_turns := 6"],
-	["card:Dug In:desc", "for 4 turns", "scripts/battle.gd", "_resolve_special", "var di_turns := 4"],
-	["card:Heads Down:desc", "for 3 turns", "scripts/battle.gd", "_resolve", "var hd_turns := 4 if is_perfect else 3"],
-	["card:Heads Down:perfect", "4th turn", "scripts/battle.gd", "_resolve", "var hd_turns := 4 if is_perfect else 3"],
 	["card:Tripwire:desc", "for 6 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(attacker, \"tripwire\", 6)"],
 	["card:Shrapnel Charge:desc", "for 3 turns", "scripts/battle.gd", "_resolve", "var sv_turns := 4 if is_perfect else 3"],
 	["card:Explosive Shot:perfect", "{atk:12}", "scripts/battle.gd", "_resolve", "raw = 0.12 * attacker.attack"],
 	["card:Venom Coating:desc", "for 4 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(attacker, \"venom_coat\", 4)"],
 	["card:Hamstring:desc", "for\\n3 turns", "scripts/battle.gd", "_resolve", "var sv_turns := 4 if is_perfect else 3"],
-	["card:Deadfall:desc", "Stunned 1 turn", "scripts/battle.gd", "_spring_trap", "_apply_status(victim, \"stunned\", 1,"],
 	["card:Harvest:desc", "12% of", "scripts/battle.gd", "_resolve_special", "var hv_pct := 0.12 + HARVEST_ALLY_BONUS"],
 	["card:Harvest:perfect", "150%", "scripts/battle.gd", "_resolve_special", "(1.5 if is_perfect else 1.0)"],
 	["card:Choking Smoke:desc", "Burning 2 turns", "scripts/battle.gd", "_resolve_special", "var cs_burn := 2"],
-	["card:Choking Smoke:desc", "for 3 turns", "scripts/battle.gd", "_resolve_special", "var cs_turns := 3"],
-	["card:Choking Smoke:desc", "50% more", "scripts/battle.gd", "_miss_chance", "(0.50 if attacker.has_status(\"blind\")"],
-	["card:Snare Line:desc", "two turns", "scripts/battle.gd", "_resolve_special", "var sl_turns := 2"],
-	["card:Loaded Shot:perfect", "2 turns", "scripts/battle.gd", "_resolve", "_apply_poison(attacker, ls_t, 2)"],
-	["card:Preparation:desc", "15 Mana", "scripts/battle.gd", "_resolve_special", "var pr_mana := 15"],
-	["card:Stalking Horse:desc", "for 4 turns", "scripts/battle.gd", "_resolve_special", "var sh_turns := 4"],
-	["card:Downwind:desc", "For 4 turns", "scripts/battle.gd", "_resolve_special", "var dw_turns := 4"],
-	["card:Cull:desc", "10% of", "scripts/battle.gd", "_resolve_special", "var cu_pct := 0.12 if is_perfect else 0.10"],
-	["card:Cull:perfect", "{atk:12}", "scripts/battle.gd", "_resolve_special", "var cu_pct := 0.12 if is_perfect else 0.10"],
-	["card:Thick Hide:desc", "for 4\\nturns", "scripts/battle.gd", "_resolve_special", "var th2_turns := 4"],
-	["card:Salve:desc", "for\\n3 turns", "scripts/battle.gd", "_resolve_special", "var sv_turns := 4 if is_perfect else 3"],
-	["card:Salve:perfect", "4th turn", "scripts/battle.gd", "_resolve_special", "var sv_turns := 4 if is_perfect else 3"],
 	["glossary:initiative:long", "a quarter at one stack", "scripts/unit.gd", "effective_speed", "maxf(0.75 - frigid_bonus"],
 	["glossary:initiative:long", "Slowed cuts speed a quarter", "scripts/unit.gd", "effective_speed", "(0.75 if has_status(\"slow\") else 1.0)"],
 	["glossary:initiative:long", "a half at two or more", "scripts/unit.gd", "effective_speed", "maxf(0.5 - frigid_bonus * chill"],
-	["glossary:extra_turn:long", "after your NEXT turn", "scripts/battle.gd", "_resolve_special", "attacker.prep_pending = 2"],
 	["glossary:pressure_break:long", "crits deal 1.5x BD", "scripts/battle.gd", "_resolve", "ab.pressure * pr_mult * (1.5 if is_crit else 1.0)"],
 	["glossary:pressure_break:long", "dropping 30% of its armor", "scripts/unit.gd", "effective_armor", "a *= 0.7"],
 	["glossary:pressure_break:long", "+25% crit chance against it", "scripts/battle.gd", "_resolve", "(0.25 if strike_target.broken else 0.0)"],
@@ -1265,9 +1023,7 @@ const PINS := [
 	["glossary:crit:short", "1.5x damage", "scripts/battle.gd", "_resolve", "var crit_mult := 1.5"],
 	["glossary:crit:long", "bond shares +10%", "scripts/battle.gd", "_party_crit_bonus", "0.10 * _bond_mult(h, \"aguila\")"],
 	["glossary:crit:long", "a flat +1% each", "scripts/battle.gd", "_resolve", "(0.01 + 0.01 * attacker.arcane_mastery_ranks)"],
-	["glossary:hits_not_casts:long", "banks six charges", "scripts/battle.gd", "_resolve_special", "var aa_n: int = maxi(6,"],
 	["glossary:miss:long", "Dazed adds +20%", "scripts/battle.gd", "_miss_chance", "(0.20 if attacker.has_status(\"dazed\")"],
-	["glossary:miss:long", "Blind adds +50%", "scripts/battle.gd", "_miss_chance", "(0.50 if attacker.has_status(\"blind\")"],
 	["glossary:miss:long", "Elusive target adds +25%", "scripts/battle.gd", "_miss_chance", "chance += 0.25"],
 	["glossary:parry:short", "at a quarter strength", "scripts/battle.gd", "_resolve", "raw *= 0.0 if wall_parry else 0.25"],
 	["glossary:parry:long", "and 25% Break damage", "scripts/battle.gd", "_resolve", "int(round(pr * 0.25))"],
@@ -1275,7 +1031,6 @@ const PINS := [
 	["glossary:stance:long", "+10% damage taken", "scripts/battle.gd", "_resolve", "raw *= 1.0 + 0.10 * (2.0 if strike_target.rune_naked_blade"],
 	["glossary:stance:long", "-10% damage dealt", "scripts/battle.gd", "_resolve", "raw *= 1.0 - 0.10 * (2.0 if attacker.rune_naked_blade"],
 	["glossary:stance:long", "15% less damage taken", "scripts/battle.gd", "_resolve", "var sf_def := 0.15 *"],
-	["glossary:stance_gated:long", "for 3 turns his abilities", "scripts/battle.gd", "_resolve_special", "var fg_turns := 3"],
 	["glossary:fallen:long", "at full health when Empowered", "scripts/battle.gd", "_resolve_special", "rez_frac = 1.0"],
 	["glossary:fallen:long", "at least 20% of their max HP", "scripts/unit.gd", "sync_victory_state", "int(save_max * 0.2)"],
 	["glossary:fallen:long", "back at 50% HP", "scripts/battle.gd", "_use_item", "target.revive(0.5)"],
@@ -1288,11 +1043,8 @@ const PINS := [
 	["glossary:status_broken:long", "armor drops by 30%", "scripts/unit.gd", "effective_armor", "a *= 0.7"],
 	["glossary:status_slow:short", "-25% speed", "scripts/unit.gd", "effective_speed", "(0.75 if has_status(\"slow\") else 1.0)"],
 	["glossary:status_slow:long", "cuts speed by 25%", "scripts/unit.gd", "effective_speed", "(0.75 if has_status(\"slow\") else 1.0)"],
-	["glossary:status_chilled:short", "4 stacks freeze solid", "scripts/battle.gd", "_apply_status", "status_stacks(\"chilled\") >= 4 and not target.has_status(\"frozen\")"],
 	["glossary:status_chilled:short", "slower at one stack", "scripts/unit.gd", "effective_speed", "if chill == 1:"],
 	["glossary:status_chilled:short", "slower again at two", "scripts/unit.gd", "effective_speed", "elif chill >= 2:"],
-	["glossary:status_chilled:long", "Chill stacks up to 4", "scripts/unit.gd", "add_status", "s.stacks = mini(int(s.stacks), 4)"],
-	["glossary:status_chilled:long", "the fourth FREEZES", "scripts/battle.gd", "_apply_status", "status_stacks(\"chilled\") >= 4 and not target.has_status(\"frozen\")"],
 	["glossary:status_chilled:long", "one stack is -25% speed", "scripts/unit.gd", "effective_speed", "maxf(0.75 - frigid_bonus"],
 	["glossary:status_chilled:long", "two is -50%", "scripts/unit.gd", "effective_speed", "maxf(0.5 - frigid_bonus * chill"],
 	["glossary:status_chilled:long", "three also cuts", "scripts/battle.gd", "_resolve", "if atk_chill >= 3:"],
@@ -1307,8 +1059,6 @@ const PINS := [
 	["glossary:status_hexed:long", "it never fades", "scripts/battle.gd", "_use_item", "_apply_status(vs_e, \"hexed\", -1)"],
 	["glossary:status_dazed:short", "20% more likely to miss", "scripts/battle.gd", "_miss_chance", "(0.20 if attacker.has_status(\"dazed\")"],
 	["glossary:status_dazed:long", "miss an extra 20%", "scripts/battle.gd", "_miss_chance", "(0.20 if attacker.has_status(\"dazed\")"],
-	["glossary:status_blind:short", "50% more likely to miss", "scripts/battle.gd", "_miss_chance", "(0.50 if attacker.has_status(\"blind\")"],
-	["glossary:status_blind:long", "miss an extra 50%", "scripts/battle.gd", "_miss_chance", "(0.50 if attacker.has_status(\"blind\")"],
 	["glossary:status_psychosis:short", "50% each turn", "scripts/battle.gd", "_enemy_turn", "if randf() < 0.5:"],
 	["glossary:status_psychosis:long", "there is a 50% chance", "scripts/battle.gd", "_enemy_turn", "if randf() < 0.5:"],
 	["glossary:status_ruin:short", "it does not wear off", "scripts/battle.gd", "_gain_ruin", "_apply_status(target, \"ruin\", -1, 0, 0, occ)"],
@@ -1321,7 +1071,6 @@ const PINS := [
 	["glossary:status_hysteria:long", "DOUBLE Break damage", "scripts/battle.gd", "_enemy_turn", "\"pressure\": hys_basic.pressure * 2"],
 	["glossary:status_umbral_sigil:short", "half of most strikes", "scripts/battle.gd", "_umbral_sigil_echo", "landed * 0.5"],
 	["glossary:status_umbral_sigil:long", "half the damage", "scripts/battle.gd", "_umbral_sigil_echo", "landed * 0.5"],
-	["glossary:status_snared:long", "Stunned for a turn", "scripts/battle.gd", "_spring_trap", "_apply_status(victim, \"stunned\", 1"],
 	["glossary:status_quickdraw:short", "act 50% faster", "scripts/unit.gd", "effective_speed", "s *= 1.5"],
 	["glossary:status_quickdraw:long", "for several turns", "scripts/battle.gd", "_resolve_special", "_apply_status(attacker, \"quickdraw\", 6)"],
 	["glossary:status_quickdraw:long", "bearer by 50%", "scripts/unit.gd", "effective_speed", "s *= 1.5"],
@@ -1333,7 +1082,6 @@ const PINS := [
 	["glossary:res_mana:long", "+12 at each turn start", "scripts/battle.gd", "_mana_regen", "var regen := 12 + u.mana_regen_bonus"],
 	["glossary:res_mana:long", "Evocation nearly doubles that", "scripts/battle.gd", "_spawn_units", "cfg[\"mana_regen_bonus\"] = 10"],
 	["glossary:res_resonance:short", "no practical cap", "scripts/battle.gd", "_spawn_units", "cfg[\"second_max\"] = 99"],
-	["glossary:res_resonance:long", "1 per cast", "scripts/battle.gd", "_resolve", "singularity_crit_build) if any_crit else 1"],
 	["glossary:res_resonance:long", "2 on a crit", "scripts/battle.gd", "_resolve", "var res_gain := (2 + attacker.rune_overflow"],
 	["glossary:res_resonance:long", "everything above 2", "scripts/battle.gd", "_resolve_special", "var st_floor := 2 + attacker.still_mind_ranks"],
 	["glossary:res_resonance:long", "a flat +1% crit chance per stack", "scripts/battle.gd", "_resolve", "(0.01 + 0.01 * attacker.arcane_mastery_ranks)"],
@@ -1344,7 +1092,6 @@ const PINS := [
 	["glossary:res_empower:short", "Spend a Mercy stack", "scripts/battle.gd", "_consume_empower", "attacker.second_resource -= 1"],
 	["glossary:res_empower:long", "at FULL health", "scripts/battle.gd", "_resolve_special", "rez_frac = 1.0"],
 	["glossary:res_empower:long", "spending 1 Mercy", "scripts/battle.gd", "_consume_empower", "attacker.second_resource -= 1"],
-	["glossary:res_faith:long", "a heal of 15%+ max HP", "scripts/battle.gd", "_gain_faith", "u.max_hp * (0.15 + 0.01 * (devout.faithful_step"],
 	["glossary:res_focus:long", "banks up to 50", "scripts/battle.gd", "_sharpshooter_focus", "attacker.second_resource = mini(attacker.second_resource, 50)"],
 	["glossary:res_focus:long", "builds +20 Focus", "scripts/battle.gd", "_sharpshooter_focus", "var gain := 20 + attacker.muscle_memory_ranks"],
 	["glossary:pack_bond:long", "ONE COMPANION AT A TIME", "scripts/battle.gd", "_beast_cap", "the_pack > 0 else 1"],
@@ -1382,16 +1129,11 @@ const PINS := [
 	["glossary:end_boss:long", "a talent point apiece", "scripts/profile.gd", "award_zone_boss_points", "int(purse.get(cls, 0)) + 1"],
 	["glossary:pouch_slots:long", "for the whole fight", "scripts/battle.gd", "_use_item", "_apply_status(vs_e, \"hexed\", -1)"],
 	["glossary:ability_draft:short", "offered three at a time", "scripts/run_state.gd", "roll_draft_offer", "return left.slice(0, 3)"],
-	["glossary:lent_health:long", "a tenth of his maximum", "scripts/battle.gd", "_resolve_special", "fs_step := maxi(int(round(attacker.max_hp * 0.10"],
-	["glossary:lent_health:long", "by 30% of his (40% on a perfect cast)", "scripts/battle.gd", "_resolve_special", "var fs_steps := 4 if is_perfect else 3"],
-	["glossary:frenzy_floor:short", "keeps HALF", "scripts/unit.gd", "frenzy_bonus", "[0.5, 0.85, 1.0]"],
-	["glossary:frenzy_floor:long", "FULL bonus for a few turns", "scripts/battle.gd", "_resolve_special", "var un_turns := 4"],
 	["glossary:frenzy_floor:long", "+2% damage for every", "scripts/unit.gd", "frenzy_bonus", "(2.0 + bloodrage_step_bonus"],
 	["glossary:frenzy_floor:long", "every 5% of maximum health", "scripts/unit.gd", "frenzy_bonus", "* 100.0 / 5.0)"],
 	["glossary:plating_climb:long", "a flat 15% Block chance", "scripts/battle.gd", "_plating_slice", "(0.15 + u.plating_bonus)"],
 	["glossary:plating_climb:long", "another 8% every time", "scripts/battle.gd", "_resolve", "var wd_climb := 0.08"],
 	["glossary:recast_refused:long", "better than a third", "scripts/battle.gd", "_resolve_special", "var ds_pct := 0.35 + 0.01 * attacker.stalwart_step"],
-	["glossary:recast_refused:long", "Nexus Ward a fifth", "scripts/battle.gd", "_resolve_special", "var mb_pct := 0.20"],
 	["lit:data/enemies.json", "for 25% of their max HP", "scripts/battle.gd", "_resolve_special", "var wave_heal := maxi(int(round(target.max_hp * 0.25)), 1)"],
 	["lit:data/enemies.json", "heals 25% of max health", "scripts/battle.gd", "_resolve_special", "var wave_heal := maxi(int(round(target.max_hp * 0.25)), 1)"],
 	# BATCH IK §5 — the two wards name the strike; the figure and its code are unmoved.

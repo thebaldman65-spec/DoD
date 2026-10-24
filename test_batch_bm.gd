@@ -42,6 +42,8 @@
 # rule with no reachable gate can be checked at all.
 extends SceneTree
 
+const Gate = preload("res://gate_fixture.gd")   # IT §3b: the one window helper (`block`, `within`)
+
 const SCRATCH := "user://test_bm_profile.json"
 # What `Profile.save_path` is put back to on the way out — its own default.
 const REAL_PROFILE := "user://profile.json"
@@ -701,9 +703,13 @@ func _award_sites_deleted() -> void:
 	# THE HANDOFF: the awakening EQUIPS rather than pays, from BOTH paths.
 	# BATCH GK — BOTH PATHS REACH IT THROUGH `Run.awaken`, the one door class
 	# selection and the sim share; the awakening is what equips.
+	# BATCH IT §3b — RE-POINTED: 700 characters ran 251 past `awaken` into the next declaration's comment; the slice is the
+	# function's own block now, and it says so.
 	var aw := rs.find("func awaken(")
+	var aw_body := Gate.block(rs, aw)
+	_check(Gate.within(rs, aw, aw_body), "the awakening's slice ends inside `awaken`")
 	_check(sc.contains("Run.awaken(idx, rune_id)") and aw >= 0
-			and rs.substr(aw, 700).contains("equip_spec_talents(idx)"),
+			and aw_body.contains("equip_spec_talents(idx)"),
 		"the class-selection screen awakens, and the awakening equips")
 	_check(sim.contains("run.awaken(i, "), "and so does the harness")
 	_check(rs.contains("func equip_spec_talents(idx: int) -> void:"),
@@ -802,7 +808,11 @@ func _negative_controls() -> void:
 	# true for every needle — a check that has stopped asking its question with
 	# nothing to announce it (the `test_batch_bg` shape, EC §2).
 	_check(i >= 0, "NEGATIVE 4: the party-member anchor resolves, so the slice is real")
-	var member_line := rs.substr(i, 300)
+	# BATCH IT §3b — RE-POINTED: 300 characters ran 134 past the member's dict into `new_run`'s next comment, so the absence
+	# was asked of that prose too. The slice is the member's own statement block, and it says so.
+	var member_line := Gate.block(rs, i)
+	_check(Gate.within(rs, i, member_line) and member_line.contains("\"key\": key"),
+		"NEGATIVE 4: the member slice is the party member's own literal, whole and alone")
 	_check(not member_line.contains("talent_points")
 		and not member_line.contains("talent_flex"),
 		"NEGATIVE 4: a party member carries no talent purse to award into")
@@ -827,8 +837,12 @@ func _negative_controls() -> void:
 	_check(tsx.contains("func _locked() -> bool:") and tsx.contains("return Run.active"),
 		"NEGATIVE 5: the build screen locks while a run is in flight")
 	for guard in ["func _on_node(id: String) -> void:", "func _on_respec() -> void:"]:
+		# BATCH IT §3b — RE-POINTED: 120 characters ran 27 past `_on_respec` into the next section's banner; each guard is
+		# read in its own function's block now.
 		var gi := tsx.find(guard)
-		_check(tsx.substr(gi, 120).contains("if _locked():"),
+		var g_body := Gate.block(tsx, gi)
+		_check(Gate.within(tsx, gi, g_body), "NEGATIVE 5: the %s slice ends inside the function" % guard)
+		_check(g_body.contains("if _locked():"),
 			"NEGATIVE 5: %s checks the lock first" % guard)
 	var ps := _src("res://scripts/party_screen.gd")
 	_check(not ps.contains("func _learn_talent"),

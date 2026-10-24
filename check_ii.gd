@@ -355,7 +355,11 @@ func _s03_one_kind_of_face() -> void:
 		if f.ends_with(".gd") and Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/" + f)).contains("Berserker_Portrait"):
 			drawn_by.append(f)
 	var src_cl := Gate.strip_comments(FileAccess.get_file_as_string("res://scripts/classes.gd"))
-	var icon_body := src_cl.substr(src_cl.find("static func class_icon("), 400)
+	# BATCH IT §3b — RE-POINTED: a fixed 400 characters from the head ran past `class_icon`'s own body into the
+	# functions below it; the window is the function's block now, cut where its indentation returns.
+	var icon_body := Gate.block(src_cl, src_cl.find("static func class_icon("))
+	ok(icon_body.begins_with("static func class_icon(") and icon_body.contains("return"),
+		"§0.3: `class_icon`'s body is not found — the window has no subject")
 	ok(drawn_by == ["classes.gd"] and not icon_body.contains("SPEC_PORTRAITS"),
 		"§0.3: the bust is named by %s, or `class_icon` still reads it — it is kept, and drawn nowhere" % [drawn_by])
 	print("    %d card faces; the bust kept at %s and named only by %s" % [cards, bust.get_file(), drawn_by])

@@ -62,6 +62,7 @@ extends SceneTree
 # 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
 # This suite keeps its own SIGNATURE and delegates, so not one call site moved.
 const Fixture = preload("res://suite_fixture.gd")
+const Gate = preload("res://gate_fixture.gd")   # IT §3b: the one window helper (`subject`, `ends_inside`)
 
 
 var checks := 0
@@ -415,7 +416,7 @@ func _additive_units() -> void:
 		"0.01 * attacker.exposed_nerve": "Exposed Nerve",
 		"0.01 * attacker.tunnel_vision": "Tunnel Vision",
 		"0.01 * attacker.rapid_fire": "Rapid Fire",
-		"2.0 + attacker.opp_aim_step": "Opportunist's Aim",
+		"POWERSHOT_PCT_PER_POINT + attacker.opp_aim_step": "Opportunist's Aim",   # BATCH IT §2 — RE-POINTED: the literal this read is a named constant now; the needle names it.
 		"20 + attacker.muscle_memory_ranks": "Muscle Memory",
 		"_gain_focus(attacker, attacker.perfect_form + attacker.rune_perfect_form)":
 			"Perfect Form",
@@ -708,10 +709,18 @@ func _bot_policy_source() -> void:
 		"BOT: the old 80-Focus threshold is gone")
 	# The mark must be chosen BEFORE any pick that points at an enemy, or a
 	# class-pool ability quietly switches him off the meter he is made of.
-	var hunter_at := src.find("\t\t\"hunter\":")
-	var mark_at := src.find("target_foe = _focus_mark(u, target_foe)", hunter_at)
-	var first_pick := src.find("var snare := _find_ability(u, \"Snare Trap\")", hunter_at)
-	ok(hunter_at > 0 and mark_at > hunter_at and mark_at < first_pick,
+	# BATCH IT §3b — RE-POINTED: the first `"hunter":` in battle.gd is `_bot_class_kit_pick`'s, not the rotation's, so this
+	# order was asked from the wrong branch's key (the later finds landed right only by being unique). The branch is taken
+	# inside `_autoplay_pick_kit`, cut at its own end, and the pick names what it picked before the order is read in it.
+	var kit_at := src.find("func _autoplay_pick_kit(")
+	var hunter_at := src.find("\t\t\"hunter\":", kit_at) if kit_at >= 0 else -1
+	var branch := Gate.subject(src, hunter_at, "\n\t\t\"")
+	ok(kit_at >= 0 and hunter_at > kit_at and Gate.ends_inside(branch, "\n\t\t\"")
+		and branch.contains("target_foe = _focus_mark(u, target_foe)"),
+		"BOT: the branch read is not the rotation's hunter branch in `_autoplay_pick_kit`, whole and alone (at %d)" % hunter_at)
+	var mark_at := branch.find("target_foe = _focus_mark(u, target_foe)")
+	var first_pick := branch.find("var snare := _find_ability(u, \"Snare Trap\")")
+	ok(mark_at > 0 and mark_at < first_pick,
 		"BOT: the mark is decided before any enemy-pointed pick in the branch")
 
 

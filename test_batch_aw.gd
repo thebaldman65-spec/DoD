@@ -447,8 +447,14 @@ func _dissolved_pair() -> void:
 	# It is left standing rather than deleted because DG's sanctioned fall is
 	# the six REDS and nothing else, and it is recorded as owed in
 	# docs/state.md with its two siblings in `as` and `at`.
-	var live_list := claude.substr(claude.find("no rune may write"), 120)
-	ok(not live_list.contains("stalwart/bastion"),
+	# BATCH IT §3b — REPAIRED TO INTENT: the 120-character window was a fixed read from an anchor `find` cannot locate, so
+	# it was the empty string and the negative was true of nothing (IT §3a's census: a MISS). Its subject — the LIVE list of
+	# exclusive pairs — went with CW §1, so the window has nothing to stand on; what the question still asks is whether the
+	# pair is named as live anywhere in the rules, and that is a whole-file read with no position to miss. The anchor's
+	# absence is asserted as the reason, so the day a list comes back this says so.
+	ok(claude.find("no rune may write") < 0,
+		"the LIVE exclusive-pair list this read is back in CLAUDE.md — read the pair inside it again")
+	ok(not claude.contains("stalwart/bastion"),
 		"...and it is out of the LIVE half of that list")
 
 

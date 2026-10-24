@@ -38,6 +38,7 @@ extends SceneTree
 # 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
 # This suite keeps its own SIGNATURE and delegates, so not one call site moved.
 const Fixture = preload("res://suite_fixture.gd")
+const Gate = preload("res://gate_fixture.gd")   # IT §3b: the one window helper (`block`, `within`, `comment_above`)
 
 
 # §1's design numbers, in one place — battle.gd's two constants and the three
@@ -300,7 +301,11 @@ func _the_field_exists_and_has_one_ratchet() -> void:
 			% bsrc.count("_reset_faith_meters()"))
 	# It must reset the two TOGETHER — a reset that cleared one is the drift.
 	var i := bsrc.find("func _reset_faith_meters()")
-	var body := bsrc.substr(i, 300)
+	# BATCH IT §3b — RE-POINTED: every fixed slice in this suite ran past its subject (this one 174 past the function, the
+	# status entry's 400 into `cons_ground`, the passive's 700 into the Occultist, `_faith_gained`'s 700 into the next
+	# comment). Each is its subject's own block now (`Gate.block`), and each says so.
+	var body := Gate.block(bsrc, i)
+	ok(Gate.within(bsrc, i, body), "§1: the reset's slice ends inside `_reset_faith_meters`")
 	ok(body.contains("h.faith_stacks = 0") and body.contains("h.faith_peak = 0"),
 		"§1: ...and it zeroes the count and the peak together")
 	# The reset runs BEFORE the opening oath, which GRANTS Faith.
@@ -363,13 +368,17 @@ func _the_two_texts_state_the_peak_rule() -> void:
 	var bsrc := _src("res://scripts/battle.gd")
 	var i := bsrc.find("\"faith\": [\"Faith\"")
 	ok(i > 0, "§1: the Faith status default is findable")
-	ok(bsrc.substr(i, 400).contains("HIGHEST count held this battle"),
+	var chip := Gate.block(bsrc, i)
+	ok(Gate.within(bsrc, i, chip), "§1: the Faith status slice ends inside its own entry")
+	ok(chip.contains("HIGHEST count held this battle"),
 		"§1: the status default states the peak rule")
 	var csrc := _src("res://scripts/classes.gd")
 	var j := csrc.find("\"passive_desc\": \"Conviction:")
 	# BATCH CQ §3 — FLATTENED BEFORE THE READ (see bg): CL re-wrapped the block
 	# and the break now falls inside the phrase. The sentence is unchanged.
-	ok(j > 0 and csrc.substr(j, 700).replace("\\n", " ").contains("HIGHEST COUNT HELD THIS BATTLE"),
+	var passive := Gate.block(csrc, j)
+	ok(Gate.within(csrc, j, passive) and passive.ends_with("\","), "§1: the passive slice is the Devout's `passive_desc` string, whole and alone")
+	ok(j > 0 and passive.replace("\\n", " ").contains("HIGHEST COUNT HELD THIS BATTLE"),
 		"§1: ...and so does Conviction's passive block")
 	# Since IJ §2 the rate is a token (`Battle.FAITH_PER_ABSORB`), so it is read where the rule is shown.
 	ok(Classes.engine_desc("conviction").contains("2 a hit"),
@@ -417,7 +426,8 @@ func _every_gain_names_its_source() -> void:
 	# The total and the term are written by ONE call, so they cannot disagree.
 	var i := src.find("func _faith_gained(")
 	ok(i > 0, "§2: Faith is booked through one door")
-	var body := src.substr(i, 700)
+	var body := Gate.block(src, i)
+	ok(Gate.within(src, i, body), "§2: the booking slice ends inside `_faith_gained`")
 	ok(body.contains("_stat(\"faith_gained_total\"") \
 			and body.contains("_stat(\"faith_gained_\" + source"),
 		"§2: ...which writes the total and the named term together")

@@ -2214,3 +2214,49 @@ NOT a wrapping problem.
   invalidated by a re-selection, **which is the only failure this rule exists to catch**, so a filler is listed and not
   repaired: IO's census lists 321 (the WEAK rows of IO's census file, docs/reports/IO-census.tsv). **The test is asked of
   every pick a census finds, so the next census does not re-ask whether a filler is a site.**
+
+## STANDING RULE — A WINDOW ASSERTS IT ENDS INSIDE ITS OWN SUBJECT, AND A POSITIONAL PICK ASSERTS IT PICKED WHAT ITS PREDICATE NAMES (Batch IT §3b, ruled by the designer)
+> **A WINDOW ASSERTS IT ENDS INSIDE ITS OWN SUBJECT. A POSITIONAL PICK ASSERTS THAT WHAT IT PICKED IS WHAT ITS PREDICATE
+> NAMES.** A read that takes a fixed length from an anchor is a positional read of its END, so the two are one shape: a read
+> that selects its subject by where it sits rather than by what it is. **Each passes while the code it was written against
+> holds still, and stops asking anything once that code moves** — IS found five that had already stopped.
+
+- **FIVE OF AN UNBOUNDED FAMILY IS NOT A REPAIR, SO THE FAMILY WAS CENSUSED FIRST (IT §3a).** Every positional and fixed-length
+  read in the battery's targets and the two fixtures, one row a read — its anchor, how it selects, what its assertion is about,
+  ASKS-ITS-QUESTION or MISSES, and the tree it read — kept as the census of record (docs/reports/IT-positional-census.tsv):
+  **489 reads, 78 MISSES — 53 fixed windows and 25 positional picks.** Dozens, so the brief's stop held: every window and IS's
+  five picks were repaired (58), and the other 20 picks are reported as a population in the census, each row naming where it
+  lands.
+- **THE SUBJECT IS CUT BY ITS OWN END, NEVER BY A COUNT.** `gate_fixture.gd` holds the helpers: `block` (a statement's
+  indentation block, cut where its indentation returns), `subject` (an anchor to the next named end), `ends_inside`, and
+  `comment_above` with `is_comment` for the comment lines directly above a line. **A repaired read asserts its subject was
+  found**, so an empty window reds rather than reading as an absence.
+- **THE VERIFICATION IS NOT THE NEW INDEX.** A re-pointed pick is proved by breaking the thing it is about and watching it red —
+  what none of IS's five could do — one control a piece, armed on the subject the predicate chose (IM's C10).
+- **A NEW READ OF THIS SHAPE IS CUT BY ITS SUBJECT IN THE BATCH THAT WRITES IT.** A `substr(at, N)`, a first match whose
+  assertion never says what it matched, or a read past an anchor with no end of its own is this family's next member.
+
+## STANDING RULE — AN ALARM's BAR IS SET BY THE THING IT IS ALARMING ABOUT, AND STRUCTURE IS FENCED (Batch IT §4, ruled by the designer)
+> **AN ALARM's BAR IS SET BY THE THING IT IS ALARMING ABOUT. A ONE-TIME STRUCTURAL SECTION IS NOT THAT THING.** `check_fg` §4
+> reads the largest single-batch growth `docs/state.md` records, and IS's index section made IS the record — +36,759 B where
+> ES's +13,700 had stood — so a batch had set the bar its own alarm reads.
+
+- **THE EXCLUSION IS MECHANICAL, OR IT IS AN ESCAPE HATCH.** Bytes between a named pair of fences — an `INDEX:BEGIN` comment
+  naming its batch and section, and its `INDEX:END` — are structure and do not count as a batch's writing. The record stays
+  ES's, and a batch whose net holds a fenced section records the section's bytes beside its net, in the form `check_fg` §4b
+  parses. **`check_fg` §4b asserts the claim is fenced**: the fence it names stands once, closes after it opens and holds a
+  section, the record is below the claimed net, and the net less the fenced bytes is within the record.
+- **A SECTION A GATE CANNOT IDENTIFY IS NOT STRUCTURAL, WHATEVER A BATCH CALLS IT.** The next batch that wants its growth
+  excused fences it, names it and makes it revertible — and a revert of the fenced section returns the record to ES's with
+  nothing else to do.
+
+## STANDING RULE — A LATENT DEFECT THAT NEEDS A WRITER GETS A GATE THAT REDS WHEN THE WRITER APPEARS (Batch IT §7, the designer's)
+> **A LATENT DEFECT THAT NEEDS A WRITER GETS A GATE THAT REDS WHEN THE WRITER APPEARS.** It is better than a FOUND AT line,
+> which waits for a reader: the gate derives the writers of the state the defect needs from the source every battery, and
+> reds the day one is authored, naming the defect it arms.
+
+- **THE WORKED EXAMPLE IS THE CRYOMANCER's SAME-TURN HOLD ROUTE (IS §3b).** A hold laid and paid inside one turn would make
+  Shatter's and Winter's Toll's floor of 1 a defect; nothing writes the route today, so it is armed, not repaired, and
+  `check_is` §3b reds when a writer appears.
+- **A LATENT SHAPE A BATCH FINDS AND DOES NOT REPAIR IS OFFERED THIS FIRST.** Where its writers can be derived, the gate is
+  written in the batch that finds it; a FOUND AT line is for the shape whose writers cannot be.

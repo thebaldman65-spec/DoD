@@ -27,6 +27,7 @@ extends SceneTree
 # 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
 # This suite keeps its own SIGNATURE and delegates, so not one call site moved.
 const Fixture = preload("res://suite_fixture.gd")
+const Gate = preload("res://gate_fixture.gd")   # IT §3b: the one window helper (`block`, `within`, `comment_above`)
 
 # §2's shipped value, and the whole point of the sweep: the rung-1 multiplier
 # was chosen by measuring untalented completion at four values, not by guess.
@@ -124,14 +125,18 @@ func _source_guard() -> void:
 	# freeze refused is frozen by the very next chill. An `== 4` here would
 	# make the guard leave enemies permanently unfreezable, which would be a
 	# worse bug than the crash and a silent one.
-	ok(src.contains("if target.status_stacks(\"chilled\") >= 4 and not target.has_status(\"frozen\"):"),
-		"§1: the flash-freeze threshold reads >= 4 (AT the cap), not == 4 (REACHING it)")
+	# BATCH IT §2 — RE-POINTED: the literal this read is a named constant now; the needle names it.
+	ok(src.contains("if target.status_stacks(\"chilled\") >= BattleUnit.CHILLED_FREEZE_STACKS and not target.has_status(\"frozen\"):"),
+		"§1: the flash-freeze threshold reads >= CHILLED_FREEZE_STACKS (AT the cap), not == (REACHING it)")
 	# Cryoclasm moves a hold and is deliberately not a release. The guard can
 	# only reach it if something in that branch sets the flag.
 	var cc := src.find("\"cryoclasm\":")
 	ok(cc > 0, "§1: the Cryoclasm branch is where it was")
 	if cc > 0:
-		var cc_body := src.substr(cc, 1800)
+		# BATCH IT §3b — RE-POINTED: 1800 characters ran 412 past the Cryoclasm arm into Stabilize's (the Vendetta shape), so
+		# the absence of `_hold_release(` was asked of Stabilize's text too. The slice is the arm's own block, and says so.
+		var cc_body := Gate.block(src, cc)
+		ok(Gate.within(src, cc, cc_body), "§1: the Cryoclasm slice ends inside its own arm — it does not run into Stabilize's")
 		ok(not cc_body.contains("_hold_release("),
 			"§1: Cryoclasm still does NOT route through _hold_release")
 		ok(cc_body.contains("_hold_freeze(target, attacker)"),

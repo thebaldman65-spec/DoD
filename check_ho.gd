@@ -414,7 +414,11 @@ func _s1a_the_scope() -> void:
 	ok(st.contains("Runes.eligible_ids(m, Runes.owned_names(m, held))"),
 		"§1a: the drop no longer asks every hero's `eligible_ids`")
 	# THE COUNTER'S ONE EXCLUSION IS THE CORE RUNES: it names engines, never a scope.
-	var pr := st.substr(st.find("func peddler_rune("), 420)
+	# BATCH IT §3b — RE-POINTED: 420 characters over a 330-character function ran 90 into `peddler_withholds_only_core`,
+	# so the negative was asked of its signature too. The slice is the function's own block, and says so.
+	var pr_at := st.find("func peddler_rune(")
+	var pr := Gate.block(st, pr_at)
+	ok(Gate.within(st, pr_at, pr), "§1a: the Peddler's slice ends inside `peddler_rune`")
 	ok(pr.contains("is_engine_rune") and not pr.contains("is_party"),
 		"§1a: the Peddler's roll excludes something besides core runes")
 
@@ -1083,7 +1087,11 @@ func _s4e_the_sources() -> void:
 		"§4e: Holy Conduit does not add its share to what the config carries")
 	var raw := FileAccess.get_file_as_string("res://scripts/unit.gd")
 	var at := raw.find("mult = maxf(mult, 0.0)")
-	var win := raw.substr(maxi(at - 1400, 0), 1400) if at > 0 else ""
+	# BATCH IT §3b — RE-POINTED: the 1400 characters BEFORE the clamp started 564 inside the code above its comment (the
+	# covenant branch and the Last Hope comment), so the negative below was asked of them too. The read is the clamp's own
+	# comment — the comment lines directly above it — and says so.
+	var win := Gate.comment_above(raw, at) if at > 0 else ""
+	ok(Gate.is_comment(win), "§4e: the read above the heal clamp is its own comment and nothing else (%d chars)" % win.length())
 	# THE POSITIVE ARM FIRST: this is the clamp's own comment.
 	ok(at > 0 and win.contains("Batch AA guard") and win.contains("hero_spawn_defaults"),
 		"§4e: the heal clamp's comment is not where it was, or does not name the defaults the sum now starts from")
@@ -1606,7 +1614,10 @@ func _s8_the_policy() -> void:
 	# a row is heading text, and a pin it satisfies has stopped asking).
 	var ir := FileAccess.get_file_as_string("res://docs/instrument-rules.md")
 	var head := ir.find("## STANDING RULE — A BATCH CLEARS THE PREVIOUS BATCH'S ISOLATED COPIES WHEN IT FINISHES")
-	var block := ir.substr(head, 2400) if head >= 0 else ""
+	# BATCH IT §3b — RE-POINTED: 2400 characters over a 2288-character section ran 112 into the next STANDING RULE heading.
+	# The section is read to its own end — the next `## ` heading — and says so.
+	var block := Gate.subject(ir, head, "\n## ") if head >= 0 else ""
+	ok(Gate.ends_inside(block, "\n## "), "§8: the copies' policy slice ends inside its own section (%d chars)" % block.length())
 	ok(ir.length() > 50000 and head >= 0, "§8: docs/instrument-rules.md does not carry the copies' policy")
 	ok(block.contains("One batch's worth stays for") and block.contains("`config/name`")
 			and block.contains("`../save-backups/` IS NEVER TOUCHED"),

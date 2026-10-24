@@ -639,7 +639,9 @@ func _no_target_list() -> Array:
 	var out: Array = []
 	if at < 0 or open < 0 or close < 0:
 		return out
-	var tail := src.substr(close, 60)
+	# BATCH IT §3b — RE-POINTED: a fixed 60 characters after `]:` ran 42 into the next `elif`; the tail is the branch's own
+	# body now — the rest of the `elif` statement's block, cut where its indentation returns.
+	var tail := Gate.block(src, open).substr(close - open)
 	if not tail.contains("target = u"):
 		return out
 	for m in RegEx.create_from_string("\"([a-z_]+)\"").search_all(src.substr(open, close - open)):

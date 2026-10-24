@@ -195,6 +195,218 @@ static func lineage_cards(spec: String) -> Array:
 	return out
 
 
+# ── BATCH IT §3b — A FIXED WINDOW IS A POSITIONAL READ OF ITS END ───────────
+# A window of a fixed length is right only while its subject is at least that long and nothing follows it inside the
+# length. When the next arm, function or entry moves up, the window reads text its gate never chose, and stays green
+# (IT §3a's census found dozens). **A WINDOW ASSERTS IT ENDS INSIDE ITS OWN SUBJECT.** Its subject ends one of two ways:
+#   · `block(text, at)` — where the INDENTATION returns: from `at` through every line indented deeper than the line `at`
+#     stands on (blank lines kept), up to the first line at that indent or shallower — the end of a match arm, a branch,
+#     a function (whose next top-level line, a `const`, a `var` or the next function's own comment, is not its body),
+#     an entry. `within(text, at, window)` is the assertion: a non-empty window that the block starts with.
+#   · `subject(text, at, end)` — up to the first literal `end` after `at`, or "" when there is none, which the caller
+#     asserts against; `ends_inside(window, end)` is the assertion, true only of a non-empty window holding no `end`
+#     past its first character.
+# A window widened past its subject again fails either assertion. `comment_above(text, at)` is the comment a definition
+# carries: the comment lines directly above the line `at` stands on, read back to the first line that is not one.
+static func indent_of(line: String) -> int:
+	var n := 0
+	while n < line.length() and (line[n] == "\t" or line[n] == " "):
+		n += 1
+	return n
+
+
+static func block(text: String, at: int) -> String:
+	if at < 0 or at >= text.length():
+		return ""
+	var ls := text.rfind("\n", at - 1) + 1 if at > 0 else 0
+	var le := text.find("\n", at)
+	var depth := indent_of(text.substr(ls, (le if le >= 0 else text.length()) - ls))
+	var end := text.length()
+	var p := le
+	while p >= 0 and p < text.length():
+		var nx := text.find("\n", p + 1)
+		var line := text.substr(p + 1, (nx if nx >= 0 else text.length()) - p - 1)
+		if line.strip_edges() != "" and indent_of(line) <= depth:
+			end = p
+			break
+		p = nx
+	return text.substr(at, end - at)
+
+
+static func within(text: String, at: int, window: String) -> bool:
+	return window != "" and block(text, at).begins_with(window)
+
+
+static func subject(text: String, at: int, end: String) -> String:
+	if at < 0 or end == "":
+		return ""
+	var e := text.find(end, at + 1)
+	return text.substr(at, e - at) if e > at else ""
+
+
+static func ends_inside(window: String, end: String) -> bool:
+	return window != "" and window.find(end, 1) < 0
+
+
+static func comment_above(text: String, at: int) -> String:
+	if at <= 0:
+		return ""
+	var top := text.rfind("\n", at - 1)
+	var start := top + 1
+	while top > 0:
+		var prev := text.rfind("\n", top - 1)
+		var line := text.substr(prev + 1, top - prev - 1).strip_edges()
+		if not line.begins_with("#"):
+			break
+		start = prev + 1
+		top = prev
+	return text.substr(start, maxi(text.rfind("\n", at - 1) + 1 - start, 0))
+
+
+# The assertion a comment window carries: non-empty, and every line of it a comment (a backward window widened again
+# reaches the definition above it, whose code lines are not).
+static func is_comment(window: String) -> bool:
+	if window.strip_edges() == "":
+		return false
+	for line in window.split("\n"):
+		var t := String(line).strip_edges()
+		if t != "" and not t.begins_with("#"):
+			return false
+	return true
+
+
+# ── BATCH IT §2 — THE TEXT A SURFACE READS, BY ITS HOLDER ───────────────────
+# `check_ij` §3's reader, moved here unchanged so `check_it` §2 reads a holder the same way: a reader copied between gates
+# inherits its bugs and diverges silently (DA §3). `cache` is the caller's — the comment-stripped sources, the bodies and
+# the corpus by name. A `lit:` holder is `check_ij`'s own stream and reads null here.
+static func holder_text(holder: String, cache: Dictionary) -> Variant:
+	var p := holder.split(":", true, 2)
+	var kind := String(p[0])
+	if kind == "card":
+		if not cache.has("cards"):
+			var by_name := {}
+			for ab in Classes.ability_corpus():
+				by_name[ab.display_name] = ab
+			cache["cards"] = by_name
+		var cards: Dictionary = cache["cards"]
+		if not cards.has(p[1]):
+			return null
+		var ab = cards[p[1]]
+		return String(ab.perfect_text) if p.size() > 2 and p[2] == "perfect" else String(ab.description)
+	if kind == "src":
+		return fn_body(String(p[1]), String(p[2]), cache) if p.size() > 2 else null
+	if kind == "lit":
+		return null
+	var key := String(p[1])
+	match kind:
+		"status":
+			var st: Dictionary = (load("res://scripts/battle.gd") as Script).get_script_constant_map()["STATUS_INFO"]
+			return String(st[key][3]) if st.has(key) else null
+		"rune":
+			return String(Runes.config(key).get("desc", "")) if Runes.config(key).size() > 0 else null
+		"relic":
+			return Relics.desc_of(key) if Relics.POOL.has(key) else null
+		"talent":
+			for node in Talents.TREE:
+				if String(node.get("id", "")) == key:
+					return Talents.desc_for(node, 1)
+			return null
+		"engine":
+			return Classes.engine_desc(key)
+		"passive":
+			return String(Classes.CLASS_PASSIVES[key]["desc"]) if Classes.CLASS_PASSIVES.has(key) else null
+		"glossary":
+			for e in Glossary.entries():
+				if String(e.get("id", "")) == key:
+					return String(e.get(String(p[2]) if p.size() > 2 else "long", ""))
+			return null
+		"upgrade":
+			var up: Dictionary = (load("res://scripts/run_state.gd") as Script).get_script_constant_map()["ABILITY_UPGRADES"]
+			return String(up[key].get("desc", "")) if up.has(key) else null
+		"item", "modifier", "difficulty":
+			var rs: Dictionary = (load("res://scripts/run_state.gd") as Script).get_script_constant_map()
+			var tab: Dictionary = rs[{"item": "ITEM_INFO", "modifier": "MODIFIERS", "difficulty": "DIFFICULTIES"}[kind]]
+			if not tab.has(key):
+				return null
+			return String(tab[key][1]) if kind == "item" else String(tab[key].get("desc", ""))
+	return null
+
+
+# A function's comment-stripped body: from its `func` line to the next top-level declaration.
+static func fn_body(path: String, fn: String, cache: Dictionary) -> String:
+	var key := "body:" + path + "::" + fn
+	if cache.has(key):
+		return cache[key]
+	var skey := "src:" + path
+	if not cache.has(skey):
+		cache[skey] = strip_comments(FileAccess.get_file_as_string("res://" + path))
+	var lines := String(cache[skey]).split("\n")
+	var head := RegEx.new()
+	head.compile("^(static\\s+)?func\\s+" + fn + "\\s*\\(")
+	var top := RegEx.new()
+	top.compile("^((static\\s+)?func\\s+\\w+\\s*\\(|const\\b|var\\b|static var\\b|class_name\\b|extends\\b)")
+	var start := -1
+	for i in lines.size():
+		if head.search(lines[i]) != null:
+			start = i
+			break
+	var out := ""
+	if start >= 0:
+		var end := lines.size()
+		for j in range(start + 1, lines.size()):
+			if top.search(lines[j]) != null:
+				end = j
+				break
+		out = "\n".join(lines.slice(start, end))
+	cache[key] = out
+	return out
+
+
+# A needle counted WHOLE: a figure is not matched inside a longer number.
+static func count_whole(hay: String, needle: String) -> int:
+	if needle == "":
+		return 0
+	var n := 0
+	var at := hay.find(needle)
+	var digits := "0123456789"
+	while at >= 0:
+		var good := true
+		var tail := at + needle.length()
+		if needle[needle.length() - 1] in digits and tail < hay.length():
+			if hay[tail] in digits or (hay[tail] == "." and tail + 1 < hay.length() and hay[tail + 1] in digits):
+				good = false
+		if needle[0] in digits and at > 0:
+			if hay[at - 1] in digits or (hay[at - 1] == "." and at > 1 and hay[at - 2] in digits):
+				good = false
+		if good:
+			n += 1
+		at = hay.find(needle, at + 1)
+	return n
+
+
+# ── BATCH IT — AN INDEX ROW's KEY, AND A DOOR EVALUATED ─────────────────────
+# `check_is` §5's row reader, moved here unchanged so `check_it` §5 reads the same key: the heading a row of
+# `docs/state.md`'s index names, as `- **CORE** `` ### SANCTITY's STEP ``` or `- `` ### FOUND AT HX `` — label …`.
+static func index_entry_key(line: String) -> String:
+	if not line.begins_with("- "):
+		return ""
+	var a := line.find("`` #")
+	if a < 0:
+		return ""
+	var b := line.find(" ``", a + 3)
+	return line.substr(a + 3, b - a - 3).strip_edges() if b > a else ""
+
+
+# A door: a GDScript `Expression` over named inputs (`check_iq` §2f and `check_it` §2 read a figure through one), or
+# null when it does not parse or does not run.
+static func eval_door(expr: String, names: Array, values: Array) -> Variant:
+	var e := Expression.new()
+	if e.parse(expr, PackedStringArray(names)) != OK:
+		return null
+	var v = e.execute(values, null, false)
+	return null if e.has_execute_failed() else v
+
+
 static func strip_comments(src: String) -> String:
 	var out := ""
 	for raw_line in src.split("\n"):

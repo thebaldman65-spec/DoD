@@ -596,7 +596,11 @@ func _s5_the_record() -> void:
 	print("\n§5 — Rupture's watch condition sits on its constant")
 	var raw := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	var at := raw.find("const RUPTURE_BREAK_PER_TICK")
-	var above := raw.substr(maxi(at - 2400, 0), 2400) if at >= 0 else ""
+	# BATCH IT §3b — RE-POINTED: the 2400 characters BEFORE the constant started 974 above its comment, inside the
+	# CONJUNCTIONS table and its header, so "recorded beside it" was read over the table too. The read is the constant's
+	# own comment — the comment lines directly above it — and says so.
+	var above := Gate.comment_above(raw, at) if at >= 0 else ""
+	ok(Gate.is_comment(above), "§5: the read above RUPTURE_BREAK_PER_TICK is its own comment and nothing else (%d chars)" % above.length())
 	ok(at >= 0 and above.contains("WATCH CONDITION, RECORDED BESIDE IT"),
 		"§5: the watch condition is not recorded beside RUPTURE_BREAK_PER_TICK")
 	ok(above.contains("IS NOT A GUIDE"),

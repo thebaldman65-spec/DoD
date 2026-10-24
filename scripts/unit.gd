@@ -13,6 +13,15 @@ const OUTLINE_SHADER := preload("res://shaders/outline.gdshader")
 # from it (stored as a negative resist, so resists and weaknesses stack).
 const WEAKNESS_EXTRA := 0.25
 
+# ---- BATCH IT §2: THE CATALOGUE's FIGURES A UNIT DECIDES, NAMED (battle.gd holds the rest; IT §2) ----
+const UNSLAKED_KEEP := 1.0                    # Unslaked
+const FRENZY_FLOOR_KEEP := 0.5                # Unslaked
+const MERCY_WINDOW_AT := 0.5                  # Vespers
+const VOW_OF_SUFFERING_SHARE := 2             # Vow of Suffering
+const CHILLED_FREEZE_STACKS := 4              # Killing Frost: the chill that freezes, and the pile's ceiling — one figure, a re-tune moves both
+const SECOND_WIND_WINDOW_TURNS := 2           # Second Wind: the turns it reads (the ledger keeps them)
+const REPRISAL_WINDOW_TURNS := 2              # Reprisal: the turns it reads (the ledger keeps them)
+
 # Buff/Debuff keywords: a DEBUFF is any negative status, a BUFF any positive
 # one. This registry backs talents that count debuffs (Dominant Presence,
 # Iron Will — its chip updates live in _refresh_chips) and future dispels.
@@ -937,8 +946,8 @@ var triage_heal := 0          # Triage: +N% healing, and heals may CRIT at all
 var rune_triage_heal := 0     # rune-owned: the Triage Ward +3, the Open Hand +3
 var heavenly_step := 0        # Heavenly Aura: the INCREASE on Mercy's base 5%/stack
 var holy_light_pct := 0       # Holy Light: N% of max Mana back on a perfect cast
-var guardian_step := 0        # Guardian Angel: the INCREASE on the 50% Mercy window
-var mercy_threshold := 0.5    # party-wide stamp (Guardian Angel raises it)
+var guardian_step := 0        # Guardian Angel: the INCREASE on the Mercy window (`MERCY_WINDOW_AT`)
+var mercy_threshold := MERCY_WINDOW_AT    # party-wide stamp (Guardian Angel raises it)
 var divine_presence_pct := 0  # Divine Presence: end-of-turn drip heal, N% of max HP
 var rune_divine_presence_pct := 0 # rune-owned: the Sleepless Vigil +2. An INT whose
                               # name does not end "_ranks", so it is in
@@ -3556,7 +3565,7 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 			# party about.
 			s.stacks = int(s.get("stacks", 1)) + 1
 			if not chill_uncapped:
-				s.stacks = mini(int(s.stacks), 4)
+				s.stacks = mini(int(s.stacks), CHILLED_FREEZE_STACKS)
 			s.turns = turns
 			s.short = "C%d" % s.stacks
 			s.desc = _chilled_desc(int(s.stacks), turns < 0)
@@ -3634,8 +3643,8 @@ static func _chilled_desc(stacks: int, permanent := false) -> String:
 		effect = "-50% speed, -15% damage dealt"
 	var clock := "Permafrost: this chill never thaws" if permanent \
 		else "Each stack resets the 3-turn clock"
-	return "Chilled x%d: %s.\n%s;\nat 4 stacks the victim FREEZES solid." % [
-		stacks, effect, clock]
+	return "Chilled x%d: %s.\n%s;\nat %d stacks the victim FREEZES solid." % [
+		stacks, effect, clock, CHILLED_FREEZE_STACKS]
 
 
 # BATCH FT — SANCTITY's REMOVAL half is here and in `purge_debuffs`, and it
@@ -4393,11 +4402,11 @@ func frenzy_bonus() -> float:
 	var steps: int = int((1.0 - hp / float(max_hp)) * 100.0 / 5.0) \
 		+ frenzy_rage_steps()
 	var current: float = mini(steps, FRENZY_MAX_STEPS) * step
-	# Scar Tissue: the floor keeps 85% of the peak instead of half — or ALL
+	# Scar Tissue: the floor keeps 85% of the peak instead of the base share — or ALL
 	# of it at 2, which is the node plus its cross-row partner Unstoppable
 	# (see the Batch AJ header in talents.gd). At 100% the floor tracks the
 	# peak exactly, so the bonus never falls at all.
-	var keep: float = [0.5, 0.85, 1.0][clampi(scar_tissue_ranks, 0, 2)]
+	var keep: float = [FRENZY_FLOOR_KEEP, 0.85, 1.0][clampi(scar_tissue_ranks, 0, 2)]
 	# BATCH CI — UNSLAKED. The first card in the game to read this passive's
 	# floor at all, and it reads the RATCHET RATE rather than the floor itself:
 	# for its window the floor captures the FULL bonus he reaches instead of
@@ -4405,7 +4414,7 @@ func frenzy_bonus() -> float:
 	# already keeps 100% is never quietly lowered to it — the card can only
 	# ever raise what is kept.
 	if has_status("unslaked"):
-		keep = maxf(keep, 1.0)
+		keep = maxf(keep, UNSLAKED_KEEP)
 	if current * keep > frenzy_floor:
 		frenzy_floor = current * keep
 		if scar_tissue_ranks > 0:
@@ -4594,7 +4603,7 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	# or already dead), and only THAT is subtracted here — a relocation that
 	# never landed must not also vanish from the ally.
 	if amount > 1 and has_status("vow") and vow_cb.is_valid():
-		var share: int = int(vow_cb.call(self, amount / 2))
+		var share: int = int(vow_cb.call(self, amount / VOW_OF_SUFFERING_SHARE))
 		if share > 0:
 			amount -= share
 			float_text("Vow -%d" % share, Color(0.98, 0.85, 0.45))
@@ -4988,7 +4997,7 @@ func _report_taken(amount: int, hp_before: int) -> void:
 	# grow a dictionary nobody reads).
 	dmg_by_turn[battle_turn] = int(dmg_by_turn.get(battle_turn, 0)) + lost
 	for stale in dmg_by_turn.keys():
-		if int(stale) < battle_turn - 1:
+		if int(stale) < battle_turn - (SECOND_WIND_WINDOW_TURNS - 1):
 			dmg_by_turn.erase(stale)
 	# BATCH BR — BATTLE TRANCE's accumulator rides the SAME one door, for the
 	# same reason: a future damage source cannot forget to report to it, and it
@@ -5012,7 +5021,7 @@ func _report_taken(amount: int, hp_before: int) -> void:
 func damage_taken_recent() -> int:
 	var total := 0
 	for key in dmg_by_turn:
-		if int(key) >= battle_turn - 1:
+		if int(key) >= battle_turn - (SECOND_WIND_WINDOW_TURNS - 1):
 			total += int(dmg_by_turn[key])
 	return total
 
@@ -5025,7 +5034,7 @@ func damage_taken_recent() -> int:
 func healing_done_recent() -> int:
 	var total := 0
 	for key in heal_by_turn:
-		if int(key) >= battle_turn - 1:
+		if int(key) >= battle_turn - (REPRISAL_WINDOW_TURNS - 1):
 			total += int(heal_by_turn[key])
 	return total
 

@@ -215,8 +215,15 @@ func _s0_rulings() -> void:
 	var at7 := claude.find(seven)
 	ok(gx_at >= 0 and at7 > gx_at and (gx_end < 0 or at7 < gx_end),
 		"§0.2: the reasoning does not stand in GX's block, beside the sentence a sitting-out rune wears")
+	# BATCH IT §3b — RE-POINTED: a fixed 1400 characters from the sentence; the window is the bullet that holds it now,
+	# cut at the next bullet or heading, so a code named only in the bullet below cannot satisfy it.
+	var b_next := claude.find("\n- ", at7)
+	var h_next := claude.find("\n## ", at7)
+	var b_end := mini(b_next, h_next) if b_next > at7 and h_next > at7 else maxi(b_next, h_next)
+	var bullet := claude.substr(at7, b_end - at7) if b_end > at7 else ""
+	ok(bullet != "", "§0.2: the bullet holding the reasoning has no end — the window has no subject")
 	for n in ["N010", "N026", "N027", "N030", "N033", "N036", "N043"]:
-		ok(claude.substr(at7, 1400).contains(n), "§0.2: the reasoning does not name %s, one of the seven it stands for" % n)
+		ok(bullet.contains(n), "§0.2: the reasoning does not name %s, one of the seven it stands for" % n)
 	# §0.11 — the writing rule, in the text standard (and only there).
 	var ally := "A TEXT THAT MEANS THE FOUR MEANS HERO"
 	ok(std.count(ally) == 1 and not claude.contains(ally) and not rules.contains(ally),
@@ -232,7 +239,10 @@ func _s0_rulings() -> void:
 	ok(rules.count(blk_head) == 1, "§0.12: the instrument rules do not hold the rule's block once")
 	ok(claude.contains(row), "§0.12: CLAUDE.md's index has no row for the rule")
 	ok(not claude.contains(blk_head), "§0.12: the rule's block is in CLAUDE.md too — a rule stands in one file")
-	var blk := rules.substr(rules.find(blk_head), 2600)
+	# BATCH IT §3b — RE-POINTED: a fixed 2600 characters from the heading; the window is the block now, cut at the next
+	# `## ` heading, so a half carried by the block below cannot satisfy it.
+	var blk := Gate.subject(rules, rules.find(blk_head), "\n## ")
+	ok(blk.begins_with(blk_head), "§0.12: the rule's block has no end — the window has no subject")
 	ok(blk.contains("Every alternative in a needle is live, or it is deleted"),
 		"§0.12: the rule does not carry its needle half")
 	ok(blk.contains("zero is indistinguishable"), "§0.12: the rule does not carry its zero-read half")
@@ -254,8 +264,10 @@ func _s1_blood_debt() -> void:
 	var pt := src.find("func _player_turn(")
 	var open := src.find("elif ab.special in [", pt)
 	var close := src.find("]:", open)
+	# BATCH IT §3b — RE-POINTED: a fixed 60 characters after `]:` reached the next `elif`; the tail is the branch's own body
+	# now — the rest of the `elif` statement's block, cut where its indentation returns (check_hl's repair, the same list).
 	ok(pt >= 0 and open > pt and close > open and src.substr(open, close - open).contains("\"blood_price\"")
-			and src.substr(close, 60).contains("target = u"),
+			and Gate.block(src, open).substr(close - open).contains("target = u"),
 		"§1a: Blood Price is not on the player turn's no-target list, so its target is not its caster")
 	var s: Node = await _board(specs, _berserker_over())
 	var b := _hero(s, "warrior")
@@ -664,7 +676,8 @@ func _s3_perfects() -> void:
 	var res := _body("scripts/battle.gd", "_resolve")
 	ok(res.contains("if ab.display_name == \"Reality Fracture\" and is_perfect:\n\t\t\t\tres_gain += 1"),
 		"§3b: the Resonance block does not bank Reality Fracture's Perfect a second time")
-	ok(res.contains("singularity_crit_build) if any_crit else 1"), "§3b: the engine's own grant — the base it banks again — moved")
+	# BATCH IT §2 — RE-POINTED: the literal this read is a named constant now; the needle names it.
+	ok(res.contains("singularity_crit_build) if any_crit else RESONANCE_PER_CAST"), "§3b: the engine's own grant — the base it banks again — moved")
 	var m := _hero(s, "mage")
 	var rfc := _card(m, "Reality Fracture") if m != null else null
 	ok(m != null and rfc != null and m.second_resource_name == "Resonance", "§3b: the board seats an Arcanist holding Reality Fracture")

@@ -521,7 +521,10 @@ func _s1c_the_refusal() -> void:
 	var consumed: Array = Talents.CONSUMED_FIELDS.keys()
 	for f in consumed:
 		var why := Talents.live_refusal({"stat": {String(f): 1}, "condition": {"heroes_lack_class": "mage"}})
-		if why.contains(String(f)) and why.contains(String(Talents.CONSUMED_FIELDS[f]).substr(0, 12)):
+		# BATCH IT §3b — RE-POINTED: the reason was read by its first 12 characters — three distinct prefixes for twelve
+		# reasons, ending before the words that say WHERE the field is consumed — so a refusal citing another field's reason
+		# passed. The whole reason is the needle now.
+		if why.contains(String(f)) and why.contains(String(Talents.CONSUMED_FIELDS[f])):
 			refused += 1
 		else:
 			print("      not refused, or not for its reason: %s -> '%s'" % [f, why])

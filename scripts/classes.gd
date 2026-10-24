@@ -3040,7 +3040,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 3,
 				"anim": "attack02", "special": "blood_offering",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Open a vein on purpose: lose 20% of\nyour CURRENT health and gain 60 Rage.\nIt can never take you below 1 — and\nthe lower you are, the less it costs."})
+				"description": "Open a vein on purpose: lose {=Battle.BLOOD_OFFERING_PCT*100}% of\nyour CURRENT health and gain {=Battle.BLOOD_OFFERING_RAGE} Rage.\nIt can never take you below 1 — and\nthe lower you are, the less it costs."})
 		# AXIS: the bleedout stops being the enemy's clock. Bloodcraze, Scent of
 		# Blood, Arterial Spray and Blood Tithe are four nodes waiting on a
 		# trigger he cannot pull. IT FIRES THE REAL BLEEDOUT PATH, not a copy,
@@ -3050,7 +3050,7 @@ static func draft_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Gut Rip", "cost": 30,
 				"damage": 6, "pressure": 20, "delay": 2.5, "cooldown": 4,
 				"anim": "attack03", "special": "gut_rip",
-				"perfect_id": "", "perfect_text": "{atk:9} per 10 buildup",
+				"perfect_id": "", "perfect_text": "{atk:{=Battle.GUT_RIP_PERFECT_PCT}} per 10 buildup",
 				"description": "Tear the wound wide: the target BLEEDS\nOUT at once whatever its buildup, and\ntakes {=@damage}% of Attack for every 10 points\nconsumed. Everything that answers a\nbleedout answers this one."})
 		# ----- BERSERKER, TRANCHE 2 (Batch BW): spend the rage, take the risk,
 		# and finally get paid back. BP's pair were both single-target and both
@@ -3076,7 +3076,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 4,
 				"anim": "attack02", "special": "reckless_abandon", "gated": true,
 				"perfect_id": "", "perfect_text": "{=Battle.RECKLESS_PERFECT_PER_10}% per {=Battle.RECKLESS_STEP} Rage",
-				"description": "Throw everything at it: spend ALL your\nRage, and for 3 turns deal +{=Battle.RECKLESS_PCT_PER_10}% damage\nfor every {=Battle.RECKLESS_STEP} points SPENT. A full bar\nis +20% — and three turns with nothing\nleft to cast."})
+				"description": "Throw everything at it: spend ALL your\nRage, and for {=Battle.RECKLESS_TURNS} turns deal +{=Battle.RECKLESS_PCT_PER_10}% damage\nfor every {=Battle.RECKLESS_STEP} points SPENT. A full bar\nis +20% — and three turns with nothing\nleft to cast."})
 		# AXIS: the risk dial at maximum, and THE DRAWBACK IS THE PAYOFF. Blood
 		# Frenzy scales his damage with missing health, so taking 30% more
 		# damage drives him into his own power band — the only card in the game
@@ -3105,7 +3105,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 5,
 				"anim": "attack03", "special": "berserk",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Let it take you: your next 4 STRIKES\neach land twice — they wait until\nspent. For 3 turns you take {=Battle.BERSERK_RISK_PCT}% more\ndamage, which is where Blood Frenzy\nlives."})
+				"description": "Let it take you: your next 4 STRIKES\neach land twice — they wait until\nspent. For {=Battle.BERSERK_RISK_TURNS} turns you take {=Battle.BERSERK_RISK_PCT}% more\ndamage, which is where Blood Frenzy\nlives."})
 		# AXIS: a reason to survive being low. Blood Frenzy pays him for missing
 		# health and NOTHING IN HIS KIT PAYS HIM BACK — that is the sustain hole,
 		# and this fills it out of his own engine rather than with a heal.
@@ -3159,7 +3159,7 @@ static func draft_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Feint", "cost": 25,
 				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 4,
 				"anim": "attack02", "special": "feint",
-				"perfect_id": "", "perfect_text": "A third charge, or 45% in Aggressive",
+				"perfect_id": "", "perfect_text": "A third charge, or {=Battle.FEINT_PERFECT_PCT}% in Aggressive",
 				"description": "Sell an opening.\nFROM AGGRESSIVE: strike for {=Battle.FEINT_STRIKE_PCT}% of\nAttack, and that enemy's next attack\nlands on one of its OWN allies.\nFROM DEFENSIVE: no strike — bank {=Battle.FEINT_GUARDS}\ncharges, each parrying an attack\noutright and returning its damage to\nthe attacker.\nEither way the stance then SWITCHES."})
 		# ----- SWORDMASTER, TRANCHE 2 (Batch BW): THE FIRST STANCE-GATED CARDS.
 		#
@@ -3246,7 +3246,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 4,
 				"anim": "attack01", "special": "battle_poise",
 				"perfect_id": "", "perfect_text": "",
-				"description": "REQUIRES THE DEFENSIVE GUARD.\nFor 4 turns every attack he PARRIES\ntakes a turn off all his other cooldowns —\nand ONCE A TURN a parry also buys a\nfree GUARD CHANGE that costs no action.\nThe guard he needs is never a turn away."})
+				"description": "REQUIRES THE DEFENSIVE GUARD.\nFor {=Battle.BATTLE_POISE_TURNS} turns every attack he PARRIES\ntakes a turn off all his other cooldowns —\nand ONCE A TURN a parry also buys a\nfree GUARD CHANGE that costs no action.\nThe guard he needs is never a turn away."})
 		# AXIS: the only card in the game that lets a build have BOTH HALVES of
 		# its own toggle.
 		#
@@ -3275,7 +3275,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": 1.0, "cooldown": 3,
 				"anim": "attack02", "special": "feigned_guard",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Show them the wrong guard. For 3 turns\nyour ABILITIES resolve as though cast\nfrom the OTHER stance — and satisfy\nthat stance's requirement — while you\nkeep the one you are standing in. It\ndoes NOT switch your guard."})
+				"description": "Show them the wrong guard. For {=Battle.FEIGNED_GUARD_TURNS} turns\nyour ABILITIES resolve as though cast\nfrom the OTHER stance — and satisfy\nthat stance's requirement — while you\nkeep the one you are standing in. It\ndoes NOT switch your guard."})
 		# ----- WARDEN (Batch BP): what does protection look like when it is not
 		# his own. Block is his signature stat and it has only ever protected
 		# him; Taunt brings damage to him one enemy at a time.
@@ -3290,7 +3290,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"anim": "attack01", "special": "covering_guard",
 				"target": Ability.Target.ALLY,
 				"perfect_id": "", "perfect_text": "",
-				"description": "Stand over another: for 4 turns YOUR\nBlock chance is rolled against every\nattack aimed at one hero, and a\nsuccess negates it entirely. Nothing\nmoves to you — the blow just stops.\nIt reads your Block LIVE."})
+				"description": "Stand over another: for {=Battle.COVERING_GUARD_TURNS} turns YOUR\nBlock chance is rolled against every\nattack aimed at one hero, and a\nsuccess negates it entirely. Nothing\nmoves to you — the blow just stops.\nIt reads your Block LIVE."})
 		# AXIS: being outnumbered becomes the point. A party-wide defensive
 		# cooldown that costs him everything, and it is self-balancing — a bigger
 		# field means more mitigation as well as more incoming.
@@ -3299,7 +3299,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 4,
 				"anim": "attack03", "special": "eye_of_storm",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Take the whole field: EVERY enemy is\ntaunted onto you for 3 turns, and you\ntake {=Battle.EYE_STORM_CUT_PCT}% less damage for each one\ntaunted. The more of them there are,\nthe better you weather it."})
+				"description": "Take the whole field: EVERY enemy is\ntaunted onto you for {=Battle.EYE_STORM_TURNS} turns, and you\ntake {=Battle.EYE_STORM_CUT_PCT}% less damage for each one\ntaunted. The more of them there are,\nthe better you weather it."})
 		# ----- WARDEN, TRANCHE 2 (Batch BW): his bulk as a weapon, a permanent
 		# duel, and Block that pays the party. BP's pair were BOTH DEFENSIVE and
 		# he has no offense at all; the first of these three is the answer to
@@ -3379,7 +3379,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 5,
 				"anim": "attack03", "special": "aegis_wall",
 				"perfect_id": "", "perfect_text": "",
-				"description": "The wall answers for the heroes: for 4\nturns every attack you BLOCK heals\nevery hero for {=Battle.AEGIS_WALL_PCT*100}% of your maximum\nhealth. A blow that gets through pays\nnothing — only a block."})
+				"description": "The wall answers for the heroes: for {=Battle.AEGIS_WALL_TURNS}\nturns every attack you BLOCK heals\nevery hero for {=Battle.AEGIS_WALL_PCT*100}% of your maximum\nhealth. A blow that gets through pays\nnothing — only a block."})
 		# ===== BATCH CI — TRANCHE 3, THE WARRIOR NINE. THE DRAFT IS COMPLETE. =====
 		#
 		# A CONTIGUOUS BLOCK rather than interleaved with BP's and BW's entries
@@ -3423,7 +3423,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 5,
 				"anim": "attack02", "special": "unslaked",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Nothing settles it. For 4 turns Blood\nFrenzy's floor keeps the FULL bonus you\nreach instead of half of it. Cast it,\nthen dive: what you bank at the bottom\nis yours for the rest of the battle."})
+				"description": "Nothing settles it. For {=Battle.UNSLAKED_TURNS} turns Blood\nFrenzy's floor keeps the FULL bonus you\nreach instead of half of it. Cast it,\nthen dive: what you bank at the bottom\nis yours for the rest of the battle."})
 		# AXIS: surviving the band he is paid for standing in. Blood Frenzy pays
 		# him for missing health and every other answer to being low is a HEAL,
 		# which lifts him straight back out of his own power band.
@@ -3447,7 +3447,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 4,
 				"anim": "attack02", "special": "spite",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Out of pure spite. For 6 turns take {=Battle.SPITE_PER_5_MISSING}%\nless damage for every 5% of maximum\nhealth MISSING, up to {=Battle.SPITE_PERFECT_CAP}%. It is\nmitigation and never healing — it keeps\nyou in the frenzy band rather than\nlifting you out of it."})
+				"description": "Out of pure spite. For {=Battle.SPITE_TURNS} turns take {=Battle.SPITE_PER_5_MISSING}%\nless damage for every 5% of maximum\nhealth MISSING, up to {=Battle.SPITE_PERFECT_CAP}%. It is\nmitigation and never healing — it keeps\nyou in the frenzy band rather than\nlifting you out of it."})
 		# AXIS: the Rage dump (BATCH HZ §2, ruled at HY). Every other Rage card is
 		# a sip; this one pours out the whole bar at once, so the decision it exists
 		# to make is WAIT OR DUMP NOW — a full bar beats the best ordinary turn and
@@ -3528,7 +3528,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"anim": "attack02",
 				"special": "recompense",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Be paid for the loss. For 6 turns,\nwhenever Blocking resets your Heavy\nPlating bonus you gain Rage equal to\nthe percentage points lost — a reset\nfrom +32% pays 32 Rage. ANVIL prevents\nthose resets, so the two do not stack."})
+				"description": "Be paid for the loss. For {=Battle.RECOMPENSE_TURNS} turns,\nwhenever Blocking resets your Heavy\nPlating bonus you gain Rage equal to\nthe percentage points lost — a reset\nfrom +32% pays 32 Rage. ANVIL prevents\nthose resets, so the two do not stack."})
 		# AXIS: the block pointed outward. A Block NEGATES an attack entirely and
 		# pays him nothing beyond that; Aegis Wall made it worth something to the
 		# party, and this makes it worth something to the enemy that threw it.
@@ -3552,7 +3552,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 4,
 				"anim": "attack03", "special": "turn_the_blade",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Send it back. For 4 turns every attack\nyou BLOCK deals Break damage to the\nattacker equal to half the damage the\nblock refused. A blow that gets THROUGH\npays nothing — only a block."})
+				"description": "Send it back. For {=Battle.TURN_THE_BLADE_TURNS} turns every attack\nyou BLOCK deals Break damage to the\nattacker equal to half the damage the\nblock refused. A blow that gets THROUGH\npays nothing — only a block."})
 		# ----- SWORDMASTER: dwell, parry, and neither stance. BP gave him
 		# readers that branch and flip, BW gated cards that require and stay.
 		# These three are the first that argue with the switch itself.
@@ -3582,7 +3582,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 5,
 				"anim": "attack01", "special": "discipline",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Do not be moved. For 7 turns, each\nconsecutive turn held in the SAME\nstance strengthens that stance's own\neffect by {=Battle.DISCIPLINE_PERFECT_STEP}%, up to {=Battle.DISCIPLINE_CAP}%. A GUARD CHANGE\nresets the accumulation to nothing —\nand so does any card that switches you."})
+				"description": "Do not be moved. For {=Battle.DISCIPLINE_TURNS} turns, each\nconsecutive turn held in the SAME\nstance strengthens that stance's own\neffect by {=Battle.DISCIPLINE_PERFECT_STEP}%, up to {=Battle.DISCIPLINE_CAP}%. A GUARD CHANGE\nresets the accumulation to nothing —\nand so does any card that switches you."})
 		# AXIS: the parry stat finally buying something. He is the only
 		# parry-STAT character in the game — 12% base, plus Sword Mastery,
 		# Swordsmanship and High Guard — and THIS IS THE FIRST CARD THAT READS
@@ -3608,7 +3608,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 4,
 				"anim": "attack02", "special": "answering_steel",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Let the blade answer. For 6 turns your\nparry chance is +{=Battle.ANSWERING_PERFECT_PARRY}%, and every attack\nyou PARRY grants {=Battle.ANSWERING_RAGE} Rage and takes a\nturn off all your other cooldowns. It pays\ntempo, not damage."})
+				"description": "Let the blade answer. For {=Battle.ANSWERING_TURNS} turns your\nparry chance is +{=Battle.ANSWERING_PERFECT_PARRY}%, and every attack\nyou PARRY grants {=Battle.ANSWERING_RAGE} Rage and takes a\nturn off all your other cooldowns. It pays\ntempo, not damage."})
 		# AXIS: being neither, and both. The stance is the spec's one binary and
 		# every card in his pool sits on one side of it; this is the card that
 		# refuses the question for three turns.
@@ -3636,7 +3636,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 6,
 				"anim": "attack03", "special": "formless",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Hold no guard at all. For 4 turns you\ndeal +30% damage AND take 15% less —\nboth stances' upsides and neither\ndownside — and you count as BOTH\nstances for anything that requires one.\nYou cannot Guard Change. When it ends\nyou suffer BOTH downsides for {=Battle.FORMLESS_RECOIL_TURNS} turns."})
+				"description": "Hold no guard at all. For {=Battle.FORMLESS_TURNS} turns you\ndeal +30% damage AND take 15% less —\nboth stances' upsides and neither\ndownside — and you count as BOTH\nstances for anything that requires one.\nYou cannot Guard Change. When it ends\nyou suffer BOTH downsides for {=Battle.FORMLESS_RECOIL_TURNS} turns."})
 		# ----- SWORDMASTER, BATCH DR §4: THE FOUR AXES HIS POOL NEVER HAD.
 		#
 		# DQ MEASURED THIS POOL AS THE MOST CONCENTRATED IN THE GAME: ten cards
@@ -3752,8 +3752,8 @@ static func draft_ability(display_name: String) -> Ability:
 				"cost": 30, "damage": 20, "pressure": 8, "delay": 3.0,
 				"cooldown": 3, "aoe": true, "anim": "attack03",
 				"special": "cinderfall",
-				"perfect_id": "", "perfect_text": "Takes 3 turns of Burn from each",
-				"description": "Rake the whole field for {=@damage}% of Attack,\nthen tear 2 turns of Burn from EACH\nburning enemy to deal that much again\nto it; an enemy not alight is set\nBurning for {=Battle.CINDERFALL_LIGHT_TURNS} turns. Overburn refunds\nevery turn taken."})
+				"perfect_id": "", "perfect_text": "Takes {=Battle.CINDERFALL_PERFECT_TAKE} turns of Burn from each",
+				"description": "Rake the whole field for {=@damage}% of Attack,\nthen tear {=Battle.CINDERFALL_TAKE} turns of Burn from EACH\nburning enemy to deal that much again\nto it; an enemy not alight is set\nBurning for {=Battle.CINDERFALL_LIGHT_TURNS} turns. Overburn refunds\nevery turn taken."})
 		# AXIS: PAID BEFORE IT BURNS (BATCH BS §4, re-authored). Its old axis was
 		# "commitment without the bill" — an exemption from Overburn's Mana
 		# drain — and BS deleted the drain, so the card's whole second sentence
@@ -3766,7 +3766,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"cost": 20, "damage": 0, "pressure": 0, "delay": 2.0,
 				"cooldown": 4, "anim": "attack02", "special": "ember_debt",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Set a debt alight: 12 turns of Burn on\none enemy — and Overburn pays you for\nevery one of them NOW, as though you\nhad already consumed them. The fire\nstill burns its full term."})
+				"description": "Set a debt alight: {=Battle.EMBER_DEBT_TURNS} turns of Burn on\none enemy — and Overburn pays you for\nevery one of them NOW, as though you\nhad already consumed them. The fire\nstill burns its full term."})
 		# ----- CRYOMANCER: what do you do with the time you bought -----
 		# AXIS: cashing in without releasing. Shatter and Ice Lance both end the
 		# hold to be paid; this collects interest and leaves the prison standing.
@@ -3774,7 +3774,7 @@ static func draft_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Winter's Toll", "dmg_type": "frost",
 				"cost": 25, "damage": 8, "pressure": 0, "delay": 2.5,
 				"cooldown": 4, "anim": "attack02", "special": "winters_toll",
-				"perfect_id": "", "perfect_text": "{atk:12} per turn held",
+				"perfect_id": "", "perfect_text": "{atk:{=Battle.WINTERS_TOLL_PERFECT_PCT}} per turn held",
 				"description": "Collect the interest: the HELD enemy\ntakes {=@damage}% of Attack for every turn it\nhas spent in the ice — AND THE HOLD\nCONTINUES. Unusable while he holds\nnothing."})
 		# AXIS: the hold as a template. One deep prison becomes the next one.
 		"Rimebinding":
@@ -3792,7 +3792,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"cost": 25, "damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP,
 				"cooldown": 4, "anim": "attack03", "special": "null_field",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Fold the storm inward: for 4 turns you\ntake 5% less damage PER RESONANCE\nSTACK — read live, so it deepens as\nyou keep casting. Just 10% at 2 stacks;\nhalf again at 10."})
+				"description": "Fold the storm inward: for {=Battle.NULL_FIELD_TURNS} turns you\ntake {=Battle.NULL_FIELD_PCT_PER_STACK*100}% less damage PER RESONANCE\nSTACK — read live, so it deepens as\nyou keep casting. Just 10% at 2 stacks;\nhalf again at 10."})
 		# AXIS: buying the ramp with tempo. His fastest early climb and a card
 		# he would rather not cast late — the correct shape for escalation.
 		"Kindled Mind":
@@ -3808,8 +3808,8 @@ static func draft_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Second Wind", "cost": 30,
 				"special": "second_wind_holy", "target": Ability.Target.ALLY,
 				"delay": 2.5, "cooldown": 4, "anim": "attack02",
-				"perfect_id": "", "perfect_text": "Up to {mhp:55|ally}",
-				"description": "Take back the last two turns on the\nturn order: heal an ally for ALL the\ndamage they have taken in that window\n(a companion: all battle), up to 40%\nof their maximum. Nothing on someone\nwho has not been hit."})
+				"perfect_id": "", "perfect_text": "Up to {mhp:{=Battle.SECOND_WIND_PERFECT_CAP_PCT*100}|ally}",
+				"description": "Take back the last two turns on the\nturn order: heal an ally for ALL the\ndamage they have taken in that window\n(a companion: all battle), up to {=Battle.SECOND_WIND_CAP_PCT*100}%\nof their maximum. Nothing on someone\nwho has not been hit."})
 		# AXIS: reversal bought in advance rather than reacted to. Resurrection
 		# undoes a death and costs Mercy; this prevents one and costs her health.
 		"Rite of Return":
@@ -3817,7 +3817,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"special": "rite_of_return", "target": Ability.Target.ALLY,
 				"delay": Ability.BUFF_DELAY_CAP, "cooldown": 5, "anim": "attack03",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Promise one hero the road back: for 4\nturns, the next blow or tick that would\nfell them restores them to 50% health\ninstead — and Holy loses 30% of hers\nwhen it pays."})
+				"description": "Promise one hero the road back: for {=Battle.RITE_OF_RETURN_TURNS}\nturns, the next blow or tick that would\nfell them restores them to {=Battle.RITE_OF_RETURN_RESTORE_PCT*100}% health\ninstead — and Holy loses {=Battle.RITE_OF_RETURN_TOLL_PCT*100}% of hers\nwhen it pays."})
 		# ----- DEVOUT: what else can he lend -----
 		# AXIS: mitigation by relocation. Divine Shield absorbs a capped amount;
 		# this has no cap, and every hit he eats builds that ally's Faith.
@@ -3826,7 +3826,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"special": "vow_suffering", "target": Ability.Target.ALLY,
 				"delay": Ability.BUFF_DELAY_CAP, "cooldown": 3, "anim": "attack02",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Take their wounds as your own: for 4\nturns HALF the damage that hero takes\nis redirected to the Devout — and\nevery share he eats kindles that hero\n1 Faith."})
+				"description": "Take their wounds as your own: for {=Battle.VOW_OF_SUFFERING_TURNS}\nturns HALF the damage that hero takes\nis redirected to the Devout — and\nevery share he eats kindles that hero\n{=Battle.VOW_OF_SUFFERING_FAITH} Faith."})
 		# AXIS: unspent protection becomes offence. His shields expire unspent
 		# constantly; this makes over-shielding a resource.
 		"Aegis Reversal":
@@ -3846,7 +3846,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 2.5, "cooldown": 4, "anim": "attack03",
 				"special": "blight_well",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Poison the source: for 6 turns, any\nhealing that enemy receives DAMAGES\nit for the same amount instead."})
+				"description": "Poison the source: for {=Battle.BLIGHT_THE_WELL_TURNS} turns, any\nhealing that enemy receives DAMAGES\nit for the same amount instead."})
 		# AXIS: corruption that compounds onto a chosen target. Spread pressure
 		# becomes focused pressure without giving up the spread.
 		"Covenant of Ash":
@@ -3863,7 +3863,7 @@ static func draft_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Twin Hunt", "cost": 25,
 				"damage": 40, "pressure": 12, "delay": 2.5, "cooldown": 3,
 				"anim": "attack02", "special": "twin_hunt",
-				"perfect_id": "", "perfect_text": "Companion strikes at {atk:55}",
+				"perfect_id": "", "perfect_text": "Companion strikes at {atk:{=Battle.TWIN_HUNT_COMPANION_PERFECT_PCT*100}}",
 				"description": "Strike as one: the Beastmaster and his\ncompanion each hit for {=@damage}% of Attack. If\nthe COMPANION'S blow is the killing one,\nhis next ability costs nothing."})
 		# AXIS: rotation without the tax. BJ measured swaps at 0.05 per trash
 		# battle — the central verb of an entire lane barely happens.
@@ -3900,7 +3900,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 2.5, "cooldown": 4, "aoe": true, "anim": "attack03",
 				"special": "choking_smoke",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Foul the air: EVERY enemy is Blinded\nfor 3 turns — 50% more likely to miss.\nArea attacks never miss, so it blanks\nsingle-target blows only.\nThe smoke also sets EVERY enemy\nBurning 2 turns — fuel for a\nPyromancer's Overburn, and one more\naffliction under your own Trapper."})
+				"description": "Foul the air: EVERY enemy is Blinded\nfor {=Battle.CHOKING_SMOKE_TURNS} turns — {=Battle.BLIND_MISS_PCT*100}% more likely to miss.\nArea attacks never miss, so it blanks\nsingle-target blows only.\nThe smoke also sets EVERY enemy\nBurning 2 turns — fuel for a\nPyromancer's Overburn, and one more\naffliction under your own Trapper."})
 		# AXIS: the traps stop waiting.
 		"Snare Line":
 			return Ability.make({"display_name": "Snare Line",
@@ -3949,7 +3949,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": Ability.BUFF_DELAY_CAP, "cooldown": 4, "anim": "attack03",
 				"special": "magic_barrier",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Raise a ward of raw magic: absorbs\ndamage equal to 20% of the Mage's\nmaximum health for 3 turns. It eats every\nblow, area attacks included, but no\ntick, recoil or reflected damage."})
+				"description": "Raise a ward of raw magic: absorbs\ndamage equal to {=Battle.NEXUS_WARD_PCT*100}% of the Mage's\nmaximum health for {=Battle.NEXUS_WARD_TURNS} turns. It eats every\nblow, area attacks included, but no\ntick, recoil or reflected damage."})
 		# AXIS: evasion rather than absorption, and THE TWO MUST NOT BE A
 		# STRICT UPGRADE OF EACH OTHER IN EITHER DIRECTION — §2's rule applied
 		# inside one pool. Better than the Barrier against three big single
@@ -3983,7 +3983,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": Ability.BUFF_DELAY_CAP, "cooldown": 5, "anim": "attack03",
 				"special": "mana_well",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Open the well: for 4 turns your Mana\nregeneration is DOUBLED. It costs Mana\nto make Mana — a long fight pays for\nit and a short one does not."})
+				"description": "Open the well: for {=Battle.MANA_WELL_TURNS} turns your Mana\nregeneration is DOUBLED. It costs Mana\nto make Mana — a long fight pays for\nit and a short one does not."})
 		# AXIS: utility nobody has. TWO HALVES, AND THE ENEMY HALF IS THIN —
 		# `shielded` is the ONLY beneficial status an enemy can carry in the
 		# whole game (two of nineteen kinds apply it), so that half removes at
@@ -4027,8 +4027,8 @@ static func draft_ability(display_name: String) -> Ability:
 				"dmg_type": "holy", "cost": 20, "damage": 0, "pressure": 0,
 				"delay": 2.0, "cooldown": 2, "anim": "attack02",
 				"special": "ministration", "target": Ability.Target.ALLY,
-				"perfect_id": "", "perfect_text": "Heals {mhp:26|ally}",
-				"description": "The plain office: heal one ally for 20%\nof THEIR maximum health. No stacks, no\nshields, no marks — it simply works."})
+				"perfect_id": "", "perfect_text": "Heals {mhp:{=Battle.MINISTRATION_PERFECT_PCT*100}|ally}",
+				"description": "The plain office: heal one ally for {=Battle.MINISTRATION_PCT*100}%\nof THEIR maximum health. No stacks, no\nshields, no marks — it simply works."})
 		# AXIS: sustained rather than burst, the opposite read to Ministration.
 		# Per target it is small on purpose; what it buys is that it is small
 		# for EVERYONE, every turn, while it holds.
@@ -4038,7 +4038,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": Ability.BUFF_DELAY_CAP, "cooldown": 5, "anim": "attack03",
 				"special": "consecration",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Bless the ground underfoot: for 4 turns\nEVERY HERO regains {=Battle.CONSECRATION_PCT*100}% of their maximum\nhealth at the start of each of their\nturns."})
+				"description": "Bless the ground underfoot: for {=Battle.CONSECRATION_TURNS} turns\nEVERY HERO regains {=Battle.CONSECRATION_PCT*100}% of their maximum\nhealth at the start of each of their\nturns."})
 		# AXIS: something to do with a turn. All three Clerics have turns where
 		# nobody needs healing and their engine is not ready, and the Break
 		# means that turn still contributes.
@@ -4067,7 +4067,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 1.5, "cooldown": 4, "anim": "attack02",
 				"special": "unburden", "target": Ability.Target.ALLY,
 				"perfect_id": "", "perfect_text": "",
-				"description": "Lift the weight: remove EVERY harmful\neffect from one ally, and they take 20%\nless damage for 3 turns. With nothing\nto remove it is still the mitigation."})
+				"description": "Lift the weight: remove EVERY harmful\neffect from one ally, and they take {=Battle.UNBURDEN_CUT*100}%\nless damage for {=Battle.UNBURDEN_TURNS} turns. With nothing\nto remove it is still the mitigation."})
 		# AXIS: the only offensive party buff a Cleric has. BANKED, NOT TIMED —
 		# it waits for each hero's next swing rather than expiring on a turn
 		# count, so a slow hero is not cheated of it.
@@ -4077,7 +4077,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": Ability.BUFF_DELAY_CAP, "cooldown": 4, "anim": "attack03",
 				"special": "exhortation",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Call them on: EVERY HERO's next attack\ndeals 35% more damage. It is BANKED,\nnot timed — it waits for each hero's\nnext swing however long they take to\ntake it."})
+				"description": "Call them on: EVERY HERO's next attack\ndeals {=Battle.EXHORTATION_PCT}% more damage. It is BANKED,\nnot timed — it waits for each hero's\nnext swing however long they take to\ntake it."})
 		# AXIS: making one heal into two. IT IS THE ONE CLASS ABILITY THAT GETS
 		# BETTER THE MORE SPEC-SPECIFIC THE BUILD IS, a deliberate inversion of
 		# the unconditional-floor role the other five play: Holy's big heals
@@ -4099,7 +4099,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": Ability.BUFF_DELAY_CAP, "cooldown": 4, "anim": "attack02",
 				"special": "undying_vigil", "target": Ability.Target.ALLY,
 				"perfect_id": "", "perfect_text": "",
-				"description": "Keep watch over one hero: for 4 turns,\nwhenever they are healed BY ANY SOURCE,\na second hero on lower health is healed\nfor half as much."})
+				"description": "Keep watch over one hero: for {=Battle.UNDYING_VIGIL_TURNS} turns,\nwhenever they are healed BY ANY SOURCE,\na second hero on lower health is healed\nfor half as much."})
 		# ============ BATCH BR: THE HUNTER AND WARRIOR CLASS-WIDE TWELVE ======
 		#
 		# THE SEAM CLOSES HERE. BQ filled Mage and Cleric; these twelve fill the
@@ -4145,8 +4145,8 @@ static func draft_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Field Dressing", "cost": 20,
 				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 3,
 				"anim": "attack02", "special": "field_dressing",
-				"perfect_id": "", "perfect_text": "Heals {mhp:24}",
-				"description": "Bind the wound where you stand: heal\n18% of your maximum health and shake\noff one harmful effect. The only\nself-heal a Hunter needs nothing set\nup for."})
+				"perfect_id": "", "perfect_text": "Heals {mhp:{=Battle.FIELD_DRESSING_PERFECT_PCT*100}}",
+				"description": "Bind the wound where you stand: heal\n{=Battle.FIELD_DRESSING_PCT*100}% of your maximum health and shake\noff one harmful effect. The only\nself-heal a Hunter needs nothing set\nup for."})
 		# AXIS: buying TIME rather than absorbing damage — the defensive shape
 		# the class does not have, stated as evasion so it never overlaps the
 		# Mage's Barrier or the Warden's Block.
@@ -4161,7 +4161,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 4,
 				"anim": "attack01", "special": "camouflage",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Go to ground: for 3 turns enemies are\n{=Battle.CAMOUFLAGE_PCT}% less likely to aim at you. It buys\nTIME rather than soaking damage —\nnothing about the blow changes, only\nwho it lands on."})
+				"description": "Go to ground: for {=Battle.CAMOUFLAGE_TURNS} turns enemies are\n{=Battle.CAMOUFLAGE_PCT}% less likely to aim at you. It buys\nTIME rather than soaking damage —\nnothing about the blow changes, only\nwho it lands on."})
 		# AXIS: the reliable strike. Every Hunter kit is built on a conditional
 		# and this works when nothing is set up yet — and being MULTI-HIT is
 		# what makes it play with a charge bank (§1) rather than beside one.
@@ -4184,7 +4184,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 3,
 				"anim": "attack01", "special": "bola",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Whip the cord round its legs: the\ntarget is SLOWED and CRIPPLED for 4\nturns. Two afflictions, one card, and\nnot one point of damage."})
+				"description": "Whip the cord round its legs: the\ntarget is SLOWED and CRIPPLED for {=Battle.BOLA_TURNS}\nturns. Two afflictions, one card, and\nnot one point of damage."})
 		# AXIS: focus fire made explicit — the ONLY party-wide amplifier the
 		# class has. It is the enemy that is marked, so every hero and every
 		# beast on the field reads it, which is what separates it from the
@@ -4195,7 +4195,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 4,
 				"anim": "attack01", "special": "hunters_mark",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Call the target out: for 6 turns EVERY\nALLY deals {=Battle.PARTY_MARK_PCT}% more damage to it. One\nmark at a time — the point is that\nevery ally strikes the same thing."})
+				"description": "Call the target out: for {=Battle.HUNTERS_MARK_TURNS} turns EVERY\nALLY deals {=Battle.PARTY_MARK_PCT}% more damage to it. One\nmark at a time — the point is that\nevery ally strikes the same thing."})
 		# AXIS: a charge BANK, which the class has never had. BANKED, NOT TIMED
 		# — the charges wait until spent, on the Interpose/`shield_charges`
 		# precedent BQ used for Mirror Image, so a cast into a lull is not
@@ -4240,7 +4240,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 4,
 				"anim": "attack01", "special": "battle_trance",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Go somewhere the pain cannot follow:\nfor 4 turns, at the start of each of\nyour turns heal {=Battle.BATTLE_TRANCE_FLOOR*100}% of maximum health\nPLUS HALF of all damage taken since\nyour last turn."})
+				"description": "Go somewhere the pain cannot follow:\nfor {=Battle.BATTLE_TRANCE_TURNS} turns, at the start of each of\nyour turns heal {=Battle.BATTLE_TRANCE_FLOOR*100}% of maximum health\nPLUS HALF of all damage taken since\nyour last turn."})
 		# AXIS: giving away tempo. THE ONLY ABILITY IN THE GAME THAT HANDS AN
 		# ALLY A TURN, and the only tempo tool a class with none can have. It
 		# reuses the EXISTING initiative machinery (the Cryomancer's Shockwave
@@ -4256,7 +4256,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"anim": "attack01", "special": "rally_ally",
 				"target": Ability.Target.ALLY,
 				"perfect_id": "", "perfect_text": "",
-				"description": "Shout one hero forward: they act NEXT,\njumping straight to the front of the\norder, and regain 15% of their\nresource. You gave them the turn — it\ncost you yours."})
+				"description": "Shout one hero forward: they act NEXT,\njumping straight to the front of the\norder, and regain {=Battle.RALLY_RESOURCE_PCT*100}% of their\nresource. You gave them the turn — it\ncost you yours."})
 		# AXIS: reaching something NOW. The very fast initiative is the point —
 		# it is a Warrior's only answer to a caster winding up.
 		#
@@ -4316,7 +4316,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 5,
 				"anim": "attack03", "special": "warcry",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Put the whole line on the front foot:\nevery hero deals {=Battle.WARCRY_PCT}% more damage for\n4 turns. The one thing a Warrior can\ndo for somebody else's numbers."})
+				"description": "Put the whole line on the front foot:\nevery hero deals {=Battle.WARCRY_PCT}% more damage for\n{=Battle.WARCRY_TURNS} turns. The one thing a Warrior can\ndo for somebody else's numbers."})
 		# AXIS: refusing to be stopped. EVERY WARRIOR SPINE DIES TO LOSING A
 		# TURN — a stunned Berserker is not bleeding anyone, a Broken Warden is
 		# not blocking.
@@ -4352,7 +4352,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 4,
 				"anim": "attack01", "special": "ironclad",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Set your teeth: for 4 turns you cannot\nbe Stunned, Frozen, Dazed or Broken,\nand take {=Battle.IRONCLAD_CUT_PCT}% less damage. The Break\nstill piles up to 99 — it just cannot\ncross until this ends."})
+				"description": "Set your teeth: for {=Battle.IRONCLAD_TURNS} turns you cannot\nbe Stunned, Frozen, Dazed or Broken,\nand take {=Battle.IRONCLAD_CUT_PCT}% less damage. The Break\nstill piles up to 99 — it just cannot\ncross until this ends."})
 		# ========== BATCH BT: TRANCHE 2, THE MAGE NINE ==========
 		#
 		# THE SYNERGY RULE STARTS HERE AND IS STANDING FROM THIS TRANCHE ON.
@@ -4603,7 +4603,7 @@ static func draft_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Pyre Wake", "dmg_type": "fire",
 				"cost": 25, "damage": 8, "pressure": 0, "delay": 2.5,
 				"cooldown": 4, "anim": "attack02", "special": "pyre_wake",
-				"perfect_id": "", "perfect_text": "Each fire {atk:12}",
+				"perfect_id": "", "perfect_text": "Each fire {atk:{=Battle.PYRE_WAKE_PERFECT_PCT}}",
 				"description": "Scatter the pyre: consume ALL of one\nenemy's Burn. For EVERY turn consumed,\na random enemy is set Burning {=Battle.PYRE_WAKE_TURNS} turn\nand takes {=@damage}% of Attack.\nOverburn refunds every turn consumed."})
 		# AXIS: THE MULTIPLIER ON GETTING FIRE, not on moving it — and it is the
 		# thing the pool most obviously lacks, because everything else in it is
@@ -4822,7 +4822,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 2.0, "cooldown": 4, "anim": "attack02",
 				"special": "recant", "target": Ability.Target.ALLY,
 				"perfect_id": "", "perfect_text": "",
-				"description": "Unspend it: one hero regains 40% of\ntheir MAXIMUM Rage or Mana.\nIt reaches the resource they cast\nwith — never a spec meter like\nResonance, Mercy, Faith or Focus."})
+				"description": "Unspend it: one hero regains {=Battle.RECANT_PCT*100}% of\ntheir MAXIMUM Rage or Mana.\nIt reaches the resource they cast\nwith — never a spec meter like\nResonance, Mercy, Faith or Focus."})
 		# AXIS: martyrdom as an economy. Mercy arrives when somebody crosses
 		# below half health, so until now the only way to fill her meter was to
 		# let the party be hurt. This is her buying a stack with her own blood,
@@ -4845,7 +4845,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 2.0, "cooldown": 4, "anim": "hurt",
 				"special": "shared_grief",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Take the wound yourself: lose 25% of\nyour MAXIMUM health and gain 4 Mercy,\n+{=Battle.SHARED_GRIEF_PER_WOUNDED} for every OTHER hero already below\nhalf health.\nIt can never take you below 1.\nA Berserker lives down there — his\nfrenzy band is your Mercy."})
+				"description": "Take the wound yourself: lose {=Battle.SHARED_GRIEF_COST_PCT*100}% of\nyour MAXIMUM health and gain {=Battle.SHARED_GRIEF_MERCY} Mercy,\n+{=Battle.SHARED_GRIEF_PER_WOUNDED} for every OTHER hero already below\nhalf health.\nIt can never take you below 1.\nA Berserker lives down there — his\nfrenzy band is your Mercy."})
 		# AXIS: her healing becomes a weapon. This is her ONLY offence and the
 		# answer to the turn where nobody is hurt — the turn a healer has
 		# nothing to do is the turn she has done her job.
@@ -4864,8 +4864,8 @@ static func draft_ability(display_name: String) -> Ability:
 				"dmg_type": "holy", "cost": 25, "damage": 0, "pressure": 6,
 				"delay": 2.5, "cooldown": 3, "anim": "attack01",
 				"special": "reprisal",
-				"perfect_id": "", "perfect_text": "75% of the healing",
-				"description": "Answer for them: deal holy damage\nequal to 50% of the healing you have\nLANDED in the last two turns on the\nturn order.\nOverhealing is not healing — only what\nactually closed a wound counts."})
+				"perfect_id": "", "perfect_text": "{=Battle.REPRISAL_PERFECT_SHARE*100}% of the healing",
+				"description": "Answer for them: deal holy damage\nequal to {=Battle.REPRISAL_SHARE*100}% of the healing you have\nLANDED in the last two turns on the\nturn order.\nOverhealing is not healing — only what\nactually closed a wound counts."})
 		# ----- DEVOUT: what else can he place. His pool was Vow of Suffering
 		# and Aegis Reversal — BOTH ACT ON SHIELDS ALREADY OUT. He could not put
 		# Faith on anyone directly, and nothing in the game read `faith_peak`
@@ -4902,7 +4902,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 2.0, "cooldown": 4, "anim": "attack02",
 				"special": "ordination",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Ordain the least of them: grant 4 Faith\nto the other hero holding the LEAST.\nIt always finds the floor — never the\nhero who is nearly there — so it carries\nthem toward the release."})
+				"description": "Ordain the least of them: grant {=Battle.ORDINATION_FAITH} Faith\nto the other hero holding the LEAST.\nIt always finds the floor — never the\nhero who is nearly there — so it carries\nthem toward the release."})
 		# AXIS: lending the number his whole kit is built on. Divine Shield
 		# absorbs 30% of HIS maximum, Afterglow heals 20% of it, Healing Pulse
 		# ticks 8% of it — every one of those spends the figure. THIS IS THE
@@ -4925,7 +4925,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 2.0, "cooldown": 4, "anim": "attack02",
 				"special": "fortified_spirit", "target": Ability.Target.ALLY,
 				"perfect_id": "", "perfect_text": "Opens at {mhp:40}",
-				"description": "Lend one hero your own bulk: their\nmaximum health rises by 30% of YOURS\nand they are healed for the same.\nThe loan DECAYS 10 points a turn over\n3 turns — health clamps under it, so\nheal them while it holds."})
+				"description": "Lend one hero your own bulk: their\nmaximum health rises by 30% of YOURS\nand they are healed for the same.\nThe loan DECAYS {=Battle.FORTIFIED_SPIRIT_STEP_PCT*100} points a turn over\n{=Battle.FORTIFIED_SPIRIT_STEPS} turns — health clamps under it, so\nheal them while it holds."})
 		# AXIS: cashing an accumulation nothing else reads. `faith_peak` is the
 		# high-water mark BI introduced so the held half of Faith would stop
 		# fighting the release; it ratchets and never falls inside a battle, so
@@ -4945,8 +4945,8 @@ static func draft_ability(display_name: String) -> Ability:
 				"dmg_type": "holy", "cost": 30, "damage": 0, "pressure": 0,
 				"delay": 2.5, "cooldown": 5, "anim": "attack03",
 				"special": "reliquary",
-				"perfect_id": "", "perfect_text": "3.5% per point",
-				"description": "Open the reliquary: every ally is healed\nfor 2.5% of YOUR maximum health per\npoint of their PEAK Faith this battle.\nNo release lowers the peak — an ally who\nreleased down to zero is still paid for\nwhat they carried."})
+				"perfect_id": "", "perfect_text": "{=Battle.RELIQUARY_PERFECT_PCT*100}% per point",
+				"description": "Open the reliquary: every ally is healed\nfor {=Battle.RELIQUARY_PCT*100}% of YOUR maximum health per\npoint of their PEAK Faith this battle.\nNo release lowers the peak — an ally who\nreleased down to zero is still paid for\nwhat they carried."})
 		# ----- OCCULTIST: what else can be done to a mark. His pool was Blight
 		# the Well and Covenant of Ash — BOTH ABOUT WHERE CORRUPTION LANDS. The
 		# mark itself was a number and nothing but a number: everything read its
@@ -4971,8 +4971,8 @@ static func draft_ability(display_name: String) -> Ability:
 				"dmg_type": "shadow", "cost": 25, "damage": 20, "pressure": 8,
 				"delay": 2.5, "cooldown": 4, "anim": "attack01",
 				"special": "suffering",
-				"perfect_id": "", "perfect_text": "3 Ruin a turn",
-				"description": "Open a wound that thinks: {=@damage}% of Attack,\nand you are healed for ALL of the damage\nit deals.\nFor 4 turns the enemy gains 2 Ruin at\nthe start of each of ITS turns — eight\nstacks bought with one turn of yours.\nCast on a BROKEN enemy, the wound runs\ndeeper: 3 Ruin a turn. Whoever breaks\nthem first feeds your madness."})
+				"perfect_id": "", "perfect_text": "{=Battle.SUFFERING_PERFECT_RUIN} Ruin a turn",
+				"description": "Open a wound that thinks: {=@damage}% of Attack,\nand you are healed for ALL of the damage\nit deals.\nFor {=Battle.SUFFERING_TURNS} turns the enemy gains {=Battle.SUFFERING_RUIN} Ruin at\nthe start of each of ITS turns — eight\nstacks bought with one turn of yours.\nCast on a BROKEN enemy, the wound runs\ndeeper: 3 Ruin a turn. Whoever breaks\nthem first feeds your madness."})
 		# AXIS: corruption relocated rather than spent. His worst case is a deep
 		# mark on something about to die — twelve stacks of work wasted when the
 		# party finishes it. This carries the pile to the boss instead.
@@ -4992,7 +4992,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 2.0, "cooldown": 3, "anim": "attack02",
 				"special": "transference",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Move the whole mark: EVERY Ruin stack on\nthe deepest-marked other enemy travels\nto this one, and 2 more join them.\nNothing detonates on the way — the\nstacks arrive as the work they already\nwere."})
+				"description": "Move the whole mark: EVERY Ruin stack on\nthe deepest-marked other enemy travels\nto this one, and {=Battle.TRANSFERENCE_BONUS} more join them.\nNothing detonates on the way — the\nstacks arrive as the work they already\nwere."})
 		# AXIS: the party marks for him. Ruin is his alone; three other heroes
 		# swing every turn and contribute nothing to the meter that IS his
 		# entire spec. This is the tranche's other cross-spec card and the
@@ -5100,8 +5100,8 @@ static func draft_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Savage Sweep", "cost": 25,
 				"damage": 0, "pressure": 0, "delay": 2.5, "cooldown": 4,
 				"anim": "attack02", "special": "savage_sweep",
-				"perfect_id": "", "perfect_text": "5 Loyalty",
-				"description": "Loose the pack down the line: your\ncompanion strikes the THREE lowest-\nhealth enemies, and gains 3 Loyalty.\nThe run opens {=Battle.SAVAGE_SWEEP_BLEED} Bleed on each, ANY\ncompanion — feeding a Berserker's\nBattle Shout and a Survivalist's\nTrapper."})
+				"perfect_id": "", "perfect_text": "{=Battle.SAVAGE_SWEEP_PERFECT_LOYALTY} Loyalty",
+				"description": "Loose the pack down the line: your\ncompanion strikes the THREE lowest-\nhealth enemies, and gains {=Battle.SAVAGE_SWEEP_LOYALTY} Loyalty.\nThe run opens {=Battle.SAVAGE_SWEEP_BLEED} Bleed on each, ANY\ncompanion — feeding a Berserker's\nBattle Shout and a Survivalist's\nTrapper."})
 		# AXIS: what rotating actually buys. FERAL MOMENTUM and MENAGERIE both
 		# already reward having cycled, but both are small passive trickles; this
 		# is the Pack build's PAYOFF, and it is deliberately near-worthless to a
@@ -5127,7 +5127,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 5,
 				"anim": "attack03", "special": "ghostpack",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Call the whole pack, living and lost:\nfor 4 turns EVERY companion you have\nsummoned this battle strikes alongside\nyour attacks for {=Battle.GHOSTPACK_SHARE*100}% — including the\nones no longer standing."})
+				"description": "Call the whole pack, living and lost:\nfor {=Battle.GHOSTPACK_TURNS} turns EVERY companion you have\nsummoned this battle strikes alongside\nyour attacks for {=Battle.GHOSTPACK_SHARE*100}% — including the\nones no longer standing."})
 		# ----- SHARPSHOOTER: the multiplier half, the finish, and the field.
 		# His pool was Called Volley and Quarry's Mark — BOTH ABOUT GENERATING
 		# AND KEEPING FOCUS. Nothing read the half PAST 100, where Focus stops
@@ -5153,8 +5153,8 @@ static func draft_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Crossfire", "cost": 25,
 				"damage": 30, "pressure": 10, "delay": 2.5, "cooldown": 4,
 				"anim": "attack02",
-				"perfect_id": "", "perfect_text": "Holds a 4th turn",
-				"description": "Set the crossfire: {=@damage}% of Attack, and\nfor 3 turns every CRITICAL hit you\nland also strikes 2 other enemies for\n{=Battle.CROSSFIRE_SHARE*100}% of that crit's damage."})
+				"perfect_id": "", "perfect_text": "Holds a {=Battle.CROSSFIRE_PERFECT_TURNS}th turn",
+				"description": "Set the crossfire: {=@damage}% of Attack, and\nfor {=Battle.CROSSFIRE_TURNS} turns every CRITICAL hit you\nland also strikes {=Battle.CROSSFIRE_SPLASH_TARGETS} other enemies for\n{=Battle.CROSSFIRE_SHARE*100}% of that crit's damage."})
 		# AXIS: patience rewarded for finishing what he started. A fresh enemy
 		# pays nothing; one at 20% health pays 8 Focus on top of the ordinary
 		# gain — so it accelerates hardest exactly when the target is about to
@@ -5171,8 +5171,8 @@ static func draft_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Calibrating Shot", "cost": 20,
 				"damage": 20, "pressure": 8, "delay": 1.5, "cooldown": 3,
 				"anim": "attack01",
-				"perfect_id": "", "perfect_text": "15% of missing health",
-				"description": "Range them as you fire: {=@damage}% of Attack,\nand you gain Focus equal to 10% of\nthe target's MISSING health.\nA fresh enemy pays nothing."})
+				"perfect_id": "", "perfect_text": "{=Battle.CALIBRATING_SHOT_PERFECT_PCT*100}% of missing health",
+				"description": "Range them as you fire: {=@damage}% of Attack,\nand you gain Focus equal to {=Battle.CALIBRATING_SHOT_PCT*100}% of\nthe target's MISSING health.\nA fresh enemy pays nothing."})
 		# AXIS: the kill stops costing him. A target dying is the most common
 		# event in a fight and it drops him to 50 retained — so the spec whose
 		# entire engine is a meter is punished by the thing it is trying to do.
@@ -5217,7 +5217,7 @@ static func draft_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Loaded Shot",
 				"dmg_type": "nature", "cost": 20, "damage": 20, "pressure": 8,
 				"delay": 2.0, "cooldown": 4, "anim": "attack01",
-				"perfect_id": "", "perfect_text": "Also lands 2 turns of Poison",
+				"perfect_id": "", "perfect_text": "Also lands {=Battle.LOADED_SHOT_PERFECT_POISON_TURNS} turns of Poison",
 				"description": "Reload with the good powder: {=@damage}% of\nAttack, and EVERY harmful effect on\nthe target has its duration reset to\nfull — the uncleansable ones too."})
 		# AXIS: the count made into a weapon. It reads how many DIFFERENT
 		# afflictions stand on the body and nothing else — at four statuses 60%
@@ -5265,7 +5265,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 5,
 				"anim": "attack01", "special": "preparation",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Ready everything: after your NEXT turn\nyou immediately take ANOTHER one.\nIt is a full turn — your own statuses\ntick again, and it refunds 15 Mana.\nOnly one may be pending."})
+				"description": "Ready everything: after your NEXT turn\nyou immediately take ANOTHER one.\nIt is a full turn — your own statuses\ntick again, and it refunds {=Battle.PREPARATION_MANA} Mana.\nOnly one may be pending."})
 		# ========== BATCH CE: TRANCHE 3, THE CLERIC NINE ==========
 		#
 		# A CONTIGUOUS BLOCK, like CB's and unlike BW's — but the AXIS/SYNERGY
@@ -5326,7 +5326,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": Ability.BUFF_DELAY_CAP, "cooldown": 4, "anim": "attack03",
 				"special": "divine_presence",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Keep the watch: for 4 turns, gain {=Battle.DIVINE_PRESENCE_MERCY}\nMercy at the start of every SECOND\nturn of yours on which NO hero fell\nbelow the window. A fall pays the\npassive instead and breaks that watch."})
+				"description": "Keep the watch: for {=Battle.DIVINE_PRESENCE_TURNS} turns, gain {=Battle.DIVINE_PRESENCE_MERCY}\nMercy at the start of every SECOND\nturn of yours on which NO hero fell\nbelow the window. A fall pays the\npassive instead and breaks that watch."})
 		# AXIS: the overflow. Mercy caps at 5 and a bad fight over-earns it; the
 		# excess is simply gone. This is the sixth stack going somewhere.
 		#
@@ -5349,7 +5349,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": Ability.BUFF_DELAY_CAP, "cooldown": 4, "anim": "attack02",
 				"special": "alms",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Give away what will not fit: for 4\nturns, every stack of Mercy earned at\nthe CAP — by a hero falling below the\nwindow, or by Divine Presence — instead\nwards the hero who earned it, absorbing\n{=Battle.ALMS_WARD_PCT}% of your maximum health."})
+				"description": "Give away what will not fit: for {=Battle.ALMS_TURNS}\nturns, every stack of Mercy earned at\nthe CAP — by a hero falling below the\nwindow, or by Divine Presence — instead\nwards the hero who earned it, absorbing\n{=Battle.ALMS_WARD_PCT}% of your maximum health."})
 		# AXIS: the crossing itself. Her engine is fuelled by allies falling
 		# below the window, and every other card of hers is about what to do
 		# once one has. This is the one that REFUSES the fall — and it is the
@@ -5387,7 +5387,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": Ability.BUFF_DELAY_CAP, "cooldown": 4, "anim": "attack03",
 				"special": "vespers", "target": Ability.Target.ALLY,
 				"perfect_id": "", "perfect_text": "",
-				"description": "Say the evening office over them: for 4\nturns, or until it fires, the next blow\nthat would take that ally below half\nhealth is absorbed for {=Battle.VESPERS_PCT*100}% of YOUR\nmaximum. No crossing, no Mercy."})
+				"description": "Say the evening office over them: for {=Battle.VESPERS_TURNS}\nturns, or until it fires, the next blow\nthat would take that ally below half\nhealth is absorbed for {=Battle.VESPERS_PCT*100}% of YOUR\nmaximum. No crossing, no Mercy."})
 		# ----- DEVOUT: two cards against the asymmetry nobody had exploited,
 		# and one shield. FAITH IS PAID ON THE HIGHEST COUNT HELD THIS BATTLE
 		# (`faith_peak`, Batch BI), so an early spike is worth exactly as much
@@ -5469,8 +5469,8 @@ static func draft_ability(display_name: String) -> Ability:
 				"dmg_type": "holy", "cost": 20, "damage": 0, "pressure": 0,
 				"delay": 2.0, "cooldown": 4, "anim": "attack02",
 				"special": "jubilee",
-				"perfect_id": "", "perfect_text": "{mhp:8} per stack",
-				"description": "Spend ALL your own Faith — 6% of your\nmaximum health and 3% of maximum Mana\nper stack. Needs {=Battle.JUBILEE_MIN_FAITH} held.\nYour PEAK DROPS TO MATCH: the\nmitigation it bought is spent with it."})
+				"perfect_id": "", "perfect_text": "{mhp:{=Battle.BLESSING_OF_THE_FAITHFUL_PERFECT_PCT*100}} per stack",
+				"description": "Spend ALL your own Faith — {=Battle.BLESSING_OF_THE_FAITHFUL_PCT*100}% of your\nmaximum health and {=Battle.BLESSING_OF_THE_FAITHFUL_MANA_PCT*100}% of maximum Mana\nper stack. Needs {=Battle.JUBILEE_MIN_FAITH} held.\nYour PEAK DROPS TO MATCH: the\nmitigation it bought is spent with it."})
 		# AXIS: the absorb, which BI §2 measured as the DRY source of the whole
 		# engine — 1.5 absorbed hits a battle, against the ground's 9.1 Faith.
 		# Conviction builds ONLY on Divine Shield absorbs, so a shield that
@@ -5528,8 +5528,8 @@ static func draft_ability(display_name: String) -> Ability:
 				"dmg_type": "shadow", "cost": 25, "damage": 0, "pressure": 20,
 				"delay": 2.0, "cooldown": 4, "anim": "attack02",
 				"special": "breaking_darkness",
-				"perfect_id": "", "perfect_text": "Holds 4 turns",
-				"description": "Break the dark over it: {=@pressure} Break\ndamage, and for 3 turns EVERY source\nof Break damage lands on it {=Battle.BREAKING_DARKNESS_BD_PCT}%\nharder. Break is what opens the madness\na boss would otherwise refuse.\nEVERY source means allies too: a\nSharpshooter's Fault Line and a\nWarden's Turn the Blade both land\nharder while this holds."})
+				"perfect_id": "", "perfect_text": "Holds {=Battle.BREAKING_DARKNESS_PERFECT_TURNS} turns",
+				"description": "Break the dark over it: {=@pressure} Break\ndamage, and for {=Battle.BREAKING_DARKNESS_TURNS} turns EVERY source\nof Break damage lands on it {=Battle.BREAKING_DARKNESS_BD_PCT}%\nharder. Break is what opens the madness\na boss would otherwise refuse.\nEVERY source means allies too: a\nSharpshooter's Fault Line and a\nWarden's Turn the Blade both land\nharder while this holds."})
 		# AXIS: the detonation cadence, and the lever nothing pulls. Ruin
 		# detonates on every TENTH stack and the stacks SURVIVE the blast, so a
 		# deep mark is an accumulation the game never lets him cash. This trades
@@ -5560,8 +5560,8 @@ static func draft_ability(display_name: String) -> Ability:
 				"dmg_type": "shadow", "cost": 30, "damage": 0, "pressure": 8,
 				"delay": 3.0, "cooldown": 5, "anim": "attack03",
 				"special": "requiem", "gated": true,
-				"perfect_id": "", "perfect_text": "{atk:10} per stack",
-				"description": "Sing it out: CONSUMES every stack of\nRuin on one enemy for {=Battle.REQUIEM_PER_STACK*100}% of Attack\neach, and every hero is healed 2% of\nyour maximum per stack.\nNothing detonates — the mark is spent."})
+				"perfect_id": "", "perfect_text": "{atk:{=Battle.REQUIEM_PERFECT_PER_STACK*100}} per stack",
+				"description": "Sing it out: CONSUMES every stack of\nRuin on one enemy for {=Battle.REQUIEM_PER_STACK*100}% of Attack\neach, and every hero is healed {=Battle.REQUIEM_HEAL_PCT*100}% of\nyour maximum per stack.\nNothing detonates — the mark is spent."})
 		# AXIS: the free one, and it is aimed at the half of the game his spec
 		# cannot reach. IT IS THE ONLY CARD OF HIS THAT READS NO RUIN AT ALL —
 		# no stacks to build, no threshold to reach, no mark to spend — so it is
@@ -5594,7 +5594,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 2.5, "cooldown": 4, "anim": "attack03",
 				"special": "penance",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Set the penance: for 4 turns that enemy\ntakes shadow damage equal to {=Battle.PENANCE_MIRROR*100}% of\nthe damage it deals, whoever it hits.\nAn enemy that never swings never pays."})
+				"description": "Set the penance: for {=Battle.PENANCE_TURNS} turns that enemy\ntakes shadow damage equal to {=Battle.PENANCE_MIRROR*100}% of\nthe damage it deals, whoever it hits.\nAn enemy that never swings never pays."})
 		# ========== BATCH CH: TRANCHE 3, THE HUNTER NINE ==========
 		#
 		# A CONTIGUOUS BLOCK (CB's and CE's shape), but the AXIS/SYNERGY check
@@ -5637,7 +5637,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 4,
 				"anim": "attack01", "special": "last_howl",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Swear the last howl: for the rest of the\nbattle, every companion that falls\ngives you +3% strike damage per stack\nof Loyalty it had earned. The meter\nbreaks as it always did — this is paid\nout of what it held, not instead."})
+				"description": "Swear the last howl: for the rest of the\nbattle, every companion that falls\ngives you +{=Battle.LAST_HOWL_PCT_PER_STACK}% strike damage per stack\nof Loyalty it had earned. The meter\nbreaks as it always did — this is paid\nout of what it held, not instead."})
 		# AXIS: the rotation stops costing the bond. THE PACK's whole lane is
 		# named for cycling companions, and BJ measured 0.05 swaps a trash
 		# battle — a verb nobody uses. BM removed the TURN cost (Instinctive
@@ -5660,7 +5660,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 4,
 				"anim": "attack01", "special": "succession",
 				"perfect_id": "", "perfect_text": "",
-				"description": "For 6 turns a swap hands on the bond:\nthe arriving companion starts with HALF\nthe Loyalty of the one it replaces,\ninstead of whatever it had earned\nbefore. It never lowers a deeper bond."})
+				"description": "For {=Battle.SUCCESSION_TURNS} turns a swap hands on the bond:\nthe arriving companion starts with HALF\nthe Loyalty of the one it replaces,\ninstead of whatever it had earned\nbefore. It never lowers a deeper bond."})
 		# AXIS: the meter as AMMUNITION. Loyalty pays continuously and has no
 		# ceiling, so a Beastmaster's only question about it is how deep it can
 		# get — never when to cash it. This is the answer, and it is deliberately
@@ -5693,8 +5693,8 @@ static func draft_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Unleash", "cost": 25,
 				"damage": 0, "pressure": 12, "delay": 2.5, "cooldown": 4,
 				"anim": "attack02", "special": "unleash", "gated": true,
-				"perfect_id": "", "perfect_text": "{atk:25} a stack",
-				"description": "Spend the whole bond at once: your\ndeepest companion strikes immediately\nfor 20% of your Attack PER STACK of\nits Loyalty, with Break behind it.\nThat meter resets to zero.\nRequires a companion with Loyalty."})
+				"perfect_id": "", "perfect_text": "{atk:{=Battle.UNLEASH_PERFECT_PCT_PER_STACK*100}} a stack",
+				"description": "Spend the whole bond at once: your\ndeepest companion strikes immediately\nfor {=Battle.UNLEASH_PCT_PER_STACK*100}% of your Attack PER STACK of\nits Loyalty, with Break behind it.\nThat meter resets to zero.\nRequires a companion with Loyalty."})
 		# ----- SHARPSHOOTER: the exception, the threshold, the depth.
 		# THE GAP ALL THREE ARE AUTHORED AGAINST: his pool reads the meter's
 		# FIRST hundred points and nothing else. Focus converts at 100 — every
@@ -5737,7 +5737,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 4,
 				"anim": "attack01", "special": "fault_line",
 				"perfect_id": "", "perfect_text": "",
-				"description": "For 6 turns, while your Focus stands\nABOVE the conversion point, every\nattack you land also deals {=Battle.FAULT_LINE_BD} Break\ndamage."})
+				"description": "For {=Battle.FAULT_LINE_TURNS} turns, while your Focus stands\nABOVE the conversion point, every\nattack you land also deals {=Battle.FAULT_LINE_BD} Break\ndamage."})
 		# AXIS: driving an uncapped meter DEEP inside a single turn. Every other
 		# way he builds Focus pays once per turn on one mark, so the meter's
 		# depth is a function of how many turns he stays — this is the only thing
@@ -5797,7 +5797,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 4,
 				"anim": "attack01", "special": "stalking_horse",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Play the stalking horse for 4 turns:\nenemies are drawn to swing at YOU, and\nevery attacker takes a DIFFERENT\naffliction — Poison, then Cripple, then\nSlowed, Exposed, Dazed and Blind. Your\nown breadth, built off their turns."})
+				"description": "Play the stalking horse for {=Battle.STALKING_HORSE_TURNS} turns:\nenemies are drawn to swing at YOU, and\nevery attacker takes a DIFFERENT\naffliction — Poison, then Cripple, then\nSlowed, Exposed, Dazed and Blind. Your\nown breadth, built off their turns."})
 		# AXIS: the party feeding his engine. Trapper's breadth term counts
 		# statuses from ANY source — his `PROTECTED_CORES` entry says so in as
 		# many words — and he is the ONLY spec in the game whose passive an ally
@@ -5819,7 +5819,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 5,
 				"anim": "attack01", "special": "downwind",
 				"perfect_id": "", "perfect_text": "",
-				"description": "For 4 turns the wind carries it: every\nharmful effect any hero lands on an\nenemy is copied onto a SECOND enemy,\npreferring one that does not have it.\nA snare and Vendetta's lock are never\ncopied. His engine, fed by every hero."})
+				"description": "For {=Battle.DOWNWIND_TURNS} turns the wind carries it: every\nharmful effect any hero lands on an\nenemy is copied onto a SECOND enemy,\npreferring one that does not have it.\nA snare and Vendetta's lock are never\ncopied. His engine, fed by every hero."})
 		# AXIS: spending the breadth. It DELIBERATELY FIGHTS HIS OWN PASSIVE —
 		# what Trapper spent the fight building is what this eats — and that
 		# tension is the point of the card rather than a cost to be smoothed
@@ -5851,8 +5851,8 @@ static func draft_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Cull", "dmg_type": "nature",
 				"cost": 30, "damage": 0, "pressure": 0, "delay": 3.0,
 				"cooldown": 5, "anim": "attack03", "special": "cull",
-				"perfect_id": "", "perfect_text": "{atk:12} a status",
-				"description": "CONSUME every affliction on one enemy:\nEVERY enemy takes 10% of Attack in\nnature damage per status removed.\nA poison that cannot be cleansed stays\n— and is not paid for. It strips your\nown Trapper bonus from that body."})
+				"perfect_id": "", "perfect_text": "{atk:{=Battle.CULL_PERFECT_PCT*100}} a status",
+				"description": "CONSUME every affliction on one enemy:\nEVERY enemy takes {=Battle.CULL_PCT*100}% of Attack in\nnature damage per status removed.\nA poison that cannot be cleansed stays\n— and is not paid for. It strips your\nown Trapper bonus from that body."})
 		# ================== BATCH DO — THE TWENTY-TWO THAT LEFT THE TREES ==================
 		#
 		# **A TALENT MAY NOT GRANT AN ABILITY.** Twenty-two talent nodes did,
@@ -6107,7 +6107,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 5,
 				"anim": "attack01", "special": "bring_it_down",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Call the kill: for 4 turns EVERY hero\ndeals {=Battle.BRING_IT_DOWN_PER}% more damage per stack of\nLoyalty on your deepest bond, up to\n+{=Battle.BRING_IT_DOWN_CAP}%. The bond is not spent — the\nnumber is read as the horn sounds."})
+				"description": "Call the kill: for {=Battle.BRING_IT_DOWN_TURNS} turns EVERY hero\ndeals {=Battle.BRING_IT_DOWN_PER}% more damage per stack of\nLoyalty on your deepest bond, up to\n+{=Battle.BRING_IT_DOWN_CAP}%. The bond is not spent — the\nnumber is read as the horn sounds."})
 		# ----- SHARPSHOOTER: the meter as armour, and the marksman dictating
 		# what an enemy is allowed to bring.
 		#
@@ -6128,7 +6128,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP,
 				"cooldown": 4, "anim": "attack01", "special": "dug_in",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Set your feet: for 4 turns you take\nless damage — a QUARTER of whatever\nFocus stands when the blow lands, up\nto {=Battle.DUG_IN_CAP}% less.\nBreak the mark and you break the\ncover with it."})
+				"description": "Set your feet: for {=Battle.DUG_IN_TURNS} turns you take\nless damage — a QUARTER of whatever\nFocus stands when the blow lands, up\nto {=Battle.DUG_IN_CAP}% less.\nBreak the mark and you break the\ncover with it."})
 		# AXIS: CTRL, which his pool did not have. It is a genuinely new control
 		# in the project: NOTHING silences an ability today, and it is written
 		# as a downgrade rather than a lost turn precisely so it is not a fourth
@@ -6142,8 +6142,8 @@ static func draft_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Heads Down", "cost": 25,
 				"damage": 20, "pressure": 8, "delay": 2.0, "cooldown": 4,
 				"anim": "attack02",
-				"perfect_id": "", "perfect_text": "Holds a 4th turn",
-				"description": "Keep them pinned: {=@damage}% of Attack, and\nfor 3 turns that enemy can bring\nNOTHING but its basic attack to bear.\nIt still acts — it simply cannot\nreach for anything better."})
+				"perfect_id": "", "perfect_text": "Holds a {=Battle.HEADS_DOWN_PERFECT_TURNS}th turn",
+				"description": "Keep them pinned: {=@damage}% of Attack, and\nfor {=Battle.HEADS_DOWN_TURNS} turns that enemy can bring\nNOTHING but its basic attack to bear.\nIt still acts — it simply cannot\nreach for anything better."})
 		# ----- SURVIVALIST: the affliction board, read as defence and as
 		# sustain. Both are the same measurement the Trapper already runs.
 		#
@@ -6160,7 +6160,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP,
 				"cooldown": 4, "anim": "attack01", "special": "thick_hide",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Toughened by your own trade: for 4\nturns you take {=Battle.THICK_HIDE_PER}% less damage for\nevery DIFFERENT affliction standing on\nwhoever is striking you, up to {=Battle.THICK_HIDE_CAP}%.\nThe wider the board, the harder you\nare to put down."})
+				"description": "Toughened by your own trade: for {=Battle.THICK_HIDE_TURNS}\nturns you take {=Battle.THICK_HIDE_PER}% less damage for\nevery DIFFERENT affliction standing on\nwhoever is striking you, up to {=Battle.THICK_HIDE_CAP}%.\nThe wider the board, the harder you\nare to put down."})
 		# AXIS: HEAL — absent from all twenty-four, and the axis the whole class
 		# was shortest of. `Field Dressing`'s claim to be "the only self-heal a
 		# Hunter can get" was ALREADY FALSE before this card (Harvest heals, and
@@ -6177,7 +6177,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 5,
 				"anim": "attack01", "special": "salve",
 				"perfect_id": "", "perfect_text": "Holds a 4th turn",
-				"description": "Distil what you have been laying: for\n3 turns you heal {=Battle.SALVE_PER}% of maximum health\nat the start of your turn for every\nDIFFERENT affliction standing on the\nenemies, up to {=Battle.SALVE_CAP}%.\nNothing is consumed — the board keeps\npaying everything else."})
+				"description": "Distil what you have been laying: for\n{=Battle.SALVE_TURNS} turns you heal {=Battle.SALVE_PER}% of maximum health\nat the start of your turn for every\nDIFFERENT affliction standing on the\nenemies, up to {=Battle.SALVE_CAP}%.\nNothing is consumed — the board keeps\npaying everything else."})
 	return null
 
 
@@ -6438,7 +6438,7 @@ static func survivalist_pool_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Deadfall", "cooldown": 5, "cost": 25,
 				"special": "deadfall", "delay": Ability.BUFF_DELAY_CAP, "anim": "attack01",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Arm a deadfall in the path. The next\nenemy to act takes {=Battle.DEADFALL_SPRING_PCT*100}% Atk nature\ndamage and is Stunned 1 turn; the trap\nthen lies dormant {=Battle.DEADFALL_DORMANCY} turns, re-arms and\nsprings again — FOUR times in all.\nIt holds a trap slot until spent."})
+				"description": "Arm a deadfall in the path. The next\nenemy to act takes {=Battle.DEADFALL_SPRING_PCT*100}% Atk nature\ndamage and is Stunned {=Battle.TRAP_STUN_TURNS} turn; the trap\nthen lies dormant {=Battle.DEADFALL_DORMANCY} turns, re-arms and\nsprings again — FOUR times in all.\nIt holds a trap slot until spent."})
 		"Harvest":
 			return Ability.make({"display_name": "Harvest", "cooldown": 4, "cost": 25,
 				"special": "harvest", "delay": 3.0, "anim": "attack02",
@@ -6635,7 +6635,7 @@ static func basic_override_ability(display_name: String) -> Ability:
 				"delay": 2.0, "anim": "attack01", "random_hits": 2,
 				"perfect_extra_hit": false,
 				"perfect_id": "", "perfect_text": "",
-				"description": "Unstable magic detonates over TWO\nrandom enemies. Builds 1 Resonance\n(2 on a critical strike)."})
+				"description": "Unstable magic detonates over TWO\nrandom enemies. Builds {=Battle.RESONANCE_PER_CAST} Resonance\n(2 on a critical strike)."})
 	return null
 
 
@@ -6812,7 +6812,7 @@ const SPEC_INFO := {
 	"inquisitor": {"name": "Devout", "constitution": 110, "archetype": "Warder", "passive": "conviction",
 		"max_hp": 175, "armor": 0.18,
 		"resists": {"holy": 0.15, "fire": 0.10, "shadow": -0.10},
-		"passive_desc": "Conviction: heroes build Faith whenever Divine Shield\nabsorbs damage for them — {=Battle.FAITH_PER_ABSORB} a hit, max {=Battle.FAITH_RELEASE} stacks, doubled\nunder Blessing of Zeal. Each stack: {=Battle.FAITH_MITIGATION_PCT}% damage mitigation\nand +{=Battle.FAITH_DAMAGE_PCT}% damage dealt, PAID ON THE HIGHEST COUNT HELD\nTHIS BATTLE. At {=Battle.FAITH_RELEASE} the hero is healed for {mhp:15|ally}, and\nthe COUNT resets while the peak does not. The Devout\nrecovers {res:3}, carries Faith as well, and that count\nnever releases.",
+		"passive_desc": "Conviction: heroes build Faith whenever Divine Shield\nabsorbs damage for them — {=Battle.FAITH_PER_ABSORB} a hit, max {=Battle.FAITH_RELEASE} stacks, doubled\nunder Blessing of Zeal. Each stack: {=Battle.FAITH_MITIGATION_PCT}% damage mitigation\nand +{=Battle.FAITH_DAMAGE_PCT}% damage dealt, PAID ON THE HIGHEST COUNT HELD\nTHIS BATTLE. At {=Battle.FAITH_RELEASE} the hero is healed for {mhp:{=Battle.FAITH_RELEASE_HEAL*100}|ally}, and\nthe COUNT resets while the peak does not. The Devout\nrecovers {res:{=Battle.FAITH_RELEASE_MANA*100}}, carries Faith as well, and that count\nnever releases.",
 		"blurb": "A living shrine — faith made armor for every hero."},
 	"occultist": {"name": "Occultist", "constitution": 95, "archetype": "Pressure", "passive": "old_gods",
 		"max_hp": 155, "armor": 0.08,
@@ -6876,13 +6876,13 @@ static func spec_abilities(spec: String) -> Array:
 			return [
 				Ability.make({"display_name": "Mocking Blow", "cost": 0, "damage": 27, "pressure": 15,
 					"resource_gain": 10, "delay": 2.0, "anim": "attack01", "cooldown": 1,
-					"perfect_id": "", "perfect_text": "Taunts last 5 turns",
-					"description": "Strike and humiliate: the target AND\none other enemy must attack the Warrior\nfor 4 turns. Builds {=@resource_gain} Rage."}),
+					"perfect_id": "", "perfect_text": "Taunts last {=Battle.MOCKING_BLOW_PERFECT_TURNS} turns",
+					"description": "Strike and humiliate: the target AND\none other enemy must attack the Warrior\nfor {=Battle.MOCKING_BLOW_TURNS} turns. Builds {=@resource_gain} Rage."}),
 				Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 43,
 					"pressure": 20, "delay": 3.0, "anim": "attack03", "resource_gain": 10,
 					"cooldown": 2,
 					"applies_status": {"id": "sunder", "turns": BattleUnit.SUNDER_TURNS},
-					"perfect_id": "", "perfect_text": "+5 bonus BD",
+					"perfect_id": "", "perfect_text": "+{=Battle.CRUSHING_BLOW_PERFECT_BD} bonus BD",
 					"description": "Moderate damage. Sunders armor by\n{=Unit.SUNDER_STEP*100}% for {=@applies_status.turns} turns. Builds {=@resource_gain} Rage."}),
 				# Shieldwall graduated from the talent tree (Batch G): his one
 				# moment of control over the Block identity belongs in the base
@@ -6908,7 +6908,7 @@ static func spec_abilities(spec: String) -> Array:
 					"cooldown": 3,
 					"applies_status": {"id": "stunned", "turns": 1},
 					"perfect_id": "", "perfect_text": "The Stun lands even on a boss.",
-					"description": "A skull-ringing bash with a keen 25%\ncrit chance: ALWAYS Stuns for {=@applies_status.turns} turn.\nBuilds {=@resource_gain} Rage.\nBosses resist Stun until Broken —\nunless the strike is PERFECT."}),
+					"description": "A skull-ringing bash with a keen {=Battle.POMMEL_STRIKE_CRIT*100}%\ncrit chance: ALWAYS Stuns for {=@applies_status.turns} turn.\nBuilds {=@resource_gain} Rage.\nBosses resist Stun until Broken —\nunless the strike is PERFECT."}),
 				# Batch AK put Guard Change back in the opening three (see
 				# trimmed_kit_ability for why) — not a free action on
 				# purpose: turn-less actions need engine support, so the
@@ -7122,7 +7122,7 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Powershot", "cooldown": 2, "cost": 25, "damage": 20,
 					"pressure": 20, "delay": 3.0, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "",
-					"description": "+2% damage for every point of the\ntarget's Break bar already FULL —\nallies break them, the marksman\nends them."}),
+					"description": "+{=Battle.POWERSHOT_PCT_PER_POINT}% damage for every point of the\ntarget's Break bar already FULL —\nallies break them, the marksman\nends them."}),
 				Ability.make({"display_name": "Hold Breath", "cooldown": 3, "cost": 15, "special": "hold_breath",
 					"delay": 1.5, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "",
@@ -7143,7 +7143,7 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Snare Trap", "cooldown": 3, "cost": 20, "special": "snare_trap",
 					"delay": 2.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "",
-					"description": "Rig a snare on one enemy: the next\ntime it acts, it is STUNNED for 1 turn\nand Poisoned for 4. A BOSS RESISTS\nUNTIL BROKEN."}),
+					"description": "Rig a snare on one enemy: the next\ntime it acts, it is STUNNED for {=Battle.TRAP_STUN_TURNS} turn\nand Poisoned for {=Battle.SNARE_TRAP_POISON_TURNS}. A BOSS RESISTS\nUNTIL BROKEN."}),
 			]
 	return []
 

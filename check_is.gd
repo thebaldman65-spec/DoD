@@ -939,6 +939,17 @@ func _s5_the_index_pilot() -> void:
 	for k in NINE_COUNTS:
 		if int(NINE_COUNTS[k]) >= 7:
 			want[k] = true
+	# BATCH IT — THE NEWEST RULINGS OWED IS THE CORE's BY ROLE (the routing's own words): the derivation counted IS's, and when
+	# a later batch's stands in its place the role passes to it — the first RULINGS OWED the file holds, newest first.
+	var newest := ""
+	for k in blocks:
+		if String(k).begins_with("### ") and String(k).ends_with("'s RULINGS OWED"):
+			newest = String(k)
+			break
+	ok(newest != "", "§5: the file holds no RULINGS OWED for the core's role")
+	if want.has("### IS's RULINGS OWED") and newest != "":
+		want.erase("### IS's RULINGS OWED")
+		want[newest] = true
 	var core_keys := core.keys()
 	core_keys.sort()
 	var want_keys := want.keys()
@@ -957,13 +968,7 @@ func _block_key(line: String) -> String:
 # An index entry names its block first, in a double-backtick span (a heading may hold a backtick):
 # `- **CORE** `` ### SANCTITY's STEP ``` or `- `` ### FOUND AT HX AND NOT FIXED `` — label … *triggers:* …`.
 func _entry_key(line: String) -> String:
-	if not line.begins_with("- "):
-		return ""
-	var a := line.find("`` #")
-	if a < 0:
-		return ""
-	var b := line.find(" ``", a + 3)
-	return line.substr(a + 3, b - a - 3).strip_edges() if b > a else ""
+	return Gate.index_entry_key(line)   # BATCH IT: the reader lives in `gate_fixture.gd`, shared with `check_it` §5
 
 
 # ── §6 — THE HISTORY STRIP ──────────────────────────────────────────────────

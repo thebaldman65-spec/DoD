@@ -94,10 +94,16 @@ func _collections(src: String) -> void:
 	# clause's collection visible where it is READ. A filter hung off a shared
 	# union would put the resource clause's answer somewhere the resource clause
 	# is not, which is the shape DJ §5 counted 23 of.
+	# BATCH IT §3b — RE-POINTED: "in one branch" was read as `r_at - p_at < 2000`, a fixed 2000 characters from the first
+	# walk that ran 617 past Rallying Shout's arm through `barrier` into `focus` — so a resource walk moved into the next arm
+	# would still have read as the same branch. The branch is the arm itself, cut where its indentation returns, and the
+	# pick names what it picked: Rallying Shout's arm, holding both walks.
 	var p_at := src.find(PRESSURE_WALK)
 	var r_at := src.find(RESOURCE_WALK)
-	ok(p_at >= 0 and r_at > p_at and (r_at - p_at) < 2000,
-		"the two clauses are no longer two adjacent loops in one branch (%d, %d)" % [p_at, r_at])
+	var arm_at := src.rfind("\n\t\t\"", p_at) + 1 if p_at > 0 else -1
+	var arm := Gate.block(src, arm_at)
+	ok(p_at >= 0 and r_at > p_at and r_at < arm_at + arm.length() and arm.begins_with("\t\t\"rally\":"),
+		"the two clauses are no longer two adjacent loops in one branch (%d, %d; Rallying Shout's arm ends %d)" % [p_at, r_at, arm_at + arm.length()])
 	# AND `dead` IS STILL EXCLUDED BY NAME on the widened half. `_hero_side()` is
 	# the authored name for "the union, living only" — the same decision DK took
 	# at four sites, for Hold the Line's reason exactly: a corpse has no meter

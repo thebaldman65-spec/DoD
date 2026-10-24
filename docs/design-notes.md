@@ -4,6 +4,31 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The strike, the eighty literals named, the positional family, and the alarm's fence (Batch IT) — 2026-10-23
+
+**Why a constant's name says what the figure is, and why two equal literals are usually two constants.** A naming pass's risk is
+not the naming; it is collapsing coincidences. Two literals that happen to share a value — a Good and a Perfect figure, two cards'
+turn counts — are moved by different re-tunes, and folding them into one constant makes the next re-tune move a card nobody meant
+to touch. So a figure is one constant only where a re-tune would move both (Killing Frost's freeze and the Chilled pile's ceiling
+are one figure: the fourth stack freezes and no fifth can land), and the re-tune is the test. A name that says where a figure is
+used goes stale the day it is used a second time; a name that says what it is does not.
+
+**Why the catalogue reads its figures through a door.** Of IQ's 171 false facts in the design document, 140 sat in present-tense
+prose — the strip could not reach them. A figure the document states and the code decides drifts the first time one side moves and
+the other does not; read on both sides by an instrument, the drift is a red the batch that caused it meets. The worked examples a
+text picks (*at 6 stacks*) are named as inputs, not figures, because no code owns them.
+
+**Why a window is cut by its subject.** A fixed-length read from an anchor is a positional read of its end: it passes while the code
+it was written against holds still and asks nothing once that code grows. Cutting a window where its statement's indentation
+returns, or at its subject's own named end, makes the read follow the code.
+
+**Why structure is fenced.** An alarm whose bar the alarming thing can set is not an alarm. A one-time structural section, fenced and
+named, can be told apart by a gate, so it does not raise the bar every later batch is measured against; a section a gate cannot
+identify is a batch's writing.
+
+**Why the index carries a stamp.** A routing table that drifts from its file routes with authority it no longer has. A stamp of each
+block makes the drift visible the moment the block changes; it cannot make the batch re-read the row, which stays the batch's.
+
 ## The load door's five answers, the pilot, and the history strip (Batch IS) — 2026-10-22
 
 **Why a removed card is dropped, when IR kept a name it did not know.** A card the game no longer has is a card the player no

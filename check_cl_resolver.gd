@@ -88,7 +88,10 @@ func _initialize() -> void:
 			if p != null:
 				authored_digits.append("%s: %s" % [ab.display_name, p.get_string()])
 	for spec in Classes.SPEC_INFO:
-		var pd := String(Classes.SPEC_INFO[spec]["passive_desc"])
+		# BATCH IT §2 — RE-POINTED: read as every surface reads it, through the figure door (`Classes.engine_desc` resolves
+		# `passive_desc`'s figure tokens before a screen resolves its values). Read raw, a value token whose figure is a
+		# token itself — `{mhp:{=Battle.FAITH_RELEASE_HEAL*100}|ally}`, the form the cards already carry — reads as unresolved.
+		var pd := Classes.resolve_figures(String(Classes.SPEC_INFO[spec]["passive_desc"]))
 		if brace.search(Classes.resolve_values(pd, hero)) != null:
 			print("UNRESOLVED TOKEN in passive_desc %s" % spec)
 			unresolved += 1

@@ -454,7 +454,7 @@ func _additive_units() -> void:
 			["0.01 * caster.vestments_pct", "Blessed Vestments"],
 			["0.01 * cleric.grace_pct", "Grace"],
 			["0.01 * cleric.sanctified_pct", "Sanctified"],
-			["0.5 + 0.01 * ga_step", "Guardian Angel"]]:
+			["BattleUnit.MERCY_WINDOW_AT + 0.01 * ga_step", "Guardian Angel"]]:   # BATCH IT §2 — RE-POINTED: the literal this read is a named constant now; the needle names it.
 		ok(bsrc.contains(String(pair[0])),
 			"%s reads its counter additively (%s)" % [pair[1], pair[0]])
 	ok(usrc.contains("0.01 * last_hope_bonus"),

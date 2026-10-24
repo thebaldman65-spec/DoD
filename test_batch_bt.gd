@@ -72,6 +72,7 @@ extends SceneTree
 # 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
 # This suite keeps its own SIGNATURE and delegates, so not one call site moved.
 const Fixture = preload("res://suite_fixture.gd")
+const Gate = preload("res://gate_fixture.gd")   # IT §3b: the one window helper (`block`, `within`, `comment_above`)
 
 
 # Mirrored from battle.gd so each check states what it depends on rather than
@@ -305,8 +306,11 @@ func _synergy_rule() -> void:
 		ok(at > 0, "%s sits inside the BT block" % n)
 		if at <= 0:
 			continue
-		# The 1600 characters above the entry are its comment.
-		var lead := block.substr(maxi(at - 1600, 0), mini(at, 1600))
+		# BATCH IT §3b — RE-POINTED: "the 1600 characters above the entry" started inside the PREVIOUS card's case or comment
+		# for most of the tranche, so a card whose own comment lost its line would have passed on its neighbour's. The lead
+		# is the entry's OWN comment — the comment lines directly above its key — and the window asserts it is nothing else.
+		var lead := Gate.comment_above(block, at)
+		ok(Gate.is_comment(lead), "%s: the lead read is the entry's own comment and nothing else (%d chars)" % [n, lead.length()])
 		ok(lead.contains("SYNERGY:") or lead.contains("SYNERGY, "),
 			"%s names what it combos with" % n)
 		ok(lead.contains("AXIS:"), "%s names its axis" % n)

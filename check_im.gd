@@ -817,7 +817,11 @@ func _s0_rulings() -> void:
 	var bw := _body("scripts/battle.gd", "_bewitched_strike")
 	ok(bw.contains("_apply_status(bw_target, \"dazed\", 2)\n"), "§0.5: the charmed Daze passes a source, or moved")
 	var bw_at := raw.find("\nfunc _bewitched_strike(")
-	ok(bw_at > 0 and raw.substr(maxi(bw_at - 900, 0), 900).contains("DI §2"),
+	# BATCH IT §3b — RE-POINTED: the 900 characters ABOVE the function started 129 inside `_cheapest_attack`, the function
+	# before it. The read is the function's own comment now — the comment lines directly above its `func` — and says so.
+	var bw_lead := Gate.comment_above(raw, bw_at + 1) if bw_at > 0 else ""
+	ok(Gate.is_comment(bw_lead), "§0.5: the lead read above `_bewitched_strike` is its own comment and nothing else (%d chars)" % bw_lead.length())
+	ok(bw_at > 0 and bw_lead.contains("DI §2"),
 		"§0.5: the comment above `_bewitched_strike` does not name DI §2's ruling")
 	# THE `st/b` COLUMN: named for what it counts, and not one printed character of the report moved.
 	ok(not raw.contains("debuff counter") and not raw.contains("the debuffer's ledger"),

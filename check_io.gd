@@ -411,7 +411,10 @@ func _s1d_the_thin_veil() -> void:
 	ok(comp.attack == int(round(100 * (1.0 + float(_run.THIN_VEIL_PCT)))), "§1d: a fresh unit's Attack read %d" % comp.attack)
 	comp.free()
 	var sm := _body("scripts/battle.gd", "_stamp_modifier")
-	var tv := sm.substr(sm.find("\"thin_veil\":"), 160)
+	# BATCH IT §3b — RE-POINTED: 160 characters ran 48 into the `long_silence` arm; the slice is the Thin Veil's own arm.
+	var tv_at := sm.find("\"thin_veil\":")
+	var tv := Gate.block(sm, tv_at)
+	ok(Gate.within(sm, tv_at, tv), "§1d: the Thin Veil slice ends inside its own arm — it does not run into the Long Silence's")
 	ok(tv.contains("if not inherited:") and tv.contains("u.attack = int(round(u.attack * (1.0 + Run.THIN_VEIL_PCT)))"),
 		"§1d: the Thin Veil is not Feverish's door read off its constant")
 	print("    %d units' Attack raised by %d%%" % [units.size(), int(round(float(_run.THIN_VEIL_PCT) * 100))])

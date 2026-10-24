@@ -39,6 +39,7 @@ extends SceneTree
 # 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
 # This suite keeps its own SIGNATURE and delegates, so not one call site moved.
 const Fixture = preload("res://suite_fixture.gd")
+const Gate = preload("res://gate_fixture.gd")   # IT §3b: the one window helper (`block`, `within`, `comment_above`)
 
 
 # §2's design numbers, in one place. The chance is (15 x the recipient's own
@@ -222,7 +223,10 @@ func _one_door_for_break_prevented() -> void:
 	var src := _src("res://scripts/battle.gd")
 	ok(src.count("func _prev_bd(") == 1, "§1: there is exactly one Break door")
 	var door := src.find("func _prev_bd(")
-	var body := src.substr(door, 420)
+	# BATCH IT §3b — RE-POINTED: 420 characters ran 219 past `_prev_bd` into `_build_sfx_pool`; the slice is the function's
+	# own block now, and it says so.
+	var body := Gate.block(src, door)
+	ok(Gate.within(src, door, body), "§1: the Break door's slice ends inside `_prev_bd`")
 	ok(body.contains("_stat(\"bdprev_hero_\" + nm, cut)"),
 		"§1: it banks the per-hero total")
 	ok(body.contains("_stat(\"bdprev_\" + term, cut)"),
