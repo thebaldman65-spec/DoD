@@ -1,0 +1,172 @@
+spine	name	file	line	sort	text
+Cleric / Sanctity	Rune of the Hierophant (core)	data/runes.json	1060	PLAYER-FACING	"name": "Rune of the Hierophant (core)", "scope": "class:cleric",
+Cleric / Sanctity	Rune of the Hierophant (core)	docs/master.html	1394	PLAYER-FACING	<tr><td>Rune of the Hierophant (core)</td><td>Sanctity</td><td>—</td></tr>
+Cleric / Sanctity	Hierophant's	docs/master.html	3463	PLAYER-FACING	healing it added, the damage it refused) and a Hierophant's Sanctity. <b>Every debug action is named</b> &mdash; on the
+Cleric / Sanctity	Hierophant	CLAUDE.md	2301	RECORD	fed a Hierophant before anyone acted; `check_ie` §2 drives them. **AND SINCE IG §1 EVERY DISPLAY CHIP IS DRAWN SO (I…
+Cleric / Sanctity	Hierophant's	CLAUDE.md	2689	RECORD	Channel and Sanctity are the Rune of the Vanguard's, the Invoker's and the Hierophant's engines (names
+Cleric / Sanctity	Hierophant	CLAUDE.md	2763	RECORD	Hierophant beside the default lineages, untalented, rung 1, a normal fight's end — was read again and the step moved
+Cleric / Sanctity	Rune of the Hierophant's	CLAUDE.md	2925	RECORD	· **sanctity_events** (the Cleric spine — the Rune of the Hierophant's engine since GK; uncapped, static,
+Cleric / Sanctity	Hierophant's	baselines.json	2023	RECORD	…w that refused a blow and added to a heal, a Hierophant's Sanctity; §1e the readout's source swept for a die or a write,…
+Cleric / Sanctity	Hierophant	baselines.json	2107	RECORD	…repaired cards land three steps longer on a Hierophant seated through the spawn, Exhortation's src, and Divine Wrath's…
+Cleric / Sanctity	Hierophant's	check_di.gd	143	RECORD	# payout reads the applier at the door, and the Hierophant's words say *each status the
+Cleric / Sanctity	Hierophant's	check_dm.gd	52	RECORD	# Hierophant's *each status the Cleric applies*), so each anchor carries the
+Cleric / Sanctity	engine_sanctity	check_gn.gd	48	RECORD	"cleric": "engine_sanctity"}
+Cleric / Sanctity	engine_sanctity	check_gq.gd	603	RECORD	"cleric": ["engine_sanctity", "engine_holy", "engine_occultist"],
+Cleric / Sanctity	engine_sanctity	check_gq.gd	607	RECORD	"cleric": "engine_sanctity", "hunter": "engine_field_kit"}
+Cleric / Sanctity	Hierophant's	check_if.gd	12	RECORD	#       and added to a heal, a Hierophant's Sanctity — each read off the line the real doors wrote.
+Cleric / Sanctity	Hierophant's	check_if.gd	460	RECORD	print("\n§1d — a Rupture, a Boil Over, a vow and a Hierophant's Sanctity in one fight's line")
+Cleric / Sanctity	Hierophant	check_if.gd	481	RECORD	…se — a Berserker with Boil Over, a Cryomancer with Smoulder, a vowed Hierophant Cleric, two enemies and the readout on")
+Cleric / Sanctity	Hierophant's	check_if.gd	536	RECORD	"§1d: a Hierophant's Sanctity is not on the line as the ledger stood: %s" % [sc])
+Cleric / Sanctity	Hierophant	check_ig.gd	16	RECORD	#       count the chips inflated), five steps the cap — driven on a Hierophant at either side of a step and at the cap.
+Cleric / Sanctity	Hierophant	check_ig.gd	408	RECORD	ok(false, "§2: the board seats a Hierophant")
+Cleric / Sanctity	Hierophant's	check_ig.gd	417	RECORD	ok(read == [0, 1, 1, 2, 5, 5], "§2: a Hierophant's steps read %s — want [0, 1, 1, 2, 5, 5]" % [read])
+Cleric / Sanctity	Hierophant's	check_il.gd	13	RECORD	#        Hierophant's repaired statuses land his steps longer, through the spawn; the recast gate adds the same steps.
+Cleric / Sanctity	HIEROPHANT's	check_il.gd	534	RECORD	# ── §1b — A HIEROPHANT's REPAIRED STATUSES LAND HIS STEPS LONGER ────────────
+Cleric / Sanctity	Hierophant's	check_il.gd	549	RECORD	print("\n§1b — a Hierophant's repaired statuses land his steps longer, seated through the spawn")
+Cleric / Sanctity	engine_sanctity	data/runes.json	1059	RECORD	"engine_sanctity": {
+Cleric / Sanctity	Hierophant's	docs/changelog.html	363	RECORD	…b>&sect;1 &mdash; SANCTITY REACHES THE CLERIC's BLESSINGS.</b> The Hierophant's rune lengthens <i>each status the Cleric
+Cleric / Sanctity	Hierophant's	docs/changelog.html	558	RECORD	…ry chip on a nameplate that shows a figure the hero holds is drawn, not laid as a status</b>, so a Hierophant's Sanctity
+Cleric / Sanctity	Hierophant	docs/changelog.html	575	RECORD	…ect;2 &mdash; SANCTITY's STEP, 16 &rarr; 13.</b> Read on the Hierophant beside the default lineages, untalented, rung 1,
+Cleric / Sanctity	Hierophant's	docs/changelog.html	610	RECORD	…ce's added healing and refused damage; and a Hierophant's Sanctity. The file opens with one line describing the run &mda…
+Cleric / Sanctity	Hierophant	docs/changelog.html	637	RECORD	…pares them byte for byte, reads the file it wrote, builds a fight holding a Rupture, a Boil Over, a vowed Hierophant and
+Cleric / Sanctity	Hierophant's	docs/changelog.html	664	RECORD	…is: nothing ticks, dispels or counts it, and it no longer floats a label or feeds the Hierophant's Sanctity at the start
+Cleric / Sanctity	Rune of the Hierophant	docs/changelog.html	3130	RECORD	Sanctity (the Rune of the Hierophant). <b>Those three names are proposed.</b></p>
+Cleric / Sanctity	Hierophant's	docs/combat-rules.md	389	RECORD	· **AND A STATUS A CLERIC LAYS ON HIS OWN SIDE CARRIES HIM AS WELL (IL §1; the Hierophant's *each status the
+Cleric / Sanctity	Hierophant's	docs/design-notes.md	528	RECORD	**Why the Cleric is passed as the source of his own blessings.** The Hierophant's rune says it lengthens each status the
+Cleric / Sanctity	Hierophant's	docs/design-notes.md	666	RECORD	Devout's, while the ledger is a Hierophant's, and one party holds one Cleric. The chip a Hierophant's count actually car…
+Cleric / Sanctity	Hierophant	docs/design-notes.md	725	RECORD	Hierophant opened every fight with free events toward his steps that nobody had earned. The engine chips are drawn the w…
+Cleric / Sanctity	Hierophant's	docs/instrument-rules.md	1393	RECORD	status events a normal fight on the Hierophant's ledger where the bot books 40.43 on IO's rung-1 road — the bot books
+Cleric / Sanctity	Hierophant	docs/kit-recon.html	16	RECORD	selection &mdash; the Rune of the Vanguard (Momentum), the Invoker (Channel) or the Hierophant (Sanctity),
+Cleric / Sanctity	Rune of the Hierophant	docs/kit-recon.html	365	RECORD	<b>Taking the Rune of the Hierophant (Sanctity) opens with Smite alone.</b> An ally-targeted Cleric card can target the
+Cleric / Sanctity	Rune of the Hierophant	docs/kit-recon.html	378	RECORD	<tr><td>Rune of the Hierophant <i>(proposed)</i></td><td>Sanctity (spine)</td><td>none, and no lineage</td><td><b>Smite…
+Cleric / Sanctity	Hierophant-taker	docs/kit-recon.html	386	RECORD	…very Cleric draws about one card in four from here; <b>a Hierophant-taker draws every card of his run from here</b>, and
+Cleric / Sanctity	Hierophant-taker	docs/kit-recon.html	433	RECORD	<li><b>Slots:</b> a Hierophant-taker opens at 3 of 7; a Devout at 4 of 7; a Holy or an Occultist at 5 of 7.</li>
+Cleric / Sanctity	Rune of the Hierophant	docs/reports/GK.md	10	RECORD	*Rune of the Vanguard*, Channel as the *Rune of the Invoker*, Sanctity as the *Rune of the Hierophant*.** None
+Cleric / Sanctity	Hierophant	docs/reports/GK.md	11	RECORD	…ary.json` and `runes.json`, 5,867 strings — finds *Vanguard*, *Invoker* and *Hierophant* nowhere but on their own runes.
+Cleric / Sanctity	Rune of the Hierophant	docs/reports/GK.md	92	RECORD	| Cleric | Sanctity (`sanctity`) | **Rune of the Hierophant** *(proposed)* | — |
+Cleric / Sanctity	Hierophant	docs/reports/GK.md	297	RECORD	| 1 | Vanguard *(spine)* · Pyromancer · Hierophant *(spine)* · Beastmaster | victory | the Cleric takes the **Rune of th…
+Cleric / Sanctity	Hierophant	docs/reports/GK.md	310	RECORD	| Cleric (took the Hierophant) | Smite | the class passive |
+Cleric / Sanctity	Hierophant	docs/reports/GL.md	95	RECORD	…| four / the Vanguard (Momentum) | four / the Invoker (Channel) | four / the Hierophant (Sanctity) | three / **none** |
+Cleric / Sanctity	Hierophant	docs/reports/GQ.md	60	RECORD	| **Vanguard, Invoker, Hierophant and the Hunter's three bring no enabler, so their cards are the engine rule alone** |…
+Cleric / Sanctity	Rune of the Hierophant	docs/reports/GQ.md	164	RECORD	| Rune of the Hierophant | *(the rule alone)* |
+Cleric / Sanctity	Hierophant	docs/reports/GQ.md	192	RECORD	(Hierophant, Devout, Occultist) and the Hunter's (Beastmaster, Sharpshooter, Medic). Nothing overlaps; the one fault
+Cleric / Sanctity	Hierophant	docs/reports/GQ.md	202	RECORD	Invoker, the Cleric the Hierophant, the Hunter the Medic. The screen moves hero by hero and lands on the map, each hero
+Cleric / Sanctity	Hierophant	docs/reports/GS.md	139	RECORD	| Cleric | Hierophant, Oathkeeper, Arbiter | — | — | 3 | — | — |
+Cleric / Sanctity	Rune of the Hierophant	docs/reports/HA.md	403	RECORD	rule engine at class selection** (the Rune of the Reaver, the Rune of the Hierophant, the Runes of the Medic and the
+Cleric / Sanctity	Hierophant	docs/reports/HC.md	311	RECORD	| the Hierophant (Sanctity) · the Oathkeeper · the Arbiter | **0 each** | **0 each** |
+Cleric / Sanctity	Hierophant	docs/reports/HO.md	370	RECORD	| the **Hierophant**'s Sanctity | fed by it, about 0.3 events a round |
+Cleric / Sanctity	Hierophant's	docs/reports/HS.md	171	RECORD	| Sanctity's events | the Hierophant's ledger | per landing / removal | **per ingredient**: forming books the arriving o…
+Cleric / Sanctity	HIEROPHANT's	docs/reports/ID.md	23	RECORD	2. **THE CLASS PASSIVE's CHIP WAS A STATUS, AND DELETING IT MOVED THE HIEROPHANT's SANCTITY (§3c).** It was laid through
+Cleric / Sanctity	Hierophant's	docs/reports/ID.md	25	RECORD	…events and four dice spent on a chip, before ID. The deletion (ruled) takes both away: a Hierophant's steps arrive four
+Cleric / Sanctity	Hierophant's	docs/reports/ID.md	355	RECORD	…_gp` is the one row ID moves for them. **The Hierophant's Sanctity is the cost the gates do not see**: four events fewer…
+Cleric / Sanctity	Hierophant's	docs/reports/IE.md	8	RECORD	…so the curve is the designer's. **§2: the engine chips are drawn as rune chips are**, and a Hierophant's steps now come
+Cleric / Sanctity	Hierophant	docs/reports/IE.md	28	RECORD	…ITY's STEPS NOW COME ABOUT ONE OF HIS TURNS LATER (§2b) — AUTHORED NOTHING.** Default build, a Hierophant Cleric, ~1,670
+Cleric / Sanctity	Hierophant; Hierophant's	docs/reports/IE.md	222	RECORD	…e probe's copies of HEAD and of §2a seat a **Hierophant** Cleric (a probe switch awakens the Cleric with the Hierophant'…
+Cleric / Sanctity	Hierophant's	docs/reports/IE.md	452	RECORD	`check_ib`) at their rows. **The Hierophant's Sanctity is the cost the gates do not see**: §2b measures it.
+Cleric / Sanctity	HIEROPHANT	docs/reports/IF.md	111	RECORD	- **SANCTITY, IF A HIEROPHANT STANDS**: the ledger's events and his steps at the fight's end.
+Cleric / Sanctity	Hierophant	docs/reports/IF.md	139	RECORD	…— a Berserker carrying Boil Over, a Pyromancer carrying Frostbolt and Smoulder, a vowed Hierophant Holy, a Survivalist,
+Cleric / Sanctity	Hierophant's	docs/reports/IG.md	56	RECORD	…t; and Faith is the Devout's, the ledger the Hierophant's, and a party holds one Cleric — Faith reaches his ledger only…
+Cleric / Sanctity	Hierophant	docs/reports/IG.md	117	RECORD	…e §2, §3 or §4 existed: IE's probe (`probe_patch.py`, `probe_hiero_patch.py` — a Hierophant beside the default lineages,
+Cleric / Sanctity	Hierophant's	docs/reports/IG.md	118	RECORD	the Cleric awakened with the Hierophant's rune) plus a per-status tally of the ledger at every fight's end (IG's
+Cleric / Sanctity	Hierophant's	docs/reports/IG.md	135	RECORD	…'s Smoulder and the Hourglass's reach are the only game changes between, and neither touches a Hierophant's party much).
+Cleric / Sanctity	Hierophant's	docs/reports/IH.md	29	RECORD	(a Cleric on the Hierophant's rune) and the Cleric's Mana.
+Cleric / Sanctity	Hierophant	docs/reports/IH.md	30	RECORD	2. **SANCTITY's STEP AT 13 — CONFIRM THE NUMBER** (IG's ruling 2, carried: the file holds no Hierophant).
+Cleric / Sanctity	Hierophant	docs/reports/II.md	21	RECORD	…E ZONE WITHOUT THE DEBUG MENU, AND SEND THE FILE** (IH's ruling 1, carried — the brief's §0.1). Its first Hierophant run
+Cleric / Sanctity	Hierophant	docs/reports/IJ.md	27	RECORD	…E ZONE WITHOUT THE DEBUG MENU, AND SEND THE FILE** (IH's ruling 1, carried — II §0.1, IJ §0.1). Its first Hierophant run
+Cleric / Sanctity	Hierophant	docs/reports/IK.md	24	RECORD	old). Its first Hierophant confirms Sanctity's step — on IL's repaired code once IL lands; it prices Boil Over's rate…
+Cleric / Sanctity	Hierophant	docs/reports/IL.md	29	RECORD	…Y ONE ZONE WITHOUT THE DEBUG MENU, AND SEND THE FILE** (IH's ruling 1, carried — five batches old). Its first Hierophant
+Cleric / Sanctity	Hierophant	docs/reports/IL.md	48	RECORD	…). Making it the Cleric's lengthens it for a Hierophant, lets Downwind copy it and books it to him; the potions likewise…
+Cleric / Sanctity	Hierophant's	docs/reports/IL.md	208	RECORD	…ecast gate** (`_recast_refused`) predicted a recast's turns without Sanctity's, so a Hierophant's recast of a lengthened
+Cleric / Sanctity	Hierophant's	docs/reports/IL.md	214	RECORD	…en** (`check_il` §1b, a Cleric holding Mercy and the Hierophant's rune, seated through the spawn): twelve repaired cards
+Cleric / Sanctity	Hierophant	docs/reports/IL.md	226	RECORD	…probe, IG's population, on the same seeds**: a Hierophant beside the default lineages (the Cleric of each of IG's three
+Cleric / Sanctity	Hierophant's	docs/reports/IL.md	227	RECORD	parties awakened with the Hierophant's rune), rung 1, the default build 20 runs a party and untalented 60, **every run s…
+Cleric / Sanctity	Hierophant	docs/reports/IM.md	30	RECORD	…*PLAY ONE ZONE WITHOUT THE DEBUG MENU, AND SEND THE FILE** (IH's ruling 1, asked at II through IM). Its first Hierophant
+Cleric / Sanctity	Hierophant	docs/reports/IN.md	187	RECORD	population (the Hierophant beside the default lineages, three parties), 20 runs a party an arm, **every run seeded from…
+Cleric / Sanctity	Hierophant	docs/reports/IN.md	322	RECORD	…ctity step, and IL §1c's re-measure of it** — IG's population exactly (rung 1, the Hierophant, the default build 20 runs
+Cleric / Sanctity	Hierophant	docs/reports/IO.md	433	RECORD	…e and population, IL's seeds and shape** — a Hierophant beside the default lineages, rung 1, the default build 20 runs a
+Cleric / Sanctity	Hierophant's	docs/reports/IP.md	100	RECORD	…he Cryomancer's third from fight 7), a Cleric on the Hierophant's spine (the vow from fight 4; the Holy's core second at
+Cleric / Sanctity	Rune of the Hierophant (core); engine_sanctity	docs/reports/IQ-master-census.tsv	1355	RECORD	M0394 3 1418 NAME AGREES Rune of the Hierophant (core) / Sanctity data/runes.json engine_sanctity
+Cleric / Sanctity	Hierophant's	docs/reports/IQ-master-census.tsv	5060	RECORD	…8 3745 NAME AGREES "every Boil Over ..., the Vow of Silence ... and a Hierophant's Sanctity" scripts/readout.gd:374-384
+Cleric / Sanctity	Hierophant	docs/reports/IU-routing.md	122	RECORD	…— the Rune of the Vanguard, the Invoker, the Hierophant is the owed ruling IU's claims ledger row ISN04 (STANDS) names a…
+Cleric / Sanctity	Hierophant	docs/state.md	159	RECORD	…ds. *triggers:* Rune of the Vanguard Invoker Hierophant, SPINE_INFO, class-selection words ENGINE_SLOTS, engine rune pri…
+Cleric / Sanctity	Hierophant's	docs/state.md	298	RECORD	Hierophant's spine (the Holy's core second at the boss) and a Sharpshooter; no talents, no relics; the vow, Grudge, Long…
+Cleric / Sanctity	Hierophant	docs/state.md	1453	RECORD	1. **The three spine runes' names** — the Rune of the Vanguard, the Invoker, the Hierophant.
+Cleric / Sanctity	Hierophant	docs/state.md	1852	RECORD	Hierophant, names proposed — and `BattleUnit._sync_engine_switches` is the three switches' one writer, so a hero
+Cleric / Sanctity	Hierophant's	scripts/battle.gd	1885	RECORD	# events and four `randf_range` a battle), so its going moves the Hierophant's count and
+Cleric / Sanctity	Hierophant's	scripts/battle.gd	7040	RECORD	# Sanctity, so a Hierophant's recast lands its base turns PLUS his steps; a proposal
+Cleric / Sanctity	Hierophant	scripts/battle.gd	8803	RECORD	# charmed body, and a Cleric's source would lengthen an enemy's action for a Hierophant (`_bewitched_strike`).
+Cleric / Sanctity	Hierophant	scripts/battle.gd	18510	RECORD	# would feed a Hierophant off an enemy's action, let Downwind copy it and book it to him (IL §1a's kept-
+Cleric / Sanctity	Hierophant's	scripts/battle.gd	22032	RECORD	# CLERIC LAYS IS (the Hierophant's *each status the Cleric applies*,
+Cleric / Sanctity	Hierophant	scripts/unit.gd	2311	RECORD	# Hierophant beside the default lineages, untalented, rung 1, a normal fight's
+Mage / Channel	Rune of the Invoker (core)	data/runes.json	1036	PLAYER-FACING	"name": "Rune of the Invoker (core)", "scope": "class:mage",
+Mage / Channel	Rune of the Invoker (core)	docs/master.html	1388	PLAYER-FACING	<tr><td>Rune of the Invoker (core)</td><td>Channel</td><td>—</td></tr>
+Mage / Channel	Invoker's	CLAUDE.md	2689	RECORD	Channel and Sanctity are the Rune of the Vanguard's, the Invoker's and the Hierophant's engines (names
+Mage / Channel	engine_channel	check_gn.gd	47	RECORD	const SPINES := {"warrior": "engine_momentum", "mage": "engine_channel",
+Mage / Channel	engine_channel	check_gq.gd	602	RECORD	"mage": ["engine_channel", "engine_pyromancer", "engine_cryomancer"],
+Mage / Channel	engine_channel	check_gq.gd	606	RECORD	var takes := {"warrior": "engine_warden", "mage": "engine_channel",
+Mage / Channel	engine_channel	data/runes.json	1035	RECORD	"engine_channel": {
+Mage / Channel	Rune of the Invoker	docs/changelog.html	3129	RECORD	that belonged to a class are runes too: Momentum (the Rune of the Vanguard), Channel (the Rune of the Invoker) and
+Mage / Channel	Invoker	docs/kit-recon.html	16	RECORD	selection &mdash; the Rune of the Vanguard (Momentum), the Invoker (Channel) or the Hierophant (Sanctity),
+Mage / Channel	Rune of the Invoker	docs/kit-recon.html	278	RECORD	passive. <b>Taking the Rune of the Invoker (Channel) at class selection opens with Magic Bolt alone.</b> No class-wide
+Mage / Channel	Rune of the Invoker	docs/kit-recon.html	294	RECORD	<tr><td>Rune of the Invoker <i>(proposed)</i></td><td>Channel (spine)</td><td>none, and no lineage</td><td><b>Magic Bolt…
+Mage / Channel	Invoker-taker	docs/kit-recon.html	302	RECORD	(classes.gd:539-540). Every Mage draws about one card in four from here; <b>an Invoker-taker draws every card of his run
+Mage / Channel	Invoker-taker	docs/kit-recon.html	352	RECORD	<li><b>Slots:</b> an Invoker-taker opens at 3 of 7; an Arcanist at 6 of 7; a Pyromancer or Cryomancer at 5 of 7.</li>
+Mage / Channel	Rune of the Invoker	docs/reports/GK.md	10	RECORD	*Rune of the Vanguard*, Channel as the *Rune of the Invoker*, Sanctity as the *Rune of the Hierophant*.** None
+Mage / Channel	Invoker	docs/reports/GK.md	11	RECORD	…ary.json` and `runes.json`, 5,867 strings — finds *Vanguard*, *Invoker* and *Hierophant* nowhere but on their own runes.
+Mage / Channel	Rune of the Invoker	docs/reports/GK.md	88	RECORD	| Mage | Channel (`channel`) | **Rune of the Invoker** *(proposed)* | — |
+Mage / Channel	Invoker	docs/reports/GK.md	298	RECORD	| 2 | Warden · Invoker *(spine)* · Occultist · Sharpshooter | victory | the Mage takes the **Pyromancer** from an elite…
+Mage / Channel	Invoker	docs/reports/GK.md	309	RECORD	| Mage (took the Invoker) | Magic Bolt | the class passive |
+Mage / Channel	Invoker	docs/reports/GL.md	95	RECORD	…| four / the Vanguard (Momentum) | four / the Invoker (Channel) | four / the Hierophant (Sanctity) | three / **none** |
+Mage / Channel	Rune of the Invoker	docs/reports/GN.md	466	RECORD	…`check_fh` **165 / 0** (its cache dealt *the Rune of the Invoker*, an engine rune, which took an engine slot), `check_fn…
+Mage / Channel	Invoker's	docs/reports/GN.md	505	RECORD	…se` **186 / 0**, `check_fh` **165 / 0** (the Invoker's rune again), `check_ek` **47 / 0**, `check_es` 57 / 0, `check_fn`…
+Mage / Channel	Invoker	docs/reports/GQ.md	60	RECORD	| **Vanguard, Invoker, Hierophant and the Hunter's three bring no enabler, so their cards are the engine rule alone** |…
+Mage / Channel	Rune of the Invoker	docs/reports/GQ.md	158	RECORD	| Rune of the Invoker | *(the rule alone)* |
+Mage / Channel	Invoker	docs/reports/GQ.md	202	RECORD	Invoker, the Cleric the Hierophant, the Hunter the Medic. The screen moves hero by hero and lands on the map, each hero
+Mage / Channel	Invoker	docs/reports/GS.md	135	RECORD	| Mage | Invoker, Weaver, Leech | — | — | 3 | — | — |
+Mage / Channel	Invoker	docs/reports/HC.md	297	RECORD	| the Invoker (Channel) · the Weaver · the Leech | 3 each | 7 each |
+Mage / Channel	Rune of the Invoker (core)	docs/reports/IA.md	414	RECORD	…Ember Leap", "Rune of the Arcanist (core)", "Rune of the Invoker (core)"], not ["Rune of the Arcanist (core)", "Rune of…
+Mage / Channel	Rune of the Invoker (core)	docs/reports/IH.md	50	RECORD	…` from the engine taken. The Mage took the **Rune of the Invoker (core)**, whose engine is **Channel — the Mage's spine*…
+Mage / Channel	Rune of the Invoker (core)	docs/reports/IH.md	101	RECORD	both by design**: the Mage took the Rune of the Invoker (core), whose engine is Channel — **the Mage's spine, which belo…
+Mage / Channel	Invoker's	docs/reports/IP.md	60	RECORD	…h the reading said**: the Mage was dealt the Invoker's spine and slotted the Cryomancer's core THIRD at fight 7 (the Wea…
+Mage / Channel	Invoker's	docs/reports/IP.md	99	RECORD	…e party: a Berserker on his own core (Grudge worn from fight 4), a Mage on the Invoker's spine (the Weaver's core second
+Mage / Channel	Rune of the Invoker (core); engine_channel	docs/reports/IQ-master-census.tsv	1343	RECORD	M0388 3 1412 NAME AGREES Rune of the Invoker (core) / Channel data/runes.json engine_channel
+Mage / Channel	Invoker	docs/reports/IU-routing.md	122	RECORD	…runes' names — the Rune of the Vanguard, the Invoker, the Hierophant is the owed ruling IU's claims ledger row ISN04 (ST…
+Mage / Channel	Invoker	docs/state.md	159	RECORD	…tion words. *triggers:* Rune of the Vanguard Invoker Hierophant, SPINE_INFO, class-selection words ENGINE_SLOTS, engine…
+Mage / Channel	Invoker's	docs/state.md	297	RECORD	core), a Mage on the Invoker's spine (the Weaver's core second from fight 5, the Cryomancer's third from fight 7), a Cle…
+Mage / Channel	Invoker	docs/state.md	1453	RECORD	1. **The three spine runes' names** — the Rune of the Vanguard, the Invoker, the Hierophant.
+Mage / Channel	Invoker	docs/state.md	1851	RECORD	**GK MADE THEM REACHABLE, AS RUNES.** Each spine is an engine rune — the Rune of the Vanguard, the Invoker and the
+Warrior / Momentum	Rune of the Vanguard (core)	data/runes.json	1012	PLAYER-FACING	"name": "Rune of the Vanguard (core)", "scope": "class:warrior",
+Warrior / Momentum	Rune of the Vanguard (core)	docs/master.html	1382	PLAYER-FACING	<tr><td>Rune of the Vanguard (core)</td><td>Momentum</td><td>—</td></tr>
+Warrior / Momentum	Rune of the Vanguard's	CLAUDE.md	2689	RECORD	Channel and Sanctity are the Rune of the Vanguard's, the Invoker's and the Hierophant's engines (names
+Warrior / Momentum	Rune of the Vanguard's	CLAUDE.md	2918	RECORD	· **momentum** (the Warrior spine — the Rune of the Vanguard's engine since GK) | **CAPPED IN THE FIELD**, not on the re…
+Warrior / Momentum	engine_momentum	check_gn.gd	47	RECORD	const SPINES := {"warrior": "engine_momentum", "mage": "engine_channel",
+Warrior / Momentum	engine_momentum	check_gq.gd	601	RECORD	"warrior": ["engine_momentum", "engine_warden", "engine_berserker"],
+Warrior / Momentum	Vanguard	check_ik.gd	399	RECORD	…") and wengs.has("momentum"), "§1c: the Warrior's engines no longer hold the Reaver and the Vanguard (%s)" % str(wengs))
+Warrior / Momentum	engine_momentum	data/runes.json	1011	RECORD	"engine_momentum": {
+Warrior / Momentum	Rune of the Vanguard	docs/changelog.html	3129	RECORD	that belonged to a class are runes too: Momentum (the Rune of the Vanguard), Channel (the Rune of the Invoker) and
+Warrior / Momentum	Rune of the Vanguard	docs/kit-recon.html	16	RECORD	selection &mdash; the Rune of the Vanguard (Momentum), the Invoker (Channel) or the Hierophant (Sanctity),
+Warrior / Momentum	Rune of the Vanguard	docs/kit-recon.html	202	RECORD	<b>It is not an engine</b>, so a card that builds or spends Rage passes the test. <b>Taking the Rune of the Vanguard
+Warrior / Momentum	Rune of the Vanguard	docs/kit-recon.html	215	RECORD	<tr><td>Rune of the Vanguard <i>(proposed)</i></td><td>Momentum (spine)</td><td>none, and no lineage</td><td><b>Strike a…
+Warrior / Momentum	Vanguard-taker	docs/kit-recon.html	222	RECORD	about one card in four from here (<code>CLASS_DRAFT_SHARE</code> 0.25, classes.gd:550). <b>A Vanguard-taker draws every
+Warrior / Momentum	Vanguard-taker	docs/kit-recon.html	263	RECORD	<li><b>From the class pool:</b> every card taken is one a Vanguard-taker can no longer earn. Six today; three if all
+Warrior / Momentum	Vanguard-taker	docs/kit-recon.html	267	RECORD	<li><b>Slots:</b> a kit of three inside the cap of seven. A Vanguard-taker opens at 3 of 7; a Berserker or Warden at
+Warrior / Momentum	Rune of the Vanguard	docs/reports/GK.md	10	RECORD	*Rune of the Vanguard*, Channel as the *Rune of the Invoker*, Sanctity as the *Rune of the Hierophant*.** None
+Warrior / Momentum	Vanguard	docs/reports/GK.md	11	RECORD	…ary.json` and `runes.json`, 5,867 strings — finds *Vanguard*, *Invoker* and *Hierophant* nowhere but on their own runes.
+Warrior / Momentum	Rune of the Vanguard	docs/reports/GK.md	84	RECORD	| Warrior | Momentum (`momentum`) | **Rune of the Vanguard** *(proposed)* | — |
+Warrior / Momentum	Vanguard	docs/reports/GK.md	297	RECORD	| 1 | Vanguard *(spine)* · Pyromancer · Hierophant *(spine)* · Beastmaster | victory | the Cleric takes the **Rune of th…
+Warrior / Momentum	Vanguard	docs/reports/GK.md	299	RECORD	…rvivalist | victory | the Warrior **buys the Vanguard at the Peddler** → Stances + Momentum | the Vanguard, then every e…
+Warrior / Momentum	Vanguard	docs/reports/GK.md	308	RECORD	| Warrior (took the Vanguard) | Strike | the class passive |
+Warrior / Momentum	Vanguard	docs/reports/GL.md	95	RECORD	| **Engines / spine** | four / the Vanguard (Momentum) | four / the Invoker (Channel) | four / the Hierophant (Sanctity)…
+Warrior / Momentum	Vanguard-taker	docs/reports/GN.md	76	RECORD	| **"GL measured a Vanguard-taker at 3 of 7 and a Berserker at 6 of 7 before this batch"** | before GN a Vanguard-taker…
+Warrior / Momentum	Vanguard	docs/reports/GQ.md	60	RECORD	| **Vanguard, Invoker, Hierophant and the Hunter's three bring no enabler, so their cards are the engine rule alone** |…
+Warrior / Momentum	Rune of the Vanguard	docs/reports/GQ.md	152	RECORD	| Rune of the Vanguard | *(the rule alone)* |
+Warrior / Momentum	Vanguard	docs/reports/GQ.md	191	RECORD	the Warrior's (Berserker, Warden, Vanguard: the note stands), the Mage's (Pyromancer, Cryomancer, Weaver), the Cleric's
+Warrior / Momentum	Vanguard	docs/reports/GS.md	131	RECORD	| Warrior | Vanguard, Reaver, Bastion | — | — | 3 | — | — |
+Warrior / Momentum	Vanguard	docs/reports/HC.md	284	RECORD	| the Vanguard (Momentum) · the Reaver · the Bastion | 5 each | 9 each |
+Warrior / Momentum	Vanguard's	docs/reports/HW.md	102	RECORD	…ause of *"does not consume Rage for extra damage"***: the designer's Warriors have run on the Vanguard's core (Momentum)
+Warrior / Momentum	engine_momentum	docs/reports/IA.md	431	RECORD	…— *§1: the warrior's six, the pouch empty — engine_momentum's rule is not drawn whole* (+195 more)<br>`check_gx` 1367 /…
+Warrior / Momentum	Rune of the Vanguard (core); engine_momentum	docs/reports/IQ-master-census.tsv	1331	RECORD	M0382 3 1406 NAME AGREES Rune of the Vanguard (core) / Momentum data/runes.json engine_momentum
+Warrior / Momentum	Rune of the Vanguard	docs/reports/IU-routing.md	122	RECORD	…TED**: 1. The three spine runes' names — the Rune of the Vanguard, the Invoker, the Hierophant is the owed ruling IU's c…
+Warrior / Momentum	Rune of the Vanguard	docs/state.md	159	RECORD	…s, texts, class-selection words. *triggers:* Rune of the Vanguard Invoker Hierophant, SPINE_INFO, class-selection words…
+Warrior / Momentum	Rune of the Vanguard	docs/state.md	1453	RECORD	1. **The three spine runes' names** — the Rune of the Vanguard, the Invoker, the Hierophant.
+Warrior / Momentum	Rune of the Vanguard	docs/state.md	1851	RECORD	**GK MADE THEM REACHABLE, AS RUNES.** Each spine is an engine rune — the Rune of the Vanguard, the Invoker and the

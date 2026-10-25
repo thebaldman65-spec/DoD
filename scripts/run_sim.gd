@@ -50,12 +50,15 @@
 #   Blacksmith               buy the first offered pairing when the gold
 #                            clears the 40g reserve (Batch BK §3).
 #   Relics (DOD_SIM_RELICS)  armed at the draft; none by default.
-#   Elite rune spoils        pick-of-3 resolved instantly: an ordinary
+#   Rune caches              the elite's and the bargain's, each rolled at
+#                            the victory and ANSWERED after the draft, in
+#                            the player's order and through his door
+#                            (`Run.take_rune_pick`, IV §1a): an ordinary
 #                            rune first (a spec-scoped one until HC §1),
-#                            else the first candidate (the build-lane
-#                            preference went with the lanes at FX);
-#                            auto-equip while a slot (Run.rune_slots:
-#                            2/3/4 by zone) is free.
+#                            else the first candidate; an ordinary rune is
+#                            worn while a slot is free, a core rune is held
+#                            unworn and then slotted from the panel's door
+#                            while an engine slot is free.
 #
 # NEVER PERSISTS: Run.sim_run gates save_run/clear_save, and this file
 # never calls Relics.unlock_random or any Profile hook — a simulated run
@@ -156,6 +159,12 @@ static var rune_shop_offered := 0   # rune offers actually put on the counter
 static var rune_elite_offered := 0  # cache candidates shown (3 per cache)
 static var rune_elite_taken := 0    # caches resolved — one rune each
 static var rune_elite_equipped := 0 # ...of those, worn (a slot was free)
+# BATCH IV §1a — THE BARGAIN's CACHE, answered since IV (FOUND AT HR: never before), and a cache let go
+# because nothing in it could be handed over.
+static var rune_bargain_offered := 0 # bargain caches queued (candidates shown, 3 per cache at a full pool)
+static var rune_bargain_taken := 0   # ...answered — one rune each
+static var rune_bargain_equipped := 0 # ...of those, worn or slotted
+static var rune_picks_spent := 0     # caches let go with nothing left to hand over
 # Batch AH: the earnable-ability economy — offers shown and picks taken
 # (2 awards a zone, 6 a run, when both pools still hold something).
 static var ability_offered := 0
@@ -180,6 +189,8 @@ static var draft_at_cap := 0
 static var rune_refused_noslot := 0 # never offered: every slot already worn
 static var rune_refused_gold := 0   # offered, left on the counter: 40g reserve
 static var rune_refused_dupe := 0   # re-roll kept landing on an owned rune
+static var rune_refused_room := 0   # IV §1b: the counter's door refused it (a full holding or bag)
+static var heals_refused := 0       # IV §1b: a potion the door refused (a full stack or no slot)
 static var rune_granted := 0        # DOD_SIM_RUNE_ECON=rich only
 # BATCH HK §1 — THE FOURTH SOURCE: a rune after every normal fight, into the bag.
 # The bot's policy is the cache's — WEAR IT WHILE A SLOT IT FITS IS FREE, else it
@@ -578,17 +589,25 @@ static func _shop_visit(run: Node) -> void:
 	for m in run.party:
 		if float(m["hp"]) / float(m["max_hp"]) < 0.5 \
 				and run.gold - heal_price >= GOLD_RESERVE:
+			# **BATCH IV §1b — THE DOOR IS ASKED BEFORE THE GOLD MOVES (DV24)**, as `shop_screen._buy_item`
+			# asks it: a full stack or no slot refuses the buy and costs nothing. Through `add_item`
+			# after it (CT), so the pouch obeys the same two walls the player's does.
+			if run.item_full("health") or run.needs_slot("health"):
+				heals_refused += 1
+				continue
 			run.gold -= heal_price
 			_run_gold_spent += heal_price
-			# BATCH CT: through `add_item`, so the sim's pouch obeys the same two
-			# walls the player's does. Health is in the opening four, so its slot
-			# always exists and this can only ever be refused by the STACK cap —
-			# which is the same refusal a player meets, and the gold is spent
-			# either way because the sim's policy already decided to spend it.
 			run.add_item("health")
 			heals_bought += 1
 	var offers := _roll_rune_offers(run)
 	for guard in 32:  # each buy shrinks the offer set; 32 = runaway insurance
+		# **BATCH IV §1b — THE COUNTER's DOOR BEFORE THE GOLD MOVES (DV25)**: `Run.buy_refusal`, the one the
+		# player's Buy asks (`Run.buy_rune`) — a full holding or a full bag refuses the purchase. Asked
+		# again every pass, because a buy can fill the holding the next offer is bound for.
+		for oi in range(offers.size() - 1, -1, -1):
+			if run.buy_refusal(offers[oi]["rune"], run.party[offers[oi]["member_idx"]]) != "":
+				offers.remove_at(oi)
+				rune_refused_room += 1
 		var best_item := ""
 		var best_offer := -1
 		var best_price := -1
@@ -788,38 +807,32 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 		battle.heroes[i].sync_victory_state(run.party[i])
 	var node_type := String(run.encounter.get("type", "fight"))
 	run.award_gold(node_type)
+	# **BATCH IV §1a — THE PLAYER's ORDER, `battle._check_end`'s victory branch line for line.** The heal,
+	# the relics' victory hooks and the bargain's reward come before the node's own spoils, and every pick
+	# they queue is ROLLED here and ANSWERED on the map — below, after a bought merchant, as the victory
+	# screen's Continue reaches them. Until IV the sim took the elite's cache at the roll and slotted a core
+	# rune before the draft was rolled (DV27), so the draft was drawn with an engine the player would not
+	# hold yet, and it never answered the bargain's cache at all (DV26).
+	# §6: clearing ANY slot heals 15%, with the relic stacking on top.
+	run.heal_party(run.victory_heal_pct())
+	var v_mana: float = run.relic_add("victory_mana_pct")
+	if v_mana > 0.0:
+		run.restore_mana(v_mana)
+	run.gold += int(run.relic_add("victory_gold"))
+	# §3: the accepted bargain pays out, and the modifier is cleared. A rune reward queues its cache on
+	# a hero (`Run.claim_reward`), answered with the elite's below.
+	var owed_before := _owed_runes(run)
+	var bargain: Dictionary = run.claim_reward()
+	var answering: Array = _newly_owed(run, owed_before, "bargain")
+	var merchant_owed: bool = bool(bargain.get("shop", false))
+	var run_over := false
 	# BATCH HK §1 — the normal fight's drop, through the game's own door, under the
 	# policy stated at `rune_drops` above.
 	if node_type == "fight":
 		_sim_take_drop(run)
+	var drafting: Array = []
 	if node_type == "elite":
 		var looter: Dictionary = run.party.pick_random()
-		# Pick-of-3 (Batch X), resolved instantly by bot policy — dumb and
-		# printed in the report header: prefer an ordinary candidate over an
-		# engine rune (a spec-scoped one until HC §1 re-scoped them all to the
-		# class), else the first (the build-lane preference went with the talent
-		# lanes at FX). Auto-equip while a slot
-		# (Run.rune_slots) is free. Empty = DOD_SIM_RUNES=off — the elite
-		# still drops its item.
-		var candidates: Array = run.roll_rune_candidates(looter)
-		if not candidates.is_empty():
-			rune_elite_offered += candidates.size()
-			var rune: Dictionary = _pick_rune_candidate(looter, candidates)
-			var worn := 0
-			for r in looter.get("runes", []):
-				if r.get("equipped", false):
-					worn += 1
-			rune["equipped"] = worn < run.rune_slots()
-			rune_elite_taken += 1
-			if rune["equipped"]:
-				rune_elite_equipped += 1
-			# BATCH HL §1 — `hold_rune` slots an engine rune only when asked now,
-			# and the player's cache answer never asks. The bot's policy is GK's —
-			# it slots one while an engine slot is free — so it asks, after the
-			# count above, and neither the run nor the count moves.
-			if String(rune.get("engine", "")) != "":
-				rune["equipped"] = true
-			run.hold_rune(looter, rune)  # BATCH GK — one door
 		# Batch AN §6: drops honour the per-type stack cap, through the same
 		# Run.add_item every other grant uses — a sim that could stockpile
 		# past the cap would report an economy the game cannot produce.
@@ -832,8 +845,6 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 		# The declines are counted and printed, because an unreported cap reads
 		# as "everything landed".
 		_sim_drop(run, run.random_loot())
-		for extra_i in int(run.relic_add("loot_extra")):
-			_sim_drop(run, run.random_loot())
 		# BATCH BO §3 / BATCH BX §2 — AN ELITE OFFERS A DRAFT TO EVERY LIVING
 		# HERO. BO offered to one drawn at random; BX makes it party-wide, and
 		# the walk has to match battle.gd's victory branch or the sim measures a
@@ -846,19 +857,24 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 		# false in practice — `heal_party` runs below and the victory sync has
 		# already returned the fallen — but a walk that silently depended on that
 		# would be a walk that breaks the day it stops being true.
+		#
+		# BATCH IV §1a — ROLLED HERE, ANSWERED ON THE MAP (`_award_draft`, below): every living hero's
+		# offer is drawn before the elite's cache is, as `battle._check_end` draws them.
 		for d_m in run.party:
 			if int(d_m.get("hp", 0)) > 0:
-				_award_draft(run, d_m)
-	# §6: clearing ANY slot heals 15%, with the relic stacking on top.
-	run.heal_party(run.victory_heal_pct())
-	var v_mana: float = run.relic_add("victory_mana_pct")
-	if v_mana > 0.0:
-		run.restore_mana(v_mana)
-	run.gold += int(run.relic_add("victory_gold"))
-	# §3: the accepted bargain pays out, and the modifier is cleared.
-	var bargain: Dictionary = run.claim_reward()
-	var merchant_owed: bool = bool(bargain.get("shop", false))
-	var run_over := false
+				if _roll_draft(run, d_m):
+					drafting.append(d_m)
+		# The rune cache (Batch X): candidates rolled NOW and stored on the looter, never rerolled, and
+		# answered on the map — the player's order since IV §1a. Empty = DOD_SIM_RUNES=off, or a pool
+		# with nothing left for him; the elite still drops its item.
+		var elite_before := _owed_runes(run)
+		var candidates: Array = run.roll_rune_candidates(looter)
+		if not candidates.is_empty():
+			rune_elite_offered += candidates.size()
+			run.queue_rune_pick(looter, candidates)
+		answering.append_array(_newly_owed(run, elite_before, "elite"))
+		for extra_i in int(run.relic_add("loot_extra")):
+			_sim_drop(run, run.random_loot())
 	# §4: the mini-boss pays an ABILITY UPGRADE now, not an ability.
 	if node_type == "miniboss":
 		_award_upgrades(run)
@@ -895,6 +911,11 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 		merchants_bought += 1
 		if shops_on:
 			_shop_visit(run)
+	# BATCH IV §1a — THE MAP's ARRIVAL: what the fight left owed is answered through the doors the hero's
+	# own screen commits through, in its order (`map_screen._confirm_hero_draft`: the draft, then the rune).
+	for d_m in drafting:
+		_award_draft(run, d_m)
+	_answer_rune_picks(run, answering)
 	if run_over:
 		_finish_run(run, battle, true)
 		return
@@ -1013,6 +1034,14 @@ static func _award_trophies(run: Node) -> void:
 				break
 		if pick == "":
 			pick = String(offer[0])
+		# **BATCH IV §3 — THE ZONE BOSS's PICK ASKS THE CAP (DV29)**, as `map_screen._pick_ability` does: at
+		# the cap a bench must be named, or the take is refused. Latent — the slot arrives before the award
+		# (EG §1) and the draft benches at the cap, so no state the sim reaches meets it today — and a guard
+		# is cheaper than a tripwire. The bench is the draft's own policy: the oldest carried card.
+		if run.ability_slots_full(m):
+			var carried: Array = run.equipped_ability_names(m)
+			if carried.is_empty() or not run.unequip_earned_ability(m, String(carried[0])):
+				continue
 		run.hold_ability(m, pick, true)
 		ability_offered += offer.size()
 		ability_taken += 1
@@ -1031,11 +1060,19 @@ static func _award_trophies(run: Node) -> void:
 # refuses — so a bot reading the pool would name a benched card, get a refusal
 # string back, and count every capped offer as an untaken one. The bot must
 # read the same set the bench step shows the player.
-static func _award_draft(run: Node, m: Dictionary) -> void:
+#
+# **BATCH IV §1a — ROLLED AT THE VICTORY, ANSWERED ON THE MAP**, the player's two moments: `_roll_draft`
+# draws the offer where `battle._check_end` draws it, before the elite's cache, and this answers it after
+# the victory, where the hero's screen does.
+static func _roll_draft(run: Node, m: Dictionary) -> bool:
 	draft_attempts += 1
 	if not run.award_draft_pick(m):
 		draft_refused_pool += 1
-		return
+		return false
+	return true
+
+
+static func _award_draft(run: Node, m: Dictionary) -> void:
 	var queue: Array = m.get("draft_candidates", [])
 	if queue.is_empty():
 		return
@@ -1094,6 +1131,85 @@ static func _pick_rune_candidate(_member: Dictionary, candidates: Array) -> Dict
 		if String(c.get("engine", "")) == "":
 			return c
 	return candidates[0]
+
+
+# Every hero's owed rune picks, by party slot — read either side of a door that may queue one, so the
+# answer knows which cache each new pick is (`_newly_owed`).
+static func _owed_runes(run: Node) -> Array:
+	var out: Array = []
+	for m in run.party:
+		out.append(int(m.get("rune_picks_owed", 0)))
+	return out
+
+
+static func _newly_owed(run: Node, before: Array, source: String) -> Array:
+	var out: Array = []
+	for i in run.party.size():
+		for k in int(run.party[i].get("rune_picks_owed", 0)) - int(before[i]):
+			out.append([i, source])
+			if source == "bargain":
+				rune_bargain_offered += 1
+	return out
+
+
+# ══ BATCH IV §1a — A RUNE CACHE's ANSWER, THROUGH THE PLAYER's DOOR ═════════════════════════════════════
+#
+# **THE CHOICE IS THE BOT's POLICY AND CARRIES ITS REASON (DV28)**: an ordinary rune first, else the first
+# — a fixed preference, printed in the header, so the figures stay attributable. **THE DOOR IS THE RULE AND
+# MAY NOT DIFFER**: `Run.take_rune_pick`, the one the hero's Confirm commits through, holds a core rune
+# unworn as it holds a player's, and the bot then slots it from the panel's own door
+# (`engine_toggle_refusal`, `toggle_engine`) while an engine slot is free — GK's policy, taken after the
+# draft rather than before it (DV27). A cache with nothing left to hand over is let go, as the player's
+# screen lets it go (`Run.spend_rune_pick`). `answering` names each pick this fight queued, in the order
+# it was queued, so the report can say which cache paid; anything still owed after it is answered too.
+static func _answer_rune_picks(run: Node, answering: Array) -> void:
+	var order: Array = answering.duplicate()
+	for i in run.party.size():
+		var listed := 0
+		for a in answering:
+			if int(a[0]) == i:
+				listed += 1
+		for k in int(run.party[i].get("rune_picks_owed", 0)) - listed:
+			order.append([i, "older"])
+	for a in order:
+		var m: Dictionary = run.party[int(a[0])]
+		if int(m.get("rune_picks_owed", 0)) < 1:
+			continue
+		var live: Array = run.rune_choice(m)
+		if live.is_empty():
+			if run.spend_rune_pick(m):
+				rune_picks_spent += 1
+			continue
+		var pick: Dictionary = _pick_rune_candidate(m, live)
+		var took: Dictionary = run.take_rune_pick(m, String(pick.get("name", "")))
+		if took.is_empty():
+			continue
+		var rune: Dictionary = took["rune"]
+		var worn := String(took["landed"]) == "worn"
+		# A full holding queues it for the panel (`hold_rune`); the bot lets it go there, its stated policy for a
+		# drop that meets a full holding (`_sim_take_drop`) — this rune, by identity, never one waiting before it.
+		if String(took["landed"]) == "pending":
+			var pq: Array = run.pending_rune_drops
+			for pi in pq.size():
+				if is_same(pq[pi], rune):
+					pq.remove_at(pi)
+					break
+		if String(rune.get("engine", "")) != "" and String(took["landed"]) == "held":
+			var rows: Array = run.engine_rows(m)
+			for ri in rows.size():
+				if is_same(rows[ri]["rune"], rune):
+					if run.engine_toggle_refusal(m, ri) == "":
+						run.toggle_engine(m, ri)
+						worn = true
+					break
+		if String(a[1]) == "bargain":
+			rune_bargain_taken += 1
+			if worn:
+				rune_bargain_equipped += 1
+		else:
+			rune_elite_taken += 1
+			if worn:
+				rune_elite_equipped += 1
 
 
 static func _tier(key: String) -> Dictionary:
@@ -1426,8 +1542,8 @@ static func _print_report(battle) -> void:
 	print("Gold per run: earned %.0f   spent %.0f   unspent at end %.0f" % [
 		gold_earned / runs, gold_spent / runs, gold_unspent / runs])
 	if shops_on:
-		print("Shop buys per run: heals %.1f   restock %.1f   runes %.1f" % [
-			heals_bought / runs, restock_bought / runs, runes_bought / runs])
+		print("Shop buys per run: heals %.1f (the door refused %.1f)   restock %.1f   runes %.1f" % [
+			heals_bought / runs, heals_refused / runs, restock_bought / runs, runes_bought / runs])
 	print("Items: used %.1f/run   carried unused at end %.1f   drops declined for want of a slot %.1f/run" % [
 		items_used / runs, items_left / runs, drops_no_slot / runs])
 	# Batch BK: merchants and events are WALKED to now, not rolled — read these
@@ -1497,6 +1613,10 @@ static func _print_report(battle) -> void:
 	print("  Elite    candidates %.2f (%.2f caches x3)   taken %.2f   equipped %.2f" % [
 		rune_elite_offered / runs, rune_elite_taken / runs,
 		rune_elite_taken / runs, rune_elite_equipped / runs])
+	# BATCH IV §1a — the bargain's cache, answered since IV; FOUND AT HR: never before.
+	print("  Bargain  caches %.2f   taken %.2f   worn %.2f   (answered after the draft, as the player's; caches let go %.2f)" % [
+		rune_bargain_offered / runs, rune_bargain_taken / runs, rune_bargain_equipped / runs,
+		rune_picks_spent / runs])
 	if rune_granted > 0:
 		print("  GRANTED  %.2f   <-- DOD_SIM_RUNE_ECON=rich is ON; this row is an experiment arm" % [
 			rune_granted / runs])
@@ -1505,9 +1625,9 @@ static func _print_report(battle) -> void:
 		rune_drops / runs, rune_drop_worn / runs,
 		(rune_drops - rune_drop_worn - rune_drop_declined) / runs, rune_drop_declined / runs])
 	print("  Acquired per hero per run: %.2f   (his reach is his class's ordinary runes less what the gates withhold; drops included since HK)" % [
-		(runes_bought + rune_elite_taken + rune_granted + rune_drops - rune_drop_declined) / runs / 4.0])
-	print("  Shop offers refused:  no free slot %.2f   unaffordable (40g reserve) %.2f   duplicate %.2f" % [
-		rune_refused_noslot / runs, rune_refused_gold / runs, rune_refused_dupe / runs])
+		(runes_bought + rune_elite_taken + rune_bargain_taken + rune_granted + rune_drops - rune_drop_declined) / runs / 4.0])
+	print("  Shop offers refused:  no free slot %.2f   unaffordable (40g reserve) %.2f   duplicate %.2f   the door (a full holding) %.2f" % [
+		rune_refused_noslot / runs, rune_refused_gold / runs, rune_refused_dupe / runs, rune_refused_room / runs])
 	print("  Elite runes won with no free slot: %.2f/run  (pouched, not worn)" % [
 		(rune_elite_taken - rune_elite_equipped) / runs])
 	# Batch AN: nothing is "walked past" any more — the merchant is scheduled

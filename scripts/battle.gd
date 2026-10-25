@@ -1264,11 +1264,20 @@ func _ready() -> void:
 	# Run.active_relics regardless of Run.active). Run-sim mode arms its
 	# relics at the draft instead — overriding here every battle would
 	# clobber relics granted mid-run by events.
-	if OS.get_environment("DOD_SIM_RELICS") != "" and not run_sim:
+	# **BATCH IV §2 — AND ONLY A STANDALONE SIM ARMS IT.** It read `not run_sim` alone, so in a
+	# PLAYER's fight, which is not a run sim either, an export left in his shell replaced the relics
+	# he had drafted at every battle's open, and nothing said so (the sweep of every environment
+	# read found it beside DV32's two; `check_iv` §2).
+	if sim and not run_sim and OS.get_environment("DOD_SIM_RELICS") != "":
 		Run.active_relics = OS.get_environment("DOD_SIM_RELICS").split(",")
 	# DOD_SIM_GRANT_ALL=1: full-kit sims (every talent/trophy ability
 	# pre-granted) — the default measures real gated progression.
-	if OS.get_environment("DOD_SIM_GRANT_ALL") == "1":
+	# **BATCH IV §2 — A SIM'S ARM, AND ONLY A SIM'S (DV32).** It armed the player's own debug
+	# toggle (All Class Abilities Unlocked) with no gate, so a player with the export set played
+	# every card of his class pool and his lineage's boss pool pre-granted, and nothing on screen
+	# told him. Gated on `sim` — a standalone sim's and a run sim's alike, both of which the
+	# arm is documented for (`sim.sh`).
+	if sim and OS.get_environment("DOD_SIM_GRANT_ALL") == "1":
 		Run.debug_grant_all = true
 	autoplay = sim or OS.get_environment("DOD_AUTOPLAY") == "1"
 	# DOD_ENEMIES_OFF=1 arms the "Enemy attacks OFF" debug toggle from the
@@ -1277,8 +1286,9 @@ func _ready() -> void:
 		debug_enemies_off = true
 	# DOD_SIM_DEBUG=1 echoes every combat-log line even in sim mode — the
 	# tail of a hung run names the exact action that never resolved.
+	# BATCH IV §2 — the sim-family flag is a sim's: a player's fight never reads it.
 	debug_prints = (autoplay and not sim) \
-		or OS.get_environment("DOD_SIM_DEBUG") == "1"
+		or (sim and OS.get_environment("DOD_SIM_DEBUG") == "1")
 	if sim:
 		Engine.max_fps = 0
 		if sim_started_ms == 0:
@@ -1442,7 +1452,8 @@ func _spawn_units() -> void:
 	# specs used by autoplay/sim battles (order: warrior, mage, cleric, hunter).
 	var default_specs := ["swordmaster", "pyromancer", "holy", "sharpshooter"]
 	var sim_specs := default_specs
-	var env_specs := OS.get_environment("DOD_SIM_SPECS")
+	# BATCH IV §2 — read only where it is used: a bot battle outside a run (a run's heroes are its party's).
+	var env_specs := "" if Run.active else OS.get_environment("DOD_SIM_SPECS")
 	if env_specs != "":
 		sim_specs = Array(env_specs.split(","))
 		# A short list used to index past the end at spawn — _spawn_units
@@ -2062,8 +2073,12 @@ func _spawn_units() -> void:
 	var composition: Array = ["raider", "chief", "archer", "archer"]
 	# DOD_SIM_ENEMIES="boss,shieldmaster,shaman" forces the enemy lineup in
 	# autoplay/sim/standalone battles (testing hook, like DOD_SIM_SPECS).
-	var env_comp := OS.get_environment("DOD_SIM_ENEMIES")
-	var env_theme := OS.get_environment("DOD_SIM_THEME")
+	# **BATCH IV §2 — A FORCED LINEUP IS A SIM'S OR A BOT BATTLE's, NEVER A REAL RUN's.** The two
+	# stood above the encounter's own warband, so an export left in a player's shell replaced every
+	# fight of his run with it (the sweep of every environment read, beside DV32; `check_iv` §2).
+	var sim_hooks := sim or not Run.active
+	var env_comp := OS.get_environment("DOD_SIM_ENEMIES") if sim_hooks else ""
+	var env_theme := OS.get_environment("DOD_SIM_THEME") if sim_hooks else ""
 	if env_comp != "":
 		composition = env_comp.split(",")
 	elif sweep:
@@ -5048,6 +5063,16 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 	if not rd_pick.is_empty():
 		return rd_pick
 	var pick := _autoplay_pick_kit(u)
+	# **BATCH IV §3 — THE ROTATION's PICK ASKS THE PLAYER's DOOR (DV05).** `_resolve` asks none, so a
+	# pick that reaches it is paid and resolved: a gate added to `_ability_usable` reached the drafted
+	# hook and the kit branch, which ask it, and never a rotation arm — Guard Change under Formless
+	# (DV06) and Mass Hysteria onto a warband that holds it (DV07) were cast where the player's button
+	# is dark. A pick the door refuses falls back to the basic, as an arm that found nothing to cast
+	# does, so the kit card and the drafted hook below are still asked. Every door reaches the bot.
+	if not pick.is_empty() and pick[0] != u.abilities[0] and not _ability_usable(u, pick[0]):
+		var fb_foes := enemies.filter(func(e): return not e.dead)
+		var fb_broken := fb_foes.filter(func(e): return e.broken)
+		pick = [u.abilities[0], _lowest_hp(fb_broken) if not fb_broken.is_empty() else _lowest_hp(fb_foes)]
 	if pick.is_empty() or pick[0] != u.abilities[0]:
 		return pick
 	var kit_pick := _bot_class_kit_pick(u)
@@ -9879,6 +9904,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				# Autoplay (or a lone survivor): fall back to another live foe.
 				var others := enemies.filter(func(e): return not e.dead and e != target)
 				second = null if others.is_empty() else others.pick_random()
+			# **BATCH IV §3 — THE FALLBACK's BODY IS WRITTEN BACK (DV11).** The on-hit package below reads
+			# `second_target` and `third_target` — a Trapper's Shrapnel Charge poisons every body it chose —
+			# and the bot skips the clicks, so the body chosen here for him was struck and never poisoned. The
+			# pick was already legal; it was only local. A player's chosen body is this one already.
+			second_target = second
 			if second != null:
 				strike_targets = [target, second]
 			if ab.choose_three:
@@ -9887,6 +9917,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					var rest := enemies.filter(
 						func(e): return not e.dead and e != target and e != second)
 					third = null if rest.is_empty() else rest.pick_random()
+				third_target = third
 				if third != null:
 					strike_targets.append(third)
 		var total_hits := strike_targets.size()

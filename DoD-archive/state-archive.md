@@ -17,6 +17,63 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT IV — 2026-10-25, FROM `docs/state.md` AS IT LEFT IT (`91ce490`)
+
+**What came here**: IU's four rulings, every one answered in IV's brief; FOUND AT IU's ten bot defects, built at IV §1–§3; FOUND AT
+HR's bargain cache the sim never answered, built at IV §1a; FOUND AT GB's ungated `DOD_SIM_RUNES`, gated at IV §2; and the
+roadmap's pilot decision, taken at IV §0.1. Each word for word, under the heading it stood under.
+
+
+### ~~IU's RULINGS OWED~~ — **ALL FOUR ANSWERED IN IV's BRIEF (1: three claims repaired at IV §4, GK's names reported; 2: CLAUDE.md takes no index, IV §0.1/§5; 3: the ten built at IV §1–§3; 4: the code decided, IV §0.4)**
+
+Full working: `docs/reports/IU.md`, NEEDS A RULING.
+
+1. **THE FIVE CLAIMS LEFT STANDING, EACH ON A RULING** (the ledger of record, `docs/reports/IU-claims.tsv`, *STANDS*). GK's
+   three spine-rune names, still *PROPOSED at GK* in `CLAUDE.md` (ISN04, ISF12): **confirm them and the parenthetical goes**
+   (GK's ruling 1). The instrument file's opening sentence, which GR §2 retired in place by the paragraph after it (IR01):
+   **keep it as the retired-in-place record, or rewrite it**. The instrument file's bold sentence that nothing restates
+   `baselines.json`, which THE REST below and `CLAUDE.md`'s harness line both do (IR09, IR50): **a rule both files break, or a
+   description that names its restatements**.
+2. **THE INDEX RULING NOW HAS ITS DERIVATION** (IU §2's census of record, `docs/reports/IU-rules-census.tsv`): *a rule with a
+   gate is a reference and can be routed around; a rule with none must be read, so its block is core* — and **112 of
+   `CLAUDE.md`'s 120 blocks hold a NONE or PARTLY rule**, so by the census's own rule nearly the whole file is core. **The
+   ruling is the designer's and comes after the pilot's fourth report**, not in a batch.
+3. **THE TEN RULE DEFECTS IN THE BOT** (FOUND AT IU, below): each a place the bot plays a different game. **A batch of their
+   own, or each repaired as its code is next touched.**
+4. **A RULE AND ITS OWN GATE CONTRADICT** (IU §2's census, S3-009): the strike-loop rule says a blow path that bypasses the
+   loop owes `battle.note_blow_met` a call of its own, and `check_ft` §6c asserts that call stands at exactly one site.
+   **Obeying the rule reds the gate; one of the two is rewritten.**
+
+### FOUND AT IU AND NOT FIXED — ITS CLOSED ITEMS (archived at IV; the section stays in `docs/state.md`)
+
+- **TEN PLACES THE BOT PLAYS A DIFFERENT GAME — EACH A DEFECT** (IU §4's census of record,
+  `docs/reports/IU-bot-divergence.tsv`, *RULE*, *OWED*): DV05, a rotation's pick is cast without the door's `_ability_usable`
+  re-asked; DV06, Guard Change cast under Formless; DV07, Mass Hysteria recast onto a warband that holds it; DV11, Shrapnel
+  Charge's second body is not poisoned; DV24, a Health Potion bought at a full stack; DV25, a rune bought past the merchant's
+  `buy_refusal`; DV26, a bargain's rune cache never answered (FOUND AT HR, carried); DV27, an elite's core rune slotted before
+  its draft is answered; DV29, the zone boss's pick taken with no slot cap (latent); DV32, the experiment arms' variables —
+  `DOD_SIM_GRANT_ALL` among them (HJ's RULINGS OWED) — read with no `sim_run` gate. **And one POLICY whose reason was written
+  nowhere** — DV13, Called Shot's spot (Sunder on an armoured body, else Exposed, never Break): the census row holds it now.
+
+### FOUND AT HR AND NOT FIXED — ITS CLOSED ITEMS (archived at IV; the section stays in `docs/state.md`)
+
+- **THE SIM NEVER ANSWERS A BARGAIN'S RUNE CACHE**, so every supply figure it prints omits 0.8–1.15 runes a hero a run.
+
+### FOUND AT GB AND NOT FIXED — ITS CLOSED ITEMS (archived at IV; the section stays in `docs/state.md`)
+
+- **NOTHING STOPS `DOD_SIM_RUNES` CHANGING A REAL GAME.** `runes_mode()` reads the environment with no `sim_run` gate,
+  and the `test_runes` assertion a `run_state.gd` comment claimed for it never existed: the purity arm covers the
+  economy and power flags only. *Stats* or *off* left exported in a player's shell changes a real run.
+
+### THE PLAYTEST'S OTHER FINDINGS — ITS CLOSED ITEMS (archived at IV; the section stays in `docs/state.md`)
+
+- **THE PILOT's DECISION IS THE DESIGNER's, AFTER ITS FOURTH REPORT — NOT A BATCH (IU's brief §10)**: whether a bounded read is a
+  sufficient read, read off the reports' three lists (opened, needed, and found at the close to have borne on the work and not
+  opened) — and then whether the 380 KiB ceiling is restated on the read, and whether `CLAUDE.md` takes an index, for which IU §2's
+  census is the derivation (IU's RULINGS OWED, 2). **No ceiling moves before it.**
+
+---
+
 ## ARCHIVED AT IU — 2026-10-24, FROM `docs/state.md` AS IT LEFT IT (`36b2556`)
 
 **What came here**: IT's four rulings, all answered in IU's brief and built at IU (§3, §4, §5; the fourth kept pinned by ruling, §0.4); FOUND AT IT's four items IU closed — the nine constants one under their card (re-valued, IU §3; the two the other way stay), the bot's swap price (IU §4), the 438 pins (kept, IU §0.4) and the twenty reported picks (seven repaired, thirteen held by the ceiling, IU §5); the claims IU's ledger closed — FOUND AT IS's, IR's, IQ's two, IL's, II's two, HZ's and GR's, and the closed halves of HY's, HV's, HR's, GF's and GA's; FOUND AT IE's Cleric-arm price, closed at IN §3 (IU's divergence census, DV04); and the roadmap's claims item, done at IU.

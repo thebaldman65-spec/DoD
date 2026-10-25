@@ -230,12 +230,24 @@ func _s1_out_of_the_offer() -> void:
 	# member through the same door yields a stat stick under the flag and never
 	# without it, which is what proves §1b measured the removal and not a driver
 	# that had stopped drawing.
+	#
+	# **BATCH IV §2 — AND IT IS A SIM's ARM (DV32).** It read the environment in any process, so a player's
+	# run with the export set was in it; it reads `sim_run` first now. So the armed draw is taken under the
+	# sim's flag, and the same flag with no sim must reach nothing — the two halves, so a gate that stopped
+	# arming reads apart from one that leaked.
 	var probe := _member("warrior", "warden")
 	var had_flag := OS.get_environment("DOD_SIM_RUNES")
+	var had_sim: bool = _run.sim_run
 	var plain: Dictionary = _run.generate_rune(probe)
 	OS.set_environment("DOD_SIM_RUNES", "stats")
+	_run.sim_run = false
+	var leaked: Dictionary = _run.generate_rune(probe)
+	_run.sim_run = true
 	var armed: Dictionary = _run.generate_rune(probe)
+	_run.sim_run = had_sim
 	OS.set_environment("DOD_SIM_RUNES", had_flag)
+	ok(not String(leaked.get("id", "")).begins_with("tpl_"),
+		"§1d: `DOD_SIM_RUNES=stats` reached a draw with no sim running — the arm leaks into a player's run (IV §2)")
 	ok(not String(plain.get("id", "")).begins_with("tpl_"),
 		"§1d: the ordinary path handed back a stat stick — %s" % [plain.get("id", "")])
 	ok(String(armed.get("id", "")).begins_with("tpl_"),

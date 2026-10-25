@@ -2,19 +2,19 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 1987,
-  "source": 1384,
-  "other": 165,
-  "document": 438
+  "total": 2040,
+  "source": 1408,
+  "other": 184,
+  "document": 448
  },
  "floor": {
-  "pins": 1987
+  "pins": 2040
  },
  "falls": [],
  "source_residency": {
-  "narrow": 47,
-  "code": 853,
-  "absent": 327,
+  "narrow": 49,
+  "code": 873,
+  "absent": 329,
   "runtime": 103,
   "unresolved": 3,
   "comment": 48,
@@ -2295,7 +2295,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_fe.gd#122"
+   "g": "check_fe.gd#123"
   },
   {
    "s": "check_fe.gd",
@@ -2306,7 +2306,18 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fe.gd#123"
+   "g": "check_fe.gd#124"
+  },
+  {
+   "s": "check_fe.gd",
+   "fn": "_s2_the_idiom_population",
+   "h": "scripts/map_screen.gd",
+   "n": "Run.take_rune_pick(member, rune_name)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_fe.gd#113"
   },
   {
    "s": "check_fe.gd",
@@ -2317,7 +2328,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fe.gd#122"
+   "g": "check_fe.gd#123"
   },
   {
    "s": "check_fe.gd",
@@ -2328,7 +2339,18 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fe.gd#117"
+   "g": "check_fe.gd#118"
+  },
+  {
+   "s": "check_fe.gd",
+   "fn": "_s2_the_idiom_population",
+   "h": "scripts/run_state.gd",
+   "n": "func take_rune_pick(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_fe.gd#112"
   },
   {
    "s": "check_fe.gd",
@@ -2361,7 +2383,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_fe.gd#118"
+   "g": "check_fe.gd#119"
   },
   {
    "s": "check_fe.gd",
@@ -2372,18 +2394,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fe.gd#113"
-  },
-  {
-   "s": "check_fe.gd",
-   "fn": "_s2_the_idiom_population",
-   "h": "scripts/map_screen.gd",
-   "n": "var live: Array = Run.rune_choice(member)",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "read",
-   "g": "check_fe.gd#112"
+   "g": "check_fe.gd#114"
   },
   {
    "s": "check_fe.gd",
@@ -2394,7 +2405,18 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fe.gd#114"
+   "g": "check_fe.gd#115"
+  },
+  {
+   "s": "check_fe.gd",
+   "fn": "_s2_the_idiom_population",
+   "h": "scripts/run_state.gd",
+   "n": "var live: Array = rune_choice(member)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_fe.gd#113"
   },
   {
    "s": "check_fe.gd",
@@ -2405,7 +2427,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fe.gd#116"
+   "g": "check_fe.gd#117"
   },
   {
    "s": "check_fe.gd",
@@ -2416,7 +2438,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fe.gd#115"
+   "g": "check_fe.gd#116"
   },
   {
    "s": "check_ff.gd",
@@ -8152,7 +8174,7 @@
    "s": "check_is.gd",
    "fn": "_s5_the_index_pilot",
    "h": "docs/state.md",
-   "n": "THE PILOT ASKS WHETHER A BOUNDED READ IS A SUFFICIENT READ",
+   "n": "WHETHER A BOUNDED READ IS A SUFFICIENT READ",
    "p": "+",
    "r": "code",
    "k": "loop-list",
@@ -8683,6 +8705,575 @@
    "k": "literal",
    "how": "param",
    "g": "check_iu.gd#451"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_blocks_below",
+   "h": "docs/state.md",
+   "n": "\n",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "param",
+   "g": "check_iv.gd#513"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_env_calls",
+   "h": "scripts/",
+   "n": "get_environment(",
+   "p": "+",
+   "r": "missing-file",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#270"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_env_calls",
+   "h": "scripts/",
+   "n": "has_environment(",
+   "p": "+",
+   "r": "missing-file",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#270"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "A BATCH's WORK CHANGES WHAT THE FILE SAYS IS TRUE. READING THE FILE AGAINST THE FINISHED WORK IS HOW THE BATCH FINDS OUT",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#64"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "A KNOWN-MOVED FIGURE LEFT UNMARKED IS THE STALE CLAIM",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#69"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "A RULE AND ITS OWN GATE ARE TWO DESCRIPTIONS OF ONE BEHAVIOUR. WHEN THEY DISAGREE, THE BEHAVIOUR IS THE ARBITER",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#65"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "A SIM-FAMILY FLAG IS READ BY A SIM ONLY",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#66"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/state.md",
+   "n": "A TRIGGER NAMES A SUBJECT. A BRIEF WHOSE SUBJECT IS A KIND OF THING MATCHES NO TRIGGER",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#70"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/state.md",
+   "n": "AND IT ENDED AFTER THREE REPORTS (IS, IT, IU)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#63"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "THE BOT ANSWERS WHAT A PLAYER ANSWERS, THROUGH THE SAME DOOR AND IN THE SAME ORDER",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#67"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "THE DIVERGENCE CENSUS's RULE COUNT IS A CEILING OF ZERO",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#68"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "THIS FILE TAKES NO INDEX, AND NOTHING IS STRUCK FROM IT",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#62"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s1_the_cache",
+   "h": "scripts/map_screen.gd",
+   "n": "Run.hold_rune(",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_iv.gd#93"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s1_the_cache",
+   "h": "scripts/map_screen.gd",
+   "n": "Run.take_rune_pick(member, rune_name)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_iv.gd#93"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s1_the_cache",
+   "h": "scripts/run_sim.gd",
+   "n": "_answer_rune_picks(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_iv.gd#151"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s1_the_cache",
+   "h": "scripts/run_sim.gd",
+   "n": "_answer_rune_picks(run, answering)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_iv.gd#149"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s1_the_cache",
+   "h": "scripts/run_sim.gd",
+   "n": "_award_draft(run, d_m)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_iv.gd#148"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s1_the_cache",
+   "h": "scripts/run_sim.gd",
+   "n": "_roll_draft(run, d_m)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_iv.gd#146"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s1_the_cache",
+   "h": "scripts/map_screen.gd",
+   "n": "func _take_rune_pick(idx: int, rune_name: String) -> Dictionary:",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#92"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s1_the_cache",
+   "h": "scripts/run_state.gd",
+   "n": "func take_rune_pick(member: Dictionary, rune_name: String) -> Dictionary:",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#90"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s1_the_cache",
+   "h": "scripts/run_state.gd",
+   "n": "hold_rune(member, rune)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_iv.gd#91"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s1_the_cache",
+   "h": "scripts/map_screen.gd",
+   "n": "queue.pop_front()",
+   "p": "-",
+   "r": "narrow",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_iv.gd#93"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s1_the_cache",
+   "h": "scripts/run_sim.gd",
+   "n": "run.claim_reward()",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_iv.gd#145"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s1_the_cache",
+   "h": "scripts/run_sim.gd",
+   "n": "run.hold_rune(",
+   "p": "-",
+   "r": "narrow",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_iv.gd#151"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s1_the_cache",
+   "h": "scripts/run_sim.gd",
+   "n": "run.hold_rune(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_iv.gd#151"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s1_the_cache",
+   "h": "scripts/run_sim.gd",
+   "n": "run.hold_rune(looter, rune)",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#94"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s1_the_cache",
+   "h": "scripts/run_sim.gd",
+   "n": "run.roll_rune_candidates(looter)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_iv.gd#147"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s1_the_cache",
+   "h": "scripts/run_sim.gd",
+   "n": "run.spend_rune_pick(m)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#94"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s1_the_cache",
+   "h": "scripts/run_sim.gd",
+   "n": "run.take_rune_pick(m, ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#94"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s1_the_cache",
+   "h": "scripts/run_state.gd",
+   "n": "rune[\"equipped\"] = String(rune.get(\"engine\", \"\")) == \"\"",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_iv.gd#91"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s1_the_cache",
+   "h": "scripts/run_state.gd",
+   "n": "rune_choice(member)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_iv.gd#91"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s1_the_cache",
+   "h": "scripts/run_sim.gd",
+   "n": "static func on_battle_end(run: Node, battle, victory: bool) -> void:",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#144"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s1c_the_marks",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_iv.gd#231",
+   "alt": true,
+   "expr": "mk"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s2_the_environment",
+   "h": "scripts/",
+   "n": null,
+   "p": "-",
+   "r": "missing-file",
+   "k": "non-literal",
+   "how": "derived",
+   "g": "check_iv.gd#305",
+   "expr": "String"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s2_the_environment",
+   "h": "scripts/",
+   "n": null,
+   "p": "+",
+   "r": "missing-file",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_iv.gd#310",
+   "expr": "String"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s2_the_environment",
+   "h": "scripts/",
+   "n": null,
+   "p": "+",
+   "r": "missing-file",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_iv.gd#312",
+   "expr": "String"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s2_the_environment",
+   "h": "scripts/",
+   "n": "func ",
+   "p": "+",
+   "r": "missing-file",
+   "k": "composed",
+   "how": "read",
+   "g": "check_iv.gd#310"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s2_the_environment",
+   "h": "scripts/",
+   "n": "func %s(",
+   "p": "+",
+   "r": "missing-file",
+   "k": "format",
+   "how": "read",
+   "g": "check_iv.gd#299"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s2_the_environment",
+   "h": "scripts/battle.gd",
+   "n": "if run_sim and not RunSim.active:",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#324"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s2_the_environment",
+   "h": "scripts/battle.gd",
+   "n": "run_sim = int(OS.get_environment(\"DOD_SIM_RUN\")) > 0",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#324"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s2_the_environment",
+   "h": "scripts/",
+   "n": "var total_target := sim_target",
+   "p": "+",
+   "r": "missing-file",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#311"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s4_the_claims",
+   "h": "docs/instrument-rules.md",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_iv.gd#473",
+   "expr": "gone"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s4_the_claims",
+   "h": "docs/instrument-rules.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_iv.gd#473",
+   "expr": "stands"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s4_the_claims",
+   "h": "docs/instrument-rules.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_iv.gd#473",
+   "expr": "gone"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s4_the_claims",
+   "h": "docs/reports/IV.md",
+   "n": "Rune of the Hierophant",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "read",
+   "g": "check_iv.gd#482"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s4_the_claims",
+   "h": "docs/reports/IV.md",
+   "n": "Rune of the Invoker",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "read",
+   "g": "check_iv.gd#482"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s4_the_claims",
+   "h": "docs/reports/IV.md",
+   "n": "Rune of the Vanguard",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "read",
+   "g": "check_iv.gd#482"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s5_the_index_question",
+   "h": "docs/state.md",
+   "n": "\n### ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#491"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s5_the_index_question",
+   "h": "docs/state.md",
+   "n": "\n### THE SHAPE RECON ON `CLAUDE.md`",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#490"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s6_the_population_rows",
+   "h": "docs/state.md",
+   "n": "<!-- INDEX:BEGIN (",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#529"
+  },
+  {
+   "s": "check_iv.gd",
+   "fn": "_s6_the_population_rows",
+   "h": "docs/state.md",
+   "n": "<!-- INDEX:END -->",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iv.gd#530"
   },
   {
    "s": "test_batch_ah.gd",

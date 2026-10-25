@@ -2550,38 +2550,29 @@ func _confirm_hero_draft() -> void:
 # stages it only when the triple came back empty. Returns what the toast says.
 func _spend_rune_pick(idx: int) -> Dictionary:
 	var member: Dictionary = Run.party[idx]
-	var queue: Array = member.get("rune_candidates", [])
-	if int(member.get("rune_picks_owed", 0)) < 1 or queue.is_empty():
+	# BATCH IV §1a — the run's door (`Run.spend_rune_pick`), which the sim lets a cache go through too.
+	if not Run.spend_rune_pick(member):
 		return {}
-	if not (Run.rune_choice(member) as Array).is_empty():
-		return {}
-	queue.pop_front()
-	member["rune_candidates"] = queue
-	member["rune_picks_owed"] = int(member.get("rune_picks_owed", 0)) - 1
 	return {"landed": "spent", "text": "%s: the cache had nothing left to offer. The pick is spent." % \
 		String(member["key"]).capitalize()}
 
 
 # The rune cache's pick, answered: the rune by its name, out of the list the screen drew
-# (`Run.rune_choice`, FD §1 — idempotent, so this re-reads the same array rather than
-# repairing a second time, and a triple that repaired to nothing is refused here).
+# (`Run.rune_choice`, FD §1 — idempotent, so the door re-reads the same array rather than
+# repairing a second time, and a triple that repaired to nothing is refused there).
 # Returns where it landed and what the toast says.
+#
+# **BATCH IV §1a — THE ANSWER IS THE RUN's DOOR NOW (`Run.take_rune_pick`)**, so the sim answers a cache
+# through the same lines a player's Confirm does; this function says what happened.
 func _take_rune_pick(idx: int, rune_name: String) -> Dictionary:
 	var member: Dictionary = Run.party[idx]
-	var live: Array = Run.rune_choice(member)
-	var queue: Array = member.get("rune_candidates", [])
-	var choice := -1
-	for i in live.size():
-		if String((live[i] as Dictionary).get("name", "")) == rune_name:
-			choice = i
-	if int(member.get("rune_picks_owed", 0)) < 1 or queue.is_empty() or choice < 0:
-		return {}
-	queue.pop_front()
-	member["rune_candidates"] = queue
 	# BATCH GV — THE LIST THE BUTTONS WERE BUILT FROM, NOT THE STORED TRIPLE: a candidate
 	# reading an engine he has not equipped SITS OUT of what `rune_choice` returns and
 	# stays stored.
-	var rune: Dictionary = live[choice]
+	var took: Dictionary = Run.take_rune_pick(member, rune_name)
+	if took.is_empty():
+		return {}
+	var rune: Dictionary = took["rune"]
 	# Auto-equip while a slot is free — the pick already happens here; save the extra
 	# click. **BATCH HK §2 — ASKED, AND `hold_rune` DECIDES BY KIND**: an ordinary rune
 	# takes one of his three slots, a party rune the party slot, each only while one is
@@ -2593,10 +2584,8 @@ func _take_rune_pick(idx: int, rune_name: String) -> Dictionary:
 	# things. It is held unworn, and its card joins the kit when he slots it on the hero's
 	# panel — an act of his own, as HK made every other equip.
 	var is_core := String(rune.get("engine", "")) != ""
-	rune["equipped"] = not is_core
-	# BATCH GK — THE ONE DOOR.
-	var landed: String = Run.hold_rune(member, rune)
-	member["rune_picks_owed"] = int(member.get("rune_picks_owed", 0)) - 1
+	# BATCH GK — THE ONE DOOR (`Run.hold_rune`, asked inside `Run.take_rune_pick` since IV §1a).
+	var landed := String(took["landed"])
 	var text := ""
 	if landed == "held" and is_core:
 		# THE WORDS HL §1 PROPOSED, RULED AT HN §2 — and since HR §1 the rune waits on the

@@ -306,8 +306,12 @@ func _s2_the_idiom_population() -> void:
 	# **EVERY RESOLUTION DOOR RE-ASKS, AND THE THREE READ DIFFERENTLY.**
 	ok(r.contains("if owned_ability_names(member).has(name):"),
 		"§2: `take_draft_ability` stopped refusing a card the hero already knows")
-	ok(m.contains("var live: Array = Run.rune_choice(member)"),
-		"§2: `_pick_rune` no longer comes through `rune_choice` (FD §1)")
+	# **BATCH IV §1a — RE-POINTED, THE QUESTION UNMOVED.** The cache's answer is the run's door now
+	# (`Run.take_rune_pick`), which the screen and the sim both call — so the re-ask is asked of the door's
+	# own body, and the screen is asked to go through it.
+	var trp := Gate.block(r, r.find("func take_rune_pick("))
+	ok(trp.contains("var live: Array = rune_choice(member)") and m.contains("Run.take_rune_pick(member, rune_name)"),
+		"§2: the rune cache's answer no longer comes through `rune_choice` (FD §1) — its door is `Run.take_rune_pick`, and the screen answers through it")
 	ok(m.contains("var live: Array = Run.ability_choice(member)"),
 		"§2: `_pick_ability` no longer comes through `ability_choice`")
 	ok(m.contains("var live: Array = Run.upgrade_choice(member)"),

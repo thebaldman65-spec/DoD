@@ -7,12 +7,14 @@ discipline for operating on the tracked documents. **It holds no rule about what
 contain**, and it is not a second place to look for one.
 
 **THE SEAM IS WHAT A RULE BINDS, NOT WHAT IT IS ABOUT (SET AT EF §2).** A rule that governs how a
-batch VERIFIES itself is here. A rule that governs what the GAME may contain is in `CLAUDE.md`.
+batch VERIFIES itself is here. A rule that governs what the GAME may contain is in `CLAUDE.md` — or, where
+it is about how a fight resolves and nothing else, in `docs/combat-rules.md` (GR §2, the paragraph below).
 **Where a rule does both, it stayed in `CLAUDE.md`** — a batch that reads only one of the two must
 not be able to miss a rule about the game, so the tiebreak runs one way only.
 
-**HALF OF THAT TIEBREAK IS RETIRED AT GR §2, BY THE DESIGNER'S RULING.** *A rule that governs what
-the GAME may contain is in `CLAUDE.md`* is no longer the whole story: the rules about how a fight
+**HALF OF THAT TIEBREAK IS RETIRED AT GR §2, BY THE DESIGNER'S RULING.** The paragraph above said only *in
+`CLAUDE.md`* until IV folded this qualification into its sentence (IR01, the designer's: a sentence that needs
+three lines of context to be true carries them): the rules about how a fight
 resolves, and nothing else, are in `docs/combat-rules.md`, a second reference `CLAUDE.md` points at.
 The rest stands — a rule that governs how a batch verifies itself is here, and a rule that belongs to
 two subjects stays in `CLAUDE.md`. **A batch meeting the paragraph above must not refuse a subject
@@ -339,8 +341,10 @@ docs contract, the text standard and the fold rule all bind what the game may co
 - **A SUITE'S CHECK COUNT CAN DRIFT, AND A DRIFTING SUITE IS RECORDED AS A BAND, NOT A NUMBER.**
   A suite that walks generated content has a count that is a function of what it rolled, and
   **a count-diffing rule reads a drift as a regression.** **The live counts and bands live in
-  `baselines.json` — ONE machine-readable file, and the only one. `check_de` reads it; neither
-  this file nor `docs/state.md` restates it, they point at it.**
+  `baselines.json` — ONE machine-readable file, and the only one. `check_de` reads it; a count
+  restated anywhere else points at it, or carries the batch that measured it** — HY §6's rule for a live
+  count (its block, below), which this sentence states since IV (IR09, the designer's): `docs/state.md`
+  names two sanctioned reds' failures, each with its batch, and they stand as they are.
   - **A BAND ALSO CARRIES THE NUMBER OF OBSERVATIONS BEHIND IT (STANDING, DE §1).** A band is a
     claim about a distribution nobody has characterised, and **the number of readings behind it is
     part of the claim.** **A band written to a sample's exact extremes is exceeded by roughly two
@@ -1215,9 +1219,9 @@ being re-taken.
 · **THE FIX IS NOT A BETTER NUMBER, IT IS FEWER COPIES.** DJ deleted both figures from that comment
   and pointed it at `check_di` §1, which walks the file and prints the live count on every battery
   run. **A number with an instrument behind it cannot rot; a number in prose always can.**
-· **IT IS THE SAME DEFECT AS THE SECOND COPY RULE** (`docs/state.md` and `CLAUDE.md` point at
-  `baselines.json` rather than restating it) — this is that rule applied to measurements taken
-  inside a batch rather than to the baseline table.
+· **IT IS THE SAME DEFECT AS THE SECOND COPY RULE** (a count the two files take from `baselines.json`
+  points at it, or carries the batch that measured it — HY §6's rule, which IV made that sentence state, IR50) — this
+  is that rule applied to measurements taken inside a batch rather than to the baseline table.
 
 ## STANDING RULE — RUN HEAD'S OWN GATE AGAINST THE NEW CODE BEFORE RE-POINTING IT (Batch FA §1b)
 
@@ -1302,6 +1306,21 @@ the rune was wired, because it was supplying the one input the defect was in.
   so a batch that touches the file finds its own row: `check_iu` §5 reds a touched target whose row still stands, and
   prints the count. **The ceiling stops a new miss arriving and the touches clear the rest**; a miss is repaired, never
   recorded.
+- **THE DIVERGENCE CENSUS's RULE COUNT IS A CEILING OF ZERO (IV §3, the designer's) — THE THIRD INSTRUMENT OF THIS
+  SHAPE, AND THE THREE READ AS ONE PRACTICE.** IU's census of record (docs/reports/IU-bot-divergence.tsv) sorted twelve
+  places the bot played by a different rule; IU repaired two and IV the other ten, each row closed in place with the batch
+  that drove it, so the census holds RULE 0 — every row CLOSED, POLICY or MODEL, every POLICY with its reason and every
+  MODEL named the bot standing in for the player's hands. `check_iv` §3b holds it: **a place the bot plays by a different
+  rule is repaired in the batch that finds it, never recorded**, and the count does not rise. *The hand-sets above, the
+  MISSES and the RULE rows are one practice*: a count of a known defect's shape, re-derived every battery, that fails
+  only when it grows.
+- **AND THE RULES A GATE COULD CHEAPLY HOLD AND DOES NOT ARE A STANDING LIST UNDER THE SAME PRACTICE (IV §5, the
+  designer's).** IU's rules census of record (docs/reports/IU-rules-census.tsv, its cheap column) found 188 rules no
+  gate fully holds that one could cheaply hold, **76 of them held by nothing at all** — the highest-value instrument
+  work left, because a rule nothing holds is one a batch breaks with the file in front of it (IT broke HO §0 162
+  times while no gate held it). **It is not a batch and it is not urgent**: each row is worked through by the batch that touches
+  its rule's subject, which builds the gate the row names and re-reads the row in place, and the two counts are
+  ceilings that do not rise (`check_iv` §5).
 
 ## STANDING RULE — A DRIVE IS A PROOF OF THE PREDICATE ONLY WHEN THE PREDICATE CHOOSES WHAT IT DRIVES (Batch IN §0.7, ruled by the designer)
 > **A DRIVE IS A PROOF OF THE PREDICATE ONLY WHEN THE PREDICATE CHOOSES WHAT IT DRIVES.** An arm that casts on a body the
@@ -1394,6 +1413,13 @@ the rune was wired, because it was supplying the one input the defect was in.
   2.2 times a player's — so a grade that turns on statuses laid carries that error, and no repair removes it. **A
   measurement names which of its figures turn on such a quantity**, beside the figures, where the next reader meets them
   (`docs/state.md`'s grade table carries the deck's).
+- **AND A FIGURE THE REPAIR MOVES IS MARKED UNTIL IT IS RE-TAKEN (IV §1c, the designer's).
+  A KNOWN-MOVED FIGURE LEFT UNMARKED IS THE STALE CLAIM THIS PROJECT SPENT TEN BATCHES RETIRING.** IV repaired the bot's rune caches, its order at a victory and the
+  merchant's doors, drove every recorded figure a default sim took against the unchanged tree, paired by seed, and marked each
+  one the drive read past its noise SUPERSEDED-PENDING in `docs/state.md`, with its measured delta and the batch that owes the
+  re-take. **The re-take is not taken in the batch that repairs when the next batch must measure anyway** — the batch that
+  authors the deck's middle re-measures the ladder — so the mark is the record between the two; `check_iv` §1c holds every
+  mark to the kept drive table (docs/reports/IV-drive.tsv).
 
 ## STANDING RULE — AN EXACT COUNTERFACTUAL IS EXACT ABOUT THE PAIRING, NOT ABOUT THE ESTIMATE (Batch EX §1b)
 
@@ -2301,3 +2327,33 @@ NOT a wrapping problem.
   `check_is` §3b reds when a writer appears.
 - **A LATENT SHAPE A BATCH FINDS AND DOES NOT REPAIR IS OFFERED THIS FIRST.** Where its writers can be derived, the gate is
   written in the batch that finds it; a FOUND AT line is for the shape whose writers cannot be.
+
+## STANDING RULE — WHEN A RULE AND ITS OWN GATE CONTRADICT, THE CODE DECIDES (Batch IV §0.4, ruled by the designer)
+> **A RULE AND ITS OWN GATE ARE TWO DESCRIPTIONS OF ONE BEHAVIOUR. WHEN THEY DISAGREE, THE BEHAVIOUR IS THE ARBITER, AND
+> ONE OF THEM IS A DEFECT.** Not the rule's seniority and not the gate's: read what the code does; whichever of the two
+> describes it stands, and the other is repaired in the batch that finds them.
+
+- **THE FIRST INSTANCE IS THE RULES CENSUS's S3-009** (IU §2; docs/reports/IU-rules-census.tsv). `CLAUDE.md`'s Momentum
+  paragraph said a new blow path that bypasses the strike loop owes the door a call of its own, and `check_ft` §6c holds
+  the door's call at one site. **The code routes every enemy blow that would bypass the loop through it** — Blood
+  Tribute and the wind-up's landing each resolve as a plain attack copy, the Hysteria pattern — so the one call is what
+  the game does: the gate stood, and IV rewrote the paragraph to say so, the census row re-read in place.
+- **IT IS THE CENSUS's PRACTICE, WRITTEN AS A RULE, SO THE NEXT ONE NEEDS NO RULING.** A census that reads every rule
+  against its gate meets these; its row records which side the code took, and the batch repairs the other.
+- **THE ARBITER IS THE CODE AS IT RUNS, NOT AS A COMMENT DESCRIBES IT** — a comment naming code is a claim (EB §2's
+  block), and a third description is not a tiebreak.
+
+## STANDING RULE — A BATCH READS `docs/state.md` AGAINST ITS FINISHED WORK: THE CLOSE-READ (Batch IV §0.1, the designer's)
+> **A BATCH's WORK CHANGES WHAT THE FILE SAYS IS TRUE. READING THE FILE AGAINST THE FINISHED WORK IS HOW THE BATCH FINDS OUT.**
+> At its close a batch reads every block of `docs/state.md` it did not open — whole, by a reader outside the working
+> read — and records each that bore on the work with what it found there and whether a trigger would have routed it
+> (ROUTED, or NOT ROUTED with the row repaired in the batch). Its output is the routing record's third list.
+
+- **IT WAS THE INDEX PILOT's FOURTH CONDITION, AND THE PILOT ENDED AT IV; THIS DID NOT END WITH IT** (the designer's).
+  The pilot asked whether a bounded read is a sufficient read, and three reports gave one answer — no wrong premise out
+  of a bounded read, every miss a stale entry the close-read caught. **The close-read was never the pilot's question**:
+  IU closed two items with it and repaired a line its own work had falsified, and it keeps running under this name.
+- **IT IS NOT HY §6's RE-READ** (the block that re-reads the reference claims naming what a batch touched): that one reads
+  the two references by the names a diff touches; this one reads the state file block by block. Each finds what the
+  other cannot.
+- **WHAT IT COSTS**: a reader, not a batch — IU's read the 85 blocks it had not opened, 152,392 B (its report, §8).

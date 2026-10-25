@@ -7,7 +7,11 @@ reds on an entry whose block changed under it — A BATCH THAT AMENDS A BLOCK AM
     python3 index_stamp.py docs/state.md            # list the entries whose stamp is missing or stale
     python3 index_stamp.py docs/state.md --write    # (re)stamp them, after re-reading each row against its block
 
-The stamp proves a row was touched when its block changed; that the row's label and triggers were re-read is the batch's."""
+The stamp proves a row was touched when its block changed; that the row's label and triggers were re-read is the batch's.
+
+**BATCH IV §6 — AND A POPULATION ROW** (`+ **POPULATION** **<kind>** `#xxxxxx` — … *lives in:* `` ### A `` · `` ### B `` …)
+carries one stamp over its member blocks: the md5 of their texts, each read as above, joined by a newline in the order the
+row names them. `check_iv` §6 reds on a row whose member changed under it, so a kind's row is re-read when a member moves."""
 import hashlib, re, sys
 
 FENCE_OPEN = '<!-- INDEX:BEGIN ('
@@ -36,6 +40,22 @@ def stamp(text):
     return hashlib.md5(WS.sub(' ', text).strip().encode('utf-8')).hexdigest()[:6]
 
 
+POP_OPEN = '+ **POPULATION** '
+POP_SPAN = re.compile(r'``\s*(#{2,3} .+?)\s*``')
+
+
+def population_members(line):  # the member keys a population row names, between *lives in:* and *records:*
+    a = line.find('*lives in:*')
+    b = line.find('*records:*', a)
+    if a < 0:
+        return []
+    return [m.group(1).strip() for m in POP_SPAN.finditer(line[a:b if b > a else len(line)])]
+
+
+def population_stamp(bl, members):
+    return stamp('\n'.join(bl.get(k, '') for k in members))
+
+
 def entry_key(line):  # gate_fixture.index_entry_key, the same reading
     if not line.startswith('- '):
         return ''
@@ -54,6 +74,19 @@ def main():
     idx = st[a:b].split('\n')
     stale, n = [], 0
     for k, line in enumerate(idx):
+        if line.startswith(POP_OPEN):
+            members = population_members(line)
+            old = re.search(r' `#[0-9a-f]{6}`', line)
+            missing = [m for m in members if m not in bl]
+            n += 1
+            if not members or missing or not old:
+                stale.append(('POPULATION BROKEN', line[:60] + (' — no block ' + str(missing) if missing else '')))
+                continue
+            want = ' `#%s`' % population_stamp(bl, members)
+            if old.group(0) != want:
+                stale.append(('STALE', line[len(POP_OPEN):len(POP_OPEN) + 40]))
+                idx[k] = line[:old.start()] + want + line[old.end():]
+            continue
         key = entry_key(line)
         if not key:
             continue

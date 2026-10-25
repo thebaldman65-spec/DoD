@@ -902,7 +902,9 @@ func _s5_the_index_pilot() -> void:
 			inside_heads += 1
 	ok(inside_heads == 0 and blocks.size() >= 100, "§5: a block stands inside the index (%d), or the file holds %d blocks" % [inside_heads, blocks.size()])
 	ok(st.find("\n## WHERE THE PROJECT IS") > b, "§5: the index does not stand above the WHERE block, where a batch meets it first")
-	for phrase in ["THE PILOT ASKS WHETHER A BOUNDED READ IS A SUFFICIENT READ", "delete this section", "opened", "needed"]:
+	# BATCH IV §0.1 — RE-POINTED, THE QUESTION UNMOVED: the pilot ended after three reports, so the section says what it
+	# ASKED; the needle is the question, in either tense (`check_iv` §0 holds that it says the pilot ended).
+	for phrase in ["WHETHER A BOUNDED READ IS A SUFFICIENT READ", "delete this section", "opened", "needed"]:
 		ok(index.contains(phrase), "§5: the routing does not say '%s'" % phrase)
 	# EVERY BLOCK HAS EXACTLY ONE ENTRY — the core, or a row — and every row carries its triggers.
 	var core := {}

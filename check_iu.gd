@@ -138,8 +138,9 @@ func _s0_the_rulings() -> void:
 const LEDGER := "docs/reports/IU-claims.tsv"
 const DISPOSITIONS := ["REPAIRED", "TRUE", "STANDS", "SUPERSEDED"]
 const KINDS := ["FALSE", "MEASUREMENT", "GONE-SUBJECT", "COPY", "POPULATION", "COUNT-GREW", "INCOMPLETE", "DECISION", "TRUE"]
-# THE CLAIMS LEFT STANDING, each waiting on a ruling its row names: a ceiling that does not rise.
-const CLAIMS_CEILING := 5
+# THE CLAIMS LEFT STANDING, each waiting on a ruling its row names: a ceiling that does not rise. BATCH IV §4 repaired
+# three on the designer's rulings (IR01, IR09, IR50), so it stands at the two GK's names wait on.
+const CLAIMS_CEILING := 2
 # How many repaired rows' words must be found for the arm to be reading the files at all — below the count IU left,
 # because a later batch may rewrite a repaired sentence again (that is not a red; putting the false words back is).
 const LOCATED_FLOOR := 120

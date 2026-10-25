@@ -4,6 +4,35 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The sim's own figures, and the last of the plumbing (Batch IV) — 2026-10-25
+
+**Why the bot answers a cache through the player's door, in his order, and not through a shortcut that lands the same rune.**
+A sim may choose worse than a player — that is a policy, and it carries its reason. Where the rune goes, what it costs and what
+is asked before it lands are rules, and a second copy of a rule in the sim is a second game the moment either copy changes. So the
+door moved out of the screen, where the sim could not reach it, and both call it. The order is part of the door: rolling a draft
+with an engine the player would not hold yet draws a different offer, so a cache answered before the draft measures a different
+party even when it pays the same rune.
+
+**Why the figures it moved are marked, not re-taken.** The batch that authors the deck's middle has to measure the ladder anyway,
+and a measurement taken twice is waste. A mark costs one sentence and says three things the next reader needs: that the figure
+is stale, by how much, and who owes the re-take. A known-moved figure left unmarked is the stale claim this project spent ten
+batches retiring.
+
+**Why every environment read is a row, not a fix to the two that were found.** The two leaks were found by a close-read's luck,
+and the sweep found three more beside them. A table of every read, each with its guard or its reason, turns the next unguarded
+switch into a red instead of another close-read's luck.
+
+**Why the index question closed by a count.** A rule a gate holds can be routed around; a rule nothing holds has to be read. When
+112 of 120 blocks hold one of the second kind, the core of any index would be nearly the whole file, and an index that routes
+around nothing costs its upkeep for no read it saves.
+
+**Why the state file's index gained population rows.** A trigger names a subject; a brief that asks about a kind of thing — every
+claim, every pick, every figure the sim took — matches no trigger, because the kind's members are scattered across blocks that each
+name their own. A row a kind, derived from what the briefs actually asked, is where such a brief finds them.
+
+**Why a rule and its gate are settled by the code.** They are two descriptions of one behaviour. Seniority picks a winner without
+looking; the code is the behaviour, so whichever describes it stands and the other is the defect.
+
 ## The claims, and what the ruling needs (Batch IU) — 2026-10-24
 
 **Why a constant holds its card's figure rather than one less.** Nine constants held one under what their card states and added the

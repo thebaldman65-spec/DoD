@@ -16,6 +16,30 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-25 &mdash; Batch IV: THE SIM's OWN FIGURES, AND THE LAST OF THE PLUMBING</h2>
+<p><b>Nothing a player sees moved: every card, rune and status reads exactly as it did. Underneath, the simulated player &mdash;
+the bot every balance measurement is taken with &mdash; now takes the rewards a player takes, in a player's order and through
+the same code a player's screen uses, and every recorded measurement this changed is marked until the next measuring batch
+re-takes it.</b> Full working: <code>docs/reports/IV.md</code>.</p>
+
+<p><b>&sect;1 &mdash; THE SIMULATED PLAYER TAKES ITS RUNES.</b> A bargain that pays a rune always paid a player one, and the
+simulated player had never taken it. It takes it now &mdash; and the elite's &mdash; through the code a player's screen
+uses, after the ability draft as a player does, and it no longer pays for a potion it cannot carry or a rune it has no room for.
+The paired measurement read every recorded figure the simulator had taken: each hero now ends a run holding about one rune more, almost always unworn because his slots were already full; the bargain grades, the mana figures and Sanctity's figures did not move, and the few that did are marked for the next measuring batch to re-take.</p>
+
+<p><b>&sect;2 &mdash; TEST SWITCHES STAY IN THE TESTS.</b> Five switches meant for the simulator could reach a real game if one was
+left set where the game was launched &mdash; the two the last batch named and three more found by checking every one: between them
+they could unlock every ability, replace a player's relics or replace his enemies. Each works only inside the simulator now, and
+every switch the game reads is on a checked list.</p>
+
+<p><b>&sect;3 &mdash; THE SIMULATED PLAYER PLAYS BY THE RULES.</b> It could cast a card the player's button would refuse, its
+two-target throw did not poison the second target, and its boss reward did not ask the ability cap. Every place the bot played by
+different rules from a player is repaired, and a check holds that count at zero.</p>
+
+<p><b>&sect;4&ndash;&sect;6 &mdash; THE RECORDS.</b> Three sentences in the testing rules that were not quite true are repaired; the
+three spine runes' names are laid out for the designer's decision; the main rule file takes no index, settled by a count;
+and the state file's index gains a row for each kind of thing a batch is asked about, so a batch about a kind finds its blocks.</p>
+
 <h2>2026-10-24 &mdash; Batch IU: THE CLAIMS, AND WHAT THE RULING NEEDS</h2>
 <p><b>Nothing a player sees moved: every card, rune and status reads exactly as it did. Underneath, the project's rule files stop
 carrying sentences the game has outgrown, every standing rule is matched to the check that holds it, nine numbers in the code now

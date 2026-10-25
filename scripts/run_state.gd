@@ -1591,11 +1591,13 @@ func random_loot() -> String:
 # variable each so the next measurement can tell them apart.
 #
 # NEITHER SHIPS AS A DEFAULT, and both are gated on `sim_run` as well as on
-# the env var — that gate is the load-bearing half. DOD_SIM_RUNES and the
-# other harness flags read the environment unconditionally, so a player
-# with a stale export in their shell would silently be in an experiment
-# arm; these two cannot be, because a real run never sets sim_run. Asserted
-# in test_runes.gd, not just intended.
+# the env var — that gate is the load-bearing half: a player with a stale
+# export in their shell would otherwise silently be in an experiment arm,
+# and these two cannot be, because a real run never sets sim_run. Asserted
+# in test_runes.gd, not just intended. **Since IV §2 every sim-family flag
+# is gated the same way** — `DOD_SIM_RUNES` beside these two, and at the
+# battle the full-kit grant, the standalone relic loadout and the forced
+# lineup — and `check_iv` §2 holds every environment read, one row each.
 const RICH_SLOTS := 4  # DOD_SIM_RUNE_ECON=rich: a fourth slot, which no real run has
 
 
@@ -2294,7 +2296,14 @@ func chronicle_keys() -> Array:
 # pre-Batch-X behaviour), off = no runes generated, offered, or dropped.
 # (BATCH ES §1: that family used to be called the "Common family" after the
 # rarity tier it sat on. There are no tiers; the family is unchanged.)
+#
+# **BATCH IV §2 — A SIM'S ARM, AND ONLY A SIM'S (DV32; FOUND AT GB).** It read the environment with no `sim_run`
+# gate, so *stats* or *off* left exported in a player's shell changed a real run and nothing said so, where `rich`
+# and `power` beside it were gated. It is gated as they are now, on the flag a real run never sets; `check_iv` §2
+# holds every environment read in the game's scripts, one row each.
 func runes_mode() -> String:
+	if not sim_run:
+		return "full"
 	var m := OS.get_environment("DOD_SIM_RUNES")
 	return m if m in ["off", "stats"] else "full"
 
@@ -2697,6 +2706,49 @@ func rune_choice_withheld(member: Dictionary) -> Array:
 		if not live_ids.has(String((c as Dictionary).get("id", ""))):
 			out.append(c)
 	return out
+
+
+# ══ BATCH IV §1a — A RUNE CACHE's ANSWER IS ONE DOOR, THE PLAYER's AND THE BOT's ═════
+#
+# **THE BOT MAY PLAY WORSE THAN A PLAYER. IT MAY NOT PLAY BY DIFFERENT RULES (IU §0.2)** — and the answer to a
+# rune cache lived in `map_screen._take_rune_pick`, a screen the sim cannot reach, so the sim never answered a
+# bargain's cache (DV26: 0.8–1.15 runes a hero a run, FOUND AT HR) and answered the elite's at the roll, a core
+# rune slotted before the draft was rolled (DV27). **The mechanics are here now, and the screen and the sim both
+# ask them**: the rune by its name out of `rune_choice`'s live list (FD §1 — the list the screen's buttons were
+# built from), the head triple spent, a core rune HELD UNWORN (HL §1: one pick hands over one thing) and any other
+# worn while a slot it fits is free (`hold_rune` decides by kind), the owed pick paid. **Which rune is the
+# player's choice, or the bot's policy; the door is the rule and does not differ.** Returns where the rune landed
+# and the rune, or `{}` when the answer is refused — no pick owed, or a name the live list does not hold.
+func take_rune_pick(member: Dictionary, rune_name: String) -> Dictionary:
+	var live: Array = rune_choice(member)
+	var queue: Array = member.get("rune_candidates", [])
+	var choice := -1
+	for i in live.size():
+		if String((live[i] as Dictionary).get("name", "")) == rune_name:
+			choice = i
+	if int(member.get("rune_picks_owed", 0)) < 1 or queue.is_empty() or choice < 0:
+		return {}
+	queue.pop_front()
+	member["rune_candidates"] = queue
+	var rune: Dictionary = live[choice]
+	rune["equipped"] = String(rune.get("engine", "")) == ""
+	var landed: String = hold_rune(member, rune)
+	member["rune_picks_owed"] = int(member.get("rune_picks_owed", 0)) - 1
+	return {"landed": landed, "rune": rune}
+
+
+# The cache let go: allowed only while `rune_choice` hands over nothing (FM §3 — a spend that did not ask it could
+# eat a live pick), the head triple spent and the owed pick paid. True when it was spent.
+func spend_rune_pick(member: Dictionary) -> bool:
+	var queue: Array = member.get("rune_candidates", [])
+	if int(member.get("rune_picks_owed", 0)) < 1 or queue.is_empty():
+		return false
+	if not rune_choice(member).is_empty():
+		return false
+	queue.pop_front()
+	member["rune_candidates"] = queue
+	member["rune_picks_owed"] = int(member.get("rune_picks_owed", 0)) - 1
+	return true
 
 
 # ══ BATCH FE §2 — THE OTHER TWO FROZEN QUEUES ARE RE-ASKED TOO ═══════════════

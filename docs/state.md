@@ -29,30 +29,34 @@ never have fired: **an alarm set above the failure level is not an alarm.** `che
 sentence every battery: over it is a warning, and past it by more than one batch at the record is a failure — the largest
 single-batch growth on record is **+13.38 KiB** (ES's +13,700 B). **A batch's fenced structure is not its writing (IT §4, the
 designer's)**: IS's +36,759 B net held **36,315 B of fenced structure** (fence `INDEX (IS §5)`: the index pilot's section, revertible by
-deleting it), so IS grew this file +444 B outside it and the record stays ES's; `check_fg` §4b holds the claim to its fence. *In the
+deleting it), so IS grew this file +444 B outside it and the record stays ES's; IV's +17,741 B net held **10,159 B of fenced structure** (fence `INDEX (IS §5)`: the nine population rows and the pilot's close), so IV grew this file +7,582 B outside it and the record stays ES's; `check_fg` §4b holds each claim to its fence. *In the
 preamble for the archive pointer's reason.*
 
-*Last rewritten: 2026-10-24 (Batch IU).*
+*Last rewritten: 2026-10-25 (Batch IV).*
 
 ---
 
 <!-- INDEX:BEGIN (IS §5) -->
-## THE INDEX PILOT IS IS's — RUNNING: READ THE CORE WHOLE; OPEN ANY OTHER BLOCK ONLY WHEN ITS ROW's TRIGGERS MATCH YOUR WORK
+## THE INDEX — READ THE CORE WHOLE; OPEN ANY OTHER BLOCK ONLY WHEN ITS ROW's TRIGGERS, OR A POPULATION ROW's, MATCH YOUR WORK (THE INDEX PILOT IS IS's, AND IT ENDED AT IV)
 
 **THE ROUTING (IS §5, the designer's pilot).** A batch reads this file's preamble, this section and the CORE below whole. For every
 other block it reads the row, and opens the block — by the heading the row names — when a trigger matches its brief or its work.
 **Every block stays in the file, in full, where it stood**: nothing was moved, merged, summarised or struck, and **to read the file
 whole again, delete this section** — that is the whole revert.
 
-**WHAT THE PILOT IS FOR.** TODAY THE CEILING IS ON THE FILE BECAUSE THE READ *IS* THE FILE. THE INDEX MAKES THE READ SMALLER THAN
-THE FILE, AND THEN THE CEILING BELONGS ON THE READ. THE PILOT ASKS WHETHER A BOUNDED READ IS A SUFFICIENT READ. **No ceiling moves at
-IS**: restating the 380 KiB on the read is IW's decision.
+**WHAT THE PILOT WAS FOR, AND HOW IT ENDED.** THE CEILING WAS ON THE FILE BECAUSE THE READ *WAS* THE FILE; THE INDEX MAKES THE READ
+SMALLER THAN THE FILE. THE PILOT ASKED WHETHER A BOUNDED READ IS A SUFFICIENT READ, **AND IT ENDED AFTER THREE REPORTS (IS, IT, IU) ON
+ONE ANSWER** (IV §0.1, the designer's): no wrong premise out of a bounded read in three batches, every miss a stale entry the close-read
+caught — a fourth report would add nothing. **The index stays**, and the routing stays a step. **`CLAUDE.md` takes none** — closed by
+IU §2's derivation, in the shape recon's block below — and **no ceiling moved**: the 380 KiB stays on this file, its restatement on
+the read never ruled.
 
 **THE FOUR CONDITIONS (the designer's).** Reversible by construction. Every row carries its triggers — a row without them is
 unroutable, and the index fails at that row. The core keeps every block seven of the last nine batches needed — derived, never chosen
 (IS's report §5 names the nine and prints the derivation); the newest RULINGS OWED is the core's by role. **And each report says which
-blocks it opened and which it needed — and while the pilot runs, reads every block it did not open at its close and says whether any
-bore on its work**: the three lists are the measurement, and an empty third list is the result.
+blocks it opened and which it needed, and reads every block it did not open at its close** — the pilot's fourth condition, kept after
+it as THE CLOSE-READ, the batch's own obligation (`docs/instrument-rules.md`'s block of that name): *a batch's work changes what this
+file says is true, and reading the file against the finished work is how the batch finds out.*
 
 **A NEW BLOCK GETS ITS ROW IN THE BATCH THAT WRITES IT; A BLOCK THAT CLOSES TAKES ITS ROW WITH IT** (`check_is` §5 reds on a block
 with no row, a row naming nothing, a row with no triggers, and a core that is not the nine batches' seven-of-nine).
@@ -73,37 +77,60 @@ whole. At its close it adds the three lists: opened, needed, and found at the cl
 batch did not follow them) **or NOT ROUTED** (no row's triggers name it, and that row is repaired in the batch), and the
 upkeep as rows touched of the total. A read outside the matched list is data, not a failure: the record says what was
 opened and what led there, which is how a trigger gets written. `check_iu` §8 holds the last batch's record to that shape;
-whether its rows were read is the batch's. **THE KNOWN LIMIT, RESTATED SO THE RULING DOES NOT ASSUME IT AWAY**: every batch
+whether its rows were read is the batch's. **IV's routing (`docs/reports/IV-routing.md`) was the first written with the population rows
+below unavailable to it, and the last.** **THE KNOWN LIMIT, RESTATED SO THE RULING DOES NOT ASSUME IT AWAY**: every batch
 of this pilot is read by a reader that already carries the project's practices, so a reader who does not know a practice
 has no instance, and more batches of the same reader will not make one.
 
 **THE CORE — READ WHOLE:**
-- **CORE** `` ## WHERE THE PROJECT IS `` `#e28f07`
+- **CORE** `` ## WHERE THE PROJECT IS `` `#40f26c`
 - **CORE** `` ## THE OPEN QUEUE `` `#17e1f1`
-- **CORE** `` ### IU's RULINGS OWED `` `#f5dba3`
-- **CORE** `` ### THE CLERIC's MANA RATE `` `#70071e`
+- **CORE** `` ### IV's RULINGS OWED `` `#7a8da7`
+- **CORE** `` ### THE CLERIC's MANA RATE `` `#5f4d62`
 - **CORE** `` ### SANCTITY's STEP `` `#7c43c9`
 - **CORE** `` ### BOIL OVER'S RATE `` `#8e9de8`
 - **CORE** `` ### THE CREST POOL `` `#cd7125`
 - **CORE** `` ### FOUND AT IA AND NOT FIXED `` `#0b3b3f`
 - **CORE** `` ### RULED AND NOT BUILT `` `#90a9d9`
 - **CORE** `` ### FOUND AT HX AND NOT FIXED `` `#c91933`
-- **CORE** `` ### THE PLAYTEST'S OTHER FINDINGS `` `#8ab247`
+- **CORE** `` ### THE PLAYTEST'S OTHER FINDINGS `` `#894ecb`
 - **CORE** `` ### THE FOUR OTHER CONJUNCTIONS `` `#dc1281`
 - **CORE** `` ### THE SKIRMISHER AND THE TRACKER `` `#b3c93d`
-- **CORE** `` ### THE SHAPE RECON ON `CLAUDE.md` `` `#2753bd`
+- **CORE** `` ### THE SHAPE RECON ON `CLAUDE.md` `` `#bd2df5`
 - **CORE** `` ### TO WATCH IN PLAY `` `#92b9de`
+
+**THE POPULATION ROWS — ONE A KIND (IV §6, the designer's).**
+A TRIGGER NAMES A SUBJECT. A BRIEF WHOSE SUBJECT IS A KIND OF THING MATCHES NO TRIGGER, BECAUSE THE KIND's MEMBERS ARE SCATTERED ACROSS BLOCKS THAT EACH NAME THEIR OWN — the claims, every rule, every
+figure a text states (IU's close-read: *the brief's populations matched no trigger*). **So each kind a brief asks for as a population
+has a row**: where its members live below (the core, read whole, holds others), its records outside this file, and its triggers.
+**Derived, not chosen**: the last ten briefs' subjects (IL–IU), each sorted a thing or a kind, and every kind more than one brief asked
+for has a row — nine, and *every rule* is not one of them, one brief having asked (IV's report §6; the derivation is kept,
+docs/reports/IV-populations.tsv). **A batch whose brief names a kind opens the row's blocks as it opens a matched row's.** A
+population row carries a stamp over its member blocks, in their order, and reds when a member's block changes (`check_iv` §6;
+`python3 index_stamp.py docs/state.md --write` re-stamps it as it re-stamps a row); a new kind gets its row when a second brief asks.
++ **POPULATION** **the claims** `#76a229` — Every present-tense claim a rule file or this file makes about the code, each with its disposition. *lives in:* `` ### FOUND AT IU AND NOT FIXED `` · `` ### FOUND AT HV AND NOT FIXED `` · `` ### FOUND AT HY AND NOT FIXED `` · `` ### FOUND AT GA AND NOT FIXED `` · `` ### FOUND AT GF AND NOT FIXED `` · `` ### FOUND AT GC AND NOT FIXED `` · `` ### FOUND AT FW AND NOT FIXED `` · `` ### FOUND AT GR AND NOT FIXED ``; the core, read whole, holds others (IV's RULINGS OWED, FOUND AT HX, FOUND AT IA, the WHERE block). *records:* docs/reports/IU-claims.tsv (the ledger of record, a disposition a row); docs/reports/IR-claims-census.md; check_hx §1d; check_iu §1; check_iv §4. *triggers:* the claims, stale claims, every claim, claims ledger, claim disposition, claims ratchet, reference claims, claims census
++ **POPULATION** **the figures behind doors** `#25835d` — Every figure or fact a player-facing text states, and the door or constant it reads. *lives in:* `` ### FOUND AT IT AND NOT FIXED `` · `` ### FOUND AT IK AND NOT FIXED `` · `` ### FOUND AT IJ AND NOT FIXED `` · `` ### FOUND AT IQ AND NOT FIXED `` · `` ### FOUND AT HL AND NOT FIXED `` · `` ### `master.html` §6b's "66 DAMAGING ABILITIES" RESOLVES AGAINST NO POPULATION ``. *records:* docs/reports/IJ-census.tsv; docs/reports/IQ-master-census.tsv; docs/reports/IT-catalogue-figures.tsv; check_ij §2 and §3; check_iq §2f; check_it §2; check_iu §3. *triggers:* every figure a text states, figures behind doors, a figure with no door, name the constants, literals get names, fact sweep, typed figure, pinned figures
++ **POPULATION** **the closed matter** `#8a1ddf` — Items and blocks closed and left standing: history, measurement tables, struck against their record. *lives in:* `` ### FOUND AT IS AND NOT FIXED `` · `` ### FOUND AT HO AND NOT FIXED `` · `` ### FOUND AT GL AND NOT FIXED `` · `` ### FOUND AT GF AND NOT FIXED `` · `` ### THE CRIT SURPLUS IS RULED END TO END `` · `` ### `BOND_MITIGATION_MAX` STAYS AT 0.75 `` · `` ### THE SUITE REDS, AND WHY ZERO IS NOT THE SAME AS FIXED ``; the core, read whole, holds others (the WHERE block, FOUND AT IA, THE SHAPE RECON). *records:* docs/reports/IQ-state-census.tsv; docs/reports/IS-claude-census.tsv; DoD-archive/state-archive.md (where closed matter goes, newest cut first); check_iq §1; check_it §1; check_hx §2; check_fg §4. *triggers:* the closed matter, closed blocks, closed items, closed-block census, history clauses, strike what is closed, measurement tables, archive what is closed
++ **POPULATION** **the positional picks** `#450d66` — A gate's selection of its subject by position or superlative, and whether it still names it. *lives in:* `` ### FOUND AT IT AND NOT FIXED `` · `` ### FOUND AT IQ AND NOT FIXED `` · `` ### FOUND AT IM AND NOT FIXED `` · `` ### GY's RULINGS OWED ``; the core, read whole, holds others (the WHERE block). *records:* docs/reports/IT-positional-census.tsv (the census of record); docs/reports/IO-census.tsv; check_it §3; check_iu §5 (the MISSES ceiling); check_in §4; check_io §6. *triggers:* positional picks, superlative picks, positional census, MISSES ceiling, fixed window, names its pick, re-selects its subject, a gate's pick
++ **POPULATION** **the bot's divergences** `#fc0910` — Every place the bot's game differs from the player's: RULE (a defect), POLICY (a choice, with its reason), MODEL. *lives in:* `` ### THE BARGAIN DECK's GRADES `` · `` ### FOUND AT GS AND NOT FIXED `` · `` ### FOUND AT IE AND NOT FIXED `` · `` ### FOUND AT IF AND NOT FIXED `` · `` ### FOUND AT IM AND NOT FIXED `` · `` ### FOUND AT GE AND NOT FIXED ``. *records:* docs/reports/IU-bot-divergence.tsv (the census of record, RULE 0 since IV); check_iu §4; check_iv §3b (the ceiling at zero); check_in §3; check_il §3. *triggers:* the bot's divergences, divergence census, bot plays a different game, the bot's rules, POLICY or RULE, sim bot, the bot pays, bot asks the player's door
++ **POPULATION** **the latent shapes** `#8d5439` — Defects that need a writer, a second member or a field nothing sets yet, each armed to red when it arrives. *lives in:* `` ### FOUND AT IV AND NOT FIXED `` · `` ### FOUND AT IR AND NOT FIXED `` · `` ### FOUND AT IS AND NOT FIXED `` · `` ### FOUND AT IC AND NOT FIXED `` · `` ### FOUND AT IL AND NOT FIXED `` · `` ### FOUND AT IM AND NOT FIXED `` · `` ### FOUND AT HY AND NOT FIXED `` · `` ### FOUND AT HZ AND NOT FIXED `` · `` ### FOUND AT FX AND NOT FIXED ``; the core, read whole, holds others (TO WATCH IN PLAY). *records:* docs/reports/IR-floor-census.md (the floor census of record); check_ir §1d; check_is §3a and §3b; check_il §1a; check_hy §5; check_iv §2. *triggers:* latent shapes, latent defect, dormant field, no writer, floor of a zero, floor census, read-only-zero field, reds when the writer appears
++ **POPULATION** **the save's keys** `#e0f2ed` — Every key a run save carries and every read of one: the load door, its rename and removal maps, its floor. *lives in:* `` ## LIVE COUNTS AND CONSTANTS WORTH HAVING AT HAND `` · `` ### HA's RULINGS OWED `` · `` ### FOUND AT HL AND NOT FIXED ``; the core, read whole, holds others (the WHERE block). *records:* check_iq §4; check_ir §2 (the rename map); check_is §2 (the load door's five answers); run_state.gd's RENAMED_CARDS and REMOVED_CARDS. *triggers:* the save's keys, every save read, load door, rename map, removal map, a key off a save, stale payload, save floor
++ **POPULATION** **the target picks** `#efdcd6` — Every pick of a card's or a door's target from a side: who is offered, and whether the cast pays there. *lives in:* `` ### FOUND AT IJ AND NOT FIXED `` · `` ### FOUND AT HF AND NOT FIXED `` · `` ### FOUND AT GN AND NOT FIXED `` · `` ### FOUND AT IM AND NOT FIXED ``. *records:* docs/reports/IR-ally-census.md; check_ir §1b; check_is §4; check_il §3; check_im §3b. *triggers:* target picks, pick pool, every pick, hero-side pick, a pick that produces nothing, the pick population, ally-target cards, _hero_side
++ **POPULATION** **the sim's recorded figures** `#0aeda8` — Every figure taken through the sim or its bot, and which a bot or instrument repair moved (SUPERSEDED-PENDING). *lives in:* `` ### THE BARGAIN DECK's GRADES `` · `` ### WHAT IV's DRIVE MOVED `` · `` ### THE FIRST CLEAN PLAYTHROUGH `` · `` ### EVERY COMPLETION FIGURE DATED BEFORE GJ EXCLUDED THE FINAL FIGHT `` · `` ### HOW LONG A FIGHT IS `` · `` ### Carried, with measurements attached `` · `` ### Small, and still owed `` · `` ### FOUND AT IE AND NOT FIXED `` · `` ### FOUND AT IF AND NOT FIXED `` · `` ### Carried from the code, reported and deliberately not fixed ``; the core, read whole, holds others (SANCTITY's STEP, THE CLERIC's MANA RATE, BOIL OVER'S RATE, the WHERE block). *records:* docs/reports/IV-drive.tsv (IV's paired drive: every default-sim figure, HEAD against IV, and its mark); docs/reports/IU.md §4; docs/reports/IP.md §2; docs/reports/IO.md §2 and §3; check_iv §1c. *triggers:* recorded sim figures, sim figures, measurements affected, which figures move, re-take, SUPERSEDED-PENDING, instrument fidelity, figures a fix could move
 
 **THE ROWS — ONE A BLOCK, IN FILE ORDER:**
 - `` ### THE FIRST CLEAN PLAYTHROUGH `` `#5461cf` — First clean playthrough (2026-10-18 Warden run). *triggers:* playtest readout, Rupture unreachable, RUPTURE_BREAK_PER_TICK, Sanctity events, SANCTITY_PER_STEP, vow 2.2 to 1, Cleric driest hero, Boil Over undrafted, Sharpshooter damage share, second playthrough, bot sim figures Sanctity steps dry turns
-- `` ### THE BARGAIN DECK's GRADES `` `#33bceb` — Bargain deck grades (table, ties, limits, missing middle). *triggers:* bargain modifier severity grades, re-grade, Parched/Slick Footing tie, Deadened/Rot tie, default build only, bot ally pools heroes-only, bot statuses Fleeting, Thin Veil vs Feverish, Warden 0.80-0.85 target, Mirrorbound
-- `` ### FOUND AT IU AND NOT FIXED `` `#371a2e` — IU's findings: ten bot RULE defects, rules the code breaks, gates holding less. *triggers:* bot divergence census, bot plays a different game, DV05 DV07 DV24 DV25 DV26 DV27 DV29 DV32, sim experiment arm, Called Shot spot DV13, 12 * 8, Blood Price note_resource_spent, Shared Ruin contagion, HEALS_STAY, check_if fixed-fps, comment copies
+- `` ### THE BARGAIN DECK's GRADES `` `#f38a63` — Bargain deck grades (table, ties, limits, missing middle; every one tied at IV). *triggers:* bargain modifier severity grades, re-grade, Parched/Slick Footing tie, Deadened/Rot tie, default build only, bot ally pools heroes-only, bot statuses Fleeting, Thin Veil vs Feverish, Warden 0.80-0.85 target, Mirrorbound
+- `` ### WHAT IV's DRIVE MOVED `` `#3df515` — Every default-sim figure IV's repair moved, SUPERSEDED-PENDING until re-taken. *triggers:* SUPERSEDED-PENDING, re-take, rune supply figures, IV's drive, recorded sim figures, the ladder's re-measure, deck's middle, which figures moved
+- `` ### FOUND AT IV AND NOT FIXED `` `#198acd` — IV's findings: two processes in one lane race its user://; DOD_ZONE_ROTATION ungated and inert. *triggers:* lane.sh, two gates in one lane, user:// race, harness save, check_ho red beside another gate, DOD_ZONE_ROTATION, zone rotation, slot pools, environment read
+- `` ### THE RULES A GATE COULD CHEAPLY HOLD `` `#d11bde` — The 188 cheap gates IU's census found (76 NONE): a standing list, two ceilings. *triggers:* cheap gate, rules census, NONE rule, PARTLY rule, a rule no gate holds, standing list, build the gate a rule names, HO §0
+- `` ### FOUND AT IU AND NOT FIXED `` `#e57696` — IU's findings: rules the code breaks, gates holding less than their rule, stale claims. *triggers:* 12 * 8, Blood Price note_resource_spent, Shared Ruin contagion, HEALS_STAY, check_if fixed-fps, gates holding less, cheap gate, stale claims outside the census, comment copies
 - `` ### FOUND AT IT AND NOT FIXED `` `#fa621c` — IT's findings: two constants pay one less, dead constants, typed figures, 13 picks. *triggers:* BATTLE_TRANCE_TURNS, MANA_WELL_TURNS, dead constant, VENDETTA_CUT, Powershot per point, typed figure, Chilled status row, catalogue structure words, positional census MISSES ceiling, iu_disposition stamp
-- `` ### FOUND AT IS AND NOT FIXED `` `#4ae18b` — IS's findings: the Cryomancer's upkeep, closed items left standing. *triggers:* Eternal Winter, Winter's Grasp, Shatter, Winter's Toll, same-turn hold, leftover closed items, check_is 3b
+- `` ### FOUND AT IS AND NOT FIXED `` `#4ae18b` — IS's findings: the Cryomancer's upkeep, closed items left standing. *triggers:* Eternal Winter, Winter's Grasp, Shatter, Winter's Toll, same-turn hold, leftover closed items, check_is 3b, Cryomancer's route, Cryomancer turn-start upkeep
 - `` ### FOUND AT IR AND NOT FIXED `` `#25860c` — Found at IR: latent floor shapes. *triggers:* floor census, Sacred Covenant Faith floor, Slow Acting Thin Blood, temporal rift, latent floor of a zero
 - `` ### FOUND AT IQ AND NOT FIXED `` `#442f50` — Found at IQ: Formless chip, stale code comments, check_hn 2a. *triggers:* Formless chip recoil, stale code comments, check_hn 2a worn arm, Fourth Stack rename, talents.gd rung 1 comment
 - `` ### FOUND AT IO AND NOT FIXED `` `#b98990` — Found at IO: _cheapest_attack returns the first free attack. *triggers:* _cheapest_attack, Long Silence enemy exemption, Heads Down, enemy 0-cost attack, enemy kit order, bargain modifier
-- `` ### FOUND AT IN AND NOT FIXED `` `#490d16` — Found at IN: r3 sample, run_sim safe slot comment, check_fh 7. *triggers:* enemies_alive_r3 sample, round three, ROUND_TICKS, Cruel Order, run_sim _take_offer safe slot comment, safe_band, check_fh 7 fallback comment
+- `` ### FOUND AT IN AND NOT FIXED `` `#490d16` — Found at IN: r3 sample, run_sim safe slot comment, check_fh 7. *triggers:* enemies_alive_r3 sample, round three, ROUND_TICKS, Cruel Order, run_sim _take_offer safe slot comment, safe_band, check_fh 7 fallback comment, false run_sim comment, DV30 bargain policy
 - `` ### FOUND AT IM AND NOT FIXED `` `#ba6e07` — Found at IM: Execute upgrade dormant, st/b split, gate defects. *triggers:* execute_upgraded, check_im 3a, Execute price, st/b sim report split, Sanctity figures, check_gn 4 hp_top, check_ew 4 vacuous ok, Firedraw drafted hook, lone burning enemy, _enemy_pick_pool
 - `` ### FOUND AT IL AND NOT FIXED `` `#c982d1` — Found at IL: sourceless dormant Cleric clauses. *triggers:* Dark Pact Invigoration invigoration_ranks, Blessed Vestments vestments_pct, status src, Cleric as source, check_il 1a
 - `` ### FOUND AT IK AND NOT FIXED `` `#258fbd` — Found at IK: other Sunders lay their own durations. *triggers:* Sunder duration, SUNDER_TURNS, Called Shot Armor, Mass Hysteria, Sundering Strike, Tyrant's Verdict, Consecrated Ground Judgement, enemies.json, handler literal, check_ij 3 pins
@@ -122,7 +149,7 @@ has no instance, and more batches of the same reader will not make one.
 - `` ### FOUND AT HV AND NOT FIXED `` `#639adc` — Found at HV: Open Line row, refused-rune re-ask, two stale lines. *triggers:* Open Line ENGINE_READ Stances, check_gv HALF, Run.rune_choice is_refused, copied Elemental Weakness, _apply_elem_weak, stale CLAUDE.md lines, one choice never two things, Pommel Strike Stun kit list
 - `` ### FOUND AT HT AND NOT FIXED `` `#f6a11b` — Found at HT: battery vs open game, rite ruin_primed, HT census. *triggers:* run_battery.sh game open, player-file arm, battery kill trap lock, rite ruin_primed, Reckoning, HT 2f census, Poison clock reset, purge Bleed chip Cull Harvest, Downwind copies, Frostbind partner
 - `` ### FOUND AT HS AND NOT FIXED `` `#6d15b0` — Found at HS: Tithe and Rupture Break, top-level-only readers. *triggers:* Tithe on Rupture Break, tick has no attacker, log_bleed_chip, set_ruin_stacks, conjunction ingredient lookup, Contagion, Reckoning, Bleed Ruin ingredients
-- `` ### FOUND AT HR AND NOT FIXED `` `#044b6c` — Found at HR: fire/ice doc-vs-code census, sim skips bargain cache. *triggers:* Shatter, Glacial Hold, Firedraw, Emberkeep, Overburn refund, Burn crit snapshot, stale code comments, sim bargain rune cache, rune supply figures
+- `` ### FOUND AT HR AND NOT FIXED `` `#dae9b7` — Found at HR: the fire/ice doc-vs-code census (the sim's cache closed at IV). *triggers:* Shatter, Glacial Hold, Firedraw, Emberkeep, Overburn refund, Burn crit snapshot, stale code comments
 - `` ### FOUND AT HP AND NOT FIXED `` `#5a5f2e` — Found at HP: Tithe's read site owes a talent rebalance. *triggers:* Tithe read site, Tithe crest rune, Breaking Heals a Hero talent, Break pay gap, Warden Long Watch, talent rebalance, widen read site, tree procs
 - `` ### FOUND AT HO AND NOT FIXED `` `#d612d3` — Found at HO: Cairn of the Fallen, revive potion, crest shapes. *triggers:* fallen hero stays down ruling, fallen_cairn event, Cairnmoss Poultice, Revive Potion on map, Tithe floor, Cleanse Debuffs talent, check_gv 4 event door, crest card grant, check_gf bag quit, stale gate comments check_ct_map
 - `` ### FOUND AT HN AND NOT FIXED `` `#a3c756` — Found at HN: missing party-condition shapes. *triggers:* Talents.party_condition_met, condition key twice, OR condition, any class twice, crest rune conditions, heroes_ keys, HN 3 census, crest design pass
@@ -145,7 +172,7 @@ has no instance, and more batches of the same reader will not make one.
 - `` ### GT's RULINGS OWED `` `#c6cd62` — GT's rulings owed: Fireball/Frostbolt price move, sitting-out slot. *triggers:* Fireball Frostbolt price, Magic Missiles baseline, Aimed Shot, EB inversion parity, card sits out keeps slot, benching, kit over cap, SITS_OUT
 - `` ### FOUND AT GS AND NOT FIXED `` `#fd1e77` — Found at GS: second clauses, engine texts, bot, drafted basics. *triggers:* Battle Poise free Guard Change, Shatterpoint Overpower, engine texts name cards, sim bot _bot_drafted_pick, drafted basics Perfect, Arcane Explosion no Perfect, Pommel Strike text, Last Rites
 - `` ### GR's RULINGS OWED `` `#2c3ddf` — GR's ruling owed: combat-rules.md has no stated ceiling. *triggers:* combat-rules.md ceiling, 70 KiB, EE ceiling method, KiB ceiling, instrument-rules.md ceiling, reference file size, check_fr 5, GR ruling 1
-- `` ### FOUND AT GR AND NOT FIXED `` `#4fc1fe` — Found at GR: ways-of-working header, census. *triggers:* ways-of-working.md header two rule files, check_fr, claude_md_census.py population, moved combat blocks
+- `` ### FOUND AT GR AND NOT FIXED `` `#4fc1fe` — Found at GR: ways-of-working header, census. *triggers:* ways-of-working.md header two rule files, check_fr, claude_md_census.py population, moved combat blocks, which file a rule lives in, combat-rules.md third rule file, IR01
 - `` ### GQ's RULINGS OWED `` `#e7a912` — GQ's rulings owed: class-selection words, fixed card text window. *triggers:* class-selection screen spec_choice words, Also opens with, Rune of the Warden Attack 75, Occultist Smite, card text window 280 px, deal of three engine runes
 - `` ### FOUND AT GQ AND NOT FIXED `` `#7c2c4c` — Found at GQ: kit texts break standard, orphaned blurbs, Tracker. *triggers:* Ministration text, Magic Missiles text, design rationale on card, ARCHETYPE_DESC, SPEC_INFO blurbs no reader, Tracker class passive vs Rune of the Tracker
 - `` ### GP's RULINGS OWED `` `#aafe0e` — GP's rulings owed: weakest class-wide cards, gated cards, holder. *triggers:* class-wide cards rebalance, CLASS_DRAFT_POOLS weaker, ENGINE_READ unreachable cards, Death Ray, Hymn of Hope, Resurrection, Runaway Resonance, holder vs party gate, two heroes one class
@@ -172,11 +199,11 @@ has no instance, and more batches of the same reader will not make one.
 - `` ### FOUND AT GA AND NOT FIXED `` `#de0bed` — Found at GA: a dated claim in instrument-rules.md. *triggers:* instrument-rules.md dated claims, EU all five correct, re-derive reference claims, stale claims
 - `` ### FOUND AT GE AND NOT FIXED `` `#12d166` — Found at GE: Long Draw drain still a gain, its words, relics header. *triggers:* Long Draw rune, SS_SEQ_MISS_DRAIN, miss drains 16 Focus, check_cs 7 model, bot 85% press roll, check_ez 5, relics.gd header, master.html talent trees residue
 - `` ### FOUND AT GC AND NOT FIXED `` `#46e127` — Found at GC: merge-claims census, deleted things named live. *triggers:* merge-ruling claims census, RULED NOT BUILT marker gate, deleted talent nodes cited, Talents.LANES, master.html talent-point economy, systems-recon.html bar-swap relic, ways-of-working table
-- `` ### FOUND AT GB AND NOT FIXED `` `#271f4c` — Found at GB: forfeit, DOD_SIM_RUNES, stale comments. *triggers:* debug_summon forfeit note_forfeit, DOD_SIM_RUNES runes_mode, stale comments in scripts and gates, dormant free_swap layered_faith crushing_blows
+- `` ### FOUND AT GB AND NOT FIXED `` `#d79079` — Found at GB: forfeit, stale comments (DOD_SIM_RUNES gated at IV). *triggers:* debug_summon forfeit note_forfeit, stale comments in scripts and gates, dormant free_swap layered_faith crushing_blows
 - `` ### FOUND AT FX AND NOT FIXED `` `#bdc673` — Found at FX: chip names, dormant fields, retired vocabulary. *triggers:* iron_will chip, undying_rage, dormant fields 275 of 304, the_pack, deleted-node log labels, _evade_source ghillie, retired vocabulary, vacuous suite checks, master.html inconsistencies
 - `` ### FOUND AT FW AND NOT FIXED `` `#472cbd` — Found at FW: relic hook sites, death refusals, unapplied content. *triggers:* relics.gd hook read sites, rest_heal_add, Cairnmoss Poultice, Martyr's Knucklebone, death refusals, stale comments, effective_speed, never-applied statuses, tick kill skips _on_enemy_death, combat-rules.md four death-refusals
 - `` ### THE CLASS MERGE ~~IS MEASURED AND UNRULED~~ WAS MEASURED AT FP AND IS RULED `` `#2b37c6` — Class merge project (FP): size, staging, spines, spell partition. *triggers:* class merge, merge-recon.html, class-merge branch, specs to classes, battery reds during merge, engine move, merge pilot, Sanctity potency layer, is_spell flag, dmg_type, recon coverage
-- `` ### THE THREE SPINES ARE BUILT AND ALL THREE RATES ARE SET (FU, FV); WHAT IS STILL FLAGGED `` `#a32461` — Three spines (Momentum, Channel, Sanctity): still flagged. *triggers:* CHANNEL_SPARES_PHYSICAL, CHANNEL_CAST_FLOOR, MOMENTUM_EXCHANGES_PER_STEP, Momentum cap, self-damage taken half, second meter display, ledger spender BI 1, _sync_engine_switches, spine runes
+- `` ### THE THREE SPINES ARE BUILT AND ALL THREE RATES ARE SET (FU, FV); WHAT IS STILL FLAGGED `` `#a32461` — Three spines (Momentum, Channel, Sanctity): still flagged. *triggers:* CHANNEL_SPARES_PHYSICAL, CHANNEL_CAST_FLOOR, MOMENTUM_EXCHANGES_PER_STEP, Momentum cap, self-damage taken half, second meter display, ledger spender BI 1, _sync_engine_switches, spine runes, note_blow_met
 - `` ### FIVE DRAFTED ABILITIES ARE NAMED AND DESCRIBED NOWHERE `` `#87b6b9` — Five drafted abilities undescribed in master.html. *triggers:* Arcane Surge, Divine Wrath, Mana Shield, Reality Fracture, Rallying Shout, master.html 6b drafted-abilities table, DY vault re-homes, card rows
 - `` ### `master.html` §6b's "66 DAMAGING ABILITIES" RESOLVES AGAINST NO POPULATION `` `#42b06e` — master.html 6b's 66 damaging abilities has no population. *triggers:* master.html 6b, 66 damaging abilities, damage stated in prose, damage > 0 corpus, draft pools 39, denominator
 - `` ### TWO SMALL DOC REPAIRS FR FOUND AND DID NOT TAKE `` `#e02254` — Two small doc repairs FR left: events.gd comment, master.html word. *triggers:* events.gd comment talent_points verb, event worked example, master.html the every hero, clearing heal 15%
@@ -203,9 +230,9 @@ has no instance, and more batches of the same reader will not make one.
 - `` ### THE SEVENTH FAMILY, FOUND AT DM AND DELIBERATELY NOT SWEPT `` `#b78fa5` — Seventh family: card text under-states its payload (DM, unswept). *triggers:* card text under-states payload, absent clause, DM 1 test, authoring vs repair, card text sweep
 - `` ### Small, and still owed `` `#59a3f4` — Small, still owed: src coverage, companion terms, stale sims. *triggers:* vacuous as/at checks, _apply_status src coverage, check_di CALL_SITES, _companion_hit terms, We Do Not Break companion, stale sim figures, FIREDRAW_TAKE, shared_grief exactly 3 comment, Profile.save_path swap, hand-built boards
 - `` ### Carried, and still awaiting a ruling `` `#5027f0` — Carried rulings: zone-boss fallback floor, per-file ceilings. *triggers:* zone-boss fallback fully-held pool, EH 1, CLAUDE.md ceiling, instrument-rules.md ceiling, combat-rules.md ceiling, EE method, subject seam split
-- `` ### Carried, with measurements attached `` `#02ab0b` — Carried measurements: Frenzy rate, Faith lane band, revert sweeps. *triggers:* FRENZY_RAGE_PER_STEP, Blood Frenzy peak, Reckless Abandon, Faith lane, FAITH_RELEASE, HELD_MAX, Communion band, Elevation, Blessing of the Faithful, revert constant prose sweep
+- `` ### Carried, with measurements attached `` `#02ab0b` — Carried measurements: Frenzy rate, Faith lane band, revert sweeps. *triggers:* FRENZY_RAGE_PER_STEP, Blood Frenzy peak, Reckless Abandon, Faith lane, FAITH_RELEASE, HELD_MAX, Communion band, Elevation, Blessing of the Faithful, revert constant prose sweep, recorded sim figures, sim readings carried
 - `` ### Named by the designer, carried from CX `` `#31545e` — Named by the designer (CX): relics per hero, rune content. *triggers:* relics per-hero ruling, active_relics save format, victory_heal_pct, rest_heal_add, resource_floor_pct, relic read sites, enemy interference status, rune content pass, enemy debuff duration vs cooldown
-- `` ### Carried from the code, reported and deliberately not fixed `` `#405008` — Carried from code: shop key, counts, beast ids. *triggers:* rune trade event, scarred_runes id, shop confounder merchant key, devoted_fury, checks=none targets, _recast_refusal_note Frozen vs Held, check_cu check_cv, beast identifiers, Killing Frost vs Blizzard
+- `` ### Carried from the code, reported and deliberately not fixed `` `#cdf0ae` — Carried from code: shop key, counts, beast ids. *triggers:* rune trade event, scarred_runes id, shop confounder merchant key, devoted_fury, checks=none targets, _recast_refusal_note Frozen vs Held, check_cu check_cv, beast identifiers, Killing Frost vs Blizzard, SUPERSEDED-PENDING, runes bought per run
 - `` ## LIVE COUNTS AND CONSTANTS WORTH HAVING AT HAND `` `#48d936` — Live counts and constants (delays, corpus, pools, saves). *triggers:* BASIC_DELAY, BUFF_DELAY_CAP, PURE_BUFFS, ability corpus 231, RECAST_GATED 64, FRENZY_MAX_STEPS, FAITH_RELEASE, draft pools 179, ABILITY_SLOTS_BY_BOSS, pouch slots, SC_PROFILE_DEFAULT, save v15, relics, EMBERKEEP_TURNS recast proposal
 - `` ### THE TEST TREE, AS OF EF `` `#60a024` — Test tree as of EF: suites, battery, baselines, differ. *triggers:* suites at repo root, suite_fixture _spawn, run_battery.sh GATES, gates outside GATES, .ran manifest, baselines.json rows, new gate rows, check_parse coverage, check_de differ, stamp gates, check_da 3 walk
 - `` ### HOW LONG A FIGHT IS `` `#014714` — How long a fight is: rounds tables, ramp arrival (stale since DK). *triggers:* fight length rounds, turns per hero, rung 2 same fight, DOD_SIM_ROWS, elite shortest, Avg rounds/battle bug, cy_report_line, ramp arrival Frenzy Faith Loyalty Focus, sim confounders
@@ -219,76 +246,61 @@ has no instance, and more batches of the same reader will not make one.
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: IU — THE CLAIMS, AND WHAT THE RULING NEEDS.** IMPLEMENT ONLY. **Every claim IU's census read left it with a
-  disposition and a ratchet holds what is left; every rule in `CLAUDE.md` was read against the gate that holds it; the nine
-  constants hold their card's figure; and the bot pays the player's swap price.** Full working: **`docs/reports/IU.md`**. **The
-  queue is empty: IU was its last batch, and the roadmap holds the authoring list and nothing else** (the roadmap, below).
-- **THE DESIGNER's FILES, READ AND UNTOUCHED.** The readout holds what it held at IT: IH's debug-touched first file and the clean
-  one, `readout/run-20261018-194229.jsonl`, which `latest.txt` names — 24,340 B, md5 `610bcd8c2b43f97703e63053e86728fa` at IU's
+- **Last batch: IV — THE SIM's OWN FIGURES, AND THE LAST OF THE PLUMBING.** IMPLEMENT ONLY. **The sim answers what a player
+  answers, through his doors and in his order; the divergence census holds RULE 0; every environment read in the game's scripts
+  is a row; the index question is closed by its derivation and the pilot ended; the index has its population rows.** Full working:
+  **`docs/reports/IV.md`**. **The queue is empty and the roadmap holds the authoring list and nothing else** — the deck's middle
+  first, and it owes the sim's marked figures their re-take (the roadmap, below; WHAT IV's DRIVE MOVED).
+- **THE DESIGNER's FILES, READ AND UNTOUCHED.** The readout holds what it held at IU: IH's debug-touched first file and the clean
+  one, `readout/run-20261018-194229.jsonl`, which `latest.txt` names — 24,340 B, md5 `610bcd8c2b43f97703e63053e86728fa` at IV's
   open and at its close, **still the one run**. `run_save.bin` (55,264 B, md5 `fcb20c91…`) still holds it at zone two's start. Both
-  backed up with the player's files (`../save-backups/IU-20261024-101003`). **A second run with a different party is still asked
+  backed up with the player's files (`../save-backups/IV-20261024-230637`). **A second run with a different party is still asked
   for, on the LOOK-LIST** (the roadmap, below).
-- **§3 — THE NINE HOLD THEIR CARD's FIGURE (IT's ruling 1).** Each re-valued, the `+ 1` gone from every apply, recast row and the
-  Mantle rider, the cards reading each through `{=Battle.X}`, `check_iq` §2f's doors re-pointed; no read wanted the lower value,
-  so none was renamed. **No magnitude moved**: every player-facing text dumped through its door on both trees, 1,324 texts
-  byte-identical, and `check_iu` §3 drives each cast's applied figure.
-- **§4 — THE BOT PAYS THE PLAYER's SWAP PRICE (IT's ruling 2)**, through one builder the picker and the bot share,
-  `battle._swap_choice`. The recorded figures a swap could move — IE's and IF's dry shares, the Hourglass's Hunter — were driven
-  HEAD against the fix, 60 runs a side for each of three builds, pooled over the twelve lineages as the records were: **every
-  figure a tie, so none is re-taken** (IU's report §4). **The divergence census of record** sorts the 33 places the bot's game
-  differs: 12 RULE (2 repaired here, 10 owed — FOUND AT IU), 14 POLICY each with its reason, 5 MODEL, 2 CLOSED.
-- **§5 — SEVEN PICKS REPAIRED, THIRTEEN UNDER A CEILING (IT's ruling 3)**: the two material ones, each proved by breaking its
-  subject, and five on targets IU touched; the census's MISSES count is a ceiling that does not rise, and each standing row is
-  stamped with its target so the batch that touches it finds its row (`check_iu` §5).
-- **§0.4 — THE 438 STAY PINNED (IT's ruling 4)**, and the rule is written beside IJ's: a figure a batch re-tunes gets a
-  constant then.
-- **§1 — THE COUNT ENDED**: 193 claims in the ledger of record (`docs/reports/IU-claims.tsv`) — 169 repaired across `CLAUDE.md`,
-  the two references, `baselines.json` and `check_fg.gd`; 16 true; 3 superseded; **5 standing, each on a ruling** (IU's RULINGS
-  OWED, 1). **The ratchet**: `check_hx` §1d reads every backticked name in all four rule files, each dead name read once with its
-  mentions counted, and §1d(c) holds the live claims in dead names at the count IU left; `check_iu` §1 holds the ledger.
-- **§2 — EVERY RULE IN `CLAUDE.md` AGAINST ITS GATE**: 817 rules over the file's 120 blocks, kept (`docs/reports/IU-rules-census.tsv`,
-  every row its tree): **HELD 299, PARTLY 229, NONE 284**, five not rules; 188 of the PARTLY and NONE a gate could cheaply
-  hold, the list to work through whatever the index decides. **112 of the 120 blocks hold a NONE or PARTLY rule** — the
-  derivation the index ruling needs (IU's RULINGS OWED, 2).
-- **§6 — THE MANIFEST's COUNT IS A FLOOR**: 1,987 pins at IU (1,947 at IT), and a fall reds until the batch names its reason.
-  **§7 — `lane.sh probe` MAKES A BARE PROBE**, named inside the clearing command's last pattern; `lane.sh spent` prints the
-  command and `lane.sh strays` lists what no pattern holds.
-- **§8 — THE PILOT's THIRD REPORT, AND THE ROUTING IS A STEP** (the index section, above): the brief's thirteen subjects matched 34 rows, which with the 15-block core were opened whole (49 blocks, 133,491 B of 327,579); the close-read read the other 85 and found 30 that bore, 8 strongly — 21 ROUTED, 5 NOT ROUTED and 4 split, every unrouted row given its trigger; 30 of the 135 entries touched, 27 by hand (IT: 14 of 134) (the routing of record,
-  `docs/reports/IU-routing.md`; IU's report §8).
-- **THE INSTRUMENTS.** `check_iu` is new (§0–§8). Widened or re-pointed: `check_hx` §1d (the four rule files and the ceiling,
-  its three MISSES rows repaired, and the Faith heading's key), `check_iq` §2f's eight doors, `test_batch_be` §4,
-  `test_batch_bv` §1 and §3, `test_batch_ce` §1, `check_cs` §7's label, `suite_fixture.gd`'s Mage floor (the reading since IF
-  §2), `build_pin_manifest.py`'s floor and `lane.sh`.
-- **THE VERIFICATION** — `docs/reports/IU.md` §11.
-- **`CLAUDE.md` IS 486,160 B = 474.77 KiB AGAINST ITS 510 KiB CEILING — 35.23 KiB UNDER** (+1281 B at IU: the claims' repairs -662 B, IU's three rulings +1943 B; nothing cut): 4.4 batches at EZ's record (8,293 B).
-- **`docs/state.md` IS 326,275 B = 318.63 KiB AGAINST ITS 380 KiB CEILING — 61.37 KiB UNDER** (-1304 B at IU, this line included; the archive took 15,227 B, the closed items word for word with the cut's heading): 9.4 batches at the honest rate IT measured (6,712 B, the mean of IP–IT's own writing outside a fence).
+- **§1 — THE SIM ANSWERS THE RUNE CACHES, IN THE PLAYER's ORDER, AND ASKS THE MERCHANT's DOORS (DV24–DV27).** A cache's answer is
+  `Run.take_rune_pick`, the door the hero's screen commits through; the sim answers the bargain's (never before) and the elite's
+  through it after the draft, DV28's policy the choice; the potion and the rune counter ask their doors before the gold moves.
+  **THE DRIVE (§1c)**, HEAD against IV paired by seed, 33 arms: **the rune supply moved** — a hero ends a default run holding +1.00
+  to +1.36 runes, almost all unworn (the slots were full) — **and the ladder's 26 tied, its order holding under a shift of
+  −0.0004 ± 0.0018**; eleven recorded figures are marked SUPERSEDED-PENDING (WHAT IV's DRIVE MOVED), the re-take the deck's middle's.
+- **§2 — EVERY ENVIRONMENT READ, ONE ROW EACH (DV32).** 58 reads: the five sim-family reads a player's run could reach are gated
+  (`DOD_SIM_RUNES`, `DOD_SIM_GRANT_ALL`, and the sweep's three — the relic loadout, the forced lineup and theme), and `check_iv` §2
+  reds on a read nobody sorted. `DOD_ZONE_ROTATION` is a real run's switch, inert today (FOUND AT IV).
+- **§3 — THE FOUR REPAIRS, AND RULE 0 (DV05–07, DV11, DV29).** The rotation re-asks the door, the fallback body is written back,
+  the boss pick asks the cap; the census of record reads RULE 0, POLICY 14, MODEL 5, CLOSED 14 — a ceiling, beside `check_gw`'s and
+  IU §5's. **§0.4 — the code decided S3-009**: the gate described it, so the rule was rewritten.
+- **§4 — THE CLAIMS**: IR01, IR09 and IR50 repaired in the ledger in place; **ISN04 and ISF12 stand on GK's three names, which IV
+  reports for the ruling** (IV's RULINGS OWED, 1).
+- **§5 — THE INDEX QUESTION CLOSED** in THE SHAPE RECON by its derivation (817 rules, 112 of 120 blocks); the pilot ended after
+  three reports; the close-read kept under its own name; the 188 cheap gates (76 NONE) a standing list, both counts ceilings.
+- **§6 — NINE POPULATION ROWS** (the index, above), derived from IL–IU's subjects: five of the six expected, *every rule* dropped,
+  four added.
+- **§9 — THE ROUTING** (`docs/reports/IV-routing.md`): the brief's thirteen subjects matched 35 rows, which with the 15-block core were opened whole (50 blocks, 135,555 B of 326,275); the close-read read the other 85 and found 8 that bore, one stale (EQ's 6.98, marked) — 3 ROUTED, 5 NOT ROUTED, every unrouted row given its trigger; 28 of the 147 entries touched, 24 by hand (IU: 30 of 135).
+- **THE INSTRUMENTS.** `check_iv` is new (§0–§6). Re-pointed: `check_fe` §2 (the door's body), `check_fm` §1d (the arm a sim's, +1),
+  `check_is` §5's phrase, `check_iu`'s standing ceiling (5 → 2). `index_stamp.py` stamps the population rows.
+- **THE VERIFICATION** — `docs/reports/IV.md` §11.
+- **`CLAUDE.md` IS 488,395 B = 476.95 KiB AGAINST ITS 510 KiB CEILING — 33.05 KiB UNDER** (+2,235 B at IV: the bot's door and RULE 0 +627 B, the sim-family flag rule and its three flags +708 B, the index question's close +427 B, the strike loop's sentence +225 B, the instrument index's two rows +170 B, the cache door's re-read +78 B; nothing cut): 4.1 batches at EZ's record (8,293 B).
+- **`docs/state.md` IS 344,016 B = 335.95 KiB AGAINST ITS 380 KiB CEILING — 44.05 KiB UNDER** (+17,741 B at IV, this line included: **10,159 B of it fenced structure** — the nine population rows and the pilot's close, inside the index's fence — and +7,582 B outside it; the archive took 4,705 B, the closed items word for word with the cut's heading): 6.7 batches at the honest rate IT measured (6,712 B, the mean of IP–IT's own writing outside a fence).
 - **No save version moved**: no key a save carries changed.
 - **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in a build
   older than HL**: HL's ceiling refuses a newer save from HL's build on — HR's v15 is the first bump it has guarded — and HJ's and
   HK's builds, and `main`, carry no ceiling.
-- **Next: the roadmap's authoring list** — IU was the last batch in the queue.
-
+- **Next: the roadmap's authoring list** — the deck's middle first.
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### IU's RULINGS OWED — **FOUR; NONE IS PLAYER-VISIBLE**
+### IV's RULINGS OWED — **THREE; THE FIRST IS PLAYER-VISIBLE**
 
-Full working: `docs/reports/IU.md`, NEEDS A RULING.
+Full working: `docs/reports/IV.md`, NEEDS A RULING.
 
-1. **THE FIVE CLAIMS LEFT STANDING, EACH ON A RULING** (the ledger of record, `docs/reports/IU-claims.tsv`, *STANDS*). GK's
-   three spine-rune names, still *PROPOSED at GK* in `CLAUDE.md` (ISN04, ISF12): **confirm them and the parenthetical goes**
-   (GK's ruling 1). The instrument file's opening sentence, which GR §2 retired in place by the paragraph after it (IR01):
-   **keep it as the retired-in-place record, or rewrite it**. The instrument file's bold sentence that nothing restates
-   `baselines.json`, which THE REST below and `CLAUDE.md`'s harness line both do (IR09, IR50): **a rule both files break, or a
-   description that names its restatements**.
-2. **THE INDEX RULING NOW HAS ITS DERIVATION** (IU §2's census of record, `docs/reports/IU-rules-census.tsv`): *a rule with a
-   gate is a reference and can be routed around; a rule with none must be read, so its block is core* — and **112 of
-   `CLAUDE.md`'s 120 blocks hold a NONE or PARTLY rule**, so by the census's own rule nearly the whole file is core. **The
-   ruling is the designer's and comes after the pilot's fourth report**, not in a batch.
-3. **THE TEN RULE DEFECTS IN THE BOT** (FOUND AT IU, below): each a place the bot plays a different game. **A batch of their
-   own, or each repaired as its code is next touched.**
-4. **A RULE AND ITS OWN GATE CONTRADICT** (IU §2's census, S3-009): the strike-loop rule says a blow path that bypasses the
-   loop owes `battle.note_blow_met` a call of its own, and `check_ft` §6c asserts that call stands at exactly one site.
-   **Obeying the rule reds the gate; one of the two is rewritten.**
-
+1. **GK's THREE SPINE-RUNE NAMES, STILL *PROPOSED at GK*** (ISN04 and ISF12, the two claims the ledger of record leaves
+   standing, `docs/reports/IU-claims.tsv`): *Rune of the Vanguard (core)*, *Rune of the Invoker (core)*, *Rune of the
+   Hierophant (core)*. **IV §4 reports what the ruling needs and nothing more** — for each spine, what its rune does in one
+   sentence, its current name, and every surface the name stands on (the full sweep kept, `docs/reports/IV-spines.tsv`).
+   **Confirm or rename each, and the parenthetical in `CLAUDE.md` goes with the ruling.**
+2. **TWO GODOT PROCESSES IN ONE LANE SHARE ITS `user://`** (FOUND AT IV): `lane.sh` launches into a lane already running
+   one, and a gate that writes and reads the harness save reds beside it. **A lock in the driver, or the rule written beside
+   IQ §7's lane block** — one process a lane.
+3. **`DOD_ZONE_ROTATION` IS A REAL RUN's SWITCH, READ WITH NO GATE** (FOUND AT IV): inert while every slot pool holds one
+   zone. **A play switch the readout names, as `DOD_ENEMIES_OFF` is, or a sim's, gated on `sim_run`** — decided before a
+   pool holds two, the day `check_iv` §2 reds.
 ### THE FIRST CLEAN PLAYTHROUGH — **2026-10-18, WARDEN, ZONE ONE THROUGH ITS BOSS; SIX FINDINGS, ALL THE DESIGNER's TO RULE OR AUTHOR, NOTHING BUILT FROM THEM (IP §0.1, §4)**
 
 **The file is `readout/run-20261018-194229.jsonl`** in the live folder (24,340 B; md5 `610bcd8c2b43f97703e63053e86728fa`), backed
@@ -368,6 +380,60 @@ IO's cuts that IP re-measured. Every figure, its standard error and its source i
 - **THE THIN VEIL IS STILL FEVERISH's RULE AT TWICE THE FIGURE (IP §0.6)**: confirmed, and a rule of its own is owed — the
   designer's to author. **On the repaired instrument the two settings of the one dial cost the same** — Feverish 0.910, the Veil
   0.908 — and stand in one grade, 3.
+- **IV's DRIVE: EVERY GRADE READING AND RUNG MEAN TIED, AND THE ORDER HOLDS (IV §1c).** On this table's forced arm, HEAD against
+  IV paired by seed, no modifier's health at a bargain fight's end moved past two standard errors: **the one uniform shift that
+  best explains all 23 is -0.0004 ± 0.0018**, and the residuals about it are noise (χ² 16.1 on 22 degrees of freedom); 40 pairs
+  swap order between the two sorts and none past two standard errors on both trees; the rung means tie (Wanderer +0.006, Warden
+  -0.007, Ruin -0.008). **So the batch that authors the deck's middle re-reads these bands, and owes no re-grade for IV's
+  repair.** What the drive cannot settle: its HEAD arm reads six of the 23 outside two standard errors of IP's figures
+  (Bloodless +0.082, Overgrown −0.042, Thin Air, the Long Silence, Rot and Miasma near +0.02) — its forced arm is IN's probe
+  rebuilt from its description, and HEAD is IU's game — so it says IV moved none of them, not whether the record or the
+  instrument drifted (IV's report §1c).
+
+### WHAT IV's DRIVE MOVED — **SUPERSEDED-PENDING UNTIL THE BATCH THAT AUTHORS THE DECK's MIDDLE RE-TAKES THEM (IV §1c, the designer's)**
+
+**What it is.** IV's sim answers what a player answers (its RULE rows at zero, IV §1–§3), so IV drove the figures a default sim
+took, the brief's list whole, against the unchanged tree — HEAD against IV, paired by seed, 20 runs a party on IG's three
+parties, 33 arms: the natural default build and untalented at each rung, the Hourglass held on both builds, IG's Hierophant
+population on both builds, and the 23 forced arms with their baseline — and read each cut against its noise: a cut inside two
+standard errors is a tie. **The kept table is docs/reports/IV-drive.tsv**, 822 rows, each with the record it reads against (IV's
+report §1c). **No figure is re-taken here**: the batch that authors the deck's middle measures anyway. **Read against chance**:
+of 97 recorded readings the 7 of rune supply and the merchant's buys move by mechanism, and of the other 90, 4 read past two
+standard errors where chance gives 4 — each marked by the rule, with what it is.
+
+- **SUPERSEDED-PENDING (IV §1c) — THE RUNE-SUPPLY FIGURES** (HR §1c's supply table; the run report's *Acquired per hero per
+  run*, EQ's 3.44 in Carried from the code). The sim answers the bargain's rune cache since IV, so a hero on the default build
+  ends a run holding **+1.36 runes at Wanderer**, **+1.31 runes at Warden**, **+1.00 runes at Ruin** (|d|/se 7.2 to 10.0), +0.89
+  to +1.28 of them unworn — the slots were already full. Re-taken by the batch that authors the deck's middle.
+- **SUPERSEDED-PENDING (IV §1c) — THE MERCHANT's RUNES BOUGHT A RUN** (the run report's *runes bought*, EQ's 6.98 in Carried
+  from the code). The cache's runes fill the slots first, so IV's sim buys 0.58 fewer a run (|d|/se 5.7, the ten natural arms'
+  30 party blocks of 20 runs paired by seed; the merchants walked tie, -0.12). Re-taken by the batch that authors the deck's
+  middle.
+- **SUPERSEDED-PENDING (IV §1c) — UNTALENTED COMPLETION ON IG's HIEROPHANT POPULATION** (IO §3: runs completed 70 of 180). On
+  IV's sim **25% → 50%** of runs complete (|d|/se 2.90; Fisher's exact p ≈ 0.008) and the depth rises +3.5 of 49 — the one
+  population where the runes the sim now takes buy completion. Re-taken with Sanctity's figures by the batch that re-measures
+  the sim.
+- **SUPERSEDED-PENDING (IV §1c) — RUNS COMPLETED UNDER TINDERBOX AND UNDER MIASMA** (IP §1b: 59 and 51 of 60). Each read 93.3% →
+  100% on the drive's forced arm, |d|/se 2.05 by the rule's reading — which overstates at the boundary (Fisher's exact p ≈ 0.12
+  each), and beside the supply, 90 recorded readings expect 4 past two standard errors by chance and show 4. **Marked by the
+  rule.** Re-taken with the ladder by the batch that authors the deck's middle.
+- **SUPERSEDED-PENDING (IV §1c) — THE SIM's HUNTER BAR AT A TURN's START, THE RELIC HELD, DEFAULT** (IF §0.1b's 95 of 120). It
+  reads 3.1 of 120 lower on IV's sim (|d|/se 2.18; the Cleric -2.2 and the Mage -1.7, ties). Re-read by the batch that re-takes
+  the sim's figures.
+- **AND EVERYTHING ELSE TIED** — the bargain ladder's 26 (every grade reading and the three rung means: the order holds, THE
+  BARGAIN DECK's GRADES, above), every dry share and opens-full reading (IE §1b, IF §0.1b, IG §4c), every Sanctity figure on
+  IG's population (SANCTITY's STEP), untalented completion and depth at each rung on IG's three parties (GJ's count), and the
+  default build's completion and depth at each rung. **What moved that nothing records**: worn +0.032 ± 0.004 a hero and core
+  runes slotted +0.085 ± 0.011 (pooled over 34 arms — the slots were full), and a boss's Sanctity steps past two standard errors
+  in 6 of 34 arms, both ways (pooled +0.011 ± 0.018). **What it could not read**: FOUND AT IF's Rupture rate (3.2% of a
+  Cryomancer's turns, IF §2's own arm) — this probe books no cast, and DV05's re-ask can move it, so the batch that re-takes the
+  sim's figures reads it; BOIL OVER'S RATE's HZ figures (Rage a turn, the bot's damage at a full bar) — the probe reads Mana
+  bars only; and Carried, with measurements attached's readings, each of a retired configuration. **And HEAD against the
+  record**: this drive's HEAD arm does not reproduce several recorded levels — opens full reads 75.3 / 82.9 / 74.4% (Cleric /
+  Mage / Hunter, default with the relic) against IG §4c's 39.2 / 42.5 / 35.6, the bars about 110 of 120 against IF's 91 / 97 /
+  95, untalented dry 33.0 / 24.9 / 40.3 against IE's 26.8 / 18.3 / 33.8 — its readings are rebuilt from the reports'
+  descriptions on IG's three parties, not the original probes, so what it measures is IV's effect on each figure, and the
+  record's level is not re-read here.
 
 ### THE CLERIC's MANA RATE — **12, UNMOVED (IE §1); THE TUNING HANDLE AND THE FIGURES IT WAS MEASURED AGAINST**
 
@@ -382,7 +448,7 @@ bar above the cap), relic held and not, in `docs/reports/IF.md` §0.1b. **What e
 Mage and the Hunter) **is WITHDRAWN** (IF's brief §0.1): it asked for a higher rate while the finding pointed down.
 
 **THE FIRST CLEAN PLAYTHROUGH SAID THE OPPOSITE OF THE SIM (IP §0.1)**: the Cleric was the driest hero and the Mage and the
-Hunter never dry — THE FIRST CLEAN PLAYTHROUGH, above. With the relic, at a turn's start the bars read 91 / 97 / 95 of 120 (default). **THE RATE STAYS 12, CONFIRMED (IG's brief §0.2):**
+Hunter never dry — THE FIRST CLEAN PLAYTHROUGH, above. With the relic, at a turn's start the bars read 91 / 97 / 95 of 120 (default). *(The Hunter's reading is SUPERSEDED-PENDING since IV — WHAT IV's DRIVE MOVED.)* **THE RATE STAYS 12, CONFIRMED (IG's brief §0.2):**
 untalented — the designer's build — the Cleric is dry 11.5% of his turns with the relic, below the Mage's and the Hunter's, and the
 caveat the sim cannot close (the bot heals when hurt, a player when it matters) is the readout's. These figures were taken while the
 member's maximum was a fixed 100 (IG §4 changes that for a node-holder; the untalented rows hold no node) — re-read at IG §4c
@@ -401,16 +467,32 @@ IL's table is `docs/reports/IL.md` §1c and IO's is `docs/reports/IO.md` §3. **
 IS THE DESIGNER's TO RE-RULE (IP §0.1)**: a normal fight booked 18.33 events and 1.17 steps, the boss 51 — THE FIRST CLEAN
 PLAYTHROUGH, above.
 
+### FOUND AT IV AND NOT FIXED
+
+- **TWO GODOT PROCESSES IN ONE LANE SHARE ITS `user://`, AND A GATE THAT WRITES THE HARNESS SAVE RACES THE OTHER.**
+  `check_ho` on IV's work lane read 179 / 2 beside three gates launched into the same lane (§4d: the retired rune its save
+  brought back), 179 / 1 beside `check_fh` alone (§2c: the save the fall wrote did not load), and 179 / 0 alone — `check_fh`
+  168 / 0 each time. **`lane.sh` launches into a lane already running a process and says nothing.** The battery is
+  sequential, so only a batch's own subset runs meet it (IV's report §11). The designer's (IV's RULINGS OWED, 2).
+- **`DOD_ZONE_ROTATION` CHANGES A REAL RUN's ZONE DRAW WITH NO GATE, AND TODAY CHANGES NOTHING** (IV §2's sweep, one row a
+  read): every slot pool holds one zone, so the draw it randomises has one answer. **`check_iv` §2 reds the day a pool
+  holds two** — a latent defect that needs a writer gets a gate that reds when the writer appears (IT §7's rule) — and
+  whose switch it is waits on a ruling (IV's RULINGS OWED, 3).
+### THE RULES A GATE COULD CHEAPLY HOLD — **A STANDING LIST (IV §5, the designer's): 188 RULES, 76 OF THEM HELD BY NOTHING; BOTH COUNTS ARE CEILINGS**
+
+**What it is.** IU §2's rules census of record (docs/reports/IU-rules-census.tsv, one row a standing rule in `CLAUDE.md`)
+read every rule against the gate that holds it, and its cheap column marks the PARTLY and NONE rows a gate could cheaply
+hold: **188, 76 of them NONE** — the highest-value instrument work left, because a rule nothing holds is one a batch breaks
+with the whole file in front of it (IT broke HO §0 162 times while no gate held it).
+**A STANDING LIST, WORKED THROUGH BY THE BATCH THAT TOUCHES EACH RULE's SUBJECT** — not a batch, and not urgent, because
+authoring is what comes next. A batch whose work touches a listed rule's subject builds the gate the row names and re-reads
+the row in place, HELD with its gate and section; `check_iv` §5 holds both counts as ceilings that do not rise, the practice
+of `check_gw`'s hand-sets, IU §5's MISSES and the divergence census's RULE rows (`docs/instrument-rules.md`, `check_gw`'s
+block). **IV re-read one row and the list did not move**: S3-009, NONE and not cheap (a ruling was owed before any gate),
+re-read HELD where the code decided between the rule and its gate (IV §0.4) — the census reads HELD 300, PARTLY 229, NONE
+283 since, and the list 188 and 76.
 ### FOUND AT IU AND NOT FIXED
 
-- **TEN PLACES THE BOT PLAYS A DIFFERENT GAME — EACH A DEFECT** (IU §4's census of record,
-  `docs/reports/IU-bot-divergence.tsv`, *RULE*, *OWED*): DV05, a rotation's pick is cast without the door's `_ability_usable`
-  re-asked; DV06, Guard Change cast under Formless; DV07, Mass Hysteria recast onto a warband that holds it; DV11, Shrapnel
-  Charge's second body is not poisoned; DV24, a Health Potion bought at a full stack; DV25, a rune bought past the merchant's
-  `buy_refusal`; DV26, a bargain's rune cache never answered (FOUND AT HR, carried); DV27, an elite's core rune slotted before
-  its draft is answered; DV29, the zone boss's pick taken with no slot cap (latent); DV32, the experiment arms' variables —
-  `DOD_SIM_GRANT_ALL` among them (HJ's RULINGS OWED) — read with no `sim_run` gate. **And one POLICY whose reason was written
-  nowhere** — DV13, Called Shot's spot (Sunder on an armoured body, else Exposed, never Break): the census row holds it now.
 - **RULES THE CODE BREAKS AT HEAD, FOUND BY IU §2's READERS AND VERIFIED IN THE CODE BY EACH**: the draft block's *do not write
   `12 * 8` again* (`test_batch_ce` and `test_batch_cd` still assert `> 12 * 8`); *the ledger books what left the bar* (the
   Blood Price rune's `note_resource_spent` books a Rage-equivalent of health that never left it); HO §0 (`battle.gd`'s comment
@@ -770,10 +852,12 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
   fallen hero stays down between fights (it prices three crest runes, two relics, an event and the map's Revive Potion — IL §0.5); Tithe's read site; **the strike
   payouts' widening, a measurement — and whether Profligate's price narrows with its payout, a magnitude (both IK §5)**; **no page key and no targeted debug card pick** — each available if
   the designer asks (HU; recorded nowhere in this file until HX).
-- **THE PILOT's DECISION IS THE DESIGNER's, AFTER ITS FOURTH REPORT — NOT A BATCH (IU's brief §10)**: whether a bounded read is a
-  sufficient read, read off the reports' three lists (opened, needed, and found at the close to have borne on the work and not
-  opened) — and then whether the 380 KiB ceiling is restated on the read, and whether `CLAUDE.md` takes an index, for which IU §2's
-  census is the derivation (IU's RULINGS OWED, 2). **No ceiling moves before it.**
+- **THE PILOT ENDED AT IV, AND `CLAUDE.md` TAKES NO INDEX (IV §0.1, the designer's)**: three reports, one answer — a bounded read
+  was a sufficient one — and the other file's question closed by IU §2's count (THE SHAPE RECON, below). The close-read is kept as
+  the batch's own (the index section). **The 380 KiB stays on this file; its restatement on the read was never ruled.**
+- **THE DECK's MIDDLE OWES THE LADDER ITS RE-MEASURE (IV §1c)**: IV's sim answers what a player answers (the bargain's rune cache,
+  the draft before the cache, the merchant's doors), so every figure a default sim took moved with it, and the batch that
+  authors the deck's middle re-takes them where they are marked SUPERSEDED-PENDING — the bargain ladder first. IV's drive found the grades' order holding and their level unmoved by its repair, so the re-take there re-reads the bands; its HEAD arm read six of IP's 23 outside two standard errors, which a re-take on the record's own instrument settles.
 - **THE LOOK-LIST — WHAT A GATE CANNOT READ: WHETHER A SCREEN READS WELL (IS's brief §0.1, the designer's).** A gate reads a rect;
   it cannot read whether what is drawn reads right. **Every batch that moves something on screen adds a row here**, so the rows are
   cleared in one sitting rather than one message at a time. Nothing waits on a row.
@@ -858,7 +942,6 @@ lift the chip and leave the meter. **The Warrior's half is a status he already l
   `max()`~~ — **BOTH CORRECTED AT HS §1**; the combat file's *BURN MAGNITUDE* was repaired at IU §1 (CR12); and six code
   comments are stale (§4h names them). None is player-facing; each is a sweep for the batch that
   touches it.
-- **THE SIM NEVER ANSWERS A BARGAIN'S RUNE CACHE**, so every supply figure it prints omits 0.8–1.15 runes a hero a run.
 ### FOUND AT HP AND NOT FIXED
 
 - **TITHE'S READ SITE OWES A TALENT REBALANCE, NOT A WIDENING IN PASSING (ruled at HP §4: recorded as owed).** It is
@@ -910,7 +993,7 @@ game — HO caught one. `CLAUDE.md`'s rule-engine block carries the same marker.
 
 - **THE CENSUS'S MISSING SHAPES, PRICED FOR THE DESIGN PASS** (`docs/reports/HN.md` §3b, §3c, §3e): one key twice, an OR,
   and *any class twice* — each a few lines in `Talents.party_condition_met` and a drive. None is built.
-### THE SHAPE RECON ON `CLAUDE.md` — **QUEUED AT HN §1, RUN AT HV §3, RULED AT HX §0: THE CHECKS, THIS FILE'S TRIM, THEN A RE-MEASURE**
+### THE SHAPE RECON ON `CLAUDE.md` — **QUEUED AT HN §1, RUN AT HV §3, RULED AT HX §0, AND CLOSED AT IV §0.1: `CLAUDE.md` TAKES NO INDEX**
 
 The question it asked: **whether an index plus subjects read on demand beats one file with a moving ceiling.** It is not GY's
 reasoning split, which stays rejected. The figures, the two natural experiments and the recommendation are in
@@ -918,8 +1001,15 @@ reasoning split, which stays rejected. The figures, the two natural experiments 
 trim — taken, HX §2 — then a re-measure, one section of the next batch: §3b's census over the batches since HV, the read this
 trim left, and the checks' record. **HV's nine-unit pilot and the block index both waited on it, and it ran at IQ §3**, over the twenty batches HW–IP and on both
 files: the block index beats one file with a moving ceiling on the read — `CLAUDE.md` 48% less a batch, where HV found 38%, and
-this file 77% less. **The index pilot runs on this file since IS (the index, above)**; `CLAUDE.md` waits, and the
-decision for it is IW's. The live headroom is in the WHERE block.
+this file 77% less. **The index pilot ran on this file from IS to IU (the index, above)**, and the decision for `CLAUDE.md` was
+taken at IV by derivation.
+- **CLOSED AT IV §0.1 (the designer's): `CLAUDE.md` IS NOT INDEXED, AND NOTHING IS STRUCK FROM IT.** IU §2 read every standing rule
+  in it against the gate that holds it — **817 rules, HELD 299, PARTLY 229, NONE 284** (five not rules) — and
+  **112 of its 120 blocks hold at least one rule no gate fully holds**. The census's own rule makes those numbers an
+  answer: *a rule with a gate is a reference and can be routed around; a rule with none must be read, so its block is
+  core* — and **AN INDEX WHOSE CORE IS 112 OF 120 BLOCKS ROUTES AROUND NOTHING.** Queued at HN, priced at HV and IQ, piloted at IS, closed by a count rather than by a preference.
+  **This file keeps its index** and gains the population rows three batches of the pilot showed it lacked (the index, above). The
+  live headroom is in the WHERE block.
 
 ### TO WATCH IN PLAY — **RULED AT HN §2; EACH IS ONE CONSTANT OR ONE LINE IF IT READS WRONG**
 
@@ -1725,9 +1815,6 @@ code, and some of what it found lives elsewhere. **The tables are in `docs/repor
 
 - **A FORFEIT BOOKS A SUMMONED NODE.** `Run.debug_summon` switches off the run ledger and the wipe branch's Profile
   booking, and `_do_forfeit`'s `Profile.note_forfeit` is not guarded. Debug-only.
-- **NOTHING STOPS `DOD_SIM_RUNES` CHANGING A REAL GAME.** `runes_mode()` reads the environment with no `sim_run` gate,
-  and the `test_runes` assertion a `run_state.gd` comment claimed for it never existed: the purity arm covers the
-  economy and power flags only. *Stats* or *off* left exported in a player's shell changes a real run.
 - **STALE COMMENTS AND PRINTS OUTSIDE THE THREE FILES.** Each is an asserted surface, so each owes the source literal
   sweep:
   - `battle.gd`: two comments cite *"CLAUDE.md's hang mode (1)"*, which no longer exists; one says
@@ -2684,7 +2771,7 @@ repair.** Both are reported and neither was taken.
   `run_sim.gd` reads `type_taken.get("shop")` / `type_offered.get("shop")` where the node
   type is `"merchant"` — the key is never written, so *"it takes 0.0 of 0.0 shops offered per run"*
   is **structurally zero**. The same report prints **4.57 merchants walked, 6.98 runes bought and
-  3.44 runes acquired per hero per run** four blocks lower, off the correct key. **Its prose is
+  3.44 runes acquired per hero per run** four blocks lower, off the correct key. *(Its runes bought and its acquisition line moved at IV — SUPERSEDED-PENDING, WHAT IV's DRIVE MOVED.)* **Its prose is
   reversed as well**: it claims every route policy *"puts combat first"* and `ROUTE_ORDER` puts
   `fight` **at or near the END**, with `blacksmith` and `merchant` first and second in two of them —
   which the comment twenty lines above says itself (*"balanced: trade nodes first"*). **This is the

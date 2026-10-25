@@ -123,7 +123,7 @@ block stood and never a new file.
 the equality rule travel with their parent. **Eight of the rows are FF §2's**, and they are the
 residue: rules written into this file AFTER the seam was taken, which the seam's own test puts on
 the other side of it. **Every row after those eight was written straight into the reference rather
-than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one, IE's two, II's two, IJ's one, IK's one, IM's three, IN's one, IO's two, IP's two, IQ's two, IR's one, IS's one and IT's three —
+than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one, IE's two, II's two, IJ's one, IK's one, IM's three, IN's one, IO's two, IP's two, IQ's two, IR's one, IS's one, IT's three and IV's two —
 and GW §2's, written there at GW and given its row only at HX (HV §3e found it missing; `check_hx` §1a now reds on one) —
 and four more are MOVED, FF §2's way: HG–HJ's census and supersession blocks, written back into this file after the seam
 was taken and sent over at HY §4 by the designer's ruling, and II §4's two, the archive practice's first pass — CP §3's
@@ -208,6 +208,8 @@ new block written here):
 | A WINDOW ASSERTS IT ENDS INSIDE ITS OWN SUBJECT, AND A POSITIONAL PICK ASSERTS IT PICKED WHAT ITS PREDICATE NAMES | IT §3b |
 | AN ALARM's BAR IS SET BY THE THING IT IS ALARMING ABOUT, AND STRUCTURE IS FENCED | IT §4 |
 | A LATENT DEFECT THAT NEEDS A WRITER GETS A GATE THAT REDS WHEN THE WRITER APPEARS | IT §7 |
+| WHEN A RULE AND ITS OWN GATE CONTRADICT, THE CODE DECIDES | IV §0.4 |
+| A BATCH READS `docs/state.md` AGAINST ITS FINISHED WORK: THE CLOSE-READ | IV §0.1 |
 
 ## THE COMBAT RULES LIVE IN `docs/combat-rules.md` (STANDING, SET AT GR §2, RULED BY THE DESIGNER)
 > **THIS FILE IS STILL THE ONE A BATCH MUST READ. `docs/combat-rules.md` IS A REFERENCE IT POINTS AT,
@@ -522,7 +524,11 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
     on the file's SHAPE, queued at HN and run at HV** (`docs/reports/HV.md` §3): whether an index plus
     subjects read on demand beats one file with a moving ceiling. **RULED AT HX §0 (the designer's), AND
     THE ORDER IS NOT HV's: the checks a reference is held by first (`check_hx` §1), then `docs/state.md`'s trim, then a
-    re-measure — HV's nine-unit pilot waits, and the block index is decided at the re-measure.** The reason, so a session that
+    re-measure — HV's nine-unit pilot waits, and the block index is decided at the re-measure.** **DECIDED AT IV §0.1 (the
+    designer's): THIS FILE TAKES NO INDEX, AND NOTHING IS STRUCK FROM IT** — IU §2 read 817 rules against their gates (HELD
+    299, PARTLY 229, NONE 284) and 112 of the 120 blocks hold one no gate fully holds, so by the census's own rule nearly the
+    whole file is core, and an index whose core is 112 of 120 blocks routes around nothing; `docs/state.md` keeps its own
+    (its index section). The reason, so a session that
     finds HV's order does not wonder: `docs/state.md` was the larger file in the same read, with no ceiling, and trimming it
     asks the pilot's question — does taking content out of the required read cost anything — of a far larger population,
     with no rule moving. **GY's rejection of splitting the
@@ -1541,8 +1547,14 @@ than the candidates for it.** The bot's list is the other half of that question 
   a RULE — a price, a cooldown, a cap, a door — is a different game. So the bot swaps a companion through the picker's
   own builder, `battle._swap_choice`, at the player's `SUMMON_SWAP_COST` and `SUMMON_SWAP_DELAY` under the shared
   cooldown, and **every place the bot's rules differ from the player's is one row of a census of record**
-  (docs/reports/IU-bot-divergence.tsv, held by `check_iu` §4b): every RULE is a defect, repaired or owed where the owed
-  things are named; every POLICY carries its reason.
+  (docs/reports/IU-bot-divergence.tsv, held by `check_iu` §4b): every RULE is a defect, and **since IV none stands** —
+  IU repaired two and IV the other ten, so the census holds RULE 0, a ceiling that does not rise (`check_iv` §3b): **a
+  batch that finds the bot playing by a different rule repairs it in that batch.** Every POLICY carries its reason, and
+  every MODEL is named the bot standing in for the player's hands.
+  **THE BOT ANSWERS WHAT A PLAYER ANSWERS, THROUGH THE SAME DOOR AND IN THE SAME ORDER (IV §1a)**: a rune cache — the
+  elite's and the bargain's — through `Run.take_rune_pick`,
+  the door the hero's screen commits through, after the draft; a merchant's buy asks the counter's door before the gold
+  moves; the rotation's pick asks `_ability_usable` like the button.
   · **A PICK THAT CAN PRODUCE NOTHING IS REFUSED WITH A REASON. A PICK THAT PRODUCES LESS IS OFFERED (IL §0.7, the
     designer's; built at IM §3b).** `battle._pick_dud` says why a body would produce nothing — each arm asks what its
     handler asks — and `_enemy_pick_pool` offers the rest. **Firedraw, Transference and Cryoclasm** move a thing onto the
@@ -2733,8 +2745,9 @@ in `_resolve`'s strike loop, below both miss rolls and above the Block roll**, s
 REACHES a body books `momentum_met` and no missed blow can. **Two things bind whoever touches that
 loop next.** A new defence must resolve BELOW that line — a block, parry or absorb written above it
 re-opens the hole for exactly the blows it stops. And a blow that reaches a hero WITHOUT passing
-that loop books only the health it removes, so a new blow path that bypasses it owes the door a call
-of its own. **A hero no blow reaches and who loses no health books NO exchange, however much he
+that loop books only the health it removes, so **a new blow path reaches the door by passing that loop** — resolved
+as a plain attack copy, as Blood Tribute and the wind-up's landing are — and never by a second call: the door is one
+line, which `check_ft` §6c holds (IV §0.4: the rule and its gate disagreed, and the code decided). **A hero no blow reaches and who loses no health books NO exchange, however much he
 deals** — the spine reads the exchange, not the output, and that is a stated consequence rather than
 a defect: do not "fix" it with a step for dealing alone, which is CZ §1's inversion one engine
 along. **It is a SECOND FIELD and not a floor on the health ledger**, the one respect in which it
@@ -2794,7 +2807,7 @@ sim/autoplay/sim_run).
   the spend gate still applies | Full Heal Standing Heroes | Jump to Boss Slot | Advance to Next Zone | Reroll Specs | "All Class
   Abilities Unlocked" check = `Run.debug_grant_all`, the PRE-GRANT toggle — **the hero's CLASS
   pool and his lineage's boss pool (HJ §3, ruled by the designer; the NAME is HJ's proposal, the
-  designer's to confirm)**; also armable headlessly via `DOD_SIM_GRANT_ALL=1` | Free Travel check =
+  designer's to confirm)**; also armable in a sim via `DOD_SIM_GRANT_ALL=1` | Free Travel check =
   `Run.debug_free_travel` | Test-a-Node submenu: Shop / ??? Event / Fight / Elite / Mini-boss
   (in place, `Run.debug_summon` books nothing).
 · BATTLE `DEBUG ▾` menu (battle.gd, dev builds, not sim/autoplay): Full Restore | Kill All
@@ -2811,13 +2824,19 @@ sim/autoplay/sim_run).
   (economy policies, def on), `DOD_SIM_TIERS` (tiers of the one class tree the build wears, def 3
   — FX; `DOD_SIM_ROWS` still reads as rows/3, and `DOD_SIM_BUILDS` is RETIRED with the lanes and warns if set),
   `DOD_SIM_TROPHIES`, `DOD_SIM_RELICS`, `DOD_SIM_RUNES` (full|stats|off, def full),
-  `DOD_SIM_RUNE_ECON=rich` / `DOD_SIM_RUNE_POWER=<mult>` (AD experiment arms, double-gated on
-  Run.sim_run), `DOD_SIM_DIFFICULTY` (wanderer|warden|ruin = rungs 1-3 at x0.50 / x1.00 /
+  `DOD_SIM_RUNE_ECON=rich` / `DOD_SIM_RUNE_POWER=<mult>` (AD experiment arms, gated on
+  Run.sim_run as every sim-family flag is since IV), `DOD_SIM_DIFFICULTY` (wanderer|warden|ruin = rungs 1-3 at x0.50 / x1.00 /
   x1.30, "standard" aliases warden; **DEFAULTS TO RUNG 1** — set warden for a baseline row),
   `DOD_SIM_DEBUG` (echo the combat log in sim mode — the hang discriminator).
+  **A SIM-FAMILY FLAG IS READ BY A SIM ONLY (IV §2): a player's run with one exported plays the game it drafted.**
+  `DOD_SIM_RUNES` and `DOD_SIM_GRANT_ALL` were read with no gate (DV32), and the sweep of every read found three more —
+  `DOD_SIM_RELICS` replaced a player's relics at every fight, and the forced lineup and theme his warbands — so each is
+  gated on the sim, or on a battle outside a run; `check_iv` §2 holds every environment read in the game's scripts, one
+  row each, and reds on a new one nobody sorted.
 · ENV FLAGS, non-sim: `DOD_AUTOPLAY` (1 debug battle, echoes "[LOG]"; never exits on its own —
   timeout/kill it), `DOD_DEBUG` (above), `DOD_ENEMIES_OFF` (above), `DOD_ZONE_ROTATION`
-  (randomize zone draws within slot pools), `DOD_READOUT` (IF §1: `0` turns the playtest readout off in the player's
+  (randomize zone draws within slot pools — inert while every pool holds one zone, and `check_iv` §2 reds the day one
+  holds two, because then it changes a real run with nothing to say so), `DOD_READOUT` (IF §1: `0` turns the playtest readout off in the player's
   game; `1` turns it on in a harness, which then writes `user://readout_harness/` — the block *THE READOUT IS A READ*).
 · RETIRED, and **the record lives in `sim.sh`'s header and master.html — the sim prints no
   retired line and `scripts/` names none of them**: `DOD_SIM_MAP`, `DOD_SIM_MINIBOSS`,
@@ -4650,7 +4669,7 @@ same breath as the removal.
   its engine and a gate on ownership would withhold nothing — went with the spec scope at HC §1*: a row reaches every
   hero of its class now, most of whom do not own its engine, and this table is what withholds it from them.
 - **A QUEUED ROW SITS OUT OF THE ANSWER; IT IS NOT REPAIRED AWAY (RULED AT GW §4).** The hero's draft screen says
-  what waits and on which rune (the pick overlay did until IB §2), `map_screen._take_rune_pick` finds its rune in the list the buttons were built from, and a cache emptied
+  what waits and on which rune (the pick overlay did until IB §2), `map_screen._take_rune_pick` finds its rune in the list the buttons were built from (through `Run.take_rune_pick`, the door the sim answers by too since IV §1a), and a cache emptied
   this way can still be let go. FD's block below carries why this is not its write-back, and `docs/master.html` carries
   the reason on the player-facing side: **a retirement can never be undone and an unequipped engine is one press from
   being undone, so a state the player can undo is not a state to destroy.**
