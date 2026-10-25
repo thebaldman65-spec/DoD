@@ -20,6 +20,18 @@
 #   ./lane.sh make   <lane> <name> [<src>]  clone <src> (default: this tree) to <lane>, named <name>, checked
 #   ./lane.sh godot  <lane> <godot args>    check, then run Godot in <lane> (`--path` is added)
 #   ./lane.sh battery <lane> [suites]       check, then run <lane>'s own run_battery.sh
+#   ./lane.sh probe  <dir> <name> [<file>...]  a BARE PROBE: a scratch project holding no file of the game's,
+#                                           named `DoD probe <name>` by the driver, recorded in <dir>/.lane
+#   ./lane.sh spent                          print the one command that clears every spent lane folder
+#   ./lane.sh strays                         list the user-data folders no spent pattern holds (the live one aside)
+#
+# **A BARE PROBE (IU §7) IS A LANE TOO.** IT needed to ask whether a cross-class `const` parses in isolation, and
+# this driver had no way to launch a project with no file of the game's in it, so IT ran Godot directly and made
+# the first new user folder in thirteen batches (`IT const probe`), outside every spent pattern. The rule did not
+# change — every launch goes through here — the affordance arrived: `probe` builds the project, NAMES it inside the
+# `DoD *` pattern so the folder falls inside the one clearing command by convention, refuses any file of the
+# game's (one that lives in the repository, or a copy of one the repository tracks), and records what it made;
+# `godot` then runs it like any other lane.
 #
 # THE LIVE NAME IS READ, NEVER TYPED: it is `config/name` in HEAD's committed
 # `project.godot` (the tree's own copy if git cannot answer). THE REPOSITORY IS
@@ -108,11 +120,71 @@ _godot() {
 	sed -n 's/^GODOT=//p' "$REPO/run_battery.sh" | head -n 1
 }
 
+# THE SPENT PATTERNS — the user-data folders a batch's lanes and probes leave behind, cleared by one command the
+# designer runs when he likes (IB §4; `docs/instrument-rules.md`). A lane reuses one of these names; a probe is
+# named inside the last. One list, read by `spent`, `strays` and `check_iu` §7.
+SPENT_PATTERNS=('Dawn of Decay [F-H]? *' 'Dawn of Decay I[A-J] *' 'DoD *')
+PROBE_PREFIX="DoD probe "
+USERDATA="$HOME/Library/Application Support/Godot/app_userdata"
+
+make_probe() {
+	local dir="$1" name="$2" f live full
+	shift 2
+	if [[ -z "$dir" || -z "$name" ]]; then
+		print -r -- "usage: lane.sh probe <dir> <name> [<file>...]"
+		return 1
+	fi
+	full="$PROBE_PREFIX$name"
+	live=$(_live_name)
+	if [[ "$full" == "$live" ]]; then
+		print -r -- "PROBE REFUSED: '$full' is the live project name."
+		return 1
+	fi
+	if [[ -e "$dir" ]]; then
+		print -r -- "PROBE REFUSED: $dir exists."
+		return 1
+	fi
+	for f in "$@"; do
+		if [[ ! -f "$f" ]]; then
+			print -r -- "PROBE REFUSED: $f is not a file."
+			return 1
+		fi
+		if [[ "${f:A}" == "${REPO:A}"/* ]]; then
+			print -r -- "PROBE REFUSED: $f lives in the repository — a bare probe holds no file of the game's (write what it needs into a scratch file first)."
+			return 1
+		fi
+		# A copy is still the game's file: refused by CONTENT, against every file the repository tracks.
+		if git -C "$REPO" ls-files -s 2>/dev/null | grep -q " $(git hash-object "$f") "; then
+			print -r -- "PROBE REFUSED: $f is a copy of a file the repository tracks — a bare probe holds no file of the game's."
+			return 1
+		fi
+	done
+	mkdir -p "$dir" || return 1
+	for f in "$@"; do
+		cp "$f" "$dir/${f:t}" || return 1
+	done
+	print -r -- 'config_version=5' > "$dir/project.godot"
+	print -r -- '' >> "$dir/project.godot"
+	print -r -- '[application]' >> "$dir/project.godot"
+	print -r -- '' >> "$dir/project.godot"
+	print -r -- "config/name=\"$full\"" >> "$dir/project.godot"
+	print -r -- "kind=probe name=$full made=$(date '+%Y-%m-%d %H:%M:%S') files=${(j:,:)@:t}" > "$dir/.lane"
+	check "$dir"
+}
+
 case "$1" in
 	live)    _live_name ;;
+	probe)   shift; make_probe "$@" ;;
+	spent)   pats=(); for pat in "${SPENT_PATTERNS[@]}"; do pats+=("${pat// /\\ }"); done
+	         print -r -- "mkdir -p \"\$HOME/.Trash/DoD spent user-data folders\" && cd \"$USERDATA\" && mv ${(j: :)pats} \"\$HOME/.Trash/DoD spent user-data folders/\""
+	         print -r -- "# zsh aborts the whole command on a pattern that matches nothing: drop such a pattern from the paste first." ;;
+	strays)  setopt local_options null_glob; live=$(_live_name)
+	         for d in "$USERDATA"/*(/); do n=${d:t}; [[ "$n" == "$live" ]] && continue
+	           hit=0; for pat in "${SPENT_PATTERNS[@]}"; do [[ "$n" == ${~pat} ]] && hit=1; done
+	           (( hit )) || print -r -- "$n"; done ;;
 	check)   check "$2" ;;
 	make)    make_lane "$2" "$3" "$4" ;;
 	godot)   lane="$2"; shift 2; check "$lane" >&2 || exit 1; exec "$(_godot)" --path "$lane" "$@" ;;
 	battery) lane="$2"; shift 2; check "$lane" || exit 1; exec "$lane/run_battery.sh" "$@" ;;
-	*)       print -r -- "usage: lane.sh live|check|make|godot|battery <lane> ..."; exit 2 ;;
+	*)       print -r -- "usage: lane.sh live|check|make|godot|battery|probe|spent|strays <lane> ..."; exit 2 ;;
 esac

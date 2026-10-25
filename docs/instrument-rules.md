@@ -53,7 +53,7 @@ size in this file.**
   way; **name them, or report the number as the range it is.**
 - **THE SHAPE HAS COST THIS PROJECT FOUR TIMES AND THREE OF THE FOUR WERE FOUND BY A DISAGREEMENT,
   NOT BY A FAILURE.** EC's greedy capture window was live *inside the census EC used to measure that
-  very defect*. The sync ratio holds its own numerator, so a batch could meet the target by
+  very defect*. The sync ratio held its own numerator, so while the share was a target a batch could meet it by
   committing an unrelated file. **An instrument folded into its own subject reports a clean tree in
   the same words a clean tree does** — which is EA §1's rule arriving through the corpus instead of
   through an empty match.
@@ -98,7 +98,7 @@ below.
   **A split that drops one entry of 140 is invisible and no suite would catch it. Do not assert
   file sizes** — sizes agreeing is consistent with a duplicated entry and a dropped one.
 - **AN `<h2>` DOES NOT ALWAYS FIT ON ONE LINE, AND A LINE-ANCHORED EXTRACTOR WILL QUIETLY MISS
-  ONE.** Batch BF's heading wraps, so `^<h2>.*</h2>$` counts 107 where the archive holds 108.
+  ONE.** Batch BF's heading wraps, so at CX `^<h2>.*</h2>$` counted 107 where the archive held 108.
   **Match across lines, and count the same thing two different ways** — CX caught this only
   because a `grep -c '^<h2>'` and a regex disagreed by one, which is exactly the size of the
   error the byte-for-byte rule exists to catch.
@@ -173,8 +173,8 @@ below.
 - **THE WARNING IS THE LINE AND THE FAILURE IS THE DEADLINE.** This is the choice a watcher has to
   make and it is not "warn or fail". A gate that reds the moment a bar is crossed reds on a batch
   whose only crime is writing its own changelog entry, and the answer to either bar is a whole
-  batch of work that this file says elsewhere must not share a diff with anything — **so a red on
-  the crossing batch asks for the one thing the rules forbid, and trains everyone to ignore it.**
+  batch of work — a cut with its own rejoin proof — **so a red on
+  the crossing batch asks it to do a second batch's work inside its own, and trains everyone to ignore it.**
   A gate that only warns is ignorable, which is precisely what four batches of silence look like.
   **So: over the bar is a WARNING, and over the bar for a SECOND BATCH RUNNING is a FAILURE.** It
   cannot be ignored twice, and the red never lands on a batch that had no warning in front of it.
@@ -264,9 +264,9 @@ comment saying "so the next bump does not fail a map test either" — and BK is 
 - **THE SAME DISEASE, THIRD DOOR: `test_batch_bx` pinned the SOURCE TEXT of a guard.** CT split
   the draft's one guard — a sim, or no column owed — into two guards so §3's chaining had somewhere to
   live; the behaviour is identical. Re-pointed and **SCOPED TO THE FUNCTION BODY** — strictly
-  stronger than the global `contains` it replaced, which would have passed on either of the two
-  `if Run.sim_run:` lines elsewhere in that file. **A source-grep suite should scope to the function
-  it is talking about**, or it is asserting that a string exists somewhere in 2,000 lines.
+  stronger than the global `contains` it replaced, which at CT would have passed on either of the two
+  `if Run.sim_run:` lines then elsewhere in that file. **A source-grep suite should scope to the function
+  it is talking about**, or it is asserting that a string exists somewhere in what was 2,000 lines at CT.
 - **NOT EVERY PIN IS A MISTAKE, AND `test_batch_ce`'s GLOSSARY COUNT IS THE COUNTER-EXAMPLE.** Its
   comment says the count is pinned *deliberately*, so growth "should have to be stated rather than
   absorbed". **Bump it and say what was added and why; do not loosen it to `>=`.** CT bumped 94 → 96
@@ -431,8 +431,8 @@ the only run that could ever satisfy it and DW's own entry broke it.**
 - **AND THE SECOND HARM IS THE COUNT OF SITES.** DX's sweep found **forty-one equalities across
   thirteen files pinning ONE growing number** — the draft total — with `>=` nowhere. DO, DR and DS
   each authored cards and each had to hand-bump a dozen files, and **a batch that missed one would
-  have shipped a red that read as a regression.** **THIRTY-FIVE ASSERT A FLOOR NOW; the six that stay
-  are all in `test_batch_cd`.**
+  have shipped a red that read as a regression.** **AT DX THIRTY-FIVE ASSERTED A FLOOR; the six that stayed
+  were all in `test_batch_cd`.**
 - **THE MESSAGE MOVES WITH THE OPERATOR.** A floor whose message still says *"holds 149"* has been
   half-repaired: it must name the **live figure** and the **direction** — *"has FALLEN to %d, below
   the 149 that shipped"* — or the reader still cannot tell the two meanings apart.
@@ -454,8 +454,8 @@ the other cannot.**
   DX's sweep left five instruments standing on that test — `test_batch_cd`'s draft targets (beside
   `PER_SPEC_DEPTH`, the authoritative table a new card must move anyway), `check_di`'s
   `CALL_SITES`, `check_dv`'s two boss-pool census pins and its Holy-pool pin, and `check_cz`'s
-  `SHIELD_SPECIALS` registry. **Count the SITES, not the files** — `test_batch_cd` holds six
-  assertions and is one instrument.
+  `SHIELD_SPECIALS` registry. **Count the SITES, not the files** — `test_batch_cd` held six
+  assertions at DX and was one instrument.
 - **PUT THE TRIPWIRE WHERE THE EDIT ALREADY HAS TO LAND.** The equality that survives belongs
   beside the authoritative table, so a batch that trips it makes ONE edit rather than twelve.
 - **AND A TRIPWIRE THAT CANNOT SAY WHAT MOVED IS NOT ONE.** `test_batch_cd`'s message read
@@ -484,7 +484,7 @@ means anything.** This is CQ §3's rule applied to an operator rather than to a 
   **DY §3 deleted that dict**, and those six pins assert its ABSENCE off the source now, which is
   the same claim made about a structure that is gone.)
 - **AND THE FIRST SWEEP MISSED ONE, WHICH IS THE LIMIT OF A SWEEP BY ACCESSOR NAME.** DX's sweep
-  matched `ok()` conditions that name a pool accessor, and `test_batch_bq` §3/§4 reads
+  matched `ok()` conditions that name a pool accessor, and `test_batch_bq` §3/§4 read
   `live.size() == 6` where `live` was assigned from `class_draft_pool()` two lines up. **It was the
   exact site the next batch to author a class-wide card would trip**, and DY was that batch.
   **A CONDITION READING A LOCAL IS STILL A CONDITION READING THE POOL** — sweep the variable, not
@@ -517,29 +517,29 @@ means anything.** This is CQ §3's rule applied to an operator rather than to a 
 
 - **EA's OWN CONTROL FAILED THIS WAY AND IT IS WHY THE RULE IS HERE.** A probe asking which runes
   grant an ability read `runes.json` as an Array; it is a **Dictionary**, so the walk never ran and
-  printed *"rune entries naming an ability grant = 0"*. **The real answer is four**, two of which
-  collide with a spec draft pool. The number was wrong in the safe-looking direction.
+  printed *"rune entries naming an ability grant = 0"*. **The real answer was four**, two of which
+  collided with a spec draft pool at EA. The number was wrong in the safe-looking direction.
 - **AND AN EXTRACTOR IS A POPULATION TOO.** EA's needle verifier read **32** asserted literals
-  where there are **95**, because it counted brackets inside string literals and glued every
+  where there were **95** at EA, because it counted brackets inside string literals and glued every
   statement after a `"("` into one. **Mask the strings before counting depth**, take EVERY call in
   the logical statement rather than the first, follow chained calls (`doc.to_lower().contains(…)`),
   and model `or` groups — demanding both halves of an `or` is a false alarm, and a false alarm is
   how an instrument gets switched off.
 - **AND EB §3 RE-MEASURED THAT HOLE: IT NEVER LOST A LITERAL, IT LOST THE BOUNDARY BETWEEN
-  ASSERTIONS — WHICH IS WORSE.** Reading the tree with string-masking disabled finds the **same 124
-  distinct asserted literals** (90 positive, 34 negative) as the fixed extractor. What collapses is
-  the GROUPING: **73 positive groups become 45 and 30 negative become 25**, because an unbalanced
+  ASSERTIONS — WHICH IS WORSE.** Reading the tree with string-masking disabled found the **same 124
+  distinct asserted literals** (90 positive, 34 negative) as the fixed extractor. What collapsed was
+  the GROUPING: **73 positive groups became 45 and 30 negative became 25**, because an unbalanced
   `"("` glues the following statements into one. **An or-group passes when ANY member is present**,
   so 28 independent assertions were being satisfied by a sibling's hit rather than their own —
   a check passing for a reason other than the one it states, inside the instrument built to find
   exactly that. **The count to assert is the GROUP count, not the literal count.**
 - **AND EC §1 RE-MEASURED IT A SECOND TIME. THE OR-GROUP SPLITTER HAD NEVER FIRED ONCE.** EB's
   build modelled `or` by splitting a statement at a TOP-LEVEL `or` — and **every assertion in this
-  tree is wrapped in `ok(...)`, so the operator sits one bracket in and the depth-0 scan found none
+  tree that pins a tracked document is wrapped in `ok(...)`, so the operator sits one bracket in and the depth-0 scan found none
   in any of the 82 files.** Every statement collapsed to a single group, and that group was
   satisfied when ANY member was present. **So a CONJUNCTION was being evaluated as a DISJUNCTION**:
   `contains(A) and contains(B)` passed on A alone. The splitter was not mis-tuned, it was
-  unreachable, and a literal census reads the same 125 members either way.
+  unreachable, and a literal census read the same 125 members either way at EC.
 
 ## A GROUP OF LITERALS IS EVALUATED AS THE OPERATOR JOINS IT (STANDING, SET AT EC §1)
 > **A GROUP OF LITERALS IS EVALUATED AS THE OPERATOR JOINS IT.** `and` means EVERY member must
@@ -552,9 +552,9 @@ means anything.** This is CQ §3's rule applied to an operator rather than to a 
   an instrument gets switched off**, which is why the header sweep was left un-gated at 118 rows
   for 16 defects.
 - **MEASURED: 103 asserting statements, 125 members, 10 CONJUNCTIONS and 9
-  ALTERNATIONS.** Six of the nine alternations have a member that is legitimately absent, so a
-  repair that treated every group as a conjunction would raise **six false alarms on the first
-  run**. All ten conjunctions hold in full, so the hole cost nothing HERE — **it was a live
+  ALTERNATIONS.** At EC six of the nine alternations had a member that was legitimately absent, so a
+  repair that treated every group as a conjunction would have raised **six false alarms on the first
+  run**. All ten conjunctions held in full, so the hole cost nothing HERE — **it was a live
   blindness with no live defect under it, and that is a thing worth writing down rather than
   discovering again.**
 - **ASSERT THAT THE MODEL FITS, DO NOT ASSUME IT.** `check_ec` §1 reds on a statement that mixes
@@ -574,7 +574,7 @@ means anything.** This is CQ §3's rule applied to an operator rather than to a 
 > Before trusting a green sweep, say what its haystack IS — and what it therefore is not.
 
 - **THE POPULATION NOBODY HAD MEASURED: assertions that pin a literal into a `.gd` SOURCE file
-  outnumber the ones pinning the four tracked documents, and every document instrument this project
+  outnumber the ones pinning the tracked documents (six since the two references joined, `check_ec`'s `DOCS`), and every document instrument this project
   owns watches only the documents.** **THE LIVE FIGURES ARE NOT WRITTEN HERE**: `pin-manifest.json`
   carries them and `check_ed` prints them every battery, which is DJ §3's rule — a number with an
   instrument behind it cannot rot, and a number in prose always can. **EC's own copies proved it
@@ -670,18 +670,18 @@ means anything.** This is CQ §3's rule applied to an operator rather than to a 
   is deleted"* — and repairing one of those would delete the project's memory of why a symbol is
   gone. **The stale ones are the comments that make a LIVE claim in a dead name.**
 - **A COMMENT IN A `.gd` FILE IS AN ASSERTED SURFACE, AND EB BROKE A SUITE PROVING IT.** The
-  needle verifier and the literal-flip sweep both track needles into the four tracked DOCUMENTS.
+  needle verifier and the literal-flip sweep both tracked needles into the four tracked DOCUMENTS at EB.
   **Suites also assert literals against `.gd` SOURCE** — `test_batch_bl` control 1 pins the phrase
   `THIS BATCH DOES NOT SHIP ONE` inside `battle.gd` — and a comment-only edit changes a haystack
   neither instrument watches. EB reworded that sentence, **both document instruments stayed green,
   the comment-stripped diff read "comments only", and the battery took `bl` red.**
   · **THE SWEEP TO RUN IS THE SAME ONE WITH THE EDITED SOURCES AS THE DOCUMENTS**: every literal in
     the tree, at a floor of 4, tested for presence in each edited `.gd` file before and after.
-    **A LOST literal is a candidate needle.** It takes seconds and it is the only instrument that
-    can see this.
+    **A LOST literal is a candidate needle.** It takes seconds, and it sees before the battery what
+    `check_ed` §1 sees at it.
   · **AND "COMMENTS ONLY" STOPS BEING A SAFETY ARGUMENT.** The comment-stripped diff proves no CODE
     moved; it says nothing about whether a suite reads the comment. Both proofs are owed.
-  · **A STRING SHORTER THAN THE FLOOR IS SWEPT AT ITS OWN LENGTH (HU §4).** A chip tag is two or
+  · **A STRING SHORTER THAN THE FLOOR IS SWEPT AT ITS OWN LENGTH (HU §4).** A chip tag is one to
     three characters, so the floor of 4 is blind to every one by construction: HU re-tagged fourteen
     statuses, the sweep read clean, and HEAD's `test_batch_bg` went red in the recon on Faith's
     `F0` — a chip a running fight writes, compared as text. **When a batch changes a tag, a counter's
@@ -800,7 +800,7 @@ firing"; the number that answers that was printed four lines below it the whole 
   rather than repointed** — report the count before and after, per suite. DC's five moved by zero
   (34 / 78 / 47 / 233 / 91) while 23 failures went to none.
 - **KEEP THE SHAPE WHEN YOU LOWER THE RUNG.** `bi` §1 ratchets a peak over four gains; under the
-  new threshold the fourth cannot lift it. **Shortening the loop would have passed and stopped
+  threshold of three the fourth could not lift it. **Shortening the loop would have passed and stopped
   asking the question** — it asserts `mini(i + 1, RELEASE)` and still runs four times.
 - **AND A MOVED THRESHOLD CAN INVALIDATE HOW AN ASSERTION LOOKS, NOT ONLY WHAT IT PINS.** DC's one
   failed repair: `be`'s Communion rate was repointed from three stacks to two and still read
@@ -811,21 +811,22 @@ firing"; the number that answers that was printed four lines below it the whole 
 - **A CONSTANT'S BLAST RADIUS IS EVERY ASSERTION THAT PINS A CONSEQUENCE OF IT, NOT ONLY THE ONES
   THAT NAME IT (STANDING, SET AT DF §1).** DC swept `FAITH_RELEASE` 5 → 3 and repaired 23
   assertions across `be`, `bf`, `bg`, `bh` and `bi` — **and left eight more standing in `bu` and
-  `ce` for three batches.** The eight do not contain the words `FAITH_RELEASE` or the number 5 in
+  `ce` for three batches.** The eight did not contain the words `FAITH_RELEASE` or the number 5 in
   any greppable place: they read `w.faith_peak == 5`, `m.faith_stacks == 4`, `1 +
-  ELEVATION_STACKS_TEST`. **They are arithmetic ABOUT the threshold, so a search for the threshold
+  ELEVATION_STACKS_TEST`. **They were arithmetic ABOUT the threshold, so a search for the threshold
   cannot find them.** Sweep by driving the constant, not by grepping its name: change it, run
   everything, and let the failures enumerate the radius.
 - **AND WHEN A THRESHOLD FALLS, A PROBE THAT PARKED BELOW IT MAY NOW CROSS IT — WHICH CAN MAKE THE
   CHECK STRONGER (DF §2).** `ce`'s Elevation probe drove three allies at 0, 1 and 2 to prove the
-  card ADDS a count rather than writing a floor. At `RELEASE` = 3 two of the three now release
-  instead of coming to rest — and **the release is a better discriminator than the old one**,
-  because a floor-write of 2 would leave all three at 2 and nobody would release at all. **Ask what
+  card ADDS a count rather than writing a floor. At `RELEASE` = 3 two of the three released
+  instead of coming to rest — and **the release was a better discriminator than the old one**,
+  because a floor-write of 2 would have left all three at 2 and nobody would have released at all; since HL §3 ruled
+  `RELEASE` eight, the two deeper allies come to rest again and `test_batch_ce` reads each outcome off the threshold. **Ask what
   the new threshold makes VISIBLE before assuming it has taken something away.**
 
 ## A HELPER COPIED BETWEEN GATES INHERITS ITS BUGS AND DIVERGES SILENTLY (STANDING, SET AT DA §3, THE GATES CONSOLIDATED AT DB §1)
 > **Enumerate the ability corpus through `Classes.ability_corpus()`. Never copy another gate's
-> walk.** A talent can grant an ability that lives in no pool, and a hand-rolled walk misses it.
+> walk.** A talent could grant an ability that lived in no pool, and a hand-rolled walk missed it.
 > **A helper copied between gates inherits its bugs silently and diverges from its origin without
 > anything reporting it.**
 
@@ -852,9 +853,9 @@ gives you N, all born wrong, none of them diffed against anything.
   HO: 42 / 2). **Enter the fight through `Gate.enter_battle`, and ask what opened, never what its
   file is called.** A recon cannot see this red: it runs HEAD's root scripts, so the new gate is not
   in the copy, and HK's new gate and HO's each met the sweep in a full run. **The gates that walk
-  the gate FILES are run standalone against a new gate when it is written**: `check_da`,
-  `check_ea`, `check_ec`, `check_ed`, `check_ek`, `check_es`, `check_ff`, `check_gw`, `check_parse`
-  and `test_batch_cd`.
+  the gate FILES are run standalone against a new gate when it is written**: the targets that open
+  the root or read the battery's own list, derived on the batch's tree and never listed — `check_ij` §0.4
+  derives both routes and prints the count (the standing rule on a new gate's own source, below).
 - **AND THE PICK SURFACES' ROAD WALKER WAS FOUR COPIES OF ONE HELPER (FOUND AT HZ), SO ONE NEW BUTTON STOPPED FOUR
   ROADS. SINCE IB §6a IT IS ONE ANSWER IN `gate_fixture.gd`** — `Gate.answer_hero_draft`, `Gate.pick_choices`,
   `Gate.bound_buttons` — **and the game marks its choices**: the bench step's choice carries a `choice` meta, and every
@@ -866,7 +867,8 @@ gives you N, all born wrong, none of them diffed against anything.
   **Since IE §5 a spent section is answered too**: where the boss's or the upgrade's offer is empty and draws its *Let it go*
   (`_stage_spend`), the helper presses it, as it lets an empty cache go, and its census counts *a spent … let go*.
 - **THE DIFFERENCES THAT ARE REAL BECOME NAMED ARGUMENTS**, not invisible edits inside a copy:
-  `deterministic`, `items`, `run`.
+  `deterministic`, `items`, `run`, and since then `lineage_cards`, `party` and `party_runes`
+  (`gate_fixture.spawn`'s `opts`).
 - **A BASE CLASS IS THE RIGHT SHAPE AND IT DOES NOT COMPILE.** `extends GateBase` on a `--script`
   SceneTree target fails with `Could not find base class` **and exits 0 having run nothing**. The
   fixture is a `preload`ed `RefCounted` for that reason, and carries **no `class_name`** — that
@@ -903,7 +905,7 @@ gives you N, all born wrong, none of them diffed against anything.
 **THE RULE: a rule enforced by matching source text is only as wide as the population it sweeps and
 the calling convention it matches, and a violation that avoids either one is invisible to it — so
 when a fingerprint is written, WRITE DOWN WHAT IT CANNOT SEE.** `check_da` §3 was authored to catch
-exactly what `test_batch_cp` does, the two existed side by side for their whole lives, and it never
+exactly what `test_batch_cp` did, the two existed side by side until DW repointed its walk, and it never
 saw it.
 
 - **THE HOLES ARE NOT SYMMETRIC AND THE COUNT OF THEM IS NOT KNOWABLE FROM INSIDE.** DV read the
@@ -924,9 +926,9 @@ saw it.
 
 ## THE TRAPS — THE INSTRUMENT HALF (this file's own heading, EF §2)
 
-**Every one of these cost a batch something.** The three traps that are about the GAME —
-the documented exception, the names that look wrong and are right, and the shell/engine
-gotchas — stayed in `CLAUDE.md` under the same section title.
+**Every one of these cost a batch something.** The two traps that are about the GAME —
+the documented exception and the names that look wrong and are right — stayed in `CLAUDE.md`
+under the same section title; the shell, the engine and the files is this file's (below).
 
 ### GATES THAT PASS WITHOUT ASKING THEIR QUESTION
 - **A GATE REPORTS ITS CHECK COUNT, NOT A VERDICT** — `GATE 2 PASS (165 checks)`, never a bare
@@ -982,7 +984,8 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
   ```
   **A gate that never ran cannot fail, and a runner that trusts `$?` will call that a pass.**
   `run_battery.sh` is right to print `throws=` beside every count and that column is not
-  decoration — **`throws=` is the only thing standing between this fault and a green report.**
+  decoration — **`throws=` stands between this fault and a green report, beside the runner's NO VERDICT line and
+  `check_de`'s no-throw assertion on every log.**
 - **A CHECK THAT PASSES FOR A REASON IT IS NOT TESTING IS THE SAME GAP, AND ONLY A NEGATIVE
   CONTROL FINDS IT.** Deleting an ability's no-chain refusal did not trip the check written to
   catch it — the cast had just started a 5-turn cooldown, so the refusal came from the COOLDOWN
@@ -1009,9 +1012,9 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
 - **A SUITE MUST NOT PIN THE SAVE VERSION LITERAL** — it turns a save bump into a suite failure
   that reads like a regression.
 - **NEVER `preload` A SCRIPT THAT NAMES AN AUTOLOAD.** It resolves at parse time, before the
-  autoload exists, and it cost a gate. **THE AUTOLOAD IDENTIFIER does not resolve in a `--script`
-  SceneTree** — naming `Run` in a file compiled under `--script` is a parse error, which is the
-  rule every gate obeys by fetching the node instead.
+  autoload exists, and it cost a gate. **A `--script` GATE'S OWN CODE CAN NAME `Run`** — `check_ek`
+  reads `Run.ITEM_IDS` and `Run.ITEM_INFO` and runs clean — and the other gates fetch the node
+  instead.
 - **BUT THE AUTOLOAD NODE ITSELF EXISTS UNDER `--script`, AND BATCH FI LEANS ON IT.** This bullet
   used to end *"a test that needs one must be a SCENE run"*, and that is not what was measured.
   `/root/Run` is ABSENT during `_initialize()` and PRESENT after the first `process_frame`, with
@@ -1025,7 +1028,8 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
   headless. **A gate run BY HAND gets the harness path on the same terms as one run by the
   battery**, which is why the redirect is a property of the process and not of a wrapper script.
   `check_fi` is the instrument. **THE META LAYER IS NOT UNDER THIS**: `Profile.save_path` is still
-  swapped by hand in each suite's own `_run` preamble, and `relics.json` by nobody.
+  swapped by hand in each suite's own `_run` preamble, and `Relics.save_path`, a var since GJ, the same way by each gate that
+  needs it.
 - **THE BOT GUARD (`battle._nobody_can_press()`, CQ §1) IS A RULE OF `CLAUDE.md`'s *Working
   agreement* AND IS KEPT THERE ONLY.** A near-verbatim second copy stood here until GC deleted it,
   ruled by the designer: the guard decides how a battle waits for a player, which makes it a rule
@@ -1062,14 +1066,14 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
   before writing, and only then edit. Nothing asserts a data file's whitespace.
   · **DO NOT ASSUME THE STYLE. THIS BULLET SAID "EVERY `data/*.json` FILE IS TAB-INDENTED" AND
     THAT WAS FALSE FOR HALF OF THEM** — `glossary.json` and `enemies.json` are indented with a
-    SINGLE SPACE and carry no trailing newline; `events.json` and `runes.json` match no simple
-    `json.dumps` form at all. **The round-trip is what makes the specific value irrelevant**, which
+    SINGLE SPACE and carry no trailing newline; `events.json` is `json.dumps(obj, indent=4)` byte for byte, ASCII-escaped, with
+    no trailing newline, and `runes.json` matches no simple `json.dumps` form at all. **The round-trip is what makes the specific value irrelevant**, which
     is why it is the half of this rule that binds: it found the error the other half asserted.
     Use `ensure_ascii=False` throughout.
 - **A REFERENCE COUNT OF ZERO IS NOT EVIDENCE A FILE IS DEAD**, and it was wrong four ways in one
   audit, every one of which would have broken the build. (1) **Sprite paths are BUILT at runtime**
-  (`"%s/%s_%s.png" % [...]`), so sixteen of twenty sprite files are named nowhere in source **and
-  the parse gate still passes** after deleting them. (2) **A `class_name` global is reached by
+  (`"%s/%s_%s.png" % [...]`), so a sprite file can be named nowhere in source **and
+  the parse gate still passes** after deleting it. (2) **A `class_name` global is reached by
   NAME and has no `preload` to find** (`Profile`, `Enemies`, `Glossary`, `GlossaryPanel`).
   (3) Two files can reference only each other, a closed loop with nothing pointing in, and both be
   live. (4) A font's `OFL.txt` is its LICENCE and may not be removed at any reference count.
@@ -1094,7 +1098,7 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
     none.
   · Every "VERIFIED" block written before BATCH CE followed the old convention (a new suite, a
     battery pass and a wall of negative controls per batch). Those blocks live in
-    `docs/changelog.html` and its archive. **They are the record of what each batch did, not a
+    the changelog's archive, `DoD-archive/changelog-archive.html`. **They are the record of what each batch did, not a
     standard a content batch is now held to.**
 - Parse: run each scene headless with `--quit-after 90`, grep "SCRIPT ERROR".
   **THIRTEEN scenes in `scenes/`**, plus the two gate scenes at the repo root.
@@ -1108,10 +1112,10 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
   if the gated set is not the five §1 names, if any gated ability heals or revives, if the draft
   card's tell disagrees with the flag, or if the tell breaks the standard's 44-character ceiling. **Run it
   in any batch that touches `Ability.gated` or adds an ability.**
-- **`check_cm_live.gd` (Batch CM) is the only thing that PRESSES THE DEFENSIVE BAR.** Every
-  headless battle takes `_defensive_brace`'s bot branch, so `_run_skill_check`'s defensive path
-  is exercised nowhere else. It spawns a real non-autoplay battle, drives an enemy attack into a
-  Warden, presses the bar by hand, and measures ×0.85 / ×0.75 plus "Sloppy equals Good".
+- **`check_cm_live.gd` (Batch CM) DRIVES AN ATTACK AT THE DEFENSIVE BAR; `check_fh` §7 PRESSES THE BAR ITSELF.** Every
+  headless battle takes `_defensive_brace`'s bot branch, so no attack reaches `_run_skill_check`'s defensive path
+  headless; `check_fh` §7 calls it directly. It spawns a real non-autoplay battle, drives an enemy attack into a
+  Warden, would press the bar by hand if it opened (headless it never does, so that code never runs), and measures ×0.85 / ×0.75 plus "Sloppy equals Good".
   · **`block_chance = 0.0` DOES NOT TURN A WARDEN'S BLOCK OFF, and it cost this gate a false
     failure.** `_live_block_chance` adds `_plating_slice` (0.15 + Heavy Plating's climb) ON TOP
     of the field. The sum is clamped to [0,1], so **a large NEGATIVE field is what actually
@@ -1122,13 +1126,13 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
   guarantee, reach contiguity, and the walked distribution under an unsteered
   route plus the three policies. ~0.2s a zone (26 warbands pre-rolled for
   hover-scouting), so 1500 zones is ~5 minutes.
-- **`check_map_screen.tscn` (Batch BK) is the only thing that EXECUTES the
-  lattice draw.** The scene-parse gate loads map.tscn with no active run, so
+- **`check_map_screen.tscn` (Batch BK) EXECUTES the
+  lattice draw**, as any target that opens the map on an active run does (`check_fh` drives a whole run through it). The scene-parse gate loads map.tscn with no active run, so
   it bounces to the main menu and never draws a node. This builds the screen
   against a real in-flight run at three positions and opens its overlays — the hero's own screen (every pick
   a section of it since ID §1), the rune panel, the loadout panel and the bench step.
-  It is a SCENE run, not `--script`: **autoloads (`Run`) do not resolve in a
-  `--script` SceneTree.**
+  It is a SCENE run, not `--script`; a `--script` target reaches the same draw by changing scene
+  (`check_fh`), and a `--script` gate can name `Run` (`check_ek`).
 - **`test_batch_bl.gd` NEEDS `--fixed-fps 12`, AND IT IS NOT THE `sim.sh` FLAG** (which passes
   240, for wall-clock speed). 12 makes each frame a big TIME step, because a real-play battle
   paces itself with `create_timer` waits. **Any future suite that must run a REAL-PLAY battle to
@@ -1141,7 +1145,8 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
   code, and code moves.
   **THE META LAYER IS SAFE BY STATE, NOT BY CONSTRUCTION (FY §5b).** No target writes
   `profile.json`, because every writer points `Profile.save_path` at its own file first. **But
-  `Relics.SAVE_PATH` is a `const` with no redirect**, and any gate that reaches `_resolve_boss`,
+  `Relics.SAVE_PATH` is a `const`, and `Relics.save_path`, the var the writes use, moves only when a gate
+  sets it by hand**, and any gate that reaches `_resolve_boss`,
   directly or through a live run, reaches `Relics.unlock_random()`. So the day any relic is locked,
   the battery unlocks relics at random in the player's file. It has not happened only because every
   relic is unlocked; the open item is in `docs/state.md`.
@@ -1172,11 +1177,6 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
     is the end boss killed and `z3boss=` beside it is the old count. **A pre-GJ figure compares with
     `z3boss=` only**, and the gap between the two is the end boss's fight. `docs/reports/GJ.md` §1b
     carries the three rungs' untalented figures both ways.
-  · **A LANE ROW IS ONE FULLY-BUILT HERO MEASURED AGAINST THREE UNBUILT ONES.** Those rows are
-    honest A/B comparisons of a spec's lanes against each other; they are NOT "how much of a
-    real party's work this hero does". **A CONTRIBUTION SHARE INFLATES TWICE** — unbuilt allies
-    shrink the denominator and, for a support, feed the numerator. The lane RANKING barely
-    moves, so a re-measure is owed only where a row was read as an absolute.
   · **`d+h+p%` IS NOT A SHARE OF THE PARTY'S WORK, AND BREAK IS NOT IN IT.** Break has its own
     columns (`BD%`, `BDprev/b`) and **must not be folded in** — that needs an exchange rate
     between a Break point and a hit point that nobody can defend, and inventing it buries a
@@ -1184,15 +1184,16 @@ gotchas — stayed in `CLAUDE.md` under the same section title.
     CONSTRUCTION** — read it in `BD%` and never call such a build weak off `d+h+p%` alone.
   · **BREAK PREVENTED HAS ONE DOOR, `_prev_bd`** (per-hero total and named term written by the
     same call, so parts can never disagree with the total). **Break HEALING is a different
-    question from Break refused** — Rallying Shout and Battered Not Broken remove BANKED Break
-    and are deliberately not booked; a batch that wants them wants a new column.
+    question from Break refused** — Rallying Shout removes BANKED Break
+    and is deliberately not booked; a batch that wants it wants a new column.
   · **RunSim CALLS `Profile` NOWHERE** — a sim that read the player's ledger would make every
     baseline depend on whoever ran it. `Run.sim_run = true` makes `save_run`/`clear_save`
     no-ops, so a sim can never touch the real save.
-- **QUOTE THE RUN HARNESS AS "GATES 1/2/3", AND QUOTE THE COUNTS BESIDE THE VERDICT.** Its two
-  standing rules live in `_check` / `_check_range` / `_go`, so a gate added later inherits both
+- **QUOTE THE RUN HARNESS AS "GATES 1/2/3", AND QUOTE THE COUNTS BESIDE THE VERDICT.** Its three
+  standing rules live in `_check` / `_check_range` / `_go`, so a gate added later inherits the first two
   by doing nothing: **(1) A GATE REPORTS ITS CHECK COUNT, NOT A VERDICT** — `GATE 2 PASS (165
-  checks)`, never a bare `GATE 2 PASS` — and **(2) A GATE THAT RUNS ZERO CHECKS MUST FAIL.**
+  checks)`, never a bare `GATE 2 PASS` — and **(2) A GATE THAT RUNS ZERO CHECKS MUST FAIL.** The third,
+  **(3) A GATE MUST REACH ITS OWN END**, it inherits by ending on one `_finish()` call.
   **A COUNT OF ZERO FAILURES IS NOT EVIDENCE WHEN THE COUNT OF CHECKS IS ALSO ZERO**, and a
   gate that printed a WORD outlived two that printed wrong numbers. **THE LIVE COUNTS ARE IN
   `baselines.json`; treat a moved count as something to explain rather than a nuisance.**
@@ -1233,9 +1234,9 @@ being re-taken.
 - **THE COST OF SKIPPING IT IS A BATTERY.** That red is invisible from the diff — nothing in §4
   mentions emptiness, and the arm reads as an ordinary `_member(...)` call — so the first thing
   that would have found it is a forty-five-minute battery run, after the freeze.
-- **AND A RE-POINTED ARM IS CHECKED BEFORE IT IS USED.** §4's replacement asserts that the loadout
-  it just built really does meet the condition, **so a wrong arm reads as one broken arm rather
-  than as twenty-one broken payloads.** A rebuilt arm is new code in the gate and gets no more
+- **AND A RE-POINTED ARM IS CHECKED BEFORE IT IS USED.** §4's replacement asserted, until FN retired the conditions it met, that the loadout
+  it had just built really did meet the condition, **so a wrong arm read as one broken arm rather
+  than as FA's twenty-one broken payloads.** A rebuilt arm is new code in the gate and gets no more
   trust than the code it is testing.
 - **FB RAN IT AND FOUND NOTHING, AND THAT IS THE ENTRY WORTH HAVING.** Eighteen targets that read
   `data/runes.json`, unmodified, against FB's reverted payload before one assertion was edited:
@@ -1293,6 +1294,14 @@ the rune was wired, because it was supplying the one input the defect was in.
   the game is a batch nobody can read. `check_gw` §2 re-derives the count off the battery's own
   target list every run and fails only when it GROWS — a batch adding a legitimate hand-set raises
   the ceiling and says why in its report.
+- **THE CENSUS's MISSES COUNT IS A CEILING THAT DOES NOT RISE (IU §0.3, the designer's), AND A BATCH THAT
+  TOUCHES A TARGET CARRYING A MISSES ROW REPAIRS THAT ROW.** The positional census of record is the same instrument
+  as the shape above (docs/reports/IT-positional-census.tsv, its `iu_disposition` column). IT reported twenty picks;
+  IU repaired seven — the two material ones, each proved by breaking the subject it reads (IT's C06b), and the five
+  on targets IU touched — and the thirteen IU left stand under the ceiling, each stamped with its target file's md5,
+  so a batch that touches the file finds its own row: `check_iu` §5 reds a touched target whose row still stands, and
+  prints the count. **The ceiling stops a new miss arriving and the touches clear the rest**; a miss is repaired, never
+  recorded.
 
 ## STANDING RULE — A DRIVE IS A PROOF OF THE PREDICATE ONLY WHEN THE PREDICATE CHOOSES WHAT IT DRIVES (Batch IN §0.7, ruled by the designer)
 > **A DRIVE IS A PROOF OF THE PREDICATE ONLY WHEN THE PREDICATE CHOOSES WHAT IT DRIVES.** An arm that casts on a body the
@@ -1496,8 +1505,8 @@ a census is taken.
 
 - **AND THE SWEEP HAS TO FOLLOW THE CALL, NOT THE FUNCTION, OR IT FINDS ONLY HALF.** EV §4 swept
   for it and a DIRECT sweep — one that looks for a converting read and a raw read in the same body
-  — finds **six** Loyalty functions and **misses `_companion_strike`, which is the one EU named**,
-  because its converting read is inside `_comp_dmg_mult`. A ONE-HOP sweep finds four more.
+  — found **six** Loyalty functions at EV and **missed `_companion_strike`, which is the one EU named**,
+  because its converting read was inside `_comp_dmg_mult`. A ONE-HOP sweep found four more.
   **The population is eight, and five of them are the real shape**: `_ghost_hit` (the strike step
   against Aguila's pierce), `_companion_strike` (against Canis's Bleed), `_stamp_loyalty_chip`
   (the paid half against all three gifts), `_resolve_special`'s Kill Command (`_comp_dmg_mult`
@@ -1508,36 +1517,36 @@ a census is taken.
   accrual beside a call to `_stamp_loyalty_chip`, whose converting read is a DISPLAY. A sweep that
   does not separate a display call from a payout reports both as mixed reads.
 - **AND THE FOCUS HALF CANNOT BE READ THE SAME WAY, WHICH IS WORTH KNOWING BEFORE SOMEONE TRIES.**
-  `second_resource` is FIVE specs' currencies in one field, so a raw read of it inside a Resonance
-  or a Faith branch is not a raw read of Focus at all; and `refresh_bars()` is a universal display
+  `second_resource` is Resonance, Mercy and Focus in one field, so a raw read of it inside a Resonance
+  or a Mercy branch is not a raw read of Focus at all; and `refresh_bars()` is a universal display
   call, so a one-hop sweep on Focus returns eleven functions and **not one of them is the shape**.
   **The Loyalty sweep is sharp because `loyalty` is Loyalty's alone.**
 
 
 ## STANDING RULE — A GATE THAT DRIVES A LIVE RUN OWNS THE PLAYER'S SAVE (Batch FH §2)
-> **A TARGET THAT SETS `Run.sim_run = false` IS WRITING `user://run_save.bin`, AND TWENTY-FOUR
-> OF THEM DELETE IT.** `gate_fixture.spawn` sets `sim_run = false` and `active = true` — it has
+> **UNTIL FI, A TARGET THAT SET `Run.sim_run = false` WROTE `user://run_save.bin`, AND TWENTY-FOUR
+> OF THEM DELETED IT (FH's census).** `gate_fixture.spawn` sets `sim_run = false` and `active = true` — it has
 > to, because a `sim_run` battle is not the battle a player fights — and `battle._check_end` then
 > reaches `Run.clear_save()` on a wipe and `Run.save_run()` on a victory.
 >
 > **CENSUSED BEHAVIOURALLY, NOT SAMPLED: every one of the 80 battery targets that reaches a spawn
 > or sets `sim_run` was run ALONE against a fresh copy of a real 62,360 B run save, and the save
-> checked after each. 24 DELETE IT, 56 leave it byte-identical, none overwrites it in place:**
+> checked after each. 24 DELETED IT, 56 left it byte-identical, none overwrote it in place:**
 > `test_batch_an`, `check_flow`, `check_cm_live`, `check_co`, `check_cs`, `check_ct`, `check_cy`, `check_cz`, `check_da`, `check_di`, `check_dj`, `check_dk`, `check_dl`, `check_dm`, `check_dr`, `check_ds`, `check_du`, `check_dv`, `check_et`, `check_eu`, `check_ev`, `check_ew`, `check_ez` and `check_fd`.
 >
-> **ONLY `check_fh` PROTECTS IT END TO END, AND `check_ct` IS THE CAUTIONARY CASE.** `check_ct`
-> §2 backs the save up and puts it back — with an arm asserting exactly that, which PASSES — and
-> then its §3 spawns a battle that destroys it after the restore. **A PROTECTION SCOPED TO A
+> **AT FH ONLY `check_fh` PROTECTED IT END TO END, AND `check_ct` WAS THE CAUTIONARY CASE.** `check_ct`
+> §2 backed the save up and put it back — with an arm asserting exactly that, which PASSED — and
+> then its §3 spawned a battle that destroyed it after the restore. **A PROTECTION SCOPED TO A
 > SECTION IS NOT A PROTECTION, AND ITS OWN PASSING ARM IS WHAT MAKES THAT INVISIBLE.**
 
 - **AND A SAMPLE IS NOT A POPULATION. THIS BATCH GOT IT WRONG ONCE AND SHIPPED THE WRONG
   NUMBER.** The first measurement bisected EIGHT gates, happened to draw mostly document gates,
-  and reported the population as TWO. The number is 24, and it was only found because the save
+  and reported the population as TWO. The number was 24 at FH, and it was only found because the save
   went missing a second time after a re-run of seven targets that the "two" did not include.
   **Derive the candidate population from the source, then measure every member of it.**
 - **THAT WAS TAKEN AT BATCH FI AND THE RULE ABOVE IS DISCHARGED: A GATE NO LONGER OWNS THE
   PLAYER'S SAVE, BECAUSE IT CANNOT REACH IT.** `Run.SAVE_PATH` stays a `const` and stays the
-  player's file; the four file operations moved onto `Run.save_path`, a var, which `_ready()`
+  player's file; the four file operations moved onto `Run.save_path`, a var, which `_init()`
   points at the harness path for any non-player process. **THE BACKUP WAS THE WRONG SHAPE EVEN
   WHERE IT WORKED**, and not only because it has to be remembered: the restore is
   `FileAccess.open(REAL_SAVE, WRITE)` followed by `store_buffer`, and the open TRUNCATES — so a
@@ -1548,9 +1557,10 @@ a census is taken.
   was being written aborted the coroutine, so the restore never ran — and by then the drive's own
   end boss had already called `Run.clear_save()`. **The run save was destroyed and every
   subsequent run printed `none — nothing to protect`, which is a clean-looking line for a file
-  that is gone.** A backup written before the first byte moves survives the abort; the gate then
-  RECOVERS from it at the top of the next run and deletes it only after a successful restore, so
-  it can never resurrect a save the player deleted themselves between two clean runs.
+  that is gone.** A backup written before the first byte moves survives the abort; FH's gate then
+  RECOVERED from it at the top of the next run and deleted it only after a successful restore, so
+  it could never resurrect a save the player deleted themselves between two clean runs. Since FI
+  `check_fh` backs nothing up: it holds the bytes in `_save_backup` only to compare them.
 - **THE CONTROL IS TWO-ARMED AND THE SECOND ARM IS A KILL.** Arm one is HEAD's shape, which is
   what lost the save. Arm two: `kill -9` the gate the moment the save disappears, then run it
   again — **62,360 B recovered, byte-identical.**
@@ -1572,14 +1582,14 @@ a census is taken.
   = the 25 that end absent, and the 43 restorers were derived independently from the source.
 - **AND THE CANDIDATE PREDICATE IS PART OF THE POPULATION.** FH derived its candidates as *"reaches
   a spawn or sets `sim_run`"* — 80 of 98 — which is where `test_batch_ah` escaped: it calls
-  `run.new_run()`, that calls `clear_save()`, and it neither spawns nor sets `sim_run`. It destroys
-  the save, restores nothing, and was never in the 80. **FH's own lesson was "derive the candidates
+  `run.new_run()`, that calls `clear_save()`, and it neither spawns nor sets `sim_run`. It destroyed
+  the player's save until FI's redirect, restores nothing, and was never in the 80. **FH's own lesson was "derive the candidates
   from the source, then measure every member"; the correction is that the DERIVATION is the step
   that fails silently.** FI censused all 98 and derived nothing.
 - **A PROTECTION SCOPED TO A SECTION IS NOT A PROTECTION**, and `check_ct` is the case: its §2
   restored the save and asserted the restore had worked — an arm that PASSED — while its §3 spawned
-  a battle that destroyed it afterwards. It is the only file in the tree that both restores and
-  ends absent, and its passing arm is what made that invisible for the whole time it was true.
+  a battle that destroyed it afterwards. It was the only file in the tree that both restored and
+  ended absent, and its passing arm is what made that invisible for the whole time it was true.
 
 ## STANDING RULE — THE PIN MANIFEST BINDS A HOLDER OFF `var x :=`, NEVER OFF `var x: String =` (Batch FH §2)
 > **`build_pin_manifest.py` binds a holder from `var\s+(\w+)\s*:?=`.** An explicitly typed
@@ -1598,8 +1608,8 @@ a census is taken.
 - **AND THE SAME HOLE HAS A SECOND MOUTH: A PATH HELD IN A `const`.** The binding needs a literal
   `"res://…"` **inside the `var` statement**, so `const DOC := "res://docs/master.html"` followed
   by `var doc := FileAccess.get_file_as_string(DOC)` binds nothing either — and a needle written as
-  a named constant (`doc.contains(S7_OPEN)`) is not a literal at the call site, so it would not be
-  recorded even if the holder were bound. **Measured at FS: `check_fr` contributes 4 pins and NONE
+  a named constant (`doc.contains(S7_OPEN)`) is not a literal at the call site, so even with the holder bound it
+  is recorded only as a `non-literal` pin with no needle (residency `runtime`), which `check_ed` cannot verify. **Measured at FS: `check_fr` contributes 4 pins and NONE
   of them is into `ways-of-working.md`, the file it exists to read; `check_fs` contributes ZERO.**
   Two gates, and the manifest is blind to what both of them assert about a document.
   **THIS IS NOT AN ARGUMENT FOR INLINING THE PATH.** Named constants are how a gate says the same
@@ -1607,6 +1617,14 @@ a census is taken.
   reader-pool needle sweep, not the manifest. **It is an argument for knowing which instrument you
   are trusting**: `check_ed` is a ratchet on the pins it can SEE, and its clean reading over a new
   document gate means nothing at all.
+- **A COVERAGE LOSS IS INVISIBLE TO THE INSTRUMENT THAT MEASURES COVERAGE, SO THE COUNT IS A FLOOR (IU §6, the
+  designer's).** `check_ed` re-resolves the pins the manifest holds and cannot ask about a pin it stopped holding: IT's
+  fell 1,924 → 1,881 with nothing watching. So `build_pin_manifest.py` records the count it wrote as the manifest's
+  `floor`; a rise re-records it and needs nothing, and **a fall keeps the floor and reds `check_iu` §6 until the batch
+  regenerates with `--fall "<code>: <why>"`**, which writes the fall into the manifest's `falls`, its batch and its
+  reason beside it. **And the discipline under it: a new helper that holds a needle is taught to the builder in the
+  batch that writes the helper** — `check_iu` passes every file it reads as a `res://` path written at the call, so
+  each holder binds where it is declared.
 
 ## STANDING RULE — A TARGET CUT OFF BY A FRAME BUDGET IS INDISTINGUISHABLE FROM ONE THAT PRINTS NO VERDICT (Batch FR §5a, closed at Batch FS §1)
 > **`--quit-after N` IS FRAMES, NOT SECONDS.** FR ran a doc pre-check with `--quit-after 900` as a
@@ -1633,15 +1651,17 @@ a census is taken.
   same markers live and prints `*** NO VERDICT — INCOMPLETE ***` with the frame budget named,
   instead of `checks=?` for both cases.
 - **A COUNT IS ITS OWN MARKER; A REPORT IS NOT.** Every counting target in this battery prints its
-  tally in its FINAL summary, so a count present means the target reached its end. The rule
+  tally in its FINAL summary, so a count present means the target reached its end — except `check_de`, which
+  prints a count-shaped line per row before its own. The rule
   therefore only binds the targets that print no count — which is exactly the population an absent
   verdict says nothing about. Two of the seven printed no terminal line at all
   (`check_cl_width`, `check_map`) and were given one.
 - **AND THE POPULATION IS ON THE RECORD RATHER THAN INFERRED.** The seven that print no check
   count by design are `check_cl_resolver`, `check_cl_width`, `check_cm`, `check_cn`, `check_flow`,
-  `check_map` and `check_map_screen`. Five of them print `NAME: 0 failures`; two are pure reports.
-  **The list is not written twice**: `run_battery.sh` names it for the live report and `check_de`
-  derives it from `baselines.json`, and `check_de` §2 is what stops the two drifting.
+  `check_map` and `check_map_screen`. Four of them print `NAME: N failures`, `check_map_screen` prints `check_map_screen: OK`, and two are pure reports.
+  **The list is written twice**: `run_battery.sh` names it for the live report (`NO_COUNT`) and
+  `baselines.json` holds it as its `checks: null` rows, which `check_de` reads; `check_de` §2 holds the rows to
+  the logs, and nothing holds `NO_COUNT` to the rows.
 - **AND GATES READ A FILE WHOSE LAST LINES ARE WRITTEN AFTER THE VERIFICATION RUN, WHICH IS AN
   OBLIGATION AND NOT A DEFECT.** FS §2 put `docs/state.md` into `check_es` §4(2b)'s swept
   population, because that is where FR's third stale copy of the core-kit figure was standing.
@@ -1732,6 +1752,15 @@ a census is taken.
   batch's own tooling launches through it — a probe, a trace, a control and a recon each start with the check.
 - **IT IS HELD BY A DRIVE**: `check_iq` §7 runs the driver every battery on made-up copies — named as the live project
   (refused, and its `godot` door refuses too), named as their own (runs), the repository (refused), unnamed (refused).
+- **A RULE WITH NO AFFORDANCE FOR A THING A BATCH NEEDS GETS BROKEN. BUILD THE AFFORDANCE, NOT THE EXCEPTION (IU §7,
+  the designer's).** IT needed to ask whether a cross-class `const` parses in isolation, the driver could not launch a
+  project holding no file of the game's, and IT ran Godot directly — the first new user folder in thirteen batches.
+  **`./lane.sh probe <dir> <name> [<file>...]` makes a BARE PROBE**: a scratch project holding no file of the game's (one
+  that lives in the repository is refused, and so is a copy of a tracked one, by content), named `DoD probe <name>` so its
+  folder falls inside the one clearing command's last pattern by convention, and recorded in its `.lane`; `godot` runs it
+  like any lane. **The rule's own words stay as they are**: every launch goes through the driver. `./lane.sh spent`
+  prints the clearing command off the driver's one pattern list, and `./lane.sh strays` lists the folders no pattern
+  holds — `check_iu` §7 drives the probe's three answers and reds on a stray nobody named.
 - **WHAT IT CANNOT SEE**: a lane launched by hand, around the driver. The rule is that the driver is the one way a lane runs.
 
 ## STANDING RULE — A CLOSE THAT IS GATED ON ITS OWN INSTRUMENT CAN DEADLOCK, AND A BATCH IS NOT DONE UNTIL ITS CLOSE HAS RUN (Batch IR §0.8, ruled by the designer)
@@ -1761,7 +1790,7 @@ The reds were the cheap ones; the rest went on passing while asking nothing, or 
   its hero, a crest rune fills the crest or waits in the bag (HR §1 split the holdings; HK had every unworn kind bagged).
   An arm that appended whatever a roll returned seated a crest rune in a hero's slot, proved its exclusion by the pouch
   where the game proves it by `Run.party_rune_names`, and counted a floor two higher than its reading. **A fixture that
-  seats a rune it NAMED on a hero who can wear it — the two fixtures' `runes` option, a reset to an empty list, a save's
+  seats a rune it NAMED on a hero who can wear it — `suite_fixture.gd`'s `runes` option, `gate_fixture.gd`'s `party` override, a reset to an empty list, a save's
   fossil — builds a state the game can make or a save can hold, and is not what this rule reaches**: most of the rune
   instruments do, `check_ho` among them.
 - **AN ARM THAT PRESSES THE FIRST OFFER ASKS WHAT KIND IT PRESSED.** `offers[0]`, `live[0]` and a cache's first
@@ -2005,9 +2034,21 @@ a detail to note — it is the ruling being wrong.
   against 3 of their 75 value claims (4.0%): a count is a fact about a population, and every batch that adds a member
   moves it without touching the sentence.
 - **31 OF THE 87 STALE CLAIMS STANDING AFTER HX ARE COUNTS** (26 in this file, 5 in the combat rules) — the share this rule
-  would have kept out had it stood from the start. They are not repaired by the rule: the 87 are a batch of their own, by
-  ruling, and each is repaired there with its literal sweep.
+  would have kept out had it stood from the start. They were not repaired by the rule: the 87 were a batch of their own, by
+  ruling — IU, where each was repaired with its literal sweep or given its disposition (below).
 - **IT LOOKS FORWARD**, as HO §0 does: a count written into either reference from here on obeys it.
+- **A NEW STALE CLAIM IS A RED, NOT A ROW IN A CENSUS (IU §1b, the designer's), AND THE STANDING COUNT IS A CEILING
+  THAT DOES NOT RISE.** IU ended a count that had stood in a report for ten batches: every claim its census read — HX's
+  standing ones as IR recounted them, IQ's two, IT's 24, IS's readers' notes, and the copies and siblings beside them —
+  left it with a disposition, kept as the ledger of record (docs/reports/IU-claims.tsv; IU's tally: 193, of them 169
+  repaired, 16 true, 3 superseded and 5 standing on a ruling each names). Two ceilings hold what it left. `check_iu` §1
+  holds the ledger — a repaired claim's false words do not stand again, and the claims left standing do not grow — and
+  **`check_hx` §1d reads every backticked name in all four rule files**, each dead name read once and its mentions
+  counted, so a sentence about a symbol the tree does not have reds until it is read, and §1d(c) holds the ones read as
+  a live claim to the count IU left. **WHAT IT COST AND WHAT IT CAN HOLD**: one reading of the 52 dead names in
+  `CLAUDE.md`, and a line in `check_hx` for each dead name a later sentence writes. It holds the dead-name shape alone: a
+  false count, a wrong figure or a false sentence about a live name is not mechanically visible, and stays the re-read's
+  above to find.
 
 ## STANDING RULE — RETIRING A TRUE CLAIM IS THE SAME DEFECT AS KEEPING A FALSE ONE (Batch IM §0.4, ruled by the designer)
 > **And it is harder to find afterwards. A claim is retired against the code that decides it, never against a

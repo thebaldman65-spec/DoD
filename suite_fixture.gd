@@ -258,9 +258,12 @@ static func kill(tree: SceneTree, scene: Node) -> void:
 # pool to travel with the Stances as their enabler (the designer took the engine and
 # could not change stance), and an enabler is in no pool. The bare half did not move
 # — Guard Change was withheld from a hero holding no engine by its ruled row.
+# **BATCH IU §1 RAISED THE MAGE's TWO FLOORS TO THE READING**: IF §2's Smoulder grew both
+# halves of his pool and the row was left below it, so the table stopped being what
+# `CLAUDE.md` says it is — the reading, never below it.
 const CLASS_POOL_FLOOR := {
 	"warrior": {"whole": 42, "bare": 38},
-	"mage": {"whole": 51, "bare": 38},
+	"mage": {"whole": 52, "bare": 39},
 	"cleric": {"whole": 43, "bare": 29},
 	"hunter": {"whole": 42, "bare": 35},
 }

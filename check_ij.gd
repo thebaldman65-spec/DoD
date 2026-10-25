@@ -850,7 +850,8 @@ const PINS := [
 	["src:scripts/classes.gd:computed_block", "round(hit * 1.1)", "scripts/battle.gd", "_resolve", "* 0.01 * attacker.attack * randf_range(0.9, 1.1) * dmg_mult"],
 	["src:scripts/battle.gd:_show_actions", "+1 Loyalty", "scripts/battle.gd", "_gain_loyalty", "amount := 1)"],
 	["src:scripts/battle.gd:_show_actions", "Spend +1 Mercy", "scripts/battle.gd", "_consume_empower", "attacker.second_resource -= 1"],
-	["src:scripts/battle.gd:_open_summon_picker", "+1 Loyalty", "scripts/battle.gd", "_gain_loyalty", "amount := 1)"],
+	# BATCH IU §4 — the swap's words are built in `_swap_choice` since the bot and the picker share it.
+	["src:scripts/battle.gd:_swap_choice", "+1 Loyalty", "scripts/battle.gd", "_gain_loyalty", "amount := 1)"],
 	["src:scripts/battle.gd:_open_called_picker", "2 turns", "scripts/battle.gd", "_resolve", "_apply_status(target, \"sunder\", 2, 0, 0, attacker)"],
 	["src:scripts/battle.gd:_open_called_picker", "+30 Break", "scripts/battle.gd", "_resolve", "target.take_hit(0, 30)"],
 	["src:scripts/battle.gd:_open_called_picker", "(3 turns)", "scripts/battle.gd", "_resolve", "_apply_status(target, \"exposed\", 3, 0, 0, attacker)"],

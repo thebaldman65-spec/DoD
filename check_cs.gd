@@ -252,8 +252,8 @@ func _initialize() -> void:
 	ok(total / 4000.0 > 2.0 and total / 4000.0 < 4.0,
 		"the bot's sequence is partial credit rather than all-or-nothing")
 
-	# ---------- BATCH GE §1 — THE LONG DRAW'S MISS ----------
-	print("BATCH GE §1 — the Long Draw's miss, driven at every press, with the rune and without")
+	# ---------- §7 — THE LONG DRAW'S MISS (BATCH GE §1) ----------
+	print("BATCH CS §7 (GE §1) — the Long Draw's miss, driven at every press, with the rune and without")
 	await _s7_the_long_draw_miss(scene, ss, battle)
 
 	_report()
@@ -361,7 +361,7 @@ func _drive_and_resolve(scene: Node, ss: BattleUnit, focus: int, n: int) -> Dict
 	return {"dealt": before - foe.hp, "focus": int(bar["focus"])}
 
 
-# ---------- BATCH GE §1 — THE LONG DRAW'S MISS, DRIVEN PRESS BY PRESS ----------
+# ---------- §7 — THE LONG DRAW'S MISS (BATCH GE §1), DRIVEN PRESS BY PRESS ----------
 #
 # **THE BAR ITSELF, NOT THE MODEL.** §4 walks the model; this drives the real
 # bar through `_drive` and reads what `_pay_sequence_focus` actually paid. A

@@ -37,6 +37,13 @@ arrives without an entry is RED.
 
   usage:  python3 build_pin_manifest.py           # rewrite pin-manifest.json
           python3 build_pin_manifest.py --check   # exit 1 if it would change
+          python3 build_pin_manifest.py --fall "IU: <why>"   # a regeneration that FALLS below the
+                                                  # recorded floor, with the batch and its reason (IU §6)
+
+  THE COUNT IS A FLOOR (IU §6). The manifest records `floor.pins`; a regeneration that rises
+  re-records it, one that falls keeps it (so `check_iu` §6 reds) until `--fall` names why. A helper
+  that holds a needle is taught to this builder in the batch that writes the helper — IT's fall was
+  sixty-one needles moved onto `Gate.block`/`subject`/`comment_above` windows it could not follow.
 """
 import re, os, glob, json, sys
 
@@ -417,12 +424,41 @@ def main():
     byres = {}
     for r in src:
         byres[r["r"]] = byres.get(r["r"], 0) + 1
+    # IU §6 — THE PIN COUNT IS A FLOOR, AND A FALL IS NAMED. A coverage loss is invisible to the
+    # instrument that measures coverage: `check_ed` re-resolves the pins this file holds and cannot
+    # ask about one it stopped holding (IT's manifest fell 1,924 → 1,881 with nothing watching). So
+    # the count is recorded here, beside the pins: a regeneration that RISES re-records it and needs
+    # nothing; one that FALLS keeps the old floor — so `check_iu` §6 reds — until the run names the
+    # batch and the reason (`--fall "<BATCH>: <why>"`), which lowers the floor and keeps the row.
+    old_doc = {}
+    if os.path.exists("pin-manifest.json"):
+        try:
+            old_doc = json.load(open("pin-manifest.json", encoding="utf-8"))
+        except ValueError:
+            old_doc = {}
+    floor = int(old_doc.get("floor", {}).get("pins", old_doc.get("counts", {}).get("total", len(out))))
+    falls = list(old_doc.get("falls", []))
+    fall_arg = ""
+    if "--fall" in sys.argv:
+        k = sys.argv.index("--fall")
+        fall_arg = sys.argv[k + 1] if k + 1 < len(sys.argv) else ""
+    if len(out) >= floor:
+        floor = len(out)
+    elif fall_arg.strip() and ":" in fall_arg:
+        batch, why = fall_arg.split(":", 1)
+        falls.append(dict(batch=batch.strip(), came_from=floor, went_to=len(out), reason=why.strip()))
+        floor = len(out)
+    else:
+        print("THE PIN COUNT FELL: %d pins against a floor of %d — the floor stays, so check_iu §6 reds, "
+              "until the run names the batch and the reason: --fall \"<BATCH>: <why>\"" % (len(out), floor))
     doc = {
         "note": ("Every literal a suite pins into a file, with the file it lives in. "
                  "DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. "
                  "Do not hand-edit: re-run the generator."),
         "generated_by": "build_pin_manifest.py",
         "counts": dict(total=len(out), **counts),
+        "floor": dict(pins=floor),
+        "falls": falls,
         "source_residency": byres,
         "pins": out,
     }

@@ -32,7 +32,7 @@ designer's)**: IS's +36,759 B net held **36,315 B of fenced structure** (fence `
 deleting it), so IS grew this file +444 B outside it and the record stays ES's; `check_fg` §4b holds the claim to its fence. *In the
 preamble for the archive pointer's reason.*
 
-*Last rewritten: 2026-10-23 (Batch IT).*
+*Last rewritten: 2026-10-24 (Batch IU).*
 
 ---
 
@@ -63,10 +63,24 @@ md5 of the block's text, whitespace runs collapsed — and `check_it` §5 reds o
 row against the block, mend its label and triggers, then re-stamp** (`python3 index_stamp.py docs/state.md --write`). The stamp proves
 the row was touched when its block changed, not that it was read: that half is the batch's, and its report names the rows it mended.
 
+**THE ROUTING IS A STEP WITH A WRITTEN OUTPUT (IU §0.5, the designer's).** IS and IT each read a window and a grep while
+the thing being piloted sat unused, and IT's ad-hoc bounded read missed nine blocks that bore on its work, six of which the
+triggers would have routed. **THE INDEX DOES NOT BOUND THE READ. IT MAKES THE BOUNDING CORRECT**: the value is accuracy, not
+bytes. So before the work begins a batch writes `docs/reports/<code>-routing.md` — the brief's subjects, the rows whose
+triggers name them (each with the trigger that matched, verbatim), and the core — and opens that list and the core, the core
+whole. At its close it adds the three lists: opened, needed, and found at the close to have borne on the work and not opened
+(the close-read paid in full, outside the working read), **each miss marked ROUTED** (the triggers named the subject and the
+batch did not follow them) **or NOT ROUTED** (no row's triggers name it, and that row is repaired in the batch), and the
+upkeep as rows touched of the total. A read outside the matched list is data, not a failure: the record says what was
+opened and what led there, which is how a trigger gets written. `check_iu` §8 holds the last batch's record to that shape;
+whether its rows were read is the batch's. **THE KNOWN LIMIT, RESTATED SO THE RULING DOES NOT ASSUME IT AWAY**: every batch
+of this pilot is read by a reader that already carries the project's practices, so a reader who does not know a practice
+has no instance, and more batches of the same reader will not make one.
+
 **THE CORE — READ WHOLE:**
-- **CORE** `` ## WHERE THE PROJECT IS `` `#d693e5`
+- **CORE** `` ## WHERE THE PROJECT IS `` `#e28f07`
 - **CORE** `` ## THE OPEN QUEUE `` `#17e1f1`
-- **CORE** `` ### IT's RULINGS OWED `` `#52e02a`
+- **CORE** `` ### IU's RULINGS OWED `` `#f5dba3`
 - **CORE** `` ### THE CLERIC's MANA RATE `` `#70071e`
 - **CORE** `` ### SANCTITY's STEP `` `#7c43c9`
 - **CORE** `` ### BOIL OVER'S RATE `` `#8e9de8`
@@ -74,45 +88,46 @@ the row was touched when its block changed, not that it was read: that half is t
 - **CORE** `` ### FOUND AT IA AND NOT FIXED `` `#0b3b3f`
 - **CORE** `` ### RULED AND NOT BUILT `` `#90a9d9`
 - **CORE** `` ### FOUND AT HX AND NOT FIXED `` `#c91933`
-- **CORE** `` ### THE PLAYTEST'S OTHER FINDINGS `` `#fc81b6`
+- **CORE** `` ### THE PLAYTEST'S OTHER FINDINGS `` `#8ab247`
 - **CORE** `` ### THE FOUR OTHER CONJUNCTIONS `` `#dc1281`
 - **CORE** `` ### THE SKIRMISHER AND THE TRACKER `` `#b3c93d`
 - **CORE** `` ### THE SHAPE RECON ON `CLAUDE.md` `` `#2753bd`
 - **CORE** `` ### TO WATCH IN PLAY `` `#92b9de`
 
 **THE ROWS — ONE A BLOCK, IN FILE ORDER:**
-- `` ### THE FIRST CLEAN PLAYTHROUGH `` `#5461cf` — First clean playthrough (2026-10-18 Warden run). *triggers:* playtest readout, Rupture unreachable, RUPTURE_BREAK_PER_TICK, Sanctity events, SANCTITY_PER_STEP, vow 2.2 to 1, Cleric driest hero, Boil Over undrafted, Sharpshooter damage share, second playthrough
+- `` ### THE FIRST CLEAN PLAYTHROUGH `` `#5461cf` — First clean playthrough (2026-10-18 Warden run). *triggers:* playtest readout, Rupture unreachable, RUPTURE_BREAK_PER_TICK, Sanctity events, SANCTITY_PER_STEP, vow 2.2 to 1, Cleric driest hero, Boil Over undrafted, Sharpshooter damage share, second playthrough, bot sim figures Sanctity steps dry turns
 - `` ### THE BARGAIN DECK's GRADES `` `#33bceb` — Bargain deck grades (table, ties, limits, missing middle). *triggers:* bargain modifier severity grades, re-grade, Parched/Slick Footing tie, Deadened/Rot tie, default build only, bot ally pools heroes-only, bot statuses Fleeting, Thin Veil vs Feverish, Warden 0.80-0.85 target, Mirrorbound
-- `` ### FOUND AT IT AND NOT FIXED `` `#11cf69` — IT's findings: constants one under their card, bot swap price, dead constants, 20 picks. *triggers:* constant one under its card, +1 at the apply, BERSERK_STRIKES, swap price bot, dead constant, positional census, Powershot per point, typed figure, Chilled status row, check_ij 3 pins 438
-- `` ### FOUND AT IS AND NOT FIXED `` `#3b087d` — IS's findings: CLAUDE.md's stale claims, the Cryomancer's upkeep, closed items left standing. *triggers:* the claims batch, CLAUDE.md stale claims, Communion band, Eternal Winter, Winter's Grasp, Shatter, Winter's Toll, same-turn hold, leftover closed items
-- `` ### FOUND AT IR AND NOT FIXED `` `#7bcdc6` — Found at IR: claims recount notes, latent floor shapes. *triggers:* stale claims recount 87, CR04 CR12, IR claims census, floor census, Sacred Covenant Faith floor, Slow Acting Thin Blood, temporal rift, latent floor of a zero
-- `` ### FOUND AT IQ AND NOT FIXED `` `#cfd230` — Found at IQ: stale claims (starter rung, Formless, comments). *triggers:* starter rung only door to tier 1, note_end_boss, Formless chip recoil, stale code comments, relic read sites 25, check_hn 2a worn arm, Fourth Stack rename
+- `` ### FOUND AT IU AND NOT FIXED `` `#371a2e` — IU's findings: ten bot RULE defects, rules the code breaks, gates holding less. *triggers:* bot divergence census, bot plays a different game, DV05 DV07 DV24 DV25 DV26 DV27 DV29 DV32, sim experiment arm, Called Shot spot DV13, 12 * 8, Blood Price note_resource_spent, Shared Ruin contagion, HEALS_STAY, check_if fixed-fps, comment copies
+- `` ### FOUND AT IT AND NOT FIXED `` `#fa621c` — IT's findings: two constants pay one less, dead constants, typed figures, 13 picks. *triggers:* BATTLE_TRANCE_TURNS, MANA_WELL_TURNS, dead constant, VENDETTA_CUT, Powershot per point, typed figure, Chilled status row, catalogue structure words, positional census MISSES ceiling, iu_disposition stamp
+- `` ### FOUND AT IS AND NOT FIXED `` `#4ae18b` — IS's findings: the Cryomancer's upkeep, closed items left standing. *triggers:* Eternal Winter, Winter's Grasp, Shatter, Winter's Toll, same-turn hold, leftover closed items, check_is 3b
+- `` ### FOUND AT IR AND NOT FIXED `` `#25860c` — Found at IR: latent floor shapes. *triggers:* floor census, Sacred Covenant Faith floor, Slow Acting Thin Blood, temporal rift, latent floor of a zero
+- `` ### FOUND AT IQ AND NOT FIXED `` `#442f50` — Found at IQ: Formless chip, stale code comments, check_hn 2a. *triggers:* Formless chip recoil, stale code comments, check_hn 2a worn arm, Fourth Stack rename, talents.gd rung 1 comment
 - `` ### FOUND AT IO AND NOT FIXED `` `#b98990` — Found at IO: _cheapest_attack returns the first free attack. *triggers:* _cheapest_attack, Long Silence enemy exemption, Heads Down, enemy 0-cost attack, enemy kit order, bargain modifier
 - `` ### FOUND AT IN AND NOT FIXED `` `#490d16` — Found at IN: r3 sample, run_sim safe slot comment, check_fh 7. *triggers:* enemies_alive_r3 sample, round three, ROUND_TICKS, Cruel Order, run_sim _take_offer safe slot comment, safe_band, check_fh 7 fallback comment
 - `` ### FOUND AT IM AND NOT FIXED `` `#ba6e07` — Found at IM: Execute upgrade dormant, st/b split, gate defects. *triggers:* execute_upgraded, check_im 3a, Execute price, st/b sim report split, Sanctity figures, check_gn 4 hp_top, check_ew 4 vacuous ok, Firedraw drafted hook, lone burning enemy, _enemy_pick_pool
-- `` ### FOUND AT IL AND NOT FIXED `` `#a250b1` — Found at IL: sourceless dormant Cleric clauses, combat-rules header. *triggers:* Dark Pact Invigoration invigoration_ranks, Blessed Vestments vestments_pct, status src, Cleric as source, check_il 1a, combat-rules.md header claim
+- `` ### FOUND AT IL AND NOT FIXED `` `#c982d1` — Found at IL: sourceless dormant Cleric clauses. *triggers:* Dark Pact Invigoration invigoration_ranks, Blessed Vestments vestments_pct, status src, Cleric as source, check_il 1a
 - `` ### FOUND AT IK AND NOT FIXED `` `#258fbd` — Found at IK: other Sunders lay their own durations. *triggers:* Sunder duration, SUNDER_TURNS, Called Shot Armor, Mass Hysteria, Sundering Strike, Tyrant's Verdict, Consecrated Ground Judgement, enemies.json, handler literal, check_ij 3 pins
 - `` ### FOUND AT IJ AND NOT FIXED `` `#8c93ba` — Found at IJ: unsure master.html rows, Siege Stone, readout key. *triggers:* Vespers mercy_window glossary companion, master.html repair rows, Parry Up, Poison row, Answering Steel, Firedraw, Mercy, Siege Stone ally, readout debug action 12 Full Heal, check_ih
-- `` ### FOUND AT II AND NOT FIXED `` `#18f645` — Found at II: combat-rules header, 100g rune claim, Chain Ignition. *triggers:* combat-rules.md header claim, CLAUDE.md rune price 100g vs 150g, check_dr TICK_SITES deleted nodes, Chain Ignition Burn no source, ember_wind, _update_talent_chips
+- `` ### FOUND AT II AND NOT FIXED `` `#f9d4fb` — Found at II: check_dr deleted nodes, Chain Ignition. *triggers:* check_dr TICK_SITES deleted nodes, Chain Ignition Burn no source, ember_wind, _update_talent_chips
 - `` ### FOUND AT IH AND NOT FIXED `` `#b7d22b` — Found at IH: background art sizing, spawn's own live prologue. *triggers:* full-screen art expand mode, map and event background, TextureRect sizing, hero_live_config, battle spawn live Attack prologue, CK 1 owed helper
 - `` ### FOUND AT IG AND NOT FIXED `` `#8917c1` — Found at IG: DEBUFF_IDS keeps melted, first fight resource max. *triggers:* DEBUFF_IDS melted, Melt Armor display chip, melt_ranks, first fight opens at 100, max resource node +20, bar maximum, live prologue helper
 - `` ### FOUND AT IF AND NOT FIXED `` `#c2e408` — Found at IF: sim bot Smoulder, readout dealt, fire policy arms. *triggers:* sim bot Smoulder drafted hook, Rupture rate in sim, Cryomancer chill, readout dealt excludes companion, fixed-draft fire policy, Chilled 0%
-- `` ### FOUND AT IE AND NOT FIXED `` `#910d2a` — Found at IE: sim bot skips drafted Fireball, DISPEL_NEVER residue. *triggers:* sim bot Fireball Stoke Cinderfall, drafted hook, Mage Burn sim figures, DISPEL_NEVER spec_passive, Ember Leap Ember Debt, Cleric arms ab.cost vs _eff_cost Warded, Firedraw comment
+- `` ### FOUND AT IE AND NOT FIXED `` `#e50a34` — Found at IE: sim bot skips drafted Fireball, DISPEL_NEVER residue. *triggers:* sim bot Fireball Stoke Cinderfall, drafted hook, Mage Burn sim figures, DISPEL_NEVER spec_passive, Ember Leap Ember Debt, Firedraw comment
 - `` ### FOUND AT ID AND NOT FIXED `` `#aa93e5` — Found at ID: Mirrorbound recoil scope, check_fh draft half. *triggers:* Mirrorbound recoil, attack vs special handler, DAMAGE_SPECIALS, _resolve_special, bargain modifier card words, check_fh draft half, Gate.answer_boss_and_upgrade
 - `` ### FOUND AT IC AND NOT FIXED `` `#ac4707` — Found at IC: five dormant fields in the vow's refusal partition. *triggers:* Overkill, Temporal Rift temporal_ranks, Spite spite_ranks, Blowback, Forge Body forge_body_pct, dormant field no writer, refused crit, Vow of Silence partition
-- `` ### FOUND AT HY AND NOT FIXED `` `#dc3da6` — Found at HY: four stale claims, framed dormant retaliation sites. *triggers:* combat-rules.md byte-identical header, _book_self_cost, crit total terms, HG supersession block, retaliation sites, Spite, Whole Forest whole_forest, check_hy 5, attribution frame
-- `` ### FOUND AT HZ AND NOT FIXED `` `#d04baa` — Found at HZ: boil_over status has no writer; combat-rules header. *triggers:* boil_over status, unit.frenzy_bonus, STATUS_INFO row, check_hw 1a, Boil Over, dormant status kept, combat-rules.md header claim, intent block
+- `` ### FOUND AT HY AND NOT FIXED `` `#037abe` — Found at HY: HG's HD 2 four, framed dormant retaliation sites. *triggers:* HG supersession block, retaliation sites, Spite, Whole Forest whole_forest, check_hy 5, attribution frame, HD 2 four retirements print
+- `` ### FOUND AT HZ AND NOT FIXED `` `#dc1096` — Found at HZ: boil_over status has no writer. *triggers:* boil_over status, unit.frenzy_bonus, STATUS_INFO row, check_hw 1a, Boil Over, dormant status kept
 - `` ### HW's RULINGS OWED `` `#3a616c` — HW's rulings owed: Counter Time, proposed words, class rune draft. *triggers:* Counter Time vs Pommel Strike, stun length, Charge Dazed, Snare Line card, glossary Runes Peddler Severity, partner-spec table, class rune draft, crest rune in elite cache, roll_rune_candidates
 - `` ### FOUND AT HW AND NOT FIXED `` `#586d2c` — Found at HW: click zones, venom lane, Thin Blood chip, battery. *triggers:* HERO_SLOTS click zone overlap, companion summon fit, Venom lane, Trapper barb, Explosive Shot, _apply_poison, Long Poison, Thin Blood chip text, run_battery.sh game open, kill battery
-- `` ### FOUND AT HV AND NOT FIXED `` `#983046` — Found at HV: Open Line row, refused-rune re-ask, stale lines. *triggers:* Open Line ENGINE_READ Stances, check_gv HALF, Run.rune_choice is_refused, copied Elemental Weakness, _apply_elem_weak, stale CLAUDE.md lines, Ruin never clears, combat-rules.md crit terms
+- `` ### FOUND AT HV AND NOT FIXED `` `#639adc` — Found at HV: Open Line row, refused-rune re-ask, two stale lines. *triggers:* Open Line ENGINE_READ Stances, check_gv HALF, Run.rune_choice is_refused, copied Elemental Weakness, _apply_elem_weak, stale CLAUDE.md lines, one choice never two things, Pommel Strike Stun kit list
 - `` ### FOUND AT HT AND NOT FIXED `` `#f6a11b` — Found at HT: battery vs open game, rite ruin_primed, HT census. *triggers:* run_battery.sh game open, player-file arm, battery kill trap lock, rite ruin_primed, Reckoning, HT 2f census, Poison clock reset, purge Bleed chip Cull Harvest, Downwind copies, Frostbind partner
 - `` ### FOUND AT HS AND NOT FIXED `` `#6d15b0` — Found at HS: Tithe and Rupture Break, top-level-only readers. *triggers:* Tithe on Rupture Break, tick has no attacker, log_bleed_chip, set_ruin_stacks, conjunction ingredient lookup, Contagion, Reckoning, Bleed Ruin ingredients
-- `` ### FOUND AT HR AND NOT FIXED `` `#a0dde8` — Found at HR: fire/ice doc-vs-code census, sim skips bargain cache. *triggers:* Shatter, Glacial Hold, Firedraw, Emberkeep, Overburn refund, Burn crit snapshot, combat-rules.md BURN MAGNITUDE, stale code comments, sim bargain rune cache, rune supply figures
+- `` ### FOUND AT HR AND NOT FIXED `` `#044b6c` — Found at HR: fire/ice doc-vs-code census, sim skips bargain cache. *triggers:* Shatter, Glacial Hold, Firedraw, Emberkeep, Overburn refund, Burn crit snapshot, stale code comments, sim bargain rune cache, rune supply figures
 - `` ### FOUND AT HP AND NOT FIXED `` `#5a5f2e` — Found at HP: Tithe's read site owes a talent rebalance. *triggers:* Tithe read site, Tithe crest rune, Breaking Heals a Hero talent, Break pay gap, Warden Long Watch, talent rebalance, widen read site, tree procs
-- `` ### FOUND AT HO AND NOT FIXED `` `#d612d3` — Found at HO: Cairn of the Fallen, revive potion, crest shapes. *triggers:* fallen hero stays down ruling, fallen_cairn event, Cairnmoss Poultice, Revive Potion on map, Tithe floor, Cleanse Debuffs talent, check_gv 4 event door, crest card grant, check_gf bag quit
+- `` ### FOUND AT HO AND NOT FIXED `` `#d612d3` — Found at HO: Cairn of the Fallen, revive potion, crest shapes. *triggers:* fallen hero stays down ruling, fallen_cairn event, Cairnmoss Poultice, Revive Potion on map, Tithe floor, Cleanse Debuffs talent, check_gv 4 event door, crest card grant, check_gf bag quit, stale gate comments check_ct_map
 - `` ### FOUND AT HN AND NOT FIXED `` `#a3c756` — Found at HN: missing party-condition shapes. *triggers:* Talents.party_condition_met, condition key twice, OR condition, any class twice, crest rune conditions, heroes_ keys, HN 3 census, crest design pass
 - `` ### FOUND AT HL AND NOT FIXED `` `#3961a4` — Found at HL: engine word on cards, Guard Change twice, log literals. *triggers:* card text says engine not core rune, classes.gd card text, old save Swordmaster Guard Change twice, slot cost, combat-log literals, read names off data
-- `` ### HJ's RULINGS OWED `` `#2e2e10` — HJ's ruling owed: debug toggle name. *triggers:* debug grant-all toggle name, All Class Abilities Unlocked, debug_grant_all, map burger debug menu, class draft pool, lineage boss pool, DOD_SIM_GRANT_ALL
+- `` ### HJ's RULINGS OWED `` `#2e2e10` — HJ's ruling owed: debug toggle name. *triggers:* debug grant-all toggle name, All Class Abilities Unlocked, debug_grant_all, map burger debug menu, class draft pool, lineage boss pool, DOD_SIM_GRANT_ALL, sim experiment arm
 - `` ### THE CROSS-TARGET SUPERSESSIONS `` `#50bf92` — Cross-target supersessions: retired arms and what stands. *triggers:* supersession table, retired suite arm, test_batch_bp 5, test_batch_cp 2, test_batch_bv, test_batch_bw, check_dv 2, test_batch_ah 1, test_batch_cd 2, class_pool_floors, check_gs, retiring a superseder
 - `` ### HF's RULINGS OWED `` `#f61857` — HF's rulings owed: Burning Ground, Aper, Abundance, Mark of the Hunt. *triggers:* Burning Ground rune_burning_ground, Aper body charge boon, Tusk and Bristle, Pack Bond boon, Abundance shield ceiling, Mark of the Hunt text, Kill Command Aper, Ghostpack, Call of the Wild
 - `` ### FOUND AT HF AND NOT FIXED `` `#b012bf` — Found at HF: companion text, Venom Coating seat, Returned Burden. *triggers:* Summon Companion text three companions, Aper picker, Venom Coating seated without Trapper, seat row, Returned Burden src_name by name, Detonating Ward removals, Burning Ground fallen Cleric
@@ -120,7 +135,7 @@ the row was touched when its block changed, not that it was read: that half is t
 - `` ### HA's RULINGS OWED `` `#b4c985` — HA's rulings owed: main has no run-save guard, merge landing. *triggers:* main branch, forward guard run save, v13 save on main, load_run refusal, class-merge branch landing, tag b722cc4, per-lineage boss pools, lineage stat blocks
 - `` ### FOUND AT HA AND NOT FIXED `` `#c70130` — Found at HA: hand-seated lineages, slot and engine-text gates. *triggers:* hand-built seat without engine rune, check_et, check_fm _member, test_batch_bo, ability_slots_used, kit_slots, check_cl_resolver, check_cl_width, check_do 4 engine texts, check_di pack_bond
 - `` ### GZ's RULINGS OWED `` `#69fd7b` — GZ's ruling owed: check_dv 4 header arm passes on any cut record. *triggers:* check_dv 4 header arm, changelog cut boundary pin, check_ec 1 alternations, last cut clause, two-armed control on a real cut, changelog archive
-- `` ### GY's RULINGS OWED `` `#5dd061` — GY's rulings owed: design-notes order, arms that locate by value. *triggers:* design-notes.md entry order, newest first, two blocks, check_gx 412 769, test_batch_as 900, check_ct_map 96, vacuous filter arm, liveness arm, _live_turn_bar
+- `` ### GY's RULINGS OWED `` `#5dd061` — GY's rulings owed: design-notes order, arms that locate by value. *triggers:* design-notes.md entry order, newest first, two blocks, check_gx 412 769, test_batch_as 900, check_ct_map 96, vacuous filter arm, liveness arm, _live_turn_bar, arm locates its subject by the value it asserts
 - `` ### FOUND AT GY AND NOT FIXED `` `#d1ae6c` — Found at GY: design-notes position unasserted, combat-rules ceiling. *triggers:* design-notes.md position gate, newest-first order, test_batch_bn bs ce, combat-rules.md ceiling 70 KiB, GR ruling 1
 - `` ### GX's RULINGS OWED `` `#741538` — GX's ruling owed: battle log roll call names a sitting-out rune. *triggers:* battle log roll call Rune lines, rune sits out, GX sentence, Run.note_first_sentence, sits_out surfaces, worn rune pays nothing, spawn log
 - `` ### GW's RULINGS OWED `` `#7bd6ae` — GW's rulings owed: ninety hand-sets, check_ez 4 writer sweep. *triggers:* hand-set rune engine talent fields, check_gw 2 ceiling 90, check_ez 4 writer sweep, rune_ field carry propagation, runes.json magnitude, exemption vs repair
@@ -130,7 +145,7 @@ the row was touched when its block changed, not that it was read: that half is t
 - `` ### GT's RULINGS OWED `` `#c6cd62` — GT's rulings owed: Fireball/Frostbolt price move, sitting-out slot. *triggers:* Fireball Frostbolt price, Magic Missiles baseline, Aimed Shot, EB inversion parity, card sits out keeps slot, benching, kit over cap, SITS_OUT
 - `` ### FOUND AT GS AND NOT FIXED `` `#fd1e77` — Found at GS: second clauses, engine texts, bot, drafted basics. *triggers:* Battle Poise free Guard Change, Shatterpoint Overpower, engine texts name cards, sim bot _bot_drafted_pick, drafted basics Perfect, Arcane Explosion no Perfect, Pommel Strike text, Last Rites
 - `` ### GR's RULINGS OWED `` `#2c3ddf` — GR's ruling owed: combat-rules.md has no stated ceiling. *triggers:* combat-rules.md ceiling, 70 KiB, EE ceiling method, KiB ceiling, instrument-rules.md ceiling, reference file size, check_fr 5, GR ruling 1
-- `` ### FOUND AT GR AND NOT FIXED `` `#6b3b90` — Found at GR: misdirected pointer, ways-of-working header, census. *triggers:* combat-rules.md src pointer DJ 3, ways-of-working.md header two rule files, check_fr, claude_md_census.py population, moved combat blocks
+- `` ### FOUND AT GR AND NOT FIXED `` `#4fc1fe` — Found at GR: ways-of-working header, census. *triggers:* ways-of-working.md header two rule files, check_fr, claude_md_census.py population, moved combat blocks
 - `` ### GQ's RULINGS OWED `` `#e7a912` — GQ's rulings owed: class-selection words, fixed card text window. *triggers:* class-selection screen spec_choice words, Also opens with, Rune of the Warden Attack 75, Occultist Smite, card text window 280 px, deal of three engine runes
 - `` ### FOUND AT GQ AND NOT FIXED `` `#7c2c4c` — Found at GQ: kit texts break standard, orphaned blurbs, Tracker. *triggers:* Ministration text, Magic Missiles text, design rationale on card, ARCHETYPE_DESC, SPEC_INFO blurbs no reader, Tracker class passive vs Rune of the Tracker
 - `` ### GP's RULINGS OWED `` `#aafe0e` — GP's rulings owed: weakest class-wide cards, gated cards, holder. *triggers:* class-wide cards rebalance, CLASS_DRAFT_POOLS weaker, ENGINE_READ unreachable cards, Death Ray, Hymn of Hope, Resurrection, Runaway Resonance, holder vs party gate, two heroes one class
@@ -140,26 +155,26 @@ the row was touched when its block changed, not that it was read: that half is t
 - `` ### FOUND AT GN AND NOT FIXED `` `#cd4f48` — Found at GN: victory card omits Tollkeeper's Bell, Tripwire, bot. *triggers:* Tollkeeper's Bell victory card gold, award_gold, victory_gold hook, check_gj 4 sanctioned red, baselines.json, Tripwire on companion, Mana Shield never cast by bot
 - `` ### GM's RULINGS OWED `` `#691d7a` — GM's rulings owed: engine-bound cards, Split Shield, Dispel. *triggers:* cards leaving with an engine, half-working lineage cards, Split Shield Bulwark Line, Shieldwall, Dispel DISPEL_NEVER, Rime DEBUFF_IDS, Hold Breath, Called Volley, Drumfire, Divine Plea label
 - `` ### FOUND AT GM AND NOT FIXED `` `#c2d5b8` — Found at GM: Held Breath counter, Focus inert, enemy status census. *triggers:* Hold Breath counter armor bypass, Lethal Aim, +40 Focus inert, enemy-side status list, check_gm 4, DEBUFF_IDS, DISPEL_NEVER, sim bot draft wrapper Mana Shield, draft_ability
-- `` ### FOUND AT GL AND NOT FIXED `` `#ed63df` — Found at GL: half-working lineage cards, card texts vs code. *triggers:* Shrapnel Charge, Hamstring, Venom Coating, Pinning Shot, Called Shot, Divine Shield recast Bare Altar, Quick Shot Perfect slot 0, Charge Daze, Battle Trance, Mana Well, Arcane Explosion Resonance, party damage buffs, kit-recon.html
+- `` ### FOUND AT GL AND NOT FIXED `` `#ed63df` — Found at GL: half-working lineage cards, card texts vs code. *triggers:* Shrapnel Charge, Hamstring, Venom Coating, Pinning Shot, Called Shot, Divine Shield recast Bare Altar, Quick Shot Perfect slot 0, Charge Daze, Battle Trance, Mana Well, Arcane Explosion Resonance, party damage buffs, kit-recon.html, test_batch_bo 5 blind to slot 0
 - `` ### GK's RULINGS OWED `` `#d80eec` — GK's rulings owed: spine rune names, texts, class-selection words. *triggers:* Rune of the Vanguard Invoker Hierophant, SPINE_INFO, class-selection words ENGINE_SLOTS, engine rune price, lineage interim, Heavy Plating base stat, engine runes untagged check_ek
 - `` ### FOUND AT GK AND NOT FIXED `` `#c91323` — Found at GK: save-backups untracked, passive_id comments, seats. *triggers:* save-backups untracked, .gitignore, git add -A, battle.gd passive_id comments, engines field, instrument party lineage on wrong class seat
 - `` ### EVERY COMPLETION FIGURE DATED BEFORE GJ EXCLUDED THE FINAL FIGHT `` `#c449be` — Completion figures before GJ excluded the end boss fight. *triggers:* run completion rate, end boss in sim, third zone boss, encounter 48 of 49, EN 97/3/0, untalented completion, rows arms not re-measured, depth 49
 - `` ### GJ's RULINGS OWED `` `#4239cf` — GJ's rulings owed: end boss rung multiplier, rung-1 words, tooltip. *triggers:* end_boss_mult, end boss rung floor, rung 3 x1.30, Wanderer tooltip, glossary road entry, end boss tooltip, Hollow Crown readout, zone_base_mult
 - `` ### FOUND AT GJ AND NOT FIXED `` `#066e00` — Found at GJ: end boss fight too short, screen primitives, sim. *triggers:* end boss Hollow Crown fight length, Regalia, Broken end boss freeze, end boss content, gate_fixture screen primitives, check_fh, check_gf, sim zone-boss awards, slot ladder 10
 - `` ### ~~THE END BOSS HAS NO BUTTON~~ `` `#b6ce46` — End boss button closed at GI; tooltip and readout wording owed. *triggers:* end boss button, map _draw_lattice, SLOTS_PER_ZONE vs Run.map.size, END BOSS label, end boss tooltip, Hollow Crown waits readout, check_gj
-- `` ### FOUND AT GF AND NOT FIXED `` `#5e726d` — Found at GF: shop quit skipped, upgrade stacking, glossary. *triggers:* Peddler forge quit resume, master.html debug paragraph, upgrade stacks on forged card, roll_upgrade_offer has_upgrade, Resonance uncapped claim, Melted Armor, Caught Fast
+- `` ### FOUND AT GF AND NOT FIXED `` `#7a1b84` — Found at GF: shop quit skipped, upgrade stacking, glossary. *triggers:* Peddler forge quit resume, master.html debug paragraph, upgrade stacks on forged card, roll_upgrade_offer has_upgrade, Resonance uncapped claim CLAUDE.md governor table, Melted Armor, Caught Fast
 - `` ### FOUND AT GG AND NOT FIXED `` `#766f65` — Found at GG: glossary retirement unasserted, Penance comment. *triggers:* glossary retired key, Glossary.in_category, glossary retirement gate owed, check_et 1, Penance SYNERGY comment, Decay, Entropy entropy_ranks
 - `` ### FOUND AT GH AND NOT FIXED `` `#a42bae` — Found at GH: fallen hero replays death animation on restart. *triggers:* quit fight restart, fallen hero death animation, _die, _lay_down_the_fallen, resumed battle, party losses carry across quit
-- `` ### THE TALENT LAYER IS BUILT (FX); FIVE THINGS IN IT, AND SEVEN OF FW'S EDGES, ARE THE DESIGNER'S `` `#0974e6` — Talent layer (FX): five open rulings, FW's seven edges. *triggers:* TIER_SPEND_MIN, talent node magnitudes, swapped nodes, spend gate, relic seam, class spines, class passives, basic attack definition, spec statuses, skill-check interference, systems-recon.html
+- `` ### THE TALENT LAYER IS BUILT (FX); FIVE THINGS IN IT, AND SEVEN OF FW'S EDGES, ARE THE DESIGNER'S `` `#0974e6` — Talent layer (FX): five open rulings, FW's seven edges. *triggers:* TIER_SPEND_MIN, talent node magnitudes, swapped nodes, spend gate, relic seam, class spines, class passives, basic attack definition, spec statuses, bot never reads a skill profile, systems-recon.html
 - `` ### FY §1: THREE NODES PAID BY WHO ELSE HELD THEM, AND TODAY'S COUNT DOUBLES FOUR ITEMS `` `#0151cb` — Deepening Hex wording still owed (FY 1, ruled at GA-GC). *triggers:* Deepening Hex card wording, RUIN_FLOOR 8, every 8th, Ruin step, avatar_ruin, node paid by who else holds it, Deflection, Enemies Look Past You
 - `` ### FOUR GATES CAN WRITE THE PLAYER'S `relics.json` THE DAY A RELIC IS LOCKED `` `#1d592e` — Four gates can write player's relics.json (deferred to playtest). *triggers:* relics.json, Relics.unlock_random, Relics.save_path, _resolve_boss, check_ea, check_eg, check_eh, check_fh, locked relic, save redirect
 - `` ### FOUND AT FY AND NOT FIXED `` `#667003` — Found at FY: instrument hygiene, checks that pass by default. *triggers:* test_batch_ar as at ranks, exclusive_with, check_dk ally needles, test_batch_ay _worn_tree, test_batch_ba count, dormant field numbers, Pressure Cooker, check_fx 4 one spec per class
-- `` ### FOUND AT GA AND NOT FIXED `` `#a66bb4` — Found at GA: two dated claims in instrument-rules.md. *triggers:* instrument-rules.md dated claims, DX 1 thirty-five assert a floor, EU all five correct, re-derive reference claims, stale claims
+- `` ### FOUND AT GA AND NOT FIXED `` `#de0bed` — Found at GA: a dated claim in instrument-rules.md. *triggers:* instrument-rules.md dated claims, EU all five correct, re-derive reference claims, stale claims
 - `` ### FOUND AT GE AND NOT FIXED `` `#12d166` — Found at GE: Long Draw drain still a gain, its words, relics header. *triggers:* Long Draw rune, SS_SEQ_MISS_DRAIN, miss drains 16 Focus, check_cs 7 model, bot 85% press roll, check_ez 5, relics.gd header, master.html talent trees residue
 - `` ### FOUND AT GC AND NOT FIXED `` `#46e127` — Found at GC: merge-claims census, deleted things named live. *triggers:* merge-ruling claims census, RULED NOT BUILT marker gate, deleted talent nodes cited, Talents.LANES, master.html talent-point economy, systems-recon.html bar-swap relic, ways-of-working table
 - `` ### FOUND AT GB AND NOT FIXED `` `#271f4c` — Found at GB: forfeit, DOD_SIM_RUNES, stale comments. *triggers:* debug_summon forfeit note_forfeit, DOD_SIM_RUNES runes_mode, stale comments in scripts and gates, dormant free_swap layered_faith crushing_blows
 - `` ### FOUND AT FX AND NOT FIXED `` `#bdc673` — Found at FX: chip names, dormant fields, retired vocabulary. *triggers:* iron_will chip, undying_rage, dormant fields 275 of 304, the_pack, deleted-node log labels, _evade_source ghillie, retired vocabulary, vacuous suite checks, master.html inconsistencies
-- `` ### FOUND AT FW AND NOT FIXED `` `#472cbd` — Found at FW: relic hook sites, death refusals, unapplied content. *triggers:* relics.gd hook read sites, rest_heal_add, Cairnmoss Poultice, Martyr's Knucklebone, death refusals, stale comments, effective_speed, never-applied statuses, tick kill skips _on_enemy_death
+- `` ### FOUND AT FW AND NOT FIXED `` `#472cbd` — Found at FW: relic hook sites, death refusals, unapplied content. *triggers:* relics.gd hook read sites, rest_heal_add, Cairnmoss Poultice, Martyr's Knucklebone, death refusals, stale comments, effective_speed, never-applied statuses, tick kill skips _on_enemy_death, combat-rules.md four death-refusals
 - `` ### THE CLASS MERGE ~~IS MEASURED AND UNRULED~~ WAS MEASURED AT FP AND IS RULED `` `#2b37c6` — Class merge project (FP): size, staging, spines, spell partition. *triggers:* class merge, merge-recon.html, class-merge branch, specs to classes, battery reds during merge, engine move, merge pilot, Sanctity potency layer, is_spell flag, dmg_type, recon coverage
 - `` ### THE THREE SPINES ARE BUILT AND ALL THREE RATES ARE SET (FU, FV); WHAT IS STILL FLAGGED `` `#a32461` — Three spines (Momentum, Channel, Sanctity): still flagged. *triggers:* CHANNEL_SPARES_PHYSICAL, CHANNEL_CAST_FLOOR, MOMENTUM_EXCHANGES_PER_STEP, Momentum cap, self-damage taken half, second meter display, ledger spender BI 1, _sync_engine_switches, spine runes
 - `` ### FIVE DRAFTED ABILITIES ARE NAMED AND DESCRIBED NOWHERE `` `#87b6b9` — Five drafted abilities undescribed in master.html. *triggers:* Arcane Surge, Divine Wrath, Mana Shield, Reality Fracture, Rallying Shout, master.html 6b drafted-abilities table, DY vault re-homes, card rows
@@ -174,7 +189,7 @@ the row was touched when its block changed, not that it was read: that half is t
 - `` ### THE RUNE OF THE STANDING GROUND IS NOT AUTHORABLE, AND THE RULING IS THE PART TO KEEP `` `#b67ac5` — Rune of the Standing Ground is not authorable (base kit already). *triggers:* Standing Ground rune, Consecrated Ground cons_ground, _ground_faith_tick, Faith to allies, Devout fifth rune, check_fk 6, inert rune, narrow ground to caster
 - `` ### TWO INSTRUMENT OBSERVATIONS FROM FM `` `#8693c1` — FM instrument observations: test_batch_cb flake. *triggers:* test_batch_cb flake, Pyre Wake Overburn deep-stack arm, bank emptied not skimmed, battery load, fails_obs, baselines.json, flaky suite
 - `` ### THE `master.html` STAMP CAN SIT MANY BATCHES STALE AND PASS `` `#89f640` — master.html stamp can sit many batches stale and pass. *triggers:* master.html Last updated stamp, stamp gates fourteen suites, test_batch_ce, stamp freshness, file moved vs stamp moved, mtime, git
-- `` ### THE SKILL CHECK'S DIFFICULTY IS RULED AND BUILT `` `#54b1f2` — Skill-check difficulty ruled (EY): Sharpshooter window has no slack. *triggers:* skill check difficulty, sweep_time 1.00, half-widths, Sharpshooter Good window 97.3%, SS_SEQ_OPEN, check_cs 4 0.02 bound, widen a window
+- `` ### THE SKILL CHECK'S DIFFICULTY IS RULED AND BUILT `` `#54b1f2` — Skill-check difficulty ruled (EY): Sharpshooter window has no slack. *triggers:* skill check difficulty, sweep_time 1.00, half-widths, Sharpshooter Good window 97.3%, SS_SEQ_OPEN, check_cs 4 0.02 bound, widen a window, bot 85% press vs player window
 - `` ### THE CRIT SURPLUS IS RULED END TO END `` `#f40ba3` — Crit surplus ruled; check_ew 6 has a vacuous assertion. *triggers:* crit surplus, crit chance above certainty, crit multiplier, check_ew 6 vacuous ok, lethal_crit_mult, crit rule, vacuous assertion repair, EX
 - `` ### `BOND_MITIGATION_MAX` STAYS AT 0.75 `` `#a3fea5` — BOND_MITIGATION_MAX stays at 0.75 (ruled EW 3). *triggers:* BOND_MITIGATION_MAX 0.75, Ursus saturation, Savage Presence taunt clamp, Loyalty boon, EV fallback, bear damage reduction
 - `` ### THE LADDER `` `#940387` — Ladder: what rung 2 should ask (ruled C or C+D, unbuilt). *triggers:* rung 2 Warden question, rung-tagged enemy abilities, enemies.json rung tag, wider warband encounter shape, budget ramp BK 5, compose floor, difficulty ladder options
@@ -191,81 +206,88 @@ the row was touched when its block changed, not that it was read: that half is t
 - `` ### Carried, with measurements attached `` `#02ab0b` — Carried measurements: Frenzy rate, Faith lane band, revert sweeps. *triggers:* FRENZY_RAGE_PER_STEP, Blood Frenzy peak, Reckless Abandon, Faith lane, FAITH_RELEASE, HELD_MAX, Communion band, Elevation, Blessing of the Faithful, revert constant prose sweep
 - `` ### Named by the designer, carried from CX `` `#31545e` — Named by the designer (CX): relics per hero, rune content. *triggers:* relics per-hero ruling, active_relics save format, victory_heal_pct, rest_heal_add, resource_floor_pct, relic read sites, enemy interference status, rune content pass, enemy debuff duration vs cooldown
 - `` ### Carried from the code, reported and deliberately not fixed `` `#405008` — Carried from code: shop key, counts, beast ids. *triggers:* rune trade event, scarred_runes id, shop confounder merchant key, devoted_fury, checks=none targets, _recast_refusal_note Frozen vs Held, check_cu check_cv, beast identifiers, Killing Frost vs Blizzard
-- `` ## LIVE COUNTS AND CONSTANTS WORTH HAVING AT HAND `` `#7fda17` — Live counts and constants (delays, corpus, pools, saves). *triggers:* BASIC_DELAY, BUFF_DELAY_CAP, PURE_BUFFS, ability corpus 231, RECAST_GATED 64, FRENZY_MAX_STEPS, FAITH_RELEASE, draft pools 179, ABILITY_SLOTS_BY_BOSS, pouch slots, SC_PROFILE_DEFAULT, save v15, relics
+- `` ## LIVE COUNTS AND CONSTANTS WORTH HAVING AT HAND `` `#48d936` — Live counts and constants (delays, corpus, pools, saves). *triggers:* BASIC_DELAY, BUFF_DELAY_CAP, PURE_BUFFS, ability corpus 231, RECAST_GATED 64, FRENZY_MAX_STEPS, FAITH_RELEASE, draft pools 179, ABILITY_SLOTS_BY_BOSS, pouch slots, SC_PROFILE_DEFAULT, save v15, relics, EMBERKEEP_TURNS recast proposal
 - `` ### THE TEST TREE, AS OF EF `` `#60a024` — Test tree as of EF: suites, battery, baselines, differ. *triggers:* suites at repo root, suite_fixture _spawn, run_battery.sh GATES, gates outside GATES, .ran manifest, baselines.json rows, new gate rows, check_parse coverage, check_de differ, stamp gates, check_da 3 walk
 - `` ### HOW LONG A FIGHT IS `` `#014714` — How long a fight is: rounds tables, ramp arrival (stale since DK). *triggers:* fight length rounds, turns per hero, rung 2 same fight, DOD_SIM_ROWS, elite shortest, Avg rounds/battle bug, cy_report_line, ramp arrival Frenzy Faith Loyalty Focus, sim confounders
-- `` ### The changelog `` `#b5d569` — The changelog: live cut at GZ, archive, threshold, cut verification. *triggers:* changelog cut, changelog-archive.html, check_dv 4, check_fg 1 400 KB threshold, check_ec 2, cut verification byte-identical, changelog readers, build_docs.py, archive boundary
+- `` ### The changelog `` `#b5d569` — The changelog: live cut at GZ, archive, threshold, cut verification. *triggers:* changelog cut, changelog-archive.html, check_dv 4, check_fg 1 400 KB threshold, check_ec 2, cut verification byte-identical, changelog readers, build_docs.py, archive boundary, build_pin_manifest.py reads the changelog
 - `` ### Knowledge sync, re-measured at EG `` `#f11668` — Knowledge sync (EG): census, live sizes, deselection list. *triggers:* knowledge sync, claude_md_census.py, file count byte total, check_fg 1/2 sizes, check_fr 5, CLAUDE.md ceiling, sync share retired, deselect DoD-archive pin-manifest.json, suite files
 - `` ## KNOWN-BROKEN AND DELIBERATELY UNFIXED `` `#250eeb` — Known-broken and deliberately unfixed (section head). *triggers:* known-broken, deliberately unfixed, sanctioned reds, suite reds, check_cm_live, check_gj, flakes
-- `` ### THE SUITE REDS, AND WHY ZERO IS NOT THE SAME AS FIXED `` `#2be9ca` — Suite reds: flakes seeded, retired-word sweep, draw collision. *triggers:* suite reds history, unseeded flakes seeded, baselines.json flake field, test_rune_battle, retired-word sweep beast party, test_batch_bx 4, test_batch_bp 7 draw collision, kit before roll
-- `` ### THE REST `` `#b327b0` — The rest: sanctioned reds check_gj and check_cm_live. *triggers:* check_gj 4 red Tollkeeper's Bell, check_cm_live 4-5 failures, defensive bar, _defensive_brace, _nobody_can_press, check_fh 7, sanctioned red baselines.json, coin-flip arm
+- `` ### THE SUITE REDS, AND WHY ZERO IS NOT THE SAME AS FIXED `` `#2be9ca` — Suite reds: flakes seeded, retired-word sweep, draw collision. *triggers:* suite reds history, unseeded flakes seeded, baselines.json flake field, test_rune_battle, retired-word sweep beast party, test_batch_bx 4, test_batch_bp 7 draw collision, kit before roll, counts not repeated here
+- `` ### THE REST `` `#b10bce` — The rest: sanctioned reds check_gj and check_cm_live. *triggers:* check_gj 4 red Tollkeeper's Bell, check_cm_live 4-5 failures, defensive bar, _defensive_brace, _nobody_can_press, check_fh 7, sanctioned red baselines.json, coin-flip arm
 - `` ### FIVE MORE THINGS FH FOUND AND DID NOT FIX `` `#f0f36b` — Five more FH found: time_scale, dead buttons, grant_rune. *triggers:* _break_impact Engine.time_scale, hero sheet dead buttons, check_fh 9, Run.grant_rune, no boss awards a rune, manifest typed var, check_map not a hang, exit 0 Parse Error, _skill_done deadlock, vacuous as/at siblings
 <!-- INDEX:END -->
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: IT — THE STRIKE, THE EIGHTY LITERALS NAMED, THE POSITIONAL FAMILY, THE ALARM's FENCE AND THE INDEX STAMPED.**
-  IMPLEMENT ONLY. **Fifty-four closed items left `CLAUDE.md`, 164 constants name the figures the catalogue and the cards state, the
-  catalogue's figures are read through a door, every fixed window ends inside its subject, and the record is ES's again.** Full
-  working: **`docs/reports/IT.md`**. **The next letter is IU, the claims** (the roadmap, below).
-- **THE DESIGNER's FILES, READ AND UNTOUCHED.** The readout holds what it held at IS: IH's debug-touched first file and the clean
-  one, `readout/run-20261018-194229.jsonl`, which `latest.txt` names — 24,340 B, md5 `610bcd8c2b43f97703e63053e86728fa` at IT's
+- **Last batch: IU — THE CLAIMS, AND WHAT THE RULING NEEDS.** IMPLEMENT ONLY. **Every claim IU's census read left it with a
+  disposition and a ratchet holds what is left; every rule in `CLAUDE.md` was read against the gate that holds it; the nine
+  constants hold their card's figure; and the bot pays the player's swap price.** Full working: **`docs/reports/IU.md`**. **The
+  queue is empty: IU was its last batch, and the roadmap holds the authoring list and nothing else** (the roadmap, below).
+- **THE DESIGNER's FILES, READ AND UNTOUCHED.** The readout holds what it held at IT: IH's debug-touched first file and the clean
+  one, `readout/run-20261018-194229.jsonl`, which `latest.txt` names — 24,340 B, md5 `610bcd8c2b43f97703e63053e86728fa` at IU's
   open and at its close, **still the one run**. `run_save.bin` (55,264 B, md5 `fcb20c91…`) still holds it at zone two's start. Both
-  backed up with the player's files (`../save-backups/IT-20261023-144717`). **A second run with a different party is still asked
+  backed up with the player's files (`../save-backups/IU-20261024-101003`). **A second run with a different party is still asked
   for, on the LOOK-LIST** (the roadmap, below).
-- **§1 — THE STRIKE (IS's ruling 1).** Of IS's 78 closed items, **54 struck** — history and past measurement, each record grepped
-  where the census names it before the cut, each block read whole across it; **2 not struck** (items 6 and 10: the record is not where
-  the census says), and **the 22 superseded and done to the claims batch** — 24 in all (FOUND AT IT's remainder, above, and the
-  roadmap). The two records that stood nowhere else are written in the ledger, `docs/reports/IT-claude-strike.md`, item by item.
-- **§0.2 — THE STRIP's TEST IS ITS RULE's OPERATIVE HALF**, *is this re-read*, written into the working agreement with the record that
-  the strip was prevention: 140 of IQ's 171 false facts sat in plain present-tense prose, and a figure behind a door is the answer.
-- **§2 — THE EIGHTY, DERIVED: 173 OF THE CATALOGUE's 398 FIGURES HAD NO DOOR**, a literal in a handler; **164 constants name them now**
-  (157 in `battle.gd`, 7 in `unit.gd`; two literals one constant only where a re-tune moves both), and the cards, the glossary and the
-  status rows read them — **1,121 texts byte-identical** before and after. **`check_iq` §2 holds 1,065 figures** — IQ's 695 and the
-  catalogue's own, 316 numbers and 54 words, each through its field or constant; a figure stated there with no door reds. **A
-  declaration names what its figure is, never the figure** (`check_it` §2c): IT's own first pass wrote the figure beside 162 of the
-  164, and they were rewritten before the run (IT's report, §2). `check_ij`
-  §3's 180 pins whose literal IT named are `check_it` §2's now; 438 stay pinned (FOUND AT IT, above).
-- **§3 — THE POSITIONAL FAMILY, CENSUSED, THEN REPAIRED.** 489 reads, 78 MISSES — 53 fixed windows, 25 picks; every window and IS's
-  five picks repaired (58), cut by their subject's own end (`gate_fixture.gd`'s helpers), 20 picks reported. Kept:
-  `docs/reports/IT-positional-census.tsv`, every row its tree.
-- **§4 — THE ALARM's BAR IS ES's AGAIN** (the preamble): IS's fenced index is structure, recorded beside its net, and `check_fg` §4b
-  holds the claim to its fence.
-- **§5 — THE PILOT's SECOND REPORT, AND THE INDEX STAMPED**: every entry carries its block's stamp and `check_it` §5 reds on drift; IS's
-  rows brought current — fourteen entries touched by hand (twelve rows mended: five IS's amendments or IT's own left stale,
-  seven the pilot's close-read found; one written; the core's RULINGS OWED re-pointed) — and every one of the 134 stamped once
-  (IT's report, §5).
-- **THE INSTRUMENTS.** `check_it` is new (§0, §1, §2, §3, §5). Re-pointed: `check_ij` §3 (180 rows to `check_it` §2), `check_iq` §2 (§2f,
-  the catalogue), `check_fg` §4 (§4b, the fence), `check_is` §5 (the core's RULINGS OWED read by role), and 30 targets' windows and
-  picks (§3b). `gate_fixture.gd` holds the window helpers and the text-holder reader `check_ij` and `check_it` share.
-- **THE VERIFICATION** — `docs/reports/IT.md` §9.
-- **`CLAUDE.md` IS 484,879 B = 473.51 KiB AGAINST ITS 510 KiB CEILING — 36.49 KiB UNDER** (−8,916 B at IT: the strike cut
-  11,049 B and IT wrote +2,133 B): 4.5 batches at EZ's record (8,293 B), 12.5 at the mean of IO–IS (2,992 B). The strike
-  bought its batches once; the rate is unchanged.
-- **`docs/state.md` IS 327,579 B = 319.90 KiB AGAINST ITS 380 KiB CEILING — 60.10 KiB UNDER** (+4,083 B at IT, this line
-  included: IT's own writing +8,140, the archive's cut −4,057; its fenced structure +2,086 of the writing): 9.2 batches at the
-  honest rate (6,712 B, the mean of IP–IT's own writing outside a fence).
+- **§3 — THE NINE HOLD THEIR CARD's FIGURE (IT's ruling 1).** Each re-valued, the `+ 1` gone from every apply, recast row and the
+  Mantle rider, the cards reading each through `{=Battle.X}`, `check_iq` §2f's doors re-pointed; no read wanted the lower value,
+  so none was renamed. **No magnitude moved**: every player-facing text dumped through its door on both trees, 1,324 texts
+  byte-identical, and `check_iu` §3 drives each cast's applied figure.
+- **§4 — THE BOT PAYS THE PLAYER's SWAP PRICE (IT's ruling 2)**, through one builder the picker and the bot share,
+  `battle._swap_choice`. The recorded figures a swap could move — IE's and IF's dry shares, the Hourglass's Hunter — were driven
+  HEAD against the fix, 60 runs a side for each of three builds, pooled over the twelve lineages as the records were: **every
+  figure a tie, so none is re-taken** (IU's report §4). **The divergence census of record** sorts the 33 places the bot's game
+  differs: 12 RULE (2 repaired here, 10 owed — FOUND AT IU), 14 POLICY each with its reason, 5 MODEL, 2 CLOSED.
+- **§5 — SEVEN PICKS REPAIRED, THIRTEEN UNDER A CEILING (IT's ruling 3)**: the two material ones, each proved by breaking its
+  subject, and five on targets IU touched; the census's MISSES count is a ceiling that does not rise, and each standing row is
+  stamped with its target so the batch that touches it finds its row (`check_iu` §5).
+- **§0.4 — THE 438 STAY PINNED (IT's ruling 4)**, and the rule is written beside IJ's: a figure a batch re-tunes gets a
+  constant then.
+- **§1 — THE COUNT ENDED**: 193 claims in the ledger of record (`docs/reports/IU-claims.tsv`) — 169 repaired across `CLAUDE.md`,
+  the two references, `baselines.json` and `check_fg.gd`; 16 true; 3 superseded; **5 standing, each on a ruling** (IU's RULINGS
+  OWED, 1). **The ratchet**: `check_hx` §1d reads every backticked name in all four rule files, each dead name read once with its
+  mentions counted, and §1d(c) holds the live claims in dead names at the count IU left; `check_iu` §1 holds the ledger.
+- **§2 — EVERY RULE IN `CLAUDE.md` AGAINST ITS GATE**: 817 rules over the file's 120 blocks, kept (`docs/reports/IU-rules-census.tsv`,
+  every row its tree): **HELD 299, PARTLY 229, NONE 284**, five not rules; 188 of the PARTLY and NONE a gate could cheaply
+  hold, the list to work through whatever the index decides. **112 of the 120 blocks hold a NONE or PARTLY rule** — the
+  derivation the index ruling needs (IU's RULINGS OWED, 2).
+- **§6 — THE MANIFEST's COUNT IS A FLOOR**: 1,987 pins at IU (1,947 at IT), and a fall reds until the batch names its reason.
+  **§7 — `lane.sh probe` MAKES A BARE PROBE**, named inside the clearing command's last pattern; `lane.sh spent` prints the
+  command and `lane.sh strays` lists what no pattern holds.
+- **§8 — THE PILOT's THIRD REPORT, AND THE ROUTING IS A STEP** (the index section, above): the brief's thirteen subjects matched 34 rows, which with the 15-block core were opened whole (49 blocks, 133,491 B of 327,579); the close-read read the other 85 and found 30 that bore, 8 strongly — 21 ROUTED, 5 NOT ROUTED and 4 split, every unrouted row given its trigger; 30 of the 135 entries touched, 27 by hand (IT: 14 of 134) (the routing of record,
+  `docs/reports/IU-routing.md`; IU's report §8).
+- **THE INSTRUMENTS.** `check_iu` is new (§0–§8). Widened or re-pointed: `check_hx` §1d (the four rule files and the ceiling,
+  its three MISSES rows repaired, and the Faith heading's key), `check_iq` §2f's eight doors, `test_batch_be` §4,
+  `test_batch_bv` §1 and §3, `test_batch_ce` §1, `check_cs` §7's label, `suite_fixture.gd`'s Mage floor (the reading since IF
+  §2), `build_pin_manifest.py`'s floor and `lane.sh`.
+- **THE VERIFICATION** — `docs/reports/IU.md` §11.
+- **`CLAUDE.md` IS 486,160 B = 474.77 KiB AGAINST ITS 510 KiB CEILING — 35.23 KiB UNDER** (+1281 B at IU: the claims' repairs -662 B, IU's three rulings +1943 B; nothing cut): 4.4 batches at EZ's record (8,293 B).
+- **`docs/state.md` IS 326,275 B = 318.63 KiB AGAINST ITS 380 KiB CEILING — 61.37 KiB UNDER** (-1304 B at IU, this line included; the archive took 15,227 B, the closed items word for word with the cut's heading): 9.4 batches at the honest rate IT measured (6,712 B, the mean of IP–IT's own writing outside a fence).
 - **No save version moved**: no key a save carries changed.
 - **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in a build
   older than HL**: HL's ceiling refuses a newer save from HL's build on — HR's v15 is the first bump it has guarded — and HJ's and
   HK's builds, and `main`, carry no ceiling.
-- **Next letter: IU — the claims** (the roadmap, below).
+- **Next: the roadmap's authoring list** — IU was the last batch in the queue.
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### IT's RULINGS OWED — **FOUR; NONE IS PLAYER-VISIBLE, AND THE SECOND MOVES A SIM FIGURE**
+### IU's RULINGS OWED — **FOUR; NONE IS PLAYER-VISIBLE**
 
-Full working: `docs/reports/IT.md`, NEEDS A RULING.
+Full working: `docs/reports/IU.md`, NEEDS A RULING.
 
-1. **THE NINE CONSTANTS ONE UNDER THEIR CARD** (FOUND AT IT, above). IT §2a's rule says a constant's name is a claim, and nine of them
-   claim one less than the card states, the difference added where each is applied. **Re-value each to the card's figure and drop the
-   `+ 1` at its apply — no magnitude moves, and the recast tables follow — or rename each for what it holds.**
-2. **THE BOT's SWAP PRICE** (FOUND AT IT, above). The player swaps a companion for 10 Mana at 1.0; the bot pays the card's 20 at 3.0.
-   **Give the bot the player's price — every sim figure a Hunter's swap touches moves — or rule the divergence accepted.**
-3. **THE TWENTY REPORTED PICKS** (FOUND AT IT, above). **A batch of their own, as IN §4 took IM's thirty-four, or each repaired as its
-   gate is next touched** — the second leaves `test_batch_be` §4's and `test_batch_bv`'s Lethal Aim arms blind until then.
-4. **THE 438 PINS** (FOUND AT IT, above). Each is a text's figure a handler literal decides, pinned to its line and asserted every
-   battery. **Name them as IT named the catalogue's — a batch of their own, the same pass — or keep them pinned**, which IJ's rule
-   already holds as an answer: a figure no constant decides is pinned to the code that does.
+1. **THE FIVE CLAIMS LEFT STANDING, EACH ON A RULING** (the ledger of record, `docs/reports/IU-claims.tsv`, *STANDS*). GK's
+   three spine-rune names, still *PROPOSED at GK* in `CLAUDE.md` (ISN04, ISF12): **confirm them and the parenthetical goes**
+   (GK's ruling 1). The instrument file's opening sentence, which GR §2 retired in place by the paragraph after it (IR01):
+   **keep it as the retired-in-place record, or rewrite it**. The instrument file's bold sentence that nothing restates
+   `baselines.json`, which THE REST below and `CLAUDE.md`'s harness line both do (IR09, IR50): **a rule both files break, or a
+   description that names its restatements**.
+2. **THE INDEX RULING NOW HAS ITS DERIVATION** (IU §2's census of record, `docs/reports/IU-rules-census.tsv`): *a rule with a
+   gate is a reference and can be routed around; a rule with none must be read, so its block is core* — and **112 of
+   `CLAUDE.md`'s 120 blocks hold a NONE or PARTLY rule**, so by the census's own rule nearly the whole file is core. **The
+   ruling is the designer's and comes after the pilot's fourth report**, not in a batch.
+3. **THE TEN RULE DEFECTS IN THE BOT** (FOUND AT IU, below): each a place the bot plays a different game. **A batch of their
+   own, or each repaired as its code is next touched.**
+4. **A RULE AND ITS OWN GATE CONTRADICT** (IU §2's census, S3-009): the strike-loop rule says a blow path that bypasses the
+   loop owes `battle.note_blow_met` a call of its own, and `check_ft` §6c asserts that call stands at exactly one site.
+   **Obeying the rule reds the gate; one of the two is rewritten.**
 
 ### THE FIRST CLEAN PLAYTHROUGH — **2026-10-18, WARDEN, ZONE ONE THROUGH ITS BOSS; SIX FINDINGS, ALL THE DESIGNER's TO RULE OR AUTHOR, NOTHING BUILT FROM THEM (IP §0.1, §4)**
 
@@ -379,18 +401,42 @@ IL's table is `docs/reports/IL.md` §1c and IO's is `docs/reports/IO.md` §3. **
 IS THE DESIGNER's TO RE-RULE (IP §0.1)**: a normal fight booked 18.33 events and 1.17 steps, the boss 51 — THE FIRST CLEAN
 PLAYTHROUGH, above.
 
+### FOUND AT IU AND NOT FIXED
+
+- **TEN PLACES THE BOT PLAYS A DIFFERENT GAME — EACH A DEFECT** (IU §4's census of record,
+  `docs/reports/IU-bot-divergence.tsv`, *RULE*, *OWED*): DV05, a rotation's pick is cast without the door's `_ability_usable`
+  re-asked; DV06, Guard Change cast under Formless; DV07, Mass Hysteria recast onto a warband that holds it; DV11, Shrapnel
+  Charge's second body is not poisoned; DV24, a Health Potion bought at a full stack; DV25, a rune bought past the merchant's
+  `buy_refusal`; DV26, a bargain's rune cache never answered (FOUND AT HR, carried); DV27, an elite's core rune slotted before
+  its draft is answered; DV29, the zone boss's pick taken with no slot cap (latent); DV32, the experiment arms' variables —
+  `DOD_SIM_GRANT_ALL` among them (HJ's RULINGS OWED) — read with no `sim_run` gate. **And one POLICY whose reason was written
+  nowhere** — DV13, Called Shot's spot (Sunder on an armoured body, else Exposed, never Break): the census row holds it now.
+- **RULES THE CODE BREAKS AT HEAD, FOUND BY IU §2's READERS AND VERIFIED IN THE CODE BY EACH**: the draft block's *do not write
+  `12 * 8` again* (`test_batch_ce` and `test_batch_cd` still assert `> 12 * 8`); *the ledger books what left the bar* (the
+  Blood Price rune's `note_resource_spent` books a Rage-equivalent of health that never left it); HO §0 (`battle.gd`'s comment
+  over Faith's mitigation speaks the threshold as five, which neither `check_hp` §6's phrases nor `check_it` §2c can see); and
+  the contagion reservation may be breached by the live Shared Ruin rune, which moves Ruin stacks between enemies when a mark
+  detonates — **the designer's to rule**, and no claim was recorded.
+- **GATES THAT HOLD LESS THAN THEIR RULE CITES THEM FOR** (each a PARTLY or NONE row of the census, and a gate could hold most
+  cheaply — the census's `cheap` column): `check_cs` §5 tests its own copy of the bot's roll, not the bot's; `check_cz` §3's
+  `HEALS_STAY` holds 14 of `Ability.HEAL_SPECIALS`' 18 (Salve unchecked); `check_cl_width` only reports; `check_co` never fails
+  on an inert member and its `MUST_NOT_GATE` misses the four power-not-magnitude cards; `check_if` §1b runs on the free clock
+  (`run_battery.sh` passes `--fixed-fps` to `test_batch_bl` alone); the debug table's *not for deletion* is a notice in
+  `check_hx` §1c, never a red; the flat 150g is asserted over 79 of the 103 live runes; `check_is` §6 reads batch codes A–I
+  only; `check_is` §4 checks two of the three bot ally pools; `test_batch_bx` §4b's file set omits `scripts/runes.gd`; and
+  `test_batch_bo` §5 is blind to slot 0 (FOUND AT GL's Quick Shot), so its row reads PARTLY.
+- **STALE CLAIMS OUTSIDE THE CLAIMS POPULATION, MET AT IU's ROUTING AND ITS CLOSE-READ**, each on record where it stands:
+  FOUND AT HV's two `CLAUDE.md` lines, HY's *HD §2's four*, GA's EU reading, GF's Resonance half, FW's *four death-refusals*
+  (now `docs/combat-rules.md`'s) and GR's ways-of-working header. **And the copies IU's repairs left in comments** — each an
+  asserted surface, repaired with its subject: `check_ec.gd`'s header, `check_ea.gd`'s, `run_battery.sh`'s `check_de` comment,
+  `gate_fixture.gd`'s window note, `test_batch_bi.gd`'s, `check_fo.gd`'s Overkill note, `check_gs.gd`'s *PROPOSED at HL §1*,
+  and three `battle.gd` comments (the `_book_self_cost` header and two more).
+
 ### FOUND AT IT AND NOT FIXED
 
-- **NINE CONSTANTS NAME ONE LESS THAN THEIR CARD STATES** (IT §2's derivation; `check_iq` §2f reads each through its `+ 1`):
-  `SLOW_BURN_TURNS`, `HOARFROST_TURNS`, `FROSTBIND_TURNS`, `RESONANT_FIELD_TURNS` and `EMBERKEEP_TURNS` hold 3 where each card says
-  *4 turns*; `PRECISION_GRANT_TURNS` and `PRECISION_PERFECT_GRANT_TURNS` hold 3 and 4 for *4* and *5 turns*; `BERSERK_STRIKES` holds 3
-  for *4 STRIKES*; `MANTLE_HOPS` is one under *three times*. Each has 1 added where it is applied — a self-cast's tick offset, or a
-  Perfect folded in — so no figure is wrong and every name is a claim one off (IT's ruling 1). **And two the other way**,
-  on record at FOUND AT GL and owed a look: `BATTLE_TRANCE_TURNS` and `MANA_WELL_TURNS` hold their card's *4 turns*, applied bare,
-  and their ticks run after `tick_statuses`, so each pays three.
-- **THE BOT's SWAP PAYS THE CARD's PRICE, THE PLAYER's PAYS THE SWAP's.** The picker's swap clone costs `SUMMON_SWAP_COST` (10 Mana) at
-  `SUMMON_SWAP_DELAY` (1.0); the bot swaps by casting `_summon_choice`'s call at Summon Companion's own 20 Mana and 3.0, so the sim prices
-  every swap 10 Mana and 2.0 initiative dearer than play — the bot not playing by the player's rules (IL §3) (IT's ruling 2).
+- **TWO CONSTANTS HOLD THEIR CARD's FIGURE AND PAY ONE LESS** (on record at FOUND AT GL, owed a look; IT met them beside the nine
+  IU re-valued): `BATTLE_TRANCE_TURNS` and `MANA_WELL_TURNS` hold their card's *4 turns*, applied bare, and their ticks run after
+  `tick_statuses`, so each pays three.
 - **SIX CONSTANTS ARE DECLARED AND READ NOWHERE**: `VENDETTA_CUT`, `SPITE_CAP`, `FIREDRAW_TAKE`, `PYRE_SHARE`,
   `THRESHOLD_LOCK_TURNS` and `ASHES_RETURN` (each named once in the comment-stripped game code; each one's `_PERFECT` twin is read
   where there is one). Two were on record before IT — `FIREDRAW_TAKE` at FOUND AT IE and Small, and still owed, `ASHES_RETURN` at
@@ -404,30 +450,15 @@ PLAYTHROUGH, above.
 - **THE CHILLED STATUS ROW CANNOT READ ITS CONSTANT**: `STATUS_INFO`'s *4 stacks FREEZE* is `BattleUnit.CHILLED_FREEZE_STACKS`, and a
   `const` in `battle.gd` naming a `BattleUnit` constant does not parse under the battle/unit cycle (measured at IT: `STATUS_INFO` failed
   to parse, and `check_parse` read it). The row keeps its *4*; `check_it` §2 pins it to the constant.
-- **THE PLAYER-FACING TEXTS' REMAINDER: `check_ij` §3's 438 PINS.** The brief's population is every figure a player-facing text states
-  whose decider is a handler literal; IT named the catalogue's (173 figures — the ones §2b's door and §2c's widening are about), which
-  moved 180 of `check_ij` §3's pins to `check_it` §2. **The 438 still there are the rest of that population**, each a text's figure a
-  literal decides, pinned to its line (IT's ruling 4).
 - **THE CATALOGUE's WORDS THAT COUNT ITS STRUCTURE ARE HELD BY NOTHING**: 40 of its 94 word figures — *one mark at a time*, *a second
   enemy*, *the four* — count a card's own shape, which the code's structure decides and no figure does; `check_iq` §2f holds the 54 a
   constant or a field decides (the kept table, `docs/reports/IT-catalogue-figures.tsv`, marks the 40).
-- **TWENTY POSITIONAL PICKS ARE REPORTED, NOT REPAIRED** (the census of record, `docs/reports/IT-positional-census.tsv`, *REPORTED*):
-  `check_ft` ×3, `check_hk` ×2, `check_hl` §1e's special reads, `check_ht` §2, `check_hx` ×3, `check_hy` §6, `check_ig` §1b,
-  `gate_fixture`'s returning bodies, `test_batch_at`'s CLAUDE.md read (vacuous, a known sibling), `test_batch_be` §4, `test_batch_bv`'s
-  Lethal Aim read, and the four tranche reads that run to the end of `classes.gd` (`bt`, `bu`, `bv`, `ce`) — the brief's own stop (IT's
-  ruling 3). **Two are material**: `test_batch_be` §4's slice now holds two `return`s, so deleting the Break arm's stays green; and
-  `test_batch_bv`'s Lethal Aim pick lands on the crit-chance line, and against the real block its Crossfire predicate reads false — the
-  arm is green only on the wrong occurrence, so its repair re-writes the predicate too.
+- **THIRTEEN OF THE TWENTY REPORTED PICKS STAND, HELD BY A CEILING** (IU §5): each is repaired by the batch that next touches
+  its target — the census of record's `iu_disposition` column stamps each row with its file, and `check_iu` §5 reds a touched
+  target whose row still stands.
 
 ### FOUND AT IS AND NOT FIXED
 
-- **`CLAUDE.md` CARRIES STALE CLAIMS BESIDE ITS CLOSED MATTER — THE CLAIMS BATCH's INPUT** (the census's readers noted each and
-  listed none as closed; the census file's `notes` column holds them): Communion's *1–2 band, peaking at 30%* (7 since HL §3); the
-  Faith heading's *trades depth for frequency*, which HL §3 reversed; Instinctive Rotation cited as setting a delay to zero (its
-  field has no writer); *the two below* where the instrument file says three; the tag block's *149 draft cards* (179); the
-  zone-boss blockquote's *chain of three pools* (two since GP) and the GP block's dated counts; *sixteen of the sixty live runes*,
-  *retired 67*, *171 entries*; *the Rune of the Bared Guard is KEPT* (retired at ET); a *threshold-gated* charter FN retired;
-  *spec_draft_pool (10–13)*; CK's layout pixel figures; *names PROPOSED at GK*; and *(CO §3)*, a report that does not exist.
 - **THE CRYOMANCER's TURN-START UPKEEP IS THE ONE SAME-TURN HOLD ROUTE** (IS §3b): Eternal Winter and Winter's Grasp would lay a
   hold at the top of his own turn, before he acts, and Shatter and Winter's Toll would pay that hold one turn for none. Nothing
   writes either field; `check_is` §3b reds the day one is written, and then the floor is the designer's.
@@ -440,12 +471,6 @@ PLAYTHROUGH, above.
 
 ### FOUND AT IR AND NOT FIXED
 
-- **THE CLAIMS STAND AT 87, AND THE COUNT CARRIES NOTES FOR THE BATCH THAT REPAIRS THEM** (the recount, `docs/reports/IR-claims-census.md`,
-  one row a claim against today's file and code): **CR04 is false for a new reason** — four of its six named banks are display chips
-  since IG §1 and never touch `update_status`, so *seven* would be as wrong as *six*: its population is re-derived, not re-counted;
-  **CR12's count grew** (five sites store Burn's power since IE §3b); **eleven rows are a batch's measurement in the present tense**
-  (IR03, IR04, IR14–IR20, IR58, IR62), where HY §6's rule may want the past tense rather than a new figure; and two claims have copies
-  outside the references (`baselines.json`'s `check_cm_live` note, IR41; `check_fg.gd`'s header, IR05).
 - **THREE LATENT FLOOR SHAPES NOTHING WRITES TODAY** (IR §1d's census; the fourth, Sacred Resolve's RECOIL split, is
   closed by IS §3a's rule — a recoil of nothing splits to nothing): Sacred Covenant's Faith floor is gated on the heal
   field, not the Faith; Slow Acting would lift Thin Blood's zero poison tick back to 1; and the temporal rift reads a blow's
@@ -454,10 +479,6 @@ PLAYTHROUGH, above.
 
 ### FOUND AT IQ AND NOT FIXED
 
-- **`CLAUDE.md`'s STARTER-RUNG BLOCK SAYS CLEARING RUNG 1 IS THE ONLY THING THAT OPENS TIER 1** — beating the end boss on any rung opens
-  it (`Profile.note_end_boss` sets the tier to the rung beaten, and `Talents.tier_open` opens every tier at or below it), and the
-  draft deals all three rungs with no gate. `master.html`'s copy is repaired; the rule file's is a claim, counted at IR and left for the claims batch, and `talents.gd`'s
-  comment at its head repeats it.
 - **THE FORMLESS CHIP SAYS NO RECOIL FOLLOWS, AND ONE DOES** — `battle.gd`'s `formless` status text against the recoil its expiry
   applies: a player-facing sentence the census found beside `master.html`, not repaired here.
 - **CODE COMMENTS REPEATING WHAT THE CENSUS FOUND FALSE** — an asserted surface (DF §1), each repaired with its subject: `talents.gd`'s
@@ -465,8 +486,6 @@ PLAYTHROUGH, above.
   makes 53%), Mark of the Hunt named as an engine-gated boss card, `battle.gd`'s *59* recast-gated abilities (63 refuse), Blood
   Offering's *40* Rage (60), Berserk's *4 on a perfect* and *spends all three* (four charges, always), and *converts depth into width*
   in two places.
-- **`CLAUDE.md`'s RELIC BLOCK COUNTS 25 READ SITES** of `relic_add` and `relic_dict`; the game holds 22, 26 with the sim's. A claim, counted at IR
-  beside the starter-rung one and left for the claims batch.
 - **`check_hn` §2a's WORN ARM READS THE BAG's RUNE** (IQ's position census, read and not driven): `got_worn` keeps the last *Fourth
   Stack* on the Cleric's list, and since HR §1's hand-out the bag's copy lands there after the worn one, so the worn rune's rename is
   asserted by no arm — an instrument defect older than IQ.
@@ -507,8 +526,6 @@ PLAYTHROUGH, above.
 - **TWO CLERIC CLAUSES LAY A STATUS WITH NO SOURCE AND ARE DORMANT** — Dark Pact's Invigoration (`invigoration_ranks`) and
   Blessed Vestments' ward (`vestments_pct`): no writer in the tree, so no fight reaches either, and IL §1 left both. Each owes
   the Cleric as its source the day its field is written; `check_il` §1a reds that day, naming the field.
-- **`docs/combat-rules.md`'s HEADER CLAIM IS STALER AGAIN** — IL wrote into its DI block (*a status is applied with its `src`*).
-  Among the 86, IO's (FOUND AT HZ).
 ### FOUND AT IK AND NOT FIXED
 
 - **OTHER SUNDERS LAY THEIR OWN DURATIONS.** `BattleUnit.SUNDER_TURNS` is Sunder's own — Crushing Blow's and a Perfect Sever's —
@@ -531,10 +548,6 @@ PLAYTHROUGH, above.
 
 ### FOUND AT II AND NOT FIXED
 
-- **`docs/combat-rules.md`'s HEADER CLAIM IS STALER AGAIN** — II wrote into the frame block (the two layer-framed sites, the closed
-  partition) and the recap block (the tick's credit). Among the 86, IL's (FOUND AT HZ).
-- **`CLAUDE.md`'s RARITY BLOCK SAYS THE LIVE RUNES *read 100g*** — stale since HK §3 set 150g; the census met it (slice 3). The stale-
-  claims shape, in the required read rather than a reference.
 - **`check_dr`'s PRINT-ONLY `TICK_SITES` NAMES THREE NODES FX DELETED** (Frostbound Hours, Practised Hands, Follow-Through) — the census
   met it (slice 4); nothing asserts on it.
 - **CHAIN IGNITION's BURN IS LAID WITH NO SOURCE** (`_update_talent_chips`) and is dormant (`ember_wind` has no writer): the day it
@@ -576,9 +589,9 @@ PLAYTHROUGH, above.
   rotation's — Firestorm, Flamewave, Immolate — and understates a player who casts what he drafted. One case each, the bot's.
 - **`DISPEL_NEVER` KEEPS `spec_passive` AND `spec_passive_2`**, inert since §2a (no status carries either); `check_el` and
   `test_batch_bq` pin them.
-- **THE CENSUS's OWN, READ AND NOT DRIVEN**: Ember Leap's half-the-turns fires on Ember Debt's refund, which consumes nothing; eight
-  Cleric rotation arms test `ab.cost` where the door uses `_eff_cost` (under Warded he can pick a card he cannot afford); two
-  stale comments (`battle.gd`'s *Frostbolt the mark* — slot 0 is Magic Bolt — and Firedraw's *UP TO 4*, which takes 6).
+- **THE CENSUS's OWN, READ AND NOT DRIVEN**: Ember Leap's half-the-turns fires on Ember Debt's refund, which consumes nothing;
+  and two stale comments (`battle.gd`'s *Frostbolt the mark* — slot 0 is Magic Bolt — and Firedraw's *UP TO 4*, which takes 6).
+  (Its third finding, eight Cleric arms testing `ab.cost`, was closed at IN §3 — IU's divergence census, DV04.)
 
 ### BOIL OVER'S RATE — **0.8% AND THE 40% FLOOR STAND (IA §0.1, the designer's); THE TENSION IS RECORDED HERE AND THE LEVER IS UNBUILT**
 
@@ -665,14 +678,9 @@ block.
 
 ### FOUND AT HY AND NOT FIXED
 
-- **FOUR STALE CLAIMS HY's RE-READ MET, REPORTED AND NOT REPAIRED (§6's rule: repair or report each).** Three are among HX's
-  87, which stay a batch of their own by ruling: `docs/combat-rules.md`'s header, *every block below is byte-identical to what
-  stood in `CLAUDE.md`* (HU §3b's bullet, and now HY's frame bullet, were written there after the split); `_book_self_cost`
-  *reaches the recap's ledger and nothing else* (it writes the save too, through `_bank_party_losses`, since GH); and the crit
-  total's *twelve statements carrying thirteen terms* (thirteen and fourteen since HB's pity meter). **The fourth stands inside
-  a block moved byte for byte**: HG's supersession block cites *HD §2's four* as retirements that print what they used to
-  read, and only `check_du`'s and `test_batch_az`'s do — `test_batch_ar` prints the new reading, and `test_batch_ba` prints
-  nothing. The one claim HY's own change falsified, the reference's list of this file's readers, was repaired.
+- **HG's SUPERSESSION BLOCK CITES *HD §2's FOUR* AS RETIREMENTS THAT PRINT WHAT THEY USED TO READ** (HY's re-read, reported): only
+  `check_du`'s and `test_batch_az`'s do — `test_batch_ar` prints the new reading, and `test_batch_ba` prints nothing. The block
+  was moved byte for byte. The other three claims HY's re-read met were repaired at IU §1 (CR02, CR09, CR10).
 - **TWO OF §1c's SIX RETALIATION SITES ARE FRAMED AND DORMANT**: Spite (`spite_ranks`) and the Whole Forest's bite
   (`whole_forest`) have had no writer since FX, so no fight reaches either; each now deals under its owner's frame and puts the
   swing's back, and `check_hy` §5 drives both with the field set by hand. A batch that writes either field again inherits the
@@ -682,8 +690,6 @@ block.
 
 - **THE `boil_over` STATUS HAS NO WRITER SINCE HZ §2** — `unit.frenzy_bonus()` still reads it, `STATUS_INFO` keeps its row and
   `check_hw` §1a prints it; kept, the `spite_ranks` and `whole_forest` shape.
-- **`docs/combat-rules.md`'s HEADER CLAIM, *every block below is byte-identical to what stood in `CLAUDE.md`*, IS STALER** — HZ
-  edited two more of its blocks (the intent block, the recap-ledger block). Among HX's 87, a batch of their own.
 
 ### RULED AND NOT BUILT — **FROM HX's BRIEF; BOIL OVER, HY's, IS BUILT AT HZ §2**
 
@@ -748,14 +754,6 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
   **Whether to build the block index, for which file, or HV's pilot first, is IQ's ruling 2: nothing waits on another
   measurement.**
   **THE ORDER:**
-- **THE CLAIMS ARE THE NEXT BATCH (IU): 87 STAND, AND ITS INPUT GREW AT IT** — counted at IR (FOUND AT IR, above): HX's 87 less IA §5's
-  and HY §4's, plus IQ's two (`CLAUDE.md`'s starter-rung block, *clearing rung 1 is the only door*, and its relic block's 25 read sites
-  against the game's 22), **plus IT's 24 from `CLAUDE.md`** — IS's census's 22 SUPERSEDED and DONE items (a claim about the code,
-  checked against the code: IT's brief §0.1) and items 6 and 10, whose record was not where the census names it, so they were not
-  struck (the list: FOUND AT IT, above; the ledger `docs/reports/IT-claude-strike.md`) — plus IS §1's readers' notes (FOUND AT IS,
-  above) and IR's recount's notes (FOUND AT IR, above).
-  The per-batch re-read stops the backlog growing and does not retire it. **The Cairn's *weight 8* is not one of them and is true** (an
-  event's weight; IL §0.5).
 - **MANA STAYS (ruled).** The finding was that the Mage and the Hunter run dry and only the Cleric is always full; **measured at IE
   the sim does not show it**, and IF found the cause the designer saw — the Cracked Hourglass refilled the Cleric and not the Hunter
   (repaired, IF §0.1b); the rate is unmoved and is ruled after the readout (IF's rulings 1 and 2). **Channel's tempo payout — Mana
@@ -772,9 +770,10 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
   fallen hero stays down between fights (it prices three crest runes, two relics, an event and the map's Revive Potion — IL §0.5); Tithe's read site; **the strike
   payouts' widening, a measurement — and whether Profligate's price narrows with its payout, a magnitude (both IK §5)**; **no page key and no targeted debug card pick** — each available if
   the designer asks (HU; recorded nowhere in this file until HX).
-- **IW — THE PILOT's DECISION** (IS's brief §5): whether a bounded read is a sufficient read, read off the reports' three lists
-  (opened, needed, and found at the close to have borne on the work and not opened) — and then whether the 380 KiB ceiling is
-  restated on the read, and whether `CLAUDE.md` takes an index. **No ceiling moves before it.**
+- **THE PILOT's DECISION IS THE DESIGNER's, AFTER ITS FOURTH REPORT — NOT A BATCH (IU's brief §10)**: whether a bounded read is a
+  sufficient read, read off the reports' three lists (opened, needed, and found at the close to have borne on the work and not
+  opened) — and then whether the 380 KiB ceiling is restated on the read, and whether `CLAUDE.md` takes an index, for which IU §2's
+  census is the derivation (IU's RULINGS OWED, 2). **No ceiling moves before it.**
 - **THE LOOK-LIST — WHAT A GATE CANNOT READ: WHETHER A SCREEN READS WELL (IS's brief §0.1, the designer's).** A gate reads a rect;
   it cannot read whether what is drawn reads right. **Every batch that moves something on screen adds a row here**, so the rows are
   cleared in one sitting rather than one message at a time. Nothing waits on a row.
@@ -793,13 +792,9 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
   the roll only). Reachable only by a saved queued offer of a now-refused rune.
 - **A COPIED ELEMENTAL WEAKNESS SKIPS ITS DOOR'S LAST STEP**: `_apply_elem_weak` rewrites the chip to the value, the copy wears
   the table's *EW* and pays the same — display only, the hold's shape a fourth time, one line to route.
-- **STALE LINES IN `CLAUDE.md`**: the rune-scope block's *(the block THE PARTY SCOPE, AND THE TWO RUNES IT HOLDS below); two
-  entries carry it* (five carry the scope since HP); the drop block's *HO's rule that one choice is never two things* (HL §1's);
-  the governor table's Ruin *never clears* (the live Open Wound rune decays it a stack a turn); the no-engine block's kit list
-  omits Pommel Strike's Stun. **And in `docs/combat-rules.md`** (§3e's audit): the crit block's *twelve statements, carrying
-  thirteen terms* (fourteen since HB's pity meter), the charges block's *single-target* premise (Seeking Missiles since HF),
-  the header's *byte-identical* (HU edited CR §1), HU's own *as every other caller does* (Frostbind's mate forwards `force`), the
-  clamp list and the six banks one site short each, and the BURN MAGNITUDE line (HR's, carried).
+- **TWO STALE LINES IN `CLAUDE.md`, OUTSIDE IU's CENSUS**: the drop block's *HO's rule that one choice is never two things*
+  (HL §1's, by HV's reading), and the no-engine block's kit list, which omits Pommel Strike's Stun. The rest of HV's — the
+  rune-scope block's entries, the governor table's Ruin and the combat file's six — were repaired at IU §1.
 ### FOUND AT HT AND NOT FIXED
 
 - **`run_battery.sh` DOES NOT ASK WHETHER THE GAME IS OPEN, AND A PLAYER-FILE ARM CANNOT TELL A GATE'S WRITE FROM THE PLAYER'S**:
@@ -860,8 +855,8 @@ lift the chip and leave the meter. **The Warrior's half is a status he already l
   four Overburn refund consumers (six)~~ — **ALL SEVEN CORRECTED AT HT §3**, with every copy found off the document (the
   glossary's Overburn, the Glacial Hold rule text, three `battle.gd` comments and one in `classes.gd`); ~~`CLAUDE.md`'s DR §1
   block lists Burn and Chilled among statuses exclusive to a class and its recast block says a re-application resolves as
-  `max()`~~ — **BOTH CORRECTED AT HS §1**; `docs/combat-rules.md` calls Burn's crit snapshot *a BURN MAGNITUDE* (nothing
-  reads it); and six code comments are stale (§4h names them). None is player-facing; each is a sweep for the batch that
+  `max()`~~ — **BOTH CORRECTED AT HS §1**; the combat file's *BURN MAGNITUDE* was repaired at IU §1 (CR12); and six code
+  comments are stale (§4h names them). None is player-facing; each is a sweep for the batch that
   touches it.
 - **THE SIM NEVER ANSWERS A BARGAIN'S RUNE CACHE**, so every supply figure it prints omits 0.8–1.15 runes a hero a run.
 ### FOUND AT HP AND NOT FIXED
@@ -1249,10 +1244,6 @@ Full working: `docs/reports/GR.md`, NEEDS A RULING.
 
 ### FOUND AT GR AND NOT FIXED
 
-- **A POINTER INSIDE A MOVED RULE HAS POINTED AT THE WRONG PLACE SINCE EF.** *A status is applied with its `src`*
-  says *"see the second standing rule below, which DJ earned from this"* — DJ §3's *a number quoted from one document
-  into another stops being a measurement*, which EF moved to `docs/instrument-rules.md`. Moved byte for byte: a
-  pointer correction is a rule edit, and GR edits none.
 - **`docs/ways-of-working.md`'s HEADER STILL NAMES TWO RULE FILES** — *"`CLAUDE.md` and `docs/instrument-rules.md`
   bind what a batch DOES"*, and *"a third file and not a third seam"*. True of what it names and silent on the third.
   Not edited: the brief did not list the file, and `check_fr` reads it line by line.
@@ -1542,7 +1533,7 @@ Full working: `docs/reports/GK.md`, NEEDS A RULING.
   ability*) holds from one side only, and six of the eight upgrades stack when stamped twice (FE §2: Honed 25 → 38
   → 57). Read in the code at GF, not driven.
 - **COPIES OF TWO CLAIMS THE GLOSSARY CORRECTED ARE LEFT IN A RULE AND IN COMMENTS.** `CLAUDE.md`'s governor table
-  still calls Resonance uncapped with two removers and Ruin never-clearing; `battle.gd`'s comment above the Arcanist's
+  still calls Resonance uncapped with two removers (its Ruin half repaired at IU §1, S3-C08); `battle.gd`'s comment above the Arcanist's
   `second_max = 99` says Resonance has no ceiling at all, and the header of Runaway Resonance's first clause says
   nothing removes it. *(Arcane Arrows' constant is the six the card pays, and read, since IT §2, and its comment names
   it — archived at IT.)* None
@@ -1674,9 +1665,8 @@ and why the file has not been written since 2026-08-30.
 
 ### FOUND AT GA AND NOT FIXED — **THREE OF THE FOUR CLOSED AT GB §4; NONE IS PLAYER-FACING**
 
-- **Two claims in `docs/instrument-rules.md` are dated readings that GA did not re-derive, and it says so rather than
-  passing them:** DX §1's *"THIRTY-FIVE ASSERT A FLOOR NOW"* and EU's *"ALL FIVE ARE CORRECT TODAY"*. GB's brief
-  did not include that file either.
+- **A CLAIM IN `docs/instrument-rules.md` IS A DATED READING GA DID NOT RE-DERIVE**: EU's *"ALL FIVE ARE CORRECT TODAY"*. DX §1's
+  *"THIRTY-FIVE ASSERT A FLOOR NOW"*, the other, was repaired at IU §1 (IR10).
 ### FOUND AT GE AND NOT FIXED — **LONG DRAW IS STILL A GAIN ON THE PLAYER'S MODEL (OWED A RULING), AND ITS NEW WORDS AWAIT CONFIRMATION**
 
 - **OWED A RULING: THE DRAIN MADE LONG DRAW'S GAIN SMALLER, NOT A TRADE, ON `check_cs`'s OWN MODEL.** With the rune
@@ -2806,7 +2796,7 @@ repair.** Both are reported and neither was taken.
   `check_co` saturates by casting at grade `"good"`, so a `_recast_writes` entry proposing the
   PERFECT's duration improves on what is standing every time and the card never refuses. Salve did
   exactly that on the first run. `emberkeep` is not a counter-example — its handler writes
-  `EMBERKEEP_TURNS + 1` unconditionally. **A `special` carrying a POWER needs its own arm rather
+  `EMBERKEEP_TURNS` unconditionally (the card's figure since IU §3). **A `special` carrying a POWER needs its own arm rather
   than a `RECAST_SELF_PLAIN` row**, because that table writes `power: 0`.
   **WHEELING CUT DELIBERATELY DID NOT JOIN**: it deals real AoE damage and Break, so a recast is
   never wasted, which is why no damaging card is in that list. `check_co` refuses all but
@@ -3349,8 +3339,8 @@ reach `bp` §7 at all: it is a Warrior flow.**
   to zero the batch that fixes the card, and its row in `baselines.json` says so.
 - **`check_cm_live` reports 4 failures — 4 TO 5 SINCE IE. THIS IS THE OLDER OF THE TWO REDS THAT ARE ON PURPOSE.** Identical on
   unmodified HEAD, recorded as owed in the gate itself. **DB confirmed the four are byte-identical
-  before and after the gate consolidation; DC through DR confirm them again.** It is the only thing
-  that presses the defensive bar.
+  before and after the gate consolidation; DC through DR confirm them again.** It drives an attack at
+  the defensive bar; `check_fh` §7 presses the bar itself.
   **AND FH NAMED THE CAUSE: THE FOUR ARE ONE FACT, NOT FOUR DEFECTS.** `_defensive_brace` chooses
   between the bar and a bot roll on `_nobody_can_press()`, which is
   `sim or autoplay or DisplayServer.get_name() == "headless"` — so under **every** gate in this

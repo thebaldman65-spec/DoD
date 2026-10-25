@@ -4,6 +4,30 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The claims, and what the ruling needs (Batch IU) — 2026-10-24
+
+**Why a constant holds its card's figure rather than one less.** Nine constants held one under what their card states and added the
+one where they were applied, so the relationship between the number and the words lived in two places: the card's arithmetic and the
+apply's. A re-tune moves the text by the right amount only while the two agree, and nothing made them agree. Holding the card's figure
+and applying it bare leaves one copy. Renaming each for what it held was the honest alternative and it lost the door — the card would
+have read *constant + 1*, arithmetic where a figure should be read.
+
+**Why the bot pays the player's price.** A sim stands in for a player and may play worse — that is a policy, a constant bias that
+cancels when two builds are compared. A price, a cooldown, a cap or a door the bot meets differently is a rule, and a sim playing by a
+different rule simulates a different game. So the swap is built once, for the player's button and the bot alike, and every other
+place the bot's game differs is listed, so the next one is found by reading a list rather than by accident.
+
+**Why the claims count ended instead of being counted again.** A backlog counted for ten batches and never repaired is a figure that
+asks nothing. Every claim left with a disposition, the remainder named with what each waits on, and two ceilings hold what is left: a
+repaired claim's false words cannot return, and a sentence about a symbol the code no longer has fails until it is read.
+
+**Why every rule was matched to its check.** A rule a check holds can be routed around; a rule nothing holds has to be read. The
+census turns the question of whether the rule file needs an index from a judgement into a count — and the count says nearly every
+block holds a rule nothing fully checks.
+
+**Why the routing is a written step.** Two batches piloted an index and read by window and grep instead. The index's value is not a
+smaller read; it is a correct one, and a correct read is only shown by writing down, before the work, what was routed and why.
+
 ## The strike, the eighty literals named, the positional family, and the alarm's fence (Batch IT) — 2026-10-23
 
 **Why a constant's name says what the figure is, and why two equal literals are usually two constants.** A naming pass's risk is

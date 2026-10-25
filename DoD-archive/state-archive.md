@@ -17,6 +17,168 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT IU — 2026-10-24, FROM `docs/state.md` AS IT LEFT IT (`36b2556`)
+
+**What came here**: IT's four rulings, all answered in IU's brief and built at IU (§3, §4, §5; the fourth kept pinned by ruling, §0.4); FOUND AT IT's four items IU closed — the nine constants one under their card (re-valued, IU §3; the two the other way stay), the bot's swap price (IU §4), the 438 pins (kept, IU §0.4) and the twenty reported picks (seven repaired, thirteen held by the ceiling, IU §5); the claims IU's ledger closed — FOUND AT IS's, IR's, IQ's two, IL's, II's two, HZ's and GR's, and the closed halves of HY's, HV's, HR's, GF's and GA's; FOUND AT IE's Cleric-arm price, closed at IN §3 (IU's divergence census, DV04); and the roadmap's claims item, done at IU.
+
+
+### ~~IT's RULINGS OWED~~ — **ALL FOUR ANSWERED IN IU's BRIEF AND BUILT AT IU (1 at §3, 2 at §4, 3 at §5; 4 KEPT PINNED BY RULING, §0.4)**
+
+Full working: `docs/reports/IT.md`, NEEDS A RULING.
+
+1. **THE NINE CONSTANTS ONE UNDER THEIR CARD** (FOUND AT IT, above). IT §2a's rule says a constant's name is a claim, and nine of them
+   claim one less than the card states, the difference added where each is applied. **Re-value each to the card's figure and drop the
+   `+ 1` at its apply — no magnitude moves, and the recast tables follow — or rename each for what it holds.**
+2. **THE BOT's SWAP PRICE** (FOUND AT IT, above). The player swaps a companion for 10 Mana at 1.0; the bot pays the card's 20 at 3.0.
+   **Give the bot the player's price — every sim figure a Hunter's swap touches moves — or rule the divergence accepted.**
+3. **THE TWENTY REPORTED PICKS** (FOUND AT IT, above). **A batch of their own, as IN §4 took IM's thirty-four, or each repaired as its
+   gate is next touched** — the second leaves `test_batch_be` §4's and `test_batch_bv`'s Lethal Aim arms blind until then.
+4. **THE 438 PINS** (FOUND AT IT, above). Each is a text's figure a handler literal decides, pinned to its line and asserted every
+   battery. **Name them as IT named the catalogue's — a batch of their own, the same pass — or keep them pinned**, which IJ's rule
+   already holds as an answer: a figure no constant decides is pinned to the code that does.
+
+### FOUND AT IT AND NOT FIXED — ITS CLOSED ITEMS (archived at IU; the section stays in `docs/state.md`)
+
+- **NINE CONSTANTS NAME ONE LESS THAN THEIR CARD STATES** (IT §2's derivation; `check_iq` §2f reads each through its `+ 1`):
+  `SLOW_BURN_TURNS`, `HOARFROST_TURNS`, `FROSTBIND_TURNS`, `RESONANT_FIELD_TURNS` and `EMBERKEEP_TURNS` hold 3 where each card says
+  *4 turns*; `PRECISION_GRANT_TURNS` and `PRECISION_PERFECT_GRANT_TURNS` hold 3 and 4 for *4* and *5 turns*; `BERSERK_STRIKES` holds 3
+  for *4 STRIKES*; `MANTLE_HOPS` is one under *three times*. Each has 1 added where it is applied — a self-cast's tick offset, or a
+  Perfect folded in — so no figure is wrong and every name is a claim one off (IT's ruling 1). **And two the other way**,
+  on record at FOUND AT GL and owed a look: `BATTLE_TRANCE_TURNS` and `MANA_WELL_TURNS` hold their card's *4 turns*, applied bare,
+  and their ticks run after `tick_statuses`, so each pays three.
+- **THE BOT's SWAP PAYS THE CARD's PRICE, THE PLAYER's PAYS THE SWAP's.** The picker's swap clone costs `SUMMON_SWAP_COST` (10 Mana) at
+  `SUMMON_SWAP_DELAY` (1.0); the bot swaps by casting `_summon_choice`'s call at Summon Companion's own 20 Mana and 3.0, so the sim prices
+  every swap 10 Mana and 2.0 initiative dearer than play — the bot not playing by the player's rules (IL §3) (IT's ruling 2).
+- **THE PLAYER-FACING TEXTS' REMAINDER: `check_ij` §3's 438 PINS.** The brief's population is every figure a player-facing text states
+  whose decider is a handler literal; IT named the catalogue's (173 figures — the ones §2b's door and §2c's widening are about), which
+  moved 180 of `check_ij` §3's pins to `check_it` §2. **The 438 still there are the rest of that population**, each a text's figure a
+  literal decides, pinned to its line (IT's ruling 4).
+- **TWENTY POSITIONAL PICKS ARE REPORTED, NOT REPAIRED** (the census of record, `docs/reports/IT-positional-census.tsv`, *REPORTED*):
+  `check_ft` ×3, `check_hk` ×2, `check_hl` §1e's special reads, `check_ht` §2, `check_hx` ×3, `check_hy` §6, `check_ig` §1b,
+  `gate_fixture`'s returning bodies, `test_batch_at`'s CLAUDE.md read (vacuous, a known sibling), `test_batch_be` §4, `test_batch_bv`'s
+  Lethal Aim read, and the four tranche reads that run to the end of `classes.gd` (`bt`, `bu`, `bv`, `ce`) — the brief's own stop (IT's
+  ruling 3). **Two are material**: `test_batch_be` §4's slice now holds two `return`s, so deleting the Break arm's stays green; and
+  `test_batch_bv`'s Lethal Aim pick lands on the crit-chance line, and against the real block its Crossfire predicate reads false — the
+  arm is green only on the wrong occurrence, so its repair re-writes the predicate too.
+
+### FOUND AT IS AND NOT FIXED — ITS CLOSED ITEMS (archived at IU; the section stays in `docs/state.md`)
+
+- **`CLAUDE.md` CARRIES STALE CLAIMS BESIDE ITS CLOSED MATTER — THE CLAIMS BATCH's INPUT** (the census's readers noted each and
+  listed none as closed; the census file's `notes` column holds them): Communion's *1–2 band, peaking at 30%* (7 since HL §3); the
+  Faith heading's *trades depth for frequency*, which HL §3 reversed; Instinctive Rotation cited as setting a delay to zero (its
+  field has no writer); *the two below* where the instrument file says three; the tag block's *149 draft cards* (179); the
+  zone-boss blockquote's *chain of three pools* (two since GP) and the GP block's dated counts; *sixteen of the sixty live runes*,
+  *retired 67*, *171 entries*; *the Rune of the Bared Guard is KEPT* (retired at ET); a *threshold-gated* charter FN retired;
+  *spec_draft_pool (10–13)*; CK's layout pixel figures; *names PROPOSED at GK*; and *(CO §3)*, a report that does not exist.
+
+### FOUND AT IR AND NOT FIXED — ITS CLOSED ITEMS (archived at IU; the section stays in `docs/state.md`)
+
+- **THE CLAIMS STAND AT 87, AND THE COUNT CARRIES NOTES FOR THE BATCH THAT REPAIRS THEM** (the recount, `docs/reports/IR-claims-census.md`,
+  one row a claim against today's file and code): **CR04 is false for a new reason** — four of its six named banks are display chips
+  since IG §1 and never touch `update_status`, so *seven* would be as wrong as *six*: its population is re-derived, not re-counted;
+  **CR12's count grew** (five sites store Burn's power since IE §3b); **eleven rows are a batch's measurement in the present tense**
+  (IR03, IR04, IR14–IR20, IR58, IR62), where HY §6's rule may want the past tense rather than a new figure; and two claims have copies
+  outside the references (`baselines.json`'s `check_cm_live` note, IR41; `check_fg.gd`'s header, IR05).
+
+### FOUND AT IQ AND NOT FIXED — ITS CLOSED ITEMS (archived at IU; the section stays in `docs/state.md`)
+
+- **`CLAUDE.md`'s STARTER-RUNG BLOCK SAYS CLEARING RUNG 1 IS THE ONLY THING THAT OPENS TIER 1** — beating the end boss on any rung opens
+  it (`Profile.note_end_boss` sets the tier to the rung beaten, and `Talents.tier_open` opens every tier at or below it), and the
+  draft deals all three rungs with no gate. `master.html`'s copy is repaired; the rule file's is a claim, counted at IR and left for the claims batch, and `talents.gd`'s
+  comment at its head repeats it.
+- **`CLAUDE.md`'s RELIC BLOCK COUNTS 25 READ SITES** of `relic_add` and `relic_dict`; the game holds 22, 26 with the sim's. A claim, counted at IR
+  beside the starter-rung one and left for the claims batch.
+
+### FOUND AT IL AND NOT FIXED — ITS CLOSED ITEMS (archived at IU; the section stays in `docs/state.md`)
+
+- **`docs/combat-rules.md`'s HEADER CLAIM IS STALER AGAIN** — IL wrote into its DI block (*a status is applied with its `src`*).
+  Among the 86, IO's (FOUND AT HZ).
+
+### FOUND AT II AND NOT FIXED — ITS CLOSED ITEMS (archived at IU; the section stays in `docs/state.md`)
+
+- **`docs/combat-rules.md`'s HEADER CLAIM IS STALER AGAIN** — II wrote into the frame block (the two layer-framed sites, the closed
+  partition) and the recap block (the tick's credit). Among the 86, IL's (FOUND AT HZ).
+- **`CLAUDE.md`'s RARITY BLOCK SAYS THE LIVE RUNES *read 100g*** — stale since HK §3 set 150g; the census met it (slice 3). The stale-
+  claims shape, in the required read rather than a reference.
+
+### FOUND AT IE AND NOT FIXED — ITS CLOSED ITEMS (archived at IU; the section stays in `docs/state.md`)
+
+- **THE CENSUS's OWN, READ AND NOT DRIVEN**: Ember Leap's half-the-turns fires on Ember Debt's refund, which consumes nothing; eight
+  Cleric rotation arms test `ab.cost` where the door uses `_eff_cost` (under Warded he can pick a card he cannot afford); two
+  stale comments (`battle.gd`'s *Frostbolt the mark* — slot 0 is Magic Bolt — and Firedraw's *UP TO 4*, which takes 6).
+
+### FOUND AT HY AND NOT FIXED — ITS CLOSED ITEMS (archived at IU; the section stays in `docs/state.md`)
+
+- **FOUR STALE CLAIMS HY's RE-READ MET, REPORTED AND NOT REPAIRED (§6's rule: repair or report each).** Three are among HX's
+  87, which stay a batch of their own by ruling: `docs/combat-rules.md`'s header, *every block below is byte-identical to what
+  stood in `CLAUDE.md`* (HU §3b's bullet, and now HY's frame bullet, were written there after the split); `_book_self_cost`
+  *reaches the recap's ledger and nothing else* (it writes the save too, through `_bank_party_losses`, since GH); and the crit
+  total's *twelve statements carrying thirteen terms* (thirteen and fourteen since HB's pity meter). **The fourth stands inside
+  a block moved byte for byte**: HG's supersession block cites *HD §2's four* as retirements that print what they used to
+  read, and only `check_du`'s and `test_batch_az`'s do — `test_batch_ar` prints the new reading, and `test_batch_ba` prints
+  nothing. The one claim HY's own change falsified, the reference's list of this file's readers, was repaired.
+
+### FOUND AT HZ AND NOT FIXED — ITS CLOSED ITEMS (archived at IU; the section stays in `docs/state.md`)
+
+- **`docs/combat-rules.md`'s HEADER CLAIM, *every block below is byte-identical to what stood in `CLAUDE.md`*, IS STALER** — HZ
+  edited two more of its blocks (the intent block, the recap-ledger block). Among HX's 87, a batch of their own.
+
+### FOUND AT HV AND NOT FIXED — ITS CLOSED ITEMS (archived at IU; the section stays in `docs/state.md`)
+
+- **STALE LINES IN `CLAUDE.md`**: the rune-scope block's *(the block THE PARTY SCOPE, AND THE TWO RUNES IT HOLDS below); two
+  entries carry it* (five carry the scope since HP); the drop block's *HO's rule that one choice is never two things* (HL §1's);
+  the governor table's Ruin *never clears* (the live Open Wound rune decays it a stack a turn); the no-engine block's kit list
+  omits Pommel Strike's Stun. **And in `docs/combat-rules.md`** (§3e's audit): the crit block's *twelve statements, carrying
+  thirteen terms* (fourteen since HB's pity meter), the charges block's *single-target* premise (Seeking Missiles since HF),
+  the header's *byte-identical* (HU edited CR §1), HU's own *as every other caller does* (Frostbind's mate forwards `force`), the
+  clamp list and the six banks one site short each, and the BURN MAGNITUDE line (HR's, carried).
+
+### FOUND AT HR AND NOT FIXED — ITS CLOSED ITEMS (archived at IU; the section stays in `docs/state.md`)
+
+- **THE CENSUS FOUND THE DOCUMENTS DISAGREEING WITH THE CODE ON FIRE AND ICE** (`docs/reports/HR.md` §4h): ~~`master.html`
+  pays Shatter per stack (the code: per turn held), gives the hold window *+15% from all sources* (hero strikes only), has
+  Firedraw take *what is there or 4* (always 6), has Emberkeep double *every Burn he applies* in one row (any hero's) and
+  lay 4 through Flamewave (a burning body skips the doubling), says only the Tyrant's frost weakness is set, and names
+  four Overburn refund consumers (six)~~ — **ALL SEVEN CORRECTED AT HT §3**, with every copy found off the document (the
+  glossary's Overburn, the Glacial Hold rule text, three `battle.gd` comments and one in `classes.gd`); ~~`CLAUDE.md`'s DR §1
+  block lists Burn and Chilled among statuses exclusive to a class and its recast block says a re-application resolves as
+  `max()`~~ — **BOTH CORRECTED AT HS §1**; `docs/combat-rules.md` calls Burn's crit snapshot *a BURN MAGNITUDE* (nothing
+  reads it); and six code comments are stale (§4h names them). None is player-facing; each is a sweep for the batch that
+  touches it.
+
+### FOUND AT GR AND NOT FIXED — ITS CLOSED ITEMS (archived at IU; the section stays in `docs/state.md`)
+
+- **A POINTER INSIDE A MOVED RULE HAS POINTED AT THE WRONG PLACE SINCE EF.** *A status is applied with its `src`*
+  says *"see the second standing rule below, which DJ earned from this"* — DJ §3's *a number quoted from one document
+  into another stops being a measurement*, which EF moved to `docs/instrument-rules.md`. Moved byte for byte: a
+  pointer correction is a rule edit, and GR edits none.
+
+### FOUND AT GF AND NOT FIXED — ITS CLOSED ITEMS (archived at IU; the section stays in `docs/state.md`)
+
+- **COPIES OF TWO CLAIMS THE GLOSSARY CORRECTED ARE LEFT IN A RULE AND IN COMMENTS.** `CLAUDE.md`'s governor table
+  still calls Resonance uncapped with two removers and Ruin never-clearing; `battle.gd`'s comment above the Arcanist's
+  `second_max = 99` says Resonance has no ceiling at all, and the header of Runaway Resonance's first clause says
+  nothing removes it. *(Arcane Arrows' constant is the six the card pays, and read, since IT §2, and its comment names
+  it — archived at IT.)* None
+  of these is player-facing. IJ §2's player-facing words name the three removers (Arcane Bolt, Stabilize, Threshold).
+
+### FOUND AT GA AND NOT FIXED — ITS CLOSED ITEMS (archived at IU; the section stays in `docs/state.md`)
+
+- **Two claims in `docs/instrument-rules.md` are dated readings that GA did not re-derive, and it says so rather than
+  passing them:** DX §1's *"THIRTY-FIVE ASSERT A FLOOR NOW"* and EU's *"ALL FIVE ARE CORRECT TODAY"*. GB's brief
+  did not include that file either.
+
+### THE PLAYTEST'S OTHER FINDINGS — ITS CLOSED ITEMS (archived at IU; the section stays in `docs/state.md`)
+
+- **THE CLAIMS ARE THE NEXT BATCH (IU): 87 STAND, AND ITS INPUT GREW AT IT** — counted at IR (FOUND AT IR, above): HX's 87 less IA §5's
+  and HY §4's, plus IQ's two (`CLAUDE.md`'s starter-rung block, *clearing rung 1 is the only door*, and its relic block's 25 read sites
+  against the game's 22), **plus IT's 24 from `CLAUDE.md`** — IS's census's 22 SUPERSEDED and DONE items (a claim about the code,
+  checked against the code: IT's brief §0.1) and items 6 and 10, whose record was not where the census names it, so they were not
+  struck (the list: FOUND AT IT, above; the ledger `docs/reports/IT-claude-strike.md`) — plus IS §1's readers' notes (FOUND AT IS,
+  above) and IR's recount's notes (FOUND AT IR, above).
+  The per-batch re-read stops the backlog growing and does not retire it. **The Cairn's *weight 8* is not one of them and is true** (an
+  event's weight; IL §0.5).
+
 ## ARCHIVED AT IT — 2026-10-23, FROM `docs/state.md` AS IS LEFT IT (`73e71a0`)
 
 **What came here**: IS's two rulings, both answered in IT's brief and built at IT (§1, §0.2); FOUND AT IS's three items IT closed — the fixed window's shape (censused and repaired, IT §3), the five positional picks (repaired, IT §3b) and the record `check_fg` §4's bar read (ES's again, IT §4); FOUND AT IQ's `check_ho` §8 window, repaired at IT §3b; the roadmap's IT entry, done; and half an item each of FOUND AT GQ (Nexus Ward's and Ministration's plain 20%) and FOUND AT GF (Arcane Arrows' stale constant), both closed at IT §2 and found by the pilot's close-read.

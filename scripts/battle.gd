@@ -850,7 +850,7 @@ const RECKLESS_PCT_PER_10 := 2    # damage % per 10 Rage actually SPENT
 const RECKLESS_PERFECT_PER_10 := 3
 const RECKLESS_STEP := 10         # ...and the size of one step, which is also
                                   # the gate: below one step the cast buys zero
-const BERSERK_STRIKES := 3        # doubled strikes banked (4 on a perfect)
+const BERSERK_STRIKES := 4        # Berserk: the doubled strikes it banks
 const BERSERK_RISK_PCT := 30      # extra damage TAKEN, its own 3-turn clock
 const BLOOD_DEBT_HEAL := 0.25     # of his max health, per bleedout of the mark
 const BLOOD_DEBT_PERFECT_HEAL := 0.35
@@ -1019,9 +1019,9 @@ const UNSLAKED_TURNS := 4                     # Unslaked
 const SPITE_TURNS := 6                        # Spite
 const SPITE_STEP_PCT := 5.0                   # Spite
 const PRECISION_AGGRO_HITS := 2               # Precision Strike
-const PRECISION_GRANT_TURNS := 3              # Precision Strike
+const PRECISION_GRANT_TURNS := 4              # Precision Strike
 const PRECISION_DEF_HITS := 1                 # Precision Strike
-const PRECISION_PERFECT_GRANT_TURNS := 4      # Precision Strike
+const PRECISION_PERFECT_GRANT_TURNS := 5      # Precision Strike (Perfect)
 const FEINT_PERFECT_PCT := 45                 # Feint
 const BATTLE_POISE_TURNS := 4                 # Battle Poise
 const FEIGNED_GUARD_TURNS := 3                # Feigned Guard
@@ -5929,7 +5929,9 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 				for want in BOT_PET_ORDER:
 					if bot_beasts.any(func(b): return b.companion_kind == want):
 						continue
-					var sw := _summon_choice(u, want)
+					# BATCH IU §4 — the SWAP the picker would offer for this companion, at
+					# its price and through its door (`_swap_choice`), never the call.
+					var sw := _swap_choice(u, _summon_choice(u, want))
 					if sw == null or not _ability_usable(u, sw):
 						continue
 					var worth := _bot_boon_worth(u, want)
@@ -5937,7 +5939,7 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 						best_worth = worth
 						best_in = want
 				if best_in != "" and best_worth > out_worth * 1.25:
-					return [_summon_choice(u, best_in), u]
+					return [_swap_choice(u, _summon_choice(u, best_in)), u]
 			# Spirit Bond when the pack is hurting.
 			var sbond := _find_ability(u, "Spirit Bond")
 			if sbond != null and u.resource >= _eff_cost(u, sbond) and u.ability_ready(sbond) \
@@ -6776,9 +6778,9 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 		return []
 	match ab.special:
 		"emberkeep":
-			return [{"id": "emberkeep", "turns": EMBERKEEP_TURNS + 1, "power": 0}]
+			return [{"id": "emberkeep", "turns": EMBERKEEP_TURNS, "power": 0}]
 		"hoarfrost_armor":
-			return [{"id": "rimeguard", "turns": HOARFROST_TURNS + 1, "power": 0}]
+			return [{"id": "rimeguard", "turns": HOARFROST_TURNS, "power": 0}]
 		"tripwire":
 			return [{"id": "tripwire", "turns": -1 if u.whole_forest > 0 else 6,
 				"power": 0}]
@@ -6804,7 +6806,7 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 		# It read exactly that way on the first run — 1 failure, "Salve still
 		# casts after landing on every target it can reach". THE RULE THE FIX
 		# ENCODES: a proposal must equal what a GOOD cast writes, which is why
-		# `emberkeep` above proposes `EMBERKEEP_TURNS + 1` — its handler writes
+		# `emberkeep` above proposes `EMBERKEEP_TURNS` — its handler writes
 		# that unconditionally, perfect or not. The perfect's fourth turn is
 		# bought at the bar, after this door.
 		"bear_brunt":
@@ -6911,12 +6913,12 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 		"anointing":
 			return [{"id": "anointed", "turns": ANOINTING_TURNS, "power": 0}]
 		"resonant_field":
-			return [{"id": "resonant_field", "turns": RESONANT_FIELD_TURNS + 1,
+			return [{"id": "resonant_field", "turns": RESONANT_FIELD_TURNS,
 				"power": 0}]
 		"hysteria":
 			return [{"id": "hysteria", "turns": -1, "power": 0}]
 		"slow_burn":
-			return [{"id": "slow_burn", "turns": SLOW_BURN_TURNS + 1, "power": 0}]
+			return [{"id": "slow_burn", "turns": SLOW_BURN_TURNS, "power": 0}]
 		"choking_smoke":
 			return [{"id": "blind", "turns": CHOKING_SMOKE_TURNS, "power": 0}]
 		"covering_guard":
@@ -7016,7 +7018,7 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 				"unyielding_pct": 0.01 * u.unyielding_ranks,
 			}
 			if ab.special == "mantle":
-				riders["mantle"] = float(MANTLE_HOPS + 1)
+				riders["mantle"] = float(MANTLE_HOPS)
 			return [{"id": "barrier", "turns": -1, "power": base,
 				"riders": riders}]
 	return []
@@ -7791,6 +7793,27 @@ func _summon_choice(u: BattleUnit, kind: String) -> Ability:
 	return call
 
 
+# BATCH IU §4 — A SWAP, AND THE ONE PLACE IT IS BUILT. At capacity a call is a SWAP, priced as
+# one: `SUMMON_SWAP_COST` at `SUMMON_SWAP_DELAY`, no cooldown of its own, and the shared
+# "Swap Companion" one `_do_summon` sets. Built off the call `_summon_choice` makes for the same
+# companion, so a companion that cannot be called cannot be swapped in either. **The player's
+# picker and the bot both come here** — the bot swapped by casting the call at the card's own
+# price until IU, and the bot may play worse than a player but never by different rules (IL §3).
+func _swap_choice(u: BattleUnit, call: Ability) -> Ability:
+	if call == null:
+		return null
+	var beast: String = call.display_name.get_slice(" ", 1)
+	var swap_desc := "Swap the pack: %s arrives with its\nswap effect%s.\nShared cooldown: %d turns." % [
+		beast, " and +1 Loyalty" if u.has_engine("pack") else "", SWAP_COOLDOWN]
+	if u.the_pack > 0:
+		swap_desc += "\nReplaces whichever companion holds LESS\nLoyalty (ties: the older)."
+	return Ability.make({"display_name": "Swap " + beast,
+		"cooldown": 0, "cost": SUMMON_SWAP_COST, "special": "summon", "delay": SUMMON_SWAP_DELAY,
+		"anim": "attack01",
+		"perfect_id": "", "perfect_text": "",
+		"description": swap_desc})
+
+
 # BATCH HB §1 — ONE CARD, THREE CALLS, AND THIS IS WHERE THE CHOICE IS MADE.
 # The three summons were three cards and the picker listed them; Summon Companion
 # is one card and the picker lists its three CALLS — `_summon_choice` builds each
@@ -7812,16 +7835,7 @@ func _open_summon_picker(u: BattleUnit) -> void:
 	if swapping:
 		_summon_opts = []
 		for a in calls:
-			var beast: String = a.display_name.get_slice(" ", 1)
-			var swap_desc := "Swap the pack: %s arrives with its\nswap effect%s.\nShared cooldown: %d turns." % [
-				beast, " and +1 Loyalty" if u.has_engine("pack") else "", SWAP_COOLDOWN]
-			if u.the_pack > 0:
-				swap_desc += "\nReplaces whichever companion holds LESS\nLoyalty (ties: the older)."
-			_summon_opts.append(Ability.make({"display_name": "Swap " + beast,
-				"cooldown": 0, "cost": SUMMON_SWAP_COST, "special": "summon", "delay": SUMMON_SWAP_DELAY,
-				"anim": "attack01",
-				"perfect_id": "", "perfect_text": "",
-				"description": swap_desc}))
+			_summon_opts.append(_swap_choice(u, a))
 	else:
 		_summon_opts = calls
 	# Call of the Wild (boss trophy) rides in the group in both modes.
@@ -15701,7 +15715,7 @@ const DETONATE_AT := 4
 # one body, and BD §4's Deadfall/Snare Trap finding is what that rule exists to
 # prevent. Doubling is worth exactly as much as the stack he built, which is the
 # deferred-damage spine stated as a card; an empty target is lit since IE §3b.
-const SLOW_BURN_TURNS := 3
+const SLOW_BURN_TURNS := 4
 const STOKE_MULT := 2
 const STOKE_MULT_PERFECT := 3
 # BATCH IE §3b — THE MAGE'S FIRE WAS READ BY MORE CARDS THAN LAID IT (the designer's finding), and
@@ -15730,7 +15744,7 @@ const KILLING_FROST_STACKS_PERFECT := 3
 # Cryomancer's, and no Mage can hold both spec pools.
 const HOARFROST_CUT := 0.25
 const HOARFROST_STACKS := 2
-const HOARFROST_TURNS := 3
+const HOARFROST_TURNS := 4
 # ARCANE BOLT: the share of his Resonance he KEEPS. It is a HALVING rather than
 # a vent to a floor, which is the whole distinction from Stabilize (the boss
 # pool's spender, which drops him to 2): the curve keeps compounding from where
@@ -15779,21 +15793,21 @@ const FIREDRAW_TAKE_PERFECT := 6
 const PYRE_WAKE_TURNS := 1
 # EMBERKEEP: the window, and the multiplier applied at APPLICATION. The
 # multiplier is a const rather than a literal 2 because the doubling is read at
-# `_apply_status` — a long way from this card — and a bare 2 there would be
+# `_apply_status` — a long way from this card — and a bare literal there would be
 # unattributable.
-const EMBERKEEP_TURNS := 3
+const EMBERKEEP_TURNS := 4
 const EMBERKEEP_MULT := 2
 # COLD IRON: what a FROZEN target multiplies the blow by. It does NOT release
 # the hold, which is the whole card and is a property of this ability never
 # calling `_hold_release` rather than of any flag.
 const COLD_IRON_FROZEN_MULT := 2.0
 # FROSTBIND: the window and the share of a blow the partner also takes.
-const FROSTBIND_TURNS := 3
+const FROSTBIND_TURNS := 4
 const FROSTBIND_SHARE := 0.40
 # RESONANT FIELD: the share of his LIVE Resonance bonus each ally deals. Half,
 # and it is read at the attacker block off his current meter — the status
 # carries no number at all (Null Field's rule).
-const RESONANT_FIELD_TURNS := 3
+const RESONANT_FIELD_TURNS := 4
 const RESONANT_FIELD_SHARE := 0.50
 # THRESHOLD: the depth it buys and how long he is locked out afterwards.
 #
@@ -15840,7 +15854,7 @@ const ELEVATION_STACKS := 2
 const JUBILEE_MIN_FAITH := 3
 # MANTLE: the shield's share of HIS maximum, and how many times it passes on.
 const MANTLE_PCT := 0.25
-const MANTLE_HOPS := 2
+const MANTLE_HOPS := 3
 # BREAKING DARKNESS (was ANATHEMA): the percentage POINTS of extra Break damage
 # the mark buys, read at `unit.take_hit`'s pressure block — THE ONE PLACE BREAK
 # IS EVER AMPLIFIED.
@@ -21202,7 +21216,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# strikes to a turn count instead would tick them away unspent on a
 			# turn he could not reach anybody, which is exactly the failure
 			# Feint's charges exist to avoid.
-			var bk_charges := BERSERK_STRIKES + 1
+			var bk_charges := BERSERK_STRIKES
 			attacker.berserk_strikes += bk_charges
 			_stamp_berserk_chip(attacker)
 			_apply_status(attacker, "berserk_risk", BERSERK_RISK_TURNS, BERSERK_RISK_PCT)
@@ -21238,18 +21252,18 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				# first thing the new guard pays for — a bypass he cannot use on
 				# the swing that found the seam would read as a bug.
 				if ps_aggressive:
-					_apply_status(attacker, "parry_up", ps_turns + 1,
+					_apply_status(attacker, "parry_up", ps_turns,
 						PRECISION_PARRY_PCT)
 				else:
-					_apply_status(attacker, "open_guard", ps_turns + 1)
+					_apply_status(attacker, "open_guard", ps_turns)
 				_message("%s finds the seam!" % attacker.unit_name)
 				_log("%s: Precision Strike from the %s guard — %s%s" % [
 					attacker.unit_name,
 					"Aggressive" if ps_aggressive else "Defensive",
 					("two cuts at %d%% and +%d%% parry for %d turns" % [
-						ps_pct, PRECISION_PARRY_PCT, ps_turns + 1]) if ps_aggressive \
+						ps_pct, PRECISION_PARRY_PCT, ps_turns]) if ps_aggressive \
 					else ("one cut at %d%% and his attacks ignore ALL armor for %d turns" % [
-						ps_pct, ps_turns + 1]),
+						ps_pct, ps_turns]),
 					" [PERFECT]" if is_perfect else ""], "#7cc8f0")
 				for ps_i in ps_hits:
 					if target.dead:
@@ -22291,7 +22305,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# alight, which is not sloppiness: fire laid inside the window is
 			# held too, so Slow Burn into Firestorm is a real line of play and
 			# not merely Firestorm into Slow Burn.
-			var sb_turns := SLOW_BURN_TURNS + 1
+			var sb_turns := SLOW_BURN_TURNS
 			var sb_n := 0
 			for foe in enemies:
 				if foe.dead:
@@ -22432,7 +22446,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# hold). Both halves live elsewhere and each says where the other
 			# is: the 25% at the strike-target block, the retaliation in the
 			# post-strike block beside Immolate's ignite.
-			var hf_turns := HOARFROST_TURNS + 1
+			var hf_turns := HOARFROST_TURNS
 			_apply_status(attacker, "rimeguard", hf_turns)
 			_sfx("parry", -7.0, 1.3)
 			attacker.float_text("HOARFROST", Color(0.62, 0.85, 1.0))
@@ -22633,7 +22647,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# correctly untouched, and every Burn HE applies rides it with no
 			# per-ability list to keep up to date. THE CAST ITSELF ONLY OPENS THE
 			# WINDOW.
-			var ek_turns := EMBERKEEP_TURNS + 1
+			var ek_turns := EMBERKEEP_TURNS
 			_apply_status(attacker, "emberkeep", ek_turns)
 			_sfx("heal", -9.0, 0.8)
 			attacker.float_text("EMBERKEEP", Color(1.0, 0.68, 0.30))
@@ -22714,7 +22728,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s: Frostbind — there is no second body to chain to" % \
 					attacker.unit_name, "#909090")
 			else:
-				var fb_turns := FROSTBIND_TURNS + 1
+				var fb_turns := FROSTBIND_TURNS
 				# THE BOND IS STORED ON BOTH ENDS AND READ FROM BOTH, so a
 				# Cleansing Rite taking it off ONE partner breaks the chain
 				# honestly rather than leaving a half-bond pointing at a body
@@ -22748,7 +22762,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# ALLIES ONLY, AND HE IS EXCLUDED DELIBERATELY: he already deals the
 			# FULL bonus, and handing him half of it again would make the card a
 			# self-multiplier on the curve it is supposed to be sharing.
-			var rf_turns := RESONANT_FIELD_TURNS + 1
+			var rf_turns := RESONANT_FIELD_TURNS
 			var rf_n := 0
 			for ally in heroes:
 				if ally.dead or ally == attacker or ally.is_companion:
@@ -22994,7 +23008,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s: Mantle finds nobody to lay it on" % attacker.unit_name,
 					"#909090")
 			else:
-				var mn_hops := MANTLE_HOPS + 1
+				var mn_hops := MANTLE_HOPS
 				var mn_power := maxi(int(round(attacker.max_hp * MANTLE_PCT)), 1)
 				# IT IS A REAL DIVINE SHIELD, granted through the ONE door, which
 				# is what makes every hop build Faith and carry Blessed Barrier,

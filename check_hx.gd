@@ -13,11 +13,13 @@
 #       said which file it belongs in, and a known block that is gone is a
 #       notice; the two written back after the seam moved to the reference at
 #       HY §4, by ruling (`WRITTEN_BACK` names any that are left).
-#   §1d THE REFERENCES' NAMES RESOLVE — every backticked file, function,
-#       constant and identifier in the two references is found in the tree;
-#       (a) and found OUTSIDE an instrument's needle, or named here with what the
-#       sentence does with it; (b) a constant's value written beside its name is
-#       the value the script declares.
+#   §1d THE RULE FILES' NAMES RESOLVE — every backticked file, function,
+#       constant and identifier in the four rule files (the two references since
+#       HX; `CLAUDE.md` and the ways of working since IU §1b) is found in the tree,
+#       or read here; (a) and found OUTSIDE an instrument's needle, or named here
+#       with what the sentence does with it; (b) a constant's value written beside
+#       its name is the value the script declares; (c) THE CEILING — the mentions
+#       of a dead name that stand as a live claim do not rise (IU §1b).
 #   §2  THE STATE ARCHIVE — `docs/state.md` names it in its own header, a reader
 #       reaches it through that name, and no section stands in both halves.
 #   §3  THE TWO RULES EVERY BRIEF WROTE BY HAND STAND IN THE INSTRUMENT RULES,
@@ -49,6 +51,16 @@
 # that reads it*). HX's census sized both populations (`docs/reports/HX.md` §1d);
 # the claims a gate can read beyond a name are read where they are cheap.
 #
+# **WHAT §1d(c) COST AND WHAT IT CAN HOLD (IU §1b).** IU widened the walk to the
+# four rule files and read every dead name it met there — 52 in `CLAUDE.md`, one
+# reading each, and each a record, an engine name or a key once IU's repairs had
+# landed — and set the ceiling at the count that was left. It holds ONE shape of
+# stale claim: a sentence about a symbol the tree does not have, written in
+# backticks. It cannot see a false count, a wrong figure, a present-tense
+# measurement, a false sentence about a live name, or a dead name in plain prose;
+# and a reading is a judgement the gate records, never one it checks. The ledger
+# of IU's 193 claims (`check_iu` §1) holds the rest of what IU repaired.
+#
 #   /Applications/Godot.app/Contents/MacOS/Godot --headless --path . \
 #       --script check_hx.gd
 extends SceneTree
@@ -72,7 +84,6 @@ const KNOWN_SHARED := [
 	"CLAUDE.md ~ instrument-rules.md: a sim that read the player's ledger would",  # RULE TEXT IN TWO FILES: RunSim calls Profile nowhere (the talent handoff and the sim bullet)
 	"CLAUDE.md ~ combat-rules.md: the crit roll a multi hit's charges the",  # seam prose: the combat pointer's scope, stated by both sides (GR §2)
 	"CLAUDE.md ~ combat-rules.md: the damage door and the attribution frame the",  # seam prose: the same scope
-	"CLAUDE.md ~ combat-rules.md: multi hit's charges the collections a loop walks",  # seam prose: the same scope
 	"CLAUDE.md ~ combat-rules.md: that is also about a card a rune",  # the tiebreak, stated by both sides of the subject seam
 	"instrument-rules.md ~ combat-rules.md: rules the file a batch is required to",  # each reference's own opening, of itself
 	"instrument-rules.md ~ combat-rules.md: a rule that belongs to two subjects stays",  # the tiebreak, in both references' preambles
@@ -119,7 +130,7 @@ const KNOWN_BLOCKS := [
 	"THE SHARPSHOOTER'S BASIC IS A SEQUENCE",
 	"REMOVING A SKILL CHECK MAKES ITS PERFECT-ONLY BEHAVIOUR UNCONDITIONAL",
 	"A PASSIVE PAID IN DAMAGE TAKEN INVERTS AGAINST EVERY BATCH THAT HELPS THE PARTY",
-	"FAITH RELEASES AT `FAITH_RELEASE`, AND THE LANE TRADES DEPTH FOR FREQUENCY",
+	"FAITH RELEASES AT `FAITH_RELEASE`, AND ONE NUMBER SETS BOTH THE HOLD AND THE RELEASE",
 	"A REVERTED CONSTANT MUST BE SWEPT THROUGH THE ABILITY CARD TOO",
 	"CARD TEXT AND COMMENTS DO NOT NAME A MAGNITUDE A CONSTANT HOLDS",
 	"A PURE BUFF COSTS HALF A SWING",
@@ -234,6 +245,7 @@ const WRITTEN_BACK := {}
 # one string `check_fi` §5 lets no file but `run_state.gd` carry.
 const NOT_REPO_NAMES := [
 	"docs/reports/<CODE>.md",
+	"docs/reports/XX.md",
 	".gd",
 	"res://data/*.json",
 	"check_*.gd",
@@ -256,16 +268,85 @@ const NOT_REPO_NAMES := [
 # of a deletion is correct and stays (EB §2: sweeping one deletes the project's
 # memory of why a symbol is gone); a KEY or a convention word is an
 # instrument's own; a LIVE CLAIM IN A DEAD NAME is the stale shape, named and
-# queued. A new member reds; a member that has gone prints a notice.
+# queued. A new member reds; a member that has gone prints a notice. **Since IU
+# §1b each line carries its MENTIONS**: a known name written into a new sentence is
+# a new claim nobody has read, and only the count shows it. **And an ABSENCE is a
+# sentence whose claim is that the tree lacks the name**: the day the game or an
+# instrument's code carries it, the sentence is false, and that reds instead of
+# printing a notice. A name that resolves nowhere at all is read here too — the
+# line's own string is what makes it resolve (`CLAUDE.md` keeps records of
+# deletions no needle pins absent).
 const KNOWN_NEEDLE_ONLY := {
-	"instrument-rules.md::wd_hold_line": "a KEY — `check_dk` §1's pin table names an entry by the node it pinned",
-	"instrument-rules.md::dv_waters": "a KEY — `check_dk` §1's pin table, re-pointed at `_next_unit()`'s walk",
-	"instrument-rules.md::CLASS_POOLS": "a RECORD of a deletion (DY §3) — the sentence says it was deleted",
-	"instrument-rules.md::_overburn_drain": "a RECORD of a deletion — EB §2's own example of one that must not be swept",
-	"instrument-rules.md::AXIS": "a CONVENTION word — the AXIS/SYNERGY comment lines six tranche suites pin",
-	"instrument-rules.md::SYNERGY": "a CONVENTION word — the AXIS/SYNERGY comment lines six tranche suites pin",
-	"combat-rules.md::wd_tank_spank": "a LIVE CLAIM IN A DEAD NAME — DK §1's reading kept in the present tense; FX deleted the node; queued at HX §1d, not repaired (the file is not HX's)",
+	"instrument-rules.md::wd_hold_line": [1, "a KEY — `check_dk` §1's pin table names an entry by the node it pinned"],
+	"instrument-rules.md::dv_waters": [1, "a KEY — `check_dk` §1's pin table, re-pointed at `_next_unit()`'s walk"],
+	"instrument-rules.md::CLASS_POOLS": [2, "a RECORD of a deletion (DY §3) — the sentence says it was deleted"],
+	"instrument-rules.md::_overburn_drain": [1, "a RECORD of a deletion — EB §2's own example of one that must not be swept"],
+	"instrument-rules.md::AXIS": [1, "a CONVENTION word — the AXIS/SYNERGY comment lines six tranche suites pin"],
+	"instrument-rules.md::SYNERGY": [1, "a CONVENTION word — the AXIS/SYNERGY comment lines six tranche suites pin"],
+	"instrument-rules.md::iu_disposition": [1, "a KEY — the positional census of record's column, which `check_iu` §5 reads (IU §0.3)"],
+	"combat-rules.md::wd_tank_spank": [1, "a RECORD — DK §1's fifth candidate, in the past tense since IU §1 (CR19); FX deleted the node"],
+	"CLAUDE.md::cr_rime": [1, "a RECORD — CU's finding, in the past tense; the node went with the trees at FX"],
+	"CLAUDE.md::CLASS_POOLS": [5, "a RECORD of a deletion (DY §3) — DY's worked example of scaffolding"],
+	"CLAUDE.md::roll_ability_offer": [2, "a RECORD of a deletion (DY §3)"],
+	"CLAUDE.md::class_pool": [1, "a RECORD of a deletion — `CLASS_POOLS`'s accessor, deleted with it (DY §3)"],
+	"CLAUDE.md::can_equip": [2, "a RECORD of a deletion — the talent system's names, DELETED, NOT ZEROED (BM; the twelve trees at FX)"],
+	"CLAUDE.md::equipped_learned": [2, "a RECORD of a deletion — the talent system's names, DELETED, NOT ZEROED (BM; the twelve trees at FX)"],
+	"CLAUDE.md::equip_cell": [2, "a RECORD of a deletion — the talent system's names, DELETED, NOT ZEROED (BM; the twelve trees at FX)"],
+	"CLAUDE.md::award_talent_points": [1, "a RECORD of a deletion — the talent system's names, DELETED, NOT ZEROED (BM; the twelve trees at FX)"],
+	"CLAUDE.md::award_spec_point": [1, "a RECORD of a deletion — the talent system's names, DELETED, NOT ZEROED (BM; the twelve trees at FX)"],
+	"CLAUDE.md::can_learn": [1, "a RECORD of a deletion — the talent system's names, DELETED, NOT ZEROED (BM; the twelve trees at FX)"],
+	"CLAUDE.md::purse_for": [1, "a RECORD of a deletion — the talent system's names, DELETED, NOT ZEROED (BM; the twelve trees at FX)"],
+	"CLAUDE.md::points_spent": [1, "a RECORD of a deletion — the talent system's names, DELETED, NOT ZEROED (BM; the twelve trees at FX)"],
+	"CLAUDE.md::MAX_PER_ROW": [1, "a RECORD of a deletion — the talent system's names, DELETED, NOT ZEROED (BM; the twelve trees at FX)"],
+	"CLAUDE.md::start_talent_points": [1, "a RECORD of a deletion — the talent system's names, DELETED, NOT ZEROED (BM; the twelve trees at FX)"],
+	"CLAUDE.md::LANE_TREES": [1, "a RECORD of a deletion — the talent system's names, DELETED, NOT ZEROED (BM; the twelve trees at FX)"],
+	"CLAUDE.md::LANE_NAMES": [1, "a RECORD of a deletion — the talent system's names, DELETED, NOT ZEROED (BM; the twelve trees at FX)"],
+	"CLAUDE.md::TIER_ROWS": [1, "a RECORD of a deletion — the talent system's names, DELETED, NOT ZEROED (BM; the twelve trees at FX)"],
+	"CLAUDE.md::CAPSTONE_ROW": [1, "a RECORD of a deletion — the talent system's names, DELETED, NOT ZEROED (BM; the twelve trees at FX)"],
+	"CLAUDE.md::LANES": [1, "a RECORD of a deletion — the talent system's names, DELETED, NOT ZEROED (BM; the twelve trees at FX)"],
+	"CLAUDE.md::CELLS_PER_SPEC": [1, "a RECORD of a deletion — the talent system's names, DELETED, NOT ZEROED (BM; the twelve trees at FX)"],
+	"CLAUDE.md::unequip_row": [1, "a RECORD of a deletion — the talent system's names, DELETED, NOT ZEROED (BM; the twelve trees at FX)"],
+	"CLAUDE.md::equipped_talents": [1, "a RECORD of a deletion — the talent system's names, DELETED, NOT ZEROED (BM; the twelve trees at FX)"],
+	"CLAUDE.md::_target_lane": [1, "a RECORD of a deletion — the talent system's names, DELETED, NOT ZEROED (BM; the twelve trees at FX) — the lane build `DOD_SIM_BUILDS` drove"],
+	"CLAUDE.md::rows_built": [1, "a RECORD of a deletion — the talent system's names, DELETED, NOT ZEROED (BM; the twelve trees at FX) — the lane build `DOD_SIM_BUILDS` drove"],
+	"CLAUDE.md::sm_def_stance": [3, "a RECORD — a deleted node cited as EP §4's case and in FX's list of nodes the rules named"],
+	"CLAUDE.md::passive_id": [1, "a RECORD of a deletion — GK replaced it with `engines`; the sentence says so"],
+	"CLAUDE.md::_overburn_capped": [1, "a RECORD of a deletion — the Overburn meter's helpers, DELETED (the sentence says so)"],
+	"CLAUDE.md::_overburn_drain": [1, "a RECORD of a deletion — EB §2's own example of one that must not be swept"],
+	"CLAUDE.md::_overburn_tick": [1, "a RECORD of a deletion — the Overburn meter's helpers, DELETED (the sentence says so)"],
+	"CLAUDE.md::sm_precision": [1, "a RECORD — the node's past, the worked example of the ability rule and the status rule"],
+	"CLAUDE.md::SCOPE_INFO": [1, "a RECORD of a deletion — the rune scopes' display, deleted with the scopes"],
+	"CLAUDE.md::shown_scope": [1, "a RECORD of a deletion — the rune scopes' display, deleted with the scopes"],
+	"CLAUDE.md::scope_label": [1, "a RECORD of a deletion — the rune scopes' display, deleted with the scopes"],
+	"CLAUDE.md::scope_color": [1, "a RECORD of a deletion — the rune scopes' display, deleted with the scopes"],
+	"CLAUDE.md::loadout_condition_met": [1, "a RECORD of a deletion — the door came out with the retired conditions"],
+	"CLAUDE.md::rune_": [5, "a CONVENTION word — the field prefix every rune twin carries (`rune_X`)"],
+	"CLAUDE.md::_bag_the_unworn": [1, "a RECORD of a deletion — HK's, deleted because it would undo the hand-out"],
+	"CLAUDE.md::draft_card_is_class": [2, "a RECORD of a deletion (EH)"],
+	"CLAUDE.md::CLASS_DRAFT_SHARE": [1, "a RECORD of a deletion (EH)"],
+	"CLAUDE.md::roll_class_fallback_offer": [1, "a RECORD of a deletion — deleted rather than left as a second reader"],
+	"CLAUDE.md::sm_composure": [1, "a RECORD — GC's naming ruling, giving the precedent node the name came from"],
+	"CLAUDE.md::bz_warcry": [1, "a RECORD — FO's `Overkill` label collision, in the past tense since IU §1 (IT77); FX deleted both nodes"],
+	"CLAUDE.md::ss_overkill": [1, "a RECORD — FO's `Overkill` label collision, in the past tense since IU §1 (IT77); FX deleted both nodes"],
+	"CLAUDE.md::harness_1": [1, "a KEY — `baselines.json`'s rows for the harness's live counts"],
+	"CLAUDE.md::harness_3": [1, "a KEY — `baselines.json`'s rows for the harness's live counts"],
+	"CLAUDE.md::make_custom_tooltip": [1, "an ENGINE name — Godot's tooltip virtual, which the sentence says nothing in the tree overrides (an override is spelled `_make_custom_tooltip`, a token this walk does not match)"],
+	"CLAUDE.md::_worse_grade": [1, "a RECORD of a deletion — the sentence says it and `_GRADE_ORDER` are deleted"],
+	"CLAUDE.md::DOD_SIM_MAP": [1, "an ABSENCE — a retired sim variable; the sentence says `scripts/` names none of them"],
+	"CLAUDE.md::DOD_SIM_MINIBOSS": [1, "an ABSENCE — a retired sim variable; the sentence says `scripts/` names none of them"],
+	"CLAUDE.md::DOD_SIM_START_RUNE": [1, "an ABSENCE — a retired sim variable; the sentence says `scripts/` names none of them"],
+	"CLAUDE.md::DOD_SIM_SPEC_OPENING": [1, "an ABSENCE — a retired sim variable; the sentence says `scripts/` names none of them"],
+	"CLAUDE.md::NO_HOME": [1, "a RECORD — EM's table, in the past tense"],
 }
+
+# §1d — THE FOUR RULE FILES the walk reads (`check_hx` §1b's four).
+const RULE_FILES := ["instrument-rules.md", "combat-rules.md", "CLAUDE.md", "ways-of-working.md"]
+
+# §1d(c) — THE CEILING (IU §1b): mentions of a dead name standing as a live claim
+# in the rule files, unread or read as one. IU repaired the last (`wd_tank_spank`'s
+# sentence, CR19) and set it where it stood. It does not rise; a batch that writes
+# a new one repairs it or reds.
+const LIVE_CLAIM_CEILING := 0
 
 
 func ok(cond: bool, what: String) -> void:
@@ -286,7 +367,7 @@ func _initialize() -> void:
 	_s1a_residency(cm, ir, cr)
 	_s1b_no_second_copy(cm, ir, cr, wow)
 	_s1c_not_written_back(cm)
-	_s1d_names_resolve(ir, cr)
+	_s1d_names_resolve(cm, ir, cr, wow)
 	_s2_the_state_archive()
 	_s3_the_two_rules()
 	_s5_the_rulings()
@@ -427,12 +508,16 @@ func _words(txt: String) -> PackedStringArray:
 	return out
 
 
+# EVERY INDEX A SHINGLE STANDS AT, not its first (IU §5): keyed to its first, a
+# run whose words also stood earlier in the file was cut in two and part of it
+# read at the earlier place — IT's census found the combat-scope run split so.
 func _shingles(ws: PackedStringArray, n: int) -> Dictionary:
 	var d := {}
 	for i in range(0, ws.size() - n + 1):
 		var key := " ".join(ws.slice(i, i + n))
 		if not d.has(key):
-			d[key] = i
+			d[key] = []
+		(d[key] as Array).append(i)
 	return d
 
 
@@ -458,12 +543,16 @@ func _norm(s: String) -> String:
 func _statements(txt: String) -> Array:
 	var out: Array = []
 	var prov := RegEx.new()
-	prov.compile("\\s*\\((STANDING|SET AT|Batch|RULED|this file|GATHERED)[^)]*\\)?.*$")
+	# THE PROVENANCE PARENTHESIS GOES, AND ONLY IT (IU §5): cut to the line's end,
+	# a heading with a clause after its provenance lost the clause — DM §3's
+	# *RULE ON CLAUSES, NOT ON ABILITIES* was never compared. An unclosed one, a
+	# heading wrapped mid-parenthesis, still runs to the end.
+	prov.compile("\\s*\\((STANDING|SET AT|Batch|RULED|this file|GATHERED)[^)]*(\\)|$)")
 	var bold := RegEx.new()
 	bold.compile("(?m)^\\s*(?:- |· |\\d+\\. |> )?\\*\\*([^*\\n][^*]{20,400}?)\\*\\*")
 	for line in txt.split("\n"):
 		if line.begins_with("## ") or line.begins_with("### "):
-			var h := prov.sub(line.lstrip("# "), "", false)
+			var h := prov.sub(line.lstrip("# "), "", true)
 			var n := _norm(h)
 			if n.split(" ").size() >= 5:
 				out.append(n)
@@ -504,7 +593,8 @@ func _s1b_no_second_copy(cm: String, ir: String, cr: String, wow: String) -> voi
 			var pos: Array = []
 			for key in shs[a]:
 				if shs[b].has(key):
-					pos.append(int(shs[a][key]))
+					for at in shs[a][key]:
+						pos.append(int(at))
 			pos.sort()
 			var runs: Array = []
 			for p in pos:
@@ -708,7 +798,7 @@ func _mask_strings(src: String) -> String:
 
 func _kind(t: String) -> String:
 	var rx_path := RegEx.new()
-	rx_path.compile("\\.(gd|md|json|sh|py|html|cfg|bin|tscn|godot)\\b")
+	rx_path.compile("\\.(gd|md|json|sh|py|html|cfg|bin|tscn|godot|txt)\\b")
 	if rx_path.search(t) != null:
 		return "path"
 	var rx_call := RegEx.new()
@@ -738,19 +828,39 @@ func _word_in(corpus: String, w: String) -> bool:
 
 func _path_exists(t: String) -> bool:
 	var rx := RegEx.new()
-	rx.compile("([\\w./-]+\\.(gd|md|json|sh|py|html|cfg|bin|tscn|godot))")
+	rx.compile("([\\w./-]+\\.(gd|md|json|sh|py|html|cfg|bin|tscn|godot|txt))")
 	var m := rx.search(t)
 	if m == null:
 		return false
 	var p := m.get_string(1).trim_prefix("res://")
-	for base in ["res://", "res://docs/", "res://docs/reports/", "res://scripts/", "res://data/", "res://DoD-archive/"]:
+	for base in ["res://", "res://docs/", "res://docs/reports/", "res://scripts/", "res://data/", "res://scenes/", "res://DoD-archive/"]:
 		if FileAccess.file_exists(base + p) or FileAccess.file_exists(base + p.get_file()):
 			return true
-	return false
+	# AN ASSET IS FOUND BY ITS NAME (IU §5): `OFL.txt`, the font's licence, was a
+	# "dotted" name read by its extension until `.txt` became a path.
+	return _asset_names().has(p.get_file())
 
 
-func _s1d_names_resolve(ir: String, cr: String) -> void:
-	print("\n§1d — every backticked name in the two references resolves")
+var _assets := {}
+
+
+func _asset_names() -> Dictionary:
+	if _assets.is_empty():
+		var todo: Array = ["res://assets"]
+		while not todo.is_empty():
+			var dir_path: String = todo.pop_back()
+			var d := DirAccess.open(dir_path)
+			if d == null:
+				continue
+			for sub in d.get_directories():
+				todo.append(dir_path.path_join(sub))
+			for f in d.get_files():
+				_assets[f] = true
+	return _assets
+
+
+func _s1d_names_resolve(cm: String, ir: String, cr: String, wow: String) -> void:
+	print("\n§1d — every backticked name in the four rule files resolves")
 	var corp := _corpora()
 	var corpus: String = corp["whole"]
 	var game: String = corp["game"]
@@ -762,20 +872,31 @@ func _s1d_names_resolve(ir: String, cr: String) -> void:
 	var tick := RegEx.new()
 	tick.compile("`([^`\\n]+)`")
 	var checked := 0
+	var per_file := {}
 	var unresolved: Array = []
 	var needle_only: Array = []
 	var new_needle_only: Array = []
-	for pair in [["instrument-rules.md", ir], ["combat-rules.md", cr]]:
+	# Every MENTION of a dead name is counted, not each name once (IU §1b): a known
+	# name written into a new sentence is a new claim, and only its count shows it.
+	var mentions := {}
+	var dead_in := {}
+	var texts := {"instrument-rules.md": ir, "combat-rules.md": cr, "CLAUDE.md": cm, "ways-of-working.md": wow}
+	for f in RULE_FILES:
+		var pair := [f, texts[f]]
 		var seen := {}
+		var n_file := 0
 		for m in tick.search_all(String(pair[1])):
 			var t := m.get_string(1)
 			if seen.has(t):
+				if seen[t] != "":
+					mentions[seen[t]] = int(mentions[seen[t]]) + 1
 				continue
-			seen[t] = true
+			seen[t] = ""
 			var kind := _kind(t)
 			if kind == "":
 				continue
 			checked += 1
+			n_file += 1
 			if t.begins_with("user://"):
 				continue
 			var good := false
@@ -792,44 +913,98 @@ func _s1d_names_resolve(ir: String, cr: String) -> void:
 					w = t.get_slice(".", 1)
 			if w != "":
 				good = _word_in(corpus, w)
+			var key := ""
 			if not good and not NOT_REPO_NAMES.has(t):
-				unresolved.append("%s: `%s` (%s)" % [pair[0], t, kind])
+				key = "%s::%s" % [pair[0], t]
+				dead_in[key] = "dead"
+				if not unresolved.has(key):
+					unresolved.append(key)
 			if good and w != "" and not NOT_REPO_NAMES.has(t) and not _word_in(game, w) and not _word_in(instr, w):
-				var key := "%s::%s" % [pair[0], w]
-				needle_only.append(key)
-				if not KNOWN_NEEDLE_ONLY.has(key):
-					new_needle_only.append(key)
-	for u in unresolved:
-		print("    UNRESOLVED: %s" % u)
-	ok(unresolved.is_empty(),
-		"§1d: %d backticked name(s) in the references resolve nowhere in the tree: %s" % [
-			unresolved.size(), " / ".join(PackedStringArray(unresolved))])
-	ok(checked >= 300, "§1d: only %d names were checked — the extractor has stopped matching" % checked)
-	print("  CHECKED %d names across the two references; %d unresolved" % [checked, unresolved.size()])
+				key = "%s::%s" % [pair[0], w]
+				dead_in[key] = "needle"
+				if not needle_only.has(key):
+					needle_only.append(key)
+			if key != "":
+				seen[t] = key
+				mentions[key] = int(mentions.get(key, 0)) + 1
+		per_file[pair[0]] = n_file
+	# A name is READ when its table carries it with at least as many mentions as
+	# the files hold; the mentions past that are new sentences nobody has read.
+	var unread := {}
+	for k in mentions:
+		var known: Array = _known(dead_in[k]).get(k, [0, ""])
+		if int(mentions[k]) > int(known[0]):
+			unread[k] = int(mentions[k]) - int(known[0])
+	for k in unresolved:
+		print("    UNRESOLVED: %s ×%d" % [k, mentions[k]])
+	var new_dead: Array = unresolved.filter(func(k): return unread.has(k))
+	ok(new_dead.is_empty(),
+		"§1d: %d backticked name(s) in the rule files resolve nowhere in the tree: %s" % [
+			new_dead.size(), " / ".join(PackedStringArray(new_dead.map(func(k): return "%s (%d unread)" % [k, unread[k]])))])
+	ok(checked >= 1300 and int(per_file.get("CLAUDE.md", 0)) >= 900,
+		"§1d: only %d names were checked, %d of them in CLAUDE.md — the extractor has stopped matching" % [
+			checked, int(per_file.get("CLAUDE.md", 0))])
+	print("  CHECKED %d names across the four rule files (%s); %d resolve nowhere" % [checked,
+		", ".join(PackedStringArray(RULE_FILES.map(func(f): return "%s %d" % [f, per_file.get(f, 0)]))), unresolved.size()])
 	# (a) — a name found only inside an instrument's needle.
 	for k in needle_only:
-		print("  [needle only] %s — %s" % [k, KNOWN_NEEDLE_ONLY.get(k, "NEW: not read yet")])
+		print("  [needle only] %s ×%d — %s" % [k, mentions[k], (KNOWN_NEEDLE_ONLY.get(k, [0, "NEW: not read yet"]) as Array)[1]])
+		if unread.has(k):
+			new_needle_only.append("%s (%d unread)" % [k, unread[k]])
 	ok(new_needle_only.is_empty(),
-		"§1d(a): %d name(s) in the references live only inside an instrument's string — a dead name a needle keeps alive, or a key nobody has read: %s" % [
+		"§1d(a): %d name(s) in the rule files live only inside an instrument's string — a dead name a needle keeps alive, or a key nobody has read: %s" % [
 			new_needle_only.size(), " / ".join(PackedStringArray(new_needle_only))])
+	var absent_broken: Array = []
 	for k in KNOWN_NEEDLE_ONLY:
-		if not needle_only.has(k):
+		var line: Array = KNOWN_NEEDLE_ONLY[k]
+		var held := int(mentions.get(k, 0)) if dead_in.get(k, "") == "needle" else 0
+		if held == 0 and String(line[1]).begins_with("an ABSENCE"):
+			absent_broken.append("%s — %s" % [k, line[1]])
+		elif held == 0:
 			print("  NOTICE: %s is no longer found only in a needle — delete its KNOWN_NEEDLE_ONLY line" % k)
-	print("  (a) CHECKED %d names against the game and the instruments' code; %d live only in a needle, %d of them known" % [
+		elif held < int(line[0]):
+			print("  NOTICE: %s is mentioned %d time(s), its line says %d — lower it" % [k, held, line[0]])
+	ok(absent_broken.is_empty(),
+		"§1d(c): %d name(s) a sentence says the tree does not have resolve in it now — the claim was its absence: %s" % [
+			absent_broken.size(), " / ".join(PackedStringArray(absent_broken))])
+	print("  (a) CHECKED %d names against the game and the instruments' code; %d live only in a needle, %d of them read" % [
 		checked, needle_only.size(), needle_only.size() - new_needle_only.size()])
+	# (c) — THE CEILING (IU §1b). A dead name's mention stands as a claim when it is
+	# unread or read as a live one; the count of them does not rise.
+	var standing: Array = []
+	var n_standing := 0
+	for k in mentions:
+		var reading := String((_known(dead_in[k]).get(k, [0, ""]) as Array)[1])
+		var n := int(unread.get(k, 0))
+		if reading.begins_with("a LIVE CLAIM"):
+			n = int(mentions[k])
+		if n > 0:
+			n_standing += n
+			standing.append("%s ×%d" % [k, n])
+	ok(n_standing <= LIVE_CLAIM_CEILING,
+		"§1d(c): %d mention(s) of a dead name stand as a live claim in the rule files, unread or read as one, over the ceiling of %d (IU §1b) — %s" % [
+			n_standing, LIVE_CLAIM_CEILING, " / ".join(PackedStringArray(standing))])
+	ok(mentions.size() >= 30,
+		"§1d(c): only %d dead names were found across the four rule files — the walk has stopped seeing the records it reads" % mentions.size())
+	print("  (c) CHECKED %d dead names, %d mentions; %d stand as a live claim, ceiling %d" % [
+		mentions.size(), mentions.values().reduce(func(a, b): return a + b, 0), n_standing, LIVE_CLAIM_CEILING])
 	# (b) — a constant's value written beside its name.
 	var stated := RegEx.new()
 	stated.compile("`(?:[\\w.]*\\.)?([A-Z][A-Z0-9_]+)\\s*:?=\\s*([^`]+)`")
 	var values := 0
 	var wrong: Array = []
-	for pair in [["instrument-rules.md", ir], ["combat-rules.md", cr]]:
+	for f in RULE_FILES:
+		var pair := [f, texts[f]]
 		for m in stated.search_all(String(pair[1])):
-			values += 1
 			var name := m.get_string(1)
 			var said := m.get_string(2).strip_edges()
 			var decl := RegEx.new()
 			decl.compile("(?m)^\\s*(?:static\\s+)?(?:const|var)\\s+" + name + "\\s*(?::\\s*\\w+\\s*)?:?=\\s*([^\\n]+)")
 			var d := decl.search(corpus)
+			# An environment variable is set on a command line and declared nowhere.
+			if d == null and name.begins_with("DOD_"):
+				continue
+			values += 1
 			var held := d.get_string(1).strip_edges() if d != null else "<declared nowhere>"
 			var decl_pick := ("the first declaration of %s in the corpus's walk order, `%s`" % [name, d.get_string(0).strip_edges()]) \
 				if d != null else "no declaration of %s in the corpus's walk order" % name
@@ -837,10 +1012,15 @@ func _s1d_names_resolve(ir: String, cr: String) -> void:
 			if held != said:
 				wrong.append(("%s: %s is %s in the script, %s in the reference" % [pair[0], name, held, said]) + " — %s" % decl_pick)
 	ok(wrong.is_empty(),
-		"§1d(b): %d constant value(s) in the references are not the declared ones: %s" % [
+		"§1d(b): %d constant value(s) in the rule files are not the declared ones: %s" % [
 			wrong.size(), " / ".join(PackedStringArray(wrong))])
 	print("  (b) CHECKED %d stated constant values; %d wrong" % [values, wrong.size()])
 
+
+# A name that resolves nowhere has no line to be read by: it reds until a line names
+# it, and the line, a string in this gate, is what makes it resolve.
+func _known(tag: String) -> Dictionary:
+	return KNOWN_NEEDLE_ONLY if tag == "needle" else {}
 
 # ── §2 — THE STATE ARCHIVE, REACHED THROUGH THE LIVE FILE ───────────────────
 #

@@ -16,6 +16,32 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-24 &mdash; Batch IU: THE CLAIMS, AND WHAT THE RULING NEEDS</h2>
+<p><b>Nothing a player sees moved: every card, rune and status reads exactly as it did. Underneath, the project's rule files stop
+carrying sentences the game has outgrown, every standing rule is matched to the check that holds it, nine numbers in the code now
+hold exactly what their cards say, and the simulated player pays the same price to swap a companion that a player does.</b> Full
+working: <code>docs/reports/IU.md</code>.</p>
+
+<p><b>&sect;1 &mdash; THE CLAIMS.</b> 193 sentences in the project's rule files that were counted as no longer true were each read
+against the code: 169 were repaired, 16 turned out to be true, 3 were taken by another sentence's repair, and 5 wait on a decision
+the designer owes. From here, a new sentence about a piece of code that no longer exists fails the checks until someone has read it.</p>
+
+<p><b>&sect;2 &mdash; EVERY RULE AGAINST ITS CHECK.</b> The 817 standing rules in <code>CLAUDE.md</code> were each matched to the check
+that holds them: 299 are held, 229 held only in part, and 284 by nothing at all &mdash; and the list says which of those a check could
+cheaply hold.</p>
+
+<p><b>&sect;3 &mdash; NINE NUMBERS HOLD WHAT THEIR CARDS SAY.</b> Slow Burn, Hoarfrost Armor, Frostbind, Resonant Field, Emberkeep,
+Precision Strike (both grades), Berserk and Mantle each kept a number one smaller than their card states and added one where it
+applied; each now holds the card's own figure. Every effect lasts exactly as long as it did.</p>
+
+<p><b>&sect;4 &mdash; THE SIMULATED PLAYER PAYS THE SWAP's PRICE.</b> The test bot swapped a companion at the full summon's price; it
+now pays the swap's, built by the same code as the player's button. No recorded measurement moved beyond its noise. Every other place
+the bot plays by different rules is now listed &mdash; ten of them are defects, owed a fix.</p>
+
+<p><b>&sect;5&ndash;&sect;8 &mdash; THE INSTRUMENTS.</b> Seven of the twenty test reads found looking at the wrong thing were repaired
+and the other thirteen are held under a ceiling; the number of facts the test pins cover can no longer fall without a reason; the
+lane script can build a bare test project; and reading the state file's index is now a written step at the start of a batch.</p>
+
 <h2>2026-10-23 &mdash; Batch IT: THE STRIKE, THE EIGHTY LITERALS NAMED, THE POSITIONAL FAMILY, AND THE ALARM's FENCE</h2>
 <p><b>Nothing a player sees moved: every card, rune, glossary entry, status chip and table reads exactly as it did. Underneath, the
 numbers the cards state are now named in the code they come from, the design document's card catalogue is checked against them,

@@ -423,7 +423,12 @@ func _synergy_rule() -> void:
 	ok(at_block > 0, "the BV block is anchored in classes.gd")
 	if at_block <= 0:
 		return
-	var block := src.substr(at_block)
+	# BATCH IU §5 — THE BV TRANCHE, CUT BY ITS OWN END: the banner to the next tranche's banner. It ran to
+	# the end of `classes.gd` (IT §3a's census, REPORTED), so a NINE card defined in any later tranche still
+	# "sat inside the BV block"; the slice names what it picked, then asks it.
+	var block := Gate.subject(src, at_block, "# ========== BATCH ")
+	ok(block.begins_with("BATCH BV: TRANCHE 2, THE HUNTER NINE") and Gate.ends_inside(block, "# ========== BATCH "),
+		"the BV block read is the BV tranche alone — it ends at the next tranche's banner (%d chars)" % block.length())
 	for n in NINE:
 		var at := block.find('"%s":' % n)
 		ok(at > 0, "%s sits inside the BV block" % n)
@@ -644,15 +649,25 @@ func _source_rules() -> void:
 	var at_cf_arm := code.find('if ab.display_name == "Crossfire" and attacker.is_hero')
 	ok(at_cf_arm > 0,
 		"Crossfire's window is gated on the ABILITY, not on the Lethal Aim passive")
-	var at_lethal := code.find('attacker.has_engine("lethal_aim")')
-	ok(at_lethal > 0 and at_cf_arm > at_lethal,
+	# BATCH IU §5 — THE LETHAL AIM BLOCK, PICKED BY ITS OWN HEAD AND CUT BY ITS OWN END. The first
+	# `has_engine("lethal_aim")` in the file is the strike loop's crit-chance term, some eighteen
+	# hundred lines above the block these two checks are about, and against the real block the
+	# Crossfire arm sits BEFORE it — so the old `at_cf_arm > at_lethal` was green only on the wrong
+	# occurrence (IT §3a's census, one of its two material picks). The pick names what it picked,
+	# and "outside" is asked of the block's extent, not of an order.
+	var at_lethal := code.find('if attacker.is_hero and attacker.has_engine("lethal_aim")')
+	var la_block := Gate.block(code, at_lethal)
+	ok(at_lethal > 0 and la_block.contains("_sharpshooter_focus(attacker, target, ab)"),
+		"the Lethal Aim block read is the strike's Focus block — the one that calls `_sharpshooter_focus`")
+	var la_end := at_lethal + la_block.length()
+	ok(at_lethal > 0 and at_cf_arm > 0 and (at_cf_arm < at_lethal or at_cf_arm >= la_end),
 		"and it is outside that block rather than merely before it")
 	# CALIBRATING SHOT'S GAIN *IS* PASSIVE-GATED AND MUST BE — Focus is the
 	# Sharpshooter's meter and nobody else has one to pay into. The distinction
 	# is the point: an effect that reads a SPEC METER belongs with the passive, an
 	# effect that reads the ABILITY does not.
 	var at_calib := code.find('if ab.display_name == "Calibrating Shot":')
-	ok(at_calib > at_lethal,
+	ok(at_lethal > 0 and at_calib > at_lethal and at_calib < la_end,
 		"Calibrating Shot's Focus gain stays inside the Lethal Aim block, where it belongs")
 	# PREPARATION: THE HOOK IS AT THE END OF THE HERO'S TURN, and the refusal is
 	# in the usability gate. Both are structural and both are load-bearing.

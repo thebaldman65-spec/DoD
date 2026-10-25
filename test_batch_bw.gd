@@ -80,7 +80,7 @@ const Gate = preload("res://gate_fixture.gd")   # IT §3b: the one window helper
 const RECKLESS_PCT_PER_10_TEST := 2
 # BATCH CQ §3 — FOUR SINCE CN §3'S FOLD. Berserk banked three and a Perfect
 # banked a fourth; the bar came off the card, so the fourth is what every cast
-# banks (`BERSERK_STRIKES + 1` at the read site).
+# banks (`BERSERK_STRIKES` holds it since IU §3, the `+ 1` at the read site gone).
 const BERSERK_STRIKES_TEST := 4
 const BERSERK_RISK_PCT_TEST := 30
 const BLOOD_DEBT_HEAL_TEST := 0.25

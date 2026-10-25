@@ -20,8 +20,8 @@
 # **THE WARNING IS THE LINE AND THE FAILURE IS THE DEADLINE.** A check that
 # reds the moment the bar is crossed reds on a batch whose only crime is
 # writing its own changelog entry, and the cut is a batch of work — a
-# byte-for-byte split with its own rejoin proof — which this project's own rule
-# says must not share a diff with anything else. A check that ONLY warns can be
+# byte-for-byte split with its own rejoin proof, and a red on the crossing batch
+# asks it to do that batch's work inside its own. A check that ONLY warns can be
 # ignored, which is exactly what four batches of silence look like.
 #
 # So both, and the split between them is the RULE's own words rather than a

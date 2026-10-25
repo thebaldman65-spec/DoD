@@ -16,8 +16,8 @@ is in `docs/instrument-rules.md`, whatever it is about.
 
 The two halves were asserted to rejoin byte for byte against the pre-split `CLAUDE.md`, beside a
 heading partition, before either was trusted — **never by comparing sizes** — and the proof is in
-`docs/reports/GR.md` §4. **Every block below is byte-identical to what stood in `CLAUDE.md`**, in
-the order it stood there, and `CLAUDE.md` indexes each by heading.
+`docs/reports/GR.md` §4. **Every block below was byte-identical to what stood in `CLAUDE.md` when it moved**, and stands in
+the order it stood there; later batches have edited them here, and `CLAUDE.md` indexes each by heading.
 
 **WHEN A RULE MOVES BACK OR ACROSS, THE PIN MOVES WITH IT IN THE SAME BATCH.** None of the nine
 carried a pin when it moved — measured against the pin manifest and a sweep of every suite and gate
@@ -38,16 +38,16 @@ computed from LIVE STATE, that let a weaker recast overwrite a standing buff DOW
 the waste CO's refusal was written to fix, and unreachable by that refusal because all three carry
 a second payload.
 - **THE CLAMP IS AT THE CALL SITE: Battle Shout, Stabilize, Eye of the Storm, and since CQ Blood
-  Debt and Reckless Abandon.** Each
+  Debt and Reckless Abandon**, and `_apply_elem_weak`, the one door the dormant rider and Magic Burst share. Each
   reads `status_power` BEFORE `_apply_status` and writes the chip only when the new value is at
-  least as strong. `status_power` returns **-1** when nothing stands, so a fresh cast always
+  least as strong; Shieldwall and Split Shield reach the same end by writing `maxi(status_power(...), pct)`. `status_power` returns **-1** when nothing stands, so a fresh cast always
   writes. **THE CAST STILL PAYS** — the +5 Rage, the Mana and 5% heal, and the taunts all sit
   OUTSIDE the guarded branch, which is the whole reason the fix belongs here and not in the gate.
 - **DO NOT CLAMP `update_status` GLOBALLY, AND TWO SITES SETTLE IT ALONE.** `held_breath` and
   `instinct` compute `status_power(...) - 1` and write it back — they are COUNTDOWNS, and a global
-  `maxi` freezes them at their opening value forever, so neither is ever spent. Six more banks
-  decrement through the same door: `mirror`, `arrows`, `feint_guard`, `berserk`, `deadfall`,
-  `loyalty`. **Nothing would crash and nothing would log.**
+  `maxi` freezes them at their opening value forever, so neither is ever spent. Two more banks
+  decrement through the same door, `mirror` and `arrows`; `feint_guard`, `berserk`, `deadfall` and
+  `loyalty` are display chips (`set_display_chip`) and never touch it. **Nothing would crash and nothing would log.**
 - **THE CENSUS IS IN CP's CHANGELOG ENTRY (IN `DoD-archive/changelog-archive.html` SINCE THE CUT)
   AND IS THE ARTEFACT TO READ BEFORE TOUCHING THIS**: 69
   call sites, 42 passing a power, and 29 of them calling `_apply_status` then `update_status` on
@@ -82,7 +82,8 @@ NOT BE WRITTEN**; an ability obeys this rule by not passing `force`.
   · **AND A COPY NEVER CARRIES IT (HU §3b, ruled by the designer).** Downwind's carry re-entered
     the door with the original's arguments, `force` among them, so a Perfect Pommel Strike's copy
     stunned a SECOND, unbroken boss — the one exception reaching a body its card never aimed at.
-    The carry lays the status without it, as every other caller does; the Perfect still stuns its
+    The carry lays the status without it, as every other caller does or forwards a `force` no caller
+    sets true (`_hold_freeze`, Frostbind's mate, `_spring_trap`); the Perfect still stuns its
     own target, and a Broken boss still takes the copy. **A carrier that forwards `force`
     re-opens this door** (`check_hu` §3b drives both).
 - **`_spring_trap`'s `force_stun` PARAMETER SURVIVES WITH NO CALLER PASSING TRUE.** Left in place
@@ -90,7 +91,7 @@ NOT BE WRITTEN**; an ability obeys this rule by not passing `force`.
   passing `true` is re-opening the door this rule closed.**
 - **THE CONFORMING SET, CENSUSED AT CR AND WORTH NOT RE-DERIVING:** Mind Flay (`psychosis`),
   Bewitch, Mass Hysteria, Glacial Prison and Cryoclasm (both through `_hold_freeze` with no
-  force), Spread of Madness (which filters `not e.is_boss or e.broken` itself) and Ricochet's
+  force) and Ricochet's
   stagger all already gate on Broken. **Flash Freeze and Snare Trap were the only two that did
   not.**
 
@@ -100,8 +101,8 @@ of `_enemy_turn` **byte-for-byte** — only *when* it runs moved, and a diff tou
 inside it breaks that promise.
 · **Declaration**: `_declare_intent(u)`, called from `_declare_all_intents()` at battle start
   (after the opening oath/Faith hooks, which move state the policy reads), from the turn loop
-  **right after** `await _enemy_turn(u)` — **NOT from the bottom of `_enemy_turn`**, which has
-  eight returns, and a declaration owed on all of them is a declaration owed by the caller — on
+  **right after** `await _enemy_turn(u)` — **NOT from the bottom of `_enemy_turn`**, which returns
+  from many places, and a declaration owed on all of them is a declaration owed by the caller — on
   each lost-turn branch after the discard, and in `_hold_release`.
 · **Re-validation** at resolution, `_revalidate_intent(u)`, in this fixed order: (1) ability
   unusable → fall back to `_cheapest_attack` **AND LOG IT** (a silent substitution is the intent
@@ -124,8 +125,8 @@ inside it breaks that promise.
   table.
 **NO PREDICTED DAMAGE NUMBER MAY SHIP, AND THAT IS A FINDING RATHER THAN AN OMISSION.** The strike
 block fails on two counts, either fatal alone: it MUTATES on the way through (`crit_streak`,
-resource restores, `float_text`, three ledgers), and its FIRST line is `randf_range(0.9, 1.1)`
-with a crit rolling inside it — **the same call with identical inputs returns a different
+resource restores, `float_text`, three ledgers), and every hit rolls a crit and then
+`randf_range(0.9, 1.1)` — **the same call with identical inputs returns a different
 number.** Icon plus a word read off the declaration is shown instead — the ability's own name, the
 status an affliction applies, or a wind-up's turns — so it cannot drift. **AND SINCE HZ §1a A HOVER ON
 THAT LINE, AND ON THE TURN BAR'S GLYPH, DETAILS THE DECLARED ABILITY OFF ITS OWN DATA**
@@ -158,7 +159,8 @@ bar) and sits **BELOW ALL FOUR DEATH-REFUSALS** — above them it would count he
 back AND file a refused death as a killing blow. **Five `_resolve_special` branches remove a
 hero's own health directly** (`phoenix`, `dark_pact`, `blood_offering`, `blood_price`,
 `shared_grief`) — a price paid, not a wound dealt, so none may feed an on-damage rider — **and each
-books the delta through `_book_self_cost`, which reaches the recap's ledger and nothing else (GF).**
+books the delta through `_book_self_cost`, which reaches the recap's ledger (GF) and `_bank_party_losses`, which banks the party's health for
+the save, and no rider.**
 **Blood Price's price moves with the Blood Debt rune worn (IK §1)**: it is dealt through `take_hit` to the enemy with the
 most health, under the Berserker's own frame — a wound he deals, with every reader of the frame reading him — and he pays nothing.
 A new damage source goes through one of the two functions; a new direct cost calls
@@ -268,7 +270,7 @@ A new damage source goes through one of the two functions; a new direct cost cal
 
 **THIS IS NOT FOCUS'S CONVERSION AND MUST NOT BE FOLDED INTO IT.** Focus converts at a DEPTH IN ONE
 METER (`unit.focus_convert`, still 100, still `FOCUS_STEP`); this converts a TOTAL assembled over
-twelve statements, carrying thirteen terms. **A hero at 80 Focus is below his own split point, is still contributing +40% crit
+thirteen statements, carrying fourteen terms, since HB added the pity meter. **A hero at 80 Focus is below his own split point, is still contributing +40% crit
 chance, and can be past 100% TOTAL once a Broken target and a talent are added — both conversions
 fire on that blow and nothing is counted twice**, because the sub-split Focus is inside
 `crit_chance` and was never paid as multiplier.
@@ -290,7 +292,7 @@ fire on that blow and nothing is counted twice**, because the sub-split Focus is
   one) and flagged it rather than tuning it. **The designer ruled 0.50, and the reasoning is
   recorded so the priced alternative is not re-proposed later as a discovery:** 1.0 is a rate tuned
   for ONE meter that one spec builds on one target, and this constant prices a total assembled over
-  **twelve statements — thirteen terms** — and fed by the whole party. Nothing has ever tested that
+  **thirteen statements — fourteen terms since HB** — and fed by the whole party. Nothing has ever tested that
   those two answers should be the same number. **It is still deliberately NOT written as a
   derivation from `FOCUS_STEP`**: a derivation would assert they must stay equal, and one line is
   what makes this constant movable. `docs/reports/EX.md` §1.
@@ -320,10 +322,11 @@ fire on that blow and nothing is counted twice**, because the sub-split Focus is
   `randf() < minf(1.93, 1.0)` are the same blow. A `minf` there would change no behaviour and would
   add a SECOND place the ceiling is written down, which is the drift this rule exists to avoid.
 - **ONE DISPLAY SURFACE SHOWS A PARTIAL CRIT TOTAL AND IT IS NOT A ROLL.**
-  `party_screen`'s hero card prints the base rate (spelled as a literal) plus `crit_bonus`; three
-  `battle.gd` sites spend `CRIT_CHANCE + crit_bonus` as a BURN MAGNITUDE rather than as a chance. **None can know the assembled
+  `party_screen`'s hero card prints the base rate (spelled as a literal) plus `crit_bonus`; five
+  `battle.gd` sites store `CRIT_CHANCE + crit_bonus` as Burn's `power` rather than roll it as a chance (two of them since Stoke
+  and Cinderfall set an unlit enemy Burning), and nothing reads that power. **None can know the assembled
   total** — it depends on the ability, the target and the board — so none was changed, and a sweep
-  for "places that read `CRIT_CHANCE`" must not mistake any of the four for a roll site.
+  for "places that read `CRIT_CHANCE`" must not mistake any of the six for a roll site.
 
 ## STANDING RULE — CHARGES AND ON-HIT EFFECTS COUNT HITS, NOT CASTS (Batch BR §1)
 **A multi-hit ability spends one charge PER HIT and fires its on-hit effects PER HIT.** Aimed
@@ -339,8 +342,9 @@ does one an absolute parry zeroed: a charge rides a blow that landed.
   differed.
 · **APPLIED RETROACTIVELY, AND WHAT CHANGED IS ONE THING: MIRROR IMAGE** (BQ) now spends one image
   per hit of a multi-hit attack. The gate is `multi_hits` ALONE, which keeps the card's promise
-  true — a multi-hit ability is repeated strikes on ONE target, i.e. single-target, while an area
-  attack, a random scatter and a chosen pair are not and still spend nothing. **IT CHANGES NOTHING
+  true — each strike of a multi-hit ability lands on one target (the one it aims at, or, for Seeking
+  Missiles' extra missiles, the body each seeks), i.e. single-target, while an area
+  attack, a random scatter, a chosen pair and a chosen three are not and still spend nothing. **IT CHANGES NOTHING
   IN PLAY TODAY**: no enemy in enemies.json carries `multi_hits` or `random_hits` (asserted, not
   assumed) and heroes do not attack the Mage. It is the rule made TRUE ahead of its use.
 · **THE OTHER THREE CHARGE BANKS ALREADY COUNTED HITS** — Interpose's `shield_charges` (the block
@@ -379,8 +383,8 @@ be found by counting call sites, never by playing.
   earned by closing this. Harvest's ally loop walked `heroes`, so a wound Aguila opened paid the
   base rate however it was stamped; **DI left the seven companion sites unstamped rather than let
   the sweep look complete while the wound still paid nothing**, and DJ stamped them with the loop.
-· **AND MEASURE COVERAGE WITH A WALK, NOT A `grep`** — see the second standing rule below, which
-  DJ earned from this. `check_di` §1 balances parens, skips comments, and PRINTS the live figure
+· **AND MEASURE COVERAGE WITH A WALK, NOT A `grep`** — see the standing rule DJ earned from this, which
+  stands in `docs/instrument-rules.md`. `check_di` §1 balances parens, skips comments, and PRINTS the live figure
   on every battery run.
 · **AND A STATUS A CLERIC LAYS ON HIS OWN SIDE CARRIES HIM AS WELL (IL §1; the Hierophant's *each status the
   Cleric applies*, IJ's ruling 9).** The batches after DI left hero-side grants unstamped because nothing read their
@@ -398,11 +402,12 @@ be found by counting call sites, never by playing.
 **`heroes.append` is reached at exactly ONE site**, the party spawn; a summoned beast is appended
 to `companions` at the one place a companion is built. Nothing else ever adds to either array.
 **The line numbers that used to stand here are deleted rather than re-numbered** — DK's own edits
-moved one of them, which is this block's neighbouring rule met in the wild.
+moved one of them, which is DJ's number-quoting rule in `docs/instrument-rules.md` met in the wild.
 · **THE THREE IDIOMS, AND THEY ARE NOT INTERCHANGEABLE.** `heroes + companions` is the union **dead
   or alive**; `_hero_side()` is the union **of the living only**; bare `heroes` is the four, and no
-  `not h.is_companion` clause on it changes that — **every such filter in `battle.gd` is
-  filtering an array that cannot hold one.** They record the author's INTENT, which is worth
+  `not h.is_companion` clause on it changes that — **every such filter on a `heroes` walk in `battle.gd` is
+  filtering an array that cannot hold one** — and `_ally_pick_pool`'s, on `_hero_side()`, is the one that does exclude, for
+  the cards whose words say *hero*. They record the author's INTENT, which is worth
   reading. They are not what does the excluding.
 · **AND A PER-TURN EFFECT IS A FOURTH EXCLUSION NOBODY WRITES DOWN.** `_next_unit()` walks
   `heroes + enemies`, so a companion takes no turns — a "each ally, each turn" clause can never
@@ -423,7 +428,8 @@ moved one of them, which is this block's neighbouring rule met in the wild.
   Shout's RESOURCE clause (a beast has no resource bar — **its Pressure clause is a separate
   ruling and DL §1 widened it**), Devoutness and Last Hope (stamped at party spawn, before a
   beast exists), Cleansing Waters (per-turn, and a companion takes none) and Tank and Spank (the
-  chip lands and pays nothing). **The reason is recorded beside each one in the source**, because
+  chip landed and paid nothing); Rallying Cry, Cleansing Waters and Tank and Spank were talent nodes the one
+  tree no longer has, so their text is gone and their dormant read sites stay. **The reason is recorded beside each one whose text still stands in the source**, because
   "hero" alone is a decision the next author re-litigates. `check_dk` §1 pins both populations by
   their own read lines, so neither half can rot without saying so.
 
@@ -432,17 +438,17 @@ moved one of them, which is this block's neighbouring rule met in the wild.
 > A widening that changes no measurement is not a smaller fix — it is **worse than the narrow
 > word**, because a chip appears on the unit and it reads as working.
 
-DK widened five candidates and **only four of them landed**. The fifth, `wd_tank_spank`, applies
-`empower` to a companion perfectly cleanly: the status attaches, the chip renders, the tooltip
-reads. **It pays exactly nothing.** A beast strikes through `_companion_hit`, which is its own
+DK widened five candidates and **only four of them landed**. The fifth, `wd_tank_spank` (a node the one tree no longer has), applied
+`empower` to a companion perfectly cleanly: the status attached, the chip rendered, the tooltip
+read. **It paid exactly nothing**, and `empower` on a beast still pays nothing. A beast strikes through `_companion_hit`, which is its own
 damage path and reads only a handful of the hero strike loop's multiplier terms (`empower` only
 when its hunter holds the Shared Hide rune) — measured over 40 seeded blows with the chip
 standing, **ratio 1.0000.** Its TEXT was corrected
 instead.
 · **THE THREE PLACES A WIDENING DIES, AND ONLY THE FIRST IS THE COLLECTION.** (1) the loop walks
   bare `heroes`; (2) a filter downstream removes it — this is the one CV §4 believed was the
-  mechanism and it never was, since **every `is_companion` filter walks `heroes` and removes
-  nothing**; (3) **the READ SITE below simply never runs for that body.** The third is invisible to
+  mechanism and it never was, since **every `is_companion` filter DK met walked `heroes` and removed
+  nothing** (`_ally_pick_pool`'s, on `_hero_side()`, is one that removes); (3) **the READ SITE below simply never runs for that body.** The third is invisible to
   every source grep and to every check that asserts on a collection.
 · **SO THE EVIDENCE IS A LIVE MEASUREMENT ON THE ACTUAL BODY, NOT A COLLECTION ASSERTION.**
   `check_dk` §2 summons a real bear and reads what each of the four pays it: Sanctuary heals it

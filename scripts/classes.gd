@@ -3105,7 +3105,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP, "cooldown": 5,
 				"anim": "attack03", "special": "berserk",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Let it take you: your next 4 STRIKES\neach land twice — they wait until\nspent. For {=Battle.BERSERK_RISK_TURNS} turns you take {=Battle.BERSERK_RISK_PCT}% more\ndamage, which is where Blood Frenzy\nlives."})
+				"description": "Let it take you: your next {=Battle.BERSERK_STRIKES} STRIKES\neach land twice — they wait until\nspent. For {=Battle.BERSERK_RISK_TURNS} turns you take {=Battle.BERSERK_RISK_PCT}% more\ndamage, which is where Blood Frenzy\nlives."})
 		# AXIS: a reason to survive being low. Blood Frenzy pays him for missing
 		# health and NOTHING IN HIS KIT PAYS HIM BACK — that is the sustain hole,
 		# and this fills it out of his own engine rather than with a heal.
@@ -3149,8 +3149,8 @@ static func draft_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Precision Strike", "cost": 20,
 				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 3,
 				"anim": "attack01", "special": "precision_strike",
-				"perfect_id": "", "perfect_text": "The stance holds 5 turns",
-				"description": "Read the guard, then change it.\nFROM AGGRESSIVE: strike TWICE for {=Battle.PRECISION_AGGRO_PCT}%\nof Attack each, and gain +{=Battle.PRECISION_PARRY_PCT}% parry\nfor 4 turns.\nFROM DEFENSIVE: strike ONCE for {=Battle.PRECISION_DEF_PCT}%\nof Attack with {=Battle.PRECISION_DEF_BD} BD, and your attacks\nignore ALL armor for 4 turns.\nEither way the stance then SWITCHES."})
+				"perfect_id": "", "perfect_text": "The stance holds {=Battle.PRECISION_PERFECT_GRANT_TURNS} turns",
+				"description": "Read the guard, then change it.\nFROM AGGRESSIVE: strike TWICE for {=Battle.PRECISION_AGGRO_PCT}%\nof Attack each, and gain +{=Battle.PRECISION_PARRY_PCT}% parry\nfor {=Battle.PRECISION_GRANT_TURNS} turns.\nFROM DEFENSIVE: strike ONCE for {=Battle.PRECISION_DEF_PCT}%\nof Attack with {=Battle.PRECISION_DEF_BD} BD, and your attacks\nignore ALL armor for {=Battle.PRECISION_GRANT_TURNS} turns.\nEither way the stance then SWITCHES."})
 		# AXIS: their swing lands somewhere they did not intend. From the front
 		# foot he tricks them into a friend; from the back foot into themselves.
 		# CHARGES, NOT TURNS — they wait until spent, so a Feint cast into a lull
@@ -4383,7 +4383,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"cost": 15, "damage": 0, "pressure": 0, "delay": 1.5,
 				"cooldown": 4, "anim": "attack03", "special": "slow_burn",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Bank the fire: for 4 turns the Burn on\nEVERY enemy stops counting down. It\nstill burns for its full damage — it\njust never gets shorter.\nThe mark rides enemies not yet alight,\nso fire laid inside the window holds too."})
+				"description": "Bank the fire: for {=Battle.SLOW_BURN_TURNS} turns the Burn on\nEVERY enemy stops counting down. It\nstill burns for its full damage — it\njust never gets shorter.\nThe mark rides enemies not yet alight,\nso fire laid inside the window holds too."})
 		# AXIS: the bank multiplies instead of growing. Backdraft ADDS turns and
 		# Ember Debt LAYS them; this one doubles what is already there, so it is
 		# worth as much as the stack he built — and since IE §3b an empty target
@@ -4497,7 +4497,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"cost": 20, "damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP,
 				"cooldown": 4, "anim": "attack01", "special": "hoarfrost_armor",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Wear the winter: for 4 turns you take\n{=Battle.HOARFROST_CUT*100}% less damage, and anything that\nstrikes you gains {=Battle.HOARFROST_STACKS} stacks of Chilled.\nThey build the pile by hitting you."})
+				"description": "Wear the winter: for {=Battle.HOARFROST_TURNS} turns you take\n{=Battle.HOARFROST_CUT*100}% less damage, and anything that\nstrikes you gains {=Battle.HOARFROST_STACKS} stacks of Chilled.\nThey build the pile by hitting you."})
 		# ----- ARCANIST: the first thing in the DRAFT that spends. Every node
 		# and every drafted card he owns READS Resonance; the only spender he
 		# has ever had is STABILIZE, which is a boss-pool pick and vents the
@@ -4627,7 +4627,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"cost": 20, "damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP,
 				"cooldown": 4, "anim": "attack01", "special": "emberkeep",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Keep the embers: for 4 turns every\nBurn ANY HERO applies lands at DOUBLE\nduration — a Survivalist's Choking\nSmoke burns twice as long beside you.\nIt changes what ARRIVES, not what is\nalready burning — fire already on the\nboard is untouched."})
+				"description": "Keep the embers: for {=Battle.EMBERKEEP_TURNS} turns every\nBurn ANY HERO applies lands at DOUBLE\nduration — a Survivalist's Choking\nSmoke burns twice as long beside you.\nIt changes what ARRIVES, not what is\nalready burning — fire already on the\nboard is untouched."})
 		# ----- CRYOMANCER: copy wide, hit the prisoner, chain two bodies. His
 		# pool assumes a hold and acts on ONE enemy, and his control has always
 		# been one enemy at a time.
@@ -4694,7 +4694,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"cooldown": 4, "anim": "attack03", "special": "frostbind",
 				"choose_two": true,
 				"perfect_id": "", "perfect_text": "",
-				"description": "Chain two enemies together for 4 turns:\nChilled landing on either lands on\nboth, and damage dealt to one is dealt\nto the other at {=Battle.FROSTBIND_SHARE*100}%.\nThe mirrored blow does NOT mirror back.\nIf both reach the threshold, the pair\nfreezes together."})
+				"description": "Chain two enemies together for {=Battle.FROSTBIND_TURNS} turns:\nChilled landing on either lands on\nboth, and damage dealt to one is dealt\nto the other at {=Battle.FROSTBIND_SHARE*100}%.\nThe mirrored blow does NOT mirror back.\nIf both reach the threshold, the pair\nfreezes together."})
 		# ----- ARCANIST: share the curve, buy it early, make it unanswerable.
 		# EVERYTHING HE HAS IS HIS OWN CURVE — nothing shares it, nothing changes
 		# its shape, and nothing gets past what a boss's armor and healing do to
@@ -4720,7 +4720,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"cost": 25, "damage": 0, "pressure": 0, "delay": Ability.BUFF_DELAY_CAP,
 				"cooldown": 4, "anim": "attack01", "special": "resonant_field",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Tune the others to the storm: for 4\nturns every other HERO deals bonus\ndamage equal to HALF your current\nResonance bonus.\nIt reads the meter LIVE — keep\nbuilding and their share climbs too."})
+				"description": "Tune the others to the storm: for {=Battle.RESONANT_FIELD_TURNS}\nturns every other HERO deals bonus\ndamage equal to HALF your current\nResonance bonus.\nIt reads the meter LIVE — keep\nbuilding and their share climbs too."})
 		# AXIS: the late game bought early, at the cost of the ramp. Below 15 it
 		# is a huge jump; above 15 it is a nerf he would never take — so it
 		# RESCUES A SLOW START and becomes dead weight in a long fight, which is

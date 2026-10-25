@@ -40,6 +40,7 @@ extends SceneTree
 # 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
 # This suite keeps its own SIGNATURE and delegates, so not one call site moved.
 const Fixture = preload("res://suite_fixture.gd")
+const Gate = preload("res://gate_fixture.gd")   # IU §5: the window helper (`block`)
 
 
 # The design number, in one place: the tree payload, the tooltip and every
@@ -305,7 +306,15 @@ func _contribution_cannot_see_break() -> void:
 	var heal := src.find("_devout_heal(src_name, float(amount), term, healed)")
 	ok(door > 0 and heal > door,
 		"§4: the Break term is branched off before the healing door")
-	ok(door > 0 and src.substr(door, heal - door).contains("return"),
+	# BATCH IU §5 — THE BREAK ARM, CUT BY ITS OWN END (`Gate.block`: the `if` and its indented body),
+	# never to the healing door. BF §1 put the `bd_` arm between the two, so a slice to the door
+	# carried that arm's `return` as well, and deleting the Break arm's own stayed green (IT §3a's
+	# census, one of its two material picks). The slice names what it picked, then asks it.
+	var brk := Gate.block(src, door)
+	ok(door > 0 and brk.begins_with("if term == \"devoutness_break\":") \
+			and brk.contains("faith_break_cut") and not brk.contains("term.begins_with(\"bd_\")"),
+		"§4: the slice read is the Break arm, whole and alone — it ends before the `bd_` arm")
+	ok(door > 0 and brk.contains("return"),
 		"§4: Break points removed are banked to faith_break_cut and go no further")
 	_report.append("§4: contrib% = (dmg + heal + prev) / pool — Break points, " \
 		+ "dealt OR prevented, are outside both numerator and denominator")

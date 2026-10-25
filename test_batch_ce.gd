@@ -58,12 +58,13 @@ extends SceneTree
 # 37 suites as 36 bodies and `_kill` in 14 as one; both are authored once now.
 # This suite keeps its own SIGNATURE and delegates, so not one call site moved.
 const Fixture = preload("res://suite_fixture.gd")
+const Gate = preload("res://gate_fixture.gd")   # IU §5: the window helper (`subject`, `ends_inside`)
 
 
 # Mirrored from battle.gd so each check states what it depends on rather than
 # hiding it inside a magic number.
 const ALMS_WARD_PCT_TEST := 12
-# BATCH CQ §3 — THREE SINCE CN §3'S FOLD (`MANTLE_HOPS + 1` at the read site).
+# BATCH CQ §3 — THREE SINCE CN §3'S FOLD (`MANTLE_HOPS` holds it since IU §3, the `+ 1` at the read site gone).
 const MANTLE_HOPS_TEST := 3
 const JUBILEE_MIN_FAITH_TEST := 3
 # RE-POINTED BY BATCH CG. Four of CE's magnitudes moved and one arrived; the
@@ -369,9 +370,14 @@ func _synergy_rule() -> void:
 	ok(start > 0, "the CE block is findable in classes.gd")
 	if start <= 0:
 		return
-	var block := src.substr(start, src.find("the vault, unsealed", start) - start)
+	# BATCH IU §5 — THE CE TRANCHE, CUT BY ITS OWN END: the banner to the next tranche's banner, never to the
+	# vault section, which sat three tranches further on (IT §3a's census, REPORTED: a NINE card defined in
+	# the CH, DO or DS region would still have read "inside the CE block").
+	var block := Gate.subject(src, start, "# ========== BATCH ")
 	ok(block.length() > 2000, "the CE block is a real region (%d chars)"
 		% block.length())
+	ok(block.begins_with("BATCH CE: TRANCHE 3, THE CLERIC NINE") and Gate.ends_inside(block, "# ========== BATCH "),
+		"the CE block read is the CE tranche alone — it ends at the next tranche's banner")
 	for n in NINE:
 		var at := block.find('"%s":' % n)
 		ok(at > 0, "%s's definition is inside the CE block" % n)
