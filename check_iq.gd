@@ -474,14 +474,15 @@ func _s2_master_figures() -> void:
 	var t0 := doc.find("<tr><th>Modifier</th><th>Severity</th>")
 	var t1 := doc.find("</table>", t0)
 	ok(t0 >= 0 and t1 > t0, "§2c: the modifier table is not in the document")
-	var mod_row := RegEx.create_from_string("<tr><td>([^<]+)</td><td>(\\d)</td>")
+	# RE-POINTED AT IX §3: a modifier with no severity is written with a dash where its grade would stand.
+	var mod_row := RegEx.create_from_string("<tr><td>([^<]+)</td><td>(\\d|—)</td>")
 	var listed := {}
 	for m in mod_row.search_all(doc.substr(t0, t1 - t0)):
 		var name := m.get_string(1).strip_edges()
 		listed[name] = true
 		if not deck.has(name):
 			wrong.append("§2c: the modifier table lists '%s', which the deck does not hold" % name)
-		elif deck[name] != int(m.get_string(2)):
+		elif deck[name] != (0 if m.get_string(2) == "—" else int(m.get_string(2))):
 			wrong.append("§2c: '%s' is listed at severity %s, the deck's is %d" % [name, m.get_string(2), deck[name]])
 	for name in deck:
 		if not listed.has(name):

@@ -382,8 +382,12 @@ func _s1_the_ladder() -> void:
 		if not st.contains("| %s | %.3f" % [r["modifier"], float(r["reading"])]):
 			missing.append(String(r["modifier"]))
 	ok(missing.is_empty(), "§1: %d modifiers' readings are not the figures docs/state.md's grades table carries: %s" % [missing.size(), str(missing)])
-	ok(st.contains(ARM_NEEDLE[a["arm"]]), "§1: docs/state.md does not say the arm the tables give (%s) — the screen's best R5 is %.2f and the cuts real %s" % [a["arm"], a["best"], str(a["real"])])
-	ok(st.contains(SUPERSEDED_NEEDLE), "§1: docs/state.md does not say the ladder's figures replace IP's — the measurement replaces the record rather than checking it")
+	# RE-POINTED AT IX §3: IX archived IW's grades block word for word, its heading struck as superseded by the cost scale, so
+	# the arm IW's tables gave and the ladder's figures replacing IP's are IW's record, read where that record lives; the
+	# readings above stay the live file's, IX's grades table carrying them.
+	var arch := _doc("res://DoD-archive/state-archive.md")
+	ok(arch.contains(ARM_NEEDLE[a["arm"]]), "§1: the state archive does not keep the arm the tables give (%s) — the screen's best R5 is %.2f and the cuts real %s" % [a["arm"], a["best"], str(a["real"])])
+	ok(arch.contains(SUPERSEDED_NEEDLE), "§1: the state archive does not keep the ladder's figures replacing IP's — the measurement replaces the record rather than checking it")
 	print("    CHECKED %d candidates (the winner %s, R5 %.2f), %d modifiers on its ladder, %d levels, cuts real %s — arm %s" % [
 		by.size(), a["winner"], a["best"], lrows.size(), levels.max() if not levels.is_empty() else 0, str(a["real"]), a["arm"]])
 
@@ -401,11 +405,16 @@ func _s2_the_grades() -> void:
 	var mods: Dictionary = _run.MODIFIERS
 	var moved: Array = []
 	var arm_bad: Array = []
+	# RE-POINTED AT IX §3: the grade a reading gives is the cost scale's (`docs/reports/IX-scale.tsv`, IX's arithmetic on these
+	# readings); the ladder's `grade` column is the grade as it stood at IW, kept as the record.
+	var scaled := {}
+	for sr in _tsv("res://docs/reports/IX-scale.tsv", ["id", "grade"]):
+		scaled[String(sr["id"])] = String(sr["grade"])
 	for r in lrows:
 		var id := String(r["id"])
 		var sev := int((mods.get(id, {}) as Dictionary).get("severity", 0))
-		if sev != int(r["grade"]):
-			moved.append("%s carries severity %d, its measurement reads grade %s" % [r["modifier"], sev, r["grade"]])
+		if not scaled.has(id) or sev != int(scaled[id]):
+			moved.append("%s carries severity %d, its measurement reads grade %s" % [r["modifier"], sev, scaled.get(id, "none")])
 		if a["arm"] == "A" and int(r["grade"]) != int(r["io_cut_grade"]):
 			arm_bad.append(String(r["modifier"]))
 	ok(moved.is_empty(), "§2: %d modifiers carry a grade no reading is behind — every grade carries its measurement: %s" % [moved.size(), str(moved)])

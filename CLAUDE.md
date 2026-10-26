@@ -1909,7 +1909,7 @@ decision and the STRUCTURE is what shipped.
   hardest rung dealt the mildest bargains), plus **FIXED ENCOUNTERS CARRY A MODIFIER**
   (`Run.arm_fixed_modifier`, armed at BOTH walk sites): the mini-boss and every boss, the nodes
   a route cannot duck. It is NOT a bargain — no offer, no choice, NO REWARD — **and it draws from
-  `Run.FIXED_MODIFIER_BAND`, the eight of severity 3–4, never from severity 5 (IN §1; CONFIRMED AT IO §0.4, the
+  `Run.FIXED_MODIFIER_BAND`, the modifiers of severity 3–4 (eight until IX §3's scale, five since), never from severity 5 (IN §1; CONFIRMED AT IO §0.4, the
   designer's)**: a modifier with no reward is not a bargain, so a severity 5 there would be pure difficulty with no
   twist bought — AQ's rule arriving by a different door. **Which eight is the grades'**: a re-grade moves the band's
   contents with it, and the batch that re-grades says what the fixed encounters draw after.
@@ -1963,6 +1963,24 @@ decision and the STRUCTURE is what shipped.
   measurement and its cut are IO's report, §2, re-taken where IP's repaired instrument could move it and re-cut at IP
   §1b (IP's report); **re-measured at IW §1 on the population a screen derived, where two of the four cuts fall inside a level,
   so no grade moved and the figures are IW's** (IW's report; which party the deck is ranked by is owed a ruling, `docs/state.md`).
+  **ITS RANK AND ITS COUNTS ARE SUPERSEDED AT IX §3, BY THE DESIGNER (the bullet below)**: what a grade measures — what a modifier
+  costs, not how it reads — stands; the cut at fixed counts and the cliff three deep do not.
+· **A MODIFIER's SEVERITY IS WHAT IT COSTS THE REFERENCE PARTY's HEALTH AT A BARGAIN FIGHT's END, AGAINST THE SAME PARTY WITH NO
+  MODIFIER (IX §3, the designer's).** In points of that party's maximum health:
+  no severity under 0.48; 1 to 1.70; 2 to 3.70; 3 to 6.88; 4 to 12.22; 5 from 12.22
+  — a grade of about 0.9, 2.5, 4.9, 8.8 and 15.6 or more, the costs of the levels it is cut between. **THE PARTY IS PART OF THE DEFINITION AND IS WRITTEN BESIDE THE SCALE
+  (IX §0.2)**: the sim's default party — the Berserker, the Cryomancer, the Devout and the Beastmaster — untalented, at Wanderer,
+  the one candidate of nine whose crowd a screen could resolve (IW §1a). A grade is a cost on a named party, not a universal truth:
+  a modifier whose cost swings by more than a band between parties carries that in its own words, where a player can see
+  whether it hits their build. **The cuts are derived, never chosen** — the midpoints between the costs of IW's eight levels
+  against the *none* arm — **and every grade falls out of its modifier's own reading by arithmetic**, so the counts move with
+  the costs and a re-measure re-grades by the same arithmetic, never by a re-cut.
+  **A MODIFIER THAT COSTS NOTHING HAS NO SEVERITY**: it sits in no band, so no rung deals it and no fixed encounter draws it
+  until it is re-authored, and **the rung
+  bands are read, never re-set to reach it or to fill one** (a rung whose band runs thin waits for the re-authored modifiers).
+  The exemption above stands — one that reads near the baseline only because the bot cannot use what it takes away keeps a
+  severity — and IX §2 found none of its six free modifiers that case. The derivation, the grades and what each band holds:
+  IX's report §3 and `docs/state.md`.
 · **THE BOT's ALLY POOLS ARE A KNOWN CONSTANT BIAS. THE BATCH THAT CHANGES THEM RE-MEASURES THE LADDER IN THE SAME BATCH, OR IT
   RETIRES THE LADDER (IS §4, the designer's).** Every bot ally pool is heroes-only where the player's picker admits a companion
   (`battle._bot_drafted_pick`, `_bot_class_kit_pick`, `_autoplay_pick_kit`), and every grade, band and band's mean above was

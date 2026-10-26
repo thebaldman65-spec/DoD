@@ -4976,8 +4976,8 @@ func bomb_damage() -> int:
 # THE POOL IS WEIGHTED LOW, DELIBERATELY. Every offer's first draw comes from
 # the rung's mild pool, so the safe slot on every card all run is served by
 # that pool alone; the harsh end already rotates and the low end is what
-# actually repeats. Counts: 6 / 6 / 4 / 4 across severities 1-4, and three more
-# at severity 5 — dealt at Ruin alone (its gamble band); four from IN §1 to IP §1b.
+# actually repeats. The counts are the scale's since IX §3 (below) and move with
+# the costs; IO's 6 / 6 / 4 / 4 / 3 is retired with the rank it was cut at.
 #
 # **BATCH IO §2 — EVERY GRADE IN THE TABLE IS A MEASUREMENT (the designer's).** A
 # modifier's severity is its rank by what it costs a party, not by how it reads: the
@@ -4992,6 +4992,17 @@ func bomb_damage() -> int:
 # cuts are still ties, named in `docs/state.md`). The section headers below say
 # where each modifier was AUTHORED, not where it is graded. A re-grade keeps the table's
 # order, so the dice deal by the same positions.
+#
+# **BATCH IX §3 — A SEVERITY IS A COST BAND ON A NAMED PARTY, NOT A RANK AT A COUNT (the designer's); it supersedes the
+# rank and IO's counts above.** A modifier's severity is what it costs THE REFERENCE PARTY's health at a bargain fight's
+# end, against the same party with no modifier. **The reference party: the sim's default party — the Berserker, the
+# Cryomancer, the Devout and the Beastmaster — untalented, at Wanderer (IX §0.2).** In points of that party's maximum
+# health: **no severity under 0.48; 1 to 1.70; 2 to 3.70; 3 to 6.88; 4 to 12.22; 5 from 12.22** — the cuts are the
+# midpoints between the costs of IW's eight levels against the *none* arm (IX §3's derivation, off
+# `docs/reports/IW-ladder.tsv`), and each row's grade falls out of its own reading by arithmetic, so the counts move with
+# the costs. **A modifier that costs nothing has no severity (`"severity": 0`)**: no band reaches it, so no rung deals it
+# and no fixed encounter draws it until it is re-authored. Every figure, every cost and the derivation printed:
+# `docs/reports/IX-scale.tsv` and IX's report, §3.
 #
 # SEVERITY 4 IS FOUR AGAIN (Batch BB §5). `rot` — maximum health halved for
 # everyone — was authored by AQ, implemented, and DROPPED there: the battle-end
@@ -5046,43 +5057,43 @@ const SEVERITY_COLORS := {
 const MODIFIERS := {
 	"overgrown": {"name": "Overgrown", "tag": "Ov", "severity": 4,
 		"desc": "Both parties begin the fight at 70% health at most."},
-	"tinderbox": {"name": "Tinderbox", "tag": "Ti", "severity": 1,
+	"tinderbox": {"name": "Tinderbox", "tag": "Ti", "severity": 0,
 		"desc": "All fire strike damage +25%, whoever deals it."},
-	"frenzied": {"name": "Frenzied", "tag": "Fr", "severity": 1,
+	"frenzied": {"name": "Frenzied", "tag": "Fr", "severity": 0,
 		"desc": "Everyone acts 30% faster. Cooldowns are unchanged."},
-	"brittle": {"name": "Brittle", "tag": "Bi", "severity": 2,
+	"brittle": {"name": "Brittle", "tag": "Bi", "severity": 1,
 		"desc": "All attacks ignore armor, on both sides."},
-	"warded": {"name": "Warded", "tag": "Wa", "severity": 1,
+	"warded": {"name": "Warded", "tag": "Wa", "severity": 2,
 		"desc": "All abilities cost 25% more. Basic attacks are free."},
 	"bloodless": {"name": "Bloodless", "tag": "Nh", "severity": 5,
 		"desc": "No healing for anyone. Bleed and damage-over-time still tick."},
 	# ---- authored by AQ at severity 1 (every grade in this table is IO §2's measurement) ----
-	"parched": {"name": "Parched", "tag": "Pa", "severity": 1,
+	"parched": {"name": "Parched", "tag": "Pa", "severity": 0,
 		"desc": "Both parties begin the fight at half resource at most."},
-	"slick": {"name": "Slick Footing", "tag": "Sk", "severity": 2,
+	"slick": {"name": "Slick Footing", "tag": "Sk", "severity": 1,
 		"desc": "Every ability costs +0.5 initiative. Everyone is slower to come round again."},
-	"dulledge": {"name": "Dull Edge", "tag": "De", "severity": 1,
+	"dulledge": {"name": "Dull Edge", "tag": "De", "severity": 0,
 		"desc": "Critical chance -5%, for everyone."},
-	"muffled": {"name": "Muffled", "tag": "Mu", "severity": 2,
+	"muffled": {"name": "Muffled", "tag": "Mu", "severity": 0,
 		"desc": "All Break damage is reduced 25%. Meters fill slowly."},
 	"hoarfrost": {"name": "Hoarfrost", "tag": "Ho", "severity": 1,
 		"desc": "Everyone begins the fight Chilled."},
 	# ---- authored by AQ at severity 2 ----
-	"fleeting": {"name": "Fleeting", "tag": "Ft", "severity": 2,
+	"fleeting": {"name": "Fleeting", "tag": "Ft", "severity": 0,
 		"desc": "Every status applied lasts one turn less (never below one)."},
-	"feverish": {"name": "Feverish", "tag": "Fv", "severity": 3,
+	"feverish": {"name": "Feverish", "tag": "Fv", "severity": 2,
 		"desc": "Everyone deals 25% more damage. Fights end quickly, one way or the other."},
-	"deadened": {"name": "Deadened", "tag": "Dd", "severity": 3,
+	"deadened": {"name": "Deadened", "tag": "Dd", "severity": 1,
 		"desc": "Nobody can be Broken. The Break meter does nothing this fight."},
-	"miasma": {"name": "Miasma", "tag": "Ma", "severity": 4,
+	"miasma": {"name": "Miasma", "tag": "Ma", "severity": 3,
 		"desc": "All healing received is halved."},
 	# ---- authored by AQ at severity 3 ----
-	"thinair": {"name": "Thin Air", "tag": "Ta", "severity": 4,
+	"thinair": {"name": "Thin Air", "tag": "Ta", "severity": 5,
 		"desc": "No resource returns at the start of a turn. Anything else that builds it still does."},
 	"encumbered": {"name": "Encumbered", "tag": "En", "severity": 2,
 		"desc": "Every ability with a cooldown costs two more turns of it. Basic attacks are unaffected."},
 	# ---- authored by AQ at severity 4 ----
-	"bloodletting": {"name": "Bloodletting", "tag": "Wo", "severity": 2,
+	"bloodletting": {"name": "Bloodletting", "tag": "Wo", "severity": 1,
 		"desc": "Every hit opens a wound. All attacks add 15 Bleed, on both sides."},
 	"mirrorbound": {"name": "Mirrorbound", "tag": "Mr", "severity": 5,
 		"desc": "An attack that does not miss sends a quarter of the damage it deals back on its attacker — at least 1, even when it deals none. On both sides."},

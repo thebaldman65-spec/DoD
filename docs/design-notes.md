@@ -4,6 +4,37 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The baseline's own error bar, and why the free modifiers are free (Batch IX) — 2026-10-26
+
+**Why a severity is a band of cost and not a rank cut at fixed counts.** IW's ladder showed the deck's costs, above the cheapest
+level, rising a step a little under double the last — a scale nobody designed, read off the measurement. A rank cut at fixed
+counts moves modifiers by where the counts fall, and IW showed two of the four cuts landing inside a cluster; a band of cost moves
+each modifier by its own figure. So the boundaries are the midpoints between the measured levels' costs and every grade falls out
+of its reading, and the counts are whatever the costs make them.
+
+**Why the scale names a party.** The same modifier costs an untalented party ten times what it costs a fully talented one (Thin
+Air), because a talented party has a second source of what the modifier takes. That is a feature — difficulty that depends on the
+build — and one number cannot carry it, so a grade is what a modifier costs one named party, the one a screen could resolve, and a
+modifier whose cost swings by more than a band between parties says so in its words.
+
+**Why the baseline got its own error bar.** Every cost is a difference from it, so it is the one figure the others mean nothing
+without. An arm that measures nothing happening is still an arm, with a seed, a count and an error, and every other arm is set
+against it run for run. Pairing turned out to buy little: a run parts from its twin at its first bargain fight.
+
+**Why the cheapest modifiers were measured one side at a time.** A modifier can be free because it is too mild, or because the
+enemies' half of it pays the party back — the shape that sank the Hungering Dark. The two want different repairs: a number turned,
+or a rule re-keyed. Laid on the heroes alone, none of the seven showed the second shape, so each wants its number turned. Two of
+them move the healing a fight takes rather than the health it ends at, so a number turned on them is turned against this party's
+healing — which is the one party the scale names, met again at the repair.
+
+**Why the six were taken out of the deck rather than left at severity 1.** A modifier that costs nothing has no band to stand in;
+leaving it graded would deal it as a price the party never pays. Taking it out of every band changes what the rungs deal, and the
+bands were read rather than widened to make up for it: the free modifiers come back when they cost something.
+
+**Why the scale's first band is a warning as well as a grade.** Two standard errors of a paired cost at sixty runs are about
+1.3 points of health, and a severity 1 is about 0.9: the instrument cannot yet tell a 1 from no severity.
+Reading one cleanly wants about 113 runs an arm — recorded so the next re-authoring is measured at a count that can see it.
+
 ## The ladder with resolution, and the deck's middle (Batch IW) — 2026-10-25
 
 **Why the ladder was measured on a population a screen chose, and not on more runs.** To tell five grades apart the readings

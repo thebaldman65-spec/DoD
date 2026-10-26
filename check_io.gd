@@ -49,7 +49,9 @@ const GONE_WORDS := ["famine", "Famine", "cruel_order", "Cruel Order", "_pouch_s
 	"hungering_dark", "Hungering Dark", "HUNGERING_DARK_PCT", "_dark_feeds"]
 # §2 — the sizes the bands are built on: six at 1, six at 2, four at 3, four at 4, and three at 5 since IP §1b (four
 # from IO's brief §2, constraint 1, until the top was cut at the cliff).
-const GRADE_COUNTS := {1: 6, 2: 6, 3: 4, 4: 4, 5: 3}
+# RE-POINTED AT IX §3: a grade is a cost band on the reference party now, so the counts are the scale's arithmetic on IW's
+# ladder (six modifiers carry no severity and stand in no band) — a re-measure moves them with the costs, and this line with it.
+const GRADE_COUNTS := {1: 5, 2: 3, 3: 3, 4: 2, 5: 4}
 # §5 — the four glyphs, each meaning one thing (IE §0.1, II §0.4); a bargain's chip is none of them.
 const GLYPHS := ["◆", "↑", "✦", "○"]
 
@@ -158,7 +160,8 @@ func _floor_offer(floor_sev: int) -> Array:
 	var rest: Array = []
 	for id in _run.MODIFIERS:
 		var sv := int(_run.modifier_severity(String(id)))
-		if sv >= 5:
+		# RE-POINTED AT IX §3: a modifier with no severity is in no band, so the floor's split is of the graded deck.
+		if sv >= 5 or sv < 1:
 			continue
 		if sv <= floor_sev:
 			low.append(String(id))
@@ -573,7 +576,9 @@ func _s1f_the_words() -> void:
 	var rows_bad: Array = []
 	for id3 in _run.MODIFIERS:
 		var cfg: Dictionary = _run.MODIFIERS[id3]
-		if not mh.contains("<td>%s</td><td>%d</td>" % [String(cfg["name"]), int(cfg["severity"])]):
+		# RE-POINTED AT IX §3: a modifier with no severity is written with a dash where its grade would stand.
+		var sev_cell := "—" if int(cfg["severity"]) == 0 else str(int(cfg["severity"]))
+		if not mh.contains("<td>%s</td><td>%s</td>" % [String(cfg["name"]), sev_cell]):
 			rows_bad.append("%s %d" % [cfg["name"], cfg["severity"]])
 	ok(rows_bad.is_empty(), "§1f: `master.html`'s modifier table has no row at its grade for %s" % str(rows_bad))
 	for gone in ["Famine", "Cruel Order", "The Hungering Dark"]:

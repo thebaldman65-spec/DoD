@@ -181,7 +181,9 @@ func _snap(scene: Node) -> String:
 func _table_sevs() -> Array:
 	var out: Array = []
 	for id in _run.MODIFIERS:
-		out.append(int(_run.modifier_severity(String(id))))
+		# RE-POINTED AT IX §3: the table a rung deals from is the graded deck — a modifier with no severity stands in no band.
+		if int(_run.modifier_severity(String(id))) >= 1:
+			out.append(int(_run.modifier_severity(String(id))))
 	return out
 
 
@@ -273,7 +275,8 @@ func _floor_offer(floor_sev: int) -> Array:
 	# BATCH IN §1 — IM's table was the twenty: Ruin's severity-5 four stand above every band this model deals.
 	var top20 := int(((_run.DIFFICULTIES["ruin"] as Dictionary)["gamble_band"] as Array)[0]) - 1
 	for id in _run.MODIFIERS:
-		if int(_run.modifier_severity(String(id))) > top20:
+		# RE-POINTED AT IX §3: and a modifier with no severity is in no band, so the floor never split it either.
+		if int(_run.modifier_severity(String(id))) > top20 or int(_run.modifier_severity(String(id))) < 1:
 			continue
 		if int(_run.modifier_severity(String(id))) <= floor_sev:
 			low.append(String(id))
@@ -420,9 +423,10 @@ func _s1_the_words() -> void:
 		else:
 			high += 1
 	var mod_e := String(Glossary.entry("modifier").get("long", ""))
-	ok(low > high and mod_e.contains("The twenty are weighted toward the mild end"),
-		"§1: G080L — the twenty hold %d at severity 1-2 and %d at 3-%d; the entry says the twenty are weighted toward the mild end: %s" % [
-			low, high, top_20, mod_e.contains("The twenty are weighted toward the mild end")])
+	# RE-POINTED AT IX §3: the scale moves how many stand beneath Ruin's gambles, so the entry names them without a count.
+	ok(low > high and mod_e.contains("They are weighted toward the mild end"),
+		"§1: G080L — the modifiers beneath Ruin's gambles hold %d at severity 1-2 and %d at 3-%d; the entry says they are weighted toward the mild end: %s" % [
+			low, high, top_20, mod_e.contains("They are weighted toward the mild end")])
 	ok(mod_e.contains("the safe slot on Wanderer's and Warden's bargains draws from that end")
 			and not mod_e.contains("the safe slot on every bargain"),
 		"§1: the modifier entry still says every bargain's safe slot draws from the mild end — Ruin's does not")

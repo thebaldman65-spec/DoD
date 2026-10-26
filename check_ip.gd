@@ -36,9 +36,13 @@ var _strip := {}
 # §1a — every name the removed modifier and its doors went by.
 const DARK_WORDS := ["hungering_dark", "Hungering Dark", "HUNGERING_DARK_PCT", "_dark_feeds"]
 # §1b — the sizes the bands are built on since the cut (the brief's §1b): the table's own counts, the top three deep.
-const GRADE_COUNTS := {1: 6, 2: 6, 3: 4, 4: 4, 5: 3}
+# RE-POINTED AT IX §3: a grade is a cost band on the reference party now, so the counts are the scale's arithmetic on IW's
+# ladder (six modifiers carry no severity and stand in no band) — a re-measure moves them with the costs, and this line with it.
+const GRADE_COUNTS := {1: 5, 2: 3, 3: 3, 4: 2, 5: 4}
 # §1b — EP's sample as IO read it (`docs/reports/IO.md` §2d): the reading the cut is held against, not a grade.
-const IO_SAMPLE := {"wanderer": 2.84, "warden": 3.29, "ruin": 4.49}
+# RE-POINTED AT IX §3: the scale's grades deal these means from the same dice (IX's reading; IO's 2.84 / 3.29 / 4.49 stood until
+# then), so a grade moved with no measurement still moves a mean here.
+const IO_SAMPLE := {"wanderer": 2.76, "warden": 3.28, "ruin": 4.47}
 
 
 func ok(cond: bool, what: String) -> void:
@@ -225,8 +229,9 @@ func _s1b_the_cut() -> void:
 	# RUIN's GAMBLES: the band holds three and is severity 5 alone; no other rung's band reaches it.
 	var ruin: Dictionary = _run.DIFFICULTIES["ruin"]
 	var gb := _band_members(ruin["gamble_band"])
-	ok(gb.size() == 3 and (ruin["gamble_band"] as Array) == [5, 5], "§1b: Ruin's gamble band %s holds %s — want the three of severity 5" % [
-		str(ruin["gamble_band"]), str(gb)])
+	# RE-POINTED AT IX §3: severity 5 is the scale's top band, as deep as the costs put it — four since IX.
+	ok(gb.size() == int(GRADE_COUNTS[5]) and (ruin["gamble_band"] as Array) == [5, 5], "§1b: Ruin's gamble band %s holds %s — want the %d of severity 5" % [
+		str(ruin["gamble_band"]), str(gb), int(GRADE_COUNTS[5])])
 	for d in ["wanderer", "warden"]:
 		var reach: Array = []
 		for k in ["safe_band", "gamble_band"]:
@@ -236,7 +241,8 @@ func _s1b_the_cut() -> void:
 		ok(reach.is_empty(), "§1b: %s's bands reach a severity-5 modifier: %s" % [d, str(reach)])
 	# THE FIXED ENCOUNTERS draw the eight of severity 3–4, never a 5.
 	var fixed := _band_members(_run.FIXED_MODIFIER_BAND)
-	ok(fixed.size() == 8 and (_run.FIXED_MODIFIER_BAND as Array) == [3, 4], "§1b: the fixed band %s holds %d — %s" % [
+	# RE-POINTED AT IX §3: the fixed encounters draw whatever the scale grades 3–4 (eight until IX, five since).
+	ok(fixed.size() == int(GRADE_COUNTS[3]) + int(GRADE_COUNTS[4]) and (_run.FIXED_MODIFIER_BAND as Array) == [3, 4], "§1b: the fixed band %s holds %d — %s" % [
 		str(_run.FIXED_MODIFIER_BAND), fixed.size(), str(fixed)])
 	print("    Ruin's gambles: %s; the fixed encounters draw %s" % [str(gb), str(fixed)])
 	# THE WORDS THAT COUNT THEM (II §0.7: a figure the text states is read off what decides it, or an instrument holds the two

@@ -17,6 +17,88 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT IX — 2026-10-26, FROM `docs/state.md` AS IT LEFT IT (`a538639`)
+
+**What came here**: IW's two rulings, both answered in IX's brief (the scale, IX §0.1 and §3; one party, IX §0.2); THE BARGAIN DECK's GRADES as IW left it — IW's table, its levels and its arm, superseded by IX's scale; and the roadmap's item that the deck's middle waits on IW's rulings. Each word for word, under the heading it stood under.
+
+
+### ~~IW's RULINGS OWED~~ — **BOTH ANSWERED IN IX's BRIEF (1: the nineteen are a scale, not a re-cut — a grade is a cost band and falls out of its reading, IX §0.1 and §3; 2: one party, IW's, named beside the scale, IX §0.2)** — was: **TWO; BOTH ARE THE DECK's, AND NOTHING IS AUTHORED OR RE-CUT UNTIL THEY ARE ANSWERED**
+
+Full working: `docs/reports/IW.md`, NEEDS A RULING.
+
+1. **THE 19 GRADES THE MEASUREMENT DOES NOT SUPPORT, EACH WITH ITS HANDLE** (arm B's list; THE BARGAIN DECK's GRADES, below). Each shares a level of IW's ladder with a modifier of another grade, so the measurement cannot place it in its grade rather than the neighbour's. **Which to re-cut, and by which handle, is the designer's** — a handle is named, never its figure, so a re-tune at its source is read by `check_iw` §2 and nothing goes stale. **The list's length hangs on one reading**: Deadened opens its level by 0.2% of the line the rule draws, and read the other side Brittle, Slick Footing, Bloodletting, Encumbered would be supported and 15 not (the arm the same; IW's report §2):
+
+| modifier | grade | IW's reading | other grades in its level | the handle |
+|---|---|---|---|---|
+| Dull Edge | 1 | 0.950 | 2 | a percentage — `u.crit_bonus` in its arm of `battle._stamp_modifier` |
+| Parched | 1 | 0.945 | 2 | a fraction — `u.max_resource` in its arm of `battle._stamp_modifier` |
+| Tinderbox | 1 | 0.944 | 2 | a percentage — `u.type_dmg_bonus["fire"]` in its arm of `battle._stamp_modifier` |
+| Frenzied | 1 | 0.943 | 2 | a percentage — `mod_speed_mult` in its arm of `battle._stamp_modifier` |
+| Muffled | 2 | 0.943 | 1 | a percentage — `mod_bd_mult` in its arm of `battle._stamp_modifier` |
+| Fleeting | 2 | 0.940 | 1 | a count — `mod_status_turns` in its arm of `battle._stamp_modifier` |
+| Hoarfrost | 1 | 0.939 | 2 | a duration — `_apply_status(u, "chilled"` in its arm of `battle._stamp_modifier` |
+| Deadened | 3 | 0.938 | 2 | a rule — no handle to turn |
+| Brittle | 2 | 0.936 | 3 | a rule — no handle to turn |
+| Slick Footing | 2 | 0.936 | 3 | a count — `ab.delay` in its arm of `battle._stamp_modifier` |
+| Bloodletting | 2 | 0.935 | 3 | a count — `mod_bleed_add` in its arm of `battle._stamp_modifier` |
+| Encumbered | 2 | 0.927 | 3 | a count — `ab.cooldown` in its arm of `battle._stamp_modifier` |
+| Feverish | 3 | 0.920 | 1 | a percentage — `u.attack` in its arm of `battle._stamp_modifier` |
+| Warded | 1 | 0.918 | 3 | a percentage — `mod_cost_mult` in its arm of `battle._stamp_modifier` |
+| The Thin Veil | 3 | 0.896 | 4 | a percentage — `Run.THIN_VEIL_PCT` in its arm of `battle._stamp_modifier` |
+| The Long Silence | 3 | 0.895 | 4 | a rule — no handle to turn |
+| Miasma | 4 | 0.892 | 3 | a percentage — `healing_received_mult` in its arm of `battle._stamp_modifier` |
+| Thin Air | 4 | 0.734 | 5 | a rule — no handle to turn |
+| Bloodless | 5 | 0.702 | 4 | a rule — no handle to turn |
+
+2. **WHICH PARTY THE DECK IS RANKED BY.** A severity is a rank by what a modifier costs a party (IO §2) — and on the incumbent nineteen cost the same, while on the party the screen chose the order moves (Thin Air with the costliest, Warded with grade 3, Deadened and Hoarfrost with the cheapest). **Rank the deck by one party, by several, or by what each rung's own party meets** — the measurement can serve any of them; the choice is what a grade means — and the glossary's *Severity* entry, which tells the player *a severity is a rank by what a modifier costs*, follows the answer (it holds today: the three 5s are three of the four costliest on IW's ladder).
+
+### ~~THE BARGAIN DECK's GRADES~~ — **SUPERSEDED AT IX §3 (a severity is a cost band on the reference party; every grade re-set by arithmetic — THE BARGAIN DECK's GRADES in `docs/state.md`)** — was: **RE-MEASURED AT IW §1 ON THE POPULATION A SCREEN DERIVED; ARM B: NO GRADE IS RE-CUT, AND THE MEASUREMENT SUPPORTS 4 OF TWENTY-THREE**
+
+**What the table is (IW §1).** Each modifier forced on every bargain of a run — the sim's forced arm through IV's probe, its fidelity proved (IW's report §1) — on the population a screen of nine derived: **the sim's default party (the Berserker, the Cryomancer, the Devout and the Beastmaster), untalented, at Wanderer**, seed block 38, sixty runs an arm; the party's share of its health at a bargain fight's end (an elite, and the mini-boss, which offers a bargain at Wanderer). **THE LADDER's FIGURES REPLACE IP's — THIS MEASUREMENT REPLACES THE RECORD RATHER THAN CHECKING IT**, and IP's figures are superseded; the grades stand as IP cut them (arm B, below). Every figure, its standard error, its level and its handle: `docs/reports/IW-ladder.tsv`; the screen: `docs/reports/IW-screen.tsv`.
+
+**Why this population.** The incumbent — IG's three parties, all twenty-seven nodes, Ruin — ends nineteen of the twenty-three bargain fights within a few hundredths of full health, too close for its noise to rank them. The screen read each candidate on five modifiers across the range (thirty runs) and ranked them by the spread of its readings over its own two standard errors, the floor 4 written before it ran: the sim's default party untalented, Wanderer 20.1 (its four cheaper 4.5); IG's Hierophant population untalented, Wanderer 13.8 (its four cheaper 3.1); IG's three parties, all 27 nodes, Ruin (the incumbent) 12.3 (its four cheaper 3.7); the sim's default party untalented, Warden 11.3 (its four cheaper 4.0); IG's three parties untalented, Wanderer 11.0 (its four cheaper 2.4); IG's three parties, one tier, Ruin 7.8 (its four cheaper 1.8); IG's Hierophant population untalented, Warden 7.1 (its four cheaper 3.0); IG's three parties untalented, Warden 4.9 (its four cheaper 1.7); IG's three parties untalented, Ruin 4.2 (its four cheaper 2.1). The winner is also the only candidate whose four cheaper readings alone clear 4.
+
+| modifier | IW's reading | level | grade (as it stands) | supported | IP's figure (superseded) |
+|---|---|---|---|---|---|
+| Dull Edge | 0.950 ± 0.004 | 1 | 1 | **no** | 0.957 |
+| Parched | 0.945 ± 0.004 | 1 | 1 | **no** | 0.948 |
+| Tinderbox | 0.944 ± 0.005 | 1 | 1 | **no** | 0.951 |
+| Frenzied | 0.943 ± 0.005 | 1 | 1 | **no** | 0.954 |
+| Muffled | 0.943 ± 0.004 | 1 | 2 | **no** | 0.941 |
+| Fleeting | 0.940 ± 0.005 | 1 | 2 | **no** | 0.931 |
+| Hoarfrost | 0.939 ± 0.005 | 1 | 1 | **no** | 0.963 |
+| Deadened | 0.938 ± 0.004 | 2 | 3 | **no** | 0.899 |
+| Brittle | 0.936 ± 0.005 | 2 | 2 | **no** | 0.921 |
+| Slick Footing | 0.936 ± 0.006 | 2 | 2 | **no** | 0.945 |
+| Bloodletting | 0.935 ± 0.005 | 2 | 2 | **no** | 0.938 |
+| Encumbered | 0.927 ± 0.006 | 2 | 2 | **no** | 0.941 |
+| Feverish | 0.920 ± 0.006 | 3 | 3 | **no** | 0.910 |
+| Warded | 0.918 ± 0.008 | 3 | 1 | **no** | 0.949 |
+| The Thin Veil | 0.896 ± 0.006 | 4 | 3 | **no** | 0.908 |
+| The Long Silence | 0.895 ± 0.005 | 4 | 3 | **no** | 0.910 |
+| Miasma | 0.892 ± 0.007 | 4 | 4 | **no** | 0.875 |
+| Rot | 0.857 ± 0.008 | 5 | 4 | yes | 0.899 |
+| Overgrown | 0.854 ± 0.009 | 5 | 4 | yes | 0.857 |
+| Mirrorbound | 0.788 ± 0.009 | 6 | 5 | yes | 0.706 |
+| Thin Air | 0.734 ± 0.014 | 7 | 4 | **no** | 0.897 |
+| Bloodless | 0.702 ± 0.010 | 7 | 5 | **no** | 0.640 |
+| Wasting | 0.579 ± 0.016 | 8 | 5 | yes | 0.684 |
+
+- **ARM B — THE GRADES ARE NOT FIVE LEVELS ON THIS POPULATION EITHER, SO NONE IS RE-CUT (IW §2, by the rule written before the ladder ran).** A level opens at the cheapest reading and holds every next one within two standard errors of the difference of its first (IP §0.4's tie rule); a cut at IO's counts is real when its two neighbours sit in different levels. **8 levels; two of the four cuts fall inside one** — Fleeting | Hoarfrost (0.001 apart, 0.16 se) and The Long Silence | Miasma (0.003 apart, 0.32 se) — and two are real (Encumbered | Feverish, 0.83 se; Mirrorbound | Thin Air, 3.20 se). A re-cut on it would move modifiers across two of the four boundaries by noise, which is a grade changed without its measurement.
+- **SUPPORTED, AND NOT.** A grade is supported when every modifier of its level carries it: **4** are — Rot, Overgrown, Mirrorbound, Wasting; **the other 19 share a level with a modifier of another grade**, and the list, with each one's handle, is the designer's to rule on (IW's RULINGS OWED, 1).
+- **WHAT THIS POPULATION READS THAT THE INCUMBENT COULD NOT.** The costs spread wider — 8 levels where the incumbent's re-drive read six — and the order moves where it is not noise: **Thin Air** (grade 4) ends a bargain fight at 0.734, between Mirrorbound and Bloodless, and completes 26 of 60 runs; **Mirrorbound** (grade 5) at 0.788, above it; **Warded** (grade 1) at 0.918, with grade 3; **Deadened** (grade 3) at 0.938 and **Hoarfrost** (grade 1) at 0.939, in the cheapest two levels. An untalented party leans on what these take away — its resource returning, its armour, its cheap casts — so a grade is a rank by what a modifier costs a party, and **this measurement says the party matters**: which party the deck is ranked by is the designer's (IW's RULINGS OWED, 2).
+- **THE GAP, MEASURED.** The largest interval between two adjacent readings is Bloodless | Wasting, 0.123 wide (6.6 se) — at the costly end. Above it: Overgrown 0.854 | Mirrorbound 0.788 and Mirrorbound | Thin Air 0.734, both past two standard errors. **Nothing is authored**: the modifiers are the designer's, against these figures. **What a target would be derived from, measured beside it** (arm A's step, read on arm B as data): this party's natural bargain fights — the bot's own bargains, no forced modifier, sixty runs a rung — end at **0.869 at Wanderer, 0.647 at Warden, 0.540 at Ruin** (53, 1 and 0 of 60 runs completed); with no modifier at all, its Wanderer bargain fights end at 0.944.
+- **WHAT THE GRADES ARE, SAID WHERE THEY ARE READ.** They are still IP's cut of the incumbent (IO §2's method, IP §1b's counts), and **IW's figures are one party's**, untalented, at Wanderer's multiplier, through the bot — which books 2.2 times a player's status events (THE FIRST CLEAN PLAYTHROUGH) and whose ally pools are heroes-only (a constant bias every figure here was taken through, IS §4). IP's two ties (Parched | Slick Footing, Deadened | Rot) are IP's figures and are superseded with them.
+- **THE THIN VEIL IS STILL FEVERISH's RULE AT TWICE THE FIGURE (IP §0.6)**: on IW's population the two settings of the one dial read apart — Feverish 0.920, the Veil 0.896 — where IP's read them together; a rule of its own is still the designer's to author.
+
+### THE PLAYTEST'S OTHER FINDINGS — **LATER BATCHES BY RULING (HW's brief §5); THE ROADMAP HOLDS THE ORDER** — ITS CLOSED ITEMS (archived at IX; the section stays in `docs/state.md`)
+
+- **THE LADDER IS RE-MEASURED (IW §1), AND THE DECK's MIDDLE WAITS ON IW's TWO RULINGS**: on the population a screen derived the costs spread wider and re-order the deck, but two of the four cuts fall inside a level, so no grade moved (arm B) — the nineteen grades the measurement does not support, and which party the deck is ranked by, are the designer's (IW's RULINGS OWED); every mark IV set is re-taken (THE SIM's FIGURES, RE-TAKEN AT IW). The modifiers of the middle are the designer's, against IW's figures.
+
+*Both rulings answered in IX's brief (the scale, IX §0.1 and §3; one party, IX §0.2); IX's item in its place.*
+
+---
+
 ## ARCHIVED AT IW — 2026-10-25, FROM `docs/state.md` AS IT LEFT IT (`b462bc3`)
 
 **What came here**: IV's three rulings, every one answered in IW's brief; WHAT IV's DRIVE MOVED, every mark re-taken at IW §3; FOUND AT IV's two findings, the lane lock built at IW §0.2 and `DOD_ZONE_ROTATION` gated at IW §0.3; and GK's first ruling, the spine names, confirmed at IW §0.1; THE BARGAIN DECK's GRADES' superseded table (IP's figures and IV's paragraph beside them, replaced by IW's ladder) and the roadmap's re-measure item, taken at IW §1. Each word for word, under the heading it stood under.

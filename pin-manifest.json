@@ -2,20 +2,20 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 2062,
-  "source": 1413,
-  "other": 194,
-  "document": 455
+  "total": 2075,
+  "source": 1414,
+  "other": 202,
+  "document": 459
  },
  "floor": {
-  "pins": 2062
+  "pins": 2075
  },
  "falls": [],
  "source_residency": {
   "narrow": 49,
   "code": 873,
   "absent": 329,
-  "runtime": 103,
+  "runtime": 104,
   "unresolved": 3,
   "comment": 48,
   "missing-file": 5,
@@ -7473,7 +7473,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_im.gd#586"
+   "g": "check_im.gd#587"
   },
   {
    "s": "check_im.gd",
@@ -7484,7 +7484,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "read",
-   "g": "check_im.gd#595"
+   "g": "check_im.gd#596"
   },
   {
    "s": "check_im.gd",
@@ -7495,7 +7495,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "read",
-   "g": "check_im.gd#595"
+   "g": "check_im.gd#596"
   },
   {
    "s": "check_im.gd",
@@ -7506,7 +7506,7 @@
    "r": "comment",
    "k": "literal",
    "how": "derived",
-   "g": "check_im.gd#589"
+   "g": "check_im.gd#590"
   },
   {
    "s": "check_im.gd",
@@ -7517,7 +7517,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_im.gd#583"
+   "g": "check_im.gd#584"
   },
   {
    "s": "check_im.gd",
@@ -7528,7 +7528,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "read",
-   "g": "check_im.gd#595"
+   "g": "check_im.gd#596"
   },
   {
    "s": "check_im.gd",
@@ -7539,7 +7539,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_im.gd#590"
+   "g": "check_im.gd#591"
   },
   {
    "s": "check_im.gd",
@@ -7550,7 +7550,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_im.gd#583"
+   "g": "check_im.gd#584"
   },
   {
    "s": "check_im.gd",
@@ -7561,7 +7561,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_im.gd#590"
+   "g": "check_im.gd#591"
   },
   {
    "s": "check_in.gd",
@@ -7572,7 +7572,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_in.gd#543",
+   "g": "check_in.gd#549",
    "expr": "note"
   },
   {
@@ -7584,7 +7584,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_in.gd#544"
+   "g": "check_in.gd#550"
   },
   {
    "s": "check_in.gd",
@@ -7595,7 +7595,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_in.gd#388"
+   "g": "check_in.gd#394"
   },
   {
    "s": "check_in.gd",
@@ -7606,7 +7606,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_in.gd#385"
+   "g": "check_in.gd#391"
   },
   {
    "s": "check_io.gd",
@@ -7617,7 +7617,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_io.gd#763"
+   "g": "check_io.gd#764"
   },
   {
    "s": "check_io.gd",
@@ -7628,7 +7628,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_io.gd#764"
+   "g": "check_io.gd#765"
   },
   {
    "s": "check_io.gd",
@@ -7639,7 +7639,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_io.gd#762"
+   "g": "check_io.gd#763"
   },
   {
    "s": "check_io.gd",
@@ -7662,18 +7662,18 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_io.gd#420"
+   "g": "check_io.gd#421"
   },
   {
    "s": "check_io.gd",
    "fn": "_s1f_the_words",
    "h": "docs/master.html",
-   "n": "<td>%s</td><td>%d</td>",
+   "n": "<td>%s</td><td>%s</td>",
    "p": "-",
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_io.gd#416"
+   "g": "check_io.gd#417"
   },
   {
    "s": "check_io.gd",
@@ -7684,7 +7684,7 @@
    "r": "code",
    "k": "literal",
    "how": "inline",
-   "g": "check_io.gd#662"
+   "g": "check_io.gd#663"
   },
   {
    "s": "check_ip.gd",
@@ -9470,25 +9470,25 @@
   {
    "s": "check_iw.gd",
    "fn": "_s1_the_ladder",
-   "h": "docs/state.md",
-   "n": null,
-   "p": "+",
-   "r": "runtime",
-   "k": "non-literal",
-   "how": "read",
-   "g": "check_iw.gd#271",
-   "expr": "ARM_NEEDLE"
-  },
-  {
-   "s": "check_iw.gd",
-   "fn": "_s1_the_ladder",
-   "h": "docs/state.md",
+   "h": "DoD-archive/state-archive.md",
    "n": null,
    "p": "+",
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
    "g": "check_iw.gd#272",
+   "expr": "ARM_NEEDLE"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s1_the_ladder",
+   "h": "DoD-archive/state-archive.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_iw.gd#273",
    "expr": "SUPERSEDED_NEEDLE"
   },
   {
@@ -9511,7 +9511,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iw.gd#343",
+   "g": "check_iw.gd#347",
    "expr": "_flat"
   },
   {
@@ -9523,8 +9523,141 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iw.gd#355",
+   "g": "check_iw.gd#359",
    "expr": "_flat"
+  },
+  {
+   "s": "check_ix.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "A MODIFIER THAT COSTS NOTHING HAS NO SEVERITY",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ix.gd#65"
+  },
+  {
+   "s": "check_ix.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "A MODIFIER's SEVERITY IS WHAT IT COSTS THE REFERENCE PARTY's HEALTH AT A BARGAIN FIGHT's END",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ix.gd#63"
+  },
+  {
+   "s": "check_ix.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "AN ARM THAT MEASURES NOTHING HAPPENING IS AN ARM, WITH A COUNT, A SEED AND AN ERROR BAR.",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ix.gd#67"
+  },
+  {
+   "s": "check_ix.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/state.md",
+   "n": "THE MODIFIERS THAT COST NOTHING ARE THE WORK; THE REST ARE A SCALE, NOT A RE-CUT",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ix.gd#66"
+  },
+  {
+   "s": "check_ix.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "THE PARTY IS PART OF THE DEFINITION AND IS WRITTEN BESIDE THE SCALE",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ix.gd#64"
+  },
+  {
+   "s": "check_ix.gd",
+   "fn": "_s2_the_halves",
+   "h": "docs/state.md",
+   "n": "%s — %s",
+   "p": "-",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_ix.gd#141"
+  },
+  {
+   "s": "check_ix.gd",
+   "fn": "_s3_the_scale",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ix.gd#272",
+   "expr": "says"
+  },
+  {
+   "s": "check_ix.gd",
+   "fn": "_s3_the_scale",
+   "h": "scripts/run_sim.gd",
+   "n": "var default_specs := ",
+   "p": "+",
+   "r": "runtime",
+   "k": "composed",
+   "how": "read",
+   "g": "check_ix.gd#217"
+  },
+  {
+   "s": "check_ix.gd",
+   "fn": "_s4_the_swing",
+   "h": "docs/state.md",
+   "n": "%s swings",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_ix.gd#311"
+  },
+  {
+   "s": "check_ix.gd",
+   "fn": "_s4_the_swing",
+   "h": "docs/state.md",
+   "n": "%s swings %d bands",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_ix.gd#306"
+  },
+  {
+   "s": "check_ix.gd",
+   "fn": "_s4_the_swing",
+   "h": "docs/state.md",
+   "n": "the swing across builds",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ix.gd#318"
+  },
+  {
+   "s": "check_ix.gd",
+   "fn": "_s4_the_swing",
+   "h": "docs/state.md",
+   "n": "the swing between these two",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ix.gd#317"
   },
   {
    "s": "test_batch_ah.gd",
@@ -13720,7 +13853,18 @@
    "s": "test_batch_bb.gd",
    "fn": "_docs",
    "h": "data/glossary.json",
-   "n": "The twenty are weighted toward the mild end",
+   "n": "The twenty are weighted",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "test_batch_bb.gd#422"
+  },
+  {
+   "s": "test_batch_bb.gd",
+   "fn": "_docs",
+   "h": "data/glossary.json",
+   "n": "They are weighted toward the mild end",
    "p": "+",
    "r": "code",
    "k": "literal",

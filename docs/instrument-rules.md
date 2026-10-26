@@ -1406,6 +1406,15 @@ the rune was wired, because it was supplying the one input the defect was in.
   drive re-driven on the same tree reproduces its probe lines byte for byte — IW's re-drive of IV's forced arm reproduced IV's
   84,097 — and a job driven with the probe's reads switched off reproduces its probe-on twin's every run and the sim's own report,
   which is what shows the probe spends no die.
+- **AN ARM THAT MEASURES NOTHING HAPPENING IS AN ARM, WITH A COUNT, A SEED AND AN ERROR BAR. (IX §1, the designer's)** A baseline is
+  the one figure that gives every other arm its meaning, so it is driven, kept and printed as an arm is — its seed block, its run
+  count, its reading and its standard error, in the kept table and wherever the arms are read — and every arm is set against it
+  as a PAIRED difference by seed, with that difference's own error, never as two intervals eyeballed side by side. **It is read
+  by the rule the arms are read by, and that is asserted**: the *none* arm lays no modifier, so its bargain fights are read by
+  node, which is the arms' rule only because on every arm the node reading and the modifier reading count the same fights —
+  IV's reader counted a bargain fight only where a modifier stood, and could not read its own *none* arm. **And pairing buys
+  what the runs share, no more**: a run diverges from its twin at its first bargain fight, so on IX's arms the paired error
+  stood within a few percent of the unpaired one — the pairing makes the comparison honest, not cheap.
 
 ## STANDING RULE — AN INSTRUMENT'S OWN FIDELITY IS A PREMISE OF EVERY MEASUREMENT IT TAKES (Batch IP §2, ruled by the designer)
 > **AN INSTRUMENT'S OWN FIDELITY IS A PREMISE OF EVERY MEASUREMENT IT TAKES.** A defect known in the instrument is

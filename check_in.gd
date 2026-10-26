@@ -48,7 +48,10 @@ const REMOVED := {"famine": "Famine", "cruel_order": "Cruel Order", "hungering_d
 # §1 — the grade counts the bands are built on. IN's *no existing modifier's severity moves* (its brief §6) held for IN; IO §2
 # re-graded the deck by measurement, at these counts (IO's brief §2, constraint 1) — and IP §1b cut the top at the cliff the
 # measurement shows, three deep, the counts below it the table's own.
-const GRADE_COUNTS := {1: 6, 2: 6, 3: 4, 4: 4, 5: 3}
+# RE-POINTED AT IX §3: a grade is a cost band on the reference party now, so the counts are the scale's arithmetic on IW's
+# ladder (six modifiers carry no severity and stand in no band) — a re-measure moves them with the costs, and this line with it.
+const GRADE_COUNTS := {1: 5, 2: 3, 3: 3, 4: 2, 5: 4}
+const UNGRADED := 6
 
 
 func ok(cond: bool, what: String) -> void:
@@ -155,7 +158,8 @@ func _im_offer(floor_sev: int) -> Array:
 	var rest: Array = []
 	for id in _run.MODIFIERS:
 		var sv := int(_run.modifier_severity(String(id)))
-		if sv >= 5:
+		# RE-POINTED AT IX §3: a modifier with no severity is in no band, so the table the floor split is the graded deck.
+		if sv >= 5 or sv < 1:
 			continue
 		if sv <= floor_sev:
 			low.append(String(id))
@@ -192,10 +196,16 @@ func _s1a_the_table() -> void:
 	for id1 in REMOVED:
 		ok(not (_run.MODIFIERS as Dictionary).has(id1), "§1a: `%s` (%s) is still in the deck — it was removed (IO §1, IP §1a)" % [id1, REMOVED[id1]])
 	var counts := {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+	var free := 0
 	for id2 in _run.MODIFIERS:
 		var sv0 := int(_run.modifier_severity(String(id2)))
+		if sv0 == 0:
+			free += 1
+			continue
 		counts[sv0] = int(counts.get(sv0, 0)) + 1
+	# The message keeps its words: IU's rules census holds them as S2-086's needle (check_iu §2).
 	ok(counts == GRADE_COUNTS, "§1a: the grades hold %s — the bands are built on %s" % [str(counts), str(GRADE_COUNTS)])
+	ok(free == UNGRADED, "§1a: %d modifiers carry no severity — the scale gives %d" % [free, UNGRADED])
 	var at5 := _band_members([5, 5])
 	print("    severity 5: %s; the grades at %s" % [str(at5), str(counts)])
 	# THE BANDS: Ruin's gambles at 5 alone; no Wanderer or Warden band reaches a severity-5 modifier — asserted

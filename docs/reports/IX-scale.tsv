@@ -1,0 +1,25 @@
+arm	id	seed_block	runs	completed	n_with_bargain	rule	fights_read	fights_node	fights_mod	reading	se	cost	d	d_se	z	verdict	level	grade_was	grade
+(no modifier)	none	38	60	56	60	node	718	718	0	0.943863	0.004887	0.000000	0.000000	0.000000	0.00	baseline	-	-	-
+Dull Edge	dulledge	38	60	58	60	modifier	716	716	716	0.949974	0.003591	-0.006111	0.006112	0.005335	1.15	costs nothing	1	1	0
+Parched	parched	38	60	58	60	modifier	692	692	692	0.945215	0.004367	-0.001352	0.001352	0.005453	0.25	costs nothing	1	1	0
+Tinderbox	tinderbox	38	60	58	60	modifier	719	719	719	0.944263	0.004847	-0.000400	0.000400	0.003664	0.11	costs nothing	1	1	0
+Frenzied	frenzied	38	60	51	60	modifier	711	711	711	0.943399	0.004905	0.000464	-0.000464	0.002361	-0.20	costs nothing	1	1	0
+Muffled	muffled	38	60	58	60	modifier	713	713	713	0.943007	0.004347	0.000856	-0.000855	0.006735	-0.13	costs nothing	1	2	0
+Fleeting	fleeting	38	60	58	60	modifier	698	698	698	0.939796	0.004765	0.004067	-0.004066	0.006218	-0.65	costs nothing	1	2	0
+Hoarfrost	hoarfrost	38	60	53	60	modifier	710	710	710	0.938738	0.005012	0.005125	-0.005124	0.005976	-0.86	costs nothing	1	1	1
+Deadened	deadened	38	60	55	60	modifier	718	718	718	0.938473	0.004476	0.005390	-0.005389	0.005841	-0.92	costs nothing	2	3	1
+Brittle	brittle	38	60	53	60	modifier	696	696	696	0.936397	0.004906	0.007466	-0.007465	0.006615	-1.13	costs nothing	2	2	1
+Slick Footing	slick	38	60	58	60	modifier	703	703	703	0.936323	0.005614	0.007540	-0.007539	0.007120	-1.06	costs nothing	2	2	1
+Bloodletting	bloodletting	38	60	57	60	modifier	698	698	698	0.935147	0.005135	0.008716	-0.008716	0.006476	-1.35	costs nothing	2	2	1
+Encumbered	encumbered	38	60	57	60	modifier	707	707	707	0.926683	0.006176	0.017180	-0.017180	0.007408	-2.32	costs something	2	2	2
+Feverish	feverish	38	60	54	60	modifier	724	724	724	0.919683	0.005693	0.024180	-0.024180	0.007495	-3.23	costs something	3	3	2
+Warded	warded	38	60	55	60	modifier	715	715	715	0.918456	0.008271	0.025407	-0.025407	0.008752	-2.90	costs something	3	1	2
+The Thin Veil	thin_veil	38	60	56	60	modifier	722	722	722	0.896386	0.005978	0.047477	-0.047477	0.007000	-6.78	costs something	4	3	3
+The Long Silence	long_silence	38	60	55	60	modifier	703	703	703	0.895081	0.004959	0.048782	-0.048782	0.005568	-8.76	costs something	4	3	3
+Miasma	miasma	38	60	53	60	modifier	726	726	726	0.892413	0.006786	0.051450	-0.051449	0.007160	-7.19	costs something	4	4	3
+Rot	rot	38	60	43	60	modifier	682	682	682	0.857271	0.007549	0.086592	-0.086592	0.008299	-10.43	costs something	5	4	4
+Overgrown	overgrown	38	60	54	60	modifier	695	695	695	0.853578	0.008892	0.090285	-0.090284	0.009215	-9.80	costs something	5	4	4
+Mirrorbound	mirrorbound	38	60	52	60	modifier	717	717	717	0.787967	0.008981	0.155896	-0.155896	0.009833	-15.86	costs something	6	5	5
+Thin Air	thinair	38	60	26	60	modifier	618	618	618	0.733564	0.014389	0.210299	-0.210299	0.013830	-15.21	costs something	7	4	5
+Bloodless	bloodless	38	60	40	60	modifier	697	697	697	0.701648	0.009986	0.242215	-0.242215	0.010222	-23.70	costs something	7	5	5
+Wasting	wasting	38	60	33	60	modifier	652	652	652	0.578525	0.015771	0.365338	-0.365337	0.015135	-24.14	costs something	8	5	5

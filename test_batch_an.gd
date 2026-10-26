@@ -170,13 +170,16 @@ func _test_offer(RunState) -> void:
 		"...and the test knows all of them")
 	# The pool is WEIGHTED LOW on purpose: every offer's safe slot is served
 	# by the 1-2 pool alone, so that is the end that actually repeats.
-	var by_sev := {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+	# RE-POINTED AT IX §3: a grade is a cost band on the reference party, so the counts are the scale's arithmetic on IW's ladder
+	# (IO's six / six / four / four retired with the rank), and the six that cost nothing carry no severity — no band deals them.
+	var by_sev := {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
 	for mid in run.MODIFIERS:
 		by_sev[run.modifier_severity(String(mid))] += 1
-	ok(by_sev[1] == 6, "six severity-1 modifiers (got %d)" % by_sev[1])
-	ok(by_sev[2] == 6, "six severity-2 modifiers (got %d)" % by_sev[2])
-	ok(by_sev[3] == 4, "four severity-3 modifiers (got %d)" % by_sev[3])
-	ok(by_sev[4] == 4, "four severity-4 modifiers (got %d)" % by_sev[4])
+	ok(by_sev[0] == 6, "six modifiers carry no severity (got %d)" % by_sev[0])
+	ok(by_sev[1] == 5, "five severity-1 modifiers (got %d)" % by_sev[1])
+	ok(by_sev[2] == 3, "three severity-2 modifiers (got %d)" % by_sev[2])
+	ok(by_sev[3] == 3, "three severity-3 modifiers (got %d)" % by_sev[3])
+	ok(by_sev[4] == 2, "two severity-4 modifiers (got %d)" % by_sev[4])
 	ok(by_sev[1] + by_sev[2] > by_sev[3] + by_sev[4],
 		"the pool is weighted toward the low severities")
 	# `rot` was authored by AQ and DROPPED there, because the battle-end sync
@@ -196,8 +199,10 @@ func _test_offer(RunState) -> void:
 		"Bloodless keeps its name")
 	for id in want:
 		ok(run.MODIFIERS.has(id), "%s exists" % id)
-		ok(run.modifier_severity(id) >= 1 and run.modifier_severity(id) <= 5,
-			"%s is graded 1-5 (authored at %d; IO §2 measures it)" % [id, int(want[id])])
+		# RE-POINTED AT IX §3: a grade is a cost band, and a modifier that costs nothing carries none (0) — how many is pinned
+		# below, where the tally is the scale's.
+		ok(run.modifier_severity(id) >= 0 and run.modifier_severity(id) <= 5,
+			"%s is graded 1-5 or carries no severity (authored at %d; IX §3's scale measures it)" % [id, int(want[id])])
 		ok(String(run.MODIFIERS[id]["desc"]) != "", "%s states its effect" % id)
 	# Severity is FLAT: it must not read the party. Wreck the party and
 	# confirm every severity is unmoved. (RE-POINTED AT IO §2: unmoved from what it read before the wreck — the grade is
