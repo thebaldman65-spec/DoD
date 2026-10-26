@@ -18,8 +18,9 @@
 #   ./lane.sh live                          print the live project name, as this script reads it
 #   ./lane.sh check  <lane>                 exit 0 if <lane> may run, 1 (and why) if not
 #   ./lane.sh make   <lane> <name> [<src>]  clone <src> (default: this tree) to <lane>, named <name>, checked
-#   ./lane.sh godot  <lane> <godot args>    check, then run Godot in <lane> (`--path` is added)
-#   ./lane.sh battery <lane> [suites]       check, then run <lane>'s own run_battery.sh
+#   ./lane.sh godot  <lane> <godot args>    check, then run Godot in <lane> (`--path` is added) — or in the lane handed out
+#   ./lane.sh battery <lane> [suites]       check, then run <lane>'s own run_battery.sh — or the handed-out lane's
+#   ./lane.sh busy   <lane>                 print the pid of every Godot running in <lane>, one a line (exit 1 if none)
 #   ./lane.sh probe  <dir> <name> [<file>...]  a BARE PROBE: a scratch project holding no file of the game's,
 #                                           named `DoD probe <name>` by the driver, recorded in <dir>/.lane
 #   ./lane.sh spent                          print the one command that clears every spent lane folder
@@ -32,6 +33,15 @@
 # `DoD *` pattern so the folder falls inside the one clearing command by convention, refuses any file of the
 # game's (one that lives in the repository, or a copy of one the repository tracks), and records what it made;
 # `godot` then runs it like any other lane.
+#
+# **ONE PROCESS A LANE, AND A LANE IN USE HANDS OUT ANOTHER (IW §0.2, the designer's).** Two Godot processes in one lane
+# share its `user://`, so a gate that writes and reads the harness save races the other: IV's `check_ho` read 179 / 2 beside
+# three gates launched into one lane, 179 / 1 beside one and 179 / 0 alone — a red that is not a defect, which cost a
+# diagnosis. So `godot` and `battery` ask whether a Godot already runs in the lane (`busy`: its `--path`, resolved against the
+# process's own directory, is the lane) and, if one does, **refuse that lane — naming it and the pid — and run in another**:
+# the first idle `<lane>-<k>` beside it, else a fresh clone of it named `<its name> <k>` (inside the spent patterns whenever
+# its own name is). **A refusal with no way forward is a rule wearing a lock's clothes**: running a batch's subset gates in
+# parallel is the useful thing every batch does, so the lock refuses the LANE, never the launch.
 #
 # THE LIVE NAME IS READ, NEVER TYPED: it is `config/name` in HEAD's committed
 # `project.godot` (the tree's own copy if git cannot answer). THE REPOSITORY IS
@@ -120,6 +130,60 @@ _godot() {
 	sed -n 's/^GODOT=//p' "$REPO/run_battery.sh" | head -n 1
 }
 
+# The pid of every Godot process running in <lane>, one a line: its `--path` argument (absolute, or relative to the
+# process's own working directory — `run_battery.sh` runs `--path .` from the lane) resolves to the lane.
+lane_pids() {
+	local abs="${1:A}" pid cmd p cwd
+	ps -axo pid=,command= | while read -r pid cmd; do
+		[[ "$cmd" == *"/Godot.app/"* || "$cmd" == Godot\ * ]] || continue
+		[[ "$cmd" == *" --path "* ]] || continue
+		p=${${cmd#* --path }%% *}
+		if [[ "$p" != /* ]]; then
+			cwd=$(lsof -a -p "$pid" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p' | head -n 1)
+			[[ -z "$cwd" ]] && continue
+			p="$cwd/$p"
+		fi
+		[[ "${p:A}" == "$abs" ]] && print -r -- "$pid"
+	done
+}
+
+# A lane beside <lane> that runs nothing: the first idle `<lane>-<k>` that passes `check`, else a fresh clone of <lane>
+# named `<its name> <k>`. Prints the lane, or nothing.
+_handout() {
+	local lane="${1:A}" name k cand
+	name=$(_name_in "$lane/project.godot")
+	for k in {2..9}; do
+		cand="${lane}-${k}"
+		if [[ -d "$cand" ]]; then
+			check "$cand" >/dev/null 2>&1 || continue
+			[[ -z "$(lane_pids "$cand")" ]] && { print -r -- "$cand"; return 0; }
+		else
+			make_lane "$cand" "$name $k" "$lane" >/dev/null 2>&1 || return 1
+			print -r -- "$cand"
+			return 0
+		fi
+	done
+	return 1
+}
+
+# The lane a launch runs in: <lane> itself while no Godot runs there; otherwise the refusal, named, and a lane handed out.
+_lane_or_handout() {
+	local lane="$1" pids alt
+	pids=$(lane_pids "$lane")
+	if [[ -z "$pids" ]]; then
+		print -r -- "$lane"
+		return 0
+	fi
+	print -r -- "LANE BUSY: $lane already runs Godot (pid ${(j:, :)${(f)pids}}) — one process a lane: two share its user:// and race the harness save (IW §0.2)." >&2
+	alt=$(_handout "$lane")
+	if [[ -z "$alt" ]]; then
+		print -r -- "LANE REFUSED: no lane beside $lane could be handed out — make one (lane.sh make) and launch there." >&2
+		return 1
+	fi
+	print -r -- "LANE HANDED OUT: $alt runs as '$(_name_in "$alt/project.godot")', and this launch runs there instead." >&2
+	print -r -- "$alt"
+}
+
 # THE SPENT PATTERNS — the user-data folders a batch's lanes and probes leave behind, cleared by one command the
 # designer runs when he likes (IB §4; `docs/instrument-rules.md`). A lane reuses one of these names; a probe is
 # named inside the last. One list, read by `spent`, `strays` and `check_iu` §7.
@@ -184,7 +248,10 @@ case "$1" in
 	           (( hit )) || print -r -- "$n"; done ;;
 	check)   check "$2" ;;
 	make)    make_lane "$2" "$3" "$4" ;;
-	godot)   lane="$2"; shift 2; check "$lane" >&2 || exit 1; exec "$(_godot)" --path "$lane" "$@" ;;
-	battery) lane="$2"; shift 2; check "$lane" || exit 1; exec "$lane/run_battery.sh" "$@" ;;
-	*)       print -r -- "usage: lane.sh live|check|make|godot|battery|probe|spent|strays <lane> ..."; exit 2 ;;
+	godot)   lane="$2"; shift 2; check "$lane" >&2 || exit 1; lane=$(_lane_or_handout "$lane") || exit 1
+	         exec "$(_godot)" --path "${lane:A}" "$@" ;;
+	battery) lane="$2"; shift 2; check "$lane" || exit 1; lane=$(_lane_or_handout "$lane") || exit 1
+	         exec "$lane/run_battery.sh" "$@" ;;
+	busy)    pids=$(lane_pids "$2"); [[ -n "$pids" ]] && print -r -- "$pids" || exit 1 ;;
+	*)       print -r -- "usage: lane.sh live|check|make|godot|battery|busy|probe|spent|strays <lane> ..."; exit 2 ;;
 esac

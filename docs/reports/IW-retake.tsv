@@ -1,0 +1,14 @@
+arm	figure	record	iw	iw_se	n	state_needle
+D1	runes_hero	HR §1c's supply table	8.5750	0.1122	60	8.57 runes at Wanderer
+D2	runes_hero	HR §1c's supply table	8.6417	0.1004	60	8.64 at Warden
+D3	runes_hero	HR §1c's supply table	8.3417	0.1068	60	8.34 at Ruin
+D1	held_hero	HR §1c's supply table	2.9250	0.0962	60	**2.92 / 2.88 / 2.70 of them unworn**
+D2	held_hero	HR §1c's supply table	2.8750	0.0872	60	**2.92 / 2.88 / 2.70 of them unworn**
+D3	held_hero	HR §1c's supply table	2.7000	0.0891	60	**2.92 / 2.88 / 2.70 of them unworn**
+NAT30	runes_bought	EQ's 6.98 (Carried from the code)	3.3567	0.1739	30	3.36 runes bought
+HS_U	completed	IO §3's 70 of 180	50.0000	6.5094	60	**30 of 60**
+F_tinderbox	completed	IP §1b's 59 of 60	100.0000	0.0000	60	**60 and 60 of 60**
+F_miasma	completed	IP §1b's 51 of 60	100.0000	0.0000	60	**60 and 60 of 60**
+H2	bar_hunter	IF §0.1b's 95 of 120	105.9070	1.1583	60	**107.0 / 109.8 / 105.9 of 120**
+R60	rupture	IF §2's 3.2% (FOUND AT IF)	1.6395	0.4694	60	**1.7% of his turns**
+D1	rage_turn	HZ §2's about 20 a turn (BOIL OVER'S RATE)	21.4152	0.0000	6949	about 21 Rage a turn

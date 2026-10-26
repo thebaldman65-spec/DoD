@@ -2,13 +2,13 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 2040,
-  "source": 1408,
-  "other": 184,
-  "document": 448
+  "total": 2062,
+  "source": 1413,
+  "other": 194,
+  "document": 455
  },
  "floor": {
-  "pins": 2040
+  "pins": 2062
  },
  "falls": [],
  "source_residency": {
@@ -18,6 +18,7 @@
   "runtime": 103,
   "unresolved": 3,
   "comment": 48,
+  "missing-file": 5,
   "alt-sibling": 3
  },
  "pins": [
@@ -8715,7 +8716,7 @@
    "r": "code",
    "k": "literal",
    "how": "param",
-   "g": "check_iv.gd#513"
+   "g": "check_iv.gd#521"
   },
   {
    "s": "check_iv.gd",
@@ -8726,7 +8727,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_iv.gd#270"
+   "g": "check_iv.gd#278"
   },
   {
    "s": "check_iv.gd",
@@ -8737,7 +8738,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_iv.gd#270"
+   "g": "check_iv.gd#278"
   },
   {
    "s": "check_iv.gd",
@@ -9067,7 +9068,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iv.gd#231",
+   "g": "check_iv.gd#239",
    "alt": true,
    "expr": "mk"
   },
@@ -9080,7 +9081,7 @@
    "r": "missing-file",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_iv.gd#305",
+   "g": "check_iv.gd#313",
    "expr": "String"
   },
   {
@@ -9092,7 +9093,7 @@
    "r": "missing-file",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iv.gd#310",
+   "g": "check_iv.gd#318",
    "expr": "String"
   },
   {
@@ -9104,7 +9105,7 @@
    "r": "missing-file",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iv.gd#312",
+   "g": "check_iv.gd#320",
    "expr": "String"
   },
   {
@@ -9116,7 +9117,7 @@
    "r": "missing-file",
    "k": "composed",
    "how": "read",
-   "g": "check_iv.gd#310"
+   "g": "check_iv.gd#318"
   },
   {
    "s": "check_iv.gd",
@@ -9127,7 +9128,7 @@
    "r": "missing-file",
    "k": "format",
    "how": "read",
-   "g": "check_iv.gd#299"
+   "g": "check_iv.gd#307"
   },
   {
    "s": "check_iv.gd",
@@ -9138,7 +9139,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iv.gd#324"
+   "g": "check_iv.gd#332"
   },
   {
    "s": "check_iv.gd",
@@ -9149,7 +9150,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iv.gd#324"
+   "g": "check_iv.gd#332"
   },
   {
    "s": "check_iv.gd",
@@ -9160,7 +9161,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_iv.gd#311"
+   "g": "check_iv.gd#319"
   },
   {
    "s": "check_iv.gd",
@@ -9171,7 +9172,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iv.gd#473",
+   "g": "check_iv.gd#481",
    "expr": "gone"
   },
   {
@@ -9183,7 +9184,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iv.gd#473",
+   "g": "check_iv.gd#481",
    "expr": "stands"
   },
   {
@@ -9195,7 +9196,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iv.gd#473",
+   "g": "check_iv.gd#481",
    "expr": "gone"
   },
   {
@@ -9207,7 +9208,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "read",
-   "g": "check_iv.gd#482"
+   "g": "check_iv.gd#490"
   },
   {
    "s": "check_iv.gd",
@@ -9218,7 +9219,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "read",
-   "g": "check_iv.gd#482"
+   "g": "check_iv.gd#490"
   },
   {
    "s": "check_iv.gd",
@@ -9229,7 +9230,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "read",
-   "g": "check_iv.gd#482"
+   "g": "check_iv.gd#490"
   },
   {
    "s": "check_iv.gd",
@@ -9240,7 +9241,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iv.gd#491"
+   "g": "check_iv.gd#499"
   },
   {
    "s": "check_iv.gd",
@@ -9251,7 +9252,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iv.gd#490"
+   "g": "check_iv.gd#498"
   },
   {
    "s": "check_iv.gd",
@@ -9262,7 +9263,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iv.gd#529"
+   "g": "check_iv.gd#537"
   },
   {
    "s": "check_iv.gd",
@@ -9273,7 +9274,257 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iv.gd#530"
+   "g": "check_iv.gd#538"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s01_the_names",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_iw.gd#122",
+   "expr": "gone"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s01_the_names",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_iw.gd#123",
+   "expr": "stands"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s01_the_names",
+   "h": "docs/kit-recon.html",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_iw.gd#109",
+   "expr": "String"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s01_the_names",
+   "h": "data/runes.json",
+   "n": "\"%s (core)\"",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_iw.gd#108"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s01_the_names",
+   "h": "CLAUDE.md",
+   "n": "the Hierophant's engines (named at GK, confirmed at IW §0.1, the designer's)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iw.gd#110"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s02_the_lock",
+   "h": "iw_sleeper.gd",
+   "n": "IWLOCK ran in %s-2/",
+   "p": "+",
+   "r": "missing-file",
+   "k": "format",
+   "how": "read",
+   "g": "check_iw.gd#166"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s02_the_lock",
+   "h": "iw_sleeper.gd",
+   "n": "IWLOCK ran in %s/",
+   "p": "+",
+   "r": "missing-file",
+   "k": "format",
+   "how": "read",
+   "g": "check_iw.gd#153"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s02_the_lock",
+   "h": "iw_sleeper.gd",
+   "n": "LANE BUSY",
+   "p": "-",
+   "r": "missing-file",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iw.gd#153"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s02_the_lock",
+   "h": "iw_sleeper.gd",
+   "n": "LANE BUSY: %s already runs Godot (pid %d)",
+   "p": "+",
+   "r": "missing-file",
+   "k": "format",
+   "how": "read",
+   "g": "check_iw.gd#164"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s02_the_lock",
+   "h": "iw_sleeper.gd",
+   "n": "LANE HANDED OUT: %s-2",
+   "p": "+",
+   "r": "missing-file",
+   "k": "format",
+   "how": "read",
+   "g": "check_iw.gd#165"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s02_the_lock",
+   "h": "lane.sh",
+   "n": "battery) lane=\"$2\"; shift 2; check \"$lane\" || exit 1; lane=$(_lane_or_handout \"$lane\") || exit 1",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iw.gd#135"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s02_the_lock",
+   "h": "lane.sh",
+   "n": "godot)   lane=\"$2\"; shift 2; check \"$lane\" >&2 || exit 1; lane=$(_lane_or_handout \"$lane\") || exit 1",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iw.gd#134"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_iw.gd#65",
+   "expr": "MEASURE_NEEDLE"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "A NAME THE PROJECT's OWN PROSE TOOK UP AS THE THING's NOUN HAS ALREADY PASSED THE TEST A NEW NAME WOULD HAVE TO PASS (IW §0.1, the designer's)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iw.gd#61"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "A REFUSAL WITH NO WAY FORWARD IS A RULE WEARING A LOCK's CLOTHES.",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iw.gd#63"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "AND A FLAG THAT CHANGES WHAT A RUN CONTAINS IS THE SIM's, UNLESS THE PLAYER CHOOSES THAT CONTENT SOMEWHERE ELSE TOO (IW §0.3, the designer's)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iw.gd#62"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s0_the_rulings",
+   "h": "lane.sh",
+   "n": "ONE PROCESS A LANE, AND A LANE IN USE HANDS OUT ANOTHER (IW §0.2, the designer's)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iw.gd#64"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s1_the_ladder",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_iw.gd#271",
+   "expr": "ARM_NEEDLE"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s1_the_ladder",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_iw.gd#272",
+   "expr": "SUPERSEDED_NEEDLE"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s1_the_ladder",
+   "h": "docs/state.md",
+   "n": "| %s | %.3f",
+   "p": "-",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_iw.gd#268"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s3_the_retakes",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_iw.gd#343",
+   "expr": "_flat"
+  },
+  {
+   "s": "check_iw.gd",
+   "fn": "_s3_the_retakes",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_iw.gd#355",
+   "expr": "_flat"
   },
   {
    "s": "test_batch_ah.gd",

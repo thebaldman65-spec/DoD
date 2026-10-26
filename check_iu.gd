@@ -139,8 +139,9 @@ const LEDGER := "docs/reports/IU-claims.tsv"
 const DISPOSITIONS := ["REPAIRED", "TRUE", "STANDS", "SUPERSEDED"]
 const KINDS := ["FALSE", "MEASUREMENT", "GONE-SUBJECT", "COPY", "POPULATION", "COUNT-GREW", "INCOMPLETE", "DECISION", "TRUE"]
 # THE CLAIMS LEFT STANDING, each waiting on a ruling its row names: a ceiling that does not rise. BATCH IV §4 repaired
-# three on the designer's rulings (IR01, IR09, IR50), so it stands at the two GK's names wait on.
-const CLAIMS_CEILING := 2
+# three on the designer's rulings (IR01, IR09, IR50), and IW §0.1 the two GK's names waited on (ISN04, ISF12), so it
+# stands at zero.
+const CLAIMS_CEILING := 0
 # How many repaired rows' words must be found for the arm to be reading the files at all — below the count IU left,
 # because a later batch may rewrite a repaired sentence again (that is not a red; putting the false words back is).
 const LOCATED_FLOOR := 120
@@ -681,13 +682,15 @@ func _s8_the_routing() -> void:
 	var heads := RegEx.new()
 	# A heading may hold a backtick of its own (`… IN A `const``): the cell closes at the double one.
 	heads.compile("``\\s*(#{2,3} .+?)\\s*``")
-	# A block's key is its heading up to the first " — " (`check_is` §5's reading), in the state file or its archive.
+	# A block's key is its heading up to the first " — " (`check_is` §5's reading), in the state file or its archive. The
+	# archive strikes a section every item of which is answered (`### ~~X~~ — …`, its own header's rule), and that is still
+	# block X: IW is the first batch to archive whole a block its routing matched (WHAT IV's DRIVE MOVED, FOUND AT IV).
 	var keys := {}
 	for f in [state, arch]:
 		for line in String(f).split("\n"):
 			if String(line).begins_with("## ") or String(line).begins_with("### "):
 				var dash := String(line).find(" — ")
-				keys[(String(line).left(dash) if dash > 0 else String(line)).strip_edges()] = true
+				keys[(String(line).left(dash) if dash > 0 else String(line)).replace("~~", "").strip_edges()] = true
 	var rows := 0
 	var homeless: Array = []
 	var bare: Array = []

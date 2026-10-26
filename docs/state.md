@@ -32,7 +32,7 @@ designer's)**: IS's +36,759 B net held **36,315 B of fenced structure** (fence `
 deleting it), so IS grew this file +444 B outside it and the record stays ES's; IV's +17,741 B net held **10,159 B of fenced structure** (fence `INDEX (IS §5)`: the nine population rows and the pilot's close), so IV grew this file +7,582 B outside it and the record stays ES's; `check_fg` §4b holds each claim to its fence. *In the
 preamble for the archive pointer's reason.*
 
-*Last rewritten: 2026-10-25 (Batch IV).*
+*Last rewritten: 2026-10-25 (Batch IW).*
 
 ---
 
@@ -83,17 +83,17 @@ of this pilot is read by a reader that already carries the project's practices, 
 has no instance, and more batches of the same reader will not make one.
 
 **THE CORE — READ WHOLE:**
-- **CORE** `` ## WHERE THE PROJECT IS `` `#40f26c`
+- **CORE** `` ## WHERE THE PROJECT IS `` `#394180`
 - **CORE** `` ## THE OPEN QUEUE `` `#17e1f1`
-- **CORE** `` ### IV's RULINGS OWED `` `#7a8da7`
-- **CORE** `` ### THE CLERIC's MANA RATE `` `#5f4d62`
+- **CORE** `` ### IW's RULINGS OWED `` `#e08036`
+- **CORE** `` ### THE CLERIC's MANA RATE `` `#735e7f`
 - **CORE** `` ### SANCTITY's STEP `` `#7c43c9`
-- **CORE** `` ### BOIL OVER'S RATE `` `#8e9de8`
+- **CORE** `` ### BOIL OVER'S RATE `` `#6ed606`
 - **CORE** `` ### THE CREST POOL `` `#cd7125`
 - **CORE** `` ### FOUND AT IA AND NOT FIXED `` `#0b3b3f`
 - **CORE** `` ### RULED AND NOT BUILT `` `#90a9d9`
 - **CORE** `` ### FOUND AT HX AND NOT FIXED `` `#c91933`
-- **CORE** `` ### THE PLAYTEST'S OTHER FINDINGS `` `#894ecb`
+- **CORE** `` ### THE PLAYTEST'S OTHER FINDINGS `` `#ec2e2f`
 - **CORE** `` ### THE FOUR OTHER CONJUNCTIONS `` `#dc1281`
 - **CORE** `` ### THE SKIRMISHER AND THE TRACKER `` `#b3c93d`
 - **CORE** `` ### THE SHAPE RECON ON `CLAUDE.md` `` `#bd2df5`
@@ -112,17 +112,17 @@ population row carries a stamp over its member blocks, in their order, and reds 
 + **POPULATION** **the figures behind doors** `#25835d` — Every figure or fact a player-facing text states, and the door or constant it reads. *lives in:* `` ### FOUND AT IT AND NOT FIXED `` · `` ### FOUND AT IK AND NOT FIXED `` · `` ### FOUND AT IJ AND NOT FIXED `` · `` ### FOUND AT IQ AND NOT FIXED `` · `` ### FOUND AT HL AND NOT FIXED `` · `` ### `master.html` §6b's "66 DAMAGING ABILITIES" RESOLVES AGAINST NO POPULATION ``. *records:* docs/reports/IJ-census.tsv; docs/reports/IQ-master-census.tsv; docs/reports/IT-catalogue-figures.tsv; check_ij §2 and §3; check_iq §2f; check_it §2; check_iu §3. *triggers:* every figure a text states, figures behind doors, a figure with no door, name the constants, literals get names, fact sweep, typed figure, pinned figures
 + **POPULATION** **the closed matter** `#8a1ddf` — Items and blocks closed and left standing: history, measurement tables, struck against their record. *lives in:* `` ### FOUND AT IS AND NOT FIXED `` · `` ### FOUND AT HO AND NOT FIXED `` · `` ### FOUND AT GL AND NOT FIXED `` · `` ### FOUND AT GF AND NOT FIXED `` · `` ### THE CRIT SURPLUS IS RULED END TO END `` · `` ### `BOND_MITIGATION_MAX` STAYS AT 0.75 `` · `` ### THE SUITE REDS, AND WHY ZERO IS NOT THE SAME AS FIXED ``; the core, read whole, holds others (the WHERE block, FOUND AT IA, THE SHAPE RECON). *records:* docs/reports/IQ-state-census.tsv; docs/reports/IS-claude-census.tsv; DoD-archive/state-archive.md (where closed matter goes, newest cut first); check_iq §1; check_it §1; check_hx §2; check_fg §4. *triggers:* the closed matter, closed blocks, closed items, closed-block census, history clauses, strike what is closed, measurement tables, archive what is closed
 + **POPULATION** **the positional picks** `#450d66` — A gate's selection of its subject by position or superlative, and whether it still names it. *lives in:* `` ### FOUND AT IT AND NOT FIXED `` · `` ### FOUND AT IQ AND NOT FIXED `` · `` ### FOUND AT IM AND NOT FIXED `` · `` ### GY's RULINGS OWED ``; the core, read whole, holds others (the WHERE block). *records:* docs/reports/IT-positional-census.tsv (the census of record); docs/reports/IO-census.tsv; check_it §3; check_iu §5 (the MISSES ceiling); check_in §4; check_io §6. *triggers:* positional picks, superlative picks, positional census, MISSES ceiling, fixed window, names its pick, re-selects its subject, a gate's pick
-+ **POPULATION** **the bot's divergences** `#fc0910` — Every place the bot's game differs from the player's: RULE (a defect), POLICY (a choice, with its reason), MODEL. *lives in:* `` ### THE BARGAIN DECK's GRADES `` · `` ### FOUND AT GS AND NOT FIXED `` · `` ### FOUND AT IE AND NOT FIXED `` · `` ### FOUND AT IF AND NOT FIXED `` · `` ### FOUND AT IM AND NOT FIXED `` · `` ### FOUND AT GE AND NOT FIXED ``. *records:* docs/reports/IU-bot-divergence.tsv (the census of record, RULE 0 since IV); check_iu §4; check_iv §3b (the ceiling at zero); check_in §3; check_il §3. *triggers:* the bot's divergences, divergence census, bot plays a different game, the bot's rules, POLICY or RULE, sim bot, the bot pays, bot asks the player's door
-+ **POPULATION** **the latent shapes** `#8d5439` — Defects that need a writer, a second member or a field nothing sets yet, each armed to red when it arrives. *lives in:* `` ### FOUND AT IV AND NOT FIXED `` · `` ### FOUND AT IR AND NOT FIXED `` · `` ### FOUND AT IS AND NOT FIXED `` · `` ### FOUND AT IC AND NOT FIXED `` · `` ### FOUND AT IL AND NOT FIXED `` · `` ### FOUND AT IM AND NOT FIXED `` · `` ### FOUND AT HY AND NOT FIXED `` · `` ### FOUND AT HZ AND NOT FIXED `` · `` ### FOUND AT FX AND NOT FIXED ``; the core, read whole, holds others (TO WATCH IN PLAY). *records:* docs/reports/IR-floor-census.md (the floor census of record); check_ir §1d; check_is §3a and §3b; check_il §1a; check_hy §5; check_iv §2. *triggers:* latent shapes, latent defect, dormant field, no writer, floor of a zero, floor census, read-only-zero field, reds when the writer appears
++ **POPULATION** **the bot's divergences** `#4ddcd1` — Every place the bot's game differs from the player's: RULE (a defect), POLICY (a choice, with its reason), MODEL. *lives in:* `` ### THE BARGAIN DECK's GRADES `` · `` ### FOUND AT GS AND NOT FIXED `` · `` ### FOUND AT IE AND NOT FIXED `` · `` ### FOUND AT IF AND NOT FIXED `` · `` ### FOUND AT IM AND NOT FIXED `` · `` ### FOUND AT GE AND NOT FIXED ``. *records:* docs/reports/IU-bot-divergence.tsv (the census of record, RULE 0 since IV); check_iu §4; check_iv §3b (the ceiling at zero); check_in §3; check_il §3. *triggers:* the bot's divergences, divergence census, bot plays a different game, the bot's rules, POLICY or RULE, sim bot, the bot pays, bot asks the player's door
++ **POPULATION** **the latent shapes** `#e71454` — Defects that need a writer, a second member or a field nothing sets yet, each armed to red when it arrives. *lives in:* `` ### FOUND AT IW AND NOT FIXED `` · `` ### FOUND AT IR AND NOT FIXED `` · `` ### FOUND AT IS AND NOT FIXED `` · `` ### FOUND AT IC AND NOT FIXED `` · `` ### FOUND AT IL AND NOT FIXED `` · `` ### FOUND AT IM AND NOT FIXED `` · `` ### FOUND AT HY AND NOT FIXED `` · `` ### FOUND AT HZ AND NOT FIXED `` · `` ### FOUND AT FX AND NOT FIXED ``; the core, read whole, holds others (TO WATCH IN PLAY). *records:* docs/reports/IR-floor-census.md (the floor census of record); check_ir §1d; check_is §3a and §3b; check_il §1a; check_hy §5; check_iv §2. *triggers:* latent shapes, latent defect, dormant field, no writer, floor of a zero, floor census, read-only-zero field, reds when the writer appears
 + **POPULATION** **the save's keys** `#e0f2ed` — Every key a run save carries and every read of one: the load door, its rename and removal maps, its floor. *lives in:* `` ## LIVE COUNTS AND CONSTANTS WORTH HAVING AT HAND `` · `` ### HA's RULINGS OWED `` · `` ### FOUND AT HL AND NOT FIXED ``; the core, read whole, holds others (the WHERE block). *records:* check_iq §4; check_ir §2 (the rename map); check_is §2 (the load door's five answers); run_state.gd's RENAMED_CARDS and REMOVED_CARDS. *triggers:* the save's keys, every save read, load door, rename map, removal map, a key off a save, stale payload, save floor
 + **POPULATION** **the target picks** `#efdcd6` — Every pick of a card's or a door's target from a side: who is offered, and whether the cast pays there. *lives in:* `` ### FOUND AT IJ AND NOT FIXED `` · `` ### FOUND AT HF AND NOT FIXED `` · `` ### FOUND AT GN AND NOT FIXED `` · `` ### FOUND AT IM AND NOT FIXED ``. *records:* docs/reports/IR-ally-census.md; check_ir §1b; check_is §4; check_il §3; check_im §3b. *triggers:* target picks, pick pool, every pick, hero-side pick, a pick that produces nothing, the pick population, ally-target cards, _hero_side
-+ **POPULATION** **the sim's recorded figures** `#0aeda8` — Every figure taken through the sim or its bot, and which a bot or instrument repair moved (SUPERSEDED-PENDING). *lives in:* `` ### THE BARGAIN DECK's GRADES `` · `` ### WHAT IV's DRIVE MOVED `` · `` ### THE FIRST CLEAN PLAYTHROUGH `` · `` ### EVERY COMPLETION FIGURE DATED BEFORE GJ EXCLUDED THE FINAL FIGHT `` · `` ### HOW LONG A FIGHT IS `` · `` ### Carried, with measurements attached `` · `` ### Small, and still owed `` · `` ### FOUND AT IE AND NOT FIXED `` · `` ### FOUND AT IF AND NOT FIXED `` · `` ### Carried from the code, reported and deliberately not fixed ``; the core, read whole, holds others (SANCTITY's STEP, THE CLERIC's MANA RATE, BOIL OVER'S RATE, the WHERE block). *records:* docs/reports/IV-drive.tsv (IV's paired drive: every default-sim figure, HEAD against IV, and its mark); docs/reports/IU.md §4; docs/reports/IP.md §2; docs/reports/IO.md §2 and §3; check_iv §1c. *triggers:* recorded sim figures, sim figures, measurements affected, which figures move, re-take, SUPERSEDED-PENDING, instrument fidelity, figures a fix could move
++ **POPULATION** **the sim's recorded figures** `#1b6569` — Every figure taken through the sim or its bot, and which a bot or instrument repair moved (SUPERSEDED-PENDING). *lives in:* `` ### THE BARGAIN DECK's GRADES `` · `` ### THE SIM's FIGURES, RE-TAKEN AT IW `` · `` ### THE FIRST CLEAN PLAYTHROUGH `` · `` ### EVERY COMPLETION FIGURE DATED BEFORE GJ EXCLUDED THE FINAL FIGHT `` · `` ### HOW LONG A FIGHT IS `` · `` ### Carried, with measurements attached `` · `` ### Small, and still owed `` · `` ### FOUND AT IE AND NOT FIXED `` · `` ### FOUND AT IF AND NOT FIXED `` · `` ### FOUND AT GJ AND NOT FIXED `` · `` ### Carried from the code, reported and deliberately not fixed ``; the core, read whole, holds others (SANCTITY's STEP, THE CLERIC's MANA RATE, BOIL OVER'S RATE, the WHERE block). *records:* docs/reports/IV-drive.tsv (IV's paired drive: every default-sim figure, HEAD against IV, and its mark); docs/reports/IW-retake.tsv (IW's re-takes); docs/reports/IW-ladder.tsv and IW-screen.tsv (IW's ladder and screen); check_iw §1 and §3; docs/reports/IU.md §4; docs/reports/IP.md §2; docs/reports/IO.md §2 and §3; check_iv §1c. *triggers:* recorded sim figures, sim figures, measurements affected, which figures move, re-take, SUPERSEDED-PENDING, instrument fidelity, figures a fix could move
 
 **THE ROWS — ONE A BLOCK, IN FILE ORDER:**
 - `` ### THE FIRST CLEAN PLAYTHROUGH `` `#5461cf` — First clean playthrough (2026-10-18 Warden run). *triggers:* playtest readout, Rupture unreachable, RUPTURE_BREAK_PER_TICK, Sanctity events, SANCTITY_PER_STEP, vow 2.2 to 1, Cleric driest hero, Boil Over undrafted, Sharpshooter damage share, second playthrough, bot sim figures Sanctity steps dry turns
-- `` ### THE BARGAIN DECK's GRADES `` `#f38a63` — Bargain deck grades (table, ties, limits, missing middle; every one tied at IV). *triggers:* bargain modifier severity grades, re-grade, Parched/Slick Footing tie, Deadened/Rot tie, default build only, bot ally pools heroes-only, bot statuses Fleeting, Thin Veil vs Feverish, Warden 0.80-0.85 target, Mirrorbound
-- `` ### WHAT IV's DRIVE MOVED `` `#3df515` — Every default-sim figure IV's repair moved, SUPERSEDED-PENDING until re-taken. *triggers:* SUPERSEDED-PENDING, re-take, rune supply figures, IV's drive, recorded sim figures, the ladder's re-measure, deck's middle, which figures moved
-- `` ### FOUND AT IV AND NOT FIXED `` `#198acd` — IV's findings: two processes in one lane race its user://; DOD_ZONE_ROTATION ungated and inert. *triggers:* lane.sh, two gates in one lane, user:// race, harness save, check_ho red beside another gate, DOD_ZONE_ROTATION, zone rotation, slot pools, environment read
+- `` ### THE BARGAIN DECK's GRADES `` `#a8f45a` — Bargain deck grades: IW's ladder on a screened party, arm B, the levels. *triggers:* bargain modifier severity grades, re-grade, IW ladder, screen populations, levels and cuts, default party untalented, bot ally pools heroes-only, Warden 0.80-0.85 target, deck's middle, Mirrorbound, grade handles
+- `` ### THE SIM's FIGURES, RE-TAKEN AT IW `` `#0f5edf` — IV's marked sim figures re-taken at IW; Rupture and Boil Over's Rage read. *triggers:* SUPERSEDED-PENDING, re-take, rune supply figures, IV's drive, recorded sim figures, runes bought per run, Hierophant completion, Tinderbox Miasma completion, Hourglass bars, Rupture rate in sim, Rage a turn
+- `` ### FOUND AT IW AND NOT FIXED `` `#485358` — IW's findings: a pool's second zone no player can draw; what the screen and the ladder found. *triggers:* DOD_ZONE_ROTATION, zone rotation, slot pools, draw_zones, a zone no player can draw, player's zone draw, single-party ladder, resolution against breadth, screen populations, environment read
 - `` ### THE RULES A GATE COULD CHEAPLY HOLD `` `#d11bde` — The 188 cheap gates IU's census found (76 NONE): a standing list, two ceilings. *triggers:* cheap gate, rules census, NONE rule, PARTLY rule, a rule no gate holds, standing list, build the gate a rule names, HO §0
 - `` ### FOUND AT IU AND NOT FIXED `` `#e57696` — IU's findings: rules the code breaks, gates holding less than their rule, stale claims. *triggers:* 12 * 8, Blood Price note_resource_spent, Shared Ruin contagion, HEALS_STAY, check_if fixed-fps, gates holding less, cheap gate, stale claims outside the census, comment copies
 - `` ### FOUND AT IT AND NOT FIXED `` `#fa621c` — IT's findings: two constants pay one less, dead constants, typed figures, 13 picks. *triggers:* BATTLE_TRANCE_TURNS, MANA_WELL_TURNS, dead constant, VENDETTA_CUT, Powershot per point, typed figure, Chilled status row, catalogue structure words, positional census MISSES ceiling, iu_disposition stamp
@@ -138,7 +138,7 @@ population row carries a stamp over its member blocks, in their order, and reds 
 - `` ### FOUND AT II AND NOT FIXED `` `#f9d4fb` — Found at II: check_dr deleted nodes, Chain Ignition. *triggers:* check_dr TICK_SITES deleted nodes, Chain Ignition Burn no source, ember_wind, _update_talent_chips
 - `` ### FOUND AT IH AND NOT FIXED `` `#b7d22b` — Found at IH: background art sizing, spawn's own live prologue. *triggers:* full-screen art expand mode, map and event background, TextureRect sizing, hero_live_config, battle spawn live Attack prologue, CK 1 owed helper
 - `` ### FOUND AT IG AND NOT FIXED `` `#8917c1` — Found at IG: DEBUFF_IDS keeps melted, first fight resource max. *triggers:* DEBUFF_IDS melted, Melt Armor display chip, melt_ranks, first fight opens at 100, max resource node +20, bar maximum, live prologue helper
-- `` ### FOUND AT IF AND NOT FIXED `` `#c2e408` — Found at IF: sim bot Smoulder, readout dealt, fire policy arms. *triggers:* sim bot Smoulder drafted hook, Rupture rate in sim, Cryomancer chill, readout dealt excludes companion, fixed-draft fire policy, Chilled 0%
+- `` ### FOUND AT IF AND NOT FIXED `` `#768dfb` — Found at IF: sim bot Smoulder (Rupture re-read at IW), readout dealt, fire policy arms. *triggers:* sim bot Smoulder drafted hook, Rupture rate in sim, Cryomancer chill, readout dealt excludes companion, fixed-draft fire policy, Chilled 0%
 - `` ### FOUND AT IE AND NOT FIXED `` `#e50a34` — Found at IE: sim bot skips drafted Fireball, DISPEL_NEVER residue. *triggers:* sim bot Fireball Stoke Cinderfall, drafted hook, Mage Burn sim figures, DISPEL_NEVER spec_passive, Ember Leap Ember Debt, Firedraw comment
 - `` ### FOUND AT ID AND NOT FIXED `` `#aa93e5` — Found at ID: Mirrorbound recoil scope, check_fh draft half. *triggers:* Mirrorbound recoil, attack vs special handler, DAMAGE_SPECIALS, _resolve_special, bargain modifier card words, check_fh draft half, Gate.answer_boss_and_upgrade
 - `` ### FOUND AT IC AND NOT FIXED `` `#ac4707` — Found at IC: five dormant fields in the vow's refusal partition. *triggers:* Overkill, Temporal Rift temporal_ranks, Spite spite_ranks, Blowback, Forge Body forge_body_pct, dormant field no writer, refused crit, Vow of Silence partition
@@ -183,11 +183,11 @@ population row carries a stamp over its member blocks, in their order, and reds 
 - `` ### GM's RULINGS OWED `` `#691d7a` — GM's rulings owed: engine-bound cards, Split Shield, Dispel. *triggers:* cards leaving with an engine, half-working lineage cards, Split Shield Bulwark Line, Shieldwall, Dispel DISPEL_NEVER, Rime DEBUFF_IDS, Hold Breath, Called Volley, Drumfire, Divine Plea label
 - `` ### FOUND AT GM AND NOT FIXED `` `#c2d5b8` — Found at GM: Held Breath counter, Focus inert, enemy status census. *triggers:* Hold Breath counter armor bypass, Lethal Aim, +40 Focus inert, enemy-side status list, check_gm 4, DEBUFF_IDS, DISPEL_NEVER, sim bot draft wrapper Mana Shield, draft_ability
 - `` ### FOUND AT GL AND NOT FIXED `` `#ed63df` — Found at GL: half-working lineage cards, card texts vs code. *triggers:* Shrapnel Charge, Hamstring, Venom Coating, Pinning Shot, Called Shot, Divine Shield recast Bare Altar, Quick Shot Perfect slot 0, Charge Daze, Battle Trance, Mana Well, Arcane Explosion Resonance, party damage buffs, kit-recon.html, test_batch_bo 5 blind to slot 0
-- `` ### GK's RULINGS OWED `` `#d80eec` — GK's rulings owed: spine rune names, texts, class-selection words. *triggers:* Rune of the Vanguard Invoker Hierophant, SPINE_INFO, class-selection words ENGINE_SLOTS, engine rune price, lineage interim, Heavy Plating base stat, engine runes untagged check_ek
+- `` ### GK's RULINGS OWED `` `#fb38f9` — GK's rulings owed: spine rule texts, class-selection words (the names confirmed at IW). *triggers:* SPINE_INFO, spine rule texts, Rune of the Vanguard Invoker Hierophant, class-selection words ENGINE_SLOTS, engine rune price, lineage interim, Heavy Plating base stat, engine runes untagged check_ek
 - `` ### FOUND AT GK AND NOT FIXED `` `#c91323` — Found at GK: save-backups untracked, passive_id comments, seats. *triggers:* save-backups untracked, .gitignore, git add -A, battle.gd passive_id comments, engines field, instrument party lineage on wrong class seat
 - `` ### EVERY COMPLETION FIGURE DATED BEFORE GJ EXCLUDED THE FINAL FIGHT `` `#c449be` — Completion figures before GJ excluded the end boss fight. *triggers:* run completion rate, end boss in sim, third zone boss, encounter 48 of 49, EN 97/3/0, untalented completion, rows arms not re-measured, depth 49
 - `` ### GJ's RULINGS OWED `` `#4239cf` — GJ's rulings owed: end boss rung multiplier, rung-1 words, tooltip. *triggers:* end_boss_mult, end boss rung floor, rung 3 x1.30, Wanderer tooltip, glossary road entry, end boss tooltip, Hollow Crown readout, zone_base_mult
-- `` ### FOUND AT GJ AND NOT FIXED `` `#066e00` — Found at GJ: end boss fight too short, screen primitives, sim. *triggers:* end boss Hollow Crown fight length, Regalia, Broken end boss freeze, end boss content, gate_fixture screen primitives, check_fh, check_gf, sim zone-boss awards, slot ladder 10
+- `` ### FOUND AT GJ AND NOT FIXED `` `#066e00` — Found at GJ: end boss fight too short, screen primitives, sim. *triggers:* end boss Hollow Crown fight length, Regalia, Broken end boss freeze, end boss content, gate_fixture screen primitives, check_fh, check_gf, sim zone-boss awards, slot ladder 10, recorded sim figures, re-take owed
 - `` ### ~~THE END BOSS HAS NO BUTTON~~ `` `#b6ce46` — End boss button closed at GI; tooltip and readout wording owed. *triggers:* end boss button, map _draw_lattice, SLOTS_PER_ZONE vs Run.map.size, END BOSS label, end boss tooltip, Hollow Crown waits readout, check_gj
 - `` ### FOUND AT GF AND NOT FIXED `` `#7a1b84` — Found at GF: shop quit skipped, upgrade stacking, glossary. *triggers:* Peddler forge quit resume, master.html debug paragraph, upgrade stacks on forged card, roll_upgrade_offer has_upgrade, Resonance uncapped claim CLAUDE.md governor table, Melted Armor, Caught Fast
 - `` ### FOUND AT GG AND NOT FIXED `` `#766f65` — Found at GG: glossary retirement unasserted, Penance comment. *triggers:* glossary retired key, Glossary.in_category, glossary retirement gate owed, check_et 1, Penance SYNERGY comment, Decay, Entropy entropy_ranks
@@ -203,7 +203,7 @@ population row carries a stamp over its member blocks, in their order, and reds 
 - `` ### FOUND AT FX AND NOT FIXED `` `#bdc673` — Found at FX: chip names, dormant fields, retired vocabulary. *triggers:* iron_will chip, undying_rage, dormant fields 275 of 304, the_pack, deleted-node log labels, _evade_source ghillie, retired vocabulary, vacuous suite checks, master.html inconsistencies
 - `` ### FOUND AT FW AND NOT FIXED `` `#472cbd` — Found at FW: relic hook sites, death refusals, unapplied content. *triggers:* relics.gd hook read sites, rest_heal_add, Cairnmoss Poultice, Martyr's Knucklebone, death refusals, stale comments, effective_speed, never-applied statuses, tick kill skips _on_enemy_death, combat-rules.md four death-refusals
 - `` ### THE CLASS MERGE ~~IS MEASURED AND UNRULED~~ WAS MEASURED AT FP AND IS RULED `` `#2b37c6` — Class merge project (FP): size, staging, spines, spell partition. *triggers:* class merge, merge-recon.html, class-merge branch, specs to classes, battery reds during merge, engine move, merge pilot, Sanctity potency layer, is_spell flag, dmg_type, recon coverage
-- `` ### THE THREE SPINES ARE BUILT AND ALL THREE RATES ARE SET (FU, FV); WHAT IS STILL FLAGGED `` `#a32461` — Three spines (Momentum, Channel, Sanctity): still flagged. *triggers:* CHANNEL_SPARES_PHYSICAL, CHANNEL_CAST_FLOOR, MOMENTUM_EXCHANGES_PER_STEP, Momentum cap, self-damage taken half, second meter display, ledger spender BI 1, _sync_engine_switches, spine runes, note_blow_met
+- `` ### THE THREE SPINES ARE BUILT AND ALL THREE RATES ARE SET (FU, FV); WHAT IS STILL FLAGGED `` `#784aaf` — Three spines (Momentum, Channel, Sanctity): still flagged. *triggers:* CHANNEL_SPARES_PHYSICAL, CHANNEL_CAST_FLOOR, MOMENTUM_EXCHANGES_PER_STEP, Momentum cap, self-damage taken half, second meter display, ledger spender BI 1, _sync_engine_switches, spine runes, note_blow_met
 - `` ### FIVE DRAFTED ABILITIES ARE NAMED AND DESCRIBED NOWHERE `` `#87b6b9` — Five drafted abilities undescribed in master.html. *triggers:* Arcane Surge, Divine Wrath, Mana Shield, Reality Fracture, Rallying Shout, master.html 6b drafted-abilities table, DY vault re-homes, card rows
 - `` ### `master.html` §6b's "66 DAMAGING ABILITIES" RESOLVES AGAINST NO POPULATION `` `#42b06e` — master.html 6b's 66 damaging abilities has no population. *triggers:* master.html 6b, 66 damaging abilities, damage stated in prose, damage > 0 corpus, draft pools 39, denominator
 - `` ### TWO SMALL DOC REPAIRS FR FOUND AND DID NOT TAKE `` `#e02254` — Two small doc repairs FR left: events.gd comment, master.html word. *triggers:* events.gd comment talent_points verb, event worked example, master.html the every hero, clearing heal 15%
@@ -232,7 +232,7 @@ population row carries a stamp over its member blocks, in their order, and reds 
 - `` ### Carried, and still awaiting a ruling `` `#5027f0` — Carried rulings: zone-boss fallback floor, per-file ceilings. *triggers:* zone-boss fallback fully-held pool, EH 1, CLAUDE.md ceiling, instrument-rules.md ceiling, combat-rules.md ceiling, EE method, subject seam split
 - `` ### Carried, with measurements attached `` `#02ab0b` — Carried measurements: Frenzy rate, Faith lane band, revert sweeps. *triggers:* FRENZY_RAGE_PER_STEP, Blood Frenzy peak, Reckless Abandon, Faith lane, FAITH_RELEASE, HELD_MAX, Communion band, Elevation, Blessing of the Faithful, revert constant prose sweep, recorded sim figures, sim readings carried
 - `` ### Named by the designer, carried from CX `` `#31545e` — Named by the designer (CX): relics per hero, rune content. *triggers:* relics per-hero ruling, active_relics save format, victory_heal_pct, rest_heal_add, resource_floor_pct, relic read sites, enemy interference status, rune content pass, enemy debuff duration vs cooldown
-- `` ### Carried from the code, reported and deliberately not fixed `` `#cdf0ae` — Carried from code: shop key, counts, beast ids. *triggers:* rune trade event, scarred_runes id, shop confounder merchant key, devoted_fury, checks=none targets, _recast_refusal_note Frozen vs Held, check_cu check_cv, beast identifiers, Killing Frost vs Blizzard, SUPERSEDED-PENDING, runes bought per run
+- `` ### Carried from the code, reported and deliberately not fixed `` `#3dad18` — Carried from code: shop key, counts, beast ids. *triggers:* rune trade event, scarred_runes id, shop confounder merchant key, devoted_fury, checks=none targets, _recast_refusal_note Frozen vs Held, check_cu check_cv, beast identifiers, Killing Frost vs Blizzard, SUPERSEDED-PENDING, runes bought per run
 - `` ## LIVE COUNTS AND CONSTANTS WORTH HAVING AT HAND `` `#48d936` — Live counts and constants (delays, corpus, pools, saves). *triggers:* BASIC_DELAY, BUFF_DELAY_CAP, PURE_BUFFS, ability corpus 231, RECAST_GATED 64, FRENZY_MAX_STEPS, FAITH_RELEASE, draft pools 179, ABILITY_SLOTS_BY_BOSS, pouch slots, SC_PROFILE_DEFAULT, save v15, relics, EMBERKEEP_TURNS recast proposal
 - `` ### THE TEST TREE, AS OF EF `` `#60a024` — Test tree as of EF: suites, battery, baselines, differ. *triggers:* suites at repo root, suite_fixture _spawn, run_battery.sh GATES, gates outside GATES, .ran manifest, baselines.json rows, new gate rows, check_parse coverage, check_de differ, stamp gates, check_da 3 walk
 - `` ### HOW LONG A FIGHT IS `` `#014714` — How long a fight is: rounds tables, ramp arrival (stale since DK). *triggers:* fight length rounds, turns per hero, rung 2 same fight, DOD_SIM_ROWS, elite shortest, Avg rounds/battle bug, cy_report_line, ramp arrival Frenzy Faith Loyalty Focus, sim confounders
@@ -246,61 +246,72 @@ population row carries a stamp over its member blocks, in their order, and reds 
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: IV — THE SIM's OWN FIGURES, AND THE LAST OF THE PLUMBING.** IMPLEMENT ONLY. **The sim answers what a player
-  answers, through his doors and in his order; the divergence census holds RULE 0; every environment read in the game's scripts
-  is a row; the index question is closed by its derivation and the pilot ended; the index has its population rows.** Full working:
-  **`docs/reports/IV.md`**. **The queue is empty and the roadmap holds the authoring list and nothing else** — the deck's middle
-  first, and it owes the sim's marked figures their re-take (the roadmap, below; WHAT IV's DRIVE MOVED).
-- **THE DESIGNER's FILES, READ AND UNTOUCHED.** The readout holds what it held at IU: IH's debug-touched first file and the clean
-  one, `readout/run-20261018-194229.jsonl`, which `latest.txt` names — 24,340 B, md5 `610bcd8c2b43f97703e63053e86728fa` at IV's
-  open and at its close, **still the one run**. `run_save.bin` (55,264 B, md5 `fcb20c91…`) still holds it at zone two's start. Both
-  backed up with the player's files (`../save-backups/IV-20261024-230637`). **A second run with a different party is still asked
-  for, on the LOOK-LIST** (the roadmap, below).
-- **§1 — THE SIM ANSWERS THE RUNE CACHES, IN THE PLAYER's ORDER, AND ASKS THE MERCHANT's DOORS (DV24–DV27).** A cache's answer is
-  `Run.take_rune_pick`, the door the hero's screen commits through; the sim answers the bargain's (never before) and the elite's
-  through it after the draft, DV28's policy the choice; the potion and the rune counter ask their doors before the gold moves.
-  **THE DRIVE (§1c)**, HEAD against IV paired by seed, 33 arms: **the rune supply moved** — a hero ends a default run holding +1.00
-  to +1.36 runes, almost all unworn (the slots were full) — **and the ladder's 26 tied, its order holding under a shift of
-  −0.0004 ± 0.0018**; eleven recorded figures are marked SUPERSEDED-PENDING (WHAT IV's DRIVE MOVED), the re-take the deck's middle's.
-- **§2 — EVERY ENVIRONMENT READ, ONE ROW EACH (DV32).** 58 reads: the five sim-family reads a player's run could reach are gated
-  (`DOD_SIM_RUNES`, `DOD_SIM_GRANT_ALL`, and the sweep's three — the relic loadout, the forced lineup and theme), and `check_iv` §2
-  reds on a read nobody sorted. `DOD_ZONE_ROTATION` is a real run's switch, inert today (FOUND AT IV).
-- **§3 — THE FOUR REPAIRS, AND RULE 0 (DV05–07, DV11, DV29).** The rotation re-asks the door, the fallback body is written back,
-  the boss pick asks the cap; the census of record reads RULE 0, POLICY 14, MODEL 5, CLOSED 14 — a ceiling, beside `check_gw`'s and
-  IU §5's. **§0.4 — the code decided S3-009**: the gate described it, so the rule was rewritten.
-- **§4 — THE CLAIMS**: IR01, IR09 and IR50 repaired in the ledger in place; **ISN04 and ISF12 stand on GK's three names, which IV
-  reports for the ruling** (IV's RULINGS OWED, 1).
-- **§5 — THE INDEX QUESTION CLOSED** in THE SHAPE RECON by its derivation (817 rules, 112 of 120 blocks); the pilot ended after
-  three reports; the close-read kept under its own name; the 188 cheap gates (76 NONE) a standing list, both counts ceilings.
-- **§6 — NINE POPULATION ROWS** (the index, above), derived from IL–IU's subjects: five of the six expected, *every rule* dropped,
-  four added.
-- **§9 — THE ROUTING** (`docs/reports/IV-routing.md`): the brief's thirteen subjects matched 35 rows, which with the 15-block core were opened whole (50 blocks, 135,555 B of 326,275); the close-read read the other 85 and found 8 that bore, one stale (EQ's 6.98, marked) — 3 ROUTED, 5 NOT ROUTED, every unrouted row given its trigger; 28 of the 147 entries touched, 24 by hand (IU: 30 of 135).
-- **THE INSTRUMENTS.** `check_iv` is new (§0–§6). Re-pointed: `check_fe` §2 (the door's body), `check_fm` §1d (the arm a sim's, +1),
-  `check_is` §5's phrase, `check_iu`'s standing ceiling (5 → 2). `index_stamp.py` stamps the population rows.
-- **THE VERIFICATION** — `docs/reports/IV.md` §11.
-- **`CLAUDE.md` IS 488,395 B = 476.95 KiB AGAINST ITS 510 KiB CEILING — 33.05 KiB UNDER** (+2,235 B at IV: the bot's door and RULE 0 +627 B, the sim-family flag rule and its three flags +708 B, the index question's close +427 B, the strike loop's sentence +225 B, the instrument index's two rows +170 B, the cache door's re-read +78 B; nothing cut): 4.1 batches at EZ's record (8,293 B).
-- **`docs/state.md` IS 344,016 B = 335.95 KiB AGAINST ITS 380 KiB CEILING — 44.05 KiB UNDER** (+17,741 B at IV, this line included: **10,159 B of it fenced structure** — the nine population rows and the pilot's close, inside the index's fence — and +7,582 B outside it; the archive took 4,705 B, the closed items word for word with the cut's heading): 6.7 batches at the honest rate IT measured (6,712 B, the mean of IP–IT's own writing outside a fence).
+- **Last batch: IW — THE LADDER WITH RESOLUTION, AND THE DECK's MIDDLE.** IMPLEMENT ONLY. **The ladder is measured on a population
+  that can feel it, and it re-orders the deck without supporting a re-cut; every figure IV marked is re-taken; GK's three names are
+  confirmed; `lane.sh` locks a lane in use and hands out another; `DOD_ZONE_ROTATION` is the sim's.** Full working:
+  **`docs/reports/IW.md`**. **The queue holds IW's two rulings, both the deck's** — the deck's middle is the designer's, against IW's
+  figures (the roadmap, below).
+- **THE DESIGNER's FILES, READ AND UNTOUCHED.** The readout holds what it held at IV: IH's debug-touched first file and the clean one,
+  `readout/run-20261018-194229.jsonl`, which `latest.txt` names — 24,340 B, md5 `610bcd8c2b43f97703e63053e86728fa` at IW's open and at
+  its close, **still the one run**. `run_save.bin` (55,264 B, md5 `fcb20c91…`) still holds it at zone two's start. Both backed up with
+  the player's files (`../save-backups/IW-20261025-100215`). **A second run with a different party is still asked for, on the
+  LOOK-LIST** (the roadmap, below).
+- **§1 — THE LADDER, ON A POPULATION THAT CAN FEEL IT.** A screen of nine candidate populations — five modifiers each across the range,
+  thirty runs, the criterion and its floor written before it ran — chose **the sim's default party untalented at Wanderer** (a spread of
+  20.1 of its own two standard errors, the incumbent's 12.3); the ladder on it, twenty-three modifiers at sixty runs, spread the
+  deck over 8 levels and re-ordered it (THE BARGAIN DECK's GRADES). **The instrument's fidelity proved first**: IV's forced arm
+  re-driven on HEAD reproduced IV's lines byte for byte, and a job with the probe's reads off reproduced its twin's every run.
+- **§2 — ARM B, BY THE RULE WRITTEN BEFORE THE LADDER RAN.** Two of the four cuts at IO's counts fall inside a level, so **no grade
+  moved**; 19 of the twenty-three share a level with another grade, each listed with its handle, and which party the deck is
+  ranked by — the two rulings (IW's RULINGS OWED).
+- **§3 — EVERY MARK RE-TAKEN.** IV's twelve arms re-driven on HEAD on IV's own seeds reproduced IV's second arm line for line, so each
+  marked figure's re-take is that arm's figure, now the record's; and the two IV could not read are read — a Cryomancer's Rupture
+  stands at 1.7% of his turns, a Warrior gains about 21 Rage a turn (THE SIM's FIGURES, RE-TAKEN AT IW).
+- **§4 — THE NAMES, THE LOCK, THE FLAG.** GK's parenthetical is struck from every live file and ISN04 and ISF12 are repaired, so no claim
+  stands (`check_iu`'s ceiling 2 → 0 — the brief's *5 → 3* was stale); a lane already running Godot is refused by name and pid and the
+  launch runs in another lane (`lane.sh busy`); a player's run does not read `DOD_ZONE_ROTATION` (FOUND AT IW: a pool's second zone is
+  then one no player can draw).
+- **§7 — THE ROUTING** (`docs/reports/IW-routing.md`): the brief's ten subjects matched 38 rows and 5 population rows (which added 12 blocks), opened with the 15-block core whole (65 blocks, 161,046 B of 344,016); the close-read read the other 73 whole — 2 bore, none stale, 1 NOT ROUTED (FOUND AT GJ, given the re-take's triggers); 16 of 147 index entries touched, 12 by hand.
+- **THE INSTRUMENTS.** `check_iw` is new (§0–§3). Re-pointed: `check_iv` §1c (a re-taken figure is IW's), §2 (the flag GATED), §4 (none
+  standing); `check_iu` §1 (the ceiling at zero).
+- **THE VERIFICATION** — `docs/reports/IW.md` §7.
+- **`CLAUDE.md` IS 489,977 B = 478.49 KiB AGAINST ITS 510 KiB CEILING — 31.51 KiB UNDER** (+1,582 B at IW, nothing cut: the names' ruling, a bullet of the name-sweep block, +925; the zone flag's ruling beside IV's sim-family rule, +388; the ladder's re-measure in its block, +239; the class-core parenthetical's *PROPOSED* made *confirmed*, +30): 3.9 batches at EZ's record (8,293 B).
+- **`docs/state.md` IS 345,195 B = 337.10 KiB AGAINST ITS 380 KiB CEILING — 42.90 KiB UNDER** (+1,179 B net at IW, this line included: +375 B of it inside the index's fence — three rows written, three gone, six mended — and +804 B outside it; **the archive took 15,672 B** — IV's three rulings, WHAT IV's DRIVE MOVED, FOUND AT IV, GK's first ruling, the grades' superseded table and the roadmap's re-measure item, word for word — so IW wrote 16,851 B where it cut 15,672): 6.5 batches at the honest rate IT measured (6,712 B, the mean of IP–IT's own writing outside a fence).
 - **No save version moved**: no key a save carries changed.
 - **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in a build
   older than HL**: HL's ceiling refuses a newer save from HL's build on — HR's v15 is the first bump it has guarded — and HJ's and
   HK's builds, and `main`, carry no ceiling.
-- **Next: the roadmap's authoring list** — the deck's middle first.
+- **Next: IW's two rulings, then the deck's middle** — the modifiers are the designer's, against IW's ladder.
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### IV's RULINGS OWED — **THREE; THE FIRST IS PLAYER-VISIBLE**
+### IW's RULINGS OWED — **TWO; BOTH ARE THE DECK's, AND NOTHING IS AUTHORED OR RE-CUT UNTIL THEY ARE ANSWERED**
 
-Full working: `docs/reports/IV.md`, NEEDS A RULING.
+Full working: `docs/reports/IW.md`, NEEDS A RULING.
 
-1. **GK's THREE SPINE-RUNE NAMES, STILL *PROPOSED at GK*** (ISN04 and ISF12, the two claims the ledger of record leaves
-   standing, `docs/reports/IU-claims.tsv`): *Rune of the Vanguard (core)*, *Rune of the Invoker (core)*, *Rune of the
-   Hierophant (core)*. **IV §4 reports what the ruling needs and nothing more** — for each spine, what its rune does in one
-   sentence, its current name, and every surface the name stands on (the full sweep kept, `docs/reports/IV-spines.tsv`).
-   **Confirm or rename each, and the parenthetical in `CLAUDE.md` goes with the ruling.**
-2. **TWO GODOT PROCESSES IN ONE LANE SHARE ITS `user://`** (FOUND AT IV): `lane.sh` launches into a lane already running
-   one, and a gate that writes and reads the harness save reds beside it. **A lock in the driver, or the rule written beside
-   IQ §7's lane block** — one process a lane.
-3. **`DOD_ZONE_ROTATION` IS A REAL RUN's SWITCH, READ WITH NO GATE** (FOUND AT IV): inert while every slot pool holds one
-   zone. **A play switch the readout names, as `DOD_ENEMIES_OFF` is, or a sim's, gated on `sim_run`** — decided before a
-   pool holds two, the day `check_iv` §2 reds.
+1. **THE 19 GRADES THE MEASUREMENT DOES NOT SUPPORT, EACH WITH ITS HANDLE** (arm B's list; THE BARGAIN DECK's GRADES, below). Each shares a level of IW's ladder with a modifier of another grade, so the measurement cannot place it in its grade rather than the neighbour's. **Which to re-cut, and by which handle, is the designer's** — a handle is named, never its figure, so a re-tune at its source is read by `check_iw` §2 and nothing goes stale. **The list's length hangs on one reading**: Deadened opens its level by 0.2% of the line the rule draws, and read the other side Brittle, Slick Footing, Bloodletting, Encumbered would be supported and 15 not (the arm the same; IW's report §2):
+
+| modifier | grade | IW's reading | other grades in its level | the handle |
+|---|---|---|---|---|
+| Dull Edge | 1 | 0.950 | 2 | a percentage — `u.crit_bonus` in its arm of `battle._stamp_modifier` |
+| Parched | 1 | 0.945 | 2 | a fraction — `u.max_resource` in its arm of `battle._stamp_modifier` |
+| Tinderbox | 1 | 0.944 | 2 | a percentage — `u.type_dmg_bonus["fire"]` in its arm of `battle._stamp_modifier` |
+| Frenzied | 1 | 0.943 | 2 | a percentage — `mod_speed_mult` in its arm of `battle._stamp_modifier` |
+| Muffled | 2 | 0.943 | 1 | a percentage — `mod_bd_mult` in its arm of `battle._stamp_modifier` |
+| Fleeting | 2 | 0.940 | 1 | a count — `mod_status_turns` in its arm of `battle._stamp_modifier` |
+| Hoarfrost | 1 | 0.939 | 2 | a duration — `_apply_status(u, "chilled"` in its arm of `battle._stamp_modifier` |
+| Deadened | 3 | 0.938 | 2 | a rule — no handle to turn |
+| Brittle | 2 | 0.936 | 3 | a rule — no handle to turn |
+| Slick Footing | 2 | 0.936 | 3 | a count — `ab.delay` in its arm of `battle._stamp_modifier` |
+| Bloodletting | 2 | 0.935 | 3 | a count — `mod_bleed_add` in its arm of `battle._stamp_modifier` |
+| Encumbered | 2 | 0.927 | 3 | a count — `ab.cooldown` in its arm of `battle._stamp_modifier` |
+| Feverish | 3 | 0.920 | 1 | a percentage — `u.attack` in its arm of `battle._stamp_modifier` |
+| Warded | 1 | 0.918 | 3 | a percentage — `mod_cost_mult` in its arm of `battle._stamp_modifier` |
+| The Thin Veil | 3 | 0.896 | 4 | a percentage — `Run.THIN_VEIL_PCT` in its arm of `battle._stamp_modifier` |
+| The Long Silence | 3 | 0.895 | 4 | a rule — no handle to turn |
+| Miasma | 4 | 0.892 | 3 | a percentage — `healing_received_mult` in its arm of `battle._stamp_modifier` |
+| Thin Air | 4 | 0.734 | 5 | a rule — no handle to turn |
+| Bloodless | 5 | 0.702 | 4 | a rule — no handle to turn |
+
+2. **WHICH PARTY THE DECK IS RANKED BY.** A severity is a rank by what a modifier costs a party (IO §2) — and on the incumbent nineteen cost the same, while on the party the screen chose the order moves (Thin Air with the costliest, Warded with grade 3, Deadened and Hoarfrost with the cheapest). **Rank the deck by one party, by several, or by what each rung's own party meets** — the measurement can serve any of them; the choice is what a grade means — and the glossary's *Severity* entry, which tells the player *a severity is a rank by what a modifier costs*, follows the answer (it holds today: the three 5s are three of the four costliest on IW's ladder).
 ### THE FIRST CLEAN PLAYTHROUGH — **2026-10-18, WARDEN, ZONE ONE THROUGH ITS BOSS; SIX FINDINGS, ALL THE DESIGNER's TO RULE OR AUTHOR, NOTHING BUILT FROM THEM (IP §0.1, §4)**
 
 **The file is `readout/run-20261018-194229.jsonl`** in the live folder (24,340 B; md5 `610bcd8c2b43f97703e63053e86728fa`), backed
@@ -332,109 +343,54 @@ aside (IP's report, §0.1).
   (3,396 of 8,053; at the boss 988 of 1,955, his best turn 339); **the Berserker dealt 18.2%** (1,468), his `low_water` 0.00 in all
   ten fights and **22.9% of his costed turns hard-dry** (11 of 48).
 
-### THE BARGAIN DECK's GRADES — **MEASURED (IO §2, RE-TAKEN AND RE-CUT AT IP §1b AND §2); TWO CUTS ARE TIES; THE GRADES ARE THE BOT's AND THE DEFAULT BUILD's**
+### THE BARGAIN DECK's GRADES — **RE-MEASURED AT IW §1 ON THE POPULATION A SCREEN DERIVED; ARM B: NO GRADE IS RE-CUT, AND THE MEASUREMENT SUPPORTS 4 OF TWENTY-THREE**
 
-**What the table is.** Each modifier forced on every bargain of a Ruin run (the sim's forced arm: IG's three parties, the default
-build, seed block 21, twenty runs a party), the party's share of its health at a bargain fight's end, sorted and cut 6 / 6 / 4 / 4 / 3.
-**Which instrument each figure is**: IO's for most; **IP's repaired bot** (the player's potion) for Bloodless, Miasma, Wasting and
-the Thin Veil, the four the potion could move; **pooled over a second seed block** (block 41, IP's bot) for the six either side of
-IO's cuts that IP re-measured. Every figure, its standard error and its source is IP's report, §1b.
+**What the table is (IW §1).** Each modifier forced on every bargain of a run — the sim's forced arm through IV's probe, its fidelity proved (IW's report §1) — on the population a screen of nine derived: **the sim's default party (the Berserker, the Cryomancer, the Devout and the Beastmaster), untalented, at Wanderer**, seed block 38, sixty runs an arm; the party's share of its health at a bargain fight's end (an elite, and the mini-boss, which offers a bargain at Wanderer). **THE LADDER's FIGURES REPLACE IP's — THIS MEASUREMENT REPLACES THE RECORD RATHER THAN CHECKING IT**, and IP's figures are superseded; the grades stand as IP cut them (arm B, below). Every figure, its standard error, its level and its handle: `docs/reports/IW-ladder.tsv`; the screen: `docs/reports/IW-screen.tsv`.
 
-| grade | holds, in the measured order | health at a bargain fight's end |
-|---|---|---|
-| **5** | Mirrorbound, Wasting, Bloodless | 0.706 – 0.640 |
-| **4** | Rot, Thin Air, Miasma, Overgrown | 0.899 – 0.857 |
-| **3** | the Long Silence, Feverish, the Thin Veil, Deadened | 0.910 – 0.899 |
-| **2** | Slick Footing, Muffled, Encumbered, Bloodletting, Fleeting, Brittle | 0.945 – 0.921 |
-| **1** | Hoarfrost, Dull Edge, Frenzied, Tinderbox, Warded, Parched | 0.963 – 0.948 |
+**Why this population.** The incumbent — IG's three parties, all twenty-seven nodes, Ruin — ends nineteen of the twenty-three bargain fights within a few hundredths of full health, too close for its noise to rank them. The screen read each candidate on five modifiers across the range (thirty runs) and ranked them by the spread of its readings over its own two standard errors, the floor 4 written before it ran: the sim's default party untalented, Wanderer 20.1 (its four cheaper 4.5); IG's Hierophant population untalented, Wanderer 13.8 (its four cheaper 3.1); IG's three parties, all 27 nodes, Ruin (the incumbent) 12.3 (its four cheaper 3.7); the sim's default party untalented, Warden 11.3 (its four cheaper 4.0); IG's three parties untalented, Wanderer 11.0 (its four cheaper 2.4); IG's three parties, one tier, Ruin 7.8 (its four cheaper 1.8); IG's Hierophant population untalented, Warden 7.1 (its four cheaper 3.0); IG's three parties untalented, Warden 4.9 (its four cheaper 1.7); IG's three parties untalented, Ruin 4.2 (its four cheaper 2.1). The winner is also the only candidate whose four cheaper readings alone clear 4.
 
-- **TWO CUTS ARE TIES, NAMED ARBITRARY (IP §0.4's rule, `docs/instrument-rules.md`).** After a second seed block, **Parched |
-  Slick Footing** (severity 1 | 2) sit 0.003 apart against two standard errors of 0.007, and **Deadened | Rot** (3 | 4) 0.001 apart
-  against 0.011: the measurement cannot say which of each pair is costlier, so the sort's order stands and **either could hold
-  either grade**. **NO THIRD BLOCK (IQ §0.2, the designer's): a tie that survives its second block is a measurement that
-  succeeded** — the two cost the party the same, and *two modifiers that cost the same belong in the same grade; a boundary
-  between them is an artifact of fixed counts, not a fact about the deck.* The cuts are made at fixed counts over a deck that
-  clusters, so a cut falls inside a cluster somewhere; the bands read grades, not modifiers, so an arbitrary cut moves one
-  modifier between two adjacent bands and nothing else. **Do not re-measure these two** — an hour to order two modifiers the
-  measurement has already called equal (the rule beside the tie rule, `docs/instrument-rules.md`). The other two cuts are measurements: Brittle | the Long Silence (2 | 3) 0.011 apart, just past two standard errors (2.02),
-  and the cliff, Overgrown | Mirrorbound (4 | 5), 0.151 apart.
-- **LIMITATION ONE — THE GRADES ARE THE DEFAULT BUILD's (IP §0.5, the designer's).** The untalented arm completes no run on Ruin in
-  any arm, so runs completed cannot break a tie there, and its standard errors run three to ten times the default build's. Cut the
-  same way, **seven grade differently untalented**: Parched and Warded (2 untalented), Muffled and Deadened (1), Brittle (3),
-  Overgrown (3) and the Thin Veil (4). Severity 5 holds the same three on both builds.
-- **LIMITATION TWO — THE GRADES ARE THE BOT's (IP §0.5).** The bot books 2.2 times a player's status events (THE FIRST CLEAN
-  PLAYTHROUGH, above), so **a grade that turns on statuses laid may be mis-graded for a player**: by mechanism that is **Fleeting**,
-  whose door is every status applied. Hoarfrost lays one chill on every body at the start, and its cost reads the chill, not how
-  many statuses anyone lays. **And the grades that turn on healing** — Bloodless, Miasma, Wasting and the Thin Veil — were the bot's
-  potion's until IP §2 repaired it and re-took them; the bot still drinks by its own policy (below 35%, before acting), not a
-  player's. **And its ally pools are heroes-only where the player's picker admits a companion — a CONSTANT bias every grade here
-  was measured through, not repaired (IS §4): the batch that widens them re-measures this table in the same batch, or retires
-  it** (`CLAUDE.md`'s ladder block holds the rule).
-- **THE DECK HAS NO MIDDLE (IP §0.12, the designer's)**: between the cliff's 0.706 and Overgrown's 0.857 there is nothing. **Four or
-  five modifiers costing 0.78 to 0.86 are what the deck is missing, and they are the designer's to author** — what gives Warden a
-  middle rung; no count moves and no band is widened to reach for it. **THE TARGET, SET AT IQ §0.5 SO THE AUTHORING HAS A
-  CONDITION RATHER THAN A FEELING: Warden's bargain fights end between 0.80 and 0.85 of the party's health** — the midpoint of the
-  ladder it sits in. On IP's cut the three rungs end at 0.956, 0.908 and 0.687: Warden sits 0.048 under Wanderer and 0.221 over
-  Ruin, so 0.908 is the best this deck can do and no re-grade of twenty-three modifiers makes it a middle rung. **Recorded, not
-  pursued**: the four or five modifiers at 0.78–0.86 are the designer's, and nothing moves toward the target until they are authored.
-- **THE THIN VEIL IS STILL FEVERISH's RULE AT TWICE THE FIGURE (IP §0.6)**: confirmed, and a rule of its own is owed — the
-  designer's to author. **On the repaired instrument the two settings of the one dial cost the same** — Feverish 0.910, the Veil
-  0.908 — and stand in one grade, 3.
-- **IV's DRIVE: EVERY GRADE READING AND RUNG MEAN TIED, AND THE ORDER HOLDS (IV §1c).** On this table's forced arm, HEAD against
-  IV paired by seed, no modifier's health at a bargain fight's end moved past two standard errors: **the one uniform shift that
-  best explains all 23 is -0.0004 ± 0.0018**, and the residuals about it are noise (χ² 16.1 on 22 degrees of freedom); 40 pairs
-  swap order between the two sorts and none past two standard errors on both trees; the rung means tie (Wanderer +0.006, Warden
-  -0.007, Ruin -0.008). **So the batch that authors the deck's middle re-reads these bands, and owes no re-grade for IV's
-  repair.** What the drive cannot settle: its HEAD arm reads six of the 23 outside two standard errors of IP's figures
-  (Bloodless +0.082, Overgrown −0.042, Thin Air, the Long Silence, Rot and Miasma near +0.02) — its forced arm is IN's probe
-  rebuilt from its description, and HEAD is IU's game — so it says IV moved none of them, not whether the record or the
-  instrument drifted (IV's report §1c).
+| modifier | IW's reading | level | grade (as it stands) | supported | IP's figure (superseded) |
+|---|---|---|---|---|---|
+| Dull Edge | 0.950 ± 0.004 | 1 | 1 | **no** | 0.957 |
+| Parched | 0.945 ± 0.004 | 1 | 1 | **no** | 0.948 |
+| Tinderbox | 0.944 ± 0.005 | 1 | 1 | **no** | 0.951 |
+| Frenzied | 0.943 ± 0.005 | 1 | 1 | **no** | 0.954 |
+| Muffled | 0.943 ± 0.004 | 1 | 2 | **no** | 0.941 |
+| Fleeting | 0.940 ± 0.005 | 1 | 2 | **no** | 0.931 |
+| Hoarfrost | 0.939 ± 0.005 | 1 | 1 | **no** | 0.963 |
+| Deadened | 0.938 ± 0.004 | 2 | 3 | **no** | 0.899 |
+| Brittle | 0.936 ± 0.005 | 2 | 2 | **no** | 0.921 |
+| Slick Footing | 0.936 ± 0.006 | 2 | 2 | **no** | 0.945 |
+| Bloodletting | 0.935 ± 0.005 | 2 | 2 | **no** | 0.938 |
+| Encumbered | 0.927 ± 0.006 | 2 | 2 | **no** | 0.941 |
+| Feverish | 0.920 ± 0.006 | 3 | 3 | **no** | 0.910 |
+| Warded | 0.918 ± 0.008 | 3 | 1 | **no** | 0.949 |
+| The Thin Veil | 0.896 ± 0.006 | 4 | 3 | **no** | 0.908 |
+| The Long Silence | 0.895 ± 0.005 | 4 | 3 | **no** | 0.910 |
+| Miasma | 0.892 ± 0.007 | 4 | 4 | **no** | 0.875 |
+| Rot | 0.857 ± 0.008 | 5 | 4 | yes | 0.899 |
+| Overgrown | 0.854 ± 0.009 | 5 | 4 | yes | 0.857 |
+| Mirrorbound | 0.788 ± 0.009 | 6 | 5 | yes | 0.706 |
+| Thin Air | 0.734 ± 0.014 | 7 | 4 | **no** | 0.897 |
+| Bloodless | 0.702 ± 0.010 | 7 | 5 | **no** | 0.640 |
+| Wasting | 0.579 ± 0.016 | 8 | 5 | yes | 0.684 |
 
-### WHAT IV's DRIVE MOVED — **SUPERSEDED-PENDING UNTIL THE BATCH THAT AUTHORS THE DECK's MIDDLE RE-TAKES THEM (IV §1c, the designer's)**
+- **ARM B — THE GRADES ARE NOT FIVE LEVELS ON THIS POPULATION EITHER, SO NONE IS RE-CUT (IW §2, by the rule written before the ladder ran).** A level opens at the cheapest reading and holds every next one within two standard errors of the difference of its first (IP §0.4's tie rule); a cut at IO's counts is real when its two neighbours sit in different levels. **8 levels; two of the four cuts fall inside one** — Fleeting | Hoarfrost (0.001 apart, 0.16 se) and The Long Silence | Miasma (0.003 apart, 0.32 se) — and two are real (Encumbered | Feverish, 0.83 se; Mirrorbound | Thin Air, 3.20 se). A re-cut on it would move modifiers across two of the four boundaries by noise, which is a grade changed without its measurement.
+- **SUPPORTED, AND NOT.** A grade is supported when every modifier of its level carries it: **4** are — Rot, Overgrown, Mirrorbound, Wasting; **the other 19 share a level with a modifier of another grade**, and the list, with each one's handle, is the designer's to rule on (IW's RULINGS OWED, 1).
+- **WHAT THIS POPULATION READS THAT THE INCUMBENT COULD NOT.** The costs spread wider — 8 levels where the incumbent's re-drive read six — and the order moves where it is not noise: **Thin Air** (grade 4) ends a bargain fight at 0.734, between Mirrorbound and Bloodless, and completes 26 of 60 runs; **Mirrorbound** (grade 5) at 0.788, above it; **Warded** (grade 1) at 0.918, with grade 3; **Deadened** (grade 3) at 0.938 and **Hoarfrost** (grade 1) at 0.939, in the cheapest two levels. An untalented party leans on what these take away — its resource returning, its armour, its cheap casts — so a grade is a rank by what a modifier costs a party, and **this measurement says the party matters**: which party the deck is ranked by is the designer's (IW's RULINGS OWED, 2).
+- **THE GAP, MEASURED.** The largest interval between two adjacent readings is Bloodless | Wasting, 0.123 wide (6.6 se) — at the costly end. Above it: Overgrown 0.854 | Mirrorbound 0.788 and Mirrorbound | Thin Air 0.734, both past two standard errors. **Nothing is authored**: the modifiers are the designer's, against these figures. **What a target would be derived from, measured beside it** (arm A's step, read on arm B as data): this party's natural bargain fights — the bot's own bargains, no forced modifier, sixty runs a rung — end at **0.869 at Wanderer, 0.647 at Warden, 0.540 at Ruin** (53, 1 and 0 of 60 runs completed); with no modifier at all, its Wanderer bargain fights end at 0.944.
+- **WHAT THE GRADES ARE, SAID WHERE THEY ARE READ.** They are still IP's cut of the incumbent (IO §2's method, IP §1b's counts), and **IW's figures are one party's**, untalented, at Wanderer's multiplier, through the bot — which books 2.2 times a player's status events (THE FIRST CLEAN PLAYTHROUGH) and whose ally pools are heroes-only (a constant bias every figure here was taken through, IS §4). IP's two ties (Parched | Slick Footing, Deadened | Rot) are IP's figures and are superseded with them.
+- **THE THIN VEIL IS STILL FEVERISH's RULE AT TWICE THE FIGURE (IP §0.6)**: on IW's population the two settings of the one dial read apart — Feverish 0.920, the Veil 0.896 — where IP's read them together; a rule of its own is still the designer's to author.
 
-**What it is.** IV's sim answers what a player answers (its RULE rows at zero, IV §1–§3), so IV drove the figures a default sim
-took, the brief's list whole, against the unchanged tree — HEAD against IV, paired by seed, 20 runs a party on IG's three
-parties, 33 arms: the natural default build and untalented at each rung, the Hourglass held on both builds, IG's Hierophant
-population on both builds, and the 23 forced arms with their baseline — and read each cut against its noise: a cut inside two
-standard errors is a tie. **The kept table is docs/reports/IV-drive.tsv**, 822 rows, each with the record it reads against (IV's
-report §1c). **No figure is re-taken here**: the batch that authors the deck's middle measures anyway. **Read against chance**:
-of 97 recorded readings the 7 of rune supply and the merchant's buys move by mechanism, and of the other 90, 4 read past two
-standard errors where chance gives 4 — each marked by the rule, with what it is.
+### THE SIM's FIGURES, RE-TAKEN AT IW — **EVERY MARK IV SET IS TAKEN (IW §3); THE RECORD IS IW's FIGURE NOW**
 
-- **SUPERSEDED-PENDING (IV §1c) — THE RUNE-SUPPLY FIGURES** (HR §1c's supply table; the run report's *Acquired per hero per
-  run*, EQ's 3.44 in Carried from the code). The sim answers the bargain's rune cache since IV, so a hero on the default build
-  ends a run holding **+1.36 runes at Wanderer**, **+1.31 runes at Warden**, **+1.00 runes at Ruin** (|d|/se 7.2 to 10.0), +0.89
-  to +1.28 of them unworn — the slots were already full. Re-taken by the batch that authors the deck's middle.
-- **SUPERSEDED-PENDING (IV §1c) — THE MERCHANT's RUNES BOUGHT A RUN** (the run report's *runes bought*, EQ's 6.98 in Carried
-  from the code). The cache's runes fill the slots first, so IV's sim buys 0.58 fewer a run (|d|/se 5.7, the ten natural arms'
-  30 party blocks of 20 runs paired by seed; the merchants walked tie, -0.12). Re-taken by the batch that authors the deck's
-  middle.
-- **SUPERSEDED-PENDING (IV §1c) — UNTALENTED COMPLETION ON IG's HIEROPHANT POPULATION** (IO §3: runs completed 70 of 180). On
-  IV's sim **25% → 50%** of runs complete (|d|/se 2.90; Fisher's exact p ≈ 0.008) and the depth rises +3.5 of 49 — the one
-  population where the runes the sim now takes buy completion. Re-taken with Sanctity's figures by the batch that re-measures
-  the sim.
-- **SUPERSEDED-PENDING (IV §1c) — RUNS COMPLETED UNDER TINDERBOX AND UNDER MIASMA** (IP §1b: 59 and 51 of 60). Each read 93.3% →
-  100% on the drive's forced arm, |d|/se 2.05 by the rule's reading — which overstates at the boundary (Fisher's exact p ≈ 0.12
-  each), and beside the supply, 90 recorded readings expect 4 past two standard errors by chance and show 4. **Marked by the
-  rule.** Re-taken with the ladder by the batch that authors the deck's middle.
-- **SUPERSEDED-PENDING (IV §1c) — THE SIM's HUNTER BAR AT A TURN's START, THE RELIC HELD, DEFAULT** (IF §0.1b's 95 of 120). It
-  reads 3.1 of 120 lower on IV's sim (|d|/se 2.18; the Cleric -2.2 and the Mage -1.7, ties). Re-read by the batch that re-takes
-  the sim's figures.
-- **AND EVERYTHING ELSE TIED** — the bargain ladder's 26 (every grade reading and the three rung means: the order holds, THE
-  BARGAIN DECK's GRADES, above), every dry share and opens-full reading (IE §1b, IF §0.1b, IG §4c), every Sanctity figure on
-  IG's population (SANCTITY's STEP), untalented completion and depth at each rung on IG's three parties (GJ's count), and the
-  default build's completion and depth at each rung. **What moved that nothing records**: worn +0.032 ± 0.004 a hero and core
-  runes slotted +0.085 ± 0.011 (pooled over 34 arms — the slots were full), and a boss's Sanctity steps past two standard errors
-  in 6 of 34 arms, both ways (pooled +0.011 ± 0.018). **What it could not read**: FOUND AT IF's Rupture rate (3.2% of a
-  Cryomancer's turns, IF §2's own arm) — this probe books no cast, and DV05's re-ask can move it, so the batch that re-takes the
-  sim's figures reads it; BOIL OVER'S RATE's HZ figures (Rage a turn, the bot's damage at a full bar) — the probe reads Mana
-  bars only; and Carried, with measurements attached's readings, each of a retired configuration. **And HEAD against the
-  record**: this drive's HEAD arm does not reproduce several recorded levels — opens full reads 75.3 / 82.9 / 74.4% (Cleric /
-  Mage / Hunter, default with the relic) against IG §4c's 39.2 / 42.5 / 35.6, the bars about 110 of 120 against IF's 91 / 97 /
-  95, untalented dry 33.0 / 24.9 / 40.3 against IE's 26.8 / 18.3 / 33.8 — its readings are rebuilt from the reports'
-  descriptions on IG's three parties, not the original probes, so what it measures is IV's effect on each figure, and the
-  record's level is not re-read here.
-
+**What it is.** IV marked eleven figures its drive showed moved SUPERSEDED-PENDING (WHAT IV's DRIVE MOVED, archived at IW). **IW re-drove IV's twelve arms on HEAD on IV's own seeds** — the ten natural arms on IG's three parties and the incumbent's two forced arms, through IV's probe — and **every one of the 36 logs reproduced IV's second arm line for line** (363,651 probe lines): HEAD is IV's tree for these figures, so each re-take is that arm's figure, and it is the record's now. Its instrument is IV's rebuilt one, not the records' original probes (IV §1c: the levels differ), so **these figures replace the records rather than checking them**. The kept table: `docs/reports/IW-retake.tsv`; §1b's ladder reached none of the eleven (each is a natural run's figure; IW's report §3).
+- **THE RUNE SUPPLY** (HR §1c's supply table): a hero on the default build ends a run holding **8.57 runes at Wanderer, 8.64 at Warden, 8.34 at Ruin**, **2.92 / 2.88 / 2.70 of them unworn** at the three rungs.
+- **THE RUN REPORT's SHOP LINE** (EQ's 4.57 merchants walked, 6.98 runes bought and 3.44 acquired per hero per run, Carried from the code): over the ten natural arms' thirty party blocks, **4.82 merchants walked, 3.36 runes bought, 6.36 acquired per hero per run**.
+- **UNTALENTED COMPLETION ON IG's HIEROPHANT POPULATION** (IO §3's 70 of 180): **30 of 60** completed, depth 42.8 of 49.
+- **RUNS COMPLETED UNDER TINDERBOX AND UNDER MIASMA** (IP §1b's 59 and 51 of 60), the incumbent's forced arm: **60 and 60 of 60**.
+- **THE SIM's BARS AT A TURN's START, THE RELIC HELD, DEFAULT** (IF §0.1b's 91 / 97 / 95 of 120, Cleric / Mage / Hunter): **107.0 / 109.8 / 105.9 of 120**.
+- **AND THE TWO IV's DRIVE COULD NOT READ, READ.** **Rupture** (IF §2's 3.2% on IF's tree; FOUND AT IF): a Rupture stands on a living enemy at the start of a Cryomancer's turn on **1.7% of his turns** — sixty default-build runs at Wanderer, IV's repaired bot (per run 1.64 ± 0.47). **Boil Over's Rage** (HZ §2's about 20 a turn, median 15; BOIL OVER'S RATE): about 21 Rage a turn on the same build and rung, twenty runs a lineage — the Berserker 23.1 (median 15), the Warden 19.8 (median 15), the Swordmaster 21.4 (median 15); holding 100 or more, what he dealt between two of his turns ran a median 43% / 46% / 57% of his Attack (that reading includes what his statuses dealt in the span, so it bounds the bot's dump from above).
 ### THE CLERIC's MANA RATE — **12, UNMOVED (IE §1); THE TUNING HANDLE AND THE FIGURES IT WAS MEASURED AGAINST**
 
 **The drip is `battle._mana_regen`'s `12 + u.mana_regen_bonus`, one base for every Mana hero; the Mage's Evocation adds 10.** A
@@ -448,7 +404,7 @@ bar above the cap), relic held and not, in `docs/reports/IF.md` §0.1b. **What e
 Mage and the Hunter) **is WITHDRAWN** (IF's brief §0.1): it asked for a higher rate while the finding pointed down.
 
 **THE FIRST CLEAN PLAYTHROUGH SAID THE OPPOSITE OF THE SIM (IP §0.1)**: the Cleric was the driest hero and the Mage and the
-Hunter never dry — THE FIRST CLEAN PLAYTHROUGH, above. With the relic, at a turn's start the bars read 91 / 97 / 95 of 120 (default). *(The Hunter's reading is SUPERSEDED-PENDING since IV — WHAT IV's DRIVE MOVED.)* **THE RATE STAYS 12, CONFIRMED (IG's brief §0.2):**
+Hunter never dry — THE FIRST CLEAN PLAYTHROUGH, above. With the relic, at a turn's start the bars read 91 / 97 / 95 of 120 (default) on IF's instrument; *re-taken at IW on IV's: 107.0 / 109.8 / 105.9 (THE SIM's FIGURES, RE-TAKEN AT IW).* **THE RATE STAYS 12, CONFIRMED (IG's brief §0.2):**
 untalented — the designer's build — the Cleric is dry 11.5% of his turns with the relic, below the Mage's and the Hunter's, and the
 caveat the sim cannot close (the bot heals when hurt, a player when it matters) is the readout's. These figures were taken while the
 member's maximum was a fixed 100 (IG §4 changes that for a node-holder; the untalented rows hold no node) — re-read at IG §4c
@@ -467,17 +423,19 @@ IL's table is `docs/reports/IL.md` §1c and IO's is `docs/reports/IO.md` §3. **
 IS THE DESIGNER's TO RE-RULE (IP §0.1)**: a normal fight booked 18.33 events and 1.17 steps, the boss 51 — THE FIRST CLEAN
 PLAYTHROUGH, above.
 
-### FOUND AT IV AND NOT FIXED
+### FOUND AT IW AND NOT FIXED
 
-- **TWO GODOT PROCESSES IN ONE LANE SHARE ITS `user://`, AND A GATE THAT WRITES THE HARNESS SAVE RACES THE OTHER.**
-  `check_ho` on IV's work lane read 179 / 2 beside three gates launched into the same lane (§4d: the retired rune its save
-  brought back), 179 / 1 beside `check_fh` alone (§2c: the save the fall wrote did not load), and 179 / 0 alone — `check_fh`
-  168 / 0 each time. **`lane.sh` launches into a lane already running a process and says nothing.** The battery is
-  sequential, so only a batch's own subset runs meet it (IV's report §11). The designer's (IV's RULINGS OWED, 2).
-- **`DOD_ZONE_ROTATION` CHANGES A REAL RUN's ZONE DRAW WITH NO GATE, AND TODAY CHANGES NOTHING** (IV §2's sweep, one row a
-  read): every slot pool holds one zone, so the draw it randomises has one answer. **`check_iv` §2 reds the day a pool
-  holds two** — a latent defect that needs a writer gets a gate that reds when the writer appears (IT §7's rule) — and
-  whose switch it is waits on a ruling (IV's RULINGS OWED, 3).
+- **A SLOT POOL's SECOND ZONE IS ONE NO PLAYER CAN DRAW** (read in the code beside IW §0.3): `Run.draw_zones` takes a pool's random
+  member only while the rotation is enabled and the pool's first otherwise, and since IW the rotation is the sim's — so a player's run
+  draws each pool's first author, and a zone authored second into a pool is reached by the sim's flag and by no player. Inert while
+  every pool in `SLOT_POOLS` holds one zone; `check_iv` §2's latent arm reds the day one holds two, and **the draw a player gets is owed
+  its door then** — a random draw, or the first author always — the designer's. (IW's brief read *the player gets the draw*; today's
+  code gives him the first.)
+- **RESOLUTION AND BREADTH PULLED APART, MEASURED** (IW §1a): the screen's winner is one party — the sim's default lineup, untalented,
+  at Wanderer, R5 20.1 — while IG's three parties under the same terms read 11.0: their party-to-party spread is noise to a
+  ladder, so a population broad enough to speak for every lineage resolves the deck about half as well. IW's ladder is four lineages'
+  (THE BARGAIN DECK's GRADES says so where the grades are read); a ladder for the whole roster at this resolution wants about three
+  times the runs ((20.1 / 11.0)² ≈ 3.3), which is what the screen exists to avoid.
 ### THE RULES A GATE COULD CHEAPLY HOLD — **A STANDING LIST (IV §5, the designer's): 188 RULES, 76 OF THEM HELD BY NOTHING; BOTH COUNTS ARE CEILINGS**
 
 **What it is.** IU §2's rules census of record (docs/reports/IU-rules-census.tsv, one row a standing rule in `CLAUDE.md`)
@@ -655,7 +613,7 @@ re-read HELD where the code decided between the rule and its gate (IV §0.4) —
 ### FOUND AT IF AND NOT FIXED
 
 - **THE SIM's BOT CASTS A DRAFTED SMOULDER ONLY THROUGH THE DRAFTED HOOK** — as it does Fireball (FOUND AT IE): only when Magic Burst and
-  Magic Missiles are both unavailable. A Cryomancer's Rupture reads 3.2% of his turns in the sim's default-build runs on IF's code and
+  Magic Missiles are both unavailable. A Cryomancer's Rupture reads 3.2% of his turns in the sim's default-build runs on IF's code (**1.7% re-read at IW**, sixty runs on IV's repaired bot — THE SIM's FIGURES, RE-TAKEN AT IW) and
   15.3% for one who holds Smoulder and casts it whenever it is ready (IF §2); the readout reads the designer's.
 - **THE READOUT's *dealt* IS THE HERO's OWN** — a companion's blows are credited to the companion's name and are not in its hunter's
   figure; Boil Over and the vow, which the readout exists for, are not affected.
@@ -686,7 +644,7 @@ against**, each HZ's:
 - **Maximum Rage**: 100 for every Warrior lineage; 120 with the tier-1 node that raises the pool (the sim's full build carries it).
 - **Rage a turn, in real fights** (20 sim runs a lineage, the default rung): a Warrior gains **about 20 a turn** (median 15) in every
   zone and lineage, so a bar of 100 fills in **about five of his turns** — about a fight. Holding 100 or more, the bot's damaging
-  actions dealt a median 35–54% of his Attack.
+  actions dealt a median 35–54% of his Attack. **Re-read at IW on IV's repaired bot** (the default build at the default rung, twenty runs a lineage): about 21 a turn — the Berserker 23.1 (median 15), the Warden 19.8 (median 15), the Swordmaster 21.4 (median 15) — so a bar of 100 fills in about 4.7 of his turns; holding 100 or more, what he dealt between two of his turns ran a median 43% / 46% / 57% of his Attack (THE SIM's FIGURES, RE-TAKEN AT IW).
 - **The census, on one deterministic board at Attack 100** (`check_hz` §2 prints it every battery, each card on its own board):
   the best ordinary turn is **Rampage, 45 for 40 Rage (52 with the Berserker's core)**; Execute 38, Cleave 35, Crushing Blow 30
   (31 with the core) — about 1.0 to 1.6 a point of Rage.
@@ -855,9 +813,7 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
 - **THE PILOT ENDED AT IV, AND `CLAUDE.md` TAKES NO INDEX (IV §0.1, the designer's)**: three reports, one answer — a bounded read
   was a sufficient one — and the other file's question closed by IU §2's count (THE SHAPE RECON, below). The close-read is kept as
   the batch's own (the index section). **The 380 KiB stays on this file; its restatement on the read was never ruled.**
-- **THE DECK's MIDDLE OWES THE LADDER ITS RE-MEASURE (IV §1c)**: IV's sim answers what a player answers (the bargain's rune cache,
-  the draft before the cache, the merchant's doors), so every figure a default sim took moved with it, and the batch that
-  authors the deck's middle re-takes them where they are marked SUPERSEDED-PENDING — the bargain ladder first. IV's drive found the grades' order holding and their level unmoved by its repair, so the re-take there re-reads the bands; its HEAD arm read six of IP's 23 outside two standard errors, which a re-take on the record's own instrument settles.
+- **THE LADDER IS RE-MEASURED (IW §1), AND THE DECK's MIDDLE WAITS ON IW's TWO RULINGS**: on the population a screen derived the costs spread wider and re-order the deck, but two of the four cuts fall inside a level, so no grade moved (arm B) — the nineteen grades the measurement does not support, and which party the deck is ranked by, are the designer's (IW's RULINGS OWED); every mark IV set is re-taken (THE SIM's FIGURES, RE-TAKEN AT IW). The modifiers of the middle are the designer's, against IW's figures.
 - **THE LOOK-LIST — WHAT A GATE CANNOT READ: WHETHER A SCREEN READS WELL (IS's brief §0.1, the designer's).** A gate reads a rect;
   it cannot read whether what is drawn reads right. **Every batch that moves something on screen adds a row here**, so the rows are
   cleared in one sitting rather than one message at a time. Nothing waits on a row.
@@ -1536,11 +1492,10 @@ Full working: `docs/reports/GM.md`, NEEDS A RULING.
   `systems-recon.html`). GL added no `CLAUDE.md` line (the brief forbade rules); **selecting it in the picker is the
   designer's**.
 
-### GK's RULINGS OWED — **NINE; THE NAMES, THE WORDS AND THE THIN KIT ARE PLAYER-VISIBLE**
+### GK's RULINGS OWED — **SIX LEFT; THE NAMES CONFIRMED AT IW §0.1; THE WORDS AND THE THIN KIT ARE PLAYER-VISIBLE**
 
 Full working: `docs/reports/GK.md`, NEEDS A RULING.
 
-1. **The three spine runes' names** — the Rune of the Vanguard, the Invoker, the Hierophant.
 2. **The three spines' rule texts** (`Classes.SPINE_INFO`), which no player read before GK.
 3. **The class-selection words** — *"Take one of three engine runes — a second can join it later, and either can be
    dropped"*. Since IJ §2: *"Take one of three core runes — 2 more can join it later, and any can be dropped"* (the count read
@@ -1936,7 +1891,7 @@ the things a later batch must not re-derive from scratch:
 ### THE THREE SPINES ARE BUILT AND ALL THREE RATES ARE SET (FU, FV); WHAT IS STILL FLAGGED — **OWED A RULING (FT)**
 
 **GK MADE THEM REACHABLE, AS RUNES.** Each spine is an engine rune — the Rune of the Vanguard, the Invoker and the
-Hierophant, names proposed — and `BattleUnit._sync_engine_switches` is the three switches' one writer, so a hero
+Hierophant, names confirmed at IW §0.1 — and `BattleUnit._sync_engine_switches` is the three switches' one writer, so a hero
 holding one has its switch on and no class carries a spine.
 
 **None of it blocks the next batch.** The machinery is drivable and every number is a named
@@ -2771,7 +2726,7 @@ repair.** Both are reported and neither was taken.
   `run_sim.gd` reads `type_taken.get("shop")` / `type_offered.get("shop")` where the node
   type is `"merchant"` — the key is never written, so *"it takes 0.0 of 0.0 shops offered per run"*
   is **structurally zero**. The same report prints **4.57 merchants walked, 6.98 runes bought and
-  3.44 runes acquired per hero per run** four blocks lower, off the correct key. *(Its runes bought and its acquisition line moved at IV — SUPERSEDED-PENDING, WHAT IV's DRIVE MOVED.)* **Its prose is
+  3.44 runes acquired per hero per run** four blocks lower, off the correct key. *(Re-taken at IW over the ten natural arms' thirty party blocks: 4.82 merchants walked, 3.36 runes bought, 6.36 acquired per hero per run — THE SIM's FIGURES, RE-TAKEN AT IW.)* **Its prose is
   reversed as well**: it claims every route policy *"puts combat first"* and `ROUTE_ORDER` puts
   `fight` **at or near the END**, with `blacksmith` and `merchant` first and second in two of them —
   which the comment twenty lines above says itself (*"balanced: trade nodes first"*). **This is the

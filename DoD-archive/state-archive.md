@@ -17,6 +17,156 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT IW — 2026-10-25, FROM `docs/state.md` AS IT LEFT IT (`b462bc3`)
+
+**What came here**: IV's three rulings, every one answered in IW's brief; WHAT IV's DRIVE MOVED, every mark re-taken at IW §3; FOUND AT IV's two findings, the lane lock built at IW §0.2 and `DOD_ZONE_ROTATION` gated at IW §0.3; and GK's first ruling, the spine names, confirmed at IW §0.1; THE BARGAIN DECK's GRADES' superseded table (IP's figures and IV's paragraph beside them, replaced by IW's ladder) and the roadmap's re-measure item, taken at IW §1. Each word for word, under the heading it stood under.
+
+
+### ~~IV's RULINGS OWED~~ — **ALL THREE ANSWERED IN IW's BRIEF (1: the three spine names confirmed, IW §0.1; 2: a lock in `lane.sh`, IW §0.2; 3: `DOD_ZONE_ROTATION` is the sim's, IW §0.3)** — was: **THREE; THE FIRST IS PLAYER-VISIBLE**
+
+Full working: `docs/reports/IV.md`, NEEDS A RULING.
+
+1. **GK's THREE SPINE-RUNE NAMES, STILL *PROPOSED at GK*** (ISN04 and ISF12, the two claims the ledger of record leaves
+   standing, `docs/reports/IU-claims.tsv`): *Rune of the Vanguard (core)*, *Rune of the Invoker (core)*, *Rune of the
+   Hierophant (core)*. **IV §4 reports what the ruling needs and nothing more** — for each spine, what its rune does in one
+   sentence, its current name, and every surface the name stands on (the full sweep kept, `docs/reports/IV-spines.tsv`).
+   **Confirm or rename each, and the parenthetical in `CLAUDE.md` goes with the ruling.**
+2. **TWO GODOT PROCESSES IN ONE LANE SHARE ITS `user://`** (FOUND AT IV): `lane.sh` launches into a lane already running
+   one, and a gate that writes and reads the harness save reds beside it. **A lock in the driver, or the rule written beside
+   IQ §7's lane block** — one process a lane.
+3. **`DOD_ZONE_ROTATION` IS A REAL RUN's SWITCH, READ WITH NO GATE** (FOUND AT IV): inert while every slot pool holds one
+   zone. **A play switch the readout names, as `DOD_ENEMIES_OFF` is, or a sim's, gated on `sim_run`** — decided before a
+   pool holds two, the day `check_iv` §2 reds.
+
+### ~~WHAT IV's DRIVE MOVED~~ — **EVERY MARK RE-TAKEN AT IW §3 (THE SIM's FIGURES, RE-TAKEN AT IW, in `docs/state.md`)** — was: **SUPERSEDED-PENDING UNTIL THE BATCH THAT AUTHORS THE DECK's MIDDLE RE-TAKES THEM (IV §1c, the designer's)**
+
+**What it is.** IV's sim answers what a player answers (its RULE rows at zero, IV §1–§3), so IV drove the figures a default sim
+took, the brief's list whole, against the unchanged tree — HEAD against IV, paired by seed, 20 runs a party on IG's three
+parties, 33 arms: the natural default build and untalented at each rung, the Hourglass held on both builds, IG's Hierophant
+population on both builds, and the 23 forced arms with their baseline — and read each cut against its noise: a cut inside two
+standard errors is a tie. **The kept table is docs/reports/IV-drive.tsv**, 822 rows, each with the record it reads against (IV's
+report §1c). **No figure is re-taken here**: the batch that authors the deck's middle measures anyway. **Read against chance**:
+of 97 recorded readings the 7 of rune supply and the merchant's buys move by mechanism, and of the other 90, 4 read past two
+standard errors where chance gives 4 — each marked by the rule, with what it is.
+
+- **SUPERSEDED-PENDING (IV §1c) — THE RUNE-SUPPLY FIGURES** (HR §1c's supply table; the run report's *Acquired per hero per
+  run*, EQ's 3.44 in Carried from the code). The sim answers the bargain's rune cache since IV, so a hero on the default build
+  ends a run holding **+1.36 runes at Wanderer**, **+1.31 runes at Warden**, **+1.00 runes at Ruin** (|d|/se 7.2 to 10.0), +0.89
+  to +1.28 of them unworn — the slots were already full. Re-taken by the batch that authors the deck's middle.
+- **SUPERSEDED-PENDING (IV §1c) — THE MERCHANT's RUNES BOUGHT A RUN** (the run report's *runes bought*, EQ's 6.98 in Carried
+  from the code). The cache's runes fill the slots first, so IV's sim buys 0.58 fewer a run (|d|/se 5.7, the ten natural arms'
+  30 party blocks of 20 runs paired by seed; the merchants walked tie, -0.12). Re-taken by the batch that authors the deck's
+  middle.
+- **SUPERSEDED-PENDING (IV §1c) — UNTALENTED COMPLETION ON IG's HIEROPHANT POPULATION** (IO §3: runs completed 70 of 180). On
+  IV's sim **25% → 50%** of runs complete (|d|/se 2.90; Fisher's exact p ≈ 0.008) and the depth rises +3.5 of 49 — the one
+  population where the runes the sim now takes buy completion. Re-taken with Sanctity's figures by the batch that re-measures
+  the sim.
+- **SUPERSEDED-PENDING (IV §1c) — RUNS COMPLETED UNDER TINDERBOX AND UNDER MIASMA** (IP §1b: 59 and 51 of 60). Each read 93.3% →
+  100% on the drive's forced arm, |d|/se 2.05 by the rule's reading — which overstates at the boundary (Fisher's exact p ≈ 0.12
+  each), and beside the supply, 90 recorded readings expect 4 past two standard errors by chance and show 4. **Marked by the
+  rule.** Re-taken with the ladder by the batch that authors the deck's middle.
+- **SUPERSEDED-PENDING (IV §1c) — THE SIM's HUNTER BAR AT A TURN's START, THE RELIC HELD, DEFAULT** (IF §0.1b's 95 of 120). It
+  reads 3.1 of 120 lower on IV's sim (|d|/se 2.18; the Cleric -2.2 and the Mage -1.7, ties). Re-read by the batch that re-takes
+  the sim's figures.
+- **AND EVERYTHING ELSE TIED** — the bargain ladder's 26 (every grade reading and the three rung means: the order holds, THE
+  BARGAIN DECK's GRADES, above), every dry share and opens-full reading (IE §1b, IF §0.1b, IG §4c), every Sanctity figure on
+  IG's population (SANCTITY's STEP), untalented completion and depth at each rung on IG's three parties (GJ's count), and the
+  default build's completion and depth at each rung. **What moved that nothing records**: worn +0.032 ± 0.004 a hero and core
+  runes slotted +0.085 ± 0.011 (pooled over 34 arms — the slots were full), and a boss's Sanctity steps past two standard errors
+  in 6 of 34 arms, both ways (pooled +0.011 ± 0.018). **What it could not read**: FOUND AT IF's Rupture rate (3.2% of a
+  Cryomancer's turns, IF §2's own arm) — this probe books no cast, and DV05's re-ask can move it, so the batch that re-takes the
+  sim's figures reads it; BOIL OVER'S RATE's HZ figures (Rage a turn, the bot's damage at a full bar) — the probe reads Mana
+  bars only; and Carried, with measurements attached's readings, each of a retired configuration. **And HEAD against the
+  record**: this drive's HEAD arm does not reproduce several recorded levels — opens full reads 75.3 / 82.9 / 74.4% (Cleric /
+  Mage / Hunter, default with the relic) against IG §4c's 39.2 / 42.5 / 35.6, the bars about 110 of 120 against IF's 91 / 97 /
+  95, untalented dry 33.0 / 24.9 / 40.3 against IE's 26.8 / 18.3 / 33.8 — its readings are rebuilt from the reports'
+  descriptions on IG's three parties, not the original probes, so what it measures is IV's effect on each figure, and the
+  record's level is not re-read here.
+
+### ~~FOUND AT IV AND NOT FIXED~~ — **BOTH CLOSED AT IW (the lane lock, IW §0.2; `DOD_ZONE_ROTATION` gated on the sim, IW §0.3)**
+
+- **TWO GODOT PROCESSES IN ONE LANE SHARE ITS `user://`, AND A GATE THAT WRITES THE HARNESS SAVE RACES THE OTHER.**
+  `check_ho` on IV's work lane read 179 / 2 beside three gates launched into the same lane (§4d: the retired rune its save
+  brought back), 179 / 1 beside `check_fh` alone (§2c: the save the fall wrote did not load), and 179 / 0 alone — `check_fh`
+  168 / 0 each time. **`lane.sh` launches into a lane already running a process and says nothing.** The battery is
+  sequential, so only a batch's own subset runs meet it (IV's report §11). The designer's (IV's RULINGS OWED, 2).
+- **`DOD_ZONE_ROTATION` CHANGES A REAL RUN's ZONE DRAW WITH NO GATE, AND TODAY CHANGES NOTHING** (IV §2's sweep, one row a
+  read): every slot pool holds one zone, so the draw it randomises has one answer. **`check_iv` §2 reds the day a pool
+  holds two** — a latent defect that needs a writer gets a gate that reds when the writer appears (IT §7's rule) — and
+  whose switch it is waits on a ruling (IV's RULINGS OWED, 3).
+
+### GK's RULINGS OWED — **NINE; THE NAMES, THE WORDS AND THE THIN KIT ARE PLAYER-VISIBLE** — ITS CLOSED ITEMS (archived at IW; the section stays in `docs/state.md`)
+
+1. **The three spine runes' names** — the Rune of the Vanguard, the Invoker, the Hierophant.
+
+*Answered at IW §0.1 (the designer's): all three confirmed — the project's own prose had taken them up as the things' nouns.*
+
+### THE BARGAIN DECK's GRADES — **MEASURED (IO §2, RE-TAKEN AND RE-CUT AT IP §1b AND §2); TWO CUTS ARE TIES; THE GRADES ARE THE BOT's AND THE DEFAULT BUILD's** — ITS CLOSED ITEMS (archived at IW: IP's table, superseded by IW's ladder; the section stays in `docs/state.md`)
+
+**What the table is.** Each modifier forced on every bargain of a Ruin run (the sim's forced arm: IG's three parties, the default
+build, seed block 21, twenty runs a party), the party's share of its health at a bargain fight's end, sorted and cut 6 / 6 / 4 / 4 / 3.
+**Which instrument each figure is**: IO's for most; **IP's repaired bot** (the player's potion) for Bloodless, Miasma, Wasting and
+the Thin Veil, the four the potion could move; **pooled over a second seed block** (block 41, IP's bot) for the six either side of
+IO's cuts that IP re-measured. Every figure, its standard error and its source is IP's report, §1b.
+
+| grade | holds, in the measured order | health at a bargain fight's end |
+|---|---|---|
+| **5** | Mirrorbound, Wasting, Bloodless | 0.706 – 0.640 |
+| **4** | Rot, Thin Air, Miasma, Overgrown | 0.899 – 0.857 |
+| **3** | the Long Silence, Feverish, the Thin Veil, Deadened | 0.910 – 0.899 |
+| **2** | Slick Footing, Muffled, Encumbered, Bloodletting, Fleeting, Brittle | 0.945 – 0.921 |
+| **1** | Hoarfrost, Dull Edge, Frenzied, Tinderbox, Warded, Parched | 0.963 – 0.948 |
+
+- **TWO CUTS ARE TIES, NAMED ARBITRARY (IP §0.4's rule, `docs/instrument-rules.md`).** After a second seed block, **Parched |
+  Slick Footing** (severity 1 | 2) sit 0.003 apart against two standard errors of 0.007, and **Deadened | Rot** (3 | 4) 0.001 apart
+  against 0.011: the measurement cannot say which of each pair is costlier, so the sort's order stands and **either could hold
+  either grade**. **NO THIRD BLOCK (IQ §0.2, the designer's): a tie that survives its second block is a measurement that
+  succeeded** — the two cost the party the same, and *two modifiers that cost the same belong in the same grade; a boundary
+  between them is an artifact of fixed counts, not a fact about the deck.* The cuts are made at fixed counts over a deck that
+  clusters, so a cut falls inside a cluster somewhere; the bands read grades, not modifiers, so an arbitrary cut moves one
+  modifier between two adjacent bands and nothing else. **Do not re-measure these two** — an hour to order two modifiers the
+  measurement has already called equal (the rule beside the tie rule, `docs/instrument-rules.md`). The other two cuts are measurements: Brittle | the Long Silence (2 | 3) 0.011 apart, just past two standard errors (2.02),
+  and the cliff, Overgrown | Mirrorbound (4 | 5), 0.151 apart.
+- **LIMITATION ONE — THE GRADES ARE THE DEFAULT BUILD's (IP §0.5, the designer's).** The untalented arm completes no run on Ruin in
+  any arm, so runs completed cannot break a tie there, and its standard errors run three to ten times the default build's. Cut the
+  same way, **seven grade differently untalented**: Parched and Warded (2 untalented), Muffled and Deadened (1), Brittle (3),
+  Overgrown (3) and the Thin Veil (4). Severity 5 holds the same three on both builds.
+- **LIMITATION TWO — THE GRADES ARE THE BOT's (IP §0.5).** The bot books 2.2 times a player's status events (THE FIRST CLEAN
+  PLAYTHROUGH, above), so **a grade that turns on statuses laid may be mis-graded for a player**: by mechanism that is **Fleeting**,
+  whose door is every status applied. Hoarfrost lays one chill on every body at the start, and its cost reads the chill, not how
+  many statuses anyone lays. **And the grades that turn on healing** — Bloodless, Miasma, Wasting and the Thin Veil — were the bot's
+  potion's until IP §2 repaired it and re-took them; the bot still drinks by its own policy (below 35%, before acting), not a
+  player's. **And its ally pools are heroes-only where the player's picker admits a companion — a CONSTANT bias every grade here
+  was measured through, not repaired (IS §4): the batch that widens them re-measures this table in the same batch, or retires
+  it** (`CLAUDE.md`'s ladder block holds the rule).
+- **THE DECK HAS NO MIDDLE (IP §0.12, the designer's)**: between the cliff's 0.706 and Overgrown's 0.857 there is nothing. **Four or
+  five modifiers costing 0.78 to 0.86 are what the deck is missing, and they are the designer's to author** — what gives Warden a
+  middle rung; no count moves and no band is widened to reach for it. **THE TARGET, SET AT IQ §0.5 SO THE AUTHORING HAS A
+  CONDITION RATHER THAN A FEELING: Warden's bargain fights end between 0.80 and 0.85 of the party's health** — the midpoint of the
+  ladder it sits in. On IP's cut the three rungs end at 0.956, 0.908 and 0.687: Warden sits 0.048 under Wanderer and 0.221 over
+  Ruin, so 0.908 is the best this deck can do and no re-grade of twenty-three modifiers makes it a middle rung. **Recorded, not
+  pursued**: the four or five modifiers at 0.78–0.86 are the designer's, and nothing moves toward the target until they are authored.
+- **THE THIN VEIL IS STILL FEVERISH's RULE AT TWICE THE FIGURE (IP §0.6)**: confirmed, and a rule of its own is owed — the
+  designer's to author. **On the repaired instrument the two settings of the one dial cost the same** — Feverish 0.910, the Veil
+  0.908 — and stand in one grade, 3.
+- **IV's DRIVE: EVERY GRADE READING AND RUNG MEAN TIED, AND THE ORDER HOLDS (IV §1c).** On this table's forced arm, HEAD against
+  IV paired by seed, no modifier's health at a bargain fight's end moved past two standard errors: **the one uniform shift that
+  best explains all 23 is -0.0004 ± 0.0018**, and the residuals about it are noise (χ² 16.1 on 22 degrees of freedom); 40 pairs
+  swap order between the two sorts and none past two standard errors on both trees; the rung means tie (Wanderer +0.006, Warden
+  -0.007, Ruin -0.008). **So the batch that authors the deck's middle re-reads these bands, and owes no re-grade for IV's
+  repair.** What the drive cannot settle: its HEAD arm reads six of the 23 outside two standard errors of IP's figures
+  (Bloodless +0.082, Overgrown −0.042, Thin Air, the Long Silence, Rot and Miasma near +0.02) — its forced arm is IN's probe
+  rebuilt from its description, and HEAD is IU's game — so it says IV moved none of them, not whether the record or the
+  instrument drifted (IV's report §1c).
+
+### THE PLAYTEST'S OTHER FINDINGS — ITS CLOSED ITEMS (archived at IW; the section stays in `docs/state.md`)
+
+- **THE DECK's MIDDLE OWES THE LADDER ITS RE-MEASURE (IV §1c)**: IV's sim answers what a player answers (the bargain's rune cache,
+  the draft before the cache, the merchant's doors), so every figure a default sim took moved with it, and the batch that
+  authors the deck's middle re-takes them where they are marked SUPERSEDED-PENDING — the bargain ladder first. IV's drive found the grades' order holding and their level unmoved by its repair, so the re-take there re-reads the bands; its HEAD arm read six of IP's 23 outside two standard errors, which a re-take on the record's own instrument settles.
+
+---
+
 ## ARCHIVED AT IV — 2026-10-25, FROM `docs/state.md` AS IT LEFT IT (`91ce490`)
 
 **What came here**: IU's four rulings, every one answered in IV's brief; FOUND AT IU's ten bot defects, built at IV §1–§3; FOUND AT

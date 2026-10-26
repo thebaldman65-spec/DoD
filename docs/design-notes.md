@@ -4,6 +4,38 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The ladder with resolution, and the deck's middle (Batch IW) — 2026-10-25
+
+**Why the ladder was measured on a population a screen chose, and not on more runs.** To tell five grades apart the readings
+have to spread at least four times their two standard errors, and on the party the deck had always been measured on — all
+twelve lineages fully talented, at Ruin — nineteen of the twenty-three modifiers cost so little that they crowd into a few
+hundredths of the party's health. More runs shrink the noise only with the square root of the count: halving it costs four times
+the runs and buys a decimal place on a quantity that is nearly the same for every modifier. A party the bargains actually hurt
+spreads them apart at the same count. So nine candidate parties were screened on five modifiers each, with the criterion and its
+floor written down before any of them ran, and the full ladder was measured on the winner.
+
+**Why the screen's criterion was written before it ran, and why a second one was written beside it.** A floor chosen after the
+readings is not a floor. The brief's ratio reads the spread of five readings including the cliff — Wasting — so a party with a
+deep cliff and small noise reads high however its crowd bunches; the ratio of the four above the cliff reads the crowd itself.
+Both were fixed before the screen; the brief's decided the winner, and the second could only have asked for a second ladder.
+
+**Why no grade moved, though the measurement re-orders the deck.** On the party the screen chose the deck spreads over more levels and several modifiers sit far from their grade. But two of the four places the counts cut fall inside a level — the modifiers either side of the cut cost the party the same — so a re-cut would move them across a boundary by noise, which is a grade changed without its measurement. The rule for that was written before the ladder ran; the grades the measurement does not support, and which party the deck is ranked by, go to the designer.
+
+**Why the three spine names were confirmed rather than re-opened.** For eleven batches the reports, the gates and the recon called
+a Cleric on that spine *a Hierophant* without anyone deciding to — eighty-four of that spine's ninety-two mentions. A name the
+project's own writing took up as the thing's noun has already passed the test a new name would have to pass.
+
+**Why the lane lock hands out another lane instead of refusing.** A rule saying *one gate a lane* would be broken the first time a
+batch needed to run its gates side by side, which every batch does. A refusal with no way forward is the same rule in a lock's
+clothes; a refusal that runs the launch in another lane removes the race without removing the habit.
+
+**Why the zone switch is the simulator's.** A player chooses his party and his build, never his zones — the run draws them. A
+switch that changes what a run contains is a measuring tool, so a real run with it left set plays the run it drafted.
+
+**Why the eleven figures were a drive of their own.** They are a natural run's figures — the bot's own bargains — at their own rungs
+on their own parties; the ladder forces one modifier on every bargain of one party at one rung, so it reaches none of them. Re-driven
+on IV's own seeds on today's tree, they read exactly what IV's second arm read, which is what makes them re-takes and not new numbers.
+
 ## The sim's own figures, and the last of the plumbing (Batch IV) — 2026-10-25
 
 **Why the bot answers a cache through the player's door, in his order, and not through a shortcut that lands the same rune.**

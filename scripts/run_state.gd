@@ -323,8 +323,9 @@ func note_debug(action: String, taken: String) -> void:
 # tags in enemies.json actually mean. The Forest of Old hosts slots 1
 # AND 3: roster 1 as the opener, the tougher roster 3 as the finale.
 # Random draws stay behind DOD_ZONE_ROTATION=1 (fixed first-candidate
-# order otherwise) until each pool holds ~2 candidates; with today's
-# single-candidate pools both modes draw identically.
+# order otherwise), and since IW §0.3 that flag is the SIM's: a player's run
+# takes each pool's first author. With today's single-candidate pools both
+# modes draw identically.
 # Adding a zone = ZONE_DEFS entry + SLOT_POOLS candidacy + roster tags
 # in enemies.json + zone_name keys in the battle/map background dicts.
 const SLOT_COUNT := 3
@@ -3869,12 +3870,16 @@ func draft_price() -> int:
 	return maxi(int(round(base * (1.0 - relic_add("shop_discount")))), 1)
 
 
+# BATCH IW §0.3 — A FLAG THAT CHANGES WHAT A RUN CONTAINS IS THE SIM's (the designer's): a player chooses
+# his party and his build, never his zones, so the rotation is read by a run sim only, beside the run
+# sim's other arms (`runes_mode`, `rune_econ`, `rune_power`). A player's run draws each pool's first.
 func rotation_enabled() -> bool:
-	return OS.get_environment("DOD_ZONE_ROTATION") == "1"
+	return sim_run and OS.get_environment("DOD_ZONE_ROTATION") == "1"
 
 
 # One zone id per slot for this run. Fixed order = each pool's first
-# author; the rotation flag draws randomly within the authored pools.
+# author; the rotation flag (a sim's, IW §0.3) draws randomly within the
+# authored pools.
 func draw_zones() -> void:
 	zone_draw = []
 	for slot in SLOT_COUNT:

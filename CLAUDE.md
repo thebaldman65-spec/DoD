@@ -1961,7 +1961,8 @@ decision and the STRUCTURE is what shipped.
   modifier the sort moves leaves the bands that deal its old grade — Wanderer's and Warden's offers move with it, the
   one place they are expected to. **No grade moves by feel, and none to make a rung's mean read better.** The
   measurement and its cut are IO's report, §2, re-taken where IP's repaired instrument could move it and re-cut at IP
-  §1b (IP's report).
+  §1b (IP's report); **re-measured at IW §1 on the population a screen derived, where two of the four cuts fall inside a level,
+  so no grade moved and the figures are IW's** (IW's report; which party the deck is ranked by is owed a ruling, `docs/state.md`).
 · **THE BOT's ALLY POOLS ARE A KNOWN CONSTANT BIAS. THE BATCH THAT CHANGES THEM RE-MEASURES THE LADDER IN THE SAME BATCH, OR IT
   RETIRES THE LADDER (IS §4, the designer's).** Every bot ally pool is heroes-only where the player's picker admits a companion
   (`battle._bot_drafted_pick`, `_bot_class_kit_pick`, `_autoplay_pick_kit`), and every grade, band and band's mean above was
@@ -2698,8 +2699,9 @@ the block left out, spend what they were paid.
 
 ## STANDING RULE — A CLASS CORE IS A LEDGER, NOT A PURSE (Batch FT §1)
 **ITS CORE HALF IS SUPERSEDED BY THE ENGINE RUNE CHARTER ABOVE: NO CLASS HAS A CORE (GK).** Momentum,
-Channel and Sanctity are the Rune of the Vanguard's, the Invoker's and the Hierophant's engines (names
-PROPOSED at GK), and Focus is the Rune of the Sharpshooter's — held like the other twenty, never given.
+Channel and Sanctity are the Rune of the Vanguard's, the Invoker's and
+the Hierophant's engines (named at GK, confirmed at IW §0.1, the designer's), and Focus is the Rune of
+the Sharpshooter's — held like the other twenty, never given.
 **What stands is the LEDGER half**, which the rest of this block is about.
 
 **AND ALL THREE ACCUMULATE AND PAY WHILE HELD AND ARE NEVER CONSUMED, WHICH IS BI §1's PRESCRIBED
@@ -2833,10 +2835,13 @@ sim/autoplay/sim_run).
   `DOD_SIM_RELICS` replaced a player's relics at every fight, and the forced lineup and theme his warbands — so each is
   gated on the sim, or on a battle outside a run; `check_iv` §2 holds every environment read in the game's scripts, one
   row each, and reds on a new one nobody sorted.
+  **AND A FLAG THAT CHANGES WHAT A RUN CONTAINS IS THE SIM's, UNLESS THE PLAYER CHOOSES THAT CONTENT SOMEWHERE ELSE TOO (IW §0.3, the designer's)**:
+  a player chooses his party and his build, never his zones — the run draws them — so `DOD_ZONE_ROTATION` (randomize
+  the zone draw within slot pools) is read by a run sim only, beside the five, and a player's run takes each pool's first
+  zone. Inert while every pool holds one zone; the day one holds two, the sim can force a draw for a measurement, and
+  the draw a player gets is owed its own door (`check_iv` §2's latent arm reds that day).
 · ENV FLAGS, non-sim: `DOD_AUTOPLAY` (1 debug battle, echoes "[LOG]"; never exits on its own —
-  timeout/kill it), `DOD_DEBUG` (above), `DOD_ENEMIES_OFF` (above), `DOD_ZONE_ROTATION`
-  (randomize zone draws within slot pools — inert while every pool holds one zone, and `check_iv` §2 reds the day one
-  holds two, because then it changes a real run with nothing to say so), `DOD_READOUT` (IF §1: `0` turns the playtest readout off in the player's
+  timeout/kill it), `DOD_DEBUG` (above), `DOD_ENEMIES_OFF` (above), `DOD_READOUT` (IF §1: `0` turns the playtest readout off in the player's
   game; `1` turns it on in a harness, which then writes `user://readout_harness/` — the block *THE READOUT IS A READ*).
 · RETIRED, and **the record lives in `sim.sh`'s header and master.html — the sim prints no
   retired line and `scripts/` names none of them**: `DOD_SIM_MAP`, `DOD_SIM_MINIBOSS`,
@@ -5293,6 +5298,14 @@ call and one string).
   (`check_ho` §5e pins it), and a tithe is a share of what you produce given to the whole — the rule exactly.
   `check_hp` §2f swept the new names against 1,022 names in fourteen populations: *Dead Air* near-misses the
   Survivalist's zone-boss card *Deadfall*, and ships as a named near-miss.
+· **A NAME THE PROJECT's OWN PROSE TOOK UP AS THE THING's NOUN HAS ALREADY PASSED THE TEST A NEW NAME WOULD HAVE TO PASS (IW §0.1, the designer's).**
+  GK's three spine runes stood unconfirmed for eleven batches while the reports, the gates and the recon took their names
+  up as nouns — *a Hierophant* carries 84 of its spine's 92 record rows, *a Vanguard-taker* and *an Invoker-taker* are how
+  the kit recon says it (IV §4's census) — and nobody reached for a better word. **All three are confirmed**, and each fits
+  its engine: a vanguard presses forward and Momentum pays for pressing, an invoker casts and Channel is paid in Mana spent,
+  a hierophant keeps the mysteries and Sanctity lengthens blessings. The census swept every ability, status, relic, node,
+  rune, enemy, item, zone, glossary entry and event and met no collision; *Vanguard* contains *Guard*, which bites a
+  substring matcher and no reader.
 · **AND SINCE HI A GATE ASKS THE ABILITY HALF OF IT OF EVERY CARD: ONE NAME, ONE DEFINITION (`check_hi`).** Nothing
   in the battery asked it before (HH's finding); the per-tranche sweeps ask it of their own nine. `pool_ability` walks
   a CHAIN of definition tables and answers the FIRST that holds the name, so a card written into two tables leaves a

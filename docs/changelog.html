@@ -16,6 +16,23 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-25 &mdash; Batch IW: THE LADDER WITH RESOLUTION, AND THE DECK's MIDDLE</h2>
+<p><b>Nothing a player sees on a card, a rune or a status moved. The bargain deck's grades were measured again, this time on a
+party the bargains actually hurt, so the measurement can tell them apart; the simulator's eleven figures that the last batch
+marked as out of date are taken again; the three spine runes' names are confirmed; and a test switch that could change which
+zones a run draws now works only inside the simulator.</b> Full working: <code>docs/reports/IW.md</code>.</p>
+
+<p><b>&sect;1 &mdash; THE LADDER, ON A PARTY THAT CAN FEEL IT.</b> The deck had been measured on a party so strong that nineteen of its twenty-three twists ended a fight within a few hundredths of full health &mdash; too close to rank. Nine candidate parties were tried first, the rule for choosing written down before any ran, and the full measurement was taken on the one the bargains hurt most clearly: the simulator's default party with no talents, at the easiest difficulty. The measuring tool was checked before it was trusted: re-run, it reproduced the last batch's numbers exactly, and switching its readings off changed nothing in the runs.</p>
+
+<p><b>&sect;2 &mdash; WHAT THE MEASUREMENT SAYS ABOUT THE DECK.</b> On that party the twists spread out further and fall in a different order &mdash; losing the resource that returns each turn costs it nearly as much as the harshest twists, and the costlier abilities hurt it more than their grade says &mdash; but at two of the four places the grades are cut, the twists either side still cost the same. So no grade changed: the nineteen twists whose grade the measurement does not support are listed for the designer, each with the number that could be turned, beside the question of which party the grades should be ranked by.</p>
+
+<p><b>&sect;3 &mdash; THE ELEVEN FIGURES, TAKEN AGAIN.</b> Every figure the last batch marked out of date &mdash; the runes a hero ends a run holding, what the merchant sells, how often the weakest party finishes, how two twists' runs end, the mana bars with the Hourglass &mdash; was measured again on the same seeds and read exactly what the last batch's second measurement read, so those are the record now; and two it could not read are read: a Cryomancer's Rupture stands at 1.7% of his turns, and a Warrior gains about 21 Rage a turn.</p>
+
+<p><b>&sect;4 &mdash; THE NAMES, THE LANES AND THE ZONE SWITCH.</b> The Rune of the Vanguard, the Rune of the Invoker and the Rune
+of the Hierophant are the designer's names now, not proposals &mdash; the project's own writing had already adopted them as nouns.
+Running two test copies of the game in one folder at once no longer races: the launcher refuses the busy folder by name and runs
+the second copy in another. And the zone-rotation switch is the simulator's: a real run takes each zone slot's first zone.</p>
+
 <h2>2026-10-25 &mdash; Batch IV: THE SIM's OWN FIGURES, AND THE LAST OF THE PLUMBING</h2>
 <p><b>Nothing a player sees moved: every card, rune and status reads exactly as it did. Underneath, the simulated player &mdash;
 the bot every balance measurement is taken with &mdash; now takes the rewards a player takes, in a player's order and through
@@ -3151,7 +3168,7 @@ untouched. Full working: <code>docs/reports/GK.md</code>.</p>
 <p><b>A HERO NO LONGER CHOOSES A SPECIALIZATION. HE TAKES AN ENGINE RUNE.</b> Every spec's passive is now a rune named
 after the spec that carried it — the Rune of the Berserker, the Rune of the Warden and ten more — and the three engines
 that belonged to a class are runes too: Momentum (the Rune of the Vanguard), Channel (the Rune of the Invoker) and
-Sanctity (the Rune of the Hierophant). <b>Those three names are proposed.</b></p>
+Sanctity (the Rune of the Hierophant). <b>Those three names stood unconfirmed until IW §0.1, which confirmed all three.</b></p>
 <ul>
 <li><b>Class selection deals three.</b> Before the first battle each hero is dealt three of his class's engine runes and
 takes one. The Warrior, the Mage and the Cleric have four; the Hunter three.</li>

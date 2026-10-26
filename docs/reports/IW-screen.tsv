@@ -1,0 +1,46 @@
+candidate	population	arm	reading	se	n_with_bargain	completed	runs	R5	R4
+C1	IG 3 parties, 27 nodes, Ruin	dulledge	0.9497	0.0064	30	30	30	12.29	3.70
+C1	IG 3 parties, 27 nodes, Ruin	muffled	0.9483	0.0053	30	29	30	12.29	3.70
+C1	IG 3 parties, 27 nodes, Ruin	long_silence	0.9219	0.0082	30	30	30	12.29	3.70
+C1	IG 3 parties, 27 nodes, Ruin	thin_veil	0.8896	0.0126	30	27	30	12.29	3.70
+C1	IG 3 parties, 27 nodes, Ruin	wasting	0.6764	0.0231	30	24	30	12.29	3.70
+C2	IG 3, untalented, Wanderer	dulledge	0.8835	0.0169	30	20	30	10.98	2.39
+C2	IG 3, untalented, Wanderer	muffled	0.8964	0.0137	30	22	30	10.98	2.39
+C2	IG 3, untalented, Wanderer	long_silence	0.8477	0.0163	30	22	30	10.98	2.39
+C2	IG 3, untalented, Wanderer	thin_veil	0.8203	0.0168	30	21	30	10.98	2.39
+C2	IG 3, untalented, Wanderer	wasting	0.4902	0.0288	30	10	30	10.98	2.39
+C3	IG 3, untalented, Warden	dulledge	0.7248	0.0341	30	0	30	4.88	1.68
+C3	IG 3, untalented, Warden	muffled	0.7293	0.0390	30	4	30	4.88	1.68
+C3	IG 3, untalented, Warden	long_silence	0.6720	0.0230	30	2	30	4.88	1.68
+C3	IG 3, untalented, Warden	thin_veil	0.6129	0.0428	30	2	30	4.88	1.68
+C3	IG 3, untalented, Warden	wasting	0.3938	0.0329	30	0	30	4.88	1.68
+C4	IG 3, untalented, Ruin	dulledge	0.6256	0.0423	29	0	30	4.25	2.15
+C4	IG 3, untalented, Ruin	muffled	0.6239	0.0460	29	0	30	4.25	2.15
+C4	IG 3, untalented, Ruin	long_silence	0.4956	0.0406	28	0	30	4.25	2.15
+C4	IG 3, untalented, Ruin	thin_veil	0.4464	0.0375	29	0	30	4.25	2.15
+C4	IG 3, untalented, Ruin	wasting	0.2861	0.0335	29	0	30	4.25	2.15
+C5	Hierophant pop., untalented, Wanderer	dulledge	0.8715	0.0142	30	13	30	13.75	3.08
+C5	Hierophant pop., untalented, Wanderer	muffled	0.8800	0.0112	30	14	30	13.75	3.08
+C5	Hierophant pop., untalented, Wanderer	long_silence	0.7921	0.0153	30	12	30	13.75	3.08
+C5	Hierophant pop., untalented, Wanderer	thin_veil	0.8223	0.0164	30	15	30	13.75	3.08
+C5	Hierophant pop., untalented, Wanderer	wasting	0.4537	0.0204	30	5	30	13.75	3.08
+C6	Hierophant pop., untalented, Warden	dulledge	0.6975	0.0291	30	0	30	7.06	3.01
+C6	Hierophant pop., untalented, Warden	muffled	0.7371	0.0264	30	0	30	7.06	3.01
+C6	Hierophant pop., untalented, Warden	long_silence	0.5566	0.0294	30	0	30	7.06	3.01
+C6	Hierophant pop., untalented, Warden	thin_veil	0.5620	0.0353	30	0	30	7.06	3.01
+C6	Hierophant pop., untalented, Warden	wasting	0.3355	0.0222	30	0	30	7.06	3.01
+C7	default party, untalented, Wanderer	dulledge	0.9486	0.0050	30	29	30	20.06	4.52
+C7	default party, untalented, Wanderer	muffled	0.9396	0.0066	30	28	30	20.06	4.52
+C7	default party, untalented, Wanderer	long_silence	0.8874	0.0075	30	27	30	20.06	4.52
+C7	default party, untalented, Wanderer	thin_veil	0.8909	0.0080	30	28	30	20.06	4.52
+C7	default party, untalented, Wanderer	wasting	0.5736	0.0196	30	15	30	20.06	4.52
+C8	default party, untalented, Warden	dulledge	0.8373	0.0150	30	2	30	11.26	3.96
+C8	default party, untalented, Warden	muffled	0.8281	0.0150	30	3	30	11.26	3.96
+C8	default party, untalented, Warden	long_silence	0.6986	0.0183	30	1	30	11.26	3.96
+C8	default party, untalented, Warden	thin_veil	0.7123	0.0217	30	2	30	11.26	3.96
+C8	default party, untalented, Warden	wasting	0.4365	0.0189	30	2	30	11.26	3.96
+C9	IG 3, one tier, Ruin	dulledge	0.8471	0.0199	28	5	30	7.82	1.84
+C9	IG 3, one tier, Ruin	muffled	0.8285	0.0234	28	8	30	7.82	1.84
+C9	IG 3, one tier, Ruin	long_silence	0.7739	0.0233	27	6	30	7.82	1.84
+C9	IG 3, one tier, Ruin	thin_veil	0.7626	0.0254	27	4	30	7.82	1.84
+C9	IG 3, one tier, Ruin	wasting	0.4684	0.0290	27	1	30	7.82	1.84

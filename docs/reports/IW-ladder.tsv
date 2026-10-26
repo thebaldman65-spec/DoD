@@ -1,0 +1,24 @@
+modifier	id	reading	se	n_with_bargain	completed	runs	grade	io_cut_grade	level	supported	ip_figure	handle_kind	handle
+Dull Edge	dulledge	0.949974	0.003591	60	58	60	1	1	1	no	0.957	percentage	u.crit_bonus
+Parched	parched	0.945215	0.004367	60	58	60	1	1	1	no	0.948	fraction	u.max_resource
+Tinderbox	tinderbox	0.944263	0.004847	60	58	60	1	1	1	no	0.951	percentage	u.type_dmg_bonus["fire"]
+Frenzied	frenzied	0.943399	0.004905	60	51	60	1	1	1	no	0.954	percentage	mod_speed_mult
+Muffled	muffled	0.943007	0.004347	60	58	60	2	1	1	no	0.941	percentage	mod_bd_mult
+Fleeting	fleeting	0.939796	0.004765	60	58	60	2	1	1	no	0.931	count	mod_status_turns
+Hoarfrost	hoarfrost	0.938738	0.005012	60	53	60	1	2	1	no	0.963	duration	_apply_status(u, "chilled"
+Deadened	deadened	0.938473	0.004476	60	55	60	3	2	2	no	0.899	rule	mod_no_break
+Brittle	brittle	0.936397	0.004906	60	53	60	2	2	2	no	0.921	rule	mod_ignore_armor
+Slick Footing	slick	0.936323	0.005614	60	58	60	2	2	2	no	0.945	count	ab.delay
+Bloodletting	bloodletting	0.935147	0.005135	60	57	60	2	2	2	no	0.938	count	mod_bleed_add
+Encumbered	encumbered	0.926683	0.006176	60	57	60	2	2	2	no	0.941	count	ab.cooldown
+Feverish	feverish	0.919683	0.005693	60	54	60	3	3	3	no	0.910	percentage	u.attack
+Warded	warded	0.918456	0.008271	60	55	60	1	3	3	no	0.949	percentage	mod_cost_mult
+The Thin Veil	thin_veil	0.896386	0.005978	60	56	60	3	3	4	no	0.908	percentage	Run.THIN_VEIL_PCT
+The Long Silence	long_silence	0.895081	0.004959	60	55	60	3	3	4	no	0.910	rule	mod_silence
+Miasma	miasma	0.892413	0.006786	60	53	60	4	4	4	no	0.875	percentage	healing_received_mult
+Rot	rot	0.857271	0.007549	60	43	60	4	4	5	yes	0.899	fraction	u.max_hp
+Overgrown	overgrown	0.853578	0.008892	60	54	60	4	4	5	yes	0.857	percentage	u.max_hp
+Mirrorbound	mirrorbound	0.787967	0.008981	60	52	60	5	4	6	yes	0.706	percentage	mod_recoil
+Thin Air	thinair	0.733564	0.014389	60	26	60	4	5	7	no	0.897	rule	mod_no_regen
+Bloodless	bloodless	0.701648	0.009986	60	40	60	5	5	7	no	0.640	rule	mod_no_heals
+Wasting	wasting	0.578525	0.015771	60	33	60	5	5	8	yes	0.684	percentage	Run.WASTING_PCT@_wasting_tick

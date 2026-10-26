@@ -1392,6 +1392,20 @@ the rune was wired, because it was supplying the one input the defect was in.
   measurement has already said are equivalent — the sort's order stands, the cut is named arbitrary, and the reasoning stands
   beside the grades so nobody re-measures it. The case is IP's two: Deadened | Rot 0.0006 apart, Parched | Slick Footing
   0.0026.
+- **RESOLUTION COMES FROM A POPULATION WHOSE SUBJECTS DIFFER MORE, NOT FROM MORE RUNS (IW §1, the designer's).** To tell N bands
+  apart the readings must spread at least (N − 1) × 2se, and more runs buy that slowly — the standard error falls with the square
+  root of the count, so halving it costs four times the runs and buys one decimal of a quantity nearly the same for every
+  subject. A population on which the subjects' costs differ more buys it at the same count. **So a measurement too crowded to
+  resolve its subjects first SCREENS candidate populations** — derived from what an earlier drive shows moving, each read on
+  a few subjects that span the range at a modest count — **and its criterion and its floor are written before the screen runs**:
+  a floor chosen after the readings is not a floor. Every candidate's ratio is reported, because a population that loses is
+  evidence too. The case is IW's: nine candidates, five modifiers each, thirty runs; the incumbent (IG's three parties, all 27
+  nodes, Ruin) read a spread of 12.3 of its own 2se, and the sim's default party untalented at Wanderer 20.1 — the ladder was
+  measured there (`docs/reports/IW.md` §1).
+- **AND THE INSTRUMENT's FIDELITY IS PROVED, NOT ASSERTED, BEFORE ITS READINGS ARE USED (IW §7, IP §2's block below).** A seeded
+  drive re-driven on the same tree reproduces its probe lines byte for byte — IW's re-drive of IV's forced arm reproduced IV's
+  84,097 — and a job driven with the probe's reads switched off reproduces its probe-on twin's every run and the sim's own report,
+  which is what shows the probe spends no die.
 
 ## STANDING RULE — AN INSTRUMENT'S OWN FIDELITY IS A PREMISE OF EVERY MEASUREMENT IT TAKES (Batch IP §2, ruled by the designer)
 > **AN INSTRUMENT'S OWN FIDELITY IS A PREMISE OF EVERY MEASUREMENT IT TAKES.** A defect known in the instrument is
@@ -1787,6 +1801,16 @@ a census is taken.
   like any lane. **The rule's own words stay as they are**: every launch goes through the driver. `./lane.sh spent`
   prints the clearing command off the driver's one pattern list, and `./lane.sh strays` lists the folders no pattern
   holds — `check_iu` §7 drives the probe's three answers and reds on a stray nobody named.
+- **ONE PROCESS A LANE, AND A LANE IN USE HANDS OUT ANOTHER — A LOCK IN THE DRIVER, NOT A RULE (IW §0.2, the designer's).**
+  Two Godot processes in one lane share its `user://`, and a gate that writes the harness save races the other: IV's
+  `check_ho` read 179 / 2 beside three gates launched into one lane, 179 / 1 beside one and 179 / 0 alone — a red that was
+  not a defect, and it cost a diagnosis. A rule saying *one gate a lane* would be the IU §7 shape again, because running a
+  batch's subset gates in parallel is the useful thing every batch does. So `godot` and `battery` ask whether a Godot already
+  runs in the lane — its `--path`, resolved against the process's own directory, is the lane (`lane.sh busy` prints the pids)
+  — and if one does, they refuse that lane, naming it and the pid, and run in another: the first idle lane beside it
+  numbered after it, else a fresh clone of it named after it.
+  **A REFUSAL WITH NO WAY FORWARD IS A RULE WEARING A LOCK's CLOTHES.** `check_iw` §0.2 drives it every battery: an idle
+  lane runs the launch in place, and a busy one is refused by name and pid while the launch runs in the lane handed out.
 - **WHAT IT CANNOT SEE**: a lane launched by hand, around the driver. The rule is that the driver is the one way a lane runs.
 
 ## STANDING RULE — A CLOSE THAT IS GATED ON ITS OWN INSTRUMENT CAN DEADLOCK, AND A BATCH IS NOT DONE UNTIL ITS CLOSE HAS RUN (Batch IR §0.8, ruled by the designer)

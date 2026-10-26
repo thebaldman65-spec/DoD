@@ -9,12 +9,14 @@
 #   §1b  THE MERCHANT's DOORS, DRIVEN: a potion at its stack cap and a rune at a full holding are refused before the gold
 #        moves, and each one the door allows is bought (the positive arms).
 #   §1c  WHAT THE DRIVE SHOWED MOVED IS MARKED: every figure the kept drive table reads as moved stands marked
-#        SUPERSEDED-PENDING in `docs/state.md`, with its delta and the batch that owes the re-take.
+#        SUPERSEDED-PENDING in `docs/state.md`, with its delta and the batch that owes the re-take — until it is re-taken
+#        (IW's re-take table; `check_iw` §3 holds the re-taken figure written and its mark gone).
 #   §2   EVERY ENVIRONMENT READ IN THE GAME's SCRIPTS, ONE ROW EACH: the population is the table, every sim-family read
 #        stands behind its guard, and DRIVEN, a player's run with every sim arm exported plays the game it drafted.
 #   §3   THE FOUR REPAIRS, DRIVEN — the fallback bodies (DV11, on a Survivalist), the rotation's door (DV05, Guard Change
 #        under Formless), the zone boss's cap (DV29, at the cap) — and the divergence census at RULE 0, a ceiling.
-#   §4   THE CLAIMS: IR01, IR09 and IR50 repaired in place in IU's ledger; the two left stand on GK's names.
+#   §4   THE CLAIMS: IR01, IR09 and IR50 repaired in place in IU's ledger; the two that stood on GK's names are repaired at
+#        IW §0.1, so none stands (`check_iw` §0.1 holds their repair).
 #   §5   THE INDEX QUESTION, CLOSED WHERE IT WAS QUEUED; THE PILOT ENDED; THE CLOSE-READ KEPT; THE STANDING LIST A CEILING.
 #   §6   THE INDEX's POPULATION ROWS: every kind the derivation found has a row, each row names blocks that exist, and its
 #        stamp reds when a member's block changes.
@@ -319,12 +321,19 @@ func _s1b_the_merchant() -> void:
 # names its mark, and the mark stands in `docs/state.md`: a known-moved figure left unmarked is the stale claim this project
 # spent ten batches retiring.
 const DRIVE_TABLE := "docs/reports/IV-drive.tsv"
+# THE RE-TAKES (BATCH IW §3): a figure re-taken is no longer pending, so its mark goes with the re-take and the figure IW took
+# stands where the record stood — `check_iw` §3 holds both; this section holds the marks of the rest.
+const RETAKE_TABLE := "docs/reports/IW-retake.tsv"
 
 
 func _s1c_the_marks() -> void:
 	print("\n§1c — what the drive showed moved is marked superseded-pending")
 	var rows := _tsv("res://" + DRIVE_TABLE, ["arm", "figure", "A", "B", "d", "z", "verdict", "recorded", "mark"])
 	var st := _flat(_doc("res://docs/state.md"))
+	var retaken := {}
+	for t in _tsv("res://" + RETAKE_TABLE, ["arm", "figure"]):
+		retaken["%s|%s" % [t["arm"], t["figure"]]] = true
+	var retook := 0
 	var moved := 0
 	var marked := 0
 	var unmarked: Array = []
@@ -339,6 +348,9 @@ func _s1c_the_marks() -> void:
 			bad.append("%s %s reads %s at |d|/se %.2f" % [r["arm"], r["figure"], v, z])
 		if v != "MOVES" or String(r["recorded"]) == "":
 			continue
+		if retaken.has("%s|%s" % [r["arm"], r["figure"]]):
+			retook += 1
+			continue
 		moved += 1
 		var mk := _flat(String(r["mark"]))
 		if mk.length() < 12 or not st.contains(mk) or not mk.contains("SUPERSEDED-PENDING"):
@@ -347,10 +359,10 @@ func _s1c_the_marks() -> void:
 			marked += 1
 	ok(rows.size() >= 40, "§1c: the drive table holds %d rows — the drive read every default-sim figure it names" % rows.size())
 	ok(bad.is_empty(), "§1c: %d rows' verdicts disagree with their noise (a cut inside two standard errors is a tie): %s" % [bad.size(), str(bad)])
-	ok(moved > 0, "§1c: the drive table holds no recorded figure that moved — the marks' population is empty, so the arm below proves nothing")
+	ok(moved + retook > 0, "§1c: the drive table holds no recorded figure that moved — the marks' population is empty, so the arm below proves nothing")
 	ok(unmarked.is_empty(),
 		"§1c: %d recorded figures the drive shows moved stand unmarked in docs/state.md — a known-moved figure is SUPERSEDED-PENDING with its delta and the batch that owes the re-take: %s" % [unmarked.size(), str(unmarked)])
-	print("    CHECKED %d drive rows: %d recorded figures moved, %d marked superseded-pending" % [rows.size(), moved, marked])
+	print("    CHECKED %d drive rows: %d recorded figures moved — %d re-taken at IW, %d of the rest marked superseded-pending" % [rows.size(), moved + retook, retook, marked])
 
 
 # ── §2 — EVERY ENVIRONMENT READ, ONE ROW EACH ─────────────────────────────────
@@ -389,7 +401,7 @@ const ENV_ROWS := {
 	"run_state.gd|rune_econ|DOD_SIM_RUNE_ECON": [1, "GATED", "if not sim_run:", "a run sim's arm (AD)"],
 	"run_state.gd|rune_power|DOD_SIM_RUNE_POWER": [1, "GATED", "if not sim_run:", "a run sim's arm (AD)"],
 	"run_state.gd|runes_mode|DOD_SIM_RUNES": [1, "GATED", "if not sim_run:", "a run sim's arm (IV §2, DV32: a player's run read it)"],
-	"run_state.gd|rotation_enabled|DOD_ZONE_ROTATION": [1, "NONSIM", "", "a zone-draw switch for real play — INERT while every slot pool holds one zone (the latent arm below)"],
+	"run_state.gd|rotation_enabled|DOD_ZONE_ROTATION": [1, "GATED", "return sim_run and OS.get_environment(\"DOD_ZONE_ROTATION\")", "the sim's since IW §0.3 (a flag that changes what a run contains is the sim's) — a player's run draws each pool's first zone (the latent arm below)"],
 }
 # The variables §2's drive exports into a player's run, and clears after.
 const SIM_FAMILY_DRIVEN := ["DOD_SIM_RUNES", "DOD_SIM_GRANT_ALL", "DOD_SIM_RELICS", "DOD_SIM_ENEMIES", "DOD_SIM_THEME", "DOD_SIM_DEBUG"]
@@ -496,11 +508,12 @@ func _s2_the_environment() -> void:
 	ok(miscount.is_empty(), "§2: %d rows read a variable a different number of times than the row says: %s" % [miscount.size(), str(miscount)])
 	ok(gone.is_empty(), "§2: %d rows name a read the scripts no longer make — delete them: %s" % [gone.size(), str(gone)])
 	ok(unguarded.is_empty(), "§2: %d sim-family reads stand behind no guard — a sim's arm leaks into a player's game: %s" % [unguarded.size(), str(unguarded)])
-	# THE LATENT ARM: the one non-sim switch that changes a real run's draw is inert while every slot pool holds one zone.
+	# THE LATENT ARM: since IW §0.3 the rotation is the sim's, so a player's run draws each slot pool's first zone — and a
+	# pool of two holds a zone no player can draw, which is owed its door the day it is authored.
 	var pools: Array = _run.SLOT_POOLS
 	var multi: Array = pools.filter(func(p): return (p as Array).size() > 1)
 	ok(multi.is_empty(),
-		"§2: a slot pool holds %d zones — `DOD_ZONE_ROTATION` now changes a real run's zones with nothing to say so; it is owed a gate or a readout line before it ships (IV's finding)" % (multi[0] as Array).size() if not multi.is_empty() else "")
+		"§2: a slot pool holds %d zones — a player's run takes each pool's first (`DOD_ZONE_ROTATION` is the sim's since IW §0.3), so the second is a zone no player can draw; the draw a player gets is owed its door before the pool ships" % (multi[0] as Array).size() if not multi.is_empty() else "")
 	# DRIVEN: a player's run with every sim-family arm exported plays the game it drafted.
 	OS.set_environment("DOD_SIM_RUNES", "stats")
 	OS.set_environment("DOD_SIM_GRANT_ALL", "1")
@@ -660,7 +673,7 @@ const LEDGER := "docs/reports/IU-claims.tsv"
 
 
 func _s4_the_claims() -> void:
-	print("\n§4 — the claims: three repaired in place, two standing on GK's names")
+	print("\n§4 — the claims: three repaired in place, and none standing since IW §0.1")
 	var rows := _tsv("res://" + LEDGER, ["id", "file", "disposition", "stands", "gone", "tree"])
 	var by := {}
 	for r in rows:
@@ -680,7 +693,7 @@ func _s4_the_claims() -> void:
 		if String(r["disposition"]) == "STANDS":
 			standing.append(String(r["id"]))
 	standing.sort()
-	ok(standing == ["ISF12", "ISN04"], "§4: the claims left standing are %s — GK's two names, and only they, wait on a ruling" % str(standing))
+	ok(standing.is_empty(), "§4: the claims left standing are %s — GK's two names were the last, and IW §0.1 confirmed them, so none waits on a ruling" % str(standing))
 	var rep := _doc("res://docs/reports/IV.md")
 	for nm in ["Rune of the Vanguard", "Rune of the Invoker", "Rune of the Hierophant"]:
 		ok(rep.contains(nm), "§4: IV's report does not carry the spine report for %s — what it does, its name, every surface" % nm)

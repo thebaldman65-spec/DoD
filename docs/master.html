@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-10-22 (Batch IS &mdash; the load door's five answers, the pilot, and the history strip)</b></p>
+<p align="right"><b>Last updated: 2026-10-25 (Batch IW &mdash; the zone draw is a simulator's switch)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -417,8 +417,8 @@ one zone from its own authored candidate pool — zones are designed FOR a posit
 (openers are not finales), so a zone def carries its name, its boss, and a roster per
 slot it can host. The current pools run fixed: 1. Forest of Old (roster 1) → 2. The
 Scarlands (roster 2) → 3. Forest of Old as the finale (tougher roster 3 — behemoths walk
-the old woods). Random slot draws sit behind the DOD_ZONE_ROTATION=1 flag until each
-pool holds ~2 candidates; every zone keeps the same 16-slot generated shape. Deeper-slot enemies are tinted redder, and the slot sets
+the old woods). A run takes each pool's first zone; a random draw within a pool is a simulator's
+switch (DOD_ZONE_ROTATION=1), and every pool holds one candidate today; every zone keeps the same 16-slot generated shape. Deeper-slot enemies are tinted redder, and the slot sets
 the stat multiplier (§4.3). The finale ends in a zone boss like the other two, and
 the <b>END BOSS</b> stands in a seventeenth slot after it: the run ends on the END BOSS's
 death.</li>
