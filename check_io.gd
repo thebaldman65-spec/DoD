@@ -51,7 +51,10 @@ const GONE_WORDS := ["famine", "Famine", "cruel_order", "Cruel Order", "_pouch_s
 # from IO's brief §2, constraint 1, until the top was cut at the cliff).
 # RE-POINTED AT IX §3: a grade is a cost band on the reference party now, so the counts are the scale's arithmetic on IW's
 # ladder (six modifiers carry no severity and stand in no band) — a re-measure moves them with the costs, and this line with it.
-const GRADE_COUNTS := {1: 5, 2: 3, 3: 3, 4: 2, 5: 4}
+# RE-POINTED AT IY §2 and §4: the tally the grades hold — the test binds (a cost inside two standard errors has no severity),
+# the grade is the highest cost measured on any population (Deadened 3, Brittle 2), and the nine turned handles graded by
+# their own measurement (`docs/reports/IY-grades.tsv`).
+const GRADE_COUNTS := {1: 3, 2: 5, 3: 5, 4: 2, 5: 4}
 # §5 — the four glyphs, each meaning one thing (IE §0.1, II §0.4); a bargain's chip is none of them.
 const GLYPHS := ["◆", "↑", "✦", "○"]
 

@@ -832,7 +832,9 @@ func _s5_strike() -> void:
 			clar.contains("its strikes land"), not clar.contains("the spell lands"),
 			clar.contains("if ab.special == \"\" and ab.heal <= 0:\n\t\t\t_log(\"   → Rune: Clarity")])
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	for row in ["All fire strike damage +25%, whoever deals it.", "Takes 25% less strike damage", "more strike damage"]:
+	# BATCH IY §2 — Tinderbox's figure is a `Run` constant now: the row is read at the constant's figure.
+	var tinder := "All fire strike damage +%d%%, whoever deals it." % int(round(float(_run.TINDERBOX_FIRE_PCT) * 100.0))
+	for row in [tinder, "Takes 25% less strike damage", "more strike damage"]:
 		ok(master.contains(row), "§5b: master.html does not read '%s'" % row)
 	# (c) WHAT THE WORDS SAY, READ OFF THE FIGHT. Profligate prices a Killing Frost double and pays it nothing,
 	# and pays a spell that strikes; the arms differ by the rune alone.

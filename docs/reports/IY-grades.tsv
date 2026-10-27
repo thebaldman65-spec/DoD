@@ -1,0 +1,24 @@
+modifier	id	ix_ref_cost	ref_cost	ref_se	ref_z	ref_source	inc_cost	inc_se	inc_z	inc_applies	higher	ref_band	inc_band	grade	population	batch
+Dull Edge	dulledge	-0.6111	-0.5385	0.2426	-2.2196	IY §2	-1.0860	0.5457	-1.9901	no	reference	0	0	0	the default four	IY §2
+Parched	parched	-0.1352	1.8999	0.3958	4.7998	IY §2	0.3956	0.6550	0.6040	no	incumbent	2	0	2	the default four	IY §2
+Tinderbox	tinderbox	-0.0400	-0.0205	0.1416	-0.1447	IY §2	-0.4508	0.5081	-0.8874	no	reference	0	0	0	the default four	IY §2
+Frenzied	frenzied	0.0464	0.1302	0.0591	2.2018	IY §2	-0.5514	0.2101	-2.6244	yes	reference	0	0	0	the default four	IY §2
+Muffled	muffled	0.0856	-0.2383	0.2231	-1.0683	IY §2	-0.2772	0.5833	-0.4752	no	reference	0	0	0	the default four	IY §2
+Fleeting	fleeting	0.4067	1.6315	0.4198	3.8860	IY §2	0.1462	0.6056	0.2414	no	reference	1	0	1	the default four	IY §2
+Hoarfrost	hoarfrost	0.5125	1.0349	0.2857	3.6226	IY §2	-0.8830	0.5833	-1.5138	no	reference	1	0	1	the default four	IY §2
+Deadened	deadened	0.5390	0.5390	0.5841	0.9200	IX §1	5.2319	0.9168	5.7063	yes	incumbent	0	3	3	the incumbent	IV, graded at IY §4
+Brittle	brittle	0.7466	0.7466	0.6615	1.1300	IX §1	3.3355	0.8889	3.7523	yes	incumbent	0	2	2	the incumbent	IV, graded at IY §4
+Slick Footing	slick	0.7540	0.9799	0.3155	3.1060	IY §2	-0.3773	0.5736	-0.6577	no	reference	1	0	1	the default four	IY §2
+Bloodletting	bloodletting	0.8716	4.3661	0.4940	8.8377	IY §2	-0.5441	0.6444	-0.8443	no	reference	3	0	3	the default four	IY §2
+Encumbered	encumbered	1.7180	1.7180	0.7408	2.3200	IX §1	0.0404	0.5807	0.0695	yes	reference	2	0	2	the default four	IW, graded at IX §3
+Feverish	feverish	2.4180	2.4180	0.7495	3.2300	IX §1	2.4161	0.6501	3.7162	yes	reference	2	2	2	the default four	IW, graded at IX §3
+Warded	warded	2.5407	2.5407	0.8752	2.9000	IX §1	0.2131	0.5348	0.3986	yes	reference	2	0	2	the default four	IW, graded at IX §3
+The Thin Veil	thin_veil	4.7477	4.7477	0.7000	6.7800	IX §1	4.8524	0.8113	5.9813	yes	incumbent	3	3	3	the incumbent	IV, graded at IY §4
+The Long Silence	long_silence	4.8782	4.8782	0.5568	8.7600	IX §1	2.1329	0.6072	3.5128	yes	reference	3	2	3	the default four	IW, graded at IX §3
+Miasma	miasma	5.1450	5.1450	0.7160	7.1900	IX §1	5.4559	0.7763	7.0277	yes	incumbent	3	3	3	the incumbent	IV, graded at IY §4
+Rot	rot	8.6592	8.6592	0.8299	10.4300	IX §1	3.4021	0.6909	4.9245	yes	reference	4	2	4	the default four	IW, graded at IX §3
+Overgrown	overgrown	9.0285	9.0285	0.9215	9.8000	IX §1	10.5351	1.1119	9.4752	yes	incumbent	4	4	4	the incumbent	IV, graded at IY §4
+Mirrorbound	mirrorbound	15.5896	15.5896	0.9833	15.8600	IX §1	25.7206	1.6608	15.4865	yes	incumbent	5	5	5	the incumbent	IV, graded at IY §4
+Thin Air	thinair	21.0299	21.0299	1.3830	15.2100	IX §1	2.3050	0.7399	3.1151	yes	reference	5	2	5	the default four	IW, graded at IX §3
+Bloodless	bloodless	24.2215	24.2215	1.0222	23.7000	IX §1	21.2556	1.1884	17.8867	yes	reference	5	5	5	the default four	IW, graded at IX §3
+Wasting	wasting	36.5338	36.5338	1.5135	24.1400	IX §1	26.2576	1.6640	15.7794	yes	reference	5	5	5	the default four	IW, graded at IX §3

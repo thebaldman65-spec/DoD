@@ -175,10 +175,12 @@ func _test_offer(RunState) -> void:
 	var by_sev := {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
 	for mid in run.MODIFIERS:
 		by_sev[run.modifier_severity(String(mid))] += 1
-	ok(by_sev[0] == 6, "six modifiers carry no severity (got %d)" % by_sev[0])
-	ok(by_sev[1] == 5, "five severity-1 modifiers (got %d)" % by_sev[1])
-	ok(by_sev[2] == 3, "three severity-2 modifiers (got %d)" % by_sev[2])
-	ok(by_sev[3] == 3, "three severity-3 modifiers (got %d)" % by_sev[3])
+	# RE-POINTED AT IY §2 and §4: the test binds, the grade takes the higher cost, and the nine turned handles graded by their
+	# own measurement — the tally is IY's (`docs/reports/IY-grades.tsv`).
+	ok(by_sev[0] == 4, "four modifiers carry no severity (got %d)" % by_sev[0])
+	ok(by_sev[1] == 3, "three severity-1 modifiers (got %d)" % by_sev[1])
+	ok(by_sev[2] == 5, "five severity-2 modifiers (got %d)" % by_sev[2])
+	ok(by_sev[3] == 5, "five severity-3 modifiers (got %d)" % by_sev[3])
 	ok(by_sev[4] == 2, "two severity-4 modifiers (got %d)" % by_sev[4])
 	ok(by_sev[1] + by_sev[2] > by_sev[3] + by_sev[4],
 		"the pool is weighted toward the low severities")
@@ -394,13 +396,13 @@ func _test_modifiers_live() -> void:
 					ok(u.hp > 0, "Overgrown never kills anyone outright")
 			"fire":
 				for u in everyone:
-					ok(is_equal_approx(float(u.type_dmg_bonus.get("fire", 0.0)), 0.25),
-						"Tinderbox: %s deals +25%% fire" % u.unit_name)
+					ok(is_equal_approx(float(u.type_dmg_bonus.get("fire", 0.0)), float(run.TINDERBOX_FIRE_PCT)),
+						"Tinderbox: %s deals +%d%% fire" % [u.unit_name, int(round(float(run.TINDERBOX_FIRE_PCT) * 100))])
 			"speed":
 				for u in everyone:
-					ok(is_equal_approx(u.mod_speed_mult, 1.3),
-						"Frenzied: %s acts 30%% faster" % u.unit_name)
-					ok(is_equal_approx(u.effective_speed(), u.speed * 1.3),
+					ok(is_equal_approx(u.mod_speed_mult, float(run.FRENZIED_SPEED)),
+						"Frenzied: %s acts %d%% faster" % [u.unit_name, int(round((float(run.FRENZIED_SPEED) - 1.0) * 100))])
+					ok(is_equal_approx(u.effective_speed(), u.speed * float(run.FRENZIED_SPEED)),
 						"...and effective_speed reads it")
 			"armor":
 				for u in everyone:
@@ -437,17 +439,18 @@ func _test_modifiers_live() -> void:
 				for i in everyone.size():
 					var u: BattleUnit = everyone[i]
 					var b: Dictionary = base[i]
-					ok(u.resource <= int(b["maxres"]) / 2,
-						"Parched: %s opens at or under half resource (%d of %d)" % [
+					ok(u.resource <= int(int(b["maxres"]) * float(run.PARCHED_SHARE)),
+						"Parched: %s opens at or under its share of the bar (%d of %d)" % [
 							u.unit_name, u.resource, u.max_resource])
 					if String(b["second_name"]) != "":
-						ok(u.second_resource <= int(b["second_max"]) / 2,
-							"Parched: %s's %s is halved too" % [u.unit_name,
+						ok(u.second_resource <= maxi(int(int(b["second_max"]) * float(run.PARCHED_SHARE)), 0),
+							"Parched: %s's %s is cut to its share too" % [u.unit_name,
 								b["second_name"]])
 					# Overgrown's lesson: it must never top a low tank UP.
 					u.resource = 1
 					battle._stamp_modifier(u, "parched")
-					ok(u.resource == 1,
+					# BATCH IY §2 — at a share of nothing a unit holding 1 is cut to 0, which is still taking: the rule is never above.
+					ok(u.resource <= 1,
 						"Parched never REFILLS %s — it only ever takes" % u.unit_name)
 			"delay":
 				for i in everyone.size():
@@ -457,30 +460,30 @@ func _test_modifiers_live() -> void:
 						if not was_delays.has(ab.display_name):
 							continue
 						ok(is_equal_approx(ab.delay,
-							float(was_delays[ab.display_name]) + 0.5),
-							"Slick Footing: %s's %s costs +0.5 initiative" % [
-								u.unit_name, ab.display_name])
+							float(was_delays[ab.display_name]) + float(run.SLICK_DELAY)),
+							"Slick Footing: %s's %s costs +%s initiative" % [
+								u.unit_name, ab.display_name, str(run.SLICK_DELAY)])
 			"crit":
 				for i in everyone.size():
 					var u: BattleUnit = everyone[i]
 					ok(is_equal_approx(u.crit_bonus,
-						maxf(float(base[i]["crit"]) - 0.05, -0.10)),
-						"Dull Edge: %s loses 5 points of crit" % u.unit_name)
+						maxf(float(base[i]["crit"]) - float(run.DULL_EDGE_CRIT), -0.10)),
+						"Dull Edge: %s loses %d points of crit" % [u.unit_name, int(round(float(run.DULL_EDGE_CRIT) * 100))])
 					ok(0.10 + u.crit_bonus >= 0.0,
 						"Dull Edge: %s's total crit chance never goes negative"
 						% u.unit_name)
 			"bd":
 				for u in everyone:
-					ok(u.mod_bd_mult == 75, "Muffled: %s is stamped" % u.unit_name)
+					ok(u.mod_bd_mult == int(run.MUFFLED_BD_PCT), "Muffled: %s is stamped" % u.unit_name)
 					# Driven at the read site. Constitution is normalised first
 					# so the assertion reads the modifier and not the stat.
 					u.constitution = 100
 					u.pressure = 0
 					u.broken = false
 					u.take_hit(0, 40)
-					ok(u.pressure == 30,
-						"Muffled: 40 Break damage on %s lands 30 (got %d)" % [
-							u.unit_name, u.pressure])
+					ok(u.pressure == 40 * int(run.MUFFLED_BD_PCT) / 100,
+						"Muffled: 40 Break damage on %s lands %d (got %d)" % [
+							u.unit_name, 40 * int(run.MUFFLED_BD_PCT) / 100, u.pressure])
 			"chilled":
 				for u in everyone:
 					ok(u.has_status("chilled"),
@@ -490,16 +493,16 @@ func _test_modifiers_live() -> void:
 					ok(u.effective_speed() < u.speed,
 						"...and effective_speed reads it (%s)" % u.unit_name)
 					ok(not u.get_status("chilled").is_empty()
-						and int(u.get_status("chilled")["turns"]) == 3,
-						"...for three turns")
+						and int(u.get_status("chilled")["turns"]) == int(run.HOARFROST_CHILL_TURNS),
+						"...for its %d turns" % int(run.HOARFROST_CHILL_TURNS))
 			"status_turns":
 				for u in everyone:
-					ok(u.mod_status_turns == -1,
+					ok(u.mod_status_turns == -int(run.FLEETING_TURNS),
 						"Fleeting: %s is stamped" % u.unit_name)
 					u.remove_status("exposed")
 					battle._apply_status(u, "exposed", 3)
-					ok(int(u.get_status("exposed").get("turns", 0)) == 2,
-						"Fleeting: a 3-turn status on %s lands as 2" % u.unit_name)
+					ok(int(u.get_status("exposed").get("turns", 0)) == maxi(3 - int(run.FLEETING_TURNS), 1),
+						"Fleeting: a 3-turn status on %s lands as %d" % [u.unit_name, maxi(3 - int(run.FLEETING_TURNS), 1)])
 					u.remove_status("exposed")
 					battle._apply_status(u, "exposed", 1)
 					ok(int(u.get_status("exposed").get("turns", 0)) == 1,
@@ -568,7 +571,7 @@ func _test_modifiers_live() -> void:
 								ab.display_name)
 			"bleed":
 				for u in everyone:
-					ok(u.mod_bleed_add == 15,
+					ok(u.mod_bleed_add == int(run.BLOODLETTING_BLEED),
 						"Bloodletting: %s is stamped" % u.unit_name)
 				_source_has("res://scripts/battle.gd",
 					"bleed_amount += attacker.mod_bleed_add",

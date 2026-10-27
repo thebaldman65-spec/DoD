@@ -1414,7 +1414,17 @@ the rune was wired, because it was supplying the one input the defect was in.
   node, which is the arms' rule only because on every arm the node reading and the modifier reading count the same fights —
   IV's reader counted a bargain fight only where a modifier stood, and could not read its own *none* arm. **And pairing buys
   what the runs share, no more**: a run diverges from its twin at its first bargain fight, so on IX's arms the paired error
-  stood within a few percent of the unpaired one — the pairing makes the comparison honest, not cheap.
+  stood within a few percent of the unpaired one — the pairing makes the comparison honest, not cheap. *(Cheap since IY §1, the
+  bullet below: the fight is seeded now, and the same pairing halves the error.)*
+- **PAIR AT THE UNIT YOU MEASURE, NOT THE UNIT YOU RUN. (IY §1, the designer's)** The measurement's unit is the bargain fight and
+  the seed's unit was the run, so the pairing cancelled nothing it was meant to: every die after a run's first branch was drawn
+  from wherever that fight left the stream. **So the sim seeds the unit it measures** — `DOD_SIM_FIGHT_SEED=<block>` reseeds the
+  dice at the step onto every node and at every won fight's spoils, off the block, the run's ordinal and the node's place
+  (`RunSim._seed_node`), and spends no die unset — and a seeding change is **verified before it is used, on its own**: its
+  switch proved inert unset (the tree reproduces HEAD line for line), the seed proved the node's and not the process's (a second
+  process reproduces it), and **its readings held to the old instrument's as ties — a seeding change that moves a cost past two
+  standard errors is not a seeding change**. IY's cheap arm's paired error fell from 0.94 to 0.55 of the unpaired. **A seeded
+  fight is not an identical fight**: the parties diverge in state, and the rolls agree only until a branch goes another way.
 
 ## STANDING RULE — AN INSTRUMENT'S OWN FIDELITY IS A PREMISE OF EVERY MEASUREMENT IT TAKES (Batch IP §2, ruled by the designer)
 > **AN INSTRUMENT'S OWN FIDELITY IS A PREMISE OF EVERY MEASUREMENT IT TAKES.** A defect known in the instrument is

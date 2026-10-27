@@ -356,6 +356,11 @@ new block written here):
     its figure inside its `const`. **A token anywhere else prints raw; one naming nothing stays
     visible and errors.** A figure no constant decides is pinned to the code that does
     (`check_ij` §3). HO §0's rule below is untouched: a card still names no OTHER rule's figure.
+    **A COUNT A DOOR CAN COMPUTE BELONGS BEHIND A DOOR, NOT DELETED (IY §0.5, the designer's).** A count a text states that the
+    code can count off a table it holds — how many modifiers a band holds — is no constant, so it is a `figure_` function of a
+    figure source taking nothing (`{=Run.figure_modifiers_dealt_beneath_top}`), which `Classes.figure_value` calls at the door:
+    the sentence is true forever instead of losing its count and being vague forever. **A count only a door can compute is not
+    a reason to strike it.**
     **A PIN IS AN ANSWER, NOT A BACKLOG (IU §0.4, the designer's).** A pin asserts that the text and the code agree,
     so a pinned figure cannot be false without reddening: `check_ij` §3's pins (438 at IT) are a maintenance cost, not
     a correctness risk, and they stay pinned. **A FIGURE A BATCH RE-TUNES GETS A CONSTANT THEN** — the pins shrink as
@@ -1909,7 +1914,7 @@ decision and the STRUCTURE is what shipped.
   hardest rung dealt the mildest bargains), plus **FIXED ENCOUNTERS CARRY A MODIFIER**
   (`Run.arm_fixed_modifier`, armed at BOTH walk sites): the mini-boss and every boss, the nodes
   a route cannot duck. It is NOT a bargain — no offer, no choice, NO REWARD — **and it draws from
-  `Run.FIXED_MODIFIER_BAND`, the modifiers of severity 3–4 (eight until IX §3's scale, five since), never from severity 5 (IN §1; CONFIRMED AT IO §0.4, the
+  `Run.FIXED_MODIFIER_BAND`, the modifiers of severity 3–4 (eight until IX §3's scale, five at IX, seven since IY §4's grades), never from severity 5 (IN §1; CONFIRMED AT IO §0.4, the
   designer's)**: a modifier with no reward is not a bargain, so a severity 5 there would be pure difficulty with no
   twist bought — AQ's rule arriving by a different door. **Which eight is the grades'**: a re-grade moves the band's
   contents with it, and the batch that re-grades says what the fixed encounters draw after.
@@ -1972,15 +1977,34 @@ decision and the STRUCTURE is what shipped.
   (IX §0.2)**: the sim's default party — the Berserker, the Cryomancer, the Devout and the Beastmaster — untalented, at Wanderer,
   the one candidate of nine whose crowd a screen could resolve (IW §1a). A grade is a cost on a named party, not a universal truth:
   a modifier whose cost swings by more than a band between parties carries that in its own words, where a player can see
-  whether it hits their build. **The cuts are derived, never chosen** — the midpoints between the costs of IW's eight levels
+  whether it hits their build *(superseded at IY §0.3, the designer's: no modifier's words carry the swing — the grade takes the
+  higher cost, the bullet below)*. **The cuts are derived, never chosen** — the midpoints between the costs of IW's eight levels
   against the *none* arm — **and every grade falls out of its modifier's own reading by arithmetic**, so the counts move with
-  the costs and a re-measure re-grades by the same arithmetic, never by a re-cut.
+  the costs and a re-measure re-grades by the same arithmetic, never by a re-cut. **IY §0.1 and §0.3 QUALIFY THE ARITHMETIC,
+  BY THE DESIGNER (the bullet below)**: the reading must pass the instrument's test, and the reading graded is the highest any
+  population gave.
   **A MODIFIER THAT COSTS NOTHING HAS NO SEVERITY**: it sits in no band, so no rung deals it and no fixed encounter draws it
   until it is re-authored, and **the rung
   bands are read, never re-set to reach it or to fill one** (a rung whose band runs thin waits for the re-authored modifiers).
   The exemption above stands — one that reads near the baseline only because the bot cannot use what it takes away keeps a
   severity — and IX §2 found none of its six free modifiers that case. The derivation, the grades and what each band holds:
   IX's report §3 and `docs/state.md`.
+· **A GRADE's BAND MUST BE WIDER THAN THE INSTRUMENT THAT SETS IT. A BAND NARROWER THAN TWO STANDARD ERRORS IS NOT A GRADE; IT IS
+  A ROUNDING OF NOISE (IY §0.1, the designer's).** So **the test binds, not the arithmetic**: a cost a paired reading cannot tell
+  from none — inside two of its standard errors — is no cost, whatever its midpoint says, and its modifier carries no severity.
+  The scale stands (it is the deck's real shape, and its derivation is printed). **The answer to a band finer than the
+  instrument is a sharper instrument, never a wider band**: widening grade 1 to the instrument would swallow grade 2's centre and
+  leave the deck four grades where its cards show five.
+  **A GRADE MAY OVERSTATE WHAT A MODIFIER COSTS. IT MAY NOT UNDERSTATE IT. THE GRADE IS THE HIGHEST COST THE PROJECT HAS MEASURED, ON ANY POPULATION (IY §0.3, the designer's)**
+  — the default four's or
+  the talented incumbent's, each against its own *none* arm, each test-bound — so a modifier that costs a fuller build more is
+  graded by that build, and a player who has invested is never dealt it as a milder card than it is for them. **Only a reading of
+  the modifier as it stands counts**: a reading taken before its handle moved measured another modifier. **Every grade names
+  the population and the batch it came from** — `Run.MODIFIERS`' `graded` field, which the scale's definition requires of every
+  row — **so measuring a second population is how a modifier earns its grade**, which gives breadth a reason that is not
+  resolution. **No modifier's words carry the swing**: a modifier names its mechanic, and the player's knowledge of their own
+  build does the rest; the swing is a fact about builds, recorded where the project needs it. The readings, both populations,
+  every grade's source: `docs/reports/IY-grades.tsv` and IY's report §4.
 · **THE BOT's ALLY POOLS ARE A KNOWN CONSTANT BIAS. THE BATCH THAT CHANGES THEM RE-MEASURES THE LADDER IN THE SAME BATCH, OR IT
   RETIRES THE LADDER (IS §4, the designer's).** Every bot ally pool is heroes-only where the player's picker admits a companion
   (`battle._bot_drafted_pick`, `_bot_class_kit_pick`, `_autoplay_pick_kit`), and every grade, band and band's mean above was

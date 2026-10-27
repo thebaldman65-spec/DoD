@@ -509,7 +509,7 @@ func _s1b_the_fields() -> void:
 		"§1b: Whetstone no longer writes Attack, or one of the two is live")
 	ok(bs.contains("if u.iron_will_ranks > 0:\n\t\t\tu.set_display_chip(\"iron_will\"") and consumed.has("iron_will_ranks"),
 		"§1b: the Iron Will chip is no longer laid at the spawn, or the field is live")
-	ok(bs.contains("cfg[\"attack\"] = int(round(int(cfg.get(\"attack\", 100))") and bs.contains("u.crit_bonus = maxf(u.crit_bonus - 0.05, -CRIT_CHANCE)"),
+	ok(bs.contains("cfg[\"attack\"] = int(round(int(cfg.get(\"attack\", 100))") and bs.contains("u.crit_bonus = maxf(u.crit_bonus - Run.DULL_EDGE_CRIT, -CRIT_CHANCE)"),
 		"§1b: the spawn no longer scales Attack after the payloads, or the modifier no longer floors crit")
 
 

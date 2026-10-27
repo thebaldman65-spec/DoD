@@ -2372,9 +2372,9 @@ func _stamp_modifier(u: BattleUnit, mod_id: String, inherited := false) -> void:
 		"tinderbox":
 			# The existing typed-damage hook the Emberheart relic uses.
 			u.type_dmg_bonus["fire"] = \
-				float(u.type_dmg_bonus.get("fire", 0.0)) + 0.25
+				float(u.type_dmg_bonus.get("fire", 0.0)) + Run.TINDERBOX_FIRE_PCT
 		"frenzied":
-			u.mod_speed_mult = 1.3
+			u.mod_speed_mult = Run.FRENZIED_SPEED
 		"brittle":
 			u.mod_ignore_armor = true
 		"warded":
@@ -2385,31 +2385,31 @@ func _stamp_modifier(u: BattleUnit, mod_id: String, inherited := false) -> void:
 			# Overgrown's lesson, applied to the other tank: clamp to the
 			# CURRENT value too, so a mage who walks in on fumes is never
 			# topped UP by a modifier that only ever takes.
-			u.resource = mini(u.resource, u.max_resource / 2)
+			u.resource = mini(u.resource, int(u.max_resource * Run.PARCHED_SHARE))
 			if u.second_resource_name != "":
 				# An UNCAPPED meter (Focus since AZ) has no maximum to take half
 				# of, so Parched halves what he is HOLDING instead. Same promise
 				# either way — the modifier only ever takes.
-				u.second_resource = (u.second_resource / 2) if u.second_max < 0 \
-					else mini(u.second_resource, u.second_max / 2)
+				u.second_resource = int(u.second_resource * Run.PARCHED_SHARE) if u.second_max < 0 \
+					else mini(u.second_resource, int(u.second_max * Run.PARCHED_SHARE))
 			u.refresh_bars()
 		"slick":
 			for ab in u.abilities:
-				ab.delay += 0.5
+				ab.delay += Run.SLICK_DELAY
 		"dulledge":
 			# Floored so a unit's TOTAL crit chance (CRIT_CHANCE + bonus)
 			# can never go under zero — several read sites add the two.
 			if not inherited:
-				u.crit_bonus = maxf(u.crit_bonus - 0.05, -CRIT_CHANCE)
+				u.crit_bonus = maxf(u.crit_bonus - Run.DULL_EDGE_CRIT, -CRIT_CHANCE)
 		"muffled":
-			u.mod_bd_mult = 75
+			u.mod_bd_mult = Run.MUFFLED_BD_PCT
 		"hoarfrost":
 			# Through the normal status door, so Frigid Grip and the rest of
 			# Chilled's riders behave exactly as they always do. The plate
 			# already exists at this point, so the chip renders.
-			_apply_status(u, "chilled", 3)
+			_apply_status(u, "chilled", Run.HOARFROST_CHILL_TURNS)
 		"fleeting":
-			u.mod_status_turns = -1
+			u.mod_status_turns = -Run.FLEETING_TURNS
 		"feverish":
 			if not inherited:
 				u.attack = int(round(u.attack * 1.25))
@@ -2429,7 +2429,7 @@ func _stamp_modifier(u: BattleUnit, mod_id: String, inherited := false) -> void:
 				if ab.cooldown > 0:
 					ab.cooldown += 2
 		"bloodletting":
-			u.mod_bleed_add = 15
+			u.mod_bleed_add = Run.BLOODLETTING_BLEED
 		"mirrorbound":
 			u.mod_recoil = 0.25
 		"rot":
@@ -15388,8 +15388,8 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 			_log("   → Chilled on %s (x%d — Glacial Hold: never thaws)" % [target.unit_name,
 				target.status_stacks("chilled")], "#7cc8f0")
 		else:
-			_log("   → Chilled on %s (x%d, 3-turn clock reset)" % [target.unit_name,
-				target.status_stacks("chilled")], "#7cc8f0")
+			_log("   → Chilled on %s (x%d, %d-turn clock reset)" % [target.unit_name,
+				target.status_stacks("chilled"), int(pile.get("turns", 3))], "#7cc8f0")
 		return
 	if id == "burn":
 		# Reapplication extends duration — log the running total.

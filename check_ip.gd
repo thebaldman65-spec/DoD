@@ -38,11 +38,17 @@ const DARK_WORDS := ["hungering_dark", "Hungering Dark", "HUNGERING_DARK_PCT", "
 # §1b — the sizes the bands are built on since the cut (the brief's §1b): the table's own counts, the top three deep.
 # RE-POINTED AT IX §3: a grade is a cost band on the reference party now, so the counts are the scale's arithmetic on IW's
 # ladder (six modifiers carry no severity and stand in no band) — a re-measure moves them with the costs, and this line with it.
-const GRADE_COUNTS := {1: 5, 2: 3, 3: 3, 4: 2, 5: 4}
+# RE-POINTED AT IY §2 and §4: the tally the grades hold — the test binds (a cost inside two standard errors has no severity),
+# the grade is the highest cost measured on any population (Deadened 3, Brittle 2), and the nine turned handles graded by
+# their own measurement (`docs/reports/IY-grades.tsv`).
+const GRADE_COUNTS := {1: 3, 2: 5, 3: 5, 4: 2, 5: 4}
 # §1b — EP's sample as IO read it (`docs/reports/IO.md` §2d): the reading the cut is held against, not a grade.
 # RE-POINTED AT IX §3: the scale's grades deal these means from the same dice (IX's reading; IO's 2.84 / 3.29 / 4.49 stood until
 # then), so a grade moved with no measurement still moves a mean here.
 const IO_SAMPLE := {"wanderer": 2.76, "warden": 3.28, "ruin": 4.47}
+# RE-POINTED AT IY §4: the held reading is IY's — its re-grade moved the bands' contents (the test binds, the higher cost, the
+# nine turned), so Warden's mean moved +0.10 off IO's by the deck, not by the draw; IO's figures stay printed as the record.
+const IY_SAMPLE := {"wanderer": 2.733, "warden": 3.377, "ruin": 4.434}
 
 
 func ok(cond: bool, what: String) -> void:
@@ -241,7 +247,7 @@ func _s1b_the_cut() -> void:
 		ok(reach.is_empty(), "§1b: %s's bands reach a severity-5 modifier: %s" % [d, str(reach)])
 	# THE FIXED ENCOUNTERS draw the eight of severity 3–4, never a 5.
 	var fixed := _band_members(_run.FIXED_MODIFIER_BAND)
-	# RE-POINTED AT IX §3: the fixed encounters draw whatever the scale grades 3–4 (eight until IX, five since).
+	# RE-POINTED AT IX §3: the fixed encounters draw whatever the scale grades 3–4 (eight until IX, five at IX, seven since IY §4).
 	ok(fixed.size() == int(GRADE_COUNTS[3]) + int(GRADE_COUNTS[4]) and (_run.FIXED_MODIFIER_BAND as Array) == [3, 4], "§1b: the fixed band %s holds %d — %s" % [
 		str(_run.FIXED_MODIFIER_BAND), fixed.size(), str(fixed)])
 	print("    Ruin's gambles: %s; the fixed encounters draw %s" % [str(gb), str(fixed)])
@@ -297,8 +303,8 @@ func _s1b_the_sample() -> void:
 		var mean := float(sum) / maxf(float(n), 1.0)
 		ok(n == 1200 and short == 0, "§1b: %s dealt %d options over 400 offers (%d short), want 1,200" % [d, n, short])
 		ok(absf(mean - want) < 0.05, "§1b: %s's sample reads %.3f against its bands' arithmetic %.3f" % [d, mean, want])
-		ok(absf(mean - float(IO_SAMPLE[d])) < 0.05, "§1b: %s's sample reads %.3f — %+.3f from IO's %.2f" % [
-			d, mean, mean - float(IO_SAMPLE[d]), float(IO_SAMPLE[d])])
+		ok(absf(mean - float(IY_SAMPLE[d])) < 0.05, "§1b: %s's sample reads %.3f — %+.3f from the held reading %.3f (IY's; IO read %.2f)" % [
+			d, mean, mean - float(IY_SAMPLE[d]), float(IY_SAMPLE[d]), float(IO_SAMPLE[d])])
 		if d == "ruin":
 			ok(twin == 0 and five == 800, "§1b: Ruin dealt %d severity-5 options, and %d offers without two distinct gambles" % [five, twin])
 		else:

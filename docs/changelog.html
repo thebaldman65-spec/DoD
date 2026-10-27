@@ -16,6 +16,39 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-10-26 &mdash; Batch IY: A GRADE IS THE HIGHEST COST MEASURED, AND NINE HANDLES TURNED</h2>
+<p><b>Nine bargains changed their one number, and five of them are dealt again.</b> Bloodletting adds 45 Bleed a hit (was 15);
+Hoarfrost's Chilled, which everyone begins the fight under, lasts nine turns (was three); Slick Footing makes every ability cost +1.5 initiative (was
++0.5); Fleeting takes two turns off every status (was one); Parched opens a bargain fight with no resource at all (was half); Dull
+Edge takes 10% crit chance (was 5%); Muffled lets half of Break damage land (was three quarters); Tinderbox gives every fire strike
++75% (was +25%). Frenzied is unchanged. No bargain's rule changed, only its number &mdash; and each number is a measured step, not
+a final placing, which is the designer's. Bloodletting now carries severity 3, Parched 2, and Fleeting, Hoarfrost and Slick Footing
+1; Dull Edge, Tinderbox, Frenzied and Muffled still cost nothing the measurement can find, so no rung offers them. Deadened moved to
+severity 3 and Brittle to 2, because they cost fully talented heroes far more than untalented ones. Full working:
+<code>docs/reports/IY.md</code>.</p>
+
+<p><b>&sect;1 &mdash; A SHARPER MEASUREMENT.</b> The simulator compares a bargain against no bargain run for run, but two runs
+used to part ways at their first bargain fight, so the comparison bought little. Now every map node and every won fight's spoils
+draws its dice from the run's own seed, so the two runs meet the same dice at every node. The comparison's error fell to 0.55
+of what it would be unpaired (it was 0.94): a cost can now be told from nothing at about 0.6 points of health,
+where it took 1.5.</p>
+
+<p><b>&sect;2 &mdash; A COST THE MEASUREMENT CANNOT SEE IS NO COST.</b> A severity used to be read from a cost alone, even one
+smaller than the measurement's own noise. Now a cost has to stand clear of that noise before it earns any severity, and the
+severity is the highest cost measured on any set of heroes: a bargain may be priced above what it costs some heroes, never below
+what it costs others.</p>
+
+<p><b>&sect;3 &mdash; WHAT THE NINE NUMBERS DO.</b> Each of the nine was turned by one step and measured again: Bloodletting
++4.37 &plusmn; 0.49 points of health at a bargain fight's end, Parched +1.90 &plusmn; 0.40, Fleeting +1.63 &plusmn; 0.42, Hoarfrost
++1.03 &plusmn; 0.29, Slick Footing +0.98 &plusmn; 0.32. Bloodletting overshot its target. Hoarfrost stops costing more once its Chilled
+outlasts the fight, so its nine turns were set against a fight's length. Frenzied costs nothing even at three times the speed,
+because speeding every unit up changes nobody's turn order. Dull Edge at its floor helps the heroes, since the enemies lose more crits
+than they do. Where the numbers should finally sit is the designer's call. The combat log's line for a Chilled stack now names the clock
+it set, where it always said three.</p>
+
+<p><b>&sect;4 &mdash; THE GLOSSARY's COUNT.</b> The glossary says how many bargains every road deals; that count is now worked out
+from the grades (15 today), so it follows the next re-grade on its own.</p>
+
 <h2>2026-10-26 &mdash; Batch IX: THE BASELINE's OWN ERROR BAR, AND WHY THE FREE MODIFIERS ARE FREE</h2>
 <p><b>Six bargains are no longer dealt, and fourteen moved grade.</b> Dull Edge, Parched, Tinderbox, Frenzied, Muffled and Fleeting cost the party nothing
 the measurement can find, so they carry no severity now and no rung offers them until they are re-authored. Every other bargain's

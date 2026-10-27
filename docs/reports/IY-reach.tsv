@@ -1,0 +1,3 @@
+modifier	id	handle	deck_value	extreme_value	reading	se	cost	d_se	z	heal	heal_se	heal_z	len	len_se	len_z	fight_turns_per_hero	verdict
+Frenzied	frenzied	FRENZIED_SPEED	1.3	3.0	0.940763	0.003667	-0.002692	0.001498	-1.80	0.11	2.68	0.04	0.038	0.090	0.42	8.62	no reach
+Hoarfrost	hoarfrost	HOARFROST_CHILL_TURNS	3	99	0.931248	0.004999	0.006823	0.002602	2.62	-29.33	5.75	-5.11	-1.041	0.219	-4.74	8.62	reach

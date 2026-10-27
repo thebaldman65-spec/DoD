@@ -2591,7 +2591,10 @@ const _TOTAL_STATS := {
 #   `{=Battle.VESPERS_PCT*100}`  a constant of a game script (`FIGURE_SOURCES`), times a scale;
 #   `{=@damage}`                 a field of the entry the text belongs to (a dotted path walks
 #                                a dictionary or an array: `{=@payload.stat.max_hp_pct*100}`);
-#   `{=@damage*Ability.GRADE_DMG_MULT.perfect}`  one reference times another.
+#   `{=@damage*Ability.GRADE_DMG_MULT.perfect}`  one reference times another;
+#   `{=Run.figure_modifiers_dealt_beneath_top}`  a COUNT a figure source computes off its own constants (IY §0.5: a
+#                                a count a door can compute belongs behind a door) — a static function of the source
+#                                whose name begins `figure_` and takes nothing, called at the door.
 # A figure prints whole when it is whole and to two places when it is not. **A token that
 # names nothing stays on the screen and is pushed as an error**, and `check_ij` reds on any
 # token left on any surface — a text can stop reading its constant only by saying so.
@@ -2649,6 +2652,9 @@ static func figure_value(ref: String, fields: Dictionary = {}) -> Variant:
 		if not _figure_consts.has(src):
 			_figure_consts[src] = (load(String(FIGURE_SOURCES[src])) as Script).get_script_constant_map()
 		cur = _figure_consts[src]
+		# BATCH IY §0.5 — A COUNT A DOOR CAN COMPUTE: no constant of that name, so a `figure_` function of the source.
+		if parts.size() == 1 and String(parts[0]).begins_with("figure_") and not (cur as Dictionary).has(parts[0]):
+			return _figure_count(src, String(parts[0]))
 	for p in parts:
 		if cur is Dictionary and (cur as Dictionary).has(p):
 			cur = cur[p]
@@ -2657,6 +2663,17 @@ static func figure_value(ref: String, fields: Dictionary = {}) -> Variant:
 		else:
 			return null
 	return cur if typeof(cur) == TYPE_INT or typeof(cur) == TYPE_FLOAT else null
+
+
+# BATCH IY §0.5 — the count a figure source computes: its static `figure_` function taking nothing, called on the script
+# (read at runtime, never preloaded — CT's rule), its return an int or a float, or null.
+static func _figure_count(src: String, fn: String) -> Variant:
+	var sc := load(String(FIGURE_SOURCES[src])) as Script
+	for m in sc.get_script_method_list():
+		if String(m["name"]) == fn and (int(m["flags"]) & METHOD_FLAG_STATIC) != 0 and (m["args"] as Array).is_empty():
+			var v: Variant = sc.call(fn)
+			return v if typeof(v) == TYPE_INT or typeof(v) == TYPE_FLOAT else null
+	return null
 
 
 static func figure_text(x: float) -> String:

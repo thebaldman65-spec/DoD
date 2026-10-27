@@ -2,13 +2,13 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 2075,
+  "total": 2094,
   "source": 1414,
-  "other": 202,
-  "document": 459
+  "other": 213,
+  "document": 467
  },
  "floor": {
-  "pins": 2075
+  "pins": 2094
  },
  "falls": [],
  "source_residency": {
@@ -4867,7 +4867,7 @@
    "s": "check_hp.gd",
    "fn": "_s1b_the_fields",
    "h": "scripts/battle.gd",
-   "n": "u.crit_bonus = maxf(u.crit_bonus - 0.05, -CRIT_CHANCE)",
+   "n": "u.crit_bonus = maxf(u.crit_bonus - Run.DULL_EDGE_CRIT, -CRIT_CHANCE)",
    "p": "+",
    "r": "code",
    "k": "literal",
@@ -7400,23 +7400,12 @@
    "s": "check_ik.gd",
    "fn": "_s5_strike",
    "h": "docs/master.html",
-   "n": "All fire strike damage +25%, whoever deals it.",
-   "p": "+",
-   "r": "code",
-   "k": "loop-list",
-   "how": "read",
-   "g": "check_ik.gd#595"
-  },
-  {
-   "s": "check_ik.gd",
-   "fn": "_s5_strike",
-   "h": "docs/master.html",
    "n": "Takes 25% less strike damage",
    "p": "+",
    "r": "code",
    "k": "loop-list",
    "how": "read",
-   "g": "check_ik.gd#595"
+   "g": "check_ik.gd#596"
   },
   {
    "s": "check_ik.gd",
@@ -7427,7 +7416,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "read",
-   "g": "check_ik.gd#595"
+   "g": "check_ik.gd#596"
   },
   {
    "s": "check_il.gd",
@@ -7695,7 +7684,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#296"
+   "g": "check_ip.gd#297"
   },
   {
    "s": "check_ip.gd",
@@ -7706,7 +7695,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#292"
+   "g": "check_ip.gd#293"
   },
   {
    "s": "check_ip.gd",
@@ -7717,7 +7706,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#295"
+   "g": "check_ip.gd#296"
   },
   {
    "s": "check_ip.gd",
@@ -7728,7 +7717,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#289"
+   "g": "check_ip.gd#290"
   },
   {
    "s": "check_ip.gd",
@@ -7739,7 +7728,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#291"
+   "g": "check_ip.gd#292"
   },
   {
    "s": "check_ip.gd",
@@ -7750,7 +7739,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#290"
+   "g": "check_ip.gd#291"
   },
   {
    "s": "check_ip.gd",
@@ -7761,7 +7750,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ip.gd#297"
+   "g": "check_ip.gd#298"
   },
   {
    "s": "check_ip.gd",
@@ -7772,7 +7761,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ip.gd#297"
+   "g": "check_ip.gd#298"
   },
   {
    "s": "check_ip.gd",
@@ -7783,7 +7772,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ip.gd#294"
+   "g": "check_ip.gd#295"
   },
   {
    "s": "check_ip.gd",
@@ -7794,7 +7783,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#287"
+   "g": "check_ip.gd#288"
   },
   {
    "s": "check_ip.gd",
@@ -7805,7 +7794,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#288"
+   "g": "check_ip.gd#289"
   },
   {
    "s": "check_ip.gd",
@@ -7816,7 +7805,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ip.gd#297"
+   "g": "check_ip.gd#298"
   },
   {
    "s": "check_ip.gd",
@@ -7827,7 +7816,7 @@
    "r": "missing-file",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ip.gd#85",
+   "g": "check_ip.gd#86",
    "expr": "String"
   },
   {
@@ -7839,7 +7828,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ip.gd#169",
+   "g": "check_ip.gd#170",
    "expr": "said"
   },
   {
@@ -9601,7 +9590,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ix.gd#272",
+   "g": "check_ix.gd#276",
    "expr": "says"
   },
   {
@@ -9624,7 +9613,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_ix.gd#311"
+   "g": "check_ix.gd#315"
   },
   {
    "s": "check_ix.gd",
@@ -9635,7 +9624,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_ix.gd#306"
+   "g": "check_ix.gd#310"
   },
   {
    "s": "check_ix.gd",
@@ -9646,7 +9635,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_ix.gd#318"
+   "g": "check_ix.gd#322"
   },
   {
    "s": "check_ix.gd",
@@ -9657,7 +9646,229 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ix.gd#317"
+   "g": "check_ix.gd#321"
+  },
+  {
+   "s": "check_iy.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "A COUNT A DOOR CAN COMPUTE BELONGS BEHIND A DOOR, NOT DELETED",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iy.gd#86"
+  },
+  {
+   "s": "check_iy.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "A GRADE MAY OVERSTATE WHAT A MODIFIER COSTS. IT MAY NOT UNDERSTATE IT. THE GRADE IS THE HIGHEST COST THE PROJECT HAS MEASURED, ON ANY POPULATION",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iy.gd#85"
+  },
+  {
+   "s": "check_iy.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "A GRADE's BAND MUST BE WIDER THAN THE INSTRUMENT THAT SETS IT",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iy.gd#84"
+  },
+  {
+   "s": "check_iy.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/state.md",
+   "n": "A HANDLE WITH NO REACH CANNOT BE TURNED INTO A COST AT ANY VALUE",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iy.gd#89"
+  },
+  {
+   "s": "check_iy.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "PAIR AT THE UNIT YOU MEASURE, NOT THE UNIT YOU RUN.",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iy.gd#87"
+  },
+  {
+   "s": "check_iy.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "THE GRADE IS THE HIGHEST COST THE PROJECT HAS MEASURED",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iy.gd#91"
+  },
+  {
+   "s": "check_iy.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/state.md",
+   "n": "TURNING NINE HANDLES TO ONE TARGET MEASURES NINE SLOPES",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iy.gd#88"
+  },
+  {
+   "s": "check_iy.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "no severity under ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iy.gd#90"
+  },
+  {
+   "s": "check_iy.gd",
+   "fn": "_s1_the_seeding",
+   "h": "docs/state.md",
+   "n": "DOD_SIM_FIGHT_SEED",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iy.gd#160"
+  },
+  {
+   "s": "check_iy.gd",
+   "fn": "_s1_the_seeding",
+   "h": "docs/state.md",
+   "n": "ratio %.3f",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_iy.gd#160"
+  },
+  {
+   "s": "check_iy.gd",
+   "fn": "_s2_the_handles",
+   "h": "docs/master.html",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "derived",
+   "g": "check_iy.gd#242",
+   "expr": "_figure_words"
+  },
+  {
+   "s": "check_iy.gd",
+   "fn": "_s2_the_handles",
+   "h": "docs/state.md",
+   "n": "%s — %s → %s",
+   "p": "-",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_iy.gd#286"
+  },
+  {
+   "s": "check_iy.gd",
+   "fn": "_s2_the_handles",
+   "h": "docs/master.html",
+   "n": "</tr>",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iy.gd#241"
+  },
+  {
+   "s": "check_iy.gd",
+   "fn": "_s2_the_handles",
+   "h": "docs/master.html",
+   "n": "<tr><td>%s</td>",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_iy.gd#240"
+  },
+  {
+   "s": "check_iy.gd",
+   "fn": "_s3_the_reach",
+   "h": "docs/state.md",
+   "n": "%s at %s: %s",
+   "p": "-",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_iy.gd#307"
+  },
+  {
+   "s": "check_iy.gd",
+   "fn": "_s4_the_grades",
+   "h": "docs/state.md",
+   "n": "%s — the %s is the higher",
+   "p": "-",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_iy.gd#352"
+  },
+  {
+   "s": "check_iy.gd",
+   "fn": "_s5_the_door_and_the_bands",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_iy.gd#388",
+   "expr": "says"
+  },
+  {
+   "s": "check_iy.gd",
+   "fn": "_s5_the_door_and_the_bands",
+   "h": "data/glossary.json",
+   "n": "\"id\": \"modifier\"",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iy.gd#359"
+  },
+  {
+   "s": "check_iy.gd",
+   "fn": "_s5_the_door_and_the_bands",
+   "h": "data/glossary.json",
+   "n": "\"see_also\"",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iy.gd#360"
+  },
+  {
+   "s": "check_iy.gd",
+   "fn": "_s5_the_door_and_the_bands",
+   "h": "data/glossary.json",
+   "n": "the ",
+   "p": "+",
+   "r": "runtime",
+   "k": "composed",
+   "how": "derived",
+   "g": "check_iy.gd#362"
   },
   {
    "s": "test_batch_ah.gd",

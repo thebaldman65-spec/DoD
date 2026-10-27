@@ -4,6 +4,42 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A grade is the highest cost measured, and nine handles turned (Batch IY) — 2026-10-26
+
+**Why the test binds before the band.** A band narrower than two standard errors of the reading that sets it is not a grade:
+the reading cannot tell the band from the one beside it, or from nothing. IX's first band ended at 1.70 points of health, and its
+paired error was about 0.7, so a grade 1 could not be told from no cost at all. A grade is now earned in two steps: a cost must clear
+two standard errors of zero, and only then does the band it lands in decide its severity. That emptied grade 1 before the nine were
+measured again, and IY's sharper instrument is what filled it.
+
+**Why a grade takes the highest cost measured.** The same modifier can cost two sets of heroes very different amounts: Deadened
+costs the untalented reference four 0.54 points and the talented incumbent
+5.23, because the incumbent's plan is Break and Deadened takes Break away. A grade that took the
+lower reading would deal Deadened as a price the incumbent's player pays several times over. A grade that takes the higher one
+can overprice it for an untalented team, and the reward follows the grade, so overpricing pays. So **a grade may overstate what a
+modifier costs and may never understate it**, and its row names the population and the batch whose reading set it.
+
+**Why nine handles were turned toward one target.** A modifier that costs nothing can be too mild, or keyed to something the
+reference party does not do. Turning each one's number by one step and measuring again gives its slope, and the slope is what a
+placing needs: where grade 2's centre sits on that handle, or that no value reaches it. The step was chosen by rule (a reduction
+doubled, a bonus trebled, a share's reduction doubled, Hoarfrost against a fight's length), so the values are the instrument's and not a
+judgement. The placing against the slopes is the designer's.
+
+**Why the sim seeds each fight, not only each run.** A modifier's cost is measured fight by fight, but pairing was done run by run,
+and a run parts from its twin at its first bargain fight. Seeding every node and every won fight's spoils from the run's seed pairs
+the dice at the unit the cost is read at: the paired error fell to 0.55 of the unpaired (run seeding gave 0.94),
+and the costs read with it tie with IX's. The warbands were already paired, since the map composes them when a zone is generated;
+what the fight seed pairs is the dice from each node on.
+
+**Why Frenzied stays where it is.** At three times every unit's speed it still costs nothing (§3's reach arm,
+-0.27 ± 0.15): a speed-up on every unit rescales the
+timeline and changes nobody's turn order. No value of its number can make it a cost, so it was not turned; whether its rule is
+re-keyed is the designer's.
+
+**Why the glossary's count went behind a door.** The sentence that says how many modifiers every road deals is a count of the
+grades, and IX deleted it rather than keep a number that moves with every re-grade. A count a door can compute belongs behind a
+door: `Run.figure_modifiers_dealt_beneath_top()` counts it, and the sentence reads it through a token.
+
 ## The baseline's own error bar, and why the free modifiers are free (Batch IX) — 2026-10-26
 
 **Why a severity is a band of cost and not a rank cut at fixed counts.** IW's ladder showed the deck's costs, above the cheapest

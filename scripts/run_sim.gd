@@ -216,6 +216,15 @@ static var worn_kind := {}          # class|universal|stick -> runes worn (HC §
 static var depth_reached: Array = []  # absolute slot at run end, 1..49 (1..48 before GJ)
 static var r8_samples: Array = []     # one ratio@z1t8 per run that fought it
 static var _run_r8 := -1.0
+# BATCH IY §1 — A FIGHT DRAWS ITS OWN SEED FROM THE RUN's (`DOD_SIM_FIGHT_SEED=<block>`). IX found that two arms
+# paired by their RUN's seed part at the first bargain fight: every die after it is drawn from wherever that fight left
+# the stream, so the paired error stood at 0.91 of the unpaired. **Pair at the unit you measure**: with the flag set,
+# every node the walk steps onto, and every won fight's spoils, reseed the dice off the block, the run's ordinal and the
+# node's place on the board (`_seed_node`) — so two arms' fights at one node meet the same warband and the same rolls
+# wherever their states still agree. **A seeded fight is not an identical fight**: the parties diverge in state (health,
+# gold, what they hold), and the rolls agree only until the state makes a branch go another way. It changes no rule and
+# no figure; unset, nothing here runs and no die is spent. A sim-family flag (IV §2): only a run sim reaches this file.
+static var fight_seed_block := ""
 
 
 static func begin(run: Node, n: int) -> void:
@@ -223,6 +232,7 @@ static func begin(run: Node, n: int) -> void:
 	runs_target = maxi(n, 1)
 	run.sim_run = true  # in-memory runs only — never touch the player's save
 	route = OS.get_environment("DOD_SIM_ROUTE")
+	fight_seed_block = OS.get_environment("DOD_SIM_FIGHT_SEED")
 	# Batch BK: the three policies are greedy / balanced / cautious. "default"
 	# and "elites" are kept as ALIASES rather than deleted — every sim script
 	# and every Matrix row in the changelog names them, and a flag that
@@ -358,6 +368,7 @@ static func walk_to_next_fight(run: Node) -> bool:
 		var ty := String(node["type"])
 		type_taken[ty] = int(type_taken.get(ty, 0)) + 1
 		run.advance(pick)
+		_seed_node(run, 0)  # BATCH IY §1: the node the walk stepped onto draws its own seed
 		if ty == "blacksmith":
 			_blacksmith_visit(run)
 			continue
@@ -389,6 +400,19 @@ static func walk_to_next_fight(run: Node) -> bool:
 		run.arm_fixed_modifier(ty)  # BATCH BM §5: rung 3's second twist
 		return true
 	return false  # unreachable: the loop only leaves through a return
+
+
+# BATCH IY §1 — the one door the fight seed is drawn through: the block, the run's ordinal, the node's zone and slot,
+# and the phase (0 the step onto the node, 1 a won fight's spoils). `hash` of an Array of ints is the same in every
+# process, so two arms' runs of one ordinal draw one seed at one node.
+static func _seed_node(run: Node, phase: int) -> void:
+	if fight_seed_block == "":
+		return
+	seed(node_seed(int(fight_seed_block), runs_done, int(run.zone_idx), int(run.slot_idx), phase))
+
+
+static func node_seed(block: int, run_i: int, zone: int, slot: int, phase: int) -> int:
+	return hash([block, run_i, zone, slot, phase])
 
 
 # THE ROUTE POLICY, and it is one axis on purpose: HOW MUCH ELITE the bot
@@ -798,6 +822,7 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 		wipes.append({"zone": run.zone_idx + 1, "tier": run.slot_idx + 1})
 		_finish_run(run, battle, false)
 		return
+	_seed_node(run, 1)  # BATCH IY §1: a won fight's spoils draw their own seed
 	t["wins"] += 1.0
 	run.combat_wins += 1
 	for i in battle.heroes.size():

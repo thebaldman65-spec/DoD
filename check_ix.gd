@@ -312,6 +312,12 @@ func _s3_the_scale() -> Dictionary:
 	var free := 0
 	var graded := 0
 	var counts := {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+	# RE-POINTED AT IY §4: the grade a modifier carries is the highest cost measured on any population, test-bound — IY's kept
+	# table, which `check_iy` §4 re-derives from both readings; IX's arithmetic on its own readings is IX's record, and the arm
+	# below still holds IX's table to its own column.
+	var iy := {}
+	for gr in _tsv("res://docs/reports/IY-grades.tsv", ["id", "grade"]):
+		iy[String(gr["id"])] = int(gr["grade"])
 	for r in srows:
 		var id := String(r["id"])
 		if id == "none":
@@ -322,15 +328,16 @@ func _s3_the_scale() -> Dictionary:
 			if c >= float(cuts[k]):
 				band = k + 1
 		var sev := int((mods.get(id, {}) as Dictionary).get("severity", -1))
-		counts[band] = int(counts.get(band, 0)) + 1
-		if band == 0:
+		var want := int(iy.get(id, -1))
+		counts[want] = int(counts.get(want, 0)) + 1
+		if want == 0:
 			free += 1
 			if sev != 0:
-				free_graded.append("%s (costs %.2f points, carries severity %d)" % [id, c, sev])
+				free_graded.append("%s (graded none at IY, carries severity %d)" % [id, sev])
 		else:
 			graded += 1
-			if sev != band:
-				off.append("%s carries severity %d, its cost of %.2f points falls in band %d" % [id, sev, c, band])
+			if sev != want:
+				off.append("%s carries severity %d, the highest cost measured gives %d" % [id, sev, want])
 		if int(r["grade"]) != band:
 			off.append("%s: the kept table writes grade %s, its cost gives %d" % [id, r["grade"], band])
 	ok(free_graded.is_empty(), "§3: %d modifiers cost nothing and carry a severity — a modifier that costs nothing has no severity: %s" % [free_graded.size(), str(free_graded)])

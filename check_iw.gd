@@ -408,7 +408,8 @@ func _s2_the_grades() -> void:
 	# RE-POINTED AT IX §3: the grade a reading gives is the cost scale's (`docs/reports/IX-scale.tsv`, IX's arithmetic on these
 	# readings); the ladder's `grade` column is the grade as it stood at IW, kept as the record.
 	var scaled := {}
-	for sr in _tsv("res://docs/reports/IX-scale.tsv", ["id", "grade"]):
+	# RE-POINTED AT IY §4: the measurement behind every grade is IY's grades table (the highest cost measured, test-bound).
+	for sr in _tsv("res://docs/reports/IY-grades.tsv", ["id", "grade"]):
 		scaled[String(sr["id"])] = String(sr["grade"])
 	for r in lrows:
 		var id := String(r["id"])

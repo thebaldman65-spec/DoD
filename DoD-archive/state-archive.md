@@ -17,6 +17,94 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT IY — 2026-10-26, FROM `docs/state.md` AS IT LEFT IT (`fa24c3b`)
+
+**What came here**: IX's five rulings, all answered in IY's brief; THE BARGAIN DECK's GRADES as IX left it — IX's scale table, its re-grade, its bands and its one-sided table, superseded by IY's grades; FOUND AT IX's pairing item, built at IY §1; and the roadmap's item that the free modifiers wait on IX's rulings. Each word for word, under the heading it stood under.
+
+
+### ~~IX's RULINGS OWED~~ — **ALL FIVE ANSWERED IN IY's BRIEF (1: the test binds — eleven carry no severity, IY §0.1; 2: the repair is a handle, nine turned to one target to measure nine slopes, IY §0.2 and §2; 3: no rewording — the grade takes the higher cost, Deadened 3 and Brittle 2, IY §0.3 and §4; 4: Warden's gamble band waits one batch, read again at IY §5; 5: the count goes behind a door, IY §0.5)** — was: **FIVE; THE FREE MODIFIERS ARE THE DESIGNER's, AND WHAT *COSTS NOTHING* MEANS IS OWED FIRST**
+
+Full working: `docs/reports/IX.md`, NEEDS A RULING.
+
+1. **WHAT *COSTS NOTHING* MEANS — THE SCALE's FIRST CUT, OR §1's TEST.** The brief defines it twice and the two disagree. §3's arithmetic puts the first cut at 0.48 points and leaves 6 without a severity (built: §3 says a grade falls out of its reading by arithmetic); §1's paired test finds 11 inside two standard errors of the baseline — the 6, Hoarfrost and grade 1's other four. **Hoarfrost is graded 1, where it stood, 0.03 points past the first cut**, so the brief's seven are six by its own derivation. If the test binds, 11 carry no severity, grade 1 is empty and Wanderer's safe band holds 3. **Either way the scale's first band is finer than the instrument**: at sixty runs two standard errors of a paired cost are about 1.3 points.
+2. **THE FREE MODIFIERS' REPAIR IS A HANDLE, NOT A RE-KEY (§2) — AND A SEVERITY 1 IS A COST SIXTY RUNS CANNOT READ.** No half of any of the seven moves the party past two standard errors: no warband half pays it (the Dark's shape is nowhere), and no party half charges it. Each one's handle is in THE BARGAIN DECK's GRADES. A modifier re-authored to cost about 0.93 points reads at two standard errors at about 113 runs an arm, where IW's ladder took sixty: **the brief that turns Dull Edge to cost 1% can be written, and at sixty runs not verified.**
+3. **THE SWING's WORDS (§4).** 5 modifiers' costs lie more than one band apart between the reference party and the incumbent — Thin Air, Deadened, Encumbered, Rot, Warded; each one's words against *can a player tell from the words that it hits their build harder* are IX's report §4. The rewording is the designer's.
+4. **WARDEN's GAMBLE BAND HOLDS TWO** — Rot and Overgrown, exactly the two gambles a Warden offer deals, so every Warden offer's gambles are that pair until the free modifiers come back. The bands were read, not re-set (§3): whether they wait or move is the designer's.
+5. **THE GLOSSARY's MODIFIER ENTRY LOST A COUNT** — it said *the twenty beneath them are what every road deals. The twenty are weighted toward the mild end*; the scale leaves nineteen beneath severity 5, thirteen of them dealt, so the count came out (*those beneath them … They are weighted*) and nothing else moved. The words are the designer's to confirm.
+
+### ~~THE BARGAIN DECK's GRADES~~ — **SUPERSEDED AT IY (the test binds and the grade takes the higher cost, IY §0.1, §0.3 and §4; nine handles turned, IY §2 — THE BARGAIN DECK's GRADES in `docs/state.md`)** — was: **A COST BAND ON ONE NAMED PARTY SINCE IX §3; 6 MODIFIERS COST NOTHING AND CARRY NO SEVERITY, AND THE OTHER 17 ARE GRADED BY ARITHMETIC**
+
+**THE MODIFIERS THAT COST NOTHING ARE THE WORK; THE REST ARE A SCALE, NOT A RE-CUT (IX §0.1, the designer's).** IW's ladder showed the deck's costs a step a little under double the last above its cheapest level; so a grade is defined as a band of cost and every modifier's grade falls out of its own reading, and only the ones with no cost to band are design work.
+
+**THE SCALE (IX §3; the rule is `CLAUDE.md`'s ladder block, and the comment above `Run.MODIFIERS` states it too).** A modifier's severity is what it costs the reference party's health at a bargain fight's end, against the same party with no modifier, in points of its maximum health: **no severity under 0.48; 1 to 1.70; 2 to 3.70; 3 to 6.88; 4 to 12.22; 5 from 12.22** — the midpoints between the costs of IW's eight levels; a grade's centre is its level's cost, **0.93 / 2.48 / 4.92 / 8.84 / 15.59 or more** (the brief's 1 / 2.5 / 5 / 10 / 20: the derivation reads the top two lower, and it is the derivation's). **The reference party (IX §0.2), named beside the scale**: the sim's default party — the Berserker, the Cryomancer, the Devout and the Beastmaster — untalented, at Wanderer, seed block 38; the one candidate of IW's nine whose crowd a screen could resolve.
+
+**THE BASELINE IS AN ARM (IX §1).** With no modifier the party ends a bargain fight at **0.944 ± 0.005** (0.943863 ± 0.004887), 60 runs of block 38, 718 bargain fights read by node — the arms' rule, which on every one of the 23 arms counts the same fights as the modifier reading (asserted, IV's reader having counted a fight only where a modifier stood). IX re-drove it and it reproduced IW's arm line for line. Every arm below is paired against it by seed: **pairing buys little** — a run diverges at its first bargain — the paired error stood at a median 0.91 of the unpaired.
+
+| modifier | IW's reading | cost (points) | paired against *none* (points) | §1 | IW's level | grade was | **grade** | from the nearest cut |
+|---|---|---|---|---|---|---|---|---|
+| Dull Edge | 0.950 | -0.61 | +0.61 ± 0.53 | costs nothing | 1 | 1 | **—** | 1.09 |
+| Parched | 0.945 | -0.14 | +0.14 ± 0.55 | costs nothing | 1 | 1 | **—** | **a tie** — 0.62 from a cut |
+| Tinderbox | 0.944 | -0.04 | +0.04 ± 0.37 | costs nothing | 1 | 1 | **—** | **a tie** — 0.52 from a cut |
+| Frenzied | 0.943 | +0.05 | -0.05 ± 0.24 | costs nothing | 1 | 1 | **—** | **a tie** — 0.44 from a cut |
+| Muffled | 0.943 | +0.09 | -0.09 ± 0.67 | costs nothing | 1 | 2 | **—** | **a tie** — 0.40 from a cut |
+| Fleeting | 0.940 | +0.41 | -0.41 ± 0.62 | costs nothing | 1 | 2 | **—** | **a tie** — 0.08 from a cut |
+| Hoarfrost | 0.939 | +0.51 | -0.51 ± 0.60 | costs nothing | 1 | 1 | **1** | **a tie** — 0.03 from a cut |
+| Deadened | 0.938 | +0.54 | -0.54 ± 0.58 | costs nothing | 2 | 3 | **1** | **a tie** — 0.06 from a cut |
+| Brittle | 0.936 | +0.75 | -0.75 ± 0.66 | costs nothing | 2 | 2 | **1** | **a tie** — 0.26 from a cut |
+| Slick Footing | 0.936 | +0.75 | -0.75 ± 0.71 | costs nothing | 2 | 2 | **1** | **a tie** — 0.27 from a cut |
+| Bloodletting | 0.935 | +0.87 | -0.87 ± 0.65 | costs nothing | 2 | 2 | **1** | **a tie** — 0.39 from a cut |
+| Encumbered | 0.927 | +1.72 | -1.72 ± 0.74 | costs something | 2 | 2 | **2** | **a tie** — 0.02 from a cut |
+| Feverish | 0.920 | +2.42 | -2.42 ± 0.75 | costs something | 3 | 3 | **2** | **a tie** — 0.72 from a cut |
+| Warded | 0.918 | +2.54 | -2.54 ± 0.88 | costs something | 3 | 1 | **2** | **a tie** — 0.84 from a cut |
+| The Thin Veil | 0.896 | +4.75 | -4.75 ± 0.70 | costs something | 4 | 3 | **3** | **a tie** — 1.05 from a cut |
+| The Long Silence | 0.895 | +4.88 | -4.88 ± 0.56 | costs something | 4 | 3 | **3** | 1.18 |
+| Miasma | 0.892 | +5.14 | -5.14 ± 0.72 | costs something | 4 | 4 | **3** | 1.44 |
+| Rot | 0.857 | +8.66 | -8.66 ± 0.83 | costs something | 5 | 4 | **4** | 1.78 |
+| Overgrown | 0.854 | +9.03 | -9.03 ± 0.92 | costs something | 5 | 4 | **4** | 2.14 |
+| Mirrorbound | 0.788 | +15.59 | -15.59 ± 0.98 | costs something | 6 | 5 | **5** | 3.37 |
+| Thin Air | 0.734 | +21.03 | -21.03 ± 1.38 | costs something | 7 | 4 | **5** | 8.81 |
+| Bloodless | 0.702 | +24.22 | -24.22 ± 1.02 | costs something | 7 | 5 | **5** | 12.00 |
+| Wasting | 0.579 | +36.53 | -36.53 ± 1.51 | costs something | 8 | 5 | **5** | 24.32 |
+
+- **THE RE-GRADE, BY ARITHMETIC: 14 MOVED, 9 STOOD.** To no severity: Dull Edge (1), Parched (1), Tinderbox (1), Frenzied (1), Muffled (2), Fleeting (2). Down: Deadened 3 → 1, Brittle 2 → 1, Slick Footing 2 → 1, Bloodletting 2 → 1, Feverish 3 → 2, Miasma 4 → 3. Up: Warded 1 → 2, Thin Air 4 → 5. The grades hold no severity 6; 1 5; 2 3; 3 3; 4 2; 5 4. No mechanic moved; the rewards follow the grade, as they always have.
+- **THE BRIEF's SEVEN ARE SIX BY ITS OWN DERIVATION.** Hoarfrost's cost, 0.51 points, lands 0.03 past the first cut (0.48), so arithmetic grades it 1 — where it stood. **And §1's own test reads 11, not seven**: Dull Edge, Parched, Tinderbox, Frenzied, Muffled, Fleeting, Hoarfrost, Deadened, Brittle, Slick Footing, Bloodletting each lie inside two standard errors of the baseline. **At sixty runs two standard errors of a paired cost are about 1.3 points, so a severity 1 (about 0.93) cannot be told from none**: the scale's first band is finer than the instrument, and a modifier re-authored to cost 1% reads at two standard errors at about 113 runs an arm. **Which definition of *costs nothing* binds is owed** (IX's RULINGS OWED, 1).
+- **THE TIES, NAMED WHERE THE GRADES ARE READ (IP §0.4).** 14 modifiers lie within two standard errors of a cut — every one below grade 4 but Dull Edge, The Long Silence, Miasma — so their grades are the arithmetic's, not the measurement's: a re-run is not promised to keep them, and the narrowest are Encumbered (0.02 from the 1|2 cut), Hoarfrost (0.03) and Deadened (0.06) past the first, Fleeting (0.08) short of it.
+- **THE BANDS, READ AND NOT RE-SET (IX §3).** Wanderer's safe band (1–2) holds 8; Wanderer's gamble band (3–4) holds 5; Warden's safe band (1–3) holds 11; Warden's gamble band (4–4) holds 2; Ruin's safe band (3–4) holds 5; Ruin's gamble band (5–5) holds 4; Ruin's fixed encounters draw from the 5 of severity 3–4. **Warden's gamble band holds the two its offer deals, so every Warden offer's gambles are Rot and Overgrown** until the free modifiers come back — a finding, and the bands wait for them (IX's RULINGS OWED, 4). Thin Air, graded 5, is Ruin's alone now; the mildest severity each rung deals is unchanged (1, 1 and 3), so the merchant stands where it stood.
+
+**WHY THE FREE ONES ARE FREE (IX §2).** Beside each of the brief's seven, the modifier laid on the party alone (`DOD_IX_SIDE=party`: the heroes stamped at the spawn and a companion at its call, no enemy), sixty runs on the same seeds; **P** is what the party's own half does to the party, **W** what the warband's half does to it (two-sided less one-sided). The rule that sorts a cause was written before any one-sided arm was read (a half moves the party at two standard errors or more):
+
+| modifier | its handle | one-sided | P: the party's half | W: the warband's half | net (two-sided) | the cause the rule gives |
+|---|---|---|---|---|---|---|
+| Dull Edge | `u.crit_bonus` −0.05 | 0.948 ± 0.004 | +0.41 ± 0.56 | +0.20 ± 0.50 | +0.61 ± 0.53 | Dull Edge — the magnitude is too small |
+| Parched | `u.max_resource` / 2 | 0.945 ± 0.004 | +0.14 ± 0.55 | +0.00 ± 0.00 | +0.14 ± 0.55 | Parched — the magnitude is too small |
+| Tinderbox | `u.type_dmg_bonus["fire"]` +0.25 | 0.943 ± 0.005 | -0.10 ± 0.28 | +0.14 ± 0.26 | +0.04 ± 0.37 | Tinderbox — the magnitude is too small |
+| Frenzied | `mod_speed_mult` 1.3 | 0.949 ± 0.003 | +0.52 ± 0.54 | -0.57 ± 0.53 | -0.05 ± 0.24 | Frenzied — the magnitude is too small |
+| Muffled | `mod_bd_mult` 75 | 0.942 ± 0.005 | -0.23 ± 0.61 | +0.14 ± 0.69 | -0.09 ± 0.67 | Muffled — the magnitude is too small |
+| Fleeting | `mod_status_turns` −1 | 0.933 ± 0.005 | -1.05 ± 0.61 | +0.64 ± 0.70 | -0.41 ± 0.62 | Fleeting — the magnitude is too small |
+| Hoarfrost | a Chilled of 3 turns (`_apply_status(u, "chilled", 3)`) | 0.941 ± 0.005 | -0.30 ± 0.51 | -0.21 ± 0.71 | -0.51 ± 0.60 | Hoarfrost — the magnitude is too small |
+
+- **NOT ONE HALF OF THE SEVEN MOVES THE PARTY — SO NONE IS THE DARK's SHAPE, AND EVERY ONE IS A HANDLE TO TURN.** No warband half pays the party past two standard errors, and no party half charges it past two. Parched's warband half is not small but nothing: its one-sided arm reproduces its two-sided arm run for run (enemies carry almost no resource to clamp). The nearest to moving is Fleeting's party half (-1.05 ± 0.61): statuses on the heroes, which are nearly all the party's own buffs, run a turn short.
+- **A SLOWER FIGHT PAYS NOBODY HERE, AND THE PARTY's HEALING TAKES UP THE TEMPO HALVES.** The third cause, read by the rule written first — a half lengthens the bargain fights and the party's healing rises with them, each at two standard errors, at no cost to the party — shows on none of the fourteen halves; it was predicted on Dull Edge and Muffled. Muffled's warband half lengthens the fights (+1.42 ± 0.50 of the party's turns) and the healing in them does not move (-3.7 ± 12.4), nor does the party (+0.14). **What moves instead is the healing, in two mirrored pairs, while the fight's length and the party's health at its end stand still**: the party alone quickened heals 35 ± 14 less a bargain fight and the warband quickened too gives it back (+38 ± 14); the party alone chilled heals 37 ± 15 more and the warband chilled too takes 58 ± 16 of it away (of 233 a fight with no modifier). So for Frenzied and Hoarfrost *the magnitude is too small* reads *too small to get past the healing*. Read, not pre-registered — 28 readings at two standard errors — and no arm removes the party's healing, so it is not proved.
+- **THE HEADROOM IS SMALL, AND IT IS THE POPULATION's.** The reference party ends a bargain fight at 0.944, so a modifier that pays it can gain at most 5.6 points where one that costs it can take ninety-four: even the party alone 30% faster (Frenzied one-sided) gains +0.52. A rule read on this population cannot show a large gift, which is part of why no warband half reads as one.
+
+**THE SWING BETWEEN THESE TWO (IX §4).** Every modifier's cost on the incumbent — IG's three parties, all twenty-seven nodes, Ruin, IV's rebuilt arms, against its own *none* arm read by node (0.944 ± 0.005, 60 runs; IV's reader could not read it) — banded on the same scale beside its band on the reference party. **Two populations, two readings each, not a range across builds: the swing between these two.** Over one band: Thin Air swings 3 bands (5 against 2); Deadened swings 2 bands (1 against 3); Encumbered swings 2 bands (2 against —); Rot swings 2 bands (4 against 2); Warded swings 2 bands (2 against —). **Thin Air is three bands, not five** (21.0 points against 2.3). Each one's words against *can a player tell from the words that it hits their build harder* are IX's report, §4; the rewording is the designer's (IX's RULINGS OWED, 3).
+
+**WHAT THE GRADES ARE, SAID WHERE THEY ARE READ.** One party's, untalented, at Wanderer's multiplier, through the bot — which books 2.2 times a player's status events (THE FIRST CLEAN PLAYTHROUGH) and whose ally pools are heroes-only (a constant bias every figure here was taken through, IS §4). Every figure, its error, its band and its cause: `docs/reports/IX-scale.tsv`, `IX-onesided.tsv` and `IX-swing.tsv`; IW's ladder (`docs/reports/IW-ladder.tsv`) is the measurement the scale is derived from.
+
+### FOUND AT IX AND NOT FIXED — ITS CLOSED ITEM (archived at IY; the block stays in `docs/state.md`)
+
+- **PAIRING BY SEED BUYS LITTLE ON A RUN** — a run diverges from its twin at its first bargain fight, so the paired error stood at a median 0.91 of the unpaired across the 23 arms. A seed per FIGHT rather than per run would pair what the cheap end needs paired; an instrument change, not built.
+
+*Built at IY §1: the sim seeds every node and every won fight's spoils off the run's seed (`DOD_SIM_FIGHT_SEED`), and the cheap arm's paired error fell to 0.55 of the unpaired.*
+
+### THE PLAYTEST'S OTHER FINDINGS — **LATER BATCHES BY RULING (HW's brief §5); THE ROADMAP HOLDS THE ORDER** — ITS CLOSED ITEMS (archived at IY; the section stays in `docs/state.md`)
+
+- **THE GRADE SCALE IS A COST (IX §3), AND THE FREE MODIFIERS ARE THE DESIGNER's**: a severity is a band of what a modifier costs one named party, every grade falls out of its reading by arithmetic, and 6 cost nothing and carry no severity (THE BARGAIN DECK's GRADES). Each is *the magnitude is too small* (§2), so its repair is its handle — against a severity 1 that sixty runs cannot tell from none (IX's RULINGS OWED, 1 and 2). The modifiers are the designer's, against IX's scale and IW's figures.
+
+*Answered in IY's brief and built at IY (the test binds; the higher cost; nine handles turned and measured); IY's item in its place.*
+
+---
+
 ## ARCHIVED AT IX — 2026-10-26, FROM `docs/state.md` AS IT LEFT IT (`a538639`)
 
 **What came here**: IW's two rulings, both answered in IX's brief (the scale, IX §0.1 and §3; one party, IX §0.2); THE BARGAIN DECK's GRADES as IW left it — IW's table, its levels and its arm, superseded by IX's scale; and the roadmap's item that the deck's middle waits on IW's rulings. Each word for word, under the heading it stood under.

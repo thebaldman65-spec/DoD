@@ -547,7 +547,8 @@ const REPAIRS := [
 	["item:revive", "fallen hero at", "fallen ally at"],
 	["modifier:overgrown", "health at most.", "70% health."],
 	["modifier:parched", "resource at most.", "half resource."],
-	["modifier:dulledge", "chance -5%, for", "is halved,"],
+	# BATCH IY §2 — the figure is DULL_EDGE_CRIT's now, read by its words; `check_iy` §2 holds it. The repaired clause stands.
+	["modifier:dulledge", "Critical chance -", "is halved,"],
 	["modifier:thinair", "Anything else that builds it still does.", "What you have is what you get."],
 	["relic:tithe", "Gold won in battles and bargains", "All gold earned from nodes"],
 	["relic:kingsledger", "battle and bargain", "all node"],
@@ -698,6 +699,9 @@ func _s3_pins() -> void:
 	# BATCH IT §2 — 180 rows LEFT this table, each for `check_it` §2: IT named the literal each pinned, so the figure has
 	# a constant now and the pin's premise (no constant decides it) is gone. Each is held there against its intent — the
 	# text's figure against the constant's value, and the decision site reading the constant. The floor is IJ's 400.
+	# BATCH IY §2 — SIX MORE LEFT IT, FOR `check_iy` §2: Tinderbox's, Frenzied's, Slick Footing's, Muffled's, Fleeting's and
+	# Bloodletting's figures are `Run` constants now (IU §0.4: a figure a batch re-tunes gets a constant then), read bare at the
+	# stamp and formatted in the words, so the pin's premise is gone; `check_iy` §2 holds each text's figure to its constant.
 	ok(PINS.size() >= 400, "§3: only %d pins — the table has lost rows" % PINS.size())
 	print("    CHECKED %d pins: %d holders unread, %d texts moved, %d codes moved" % [
 		PINS.size(), bad_holder.size(), bad_text.size(), bad_code.size()])
@@ -943,16 +947,10 @@ const PINS := [
 	["item:revive", "at 50% HP", "scripts/battle.gd", "_use_item", "target.revive(0.5)"],
 	["item:defense", "for 3 turns", "scripts/battle.gd", "_use_item", "_apply_status(h, \"fortify\", 3)"],
 	["item:defense", "+10% armor", "scripts/unit.gd", "effective_armor", "a += 0.10"],
-	["modifier:tinderbox", "damage +25%", "scripts/battle.gd", "_stamp_modifier", "float(u.type_dmg_bonus.get(\"fire\", 0.0)) + 0.25"],
-	["modifier:frenzied", "30% faster", "scripts/battle.gd", "_stamp_modifier", "u.mod_speed_mult = 1.3"],
 	["modifier:warded", "25% more", "scripts/battle.gd", "_stamp_modifier", "u.mod_cost_mult = 1.25"],
-	["modifier:slick", "+0.5 initiative", "scripts/battle.gd", "_stamp_modifier", "ab.delay += 0.5"],
-	["modifier:muffled", "reduced 25%", "scripts/battle.gd", "_stamp_modifier", "u.mod_bd_mult = 75"],
-	["modifier:fleeting", "one turn less", "scripts/battle.gd", "_stamp_modifier", "u.mod_status_turns = -1"],
 	["modifier:feverish", "25% more damage", "scripts/battle.gd", "_stamp_modifier", "u.attack = int(round(u.attack * 1.25))"],
 	["modifier:miasma", "is halved", "scripts/battle.gd", "_stamp_modifier", "u.healing_received_mult *= 0.5"],
 	["modifier:encumbered", "two more turns", "scripts/battle.gd", "_stamp_modifier", "ab.cooldown += 2"],
-	["modifier:bloodletting", "add 15 Bleed", "scripts/battle.gd", "_stamp_modifier", "u.mod_bleed_add = 15"],
 	["modifier:mirrorbound", "a quarter", "scripts/battle.gd", "_stamp_modifier", "u.mod_recoil = 0.25"],
 	["modifier:rot", "is halved", "scripts/battle.gd", "_stamp_modifier", "maxi(u.max_hp / 2, 1)"],
 	["src:scripts/spec_choice_screen.gd:_draw_screen", "one of three core", "scripts/run_state.gd", "deal_engines", "dealt = pool.slice(0, 3)"],
