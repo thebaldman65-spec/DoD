@@ -121,11 +121,12 @@ const IX_MEDIAN_RATIO := 0.91
 const BANDS := {"wanderer": [[1, 2], [3, 4]], "warden": [[1, 3], [4, 4]], "ruin": [[3, 4], [5, 5]]}
 # THE NINE HANDLES: the modifier, its constant, the line of `battle._stamp_modifier`'s branch that reads it bare, and the figure
 # each one's words state, formatted off the constant the way its `desc` does.
-# RE-POINTED AT IZ: Dull Edge (§3) and Tinderbox (§5) are removed, so seven handles stand; Frenzied's is the flat amount its re-key
+# RE-POINTED AT IZ: Dull Edge (§3) and Tinderbox (§5) are removed, so seven handles stand; Leaden's (Frenzied's then) is the flat amount its re-key
 # adds (§4). IY's table below keeps all nine as IY's record.
 const HANDLES := [
 	["parched", "PARCHED_SHARE", "u.resource = mini(u.resource, int(u.max_resource * Run.PARCHED_SHARE))"],
-	["frenzied", "FRENZIED_SPEED_ADD", "u.mod_speed_add = Run.FRENZIED_SPEED_ADD"],
+	# RE-POINTED AT JA §1: the card is Leaden, its constant named for it (IT §2a); the id is the one the save carries.
+	["frenzied", "LEADEN_SPEED_ADD", "u.mod_speed_add = Run.LEADEN_SPEED_ADD"],
 	["muffled", "MUFFLED_BD_PCT", "u.mod_bd_mult = Run.MUFFLED_BD_PCT"],
 	["fleeting", "FLEETING_TURNS", "u.mod_status_turns = -Run.FLEETING_TURNS"],
 	["hoarfrost", "HOARFROST_CHILL_TURNS", "_apply_status(u, \"chilled\", Run.HOARFROST_CHILL_TURNS)"],
@@ -234,7 +235,7 @@ func _s1_the_seeding() -> void:
 	for r in rows:
 		by[String(r["id"])] = r
 	ok(by.has("none") and by.has("encumbered") and by.has("frenzied"),
-		"§1: the seeding table carries no baseline, no Encumbered or no Frenzied arm (%s)" % str(by.keys()))
+		"§1: the seeding table carries no baseline, no Encumbered or no Leaden (then Frenzied) arm (%s)" % str(by.keys()))
 	if not (by.has("none") and by.has("encumbered") and by.has("frenzied")):
 		return
 	var bad: Array = []
@@ -297,7 +298,8 @@ func _figure_words(id: String, v: Variant) -> String:
 		"tinderbox":
 			return "+%d%%" % int(round(float(v) * 100))
 		"frenzied":
-			return "%d%% faster" % int(round(float(v)))
+			# RE-POINTED AT JA §0.1: the card is Leaden and its words are the designer's — the constant's figure stated as a slow-down.
+			return "about %d%% more slowly" % int(round(-float(v)))
 		"muffled":
 			return "reduced %d%%" % (100 - int(v))
 		"fleeting":
@@ -373,7 +375,9 @@ func _s2_the_handles() -> void:
 	# placing kept is still IY's new value; one it reverted is back at IY's old value; one removed or re-keyed is IY's record alone.
 	var placed := {}
 	var iz_src := {}
-	for zr in _tsv("res://docs/reports/IZ-grades.tsv", ["id", "handle", "value", "population", "batch"]):
+	# RE-POINTED AT JA §2: the placing of record is JA's table since Fleeting moved to three turns off — off both of IY's values, so
+	# it is JA's (its in-deck reading, `check_ja` §2) and IY's row is its record alone, as a removed or re-keyed handle's is.
+	for zr in _tsv("res://docs/reports/JA-grades.tsv", ["id", "handle", "value", "population", "batch"]):
 		placed[String(zr["id"])] = [String(zr["handle"]), String(zr["value"])]
 		iz_src[String(zr["id"])] = "%s — %s" % [String(zr["population"]), String(zr["batch"])]
 	var off: Array = []
@@ -383,7 +387,7 @@ func _s2_the_handles() -> void:
 		var live: Variant = _konst(String(r["constant"]))
 		# THE TABLE MEASURED THE DECK IY LEFT (R01 at IY); SINCE IZ the placing decides it — kept at IY's value or reverted to IY's old one.
 		var pl: Array = placed.get(id, ["", ""])
-		if String(pl[0]) == String(r["constant"]):
+		if String(pl[0]) == String(r["constant"]) and not String(iz_src.get(id, "")).ends_with("JA §2"):
 			var kept := is_equal_approx(float(pl[1]), float(r["new_value"]))
 			var reverted := is_equal_approx(float(pl[1]), float(r["old_value"]))
 			if live == null or not is_equal_approx(float(live), float(pl[1])) or not (kept or reverted):
@@ -440,7 +444,7 @@ func _s3_the_reach() -> void:
 	print("\n§3 — the reach test: each verdict the pre-registered rule's, the healing read beside it")
 	var rows := _tsv("res://" + REACH_TSV, ["modifier", "id", "handle", "deck_value", "extreme_value", "cost", "d_se", "z", "heal",
 		"heal_se", "heal_z", "verdict"])
-	ok(rows.size() == 2, "§3: the reach table holds %d rows — Frenzied and Hoarfrost" % rows.size())
+	ok(rows.size() == 2, "§3: the reach table holds %d rows — Leaden (Frenzied then) and Hoarfrost" % rows.size())
 	var bad: Array = []
 	# RE-POINTED AT IZ: IZ archived IY's grades block word for word (its heading struck), so IY's record is read where it lives.
 	var grades := _flat(_block(_doc("res://DoD-archive/state-archive.md"), "### ~~THE BARGAIN DECK's GRADES~~"))
@@ -475,7 +479,8 @@ func _s4_the_grades() -> void:
 	# populations (`docs/reports/IZ-grades.tsv`, `check_iz` §2). IY's table is held to its own arithmetic here, and to the game only
 	# where IZ kept IY's grade and its source.
 	var iz_src := {}
-	for zr in _tsv("res://docs/reports/IZ-grades.tsv", ["id", "population", "batch"]):
+	# RE-POINTED AT JA §2: the grades of record are JA's table (Fleeting re-read in the deck); a grade JA moved is JA's, not IY's.
+	for zr in _tsv("res://docs/reports/JA-grades.tsv", ["id", "population", "batch"]):
 		iz_src[String(zr["id"])] = "%s — %s" % [String(zr["population"]), String(zr["batch"])]
 	ok(rows.size() == mods.size() + 2, "§4: the grades table holds %d rows — the deck holds %d" % [rows.size(), mods.size()])
 	var off: Array = []

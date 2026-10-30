@@ -337,7 +337,8 @@ func _s3_the_scale() -> Dictionary:
 	# RE-POINTED AT IZ §2: the grade is IZ's table's (`docs/reports/IZ-grades.tsv`, which `check_iz` §2 re-derives): the sharper
 	# reading of one population replaces the blunter (IZ §0.1). A modifier IZ removed is IX's record and not the deck's.
 	var iy := {}
-	for gr in _tsv("res://docs/reports/IZ-grades.tsv", ["id", "grade"]):
+	# RE-POINTED AT JA §2: the grades of record are JA's table since Fleeting was re-read in the deck at three turns off.
+	for gr in _tsv("res://docs/reports/JA-grades.tsv", ["id", "grade"]):
 		iy[String(gr["id"])] = int(gr["grade"])
 	for r in srows:
 		var id := String(r["id"])

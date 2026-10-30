@@ -608,7 +608,7 @@ func _s7_the_bare_probe() -> void:
 	var copy := base + "/copy_of_unit.gd"
 	# RE-POINTED AT IZ: the copy is of the file AS THE REPOSITORY TRACKS IT — the index's blob, which is what `lane.sh` compares
 	# against — never the working tree's, which differs from it whenever a batch has edited `unit.gd` and not committed: IZ
-	# re-keyed Frenzied there, and the arm read red on every tree carrying the edit, a copy of nothing the repository tracks.
+	# re-keyed Frenzied (Leaden since JA) there, and the arm read red on every tree carrying the edit, a copy of nothing the repository tracks.
 	var blob: Array = []
 	OS.execute("/usr/bin/git", PackedStringArray(["-C", ProjectSettings.globalize_path("res://"), "show", ":scripts/unit.gd"]), blob, false)
 	var g := FileAccess.open(copy, FileAccess.WRITE)

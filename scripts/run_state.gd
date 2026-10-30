@@ -5067,17 +5067,18 @@ const THIN_VEIL_PCT := 0.5
 # one's slope** (IY's report §2: the old value and its cost, the new value and its cost, the slope); the placing in a band
 # is the designer's against the slopes. A STARTING VALUE each (CQ §6).
 #   PARCHED_SHARE          the share of a bar (and of a held meter) both parties may open a fight with
-#   FRENZIED_SPEED_ADD     what every unit's speed gains, ADDED (IZ §4 re-keyed it from a multiplier, which rescaled the timeline
-#                          and moved no turn); 100 is the average speed, so the figure is the share its words read at the average
+#   LEADEN_SPEED_ADD       what every unit's speed gains, ADDED (IZ §4 re-keyed it from a multiplier, which rescaled the timeline
+#                          and moved no turn); 100 is the average speed, so the figure is the share its words read at the average;
+#                          named for its card (IT §2a) since JA §1 renamed the card — LEADEN_SPEED_ADD read FRENZIED_SPEED_ADD at IZ
 #   MUFFLED_BD_PCT         the share of Break damage that lands, an integer percent (the field's own unit)
 #   FLEETING_TURNS         the turns every status applied loses (never below one)
 #   HOARFROST_CHILL_TURNS  the turns of the Chilled every unit opens the fight under (Hoarfrost Armor's turns are Battle's own)
 #   SLICK_DELAY            the initiative every ability gains
 #   BLOODLETTING_BLEED     the Bleed every hit adds
 const PARCHED_SHARE := 0.0
-const FRENZIED_SPEED_ADD := -30.0
+const LEADEN_SPEED_ADD := -30.0
 const MUFFLED_BD_PCT := 50
-const FLEETING_TURNS := 1
+const FLEETING_TURNS := 3
 const HOARFROST_CHILL_TURNS := 9
 const SLICK_DELAY := 0.5
 const BLOODLETTING_BLEED := 15
@@ -5097,8 +5098,14 @@ const SEVERITY_COLORS := {
 const MODIFIERS := {
 	"overgrown": {"name": "Overgrown", "tag": "Ov", "severity": 4, "graded": "the incumbent — IV, graded at IY §4",
 		"desc": "Both parties begin the fight at 70% health at most."},
-	"frenzied": {"name": "Frenzied", "tag": "Fr", "severity": 1, "graded": "the default four — IZ §4",
-		"desc": "Everyone acts %d%% faster. Cooldowns are unchanged." % [int(round(FRENZIED_SPEED_ADD))]},
+	# BATCH JA §0.1 — LEADEN, THE CARD FRENZIED WAS (the designer's words). A flat amount off every speed widens the gap between
+	# fast and slow — `delay / (speed + c)` moves a slow body's schedule more than a fast one's — so the card says so; its figure is
+	# the constant's at the average speed of 100. THE ID STAYS `frenzied`: a save names a modifier by its id and the project has no
+	# rename path for one (`RENAMED_CARDS` is cards'), so the display name moved alone and the id is the old name's one survivor.
+	# ITS CHIP WEARS ITS OWN LETTERS, `Ld` (IO §5; the designer's, in JA's conversation — Leaden wore Frenzied's `Fr`).
+	"frenzied": {"name": "Leaden", "tag": "Ld", "severity": 1, "graded": "the default four — IZ §4",
+		"desc": "Everyone acts about %d%% more slowly, and the slower a body already is the more it loses. Cooldowns are unchanged."
+			% [int(round(-LEADEN_SPEED_ADD))]},
 	"brittle": {"name": "Brittle", "tag": "Bi", "severity": 2, "graded": "the incumbent — IV, graded at IY §4",
 		"desc": "All attacks ignore armor, on both sides."},
 	"warded": {"name": "Warded", "tag": "Wa", "severity": 2, "graded": "the default four — IZ §1",
@@ -5115,7 +5122,10 @@ const MODIFIERS := {
 	"hoarfrost": {"name": "Hoarfrost", "tag": "Ho", "severity": 1, "graded": "the default four — IY §2",
 		"desc": "Everyone begins the fight Chilled."},
 	# ---- authored by AQ at severity 2 ----
-	"fleeting": {"name": "Fleeting", "tag": "Ft", "severity": 1, "graded": "the default four — IZ §1",
+	# BATCH JA §2 — THREE TURNS OFF, A 2, MEASURED IN THE DECK (the designer placed it there off IZ's lever point). The words
+	# are the template's at the value: *every effect lasts one turn* was the brief's and is not the rule — a status of five turns
+	# or more keeps all but three of them, and a battle-long one is untouched (JA §3's census of the status door).
+	"fleeting": {"name": "Fleeting", "tag": "Ft", "severity": 2, "graded": "the default four — JA §2",
 		"desc": "Every status applied lasts %s less (never below one)." % [
 			"one turn" if FLEETING_TURNS == 1 else "%d turns" % FLEETING_TURNS]},
 	"feverish": {"name": "Feverish", "tag": "Fv", "severity": 2, "graded": "the default four — IZ §1",

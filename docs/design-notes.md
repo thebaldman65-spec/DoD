@@ -4,6 +4,37 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The shares, before the four (Batch JA) — 2026-10-30
+
+**Why Leaden.** IZ re-keyed the card from a factor on every speed to a flat amount added to every speed, and the amount that cost
+the party was a subtraction (-30), so its old words read *Everyone acts -30% faster* — a slow-down stated as a negative speed-up.
+The designer renamed it for what it does: a flat amount off every speed takes a larger share of a slow body's speed than of a fast
+one's, so the gap between fast and slow widens, and the card says so — *the slower a body already is the more it loses*. The
+constant is named for the card (`LEADEN_SPEED_ADD`, IT §2a) and nothing about the mechanic moved: -30, floored at a tenth of a unit's
+own speed, and IZ's drive reads the same 23 of the first 48 turns changing hands on the renamed tree. **The id stays `frenzied`**: a
+save names a modifier by its id, and the project's one rename path is the cards' (`RENAMED_CARDS`), so the display name moved alone
+rather than inventing a second path; the chip wears the card's own letters, `Ld`. **The brief's reading that the party is the slow
+side of the field did not hold**: the census reads the heroes faster at their turns (98.5 against 90.8 on the reference party, 116.8
+against 92.2 on the incumbent), so a flat amount takes more of the warband's speed than the party's and the subtraction still costs
+the party — the words are true of the mechanic; why it costs is not the share of speed.
+
+**Why Fleeting's words are the code's.** Fleeting moved to three turns off, and measured in the deck it costs the reference party +2.29 ± 0.26 points of health at a bargain fight's end — a 2, a tie by the test with IZ's lever point (+3.10 ± 0.32). The brief gave it the words *every
+effect lasts one turn*, on the reading that three off with a floor of one leaves every status a single turn. The status door's census
+says otherwise: of every status the party benefits from laid for a positive count, 8.2% on the reference party (6.1% on the
+incumbent) were laid for five turns or more and keep all but three of them, and the battle-long ones — Chilled from a hold, a
+barrier, Snared, Ruin — are untouched by the rule. The designer chose the true sentence over the short one: *Every status applied
+lasts 3 turns less (never below one)*, which is what the template has always said at any value but one.
+
+**Why the shares come before the four.** Grade 4's empty slots want new rules, not harder numbers, and the last three rules removed
+or re-cut each taught the same lesson a batch late: the Hungering Dark fed the side that deals more damage, Tinderbox could not
+charge the side that deals the fire, and Dull Edge's crit was the warband's more than the party's where it counted. So the shares of
+every quantity a rule could key on are measured first, on both parties, and kept as a table the next author reads before writing a
+figure. **What the table says is not what the three failures suggested**: the heroes produce most of nearly everything (damage six to
+seven times, healing eight to fifteen, the resource two hundred), the warband holds more health and more armor, and tempo and turn
+order are near even — but on the instrument the scale is set on every one of the twenty-one modifiers costs the party, bonuses on the
+party's own quantities included. The share says whom a rule touches more; whether it costs the party is what the touch does to the
+party's health, which the warband's output moves directly and the party's own only through the fight's length.
+
 ## The placing, two re-keys, and a removal (Batch IZ) — 2026-10-27
 
 **Why the sharper reading replaces the blunter.** IY ruled that a grade takes the highest cost measured on any population, so a

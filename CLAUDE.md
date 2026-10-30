@@ -1948,6 +1948,18 @@ decision and the STRUCTURE is what shipped.
   and the Cleric fed least of the four under it is the same lopsidedness inside the party. **So a new modifier names
   the quantity it is keyed on and reads both sides' share of it before it is authored: binding both sides is the
   floor, not the test.**
+· **A NEW MODIFIER NAMES THE TWO SIDES' SHARES OF ITS QUANTITY BEFORE IT IS BUILT (JA §3, the designer's), READ OFF THE CENSUS OF
+  RECORD, `docs/reports/JA-shares.tsv`** — every quantity a live modifier keys on and the doors' others, what each side produced, on
+  the reference party and the talented incumbent; a quantity the table lacks is read the same way (JA's probe, the strike ledger, the
+  status door and the resource doors) and added before the rule is. **Three rules cost a batch each to learn this — the Hungering
+  Dark, Tinderbox and Dull Edge — and the census makes it a measurement.** **AND A SHARE IS NOT A SIGN (JA §3's finding, the batch's,
+  stated as a prediction a later batch can break)**: on the instrument the scale is set on — the party's health at a fight's end —
+  every one of the twenty-one live modifiers costs the party, the two damage bonuses where the heroes deal six times the warband's
+  damage among them, and Rot's, Overgrown's and Brittle's penalties on what the warband holds more of; the two rules ever recorded
+  paying it were a payout landing on the party's health in proportion to what the party produces more of (the Dark) and a penalty
+  taking more of the warband's damage into the party than of the party's out (Dull Edge at its floor). **A share says whom a rule
+  touches more; what the touch does to the party's health decides the sign** — and a quantity the warband produces none of (the
+  turn-start drip, cooldowns) binds the party alone however the words read.
 · **A CLASS PASSIVE OUTRANKS A MODIFIER WHERE THEY CONTRADICT (IO §0.5, the designer's).** A hero's lineage is what
   he is; a modifier is what this fight is. **The thing he is wins.** The worked example is the Tracker's opening turn,
   kept before the first round under IN's Cruel Order (withdrawn at IO); the rule binds the next modifier that meets a

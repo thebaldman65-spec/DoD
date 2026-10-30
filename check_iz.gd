@@ -16,7 +16,7 @@
 #   §3   DULL EDGE AND TINDERBOX ARE REMOVED, NOT DISABLED: no file of the game names either, and the modifiers beside them still
 #        are (the positive arm); DRIVEN, a save whose offer names them loads with those options dropped and a clean offer loads
 #        whole, and a bargain taken under one is fought under none.
-#   §4   FRENZIED ADDS: the stamp writes the flat amount, the speed reads it added and floored; the re-key's kept arms (the add,
+#   §4   LEADEN ADDS (the card IZ re-keyed as Frenzied; renamed at JA §1): the stamp writes the flat amount, the speed reads it added and floored; the re-key's kept arms (the add,
 #        its sign read, the subtraction driven because the add pays) and the amount shipped is one that costs the party; DRIVEN,
 #        the turn order of a real board moves under the stamp — the property the multiplication could not have (C05).
 #   §5   MUFFLED AND TINDERBOX ON THE POPULATIONS THEIR RULES NAME: each reading's arithmetic, the fire party's derivation, the
@@ -248,7 +248,10 @@ func _s1_the_rereads() -> void:
 
 
 # ── §2 — THE PLACING ──────────────────────────────────────────────────────────────────────────────────
-const GRADES_TSV := "docs/reports/IZ-grades.tsv"
+# RE-POINTED AT JA §2: the grades of record are JA's table since Fleeting moved to 3 and was re-read in the deck — IZ's rows
+# carried forward but for Fleeting's (its value, its reading, its grade) and the renamed card's name and constant. IZ's table
+# stays IZ's record (`docs/reports/IZ-grades.tsv`).
+const GRADES_TSV := "docs/reports/JA-grades.tsv"
 
 
 func _s2_the_placing() -> void:
@@ -407,7 +410,7 @@ func _s3_the_removal() -> void:
 	print("    CHECKED %d files of the game for the removed words, the load door both ways, and the bargain in force" % files.size())
 
 
-# ── §4 — FRENZIED ADDS ───────────────────────────────────────────────────────────────────────────────
+# ── §4 — LEADEN ADDS ─────────────────────────────────────────────────────────────────────────────────
 const REKEY_TSV := "docs/reports/IZ-rekey.tsv"
 
 
@@ -415,7 +418,9 @@ const REKEY_TSV := "docs/reports/IZ-rekey.tsv"
 # speed) and a basic attack's delay after every turn (`Ability.BASIC_DELAY` over the speed), the division every reschedule in
 # `battle.gd` makes — as the sequence of the units' seats. A factor on every speed divides every time by one number and leaves this
 # sequence as it was; an amount added to every speed does not.
-func _order(units: Array, steps: int) -> Array:
+# RE-POINTED AT JA §1: STATIC, SO `check_ja` §1 READS THIS ONE MODEL THROUGH A PRELOAD (DA §3: a helper copied between gates diverges
+# silently). It did not move to `gate_fixture.gd`: that file carries a standing positional row (`check_iu` §5), and the thirteen stay.
+static func turn_order(units: Array, steps: int) -> Array:
 	var t := {}
 	for i in units.size():
 		t[i] = 100.0 / maxf(float(units[i].effective_speed()), 0.1)
@@ -431,19 +436,21 @@ func _order(units: Array, steps: int) -> Array:
 
 
 func _s4_the_rekey() -> void:
-	print("\n§4 — Frenzied adds: the stamp writes a flat amount, the speed reads it added and floored, and a board's turn order moves")
+	print("\n§4 — Leaden adds: the stamp writes a flat amount, the speed reads it added and floored, and a board's turn order moves")
 	var cache := {}
 	var stamp := Gate.strip_comments(Gate.fn_body("scripts/battle.gd", "_stamp_modifier", cache))
 	var speed_fn := Gate.strip_comments(Gate.fn_body("scripts/unit.gd", "effective_speed", cache))
-	var add: Variant = _konst("FRENZIED_SPEED_ADD")
-	ok(add != null and _konst("FRENZIED_SPEED") == null,
-		"§4: Run carries no FRENZIED_SPEED_ADD (%s), or still carries the multiplier FRENZIED_SPEED" % str(add))
-	ok(Gate.count_whole(stamp, "u.mod_speed_add = Run.FRENZIED_SPEED_ADD") == 1,
-		"§4: Frenzied's stamp does not write the flat amount once (`u.mod_speed_add = Run.FRENZIED_SPEED_ADD`)")
+	# RE-POINTED AT JA §1: the constant is named for its card since the card is Leaden (IT §2a); the multiplier's name is IZ's
+	# record (FRENZIED_SPEED, the multiplier the re-key replaced — Leaden's then), asserted gone under it.
+	var add: Variant = _konst("LEADEN_SPEED_ADD")
+	ok(add != null and _konst("FREN" + "ZIED_SPEED") == null,
+		"§4: Run carries no LEADEN_SPEED_ADD (%s), or still carries the multiplier Leaden's re-key replaced" % str(add))
+	ok(Gate.count_whole(stamp, "u.mod_speed_add = Run.LEADEN_SPEED_ADD") == 1,
+		"§4: Leaden's stamp does not write the flat amount once (`u.mod_speed_add = Run.LEADEN_SPEED_ADD`)")
 	ok(speed_fn.contains("maxf(speed + mod_speed_add, speed * MOD_SPEED_FLOOR)") and not speed_fn.contains("mod_speed_mult"),
 		"§4: effective_speed does not add the flat amount, floored at a share of the unit's own speed")
 	# THE RE-KEY's KEPT ARMS (IZ §4): each arm's verdict is its own arithmetic; the subtraction is driven because an add pays the
-	# party; the amount shipped is one an arm read costing the party — and with none that does, Frenzied is not in the deck.
+	# party; the amount shipped is one an arm read costing the party — and with none that does, Leaden is not in the deck.
 	var rk := _tsv("res://" + REKEY_TSV, ["arm", "value", "runs", "cost", "d_se", "z", "verdict"])
 	var bad: Array = []
 	var add_pays := false
@@ -461,19 +468,20 @@ func _s4_the_rekey() -> void:
 			costs.append(float(r["value"]))
 	ok(bad.is_empty() and rk.size() >= 3, "§4: %d of the re-key's %d arms are not their own arithmetic: %s" % [bad.size(), rk.size(), str(bad)])
 	var shipped_neg := add != null and float(add) < 0.0
-	ok(not shipped_neg or add_pays, "§4: Frenzied ships a subtraction and no add was read paying the party — the subtraction is driven only when the add pays")
+	ok(not shipped_neg or add_pays, "§4: Leaden ships a subtraction and no add was read paying the party — the subtraction is driven only when the add pays")
 	if costs.is_empty():
-		ok(not (_run.MODIFIERS as Dictionary).has("frenzied"), "§4: no direction of the re-key costs the party, and Frenzied is still in the deck")
+		ok(not (_run.MODIFIERS as Dictionary).has("frenzied"), "§4: no direction of the re-key costs the party, and Leaden is still in the deck")
 	else:
-		ok(add != null and costs.has(float(add)), "§4: Frenzied ships %s; the arms that cost the party were driven at %s" % [str(add), str(costs)])
+		ok(add != null and costs.has(float(add)), "§4: Leaden ships %s; the arms that cost the party were driven at %s" % [str(add), str(costs)])
 	print("    the re-key's arms: %d, an add paying %s, costing at %s; shipped %s" % [rk.size() - 1, str(add_pays), str(costs), str(add)])
 	if add == null or not (_run.MODIFIERS as Dictionary).has("frenzied"):
 		return
-	# NO WORD OF FRENZIED's MOVES (IZ §4): its sentence is the one it was, stating its constant's figure — at the average speed
-	# (100, `unit.gd`'s own convention) the amount is the share the words read.
+	# RE-POINTED AT JA §0.1: IZ §4 moved no word, and the card read a slow-down as a negative speed-up (Leaden's, Frenzied's then);
+	# its words are the designer's two clauses now, still stating the constant's figure — at the average speed (100, `unit.gd`'s
+	# own convention) the amount is the share the words read. `check_ja` §1 holds the card whole.
 	var desc := String((_run.MODIFIERS["frenzied"] as Dictionary).get("desc", ""))
-	ok(desc == "Everyone acts %d%% faster. Cooldowns are unchanged." % int(round(float(add))),
-		"§4: Frenzied's words are not its sentence stating its constant's figure ('%s')" % desc)
+	ok(desc.begins_with("Everyone acts about %d%% more slowly," % int(round(-float(add)))),
+		"§4: Leaden's words are not its sentence stating its constant's figure ('%s')" % desc)
 	# DRIVEN, ON A REAL BOARD THROUGH THE REAL STAMP.
 	var scene: Node = await Gate.spawn(self, ["berserker", "cryomancer", "inquisitor", "beastmaster"])
 	var units: Array = scene.get("heroes") + scene.get("enemies")
@@ -485,17 +493,17 @@ func _s4_the_rekey() -> void:
 		distinct[snappedf(float(v), 0.01)] = true
 	ok(units.size() >= 5 and distinct.size() >= 2,
 		"§4: the board holds %d units at %d distinct speeds — the drive needs two speeds to move an order" % [units.size(), distinct.size()])
-	var plain := _order(units, 48)
+	var plain := turn_order(units, 48)
 	for u in units:
 		scene.call("_stamp_modifier", u, "frenzied")
-	var stamped := _order(units, 48)
+	var stamped := turn_order(units, 48)
 	var off: Array = []
 	for i in units.size():
 		var want := maxf(float(units[i].speed) + float(add), float(units[i].speed) * 0.1) * float(plain_speeds[i]) / float(units[i].speed)
 		if absf(float(units[i].effective_speed()) - want) > 0.001:
 			off.append("%s %.2f -> %.2f (want %.2f)" % [units[i].unit_name, float(plain_speeds[i]), float(units[i].effective_speed()), want])
 	ok(off.is_empty(), "§4: under the stamp a unit's speed is not its own plus %s: %s" % [str(add), str(off)])
-	ok(plain != stamped, "§4: DRIVEN — under Frenzied the board's first 48 turns fell in the same order as with no modifier — a speed change every unit shares moves no turn (the multiplication's shape)")
+	ok(plain != stamped, "§4: DRIVEN — under Leaden the board's first 48 turns fell in the same order as with no modifier — a speed change every unit shares moves no turn (the multiplication's shape)")
 	var moved := 0
 	for k in plain.size():
 		if int(plain[k]) != int(stamped[k]):

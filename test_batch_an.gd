@@ -182,9 +182,11 @@ func _test_offer(RunState) -> void:
 	# own measurement — the tally is IY's (`docs/reports/IY-grades.tsv`).
 	# RE-POINTED AT IZ §1–§5: the tally the grades hold since IZ — the sharper reading of one population replaces the
 	# blunter (IZ §0.1), the reverts graded by their own old readings, Dull Edge removed (§3); `docs/reports/IZ-grades.tsv`.
+	# RE-POINTED AT JA §2: Fleeting at three turns off, re-read in the deck, is a 2 — six at 1, five at 2; the grades of record
+	# are `docs/reports/JA-grades.tsv`.
 	ok(by_sev[0] == 0, "no modifiers carry no severity (got %d)" % by_sev[0])
-	ok(by_sev[1] == 7, "seven severity-1 modifiers (got %d)" % by_sev[1])
-	ok(by_sev[2] == 4, "four severity-2 modifiers (got %d)" % by_sev[2])
+	ok(by_sev[1] == 6, "six severity-1 modifiers (got %d)" % by_sev[1])
+	ok(by_sev[2] == 5, "five severity-2 modifiers (got %d)" % by_sev[2])
 	ok(by_sev[3] == 4, "four severity-3 modifiers (got %d)" % by_sev[3])
 	ok(by_sev[4] == 2, "two severity-4 modifiers (got %d)" % by_sev[4])
 	ok(by_sev[1] + by_sev[2] > by_sev[3] + by_sev[4],
@@ -345,7 +347,7 @@ func _test_modifiers_live() -> void:
 		# catches a stamp leaking out of the battle that armed it.
 		for u in clean.heroes + clean.enemies:
 			ok(not u.mod_ignore_armor, "no modifier: armor is untouched")
-			# RE-POINTED AT IZ §4: Frenzied ADDS to a speed now (`mod_speed_add`), so untouched is zero.
+			# RE-POINTED AT IZ §4: Leaden (Frenzied then) ADDS to a speed now (`mod_speed_add`), so untouched is zero.
 			ok(is_equal_approx(float(u.get("mod_speed_add")), 0.0), "no modifier: speed is untouched")
 			ok(is_equal_approx(u.mod_cost_mult, 1.0), "no modifier: costs are untouched")
 			ok(not u.mod_no_heals, "no modifier: healing is untouched")
@@ -398,13 +400,14 @@ func _test_modifiers_live() -> void:
 						"Overgrown: %s opens at or under 70%% (%d/%d)" % [
 							u.unit_name, u.hp, u.max_hp])
 					ok(u.hp > 0, "Overgrown never kills anyone outright")
-			# RE-POINTED AT IZ §4: Frenzied is re-keyed to a flat amount ADDED to every speed (a factor on every speed rescaled the
+			# RE-POINTED AT IZ §4: Leaden (Frenzied then) is re-keyed to a flat amount ADDED to every speed (a factor on every speed rescaled the
 			# timeline and moved no turn — IY §3), floored at a tenth of the unit's own speed; read off the constant, never typed.
 			"speed":
 				for u in everyone:
-					ok(is_equal_approx(float(u.get("mod_speed_add")), float(run.FRENZIED_SPEED_ADD)),
-						"Frenzied: %s acts %d%% faster at the average speed" % [u.unit_name, int(round(float(run.FRENZIED_SPEED_ADD)))])
-					ok(is_equal_approx(u.effective_speed(), maxf(u.speed + float(run.FRENZIED_SPEED_ADD), u.speed * 0.1)),
+					# RE-POINTED AT JA §1: the card is Leaden and its constant is named for it (IT §2a); no magnitude moved.
+					ok(is_equal_approx(float(u.get("mod_speed_add")), float(run.LEADEN_SPEED_ADD)),
+						"Leaden: %s acts about %d%% more slowly at the average speed" % [u.unit_name, int(round(-float(run.LEADEN_SPEED_ADD)))])
+					ok(is_equal_approx(u.effective_speed(), maxf(u.speed + float(run.LEADEN_SPEED_ADD), u.speed * 0.1)),
 						"...and effective_speed reads it added")
 			"armor":
 				for u in everyone:

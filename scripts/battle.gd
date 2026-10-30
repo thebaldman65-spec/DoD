@@ -2197,7 +2197,7 @@ func _spawn_units() -> void:
 	# stat. Every reschedule site in this file has always divided by
 	# effective_speed() — so Chilled, Slowed and Quick Draw have always bent
 	# the timeline — but this one line read `u.speed`, which meant the two
-	# modifiers stamped immediately above it (Frenzied's mod_speed_add and
+	# modifiers stamped immediately above it (Leaden's mod_speed_add and
 	# Hoarfrost's three stacks of Chilled) did nothing to the FIRST turn
 	# order, exactly what the comment on _apply_battle_modifier promised they
 	# would. The divisor is floored because a modifier is allowed to stack
@@ -2327,10 +2327,10 @@ func _stamp_fk_enemy_runes() -> void:
 # damage pipeline — because every unit-side field has exactly one read site
 # and the stat-side ones use hooks that already existed.
 #
-# Applied AFTER spawn and BEFORE the opening initiative roll: Frenzied has
+# Applied AFTER spawn and BEFORE the opening initiative roll: Leaden has
 # to be on the board before `next_time` is seeded off effective speed, or the
 # first turn order would be the unmodified one. That claim was FALSE from AN
-# until Batch AS — the roll read the raw `speed` stat, so neither Frenzied
+# until Batch AS — the roll read the raw `speed` stat, so neither Leaden
 # (mod_speed_add) nor Hoarfrost (Chilled) reached it. Both live in
 # effective_speed(), which the seed now calls.
 func _apply_battle_modifier() -> void:
@@ -2370,7 +2370,7 @@ func _stamp_modifier(u: BattleUnit, mod_id: String, inherited := false) -> void:
 			u.hp = maxi(mini(u.hp, int(round(u.max_hp * 0.7))), 1)
 			u.refresh_bars()
 		"frenzied":
-			u.mod_speed_add = Run.FRENZIED_SPEED_ADD
+			u.mod_speed_add = Run.LEADEN_SPEED_ADD
 		"brittle":
 			u.mod_ignore_armor = true
 		"warded":

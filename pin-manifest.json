@@ -2,13 +2,13 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 2114,
+  "total": 2124,
   "source": 1414,
-  "other": 216,
-  "document": 484
+  "other": 219,
+  "document": 491
  },
  "floor": {
-  "pins": 2114
+  "pins": 2124
  },
  "falls": [],
  "source_residency": {
@@ -9476,7 +9476,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iw.gd#275",
+   "g": "check_iw.gd#276",
    "expr": "ARM_NEEDLE"
   },
   {
@@ -9488,7 +9488,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iw.gd#276",
+   "g": "check_iw.gd#277",
    "expr": "SUPERSEDED_NEEDLE"
   },
   {
@@ -9500,7 +9500,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_iw.gd#271"
+   "g": "check_iw.gd#272"
   },
   {
    "s": "check_iw.gd",
@@ -9511,7 +9511,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iw.gd#357",
+   "g": "check_iw.gd#358",
    "expr": "_flat"
   },
   {
@@ -9523,7 +9523,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iw.gd#369",
+   "g": "check_iw.gd#370",
    "expr": "_flat"
   },
   {
@@ -10092,6 +10092,116 @@
    "k": "literal",
    "how": "derived",
    "g": "check_iz.gd#462"
+  },
+  {
+   "s": "check_ja.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "A NEW MODIFIER NAMES THE TWO SIDES' SHARES OF ITS QUANTITY BEFORE IT IS BUILT",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ja.gd#83"
+  },
+  {
+   "s": "check_ja.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "A NEW MODIFIER NAMES THE TWO SIDES' SHARES OF ITS QUANTITY BEFORE IT IS BUILT",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ja.gd#85"
+  },
+  {
+   "s": "check_ja.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "TWO-SIDEDNESS DOES NOT MAKE A RULE EVEN",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ja.gd#84"
+  },
+  {
+   "s": "check_ja.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/design-notes.md",
+   "n": "Why Fleeting's words are the code's",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ja.gd#88"
+  },
+  {
+   "s": "check_ja.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/design-notes.md",
+   "n": "Why Leaden",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ja.gd#88"
+  },
+  {
+   "s": "check_ja.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "docs/reports/JA-shares.tsv",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ja.gd#87"
+  },
+  {
+   "s": "check_ja.gd",
+   "fn": "_s1_leaden",
+   "h": "docs/master.html",
+   "n": "<tr><td>Leaden</td><td>1</td><td>%s</td></tr>",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_ja.gd#164"
+  },
+  {
+   "s": "check_ja.gd",
+   "fn": "_s2_fleeting",
+   "h": "docs/state.md",
+   "n": "Fleeting at 3",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ja.gd#201"
+  },
+  {
+   "s": "check_ja.gd",
+   "fn": "_s3_the_census",
+   "h": "docs/state.md",
+   "n": "THE SHARE CENSUS",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ja.gd#240"
+  },
+  {
+   "s": "check_ja.gd",
+   "fn": "_s4_the_axes",
+   "h": "docs/state.md",
+   "n": "grade 4 holds health alone",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ja.gd#283"
   },
   {
    "s": "test_batch_ah.gd",
@@ -22279,7 +22389,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "test_batch_cb.gd#633",
+   "g": "test_batch_cb.gd#637",
    "expr": "n"
   },
   {
@@ -22291,7 +22401,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "test_batch_cb.gd#640",
+   "g": "test_batch_cb.gd#644",
    "expr": "said"
   },
   {
@@ -22303,7 +22413,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "test_batch_cb.gd#645",
+   "g": "test_batch_cb.gd#649",
    "expr": "depth_line"
   },
   {
@@ -22315,7 +22425,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_cb.gd#650"
+   "g": "test_batch_cb.gd#654"
   },
   {
    "s": "test_batch_cb.gd",
@@ -22326,7 +22436,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_cb.gd#652"
+   "g": "test_batch_cb.gd#656"
   },
   {
    "s": "test_batch_cb.gd",
@@ -22337,7 +22447,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_cb.gd#656"
+   "g": "test_batch_cb.gd#660"
   },
   {
    "s": "test_batch_cb.gd",
@@ -22348,7 +22458,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_cb.gd#648"
+   "g": "test_batch_cb.gd#652"
   },
   {
    "s": "test_batch_cb.gd",
@@ -22359,7 +22469,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_cb.gd#646"
+   "g": "test_batch_cb.gd#650"
   },
   {
    "s": "test_batch_cb.gd",
@@ -22370,7 +22480,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_cb.gd#647"
+   "g": "test_batch_cb.gd#651"
   },
   {
    "s": "test_batch_cb.gd",

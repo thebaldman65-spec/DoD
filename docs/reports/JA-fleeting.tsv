@@ -1,0 +1,3 @@
+arm	id	modifier	handle	value	runs	completed	reading	se	cost	d_se	z	unpaired	ratio	prior_cost	prior_se	prior_source	tie_z	band
+J_none	none	(no modifier)	-	-	60	58	0.940645	0.004130	0.0000	0.0000	0.00	-	-	-	-	-	-	-
+J_fleeting3	fleeting	Fleeting	FLEETING_TURNS	3	60	58	0.917791	0.004734	2.2854	0.2610	8.75	0.6282	0.416	3.0962	0.3160	IZ stage B (the lever point, IZ §2)	-1.98	2

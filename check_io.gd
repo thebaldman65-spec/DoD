@@ -56,7 +56,9 @@ const GONE_WORDS := ["famine", "Famine", "cruel_order", "Cruel Order", "_pouch_s
 # their own measurement (`docs/reports/IY-grades.tsv`).
 # RE-POINTED AT IZ §1–§5: the tally the grades hold since IZ — the sharper reading of one population replaces the blunter
 # (IZ §0.1), the reverts graded by their own old readings, Dull Edge removed (§3); `docs/reports/IZ-grades.tsv`.
-const GRADE_COUNTS := {1: 7, 2: 4, 3: 4, 4: 2, 5: 4}
+# RE-POINTED AT JA §2: Fleeting at three turns off, re-read in the deck, is a 2 — six at 1, five at 2; the grades of record are
+# `docs/reports/JA-grades.tsv`.
+const GRADE_COUNTS := {1: 6, 2: 5, 3: 4, 4: 2, 5: 4}
 # §5 — the four glyphs, each meaning one thing (IE §0.1, II §0.4); a bargain's chip is none of them.
 const GLYPHS := ["◆", "↑", "✦", "○"]
 

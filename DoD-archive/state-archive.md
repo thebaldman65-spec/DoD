@@ -17,6 +17,45 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT JA — 2026-10-30, FROM `docs/state.md` AS IT LEFT IT (`1a276cd`)
+
+**What came here**: IZ's three rulings, all answered in JA's brief; FOUND AT IZ's coin-flip item and TWO INSTRUMENT OBSERVATIONS FROM FM whole, both closed by JA §5's repair of the arm they named; and the roadmap's IZ item. Each word for word, under the heading it stood under.
+
+
+### ~~IZ's RULINGS OWED~~ — **ALL THREE ANSWERED IN JA's BRIEF (1: Frenzied becomes Leaden, with the designer's words, its constant renamed with the card and its id kept, JA §1; 2: Fleeting goes to three turns off — a 2, measured in the deck, its words the rule's — and grade 4's four are the designer's, the share census and the axis table first, JA §2–§4; 3: Warden's band stays, the repetition answered by grade 4, JA §0.4)** — was: **THREE; FRENZIED's WORDS NOW READ A SLOW-DOWN AS A SPEED-UP, GRADE 4 HOLDS TWO, AND WARDEN's BAND WAITS ON IT**
+
+Full working: `docs/reports/IZ.md`, NEEDS A RULING.
+
+1. **FRENZIED's WORDS — THE SIGN FLIPPED (IZ §4: *if the sign flips, the rewording is mine*).** Added to every unit's speed, the amount pays the party (+300: -0.70 ± 0.29, z -2.46; +30 a tie), so the subtraction was driven, and it costs (-30: +0.60 ± 0.26, z 2.32, a 1): -30 shipped. **No word moved**, so the card reads *Everyone acts -30% faster. Cooldowns are unchanged.* — a slow-down stated as a negative speed-up, its figure read off `FRENZIED_SPEED_ADD` at the average speed of 100. The rewording is the designer's.
+2. **GRADE 4 IS THE HOLE, AND GRADE 1 HOLDS SEVEN (IZ §2).** The deck holds none 0; 1 7; 2 4; 3 4; 4 2; 5 4, against 5 / 5 / 5 / 4 / 4: the readings allow no more. Grade 1's seven are the three reverted to values that cost a 1 (Slick Footing, Fleeting, Bloodletting), Hoarfrost (whose reach ends at a 1), Encumbered (re-read to a 1), Muffled (a 1 on its own population) and Frenzied (-30). **Grade 4's four empty slots are new modifiers, the designer's to author** (IZ §8). The one measured lever between: Fleeting at 3 reads +3.10 ± 0.32 (a 2) — a slope point, not placed, since §1 found its old value a cost.
+3. **WARDEN's BAND STAYS, AND WHAT MOVING IT COSTS IS PRICED (IZ §0.4).** Wanderer's bands on Warden end its bargain fights +5.78 ± 2.16 points of health kinder (z 2.68: materially milder), so the band does not move, and **every Warden offer's gambles are still Rot and Overgrown**. Moved, Warden's bands would equal Wanderer's and its twist — the safe slot less mild — would be gone. A grade-4 modifier authored (ruling 2) is what the measurement leaves.
+
+### FOUND AT IZ AND NOT FIXED — ITS CLOSED ITEM (archived at JA; the block stays in `docs/state.md`)
+
+- **`test_batch_cb`'s PYRE WAKE DEEP-STACK ARM READS WHERE A RANDOM SCATTER PUT ITS FIRES** (IZ's recon 2): red once — *the bank is
+  emptied rather than skimmed (got 9)*, every one of the nine turns Pyre Wake consumed scattered back onto the deep body — on game
+  code byte-identical to recon 1's, where it was green, and green three times of three re-run on that code. The suite seeds its dice
+  and the run's timing still moves what the scatter deals: an arm that reads what the dice dealt is a coin flip (HR §6). Not IZ's to
+  repair; the repair is to assert the bank before the scatter, or to count the scatter's landings.
+
+*Repaired at JA §5: the arm reads the bank — Overburn's refund of the nine turns consumed — and never where the scattered fires fell; 2107 / 0 five runs of five on one tree.*
+
+### ~~TWO INSTRUMENT OBSERVATIONS FROM FM~~ — **BOTH REPAIRED: THE SECOND AT JA §5 (the arm reads the bank, not the scatter)** — was: **ONE REPAIRED, ONE NOT**
+
+- **`test_batch_cb` FLAKES UNDER BATTERY LOAD AND IT IS NOT REPAIRED.** FM's reconnaissance run
+  read **1721 checks / 1 failure** — *"the bank is emptied rather than skimmed (got 9)"*, the Pyre
+  Wake / Overburn deep-stack arm — and **three standalone re-runs read 1721 / 0**, matching the
+  baseline exactly. It is nothing to do with runes; the arm awaits frames, and the battery was
+  running four Godots wide at the time. **Recorded rather than repaired**, because a flake diagnosed
+  from one observation is a guess: the next batch that sees it has two, and `baselines.json` says
+  `fails_obs: 2` for that row, which is thin.
+
+### THE PLAYTEST'S OTHER FINDINGS — **LATER BATCHES BY RULING (HW's brief §5); THE ROADMAP HOLDS THE ORDER** — ITS CLOSED ITEMS (archived at JA; the section stays in `docs/state.md`)
+
+- **THE PLACING IS TAKEN, FRENZIED ADDS, AND TWO MODIFIERS LEFT (IZ)**: the sharper reading of one population replaces the blunter, the old values were re-read on it (four of IX's eleven free were never free; three went back), Frenzied's subtraction costs, Dull Edge and Tinderbox left the deck, and every modifier carries a severity (THE BARGAIN DECK's GRADES). **Frenzied's words are the designer's** (IZ's RULINGS OWED 1), **grade 4's empty slots** (2), and Warden's band waits on them, priced (3).
+
+*Answered in JA's brief and built at JA (Leaden, Fleeting at 3, the share census); JA's item in its place.*
+
 ## ARCHIVED AT IZ — 2026-10-27, FROM `docs/state.md` AS IT LEFT IT (`5f22c19`)
 
 **What came here**: IY's four rulings, all answered in IZ's brief; THE BARGAIN DECK's GRADES as IY left it — its seeding, its nine slopes, its reach test, its sweep, its bands and its swing, superseded by IZ's grades; FOUND AT IY's five closed items; FOUND AT IX's glossary item; and the roadmap's item that the placing waited on IY's rulings. Each word for word, under the heading it stood under.

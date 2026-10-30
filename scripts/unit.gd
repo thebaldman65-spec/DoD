@@ -295,7 +295,7 @@ var no_heals := false        # Ancient Pact: this beast rejects all healing
 # damage pipeline. Defaults are the no-modifier values, so a battle with no
 # modifier runs the pre-AN code path byte for byte.
 var mod_ignore_armor := false  # Brittle    — read in effective_armor()
-var mod_speed_add := 0.0       # Frenzied   — read in effective_speed()
+var mod_speed_add := 0.0       # Leaden     — read in effective_speed()
 var mod_no_heals := false      # Bloodless  — read in heal_amount()
 var mod_cost_mult := 1.0       # Warded     — read in battle._eff_cost()
 # Batch AQ's six, same rule: one field, one read site, default = no modifier.
@@ -3980,15 +3980,15 @@ func start_cooldown(ab: Ability) -> void:
 		cooldowns[ab.display_name] = ab.cooldown + 1
 
 
-# BATCH IZ §4 — FRENZIED's FLOOR: a speed a flat amount moves never falls under a tenth of the unit's own, the deepest
+# BATCH IZ §4 — LEADEN's FLOOR: a speed a flat amount moves never falls under a tenth of the unit's own, the deepest
 # chill's floor below, so a subtraction slows a unit and never stalls it.
 const MOD_SPEED_FLOOR := 0.1
 
 
 func effective_speed() -> float:
-	# Frenzied (Batch AN): everyone acts faster. It moves the SPEED, not
-	# the cooldowns — cooldowns tick in the unit's own turns, so a faster
-	# unit reaches its next turn sooner but has not shortened anything, which
+	# Leaden (Batch AN; named so since JA §1): everyone acts more slowly. It moves the SPEED, not
+	# the cooldowns — cooldowns tick in the unit's own turns, so a slower
+	# unit reaches its next turn later but has lengthened nothing, which
 	# is exactly what "cooldowns unchanged" asks for. **BATCH IZ §4 — IT ADDS,
 	# IT DOES NOT MULTIPLY.** Every delay is divided by this speed, so a factor
 	# on every unit rescales the whole timeline and moves no turn's order at

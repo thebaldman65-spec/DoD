@@ -383,8 +383,11 @@ func _s1_the_ladder() -> void:
 	for r in lrows:
 		if removed_at_iz.has(String(r["id"])):
 			continue
-		if not st.contains("| %s | %.3f" % [r["modifier"], float(r["reading"])]):
-			missing.append(String(r["modifier"]))
+		# RE-POINTED AT JA §1: the ladder names a card as IW knew it, and the state file's table carries it under the name the deck
+		# gives it today (the card IW read as the old name is Leaden since JA; its id is unmoved).
+		var shown := String((mods.get(String(r["id"]), {}) as Dictionary).get("name", r["modifier"]))
+		if not st.contains("| %s | %.3f" % [shown, float(r["reading"])]):
+			missing.append(shown)
 	ok(missing.is_empty(), "§1: %d modifiers' readings are not the figures docs/state.md's grades table carries: %s" % [missing.size(), str(missing)])
 	# RE-POINTED AT IX §3: IX archived IW's grades block word for word, its heading struck as superseded by the cost scale, so
 	# the arm IW's tables gave and the ladder's figures replacing IP's are IW's record, read where that record lives; the
@@ -416,7 +419,8 @@ func _s2_the_grades() -> void:
 	# RE-POINTED AT IZ §2: it is IZ's since — the sharper reading of one population replaces the blunter (IZ §0.1) — and the two
 	# IZ removed are the ladder's record, not the deck's.
 	var removed_at_iz := ["dulledge", "tinderbox"]
-	for sr in _tsv("res://docs/reports/IZ-grades.tsv", ["id", "grade"]):
+	# RE-POINTED AT JA §2: the grades of record are JA's table since Fleeting was re-read in the deck at three turns off.
+	for sr in _tsv("res://docs/reports/JA-grades.tsv", ["id", "grade"]):
 		scaled[String(sr["id"])] = String(sr["grade"])
 	for r in lrows:
 		var id := String(r["id"])
@@ -441,7 +445,7 @@ func _s2_the_grades() -> void:
 			continue
 		var kind := String(r["handle_kind"])
 		var handle := String(r["handle"])
-		# RE-POINTED AT IZ §4: Frenzied is re-keyed — the field its arm writes is the flat amount, `mod_speed_add`.
+		# RE-POINTED AT IZ §4: Leaden (Frenzied then) is re-keyed — the field its arm writes is the flat amount, `mod_speed_add`.
 		if id == "frenzied" and handle == "mod_speed_mult":
 			handle = "mod_speed_add"
 		if String(r["supported"]) == "no":

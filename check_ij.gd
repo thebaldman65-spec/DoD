@@ -698,7 +698,7 @@ func _s3_pins() -> void:
 	# BATCH IT §2 — 180 rows LEFT this table, each for `check_it` §2: IT named the literal each pinned, so the figure has
 	# a constant now and the pin's premise (no constant decides it) is gone. Each is held there against its intent — the
 	# text's figure against the constant's value, and the decision site reading the constant. The floor is IJ's 400.
-	# BATCH IY §2 — SIX MORE LEFT IT, FOR `check_iy` §2: Tinderbox's, Frenzied's, Slick Footing's, Muffled's, Fleeting's and
+	# BATCH IY §2 — SIX MORE LEFT IT, FOR `check_iy` §2: Tinderbox's, Frenzied's (Leaden's), Slick Footing's, Muffled's, Fleeting's and
 	# Bloodletting's figures are `Run` constants now (IU §0.4: a figure a batch re-tunes gets a constant then), read bare at the
 	# stamp and formatted in the words, so the pin's premise is gone; `check_iy` §2 holds each text's figure to its constant.
 	ok(PINS.size() >= 400, "§3: only %d pins — the table has lost rows" % PINS.size())

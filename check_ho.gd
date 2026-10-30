@@ -949,7 +949,7 @@ func _s4_the_trap() -> void:
 	# CARRIED AT THE DEFAULT, EXCEPT THE ONE SENTINEL, which is carried as the
 	# baseline the roll reads for a hero — and what a class or a lineage sets wins.
 	var mage_cfg: Dictionary = Classes.hero_config("mage")
-	# RE-POINTED AT IZ §4: Frenzied's field is the flat amount `mod_speed_add` now, whose default is zero, so it left
+	# RE-POINTED AT IZ §4: Leaden's (Frenzied's then) field is the flat amount `mod_speed_add` now, whose default is zero, so it left
 	# this population (a zero default reads the same added or replaced) and this list with it.
 	for f2 in ["healing_received_mult", "mercy_threshold", "overcharge_mult", "second_max",
 			"mod_bd_mult", "mod_cost_mult"]:
@@ -1008,7 +1008,7 @@ func _s4_the_trap() -> void:
 
 	# (3) EVERY OTHER FIELD OF THE POPULATION A PAYLOAD CAN LAND ON: +delta reads
 	# default + delta on each hero the spawn does not re-derive the field for.
-	# RE-POINTED AT IZ §4: `mod_speed_mult` left the population with Frenzied's re-key (above), so five fields on four
+	# RE-POINTED AT IZ §4: `mod_speed_mult` left the population with Leaden's (Frenzied's) re-key (above), so five fields on four
 	# heroes, less the one second resource the spawn re-derives, are nineteen reads.
 	var delta := {"mercy_threshold": 0.1, "overcharge_mult": 0.25, "second_max": 7,
 		"mod_bd_mult": 10, "mod_cost_mult": 0.5}

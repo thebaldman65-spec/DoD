@@ -678,11 +678,21 @@ func _live_pyre_wake() -> void:
 	deep.hp = 4000
 	f2[1].max_hp = 4000
 	f2[1].hp = 4000
+	# BATCH JA §5 — THE BANK IS READ AT OVERBURN's ONE DOOR, NEVER OFF WHERE THE FIRES FELL. The arm read `deep`'s
+	# Burn after the scatter and asked it be under nine; every turn consumed lands a fresh fire on a body the dice pick,
+	# so all nine landing back on `deep` (one cast in 512 on two bodies) read nine and red the arm on a correct card — FM
+	# and IZ each saw it once. What the card consumed is what the refund pays: one Mana a turn, through
+	# `_overburn_refund`, read off the bank before a fire is laid. Nine back is the bank emptied; a skim pays less.
+	# Room is left on the bar so the refund is never clamped (it pays at most what the bar lacks).
+	py2.max_resource = 100
+	py2.resource = 40
+	var mana2_was: int = py2.resource
+	var pw2_cost: int = _card("Pyre Wake").cost
 	s2.call("_apply_status", deep, "burn", 9, 0, 6, py2)
 	await s2.call("_resolve", py2, _card("Pyre Wake"), deep, "good")
-	# Its own 9 are gone; what it holds now is only what the scatter gave back.
-	ok(_burn_turns(deep) < 9,
-		"the bank is emptied rather than skimmed (got %d)" % _burn_turns(deep))
+	ok(py2.resource - mana2_was == 9 - pw2_cost,
+		"the bank is emptied rather than skimmed: all nine turns consumed, refunded a Mana each (want %d, got %d)"
+			% [9 - pw2_cost, py2.resource - mana2_was])
 	ok(_burn_turns(deep) + _burn_turns(f2[1]) == 9,
 		"and all nine turns landed again as fresh fires (got %d)" % (
 			_burn_turns(deep) + _burn_turns(f2[1])))
