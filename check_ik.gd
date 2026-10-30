@@ -801,7 +801,6 @@ func _s5_strike() -> void:
 		"relic emberheart": Relics.desc_of("emberheart"),
 		"relic frostsigil": Relics.desc_of("frostsigil"),
 		"relic nightbloom": Relics.desc_of("nightbloom"),
-		"modifier tinderbox": String(_run.MODIFIERS["tinderbox"]["desc"]),
 		"rune clarity": String(Runes.config("clarity").get("desc", "")),
 		"rune profligate": String(Runes.config("profligate").get("desc", "")),
 	}
@@ -812,7 +811,8 @@ func _s5_strike() -> void:
 	var bsrc := _src("scripts/battle.gd")
 	var chip_at := bsrc.find("\"shielded\": [\"Shielded\"")
 	texts["chip shielded"] = bsrc.substr(chip_at, bsrc.find("\n", chip_at) - chip_at) if chip_at >= 0 else ""
-	ok(texts.size() == 9, "§5b: %d of the nine texts read" % texts.size())
+	# RE-POINTED AT IZ §5: Tinderbox left the deck (no reach on the party that deals fire), so eight texts say *strike damage*.
+	ok(texts.size() == 8, "§5b: %d of the eight texts read" % texts.size())
 	for k in texts:
 		ok(String(texts[k]).contains("strike damage"), "§5b: %s does not say strike damage ('%s')" % [k, texts[k]])
 		ok(not String(texts[k]).contains("{="), "§5b: %s carries a raw token" % k)
@@ -820,7 +820,6 @@ func _s5_strike() -> void:
 				"All fire damage +", "25% less damage taken", "Takes 25% less damage\\n", "% more damage and cost",
 				"% more damage."]:
 			ok(not String(texts[k]).contains(dead), "§5b: %s still says '%s'" % [k, dead])
-	ok(String(texts["modifier tinderbox"]).contains("whoever deals it"), "§5b: Tinderbox lost *whoever deals it*")
 	ok(String(texts["rune profligate"]).contains("a Killing Frost costs double and is paid nothing"),
 		"§5b: Profligate does not name its asymmetry")
 	var fig := "+%d%%" % int(round(float(Relics.POOL["emberheart"]["hooks"]["dmg_type_mult"]["fire"]) * 100.0))
@@ -833,8 +832,9 @@ func _s5_strike() -> void:
 			clar.contains("if ab.special == \"\" and ab.heal <= 0:\n\t\t\t_log(\"   → Rune: Clarity")])
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
 	# BATCH IY §2 — Tinderbox's figure is a `Run` constant now: the row is read at the constant's figure.
-	var tinder := "All fire strike damage +%d%%, whoever deals it." % int(round(float(_run.TINDERBOX_FIRE_PCT) * 100.0))
-	for row in [tinder, "Takes 25% less strike damage", "more strike damage"]:
+	# RE-POINTED AT IZ §5: Tinderbox is removed, and its row with it; the other two rows still say *strike damage*.
+	ok(not master.contains("<td>Tinderbox</td>"), "§5b: master.html still lists Tinderbox, which IZ §5 removed")
+	for row in ["Takes 25% less strike damage", "more strike damage"]:
 		ok(master.contains(row), "§5b: master.html does not read '%s'" % row)
 	# (c) WHAT THE WORDS SAY, READ OFF THE FIGHT. Profligate prices a Killing Frost double and pays it nothing,
 	# and pays a spell that strikes; the arms differ by the rune alone.
@@ -889,7 +889,8 @@ func _s5_strike() -> void:
 			bsrc.contains("if strike_target.has_status(\"shielded\"):"), _body("scripts/battle.gd", "_companion_hit").contains("\"shielded\"")])
 	var reads := _body("scripts/battle.gd", "_resolve").count("type_dmg_bonus.get(")
 	var stamps := _body("scripts/battle.gd", "_stamp_modifier").count("type_dmg_bonus.get(")
-	ok(reads == 1 and stamps == 1 and bsrc.count("type_dmg_bonus.get(") == reads + stamps,
+	# RE-POINTED AT IZ §5: Tinderbox's stamp was the one other read; with it removed the strike is the only one.
+	ok(reads == 1 and stamps == 0 and bsrc.count("type_dmg_bonus.get(") == reads + stamps,
 		"§5c: the school bonus is read somewhere other than the strike (%d in the strike, %d in Tinderbox's stamp, %d in all)" % [
 			reads, stamps, bsrc.count("type_dmg_bonus.get(")])
 

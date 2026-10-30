@@ -359,14 +359,16 @@ func _s1_the_ladder() -> void:
 	ok((a["bad_ratio"] as Array).is_empty(), "§1: %d candidates' written R5 or R4 is not the ratio their own readings give: %s" % [(a["bad_ratio"] as Array).size(), str(a["bad_ratio"])])
 	var lrows: Array = a["ladder"]
 	var mods: Dictionary = _run.MODIFIERS
-	ok(lrows.size() == mods.size(), "§1: the ladder holds %d modifiers and the deck %d — every modifier is measured" % [lrows.size(), mods.size()])
+	# RE-POINTED AT IZ §3 and §5: the ladder measured the two IZ removed (Dull Edge, Tinderbox); every modifier the deck holds is on it.
+	var removed_at_iz := ["dulledge", "tinderbox"]
+	ok(lrows.size() == mods.size() + removed_at_iz.size(), "§1: the ladder holds %d modifiers and the deck %d — every modifier is measured" % [lrows.size(), mods.size()])
 	var thin: Array = []
 	var foreign: Array = []
 	var lvl_bad: Array = []
 	var levels: Array = a["levels"]
 	for i in lrows.size():
 		var r: Dictionary = lrows[i]
-		if not mods.has(String(r["id"])):
+		if not mods.has(String(r["id"])) and not removed_at_iz.has(String(r["id"])):
 			foreign.append(String(r["id"]))
 		if int(r["n_with_bargain"]) < 40:
 			thin.append("%s n=%s" % [r["modifier"], r["n_with_bargain"]])
@@ -379,6 +381,8 @@ func _s1_the_ladder() -> void:
 	var st := _doc("res://docs/state.md")
 	var missing: Array = []
 	for r in lrows:
+		if removed_at_iz.has(String(r["id"])):
+			continue
 		if not st.contains("| %s | %.3f" % [r["modifier"], float(r["reading"])]):
 			missing.append(String(r["modifier"]))
 	ok(missing.is_empty(), "§1: %d modifiers' readings are not the figures docs/state.md's grades table carries: %s" % [missing.size(), str(missing)])
@@ -409,10 +413,15 @@ func _s2_the_grades() -> void:
 	# readings); the ladder's `grade` column is the grade as it stood at IW, kept as the record.
 	var scaled := {}
 	# RE-POINTED AT IY §4: the measurement behind every grade is IY's grades table (the highest cost measured, test-bound).
-	for sr in _tsv("res://docs/reports/IY-grades.tsv", ["id", "grade"]):
+	# RE-POINTED AT IZ §2: it is IZ's since — the sharper reading of one population replaces the blunter (IZ §0.1) — and the two
+	# IZ removed are the ladder's record, not the deck's.
+	var removed_at_iz := ["dulledge", "tinderbox"]
+	for sr in _tsv("res://docs/reports/IZ-grades.tsv", ["id", "grade"]):
 		scaled[String(sr["id"])] = String(sr["grade"])
 	for r in lrows:
 		var id := String(r["id"])
+		if removed_at_iz.has(id):
+			continue
 		var sev := int((mods.get(id, {}) as Dictionary).get("severity", 0))
 		if not scaled.has(id) or sev != int(scaled[id]):
 			moved.append("%s carries severity %d, its measurement reads grade %s" % [r["modifier"], sev, scaled.get(id, "none")])
@@ -428,8 +437,13 @@ func _s2_the_grades() -> void:
 	var unnamed: Array = []
 	for r in lrows:
 		var id := String(r["id"])
+		if removed_at_iz.has(id):
+			continue
 		var kind := String(r["handle_kind"])
 		var handle := String(r["handle"])
+		# RE-POINTED AT IZ §4: Frenzied is re-keyed — the field its arm writes is the flat amount, `mod_speed_add`.
+		if id == "frenzied" and handle == "mod_speed_mult":
+			handle = "mod_speed_add"
 		if String(r["supported"]) == "no":
 			unsupported += 1
 			if kind == "":

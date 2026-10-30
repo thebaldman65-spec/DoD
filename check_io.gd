@@ -54,7 +54,9 @@ const GONE_WORDS := ["famine", "Famine", "cruel_order", "Cruel Order", "_pouch_s
 # RE-POINTED AT IY §2 and §4: the tally the grades hold — the test binds (a cost inside two standard errors has no severity),
 # the grade is the highest cost measured on any population (Deadened 3, Brittle 2), and the nine turned handles graded by
 # their own measurement (`docs/reports/IY-grades.tsv`).
-const GRADE_COUNTS := {1: 3, 2: 5, 3: 5, 4: 2, 5: 4}
+# RE-POINTED AT IZ §1–§5: the tally the grades hold since IZ — the sharper reading of one population replaces the blunter
+# (IZ §0.1), the reverts graded by their own old readings, Dull Edge removed (§3); `docs/reports/IZ-grades.tsv`.
+const GRADE_COUNTS := {1: 7, 2: 4, 3: 4, 4: 2, 5: 4}
 # §5 — the four glyphs, each meaning one thing (IE §0.1, II §0.4); a bargain's chip is none of them.
 const GLYPHS := ["◆", "↑", "✦", "○"]
 
@@ -195,7 +197,8 @@ func _floor_offer(floor_sev: int) -> Array:
 func _s1a_the_deck() -> void:
 	print("\n§1a — the deck re-cut to AQ's rule: three removed, one binds both sides, two new")
 	var mods: Dictionary = _run.MODIFIERS
-	ok(mods.size() == 23, "§1a: the deck holds %d modifiers — twenty, and three at severity 5" % mods.size())
+	# RE-POINTED AT IZ §3 and §5: Dull Edge and Tinderbox are removed, so the twenty are eighteen.
+	ok(mods.size() == 21, "§1a: the deck holds %d modifiers — twenty, and three at severity 5" % mods.size())
 	for id in GONE:
 		ok(not mods.has(id), "§1a: `%s` is still in the deck" % id)
 	for id2 in RECUT:

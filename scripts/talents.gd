@@ -548,7 +548,7 @@ const CONSUMED_FIELDS := {
 	"max_hp_pct": "consumed at the spawn: it is multiplied into maximum health and is not a field",
 	"attack": "consumed at the spawn and at every summon: the spawn scales it after the payloads, a companion copies it, and Whetstone writes it mid-fight",
 	"armor": "consumed at every summon: a companion copies it",
-	"crit_bonus": "consumed at every summon: a companion copies it, and a battle modifier floors it at the spawn",
+	"crit_bonus": "consumed at every summon: a companion copies it",
 	"speed": "consumed at the opening and at every summon: the first turn order is seeded from it, and a companion copies it",
 	"max_resource": "consumed at the spawn: it builds the resource bar, and every gain is clamped to it",
 	"iron_will_ranks": "consumed at the spawn: its chip is laid there, only when the figure is above nothing",

@@ -271,8 +271,8 @@ new block written here):
     *Append-only* for the same reason.
   - **THE REASON, RECORDED WITH THE RULE SO THE REBUILD IS NOT RE-PROPOSED AS A
     FIX.** `docs/build_docs.py` reads `docs/changelog.html` by relative name,
-    and that file is **the RECENT HALF only** — the changelog has been cut five
-    times (BZ at BO/BP, CX at CN/CO, DV at DF/DG, FG at EP/EQ, GZ at FS/FT) and everything
+    and that file is **the RECENT HALF only** — the changelog has been cut six
+    times (BZ at BO/BP, CX at CN/CO, DV at DF/DG, FG at EP/EQ, GZ at FS/FT, IZ at HR/HS) and everything
     older lives in `DoD-archive/changelog-archive.html`. **Rebuilding would
     overwrite `DoD Changelog.docx` with the recent half and drop the rest**,
     which is not a stale export becoming fresh; it is an archive being
@@ -1914,7 +1914,7 @@ decision and the STRUCTURE is what shipped.
   hardest rung dealt the mildest bargains), plus **FIXED ENCOUNTERS CARRY A MODIFIER**
   (`Run.arm_fixed_modifier`, armed at BOTH walk sites): the mini-boss and every boss, the nodes
   a route cannot duck. It is NOT a bargain — no offer, no choice, NO REWARD — **and it draws from
-  `Run.FIXED_MODIFIER_BAND`, the modifiers of severity 3–4 (eight until IX §3's scale, five at IX, seven since IY §4's grades), never from severity 5 (IN §1; CONFIRMED AT IO §0.4, the
+  `Run.FIXED_MODIFIER_BAND`, the modifiers of severity 3–4 (eight until IX §3's scale, five at IX, seven at IY §4's grades, six since IZ's), never from severity 5 (IN §1; CONFIRMED AT IO §0.4, the
   designer's)**: a modifier with no reward is not a bargain, so a severity 5 there would be pure difficulty with no
   twist bought — AQ's rule arriving by a different door. **Which eight is the grades'**: a re-grade moves the band's
   contents with it, and the batch that re-grades says what the fixed encounters draw after.
@@ -1972,8 +1972,9 @@ decision and the STRUCTURE is what shipped.
   costs, not how it reads — stands; the cut at fixed counts and the cliff three deep do not.
 · **A MODIFIER's SEVERITY IS WHAT IT COSTS THE REFERENCE PARTY's HEALTH AT A BARGAIN FIGHT's END, AGAINST THE SAME PARTY WITH NO
   MODIFIER (IX §3, the designer's).** In points of that party's maximum health:
-  no severity under 0.48; 1 to 1.70; 2 to 3.70; 3 to 6.88; 4 to 12.22; 5 from 12.22
-  — a grade of about 0.9, 2.5, 4.9, 8.8 and 15.6 or more, the costs of the levels it is cut between. **THE PARTY IS PART OF THE DEFINITION AND IS WRITTEN BESIDE THE SCALE
+  no severity under 0.48; 1 to 1.78; 2 to 3.74; 3 to 6.88; 4 to 12.22; 5 from 12.22
+  — a grade of about 1.0, 2.6, 4.9, 8.8 and 15.6 or more, the costs of the levels it is cut between (re-derived at IZ §1 on the
+  sharper readings, the bullet below). **THE PARTY IS PART OF THE DEFINITION AND IS WRITTEN BESIDE THE SCALE
   (IX §0.2)**: the sim's default party — the Berserker, the Cryomancer, the Devout and the Beastmaster — untalented, at Wanderer,
   the one candidate of nine whose crowd a screen could resolve (IW §1a). A grade is a cost on a named party, not a universal truth:
   a modifier whose cost swings by more than a band between parties carries that in its own words, where a player can see
@@ -2005,6 +2006,19 @@ decision and the STRUCTURE is what shipped.
   resolution. **No modifier's words carry the swing**: a modifier names its mechanic, and the player's knowledge of their own
   build does the rest; the swing is a fact about builds, recorded where the project needs it. The readings, both populations,
   every grade's source: `docs/reports/IY-grades.tsv` and IY's report §4.
+· **TWO READINGS OF THE SAME POPULATION ARE TWO ESTIMATES OF ONE FACT, AND THE SHARPER INSTRUMENT's REPLACES THE OTHER (IZ §0.1, the designer's).**
+  IY §0.3's *the higher cost* is about populations: two populations are two facts, and the grade takes the higher. **Keeping the
+  higher of two estimates of one fact is a bias, a ratchet every re-read could only raise**, so a re-measure on a sharper instrument
+  replaces the blunter reading of the same population, and a grade resting on a reading the sharper instrument has re-taken is
+  re-graded off it; the scale's derivation takes the sharper readings the same way and moves with them (`docs/reports/IZ-scale.tsv`).
+  **A MODIFIER KEYED ON SOMETHING ONLY SOME BUILDS DO IS GRADED ON A BUILD THAT DOES IT (IZ §0.3, the designer's)** — a Break rule on
+  the party whose plan is Break, a fire rule on the party whose strikes carry the most fire, the population derived and named —
+  **AND ONE THAT KEYS ON SOMETHING EVERY BUILD DOES AND STILL COSTS NOTHING HAS NO REACH, AND LEAVES THE DECK**, removed, not disabled,
+  on the Hungering Dark's standard, its built shape and the reading that removed it kept in `docs/design-notes.md`.
+  **A HANDLE WORTH 0.15 POINTS PER TEN POINTS OF ITS QUANTITY CANNOT CARRY A BARGAIN, AND CRIT IS A QUANTITY EVERY BUILD MAKES, SO NO POPULATION SAVES IT**
+  — Dull Edge, the worked example; Tinderbox left by the rule's stop condition, costing nothing even on the party whose strikes carry
+  the most fire. **So the deck holds no free modifier**: *a modifier that costs nothing has no severity* (above) binds the next one
+  authored, until the population its rule names grades it or it leaves. Every grade's readings and source: `docs/reports/IZ-grades.tsv`.
 · **THE BOT's ALLY POOLS ARE A KNOWN CONSTANT BIAS. THE BATCH THAT CHANGES THEM RE-MEASURES THE LADDER IN THE SAME BATCH, OR IT
   RETIRES THE LADDER (IS §4, the designer's).** Every bot ally pool is heroes-only where the player's picker admits a companion
   (`battle._bot_drafted_pick`, `_bot_class_kit_pick`, `_autoplay_pick_kit`), and every grade, band and band's mean above was
@@ -5077,8 +5091,8 @@ Chilled.** The difference is not size and it is not confidence:
   `check_du` §1 and §2 measure the ratios on forty seeded blows every battery run — 1.0000 before,
   0.7501 after for Cripple — because a gate that asserted the READ SITE EXISTS would have passed on
   every one of the nine statuses DT measured attaching and paying nothing.
-· **AND AN EFFECT CAN BE INERT TWICE OVER.** Typed relic damage CAN be written onto a companion,
-  and is still deliberately unread: **a companion's blow carries no damage type at all**, so the
+· **AND AN EFFECT CAN BE INERT TWICE OVER.** Typed damage could be written onto a companion — the Tinderbox bargain
+  wrote it until IZ §5 removed it, and nothing does now — and is still deliberately unread: **a companion's blow carries no damage type at all**, so the
   read would find nothing to apply. Fixing half of that would read as working while paying exactly
   what it pays now.
 

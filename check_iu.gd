@@ -606,8 +606,13 @@ func _s7_the_bare_probe() -> void:
 	ok(int(r_repo[0]) == 1 and String(r_repo[1]).contains("lives in the repository") and not DirAccess.dir_exists_absolute(base + "/inrepo"),
 		"§7: a probe holding a file of the repository was not refused: exit %d, '%s'" % [int(r_repo[0]), r_repo[1]])
 	var copy := base + "/copy_of_unit.gd"
+	# RE-POINTED AT IZ: the copy is of the file AS THE REPOSITORY TRACKS IT — the index's blob, which is what `lane.sh` compares
+	# against — never the working tree's, which differs from it whenever a batch has edited `unit.gd` and not committed: IZ
+	# re-keyed Frenzied there, and the arm read red on every tree carrying the edit, a copy of nothing the repository tracks.
+	var blob: Array = []
+	OS.execute("/usr/bin/git", PackedStringArray(["-C", ProjectSettings.globalize_path("res://"), "show", ":scripts/unit.gd"]), blob, false)
 	var g := FileAccess.open(copy, FileAccess.WRITE)
-	g.store_buffer(FileAccess.get_file_as_bytes("res://scripts/unit.gd"))
+	g.store_string(String(blob[0]) if blob.size() > 0 else "")
 	g.close()
 	var r_copy: Array = _driver(["probe", base + "/copy", "IU refused", copy])
 	ok(int(r_copy[0]) == 1 and String(r_copy[1]).contains("is a copy of a file the repository tracks"),

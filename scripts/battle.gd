@@ -2197,7 +2197,7 @@ func _spawn_units() -> void:
 	# stat. Every reschedule site in this file has always divided by
 	# effective_speed() — so Chilled, Slowed and Quick Draw have always bent
 	# the timeline — but this one line read `u.speed`, which meant the two
-	# modifiers stamped immediately above it (Frenzied's mod_speed_mult and
+	# modifiers stamped immediately above it (Frenzied's mod_speed_add and
 	# Hoarfrost's three stacks of Chilled) did nothing to the FIRST turn
 	# order, exactly what the comment on _apply_battle_modifier promised they
 	# would. The divisor is floored because a modifier is allowed to stack
@@ -2331,7 +2331,7 @@ func _stamp_fk_enemy_runes() -> void:
 # to be on the board before `next_time` is seeded off effective speed, or the
 # first turn order would be the unmodified one. That claim was FALSE from AN
 # until Batch AS — the roll read the raw `speed` stat, so neither Frenzied
-# (mod_speed_mult) nor Hoarfrost (Chilled) reached it. Both live in
+# (mod_speed_add) nor Hoarfrost (Chilled) reached it. Both live in
 # effective_speed(), which the seed now calls.
 func _apply_battle_modifier() -> void:
 	var mod_id := _active_modifier()
@@ -2355,10 +2355,10 @@ func _active_modifier() -> String:
 	return mod_id if Run.MODIFIERS.has(mod_id) else ""
 
 
-# ONE list of twenty, one branch each (AQ's nineteen plus Rot, reinstated by
-# BB §5). `inherited` is true for a companion
-# summoned mid-battle (§4): it arrives carrying its hunter's Attack and crit
-# ALREADY modified, so the two branches that write those must not fire again.
+# ONE branch for each modifier of `Run.MODIFIERS` (AQ's nineteen were the first, Rot
+# reinstated by BB §5). `inherited` is true for a companion
+# summoned mid-battle (§4): it arrives carrying its hunter's Attack ALREADY
+# modified, so the branches that write it must not fire again.
 # Everything else has to be stamped or the beast is the one unit on the field
 # the bargain does not bind.
 func _stamp_modifier(u: BattleUnit, mod_id: String, inherited := false) -> void:
@@ -2369,12 +2369,8 @@ func _stamp_modifier(u: BattleUnit, mod_id: String, inherited := false) -> void:
 			# never healed up to 70% by a modifier that only ever takes.
 			u.hp = maxi(mini(u.hp, int(round(u.max_hp * 0.7))), 1)
 			u.refresh_bars()
-		"tinderbox":
-			# The existing typed-damage hook the Emberheart relic uses.
-			u.type_dmg_bonus["fire"] = \
-				float(u.type_dmg_bonus.get("fire", 0.0)) + Run.TINDERBOX_FIRE_PCT
 		"frenzied":
-			u.mod_speed_mult = Run.FRENZIED_SPEED
+			u.mod_speed_add = Run.FRENZIED_SPEED_ADD
 		"brittle":
 			u.mod_ignore_armor = true
 		"warded":
@@ -2396,11 +2392,6 @@ func _stamp_modifier(u: BattleUnit, mod_id: String, inherited := false) -> void:
 		"slick":
 			for ab in u.abilities:
 				ab.delay += Run.SLICK_DELAY
-		"dulledge":
-			# Floored so a unit's TOTAL crit chance (CRIT_CHANCE + bonus)
-			# can never go under zero — several read sites add the two.
-			if not inherited:
-				u.crit_bonus = maxf(u.crit_bonus - Run.DULL_EDGE_CRIT, -CRIT_CHANCE)
 		"muffled":
 			u.mod_bd_mult = Run.MUFFLED_BD_PCT
 		"hoarfrost":
@@ -25666,8 +25657,8 @@ func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null,
 	# only unit on the field the modifier did not bind. It sits beside the
 	# armor / Stability / crit copies above because those are the existing
 	# precedent for "inherit the state of the fight". `inherited` is true: the
-	# Attack and crit it just copied off the hunter already carry Feverish and
-	# Dull Edge, and stamping those twice would double them.
+	# Attack it just copied off the hunter already carries Feverish or the Thin
+	# Veil, and stamping it twice would double it.
 	var comp_mod := _active_modifier()
 	if comp_mod != "":
 		_stamp_modifier(comp, comp_mod, true)
@@ -26084,7 +26075,8 @@ func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int,
 	# reachable, which would be authoring rather than repair.
 	#
 	# `type_dmg_bonus` IS DELIBERATELY NOT READ, AND IT IS INERT TWICE OVER. The
-	# Tinderbox modifier really can write a fire bonus onto a companion, but a
+	# Tinderbox modifier could write a fire bonus onto a companion until IZ §5
+	# removed it, and nothing does now; and a
 	# companion's blow carries no damage type at all — see the flat physical
 	# resist read below — so the term would find nothing to apply to. Fixing
 	# half of that would read as working while paying exactly what it pays now.

@@ -288,9 +288,13 @@ func _live(scene: Node) -> void:
 	print("\n§4 — typed relic damage is inert TWICE OVER and is not read")
 	comp.statuses.clear()
 	comp.type_dmg_bonus = {}
+	# RE-POINTED AT IZ §5: Tinderbox — the bargain that wrote a fire bonus onto a companion — is removed, so §4's first half (a
+	# companion CAN be given one) has no writer in the game; the bonus is written by hand as it wrote it, and the arm below still
+	# drives the second half, the one that holds: a companion's blow carries no damage type.
 	scene._stamp_modifier(comp, "tinderbox")
-	ok(not comp.type_dmg_bonus.is_empty(),
-		"the kindling bargain no longer writes a typed bonus onto a companion — §4's first half is stale")
+	ok(comp.type_dmg_bonus.is_empty(),
+		"a removed bargain still writes a typed bonus onto a companion — Tinderbox's branch is back in the stamp")
+	comp.type_dmg_bonus = {"fire": 0.75}
 	print("  a companion CAN be given %s" % str(comp.type_dmg_bonus))
 	var tind := await _blows(scene, comp, foe)
 	ok(tind == plain,

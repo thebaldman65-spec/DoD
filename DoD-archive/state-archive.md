@@ -17,6 +17,122 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT IZ — 2026-10-27, FROM `docs/state.md` AS IT LEFT IT (`5f22c19`)
+
+**What came here**: IY's four rulings, all answered in IZ's brief; THE BARGAIN DECK's GRADES as IY left it — its seeding, its nine slopes, its reach test, its sweep, its bands and its swing, superseded by IZ's grades; FOUND AT IY's five closed items; FOUND AT IX's glossary item; and the roadmap's item that the placing waited on IY's rulings. Each word for word, under the heading it stood under.
+
+
+### ~~IY's RULINGS OWED~~ — **ALL FOUR ANSWERED IN IZ's BRIEF (1: the placing waits on the re-reads — Bloodletting back at 15, and Slick Footing and Fleeting, which §1 found never free, back too, IZ §0.2 and §2; 2: three problems, not one — Frenzied re-keyed to an amount, Dull Edge removed, Muffled and Tinderbox read on the populations their rules name and Tinderbox removed, IZ §0.3 and §3–§5; 3: the sharper reading of one population replaces the blunter, IZ §0.1; 4: Warden's band measured both ways and kept, the finding priced, IZ §0.4)** — was: **FOUR; THE NINE ARE PLACED BY THE DESIGNER AGAINST THEIR SLOPES, AND FOUR HANDLES COST THIS PARTY NOTHING AT THE VALUES TRIED**
+
+Full working: `docs/reports/IY.md`, NEEDS A RULING.
+
+1. **THE PLACING — THE NINE AGAINST THEIR SLOPES (IY §0.2: the placing is the designer's).** At IY's values the deck holds none 4; 1 3; 2 5; 3 5; 4 2; 5 4, against the target 5 / 5 / 5 / 4 / 4. What each slope gives (THE BARGAIN DECK's GRADES, the slopes' table): **Bloodletting overshot to a 3** (+4.37 ± 0.49 at 45) — grade 2's centre at about 29 Bleed, and **at its old 15 this instrument reads it +0.80 ± 0.30, a 1** (IY's control C02d, z 2.65: a cost IX's instrument could not resolve); **Fleeting** (+1.63 ± 0.42 at 2) reaches 2.48 at about 2.7 turns, so 3; **Parched is at its floor** (+1.90 ± 0.40 with no resource at all) — a 2 below the centre, and no value goes further; **Hoarfrost and Slick Footing are 1s** (+1.03 ± 0.29 and +0.98 ± 0.32) — Hoarfrost saturates where the Chilled outlasts the fight, and Slick's slope (0.23 points an initiative) puts 2.48 past +8, no value a deck would use.
+2. **FOUR HANDLES COST THE REFERENCE PARTY NOTHING — TWO DRIVEN TO THEIR EXTREME, TWO ARGUED, NOT DRIVEN — AND THEIR RULES MAY WANT RE-KEYING (IY §3: the re-key is the designer's).** DRIVEN: **Frenzied** — a speed-up on every unit rescales the timeline: +0.13 ± 0.06 at 1.3, a cost under the first cut, and none at 3.0 (§3's reach arm: no reach). **Dull Edge** — at its floor, every unit's base crit gone (no value goes further), it PAYS the party (-0.54 ± 0.24): the warband's crits cost the party more than its own pay it. ARGUED, NOT DRIVEN to an extreme: **Tinderbox** — -0.02 ± 0.14 at +75%, a slope of 0.04 points per unit of the bonus: the reference party deals almost no fire. **Muffled** — -0.24 ± 0.22 at half the Break damage, and bounded above, by its rule, by Deadened's 0.54 on this party (no Break at all); the incumbent, whose plan is Break, is where Break-keyed modifiers cost (Deadened 5.23 there).
+3. **ONE POPULATION, TWO READINGS — WHICH DOES A GRADE TAKE?** On IY's sharper instrument Encumbered reads +0.74 ± 0.32 (a 1 by the arithmetic, past the test) where IX's run-seeded reading was 1.72 ± 0.74 (a 2); the two are a tie with each other. **§0.3's rule keeps the higher, so it stands at 2.** Whether a re-measure on a sharper instrument replaces a reading of the same population, or joins it as §0.3's *any population* does, is the designer's.
+4. **WARDEN's GAMBLE BAND STILL HOLDS TWO — Rot and Overgrown (IY §5, the finding again, with its batch).** §2 filled grade 1 and grade 2 and moved Bloodletting into 3, and grade 4 is untouched, so every Warden offer's gambles are still that pair. **The band moves in the batch that can measure what moving it does** (IY §0.4): the bargain-fight endings under a band change, a figure that does not exist yet.
+
+### ~~THE BARGAIN DECK's GRADES~~ — **SUPERSEDED AT IZ (the sharper reading of one population replaces the blunter, IZ §0.1; the placing, Frenzied's re-key and two removals, IZ §2–§5 — THE BARGAIN DECK's GRADES in `docs/state.md`)** — was: **THE TEST BINDS AND A GRADE IS THE HIGHEST COST MEASURED, SINCE IY; FOUR CARRY NO SEVERITY, NINE HANDLES WERE TURNED AND THE INSTRUMENT HALVED ITS ERROR**
+
+**THE MODIFIERS THAT COST NOTHING ARE THE WORK; THE REST ARE A SCALE, NOT A RE-CUT (IX §0.1, the designer's).** IW's ladder showed the deck's costs a step a little under double the last above its cheapest level; so a grade is a band of cost, and only the ones with no cost to band are design work.
+
+**THE SCALE (IX §3; the rule is `CLAUDE.md`'s ladder block, and the comment above `Run.MODIFIERS` states it too).** What a modifier costs the reference party's health at a bargain fight's end, against the same party with no modifier, in points of its maximum health: **no severity under 0.48; 1 to 1.70; 2 to 3.70; 3 to 6.88; 4 to 12.22; 5 from 12.22**, centred at **0.93 / 2.48 / 4.92 / 8.84 / 15.59 or more**. **The reference party**: the sim's default four — the Berserker, the Cryomancer, the Devout and the Beastmaster — untalented, at Wanderer, seed block 38. **A GRADE's BAND MUST BE WIDER THAN THE INSTRUMENT THAT SETS IT (IY §0.1, the designer's)**: a cost inside two of its paired standard errors is no cost and carries no severity, so the test binds, not the arithmetic. **THE GRADE IS THE HIGHEST COST MEASURED, ON ANY POPULATION (IY §0.3)** — the default four's or the talented incumbent's, each test-bound, and only a reading of the modifier as it stands — and every row of `Run.MODIFIERS` names the population and the batch its grade came from (`graded`).
+
+**THE INSTRUMENT, SHARPENED (IY §1).** The sim seeds every node it steps onto and every won fight's spoils off the run's seed (`DOD_SIM_FIGHT_SEED=38`), so two arms' fights at one node draw the same dice until a branch parts them: **Encumbered's paired error fell from IX's 0.74 to 0.32 points — ratio 0.554 of the unpaired** (IX 0.941; IX's median 0.91) — and Frenzied's to 0.05 (ratio 0.084). Both costs held to IX's as ties (z -1.22 and -0.41), and so did the baseline. **At sixty runs two standard errors of a paired cost are now about 0.6 points**, where they were 1.3 — so a severity 1 (0.93) reads.
+
+**THE BASELINE IS AN ARM (IX §1).** Run-seeded, IX's *none* arm read **0.944 ± 0.005** (0.943863 ± 0.004887), 60 runs of block 38, 718 bargain fights read by node, IW's deck. Fight-seeded on IY's §2 deck it reads **0.934 ± 0.005** (60 runs, 708 bargain fights) and on HEAD's deck 0.938 ± 0.004 (§1) — each a tie with the last. Every arm is paired against its own deck's baseline.
+
+**TURNING NINE HANDLES TO ONE TARGET MEASURES NINE SLOPES (IY §0.2, the designer's).** Each of IX's nine free modifiers turned toward grade 2's centre (2.48 points) by a step its own arithmetic gives — every one read inside two standard errors at IX, so none had a slope to scale from — and measured: sixty runs, fight-seeded, paired against the re-driven baseline. **The placing in a band is the designer's against these slopes** (IY's RULINGS OWED). Each one's handle is a `Run` constant now.
+
+| modifier — old → new | the rule | IX's cost | the new cost | z | the slope (points a unit) | grade |
+|---|---|---|---|---|---|---|
+| Dull Edge — 0.05 → 0.1 | a reduction doubled, to its floor | -0.61 ± 0.53 | **-0.54 ± 0.24** | -2.22 | 1.452 | **—** |
+| Parched — 0.5 → 0.0 | the share's reduction doubled | -0.14 ± 0.55 | **+1.90 ± 0.40** | +4.80 | -4.070 | **2** |
+| Tinderbox — 0.25 → 0.75 | a bonus trebled | -0.04 ± 0.37 | **-0.02 ± 0.14** | -0.14 | 0.039 | **—** |
+| Frenzied — 1.3 → 1.3 | no reach: not turned | +0.05 ± 0.24 | **+0.13 ± 0.06** | +2.20 | - | **—** |
+| Muffled — 75 → 50 | the share's reduction doubled | +0.09 ± 0.67 | **-0.24 ± 0.22** | -1.07 | 0.013 | **—** |
+| Fleeting — 1 → 2 | a reduction doubled | +0.41 ± 0.62 | **+1.63 ± 0.42** | +3.89 | 1.225 | **1** |
+| Hoarfrost — 3 → 9 | derived against the reach test: the fight's length | +0.51 ± 0.60 | **+1.03 ± 0.29** | +3.62 | 0.087 | **1** |
+| Slick Footing — 0.5 → 1.5 | a bonus trebled | +0.75 ± 0.71 | **+0.98 ± 0.32** | +3.11 | 0.226 | **1** |
+| Bloodletting — 15 → 45 | a bonus trebled | +0.87 ± 0.65 | **+4.37 ± 0.49** | +8.84 | 0.117 | **3** |
+
+**THE REACH TEST (IY §3).** Each tempo handle taken far past any value the deck would use, sixty runs, paired, the healing read in the same arm:
+- **Frenzied at 3.0: no reach** — -0.27 ± 0.15 points (z -1.80); the party's healing a bargain fight +0.1 ± 2.7 (z +0.04), its length +0.04 ± 0.09 hero turns.
+- **Hoarfrost at 99: reach** — +0.68 ± 0.26 points (z +2.62); the party's healing a bargain fight -29.3 ± 5.8 (z -5.11), its length -1.04 ± 0.22 hero turns.
+- **A HANDLE WITH NO REACH CANNOT BE TURNED INTO A COST AT ANY VALUE**: Frenzied multiplies every unit's speed, which rescales the timeline and moves no turn's order, so its rule wants re-keying, not its number; Hoarfrost's reach ends where the Chilled outlasts the fight (about 8.62 of a hero's own turns), so its whole range is a severity 1 at most. **IX's absorption reading is not confirmed**: on the two-sided arms the healing moved with the cost or not at all.
+
+**EVERY GRADE (IY §4): THE HIGHER OF TWO READINGS, TEST-BOUND.** The sweep — of IX's reading (the default four) and IV's (the incumbent: IG's three parties, all nodes, Ruin), which costs the more:
+
+| modifier | IW's reading | the default four's cost (IX) | the incumbent's (IV) | the higher | the reading graded | **grade** | its population and batch |
+|---|---|---|---|---|---|---|---|
+| Dull Edge | 0.950 | -0.61 | -1.09 (z -1.99) | reference | IY §2 -0.54 (z -2.22) | **—** | the default four — IY §2 |
+| Parched | 0.945 | -0.14 | +0.40 (z +0.60) | incumbent | IY §2 +1.90 (z +4.80) | **2** | the default four — IY §2 |
+| Tinderbox | 0.944 | -0.04 | -0.45 (z -0.89) | reference | IY §2 -0.02 (z -0.14) | **—** | the default four — IY §2 |
+| Frenzied | 0.943 | +0.05 | -0.55 (z -2.62) | reference | IY §2 +0.13 (z +2.20) | **—** | the default four — IY §2 |
+| Muffled | 0.943 | +0.09 | -0.28 (z -0.48) | reference | IY §2 -0.24 (z -1.07) | **—** | the default four — IY §2 |
+| Fleeting | 0.940 | +0.41 | +0.15 (z +0.24) | reference | IY §2 +1.63 (z +3.89) | **1** | the default four — IY §2 |
+| Hoarfrost | 0.939 | +0.51 | -0.88 (z -1.51) | reference | IY §2 +1.03 (z +3.62) | **1** | the default four — IY §2 |
+| Deadened | 0.938 | +0.54 | +5.23 (z +5.71) | incumbent | IV +5.23 (z +5.71) | **3** | the incumbent — IV, graded at IY §4 |
+| Brittle | 0.936 | +0.75 | +3.34 (z +3.75) | incumbent | IV +3.34 (z +3.75) | **2** | the incumbent — IV, graded at IY §4 |
+| Slick Footing | 0.936 | +0.75 | -0.38 (z -0.66) | reference | IY §2 +0.98 (z +3.11) | **1** | the default four — IY §2 |
+| Bloodletting | 0.935 | +0.87 | -0.54 (z -0.84) | reference | IY §2 +4.37 (z +8.84) | **3** | the default four — IY §2 |
+| Encumbered | 0.927 | +1.72 | +0.04 (z +0.07) | reference | IX +1.72 (z +2.32) | **2** | the default four — IW, graded at IX §3 |
+| Feverish | 0.920 | +2.42 | +2.42 (z +3.72) | reference | IX +2.42 (z +3.23) | **2** | the default four — IW, graded at IX §3 |
+| Warded | 0.918 | +2.54 | +0.21 (z +0.40) | reference | IX +2.54 (z +2.90) | **2** | the default four — IW, graded at IX §3 |
+| The Thin Veil | 0.896 | +4.75 | +4.85 (z +5.98) | incumbent | IV +4.85 (z +5.98) | **3** | the incumbent — IV, graded at IY §4 |
+| The Long Silence | 0.895 | +4.88 | +2.13 (z +3.51) | reference | IX +4.88 (z +8.76) | **3** | the default four — IW, graded at IX §3 |
+| Miasma | 0.892 | +5.14 | +5.46 (z +7.03) | incumbent | IV +5.46 (z +7.03) | **3** | the incumbent — IV, graded at IY §4 |
+| Rot | 0.857 | +8.66 | +3.40 (z +4.92) | reference | IX +8.66 (z +10.43) | **4** | the default four — IW, graded at IX §3 |
+| Overgrown | 0.854 | +9.03 | +10.54 (z +9.48) | incumbent | IV +10.54 (z +9.48) | **4** | the incumbent — IV, graded at IY §4 |
+| Mirrorbound | 0.788 | +15.59 | +25.72 (z +15.49) | incumbent | IV +25.72 (z +15.49) | **5** | the incumbent — IV, graded at IY §4 |
+| Thin Air | 0.734 | +21.03 | +2.31 (z +3.12) | reference | IX +21.03 (z +15.21) | **5** | the default four — IW, graded at IX §3 |
+| Bloodless | 0.702 | +24.22 | +21.26 (z +17.89) | reference | IX +24.22 (z +23.70) | **5** | the default four — IW, graded at IX §3 |
+| Wasting | 0.579 | +36.53 | +26.26 (z +15.78) | reference | IX +36.53 (z +24.14) | **5** | the default four — IW, graded at IX §3 |
+
+- **THE SWEEP, ONE LINE EACH**: Dull Edge — the reference is the higher; Parched — the incumbent is the higher; Tinderbox — the reference is the higher; Frenzied — the reference is the higher; Muffled — the reference is the higher; Fleeting — the reference is the higher; Hoarfrost — the reference is the higher; Deadened — the incumbent is the higher; Brittle — the incumbent is the higher; Slick Footing — the reference is the higher; Bloodletting — the reference is the higher; Encumbered — the reference is the higher; Feverish — the reference is the higher; Warded — the reference is the higher; The Thin Veil — the incumbent is the higher; The Long Silence — the reference is the higher; Miasma — the incumbent is the higher; Rot — the reference is the higher; Overgrown — the incumbent is the higher; Mirrorbound — the incumbent is the higher; Thin Air — the reference is the higher; Bloodless — the reference is the higher; Wasting — the reference is the higher. **7 read higher on the incumbent** (Parched, Deadened, Brittle, The Thin Veil, Miasma, Overgrown, Mirrorbound); of them **Deadened and Brittle alone stand in a higher band there**, and take their grades from it — Deadened 3 (5.23 points, z 5.71) and Brittle 2 (3.34, z 3.75); the rest share a band with the default four, so the grade does not move, and the swinging modifiers but those two read higher on the default four, as the brief said. A handle that moved since IV measured another modifier, so its incumbent reading is set aside.
+- **THE GRADES HOLD** none 4; 1 3; 2 5; 3 5; 4 2; 5 4.
+
+**THE BANDS, READ AND NOT RE-SET (IY §5, IX's RULINGS OWED 4 answered by the measurement or not).** Wanderer's safe band (1–2) holds 8; Wanderer's gamble band (3–4) holds 7; Warden's safe band (1–3) holds 13; Warden's gamble band (4–4) holds 2; Ruin's safe band (3–4) holds 7; Ruin's gamble band (5–5) holds 4; Ruin's fixed encounters draw from the 7 of severity 3–4. **Warden's gamble band holds 2 — Rot, Overgrown.**
+
+**THE SWING BETWEEN THESE TWO (IX §4).** Banded on the scale without the test, as IX read it: Thin Air swings 3 bands (5 against 2); Deadened swings 2 bands (1 against 3); Encumbered swings 2 bands (2 against —); Rot swings 2 bands (4 against 2); Warded swings 2 bands (2 against —). **Two populations, two readings each, not a range across builds: the swing between these two.** Its words are not rewritten (IY §0.3): the grade takes the higher cost instead.
+
+**WHY IX's SEVEN WERE FREE (IX §2), ONE LINE EACH**: Dull Edge — the magnitude is too small; Parched — the magnitude is too small; Tinderbox — the magnitude is too small; Frenzied — the magnitude is too small; Muffled — the magnitude is too small; Fleeting — the magnitude is too small; Hoarfrost — the magnitude is too small. Their one-sided table is IX's (`docs/reports/IX-onesided.tsv`).
+
+**WHAT THE GRADES ARE, SAID WHERE THEY ARE READ.** One party's, or the incumbent's where it pays more, through the bot — which books 2.2 times a player's status events (THE FIRST CLEAN PLAYTHROUGH) and whose ally pools are heroes-only (a constant bias every figure here was taken through, IS §4). Every figure: `docs/reports/IY-seeding.tsv`, `IY-reach.tsv`, `IY-handles.tsv` and `IY-grades.tsv`; IX's scale and arms, `docs/reports/IX-scale.tsv`, `IX-onesided.tsv` and `IX-swing.tsv`.
+
+### FOUND AT IY AND NOT FIXED — ITS CLOSED ITEMS (archived at IZ; the block stays in `docs/state.md`)
+
+- **THE SHARPER INSTRUMENT MAKES SMALL COSTS SIGNIFICANT, AND THE SCALE's FIRST CUT IS WHAT KEEPS THEM UNGRADED**: Frenzied costs +0.13 ± 0.06 at 1.3 (z +2.20) — a cost past the test and under 0.48, so no severity. The test and the cut now each do a job: the test says whether a cost is there, the cut whether it is a grade's.
+
+*Overtaken at IZ §4: Frenzied's multiplication is re-keyed to an amount whose subtraction costs a grade 1, and no modifier on IZ's deck reads past the test and under the first cut.*
+
+- **FRENZIED PAYS THE TALENTED INCUMBENT** (IV's reading, -0.55, z -2.62): the one modifier whose reading on any population is a gift past two standard errors besides Dull Edge at its floor (-0.54 ± 0.24 on the default four). IX's *pays the party* was a verdict the reference party's headroom could barely give (FOUND AT IX); the incumbent can.
+
+*Overtaken at IZ §4: the reading measured the multiplication, which IZ re-keyed; the subtraction that shipped was read on the default four.*
+
+- **THE CHANGELOG NEARS ITS THRESHOLD** (the close-read's one block that bore): `docs/changelog.html` stood at 387,694 B of the 400,000 `check_fg` §1 reads, before IY's entry; the next batch's entry will likely cross it, and a cut is owed then (CW §4's procedure, the changelog block below).
+
+*Taken at IZ §6: cut at HR/HS by CW §4's procedure, a batch before the bar — the live file 142,566 B before IZ's entry.*
+
+- **A COST THE OLD INSTRUMENT COULD NOT SEE IS ONE THE NEW ONE DOES** (IY's control C02d): Bloodletting put back at its old 15 on IY's deck reads +0.80 ± 0.30 (z 2.65) — a tie with IX's +0.87 ± 0.65, which sat inside IX's noise. So §0.1's *no severity* for the three IX read inside two standard errors (Hoarfrost, Slick Footing, Bloodletting) was the old instrument's reach, not their cost; IY measured the nine at their new values only, and the old values' grades on this instrument are not taken.
+
+*Answered at IZ §1: the old values re-read on the sharper instrument — four of IX's eleven free were under the old instrument's reach — and the reverts placed at IZ §2.*
+
+- **A BRIEF's *SEVEN OF THE NINE* WAS ALL NINE**: every one of IX's nine free modifiers read inside two standard errors (IY's report §0).
+
+*A record that asks nothing, archived at IZ.*
+
+### FOUND AT IX AND NOT FIXED — ITS CLOSED ITEM (archived at IZ; the block stays in `docs/state.md`)
+
+- **THE GLOSSARY's *Every modifier carries a severity of 1 to 5*** stays true of every modifier a rung deals; six in the table carry none and are dealt by none. The designer's words.
+
+*True of every modifier since IZ: each carries a severity of 1 to 5 (IZ §2–§5).*
+
+### THE PLAYTEST'S OTHER FINDINGS — **LATER BATCHES BY RULING (HW's brief §5); THE ROADMAP HOLDS THE ORDER** — ITS CLOSED ITEMS (archived at IZ; the section stays in `docs/state.md`)
+
+- **THE INSTRUMENT IS SHARPENED AND NINE HANDLES WERE TURNED (IY)**: the sim seeds each fight off its run (two standard errors of a paired cost about 0.6 points, where they were 1.3), the test binds and a grade is the highest cost measured on any population, and the nine free modifiers' handles were each turned and measured — five cost something now (THE BARGAIN DECK's GRADES). **The placing against the slopes is the designer's** (IY's RULINGS OWED 1), four rules want re-keying (2), and Warden's band waits for the measurement of a band change (4).
+
+*Answered in IZ's brief and built at IZ (the placing, Frenzied's re-key, two removals); IZ's item in its place.*
+
 ## ARCHIVED AT IY — 2026-10-26, FROM `docs/state.md` AS IT LEFT IT (`fa24c3b`)
 
 **What came here**: IX's five rulings, all answered in IY's brief; THE BARGAIN DECK's GRADES as IX left it — IX's scale table, its re-grade, its bands and its one-sided table, superseded by IY's grades; FOUND AT IX's pairing item, built at IY §1; and the roadmap's item that the free modifiers wait on IX's rulings. Each word for word, under the heading it stood under.

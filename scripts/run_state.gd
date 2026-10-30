@@ -4275,7 +4275,7 @@ func _array_or_empty(v: Variant) -> Array:
 # **A KEY THAT COMES OFF A SAVE IS A KEY THE CODE DID NOT CHOOSE.** A bargain's offer
 # is rolled once for its encounter and saved with it (GF), so a save frozen on the offer
 # screen carries three modifier ids from the deck it was rolled against — and a removal
-# since (Famine and Cruel Order at IO, the Hungering Dark at IP) leaves an id the deck
+# since (Famine and Cruel Order at IO, the Hungering Dark at IP, Dull Edge and Tinderbox at IZ) leaves an id the deck
 # no longer holds, which the offer screen read straight into `MODIFIERS`.
 # - **An option naming an id the deck does not hold is DROPPED**; the offer is dealt one
 #   fewer, and the next save writes the repair back.
@@ -4997,9 +4997,11 @@ func bomb_damage() -> int:
 # rank and IO's counts above.** A modifier's severity is what it costs THE REFERENCE PARTY's health at a bargain fight's
 # end, against the same party with no modifier. **The reference party: the sim's default party — the Berserker, the
 # Cryomancer, the Devout and the Beastmaster — untalented, at Wanderer (IX §0.2).** In points of that party's maximum
-# health: **no severity under 0.48; 1 to 1.70; 2 to 3.70; 3 to 6.88; 4 to 12.22; 5 from 12.22** — the cuts are the
+# health: **no severity under 0.48; 1 to 1.78; 2 to 3.74; 3 to 6.88; 4 to 12.22; 5 from 12.22** — the cuts are the
 # midpoints between the costs of IW's eight levels against the *none* arm (IX §3's derivation, off
-# `docs/reports/IW-ladder.tsv`), and each row's grade falls out of its own reading by arithmetic, so the counts move with
+# `docs/reports/IW-ladder.tsv`; re-derived at IZ §1 with ten of the levels' twenty-three readings replaced by sharper
+# readings of the same population, `docs/reports/IZ-scale.tsv`), and each row's grade falls out of its own reading by
+# arithmetic, so the counts move with
 # the costs. **A modifier that costs nothing has no severity (`"severity": 0`)**: no band reaches it, so no rung deals it
 # and no fixed encounter draws it until it is re-authored. Every figure, every cost and the derivation printed:
 # `docs/reports/IX-scale.tsv` and IX's report, §3.
@@ -5012,6 +5014,13 @@ func bomb_damage() -> int:
 # the reference party's or the incumbent's, each paired against its own *none* arm — so a modifier that costs the talented
 # incumbent more is graded by the incumbent. **Every row names the population and the batch its grade came from**
 # (`graded`), which the scale now requires of every grade. Every reading, both populations: `docs/reports/IY-grades.tsv`.
+# **BATCH IZ §0.1 — THE SHARPER READING OF ONE POPULATION REPLACES THE BLUNTER (the designer's).** Two readings of different
+# populations are two facts and the grade takes the higher; two readings of the SAME population are two estimates of one fact,
+# and the sharper instrument's replaces the other — keeping the higher of two estimates is a bias, a ratchet on every re-read.
+# **AND A MODIFIER KEYED ON SOMETHING ONLY SOME BUILDS DO IS GRADED ON A BUILD THAT DOES IT; ONE KEYED ON SOMETHING EVERY
+# BUILD DOES THAT STILL COSTS NOTHING HAS NO REACH AND LEAVES THE DECK (IZ §0.3)** — Dull Edge left at IZ §3, and Tinderbox
+# at IZ §5, read on the party whose strikes carry the most fire and costing it nothing. Every grade's
+# reading since IZ: `docs/reports/IZ-grades.tsv`.
 #
 # SEVERITY 4 IS FOUR AGAIN (Batch BB §5). `rot` — maximum health halved for
 # everyone — was authored by AQ, implemented, and DROPPED there: the battle-end
@@ -5052,29 +5061,26 @@ func bomb_damage() -> int:
 #                   and the enemy's re-validation; a unit's basic attack is exempt
 const WASTING_PCT := 0.08
 const THIN_VEIL_PCT := 0.5
-# BATCH IY §2 — THE NINE HANDLES THAT COST NOTHING, EACH A CONSTANT (IU §0.4: a figure a batch re-tunes gets a
+# BATCH IY §2 — THE NINE HANDLES THAT COST NOTHING, EACH A CONSTANT — SEVEN SINCE IZ REMOVED DULL EDGE AND TINDERBOX (IU §0.4: a figure a batch re-tunes gets a
 # constant then). Each was a literal in `battle._stamp_modifier`; each is read there bare, and the modifier's words below
 # format it, so a re-tune moves one line and the words follow. **IY turned them toward a severity 2 to measure each
 # one's slope** (IY's report §2: the old value and its cost, the new value and its cost, the slope); the placing in a band
 # is the designer's against the slopes. A STARTING VALUE each (CQ §6).
-#   DULL_EDGE_CRIT         the crit chance taken from every unit (floored so a unit's total crit never goes under zero)
 #   PARCHED_SHARE          the share of a bar (and of a held meter) both parties may open a fight with
-#   TINDERBOX_FIRE_PCT     what every fire strike gains, whoever deals it
-#   FRENZIED_SPEED         every unit's speed multiplier
+#   FRENZIED_SPEED_ADD     what every unit's speed gains, ADDED (IZ §4 re-keyed it from a multiplier, which rescaled the timeline
+#                          and moved no turn); 100 is the average speed, so the figure is the share its words read at the average
 #   MUFFLED_BD_PCT         the share of Break damage that lands, an integer percent (the field's own unit)
 #   FLEETING_TURNS         the turns every status applied loses (never below one)
 #   HOARFROST_CHILL_TURNS  the turns of the Chilled every unit opens the fight under (Hoarfrost Armor's turns are Battle's own)
 #   SLICK_DELAY            the initiative every ability gains
 #   BLOODLETTING_BLEED     the Bleed every hit adds
-const DULL_EDGE_CRIT := 0.1
 const PARCHED_SHARE := 0.0
-const TINDERBOX_FIRE_PCT := 0.75
-const FRENZIED_SPEED := 1.3
+const FRENZIED_SPEED_ADD := -30.0
 const MUFFLED_BD_PCT := 50
-const FLEETING_TURNS := 2
+const FLEETING_TURNS := 1
 const HOARFROST_CHILL_TURNS := 9
-const SLICK_DELAY := 1.5
-const BLOODLETTING_BLEED := 45
+const SLICK_DELAY := 0.5
+const BLOODLETTING_BLEED := 15
 # The words a share of a bar is said in, so the sentence keeps its register as the figure moves.
 const SHARE_WORDS := {1.0: "full", 0.5: "half", 0.25: "a quarter", 0.0: "no"}
 # BATCH IO §5 — EVERY MODIFIER CARRIES ITS OWN LETTERS (`tag`), for the battle's bargain chip, and HU §4's
@@ -5091,32 +5097,28 @@ const SEVERITY_COLORS := {
 const MODIFIERS := {
 	"overgrown": {"name": "Overgrown", "tag": "Ov", "severity": 4, "graded": "the incumbent — IV, graded at IY §4",
 		"desc": "Both parties begin the fight at 70% health at most."},
-	"tinderbox": {"name": "Tinderbox", "tag": "Ti", "severity": 0, "graded": "the default four — IY §2",
-		"desc": "All fire strike damage +%d%%, whoever deals it." % [int(round(TINDERBOX_FIRE_PCT * 100))]},
-	"frenzied": {"name": "Frenzied", "tag": "Fr", "severity": 0, "graded": "the default four — IY §2",
-		"desc": "Everyone acts %d%% faster. Cooldowns are unchanged." % [int(round((FRENZIED_SPEED - 1.0) * 100))]},
+	"frenzied": {"name": "Frenzied", "tag": "Fr", "severity": 1, "graded": "the default four — IZ §4",
+		"desc": "Everyone acts %d%% faster. Cooldowns are unchanged." % [int(round(FRENZIED_SPEED_ADD))]},
 	"brittle": {"name": "Brittle", "tag": "Bi", "severity": 2, "graded": "the incumbent — IV, graded at IY §4",
 		"desc": "All attacks ignore armor, on both sides."},
-	"warded": {"name": "Warded", "tag": "Wa", "severity": 2, "graded": "the default four — IW, graded at IX §3",
+	"warded": {"name": "Warded", "tag": "Wa", "severity": 2, "graded": "the default four — IZ §1",
 		"desc": "All abilities cost 25% more. Basic attacks are free."},
 	"bloodless": {"name": "Bloodless", "tag": "Nh", "severity": 5, "graded": "the default four — IW, graded at IX §3",
 		"desc": "No healing for anyone. Bleed and damage-over-time still tick."},
 	# ---- authored by AQ at severity 1 (every grade in this table is IO §2's measurement) ----
 	"parched": {"name": "Parched", "tag": "Pa", "severity": 2, "graded": "the default four — IY §2",
 		"desc": "Both parties begin the fight at %s resource at most." % [SHARE_WORDS[PARCHED_SHARE]]},
-	"slick": {"name": "Slick Footing", "tag": "Sk", "severity": 1, "graded": "the default four — IY §2",
+	"slick": {"name": "Slick Footing", "tag": "Sk", "severity": 1, "graded": "the default four — IZ §1",
 		"desc": "Every ability costs +%s initiative. Everyone is slower to come round again." % [SLICK_DELAY]},
-	"dulledge": {"name": "Dull Edge", "tag": "De", "severity": 0, "graded": "the default four — IY §2",
-		"desc": "Critical chance -%d%%, for everyone." % [int(round(DULL_EDGE_CRIT * 100))]},
-	"muffled": {"name": "Muffled", "tag": "Mu", "severity": 0, "graded": "the default four — IY §2",
+	"muffled": {"name": "Muffled", "tag": "Mu", "severity": 1, "graded": "the incumbent — IZ §5",
 		"desc": "All Break damage is reduced %d%%. Meters fill slowly." % [100 - MUFFLED_BD_PCT]},
 	"hoarfrost": {"name": "Hoarfrost", "tag": "Ho", "severity": 1, "graded": "the default four — IY §2",
 		"desc": "Everyone begins the fight Chilled."},
 	# ---- authored by AQ at severity 2 ----
-	"fleeting": {"name": "Fleeting", "tag": "Ft", "severity": 1, "graded": "the default four — IY §2",
+	"fleeting": {"name": "Fleeting", "tag": "Ft", "severity": 1, "graded": "the default four — IZ §1",
 		"desc": "Every status applied lasts %s less (never below one)." % [
 			"one turn" if FLEETING_TURNS == 1 else "%d turns" % FLEETING_TURNS]},
-	"feverish": {"name": "Feverish", "tag": "Fv", "severity": 2, "graded": "the default four — IW, graded at IX §3",
+	"feverish": {"name": "Feverish", "tag": "Fv", "severity": 2, "graded": "the default four — IZ §1",
 		"desc": "Everyone deals 25% more damage. Fights end quickly, one way or the other."},
 	"deadened": {"name": "Deadened", "tag": "Dd", "severity": 3, "graded": "the incumbent — IV, graded at IY §4",
 		"desc": "Nobody can be Broken. The Break meter does nothing this fight."},
@@ -5125,10 +5127,10 @@ const MODIFIERS := {
 	# ---- authored by AQ at severity 3 ----
 	"thinair": {"name": "Thin Air", "tag": "Ta", "severity": 5, "graded": "the default four — IW, graded at IX §3",
 		"desc": "No resource returns at the start of a turn. Anything else that builds it still does."},
-	"encumbered": {"name": "Encumbered", "tag": "En", "severity": 2, "graded": "the default four — IW, graded at IX §3",
+	"encumbered": {"name": "Encumbered", "tag": "En", "severity": 1, "graded": "the default four — IZ §1",
 		"desc": "Every ability with a cooldown costs two more turns of it. Basic attacks are unaffected."},
 	# ---- authored by AQ at severity 4 ----
-	"bloodletting": {"name": "Bloodletting", "tag": "Wo", "severity": 3, "graded": "the default four — IY §2",
+	"bloodletting": {"name": "Bloodletting", "tag": "Wo", "severity": 1, "graded": "the default four — IY's control C02d",
 		"desc": "Every hit opens a wound. All attacks add %d Bleed, on both sides." % [BLOODLETTING_BLEED]},
 	"mirrorbound": {"name": "Mirrorbound", "tag": "Mr", "severity": 5, "graded": "the incumbent — IV, graded at IY §4",
 		"desc": "An attack that does not miss sends a quarter of the damage it deals back on its attacker — at least 1, even when it deals none. On both sides."},

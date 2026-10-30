@@ -4,6 +4,50 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The placing, two re-keys, and a removal (Batch IZ) — 2026-10-27
+
+**Why the sharper reading replaces the blunter.** IY ruled that a grade takes the highest cost measured on any population, so a
+modifier that costs a fuller build more is graded by that build. That rule is about populations, and it was being applied inside
+one: Encumbered had a run-seeded reading of 1.72 points and a fight-seeded one of 0.74, both of the default four, and the higher kept
+it at a 2. Two readings of one population are two estimates of one fact, and keeping the higher of two estimates is a ratchet —
+every re-read could only raise a grade. So the fight-seeded reading replaces the run-seeded one, and the re-reads came first: of the
+eleven IX called free, four were costs the old instrument could not resolve (Slick Footing 0.71, Fleeting 0.92, Bloodletting 0.80,
+Brittle 2.00 on the reference party), and three of those had their handles turned at IY when nothing needed turning. They went back.
+
+**Why Dull Edge was removed rather than re-keyed.** Its built shape: at the spawn every unit's `crit_bonus` lost `DULL_EDGE_CRIT`
+(0.05 until IY, 0.1 after), floored so a unit's total crit never went under zero, and a companion summoned mid-fight was not stamped
+again (it copied its hunter's already-lowered crit). IY's slope is 1.452 points of health per unit of crit, so the handle is worth
+**0.15 points per ten points** of crit chance, and at its floor — every unit's base crit gone — it read -0.54 ± 0.24: it paid the
+party, because the warband's crits cost the heroes more than their own crits pay them. At that slope a grade 2's 2.48 points is
+about 170 points of crit (2.48 / 1.452) — some 210 from where the floor read — and the floor is already every unit's base crit gone,
+so no value of the handle reaches a grade. Crit is a quantity every build makes, so no population is
+keyed to escape it and none would read it differently: no population saves it. Removed, not disabled, on the Hungering Dark's
+standard; a save naming it loads with that option dropped.
+
+**Why Tinderbox was removed too, and what it was.** Its built shape: at the spawn every unit's `type_dmg_bonus["fire"]` gained
+`TINDERBOX_FIRE_PCT` (0.25 until IY, 0.75 after) — the Emberheart relic's typed-damage hook, which stays. The rule names fire, so it
+was read on the party whose strikes carry the most fire: the default four with the Pyromancer for the Cryomancer, 15.9% of their
+strike damage fire against the reference party's 5.3%. On them, at +75%, it read **+0.24 ± 0.23** — no reach on the population its own
+rule names, which is the stop condition. The derivation says why: the heroes dealt about twelve times the warband's fire, so *every
+fire strike +75%, whoever deals it* fed the heroes far more than it charged them — the Hungering Dark's shape (IP §0.2), a rule keyed
+on a quantity the two sides do not produce equally. A fire rule authored again names both sides' shares before its figure.
+
+**Why Frenzied subtracts.** A factor on every unit's speed divides every turn's delay by one number, so the timeline rescales and no
+turn changes hands — IY's reach test found no value of the multiplier that cost anything. An amount added to every speed helps a slow
+unit more than a fast one, so it moves the order; which side it favours was measured. Thirty points — the old 30% stated at the average
+speed of 100, the same step as an amount — read a tie; three hundred paid the party (-0.70), so the add helps the heroes and the
+subtraction was driven: thirty off every speed costs them +0.60 ± 0.26, a grade 1. The floor is a tenth of a unit's own speed, so
+nothing stalls. Its words were not touched, so they now state a slow-down as a negative speed-up; that rewording is the designer's.
+
+**Why Warden's band stayed.** The brief's rule: a band move the measurement cannot tell from none moves the band (the repetition fixed
+for nothing), and one that makes the rung materially milder stays, its cost priced. Wanderer's bands on Warden ended its bargain fights
+5.78 ± 2.16 points kinder, so the band stays and every Warden offer's gambles are still Rot and Overgrown. Moved, Warden's bands would
+have been Wanderer's, and the rung's twist — its safe slot less mild — would have gone with them. Grade 4 holding two is what the
+measurement leaves to be authored.
+
+**Why the changelog was cut a batch early.** IZ's own entry would not have crossed the 400 KB bar; the brief ordered the cut ahead of
+the documents so the documents land on the cut file, and a cut taken by procedure before the bar is the sequence FG designed.
+
 ## A grade is the highest cost measured, and nine handles turned (Batch IY) — 2026-10-26
 
 **Why the test binds before the band.** A band narrower than two standard errors of the reading that sets it is not a grade:

@@ -547,8 +547,7 @@ const REPAIRS := [
 	["item:revive", "fallen hero at", "fallen ally at"],
 	["modifier:overgrown", "health at most.", "70% health."],
 	["modifier:parched", "resource at most.", "half resource."],
-	# BATCH IY §2 — the figure is DULL_EDGE_CRIT's now, read by its words; `check_iy` §2 holds it. The repaired clause stands.
-	["modifier:dulledge", "Critical chance -", "is halved,"],
+	# BATCH IY §2 — Dull Edge's row stood here; IZ §3 removed the modifier, and its text with it.
 	["modifier:thinair", "Anything else that builds it still does.", "What you have is what you get."],
 	["relic:tithe", "Gold won in battles and bargains", "All gold earned from nodes"],
 	["relic:kingsledger", "battle and bargain", "all node"],

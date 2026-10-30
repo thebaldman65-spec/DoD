@@ -1,0 +1,24 @@
+level	id	modifier	ix_cost	cost	se	source	level_ix	level_iz	cut_ix	cut_iz
+1	dulledge	Dull Edge	-0.6111	-0.6111	-	IW (run-seeded), against IX's baseline	0.0378	-0.0396	0.4818	0.4800
+1	parched	Parched	-0.1352	-0.1352	-	IW (run-seeded), against IX's baseline	0.0378	-0.0396	0.4818	0.4800
+1	tinderbox	Tinderbox	-0.0400	-0.0400	-	IW (run-seeded), against IX's baseline	0.0378	-0.0396	0.4818	0.4800
+1	frenzied	Frenzied	0.0464	-0.0521	0.0487	IY §1	0.0378	-0.0396	0.4818	0.4800
+1	muffled	Muffled	0.0856	0.0856	-	IW (run-seeded), against IX's baseline	0.0378	-0.0396	0.4818	0.4800
+1	fleeting	Fleeting	0.4067	0.9211	0.2578	IZ §1	0.0378	-0.0396	0.4818	0.4800
+1	hoarfrost	Hoarfrost	0.5125	-0.4455	0.3201	IZ §1	0.0378	-0.0396	0.4818	0.4800
+2	deadened	Deadened	0.5390	0.4039	0.2932	IZ §1	0.9258	0.9996	1.7026	1.7791
+2	brittle	Brittle	0.7466	1.9961	0.3473	IZ §1	0.9258	0.9996	1.7026	1.7791
+2	slick	Slick Footing	0.7540	0.7078	0.2810	IZ §1	0.9258	0.9996	1.7026	1.7791
+2	bloodletting	Bloodletting	0.8716	0.7998	0.3020	IY C02d	0.9258	0.9996	1.7026	1.7791
+2	encumbered	Encumbered	1.7180	1.0902	0.3134	IZ §1	0.9258	0.9996	1.7026	1.7791
+3	feverish	Feverish	2.4180	3.1532	0.3757	IZ §1	2.4793	2.5586	3.7015	3.7411
+3	warded	Warded	2.5407	1.9640	0.3088	IZ §1	2.4793	2.5586	3.7015	3.7411
+4	thin_veil	The Thin Veil	4.7477	4.7477	-	IW (run-seeded), against IX's baseline	4.9236	4.9236	6.8837	6.8837
+4	long_silence	The Long Silence	4.8782	4.8782	-	IW (run-seeded), against IX's baseline	4.9236	4.9236	6.8837	6.8837
+4	miasma	Miasma	5.1450	5.1450	-	IW (run-seeded), against IX's baseline	4.9236	4.9236	6.8837	6.8837
+5	rot	Rot	8.6592	8.6592	-	IW (run-seeded), against IX's baseline	8.8439	8.8439	12.2167	12.2167
+5	overgrown	Overgrown	9.0285	9.0285	-	IW (run-seeded), against IX's baseline	8.8439	8.8439	12.2167	12.2167
+6	mirrorbound	Mirrorbound	15.5896	15.5896	-	IW (run-seeded), against IX's baseline	15.5896	15.5896	19.1076	19.1076
+7	thinair	Thin Air	21.0299	21.0299	-	IW (run-seeded), against IX's baseline	22.6257	22.6257	29.5798	29.5798
+7	bloodless	Bloodless	24.2215	24.2215	-	IW (run-seeded), against IX's baseline	22.6257	22.6257	29.5798	29.5798
+8	wasting	Wasting	36.5338	36.5338	-	IW (run-seeded), against IX's baseline	36.5338	36.5338	-	-

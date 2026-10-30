@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-10-26 (Batch IY &mdash; a grade is the highest cost measured, and nine handles turned)</b></p>
+<p align="right"><b>Last updated: 2026-10-27 (Batch IZ &mdash; the placing, two re-keys, and a removal)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -266,9 +266,10 @@ side: a modifier that leaned on one side would be a difficulty slider, and the r
 rung deals carries a <b>severity of 1&ndash;5</b>, and <b>the reward table reads that severity</b>. <b>A severity is a band of what a
 modifier costs one named set of heroes</b> &mdash; the sim's default four (the Berserker, the Cryomancer, the Devout and the
 Beastmaster), untalented, at Wanderer: each modifier is measured forced on every bargain of their runs, and its severity is how much
-of those heroes' health it takes at a bargain fight's end against the same fights with no modifier &mdash; <b>about 0.9% for a 1, 2.5% for
-a 2, 4.9% for a 3, 8.8% for a 4 and 15.6% or more for a 5</b>. <b>A modifier that costs those heroes nothing has no severity, and no rung
-deals it</b> &mdash; and <b>nothing</b> means a cost the measurement cannot tell from none, inside its own error. <b>Where a fuller
+of those heroes' health it takes at a bargain fight's end against the same fights with no modifier &mdash; <b>about 1.0% for a 1, 2.6% for
+a 2, 4.9% for a 3, 8.8% for a 4 and 15.6% or more for a 5</b>. <b>Every modifier in the deck costs something</b>, and <b>nothing</b> means a cost the measurement cannot tell from none,
+inside its own error: <b>a modifier keyed on something only some heroes do is measured on heroes who do it</b> &mdash; Muffled on on
+talented heroes whose plan is Break &mdash; and one that costs nothing even there is not in the game. <b>Where a fuller
 set of heroes was measured too and pays more, the grade is the most any of them pays</b>: a severity may overstate what a modifier
 costs you, never understate it. So a grade says how hard a fight under it is, not how harsh its words sound. Severity is <b>flat</b> and <b>deliberately ignores which heroes you drafted</b>: a modifier that happens to be cheap
 for your build is a good deal you earned by building that way. A modifier binds every combatant on the field, including a
@@ -284,30 +285,28 @@ rather than by rejecting rolls, and no band ever falls back to another: every ba
 modifiers enough for its slots.</p>
 <p>The reward pays <b>on victory</b>: the modifier is the price, and the reward is what
 clearing the fight under it bought.</p>
-<p><b>The pool is 23</b>: four carry no severity and no rung deals them, and the nineteen that are dealt are <b>weighted
-low</b> &mdash; three at severity 1, five at 2, five at 3, two at 4 and four at 5. Because the
+<p><b>The pool is 21</b>, and a rung deals every one; it is <b>weighted
+low</b> &mdash; seven at severity 1, four at 2, four at 3, two at 4 and four at 5. Because the
 safe slot on Wanderer's and Warden's cards is served from the mild end, that is the end a run
 actually sees repeatedly.</p>
 <table border="1" cellpadding="4">
 <tr><th>Modifier</th><th>Severity</th><th>Effect (both sides)</th></tr>
-<tr><td>Dull Edge</td><td>—</td><td>Critical chance -10%, for everyone.</td></tr>
-<tr><td>Frenzied</td><td>—</td><td>Everyone acts 30% faster. Cooldowns are unchanged.</td></tr>
-<tr><td>Tinderbox</td><td>—</td><td>All fire strike damage +75%, whoever deals it.</td></tr>
-<tr><td>Muffled</td><td>—</td><td>All Break damage is reduced 50%. Meters fill slowly.</td></tr>
-<tr><td>Fleeting</td><td>1</td><td>Every status applied lasts 2 turns less (never below
+<tr><td>Frenzied</td><td>1</td><td>Everyone acts -30% faster. Cooldowns are unchanged.</td></tr>
+<tr><td>Muffled</td><td>1</td><td>All Break damage is reduced 50%. Meters fill slowly.</td></tr>
+<tr><td>Fleeting</td><td>1</td><td>Every status applied lasts one turn less (never below
 one).</td></tr>
 <tr><td>Hoarfrost</td><td>1</td><td>Everyone begins the fight Chilled.</td></tr>
-<tr><td>Slick Footing</td><td>1</td><td>Every ability costs +1.5 initiative. Everyone is
+<tr><td>Slick Footing</td><td>1</td><td>Every ability costs +0.5 initiative. Everyone is
 slower to come round again.</td></tr>
+<tr><td>Encumbered</td><td>1</td><td>Every ability with a cooldown costs two more turns of it.
+Basic attacks are unaffected.</td></tr>
+<tr><td>Bloodletting</td><td>1</td><td>Every hit opens a wound. All attacks add 15 Bleed, on
+both sides.</td></tr>
 <tr><td>Parched</td><td>2</td><td>Both parties begin the fight at no resource at most.</td></tr>
 <tr><td>Brittle</td><td>2</td><td>All attacks ignore armor, on both sides.</td></tr>
 <tr><td>Warded</td><td>2</td><td>All abilities cost 25% more. Basic attacks are free. Every button and the summon picker show the price the fight charges.</td></tr>
-<tr><td>Encumbered</td><td>2</td><td>Every ability with a cooldown costs two more turns of it.
-Basic attacks are unaffected.</td></tr>
 <tr><td>Feverish</td><td>2</td><td>Everyone deals 25% more damage. Fights end quickly, one way
 or the other.</td></tr>
-<tr><td>Bloodletting</td><td>3</td><td>Every hit opens a wound. All attacks add 45 Bleed, on
-both sides.</td></tr>
 <tr><td>Deadened</td><td>3</td><td>Nobody can be Broken. The Break meter does nothing this
 fight.</td></tr>
 <tr><td>The Long Silence</td><td>3</td><td>Nobody may use the same ability twice this fight. Basic attacks are exempt &mdash; a hero's first card, an enemy's cheapest attack &mdash; so nobody is ever left with nothing to do. A spent card's button goes dark and says why; an enemy whose move is spent falls back to its basic attack, and its declared move says so a turn ahead.</td></tr>
@@ -737,7 +736,7 @@ ride stacks on a different axis.</li>
 <li><b>A STRIKE is the damage an ability deals as its blow lands, and the list above is what a strike reads.</b>
 A status's tick, a detonation, a bleedout burst, a reflection and a bomb are not strikes, and a bonus to strike
 damage does not reach them; nor does it, or the Shieldmaster's ward, reach a strike a card deals by a rule of its
-own (a Killing Frost's). The school relics, Tinderbox, Clarity, Profligate and the ward each say <i>strike</i>.</li>
+own (a Killing Frost's). The school relics, Clarity, Profligate and the ward each say <i>strike</i>.</li>
 <li><b>A companion's blows resolve on their own path and read almost none of that list.</b> They
 carry their own damage roll and their own flat critical, and of the strike loop's terms they read
 <b>Mark of the Hunt</b>, the ownerless <b>Hunter's Mark</b>, the Tracker's mark (&sect;6.0), <b>Cripple and Chilled</b>. <b>TWO RUNES REACH IT AS WELL</b> &mdash; the <b>Bared Fang</b>'s flat +30%,

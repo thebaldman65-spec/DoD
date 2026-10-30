@@ -148,9 +148,11 @@ func _test_offer(RunState) -> void:
 	# mid-run holds a pending modifier by id. RE-POINTED AT IO §2: every grade is
 	# a measurement now (the designer's), so the grade asserted is one the ladder
 	# holds; the values below are the grades AQ AUTHORED, kept as the record.
-	var want := {"overgrown": 1, "tinderbox": 2, "frenzied": 2,
+	# RE-POINTED AT IZ §5: Tinderbox is removed too (no reach on the party that deals fire).
+	var want := {"overgrown": 1, "frenzied": 2,
 		"brittle": 3, "warded": 3, "bloodless": 4,
-		"parched": 1, "slick": 1, "dulledge": 1, "muffled": 1, "hoarfrost": 1,
+		# RE-POINTED AT IZ §3: Dull Edge is removed (a handle worth 0.15 points per ten points of crit carries no bargain).
+		"parched": 1, "slick": 1, "muffled": 1, "hoarfrost": 1,
 		"fleeting": 2, "feverish": 2, "deadened": 2, "miasma": 2,
 		"thinair": 3, "encumbered": 3,
 		"bloodletting": 4, "mirrorbound": 4,
@@ -164,7 +166,8 @@ func _test_offer(RunState) -> void:
 	# Hungering Dark is removed (two-sidedness did not make it even), so the pool is twenty-three and the test knows the three
 	# of the four that stand.
 	var ruin_four := {"wasting": 5, "thin_veil": 5, "long_silence": 5}
-	ok(run.MODIFIERS.size() == 23, "twenty-three authored modifiers (the twenty, and the three of the four authored at severity 5 that stand — IN §1, IO §1, IP §1a)")
+	# RE-POINTED AT IZ §3 and §5: Dull Edge and Tinderbox are removed too, so the pool is twenty-one.
+	ok(run.MODIFIERS.size() == 21, "twenty-one authored modifiers (the twenty less Dull Edge and Tinderbox, and the three of the four authored at severity 5 that stand — IN §1, IO §1, IP §1a, IZ §3 and §5)")
 	ok(run.MODIFIERS.size() == want.size() + ruin_four.size()
 			and ruin_four.keys().all(func(k): return run.modifier_severity(String(k)) >= 1 and run.modifier_severity(String(k)) <= 5),
 		"...and the test knows all of them")
@@ -177,10 +180,12 @@ func _test_offer(RunState) -> void:
 		by_sev[run.modifier_severity(String(mid))] += 1
 	# RE-POINTED AT IY §2 and §4: the test binds, the grade takes the higher cost, and the nine turned handles graded by their
 	# own measurement — the tally is IY's (`docs/reports/IY-grades.tsv`).
-	ok(by_sev[0] == 4, "four modifiers carry no severity (got %d)" % by_sev[0])
-	ok(by_sev[1] == 3, "three severity-1 modifiers (got %d)" % by_sev[1])
-	ok(by_sev[2] == 5, "five severity-2 modifiers (got %d)" % by_sev[2])
-	ok(by_sev[3] == 5, "five severity-3 modifiers (got %d)" % by_sev[3])
+	# RE-POINTED AT IZ §1–§5: the tally the grades hold since IZ — the sharper reading of one population replaces the
+	# blunter (IZ §0.1), the reverts graded by their own old readings, Dull Edge removed (§3); `docs/reports/IZ-grades.tsv`.
+	ok(by_sev[0] == 0, "no modifiers carry no severity (got %d)" % by_sev[0])
+	ok(by_sev[1] == 7, "seven severity-1 modifiers (got %d)" % by_sev[1])
+	ok(by_sev[2] == 4, "four severity-2 modifiers (got %d)" % by_sev[2])
+	ok(by_sev[3] == 4, "four severity-3 modifiers (got %d)" % by_sev[3])
 	ok(by_sev[4] == 2, "two severity-4 modifiers (got %d)" % by_sev[4])
 	ok(by_sev[1] + by_sev[2] > by_sev[3] + by_sev[4],
 		"the pool is weighted toward the low severities")
@@ -340,7 +345,8 @@ func _test_modifiers_live() -> void:
 		# catches a stamp leaking out of the battle that armed it.
 		for u in clean.heroes + clean.enemies:
 			ok(not u.mod_ignore_armor, "no modifier: armor is untouched")
-			ok(is_equal_approx(u.mod_speed_mult, 1.0), "no modifier: speed is untouched")
+			# RE-POINTED AT IZ §4: Frenzied ADDS to a speed now (`mod_speed_add`), so untouched is zero.
+			ok(is_equal_approx(float(u.get("mod_speed_add")), 0.0), "no modifier: speed is untouched")
 			ok(is_equal_approx(u.mod_cost_mult, 1.0), "no modifier: costs are untouched")
 			ok(not u.mod_no_heals, "no modifier: healing is untouched")
 			ok(u.mod_bd_mult == 100, "no modifier: Break damage is untouched")
@@ -361,14 +367,12 @@ func _test_modifiers_live() -> void:
 	# half-right.
 	var expectations := {
 		"overgrown": "hp",
-		"tinderbox": "fire",
 		"frenzied": "speed",
 		"brittle": "armor",
 		"warded": "cost",
 		"bloodless": "heal",
 		"parched": "resource",
 		"slick": "delay",
-		"dulledge": "crit",
 		"muffled": "bd",
 		"hoarfrost": "chilled",
 		"fleeting": "status_turns",
@@ -394,16 +398,14 @@ func _test_modifiers_live() -> void:
 						"Overgrown: %s opens at or under 70%% (%d/%d)" % [
 							u.unit_name, u.hp, u.max_hp])
 					ok(u.hp > 0, "Overgrown never kills anyone outright")
-			"fire":
-				for u in everyone:
-					ok(is_equal_approx(float(u.type_dmg_bonus.get("fire", 0.0)), float(run.TINDERBOX_FIRE_PCT)),
-						"Tinderbox: %s deals +%d%% fire" % [u.unit_name, int(round(float(run.TINDERBOX_FIRE_PCT) * 100))])
+			# RE-POINTED AT IZ §4: Frenzied is re-keyed to a flat amount ADDED to every speed (a factor on every speed rescaled the
+			# timeline and moved no turn — IY §3), floored at a tenth of the unit's own speed; read off the constant, never typed.
 			"speed":
 				for u in everyone:
-					ok(is_equal_approx(u.mod_speed_mult, float(run.FRENZIED_SPEED)),
-						"Frenzied: %s acts %d%% faster" % [u.unit_name, int(round((float(run.FRENZIED_SPEED) - 1.0) * 100))])
-					ok(is_equal_approx(u.effective_speed(), u.speed * float(run.FRENZIED_SPEED)),
-						"...and effective_speed reads it")
+					ok(is_equal_approx(float(u.get("mod_speed_add")), float(run.FRENZIED_SPEED_ADD)),
+						"Frenzied: %s acts %d%% faster at the average speed" % [u.unit_name, int(round(float(run.FRENZIED_SPEED_ADD)))])
+					ok(is_equal_approx(u.effective_speed(), maxf(u.speed + float(run.FRENZIED_SPEED_ADD), u.speed * 0.1)),
+						"...and effective_speed reads it added")
 			"armor":
 				for u in everyone:
 					ok(u.mod_ignore_armor, "Brittle: %s is stamped" % u.unit_name)
@@ -463,15 +465,6 @@ func _test_modifiers_live() -> void:
 							float(was_delays[ab.display_name]) + float(run.SLICK_DELAY)),
 							"Slick Footing: %s's %s costs +%s initiative" % [
 								u.unit_name, ab.display_name, str(run.SLICK_DELAY)])
-			"crit":
-				for i in everyone.size():
-					var u: BattleUnit = everyone[i]
-					ok(is_equal_approx(u.crit_bonus,
-						maxf(float(base[i]["crit"]) - float(run.DULL_EDGE_CRIT), -0.10)),
-						"Dull Edge: %s loses %d points of crit" % [u.unit_name, int(round(float(run.DULL_EDGE_CRIT) * 100))])
-					ok(0.10 + u.crit_bonus >= 0.0,
-						"Dull Edge: %s's total crit chance never goes negative"
-						% u.unit_name)
 			"bd":
 				for u in everyone:
 					ok(u.mod_bd_mult == int(run.MUFFLED_BD_PCT), "Muffled: %s is stamped" % u.unit_name)
@@ -631,7 +624,7 @@ func _test_companion_modifier() -> void:
 	battle.free()
 	# The two the summon site already inherited, stated so a future reader
 	# does not "fix" them into a double application: the beast copies the
-	# hunter's Attack and crit, and those already carry Feverish / Dull Edge.
+	# hunter's Attack, and it already carries Feverish or the Thin Veil (Dull Edge, which wrote crit, left at IZ §3).
 	var fev := await _spawn_battle(run, "feverish",
 		["berserker", "pyromancer", "holy", "beastmaster"])
 	if fev != null:

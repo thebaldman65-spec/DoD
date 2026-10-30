@@ -949,8 +949,10 @@ func _s4_the_trap() -> void:
 	# CARRIED AT THE DEFAULT, EXCEPT THE ONE SENTINEL, which is carried as the
 	# baseline the roll reads for a hero — and what a class or a lineage sets wins.
 	var mage_cfg: Dictionary = Classes.hero_config("mage")
+	# RE-POINTED AT IZ §4: Frenzied's field is the flat amount `mod_speed_add` now, whose default is zero, so it left
+	# this population (a zero default reads the same added or replaced) and this list with it.
 	for f2 in ["healing_received_mult", "mercy_threshold", "overcharge_mult", "second_max",
-			"mod_bd_mult", "mod_cost_mult", "mod_speed_mult"]:
+			"mod_bd_mult", "mod_cost_mult"]:
 		if not is_equal_approx(float(mage_cfg.get(f2, -99.0)), float(defaults[f2])):
 			wrong.append("%s carried as %s, declared %s" % [f2, mage_cfg.get(f2), defaults[f2]])
 	ok(uncarried.is_empty(), "§4: a hero's config does not carry %s before any payload" % [uncarried])
@@ -1006,8 +1008,10 @@ func _s4_the_trap() -> void:
 
 	# (3) EVERY OTHER FIELD OF THE POPULATION A PAYLOAD CAN LAND ON: +delta reads
 	# default + delta on each hero the spawn does not re-derive the field for.
+	# RE-POINTED AT IZ §4: `mod_speed_mult` left the population with Frenzied's re-key (above), so five fields on four
+	# heroes, less the one second resource the spawn re-derives, are nineteen reads.
 	var delta := {"mercy_threshold": 0.1, "overcharge_mult": 0.25, "second_max": 7,
-		"mod_bd_mult": 10, "mod_cost_mult": 0.5, "mod_speed_mult": 0.5}
+		"mod_bd_mult": 10, "mod_cost_mult": 0.5}
 	var d_w: Node = await _battle(SEATS, ENG4, {"stat": delta}, true)
 	var added := 0
 	var asked := 0
@@ -1027,7 +1031,7 @@ func _s4_the_trap() -> void:
 			else:
 				missed.append("%s on hero %d: %s" % [f3, hi, h.get(f3)])
 	print("    CHECKED %d fields on %d heroes: %d read default + delta" % [delta.size(), hs.size(), added])
-	ok(hs.size() == 4 and asked >= 20 and added == asked, "§4: a payload did not ADD on %s" % [missed.slice(0, 6)])
+	ok(hs.size() == 4 and asked >= 19 and added == asked, "§4: a payload did not ADD on %s" % [missed.slice(0, 6)])
 
 
 # ── §4d — A SAVED RUN HOLDING A RETIRED RUNE THAT PRICES HEALING ────────────

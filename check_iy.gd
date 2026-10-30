@@ -121,11 +121,11 @@ const IX_MEDIAN_RATIO := 0.91
 const BANDS := {"wanderer": [[1, 2], [3, 4]], "warden": [[1, 3], [4, 4]], "ruin": [[3, 4], [5, 5]]}
 # THE NINE HANDLES: the modifier, its constant, the line of `battle._stamp_modifier`'s branch that reads it bare, and the figure
 # each one's words state, formatted off the constant the way its `desc` does.
+# RE-POINTED AT IZ: Dull Edge (§3) and Tinderbox (§5) are removed, so seven handles stand; Frenzied's is the flat amount its re-key
+# adds (§4). IY's table below keeps all nine as IY's record.
 const HANDLES := [
-	["dulledge", "DULL_EDGE_CRIT", "u.crit_bonus = maxf(u.crit_bonus - Run.DULL_EDGE_CRIT, -CRIT_CHANCE)"],
 	["parched", "PARCHED_SHARE", "u.resource = mini(u.resource, int(u.max_resource * Run.PARCHED_SHARE))"],
-	["tinderbox", "TINDERBOX_FIRE_PCT", "float(u.type_dmg_bonus.get(\"fire\", 0.0)) + Run.TINDERBOX_FIRE_PCT"],
-	["frenzied", "FRENZIED_SPEED", "u.mod_speed_mult = Run.FRENZIED_SPEED"],
+	["frenzied", "FRENZIED_SPEED_ADD", "u.mod_speed_add = Run.FRENZIED_SPEED_ADD"],
 	["muffled", "MUFFLED_BD_PCT", "u.mod_bd_mult = Run.MUFFLED_BD_PCT"],
 	["fleeting", "FLEETING_TURNS", "u.mod_status_turns = -Run.FLEETING_TURNS"],
 	["hoarfrost", "HOARFROST_CHILL_TURNS", "_apply_status(u, \"chilled\", Run.HOARFROST_CHILL_TURNS)"],
@@ -255,7 +255,8 @@ func _s1_the_seeding() -> void:
 		by["encumbered"]["ratio"], by["encumbered"]["ix_ratio"]])
 	var all_fight := rows.all(func(r): return String(r["seeding"]) == "fight")
 	ok(all_fight, "§1: an arm of the seeding table was not driven fight-seeded")
-	var grades := _flat(_block(_doc("res://docs/state.md"), "### THE BARGAIN DECK's GRADES"))
+	# RE-POINTED AT IZ: IZ archived IY's grades block word for word (its heading struck), so IY's record is read where it lives.
+	var grades := _flat(_block(_doc("res://DoD-archive/state-archive.md"), "### ~~THE BARGAIN DECK's GRADES~~"))
 	ok(grades.contains("ratio %.3f" % float(by["encumbered"]["ratio"])) and grades.contains("DOD_SIM_FIGHT_SEED"),
 		"§1: the state file's grades block does not carry Encumbered's ratio (%.3f) or name the seeding the arms are driven at" % float(by["encumbered"]["ratio"]))
 	print("    CHECKED the seeding's doors in run_sim.gd, the switch inert unset, two arms DRIVEN both ways (%d nodes), and %d arms of the kept table (Encumbered's ratio %s against IX's %s)" % [
@@ -296,7 +297,7 @@ func _figure_words(id: String, v: Variant) -> String:
 		"tinderbox":
 			return "+%d%%" % int(round(float(v) * 100))
 		"frenzied":
-			return "%d%% faster" % int(round((float(v) - 1.0) * 100))
+			return "%d%% faster" % int(round(float(v)))
 		"muffled":
 			return "reduced %d%%" % (100 - int(v))
 		"fleeting":
@@ -366,15 +367,27 @@ func _s2_the_handles() -> void:
 		_reach_turns[String(rr["id"])] = float(rr["fight_turns_per_hero"])
 	var rows := _tsv("res://" + HANDLES_TSV, ["modifier", "id", "constant", "old_value", "new_value", "rule", "reasoning", "old_cost",
 		"old_se", "new_cost", "new_se", "new_z", "slope", "grade"])
-	ok(rows.size() == HANDLES.size(), "§2: the handles table holds %d rows — the nine are nine" % rows.size())
+	# RE-POINTED AT IZ: the table is IY's record of nine; the deck holds seven of them (two removed at IZ).
+	ok(rows.size() == 9, "§2: the handles table holds %d rows — the nine are nine" % rows.size())
+	# THE DECK's VALUES ARE IZ's PLACING (`docs/reports/IZ-grades.tsv`, held to the live constants by `check_iz` §2): a handle the
+	# placing kept is still IY's new value; one it reverted is back at IY's old value; one removed or re-keyed is IY's record alone.
+	var placed := {}
+	var iz_src := {}
+	for zr in _tsv("res://docs/reports/IZ-grades.tsv", ["id", "handle", "value", "population", "batch"]):
+		placed[String(zr["id"])] = [String(zr["handle"]), String(zr["value"])]
+		iz_src[String(zr["id"])] = "%s — %s" % [String(zr["population"]), String(zr["batch"])]
 	var off: Array = []
 	var costs := 0
 	for r in rows:
 		var id := String(r["id"])
 		var live: Variant = _konst(String(r["constant"]))
-		# THE TABLE MEASURES THE DECK: its new value is the live constant, so a re-tune after the drive reds here (R01).
-		if live == null or not is_equal_approx(float(live), float(r["new_value"])):
-			off.append("%s: the table measured %s at %s and the deck holds %s — the slope is the table's, the deck has moved" % [id, r["constant"], r["new_value"], str(live)])
+		# THE TABLE MEASURED THE DECK IY LEFT (R01 at IY); SINCE IZ the placing decides it — kept at IY's value or reverted to IY's old one.
+		var pl: Array = placed.get(id, ["", ""])
+		if String(pl[0]) == String(r["constant"]):
+			var kept := is_equal_approx(float(pl[1]), float(r["new_value"]))
+			var reverted := is_equal_approx(float(pl[1]), float(r["old_value"]))
+			if live == null or not is_equal_approx(float(live), float(pl[1])) or not (kept or reverted):
+				off.append("%s: the placing holds %s at %s and the deck at %s — neither IY's new value %s nor its old %s" % [id, r["constant"], pl[1], str(live), r["new_value"], r["old_value"]])
 		# THE STEP IS ITS RULE's (C03): derived from the old value, never chosen.
 		var floor_v := float((load("res://scripts/battle.gd") as Script).get_script_constant_map()["CRIT_CHANCE"]) if id == "dulledge" else 1e9
 		var want := _step(String(r["rule"]), float(r["old_value"]), floor_v)
@@ -403,12 +416,17 @@ func _s2_the_handles() -> void:
 	ok(off.is_empty(), "§2: %d of the handles table's rows are not the deck's, their rule's or their own arithmetic: %s" % [off.size(), str(off)])
 	# THE ABSENCE AND ITS POSITIVE ARM: no modifier whose cost is inside the noise carries a severity, and some cost something.
 	var free_graded: Array = []
+	# RE-POINTED AT IZ: only a modifier still graded off IY's own reading answers to it; one IZ re-graded (a sharper reading, another
+	# population, a re-key) or removed is IZ's, held by `check_iz` §2 and §5.
 	for r in rows:
+		if String(iz_src.get(String(r["id"]), "")) != "the default four — IY §2":
+			continue
 		if int(r["grade"]) == 0 and int(_run.modifier_severity(String(r["id"]))) != 0:
 			free_graded.append(String(r["id"]))
 	ok(free_graded.is_empty(), "§2: %d of the nine cost nothing the instrument can read and carry a severity: %s" % [free_graded.size(), str(free_graded)])
 	ok(costs > 0, "§2: none of the nine turned handles costs something — the positive arm is empty")
-	var grades := _flat(_block(_doc("res://docs/state.md"), "### THE BARGAIN DECK's GRADES"))
+	# RE-POINTED AT IZ: IZ archived IY's grades block word for word (its heading struck), so IY's record is read where it lives.
+	var grades := _flat(_block(_doc("res://DoD-archive/state-archive.md"), "### ~~THE BARGAIN DECK's GRADES~~"))
 	var unnamed: Array = []
 	for r in rows:
 		if not grades.contains("%s — %s → %s" % [String(r["modifier"]), String(r["old_value"]), String(r["new_value"])]):
@@ -424,7 +442,8 @@ func _s3_the_reach() -> void:
 		"heal_se", "heal_z", "verdict"])
 	ok(rows.size() == 2, "§3: the reach table holds %d rows — Frenzied and Hoarfrost" % rows.size())
 	var bad: Array = []
-	var grades := _flat(_block(_doc("res://docs/state.md"), "### THE BARGAIN DECK's GRADES"))
+	# RE-POINTED AT IZ: IZ archived IY's grades block word for word (its heading struck), so IY's record is read where it lives.
+	var grades := _flat(_block(_doc("res://DoD-archive/state-archive.md"), "### ~~THE BARGAIN DECK's GRADES~~"))
 	for r in rows:
 		var z := float(r["cost"]) / maxf(float(r["d_se"]), 1e-9)
 		if absf(z - float(r["z"])) > 0.01:
@@ -452,7 +471,13 @@ func _s4_the_grades() -> void:
 	var rows := _tsv("res://" + GRADES_TSV, ["modifier", "id", "ix_ref_cost", "ref_cost", "ref_se", "ref_z", "ref_source", "inc_cost",
 		"inc_se", "inc_z", "inc_applies", "higher", "ref_band", "inc_band", "grade", "population", "batch"])
 	var mods: Dictionary = _run.MODIFIERS
-	ok(rows.size() == mods.size(), "§4: the grades table holds %d rows — the deck holds %d" % [rows.size(), mods.size()])
+	# RE-POINTED AT IZ: IY's table graded IY's deck; IZ removed two of its rows, and re-graded others on sharper readings or other
+	# populations (`docs/reports/IZ-grades.tsv`, `check_iz` §2). IY's table is held to its own arithmetic here, and to the game only
+	# where IZ kept IY's grade and its source.
+	var iz_src := {}
+	for zr in _tsv("res://docs/reports/IZ-grades.tsv", ["id", "population", "batch"]):
+		iz_src[String(zr["id"])] = "%s — %s" % [String(zr["population"]), String(zr["batch"])]
+	ok(rows.size() == mods.size() + 2, "§4: the grades table holds %d rows — the deck holds %d" % [rows.size(), mods.size()])
 	var off: Array = []
 	var unsourced: Array = []
 	var counts := {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
@@ -480,12 +505,13 @@ func _s4_the_grades() -> void:
 		if pop == "the incumbent":
 			by_inc += 1
 		var sev := int(_run.modifier_severity(id))
-		if sev != g:
+		var iy_kept := String(iz_src.get(id, "")) == "%s — %s" % [String(r["population"]), String(r["batch"])]
+		if iy_kept and sev != g:
 			off.append("%s carries severity %d in the game, the highest measured cost gives %d" % [id, sev, g])
 		counts[g] = int(counts.get(g, 0)) + 1
 		# EVERY GRADE NAMES ITS POPULATION AND ITS BATCH (C06), in the code's own row.
 		var graded := String((mods.get(id, {}) as Dictionary).get("graded", ""))
-		if graded != "%s — %s" % [String(r["population"]), String(r["batch"])] or String(r["batch"]) == "":
+		if iy_kept and graded != "%s — %s" % [String(r["population"]), String(r["batch"])] or String(r["batch"]) == "":
 			unsourced.append("%s ('%s', the table: '%s — %s')" % [id, graded, r["population"], r["batch"]])
 	ok(off.is_empty(), "§4: %d grades are not the highest cost measured, test-bound: %s" % [off.size(), str(off)])
 	ok(unsourced.is_empty(), "§4: %d rows of Run.MODIFIERS do not name the population and the batch their grade came from: %s" % [unsourced.size(), str(unsourced)])
@@ -493,7 +519,8 @@ func _s4_the_grades() -> void:
 	ok(int(_run.modifier_severity("deadened")) == 3 and int(_run.modifier_severity("brittle")) == 2,
 		"§4: Deadened carries %d and Brittle %d — the incumbent's readings give them 3 and 2" % [_run.modifier_severity("deadened"), _run.modifier_severity("brittle")])
 	ok(by_inc >= 2, "§4: the incumbent grades %d modifiers — Deadened and Brittle at least" % by_inc)
-	var grades := _flat(_block(_doc("res://docs/state.md"), "### THE BARGAIN DECK's GRADES"))
+	# RE-POINTED AT IZ: IZ archived IY's grades block word for word (its heading struck), so IY's record is read where it lives.
+	var grades := _flat(_block(_doc("res://DoD-archive/state-archive.md"), "### ~~THE BARGAIN DECK's GRADES~~"))
 	var said: Array = []
 	for r in rows:
 		if not grades.contains("%s — the %s is the higher" % [String(r["modifier"]), String(r["higher"])]):

@@ -1,0 +1,5 @@
+arm	value	rule	runs	completed	reading	se	cost	d_se	z	unpaired	ratio	verdict
+none	-	no modifier (the re-driven none arm, IZ §1)	60	52	0.934103	0.005685	0.0000	0.0000	0.00	-	-	baseline
+F_add30	30.0	the add: thirty points on every speed, the old 30% at the average speed of 100	60	55	0.933866	0.005244	0.0237	0.2837	0.08	0.7734	0.367	tie
+F_add300	300.0	the add at ten times, to read its sign past the noise	60	56	0.941122	0.004973	-0.7019	0.2856	-2.46	0.7553	0.378	pays
+F_sub30	-30.0	the subtraction: thirty points off every speed, floored at a tenth of its own	60	54	0.928122	0.005473	0.5981	0.2581	2.32	0.7891	0.327	costs

@@ -427,10 +427,12 @@ func _s4_the_cut() -> void:
 	# own = 32 live and taking the archive to 214.** Both numbers move ONLY in
 	# the batch that moves them, which is why the archive's is an equality and
 	# the live file's is not.
-	ok(live_span >= 32,
-		"§4: the live file holds %d entries, FEWER than the 32 the cut left — an entry has been dropped" % live_span)
-	ok(arch_span == 214, "§4: the archive holds %d entries, not the 214 the cut made" % arch_span)
-	print("  live %d entries (floor 32, +1 a batch since the cut), archive %d" % [
+	# **BATCH IZ CUT AGAIN, AT HR/HS (IZ §6), AND THIS IS THAT RE-POINT**: 49 moved
+	# out, leaving 33 plus its own = 34 live and taking the archive to 263.
+	ok(live_span >= 34,
+		"§4: the live file holds %d entries, FEWER than the 34 the cut left — an entry has been dropped" % live_span)
+	ok(arch_span == 263, "§4: the archive holds %d entries, not the 263 the cut made" % arch_span)
+	print("  live %d entries (floor 34, +1 a batch since the cut), archive %d" % [
 		live_span, arch_span])
 
 	# THE BOUNDARY IS A BATCH BOUNDARY AND IT IS THE ONE INTENDED.
@@ -450,15 +452,16 @@ func _s4_the_cut() -> void:
 	# same always-true shape FG took the `or` off for, arriving by another road.
 	# Reported at GZ §3, not repaired: the needle is re-pointed here and nothing
 	# else about the arm is changed.
-	ok(live.contains("<h2>2026-09-09 &mdash; Batch FT"),
-		"§4: the live file's oldest entry, Batch FT, is missing")
-	ok(not live.contains("<h2>2026-09-09 &mdash; Batch FS"),
-		"§4: Batch FS is still in the live file — the cut did not move it")
-	ok(arch.contains("<h2>2026-09-09 &mdash; Batch FS"),
-		"§4: Batch FS is not in the archive — an entry was DROPPED by the cut")
-	ok(not arch.contains("<h2>2026-09-09 &mdash; Batch FT"),
-		"§4: Batch FT is in BOTH halves — the cut duplicated an entry")
-	ok(live.contains("<h2>2026-09-20 &mdash; Batch GZ"),
+	# **RE-POINTED AT IZ FROM FS/FT TO HR/HS (IZ §6)** — the same five literals, each one cut along.
+	ok(live.contains("<h2>2026-10-05 &mdash; Batch HS"),
+		"§4: the live file's oldest entry, Batch HS, is missing")
+	ok(not live.contains("<h2>2026-10-05 &mdash; Batch HR"),
+		"§4: Batch HR is still in the live file — the cut did not move it")
+	ok(arch.contains("<h2>2026-10-05 &mdash; Batch HR"),
+		"§4: Batch HR is not in the archive — an entry was DROPPED by the cut")
+	ok(not arch.contains("<h2>2026-10-05 &mdash; Batch HS"),
+		"§4: Batch HS is in BOTH halves — the cut duplicated an entry")
+	ok(live.contains("<h2>2026-10-27 &mdash; Batch IZ"),
 		"§4: the cutting batch's own entry is not in the live changelog")
 
 	# ZERO OVERLAP, ASSERTED OVER THE WHOLE OF BOTH HALVES rather than at the
@@ -482,9 +485,11 @@ func _s4_the_cut() -> void:
 	# whose weaker member is always true is a check that has stopped asking its
 	# question, which is exactly what `check_ec` §1 exists to read: it counted
 	# this among nine live alternations and reported it SATISFIED.
-	ok(live.contains("Batch GZ</b> at FS/FT"),
+	# RE-POINTED AT IZ: the needle is IZ's clause now. GZ's ruling 1 stands unrepaired — the header keeps every cut, so
+	# `Batch GZ</b> at FS/FT` still passes on IZ's tree, and this arm is satisfied by the record again one cut later.
+	ok(live.contains("Batch IZ</b> at HR/HS"),
 		"§4: the live header does not record which batch made this cut")
-	print("  live %d entries (GZ..FT), archive %d entries (FS..Batch 1), 0 overlapping headings" % [
+	print("  live %d entries (IZ..HS), archive %d entries (HR..Batch 1), 0 overlapping headings" % [
 		live_span, arch_span])
 
 

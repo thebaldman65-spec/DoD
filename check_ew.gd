@@ -362,7 +362,8 @@ func _s4_the_thin_sites(scene: Node, src: String) -> void:
 #   · `_party_crit_bonus()` is gated on `attacker.is_hero`, so the largest crit
 #     term in the game cannot reach one at all.
 #   · `crit_bonus` is written on the HERO spawn path and inherited by
-#     companions; the only other writer is `dulledge`, which SUBTRACTS.
+#     companions; the only other writer was `dulledge`, which SUBTRACTED,
+#     and Dull Edge left the deck at IZ §3.
 #   · every remaining term is a talent counter, and an enemy is allocated no
 #     tree, so every one of them is zero.
 #
@@ -383,8 +384,9 @@ func _s5_no_enemy_reaches_it(scene: Node, src: String) -> void:
 		var line := String(raw)
 		if line.contains(".crit_bonus =") or line.contains("u.crit_bonus ="):
 			writers += 1
-	ok(writers == 3,
-		"§5: exactly three writers of crit_bonus — hero spawn, dulledge, the pack (%d)" % writers)
+	# RE-POINTED AT IZ §3: Dull Edge is removed, so the writers are two — the hero spawn and the pack.
+	ok(writers == 2,
+		"§5: exactly two writers of crit_bonus — hero spawn, the pack (%d)" % writers)
 	# DRIVEN: every enemy on the field is at the base rate with no bonus at all.
 	var worst := 0.0
 	for e in scene.get("enemies"):

@@ -98,6 +98,9 @@ const PARTY_SPECS := "[\"berserker\", \"cryomancer\", \"inquisitor\", \"beastmas
 const BESIDE := 1600
 # What the rungs dealt from when the scale was taken: the bands are read here, never re-set (IX §3).
 const BANDS := {"wanderer": [[1, 2], [3, 4]], "warden": [[1, 3], [4, 4]], "ruin": [[3, 4], [5, 5]]}
+# RE-POINTED AT IZ §3 and §5: the modifiers IZ removed (Dull Edge for no reach, Tinderbox by §5's stop condition) — IX's tables
+# measured them, so IX's record names them and the deck does not.
+const REMOVED_AT_IZ := ["dulledge", "tinderbox"]
 
 
 # ── §0 — THE RULINGS, EACH WHERE A FUTURE SESSION READS IT ──────────────────────────────────────────
@@ -159,10 +162,13 @@ func _s1_the_baseline() -> void:
 			verdicts_bad.append("%s (z %.2f, written %s / %s)" % [r["arm"], z, r["z"], r["verdict"]])
 	ok(differ.is_empty(), "§1: %d arms count different fights by node and by modifier — a baseline read by a different rule than the arms is not a baseline: %s" % [differ.size(), str(differ)])
 	ok(verdicts_bad.is_empty(), "§1: %d verdicts are not their own paired z's: %s" % [verdicts_bad.size(), str(verdicts_bad)])
-	ok(arms == (_run.MODIFIERS as Dictionary).size(), "§1: the kept table reads %d modifier arms — the deck holds %d" % [arms, (_run.MODIFIERS as Dictionary).size()])
+	# RE-POINTED AT IZ: the deck holds IX's arms less the modifiers IZ removed.
+	ok(arms == (_run.MODIFIERS as Dictionary).size() + REMOVED_AT_IZ.size(), "§1: the kept table reads %d modifier arms — the deck holds %d" % [arms, (_run.MODIFIERS as Dictionary).size()])
 	# THE RECORD CARRIES THE ERROR BAR: the state file's grades block states the baseline with its se and its count.
 	var want_line := "%.3f ± %.3f" % [float(base["reading"]), float(base["se"])]
-	var grades := _block(_doc("res://docs/state.md"), "### THE BARGAIN DECK's GRADES")
+	# RE-POINTED AT IZ: IZ archived IY's grades block word for word (its heading struck, `DoD-archive/state-archive.md`), so a figure IY or IX
+	# recorded there is read where that record lives; the live block is IZ's.
+	var grades := _block(_doc("res://DoD-archive/state-archive.md"), "### ~~THE BARGAIN DECK's GRADES~~")
 	ok(_flat(grades).contains(want_line) and _flat(grades).contains("%d runs" % int(base["runs"])),
 		"§1: the state file's grades block does not carry the baseline with its error bar and its count ('%s', %d runs)" % [want_line, int(base["runs"])])
 	print("    CHECKED the baseline (%s ± %s, %s runs, block %s, %s fights by node) and %d arms' fights and verdicts" % [
@@ -205,7 +211,9 @@ func _s2_the_halves() -> void:
 	var rows := _tsv("res://" + HALVES_TSV, ["modifier", "id", "one_reading", "one_se", "P", "P_se", "W", "W_se", "net", "net_se", "cause"])
 	var bad: Array = []
 	var no_err: Array = []
-	var grades := _flat(_block(_doc("res://docs/state.md"), "### THE BARGAIN DECK's GRADES"))
+	# RE-POINTED AT IZ: IZ archived IY's grades block word for word (its heading struck, `DoD-archive/state-archive.md`), so a figure IY or IX
+	# recorded there is read where that record lives; the live block is IZ's.
+	var grades := _flat(_block(_doc("res://DoD-archive/state-archive.md"), "### ~~THE BARGAIN DECK's GRADES~~"))
 	var unnamed: Array = []
 	for r in rows:
 		# An error is a number, and it may be zero: a half whose every run reads its twin's (Parched's warband half) has none.
@@ -262,6 +270,16 @@ func _s3_the_scale() -> Dictionary:
 	print("    the derivation: the levels' costs %s points; the cuts %s" % [
 		str(cost.keys().map(func(k): return "%d %.2f" % [k, 100.0 * float(cost[k])])), str(cuts.map(func(c): return "%.2f" % c))])
 	# THE WRITTEN SCALE, in both files, is the derivation's.
+	# RE-POINTED AT IZ §1: the derivation the documents state is IZ's — IX's arithmetic, unchanged, on the sharper readings
+	# (`docs/reports/IZ-scale.tsv`, re-derived by `check_iz` §1: the sharper reading of one population replaces the blunter,
+	# IZ §0.1); IX's own derivation off IW's readings is printed above as IX's record, and grades IX's table below.
+	var iz_cut := {}
+	var iz_lv := {}
+	for zr in _tsv("res://docs/reports/IZ-scale.tsv", ["level", "level_iz", "cut_iz"]):
+		iz_lv[int(zr["level"])] = float(zr["level_iz"]) / 100.0
+		if String(zr["cut_iz"]) != "-":
+			iz_cut[int(zr["level"])] = float(zr["cut_iz"])
+	var stated: Array = [1, 2, 3, 4, 5].map(func(L): return float(iz_cut.get(L, -1.0)))
 	var rx := RegEx.new()
 	rx.compile(SCALE_RX)
 	for path in ["res://CLAUDE.md", "res://scripts/run_state.gd"]:
@@ -273,7 +291,7 @@ func _s3_the_scale() -> Dictionary:
 		var written: Array = []
 		for k in range(1, 6):
 			written.append(m.get_string(k))
-		var derived: Array = cuts.map(func(c): return "%.2f" % c)
+		var derived: Array = stated.map(func(c): return "%.2f" % c)
 		ok(str(written) == str(derived), "§3: %s writes the cuts %s — the derivation gives %s: the scale is the derivation's" % [path, str(written), str(derived)])
 		ok(m.get_string(6) == m.get_string(5), "§3: %s's severity 5 opens at %s where 4 ends at %s" % [path, m.get_string(6), m.get_string(5)])
 		# THE PARTY STANDS BESIDE THE SCALE (IX §0.2): the definition names its party within the paragraph that states it.
@@ -282,11 +300,12 @@ func _s3_the_scale() -> Dictionary:
 		ok(near.contains(PARTY), "§0.2: %s does not name the reference party beside the scale — the party is part of the definition" % path)
 	# THE CENTRES, WHERE A DOCUMENT STATES THEM: each grade's level cost, to a decimal (II §0.7 — a figure a text states is
 	# held against what decides it).
-	var centre: Array = [cost.get(2, 0.0), cost.get(3, 0.0), cost.get(4, 0.0), cost.get(5, 0.0), 9.9]
+	# RE-POINTED AT IZ §1: the centres the documents state are IZ's levels' costs (IZ-scale.tsv), as the cuts are.
+	var centre: Array = [iz_lv.get(2, 0.0), iz_lv.get(3, 0.0), iz_lv.get(4, 0.0), iz_lv.get(5, 0.0), 9.9]
 	var top := 9.9
-	for L in cost:
+	for L in iz_lv:
 		if int(L) >= 6:
-			top = minf(top, float(cost[L]))
+			top = minf(top, float(iz_lv[L]))
 	centre[4] = top
 	var want_c: Array = centre.map(func(c): return "%.1f" % (100.0 * float(c)))
 	var crx := RegEx.new()
@@ -315,12 +334,14 @@ func _s3_the_scale() -> Dictionary:
 	# RE-POINTED AT IY §4: the grade a modifier carries is the highest cost measured on any population, test-bound — IY's kept
 	# table, which `check_iy` §4 re-derives from both readings; IX's arithmetic on its own readings is IX's record, and the arm
 	# below still holds IX's table to its own column.
+	# RE-POINTED AT IZ §2: the grade is IZ's table's (`docs/reports/IZ-grades.tsv`, which `check_iz` §2 re-derives): the sharper
+	# reading of one population replaces the blunter (IZ §0.1). A modifier IZ removed is IX's record and not the deck's.
 	var iy := {}
-	for gr in _tsv("res://docs/reports/IY-grades.tsv", ["id", "grade"]):
+	for gr in _tsv("res://docs/reports/IZ-grades.tsv", ["id", "grade"]):
 		iy[String(gr["id"])] = int(gr["grade"])
 	for r in srows:
 		var id := String(r["id"])
-		if id == "none":
+		if id == "none" or REMOVED_AT_IZ.has(id):
 			continue
 		var c := 100.0 * (base - float(r["reading"]))
 		var band := 0
@@ -343,7 +364,9 @@ func _s3_the_scale() -> Dictionary:
 	ok(free_graded.is_empty(), "§3: %d modifiers cost nothing and carry a severity — a modifier that costs nothing has no severity: %s" % [free_graded.size(), str(free_graded)])
 	ok(off.is_empty(), "§3: %d grades are not the band their own cost falls in — the arithmetic: %s" % [off.size(), str(off)])
 	ok(free + graded == mods.size(), "§3: the kept table costs %d of the deck's %d modifiers" % [free + graded, mods.size()])
-	ok(free > 0 and graded > 0, "§3: the scale reads %d free and %d graded — both arms must hold a member" % [free, graded])
+	# RE-POINTED AT IZ §0.3: a modifier keyed on what only some builds do is graded on one that does it, and one that costs nothing
+	# even there leaves the deck — so the deck holds no free modifier, and the free arm's subject is `check_iz` §5's.
+	ok(free == 0 and graded > 0, "§3: the scale reads %d free and %d graded — since IZ §0.3 the deck holds no free modifier" % [free, graded])
 	# SEVERITY 5 ZEROES NO CLASS's KIT (IN §1's line), AND THE SCALE MOVED A MODIFIER INTO IT: Thin Air stops the turn-start drip
 	# and nothing else, so what it can never take is a card that costs nothing — and every class's basic costs nothing.
 	var at5: Array = []
@@ -388,13 +411,15 @@ func _s4_the_swing(scale: Dictionary) -> void:
 		if String(r["id"]) == "none":
 			inc_base = float(r["inc_reading"])
 	ok(inc_base > 0.0, "§4: the swing table carries no incumbent baseline")
-	var block := _flat(_block(_doc("res://docs/state.md"), "### THE BARGAIN DECK's GRADES"))
+	# RE-POINTED AT IZ: IZ archived IY's grades block word for word (its heading struck, `DoD-archive/state-archive.md`), so a figure IY or IX
+	# recorded there is read where that record lives; the live block is IZ's.
+	var block := _flat(_block(_doc("res://DoD-archive/state-archive.md"), "### ~~THE BARGAIN DECK's GRADES~~"))
 	var bad: Array = []
 	var over: Array = []
 	var named_wrong: Array = []
 	var n := 0
 	for r in rows:
-		if String(r["id"]) == "none":
+		if String(r["id"]) == "none" or REMOVED_AT_IZ.has(String(r["id"])):
 			continue
 		n += 1
 		var ic := 100.0 * (inc_base - float(r["inc_reading"]))

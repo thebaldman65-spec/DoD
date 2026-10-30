@@ -53,8 +53,10 @@ const REMOVED := {"famine": "Famine", "cruel_order": "Cruel Order", "hungering_d
 # RE-POINTED AT IY §2 and §4: the tally the grades hold — the test binds (a cost inside two standard errors has no severity),
 # the grade is the highest cost measured on any population (Deadened 3, Brittle 2), and the nine turned handles graded by
 # their own measurement (`docs/reports/IY-grades.tsv`).
-const GRADE_COUNTS := {1: 3, 2: 5, 3: 5, 4: 2, 5: 4}
-const UNGRADED := 4  # IY: the four whose handle reaches no cost on the reference party
+# RE-POINTED AT IZ §1–§5: the tally the grades hold since IZ — the sharper reading of one population replaces the blunter
+# (IZ §0.1), the reverts graded by their own old readings, Dull Edge removed (§3); `docs/reports/IZ-grades.tsv`.
+const GRADE_COUNTS := {1: 7, 2: 4, 3: 4, 4: 2, 5: 4}
+const UNGRADED := 0  # IZ: none — a modifier free even on the population its rule names leaves the deck (IZ §0.3, §5)
 
 
 func ok(cond: bool, what: String) -> void:

@@ -1,0 +1,3 @@
+arm	safe	gamble	holds_safe	holds_gamble	runs	fights	reading	se	d	d_se	z	verdict
+now	1-3	4-4	15	2	60	370	0.655327	0.019058	0.0000	0.0000	0.00	baseline
+moved	1-2	3-4	11	6	60	372	0.713162	0.015044	5.7835	2.1595	2.68	milder

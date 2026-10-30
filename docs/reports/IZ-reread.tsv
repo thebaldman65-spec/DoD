@@ -1,0 +1,10 @@
+arm	id	modifier	handle	value	runs	completed	reading	se	cost	d_se	z	unpaired	ratio	prior_cost	prior_se	prior_source	tie_z	band
+A_none	none	(no modifier)	-	-	60	52	0.934103	0.005685	0.0000	0.0000	0.00	-	-	-	-	-	-	-
+A_slick05	slick	Slick Footing	SLICK_DELAY	0.5	60	58	0.927024	0.005647	0.7078	0.2810	2.52	0.8013	0.351	0.7540	0.7120	IX §1 (run-seeded)	-0.06	1
+A_fleeting1	fleeting	Fleeting	FLEETING_TURNS	1	60	57	0.924892	0.006376	0.9211	0.2578	3.57	0.8542	0.302	0.4067	0.6218	IX §1 (run-seeded)	0.76	1
+A_hoarfrost3	hoarfrost	Hoarfrost	HOARFROST_CHILL_TURNS	3	60	58	0.938558	0.004736	-0.4455	0.3201	-1.39	0.7399	0.433	0.5125	0.5976	IX §1 (run-seeded)	-1.41	0
+A_encumbered	encumbered	Encumbered	-	-	60	55	0.923201	0.005048	1.0902	0.3134	3.48	0.7603	0.412	0.7355	0.3186	IY §1 (fight-seeded, IX's deck); IX §1 1.72 ± 0.74	0.79	1
+A_feverish	feverish	Feverish	-	-	60	51	0.902570	0.007639	3.1532	0.3757	8.39	0.9522	0.395	2.4180	0.7495	IX §1 (run-seeded)	0.88	2
+A_warded	warded	Warded	-	-	60	54	0.914463	0.007210	1.9640	0.3088	6.36	0.9182	0.336	2.5407	0.8752	IX §1 (run-seeded)	-0.62	2
+A_deadened	deadened	Deadened	-	-	60	56	0.930064	0.005423	0.4039	0.2932	1.38	0.7857	0.373	0.5390	0.5841	IX §1 (run-seeded)	-0.21	0
+A_brittle	brittle	Brittle	-	-	60	55	0.914141	0.007160	1.9961	0.3473	5.75	0.9142	0.380	0.7466	0.6615	IX §1 (run-seeded)	1.67	2

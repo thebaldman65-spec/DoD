@@ -560,8 +560,9 @@ func _rot_pool() -> void:
 		by_sev[run.modifier_severity(String(mid))] += 1
 	ok(by_sev[4] == 2 and run.modifier_severity("rot") == 4,
 		"§5: THE SEVERITY-4 POOL IS THE SCALE's TWO, ROT AMONG THEM (got %d, Rot at %d)" % [by_sev[4], run.modifier_severity("rot")])
-	ok(run.MODIFIERS.size() == 23 and by_sev[5] == 4,
-		"§5: twenty-three modifiers — Ruin's four at severity 5 among them (got %d, %d at 5)" % [run.MODIFIERS.size(), by_sev[5]])
+	# RE-POINTED AT IZ §3 and §5: Dull Edge and Tinderbox are removed, so the pool is twenty-one; severity 5 still four deep.
+	ok(run.MODIFIERS.size() == 21 and by_sev[5] == 4,
+		"§5: twenty-one modifiers — Ruin's four at severity 5 among them (got %d, %d at 5)" % [run.MODIFIERS.size(), by_sev[5]])
 	# The floor still holds by construction with a bigger high pool.
 	var misses := 0
 	for _i in 400:

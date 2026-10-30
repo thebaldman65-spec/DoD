@@ -2,19 +2,19 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 2094,
+  "total": 2114,
   "source": 1414,
-  "other": 213,
-  "document": 467
+  "other": 216,
+  "document": 484
  },
  "floor": {
-  "pins": 2094
+  "pins": 2114
  },
  "falls": [],
  "source_residency": {
   "narrow": 49,
-  "code": 873,
-  "absent": 329,
+  "code": 872,
+  "absent": 330,
   "runtime": 104,
   "unresolved": 3,
   "comment": 48,
@@ -1158,7 +1158,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_du.gd#235"
+   "g": "check_du.gd#236"
   },
   {
    "s": "check_du.gd",
@@ -1169,7 +1169,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_du.gd#233"
+   "g": "check_du.gd#234"
   },
   {
    "s": "check_du.gd",
@@ -1180,7 +1180,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_du.gd#234"
+   "g": "check_du.gd#235"
   },
   {
    "s": "check_dv.gd",
@@ -1329,7 +1329,7 @@
    "s": "check_dv.gd",
    "fn": "_s4_the_cut",
    "h": "docs/changelog.html",
-   "n": "<h2>2026-09-09 &mdash; Batch FS",
+   "n": "<h2>2026-10-05 &mdash; Batch HR",
    "p": "-",
    "r": "absent",
    "k": "literal",
@@ -1340,7 +1340,7 @@
    "s": "check_dv.gd",
    "fn": "_s4_the_cut",
    "h": "docs/changelog.html",
-   "n": "<h2>2026-09-09 &mdash; Batch FT",
+   "n": "<h2>2026-10-05 &mdash; Batch HS",
    "p": "+",
    "r": "code",
    "k": "literal",
@@ -1351,7 +1351,7 @@
    "s": "check_dv.gd",
    "fn": "_s4_the_cut",
    "h": "docs/changelog.html",
-   "n": "<h2>2026-09-20 &mdash; Batch GZ",
+   "n": "<h2>2026-10-27 &mdash; Batch IZ",
    "p": "+",
    "r": "code",
    "k": "literal",
@@ -1362,7 +1362,7 @@
    "s": "check_dv.gd",
    "fn": "_s4_the_cut",
    "h": "docs/changelog.html",
-   "n": "Batch GZ</b> at FS/FT",
+   "n": "Batch IZ</b> at HR/HS",
    "p": "+",
    "r": "code",
    "k": "literal",
@@ -4811,6 +4811,17 @@
    "s": "check_hp.gd",
    "fn": "_s1b_the_fields",
    "h": "scripts/battle.gd",
+   "n": "Run.DULL_EDGE_CRIT",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#288"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s1b_the_fields",
+   "h": "scripts/battle.gd",
    "n": "attacker.attack += attacker.whetstone",
    "p": "+",
    "r": "code",
@@ -4862,17 +4873,6 @@
    "k": "literal",
    "how": "read",
    "g": "check_hp.gd#287"
-  },
-  {
-   "s": "check_hp.gd",
-   "fn": "_s1b_the_fields",
-   "h": "scripts/battle.gd",
-   "n": "u.crit_bonus = maxf(u.crit_bonus - Run.DULL_EDGE_CRIT, -CRIT_CHANCE)",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "read",
-   "g": "check_hp.gd#288"
   },
   {
    "s": "check_hp.gd",
@@ -7400,12 +7400,23 @@
    "s": "check_ik.gd",
    "fn": "_s5_strike",
    "h": "docs/master.html",
+   "n": "<td>Tinderbox</td>",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ik.gd#593"
+  },
+  {
+   "s": "check_ik.gd",
+   "fn": "_s5_strike",
+   "h": "docs/master.html",
    "n": "Takes 25% less strike damage",
    "p": "+",
    "r": "code",
    "k": "loop-list",
    "how": "read",
-   "g": "check_ik.gd#596"
+   "g": "check_ik.gd#595"
   },
   {
    "s": "check_ik.gd",
@@ -7416,7 +7427,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "read",
-   "g": "check_ik.gd#596"
+   "g": "check_ik.gd#595"
   },
   {
    "s": "check_il.gd",
@@ -7684,7 +7695,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#297"
+   "g": "check_ip.gd#298"
   },
   {
    "s": "check_ip.gd",
@@ -7695,7 +7706,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#293"
+   "g": "check_ip.gd#294"
   },
   {
    "s": "check_ip.gd",
@@ -7706,7 +7717,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#296"
+   "g": "check_ip.gd#297"
   },
   {
    "s": "check_ip.gd",
@@ -7717,7 +7728,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#290"
+   "g": "check_ip.gd#291"
   },
   {
    "s": "check_ip.gd",
@@ -7728,7 +7739,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#292"
+   "g": "check_ip.gd#293"
   },
   {
    "s": "check_ip.gd",
@@ -7739,7 +7750,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#291"
+   "g": "check_ip.gd#292"
   },
   {
    "s": "check_ip.gd",
@@ -7750,7 +7761,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ip.gd#298"
+   "g": "check_ip.gd#299"
   },
   {
    "s": "check_ip.gd",
@@ -7761,7 +7772,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ip.gd#298"
+   "g": "check_ip.gd#299"
   },
   {
    "s": "check_ip.gd",
@@ -7772,7 +7783,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ip.gd#295"
+   "g": "check_ip.gd#296"
   },
   {
    "s": "check_ip.gd",
@@ -7783,7 +7794,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#288"
+   "g": "check_ip.gd#289"
   },
   {
    "s": "check_ip.gd",
@@ -7794,7 +7805,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#289"
+   "g": "check_ip.gd#290"
   },
   {
    "s": "check_ip.gd",
@@ -7805,7 +7816,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ip.gd#298"
+   "g": "check_ip.gd#299"
   },
   {
    "s": "check_ip.gd",
@@ -7816,7 +7827,7 @@
    "r": "missing-file",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ip.gd#86",
+   "g": "check_ip.gd#87",
    "expr": "String"
   },
   {
@@ -7828,7 +7839,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ip.gd#170",
+   "g": "check_ip.gd#171",
    "expr": "said"
   },
   {
@@ -8672,7 +8683,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_iu.gd#469"
+   "g": "check_iu.gd#471"
   },
   {
    "s": "check_iu.gd",
@@ -8683,7 +8694,7 @@
    "r": "missing-file",
    "k": "composed",
    "how": "param",
-   "g": "check_iu.gd#448"
+   "g": "check_iu.gd#450"
   },
   {
    "s": "check_iu.gd",
@@ -8694,7 +8705,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "param",
-   "g": "check_iu.gd#451"
+   "g": "check_iu.gd#453"
   },
   {
    "s": "check_iv.gd",
@@ -9465,7 +9476,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iw.gd#272",
+   "g": "check_iw.gd#275",
    "expr": "ARM_NEEDLE"
   },
   {
@@ -9477,7 +9488,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iw.gd#273",
+   "g": "check_iw.gd#276",
    "expr": "SUPERSEDED_NEEDLE"
   },
   {
@@ -9489,7 +9500,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_iw.gd#268"
+   "g": "check_iw.gd#271"
   },
   {
    "s": "check_iw.gd",
@@ -9500,7 +9511,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iw.gd#347",
+   "g": "check_iw.gd#357",
    "expr": "_flat"
   },
   {
@@ -9512,7 +9523,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iw.gd#359",
+   "g": "check_iw.gd#369",
    "expr": "_flat"
   },
   {
@@ -9524,7 +9535,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ix.gd#65"
+   "g": "check_ix.gd#66"
   },
   {
    "s": "check_ix.gd",
@@ -9535,7 +9546,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ix.gd#63"
+   "g": "check_ix.gd#64"
   },
   {
    "s": "check_ix.gd",
@@ -9546,7 +9557,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ix.gd#67"
+   "g": "check_ix.gd#68"
   },
   {
    "s": "check_ix.gd",
@@ -9557,7 +9568,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ix.gd#66"
+   "g": "check_ix.gd#67"
   },
   {
    "s": "check_ix.gd",
@@ -9568,18 +9579,18 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ix.gd#64"
+   "g": "check_ix.gd#65"
   },
   {
    "s": "check_ix.gd",
    "fn": "_s2_the_halves",
-   "h": "docs/state.md",
+   "h": "DoD-archive/state-archive.md",
    "n": "%s — %s",
    "p": "-",
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_ix.gd#141"
+   "g": "check_ix.gd#142"
   },
   {
    "s": "check_ix.gd",
@@ -9590,7 +9601,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ix.gd#276",
+   "g": "check_ix.gd#284",
    "expr": "says"
   },
   {
@@ -9602,51 +9613,51 @@
    "r": "runtime",
    "k": "composed",
    "how": "read",
-   "g": "check_ix.gd#217"
+   "g": "check_ix.gd#225"
   },
   {
    "s": "check_ix.gd",
    "fn": "_s4_the_swing",
-   "h": "docs/state.md",
+   "h": "DoD-archive/state-archive.md",
    "n": "%s swings",
    "p": "+",
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_ix.gd#315"
+   "g": "check_ix.gd#323"
   },
   {
    "s": "check_ix.gd",
    "fn": "_s4_the_swing",
-   "h": "docs/state.md",
+   "h": "DoD-archive/state-archive.md",
    "n": "%s swings %d bands",
    "p": "+",
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_ix.gd#310"
+   "g": "check_ix.gd#318"
   },
   {
    "s": "check_ix.gd",
    "fn": "_s4_the_swing",
-   "h": "docs/state.md",
+   "h": "DoD-archive/state-archive.md",
    "n": "the swing across builds",
    "p": "-",
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_ix.gd#322"
+   "g": "check_ix.gd#330"
   },
   {
    "s": "check_ix.gd",
    "fn": "_s4_the_swing",
-   "h": "docs/state.md",
+   "h": "DoD-archive/state-archive.md",
    "n": "the swing between these two",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ix.gd#321"
+   "g": "check_ix.gd#329"
   },
   {
    "s": "check_iy.gd",
@@ -9739,7 +9750,7 @@
   {
    "s": "check_iy.gd",
    "fn": "_s1_the_seeding",
-   "h": "docs/state.md",
+   "h": "DoD-archive/state-archive.md",
    "n": "DOD_SIM_FIGHT_SEED",
    "p": "+",
    "r": "code",
@@ -9750,7 +9761,7 @@
   {
    "s": "check_iy.gd",
    "fn": "_s1_the_seeding",
-   "h": "docs/state.md",
+   "h": "DoD-archive/state-archive.md",
    "n": "ratio %.3f",
    "p": "+",
    "r": "runtime",
@@ -9773,13 +9784,13 @@
   {
    "s": "check_iy.gd",
    "fn": "_s2_the_handles",
-   "h": "docs/state.md",
+   "h": "DoD-archive/state-archive.md",
    "n": "%s — %s → %s",
    "p": "-",
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_iy.gd#286"
+   "g": "check_iy.gd#297"
   },
   {
    "s": "check_iy.gd",
@@ -9806,24 +9817,24 @@
   {
    "s": "check_iy.gd",
    "fn": "_s3_the_reach",
-   "h": "docs/state.md",
+   "h": "DoD-archive/state-archive.md",
    "n": "%s at %s: %s",
    "p": "-",
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_iy.gd#307"
+   "g": "check_iy.gd#318"
   },
   {
    "s": "check_iy.gd",
    "fn": "_s4_the_grades",
-   "h": "docs/state.md",
+   "h": "DoD-archive/state-archive.md",
    "n": "%s — the %s is the higher",
    "p": "-",
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_iy.gd#352"
+   "g": "check_iy.gd#367"
   },
   {
    "s": "check_iy.gd",
@@ -9834,7 +9845,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iy.gd#388",
+   "g": "check_iy.gd#403",
    "expr": "says"
   },
   {
@@ -9846,7 +9857,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iy.gd#359"
+   "g": "check_iy.gd#374"
   },
   {
    "s": "check_iy.gd",
@@ -9857,7 +9868,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iy.gd#360"
+   "g": "check_iy.gd#375"
   },
   {
    "s": "check_iy.gd",
@@ -9868,7 +9879,219 @@
    "r": "runtime",
    "k": "composed",
    "how": "derived",
-   "g": "check_iy.gd#362"
+   "g": "check_iy.gd#377"
+  },
+  {
+   "s": "check_iz.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/design-notes.md",
+   "n": "+0.24",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iz.gd#82"
+  },
+  {
+   "s": "check_iz.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/design-notes.md",
+   "n": "0.15 points",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iz.gd#81"
+  },
+  {
+   "s": "check_iz.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "A HANDLE WORTH 0.15 POINTS PER TEN POINTS OF ITS QUANTITY CANNOT CARRY A BARGAIN",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iz.gd#77"
+  },
+  {
+   "s": "check_iz.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/design-notes.md",
+   "n": "Dull Edge",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iz.gd#81"
+  },
+  {
+   "s": "check_iz.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "ONE THAT KEYS ON SOMETHING EVERY BUILD DOES AND STILL COSTS NOTHING HAS NO REACH, AND LEAVES THE DECK",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iz.gd#76"
+  },
+  {
+   "s": "check_iz.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "THE SHARPER INSTRUMENT's REPLACES THE OTHER",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iz.gd#79"
+  },
+  {
+   "s": "check_iz.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "TWO READINGS OF THE SAME POPULATION ARE TWO ESTIMATES OF ONE FACT, AND THE SHARPER INSTRUMENT's REPLACES THE OTHER",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iz.gd#75"
+  },
+  {
+   "s": "check_iz.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/design-notes.md",
+   "n": "Tinderbox",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iz.gd#82"
+  },
+  {
+   "s": "check_iz.gd",
+   "fn": "_s0_the_rulings",
+   "h": "CLAUDE.md",
+   "n": "no severity under ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iz.gd#78"
+  },
+  {
+   "s": "check_iz.gd",
+   "fn": "_s1_the_rereads",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_iz.gd#138",
+   "expr": "said"
+  },
+  {
+   "s": "check_iz.gd",
+   "fn": "_s1_the_rereads",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_iz.gd#152",
+   "expr": "price"
+  },
+  {
+   "s": "check_iz.gd",
+   "fn": "_s2_the_placing",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_iz.gd#220",
+   "expr": "tally"
+  },
+  {
+   "s": "check_iz.gd",
+   "fn": "_s3_the_removal",
+   "h": "docs/master.html",
+   "n": "<tr><td>Dull Edge</td>",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iz.gd#253"
+  },
+  {
+   "s": "check_iz.gd",
+   "fn": "_s3_the_removal",
+   "h": "docs/master.html",
+   "n": "<tr><td>Parched</td>",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iz.gd#253"
+  },
+  {
+   "s": "check_iz.gd",
+   "fn": "_s3_the_removal",
+   "h": "docs/master.html",
+   "n": "<tr><td>Tinderbox</td>",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iz.gd#253"
+  },
+  {
+   "s": "check_iz.gd",
+   "fn": "_s6_the_band_and_the_cut",
+   "h": "docs/changelog.html",
+   "n": "/changelog-archive.html</code>",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iz.gd#459"
+  },
+  {
+   "s": "check_iz.gd",
+   "fn": "_s6_the_band_and_the_cut",
+   "h": "docs/changelog.html",
+   "n": "<code>",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iz.gd#460"
+  },
+  {
+   "s": "check_iz.gd",
+   "fn": "_s6_the_band_and_the_cut",
+   "h": "docs/changelog.html",
+   "n": "Batch IZ</b> at HR/HS",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_iz.gd#457"
+  },
+  {
+   "s": "check_iz.gd",
+   "fn": "_s6_the_band_and_the_cut",
+   "h": "docs/changelog.html",
+   "n": "res://",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_iz.gd#462"
   },
   {
    "s": "test_batch_ah.gd",

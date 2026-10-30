@@ -314,8 +314,8 @@ fire on that blow and nothing is counted twice**, because the sub-split Focus is
   arm's mean by +0.0002% against a ±0.11% floor), **but it is a rare event and must not be asserted
   as impossible.** EX §2.
 - **IT CANNOT REACH AN ENEMY, AND THAT IS STRUCTURAL.** `_party_crit_bonus()` is hero-gated at its
-  read site; `crit_bonus` is written on the HERO spawn path and inherited only by a companion (its
-  one other writer, `dulledge`, SUBTRACTS); every remaining term is a talent counter and an enemy is
+  read site; `crit_bonus` is written on the HERO spawn path and inherited only by a companion (the
+  one other writer it had, a battle modifier that subtracted, was removed at IZ §3); every remaining term is a talent counter and an enemy is
   allocated no tree. **Measured: 69,932 enemy crit rolls, deepest total 0.3500, none at a
   certainty.** A future enemy ability that raised one would need this checked again.
 - **THE ROLL IS DELIBERATELY NOT CLAMPED.** `randf()` returns [0,1), so `randf() < 1.93` and
