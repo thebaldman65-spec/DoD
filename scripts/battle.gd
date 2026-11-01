@@ -4309,7 +4309,7 @@ func _ambush_spend(u: BattleUnit) -> void:
 			h.next_time = _ambush_moved_on(h, h.next_time, _clock)
 
 
-# ══ BATCH JB §2b — OUTPACED: THE WARBAND FIRST, EVERY ROUND ═════════════════════
+# ══ BATCH JB §2b — OUTPACED: THE WARBAND FIRST, SPAN BY SPAN ════════════════════
 #
 # **The game has no rounds, so the timeline is read in spans of one basic swing at the average speed** (`OUTPACED_SPAN`), and in
 # each span every enemy due acts before any hero due, each side in its own order; speed still counts across spans. **Two places

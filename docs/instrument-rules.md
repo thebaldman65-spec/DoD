@@ -1384,8 +1384,14 @@ the rune was wired, because it was supplying the one input the defect was in.
 - **A TIE IS NAMED WHERE THE GRADES ARE READ, NOT ONLY IN A REPORT.** The grade a tie hands out is still a grade the deck
   deals, so the sort's order stands; what changes is that the file holding the grades says which cuts the measurement
   could not make, so nobody reads a coin flip as a ranking.
+- **A GRADE IS READ OFF THE READING. A TIE AT A CUT IS NAMED, NOT RESOLVED UPWARD (JC §0.5, the designer's): THE SETTLEMENT OF THIS RULE AND
+  IY §0.3's, NOT A THIRD OPINION.** *A grade may overstate what a modifier costs but may not understate it* bars grading a modifier below what it
+  was **measured** to cost, never below what its error bar permits. **The alternative ratchets the deck to all 5s over enough batches**, because
+  every reading is inside some error of some cut: that is what a five-band scale does to a continuous quantity, and it is no defect. The case
+  is Ambushed, a 4 at +12.02 ± 1.20, 0.20 under grade 5's floor, named as a tie as JB named it. This rule's *named as arbitrary in the file* is
+  how such a grade is recorded; the second seed block stays available and is no longer owed.
 - **AND A TIE THAT SURVIVES ITS SECOND BLOCK IS A MEASUREMENT THAT SUCCEEDED (IQ §0.2, the designer's — it qualifies the
-  rule above).** *Two modifiers that cost the same belong in the same grade, and a boundary between them is an artifact of
+  rule that heads this block).** *Two modifiers that cost the same belong in the same grade, and a boundary between them is an artifact of
   fixed counts, not a fact about the deck.* The cuts are made at fixed counts, and a deck that clusters guarantees an
   arbitrary cut wherever a cluster meets one; **the bands read grades, not modifiers**, so such a cut moves one modifier
   between two adjacent bands and nothing else. **So the tie gets no third block** — an hour spent ordering two modifiers the

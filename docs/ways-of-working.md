@@ -96,6 +96,13 @@ compaction.** Each was a sentence or less.
   according to whether an instruction was priced. `check_fr.gd` names it among the rules it cannot
   assert, and like the rules around it, it is kept by people rather than by an instrument.
 
+**AND A BRIEF THAT GRADES A MODIFIER CARRIES TWO MORE RULES (JC §0.9, the designer's).** **A BRIEF THAT GRADES A MODIFIER NAMES BOTH POPULATIONS**:
+a rule only some builds can reach is graded on a build that reaches it, every row of the grades table carries a second population, and
+Ruin's bosses draw from 3–4, so a brief that names the reference four alone under-specifies an instrument a standing rule requires. JB's
+brief did, and the incumbent's arms moved two of its four grades. **A BRIEF ALLOWS A CARD ONE TUNE, AND IT MAY ALLOW A CURVE WHERE A CUT IS SUSPECTED**:
+Ambushed's curve bent at the cut, and reading 8, 9 and 11 was a curve, not fishing for a grade. The one tune is written here for the first time
+as a rule; until JC it stood only in the briefs that allowed it, so this states the pair and the next batch needs no conversation for either.
+
 ## RECON BEFORE AUTHORING
 
 > **Before content is written for an area, a batch reads out what already exists there: the

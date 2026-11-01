@@ -17,6 +17,32 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT JC — 2026-11-01, FROM `docs/state.md` AS IT LEFT IT (`81fe49e`)
+
+**What came here**: JB's three rulings, all answered in JC's brief; FOUND AT JB's five closed items (the fixed band's Ambushed, the batch-code arm, the brief's premises, Outpaced's words, the five seats); and the roadmap's JB item. Each word for word, under the heading it stood under.
+
+
+### ~~JB's RULINGS OWED~~ — **ALL THREE ANSWERED IN JC's BRIEF (1: the deck is closed at twenty-five and the target retired, JC §0.1; 2: no fourth-grade card on those axes and Porous's range not driven, JC §0.2; 3: the census prices the gross, and it gains a divisor, JC §0.3)** — was: ***THREE; THE DECK's SHAPE, THE AXES THE FOUR DID NOT REACH, AND WHAT THE CENSUS IS FOR***
+
+Full working: `docs/reports/JB.md`, NEEDS A RULING.
+
+1. **THE DECK's SHAPE (JB §4).** It holds 1×7, 2×7, 3×4, 4×3, 5×4 against the 5 / 5 / 5 / 4 / 4 it was aimed at: one at 1 and two at 2 where four 4s were aimed, because the readings allow no more. Whether anything comes off is the designer's; nothing did.
+2. **THREE OF THE FOUR LANDED UNDER GRADE 4, AND ONE HAS NO HANDLE LEFT (JB §3).** Fractured sits at its limit and reads a 1; Outpaced states a rule, has no value to move, and reads a 2; Porous was read at 0.4 alone and reads a 2, the rest of its handle not driven, and neither extrapolation reaches a 4 (about +3.5 on a straight line, about +5.6 by what a lost barrier cost, against a floor of 6.88). **So the turn order stands at 2, Break at 3 and a barrier at 2 as read.** A 4 on any of them is a new shape; whether one is wanted, and whether Porous's range is driven, is the designer's.
+3. **THE CENSUS's PRICE DOES NOT PRICE (JB §3).** Both prices written from it missed: a share gives what a side produces, and a cost is what is left after the party absorbs it, so Ambushed's price was wrong twice in opposite directions and Porous's assumed every barrier fills. The practice stands, for whom a rule touches. Whether a new card's starting value is still derived from it, or from an arm, is the designer's.
+
+### FOUND AT JB AND NOT FIXED — ITS CLOSED ITEMS (archived at JC; the block stays in `docs/state.md`)
+
+- **RUIN's MINI-BOSS AND BOSSES CAN DRAW AMBUSHED** (`Run.FIXED_MODIFIER_BAND`, severity 3–4 holds 7): eight free warband turns with no reward. The rung reads the deck; nothing was special-cased, and the forced arm above is the only reading of it.
+- ~~**`check_is` §6 CANNOT SEE A BATCH CODE PAST I**~~ — **WIDENED AFTER JB's COMMIT, THE DESIGNER's WORD**: `BATCH_NAME` read `[A-I][A-Z]`, blind since JA, so `JB §2` in `master.html`'s body would have passed. It reads `[A-Z][A-Z]` now, every letter, so KA cannot reopen it. The body's only hits remain *from HP* and *before HP*, and `NOT_A_BATCH` holds HP.
+- **THE BRIEF's PREMISES THAT DID NOT HOLD** (JB's report §0): *a rate or a duration a multiplier can key on* — Break has neither; *Inverted's comparator* — the order is a timeline, there is no comparator; *the slowest body acts first* — the opening roll is dice and the Tracker's opening turn stands; *the warband strikes first* — every party holds a Hunter, and IO §0.5 binds; *four new ids make the offer defect bigger* — they do not (no save written before them holds one, and no old id's grade moved); *rate tweaks top out near 3* — its own example reads 4.75, and Miasma 5.14; *HR/HS's method* for the state's cut — that is the changelog's boundary; the state's method is HX §2's.
+- **OUTPACED's *EVERY ROUND* HAS NO ROUND UNDER IT** (JB §2b): the words are the brief's, and the game has no rounds. The code reads a span of one basic swing at the average speed: inside a span the warband goes first, and across spans speed still counts, so a hero due in one span acts before a slow enemy due in the next. The glossary defines no *round*. A player who reads the card as *every enemy before any hero, always* will see a fast hero break it.
+- **FIVE SEATS THAT SAY *NEXT* ASSUME THE TIMELINE** (read, not run): Rally, a free action, Preparation, Watchtower and the Resonating Hourglass each seat a hero at the soonest clock less 0.01. Under Outpaced an enemy due in that span still goes first, so *acts next* and *at once* can come a turn late; under Ambushed the seat waits for the run's end. Both follow from what the cards say, and nothing was changed for them.
+
+### THE PLAYTEST'S OTHER FINDINGS — **LATER BATCHES BY RULING (HW's brief §5); THE ROADMAP HOLDS THE ORDER** — ITS CLOSED ITEM (archived at JC; the block stays in `docs/state.md`)
+
+- **THE FOUR ARE AUTHORED, AND THE TWO RULES REPLACED (JB)**: Ambushed a 4, Outpaced and Porous 2s, Fractured a 1, the deck 1×7, 2×7, 3×4, 4×3, 5×4; a bargain may not pay the party, and a rule costs the party by what it does to the party's health, the share setting how much the party claws back. **The deck's shape is the designer's** (JB's RULINGS OWED 1), and three axes the four did not reach (2).
+
+
 ## ARCHIVED AT JB — 2026-10-31, FROM `docs/state.md` AS IT LEFT IT (`48837df`)
 
 **What came here**: JA's three rulings, all answered in JB's brief; FOUND AT JA's premises item, a record; the roadmap's JA item; and the records in THE TEST TREE, Knowledge sync, Small and still owed and Carried that ask nothing: what each batch added to the battery and to `baselines.json`, three items closed by what they name, and two figures the census prints. JB §5's condition was met (19,466 B of room, under 20,000 B). Each word for word, under the heading it stood under, a fragment of a paragraph where the paragraph's live half stayed.

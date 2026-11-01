@@ -304,6 +304,18 @@ new block written here):
       is a figure behind a door**: `check_iq` §2 reads its figures against the field or the constant that decides them —
       the card catalogue's own since IT §2. A batch does not read the strip as the defect fix it was not.
 - Terminology: damage against the Break meter = "Break damage (BD)" everywhere.
+- **DO NOT ASK. DECIDE, AND SAY WHAT YOU DECIDED (STANDING, SET AT JC, THE DESIGNER's WORD, GIVEN TWICE).** JB asked seven times and the
+  answer was the recommendation seven times out of seven: the asking cost a conversation and changed nothing. **Nothing waits on a reply**:
+  no step of any brief is blocked on one, and a brief that seems to need one got a premise wrong, which is what the report's premise table is for.
+  · **A PREMISE THAT TURNS OUT FALSE**: when a card, a rule or a measurement has to change because of one, change it the way you would
+    recommend, and write down what you changed and why. Those are findings with an obvious answer, not preferences.
+  · **A CHOICE THAT IS GENUINELY THE DESIGNER's AND CANNOT BE UNMADE INSIDE THE BATCH**: take the recommendation anyway and put it in NEEDS A
+    RULING — what you took, what the alternative was, and what reversing it would cost. **A ruling owed is not a batch stalled.**
+  · **THE BRIEF STAYS WRONG WHERE IT WAS WRONG**: correcting a premise in flight does not shrink the premise table. Every departure is
+    still named there and in FOUND AT.
+  · **IT SETTLES WHO DECIDES IN FLIGHT, NOT WHAT A BATCH MAY AUTHOR**: a batch still authors no rune, and still applies no fold that moves a
+    magnitude on its own judgment; what those two rules keep from a batch it reports, as they say. *(This clause is JC's reading, not the
+    designer's words, and JC's NEEDS A RULING asks.)*
 - **A FOLD, A RENAME OR A REFACTOR THAT CHANGES A MAGNITUDE IS A DESIGN CHANGE. IT GOES TO THE
   DESIGNER AS A REPORT AND IS NEVER APPLIED ON THE BATCH'S OWN JUDGMENT (STANDING, SET AT BATCH
   CQ §6).** The rule exists because of CN §3: removing the timing bar from 113 abilities orphaned
@@ -1914,10 +1926,13 @@ decision and the STRUCTURE is what shipped.
   hardest rung dealt the mildest bargains), plus **FIXED ENCOUNTERS CARRY A MODIFIER**
   (`Run.arm_fixed_modifier`, armed at BOTH walk sites): the mini-boss and every boss, the nodes
   a route cannot duck. It is NOT a bargain — no offer, no choice, NO REWARD — **and it draws from
-  `Run.FIXED_MODIFIER_BAND`, the modifiers of severity 3–4 (eight until IX §3's scale, five at IX, seven at IY §4's grades, six at IZ's, seven since JB's), never from severity 5 (IN §1; CONFIRMED AT IO §0.4, the
+  `Run.FIXED_MODIFIER_BAND`, the modifiers of severity 3–4 (eight until IX §3's scale, five at IX, seven at IY §4's grades, six at IZ's, seven at JB's), less what `opening_burst` marks, so six draw since JC, never from severity 5 (IN §1; CONFIRMED AT IO §0.4, the
   designer's)**: a modifier with no reward is not a bargain, so a severity 5 there would be pure difficulty with no
-  twist bought — a difficulty slider nothing prices. **Which eight is the grades'**: a re-grade moves the band's
-  contents with it, and the batch that re-grades says what the fixed encounters draw after.
+  twist bought — a difficulty slider nothing prices. **Which modifiers stand there is the grades'**: a re-grade moves the band's
+  contents with it, and the batch that re-grades says what the fixed encounters draw after. **AND IT DRAWS NO BURST OPENER (JC §0.6, the
+  designer's)**: a fixed encounter is a tax, not a bargain, so it draws the mildest shapes, and a free run of warband turns before the heroes act is the
+  one shape that does not belong there: the opening turn matters most where the fight is hardest. **`opening_burst` is a field on the modifier and
+  the band reads the field, never a name**, so the next burst card carries it and inherits the rule with no brief.
 · **A NODE THAT ARMS A FIXED MODIFIER OFFERS NO BARGAIN (IR §1a, the designer's).** The mini-boss is the one node that is
   both, and the two never met: in play `accept_offer` overwrote the armed modifier, and in the sim the bargain came first
   and the arm's never-stack guard skipped it, so a Ruin mini-boss fought the bargain alone. **The meeting is removed, not
@@ -1951,13 +1966,34 @@ decision and the STRUCTURE is what shipped.
   Edge at its floor took more of the warband's crits out of the party than of the party's own out. **A third paid at JB, and this rule did not
   predict it**: Inverted gave the party's slowest body, its healer, half as many turns again, and the warband's pressure on that arm was not read
   (`docs/design-notes.md`).
+· **THE DECK IS CLOSED AT TWENTY-FIVE, AND A GRADE IS FOUND AFTER A MECHANIC IS BUILT, NEVER CHOSEN BEFORE IT (JC §0.1, the designer's).** Nothing
+  comes off the deck and nothing more goes on. **A table of how many cards each grade should hold assumed a grade is authorable**, and JB is the
+  batch that proved it is not: three of four cards landed two and three grades under the 4 they were aimed at, and not through bad building.
+  The tally stands in `docs/state.md`; the shape it was first aimed at is retired, and `docs/design-notes.md` keeps it.
+· **PRESSURE IS ABSORBABLE AND CAPACITY IS NOT: THE HIGH GRADES BELONG TO RULES THAT TAKE AWAY WHAT THE PARTY ABSORBS WITH (JC §0.4, the designer's).**
+  The party's own recovery takes pressure back (half to two-thirds of Ambushed's at eight and nine turns; read on that arm and not proved of every
+  pressure, Porous's healing having answered a fifth), so a rule that only adds to the blows or reorders them stops short of the top of the scale
+  whatever its figure: Fractured 0.86 for every Break made permanent, Outpaced 1.13 for the whole turn order, Feverish 3.15 at +25%, the Thin Veil
+  4.75 at +50%. **Every modifier at 4 or 5 does one of three other things**: it takes from what the party absorbs with (Rot halves the body,
+  Overgrown opens it short, Wasting takes a share of its maximum every turn, Thin Air dries what pays for healing, Bloodless stops healing), it
+  scales with the party's own action (Mirrorbound: the party cannot stop striking, so it cannot stop paying), or it outruns the recovery rate
+  (Ambushed: a burst of eight turns arrives faster than healing answers, and one more turn is a grade). **So the axis table never showed a gap, and the deck is shaped like the game**: health, healing,
+  resource and recoil reach 5 because they are the absorption axes; damage, Break, the hand, status duration, a barrier and the turn order stop
+  between 1 and 3 because they are pressure or small capacity; and tempo's one 4 is the burst, not the rate.
+· **NO FOURTH-GRADE CARD STANDS ON THE TURN ORDER, BREAK OR A BARRIER, AND A 4 THERE WOULD NEED A NEW SHAPE (JC §0.2, the designer's).** Fractured at 0.0
+  reads a 1, Outpaced a 2, and **Porous stays a 2 at 0.4 and its range is not driven**: the values left run toward *barriers do nothing*, and
+  two-fifths taxes a mechanism where zero deletes it. A 3 is not worth removing a mechanic from play for.
 · **A NEW MODIFIER NAMES THE TWO SIDES' SHARES OF ITS QUANTITY BEFORE IT IS BUILT (JA §3, the designer's), READ OFF THE CENSUS OF
   RECORD, `docs/reports/JA-shares.tsv`** — every quantity a live modifier keys on and the doors' others, what each side produced, on
   the reference party and the talented incumbent; a quantity the table lacks is read the same way (JA's probe, the strike ledger, the
   status door and the resource doors) and added before the rule is. **Three rules cost a batch each to learn this — the Hungering
-  Dark, Tinderbox and Dull Edge — and the census makes it a measurement.** **A share says whom a rule touches, which is the rule above's
-  subject, and it can price a rule before the code exists (JB §3 graded two such prices)**; a quantity the warband produces none of (the
-  turn-start drip, cooldowns) binds the party alone however the words read.
+  Dark, Tinderbox and Dull Edge — and the census makes it a measurement.** **A share says whom a rule touches, which is the subject of JB §0.2's
+  rule, and it can price a rule before the code exists (JB §3 graded two such prices)**; a quantity the warband produces none of (the
+  turn-start drip, cooldowns) binds the party alone however the words read. **A CENSUS PRICES THE GROSS, AND THE COST IS THE GROSS AFTER THE PARTY's HEALING — SO DIVIDE BY ABOUT TWO AND A HALF. READ THE GROSS ON THE
+  POPULATION THE CARD ACTS ON, NOT ON EVERY FIGHT, AND CHECK A MULTIPLIER ON A CAPACITY AGAINST WHAT THAT CAPACITY ABSORBS (JC §0.3, the designer's).**
+  Corrected for both, Ambushed at 8 grossed 18.4 points and read 6.67, at 9, 20.7 and 9.03, and Porous at 0.4, 4.8 and 2.09: 2.76, 2.29 and
+  2.30. **Three readings behind one divisor, so it is written to be tested, not believed**, and it has an edge already: at 11 Ambushed read
+  15.47 on 25.3, 1.64, because past what the healing can answer nothing is left to divide by.
 · **A CLASS PASSIVE OUTRANKS A MODIFIER WHERE THEY CONTRADICT (IO §0.5, the designer's).** A hero's lineage is what
   he is; a modifier is what this fight is. **The thing he is wins.** The worked example is the Tracker's opening turn,
   kept before the first round under IN's Cruel Order (withdrawn at IO) and before Ambushed's run at JB, whose card names the Hunter for
@@ -2007,6 +2043,7 @@ decision and the STRUCTURE is what shipped.
   instrument is a sharper instrument, never a wider band**: widening grade 1 to the instrument would swallow grade 2's centre and
   leave the deck four grades where its cards show five.
   **A GRADE MAY OVERSTATE WHAT A MODIFIER COSTS. IT MAY NOT UNDERSTATE IT. THE GRADE IS THE HIGHEST COST THE PROJECT HAS MEASURED, ON ANY POPULATION (IY §0.3, the designer's)**
+  *(what it was measured to cost, not what its error bar permits: the tie block's settlement in `docs/instrument-rules.md`, JC §0.5)*
   — the default four's or
   the talented incumbent's, each against its own *none* arm, each test-bound — so a modifier that costs a fuller build more is
   graded by that build, and a player who has invested is never dealt it as a milder card than it is for them. **Only a reading of

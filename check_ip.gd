@@ -7,7 +7,7 @@
 #        a live id is still read — the positive arm.
 #   §1b  SEVERITY 5 IS THE CLIFF, THREE DEEP: the deck holds twenty-three, cut six / six / four / four / three; Ruin's gamble
 #        band holds the three and every Ruin offer deals two of them, distinct; no Wanderer or Warden band reaches severity 5,
-#        over the data and over EP's sample; the fixed encounters draw the eight of severity 3–4; EP's sample reads its
+#        over the data and over EP's sample; the fixed band holds severity 3–4; EP's sample reads its
 #        bands' arithmetic, and IO's reading beside it. **NO GRADE IS PINNED HERE**: the grades are the measurement's (IP's
 #        report, §1b), and a re-grade that keeps the counts leaves this gate green.
 #   §2   THE BOT DRINKS THE PLAYER's POTION: DRIVEN — on the real turn loop, a bot hero who opens his turn below the line
@@ -259,13 +259,13 @@ func _s1b_the_cut() -> void:
 				if int(_run.modifier_severity(String(id4))) >= 5:
 					reach.append(id4)
 		ok(reach.is_empty(), "§1b: %s's bands reach a severity-5 modifier: %s" % [d, str(reach)])
-	# THE FIXED ENCOUNTERS draw the eight of severity 3–4, never a 5.
+	# THE FIXED BAND holds the severities 3–4, never a 5, and the encounters draw it less what `opening_burst` marks (JC §0.6).
 	var fixed := _band_members(_run.FIXED_MODIFIER_BAND)
-	# RE-POINTED AT IX §3: the fixed encounters draw whatever the scale grades 3–4 (eight until IX, five at IX, seven at IY §4,
-	# six since IZ — Bloodletting reverted to a 1).
+	# RE-POINTED AT IX §3: the fixed band holds whatever the scale grades 3–4 (eight until IX, five at IX, seven at IY §4,
+	# six at IZ — Bloodletting reverted to a 1 — and seven since JB).
 	ok(fixed.size() == int(GRADE_COUNTS[3]) + int(GRADE_COUNTS[4]) and (_run.FIXED_MODIFIER_BAND as Array) == [3, 4], "§1b: the fixed band %s holds %d — %s" % [
 		str(_run.FIXED_MODIFIER_BAND), fixed.size(), str(fixed)])
-	print("    Ruin's gambles: %s; the fixed encounters draw %s" % [str(gb), str(fixed)])
+	print("    Ruin's gambles: %s; the fixed band holds %s and draws %s" % [str(gb), str(fixed), str(_run._fixed_modifier_pool())])
 	# THE WORDS THAT COUNT THEM (II §0.7: a figure the text states is read off what decides it, or an instrument holds the two
 	# together). `master.html`'s ladder says how many bargains Ruin alone deals, in the band's own number; the glossary's two
 	# entries say it with no number, a count no constant holds being a count no text should type.

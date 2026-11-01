@@ -331,10 +331,10 @@ func _s1c_the_reward_row() -> void:
 		big, int(gold.get(5, 0))])
 
 
-# ── §1d — THE FIXED ENCOUNTERS KEEP THE EIGHT THEY DREW ─────────────────────
+# ── §1d — THE FIXED ENCOUNTERS DRAW THE BAND, LESS WHAT CARRIES `opening_burst` ──
 
 func _s1d_the_fixed_band() -> void:
-	print("\n§1d — Ruin's mini-boss and bosses draw their modifier from severity 3–4, as they always did")
+	print("\n§1d — Ruin's mini-boss and bosses draw their modifier from severity 3–4, less what carries `opening_burst`")
 	var was := String(_run.difficulty)
 	var was_mod := String(_run.pending_modifier)
 	_run.difficulty = "ruin"
@@ -346,11 +346,11 @@ func _s1d_the_fixed_band() -> void:
 		seen[String(_run.pending_modifier)] = true
 	_run.pending_modifier = was_mod
 	_run.difficulty = was
-	var want := _band_members([3, 4])
+	var want: Array = _band_members([3, 4]).filter(func(i): return not bool((_run.MODIFIERS[i] as Dictionary).get("opening_burst", false)))
 	var got: Array = seen.keys()
 	got.sort()
 	want.sort()
-	ok(got == want, "§1d: 400 fixed draws at Ruin read %s — want the eight of severity 3–4, %s" % [str(got), str(want)])
+	ok(got == want, "§1d: 400 fixed draws at Ruin read %s — want severity 3–4 less what carries `opening_burst`, %s" % [str(got), str(want)])
 	ok(not got.any(func(i): return int(_run.modifier_severity(String(i))) >= 5),
 		"§1d: a fixed encounter drew a severity-5 modifier — a bargain's, priced with a reward it never pays")
 

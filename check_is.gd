@@ -118,9 +118,12 @@ const NINE_COUNTS := {
 }
 
 # §6 — A BATCH NAMED AS ONE, AND WHAT THE GAME WAS. Every letter, not the letters so far: `[A-I]` went blind at JA, the first J code.
+# And the arm holds the project's own rule, not a pattern written for today: the population is every code the project has reported
+# under (`docs/reports/`), so a code the pattern cannot read reds here the day it is written.
 var BATCH_NAME := RegEx.create_from_string("(Batch\\s+([A-Z][A-Z])\\b|\\b([A-Z][A-Z])\\s*(?:&sect;|§)|\\b(?:since|until|at|from|before|after|by|of|in)\\s+([A-Z][A-Z])(?:\\b(?![\\w-])))")
 var WAS_NOW := RegEx.create_from_string("(?i)\\bwas\\s+[^.;<]{0,25}?\\bnow\\b")
-const NOT_A_BATCH := ["HP", "BD"]   # health points and Break damage, after *of* or *from*: game terms, not batches
+const NOT_A_BATCH := ["HP", "BD"]   # health points and Break damage after a preposition: game terms, not batches. `Batch HP` and `HP §2` are one
+const REPORT_FLOOR := 100   # the reports the population must hold, so a walk that read nothing reds
 const MOVED_HEADING := "### Moved from master.html"
 const MOVED_FLOOR := 50
 
@@ -975,6 +978,11 @@ func _entry_key(line: String) -> String:
 
 # ── §6 — THE HISTORY STRIP ──────────────────────────────────────────────────
 
+# A match names a batch unless it is the game's word after a preposition, the pattern's third alternative (group 4).
+func _names_a_batch(m: RegExMatch) -> bool:
+	return not NOT_A_BATCH.has(m.get_string(4))
+
+
 func _s6_the_history_strip() -> void:
 	print("\n§6 — master.html says what the game is")
 	var html := FileAccess.get_file_as_string("res://docs/master.html")
@@ -982,15 +990,36 @@ func _s6_the_history_strip() -> void:
 	ok(stamp_end > 0 and html.substr(0, stamp_end).contains("(Batch "), "§6: the stamp — the one batch the file names — is gone")
 	var body := html.substr(stamp_end) if stamp_end > 0 else html
 	var names := []
+	var met := {}
 	for m in BATCH_NAME.search_all(body):
 		var code := ""
 		for g in range(2, m.get_group_count() + 1):
 			if m.get_string(g) != "":
 				code = m.get_string(g)
 				break
-		if code != "" and not NOT_A_BATCH.has(code):
+		met[code] = int(met.get(code, 0)) + 1
+		if code != "" and _names_a_batch(m):
 			names.append(body.substr(maxi(m.get_start() - 30, 0), 70).replace("\n", " "))
 	ok(names.is_empty(), "§6: master.html names a batch outside its stamp (%d): %s" % [names.size(), str(names.slice(0, 6))])
+	# THE POPULATION: every code the project has reported under, in the three forms the pattern reads a code in. The negative arm above
+	# is an absence, so it stands beside these two: the pattern read something on this body, and it can read every code there is.
+	ok(not met.is_empty(), "§6: the pattern read nothing on master.html's body, so the arm above asked nothing")
+	var codes := []
+	var unread := []
+	var report := RegEx.create_from_string("^[A-Z]+\\.md$")
+	for f in DirAccess.get_files_at("res://docs/reports"):
+		if report.search(f) == null:
+			continue
+		var c: String = f.get_basename()
+		codes.append(c)
+		for form in ["Batch %s", "%s §1", "since %s"]:
+			var hit: RegExMatch = BATCH_NAME.search(form % c)
+			# `since HP` is the one form of the one code the exemption gives up: after a preposition it is the game's word.
+			if hit == null or not (_names_a_batch(hit) or form == "since %s"):
+				unread.append(form % c)
+	ok(codes.size() >= REPORT_FLOOR, "§6: the reports hold %d batch codes, under the floor of %d" % [codes.size(), REPORT_FLOOR])
+	ok(unread.is_empty(), "§6: the pattern cannot read %d of the project's batch codes: %s" % [unread.size(), str(unread.slice(0, 6))])
+	print("    the pattern read %s on the body, %d of them batches; it reads all %d of the project's codes" % [str(met), names.size(), codes.size()])
 	var wasnow := []
 	for m in WAS_NOW.search_all(body):
 		wasnow.append(body.substr(maxi(m.get_start() - 20, 0), 80).replace("\n", " "))

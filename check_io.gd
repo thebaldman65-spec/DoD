@@ -734,7 +734,7 @@ func _s2_the_ladder() -> void:
 	ok(k5 == k4, "§0.7: severity 5 pays %s where severity 4 pays %s" % [str(k5), str(k4)])
 	print("    the gold reads %s — steps %s, growing by %d: severity 5 pays %d or a rune" % [
 		str([gold.get(1), gold.get(2), gold.get(3), gold.get(4), gold.get(5)]), str(steps), growth, int(gold.get(5, 0))])
-	# THE FIXED ENCOUNTERS DRAW FROM SEVERITY 3–4, WHATEVER THE GRADES PUT THERE.
+	# THE FIXED ENCOUNTERS DRAW FROM SEVERITY 3–4, WHATEVER THE GRADES PUT THERE, LESS WHAT CARRIES `opening_burst`.
 	var was := String(_run.difficulty)
 	var was_mod := String(_run.pending_modifier)
 	_run.difficulty = "ruin"
@@ -748,9 +748,9 @@ func _s2_the_ladder() -> void:
 	_run.difficulty = was
 	var got: Array = seen.keys()
 	got.sort()
-	var want := _band_members([3, 4])
+	var want: Array = _band_members([3, 4]).filter(func(i): return not bool((_run.MODIFIERS[i] as Dictionary).get("opening_burst", false)))
 	want.sort()
-	ok(got == want, "§2: 400 fixed draws at Ruin read %s — want severity 3–4, %s" % [str(got), str(want)])
+	ok(got == want, "§2: 400 fixed draws at Ruin read %s — want severity 3–4 less what carries `opening_burst`, %s" % [str(got), str(want)])
 	print("    Ruin's fixed encounters draw: %s" % ", ".join(PackedStringArray(got.map(func(i): return String((_run.MODIFIERS[i] as Dictionary)["name"])))))
 	# THE MERCHANT AT EACH RUNG's MILDEST DEALT.
 	for d3 in ["wanderer", "warden", "ruin"]:

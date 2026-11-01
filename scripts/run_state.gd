@@ -5170,13 +5170,18 @@ const MODIFIERS := {
 	# AMBUSHED binds the warband's side alone and says so (JB §0.1: a bargain may not pay the heroes; whether the warband feels it
 	# is flavour). THE HUNTER IS NAMED BECAUSE THE PASSIVE STANDS (IO §0.5, confirmed in JB's conversation, the designer's): he
 	# takes his opening turn, and only then does the warband take its run.
-	"ambushed": {"name": "Ambushed", "tag": "Am", "severity": 4, "graded": "the incumbent — JB §3",
+	# **`opening_burst` NAMES A MODIFIER THAT HANDS THE WARBAND A RUN OF FREE TURNS (JC §0.6), and a fixed encounter draws no modifier carrying it**
+	# (`_fixed_modifier_pool`): a fixed encounter is a tax with no reward, so it draws the mildest shapes, and a burst opener is the one
+	# shape that does not belong there. Outpaced puts the warband first and adds it no turn, so it carries nothing. The next burst card
+	# carries the field and inherits the rule, with no brief.
+	"ambushed": {"name": "Ambushed", "tag": "Am", "severity": 4, "graded": "the incumbent — JB §3", "opening_burst": true,
 		"desc": "The warband takes %s turns before any hero but the Hunter acts." % [COUNT_WORDS[AMBUSHED_WARBAND_TURNS]]},
 	# OUTPACED IS §2b'S RESERVE, AUTHORED IN INVERTED'S PLACE: reading speed backwards hands the heroes' slowest body, their healer,
 	# half as many turns again, and it paid them (JB §3; its built shape is in `docs/design-notes.md`). It states a rule, so it holds
-	# no card figure. The Hunter's opening turn stands (IO §0.5), and the words say so.
+	# no card figure. The Hunter's opening turn stands (IO §0.5), and the words say so. The game has no rounds, so the words speak of speed
+	# (JC §0.7); `battle.OUTPACED_SPAN` stays unspoken, and a hero a hair ahead across a span's edge still goes first.
 	"outpaced": {"name": "Outpaced", "tag": "Op", "severity": 2, "graded": "the incumbent — JB §3",
-		"desc": "The warband acts before any hero every round, whatever the speeds. The Hunter's opening turn stands."},
+		"desc": "The warband moves first. A hero only goes ahead of an enemy by being clearly faster. The Hunter's opening turn stands."},
 	# FRACTURED — BREAK HAS NO RATE TO MULTIPLY (JB §2c): a Broken body loses one turn and its meter empties, so the share that empties
 	# is the handle and the card follows the mechanic (the designer's answer in JB's conversation).
 	"fractured": {"name": "Fractured", "tag": "Fc", "severity": 1, "graded": "the default four — JB §3",
@@ -5363,7 +5368,7 @@ const FIXED_MODIFIER_NODES := ["miniboss", "boss", "endboss"]
 # `>= 3` while the table topped at 4, so it drew from 3–4; the severity-5 four are a
 # BARGAIN's — priced with a reward a fixed encounter never pays — and the band keeps
 # Ruin's mini-boss and bosses on severity 3–4. **CONFIRMED AT IO §0.4 (the designer's)**:
-# a modifier with no reward is not a bargain. Which eight stand there is the grades', so
+# a modifier with no reward is not a bargain. Which modifiers stand there is the grades', so
 # IO §2's re-grade moved the band's contents (IO's report says what it draws now).
 const FIXED_MODIFIER_BAND := [3, 4]
 
@@ -5378,10 +5383,13 @@ func arm_fixed_modifier(node_type: String) -> void:
 	pending_modifier = String(_fixed_modifier_pool().pick_random())
 
 
-# The modifiers a fixed encounter draws from: the deck's severities inside `FIXED_MODIFIER_BAND`.
+# The modifiers a fixed encounter draws from: the deck's severities inside `FIXED_MODIFIER_BAND`, less any that hands the warband
+# free turns (JC §0.6, the field on `MODIFIERS`' Ambushed row).
 func _fixed_modifier_pool() -> Array:
 	var pool: Array = []
 	for id in MODIFIERS:
+		if bool(MODIFIERS[id].get("opening_burst", false)):
+			continue
 		var fx_sev := modifier_severity(String(id))
 		if fx_sev >= int(FIXED_MODIFIER_BAND[0]) and fx_sev <= int(FIXED_MODIFIER_BAND[1]):
 			pool.append(String(id))

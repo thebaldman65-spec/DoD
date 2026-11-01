@@ -382,7 +382,7 @@ func _s2b_outpaced() -> void:
 	ok(mods.has("outpaced"), "§2b: the deck holds no Outpaced")
 	if not mods.has("outpaced"):
 		return
-	ok(String(mods["outpaced"].get("desc", "")) == "The warband acts before any hero every round, whatever the speeds. The Hunter's opening turn stands.",
+	ok(String(mods["outpaced"].get("desc", "")) == "The warband moves first. A hero only goes ahead of an enemy by being clearly faster. The Hunter's opening turn stands.",
 		"§2b: the card's words are not its rule ('%s')" % mods["outpaced"].get("desc", ""))
 	# INVERTED LEFT THE CODE WHEN IT PAID THE PARTY (JB §3), ITS READING AND ITS SHAPE THE DESIGN NOTES': built at run time, so this gate holds no copy.
 	var gone := "INVERTED_SPEED" + "_PIVOT"
