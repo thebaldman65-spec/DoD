@@ -21,7 +21,7 @@
 #        the reading gives, naming its population and batch (C09); the tally.
 #   §4   THE DECK, RE-READ: the axis table re-derived from the deck (C10); what Warden's gambles deal; the deck in `master.html`,
 #        its cards at their severities and its tally the code's.
-#   §5   THE CUT: the condition, at the open's reading (C11); the archive's newest cut is JB's.
+#   §5   THE CUT: the condition, at the open's reading (C11); JB's cut stands in the archive; the close holds while JB last wrote the file.
 #
 #   /Applications/Godot.app/Contents/MacOS/Godot --headless --path . --script check_jb.gd
 extends SceneTree
@@ -693,8 +693,14 @@ func _s5_the_cut() -> void:
 	ok(int(r["open_bytes"]) + int(r["written_bytes"]) - int(r["cut_bytes"]) == int(r["close_bytes"]),
 		"§5: the net does not sum: %s + %s - %s against %s" % [r["open_bytes"], r["written_bytes"], r["cut_bytes"], r["close_bytes"]])
 	var arch := _doc("res://DoD-archive/state-archive.md")
-	var at := arch.find("\n## ARCHIVED AT ")
-	ok(at >= 0 and arch.substr(at, 40).contains("AT JB"), "§5: the archive's newest cut is not JB's")
-	var live := FileAccess.get_file_as_string("res://docs/state.md").to_utf8_buffer().size()
-	ok(live == int(r["close_bytes"]), "§5: docs/state.md reads %d B and the table's close %s B" % [live, r["close_bytes"]])
-	print("    CHECKED the condition at %d B of room; the cut %s B; the net to %s B" % [room, r["cut_bytes"], r["close_bytes"]])
+	# BOTH ARMS READ JB's OWN RECORD, NOT THE LATEST: a later cut goes above JB's and a later batch moves the file, and
+	# neither may red a closed batch. So the cut is found by its own heading, and the size holds while the stamp names JB.
+	var at := arch.find("\n## ARCHIVED AT JB")
+	ok(at >= 0 and arch.substr(at, 100).contains("48837df"), "§5: the archive holds no cut of JB's, taken from JA's commit")
+	var state := FileAccess.get_file_as_string("res://docs/state.md")
+	var live := state.to_utf8_buffer().size()
+	var stamp := RegEx.create_from_string("Last rewritten: [^\\n]*\\(Batch ([A-Z]{2})").search(state)
+	var writer := stamp.get_string(1) if stamp != null else "none"
+	ok(stamp != null and (writer != "JB" or live == int(r["close_bytes"])),
+		"§5: docs/state.md's stamp names %s and it reads %d B, the table's close %s B" % [writer, live, r["close_bytes"]])
+	print("    CHECKED the condition at %d B of room; the cut %s B; the net to %s B; last written by %s, at %d B" % [room, r["cut_bytes"], r["close_bytes"], writer, live])
