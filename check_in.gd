@@ -57,7 +57,8 @@ const REMOVED := {"famine": "Famine", "cruel_order": "Cruel Order", "hungering_d
 # (IZ §0.1), the reverts graded by their own old readings, Dull Edge removed (§3); `docs/reports/IZ-grades.tsv`.
 # RE-POINTED AT JA §2: Fleeting at three turns off, re-read in the deck, is a 2 — six at 1, five at 2; the grades of record are
 # `docs/reports/JA-grades.tsv`.
-const GRADE_COUNTS := {1: 6, 2: 5, 3: 4, 4: 2, 5: 4}
+# RE-POINTED AT JB §3: the four, each placed by its reading.
+const GRADE_COUNTS := {1: 7, 2: 7, 3: 4, 4: 3, 5: 4}
 const UNGRADED := 0  # IZ: none — a modifier free even on the population its rule names leaves the deck (IZ §0.3, §5)
 
 
@@ -514,13 +515,15 @@ func _s1h_cruel_order() -> void:
 		_run.pending_modifier = String(mid)
 		if s.call("_next_unit") != h:
 			out.append(String(mid))
-	ok(out.is_empty(), "§1h: the hero due first did not act first under %s" % str(out))
+	# RE-POINTED AT JB §2b: Outpaced stands on the spans Cruel Order read, and that is its card; every other card orders by the timeline alone.
+	ok(out == ["outpaced"], "§1h: the hero due first did not act first under %s — Outpaced alone puts the warband ahead of him" % str(out))
 	var b := _src("scripts/battle.gd")
 	ok(not b.contains("_turn_before") and not b.contains("ROUND_TICKS") and not b.contains("\"cruel_order\""),
 		"§1h: Cruel Order's door or its round is still in `battle.gd`")
-	ok(_body("scripts/battle.gd", "_next_unit").contains("if u.next_time < best.next_time:")
-			and _body("scripts/battle.gd", "_rebuild_turn_bar").contains("if entry.t < best.t:"),
-		"§1h: the loop and the bar do not both order turns by the timeline alone")
+	ok(_body("scripts/battle.gd", "_next_unit").contains("_turn_precedes(u, u.next_time, best, best.next_time, outpaced)")
+			and _body("scripts/battle.gd", "_rebuild_turn_bar").contains("_turn_precedes(entry.unit, entry.t, best.unit, best.t, outpaced)")
+			and _body("scripts/battle.gd", "_turn_precedes").contains("return ta < tb"),
+		"§1h: the loop and the bar do not both order turns through the one door, the timeline its last word")
 	_run.pending_modifier = ""
 	await _clear(s)
 
@@ -553,9 +556,10 @@ func _s1i_the_words() -> void:
 	# RE-POINTED AT IO §1: the entry goes back to AQ's rule — every modifier binds both sides, nothing binds one — and names
 	# neither of the two IO removed.
 	var mod_e := String(Glossary.entry("modifier").get("long", ""))
-	ok(mod_e.contains("EVERY MODIFIER BINDS BOTH SIDES") and not mod_e.contains("bind one side -")
+	# RE-POINTED AT JB §0.1: the promise went with AQ's sentence.
+	ok(mod_e.contains("every modifier in the deck costs your heroes") and not mod_e.contains("bind one side")
 			and not mod_e.contains("Famine") and not mod_e.contains("Cruel Order"),
-		"§1i: the modifier entry says something binds one side, or names a modifier IO removed")
+		"§1i: the modifier entry does not say what the deck promises, or names a modifier IO removed")
 	var lad := String(Glossary.entry("difficulty_ladder").get("long", ""))
 	ok(lad.contains("severity 5"), "§1i: the ladder entry does not say Ruin's gambles are severity 5")
 	# RE-POINTED AT IO §2: each of IN's two that stayed has its row at the grade the table gives it now, and the two removed

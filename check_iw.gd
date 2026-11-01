@@ -345,6 +345,16 @@ func _the_arm() -> Dictionary:
 	return {"screen": srows, "by": by, "best": best, "winner": winner, "bad_ratio": bad_ratio, "ladder": lrows,
 		"levels": levels, "real": real, "arm": "A" if best >= R_FLOOR and all_real else "B"}
 
+# RE-POINTED AT JB §2: THIS GATE'S KEPT TABLES WERE TAKEN ON THE DECK BEFORE JB's FOUR, AND EACH OF THE FOUR NAMES THE BATCH THAT
+# GRADED IT, SO THE DECK THEY MEASURED IS READ OFF THE ROWS AND NEVER OFF A LIST (`check_jb` §3 holds the four).
+func _deck_before_jb() -> Dictionary:
+	var out := {}
+	var mods: Dictionary = _run.MODIFIERS
+	for id in mods:
+		if not String((mods[id] as Dictionary).get("graded", "")).contains("JB §"):
+			out[id] = mods[id]
+	return out
+
 
 func _s1_the_ladder() -> void:
 	print("\n§1 — the ladder's measurement is kept: the screen, the ladder, and the arm they give")
@@ -358,7 +368,7 @@ func _s1_the_ladder() -> void:
 	ok(short.is_empty(), "§1: candidates without their five readings: %s" % str(short))
 	ok((a["bad_ratio"] as Array).is_empty(), "§1: %d candidates' written R5 or R4 is not the ratio their own readings give: %s" % [(a["bad_ratio"] as Array).size(), str(a["bad_ratio"])])
 	var lrows: Array = a["ladder"]
-	var mods: Dictionary = _run.MODIFIERS
+	var mods: Dictionary = _deck_before_jb()
 	# RE-POINTED AT IZ §3 and §5: the ladder measured the two IZ removed (Dull Edge, Tinderbox); every modifier the deck holds is on it.
 	var removed_at_iz := ["dulledge", "tinderbox"]
 	ok(lrows.size() == mods.size() + removed_at_iz.size(), "§1: the ladder holds %d modifiers and the deck %d — every modifier is measured" % [lrows.size(), mods.size()])

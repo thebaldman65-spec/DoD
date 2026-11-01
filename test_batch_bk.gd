@@ -631,16 +631,25 @@ func _section_save() -> void:
 
 func _section_negative_controls() -> void:
 	run.zone_idx = 0
-	run._generate_map()
 
 	# (1) CROSSING EDGES PERMITTED. Break one map's edges into a crossing pair
 	# and prove the auditor above catches it — an audit that only ever sees
 	# clean maps is an audit nobody has tested.
 	var before_cross := _bad_crossing
+	# BATCH JB — THE ARM WANTS A SHAPE, SO IT DRAWS UNTIL IT HAS ONE. It took the
+	# one map this section opened with, and about one map in a hundred has no two
+	# adjacent three-wide columns: JB's first acceptance read this suite red with
+	# nothing wrong, at the rate HEAD's generator misses too. Not seeded: a seed is
+	# a dice sequence the next generator change takes away, and the shape is not.
+	# Sixty-four misses running means the shape has gone, the red this arm is for.
 	var slot := -1
-	for s in range(0, run.MINI_SLOT - 1):
-		if run.map[s].size() == 3 and run.map[s + 1].size() == 3:
-			slot = s
+	for _draw in 64:
+		run._generate_map()
+		for s in range(0, run.MINI_SLOT - 1):
+			if run.map[s].size() == 3 and run.map[s + 1].size() == 3:
+				slot = s
+				break
+		if slot >= 0:
 			break
 	if slot >= 0:
 		run.map[slot][0]["next"] = [2]

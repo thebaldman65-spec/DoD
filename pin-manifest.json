@@ -2,20 +2,20 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 2124,
-  "source": 1414,
-  "other": 219,
-  "document": 491
+  "total": 2133,
+  "source": 1416,
+  "other": 221,
+  "document": 496
  },
  "floor": {
-  "pins": 2124
+  "pins": 2133
  },
  "falls": [],
  "source_residency": {
   "narrow": 49,
-  "code": 872,
+  "code": 873,
   "absent": 330,
-  "runtime": 104,
+  "runtime": 105,
   "unresolved": 3,
   "comment": 48,
   "missing-file": 5,
@@ -7695,7 +7695,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#298"
+   "g": "check_ip.gd#299"
   },
   {
    "s": "check_ip.gd",
@@ -7706,7 +7706,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#294"
+   "g": "check_ip.gd#295"
   },
   {
    "s": "check_ip.gd",
@@ -7717,7 +7717,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#297"
+   "g": "check_ip.gd#298"
   },
   {
    "s": "check_ip.gd",
@@ -7728,7 +7728,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#291"
+   "g": "check_ip.gd#292"
   },
   {
    "s": "check_ip.gd",
@@ -7739,7 +7739,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#293"
+   "g": "check_ip.gd#294"
   },
   {
    "s": "check_ip.gd",
@@ -7750,7 +7750,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#292"
+   "g": "check_ip.gd#293"
   },
   {
    "s": "check_ip.gd",
@@ -7761,7 +7761,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ip.gd#299"
+   "g": "check_ip.gd#300"
   },
   {
    "s": "check_ip.gd",
@@ -7772,7 +7772,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ip.gd#299"
+   "g": "check_ip.gd#300"
   },
   {
    "s": "check_ip.gd",
@@ -7783,29 +7783,29 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ip.gd#296"
+   "g": "check_ip.gd#297"
   },
   {
    "s": "check_ip.gd",
    "fn": "_s0_rulings",
    "h": "CLAUDE.md",
-   "n": "TWO-SIDEDNESS DOES NOT MAKE A RULE EVEN",
+   "n": "A RULE COSTS THE PARTY WHEN IT ADDS TO THE WARBAND's PRESSURE",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#289"
+   "g": "check_ip.gd#290"
   },
   {
    "s": "check_ip.gd",
    "fn": "_s0_rulings",
    "h": "docs/instrument-rules.md",
-   "n": "TWO-SIDEDNESS DOES NOT MAKE A RULE EVEN",
+   "n": "A RULE COSTS THE PARTY WHEN IT ADDS TO THE WARBAND's PRESSURE",
    "p": "-",
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_ip.gd#290"
+   "g": "check_ip.gd#291"
   },
   {
    "s": "check_ip.gd",
@@ -7816,7 +7816,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ip.gd#299"
+   "g": "check_ip.gd#300"
   },
   {
    "s": "check_ip.gd",
@@ -7827,7 +7827,7 @@
    "r": "missing-file",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ip.gd#87",
+   "g": "check_ip.gd#88",
    "expr": "String"
   },
   {
@@ -7839,7 +7839,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ip.gd#171",
+   "g": "check_ip.gd#172",
    "expr": "said"
   },
   {
@@ -9476,7 +9476,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iw.gd#276",
+   "g": "check_iw.gd#283",
    "expr": "ARM_NEEDLE"
   },
   {
@@ -9488,7 +9488,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iw.gd#277",
+   "g": "check_iw.gd#284",
    "expr": "SUPERSEDED_NEEDLE"
   },
   {
@@ -9500,7 +9500,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_iw.gd#272"
+   "g": "check_iw.gd#279"
   },
   {
    "s": "check_iw.gd",
@@ -9511,7 +9511,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iw.gd#358",
+   "g": "check_iw.gd#365",
    "expr": "_flat"
   },
   {
@@ -9523,7 +9523,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iw.gd#370",
+   "g": "check_iw.gd#377",
    "expr": "_flat"
   },
   {
@@ -9590,7 +9590,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_ix.gd#142"
+   "g": "check_ix.gd#149"
   },
   {
    "s": "check_ix.gd",
@@ -9601,7 +9601,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ix.gd#284",
+   "g": "check_ix.gd#291",
    "expr": "says"
   },
   {
@@ -9613,7 +9613,7 @@
    "r": "runtime",
    "k": "composed",
    "how": "read",
-   "g": "check_ix.gd#225"
+   "g": "check_ix.gd#232"
   },
   {
    "s": "check_ix.gd",
@@ -9624,7 +9624,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_ix.gd#323"
+   "g": "check_ix.gd#330"
   },
   {
    "s": "check_ix.gd",
@@ -9635,7 +9635,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_ix.gd#318"
+   "g": "check_ix.gd#325"
   },
   {
    "s": "check_ix.gd",
@@ -9646,7 +9646,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_ix.gd#330"
+   "g": "check_ix.gd#337"
   },
   {
    "s": "check_ix.gd",
@@ -9657,7 +9657,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ix.gd#329"
+   "g": "check_ix.gd#336"
   },
   {
    "s": "check_iy.gd",
@@ -9834,7 +9834,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_iy.gd#367"
+   "g": "check_iy.gd#374"
   },
   {
    "s": "check_iy.gd",
@@ -9845,7 +9845,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iy.gd#403",
+   "g": "check_iy.gd#410",
    "expr": "says"
   },
   {
@@ -9857,7 +9857,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iy.gd#374"
+   "g": "check_iy.gd#381"
   },
   {
    "s": "check_iy.gd",
@@ -9868,7 +9868,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iy.gd#375"
+   "g": "check_iy.gd#382"
   },
   {
    "s": "check_iy.gd",
@@ -9879,7 +9879,7 @@
    "r": "runtime",
    "k": "composed",
    "how": "derived",
-   "g": "check_iy.gd#377"
+   "g": "check_iy.gd#384"
   },
   {
    "s": "check_iz.gd",
@@ -10013,7 +10013,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iz.gd#220",
+   "g": "check_iz.gd#230",
    "expr": "tally"
   },
   {
@@ -10025,7 +10025,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_iz.gd#253"
+   "g": "check_iz.gd#263"
   },
   {
    "s": "check_iz.gd",
@@ -10036,7 +10036,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iz.gd#253"
+   "g": "check_iz.gd#263"
   },
   {
    "s": "check_iz.gd",
@@ -10047,7 +10047,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_iz.gd#253"
+   "g": "check_iz.gd#263"
   },
   {
    "s": "check_iz.gd",
@@ -10058,7 +10058,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iz.gd#459"
+   "g": "check_iz.gd#469"
   },
   {
    "s": "check_iz.gd",
@@ -10069,7 +10069,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iz.gd#460"
+   "g": "check_iz.gd#470"
   },
   {
    "s": "check_iz.gd",
@@ -10080,7 +10080,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iz.gd#457"
+   "g": "check_iz.gd#467"
   },
   {
    "s": "check_iz.gd",
@@ -10091,7 +10091,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_iz.gd#462"
+   "g": "check_iz.gd#472"
   },
   {
    "s": "check_ja.gd",
@@ -10102,7 +10102,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ja.gd#83"
+   "g": "check_ja.gd#90"
   },
   {
    "s": "check_ja.gd",
@@ -10113,18 +10113,18 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ja.gd#85"
+   "g": "check_ja.gd#92"
   },
   {
    "s": "check_ja.gd",
    "fn": "_s0_the_rulings",
    "h": "CLAUDE.md",
-   "n": "TWO-SIDEDNESS DOES NOT MAKE A RULE EVEN",
+   "n": "A RULE COSTS THE PARTY WHEN IT ADDS TO THE WARBAND's PRESSURE",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ja.gd#84"
+   "g": "check_ja.gd#91"
   },
   {
    "s": "check_ja.gd",
@@ -10135,7 +10135,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ja.gd#88"
+   "g": "check_ja.gd#95"
   },
   {
    "s": "check_ja.gd",
@@ -10146,7 +10146,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ja.gd#88"
+   "g": "check_ja.gd#95"
   },
   {
    "s": "check_ja.gd",
@@ -10157,7 +10157,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ja.gd#87"
+   "g": "check_ja.gd#94"
   },
   {
    "s": "check_ja.gd",
@@ -10168,7 +10168,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_ja.gd#164"
+   "g": "check_ja.gd#171"
   },
   {
    "s": "check_ja.gd",
@@ -10179,7 +10179,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ja.gd#201"
+   "g": "check_ja.gd#208"
   },
   {
    "s": "check_ja.gd",
@@ -10190,18 +10190,119 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ja.gd#240"
+   "g": "check_ja.gd#247"
   },
   {
    "s": "check_ja.gd",
    "fn": "_s4_the_axes",
    "h": "docs/state.md",
-   "n": "grade 4 holds health alone",
+   "n": "Grade 4 holds health and tempo",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ja.gd#283"
+   "g": "check_ja.gd#290"
+  },
+  {
+   "s": "check_jb.gd",
+   "fn": "_resolve_arm",
+   "h": "scripts/battle.gd",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_jb.gd#438",
+   "expr": "marker"
+  },
+  {
+   "s": "check_jb.gd",
+   "fn": "_resolve_arm",
+   "h": "scripts/battle.gd",
+   "n": "\n\t\t\"",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jb.gd#441"
+  },
+  {
+   "s": "check_jb.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/design-notes.md",
+   "n": "Why IP's sentence went",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jb.gd#89"
+  },
+  {
+   "s": "check_jb.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/design-notes.md",
+   "n": "Why the one-sidedness promise went",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jb.gd#89"
+  },
+  {
+   "s": "check_jb.gd",
+   "fn": "_s1_the_two_rules",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_jb.gd#121",
+   "expr": "ip_head"
+  },
+  {
+   "s": "check_jb.gd",
+   "fn": "_s4_the_deck",
+   "h": "docs/master.html",
+   "n": "<tr><td>%s</td><td>%d</td>",
+   "p": "-",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_jb.gd#530"
+  },
+  {
+   "s": "check_jb.gd",
+   "fn": "_s4_the_deck",
+   "h": "docs/master.html",
+   "n": "The pool is %d",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_jb.gd#536"
+  },
+  {
+   "s": "check_jb.gd",
+   "fn": "_s5_the_cut",
+   "h": "DoD-archive/state-archive.md",
+   "n": "\n## ARCHIVED AT ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jb.gd#549"
+  },
+  {
+   "s": "check_jb.gd",
+   "fn": "_s5_the_cut",
+   "h": "DoD-archive/state-archive.md",
+   "n": "AT JB",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "slice",
+   "g": "check_jb.gd#550"
   },
   {
    "s": "test_batch_ah.gd",

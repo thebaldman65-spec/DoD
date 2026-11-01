@@ -45,7 +45,8 @@ const DARK_WORDS := ["hungering_dark", "Hungering Dark", "HUNGERING_DARK_PCT", "
 # (IZ §0.1), the reverts graded by their own old readings, Dull Edge removed (§3); `docs/reports/IZ-grades.tsv`.
 # RE-POINTED AT JA §2: Fleeting at three turns off, re-read in the deck, is a 2 — six at 1, five at 2; the grades of record are
 # `docs/reports/JA-grades.tsv`.
-const GRADE_COUNTS := {1: 6, 2: 5, 3: 4, 4: 2, 5: 4}
+# RE-POINTED AT JB §3: the four, each placed by its reading.
+const GRADE_COUNTS := {1: 7, 2: 7, 3: 4, 4: 3, 5: 4}
 # §1b — EP's sample as IO read it (`docs/reports/IO.md` §2d): the reading the cut is held against, not a grade.
 # RE-POINTED AT IX §3: the scale's grades deal these means from the same dice (IX's reading; IO's 2.84 / 3.29 / 4.49 stood until
 # then), so a grade moved with no measurement still moves a mean here.
@@ -57,6 +58,9 @@ const IY_SAMPLE := {"wanderer": 2.733, "warden": 3.377, "ruin": 4.434}
 # reverts and the two removals moved the bands' contents, so the means moved by the deck, not by the draw (each sits within
 # 0.01 of its bands' arithmetic); IY's figures stay printed as the record.
 const IZ_SAMPLE := {"wanderer": 2.671, "warden": 3.275, "ruin": 4.443}
+# RE-POINTED AT JB §3: the held reading is JB's, read off this gate's own print on JB's tree — the four moved the bands' contents,
+# so the means moved by the deck, not by the draw (each sits within 0.02 of its bands' arithmetic); IZ's figures stay printed as the record.
+const JB_SAMPLE := {"wanderer": 2.776, "warden": 3.261, "ruin": 4.470}
 
 
 func ok(cond: bool, what: String) -> void:
@@ -237,7 +241,8 @@ func _s1b_the_cut() -> void:
 	for sv2 in [1, 2, 3, 4, 5]:
 		counts[sv2] = (by.get(sv2, []) as Array).size()
 	# RE-POINTED AT IZ §3 and §5: two removed.
-	ok((_run.MODIFIERS as Dictionary).size() == 21, "§1b: the deck holds %d modifiers, want 21" % (_run.MODIFIERS as Dictionary).size())
+	# RE-POINTED AT JB §2: the four joined.
+	ok((_run.MODIFIERS as Dictionary).size() == 25, "§1b: the deck holds %d modifiers, want 25" % (_run.MODIFIERS as Dictionary).size())
 	ok(counts == GRADE_COUNTS, "§1b: the grades hold %s — the bands are built on %s" % [str(counts), str(GRADE_COUNTS)])
 	for sv3 in [1, 2, 3, 4, 5]:
 		print("    severity %d: %s" % [sv3, ", ".join(PackedStringArray((by.get(sv3, []) as Array).map(func(i): return String((_run.MODIFIERS[i] as Dictionary)["name"]))))])
@@ -313,8 +318,8 @@ func _s1b_the_sample() -> void:
 		var mean := float(sum) / maxf(float(n), 1.0)
 		ok(n == 1200 and short == 0, "§1b: %s dealt %d options over 400 offers (%d short), want 1,200" % [d, n, short])
 		ok(absf(mean - want) < 0.05, "§1b: %s's sample reads %.3f against its bands' arithmetic %.3f" % [d, mean, want])
-		ok(absf(mean - float(IZ_SAMPLE[d])) < 0.05, "§1b: %s's sample reads %.3f — %+.3f from the held reading %.3f (IZ's; IY read %.3f, IO %.2f)" % [
-			d, mean, mean - float(IZ_SAMPLE[d]), float(IZ_SAMPLE[d]), float(IY_SAMPLE[d]), float(IO_SAMPLE[d])])
+		ok(absf(mean - float(JB_SAMPLE[d])) < 0.05, "§1b: %s's sample reads %.3f — %+.3f from the held reading %.3f (JB's; IZ read %.3f, IY %.3f, IO %.2f)" % [
+			d, mean, mean - float(JB_SAMPLE[d]), float(JB_SAMPLE[d]), float(IZ_SAMPLE[d]), float(IY_SAMPLE[d]), float(IO_SAMPLE[d])])
 		if d == "ruin":
 			ok(twin == 0 and five == 800, "§1b: Ruin dealt %d severity-5 options, and %d offers without two distinct gambles" % [five, twin])
 		else:
@@ -409,8 +414,9 @@ func _s0_rulings() -> void:
 	var cm := FileAccess.get_file_as_string("res://CLAUDE.md")
 	var ir := FileAccess.get_file_as_string("res://docs/instrument-rules.md")
 	var dn := FileAccess.get_file_as_string("res://docs/design-notes.md")
-	ok(cm.count("TWO-SIDEDNESS DOES NOT MAKE A RULE EVEN") == 1, "§0.2: `CLAUDE.md` does not state the two-sidedness rule once")
-	ok(not ir.contains("TWO-SIDEDNESS DOES NOT MAKE A RULE EVEN"), "§0.2: the two-sidedness rule stands in the instrument rules too")
+	# RE-POINTED AT JB §0.2: IP's rule was replaced where it stood; the rule that replaced it is the one held once.
+	ok(cm.count("A RULE COSTS THE PARTY WHEN IT ADDS TO THE WARBAND's PRESSURE") == 1, "§0.2: `CLAUDE.md` does not state what costs the party once")
+	ok(not ir.contains("A RULE COSTS THE PARTY WHEN IT ADDS TO THE WARBAND's PRESSURE"), "§0.2: the rule stands in the instrument rules too")
 	ok(ir.count("## STANDING RULE — A CUT INSIDE TWO STANDARD ERRORS IS NOT A MEASUREMENT, IT IS A TIE") == 1,
 		"§0.4: `docs/instrument-rules.md` does not head the tie rule once")
 	ok(ir.count("## STANDING RULE — AN INSTRUMENT'S OWN FIDELITY IS A PREMISE OF EVERY MEASUREMENT IT TAKES") == 1,

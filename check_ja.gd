@@ -128,6 +128,16 @@ func _band(cost_points: float, z: float, cuts: Array) -> int:
 			b = k + 1
 	return b
 
+# RE-POINTED AT JB §2: THIS GATE'S KEPT TABLES WERE TAKEN ON THE DECK BEFORE JB's FOUR, AND EACH OF THE FOUR NAMES THE BATCH THAT
+# GRADED IT, SO THE DECK THEY MEASURED IS READ OFF THE ROWS AND NEVER OFF A LIST (`check_jb` §3 holds the four).
+func _deck_before_jb() -> Dictionary:
+	var out := {}
+	var mods: Dictionary = _run.MODIFIERS
+	for id in mods:
+		if not String((mods[id] as Dictionary).get("graded", "")).contains("JB §"):
+			out[id] = mods[id]
+	return out
+
 
 # ── §0 — THE RULINGS ──────────────────────────────────────────────────────────────────────────────────
 func _s0_the_rulings() -> void:
@@ -136,15 +146,15 @@ func _s0_the_rulings() -> void:
 	var notes := _doc("res://docs/design-notes.md")
 	ok(claude.contains("A NEW MODIFIER NAMES THE TWO SIDES' SHARES OF ITS QUANTITY BEFORE IT IS BUILT"),
 		"§0.3: CLAUDE.md does not say a new modifier names the two sides' shares of its quantity before it is built")
-	# WHERE THE MODIFIER RULES ARE: beside IP's two-sidedness rule, inside the ladder block that states the scale.
-	var ip_at := claude.find("TWO-SIDEDNESS DOES NOT MAKE A RULE EVEN")
+	# WHERE THE MODIFIER RULES ARE: beside the rule that replaced IP's at JB §0.2, inside the ladder block that states the scale.
+	var ip_at := claude.find("A RULE COSTS THE PARTY WHEN IT ADDS TO THE WARBAND's PRESSURE")
 	var ja_at := claude.find("A NEW MODIFIER NAMES THE TWO SIDES' SHARES OF ITS QUANTITY BEFORE IT IS BUILT")
 	ok(ip_at >= 0 and ja_at > ip_at and ja_at - ip_at < 6000,
-		"§0.3: the share practice does not stand beside the two-sidedness rule (%d bytes apart)" % (ja_at - ip_at))
+		"§0.3: the share practice does not stand beside the rule on what costs the party (%d bytes apart)" % (ja_at - ip_at))
 	ok(claude.contains("docs/reports/JA-shares.tsv"), "§0.3: CLAUDE.md does not name the census of record the shares are read off")
 	ok(notes.contains("Why Leaden") and notes.contains("Why Fleeting's words are the code's"),
 		"§0: docs/design-notes.md keeps no record of why the card is Leaden, or why Fleeting's words are the code's")
-	print("    CHECKED the share practice in CLAUDE.md beside the two-sidedness rule, and the two records in the design notes")
+	print("    CHECKED the share practice in CLAUDE.md beside the rule on what costs the party, and the two records in the design notes")
 
 
 # ── §1 — LEADEN ───────────────────────────────────────────────────────────────────────────────────────
@@ -334,7 +344,7 @@ func _s3_the_census() -> void:
 				named[m] = true
 	ok(bad.is_empty() and rows.size() >= 20, "§3: %d of the census's %d rows are not their own arithmetic: %s" % [bad.size(), rows.size(), str(bad)])
 	# THE POPULATION IS DERIVED, NOT LISTED (C07): every modifier the deck holds has its quantity's row, and no row names one it does not.
-	var deck: Array = (_run.MODIFIERS as Dictionary).keys()
+	var deck: Array = _deck_before_jb().keys()
 	var missing: Array = deck.filter(func(id): return not named.has(String(id)))
 	var stray: Array = named.keys().filter(func(id): return not (_run.MODIFIERS as Dictionary).has(String(id)))
 	ok(missing.is_empty(), "§3: %d live modifiers' quantities have no row in the census: %s" % [missing.size(), str(missing)])
@@ -390,12 +400,13 @@ func _s4_the_axes() -> void:
 			if (String(r["candidate"]) == "yes") != even:
 				off.append("%s: written candidate '%s', the census gives %s" % [r["axis"], r["candidate"], str(even)])
 	ok(off.is_empty(), "§4: %d of the axis table's cells are not the deck's or the census's: %s" % [off.size(), str(off)])
-	var deck: Array = (_run.MODIFIERS as Dictionary).keys()
+	var deck: Array = _deck_before_jb().keys()
 	var unplaced: Array = deck.filter(func(id): return int(seen.get(String(id), 0)) != 1)
 	ok(unplaced.is_empty() and rows.size() >= 8, "§4: %d modifiers of the deck sit on no axis or on two: %s" % [unplaced.size(), str(unplaced)])
 	var grades := _flat(_block(_doc("res://docs/state.md"), "### THE BARGAIN DECK's GRADES"))
-	ok(fours == ["health"] and grades.contains("grade 4 holds health alone"),
-		"§4: the axes holding a 4 are %s, or the state file's grades block does not say grade 4 holds health alone" % str(fours))
+	# RE-POINTED AT JB §4: JA's table is the deck before the four, and it read grade 4 on health alone; the state speaks for the deck since (`check_jb` §4).
+	ok(fours == ["health"] and grades.contains("Grade 4 holds health and tempo"),
+		"§4: JA's table holds a 4 on %s, or the state file's grades block does not say what grade 4 holds now" % str(fours))
 	print("    CHECKED %d axes over the deck's %d modifiers; the axes holding a 4: %s" % [rows.size(), deck.size(), str(fours)])
 
 

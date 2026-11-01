@@ -2322,7 +2322,7 @@ func _stamp_fk_enemy_runes() -> void:
 # ---------- Batch AN §3 / Batch AQ §3: the battle modifier ----------
 #
 # The bargain the player accepted at the offer screen, stamped onto every
-# combatant on BOTH sides once they all exist. Each modifier is one field
+# combatant it reaches once they all exist. Each modifier is one field
 # write (or one stat nudge) and nothing else — no per-modifier branch in the
 # damage pipeline — because every unit-side field has exactly one read site
 # and the stat-side ones use hooks that already existed.
@@ -2339,6 +2339,8 @@ func _apply_battle_modifier() -> void:
 		return
 	for u in heroes + enemies:
 		_stamp_modifier(u, mod_id)
+	if mod_id == "ambushed":
+		_ambush_left = Run.AMBUSHED_WARBAND_TURNS
 	var cfg: Dictionary = Run.MODIFIERS[mod_id]
 	_log("[b]%s[/b] — %s" % [String(cfg["name"]).to_upper(), String(cfg["desc"])],
 		"#d0a0e0")
@@ -2439,7 +2441,7 @@ func _stamp_modifier(u: BattleUnit, mod_id: String, inherited := false) -> void:
 			# that is the design rather than an oversight: Unkillable's mend,
 			# the below-half Mercy window and the Devout's whole kit are RATIOS
 			# of the maximum, so they scale with the smaller pool exactly as
-			# every other modifier binding both parties does. It was why Rot was
+			# every other modifier reaching both sides does. It was why Rot was
 			# AUTHORED at severity 4; IO §2 grades it by what it costs, measured.
 			var rot_lost: int = u.max_hp - maxi(u.max_hp / 2, 1)
 			u.max_hp -= rot_lost
@@ -2470,6 +2472,20 @@ func _stamp_modifier(u: BattleUnit, mod_id: String, inherited := false) -> void:
 		# the end of a turn (`_wasting_tick`). Listed so the table's every id has its arm here.
 		"wasting":
 			pass
+		# BATCH JB §2a — AMBUSHED STAMPS NOTHING ON A UNIT EITHER: its run is one count of the battle's (`_ambush_left`), set by
+		# `_apply_battle_modifier`, which the loop and the turn bar both read. Listed so the table's every id has its arm here.
+		"ambushed":
+			pass
+		# OUTPACED STAMPS NOTHING EITHER: the door that orders turns asks `_modifier_is` where it orders them (`_turn_precedes`).
+		"outpaced":
+			pass
+		"fractured":
+			u.mod_break_recovery = Run.FRACTURED_RECOVERY_MULT
+		# BATCH JB §2d — THE HEROES' SIDE ALONE, A COMPANION WITH IT (`is_hero`; its summon comes through here too): the warband lays no
+		# barrier, and the card is not to become a rule about one by accident the day a barrier is authored for it (`check_jb` §2d).
+		"porous":
+			if u.is_hero:
+				u.mod_barrier_mult = Run.POROUS_BARRIER_MULT
 
 
 # BATCH IN §1 — IS THIS MODIFIER THE ONE THE FIGHT IS FOUGHT UNDER? Asked live at each
@@ -3168,6 +3184,8 @@ func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability
 	if alive.is_empty():
 		return
 	var intent_shown := {}   # BATCH BL §1: one icon per enemy, first slot only
+	var ambush_left := _ambush_left  # BATCH JB §2a — the bar walks the run the loop keeps
+	var outpaced := _modifier_is("outpaced")  # BATCH JB §2b — and orders as the loop orders
 	var sim: Array = alive.map(func(u): return {"unit": u, "t": u.next_time})
 	if preview_unit != null and preview_ability != null:
 		for entry in sim:
@@ -3180,11 +3198,25 @@ func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability
 				entry.t += preview_unit.momentum_delay_mult() \
 					* preview_ability.delay * 100.0 / preview_unit.effective_speed()
 	for i in 14:
-		var best: Dictionary = sim[0]
+		var best: Dictionary = {}
 		for entry in sim:
-			if entry.t < best.t:
+			if not _ambush_waits(entry.unit, entry.t, ambush_left) and (best.is_empty()
+					or _turn_precedes(entry.unit, entry.t, best.unit, best.t, outpaced)):
 				best = entry
+		if best.is_empty():
+			# Every enemy on the bar is held, so the run is drawn as spent; the loop reaches the same order.
+			ambush_left = 0
+			best = sim[0]
+			for entry in sim:
+				if _turn_precedes(entry.unit, entry.t, best.unit, best.t, outpaced):
+					best = entry
 		var u: BattleUnit = best.unit
+		if ambush_left > 0 and not u.is_hero:
+			ambush_left -= 1
+			if ambush_left == 0:
+				for entry in sim:
+					if entry.unit.is_hero:
+						entry.t = _ambush_moved_on(entry.unit, entry.t, best.t)
 		var is_ghost: bool = preview_unit != null and u == preview_unit \
 			and not best.get("ghost_shown", false)
 		if is_ghost:
@@ -3490,6 +3522,7 @@ func _run_battle() -> void:
 		if u == null:
 			break
 		_clock = u.next_time  # where "now" is, for anything rejoining the timeline
+		_ambush_spend(u)
 		# Field-size proxy: count the enemies still standing as round 3 opens
 		# (every unit at speed 100 acts once per 100 timeline ticks).
 		if sim and not _r3_recorded and u.next_time >= 200.0:
@@ -4117,7 +4150,7 @@ func _run_battle() -> void:
 			# board guards) and a declaration owed on every one of them is a
 			# declaration owed by the CALLER.
 			_declare_intent(u)
-			# BATCH IO §1 — WASTING BINDS BOTH SIDES: an enemy's turn ends as a hero's does. Below the
+			# BATCH IO §1 — WASTING REACHES BOTH SIDES: an enemy's turn ends as a hero's does. Below the
 			# declaration, which BL §1 puts right after the turn; a body the clock fells never acts on it.
 			_wasting_tick(u)
 		# BATCH FK — THE RUNE OF THE GRACE PAYS HERE, at the end of the acting
@@ -4169,7 +4202,7 @@ func _grace_echo(u: BattleUnit) -> void:
 # ══ BATCH IN §1 — WASTING: A CLOCK ON THE FIGHT — BOTH SIDES SINCE IO §1 ══════════════
 #
 # **At the end of every turn, whoever took it loses `Run.WASTING_PCT` of its maximum
-# health** — hero and enemy alike (IO §1: AQ's rule, every modifier binds both sides) —
+# health** — hero and enemy alike (IO §1) —
 # the turn it took, and a turn a stun, a freeze or a Break cost it, which still counts
 # here as every timer's turn does. Its own function for the AR trap's reason
 # (`_run_battle` cannot be driven headlessly), and called at each of the five places a
@@ -4245,13 +4278,69 @@ func _watchtower_check() -> void:
 		"#b0a8e0")
 
 
+# ══ BATCH JB §2a — AMBUSHED: THE WARBAND'S OPENING RUN ═══════════════════════════
+#
+# **The order is a timeline with one door, this function, and the turn bar walks the same schedule**, so the run is one count both
+# read (`_ambush_left`, set by `_apply_battle_modifier`) — the seat Cruel Order's `_turn_before` took at IN, which left with it at
+# IO. While any of the run is left, no hero is handed a turn. **A turn placed before the fight's first tick stays before it, and only
+# the Tracker's, the Hunter's class passive, at -0.01 (IO §0.5: a class passive outranks a modifier)**, which is why the card names
+# him: an ally his opening turn seats there, as a Resonating Hourglass does at `_clock`, waits with the rest. A turn the warband is
+# handed counts, a lost one included: the card counts turns, not blows.
+# **WHEN THE RUN ENDS THE HEROES' CLOCKS MOVE ON BY THE TIME IT TOOK**, or every seed left behind on the timeline would hand them
+# their turns back in a burst, and the card would be a delay that costs nobody anything. **A hero seated during the run already
+# stands on the clock** (Watchtower's answer, a free action), so what moves on is capped at the slowest opening that hero could roll.
+var _ambush_left := 0
+
+
+func _ambush_waits(u: BattleUnit, t: float, left: int) -> bool:
+	return left > 0 and u.is_hero and not (t < 0.0 and u.hero_key == "hunter")
+
+
+func _ambush_moved_on(u: BattleUnit, t: float, clock: float) -> float:
+	return minf(t, 100.0 / maxf(u.effective_speed(), 0.1)) + clock
+
+
+func _ambush_spend(u: BattleUnit) -> void:
+	if _ambush_left <= 0 or u.is_hero:
+		return
+	_ambush_left -= 1
+	if _ambush_left == 0:
+		for h in heroes:
+			h.next_time = _ambush_moved_on(h, h.next_time, _clock)
+
+
+# ══ BATCH JB §2b — OUTPACED: THE WARBAND FIRST, EVERY ROUND ═════════════════════
+#
+# **The game has no rounds, so the timeline is read in spans of one basic swing at the average speed** (`OUTPACED_SPAN`), and in
+# each span every enemy due acts before any hero due, each side in its own order; speed still counts across spans. **Two places
+# order turns and both ask this**, so the loop and the turn bar cannot disagree; under any other card it is the timeline alone.
+# A turn placed before the first span — the Tracker's, at -0.01 — stays before it (IO §0.5). The shape is IN's Cruel Order, read
+# in `docs/design-notes.md` before this was built.
+const OUTPACED_SPAN := BASIC_DELAY
+
+
+func _turn_precedes(a: BattleUnit, ta: float, b: BattleUnit, tb: float, outpaced: bool) -> bool:
+	if outpaced:
+		var sa := floorf(ta / OUTPACED_SPAN)
+		var sb := floorf(tb / OUTPACED_SPAN)
+		if sa != sb:
+			return sa < sb
+		if a.is_hero != b.is_hero:
+			return not a.is_hero
+	return ta < tb
+
+
 func _next_unit() -> BattleUnit:
 	var alive := (heroes + enemies).filter(func(u): return not u.dead)
 	if alive.is_empty():
 		return null
+	var free := alive.filter(func(u): return not _ambush_waits(u, u.next_time, _ambush_left))
+	if not free.is_empty():
+		alive = free
+	var outpaced := _modifier_is("outpaced")
 	var best: BattleUnit = alive[0]
 	for u in alive:
-		if u.next_time < best.next_time:
+		if _turn_precedes(u, u.next_time, best, best.next_time, outpaced):
 			best = u
 	return best
 
@@ -18453,9 +18542,8 @@ func _split_shield_allies(u: BattleUnit) -> Array:
 # recoils, the one who bleeds out) and then down `bodies` in their order. Deterministic, so a gate can read it
 # again, and no die is spent. **The three readings, and why this is the one that survives**: a share rounded
 # and floored at 1 billed four bound heroes 4 for a 1-damage blow — wrong by *split evenly*, and against the
-# party; no floor and no distribution makes a blow under the bind count cost nobody anything — a gift, and the
-# Hungering Dark's lesson is that a rule keyed on a quantity pays the side that produces more of it, which for
-# small blows is the warband; distributing is exact and cannot be gamed either way. One Soul's split and Chain
+# party; no floor and no distribution makes a blow under the bind count cost nobody anything — a gift, and for
+# small blows the gift is the warband's; distributing is exact and cannot be gamed either way. One Soul's split and Chain
 # Ignition's already had this shape. **Every split in the game is this function** (`check_is` §3a): the Unity
 # strike, its recoil and its bleedout, and Blowback's, which nothing writes today. Returns `[body, share]`
 # pairs in hand-out order; a share may be 0, and a caller bills nobody a 0.

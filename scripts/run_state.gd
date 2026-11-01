@@ -5038,17 +5038,16 @@ func bomb_damage() -> int:
 # BATCH IN §1 — FOUR BARGAINS ONLY RUIN EVER SEES (severity 5, the designer's).
 # One sentence each, one system each, and NONE ZEROES A CLASS's KIT — a modifier
 # that makes one hero's whole hand dead is not harsh, it is unplayable.
-# **BATCH IO §1 RE-CUT THEM TO AQ's RULE, AND NOTHING IN THE DECK BINDS ONE SIDE
-# (the designer's).** A modifier that binds one side is a difficulty slider, and
-# the rung is already the difficulty slider: a bargain changes the fight, it does
-# not change the odds. So Famine (the pouch — enemies carry none) and Cruel Order
+# **BATCH IO §1 RE-CUT THEM TO AQ's PROMISE (the designer's), WHICH JB §0.1 REPLACED: A BARGAIN MAY
+# NOT PAY THE HEROES, AND WHETHER THE WARBAND FEELS IT TOO IS FLAVOUR, NOT FAIRNESS** (`CLAUDE.md`'s
+# ladder block). Under the promise Famine (the pouch — enemies carry none) and Cruel Order
 # (the warband first — *both sides first* is incoherent) are REMOVED, not disabled;
 # their built shape and IN's measurements are in `docs/design-notes.md`. Wasting
-# binds both sides, and two two-sided rules replace the pair. **BATCH IP §1a — THE
-# HUNGERING DARK IS REMOVED TOO, NOT DISABLED (the designer's)**: two-sided, it paid
-# whoever deals more damage, and the heroes deal about six times what a warband does,
-# so a bargain under it was a gift. Its shape, IO's measurements and the rule it
-# taught are in `docs/design-notes.md`.
+# reaches both sides, and two two-sided rules replace the pair. **BATCH IP §1a — THE
+# HUNGERING DARK IS REMOVED TOO, NOT DISABLED (the designer's)**: its payout landed on
+# the party's health, in proportion to damage the heroes deal about six times over,
+# so a bargain under it was a gift. Its shape and IO's measurements are in
+# `docs/design-notes.md`.
 # Every figure is read off a constant below (II §0.7: a figure the code holds is
 # read, never retyped); each is a STARTING VALUE (CQ §6) and the designer's to tune.
 #   wasting         a clock on the fight — `battle._wasting_tick`, at the end of every
@@ -5082,8 +5081,19 @@ const FLEETING_TURNS := 3
 const HOARFROST_CHILL_TURNS := 9
 const SLICK_DELAY := 0.5
 const BLOODLETTING_BLEED := 15
-# The words a share of a bar is said in, so the sentence keeps its register as the figure moves.
-const SHARE_WORDS := {1.0: "full", 0.5: "half", 0.25: "a quarter", 0.0: "no"}
+# BATCH JB §2 — THE FOUR, ON THE AXES THE DECK LEFT SHALLOW (JA's axis table), EACH A CONSTANT ITS CARD READS. Two of the three
+# starting values are priced off JA's census before the code existed; the grade follows the reading (JB §3).
+#   AMBUSHED_WARBAND_TURNS   the turns the warband takes before any hero but the Hunter (the turn loop's `_ambush_left`)
+#   FRACTURED_RECOVERY_MULT  the share of the meter a Broken body's recovery empties, which every other fight is the whole of
+#   POROUS_BARRIER_MULT      the share of its face value a barrier on the heroes' side holds against a blow
+const AMBUSHED_WARBAND_TURNS := 8
+const FRACTURED_RECOVERY_MULT := 0.0
+const POROUS_BARRIER_MULT := 0.4
+# The words a share of a bar is said in, so the sentence keeps its register as the figure moves — and a count's, for the same reason.
+const SHARE_WORDS := {1.0: "full", 0.75: "three-quarters", 0.6: "three-fifths", 0.5: "half", 0.4: "two-fifths", 0.3: "three-tenths",
+	0.25: "a quarter", 0.2: "one-fifth", 0.0: "no"}
+const COUNT_WORDS := {4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten", 11: "eleven", 12: "twelve",
+	13: "thirteen", 14: "fourteen", 15: "fifteen", 16: "sixteen"}
 # BATCH IO §5 — EVERY MODIFIER CARRIES ITS OWN LETTERS (`tag`), for the battle's bargain chip, and HU §4's
 # rule binds them as it binds a status's: no two chips in the game show the same letters, case set aside,
 # and none is a status's tag or counter (`check_hu` §4a walks them with the statuses). The tints are the
@@ -5114,7 +5124,7 @@ const MODIFIERS := {
 		"desc": "No healing for anyone. Bleed and damage-over-time still tick."},
 	# ---- authored by AQ at severity 1 (every grade in this table is IO §2's measurement) ----
 	"parched": {"name": "Parched", "tag": "Pa", "severity": 2, "graded": "the default four — IY §2",
-		"desc": "Both parties begin the fight at %s resource at most." % [SHARE_WORDS[PARCHED_SHARE]]},
+		"desc": "Every hero, and any enemy that carries a bar, begins the fight at %s resource at most." % [SHARE_WORDS[PARCHED_SHARE]]},
 	"slick": {"name": "Slick Footing", "tag": "Sk", "severity": 1, "graded": "the default four — IZ §1",
 		"desc": "Every ability costs +%s initiative. Everyone is slower to come round again." % [SLICK_DELAY]},
 	"muffled": {"name": "Muffled", "tag": "Mu", "severity": 1, "graded": "the incumbent — IZ §5",
@@ -5156,6 +5166,26 @@ const MODIFIERS := {
 			% [int(round(THIN_VEIL_PCT * 100))]},
 	"long_silence": {"name": "The Long Silence", "tag": "Ls", "severity": 3, "graded": "the default four — IW, graded at IX §3",
 		"desc": "Nobody may use the same ability twice this fight. Basic attacks are exempt."},
+	# ---- authored at JB §2, each a shape rather than a rate, each graded by its own reading (§3) ----
+	# AMBUSHED binds the warband's side alone and says so (JB §0.1: a bargain may not pay the heroes; whether the warband feels it
+	# is flavour). THE HUNTER IS NAMED BECAUSE THE PASSIVE STANDS (IO §0.5, confirmed in JB's conversation, the designer's): he
+	# takes his opening turn, and only then does the warband take its run.
+	"ambushed": {"name": "Ambushed", "tag": "Am", "severity": 4, "graded": "the incumbent — JB §3",
+		"desc": "The warband takes %s turns before any hero but the Hunter acts." % [COUNT_WORDS[AMBUSHED_WARBAND_TURNS]]},
+	# OUTPACED IS §2b'S RESERVE, AUTHORED IN INVERTED'S PLACE: reading speed backwards hands the heroes' slowest body, their healer,
+	# half as many turns again, and it paid them (JB §3; its built shape is in `docs/design-notes.md`). It states a rule, so it holds
+	# no card figure. The Hunter's opening turn stands (IO §0.5), and the words say so.
+	"outpaced": {"name": "Outpaced", "tag": "Op", "severity": 2, "graded": "the incumbent — JB §3",
+		"desc": "The warband acts before any hero every round, whatever the speeds. The Hunter's opening turn stands."},
+	# FRACTURED — BREAK HAS NO RATE TO MULTIPLY (JB §2c): a Broken body loses one turn and its meter empties, so the share that empties
+	# is the handle and the card follows the mechanic (the designer's answer in JB's conversation).
+	"fractured": {"name": "Fractured", "tag": "Fc", "severity": 1, "graded": "the default four — JB §3",
+		"desc": ("A Broken body's meter does not empty. Any Break damage Breaks it again." if FRACTURED_RECOVERY_MULT == 0.0
+			else "A Broken body's meter empties only %s of the way." % [SHARE_WORDS[FRACTURED_RECOVERY_MULT]])},
+	# POROUS binds the heroes' side alone as the deck plays — the warband lays no barrier (JA's census read it absorbing none) — and
+	# the card names no side, so it says nothing the deck does not do (JB §0.1).
+	"porous": {"name": "Porous", "tag": "Po", "severity": 2, "graded": "the default four — JB §3",
+		"desc": "Barriers hold %s of what they would." % [SHARE_WORDS[POROUS_BARRIER_MULT]]},
 }
 
 # The reward table reads severity and nothing else. Each entry is the list
@@ -5348,7 +5378,7 @@ func arm_fixed_modifier(node_type: String) -> void:
 	pending_modifier = String(_fixed_modifier_pool().pick_random())
 
 
-# The eight a fixed encounter draws from: the deck's severities inside `FIXED_MODIFIER_BAND`.
+# The modifiers a fixed encounter draws from: the deck's severities inside `FIXED_MODIFIER_BAND`.
 func _fixed_modifier_pool() -> Array:
 	var pool: Array = []
 	for id in MODIFIERS:

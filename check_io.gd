@@ -58,7 +58,8 @@ const GONE_WORDS := ["famine", "Famine", "cruel_order", "Cruel Order", "_pouch_s
 # (IZ §0.1), the reverts graded by their own old readings, Dull Edge removed (§3); `docs/reports/IZ-grades.tsv`.
 # RE-POINTED AT JA §2: Fleeting at three turns off, re-read in the deck, is a 2 — six at 1, five at 2; the grades of record are
 # `docs/reports/JA-grades.tsv`.
-const GRADE_COUNTS := {1: 6, 2: 5, 3: 4, 4: 2, 5: 4}
+# RE-POINTED AT JB §3: the four, each placed by its reading.
+const GRADE_COUNTS := {1: 7, 2: 7, 3: 4, 4: 3, 5: 4}
 # §5 — the four glyphs, each meaning one thing (IE §0.1, II §0.4); a bargain's chip is none of them.
 const GLYPHS := ["◆", "↑", "✦", "○"]
 
@@ -200,7 +201,8 @@ func _s1a_the_deck() -> void:
 	print("\n§1a — the deck re-cut to AQ's rule: three removed, one binds both sides, two new")
 	var mods: Dictionary = _run.MODIFIERS
 	# RE-POINTED AT IZ §3 and §5: Dull Edge and Tinderbox are removed, so the twenty are eighteen.
-	ok(mods.size() == 21, "§1a: the deck holds %d modifiers — twenty, and three at severity 5" % mods.size())
+	# RE-POINTED AT JB §2: the four joined.
+	ok(mods.size() == 25, "§1a: the deck holds %d modifiers — twenty-five, four of them at severity 5" % mods.size())
 	for id in GONE:
 		ok(not mods.has(id), "§1a: `%s` is still in the deck" % id)
 	for id2 in RECUT:
@@ -574,9 +576,9 @@ func _s1f_the_words() -> void:
 		ok(String((_run.MODIFIERS[id2] as Dictionary)["desc"]).contains("heroes and enemies alike"),
 			"§1f: `%s` does not say it binds both sides" % id2)
 	var mod_e := String(Glossary.entry("modifier").get("long", ""))
-	ok(mod_e.contains("EVERY MODIFIER BINDS BOTH SIDES") and mod_e.contains("nothing in the deck binds one side")
-			and not mod_e.contains("RUIN'S FOUR bind one side") and not mod_e.contains("bind one side —"),
-		"§1f: the modifier entry does not say every modifier binds both sides, or still says Ruin's four bind one")
+	# RE-POINTED AT JB §0.1: the promise went; the entry says what the deck can keep, and no longer the sentence that replaced it says the rest.
+	ok(mod_e.contains("every modifier in the deck costs your heroes, and the severity says how much") and not mod_e.contains("bind one side"),
+		"§1f: the modifier entry does not say every modifier costs the heroes, or still promises one-sidedness")
 	var sev := String(Glossary.entry("severity").get("long", ""))
 	ok(sev.contains("severity of 1 to 5") and sev.contains("A SEVERITY IS A RANK BY WHAT A MODIFIER COSTS"),
 		"§1f: the severity entry does not say a severity is a rank by what the modifier costs")

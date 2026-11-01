@@ -288,7 +288,7 @@ var beast_committed := false # Lone Bond: a REAL summon has been spent (Call
 var free_summons := 0        # No Beast Left: how many summons are still free
 var no_heals := false        # Ancient Pact: this beast rejects all healing
 # ---- Batch AN §3: the battle modifier ----
-# A modifier binds BOTH parties for one battle, so it is stamped on every
+# A modifier holds for one battle, so it is stamped on every body it binds —
 # unit at spawn rather than checked per-unit at a read site. Each field has
 # exactly ONE read site, named beside it — which is what lets a modifier be
 # authored as a stamp rather than as six conditionals scattered through the
@@ -296,6 +296,8 @@ var no_heals := false        # Ancient Pact: this beast rejects all healing
 # modifier runs the pre-AN code path byte for byte.
 var mod_ignore_armor := false  # Brittle    — read in effective_armor()
 var mod_speed_add := 0.0       # Leaden     — read in effective_speed()
+var mod_break_recovery := 1.0  # Fractured  — read in recover_from_break()
+var mod_barrier_mult := 1.0    # Porous     — read in _barrier_absorb()
 var mod_no_heals := false      # Bloodless  — read in heal_amount()
 var mod_cost_mult := 1.0       # Warded     — read in battle._eff_cost()
 # Batch AQ's six, same rule: one field, one read site, default = no modifier.
@@ -4496,6 +4498,20 @@ func _siphon_pay(amount: int) -> int:
 	return amount - covered
 
 
+# BATCH JB §2d — POROUS, AT THE ONE LINE A BARRIER ABSORBS AT. It reads here rather than where a barrier is laid because several
+# sites lay one and Layered Faith and Abundance add to what stands, so a cut at the lay would shave the held half again, and the
+# recast gate reads face values: a face value spends faster here, and is the same number everywhere else. Returns what it took off the blow.
+func _barrier_absorb(s: Dictionary, amount: int) -> int:
+	if mod_barrier_mult >= 1.0:
+		var whole: int = mini(s.power, amount)
+		s.power -= whole
+		return whole
+	var holds := maxi(int(ceil(s.power * mod_barrier_mult)), 1)
+	var absorbed: int = mini(holds, amount)
+	s.power = 0 if absorbed >= holds else s.power - int(ceil(absorbed / mod_barrier_mult))
+	return absorbed
+
+
 func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	# BATCH HF — VOW OF SILENCE, first: a blow its source may not deal is not
 	# dealt, so nothing below it — a barrier's absorb, One Soul's split, the
@@ -4532,9 +4548,8 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	for s in statuses:
 		if s.id == "barrier" and s.power > 0:
 			var would_have_died := amount >= hp
-			var absorbed: int = mini(s.power, amount)
+			var absorbed := _barrier_absorb(s, amount)
 			amount -= absorbed
-			s.power -= absorbed
 			# BATCH HF — DETONATING WARD books what the ward eats while it is
 			# armed; the battle spends the total when the barrier breaks
 			# (`barrier_broken_cb`, below) or ends (`status_expired_cb`).
@@ -5179,10 +5194,16 @@ func revive(pct: float) -> void:
 		revived_cb.call(self)
 
 
+# BATCH JB §2c — FRACTURED: THE SHARE OF THE METER A RECOVERY EMPTIES IS THE HANDLE, because a Broken body has no rate: it loses one
+# turn and this line empties it. Held under `stability`, as Ironclad holds it, so the body stands un-Broken until Break damage
+# lands: a meter left AT `stability` would be read as a Break by `take_hit` on a blow carrying none. A body nobody strikes recovers
+# its turn, so a board of Broken bodies still plays out.
 func recover_from_break() -> void:
 	broken = false
 	broken_extra_turns = 0
 	pressure = 0
+	if mod_break_recovery < 1.0:
+		pressure = mini(int(round(stability * (1.0 - mod_break_recovery))), stability - 1)
 	modulate = Color.WHITE
 	remove_status("broken")
 	refresh_bars()

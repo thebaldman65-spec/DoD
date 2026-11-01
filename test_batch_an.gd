@@ -167,8 +167,10 @@ func _test_offer(RunState) -> void:
 	# of the four that stand.
 	var ruin_four := {"wasting": 5, "thin_veil": 5, "long_silence": 5}
 	# RE-POINTED AT IZ §3 and §5: Dull Edge and Tinderbox are removed too, so the pool is twenty-one.
-	ok(run.MODIFIERS.size() == 21, "twenty-one authored modifiers (the twenty less Dull Edge and Tinderbox, and the three of the four authored at severity 5 that stand — IN §1, IO §1, IP §1a, IZ §3 and §5)")
-	ok(run.MODIFIERS.size() == want.size() + ruin_four.size()
+	# RE-POINTED AT JB §2: the four joined, each at a grade its reading gave (`docs/reports/JB-grades.tsv`).
+	var jb_four := {"ambushed": 1, "outpaced": 1, "fractured": 1, "porous": 1}
+	ok(run.MODIFIERS.size() == 25, "twenty-five authored modifiers (the twenty less Dull Edge and Tinderbox, the three of the four authored at severity 5 that stand, and JB's four — IN §1, IO §1, IP §1a, IZ §3 and §5, JB §2)")
+	ok(run.MODIFIERS.size() == want.size() + ruin_four.size() + jb_four.size()
 			and ruin_four.keys().all(func(k): return run.modifier_severity(String(k)) >= 1 and run.modifier_severity(String(k)) <= 5),
 		"...and the test knows all of them")
 	# The pool is WEIGHTED LOW on purpose: every offer's safe slot is served
@@ -185,10 +187,10 @@ func _test_offer(RunState) -> void:
 	# RE-POINTED AT JA §2: Fleeting at three turns off, re-read in the deck, is a 2 — six at 1, five at 2; the grades of record
 	# are `docs/reports/JA-grades.tsv`.
 	ok(by_sev[0] == 0, "no modifiers carry no severity (got %d)" % by_sev[0])
-	ok(by_sev[1] == 6, "six severity-1 modifiers (got %d)" % by_sev[1])
-	ok(by_sev[2] == 5, "five severity-2 modifiers (got %d)" % by_sev[2])
+	ok(by_sev[1] == 7, "seven severity-1 modifiers (got %d)" % by_sev[1])
+	ok(by_sev[2] == 7, "seven severity-2 modifiers (got %d)" % by_sev[2])
 	ok(by_sev[3] == 4, "four severity-3 modifiers (got %d)" % by_sev[3])
-	ok(by_sev[4] == 2, "two severity-4 modifiers (got %d)" % by_sev[4])
+	ok(by_sev[4] == 3, "three severity-4 modifiers (got %d)" % by_sev[4])
 	ok(by_sev[1] + by_sev[2] > by_sev[3] + by_sev[4],
 		"the pool is weighted toward the low severities")
 	# `rot` was authored by AQ and DROPPED there, because the battle-end sync

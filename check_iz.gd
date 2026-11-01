@@ -253,13 +253,23 @@ func _s1_the_rereads() -> void:
 # stays IZ's record (`docs/reports/IZ-grades.tsv`).
 const GRADES_TSV := "docs/reports/JA-grades.tsv"
 
+# RE-POINTED AT JB §2: THIS GATE'S KEPT TABLES WERE TAKEN ON THE DECK BEFORE JB's FOUR, AND EACH OF THE FOUR NAMES THE BATCH THAT
+# GRADED IT, SO THE DECK THEY MEASURED IS READ OFF THE ROWS AND NEVER OFF A LIST (`check_jb` §3 holds the four).
+func _deck_before_jb() -> Dictionary:
+	var out := {}
+	var mods: Dictionary = _run.MODIFIERS
+	for id in mods:
+		if not String((mods[id] as Dictionary).get("graded", "")).contains("JB §"):
+			out[id] = mods[id]
+	return out
+
 
 func _s2_the_placing() -> void:
 	print("\n§2 — the placing: every handle where its reading measured it, every grade its readings' highest test-bound band")
 	var rows := _tsv("res://" + GRADES_TSV, ["modifier", "id", "handle", "value", "ref_cost", "ref_se", "ref_z", "ref_source",
 		"ref_seeding", "alt_population", "alt_cost", "alt_se", "alt_z", "alt_source", "alt_applies", "ref_band", "alt_band", "grade",
 		"population", "batch"])
-	var mods: Dictionary = _run.MODIFIERS
+	var mods: Dictionary = _deck_before_jb()
 	var ids := rows.map(func(r): return String(r["id"]))
 	var deck := mods.keys().map(func(k): return String(k))
 	ids.sort()
@@ -310,7 +320,11 @@ func _s2_the_placing() -> void:
 	# THE RULED REVERT (IZ §0.2): Bloodletting at its old 15, where the sharper instrument reads it a grade 1.
 	ok(int(_konst("BLOODLETTING_BLEED") if _konst("BLOODLETTING_BLEED") != null else -1) == 15, "§2: Bloodletting's handle is %s — IZ §0.2 reverts it to 15" % str(_konst("BLOODLETTING_BLEED")))
 	var grades := _flat(_block(_doc("res://docs/state.md"), "### THE BARGAIN DECK's GRADES"))
-	var tally := "none %d; 1 %d; 2 %d; 3 %d; 4 %d; 5 %d" % [counts[0], counts[1], counts[2], counts[3], counts[4], counts[5]]
+	# RE-POINTED AT JB §3: the kept table graded the deck before the four; the state's tally is the deck's, the four among it.
+	var deck_counts := {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+	for id2 in _run.MODIFIERS:
+		deck_counts[int(_run.modifier_severity(String(id2)))] += 1
+	var tally := "none %d; 1 %d; 2 %d; 3 %d; 4 %d; 5 %d" % [deck_counts[0], deck_counts[1], deck_counts[2], deck_counts[3], deck_counts[4], deck_counts[5]]
 	ok(grades.contains(tally), "§2: the state file's grades block does not carry the tally the table gives (%s)" % tally)
 	print("    CHECKED %d grades against their readings; the deck holds %s" % [rows.size(), tally])
 
@@ -571,7 +585,7 @@ const BAND_MOVED := [[1, 2], [3, 4]]
 
 func _holds(band: Array) -> int:
 	var n := 0
-	for id in _run.MODIFIERS:
+	for id in _deck_before_jb():
 		var s := int(_run.modifier_severity(String(id)))
 		if s >= int(band[0]) and s <= int(band[1]):
 			n += 1

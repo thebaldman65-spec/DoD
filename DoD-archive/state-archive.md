@@ -17,6 +17,332 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT JB — 2026-10-31, FROM `docs/state.md` AS IT LEFT IT (`48837df`)
+
+**What came here**: JA's three rulings, all answered in JB's brief; FOUND AT JA's premises item, a record; the roadmap's JA item; and the records in THE TEST TREE, Knowledge sync, Small and still owed and Carried that ask nothing: what each batch added to the battery and to `baselines.json`, three items closed by what they name, and two figures the census prints. JB §5's condition was met (19,466 B of room, under 20,000 B). Each word for word, under the heading it stood under, a fragment of a paragraph where the paragraph's live half stayed.
+
+
+### ~~JA's RULINGS OWED~~ — **ALL THREE ANSWERED IN JB's BRIEF (1: the four one-sided cards stay and AQ's promise goes, JB §0.1, §1; 2: IP §0.2 replaced where it stood, JB §0.2; 3: the four authored and placed by their readings, JB §2, §3)** — was: **THREE; TWO MODIFIERS BIND THE PARTY ALONE AS THE DECK PLAYS, A SHARE IS NOT A SIGN, AND GRADE 4's FOUR ARE THE DESIGNER's WITH THEIR INPUTS IN**
+
+Full working: `docs/reports/JA.md`, NEEDS A RULING.
+
+1. **THIN AIR AND ENCUMBERED BIND THE PARTY ALONE AS THE DECK PLAYS (JA §3's census).** The warband takes no turn-start drip (the drip is `_player_turn`'s alone) and no enemy ability carries a cooldown, so over 80 runs and 2,217 fights the warband produced **none** of either quantity; Parched's and Warded's it produced nearly none of (the heroes 190 to 310 times the resource held, 42 to 49 times the resource paid — the warband's two Rage kinds). AQ's rule (IO §0.2) and the glossary's *nothing in the deck binds one side* read the words, and these read the effect: each is a difficulty slider by AQ's own test. Re-cut, accept, or rule what *binds both sides* means — the designer's; nothing moved (JA §7).
+2. **A SHARE IS NOT A SIGN (JA §3).** IP §0.2's rule reads *a rule keyed on a quantity the two sides do not produce equally pays the side that produces more of it*; on the instrument the scale is set on, both damage bonuses (Feverish, the Thin Veil) — keyed on a quantity the heroes produce 6.3 to 7.1 times more of — cost the party, and so do penalties on what the warband holds more of (Rot, Overgrown, Brittle). The census's pattern is written beside IP's rule in `CLAUDE.md`, the batch's reading and not a ruling; **whether IP's sentence is narrowed to the shape it was written for (a payout landing on the party's health) is the designer's.**
+3. **GRADE 4's FOUR ARE THE DESIGNER's, AND THE INPUTS ARE IN (JA §3, §4).** The share census (`docs/reports/JA-shares.tsv`, two parties, 29 quantities) and the axis table (`docs/reports/JA-axes.tsv`, ten axes): **grade 4 holds health alone**; healing, resource and recoil reach 5 with no 4; damage, Break and the hand top at 3, status duration at 2, tempo and the turn order at 1. **An axis is a candidate for a two-sided rule only where the warband produces its quantity too** — health, turn order, armor; reference party: Break, tempo, hits — and Warden's gambles stay Rot and Overgrown until one is authored (IZ §0.4).
+
+### FOUND AT JA AND NOT FIXED — ITS CLOSED ITEM (archived at JB; the block stays in `docs/state.md`)
+
+- **THE BRIEF's PREMISES THAT DID NOT HOLD** (JA's report §0): *nine batches ago* eleven of twenty-three cost nothing — it was IX, three batches back; *three failed the same test, each paying one side* — the Dark and Dull Edge at its floor paid the party, Tinderbox read a tie (+0.24 ± 0.23) and left by the stop condition; *IX §2d found a second mechanism, a longer fight pays the side with sustain* — IX §2d pre-registered that shape and found it on none of fourteen halves; *the party is on the slow side of the field* — the faster (above); *at -3 every effect lasts one turn* — 6–8% of the party's positive-count statuses run five turns or more and the battle-long ones are untouched (the designer chose the true words); *every other axis stops at 3 or below* — healing, resource and recoil reach 5.
+
+*A record; JA's report §0 holds it.*
+
+### THE PLAYTEST'S OTHER FINDINGS — **LATER BATCHES BY RULING (HW's brief §5); THE ROADMAP HOLDS THE ORDER** — ITS CLOSED ITEMS (archived at JB; the section stays in `docs/state.md`)
+
+- **THE SHARES ARE MEASURED, LEADEN AND FLEETING AT 3 (JA)**: Frenzied is Leaden, Fleeting takes three turns off and is a 2, and the census grade 4 waits on is taken — what each side produces of every quantity a rule can key on, on both parties, and the deck's axes crossed with it (THE SHARE CENSUS). **Grade 4's four are the designer's, their inputs in** (JA's RULINGS OWED 3); **two modifiers bind the party alone as the deck plays** (1), and **a share is not a sign** (2).
+
+*Answered in JB's brief and built at JB; JB's item in its place.*
+
+### THE TEST TREE, AS OF EF — ITS CLOSED ITEMS (archived at JB; the block stays in `docs/state.md`)
+
+*What each batch's gate was added for, and what each batch moved in `baselines.json`: a record that asks nothing; `check_parse` prints the population and `baselines.json` carries each row's note.*
+
+**EV ADDED `check_ev` BECAUSE THE FALLBACK'S TWO FAILURE MODES ARE INVISIBLE IN THE SOURCE**: a
+  fallback that never fires and one that fires for every converted stack would BOTH pass a static
+  check, and they are simply the two ways one line of arithmetic goes off by one. Every section is
+  live; §0 drives the disjointness invariant over 240 readings; §1 pins Loyalty 9 by name because it
+  is the one depth where a converted stack still buys the clamp; §3 asserts the OPPOSITE of
+  `check_eu` §1c with the same instrument at a saturated depth. **Seven negative controls, all seven
+  bit**, the first of them HEAD's own `battle.gd`.
+  Before it, **ES ADDED `check_es` BECAUSE THAT BATCH CARRIES FOUR RULINGS AND THREE OF THEM DECAY SILENTLY.**
+  §1 is the one a source sweep cannot reach: a re-invented tier is a new table and a new roll, and
+  the OFFER DISTRIBUTION is the only place it shows, so it is MEASURED at three zone slots —
+  against a 4.5-point band until FG — where the old weights spread it by 29.
+  §3 is the dangerous one: with the `scarred`
+  flag gone, `Runes.is_cost` is the only thing that knows a rune charges anything and it is what the
+  power arm holds a cost by, so the costed population is derived and pinned as a NAMED SET with
+  `exsanguination` named as the one whose cost is a behaviour rather than a term. §4 is DS's Heads
+  Down shape outright and is DRIVEN through the real equip/unequip doors. **§2 DELIBERATELY ENCODED
+  NO RULING** while the five universals' classes were unmade; **ET §1 retired the five and
+  RE-POINTED §2 onto a wider question** — every entry a spec cannot draw must be undrawable BECAUSE
+  IT IS RETIRED, over every rune rather than the five — so a retirement wearing an eligibility rule
+  still goes red, and the depth table it prints now reads zero across all twelve. Before it,
+  **EM ADDED `check_em` BECAUSE EJ §5 NAMED THIS BATCH AS ITS HOME**: *the property a future gate
+  wants — that no rune writes a live node's counter — belongs in the batch that takes the charter.*
+  §1 derives that property from `Talents.tree()` and `runes.json` rather than from a list of names,
+  and its unit-math exemptions are an EQUALITY. **§2 is the one that earns the gate**: splitting a
+  counter is safe in the arithmetic and lethal in the GUARD, so it sweeps STATEMENTS and fails if
+  any statement reads one half without the other. §3 holds the AA type trap on the `rune_` side; §4
+  pinned the three clauses with no home as an EQUALITY until EN.
+  **Five negative controls, all five bit.**
+  **EL ADDED `check_el` BECAUSE THAT BATCH CARRIES THREE RULINGS**: that MARK's population is
+  DERIVED from the marks the game itself names rather than listed, that `master.html` §6c's tag
+  table is the code's table, and that the widest tag line is MEASURED rather than transcribed
+  (DJ §3). **The first is the one that decays silently** — the day an eleventh mark is authored,
+  nothing else in the tree would notice its card going untagged — so §1 pins the STATUS half from
+  outside (`DISPEL_NEVER.size()`, DW's idiom) and DERIVES the CARD half live out of
+  `battle.gd`'s apply sites, through both anchors, agreeing in both directions.
+  **EK ADDED `check_ek` BECAUSE THAT BATCH CARRIED TWO RULINGS**: that the vocabulary is
+  MECHANICS rather than status names, and that the tags are MECHANICALLY INERT. **Inertness
+  is the one property nothing else in the tree would notice losing**, so §3 asserts it as a
+  POPULATION — every `.gd` swept comment-stripped, and **EL SPLIT THAT ASSERTION IN TWO** because
+  it was two claims: the files in the SHIPPED GAME naming a tag are pinned by name,
+  the TARGETS that check one are listed separately, and ZERO is still
+  asserted separately in the six files a mechanic would have to live in.
+  **EH ADDED `check_eh` BECAUSE §1 IS A RULING AND BECAUSE THE THIRD TIER CAN ONLY BE PROVED
+  LIVE.** A tier that resolves correctly and announces nothing passes every static check in the
+  tree, and silence is the exact defect EA existed to end. **EG ADDED `check_eg` BECAUSE §1 AND §2
+  ARE BOTH RULINGS, AND BECAUSE §1 DRIVES THE THIRD
+  ZONE-BOSS GRANT.** A slot ladder that never grants would pass every static check in the tree,
+  which is DS's Heads Down arriving at a new mechanic.
+  **EF AND EE EACH ADDED NONE, ED ADDED `check_ed`**, and before it EC added `check_ec`, EB `check_eb`, EA `check_ea`, DW
+  `check_dw`, DV `check_dv` and DU `check_du`; **DZ AND DY EACH ADDED NONE.** **ED ADDED ONE BECAUSE
+  §2 IS A RULING** — the manifest is the answer to the coverage question EC priced and left open,
+  and a gate encodes a ruling. **§1 ADDED NOTHING, because its ruling is that nothing should
+  change.** **EC ADDED ONE BECAUSE §1 IS AN
+  INSTRUMENT REPAIR THAT HAS TO SURVIVE THE BATCH** — the scratchpad sweep is rebuilt every batch
+  and a boundary fixed only there is a fix that expires. **§2 AND §3 ADDED NOTHING**, because both
+  are measurements the brief forbids ruling on and a gate encodes a ruling. **EB ADDED ONE BECAUSE
+  ITS §1 IS A RULING** — a gate
+  encodes a ruling, and EB §1 is the ruling on the measurement EA handed over. **EA §3 WAS STILL A
+  MEASUREMENT AND RODE IN `check_ea` PINNING A DIRECTION RATHER THAN A COUNT**, which is the
+  shape that does not encode a ruling nobody made; `check_eb` §1 is the shape that does, now that
+  the ruling exists. **`check_ec` IS A THIRD SHAPE: A PROPERTY OF THE INSTRUMENTS THEMSELVES**, and
+  it carries its own discrimination control on synthetic input because the repair it encodes is
+  dangerous in the opposite direction. **`check_dw` ASSERTS
+  THE CONSEQUENCES, NOT THE SOURCE**: §1 and §2 re-derive both of `test_batch_cp`'s named
+  populations LIVE and require the suite's table to equal them, because a named population is only
+  useful while it is still the real one — which is what stopped being true between CN and DW. **It
+  also pins `check_da`'s exemption table at ONE from outside**, so a batch adding a second has to
+  move a line in another file and say why.
+
+- **`check_ds` NEEDS NO `check_da` §3 EXEMPTION AND IT TOOK A RED TO ESTABLISH THAT.** It calls
+  neither draft-pool accessor; its **header comment named both of them** while explaining that it
+  does not, and §3's fingerprint is a substring match over the whole source. **The names came out of
+  the prose rather than an exemption being granted** — an exemption granted to a sentence would
+  blind §3 to a real walk arriving in that file later, which is worse than the violation it covers.
+  **`check_du` NEEDED NO EXEMPTION EITHER AND DID NOT TRIP §3 AT ALL**, because that lesson was
+  applied rather than re-learned: it reads neither draft-pool accessor and its comments name
+  neither. **`check_dv` NEEDED NONE EITHER**, for the same reason, and was run standalone before the
+  battery to prove it: `check_da` reads **37/0 over 32 gates**.
+  - **AND §3's BLIND SPOT IS CLOSED AT DW §1, WITH ONE MORE HOLE THAN DV DIAGNOSED.** Its walk
+    sweep read **`check_*.gd` ONLY** and its fingerprint matched the two pool **ACCESSORS** where
+    `test_batch_cp._corpus()` reads the **CONSTANTS** — both real. **THE THIRD WAS LARGER AND SAT
+    INSIDE THE POPULATION IT ALREADY SWEPT**: the fingerprint assumed a corpus walk touches the
+    DRAFT pools at all, and `check_cl_resolver._every_ability()` read only `Classes.kit()` and
+    `Classes.spec_abilities()` until DW and reached **43 of 227**.
+    **THREE WALKS: 43, 91 and 207.** A SECOND
+    sweep runs over gates AND suites now, matching constants as well as accessors, and asks whether
+    a function **RETURNS** a collection built from two or more ability-source families. **37 → 39,
+    one exemption, and the old sweep is untouched.**
+
+**FF ADDED
+  `check_ff` AT [55, 55] AND MOVED EXACTLY ONE OTHER ROW — `check_parse` 169 → 170 — BOTH WRITTEN
+  BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS.**
+
+**The row count below is the historical reading and is kept for
+  the reasoning attached to each move.** **ES ADDED `check_es` AT [42, 42] AND MOVED EXACTLY THREE OTHER ROWS —
+  `test_runes` 3101 → 3118, `check_ek` 43 → 45 and `check_parse` 161 → 162 — ALL FOUR WRITTEN BEFORE
+  THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS EACH.** **The `test_runes` +17 was COUNTED OFF
+  THE DIFF rather than guessed**: `_schema` goes 472 → 585 (two absence pins and a no-prefix pin
+  replace one tier check and one conditional price check, over 65 entries) and `_scarred` → `_costs`
+  goes 102 → 6, called twice as before; +113 − 96 = +17. **`check_parse`'s move is that row working
+  as designed** — its count IS its coverage, so a target joining the battery raises it the same day. **EM ADDED `check_em` AT [210, 210]; EN MOVED IT TO [223, 223] AND MOVED `av` AND `ax` BY ONE AND TWO. EM MOVED FIVE OTHER ROWS —
+  `check_dp` 43 → 48, `check_parse` 160 → 161, `test_batch_ak` 495 → 496, `test_batch_ax`
+  348 → 350 and `test_runes` 3121 → 3125 — ALL SIX WRITTEN BEFORE THE BATTERY**, three of them
+  off three identical standalone readings apiece. **`check_parse` read 163 first**, and the extra
+  two were scratch measurement probes sitting in the repo root that its RESIDUE walk found — the
+  walk working, and they were moved out of the tree. Before it, **EL ADDED `check_el` AT [23, 23]
+  AND MOVED EXACTLY TWO OTHER ROWS —
+  `check_ek`, 39 → 43, and `check_parse`, 159 → 160 — ALL THREE WRITTEN BEFORE THE BATTERY OFF
+  STANDALONE READINGS**, so `check_de` certified on pass one. **`check_ek`'s move is itemised in
+  its own row**: §3 splits one assertion into two, §4 adds two population assertions and one more
+  tag to sweep. Before it, **EK ADDED `check_ek` AT [39, 39] AND MOVED EXACTLY ONE OTHER ROW —
+  `check_parse`, 158 → 159**. **The `check_parse` move is that row working
+  as designed rather than drifting**: its count IS its coverage, so a target joining the battery
+  raises it the same day. **EI ADDED NO ROW AND MOVED EXACTLY ONE — `check_parse`, `checks: null`
+  → `[158, 158]`** — written before the battery off three identical standalone readings, so
+  `check_de` certified on pass one. **THAT ROW IS A DIFFERENT KIND OF NUMBER FROM EVERY OTHER ONE
+  IN THE TABLE: it is a COVERAGE count, not an assertion tally**, and it is pinned for the reason
+  the batch exists — a failure total reads zero whether that gate walks 158 files or 41, which is
+  how it was found short three times with nothing going red.
+  **EH ADDED `check_eh` AND MOVED EXACTLY ONE OTHER ROW — `check_ea`
+  62 → 86 — BOTH WRITTEN BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS**, so
+  `check_de` certifies on pass one. **EG ADDED `check_eg` AND MOVED FOUR ROWS, ALL FIVE WRITTEN BEFORE THE
+  BATTERY OFF STANDALONE READINGS** — `test_batch_bo` 1131 → 1140, `test_batch_bx` 157 → 161,
+  `check_ea` 60 → 62, `test_batch_bp` 275 → 276, and its own row off THREE identical readings of 68,
+  so `check_de` certified on pass one. **THE `bo` DELTA WAS COUNTED OFF THE DIFF RATHER THAN
+  GUESSED** — +20 `ok(` against −11, every one linear. **EF ADDED NO ROW AND MOVED EXACTLY ONE — `check_ec` 22 → 23, the fifth
+  tracked document, written off three identical standalone readings BEFORE the battery so
+  `check_de` certified on pass one.** **ED ADDED `check_ed` AND MOVED THREE ROWS, ALL THREE PREDICTED AND ALL
+  THREE CONFIRMED STANDALONE BEFORE THE BATTERY** — `check_dr` 79 → 80, `test_batch_bm`
+  1888 → 1889 and `test_batch_bs` 266 → 267, one locator guard each. **Its own row was written off
+  three identical standalone readings of 18**, so `check_de` certified on pass one and reported
+  **ZERO NOTICES**. **EB ADDED `check_eb` AND MOVED NOTHING ELSE** — its row was written
+  BEFORE the battery off three identical standalone readings of 12, so `check_de` certified on pass
+  one instead of reporting an unwatched target, and it reported **ZERO NOTICES**. Before it, **EA
+  ADDED `check_ea` AND MOVED EXACTLY ONE OTHER ROW** — `test_batch_ah`, which asserted the OLD
+  award behaviour outright and was inverted in place rather than deleted. **DZ ADDED NO ROW AND MOVED NONE — IT WAS THE FIRST BATCH IN THIS
+  FILE'S RECORD TO PREDICT A COMPLETELY FLAT TABLE AND GET ONE.** It edits no `.gd` file and no data file,
+  and **every assertion against the documents it does edit is a `contains` whose COUNT is fixed**,
+  so `CLAUDE.md` can lose 51 KiB without moving a single check count. **DY ADDED NO ROW EITHER AND
+  MOVED MANY** — a batch that grows two pools and deletes a third moves every loop that walks one,
+  which is what its prediction table is for.
+  **THE `flake` FIELD IS GONE FROM `test_batch_at`'S ROW.**
+  Before it, **DX ADDED NO ROW AND MOVED EXACTLY ONE FIELD** — `harness_2`'s failure
+  band, `[0,1]` → `[0,0]`, with its `flake` field REMOVED because the flake is repaired rather than
+  quiet. **A BATCH THAT MOVES A FAILURE BAND DOWN IS THE ONLY KIND THAT SHOULD**, and DE's polarity
+  rule is why: a FALLING failure count is a notice, a rising one is an error. DV added `check_dv`
+  and moved nothing else; DU added `check_du` and moved `check_cz`. **`check_de` HAS NO ROW OF ITS
+  OWN, SO ITS OWN +4 FOR A NEW GATE IS REPORTED BY NOTHING** — **EB adds `check_eb` and moves it
+  325 → 329, and EA moved it 321 → 325, for exactly that reason**, and DX added no target so it did not move at all; and the battery's first pass after a new gate necessarily reads one `check_de`
+  failure — a target that ran with no row is UNWATCHED, which is that assertion working — so the row
+  is added and `check_de` re-run over the same log directory, which is what it is built for. **DR ADDED `check_dr` AND MOVED FIVE ROWS** — `test_batch_bt`, `check_co`,
+  and the three its own first battery NOTICED and it had not predicted (`bo`, `cb`, `ce`).
+
+- **DR MOVED `test_batch_cd`'S TABLE WITHOUT MOVING ITS COUNT** —
+  `PER_SPEC_DEPTH` is the ONE authoritative per-spec table and DR's two movements (Swordmaster
+  10 → 12, Cryomancer 12 → 11) cost one edit there and none in the suites that assert only
+  the FLOOR and the TOTAL, which is exactly what that centralisation is for. **ITS COUNT IS IN `baselines.json` AND IS NOT RESTATED HERE — THIS PROSE HAS BEEN WRONG TWICE**:
+  it read 72 from DG until DP corrected it to 85, and 85 was stale again by EA. **A number this
+  file restates is a second copy by construction.** It is the hygiene suite: the dead-symbol sweep, the
+  draft-target sweep and the pool measurement. **DG repaired its §2 anchor guard and added the
+  assertion that the guard RESOLVED**, which is the +1.
+
+  **Before it, EI, EF and EE each moved the stamp and nothing else in that document; EG moved it
+  and three prose blocks** — the draft column's cap and ledger bullets, the seven-slot-cap
+  paragraph and the take-one-and-bench-one paragraph. **EA moved the stamp and four prose sites; DZ
+  moved the stamp and nothing else.**
+
+### Knowledge sync, re-measured at EG — ITS CLOSED ITEMS (archived at JB; the block stays in `docs/state.md`)
+
+*`claude_md_census.py` and `check_fg` print the live figures; the retired target's rule is `CLAUDE.md`'s.*
+
+- **THE FIGURE IS NOT RESTATED HERE ANY MORE, AND THAT IS THE POINT.** This line has carried a
+  file count and a byte total since EG and **it has been stale on arrival for three batches running**
+  (EP found it four batches out, EQ recorded its own as one file stale). **`claude_md_census.py`
+  prints both for any commit and reads `git ls-files`**, so a new file is outside the number until it
+  is staged — which is exactly why a copy written into this file is wrong the moment the batch that
+  wrote it adds its own report. **Run the census; do not quote a number from here.** **EV adds two
+  files (`check_ev.gd`, `docs/reports/EV.md`) and deletes none**, and the STAGED tree reads
+  **198 files / 9.0299 MiB** with both of them in it. **THE BYTE TOTAL IS MEASURED IMMEDIATELY
+  BEFORE THIS LINE IS WRITTEN AND THIS LINE IS INSIDE IT** — that is the same caveat EG's block
+  has always carried, and it is why the FILE COUNT is the durable half and the byte total is not.
+  **AND THIS LINE WAS STALE AGAIN ON ARRIVAL, WHICH IS FOUR BATCHES RUNNING**: it recorded EU's tree
+  at 194 files and the census reads **196 at that very commit** (`--rev HEAD`), so the recorded
+  figure was two files short before EV touched anything. **196 + EV's own two = 198**, which is the
+  whole of the delta and is the only way to read this row that stays true.
+- **THE SHARE OF THE SYNC IS RETIRED AS A TARGET (EE §1) AND IS NOT TRACKED.** `CLAUDE.md` is
+  measured in KiB against **the ceiling its own block states** (EE's 290, re-derived at FU, GY and HN) whose procedure
+  was a SPLIT, **and EF, FF and GR each took one**; since HN §1 the next move is a recon on the file's shape. **NO LIVE READING IS CARRIED HERE ANY MORE**: `check_fg` §2 prints the size, the bar
+  and the headroom every battery, and the two figures this bullet used to carry (EP's 217.17 and
+  EU's 235.11, "about twelve batches") are exactly the kind of number that was stale by the time
+  anybody read it. **The current reading is `check_fg` §2's print, and each batch report carries its own.**
+  **EP's BATCH ADDED NO RULE; THE DESIGNER'S RULINGS AFTERWARDS ADDED TWO, +3,529 B (3.45 KiB)** —
+  the rung-lever rule and the Scarred-rune refund rule, both of which settle with no implementation
+  and would have been lost from this file's next rewrite. **EK grew it by 3,713 B (3.63 KiB)**, which is one
+  standing reference: the three vocabularies, the tables and their one accessor each, the
+  inertness ruling, and the rule that a new ability or rune is owed a row in the same batch.
+  **`docs/instrument-rules.md` has no stated ceiling**; the arithmetic for one is in
+  `docs/reports/EF.md` §2 and taking it is a ruling. **It is therefore the one document of the
+  three with no bar for an instrument to hold it to** — `check_fr` §5 prints its size every battery
+  against nothing, because FG's rule says a bar worth stating is a bar something must read, and the
+  converse is that a file with no bar has nothing to read against.
+  - **THE SPLIT COST ABOUT A BATCH AND THREE QUARTERS OF GROWTH, TO BUY THIRTEEN, AND THE TWO HALVES DO NOT GROW AT THE SAME
+    RATE** — measured, not assumed; the bytes and the per-batch rates over DK→EE and DZ→EE are `docs/reports/EF.md` §2's (IM §0.7).
+    The recent rate is what five instrument batches in a row look like.
+  - **FOR THE RECORD, AND NOT AS A TARGET: the retired ratio has not been re-derived at EF and is not
+    worth re-deriving.** Its numerator is now spread over two files and its denominator gained both,
+    which is the third way the same measurement can move without anything about density changing.
+
+  **MEASURED AT FH RATHER THAN CARRIED: 53 `check_*.gd` files existed then, 46 of them in the
+  battery's GATES list, and the battery ran 46 suites out of 47 `test_*.gd` (44 of those
+  `test_batch_*`).** The seven `check_*.gd` files outside the GATES list are `check_ck_width`,
+  `check_ct_map`, `check_cu`, `check_cv`, `check_de`, `check_dn` and `check_map_screen`; `check_de` runs
+  as the battery's post-pass and `check_map_screen` as a scene target, so five are outside the battery. The line below is the
+  history of that count and **it read 42 when FH arrived** — **EM ADDED `check_em` AND THIS LINE STILL READ 41 WHEN EP ARRIVED**; before it
+  **EL ADDED `check_el`**, EK `check_ek`, EH `check_eh`, EG `check_eg`; EF and EE added none, ED added `check_ed`,
+  EC `check_ec`, EB `check_eb`, EA `check_ea`, and DZ and DY each added none.
+
+### Small, and still owed — ITS CLOSED ITEMS (archived at JB; the block stays in `docs/state.md`)
+
+*`_companion_hit`'s two live terms were fixed at DU and its ruling is `CLAUDE.md`'s; sims have run at IF, IO, IV and IW since the widenings; the prune and its target closed at EE.*
+
+- **`_companion_hit` READS 5 OF THE HERO STRIKE LOOP'S MULTIPLIER TERMS, AND THE TWO IT GAINED AT
+  DU WERE THE ONLY TWO THAT WERE LIVE.** The attacker-side block is the run of `raw`-mutation sites
+  in `battle.gd`'s `_resolve`; the five it reads are **Mark of the Hunt, the ownerless Hunter's
+  Mark, Necrosis, `cripple` and `chilled` (both terms)**. **MOST OF THE REMAINING MISSES ARE
+  UNREACHABLE BY SHAPE RATHER THAN BY OVERSIGHT, AND THE SHAPE IS IN THE SIGNATURE**: the function
+  takes a FLOAT, not an `Ability`, so all 26 ability-keyed terms cannot apply; a companion's
+  `engines` is empty — its `passive_id` was `""` until GK — (10 more) and **every talent-rank field on it is zero, always** (20 more).
+  **Of the 76 still absent, all 76 fail the brief's own test — a term no companion can receive is a
+  non-issue.**
+  - **THE TWO THAT WERE LIVE ARE FIXED AND MEASURED.** **`cripple`** — enemies target
+    `_hero_side()`, which holds the living companion, and `_apply_status` lands the rider with no
+    companion filter; **two enemy abilities carry it** (Ride-by Slash, Grasping Roots). **40 seeded
+    blows: 30268 in both arms before, ratio 1.0000; 30268 against 22703 after, ratio 0.7501.** And
+    **`chilled`** — the frost modifier stamps a summoned companion deliberately and its branch
+    carries no `inherited` guard. **Both terms read; all four arms land exactly** (1.0000 / 0.8500 /
+    0.9700 / 0.7735).
+  - **ONE STACK IS THE CEILING AND THE `>= 3` ARM IS UNREACHABLE IN PLAY.** The frost stamp is the
+    only application that reaches a companion; every other one in the file targets an enemy. **The
+    stack count was NOT raised to make the arm reachable** — that would be authoring. `check_du` §3
+    asserts the stamp lands 1, so the day the ceiling moves the gate says this line is stale.
+  - **`cripple` AND `chilled` ARE INSTRUMENTED NOW, WHICH THEY WERE NOT.** `check_du` §1 and §2
+    measure the ratios every battery run beside `check_dk` §4's `empower` and `check_dm` §2's
+    `wrath` and `battle_shout`. **Before DU, removing either read would have been silent.**
+  - **AND ONE IS STILL INERT TWICE OVER, DELIBERATELY.** `type_dmg_bonus` could reach a companion —
+    the kindling modifier, Tinderbox, wrote `{"fire": 0.25}` onto one, measured, until IZ §5 removed it, and nothing writes one
+    now — but **a companion's blow
+    carries no `dmg_type` at all**, so adding the read would find nothing to apply. `check_du` §4
+    drives a companion given the bonus by hand through forty blows and requires the total unchanged, so the day a
+    companion's blow grows a type the gate says the second reason is gone. **`dmg_bonus` cannot
+    reach one**: the summon copies Attack, armour, speed, crit and `companion_power` off the hunter
+    and not that, measured at 0.000.
+  - **NOTHING FURTHER WAS WIDENED AND THAT IS THE RULING, NOT AN OMISSION.** `CLAUDE.md` carries the
+    line: **a player effect that lands and pays nothing costs the player a card; an ENEMY effect
+    that lands and pays nothing costs the player nothing.** The first is a dead card, the second is
+    an exploit — and **a general widening would hang visible chips on a companion that change
+    nothing, which is worse than the narrow miss because it reads as working.**
+- **NO SIM HAS RUN SINCE THE FIVE WIDENINGS, SO EVERY CARRIED SIM FIGURE IN THIS FILE IS STALE.**
+  Sanctuary, Hold the Line, Rally and the Field Medic (DK) and Rallying Shout's Pressure clause
+  (DL) all reach a fifth body in a Beastmaster party. **THE HEALING AND BREAK FIGURES AT THE FOOT
+  OF THIS FILE ARE MARKED STALE RATHER THAN LEFT TO BE QUOTED AS CURRENT.** They are DA's, they
+  predate DK and DL, and **correcting them means running the sim, which no batch since has done.**
+  **DM moves no magnitude and adds nothing to that staleness.**
+- **`CLAUDE.md` IS PRUNED AT DZ §3 AND CW's TARGET IS MET ON BOTH HALVES FOR THE FIRST TIME.**
+  CW set *"under 3% of the knowledge sync and roughly flat over time"*; the ratio had risen every
+  batch from 3.25% at DI to **3.639%** at DY, and **DG through DY all declined the prune.** It is
+  taken. **The live figures are printed by `check_fg` §2 every battery and are not restated here.**
+  **THE ARITHMETIC OF THE TARGET IS NOT THE OBVIOUS ONE AND IS WORTH KEEPING**: pruning this file
+  shrinks the sync's DENOMINATOR too, so clearing 3% needed **more than 47.8 KiB**, not the 46.4
+  a naive subtraction gives. **AND THE PRUNE IS BOUNDED BY ASSERTIONS RATHER THAN BY JUDGEMENT** —
+  **60 literals must survive verbatim** across the **26 targets that actually read the file** (9
+  gates and 17 suites — a grep for the filename over-reports that population by two thirds, because
+  18 more name it only in a comment), several of which read as history because a suite reads them. **THE BATCH-CODE PINS ARE CLOSED AT
+  EA §2 AND THERE WERE SIX, NOT THREE** — the four bare ones (`BATCH BN`, `BATCH BS`, `BATCH CE`
+  and `BATCH CG`, the fourth DZ predicted, one line under the third) plus two whose LITERAL merely
+  carried a code. **All six re-pointed at the rule each was reaching for; none deleted.**
+  `check_ea` §3 sweeps for a seventh every run, by the VARIABLE holding the document.
+
+### Carried, and still awaiting a ruling — ITS CLOSED ITEMS (archived at JB; the block stays in `docs/state.md`)
+
+*GR took the split these two reasoned toward.*
+
+  - **BOTH OF EF'S NUMBERS ARE NOW STALE IN OPPOSITE DIRECTIONS, WHICH IS WHY THIS ITEM MATTERS
+    MORE THAN IT DID.** EF's **220 KiB for `CLAUDE.md` is BELOW the live file** and always
+    would have been within four batches at the measured rate — it was derived off a +6.30 KiB worst
+    batch when the file was 175 KiB. EF's **95 KiB for the reference is now below it**, and
+    it was derived off a +5.00 KiB worst batch (DX) that was itself building that
+    file. **Neither number should be adopted as written; the METHOD is what survives.**
+  - **AND FF MEASURED THAT THE ALTERNATIVE — ANOTHER SPLIT — IS GONE.** Three quarters of
+    `CLAUDE.md` is rule about what the game may contain, held here by EF's one-way tiebreak, and
+    the residue is spent. **FF named two moves and FU took the first; at 340 the one left is to
+    overturn the tiebreak for a SUBJECT** — see the subject-seam item above — and accept that a batch
+    may have to open two files to find a rule about the game. Working: `docs/reports/FF.md` §1 and
+    `docs/reports/FU.md` §1, and the ceiling block in `CLAUDE.md` says so. **GR TOOK IT**, on the designer's
+    ruling: combat law is `docs/combat-rules.md`, a THIRD rule file, and like the instrument reference it has no
+    stated ceiling (GR's ruling 1).
+
 ## ARCHIVED AT JA — 2026-10-30, FROM `docs/state.md` AS IT LEFT IT (`1a276cd`)
 
 **What came here**: IZ's three rulings, all answered in JA's brief; FOUND AT IZ's coin-flip item and TWO INSTRUMENT OBSERVATIONS FROM FM whole, both closed by JA §5's repair of the arm they named; and the roadmap's IZ item. Each word for word, under the heading it stood under.

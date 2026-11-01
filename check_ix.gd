@@ -123,6 +123,18 @@ func _s0_the_rulings() -> void:
 
 
 # ── §1 — THE BASELINE IS AN ARM, AND IT COUNTS THE FIGHTS THE ARMS COUNT ────────────────────────────
+
+# RE-POINTED AT JB §2: THIS GATE'S KEPT TABLES WERE TAKEN ON THE DECK BEFORE JB's FOUR, AND EACH OF THE FOUR NAMES THE BATCH THAT
+# GRADED IT, SO THE DECK THEY MEASURED IS READ OFF THE ROWS AND NEVER OFF A LIST (`check_jb` §3 holds the four).
+func _deck_before_jb() -> Dictionary:
+	var out := {}
+	var mods: Dictionary = _run.MODIFIERS
+	for id in mods:
+		if not String((mods[id] as Dictionary).get("graded", "")).contains("JB §"):
+			out[id] = mods[id]
+	return out
+
+
 func _s1_the_baseline() -> void:
 	print("\n§1 — the baseline is an arm: its count, its seed, its error bar, and the fights it counts")
 	var rows := _tsv("res://" + SCALE_TSV, ["arm", "id", "seed_block", "runs", "n_with_bargain", "rule", "fights_read", "fights_node",
@@ -163,7 +175,7 @@ func _s1_the_baseline() -> void:
 	ok(differ.is_empty(), "§1: %d arms count different fights by node and by modifier — a baseline read by a different rule than the arms is not a baseline: %s" % [differ.size(), str(differ)])
 	ok(verdicts_bad.is_empty(), "§1: %d verdicts are not their own paired z's: %s" % [verdicts_bad.size(), str(verdicts_bad)])
 	# RE-POINTED AT IZ: the deck holds IX's arms less the modifiers IZ removed.
-	ok(arms == (_run.MODIFIERS as Dictionary).size() + REMOVED_AT_IZ.size(), "§1: the kept table reads %d modifier arms — the deck holds %d" % [arms, (_run.MODIFIERS as Dictionary).size()])
+	ok(arms == _deck_before_jb().size() + REMOVED_AT_IZ.size(), "§1: the kept table reads %d modifier arms — the deck it measured holds %d" % [arms, _deck_before_jb().size()])
 	# THE RECORD CARRIES THE ERROR BAR: the state file's grades block states the baseline with its se and its count.
 	var want_line := "%.3f ± %.3f" % [float(base["reading"]), float(base["se"])]
 	# RE-POINTED AT IZ: IZ archived IY's grades block word for word (its heading struck, `DoD-archive/state-archive.md`), so a figure IY or IX
@@ -364,7 +376,7 @@ func _s3_the_scale() -> Dictionary:
 			off.append("%s: the kept table writes grade %s, its cost gives %d" % [id, r["grade"], band])
 	ok(free_graded.is_empty(), "§3: %d modifiers cost nothing and carry a severity — a modifier that costs nothing has no severity: %s" % [free_graded.size(), str(free_graded)])
 	ok(off.is_empty(), "§3: %d grades are not the band their own cost falls in — the arithmetic: %s" % [off.size(), str(off)])
-	ok(free + graded == mods.size(), "§3: the kept table costs %d of the deck's %d modifiers" % [free + graded, mods.size()])
+	ok(free + graded == _deck_before_jb().size(), "§3: the kept table costs %d of the deck's %d modifiers" % [free + graded, _deck_before_jb().size()])
 	# RE-POINTED AT IZ §0.3: a modifier keyed on what only some builds do is graded on one that does it, and one that costs nothing
 	# even there leaves the deck — so the deck holds no free modifier, and the free arm's subject is `check_iz` §5's.
 	ok(free == 0 and graded > 0, "§3: the scale reads %d free and %d graded — since IZ §0.3 the deck holds no free modifier" % [free, graded])
@@ -442,7 +454,7 @@ func _s4_the_swing(scale: Dictionary) -> void:
 		elif block.contains("%s swings" % String(r["modifier"])):
 			named_wrong.append("%s (swings %d, named as a swing)" % [r["modifier"], sw])
 	ok(bad.is_empty(), "§4: %d rows' bands or swing are not their costs' on the scale: %s" % [bad.size(), str(bad)])
-	ok(n == (_run.MODIFIERS as Dictionary).size(), "§4: the swing is computed over %d modifiers — the deck holds %d" % [n, (_run.MODIFIERS as Dictionary).size()])
+	ok(n == _deck_before_jb().size(), "§4: the swing is computed over %d modifiers — the deck it measured holds %d" % [n, _deck_before_jb().size()])
 	ok(named_wrong.is_empty(), "§4: the state file's swing list is not the modifiers over one band: %s" % str(named_wrong))
 	ok(not over.is_empty(), "§4: no modifier swings more than one band — the list's positive arm is empty")
 	ok(block.contains("the swing between these two"),

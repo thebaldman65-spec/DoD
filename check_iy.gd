@@ -467,6 +467,18 @@ func _s3_the_reach() -> void:
 
 
 # ── §4 — EVERY GRADE: THE HIGHEST COST MEASURED, TEST-BOUND, ITS POPULATION AND ITS BATCH ───────────────
+
+# RE-POINTED AT JB §2: THIS GATE'S KEPT TABLES WERE TAKEN ON THE DECK BEFORE JB's FOUR, AND EACH OF THE FOUR NAMES THE BATCH THAT
+# GRADED IT, SO THE DECK THEY MEASURED IS READ OFF THE ROWS AND NEVER OFF A LIST (`check_jb` §3 holds the four).
+func _deck_before_jb() -> Dictionary:
+	var out := {}
+	var mods: Dictionary = _run.MODIFIERS
+	for id in mods:
+		if not String((mods[id] as Dictionary).get("graded", "")).contains("JB §"):
+			out[id] = mods[id]
+	return out
+
+
 func _s4_the_grades() -> void:
 	print("\n§4 — every grade is the highest cost measured on any population, test-bound, and says whose it is")
 	# Each row: IX's reference reading and IV's incumbent reading, the sweep's two (`higher` names which is the more costly);
@@ -482,7 +494,7 @@ func _s4_the_grades() -> void:
 	# RE-POINTED AT JA §2: the grades of record are JA's table (Fleeting re-read in the deck); a grade JA moved is JA's, not IY's.
 	for zr in _tsv("res://docs/reports/JA-grades.tsv", ["id", "population", "batch"]):
 		iz_src[String(zr["id"])] = "%s — %s" % [String(zr["population"]), String(zr["batch"])]
-	ok(rows.size() == mods.size() + 2, "§4: the grades table holds %d rows — the deck holds %d" % [rows.size(), mods.size()])
+	ok(rows.size() == _deck_before_jb().size() + 2, "§4: the grades table holds %d rows — the deck it graded holds %d" % [rows.size(), _deck_before_jb().size()])
 	var off: Array = []
 	var unsourced: Array = []
 	var counts := {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0}

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-10-30 (Batch JA &mdash; the shares, before the four)</b></p>
+<p align="right"><b>Last updated: 2026-10-31 (Batch JB &mdash; the four)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -261,8 +261,8 @@ player is shown <b>3 options</b> and picks one. <b>On Ruin the mini-boss offers 
 elites the route reached, and how far the run got). The bargain is an event on the
 road, not a gate in front of every battle. Each option is one <b>modifier</b> plus one
 <b>reward</b>, both visible before choosing. There is no decline.</p>
-<p>A modifier is a condition on that battle. <b>Every modifier binds both sides</b> &mdash; nothing in the deck binds one
-side: a modifier that leaned on one side would be a difficulty slider, and the rung is already that. Each one a
+<p>A modifier is a condition on that battle. <b>Every modifier in the deck costs your heroes, and the severity says how much</b>:
+most reach both sides, and some lean on the heroes alone. Each one a
 rung deals carries a <b>severity of 1&ndash;5</b>, and <b>the reward table reads that severity</b>. <b>A severity is a band of what a
 modifier costs one named set of heroes</b> &mdash; the sim's default four (the Berserker, the Cryomancer, the Devout and the
 Beastmaster), untalented, at Wanderer: each modifier is measured forced on every bargain of their runs, and its severity is how much
@@ -272,7 +272,7 @@ inside its own error: <b>a modifier keyed on something only some heroes do is me
 talented heroes whose plan is Break &mdash; and one that costs nothing even there is not in the game. <b>Where a fuller
 set of heroes was measured too and pays more, the grade is the most any of them pays</b>: a severity may overstate what a modifier
 costs you, never understate it. So a grade says how hard a fight under it is, not how harsh its words sound. Severity is <b>flat</b> and <b>deliberately ignores which heroes you drafted</b>: a modifier that happens to be cheap
-for your build is a good deal you earned by building that way. A modifier binds every combatant on the field, including a
+for your build is a good deal you earned by building that way. A modifier holds for the whole battle, including a
 <b>companion summoned mid-battle</b>, and it stands at the top of the battle screen for the whole fight (&sect;10).</p>
 <p><b>How the three cards are dealt.</b> Each rung names two bands of severity: the first card
 comes from its <b>safe band</b> and the other two from its <b>gamble band</b>, so <b>every offer
@@ -285,15 +285,16 @@ rather than by rejecting rolls, and no band ever falls back to another: every ba
 modifiers enough for its slots.</p>
 <p>The reward pays <b>on victory</b>: the modifier is the price, and the reward is what
 clearing the fight under it bought.</p>
-<p><b>The pool is 21</b>, and a rung deals every one; it is <b>weighted
-low</b> &mdash; six at severity 1, five at 2, four at 3, two at 4 and four at 5. Because the
+<p><b>The pool is 25</b>, and a rung deals every one; it is <b>weighted
+low</b> &mdash; seven at severity 1, seven at 2, four at 3, three at 4 and four at 5. Because the
 safe slot on Wanderer's and Warden's cards is served from the mild end, that is the end a run
 actually sees repeatedly.</p>
 <table border="1" cellpadding="4">
-<tr><th>Modifier</th><th>Severity</th><th>Effect (both sides)</th></tr>
+<tr><th>Modifier</th><th>Severity</th><th>Effect</th></tr>
 <tr><td>Leaden</td><td>1</td><td>Everyone acts about 30% more slowly, and the slower a body already is the more it
 loses. Cooldowns are unchanged.</td></tr>
 <tr><td>Muffled</td><td>1</td><td>All Break damage is reduced 50%. Meters fill slowly.</td></tr>
+<tr><td>Fractured</td><td>1</td><td>A Broken body's meter does not empty. Any Break damage Breaks it again.</td></tr>
 <tr><td>Hoarfrost</td><td>1</td><td>Everyone begins the fight Chilled.</td></tr>
 <tr><td>Slick Footing</td><td>1</td><td>Every ability costs +0.5 initiative. Everyone is
 slower to come round again.</td></tr>
@@ -301,7 +302,9 @@ slower to come round again.</td></tr>
 Basic attacks are unaffected.</td></tr>
 <tr><td>Bloodletting</td><td>1</td><td>Every hit opens a wound. All attacks add 15 Bleed, on
 both sides.</td></tr>
-<tr><td>Parched</td><td>2</td><td>Both parties begin the fight at no resource at most.</td></tr>
+<tr><td>Parched</td><td>2</td><td>Every hero, and any enemy that carries a bar, begins the fight at no resource at most.</td></tr>
+<tr><td>Porous</td><td>2</td><td>Barriers hold two-fifths of what they would.</td></tr>
+<tr><td>Outpaced</td><td>2</td><td>The warband acts before any hero every round, whatever the speeds. The Hunter's opening turn stands.</td></tr>
 <tr><td>Brittle</td><td>2</td><td>All attacks ignore armor, on both sides.</td></tr>
 <tr><td>Warded</td><td>2</td><td>All abilities cost 25% more. Basic attacks are free. Every button and the summon picker show the price the fight charges.</td></tr>
 <tr><td>Feverish</td><td>2</td><td>Everyone deals 25% more damage. Fights end quickly, one way
@@ -315,6 +318,7 @@ fight.</td></tr>
 <tr><td>Rot</td><td>4</td><td>Everyone's maximum health is halved, on both sides. It lasts the
 fight and no longer.</td></tr>
 <tr><td>Overgrown</td><td>4</td><td>Both parties begin the fight at 70% health at most.</td></tr>
+<tr><td>Ambushed</td><td>4</td><td>The warband takes eight turns before any hero but the Hunter acts.</td></tr>
 <tr><td>Thin Air</td><td>5</td><td>No resource returns at the start of a turn. Anything else that
 builds it still does.</td></tr>
 <tr><td>Mirrorbound</td><td>5</td><td>An attack that does not miss sends a quarter of the damage it deals
@@ -331,7 +335,7 @@ decision rather than a dead hand.</p>
 <p><b>Rot is not excluded from anything that reads maximum health.</b> The
 below-half Mercy window, Conviction's growth and the Devout's whole kit are ratios of the
 maximum, so they all scale with the smaller pool &mdash; consistent with every other modifier
-that binds both parties. The halving lasts the fight
+that reaches both sides. The halving lasts the fight
 and is undone when it ends: nothing a bargain does to maximum health may follow the heroes out
 of the battle that charged for it.</p>
 <table border="1" cellpadding="4">

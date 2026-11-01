@@ -32,7 +32,7 @@ designer's)**: IS's +36,759 B net held **36,315 B of fenced structure** (fence `
 deleting it), so IS grew this file +444 B outside it and the record stays ES's; IV's +17,741 B net held **10,159 B of fenced structure** (fence `INDEX (IS §5)`: the nine population rows and the pilot's close), so IV grew this file +7,582 B outside it and the record stays ES's; `check_fg` §4b holds each claim to its fence. *In the
 preamble for the archive pointer's reason.*
 
-*Last rewritten: 2026-10-30 (Batch JA).*
+*Last rewritten: 2026-10-31 (Batch JB).*
 
 ---
 
@@ -83,9 +83,9 @@ of this pilot is read by a reader that already carries the project's practices, 
 has no instance, and more batches of the same reader will not make one.
 
 **THE CORE — READ WHOLE:**
-- **CORE** `` ## WHERE THE PROJECT IS `` `#b1227b`
+- **CORE** `` ## WHERE THE PROJECT IS `` `#1a321e`
 - **CORE** `` ## THE OPEN QUEUE `` `#17e1f1`
-- **CORE** `` ### JA's RULINGS OWED `` `#73d2f5`
+- **CORE** `` ### JB's RULINGS OWED `` `#1b8038`
 - **CORE** `` ### THE CLERIC's MANA RATE `` `#735e7f`
 - **CORE** `` ### SANCTITY's STEP `` `#7c43c9`
 - **CORE** `` ### BOIL OVER'S RATE `` `#6ed606`
@@ -93,7 +93,7 @@ has no instance, and more batches of the same reader will not make one.
 - **CORE** `` ### FOUND AT IA AND NOT FIXED `` `#0b3b3f`
 - **CORE** `` ### RULED AND NOT BUILT `` `#90a9d9`
 - **CORE** `` ### FOUND AT HX AND NOT FIXED `` `#c91933`
-- **CORE** `` ### THE PLAYTEST'S OTHER FINDINGS `` `#2aa245`
+- **CORE** `` ### THE PLAYTEST'S OTHER FINDINGS `` `#1cf7d3`
 - **CORE** `` ### THE FOUR OTHER CONJUNCTIONS `` `#dc1281`
 - **CORE** `` ### THE SKIRMISHER AND THE TRACKER `` `#b3c93d`
 - **CORE** `` ### THE SHAPE RECON ON `CLAUDE.md` `` `#bd2df5`
@@ -110,20 +110,21 @@ population row carries a stamp over its member blocks, in their order, and reds 
 `python3 index_stamp.py docs/state.md --write` re-stamps it as it re-stamps a row); a new kind gets its row when a second brief asks.
 + **POPULATION** **the claims** `#76a229` — Every present-tense claim a rule file or this file makes about the code, each with its disposition. *lives in:* `` ### FOUND AT IU AND NOT FIXED `` · `` ### FOUND AT HV AND NOT FIXED `` · `` ### FOUND AT HY AND NOT FIXED `` · `` ### FOUND AT GA AND NOT FIXED `` · `` ### FOUND AT GF AND NOT FIXED `` · `` ### FOUND AT GC AND NOT FIXED `` · `` ### FOUND AT FW AND NOT FIXED `` · `` ### FOUND AT GR AND NOT FIXED ``; the core, read whole, holds others (IV's RULINGS OWED, FOUND AT HX, FOUND AT IA, the WHERE block). *records:* docs/reports/IU-claims.tsv (the ledger of record, a disposition a row); docs/reports/IR-claims-census.md; check_hx §1d; check_iu §1; check_iv §4. *triggers:* the claims, stale claims, every claim, claims ledger, claim disposition, claims ratchet, reference claims, claims census
 + **POPULATION** **the figures behind doors** `#25835d` — Every figure or fact a player-facing text states, and the door or constant it reads. *lives in:* `` ### FOUND AT IT AND NOT FIXED `` · `` ### FOUND AT IK AND NOT FIXED `` · `` ### FOUND AT IJ AND NOT FIXED `` · `` ### FOUND AT IQ AND NOT FIXED `` · `` ### FOUND AT HL AND NOT FIXED `` · `` ### `master.html` §6b's "66 DAMAGING ABILITIES" RESOLVES AGAINST NO POPULATION ``. *records:* docs/reports/IJ-census.tsv; docs/reports/IQ-master-census.tsv; docs/reports/IT-catalogue-figures.tsv; check_ij §2 and §3; check_iy §2 and §5 (the nine handles' constants and the glossary's count); check_iq §2f; check_it §2; check_iu §3. *triggers:* every figure a text states, figures behind doors, a figure with no door, name the constants, literals get names, fact sweep, typed figure, pinned figures
-+ **POPULATION** **the closed matter** `#8a1ddf` — Items and blocks closed and left standing: history, measurement tables, struck against their record. *lives in:* `` ### FOUND AT IS AND NOT FIXED `` · `` ### FOUND AT HO AND NOT FIXED `` · `` ### FOUND AT GL AND NOT FIXED `` · `` ### FOUND AT GF AND NOT FIXED `` · `` ### THE CRIT SURPLUS IS RULED END TO END `` · `` ### `BOND_MITIGATION_MAX` STAYS AT 0.75 `` · `` ### THE SUITE REDS, AND WHY ZERO IS NOT THE SAME AS FIXED ``; the core, read whole, holds others (the WHERE block, FOUND AT IA, THE SHAPE RECON). *records:* docs/reports/IQ-state-census.tsv; docs/reports/IS-claude-census.tsv; DoD-archive/state-archive.md (where closed matter goes, newest cut first); check_iq §1; check_it §1; check_hx §2; check_fg §4. *triggers:* the closed matter, closed blocks, closed items, closed-block census, history clauses, strike what is closed, measurement tables, archive what is closed
++ **POPULATION** **the closed matter** `#44c486` — Items and blocks closed and left standing: history, measurement tables, struck against their record. *lives in:* `` ### FOUND AT IS AND NOT FIXED `` · `` ### FOUND AT HO AND NOT FIXED `` · `` ### FOUND AT GL AND NOT FIXED `` · `` ### FOUND AT GF AND NOT FIXED `` · `` ### THE CRIT SURPLUS IS RULED END TO END `` · `` ### `BOND_MITIGATION_MAX` STAYS AT 0.75 `` · `` ### THE SUITE REDS, AND WHY ZERO IS NOT THE SAME AS FIXED ``; the core, read whole, holds others (the WHERE block, FOUND AT IA, THE SHAPE RECON). *records:* docs/reports/IQ-state-census.tsv; docs/reports/IS-claude-census.tsv; DoD-archive/state-archive.md (where closed matter goes, newest cut first); check_iq §1; check_it §1; check_hx §2; check_fg §4. *triggers:* the closed matter, closed blocks, closed items, closed-block census, history clauses, strike what is closed, measurement tables, archive what is closed
 + **POPULATION** **the positional picks** `#450d66` — A gate's selection of its subject by position or superlative, and whether it still names it. *lives in:* `` ### FOUND AT IT AND NOT FIXED `` · `` ### FOUND AT IQ AND NOT FIXED `` · `` ### FOUND AT IM AND NOT FIXED `` · `` ### GY's RULINGS OWED ``; the core, read whole, holds others (the WHERE block). *records:* docs/reports/IT-positional-census.tsv (the census of record); docs/reports/IO-census.tsv; check_it §3; check_iu §5 (the MISSES ceiling); check_in §4; check_io §6. *triggers:* positional picks, superlative picks, positional census, MISSES ceiling, fixed window, names its pick, re-selects its subject, a gate's pick
-+ **POPULATION** **the bot's divergences** `#c83bf3` — Every place the bot's game differs from the player's: RULE (a defect), POLICY (a choice, with its reason), MODEL. *lives in:* `` ### THE BARGAIN DECK's GRADES `` · `` ### FOUND AT GS AND NOT FIXED `` · `` ### FOUND AT IE AND NOT FIXED `` · `` ### FOUND AT IF AND NOT FIXED `` · `` ### FOUND AT IM AND NOT FIXED `` · `` ### FOUND AT GE AND NOT FIXED ``. *records:* docs/reports/IU-bot-divergence.tsv (the census of record, RULE 0 since IV); check_iu §4; check_iv §3b (the ceiling at zero); check_in §3; check_il §3. *triggers:* the bot's divergences, divergence census, bot plays a different game, the bot's rules, POLICY or RULE, sim bot, the bot pays, bot asks the player's door
++ **POPULATION** **the bot's divergences** `#124ad7` — Every place the bot's game differs from the player's: RULE (a defect), POLICY (a choice, with its reason), MODEL. *lives in:* `` ### THE BARGAIN DECK's GRADES `` · `` ### FOUND AT GS AND NOT FIXED `` · `` ### FOUND AT IE AND NOT FIXED `` · `` ### FOUND AT IF AND NOT FIXED `` · `` ### FOUND AT IM AND NOT FIXED `` · `` ### FOUND AT GE AND NOT FIXED ``. *records:* docs/reports/IU-bot-divergence.tsv (the census of record, RULE 0 since IV); check_iu §4; check_iv §3b (the ceiling at zero); check_in §3; check_il §3. *triggers:* the bot's divergences, divergence census, bot plays a different game, the bot's rules, POLICY or RULE, sim bot, the bot pays, bot asks the player's door
 + **POPULATION** **the latent shapes** `#20d44d` — Defects that need a writer, a second member or a field nothing sets yet, each armed to red when it arrives. *lives in:* `` ### FOUND AT IX AND NOT FIXED `` · `` ### FOUND AT IW AND NOT FIXED `` · `` ### FOUND AT IR AND NOT FIXED `` · `` ### FOUND AT IS AND NOT FIXED `` · `` ### FOUND AT IC AND NOT FIXED `` · `` ### FOUND AT IL AND NOT FIXED `` · `` ### FOUND AT IM AND NOT FIXED `` · `` ### FOUND AT HY AND NOT FIXED `` · `` ### FOUND AT HZ AND NOT FIXED `` · `` ### FOUND AT FX AND NOT FIXED ``; the core, read whole, holds others (TO WATCH IN PLAY). *records:* docs/reports/IR-floor-census.md (the floor census of record); check_ir §1d; check_is §3a and §3b; check_il §1a; check_hy §5; check_iv §2. *triggers:* latent shapes, latent defect, dormant field, no writer, floor of a zero, floor census, read-only-zero field, reds when the writer appears
 + **POPULATION** **the save's keys** `#e0f2ed` — Every key a run save carries and every read of one: the load door, its rename and removal maps, its floor. *lives in:* `` ## LIVE COUNTS AND CONSTANTS WORTH HAVING AT HAND `` · `` ### HA's RULINGS OWED `` · `` ### FOUND AT HL AND NOT FIXED ``; the core, read whole, holds others (the WHERE block). *records:* check_iq §4; check_ir §2 (the rename map); check_is §2 (the load door's five answers); run_state.gd's RENAMED_CARDS and REMOVED_CARDS. *triggers:* the save's keys, every save read, load door, rename map, removal map, a key off a save, stale payload, save floor
 + **POPULATION** **the target picks** `#ba7c5e` — Every pick of a card's or a door's target from a side: who is offered, and whether the cast pays there. *lives in:* `` ### FOUND AT IJ AND NOT FIXED `` · `` ### FOUND AT HF AND NOT FIXED `` · `` ### FOUND AT GN AND NOT FIXED `` · `` ### FOUND AT IM AND NOT FIXED ``. *records:* docs/reports/IR-ally-census.md; check_ir §1b; check_is §4; check_il §3; check_im §3b. *triggers:* target picks, pick pool, every pick, hero-side pick, a pick that produces nothing, the pick population, ally-target cards, _hero_side
-+ **POPULATION** **the sim's recorded figures** `#642f30` — Every figure taken through the sim or its bot, and which a bot or instrument repair moved (SUPERSEDED-PENDING). *lives in:* `` ### THE BARGAIN DECK's GRADES `` · `` ### THE SIM's FIGURES, RE-TAKEN AT IW `` · `` ### THE FIRST CLEAN PLAYTHROUGH `` · `` ### EVERY COMPLETION FIGURE DATED BEFORE GJ EXCLUDED THE FINAL FIGHT `` · `` ### HOW LONG A FIGHT IS `` · `` ### Carried, with measurements attached `` · `` ### Small, and still owed `` · `` ### FOUND AT IE AND NOT FIXED `` · `` ### FOUND AT IF AND NOT FIXED `` · `` ### FOUND AT GJ AND NOT FIXED `` · `` ### Carried from the code, reported and deliberately not fixed ``; the core, read whole, holds others (SANCTITY's STEP, THE CLERIC's MANA RATE, BOIL OVER'S RATE, the WHERE block). *records:* docs/reports/IV-drive.tsv (IV's paired drive: every default-sim figure, HEAD against IV, and its mark); docs/reports/IW-retake.tsv (IW's re-takes); docs/reports/IW-ladder.tsv and IW-screen.tsv (IW's ladder and screen); check_iw §1 and §3; docs/reports/IX-scale.tsv, IX-onesided.tsv and IX-swing.tsv (IX's baseline, scale, one-sided arms and swing); check_ix §1–§4; docs/reports/IY-seeding.tsv, IY-reach.tsv, IY-handles.tsv and IY-grades.tsv (IY's seeding, reach arms, nine handles and every grade's readings); check_iy §1–§4; docs/reports/IZ-reread.tsv, IZ-scale.tsv, IZ-rekey.tsv, IZ-fire.tsv, IZ-populations.tsv, IZ-band.tsv and IZ-grades.tsv (IZ's re-reads and re-derived scale, Leaden's (Frenzied's) re-key, the fire derivation, the two populations, Warden's arms and every grade); check_iz §1–§6; docs/reports/IU.md §4; docs/reports/IP.md §2; docs/reports/IO.md §2 and §3; check_iv §1c. *triggers:* recorded sim figures, sim figures, measurements affected, which figures move, re-take, SUPERSEDED-PENDING, instrument fidelity, figures a fix could move
++ **POPULATION** **the sim's recorded figures** `#7d1fee` — Every figure taken through the sim or its bot, and which a bot or instrument repair moved (SUPERSEDED-PENDING). *lives in:* `` ### THE BARGAIN DECK's GRADES `` · `` ### THE SIM's FIGURES, RE-TAKEN AT IW `` · `` ### THE FIRST CLEAN PLAYTHROUGH `` · `` ### EVERY COMPLETION FIGURE DATED BEFORE GJ EXCLUDED THE FINAL FIGHT `` · `` ### HOW LONG A FIGHT IS `` · `` ### Carried, with measurements attached `` · `` ### Small, and still owed `` · `` ### FOUND AT IE AND NOT FIXED `` · `` ### FOUND AT IF AND NOT FIXED `` · `` ### FOUND AT GJ AND NOT FIXED `` · `` ### Carried from the code, reported and deliberately not fixed ``; the core, read whole, holds others (SANCTITY's STEP, THE CLERIC's MANA RATE, BOIL OVER'S RATE, the WHERE block). *records:* docs/reports/IV-drive.tsv (IV's paired drive: every default-sim figure, HEAD against IV, and its mark); docs/reports/IW-retake.tsv (IW's re-takes); docs/reports/IW-ladder.tsv and IW-screen.tsv (IW's ladder and screen); check_iw §1 and §3; docs/reports/IX-scale.tsv, IX-onesided.tsv and IX-swing.tsv (IX's baseline, scale, one-sided arms and swing); check_ix §1–§4; docs/reports/IY-seeding.tsv, IY-reach.tsv, IY-handles.tsv and IY-grades.tsv (IY's seeding, reach arms, nine handles and every grade's readings); check_iy §1–§4; docs/reports/IZ-reread.tsv, IZ-scale.tsv, IZ-rekey.tsv, IZ-fire.tsv, IZ-populations.tsv, IZ-band.tsv and IZ-grades.tsv (IZ's re-reads and re-derived scale, Leaden's (Frenzied's) re-key, the fire derivation, the two populations, Warden's arms and every grade); check_iz §1–§6; docs/reports/IU.md §4; docs/reports/IP.md §2; docs/reports/IO.md §2 and §3; check_iv §1c. *triggers:* recorded sim figures, sim figures, measurements affected, which figures move, re-take, SUPERSEDED-PENDING, instrument fidelity, figures a fix could move
 
 **THE ROWS — ONE A BLOCK, IN FILE ORDER:**
 - `` ### THE FIRST CLEAN PLAYTHROUGH `` `#5461cf` — First clean playthrough (2026-10-18 Warden run). *triggers:* playtest readout, Rupture unreachable, RUPTURE_BREAK_PER_TICK, Sanctity events, SANCTITY_PER_STEP, vow 2.2 to 1, Cleric driest hero, Boil Over undrafted, Sharpshooter damage share, second playthrough, bot sim figures Sanctity steps dry turns
-- `` ### THE BARGAIN DECK's GRADES `` `#bfe5ee` — Bargain grades: the scale, Leaden's re-key, Fleeting at 3, Warden's arms. *triggers:* bargain modifier severity grades, re-grade, grade scale, cost band, reference party, no severity, the test binds, highest cost measured, sharper reading, handle values, reach test, fight seed, the swing, Frenzied re-key, Leaden, Fleeting at 3, Warden band
-- `` ### THE SHARE CENSUS `` `#a29348` — Each side's share of every quantity a rule keys on, both parties (JA §3); the axes (JA §4). *triggers:* share census, two sides' shares, heroes vs warband, binds one side, one-sided in effect, axis table, grade 4 axes, a share is not a sign, status door durations
+- `` ### THE BARGAIN DECK's GRADES `` `#6c9c26` — Bargain grades: the scale, Fleeting at 3, the four, Warden's arms. *triggers:* bargain modifier severity grades, re-grade, grade scale, cost band, reference party, no severity, the test binds, highest cost measured, sharper reading, fight seed, the swing, Leaden, Fleeting at 3, Warden band, Ambushed, Outpaced, Fractured, Porous, Inverted
+- `` ### THE SHARE CENSUS `` `#c7d80b` — Each side's share of every quantity a rule keys on (JA §3); the axes, re-derived at JB §4; the two prices. *triggers:* share census, two sides' shares, heroes vs warband, binds one side, one-sided in effect, axis table, grade 4 axes, a share is not a sign, status door durations, census price, what a share prices
 - `` ### THE SIM's FIGURES, RE-TAKEN AT IW `` `#ee7ad8` — IV's marked sim figures re-taken at IW; Rupture and Boil Over's Rage read. *triggers:* SUPERSEDED-PENDING, re-take, rune supply figures, IV's drive, recorded sim figures, runes bought per run, Hierophant completion, Tinderbox Miasma completion, Hourglass bars, Rupture rate in sim, Rage a turn
-- `` ### FOUND AT JA AND NOT FIXED `` `#de9b8e` — JA's findings: the party is the faster side; the kept id; the strike ledger. *triggers:* faster side, slow side, kept id, modifier id rename, strike ledger vs door, JA premises, every effect lasts one turn
+- `` ### FOUND AT JB AND NOT FIXED `` `#d9cc6f` — JB's findings: a sign following the slowest hero, Ambushed's bend, Fractured's tie, Porous at a cut. *triggers:* slowest hero, Ambushed curve, Fractured incumbent, Porous cut, JB premises, fixed encounter Ambushed
+- `` ### FOUND AT JA AND NOT FIXED `` `#9ec959` — JA's findings: the party is the faster side; the kept id; the strike ledger. *triggers:* faster side, slow side, kept id, modifier id rename, strike ledger vs door, every effect lasts one turn
 - `` ### FOUND AT IZ AND NOT FIXED `` `#b67275` — IZ's findings: Tinderbox fed the side that makes the fire; Deadened's swing; the brief's premises. *triggers:* one-sided fire, fire share, Tinderbox lopsided, Deadened swing, reference reading free, IZ premises, three of the eleven
 - `` ### FOUND AT IY AND NOT FIXED `` `#c2fb6f` — IY's findings: the absorption unconfirmed; the warbands already paired. *triggers:* absorption not confirmed, warbands already paired, seed per fight, paired by seed
 - `` ### FOUND AT IX AND NOT FIXED `` `#48c877` — IX's findings: a saved offer can deal a modifier at its old reward; the party's headroom; healing; check_hk's walk. *triggers:* saved offer no severity, SEVERITY 0, headroom, pays the party, severity of 1 to 5, healing takes up a tempo half, reference party healing, check_hk walk not seeded
@@ -162,7 +163,7 @@ population row carries a stamp over its member blocks, in their order, and reds 
 - `` ### HJ's RULINGS OWED `` `#2e2e10` — HJ's ruling owed: debug toggle name. *triggers:* debug grant-all toggle name, All Class Abilities Unlocked, debug_grant_all, map burger debug menu, class draft pool, lineage boss pool, DOD_SIM_GRANT_ALL, sim experiment arm
 - `` ### THE CROSS-TARGET SUPERSESSIONS `` `#50bf92` — Cross-target supersessions: retired arms and what stands. *triggers:* supersession table, retired suite arm, test_batch_bp 5, test_batch_cp 2, test_batch_bv, test_batch_bw, check_dv 2, test_batch_ah 1, test_batch_cd 2, class_pool_floors, check_gs, retiring a superseder
 - `` ### HF's RULINGS OWED `` `#f61857` — HF's rulings owed: Burning Ground, Aper, Abundance, Mark of the Hunt. *triggers:* Burning Ground rune_burning_ground, Aper body charge boon, Tusk and Bristle, Pack Bond boon, Abundance shield ceiling, Mark of the Hunt text, Kill Command Aper, Ghostpack, Call of the Wild
-- `` ### FOUND AT HF AND NOT FIXED `` `#b012bf` — Found at HF: companion text, Venom Coating seat, Returned Burden. *triggers:* Summon Companion text three companions, Aper picker, Venom Coating seated without Trapper, seat row, Returned Burden src_name by name, Detonating Ward removals, Burning Ground fallen Cleric
+- `` ### FOUND AT HF AND NOT FIXED `` `#b012bf` — Found at HF: companion text, Venom Coating seat, Returned Burden. *triggers:* Summon Companion text three companions, Aper picker, Venom Coating seated without Trapper, seat row, Returned Burden src_name by name, Detonating Ward removals, Burning Ground fallen Cleric, barrier absorb
 - `` ### HD's RULINGS OWED `` `#3815ee` — HD's ruling owed: section 3 floors went to runes, not cards. *triggers:* class pool floors CLASS_POOL_FLOOR, rune floor RUNE_FLOOR, check_gv 3, Cleric no-engine rune offer, card-pool floors, HD 3
 - `` ### HA's RULINGS OWED `` `#b4c985` — HA's rulings owed: main has no run-save guard, merge landing. *triggers:* main branch, forward guard run save, v13 save on main, load_run refusal, class-merge branch landing, tag b722cc4, per-lineage boss pools, lineage stat blocks
 - `` ### FOUND AT HA AND NOT FIXED `` `#8bf69b` — Found at HA: hand-seated lineages, slot and engine-text gates. *triggers:* hand-built seat without engine rune, check_et, check_fm _member, test_batch_bo, ability_slots_used, kit_slots, check_cl_resolver, check_cl_width, check_do 4 engine texts, check_di pack_bond
@@ -232,50 +233,51 @@ population row carries a stamp over its member blocks, in their order, and reds 
 - `` ### THE THREE PRICING QUESTIONS `` `#a7ea0a` — Three pricing questions: core baseline, Divine Wrath, Sanctuary. *triggers:* protected core baseline EB 1, check_eb 1 crossover, check_ea 4, Divine Wrath vs Blessing of Zeal, PURE_BUFFS, BUFF_DELAY_CAP, Arcane Surge initiative, Hold the Line, Sanctuary vs Hymn of Hope
 - `` ### THE TALENT CHARTER `` `#b95279` — Talent charter (DO/DP) residue: Torment, owns_ability, no-Perfect. *triggers:* talent charter, Ruined Mind, Lingering Torment oc_torment, owns_ability condition, CHECK_WITHOUT_PERFECT, Rampage, Pyroblast, test_batch_bo 5, talent-audit.html 8
 - `` ### THE SEVENTH FAMILY, FOUND AT DM AND DELIBERATELY NOT SWEPT `` `#b78fa5` — Seventh family: card text under-states its payload (DM, unswept). *triggers:* card text under-states payload, absent clause, DM 1 test, authoring vs repair, card text sweep
-- `` ### Small, and still owed `` `#9d100d` — Small, still owed: src coverage, companion terms, stale sims. *triggers:* vacuous as/at checks, _apply_status src coverage, check_di CALL_SITES, _companion_hit terms, We Do Not Break companion, stale sim figures, FIREDRAW_TAKE, shared_grief exactly 3 comment, Profile.save_path swap, hand-built boards
-- `` ### Carried, and still awaiting a ruling `` `#5027f0` — Carried rulings: zone-boss fallback floor, per-file ceilings. *triggers:* zone-boss fallback fully-held pool, EH 1, CLAUDE.md ceiling, instrument-rules.md ceiling, combat-rules.md ceiling, EE method, subject seam split
+- `` ### Small, and still owed `` `#778686` — Small, still owed: src coverage, companion terms, stale sims. *triggers:* vacuous as/at checks, _apply_status src coverage, check_di CALL_SITES, _companion_hit terms, We Do Not Break companion, stale sim figures, FIREDRAW_TAKE, shared_grief exactly 3 comment, Profile.save_path swap, hand-built boards
+- `` ### Carried, and still awaiting a ruling `` `#85d920` — Carried rulings: zone-boss fallback floor, per-file ceilings. *triggers:* zone-boss fallback fully-held pool, EH 1, CLAUDE.md ceiling, instrument-rules.md ceiling, combat-rules.md ceiling, EE method, subject seam split
 - `` ### Carried, with measurements attached `` `#02ab0b` — Carried measurements: Frenzy rate, Faith lane band, revert sweeps. *triggers:* FRENZY_RAGE_PER_STEP, Blood Frenzy peak, Reckless Abandon, Faith lane, FAITH_RELEASE, HELD_MAX, Communion band, Elevation, Blessing of the Faithful, revert constant prose sweep, recorded sim figures, sim readings carried
 - `` ### Named by the designer, carried from CX `` `#31545e` — Named by the designer (CX): relics per hero, rune content. *triggers:* relics per-hero ruling, active_relics save format, victory_heal_pct, rest_heal_add, resource_floor_pct, relic read sites, enemy interference status, rune content pass, enemy debuff duration vs cooldown
 - `` ### Carried from the code, reported and deliberately not fixed `` `#3dad18` — Carried from code: shop key, counts, beast ids. *triggers:* rune trade event, scarred_runes id, shop confounder merchant key, devoted_fury, checks=none targets, _recast_refusal_note Frozen vs Held, check_cu check_cv, beast identifiers, Killing Frost vs Blizzard, SUPERSEDED-PENDING, runes bought per run
 - `` ## LIVE COUNTS AND CONSTANTS WORTH HAVING AT HAND `` `#48d936` — Live counts and constants (delays, corpus, pools, saves). *triggers:* BASIC_DELAY, BUFF_DELAY_CAP, PURE_BUFFS, ability corpus 231, RECAST_GATED 64, FRENZY_MAX_STEPS, FAITH_RELEASE, draft pools 179, ABILITY_SLOTS_BY_BOSS, pouch slots, SC_PROFILE_DEFAULT, save v15, relics, EMBERKEEP_TURNS recast proposal
-- `` ### THE TEST TREE, AS OF EF `` `#60a024` — Test tree as of EF: suites, battery, baselines, differ. *triggers:* suites at repo root, suite_fixture _spawn, run_battery.sh GATES, gates outside GATES, .ran manifest, baselines.json rows, new gate rows, check_parse coverage, check_de differ, stamp gates, check_da 3 walk
+- `` ### THE TEST TREE, AS OF EF `` `#6213c7` — Test tree as of EF: suites, battery, baselines, differ. *triggers:* suites at repo root, suite_fixture _spawn, run_battery.sh GATES, gates outside GATES, .ran manifest, baselines.json rows, new gate rows, check_parse coverage, check_de differ, stamp gates, check_da 3 walk
 - `` ### HOW LONG A FIGHT IS `` `#014714` — How long a fight is: rounds tables, ramp arrival (stale since DK). *triggers:* fight length rounds, turns per hero, rung 2 same fight, DOD_SIM_ROWS, elite shortest, Avg rounds/battle bug, cy_report_line, ramp arrival Frenzy Faith Loyalty Focus, sim confounders
 - `` ### The changelog `` `#d8ae77` — The changelog: live cut at IZ (HR/HS), archive, threshold, cut verification. *triggers:* changelog cut, changelog-archive.html, check_dv 4, check_fg 1 400 KB threshold, check_ec 2, cut verification byte-identical, changelog readers, build_docs.py, archive boundary, build_pin_manifest.py reads the changelog, changelog headroom, next changelog cut owed
-- `` ### Knowledge sync, re-measured at EG `` `#f11668` — Knowledge sync (EG): census, live sizes, deselection list. *triggers:* knowledge sync, claude_md_census.py, file count byte total, check_fg 1/2 sizes, check_fr 5, CLAUDE.md ceiling, sync share retired, deselect DoD-archive pin-manifest.json, suite files
+- `` ### Knowledge sync, re-measured at EG `` `#cc41b7` — Knowledge sync (EG): census, live sizes, deselection list. *triggers:* knowledge sync, claude_md_census.py, file count byte total, check_fg 1/2 sizes, check_fr 5, CLAUDE.md ceiling, sync share retired, deselect DoD-archive pin-manifest.json, suite files
 - `` ## KNOWN-BROKEN AND DELIBERATELY UNFIXED `` `#250eeb` — Known-broken and deliberately unfixed (section head). *triggers:* known-broken, deliberately unfixed, sanctioned reds, suite reds, check_cm_live, check_gj, flakes
-- `` ### THE SUITE REDS, AND WHY ZERO IS NOT THE SAME AS FIXED `` `#2be9ca` — Suite reds: flakes seeded, retired-word sweep, draw collision. *triggers:* suite reds history, unseeded flakes seeded, baselines.json flake field, test_rune_battle, retired-word sweep beast party, test_batch_bx 4, test_batch_bp 7 draw collision, kit before roll, counts not repeated here
+- `` ### THE SUITE REDS, AND WHY ZERO IS NOT THE SAME AS FIXED `` `#58b424` — Suite reds: flakes seeded, retired-word sweep, draw collision. *triggers:* suite reds history, unseeded flakes seeded, baselines.json flake field, test_rune_battle, retired-word sweep beast party, test_batch_bx 4, test_batch_bp 7 draw collision, kit before roll, counts not repeated here
 - `` ### THE REST `` `#b10bce` — The rest: sanctioned reds check_gj and check_cm_live. *triggers:* check_gj 4 red Tollkeeper's Bell, check_cm_live 4-5 failures, defensive bar, _defensive_brace, _nobody_can_press, check_fh 7, sanctioned red baselines.json, coin-flip arm
 - `` ### FIVE MORE THINGS FH FOUND AND DID NOT FIX `` `#f0f36b` — Five more FH found: time_scale, dead buttons, grant_rune. *triggers:* _break_impact Engine.time_scale, hero sheet dead buttons, check_fh 9, Run.grant_rune, no boss awards a rune, manifest typed var, check_map not a hang, exit 0 Parse Error, _skill_done deadlock, vacuous as/at siblings, an band drift
 <!-- INDEX:END -->
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: JA — THE SHARES, BEFORE THE FOUR.** IMPLEMENT ONLY. **Frenzied is Leaden, Fleeting takes three turns off and is a 2, and the measurement the designer's four grade-4 modifiers wait on is taken: what each side produces of every quantity a rule can key on, on both parties, and the deck's axes crossed with it.** Full working: **`docs/reports/JA.md`**. **The queue holds JA's three rulings, the first that Thin Air and Encumbered bind the party alone as the deck plays** (JA's RULINGS OWED).
-- **THE DESIGNER's FILES, READ AND UNTOUCHED.** The readout holds what it held at IZ: IH's debug-touched first file and the clean one, `readout/run-20261018-194229.jsonl`, which `latest.txt` names — 24,340 B, md5 `610bcd8c2b43f97703e63053e86728fa` at JA's open and at its close, **still the one run**. `run_save.bin` (55,264 B, md5 `fcb20c91…`) still holds it at zone two's start, with no offer pending. Both backed up with the player's files (`../save-backups/JA-20261029-220449`). **A second run with a different party is still asked for, on the LOOK-LIST** (the roadmap, below).
-- **§0 — IZ's THREE RULINGS, ANSWERED IN JA's BRIEF** (the designer's): Frenzied becomes Leaden, with its words; Fleeting goes to three turns off; grade 4's four are the designer's, the share census and the axis table first; Warden's band stays. **Two of the brief's words did not hold and the designer chose in conversation** (JA §0): Fleeting's card states the rule as it is (*every effect lasts one turn* is not three turns off), and Leaden's chip wears its own letters, `Ld`.
-- **§1 — LEADEN.** The card's two clauses, its figure read off `LEADEN_SPEED_ADD` at the average speed (the constant named for its card, IT §2a); **no magnitude moved** (-30, the floor at a tenth) and IZ's drive reads 23 of the first 48 turns changing hands on the renamed tree. **The id stays `frenzied`**: the project has no rename path for a modifier id, so the display name moved alone (FOUND AT JA). The old name swept from every live file; it survives as the id and as a record beside the new one.
-- **§2 — FLEETING AT 3, MEASURED IN THE DECK**: sixty runs paired against a re-driven baseline (0.941 ± 0.004, a tie with IZ's 0.934), Fleeting at three turns off costs **+2.29 ± 0.26** points (z 8.75) — **a 2** — and a tie by the test with IZ's lever point (+3.10 ± 0.32, z -1.98, at its edge). Its words are the code's: *Every status applied lasts 3 turns less (never below one).* **The deck holds none 0; 1 6; 2 5; 3 4; 4 2; 5 4.**
-- **§3 — THE SHARE CENSUS** (THE SHARE CENSUS, below): 29 quantities, both sides, the reference party (20 runs) and the incumbent (60). **The heroes produce most of nearly everything; the warband fields more health and more armor; turns, speed and Wasting's clock are near even — and a share is not a sign**: every one of the 21 modifiers costs the party, both damage bonuses among them. **Thin Air and Encumbered bind the party alone as the deck plays** (the warband takes no turn-start drip and carries no cooldown; JA's RULINGS OWED 1).
-- **§4 — THE AXIS TABLE**: ten axes; **grade 4 holds health alone**, and healing, resource and recoil reach 5 with no 4. A two-sided rule's candidates are health, the turn order, tempo and Break — the axes whose quantity the warband produces too.
-- **§5 — `test_batch_cb`'s COIN FLIP, REPAIRED**: the Pyre Wake deep-stack arm reads the bank (Overburn's refund of the nine turns consumed) where it read where nine scattered fires fell; 2107 / 0 five runs of five on one tree, red on a card made to skim, and HEAD's arm green on that card three of three — it could not see the defect it named.
-- **§8.1 — THE ROUTING** (`docs/reports/JA-routing.md`): the brief's ten subjects matched 42 rows and 8 population rows (which added 22 blocks), opened with the 15-block core whole (79 blocks, 190,341 B of 358,738); the close-read found four unrouted blocks that bore, all ROUTED (the working read's misses, so no row was repaired) and none stale because of JA — and one of them, the carried item naming enemy cooldowns, stood against JA's first ruling, so the data was read before the ruling stood: none of the 50 enemy abilities sets one; the upkeep is 12 of 151 entries (the routing record).
-- **THE INSTRUMENTS.** `check_ja` is new (§0–§5). Re-pointed, each to its intent: `check_iz` (§2 reads JA's grades table, §4 the renamed card; its turn-order model a static function `check_ja` reads), `check_iy` (the handle's constant and words, JA's table), `check_ix` and `check_iw` (JA's table; `check_iw` finds the state's row by the name shown), `check_in`, `check_io` and `check_ip` (the grade counts), `test_batch_an` (the constant, the tally 6 / 5), comments in `check_ho`, `check_ij` and `check_iu` — eleven targets — and `test_batch_cb`'s arm (§5), and the rows in `baselines.json` they move (`check_ja` 101 new, `check_parse` 243, `check_gj`'s sanctioned figures +160 / 180, the same 20-gold gap); the manifest regenerated.
-- **THE VERIFICATION** — `docs/reports/JA.md` §8.
-- **`CLAUDE.md` IS 498,257 B = 486.58 KiB AGAINST ITS 510 KiB CEILING — 23.42 KiB UNDER** (+1533 B at JA, nothing cut: the ladder block's one new bullet beside IP's two-sidedness rule — a new modifier names the two sides' shares of its quantity before it is built, read off the census of record, and a share is not a sign): 2.9 batches at EZ's record (8,293 B).
-- **`docs/state.md` IS 369,654 B = 360.99 KiB AGAINST ITS 380 KiB CEILING — 19.01 KiB UNDER** (+10916 B net at JA, this line included: +327 B of it inside the index's fence — three rows written (one in the core's place, renamed), two mended and one struck, the rest re-stamped — and +10589 B outside it; **the archive took 3,641 B** — IZ's three rulings, FOUND AT IZ's coin-flip item, TWO INSTRUMENT OBSERVATIONS FROM FM whole and the roadmap's IZ item, word for word — so JA wrote 14,557 B where it cut 3,641: the cut did not keep pace, the census and its findings the new writing): 2.9 batches at the honest rate IT measured (6,712 B, the mean of IP–IT's own writing outside a fence).
-- **No save version moved**: a modifier's id is what a save carries and the id did not move; a grade, a handle and a constant are not saved.
+- **Last batch: JB — THE FOUR.** IMPLEMENT ONLY. **Four modifiers are authored against two new rules, and the deck is 25: Ambushed a 4, Outpaced and Porous 2s, Fractured a 1.** Full working: **`docs/reports/JB.md`**. **The queue holds JB's rulings, the first the deck's shape** (JB's RULINGS OWED).
+- **THE DESIGNER's FILES, READ AND UNTOUCHED.** The readout holds what it held at JA: IH's debug-touched first file and the clean one, `readout/run-20261018-194229.jsonl`, which `latest.txt` names — 24,340 B, md5 `610bcd8c2b43f97703e63053e86728fa` at JB's open and at its close, **still the one run**. `run_save.bin` (55,264 B, md5 `fcb20c91…`) still holds it at zone two's start, with no offer pending. Both backed up with the player's files (`../save-backups/JB-20261030-200402`). **A second run with a different party is still asked for, on the LOOK-LIST** (the roadmap, below).
+- **§0 — JA's THREE RULINGS, ANSWERED IN JB's BRIEF** (the designer's): the four one-sided cards stay and AQ's promise goes (a bargain may not pay the party; whether the warband feels it is flavour, not fairness); IP §0.2 is replaced where it stood (a rule costs the party when it adds to the warband's pressure on the party's health or takes from what the party absorbs it with; the share sets how much the party's output claws back, never the sign); the four go where the deck is shallow. **Seven answers came in conversation** (JB §0): Fractured's shape, the Hunter's passive standing, Inverted's reach, the reserve's name (Outpaced), placing Fractured and Porous by their readings, a third arm for Ambushed, and Ambushed at 8 on the incumbent's reading.
+- **§1 — THE TWO RULES.** `CLAUDE.md`'s two bullets replaced where they stood, the glossary's and `master.html`'s promise and the map's first-run line with them, the old sentences kept in `docs/design-notes.md`. **The cards**: Parched's words moved (*Every hero, and any enemy that carries a bar, begins the fight at no resource at most.*); Thin Air's, Encumbered's and Warded's already read honestly.
+- **§2 — THE FOUR.** **Ambushed** (`AMBUSHED_WARBAND_TURNS`, eight turns before any hero but the Hunter): a count the loop and the turn bar both read, the heroes' clocks moved on when the run ends. **Outpaced** (§2b's reserve, in Inverted's place): in each span the warband first, the Hunter's opening turn standing. **Fractured** (`FRACTURED_RECOVERY_MULT`): Break has no rate, so the share of the meter a recovery empties is the handle, and the meter stays one short of full. **Porous** (`POROUS_BARRIER_MULT`): a barrier on the heroes' side holds two-fifths of its face value, read at the one line a barrier absorbs at.
+- **§3 — MEASURED AND PLACED**, sixty runs an arm on each of the two populations, paired against a re-driven *none* (0.940 ± 0.005 and 0.953 ± 0.004), the grade the higher reading (IY §0.3): **Ambushed at 8 +6.67 ± 0.67 and +12.02 ± 1.20 on the incumbent — a 4, 0.20 under a 5**; **Outpaced +1.13 ± 0.30 and +2.10 ± 0.51 — a 2**; **Porous +2.09 ± 0.31 and +0.57 ± 0.19 — a 2**; **Fractured +0.86 ± 0.29 and a tie, +0.33 ± 0.21 — a 1**. **Inverted paid the party, -1.08 ± 0.32**, because the party's slowest hero is its healer, so it left and the reserve took its place. **The census's two prices both missed**: Ambushed's 10.2 read +6.67 at the price's own eight turns, Porous's 7.9 read 2.09 (THE SHARE CENSUS).
+- **§4 — THE DECK**: 1×7, 2×7, 3×4, 4×3, 5×4, 25 in all. **Grade 4 holds health and tempo**; eleven axes, a barrier the new one; the turn order tops at 2 and Break at 3. Warden's gambles hold 3 (Rot, Overgrown, Ambushed), and an offer deals two of the three.
+- **§5 — THE CUT.** The open read 19,466 B of room, under the condition's 20,000 B, so the cut was taken: 29,648 B to the archive, net below.
+- **§8.1 — THE ROUTING** (`docs/reports/JB-routing.md`): the brief's twelve subjects matched 41 rows and 8 population rows (which added 28 blocks), opened with the 15-block core whole (84 blocks, 214,128 B of 369,654; 32 in the working read, 52 by a reader outside it, said so in the record); the close-read found none of the 58 unrouted blocks stale because of JB, and five bore lightly, the one not routed repaired (FOUND AT HF's row takes *barrier absorb*).
+- **THE INSTRUMENTS.** `check_jb` is new (§0–§5). Re-pointed, each to its intent: `check_in`, `check_io` and `check_ip` (the grade counts, the deck's size, the two rules' needles; `check_in` §1h's order through the new door; `check_ip`'s held sample), `test_batch_an` and `test_batch_bb` (the deck, the tally), and `check_iw`, `check_ix`, `check_iy`, `check_iz` and `check_ja`, whose kept tables read the deck they measured (`_deck_before_jb`, off each row's `graded`) — ten targets — and the rows in `baselines.json` they move; the manifest regenerated.
+- **THE VERIFICATION** — `docs/reports/JB.md` §8.
+- **`CLAUDE.md` IS 498,550 B = 486.87 KiB AGAINST ITS 510 KiB CEILING — 23.13 KiB UNDER** (+293 B at JB, nothing cut: the ladder block's two rules replaced where they stood, JA's bullet trimmed of what the rule now says): 2.9 batches at EZ's record (8,293 B).
+- **`docs/state.md` IS 349,291 B = 341.10 KiB AGAINST ITS 380 KiB CEILING — 38.90 KiB UNDER** (-20363 B net at JB, this line included: +317 B of it inside the index's fence — two rows written, two mended, the rest re-stamped — and -20680 B outside it; **the archive took 29,648 B**, its top cut, so JB wrote 9,285 B where it cut 29,648: the cut outran the writing): 5.9 batches at the honest rate IT measured (6,712 B, the mean of IP–IT's own writing outside a fence).
+- **No save version moved**: a modifier's id is what a save carries, and four new ids are keys no older save holds; `Run._drop_stale_offer_options` already drops an id the deck lacks, so an older build reading a newer offer deals one fewer.
 - **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in a build older than HL**: HL's ceiling refuses a newer save from HL's build on — HR's v15 is the first bump it has guarded — and HJ's and HK's builds, and `main`, carry no ceiling.
-- **Next: JA's rulings** — the two one-sided-in-effect modifiers, IP's sentence against the census, and grade 4's four, whose inputs are in.
+- **Next: JB's rulings** — the deck's shape, and the three cards that landed under the aim.
+
 
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### JA's RULINGS OWED — **THREE; TWO MODIFIERS BIND THE PARTY ALONE AS THE DECK PLAYS, A SHARE IS NOT A SIGN, AND GRADE 4's FOUR ARE THE DESIGNER's WITH THEIR INPUTS IN**
+### JB's RULINGS OWED — **THREE; THE DECK's SHAPE, THE AXES THE FOUR DID NOT REACH, AND WHAT THE CENSUS IS FOR**
 
-Full working: `docs/reports/JA.md`, NEEDS A RULING.
+Full working: `docs/reports/JB.md`, NEEDS A RULING.
 
-1. **THIN AIR AND ENCUMBERED BIND THE PARTY ALONE AS THE DECK PLAYS (JA §3's census).** The warband takes no turn-start drip (the drip is `_player_turn`'s alone) and no enemy ability carries a cooldown, so over 80 runs and 2,217 fights the warband produced **none** of either quantity; Parched's and Warded's it produced nearly none of (the heroes 190 to 310 times the resource held, 42 to 49 times the resource paid — the warband's two Rage kinds). AQ's rule (IO §0.2) and the glossary's *nothing in the deck binds one side* read the words, and these read the effect: each is a difficulty slider by AQ's own test. Re-cut, accept, or rule what *binds both sides* means — the designer's; nothing moved (JA §7).
-2. **A SHARE IS NOT A SIGN (JA §3).** IP §0.2's rule reads *a rule keyed on a quantity the two sides do not produce equally pays the side that produces more of it*; on the instrument the scale is set on, both damage bonuses (Feverish, the Thin Veil) — keyed on a quantity the heroes produce 6.3 to 7.1 times more of — cost the party, and so do penalties on what the warband holds more of (Rot, Overgrown, Brittle). The census's pattern is written beside IP's rule in `CLAUDE.md`, the batch's reading and not a ruling; **whether IP's sentence is narrowed to the shape it was written for (a payout landing on the party's health) is the designer's.**
-3. **GRADE 4's FOUR ARE THE DESIGNER's, AND THE INPUTS ARE IN (JA §3, §4).** The share census (`docs/reports/JA-shares.tsv`, two parties, 29 quantities) and the axis table (`docs/reports/JA-axes.tsv`, ten axes): **grade 4 holds health alone**; healing, resource and recoil reach 5 with no 4; damage, Break and the hand top at 3, status duration at 2, tempo and the turn order at 1. **An axis is a candidate for a two-sided rule only where the warband produces its quantity too** — health, turn order, armor; reference party: Break, tempo, hits — and Warden's gambles stay Rot and Overgrown until one is authored (IZ §0.4).
+1. **THE DECK's SHAPE (JB §4).** It holds 1×7, 2×7, 3×4, 4×3, 5×4 against the 5 / 5 / 5 / 4 / 4 it was aimed at: one at 1 and two at 2 where four 4s were aimed, because the readings allow no more. Whether anything comes off is the designer's; nothing did.
+2. **THREE OF THE FOUR LANDED UNDER GRADE 4, AND ONE HAS NO HANDLE LEFT (JB §3).** Fractured sits at its limit and reads a 1; Outpaced states a rule, has no value to move, and reads a 2; Porous was read at 0.4 alone and reads a 2, the rest of its handle not driven, and neither extrapolation reaches a 4 (about +3.5 on a straight line, about +5.6 by what a lost barrier cost, against a floor of 6.88). **So the turn order stands at 2, Break at 3 and a barrier at 2 as read.** A 4 on any of them is a new shape; whether one is wanted, and whether Porous's range is driven, is the designer's.
+3. **THE CENSUS's PRICE DOES NOT PRICE (JB §3).** Both prices written from it missed: a share gives what a side produces, and a cost is what is left after the party absorbs it, so Ambushed's price was wrong twice in opposite directions and Porous's assumed every barrier fills. The practice stands, for whom a rule touches. Whether a new card's starting value is still derived from it, or from an arm, is the designer's.
 
 
 
@@ -310,7 +312,7 @@ aside (IP's report, §0.1).
   (3,396 of 8,053; at the boss 988 of 1,955, his best turn 339); **the Berserker dealt 18.2%** (1,468), his `low_water` 0.00 in all
   ten fights and **22.9% of his costed turns hard-dry** (11 of 48).
 
-### THE BARGAIN DECK's GRADES — **THE SHARPER READING OF ONE POPULATION REPLACES THE BLUNTER, SINCE IZ; EVERY MODIFIER CARRIES A SEVERITY, TWO LEFT THE DECK, AND GRADE 4 HOLDS TWO**
+### THE BARGAIN DECK's GRADES — **THE SHARPER READING OF ONE POPULATION REPLACES THE BLUNTER, SINCE IZ; EVERY MODIFIER CARRIES A SEVERITY, TWO LEFT THE DECK, FOUR JOINED IT AT JB, AND GRADE 4 HOLDS THREE**
 
 **THE MODIFIERS THAT COST NOTHING ARE THE WORK; THE REST ARE A SCALE, NOT A RE-CUT (IX §0.1, the designer's).** IW's ladder showed the deck's costs a step a little under double the last above its cheapest level; so a grade is a band of cost, and only the ones with no cost to band are design work. **Since IZ none is left**: three had never been free (the price, below), Leaden's (Frenzied's then) re-key costs, Muffled costs its own population, and Dull Edge and Tinderbox left the deck.
 
@@ -375,11 +377,16 @@ aside (IP's report, §0.1).
 | Thin Air | 0.734 | IX §1 +21.03 ± 1.38 (z +15.21) | +2.31 ± 0.74 (z +3.12) | **5** (5) | the default four — IW, graded at IX §3 |
 | Bloodless | 0.702 | IX §1 +24.22 ± 1.02 (z +23.70) | +21.26 ± 1.19 (z +17.89) | **5** (5) | the default four — IW, graded at IX §3 |
 | Wasting | 0.579 | IX §1 +36.53 ± 1.51 (z +24.14) | +26.26 ± 1.66 (z +15.78) | **5** (5) | the default four — IW, graded at IX §3 |
+| Fractured | — | JB §3 +0.86 ± 0.29 (z +2.95) | JB §3 +0.33 ± 0.21 (z +1.54) | **1** (—) | the default four — JB §3 |
+| Porous | — | JB §3 +2.09 ± 0.31 (z +6.69) | JB §3 +0.57 ± 0.19 (z +3.05) | **2** (—) | the default four — JB §3 |
+| Outpaced | — | JB §3 +1.13 ± 0.30 (z +3.72) | JB §3 +2.10 ± 0.51 (z +4.11) | **2** (—) | the incumbent — JB §3 |
+| Ambushed | — | JB §3 +6.67 ± 0.67 (z +9.89) | JB §3 +12.02 ± 1.20 (z +10.01) | **4** (—) | the incumbent — JB §3 |
 
-- **THE GRADES HOLD** none 0; 1 6; 2 5; 3 4; 4 2; 5 4. **Moved since IZ**: Fleeting 1 → 2 — **Fleeting at 3**, three turns off every status (never below one), re-read in the deck (JA §2, below); the card IZ re-keyed is Leaden since JA §1, its grade and its figure unmoved. **Grade 4 holds health alone** — JA §4's axis table (THE SHARE CENSUS, below): grade 4 holds health alone, and healing, resource and recoil reach 5 with no 4. Every reading and the bands each gives: `docs/reports/JA-grades.tsv` (IZ's `IZ-grades.tsv` its record).
+- **THE GRADES HOLD** none 0; 1 7; 2 7; 3 4; 4 3; 5 4. **Moved since JA**: the four joined, each by its readings (JB §3, below); no other grade moved, and Fleeting at 3 stands (JA §2, below). **Grade 4 holds health and tempo** — the axes (THE SHARE CENSUS, below). Every reading and the bands each gives: `docs/reports/JB-grades.tsv` (JA's `JA-grades.tsv` its record).
+- **THE FOUR, EACH ON BOTH POPULATIONS (JB §3).** Sixty runs an arm, fight-seeded, each paired against its own re-driven *none* (the default four 0.939501 ± 0.004768, 57 of 60 completed; the incumbent 0.953368 ± 0.004352, 59 of 60), the grade the higher reading (IY §0.3). **Ambushed at 8**: +6.67 ± 0.67 and +12.02 ± 1.20, **a 4**, 0.20 under the cut to 5 (at 9, +9.03 and +15.07, a 5; at 11, +15.47). **Outpaced**: +1.13 ± 0.30 and +2.10 ± 0.51, **a 2**. **Porous at 0.4**: +2.09 ± 0.31 and +0.57 ± 0.19, **a 2**. **Fractured at 0.0**: +0.86 ± 0.29 and a tie, +0.33 ± 0.21, **a 1**. **Inverted paid, -1.08 ± 0.32**, and left the deck for §2b's reserve (its shape and reading in `docs/design-notes.md`). Every arm: `docs/reports/JB-arms.tsv`.
 - **FLEETING AT 3, IN THE DECK (JA §2).** Sixty runs, the reference party, fight-seeded, paired against a re-driven *none* arm on JA's deck (0.941 ± 0.004, 58 of 60 completed; a tie with IZ's 0.934, z 0.93): **+2.29 ± 0.26 points** (z 8.75, ratio 0.416) — **a 2**; IZ's lever point, taken on IY's deck, read +3.10 ± 0.32 — **a tie by the test, at its edge** (z -1.98) — and the in-deck reading is the grade's (`docs/reports/JA-fleeting.tsv`). A bargain fight under it runs 1.97 hero turns longer and the party heals 37.7 less in it. **Its words are the code's, by the designer's choice**: *Every status applied lasts 3 turns less (never below one).* — the brief's *every effect lasts one turn* is not the rule (THE SHARE CENSUS: 8.2% of the party's statuses laid for a positive count run five turns or more, and the battle-long ones are untouched).
 
-**THE BANDS, READ AND NOT RE-SET (IZ §0.4).** Wanderer's safe band (1–2) holds 11; Wanderer's gamble band (3–4) holds 6; Warden's safe band (1–3) holds 15; Warden's gamble band (4–4) holds 2; Ruin's safe band (3–4) holds 6; Ruin's gamble band (5–5) holds 4; Ruin's fixed encounters draw from the 6 of severity 3–4. **Warden's gamble band holds 2 — Rot, Overgrown — and stays**: its two arms, the reference party at Warden, natural, sixty runs each, fight-seeded, paired:
+**THE BANDS, READ AND NOT RE-SET (IZ §0.4).** Wanderer's safe band (1–2) holds 14; Wanderer's gamble band (3–4) holds 7; Warden's safe band (1–3) holds 18; Warden's gamble band (4–4) holds 3; Ruin's safe band (3–4) holds 7; Ruin's gamble band (5–5) holds 4; Ruin's fixed encounters draw from the 7 of severity 3–4. **Warden's gamble band held 2 — Rot, Overgrown — when IZ kept it, and holds 3 since JB, so an offer deals two of Rot, Overgrown and Ambushed**: IZ's two arms, driven on the deck of two, the reference party at Warden, natural, sixty runs each, fight-seeded, paired:
 
 | the arm | Warden safe / gamble | holds | its reading (60 runs, bargain fights) | against *now* |
 |---|---|---|---|---|
@@ -432,7 +439,9 @@ aside (IP's report, §0.1).
 
 **THE THREE QUESTIONS, ANSWERED.** **1. What the warband produces more of, or as much of**: the health on the field (it fields 1.5 to 1.8 times the party's maximum health and opening health, both parties), the armor that takes off blows (its armor takes 3.2 times the party's off the other side's blows on the reference, 1.8 on the incumbent), and — inside 2:1 — the turns, the speed at a turn, the turns weighted by health (Wasting's clock), and on the reference party the hits and the Break damage. Everything else the heroes produce twice over or more, and four quantities a live modifier keys on the warband produces none or nearly none of: the turn-start drip and cooldowns (none — Thin Air and Encumbered bind the party alone as the deck plays, JA's RULINGS OWED 1), the resource held and paid (two Rage kinds). **2. Inside 2:1**: Leaden's speed, Wasting's clock, Rot's and Overgrown's health and Brittle's armor on both parties; Slick Footing's and Hoarfrost's turns, Bloodletting's hits and Muffled's Break on the reference. **3. The sign — A SHARE IS NOT A SIGN**: every one of the 21 live modifiers costs the party. The penalties on what the heroes produce most of cost it, as the three failures suggested (Bloodless, Miasma, Thin Air, Parched, Warded, Encumbered, the Long Silence, Fleeting, Muffled and Deadened on the party whose plan is Break — and Muffled reads free on the reference party, whose Break is inside 2:1); **so do the penalties on what the warband holds more of** (Rot, Overgrown, Brittle) **and both bonuses on the damage the heroes deal six times over** (Feverish, the Thin Veil). The two rules ever recorded paying the party were a payout landing on the party's health in proportion to what it produces more of (the Hungering Dark) and a penalty taking more of the warband's damage into the party than of the party's out (Dull Edge at its floor). **The prediction a later batch can break**: on the party's health at a fight's end, a two-sided rule costs the party when it adds to the warband's damage into the party or takes from what the party absorbs it with, whatever the shares; the share sets how much the party's own output offsets. **The Dark is not the census's limit** — its sign follows its share, because its payout is the instrument's own quantity; Feverish is: the shares alone call it a gift.
 
-**THE AXES (JA §4), CROSSED.** One row an axis, every modifier of the deck on one: **health** 4, 4, 5 (Overgrown, Rot, Wasting) — **grade 4 holds health alone**; **healing** 3, 5 (Miasma, Bloodless); **resource** 2, 2, 5 (Parched, Warded, Thin Air); **damage** 1, 2, 2, 3 (Bloodletting, Brittle, Feverish, the Thin Veil); **recoil** 5 (Mirrorbound); **Break** 1, 3 (Muffled, Deadened); **status duration** 2 (Fleeting); **tempo** 1, 1 (Hoarfrost, Slick Footing); **the turn order** 1 (Leaden); **the hand** 1, 3 (Encumbered, the Long Silence). **Healing, resource and recoil reach 5 with no 4**; the others top out at 3 or below. **An axis is a candidate for a two-sided rule only where the warband produces its quantity too**: health and the turn order on both parties, tempo and Break on the reference party — and inside damage, its hits and its armor; healing, resource, status duration and the hand are the party's quantities, so a rule there binds one side whatever it says.
+**THE AXES (JA §4), RE-DERIVED AT JB §4.** One row an axis, every modifier of the deck on one (`docs/reports/JB-axes.tsv`, `JA-axes.tsv` its record): **health** 4, 4, 5 (Overgrown, Rot, Wasting); **tempo** 1, 1, 4 (Hoarfrost, Slick Footing, Ambushed); **healing** 3, 5 (Miasma, Bloodless); **resource** 2, 2, 5 (Parched, Warded, Thin Air); **damage** 1, 2, 2, 3 (Bloodletting, Brittle, Feverish, the Thin Veil); **recoil** 5 (Mirrorbound); **Break** 1, 1, 3 (Fractured, Muffled, Deadened); **status duration** 2 (Fleeting); **the hand** 1, 3 (Encumbered, the Long Silence); **a barrier** 2 (Porous, new); **the turn order** 1, 2 (Leaden, Outpaced). **Grade 4 holds health and tempo**; healing, resource and recoil reach 5 with no 4; the turn order tops at 2. A share says whom a rule touches: healing, resource, status duration, the hand and a barrier are the party's quantities, so a rule there binds one side whatever it says, which §0.1 permits and the card must not deny.
+
+**THE TWO PRICES (JB §3): THE CENSUS NAMES WHO A RULE TOUCHES, AND IT DOES NOT PRICE ONE.** Written from this table before the code existed: Ambushed at eight, 10.2 points (it read +6.67 on the party the price was written for); Porous at 0.4, 7.9 (it read 2.09, 26%). **A read-only drive says why** (JA's probe six on the shipping deck, 20 runs an arm, about 230 bargain fights each): **each turn of the run landed almost twice the every-fight mean the price used** (under Ambushed at nine, 170 more at the door over the nine turns, 18.9 a turn against 10.47, though a warband's every turn in those fights landed 13.12 against 9.53), **and the party heals back half to two-thirds of it** (healing +87.8 on the sixty-run arm, +115 on this drive); **and a barrier rarely fills**, so holding two-fifths took 37% off what barriers absorbed (104.6 → 65.5), not 60%, and the party healed some of the rest. A share is what is produced; a cost is the margin left after what the party absorbs.
 
 
 ### THE SIM's FIGURES, RE-TAKEN AT IW — **EVERY MARK IV SET IS TAKEN (IW §3); THE RECORD IS IW's FIGURE NOW**
@@ -476,6 +485,21 @@ IL's table is `docs/reports/IL.md` §1c and IO's is `docs/reports/IO.md` §3. **
 IS THE DESIGNER's TO RE-RULE (IP §0.1)**: a normal fight booked 18.33 events and 1.17 steps, the boss 51 — THE FIRST CLEAN
 PLAYTHROUGH, above.
 
+### FOUND AT JB AND NOT FIXED
+
+- **A RULE's SIGN CAN FOLLOW WHO THE PARTY's SLOWEST HERO IS** (JB §3): Inverted paid the reference party because its slowest body, the Cleric at 85, is its healer, whose turns rose from 9.32 to 13.62 a bargain fight and whose healing rose 59%. A party whose slowest hero is not its healer might read it the other way; it was not driven, and the card left. Its shape and reading are in `docs/design-notes.md`.
+- **AMBUSHED's GRADE SITS AT A CUT, AND THE CURVE BENDS THERE** (JB §3): on the reference party +6.67, +9.03 and +15.47 at 8, 9 and 11, with 50, 49 and 38 of 60 runs finished; on the incumbent +12.02 at 8 and +15.07 at 9, with 36 and 30 of 60 against the *none* arm's 59. The incumbent's reading at 8 stands 0.20 under grade 5's floor, inside two standard errors: **named here as a tie at the cut (IP §0.4).** The healing rises about 90 at each value on the reference party and has no more to give, so **one turn either way is a grade**, and a re-tune is a re-measure. A forced arm lays it on every bargain and every fixed encounter, so its finishes are the floor, not the rate.
+- **RUIN's MINI-BOSS AND BOSSES CAN DRAW AMBUSHED** (`Run.FIXED_MODIFIER_BAND`, severity 3–4 holds 7): eight free warband turns with no reward. The rung reads the deck; nothing was special-cased, and the forced arm above is the only reading of it.
+- **FRACTURED IS A TIE ON THE INCUMBENT** (JB §3): +0.33 ± 0.21 (z 1.54), because the warband Breaks that party almost never (278 Breaks in 1,658 fights). IZ §0.3's arm, taken because a Break rule is graded on a build whose plan is Break; the grade is the reference party's. A first read on an earlier deck gave -0.25 ± 0.24, also a tie.
+- **POROUS STANDS A SHADE PAST A CUT** (JB §3, IP §0.4): its two reference readings, +1.86 and +2.09, sit 0.08 and 0.31 past grade 2's floor of 1.78, inside two standard errors of it. Named here as a tie at the cut, with no second seed block: the later reading is the grade's.
+- **OUTPACED's GRADE MOVED AFTER ITS READINGS WERE TAKEN** (JB §3): the arms ran with it at 1, and its incumbent reading made it a 2, which moves only what an offer of it pays. No arm was re-driven for that: a re-roll could only move a reading at a cut by chance.
+- **`check_is` §6 CANNOT SEE A BATCH CODE PAST I** (JB's positional re-run): its `BATCH_NAME` pattern reads `[A-I][A-Z]`, so `JB §2` in `master.html`'s body would pass silently. It has been blind since JA, the first J code. The body holds none today, read by hand, and the stamp's own read still lands. Widening it is one letter; the brief did not ask for it, so the arm stands as it is.
+- **THE BRIEF's PREMISES THAT DID NOT HOLD** (JB's report §0): *a rate or a duration a multiplier can key on* — Break has neither; *Inverted's comparator* — the order is a timeline, there is no comparator; *the slowest body acts first* — the opening roll is dice and the Tracker's opening turn stands; *the warband strikes first* — every party holds a Hunter, and IO §0.5 binds; *four new ids make the offer defect bigger* — they do not (no save written before them holds one, and no old id's grade moved); *rate tweaks top out near 3* — its own example reads 4.75, and Miasma 5.14; *HR/HS's method* for the state's cut — that is the changelog's boundary; the state's method is HX §2's.
+- **ALL FOUR GRADES SIT INSIDE TWO ERRORS OF A CUT** (JB §3, IP §0.4): Ambushed and Porous are named above. **Outpaced's 2 is +2.10 ± 0.51, 0.63 errors past grade 2's floor of 1.78, and Fractured's 1 is +0.86 ± 0.29, 1.31 errors past grade 1's floor of 0.48, under which it would carry no severity.** Each is a tie at its cut, named here as arbitrary, with no second seed block.
+- **OUTPACED's *EVERY ROUND* HAS NO ROUND UNDER IT** (JB §2b): the words are the brief's, and the game has no rounds. The code reads a span of one basic swing at the average speed: inside a span the warband goes first, and across spans speed still counts, so a hero due in one span acts before a slow enemy due in the next. The glossary defines no *round*. A player who reads the card as *every enemy before any hero, always* will see a fast hero break it.
+- **FIVE SEATS THAT SAY *NEXT* ASSUME THE TIMELINE** (read, not run): Rally, a free action, Preparation, Watchtower and the Resonating Hourglass each seat a hero at the soonest clock less 0.01. Under Outpaced an enemy due in that span still goes first, so *acts next* and *at once* can come a turn late; under Ambushed the seat waits for the run's end. Both follow from what the cards say, and nothing was changed for them.
+
+
 ### FOUND AT JA AND NOT FIXED
 
 - **THE PARTY IS THE FASTER SIDE, AND LEADEN's SUBTRACTION STILL COSTS IT** (JA §3): the heroes' effective speed at their turns reads 98.5 against the warband's 90.8 on the reference party and 116.8 against 92.2 on the incumbent, so a flat amount off every speed takes the larger share of the warband's — and IZ's -30 costs the party +0.60 ± 0.26. The brief's reading (*the party is on the slow side of the field*) does not hold; the card's words are true of the mechanic (*the slower a body already is the more it loses*) and why the subtraction costs the party is not a share of speed. Not driven further.
@@ -483,7 +507,6 @@ PLAYTHROUGH, above.
 - **THE STRIKE LEDGER IS NOT THE DOOR** (JA §3's fidelity): the hero strike loop's `final` is the blow computed, before a barrier, a death refusal or the vow, and it holds no companion's blow (`_companion_hit`) and no special that resolves outside the loop — so the warband's strike damage reads 1.6 times its damage at the door on the reference party. A census of what a rule keys on reads the door for damage and the loop for blows, crits and armor; the armor row is the loop's site alone (about twenty other sites in the specials take armor off their own figures).
 - **A CARRIED ITEM NAMES ENEMY COOLDOWNS, AND NO ENEMY HAS ONE** (JA's close-read): *Named by the designer, carried from CX* still lists *the enemy debuffs whose duration exceeds their own cooldown*, while none of the 50 abilities in `data/enemies.json` sets a `cooldown` — the loader reads the key and no row writes it — and the census read 0 warband cooldown turns over 2,217 fights. The item predates JA and may mean how often an enemy re-casts; JA left it standing and read Encumbered off the data.
 - **THE BATTERY's 240-SECOND WATCHDOG SAT ON `test_batch_bk` ON A SLOW DAY, AND THE CODE WAS NOT WHY** (JA's recon 1): `test_batch_bk` and `check_ez` timed out on the pre-check and again on recon 1, reading like a hang. Run alone they pass, at 243 s and 207 s against about 135 s and 126 s at every acceptance through IZ; run side by side, HEAD and JA's code read 366 s and 361 s, 385 s and 388 s, so JA costs nothing and the machine was slower that day, for a reason nothing read (on mains, no thermal warning recorded, memory free). Recon 2 and the acceptance ran under the battery's own override, `DOD_SUITE_TIMEOUT=480`, its 240 s default retained. **A timeout on either gate is a question for HEAD's copy first.**
-- **THE BRIEF's PREMISES THAT DID NOT HOLD** (JA's report §0): *nine batches ago* eleven of twenty-three cost nothing — it was IX, three batches back; *three failed the same test, each paying one side* — the Dark and Dull Edge at its floor paid the party, Tinderbox read a tie (+0.24 ± 0.23) and left by the stop condition; *IX §2d found a second mechanism, a longer fight pays the side with sustain* — IX §2d pre-registered that shape and found it on none of fourteen halves; *the party is on the slow side of the field* — the faster (above); *at -3 every effect lasts one turn* — 6–8% of the party's positive-count statuses run five turns or more and the battle-long ones are untouched (the designer chose the true words); *every other axis stops at 3 or below* — healing, resource and recoil reach 5.
 
 
 ### FOUND AT IZ AND NOT FIXED
@@ -894,7 +917,7 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
 - **THE PILOT ENDED AT IV, AND `CLAUDE.md` TAKES NO INDEX (IV §0.1, the designer's)**: three reports, one answer — a bounded read
   was a sufficient one — and the other file's question closed by IU §2's count (THE SHAPE RECON, below). The close-read is kept as
   the batch's own (the index section). **The 380 KiB stays on this file; its restatement on the read was never ruled.**
-- **THE SHARES ARE MEASURED, LEADEN AND FLEETING AT 3 (JA)**: Frenzied is Leaden, Fleeting takes three turns off and is a 2, and the census grade 4 waits on is taken — what each side produces of every quantity a rule can key on, on both parties, and the deck's axes crossed with it (THE SHARE CENSUS). **Grade 4's four are the designer's, their inputs in** (JA's RULINGS OWED 3); **two modifiers bind the party alone as the deck plays** (1), and **a share is not a sign** (2).
+- **THE FOUR ARE AUTHORED, AND THE TWO RULES REPLACED (JB)**: Ambushed a 4, Outpaced and Porous 2s, Fractured a 1, the deck 1×7, 2×7, 3×4, 4×3, 5×4; a bargain may not pay the party, and a rule costs the party by what it does to the party's health, the share setting how much the party claws back. **The deck's shape is the designer's** (JB's RULINGS OWED 1), and three axes the four did not reach (2).
 - **THE LOOK-LIST — WHAT A GATE CANNOT READ: WHETHER A SCREEN READS WELL (IS's brief §0.1, the designer's).** A gate reads a rect;
   it cannot read whether what is drawn reads right. **Every batch that moves something on screen adds a row here**, so the rows are
   cleared in one sitting rather than one message at a time. Nothing waits on a row.
@@ -904,6 +927,8 @@ Full working: `docs/reports/HW.md`, NEEDS A RULING.
     seen. *One look, no play*: a new profile, the first map.
   · **THE MAP's ARRIVAL TOAST WRAPS** (IS §2a): a toast longer than the screen takes a second line, where it ran off both ends. *One
     look*: load a run whose save names a removed card, or take a drop whose line runs long.
+  · **THE TURN BAR UNDER AMBUSHED AND OUTPACED** (JB §2): eight warband turns and then the heroes, and the warband first in each span, drawn off the order the loop keeps and driven headless, never
+    seen. *One look*: a fight under each.
 ### FOUND AT HV AND NOT FIXED
 
 - **OPEN LINE OWES AN `ENGINE_READ` ROW (the Stances).** It requires Guard Change, which only the Stances bring since HL §1, and
@@ -2616,52 +2641,10 @@ repair.** Both are reported and neither was taken.
   are hero self-buffs and correctly unstamped, and Counter Time's Stun, which passes its
   `attacker` and exactly replaces the stamped site the retirement took). **The reason is in the
   gate's own comment, which is what that const's header demands of a batch that moves it.**
-- **`_companion_hit` READS 5 OF THE HERO STRIKE LOOP'S MULTIPLIER TERMS, AND THE TWO IT GAINED AT
-  DU WERE THE ONLY TWO THAT WERE LIVE.** The attacker-side block is the run of `raw`-mutation sites
-  in `battle.gd`'s `_resolve`; the five it reads are **Mark of the Hunt, the ownerless Hunter's
-  Mark, Necrosis, `cripple` and `chilled` (both terms)**. **MOST OF THE REMAINING MISSES ARE
-  UNREACHABLE BY SHAPE RATHER THAN BY OVERSIGHT, AND THE SHAPE IS IN THE SIGNATURE**: the function
-  takes a FLOAT, not an `Ability`, so all 26 ability-keyed terms cannot apply; a companion's
-  `engines` is empty — its `passive_id` was `""` until GK — (10 more) and **every talent-rank field on it is zero, always** (20 more).
-  **Of the 76 still absent, all 76 fail the brief's own test — a term no companion can receive is a
-  non-issue.**
-  - **THE TWO THAT WERE LIVE ARE FIXED AND MEASURED.** **`cripple`** — enemies target
-    `_hero_side()`, which holds the living companion, and `_apply_status` lands the rider with no
-    companion filter; **two enemy abilities carry it** (Ride-by Slash, Grasping Roots). **40 seeded
-    blows: 30268 in both arms before, ratio 1.0000; 30268 against 22703 after, ratio 0.7501.** And
-    **`chilled`** — the frost modifier stamps a summoned companion deliberately and its branch
-    carries no `inherited` guard. **Both terms read; all four arms land exactly** (1.0000 / 0.8500 /
-    0.9700 / 0.7735).
-  - **ONE STACK IS THE CEILING AND THE `>= 3` ARM IS UNREACHABLE IN PLAY.** The frost stamp is the
-    only application that reaches a companion; every other one in the file targets an enemy. **The
-    stack count was NOT raised to make the arm reachable** — that would be authoring. `check_du` §3
-    asserts the stamp lands 1, so the day the ceiling moves the gate says this line is stale.
-  - **`cripple` AND `chilled` ARE INSTRUMENTED NOW, WHICH THEY WERE NOT.** `check_du` §1 and §2
-    measure the ratios every battery run beside `check_dk` §4's `empower` and `check_dm` §2's
-    `wrath` and `battle_shout`. **Before DU, removing either read would have been silent.**
-  - **AND ONE IS STILL INERT TWICE OVER, DELIBERATELY.** `type_dmg_bonus` could reach a companion —
-    the kindling modifier, Tinderbox, wrote `{"fire": 0.25}` onto one, measured, until IZ §5 removed it, and nothing writes one
-    now — but **a companion's blow
-    carries no `dmg_type` at all**, so adding the read would find nothing to apply. `check_du` §4
-    drives a companion given the bonus by hand through forty blows and requires the total unchanged, so the day a
-    companion's blow grows a type the gate says the second reason is gone. **`dmg_bonus` cannot
-    reach one**: the summon copies Attack, armour, speed, crit and `companion_power` off the hunter
-    and not that, measured at 0.000.
-  - **NOTHING FURTHER WAS WIDENED AND THAT IS THE RULING, NOT AN OMISSION.** `CLAUDE.md` carries the
-    line: **a player effect that lands and pays nothing costs the player a card; an ENEMY effect
-    that lands and pays nothing costs the player nothing.** The first is a dead card, the second is
-    an exploit — and **a general widening would hang visible chips on a companion that change
-    nothing, which is worse than the narrow miss because it reads as working.**
 - **WE DO NOT BREAK AND HEAL MORE WHEN LOW ARE RECEIVABLE AND ARE NOT RECEIVED**, because both are
   stamped once in the party-spawn block before any companion exists. **Measured: a beast wearing
   `devotion` at 20 banks 32 Break from a 40-BD blow.** Reaching a beast summoned later wants a
   **re-stamp on summon** — a second write site for one node's worth of effect.
-- **NO SIM HAS RUN SINCE THE FIVE WIDENINGS, SO EVERY CARRIED SIM FIGURE IN THIS FILE IS STALE.**
-  Sanctuary, Hold the Line, Rally and the Field Medic (DK) and Rallying Shout's Pressure clause
-  (DL) all reach a fifth body in a Beastmaster party. **THE HEALING AND BREAK FIGURES AT THE FOOT
-  OF THIS FILE ARE MARKED STALE RATHER THAN LEFT TO BE QUOTED AS CURRENT.** They are DA's, they
-  predate DK and DL, and **correcting them means running the sim, which no batch since has done.**
-  **DM moves no magnitude and adds nothing to that staleness.**
 - **`FIREDRAW_TAKE` (4) IS DEAD, AND WAS DEAD BEFORE DH.** `firedraw` uses
   `FIREDRAW_TAKE_PERFECT` (6) unconditionally. **DH deliberately did not collapse it** — that would
   move a magnitude — but it is a real dead symbol that `test_batch_cd`'s sweep does not catch.
@@ -2679,20 +2662,6 @@ repair.** Both are reported and neither was taken.
   because **seven battery suites do not swap it at all** and would newly get a scratch profile
   instead of the designer's, which is a behaviour change to seven suites and belongs to its own
   batch.
-- **`CLAUDE.md` IS PRUNED AT DZ §3 AND CW's TARGET IS MET ON BOTH HALVES FOR THE FIRST TIME.**
-  CW set *"under 3% of the knowledge sync and roughly flat over time"*; the ratio had risen every
-  batch from 3.25% at DI to **3.639%** at DY, and **DG through DY all declined the prune.** It is
-  taken. **The live figures are printed by `check_fg` §2 every battery and are not restated here.**
-  **THE ARITHMETIC OF THE TARGET IS NOT THE OBVIOUS ONE AND IS WORTH KEEPING**: pruning this file
-  shrinks the sync's DENOMINATOR too, so clearing 3% needed **more than 47.8 KiB**, not the 46.4
-  a naive subtraction gives. **AND THE PRUNE IS BOUNDED BY ASSERTIONS RATHER THAN BY JUDGEMENT** —
-  **60 literals must survive verbatim** across the **26 targets that actually read the file** (9
-  gates and 17 suites — a grep for the filename over-reports that population by two thirds, because
-  18 more name it only in a comment), several of which read as history because a suite reads them. **THE BATCH-CODE PINS ARE CLOSED AT
-  EA §2 AND THERE WERE SIX, NOT THREE** — the four bare ones (`BATCH BN`, `BATCH BS`, `BATCH CE`
-  and `BATCH CG`, the fourth DZ predicted, one line under the third) plus two whose LITERAL merely
-  carried a code. **All six re-pointed at the rule each was reaching for; none deleted.**
-  `check_ea` §3 sweeps for a seventh every run, by the VARIABLE holding the document.
 - **TEN HAND-BUILT BATTLE BOARDS REMAIN, IN SIX FILES** — `al` (2), `an`, `ax`, `bl`,
   `test_rune_battle` (3), `test_run_harness` (2). **None is a copied helper.** `check_da` §3
   carries them as a **named ratchet** (by file AND by count), so a new copy cannot hide among them.
@@ -2710,20 +2679,7 @@ repair.** Both are reported and neither was taken.
   held both halves. **FU re-derived `CLAUDE.md`'s own ceiling by EE's method off FF's post-split
   reading (261.03 + ten × EZ's 8.10 = 342.03, stated as 340)**, which is the per-half move for that
   file. `docs/instrument-rules.md` has no stated ceiling and deriving one is still the designer's.
-  - **BOTH OF EF'S NUMBERS ARE NOW STALE IN OPPOSITE DIRECTIONS, WHICH IS WHY THIS ITEM MATTERS
-    MORE THAN IT DID.** EF's **220 KiB for `CLAUDE.md` is BELOW the live file** and always
-    would have been within four batches at the measured rate — it was derived off a +6.30 KiB worst
-    batch when the file was 175 KiB. EF's **95 KiB for the reference is now below it**, and
-    it was derived off a +5.00 KiB worst batch (DX) that was itself building that
-    file. **Neither number should be adopted as written; the METHOD is what survives.**
-  - **AND FF MEASURED THAT THE ALTERNATIVE — ANOTHER SPLIT — IS GONE.** Three quarters of
-    `CLAUDE.md` is rule about what the game may contain, held here by EF's one-way tiebreak, and
-    the residue is spent. **FF named two moves and FU took the first; at 340 the one left is to
-    overturn the tiebreak for a SUBJECT** — see the subject-seam item above — and accept that a batch
-    may have to open two files to find a rule about the game. Working: `docs/reports/FF.md` §1 and
-    `docs/reports/FU.md` §1, and the ceiling block in `CLAUDE.md` says so. **GR TOOK IT**, on the designer's
-    ruling: combat law is `docs/combat-rules.md`, a THIRD rule file, and like the instrument reference it has no
-    stated ceiling (GR's ruling 1).
+
 
 
 
@@ -2996,74 +2952,7 @@ repair.** Both are reported and neither was taken.
   **COUNTED OUT OF THE SCRIPT ITSELF RATHER THAN CARRIED FORWARD: it read "thirty-six" through ES,
   ET, EU and EV, which is the shape `CLAUDE.md`'s own rule warns about (a number quoted from one
   document into another stops being a measurement).**
-  **EV ADDED `check_ev` BECAUSE THE FALLBACK'S TWO FAILURE MODES ARE INVISIBLE IN THE SOURCE**: a
-  fallback that never fires and one that fires for every converted stack would BOTH pass a static
-  check, and they are simply the two ways one line of arithmetic goes off by one. Every section is
-  live; §0 drives the disjointness invariant over 240 readings; §1 pins Loyalty 9 by name because it
-  is the one depth where a converted stack still buys the clamp; §3 asserts the OPPOSITE of
-  `check_eu` §1c with the same instrument at a saturated depth. **Seven negative controls, all seven
-  bit**, the first of them HEAD's own `battle.gd`.
-  Before it, **ES ADDED `check_es` BECAUSE THAT BATCH CARRIES FOUR RULINGS AND THREE OF THEM DECAY SILENTLY.**
-  §1 is the one a source sweep cannot reach: a re-invented tier is a new table and a new roll, and
-  the OFFER DISTRIBUTION is the only place it shows, so it is MEASURED at three zone slots —
-  against a 4.5-point band until FG — where the old weights spread it by 29.
-  §3 is the dangerous one: with the `scarred`
-  flag gone, `Runes.is_cost` is the only thing that knows a rune charges anything and it is what the
-  power arm holds a cost by, so the costed population is derived and pinned as a NAMED SET with
-  `exsanguination` named as the one whose cost is a behaviour rather than a term. §4 is DS's Heads
-  Down shape outright and is DRIVEN through the real equip/unequip doors. **§2 DELIBERATELY ENCODED
-  NO RULING** while the five universals' classes were unmade; **ET §1 retired the five and
-  RE-POINTED §2 onto a wider question** — every entry a spec cannot draw must be undrawable BECAUSE
-  IT IS RETIRED, over every rune rather than the five — so a retirement wearing an eligibility rule
-  still goes red, and the depth table it prints now reads zero across all twelve. Before it,
-  **EM ADDED `check_em` BECAUSE EJ §5 NAMED THIS BATCH AS ITS HOME**: *the property a future gate
-  wants — that no rune writes a live node's counter — belongs in the batch that takes the charter.*
-  §1 derives that property from `Talents.tree()` and `runes.json` rather than from a list of names,
-  and its unit-math exemptions are an EQUALITY. **§2 is the one that earns the gate**: splitting a
-  counter is safe in the arithmetic and lethal in the GUARD, so it sweeps STATEMENTS and fails if
-  any statement reads one half without the other. §3 holds the AA type trap on the `rune_` side; §4
-  pinned the three clauses with no home as an EQUALITY until EN.
-  **Five negative controls, all five bit.**
-  **EL ADDED `check_el` BECAUSE THAT BATCH CARRIES THREE RULINGS**: that MARK's population is
-  DERIVED from the marks the game itself names rather than listed, that `master.html` §6c's tag
-  table is the code's table, and that the widest tag line is MEASURED rather than transcribed
-  (DJ §3). **The first is the one that decays silently** — the day an eleventh mark is authored,
-  nothing else in the tree would notice its card going untagged — so §1 pins the STATUS half from
-  outside (`DISPEL_NEVER.size()`, DW's idiom) and DERIVES the CARD half live out of
-  `battle.gd`'s apply sites, through both anchors, agreeing in both directions.
-  **EK ADDED `check_ek` BECAUSE THAT BATCH CARRIED TWO RULINGS**: that the vocabulary is
-  MECHANICS rather than status names, and that the tags are MECHANICALLY INERT. **Inertness
-  is the one property nothing else in the tree would notice losing**, so §3 asserts it as a
-  POPULATION — every `.gd` swept comment-stripped, and **EL SPLIT THAT ASSERTION IN TWO** because
-  it was two claims: the files in the SHIPPED GAME naming a tag are pinned by name,
-  the TARGETS that check one are listed separately, and ZERO is still
-  asserted separately in the six files a mechanic would have to live in.
-  **EH ADDED `check_eh` BECAUSE §1 IS A RULING AND BECAUSE THE THIRD TIER CAN ONLY BE PROVED
-  LIVE.** A tier that resolves correctly and announces nothing passes every static check in the
-  tree, and silence is the exact defect EA existed to end. **EG ADDED `check_eg` BECAUSE §1 AND §2
-  ARE BOTH RULINGS, AND BECAUSE §1 DRIVES THE THIRD
-  ZONE-BOSS GRANT.** A slot ladder that never grants would pass every static check in the tree,
-  which is DS's Heads Down arriving at a new mechanic.
-  **EF AND EE EACH ADDED NONE, ED ADDED `check_ed`**, and before it EC added `check_ec`, EB `check_eb`, EA `check_ea`, DW
-  `check_dw`, DV `check_dv` and DU `check_du`; **DZ AND DY EACH ADDED NONE.** **ED ADDED ONE BECAUSE
-  §2 IS A RULING** — the manifest is the answer to the coverage question EC priced and left open,
-  and a gate encodes a ruling. **§1 ADDED NOTHING, because its ruling is that nothing should
-  change.** **EC ADDED ONE BECAUSE §1 IS AN
-  INSTRUMENT REPAIR THAT HAS TO SURVIVE THE BATCH** — the scratchpad sweep is rebuilt every batch
-  and a boundary fixed only there is a fix that expires. **§2 AND §3 ADDED NOTHING**, because both
-  are measurements the brief forbids ruling on and a gate encodes a ruling. **EB ADDED ONE BECAUSE
-  ITS §1 IS A RULING** — a gate
-  encodes a ruling, and EB §1 is the ruling on the measurement EA handed over. **EA §3 WAS STILL A
-  MEASUREMENT AND RODE IN `check_ea` PINNING A DIRECTION RATHER THAN A COUNT**, which is the
-  shape that does not encode a ruling nobody made; `check_eb` §1 is the shape that does, now that
-  the ruling exists. **`check_ec` IS A THIRD SHAPE: A PROPERTY OF THE INSTRUMENTS THEMSELVES**, and
-  it carries its own discrimination control on synthetic input because the repair it encodes is
-  dangerous in the opposite direction. **`check_dw` ASSERTS
-  THE CONSEQUENCES, NOT THE SOURCE**: §1 and §2 re-derive both of `test_batch_cp`'s named
-  populations LIVE and require the suite's table to equal them, because a named population is only
-  useful while it is still the real one — which is what stopped being true between CN and DW. **It
-  also pins `check_da`'s exemption table at ONE from outside**, so a batch adding a second has to
-  move a line in another file and say why. **Seven
+  **Seven
   `check_*.gd` files are not in `GATES`** — `check_ck_width`,
   `check_cu`, `check_cv`, `check_dn`, `check_ct_map`, `check_map_screen` and `check_de`. **`check_ct_map` and
   `check_map_screen` run in the SCENE RUNS section and `check_de` runs in its own post-pass section
@@ -3071,25 +2960,6 @@ repair.** Both are reported and neither was taken.
   **SINCE EI THOSE FOUR ARE PARSE-COVERED AND NAMED IN `check_parse`'s OUTPUT EVERY RUN** as its
   RESIDUE — in the tree, spawned by nothing, reached by nothing. They are still not in `GATES`,
   because what a failure in an audit REPORT means is a ruling rather than a detail.
-- **`check_ds` NEEDS NO `check_da` §3 EXEMPTION AND IT TOOK A RED TO ESTABLISH THAT.** It calls
-  neither draft-pool accessor; its **header comment named both of them** while explaining that it
-  does not, and §3's fingerprint is a substring match over the whole source. **The names came out of
-  the prose rather than an exemption being granted** — an exemption granted to a sentence would
-  blind §3 to a real walk arriving in that file later, which is worse than the violation it covers.
-  **`check_du` NEEDED NO EXEMPTION EITHER AND DID NOT TRIP §3 AT ALL**, because that lesson was
-  applied rather than re-learned: it reads neither draft-pool accessor and its comments name
-  neither. **`check_dv` NEEDED NONE EITHER**, for the same reason, and was run standalone before the
-  battery to prove it: `check_da` reads **37/0 over 32 gates**.
-  - **AND §3's BLIND SPOT IS CLOSED AT DW §1, WITH ONE MORE HOLE THAN DV DIAGNOSED.** Its walk
-    sweep read **`check_*.gd` ONLY** and its fingerprint matched the two pool **ACCESSORS** where
-    `test_batch_cp._corpus()` reads the **CONSTANTS** — both real. **THE THIRD WAS LARGER AND SAT
-    INSIDE THE POPULATION IT ALREADY SWEPT**: the fingerprint assumed a corpus walk touches the
-    DRAFT pools at all, and `check_cl_resolver._every_ability()` read only `Classes.kit()` and
-    `Classes.spec_abilities()` until DW and reached **43 of 227**.
-    **THREE WALKS: 43, 91 and 207.** A SECOND
-    sweep runs over gates AND suites now, matching constants as well as accessors, and asks whether
-    a function **RETURNS** a collection built from two or more ability-source families. **37 → 39,
-    one exemption, and the old sweep is untouched.**
 - **THE BATTERY WRITES A MANIFEST, `$OUT/.ran`, AND THE DIFFER TRUSTS IT RATHER THAN THE DIRECTORY
   LISTING.** `run_battery.sh` does NOT clear `$OUT` between runs, so a target that failed to launch
   would otherwise be blessed by its PREVIOUS run's log. A name is appended immediately before its
@@ -3099,83 +2969,15 @@ repair.** Both are reported and neither was taken.
 - **`gate_fixture.gd` AND `suite_fixture.gd` ARE NOT GATES AND ARE DELIBERATELY NOT NAMED
   `check_*`/`test_*`** — `test_batch_cd` and `check_da` both glob those prefixes.
 - **THE BASELINE TABLE IS `baselines.json` AND ITS ROWS ARE THE SUITES, THE GATES, THE
-  SCENE RUNS AND THE HARNESS GATES**. **FF ADDED
-  `check_ff` AT [55, 55] AND MOVED EXACTLY ONE OTHER ROW — `check_parse` 169 → 170 — BOTH WRITTEN
-  BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS.** **A new gate owes TWO rows**, its
+  SCENE RUNS AND THE HARNESS GATES**. **A new gate owes TWO rows**, its
   own and `check_parse`'s, because that gate's count IS its coverage and a target joining the
-  battery raises it the same day. **The row count below is the historical reading and is kept for
-  the reasoning attached to each move.** **ES ADDED `check_es` AT [42, 42] AND MOVED EXACTLY THREE OTHER ROWS —
-  `test_runes` 3101 → 3118, `check_ek` 43 → 45 and `check_parse` 161 → 162 — ALL FOUR WRITTEN BEFORE
-  THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS EACH.** **The `test_runes` +17 was COUNTED OFF
-  THE DIFF rather than guessed**: `_schema` goes 472 → 585 (two absence pins and a no-prefix pin
-  replace one tier check and one conditional price check, over 65 entries) and `_scarred` → `_costs`
-  goes 102 → 6, called twice as before; +113 − 96 = +17. **`check_parse`'s move is that row working
-  as designed** — its count IS its coverage, so a target joining the battery raises it the same day. **EM ADDED `check_em` AT [210, 210]; EN MOVED IT TO [223, 223] AND MOVED `av` AND `ax` BY ONE AND TWO. EM MOVED FIVE OTHER ROWS —
-  `check_dp` 43 → 48, `check_parse` 160 → 161, `test_batch_ak` 495 → 496, `test_batch_ax`
-  348 → 350 and `test_runes` 3121 → 3125 — ALL SIX WRITTEN BEFORE THE BATTERY**, three of them
-  off three identical standalone readings apiece. **`check_parse` read 163 first**, and the extra
-  two were scratch measurement probes sitting in the repo root that its RESIDUE walk found — the
-  walk working, and they were moved out of the tree. Before it, **EL ADDED `check_el` AT [23, 23]
-  AND MOVED EXACTLY TWO OTHER ROWS —
-  `check_ek`, 39 → 43, and `check_parse`, 159 → 160 — ALL THREE WRITTEN BEFORE THE BATTERY OFF
-  STANDALONE READINGS**, so `check_de` certified on pass one. **`check_ek`'s move is itemised in
-  its own row**: §3 splits one assertion into two, §4 adds two population assertions and one more
-  tag to sweep. Before it, **EK ADDED `check_ek` AT [39, 39] AND MOVED EXACTLY ONE OTHER ROW —
-  `check_parse`, 158 → 159**. **The `check_parse` move is that row working
-  as designed rather than drifting**: its count IS its coverage, so a target joining the battery
-  raises it the same day. **EI ADDED NO ROW AND MOVED EXACTLY ONE — `check_parse`, `checks: null`
-  → `[158, 158]`** — written before the battery off three identical standalone readings, so
-  `check_de` certified on pass one. **THAT ROW IS A DIFFERENT KIND OF NUMBER FROM EVERY OTHER ONE
-  IN THE TABLE: it is a COVERAGE count, not an assertion tally**, and it is pinned for the reason
-  the batch exists — a failure total reads zero whether that gate walks 158 files or 41, which is
-  how it was found short three times with nothing going red.
-  **EH ADDED `check_eh` AND MOVED EXACTLY ONE OTHER ROW — `check_ea`
-  62 → 86 — BOTH WRITTEN BEFORE THE BATTERY OFF THREE IDENTICAL STANDALONE READINGS**, so
-  `check_de` certifies on pass one. **EG ADDED `check_eg` AND MOVED FOUR ROWS, ALL FIVE WRITTEN BEFORE THE
-  BATTERY OFF STANDALONE READINGS** — `test_batch_bo` 1131 → 1140, `test_batch_bx` 157 → 161,
-  `check_ea` 60 → 62, `test_batch_bp` 275 → 276, and its own row off THREE identical readings of 68,
-  so `check_de` certified on pass one. **THE `bo` DELTA WAS COUNTED OFF THE DIFF RATHER THAN
-  GUESSED** — +20 `ok(` against −11, every one linear. **EF ADDED NO ROW AND MOVED EXACTLY ONE — `check_ec` 22 → 23, the fifth
-  tracked document, written off three identical standalone readings BEFORE the battery so
-  `check_de` certified on pass one.** **ED ADDED `check_ed` AND MOVED THREE ROWS, ALL THREE PREDICTED AND ALL
-  THREE CONFIRMED STANDALONE BEFORE THE BATTERY** — `check_dr` 79 → 80, `test_batch_bm`
-  1888 → 1889 and `test_batch_bs` 266 → 267, one locator guard each. **Its own row was written off
-  three identical standalone readings of 18**, so `check_de` certified on pass one and reported
-  **ZERO NOTICES**. **EB ADDED `check_eb` AND MOVED NOTHING ELSE** — its row was written
-  BEFORE the battery off three identical standalone readings of 12, so `check_de` certified on pass
-  one instead of reporting an unwatched target, and it reported **ZERO NOTICES**. Before it, **EA
-  ADDED `check_ea` AND MOVED EXACTLY ONE OTHER ROW** — `test_batch_ah`, which asserted the OLD
-  award behaviour outright and was inverted in place rather than deleted. **DZ ADDED NO ROW AND MOVED NONE — IT WAS THE FIRST BATCH IN THIS
-  FILE'S RECORD TO PREDICT A COMPLETELY FLAT TABLE AND GET ONE.** It edits no `.gd` file and no data file,
-  and **every assertion against the documents it does edit is a `contains` whose COUNT is fixed**,
-  so `CLAUDE.md` can lose 51 KiB without moving a single check count. **DY ADDED NO ROW EITHER AND
-  MOVED MANY** — a batch that grows two pools and deletes a third moves every loop that walks one,
-  which is what its prediction table is for.
-  **THE `flake` FIELD IS GONE FROM `test_batch_at`'S ROW.**
-  Before it, **DX ADDED NO ROW AND MOVED EXACTLY ONE FIELD** — `harness_2`'s failure
-  band, `[0,1]` → `[0,0]`, with its `flake` field REMOVED because the flake is repaired rather than
-  quiet. **A BATCH THAT MOVES A FAILURE BAND DOWN IS THE ONLY KIND THAT SHOULD**, and DE's polarity
-  rule is why: a FALLING failure count is a notice, a rising one is an error. DV added `check_dv`
-  and moved nothing else; DU added `check_du` and moved `check_cz`. **`check_de` HAS NO ROW OF ITS
-  OWN, SO ITS OWN +4 FOR A NEW GATE IS REPORTED BY NOTHING** — **EB adds `check_eb` and moves it
-  325 → 329, and EA moved it 321 → 325, for exactly that reason**, and DX added no target so it did not move at all; and the battery's first pass after a new gate necessarily reads one `check_de`
-  failure — a target that ran with no row is UNWATCHED, which is that assertion working — so the row
-  is added and `check_de` re-run over the same log directory, which is what it is built for. **DR ADDED `check_dr` AND MOVED FIVE ROWS** — `test_batch_bt`, `check_co`,
-  and the three its own first battery NOTICED and it had not predicted (`bo`, `cb`, `ce`). **IT IS
+  battery raises it the same day. **IT IS
   `indent=1` AND MUST BE RE-DUMPED THAT WAY** — Python's default churns the whole file for a
   four-line change. **DO NOT RESTATE ITS NUMBERS HERE OR IN `CLAUDE.md`** — a second copy of a
   number is this project's oldest recurring defect, and **DG found five live copies of one figure
   and two disagreeing copies of another.** Per target it carries the expected check count (a number
   or a band), **the expected FAILURE count**, **how many readings the row rests on**, any known
   flake and its rate, and an optional verdict string. **Every red row carries the reason it is red.**
-- **DR MOVED `test_batch_cd`'S TABLE WITHOUT MOVING ITS COUNT** —
-  `PER_SPEC_DEPTH` is the ONE authoritative per-spec table and DR's two movements (Swordmaster
-  10 → 12, Cryomancer 12 → 11) cost one edit there and none in the suites that assert only
-  the FLOOR and the TOTAL, which is exactly what that centralisation is for. **ITS COUNT IS IN `baselines.json` AND IS NOT RESTATED HERE — THIS PROSE HAS BEEN WRONG TWICE**:
-  it read 72 from DG until DP corrected it to 85, and 85 was stale again by EA. **A number this
-  file restates is a second copy by construction.** It is the hygiene suite: the dead-symbol sweep, the
-  draft-target sweep and the pool measurement. **DG repaired its §2 anchor guard and added the
-  assertion that the guard RESOLVED**, which is the +1.
 - **`check_de.gd` IS THE DIFFER, IT SPAWNS NOTHING, AND IT HAS NO ROW OF ITS OWN** — it excludes
   itself from its own sweep, which is why its count moving 289 → 293 at DM (four assertions per
   target, and DM adds one gate) is reported by nothing. **DI's report made the same movement
@@ -3189,10 +2991,6 @@ repair.** Both are reported and neither was taken.
 - **The master.html stamp gate is duplicated across 14 suites** (ah, bb, bn, bo, bp, bq, br, bs,
   bt, bu, bv, bw, bx, ce), all on the self-comparing pattern — no bump is owed on a re-stamp.
 - **Run harness gate counts are in `baselines.json`** — EE's locator guard moved gate 2 from 165.
-  **Before it, EI, EF and EE each moved the stamp and nothing else in that document; EG moved it
-  and three prose blocks** — the draft column's cap and ledger bullets, the seven-slot-cap
-  paragraph and the take-one-and-bench-one paragraph. **EA moved the stamp and four prose sites; DZ
-  moved the stamp and nothing else.**
   - **THE FOURTEEN STAMP GATES COMPARE AGAINST THEIR OWN BATCH CODE, NOT AGAINST THE PREVIOUS
     STAMP, AND THAT IS WHY DY'S RECORDED SORTING DEBT IS NOT ONE.** Each reads
     `substr(_code_at + 7, 2)` and asserts `>=` its own code — every one of them `CE` or older.
@@ -3336,20 +3134,6 @@ those six extensions. **IT IS THE CENSUS SCRIPT'S DEFINITION NOW, NOT A DESCRIPT
 re-derivable rather than recorded. **ALL SIZES BELOW ARE KiB (1024 bytes)**, and all are measured on
 the CERTIFIED tree — before this file and `docs/reports/EF.md` were written, because both are inside
 the number.*
-- **THE FIGURE IS NOT RESTATED HERE ANY MORE, AND THAT IS THE POINT.** This line has carried a
-  file count and a byte total since EG and **it has been stale on arrival for three batches running**
-  (EP found it four batches out, EQ recorded its own as one file stale). **`claude_md_census.py`
-  prints both for any commit and reads `git ls-files`**, so a new file is outside the number until it
-  is staged — which is exactly why a copy written into this file is wrong the moment the batch that
-  wrote it adds its own report. **Run the census; do not quote a number from here.** **EV adds two
-  files (`check_ev.gd`, `docs/reports/EV.md`) and deletes none**, and the STAGED tree reads
-  **198 files / 9.0299 MiB** with both of them in it. **THE BYTE TOTAL IS MEASURED IMMEDIATELY
-  BEFORE THIS LINE IS WRITTEN AND THIS LINE IS INSIDE IT** — that is the same caveat EG's block
-  has always carried, and it is why the FILE COUNT is the durable half and the byte total is not.
-  **AND THIS LINE WAS STALE AGAIN ON ARRIVAL, WHICH IS FOUR BATCHES RUNNING**: it recorded EU's tree
-  at 194 files and the census reads **196 at that very commit** (`--rev HEAD`), so the recorded
-  figure was two files short before EV touched anything. **196 + EV's own two = 198**, which is the
-  whole of the delta and is the only way to read this row that stays true.
 - **LIVE SIZES ARE PRINTED, NOT CARRIED.** `check_fg` §1 and §2 print `docs/changelog.html` and `CLAUDE.md`
   against their bars, `check_fr` §5 prints `docs/instrument-rules.md`, `CLAUDE.md`, `docs/ways-of-working.md` and, since GR,
   `docs/combat-rules.md`,
@@ -3360,28 +3144,6 @@ the number.*
   direction a carried-forward number never moves on its own** — and then the threshold was crossed four
   batches before anyone noticed. **`check_fg` §1 prints the live figure and the headroom against the bar every
   battery. Read that.**
-- **THE SHARE OF THE SYNC IS RETIRED AS A TARGET (EE §1) AND IS NOT TRACKED.** `CLAUDE.md` is
-  measured in KiB against **the ceiling its own block states** (EE's 290, re-derived at FU, GY and HN) whose procedure
-  was a SPLIT, **and EF, FF and GR each took one**; since HN §1 the next move is a recon on the file's shape. **NO LIVE READING IS CARRIED HERE ANY MORE**: `check_fg` §2 prints the size, the bar
-  and the headroom every battery, and the two figures this bullet used to carry (EP's 217.17 and
-  EU's 235.11, "about twelve batches") are exactly the kind of number that was stale by the time
-  anybody read it. **The current reading is `check_fg` §2's print, and each batch report carries its own.**
-  **EP's BATCH ADDED NO RULE; THE DESIGNER'S RULINGS AFTERWARDS ADDED TWO, +3,529 B (3.45 KiB)** —
-  the rung-lever rule and the Scarred-rune refund rule, both of which settle with no implementation
-  and would have been lost from this file's next rewrite. **EK grew it by 3,713 B (3.63 KiB)**, which is one
-  standing reference: the three vocabularies, the tables and their one accessor each, the
-  inertness ruling, and the rule that a new ability or rune is owed a row in the same batch.
-  **`docs/instrument-rules.md` has no stated ceiling**; the arithmetic for one is in
-  `docs/reports/EF.md` §2 and taking it is a ruling. **It is therefore the one document of the
-  three with no bar for an instrument to hold it to** — `check_fr` §5 prints its size every battery
-  against nothing, because FG's rule says a bar worth stating is a bar something must read, and the
-  converse is that a file with no bar has nothing to read against.
-  - **THE SPLIT COST ABOUT A BATCH AND THREE QUARTERS OF GROWTH, TO BUY THIRTEEN, AND THE TWO HALVES DO NOT GROW AT THE SAME
-    RATE** — measured, not assumed; the bytes and the per-batch rates over DK→EE and DZ→EE are `docs/reports/EF.md` §2's (IM §0.7).
-    The recent rate is what five instrument batches in a row look like.
-  - **FOR THE RECORD, AND NOT AS A TARGET: the retired ratio has not been re-derived at EF and is not
-    worth re-deriving.** Its numerator is now spread over two files and its denominator gained both,
-    which is the third way the same measurement can move without anything about density changing.
 - **THE DESELECTION LIST FOR THE FILE PICKER. THE ONE FH ADDS IS `DoD-archive/`, BOTH FILES.**
   It is **1,680,660 B**, larger than every `check_*.gd` in the tree put together. **Deselect `pin-manifest.json`** too — it stays in the repo and
   `check_ed` goes on reading it off disk. Already standing and unchanged: the 47 suite files,
@@ -3395,14 +3157,6 @@ the number.*
   **a split ADDS a file to that list and never removes one from the sync.**
 - **The 47 suite files cannot be archived (they must be in the repo to run) but they CAN be
   deselected from the sync.**
-  **MEASURED AT FH RATHER THAN CARRIED: 53 `check_*.gd` files existed then, 46 of them in the
-  battery's GATES list, and the battery ran 46 suites out of 47 `test_*.gd` (44 of those
-  `test_batch_*`).** The seven `check_*.gd` files outside the GATES list are `check_ck_width`,
-  `check_ct_map`, `check_cu`, `check_cv`, `check_de`, `check_dn` and `check_map_screen`; `check_de` runs
-  as the battery's post-pass and `check_map_screen` as a scene target, so five are outside the battery. The line below is the
-  history of that count and **it read 42 when FH arrived** — **EM ADDED `check_em` AND THIS LINE STILL READ 41 WHEN EP ARRIVED**; before it
-  **EL ADDED `check_el`**, EK `check_ek`, EH `check_eh`, EG `check_eg`; EF and EE added none, ED added `check_ed`,
-  EC `check_ec`, EB `check_eb`, EA `check_ea`, and DZ and DY each added none.
 - **`scripts/` contains ZERO test suites.** All game code.
 
 ---
@@ -3424,6 +3178,7 @@ defect, and the way to establish that is to seed it, not to widen it.**
 **AND NO SWEEP OF THE SOURCE CAN CERTIFY THERE IS NO FIFTH** — twenty suites draw without seeding
 and are stable, and `at` itself calls no RNG at all. **`baselines.json`'s `flake` fields are the
 census; one row carries one, `test_rune_battle`'s, kept after its seeding.**
+**THE FIFTH SURFACED AT JB, AND IT WAS NOT THE BATCH'S.** `test_batch_bk` §9 took the one map its section opened with and wanted two adjacent three-wide columns, which about one map in a hundred lacks, at the same rate on JA's generator as on JB's, so JB's first acceptance read it red with nothing wrong. **It draws until it has the shape now, sixty-four at most, and it is not seeded**: the arm wants a shape, and a seed is a dice sequence the next generator change takes away.
 
 **THE RETIRED-WORD SWEEP CAUGHT DU TOO, AND IT WAS CAUGHT BEFORE THE BATTERY RATHER THAN BY IT.**
 `test_batch_bx` §4 keeps *beast* out of player-facing prose and §4b keeps *party* out; both read

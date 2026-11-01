@@ -1914,9 +1914,9 @@ decision and the STRUCTURE is what shipped.
   hardest rung dealt the mildest bargains), plus **FIXED ENCOUNTERS CARRY A MODIFIER**
   (`Run.arm_fixed_modifier`, armed at BOTH walk sites): the mini-boss and every boss, the nodes
   a route cannot duck. It is NOT a bargain — no offer, no choice, NO REWARD — **and it draws from
-  `Run.FIXED_MODIFIER_BAND`, the modifiers of severity 3–4 (eight until IX §3's scale, five at IX, seven at IY §4's grades, six since IZ's), never from severity 5 (IN §1; CONFIRMED AT IO §0.4, the
+  `Run.FIXED_MODIFIER_BAND`, the modifiers of severity 3–4 (eight until IX §3's scale, five at IX, seven at IY §4's grades, six at IZ's, seven since JB's), never from severity 5 (IN §1; CONFIRMED AT IO §0.4, the
   designer's)**: a modifier with no reward is not a bargain, so a severity 5 there would be pure difficulty with no
-  twist bought — AQ's rule arriving by a different door. **Which eight is the grades'**: a re-grade moves the band's
+  twist bought — a difficulty slider nothing prices. **Which eight is the grades'**: a re-grade moves the band's
   contents with it, and the batch that re-grades says what the fixed encounters draw after.
 · **A NODE THAT ARMS A FIXED MODIFIER OFFERS NO BARGAIN (IR §1a, the designer's).** The mini-boss is the one node that is
   both, and the two never met: in play `accept_offer` overwrote the armed modifier, and in the sim the bargain came first
@@ -1930,40 +1930,38 @@ decision and the STRUCTURE is what shipped.
   whole hand dead is not harsh, it is unplayable, and that is the line severity 5 does not cross**: one
   sentence, one system each. ~~**And the four bind ONE side** (the road leaning on the heroes) where the
   twenty bind both~~ — **OVERTURNED AT IO §0.2 BY THE DESIGNER, AND RECORDED SO IT IS NOT RE-PROPOSED.**
-· **NOTHING IN THE DECK BINDS ONE SIDE — AQ's RULE, FOR EVERY SEVERITY (IO §0.2, the designer's).** **A modifier
-  that binds one side is a difficulty slider, and the rung is already the difficulty slider: a bargain changes the
-  fight, it does not change the odds.** AQ named *no items this fight* as deliberately not authored; IN built it as
-  Famine, and IO removed it and Cruel Order — the two with no two-sided reading (enemies carry no pouch; *both sides
-  first* is incoherent) — **removed, not disabled**, their built shape and IN's measurements kept in
-  `docs/design-notes.md` so neither is re-invented or re-measured if a home for a one-sided rule appears. Wasting binds
-  both sides; the Hungering Dark bound both and is removed too, for the bullet below. **A new modifier is read against
-  this before it is authored: name the reading under which it binds both sides, or it is a difficulty slider.**
-· **TWO-SIDEDNESS DOES NOT MAKE A RULE EVEN (IP §0.2, the designer's — it qualifies AQ's rule, above).** **A RULE KEYED
-  ON A QUANTITY THE TWO SIDES DO NOT PRODUCE EQUALLY PAYS THE SIDE THAT PRODUCES MORE OF IT.** Damage dealt, statuses
-  laid, cards cast, healing received — each is lopsided, and a modifier keyed on one of them is a one-sided rule wearing
-  two-sided words. **The worked example is the Hungering Dark** — *whoever deals damage heals a share of it* — made
-  two-sided at IO to satisfy AQ: the heroes deal about six times what a warband does, so it fed them six to one and a
-  bargain under it ended healthier than one with no modifier at all. No figure fixes that shape, so it was **removed,
-  not disabled** (IP §1a), its shape and IO's measurements beside Famine's and Cruel Order's in `docs/design-notes.md`;
-  and the Cleric fed least of the four under it is the same lopsidedness inside the party. **So a new modifier names
-  the quantity it is keyed on and reads both sides' share of it before it is authored: binding both sides is the
-  floor, not the test.**
+· **A BARGAIN MAY NOT PAY THE PARTY. WHETHER THE WARBAND FEELS IT TOO IS A QUESTION OF FLAVOUR, NOT OF FAIRNESS (JB §0.1, the designer's;
+  it replaces AQ's promise, whose words are kept in `docs/design-notes.md`).** A card that binds the party alone and says so is a
+  difficulty slider with a measured price, which is an honest thing to deal. **A card that *reads* as binding both sides and binds one is
+  the same defect as a modifier named for the opposite of what it does**, so a modifier's words are read against what it does in the batch
+  that authors it, and **what the deck promises is that every modifier in it costs the party, and that the severity says how much.** The
+  reason is JA's census: the warband has no turn-start drip, no cooldown on any of its 50 abilities and two Rage bars against the party's
+  whole resource, so no re-cut of a card fixes that; only rebuilding the warband would, and that is not a bargain's to do. AQ named *no items
+  this fight* as deliberately not authored; IN built it as Famine, and IO removed it and Cruel Order (enemies carry no pouch; *both sides
+  first* is incoherent) — **removed, not disabled**, their built shape and IN's measurements kept in `docs/design-notes.md`, where a batch
+  reads them before it authors a rule either resembles (Ambushed, at JB, is Cruel Order's neighbour and was built fresh).
+· **A RULE COSTS THE PARTY WHEN IT ADDS TO THE WARBAND's PRESSURE ON THE PARTY's HEALTH, OR TAKES FROM WHAT THE PARTY ABSORBS IT WITH. THE
+  SHARE SETS HOW MUCH THE PARTY's OWN OUTPUT CLAWS BACK — NEVER THE SIGN (JB §0.2, the designer's; it replaces IP §0.2, whose sentence is
+  kept in `docs/design-notes.md`).** **The reason is structural: the measurement is one-way.** What is measured is the party's health at a
+  fight's end. The warband's output writes to it directly; the party's writes to it only through the fight ending sooner, and that offset is
+  weak, about a tenth of a point per percent of damage (Feverish 3.15 at 25%, the Thin Veil 4.75 at 50%). **Two rules recorded paying the party
+  did the reverse of this and are predicted by it**: the Hungering Dark — *whoever deals damage heals a share of it* — landed its
+  payout on the party's health, so a bargain under it ended healthier than one with no modifier at all, and no figure fixes that shape, so it
+  was **removed, not disabled** (IP §1a), its shape and IO's measurements beside Famine's and Cruel Order's in `docs/design-notes.md`; and Dull
+  Edge at its floor took more of the warband's crits out of the party than of the party's own out. **A third paid at JB, and this rule did not
+  predict it**: Inverted gave the party's slowest body, its healer, half as many turns again, and the warband's pressure on that arm was not read
+  (`docs/design-notes.md`).
 · **A NEW MODIFIER NAMES THE TWO SIDES' SHARES OF ITS QUANTITY BEFORE IT IS BUILT (JA §3, the designer's), READ OFF THE CENSUS OF
   RECORD, `docs/reports/JA-shares.tsv`** — every quantity a live modifier keys on and the doors' others, what each side produced, on
   the reference party and the talented incumbent; a quantity the table lacks is read the same way (JA's probe, the strike ledger, the
   status door and the resource doors) and added before the rule is. **Three rules cost a batch each to learn this — the Hungering
-  Dark, Tinderbox and Dull Edge — and the census makes it a measurement.** **AND A SHARE IS NOT A SIGN (JA §3's finding, the batch's,
-  stated as a prediction a later batch can break)**: on the instrument the scale is set on — the party's health at a fight's end —
-  every one of the twenty-one live modifiers costs the party, the two damage bonuses where the heroes deal six times the warband's
-  damage among them, and Rot's, Overgrown's and Brittle's penalties on what the warband holds more of; the two rules ever recorded
-  paying it were a payout landing on the party's health in proportion to what the party produces more of (the Dark) and a penalty
-  taking more of the warband's damage into the party than of the party's out (Dull Edge at its floor). **A share says whom a rule
-  touches more; what the touch does to the party's health decides the sign** — and a quantity the warband produces none of (the
+  Dark, Tinderbox and Dull Edge — and the census makes it a measurement.** **A share says whom a rule touches, which is the rule above's
+  subject, and it can price a rule before the code exists (JB §3 graded two such prices)**; a quantity the warband produces none of (the
   turn-start drip, cooldowns) binds the party alone however the words read.
 · **A CLASS PASSIVE OUTRANKS A MODIFIER WHERE THEY CONTRADICT (IO §0.5, the designer's).** A hero's lineage is what
   he is; a modifier is what this fight is. **The thing he is wins.** The worked example is the Tracker's opening turn,
-  kept before the first round under IN's Cruel Order (withdrawn at IO); the rule binds the next modifier that meets a
-  class passive.
+  kept before the first round under IN's Cruel Order (withdrawn at IO) and before Ambushed's run at JB, whose card names the Hunter for
+  it, and Outpaced's words say his opening turn stands for the same reason. The rule binds the next modifier that meets a class passive.
 · **A SEVERITY IS A RANK BY WHAT A MODIFIER COSTS A PARTY, NOT BY HOW IT READS (IO §2, the designer's).** The deck is
   sorted by the party's health at a bargain fight's end under each modifier forced on every bargain of a Ruin run (the
   sim's forced arm — immune to the bot taking the gamble), runs completed breaking a tie, and the sorted list is cut

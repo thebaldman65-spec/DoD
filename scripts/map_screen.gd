@@ -233,7 +233,7 @@ func _maybe_show_framing() -> bool:
 		"upgrades for gold. TRADE is the Peddler. ??? is something standing\n" +
 		"on the road, and you will not know what until you stand on it.\n\n" +
 		"Before every elite, and every mini-boss but Ruin's, THREE BARGAINS:\n" +
-		"a condition that binds both sides of the battle, and what clearing\n" +
+		"a condition on the coming battle, and what clearing\n" +
 		"it pays — one always the safer deal. Ruin's mini-boss fights unpaid.\n\n" +
 		"Winning any fight heals every hero %d%%. There is no resting.\n" % int(round(Run.SLOT_HEAL_PCT * 100)) +
 		"Death ends the run and takes everything, but every boss you fell\n" +

@@ -1,0 +1,12 @@
+axis	quantity	modifiers	grades	top	holds_4	ref_ratio	ref_class	inc_ratio	inc_class	candidate	modifier_quantities
+health	maximum health standing as a fight opens	overgrown:4,rot:4,wasting:5	4,4,5	5	yes	0.67	inside 2:1	0.59	inside 2:1	yes	overgrown: health standing as a fight opens 0.65/0.56; rot: maximum health standing as a fight opens 0.67/0.59; wasting: turns weighted by maximum health 1.20/1.07
+a barrier	barrier absorbed	porous:2	2	2	no	inf	heroes alone	inf	heroes alone	no	porous: barrier absorbed inf/inf
+healing	healing received	miasma:3,bloodless:5	3,5	5	no	7.93	heroes 2x+	15.36	heroes 2x+	no	miasma: healing received 7.93/15.36; bloodless: healing received 7.93/15.36
+resource	resource held as a fight opens	parched:2,warded:2,thinair:5	2,2,5	5	no	189.82	heroes 2x+	310.47	heroes 2x+	no	parched: resource held as a fight opens 189.82/310.47; warded: resource paid for casts 41.97/49.11; thinair: resource returned at turn start inf/inf
+damage	damage dealt (the damage door)	bloodletting:1,brittle:2,feverish:2,thin_veil:3	1,2,2,3	3	no	6.30	heroes 2x+	7.10	heroes 2x+	no	bloodletting: hits landed 1.89/2.89, Bleed built, produced inf/inf; brittle: armor's cut, held 0.31/0.57; feverish: damage dealt (the damage door) 6.30/7.10; thin_veil: damage dealt (the damage door) 6.30/7.10
+recoil	strike damage (the hero strike loop)	mirrorbound:5	5	5	no	3.42	heroes 2x+	4.67	heroes 2x+	no	mirrorbound: strike damage (the hero strike loop) 3.42/4.67
+Break	Break damage, produced	fractured:1,muffled:1,deadened:3	1,1,3	3	no	1.26	inside 2:1	4.26	heroes 2x+	yes	fractured: Breaks, produced 2.07/25.29, Break damage, produced 1.26/4.26; muffled: Break damage, produced 1.26/4.26; deadened: Breaks, produced 2.07/25.29
+status duration	status-turns, paying each side	fleeting:2	2	2	no	8.25	heroes 2x+	13.95	heroes 2x+	no	fleeting: status-turns, paying each side 8.25/13.95, status-turns Fleeting at 3 takes 9.56/13.46
+tempo	turns taken	hoarfrost:1,slick:1,ambushed:4	1,1,4	4	yes	1.88	inside 2:1	2.05	heroes 2x+	yes	hoarfrost: turns taken 1.88/2.05; slick: turns taken 1.88/2.05, casts 2.07/2.82; ambushed: turns taken 1.88/2.05
+the turn order	mean speed at a turn	frenzied:1,outpaced:2	1,2	2	no	1.08	inside 2:1	1.27	inside 2:1	yes	frenzied: mean speed at a turn 1.08/1.27; outpaced: mean speed at a turn 1.08/1.27
+the hand (the draft's cards)	casts not of slot 0	encumbered:1,long_silence:3	1,3	3	no	4.21	heroes 2x+	6.02	heroes 2x+	no	encumbered: cooldown turns started inf/inf; long_silence: casts not of slot 0 4.21/6.02

@@ -4,6 +4,65 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The four (Batch JB) — 2026-10-31
+
+**Why the one-sidedness promise went.** The sentence was *nothing in the deck binds one side*, with its rule beside it: *a modifier that binds
+one side is a difficulty slider, and the rung is already the difficulty slider: a bargain changes the fight, it does not change the odds*.
+JA's census showed the deck could not keep it: Thin Air and Encumbered charge the warband nothing, Parched and Warded nearly nothing, because
+the warband has no turn-start drip, no cooldown on any of its 50 abilities, and two Rage bars. No re-cut of those cards fixes that; only
+rebuilding the warband would. So the distinction it was reaching for is stated properly, and it was never about sidedness: **a bargain may
+not pay the party; whether the warband feels it too is a question of flavour, not of fairness.** A card that binds the party alone and says
+so is a difficulty slider with a measured price, which is an honest thing to deal. A card that reads as binding both sides and binds one is
+the same defect as a modifier named for the opposite of what it does. What the deck promises now is what it can keep: every modifier in it
+costs the party, and the severity says how much.
+
+**Why IP's sentence went.** It read *a rule keyed on a quantity the two sides do not produce equally pays the side that produces more of it*,
+and every one of the twenty-one measured against it: both damage bonuses sit on a quantity the heroes produce six times over and cost them, and
+three penalties on what the warband holds more of cost them too. The reason is that the measurement is one-way. What is read is the party's
+health at a fight's end; the warband's output writes to that directly, and the party's only through a shorter fight. So the rule that replaced
+it, in the same place, says what writes to that health: a rule costs the party when it adds to the warband's pressure on the party's health or
+takes from what the party absorbs it with, and the share sets how much the party's own output claws back, never the sign. The share stays a
+practice, because it says whom a rule touches.
+
+**Why Inverted left, and its shape and reading, so it is not re-invented.** *Speed is read backwards. The slower a body, the sooner and the
+more often it acts.* Built at the one speed door: `effective_speed` returned 100 × 100 over the speed, statuses included, so a mirror about the
+average speed moved the whole schedule where a factor moves nothing. The designer chose the whole of speed over the natural stat alone. Sixty
+fight-seeded runs on the reference four read **-1.08 ± 0.32: it paid the party.** The reference party's slowest body is its healer: the Cleric at
+85 went from 9.32 to 13.62 turns a bargain fight and healing rose from 206.9 to 329.1. **The rule above did not predict that**: the prediction
+applied it and said the card costs. The rule speaks to what adds to the warband's pressure and what takes from what the party absorbs; this added
+to what the party absorbs, and the warband's pressure on that arm was not read, so the arm neither bears the rule out nor breaks it. Its sign
+follows the party's speed order, so a party whose slowest hero is not its healer might read it the other way. It is removed, not disabled, and §2b's reserve took its place.
+
+**Why Outpaced is Cruel Order's rule and not its return.** The reserve is the rule IN built as Cruel Order and IO removed for being one-sided:
+in each span of one basic swing at the average speed, every enemy due acts before any hero due, each side in its own order, and speed still
+counts across spans. §0.1 removed the reason it left. The designer gave it a new name, because the card is the rule, not the history. It reads
+a 1 on the reference party and a 2 on the incumbent, and the grade takes the higher: the warband's turns do not rise, only their order inside a span.
+
+**Why Ambushed names the Hunter.** His passive reads *Always attacks first in every fight*, and a class passive outranks a modifier (IO §0.5).
+Every party holds a Hunter, so a card saying the warband strikes first would be false in every fight it was dealt. The designer kept the rule
+and changed the words: he takes his opening turn, and only then does the warband take its run. When the run ends the heroes' clocks move on by
+the time it took; otherwise every seed left behind would hand them their turns back in a burst and the card would cost nobody anything.
+
+**Why Ambushed is 8, and took five arms.** On the reference party eight read a 3, eleven a 5 and nine a 4. The curve bends because the party's healing takes up the first of the
+damage and then stops: it rose about 90 at each value. But a grade is the highest cost on any population, and on the incumbent nine read +15.07, a 5, which would have made it Ruin's alone and filled
+nothing at Warden. Eight reads +12.02 there, a 4 by 0.20. So the card is the brief's own figure, graded on the population that pays most. Ruin's warbands hit 1.3 times harder and its bosses
+can draw it, so that population is the one the grade should answer to.
+
+**Why Fractured is the meter and not a rate.** Break has no recovery rate: a Broken body loses one turn and its meter empties. The designer
+weighed a body that never acts again, which is the brief's words but a dead hand for a hero and a board that could only end by forfeit, and took
+the meter: the body gets its turn back, but stands one point short of full, so any Break damage Breaks it again. It reads a 1 on the reference
+party and a tie on the incumbent, whose heroes the warband almost never Breaks. The share of the meter a recovery empties is the handle, and it
+is already at its limit.
+
+**Why Porous reads a 2 where the census said a 4.** The price was what barriers absorbed, cut by three-fifths. But most barriers never hold all they
+could: at two-fifths of its face value a barrier still eats most of what it would have, and absorption fell 37%, not 60%, and the party healed some
+of the rest. The figure was read at 0.4 alone. A straight line from no card reaches about +3.5 at no barrier at all, and what the barrier lost cost
+reaches about +5.6: neither is a 4, whose floor is 6.88, and neither was driven.
+
+**What the census's two prices taught.** It priced Ambushed at eight turns at 10.2, and the reference party reads about 6: two errors, in opposite directions. Each of the
+run's turns landed about 18.9 at the door, almost twice the every-fight 10.47 the price used, and the party heals back half to two-thirds of it. It priced Porous at 7.9 and it reads 2.09. A share says what is
+produced; a cost is the margin left after what the party absorbs. The census names who a rule touches, and it does not price a rule.
+
 ## The shares, before the four (Batch JA) — 2026-10-30
 
 **Why Leaden.** IZ re-keyed the card from a factor on every speed to a flat amount added to every speed, and the amount that cost

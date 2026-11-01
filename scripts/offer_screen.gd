@@ -1,6 +1,6 @@
 # The offer screen (Batch AN §3, re-gated in AO §2): before every ELITE and
 # MINI-BOSS slot the player is shown three bargains and takes one. A bargain
-# is one MODIFIER (a condition binding BOTH parties for that battle) plus one
+# is one MODIFIER (a condition on that battle, its cost to the heroes its severity) plus one
 # REWARD, both visible before choosing. Plain fights and bosses walk straight
 # in — four bargains a zone is an event, ten was a toll booth.
 #
@@ -72,7 +72,7 @@ func _draw_screen() -> void:
 	var sub := Label.new()
 	sub.text = opener \
 		+ "  Choose the terms you will fight on —\n" \
-		+ "the condition binds BOTH sides, and the payment lands when they fall."
+		+ "the condition costs your heroes, and the payment lands when the warband falls."
 	sub.add_theme_font_size_override("font_size", 15)
 	sub.add_theme_color_override("font_color", Color(0.72, 0.68, 0.6))
 	sub.position = Vector2(0, 80)
