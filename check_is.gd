@@ -117,8 +117,8 @@ const NINE_COUNTS := {
 	"### TO WATCH IN PLAY": 9, "### FOUND AT HP AND NOT FIXED": 6,
 }
 
-# §6 — A BATCH NAMED AS ONE, AND WHAT THE GAME WAS.
-var BATCH_NAME := RegEx.create_from_string("(Batch\\s+([A-I][A-Z])\\b|\\b([A-I][A-Z])\\s*(?:&sect;|§)|\\b(?:since|until|at|from|before|after|by|of|in)\\s+([A-I][A-Z])(?:\\b(?![\\w-])))")
+# §6 — A BATCH NAMED AS ONE, AND WHAT THE GAME WAS. Every letter, not the letters so far: `[A-I]` went blind at JA, the first J code.
+var BATCH_NAME := RegEx.create_from_string("(Batch\\s+([A-Z][A-Z])\\b|\\b([A-Z][A-Z])\\s*(?:&sect;|§)|\\b(?:since|until|at|from|before|after|by|of|in)\\s+([A-Z][A-Z])(?:\\b(?![\\w-])))")
 var WAS_NOW := RegEx.create_from_string("(?i)\\bwas\\s+[^.;<]{0,25}?\\bnow\\b")
 const NOT_A_BATCH := ["HP", "BD"]   # health points and Break damage, after *of* or *from*: game terms, not batches
 const MOVED_HEADING := "### Moved from master.html"
