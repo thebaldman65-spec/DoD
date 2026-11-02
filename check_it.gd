@@ -207,7 +207,7 @@ const STRIKE := [
 		"> resumed run is placed.**\n\n- **THE STEP STAYS AT THE CL"],
 	[45, "HIST", [["docs/reports/GH.md", "NO SAVE VERSION"]],
 		"- **IT MOVED NO SAVE VERSION** (VERSIONS, under TALENTS ARE META PROGR",
-		"lays the fight they opened.\n\n## STANDING RULE — BREAK IS"],
+		"lays the fight they opened.\n\n## STANDING RULE — A FALL S"],
 	[46, "HIST", [["docs/reports/FD.md", "Pyrewake"], ["docs/reports/FD.md", "54 of 227"]],
 		"- **54 OF 227 ROWS MOVED, AND THE POPULATION WAS DERIVED RATHER THAN T",
 		"e word is on the card for.\n\n- **30 ROWS LOST A SECONDARY"],

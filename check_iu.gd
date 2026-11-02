@@ -556,10 +556,18 @@ func _s6_the_pin_floor() -> void:
 
 
 # ── §7 — THE BARE PROBE ───────────────────────────────────────────────────────
-# THE FOLDERS NO SPENT PATTERN HOLDS, EACH WITH HOW IT CAME: the two that predate the driver's probe. A new one reds.
+# THE FOLDERS NO SPENT PATTERN HOLDS, EACH WITH HOW IT CAME: the two that predate the driver's probe, and the eight JD's short lane names made. A new one reds.
 const KNOWN_STRAYS := {
 	"IT const probe": "IT §6 — a three-file probe run with `--path`, around lane.sh; carried by name in IT's clearing command",
 	"[unnamed project]": "a project with no config/name, made 2026-07-02, before the batches counted their folders",
+	"IA pre1": "JD §6 — a lane made under a report's short name, so its user folder lost the project prefix and fell outside the patterns; cleared by name in JD's report",
+	"IC work": "JD §6 — a lane made under a report's short name, so its user folder lost the project prefix and fell outside the patterns; cleared by name in JD's report",
+	"IE probeA1": "JD §6 — a lane made under a report's short name, so its user folder lost the project prefix and fell outside the patterns; cleared by name in JD's report",
+	"IE probeA1 2": "JD §6 — a lane made under a report's short name, so its user folder lost the project prefix and fell outside the patterns; cleared by name in JD's report",
+	"IE probeA2": "JD §6 — a lane made under a report's short name, so its user folder lost the project prefix and fell outside the patterns; cleared by name in JD's report",
+	"IE probeA3": "JD §6 — a lane made under a report's short name, so its user folder lost the project prefix and fell outside the patterns; cleared by name in JD's report",
+	"IG p1": "JD §6 — a lane made under a report's short name, so its user folder lost the project prefix and fell outside the patterns; cleared by name in JD's report",
+	"IG p2": "JD §6 — a lane made under a report's short name, so its user folder lost the project prefix and fell outside the patterns; cleared by name in JD's report",
 }
 
 

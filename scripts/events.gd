@@ -43,13 +43,14 @@
 #   relic_grant   {}                       random inactive relic joins the
 #                                          run (slots full = 40g instead)
 #
-# TARGET SELECTORS: "party" (default) | "random" | "lowest_hp"
+# TARGET SELECTORS: "party" (default) | "random" | "lowest_hp" | "fell"
 #   | "class:<warrior|mage|cleric|hunter>" — living members only, except
-#   revive_pct which exists for the dead.
+#   revive_pct which exists for the dead. "fell" is a hero down when the
+#   last won fight ended (`BattleUnit.FELL_LAST_FIGHT`).
 #
 # REQUIREMENT CONDITIONS (event-level gates selection, choice-level
 # greys the button): min_gold, max_gold, zone_slot [slots], has_item
-# {id}, spec_in_party [spec ids], fallen_hero (bool).
+# {id}, spec_in_party [spec ids], fallen_hero (bool), fell_last_fight (bool).
 class_name Events
 
 const DATA_PATH := "res://data/events.json"
@@ -203,6 +204,16 @@ static func failed_reason(run: Node, req: Dictionary) -> String:
 		if bool(req["fallen_hero"]) != any_fallen:
 			return "Needs a fallen hero." if bool(req["fallen_hero"]) \
 				else "Needs every hero standing."
+	# BATCH JD §4 — THE CAIRN'S REQUIREMENT (JD §0.2, the designer's): no hero stands at 0 between fights and none ever
+	# will, so `fallen_hero` above can never be met; this reads who the last won fight left down.
+	if req.has("fell_last_fight"):
+		var any_fell := false
+		for member in run.get("party"):
+			if member.get(BattleUnit.FELL_LAST_FIGHT, false):
+				any_fell = true
+		if bool(req["fell_last_fight"]) != any_fell:
+			return "Needs a hero left down by the last fight." if bool(req["fell_last_fight"]) \
+				else "Needs every hero standing when the last fight ended."
 	return ""
 
 
@@ -444,6 +455,8 @@ static func _targets(run: Node, fx: Dictionary) -> Array:
 	var sel := String(fx.get("target", "party"))
 	if sel == "party":
 		return living
+	if sel == "fell":
+		return living.filter(func(m): return m.get(BattleUnit.FELL_LAST_FIGHT, false))
 	if sel == "random":
 		return [living.pick_random()]
 	if sel == "lowest_hp":

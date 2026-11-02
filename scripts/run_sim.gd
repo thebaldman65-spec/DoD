@@ -839,7 +839,8 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 	# rune before the draft was rolled (DV27), so the draft was drawn with an engine the player would not
 	# hold yet, and it never answered the bargain's cache at all (DV26).
 	# §6: clearing ANY slot heals 15%, with the relic stacking on top.
-	run.heal_party(run.victory_heal_pct())
+	# BATCH JD §2: and it passes by a hero still down at the end of this fight.
+	run.clearing_heal()
 	var v_mana: float = run.relic_add("victory_mana_pct")
 	if v_mana > 0.0:
 		run.restore_mana(v_mana)
@@ -879,8 +880,8 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 		# never hold a card the real flow would not have shown it.
 		#
 		# The health gate is the same one battle.gd applies and is likewise never
-		# false in practice — `heal_party` runs below and the victory sync has
-		# already returned the fallen — but a walk that silently depended on that
+		# false in practice — the victory sync has already returned the fallen
+		# — but a walk that silently depended on that
 		# would be a walk that breaks the day it stops being true.
 		#
 		# BATCH IV §1a — ROLLED HERE, ANSWERED ON THE MAP (`_award_draft`, below): every living hero's

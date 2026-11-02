@@ -17,6 +17,79 @@ heading stands in both files.
 
 ---
 
+## ARCHIVED AT JD — 2026-11-01, FROM `docs/state.md` AS IT LEFT IT (`8a2a41a`)
+
+*JC's two rulings, answered in JD's brief, and every item the fall's ruling or its build closed. The rest of each block stays in `docs/state.md`.*
+
+
+### ~~JC's RULINGS OWED~~ — **BOTH ANSWERED IN JD's BRIEF (1: the fall does not last, JD §0.1; 2: the clause stands as JC wrote it, JD §0.3)**, *its heading was: **TWO; THE FALLEN HERO, AND HOW FAR THE STANDING WORD REACHES***
+
+Full working: `docs/reports/JC.md`, NEEDS A RULING.
+
+1. **WHETHER A FALLEN HERO STAYS DOWN BETWEEN FIGHTS (JC §4), AND THE THREE TABLES IT WANTS.** Nothing is built or recommended; the ruling is the designer's and it prices seven things (`docs/reports/JC-fallen-seven.tsv`). **What happens today**: a hero who falls in a won fight walks out at 35%, the fifth `sync_victory_state` floors him at and the 15% the clearing heal adds after it, more under a relic; the line reads his health and not `dead`, so a hero at 1 and a hero at 0 leave alike (`docs/reports/JC-fallen-doors.tsv`, 31 doors). **How often** (`docs/reports/JC-fallen-rate.tsv`; the sim's bot, no modifier stamped, 60 runs a row, so a floor on a run that takes bargains): the reference four fall 0.023 ± 0.009 a fight at Wanderer, 40 falls in 1,712 fights, 16 of 60 runs holding one and 57 finished; 0.31 ± 0.02 at Warden, 8 finished; 0.55 ± 0.03 at Ruin, 1 finished. The talented incumbent falls 0 of 1,671 at Wanderer, 10 of 1,676 at Warden and 17 of 1,660 at Ruin, 0.010 ± 0.004, 59 finished. **What the ruling would bite is a won fight ending with a hero down**: 0.37 a run on the reference at Wanderer and about 1.6 at Warden and Ruin, 0.18 on the incumbent at Ruin; every hero who fell in a won fight was still down at its end but for 3 of 121 at Warden. A zone boss reads highest (0.92 and 1.53 a fight, untalented, at Warden and Ruin), the end boss felled no hero in 245 fights, and the Mage falls most, 36% to 50% of the falls in won fights. **The one real run**: 2 falls in 10 fights, both in the zone boss's fight, both standing at its end; the bot raises by Resurrection alone and never with a potion. **What the figure cannot see**: it counts how often today's rule is reached, a gross, and a fall that lasted would send the party into the next fight short, so it cannot price itself. **Beyond the seven, what no record names**: `docs/reports/JC.md` §4.
+2. **HOW FAR THE STANDING WORD REACHES (JC §1).** Taken: it settles who decides in flight, and it does not widen what a batch may author, so a batch still authors no rune and applies no fold that moves a magnitude. **The alternative**: it overrides both rules. **Reversing it** deletes one sub-bullet of `CLAUDE.md`'s batch-conduct rules and reads the two rules against it.
+
+### FOUND AT JC AND NOT FIXED — ITS CLOSED ITEMS (archived at JD; the block stays in `docs/state.md`)
+
+- **A HERO WHO FALLS IN A WON FIGHT WALKS OUT AT 35%, NOT 20%** (JC §4): `sync_victory_state` floors him at a fifth and `heal_party` runs after it and reads `hp > 0`, so the clearing heal reaches him: 35%, and every relic on `victory_heal_pct` adds to it (the Chalice of Dawn 10, Martyr's Knucklebone 15, the Cracked Hourglass 5). `master.html`'s *at 20% max HP* and this file's *the fifth* name the floor alone. Left for the ruling, which rewrites the sentence.
+- **THE RETURN DOES NOT READ `dead`** (JC §4): a hero at 1 health and a hero at 0 leave a won fight alike, so past the fight's own end a fall costs nothing a near-fall does not.
+- **THE CENSUS's *KILLS* ROW COUNTS COMPANIONS** (JC §4): `is_hero` is true of a companion, so JA's 98 and 233 are deaths on the hero side, not heroes. Read as heroes they gave 0.175 a fight where heroes fall 0.023, and my prediction was built on that. The row's words, *the other side's deaths*, are true.
+- **THE DIVISOR IS A FIT, NOT A MECHANISM** (JC §0.3): the gross less the arm's own healing reads Ambushed better than any divisor (6.71, 10.01 and 14.21 against 6.67, 9.03 and 15.47) and Porous worse (3.86 against 2.09), and it wants the arm the price was to replace. Porous's arm healed back a fifth of what it added, and something else took the rest; not driven.
+- **`_die()` HAS NO GUARD AGAINST A SECOND DEATH** (JC §4): two fights at Warden booked a hero twice with no raise between, so the death callback ran twice on one body. The rate table drops them; nothing was seen to go wrong beyond the count, and it was not driven.
+- **THE GRADES AND THE COMPLETION FIGURES REST ON THE RETURN** (JC §4): every reading the deck is graded on was taken with heroes returned after every won fight, the sim's victory and the game's through one `sync_victory_state`. A fall that lasted would re-read the closed deck.
+
+### THE CREST POOL — ITS CLOSED HALF (archived at JD; the block stays in `docs/state.md`)
+
+- **WHAT NOW PRICES THEM: WHETHER A FALLEN HERO STAYS DOWN BETWEEN FIGHTS** (FOUND AT HO). Brought back at the fifth every
+  victory writes, the three pay for a few turns of a fight; if a fall lasted they would pay for whole fights. **That item is no
+  longer only a difficulty ruling — it sets the value of three of four crest runes, and it is owed before any of them is re-cut.**
+  **It decides four other things, each a different thing (IL's brief §0.5, corrected at IL: the Cairn is an event, not a relic)**:
+  - **The Cairn of the Fallen — an EVENT that cannot be drawn at all.** Its `fallen_hero` requirement is a member at 0 health
+    between fights, which nothing holds (FOUND AT HO). If a fall persists the requirement becomes reachable and the event lives
+    with no change. Events draw by weight and its weight of 8 is true; no RELIC carries a weight (IK's premise 27 stands).
+  - **Cairnmoss Poultice — a relic, suspended since IK §6.** Its whole effect was the retired rest node's; its new effect rides
+    the post-fight recovery at the number that ruling sets.
+  - **Martyr's Knucklebone — a relic that works, one clause short.** It kept its victory heal and lost the dead rest clause
+    (`rest_heal_add`); whether the lost clause is replaced, and with what, is the ruling's. It is the mildest of the three and may
+    need nothing. `master.html`'s hook paragraph names it alone, and is right to: the other relic is suspended and the Cairn is an
+    event the document does not list.
+  - **The map's Revive Potion**, which has nobody to raise on the map (FOUND AT HO).
+
+### FOUND AT HO AND NOT FIXED — ITS CLOSED ITEM (archived at JD; the block stays in `docs/state.md`)
+
+- **THE EVENT *THE CAIRN OF THE FALLEN* CANNOT BE DRAWN, AND A REVIVE POTION HAS NOBODY TO RAISE ON THE MAP — BOTH WAIT ON
+  A RULING: WHETHER A FALLEN HERO STAYS DOWN BETWEEN FIGHTS (still open, not decided at HP, HP §7).** It is a difficulty
+  ruling — **and since IA §0.2 (the designer's) it prices three of the four crest runes**, which pay for a few turns while a fall
+  lasts a fight and would pay for whole fights if a fall lasted longer: it is owed before any of them is re-cut (THE CREST POOL,
+  above). HP's ruling 1 had decoupled it from the runes' authoring. `fallen_cairn` (an event's weight 8, true — IL §0.5)
+  requires a member at 0 health and raises the fallen at 35%; **Cairnmoss Poultice waits on the same ruling since IK §6** (suspended
+  from every draw, its re-cut riding the post-fight recovery); the one line that writes a member's health to 0 is the
+  fight's own banking (`battle._bank_party_losses`), which stops once a fight is decided, and every victory then writes
+  at least a fifth. **0 of 3,957 events drawn across HO's measurement runs**, where each of the other nineteen was drawn
+  at least 18 times. `map_screen._use_item` offers a Revive Potion *the fallen* and can only answer *"No one to use the
+  Revive Potion on."* Since IJ §2 the glossary no longer says a Revive Potion works on the map.
+
+### FOUND AT FW AND NOT FIXED — ITS CLOSED CLAUSE (archived at JD, the item as it stood; what is still owed stays in `docs/state.md`)
+
+- **`relics.gd`'s header says every hook is read at exactly one site** — `gold_find_mult` is read at two,
+  `shop_discount` at four, and **`rest_heal_add` at none**, so Cairnmoss Poultice pays nothing and
+  neither does Martyr's Knucklebone's *"rest nodes restore 10% more"* (GB). **`docs/master.html`'s copy of the claim was
+  corrected at GE §2**, where six hooks read at more than one site were counted; this header still owes its own. **IJ §2
+  dropped the rest clause from Martyr's Knucklebone's words**; **Cairnmoss Poultice is suspended from every draw since IK §6**
+  (`Relics.is_suspended`), its entry and the player's unlock kept, until its re-cut ships.
+
+### TWO SMALL DOC REPAIRS FR FOUND AND DID NOT TAKE — ITS CLOSED ITEM (archived at JD; the block stays in `docs/state.md`)
+
+- **`master.html` reads *"clearing any encounter heals **the every hero** 15% of max HP"*.**
+  One word. It is outside a NUMBER sweep's scope, and by the time it was noticed the tree was
+  frozen for the battery — a post-run edit would have made the shipped tree differ from the
+  verified one.
+
+### THE PLAYTEST'S OTHER FINDINGS — ITS CLOSED CLAUSE (archived at JD; the block stays in `docs/state.md`)
+
+- *The roadmap's clause until JD*: whether a fallen hero stays down between fights (it prices three crest runes, two relics, an event and the map's Revive Potion — IL §0.5).
+
+
 ## ARCHIVED AT JC — 2026-11-01, FROM `docs/state.md` AS IT LEFT IT (`81fe49e`)
 
 **What came here**: JB's three rulings, all answered in JC's brief; FOUND AT JB's five closed items (the fixed band's Ambushed, the batch-code arm, the brief's premises, Outpaced's words, the five seats); and the roadmap's JB item. Each word for word, under the heading it stood under.

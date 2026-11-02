@@ -143,7 +143,7 @@
   "term": "Fallen Heroes",
   "category": "combat",
   "short": "The dead sit the fight out - but victory brings everyone back.",
-  "long": "A hero at 0 HP falls: they lose every status and take no turns until raised, though a Burn or Poison they laid goes on burning. Mid-battle, a Revive Potion brings them back at 50% HP and the Cleric's Resurrection at 25% (at full health when Empowered). If the heroes WIN the battle, the Untouched refuse to stay down: every hero - fallen or merely battered - leaves the fight with at least 20% of their max HP. Only losing everyone ends the run.",
+  "long": "A hero at 0 HP falls: they lose every status and take no turns until raised, though a Burn or Poison they laid goes on burning. Mid-battle, a Revive Potion brings them back at 50% HP and the Cleric's Resurrection at 25% (at full health when Empowered). If the heroes WIN the battle, the Untouched refuse to stay down: every hero - fallen or merely battered - leaves the fight with at least {=Unit.RETURN_FLOOR_PCT*100}% of their max HP. A hero still down when the fight ends leaves at that floor, and the heal a victory pays passes that hero by, unless Cairnmoss Poultice is carried. Only losing everyone ends the run.",
   "see_also": [
    "wipe",
    "consumables"

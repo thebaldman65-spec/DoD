@@ -18,7 +18,7 @@
 #   §5   A STRIKE, NAMED ONCE: the glossary's entry, the eight texts and the ward's chip saying it through the door
 #        each surface reads, and the asymmetries they now name read off the fight — Profligate's price on a Killing
 #        Frost it pays nothing, a ward that lessens a hero's strike and no companion's blow.
-#   §6   CAIRNMOSS POULTICE CANNOT BE DRAWN, AND THE BOMB's LINE: suspended at the boss's unlock, an event's grant,
+#   §6   CAIRNMOSS POULTICE IS DRAWN AGAIN (JD), AND THE BOMB's LINE: back at the boss's unlock, an event's grant,
 #        the draft and the shelf, kept everywhere else; the bomb's sentence in the items entry, and true in a fight.
 #   §9   The player's files are as this gate found them.
 #
@@ -895,7 +895,7 @@ func _s5_strike() -> void:
 			reads, stamps, bsrc.count("type_dmg_bonus.get(")])
 
 
-# ── §6 — CAIRNMOSS POULTICE CANNOT BE DRAWN, AND THE BOMB's LINE ────────────
+# ── §6 — CAIRNMOSS POULTICE IS DRAWN AGAIN, AND THE BOMB's LINE ────────────
 
 func _fresh_relics(ids: Array) -> void:
 	Relics.save_path = SCRATCH_RELICS
@@ -920,10 +920,12 @@ func _all(n: Node, cls: String) -> Array:
 
 
 func _s6_cairnmoss_and_the_bomb() -> void:
-	print("\n§6 — Cairnmoss Poultice cannot be drawn; the bomb's line")
+	print("\n§6 — Cairnmoss Poultice is drawn again; the bomb's line")
 	var suspended: Array = Relics.POOL.keys().filter(func(id): return Relics.is_suspended(String(id)))
 	print("    suspended: %s of %d relics" % [str(suspended), Relics.POOL.size()])
-	ok(suspended.has("cairnmoss"), "§6: Cairnmoss Poultice is not suspended")
+	# BATCH JD §4 — ITS RE-CUT SHIPPED, SO EVERY ARM BELOW IS THE SAME DOOR READ THE OTHER WAY: this section held it out of each draw, and now
+	# holds it in each. `is_suspended` stands with nothing in it.
+	ok(not suspended.has("cairnmoss"), "§6: Cairnmoss Poultice is suspended")
 	for sid in suspended:
 		var why := String(Relics.POOL[sid].get("suspended", ""))
 		ok(why.contains("pays nothing") and why.contains("returns when"), "§6: %s's suspension does not say what is lost and what brings it back" % sid)
@@ -931,20 +933,20 @@ func _s6_cairnmoss_and_the_bomb() -> void:
 	# KEPT: the entry resolves, and an unlock of it survives a load.
 	ok(Relics.POOL.has("cairnmoss") and Relics.desc_of("cairnmoss") != "", "§6: Cairnmoss's entry no longer resolves")
 	_fresh_relics(["cairnmoss", "coin"])
-	ok(Relics.unlocked.has("cairnmoss"), "§6: a load dropped an unlock of the suspended relic")
-	# THE BOSS's UNLOCK: never it — and with every other relic owned, nothing.
+	ok(Relics.unlocked.has("cairnmoss"), "§6: a load dropped an unlock of the relic")
+	# THE BOSS's UNLOCK: it, among the rest — and with every other relic owned, it.
 	var drew := 0
 	for _i in 300:
 		_fresh_relics([])
 		var got: Dictionary = Relics.unlock_random()
 		if String(got.get("id", "")) == "cairnmoss":
 			drew += 1
-	ok(drew == 0, "§6: the boss's unlock drew Cairnmoss %d times in 300" % drew)
+	ok(drew > 0, "§6: the boss's unlock drew Cairnmoss %d times in 300" % drew)
 	var all_but: Array = Relics.POOL.keys().filter(func(id): return id != "cairnmoss")
 	_fresh_relics(all_but)
-	ok(Relics.unlock_random().is_empty() and not Relics.unlocked.has("cairnmoss"),
-		"§6: with every other relic owned the unlock handed out the suspended one")
-	# AN EVENT's GRANT: never it — and with every other common held, gold instead.
+	ok(String(Relics.unlock_random().get("id", "")) == "cairnmoss" and Relics.unlocked.has("cairnmoss"),
+		"§6: with every other relic owned the unlock did not hand it out")
+	# AN EVENT's GRANT: it, among the rest — and with every other common held, it.
 	var active_was: Array = (_run.get("active_relics") as Array).duplicate()
 	var gold_was := int(_run.get("gold"))
 	var granted := 0
@@ -953,14 +955,14 @@ func _s6_cairnmoss_and_the_bomb() -> void:
 		Events.apply(_run, {"effect": "relic_grant", "tier": "common"})
 		if (_run.get("active_relics") as Array).has("cairnmoss"):
 			granted += 1
-	ok(granted == 0, "§6: an event granted Cairnmoss %d times in 300" % granted)
+	ok(granted > 0, "§6: an event granted Cairnmoss %d times in 300" % granted)
 	var commons: Array = Relics.POOL.keys().filter(func(id): return String(Relics.POOL[id].get("tier", "common")) == "common" and id != "cairnmoss")
 	_run.set("active_relics", commons.slice(0, 2))
 	var last := Events.apply(_run, {"effect": "relic_grant", "tier": "common"})
-	ok(last.begins_with("RELIC: ") and not last.contains("Cairnmoss"), "§6: a common grant with room did not grant a live common ('%s')" % last)
+	ok(last.begins_with("RELIC: "), "§6: a common grant with room did not grant a live common ('%s')" % last)
 	_run.set("active_relics", active_was)
 	_run.set("gold", gold_was)
-	# THE DRAFT AND THE SHELF: unlocked, it draws no button and no panel; the relic beside it does.
+	# THE DRAFT AND THE SHELF: unlocked, it draws its button and its panel, as the relic beside it does.
 	_profile_path = Profile.save_path
 	Profile.save_path = SCRATCH_PROFILE
 	Profile.loaded = false
@@ -970,12 +972,12 @@ func _s6_cairnmoss_and_the_bomb() -> void:
 	change_scene_to_file("res://scenes/draft.tscn")
 	await Gate.frames(self, 6)
 	var picker: Array = _all(current_scene, "Button").map(func(b): return String((b as Button).text))
-	ok(picker.any(func(t): return String(t).contains("Gravewrought Coin")) and not picker.any(func(t): return String(t).contains("Cairnmoss")),
-		"§6: the draft's assignment draws Cairnmoss, or not the coin beside it: %s" % str(picker.filter(func(t): return String(t).contains("Coin") or String(t).contains("Cairnmoss"))))
+	ok(picker.any(func(t): return String(t).contains("Gravewrought Coin")) and picker.any(func(t): return String(t).contains("Cairnmoss")),
+		"§6: the draft's assignment does not draw Cairnmoss and the coin beside it: %s" % str(picker.filter(func(t): return String(t).contains("Coin") or String(t).contains("Cairnmoss"))))
 	change_scene_to_file("res://scenes/relics_screen.tscn")
 	await Gate.frames(self, 6)
 	var shelf: Array = _all(current_scene, "Label").map(func(l): return String((l as Label).text))
-	ok(shelf.any(func(t): return String(t).begins_with("Gravewrought Coin")) and not shelf.any(func(t): return String(t).contains("Cairnmoss")),
+	ok(shelf.any(func(t): return String(t).begins_with("Gravewrought Coin")) and shelf.any(func(t): return String(t).contains("Cairnmoss")),
 		"§6: the shelf shows the coin beside it: %s; it shows Cairnmoss: %s" % [
 			shelf.any(func(t): return String(t).begins_with("Gravewrought Coin")), shelf.any(func(t): return String(t).contains("Cairnmoss"))])
 	if current_scene != null:

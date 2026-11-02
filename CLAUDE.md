@@ -316,6 +316,9 @@ new block written here):
   · **IT SETTLES WHO DECIDES IN FLIGHT, NOT WHAT A BATCH MAY AUTHOR**: a batch still authors no rune, and still applies no fold that moves a
     magnitude on its own judgment; what those two rules keep from a batch it reports, as they say. *(This clause is JC's reading, not the
     designer's words, and JC's NEEDS A RULING asks.)*
+  · **THE WORD REMOVES THE QUESTION, NOT THE RULING (JD §0.3, the designer's, who kept the clause above as it was written).** A premise breaking mid-batch is a **correctness** question and
+    belongs to whoever is holding the code. A rune's text or a magnitude is a **taste** question and belongs to the designer. The word does not move the second kind; it only stops the first
+    kind from waiting. *Break has no rate* forced a mechanic to be invented mid-batch, and it was, and it was right, which is correctness; authoring Fractured from nothing would not have been.
 - **A FOLD, A RENAME OR A REFACTOR THAT CHANGES A MAGNITUDE IS A DESIGN CHANGE. IT GOES TO THE
   DESIGNER AS A REPORT AND IS NEVER APPLIED ON THE BATCH'S OWN JUDGMENT (STANDING, SET AT BATCH
   CQ §6).** The rule exists because of CN §3: removing the timing bar from 113 abilities orphaned
@@ -1849,9 +1852,9 @@ merged.** A Berserker wears the Warrior's cells.
 **THIS IS DERIVED FROM THE CODE, NOT ASSERTED.** `relics.gd`'s own header names every hook and
 where each is read, and the sites are: `new_run` (the opening purse and pouch), **battle
 SPAWN** (base stats, written before turn one), the victory screen, `award_gold`, shop
-prices, elite spoils (a rest-node hook has had no reader since AN removed rest nodes). **NOT ONE RELIC HOOK IS READ WHILE A TURN IS RESOLVING** — swept over every
+prices, elite spoils, and the clearing heal for a hero left down. **NOT ONE RELIC HOOK IS READ WHILE A TURN IS RESOLVING** — swept over every
 read site of `relic_add` / `relic_dict`, which land in `_spawn_units`, `_check_end`,
-`new_run`, `award_gold`, `claim_reward`, `victory_heal_pct`, the price functions (`draft_price`,
+`new_run`, `award_gold`, `claim_reward`, `victory_heal_pct`, `clearing_heal`, `clearing_heal_note`, the price functions (`draft_price`,
 `blacksmith_price`, `rune_price`, and the shop's and RunSim's `_price`) and RunSim's `on_battle_end`. And the header's own
 *"NEEDS PLUMBING (declared out for now)"* list — on-kill and per-turn procs, revive-on-death,
 enemy-side auras, DoT-tick and Break-damage multipliers — **is precisely the in-combat category.**
@@ -1895,7 +1898,7 @@ later batch to infer.
 **WHAT THIS RULE DOES NOT DECIDE.** It says what each layer is FOR; it does not say a relic must
 stay party-wide. **THE PER-HERO RULING (a relic assigned to one hero at pickup) STANDS AND IS
 UNBUILT** — see the relic block in `docs/state.md`, and note that four hooks (`victory_heal_pct`,
-`victory_mana_pct`, `rest_heal_add` (which nothing reads), `resource_floor_pct`) need a ruling before any of it, and that
+`victory_mana_pct`, `fallen_recover`, `resource_floor_pct`) need a ruling before any of it, and that
 the draft assigns relics before there are specs to assign them to.
 
 ## ~~WHAT MAKES A ROW-8 NODE, AND BH'S FIFTEEN POINTS~~ — BM §2, retired with the lanes at FX and BH §2 deleted at GC; the record is `docs/reports/FX.md` §3 and `docs/reports/GC.md` §1 (BM's own rule: the changelog archive's BM entry)
@@ -1994,6 +1997,9 @@ decision and the STRUCTURE is what shipped.
   Corrected for both, Ambushed at 8 grossed 18.4 points and read 6.67, at 9, 20.7 and 9.03, and Porous at 0.4, 4.8 and 2.09: 2.76, 2.29 and
   2.30. **Three readings behind one divisor, so it is written to be tested, not believed**, and it has an edge already: at 11 Ambushed read
   15.47 on 25.3, 1.64, because past what the healing can answer nothing is left to divide by.
+  **THE DIVISOR IS A PRIOR FOR A VALUE THAT HAS NOT BEEN BUILT, NOT A RULE, AND IT CARRIES ITS OWN SPREAD: ×1.5 TO ×3.8 RAW, ×2.3 TO ×2.8 ONCE THE GROSS IS READ ON THE RIGHT POPULATION, AND IT
+  BREAKS WHERE THE HEALING SATURATES (JD §0.4, the designer's, correcting the sentence above).** The gross less the arm's own healing is the better account of Ambushed, within 0.04 at the
+  value that shipped, and Porous reads worse on it, 3.86 against 2.09. It is a post-hoc account: it needs the arm, which is the thing the price was to replace.
 · **A CLASS PASSIVE OUTRANKS A MODIFIER WHERE THEY CONTRADICT (IO §0.5, the designer's).** A hero's lineage is what
   he is; a modifier is what this fight is. **The thing he is wins.** The worked example is the Tracker's opening turn,
   kept before the first round under IN's Cruel Order (withdrawn at IO) and before Ambushed's run at JB, whose card names the Hunter for
@@ -2777,7 +2783,7 @@ the block left out, spend what they were paid.
 > every hero already passes. A new source of what a door carries owes that door, or the engine reading it goes silent
 > for that source — and nothing says so.**
 
-- **THE DOORS.** A death is `unit._die()`, which calls `died_cb` BEFORE the statuses clear (the Reaver's kill, a mark
+- **THE DOORS.** A death is `unit._die()`, once a body until it is raised (JD §3), which calls `died_cb` BEFORE the statuses clear (the Reaver's kill, a mark
   that moves, a bond that passes). Damage is BL's `_report_taken` door, read through the attribution frame (the
   Weaver's tally, the Leech's return, the Arbiter's heal, the marks). An effect laid on an enemy is `_apply_status`
   (the Medic). A blow is `_resolve`'s strike loop (the Tracker's and the Skirmisher's pay, the Bastion's spend). **A
@@ -3937,6 +3943,23 @@ five reachable at once.
   re-created. The FK banks a spawn consumed go back onto the saved copy only, because the restart
   replays the fight they opened.
 
+## STANDING RULE — A FALL STAYS INSIDE ITS FIGHT (Batch JD §0.1, ruled by the designer)
+> **THE FALL DOES NOT LAST. A HERO WHO FALLS WALKS OUT AT THE 20% FLOOR. THE CLEARING HEAL PASSES HIM BY, AND SO DOES EVERY RELIC THAT ADDS TO IT.**
+
+**The body does not outlast its fight; what it cost does.**
+- **THREE REASONS, IN THE ORDER THAT DECIDED IT.** Only two of the seven things the question priced needed a fall that lasts, the Cairn and the map's Revive Potion; the other five needed a
+  figure named. Those two would have cost every grade and every completion figure in the project, each measured with heroes returned after every won fight. And the rate says who a heavier
+  ruling lands on: a fall is rare where a run finishes and common where it does not, so a lasting fall is a penalty aimed at parties already losing, and falls would breed falls (the floor
+  itself breeds a little, measured at JD's report §5).
+  **Do not re-open it to make either of the two reachable**: a re-cut answered the Cairn and the potion's path is deleted (JD's report §4).
+- **THE 35% WAS AN ACCIDENT, NOT A DESIGN**: the order of two lines, a floor and then a heal that read `hp > 0`. Every living document had said the floor.
+- **NOTHING STANDS AT 0 HEALTH BETWEEN FIGHTS, AND NOTHING WILL**, so a thing written for *the fallen on the map* has nobody to reach. **What the map can ask is `BattleUnit.FELL_LAST_FIGHT`**,
+  a member key written at the one return both victory branches pass through, and read by `Run.clearing_heal` and the Cairn. **It names a hero still down when the fight ended: a hero raised
+  inside the fight stands, and the heal reaches him.** The readout's `fell` is not this door: a readout is a read, off in a sim and on no save, and it counts a hero raised.
+- **THE MARK IS ONE FIGHT LONG; THE HEALTH IT COST STAYS UNTIL HEALED.** He opens the next fight behind a hero who ended at 1 health by the clearing heal and whatever relics add to it.
+  `Run.advance_zone` runs only while `has_next_zone()` holds, so zone 1's and zone 2's bosses restore every hero and take the mark; **the third zone's boss has no descent, so a hero down at
+  its end meets the end boss at the floor.** Cairnmoss Poultice buys the penalty out, and that is what it is for: a penalty you can buy your way out of is better than one you cannot.
+
 ## STANDING RULE — BREAK IS A SECONDARY TAG ONLY (Batch FD §2, ruled by the designer)
 
 > **No card carries BREAK as its PRIMARY. Every one that did reads `["OFFENSE", "BREAK"]` but Feint (below). BREAK
@@ -4170,7 +4193,7 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
     routing around it, and makes the runes better than they were written: *while no Cleric stands, every hero takes
     less* is a moment in a fight; *you recruited without a Cleric* was a choice in a lobby. **The three it was chosen
     over**: a roster that can leave a class out (not a batch — at least four standing rules rest on one hero a class);
-    the fallen staying down between fights (a difficulty ruling of its own, still open, and it made only the fallen
+    the fallen staying down between fights (a difficulty ruling of its own, answered at JD §0.1: a fall does not last; and it made only the fallen
     rune real); and leaving the runes unauthored. `docs/reports/HO.md` §3c prices all four.
   · **THE RE-READ IS LOAD-BEARING FOR THE CREST POOL, NOT A CONVENIENCE (IA §0.2, the designer's).** Three of the four
     live crest runes — Dirge, Dead Air, Empty Pulpit — are COMEBACK runes: every fight opens with all four standing, so
@@ -5051,7 +5074,7 @@ today; a property is the thing worth pinning.
   one Cleric pool and offered only to a hero holding Mercy (its `ENGINE_READ` row); no other class is
   handed a card carrying the special, by any pool, kit or basic (`check_dr` §2). True with a qualifier
   the gate prints rather than hides: `BattleUnit.revive()` has **two** callers, `resurrection` and the
-  **REVIVE POTION**, and the `revive_pct` map event is a third channel. **Exclusive as an ability; not
+  **REVIVE POTION**, and the event verb `revive_pct` is a third, which no event uses since JD. **Exclusive as an ability; not
   exclusive as a channel.**
 · **COOLDOWN MANIPULATION IS *NOT* THE SWORDMASTER'S, AND THE CLAIM THAT IT WAS IS THE USEFUL
   RECORD.** `_tick_cooldowns` has **SEVEN** callers: Answering Steel and Battle Poise (his),

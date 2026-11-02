@@ -1085,6 +1085,12 @@ var rot_hp_lost := 0          # Rot: max HP taken for one fight (added back at t
 # fight that carries both, and that is a coincidence of the numbers, not a
 # licence to merge them: they answer different questions and one of them is
 # read somewhere else.
+#
+# BATCH JD §2 — A MEMBER KEY: THIS HERO WAS DOWN WHEN THE LAST WON FIGHT ENDED. After the return below his
+# health no longer says so.
+const FELL_LAST_FIGHT := "fell_last_fight"
+# BATCH JD §1 — THE FLOOR A WON FIGHT RETURNS A HERO AT, NAMED SO A TEXT CAN READ IT (the glossary's fallen entry does).
+const RETURN_FLOOR_PCT := 0.2
 func sync_victory_state(member: Dictionary) -> void:
 	# BATCH BU — FORTIFIED SPIRIT IS FORCED TO EXPIRE HERE, AND THE CHOICE
 	# BETWEEN THIS AND A FOURTH FIELD IS THE WHOLE DECISION. The Devout's loan
@@ -1105,9 +1111,18 @@ func sync_victory_state(member: Dictionary) -> void:
 	expire_fortified_spirit()
 	var save_max: int = max_hp - tenacity_hp_gained - conviction_hp_gained \
 		+ rot_hp_lost
-	# The fallen refuse to stay down: heroes return from a won fight at 20%,
+	# The fallen refuse to stay down: heroes return from a won fight at the floor,
 	# and hp is clamped under the restored maximum in the same step.
-	member["hp"] = clampi(maxi(hp, int(save_max * 0.2)), 1, save_max)
+	member["hp"] = clampi(maxi(hp, int(save_max * RETURN_FLOOR_PCT)), 1, save_max)
+	# BATCH JD §2 — AND THE RETURN SAYS WHOM IT RETURNED (the designer's ruling, JD §0.1). A hero still down here
+	# walks out at the floor above and the clearing heal passes him by (`Run.clearing_heal`); a hero raised inside
+	# the fight stands, and the heal reaches him. The key rides the party dict as `companions_standing` does, so
+	# no save version moved, and it goes rather than reads false, so a fight nobody fell in leaves a member's
+	# keys as they were.
+	if dead:
+		member[FELL_LAST_FIGHT] = true
+	else:
+		member.erase(FELL_LAST_FIGHT)
 	member["max_hp"] = save_max
 	if resource_name == "Mana":
 		member["mana"] = resource
@@ -4962,7 +4977,9 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 			float_text("OVERPRESSURE", Color(0.85, 0.7, 0.35))
 	var just_broke := false
 	var applied_bd := 0
-	if not broken:
+	# BATCH JD §3 — A BODY ALREADY DOWN TAKES NO BREAK. `revive` does not clear `broken`, so a Break laid on a corpse
+	# would rise with him; `_die()`'s second pass used to sweep it, and `_die()` runs once a body now.
+	if not broken and not dead:
 		applied_bd = pressure_add
 		pressure += pressure_add
 		# BATCH BR — IRONCLAD IS A CAP, NOT AN IMMUNITY, AND THIS LINE IS THE
@@ -5132,6 +5149,13 @@ func take_tick_damage(amount: int, label: String, color: Color) -> bool:
 
 
 func _die() -> void:
+	# BATCH JD §3 — ONE DEATH A BODY. A strike can fell its own target between the pick and the blow: a Sacred Resolve
+	# share handed to a hero under the Oathkeeper's bond comes back on the struck hero as a tick, and the strike then
+	# lands on the corpse. The second pass ran the death callback again (a second fall in the readout, and it would be a
+	# second kill for the Reaver on an enemy) and played the animation again. The one thing it swept that mattered, a
+	# Break that blow laid on the corpse, `take_hit` no longer lays.
+	if dead:
+		return
 	dead = true
 	broken = false
 	broken_pending = false

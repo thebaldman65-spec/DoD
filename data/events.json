@@ -617,15 +617,16 @@
         "text": "A cairn raised for soldiers of an older war. The stones remember\nwhat it is to have died for someone \u2014 and what it costs to return.",
         "weight": 8,
         "requires": {
-            "fallen_hero": true
+            "fell_last_fight": true
         },
         "choices": [
             {
-                "label": "Lay your dead upon the stones",
+                "label": "Lay your fallen upon the stones",
                 "effects": [
                     {
-                        "effect": "revive_pct",
-                        "amount": 0.35
+                        "effect": "heal_pct",
+                        "amount": 1.0,
+                        "target": "fell"
                     }
                 ],
                 "outcome": "The cairn takes their silence and hands back their breath."

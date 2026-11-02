@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-11-01 (Batch JC &mdash; the deck closed, the queue reopened)</b></p>
+<p align="right"><b>Last updated: 2026-11-01 (Batch JD &mdash; the fall repaired, the seven disposed)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -99,8 +99,8 @@ Cleric's. The rune can be dropped or swapped
 later; the spec it carried is the hero's lineage for the whole run.</li>
 <li><b>Victory rewards:</b> gold for every fight, <b>a rune for every normal fight won</b> &mdash;
 dropped at random to the hero whose class it is, who holds it unworn until he equips it, or into the
-Crest's bag for a crest rune (§8, Runes) &mdash; and <b>winning any fight heals the
-every hero 15% of max HP</b> — there is no resting, so this is the whole recovery curve (the
+Crest's bag for a crest rune (§8, Runes) &mdash; and <b>winning any fight heals every hero
+15% of max HP</b> and passes by a hero still down when it ends — there is no resting, so this is the whole recovery curve (the
 Chalice of Dawn relic stacks its 10% on top for 25%). <b>No victory in a run pays a talent
 point</b> except a zone boss's, which banks one for each class among the heroes to the profile
 (§7). The <b>mini-boss</b>
@@ -362,7 +362,7 @@ with extra steps, not a gamble.</p>
 another</b> at a rate the player accepts or declines. Health for a rune, maximum health for
 gold, gold or health for a new ability, gold for a relic. <b>Declining is always one of the
 buttons.</b> 8 authored.</li>
-<li><b>Boon &mdash; 25%.</b> A straight benefit, no cost. 8 authored.</li>
+<li><b>Boon &mdash; 25%.</b> A straight benefit, no cost. 8 authored. One, the Cairn of the Fallen, can stand only after a fight that left a hero down, and makes whole each hero it left down.</li>
 <li><b>Bane &mdash; 15%.</b> A straight detriment, one button, no decline. <b>Banes are
 mild, and no bane may kill a hero or reduce anyone below 1 HP</b> &mdash; a bane the player
 could not have avoided is only fair if it costs a resource, never a run. 4 authored: Ashfall
@@ -374,13 +374,13 @@ entry &mdash; so authoring a ninth boon does not make boons commoner.</p>
 <p>Effects speak a fixed <b>verb vocabulary</b> — gold / gold_pct / heal_pct / damage_pct
 (never kills: floors at 1 HP) / mana_pct / max_hp_pct / attack_pct (permanent for the run,
 applied at battle spawn) / item / random_item / revive_pct (the fallen
-return) / relic_grant (random inactive relic; +40 gold when slots are full) / <b>rune_grant</b>
+return; no event uses it) / relic_grant (random inactive relic; +40 gold when slots are full) / <b>rune_grant</b>
 (a rune through the same door the elite cache uses, worn when a slot is free and otherwise held unworn by the hero it is for, or in the bag for a crest rune) /
 <b>ability_draft</b> (the three-card offer itself, answered on the hero's own draft screen like any
 other owed pick) —
-aimed by <b>target selectors</b> (<code>party</code>, random, lowest_hp, class:&lt;key&gt;) and gated by
+aimed by <b>target selectors</b> (<code>party</code>, random, lowest_hp, fell, class:&lt;key&gt;) and gated by
 <b>requirement conditions</b> (min_gold, max_gold, zone_slot, has_item, <code>spec_in_party</code>,
-fallen_hero). Adding an event is a JSON edit; adding a verb is one handler. <b>20 events</b>
+fallen_hero (no event uses it), fell_last_fight). Adding an event is a JSON edit; adding a verb is one handler. <b>20 events</b>
 ship now. Seen events persist in the save and never repeat within a run until the pool
 exhausts.</p>
 <p><b>Not built, and the reason is worth keeping:</b> the "a held rune for two of lower
@@ -391,9 +391,14 @@ so the event would have to be re-specified before it could be built.</p>
 
 <h3>3c. Attrition, the pouch and its slots</h3>
 <p><b>There is no resting.</b> Winning any fight heals every hero <b>15% of max HP</b>
-(the Chalice of Dawn relic's 10% stacks on top). <b>Potions are usable on the map screen</b>,
-not only in battle: the inventory is interactive and targets a hero from the stat cards. Four
-items are <b>battle-only</b> — the Bomb (nothing on the road to throw it at), the Cleansing
+(the Chalice of Dawn relic's 10% stacks on top). A hero still down when the fight ends walks out at
+the floor instead: the heal, and every relic that adds to it, passes that hero by, unless Cairnmoss
+Poultice is carried. A hero raised inside the fight stands and takes it with the rest. The descent after
+zone 1's and zone 2's bosses restores every hero, so a fall in those two fights leaves no mark; the third
+zone's boss has no descent, so a hero down at its end meets the end boss at the floor. <b>Potions are usable on the map screen</b>,
+not only in battle: the inventory is interactive and targets a hero from the stat cards. Five
+items are <b>battle-only</b> — the Bomb (nothing on the road to throw it at), the Revive Potion
+(no hero lies fallen between fights), the Cleansing
 Draught, the Cursed Visage and the Resonating Hourglass — and each sits in the pouch with a
 disabled button that says why on hover. The Defense Potion is also meaningless outside a fight
 and refuses with a message when pressed.</p>
@@ -3008,7 +3013,7 @@ user://relics.json; up to 3 equipped per run at the draft (scrolling shelf; even
 a run-scoped extra via relic_grant). <b>EVERY EQUIPPED RELIC APPLIES TO ALL FOUR HEROES, AND THE
 PER-HERO RULING IS STILL UNBUILT.</b> `Run.active_relics` is a flat list of up to 3 ids with no hero key, and
 both accessors (`Run.relic_add` / `relic_dict`) take a hook and nothing else — so every
-equipped relic reaches every hero, at all 22 read sites. The ruling that a relic is
+relic belongs to one hero, at any read site, and what one adds to the clearing heal still passes by a hero left down. The ruling that a relic is
 assigned to ONE hero at pickup stands and has never been started. <b>The draft also
 assigns relics BEFORE specs are chosen</b>, so "which hero" has the least information behind
 it at exactly the moment it would be asked.
@@ -3020,15 +3025,15 @@ per class, and every node pays every class that can buy it, whichever spec wears
 that must know which spec a hero is belongs on a rune, which one hero buys for one run and which
 is scoped to his class and offered only while any engine it reads is equipped. Not one relic hook is read inside a turn — the read sites are run
 start, battle SPAWN (base stats, before turn one), the victory screen, gold awards, shop prices
-and elite spoils, 22 in all, and three of the hooks are read at more than one. The category
+and elite spoils, 24 in all, and four of the hooks are read at more than one. The category
 `relics.gd` declares OUT — on-kill and per-turn procs, revive-on-death, enemy auras, DoT and
 Break multipliers — is exactly the in-combat one, and the talent tree is the only permanent
-layer that reaches a turn as it resolves. <b>Pool: 24 relics — 16 common, 8 rare (marked RARE on the shelf and in the picker)</b> — every
+layer that reaches a turn as it resolves. <b>Pool: 25 relics — 17 common, 8 rare (marked RARE on the shelf and in the picker)</b> — every
 effect expressed through an audited <b>hook vocabulary</b> (18 hooks, listed atop relics.gd:
 run-start gold/items, per-hero stat boosts at battle spawn — attack, typed damage, max
 HP, armor, speed, crit, Constitution, resistances, resource floor — victory heal/mana/gold,
-gold-find, shop discount, elite loot; the <code>rest_heal_add</code> hook has no reader, because
-the map has no rest node, so Martyr's Knucklebone pays only its victory heal, pending a design pass). Scalar hooks SUM and dict hooks merge
+gold-find, shop discount, elite loot, and a hero left down taking the victory heal with the rest, which is Cairnmoss
+Poultice alone: the victory heal itself passes that hero by, relics and all). Scalar hooks SUM and dict hooks merge
 across the equipped set, so stacking is well-defined. Adding a relic on an existing hook is
 pure data. Highlights: Waystone Shard opens the run with a Health Potion, a Mana Potion and a Bomb; the elemental trio
 (Emberheart / Frostbound Sigil / Nightbloom Charm) raises strike damage in all six non-physical

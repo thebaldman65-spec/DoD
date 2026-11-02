@@ -1030,7 +1030,6 @@ const PINS := [
 	["glossary:stance:long", "-10% damage dealt", "scripts/battle.gd", "_resolve", "raw *= 1.0 - 0.10 * (2.0 if attacker.rune_naked_blade"],
 	["glossary:stance:long", "15% less damage taken", "scripts/battle.gd", "_resolve", "var sf_def := 0.15 *"],
 	["glossary:fallen:long", "at full health when Empowered", "scripts/battle.gd", "_resolve_special", "rez_frac = 1.0"],
-	["glossary:fallen:long", "at least 20% of their max HP", "scripts/unit.gd", "sync_victory_state", "int(save_max * 0.2)"],
 	["glossary:fallen:long", "back at 50% HP", "scripts/battle.gd", "_use_item", "target.revive(0.5)"],
 	["glossary:fallen:long", "Resurrection at 25%", "scripts/battle.gd", "_resolve_special", "var rez_frac := 0.25"],
 	["glossary:hero_vs_ally:long", "sheds the 30", "scripts/battle.gd", "_resolve_special", "var pressure_cut := 30"],

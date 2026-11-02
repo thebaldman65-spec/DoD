@@ -4,6 +4,22 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The fall repaired, the seven disposed (Batch JD) — 2026-11-01
+
+**Why a fall does not last.** The question had been parked for twenty batches as structural, and JC's read-out showed five of the seven things it priced needed a figure and not a fall that lasts. Only the Cairn and the map's Revive Potion needed one, and buying those two would have re-read every grade and every completion figure in the project, all of them measured with heroes returned after every won fight. The rate says who a heavier ruling lands on: a fall is rare on the populations that finish a run and common on the ones that do not, so a lasting fall is a penalty aimed at parties already losing, and falls would breed falls.
+
+**Why the 35% was the thing to repair.** Every living document had promised the floor. The code said 35% because of the order of two lines, a floor and then a heal that read `hp > 0`. Passing the heal by him gives a fall a cost past its fight with no body on the map, so no save version moved, and nothing that reads a hero at 0 health between fights had to be built.
+
+**Why the floor stands though it breeds a little.** The reason against a lasting fall was that falls would breed falls, and on the same seeds the one-fight version does too, on a small scale: +0.18 ± 0.08 falls a run, the same hero falling again more often, and three finishes in 120 lost, each to a wipe in the fight after a hero was carried in. The designer's ruling stands and that figure goes beside it; it separates this ruling from a heavier one in degree, not in kind, and Cairnmoss Poultice is the way out it left open.
+
+**Why a hero raised inside the fight takes the heal.** *A hero who falls walks out at the floor* cannot be true of a hero who stood up at 50%. A raise is the answer to a fall, and the mark names what is left unanswered when the fight ends.
+
+**Why Cairnmoss Poultice lifts him and the Knucklebone does not.** A penalty you can buy your way out of is better than one you cannot, and the rule makes a common relic legible in one line. The relics on the victory heal lift everyone but him; this one lifts him.
+
+**Why a second call to `_die()` could not simply be stopped.** It was running the death callback twice, which reads harmless on a hero, and sweeping the Break the blow on the corpse had just laid, which nobody had written down. `revive` does not clear `broken`, so a bare guard would have raised him Broken. A body already down takes no Break now.
+
+**Why the divisor is a prior.** It is a fit to three readings with a spread and an edge, and the better account of Ambushed, the gross less the arm's own healing, needs the arm the price was meant to replace. Keeping it as a prior keeps what it is good for: a figure before a value is built.
+
 ## The deck closed, the queue reopened (Batch JC) — 2026-11-01
 
 **Why the target went and no card did.** The deck reads 7 / 7 / 4 / 3 / 4 against the 5 / 5 / 5 / 4 / 4 it was aimed at, and the designer ruled that the target is what is wrong. It was written down before a single modifier had been priced and it assumed a grade is authorable: choose a severity, build a card to it. JB proved it is not: Ambushed reached the 4 it was aimed at, and Outpaced, Porous and Fractured landed two, two and three grades under it, not through bad building. A grade is a property of the mechanic, found after it is built. So nothing comes off, nothing more goes on, and twenty-five graded modifiers is a good deck; a table written before the instrument existed is no reason to change one. The figure is kept here because the record says what was true when it was written; no living document states it.

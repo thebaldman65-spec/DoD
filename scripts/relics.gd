@@ -23,7 +23,7 @@
 #   victory_mana_pct      victory screen      party mana per victory
 #   victory_gold          victory screen      flat gold per victory
 #   gold_find_mult        award_gold          all node gold (+frac)
-#   rest_heal_add         rest nodes          added to the 30% waystone
+#   fallen_recover        clearing_heal, _note  a hero left down takes the clearing heal
 #   shop_discount         shop prices         prices x (1 - frac)
 #   loot_extra            elite spoils        extra consumable drops
 # NEEDS PLUMBING (declared out for now): on-kill/per-turn procs,
@@ -47,7 +47,7 @@ const POOL := {
 		"desc": "Begin each run with +{=@hooks.start_gold} gold.",
 		"hooks": {"start_gold": 80}},
 	"chalice": {"name": "Chalice of Dawn", "tier": "common",
-		"desc": "Every hero heals {=@hooks.victory_heal_pct*100}% after every victory.",
+		"desc": "Every standing hero heals {=@hooks.victory_heal_pct*100}% of maximum\nhealth after every victory.",
 		"hooks": {"victory_heal_pct": 0.10}},
 	"emberheart": {"name": "Emberheart", "tier": "common",
 		"desc": "Fire and Holy strike damage +{=@hooks.dmg_type_mult.fire*100}%.",
@@ -64,13 +64,12 @@ const POOL := {
 	"lodestone": {"name": "Peddler's Lodestone", "tier": "common",
 		"desc": "Shop prices reduced {=@hooks.shop_discount*100}%.",
 		"hooks": {"shop_discount": 0.20}},
-	# BATCH IK §6 — SUSPENDED, NOT DELETED: its one hook was the rest node's, and rest nodes left the
-	# map at AN §6, so it paid nothing. `is_suspended` keeps it out of every draw and every list a player
-	# picks from; its entry, its words and the player's unlock stay, for the re-cut that brings it back.
+	# BATCH JD §4 — RE-CUT ONTO THE RETURN, AND IT IS THE RULING'S COUNTER (JD §0.2, the designer's). IK §6 suspended
+	# it when the rest node's hook paid nothing; with it a hero left down takes the clearing heal like everyone
+	# (`Run.clearing_heal`). The relics on `victory_heal_pct` lift everyone but him; this one lifts him.
 	"cairnmoss": {"name": "Cairnmoss Poultice", "tier": "common",
-		"desc": "Rest nodes restore 45% instead of 30%.",
-		"hooks": {"rest_heal_add": 0.15},
-		"suspended": "IK §6: its whole effect was the rest node's (rest_heal_add), and rest nodes were deleted at AN §6, so it pays nothing. It returns when its re-cut ships: it rides the post-fight recovery, at a number set by the ruling on whether a fallen hero stays down between fights."},
+		"desc": "A hero who falls recovers with the rest.",
+		"hooks": {"fallen_recover": 1}},
 	"lantern": {"name": "Gravelight Lantern", "tier": "common",
 		"desc": "Elite spoils include one extra consumable.",
 		"hooks": {"loot_extra": 1}},
@@ -107,7 +106,7 @@ const POOL := {
 		"hooks": {"hero_resist_add": {"fire": 0.10, "frost": 0.10,
 			"nature": 0.10, "shadow": 0.10, "holy": 0.10, "arcane": 0.10}}},
 	"hourglass": {"name": "Cracked Hourglass", "tier": "rare",
-		"desc": "After every victory: every hero recovers\n{=@hooks.victory_mana_pct*100}% Mana and heals {=@hooks.victory_heal_pct*100}%.",
+		"desc": "After every victory: every hero with Mana\nrecovers {=@hooks.victory_mana_pct*100}% of maximum Mana, and every\nstanding hero heals {=@hooks.victory_heal_pct*100}% of maximum health.",
 		"hooks": {"victory_mana_pct": 0.30, "victory_heal_pct": 0.05}},
 	"kingsledger": {"name": "The King's Ledger", "tier": "rare",
 		"desc": "+{=@hooks.start_gold} gold at run start; battle and bargain gold +{=@hooks.gold_find_mult*100}%.",
@@ -118,8 +117,8 @@ const POOL := {
 		"desc": "Every hero deals +{=@hooks.hero_attack_mult*100}% strike damage.",
 		"hooks": {"hero_attack_mult": 0.12}},
 	"martyrbone": {"name": "Martyr's Knucklebone", "tier": "rare",
-		"desc": "Every hero heals {=@hooks.victory_heal_pct*100}% after every victory.",
-		"hooks": {"victory_heal_pct": 0.15, "rest_heal_add": 0.10}},
+		"desc": "Every standing hero heals {=@hooks.victory_heal_pct*100}% of maximum\nhealth after every victory.",
+		"hooks": {"victory_heal_pct": 0.15}},
 	"tollbell": {"name": "Tollkeeper's Bell", "tier": "rare",
 		"desc": "+{=@hooks.victory_gold} gold after every victory.",
 		"hooks": {"victory_gold": 20}},
@@ -171,6 +170,8 @@ static func desc_of(id: String) -> String:
 # entry resolves, its words stand and an unlock of it is never dropped (`load_data` keeps every POOL
 # id), but no draw reaches it and no list a player picks from shows it — the boss's unlock below, an
 # event's relic grant, the draft's assignment and the shelf. The string names what is lost.
+#
+# BATCH JD §4: Cairnmoss Poultice was the one relic it held, and it is back. The door stands, holding nothing.
 static func is_suspended(id: String) -> bool:
 	return String(POOL.get(id, {}).get("suspended", "")) != ""
 

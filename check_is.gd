@@ -76,6 +76,7 @@ const MEMBER_KEYS := {
 	"pick_serials": "bookkeeping keyed by pick kind", "pick_sources": "bookkeeping keyed by serial",
 	"fk_mercy_carry": "a number", "fk_resonance_carry": "a number", "event_attack_pct": "a number",
 	"companions_standing": "read at its door: a kind `COMPANION_STATS` lacks is not returned (GH)",
+	"fell_last_fight": "a flag",
 	"bm_abilities": "CARDS", "bm_equipped": "CARDS", "draft_refused": "CARDS", "draft_candidates": "CARDS",
 	"bm_candidates": "CARDS", "upgrades": "CARDS", "up_candidates": "CARDS",
 	"runes": "RUNES", "engines": "RUNES", "rune_candidates": "RUNES", "engine_offer": "RUNES",
@@ -370,6 +371,7 @@ func _s2_the_load_door() -> void:
 		for k in (m as Dictionary).keys():
 			mkeys[String(k)] = "a saved member"
 	mkeys["companions_standing"] = "battle.COMPANIONS_STANDING"
+	mkeys[BattleUnit.FELL_LAST_FIGHT] = "BattleUnit.FELL_LAST_FIGHT"
 	var munsorted := []
 	for k in mkeys:
 		if not MEMBER_KEYS.has(String(k)):

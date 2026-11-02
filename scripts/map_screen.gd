@@ -235,7 +235,7 @@ func _maybe_show_framing() -> bool:
 		"Before every elite, and every mini-boss but Ruin's, THREE BARGAINS:\n" +
 		"a condition on the coming battle, and what clearing\n" +
 		"it pays — one always the safer deal. Ruin's mini-boss fights unpaid.\n\n" +
-		"Winning any fight heals every hero %d%%. There is no resting.\n" % int(round(Run.SLOT_HEAL_PCT * 100)) +
+		"Winning any fight heals every hero standing %d%%. There is no resting.\n" % int(round(Run.SLOT_HEAL_PCT * 100)) +
 		"Death ends the run and takes everything, but every boss you fell\n" +
 		"leaves a RELIC behind, unlocked forever, and every zone boss a\n" +
 		"talent point for each class among the heroes, banked as it falls.")
@@ -3866,8 +3866,11 @@ func _decline_pending_drop(overlay: Control) -> void:
 # why on hover, beats a button that looks live and then declines — so the
 # three new ones follow it. The Defense Potion is left exactly as it was:
 # changing it is not in this batch.
+# BATCH JD §4 — THE REVIVE POTION JOINS THEM (JD §0.2, the designer's): no hero stands at 0 between fights and none ever
+# will, so its map path could only answer that nobody needed it. It works in a fight.
 const MAP_REFUSAL := {
 	"bomb": "Nothing here to throw it at — battle only.",
+	"revive": "No one lies fallen between fights — battle only.",
 	"cleanse": "Nothing to cleanse between fights — battle only.",
 	"visage": "There is no one here to curse — battle only.",
 	"hourglass": "Nothing is waiting on a turn out here — battle only.",
@@ -3889,15 +3892,13 @@ func _map_item_tooltip(id: String) -> String:
 	return "%s\n\nClick to use it now." % base
 
 
-# Picking the target: revive offers the fallen, everything else the living.
+# Picking the target: every hero living.
 func _use_item(id: String) -> void:
 	if int(Run.items.get(id, 0)) < 1 or not _usable_on_map(id):
 		return
-	var wants_dead := id == "revive"
 	var eligible: Array = []
 	for i in Run.party.size():
-		var alive := int(Run.party[i]["hp"]) > 0
-		if alive != wants_dead:
+		if int(Run.party[i]["hp"]) > 0:
 			eligible.append(i)
 	if id == "defense":
 		# Party-wide and battle-scoped: there is no "3 turns" on the map, so
@@ -4121,9 +4122,6 @@ func _apply_item(id: String, idx: int, overlay: Control) -> void:
 				int(member["max_mana"]))
 			line = "%s recovers %d Mana." % [String(member["key"]).capitalize(),
 				int(member["mana"]) - mana_was]
-		"revive":
-			member["hp"] = maxi(int(member["max_hp"]) / 2, 1)
-			line = "%s is back on their feet." % String(member["key"]).capitalize()
 		_:
 			return
 	Run.items[id] = int(Run.items.get(id, 0)) - 1

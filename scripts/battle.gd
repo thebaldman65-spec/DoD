@@ -29289,7 +29289,8 @@ func _check_end() -> void:
 		# §6: clearing ANY slot heals the party. This is the whole of the
 		# rest-node replacement, and it rides the SAME relic hook the Chalice of
 		# Dawn already used, so the relic\'s 10% stacks on top of the base 15%.
-		Run.heal_party(Run.victory_heal_pct())
+		# BATCH JD §2: and it passes by a hero still down at the end of this fight.
+		Run.clearing_heal()
 		var v_mana := Run.relic_add("victory_mana_pct")
 		if v_mana > 0.0:
 			Run.restore_mana(v_mana)
@@ -29413,8 +29414,8 @@ func _check_end() -> void:
 		if node_type in ["boss", "endboss"]:
 			_resolve_boss(gold_gain, node_type == "endboss")
 		else:
-			var win_text := "+%d gold. The heroes recover %d%%." % [
-				gold_gain, int(round(Run.victory_heal_pct() * 100))]
+			var win_text := "+%d gold. The heroes recover %d%%.%s" % [
+				gold_gain, int(round(Run.victory_heal_pct() * 100)), Run.clearing_heal_note()]
 			# BATCH BK §3/§5: NOTHING is rolled behind a cleared fight any more.
 			# The merchant and the event are MAP NODES the player routed to, or
 			# past. The only thing that can still stand between a victory and the

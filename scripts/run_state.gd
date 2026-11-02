@@ -1530,10 +1530,30 @@ func _combo_ok(spec: Dictionary, picked: Array, role_counts: Dictionary) -> bool
 	return true
 
 
-func heal_party(pct: float) -> void:
+func heal_party(pct: float, pass_by_the_fallen := false) -> void:
 	for member in party:
-		if member["hp"] > 0:
+		if member["hp"] > 0 and not (pass_by_the_fallen and member.get(BattleUnit.FELL_LAST_FIGHT, false)):
 			member["hp"] = mini(member["hp"] + int(member["max_hp"] * pct), member["max_hp"])
+
+
+# BATCH JD §2 — THE CLEARING HEAL, AND WHOM IT PASSES BY (JD §0.1, the designer's): A HERO WHO FALLS WALKS OUT AT THE
+# FLOOR, AND THE CLEARING HEAL PASSES HIM BY, AND SO DOES EVERY RELIC THAT ADDS TO IT. He stood at 35% until JD only
+# because this heal runs after `sync_victory_state`'s floor and `heal_party` read `hp > 0`. **`BattleUnit.FELL_LAST_FIGHT`
+# is the door**: his health no longer says who fell, the battle's bodies are gone by the map, and the readout is a read,
+# off in a sim and on no save. Both victory branches call this, so the two cannot differ. Cairnmoss Poultice is the one
+# way a hero still down takes it, with the rest.
+func clearing_heal() -> void:
+	heal_party(victory_heal_pct(), relic_add("fallen_recover") <= 0.0)
+
+
+# What the victory card adds to *the heroes recover*, which is not true of a hero the heal passed by.
+func clearing_heal_note() -> String:
+	if relic_add("fallen_recover") > 0.0:
+		return ""
+	for member in party:
+		if member.get(BattleUnit.FELL_LAST_FIGHT, false):
+			return " A hero left down does not."
+	return ""
 
 
 # Awakening HP sync (Batch T): spec stat blocks raise max HP, but the
@@ -3932,6 +3952,8 @@ func advance_zone() -> void:
 	for member in party:
 		member["hp"] = member["max_hp"]
 		member["mana"] = member["max_mana"]
+		# BATCH JD §4: restored whole, a hero left down has nothing left for the Cairn to answer.
+		member.erase(BattleUnit.FELL_LAST_FIGHT)
 	_generate_map()
 
 
@@ -5621,7 +5643,8 @@ func begin_event_node() -> bool:
 
 # ---------- Batch AN §6: attrition ----------
 
-# Winning ANY battle heals the party this much. It rides the SAME
+# Winning ANY battle heals the party this much (a hero still down at its end
+# excepted, `clearing_heal`). It rides the SAME
 # `victory_heal_pct` hook the Chalice of Dawn already uses rather than a new
 # one, so the relic's 10% stacks on top for 25% and there is still exactly
 # one read site for "how much does a victory heal".

@@ -15,7 +15,7 @@
 #   §3   THE BATCH-CODE ARM: the pattern `check_is` §6 holds reads every code the project has reported under and the next one (C09).
 #   §4   THE FALLEN HERO, READ OUT: every door the table names is a function in its file, in every place the brief asks after (doors);
 #        each of the things the ruling prices stands in the record the row names, and the rows sum to the sentence the record states
-#        (C10); every figure carries its population and its fidelity (C11); and nothing of it is built.
+#        (C10); and every figure carries its population and its fidelity (C11). What it read out is built since, and `check_jd` holds it.
 #
 #   Every needle is the rule's own words, never the batch code beside them (EA §2), and the retired figure is built at run time, so
 #   this gate holds no copy of what it sweeps for.
@@ -389,8 +389,9 @@ func _s4_the_fallen_hero() -> void:
 		rungs[int(r["rung"])] = true
 	ok(bare == 0 and rate.size() > 0, "§4: %d of %d rows give a figure with no population or no fidelity" % [bare, rate.size()])
 	ok(pops.size() >= 2 and rungs.size() == 3, "§4: the rate reads %d populations on %d rungs" % [pops.size(), rungs.size()])
-	# NOTHING OF IT IS BUILT: THE RETURN STANDS AT THE LINE THE DOORS TABLE NAMES, AND THE EVENT STILL WAITS.
+	# THE RULING CAME AFTER THESE TWO WERE WRITTEN: THE RETURN STANDS AT THE LINE THE DOORS TABLE NAMES, ITS FLOOR A NAMED CONSTANT, AND THE
+	# EVENT READS WHAT THE RULING LEFT IT.
 	var unit := _doc("res://scripts/unit.gd")
-	ok(unit.contains("member[\"hp\"] = clampi(maxi(hp, int(save_max * 0.2)), 1, save_max)"), "§4: the return moved, and the ruling is the designer's")
-	ok(_doc("res://data/events.json").contains("\"fallen_hero\": true"), "§4: the Cairn's requirement moved")
+	ok(unit.contains("member[\"hp\"] = clampi(maxi(hp, int(save_max * RETURN_FLOOR_PCT)), 1, save_max)"), "§4: the return moved, and the ruling is the designer's")
+	ok(_doc("res://data/events.json").contains("\"fell_last_fight\": true"), "§4: the Cairn's requirement moved")
 	print("    CHECKED %d doors in %d places; %d things on their records %s; %d rate rows on %d populations and %d rungs" % [doors.size(), places.size(), seven.size(), str(kinds), rate.size(), pops.size(), rungs.size()])

@@ -2,18 +2,18 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 2144,
-  "source": 1420,
-  "other": 224,
-  "document": 500
+  "total": 2152,
+  "source": 1421,
+  "other": 226,
+  "document": 505
  },
  "floor": {
-  "pins": 2144
+  "pins": 2152
  },
  "falls": [],
  "source_residency": {
   "narrow": 49,
-  "code": 876,
+  "code": 877,
   "absent": 330,
   "runtime": 106,
   "unresolved": 3,
@@ -8098,7 +8098,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_is.gd#480"
+   "g": "check_is.gd#481"
   },
   {
    "s": "check_is.gd",
@@ -8109,7 +8109,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_is.gd#624",
+   "g": "check_is.gd#625",
    "expr": "_pick_words"
   },
   {
@@ -8121,7 +8121,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_is.gd#648",
+   "g": "check_is.gd#649",
    "expr": "INDEX_BEGIN"
   },
   {
@@ -8133,7 +8133,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_is.gd#649",
+   "g": "check_is.gd#650",
    "expr": "INDEX_END"
   },
   {
@@ -8145,7 +8145,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_is.gd#650",
+   "g": "check_is.gd#651",
    "expr": "INDEX_BEGIN"
   },
   {
@@ -8157,7 +8157,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_is.gd#650",
+   "g": "check_is.gd#651",
    "expr": "INDEX_END"
   },
   {
@@ -8169,7 +8169,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_is.gd#664"
+   "g": "check_is.gd#665"
   },
   {
    "s": "check_is.gd",
@@ -8180,7 +8180,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_is.gd#666"
+   "g": "check_is.gd#667"
   },
   {
    "s": "check_is.gd",
@@ -8191,7 +8191,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_is.gd#666"
+   "g": "check_is.gd#667"
   },
   {
    "s": "check_is.gd",
@@ -8202,7 +8202,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_is.gd#666"
+   "g": "check_is.gd#667"
   },
   {
    "s": "check_is.gd",
@@ -8213,7 +8213,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_is.gd#666"
+   "g": "check_is.gd#667"
   },
   {
    "s": "check_is.gd",
@@ -8224,7 +8224,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_is.gd#761",
+   "g": "check_is.gd#762",
    "expr": "MOVED_HEADING"
   },
   {
@@ -8236,7 +8236,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_is.gd#762"
+   "g": "check_is.gd#763"
   },
   {
    "s": "check_is.gd",
@@ -8247,7 +8247,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_is.gd#763"
+   "g": "check_is.gd#764"
   },
   {
    "s": "check_is.gd",
@@ -8258,7 +8258,7 @@
    "r": "code",
    "k": "literal",
    "how": "slice",
-   "g": "check_is.gd#726"
+   "g": "check_is.gd#727"
   },
   {
    "s": "check_is.gd",
@@ -8269,7 +8269,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_is.gd#725"
+   "g": "check_is.gd#726"
   },
   {
    "s": "check_is.gd",
@@ -8280,7 +8280,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_is.gd#725"
+   "g": "check_is.gd#726"
   },
   {
    "s": "check_is.gd",
@@ -8291,7 +8291,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_is.gd#764"
+   "g": "check_is.gd#765"
   },
   {
    "s": "check_is.gd",
@@ -8302,7 +8302,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_is.gd#764"
+   "g": "check_is.gd#765"
   },
   {
    "s": "check_iu.gd",
@@ -10420,12 +10420,100 @@
    "s": "check_jc.gd",
    "fn": "_s4_the_fallen_hero",
    "h": "scripts/unit.gd",
-   "n": "member[\"hp\"] = clampi(maxi(hp, int(save_max * 0.2)), 1, save_max)",
+   "n": "member[\"hp\"] = clampi(maxi(hp, int(save_max * RETURN_FLOOR_PCT)), 1, save_max)",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
    "g": "check_jc.gd#311"
+  },
+  {
+   "s": "check_jd.gd",
+   "fn": "_block",
+   "h": "CLAUDE.md",
+   "n": "\n",
+   "p": "+",
+   "r": "runtime",
+   "k": "composed",
+   "how": "param",
+   "g": "check_jd.gd#83"
+  },
+  {
+   "s": "check_jd.gd",
+   "fn": "_block",
+   "h": "CLAUDE.md",
+   "n": "\n#",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "param",
+   "g": "check_jd.gd#87"
+  },
+  {
+   "s": "check_jd.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/state.md",
+   "n": "THE DIVISOR IS A PRIOR",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jd.gd#209"
+  },
+  {
+   "s": "check_jd.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/state.md",
+   "n": "| kills, a companion's death counted |",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jd.gd#215"
+  },
+  {
+   "s": "check_jd.gd",
+   "fn": "_s1_the_figure",
+   "h": "docs/master.html",
+   "n": "Fallen heroes return after a won battle at %d%% max HP",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_jd.gd#224"
+  },
+  {
+   "s": "check_jd.gd",
+   "fn": "_s1_the_figure",
+   "h": "docs/master.html",
+   "n": "passes by a hero still down",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jd.gd#226"
+  },
+  {
+   "s": "check_jd.gd",
+   "fn": "_s1_the_figure",
+   "h": "docs/master.html",
+   "n": "returns the fallen at %d%% of maximum",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_jd.gd#225"
+  },
+  {
+   "s": "check_jd.gd",
+   "fn": "_s7_what_is_not_done",
+   "h": "scripts/battle.gd",
+   "n": "func _lay_down_the_fallen()",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jd.gd#496"
   },
   {
    "s": "test_batch_ah.gd",

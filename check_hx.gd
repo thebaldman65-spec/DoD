@@ -232,6 +232,8 @@ const KNOWN_BLOCKS := [
 	# BATCH IF §1 — a game rule (what the playtest readout may do inside the game, and where the game writes it), so it
 	# binds this file; its proof is a run, and the run's shape is said there because a later hook must repeat it.
 	"STANDING RULE — THE READOUT IS A READ, AND IT IS THE PLAYER'S",
+	# BATCH JD §0.1 — a game rule (what a fall costs past its fight, and what the map can ask about one), so it binds this file.
+	"STANDING RULE — A FALL STAYS INSIDE ITS FIGHT",
 ]
 
 # §1c — THE INSTRUMENT RULES WRITTEN BACK AFTER THE SEAM WAS TAKEN (HV §3e), named and left until a ruling

@@ -12,7 +12,7 @@ Break damage, produced	muffled	Break damage the other side's meters took	228205.
 Breaks, produced	deadened	the other side's bodies Broken	1517.0	733.0	2.07	heroes 2x+	2.36	7032.0	278.0	25.29	heroes 2x+	33.81	559	20	1658	60
 Bleed built, produced	bloodletting	Bleed landed on the other side's meters	80319.0	0.0	inf	heroes alone	inf	128565.0	0.0	inf	heroes alone	inf	559	20	1658	60
 bleedouts, produced	-	the other side's meters bled out	131.0	0.0	inf	heroes alone	inf	222.0	0.0	inf	heroes alone	inf	559	20	1658	60
-kills	-	the other side's deaths	2067.0	98.0	21.09	heroes 2x+	28.18	5992.0	233.0	25.72	heroes 2x+	42.87	559	20	1658	60
+kills	-	the other side's deaths, by body: a companion's death counts on the heroes' side (`is_hero` is true of a companion), so the warband's column is not heroes fallen	2067.0	98.0	21.09	heroes 2x+	28.18	5992.0	233.0	25.72	heroes 2x+	42.87	559	20	1658	60
 turns taken	slick,hoarfrost	every turn the loop hands out, by the actor's side	19742.0	10508.0	1.88	inside 2:1	2.09	42526.0	20758.0	2.05	heroes 2x+	2.26	559	20	1658	60
 mean speed at a turn	frenzied	the actor's effective speed as its turn is handed out, averaged	98.5	90.8	1.08	inside 2:1	1.13	116.8	92.2	1.27	inside 2:1	1.30	559	20	1658	60
 turns weighted by maximum health	wasting	every turn times the actor's maximum health (Wasting's clock)	4163295.0	3480060.0	1.20	inside 2:1	1.21	10140741.0	9475110.0	1.07	inside 2:1	1.11	559	20	1658	60
