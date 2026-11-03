@@ -291,7 +291,9 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 	"rune_thin_blood",
 	# BATCH HO §3 — the two crest runes' fields: each is the `rune_` half of an int
 	# the one tree writes (`blood_communion`, `field_medic`), summed at its site.
-	"rune_blood_communion", "rune_field_medic"]
+	"rune_blood_communion", "rune_field_medic",
+	# BATCH JG §3 — Communion's flag, the Shared Mark's shape: its magnitude is `Battle.COMMUNION_STRIKE`.
+	"rune_core_strike"]
 
 static var _data := {}
 
@@ -549,6 +551,8 @@ const RUNE_TAGS := {
 	"empty_pulpit": ["DEFENSE"],               # Empty Pulpit — no Cleric stands, every hero takes less
 	"dead_air": ["OFFENSE"],                   # Dead Air — no Mage stands, every hero deals more
 	"dirge": ["OFFENSE"],                      # Dirge — a hero lies fallen, the rest deal more
+	# BATCH JG §3 — what the party carries, not what has gone wrong.
+	"communion": ["OFFENSE"],                  # Communion — a hero wearing the named core stands, every hero deals more
 }
 
 
@@ -578,7 +582,7 @@ const RUNE_TAGS := {
 # conditions on the hero's drafted tags and stay retired; CONDITIONAL is the word for
 # ANY condition a payload carries — on who stands (the `heroes_…` keys, read as the
 # fight runs), on a node he owns (`has_node`) or a card he holds (`owns_ability`).
-# HP's three crest runes are the population, derived over every entry, live and
+# HP's three crest runes and Communion (JG §3) are the population, derived over every entry, live and
 # retired: no other payload carries a `condition` of any kind. TRADEOFF and
 # CONDITIONAL are the two secondaries a row may carry today.
 #
@@ -704,6 +708,7 @@ const RUNE_SHAPES := {
 	"empty_pulpit": ["STAT", "CONDITIONAL"],
 	"dead_air": ["STAT", "CONDITIONAL"],
 	"dirge": ["STAT", "CONDITIONAL"],
+	"communion": ["STAT", "CONDITIONAL"],
 }
 
 const RUNE_TYPES := ["ABILITY", "PASSIVE", "STAT"]
@@ -1099,7 +1104,8 @@ static func is_refused(entry: Dictionary) -> bool:
 #
 # **THE CARD GATE'S RULE, ONE LAYER OVER** (`Classes.ENGINE_READ`, GP): a rune
 # that cannot pay without its engine is not offered to a hero whose engine slots
-# do not hold it, because offering it is offering a rune that does nothing.
+# do not hold it, because offering it is offering a rune that does nothing. *(A crest rune is on no row: a row is one
+# hero's gate and the crest is worn by all four. Communion names a core and is offered with none slotted, JG §3.)*
 #
 # **THE POPULATION WAS DERIVED AT THE READ SITE AND DRIVEN, NOT TAKEN FROM A
 # FIELD OR FROM FP's 43.** Every one of the sixty live ordinary runes had each
@@ -1945,6 +1951,13 @@ static func engine_rune_id(pid: String) -> String:
 		if String((data[id] as Dictionary).get("engine", "")) == pid:
 			return String(id)
 	return ""
+
+
+# BATCH JG §3 — THE NAME A PLAYER KNOWS A CORE BY: its rune's, less the `(core)` the name wears on a slot. No rune
+# carried a condition on a core until Communion, and `Classes.engine_title` answers a spine with its meter (*the
+# Momentum*), which is nothing a hero wears.
+static func core_noun(pid: String) -> String:
+	return String(config(engine_rune_id(pid)).get("name", "")).trim_suffix(" (core)")
 
 
 # The engines a member HOLDS: the engine runes in his two slots, by engine id,

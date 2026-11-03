@@ -1988,7 +1988,7 @@ decision and the STRUCTURE is what shipped.
   (JE §0.3, the designer's)**: a refinement of the rule above, which stands for what it was written for. Neither of two arms of one instrument is the better estimate, and a tie at a cut can land
   on both sides of it. **THE POOLED MEAN IS THE GRADE's. ITS ERROR TAKES THE COVARIANCE WHERE THE ARMS SHARE SEEDS**: two arms on one seed block are largely one draw of the dice read twice, so the
   independent formula prints a sharper bar than the instrument holds (JE's report §2: Ambushed's two read r 0.77, ±1.23 where independence prints ±0.93; **that clause is correctness, so it is a batch's to write and the designer's to be told of**, JF §0.1).
-  **A TIE BETWEEN TWO BATCHES' ARMS ON ONE SEED BLOCK IS NAMED AS CORRELATED. WHERE SUCH A TIE DECIDES A GRADE, THE COVARIANCE IS COMPUTED BEFORE THE GRADE IS WRITTEN (JF §0.1, the designer's).** Every such tie since IY's fight seed
+  **TWO READINGS OF ONE POPULATION ON ONE SEED BLOCK ARE NAMED AS CORRELATED: WHAT MATTERS IS THE SHARED SEEDS, NOT WHOSE BATCH THEY WERE. WHERE SUCH A TIE DECIDES A GRADE, THE COVARIANCE IS COMPUTED BEFORE THE GRADE IS WRITTEN (JF §0.1, the designer's; its first words JG §0.1's, which reach Porous and Fractured, whose pair is JB's alone).** Every such tie since IY's fight seed
   was read against the sum of squares, which overstates the error where the arms correlate (r 0.77 on Ambushed's pair, the one measured). **No arm is re-read. THE GRADES WHOSE TIES WERE READ THE OLD WAY ARE AMBUSHED, POROUS, FLEETING, ENCUMBERED, FRACTURED, SLICK FOOTING, FEVERISH AND WARDED, ALL EIGHT ALREADY SETTLED**: Ambushed stays a 4 on the covariance's own error; Porous, Fractured and Fleeting each read two states of the deck, each pair in one band; Encumbered's three read one band on today's cuts, and IZ's sharper arm had taken it from 2 to 1; Slick Footing, Feverish and Warded each tie IX's reading inside one band. Outpaced's reference pair feeds no grade.
   **A MODIFIER KEYED ON SOMETHING ONLY SOME BUILDS DO IS GRADED ON A BUILD THAT DOES IT (IZ §0.3, the designer's)** — a Break rule on
   the party whose plan is Break, a fire rule on the party whose strikes carry the most fire, the population derived and named —
@@ -3397,7 +3397,7 @@ runes have always carried their own.
   carries, because a branch still reading `spec:` is a scope read as a spec after the data stopped being one.
   `test_runes` holds the data to the two bands, so a `spec:` entry reds rather than rolling for nobody. **And a third
   scope is ruled beside them at HK §4: `party`, the CREST's**, which passes for every hero because it names no class
-  (the block *THE PARTY SCOPE, AND THE RUNES IT HOLDS* below); five entries carry it, four of them live.
+  (the block *THE PARTY SCOPE, AND THE RUNES IT HOLDS* below); six entries carry it, five of them live.
 - **NO SURFACE SHOWS A SCOPE BAND (HE §4, ruled by the designer).** From HC every rune a hero could be offered read
   `[Class]` — a hero sees only his class's runes, so the band was on every rune and told nobody anything. The word is
   gone from the Peddler's row and a cache's button, the band's tint from those and the three surfaces that tinted a
@@ -4000,7 +4000,7 @@ Batch FG §3**: EZ wrote `100g ×27, 120g ×6, 160g ×5`, and the file said `×4
 day it was written, so the TOTAL was measured and the split was not. FC's and FO's retirements
 have since taken the total to 67, and HP §3's retirement of Fellowship, at the flat 150, to 68; the generated stat family keeps `TEMPLATE_PRICE` = 50, the
 Common floor it already had. **Neither is a second pricing rule** — one is history and the other is
-the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over its sixty, HF's fifteen and the crest's four, and `check_go` §0 over the nine rule engines — 150 since HK; the fifteen lineage and spine engine runes' price no gate asserts.
+the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over its sixty, HF's fifteen and the crest's five, and `check_go` §0 over the nine rule engines — 150 since HK; the fifteen lineage and spine engine runes' price no gate asserts.
 
 ## STANDING RULE — A RUNE DROPS AFTER EVERY NORMAL FIGHT; A CLASS RUNE LIVES WITH ITS HERO, THE BAG IS THE CREST'S (Batch HK §1, ruled by the designer; the holdings split at HR §1)
 
@@ -4091,14 +4091,14 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
 > CREST, which takes no hero's slot — ONE slot, `Run.PARTY_RUNE_SLOTS`, the one constant every reader asks, so raising
 > it is one edit.**
 
-- **FOUR ARE LIVE: *TITHE*, AND THREE THAT READ WHO STANDS AS THE FIGHT RUNS (HO §3; HP §2, the designer's).** *Tithe*:
+- **FIVE ARE LIVE: *TITHE*, THREE THAT READ WHO STANDS AS THE FIGHT RUNS (HO §3; HP §2, the designer's), AND *COMMUNION*, WHICH READS WHAT THE FOUR CARRY (JG §3).** *Tithe*:
   a hero's attack that lands Break heals whoever of the four is lowest — its words narrowed at HP §4 to what its read
   site pays. *Empty Pulpit*, *Dead Air* and *Dirge* pay a stat on every hero while no Cleric stands, while no Mage
-  stands, and while a hero lies fallen. **Tithe writes the `rune_` half of a counter the one tree writes, summed at the
+  stands, and while a hero lies fallen; *Communion* pays one while a hero wearing the Rune of the Devout stands. **Tithe writes the `rune_` half of a counter the one tree writes, summed at the
   node's own site** (`rune_blood_communion`): EM's charter binds a crest rune as it binds any rune, so HN's census says
   what a crest CAN put on all four and the charter says what it MAY write. The three write `dmg_taken_bonus` and
-  `dmg_bonus`, unit math (`check_em.UNIT_MATH`). **Every magnitude is RULED**: Tithe 30 (HP §0); Dirge 45% and Empty
-  Pulpit 50% as HP proposed them, Dead Air 75% (HQ §1, the designer's; `check_hp` §2a holds each). *Fellowship* is
+  `dmg_bonus`, unit math (`check_em.UNIT_MATH`). **Every magnitude but Communion's is RULED**: Tithe 30 (HP §0); Dirge 45% and Empty
+  Pulpit 50% as HP proposed them, Dead Air 75% (HQ §1, the designer's; `check_hp` §2a holds each). **Communion 11% is derived from the floor below** (`check_jg` §3b): it writes `rune_core_strike`, a flag on the Shared Mark's shape, read beside `dmg_bonus` in the one sum that field is read in, and its magnitude is `Battle.COMMUNION_STRIKE`. *Fellowship* is
   RETIRED (two bullets down).
   · **TITHE PAYS FOR BREAK THAT LANDED, AND NOTHING FOR A BLOW THAT LANDED NONE (IR §1d, the designer's).** Its share is of the
     Break the meter took, and a floor of 1 on a share pays only when there is something to share: a Broken body, the Deadened
@@ -4120,7 +4120,17 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
     won fight's damage taken — and that is a property of the state, not of the figure: watched, never tuned on.
   · **A CONDITIONAL EFFECT IS WORTH ITS MAGNITUDE TIMES ITS UPTIME, AND THE UPTIME IS READ ON THE POPULATION THAT FINISHES RUNS (JF §0.3, the designer's).** Dirge at 45% over 1.7% of turns is worth about eight-tenths of a percent. With no crest worn, on runs that finish, of all hero turns: the reference four at Wanderer, 55 runs of 60, Dirge 1.7%, Dead Air 0.8%, Empty Pulpit 0.3%; the incumbent at Ruin, 57 runs of 60, Dirge 0.8%, Dead Air 0.4%, Empty Pulpit 0.3%.
     On the reference four at Ruin, which finishes none of 60, the same three hold 18.0%, 9.4% and 1.8%. A hero turn of a lost run holds them four to thirteen times as often as one of a run that finishes, at Wanderer and on the incumbent at Ruin, on five lost runs and three; lost runs are few, so six to eight held turns in ten still fall in runs that finish. At Warden, where five finish, the table cannot tell them apart. **So no figure moves: no magnitude fixes an uptime that small, and the crest's cap is one, so taking one
-    costs the slot.** The next crest rune is priced this way before it is authored, against the table of record, `docs/reports/JF-uptimes.tsv`, which reads every condition in the pool by rung with no crest worn. *The product is a gross, not a price (the batch's sentence, beside the designer's rule).*
+    costs the slot.** The next crest rune is priced this way before it is authored, against the table of record, `docs/reports/JF-uptimes.tsv`, which reads every condition the pool held at JF by rung with no crest worn, and `docs/reports/JG-uptimes.tsv`, which reads the cores. *The product is a gross, not a price (the batch's sentence, beside the designer's rule).*
+  · **THE POOL IS THREE PARTS INSURANCE AND ONE PART A RUNE, AND NO MAGNITUDE FIXES A CONDITION (JG §1.1, the designer's).** With no crest worn, on the reference four at Wanderer, on the 55 runs that finish, of all hero turns, and each product the batch's arithmetic off `docs/reports/JF-uptimes.tsv`:
+    a blow lands Break with a hero below full, Tithe 42.7%, 13% of a Break blow at its figure and about 2.8 health a hero turn; a hero lies fallen, Dirge 1.7%, 0.77%; no Mage stands, Dead Air 0.8%, 0.6%; no Cleric stands, Empty Pulpit 0.3%, 0.16%. Tithe reads 43 to 45% over every run on that party, and 33 to 35% on the incumbent.
+    **THREE OF THE FOUR KEY ON A HERO BEING DOWN, AND A HERO BEING DOWN IS RARE IN A RUN THAT FINISHES. TITHE IS THE ONE THAT WORKS, AND IT WORKS BECAUSE WHAT IT WAITS FOR IS A THING THAT HAPPENS.** So the three keep their figures, stay as insurance and stay on TO WATCH IN PLAY with their uptimes, and the pool's next rune keys on what the party does rather than on what has gone wrong.
+  · **THE CAP STAYS AT ONE (JG §1.2, the designer's).** A second slot is machinery nobody has walked, the bag and the crest strip at two. **WIDEN THE SLOT WHEN THE POOL IS WORTH FILLING, NOT BEFORE.**
+  · **TITHE's READ SITE WAITS ON THE TALENT's OWN BATCH (JG §1.3, the designer's).** It is *Breaking Heals a Hero*'s site, and the talent owes its own measurement first, so it is neither split nor rebalanced before that batch. No letter is assigned; FOUND AT HP in `docs/state.md` holds the item.
+  · **A NEW CREST RUNE's MAGNITUDE × UPTIME CLEARS 5% ON THE POPULATION THAT FINISHES RUNS, OR THE CONDITION IS TOO RARE AND THE RUNE DOES NOT SHIP (JG §1.4, the designer's).** The floor is derived from the pool's own two ends: Tithe's product is about 13%, Dirge's 0.77%, and 5% sits between the one that works and the three that do not, reachable at 25% uptime and 20%.
+    **IF THE FIGURE THE FLOOR DEMANDS IS ABOVE 75%, THE POOL's LARGEST, THE CONDITION IS TOO RARE AND THE ANSWER IS A DIFFERENT CONDITION, NOT A BIGGER NUMBER.** *(The batch's reading, JG §3:)* the population is the two rows JF's worth rule names, the reference four at Wanderer and the incumbent at Ruin, and the figure answers to the lower. The two ends are in different units, Break healed and damage dealt, so the floor is a rule of thumb between them and the product stays a gross.
+    **The floor does not replace the relation above it**: a conditioned rune still pays beyond the bare writer of its effect (HP §5), so on strike damage, where the tree writes 10%, a condition that holds half the time or more has a quotient the relation refuses, and the designer's own *50% uptime at 10%* reds `check_fn` §1b. There the relation sets the figure (the batch's precedence, JG's RULINGS OWED 7).
+  · **COMMUNION READS WHAT THE FOUR CARRY (JG §3; the floor and the rune the designer's, its key, its core and its figure the batch's, JG's RULINGS OWED).** `heroes_hold_core` takes one named core and asks whether a hero who stands wears it. **The condition's writers are the map's: `Run.awaken`, `Run.toggle_engine` and the swaps, read at the spawn. A fight keeps what it opened with (GM §2), so inside one only its holder's own fall and rise move it, and those two doors are where it is re-read.**
+    *Every hero holds a core* holds on every hero turn of every run on every cell read (`docs/reports/JG-uptimes.tsv`), because each takes one at class selection and the bot never unslots one: it is true of every party the bot plays, so it reads no choice (HL §4), and the card does not read it. A named core is true of the parties that chose it. **Its core is the one with the smallest quotient past the bare figure on those two rows, Conviction and Permafrost a tie, Conviction taken, and its figure that quotient a whole percent up, so the product still clears.** A party that opens with it is paid about 11% from the first fight; one that does not is paid nothing in most runs (30 of the incumbent's 60 arm runs never paid a hero turn, all on the two parties that did not open with it, 30 of their 40) and from the fight it finds the core in the rest: the 48.74% it is priced on is an average over three parties, and no party's uptime.
 - **A CONDITION ON THE FOUR IS READ AS THE FIGHT RUNS, BECAUSE READ AT THE SPAWN IT WAS A CONSTANT (HP §1, ruled; HO §3c
   found it).** The draft seats exactly one of each class — four picks from a roster of four — and a hero who falls in
   a fight that is WON stands again when it ends, so every fight a run played forward OPENS with one of each class, all
@@ -4163,7 +4173,7 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
 - **A LIVE PAYLOAD CARRIES A STAT ON A FIELD READ FRESH AND NOTHING ELSE, AND ANYTHING ELSE IS REFUSED LOUDLY WHERE IT IS
   AUTHORED (HP §1b).** A field read fresh at its read site is reversible — change the number and the next read sees
   it — and a field consumed once is not. **`Talents.LIVE_FIELDS` and `Talents.CONSUMED_FIELDS` partition HN §3a's
-  twenty-eight every-hero fields, DERIVED at the read sites** (seventeen fresh, with the four `rune_` twins summed
+  twenty-eight every-hero fields, DERIVED at the read sites; Communion's flag is a live field beside them, no twin and none of the twenty-eight, JG §3** (seventeen fresh, with the four `rune_` twins summed
   beside them; eleven consumed, each carrying where — a companion's summon copies six of them — and HN's party-wide
   stamps refused beside them). `Talents.live_refusal`
   is the one answer, and it refuses a card, an ability's figures, a live condition nested in an `also` or `upgrade`,
@@ -4191,7 +4201,7 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
   still pays; no door offers it. The shape cannot be fixed by tuning, so a cleansing crest rune is not re-proposed until
   the supply it answers is. **A SAVE THAT HELD IT LOADS WITH IT — HP's BRIEF SAID *WITHOUT*, AND THE BRIEF WAS THE ERROR
   (confirmed at HQ §1, the designer's)**: loading without it would have overturned FO §2 for this one rune and changed a
-  retired entry's payload. It is not a reversal of anything, and `data/runes.json`'s 171 entries count it.
+  retired entry's payload. It is not a reversal of anything, and `data/runes.json` still counts it.
 - **A HOLE IN THE FOUR IS PAID IN A STAT ONLY WHERE A STAT STANDS IN FOR THE CLASS (HO §3d, the designer's).** *No
   Cleric* pays mitigation for the healing that is missing and *no Mage* pays damage for the burst, a family of two by
   intent. **A *no Warrior* and a *no Hunter* crest were designed and CUT, and are not re-proposed**: a Warrior tanks by
@@ -4724,7 +4734,7 @@ name would be the failure worth catching, so `check_fd` §1f asserts the three s
 same breath as the removal.
 
 ## STANDING RULE — A RUNE THAT READS AN ENGINE IS OFFERED ONLY WHILE THAT ENGINE IS EQUIPPED (Batch GV)
-> **GP's card gate, one layer over. `Runes.ENGINE_READ` is the table — forty-two of the seventy-nine live ordinary runes (`check_gv` §0 sorts them all) (GV's
+> **GP's card gate, one layer over. `Runes.ENGINE_READ` is the table — forty-two of the eighty live ordinary runes (`check_gv` §0 sorts them all) (GV's
 > thirty-five, HC §2's Layered Aegis and HE §1's RULED rows less Long Poison, un-gated at HF §6), an engine and a `why` apiece — and `Runes.offerable` is the one answer: `Runes.eligible_ids` asks it at every roll (the
 > Peddler, the elite cache, the bargain, the event verb) and `Run.rune_choice` at a queued offer's answer.** *Since HB
 > it also withholds a rune that needs a companion from a hero who has dismissed the pet (`Runes.COMPANION_READ`).*
@@ -4734,6 +4744,7 @@ same breath as the removal.
   (`check_gv` §1): a row pays equipped and moves nothing owned. GP's groups hold — a rune that HALF-works, or needs only
   a card, a status any card lays, the stance or nothing, is not gated. **FP's 43 described the game at FP**:
   thirty-three of them are rows, ten are not, and two it did not count are (`docs/reports/GV.md` §3a).
+- **A CREST RUNE IS THE ONE EXCEPTION (JG §3; JG's RULINGS OWED).** A row is one hero's gate and the crest is worn by all four, so Communion, which names a core, is on no row: it is offered with no core slotted, and worn so it reads ARMED and the roll call says it waits. It never wears ○, though II §0.4's ○ marks a worn thing paying nothing: an exception to that rule too (JG's RULINGS OWED 5).
 - **EQUIPPED, NEVER OWNED.** The fight, the card gate and a rune's `requires_ability` on an enabler all read the
   equipped set. *GV's second reason — a spec rune's scope was the lineage, so every hero who could be offered a row owned
   its engine and a gate on ownership would withhold nothing — went with the spec scope at HC §1*: a row reaches every

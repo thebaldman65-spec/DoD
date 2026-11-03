@@ -989,6 +989,12 @@
 		"desc": "While a hero lies fallen, the rest deal\n{=@payload.stat.dmg_bonus*100}% more strike damage.",
 		"payload": {"stat": {"dmg_bonus": 0.45}, "condition": {"heroes_all_standing": false}}
 	},
+	"communion": {
+		"name": "Communion", "scope": "party",
+		"price": 150,
+		"desc": "While a hero wearing the Rune of the Devout\nstands, every hero deals {=Battle.COMMUNION_STRIKE*100}% more\nstrike damage.",
+		"payload": {"stat": {"rune_core_strike": 1}, "condition": {"heroes_hold_core": "conviction"}}
+	},
 
 	"engine_berserker": {
 		"name": "Rune of the Berserker (core)", "scope": "class:warrior",

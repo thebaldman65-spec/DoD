@@ -228,6 +228,9 @@ const GROUPS := {
 	"empty_pulpit": ["CREST", "every hero's damage taken, while no Cleric stands"],
 	"dead_air": ["CREST", "every hero's damage dealt, while no Mage stands"],
 	"dirge": ["CREST", "every hero's damage dealt, while a hero lies fallen"],
+	# BATCH JG §3 — THE FIRST CREST RUNE WHOSE CONDITION NAMES A CORE: no `ENGINE_READ` row, because a row is one hero's gate
+	# and the crest is worn by all four; a drop with no holder is the crest's own rule, and JG's RULINGS OWED asks.
+	"communion": ["CREST", "every hero's damage dealt, while a hero wearing the Rune of the Devout stands"],
 }
 
 # The cards a drive casts beyond the one `requires_ability` names, seated drafted
@@ -929,7 +932,9 @@ func _s1_every_rune_driven() -> void:
 				and (ho_src.contains("func _s5b_%s(" % id) or ho_src.contains("func _s5c_%s(" % id))
 			var by_hp: bool = hp_src.contains("const THREE := {") and hp_src.contains('"%s": {' % id) \
 				and hp_src.contains("func _s2c_each_through_a_fall_and_a_revive")
-			ok(by_ho or by_hp,
+			# BATCH JG §3 — OR `check_jg` §3d DOES: Communion, through a real fall and a real revive.
+			var by_jg: bool = String(id) == "communion" and FileAccess.get_file_as_string("res://check_jg.gd").contains("func _s3d_the_fight")
+			ok(by_ho or by_hp or by_jg,
 				"§1: %s is worn by the crest and neither `check_ho` §5 nor `check_hp` §2 drives it — a CREST rune nobody drives" % id)
 			crest += 1
 			continue

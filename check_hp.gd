@@ -68,6 +68,9 @@ const HN_28 := ["max_hp", "max_hp_pct", "attack", "armor", "crit_bonus", "speed"
 	"rapid_fire", "snap_shot", "constitution", "stability", "block_chance"]
 const TWINS := {"rune_broken_will_ranks": "broken_will_ranks", "rune_blood_communion": "blood_communion",
 	"rune_bonecracker_ranks": "bonecracker_ranks", "rune_field_medic": "field_medic"}
+# BATCH JG §3 — a live field that is no twin and no part of HN's twenty-eight: a rune's own flag, read fresh in the sum
+# `dmg_bonus` is read in. It joins the walks below it; the partition is asked of the twenty-eight.
+const RUNE_FLAGS := ["rune_core_strike"]
 # HN §3a's third group: the stamps the battle takes the best holder's figure of, once.
 const STAMPS := ["devoutness_ranks", "rune_devoutness_ranks", "last_hope_pct", "rune_last_hope_pct", "guardian_step"]
 # The fields `_do_summon` hands a companion as it is called (the body's cfg, and the
@@ -436,7 +439,7 @@ func _s1b_the_fields() -> void:
 	for f in Talents.LIVE_FIELDS:
 		if TWINS.has(String(f)):
 			twins.append(String(f))
-		else:
+		elif not RUNE_FLAGS.has(String(f)):
 			fresh.append(String(f))
 	# The consumed list carries HN's party-wide stamps beside the eleven (its third group,
 	# outside the twenty-eight); the partition is asked of the twenty-eight.

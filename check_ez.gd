@@ -153,15 +153,16 @@ func _s0_the_pool() -> void:
 	# **BATCH HP MOVED IT 168 -> 171**: the three crest runes that read who stands, live;
 	# Fellowship is retired and its entry kept (ET's contract), so the crest's live count
 	# goes 2 -> 4 and the file grows by the three.
-	ok(data.size() == 171, "§0: the authored pool is %d entries, expected 171 (the twenty-four engine runes, HF's fifteen and the crest's four live)" % data.size())
+	# **BATCH JG MOVED IT 171 -> 172**: Communion, the crest's fifth live rune.
+	ok(data.size() == 172, "§0: the authored pool is %d entries, expected 172 (the twenty-four engine runes, HF's fifteen and the crest's five live)" % data.size())
 	var eng := 0
 	for id0 in data:
 		if String((data[id0] as Dictionary).get("engine", "")) != "":
 			eng += 1
 	var hf := _hf_ids()
 	var crest := _crest_ids()
-	ok(eng == 24 and hf.size() == 15 and crest.size() == 4
-			and ez.size() + eng + hf.size() + crest.size() == 103,
+	ok(eng == 24 and hf.size() == 15 and crest.size() == 5
+			and ez.size() + eng + hf.size() + crest.size() == 104,
 		"§0: ...and twenty-four of them are ENGINE runes (GK, GO), %d are HF's class runes and %d are the crest's, live beside the sixty and outside this gate's population (%d engines)" % [hf.size(), crest.size(), eng])
 	# THE PARTITION: every live entry is one of the four kinds, so a live rune that
 	# is none of them — a scope nothing resolves, a lineage and the crest at once —
@@ -456,6 +457,9 @@ func _party_for(cond: Dictionary) -> Array:
 				(m as Dictionary)["hp"] = 0
 	if cond.has("heroes_all_standing") and not bool(cond["heroes_all_standing"]):
 		(party[1] as Dictionary)["hp"] = 0
+	# BATCH JG §3 — A PARTY THE KEY HOLDS FOR: the core it names, slotted on the Cleric.
+	if cond.has("heroes_hold_core"):
+		(party[2] as Dictionary)["engines"] = [{"engine": String(cond["heroes_hold_core"]), "equipped": true}]
 	return party
 
 

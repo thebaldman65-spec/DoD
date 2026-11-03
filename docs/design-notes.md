@@ -4,6 +4,18 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Communion, the first rune since HP (Batch JG) — 2026-11-03
+
+**Why a crest rune's figure answers to a floor.** The pool's own two ends say what works: Tithe pays about 13% of a Break blow on nearly half of hero turns, and Dirge about eight-tenths of a percent. A floor between them says a condition has to happen often enough to be felt, and a figure that would have to pass the pool's largest is a condition too rare, which no number repairs.
+
+**Why the card does not read *every hero holds a core*.** Every hero takes one at class selection, so that sentence is true of every party from the first turn unless a player unslots one. A condition true of every party reads no choice, the failure a party rune is written against, and the floor's quotient on it is under the talent tree's bare 10%. What the words reached for, a party that has built up its cores, is real and it rises through a run, but it is a shape the door lacks.
+
+**Why a lineage's core and not a found one.** A player either holds a named core or does not, so its uptime for him is nearly all or nearly nothing. Read on a population, a found core looks rare and earns a large figure, and a player who took that core at class selection would then be paid the whole of it all fight. Conviction's lower reading comes from three incumbent parties of which one holds it, so its figure is close to what the rule of thumb wants for a party that builds for it. The same reading is nobody's uptime, and the record says so.
+
+**Why a fall still moves it.** A fight keeps what it opened with, so nothing in a fight writes a core. Its holder falling is the one thing that can change the condition inside a fight, and the key counts the heroes who stand.
+
+**Why it ships reading no outcome.** It pays, and a fight shows it: the same opening fight ends about 7% sooner. Whether that turns into runs won is past what sixty runs can read, and the brief ordered it shipped either way.
+
 ## The cut, the read-outs, and the verification put right (Batch JF) — 2026-11-02
 
 **Why a conditional effect is priced on who finishes.** A rune's figure is what it pays while its condition holds, and a player meets it only as often as the condition does. Dirge's 45% looks like a large number until it is multiplied by the hero turns it gets where runs finish in numbers, under 2%. Read on a rung where no run finishes, the same rune looks like it holds a sixth of the game, and nobody there sees the end. So the uptime is read where runs finish, and no figure moved: no magnitude fixes an uptime that small.

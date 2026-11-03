@@ -149,16 +149,17 @@ func _s1_rune_tags_follow_the_cards() -> void:
 	# `dmg_taken_bonus`, less damage taken (DEFENSE), and Dead Air and Dirge write
 	# `dmg_bonus` (OFFENSE). Fellowship is retired and its row is KEPT — the table is
 	# keyed by id and a retired entry still resolves — so DEFENSE keeps it.
+	# **BATCH JG MOVED OFFENSE 34 -> 35 AND NOTHING ELSE.** Communion adds to strike damage (OFFENSE), derived at its read site.
 	var want := {"DEBUFF": 38, "DEFENSE": 42, "BREAK": 0, "RESOURCE": 28,
-		"OFFENSE": 34, "TEMPO": 5, "MARK": 0}
+		"OFFENSE": 35, "TEMPO": 5, "MARK": 0}
 	var moved_col: Array = []
 	for k in want:
 		if int(spread[String(k)]) != int(want[k]):
 			moved_col.append("%s %d!=%d" % [k, int(spread[String(k)]), int(want[k])])
 	ok(moved_col.is_empty(),
 		"§1: a primary column the demotion does not touch has moved — %s" % [moved_col])
-	ok(Runes.RUNE_TAGS.size() == 147,
-		"§1: the table is %d rows, not the 147 after HP (FO's 127, HF's fifteen and the crest's five, one retired)" % Runes.RUNE_TAGS.size())
+	ok(Runes.RUNE_TAGS.size() == 148,
+		"§1: the table is %d rows, not the 148 after JG (FO's 127, HF's fifteen and the crest's six, one retired)" % Runes.RUNE_TAGS.size())
 	print("    RUNE_TAGS primaries: %s" % [spread])
 
 	# **THE CARD TABLE IS THE POSITIVE ARM.** FD's ruling is what this one

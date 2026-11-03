@@ -126,7 +126,7 @@ func _s1_the_rulings() -> void:
 	ok(pool >= 0, "§1a: the pooling rule is not in the ladder block")
 	ok(clause > pool and clause - pool < 900, "§1a: the covariance clause does not stand in the pooling rule (%d, %d)" % [pool, clause])
 	ok(ladder.contains("that clause is correctness, so it is a batch's to write and the designer's to be told of"), "§1a: the clause is still written as the batch's reading, waiting on a ruling")
-	var tie := ladder.find("A TIE BETWEEN TWO BATCHES' ARMS ON ONE SEED BLOCK IS NAMED AS CORRELATED. WHERE SUCH A TIE DECIDES A GRADE, THE COVARIANCE IS COMPUTED BEFORE THE GRADE IS WRITTEN")
+	var tie := ladder.find("WHERE SUCH A TIE DECIDES A GRADE, THE COVARIANCE IS COMPUTED BEFORE THE GRADE IS WRITTEN")
 	ok(tie > pool and tie - pool < 1400, "§1a: the standing correction does not stand where the pooling rule stands (%d, %d)" % [pool, tie])
 	ok(ladder.contains(SETTLED), "§1b: the settled ties are not named in one line")
 	# EACH NAME A GRADE THE DECK STILL HOLDS, AT THE GRADE THE SENTENCE CALLS SETTLED: a re-grade owes this line a re-read.
@@ -134,7 +134,7 @@ func _s1_the_rulings() -> void:
 	for spec in [["ambushed", 4], ["porous", 2], ["fleeting", 2], ["encumbered", 1], ["fractured", 1], ["slick", 1], ["feverish", 2], ["warded", 2]]:
 		ok(int((deck.get(spec[0], {}) as Dictionary).get("severity", -1)) == int(spec[1]), "§1b: %s no longer stands at %d, and the line calls it settled" % [spec[0], int(spec[1])])
 	var source := _doc("res://scripts/run_state.gd")
-	ok(source.contains("A TIE BETWEEN TWO BATCHES' ARMS ON ONE SEED BLOCK IS NAMED AS CORRELATED"), "§1a: the comment above `Run.MODIFIERS`, the rule's second home, does not carry the correction")
+	ok(source.contains("TWO READINGS OF ONE POPULATION ON ONE SEED BLOCK ARE NAMED AS CORRELATED"), "§1a: the comment above `Run.MODIFIERS`, the rule's second home, does not carry the correction")
 	# THE PRICE, IN THE RULING's OWN BLOCK, EACH FIGURE ITS OWN ARITHMETIC OFF THE SPIRAL's COUNTS: 0 / 45 / 15, the old rule's and the standing one's.
 	var fall := _flat(_block(rules, FALL_HEAD))
 	var spiral := _tsv("res://docs/reports/JE-spiral.tsv", ["figure", "population", "jc_rule", "je_rule"])
@@ -284,6 +284,9 @@ func _s4a_the_pool() -> void:
 	print("    the scope holds %s" % str(scope))
 	ok(scope.size() >= 5, "§4a: the party scope holds %d entries" % scope.size())
 	for id in scope:
+		# BATCH JG §3 — THE TABLE IS A KEPT READ-OUT OF THE FIVE THE POOL HELD AT JF, AND A KEPT REPORT IS NOT REWRITTEN: `check_jg` §3 holds Communion.
+		if id == "communion":
+			continue
 		ok(named.has(id), "§4a: %s has no row in the pool's table" % id)
 		if not named.has(id):
 			continue
@@ -408,7 +411,7 @@ func _s5_the_deck() -> void:
 func _s6_the_verification() -> void:
 	print("\n§6 — the rewordings, the readers, and the positional tool's own control")
 	var instr := _flat(_doc("res://docs/instrument-rules.md"))
-	ok(instr.contains("A RECON IS OWED WHEN THE GAME's CODE OR DATA MOVES. A GATE's OWN CHANGE IS COVERED BY THE PRE-RUN THAT RUNS IT, PLUS THE STANDALONE `check_de` AND THE ACCEPTANCE"), "§6a: cut two's wording is not fixed")
+	ok(instr.contains("A RECON IS OWED WHEN THE GAME's CODE OR DATA MOVES. A GATE's, AN INSTRUMENT's OR THE RUNNER's OWN CHANGE IS COVERED BY THE PRE-RUN THAT RUNS IT, PLUS THE STANDALONE `check_de` AND THE ACCEPTANCE"), "§6a: cut two's wording is not fixed")
 	var old_recon := "RECON IS OWED FOR " + "CODE AND GATES"
 	ok(not instr.contains(old_recon), "§6a: the old wording of cut two still stands")
 	ok(instr.contains("THE POSITIONAL RE-RUN RE-DERIVES ALL 489 READS EVERY BATCH"), "§6a: the positional rule does not re-derive all 489")

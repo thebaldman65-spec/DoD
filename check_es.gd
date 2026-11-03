@@ -172,7 +172,8 @@ func _s1_rarity_is_gone() -> void:
 	# condition on who stands holds as the fight runs (the designer's, HP §2), and
 	# Fellowship retired rather than deleted (HP §3, ET's contract) — so the file
 	# grows by the three and keeps the one.
-	ok(data.size() == 171, "§1: the authored pool is %d entries, expected 171" % data.size())
+	# **BATCH JG: 171 -> 172.** Communion.
+	ok(data.size() == 172, "§1: the authored pool is %d entries, expected 172" % data.size())
 	ok(with_rarity.is_empty(), "§1: %s still carry a `rarity` key" % [with_rarity])
 	ok(with_scarred.is_empty(), "§1: %s still carry a `scarred` key" % [with_scarred])
 

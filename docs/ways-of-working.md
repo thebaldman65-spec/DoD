@@ -107,6 +107,8 @@ as a rule; until JC it stood only in the briefs that allowed it, so this states 
 the thing that would find it is broken, and a brief's own negatives had no such pairing: *it is not a spiral* was a claim of absence given as a reason, and nobody had read it. *(The batch's addition, not the designer's words:)* **the batch checks what the
 reading can actually see, too**: JE's brief ordered a re-read of a gap of 45 off logs whose bot opened with no relic, so the gap was all but absent from them.
 
+**A FIGURE IN A BRIEF CARRIES THE POPULATION IT WAS READ ON, AND A CITATION NAMES ITS SECTION (JG §0, the designer's).** JF found thirty-two of forty-two premises wanting, and the two that mattered were one failure twice: one column quoted of a two-column table, and a finding cited to a batch that does not hold it. **It is a writing rule, not an instrument**, so like the pricing rule above nothing in the tree can check it.
+
 ## RECON BEFORE AUTHORING
 
 > **Before content is written for an area, a batch reads out what already exists there: the

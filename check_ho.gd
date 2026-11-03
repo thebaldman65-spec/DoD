@@ -99,6 +99,8 @@ const NEAR_MISSES := {
 const LITERAL_MISSES := {
 	"Tithe": ["battle.gd:    → Blood Tithe: %s collects %d Rage"],
 	"Fellowship": [],
+	# BATCH JG §3 — the Devout's deleted node: its log line and the sim's Faith term, neither reachable by a player, named.
+	"Communion": ["battle.gd:    → Talent: Communion — %s's fervor spreads to %s", "battle.gd: Communion"],
 }
 
 # §7 — the card's words, ruled at HO §0, as the screen breaks them.
@@ -851,9 +853,11 @@ func _s2d_the_three_are_authored() -> void:
 	crest_ids.sort()
 	live_ids.sort()
 	ok((data as Dictionary).size() > 100, "§2d: data/runes.json read back %d entries" % (data as Dictionary).size())
-	ok(crest_ids == ["dead_air", "dirge", "empty_pulpit", "fellowship", "tithe"]
-			and live_ids == ["dead_air", "dirge", "empty_pulpit", "tithe"],
+	ok(crest_ids == ["communion", "dead_air", "dirge", "empty_pulpit", "fellowship", "tithe"]
+			and live_ids == ["communion", "dead_air", "dirge", "empty_pulpit", "tithe"],
 		"§2d: the file's crest runes are %s, %s of them live" % [crest_ids, live_ids])
+	# BATCH JG §3 — COMMUNION IS NOT ONE OF THE THREE HO SPECIFIED: `check_jg` §3 holds it.
+	conditioned.erase("Communion")
 	var wrong: Array = []
 	for nm in HELD_BACK:
 		if str(conditioned.get(nm, {})) != str(HELD_BACK[nm]):
@@ -1439,7 +1443,7 @@ func _s5e_the_names() -> void:
 	var crest_all: Array = []
 	for cr in _all_crest_runes():
 		crest_all.append(String((cr as Dictionary).get("id", "")))
-	ok(crest_all.size() == 5, "§5e: the literal sweep asks %d crest entries, not the five" % crest_all.size())
+	ok(crest_all.size() == 6, "§5e: the literal sweep asks %d crest entries, not the six" % crest_all.size())
 	for id2 in crest_all:
 		var shipped := Runes.display_name(Runes.config(String(id2)))
 		var found: Array = []

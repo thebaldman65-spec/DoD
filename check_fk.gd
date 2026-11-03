@@ -158,7 +158,8 @@ func _s1_the_pool() -> void:
 	# BATCH HP §2 — FOUR SINCE HP: Tithe, and the three that pay while a condition on
 	# who stands holds (Empty Pulpit, Dead Air, Dirge). Fellowship is retired (HP §3)
 	# and is skipped with the other retired entries at the head of the walk.
-	ok(crest.size() == 4, "§1: %d live runes are the crest's, not HP's four — %s" % [crest.size(), crest])
+	# BATCH JG §3 — FIVE SINCE JG: Communion.
+	ok(crest.size() == 5, "§1: %d live runes are the crest's, not JG's five — %s" % [crest.size(), crest])
 	ok(by_spec.size() == 12,
 		"§1: the live pool spans %d specs, not all 12 — %s" % [
 			by_spec.size(), by_spec.keys()])

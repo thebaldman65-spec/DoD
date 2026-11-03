@@ -11724,9 +11724,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# in `note_resource_spent` still cannot see the ability at all.
 			# BATCH GO — SAVAGE ASSAULT'S PAYOUT JOINS THE SAME SUM, for Channel's
 			# reason: "a percentage of damage dealt" has one honest place to land.
-			# It is ADDED to the other terms, so it compounds with none of them.
+			# It is ADDED to the other terms, so it compounds with none of them. BATCH JG §3 — COMMUNION JOINS IT, for the same reason.
 			raw *= 1.0 + attacker.dmg_bonus + attacker.channel_bonus(ab.dmg_type) \
-				+ attacker.reaver_bonus() \
+				+ attacker.reaver_bonus() + (COMMUNION_STRIKE if attacker.rune_core_strike > 0 else 0.0) \
 				+ float(attacker.type_dmg_bonus.get(ab.dmg_type, 0.0))
 			# RUNAWAY RESONANCE, CLAUSE 2 (target side): the same compounding
 			# curve at half the step, and NOTHING SOFTENS IT — Arcane Ward is
@@ -26919,6 +26919,13 @@ const COUP_FOCUS_CAP := 200
 const SHARED_MARK_FOCUS := 5
 
 
+# BATCH JG §3 — COMMUNION'S FIGURE, THE WHOLE OF IT: the card and the chip read it and the strike multiplies by it.
+# **IT IS DERIVED**: the crest's floor over the lower of the core's two readings on the runs that finish, a whole
+# percent up so the product still clears the floor (`CLAUDE.md`'s crest block; `check_jg` §3b reads the quotient off
+# `docs/reports/JG-uptimes.tsv`). A re-tune moves this line and that arm; the floor and HP §5's relation stay.
+const COMMUNION_STRIKE := 0.11
+
+
 func _focus_cap(u: BattleUnit) -> int:
 	if u.spray > 0:
 		return 50
@@ -29059,6 +29066,8 @@ func _rune_effect_words(payload: Dictionary) -> String:
 			"dmg_bonus":
 				parts.append("every hero deals %d%% %s strike damage" % [int(round(absf(v) * 100.0)),
 					"more" if v > 0.0 else "less"])
+			"rune_core_strike":
+				parts.append("every hero deals %d%% more strike damage" % int(round(COMMUNION_STRIKE * 100.0)))
 			"rune_blood_communion":
 				parts.append("a hero's attack that lands Break heals the hero furthest from full for %d%% of it" % int(round(v)))
 			_:
@@ -29075,7 +29084,7 @@ func _condition_words(cond: Dictionary) -> String:
 	if cond.has("heroes_include_class"):
 		return "while a %s stands" % String(cond["heroes_include_class"]).capitalize()
 	if cond.has("heroes_hold_core"):
-		return "while a hero wears the %s" % Classes.engine_title(String(cond["heroes_hold_core"]))
+		return "while a hero wearing the %s stands" % Runes.core_noun(String(cond["heroes_hold_core"]))
 	if cond.has("heroes_class_count"):
 		var cc: Dictionary = cond["heroes_class_count"]
 		return "while %d to %d %ss stand" % [int(cc.get("min", 0)), int(cc.get("max", 4)),

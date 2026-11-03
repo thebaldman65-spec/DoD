@@ -17,6 +17,22 @@ heading stands in both files. **Since JE §3 it also takes what `CLAUDE.md` clos
 
 ---
 
+## ARCHIVED AT JG — 2026-11-03, FROM `docs/state.md` AS JF LEFT IT (`8949213`)
+
+*What JG's brief answered, word for word from the file. No cut was taken: JG writes a rune, and `docs/state.md` stands under its ceiling.*
+
+### ~~JF's RULINGS OWED~~ — **ALL FOUR ANSWERED IN JG's BRIEF (1: the ties' rule takes the alternative, JG §0.1; 2: *Ruin runes* struck, the figures and the rate the rule's, JG §0.2; 3: POLICY, JG §0.3; 4: all three wordings, the third extended, JG §0.4)**
+
+*Its head as it stood: **FOUR; EACH TAKEN ON THE RECOMMENDATION, NONE HOLDING ANYTHING UP***
+
+Full working: `docs/reports/JF.md`, NEEDS A RULING.
+
+1. **THE TIES READ THE OLD WAY ARE EIGHT, NOT THREE (JF §0.1).** The brief's line named Ambushed, Porous and Fleeting. Encumbered is the one grade such a choice ever moved (IZ's 2 → 1, `docs/reports/IZ-grades.tsv`), Fractured stands in JB's sentence beside Porous, and `docs/reports/IZ-reread.tsv` prints the same test on Slick Footing, Feverish and Warded, each the reading its grade rests on. **Taken**: the line names eight, all settled, and no grade moved at JF. **Porous's and Fractured's arms are one batch's, so *two batches' arms* does not reach them as worded.** **The alternative**: *two readings of one population on one seed block*, which reaches them. **Reversing it** is a few words in the rule.
+2. **"RUIN RUNES" DOES NOT HOLD ON THE RULE's OWN POPULATION, AND THE UPTIME THE RULE QUOTES IS THE TRUE NONE's (JF §0.3, §4).** The incumbent finishes 57 runs of 60 at Ruin with no crest worn, and JE's 1.4% was read on a party wearing a crest rune in 55 of 60 runs. **Taken**: the rule's words as ordered; its figures read with no crest worn on runs that finish, 1.7, 0.8 and 0.3% at Wanderer and 0.8, 0.4 and 0.3% on the incumbent at Ruin; a rate per hero turn, four to thirteen times a lost run's against a finishing run's, in place of *Ruin runes*. **And *fire almost exclusively in runs that are already lost* does not hold where runs finish in numbers**: 61 to 78% of held turns fall in runs that finish, because lost runs are few. **The alternatives**: the brief's 1.4, 0.8 and 0.4%, the default sim's over every run; or 2.0, 1.0 and 0.5%, no crest worn over every Wanderer run, which keeps the brief's scope with the crest repaired. **Reversing it** is one sentence in `CLAUDE.md`, one row of TO WATCH IN PLAY and `check_jf` §1d's cells.
+3. **THE RELIC DEFAULT AND THE CREST DEFAULT ARE SORTED POLICY (JF §2, §4).** The bot takes no relic at the draft unless a job names some, and wears the first crest rune it draws: the same doors and legal choices. **Taken**: POLICY, rows DV34 and DV35. **The alternative**: MODEL, the bot standing in for a player's hands; RULE is out, because a RULE is repaired in its batch and `check_iv` §3b holds that count at zero. **Reversing it** is one cell a row.
+4. **THREE WORDS OF MINE STAND UNDER YOUR VERIFICATION RULES (JF §6).** The readers' list names the positional reader, where you wrote *the positional reader stays* apart from the four; *a comment moves no die, and a code line owes the recon* is my reading of *code*, and it is the sentence that exempts this batch, so it is marked the batch's; and the recon rule names the game's code and a gate's own change, and a `.py` instrument's or the runner's change is neither (JF changed `claude_md_census.py` and `run_battery.sh`). **Taken**: all three as written, the third read as a gate's. **The alternative**: strike the first, or name instruments in the rule. **Reversing it** is one clause each.
+
+
 ## ARCHIVED AT JF — 2026-11-02, FROM `docs/state.md` AS JE LEFT IT (`4b8763d`)
 
 *What JF's rulings answered, and what its cut derived closed (JF §3, HX §2's method): `docs/reports/JF-cut.tsv` names each unit and what closed it, word for word from the file.*

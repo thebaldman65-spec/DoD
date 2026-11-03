@@ -537,7 +537,9 @@ const LIVE_FIELDS := ["dmg_bonus", "dmg_taken_bonus", "parry_bonus", "pierce_bon
 	"block_chance", "broken_will_ranks", "rune_broken_will_ranks", "blood_communion",
 	"rune_blood_communion", "bonecracker_ranks", "rune_bonecracker_ranks", "field_medic",
 	"rune_field_medic", "follow_through", "deflection", "undying_rage", "no_cover",
-	"sundering_shot", "no_quarter_ranks", "rapid_fire", "snap_shot"]
+	"sundering_shot", "no_quarter_ranks", "rapid_fire", "snap_shot",
+	# BATCH JG §3 — Communion's flag: one read, in the sum `dmg_bonus` is read in, and no writer after the spawn.
+	"rune_core_strike"]
 # **THE ELEVEN OF THE TWENTY-EIGHT A LIVE PAYLOAD IS REFUSED, AND WHERE EACH IS
 # CONSUMED** — with the party-wide stamps beside them. The refusal names the reason,
 # so the batch that authors one reads why rather than re-deriving it. A field on

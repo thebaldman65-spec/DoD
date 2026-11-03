@@ -413,7 +413,7 @@ const TAG_CHECKERS := ["check_ek.gd", "check_el.gd", "check_es.gd",
 	"check_ez.gd", "check_fd.gd", "check_fe.gd", "check_fh.gd",
 	"check_fk.gd", "check_fn.gd", "check_fo.gd", "check_gn.gd",
 	"check_go.gd", "check_gu.gd", "check_hf.gd", "check_ho.gd", "check_hp.gd",
-	"check_if.gd", "check_map_screen.gd", "test_batch_ar.gd"]
+	"check_if.gd", "check_jg.gd", "check_map_screen.gd", "test_batch_ar.gd"]
 
 # The files a MECHANIC would have to live in. Asserted at ZERO separately from
 # the set above, because "the set is exactly these five" and "battle.gd holds

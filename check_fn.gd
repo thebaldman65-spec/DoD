@@ -48,6 +48,9 @@
 #       --script check_fn.gd
 extends SceneTree
 
+# BATCH JG §3 — a flag field, the effect it adds to and the constant that holds its magnitude (§1b).
+const FLAG_WEIGHED := {"rune_core_strike": ["dmg_bonus", "COMMUNION_STRIKE"]}
+
 const Gate = preload("res://gate_fixture.gd")
 
 # **THE EIGHT, BY ID — HEAD's `check_fk.STILL_GATED`, CARRIED VERBATIM.** Listed
@@ -305,13 +308,19 @@ func _s1_the_eight_are_ungated() -> void:
 			under.append("%s writes no stat to weigh" % id5)
 		for f5 in st5:
 			var v5 := float(st5[f5])
-			if not bare.has(f5):
-				under.append("%s: no bare writer carries `%s` — name the reference" % [id5, f5])
+			# BATCH JG §3 — A FLAG IS WEIGHED BY WHAT IT PAYS: Communion's field holds no magnitude (the Shared
+			# Mark's shape), so the relation reads its constant against the effect it adds to. The named reference.
+			var fw := String(f5)
+			if FLAG_WEIGHED.has(fw):
+				v5 = float((load("res://scripts/battle.gd") as Script).get_script_constant_map()[FLAG_WEIGHED[fw][1]])
+				fw = String(FLAG_WEIGHED[fw][0])
+			if not bare.has(fw):
+				under.append("%s: no bare writer carries `%s` — name the reference" % [id5, fw])
 				continue
-			var ref := float(bare[f5][0])
-			relation_rows.append("%s %s %s against %s %s" % [id5, f5, str(v5), bare[f5][1], str(ref)])
+			var ref := float(bare[fw][0])
+			relation_rows.append("%s %s %s against %s %s" % [id5, fw, str(v5), bare[fw][1], str(ref)])
 			if not (absf(v5) > absf(ref) and signf(v5) == signf(ref)):
-				under.append("%s: `%s` %s is not beyond the bare %s (%s)" % [id5, f5, str(v5), str(ref), bare[f5][1]])
+				under.append("%s: `%s` %s is not beyond the bare %s (%s)" % [id5, fw, str(v5), str(ref), bare[fw][1]])
 	print("    CHECKED %d conditioned live runes against the bare writers: %s" % [conditioned.size(), relation_rows])
 	ok(under.is_empty(),
 		"§1b: a conditioned rune pays no more than the bare equivalent — FN's ruling, reconciled at HP §5: %s" % [under])

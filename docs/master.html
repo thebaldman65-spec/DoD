@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-11-02 (Batch JE &mdash; the trace sized, the ceiling cut, the runes priced)</b></p>
+<p align="right"><b>Last updated: 2026-11-03 (Batch JG &mdash; Communion, the first rune since HP)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1323,10 +1323,10 @@ Kit panel says which rune brings it back, on its row and on its hover, and the k
 Kill Command and the companion cards on the companion every Hunter but the Sharpshooter summons
 &mdash; always fights.</li>
 <li><b>A rune that reads an engine is offered only while that engine is equipped.</b> Forty-two of
-the seventy-nine ordinary runes pay nothing at all to a hero whose engine slots do not hold their engine &mdash;
+the eighty ordinary runes pay nothing at all to a hero whose engine slots do not hold their engine &mdash;
 a Ruin rune to a Cleric who has unequipped the Rune of the Occultist (core), a Focus rune to a Hunter who has
 unequipped the Rune of the Sharpshooter (core) &mdash; and none of them is rolled for him, at the Peddler, in
-an elite's cache, in a bargain or from an event. <b>A rune that still does part of its job without its
+an elite's cache, in a bargain or from an event. A crest rune is worn by all four, so no hero's engine gates it: <i>Communion</i> can arrive with nobody wearing its core, and waits. <b>A rune that still does part of its job without its
 engine is offered</b>: Glass Prison still freezes a second body, and the runes that read a card or
 nothing at all are offered to every hero of their class. <b>A rune that reads a status or a stance is
 the rune of the engine that lays it</b>, and is offered, and pays, only while that engine rune is
@@ -2755,7 +2755,7 @@ holds.</li>
 <li><b>Runes</b> (run-scoped gear, dropped after every normal fight, bought at the Peddler or chosen
 from elite caches — the in-run power source): an <b>authored pool</b> (data/runes.json).
 <br><b>A RUNE DROPS AFTER EVERY NORMAL FIGHT WON</b>: one, at random, always for a class among the
-heroes or for the Crest, never one they already hold, and never one that reads an engine not equipped &mdash; the rules
+heroes or for the Crest, never one they already hold, and never a hero's rune that reads an engine not equipped &mdash; the rules
 every other way of getting a rune follows &mdash; and the victory card names it. An elite, a mini-boss
 and a boss drop none; each pays its own reward. <b>A CLASS RUNE OR A CORE RUNE GOES TO ITS HERO</b>
 &mdash; the hero of its class &mdash; who holds it unworn until he equips it, and the victory card and
@@ -2768,14 +2768,14 @@ onto a full holding</b> is shown beside that holding: drop one of its runes to t
 behind. A full holding refuses an unequip until there is room, and a swap &mdash; one rune each way
 &mdash; always goes through, except a core-rune swap that would put Summon Companion back into a kit with no free slot.
 <br><b>THE CREST</b> is a slot of its own, beside the heroes' slots, for a rune worn by every hero at
-once: its effect reaches all four in every fight. There is one crest slot. <b>FOUR CREST RUNES EXIST.
+once: its effect reaches all four in every fight. There is one crest slot. <b>FIVE CREST RUNES EXIST.
 <i>Tithe</i></b>: a hero's attack that lands Break heals the hero furthest from full, for 30% of it &mdash; the hero
 standing lowest by share of maximum health. It reads the
 Break an ordinary attack applies as it lands &mdash; an attack that lands none (into an enemy already Broken, under Deadened, or a blow its Constitution rounds away) heals nobody, and nothing for Break dealt by a
 card's own effect, a trap, a companion, a talent's proc or the Long Watch's carry &mdash; and it is added to the talent
 tree's <i>Breaking Heals a Hero</i> for a hero who wears both. <b><i>Empty Pulpit</i></b>: while no Cleric stands, every
 hero takes 50% less strike damage. <b><i>Dead Air</i></b>: while no Mage stands, every hero deals 75% more strike
-damage. <b><i>Dirge</i></b>: while a hero lies fallen, the rest deal 45% more strike damage &mdash; all three read the
+damage. <b><i>Dirge</i></b>: while a hero lies fallen, the rest deal 45% more strike damage. <b><i>Communion</i></b>: while a hero wearing the Rune of the Devout stands, every hero deals 11% more strike damage &mdash; all four read the
 strike, as the glossary defines it, and nothing else. <b>A crest rune drops and is sold as any
 other rune is, and sits in the bag while the Crest does not wear it</b>; it belongs to no class, and wears no marker on its name: the Peddler's row
 and an event's line say <i>for the crest</i> beside one. <b>It is never in a hero's own pick of three</b> &mdash; the elite's
@@ -2794,9 +2794,9 @@ so every fight opens with all four standing unless it is resumed after a quit, w
 still down. A card a crest rune grants is on every hero's bar for the fight, priced in each hero's own resource, and is
 not kept after it.
 <br><b>ALL TWELVE SPECS ARE AUTHORED, AND FIFTEEN CLASS RUNES READ NO ENGINE.
-147 ORDINARY ENTRIES: 68 RETIRED AND 79 LIVE.</b> Sixty were written for a lineage &mdash; ten
+148 ORDINARY ENTRIES: 68 RETIRED AND 80 LIVE.</b> Sixty were written for a lineage &mdash; ten
 lineages have five, the Beastmaster six, and the Devout four &mdash; <b>fifteen were written for
-their class and read no engine</b> (below), and <b>four are the Crest's</b> (above). <b>The Devout's fifth is OWED, not missing</b>: a rune saying
+their class and read no engine</b> (below), and <b>five are the Crest's</b> (above). <b>The Devout's fifth is OWED, not missing</b>: a rune saying
 <i>&ldquo;Consecrated Ground grants Faith to allies standing in it, not only to its caster&rdquo;</i>
 would ship 100% inert, because that is <b>the base kit</b>.
 <b>PRICE IS 150g, FLAT, EVERY RUNE, AND THE PEDDLER BUYS BACK
@@ -2804,7 +2804,7 @@ ANY RUNE NOBODY WEARS FOR A THIRD (50g)</b> &mdash; there is no rarity and price
 player pays for FIT rather than for magnitude; selling is a decision rather than free money, and the
 Peddler is where the luck of a drop is fixed. <b>SCOPE IS
 THE CLASS for seventy-five of them</b> &mdash; a rune reaches every hero of its class, and three gates decide which
-of them he is offered (Eligibility, below) &mdash; <b>and the Crest's four belong to no class</b> and are offered to every
+of them he is offered (Eligibility, below) &mdash; <b>and the Crest's five belong to no class</b> and are offered to every
 hero; and every hero in the game draws an authored pool rather than the generated stat family alone.
 <br><b>THE FIFTEEN THAT READ NO ENGINE.</b> Each reads only what every hero of its class already has
 &mdash; his three kit cards and his basic, his class resource, the statuses his own kit lays &mdash; and
@@ -2837,10 +2837,10 @@ one holding the Rune of the Sharpshooter (core). <b>Burning Ground sits out besi
 <br><b>EVERY RUNE CARRIES A PRIMARY TYPE AND AN OPTIONAL SECONDARY.</b> The
 primary is what it touches &mdash; <b>ABILITY, PASSIVE or STAT</b>; the secondary is what gates
 it, if anything, and there are two. <b>TRADEOFF</b> is a cost paired with a bigger upside,
-self-balancing and readable on the card, and <b>fifteen of the seventy-nine carry it</b>.
+self-balancing and readable on the card, and <b>fifteen of the eighty carry it</b>.
 <b>CONDITIONAL</b> is a payload gated on a condition, so the rune pays only while
-that condition holds: <b><i>Empty Pulpit</i>, <i>Dead Air</i> and <i>Dirge</i> carry it</b>, the
-three crest runes that read who stands, and no other rune's payload carries a condition of any
+that condition holds: <b><i>Empty Pulpit</i>, <i>Dead Air</i>, <i>Dirge</i> and <i>Communion</i> carry it</b>, the
+four crest runes that read who stands and what they wear, and no other rune's payload carries a condition of any
 kind. THRESHOLD and BREADTH remain words in the vocabulary and are on no row. The labels live in
 <code>Runes.RUNE_SHAPES</code> beside the archetype tags in <code>RUNE_TAGS</code>, and the two are
 <b>different axes</b>: one says what a rune is FOR in the seven-word card vocabulary, the other
@@ -2853,10 +2853,10 @@ side.
 would be strictly WORSE than a bare one &mdash; the price does not fall to pay for the clause
 &mdash; so a rune that pays only while its condition holds pays more than any bare writer of the
 same effect: <i>Dead Air</i>'s 75% and <i>Dirge</i>'s 45% more strike damage dealt against the talent
-tree's 10% on the same field, <i>Empty Pulpit</i>'s 50% less strike damage taken against its 10%. <code>check_fn</code>
+tree's 10% on the same field, <i>Communion</i>'s 11% against the same 10%, <i>Empty Pulpit</i>'s 50% less strike damage taken against its 10%. <code>check_fn</code>
 &sect;1b asserts that relation over every live rune with a condition. <b>No rune carries a
 condition on a hero's tags</b>: THRESHOLD and BREADTH are absent from the file, from the code and
-from the screens, and <code>check_fn</code> &sect;1b asserts their keys absent across all 171
+from the screens, and <code>check_fn</code> &sect;1b asserts their keys absent across all 172
 entries, live and retired, so a re-gating is caught where it would appear rather than where
 somebody happened to look.
 <br><b>DEEPENING HEX SUBTRACTS 2 FROM THE RUIN THRESHOLD RATHER THAN SETTING IT TO 8</b> &mdash;
@@ -2896,7 +2896,7 @@ bargain's rune reward, the event verb <code>rune_grant</code> and the cache's ow
 reach the pool through one function, and it hands back <b>nothing</b> when a hero's pool is
 spent.
 <br><b>Eligibility:</b> every rune declares a scope, and every live one is its class &mdash; or, for
-the Crest's four, no class at all, which every hero is offered &mdash;
+the Crest's five, no class at all, which every hero is offered &mdash;
 <b>there is no spec scope</b>. <b>Three gates decide which of his class's runes a hero is offered</b>, all
 three at every roll: a rune that reads an engine only while that engine is equipped (&sect;6.0); a
 rune that modifies a named ability only to a hero who owns it (boss trophies and drafted cards
@@ -2923,7 +2923,7 @@ the offer. <b>And an owed cache pick whose triple repairs to nothing can be SPEN
 hero's card &mdash; it cannot be filled, so holding it would strand the run.
 <br><b>EVERY LIVE RUNE IS SCOPED TO ITS CLASS, OR TO THE CREST</b>: the Warrior's eighteen, the Mage's
 twenty, the Cleric's nineteen and the Hunter's eighteen, retired entries scoped the same way, and the
-Crest's four, which belong to no class. The five universal entries are retired, and
+Crest's five, which belong to no class. The five universal entries are retired, and
 <code>_scope_ok</code> resolves the class, the Crest's scope and the universal band and nothing else.
 <br><b>Every live rune is 150g, flat</b> &mdash; the player pays for FIT rather than for magnitude.
 <br><b>Heroes begin the run with no ordinary runes and three empty slots</b> — and the engine
@@ -2941,7 +2941,7 @@ now owned, tops the triple back to three through the same <code>eligible_ids</co
 uses, and <b>writes the repair back</b> so it happens once rather than on every screen open. It
 is <b>not a reroll</b> — a triple with nothing wrong with it is returned untouched.
 <br><b>AND A RUNE THAT READS AN ENGINE IS OFFERED ONLY WHILE THAT ENGINE IS EQUIPPED (&sect;6.0).</b>
-Forty-two of the seventy-nine are in that table &mdash; every Ruin, Focus and Resonance rune, the Mercy
+Forty-two of the eighty are in that table &mdash; every Ruin, Focus and Resonance rune, the Mercy
 and Faith runes and the one that adds to Divine Shield, both Heavy Plating runes and Bared Plate, both
 stance-number runes and Mirror Guard, two of the Pack Bond runes, two of the Trapper runes, both Overburn
 runes and Long Fuse, the Glacial Hold rune and the Cryomancer's Killing Cold and Deep Cold, and the Blood Frenzy rune and the Berserker's Slaughterhouse
