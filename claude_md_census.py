@@ -219,6 +219,10 @@ def main():
 	sync_bytes = sum(len(tree.read(f).encode("utf-8")) for f in files)
 	print("rev=%s  files=%d  sync=%d B = %.4f MiB"
 	      % (args.rev or "working tree", len(files), sync_bytes, sync_bytes / 1048576.0))
+	# The archive folder moves at every cut, so a typed figure for it is stale the batch after: printed here, read here (JF §3).
+	archive = [f for f in files if f.startswith("DoD-archive/")]
+	archive_bytes = sum(len(tree.read(f).encode("utf-8")) for f in archive)
+	print("DoD-archive/: %d files, %d B" % (len(archive), archive_bytes))
 	print("%s: %d B = %.2f KiB  blocks=%d  chars=%d  needles=%d located=%d unlocated=%d"
 	      % (GUIDE, len(guide.encode("utf-8")), len(guide.encode("utf-8")) / 1024.0,
 	         len(blks), total, len(needles), located, len(lost)))

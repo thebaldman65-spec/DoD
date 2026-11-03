@@ -4,6 +4,16 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The cut, the read-outs, and the verification put right (Batch JF) — 2026-11-02
+
+**Why a conditional effect is priced on who finishes.** A rune's figure is what it pays while its condition holds, and a player meets it only as often as the condition does. Dirge's 45% looks like a large number until it is multiplied by the hero turns it gets where runs finish in numbers, under 2%. Read on a rung where no run finishes, the same rune looks like it holds a sixth of the game, and nobody there sees the end. So the uptime is read where runs finish, and no figure moved: no magnitude fixes an uptime that small.
+
+**Why the settled ties are named at all.** Nothing about them is open. They are named because a reader who meets *a tie* in a grade's row should know that error was read as if the arms were independent, and that each pair was checked to sit in one band, or for Ambushed, against its covariance.
+
+**Why a party's shape is not a second gate.** A requirement the player chose into is known at the pick, so a weight on it does honest work. A requirement about what just happened is chosen by nobody and fires rarely, and that is the one a weight must not make rarer still.
+
+**Why the verification is put right rather than trimmed.** A cut worth five per cent is not worth a derivation that was wrong for batches. The readers found what the recon could not, so when time is short a recon goes and a reader stays. A tool that clears a read gets a control of its own for the same reason a gate does: the first run of `pos_seq.py`'s found a move it read as unmoved.
+
 ## The trace sized, the ceiling cut, the runes priced (Batch JE) — 2026-11-02
 
 **Why the relics reach the hero who fell.** A party with three healing relics sent a standing hero out at 65% and a hero who fell at 20%, so the gap widened with every relic found, and that is a penalty on earning rewards. A fall should cost the same thing every time. JD's own measurement could not show this: its bot opened with no relic and few gained one, so the gap it read was nearly all the base. Read with three relics at Warden on the same seeds, the same hero fell again in the next fight 33% of the time when he took everything, 58% when the relics passed him by, and 40% now, so the re-fall follows the gap, and so does how long a run lasts: at the gap of 45 runs were shorter past two errors on both rungs, and at 15 they tie the old rule.

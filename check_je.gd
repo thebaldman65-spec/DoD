@@ -1,6 +1,6 @@
 # BATCH JE — THE TRACE SIZED, THE CEILING CUT, THE RUNES PRICED.
 #
-#   §0   THE RULINGS, EACH PINNED IN THE FILE IT BINDS: the fall's block resized, the weight's rule, the two cuts of the verification, the brief's negatives.
+#   §0   THE RULINGS, EACH PINNED IN THE FILE IT BINDS: the fall's block resized, the weight's rule, the verification's two rules as they stand reworded, the brief's negatives.
 #   §1   THE TRACE, DRIVEN ON A REAL BOARD: a hero who fell reads the floor plus the relic adds and not the base (C01, C02); a hero at 1 health the
 #        floor plus base plus relics; Cairnmoss closing the base and no more (C03); the figure the fall costs fixed whatever the relics (R01); the
 #        third zone's boss restoring through its card's own button and on a resume (C04), taking the mark (C05), and the end boss fought whole.
@@ -263,8 +263,8 @@ func _s0_the_rulings() -> void:
 	ok(fall.contains("a raise is the answer to a fall"), "§0.5: the block does not say why a hero raised draws no Cairn")
 	ok(fall.contains("A WEIGHT GATES FREQUENCY AND A REQUIREMENT GATES RELEVANCE. DO NOT GATE TWICE"), "§0.4: the weight's rule is not in the block")
 	var instr := _doc("res://docs/instrument-rules.md")
-	ok(instr.contains("A RECON IS OWED FOR CODE AND GATES, NOT FOR WORDS"), "§7: the recon's cut is not in the instrument rules")
-	ok(instr.contains("THE POSITIONAL RE-RUN RUNS WHERE A READ's OWN FILE CHANGED, NOT EVERY BATCH"), "§7: the positional cut is not in the instrument rules")
+	ok(instr.contains("A RECON IS OWED WHEN THE GAME's CODE OR DATA MOVES"), "§7: the recon's rule is not in the instrument rules")
+	ok(instr.contains("THE POSITIONAL RE-RUN RE-DERIVES ALL 489 READS EVERY BATCH"), "§7: the positional rule is not in the instrument rules")
 	ok(instr.contains("AN ASSERTION WRITTEN TO PASS IS NOT A PREDICTION"), "§7: the prediction's floor is not in the instrument rules")
 	ok(_doc("res://docs/ways-of-working.md").contains("A BRIEF THAT GIVES AN ABSENCE AS A REASON ORDERS THE READING THAT WOULD FIND IT"), "§0.7: the brief's rule is not in the ways of working")
 	var fallen := String(Glossary.entry("fallen").get("long", ""))

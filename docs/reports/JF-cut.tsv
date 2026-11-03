@@ -1,0 +1,21 @@
+unit	kind	bytes	closed_by	first_words	chars	md5
+`master.html` §6b's 66	block	473	the sentence left `master.html` at IQ (`11ef9fa`): it reads *many damaging abilities*, and only an audit holds the figure	*"30 of the 66 damaging abilities never state their damage in prose."*	363	815fd62058896284db1ae4cce392faef
+`BOND_MITIGATION_MAX` stays	block	870	closed by its own heading at EW §3; the constant stands	**EV measured and priced it; the designer has ruled it stays.**	776	1bf8ebca0ebe5b37931c8b5264c56985
+JE's RULINGS OWED	block	2919	all four answered in JF's brief: JF §0.1, §0.2, §0.3, §0.4	1. **THE POOLED ERROR IS ±1.23, NOT ±0.93 (JE §2).**	2755	48b8b08d483a5b4eed8352deb09e2c57
+no relic in a sim	item	544	JF §2: row DV34, and the scale's sentence	**EVERY SIM FIGURE IN THE PROJECT CARRIES NO RELIC UNLESS IT SAY	540	bc80c67332cdb9829b38a658fe9c7eef
+one seed block	item	413	JF §0.1's standing correction	**TWO ARMS ON ONE SEED BLOCK ARE LARGELY ONE DRAW READ TWICE** (	409	4590a0e5b9709b2dffb0863631bd28bb
+Porous and Fleeting	item	357	JF §0.1's line, which names eight	**POROUS AND FLEETING STAND ON A CHOICE THE POOLING RULE NOW NAM	353	ee3e7ee0109aa32e5009a02ae12bea52
+the positional cut	item	509	JF §6: the cut is withdrawn	**THE POSITIONAL CUT BUYS LESS THAN IT READS, AND ITS FIRST DERI	505	a9014301f9c7a17a417271b8097677a6
+a rule's sign	item	411	a record that asks nothing: the card left, its shape in `docs/design-notes.md`	**A RULE's SIGN CAN FOLLOW WHO THE PARTY's SLOWEST HERO IS** (JB	407	e3428d98d1ae7aff0ad9664d535838d9
+Outpaced's grade	item	265	a record that asks nothing: no arm was owed	**OUTPACED's GRADE MOVED AFTER ITS READINGS WERE TAKEN** (JB §3)	261	ab2cd688c25de2879d6d310cf43a4e00
+the faster side	item	612	a record that asks nothing: not driven further, and the modifier reads its cost	**THE PARTY IS THE FASTER SIDE, AND LEADEN's SUBTRACTION STILL C	605	4c196ad80001c1e58962fb4b73493eda
+HW's copy of HT's two	item	131	a copy: FOUND AT HT holds both	**`run_battery.sh` STILL DOES NOT ASK WHETHER THE GAME IS OPEN, 	128	de9e3b36bc391629bb54cb391a95e23f
+five parties	item	197	a record that asks nothing: all artificial, and the one that reached a draw is repaired	**Five four-hero parties in the instruments seat a lineage on an	192	06441bce68d9f9242d32054d8e7336b4
+the debug paragraph	item	222	fixed: neither phrase stands in `master.html`, and FOUND AT IS says so	**`docs/master.html`'s debug paragraph** still says *"a summoned	219	6a8ff8ca2c7032190032d24bc9815e15
+GE's copy of FW's item	item	181	a copy: FOUND AT FW holds it	**`relics.gd`'s header still says every hook is read at exactly 	175	fd05f67687971db50d91cd49a31301c5
+the §2 sweep's residue	item	469	superseded by its own words: FOUND AT GC holds it	**THE §2 SWEEP'S RESIDUE, ALL OF IT ALREADY QUEUED UNDER GC:** `	461	04b8f46c9797444320cd7c5b31ba9fba
+master.html inconsistencies	item	327	fixed, all five: each read at `docs/master.html` at JF	**master.html inconsistencies the sweep found and left, all olde	320	da38dd372fb787307557a77318fcb2de
+`FIREDRAW_TAKE`	item	274	superseded: FOUND AT IT's six constants name it	**`FIREDRAW_TAKE` (4) IS DEAD, AND WAS DEAD BEFORE DH.** `firedr	267	64aa1ac36f58c940c12fdb7a502ec4c4
+`check_cu` and `check_cv`	item	197	superseded: THE TEST TREE says it wider	**`check_cu` AND `check_cv` ARE NOT IN `run_battery.sh`'s `GATES	194	8df30f9c2f146ef35e237c7903ecc745
+the generic talent fallback	item	179	struck by its own hand at FX	**~~Two specs still take the generic talent fallback~~ — MOOT AT	173	d17d245544b1dab06a94a00c856a203f
+GC: instrument-rules, 3	item	195	fixed: two of the three are gone and the third is past tense	`docs/instrument-rules.md`, 3: a talent granting an ability (non	190	9234a98825df65fdb742df4bead5c08d

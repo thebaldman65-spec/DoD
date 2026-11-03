@@ -1,0 +1,55 @@
+n	target	status	slack	note
+122	check_gx	ON-SUBJECT	n/a (delimited)	Note's third path, 3 lines to the first '.': 'Sits out of every fight while the Rune of the Occultist (core) is not equipped.' All 24 core names reach it; none ends in '.'.
+176	check_ht	ON-SUBJECT	n/a (delimited)	master.html L823, once; 727 chars to the first </tr>, one row; second-degree inside, no tier word. The negative reads the whole row.
+177	check_ht	ON-SUBJECT	n/a (delimited)	L1005, once; 2133 chars to <h3>4.7 Items in battle (L1032), no heading between; needle inside, no tier word. The negative reads the whole block.
+328	check_iq	ON-SUBJECT	n/a (delimited)	125 card rows, 124 priced, Boil Over the one prose cell, no cell with two BD; second cell is the price on all. Floor 124 = reading. Corpus approximated from display_name literals.
+329	check_iq	ON-SUBJECT	92 of 160 (57.5%)	78 statlines, longest match 68, none cut by the ceiling. Floor 78 = reading. Corpus approximated from display_name literals.
+330	check_iq	ON-SUBJECT	n/a (delimited)	L291 to </table> L327, 25 rows, no nested table; deck and table agree both ways at 25, every severity matches.
+347	test_batch_au	ON-SUBJECT	n/a (delimited)	run_state L5887, once; 576 chars, cut at `return landed` on the line after the loop, equal to its block. Positive fallback_upgrade_id( inside; both negatives read the whole loop.
+394	test_batch_bm	TIGHT	60 of 1400 (4.3%)	Head stanza it was written for ends +1340; comments fill the window, only 524 code chars. Arms at +1807/+2002 unread, as at BM (18% of the branch). No `talent` in branch code today.
+468	test_batch_bx	ON-SUBJECT	n/a (delimited)	Re-pointed: subject to its own closing brace, 2065 chars, next entry archetype_tags. every living hero +263, one screen +351, per hero +1223.
+2	check_di	ON-SUBJECT	5 of 24 (20.8%)	Declaration L15093 alone matches; the 19-char prefix fits the 24-char head, params run 108. Walk gives 221 sites = CALL_SITES, 134 sourced, 0 null.
+8	check_dl	ON-SUBJECT	n/a (block)	Re-pointed: rally arm L20170-20221, 3036 chars, no code lost to a comment. r_at 936 past p_at, 446 short of the arm's end; begins_with names the arm.
+9	check_dm	ON-SUBJECT	38 of 120 (31.7%)	Clause L20528, walk L20527, 82 back, encloses it (indent 3 over 4); in bulwark arm, 2782 chars, whole.
+10	check_dm	ON-SUBJECT	38 of 120 (31.7%)	Clause L20469, walk L20468, 82 back, encloses it; in cons_ground arm, 1348 chars, whole.
+11	check_dm	ON-SUBJECT	62 of 120 (51.7%)	Clause L24326, walk L24325, 58 back, encloses it; in divine_wrath arm, 1356 chars, whole.
+12	check_dm	ON-SUBJECT	62 of 120 (51.7%)	Clause L20448, walk L20447, 58 back, encloses it; in unity arm, 1625 chars, whole.
+13	check_dm	ON-SUBJECT	659 of 1400 (47.1%)	Clause L23979, walk L23964, 741 back; no line between at walk depth, so it encloses. In battle_shout arm, 3774 chars, whole.
+14	check_dm	ON-SUBJECT	399 of 1400 (28.5%)	Clause L24269, walk L24251, 1001 back; no line between at walk depth, so it encloses. In hold_the_line arm, 3968 chars, whole.
+15	check_dm	ON-SUBJECT	408 of 1400 (29.1%)	Clause L23983, refund L23999, 992 on. Re-pointed: the refund must stand in battle_shout's own arm; it does, 393 from the end, so the other arms' copies cannot serve.
+16	check_dm	ON-SUBJECT	984 of 1400 (70.3%)	Clause L24269, refund L24276, 416 on. Re-pointed: in hold_the_line's own arm, 383 from the end, so the other arms' copies cannot serve.
+72	check_fh	ON-SUBJECT	n/a (block)	Re-pointed: _resolve_boss L29455-29556, 2193 chars, whole, stops at _drop_item_line. None of the three rune doors in it.
+91	check_ft	ON-SUBJECT	n/a (to next func)	Each guard is its function's first code line, once in the window. Sanctity's runs 412 past over 13 vars, which cannot hold an `if`. Reads contains, message says opens.
+134	check_hl	ON-SUBJECT	n/a (block)	Re-pointed: elif L4713, list closes L4828; the block's tail is `]:` and `target = u` alone. 95 names read (floor 80); one such elif in _player_turn.
+178	check_ht	ON-SUBJECT	n/a (delimited)	Re-pointed: comment_above, L620-638, 19 lines, 1426 chars, is_comment true, stops at a blank line; both needles inside. Starts at the constant's own comment, not the table.
+309	check_im	ON-SUBJECT	n/a (delimited)	Re-pointed: comment_above, 9 lines, 772 chars, is_comment true, stops at a blank line; DI §2 at +186. _cheapest_attack no longer read.
+311	check_in	ON-SUBJECT	66 of 200 (33%)	The drink's `if` closes +134, items["health"] ends +125; window ends inside the 415-char branch. The negative covers the whole condition; _pouch absent from all of _player_turn.
+314	check_io	ON-SUBJECT	n/a (block)	Re-pointed: thin_veil arm, 112 chars, whole, stops at long_silence. Needles +16, +38.
+321	check_ip	ON-SUBJECT	68 of 320 (21.2%)	Needle ends +252, once, inside the 415-char drink branch; window ends in the same branch's _log line.
+365	test_batch_bc	ON-SUBJECT	n/a (block)	Re-pointed: devoutness_break arm L31441-31444, 131 chars, no code lost. return +125; _prev( absent (_prev_bd( does not match it); next _prev( 2834 past.
+370	test_batch_bf	ON-SUBJECT	n/a (block)	Re-pointed: _prev_bd L31522-31530, 203 chars, whole, stops at _sfx_players. Needles +140, +173.
+373	test_batch_bg	ON-SUBJECT	n/a (block)	Re-pointed: faith entry L364, one line, 273 chars, whole, stops at cons_ground. Needles +166, +248.
+376	test_batch_bi	ON-SUBJECT	n/a (block)	Re-pointed: _reset_faith_meters L19389-19395, 128 chars; stops at the comment after it, no code lost. Both zeroes inside.
+379	test_batch_bi	ON-SUBJECT	n/a (block)	Re-pointed: the same block as n373, faith entry, 273 chars, whole. Needle +166.
+381	test_batch_bi	ON-SUBJECT	n/a (block)	Re-pointed: _faith_gained L19366-19378, 540 chars; stops at the comment after it, no code lost. Needles +100, +139.
+398	test_batch_bn	TIGHT	9 of 700 (1.3%)	_hold_freeze L14757: guard +620, dead gate +645 to +691, in a comment-filled head. One more comment line takes dead to -1 and reds correct code. Loud, not silent.
+399	test_batch_bn	ON-SUBJECT	n/a (block)	Re-pointed: cryoclasm arm L24657-24686, 1388 chars, whole, stops at stabilize. Freeze needle +1358; _hold_release( absent.
+403	test_batch_bo	ON-SUBJECT	463 of 2600 (17.8%)	Elite L29319, once; award ends +2137 of a 3913-char arm, so `no roll before the offer` is fully read. randf() absent from the rest of the arm too.
+424	test_batch_bs	ON-SUBJECT	n/a (block)	Re-pointed: take_tick_damage L5103-5150, 1938 chars, whole, stops at _die(). kiln_forged_at absent; stands at L599, L4712, L4714 only. Negative-only, see report.
+430	test_batch_bu	ON-SUBJECT	n/a (block)	Re-pointed: sync_victory_state, 729 chars, whole; stops before expire_fortified_spirit's own signature, so the call at +54 is the sync's. fortified_hp_gained absent.
+431	test_batch_bu	ON-SUBJECT	n/a (block)	Re-pointed: suffering case, 1861 chars, whole, stops at transference. Needles +253, +571; RUIN_LEECH_CAP absent.
+432	test_batch_bu	ON-SUBJECT	n/a (block)	Re-pointed: transference case, 1193 chars, whole, stops at anointing. set_ruin_stacks +596; _gain_ruin( absent, next 27911 past.
+433	test_batch_bu	ON-SUBJECT	n/a (block)	Re-pointed: _suffering_tick, 276 chars, whole, stops at _battle_trance_tick. _gain_ruin( +255, its own line.
+439	test_batch_bv	TIGHT	10 of 300 (3.3%)	Re-pointed to the block, 310 chars, whole; needles +142, +231; _companion_strike( 271 past. The length>300 bound has 10 left: an 11-char trim reds correct code.
+441	test_batch_bv	ON-SUBJECT	n/a (block)	Re-pointed: Hunt block, 350 chars, whole, no overhang either end; begins_with holds. status_stacks absent, next 5576 past.
+442	test_batch_bv	ON-SUBJECT	n/a (block)	Re-pointed: _loaded_shot_refresh, 783 chars, whole, stops at HARVEST_BOT_YIELD. Needles +217, +278; sticky absent, next 185 past.
+451	test_batch_bw	ON-SUBJECT	359 of 420 (85.5%)	Not re-pointed: anchor once; _tick_cooldowns( ends +61; window ends inside the parry hook, length bound met.
+453	test_batch_bw	ON-SUBJECT	n/a (block)	Re-pointed: _stance_satisfies, 137 chars, whole, stops at _has_defensive_check. _eff_stance( +113.
+454	test_batch_bw	ON-SUBJECT	n/a (block)	Re-pointed: feigned_guard case, 643 chars, whole, stops at covering_guard; pivot absent, next 12315 past. The `covers the case` positive is the anchor's own word.
+455	test_batch_bw	ON-SUBJECT	n/a (block)	Re-pointed: precision_strike 2263 chars, switch +2073; feint 1976 chars, switch +1800; each whole, so neither can borrow the other's call.
+457	test_batch_bw	ON-SUBJECT	n/a (block)	Re-pointed: payout block, 649 chars, whole, stops at the feaster loop. Length>400 by 249; src_name +73; remove_status absent.
+459	test_batch_bw	ON-SUBJECT	n/a (block)	Re-pointed: vendetta case, 1015 chars, whole, stops at aegis_wall. `"mocked", -1` +280. `not func ` is now redundant with the block.
+460	test_batch_bw	ON-SUBJECT	n/a (block)	Re-pointed: Berserk block, 731 chars, whole, stops at seek_bodies. Needles +92, +294.
+476	test_batch_ce	TIGHT	26 of 700 (3.7%)	Hymn arm, raw: perfect +613, empowered +646 to +674, comment fills the head of a 2283-char arm. Pushed off, emp_at is -1 and correct code reds (CH's fault). Loud.
+480	test_batch_ce	ON-SUBJECT	42 of 90 (46.7%)	L337, once; tag slot holds "Dk!" +43 to +48, so a "BD" tag would land inside the window. "BD" absent.
+486	test_batch_cp	ON-SUBJECT	147 of 420 (35%)	unit.gd L3801, once; needle ends +273 of a 987-char function, once in the window.

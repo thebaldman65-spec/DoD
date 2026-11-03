@@ -739,7 +739,7 @@ them** — they move every batch.
   moved the entry here, and `docs/state.md` declined to move it on exactly that ground; **FS's brief states the reports are
   already deselected.** The picker's state is not in the repo and no instrument can read it, so
   neither claim is checkable here. **It is the largest single item still in question, and it grows
-  by one every batch.** A ruling either way belongs on this line, and
+  every batch.** A ruling either way belongs on this line, and
   until there is one **do not read the absence of a change as agreement.**
 - **THE TEST SUITES ARE AT THE REPO ROOT, NOT IN `scripts/`.** `scripts/` is game code and stays
   selected in full. **Deselecting "the scripts folder" would drop `battle.gd` and keep every
@@ -1943,7 +1943,10 @@ decision and the STRUCTURE is what shipped.
   MODIFIER (IX §3, the designer's).** In points of that party's maximum health:
   no severity under 0.48; 1 to 1.78; 2 to 3.74; 3 to 6.88; 4 to 12.22; 5 from 12.22
   — a grade of about 1.0, 2.6, 4.9, 8.8 and 15.6 or more, the costs of the levels it is cut between (re-derived at IZ §1 on the
-  sharper readings, the bullet below). **THE PARTY IS PART OF THE DEFINITION AND IS WRITTEN BESIDE THE SCALE
+  sharper readings, the bullet below). **A POINT IS A PERCENT OF THE HEALTH OF A PARTY THAT OPENED WITH NO RELIC, AND THAT DEFAULT IS WRITTEN BESIDE THE SCALE (JF §2, the designer's).**
+  `DOD_SIM_RELICS` is none unless a job says so, where a player's party opens with what it drafted: a POLICY, row DV34 of `docs/reports/IU-bot-divergence.tsv`. **Every grade is a modifier against *none* on one tree, so a shared baseline that opens with no relic is consistent and the grades stand.
+  What rests on the default is the absolute scale**: three relics take Wanderer's falls from 53 to 13, so a party that finds them is playing a milder deck than the one that was graded. No grade is re-read for it. **And the bot wears the first crest rune it draws, row DV35, so that party wore one in most runs**: the same shared baseline, and the same answer.
+  **THE PARTY IS PART OF THE DEFINITION AND IS WRITTEN BESIDE THE SCALE
   (IX §0.2)**: the sim's default party — the Berserker, the Cryomancer, the Devout and the Beastmaster — untalented, at Wanderer,
   the one candidate of nine whose crowd a screen could resolve (IW §1a). A grade is a cost on a named party, not a universal truth:
   a modifier whose cost swings by more than a band between parties carries that in its own words, where a player can see
@@ -1984,7 +1987,9 @@ decision and the STRUCTURE is what shipped.
   **TWO READINGS OF ONE QUANTITY ON ONE POPULATION, TAKEN ON THE SAME INSTRUMENT, ARE POOLED — INVERSE-VARIANCE — NOT CHOSEN BETWEEN. THE SHARPER-REPLACES RULE IS FOR A SHARPER INSTRUMENT
   (JE §0.3, the designer's)**: a refinement of the rule above, which stands for what it was written for. Neither of two arms of one instrument is the better estimate, and a tie at a cut can land
   on both sides of it. **THE POOLED MEAN IS THE GRADE's. ITS ERROR TAKES THE COVARIANCE WHERE THE ARMS SHARE SEEDS**: two arms on one seed block are largely one draw of the dice read twice, so the
-  independent formula prints a sharper bar than the instrument holds (JE's report §2: Ambushed's two read r 0.77, ±1.23 where independence prints ±0.93; that clause is the batch's reading, and NEEDS A RULING 1 asks).
+  independent formula prints a sharper bar than the instrument holds (JE's report §2: Ambushed's two read r 0.77, ±1.23 where independence prints ±0.93; **that clause is correctness, so it is a batch's to write and the designer's to be told of**, JF §0.1).
+  **A TIE BETWEEN TWO BATCHES' ARMS ON ONE SEED BLOCK IS NAMED AS CORRELATED. WHERE SUCH A TIE DECIDES A GRADE, THE COVARIANCE IS COMPUTED BEFORE THE GRADE IS WRITTEN (JF §0.1, the designer's).** Every such tie since IY's fight seed
+  was read against the sum of squares, which overstates the error where the arms correlate (r 0.77 on Ambushed's pair, the one measured). **No arm is re-read. THE GRADES WHOSE TIES WERE READ THE OLD WAY ARE AMBUSHED, POROUS, FLEETING, ENCUMBERED, FRACTURED, SLICK FOOTING, FEVERISH AND WARDED, ALL EIGHT ALREADY SETTLED**: Ambushed stays a 4 on the covariance's own error; Porous, Fractured and Fleeting each read two states of the deck, each pair in one band; Encumbered's three read one band on today's cuts, and IZ's sharper arm had taken it from 2 to 1; Slick Footing, Feverish and Warded each tie IX's reading inside one band. Outpaced's reference pair feeds no grade.
   **A MODIFIER KEYED ON SOMETHING ONLY SOME BUILDS DO IS GRADED ON A BUILD THAT DOES IT (IZ §0.3, the designer's)** — a Break rule on
   the party whose plan is Break, a fire rule on the party whose strikes carry the most fire, the population derived and named —
   **AND ONE THAT KEYS ON SOMETHING EVERY BUILD DOES AND STILL COSTS NOTHING HAS NO REACH, AND LEAVES THE DECK**, removed, not disabled,
@@ -3880,6 +3885,8 @@ five reachable at once.
 - **THE MARK IS ONE FIGHT LONG; THE HEALTH IT COST STAYS UNTIL HEALED.** He opens the next fight behind a hero who ended at 1 health by the base clearing heal, `Run.SLOT_HEAL_PCT`, and by
   nothing else. **THE RELICS REACH THE HERO WHO FELL: A FALL MUST COST THE SAME THING EVERY TIME (JE §0.1, the designer's).** With the relics passing him by, the gap widened with every relic
   the player found, which is a penalty on earning rewards. `Run.fallen_heal_pct` is what he takes. **Do not re-open it by taking a relic off him.**
+- **THE RULING STANDS AT FIFTEEN, AND WHAT THE TRACE COSTS IS WRITTEN HERE (JF §0.2, the designer's).** The reading that separates is three relics, where the gap exists: fights survived fall 1.43 ± 0.59 at Warden and 1.88 ± 0.54 at Ruin at JD's gap of 45 and tie the old rule at 15 on both
+  (JE's report §5). **THE PRICE: AT FIFTEEN THE SAME HERO STILL FALLS AGAIN MORE OFTEN THAN ON THE OLD RULE, 40% AGAINST 33% AT WARDEN AND 53% AGAINST 38% AT RUIN, A TIE AT ONE RUNG AND PAST TWO ERRORS AT THE OTHER. A HERO BEHIND BY THE BASE IS A LIKELIER NEXT FALL.** That is the trace, and it is accepted.
 - **ALL THREE ZONE BOSSES RESTORE, AND THE END BOSS IS FOUGHT WHOLE (JE §0.2, the designer's).** `Run.advance_zone` runs only while `has_next_zone()` holds, and that condition, not a design, put
   the whole of the carry on the fight the run is built toward. `Run.leave_zone_boss` is the one way out of a boss's card, for the card's button, the sim and a resume alike, and the mark goes
   with the wound.
@@ -3887,6 +3894,7 @@ five reachable at once.
   better than one you cannot.
 - **A WEIGHT GATES FREQUENCY AND A REQUIREMENT GATES RELEVANCE. DO NOT GATE TWICE (JE §0.4, the designer's).** A boon that needs a specific thing to have just happened carries a high weight
   inside that condition. The Cairn stands at the pool's top weight for that reason: at its old weight it was drawn 3 times in 240 runs, and a beat that rare is a rumour.
+  **A REQUIREMENT ABOUT THE PARTY's SHAPE IS KNOWN WHEN THE PLAYER PICKS, AND THE PLAYER CHOSE INTO IT, SO ITS WEIGHT IS DOING HONEST WORK. A REQUIREMENT ABOUT WHAT JUST HAPPENED IS NOT CHOSEN AND FIRES RARELY, AND THAT IS THE ONE *DO NOT GATE TWICE* IS FOR (JF §0.4, the designer's).** The Old Trapper's Camp and the Humming Obelisk each need a spec in the party, and both stay at 8.
 
 ## STANDING RULE — BREAK IS A SECONDARY TAG ONLY (Batch FD §2, ruled by the designer)
 
@@ -4110,6 +4118,9 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
     (50% half-replaced him for no reason). How often a condition holds sets what a rune is worth over a fight — Dead
     Air 0.35–0.61 of a bare 10% at 75%, no fall and no depth moved (`docs/reports/HQ.md` §1); Empty Pulpit's 2% of a
     won fight's damage taken — and that is a property of the state, not of the figure: watched, never tuned on.
+  · **A CONDITIONAL EFFECT IS WORTH ITS MAGNITUDE TIMES ITS UPTIME, AND THE UPTIME IS READ ON THE POPULATION THAT FINISHES RUNS (JF §0.3, the designer's).** Dirge at 45% over 1.7% of turns is worth about eight-tenths of a percent. With no crest worn, on runs that finish, of all hero turns: the reference four at Wanderer, 55 runs of 60, Dirge 1.7%, Dead Air 0.8%, Empty Pulpit 0.3%; the incumbent at Ruin, 57 runs of 60, Dirge 0.8%, Dead Air 0.4%, Empty Pulpit 0.3%.
+    On the reference four at Ruin, which finishes none of 60, the same three hold 18.0%, 9.4% and 1.8%. A hero turn of a lost run holds them four to thirteen times as often as one of a run that finishes, at Wanderer and on the incumbent at Ruin, on five lost runs and three; lost runs are few, so six to eight held turns in ten still fall in runs that finish. At Warden, where five finish, the table cannot tell them apart. **So no figure moves: no magnitude fixes an uptime that small, and the crest's cap is one, so taking one
+    costs the slot.** The next crest rune is priced this way before it is authored, against the table of record, `docs/reports/JF-uptimes.tsv`, which reads every condition in the pool by rung with no crest worn. *The product is a gross, not a price (the batch's sentence, beside the designer's rule).*
 - **A CONDITION ON THE FOUR IS READ AS THE FIGHT RUNS, BECAUSE READ AT THE SPAWN IT WAS A CONSTANT (HP §1, ruled; HO §3c
   found it).** The draft seats exactly one of each class — four picks from a roster of four — and a hero who falls in
   a fight that is WON stands again when it ends, so every fight a run played forward OPENS with one of each class, all

@@ -1995,14 +1995,15 @@ the drive keeps the fast frames.
   battery.
 
 
-**A RECON IS OWED FOR CODE AND GATES, NOT FOR WORDS (JE §7, the designer's).** One recon on the tree the code lands in; a pre-run plus the standalone `check_de` for a tree that differs from it only in
-words, comments and baseline rows; **the acceptance reads the whole either way.** A third recon of 87 minutes for changes that move no die buys nothing a pre-run does not.
+**THE READERS ARE THE FLOOR AND THE RECON IS THE VARIABLE PART (JF §6, the designer's).** JE's 87-minute recon found two reds; its fresh reader found two unmet orders and eleven false claims in the batch's own report, and three of its readers cost about 1.3 million tokens between them. **The blocks' reader, the close-read, a reader on the new text before any pre-run, a positional reader and a fresh reader on the assembled report are not optional and not negotiable against time. If something must be dropped for time it is a recon, by the rule below, and never a reader.**
 
-**THE POSITIONAL RE-RUN RUNS WHERE A READ's OWN FILE CHANGED, NOT EVERY BATCH (JE §7, the designer's).** A read whose file a batch does not touch cannot have moved, so the subset is derived from the
-batch's diff, its count skipped is printed with why, and **every read of a gate whose source the batch edits is in the subset**, because the census is read off gate sources (JE's brief owed the full re-run to the first batch
-that edits one; JE was that batch). **A haystack the census writes as a population — *every check_ .gd*, *six scripts*, a runtime log — is in the subset too**: it names no file, so no diff can clear it, and JE's first derivation skipped those through its parse. If the derivation cannot be made safely the batch says so and runs the whole. The cut is for cost, not for coverage.
+**A RECON IS OWED WHEN THE GAME's CODE OR DATA MOVES. A GATE's OWN CHANGE IS COVERED BY THE PRE-RUN THAT RUNS IT, PLUS THE STANDALONE `check_de` AND THE ACCEPTANCE (JF §6, the designer's; it replaces JE §7's wording, which said *code and gates* where JE did this).** *The test, the batch's reading: a diff of `scripts/` and `data/` against the recon's tree or HEAD; a comment moves no die, and a code line owes the recon.* **The acceptance reads the whole either way.**
 
-**AN ASSERTION WRITTEN TO PASS IS NOT A PREDICTION (JD §8, JE §0.6, the designer's).** Every drive has a prediction written as a file first, with a figure in it that could be wrong.
+**THE POSITIONAL RE-RUN RE-DERIVES ALL 489 READS EVERY BATCH, THE MECHANICAL PASSES DOING WHAT THEY CAN (JF §6, the designer's; JE §7's cut is withdrawn).** The honest skip was 26 of 489, and the selecting tool's parse, wrong since IX at the latest, had hidden 65 of JE's 91 skips, 24 of them over files JE edited: a cut worth five per cent is not worth a derivation that was wrong that long. **A haystack the census writes as a population — *every check_ .gd*, *six scripts*, a runtime log — goes to a reader**: it names no file, so no diff can clear it.
+
+**A TOOL THAT CLEARS A READ HAS A CONTROL OF ITS OWN (JF §6, the designer's order; the sentence is the batch's).** The positional pass *pos_seq.py* cleared reads at two batches with none. Its control's first run found a move it read as unmoved, a needle on another line of one hunk, and a limit it could not see, a fixed-width read pushed by lines that hold no needle. The first is repaired and the second narrowed to what the census's prose names (`docs/reports/JF-posseq.tsv`, the tool as JE left it beside the tool as it stands).
+
+**AN ASSERTION WRITTEN TO PASS IS NOT A PREDICTION (JD §8, JE §0.6, the designer's).** Every drive has a prediction written as a file first, with a figure in it that could be wrong. **EVERY PREDICTION IS A FILE WRITTEN BEFORE ITS LAUNCH, AND A READ-OUT's TABLES ARE PREDICTED TOO (JF §6, the designer's).**
 
 **EVERY WAIT READS THE RUNNER's DONE LINE AND CARRIES A TIME BOUND (JE §0.6, the designer's).** A watcher whose condition can match its own command line cannot exit, and one cost JD six hours, so a wait names the marker it reads and the bound it stops at, and says which of the two ended it. **A LANE's NAME COMES FROM `lane.sh`, NEVER FROM A REPORT's PROSE (JE §6)**: a report drops the project's prefix, and eight folders at JD are what that costs.
 
@@ -2189,7 +2190,7 @@ a detail to note — it is the ruling being wrong.
   dice out of every battle's opening, and one recon of HEAD's battery against all of ID's code had to carry both causes.
   A premise about what a batch does NOT touch cannot be checked by the brief's author, who has not read the code the
   batch will move; the batch can, by reading every door its change passes.
-- **SO THE BATCH CONFIRMS THE BLAST RADIUS BEFORE IT SETS THE RECON, AND SAYS WHAT IT FOUND.** One recon when the change
+- **SO THE BATCH CONFIRMS THE BLAST RADIUS BEFORE IT SETS THE RECON, AND SAYS WHAT IT FOUND.** One recon, when one is owed, when the change
   reaches no seeded die and no shared door; one recon per cause when it does — the first cause alone, then all of the
   batch's code — so each move is attributed to one cause by a stub rather than argued apart afterwards. IE's §2a moved the
   spawn path (an engine chip was a status, a float and a die), so IE took two.

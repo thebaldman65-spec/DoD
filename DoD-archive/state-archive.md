@@ -17,6 +17,105 @@ heading stands in both files. **Since JE §3 it also takes what `CLAUDE.md` clos
 
 ---
 
+## ARCHIVED AT JF — 2026-11-02, FROM `docs/state.md` AS JE LEFT IT (`4b8763d`)
+
+*What JF's rulings answered, and what its cut derived closed (JF §3, HX §2's method): `docs/reports/JF-cut.tsv` names each unit and what closed it, word for word from the file.*
+
+### `master.html` §6b's "66 DAMAGING ABILITIES" RESOLVES AGAINST NO POPULATION — **FR §2, NOT FIXED**
+
+*"30 of the 66 damaging abilities never state their damage in prose."* **The whole corpus gives 75
+with `damage > 0`; the draft pools give 39.** Neither is 66. The denominator is a past batch's own
+classification and is not recoverable from the tree, so **the figure was reported and deliberately
+not corrected** — correcting it would mean inventing a population.
+
+### `BOND_MITIGATION_MAX` STAYS AT 0.75 — **RULED AT EW §3. NOT A QUESTION ANY MORE.**
+
+**EV measured and priced it; the designer has ruled it stays.** The guard forces some value below
+1.0 and does not force 0.75 — 0.85 or 0.90 would satisfy it identically and would push the bear's
+saturation point from a boon of 7.50 to 8.50 or 9.00, which is one to two more stacks of real cover
+at the deep step and five to seven at the untalented one. **But that constant is a 75% damage
+reduction and 0.90 would make it 90%**, which is a large survivability change wearing a saturation
+fix's clothes, and **EV's fallback already answers the waste**. **Recorded with its reasoning so the
+priced alternative is not re-proposed as a discovery.** (Savage Presence's taunt ceiling of 1.0 was
+never in this question: it is `minf(..., 1.0)` on a probability, so it is arithmetic.)
+
+### ~~JE's RULINGS OWED~~ — **ALL FOUR ANSWERED IN JF's BRIEF (1: the clause stays, JF §0.1; 2: the ruling stands at fifteen, JF §0.2; 3: the runes keep their figures, JF §0.3; 4: both boons stay at 8, JF §0.4)**
+
+*Its head as it stood: **FOUR; EACH TAKEN ON THE RECOMMENDATION, NONE HOLDING ANYTHING UP***
+
+Full working: `docs/reports/JE.md`, NEEDS A RULING.
+
+1. **THE POOLED ERROR IS ±1.23, NOT ±0.93 (JE §2).** JB's and JD's arms ran the same 60 seeds, and their run-by-run paired differences correlate at r 0.77, so the pooled mean of +12.149 is right and the independent formula's bar is not. **Taken**: the mean as ordered, the grade a 4, the error with the covariance, the rule written with that clause. It is no sharper than JB's own arm, so the tie at the cut is named against the same bar as before. **The alternative**: the ±0.93 as ordered. **Reversing it** is one word in the rule and one table row; a third arm on a fresh seed block would be the first independent sample, about six minutes a party.
+2. **THE SPIRAL WAS NEVER READ AT 45, AND THE RE-FALL FOLLOWS THE GAP (JE §5).** JD's arms opened with no relic; an event hands a rare one in about a third of runs, a heal relic in about one in ten. Three relics at Warden, the same seeds, the old rule, JD's and JE's: falls 304, 327, 306; paired against the old rule +0.38 ± 0.20 at 45 and +0.03 ± 0.20 at 15, neither past two errors, a figure a wipe floors; the same hero falling again 37 of 113, 72 of 125, 48 of 120. At Ruin 39 of 103, 78 of 108, 49 of 93. **Fights survived, paired against the old rule, are the reading that separates**: -1.43 ± 0.59 at Warden and -1.88 ± 0.54 at Ruin at 45, a tie at 15 on both. **Taken**: the ruling stands at 15. **The alternative**: a smaller base read against what 15 still does, which is +0.18 ± 0.08 where no relic is held. **Reversing it** is `SLOT_HEAL_PCT`'s share of what `Run.fallen_heal_pct` reads.
+3. **THE THREE CREST RUNES STAND AT THEIR FIGURES (JE §4).** Thirty hero turns for any hero's first fall and the Mage's on the reference four, about ten rounds of the three left, seventeen to twenty for the Cleric's, where the brief says *a few*; 12 to 18% of the reference four's hero turns at Warden and Ruin for Dirge, 8 to 9% for Dead Air, 2% for Empty Pulpit, and under 1.5% of each at Wanderer and on the incumbent, the shares HP and HQ priced on. No arm moved the count of finishes, or a fall or a depth past 1.6 errors; by seed 8 to 12 of 60 runs flip, which is what a worn rune re-rolling everything after its first effect looks like. **Taken**: nothing touched; a magnitude is yours. **The alternative**: a lower figure now the stretch is known to be long. **Reversing it** is one number in `data/runes.json` each.
+4. **TWO BOONS STILL SIT UNDER *DO NOT GATE TWICE* AS WRITTEN, IF A PARTY'S SHAPE IS A REQUIREMENT (JE §0.4).** The Old Trapper's Camp and the Humming Obelisk each need a spec in the party and carry 8. **Taken**: unchanged: your rule names a thing that has *just happened*, and neither has. **The alternative**: both to 12. **Reversing it** is two numbers in `data/events.json`.
+
+### FOUND AT JE AND NOT FIXED — ITS CLOSED ITEMS (archived at JF; the block stays in `docs/state.md`)
+
+- **EVERY SIM FIGURE IN THE PROJECT CARRIES NO RELIC UNLESS IT SAYS SO** (JE §5, `docs/reports/JE-spiral.tsv`): `DOD_SIM_RELICS` is none by default where a player's party opens with what it drafted; the one that reaches a sim is an event's rare grant, in about a third of runs. It is a row the divergence census does not hold. Three relics took Wanderer's falls from 53 to 14 on JD's rule. No grade and no completion figure in this file describes a party holding one; the Hourglass arms and JE's own three-relic arms are the readings that do.
+- **TWO ARMS ON ONE SEED BLOCK ARE LARGELY ONE DRAW READ TWICE** (JE §2, `docs/reports/JE-pooled.tsv`): every *tie* the project reads between two batches' arms of one population has shared its seeds since IZ's fight seed, so each such test's error is the difference of two correlated readings, and the sum of squares overstates it (r 0.77 on Ambushed's pair). A tie read that way is a generous tie. Not re-read.
+- **POROUS AND FLEETING STAND ON A CHOICE THE POOLING RULE NOW NAMES** (JE §2): Porous's *the later reading is the grade's* is a choice between two readings of one population; pooled it stays over its cut at either end, so no grade moves. Fleeting's *the in-deck reading* was two decks, so not one quantity. The words are left as their batches wrote them.
+- **THE POSITIONAL CUT BUYS LESS THAN IT READS, AND ITS FIRST DERIVATION WAS WRONG** (JE §7): `pos_select` read a census row's prose for one path a part, so a haystack written as a population named no file and read as unchanged: JE's first 91 held 65 such reads, at least 24 of them over files it edited, and JD's 92 came from the same parse. The parse is repaired and those reads were read; the honest skip is 26 of 489. A batch that writes `docs/state.md` and `CLAUDE.md` touches most haystacks there are.
+
+### FOUND AT JB AND NOT FIXED — ITS CLOSED ITEMS (archived at JF; the block stays in `docs/state.md`)
+
+- **A RULE's SIGN CAN FOLLOW WHO THE PARTY's SLOWEST HERO IS** (JB §3): Inverted paid the reference party because its slowest body, the Cleric at 85, is its healer, whose turns rose from 9.32 to 13.62 a bargain fight and whose healing rose 59%. A party whose slowest hero is not its healer might read it the other way; it was not driven, and the card left. Its shape and reading are in `docs/design-notes.md`.
+- **OUTPACED's GRADE MOVED AFTER ITS READINGS WERE TAKEN** (JB §3): the arms ran with it at 1, and its incumbent reading made it a 2, which moves only what an offer of it pays. No arm was re-driven for that: a re-roll could only move a reading at a cut by chance.
+
+### FOUND AT JA AND NOT FIXED — ITS CLOSED ITEMS (archived at JF; the block stays in `docs/state.md`)
+
+- **THE PARTY IS THE FASTER SIDE, AND LEADEN's SUBTRACTION STILL COSTS IT** (JA §3): the heroes' effective speed at their turns reads 98.5 against the warband's 90.8 on the reference party and 116.8 against 92.2 on the incumbent, so a flat amount off every speed takes the larger share of the warband's — and IZ's -30 costs the party +0.60 ± 0.26. The brief's reading (*the party is on the slow side of the field*) does not hold; the card's words are true of the mechanic (*the slower a body already is the more it loses*) and why the subtraction costs the party is not a share of speed. Not driven further.
+
+### FOUND AT HW AND NOT FIXED — ITS CLOSED ITEMS (archived at JF; the block stays in `docs/state.md`)
+
+- **`run_battery.sh` STILL DOES NOT ASK WHETHER THE GAME IS OPEN, AND A PLAIN `kill` STILL DOES NOT STOP IT** (HT's two, carried).
+
+### FOUND AT GK AND NOT FIXED — ITS CLOSED ITEMS (archived at JF; the block stays in `docs/state.md`)
+
+- **Five four-hero parties in the instruments seat a lineage on another class's seat** — all artificial; none reaches a class-keyed draw (a static sweep at GK), and the one that did is repaired.
+
+### FOUND AT GF AND NOT FIXED — ITS CLOSED ITEMS (archived at JF; the block stays in `docs/state.md`)
+
+- **`docs/master.html`'s debug paragraph** still says *"a summoned rest really heals"* (the Rest summon went with the
+  rest nodes) and names *"Jump to Boss Tier"* (the item is *Jump to Boss Slot*). Outside GF's surfaces.
+
+### FOUND AT GE AND NOT FIXED — ITS CLOSED ITEMS (archived at JF; the block stays in `docs/state.md`)
+
+- **`relics.gd`'s header still says every hook is read at exactly one site** — FW's item below,
+  unchanged; `docs/master.html`'s copy of the same claims was corrected at GE §2.
+- **THE §2 SWEEP'S RESIDUE, ALL OF IT ALREADY QUEUED UNDER GC:** `docs/master.html` still says *"the talent trees"* on
+  EM's charter line and still prices talent points the pre-BM way in §2; `CLAUDE.md`'s name-sweep block still cites
+  deleted Warden nodes. None of them says a talent is tied to a spec; each is the census's other direction. *(DO's move
+  of twenty-two cards, the other *"talent trees"*, left `master.html` with IS §6's strip — archived at IS.)*
+
+### FOUND AT FX AND NOT FIXED — ITS CLOSED ITEMS (archived at JF; the block stays in `docs/state.md`)
+
+- **master.html inconsistencies the sweep found and left, all older than FX:**
+  - §3's elite talent point contradicts §8;
+  - §4.3's Seasoned Fighter half-health wording;
+  - the Parry Up row credits the retired Still Wrist;
+  - Overcharge is "half" in one place and "FULL" in another;
+  - §12's "talent-gated abilities".
+
+### Small, and still owed — ITS CLOSED ITEMS (archived at JF; the block stays in `docs/state.md`)
+
+- **`FIREDRAW_TAKE` (4) IS DEAD, AND WAS DEAD BEFORE DH.** `firedraw` uses
+  `FIREDRAW_TAKE_PERFECT` (6) unconditionally. **DH deliberately did not collapse it** — that would
+  move a magnitude — but it is a real dead symbol that `test_batch_cd`'s sweep does not catch.
+
+### Carried from the code, reported and deliberately not fixed — ITS CLOSED ITEMS (archived at JF; the block stays in `docs/state.md`)
+
+- **`check_cu` AND `check_cv` ARE NOT IN `run_battery.sh`'s `GATES` ARRAY.** They are audit REPORTS
+  rather than pass/fail gates, so what a failure means there is a decision rather than a detail.
+- **~~Two specs still take the generic talent fallback~~ — MOOT AT FX (GB §4 census):** no node of the one
+  tree grants an ability, so none can collide and take the fallback.
+
+### FOUND AT GC AND NOT FIXED — ITS CLOSED ITEMS (archived at JF; the block stays in `docs/state.md`)
+
+  - `docs/instrument-rules.md`, 3: a talent granting an ability (none has since DO), *"A LANE ROW IS ONE FULLY-BUILT
+    HERO"*, and Battered Not Broken removing banked Break (the node is gone).
+
+
 ## ARCHIVED AT JE — 2026-11-02, FROM `docs/state.md` AND `CLAUDE.md` AS JD LEFT THEM (`8679027`)
 
 *From the state: what JE's rulings answered. From `CLAUDE.md` (JE §3, the designer's, II §4's rule), below them: the history of HERO AND ALLY, the ALLY/HERO THREAD whole and the four struck lines, byte for byte. The hero and ally law itself went to `docs/text-standard.html` §4.9b and is not here.*

@@ -5063,6 +5063,8 @@ func bomb_damage() -> int:
 # populations are two facts and the grade takes the higher; two readings of the SAME population are two estimates of one fact,
 # and the sharper instrument's replaces the other — keeping the higher of two estimates is a bias, a ratchet on every re-read.
 # **BATCH JE §0.3 — TWO READINGS OF ONE QUANTITY ON ONE INSTRUMENT ARE POOLED, NOT CHOSEN BETWEEN (the designer's)**: the refinement, beside the rule it refines.
+# **BATCH JF §0.1 — A TIE BETWEEN TWO BATCHES' ARMS ON ONE SEED BLOCK IS NAMED AS CORRELATED, AND WHERE IT DECIDES A GRADE THE COVARIANCE IS COMPUTED BEFORE THE GRADE IS WRITTEN (the designer's).**
+# **BATCH JF §2 — A POINT IS A PERCENT OF THE HEALTH OF A PARTY THAT OPENED WITH NO RELIC (the designer's)**: every grade is a modifier against *none* on one tree, so the grades stand; the absolute scale is what rests on the default. The bot wears the first crest rune it draws (DV35), on the same answer.
 # **AND A MODIFIER KEYED ON SOMETHING ONLY SOME BUILDS DO IS GRADED ON A BUILD THAT DOES IT; ONE KEYED ON SOMETHING EVERY
 # BUILD DOES THAT STILL COSTS NOTHING HAS NO REACH AND LEAVES THE DECK (IZ §0.3)** — Dull Edge left at IZ §3, and Tinderbox
 # at IZ §5, read on the party whose strikes carry the most fire and costing it nothing. Every grade's
