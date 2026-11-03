@@ -839,7 +839,7 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 	# rune before the draft was rolled (DV27), so the draft was drawn with an engine the player would not
 	# hold yet, and it never answered the bargain's cache at all (DV26).
 	# §6: clearing ANY slot heals 15%, with the relic stacking on top.
-	# BATCH JD §2: and it passes by a hero still down at the end of this fight.
+	# BATCH JD §2, JE §1: and a hero still down at the end of this fight takes the relics and not the base.
 	run.clearing_heal()
 	var v_mana: float = run.relic_add("victory_mana_pct")
 	if v_mana > 0.0:
@@ -920,10 +920,10 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 		# slot further, which the walk below reaches like any other fight.
 		run.note_zone_boss_cleared()
 		_award_trophies(run)  # never Relics.unlock_random — that persists
-		if run.has_next_zone():
-			run.advance_zone()
-		else:
+		if not run.has_next_zone():
 			third_boss_kills += 1
+		# BATCH JE §0.2: the game's own door out of a zone boss, and the third restores like the other two.
+		run.leave_zone_boss()
 	elif node_type == "endboss":
 		# The end boss awards no ability pick (BM §4) — nothing follows it — and
 		# its relic and its talent tier are persistent, so the sim books neither.

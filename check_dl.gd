@@ -236,9 +236,10 @@ func _texts() -> void:
 	# re-litigated by the next author who trips on it. DZ folded DL §1's heading into
 	# the hero/ally block's bullet and IJ struck the heading to a line naming its
 	# record, so the needle is the bullet that binds — never the struck line.
-	var claude := FileAccess.get_file_as_string("res://CLAUDE.md")
+	# RE-POINTED AT JE: the law moved to the text standard, where a card is written.
+	var claude := FileAccess.get_file_as_string("res://docs/text-standard.html")
 	ok(claude.contains("THE UNIT OF A RULING IS THE CLAUSE, NOT THE ABILITY"),
-		"CLAUDE.md no longer carries DL §1's standing rule")
+		"the text standard no longer carries DL §1's standing rule")
 
 
 # ── helpers ────────────────────────────────────────────────────────────────

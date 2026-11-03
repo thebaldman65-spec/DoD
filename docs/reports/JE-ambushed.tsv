@@ -1,0 +1,5 @@
+arm	population	runs	cost	se	finished	endboss_losses	endboss_falls	endboss_fights	cairn	bargain_fights_moved	bargain_fights	fidelity
+JD, Ambushed at 8	the default four	60	7.2327	0.7719	46	0	0	46	3	-	702	JD §5, read for the pair; block 38, Wanderer, untalented
+JE, Ambushed at 8	the default four	60	7.2722	0.7686	46	0	0	46	3	15	702	JE tree, the same seeds, against the same tree no-modifier arm; read-only probes; NOT pooled, JE tree is another instrument
+JD, Ambushed at 8	the incumbent	60	12.3405	1.4568	32	5	60	37	0	-	507	JD §5, read for the pair; block 21, three parties, Ruin
+JE, Ambushed at 8	the incumbent	60	12.1586	1.4092	37	0	20	37	0	6	507	JE tree, the same seeds, against the same tree no-modifier arm; read-only probes; NOT pooled, JE tree is another instrument; 36 runs reach the end boss on both trees and its falls there go 56 to 20; of JD's five end-boss losses four finish here and P0 2100068 falls a fight sooner, at the third boss, and P0 2100078, lost at the third boss on JD's tree, finishes

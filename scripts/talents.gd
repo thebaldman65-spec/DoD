@@ -140,7 +140,7 @@ const TREE := [
 	# PRECEDENT: Blood Communion (oc_blood_communion) — blood_communion 20. TAKEN.
 	# THE BRIEF'S LABEL WAS "Breaking heals the party", AND BOTH HALVES OF IT
 	# ARE WRONG HERE: the word *party* is retired from player-facing text
-	# (CLAUDE.md, HERO AND ALLY — `test_batch_bx` §4b reads this file), and the
+	# (the text standard's §4.9, HERO AND ALLY — `test_batch_bx` §4b reads this file), and the
 	# read site heals ONE body, the lowest-health hero. The name says that.
 	# BATCH HQ §1 — THE WORDS NARROWED TO THE READ SITE, AS TITHE'S WERE (HP §4). They
 	# said *every point of Break damage dealt*, and the site reads the Break an

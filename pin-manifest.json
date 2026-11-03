@@ -2,18 +2,18 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 2152,
-  "source": 1421,
-  "other": 226,
-  "document": 505
+  "total": 2182,
+  "source": 1423,
+  "other": 238,
+  "document": 521
  },
  "floor": {
-  "pins": 2152
+  "pins": 2182
  },
  "falls": [],
  "source_residency": {
   "narrow": 49,
-  "code": 877,
+  "code": 879,
   "absent": 330,
   "runtime": 106,
   "unresolved": 3,
@@ -598,7 +598,7 @@
   {
    "s": "check_dl.gd",
    "fn": "_texts",
-   "h": "CLAUDE.md",
+   "h": "docs/text-standard.html",
    "n": "THE UNIT OF A RULING IS THE CLAUSE, NOT THE ABILITY",
    "p": "+",
    "r": "code",
@@ -637,29 +637,29 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dm.gd#183"
+   "g": "check_dm.gd#184"
   },
   {
    "s": "check_dm.gd",
    "fn": "_closed",
-   "h": "CLAUDE.md",
+   "h": "DoD-archive/state-archive.md",
    "n": "RULE ON CLAUSES, NOT ON ABILITIES",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dm.gd#181"
+   "g": "check_dm.gd#182"
   },
   {
    "s": "check_dm.gd",
    "fn": "_closed",
-   "h": "CLAUDE.md",
+   "h": "DoD-archive/state-archive.md",
    "n": "THE ALLY/HERO THREAD IS CLOSED",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dm.gd#180"
+   "g": "check_dm.gd#181"
   },
   {
    "s": "check_dm.gd",
@@ -6900,7 +6900,19 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ij.gd#49",
+   "g": "check_ij.gd#50",
+   "expr": "at_head"
+  },
+  {
+   "s": "check_ij.gd",
+   "fn": "_s02_struck",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ij.gd#51",
    "expr": "String"
   },
   {
@@ -6912,7 +6924,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ij.gd#58"
+   "g": "check_ij.gd#60"
   },
   {
    "s": "check_ij.gd",
@@ -6923,7 +6935,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ij.gd#58"
+   "g": "check_ij.gd#60"
   },
   {
    "s": "check_ij.gd",
@@ -6934,7 +6946,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ij.gd#58"
+   "g": "check_ij.gd#60"
   },
   {
    "s": "check_ij.gd",
@@ -6945,7 +6957,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_ij.gd#59"
+   "g": "check_ij.gd#61"
   },
   {
    "s": "check_ij.gd",
@@ -6956,7 +6968,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_ij.gd#59"
+   "g": "check_ij.gd#61"
   },
   {
    "s": "check_ij.gd",
@@ -6967,7 +6979,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ij.gd#67",
+   "g": "check_ij.gd#69",
    "expr": "NEW_GATE_RULE"
   },
   {
@@ -6979,7 +6991,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ij.gd#68",
+   "g": "check_ij.gd#70",
    "expr": "NEW_GATE_ROW"
   },
   {
@@ -6991,7 +7003,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ij.gd#67",
+   "g": "check_ij.gd#69",
    "expr": "NEW_GATE_RULE"
   },
   {
@@ -7003,7 +7015,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_ij.gd#77"
+   "g": "check_ij.gd#79"
   },
   {
    "s": "check_ij.gd",
@@ -7014,7 +7026,7 @@
    "r": "missing-file",
    "k": "format",
    "how": "read",
-   "g": "check_ij.gd#78"
+   "g": "check_ij.gd#80"
   },
   {
    "s": "check_ij.gd",
@@ -7025,19 +7037,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_ij.gd#78"
-  },
-  {
-   "s": "check_ij.gd",
-   "fn": "_s4_rules",
-   "h": "CLAUDE.md",
-   "n": null,
-   "p": "+",
-   "r": "runtime",
-   "k": "non-literal",
-   "how": "read",
-   "g": "check_ij.gd#273",
-   "expr": "FIGURE_RULE"
+   "g": "check_ij.gd#80"
   },
   {
    "s": "check_ij.gd",
@@ -7060,7 +7060,19 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ij.gd#296",
+   "g": "check_ij.gd#277",
+   "expr": "FIGURE_RULE"
+  },
+  {
+   "s": "check_ij.gd",
+   "fn": "_s4_rules",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ij.gd#298",
    "expr": "SWEEP_ROW"
   },
   {
@@ -7072,7 +7084,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ij.gd#273",
+   "g": "check_ij.gd#275",
    "expr": "FIGURE_RULE"
   },
   {
@@ -7084,7 +7096,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ij.gd#277"
+   "g": "check_ij.gd#279"
   },
   {
    "s": "check_ik.gd",
@@ -8482,7 +8494,7 @@
    "r": "missing-file",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iu.gd#165",
+   "g": "check_iu.gd#172",
    "expr": "_unesc"
   },
   {
@@ -8494,7 +8506,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iu.gd#171",
+   "g": "check_iu.gd#178",
    "expr": "_flat"
   },
   {
@@ -8506,7 +8518,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_iu.gd#257"
+   "g": "check_iu.gd#264"
   },
   {
    "s": "check_iu.gd",
@@ -8517,7 +8529,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_iu.gd#239"
+   "g": "check_iu.gd#246"
   },
   {
    "s": "check_iu.gd",
@@ -8528,7 +8540,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_iu.gd#313"
+   "g": "check_iu.gd#320"
   },
   {
    "s": "check_iu.gd",
@@ -8539,7 +8551,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_iu.gd#313"
+   "g": "check_iu.gd#320"
   },
   {
    "s": "check_iu.gd",
@@ -8550,7 +8562,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_iu.gd#313"
+   "g": "check_iu.gd#320"
   },
   {
    "s": "check_iu.gd",
@@ -8561,7 +8573,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_iu.gd#319"
+   "g": "check_iu.gd#326"
   },
   {
    "s": "check_iu.gd",
@@ -8572,7 +8584,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_iu.gd#319"
+   "g": "check_iu.gd#326"
   },
   {
    "s": "check_iu.gd",
@@ -8583,7 +8595,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iu.gd#317"
+   "g": "check_iu.gd#324"
   },
   {
    "s": "check_iu.gd",
@@ -8594,7 +8606,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iu.gd#314"
+   "g": "check_iu.gd#321"
   },
   {
    "s": "check_iu.gd",
@@ -8605,7 +8617,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iu.gd#310"
+   "g": "check_iu.gd#317"
   },
   {
    "s": "check_iu.gd",
@@ -8616,7 +8628,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_iu.gd#319"
+   "g": "check_iu.gd#326"
   },
   {
    "s": "check_iu.gd",
@@ -8627,7 +8639,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iu.gd#200",
+   "g": "check_iu.gd#207",
    "expr": "cid"
   },
   {
@@ -8639,7 +8651,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iu.gd#389"
+   "g": "check_iu.gd#396"
   },
   {
    "s": "check_iu.gd",
@@ -8650,7 +8662,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iu.gd#389"
+   "g": "check_iu.gd#396"
   },
   {
    "s": "check_iu.gd",
@@ -8661,7 +8673,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iu.gd#399"
+   "g": "check_iu.gd#406"
   },
   {
    "s": "check_iu.gd",
@@ -8672,7 +8684,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iu.gd#399"
+   "g": "check_iu.gd#406"
   },
   {
    "s": "check_iu.gd",
@@ -8683,7 +8695,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_iu.gd#471"
+   "g": "check_iu.gd#478"
   },
   {
    "s": "check_iu.gd",
@@ -8694,7 +8706,7 @@
    "r": "missing-file",
    "k": "composed",
    "how": "param",
-   "g": "check_iu.gd#450"
+   "g": "check_iu.gd#457"
   },
   {
    "s": "check_iu.gd",
@@ -8705,7 +8717,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "param",
-   "g": "check_iu.gd#453"
+   "g": "check_iu.gd#460"
   },
   {
    "s": "check_iv.gd",
@@ -10513,7 +10525,337 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_jd.gd#496"
+   "g": "check_jd.gd#497"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_block",
+   "h": "CLAUDE.md",
+   "n": "\n",
+   "p": "+",
+   "r": "runtime",
+   "k": "composed",
+   "how": "param",
+   "g": "check_je.gd#79"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_block",
+   "h": "CLAUDE.md",
+   "n": "\n#",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "param",
+   "g": "check_je.gd#83"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "A RECON IS OWED FOR CODE AND GATES, NOT FOR WORDS",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_je.gd#199"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "AN ASSERTION WRITTEN TO PASS IS NOT A PREDICTION",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_je.gd#201"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/instrument-rules.md",
+   "n": "THE POSITIONAL RE-RUN RUNS WHERE A READ's OWN FILE CHANGED, NOT EVERY BATCH",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_je.gd#200"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s1c_every_text",
+   "h": "docs/master.html",
+   "n": "All three zone bosses restore every hero",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_je.gd#249"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s1c_every_text",
+   "h": "scripts/run_state.gd",
+   "n": "func fallen_heal_pct()",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_je.gd#260"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s1c_every_text",
+   "h": "docs/master.html",
+   "n": "has no descent",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_je.gd#250"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s1c_every_text",
+   "h": "scripts/run_state.gd",
+   "n": "heal_party(victory_heal_pct(), fallen_heal_pct())",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_je.gd#260"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s1c_every_text",
+   "h": "docs/master.html",
+   "n": "heals every hero %d%% of max HP</b>, and that %d%% passes by a hero still down",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_je.gd#246"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s1c_every_text",
+   "h": "docs/master.html",
+   "n": "heals every hero <b>%d%% of max HP</b>",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_je.gd#247"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s1c_every_text",
+   "h": "docs/master.html",
+   "n": "reaches that hero all the same",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_je.gd#248"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s2a_the_pooled_reading",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_je.gd#330",
+   "expr": "SHARPER"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s2a_the_pooled_reading",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_je.gd#331",
+   "expr": "POOLED"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s2a_the_pooled_reading",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_je.gd#327",
+   "expr": "pooled_txt"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s2a_the_pooled_reading",
+   "h": "docs/state.md",
+   "n": "+12.02 ± 1.20",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_je.gd#328"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s2a_the_pooled_reading",
+   "h": "docs/state.md",
+   "n": "+12.34 ± 1.46",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_je.gd#328"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s2a_the_pooled_reading",
+   "h": "CLAUDE.md",
+   "n": "ITS ERROR TAKES THE COVARIANCE WHERE THE ARMS SHARE SEEDS",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_je.gd#334"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s3_the_cut",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_je.gd#378",
+   "expr": "String"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s3_the_cut",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_je.gd#383",
+   "expr": "at_head"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s3_the_cut",
+   "h": "DoD-archive/state-archive.md",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_je.gd#377",
+   "expr": "String"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s3_the_cut",
+   "h": "DoD-archive/state-archive.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_je.gd#384",
+   "expr": "at_head"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s3_the_cut",
+   "h": "docs/text-standard.html",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_je.gd#372",
+   "expr": "LAW_HEAD"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s3_the_cut",
+   "h": "docs/text-standard.html",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "derived",
+   "g": "check_je.gd#376",
+   "expr": "String"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s3_the_cut",
+   "h": "DoD-archive/state-archive.md",
+   "n": "**A BATCH THAT FINDS\nNOTHING TO WIDEN HAS STILL MEASURED SOMETHING**",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_je.gd#385"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s3_the_cut",
+   "h": "CLAUDE.md",
+   "n": "**`docs/instrument-rules.md`**,\n  **`docs/combat-rules.md`**",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_je.gd#380",
+   "alt": true
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s3_the_cut",
+   "h": "docs/text-standard.html",
+   "n": "<h2>4.10",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_je.gd#374"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s3_the_cut",
+   "h": "CLAUDE.md",
+   "n": "HERO AND ALLY ARE THE ONLY TWO WORDS, AND THAT LAW IS THE STANDARD's §4.9",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_je.gd#379"
+  },
+  {
+   "s": "check_je.gd",
+   "fn": "_s3_the_cut",
+   "h": "CLAUDE.md",
+   "n": "`docs/design-notes.md`, `docs/text-standard.html`",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_je.gd#380",
+   "alt": true
   },
   {
    "s": "test_batch_ah.gd",

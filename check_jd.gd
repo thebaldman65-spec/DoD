@@ -6,9 +6,9 @@
 #        and no living document says a hero who fell walks out above it (C04).
 #   §2   THE RETURN, DRIVEN ON A REAL BOARD: a real fight, heroes down through the damage door, won through `_check_end`. A hero who
 #        fell at the floor (C01); a hero at 1 health at the floor plus the clearing heal (C02); the others reached, which is what makes
-#        *it did not reach him* a reading; every relic on the hook, derived, reaching the second and not the first (C03); Cairnmoss
-#        lifting him; a hero raised inside the fight standing with the rest; the key through the save; the trace at the next fight's
-#        spawn, and the one place it does not reach.
+#        *it did not reach him* a reading; every relic on the hook, derived, reaching both, the first by its add alone (RE-POINTED AT JE: the
+#        relics reach him, and `check_je` §1a holds the base's cost); Cairnmoss lifting him; a hero raised inside the fight standing with the
+#        rest; the key through the save; the trace at the next fight's spawn, and the zone restores that end it.
 #   §3   ONE DEATH A BODY: the death callback once on a hero and on an enemy, a body raised able to fall again, no Break on a corpse;
 #        and the road it happened on, a Sacred Resolve share under the bond felling the struck hero mid-strike (C05).
 #   §4   THE FOUR DISPOSITIONS: the Cairn drawn after a real fall and not without one, the hero who fell made whole and nobody else
@@ -274,7 +274,7 @@ func _s0_the_rulings() -> void:
 	var rules := _doc("res://CLAUDE.md")
 	var fall := _flat(_block(rules, FALL_HEAD))
 	ok(fall.contains("THE FALL DOES NOT LAST"), "§0.1: the ruling does not stand in its block")
-	ok(fall.contains("THE CLEARING HEAL PASSES HIM BY, AND SO DOES EVERY RELIC THAT ADDS TO IT"), "§0.1: the rule's sentence is not in its block")
+	ok(fall.contains("THE BASE CLEARING HEAL PASSES HIM BY, AND EVERY RELIC THAT ADDS TO IT REACHES HIM"), "§0.1: the rule's sentence is not in its block")
 	ok(fall.contains("a hero raised inside the fight"), "§0.1: the block does not say whom the key names")
 	var conduct := _flat(_block(rules, CONDUCT_HEAD))
 	var clause := conduct.find("IT SETTLES WHO DECIDES IN FLIGHT, NOT WHAT A BATCH MAY AUTHOR")
@@ -353,7 +353,7 @@ func _s2a_the_return() -> void:
 
 # THE POPULATION IS THE HOOK'S, READ OFF THE POOL, SO THE NEXT RELIC ON IT IS DRIVEN WITH NOTHING WRITTEN HERE.
 func _s2b_every_relic_on_the_hook() -> void:
-	print("\n§2b — every relic on the hook reaches the second hero and not the first")
+	print("\n§2b — every relic on the hook reaches both heroes, the first by its add alone")
 	var on_hook: Array = Relics.POOL.keys().filter(func(id): return (Relics.POOL[id].get("hooks", {}) as Dictionary).has("victory_heal_pct"))
 	print("    the hook's relics: %s" % str(on_hook))
 	ok(on_hook.size() >= 3, "§2b: the hook holds %d relics" % on_hook.size())
@@ -362,10 +362,12 @@ func _s2b_every_relic_on_the_hook() -> void:
 		var ended := await _fought(carried)
 		var pct: float = _run.victory_heal_pct()
 		ok(pct > _run.SLOT_HEAL_PCT, "§2b: %s lifted no heal" % str(carried))
-		ok(int(_run.party[FELL]["hp"]) == _floor_of(FELL), "§2b: DRIVEN — %s reached the hero who fell: %d, the floor %d" % [str(carried), int(_run.party[FELL]["hp"]), _floor_of(FELL)])
+		var adds: float = pct - _run.SLOT_HEAL_PCT
+		ok(int(_run.party[FELL]["hp"]) == _floor_of(FELL) + int(_run.party[FELL]["max_hp"] * adds) or int(_run.party[FELL]["hp"]) == _floor_of(FELL) + int(_run.party[FELL]["max_hp"] * _run.relic_add("victory_heal_pct")),
+			"§2b: DRIVEN — %s did not reach the hero who fell by its add alone: %d, the floor %d" % [str(carried), int(_run.party[FELL]["hp"]), _floor_of(FELL)])
 		ok(int(_run.party[AT_ONE]["hp"]) == _healed(AT_ONE, 1, pct), "§2b: DRIVEN — %s did not reach the hero at 1 health: %d, wanted %d" % [str(carried), int(_run.party[AT_ONE]["hp"]), _healed(AT_ONE, 1, pct)])
-		var said: bool = id == "*" or String(Relics.desc_of(String(id))).contains("standing hero")
-		ok(said, "§2b: %s's words say every hero: %s" % [str(id), Relics.desc_of(String(id)) if id != "*" else ""])
+		var said: bool = id == "*" or not String(Relics.desc_of(String(id))).contains("standing hero")
+		ok(said, "§2b: %s's words still pass him by: %s" % [str(id), Relics.desc_of(String(id)) if id != "*" else ""])
 
 
 func _s2c_cairnmoss() -> void:
@@ -418,8 +420,8 @@ func _s2e_the_key_and_the_trace() -> void:
 	# A fight nobody fell in takes the mark away, and leaves no key behind.
 	await _win(s)
 	ok(not (_run.party[FELL] as Dictionary).has(_key), "§2e: the mark outlived a fight he stood through")
-	# WHERE THE MARK STOPS, THROUGH THE VICTORY CARD's OWN BUTTON, BECAUSE THE GATE IN FRONT OF THE RESTORE IS THE SUBJECT: zone 1's and zone
-	# 2's descents restore every hero and take it, and the third zone's boss has no descent, so he meets the end boss at the floor.
+	# WHERE THE MARK STOPS, THROUGH THE VICTORY CARD's OWN BUTTON, BECAUSE THE GATE IN FRONT OF THE RESTORE IS THE SUBJECT: every zone boss restores
+	# every hero and takes it, the third included (RE-POINTED AT JE: it restored nothing until then; `check_je` §1d drives a real boss node).
 	await _fought([])
 	ok(bool((_run.party[FELL] as Dictionary).get(_key, false)), "§2e: the second board did not mark him")
 	ok(_run.has_next_zone(), "§2e: the first zone has no next zone")
@@ -432,8 +434,8 @@ func _s2e_the_key_and_the_trace() -> void:
 	ok(not _run.has_next_zone(), "§2e: the third zone has a next zone")
 	current_scene._next_zone()
 	await Gate.frames(self, 6)
-	ok(int(_run.party[FELL]["hp"]) == at_floor and at_floor == _floor_of(FELL), "§2e: DRIVEN — the third zone's boss restored him: %d, the floor %d" % [int(_run.party[FELL]["hp"]), at_floor])
-	ok(bool((_run.party[FELL] as Dictionary).get(_key, false)), "§2e: DRIVEN — the third zone's boss took the mark")
+	ok(int(_run.party[FELL]["hp"]) == int(_run.party[FELL]["max_hp"]) and at_floor == _floor_of(FELL), "§2e: DRIVEN — the third zone's boss did not restore him: %d, the floor %d" % [int(_run.party[FELL]["hp"]), at_floor])
+	ok(not (_run.party[FELL] as Dictionary).has(_key), "§2e: DRIVEN — the third zone's boss left the mark")
 
 
 # ── §3 — ONE DEATH A BODY ─────────────────────────────────────────────────────
@@ -522,7 +524,7 @@ func _draws(id: String, n: int) -> int:
 func _s4a_the_cairn() -> void:
 	print("\n§4a — the Cairn, after a real fall")
 	var ev: Dictionary = Events.config("fallen_cairn")
-	ok(int(ev.get("weight", 0)) == 8, "§4a: the Cairn's weight moved (%d)" % int(ev.get("weight", 0)))
+	ok(int(ev.get("weight", 0)) == 12, "§4a: the Cairn's weight moved (%d)" % int(ev.get("weight", 0)))
 	ok(not (ev.get("requires", {}) as Dictionary).has("fallen_hero"), "§4a: the Cairn still asks for a member at 0 health")
 	await _fought([])
 	var drawn := _draws("fallen_cairn", 3000)

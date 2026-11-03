@@ -1994,6 +1994,18 @@ the drive keeps the fast frames.
   A rule in a file costs its bytes once; a line in every brief costs them every batch, and the brief that forgets it costs a
   battery.
 
+
+**A RECON IS OWED FOR CODE AND GATES, NOT FOR WORDS (JE §7, the designer's).** One recon on the tree the code lands in; a pre-run plus the standalone `check_de` for a tree that differs from it only in
+words, comments and baseline rows; **the acceptance reads the whole either way.** A third recon of 87 minutes for changes that move no die buys nothing a pre-run does not.
+
+**THE POSITIONAL RE-RUN RUNS WHERE A READ's OWN FILE CHANGED, NOT EVERY BATCH (JE §7, the designer's).** A read whose file a batch does not touch cannot have moved, so the subset is derived from the
+batch's diff, its count skipped is printed with why, and **every read of a gate whose source the batch edits is in the subset**, because the census is read off gate sources (JE's brief owed the full re-run to the first batch
+that edits one; JE was that batch). **A haystack the census writes as a population — *every check_ .gd*, *six scripts*, a runtime log — is in the subset too**: it names no file, so no diff can clear it, and JE's first derivation skipped those through its parse. If the derivation cannot be made safely the batch says so and runs the whole. The cut is for cost, not for coverage.
+
+**AN ASSERTION WRITTEN TO PASS IS NOT A PREDICTION (JD §8, JE §0.6, the designer's).** Every drive has a prediction written as a file first, with a figure in it that could be wrong.
+
+**EVERY WAIT READS THE RUNNER's DONE LINE AND CARRIES A TIME BOUND (JE §0.6, the designer's).** A watcher whose condition can match its own command line cannot exit, and one cost JD six hours, so a wait names the marker it reads and the bound it stops at, and says which of the two ended it. **A LANE's NAME COMES FROM `lane.sh`, NEVER FROM A REPORT's PROSE (JE §6)**: a report drops the project's prefix, and eight folders at JD are what that costs.
+
 ## STANDING RULE — READ THE ROWS OF `ps`, NEVER A `grep -c` (Batch HX §3)
 
 > **Whether something is running is answered by reading the rows `ps` prints — the command, its parent, how long it has

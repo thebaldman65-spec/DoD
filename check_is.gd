@@ -299,7 +299,7 @@ func _s0_the_rulings() -> void:
 		[cl, "CLAUDE.md", "A PAYLOAD TODAY's GAME CANNOT READ IS REBUILT FROM TODAY's DEFINITION"],
 		[cl, "CLAUDE.md", "A SPLIT DISTRIBUTES WHAT IT IS GIVEN AND NEVER MULTIPLIES IT"],
 		[cl, "CLAUDE.md", "THE BOT's ALLY POOLS ARE A KNOWN CONSTANT BIAS"],
-		[cl, "CLAUDE.md", "A PICK IS OFFERED WHERE THE CAST PAYS"],
+		[FileAccess.get_file_as_string("res://docs/text-standard.html"), "docs/text-standard.html", "A PICK IS OFFERED WHERE THE CAST PAYS"],
 		[ir, "docs/instrument-rules.md", "A CENSUS's OWN LESS-THAN-FULL-CONFIDENCE ROWS ARE DRIVEN BY THE NEXT BATCH THAT TOUCHES THAT CENSUS"],
 	]
 	for p in pins:

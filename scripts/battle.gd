@@ -29289,7 +29289,7 @@ func _check_end() -> void:
 		# §6: clearing ANY slot heals the party. This is the whole of the
 		# rest-node replacement, and it rides the SAME relic hook the Chalice of
 		# Dawn already used, so the relic\'s 10% stacks on top of the base 15%.
-		# BATCH JD §2: and it passes by a hero still down at the end of this fight.
+		# BATCH JD §2, JE §1: and a hero still down at the end of this fight takes the relics and not the base.
 		Run.clearing_heal()
 		var v_mana := Run.relic_add("victory_mana_pct")
 		if v_mana > 0.0:
@@ -29510,8 +29510,8 @@ func _resolve_boss(gold_gain: int, is_end: bool) -> void:
 				" and ".join(picked)
 		# BATCH GF — SAVED WHETHER OR NOT A PICK WAS AWARDED. The slot ladder moved
 		# two lines up and it is run state; inside the `if` above it reached the
-		# disk only when some hero was paid. A resume from this card DESCENDS
-		# (`Run.resume_scene`), and it must descend with the ladder where the boss
+		# disk only when some hero was paid. A resume from this card LEAVES IT
+		# (`Run.leave_zone_boss`), and it must leave with the ladder where the boss
 		# left it.
 		Run.save_run()
 		Profile.note_boss(Run.boss_kind())
@@ -29603,9 +29603,8 @@ func _hero_label(member: Dictionary) -> String:
 func _next_zone() -> void:
 	# BATCH BM §6: the THIRD zone's boss no longer ends the run — the end boss
 	# is the slot after it, on the same board — so there is no zone to advance
-	# into. Everything else about the button is unchanged.
-	if Run.has_next_zone():
-		Run.advance_zone()
+	# into. BATCH JE §0.2: and it restores like the other two, so the end boss is fought whole.
+	Run.leave_zone_boss()
 	Run.save_run()
 	_to_map()
 

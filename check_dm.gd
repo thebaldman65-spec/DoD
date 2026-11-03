@@ -429,10 +429,12 @@ func _texts() -> void:
 func _closed() -> void:
 	var claude := FileAccess.get_file_as_string("res://CLAUDE.md")
 	ok(claude != "", "CLAUDE.md is readable")
-	ok(claude.contains("THE ALLY/HERO THREAD IS CLOSED"),
-		"CLAUDE.md no longer records that the ally/hero thread is closed")
-	ok(claude.contains("RULE ON CLAUSES, NOT ON ABILITIES"),
-		"CLAUDE.md no longer carries the rule the thread produced")
+	# RE-POINTED AT JE: the block left the rule file for the archive, whole, under II §4's rule.
+	var arch := FileAccess.get_file_as_string("res://DoD-archive/state-archive.md")
+	ok(arch.contains("THE ALLY/HERO THREAD IS CLOSED"),
+		"the archive no longer records that the ally/hero thread is closed")
+	ok(arch.contains("RULE ON CLAUSES, NOT ON ABILITIES"),
+		"the archive no longer carries the rule the thread produced")
 	var ts := FileAccess.get_file_as_string("res://docs/text-standard.html")
 	ok(ts.contains("CLOSED AT DM"),
 		"text-standard.html §4.9 no longer records the close")

@@ -1,0 +1,5 @@
+row	zone	mystic	boons	total	among_boons	of_a_draw	at_weight_8
+zone 2, no mystic in the party	2	no	6	64	18.8	4.69	3.33
+zones 1 and 3, no mystic	1	no	7	74	16.2	4.05	2.86
+zone 2, a mystic	2	yes	7	72	16.7	4.17	2.94
+zones 1 and 3, a mystic	1	yes	8	82	14.6	3.66	2.56

@@ -23,7 +23,7 @@
 #   victory_mana_pct      victory screen      party mana per victory
 #   victory_gold          victory screen      flat gold per victory
 #   gold_find_mult        award_gold          all node gold (+frac)
-#   fallen_recover        clearing_heal, _note  a hero left down takes the clearing heal
+#   fallen_recover        fallen_heal_pct, _note  a hero left down takes the base clearing heal too
 #   shop_discount         shop prices         prices x (1 - frac)
 #   loot_extra            elite spoils        extra consumable drops
 # NEEDS PLUMBING (declared out for now): on-kill/per-turn procs,
@@ -47,7 +47,7 @@ const POOL := {
 		"desc": "Begin each run with +{=@hooks.start_gold} gold.",
 		"hooks": {"start_gold": 80}},
 	"chalice": {"name": "Chalice of Dawn", "tier": "common",
-		"desc": "Every standing hero heals {=@hooks.victory_heal_pct*100}% of maximum\nhealth after every victory.",
+		"desc": "Every hero heals {=@hooks.victory_heal_pct*100}% of maximum\nhealth after every victory.",
 		"hooks": {"victory_heal_pct": 0.10}},
 	"emberheart": {"name": "Emberheart", "tier": "common",
 		"desc": "Fire and Holy strike damage +{=@hooks.dmg_type_mult.fire*100}%.",
@@ -66,7 +66,8 @@ const POOL := {
 		"hooks": {"shop_discount": 0.20}},
 	# BATCH JD §4 — RE-CUT ONTO THE RETURN, AND IT IS THE RULING'S COUNTER (JD §0.2, the designer's). IK §6 suspended
 	# it when the rest node's hook paid nothing; with it a hero left down takes the clearing heal like everyone
-	# (`Run.clearing_heal`). The relics on `victory_heal_pct` lift everyone but him; this one lifts him.
+	# (`Run.clearing_heal`). The relics on `victory_heal_pct` reach him (JE §0.1); this one buys back the base, a fixed
+	# figure, and adds none of its own.
 	"cairnmoss": {"name": "Cairnmoss Poultice", "tier": "common",
 		"desc": "A hero who falls recovers with the rest.",
 		"hooks": {"fallen_recover": 1}},
@@ -106,7 +107,7 @@ const POOL := {
 		"hooks": {"hero_resist_add": {"fire": 0.10, "frost": 0.10,
 			"nature": 0.10, "shadow": 0.10, "holy": 0.10, "arcane": 0.10}}},
 	"hourglass": {"name": "Cracked Hourglass", "tier": "rare",
-		"desc": "After every victory: every hero with Mana\nrecovers {=@hooks.victory_mana_pct*100}% of maximum Mana, and every\nstanding hero heals {=@hooks.victory_heal_pct*100}% of maximum health.",
+		"desc": "After every victory: every hero with Mana\nrecovers {=@hooks.victory_mana_pct*100}% of maximum Mana, and every\nhero heals {=@hooks.victory_heal_pct*100}% of maximum health.",
 		"hooks": {"victory_mana_pct": 0.30, "victory_heal_pct": 0.05}},
 	"kingsledger": {"name": "The King's Ledger", "tier": "rare",
 		"desc": "+{=@hooks.start_gold} gold at run start; battle and bargain gold +{=@hooks.gold_find_mult*100}%.",
@@ -117,7 +118,7 @@ const POOL := {
 		"desc": "Every hero deals +{=@hooks.hero_attack_mult*100}% strike damage.",
 		"hooks": {"hero_attack_mult": 0.12}},
 	"martyrbone": {"name": "Martyr's Knucklebone", "tier": "rare",
-		"desc": "Every standing hero heals {=@hooks.victory_heal_pct*100}% of maximum\nhealth after every victory.",
+		"desc": "Every hero heals {=@hooks.victory_heal_pct*100}% of maximum\nhealth after every victory.",
 		"hooks": {"victory_heal_pct": 0.15}},
 	"tollbell": {"name": "Tollkeeper's Bell", "tier": "rare",
 		"desc": "+{=@hooks.victory_gold} gold after every victory.",

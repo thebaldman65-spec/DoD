@@ -94,7 +94,8 @@ const STRUCK := [
 func _s02_struck() -> void:
 	print("\n§0.2 — the four closed blocks no reference holds, each struck to one line naming its record")
 	var cm := FileAccess.get_file_as_string("res://CLAUDE.md")
-	var lines := cm.split("\n")
+	# RE-POINTED AT JE: the four lines went to the archive when the rule file needed the room; what each says is unchanged, and it is gone from the rule file.
+	var lines := FileAccess.get_file_as_string("res://DoD-archive/state-archive.md").split("\n")
 	for s in STRUCK:
 		var at := -1
 		var n := 0
@@ -102,7 +103,9 @@ func _s02_struck() -> void:
 			if String(lines[i]).begins_with(String(s[0])):
 				at = i
 				n += 1
-		ok(n == 1, "§0.2: the struck line '%s' stands %d time(s) in CLAUDE.md — once" % [String(s[0]).substr(0, 50), n])
+		ok(n == 1, "§0.2: the struck line '%s' stands %d time(s) in the archive — once" % [String(s[0]).substr(0, 50), n])
+		var at_head: String = "\n" + String(s[0])
+		ok(not cm.contains(at_head), "§0.2: the struck line '%s' still stands in CLAUDE.md" % String(s[0]).substr(0, 50))
 		ok(not cm.contains(String(s[1])), "§0.2: the closed block '%s' is still in CLAUDE.md" % String(s[1]).substr(0, 60))
 		if at < 0:
 			continue

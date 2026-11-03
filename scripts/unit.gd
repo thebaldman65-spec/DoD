@@ -1115,8 +1115,8 @@ func sync_victory_state(member: Dictionary) -> void:
 	# and hp is clamped under the restored maximum in the same step.
 	member["hp"] = clampi(maxi(hp, int(save_max * RETURN_FLOOR_PCT)), 1, save_max)
 	# BATCH JD §2 — AND THE RETURN SAYS WHOM IT RETURNED (the designer's ruling, JD §0.1). A hero still down here
-	# walks out at the floor above and the clearing heal passes him by (`Run.clearing_heal`); a hero raised inside
-	# the fight stands, and the heal reaches him. The key rides the party dict as `companions_standing` does, so
+	# walks out at the floor above and takes the relics and not the base (`Run.clearing_heal`, JE §1); a hero raised
+	# inside the fight stands, and the whole heal reaches him. The key rides the party dict as `companions_standing` does, so
 	# no save version moved, and it goes rather than reads false, so a fight nobody fell in leaves a member's
 	# keys as they were.
 	if dead:

@@ -3,7 +3,7 @@
 **THE CLOSED HALF OF `docs/state.md`.** That file is rewritten every batch and holds only what is true and owed now; what it
 closes comes here, word for word, and is never rewritten. **It is reached through the live file's own header**, which names
 this file by its `res://` path, so moving it is one edit there — `check_hx` §2 follows that name, and asserts that no section
-heading stands in both files.
+heading stands in both files. **Since JE §3 it also takes what `CLAUDE.md` closes and no reference holds**, by II §4's rule, under the cut of the batch that closed it.
 
 - **WHAT COMES HERE**: a section whose heading is struck (every item in it answered), a section closed by its own heading, and
   an item of a *FOUND AT* section that is fixed, overtaken by the code, superseded by a later finding or ruling, or a record that
@@ -16,6 +16,59 @@ heading stands in both files.
   for it in the read; it is in the repository, so nothing in it is lost.
 
 ---
+
+## ARCHIVED AT JE — 2026-11-02, FROM `docs/state.md` AND `CLAUDE.md` AS JD LEFT THEM (`8679027`)
+
+*From the state: what JE's rulings answered. From `CLAUDE.md` (JE §3, the designer's, II §4's rule), below them: the history of HERO AND ALLY, the ALLY/HERO THREAD whole and the four struck lines, byte for byte. The hero and ally law itself went to `docs/text-standard.html` §4.9b and is not here.*
+
+### ~~JD's RULINGS OWED~~ — **ALL FIVE ANSWERED IN JE's BRIEF (1: the ruling stands and the trace shrinks, JE §0.1; 2: pooled, JE §0.3; 3: accepted, JE §0.5; 4: the third boss restores, JE §0.2; 5: weight 12, JE §0.4)**, *its heading was: **FIVE; EACH TAKEN ON THE RECOMMENDATION, NONE HOLDING ANYTHING UP***
+
+Full working: `docs/reports/JD.md`, NEEDS A RULING.
+
+1. **THE FLOOR BREEDS FALLS, ON A SMALL SCALE (JD §5).** On the same seeds with no modifier, HEAD against JD: falls 40 → 53 on the reference four and 17 → 26 on the incumbent, +0.18 ± 0.08 a run (z 2.26), the same hero falling again in the next fight 10 of 27 → 15 of 30 and 1 of 12 → 7 of 17, and three finishes in 120 lost, each to a wipe in the fight after a hero was carried in, none gained. The bot never drinks on the map, which is what a player would answer it with. **Taken**: the ruling stands as written; §5's tie says the grades stand and cannot see this, because it subtracts it. **The alternative**: a floor nearer the clearing heal. **Reversing it** is `RETURN_FLOOR_PCT`.
+2. **AMBUSHED's INCUMBENT READING PRINTS OVER THE CUT TO 5, INSIDE THE TEST (JD §5).** On JD's tree it reads +12.34 ± 1.46, a tie with JB's +12.02 and 0.12 over the 12.22 cut. **Taken**: no grade moved, as the brief orders, and a tie at a cut is named. **The alternative**: a floor that lasts one fight re-reads the deck, which is yours to order. **Reversing it** is a sharper arm on that population and the arithmetic.
+3. **A HERO RAISED INSIDE THE FIGHT TAKES THE CLEARING HEAL, AND THE CAIRN IS NOT DRAWN FOR HIM (JD §2).** **Taken**: the mark names a hero down when the fight ended, because *a hero who falls walks out at the floor* cannot be true of one who stood up at 50%. The brief's *which the readout already books* counts him; 3 of 290 falls in JC's table, and both of the one real run's. **The alternative**: mark any fall, at `_die()`. **Reversing it** is one line there and a second reading in `heal_party`.
+4. **TWO ZONE BOSSES LEAVE NO TRACE, AND THE THIRD CARRIES HIM ONTO THE END BOSS AT THE FLOOR (JD §0).** `Run.advance_zone` runs only while `has_next_zone()` holds: zone 1's and zone 2's bosses restore every hero, which is 3.6%, 9.3% and 11.0% of the heroes down at a won end on the reference four and 1 of 13 on the incumbent at Ruin; the third has no descent. On the incumbent under Ambushed the end boss was lost 5 of 18 times with a hero carried in and 0 of 19 clean, a small count on a party the third boss had already marked. **Taken**: each stands as the code has it, and the mark goes with the wound so the Cairn is not dealt on a hero the zone made whole. **The alternative**: a restore at the third boss, or none at the first two. **Reversing either** is one condition.
+5. **WHETHER THE CAIRN's WEIGHT OF 8 IS RIGHT (JD §4).** Drawable, it is 2.6% to 3.3% of an event draw, and it was drawn 3 times in 240 runs, all under Ambushed. **Taken**: unchanged, as ordered. The table is in the report.
+
+### FOUND AT JD AND NOT FIXED — ITS CLOSED ITEMS (archived at JE; the block stays in `docs/state.md`)
+
+- **THE BRIEF's PREMISES THAT DID NOT HOLD** (JD's report §0): *which the readout already books* — a read, off in a sim, on no save, and it counts a hero raised; *one condition on one line* — the line needed the mark, and the mark a writer and a reader; *a fall has a trace at last* — not past zone 1's and zone 2's bosses, and only 68%, 32% and 30% of the reference four's falls reach a next fight at the floor; *it is not a spiral* — on a small scale it is (JD's RULINGS OWED 1); *his companions go in at 35%* — a companion is a Hunter's beast, a third of the heroes down share the fight with another, and floor plus heal is 34.55% to 35.0% at a spec's opening maximum; *15% of one hero's maximum behind* — more under a relic; *guard it* — the bare guard leaves a Broken corpse; the brief's *the 438 pins stay pinned* — 437, the floor's own answered by its constant.
+- **WHAT WENT BEYOND THE BRIEF** (JD's report §0): three relics' words and the framing card's, the Hourglass's Mana clause with them; the Cairn's *Lay your fallen*; the victory card's sentence; the Revive Potion joining `MAP_REFUSAL`. **And two smaller**: the bond is not passed twice, and weight 8 came with the event.
+
+### THE CREST POOL — ITS CLOSED HALF (archived at JE; the block stays in `docs/state.md`)
+
+- **WHETHER A FALLEN HERO STAYS DOWN BETWEEN FIGHTS IS RULED: A FALL STAYS INSIDE ITS FIGHT (JD §0.1, `CLAUDE.md`'s block of that name), AND ALL SEVEN IT PRICED ARE DISPOSED (JD §0.2).** **Empty Pulpit, Dead Air and Dirge are JE's, and nothing here moved**: their 50 / 75 / 45% were chosen for *a few turns*, and for the bot, which never raises with a potion, a hero who fell in a won fight was still down at its end 287 of 290 times, so they pay from the fall to the end; the one real run raised both of its falls. **Nobody has read how many turns that is, and that length is the measurement JE takes**: they are mispriced, not broken. **The Cairn of the Fallen** can be drawn after a fight that left a hero down, and makes whole each hero it left down. **Cairnmoss Poultice** is back, common as it was: a hero who falls recovers with the rest. **Martyr's Knucklebone** lost its dead hook, kept its 15%, and no longer reaches a hero still down, which is what tells it from Cairnmoss. **The map's Revive Potion** path is deleted; the potion works in a fight.
+
+### FROM `CLAUDE.md`: THE TWO WORDS, THEIR THREAD, AND FOUR STRUCK LINES
+
+*The block's heading as it stood, and what stood under it in the file but the law:*
+
+## HERO AND ALLY ARE THE ONLY TWO WORDS (STANDING, SET AT BATCH CV §4, CLOSED AT DM §3)
+
+## ~~THE UNIT OF A HERO/ALLY RULING IS THE CLAUSE~~ — DL §1, folded into the hero/ally block above by DZ; the record is `docs/reports/DL.md`
+
+## THE ALLY/HERO THREAD IS CLOSED (Batch DM §3) — RULE ON CLAUSES, NOT ON ABILITIES
+> **A card can carry two clauses of different shape under one word, and a sweep that reads the
+> ability will not see it. "Party" is retired; HERO means the four, ALLY means heroes and
+> companions, and every *hero* ruling carries the structural reason a companion cannot receive it.**
+
+**A BATCH THAT FINDS
+NOTHING TO WIDEN HAS STILL MEASURED SOMETHING** — that is what lets a thread close rather than be
+abandoned.
+
+- **A CLAUSE CAN BE NARROWER THAN EITHER WORD, AND THAT SCOPE HAS NO NAME HERE.** Battle Shout and
+  Hold the Line each hand **five Rage to the CASTER** — one body — and one of the two wrote it
+  inside a group clause's colon-list, promising four heroes a payload that reaches one. **The fix
+  was to copy the sibling card that already worded it correctly, not to invent a phrasing.**
+
+*The other three struck lines, as they stood:*
+
+### ~~THE VAULT'S EXIT IS THE POOLS~~ — DY §3, settled and asserted by `check_dv` §1; the record is `docs/reports/DY.md` §3 (its finding, `docs/reports/DX.md`)
+
+## ~~WHAT MAKES A ROW-8 NODE, AND BH'S FIFTEEN POINTS~~ — BM §2, retired with the lanes at FX and BH §2 deleted at GC; the record is `docs/reports/FX.md` §3 and `docs/reports/GC.md` §1 (BM's own rule: the changelog archive's BM entry)
+
+### ~~WHERE THE RETIRED RULE ITSELF IS KEPT~~ — FN's pointer, closed with the rule; the rule is `docs/reports/EZ.md` §0 and its retirement `docs/reports/FN.md` §2
 
 ## ARCHIVED AT JD — 2026-11-01, FROM `docs/state.md` AS IT LEFT IT (`8a2a41a`)
 

@@ -230,6 +230,13 @@ func _s1_the_claims() -> void:
 # asserted, because a census of record reads at its tree.
 const RULES_CENSUS := "docs/reports/IU-rules-census.tsv"
 const VERDICTS := ["HELD", "PARTLY", "NONE", "NO-RULE"]
+# A RULE THAT LEFT `CLAUDE.md` KEEPS ITS ROW, AND THE ROW IS READ IN THE FILE IT WENT TO (JE §3): a census of record is not shortened by a move.
+const MOVED_OUT := {"HERO AND ALLY ARE THE ONLY TWO WORDS": "res://docs/text-standard.html",
+	"THE ALLY/HERO THREAD IS CLOSED": "res://DoD-archive/state-archive.md",
+	"~~THE UNIT OF A HERO/ALLY RULING IS THE CLAUSE~~": "res://DoD-archive/state-archive.md",
+	"~~THE VAULT'S EXIT IS THE POOLS~~": "res://DoD-archive/state-archive.md",
+	"~~WHAT MAKES A ROW-8 NODE, AND BH'S FIFTEEN POINTS~~": "res://DoD-archive/state-archive.md",
+	"~~WHERE THE RETIRED RULE ITSELF IS KEPT~~": "res://DoD-archive/state-archive.md"}
 const ANCHOR_FLOOR := 700
 
 
@@ -255,8 +262,14 @@ func _s2_the_rules_census() -> void:
 		tally[v] = int(tally.get(v, 0)) + 1
 		if not VERDICTS.has(v) or String(r["tree"]).strip_edges() == "":
 			bad.append(cid)
-		if not known.has(key):
+		var moved := ""
+		for m in MOVED_OUT:
+			if key.begins_with(String(m)):
+				moved = String(m)
+		if not known.has(key) and moved == "":
 			no_block.append("%s (%s)" % [cid, key.left(40)])
+		elif moved != "" and not _doc(String(MOVED_OUT[moved])).contains(moved):
+			no_block.append("%s (moved, and %s does not hold it)" % [cid, MOVED_OUT[moved]])
 		if v == "HELD" or v == "PARTLY":
 			var src := _doc("res://" + String(r["gate"]))
 			if src == "" or String(r["needle"]) == "" or not src.contains(_unesc(String(r["needle"]))):

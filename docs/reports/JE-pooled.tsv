@@ -1,0 +1,4 @@
+arm	population	cost	se	n	seeds	r	independent_se	fidelity
+JB §3	the incumbent	12.0189	1.2011	60	block 21	-	-	the sim's bot, IG's three parties, every talent worn, Ruin, 20 runs a party, block 21, fight-seeded, Ambushed at 8, paired by seed against its own tree's none arm, on JB's tree, the old return
+JD §5	the incumbent	12.3405	1.4568	60	block 21	-	-	the sim's bot, IG's three parties, every talent worn, Ruin, 20 runs a party, block 21, fight-seeded, Ambushed at 8, paired by seed against its own tree's none arm, on JD's tree, the floor
+pooled	the incumbent	12.1490	1.228	60	block 21	0.771	0.927	the two arms inverse-variance weighted, the mean as JE §0.3 orders; r is the two arms' run-by-run paired differences over the 60 common seeds (tools/je_pool.py), so the error takes the covariance; independent_se is what the brief's 0.927 is, had the arms not shared their seeds

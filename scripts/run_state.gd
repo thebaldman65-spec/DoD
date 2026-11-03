@@ -1530,29 +1530,37 @@ func _combo_ok(spec: Dictionary, picked: Array, role_counts: Dictionary) -> bool
 	return true
 
 
-func heal_party(pct: float, pass_by_the_fallen := false) -> void:
+func heal_party(pct: float, fell_pct := -1.0) -> void:
 	for member in party:
-		if member["hp"] > 0 and not (pass_by_the_fallen and member.get(BattleUnit.FELL_LAST_FIGHT, false)):
-			member["hp"] = mini(member["hp"] + int(member["max_hp"] * pct), member["max_hp"])
+		if member["hp"] > 0:
+			var heal: float = fell_pct if fell_pct >= 0.0 and member.get(BattleUnit.FELL_LAST_FIGHT, false) else pct
+			member["hp"] = mini(member["hp"] + int(member["max_hp"] * heal), member["max_hp"])
 
 
-# BATCH JD §2 — THE CLEARING HEAL, AND WHOM IT PASSES BY (JD §0.1, the designer's): A HERO WHO FALLS WALKS OUT AT THE
-# FLOOR, AND THE CLEARING HEAL PASSES HIM BY, AND SO DOES EVERY RELIC THAT ADDS TO IT. He stood at 35% until JD only
-# because this heal runs after `sync_victory_state`'s floor and `heal_party` read `hp > 0`. **`BattleUnit.FELL_LAST_FIGHT`
-# is the door**: his health no longer says who fell, the battle's bodies are gone by the map, and the readout is a read,
-# off in a sim and on no save. Both victory branches call this, so the two cannot differ. Cairnmoss Poultice is the one
-# way a hero still down takes it, with the rest.
+# BATCH JD §2, RESIZED AT JE §1 — THE CLEARING HEAL, AND WHAT A FALL COSTS OUT OF IT (JE §0.1, the designer's): A HERO WHO
+# FALLS WALKS OUT AT THE FLOOR AND THE RELICS REACH HIM; WHAT THE FALL COSTS IS THE BASE CLEARING HEAL, FIXED. A gap that
+# widened with every relic was a penalty on earning rewards. He stood above the floor until JD only because this heal
+# runs after `sync_victory_state`'s floor and `heal_party` read `hp > 0`. **`BattleUnit.FELL_LAST_FIGHT` is the door**:
+# his health no longer says who fell, the battle's bodies are gone by the map, and the readout is a read, off in a sim
+# and on no save. Both victory branches call this, so the two cannot differ.
 func clearing_heal() -> void:
-	heal_party(victory_heal_pct(), relic_add("fallen_recover") <= 0.0)
+	heal_party(victory_heal_pct(), fallen_heal_pct())
 
 
-# What the victory card adds to *the heroes recover*, which is not true of a hero the heal passed by.
+# What a hero still down when the fight ended takes: every relic's add and not the base. Cairnmoss Poultice buys the
+# base back, so he takes what everyone takes and nothing of its own.
+func fallen_heal_pct() -> float:
+	return victory_heal_pct() if relic_add("fallen_recover") > 0.0 else relic_add("victory_heal_pct")
+
+
+# What the victory card adds to *the heroes recover*, which is not the figure of a hero the base passed by.
 func clearing_heal_note() -> String:
 	if relic_add("fallen_recover") > 0.0:
 		return ""
 	for member in party:
 		if member.get(BattleUnit.FELL_LAST_FIGHT, false):
-			return " A hero left down does not."
+			var pct := int(round(fallen_heal_pct() * 100))
+			return " A hero left down recovers %d%%." % pct if pct > 0 else " A hero left down does not."
 	return ""
 
 
@@ -3938,6 +3946,25 @@ func has_next_zone() -> bool:
 	return zone_idx < SLOT_COUNT - 1
 
 
+# BATCH JE §0.2 — THE REWARD FOR CLEANSING A ZONE, AND ALL THREE PAY IT (JE §0.2, the designer's). The third zone's boss has
+# no zone after it, and `advance_zone` runs only while one follows: that condition, not a design, carried a hero onto the
+# end boss at the floor. The mark goes with the wound: restored whole, a hero left down has nothing left for the Cairn.
+func restore_party() -> void:
+	for member in party:
+		member["hp"] = member["max_hp"]
+		member["mana"] = member["max_mana"]
+		member.erase(BattleUnit.FELL_LAST_FIGHT)
+
+
+# The way out of a zone boss's card: the card's button, the sim and a resume all come through here, so a quit on the
+# third boss's card cannot duck the restore. It restores what is already whole if a resume comes through twice.
+func leave_zone_boss() -> void:
+	if has_next_zone():
+		advance_zone()
+	else:
+		restore_party()
+
+
 # Move to the next zone: fresh map, path reset; the party is fully
 # restored as a reward for cleansing the zone.
 func advance_zone() -> void:
@@ -3949,11 +3976,7 @@ func advance_zone() -> void:
 	pending_modifier = ""
 	pending_reward = {}
 	pending_shop = false
-	for member in party:
-		member["hp"] = member["max_hp"]
-		member["mana"] = member["max_mana"]
-		# BATCH JD §4: restored whole, a hero left down has nothing left for the Cairn to answer.
-		member.erase(BattleUnit.FELL_LAST_FIGHT)
+	restore_party()
 	_generate_map()
 
 
@@ -5039,6 +5062,7 @@ func bomb_damage() -> int:
 # **BATCH IZ §0.1 — THE SHARPER READING OF ONE POPULATION REPLACES THE BLUNTER (the designer's).** Two readings of different
 # populations are two facts and the grade takes the higher; two readings of the SAME population are two estimates of one fact,
 # and the sharper instrument's replaces the other — keeping the higher of two estimates is a bias, a ratchet on every re-read.
+# **BATCH JE §0.3 — TWO READINGS OF ONE QUANTITY ON ONE INSTRUMENT ARE POOLED, NOT CHOSEN BETWEEN (the designer's)**: the refinement, beside the rule it refines.
 # **AND A MODIFIER KEYED ON SOMETHING ONLY SOME BUILDS DO IS GRADED ON A BUILD THAT DOES IT; ONE KEYED ON SOMETHING EVERY
 # BUILD DOES THAT STILL COSTS NOTHING HAS NO REACH AND LEAVES THE DECK (IZ §0.3)** — Dull Edge left at IZ §3, and Tinderbox
 # at IZ §5, read on the party whose strikes carry the most fire and costing it nothing. Every grade's
@@ -5196,7 +5220,7 @@ const MODIFIERS := {
 	# (`_fixed_modifier_pool`): a fixed encounter is a tax with no reward, so it draws the mildest shapes, and a burst opener is the one
 	# shape that does not belong there. Outpaced puts the warband first and adds it no turn, so it carries nothing. The next burst card
 	# carries the field and inherits the rule, with no brief.
-	"ambushed": {"name": "Ambushed", "tag": "Am", "severity": 4, "graded": "the incumbent — JB §3", "opening_burst": true,
+	"ambushed": {"name": "Ambushed", "tag": "Am", "severity": 4, "graded": "the incumbent — JB §3 and JD §5, pooled at JE §2", "opening_burst": true,
 		"desc": "The warband takes %s turns before any hero but the Hunter acts." % [COUNT_WORDS[AMBUSHED_WARBAND_TURNS]]},
 	# OUTPACED IS §2b'S RESERVE, AUTHORED IN INVERTED'S PLACE: reading speed backwards hands the heroes' slowest body, their healer,
 	# half as many turns again, and it paid them (JB §3; its built shape is in `docs/design-notes.md`). It states a rule, so it holds
@@ -5593,7 +5617,7 @@ func next_after_scene() -> String:
 #   * a MERCHANT the bargain bought and the player never reached is visited —
 #     what the victory card's Continue does;
 #   * a ZONE BOSS beaten on a board not yet left is left — what the card's
-#     "Descend into" does. A v12 save standing there cannot say whether the boss
+#     one button does, which descends or, on the final board, restores. A v12 save standing there cannot say whether the boss
 #     fell, and it descends too: re-fighting a boss that DID fall would bank its
 #     talent points and its relic twice, and staying is a board with nothing
 #     left on it to press.
@@ -5613,8 +5637,8 @@ func resume_scene() -> String:
 		var shop := next_after_scene()
 		save_run()
 		return shop
-	if slot_idx == BOSS_SLOT and has_next_zone():
-		advance_zone()
+	if slot_idx == BOSS_SLOT:
+		leave_zone_boss()
 		save_run()
 	return "res://scenes/map.tscn"
 
@@ -5644,7 +5668,7 @@ func begin_event_node() -> bool:
 # ---------- Batch AN §6: attrition ----------
 
 # Winning ANY battle heals the party this much (a hero still down at its end
-# excepted, `clearing_heal`). It rides the SAME
+# takes the relics' adds and not this, `clearing_heal`). It rides the SAME
 # `victory_heal_pct` hook the Chalice of Dawn already uses rather than a new
 # one, so the relic's 10% stacks on top for 25% and there is still exactly
 # one read site for "how much does a victory heal".

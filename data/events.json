@@ -615,7 +615,7 @@
         "title": "The Cairn of the Fallen",
         "kind": "boon",
         "text": "A cairn raised for soldiers of an older war. The stones remember\nwhat it is to have died for someone \u2014 and what it costs to return.",
-        "weight": 8,
+        "weight": 12,
         "requires": {
             "fell_last_fight": true
         },

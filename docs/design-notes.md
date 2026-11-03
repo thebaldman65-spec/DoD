@@ -4,6 +4,18 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The trace sized, the ceiling cut, the runes priced (Batch JE) — 2026-11-02
+
+**Why the relics reach the hero who fell.** A party with three healing relics sent a standing hero out at 65% and a hero who fell at 20%, so the gap widened with every relic found, and that is a penalty on earning rewards. A fall should cost the same thing every time. JD's own measurement could not show this: its bot opened with no relic and few gained one, so the gap it read was nearly all the base. Read with three relics at Warden on the same seeds, the same hero fell again in the next fight 33% of the time when he took everything, 58% when the relics passed him by, and 40% now, so the re-fall follows the gap, and so does how long a run lasts: at the gap of 45 runs were shorter past two errors on both rungs, and at 15 they tie the old rule.
+
+**Why the third zone's boss restores.** `advance_zone` runs only while a zone follows, so the end boss, the one fight the run is built toward, took the whole of the carry through an accident of a condition. Under Ambushed on the incumbent, the end boss stopped taking runs: JD read five lost there, JE none, and four of the five finished.
+
+**Why Ambushed is pooled and not chosen.** Neither arm is the sharper instrument, and a tie at a cut had landed on both sides of it. The mean is pooled; the error keeps the covariance, because the two arms ran one seed block.
+
+**Why the Cairn is at 12.** A weight gates how often and a requirement gates when; a boon that already needs a fall to have just happened should not be rare inside that as well.
+
+**Why the crest runes stand.** They were chosen for a few turns and a won fight on the reference four runs about thirty hero turns after the first fall, seventeen to twenty after the Cleric's, so *a few* was wrong. What is rare is the condition. Nothing read here shows any of them overpriced, and a figure is the designer's.
+
 ## The fall repaired, the seven disposed (Batch JD) — 2026-11-01
 
 **Why a fall does not last.** The question had been parked for twenty batches as structural, and JC's read-out showed five of the seven things it priced needed a figure and not a fall that lasts. Only the Cairn and the map's Revive Potion needed one, and buying those two would have re-read every grade and every completion figure in the project, all of them measured with heroes returned after every won fight. The rate says who a heavier ruling lands on: a fall is rare on the populations that finish a run and common on the ones that do not, so a lasting fall is a penalty aimed at parties already losing, and falls would breed falls.

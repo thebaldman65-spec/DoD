@@ -57,7 +57,7 @@ supersession is recorded, never deleted** (HY §2's rule for HN §1). **Every ba
 whether the block it supersedes can move to a reference.** The unit is a whole block; the reasoning beside a live rule
 stays with it (GY §1, in the ceiling block). **A CLOSED BLOCK NO REFERENCE HOLDS IS STRUCK TO A LINE THAT NAMES WHAT CLOSED
 IT AND WHICH REPORT HOLDS THE RECORD — after reading that report. A block whose record stands nowhere else stays whole (IJ
-§0.2, the designer's).** This file is the rules; `docs/reports/` is the archive, so the line is a struck heading where the
+§0.2, the designer's).** **When this file needs the room a struck line goes to `DoD-archive/state-archive.md`, under the batch that moved it (JE §3).** This file is the rules; `docs/reports/` is the archive, so the line is a struck heading where the
 block stood and never a new file.
 
 **A RULING RECORDED BEFORE IT IS BUILT SAYS SO (STANDING, SET AT GC, RULED BY THE DESIGNER).**
@@ -344,6 +344,9 @@ new block written here):
   EVERY BATCH FROM CJ FORWARD, INCLUDING TUNING THAT COMES OUT OF PLAYTESTING.** Ability
   `description` and `perfect_text`, `passive_desc`, status/chip text, talent nodes, runes,
   relics, glossary, and master.html's tables. The load-bearing rules:
+  · **HERO AND ALLY ARE THE ONLY TWO WORDS, AND THAT LAW IS THE STANDARD's §4.9 (MOVED AT JE §3, THE DESIGNER's).** A card that says
+    *hero* or *ally*, a pick on the hero side and the word *party* are written to §4.9 and §4.9b, which holds what this file held
+    as its own block; the block's history is in `DoD-archive/state-archive.md`.
   · **~~TWO TIERS~~ — SUPERSEDED AT BATCH CL §1. DO NOT APPLY IT.** The rule was: draft screen
     and glossary may show percentages and formulas, everywhere else may not, because mid-combat
     surfaces could not show arithmetic. **CL DELETED THE SPLIT by removing its premise** — a
@@ -895,88 +898,6 @@ corpus came to hold both at once.
   and Snare Line's chilled *2 turns, not 1* were corrected to what the code does, with `COUNTER_TIME_TURNS` and
   `SNARE_LINE_COLD_STUN` unmoved. **Making a stun's length real touches every stun in the game** — a system change, owed its own ruling.
 
-## HERO AND ALLY ARE THE ONLY TWO WORDS (STANDING, SET AT BATCH CV §4, CLOSED AT DM §3)
-> **HERO — one of the four. ALLY — heroes and companions together. AND THERE IS NO THIRD WORD.**
-> Where the group is the ENEMY side, *warband*.
-
-**THE TEST IS NOT "DOES THE COLLECTION REACH ONE". IT IS "DOES THE EFFECT ARRIVE."** Walk the
-chain from the loop to the number that moves, and **measure it on a live companion**. A widening
-that changes no measurement is worse than the narrow word, because a chip appears and it reads as
-working — a PARTIAL arrival reads as working too, which is the same failure one step along.
-
-- **THE READ SITE'S COLLECTION IS THE TEST, NOT THE SENTENCE'S RHYTHM.** `_hero_side()` includes
-  living companions; `heroes + companions` includes them dead or alive; **a walk over bare
-  `heroes` never does, filter or no filter** — every `not h.is_companion` clause on a `heroes`
-  walk is filtering an array that cannot hold one, so it records INTENT and does no excluding.
-- **THREE FURTHER EXCLUSIONS MEAN *hero* HOWEVER THE COLLECTION IS SPELLED:** an effect stamped
-  once where the four are built (no companion exists yet); a **per-turn** effect (`_next_unit()`
-  walks `heroes + enemies` and a summon carries `next_time = INF`); and anything Faith-flavoured
-  (`_gain_faith` refuses companions outright).
-- **THE UNIT OF A RULING IS THE CLAUSE, NOT THE ABILITY.** Two clauses under one word can have two
-  different answers, and **the clause carrying NEITHER word is the one no sweep will find** —
-  Rallying Shout's *"the whole party sheds 30 Pressure, and every other ally regains 30% of their
-  resource"* was one sentence whose halves are an ally's and a hero's, and two sweeps that read the
-  ABILITY each ruled on one half and left the other standing.
-- **A WORD WITHOUT ITS REASON GETS RE-LITIGATED, SO EVERY *hero* RULING CARRIES THE STRUCTURAL
-  REASON A COMPANION CANNOT RECEIVE IT.** There are **five** and no sixth: no resource bar to
-  refuel; `_companion_hit` reads only a few of the hero strike loop's multiplier terms; stamped once at
-  party spawn; per-turn; `_gain_faith` refuses them. **A clause that is narrow by CHOICE says so**
-  rather than implying an impossibility — widening one of those is a magnitude change on companion
-  survivability, which is new PLAY rather than a widening.
-- **A GUARD AT THE SITE IS WHAT MAKES A RECORDED REASON TRUE.** A companion is built with no
-  `resource_name`, but `max_resource` is `unit.gd`'s default **100** — so "it has no bar" is only
-  true because the loop tests the name.
-- **WHEN A CLAUSE MOVES, SWEEP THE CLAUSE ACROSS EVERY SURFACE, NOT THE CARD ACROSS ONE.** The
-  card, `master.html` and the glossary each carry copies, and fixing one while the rest carry the
-  old word is this project's oldest recurring defect.
-- **A CARD WHOSE WORDS SAY *HERO* OFFERS ONLY THE HEROES (IR §1b).** An ally-target card's pick is
-  `battle._ally_pick_pool`, the one answer the player's picker, the recast refusal and the button ask, and `HERO_PICKS`
-  narrows it to the four for every card whose words say hero — each for a reason a companion carries: no turn of its own, no
-  resource bar, a callback wired on the four, no Block roll. **A new ally-target card is sorted by the words that name its
-  pick in the batch that authors it.**
-- **A PICK IS OFFERED WHERE THE CAST PAYS. WHERE IT PAYS LESS, THAT IS THE PLAYER's CHOICE TO MAKE; WHERE IT PAYS NOTHING,
-  THE PICK WAS NEVER AN OFFER (IS's brief §0.2, the designer's).** The ten narrowings were never about the word: each was a
-  cast on a body that could take nothing from it. **Mantle stays an ally card** — laid on a companion the shield arrives and
-  absorbs, and passes to the hero on the lowest health when it breaks; what is lost is one Faith event, a trade the player can
-  choose — **so the words say *hero* at the clause a companion cannot receive** (Mantle's Faith, the glossary's) and the pick
-  keeps its sort. **AND THE POPULATION IS EVERY PICK, NOT EVERY CARD (IS §4)**: a rune's or a talent's pick that offers a body
-  on the hero side — Split Shield's, Dispel's ally half, the cleanse talent's — is sorted by its words like a card's, and every
-  function that builds a pool on the hero side is sorted (`check_is` §4), so the next one is sorted in the batch that writes it.
-- **THE SURVIVING USES OF "party" ARE IDENTIFIERS AND ARE NAMED**: `party_mark` (a status id), the
-  `party` event target, `spec_in_party` (an event condition), `party.tscn`, and **the rune scope `party`
-  (HK §4), which the screens call the CREST** — its slot is saved under `crest` for this rule's sake.
-  Nothing else.
-- **PROSE ABOUT THE GAME IS NOT PLAYER-FACING.** This file, `docs/changelog.html`,
-  `docs/design-notes.md` and the batch reports are exempt. **History is not swept.**
-· **UNREACHABLE IS NOT EXCLUDED, AND IT IS NOT A SIXTH REASON (Batch FO §2).** The Shared Mark
-  pays a Sharpshooter when an ALLY strikes his mark, and **no companion can stand beside a
-  Sharpshooter**: a party is one of each class, he IS the Hunter, and since HB he is the one Hunter
-  whose engine DISMISSES the pet (the block on it below). **That is a fact about the PARTY, not about the beast** —
-  the five recorded reasons are all about a companion RECEIVING, and here the companion is the
-  ATTACKER. **So the word stays ALLY and the call is made from `_companion_hit` too**, because
-  narrowing would need an exception that evaporates the day any other class fields one.
-  **AND DK §1 IS STILL MET WITH A MEASUREMENT**: the fixture seats two Hunter specs, summons a
-  real Canis and reads the Focus arriving off its blow. **A clause unreachable in PLAY is still
-  drivable in a FIXTURE, and driving it is what stops "it would work" being an argument.**
-- **THE RULE IS KEPT BY A CHECK.** `test_batch_bx` §4 forbids "beast" in player-facing prose and
-  §4b keeps **"PARTY" IS RETIRED FROM PLAYER-FACING TEXT** over a wider file set. **Each was
-  shown to bite before it was trusted.**
-
-## ~~THE UNIT OF A HERO/ALLY RULING IS THE CLAUSE~~ — DL §1, folded into the hero/ally block above by DZ; the record is `docs/reports/DL.md`
-
-## THE ALLY/HERO THREAD IS CLOSED (Batch DM §3) — RULE ON CLAUSES, NOT ON ABILITIES
-> **A card can carry two clauses of different shape under one word, and a sweep that reads the
-> ability will not see it. "Party" is retired; HERO means the four, ALLY means heroes and
-> companions, and every *hero* ruling carries the structural reason a companion cannot receive it.**
-
-**A BATCH THAT FINDS
-NOTHING TO WIDEN HAS STILL MEASURED SOMETHING** — that is what lets a thread close rather than be
-abandoned.
-
-- **A CLAUSE CAN BE NARROWER THAN EITHER WORD, AND THAT SCOPE HAS NO NAME HERE.** Battle Shout and
-  Hold the Line each hand **five Rage to the CASTER** — one body — and one of the two wrote it
-  inside a group clause's colon-list, promising four heroes a payload that reaches one. **The fix
-  was to copy the sibling card that already worded it correctly, not to invent a phrasing.**
 ## NEVER `preload` A SCRIPT THAT NAMES AN AUTOLOAD (STANDING, SET AT BATCH CT — AND IT COST A GATE)
 **`run_sim.gd` carried a hand-copied mirror of `shop_screen.gd`'s `ITEM_PRICES`. CT replaced the
 copy with `const ITEM_PRICES := preload("res://scripts/shop_screen.gd").ITEM_PRICES` — and that
@@ -1585,8 +1506,6 @@ than the candidates for it.** The bot's list is the other half of that question 
     player's to make**: a game that refuses every suboptimal pick plays itself. **A card whose handler grows a case that
     produces nothing owes `_pick_dud` its arm in the batch that writes it.**
 
-### ~~THE VAULT'S EXIT IS THE POOLS~~ — DY §3, settled and asserted by `check_dv` §1; the record is `docs/reports/DY.md` §3 (its finding, `docs/reports/DX.md`)
-
 ### ESTABLISH WHY A STRUCTURE IS DEAD BEFORE DELETING IT (Batch DV §1)
 > **Dead code is deleted rather than zeroed — but a structure ORPHANED by a later change is a LOST
 > FEATURE, and one that was never wired is scaffolding. Only the second is a deletion. The first is
@@ -1854,7 +1773,7 @@ where each is read, and the sites are: `new_run` (the opening purse and pouch), 
 SPAWN** (base stats, written before turn one), the victory screen, `award_gold`, shop
 prices, elite spoils, and the clearing heal for a hero left down. **NOT ONE RELIC HOOK IS READ WHILE A TURN IS RESOLVING** — swept over every
 read site of `relic_add` / `relic_dict`, which land in `_spawn_units`, `_check_end`,
-`new_run`, `award_gold`, `claim_reward`, `victory_heal_pct`, `clearing_heal`, `clearing_heal_note`, the price functions (`draft_price`,
+`new_run`, `award_gold`, `claim_reward`, `victory_heal_pct`, `fallen_heal_pct`, `clearing_heal_note`, the price functions (`draft_price`,
 `blacksmith_price`, `rune_price`, and the shop's and RunSim's `_price`) and RunSim's `on_battle_end`. And the header's own
 *"NEEDS PLUMBING (declared out for now)"* list — on-kill and per-turn procs, revive-on-death,
 enemy-side auras, DoT-tick and Break-damage multipliers — **is precisely the in-combat category.**
@@ -1900,8 +1819,6 @@ stay party-wide. **THE PER-HERO RULING (a relic assigned to one hero at pickup) 
 UNBUILT** — see the relic block in `docs/state.md`, and note that four hooks (`victory_heal_pct`,
 `victory_mana_pct`, `fallen_recover`, `resource_floor_pct`) need a ruling before any of it, and that
 the draft assigns relics before there are specs to assign them to.
-
-## ~~WHAT MAKES A ROW-8 NODE, AND BH'S FIFTEEN POINTS~~ — BM §2, retired with the lanes at FX and BH §2 deleted at GC; the record is `docs/reports/FX.md` §3 and `docs/reports/GC.md` §1 (BM's own rule: the changelog archive's BM entry)
 
 ## STANDING REFERENCE — THE DIFFICULTY LADDER AND THE END BOSS (Batch BM §5/§6)
 **`Run.difficulty` WAS REUSED, NOT SHADOWED** — it was already a saved String var chosen at the
@@ -2064,6 +1981,10 @@ decision and the STRUCTURE is what shipped.
   higher of two estimates of one fact is a bias, a ratchet every re-read could only raise**, so a re-measure on a sharper instrument
   replaces the blunter reading of the same population, and a grade resting on a reading the sharper instrument has re-taken is
   re-graded off it; the scale's derivation takes the sharper readings the same way and moves with them (`docs/reports/IZ-scale.tsv`).
+  **TWO READINGS OF ONE QUANTITY ON ONE POPULATION, TAKEN ON THE SAME INSTRUMENT, ARE POOLED — INVERSE-VARIANCE — NOT CHOSEN BETWEEN. THE SHARPER-REPLACES RULE IS FOR A SHARPER INSTRUMENT
+  (JE §0.3, the designer's)**: a refinement of the rule above, which stands for what it was written for. Neither of two arms of one instrument is the better estimate, and a tie at a cut can land
+  on both sides of it. **THE POOLED MEAN IS THE GRADE's. ITS ERROR TAKES THE COVARIANCE WHERE THE ARMS SHARE SEEDS**: two arms on one seed block are largely one draw of the dice read twice, so the
+  independent formula prints a sharper bar than the instrument holds (JE's report §2: Ambushed's two read r 0.77, ±1.23 where independence prints ±0.93; that clause is the batch's reading, and NEEDS A RULING 1 asks).
   **A MODIFIER KEYED ON SOMETHING ONLY SOME BUILDS DO IS GRADED ON A BUILD THAT DOES IT (IZ §0.3, the designer's)** — a Break rule on
   the party whose plan is Break, a fire rule on the party whose strikes carry the most fire, the population derived and named —
   **AND ONE THAT KEYS ON SOMETHING EVERY BUILD DOES AND STILL COSTS NOTHING HAS NO REACH, AND LEAVES THE DECK**, removed, not disabled,
@@ -3651,11 +3572,9 @@ the next**, because the denominator moves with the slot ladder.
   on the hero sheet until IH §3), and read by nothing else — EK's inertness claim, restored by the retirement
   rather than re-asserted. **ES §4's absolute-count shapes (`tag_threshold_met`, `breadth_met`)
   are KEPT and are the door a future tag-reading rune comes back through.**
-- **THE RULE THAT STOOD HERE IS KEPT AS THE RECORD OF WHAT WAS RETIRED, WHERE THE STRUCK LINE BELOW SAYS**, so a later batch
+- **THE RULE THAT STOOD HERE IS KEPT AS THE RECORD OF WHAT WAS RETIRED, IN EZ's REPORT §0, AND ITS RETIREMENT IN FN's §2**, so a later batch
   meeting a tag and a rune in the same sentence does not re-derive EZ's arithmetic from scratch and
   re-propose it as a discovery.
-
-### ~~WHERE THE RETIRED RULE ITSELF IS KEPT~~ — FN's pointer, closed with the rule; the rule is `docs/reports/EZ.md` §0 and its retirement `docs/reports/FN.md` §2
 
 ## STANDING RULE — A FLOOR ON A BUDGET IS NOT A FLOOR ON A COUNT (Batch FA §2b)
 
@@ -3893,7 +3812,7 @@ five reachable at once.
   pure roll, because the suites sample it. **The Peddler and the forge still roll in their own
   `_ready`, and that is why a resume does not re-enter them**: a quit there still loses the node.
 - **THE RESUME DOES WHAT THE ABANDONED BUTTON WOULD HAVE DONE** — the merchant a bargain bought is
-  visited, and a zone boss beaten on its card descends — **and every branch that changes the run
+  visited, and a zone boss beaten on its card descends, or restores and stands on the final board — **and every branch that changes the run
   saves before it returns**, so a second quit resumes to the same place and never skips a zone.
 - **A NEW THING THAT CAN BE PENDING OWES THE SAVE ITS KEY AND `resume_scene` ITS BRANCH, IN THE SAME
   BATCH.** `check_gf` quits at every branch through the real screens and presses the real Continue.
@@ -3944,21 +3863,30 @@ five reachable at once.
   replays the fight they opened.
 
 ## STANDING RULE — A FALL STAYS INSIDE ITS FIGHT (Batch JD §0.1, ruled by the designer)
-> **THE FALL DOES NOT LAST. A HERO WHO FALLS WALKS OUT AT THE 20% FLOOR. THE CLEARING HEAL PASSES HIM BY, AND SO DOES EVERY RELIC THAT ADDS TO IT.**
+> **THE FALL DOES NOT LAST. A HERO WHO FALLS WALKS OUT AT THE 20% FLOOR. THE BASE CLEARING HEAL PASSES HIM BY, AND EVERY RELIC THAT ADDS TO IT REACHES HIM.**
 
 **The body does not outlast its fight; what it cost does.**
 - **THREE REASONS, IN THE ORDER THAT DECIDED IT.** Only two of the seven things the question priced needed a fall that lasts, the Cairn and the map's Revive Potion; the other five needed a
   figure named. Those two would have cost every grade and every completion figure in the project, each measured with heroes returned after every won fight. And the rate says who a heavier
   ruling lands on: a fall is rare where a run finishes and common where it does not, so a lasting fall is a penalty aimed at parties already losing, and falls would breed falls (the floor
-  itself breeds a little, measured at JD's report §5).
+  itself breeds a little: JD's report §5, and JE's §5 for what the gap does).
   **Do not re-open it to make either of the two reachable**: a re-cut answered the Cairn and the potion's path is deleted (JD's report §4).
 - **THE 35% WAS AN ACCIDENT, NOT A DESIGN**: the order of two lines, a floor and then a heal that read `hp > 0`. Every living document had said the floor.
 - **NOTHING STANDS AT 0 HEALTH BETWEEN FIGHTS, AND NOTHING WILL**, so a thing written for *the fallen on the map* has nobody to reach. **What the map can ask is `BattleUnit.FELL_LAST_FIGHT`**,
   a member key written at the one return both victory branches pass through, and read by `Run.clearing_heal` and the Cairn. **It names a hero still down when the fight ended: a hero raised
-  inside the fight stands, and the heal reaches him.** The readout's `fell` is not this door: a readout is a read, off in a sim and on no save, and it counts a hero raised.
-- **THE MARK IS ONE FIGHT LONG; THE HEALTH IT COST STAYS UNTIL HEALED.** He opens the next fight behind a hero who ended at 1 health by the clearing heal and whatever relics add to it.
-  `Run.advance_zone` runs only while `has_next_zone()` holds, so zone 1's and zone 2's bosses restore every hero and take the mark; **the third zone's boss has no descent, so a hero down at
-  its end meets the end boss at the floor.** Cairnmoss Poultice buys the penalty out, and that is what it is for: a penalty you can buy your way out of is better than one you cannot.
+  inside the fight stands, the heal reaches him, and no Cairn is drawn for him (ACCEPTED AT JE §0.5, the designer's): a raise is the answer to a fall, and a mark that fired anyway would charge
+  him for what he already paid to fix.** Its name is looser than its meaning and stands: a rename costs a save key and two gates for a word. The readout's `fell` is not this door: a readout
+  is a read, off in a sim and on no save, and it counts a hero raised.
+- **THE MARK IS ONE FIGHT LONG; THE HEALTH IT COST STAYS UNTIL HEALED.** He opens the next fight behind a hero who ended at 1 health by the base clearing heal, `Run.SLOT_HEAL_PCT`, and by
+  nothing else. **THE RELICS REACH THE HERO WHO FELL: A FALL MUST COST THE SAME THING EVERY TIME (JE §0.1, the designer's).** With the relics passing him by, the gap widened with every relic
+  the player found, which is a penalty on earning rewards. `Run.fallen_heal_pct` is what he takes. **Do not re-open it by taking a relic off him.**
+- **ALL THREE ZONE BOSSES RESTORE, AND THE END BOSS IS FOUGHT WHOLE (JE §0.2, the designer's).** `Run.advance_zone` runs only while `has_next_zone()` holds, and that condition, not a design, put
+  the whole of the carry on the fight the run is built toward. `Run.leave_zone_boss` is the one way out of a boss's card, for the card's button, the sim and a resume alike, and the mark goes
+  with the wound.
+- **Cairnmoss Poultice BUYS BACK THE BASE AND ADDS NOTHING OF ITS OWN**, so it is worth one fixed figure every time, which is what a common should be: a penalty you can buy your way out of is
+  better than one you cannot.
+- **A WEIGHT GATES FREQUENCY AND A REQUIREMENT GATES RELEVANCE. DO NOT GATE TWICE (JE §0.4, the designer's).** A boon that needs a specific thing to have just happened carries a high weight
+  inside that condition. The Cairn stands at the pool's top weight for that reason: at its old weight it was drawn 3 times in 240 runs, and a beat that rare is a rumour.
 
 ## STANDING RULE — BREAK IS A SECONDARY TAG ONLY (Batch FD §2, ruled by the designer)
 
@@ -4271,11 +4199,11 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
 
 - **"PARTY" IS RETIRED FROM PLAYER-FACING TEXT, SO THE SCOPE KEEPS ITS NAME IN CODE AND THE SCREENS SAY *CREST*** (the
   designer's word, confirmed in HL's brief). The scope string `party` is an identifier, as the event
-  target the retired-word block names is, and the slot is saved under `crest` so no string a sweep reads spells it.
+  target the text standard's §4.9 names is, and the slot is saved under `crest` so no string a sweep reads spells it.
 - **ITS PAYLOAD REACHES EVERY HERO, AND THAT IS THE ONE PARTY-LEVEL DOOR THE GAME HAS.** The battle applies a worn crest
   rune's payload to each of the four through `Talents.apply_payload`, where every rune's is applied — a live one
   through the live door above — and the hero sheet mirrors it. **HERO, NOT ALLY**: it is stamped on the four, and no
-  companion exists yet at the spawn — the first structural reason. **Little in the game reads the party whole** — two
+  companion exists yet at the spawn — the first structural reason (the text standard's §4.9b). **Little in the game reads the party whole** — two
   talent stamps a rune can feed, two engines' wiring and the relics' hooks, which it cannot; every card and rune reads
   one hero — so what a crest rune could read beyond a stat or a card on each hero is the census in
   `docs/reports/HK.md` §4b, and **a crest rune that needs more than that owes new machinery before it is authored.**

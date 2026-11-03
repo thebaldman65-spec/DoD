@@ -223,7 +223,7 @@ func _s0_the_rulings() -> void:
 	var pins := [
 		[cl, "CLAUDE.md", "A RENAME THAT CROSSES THE SAVE FLOOR ADDS A ROW TO THE LOAD DOOR's RENAME MAP, IN THE BATCH THAT RENAMES"],
 		[cl, "CLAUDE.md", "A NODE THAT ARMS A FIXED MODIFIER OFFERS NO BARGAIN"],
-		[cl, "CLAUDE.md", "A CARD WHOSE WORDS SAY *HERO* OFFERS ONLY THE HEROES"],
+		[FileAccess.get_file_as_string("res://docs/text-standard.html"), "docs/text-standard.html", "A CARD WHOSE WORDS SAY <i>HERO</i> OFFERS ONLY THE HEROES"],
 		[ir, "docs/instrument-rules.md", "A CLOSE THAT IS GATED ON ITS OWN INSTRUMENT CAN DEADLOCK, AND A BATCH IS NOT DONE UNTIL ITS CLOSE HAS RUN"],
 		[st, "docs/state.md", "THE INDEX PILOT IS IS's"],
 	]

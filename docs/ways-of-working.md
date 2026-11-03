@@ -103,6 +103,10 @@ brief did, and the incumbent's arms moved two of its four grades. **A BRIEF ALLO
 Ambushed's curve bent at the cut, and reading 8, 9 and 11 was a curve, not fishing for a grade. The one tune is written here for the first time
 as a rule; until JC it stood only in the briefs that allowed it, so this states the pair and the next batch needs no conversation for either.
 
+**A BRIEF THAT GIVES AN ABSENCE AS A REASON ORDERS THE READING THAT WOULD FIND IT (JE §0.7, the designer's).** The battery pairs every negative anchor with a positive arm, because an absence passes when
+the thing that would find it is broken, and a brief's own negatives had no such pairing: *it is not a spiral* was a claim of absence given as a reason, and nobody had read it. *(The batch's addition, not the designer's words:)* **the batch checks what the
+reading can actually see, too**: JE's brief ordered a re-read of a gap of 45 off logs whose bot opened with no relic, so the gap was all but absent from them.
+
 ## RECON BEFORE AUTHORING
 
 > **Before content is written for an area, a batch reads out what already exists there: the
