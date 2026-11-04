@@ -717,7 +717,12 @@ func _s3_the_ceilings() -> void:
 	var instr := _flat(_doc("res://docs/instrument-rules.md"))
 	ok(instr.contains("A CEILING's CONDITION READS THE ROOM PROJECTED TO THE CLOSE: THE ROOM AT THE OPEN, LESS WHAT THE BATCH EXPECTS TO WRITE, AGAINST THE BAR"), "§3d: the ceiling's condition does not read the room projected to the close")
 	var where := _flat(_block(files["docs/state.md"], "## WHERE THE PROJECT IS"))
-	ok(where.contains("PROJECTED FOR JI"), "§3d: the WHERE block carries no projected figure for the next batch")
+	# JJ re-pointed this arm at its intent, as FOUND AT JI named: a projected figure for the next batch, whichever it is — the block
+	# is rewritten every batch, and a needle naming one batch reds every batch after it. Its own bullet's bold head, which the
+	# line checking the last projection (*X's PROJECTED FOR Y, CHECKED*) cannot match.
+	var proj := RegEx.new()
+	proj.compile("\\*\\*PROJECTED FOR [A-Z]{2}\\*\\*")
+	ok(proj.search(where) != null, "§3d: the WHERE block carries no projected figure for the next batch")
 
 
 # ── §4 — WHAT IS DELIBERATELY NOT DONE ────────────────────────────────────────

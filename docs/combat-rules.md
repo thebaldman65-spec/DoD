@@ -119,9 +119,23 @@ inside it breaks that promise.
   counted); a heal at the health it restores, on the median composable body or the caster's own for a self-heal, a
   whole-warband heal on four bodies, the basic turned to health at the enemy's own Attack. A ward and a cleanse are not
   priced. **The figure is 2 under 2x, 3 under 3x and 4 past it**, in the enemy's own turns. A move a resource already bounds
-  takes one too — DU §1's *priced twice* is weighed and set aside (JI's RULINGS OWED 3). `check_ji` §1a derives the
+  takes one too — DU §1's *priced twice* is weighed and set aside (JI's ruling 3, accepted at JJ §0). `check_ji` §1a derives the
   population off the data every battery and reds on a move the rule and the data disagree about, so **a new enemy move is
   priced in the batch that authors it** and its key written with it; a designer's hand-tune of one move goes in its `TUNED`.
+· **THE SELECTION ASKS THE POOL WHERE IT ASKS THE COOLDOWN, AND A HEAL THE WARBAND CASTS PAYS FOR WHAT IT RESTORES (JJ §3).**
+  The warband shares one pool, Malice, filled at BL's two doors — the damage door by the frame's side, which hands on what a
+  blow spends past a body's last (`past_last`), and the death door — and a heal on the warband's own side costs a point of it
+  for every point of health it restores. **The refusal is the selection's, at `_enemy_ready`**: a heal names its body, and
+  the door reads what the heal would restore there now (`_malice_price`, its figure off `_warband_heal_figure`, no more than
+  the body is missing) against what the pool holds that no other declaration has set aside (`_malice_free`) — a third refusal
+  of one door, so no second gate. **A declared heal sets its price aside**, and the cast restores no more than the pool can pay
+  and pays the health its bodies gained (`_warband_heal`), so re-validation asks no pool and nothing falls back on it.
+  **THE SUPPORT HALF's CONDITIONS MOVED AT JJ §3, AND THE PROMISE ABOVE STANDS BESIDE THE CHANGE RATHER THAN OVER IT**: the
+  healers heal whenever the pool allows and a body is hurt — missing at least `MALICE_HEAL_WORTH` of what the heal would
+  restore it — the policy the brief left to the batch (JJ §3). **A new heal on the warband pays through `_warband_heal`, or
+  it is free; a new damage source that passes neither door fills nothing, and damage the frame credits to nobody — the Bomb, a
+  spread Burn with no source, the Wasting bargain's tick — fills nothing but its kill.** **A heal on a blighted body restores
+  nothing, so `_malice_price` prices it at nothing**: the pool never keeps a healer off Blight the Well.
 · **Declaration**: `_declare_intent(u)`, called from `_declare_all_intents()` at battle start
   (after the opening oath/Faith hooks, which move state the policy reads), from the turn loop
   **right after** `await _enemy_turn(u)` — **NOT from the bottom of `_enemy_turn`**, which returns
@@ -172,7 +186,7 @@ maths.**
   nowhere: `_enemy_support_action`'s thresholds, the Broken-hero exploit (the most sensitive — a
   Break window is short and a declaration made before it opens will not take it), `_lowest_hp` /
   `_threat_pick`, the taunt narrowing and the presence rolls. **The selection's policy is
-  untouched — the door's refusals it asks are rules (its price, IN §3; its cooldown, JI §1); an AI rewrite is out of scope.**
+  untouched — the door's refusals it asks are rules (its price, IN §3; its cooldown, JI §1; the warband's pool, JJ §3); an AI rewrite is out of scope** — **but the support half's conditions moved at JJ §3**, the healers healing whenever the pool allows and a body is hurt (the selection's bullet above).
 
 ## STANDING REFERENCE — THE RECAP LEDGERS AND THEIR BOUND (Batch BL §2)
 **DAMAGE TAKEN HANGS OFF ONE DOOR: `BattleUnit.damage_taken_cb`**, fired by `_report_taken` from

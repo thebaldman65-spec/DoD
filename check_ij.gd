@@ -1134,14 +1134,16 @@ const PINS := [
 	["glossary:plating_climb:long", "a flat 15% Block chance", "scripts/battle.gd", "_plating_slice", "(0.15 + u.plating_bonus)"],
 	["glossary:plating_climb:long", "another 8% every time", "scripts/battle.gd", "_resolve", "var wd_climb := 0.08"],
 	["glossary:recast_refused:long", "better than a third", "scripts/battle.gd", "_resolve_special", "var ds_pct := 0.35 + 0.01 * attacker.stalwart_step"],
-	["lit:data/enemies.json", "for 25% of their max HP", "scripts/battle.gd", "_resolve_special", "var wave_heal := maxi(int(round(target.max_hp * 0.25)), 1)"],
-	["lit:data/enemies.json", "heals 25% of max health", "scripts/battle.gd", "_resolve_special", "var wave_heal := maxi(int(round(target.max_hp * 0.25)), 1)"],
+	# BATCH JJ §3 RE-POINTED THE FOUR WARBAND-HEAL ROWS: their lines moved, unchanged, out of `_resolve_special`'s arms into
+	# `_warband_heal_figure`, the one door the arms and the pool's price read.
+	["lit:data/enemies.json", "for 25% of their max HP", "scripts/battle.gd", "_warband_heal_figure", "var wave_heal := maxi(int(round(target.max_hp * 0.25)), 1)"],
+	["lit:data/enemies.json", "heals 25% of max health", "scripts/battle.gd", "_warband_heal_figure", "var wave_heal := maxi(int(round(target.max_hp * 0.25)), 1)"],
 	# BATCH IK §5 — the two wards name the strike; the figure and its code are unmoved.
 	["lit:data/enemies.json", "Wards one of its warband: 25% less strike damage taken for 3 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"shielded\", 3)"],
 	["lit:data/enemies.json", "The Crown wards itself: 25% less strike damage taken for 3 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"shielded\", 3)"],
-	["lit:data/enemies.json", "for 20% of their max health", "scripts/battle.gd", "_resolve_special", "var growth := maxi(int(round(target.max_hp * 0.20)), 1)"],
+	["lit:data/enemies.json", "for 20% of their max health", "scripts/battle.gd", "_warband_heal_figure", "var growth := maxi(int(round(target.max_hp * 0.20)), 1)"],
 	["lit:data/enemies.json", "It lands next turn", "scripts/battle.gd", "_resolve_special", "\"ability\": ab, \"target\": null, \"turns\": 1, \"support\": false"],
-	["lit:data/enemies.json", "regains 6% of their maximum health", "scripts/battle.gd", "_resolve_special", "var tp_amt := maxi(int(round(tp_a.max_hp * 0.06)), 1)"],
+	["lit:data/enemies.json", "regains 6% of their maximum health", "scripts/battle.gd", "_warband_heal_figure", "var tp_amt := maxi(int(round(tp_a.max_hp * 0.06)), 1)"],
 	["upgrade:up_damage", "+50% damage", "scripts/run_state.gd", "_stamp_upgrade", "ab.damage * 1.5"],
 	["upgrade:up_cooldown", "-2 turns cooldown (minimum 0)", "scripts/run_state.gd", "_stamp_upgrade", "maxi(ab.cooldown - 2, 0)"],
 	["upgrade:up_speed", "Arrives 25% sooner", "scripts/run_state.gd", "_stamp_upgrade", "ab.delay * 0.75"],

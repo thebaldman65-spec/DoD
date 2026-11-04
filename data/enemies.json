@@ -177,7 +177,7 @@
     "delay": 2.5,
     "anim": "attack02",
     "target": "ally",
-    "description": "Mends the most wounded of its warband\nunder 40% health for 25% of their\nmax HP (tanks and supports first)."
+    "description": "Mends the most wounded of its warband\nfor 25% of their max HP, paid in\nMalice (tanks and supports first)."
    }
   ]
  },
@@ -325,7 +325,7 @@
     "delay": 2.5,
     "anim": "attack02",
     "target": "ally",
-    "description": "Mends the most wounded of its warband\nunder 40% health for 25% of their\nmax HP (tanks and supports first)."
+    "description": "Mends the most wounded of its warband\nfor 25% of their max HP, paid in\nMalice (tanks and supports first)."
    }
   ]
  },
@@ -638,6 +638,7 @@
    },
    {
     "display_name": "Wretched Bellow",
+    "cooldown": 2,
     "damage": 14,
     "pressure": 22,
     "delay": 3.5,

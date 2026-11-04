@@ -1267,7 +1267,9 @@ var credit_cb := Callable()
 # Conversion, Stable Alignment and Event Horizon have each had their say — so
 # the ledger books what the player felt rather than what was aimed at them.
 # `hp_before` rides along because the killing-blow line needs the number the
-# hit landed against, and only this scope still has it.
+# hit landed against, and only this scope still has it. BATCH JJ §2 — and a
+# fourth figure, what the blow spent past the body's last (0 unless it left
+# the body at zero), for the warband's Malice.
 var damage_taken_cb := Callable()
 # BATCH HF — VOW OF SILENCE'S DOOR, AT THE SAME TWO PLACES AND ABOVE EVERYTHING
 # THEY DO. Fires as (victim, amount) BEFORE a barrier, a split or a death
@@ -5082,8 +5084,11 @@ func _report_taken(amount: int, hp_before: int) -> void:
 	# CONSUMED — battle.gd zeroes it at every tick of the Trance — and a second
 	# reader of a consumed field reads zeros it did not earn.
 	momentum_taken += lost
+	# BATCH JJ §2 — AND WHAT THE BLOW SPENT PAST THE BODY's LAST: what it carried less what it removed, when it left the
+	# body at zero below every death refusal. The battle's Malice fills by it (`_malice_on_damage`); nothing else reads it.
+	var past_last := maxi(amount - lost, 0) if hp <= 0 else 0
 	if damage_taken_cb.is_valid():
-		damage_taken_cb.call(self, lost, hp_before)
+		damage_taken_cb.call(self, lost, hp_before, past_last)
 
 
 # The damage this unit has taken across the CURRENT turn and the one before

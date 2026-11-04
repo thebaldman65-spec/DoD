@@ -2,18 +2,18 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 2303,
-  "source": 1444,
-  "other": 281,
-  "document": 578
+  "total": 2319,
+  "source": 1445,
+  "other": 289,
+  "document": 585
  },
  "floor": {
-  "pins": 2303
+  "pins": 2319
  },
  "falls": [],
  "source_residency": {
   "narrow": 49,
-  "code": 891,
+  "code": 892,
   "absent": 330,
   "runtime": 109,
   "unresolved": 6,
@@ -12087,7 +12087,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ji.gd#338"
+   "g": "check_ji.gd#342"
   },
   {
    "s": "check_ji.gd",
@@ -12098,7 +12098,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ji.gd#409"
+   "g": "check_ji.gd#414"
   },
   {
    "s": "check_ji.gd",
@@ -12109,7 +12109,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ji.gd#448",
+   "g": "check_ji.gd#453",
    "expr": "MASTER_NEEDLE"
   },
   {
@@ -12121,7 +12121,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_ji.gd#456",
+   "g": "check_ji.gd#461",
    "expr": "String"
   },
   {
@@ -12133,7 +12133,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_ji.gd#482",
+   "g": "check_ji.gd#487",
    "expr": "nm"
   },
   {
@@ -12145,7 +12145,7 @@
    "r": "runtime",
    "k": "format",
    "how": "derived",
-   "g": "check_ji.gd#453"
+   "g": "check_ji.gd#458"
   },
   {
    "s": "check_ji.gd",
@@ -12156,7 +12156,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ji.gd#485"
+   "g": "check_ji.gd#490"
   },
   {
    "s": "check_ji.gd",
@@ -12167,7 +12167,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ji.gd#475"
+   "g": "check_ji.gd#480"
   },
   {
    "s": "check_ji.gd",
@@ -12178,7 +12178,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ji.gd#476"
+   "g": "check_ji.gd#481"
   },
   {
    "s": "check_ji.gd",
@@ -12189,7 +12189,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ji.gd#452"
+   "g": "check_ji.gd#457"
   },
   {
    "s": "check_ji.gd",
@@ -12200,7 +12200,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ji.gd#533",
+   "g": "check_ji.gd#538",
    "expr": "pair"
   },
   {
@@ -12212,8 +12212,188 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ji.gd#535",
+   "g": "check_ji.gd#540",
    "expr": "String"
+  },
+  {
+   "s": "check_jj.gd",
+   "fn": "_block",
+   "h": "docs/state.md",
+   "n": "\n",
+   "p": "+",
+   "r": "runtime",
+   "k": "composed",
+   "how": "param",
+   "g": "check_jj.gd#66"
+  },
+  {
+   "s": "check_jj.gd",
+   "fn": "_block",
+   "h": "docs/state.md",
+   "n": "\n#",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "param",
+   "g": "check_jj.gd#70"
+  },
+  {
+   "s": "check_jj.gd",
+   "fn": "_s1_the_ceiling",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "derived",
+   "g": "check_jj.gd#169",
+   "expr": "CEILING_REASON"
+  },
+  {
+   "s": "check_jj.gd",
+   "fn": "_s1_the_ceiling",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "derived",
+   "g": "check_jj.gd#170",
+   "expr": "CEILING_RECORD"
+  },
+  {
+   "s": "check_jj.gd",
+   "fn": "_s1_the_ceiling",
+   "h": "docs/state.md",
+   "n": "THIS FILE'S CEILING IS",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jj.gd#167"
+  },
+  {
+   "s": "check_jj.gd",
+   "fn": "_s1_the_ceiling",
+   "h": "docs/state.md",
+   "n": "never to split this file",
+   "p": "+",
+   "r": "unresolved",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_jj.gd#171"
+  },
+  {
+   "s": "check_jj.gd",
+   "fn": "_s5_the_bellow",
+   "h": "check_ji.gd",
+   "n": "const TUNED := {\"behemoth/Wretched Bellow\": 2}",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jj.gd#561"
+  },
+  {
+   "s": "check_jj.gd",
+   "fn": "_s6_the_record",
+   "h": "DoD-archive/state-archive.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_jj.gd#570",
+   "expr": "ANSWERED"
+  },
+  {
+   "s": "check_jj.gd",
+   "fn": "_s6_the_record",
+   "h": "docs/master.html",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_jj.gd#581",
+   "expr": "MASTER_NEEDLE"
+  },
+  {
+   "s": "check_jj.gd",
+   "fn": "_s6_the_record",
+   "h": "docs/state.md",
+   "n": "\n",
+   "p": "-",
+   "r": "runtime",
+   "k": "composed",
+   "how": "read",
+   "g": "check_jj.gd#568"
+  },
+  {
+   "s": "check_jj.gd",
+   "fn": "_s6_the_record",
+   "h": "docs/master.html",
+   "n": "%d when one of the warband falls",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "derived",
+   "g": "check_jj.gd#584"
+  },
+  {
+   "s": "check_jj.gd",
+   "fn": "_s6_the_record",
+   "h": "docs/master.html",
+   "n": "</p>",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jj.gd#583"
+  },
+  {
+   "s": "check_jj.gd",
+   "fn": "_s6_the_record",
+   "h": "docs/master.html",
+   "n": "a point for every %d points of damage",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "derived",
+   "g": "check_jj.gd#584"
+  },
+  {
+   "s": "check_jj.gd",
+   "fn": "_s6_the_record",
+   "h": "docs/master.html",
+   "n": "above the warband's plates",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_jj.gd#585"
+  },
+  {
+   "s": "check_jj.gd",
+   "fn": "_s6_the_record",
+   "h": "docs/master.html",
+   "n": "holds %d",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "derived",
+   "g": "check_jj.gd#584"
+  },
+  {
+   "s": "check_jj.gd",
+   "fn": "_s6_the_record",
+   "h": "docs/master.html",
+   "n": "under 40% HP (friendly tanks",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jj.gd#586"
   },
   {
    "s": "test_batch_ah.gd",

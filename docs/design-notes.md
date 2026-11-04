@@ -4,6 +4,16 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Malice, and what it pays for (Batch JJ) — 2026-11-04
+
+**Why the warband pays for its heals in what the heroes do to it.** A heal that costs nothing undoes damage for free, so the only answer is to delete enemies one at a time. Paid for out of what the heroes deal, a heal can never outrun the damage that bought it: the warband heals a tenth of what it is dealt, a kill's worth and the waste, and no more. The party cannot be out-healed, only taxed.
+
+**Why the price is the health restored on the body healed, not a fixed figure.** A Healing Wave restores 20 on a Grave Totem and 75 on a Bog Troll. A fixed price set on a reference body would charge the troll's heal less than half of what it gives. Paying the health the body actually gained keeps the one-for-one true on every body, and the part of an overheal the body could not take costs nothing. **A heal on a body under Blight the Well restores nothing** (the card turns it to damage), so by the same rule it costs nothing, and a pool that is low never keeps the card from firing.
+
+**Why a declared heal sets its price aside.** An enemy declares a turn before it acts. Two healers choosing on one pool could both declare a heal the pool can pay once, and the second would fall back to an attack on its own ally. Setting the price aside keeps the telegraph honest.
+
+**Why the reading is the fill's shape, not its size.** Two of the three ways the pool fills arrive with a death, so it is too low to pay a heal early in a fight, when a heal would matter, and full once the bodies that wanted healing are gone. That is a question about when Malice arrives, which the designer decides; the batch tuned nothing.
+
 ## The warband gets cooldowns (Batch JI) — 2026-11-03
 
 **Why the line is the enemy's own basic.** A move's weight only means something against what the same enemy does when it does nothing special. A 40-damage blow is an Orc Brute's basic and a big move for an Orc Whelp, whose own basic deals 26, so each move is priced against its own enemy's basic attack. A heal is priced at the health it restores, so a big heal waits as long as a big blow does.

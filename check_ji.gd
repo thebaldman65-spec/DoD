@@ -30,8 +30,10 @@ const Gate = preload("res://gate_fixture.gd")
 
 # THE RULE: a move worth 1.4 times its own basic or more takes a cooldown — 2 under 2x, 3 under 3x, 4 past.
 const LINE := 1.4
-# A DESIGNER's HAND-TUNE OF ONE MOVE, held beside the line ("kind/Move": its cooldown), so §1a reads it as the data's (JI's RULINGS OWED 2).
-const TUNED := {}
+# A DESIGNER's HAND-TUNE OF ONE MOVE, held beside the line ("kind/Move": its cooldown), so §1a reads it as the data's (JI's ruling 2, accepted at JJ §0).
+# The Bellow takes a 2 by hand (JJ §0, the designer's): it prices 1.37 against four heroes and 1.71 once a companion stands,
+# so on a party with a pet the warband's one big area blow was the only one with no rhythm. The state's record follows it (§1f).
+const TUNED := {"behemoth/Wretched Bellow": 2}
 const FIGURES := [[2.0, 2], [3.0, 3]]
 const TOP := 4
 # An area blow reaches the party's four heroes; so does an every-ally heal.
@@ -45,7 +47,9 @@ const SELF_HEALS := ["Regenerate"]
 # A ward and a cleanse have no exchange rate on the enemy's own data, so they are not priced.
 const UNPRICED := ["enemy_shield", "cleanse_allies"]
 # The data as it stood before the warband took cooldowns, every `cooldown` key aside: no other figure moved.
-const DATA_BEFORE := "2925280f6eec6f467c933362435fab6a"
+# JJ §3 re-pinned it: Healing Wave's words lost *under 40% health* with the policy that read it (the healers heal whenever the
+# warband's pool allows and a body is hurt); its 25% and every other figure stand.
+const DATA_BEFORE := "6f568b3c749bddbea70d9cbce9d6bb49"
 const DECK_CLOSED_AT := 25
 const FOE := {"type": "fight", "theme": "Warband", "enemies": ["whelp", "raider", "archer"]}
 const SEATS := ["warrior", "mage", "cleric", "hunter"]
@@ -250,7 +254,9 @@ func _s1a_the_population(s: Node) -> void:
 	ok(dot.has("burn") and dot.has("poison"), "§1a: the damage a Burn and a Poison tick could not be read off the battle")
 	var dot_pass := Gate.fn_body("scripts/battle.gd", "_dot_pass", _cache)
 	ok(dot_pass.contains("if pstatus.get(\"fresh\", false):"), "§1a: a Poison no longer skips the turn it lands — the blow's price is stale")
-	var special := Gate.fn_body("scripts/battle.gd", "_resolve_special", _cache)
+	# JJ §3 LIFTED THE THREE FIGURES OUT OF `_resolve_special`'s ARMS, UNCHANGED, INTO THE ONE DOOR THE ARMS AND THE POOL's PRICE
+	# BOTH READ — so the price this arm pins is read where it is decided now.
+	var special := Gate.fn_body("scripts/battle.gd", "_warband_heal_figure", _cache)
 	for sp in HEAL_SITES:
 		ok(special.contains(String(HEAL_SITES[sp])), "§1a: the %s arm no longer heals `%s` — the heal's price is stale" % [sp, HEAL_SITES[sp]])
 	var bodies: Array = []
@@ -359,6 +365,13 @@ func _support_board(f: BattleUnit, others: Array) -> void:
 	f.hp = int(f.max_hp * 0.4)
 
 
+# JJ §3 — A HEAL IS ALSO REFUSED BY THE WARBAND's POOL, at the same door; these arms read the cooldown, so they hold the pool full.
+# A tree with no pool is left as it is.
+func _full_pool(s: Node) -> void:
+	if s.get("malice") != null:
+		s.set("malice", int((s.get_script() as Script).get_script_constant_map().get("MALICE_CAP", 0)))
+
+
 func _picks(s: Node, f: BattleUnit, name: String, n: int, ticks := -1) -> int:
 	var hit := 0
 	for _i in n:
@@ -387,6 +400,7 @@ func _s1c_the_selection(s: Node) -> void:
 		var ab := _ab(f, name)
 		if ab != null and HEALS.has(ab.special):
 			_support_board(f, others)
+			_full_pool(s)
 		elif ab != null:
 			# A TAUNT FORCES THE ATTACK: the support half is passed by, so the choice is among the attacks alone.
 			s._apply_status(f, "mocked", 9, 0, 0, _heroes(s)[0])
@@ -460,6 +474,7 @@ func _s1c_the_callers(s: Node, f: BattleUnit, others: Array) -> void:
 			continue
 		if HEALS.has(ab.special):
 			_support_board(f, others)
+			_full_pool(s)
 		else:
 			s._apply_status(f, "mocked", 9, 0, 0, _heroes(s)[0])
 		driven += 1

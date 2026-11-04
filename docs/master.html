@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-11-03 (Batch JI &mdash; the warband gets cooldowns)</b></p>
+<p align="right"><b>Last updated: 2026-11-04 (Batch JJ &mdash; Malice, and what it pays for)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -703,6 +703,8 @@ can be used again — "6cd" means unusable for 6 turns after use. Typical bands:
 light hits 1–2, heavies/AoE 2–5, Resurrection 3. The remaining cooldown
 shows on the ability button ("CD n") and in its tooltip. <b>An enemy's biggest moves cool too</b>, in
 its own turns, and its plate's <b>CD</b> chip shows it (&sect;9).</li>
+<li><b>Malice:</b> the warband's one pool, filled by what the heroes do to it; every heal the warband casts costs a point of it
+for every point of health it restores, and its strip stands above the warband's plates (&sect;9).</li>
 <li><b>Buff / Debuff (keywords):</b> a DEBUFF is any negative status effect, a BUFF any
 positive one. The talent that counts debuffs (the tree's Iron Will)
 uses this classification &mdash; and <b>Broken</b>, the Break meter's state rather than an affliction
@@ -1063,11 +1065,12 @@ per win.</p>
 <p>Enemies hunt the most wounded hero 40% of the time and pick randomly otherwise; if any
 hero is Broken they exploit it
 with their hardest affordable hit that is not cooling. Mocked enemies must attack the taunting Warrior — a taunt
-also overrides support casts. <b>Support behaviors run before attacks:</b> the Orc Shaman
-casts Healing Wave on the most wounded of its warband under 40% HP (friendly tanks and supports
-first); the Orc Shieldmaster ALWAYS casts Shielding when no ally carries its ward
-(lowest-HP ally first, itself included); the Withered Warden has a 60% chance to cast Wild
-Growth on the most wounded of its warband (itself included) when someone is below 70% HP.
+also overrides support casts. <b>Support behaviors run before attacks:</b> a healer heals
+whenever its warband's pool, Malice, can pay and one of its warband is missing at least half of what the heal would
+restore &mdash; the Orc Totemist's and the Orc Shaman's Healing Wave the most wounded (friendly tanks and supports first), the
+Withered Warden's Wild Growth the most wounded (itself included), the Bog Troll's Regenerate itself, and the Grave Totem's Dark Vigil
+when two are hurt (&sect;9); the Orc Shieldmaster ALWAYS casts Shielding when no ally carries its ward
+(lowest-HP ally first, itself included).
 The Chief and the Ash-Wrought Tyrant build and spend Rage like a Warrior. <b>A move still cooling when its turn
 comes is never chosen</b> (&sect;9).</p>
 <h3>4.9 Enemy intent</h3>
@@ -2777,7 +2780,8 @@ card's own effect, a trap, a companion, a talent's proc or the Long Watch's carr
 tree's <i>Breaking Heals a Hero</i> for a hero who wears both. <b><i>Empty Pulpit</i></b>: while no Cleric stands, every
 hero takes 50% less strike damage. <b><i>Dead Air</i></b>: while no Mage stands, every hero deals 75% more strike
 damage. <b><i>Dirge</i></b>: while a hero lies fallen, the rest deal 45% more strike damage. <b><i>Communion</i></b>: while every hero who stands wears two or more core runes, every hero deals 37% more strike damage &mdash; all four read the
-strike, as the glossary defines it, and nothing else. <b>A crest rune drops and is sold as any
+strike, as the glossary defines it, and nothing else. <b>In a fight, Communion's chip on the crest strip counts how close the
+heroes are</b> &mdash; of those who stand, how many wear two or more core runes. <b>A crest rune drops and is sold as any
 other rune is, and sits in the bag while the Crest does not wear it</b>; it belongs to no class, and wears no marker on its name: the Peddler's row
 and an event's line say <i>for the crest</i> beside one. <b>It is never in a hero's own pick of three</b> &mdash; the elite's
 rune cache and the bargain's rune hold his class's runes alone.
@@ -3060,9 +3064,18 @@ counting every hero an area blow reaches and the Burn or Poison it lays, and a h
 takes a cooldown of that enemy's own turns, longer the bigger it is: the Orc Whelp's Reckless Lunge, the Orc Totemist's
 Healing Wave, the Bog Troll's Regenerate, the Orc Chief's Heavy Strike, the Withered Warden's Roots of Wrath, the
 Ash-Wrought Tyrant's Immolating Wave and Tyrant's Verdict, the Ash Hurler's Siege Stone, the Grave Totem's Dark Vigil, and
-the Hollow Crown's Hollow Wail and The Long Dark. A basic attack never cools, so every enemy always has a move. An enemy
+the Hollow Crown's Hollow Wail and The Long Dark &mdash; and, set by hand, the Rot Behemoth's Wretched Bellow. A basic attack never cools, so every enemy always has a move. An enemy
 never declares a move that will still be cooling when its turn comes, and while one cools its plate carries a <b>CD</b>
 chip: the fewest of its own turns until a move is back, its hover naming each. Encumbered binds these too.</p>
+<p><b>The warband shares one pool, Malice.</b> It fills by a point for every 10 points of damage the heroes deal it, by 25 when one
+of the warband falls, and by a point for every point of damage a blow spends past a body's last (the Bomb's blast and the Wasting bargain's tick, which no
+hero is credited with, fill only by their kills), and it holds 150; its bar stands above the
+warband's plates, its count beside it, and a fight opens with it empty (a quit fight too). <b>Every heal the warband casts costs a point
+of Malice for every point of health it restores</b> &mdash; the Orc Totemist's and the Orc Shaman's Healing Wave, the Bog Troll's
+Regenerate, the Withered Warden's Wild Growth and the Grave Totem's Dark Vigil &mdash; so the warband never heals more than its pool
+has been given; a heal on a body under Blight the Well restores nothing, so it costs nothing. A healer heals whenever the pool can pay and one of its warband is missing at least half of what the heal would restore
+(two of them, for the Grave Totem's Dark Vigil);
+it declares only a heal the pool can pay, and sets the price aside until the heal lands.</p>
 <table border="1" cellpadding="4">
 <tr><th>Enemy</th><th>Pw</th><th>Roles</th><th>Zones</th><th>HP</th><th>Kit sketch</th></tr>
 <tr><td>Orc Raider</td><td>1</td><td>skirmisher</td><td>1·2·3</td><td>140</td><td>Slash;
@@ -3075,7 +3088,7 @@ will).</td></tr>
 Stone Sling; Skull Crack (38 BD — a Break specialist). Soft to frost (bare sling
 fingers).</td></tr>
 <tr><td>Orc Totemist (teal)</td><td>1</td><td>mender</td><td>1·3</td><td>90</td><td>Weak
-support: Totem Jab; Healing Wave (25% max to the most wounded sub-40% ally, tanks and supports first). Nature resist
+support: Totem Jab; Healing Wave (25% max to the most wounded hurt ally, tanks and supports first, paid in Malice). Nature resist
 25%; soft to shadow (spirit-open).</td></tr>
 <tr><td>Orc Archer (red)</td><td>1</td><td>sniper·hexer</td><td>1·2·3</td><td>110</td>
 <td>Arrow Shot; Poison Arrow (70% Poison 3t). Physical resist 5%; soft to frost.</td></tr>
@@ -3083,7 +3096,7 @@ support: Totem Jab; Healing Wave (25% max to the most wounded sub-40% ally, tank
 <td>Strike; Shielding (25% ward, one ally at a time, always re-cast). Physical resist 15%;
 soft to arcane (the shield stops steel, not raw magic).</td></tr>
 <tr><td>Orc Shaman (blue)</td><td>2</td><td>mender</td><td>1·2·3</td><td>110</td><td>Chain
-Lightning (nature, every ally); Healing Wave. Resists fire/frost 25%, nature 50%; soft to
+Lightning (nature, every ally); Healing Wave, paid in Malice. Resists fire/frost 25%, nature 50%; soft to
 shadow (corruptible spirits).</td></tr>
 <tr><td>Orc Hexer (purple)</td><td>2</td><td>hexer</td><td>1·2·3</td><td>120</td><td>Ranged
 shadow caster: Hex Bolt; Withering Hex (70% Exposed 2t); Bone Rattle (34 BD). Resists
@@ -3104,13 +3117,13 @@ battle: unremarkable fresh, hits like a Chief as the last one standing. The kill
 question, stated as an enemy. Shadow resist 25%; soft to holy AND nature.</td></tr>
 <tr><td>Grave Totem (dusk, large)</td><td>2</td><td>mender·hexer</td><td>1·3</td><td>80</td>
 <td>Speed 130, trivially Broken (Con 60): Grasping Roots (nature, 60% Cripple 2t); Dark
-Vigil — every living ally regains 6% of its OWN max health. Physical resist 35%, shadow
+Vigil — every living ally regains 6% of its OWN max health, paid in Malice. Physical resist 35%, shadow
 50%; soft to fire AND holy at 50% — a resist puzzle, not a stat check.</td></tr>
 <tr><td>Orc Brute (brown, large)</td><td>3</td><td>brute</td><td>1·2·3</td><td>260</td>
 <td>Smash; Overhead Crush (50 BD). Physical resist 10%; soft to shadow (dumb muscle, weak
 mind).</td></tr>
 <tr><td>Bog Troll (green, large)</td><td>3</td><td>brute·bulwark</td><td>1·3</td><td>300</td>
-<td>Claw; Swampy Grasp (70% Slowed 2t); Regenerate (25% self-heal when bloodied). Nature
+<td>Claw; Swampy Grasp (70% Slowed 2t); Regenerate (25% self-heal when hurt, paid in Malice). Nature
 resist 50%; soft to fire.</td></tr>
 <tr><td>Rot Behemoth (dun, large)</td><td>3</td><td>brute·hexer</td><td>2·3</td><td>280</td>
 <td>Rotting Fist (50% Poison 3t); Wretched Bellow (nature + BD, every ally). Nature 50%,
@@ -3124,7 +3137,7 @@ Break target of any power-3 (Con 90), by design. Fire resist 50%; soft to frost.
 user: Strike (+15 Rage); Heavy Strike 30R; Chieftain&rsquo;s Maul 20R (56 BD). Physical resist 15%;
 soft to arcane (magic pierces plate).</td></tr>
 <tr><td>Withered Warden (boss)</td><td>7</td><td>boss</td><td>1·3</td><td>500</td><td>Unique
-kit: Timber Slam (Dazed 3t); Roots of Wrath (Poison, every ally); Wild Growth. Nature resist 50%;
+kit: Timber Slam (Dazed 3t); Roots of Wrath (Poison, every ally); Wild Growth, paid in Malice. Nature resist 50%;
 soft to fire (withered wood burns) — both scoutable on the map from tier 1.</td></tr>
 <tr><td>Ash-Wrought Tyrant (boss)</td><td>7</td><td>boss</td><td>2</td><td>370</td><td>Rage
 user (20 starting), unique fire kit: Cinder Cleave (+15 Rage); Immolating Wave 30R
@@ -3195,7 +3208,10 @@ and a row with more chips than room ends in a <b>+N</b> chip whose hover names e
 payout turns on and off has a rune chip</b> at the right end of the same row &mdash; an outlined chip
 with the rune mark &#10022;, bright while it pays and dim while it waits on its condition; hover it for
 which, and for what it pays, every figure read off the rune itself. <b>The Crest's rune is one chip on
-the CREST strip above the heroes' plates</b>, never one on every hero. <b>The fight's modifier stands in a strip of its own</b>,
+the CREST strip above the heroes' plates</b>, never one on every hero; Communion's chip carries a count beside it, <b>n of m</b>: of the heroes who stand, how many wear
+two or more core runes. <b>The warband's pool, Malice, stands in a strip of its own</b> above the enemies' plates and below the
+combat log: MALICE, its bar and its count out of its cap; hover it for how it fills and which of the warband spend it.
+<b>The fight's modifier stands in a strip of its own</b>,
 at the top of the screen between the turn strip and the combat log: <b>BARGAIN</b> when the heroes bought its terms at the
 offer, <b>IMPOSED</b> when Ruin's road laid it on a node a route cannot duck, then <b>one chip in the modifier's own
 letters</b> (no other chip in the game shows them), its <b>severity pips</b> as the offer card draws them, and its name; hover

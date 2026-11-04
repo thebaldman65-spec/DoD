@@ -539,8 +539,10 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
     it — so the fifth run was taken on a read already paid down. **A ruling reversed by a measurement
     is the record working, which is why this one is kept beside its reversal.**
     · **AND THE ROOM IS FINITE, SAID PLAINLY.** The two files at their two ceilings — this one at 510
-      KiB, `docs/state.md` at its own 380 KiB (HY §3) — are a read of **911,360 B: 857 B under where
-      the read stood at HW's close** (912,217 B), the read the trim was taken to relieve. The room is
+      KiB, `docs/state.md` at its own 380 KiB (HY §3) — were a read of **911,360 B: 857 B under where
+      the read stood at HW's close** (912,217 B), the read the trim was taken to relieve. *JJ §1 raised that file's to 440 KiB,
+      the designer's, because the routing bounds a batch's working read of it: the two ceilings are 972,800 B now, past where HX
+      began, and the ceiling no longer measures the working read, so the sentence that follows is HY's, kept as its record.* The room is
       real and it runs out where HX began; **when it does, the re-measure decides the shape, not a
       sixth run of this arithmetic.**
     **The next move at this ceiling is a recon
@@ -1806,7 +1808,7 @@ decision and the STRUCTURE is what shipped.
   that authors it, and **what the deck promises is that every modifier in it costs the party, and that the severity says how much.** The
   reason is JA's census, which found the warband with no turn-start drip, no cooldown on any of its 50 abilities and two Rage bars against
   the party's whole resource, so no re-cut of a card fixes that; only rebuilding the warband would, and that is not a bargain's to do.
-  Eleven of its moves cool now (JI §1), so Encumbered lengthens them as it does the party's; the drip and the two Rage bars stand. AQ named *no items
+  Twelve of its moves cool now (eleven by JI §1's rule, the Bellow by hand at JJ §0), so Encumbered lengthens them as it does the party's; the drip and the two Rage bars stand. AQ named *no items
   this fight* as deliberately not authored; IN built it as Famine, and IO removed it and Cruel Order (enemies carry no pouch; *both sides
   first* is incoherent) — **removed, not disabled**, their built shape and IN's measurements kept in `docs/design-notes.md`, where a batch
   reads them before it authors a rule either resembles (Ambushed, at JB, is Cruel Order's neighbour and was built fresh).
@@ -1844,7 +1846,7 @@ decision and the STRUCTURE is what shipped.
   status door and the resource doors) and added before the rule is. **Three rules cost a batch each to learn this — the Hungering
   Dark, Tinderbox and Dull Edge — and the census makes it a measurement.** **A share says whom a rule touches, which is the subject of JB §0.2's
   rule, and it can price a rule before the code exists (JB §3 graded two such prices)**; a quantity the warband produces none of (the
-  turn-start drip; cooldowns until JI gave eleven of its moves one) binds the party alone however the words read. **A CENSUS PRICES THE GROSS, AND THE COST IS THE GROSS AFTER THE PARTY's HEALING — SO DIVIDE BY ABOUT TWO AND A HALF. READ THE GROSS ON THE
+  turn-start drip; cooldowns until JI gave eleven of its moves one, and JJ the Bellow a twelfth by hand) binds the party alone however the words read. **A CENSUS PRICES THE GROSS, AND THE COST IS THE GROSS AFTER THE PARTY's HEALING — SO DIVIDE BY ABOUT TWO AND A HALF. READ THE GROSS ON THE
   POPULATION THE CARD ACTS ON, NOT ON EVERY FIGHT, AND CHECK A MULTIPLIER ON A CAPACITY AGAINST WHAT THAT CAPACITY ABSORBS (JC §0.3, the designer's).**
   Corrected for both, Ambushed at 8 grossed 18.4 points and read 6.67, at 9, 20.7 and 9.03, and Porous at 0.4, 4.8 and 2.09: 2.76, 2.29 and
   2.30. **Three readings behind one divisor, so it is written to be tested, not believed**, and it has an edge already: at 11 Ambushed read
@@ -2320,7 +2322,7 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
 
 - **ASSERTED, NOT ONLY FIXED (`check_ih` §6).** Every battle plate — every class, lineage and enemy kind, as spawned, at its
   longest values, with its chip row full, with no intent, with a hero fallen — the turn strip's slots, the crest strip,
-  the bargain strip at its widest name (IO §5), the skill-check bar, every map card in every state and every bargain card: no two drawn rects meet but a value inside
+  the bargain strip at its widest name (IO §5), the Malice strip at its cap (JJ §2), the skill-check bar, every map card in every state and every bargain card: no two drawn rects meet but a value inside
   its own bar (or a fill in its track), none runs past its container, no line is wider than its box. **A Label's rect is
   its LINE BOX, never its ink.** A new plate or card joins that walk, and the walk names its fullest and its emptiest.
 - **THREE GODOT FACTS MADE EVERY ONE OF IH's FINDINGS, AND THEY BIND EVERY CONTROL BUILT IN CODE.** (1) A Control's theme
@@ -4066,7 +4068,7 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
     **IF THE FIGURE THE FLOOR DEMANDS IS ABOVE 75%, THE POOL's LARGEST, THE CONDITION IS TOO RARE AND THE ANSWER IS A DIFFERENT CONDITION, NOT A BIGGER NUMBER.** *(The batch's reading, JG §3:)* the population is the two rows JF's worth rule names, the reference four at Wanderer and the incumbent at Ruin, and the figure answers to the lower. The two ends are in different units, Break healed and damage dealt, so the floor is a rule of thumb between them and the product stays a gross.
     **The floor does not replace the relation above it**: a conditioned rune still pays beyond the bare writer of its effect (HP §5), so on strike damage, where the tree writes 10%, a condition that holds half the time or more has a quotient the relation refuses. **There the relation sets the figure and the floor stands beside it as a minimum (JH §0.6, the designer's)**: 25% uptime at 20% is the case both rules allow.
   · **COMMUNION READS WHAT THE FOUR CARRY: WHILE EVERY HERO WHO STANDS WEARS TWO OR MORE CORE RUNES (JH §0.1, the designer's: one key, one shape, authorized).** `heroes_all_hold_cores` counts the core runes each hero who stands has slotted, the list the spawn reads off the member (`Runes.held_engines`). **The condition's writers are the map's: `Run.awaken`, `Run.toggle_engine` and the swaps — and in a sim `Run.hold_rune`, whose bot asks it to slot a core it is handed — read at the spawn. A fight keeps what it opened with (GM §2), so inside one only a fall and a rise move it, and those two doors are where it is re-read.**
-    **It pays every party that builds for it, and it rises through a run** — and only those: in about half the runs a hero never slots a second core and it pays nothing (the state's crest pool, JH's RULINGS OWED 6). On the shipped key with no crest worn, on the union a party wearing it rolls (its own entry struck, the die shift's rule), on the runs that finish, 18.6% on the reference four at Wanderer and 13.5% on the incumbent at Ruin, 2.2, 9.2 and 38.2% by zone on the first (`docs/reports/JH-uptimes.tsv`). **Its figure is the worth rule's quotient on the lower row, a whole percent up**, past the bare 10% and inside the pool's range. **ITS ONE IMPURITY, NAMED BESIDE IT (JH §0.1, the designer's): IT PARTLY KEYS ON A FALL.** It switches on when the one hero short of a second core goes down, about a point of its 18.6%, 5.6% of its uptime on the row the designer read, and that is accepted; on the harder rungs, where heroes fall, it is up to a third of the uptime (the state's crest pool, JH's RULINGS OWED 7). *Every hero holds a core* holds on every hero turn of every cell, because each takes one at class selection, and JG's named core was no party's uptime (19.6, 99.7 and 14.7% by party); `heroes_hold_core` stays a door no live rune carries.
+    **It pays every party that builds for it, and it rises through a run** — and only those: in about half the runs a hero never slots a second core and it pays nothing (the state's crest pool, JH's ruling 6, accepted at JJ §0). On the shipped key with no crest worn, on the union a party wearing it rolls (its own entry struck, the die shift's rule), on the runs that finish, 18.6% on the reference four at Wanderer and 13.5% on the incumbent at Ruin, 2.2, 9.2 and 38.2% by zone on the first (`docs/reports/JH-uptimes.tsv`). **Its figure is the worth rule's quotient on the lower row, a whole percent up**, past the bare 10% and inside the pool's range. **ITS ONE IMPURITY, NAMED BESIDE IT (JH §0.1, the designer's): IT PARTLY KEYS ON A FALL.** It switches on when the one hero short of a second core goes down, about a point of its 18.6%, 5.6% of its uptime on the row the designer read, and that is accepted; on the harder rungs, where heroes fall, it is up to a third of the uptime (the state's crest pool, JH's ruling 7, accepted at JJ §0). *Every hero holds a core* holds on every hero turn of every cell, because each takes one at class selection, and JG's named core was no party's uptime (19.6, 99.7 and 14.7% by party); `heroes_hold_core` stays a door no live rune carries.
 - **A CONDITION ON THE FOUR IS READ AS THE FIGHT RUNS, BECAUSE READ AT THE SPAWN IT WAS A CONSTANT (HP §1, ruled; HO §3c
   found it).** The draft seats exactly one of each class — four picks from a roster of four — and a hero who falls in
   a fight that is WON stands again when it ends, so every fight a run played forward OPENS with one of each class, all

@@ -2190,6 +2190,8 @@ func _spawn_units() -> void:
 	_stack_enemy_plates()
 	# BATCH HW §1d — the warband stands where the layout put it: fit each one's click zone.
 	_fit_enemy_target_zones(enemies)
+	# BATCH JJ §2 — and its pool stands above it, empty, for the whole fight.
+	_draw_malice_strip()
 
 	_apply_battle_modifier()
 	_stamp_fk_enemy_runes()
@@ -8693,9 +8695,14 @@ func _declare_intent(u: BattleUnit, ticks_ahead := 1) -> void:
 				else _lowest_hp(ls_pool),
 			"support": false, "message": "", "logs": []}
 	var ab: Ability = chosen["ability"]
+	# BATCH JJ §3 — A DECLARED HEAL SETS ITS PRICE ASIDE, so a second healer of the warband cannot spend the pool the first
+	# was chosen on, and the heal declared is a heal the pool can pay when it lands (`_malice_free` reads every declaration's
+	# `malice`). A declaration that is discarded, hijacked or chosen again takes its reserve with it.
+	var reserve := _malice_price(u, ab, chosen["target"]) if bool(chosen.get("support", false)) else 0
 	u.intent = {
 		"ability": ab, "target": chosen["target"], "turns": 1,
 		"support": bool(chosen.get("support", false)),
+		"malice": reserve,
 		"message": String(chosen.get("message", "")),
 		"logs": chosen.get("logs", []),
 		"category": _intent_category(u, ab),
@@ -9149,8 +9156,16 @@ func _threat_pick(pool: Array) -> BattleUnit:
 # it one past the cooldown, so a move used on a turn is refused for exactly its
 # cooldown of the unit's turns after it — the heroes' arithmetic. A choice made
 # `ticks_ahead` ticks before its turn reads the counter that many ticks early.
-func _enemy_ready(u: BattleUnit, ab: Ability, ticks_ahead := 1) -> bool:
-	return int(u.cooldowns.get(ab.display_name, 0)) <= ticks_ahead
+#
+# BATCH JJ §3 — AND A HEAL THE WARBAND CASTS ON ITSELF IS READY ONLY WHILE ITS POOL CAN PAY IT. A heal costs a point of
+# Malice for every point of health it restores, so the choice asks, of the body it would heal, what the heal would restore
+# there now (`_malice_price`) against what the pool holds that no other declared heal has set aside (`_malice_free`). A
+# third refusal of the same door, asked where the cooldown is asked (JI's ruling 1, accepted at JJ §0): the selection's business, and
+# no second gate. A choice that names no body asks the cooldown alone; every heal the selection makes names one.
+func _enemy_ready(u: BattleUnit, ab: Ability, ticks_ahead := 1, body: BattleUnit = null) -> bool:
+	if int(u.cooldowns.get(ab.display_name, 0)) > ticks_ahead:
+		return false
+	return body == null or _malice_price(u, ab, body) <= _malice_free(u)
 
 
 # The support half's lookup: the ability by name, or null while it is cooling.
@@ -9167,19 +9182,23 @@ func _enemy_support_action(u: BattleUnit, ticks_ahead := 1) -> Array:
 	# and by its cooldown where the data gives it one (Healing Wave on the Totemist,
 	# Regenerate, Dark Vigil): a cooling cast is passed by, as a condition that does
 	# not hold is, and the turn falls through to an attack.
-	# Shaman: Healing Wave the most wounded ally under 40% health —
-	# friendly tanks and healers first.
+	# BATCH JJ §3 — AND A HEAL BY THE POOL. THE HEALERS HEAL WHENEVER THE POOL ALLOWS AND A BODY IS HURT — missing at
+	# least `MALICE_HEAL_WORTH` of what the heal would restore it (`_malice_hurt`) — bounded by their cooldowns and by the
+	# pool, which `_enemy_ready` asks of each body. Until JJ a heal waited for a body under 40% (the Wave), its own health
+	# under half (Regenerate), a coin and 70% (Wild Growth): a heal that cost nothing was cast rarely, and a budget is worth
+	# nothing while demand is a fraction of supply.
+	# Totemist and Shaman: Healing Wave the most wounded hurt body the pool can pay for — tanks and supports first.
 	var wave := _find_ready(u, "Healing Wave", ticks_ahead)
 	if wave != null:
-		var hurt: Array = allies.filter(func(a): return a.hp < a.max_hp * 0.40)
+		var hurt: Array = allies.filter(func(a): return _malice_hurt(wave, a) and _enemy_ready(u, wave, ticks_ahead, a))
 		if not hurt.is_empty():
 			var prio: Array = hurt.filter(
 				func(a): return a.enemy_role in ["tank", "support"])
 			return [wave, _lowest_hp(prio if not prio.is_empty() else hurt)]
-	# Bog Troll: knits its own flesh back together when bloodied (same
+	# Bog Troll: knits its own flesh back together while it is hurt (same
 	# healing-wave machinery, self-targeted).
 	var regen := _find_ready(u, "Regenerate", ticks_ahead)
-	if regen != null and u.hp < u.max_hp * 0.5:
+	if regen != null and _malice_hurt(regen, u) and _enemy_ready(u, regen, ticks_ahead, u):
 		return [regen, u]
 	# Ritual Chanter: sweeps the warband's afflictions whenever any ally
 	# carries one worth stripping (sticky poisons and meters don't count).
@@ -9218,17 +9237,231 @@ func _enemy_support_action(u: BattleUnit, ticks_ahead := 1) -> Array:
 	# Withered Warden: tends the most wounded of its warband (itself included).
 	var growth := _find_ready(u, "Wild Growth", ticks_ahead)
 	if growth != null:
-		var wounded: Array = allies.filter(func(a): return a.hp < a.max_hp * 0.7)
-		if not wounded.is_empty() and randf() < 0.6:
+		var wounded: Array = allies.filter(func(a): return _malice_hurt(growth, a) and _enemy_ready(u, growth, ticks_ahead, a))
+		if not wounded.is_empty():
 			return [growth, _lowest_hp(wounded)]
-	# Grave Totem: pulses while the chip damage adds up — two or more
-	# wounded bodies make the vigil worth the turn.
+	# Grave Totem: pulses while two or more bodies are hurt — the vigil heals every one,
+	# and the pool pays for all it would restore.
 	var vigil := _find_ready(u, "Dark Vigil", ticks_ahead)
 	if vigil != null:
-		var nicked: Array = allies.filter(func(a): return a.hp < a.max_hp)
-		if nicked.size() >= 2:
+		var nicked: Array = allies.filter(func(a): return _malice_hurt(vigil, a))
+		if nicked.size() >= 2 and _enemy_ready(u, vigil, ticks_ahead, u):
 			return [vigil, u]
 	return []
+
+
+# ══ BATCH JJ §2 — MALICE: ONE POOL FOR THE WHOLE WARBAND, FILLED BY WHAT THE HEROES DO TO IT ═════════════════════════
+#
+# It fills by a point for every `MALICE_DAMAGE_STEP` points of damage the hero side deals the warband, by
+# `MALICE_PER_KILL` when a body of the warband falls, and by a point for every point of damage a blow spends past a body's
+# last; it holds `MALICE_CAP`. A heal the warband casts on itself costs a point of it for every point of health the heal
+# restores (§3, `_warband_heal`), so the warband heals a share of what is dealt it, a share a kill and the waste: never
+# more than it was given. **You cannot be out-healed; you can only be taxed.**
+#
+# **IT IS THE WARBAND's, SO IT IS THE FIGHT's**: a battle var, empty at every fight's opening — and a quit fight restarts
+# with it empty, as it restarts the warband at full strength (GH): nothing a fight holds rides the save, so no key and no
+# version. **ITS DOORS ARE BL's**: the damage door, read by the frame's side (`_on_damage_taken`, which `unit._report_taken`
+# hands what a blow spent past a body's last since JJ), and the one death door (`_on_unit_died`). A new source of damage to
+# the warband that passes neither door fills nothing; a new heal on the warband pays through `_warband_heal` or it is free.
+const MALICE_DAMAGE_STEP := 10
+const MALICE_PER_KILL := 25
+const MALICE_CAP := 150
+# A body is HURT, to a heal, while it is missing at least this share of what the heal would restore it — the healers'
+# spend policy (JJ §3): heal whenever the pool allows and a body is hurt.
+const MALICE_HEAL_WORTH := 0.5
+var malice := 0
+var _malice_dealt := 0  # the hero side's damage this fight not yet a whole point
+# What the pool did this fight: points it was given (`generated`), took (`banked`), let fall at the cap (`wasted`) and paid
+# for healing (`spent`). Read by the instruments; nothing in the game reads it.
+var malice_ledger := {"generated": 0, "banked": 0, "wasted": 0, "spent": 0}
+
+
+# The one way Malice comes in. What the cap refuses is wasted, and counted.
+func _malice_fill(points: int) -> void:
+	if points <= 0:
+		return
+	var got := mini(points, maxi(MALICE_CAP - malice, 0))
+	malice += got
+	malice_ledger["generated"] += points
+	malice_ledger["banked"] += got
+	malice_ledger["wasted"] += points - got
+	_refresh_malice_strip()
+
+
+# The damage door's term: health the hero side removed from the warband — a hero's or a companion's blow, a tick or a
+# mirror the frame credits to one — a point a `MALICE_DAMAGE_STEP`, the remainder carried; and what it spent past a body's
+# last, point for point. The warband's damage to itself, and to the heroes, fills nothing.
+func _malice_on_damage(victim: BattleUnit, lost: int, past_last: int) -> void:
+	if victim == null or victim.is_hero or lost <= 0:
+		return
+	var dealer := _frame_dealer()
+	if dealer == null or not dealer.is_hero:
+		return
+	_malice_dealt += lost
+	var pts := _malice_dealt / MALICE_DAMAGE_STEP
+	_malice_dealt -= pts * MALICE_DAMAGE_STEP
+	_malice_fill(pts + maxi(past_last, 0))
+
+
+# The one way Malice goes out: a warband heal, the health it restored.
+func _malice_pay(points: int) -> void:
+	if points <= 0:
+		return
+	malice = maxi(malice - points, 0)
+	malice_ledger["spent"] += points
+	_refresh_malice_strip()
+
+
+# What the pool holds that no declared heal of the warband but `exclude`'s has set aside.
+func _malice_free(exclude: BattleUnit = null) -> int:
+	var held := 0
+	for e in enemies:
+		if e != exclude and not e.dead:
+			held += int(e.intent.get("malice", 0))
+	return maxi(malice - held, 0)
+
+
+# WHAT A WARBAND HEAL RESTORES TO ONE BODY BY ITS FIGURE — the share of that body's maximum each of the three arms of
+# `_resolve_special` heals by, lifted out of them unchanged (JJ §3) so the price the selection asks and the heal that lands
+# read one figure. `check_ij` §3 and `check_ji` §1a pin each line here.
+func _warband_heal_figure(special: String, target: BattleUnit) -> int:
+	match special:
+		"healing_wave":
+			var wave_heal := maxi(int(round(target.max_hp * 0.25)), 1)
+			return wave_heal
+		"wild_growth":
+			var growth := maxi(int(round(target.max_hp * 0.20)), 1)
+			return growth
+		"totem_pulse":
+			var tp_a := target
+			var tp_amt := maxi(int(round(tp_a.max_hp * 0.06)), 1)
+			return tp_amt
+	return 0
+
+
+# THE PRICE OF A WARBAND HEAL ON A BODY: what it would restore there now — its figure, no more than the body is missing, on
+# every body it reaches (Dark Vigil's whole warband). A heal on the heroes' side (a psychotic one) is not the warband's
+# and is priced at nothing; a move that is no heal costs nothing. **A BLIGHTED BODY's HEAL RESTORES NOTHING (Blight the
+# Well turns it to damage), SO IT IS PRICED AT NOTHING**: the pool never keeps a healer off it and a declaration sets
+# nothing aside for it, so the card's payout never waits on the pool (the fresh reader's finding). The selection reads
+# no Blight, as it never did, so a short pool can leave a blighted body the one a healer can afford.
+func _malice_price(caster: BattleUnit, ab: Ability, body: BattleUnit) -> int:
+	if ab == null or body == null or body.is_hero or _warband_heal_figure(ab.special, body) <= 0:
+		return 0
+	if ab.special == "totem_pulse":
+		var all := 0
+		for e in enemies:
+			if not e.dead and not e.has_status("blight"):
+				all += mini(_warband_heal_figure(ab.special, e), maxi(e.max_hp - e.hp, 0))
+		return all
+	if body.has_status("blight"):
+		return 0
+	return mini(_warband_heal_figure(ab.special, body), maxi(body.max_hp - body.hp, 0))
+
+
+# HURT, TO A HEAL: missing at least `MALICE_HEAL_WORTH` of what the heal would restore the body.
+func _malice_hurt(ab: Ability, body: BattleUnit) -> bool:
+	if ab == null or body == null or body.dead:
+		return false
+	var fig := _warband_heal_figure(ab.special, body)
+	return fig > 0 and body.max_hp - body.hp >= MALICE_HEAL_WORTH * fig
+
+
+# A WARBAND HEAL ON ONE BODY: its figure, no more than the pool can pay — what it holds that no other declared heal has
+# set aside — and it pays a point for every point of health the body gained, measured on the body, so an overheal and a
+# heal the body refuses pay nothing. A heal on the heroes' side is no warband heal and pays nothing. Returns what the heal
+# pipeline returned, as the arms always printed it.
+func _warband_heal(caster: BattleUnit, body: BattleUnit, special: String) -> int:
+	var fig := _warband_heal_figure(special, body)
+	if body.is_hero:
+		return body.heal_amount(fig, body != caster)
+	var hp0 := body.hp
+	# A BLIGHTED BODY's HEAL TURNS TO DAMAGE (Blight the Well): it restores nothing, so it pays nothing, and it is asked for
+	# whole, as before JJ, and priced at nothing where it is chosen (`_malice_price`) — the Occultist's card does not deal
+	# less, or fire less, because the warband's pool is low.
+	var ask := fig if body.has_status("blight") else mini(fig, _malice_free(caster))
+	var got: int = body.heal_amount(ask, body != caster)
+	_malice_pay(maxi(body.hp - hp0, 0))
+	return got
+
+
+# ══ BATCH JJ §2 — THE WARBAND's POOL ON SCREEN ════════════════════════════════════════════════════════════════════════
+#
+# **A pool the player cannot see is invisible difficulty.** Malice is the side's, not a body's, so it stands on no plate:
+# a strip of its own above the warband's stack, between the combat log's foot and the highest the stack is ever lifted
+# (`_stack_enemy_plates`'s 176), where nothing else is drawn — MALICE, its bar and its count. Its hover is the rule, every
+# figure read off its constant, and who in this warband spends it. A sim draws nothing.
+const MALICE_STRIP_POS := Vector2(ENEMY_PLATE_X, 161.0)
+const MALICE_COLOR := Color(0.86, 0.36, 0.42)
+var _malice_strip: Node2D = null
+var _malice_fill_rect: ColorRect = null
+var _malice_count: Label = null
+var _malice_hover: Control = null
+
+
+func _draw_malice_strip() -> void:
+	if sim:
+		return
+	if _malice_strip != null and is_instance_valid(_malice_strip):
+		_malice_strip.queue_free()
+	_malice_strip = Node2D.new()
+	_malice_strip.position = MALICE_STRIP_POS
+	add_child(_malice_strip)
+	var head := Label.new()
+	head.text = "MALICE"
+	head.add_theme_font_size_override("font_size", 9)
+	head.add_theme_color_override("font_color", MALICE_COLOR)
+	head.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# Parented, then sized (IH §6's three Godot facts): a font-9 line is 13 px.
+	BattleUnit._put(_malice_strip, head, Vector2(0, 0), Vector2(44, 13))
+	var track := ColorRect.new()
+	track.color = Color(0.16, 0.10, 0.12, 0.95)
+	track.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	BattleUnit._put(_malice_strip, track, Vector2(46, 4), Vector2(84, 6))
+	_malice_fill_rect = ColorRect.new()
+	_malice_fill_rect.color = MALICE_COLOR
+	_malice_fill_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	BattleUnit._put(_malice_strip, _malice_fill_rect, Vector2(46, 4), Vector2(0, 6))
+	_malice_count = Label.new()
+	_malice_count.add_theme_font_size_override("font_size", 9)
+	_malice_count.add_theme_color_override("font_color", Color(0.9, 0.84, 0.82))
+	_malice_count.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	BattleUnit._put(_malice_strip, _malice_count, Vector2(134, 0), Vector2(38, 13))
+	# The hover: a bare Control over the strip, so a pointer anywhere on it reads the rule.
+	_malice_hover = Control.new()
+	_malice_hover.mouse_filter = Control.MOUSE_FILTER_STOP
+	BattleUnit._put(_malice_strip, _malice_hover, Vector2(0, 0), Vector2(BattleUnit.PLATE_W, 13))
+	_refresh_malice_strip()
+
+
+func _refresh_malice_strip() -> void:
+	if sim or _malice_strip == null or not is_instance_valid(_malice_strip):
+		return
+	_malice_fill_rect.size = Vector2(84.0 * clampf(float(malice) / MALICE_CAP, 0.0, 1.0), 6)
+	_malice_count.text = "%d/%d" % [malice, MALICE_CAP]
+	_malice_hover.tooltip_text = _malice_words()
+
+
+# THE RULE IN WORDS, every figure off its constant, hand-broken for a tooltip that does not wrap.
+func _malice_words() -> String:
+	var lines := PackedStringArray(["Malice — the warband's pool: %d of %d" % [malice, MALICE_CAP]])
+	lines.append_array(_wrap_words("It fills by a point for every %d damage the heroes deal the warband, by %d when one of its bodies falls, and by a point for every point of damage spent past a body's last." % [
+		MALICE_DAMAGE_STEP, MALICE_PER_KILL]))
+	lines.append_array(_wrap_words("A heal the warband casts costs a point of Malice for every point of health it restores."))
+	var spenders := PackedStringArray()
+	for e in enemies:
+		if e.dead:
+			continue
+		for a in e.abilities:
+			if _warband_heal_figure((a as Ability).special, e) > 0:
+				var who := "%s's %s" % [e.unit_name, (a as Ability).display_name]
+				if not spenders.has(who):
+					spenders.append(who)
+	if spenders.is_empty():
+		lines.append_array(_wrap_words("Nothing in this warband heals with it."))
+	else:
+		lines.append_array(_wrap_words("Spent by %s." % ", ".join(spenders)))
+	return "\n".join(lines)
 
 
 # The wind-up dies with the lost turn: the stored blow never lands. Loud
@@ -16703,6 +16936,8 @@ func _on_unit_died(u: BattleUnit) -> void:
 	if _readout != null and u.is_hero:
 		_readout.hero_fell(u)
 	if not u.is_hero:
+		# BATCH JJ §2 — A BODY OF THE WARBAND FALLS: its pool fills by a kill's worth, whoever dealt it.
+		_malice_fill(MALICE_PER_KILL)
 		# SAVAGE ASSAULT — the enemy's death is the Reaver's when the frame that
 		# killed it names him: his strike, his handler, his echo or a tick he laid.
 		# An ally's kill, a companion's and the enemy's own do not count.
@@ -24388,14 +24623,17 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.unit_name, ab.display_name,
 				"it" if target == attacker else target.unit_name], "#e0a0a0")
 		"wild_growth":
-			var growth := maxi(int(round(target.max_hp * 0.20)), 1)
 			_sfx("heal", -6.0, 0.8)
-			var growth_got := target.heal_amount(growth, target != attacker)
+			# BATCH JJ §3 — a warband heal: its figure, no more than the pool can pay, paid point for point.
+			var growth_spent := int(malice_ledger["spent"])
+			var growth_got := _warband_heal(attacker, target, "wild_growth")
+			growth_spent = int(malice_ledger["spent"]) - growth_spent
 			target.float_text("+%d" % growth_got, Color(0.4, 0.9, 0.45))
 			_message("%s mends %s" % [attacker.unit_name, target.unit_name])
-			_log("%s: Wild Growth heals %s for %d (20%% max HP%s)" % [attacker.unit_name,
+			_log("%s: Wild Growth heals %s for %d (20%% max HP%s)%s" % [attacker.unit_name,
 				target.unit_name, growth_got,
-				", halved by Frostbite" if target.has_status("frostbite") else ""],
+				", halved by Frostbite" if target.has_status("frostbite") else "",
+				" — %d Malice" % growth_spent if growth_spent > 0 else ""],
 				"#70d878")
 		"cleanse_allies":
 			# Ritual Chanter (Batch V): strips the LONGEST-remaining debuff
@@ -24505,17 +24743,19 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_sfx("heal", -7.0, 0.65)
 			var tp_side: Array = heroes if target.is_hero else enemies
 			var tp_total := 0
+			var tp_spent := int(malice_ledger["spent"])
 			for tp_a in tp_side:
 				if tp_a.dead:
 					continue
-				var tp_amt := maxi(int(round(tp_a.max_hp * 0.06)), 1)
-				var tp_got: int = tp_a.heal_amount(tp_amt, tp_a != attacker)
+				# BATCH JJ §3 — a warband heal on each body: no more than the pool can pay, paid point for point.
+				var tp_got: int = _warband_heal(attacker, tp_a, "totem_pulse")
 				tp_total += tp_got
 				if tp_got > 0:
 					tp_a.float_text("+%d" % tp_got, Color(0.55, 0.5, 0.75))
 			_message("%s pulses with dark vigil..." % attacker.unit_name)
-			_log("%s: Dark Vigil — its whole warband regains 6%% of its own health (%d in all)" % [
-				attacker.unit_name, tp_total], "#70d878")
+			tp_spent = int(malice_ledger["spent"]) - tp_spent
+			_log("%s: Dark Vigil — its whole warband regains 6%% of its own health (%d in all)%s" % [
+				attacker.unit_name, tp_total, " — %d Malice" % tp_spent if tp_spent > 0 else ""], "#70d878")
 		"wildfire":
 			# Batch AG: the wide payoff, and Batch AR's WIDE RELEASE VALVE —
 			# Detonation empties one bank, this one skims them all. Every
@@ -24892,14 +25132,17 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_log("%s: Divine Plea — %s is fully healed (+%d)%s" % [
 				attacker.unit_name, target.unit_name, dp_got, dp_note], "#70d878")
 		"healing_wave":
-			var wave_heal := maxi(int(round(target.max_hp * 0.25)), 1)
 			_sfx("heal", -6.0, 0.75)
-			var wave_got := target.heal_amount(wave_heal, target != attacker)
+			# BATCH JJ §3 — a warband heal: its figure, no more than the pool can pay, paid point for point.
+			var wave_spent := int(malice_ledger["spent"])
+			var wave_got := _warband_heal(attacker, target, "healing_wave")
+			wave_spent = int(malice_ledger["spent"]) - wave_spent
 			target.float_text("+%d" % wave_got, Color(0.4, 0.9, 0.45))
 			_message("%s mends %s" % [attacker.unit_name, target.unit_name])
-			_log("%s: Healing Wave — %s recovers %d (25%% max HP%s)" % [attacker.unit_name,
+			_log("%s: Healing Wave — %s recovers %d (25%% max HP%s)%s" % [attacker.unit_name,
 				target.unit_name, wave_got,
-				", halved by Frostbite" if target.has_status("frostbite") else ""],
+				", halved by Frostbite" if target.has_status("frostbite") else "",
+				" — %d Malice" % wave_spent if wave_spent > 0 else ""],
 				"#70d878")
 		"renewal":
 			# Ticks snapshot the CASTER: 15% of their max health per turn,
@@ -28828,7 +29071,8 @@ func _reread_live(tell: bool) -> void:
 		refreshed[pair[0]] = true
 	for u2 in refreshed:
 		(u2 as BattleUnit).refresh_bars()
-	if not refreshed.is_empty():
+	# BATCH JJ §5 — AND AT EVERY FALL AND RISE: Communion's count moves with who stands, whether or not its condition flips.
+	if not refreshed.is_empty() or tell:
 		_refresh_rune_chips()
 
 
@@ -28988,6 +29232,18 @@ func _draw_crest_strip(chips: Array) -> void:
 		chip.position = Vector2(x, 0)
 		_crest_strip.add_child(chip)
 		x += BattleUnit.RUNE_CHIP_W + 2.0
+		# BATCH JJ §5 — the party's count beside the chip whose condition it is (`_rune_chip_for`'s `progress`).
+		if (rc as Dictionary).has("progress"):
+			var pg := Label.new()
+			pg.text = String(rc["progress"])
+			pg.add_theme_font_size_override("font_size", 9)
+			pg.add_theme_color_override("font_color", BattleUnit.RUNE_CHIP_PAYING if bool(rc.get("paying", false)) \
+				else BattleUnit.RUNE_CHIP_ARMED)
+			pg.mouse_filter = Control.MOUSE_FILTER_STOP
+			pg.tooltip_text = String(rc.get("progress_tip", ""))
+			pg.set_meta("rune_progress", String(rc.get("name", "")))
+			BattleUnit._put(_crest_strip, pg, Vector2(x + 2.0, -1), Vector2(36, 13))
+			x += 40.0
 
 
 # ══ BATCH IO §5 — THE BARGAIN's CHIP: WHAT THIS FIGHT IS FOUGHT UNDER ═════════════════════
@@ -29075,7 +29331,19 @@ func _rune_chip_for(name: String, whose: String, payload: Dictionary, on: bool) 
 	if cw != "":
 		lines.append(("Now: %s." if on else "Pays only %s.") % cw)
 	lines.append_array(_wrap_words(_rune_effect_words(payload)))
-	return {"name": name, "tag": RUNE_CHIP_TAG, "paying": on, "tip": "\n".join(lines)}
+	var chip := {"name": name, "tag": RUNE_CHIP_TAG, "paying": on, "tip": "\n".join(lines)}
+	# BATCH JJ §5 — A CONDITION ON WHAT EVERY HERO WEARS SAYS HOW CLOSE THE PARTY IS (Communion's): of the heroes who
+	# stand, how many wear enough core runes — off the live party the condition itself reads (`_live_party`), so the count
+	# and the rune cannot disagree. **A dud you can see is a goal; a dud you cannot see is a brick.**
+	var cond: Dictionary = payload.get("condition", {})
+	if cond.has("heroes_all_hold_cores"):
+		var k := int(cond["heroes_all_hold_cores"])
+		var standing: Array = _live_party().filter(func(m): return int(m["hp"]) > 0)
+		var met := standing.filter(func(m): return Runes.held_engines(m as Dictionary).size() >= k).size()
+		chip["progress"] = "%d of %d" % [met, standing.size()]
+		chip["progress_tip"] = "\n".join(_wrap_words("%s: %d of the %d heroes who stand wear %d or more core runes." % [
+			name, met, standing.size(), k]))
+	return chip
 
 
 func _rune_effect_words(payload: Dictionary) -> String:
@@ -31178,7 +31446,7 @@ func _bank_run_ledgers() -> void:
 	_run_kills = []
 
 
-func _on_damage_taken(victim: BattleUnit, lost: int, hp_before: int) -> void:
+func _on_damage_taken(victim: BattleUnit, lost: int, hp_before: int, past_last := 0) -> void:
 	if lost <= 0 or victim == null:
 		return
 	# BATCH CB — FROSTBIND'S SECOND CLAUSE, AND IT SITS ABOVE THE HERO GATE
@@ -31313,6 +31581,9 @@ func _on_damage_taken(victim: BattleUnit, lost: int, hp_before: int) -> void:
 	# echo and a tick arrive here alike. Above the hero gate for Frostbind's
 	# reason — every victim they read is an enemy.
 	_rule_engines_on_damage(victim, lost)
+	# BATCH JJ §2 — AND MALICE, FOR THE SAME REASON: every blow and tick the hero side lands on the warband arrives here,
+	# and so does what it spent past a body's last (`past_last`, the door's own figure since JJ).
+	_malice_on_damage(victim, lost, past_last)
 	# BATCH GH — THE PARTY'S HEALTH REACHES THE SAVE AS IT LEAVES, and this door is
 	# why that needs no list: every hit and every tick passes here, below every
 	# death refusal, so a hero at zero here is a hero who fell. A companion's

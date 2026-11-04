@@ -1,0 +1,39 @@
+reading	HEAD	JJ	paired JJ − HEAD
+runs	60	60	
+completed	4	3	-0.017 ± 0.029
+fights won a run	17.17	16.62	-0.55 ± 0.59
+falls a run	6.27	6.47	+0.20 ± 0.32
+falls a run, in the fights it won	2.50	2.67	+0.17 ± 0.30
+falls a run, in the fight that ended it	3.77	3.80	+0.03 ± 0.12
+paired fights (same node, in order)	999	999	60 of 60 runs on one road throughout
+health at a fight's end, paired fights	0.8279	0.8187	-1.03 ± 0.54 points
+falls a fight, paired fights	0.295	0.343	+0.065 ± 0.026
+  falls a fight, the paired fights both arms won			+0.015 ± 0.010
+  health at a fight's end, the paired fights both arms won			-0.28 ± 0.32 points
+  hero turns a fight, the paired fights both arms won			-0.17 ± 0.17
+  paired fights holding a loss			33 lost by both arms, 17 by JJ alone, 8 by JI alone; their share of the falls a fight +0.052 ± 0.023
+hero turns a fight, paired fights	33.36	32.93	-0.42 ± 0.22
+the first fight: health at its end	0.9367	0.9379	+0.11 ± 0.23 points (60 of 60 the same node)
+the first fight: falls	0.000	0.000	+0.000 ± 0.000
+the first fight: hero turns	21.02	21.05	+0.03 ± 0.21
+enemy moves resolved	18395	17831	
+the warband's heals cast	346 (1.88 a hundred moves, 0.319 a fight)	306 (1.72 a hundred moves, 0.290 a fight)	
+health the warband healed a fight, all fights	18.5	13.2	-5.03 ± 1.94 (paired fights)
+the warband's heals cast a fight, paired fights			-0.034 ± 0.020
+  in the fights it opened with a healer	53.9 (372 fights)	37.9 (367 fights)	
+re-validation fallbacks	0	0	
+Malice, every fight (1054)		given 282.5, taken 157.6, wasted 124.9, spent 13.2 a fight	
+  at the cap, every fight		20.5% of turns; 87.5% of fights end there	
+Malice, fights with a healer (367)		given 285.2, taken 178.7, wasted 106.5, spent 37.9 a fight	
+  at the cap, fights with a healer		16.0% of turns; 79.6% of fights end there	
+Malice, fights with none (687)		given 281.1, taken 146.4, wasted 134.7, spent 0.0 a fight	
+  at the cap, fights with none		23.1% of turns; 91.7% of fights end there	
+a heal's place in its fight (0 first, 1 last)	0.68; 19% in the first half	0.79; 6% in the first half	
+healer turns healing, a fight's first half	66 of 1251 (5.3%)	18 of 1228 (1.5%)	
+healer turns healing, a fight's second half	280 of 1607 (17.4%)	288 of 1579 (18.2%)	
+JJ fights where healed != spent		0	of 1054
+cast: Healing Wave (Orc Totemist)	147	130	
+cast: Healing Wave (Orc Shaman)	107	109	
+cast: Dark Vigil (Grave Totem)	52	32	
+cast: Wild Growth (Withered Warden)	39	28	
+cast: Regenerate (Bog Troll)	1	7	
