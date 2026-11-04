@@ -2801,6 +2801,7 @@ func _on_debug_menu(id: int) -> void:
 			for u2 in heroes + companions + enemies:
 				u2.cooldowns.clear()
 				u2.unrelenting_cd = 0
+				u2.sync_cooldown_chip()
 		_log("DEBUG: cooldowns %s" % ("OFF" if debug_cooldowns_off else "back on"),
 			"#e0a050")
 		if current_hero != null and not current_hero.dead and action_panel.visible:
@@ -3960,7 +3961,7 @@ func _run_battle() -> void:
 			# The unit re-declares for its next turn straight afterwards, so the
 			# player is never left reading a blank plate.
 			_discard_intent(u, "stunned")
-			_declare_intent(u)
+			_declare_intent(u, 2)
 			# A lost turn still counts: other status timers and cooldowns tick.
 			u.tick_statuses()
 			u.tick_cooldowns()
@@ -3983,7 +3984,7 @@ func _run_battle() -> void:
 			# again — _hold_sync closes the hold on the next pass) and any
 			# freeze reached with no Cryomancer standing.
 			_discard_intent(u, "frozen")
-			_declare_intent(u)
+			_declare_intent(u, 2)
 			u.tick_statuses()
 			u.tick_cooldowns()
 			await _wait(0.8)
@@ -8653,7 +8654,10 @@ func _intent_detail(u: BattleUnit, ab: Ability, category: String) -> String:
 # One declaration. Called at battle start for every enemy and at the END of
 # every enemy turn — including turns that were lost, so a stunned enemy still
 # tells the player what it means to do next.
-func _declare_intent(u: BattleUnit) -> void:
+# BATCH JI §1 — `ticks_ahead` is how many of the unit's own cooldown ticks fall
+# between this choice and the turn the move resolves on: one from the end of a
+# turn, TWO from a stunned or frozen branch, which declares before its own tick.
+func _declare_intent(u: BattleUnit, ticks_ahead := 1) -> void:
 	if u == null or not is_instance_valid(u) or u.dead or u.is_hero:
 		return
 	# A CHARGING ENEMY HAS ALREADY DECLARED. This is the line that makes a
@@ -8667,13 +8671,13 @@ func _declare_intent(u: BattleUnit) -> void:
 		u.intent = {}
 		_refresh_intent_plate(u)
 		return
-	var chosen := _choose_enemy_action(u)
+	var chosen := _choose_enemy_action(u, ticks_ahead)
 	if chosen.is_empty():
 		u.intent = {}
 		_refresh_intent_plate(u)
 		return
 	# BATCH IO §1 — THE LONG SILENCE TELLS THE TRUTH A TURN AHEAD. The selection is BL §1's,
-	# untouched; a choice the Silence would refuse at re-validation is declared as the basic
+	# its policy untouched; a choice the Silence would refuse at re-validation is declared as the basic
 	# attack it will fall back to, at the hero it chose — or, for a support cast, the most
 	# wounded hero (no die spent) — so the telegraph never shows a move the enemy can no longer make.
 	if u.silenced(chosen["ability"] as Ability):
@@ -8747,7 +8751,7 @@ func _revalidate_intent(u: BattleUnit) -> Dictionary:
 	if decl.is_empty():
 		# Nothing was declared (battle-start edge, or the selection found no
 		# affordable attack a turn ago). Choose now rather than skip the turn.
-		decl = _choose_enemy_action(u)
+		decl = _choose_enemy_action(u, 0)
 		if decl.is_empty():
 			return {}
 	var ab: Ability = decl.get("ability")
@@ -8791,9 +8795,10 @@ func _revalidate_intent(u: BattleUnit) -> Dictionary:
 
 
 # An enemy's ability is unusable when it can no longer be paid for, when a
-# cooldown is running (enemies do not start cooldowns today — checked anyway so
-# an enemy that gains one cannot silently break the promise), or when the kit
-# it belongs to no longer holds it.
+# cooldown is running, or when the kit it belongs to no longer holds it.
+# BATCH JI §1 — ENEMIES START COOLDOWNS NOW (eleven abilities carry one), and the
+# selection asks the same counter a turn ahead (`_enemy_ready`), so a declared move
+# is never one that will still be cooling: this branch is the backstop.
 func _intent_ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	if not u.abilities.has(ab):
 		return false
@@ -8802,10 +8807,10 @@ func _intent_ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	if int(u.cooldowns.get(ab.display_name, 0)) > 0:
 		return false
 	# BATCH DS — HEADS DOWN (Sharpshooter draft). THE ONE CONDITION THE WHOLE
-	# CARD IS, and its position is the entire design. `_choose_enemy_action` is
-	# BYTE-UNTOUCHED: BL §1's header states that a diff which touches the rules
-	# inside it is a diff that broke the promise, so the enemy still SELECTS
-	# freely a turn ahead and the suppression lands here, at re-validation,
+	# CARD IS, and its position is the entire design. `_choose_enemy_action`'s
+	# POLICY is untouched (BL §1's promise; it asks only the door's price, IN §3,
+	# and its cooldown, JI §1), so the enemy still SELECTS freely a turn ahead
+	# and the suppression lands here, at re-validation,
 	# where the caller already logs "cannot bring X to bear — it falls back to
 	# Y" and already counts `intent_fallback`. A new refusal reuses a shipped
 	# announcement rather than inventing a second one.
@@ -9000,10 +9005,15 @@ func _enemy_turn(u: BattleUnit) -> void:
 # that shipped in BK, and only WHEN it runs has moved. §1 forbids an AI rewrite
 # and this function is where that promise is kept — a diff that touches the
 # rules inside it is a diff that broke the promise.
+# BATCH JI §1 — AND IT ASKS THE COOLDOWN, AS IT ASKS THE PRICE SINCE IN §3. A cooldown
+# is a rule of the door (`_intent_ability_usable` refuses a cooling move), not a
+# policy: the choice reads which moves will be ready when it resolves
+# (`_enemy_ready`, `ticks_ahead` of the unit's own turns away), and picks among them
+# exactly as it always did. Nothing about WHICH ready move it prefers moved.
 #
 # Returns {} when there is nothing to declare (no living heroes, no affordable
 # attack); resolution treats that as "fall back to the basic attack".
-func _choose_enemy_action(u: BattleUnit) -> Dictionary:
+func _choose_enemy_action(u: BattleUnit, ticks_ahead := 1) -> Dictionary:
 	var living := _hero_side()
 	if living.is_empty():
 		return {}
@@ -9031,7 +9041,7 @@ func _choose_enemy_action(u: BattleUnit) -> Dictionary:
 			is_mocked = true
 	# Support behaviors (Shielding, Wild Growth) — a taunt forces attacking instead.
 	if not is_mocked:
-		var support := _enemy_support_action(u)
+		var support := _enemy_support_action(u, ticks_ahead)
 		if not support.is_empty():
 			return {"ability": support[0], "target": support[1], "support": true,
 				"message": "", "logs": []}
@@ -9042,7 +9052,8 @@ func _choose_enemy_action(u: BattleUnit) -> Dictionary:
 	# Only damaging, off-cooldown abilities count as attacks; support casts
 	# are chosen above.
 	var affordable: Array = u.abilities.filter(
-		func(a): return _eff_cost(u, a) <= u.resource and a.damage > 0)
+		func(a): return (_eff_cost(u, a) <= u.resource and a.damage > 0
+			and _enemy_ready(u, a, ticks_ahead)))
 	# BATCH BL §1: the ONE genuinely new line in this function. Selection used
 	# to run at the instant of acting, where every enemy in the roster has at
 	# least one free attack and the list could not be empty; a declaration made
@@ -9132,15 +9143,33 @@ func _threat_pick(pool: Array) -> BattleUnit:
 	return pool.back()
 
 
+# BATCH JI §1 — AN ENEMY's MOVE IS READY WHEN ITS COOLDOWN WILL HAVE RUN OUT BY THE
+# TURN IT RESOLVES ON. The counter ticks at the start of each of the unit's own
+# turns (`BattleUnit.tick_cooldowns`, from the turn loop), and `start_cooldown` sets
+# it one past the cooldown, so a move used on a turn is refused for exactly its
+# cooldown of the unit's turns after it — the heroes' arithmetic. A choice made
+# `ticks_ahead` ticks before its turn reads the counter that many ticks early.
+func _enemy_ready(u: BattleUnit, ab: Ability, ticks_ahead := 1) -> bool:
+	return int(u.cooldowns.get(ab.display_name, 0)) <= ticks_ahead
+
+
+# The support half's lookup: the ability by name, or null while it is cooling.
+func _find_ready(u: BattleUnit, ability_name: String, ticks_ahead := 1) -> Ability:
+	var ab := _find_ability(u, ability_name)
+	return ab if ab != null and _enemy_ready(u, ab, ticks_ahead) else null
+
+
 # Non-attack decisions for enemies with support abilities. Returns
 # [ability, ally_target], or [] to fall through to a normal attack.
-func _enemy_support_action(u: BattleUnit) -> Array:
+func _enemy_support_action(u: BattleUnit, ticks_ahead := 1) -> Array:
 	var allies: Array = enemies.filter(func(e): return not e.dead)
-	# (Enemies don't use cooldowns — their support casts are gated by the
-	# conditions below and by resources alone.)
+	# BATCH JI §1 — a support cast is gated by the conditions below, by resources,
+	# and by its cooldown where the data gives it one (Healing Wave on the Totemist,
+	# Regenerate, Dark Vigil): a cooling cast is passed by, as a condition that does
+	# not hold is, and the turn falls through to an attack.
 	# Shaman: Healing Wave the most wounded ally under 40% health —
 	# friendly tanks and healers first.
-	var wave := _find_ability(u, "Healing Wave")
+	var wave := _find_ready(u, "Healing Wave", ticks_ahead)
 	if wave != null:
 		var hurt: Array = allies.filter(func(a): return a.hp < a.max_hp * 0.40)
 		if not hurt.is_empty():
@@ -9149,16 +9178,16 @@ func _enemy_support_action(u: BattleUnit) -> Array:
 			return [wave, _lowest_hp(prio if not prio.is_empty() else hurt)]
 	# Bog Troll: knits its own flesh back together when bloodied (same
 	# healing-wave machinery, self-targeted).
-	var regen := _find_ability(u, "Regenerate")
+	var regen := _find_ready(u, "Regenerate", ticks_ahead)
 	if regen != null and u.hp < u.max_hp * 0.5:
 		return [regen, u]
 	# Ritual Chanter: sweeps the warband's afflictions whenever any ally
 	# carries one worth stripping (sticky poisons and meters don't count).
-	var rite := _find_ability(u, "Cleansing Rite")
+	var rite := _find_ready(u, "Cleansing Rite", ticks_ahead)
 	if rite != null and allies.any(func(a): return not _cleansable_debuffs(a).is_empty()):
 		return [rite, u]
 	# Shieldmaster: always keeps exactly one ally Shielded (lowest HP first).
-	var shield_ab := _find_ability(u, "Shielding")
+	var shield_ab := _find_ready(u, "Shielding", ticks_ahead)
 	if shield_ab != null \
 			and not allies.any(func(a): return a.has_status("shielded")):
 		return [shield_ab, _lowest_hp(allies)]
@@ -9183,18 +9212,18 @@ func _enemy_support_action(u: BattleUnit) -> Array:
 	# instead of attacking, and the ward runs 3 turns, so the Crown is trading
 	# roughly one turn in four for 25% less damage taken. A taunt still forces
 	# it to attack, and a Dispel still strips the ward.
-	var regalia := _find_ability(u, "Regalia")
+	var regalia := _find_ready(u, "Regalia", ticks_ahead)
 	if regalia != null and not u.has_status("shielded"):
 		return [regalia, u]
 	# Withered Warden: tends the most wounded of its warband (itself included).
-	var growth := _find_ability(u, "Wild Growth")
+	var growth := _find_ready(u, "Wild Growth", ticks_ahead)
 	if growth != null:
 		var wounded: Array = allies.filter(func(a): return a.hp < a.max_hp * 0.7)
 		if not wounded.is_empty() and randf() < 0.6:
 			return [growth, _lowest_hp(wounded)]
 	# Grave Totem: pulses while the chip damage adds up — two or more
 	# wounded bodies make the vigil worth the turn.
-	var vigil := _find_ability(u, "Dark Vigil")
+	var vigil := _find_ready(u, "Dark Vigil", ticks_ahead)
 	if vigil != null:
 		var nicked: Array = allies.filter(func(a): return a.hp < a.max_hp)
 		if nicked.size() >= 2:
@@ -18662,6 +18691,9 @@ func _psychotic_support(u: BattleUnit) -> Array:
 			continue
 		# BATCH IO §1 — a Psychosis turn's support pick asks the Long Silence too: a spent ability is not re-used.
 		if u.silenced(a):
+			continue
+		# BATCH JI §1 — and its cooldown: the pick resolves this turn, after the tick.
+		if not _enemy_ready(u, a, 0):
 			continue
 		match a.special:
 			"healing_wave", "wild_growth", "totem_pulse", "cleanse_allies":

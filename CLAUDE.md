@@ -1804,8 +1804,9 @@ decision and the STRUCTURE is what shipped.
   difficulty slider with a measured price, which is an honest thing to deal. **A card that *reads* as binding both sides and binds one is
   the same defect as a modifier named for the opposite of what it does**, so a modifier's words are read against what it does in the batch
   that authors it, and **what the deck promises is that every modifier in it costs the party, and that the severity says how much.** The
-  reason is JA's census: the warband has no turn-start drip, no cooldown on any of its 50 abilities and two Rage bars against the party's
-  whole resource, so no re-cut of a card fixes that; only rebuilding the warband would, and that is not a bargain's to do. AQ named *no items
+  reason is JA's census, which found the warband with no turn-start drip, no cooldown on any of its 50 abilities and two Rage bars against
+  the party's whole resource, so no re-cut of a card fixes that; only rebuilding the warband would, and that is not a bargain's to do.
+  Eleven of its moves cool now (JI §1), so Encumbered lengthens them as it does the party's; the drip and the two Rage bars stand. AQ named *no items
   this fight* as deliberately not authored; IN built it as Famine, and IO removed it and Cruel Order (enemies carry no pouch; *both sides
   first* is incoherent) — **removed, not disabled**, their built shape and IN's measurements kept in `docs/design-notes.md`, where a batch
   reads them before it authors a rule either resembles (Ambushed, at JB, is Cruel Order's neighbour and was built fresh).
@@ -1843,7 +1844,7 @@ decision and the STRUCTURE is what shipped.
   status door and the resource doors) and added before the rule is. **Three rules cost a batch each to learn this — the Hungering
   Dark, Tinderbox and Dull Edge — and the census makes it a measurement.** **A share says whom a rule touches, which is the subject of JB §0.2's
   rule, and it can price a rule before the code exists (JB §3 graded two such prices)**; a quantity the warband produces none of (the
-  turn-start drip, cooldowns) binds the party alone however the words read. **A CENSUS PRICES THE GROSS, AND THE COST IS THE GROSS AFTER THE PARTY's HEALING — SO DIVIDE BY ABOUT TWO AND A HALF. READ THE GROSS ON THE
+  turn-start drip; cooldowns until JI gave eleven of its moves one) binds the party alone however the words read. **A CENSUS PRICES THE GROSS, AND THE COST IS THE GROSS AFTER THE PARTY's HEALING — SO DIVIDE BY ABOUT TWO AND A HALF. READ THE GROSS ON THE
   POPULATION THE CARD ACTS ON, NOT ON EVERY FIGHT, AND CHECK A MULTIPLIER ON A CAPACITY AGAINST WHAT THAT CAPACITY ABSORBS (JC §0.3, the designer's).**
   Corrected for both, Ambushed at 8 grossed 18.4 points and read 6.67, at 9, 20.7 and 9.03, and Porous at 0.4, 4.8 and 2.09: 2.76, 2.29 and
   2.30. **Three readings behind one divisor, so it is written to be tested, not believed**, and it has an edge already: at 11 Ambushed read

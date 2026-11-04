@@ -4,6 +4,18 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The warband gets cooldowns (Batch JI) — 2026-11-03
+
+**Why the line is the enemy's own basic.** A move's weight only means something against what the same enemy does when it does nothing special. A 40-damage blow is an Orc Brute's basic and a big move for an Orc Whelp, whose own basic deals 26, so each move is priced against its own enemy's basic attack. A heal is priced at the health it restores, so a big heal waits as long as a big blow does.
+
+**Why 1.4 and not 1.5.** Two moves stood just under 1.5, Reckless Lunge and Tyrant's Verdict, and the next move down, Wretched Bellow, stood at 1.37. A line drawn in the gap names the moves that are plainly bigger than a basic and stops before the ones that are only a little bigger. The gap is narrow: a companion on the field lets the Bellow's area blow reach five, which would lift it past the line, so the rule prices the four heroes.
+
+**Why the selection skips a cooling move instead of swapping it for the basic.** Swapping would make the basic the answer every time a big move was cooling, even when another ready move was the better pick. Skipping keeps the choice among the moves that are ready, as it was before, with one more reason a door is closed.
+
+**Why a chip on the plate.** The plate is where the player reads an enemy, and a cooldown is only useful to a player who can see it. The chip shows the fewest turns until a move is back; its hover names each move.
+
+**Why Encumbered was left alone.** It already read every unit on the field, so the warband's new cooldowns made it two-sided with no change to the card. Its grade is a sim figure taken before, and a card re-read while the warband is still changing would be read again two batches later.
+
 ## The rising shape, and both ceilings (Batch JH) — 2026-11-03
 
 **Why two core runes on every hero.** A condition true of every party reads no choice, and one true of a single party is a lottery ticket for the rest. Two cores on every hero who stands is a thing every party can build toward, and the longer a run goes the more of it there is, so the rune is the payoff the pool did not have.

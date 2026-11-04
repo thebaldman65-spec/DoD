@@ -3969,6 +3969,7 @@ func tick_cooldowns() -> void:
 			if not ec.is_empty():
 				ec.turns = enraged_timer
 				_refresh_chips()
+	sync_cooldown_chip()
 
 
 func ability_ready(ab: Ability) -> bool:
@@ -3995,6 +3996,34 @@ func cooldown_left(ab: Ability) -> int:
 func start_cooldown(ab: Ability) -> void:
 	if ab.cooldown > 0:
 		cooldowns[ab.display_name] = ab.cooldown + 1
+		sync_cooldown_chip()
+
+
+# BATCH JI §1 — AN ENEMY's COOLDOWN, ON ITS PLATE: one display chip, `CD` and the
+# fewest of its own turns until a cooling move is back, its hover naming each move.
+# Written at the two doors that move the counter (`start_cooldown`, `tick_cooldowns`)
+# and by the debug clear, every writer of an enemy's counter today, so it never shows
+# a clock the counter has moved past; a card that writes one any other way owes it a
+# sync (every other writer is a hero's, and returns below). A hero's cooldowns are on
+# the action buttons, so a hero has no chip. The counter is the turn the move is back on:
+# set one past the cooldown, it reads 1 the turn before the move returns.
+func sync_cooldown_chip() -> void:
+	if is_hero or is_companion:
+		return
+	var soonest := 0
+	var lines := PackedStringArray()
+	for ab in abilities:
+		var left := int(cooldowns.get(ab.display_name, 0))
+		if left <= 0:
+			continue
+		soonest = left if soonest == 0 else mini(soonest, left)
+		lines.append("%s: back on its next turn" % ab.display_name if left == 1
+			else "%s: back in %d of its turns" % [ab.display_name, left])
+	if soonest == 0:
+		remove_display_chip("cooldown")
+		return
+	set_display_chip("cooldown", "Cooldown", "CD%d" % soonest, Color(0.62, 0.68, 0.82),
+		"\n".join(lines))
 
 
 # BATCH IZ §4 — LEADEN's FLOOR: a speed a flat amount moves never falls under a tenth of the unit's own, the deepest

@@ -1,0 +1,29 @@
+reading	HEAD	JI	paired JI − HEAD
+runs	60	60	
+completed	3	4	+0.017 ± 0.029
+fights won a run	17.47	17.17	-0.30 ± 0.68
+falls a run	7.30	6.27	-1.03 ± 0.41
+falls a run, in the fights it won	3.48	2.50	-0.98 ± 0.39
+falls a run, in the fight that ended it	3.82	3.77	-0.05 ± 0.12
+paired fights (same node, in order)	987	987	58 of 60 runs on one road throughout
+health at a fight's end, paired fights	0.8211	0.8279	+0.62 ± 0.87 points
+falls a fight, paired fights	0.325	0.288	-0.043 ± 0.037
+hero turns a fight, paired fights			-0.17 ± 0.28
+the first fight: health at its end	0.9381	0.9367	-0.13 ± 0.11 points (60 of 60 the same node)
+the first fight: falls	0.000	0.000	+0.000 ± 0.000
+the first fight: hero turns	20.88	21.02	+0.13 ± 0.10
+enemy moves resolved	18824	18395	
+of them one of the eleven	1964 (10.4 a hundred, 1.78 a fight)	1261 (6.9 a hundred, 1.16 a fight)	
+re-validation fallbacks	0	0	
+enemy moves from the kinds that own one of the eleven	6268 (33.3 a hundred)	6252 (34.0 a hundred)	9 kinds
+of an owner's moves, one of the eleven	31.3 a hundred	20.2 a hundred	
+cast: Reckless Lunge	1199	705	
+cast: Heavy Strike	236	208	
+cast: Healing Wave (the Totemist's)	233	147	
+cast: Dark Vigil	102	52	
+cast: Roots of Wrath	90	57	
+cast: Tyrant's Verdict	41	39	
+cast: Siege Stone	32	28	
+cast: Immolating Wave	23	19	
+cast: Hollow Wail	4	5	
+cast: Regenerate	4	1	

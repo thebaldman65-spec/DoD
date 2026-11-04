@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-11-03 (Batch JH &mdash; the rising shape, and both ceilings)</b></p>
+<p align="right"><b>Last updated: 2026-11-03 (Batch JI &mdash; the warband gets cooldowns)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -701,8 +701,8 @@ effects that say "Adjacent" (Ursus's sweep) hit at most those two enemies.</li>
 <li><b>Cooldown (keyword, "cd"):</b> the number of the user's turns before the same ability
 can be used again — "6cd" means unusable for 6 turns after use. Typical bands: basics 0,
 light hits 1–2, heavies/AoE 2–5, Resurrection 3. The remaining cooldown
-shows on the ability button ("CD n") and in its tooltip. <b>Enemies do not use cooldowns at
-all</b> — their kits are gated by resources and AI conditions instead.</li>
+shows on the ability button ("CD n") and in its tooltip. <b>An enemy's biggest moves cool too</b>, in
+its own turns, and its plate's <b>CD</b> chip shows it (&sect;9).</li>
 <li><b>Buff / Debuff (keywords):</b> a DEBUFF is any negative status effect, a BUFF any
 positive one. The talent that counts debuffs (the tree's Iron Will)
 uses this classification &mdash; and <b>Broken</b>, the Break meter's state rather than an affliction
@@ -778,7 +778,7 @@ amounts. Resistance comes from <b>Constitution</b>: incoming BD is scaled by
 raised by relics. When the meter fills, the unit
 <b>BREAKS</b>: it loses its next
 turn, armor ×0.7, +25% crit chance against it, and enemies actively exploit Broken heroes with
-their hardest affordable attack. <b>Bosses cannot be Stunned unless Broken</b> (stuns fizzle
+their hardest affordable attack that is not cooling. <b>Bosses cannot be Stunned unless Broken</b> (stuns fizzle
 with an IMMUNE flag). Breaking triggers hitstop, a purple fracture flash, and a camera punch.
 After the lost turn, the Break meter resets to 0. Ward halves incoming BD; the talent tree's
 We Do Not Break node cuts it 20% for every hero; Bulwark of Fortitude negates it entirely.</p>
@@ -1062,13 +1062,14 @@ per win.</p>
 <h3>4.8 Enemy AI</h3>
 <p>Enemies hunt the most wounded hero 40% of the time and pick randomly otherwise; if any
 hero is Broken they exploit it
-with their hardest affordable hit. Mocked enemies must attack the taunting Warrior — a taunt
+with their hardest affordable hit that is not cooling. Mocked enemies must attack the taunting Warrior — a taunt
 also overrides support casts. <b>Support behaviors run before attacks:</b> the Orc Shaman
 casts Healing Wave on the most wounded of its warband under 40% HP (friendly tanks and supports
 first); the Orc Shieldmaster ALWAYS casts Shielding when no ally carries its ward
 (lowest-HP ally first, itself included); the Withered Warden has a 60% chance to cast Wild
 Growth on the most wounded of its warband (itself included) when someone is below 70% HP.
-The Chief and the Ash-Wrought Tyrant build and spend Rage like a Warrior.</p>
+The Chief and the Ash-Wrought Tyrant build and spend Rage like a Warrior. <b>A move still cooling when its turn
+comes is never chosen</b> (&sect;9).</p>
 <h3>4.9 Enemy intent</h3>
 <p><b>Every enemy shows what it is about to do.</b> A fight is a planning puzzle rather than a
 guessing game: the twelve spines that were authored around denial, patience and control —
@@ -3054,6 +3055,14 @@ an enemy is a data edit that automatically enrolls it in every theme wanting its
 Role-based Attack matches heroes — <b>Damage 100 (the Hollow Crown 115) / Tank 75 (the Withered Warden 100) / Support 50</b> — and ability
 damage is a % of it. <i>Art note: all kinds still share the orc sheet (tint + scale only),
 so new enemies read as tinted orcs until per-kind art lands — a known, accepted limit.</i></p>
+<p><b>An enemy's biggest moves wait between uses.</b> A move worth 1.4 times its own basic attack or more &mdash;
+counting every hero an area blow reaches and the Burn or Poison it lays, and a heal at the health it restores &mdash;
+takes a cooldown of that enemy's own turns, longer the bigger it is: the Orc Whelp's Reckless Lunge, the Orc Totemist's
+Healing Wave, the Bog Troll's Regenerate, the Orc Chief's Heavy Strike, the Withered Warden's Roots of Wrath, the
+Ash-Wrought Tyrant's Immolating Wave and Tyrant's Verdict, the Ash Hurler's Siege Stone, the Grave Totem's Dark Vigil, and
+the Hollow Crown's Hollow Wail and The Long Dark. A basic attack never cools, so every enemy always has a move. An enemy
+never declares a move that will still be cooling when its turn comes, and while one cools its plate carries a <b>CD</b>
+chip: the fewest of its own turns until a move is back, its hover naming each. Encumbered binds these too.</p>
 <table border="1" cellpadding="4">
 <tr><th>Enemy</th><th>Pw</th><th>Roles</th><th>Zones</th><th>HP</th><th>Kit sketch</th></tr>
 <tr><td>Orc Raider</td><td>1</td><td>skirmisher</td><td>1·2·3</td><td>140</td><td>Slash;

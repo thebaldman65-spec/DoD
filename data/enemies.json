@@ -84,6 +84,7 @@
    },
    {
     "display_name": "Reckless Lunge",
+    "cooldown": 2,
     "damage": 38,
     "pressure": 20,
     "delay": 2.5,
@@ -171,6 +172,7 @@
    },
    {
     "display_name": "Healing Wave",
+    "cooldown": 3,
     "special": "healing_wave",
     "delay": 2.5,
     "anim": "attack02",
@@ -582,6 +584,7 @@
    },
    {
     "display_name": "Regenerate",
+    "cooldown": 3,
     "special": "healing_wave",
     "delay": 2.5,
     "anim": "attack02",
@@ -686,6 +689,7 @@
    },
    {
     "display_name": "Heavy Strike",
+    "cooldown": 2,
     "cost": 30,
     "damage": 54,
     "pressure": 40,
@@ -745,6 +749,7 @@
    },
    {
     "display_name": "Roots of Wrath",
+    "cooldown": 3,
     "damage": 25,
     "pressure": 20,
     "delay": 3.5,
@@ -809,6 +814,7 @@
    },
    {
     "display_name": "Immolating Wave",
+    "cooldown": 4,
     "dmg_type": "fire",
     "cost": 30,
     "damage": 18,
@@ -824,6 +830,7 @@
    },
    {
     "display_name": "Tyrant's Verdict",
+    "cooldown": 2,
     "dmg_type": "fire",
     "cost": 20,
     "damage": 44,
@@ -926,6 +933,7 @@
    },
    {
     "display_name": "Siege Stone",
+    "cooldown": 4,
     "special": "windup",
     "damage": 70,
     "pressure": 45,
@@ -1031,6 +1039,7 @@
    },
    {
     "display_name": "Dark Vigil",
+    "cooldown": 4,
     "special": "totem_pulse",
     "delay": 2.5,
     "anim": "attack02",
@@ -1081,6 +1090,7 @@
    },
    {
     "display_name": "Hollow Wail",
+    "cooldown": 2,
     "damage": 20,
     "pressure": 22,
     "delay": 3.5,
@@ -1117,6 +1127,7 @@
    },
    {
     "display_name": "The Long Dark",
+    "cooldown": 4,
     "rung": 3,
     "damage": 30,
     "pressure": 26,

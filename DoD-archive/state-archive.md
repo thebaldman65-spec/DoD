@@ -17,6 +17,15 @@ heading stands in both files. **Since JE §3 it also takes what `CLAUDE.md` clos
 
 ---
 
+## ARCHIVED AT JI — 2026-11-03, FROM `docs/state.md` AS JH LEFT IT (`141b0be`)
+
+*One item, closed by JI §1: eleven of the warband's moves carry a cooldown now.*
+
+### FOUND AT JA AND NOT FIXED — ITS CLOSED ITEM (archived at JI; the block stays in `docs/state.md`)
+
+- **A CARRIED ITEM NAMES ENEMY COOLDOWNS, AND NO ENEMY HAS ONE** (JA's close-read): *Named by the designer, carried from CX* still lists *the enemy debuffs whose duration exceeds their own cooldown*, while none of the 50 abilities in `data/enemies.json` sets a `cooldown` — the loader reads the key and no row writes it — and the census read 0 warband cooldown turns over 2,217 fights. The item predates JA and may mean how often an enemy re-casts; JA left it standing and read Encumbered off the data.
+
+
 ## ARCHIVED AT JH — 2026-11-03, FROM `docs/state.md` AND `CLAUDE.md` AS JG LEFT THEM (`c5c0adf`)
 
 *From the state: what JH's brief answered, word for word; the four units JH §3 named, by HX §2's method (`docs/reports/JH-cut.tsv` names each and what closed it); and what the re-key closed of the crest pool and of FOUND AT JG. From `CLAUDE.md`, below them: three closed blocks, byte for byte.*

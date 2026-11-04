@@ -99,6 +99,29 @@ NOT BE WRITTEN**; an ability obeys this rule by not passing `force`.
 **DECLARE ON SCHEDULE, RESOLVE ON TURN.** `_choose_enemy_action` is the SELECTION half lifted out
 of `_enemy_turn` **byte-for-byte** — only *when* it runs moved, and a diff touching the rules
 inside it breaks that promise.
+· **THE PROMISE BINDS THE POLICY, AND THE SELECTION ASKS THE DOOR's COOLDOWN AS IT ASKS ITS PRICE (JI §1).** Which move it
+  prefers and at whom is the policy and does not move; a refusal the door makes is a rule, and IN §3 put the door's price
+  in the selection (`_eff_cost`). **A cooldown is the same kind of thing**: `_intent_ability_usable` refuses a cooling move,
+  so the choice reads the counter as it will stand on the turn the move resolves (`battle._enemy_ready`, the unit's own
+  ticks `ticks_ahead` away — one from the end of a turn, two from a stunned or frozen branch, which declares before its own
+  tick, none at re-validation, which chooses after it), the support half (`_enemy_support_action`) the same. **So the
+  telegraph never shows a move that will still be cooling**, and re-validation has no cooldown to fall back from. **A cooldown
+  ticks in the unit's own turns** — `BattleUnit.tick_cooldowns`, at its turn's start on all three of the loop's paths — and
+  `start_cooldown` sets it one past the figure, so a move is refused for exactly its cooldown of the unit's turns after it;
+  a held enemy, off the timeline, ticks none. **While one cools, its plate carries a `CD` chip** (`BattleUnit.sync_cooldown_chip`,
+  written at the two doors that move the counter and by the debug clear): the fewest of its turns until a move is back, its hover
+  naming each. A card that writes an enemy's counter any other way owes the chip a sync.
+· **AN ENEMY MOVE WORTH 1.4 TIMES ITS OWN BASIC ATTACK OR MORE TAKES A COOLDOWN, AND A BASIC NEVER DOES (JI §1, the brief's
+  rule; its line, *about 1.5x*, moved to the gap below it).** A basic is its kind's first free damaging move, `_cheapest_attack`'s —
+  the move the Long Silence spares and re-validation falls back to. The price is what one cast does: a blow's damage and the
+  Burn or Poison it lays (`DOT_STATUSES`' share a tick, times its ticks — a Burn's turns, a Poison's one fewer, since it skips
+  the turn it lands — and its chance), times the heroes it reaches (four for an area blow; a companion standing is not
+  counted); a heal at the health it restores, on the median composable body or the caster's own for a self-heal, a
+  whole-warband heal on four bodies, the basic turned to health at the enemy's own Attack. A ward and a cleanse are not
+  priced. **The figure is 2 under 2x, 3 under 3x and 4 past it**, in the enemy's own turns. A move a resource already bounds
+  takes one too — DU §1's *priced twice* is weighed and set aside (JI's RULINGS OWED 3). `check_ji` §1a derives the
+  population off the data every battery and reds on a move the rule and the data disagree about, so **a new enemy move is
+  priced in the batch that authors it** and its key written with it; a designer's hand-tune of one move goes in its `TUNED`.
 · **Declaration**: `_declare_intent(u)`, called from `_declare_all_intents()` at battle start
   (after the opening oath/Faith hooks, which move state the policy reads), from the turn loop
   **right after** `await _enemy_turn(u)` — **NOT from the bottom of `_enemy_turn`**, which returns
@@ -148,8 +171,8 @@ maths.**
 · **STATE-SENSITIVE POLICIES NOW READ THE BOARD ONE TURN EARLIER**, reported and corrected
   nowhere: `_enemy_support_action`'s thresholds, the Broken-hero exploit (the most sensitive — a
   Break window is short and a declaration made before it opens will not take it), `_lowest_hp` /
-  `_threat_pick`, the taunt narrowing and the presence rolls. **Selection logic itself is
-  untouched; an AI rewrite is out of scope.**
+  `_threat_pick`, the taunt narrowing and the presence rolls. **The selection's policy is
+  untouched — the door's refusals it asks are rules (its price, IN §3; its cooldown, JI §1); an AI rewrite is out of scope.**
 
 ## STANDING REFERENCE — THE RECAP LEDGERS AND THEIR BOUND (Batch BL §2)
 **DAMAGE TAKEN HANGS OFF ONE DOOR: `BattleUnit.damage_taken_cb`**, fired by `_report_taken` from

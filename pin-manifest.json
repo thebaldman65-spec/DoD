@@ -2,18 +2,18 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 2288,
-  "source": 1441,
-  "other": 273,
-  "document": 574
+  "total": 2303,
+  "source": 1444,
+  "other": 281,
+  "document": 578
  },
  "floor": {
-  "pins": 2288
+  "pins": 2303
  },
  "falls": [],
  "source_residency": {
   "narrow": 49,
-  "code": 888,
+  "code": 891,
   "absent": 330,
   "runtime": 109,
   "unresolved": 6,
@@ -12044,6 +12044,176 @@
    "k": "literal",
    "how": "read",
    "g": "check_jh.gd#558"
+  },
+  {
+   "s": "check_ji.gd",
+   "fn": "_block",
+   "h": "docs/state.md",
+   "n": "\n",
+   "p": "+",
+   "r": "runtime",
+   "k": "composed",
+   "how": "param",
+   "g": "check_ji.gd#70"
+  },
+  {
+   "s": "check_ji.gd",
+   "fn": "_block",
+   "h": "docs/state.md",
+   "n": "\n#",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "param",
+   "g": "check_ji.gd#74"
+  },
+  {
+   "s": "check_ji.gd",
+   "fn": "_s1b_the_tick",
+   "h": "scripts/battle.gd",
+   "n": "tick_cooldowns()",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ji.gd#236"
+  },
+  {
+   "s": "check_ji.gd",
+   "fn": "_s1c_the_callers",
+   "h": "scripts/battle.gd",
+   "n": "func _declare_intent(u: BattleUnit, ticks_ahead := 1) -> void:",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ji.gd#338"
+  },
+  {
+   "s": "check_ji.gd",
+   "fn": "_s1e_the_plate",
+   "h": "scripts/unit.gd",
+   "n": "set_display_chip(\"cooldown\"",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ji.gd#409"
+  },
+  {
+   "s": "check_ji.gd",
+   "fn": "_s1f_the_texts",
+   "h": "docs/master.html",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ji.gd#448",
+   "expr": "MASTER_NEEDLE"
+  },
+  {
+   "s": "check_ji.gd",
+   "fn": "_s1f_the_texts",
+   "h": "docs/master.html",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "derived",
+   "g": "check_ji.gd#456",
+   "expr": "String"
+  },
+  {
+   "s": "check_ji.gd",
+   "fn": "_s1f_the_texts",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "derived",
+   "g": "check_ji.gd#482",
+   "expr": "nm"
+  },
+  {
+   "s": "check_ji.gd",
+   "fn": "_s1f_the_texts",
+   "h": "docs/master.html",
+   "n": "%s times its own basic attack",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "derived",
+   "g": "check_ji.gd#453"
+  },
+  {
+   "s": "check_ji.gd",
+   "fn": "_s1f_the_texts",
+   "h": "docs/state.md",
+   "n": "(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_ji.gd#485"
+  },
+  {
+   "s": "check_ji.gd",
+   "fn": "_s1f_the_texts",
+   "h": "docs/state.md",
+   "n": "**The eleven**",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ji.gd#475"
+  },
+  {
+   "s": "check_ji.gd",
+   "fn": "_s1f_the_texts",
+   "h": "docs/state.md",
+   "n": "**the line under them**",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ji.gd#476"
+  },
+  {
+   "s": "check_ji.gd",
+   "fn": "_s1f_the_texts",
+   "h": "docs/master.html",
+   "n": "</p>",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_ji.gd#452"
+  },
+  {
+   "s": "check_ji.gd",
+   "fn": "_s3_the_before_figure",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ji.gd#533",
+   "expr": "pair"
+  },
+  {
+   "s": "check_ji.gd",
+   "fn": "_s3_the_before_figure",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_ji.gd#535",
+   "expr": "String"
   },
   {
    "s": "test_batch_ah.gd",

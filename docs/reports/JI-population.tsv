@@ -1,0 +1,51 @@
+kind	ability	multiple of its basic	cooldown the rule gives	cooldown in the data	how priced	rung
+hurler	Siege Stone	9.33	4	4	a blow: 280.0 against 30.0	1
+ash_tyrant	Immolating Wave	3.68	4	4	a blow: 110.4 against 30.0	1
+grave_totem	Dark Vigil	3.40	4	4	a heal: 30.6 health against a basic of 9.0	1
+hollow_crown	The Long Dark	3.31	4	4	a blow: 152.4 against 46.0	3
+bog_troll	Regenerate	2.50	3	3	a heal: 75.0 health against a basic of 30.0	1
+totemist	Healing Wave	2.12	3	3	a heal: 31.9 health against a basic of 15.0	1
+withered_warden	Roots of Wrath	2.07	3	3	a blow: 124.0 against 60.0	1
+chief	Heavy Strike	1.93	2	2	a blow: 54.0 against 28.0	1
+hollow_crown	Hollow Wail	1.74	2	2	a blow: 80.0 against 46.0	1
+ash_tyrant	Tyrant's Verdict	1.47	2	2	a blow: 44.0 against 30.0	1
+whelp	Reckless Lunge	1.46	2	2	a blow: 38.0 against 26.0	1
+behemoth	Wretched Bellow	1.37	0	0	a blow: 56.0 against 41.0	1
+chief	Chieftain's Maul	1.21	0	0	a blow: 34.0 against 28.0	1
+archer	Poison Arrow	0.96	0	0	a blow: 20.2 against 21.0	1
+ashblade	Flame Lick	0.91	0	0	a blow: 29.2 against 32.0	1
+wolfrider	Ride-by Slash	0.78	0	0	a blow: 28.0 against 36.0	1
+hollow_crown	Sundering Decree	0.74	0	0	a blow: 34.0 against 46.0	2
+brute	Overhead Crush	0.70	0	0	a blow: 28.0 against 40.0	1
+raider	Sundering Strike	0.68	0	0	a blow: 23.0 against 34.0	1
+bloodcaller	Blood Tribute	0.67	0	0	a blow: 20.0 against 30.0	1
+bog_troll	Swampy Grasp	0.65	0	0	a blow: 26.0 against 40.0	1
+hexer	Withering Hex	0.55	0	0	a blow: 24.0 against 44.0	1
+shaman	Healing Wave	0.53	0	0	a heal: 31.9 health against a basic of 60.0	1
+slinger	Skull Crack	0.50	0	0	a blow: 12.0 against 24.0	1
+withered_warden	Wild Growth	0.42	0	0	a heal: 25.5 health against a basic of 60.0	1
+hexer	Bone Rattle	0.36	0	0	a blow: 16.0 against 44.0	1
+archer	Arrow Shot	basic	0	0	its basic	1
+ash_tyrant	Cinder Cleave	basic	0	0	its basic	1
+ashblade	Cinder Slash	basic	0	0	its basic	1
+behemoth	Rotting Fist	basic	0	0	its basic	1
+bloodcaller	Ragged Cut	basic	0	0	its basic	1
+bog_troll	Claw	basic	0	0	its basic	1
+brute	Smash	basic	0	0	its basic	1
+chanter	Warding Chant	basic	0	0	its basic	1
+chanter	Cleansing Rite	-	0	0	unpriced: a cleanse	1
+chief	Strike	basic	0	0	its basic	1
+grave_totem	Grasping Roots	basic	0	0	its basic	1
+hexer	Hex Bolt	basic	0	0	its basic	1
+hollow_crown	Crown of Thorns	basic	0	0	its basic	1
+hollow_crown	Regalia	-	0	0	unpriced: a ward	1
+hurler	Ember Lob	basic	0	0	its basic	1
+raider	Slash	basic	0	0	its basic	1
+shaman	Chain Lightning	basic	0	0	its basic	1
+shieldmaster	Strike	basic	0	0	its basic	1
+shieldmaster	Shielding	-	0	0	unpriced: a ward	1
+slinger	Stone Sling	basic	0	0	its basic	1
+totemist	Totem Jab	basic	0	0	its basic	1
+whelp	Frenzied Nip	basic	0	0	its basic	1
+withered_warden	Timber Slam	basic	0	0	its basic	1
+wolfrider	Lunging Bite	basic	0	0	its basic	1
