@@ -228,9 +228,9 @@ const GROUPS := {
 	"empty_pulpit": ["CREST", "every hero's damage taken, while no Cleric stands"],
 	"dead_air": ["CREST", "every hero's damage dealt, while no Mage stands"],
 	"dirge": ["CREST", "every hero's damage dealt, while a hero lies fallen"],
-	# BATCH JG §3 — THE FIRST CREST RUNE WHOSE CONDITION NAMES A CORE: no `ENGINE_READ` row, because a row is one hero's gate
-	# and the crest is worn by all four; a drop with no holder is the crest's own rule, and JG's RULINGS OWED asks.
-	"communion": ["CREST", "every hero's damage dealt, while a hero wearing the Rune of the Devout stands"],
+	# BATCH JH §1 — A CREST RUNE THAT READS WHAT EVERY HERO WEARS, AND NAMES NO ENGINE: no `ENGINE_READ` row, because it
+	# reads no one engine and pays every party that builds for it (JG named a core here; the re-key took the exception out).
+	"communion": ["CREST", "every hero's damage dealt, while every hero who stands wears two or more core runes"],
 }
 
 # The cards a drive casts beyond the one `requires_ability` names, seated drafted
@@ -932,9 +932,9 @@ func _s1_every_rune_driven() -> void:
 				and (ho_src.contains("func _s5b_%s(" % id) or ho_src.contains("func _s5c_%s(" % id))
 			var by_hp: bool = hp_src.contains("const THREE := {") and hp_src.contains('"%s": {' % id) \
 				and hp_src.contains("func _s2c_each_through_a_fall_and_a_revive")
-			# BATCH JG §3 — OR `check_jg` §3d DOES: Communion, through a real fall and a real revive.
-			var by_jg: bool = String(id) == "communion" and FileAccess.get_file_as_string("res://check_jg.gd").contains("func _s3d_the_fight")
-			ok(by_ho or by_hp or by_jg,
+			# BATCH JH §1 — OR `check_jh` §1f DOES: Communion, through a real fall and a real revive (`check_jg` §3d did until the re-key).
+			var by_jh: bool = String(id) == "communion" and FileAccess.get_file_as_string("res://check_jh.gd").contains("func _s1f_the_fight")
+			ok(by_ho or by_hp or by_jh,
 				"§1: %s is worn by the crest and neither `check_ho` §5 nor `check_hp` §2 drives it — a CREST rune nobody drives" % id)
 			crest += 1
 			continue

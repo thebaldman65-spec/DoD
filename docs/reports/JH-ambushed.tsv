@@ -1,0 +1,5 @@
+arm	population	runs	cost	se	runs_moved	fidelity
+JH, Ambushed at 8	the default four	60	6.6156	0.6251	15 of 60 runs	JH's tree, the same seeds, against the same tree's no-modifier arm, the bot's default crest (DV35), Communion re-keyed; read-only probes; paired JH against JG +0.678 ± 0.403
+JG, Ambushed at 8, for the pair	the default four	60	5.9377	0.5605	-	JG's arm, re-read off its own logs (JG-work/logs/price)
+JH, Ambushed at 8	the incumbent	60	11.7718	1.2963	11 of 60 runs	JH's tree, the same seeds, against the same tree's no-modifier arm, the bot's default crest (DV35), Communion re-keyed; read-only probes; paired JH against JG +0.270 ± 0.303
+JG, Ambushed at 8, for the pair	the incumbent	60	11.5020	1.3047	-	JG's arm, re-read off its own logs (JG-work/logs/price)

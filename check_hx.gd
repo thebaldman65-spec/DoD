@@ -106,6 +106,7 @@ const KNOWN_STATEMENTS := [
 # EK's inertness claim, the archive practice's first pass — and their lines left with them. **IJ §0.2 struck four to a
 # line each** (the designer's ruling: a closed block no reference holds is struck to a line naming what closed it and
 # which report holds the record). **JE §3 took the four struck lines and the two words' two blocks out**, the law to `docs/text-standard.html` §4.9b and the rest to the archive.
+# **JH §3 took three more**, their live rules to the text standard's §4.5a, §4.13 and §4.14, the blocks to the archive.
 const KNOWN_BLOCKS := [
 	"WHAT THIS FILE IS, AND WHAT IT IS NOT",
 	"THE INSTRUMENT RULES LIVE IN `docs/instrument-rules.md`",
@@ -117,18 +118,15 @@ const KNOWN_BLOCKS := [
 	"The skill check — FOUR CASES, AND THE BAR IS PARAMETERIC",
 	"THE RULE EVERY PROFILE IS AUTHORED TO",
 	"WHERE THE CHECK COMES OFF",
-	"A DURATION IS STATED AS APPLIED",
 	"NEVER `preload` A SCRIPT THAT NAMES AN AUTOLOAD",
 	"THE POUCH IS SLOT-LIMITED",
 	"ITEM EFFECTS ARE PERCENTAGES OR SCALE WITH RUN DEPTH",
-	"`hexed` IS NOT `crippled`, AND THE BRIEF ASKED FOR `crippled`",
 	"VERIFY THE BRIEF AGAINST THE REPO BEFORE IMPLEMENTING IT",
 	"AND A PRECEDENT IS A CLAIM, SO A PRECEDENT GETS CHECKED",
 	"THE SHARPSHOOTER'S BASIC IS A SEQUENCE",
 	"REMOVING A SKILL CHECK MAKES ITS PERFECT-ONLY BEHAVIOUR UNCONDITIONAL",
 	"A PASSIVE PAID IN DAMAGE TAKEN INVERTS AGAINST EVERY BATCH THAT HELPS THE PARTY",
 	"FAITH RELEASES AT `FAITH_RELEASE`, AND ONE NUMBER SETS BOTH THE HOLD AND THE RELEASE",
-	"A REVERTED CONSTANT MUST BE SWEPT THROUGH THE ABILITY CARD TOO",
 	"CARD TEXT AND COMMENTS DO NOT NAME A MAGNITUDE A CONSTANT HOLDS",
 	"A PURE BUFF COSTS HALF A SWING",
 	"THE ELITE BEING SHORTEST IS ACCEPTED, NOT A DEFECT",

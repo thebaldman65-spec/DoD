@@ -1810,7 +1810,6 @@ var broken_mind := 0          # Ruined Mind: the Ruin depth past which a boss
                               # can no longer resist his Bewitchment
 var blood_communion := 0      # Blood Communion: % of his Break dealt, healed
 var rune_blood_communion := 0 # rune-owned: the crest Tithe's share, summed at the same site (HO §3a)
-var rune_core_strike := 0     # rune-owned: Communion 1 (a FLAG), read beside `dmg_bonus`; its magnitude is `Battle.COMMUNION_STRIKE` (JG §3)
 # --- Hunter ---
 var cocktail := 0             # Cocktail: other statuses per extra Poison stack
 var set_and_forget := 0       # Set and Forget: a sprung trap re-arms next turn

@@ -204,6 +204,7 @@ makes every description a TRANSLATION of its own code &mdash; and translations r
 the corpus came to hold both readings at once, <code>cr_rime</code> using both in one sentence.
 <b><code>tick_statuses()</code> running before a unit acts is an implementation detail and never
 a wording convention.</b></p>
+<p><b>A STUN COSTS ONE TURN, WHATEVER IT IS LAID FOR (HW &sect;3, ruled; moved out of <code>CLAUDE.md</code> at JH &sect;3).</b> The turn loop strips <code>stunned</code> whole at the first turn it costs, so a card says the turn its stun takes, never the length it is laid for: Counter Time's <i>next TWO turns</i> and Snare Line's chilled <i>2 turns, not 1</i> were corrected to what the code does, with <code>COUNTER_TIME_TURNS</code> and <code>SNARE_LINE_COLD_STUN</code> unmoved. <b>Making a stun's length real touches every stun in the game</b> &mdash; a system change, owed its own ruling.</p>
 
 <h3>4.6 Stacking and refresh — state what a second cast does</h3>
 <p>Whenever a second cast is possible, say what it does: refresh, extend, stack, or replace.
@@ -533,6 +534,12 @@ rune layer to explain, so every one of these lines is suppressed. That is CO &se
 &ldquo;two genuinely different causes get two sentences&rdquo;, where the second sentence is
 silence.</li>
 </ul>
+
+<h2>4.13 A NUMBER A CARD SPEAKS IS SWEPT WITH ITS CONSTANT, AND THE CARD IS THE COPY THAT GETS MISSED (BINDING, SET AT BATCH DF &sect;1, MOVED OUT OF <code>CLAUDE.md</code> AT BATCH JH &sect;3)</h2>
+<p><b>When a batch moves or reverts a magnitude, it sweeps every place the number is SPOKEN &mdash; the passive text, the status chip, the design document, the glossary, and THE ABILITY'S OWN CARD,</b> which is the copy the player reads while deciding and the one that gets missed. <b>The order that catches it: the constant, then every call site, then every STRING that states the number; grep the number, not the field.</b> When two constants move in one batch they are two sweeps, or the one with fewer surfaces looks finished because the other was. <code>CLAUDE.md</code>'s HO &sect;0 rule is the step past this one: a card names no other rule's figure at all, so there is nothing to sweep. The case that set it (Consecrated Ground promising 2 Faith for four batches while the code paid 1) is in <code>DoD-archive/state-archive.md</code>.</p>
+
+<h2>4.14 TWO STATUSES A PLAYER CANNOT TELL APART ARE ONE STATUS TOO MANY (BINDING, SET AT BATCH CT &sect;5, MOVED OUT OF <code>CLAUDE.md</code> AT BATCH JH &sect;3)</h2>
+<p><b>A new status is not named so that it reads as one the game already has.</b> CT's brief asked for <i>Crippled</i> at &minus;15% beside the live <i>Cripple</i> at &minus;25%: it shipped as <b>Hexed</b>, chip <i>Hx</i>, because two chips a player cannot tell apart, and every <code>has_status("cripple")</code> one typo from a silent bug, are not worth a homonym. <b>A rename that wants the brief's word renames both of the pair, or the pair is unreadable again.</b> The two stack, multiplicatively. &sect;4.11 is the rune's naming law and <code>CLAUDE.md</code>'s roster sweep (BR &sect;1) is the check run before any name ships; the record is in <code>DoD-archive/state-archive.md</code>.</p>
 
 <h2>5. HOW TO APPLY THIS</h2>
 <ol>

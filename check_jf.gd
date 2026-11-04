@@ -284,7 +284,7 @@ func _s4a_the_pool() -> void:
 	print("    the scope holds %s" % str(scope))
 	ok(scope.size() >= 5, "§4a: the party scope holds %d entries" % scope.size())
 	for id in scope:
-		# BATCH JG §3 — THE TABLE IS A KEPT READ-OUT OF THE FIVE THE POOL HELD AT JF, AND A KEPT REPORT IS NOT REWRITTEN: `check_jg` §3 holds Communion.
+		# BATCH JG §3 — THE TABLE IS A KEPT READ-OUT OF THE FIVE THE POOL HELD AT JF, AND A KEPT REPORT IS NOT REWRITTEN: `check_jh` §1 holds Communion since its re-key.
 		if id == "communion":
 			continue
 		ok(named.has(id), "§4a: %s has no row in the pool's table" % id)

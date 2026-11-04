@@ -291,9 +291,7 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 	"rune_thin_blood",
 	# BATCH HO §3 — the two crest runes' fields: each is the `rune_` half of an int
 	# the one tree writes (`blood_communion`, `field_medic`), summed at its site.
-	"rune_blood_communion", "rune_field_medic",
-	# BATCH JG §3 — Communion's flag, the Shared Mark's shape: its magnitude is `Battle.COMMUNION_STRIKE`.
-	"rune_core_strike"]
+	"rune_blood_communion", "rune_field_medic"]
 
 static var _data := {}
 
@@ -552,7 +550,7 @@ const RUNE_TAGS := {
 	"dead_air": ["OFFENSE"],                   # Dead Air — no Mage stands, every hero deals more
 	"dirge": ["OFFENSE"],                      # Dirge — a hero lies fallen, the rest deal more
 	# BATCH JG §3 — what the party carries, not what has gone wrong.
-	"communion": ["OFFENSE"],                  # Communion — a hero wearing the named core stands, every hero deals more
+	"communion": ["OFFENSE"],                  # Communion — every hero who stands wears two or more core runes, every hero deals more
 }
 
 
@@ -1953,9 +1951,10 @@ static func engine_rune_id(pid: String) -> String:
 	return ""
 
 
-# BATCH JG §3 — THE NAME A PLAYER KNOWS A CORE BY: its rune's, less the `(core)` the name wears on a slot. No rune
-# carried a condition on a core until Communion, and `Classes.engine_title` answers a spine with its meter (*the
-# Momentum*), which is nothing a hero wears.
+# BATCH JG §3 — THE NAME A PLAYER KNOWS A CORE BY: its rune's, less the `(core)` the name wears on a slot, for a condition
+# that names one core (`heroes_hold_core`). `Classes.engine_title` answers a spine with its meter (*the Momentum*), which
+# is nothing a hero wears. **No live rune names a core since JH §1 re-keyed Communion onto a count**; the key and this
+# noun stand for the next, and a core no rune carries still reads empty here (FOUND AT JG).
 static func core_noun(pid: String) -> String:
 	return String(config(engine_rune_id(pid)).get("name", "")).trim_suffix(" (core)")
 

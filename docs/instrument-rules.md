@@ -206,6 +206,7 @@ below.
   kind, so the batch that met 290 KiB had two moves and both were the designer's — FU §1 took one,
   and `CLAUDE.md`'s ceiling block names what is left. **Finding
   that out early is the whole value.**
+- **A CEILING's CONDITION READS THE ROOM PROJECTED TO THE CLOSE: THE ROOM AT THE OPEN, LESS WHAT THE BATCH EXPECTS TO WRITE, AGAINST THE BAR (JH §3, the designer's).** JG's brief said *cut only under 14 KiB*, the open read 15.52, nothing was cut, and JG then wrote 5,329 B: the condition read the room at the wrong moment. **The expected writing is stated before the work, and the close's reading is set beside it**, with the net and the projected figure for the next batch, so a projection that ran short is found by the batch that made it.
 
 ## A CEILING IS A NUMBER WITH AN ANSWER BEHIND IT (STANDING, Batch GZ §6, recorded at HA §5)
 > **A bar is worth stating only where crossing it has an answer the rules allow.** The changelog's
@@ -1481,6 +1482,7 @@ matter how exact the pairing is.
   the tail has less time to build** — visible directly in EX's own arms, where the same counter-
   factual priced over arms that RAN at 0 / 0.50 / 1.00 falls monotonically. Treat a counterfactual
   as an upper reading and drive the live arm before quoting a swing.
+- **A WORN RUNE LEAVES EVERY ROLL, SO A CREST ARM PAIRED AGAINST A NONE THAT ROLLS ITS ENTRY CARRIES A DIE SHIFT (JG's finding, recorded at JH §0.7, the designer's).** The drop's union, the Peddler's row and the event verb each leave out what the party holds, the Peddler and the event verb about six times as often as the drop (277 and 272 against 47 in 3,000 rolls, `check_jg` §3f), so an arm wearing a rune and a none that rolls the rune's entry part at the first drop and differ from then on for a reason that is not the rune. **Every crest reading before JH that paired an arm against such a none carries it** — JE's arms, JF's re-read, Dead Air's depth past two errors at Warden among them, and JG's pairing against its own tree; JG's against HEAD's none and its fight table rolled one union — **and none is re-read**: those arms read runes already in the pool, and no figure now rests on them. **THE CLEAN PAIRING IS HEAD's NONE FOR A RUNE NEW TO THE POOL, AND A NONE WITH THE RUNE's ENTRY STRUCK FROM `data/runes.json` FOR ONE ALREADY IN IT** — JH §2's, the first of the second kind, against HEAD with Communion struck. A none is checked for it, not assumed: the arm and a clean none read line for line until the rune first pays.
 
 ## STANDING RULE — AN ARM IS NOT READ UNTIL ITS PROCESS HAS EXITED (Batch EV §6g, recorded at EW §4)
 

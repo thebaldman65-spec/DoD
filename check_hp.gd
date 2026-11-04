@@ -1,7 +1,7 @@
 # BATCH HP — THE CONDITION AS A FIGHT RUNS, AND THE THREE RUNES IT MAKES REAL.
 #
 #   §0  THE GROUND — this process writes the harness save, and scratch meta files
-#   §1  THE LIVE DOOR — the keys read as the fight runs (all five since HQ §1); the
+#   §1  THE LIVE DOOR — the keys read as the fight runs (all five since HQ §1, six since JH §1); the
 #       fields a live payload may write, DERIVED over HN §3a's twenty-eight and held
 #       here as the partition; the refusal, loud at the table and at every
 #       application, and the roll call's tail for it in a player's words (HQ §1); the
@@ -68,9 +68,6 @@ const HN_28 := ["max_hp", "max_hp_pct", "attack", "armor", "crit_bonus", "speed"
 	"rapid_fire", "snap_shot", "constitution", "stability", "block_chance"]
 const TWINS := {"rune_broken_will_ranks": "broken_will_ranks", "rune_blood_communion": "blood_communion",
 	"rune_bonecracker_ranks": "bonecracker_ranks", "rune_field_medic": "field_medic"}
-# BATCH JG §3 — a live field that is no twin and no part of HN's twenty-eight: a rune's own flag, read fresh in the sum
-# `dmg_bonus` is read in. It joins the walks below it; the partition is asked of the twenty-eight.
-const RUNE_FLAGS := ["rune_core_strike"]
 # HN §3a's third group: the stamps the battle takes the best holder's figure of, once.
 const STAMPS := ["devoutness_ranks", "rune_devoutness_ranks", "last_hope_pct", "rune_last_hope_pct", "guardian_step"]
 # The fields `_do_summon` hands a companion as it is called (the body's cfg, and the
@@ -344,13 +341,14 @@ func _stale_line(text: String, needle: String) -> bool:
 # ── §1a — THE KEYS AND THE DOORS ────────────────────────────────────────────
 
 func _s1a_the_keys_and_the_doors() -> void:
-	print("\n§1a — the five keys read as the fight runs, and the two doors a hero's standing changes through")
+	print("\n§1a — the six keys read as the fight runs, and the two doors a hero's standing changes through")
 	# THE RULING, AS THE TABLE: HP's four, and `heroes_hold_core` since HQ §1 (ruled) —
 	# read once it went on paying after its only holder fell, stale for the reason the
-	# other four were.
+	# other four were — and since JH §0.1 the count of core runes every standing hero wears,
+	# the one key the designer authorized for Communion's re-key.
 	var live: Array = Talents.LIVE_KEYS.duplicate()
 	live.sort()
-	ok(live == ["heroes_all_standing", "heroes_class_count", "heroes_hold_core", "heroes_include_class", "heroes_lack_class"],
+	ok(live == ["heroes_all_hold_cores", "heroes_all_standing", "heroes_class_count", "heroes_hold_core", "heroes_include_class", "heroes_lack_class"],
 		"§1a: the keys read as the fight runs are %s" % [live])
 	ok(Talents.HERO_KEYS.has("heroes_hold_core") and Talents.LIVE_KEYS.has("heroes_hold_core"),
 		"§1a: `heroes_hold_core` is read once, as the fight opens, or is no longer a key — HQ §1 ruled it live")
@@ -439,7 +437,7 @@ func _s1b_the_fields() -> void:
 	for f in Talents.LIVE_FIELDS:
 		if TWINS.has(String(f)):
 			twins.append(String(f))
-		elif not RUNE_FLAGS.has(String(f)):
+		else:
 			fresh.append(String(f))
 	# The consumed list carries HN's party-wide stamps beside the eleven (its third group,
 	# outside the twenty-eight); the partition is asked of the twenty-eight.

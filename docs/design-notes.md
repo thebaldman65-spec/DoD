@@ -4,6 +4,16 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The rising shape, and both ceilings (Batch JH) — 2026-11-03
+
+**Why two core runes on every hero.** A condition true of every party reads no choice, and one true of a single party is a lottery ticket for the rest. Two cores on every hero who stands is a thing every party can build toward, and the longer a run goes the more of it there is, so the rune is the payoff the pool did not have.
+
+**Why its figure is in the payload.** The other crest runes carry theirs there, and a figure in a payload rides a save as it was built. If the pool ever wants figures a re-tune reaches in a saved run, that is a change to every crest rune at once, not a difference in one.
+
+**Why the fight that decides is the first one it pays in.** A rune is priced in the unit it acts on, and this one cannot act in a run's first fight: nobody wears two cores yet. Before it first pays, the wearer and a none whose dice match play the same game, so the first fight it pays in is the one place the two can be set side by side.
+
+**Why the none has the rune struck.** A party wearing a rune never rolls it again, so a none that still rolls it is playing with one more entry in every drop, shop and event. Struck, the none plays the wearer's game until the rune changes it.
+
 ## Communion, the first rune since HP (Batch JG) — 2026-11-03
 
 **Why a crest rune's figure answers to a floor.** The pool's own two ends say what works: Tithe pays about 13% of a Break blow on nearly half of hero turns, and Dirge about eight-tenths of a percent. A floor between them says a condition has to happen often enough to be felt, and a figure that would have to pass the pool's largest is a condition too rare, which no number repairs.

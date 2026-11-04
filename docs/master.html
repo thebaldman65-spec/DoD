@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-11-03 (Batch JG &mdash; Communion, the first rune since HP)</b></p>
+<p align="right"><b>Last updated: 2026-11-03 (Batch JH &mdash; the rising shape, and both ceilings)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1326,7 +1326,7 @@ Kill Command and the companion cards on the companion every Hunter but the Sharp
 the eighty ordinary runes pay nothing at all to a hero whose engine slots do not hold their engine &mdash;
 a Ruin rune to a Cleric who has unequipped the Rune of the Occultist (core), a Focus rune to a Hunter who has
 unequipped the Rune of the Sharpshooter (core) &mdash; and none of them is rolled for him, at the Peddler, in
-an elite's cache, in a bargain or from an event. A crest rune is worn by all four, so no hero's engine gates it: <i>Communion</i> can arrive with nobody wearing its core, and waits. <b>A rune that still does part of its job without its
+an elite's cache, in a bargain or from an event. <b>A rune that still does part of its job without its
 engine is offered</b>: Glass Prison still freezes a second body, and the runes that read a card or
 nothing at all are offered to every hero of their class. <b>A rune that reads a status or a stance is
 the rune of the engine that lays it</b>, and is offered, and pays, only while that engine rune is
@@ -2755,7 +2755,7 @@ holds.</li>
 <li><b>Runes</b> (run-scoped gear, dropped after every normal fight, bought at the Peddler or chosen
 from elite caches — the in-run power source): an <b>authored pool</b> (data/runes.json).
 <br><b>A RUNE DROPS AFTER EVERY NORMAL FIGHT WON</b>: one, at random, always for a class among the
-heroes or for the Crest, never one they already hold, and never a hero's rune that reads an engine not equipped &mdash; the rules
+heroes or for the Crest, never one they already hold, and never one that reads an engine not equipped &mdash; the rules
 every other way of getting a rune follows &mdash; and the victory card names it. An elite, a mini-boss
 and a boss drop none; each pays its own reward. <b>A CLASS RUNE OR A CORE RUNE GOES TO ITS HERO</b>
 &mdash; the hero of its class &mdash; who holds it unworn until he equips it, and the victory card and
@@ -2775,16 +2775,16 @@ Break an ordinary attack applies as it lands &mdash; an attack that lands none (
 card's own effect, a trap, a companion, a talent's proc or the Long Watch's carry &mdash; and it is added to the talent
 tree's <i>Breaking Heals a Hero</i> for a hero who wears both. <b><i>Empty Pulpit</i></b>: while no Cleric stands, every
 hero takes 50% less strike damage. <b><i>Dead Air</i></b>: while no Mage stands, every hero deals 75% more strike
-damage. <b><i>Dirge</i></b>: while a hero lies fallen, the rest deal 45% more strike damage. <b><i>Communion</i></b>: while a hero wearing the Rune of the Devout stands, every hero deals 11% more strike damage &mdash; all four read the
+damage. <b><i>Dirge</i></b>: while a hero lies fallen, the rest deal 45% more strike damage. <b><i>Communion</i></b>: while every hero who stands wears two or more core runes, every hero deals 37% more strike damage &mdash; all four read the
 strike, as the glossary defines it, and nothing else. <b>A crest rune drops and is sold as any
 other rune is, and sits in the bag while the Crest does not wear it</b>; it belongs to no class, and wears no marker on its name: the Peddler's row
 and an event's line say <i>for the crest</i> beside one. <b>It is never in a hero's own pick of three</b> &mdash; the elite's
 rune cache and the bargain's rune hold his class's runes alone.
 A crest rune's effect may carry a <b>condition on who the heroes are</b> &mdash; a class standing among the heroes or
-none of it standing, how many of a class stand, a core rune one of the standing heroes carries, every hero standing, or
+none of it standing, how many of a class stand, a core rune one of the standing heroes carries, how many core runes every standing hero wears, every hero standing, or
 a hero fallen &mdash; and <b>each of those is read as the fight runs</b>: as it opens, again every time a hero falls,
 and again every time one is raised, so a condition on a core rune stops holding the moment the only hero carrying it
-falls. The rune pays from the moment its condition holds and stops the moment it does not, and the combat log says so
+falls, and one on how many core runes every standing hero wears starts holding the moment the one hero short of them falls. The rune pays from the moment its condition holds and stops the moment it does not, and the combat log says so
 each time; at the opening, the roll call says a rune whose condition does not hold yet pays nothing until it does.
 <b>A condition may name several of these at once, and holds only when every one does.</b> A rune whose condition is read as the fight runs
 changes only what every blow reads afresh &mdash; damage dealt and taken, parry, Block, armor piercing and the like &mdash; and
@@ -2853,7 +2853,7 @@ side.
 would be strictly WORSE than a bare one &mdash; the price does not fall to pay for the clause
 &mdash; so a rune that pays only while its condition holds pays more than any bare writer of the
 same effect: <i>Dead Air</i>'s 75% and <i>Dirge</i>'s 45% more strike damage dealt against the talent
-tree's 10% on the same field, <i>Communion</i>'s 11% against the same 10%, <i>Empty Pulpit</i>'s 50% less strike damage taken against its 10%. <code>check_fn</code>
+tree's 10% on the same field, <i>Communion</i>'s 37% against the same 10%, <i>Empty Pulpit</i>'s 50% less strike damage taken against its 10%. <code>check_fn</code>
 &sect;1b asserts that relation over every live rune with a condition. <b>No rune carries a
 condition on a hero's tags</b>: THRESHOLD and BREADTH are absent from the file, from the code and
 from the screens, and <code>check_fn</code> &sect;1b asserts their keys absent across all 172

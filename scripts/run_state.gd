@@ -4538,6 +4538,9 @@ func _rebuilt_rune_list(runes: Array, who: String) -> Array:
 			"rebuild":
 				var stale := _stale_paths(rd)
 				rd["payload"] = (Runes.definition(String(rd.get("id", "")))["payload"] as Dictionary).duplicate(true)
+				# BATCH JH §1 — AND ITS CARD WITH IT: a payload rebuilt under the saved words pays today's rune and shows the one
+				# the save was written with (a JG save's Communion paid 37% under JG's 11% card). The name is refreshed on load already.
+				rd["desc"] = String(Runes.config(String(rd.get("id", ""))).get("desc", rd.get("desc", "")))
 				load_rebuilt_runes.append({"hero": who, "rune": String(rd.get("id", "")), "stale": stale})
 				load_notes.append("%s is rebuilt to work as it does now: the save held an older version." % \
 					String(rd.get("name", rd.get("id", ""))))

@@ -17,6 +17,192 @@ heading stands in both files. **Since JE §3 it also takes what `CLAUDE.md` clos
 
 ---
 
+## ARCHIVED AT JH — 2026-11-03, FROM `docs/state.md` AND `CLAUDE.md` AS JG LEFT THEM (`c5c0adf`)
+
+*From the state: what JH's brief answered, word for word; the four units JH §3 named, by HX §2's method (`docs/reports/JH-cut.tsv` names each and what closed it); and what the re-key closed of the crest pool and of FOUND AT JG. From `CLAUDE.md`, below them: three closed blocks, byte for byte.*
+
+### ~~JG's RULINGS OWED~~ — **ALL SEVEN ANSWERED IN JH's BRIEF (1 and 2: the rising shape, its key authorized, JH §0.1; 3: the figure back in the payload, JH §0.2; 4: the name stays, JH §0.3; 5: the exceptions out with the key, JH §0.4; 6: shipped, and a rune priced at the fight, JH §0.5; 7: the relation wins, JH §0.6)**
+
+*Its head as it stood: **SEVEN; EACH TAKEN ON THE RECOMMENDATION, NONE HOLDING ANYTHING UP***
+
+Full working: `docs/reports/JG.md`, NEEDS A RULING.
+
+1. **THE CARD's WORDS AND ITS KEY MOVED (JG §2, §3).** `heroes_hold_core` names one core and reads any hero who stands, so *while every hero holds a core rune* is no key the door has, and read off `_live_party` it holds on 100% of hero turns: it is true of every party the bot plays, which never unslots one, and reads no choice (HL §4), and 5 ÷ 100 is a figure HP §5's relation refuses. **Taken**: a named core, no shape added, *While a hero wearing the Rune of the Devout stands, every hero deals 11% more strike damage.* **The alternative, the rising shape the read found**: *every standing hero holds two or more*, 18.6% and 13.5%, 2.2, 9.2 and 38.2% by zone on the reference four, a figure of 37%; it is a new shape, which §5 keeps out, and it also switches on when the one hero short of a second core falls, about a point of its 18.6%. *Two heroes*, your other reading, holds 100% for the same reason the brief's words do. **Reversing it** is a new key in `Talents.party_condition_met` and `LIVE_KEYS`, its words in `_condition_words`, a figure of 37%, the card, `check_jg` §2 and §3, and the three documents that name the core.
+2. **WHICH CORE, AND THE POPULATION ITS FIGURE ANSWERS TO (JG §3).** Taken: the smallest quotient past the bare 10% on the two rows JF's worth rule names, the reference four at Wanderer and the incumbent at Ruin: Conviction, 99.7% and 48.74%, 5 ÷ 48.74 = 10.26, a whole percent up 11. **It is a reasoned pick and not arithmetic**: Conviction leads Permafrost by +2.13 ± 4.03, a tie, and the reading's own error spans a figure of 10 to 12. On the incumbent at Wanderer and Warden, the rows JF's rule does not name, it reads 52.8 and 53.4%, a quotient under the bare figure. **48.74% is no party's uptime**: 19.6, 99.7 and 14.7% by party, so a party that opens with the core is paid about 11% from the first fight, and one that does not is paid nothing in most runs: 30 of the incumbent's 60 arm runs never paid a hero turn, all on the two parties that did not open with it, 30 of their 40. A found core such as the Oathkeeper's would read 35% by the same quotient and pay 35% to anyone who took it at class selection. **The alternative**: Permafrost, also 11% on these rows. **Reversing it** is one row of data, the card, `check_jg`'s worn and bare arms and §3b, `check_gv`'s group string, and the core's name in `CLAUDE.md`, `docs/state.md` and `docs/master.html`.
+3. **A `rune_` FIELD AND A CODE CONSTANT, WHERE DIRGE AND DEAD AIR WRITE `dmg_bonus` IN THE DATA (JG §3).** Taken as ordered: `rune_core_strike`, a flag on the Shared Mark's shape, and `Battle.COMMUNION_STRIKE`. **The alternative**: `dmg_bonus` at 0.11 in the payload, the pool's precedent, which `check_em.UNIT_MATH` passes and which needs no field, no line of `Talents.LIVE_FIELDS`, `check_fn` or `check_hp`, and no arm in the chip. **A code constant reaches every saved run at a re-tune, where a payload rides the save as built (HR §0).** **Reversing it** is seven files, `scripts/unit.gd`, `runes.gd`, `talents.gd` and `battle.gd`, `data/runes.json`, `check_fn` and `check_hp`, and `check_jg` §3.
+4. **THE NAME STAYS (JG §3).** No live name holds the word, on 1,392 names in 21 populations, and *Blood Communion* is no live talent: its node is *Breaking Heals a Hero*. What is near is code: the Devout's deleted node, whose `communion_ranks` stands dormant, and Tithe's `rune_blood_communion`. **Taken**: *Communion*, its field named clear of the word. No list of the designer's reserved names exists; the sweep read the designed conjunctions and BA §1's space. **Reversing it** is one string.
+5. **NO GATE ON THE OFFER, THOUGH THE RUNE READS AN ENGINE (JG §3).** GV's rule offers a rune that reads an engine only while it is equipped, and IK §0.2 says it is never drafted dead; the crest's rule says no gate withholds one, and the brief orders the three routes. **Taken**: no gate, and the exception is written beside GV's rule and in `docs/master.html`. Worn with no holder it reads ARMED and the roll call says it waits. **It is two exceptions more**: a coupling to one partner, which DH's rule allows only as a bonus on a card that works alone, where Communion pays nothing alone; and II §0.4's ○, a worn thing paying nothing, which it never wears, so on the map a Communion held by a party with no Devout core shows no mark, and the Peddler offers it to that party. **The alternative**: a row of `Runes.ENGINE_READ`, which is one hero's gate on a rune all four wear; GP's RULINGS OWED 3 is the card's side of the same question. **Reversing it** is one row and `check_gv`'s group.
+6. **IT SHIPPED ON A READING OF NO OUTCOME (JG §3), AS ORDERED.** It pays, and the arm sees it: in each run's first fight, the same encounter on both sides, the reference four's fights end 6 to 8% sooner and deal 6 to 11% more a hero turn, each past four errors, and the incumbent's, paid on 46.8% of hero turns, 1.3% sooner at two errors (`docs/reports/JG-fight.tsv`). **What sixty runs cannot see is a run's outcome**: against HEAD's none, the pairing with one union on both sides, none of twelve readings of falls, depth and finishes passes two errors. On the pairing the brief names, one does, falls at Warden, -1.37 ± 0.46, and that is the none's die shift and no reading of the rune (FOUND AT JG). **Taken**: shipped, both readings beside it. **The alternative**: read as *the reading decides whether it ships*, the brief's other sentence, it waits for an instrument that resolves a run's outcome; the fight's own reading already resolves its pay. **Reversing it** is `"retired"` on one entry and every count JG raised: `check_es`, `check_ez`, `check_fe`, `check_fk`, `check_fo`, `check_gx`, `check_ho`, `CLAUDE.md`'s *FIVE ARE LIVE* and `docs/master.html`'s *FIVE CREST RUNES*.
+7. **WHERE THE FLOOR AND HP §5 MEET, THE RELATION WINS (JG §1.4).** Two of your rules disagree on your own example: *50% uptime at 10%* clears the floor, and the relation refuses it, because on strike damage the tree writes 10% and a conditioned rune pays beyond the bare writer of its effect (`check_fn` §1b). **Taken**: the relation sets the figure and the floor stands beside it as a minimum, written in `CLAUDE.md`'s crest block as the batch's reading. **The alternative**: the floor's figure stands and the relation yields for a crest rune, which reopens HP §5 for the pool. **Reversing it** is that sentence and `check_fn` §1b's rule for a conditioned rune.
+
+### THE MERGE'S RUNNING ORDER — **RECORDED AT FQ §3 SO THE SEQUENCE SURVIVES A COMPACTION**
+
+**Ruled: the merge is a PROJECT, not a batch — twelve to fourteen batches — and it is developed on
+its own branch with `main` staying playable** (`docs/ways-of-working.md`). **None of the below was
+done at FQ.** The order is recorded so it is not re-litigated batch by batch:
+
+1. **~~THE THREE SPINES, ON NOBODY~~ — DONE AT BATCH FT; CHANNEL'S RATE SET AT FU, MOMENTUM'S AND
+   SANCTITY'S AT FV.**
+   Momentum, Channel and Sanctity built and tested **before a
+   single spec dissolves**. FP measured that this touches **none of the 400 authored things**.
+   **Sanctity's potency layer is still the largest
+   unbuilt system in the game and is wanted independently of the merge**: its reading half is the
+   cheapest of the three (`add_status` is a single funnel), and its PAYOUT does not exist anywhere,
+   because `STATUS_INFO` holds 156 ids and carries **no magnitude at all**.
+3. **~~ENGINES TO RUNES, each with its enabler~~ — BUILT AT BATCH GK; THE NINE ENGINES THE CHARTER'S SIX A CLASS
+   OWED BUILT AT GO**, the designer's nine, transcribed. **THE ENABLER RULE NARROWED AT GS**, ruled: an engine brings
+   only what it cannot run without.
+   - **~~AND A CLASS KIT OF THREE, RULED IN GL's BRIEF~~ — BUILT AT GN.** Its recon is `docs/kit-recon.html` (GL); GN's
+     brief names the Crown's Break and freeze resistance as the batch after the kits. No step number was ruled for it.
+4. **~~POOL MERGING~~ — BUILT AT BATCH GP.** One pool a class (38 / 41 / 34 / 36; **43 / 51 / 43 / 41 since GS §1**, **43 / 51 / 43 / 42 since HB §2**, Tripwire on
+   the Survivalist's shelf; **42 / 51 / 43 / 42 since HL §1**, Guard Change travelling with the Stances; **42 / 52 / 43 / 42 since IF §2**,
+   Smoulder on the Pyromancer's shelf;
+   which put the 29 cards that stopped travelling on their shelves), the class-wide cards ordinary cards in it, the
+   class-wide share and EH §1's third zone-boss tier deleted, and **a card that reads an engine offered only to its
+   holder** — 34 of the 149, derived at the read site and driven both ways; **37 of the 178 since GS, of the 179 since HB,
+   of the 178 again since HL §1, and of the 179 since IF §2** (Lunge a ruled 38th; Guard Change's ruled row went when it began
+   travelling; Smoulder reads none).
+5. **~~THE 43 ENGINE-READING RUNES AND THE ENGINE-READING CARDS~~ — THE CARDS AT GP, THE RUNES AT GV.** GP took the
+   CARDS half at the offer door; **GV took the RUNES half at every rune door and at a queued cache's answer**, and the
+   population is **35 of the 60 live ordinary runes** rather than FP's 43 (a rune that half-works, or reads a card, a
+   status, the stance or nothing, is not gated — GP's own groups). GM's standing item — *ten live spec runes are read
+   only under their lineage's engine, and a rune's scope is the lineage, so he is still offered them* — is closed by
+   it; **what the scope itself should be was GV's ruling 5, answered at HC: the CLASS**, with the engine gate (36 rows
+   since Layered Aegis), the card a rune names and a companion present deciding what a hero is offered.
+
+### HA's RULINGS OWED — **TWO LEFT, BOTH ABOUT `main`; THE FIRST IS ANSWERED BY HB's SEQUENCE AND ALL FIVE OF THE SECOND WERE RULED FOR HD**
+
+
+Full working: `docs/reports/HA.md`, NEEDS A RULING.
+
+3. **`main` HAS NO FORWARD GUARD ON THE RUN SAVE.** Driven at HA §3c in isolated copies seeded from the player's saves:
+   `main` refuses the merged build's v3 profile and writes nothing — FQ's guard, working as built — but **loads its v13
+   run save without a word and seats three of the four heroes with their basic attack alone**, because they took a
+   spine or a rule engine and `main` has no class kits or engine runes. **The saves on disk are already the merged
+   build's.** A refusal in `main`'s `load_run`, in the profile's shape, is a small code change on `main`; whether it is
+   made before `main` is next played, or the merge simply lands first, is the designer's.
+4. **THE BRANCH IS NOT READY TO LAND, AND TWO THINGS STAND BETWEEN IT AND READY** (HA §3d): the middle group, and the
+   lineage layers GK's charter rules away and nothing has built — ~~spec-scoped runes~~ (**merged at HC**: every rune is
+   scoped to its class and three gates decide, `docs/reports/HC.md`), per-lineage boss pools and stat blocks. **The
+   rune layer was the one a player meets first**: at HA a hero who took a spine or a rule engine was offered no ordinary
+   rune at all; **since HC a Warrior, a Mage or a Hunter is, and a Cleric still is not** (HC's finding). Whether those layers
+   merge before landing or after is the designer's. **Tag `b722cc4` before merging** if the pre-merge game should stay
+   one checkout away; nothing tags it today.
+
+### ~~THE END BOSS HAS NO BUTTON~~ — **CLOSED AT GI ON `class-merge` ONLY; ITS LABEL CONFIRMED AND ITS INSTRUMENT GAP CLOSED AT GJ; TWO WORDINGS STILL OWED**
+
+- **THE LABEL *END BOSS* IS CONFIRMED** — GJ's brief calls it confirmed. **Its tooltip** (*"The END BOSS. Nothing goes
+  around it."* over *"It is always the Hollow Crown, and the road ends here."*) **and the readout's *"— the Hollow
+  Crown waits"* are still owed a confirmation** (GJ's rulings item above).
+
+### THE SUITE REDS, AND WHY ZERO IS NOT THE SAME AS FIXED — ITS CLOSED ITEMS (archived at JH; the block stays in `docs/state.md`)
+
+**DB measured 72 across 26 suites. DC repaired 23. DF sorted all 47 and repaired the 37 that were
+STALE. DG closed the remaining ten.** **THERE WERE FOUR UNSEEDED FLAKES IN THE PROJECT'S HISTORY AND
+ALL FOUR ARE NOW REPAIRED RATHER THAN QUIET.** `test_rune_battle`'s pierce was seeded at DF §0 at
+the site that flakes; **`bo`'s NULL FIELD flake is seeded and closed at DT**, settling at ZERO over
+six readings; **`test_run_harness` gate 2 is seeded and closed at DX §2**, settling at zero over
+thirty; and **`test_batch_at`'s §1 ratio is seeded and closed at DY §4**, six seeded readings all
+reading 2.1799 against six unseeded ones spanning 2.1189–2.2463. **EVERY ONE OF THE FOUR SETTLED AT
+ZERO, SO ALL FOUR WERE FLAKES AND NONE WAS A FINDING** — which is worth stating as a pattern rather
+than four times separately: **a band that has held over hundreds of readings is not usually hiding a
+defect, and the way to establish that is to seed it, not to widen it.**
+**AND DR's BATTERY 1 FOUND `test_batch_bp` §7's LATENT DRAW COLLISION, WHICH IS REPAIRED AND IS
+RECORDED HERE BECAUSE THE SHAPE RECURS.** §7 hand-builds a Warrior kit and then TAKES `cands[1]`,
+a card drawn from his live draft pool, and two of the three hand-written fillers were IN that pool.
+It is fixed with boss-pick names no draw can reach. **DS RE-DERIVED THE UNDERLYING RULE AND IT IS
+ABOUT ORDER, NOT FILLER CHOICE**: `bp` §7 stuffed `bm_abilities` *after* `award_draft_pick` had
+already rolled, and `draft_pool_left` filters owned names — so a kit built BEFORE the roll can never
+collide. `test_batch_bx` §2 and `check_map_screen` already do that and are safe, and
+`test_batch_bo` §2's Sharpshooter block uses boss-pick names. **DS's three growing pools could not
+reach `bp` §7 at all: it is a Warrior flow.**
+
+### THE CREST POOL — ITS CLOSED ITEMS (archived at JH; the block stays in `docs/state.md`)
+
+*JG's reading of its own build, which the re-key superseded.*
+
+- **WHAT `heroes_hold_core` IS WORTH (JG §2, `docs/reports/JG-uptimes.tsv`, 519 rows, no crest worn, each with its population, rung and crest state; by zone, `JG-uptimes-zones.tsv`).** The door takes one named core and asks whether a hero who stands wears it. **Every hero holds a core holds on every hero turn of every run on every cell**: each takes one at class selection and the bot never unslots one, so the bet of 20 to 45%, rising, is broken by more than a factor of two. **The spread**, on the runs that finish: the reference four at Wanderer, 55 runs, its four lineage cores 99.2 to 99.8%, the twenty others 10.3 to 20.2%; the incumbent at Ruin, 57 runs, twelve lineage cores 33.8 to 48.7%, the twelve others 10.5 to 18.1%. **The bet's rise is real one core up**: every standing hero holding two or more reads 18.6% and 13.5%, and 2.2, 9.2 and 38.2% by zone on the reference four. That shape is no key the door has (JG's RULINGS OWED 1). *Two heroes* reads 100% for the same reason *every hero* does.
+- **COMMUNION (JG §3), THE POOL's FIFTH LIVE RUNE.** Communion at 11%: *While a hero wearing the Rune of the Devout stands, every hero deals 11% more strike damage.* Conviction has the smallest quotient past the bare 10% on the two rows JF's worth rule names, 99.7% and 48.74%, 5 ÷ 48.74 = 10.26, a whole percent up 11. **The 48.74% is an average of three parties, 19.6, 99.7 and 14.7%**: a party that opens with the core is paid about 11% from the first fight, and one that does not is paid nothing in most runs (30 of the incumbent's 60 arm runs never paid a hero turn, all on the two parties that did not open with it, 30 of their 40). **The writers of its condition are the map's**: `Run.awaken`, `Run.toggle_engine` and the swaps, read at the spawn. Nothing in a fight writes a slot (GM §2), so inside one only its holder's own fall and rise move it, and those are the two doors it is re-read at. **It is the first crest rune that names an engine**, and it is offered with no gate (JG's RULINGS OWED 5). Its field is `rune_core_strike`, a flag, and its magnitude `Battle.COMMUNION_STRIKE`.
+- **ITS PRICE, AGAINST A TRUE NONE (`docs/reports/JG-crest.tsv`, sixty runs an arm, fight-seeded, the bot's crest doors held shut).** It pays on 99.9, 98.5 and 97.2% of hero turns on the reference four and 46.8% on the incumbent, **and the arm sees it pay**: in each run's first fight, the same encounter on both sides, the reference four's fights end 6 to 8% sooner and deal 6 to 11% more a hero turn, each past four errors, and the incumbent's, paid on 46.8% of hero turns, 1.3% sooner at two errors (`docs/reports/JG-fight.tsv`). **What sixty runs cannot see is a run's outcome. Against HEAD's none, the pairing with one union on both sides, none of twelve readings of falls, depth and finishes passes two errors**: depth -0.10 ± 0.14, +0.90 ± 0.88 and -0.17 ± 0.50 at Wanderer, Warden and Ruin, -0.03 ± 0.02 on the incumbent at Ruin; falls -0.15 ± 0.21, -0.07 ± 0.36, +0.32 ± 0.24 and +0.02 ± 0.11; finishes 55 → 54, 5 → 7, none and 57 → 55. **Against this tree's none, the pairing the brief names, one of twelve passes**, falls at Warden, -1.37 ± 0.46, and that is the none's die shift: a worn rune leaves every roll, the drop's union, the Peddler's row and the event verb, and the fifth entry moved that none +1.30 ± 0.48 with no rune worn (`docs/reports/JG-noise.tsv`, FOUND AT JG). Shipped with both readings beside it, as the brief ordered. **Ambushed on this tree** (`docs/reports/JG-ambushed.tsv`, unasked, because the road moved): +5.94 ± 0.56 on the default four and +11.50 ± 1.30 on the incumbent, against JE's +7.27 ± 0.77 and +12.16 ± 1.41, paired -1.33 ± 0.82 and -0.66 ± 1.59: a tie on both, not pooled, this tree being another instrument, and no grade moved.
+
+### FOUND AT JG AND NOT FIXED — ITS CLOSED ITEMS (archived at JH; the block stays in `docs/state.md`)
+
+- **A WORN RUNE LEAVES EVERY ROLL, SO A CREST ARM PAIRED ON ONE TREE CARRIES A DIE SHIFT** (JG §3): the drop's union, the Peddler's row and the event verb each leave out what the party holds, so the arm rolls one entry fewer at all three until the none draws the rune; in `check_jg` §3f's 3,000 rolls the Peddler and the event verb dealt Communion 277 and 272 times, the drop 47. The size, read with no rune worn, HEAD's none against this tree's, the same seeds (`docs/reports/JG-noise.tsv`): at Warden falls 360 → 438, +1.30 ± 0.48, depth +1.35 ± 1.01, finishes 5 → 3; at Wanderer falls 60 → 33, -0.45 ± 0.27. So the arm against this tree's none reads falls at Warden -1.37 ± 0.46, and against HEAD's none, one union on both sides, -0.07 ± 0.36. **A new rune is read against the last tree's none. A rune already in the pool has no such pairing on any kept log; a none with its entry struck from `data/runes.json` is one. JE's arms and JF's re-read carry this shift, Dead Air's depth past two errors at Warden and JF's single-rune arms among them, and none was re-read.**
+- **`_condition_words` SAID *THE MOMENTUM* FOR A CORE, AND NO SCREEN HAD EVER SHOWN IT** (JG §3): the key carried no rune until Communion, and `Classes.engine_title` answers a spine with its meter. Repaired to the rune's own noun, and `check_jg` §3d reads the chip. `engine_title`'s three other readers read right.
+- **THE FLOOR AND HP §5 MEET** (JG §1.4): on strike damage a condition that holds half the time or more has a quotient the relation refuses, so the designer's own *50% uptime at 10%* reds `check_fn` §1b. Named in the crest block; there the relation sets the figure (JG's RULINGS OWED 7).
+- **WHAT WENT BEYOND THE BRIEF** (JG's report): the Ambushed arm, `docs/reports/JG-ambushed.tsv`; the noise reading, `docs/reports/JG-noise.tsv`; the by-zone table, `docs/reports/JG-uptimes-zones.tsv`; `_condition_words`.
+
+### FROM `CLAUDE.md`: THREE CLOSED BLOCKS, BYTE FOR BYTE
+
+*Cut at JH §3 (II §4's rule; JE §3's shape): the two blocks the brief named and the duration block, a second copy of the text standard's §4.5a. Their live rules went to `docs/text-standard.html` §4.5a, §4.13 and §4.14, and the live copies are there.*
+
+## A DURATION IS STATED AS APPLIED (STANDING, SET AT BATCH CV §1)
+> **"N turns" is the number the code passes to `_apply_status`. It is never the acting-turn
+> count, and `tick_statuses()` running before a unit acts is an implementation detail rather
+> than a wording convention.**
+
+`tick_statuses()` decrements at the START of a unit's turn, so a status applied
+with `N` covers `N` calendar turns and `N-1` of the bearer's own actions. **Both readings were in
+use across the trees** — CU found `cr_rime` using both in a single sentence, the node saying 3 and
+the ability description inside its own payload saying 4.
+
+**THE CHIP DECIDES IT.** The chip counts down the raw value, so a node saying 3 while the chip
+shows 4 contradicts something the player is looking at right now. The acting-turn reading also
+makes every text a TRANSLATION of its own code, and translations rot — which is exactly how the
+corpus came to hold both at once.
+
+- **A STUN COSTS ONE TURN, WHATEVER IT IS LAID FOR (HW §3, ruled).** The turn loop strips `stunned` whole at the first
+  turn it costs, so a card says the turn its stun takes, never the length it is laid for: Counter Time's *next TWO turns*
+  and Snare Line's chilled *2 turns, not 1* were corrected to what the code does, with `COUNTER_TIME_TURNS` and
+  `SNARE_LINE_COLD_STUN` unmoved. **Making a stun's length real touches every stun in the game** — a system change, owed its own ruling.
+
+## `hexed` IS NOT `crippled`, AND THE BRIEF ASKED FOR `crippled` (STANDING, SET AT BATCH CT §5)
+**`cripple` already existed** — "Cripple", −25% damage dealt, in `DEBUFF_IDS`. The glossary entry for it reads "A **crippled** unit deals 25% less
+damage" and `battle.gd`'s Corrupted Channeling comment says "a **Crippled** enemy". Batch CT's brief
+asked for a second status called `crippled` / "Crippled" at −15%. **It shipped as `hexed` /
+"Hexed", chip "Hx".**
+- **Every number and rule of §5 is unchanged** — −15% damage dealt, battle-long (`-1` turns), in
+  `DEBUFF_IDS` so a Trapper counts it and the derived `_dispellable_buffs` set cannot reach it.
+  Only the name moved.
+- **Why:** two chips a player cannot tell apart, and every `has_status("cripple")` call site one
+  typo away from a silent bug, is not worth a homonym. **If a later batch wants the brief's name,
+  it is a rename — but rename `cripple` too, or the pair is unreadable again.**
+- **The two STACK** (multiplicative, `raw *= 0.75` then `raw *= 0.85`). Separate statuses from
+  separate sources; stacking is the only reading that leaves neither silently free.
+
+## A REVERTED CONSTANT MUST BE SWEPT THROUGH THE ABILITY CARD TOO (STANDING, SET AT DF §1)
+> **When a batch reverts a magnitude, sweep every place the number is SPOKEN — the passive text,
+> the status chip, the design doc, AND THE ABILITY'S OWN CARD. The card is the copy the player
+> reads while deciding, and it is the one that gets missed.**
+
+- **THE CASE: CONSECRATED GROUND PROMISED DOUBLE WHAT IT PAID FOR FOUR BATCHES.** CZ raised
+  `FAITH_PER_GROUND_TURN` 1 → 2 and moved the card's "kindled 1 Faith" to "kindled 2" **with it,
+  correctly**. DA reverted the constant to 1 and **left the card at 2.** DC then swept exactly this
+  defect and fixed two instances — the Devout's `passive_desc` and the `faith` status chip — and
+  **did not reach the third.** `docs/master.html` read "(1 an ally a turn)" throughout and was
+  right about the NUMBER the whole time, so the design doc and the game disagreed and only a suite
+  noticed.
+- **THE SUITE THAT NOTICED WAS READ AS STALE FOR FOUR BATCHES.** `test_batch_bj` §2 asserts
+  `classes.gd` contains "kindled 1 Faith" and it is **correct** — the code pays 1, and
+  `test_batch_aw`'s live checks measure it landing 1 at a time through a real turn. **A red that
+  sits in a pile of stale reds is invisible**, which is the whole reason a failure total gets
+  sorted before it gets repaired.
+- **THE ORDER THAT CATCHES IT: the constant, then every call site, then every STRING that states
+  the number.** Grep the number, not the field — the card said "2 Faith", not
+  `FAITH_PER_GROUND_TURN`.
+- **THE CASE IS CLOSED AT DG §1, AND THE RULING WENT TO THE CARD.** The card reads "kindled 1
+  Faith" again and **`FAITH_PER_GROUND_TURN` did not move**. DA's revert was deliberate: at the
+  reverted magnitudes an absorbed hit was very nearly a whole release and a shielded ally never
+  held Faith at all, so **raising the ground drip to match the card would have partly reopened
+  what that revert closed**. The prose was wrong, not the constant.
+- **AND THE SWEEP FOUND THE CARD WAS THE ONLY STALE SURFACE.** Five places speak this number —
+  the card, the Devout's `passive_desc`, the `faith` status chip, `data/glossary.json` and
+  `docs/master.html` — **and the other four all read 1 already.** DC's two repairs were to the
+  ABSORB magnitude, a different constant reverted in the same batch. **When a batch reverts two
+  constants at once, sweep them as two sweeps**, or the one with fewer surfaces looks finished
+  because the other one was.
+
+
 ## ARCHIVED AT JG — 2026-11-03, FROM `docs/state.md` AS JF LEFT IT (`8949213`)
 
 *What JG's brief answered, word for word from the file. No cut was taken: JG writes a rune, and `docs/state.md` stands under its ceiling.*

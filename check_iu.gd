@@ -236,7 +236,11 @@ const MOVED_OUT := {"HERO AND ALLY ARE THE ONLY TWO WORDS": "res://docs/text-sta
 	"~~THE UNIT OF A HERO/ALLY RULING IS THE CLAUSE~~": "res://DoD-archive/state-archive.md",
 	"~~THE VAULT'S EXIT IS THE POOLS~~": "res://DoD-archive/state-archive.md",
 	"~~WHAT MAKES A ROW-8 NODE, AND BH'S FIFTEEN POINTS~~": "res://DoD-archive/state-archive.md",
-	"~~WHERE THE RETIRED RULE ITSELF IS KEPT~~": "res://DoD-archive/state-archive.md"}
+	"~~WHERE THE RETIRED RULE ITSELF IS KEPT~~": "res://DoD-archive/state-archive.md",
+	# BATCH JH §3 — three closed blocks to the archive, byte for byte; their live rules to the text standard.
+	"A DURATION IS STATED AS APPLIED": "res://DoD-archive/state-archive.md",
+	"`hexed` IS NOT `crippled`, AND THE BRIEF ASKED FOR `crippled`": "res://DoD-archive/state-archive.md",
+	"A REVERTED CONSTANT MUST BE SWEPT THROUGH THE ABILITY CARD TOO": "res://DoD-archive/state-archive.md"}
 const ANCHOR_FLOOR := 700
 
 
@@ -726,7 +730,8 @@ func _s8_the_routing() -> void:
 		rows += 1
 		var cells := String(line).split("|")
 		var h := heads.search(String(line))
-		if h == null or not keys.has(h.get_string(1).strip_edges()):
+		# A STRUCK HEADING IS STILL ITS BLOCK, as the keys above are read (repaired at JH: a routing row may name one).
+		if h == null or not keys.has(h.get_string(1).strip_edges().replace("~~", "")):
 			homeless.append(h.get_string(1) if h != null else String(line).left(40))
 		if cells.size() < 5 or String(cells[3]).strip_edges() == "":
 			bare.append(h.get_string(1) if h != null else String(line).left(40))

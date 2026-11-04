@@ -856,7 +856,7 @@ func _s2d_the_three_are_authored() -> void:
 	ok(crest_ids == ["communion", "dead_air", "dirge", "empty_pulpit", "fellowship", "tithe"]
 			and live_ids == ["communion", "dead_air", "dirge", "empty_pulpit", "tithe"],
 		"§2d: the file's crest runes are %s, %s of them live" % [crest_ids, live_ids])
-	# BATCH JG §3 — COMMUNION IS NOT ONE OF THE THREE HO SPECIFIED: `check_jg` §3 holds it.
+	# BATCH JG §3 — COMMUNION IS NOT ONE OF THE THREE HO SPECIFIED: `check_jh` §1 holds it since its re-key.
 	conditioned.erase("Communion")
 	var wrong: Array = []
 	for nm in HELD_BACK:

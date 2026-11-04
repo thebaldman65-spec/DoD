@@ -11724,9 +11724,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# in `note_resource_spent` still cannot see the ability at all.
 			# BATCH GO — SAVAGE ASSAULT'S PAYOUT JOINS THE SAME SUM, for Channel's
 			# reason: "a percentage of damage dealt" has one honest place to land.
-			# It is ADDED to the other terms, so it compounds with none of them. BATCH JG §3 — COMMUNION JOINS IT, for the same reason.
+			# It is ADDED to the other terms, so it compounds with none of them. A crest rune that pays damage writes
+			# `dmg_bonus` itself (Dirge, Dead Air, Communion since JH §1), so it lands here with no term of its own.
 			raw *= 1.0 + attacker.dmg_bonus + attacker.channel_bonus(ab.dmg_type) \
-				+ attacker.reaver_bonus() + (COMMUNION_STRIKE if attacker.rune_core_strike > 0 else 0.0) \
+				+ attacker.reaver_bonus() \
 				+ float(attacker.type_dmg_bonus.get(ab.dmg_type, 0.0))
 			# RUNAWAY RESONANCE, CLAUSE 2 (target side): the same compounding
 			# curve at half the step, and NOTHING SOFTENS IT — Arcane Ward is
@@ -26919,13 +26920,6 @@ const COUP_FOCUS_CAP := 200
 const SHARED_MARK_FOCUS := 5
 
 
-# BATCH JG §3 — COMMUNION'S FIGURE, THE WHOLE OF IT: the card and the chip read it and the strike multiplies by it.
-# **IT IS DERIVED**: the crest's floor over the lower of the core's two readings on the runs that finish, a whole
-# percent up so the product still clears the floor (`CLAUDE.md`'s crest block; `check_jg` §3b reads the quotient off
-# `docs/reports/JG-uptimes.tsv`). A re-tune moves this line and that arm; the floor and HP §5's relation stay.
-const COMMUNION_STRIKE := 0.11
-
-
 func _focus_cap(u: BattleUnit) -> int:
 	if u.spray > 0:
 		return 50
@@ -28761,7 +28755,7 @@ func _on_unit_revived(u: BattleUnit) -> void:
 
 # The four as they stand now, in the shape `Talents.party_condition_met` reads.
 # BATCH HQ §1 — AND EACH WITH HIS SLOTTED ENGINES, since `heroes_hold_core` is read
-# here too: the unit's `engines` are `Runes.held_engines` of his member, taken at the
+# here too (and `heroes_all_hold_cores`, Communion's since JH §1): the unit's `engines` are `Runes.held_engines` of his member, taken at the
 # spawn (nothing in the battle writes an engine's slot, GM §2), so handed back in the
 # member's shape the re-read asks exactly what the spawn's read asked. Without them
 # the key read no engine on anybody, and a payload carrying it never paid.
@@ -29066,8 +29060,6 @@ func _rune_effect_words(payload: Dictionary) -> String:
 			"dmg_bonus":
 				parts.append("every hero deals %d%% %s strike damage" % [int(round(absf(v) * 100.0)),
 					"more" if v > 0.0 else "less"])
-			"rune_core_strike":
-				parts.append("every hero deals %d%% more strike damage" % int(round(COMMUNION_STRIKE * 100.0)))
 			"rune_blood_communion":
 				parts.append("a hero's attack that lands Break heals the hero furthest from full for %d%% of it" % int(round(v)))
 			_:
@@ -29085,6 +29077,8 @@ func _condition_words(cond: Dictionary) -> String:
 		return "while a %s stands" % String(cond["heroes_include_class"]).capitalize()
 	if cond.has("heroes_hold_core"):
 		return "while a hero wearing the %s stands" % Runes.core_noun(String(cond["heroes_hold_core"]))
+	if cond.has("heroes_all_hold_cores"):
+		return "while every hero who stands wears %d or more core runes" % int(cond["heroes_all_hold_cores"])
 	if cond.has("heroes_class_count"):
 		var cc: Dictionary = cond["heroes_class_count"]
 		return "while %d to %d %ss stand" % [int(cc.get("min", 0)), int(cc.get("max", 4)),

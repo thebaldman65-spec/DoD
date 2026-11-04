@@ -120,6 +120,8 @@ func _s0_the_rulings() -> void:
 # ── §1 — THE STRIKE FROM CLAUDE.md ──────────────────────────────────────────
 # [item, kind, [[the file its record stands in, a phrase of the record]], a phrase of the struck text, the join its cut
 # left]. The struck phrase is absent; the join stands once, so the block reads whole across the cut; the record stands.
+# BATCH JH §3 — A BLOCK THAT LEFT `CLAUDE.md` WHOLE FOR THE ARCHIVE TAKES ITS JOIN WITH IT: items 9 and 12 read whole there.
+const LEFT_WHOLE := {9: "DoD-archive/state-archive.md", 12: "DoD-archive/state-archive.md"}
 const STRIKE := [
 	[0, "HIST", [["docs/reports/IJ.md", "THE FOUR CLOSED BLOCKS, EACH STRUCK TO ONE LINE"]],
 		"II's four were struck so at IJ, each report read first (IJ's report, §",
@@ -299,8 +301,9 @@ func _s1_the_strike() -> void:
 			ok(false, "§1: item %d's struck text stands in CLAUDE.md again — '%s'" % [item, String(r[3]).substr(0, 60)])
 		else:
 			gone += 1
-		if cm.count(String(r[4])) != 1:
-			ok(false, "§1: item %d's cut does not read whole — its join stands %d times" % [item, cm.count(String(r[4]))])
+		var home: String = cm if not LEFT_WHOLE.has(item) else _doc(String(LEFT_WHOLE[item]))
+		if home.count(String(r[4])) != 1:
+			ok(false, "§1: item %d's cut does not read whole — its join stands %d times" % [item, home.count(String(r[4]))])
 		else:
 			whole += 1
 		var found := true

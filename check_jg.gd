@@ -14,6 +14,10 @@
 #   §6   THE VERIFICATION: the positional tool's control, read off its kept table: the tool lives outside the tree, so the arm reads the table (C14).
 #   §7   THE PLAYER'S FILES, as this gate found them.
 #
+#   **SINCE THE RE-KEY (JH §1) THE RUNE IS `check_jh`'s**: every arm here that read JG's build — the named core, the flag, the code
+#   constant — prints what it read as a `[record]` and asserts the fact that retired it (HG §2a's shape), and every needle into a
+#   block JH archived reads the record where it landed, the live block and its closed items together.
+#
 #   Every needle is the rule's own words, never the batch code beside them (EA §2).
 #
 #   /Applications/Godot.app/Contents/MacOS/Godot --headless --path . --script check_jg.gd
@@ -40,6 +44,10 @@ const FOUR_LIVE := {"dirge": {"heroes_all_standing": false}, "dead_air": {"heroe
 # THE TWO ROWS JF's WORTH RULE NAMES: the population the figure answers to.
 const ROWS := [["the reference four", "1"], ["the incumbent", "3"]]
 const RETIRED_RULE_ENGINES := ["quarry_hunt", "opening_strike"]
+# JG'S BUILD, AS THE RECORD: the core it named and the figure it derived. The live rune is the re-key's, and its key is this one.
+const JG_CORE := "conviction"
+const JG_FIG := 0.11
+const JH_KEY := "heroes_all_hold_cores"
 # THE DESIGNED NAMES THE RECORD HOLDS (no list of reserved names exists): the conjunctions, their old names, the two engines owing new ones, and BA §1's space.
 const RESERVED := ["Seize", "Marrowfire", "Contagion", "Reckoning", "Breach", "Blight", "Skirmisher", "Tracker", "Virulence", "Epidemic", "Plague Bearer", "Creeping Death"]
 
@@ -241,11 +249,19 @@ func _log_text(s: Node) -> String:
 	return String((h as RichTextLabel).get_parsed_text()) if h is RichTextLabel else ""
 
 
-func _flags(s: Node) -> Array:
-	var out: Array = []
-	for h in _heroes(s):
-		out.append((h as BattleUnit).get("rune_core_strike"))
-	return out
+# Whether a worn crest rune's live stamp is on: the battle's own record of what pays.
+func _paying(s: Node) -> bool:
+	for e in s.get("_live_stamps"):
+		if bool((e as Dictionary).get("crest", false)) and bool((e as Dictionary).get("on", false)):
+			return true
+	return false
+
+
+# A RECORD WHERE IT STANDS: the live block and what JH archived of it, under the archive's own heading for its closed items.
+func _record(head: String) -> String:
+	var live := _block(_doc("res://docs/state.md"), head)
+	var arch := _block(_doc("res://DoD-archive/state-archive.md"), head + " — ITS CLOSED ITEMS (archived at JH")
+	return _flat(live + "\n" + arch)
 
 
 func _fell(s: Node, seat: int) -> void:
@@ -276,9 +292,9 @@ func _blow(s: Node, atk: BattleUnit, sd: int, fi: int) -> int:
 	return was - foe.hp
 
 
+# THE LIVE FIGURE, A PAYLOAD's SINCE THE RE-KEY (JH §0.2): the texts that state it read this.
 func _strike() -> float:
-	var map: Dictionary = (load("res://scripts/battle.gd") as Script).get_script_constant_map()
-	return float(map.get("COMMUNION_STRIKE", -1.0))
+	return float(((Runes.config("communion").get("payload", {}) as Dictionary).get("stat", {}) as Dictionary).get("dmg_bonus", -1.0))
 
 
 func _pct() -> int:
@@ -370,7 +386,8 @@ func _s2_the_read() -> void:
 	ok(Talents.party_condition_met(key, [other, holder]), "§2a: the door does not hold with one standing hero wearing the named core")
 	ok(not Talents.party_condition_met(key, [other, down]), "§2a: the door holds with the one holder down")
 	ok(not Talents.party_condition_met({"heroes_hold_core": "pack"}, [other, holder]), "§2a: the door takes any core: it holds with the named one on nobody")
-	ok(Talents.HERO_KEYS.size() == 5 and Talents.LIVE_KEYS.size() == 5, "§2a: a condition shape was added: %s" % str(Talents.HERO_KEYS))
+	ok(Talents.HERO_KEYS.size() == 6 and Talents.HERO_KEYS.has(JH_KEY) and Talents.LIVE_KEYS.size() == 6 and Talents.LIVE_KEYS.has(JH_KEY),
+		"§2a: a condition shape was added beyond the one the designer authorized at the re-key: %s" % str(Talents.HERO_KEYS))
 	var rows := _tsv("res://docs/reports/JG-uptimes.tsv", ["population", "rung", "scope", "runs", "finished", "crest_at_the_end", "hero_turns", "kind", "condition", "turns_held", "share", "fidelity"])
 	ok(rows.size() >= 300, "§2b: the table holds %d rows" % rows.size())
 	var bare: Array = []
@@ -413,7 +430,7 @@ func _s2_the_read() -> void:
 	# *EVERY HERO HOLDS A CORE* IS TRUE ON EVERY HERO TURN: A CORE IS TAKEN AT CLASS SELECTION AND THE BOT NEVER UNSLOTS ONE.
 	ok(every_read == 13 and hold_all.is_empty(), "§2c: *every hero holds a core* read on %d of the 13 cells with hero turns, and under every turn on %s" % [every_read, str(hold_all)])
 	print("    CHECKED %d cells: every standing hero holds a core on every hero turn" % every_read)
-	var state := _flat(_block(_doc("res://docs/state.md"), "### THE CREST POOL"))
+	var state := _record("### THE CREST POOL")
 	ok(state.contains("holds on every hero turn of every run on every cell"), "§2c: the crest block does not say what the read found")
 	# THE SPREAD THE BLOCK STATES, OFF THE TABLE: THE FOUR LINEAGE CORES OF THE REFERENCE FOUR, AND THE TWENTY OTHERS.
 	var held: Array = []
@@ -448,14 +465,15 @@ func _s3a_the_entry() -> void:
 	ok(Runes.RUNE_SHAPES.get("communion", []) == ["STAT", "CONDITIONAL"], "§3a: its shape is %s" % str(Runes.RUNE_SHAPES.get("communion", [])))
 	ok(Runes.RUNE_TAGS.get("communion", []) == ["OFFENSE"], "§3a: its tag is %s" % str(Runes.RUNE_TAGS.get("communion", [])))
 	var cond := _cond()
-	ok(cond.size() == 1 and cond.has("heroes_hold_core"), "§3a: its condition is %s, and the card reads what the party carries" % str(cond))
+	print("    [record] JG's condition named one core, `heroes_hold_core: %s`; the re-key's is %s" % [JG_CORE, str(cond)])
+	ok(cond.size() == 1 and cond.has(JH_KEY) and not cond.has("heroes_hold_core"), "§3a: its condition is %s: the rune names a core again, the key its re-key retired" % str(cond))
 	ok(int(_run.PARTY_RUNE_SLOTS) == 1 and not e.is_empty() and Runes.is_party_rune(Runes.build("communion")), "§3a: it does not go in the crest")
 
 
 func _s3b_the_figure() -> void:
 	print("\n§3b — its figure, the floor's quotient, off the table")
 	var rows := _tsv("res://docs/reports/JG-uptimes.tsv", ["population", "rung", "scope", "condition", "share", "kind"])
-	var core := String(_cond().get("heroes_hold_core", ""))
+	var core := JG_CORE
 	var lower := 2.0
 	for row in ROWS:
 		var up := _share(rows, String(row[0]), String(row[1]), core)
@@ -464,16 +482,16 @@ func _s3b_the_figure() -> void:
 		lower = minf(lower, up)
 	var quotient := 0.05 / lower
 	var want := ceilf(quotient * 100.0 - 0.000001) / 100.0
-	print("    0.05 / %.4f = %.4f, a whole percent up %.2f; the constant holds %.4f" % [lower, quotient, want, _strike()])
-	ok(is_equal_approx(_strike(), want), "§3b: the figure %.2f is not the floor's quotient (%.4f, a whole percent up %.2f)" % [_strike(), quotient, want])
-	ok(_strike() * lower >= 0.05, "§3b: magnitude × uptime is %.4f, under the floor" % (_strike() * lower))
-	ok(_strike() <= 0.75, "§3b: the figure %.2f is above the pool's largest: the condition is too rare" % _strike())
+	print("    [record] 0.05 / %.4f = %.4f, a whole percent up %.2f; JG's figure was %.4f, and the re-key's is %.4f, off its own reading (`check_jh` §1d)" % [lower, quotient, want, JG_FIG, _strike()])
+	ok(is_equal_approx(JG_FIG, want), "§3b: JG's figure %.2f is not the floor's quotient off its own kept table (%.4f, a whole percent up %.2f)" % [JG_FIG, quotient, want])
+	ok(JG_FIG * lower >= 0.05, "§3b: JG's magnitude × uptime is %.4f, under the floor" % (JG_FIG * lower))
+	ok(not (load("res://scripts/battle.gd") as Script).get_script_constant_map().has("COMMUNION" + "_STRIKE"), "§3b: the code constant is back, where the re-key put the figure in the payload")
 	# THE RELATION THE FLOOR DOES NOT REPLACE: A CONDITIONED RUNE PAYS BEYOND THE BARE WRITER OF ITS EFFECT.
 	var bare := 0.0
 	for n in Talents.tree():
 		var st: Dictionary = ((n as Dictionary).get("payload", {}) as Dictionary).get("stat", {})
 		bare = maxf(bare, float(st.get("dmg_bonus", 0.0)))
-	ok(bare > 0.0 and _strike() > bare, "§3b: the figure %.2f is not beyond the tree's bare %.2f" % [_strike(), bare])
+	ok(bare > 0.0 and JG_FIG > bare and _strike() > bare, "§3b: a figure, %.2f or %.2f, is not beyond the tree's bare %.2f" % [JG_FIG, _strike(), bare])
 	# THE CORE: THE SMALLEST QUOTIENT PAST THE BARE FIGURE ON THE TWO ROWS, WHICH IS THE ONE MOST HELD ON ITS LOWER ROW.
 	var lowers := {}
 	for r in rows:
@@ -493,70 +511,44 @@ func _s3c_the_card() -> void:
 	print("\n§3c — its card reads its constant, and every text that states the figure agrees")
 	var raw: Dictionary = JSON.parse_string(_doc("res://data/runes.json"))
 	var desc := String((raw.get("communion", {}) as Dictionary).get("desc", ""))
-	ok(desc.contains("{=Battle.COMMUNION_STRIKE*100}"), "§3c: the card is cut off its constant: %s" % desc)
+	ok(desc.contains("{=@payload.stat.dmg_bonus*100}"), "§3c: the card is cut off its own entry: %s" % desc)
 	var shown := String(Runes.config("communion").get("desc", ""))
 	ok(shown.replace("\n", " ").contains("%d%% more strike damage" % _pct()), "§3c: the card shows '%s', not the constant's %d%%" % [shown.replace("\n", " "), _pct()])
-	var core := String(_cond().get("heroes_hold_core", ""))
-	var noun := String(Runes.config(Runes.engine_rune_id(core)).get("name", "")).trim_suffix(" (core)")
-	ok(noun != "" and shown.replace("\n", " ").contains("While a hero wearing the %s stands," % noun), "§3c: the card does not name what it reads, '%s'" % noun)
+	var noun := String(Runes.config(Runes.engine_rune_id(JG_CORE)).get("name", "")).trim_suffix(" (core)")
+	print("    [record] JG's card read *While a hero wearing the %s stands*" % noun)
+	ok(shown.replace("\n", " ").begins_with("While every hero who stands wears"), "§3c: the card does not name what it reads: '%s'" % shown.replace("\n", " "))
 	for line in shown.split("\n"):
 		ok(String(line).length() <= 44, "§3c: a line of the card is %d characters: %s" % [String(line).length(), line])
 	var master := _flat(_doc("res://docs/master.html"))
-	ok(master.contains("while a hero wearing the %s stands, every hero deals %d%% more strike damage" % [noun, _pct()]), "§3c: master.html's Communion does not state the constant's %d%%" % _pct())
+	ok(master.contains("while every hero who stands wears two or more core runes, every hero deals %d%% more strike damage" % _pct()), "§3c: master.html's Communion does not state the payload's %d%%" % _pct())
 	ok(master.contains("<i>Communion</i>'s %d%%" % _pct()), "§3c: master.html's relation does not state the constant's %d%%" % _pct())
 	var rules := _flat(_block(_doc("res://CLAUDE.md"), CREST_HEAD))
 	ok(rules.contains("Communion %d%%" % _pct()), "§3c: the crest block's figure is not the constant's %d%%" % _pct())
 	var whole := _doc("res://docs/state.md")
 	var state := _flat(_block(whole, "### THE CREST POOL"))
-	ok(state.contains("Communion at %d%%" % _pct()), "§3c: the crest block of docs/state.md is not the constant's %d%%" % _pct())
+	ok(state.contains("Communion at %d%%" % _pct()), "§3c: the crest block of docs/state.md is not the payload's %d%%" % _pct())
 	var card := "every hero deals %d%% more strike damage" % _pct()
 	ok(_flat(_block(whole, "## WHERE THE PROJECT IS")).contains(card), "§3c: the WHERE block is not the constant's %d%%" % _pct())
-	ok(_flat(_block(whole, "### JG's RULINGS OWED")).contains(card), "§3c: the rulings are not the constant's %d%%" % _pct())
+	var jg_card := "every hero deals %d%% more strike damage" % int(round(JG_FIG * 100.0))
+	ok(_flat(_block(_doc("res://DoD-archive/state-archive.md"), "### ~~JG's RULINGS OWED~~")).contains(jg_card), "§3c: JG's rulings, archived, do not state JG's %d%%" % int(round(JG_FIG * 100.0)))
 	ok(_flat(_block(whole, "### TO WATCH IN PLAY")).contains("COMMUNION AT %d%%" % _pct()), "§3c: TO WATCH IN PLAY is not the constant's %d%%" % _pct())
 
 
 func _s3d_the_fight() -> void:
 	print("\n§3d — a real fight: it pays with every hero standing, and through its holder's fall and rise")
-	var bare: Node = await _fight(BARE, true)
-	ok(_flags(bare) == [0, 0, 0, 0], "§3d: worn with no holder it paid %s" % str(_flags(bare)))
-	var waits := false
-	for line in bare.get("_rune_roll_call"):
-		if String(line) == "the crest: Communion — %s" % _c(bare, "CONDITION_UNMET_LIVE_TAIL"):
-			waits = true
-	ok(waits, "§3d: with no holder the roll call does not say it waits")
-	var s: Node = await _fight(WORN, true, true)
-	var standing := 0
-	for h in _heroes(s):
-		if not (h as BattleUnit).dead:
-			standing += 1
-	ok(standing == 4 and _flags(s) == [1, 1, 1, 1], "§3d: with every hero standing it does not hold: %d stand, %s" % [standing, str(_flags(s))])
-	# WHAT THE PLAYER READS ON THE CHIP WHILE IT PAYS: THE CONDITION'S WORDS AND THE FIGURE, AND NEITHER RAW.
-	var chip: Dictionary = s._rune_chip_for("Communion", "", Runes.config("communion").get("payload", {}), true)
-	var tip := String(chip.get("tip", ""))
-	ok(tip.contains("while a hero wearing the Rune of the") and tip.contains(" stands") and tip.contains("%d%% more strike damage" % _pct()) and not tip.contains("rune core strike") and not tip.contains("(core)"), "§3d: the chip reads '%s'" % tip.replace("\n", " | "))
-	# THE MULTIPLIER: THE SAME SEEDED BLOW, PAID AND THEN NOT, ON THE WARRIOR, WHO HOLDS NOTHING IT ASKS.
-	var war: BattleUnit = _heroes(s)[0]
-	var paid := await _blow(s, war, 7201, 0)
-	await _fell(s, CLERIC_SEAT)
-	ok(_flags(s) == [0, 0, 0, 0], "§3d: with its one holder down it still pays: %s" % str(_flags(s)))
-	ok(_log_text(s).contains("Rune: the crest: Communion — %s" % _c(s, "LIVE_OFF_TAIL")), "§3d: the switch off is not in the log")
-	var unpaid := await _blow(s, war, 7201, 1)
-	var want := float(unpaid) * (1.0 + _strike())
-	print("    the Warrior's basic took %d paid and %d unpaid (want about %.1f)" % [paid, unpaid, want])
-	ok(unpaid > 0 and absf(float(paid) - want) <= 2.0, "§3d: the paid blow took %d, not about %.1f" % [paid, want])
-	await _revived(s)
-	ok(_flags(s) == [1, 1, 1, 1], "§3d: raised, it does not pay again: %s" % str(_flags(s)))
-	ok(_log_text(s).contains("Rune: the crest: Communion — %s" % _c(s, "LIVE_ON_TAIL")), "§3d: the switch on is not in the log")
-	# A FALL THAT IS NOT ITS HOLDER's MOVES NOTHING.
-	var s2: Node = await _fight(WORN, true)
-	await _fell(s2, 1)
-	ok(_flags(s2) == [1, 1, 1, 1], "§3d: the Mage fell and it stopped paying: %s" % str(_flags(s2)))
+	# RETIRED ONTO THE RE-KEY: the drive moved with the rune. JG's party of one named core is the record, read once more —
+	# worn by a party whose heroes each wear one core, the re-keyed rune pays nothing — and `check_jh` §1f drives the live one.
+	var rec: Node = await _fight(WORN, true)
+	print("    [record] JG's party, each hero one core and the Cleric Conviction: paying %s" % str(_paying(rec)))
+	ok(not _paying(rec), "§3d: worn by heroes wearing one core each, the rune pays: it reads a named core again")
+	ok(FileAccess.get_file_as_string("res://check_jh.gd").contains("func _s1f_the_fight"), "§3d: no gate drives the re-keyed rune through a real fall and rise")
+	ok(String(rec._condition_words(_cond())).contains("every hero who stands wears"), "§3d: the chip's words are not the re-keyed condition's: %s" % rec._condition_words(_cond()))
 
 
 func _s3e_the_writers() -> void:
 	print("\n§3e — what writes its condition, and the absence inside a fight")
 	# THE CORE IS ONE A HERO CAN WEAR: A RUNE CARRIES IT, A CLASS HOLDS IT, AND THE TWO RETIRED-IN-WAITING ARE NOT NAMED.
-	var core := String(_cond().get("heroes_hold_core", ""))
+	var core := JG_CORE
 	var rid := Runes.engine_rune_id(core)
 	ok(rid != "", "§3e: no rune carries `%s`, so nothing can write this condition" % core)
 	ok(Runes.is_engine_rune(rid) and not Runes.is_retired(rid), "§3e: `%s` is no live core rune" % rid)
@@ -570,11 +562,25 @@ func _s3e_the_writers() -> void:
 		if String((rows[i]["rune"] as Dictionary).get("engine", "")) == core:
 			at = i
 	ok(at >= 0, "§3e: the panel lists no row for the core")
-	ok(Talents.party_condition_met(_cond(), _run.party), "§3e: slotted at class selection, the condition does not hold")
+	# RE-POINTED TO THE RE-KEY: one core each at class selection, a second each through the run's own door, one unslotted at the panel's.
+	ok(not Talents.party_condition_met(_cond(), _run.party), "§3e: one core each at class selection, and the condition holds")
+	for m in _run.party:
+		for pid in Classes.class_engines(String((m as Dictionary)["key"])):
+			if not Runes.held_engines(m as Dictionary).has(String(pid)) and not Classes.dismisses_pet([String(pid)]):
+				var r := Runes.build(Runes.engine_rune_id(String(pid)))
+				r["equipped"] = true
+				_run.hold_rune(m, r)
+				break
+	ok(Talents.party_condition_met(_cond(), _run.party), "§3e: a second core slotted on each through the run's door, and the condition does not hold")
+	rows = _run.engine_rows(cleric)
+	at = -1
+	for i2 in rows.size():
+		if String((rows[i2]["rune"] as Dictionary).get("engine", "")) == core:
+			at = i2
 	ok(at >= 0 and bool(_run.toggle_engine(cleric, at)), "§3e: the panel's door did not unslot the core")
 	ok(not Talents.party_condition_met(_cond(), _run.party), "§3e: unslotted through the panel's door, the condition still holds")
 	var off: Node = await _unslotted_fight()
-	ok(_flags(off) == [0, 0, 0, 0], "§3e: unslotted on the map, the next fight still pays: %s" % str(_flags(off)))
+	ok(not _paying(off), "§3e: unslotted on the map, the next fight still pays")
 	# THE ABSENCE, BESIDE ITS ARM: INSIDE A FIGHT NOTHING WRITES A SLOT, SO A FALL AND A RISE ARE ALL THAT MOVE IT.
 	var bs := Gate.strip_comments(_doc("res://scripts/battle.gd"))
 	var writers: Array = []
@@ -584,7 +590,7 @@ func _s3e_the_writers() -> void:
 		if bs.contains(w):
 			writers.append(w)
 	ok(writers.is_empty(), "§3e: the battle writes an engine's slot: %s" % str(writers))
-	var state := _flat(_block(_doc("res://docs/state.md"), "### THE CREST POOL"))
+	var state := _record("### THE CREST POOL")
 	ok(state.contains("The writers of its condition are the map's"), "§3e: the crest block does not name what writes the condition")
 	var rules := _flat(_block(_doc("res://CLAUDE.md"), CREST_HEAD))
 	ok(rules.contains("The condition's writers are the map's: `Run.awaken`, `Run.toggle_engine` and the swaps"), "§3e: the crest block of `CLAUDE.md` does not name the writers")
@@ -643,20 +649,17 @@ func _s3f_the_draw() -> void:
 func _s3g_the_field() -> void:
 	print("\n§3g — the charter: a `rune_` field, and never a node's counter")
 	var st: Dictionary = (Runes.config("communion").get("payload", {}) as Dictionary).get("stat", {})
-	var bad: Array = []
-	for f in st:
-		if not String(f).begins_with("rune_"):
-			bad.append(f)
-	ok(not st.is_empty() and bad.is_empty(), "§3g: the rune writes %s, not a `rune_` field" % str(bad if not bad.is_empty() else st))
-	ok(Talents.LIVE_FIELDS.has("rune_core_strike"), "§3g: the live door does not hold its field")
+	# RETIRED AT THE RE-KEY (JH §0.2, the designer's): the figure went back into the payload as `dmg_bonus`, the pool's own precedent.
+	print("    [record] JG wrote a `rune_` flag, `%s`, and a code constant beside it" % ("rune_core" + "_strike"))
+	ok(st.keys() == ["dmg_bonus"], "§3g: the rune writes %s, not the pool's own field" % str(st.keys()))
+	ok(not Talents.LIVE_FIELDS.has("rune_core" + "_strike"), "§3g: the live door holds a flag no rune writes")
 	var nodes := 0
 	for n in Talents.tree():
-		if ((n as Dictionary).get("payload", {}) as Dictionary).get("stat", {}).has("rune_core_strike"):
+		if ((n as Dictionary).get("payload", {}) as Dictionary).get("stat", {}).has("rune_core" + "_strike"):
 			nodes += 1
 	ok(nodes == 0, "§3g: a node writes the rune's field")
 	var bt := Gate.strip_comments(_doc("res://scripts/battle.gd"))
-	ok(bt.contains("(COMMUNION_STRIKE if attacker.rune_core_strike > 0 else 0.0)"), "§3g: the strike does not read its field beside `dmg_bonus`, or the flag stacks")
-	ok(bt.count("rune_core_strike") == 2, "§3g: the field is read at %d sites: the strike, and the chip's words" % bt.count("rune_core_strike"))
+	ok(bt.count("rune_core" + "_strike") == 0, "§3g: the battle reads a flag no rune writes, at %d sites" % bt.count("rune_core" + "_strike"))
 
 
 func _s3h_the_name() -> void:
@@ -715,7 +718,7 @@ func _s3h_the_name() -> void:
 	print("    CHECKED %d names in %d populations: %s" % [pop.size(), kinds.size(), str(hits)])
 	ok(pop.size() >= 1300 and kinds.size() == 21, "§3h: the sweep read %d names in %d populations, not the game's" % [pop.size(), kinds.size()])
 	ok(hits.is_empty(), "§3h: the name stands beside %s" % str(hits))
-	var said := _flat(_block(_doc("res://docs/state.md"), "### JG's RULINGS OWED"))
+	var said := _flat(_block(_doc("res://DoD-archive/state-archive.md"), "### ~~JG's RULINGS OWED~~"))
 	ok(said.contains("on %s names in %d populations" % [_commas(pop.size()), kinds.size()]), "§3h: the ruling does not state the sweep's own size (%d in %d)" % [pop.size(), kinds.size()])
 	# ITS FIELD MAY NOT CROSS THE WORD: `communion_ranks` IS THE DEVOUT's AND `wild_communion_step` THE BEASTMASTER's, AND THE TWO HAVE BEEN CROSSED ONCE.
 	var f := "var rune_" + "communion"
@@ -732,8 +735,8 @@ func _s3i_the_price() -> void:
 	var rows := _tsv("res://docs/reports/JG-crest.tsv", ["population", "rung", "none", "runs", "none_crest_at_the_end", "arm_paid", "falls_none", "falls_arm", "finished_none", "finished_arm", "paired_falls", "paired_depth", "z_depth", "paired_finished", "fidelity"])
 	ok(rows.size() == 8, "§3i: the table holds %d rows, not four cells on two pairings" % rows.size())
 	var seen := {}
-	var state := _flat(_block(_doc("res://docs/state.md"), "### THE CREST POOL"))
-	var found := _flat(_block(_doc("res://docs/state.md"), "### FOUND AT JG AND NOT FIXED"))
+	var state := _record("### THE CREST POOL")
+	var found := _record("### FOUND AT JG AND NOT FIXED")
 	var past_two := 0
 	for r in rows:
 		seen[String(r["population"])] = true

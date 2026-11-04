@@ -72,6 +72,16 @@ func _flat(s: String) -> String:
 
 
 # A `## ` or `### ` block by its heading, to the next heading of the same depth or shallower.
+# Every block of that heading in `text`, newest first as the file stands: `_block` read once at each occurrence.
+func _blocks(text: String, head: String) -> Array:
+	var out: Array = []
+	var at := text.find("\n" + head)
+	while at >= 0:
+		out.append(_block(text.substr(at), head))
+		at = text.find("\n" + head, at + 1)
+	return out
+
+
 func _block(text: String, head: String) -> String:
 	var at := text.find("\n" + head)
 	if at < 0:
@@ -367,10 +377,12 @@ func _s4_the_fallen_hero() -> void:
 		kinds[kind] = int(kinds.get(kind, 0)) + 1
 		var word := String(r["thing"]).replace("The map's ", "").replace("The Cairn", "Cairn")
 		var held := false
+		# EVERY BLOCK OF THAT NAME, NOT THE FIRST (JH's recon 1): the archive takes the newest cut first, so a batch that
+		# archives an item of the same block stands its copy above the one the record is in, as JH's crest items did above JE's.
 		for hay in [live, kept]:
-			var b: String = _block(hay, String(r["record_block"]))
-			if b.findn(word) >= 0 and b.findn("stays down") >= 0:
-				held = true
+			for b in _blocks(hay, String(r["record_block"])):
+				if String(b).findn(word) >= 0 and String(b).findn("stays down") >= 0:
+					held = true
 		if not held:
 			not_recorded.append(String(r["thing"]))
 	ok(not_recorded.is_empty(), "§4: %d rows stand on no record that names both them and the ruling: %s" % [not_recorded.size(), str(not_recorded)])

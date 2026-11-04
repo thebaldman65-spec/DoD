@@ -489,7 +489,7 @@ static func condition_met(cond: Dictionary, ctx: Dictionary) -> bool:
 # of them.
 #
 # **BATCH HP §1 — THE KEYS ARE READ AS THE FIGHT RUNS (ruled), AND SINCE HQ §1 ALL
-# FIVE ARE.** Read once at the spawn they were constants in a run played forward:
+# FIVE ARE (SIX SINCE JH §1).** Read once at the spawn they were constants in a run played forward:
 # the draft seats one of each class and a won fight raises the fallen, so a key about
 # who stands could only move inside a fight — where nothing re-read it. **`LIVE_KEYS`
 # are the keys the battle re-reads at every death and every revive**
@@ -510,6 +510,8 @@ static func condition_met(cond: Dictionary, ctx: Dictionary) -> bool:
 #   heroes_class_count:   {"class": "warrior", "min": 2, "max": 2} — how many stand
 #   heroes_hold_core:     "pack"                      — a standing hero has that
 #                                                       core rune's engine slotted
+#   heroes_all_hold_cores: 2                    — every hero who stands has that many
+#                                                       core runes slotted, or more (JH §1)
 #   heroes_all_standing:  true                        — every hero stands
 #   heroes_all_standing:  false                       — one or more is down
 #                                                       (HO §2: the value is read, not only the key)
@@ -517,9 +519,9 @@ static func condition_met(cond: Dictionary, ctx: Dictionary) -> bool:
 # The keys say HEROES, never the retired word (`test_batch_bx` §4b sweeps every
 # literal here): a key is data a rune is authored in, and the four are heroes.
 const HERO_KEYS := ["heroes_include_class", "heroes_lack_class", "heroes_class_count",
-	"heroes_hold_core", "heroes_all_standing"]
+	"heroes_hold_core", "heroes_all_hold_cores", "heroes_all_standing"]
 const LIVE_KEYS := ["heroes_include_class", "heroes_lack_class", "heroes_class_count",
-	"heroes_hold_core", "heroes_all_standing"]
+	"heroes_hold_core", "heroes_all_hold_cores", "heroes_all_standing"]
 # The ctx key the battle spawn hands `apply_payload` so a live payload is left for
 # the battle's own door rather than stamped into the config.
 const LIVE_DOOR := "live_door"
@@ -537,9 +539,7 @@ const LIVE_FIELDS := ["dmg_bonus", "dmg_taken_bonus", "parry_bonus", "pierce_bon
 	"block_chance", "broken_will_ranks", "rune_broken_will_ranks", "blood_communion",
 	"rune_blood_communion", "bonecracker_ranks", "rune_bonecracker_ranks", "field_medic",
 	"rune_field_medic", "follow_through", "deflection", "undying_rage", "no_cover",
-	"sundering_shot", "no_quarter_ranks", "rapid_fire", "snap_shot",
-	# BATCH JG §3 — Communion's flag: one read, in the sum `dmg_bonus` is read in, and no writer after the spawn.
-	"rune_core_strike"]
+	"sundering_shot", "no_quarter_ranks", "rapid_fire", "snap_shot"]
 # **THE ELEVEN OF THE TWENTY-EIGHT A LIVE PAYLOAD IS REFUSED, AND WHERE EACH IS
 # CONSUMED** — with the party-wide stamps beside them. The refusal names the reason,
 # so the batch that authors one reads why rather than re-deriving it. A field on
@@ -648,6 +648,13 @@ static func party_condition_met(cond: Dictionary, party: Array) -> bool:
 	if cond.has("heroes_hold_core"):
 		var pid := String(cond["heroes_hold_core"])
 		if not standing.any(func(m): return Runes.held_engines(m as Dictionary).has(pid)):
+			return false
+	# BATCH JH §1 — EVERY HERO WHO STANDS, AND NONE IS NOT EVERY (ruled). A count of core runes slotted, the one the spawn
+	# reads off the member, so a hero short of it who falls stops counting against it: that is the shape's one impurity,
+	# named beside the rune. With nobody standing the condition does not hold, so a wipe's last fall is never a switch on.
+	if cond.has("heroes_all_hold_cores"):
+		var k := int(cond["heroes_all_hold_cores"])
+		if standing.is_empty() or not standing.all(func(m): return Runes.held_engines(m as Dictionary).size() >= k):
 			return false
 	# BATCH HO §2 — THE KEY'S PRESENCE IS ASKED APART FROM ITS VALUE (ruled). `false`
 	# was read as *not asked* until HO and held whatever the party; it holds now only

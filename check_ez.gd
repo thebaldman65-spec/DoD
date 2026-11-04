@@ -460,6 +460,13 @@ func _party_for(cond: Dictionary) -> Array:
 	# BATCH JG §3 — A PARTY THE KEY HOLDS FOR: the core it names, slotted on the Cleric.
 	if cond.has("heroes_hold_core"):
 		(party[2] as Dictionary)["engines"] = [{"engine": String(cond["heroes_hold_core"]), "equipped": true}]
+	# BATCH JH §1 — AND FOR THE COUNT: every hero wearing as many core runes as the key names, each his class's own.
+	if cond.has("heroes_all_hold_cores"):
+		for m in party:
+			var held: Array = []
+			for pid in Classes.class_engines(String((m as Dictionary)["key"])).slice(0, int(cond["heroes_all_hold_cores"])):
+				held.append({"engine": String(pid), "equipped": true})
+			(m as Dictionary)["engines"] = held
 	return party
 
 

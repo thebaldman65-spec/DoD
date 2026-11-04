@@ -109,6 +109,14 @@ reading can actually see, too**: JE's brief ordered a re-read of a gap of 45 off
 
 **A FIGURE IN A BRIEF CARRIES THE POPULATION IT WAS READ ON, AND A CITATION NAMES ITS SECTION (JG §0, the designer's).** JF found thirty-two of forty-two premises wanting, and the two that mattered were one failure twice: one column quoted of a two-column table, and a finding cited to a batch that does not hold it. **It is a writing rule, not an instrument**, so like the pricing rule above nothing in the tree can check it.
 
+**A CITATION NAMES THE FILE AND THE SECTION, AND NOTHING ELSE IS CITED (JH §0.8, the designer's).** Three batches running a brief's
+citation did not resolve — a charter row one off at JG, after JD's and JF's. A row's number, a line or an entry's place is not a
+citation: **if the brief cannot name where a thing stands, it is not a premise.**
+
+**ORDER THE READING, AND DO NOT WRITE THE CARD UNTIL IT COMES BACK (JH §0.8, the designer's note 35).** JG's brief wrote a card's
+condition in one section and ordered the reading that would falsify it in another, and the words carried a condition that was
+always true. **A brief names the axis, the shape and what the figure must clear; the words wait for the reading.**
+
 ## RECON BEFORE AUTHORING
 
 > **Before content is written for an area, a batch reads out what already exists there: the
