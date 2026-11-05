@@ -237,6 +237,9 @@ const STATUS_INFO := {
 		"-15% damage dealt, for the\nrest of the battle."],
 	"retaliate": ["Retaliation", "Rt", Color(0.95, 0.6, 0.25), "Counters attackers with a basic strike."],
 	"dazed": ["Dazed", "Dz", Color(0.95, 0.7, 0.35), "Attacks are 20% more likely to miss."],
+	# BATCH JK §1 — what the warband's Rally and Entrench lay on every standing body, bought with Malice.
+	"warband_rally": ["Rally", "Ry", Color(0.92, 0.42, 0.34), "Its blows deal %d%% more damage\n(a Rally its warband bought with\nMalice)." % [int(round(MALICE_RALLY_PCT * 100))]],
+	"warband_entrench": ["Entrenched", "Et", Color(0.62, 0.72, 0.86), "Its armor is multiplied by %d\n(an Entrench its warband bought\nwith Malice)." % [BattleUnit.MALICE_ENTRENCH_MULT]],
 	"shielded": ["Shielded", "Sh", Color(0.95, 0.65, 0.25), "Takes 25% less strike damage\n(a Shieldmaster's ward, or the\nHollow Crown's Regalia)."],
 	"wrath": ["Divine Wrath", "DW", Color(1.0, 0.85, 0.35), "+15% damage dealt and +15% speed."],
 	"umbral_sigil": ["Umbral Sigil", "US", Color(0.55, 0.30, 0.70), "Branded: half of every strike this\nunit takes echoes to its whole\nwarband."],
@@ -8789,7 +8792,9 @@ func _revalidate_intent(u: BattleUnit) -> Dictionary:
 		target = target_raw
 	var want_ally: bool = bool(decl.get("support", false)) \
 		or ab.target == Ability.Target.ALLY
-	if target == null or target.dead \
+	# BATCH JK §1 — A RAISE's TARGET IS DOWN BY DESIGN: a fallen body is the move's own, never a target gone (the arm stands
+	# it up, or says it found none to stand up).
+	if target == null or (target.dead and ab.special != "malice_raise") \
 			or (not want_ally and _is_held(target)):
 		var pool: Array = enemies.filter(func(e): return not e.dead) if want_ally \
 			else _hero_side()
@@ -8803,7 +8808,7 @@ func _revalidate_intent(u: BattleUnit) -> Dictionary:
 
 # An enemy's ability is unusable when it can no longer be paid for, when a
 # cooldown is running, or when the kit it belongs to no longer holds it.
-# BATCH JI §1 — ENEMIES START COOLDOWNS NOW (eleven abilities carry one), and the
+# BATCH JI §1 — ENEMIES START COOLDOWNS NOW (eleven abilities carry one; thirty-six since JK's spends), and the
 # selection asks the same counter a turn ahead (`_enemy_ready`), so a declared move
 # is never one that will still be cooling: this branch is the backstop.
 func _intent_ability_usable(u: BattleUnit, ab: Ability) -> bool:
@@ -8825,7 +8830,7 @@ func _intent_ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# **IT REFUSES EVERYTHING BUT THE UNIT'S OWN BASIC ATTACK, AND THE TEST IS
 	# IDENTITY AGAINST `_cheapest_attack` RATHER THAN `cost > 0`.** The first
 	# version of this clause tested cost, on the assumption that an enemy's
-	# better options are the ones it pays for. **THEY ARE NOT: 46 OF THE 50
+	# better options are the ones it pays for. **THEY ARE NOT: 46 OF THE 50 (70 OF 74 WITH JK's SPENDS)
 	# ENEMY ABILITIES IN `data/enemies.json` COST ZERO** — Chain Lightning,
 	# Healing Wave, Sundering Strike and Poison Arrow among them — so a cost
 	# test would have left the card refusing FOUR abilities in the whole game
@@ -9247,7 +9252,8 @@ func _enemy_support_action(u: BattleUnit, ticks_ahead := 1) -> Array:
 		var nicked: Array = allies.filter(func(a): return _malice_hurt(vigil, a))
 		if nicked.size() >= 2 and _enemy_ready(u, vigil, ticks_ahead, u):
 			return [vigil, u]
-	return []
+	# BATCH JK §1 — AND THE SPENDS, LAST: a Raise, a Rally or an Entrench, each whenever the pool allows (`_warband_spend`).
+	return _warband_spend(u, ticks_ahead)
 
 
 # ══ BATCH JJ §2 — MALICE: ONE POOL FOR THE WHOLE WARBAND, FILLED BY WHAT THE HEROES DO TO IT ═════════════════════════
@@ -9346,6 +9352,9 @@ func _warband_heal_figure(special: String, target: BattleUnit) -> int:
 # nothing aside for it, so the card's payout never waits on the pool (the fresh reader's finding). The selection reads
 # no Blight, as it never did, so a short pool can leave a blighted body the one a healer can afford.
 func _malice_price(caster: BattleUnit, ab: Ability, body: BattleUnit) -> int:
+	# BATCH JK §2 — A SPEND IS PRICED BY ITS OWN RULE, on the body it names (`_spend_price`).
+	if ab != null and ab.special in MALICE_SPENDS:
+		return _spend_price(ab, body)
 	if ab == null or body == null or body.is_hero or _warband_heal_figure(ab.special, body) <= 0:
 		return 0
 	if ab.special == "totem_pulse":
@@ -9383,6 +9392,109 @@ func _warband_heal(caster: BattleUnit, body: BattleUnit, special: String) -> int
 	var got: int = body.heal_amount(ask, body != caster)
 	_malice_pay(maxi(body.hp - hp0, 0))
 	return got
+
+
+# ══ BATCH JK §1 — WHAT ELSE THE POOL BUYS: THREE SPENDS, EACH A MOVE ON A KIND's LIST ═════════════════════════════════
+#
+# **THE POOL BUYS HEALTH AT ONE MALICE A POINT; EVERYTHING ELSE HAS A FLAT PRICE (JK §2).** A RAISE stands a fallen body of
+# the warband back up at `MALICE_RAISE_PCT` of its health, once a body a fight, and costs the health it stands the body up with. A
+# RALLY lays `warband_rally` on every standing body for `MALICE_RALLY_TURNS` turns — its blows land `MALICE_RALLY_PCT` harder, read in the
+# strike loop, which no heal passes — for `MALICE_RALLY_PRICE`. An ENTRENCH lays `warband_entrench` for `MALICE_ENTRENCH_TURNS` turns — its
+# armor multiplied by `BattleUnit.MALICE_ENTRENCH_MULT` at `effective_armor()`, the one door every blow's armor passes — for
+# `MALICE_ENTRENCH_PRICE`. **A SPEND IS A MOVE, NOT A SIDE's ACTION**: it stands on a kind's list in `data/enemies.json`, the
+# support half chooses it last (`_warband_spend`, after every heal and ward, so their policy stands), and it asks
+# `_enemy_ready` for its cooldown and for its price on the body it names, as a heal does; a declared spend sets its price
+# aside. **No new body joins the warband mid-fight, so there is no Overrun** (JK §1 premise 1): nothing puts a new body into
+# the turn order once a fight has opened, on either side — a Raise and a Resurrection put a fallen one back.
+const MALICE_SPENDS := ["malice_raise", "malice_rally", "malice_entrench"]
+const MALICE_RAISE_PCT := 0.40
+const MALICE_RALLY_PCT := 0.30
+# A Rally's clock counts down at each of a body's turn starts, before it acts, so a body strikes rallied on one turn fewer than
+# the clock: 3, and every rallied body strikes rallied twice — the brief's two of its turns (JK's RULINGS OWED 5).
+const MALICE_RALLY_TURNS := 3
+const MALICE_RALLY_PRICE := 40
+const MALICE_ENTRENCH_TURNS := 3
+const MALICE_ENTRENCH_PRICE := 30
+# The spends' policy (JK §1): a Rally waits for this many standing bodies. Each strikes rallied twice, so three buy 1.8 of a
+# basic blow for a spend that takes 1.25 of a basic's turn (its 2.5 delay against a 2.0 basic); two buy 1.2.
+const MALICE_RALLY_BODIES := 3
+var _malice_raised: Array = []   # the bodies a Raise stood up this fight: once a body, a fight
+
+
+# The unit's move carrying `special`, or null.
+func _find_spend(u: BattleUnit, special: String) -> Ability:
+	for a in u.abilities:
+		if (a as Ability).special == special:
+			return a
+	return null
+
+
+# THE HEALTH A RAISE STANDS A BODY UP WITH — `revive`'s own figure, so the price asked and the health it buys are one.
+func _raise_figure(body: BattleUnit) -> int:
+	return maxi(int(body.max_hp * MALICE_RAISE_PCT), 1)
+
+
+# A body a Raise can stand up: down, of the warband, not raised this fight, and named by no other declared Raise.
+func _raise_holds(body: BattleUnit, asker: BattleUnit = null) -> bool:
+	if body == null or not is_instance_valid(body) or body.is_hero or not body.dead or _malice_raised.has(body):
+		return false
+	for e in enemies:
+		if e == asker or e.dead:
+			continue
+		var ia: Variant = e.intent.get("ability")
+		if ia is Ability and (ia as Ability).special == "malice_raise" and e.intent.get("target") == body:
+			return false
+	return true
+
+
+# Whether a standing body of the warband has declared a move carrying `special`.
+func _spend_declared(special: String) -> bool:
+	for e in enemies:
+		var ia: Variant = e.intent.get("ability")
+		if not e.dead and ia is Ability and (ia as Ability).special == special:
+			return true
+	return false
+
+
+# A SPEND's PRICE ON THE BODY IT NAMES: a Raise the health it stands that body up with, a point of Malice a point (JJ's
+# rule); a Rally and an Entrench flat. Written as a chain with the special first, as `_pick_dud` is, so no handler's spelling
+# stands here ahead of its arm.
+func _spend_price(ab: Ability, body: BattleUnit) -> int:
+	var sp := String(ab.special)
+	if "malice_raise" == sp:
+		return _raise_figure(body) if body != null else 0
+	if "malice_rally" == sp:
+		return MALICE_RALLY_PRICE
+	if "malice_entrench" == sp:
+		return MALICE_ENTRENCH_PRICE
+	return 0
+
+
+# THE SPENDS' POLICY (JK §1), each whenever the pool allows: a Raise on the largest fallen body it can pay for; a Rally while
+# `MALICE_RALLY_BODIES` or more bodies stand and none is rallied or about to be; an Entrench while none is entrenched or about to be.
+# Each asks `_enemy_ready` its cooldown and its price on the body it names — the selection's one door, no second gate.
+func _warband_spend(u: BattleUnit, ticks_ahead := 1) -> Array:
+	var standing: Array = enemies.filter(func(e): return not e.dead)
+	var raise := _find_spend(u, "malice_raise")
+	if raise != null and _enemy_ready(u, raise, ticks_ahead):
+		var fallen: Array = enemies.filter(func(e): return _raise_holds(e, u) and _enemy_ready(u, raise, ticks_ahead, e))
+		if not fallen.is_empty():
+			var big: BattleUnit = fallen[0]
+			for f in fallen:
+				if f.max_hp > big.max_hp:
+					big = f
+			return [raise, big]
+	var rally := _find_spend(u, "malice_rally")
+	if rally != null and standing.size() >= MALICE_RALLY_BODIES and not _spend_declared("malice_rally") \
+			and not standing.any(func(e): return e.has_status("warband_rally")) \
+			and _enemy_ready(u, rally, ticks_ahead, u):
+		return [rally, u]
+	var entrench := _find_spend(u, "malice_entrench")
+	if entrench != null and not _spend_declared("malice_entrench") \
+			and not standing.any(func(e): return e.has_status("warband_entrench")) \
+			and _enemy_ready(u, entrench, ticks_ahead, u):
+		return [entrench, u]
+	return []
 
 
 # ══ BATCH JJ §2 — THE WARBAND's POOL ON SCREEN ════════════════════════════════════════════════════════════════════════
@@ -9448,17 +9560,19 @@ func _malice_words() -> String:
 	lines.append_array(_wrap_words("It fills by a point for every %d damage the heroes deal the warband, by %d when one of its bodies falls, and by a point for every point of damage spent past a body's last." % [
 		MALICE_DAMAGE_STEP, MALICE_PER_KILL]))
 	lines.append_array(_wrap_words("A heal the warband casts costs a point of Malice for every point of health it restores."))
+	lines.append_array(_wrap_words("A Raise costs the health it stands a fallen body up with, %d%% of its maximum; a Rally %d; an Entrench %d." % [
+		int(round(MALICE_RAISE_PCT * 100)), MALICE_RALLY_PRICE, MALICE_ENTRENCH_PRICE]))
 	var spenders := PackedStringArray()
 	for e in enemies:
 		if e.dead:
 			continue
 		for a in e.abilities:
-			if _warband_heal_figure((a as Ability).special, e) > 0:
+			if _warband_heal_figure((a as Ability).special, e) > 0 or (a as Ability).special in MALICE_SPENDS:
 				var who := "%s's %s" % [e.unit_name, (a as Ability).display_name]
 				if not spenders.has(who):
 					spenders.append(who)
 	if spenders.is_empty():
-		lines.append_array(_wrap_words("Nothing in this warband heals with it."))
+		lines.append_array(_wrap_words("Nothing in this warband spends it."))
 	else:
 		lines.append_array(_wrap_words("Spent by %s." % ", ".join(spenders)))
 	return "\n".join(lines)
@@ -11296,6 +11410,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Blessing of Zeal: kindled allies strike harder.
 			if attacker.has_status("zeal"):
 				raw *= 1.15
+			# BATCH JK §1 — RALLY: a body of the warband under its Rally strikes `MALICE_RALLY_PCT` harder. Its one read, here in the
+			# strike loop beside Divine Wrath and Zeal: a warband heal's figure is a share of the body healed and never passes
+			# this line, so the pool's one-for-one and the reserve stand.
+			if attacker.has_status("warband_rally"):
+				raw *= 1.0 + MALICE_RALLY_PCT
 			# Conviction: each Faith stack sharpens the blade — +1.5% a stack,
 			# raised to +3% by Apostle and +4.5% by both it and Fervor (the
 			# multiplier is a SUM, Batch BI §1) — while the Devout stands. It
@@ -22290,7 +22409,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# pool is widened for it rather than a third Target enum being added.
 			#
 			# THE ENEMY HALF IS THIN AND IT WAS MEASURED, NOT ASSUMED (§3 asked):
-			# `shielded` is the ONLY beneficial status an enemy can carry in this
+			# `shielded` WAS the ONLY beneficial status an enemy could carry (JK added a warband's Rally and Entrench) in this
 			# game, applied by two of nineteen kinds (Orc Shieldmaster's
 			# Shielding, the Hollow Crown's Regalia). So that half strips at most
 			# ONE thing, usually nothing. Reported rather than dropped — the ally
@@ -24756,6 +24875,49 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			tp_spent = int(malice_ledger["spent"]) - tp_spent
 			_log("%s: Dark Vigil — its whole warband regains 6%% of its own health (%d in all)%s" % [
 				attacker.unit_name, tp_total, " — %d Malice" % tp_spent if tp_spent > 0 else ""], "#70d878")
+		"malice_raise":
+			# BATCH JK §1 — RAISE: a fallen body of the warband stands back up at `MALICE_RAISE_PCT` of its health, once a body a fight,
+			# and the pool pays the health it stood up with. `_die()` laid its Break down with it (JD §3) and `take_hit` lays none
+			# on a body that is down, so it rises un-Broken; the declaration it died with goes (it carried a reserve), its
+			# plate shows what is still cooling, and its first turn comes a basic swing after it rises, at its own speed, as a Resurrection's body's does.
+			if not _raise_holds(target, attacker):
+				_log("%s: %s finds no fallen body to stand up" % [attacker.unit_name, ab.display_name], "#909090")
+			else:
+				target.revive(MALICE_RAISE_PCT)
+				_malice_raised.append(target)
+				target.intent = {}
+				target.sync_cooldown_chip()
+				_malice_pay(target.hp)
+				target.next_time = attacker.next_time + BASIC_DELAY * 100.0 / target.effective_speed()
+				_sfx("heal", -6.0, 0.6)
+				target.float_text("RAISED", MALICE_COLOR)
+				_message("%s raises %s!" % [attacker.unit_name, target.unit_name])
+				_log("%s: %s — %s stands back up with %d health — %d Malice" % [attacker.unit_name,
+					ab.display_name, target.unit_name, target.hp, target.hp], "#c04868")
+				_declare_intent(target)
+				_rebuild_turn_bar()
+		"malice_rally":
+			# BATCH JK §1 — RALLY: every standing body of the warband strikes `MALICE_RALLY_PCT` harder for `MALICE_RALLY_TURNS` turns, read
+			# in the strike loop, which no heal passes; the pool pays `MALICE_RALLY_PRICE`.
+			for ra in enemies:
+				if not ra.dead:
+					_apply_status(ra, "warband_rally", MALICE_RALLY_TURNS, 0, 0, attacker)
+			_malice_pay(MALICE_RALLY_PRICE)
+			_sfx("break", -9.0, 0.8)
+			_message("%s: %s!" % [attacker.unit_name, ab.display_name])
+			_log("%s: %s — its warband deals %d%% more damage with its blows (%d turns) — %d Malice" % [
+				attacker.unit_name, ab.display_name, int(round(MALICE_RALLY_PCT * 100)), MALICE_RALLY_TURNS, MALICE_RALLY_PRICE], "#c04868")
+		"malice_entrench":
+			# BATCH JK §1 — ENTRENCH: every standing body of the warband wears its armor `BattleUnit.MALICE_ENTRENCH_MULT` times over for
+			# `MALICE_ENTRENCH_TURNS` turns, read at `effective_armor()`, the one door; the pool pays `MALICE_ENTRENCH_PRICE`.
+			for en in enemies:
+				if not en.dead:
+					_apply_status(en, "warband_entrench", MALICE_ENTRENCH_TURNS, 0, 0, attacker)
+			_malice_pay(MALICE_ENTRENCH_PRICE)
+			_sfx("parry", -8.0, 0.7)
+			_message("%s: %s!" % [attacker.unit_name, ab.display_name])
+			_log("%s: %s — its warband's armor is multiplied by %d (%d turns) — %d Malice" % [
+				attacker.unit_name, ab.display_name, BattleUnit.MALICE_ENTRENCH_MULT, MALICE_ENTRENCH_TURNS, MALICE_ENTRENCH_PRICE], "#c04868")
 		"wildfire":
 			# Batch AG: the wide payoff, and Batch AR's WIDE RELEASE VALVE —
 			# Detonation empties one bank, this one skims them all. Every

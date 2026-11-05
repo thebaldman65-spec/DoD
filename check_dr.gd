@@ -199,7 +199,12 @@ func _s2_revival() -> void:
 	# THIRD caller — which would be a second reviving ability — trips.
 	var code := _battle_code()
 	var n := code.count(".revive(")
-	ok(n == 2, "`.revive(` has %d call sites in battle.gd code, not 2 (Resurrection, the Revive Potion)" % n)
+	# BATCH JK §1 — AND A THIRD, THE WARBAND's RAISE: an enemy's move, which stands a fallen body of the warband up, so revival
+	# among the HEROES' abilities is still the Cleric's alone; a fourth caller is the trip this count exists for.
+	ok(n == 3, "`.revive(` has %d call sites in battle.gd code, not 3 (Resurrection, the Revive Potion, the warband's Raise)" % n)
+	var mr_at := code.find("\"malice_raise\":")
+	var mr_arm := code.substr(mr_at, code.find("\"malice_rally\":", mr_at) - mr_at) if mr_at >= 0 else ""
+	ok(mr_arm.contains(".revive("), "the warband's Raise is not the third caller — a third reviving hero ability would read the same count")
 	ok(code.contains("\"resurrection\":"),
 		"the `resurrection` handler is gone — the one ABILITY that revives")
 	# ...and it is HERS. Asserted off the kit rather than off a name. (BATCH GS:

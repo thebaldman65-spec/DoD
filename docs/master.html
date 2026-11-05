@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-11-04 (Batch JJ &mdash; Malice, and what it pays for)</b></p>
+<p align="right"><b>Last updated: 2026-11-04 (Batch JK &mdash; what the warband buys with its Malice)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -704,7 +704,7 @@ light hits 1–2, heavies/AoE 2–5, Resurrection 3. The remaining cooldown
 shows on the ability button ("CD n") and in its tooltip. <b>An enemy's biggest moves cool too</b>, in
 its own turns, and its plate's <b>CD</b> chip shows it (&sect;9).</li>
 <li><b>Malice:</b> the warband's one pool, filled by what the heroes do to it; every heal the warband casts costs a point of it
-for every point of health it restores, and its strip stands above the warband's plates (&sect;9).</li>
+for every point of health it restores, it buys a Raise, a Rally or an Entrench, and its strip stands above the warband's plates (&sect;9).</li>
 <li><b>Buff / Debuff (keywords):</b> a DEBUFF is any negative status effect, a BUFF any
 positive one. The talent that counts debuffs (the tree's Iron Will)
 uses this classification &mdash; and <b>Broken</b>, the Break meter's state rather than an affliction
@@ -842,6 +842,10 @@ likely to miss them.</td></tr>
 <tr><td>Shielded</td><td>Takes 25% less strike damage — the Orc Shieldmaster's single-ally
 ward, or the Hollow Crown's Regalia. A tick, a reflection, a card's own-rule damage and a companion's
 blow land whole.</td></tr>
+<tr><td>Rally</td><td>Its blows deal more damage: every standing body of a warband that bought a Rally with its Malice (&sect;9).
+Its chip is <b>Ry</b>.</td></tr>
+<tr><td>Entrenched</td><td>Its armor is multiplied: every standing body of a warband that bought an Entrench with its Malice
+(&sect;9). Its chip is <b>Et</b>.</td></tr>
 <tr><td>Ruin</td><td>The Old Gods' mark (Occultist passive, NO maximum, and it does not wear
 off — only an enemy mender's Cleansing Rite, Harvest, Cull, Requiem, Transference (which moves it to another enemy) and the Open Wound rune take it
 away):
@@ -1070,7 +1074,9 @@ whenever its warband's pool, Malice, can pay and one of its warband is missing a
 restore &mdash; the Orc Totemist's and the Orc Shaman's Healing Wave the most wounded (friendly tanks and supports first), the
 Withered Warden's Wild Growth the most wounded (itself included), the Bog Troll's Regenerate itself, and the Grave Totem's Dark Vigil
 when two are hurt (&sect;9); the Orc Shieldmaster ALWAYS casts Shielding when no ally carries its ward
-(lowest-HP ally first, itself included).
+(lowest-HP ally first, itself included). <b>And after every other support behavior, a body buys what its kind buys with Malice</b>
+(&sect;9): a Raise on the largest of its warband's fallen the pool can pay for, a Rally while three or more stand and none is
+rallied or has declared one, an Entrench while none is entrenched or has declared one &mdash; each only when the pool can pay, its price set aside until it lands.
 The Chief and the Ash-Wrought Tyrant build and spend Rage like a Warrior. <b>A move still cooling when its turn
 comes is never chosen</b> (&sect;9).</p>
 <h3>4.9 Enemy intent</h3>
@@ -1095,7 +1101,7 @@ turn every defensive decision into arithmetic. The seven categories:</p>
 <tr><td>Sweep</td><td>⇉</td><td>An attack that hits every ally, or several of them.</td></tr>
 <tr><td>Crush</td><td>▼</td><td>A high-pressure attack — a blow whose Break damage is greater than its damage's percentage of Attack.</td></tr>
 <tr><td>Afflict</td><td>●</td><td>Applies a status. Shows the status's name.</td></tr>
-<tr><td>Bolster</td><td>▲</td><td>Buffs, wards or cleanses itself or a fellow.</td></tr>
+<tr><td>Bolster</td><td>▲</td><td>Buffs, wards or cleanses itself or a fellow, or stands a fallen fellow up (a Raise).</td></tr>
 <tr><td>Mend</td><td>+</td><td>Heals.</td></tr>
 <tr><td>Wind-up</td><td>!!</td><td>A charged blow that lands on a later turn. Shows the turns remaining.</td></tr>
 </table>
@@ -1980,7 +1986,7 @@ is lengthened by 2, which the window does not double), and <b>Firestorm</b>'s 6�
 <tr><td colspan="4"><b>Class-wide — MAGE</b> (all three specs) — <i>the tools every spine wants and no spine provides, because a spine that provided them would stop being a spine</i></td></tr>
 <tr><td><b>Mirror Image</b></td><td>20 Mana, 1.0, 4cd, self</td><td>The next <b>four single-target attacks</b> against him miss outright. Area attacks roll no miss at all, so they spend no image. The images <b>wait until spent</b>.</td><td>Evasion rather than absorption. Better than Nexus Ward, the kit's barrier, against three big hits, worse against a swarm — neither is a strict upgrade of the other.</td></tr>
 <tr><td><b>Mana Well</b></td><td>20 Mana, 1.0, 5cd, self</td><td>For 4 turns his <b>Mana regeneration is doubled</b> — the live figure, so Evocation and any rune are doubled with it.</td><td>Costs Mana to make Mana: net-positive only if the fight lasts, so it is a read on the fight rather than a free button.</td></tr>
-<tr><td><b>Dispel</b></td><td>15 Mana, 1.5, 3cd, either side</td><td>Removes <b>three harmful effects from an ally, or three beneficial effects from an enemy</b>. The only ability in the game that may target either side. <b>The heroes' own work on an enemy is never one of them</b>: a mark (Hunter's Mark, Arcane Echo and the rest), Rime and every debuff stay.</td><td>Utility nobody has. <b>Note:</b> the enemy half is thin — a ward from a Shieldmaster (on an ally) or the Hollow Crown&rsquo;s <b>Regalia</b> (on itself) is the only beneficial effect an enemy can carry.</td></tr>
+<tr><td><b>Dispel</b></td><td>15 Mana, 1.5, 3cd, either side</td><td>Removes <b>three harmful effects from an ally, or three beneficial effects from an enemy</b>. The only ability in the game that may target either side. <b>The heroes' own work on an enemy is never one of them</b>: a mark (Hunter's Mark, Arcane Echo and the rest), Rime and every debuff stay.</td><td>Utility nobody has. <b>Note:</b> the enemy half is thin — a ward from a Shieldmaster (on an ally) or the Hollow Crown&rsquo;s <b>Regalia</b> (on itself) are the beneficial effects an enemy can carry, with a warband's <b>Rally</b> and <b>Entrenched</b> (&sect;9).</td></tr>
 <tr><td><b>Blink</b></td><td>10 Mana, 1.0, 3cd, self</td><td>Clears <b>two turns from every one of his cooldowns</b>. Its own is exempt.</td><td>Timing, not damage. Worth most to whoever has the most on cooldown, so it scales with kit size rather than with any spec.</td></tr>
 <tr><td colspan="4"><b>Class-wide — CLERIC</b> (all three specs) — <i>three support-shaped spines with enormous conditional power; the plain heal, the heal for every hero and the cleanse are every Cleric's class kit (&sect;5.2), so these are the rest</i></td></tr>
 <tr><td><b>Chastise</b></td><td>15 Mana, 2.0, 2cd, one enemy</td><td><b>25% of Attack</b> as holy damage and <b>20 Break damage</b> (Perfect: 25 BD).</td><td>Something to do with a turn. All three Clerics have turns where nobody needs healing and their engine is not ready.</td></tr>
@@ -3076,8 +3082,9 @@ Regenerate, the Withered Warden's Wild Growth and the Grave Totem's Dark Vigil &
 has been given; a heal on a body under Blight the Well restores nothing, so it costs nothing. A healer heals whenever the pool can pay and one of its warband is missing at least half of what the heal would restore
 (two of them, for the Grave Totem's Dark Vigil);
 it declares only a heal the pool can pay, and sets the price aside until the heal lands.</p>
+<p><b>The pool buys three things beside a heal, each a move on its kind's list.</b> A Raise stands a fallen body of the warband back up at 40% of its maximum health, once a body a fight, for the health it stands it up with; a Rally makes every standing body of the warband deal 30% more damage with its blows for 3 turns, for 40 Malice; an Entrench multiplies their armor by 2 for 3 turns, for 30 Malice. Every kind holds one: a Rally the Orc Raider, the Orc Whelp, the Orc Slinger, the Orc Archer, the Orc Hexer, the Wolfrider, the Ashblade, the Orc Brute, the Rot Behemoth, the Orc Chief, the Ash-Wrought Tyrant, the Ash Hurler and the Orc Bloodcaller; an Entrench the Orc Shieldmaster, the Orc Shaman, the Bog Troll, the Withered Warden and the Hollow Crown; a Raise and an Entrench the Orc Totemist, the Orc Ritual Chanter and the Grave Totem. Each cools like any move, on its worth against its own kind's basic, and takes a support cast's time; a raised body rises un-Broken, its first turn a basic swing after it rises, at its own speed, and a body is raised once a fight. A Rally's clock counts down at each body's turn start, as every buff's but Eye of the Storm's does, so each rallied body strikes rallied twice. A hero's Dispel strips a body's Rally and Entrenched, as it strips a ward.</p>
 <table border="1" cellpadding="4">
-<tr><th>Enemy</th><th>Pw</th><th>Roles</th><th>Zones</th><th>HP</th><th>Kit sketch</th></tr>
+<tr><th>Enemy</th><th>Pw</th><th>Roles</th><th>Zones</th><th>HP</th><th>Kit sketch (beside the Malice spend each holds, above)</th></tr>
 <tr><td>Orc Raider</td><td>1</td><td>skirmisher</td><td>1·2·3</td><td>140</td><td>Slash;
 Sundering Strike (60% Sunder 2t). Physical resist 10% — otherwise the neutral
 baseline orc.</td></tr>
@@ -3210,7 +3217,7 @@ with the rune mark &#10022;, bright while it pays and dim while it waits on its 
 which, and for what it pays, every figure read off the rune itself. <b>The Crest's rune is one chip on
 the CREST strip above the heroes' plates</b>, never one on every hero; Communion's chip carries a count beside it, <b>n of m</b>: of the heroes who stand, how many wear
 two or more core runes. <b>The warband's pool, Malice, stands in a strip of its own</b> above the enemies' plates and below the
-combat log: MALICE, its bar and its count out of its cap; hover it for how it fills and which of the warband spend it.
+combat log: MALICE, its bar and its count out of its cap; hover it for how it fills, what it buys and which of the warband spend it.
 <b>The fight's modifier stands in a strip of its own</b>,
 at the top of the screen between the turn strip and the combat log: <b>BARGAIN</b> when the heroes bought its terms at the
 offer, <b>IMPOSED</b> when Ruin's road laid it on a node a route cannot duck, then <b>one chip in the modifier's own
@@ -3624,8 +3631,8 @@ offers: Full Restore (HP/resources/secondary for every hero), <b>Kill All Enemie
 living enemy is switched off — no damage event, no on-hit or on-death proc — and the normal
 victory flow runs: gold, talent points, the heal, the bargain's reward, elite spoils and the
 summary), a <b>Cooldowns OFF</b>
-toggle (while checked, hero abilities never go on cooldown; existing cooldowns clear on
-enabling — enemies carry none), an
+toggle (while checked, no ability goes on cooldown, a hero's or an enemy's; existing cooldowns clear on
+enabling), an
 <b>Enemy attacks OFF</b> toggle (enemies skip their turns while checked), and a <b>turn
 lock</b> — pick a hero and every HERO turn is theirs until you unlock (re-select them) or
 lock a different hero, while <b>enemies keep attacking on their own turns</b> (combine with

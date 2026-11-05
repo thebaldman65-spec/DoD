@@ -4,6 +4,25 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## What the warband buys with its Malice (Batch JK) — 2026-11-04
+
+**A pool needs buyers on every kind, or it teaches that it does nothing.** JJ's pool was given about 280 a fight and spent 13,
+because only the healers could spend it and two fights in three held none. JK gives every kind something to buy — a Raise for three
+of the menders, a Rally or an Entrench for every kind — as a move on its own list rather than a side-level action, so the selection that
+chooses every other move chooses it, the player sees which body bought it, and the cooldown line every move is priced on prices it.
+
+**Why it is not measurably harder.** A spend is a move, so every Rally or Entrench is a blow its body does not strike, at a
+support cast's delay, and what the pool spends on it no longer pays a heal. A Rally's clock counts down before its bearer acts, as
+every buff's but Eye of the Storm's does, so the brief's two rallied turns needed a clock of three: JK's first draft laid two, paid one rallied blow and
+priced two, and both outside readers caught it. With the Rally whole, every outcome the brief named reads a tie, and the pool
+spends 38.0 a fight against the 50 the brief called hungry. The picker waits for three standing bodies to rally and for none
+entrenched to entrench; that, not the prices, is what the brief's own test points at, and the brief ordered no tuning, so the
+levers — a hungrier picker, a spend that costs no blow, larger figures — go to the designer.
+
+**Why no Overrun.** Nothing in the game puts a new body into the turn order once a fight has opened; the warband is laid out once, by
+its size. A companion joins off the order. Building that path is a batch of its own, so the spend went to the record, named, rather
+than in quietly.
+
 ## Malice, and what it pays for (Batch JJ) — 2026-11-04
 
 **Why the warband pays for its heals in what the heroes do to it.** A heal that costs nothing undoes damage for free, so the only answer is to delete enemies one at a time. Paid for out of what the heroes deal, a heal can never outrun the damage that bought it: the warband heals a tenth of what it is dealt, a kill's worth and the waste, and no more. The party cannot be out-healed, only taxed.

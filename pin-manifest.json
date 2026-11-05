@@ -2,18 +2,18 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 2319,
-  "source": 1445,
-  "other": 289,
+  "total": 2325,
+  "source": 1446,
+  "other": 294,
   "document": 585
  },
  "floor": {
-  "pins": 2319
+  "pins": 2325
  },
  "falls": [],
  "source_residency": {
   "narrow": 49,
-  "code": 892,
+  "code": 893,
   "absent": 330,
   "runtime": 109,
   "unresolved": 6,
@@ -1059,7 +1059,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_dr.gd#117"
+   "g": "check_dr.gd#120"
   },
   {
    "s": "check_dr.gd",
@@ -1070,7 +1070,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dr.gd#201"
+   "g": "check_dr.gd#204"
   },
   {
    "s": "check_dr.gd",
@@ -1081,7 +1081,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dr.gd#200"
+   "g": "check_dr.gd#203"
   },
   {
    "s": "check_dr.gd",
@@ -1092,7 +1092,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dr.gd#199"
+   "g": "check_dr.gd#202"
   },
   {
    "s": "check_dr.gd",
@@ -1103,7 +1103,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_dr.gd#198"
+   "g": "check_dr.gd#201"
   },
   {
    "s": "check_ds.gd",
@@ -11610,17 +11610,6 @@
   },
   {
    "s": "check_jg.gd",
-   "fn": "_s3h_the_name",
-   "h": "DoD-archive/state-archive.md",
-   "n": "on %s names in %d populations",
-   "p": "+",
-   "r": "runtime",
-   "k": "format",
-   "how": "read",
-   "g": "check_jg.gd#573"
-  },
-  {
-   "s": "check_jg.gd",
    "fn": "_s5_not_done",
    "h": "docs/reports/JE-crest.tsv",
    "n": "paired by seed against the same party with no crest",
@@ -11628,7 +11617,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_jg.gd#652"
+   "g": "check_jg.gd#656"
   },
   {
    "s": "check_jh.gd",
@@ -12076,7 +12065,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ji.gd#236"
+   "g": "check_ji.gd#241"
   },
   {
    "s": "check_ji.gd",
@@ -12087,7 +12076,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ji.gd#342"
+   "g": "check_ji.gd#347"
   },
   {
    "s": "check_ji.gd",
@@ -12098,7 +12087,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ji.gd#414"
+   "g": "check_ji.gd#419"
   },
   {
    "s": "check_ji.gd",
@@ -12109,7 +12098,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ji.gd#453",
+   "g": "check_ji.gd#458",
    "expr": "MASTER_NEEDLE"
   },
   {
@@ -12121,7 +12110,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_ji.gd#461",
+   "g": "check_ji.gd#466",
    "expr": "String"
   },
   {
@@ -12133,7 +12122,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_ji.gd#487",
+   "g": "check_ji.gd#492",
    "expr": "nm"
   },
   {
@@ -12145,7 +12134,7 @@
    "r": "runtime",
    "k": "format",
    "how": "derived",
-   "g": "check_ji.gd#458"
+   "g": "check_ji.gd#463"
   },
   {
    "s": "check_ji.gd",
@@ -12156,7 +12145,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ji.gd#490"
+   "g": "check_ji.gd#495"
   },
   {
    "s": "check_ji.gd",
@@ -12167,7 +12156,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ji.gd#480"
+   "g": "check_ji.gd#485"
   },
   {
    "s": "check_ji.gd",
@@ -12178,7 +12167,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ji.gd#481"
+   "g": "check_ji.gd#486"
   },
   {
    "s": "check_ji.gd",
@@ -12189,7 +12178,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ji.gd#457"
+   "g": "check_ji.gd#462"
   },
   {
    "s": "check_ji.gd",
@@ -12200,7 +12189,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ji.gd#538",
+   "g": "check_ji.gd#543",
    "expr": "pair"
   },
   {
@@ -12212,7 +12201,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ji.gd#540",
+   "g": "check_ji.gd#545",
    "expr": "String"
   },
   {
@@ -12394,6 +12383,87 @@
    "k": "literal",
    "how": "read",
    "g": "check_jj.gd#586"
+  },
+  {
+   "s": "check_jk.gd",
+   "fn": "_s0_the_rulings",
+   "h": "DoD-archive/state-archive.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_jk.gd#201",
+   "expr": "ANSWERED"
+  },
+  {
+   "s": "check_jk.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/state.md",
+   "n": "\n### JJ's RULINGS OWED",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jk.gd#199"
+  },
+  {
+   "s": "check_jk.gd",
+   "fn": "_s1_entrench",
+   "h": "scripts/battle.gd",
+   "n": "has_status(\"warband_entrench\")",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jk.gd#432"
+  },
+  {
+   "s": "check_jk.gd",
+   "fn": "_s1_overrun",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_jk.gd#497",
+   "expr": "OVERRUN_RECORD"
+  },
+  {
+   "s": "check_jk.gd",
+   "fn": "_s1_overrun",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_jk.gd#497",
+   "expr": "OVERRUN_TAKES"
+  },
+  {
+   "s": "check_jk.gd",
+   "fn": "_s3_the_reading",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_jk.gd#673",
+   "expr": "fig"
+  },
+  {
+   "s": "check_jk.gd",
+   "fn": "_s5_the_texts",
+   "h": "docs/state.md",
+   "n": "a Rally %d and an Entrench %d, flat",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_jk.gd#714"
   },
   {
    "s": "test_batch_ah.gd",

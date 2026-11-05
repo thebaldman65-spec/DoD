@@ -144,7 +144,12 @@ const SRC_FLOOR := 107
 # Cleric applies* (IJ's ruling 9, IL §1). The four he can cause and that stay unstamped are
 # this gate's own DI §2 rule — the potions, the charmed Daze — and the Ruin primer.
 # `SRC_FLOOR` is a ratchet and did not have to move; `check_il` §1a holds the seventeen.
-const CALL_SITES := 221
+#
+# **BATCH JK MOVED IT 221 -> 223, AND SAYS WHY. Net +2, two arrivals.** The warband's Rally lays `warband_rally` and its
+# Entrench `warband_entrench` on every standing body of the warband, each in its own arm of `_resolve_special`. Both land
+# on an ENEMY and pass the enemy that bought them as the source, DI's rule, so `with_src` moves with them; `SRC_FLOOR` is
+# a ratchet and did not have to move.
+const CALL_SITES := 223
 
 # Four plain afflictions: all in `DEBUFF_IDS`, none sticky, none on the boss
 # immunity list, so `_harvest_yield` counts all four and `purge_debuffs` takes

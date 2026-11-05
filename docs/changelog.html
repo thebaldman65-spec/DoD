@@ -16,6 +16,19 @@ and backed up by GitHub now; it is kept out of the knowledge-base sync by DESELE
 connector's file picker, which is a different act from keeping it out of the repo &mdash; see the
 <b>Batch FH</b> entry, which <b>Batch GZ</b>'s cut moved into the archive.</p>
 
+<h2>2026-11-04 &mdash; Batch JK: WHAT THE WARBAND BUYS WITH ITS MALICE</h2>
+<p><b>The warband's pool buys three things beside a heal now, and every kind of enemy can buy one.</b> A <b>Raise</b> stands a fallen
+body of the warband back up at 40% of its maximum health, once a body a fight, for that health in Malice; a <b>Rally</b> makes every
+standing body's blows land 30% harder for 3 turns &mdash; two of each enemy's own blows &mdash; for 40; an <b>Entrench</b> doubles their armor for 3 turns, for 30. Each is a
+move on its kind's list: a Rally on thirteen kinds, an Entrench on five, a Raise and an Entrench on the Orc Totemist, the Ritual
+Chanter and the Grave Totem. A body buys one when the pool can pay and no heal or ward is wanted first, and every spend waits
+2 to 4 of its own turns between uses. The Rally and Entrenched chips sit on the plates, and the Malice strip's hover names what the
+pool buys. <b>There is no Overrun</b>: nothing in the game can add a body to the warband once a fight has begun.</p>
+<p><b>Fights are not measurably harder.</b> Over sixty paired runs at Warden the pool spent 38.0 a fight where it spent 13.2,
+and every outcome &mdash; runs finished (3 to 4 of 60), heroes fallen, health at a fight's end, the length of a fight &mdash; is a
+tie: a spend costs an enemy its turn, and Malice spent on a spend no longer pays for a heal. Nothing was tuned; the choice is
+the designer's. JJ's six rulings were accepted. <code>check_jk</code> is new.</p>
+
 <h2>2026-11-04 &mdash; Batch JJ: MALICE, AND WHAT IT PAYS FOR</h2>
 <p><b>The warband shares one pool, Malice.</b> It fills with what the heroes do to it: a point for every 10 points of damage they deal it, 25 when one of its bodies falls, and a point for every point of damage a blow spends past a body's last. It holds 150, and a fight opens with it empty. Its bar stands above the warband's plates, with its count, and its hover says how it fills and which enemies spend it.</p>
 <p><b>Its heals cost Malice now.</b> The Orc Totemist's and the Orc Shaman's Healing Wave, the Bog Troll's Regenerate, the Withered Warden's Wild Growth and the Grave Totem's Dark Vigil each cost a point of Malice for every point of health they restore, so the warband can never heal more than its pool was given. A heal on a body under Blight the Well restores nothing, so it costs nothing, and a low pool never keeps a healer off it. A healer now heals whenever the pool can pay and a body it heals is missing at least half of what the heal would restore (two, for the Grave Totem's Dark Vigil); it never declares a heal the pool cannot pay, and it sets the price aside so a second healer cannot spend it first.</p>

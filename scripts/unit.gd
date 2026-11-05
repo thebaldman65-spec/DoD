@@ -4102,6 +4102,10 @@ func effective_armor() -> float:
 	# armor came from.
 	if has_status("standard"):
 		a += float(get_status("standard").get("armor", 0.0))
+	# BATCH JK §1 — ENTRENCH: a body of the warband under its Entrench wears its armor `MALICE_ENTRENCH_MULT` times over, read at
+	# this one door every blow's armor passes; the ceiling below still holds it.
+	if has_status("warband_entrench"):
+		a *= MALICE_ENTRENCH_MULT
 	if broken:
 		a *= 0.7
 	# BATCH HF — RENDING BLOWS DEEPENS SUNDER, AND THE DEPTHS ADD. One Sunder is
@@ -4119,6 +4123,8 @@ func effective_armor() -> float:
 # stands (1 unless a Rending Blows Crushing Blow deepened it). THE ONE ANSWER:
 # the armor line above and the chip `battle.gd` stamps both read it.
 const SUNDER_STEP := 0.35
+# BATCH JK §1 — what a warband's Entrench multiplies its armor by (the battle's spend lays it; this door reads it).
+const MALICE_ENTRENCH_MULT := 2
 # BATCH IK §3a — SUNDER's OWN DURATION: what its base application lays — Crushing Blow, the card every
 # Warrior holds — and what a Perfect Sever lays on the body it cut, read here by both, never retyped.
 const SUNDER_TURNS := 3

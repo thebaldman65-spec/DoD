@@ -1,0 +1,22 @@
+kind	enemy	role	basic (as JI's line prices it)	owned a cooling move before JK	the spends it holds, each with its cooldown	each spend's worth against the basic
+raider	Orc Raider	damage	34.0	no	Rally 3	Rally 2.05
+whelp	Orc Whelp	damage	26.0	yes	Rally 3	Rally 2.68
+slinger	Orc Slinger	damage	24.0	no	Rally 3	Rally 2.90
+totemist	Orc Totemist	support	15.0	yes	Raise 4, Entrench 4	Raise 3.40, Entrench 7.09
+archer	Orc Archer	damage	21.0	no	Rally 4	Rally 3.31
+shieldmaster	Orc Shieldmaster	tank	27.8	no	Entrench 4	Entrench 3.83
+shaman	Orc Shaman	support	60.0	no	Entrench 2	Entrench 1.77
+hexer	Orc Hexer	support	22.0	no	Rally 4	Rally 3.16
+wolfrider	Wolfrider	damage	36.0	no	Rally 2	Rally 1.93
+ashblade	Ashblade	damage	32.0	no	Rally 3	Rally 2.17
+brute	Orc Brute	damage	40.0	no	Rally 2	Rally 1.74
+bog_troll	Bog Troll	tank	30.0	yes	Entrench 4	Entrench 3.54
+behemoth	Rot Behemoth	damage	41.0	yes	Rally 2	Rally 1.70
+chief	Orc Chief	damage	28.0	yes	Rally 3	Rally 2.49
+withered_warden	Withered Warden	tank	60.0	yes	Entrench 2	Entrench 1.77
+ash_tyrant	Ash-Wrought Tyrant	damage	30.0	yes	Rally 3	Rally 2.32
+chanter	Orc Ritual Chanter	support	11.0	no	Raise 4, Entrench 4	Raise 4.64, Entrench 9.66
+hurler	Ash Hurler	damage	30.0	yes	Rally 3	Rally 2.32
+bloodcaller	Orc Bloodcaller	damage	30.0	no	Rally 3	Rally 2.32
+grave_totem	Grave Totem	support	9.0	yes	Raise 4, Entrench 4	Raise 5.67, Entrench 11.81
+hollow_crown	The Hollow Crown	damage	52.9	yes	Entrench 3	Entrench 2.01

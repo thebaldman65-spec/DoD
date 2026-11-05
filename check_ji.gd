@@ -270,6 +270,7 @@ func _s1a_the_population(s: Node) -> void:
 	var wrong: Array = []
 	var basics_cooling: Array = []
 	var total := 0
+	var spends := 0
 	for kind in data:
 		var k: Dictionary = data[kind]
 		var basic: Dictionary = {}
@@ -282,6 +283,11 @@ func _s1a_the_population(s: Node) -> void:
 			continue
 		var bp := _blow(basic, dot)
 		for a in k["abilities"]:
+			# JK §2 — A MALICE SPEND IS PRICED BY `check_jk` §2, on this line read out of this file: its worth on the reference board
+			# against this kind's basic. It is counted here and walked there, so this walk stays the fifty it was written for.
+			if String(a.get("special", "")).begins_with("malice_"):
+				spends += 1
+				continue
 			total += 1
 			var name := String(a["display_name"])
 			var sp := String(a.get("special", ""))
@@ -316,6 +322,7 @@ func _s1a_the_population(s: Node) -> void:
 		if float(r[0]) >= 1.0 and String(r[5]) != "its basic" or int(r[4]) > 0:
 			print("    %5.2f  %-16s %-18s rule %d, data %d  — %s" % [float(r[0]), r[1], r[2], int(r[3]), int(r[4]), r[5]])
 	print("    CHECKED %d of %d moves in %d kinds; the median composable body %.1f; %d take a cooldown" % [rows.size(), total, data.size(), body, _pop.size()])
+	print("    and %d Malice spends beside them, priced by check_jk §2" % spends)
 	ok(rows.size() == total and total >= 50, "§1a: the walk priced %d of %d moves" % [rows.size(), total])
 	ok(wrong.is_empty(), "§1a: the data and the rule disagree: %s" % [wrong])
 	ok(basics_cooling.is_empty(), "§1a: a basic attack carries a cooldown: %s" % [basics_cooling])
@@ -704,7 +711,9 @@ func _strip(v: Variant) -> Variant:
 				out[k] = _strip(v[k])
 		return out
 	if v is Array:
-		return (v as Array).map(func(x): return _strip(x))
+		# JK §1 — AND THE WARBAND's MALICE SPENDS, the moves JK added and `check_jk` holds: the digest is of every other figure.
+		return (v as Array).filter(func(x): return not (x is Dictionary and String((x as Dictionary).get("special", "")).begins_with("malice_"))) \
+			.map(func(x): return _strip(x))
 	return v
 
 

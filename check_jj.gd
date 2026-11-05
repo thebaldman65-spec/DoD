@@ -805,7 +805,10 @@ func _s7_not_done() -> void:
 	var data: Dictionary = Enemies._load()
 	var moves := 0
 	for k in data:
-		moves += ((data[k] as Dictionary).get("abilities", []) as Array).size()
+		# JK §1 — the warband's Malice spends are JK's moves, held by `check_jk` §4; the fifty beside them are what this pins.
+		for mv in (data[k] as Dictionary).get("abilities", []):
+			if not String((mv as Dictionary).get("special", "")).begins_with("malice_"):
+				moves += 1
 	print("    %d kinds, %d moves" % [data.size(), moves])
 	ok(data.size() == KINDS and moves == MOVES, "§7: the warband holds %d kinds and %d moves, not %d and %d" % [data.size(), moves, KINDS, MOVES])
 

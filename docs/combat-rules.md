@@ -118,7 +118,8 @@ inside it breaks that promise.
   the turn it lands — and its chance), times the heroes it reaches (four for an area blow; a companion standing is not
   counted); a heal at the health it restores, on the median composable body or the caster's own for a self-heal, a
   whole-warband heal on four bodies, the basic turned to health at the enemy's own Attack. A ward and a cleanse are not
-  priced. **The figure is 2 under 2x, 3 under 3x and 4 past it**, in the enemy's own turns. A move a resource already bounds
+  priced; a Malice spend is, on its worth against its kind's basic (`check_jk` §2, the line read out of `check_ji`).
+  **The figure is 2 under 2x, 3 under 3x and 4 past it**, in the enemy's own turns. A move a resource already bounds
   takes one too — DU §1's *priced twice* is weighed and set aside (JI's ruling 3, accepted at JJ §0). `check_ji` §1a derives the
   population off the data every battery and reds on a move the rule and the data disagree about, so **a new enemy move is
   priced in the batch that authors it** and its key written with it; a designer's hand-tune of one move goes in its `TUNED`.
@@ -136,6 +137,16 @@ inside it breaks that promise.
   it is free; a new damage source that passes neither door fills nothing, and damage the frame credits to nobody — the Bomb, a
   spread Burn with no source, the Wasting bargain's tick — fills nothing but its kill.** **A heal on a blighted body restores
   nothing, so `_malice_price` prices it at nothing**: the pool never keeps a healer off Blight the Well.
+· **WHAT ELSE THE POOL BUYS IS A MOVE ON ITS KIND's LIST, NEVER A SIDE's ACTION (JK §1, §2).** A Raise, a Rally and an Entrench
+  stand in `data/enemies.json`; the support half chooses one last, after every heal and ward (`_warband_spend`), so the healers'
+  policy stands, and it asks `_enemy_ready` its cooldown and its price on the body it names — **the pool buys health at one
+  Malice a point** (a Raise costs the health it stands a body up with, `_raise_figure`) **and everything else flat** (a Rally
+  `MALICE_RALLY_PRICE`, an Entrench `MALICE_ENTRENCH_PRICE`) — so a declared spend sets its price aside as a heal does, and its arm in
+  `_resolve_special` pays. **A Rally is read in the strike loop and nowhere a heal passes; an Entrench at `effective_armor()`,
+  the one door**; a Raise is `revive`, once a body a fight, the body down un-Broken (JD §3) and its first turn a basic
+  swing after it rises. **A Raise's target is down by design, so re-validation never re-targets it as a target gone.** A
+  Rally's clock counts down before its bearer acts, so a body strikes rallied one turn fewer than the clock. No new body joins
+  the warband once a fight has opened, so there is no Overrun (JK's RULINGS OWED 1).
 · **Declaration**: `_declare_intent(u)`, called from `_declare_all_intents()` at battle start
   (after the opening oath/Faith hooks, which move state the policy reads), from the turn loop
   **right after** `await _enemy_turn(u)` — **NOT from the bottom of `_enemy_turn`**, which returns

@@ -4002,7 +4002,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"perfect_id": "", "perfect_text": "",
 				"description": "Open the well: for {=Battle.MANA_WELL_TURNS} turns your Mana\nregeneration is DOUBLED. It costs Mana\nto make Mana — a long fight pays for\nit and a short one does not."})
 		# AXIS: utility nobody has. TWO HALVES, AND THE ENEMY HALF IS THIN —
-		# `shielded` is the ONLY beneficial status an enemy can carry in the
+		# `shielded` WAS the ONLY beneficial status an enemy could carry (since JK a warband's Rally and Entrench too) in the
 		# whole game (two of nineteen kinds apply it), so that half removes at
 		# most ONE thing and usually nothing. MEASURED AND REPORTED rather than
 		# quietly dropped: authoring enemy buffs is a content decision and not

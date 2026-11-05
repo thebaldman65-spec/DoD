@@ -44,6 +44,15 @@
      "turns": 2
     },
     "status_chance": 0.6
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
    }
   ]
  },
@@ -89,6 +98,15 @@
     "pressure": 20,
     "delay": 2.5,
     "anim": "attack02"
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
    }
   ]
  },
@@ -132,6 +150,15 @@
     "pressure": 38,
     "delay": 2.5,
     "anim": "attack02"
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
    }
   ]
  },
@@ -178,6 +205,24 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Mends the most wounded of its warband\nfor 25% of their max HP, paid in\nMalice (tanks and supports first)."
+   },
+   {
+    "display_name": "Raise",
+    "cooldown": 4,
+    "special": "malice_raise",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Stands a fallen body of its warband back\nup at {=Battle.MALICE_RAISE_PCT*100}% of its maximum health, for\nthat health in Malice (once a body, a fight)."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 4,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
    }
   ]
  },
@@ -230,6 +275,15 @@
      "turns": 3
     },
     "status_chance": 0.7
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 4,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
    }
   ]
  },
@@ -276,6 +330,15 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Wards one of its warband: 25% less strike damage taken for 3 turns."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 4,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
    }
   ]
  },
@@ -326,6 +389,15 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Mends the most wounded of its warband\nfor 25% of their max HP, paid in\nMalice (tanks and supports first)."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 2,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
    }
   ]
  },
@@ -387,6 +459,15 @@
     "delay": 3.0,
     "anim": "attack02",
     "dmg_type": "shadow"
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 4,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
    }
   ]
  },
@@ -436,6 +517,15 @@
      "turns": 2
     },
     "status_chance": 0.5
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 2,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
    }
   ]
  },
@@ -485,6 +575,15 @@
      "turns": 2
     },
     "status_chance": 0.6
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
    }
   ]
  },
@@ -530,6 +629,15 @@
     "pressure": 50,
     "delay": 3.5,
     "anim": "attack02"
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 2,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
    }
   ]
  },
@@ -590,6 +698,15 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Knits its own rubbery flesh back\ntogether: heals 25% of max health."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 4,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
    }
   ]
  },
@@ -645,6 +762,15 @@
     "anim": "attack02",
     "dmg_type": "nature",
     "aoe": true
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 2,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
    }
   ]
  },
@@ -704,6 +830,15 @@
     "pressure": 56,
     "delay": 4.0,
     "anim": "attack02"
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
    }
   ]
  },
@@ -769,6 +904,15 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Heals one of its warband for 20% of their max health."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 2,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
    }
   ]
  },
@@ -843,6 +987,15 @@
      "turns": 2
     },
     "status_chance": 0.7
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
    }
   ]
  },
@@ -890,6 +1043,24 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Strips one harmful effect from each of\nits warband (the longest-lasting one;\nChilled thaws one stack at a time)."
+   },
+   {
+    "display_name": "Raise",
+    "cooldown": 4,
+    "special": "malice_raise",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Stands a fallen body of its warband back\nup at {=Battle.MALICE_RAISE_PCT*100}% of its maximum health, for\nthat health in Malice (once a body, a fight)."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 4,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
    }
   ]
  },
@@ -942,6 +1113,15 @@
     "anim": "attack02",
     "aoe": true,
     "description": "Hoists a burning stone. It lands next\nturn: heavy damage to every ally.\nBreak, Freeze, or Stun the Hurler\nto cancel the throw."
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
    }
   ]
  },
@@ -990,6 +1170,15 @@
     "anim": "attack02",
     "dmg_type": "shadow",
     "description": "Grows stronger for every one of its\nwarband fallen this battle."
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
    }
   ]
  },
@@ -1046,6 +1235,24 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Its whole warband regains 6% of\ntheir maximum health."
+   },
+   {
+    "display_name": "Raise",
+    "cooldown": 4,
+    "special": "malice_raise",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Stands a fallen body of its warband back\nup at {=Battle.MALICE_RAISE_PCT*100}% of its maximum health, for\nthat health in Malice (once a body, a fight)."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 4,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
    }
   ]
  },
@@ -1141,6 +1348,15 @@
      "turns": 4
     },
     "status_chance": 0.9
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 3,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
    }
   ]
  }

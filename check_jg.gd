@@ -719,7 +719,13 @@ func _s3h_the_name() -> void:
 	ok(pop.size() >= 1300 and kinds.size() == 21, "§3h: the sweep read %d names in %d populations, not the game's" % [pop.size(), kinds.size()])
 	ok(hits.is_empty(), "§3h: the name stands beside %s" % str(hits))
 	var said := _flat(_block(_doc("res://DoD-archive/state-archive.md"), "### ~~JG's RULINGS OWED~~"))
-	ok(said.contains("on %s names in %d populations" % [_commas(pop.size()), kinds.size()]), "§3h: the ruling does not state the sweep's own size (%d in %d)" % [pop.size(), kinds.size()])
+	# JK RE-POINTED IT: the ruling is JG's record and its count the sweep JG stood on. JK's three moves and two statuses grew the
+	# names past it, so the archived figure is the floor the sweep reads now, its populations the same.
+	var said_rx := RegEx.new()
+	said_rx.compile("on ([0-9,]+) names in ([0-9]+) populations")
+	var said_m := said_rx.search(said)
+	var said_n := int(said_m.get_string(1).replace(",", "")) if said_m != null else -1
+	ok(said_m != null and said_n >= 1300 and said_n <= pop.size() and int(said_m.get_string(2)) == kinds.size(), "§3h: the ruling does not state the sweep's own size (%d in %d)" % [pop.size(), kinds.size()])
 	# ITS FIELD MAY NOT CROSS THE WORD: `communion_ranks` IS THE DEVOUT's AND `wild_communion_step` THE BEASTMASTER's, AND THE TWO HAVE BEEN CROSSED ONCE.
 	var f := "var rune_" + "communion"
 	ok(not _doc("res://scripts/unit.gd").contains(f + " ") and not _doc("res://scripts/unit.gd").contains(f + "_"), "§3h: a `rune_` field carries the word, and reads as the twin of a dormant node's counter")

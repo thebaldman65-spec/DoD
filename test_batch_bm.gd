@@ -583,11 +583,12 @@ func _end_boss_and_ladder() -> void:
 		if int(ab.get("rung", 1)) > 1:
 			ranked += 1
 	_check(ranked == 2, "the end boss gains two abilities across the ladder")
-	_check(Enemies.config(Run_end_boss_kind(), 1)["abilities"].size() == 3,
+	# BATCH JK §1 — the end boss holds a Malice spend at every rung, as every kind does; the rungs count the kit beside it.
+	_check(Enemies.config(Run_end_boss_kind(), 1)["abilities"].filter(func(x): return not String(x.special).begins_with("malice_")).size() == 3,
 		"rung 1 meets three of its abilities")
-	_check(Enemies.config(Run_end_boss_kind(), 2)["abilities"].size() == 4,
+	_check(Enemies.config(Run_end_boss_kind(), 2)["abilities"].filter(func(x): return not String(x.special).begins_with("malice_")).size() == 4,
 		"rung 2 meets four")
-	_check(Enemies.config(Run_end_boss_kind(), 3)["abilities"].size() == 5,
+	_check(Enemies.config(Run_end_boss_kind(), 3)["abilities"].filter(func(x): return not String(x.special).begins_with("malice_")).size() == 5,
 		"rung 3 meets five")
 	# Every other kind reads identically at every rung — the filter is inert
 	# where nothing is tagged.

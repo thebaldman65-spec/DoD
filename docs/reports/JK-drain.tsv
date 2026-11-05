@@ -1,0 +1,59 @@
+reading	JJ (HEAD)	JK	paired JK − JJ
+runs	60	60	
+completed	3	4	+0.017 ± 0.044
+fights won a run	16.62	17.52	+0.90 ± 0.97
+falls a run	6.47	6.08	-0.38 ± 0.39
+falls a run, in the fights it won	2.67	2.35	-0.32 ± 0.40
+falls a run, in the fight that ended it	3.80	3.73	-0.07 ± 0.18
+paired fights (same node, in order)	924	924	58 of 60 runs on one road throughout
+health at a fight's end, paired fights	0.8309	0.8377	+0.94 ± 0.84 points
+falls a fight, paired fights	0.286	0.264	-0.030 ± 0.038
+  falls a fight, the paired fights both arms won			-0.020 ± 0.010
+  health at a fight's end, the paired fights both arms won			+0.81 ± 0.39 points
+  hero turns a fight, the paired fights both arms won			+0.32 ± 0.15
+  paired fights holding a loss			19 lost by both arms, 19 by JK alone, 20 by JJ alone; their share of the falls a fight -0.012 ± 0.034
+  health at a fight's end: the share the paired fights holding a loss carry			+0.18 ± 0.70 points
+  health at a fight's end: the share the paired fights both arms won carry			+0.76 ± 0.37 points
+  falls a fight: the share the paired fights holding a loss carry			-0.012 ± 0.034
+  health at a fight's end, the paired fights JK bought nothing in			+0.38 ± 0.34 points (453 fights; JJ's hero turns there 28.2)
+  the same, the fights both arms won			+0.20 ± 0.31 points
+  health at a fight's end, the paired fights JK bought a Rally in			-0.65 ± 2.37 points (355 fights; JJ's hero turns there 37.7)
+  the same, the fights both arms won			+1.42 ± 0.99 points
+  health at a fight's end, the paired fights JK bought an Entrench and no Rally in			+5.01 ± 2.28 points (106 fights; JJ's hero turns there 35.1)
+  the same, the fights both arms won			+1.77 ± 0.99 points
+  health at a fight's end, the paired fights JK bought a Raise alone in			-0.33 ± 1.05 points (10 fights; JJ's hero turns there 23.7)
+  the same, the fights both arms won			-0.33 ± 1.05 points
+  health at a fight's end, every paired fight JK bought an Entrench in			+4.57 ± 3.16 points (193 fights)
+  the warband's blows a fight, paired fights			-0.68 ± 0.24
+hero turns a fight, paired fights	32.62	32.86	+0.37 ± 0.28
+the first fight: health at its end	0.9379	0.9359	-0.20 ± 0.27 points (60 of 60 the same node)
+the first fight: falls	0.000	0.000	+0.000 ± 0.000
+the first fight: hero turns	21.05	20.97	-0.08 ± 0.27
+enemy moves resolved	17831	18468	
+the warband's heals cast	306 (1.72 a hundred moves, 0.290 a fight)	240 (1.30 a hundred moves, 0.217 a fight)	
+health the warband healed a fight, all fights	13.2	9.4	-2.61 ± 0.83 (paired fights)
+the warband's heals cast a fight, paired fights			-0.050 ± 0.017
+  in the fights it opened with a healer	37.9 (367 fights)	28.0 (372 fights)	
+re-validation fallbacks	0	1	
+Malice given a fight	282.5	283.1	+3.61 ± 3.54 (paired fights)
+Malice taken a fight	157.6	180.8	+23.23 ± 1.66 (paired fights)
+Malice wasted a fight	124.9	102.3	-19.62 ± 3.40 (paired fights)
+Malice spent a fight	13.2	38.0	+25.57 ± 1.39 (paired fights)
+turns at the cap	20.5%	14.4%	
+fights ending at the cap	87.5%	84.6%	
+Malice spent on heals a fight	13.2	9.4	-2.61 ± 0.83 (paired fights)
+Malice spent on the spends a fight	0.0	28.6	
+Raises a fight	0.000	0.063	70 in 1107 fights
+Rallies a fight	0.000	0.420	465 in 1107 fights
+Entrenches a fight	0.000	0.254	281 in 1107 fights
+  health Raises stood bodies up with a fight		4.14	
+Malice, fights with a healer (367 and 372)	given 285.2, spent 37.9	given 297.7, spent 70.4	
+  at the cap, fights with a healer	16.0% of turns; 79.6% of fights end there	9.4% of turns; 75.8% of fights end there	
+Malice, fights with none (687 and 735)	given 281.1, spent 0.0	given 275.6, spent 21.6	
+  at the cap, fights with none	23.1% of turns; 91.7% of fights end there	17.2% of turns; 89.0% of fights end there	
+JK fights where spent != healed + the spends		0	of 1107
+cast: Healing Wave (Orc Totemist)	130	104	
+cast: Healing Wave (Orc Shaman)	109	76	
+cast: Dark Vigil (Grave Totem)	32	30	
+cast: Wild Growth (Withered Warden)	28	22	
+cast: Regenerate (Bog Troll)	7	8	
