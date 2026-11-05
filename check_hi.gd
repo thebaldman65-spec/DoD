@@ -62,7 +62,7 @@ const SCRATCH_PROFILE := "user://profile_check_hi.json"
 # through the hero resolvers, so the Warrior's basic and a raider's swing can
 # share a word. The set is asserted as an EQUALITY so the next one is a decision
 # somebody made, not a word that crept in.
-# JK §1 — AND RALLY: the warband's Malice spend, named by the brief, beside the Warrior's card (JK's RULINGS OWED 7).
+# JK §1 — AND RALLY: the warband's Malice spend, named by the brief, beside the Warrior's card (JK's ruling 7, accepted at JL §0).
 const LABEL_SHARED := ["Rally", "Strike"]
 
 var _g := Gate.new()

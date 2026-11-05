@@ -563,6 +563,47 @@
   ]
  },
  {
+  "id": "status_gall",
+  "term": "Gall",
+  "category": "statuses",
+  "short": "Healing received cut by {=Unit.GALL_HEAL_CUT*100}%.",
+  "long": "A hex the warband lays on one hero: every heal that hero receives lands {=Unit.GALL_HEAL_CUT*100}% smaller while it lasts, whoever casts it. It multiplies with Frostbite and Miasma. It is an affliction, so a cleanse lifts it.",
+  "see_also": [
+   "status_frostbite"
+  ]
+ },
+ {
+  "id": "status_sap",
+  "term": "Sap",
+  "category": "statuses",
+  "short": "Resource gained cut by {=Unit.SAP_CUT*100}%.",
+  "long": "A hex the warband lays on one hero: whatever would raise that hero's Rage or Mana raises it {=Unit.SAP_CUT*100}% less while it lasts - the turn's drip, a card's own gain, a refund, a blow taken. Spending is untouched, and so is a spec's own meter (Focus, Faith, Resonance). It is an affliction, so a cleanse lifts it.",
+  "see_also": [
+   "status_gall"
+  ]
+ },
+ {
+  "id": "status_mire",
+  "term": "Mire",
+  "category": "statuses",
+  "short": "-{=Unit.MIRE_SLOW*100}% speed; turns arrive later.",
+  "long": "A hex the warband lays on one hero: it cuts speed by {=Unit.MIRE_SLOW*100}%, which pushes every turn booked while it holds later on the initiative timeline. It multiplies with Slowed. It is an affliction, so a cleanse lifts it.",
+  "see_also": [
+   "initiative",
+   "status_slow"
+  ]
+ },
+ {
+  "id": "status_fester",
+  "term": "Fester",
+  "category": "statuses",
+  "short": "Damage each turn start, a stack at a time, growing until cleansed.",
+  "long": "A hex the warband lays on one hero: at each of that hero's turn starts it deals about {=Battle.DOT_STATUSES.fester}% of its applier's Attack for every stack, then gains a stack and its full clock back, so it does not run out on its own - only a cleanse, the hero's fall or the fight's end stops it. Under Fleeting its full clock is one turn, so it ticks once and goes.",
+  "see_also": [
+   "status_poison"
+  ]
+ },
+ {
   "id": "dmg_schools",
   "term": "The Seven Schools",
   "category": "damage",

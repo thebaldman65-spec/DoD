@@ -58,6 +58,10 @@ const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",
 	# `resonant_field` and `threshold_lock` above and `anointed`/`fortified`
 	# below; DS's brief asked for all six here and that was over-broad.
 	"heads_down",
+	# BATCH JL §2 — THE FOUR HEXES the warband lays on a hero are afflictions, so every cleanse the party owns reaches them —
+	# the Cleric's Unburden, the Cleansing Draught, a Dispel — and none is sticky: Fester, which grows until it is cleansed,
+	# must have an answer (the brief's). Listed, each also counts toward what counts a hero's debuffs (Iron Will).
+	"gall", "sap", "mire", "fester",
 	"frostbind", "unmade",
 	# BATCH CE — `breaking_darkness` (Anathema, renamed at CG §3) AND `penance`
 	# are the tranche-3 Cleric draft's two enemy-side statuses and both are
@@ -147,7 +151,17 @@ var stability := 100       # Break meter size (universal 0-100 scale)
 var constitution := 100    # resistance to Break: incoming Pressure × 100/constitution
 var pressure := 0
 var resource_name := ""    # "Rage" or "Mana" (heroes only)
-var resource := 0
+# BATCH JL §2 — SAP's DOOR IS THE BAR ITSELF. Some fifty lines in the game add to it — the turn-start drip, a cast's own
+# gain, Rage on a blow taken, a potion, a refund, every card that hands some back — and none of them passes a function, so
+# the one place every gain passes is this setter: while Sap stands, what the bar would rise by is cut by `SAP_CUT`,
+# rounded in the bearer's favour. A write that lowers the bar is untouched; a write that pays and gains at once (`_resolve`'s
+# price line) is cut on what is left of the rise. A spec's own meter is not the bar: Focus, Mercy and Resonance ride
+# `second_resource`, and Faith is a counter of its own.
+var resource := 0:
+	set(v):
+		if v > resource and has_status("sap"):
+			v -= int((v - resource) * SAP_CUT)
+		resource = v
 var max_resource := 100
 # Secondary class resource: Holy Cleric Mercy (0-5), Mage Arcane Resonance
 # (0-5; 0-8 while Overcharge is active).
@@ -3568,6 +3582,14 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 			s.desc = "Takes %d nature damage at the start of each\nturn (%d per stack); new stacks refresh the timer." % [
 				int(s.get("tick", 3)) * s.stacks, int(s.get("tick", 3))]
 			float_text("%s x%d" % [label, s.stacks], color)
+		elif id == "fester":
+			# BATCH JL §2 — FESTER STACKS as Poison does: a second hex adds a stack and refreshes its clock.
+			s.stacks = int(s.get("stacks", 1)) + 1
+			s.turns = turns
+			if tick > 0:
+				s["tick"] = tick
+			_fester_words(s)
+			float_text("%s x%d" % [label, s.stacks], color)
 		elif id == "chilled":
 			# Chilled STACKS (max 4): each application adds a stack and
 			# RESETS the clock; 4 stacks = Frozen (handled by battle.gd).
@@ -3619,6 +3641,8 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 		"full_turns": turns}
 	if id == "poison":
 		entry["fresh"] = true  # no tick on the turn it lands
+	if id == "fester":
+		_fester_words(entry)
 	if id == "chilled":
 		entry["short"] = "C1"
 		entry["desc"] = _chilled_desc(1, turns < 0)
@@ -3630,6 +3654,26 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 	# that lives in the shape of the function rather than in the ledger.
 	note_status_event(self, id)
 	float_text(label, color)
+	_refresh_chips()
+
+
+# BATCH JL §2 — FESTER's CHIP: its counter and what it deals now, read off the stack it stands at.
+func _fester_words(s: Dictionary) -> void:
+	s["short"] = "Fr%d" % int(s.get("stacks", 1))
+	s["desc"] = "Festering: takes %d damage at the start of\neach turn (%d per stack), and gains a stack\neach turn until it is cleansed." % [
+		int(s.get("tick", 1)) * int(s.get("stacks", 1)), int(s.get("tick", 1))]
+
+
+# BATCH JL §2 — FESTER GROWS: after each of its bearer's ticks it gains a stack and its full clock back — Poison's rule, a new
+# stack refreshes the timer, pointed at its own growth — so it never runs out while its bearer takes turns: it stands until
+# it is cleansed, or the fight ends. Under Fleeting its full clock is one turn, so it ticks once and goes.
+func fester_grow() -> void:
+	var s: Dictionary = _find_status("fester")
+	if s.is_empty():
+		return
+	s.stacks = int(s.get("stacks", 1)) + 1
+	s.turns = int(s.get("full_turns", s.get("turns", 1)))
+	_fester_words(s)
 	_refresh_chips()
 
 
@@ -4055,6 +4099,10 @@ func effective_speed() -> float:
 		s *= maxf(0.75 - frigid_bonus, 0.1)
 	elif chill >= 2:
 		s *= maxf(0.5 - frigid_bonus * chill, 0.1)
+	# BATCH JL §2 — MIRE: the warband's hex slows its bearer by `MIRE_SLOW`, read at the one speed every turn's delay is divided
+	# by, so it reaches an action, a lost turn and a Sloppy cast alike. It multiplies with Slowed, which does the same.
+	if has_status("mire"):
+		s *= 1.0 - MIRE_SLOW
 	if has_status("quickdraw"):
 		s *= 1.5
 	if has_status("wrath"):
@@ -4125,6 +4173,11 @@ func effective_armor() -> float:
 const SUNDER_STEP := 0.35
 # BATCH JK §1 — what a warband's Entrench multiplies its armor by (the battle's spend lays it; this door reads it).
 const MALICE_ENTRENCH_MULT := 2
+# BATCH JL §2 — THE HEXES' FIGURES, each read at its one door below: Gall cuts the healing a body receives (`heal_amount`),
+# Sap what its resource bar gains (the bar's own setter), Mire its speed (`effective_speed`).
+const GALL_HEAL_CUT := 0.5
+const SAP_CUT := 0.5
+const MIRE_SLOW := 0.25
 # BATCH IK §3a — SUNDER's OWN DURATION: what its base application lays — Crushing Blow, the card every
 # Warrior holds — and what a Perfect Sever lays on the body it cut, read here by both, never retyped.
 const SUNDER_TURNS := 3
@@ -5379,6 +5432,10 @@ func heal_amount(amount: int, external := false) -> int:
 		mult *= 1.30
 	if has_status("frostbite"):
 		mult *= 0.5
+	# BATCH JL §2 — GALL: the warband's hex cuts the healing this body receives by `GALL_HEAL_CUT`, read here beside Frostbite's
+	# half, so it reaches every heal in the game and multiplies with Frostbite and Miasma.
+	if has_status("gall"):
+		mult *= 1.0 - GALL_HEAL_CUT
 	# Last Hope (Holy talent, party-wide stamp): the nearly-dead heal deeper.
 	# ADDITIVE units (Batch AV) — the stamp is percentage POINTS, so the
 	# node's 40 and the Rune of the Open Hand's 5 each pay what they say.

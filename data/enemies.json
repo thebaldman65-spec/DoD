@@ -468,6 +468,29 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   },
+   {
+    "display_name": "Gall",
+    "special": "warband_hex",
+    "delay": 2.5,
+    "anim": "attack02",
+    "applies_status": {
+     "id": "gall",
+     "turns": 3
+    },
+    "description": "One hero receives {=Unit.GALL_HEAL_CUT*100}% less healing."
+   },
+   {
+    "display_name": "Sap",
+    "cooldown": 2,
+    "special": "warband_hex",
+    "delay": 2.5,
+    "anim": "attack02",
+    "applies_status": {
+     "id": "sap",
+     "turns": 3
+    },
+    "description": "One hero gains {=Unit.SAP_CUT*100}% less Rage or Mana."
    }
   ]
  },
@@ -771,6 +794,17 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   },
+   {
+    "display_name": "Fester",
+    "special": "warband_hex",
+    "delay": 2.5,
+    "anim": "attack02",
+    "applies_status": {
+     "id": "fester",
+     "turns": 3
+    },
+    "description": "One hero takes {=Battle.DOT_STATUSES.fester}% of the applier's Attack\nper stack at the start of each turn, and\ngains a stack and its full clock each\nturn, until cleansed."
    }
   ]
  },
@@ -1253,6 +1287,18 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+   },
+   {
+    "display_name": "Mire",
+    "cooldown": 3,
+    "special": "warband_hex",
+    "delay": 2.5,
+    "anim": "attack02",
+    "applies_status": {
+     "id": "mire",
+     "turns": 3
+    },
+    "description": "One hero acts {=Unit.MIRE_SLOW*100}% slower; turns\narrive later."
    }
   ]
  },

@@ -538,7 +538,8 @@ func _s3_the_selection(s: Node, f: BattleUnit) -> void:
 # ONE DOOR (C06): the selection asks the pool where it asks the cooldown, and nothing else that chooses or re-validates does.
 func _s3_the_door() -> void:
 	var ready := Gate.fn_body("scripts/battle.gd", "_enemy_ready", _cache)
-	ok(ready.contains("_malice_price(u, ab, body) <= _malice_free(u)"), "§3: the selection's door does not ask the pool")
+	# JL §1 — and beside what the asker's own declaration already sets aside (`held`), since a spend rides beside its body's heal.
+	ok(ready.contains("_malice_price(u, ab, body) + held <= _malice_free(u)"), "§3: the selection's door does not ask the pool")
 	var second: Array = []
 	for fn in ["_intent_ability_usable", "_revalidate_intent", "_choose_enemy_action", "_enemy_support_action", "_declare_intent", "_enemy_turn", "_find_ready"]:
 		if Gate.fn_body("scripts/battle.gd", fn, _cache).contains("_malice_free("):
@@ -807,7 +808,9 @@ func _s7_not_done() -> void:
 	for k in data:
 		# JK §1 — the warband's Malice spends are JK's moves, held by `check_jk` §4; the fifty beside them are what this pins.
 		for mv in (data[k] as Dictionary).get("abilities", []):
-			if not String((mv as Dictionary).get("special", "")).begins_with("malice_"):
+			# JL §2 — and JL's hexes, held by `check_jl` §4.
+			if not String((mv as Dictionary).get("special", "")).begins_with("malice_") \
+					and String((mv as Dictionary).get("special", "")) != "warband_hex":
 				moves += 1
 	print("    %d kinds, %d moves" % [data.size(), moves])
 	ok(data.size() == KINDS and moves == MOVES, "§7: the warband holds %d kinds and %d moves, not %d and %d" % [data.size(), moves, KINDS, MOVES])

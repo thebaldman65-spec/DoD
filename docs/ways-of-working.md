@@ -113,6 +113,11 @@ reading can actually see, too**: JE's brief ordered a re-read of a gap of 45 off
 citation did not resolve — a charter row one off at JG, after JD's and JF's. A row's number, a line or an entry's place is not a
 citation: **if the brief cannot name where a thing stands, it is not a premise.**
 
+**A BRIEF CITES ONLY WHAT THE REPOSITORY HOLDS (JL §0, the designer's).** JK's brief cited a process note by its number, and process
+notes live in a document outside the repository, so the brief ordered a premise nobody could check: JK found it nowhere in the tree,
+the backups or the memory the work reads. A brief cites only what the repository holds; the correction was the designer's, and JK owed
+nothing for it.
+
 **ORDER THE READING, AND DO NOT WRITE THE CARD UNTIL IT COMES BACK (JH §0.8, the designer's note 35).** JG's brief wrote a card's
 condition in one section and ordered the reading that would falsify it in another, and the words carried a condition that was
 always true. **A brief names the axis, the shape and what the figure must clear; the words wait for the reading.**

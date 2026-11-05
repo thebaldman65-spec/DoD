@@ -276,15 +276,24 @@ func _spend_board(s: Node) -> BattleUnit:
 	return corpse
 
 
-# The specials a foe's own selection declares, over n choices.
+# The specials a foe declares as its spend, over n declarations — JL §1: a spend rides the body's declaration beside its action,
+# so the declaration is where it is chosen ("" where none rides).
 func _chosen(s: Node, f: BattleUnit, n: int) -> Dictionary:
 	var got := {}
 	for _i in n:
-		var c: Dictionary = s.call("_choose_enemy_action", f)
-		if not c.is_empty():
-			var sp := String((c["ability"] as Ability).special)
-			got[sp] = int(got.get(sp, 0)) + 1
+		var c := _spend_chosen(s, f)
+		var sp := String((c["ability"] as Ability).special) if not c.is_empty() else ""
+		got[sp] = int(got.get(sp, 0)) + 1
 	return got
+
+
+# The spend a foe's declaration carries, {} where none rides: the declaration made afresh, then cleared.
+func _spend_chosen(s: Node, f: BattleUnit) -> Dictionary:
+	f.intent = {}
+	s.call("_declare_intent", f)
+	var sp: Variant = f.intent.get("spend", {})
+	f.intent = {}
+	return sp if sp is Dictionary and (sp as Dictionary).get("ability") is Ability else {}
 
 
 # ── §0 — JJ's SIX RULINGS ─────────────────────────────────────────────────────
@@ -433,16 +442,17 @@ func _s1_raise(s: Node, spends: bool) -> void:
 		(wh as BattleUnit).hp = (wh as BattleUnit).max_hp
 	_pool(s, cap)
 	f.cooldowns = {}
-	f2.intent = {"ability": _spend_of(f2, "malice_raise"), "target": c2, "turns": 1, "support": true, "malice": maxi(int(c2.max_hp * pct), 1)}
+	# JL §1 — a declared Raise rides its body's declaration as its spend.
+	f2.intent = {"spend": {"ability": _spend_of(f2, "malice_raise"), "target": c2, "malice": maxi(int(c2.max_hp * pct), 1)}}
 	var named := 0
 	for _j in 20:
-		var ch2: Dictionary = s.call("_choose_enemy_action", f)
+		var ch2 := _spend_chosen(s, f)
 		if not ch2.is_empty() and String((ch2["ability"] as Ability).special) == "malice_raise" and ch2["target"] == c2:
 			named += 1
 	f2.intent = {}
 	var freed := 0
 	for _k in 20:
-		var ch3: Dictionary = s.call("_choose_enemy_action", f)
+		var ch3 := _spend_chosen(s, f)
 		if not ch3.is_empty() and String((ch3["ability"] as Ability).special) == "malice_raise" and ch3["target"] == c2:
 			freed += 1
 	print("    a corpse a second raiser has declared on: chosen %d of 20 times; with that declaration gone, %d of 20" % [named, freed])
@@ -457,7 +467,7 @@ func _s1_raise(s: Node, spends: bool) -> void:
 	f.cooldowns = {}
 	var again := 0
 	for _i in 30:
-		var ch: Dictionary = s.call("_choose_enemy_action", f)
+		var ch := _spend_chosen(s, f)
 		if not ch.is_empty() and String((ch["ability"] as Ability).special) == "malice_raise" and ch["target"] == c:
 			again += 1
 	await s._resolve(f, raise, c, "good")
@@ -645,7 +655,9 @@ func _s1_the_shape(spends: bool) -> void:
 	for chunk2 in src.split("\nfunc "):
 		if chunk2.contains("_warband_spend(") and not chunk2.begins_with("_warband_spend("):
 			callers.append(String(chunk2.split("(")[0]).strip_edges())
-	ok(callers == ["_enemy_support_action"], "§1: the spends are chosen by %s, not the support half of a body's own selection" % str(callers))
+	# JL §1 — A SPEND IS CHOSEN BY THE BODY's OWN DECLARATION NOW, beside its action, and bought free on its turn: still never a
+	# side's action (`check_jl` §1 holds the turn).
+	ok(callers == ["_declare_intent"], "§1: the spends are chosen by %s, not the declaration of a body's own turn" % str(callers))
 	var listed: Array = []
 	if spends:
 		var data: Dictionary = Enemies._load()
@@ -726,7 +738,9 @@ func _s2_the_prices(s: Node, spends: bool) -> void:
 			never.append("%s's %s never chosen with the pool at its price, %d" % [entry[0], ab2.display_name, price])
 		f.intent = {}
 		s.call("_declare_intent", f)
-		var held := int(f.intent.get("malice", -1)) if not f.intent.is_empty() and String((f.intent["ability"] as Ability).special) == entry[1] else -1
+		# JL §1 — the spend rides the declaration, and sets its own price aside there.
+		var rd: Dictionary = f.intent.get("spend", {})
+		var held := int(rd.get("malice", -1)) if rd.get("ability") is Ability and String((rd["ability"] as Ability).special) == entry[1] else -1
 		if held != price:
 			unheld.append("%s's %s set aside %d of its price %d" % [entry[0], ab2.display_name, held, price])
 		f.intent = {}
@@ -869,7 +883,8 @@ func _s4_not_done(s: Node) -> void:
 	var moves := 0
 	for k2 in data:
 		for a in (data[k2] as Dictionary).get("abilities", []):
-			if not String(a.get("special", "")).begins_with("malice_"):
+			# JL §2 — and JL's hexes, which `check_jl` §4 holds beside these fifty.
+			if not String(a.get("special", "")).begins_with("malice_") and String(a.get("special", "")) != "warband_hex":
 				moves += 1
 	print("    %d kinds, %d moves beside the spends" % [data.size(), moves])
 	ok(data.size() == KINDS and moves == MOVES_BEFORE, "§4: the warband holds %d kinds and %d moves beside its spends, not %d and %d" % [data.size(), moves, KINDS, MOVES_BEFORE])

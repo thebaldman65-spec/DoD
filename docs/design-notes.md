@@ -4,6 +4,20 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The spend costs no turn, and the warband learns four hexes (Batch JL) — 2026-11-05
+
+**A body's turn was worth more than anything the pool could buy with it.** JK's spends each took a body's turn, and JK's drive read
+the warband's blows a fight falling (−0.68 ± 0.24); the brief read the same of JI's cooldowns and JJ's heals, which neither drive
+measured, and a cooldown takes a move away rather than a turn. JL keeps everything JK built and moves
+one thing: what a spend costs its body. A spend rides the move the body declared and is bought first on its turn, so the body loses
+nothing by it; one a turn, braked by its cooldown and the policy's one live Rally and Entrench. It stays a declaration rather than becoming a side's action, so the player
+reads it coming on the nameplate and the pool still sets its price aside.
+
+**Why hexes that take capacity, and why they carry so little of the result.** Pressure is absorbable and capacity is not, so the
+four cut what the heroes absorb with: healing, resource, tempo, and a stack that must be answered. Priced by what each denies off
+the census — one hero's healing over three turns is a small thing beside a blow — two of the four come in under the cooldown line,
+and their carriers meet the heroes seldom. The drive says the game is harder past two errors, and that the free spends and the Rally's two bodies carry it.
+
 ## What the warband buys with its Malice (Batch JK) — 2026-11-04
 
 **A pool needs buyers on every kind, or it teaches that it does nothing.** JJ's pool was given about 280 a fight and spent 13,

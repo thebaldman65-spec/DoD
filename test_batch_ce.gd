@@ -740,8 +740,9 @@ func _docs() -> void:
 	# `status_breaking_darkness`, `status_penance`, `status_suffering` and `status_blight` — seven chips on the board
 	# with no entry behind them. `check_ir` §1e now reads every affliction the game lists against its entry, so the
 	# next status added without one reds there; this count still says that adding one was a decision.
-	ok(gj != null and gj.size() == 109,
-		"the glossary holds 109 entries (98 + HS's conjunctions and status_rupture + IK's strike_damage + IL's most_health + IR's seven statuses)")
+	# JL §2 ADDED FOUR: Gall, Sap, Mire and Fester, the warband's hexes, afflictions `check_ir` §1e asks a line of.
+	ok(gj != null and gj.size() == 113,
+		"the glossary holds 113 entries (98 + HS's conjunctions and status_rupture + IK's strike_damage + IL's most_health + IR's seven statuses + JL's four hexes)")
 	# RE-POINTED AT THE ARCHIVE BY BATCH CX. The live changelog passed CW's 400 KB
 	# threshold, so CX cut it at the CN/CO boundary: Batch CE — with everything
 	# from BP to CN — moved OUT OF THE REPO into `changelog-archive.html`. The old

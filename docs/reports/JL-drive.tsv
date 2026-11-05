@@ -1,0 +1,105 @@
+reading	JK (HEAD)	JL	paired JL − JK
+runs	60	60	
+completed	4	3	-0.017 ± 0.038
+fights won a run	17.52	14.82	-2.70 ± 0.95
+falls a run	6.08	6.00	-0.08 ± 0.31
+falls a run, in the fights it won	2.35	2.20	-0.15 ± 0.34
+falls a run, in the fight that ended it	3.73	3.80	+0.07 ± 0.15
+fights fought, all (the population of every row read over all fights)	1107	946	
+paired fights (same node, in order)	865	865	59 of 60 runs on one road throughout
+health at a fight's end, paired fights	0.8451	0.8087	-4.33 ± 1.02 points
+falls a fight, paired fights	0.234	0.334	+0.136 ± 0.042
+  falls a fight, the paired fights both arms won			+0.051 ± 0.016
+  health at a fight's end, the paired fights both arms won			-2.73 ± 0.58 points
+  hero turns a fight, the paired fights both arms won			+0.44 ± 0.18
+  paired fights holding a loss			17 lost by both arms, 27 by JL alone, 14 by JK alone; their share of the falls a fight +0.089 ± 0.035
+  health at a fight's end: the share the paired fights holding a loss carry			-1.86 ± 0.69 points
+  health at a fight's end: the share the paired fights both arms won carry			-2.47 ± 0.52 points
+  falls a fight: the share the paired fights holding a loss carry			+0.089 ± 0.035
+  health at a fight's end, the paired fights JL bought nothing in			-0.82 ± 0.44 points (207 fights in 59 runs; JK's hero turns there 24.9)
+  the same, the fights both arms won			-0.79 ± 0.45 points
+  health at a fight's end, the paired fights JL bought a Rally in			-6.07 ± 1.56 points (517 fights in 60 runs; JK's hero turns there 35.1)
+  the same, the fights both arms won			-4.17 ± 0.87 points
+  health at a fight's end, the paired fights JL bought an Entrench and no Rally in			-5.99 ± 2.59 points (128 fights in 49 runs; JK's hero turns there 35.1)
+  the same, the fights both arms won			-2.29 ± 1.29 points
+  health at a fight's end, the paired fights JL bought a Raise alone in			-2.40 ± 1.21 points (13 fights in 12 runs; JK's hero turns there 24.2)
+  the same, the fights both arms won			-2.40 ± 1.21 points
+  health at a fight's end, every paired fight JL bought an Entrench in			-6.38 ± 3.10 points (226 fights)
+  health at a fight's end: the share the paired fights JL cast a hex in carry			-0.32 ± 0.29 points (76 fights in 43 runs)
+the warband's blows a fight, paired fights	14.63	15.76	+1.13 ± 0.26
+hero turns a fight, paired fights	32.49	32.91	+0.09 ± 0.32
+the first fight: health at its end	0.9359	0.9259	-1.00 ± 0.43 points (60 of 60 the same node)
+the first fight: falls	0.000	0.000	+0.000 ± 0.000
+the first fight: hero turns	20.97	21.65	+0.68 ± 0.29
+enemy moves resolved	18468	16263	
+the warband's heals cast	240 (1.30 a hundred moves, 0.217 a fight)	198 (1.22 a hundred moves, 0.209 a fight)	
+health the warband healed a fight, all fights	9.4	8.3	-0.29 ± 1.05 (paired fights)
+the warband's heals cast a fight, paired fights			+0.007 ± 0.027
+  in the fights it opened with a healer	28.0 (372 fights)	24.0 (328 fights)	
+re-validation fallbacks	1	1	
+Malice given a fight	283.1	278.6	+0.22 ± 4.21 (paired fights)
+Malice taken a fight	180.8	192.1	+10.89 ± 2.12 (paired fights)
+Malice wasted a fight	102.3	86.5	-10.67 ± 3.15 (paired fights)
+Malice spent a fight	38.0	52.8	+15.26 ± 1.63 (paired fights)
+turns at the cap	14.4%	11.4%	
+fights ending at the cap	84.6%	76.8%	
+Malice spent on heals a fight	9.4	8.3	-0.29 ± 1.05 (paired fights)
+Malice spent on the spends a fight	28.6	44.5	
+Raises a fight	0.063	0.097	92 in 946 fights
+Rallies a fight	0.420	0.699	661 in 946 fights
+Entrenches a fight	0.254	0.338	320 in 946 fights
+  health Raises stood bodies up with a fight		6.36	
+Malice, fights with a healer (372 and 328)	given 297.7, spent 70.4	given 291.5, spent 76.8	
+  at the cap, fights with a healer	9.4% of turns; 75.8% of fights end there	9.5% of turns; 72.9% of fights end there	
+Malice, fights with none (735 and 618)	given 275.6, spent 21.6	given 271.7, spent 40.0	
+  at the cap, fights with none	17.2% of turns; 89.0% of fights end there	12.5% of turns; 79.0% of fights end there	
+JL fights where spent != healed + the spends		0	of 946
+Gall: uptime on hero turns	0.00%	0.22%	68 of 30380 hero turns, all fights
+Gall: uptime on hero turns, the fights its carrier acted in		4.99%	68 of 1363 hero turns, 46 fights (Orc Hexer)
+Gall: cast a fight	0.000	0.041	39 in 946 fights
+Sap: uptime on hero turns	0.00%	0.18%	54 of 30380 hero turns, all fights
+Sap: uptime on hero turns, the fights its carrier acted in		3.96%	54 of 1363 hero turns, 46 fights (Orc Hexer)
+Sap: cast a fight	0.000	0.041	39 in 946 fights
+Mire: uptime on hero turns	0.00%	0.41%	126 of 30380 hero turns, all fights
+Mire: uptime on hero turns, the fights its carrier acted in		7.55%	126 of 1668 hero turns, 48 fights (Grave Totem)
+Mire: cast a fight	0.000	0.093	88 in 946 fights
+Fester: uptime on hero turns	0.00%	0.06%	17 of 30380 hero turns, all fights
+Fester: uptime on hero turns, the fights its carrier acted in		7.91%	17 of 215 hero turns, 7 fights (Rot Behemoth)
+Fester: cast a fight	0.000	0.005	5 in 946 fights
+Fester: the most stacks one hero carried, the mean over fights it was cast in		5.00	over 4 fights; peaks 8, 4, 5, 3
+Fester: its damage a fight		0.32	
+free spends a fight (a spend resolved beside its body's own action)	0.000	1.134	
+hero turns counted by the probe a fight	32.29	32.11	
+fights acted in: the Orc Archer (role hexer)	303	265	carries no hex
+fights acted in: the Orc Hexer (role hexer)	50	46	carries Gall and Sap
+fights acted in: the Rot Behemoth (role hexer)	16	7	carries Fester
+fights acted in: the Orc Bloodcaller (role hexer)	50	40	carries no hex
+fights acted in: the Grave Totem (role hexer)	56	48	carries Mire
+cast: Healing Wave (Orc Totemist)	104	83	
+cast: Healing Wave (Orc Shaman)	76	61	
+cast: Dark Vigil (Grave Totem)	30	25	
+cast: Wild Growth (Withered Warden)	22	23	
+cast: Regenerate (Bog Troll)	8	6	
+bought free: Rally by the Orc Raider		205	
+bought free: Entrench by the Orc Shieldmaster		142	
+bought free: Rally by the Orc Whelp		133	
+bought free: Rally by the Orc Archer		112	
+bought free: Rally by the Orc Slinger		81	
+bought free: Rally by the Orc Chief		65	
+bought free: Entrench by the Orc Totemist		55	
+bought free: Entrench by the Orc Ritual Chanter		48	
+bought free: Raise by the Orc Totemist		41	
+bought free: Rally by the Wolfrider		34	
+bought free: Raise by the Orc Ritual Chanter		32	
+bought free: Entrench by the Orc Shaman		29	
+bought free: Entrench by the Grave Totem		25	
+bought free: Raise by the Grave Totem		19	
+bought free: Entrench by the Bog Troll		15	
+bought free: Rally by the Orc Hexer		11	
+bought free: Rally by the Ashblade		9	
+bought free: Entrench by the Withered Warden		6	
+bought free: Rally by the Orc Bloodcaller		6	
+bought free: Rally by the Ash-Wrought Tyrant		3	
+bought free: Rally by the Orc Brute		2	
+bought free: Rally by the Ash Hurler		0	(acted in 26 fights, 38 moves; in 13 of them no body rallied)
+bought free: Rally by the Rot Behemoth		0	(acted in 7 fights, 12 moves; in 4 of them no body rallied)

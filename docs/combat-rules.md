@@ -100,7 +100,8 @@ NOT BE WRITTEN**; an ability obeys this rule by not passing `force`.
 of `_enemy_turn` **byte-for-byte** — only *when* it runs moved, and a diff touching the rules
 inside it breaks that promise.
 · **THE PROMISE BINDS THE POLICY, AND THE SELECTION ASKS THE DOOR's COOLDOWN AS IT ASKS ITS PRICE (JI §1).** Which move it
-  prefers and at whom is the policy and does not move; a refusal the door makes is a rule, and IN §3 put the door's price
+  prefers and at whom is the policy and does not move — save the hexes, which join its random pick at JL §2 and go only at a hero
+  who does not carry one, the promise standing beside the change rather than over it (JL's RULINGS OWED 7); a refusal the door makes is a rule, and IN §3 put the door's price
   in the selection (`_eff_cost`). **A cooldown is the same kind of thing**: `_intent_ability_usable` refuses a cooling move,
   so the choice reads the counter as it will stand on the turn the move resolves (`battle._enemy_ready`, the unit's own
   ticks `ticks_ahead` away — one from the end of a turn, two from a stunned or frozen branch, which declares before its own
@@ -118,7 +119,8 @@ inside it breaks that promise.
   the turn it lands — and its chance), times the heroes it reaches (four for an area blow; a companion standing is not
   counted); a heal at the health it restores, on the median composable body or the caster's own for a self-heal, a
   whole-warband heal on four bodies, the basic turned to health at the enemy's own Attack. A ward and a cleanse are not
-  priced; a Malice spend is, on its worth against its kind's basic (`check_jk` §2, the line read out of `check_ji`).
+  priced; a Malice spend is, on its worth against its kind's basic (`check_jk` §2, the line read out of `check_ji`), and a hex on
+  what it denies, off JA's census, against its carrier's basic (`check_jl` §2).
   **The figure is 2 under 2x, 3 under 3x and 4 past it**, in the enemy's own turns. A move a resource already bounds
   takes one too — DU §1's *priced twice* is weighed and set aside (JI's ruling 3, accepted at JJ §0). `check_ji` §1a derives the
   population off the data every battery and reds on a move the rule and the data disagree about, so **a new enemy move is
@@ -137,16 +139,27 @@ inside it breaks that promise.
   it is free; a new damage source that passes neither door fills nothing, and damage the frame credits to nobody — the Bomb, a
   spread Burn with no source, the Wasting bargain's tick — fills nothing but its kill.** **A heal on a blighted body restores
   nothing, so `_malice_price` prices it at nothing**: the pool never keeps a healer off Blight the Well.
-· **WHAT ELSE THE POOL BUYS IS A MOVE ON ITS KIND's LIST, NEVER A SIDE's ACTION (JK §1, §2).** A Raise, a Rally and an Entrench
-  stand in `data/enemies.json`; the support half chooses one last, after every heal and ward (`_warband_spend`), so the healers'
-  policy stands, and it asks `_enemy_ready` its cooldown and its price on the body it names — **the pool buys health at one
+· **WHAT ELSE THE POOL BUYS IS A MOVE ON ITS KIND's LIST, NEVER A SIDE's ACTION (JK §1, §2), AND IT COSTS ITS BODY NO TURN (JL §1).**
+  A Raise, a Rally and an Entrench stand in `data/enemies.json`. **One rides a body's declaration beside its action** (`intent.spend`):
+  `_declare_intent` asks `_warband_spend` after the action is chosen, so after every heal and ward and the healers' policy stands,
+  and it asks `_enemy_ready` its cooldown and its price on the body it names beside what the action already sets aside (`held`) —
+  **it is bought first on the body's turn** (`_warband_free_spend`: the door's refusals asked again, its cooldown started, its arm
+  paying, no delay charged) and the body then acts as declared; one rides a declaration, so one a turn — **the pool buys health at one
   Malice a point** (a Raise costs the health it stands a body up with, `_raise_figure`) **and everything else flat** (a Rally
-  `MALICE_RALLY_PRICE`, an Entrench `MALICE_ENTRENCH_PRICE`) — so a declared spend sets its price aside as a heal does, and its arm in
-  `_resolve_special` pays. **A Rally is read in the strike loop and nowhere a heal passes; an Entrench at `effective_armor()`,
+  `MALICE_RALLY_PRICE`, an Entrench `MALICE_ENTRENCH_PRICE`) — so a declared spend sets its price aside as a heal does (`_malice_free`
+  reads the rider), and its arm in `_resolve_special` pays. **A Rally is read in the strike loop and nowhere a heal passes; an Entrench at `effective_armor()`,
   the one door**; a Raise is `revive`, once a body a fight, the body down un-Broken (JD §3) and its first turn a basic
-  swing after it rises. **A Raise's target is down by design, so re-validation never re-targets it as a target gone.** A
-  Rally's clock counts down before its bearer acts, so a body strikes rallied one turn fewer than the clock. No new body joins
-  the warband once a fight has opened, so there is no Overrun (JK's RULINGS OWED 1).
+  swing after it rises. **A spend is never the declared action, so `_revalidate_intent` never meets one**; a Raise's own body is
+  asked still down and unraised when it is bought. A
+  Rally's clock counts down before its bearer acts, so a body strikes rallied one turn fewer than the clock — the body that bought it once more, since it acts on the turn it buys. No new body joins
+  the warband once a fight has opened, so there is no Overrun (JK's ruling 1, accepted at JL §0).
+· **A HEX IS A MOVE ON ITS KIND's LIST, CHOSEN AS AN AFFLICTION IS, AT A HERO WHO DOES NOT CARRY IT (JL §2).** Gall, Sap, Mire and
+  Fester (special `warband_hex`, its status the move's own `applies_status`) deal nothing, so the attack half's `damage > 0` never
+  reaches one: `_choose_enemy_action` puts every ready hex some hero in reach lacks beside the attacks it picks from at random, and
+  aims a hex it picks at a hero — never a companion — who does not carry it (`_hex_open`); no draw or evasion moves it, and as a
+  `special` it rolls no miss. Its arm lays it through the status door
+  with the enemy as source. Each is an affliction in `DEBUFF_IDS`, and each is read at one door: Gall in `heal_amount`, Sap at the
+  bar's own setter, Mire at `effective_speed()`, Fester in `_dot_pass`.
 · **Declaration**: `_declare_intent(u)`, called from `_declare_all_intents()` at battle start
   (after the opening oath/Faith hooks, which move state the policy reads), from the turn loop
   **right after** `await _enemy_turn(u)` — **NOT from the bottom of `_enemy_turn`**, which returns

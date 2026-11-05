@@ -2,13 +2,13 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 2325,
+  "total": 2328,
   "source": 1446,
-  "other": 294,
+  "other": 297,
   "document": 585
  },
  "floor": {
-  "pins": 2325
+  "pins": 2328
  },
  "falls": [],
  "source_residency": {
@@ -12065,7 +12065,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ji.gd#241"
+   "g": "check_ji.gd#245"
   },
   {
    "s": "check_ji.gd",
@@ -12076,7 +12076,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ji.gd#347"
+   "g": "check_ji.gd#351"
   },
   {
    "s": "check_ji.gd",
@@ -12087,7 +12087,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ji.gd#419"
+   "g": "check_ji.gd#423"
   },
   {
    "s": "check_ji.gd",
@@ -12098,7 +12098,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ji.gd#458",
+   "g": "check_ji.gd#462",
    "expr": "MASTER_NEEDLE"
   },
   {
@@ -12110,7 +12110,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_ji.gd#466",
+   "g": "check_ji.gd#470",
    "expr": "String"
   },
   {
@@ -12122,7 +12122,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_ji.gd#492",
+   "g": "check_ji.gd#496",
    "expr": "nm"
   },
   {
@@ -12134,7 +12134,7 @@
    "r": "runtime",
    "k": "format",
    "how": "derived",
-   "g": "check_ji.gd#463"
+   "g": "check_ji.gd#467"
   },
   {
    "s": "check_ji.gd",
@@ -12145,7 +12145,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_ji.gd#495"
+   "g": "check_ji.gd#499"
   },
   {
    "s": "check_ji.gd",
@@ -12156,7 +12156,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ji.gd#485"
+   "g": "check_ji.gd#489"
   },
   {
    "s": "check_ji.gd",
@@ -12167,7 +12167,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ji.gd#486"
+   "g": "check_ji.gd#490"
   },
   {
    "s": "check_ji.gd",
@@ -12178,7 +12178,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_ji.gd#462"
+   "g": "check_ji.gd#466"
   },
   {
    "s": "check_ji.gd",
@@ -12189,7 +12189,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ji.gd#543",
+   "g": "check_ji.gd#547",
    "expr": "pair"
   },
   {
@@ -12201,7 +12201,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_ji.gd#545",
+   "g": "check_ji.gd#549",
    "expr": "String"
   },
   {
@@ -12393,7 +12393,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jk.gd#201",
+   "g": "check_jk.gd#206",
    "expr": "ANSWERED"
   },
   {
@@ -12405,7 +12405,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_jk.gd#199"
+   "g": "check_jk.gd#204"
   },
   {
    "s": "check_jk.gd",
@@ -12416,7 +12416,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_jk.gd#432"
+   "g": "check_jk.gd#437"
   },
   {
    "s": "check_jk.gd",
@@ -12427,7 +12427,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jk.gd#497",
+   "g": "check_jk.gd#502",
    "expr": "OVERRUN_RECORD"
   },
   {
@@ -12439,7 +12439,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jk.gd#497",
+   "g": "check_jk.gd#502",
    "expr": "OVERRUN_TAKES"
   },
   {
@@ -12451,7 +12451,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jk.gd#673",
+   "g": "check_jk.gd#679",
    "expr": "fig"
   },
   {
@@ -12463,7 +12463,42 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_jk.gd#714"
+   "g": "check_jk.gd#720"
+  },
+  {
+   "s": "check_jl.gd",
+   "fn": "_s0_the_rulings",
+   "h": "DoD-archive/state-archive.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_jl.gd#224",
+   "expr": "ANSWERED"
+  },
+  {
+   "s": "check_jl.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/state.md",
+   "n": "\n### JK's RULINGS OWED",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jl.gd#222"
+  },
+  {
+   "s": "check_jl.gd",
+   "fn": "_s3_the_reading",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_jl.gd#799",
+   "expr": "fig"
   },
   {
    "s": "test_batch_ah.gd",

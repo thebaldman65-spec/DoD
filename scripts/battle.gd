@@ -240,6 +240,11 @@ const STATUS_INFO := {
 	# BATCH JK §1 — what the warband's Rally and Entrench lay on every standing body, bought with Malice.
 	"warband_rally": ["Rally", "Ry", Color(0.92, 0.42, 0.34), "Its blows deal %d%% more damage\n(a Rally its warband bought with\nMalice)." % [int(round(MALICE_RALLY_PCT * 100))]],
 	"warband_entrench": ["Entrenched", "Et", Color(0.62, 0.72, 0.86), "Its armor is multiplied by %d\n(an Entrench its warband bought\nwith Malice)." % [BattleUnit.MALICE_ENTRENCH_MULT]],
+	# BATCH JL §2 — THE FOUR HEXES the warband lays on a hero, each a move on a kind's list.
+	"gall": ["Gall", "Ga", Color(0.62, 0.78, 0.30), "Healing received cut by %d%%\n(a hex the warband laid)." % [int(round(BattleUnit.GALL_HEAL_CUT * 100))]],
+	"sap": ["Sap", "Sa", Color(0.42, 0.56, 0.86), "Resource gained cut by %d%%\n(a hex the warband laid)." % [int(round(BattleUnit.SAP_CUT * 100))]],
+	"mire": ["Mire", "Me", Color(0.52, 0.50, 0.34), "-%d%% speed; turns arrive later\n(a hex the warband laid)." % [int(round(BattleUnit.MIRE_SLOW * 100))]],
+	"fester": ["Fester", "Fr", Color(0.58, 0.66, 0.26), "Takes %d%% of the applier's Attack per\nstack at the start of each turn, and\ngains a stack each turn until cleansed." % [DOT_STATUSES["fester"]]],
 	"shielded": ["Shielded", "Sh", Color(0.95, 0.65, 0.25), "Takes 25% less strike damage\n(a Shieldmaster's ward, or the\nHollow Crown's Regalia)."],
 	"wrath": ["Divine Wrath", "DW", Color(1.0, 0.85, 0.35), "+15% damage dealt and +15% speed."],
 	"umbral_sigil": ["Umbral Sigil", "US", Color(0.55, 0.30, 0.70), "Branded: half of every strike this\nunit takes echoes to its whole\nwarband."],
@@ -598,7 +603,8 @@ const SFX := {
 # Values are the PERCENT of the applier's Attack dealt per tick (snapshotted
 # when the status lands); Poison is per-stack (stacks handled at the tick
 # site). The raw number doubles as the legacy fallback for tickless statuses.
-const DOT_STATUSES := {"burn": 6, "poison": 3}
+# BATCH JL §2 — FESTER ticks as Poison does, a share of its applier's Attack a stack, and grows a stack a turn (`_dot_pass`).
+const DOT_STATUSES := {"burn": 6, "poison": 3, "fester": 3}
 
 # ══ BATCH HS §2 — THE CONJUNCTIONS: TWO AFFLICTIONS MEETING ON ONE BODY MAKE A THIRD ══
 #
@@ -3304,6 +3310,10 @@ func _dot_pass(u: BattleUnit) -> void:
 			if dot_dmg <= 0 and not bool(u.get_status(dot_id).get("zero_tick", false)):
 				dot_dmg = DOT_STATUSES[dot_id]
 			var stack_tag := ""
+			if dot_id == "fester":
+				var fs_stacks := maxi(u.status_stacks("fester"), 1)
+				dot_dmg *= fs_stacks
+				stack_tag = " (x%d stacks)" % fs_stacks if fs_stacks > 1 else ""
 			if dot_id == "poison":
 				var stacks := maxi(u.status_stacks("poison"), 1)
 				dot_dmg *= stacks
@@ -3373,6 +3383,9 @@ func _dot_pass(u: BattleUnit) -> void:
 					String(dot_comp.label), info[0], dot_dmg, stack_tag], "#e08850")
 			if dot_id == "burn" and not dot_comp.is_empty() and not dot_died:
 				_dot_tick_rider(u)
+			# BATCH JL §2 — AND FESTER GROWS, after its tick: a stack and its full clock back, until it is cleansed.
+			if dot_id == "fester" and not dot_died:
+				u.fester_grow()
 			# Pyromancer burn-tick talents: mana sipped from the flames,
 			# armor melting off the victim (shown as a chip).
 			if dot_id == "burn" and not u.is_hero:
@@ -8166,6 +8179,13 @@ func _intent_hover_text(u: BattleUnit) -> String:
 		return ""
 	var ab: Ability = u.intent["ability"]
 	var lines := PackedStringArray([ab.display_name])
+	# BATCH JL §1 — A SPEND BOUGHT FIRST, FREE, said before the action it rides with.
+	var sp_v: Variant = (u.intent.get("spend", {}) as Dictionary).get("ability")
+	if sp_v is Ability:
+		lines = PackedStringArray(["First, free: %s" % (sp_v as Ability).display_name])
+		if (sp_v as Ability).description != "":
+			lines.append((sp_v as Ability).description)
+		lines.append("Then: %s" % ab.display_name)
 	if String(u.intent.get("category", "")) == "windup":
 		var wt := maxi(int(u.intent.get("turns", 1)), 1)
 		lines.append("Winds up: it lands in %d turn%s" % [wt, "" if wt == 1 else "s"])
@@ -8710,6 +8730,15 @@ func _declare_intent(u: BattleUnit, ticks_ahead := 1) -> void:
 		"logs": chosen.get("logs", []),
 		"category": _intent_category(u, ab),
 	}
+	# BATCH JL §1 — A SPEND RIDES THE DECLARATION, FREE. Chosen after the action — so after every heal and ward, JK's order —
+	# by JK's policy (`_warband_spend`), and only where the pool can pay it beside the action's own reserve; it sets its own
+	# price aside (`_malice_free` reads it), and it is bought first on the body's turn and costs the body nothing: the body
+	# then acts as declared (`_enemy_turn`). ONE A DECLARATION, so one a turn. A taunt still keeps a body from buying, as it
+	# kept it from the support half; a move the Long Silence has spent is not bought.
+	if not u.has_status("mocked"):
+		var sp := _warband_spend(u, ticks_ahead, reserve)
+		if not sp.is_empty() and not u.silenced(sp[0] as Ability):
+			u.intent["spend"] = {"ability": sp[0], "target": sp[1], "malice": _malice_price(u, sp[0], sp[1])}
 	_istat("intent_declared")
 	_refresh_intent_plate(u)
 
@@ -8792,9 +8821,9 @@ func _revalidate_intent(u: BattleUnit) -> Dictionary:
 		target = target_raw
 	var want_ally: bool = bool(decl.get("support", false)) \
 		or ab.target == Ability.Target.ALLY
-	# BATCH JK §1 — A RAISE's TARGET IS DOWN BY DESIGN: a fallen body is the move's own, never a target gone (the arm stands
-	# it up, or says it found none to stand up).
-	if target == null or (target.dead and ab.special != "malice_raise") \
+	# BATCH JL §1 — JK's RAISE CASE STOOD HERE (a Raise's target is down by design) and is deleted: a spend is never the
+	# declared action now, so no Raise reaches this branch; a spend's own re-validation is `_warband_free_spend`'s.
+	if target == null or target.dead \
 			or (not want_ally and _is_held(target)):
 		var pool: Array = enemies.filter(func(e): return not e.dead) if want_ally \
 			else _hero_side()
@@ -8808,7 +8837,7 @@ func _revalidate_intent(u: BattleUnit) -> Dictionary:
 
 # An enemy's ability is unusable when it can no longer be paid for, when a
 # cooldown is running, or when the kit it belongs to no longer holds it.
-# BATCH JI §1 — ENEMIES START COOLDOWNS NOW (eleven abilities carry one; thirty-six since JK's spends), and the
+# BATCH JI §1 — ENEMIES START COOLDOWNS NOW (eleven abilities carry one; thirty-six since JK's spends, thirty-eight since JL's hexes), and the
 # selection asks the same counter a turn ahead (`_enemy_ready`), so a declared move
 # is never one that will still be cooling: this branch is the backstop.
 func _intent_ability_usable(u: BattleUnit, ab: Ability) -> bool:
@@ -8830,7 +8859,7 @@ func _intent_ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# **IT REFUSES EVERYTHING BUT THE UNIT'S OWN BASIC ATTACK, AND THE TEST IS
 	# IDENTITY AGAINST `_cheapest_attack` RATHER THAN `cost > 0`.** The first
 	# version of this clause tested cost, on the assumption that an enemy's
-	# better options are the ones it pays for. **THEY ARE NOT: 46 OF THE 50 (70 OF 74 WITH JK's SPENDS)
+	# better options are the ones it pays for. **THEY ARE NOT: 46 OF THE 50 (70 OF 74 WITH JK's SPENDS, 74 OF 78 WITH JL's HEXES)
 	# ENEMY ABILITIES IN `data/enemies.json` COST ZERO** — Chain Lightning,
 	# Healing Wave, Sundering Strike and Poison Arrow among them — so a cost
 	# test would have left the card refusing FOUR abilities in the whole game
@@ -8864,7 +8893,13 @@ func _refresh_intent_plate(u: BattleUnit) -> void:
 	var cat := String(u.intent.get("category", "strike"))
 	var info: Array = INTENT_ICONS.get(cat, INTENT_ICONS["strike"])
 	var detail := _intent_detail(u, u.intent["ability"], cat)
-	u.set_intent_plate("%s %s" % [info[0], detail], info[1], _intent_hover_text(u))
+	var line := "%s %s" % [info[0], detail]
+	# BATCH JL §1 — THE SPEND ON THE SAME LINE, FIRST, as it is bought first: `▲ Rally · → Slash`. The line trims rather than
+	# overrun, and the hover names both.
+	var sp_ab: Variant = (u.intent.get("spend", {}) as Dictionary).get("ability")
+	if sp_ab is Ability:
+		line = "%s %s · %s" % [INTENT_ICONS["bolster"][0], (sp_ab as Ability).display_name, line]
+	u.set_intent_plate(line, info[1], _intent_hover_text(u))
 
 
 func _enemy_turn(u: BattleUnit) -> void:
@@ -8962,8 +8997,17 @@ func _enemy_turn(u: BattleUnit) -> void:
 	# BATCH BL §1 — RESOLUTION. The choice was made at the end of this unit's
 	# last turn (or at battle start); everything below re-validates it and
 	# resolves it. The three re-validation branches are `_revalidate_intent`.
+	# BATCH JL §1 — THE SPEND RIDING THE DECLARATION IS BOUGHT FIRST, FREE (`_warband_free_spend`), and the body then acts as it
+	# declared. A stun, a freeze or a hijack above discarded both, and a wind-up's turn declares none. **It is bought BEFORE
+	# re-validation clears the declaration**, the rider alone taken off it: the action's own reserve — a heal's price — stays held
+	# while the spend is bought, so a body a Raise stands up, which declares at once, cannot set that heal's Malice aside (the
+	# fresh reader's finding).
+	var sp_decl: Dictionary = (u.intent.get("spend", {}) as Dictionary).duplicate()
+	u.intent.erase("spend")
+	if not sp_decl.is_empty():
+		await _warband_free_spend(u, sp_decl)
 	var decl := _revalidate_intent(u)
-	if decl.is_empty():
+	if decl.is_empty() or u.dead or battle_over:
 		return
 	var d_ab: Ability = decl["ability"]
 	var d_target: BattleUnit = decl["target"]
@@ -9073,6 +9117,12 @@ func _choose_enemy_action(u: BattleUnit, ticks_ahead := 1) -> Dictionary:
 	# is now reachable and says "nothing to declare" rather than indexing [0].
 	if affordable.is_empty():
 		return {}
+	# BATCH JL §2 — THE HEXES: a move that lays one of the four on a hero and deals nothing, so the line above (`damage > 0`)
+	# would never reach it — the Regalia trap. It stands among the moves the selection picks from at random, as the
+	# afflictions always have, whenever it is ready and some hero in reach does not already carry it, and it is aimed at one
+	# who does not. A Broken hero is still exploited with the hardest blow.
+	var hexes: Array = u.abilities.filter(func(a): return a.special == "warband_hex" \
+		and _eff_cost(u, a) <= u.resource and _enemy_ready(u, a, ticks_ahead) and not _hex_open(living, a).is_empty())
 	var broken_heroes := living.filter(func(h): return h.broken)
 	if not broken_heroes.is_empty():
 		# Exploit a Broken hero with the hardest-hitting attack they can afford.
@@ -9086,7 +9136,11 @@ func _choose_enemy_action(u: BattleUnit, ticks_ahead := 1) -> Dictionary:
 		# Prefer finishing off wounded heroes; sometimes spread damage.
 		# Threatening Presence: Warriors draw 20% more of the random picks.
 		target = _lowest_hp(living) if randf() < 0.40 else _threat_pick(living)
-		ab = affordable.pick_random()
+		ab = (affordable + hexes).pick_random()
+		if ab.special == "warband_hex":
+			var hx_open := _hex_open(living, ab)
+			return {"ability": ab, "target": _lowest_hp(hx_open) if randf() < 0.40 else _threat_pick(hx_open),
+				"support": false, "message": "", "logs": []}
 		# Savage Presence (Ursus): the LIVE bear draws 15% of attacks its
 		# way, scaled by the bond curve — a certainty at a deep enough bond,
 		# which is what an uncapped meter is supposed to buy.
@@ -9142,6 +9196,14 @@ func _choose_enemy_action(u: BattleUnit, ticks_ahead := 1) -> Dictionary:
 		"message": message, "logs": logs}
 
 
+# BATCH JL §2 — WHOM A HEX CAN TAKE, of the bodies the selection may aim at: a hero (a companion takes no turn and holds no
+# resource bar, so a hex on one would be spent on little but a Gall) who does not already carry it. No draw and no evasion
+# moves a hex once it is aimed, and it rolls no miss: it is a `special`.
+func _hex_open(pool: Array, ab: Ability) -> Array:
+	var hx_id := String(ab.applies_status.get("id", ""))
+	return pool.filter(func(h): return not h.dead and not h.is_companion and not h.has_status(hx_id))
+
+
 # Weighted random target: Warriors weigh 1.2, everyone else 1.0.
 func _threat_pick(pool: Array) -> BattleUnit:
 	var total := 0.0
@@ -9167,10 +9229,12 @@ func _threat_pick(pool: Array) -> BattleUnit:
 # there now (`_malice_price`) against what the pool holds that no other declared heal has set aside (`_malice_free`). A
 # third refusal of the same door, asked where the cooldown is asked (JI's ruling 1, accepted at JJ §0): the selection's business, and
 # no second gate. A choice that names no body asks the cooldown alone; every heal the selection makes names one.
-func _enemy_ready(u: BattleUnit, ab: Ability, ticks_ahead := 1, body: BattleUnit = null) -> bool:
+# BATCH JL §1 — `held` is what the asker's own declaration already sets aside — a heal it chose this same declaration, before
+# the spend that rides beside it — which `_malice_free` does not count, since it excludes the asker.
+func _enemy_ready(u: BattleUnit, ab: Ability, ticks_ahead := 1, body: BattleUnit = null, held := 0) -> bool:
 	if int(u.cooldowns.get(ab.display_name, 0)) > ticks_ahead:
 		return false
-	return body == null or _malice_price(u, ab, body) <= _malice_free(u)
+	return body == null or _malice_price(u, ab, body) + held <= _malice_free(u)
 
 
 # The support half's lookup: the ability by name, or null while it is cooling.
@@ -9252,8 +9316,9 @@ func _enemy_support_action(u: BattleUnit, ticks_ahead := 1) -> Array:
 		var nicked: Array = allies.filter(func(a): return _malice_hurt(vigil, a))
 		if nicked.size() >= 2 and _enemy_ready(u, vigil, ticks_ahead, u):
 			return [vigil, u]
-	# BATCH JK §1 — AND THE SPENDS, LAST: a Raise, a Rally or an Entrench, each whenever the pool allows (`_warband_spend`).
-	return _warband_spend(u, ticks_ahead)
+	# BATCH JL §1 — THE SPENDS ARE NO LONGER THE SUPPORT HALF's LAST CHOICE: a spend costs its body no turn, so it rides the
+	# body's declaration beside whatever this half or the attack half chose (`_declare_intent`), still after every heal and ward.
+	return []
 
 
 # ══ BATCH JJ §2 — MALICE: ONE POOL FOR THE WHOLE WARBAND, FILLED BY WHAT THE HEROES DO TO IT ═════════════════════════
@@ -9324,6 +9389,8 @@ func _malice_free(exclude: BattleUnit = null) -> int:
 	for e in enemies:
 		if e != exclude and not e.dead:
 			held += int(e.intent.get("malice", 0))
+			# BATCH JL §1 — and the spend riding it, which sets its own price aside until it is bought.
+			held += int((e.intent.get("spend", {}) as Dictionary).get("malice", 0))
 	return maxi(malice - held, 0)
 
 
@@ -9410,14 +9477,15 @@ const MALICE_SPENDS := ["malice_raise", "malice_rally", "malice_entrench"]
 const MALICE_RAISE_PCT := 0.40
 const MALICE_RALLY_PCT := 0.30
 # A Rally's clock counts down at each of a body's turn starts, before it acts, so a body strikes rallied on one turn fewer than
-# the clock: 3, and every rallied body strikes rallied twice — the brief's two of its turns (JK's RULINGS OWED 5).
+# the clock: 3, and every rallied body strikes rallied twice — the brief's two of its turns (JK's ruling 5, accepted at JL §0);
+# a body that buys its Rally strikes rallied three times, since it buys first on its own turn (JL §1).
 const MALICE_RALLY_TURNS := 3
 const MALICE_RALLY_PRICE := 40
 const MALICE_ENTRENCH_TURNS := 3
 const MALICE_ENTRENCH_PRICE := 30
-# The spends' policy (JK §1): a Rally waits for this many standing bodies. Each strikes rallied twice, so three buy 1.8 of a
-# basic blow for a spend that takes 1.25 of a basic's turn (its 2.5 delay against a 2.0 basic); two buy 1.2.
-const MALICE_RALLY_BODIES := 3
+# The spends' policy (JK §1): a Rally waits for this many standing bodies. A spend costs its body no turn (JL §1), so the
+# Rally no longer has a blow of its own to beat: two bodies, the brief's.
+const MALICE_RALLY_BODIES := 2
 var _malice_raised: Array = []   # the bodies a Raise stood up this fight: once a body, a fight
 
 
@@ -9441,16 +9509,17 @@ func _raise_holds(body: BattleUnit, asker: BattleUnit = null) -> bool:
 	for e in enemies:
 		if e == asker or e.dead:
 			continue
-		var ia: Variant = e.intent.get("ability")
-		if ia is Ability and (ia as Ability).special == "malice_raise" and e.intent.get("target") == body:
+		var rd: Dictionary = e.intent.get("spend", {})
+		var ia: Variant = rd.get("ability")
+		if ia is Ability and (ia as Ability).special == "malice_raise" and rd.get("target") == body:
 			return false
 	return true
 
 
-# Whether a standing body of the warband has declared a move carrying `special`.
+# Whether a standing body of the warband has declared a spend carrying `special` (JL §1: it rides the declaration).
 func _spend_declared(special: String) -> bool:
 	for e in enemies:
-		var ia: Variant = e.intent.get("ability")
+		var ia: Variant = (e.intent.get("spend", {}) as Dictionary).get("ability")
 		if not e.dead and ia is Ability and (ia as Ability).special == special:
 			return true
 	return false
@@ -9473,11 +9542,11 @@ func _spend_price(ab: Ability, body: BattleUnit) -> int:
 # THE SPENDS' POLICY (JK §1), each whenever the pool allows: a Raise on the largest fallen body it can pay for; a Rally while
 # `MALICE_RALLY_BODIES` or more bodies stand and none is rallied or about to be; an Entrench while none is entrenched or about to be.
 # Each asks `_enemy_ready` its cooldown and its price on the body it names — the selection's one door, no second gate.
-func _warband_spend(u: BattleUnit, ticks_ahead := 1) -> Array:
+func _warband_spend(u: BattleUnit, ticks_ahead := 1, held := 0) -> Array:
 	var standing: Array = enemies.filter(func(e): return not e.dead)
 	var raise := _find_spend(u, "malice_raise")
 	if raise != null and _enemy_ready(u, raise, ticks_ahead):
-		var fallen: Array = enemies.filter(func(e): return _raise_holds(e, u) and _enemy_ready(u, raise, ticks_ahead, e))
+		var fallen: Array = enemies.filter(func(e): return _raise_holds(e, u) and _enemy_ready(u, raise, ticks_ahead, e, held))
 		if not fallen.is_empty():
 			var big: BattleUnit = fallen[0]
 			for f in fallen:
@@ -9487,14 +9556,41 @@ func _warband_spend(u: BattleUnit, ticks_ahead := 1) -> Array:
 	var rally := _find_spend(u, "malice_rally")
 	if rally != null and standing.size() >= MALICE_RALLY_BODIES and not _spend_declared("malice_rally") \
 			and not standing.any(func(e): return e.has_status("warband_rally")) \
-			and _enemy_ready(u, rally, ticks_ahead, u):
+			and _enemy_ready(u, rally, ticks_ahead, u, held):
 		return [rally, u]
 	var entrench := _find_spend(u, "malice_entrench")
 	if entrench != null and not _spend_declared("malice_entrench") \
 			and not standing.any(func(e): return e.has_status("warband_entrench")) \
-			and _enemy_ready(u, entrench, ticks_ahead, u):
+			and _enemy_ready(u, entrench, ticks_ahead, u, held):
 		return [entrench, u]
 	return []
+
+
+# BATCH JL §1 — A SPEND IS A FREE ACTION. The spend a body declared beside its action is bought first on its turn: asked again
+# at the door re-validation asks (`_intent_ability_usable` — the list, the cooldown, Heads Down, the Long Silence) and, for a
+# Raise, whether its body is still down and unraised; its cooldown starts and its arm in `_resolve_special` pays, as when it
+# was the action — and no delay is charged, so the body then acts as it declared, at its own action's delay. ONE A TURN: one
+# rides a declaration. A spend that no longer holds is not bought, and the body loses nothing by it.
+func _warband_free_spend(u: BattleUnit, sp: Dictionary) -> void:
+	var sp_ab: Variant = sp.get("ability")
+	if not (sp_ab is Ability) or u.dead or battle_over:
+		return
+	var ab: Ability = sp_ab
+	var t_raw = sp.get("target")
+	var t: BattleUnit = t_raw if (t_raw != null and is_instance_valid(t_raw)) else null
+	if not _intent_ability_usable(u, ab):
+		_log("%s cannot bring %s to bear — the spend is not bought" % [u.unit_name, ab.display_name], "#c8b880")
+		return
+	if ab.special == "malice_raise" and not _raise_holds(t, u):
+		_log("%s: %s finds no fallen body to stand up" % [u.unit_name, ab.display_name], "#909090")
+		return
+	_dmg_frame(u, ab.display_name)
+	if not debug_cooldowns_off:
+		u.start_cooldown(ab)
+	if u.mod_silence:
+		u.silence_spent[ab.display_name] = true
+	_istat("spend_free")
+	await _resolve_special(u, ab, t if t != null else u, "good", 1.0)
 
 
 # ══ BATCH JJ §2 — THE WARBAND's POOL ON SCREEN ════════════════════════════════════════════════════════════════════════
@@ -24875,6 +24971,25 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			tp_spent = int(malice_ledger["spent"]) - tp_spent
 			_log("%s: Dark Vigil — its whole warband regains 6%% of its own health (%d in all)%s" % [
 				attacker.unit_name, tp_total, " — %d Malice" % tp_spent if tp_spent > 0 else ""], "#70d878")
+		"warband_hex":
+			# BATCH JL §2 — A HEX: the warband lays one of its four on a hero — Gall, Sap, Mire or Fester, the move's own
+			# `applies_status` — through the status door, its applier the caster (Fester's tick reads its Attack). A hero who
+			# already carries it, a companion or a hero gone gives way to another hero who carries none; with none, nothing.
+			var hx_id := String(ab.applies_status.get("id", ""))
+			var hx_t: BattleUnit = target
+			if hx_t == null or hx_t.dead or not hx_t.is_hero or hx_t.is_companion or hx_t.has_status(hx_id):
+				var hx_open: Array = heroes.filter(func(h): return not h.dead and not h.has_status(hx_id))
+				hx_t = hx_open.pick_random() if not hx_open.is_empty() else null
+			if hx_t == null or not STATUS_INFO.has(hx_id):
+				_log("%s: %s finds no hero to hex" % [attacker.unit_name, ab.display_name], "#909090")
+			else:
+				_apply_status(hx_t, hx_id, int(ab.applies_status.get("turns", 0)), 0, _dot_tick(hx_id, attacker), attacker)
+				# The door may refuse it (a Hallowed hero), and says so itself; the hex is announced only where it took hold.
+				if hx_t.has_status(hx_id):
+					_sfx("hit", -10.0, 0.7)
+					_message("%s: %s on %s!" % [attacker.unit_name, ab.display_name, hx_t.unit_name])
+					_log("%s: %s on %s — %s" % [attacker.unit_name, ab.display_name, hx_t.unit_name,
+						String(STATUS_INFO[hx_id][3]).split("\n(")[0].replace("\n", " ")], "#a070c0")
 		"malice_raise":
 			# BATCH JK §1 — RAISE: a fallen body of the warband stands back up at `MALICE_RAISE_PCT` of its health, once a body a fight,
 			# and the pool pays the health it stood up with. `_die()` laid its Break down with it (JD §3) and `take_hit` lays none
