@@ -1,0 +1,22 @@
+kind	unit	basic	basic priced	second damaging move	reach	status it lays	its Break damage	delay	damage before	priced before	multiple before	cooldown before	in the population	damage after	priced after	multiple after	cooldown the rule gives after	later damaging moves (multiple)
+raider	Orc Raider	Slash	34.0	Sundering Strike	one	sunder (60%)	22	2.5	23	23.0	0.68	0	yes	48	48.0	1.41	2	-
+whelp	Orc Whelp	Frenzied Nip	26.0	Reckless Lunge	one	-	20	2.5	38	38.0	1.46	2	no — clears the line	-	-	-	-	-
+slinger	Orc Slinger	Stone Sling	24.0	Skull Crack	one	-	38	2.5	12	12.0	0.50	0	yes	34	34.0	1.42	2	-
+totemist	Orc Totemist	Totem Jab	30.0	-	-	-	-	-	-	-	-	-	no — no second damaging move: Healing Wave	-	-	-	-	-
+archer	Orc Archer	Arrow Shot	21.0	Poison Arrow	one	poison (70%)	14	2.5	16	20.2	0.96	0	yes	26	30.2	1.44	2	-
+shieldmaster	Orc Shieldmaster	Strike	37.0	-	-	-	-	-	-	-	-	-	no — no second damaging move: Shielding	-	-	-	-	-
+shaman	Orc Shaman	Chain Lightning	120.0	-	-	-	-	-	-	-	-	-	no — no second damaging move: Healing Wave	-	-	-	-	-
+hexer	Orc Hexer	Hex Bolt	44.0	Withering Hex	one	exposed (70%)	10	2.5	24	24.0	0.55	0	yes	62	62.0	1.41	2	Bone Rattle 0.36
+wolfrider	Wolfrider	Lunging Bite	36.0	Ride-by Slash	one	cripple (50%)	16	2.0	28	28.0	0.78	0	yes	51	51.0	1.42	2	-
+ashblade	Ashblade	Cinder Slash	32.0	Flame Lick	one	burn (60%)	12	2.5	22	29.2	0.91	0	yes	38	45.2	1.41	2	-
+brute	Orc Brute	Smash	40.0	Overhead Crush	one	-	50	3.5	28	28.0	0.70	0	yes	56	56.0	1.40	2	-
+bog_troll	Bog Troll	Claw	40.0	Swampy Grasp	one	slow (70%)	18	3.0	26	26.0	0.65	0	yes	56	56.0	1.40	2	-
+behemoth	Rot Behemoth	Rotting Fist	41.0	Wretched Bellow	every hero	-	22	3.5	14	56.0	1.37	2	yes	15	60.0	1.46	2	-
+chief	Orc Chief	Strike	28.0	Heavy Strike	one	-	40	4.0	54	54.0	1.93	2	no — clears the line	-	-	-	-	Chieftain's Maul 1.21
+withered_warden	Withered Warden	Timber Slam	60.0	Roots of Wrath	every hero	poison (100%)	20	3.5	25	124.0	2.07	3	no — clears the line	-	-	-	-	-
+ash_tyrant	Ash-Wrought Tyrant	Cinder Cleave	30.0	Immolating Wave	every hero	burn (80%)	14	3.5	18	110.4	3.68	4	no — clears the line	-	-	-	-	Tyrant's Verdict 1.47
+chanter	Orc Ritual Chanter	Warding Chant	22.0	-	-	-	-	-	-	-	-	-	no — no second damaging move: Cleansing Rite	-	-	-	-	-
+hurler	Ash Hurler	Ember Lob	30.0	Siege Stone	every hero	-	45	4.0	70	280.0	9.33	4	no — clears the line	-	-	-	-	-
+bloodcaller	Orc Bloodcaller	Ragged Cut	30.0	Blood Tribute	one	-	24	2.5	20	20.0	0.67	0	yes	42	42.0	1.40	2	-
+grave_totem	Grave Totem	Grasping Roots	18.0	-	-	-	-	-	-	-	-	-	no — no second damaging move: Dark Vigil	-	-	-	-	-
+hollow_crown	The Hollow Crown	Crown of Thorns	46.0	Hollow Wail	every hero	dazed (70%)	22	3.5	20	80.0	1.74	2	no — clears the line	-	-	-	-	Sundering Decree 0.74; The Long Dark 3.31

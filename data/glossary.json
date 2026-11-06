@@ -714,7 +714,7 @@
   "term": "Mana",
   "category": "resources",
   "short": "The casters' pool: regenerates slowly, restored by potions and by a zone boss that opens a new zone.",
-  "long": "Mage, Cleric, and Hunter abilities spend Mana (cap 100). It regenerates +12 at each turn start (the Mage's Evocation nearly doubles that), and potions refill it between fights - a relic that restores Mana on victory reaches every hero who spends it, the Hunter included - and a zone boss restores it in full when it opens the next zone (the last zone's boss, which the end boss follows on the same board, does not). Unlike Rage it carries over between battles - a drained Cleric stays drained until the heroes recover.",
+  "long": "Mage, Cleric, and Hunter abilities spend Mana (cap 100). It regenerates +12 at each turn start (the Mage's Evocation nearly doubles that; a Cleric gains {=Unit.CLERIC_MANA_CUT*100}% less in a fight, of every gain, though never of the bar carried into one), and potions refill it between fights - a relic that restores Mana on victory reaches every hero who spends it, the Hunter included - and a zone boss restores it in full when it opens the next zone (the last zone's boss, which the end boss follows on the same board, does not). Unlike Rage it carries over between battles - a drained Cleric stays drained until the heroes recover.",
   "see_also": [
    "res_rage",
    "node_types"

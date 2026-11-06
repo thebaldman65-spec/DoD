@@ -2,19 +2,19 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 2334,
-  "source": 1446,
-  "other": 303,
-  "document": 585
+  "total": 2352,
+  "source": 1447,
+  "other": 315,
+  "document": 590
  },
  "floor": {
-  "pins": 2334
+  "pins": 2352
  },
  "falls": [],
  "source_residency": {
   "narrow": 49,
   "code": 893,
-  "absent": 330,
+  "absent": 331,
   "runtime": 109,
   "unresolved": 6,
   "comment": 51,
@@ -6122,6 +6122,28 @@
    "k": "literal",
    "how": "read",
    "g": "check_hy.gd#616"
+  },
+  {
+   "s": "check_hz.gd",
+   "fn": "_s2_the_rage_dump",
+   "h": "CLAUDE.md",
+   "n": "SUPERSEDED FOR BOIL OVER",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hz.gd#733"
+  },
+  {
+   "s": "check_hz.gd",
+   "fn": "_s2_the_rage_dump",
+   "h": "CLAUDE.md",
+   "n": "a full bar beats two of the best ordinary turn and a cast at the floor beats an ordinary card",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hz.gd#733"
   },
   {
    "s": "check_ia.gd",
@@ -12276,7 +12298,18 @@
    "s": "check_jj.gd",
    "fn": "_s5_the_bellow",
    "h": "check_ji.gd",
-   "n": "const TUNED := {\"behemoth/Wretched Bellow\": 2}",
+   "n": "behemoth/Wretched Bellow",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jj.gd#561"
+  },
+  {
+   "s": "check_jj.gd",
+   "fn": "_s5_the_bellow",
+   "h": "check_ji.gd",
+   "n": "const TUNED := {}",
    "p": "+",
    "r": "code",
    "k": "literal",
@@ -12509,7 +12542,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jm.gd#198",
+   "g": "check_jm.gd#199",
    "expr": "ANSWERED"
   },
   {
@@ -12521,7 +12554,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_jm.gd#196"
+   "g": "check_jm.gd#197"
   },
   {
    "s": "check_jm.gd",
@@ -12532,7 +12565,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jm.gd#396",
+   "g": "check_jm.gd#397",
    "expr": "fig"
   },
   {
@@ -12544,7 +12577,7 @@
    "r": "runtime",
    "k": "composed",
    "how": "read",
-   "g": "check_jm.gd#408"
+   "g": "check_jm.gd#409"
   },
   {
    "s": "check_jm.gd",
@@ -12555,7 +12588,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jm.gd#424",
+   "g": "check_jm.gd#425",
    "expr": "PLAYED_RULE"
   },
   {
@@ -12567,8 +12600,178 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jm.gd#431",
+   "g": "check_jm.gd#432",
    "expr": "String"
+  },
+  {
+   "s": "check_jn.gd",
+   "fn": "_block",
+   "h": "docs/state.md",
+   "n": "\n",
+   "p": "+",
+   "r": "runtime",
+   "k": "composed",
+   "how": "param",
+   "g": "check_jn.gd#90"
+  },
+  {
+   "s": "check_jn.gd",
+   "fn": "_block",
+   "h": "docs/state.md",
+   "n": "\n#",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "param",
+   "g": "check_jn.gd#94"
+  },
+  {
+   "s": "check_jn.gd",
+   "fn": "_s0_boil_over",
+   "h": "docs/state.md",
+   "n": "%s damage a point of Rage, flat",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_jn.gd#352"
+  },
+  {
+   "s": "check_jn.gd",
+   "fn": "_s0_boil_over",
+   "h": "docs/master.html",
+   "n": "%s damage for every point spent, flat",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_jn.gd#350"
+  },
+  {
+   "s": "check_jn.gd",
+   "fn": "_s0_boil_over",
+   "h": "docs/master.html",
+   "n": "a full bar of 100 is %d",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_jn.gd#350"
+  },
+  {
+   "s": "check_jn.gd",
+   "fn": "_s0_sanctity",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_jn.gd#363",
+   "expr": "WAITS"
+  },
+  {
+   "s": "check_jn.gd",
+   "fn": "_s0_sanctity",
+   "h": "docs/state.md",
+   "n": "Rune of the Hierophant",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jn.gd#363"
+  },
+  {
+   "s": "check_jn.gd",
+   "fn": "_s0_the_mana",
+   "h": "docs/master.html",
+   "n": "Mana the Cleric gains in a fight is cut by ",
+   "p": "+",
+   "r": "runtime",
+   "k": "composed",
+   "how": "read",
+   "g": "check_jn.gd#283"
+  },
+  {
+   "s": "check_jn.gd",
+   "fn": "_s0_the_rulings",
+   "h": "DoD-archive/state-archive.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_jn.gd#223",
+   "expr": "ANSWERED"
+  },
+  {
+   "s": "check_jn.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/state.md",
+   "n": "\n### JM's RULINGS OWED",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jn.gd#221"
+  },
+  {
+   "s": "check_jn.gd",
+   "fn": "_s0_the_thinair",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_jn.gd#306",
+   "expr": "String"
+  },
+  {
+   "s": "check_jn.gd",
+   "fn": "_s0_the_thinair",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_jn.gd#306",
+   "expr": "RECORDED"
+  },
+  {
+   "s": "check_jn.gd",
+   "fn": "_s1_the_texts",
+   "h": "docs/state.md",
+   "n": "%s %.2f (%d)",
+   "p": "-",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_jn.gd#511"
+  },
+  {
+   "s": "check_jn.gd",
+   "fn": "_s1_the_texts",
+   "h": "docs/state.md",
+   "n": "%s× its own basic",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_jn.gd#515"
+  },
+  {
+   "s": "check_jn.gd",
+   "fn": "_s2_the_arms",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_jn.gd#526",
+   "expr": "fig"
   },
   {
    "s": "test_batch_ah.gd",
@@ -25589,7 +25792,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "test_batch_cp.gd#215"
+   "g": "test_batch_cp.gd#220"
   },
   {
    "s": "test_batch_cp.gd",
@@ -25600,7 +25803,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "test_batch_cp.gd#216",
+   "g": "test_batch_cp.gd#221",
    "alt": true
   },
   {
@@ -25612,7 +25815,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_cp.gd#218"
+   "g": "test_batch_cp.gd#223"
   },
   {
    "s": "test_batch_cp.gd",
@@ -25623,7 +25826,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "test_batch_cp.gd#216",
+   "g": "test_batch_cp.gd#221",
    "alt": true
   },
   {
@@ -25635,7 +25838,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_cp.gd#222"
+   "g": "test_batch_cp.gd#227"
   },
   {
    "s": "test_batch_cp.gd",
@@ -25646,7 +25849,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_cp.gd#223"
+   "g": "test_batch_cp.gd#228"
   },
   {
    "s": "test_batch_cp.gd",
@@ -25657,7 +25860,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_cp.gd#224"
+   "g": "test_batch_cp.gd#229"
   },
   {
    "s": "test_batch_cp.gd",

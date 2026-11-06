@@ -885,7 +885,8 @@ func _s2_the_rage_dump() -> void:
 		"§2: Boil Over is not a gated strike with no cost of its own and no Perfect rider")
 	if bo == null:
 		return
-	var rate: float = float(_const("BOIL_OVER_PCT_PER_RAGE", -1.0))
+	# SINCE JN §0 THE FIGURE IS FLAT, A POINT OF RAGE AT A TIME (the designer's), read off its constant as the rate was.
+	var rate: float = float(_const("BOIL_OVER_DMG_PER_RAGE", -1.0))
 	var floor_frac: float = float(_const("BOIL_OVER_MIN_BAR", -1.0))
 	ok(rate > 0.0 and floor_frac > 0.0 and bo.description.contains(String.num(rate)) \
 		and bo.description.contains("%d%%" % int(round(floor_frac * 100.0))),
@@ -962,13 +963,14 @@ func _s2_the_rage_dump() -> void:
 		print("      the Rage cards, one cast each on its own board: %s" % ", ".join(PackedStringArray(table.map(
 			func(r): return "%s %d for %d (%.2f a point)" % [r[0], r[2], r[1], float(r[2]) / float(r[1])]))))
 		print("      and %d that deal nothing on this board: %s" % [nothing.size(), ", ".join(PackedStringArray(nothing))])
-		# THE SHAPE THE DESIGNER SET AS THE PASS CONDITION: a full bar beats the best ordinary turn and does not
-		# beat two; a cast at the floor is worse than an ordinary card.
+		# THE SHAPE THE DESIGNER SET AS THE PASS CONDITION AT HZ: a full bar beats the best ordinary turn and does not
+		# beat two; a cast at the floor is worse than an ordinary card. **SUPERSEDED FOR BOIL OVER AT JN §0 BY THE DESIGNER's OWN
+		# HAND** — 1.5 damage a point, flat — so its two upper arms are printed here, not asserted, and the rule file records why.
 		ok(table.size() >= 10, "§2 (%s): only %d Rage cards were priced — the census has gone vacuous" % [tag, table.size()])
 		ok(full > best, "§2 (%s): a full bar deals %d, not more than the best ordinary turn (%s, %d)" % [tag, full, best_name, best])
-		ok(full < 2 * best, "§2 (%s): a full bar deals %d, more than two of the best ordinary turn (%s, %d)" % [tag, full, best_name, best])
-		ok(plain > 0 and at_floor < plain,
-			"§2 (%s): a cast at the floor deals %d, not less than an ordinary card (Crushing Blow, %d)" % [tag, at_floor, plain])
+		print("      HZ's shape, superseded at JN §0: a full bar is %.2f of the best ordinary turn; a cast at the floor %.2f of Crushing Blow" % [
+			float(full) / maxf(float(best), 1.0), float(at_floor) / maxf(float(plain), 1.0)])
+		ok(plain > 0, "§2 (%s): Crushing Blow deals nothing on this board — the census has gone vacuous" % tag)
 		# LAST RITES — the tier-3 node's field, live below a quarter's health; a dump empties the bar it pays
 		# from, and that is allowed: the cast is not refused, and the next blow is paid in health.
 		var s2: Node = await _dump_board(with_core, true)
@@ -1000,6 +1002,10 @@ func _s2_the_rage_dump() -> void:
 	if rows.has("with the core") and rows.has("without"):
 		print("  THE NUMBER THAT DECIDES IT: a full bar reads %d without the Berserker's core and %d with it" % [
 			rows["without"]["full"], rows["with the core"]["full"]])
+		var rules := FileAccess.get_file_as_string("res://CLAUDE.md")
+		# THE RULE's OWN WORDS, NEVER ITS BATCH CODE (EA §2; the new text's reader, M4): the head and the sentence that says why.
+		ok(rules.contains("SUPERSEDED FOR BOIL OVER") and rules.contains("a full bar beats two of the best ordinary turn and a cast at the floor beats an ordinary card"),
+			"§2: the dump rule's shape is no longer asserted here and the rule file does not record its supersession")
 		ok(rows["with the core"]["full"] > rows["without"]["full"],
 			"§2: the core does not multiply the dump (%d with, %d without)" % [rows["with the core"]["full"], rows["without"]["full"]])
 

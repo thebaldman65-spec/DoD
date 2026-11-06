@@ -157,10 +157,19 @@ var resource_name := ""    # "Rage" or "Mana" (heroes only)
 # rounded in the bearer's favour. A write that lowers the bar is untouched; a write that pays and gains at once (`_resolve`'s
 # price line) is cut on what is left of the rise. A spec's own meter is not the bar: Focus, Mercy and Resonance ride
 # `second_resource`, and Faith is a counter of its own.
+#
+# BATCH JN §0.1 — AND THE CLERIC GAINS HALF, AT THIS SAME DOOR (the designer's, cold since JH). His class cuts every rise
+# of his bar in a fight by `CLERIC_MANA_CUT`, rounded in his favour as Sap's is — the turn-start drip, a card's gain, a
+# potion drunk in the fight, a refund, all of it, because all of it passes here. The cut is the field `mana_gain_cut`,
+# armed by `battle._spawn_units` once his opening bar is settled: the bar he walks in with is no gain. Sap and the cut
+# both stand on a galled-and-sapped Cleric, each on what the other leaves. What a bar gains outside a fight (the
+# map's potion, an event, a zone's restoring) never reaches this setter and is not cut.
 var resource := 0:
 	set(v):
 		if v > resource and has_status("sap"):
 			v -= int((v - resource) * SAP_CUT)
+		if v > resource and mana_gain_cut > 0.0:
+			v -= int((v - resource) * mana_gain_cut)
 		resource = v
 var max_resource := 100
 # Secondary class resource: Holy Cleric Mercy (0-5), Mage Arcane Resonance
@@ -186,6 +195,7 @@ var abilities: Array = []
 var cooldowns := {}        # ability display_name -> turns until usable again
 var mana_regen_bonus := 0        # class passive: Mage Evocation
 var healing_received_mult := 1.0 # class passive: Cleric Holy Conduit
+var mana_gain_cut := 0.0         # class: the Cleric's Mana gain cut (JN §0.1), armed at spawn once the bar is settled
 
 var broken := false         # Broken: defenses down, crit vulnerable
 var broken_pending := false # will lose its next turn
@@ -4177,6 +4187,8 @@ const MALICE_ENTRENCH_MULT := 2
 # Sap what its resource bar gains (the bar's own setter), Mire its speed (`effective_speed`).
 const GALL_HEAL_CUT := 0.5
 const SAP_CUT := 0.5
+# BATCH JN §0.1 — WHAT A CLERIC's BAR GAINS IN A FIGHT IS CUT BY THIS, at the bar's own setter (Sap's door).
+const CLERIC_MANA_CUT := 0.5
 const MIRE_SLOW := 0.25
 # BATCH IK §3a — SUNDER's OWN DURATION: what its base application lays — Crushing Blow, the card every
 # Warrior holds — and what a Perfect Sever lays on the body it cut, read here by both, never retyped.

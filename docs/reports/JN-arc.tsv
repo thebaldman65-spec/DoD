@@ -1,0 +1,80 @@
+reading	JM's tree (HEAD)	HEAD and §1 alone	paired: §1 alone − JM's tree
+JM's tree (HEAD)	994f74741bfa04c3656f24a6dd70a2e373d0947f, JM's commit, as it stands, with JM's seventeen print-only probes and JN's one		
+HEAD and §1 alone		HEAD and §1's raise of ten moves in data/enemies.json, nothing else, with the same eighteen probes	
+the line	berserker,cryomancer,inquisitor,beastmaster 0 warden 60 38 - none - 1 - 38: the reference four untalented at Warden, sixty runs, block 38 and its fight seed, no modifier laid (DOD_IV_FORCE=none), no crest worn (DOD_JF_NOCREST=1), no relic		
+runs	60	60	
+completed (runs)	5	1	-0.067 ± 0.032 (z -2.05)
+fights won a run (runs)	15.67	11.53	-4.13 ± 0.78 (z -5.30)
+falls a run (runs)	5.95	6.60	+0.65 ± 0.48 (z +1.35)
+falls a run, in the fights it won (runs)	2.28	2.67	+0.38 ± 0.47 (z +0.82)
+fights fought, all	995	751	
+paired fights (same node, in order)	724	724	59 of 60 runs on one road throughout
+health at a fight's end, paired fights	0.8474	0.7609	-9.14 ± 1.06 points (z -8.65)
+falls a fight, paired fights	0.195	0.510	+0.334 ± 0.041 (z +8.06)
+hero turns a fight, paired fights	32.64	31.72	-1.12 ± 0.35 (z -3.21)
+the warband's blows a fight, paired fights	14.89	15.43	+0.45 ± 0.31 (z +1.44)
+  health at a fight's end, the paired fights both arms won			-5.47 ± 0.84 points (z -6.53)
+  falls a fight, the paired fights both arms won			+0.128 ± 0.026 (z +4.95)
+  hero turns a fight, the paired fights both arms won			+0.51 ± 0.28 (z +1.84)
+  the warband's blows a fight, the paired fights both arms won			+0.78 ± 0.24 (z +3.18)
+  paired fights holding a loss			14 lost by both arms, 40 by §1 alone, 4 by JM's tree alone
+the first fight: health at its end	0.9266	0.9225	-0.41 ± 0.51 points (z -0.80) (60 of 60 the same node)
+the first fight: the warband's blows	10.18	10.17	-0.02 ± 0.19 (z -0.09)
+the warband's blows a fight, every fight	15.50	15.42	
+enemy moves resolved through a declared turn, every fight (a spend is no move since JL; a hex is one)	16887	12700	
+§0 ALONE: the Cleric's cut and Boil Over flat, §1 alone → the tree that lands	§1 alone	the tree that lands	paired: landing − §1 alone
+§0 alone: runs	60	60	
+§0 alone: completed (runs)	1	0	-0.017 ± 0.017 (z -1.00)
+§0 alone: fights won a run (runs)	11.53	7.57	-3.97 ± 0.72 (z -5.49)
+§0 alone: falls a run (runs)	6.60	6.03	-0.57 ± 0.42 (z -1.34)
+§0 alone: falls a run, in the fights it won (runs)	2.67	2.03	-0.63 ± 0.46 (z -1.37)
+§0 alone: fights fought, all	751	514	
+§0 alone: paired fights (same node, in order)	504	504	60 of 60 runs on one road throughout
+§0 alone: health at a fight's end, paired fights	0.8156	0.6575	-15.72 ± 1.15 points (z -13.64)
+§0 alone: falls a fight, paired fights	0.296	0.692	+0.403 ± 0.048 (z +8.42)
+§0 alone: hero turns a fight, paired fights	29.94	27.27	-2.49 ± 0.30 (z -8.26)
+§0 alone: the warband's blows a fight, paired fights	14.15	14.32	+0.23 ± 0.32 (z +0.74)
+§0 alone:   health at a fight's end, the paired fights both arms won			-12.01 ± 0.91 points (z -13.26)
+§0 alone:   falls a fight, the paired fights both arms won			+0.155 ± 0.030 (z +5.20)
+§0 alone:   hero turns a fight, the paired fights both arms won			-0.84 ± 0.21 (z -3.94)
+§0 alone:   the warband's blows a fight, the paired fights both arms won			+0.19 ± 0.19 (z +0.99)
+§0 alone:   paired fights holding a loss			17 lost by both arms, 40 by the tree that lands alone, 3 by §1 alone
+§0 alone: the first fight: health at its end	0.9225	0.9212	-0.13 ± 0.16 points (z -0.78) (60 of 60 the same node)
+§0 alone: the first fight: the warband's blows	10.17	10.15	-0.02 ± 0.02 (z -1.00)
+§0 alone: the warband's blows a fight, every fight	15.42	14.40	
+§0 alone: enemy moves resolved through a declared turn, every fight (a spend is no move since JL; a hex is one)	12700	8055	
+THE WHOLE: JM's tree → the tree that lands	JM's tree	the tree that lands	paired: landing − JM's tree
+whole: runs	60	60	
+whole: completed (runs)	5	0	-0.083 ± 0.036 (z -2.32)
+whole: fights won a run (runs)	15.67	7.57	-8.10 ± 0.92 (z -8.80)
+whole: falls a run (runs)	5.95	6.03	+0.08 ± 0.40 (z +0.21)
+whole: falls a run, in the fights it won (runs)	2.28	2.03	-0.25 ± 0.39 (z -0.64)
+whole: fights fought, all	995	514	
+whole: paired fights (same node, in order)	506	506	60 of 60 runs on one road throughout
+whole: health at a fight's end, paired fights	0.8702	0.6559	-21.93 ± 1.11 points (z -19.73)
+whole: falls a fight, paired fights	0.126	0.700	+0.604 ± 0.047 (z +12.93)
+whole: hero turns a fight, paired fights	30.26	27.28	-3.00 ± 0.31 (z -9.61)
+whole: the warband's blows a fight, paired fights	13.84	14.35	+0.56 ± 0.32 (z +1.74)
+whole:   health at a fight's end, the paired fights both arms won			-15.56 ± 1.06 points (z -14.73)
+whole:   falls a fight, the paired fights both arms won			+0.209 ± 0.034 (z +6.20)
+whole:   hero turns a fight, the paired fights both arms won			-0.73 ± 0.23 (z -3.22)
+whole:   the warband's blows a fight, the paired fights both arms won			+0.46 ± 0.18 (z +2.61)
+whole:   paired fights holding a loss			5 lost by both arms, 53 by the tree that lands alone, 2 by JM's tree alone
+whole: the first fight: health at its end	0.9266	0.9212	-0.53 ± 0.48 points (z -1.11) (60 of 60 the same node)
+whole: the first fight: the warband's blows	10.18	10.15	-0.03 ± 0.18 (z -0.18)
+whole: the warband's blows a fight, every fight	15.50	14.40	
+whole: enemy moves resolved through a declared turn, every fight (a spend is no move since JL; a hex is one)	16887	8055	
+THE TEN RAISED MOVES, every fight	JM's tree	§1 alone	the tree that lands
+the ten raised moves, cast	3564	1933	1098
+HERO BREAKS, every fight (JN's probe: a hero's Break meter filling, the move in hand)	JM's tree	§1 alone	the tree that lands
+hero Breaks a fight	1.23 (1228 over 995 fights)	1.23 (926 over 751 fights)	1.09 (562 over 514 fights)
+of them, by one of the ten raised moves	327 (26.6%)	115 (12.4%)	78 (13.9%)
+the moves that Broke a hero most, on JM's tree	Strike 137; Slash 137; Skull Crack 137; Sundering Strike 118; Chain Lightning 118; Frenzied Nip 103		
+THE RAGE A WARRIOR HOLDS AT HIS TURNS (JN's probe, every fight)	JM's tree	§1 alone	the tree that lands
+Warrior turns read	7203	5030	3065
+Rage held at a turn's start, mean	49.6	49.2	42.0
+turns at 40 or more (Boil Over castable at a bar of 100)	57.8%	56.9%	47.6%
+turns at 70 or more	32.2%	31.9%	22.4%
+turns at 100 or more	13.6%	13.3%	6.9%
+the most held at a turn's start in a fight, median over fights	80.0	75	65
+Boil Overs poured	13 (Rage poured: min 40, median 65, max 100)	4 (Rage poured: min 40, median 82.5, max 100)	2 (Rage poured: min 40, median 40.0, max 40)

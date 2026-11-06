@@ -440,10 +440,13 @@ func _s1c_b_the_longest() -> void:
 	var v: Dictionary = r[true]
 	var u: Dictionary = r[false]
 	var l := int(u["landed"])
+	# THE DEVOUT IS A CLERIC: Siphon rolls its figure off the wound and the bar's setter keeps what the class's cut leaves (JN §0.1).
+	var sip := maxi(int(round(l * 0.01 * SIPHON)), 1)
+	sip -= int(sip * BattleUnit.CLERIC_MANA_CUT)
 	ok(l > 0 and int(v["landed"]) == 0, "§1c(b): the premise — %d landed unvowed and %d vowed" % [l, v["landed"]])
 	ok(String(u["leech"]).contains("leeches %d HP" % int(l * LS))
 		and String(u["drink"]).contains("drinks %d HP" % maxi(int(l * 0.1), 1))
-		and String(u["siphon"]).contains("draws %d Mana" % maxi(int(round(l * 0.01 * SIPHON)), 1))
+		and String(u["siphon"]).contains("draws %d Mana" % sip)
 		and String(u["recoil"]).contains("recoils for %d" % maxi(int(round(l * 0.25)), 1)),
 		"§1c(b) (no vow): the four did not pay off the %d that landed: %s / %s / %s / %s" % [
 			l, u["leech"], u["drink"], u["siphon"], u["recoil"]])

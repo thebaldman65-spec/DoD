@@ -1,0 +1,12 @@
+reading	untalented	tier 1 whole	paired: tier 1 − untalented	tiers 1 and 2	paired: tiers 1 and 2 − untalented
+the talent policy	every cell of the tiers a player at Warden has opened: tier 1 whole (DOD_SIM_TIERS=1), the nine nodes the first rung's end boss opens, worn by every hero of every class				
+DOD_SIM_TIERS, read off the arm's banner	0	1		2	
+DOD_SIM_RELICS, read off the arm's banner	draw3	draw3		draw3	
+the line	berserker,cryomancer,inquisitor,beastmaster <tiers> warden 60 38 draw3 - - 1 - 38: the reference four at Warden, sixty runs, block 38 and its fight seed, three relics a run, the bargains dealt, the crest the bot's, on the tree that lands				
+completion rate	0.0% (0 of 60) ± 0.0	35.0% (21 of 60) ± 6.2	+0.350 ± 0.062 (z +5.64)	68.3% (41 of 60) ± 6.0	+0.683 ± 0.061 (z +11.28)
+falls a run	6.77 ± 0.37	6.95 ± 0.48	+0.18 ± 0.53 (z +0.35)	4.95 ± 0.43	-1.82 ± 0.52 (z -3.52)
+health at a fight's end	0.5982 (510 fights)	0.7283 (1301 fights)	+20.53 ± 0.86 points (z +23.76) (paired fights)	0.8254 (1591 fights)	+29.88 ± 0.92 points (z +32.53) (paired fights)
+fights won a run	7.50 ± 0.42	21.03 ± 0.98	+13.53 ± 1.00 (z +13.56)	26.20 ± 0.69	+18.70 ± 0.81 (z +23.21)
+falls a fight, paired fights	0.790	0.073	-0.753 ± 0.038 (z -19.83)	0.040	-0.788 ± 0.037 (z -21.37)
+health at a fight's end, the fights won	0.6780	0.7509		0.8354	
+what each arm held	60 of 60 runs opened with three relics; 41 end wearing a crest rune; 228 bargains taken	60; 53; 581		60; 56; 679	

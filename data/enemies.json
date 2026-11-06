@@ -35,7 +35,8 @@
    },
    {
     "display_name": "Sundering Strike",
-    "damage": 23,
+    "cooldown": 2,
+    "damage": 48,
     "pressure": 22,
     "delay": 2.5,
     "anim": "attack02",
@@ -146,7 +147,8 @@
    },
    {
     "display_name": "Skull Crack",
-    "damage": 12,
+    "cooldown": 2,
+    "damage": 34,
     "pressure": 38,
     "delay": 2.5,
     "anim": "attack02"
@@ -265,8 +267,9 @@
    },
    {
     "display_name": "Poison Arrow",
+    "cooldown": 2,
     "dmg_type": "nature",
-    "damage": 16,
+    "damage": 26,
     "pressure": 14,
     "delay": 2.5,
     "anim": "attack02",
@@ -454,7 +457,8 @@
    },
    {
     "display_name": "Withering Hex",
-    "damage": 24,
+    "cooldown": 2,
+    "damage": 62,
     "pressure": 10,
     "delay": 2.5,
     "anim": "attack02",
@@ -533,7 +537,8 @@
    },
    {
     "display_name": "Ride-by Slash",
-    "damage": 28,
+    "cooldown": 2,
+    "damage": 51,
     "pressure": 16,
     "delay": 2.0,
     "anim": "attack02",
@@ -590,7 +595,8 @@
    },
    {
     "display_name": "Flame Lick",
-    "damage": 22,
+    "cooldown": 2,
+    "damage": 38,
     "pressure": 12,
     "delay": 2.5,
     "anim": "attack02",
@@ -650,7 +656,8 @@
    },
    {
     "display_name": "Overhead Crush",
-    "damage": 28,
+    "cooldown": 2,
+    "damage": 56,
     "pressure": 50,
     "delay": 3.5,
     "anim": "attack02"
@@ -704,7 +711,8 @@
    },
    {
     "display_name": "Swampy Grasp",
-    "damage": 26,
+    "cooldown": 2,
+    "damage": 56,
     "pressure": 18,
     "delay": 3.0,
     "anim": "attack02",
@@ -781,7 +789,7 @@
    {
     "display_name": "Wretched Bellow",
     "cooldown": 2,
-    "damage": 14,
+    "damage": 15,
     "pressure": 22,
     "delay": 3.5,
     "anim": "attack02",
@@ -1199,8 +1207,9 @@
    },
    {
     "display_name": "Blood Tribute",
+    "cooldown": 2,
     "special": "blood_tribute",
-    "damage": 20,
+    "damage": 42,
     "pressure": 24,
     "delay": 2.5,
     "anim": "attack02",

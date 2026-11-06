@@ -12,7 +12,7 @@ const CLASS_PASSIVES := {
 	"warrior": {"name": "Threatening Presence",
 		"desc": "Enemies choosing a target at random weigh the Warrior 20% more."},
 	"cleric": {"name": "Holy Conduit",
-		"desc": "All healing the Cleric receives is increased by 15%."},
+		"desc": "All healing the Cleric receives is increased by 15%. Mana the Cleric gains in a fight is cut by 50%."},
 	"hunter": {"name": "Tracker",
 		"desc": "Always attacks first in every fight."},
 	"mage": {"name": "Evocation",
@@ -2419,7 +2419,10 @@ const GATED_TELL := "GATED: a Sloppy check loses the cast.\nOnly the turn is spe
 # **THE RATE IS A TUNING HANDLE, THE DESIGNER'S TO RE-RULE** — `docs/state.md` carries it with
 # the figures it was chosen against (`docs/reports/HZ.md` §2). These are the card's own figures,
 # so its words are formatted from them and carry no second copy (HP §0).
-const BOIL_OVER_PCT_PER_RAGE := 0.8    # % of Attack per point of Rage spent
+# **BATCH JN §0.2 — FLAT, A POINT AT A TIME (the designer's, cold since JH).** It was 0.8% of the caster's ATTACK a point
+# (HZ §2), so it grew with him; it is damage a point now, so it grows with the bar alone. Armour, resistance, a crit and
+# every multiplier a strike meets still meet it — only Attack no longer scales it.
+const BOIL_OVER_DMG_PER_RAGE := 1.5    # damage per point of Rage spent, flat
 # The least of the bar it can be cast with — a FRACTION of the maximum, so the floor scales
 # with a bigger bar.
 const BOIL_OVER_MIN_BAR := 0.4
@@ -2436,9 +2439,9 @@ static func rage_dump_min(max_resource: int) -> int:
 	return int(ceil(max_resource * BOIL_OVER_MIN_BAR))
 
 
-# The dump's damage, as a percentage of Attack, for `spent` Rage.
-static func rage_dump_pct(spent: int) -> float:
-	return BOIL_OVER_PCT_PER_RAGE * maxi(spent, 0)
+# The dump's damage for `spent` Rage — flat, before the strike's variance and multipliers (JN §0.2).
+static func rage_dump_damage(spent: int) -> float:
+	return BOIL_OVER_DMG_PER_RAGE * maxi(spent, 0)
 
 
 # ---------- THE COMPUTED BLOCK (Batch CK §1) ----------
@@ -2478,7 +2481,11 @@ static func computed_block(ab: Ability, attack: int = 0,
 	if ab == null:
 		return ""
 	var lines := PackedStringArray()
-	if ab.damage > 0:
+	# BATCH JN §0.2 — BOIL OVER's DAMAGE IS FLAT, A POINT OF RAGE AT A TIME, so its line is not a share of Attack.
+	if is_rage_dump(ab):
+		lines.append("Damage: %s a point of Rage (%s)   BD: %d" % [String.num(BOIL_OVER_DMG_PER_RAGE),
+			ab.dmg_type.capitalize(), ab.pressure])
+	elif ab.damage > 0:
 		var bd := "   BD: %d" % ab.pressure
 		# BATCH CQ §5 — THE HIT COUNT MOVES TO THE DAMAGE IT MULTIPLIES, and
 		# that is what takes four of the eight overflowing lines off the card.
@@ -3467,8 +3474,10 @@ static func draft_ability(display_name: String) -> Ability:
 				"description": "Out of pure spite. For {=Battle.SPITE_TURNS} turns take {=Battle.SPITE_PER_5_MISSING}%\nless damage for every 5% of maximum\nhealth MISSING, up to {=Battle.SPITE_PERFECT_CAP}%. It is\nmitigation and never healing — it keeps\nyou in the frenzy band rather than\nlifting you out of it."})
 		# AXIS: the Rage dump (BATCH HZ §2, ruled at HY). Every other Rage card is
 		# a sip; this one pours out the whole bar at once, so the decision it exists
-		# to make is WAIT OR DUMP NOW — a full bar beats the best ordinary turn and
-		# does not beat two, and a cast at the floor is worse than an ordinary card.
+		# to make is WAIT OR DUMP NOW. HZ shaped it so a full bar beat the best ordinary
+		# turn and not two; since JN §0.2 it deals a flat figure a point of Rage, a full
+		# bar beats two and a floor cast beats an ordinary card (the dump rule, superseded
+		# for this card in `CLAUDE.md`).
 		# It has no cost of its own and wants a floor to cast (`rage_dump_min`).
 		#
 		# **IT TURNS LAST RITES OFF AT THE WORST MOMENT, AND THAT IS ALLOWED**: the
@@ -3485,12 +3494,12 @@ static func draft_ability(display_name: String) -> Ability:
 		# Broken crit window.
 		"Boil Over":
 			return Ability.make({"display_name": "Boil Over", "cost": 0,
-				"damage": int(round(BOIL_OVER_PCT_PER_RAGE * 100.0)), "pressure": 15,
+				"damage": int(round(BOIL_OVER_DMG_PER_RAGE * 100.0)), "pressure": 15,
 				"delay": 2.5, "cooldown": 5,
 				"anim": "attack03", "gated": true,
 				"perfect_id": "", "perfect_text": "",
-				"description": "Spend the WHOLE Rage bar on one blow,\nfor %s%% of Attack per point spent —\n100 Rage is {atk:%d}.\nNeeds at least %d%% of the bar to cast." % [
-					String.num(BOIL_OVER_PCT_PER_RAGE), int(round(BOIL_OVER_PCT_PER_RAGE * 100.0)),
+				"description": "Spend the WHOLE Rage bar on one blow,\nfor %s damage per point spent —\n100 Rage is %d at any Attack.\nNeeds at least %d%% of the bar to cast." % [
+					String.num(BOIL_OVER_DMG_PER_RAGE), int(round(BOIL_OVER_DMG_PER_RAGE * 100.0)),
 					int(round(BOIL_OVER_MIN_BAR * 100.0))]})
 		# ----- WARDEN: deny the reset, get paid for it, or turn it outward.
 		# Heavy Plating climbs +8% Block per unblocked hit and a BLOCK THROWS THE

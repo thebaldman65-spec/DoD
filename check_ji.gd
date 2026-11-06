@@ -31,9 +31,11 @@ const Gate = preload("res://gate_fixture.gd")
 # THE RULE: a move worth 1.4 times its own basic or more takes a cooldown — 2 under 2x, 3 under 3x, 4 past.
 const LINE := 1.4
 # A DESIGNER's HAND-TUNE OF ONE MOVE, held beside the line ("kind/Move": its cooldown), so §1a reads it as the data's (JI's ruling 2, accepted at JJ §0).
-# The Bellow takes a 2 by hand (JJ §0, the designer's): it prices 1.37 against four heroes and 1.71 once a companion stands,
-# so on a party with a pet the warband's one big area blow was the only one with no rhythm. The state's record follows it (§1f).
-const TUNED := {"behemoth/Wretched Bellow": 2}
+# **IT HOLDS NONE SINCE JN §1.** The Bellow took a 2 by hand at JJ §0, the designer's, because it priced 1.37 — 0.03 under the line —
+# and was the warband's one big area blow with no rhythm. JN §1 raised every kind's second damaging move to the line: the Bellow's
+# 14 became 15, it prices 1.46, and the rule gives it the same 2. With its reason gone the hand-tune went with it (DR §2: an exception
+# is deleted with its reasons, not kept beside a rule that now says the same); the table stays, for the next hand-tune.
+const TUNED := {}
 const FIGURES := [[2.0, 2], [3.0, 3]]
 const TOP := 4
 # An area blow reaches the party's four heroes; so does an every-ally heal.
@@ -49,7 +51,9 @@ const UNPRICED := ["enemy_shield", "cleanse_allies"]
 # The data as it stood before the warband took cooldowns, every `cooldown` key aside: no other figure moved.
 # JJ §3 re-pinned it: Healing Wave's words lost *under 40% health* with the policy that read it (the healers heal whenever the
 # warband's pool allows and a body is hurt); its 25% and every other figure stand.
-const DATA_BEFORE := "6f568b3c749bddbea70d9cbce9d6bb49"
+# JN §1 re-pinned it: ten kinds' second damaging moves rose to the line — their damage, and their cooldowns beside them — and
+# `check_jn` §1 holds that nothing else of theirs moved; every other figure stands.
+const DATA_BEFORE := "af5c81065d506b347c1ac9ceed92a5e9"
 const DECK_CLOSED_AT := 25
 const FOE := {"type": "fight", "theme": "Warband", "enemies": ["whelp", "raider", "archer"]}
 const SEATS := ["warrior", "mage", "cleric", "hunter"]

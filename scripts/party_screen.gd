@@ -196,6 +196,9 @@ func _draw_detail() -> void:
 		"Mana": "Mana — spent on abilities; +12 at the start of each turn.",
 		"Rage": "Rage — spent on abilities; +5 at turn start, +10 when hit,\nand attacks build more.",
 	}
+	# THE CLERIC's CUT, ON HIS OWN SHEET (JN §0.1): every gain of his bar in a fight, the drip among them, read off the constant.
+	if key == "cleric":
+		resource_tips["Mana"] += "\nA Cleric gains %d%% less Mana in a fight." % int(round(BattleUnit.CLERIC_MANA_CUT * 100))
 	# Resistances: armor's cousins, one per damage type — physical included,
 	# since spec blocks can carry it (the Arcanist is soft to it) and the
 	# battle plate's hover card lists it. Weaknesses show as negatives.
@@ -207,7 +210,7 @@ func _draw_detail() -> void:
 		[["HP: %d / %d" % [member["hp"], cfg["max_hp"]],
 			"Health — the hero falls at 0.\nValues include talents, equipped runes, and\nnode scaling (+2% of base per combat won)."],
 		["Attack: %d" % cfg.get("attack", 100),
-			"Attack — every ability hits for its listed %% of\nthis. Base %d for the spec's role; +2%% of base\nper combat node won (%d so far this run)." % [
+			"Attack — an ability listing a %% of Attack hits\nfor that %% of this. Base %d for the spec's role; +2%% of base\nper combat node won (%d so far this run)." % [
 				base_attack, Run.combat_wins]]],
 		[["%s: %s" % [cfg["resource_name"],
 			("%d / %d" % [member["mana"], cfg["max_resource"]]) if cfg["resource_name"] == "Mana"

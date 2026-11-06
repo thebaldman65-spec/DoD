@@ -3362,8 +3362,9 @@ func ability_hover(member: Dictionary, card_name: String, live: Dictionary = {})
 	var tip := Classes.resolve_values(ab.description, vctx)
 	tip += "\n%s" % Classes.computed_block(ab, int(cfg.get("attack", 100)),
 		String(cfg.get("resource_name", "Mana")), vctx)
-	# THE SCALING LINE STAYS OUTSIDE THE BLOCK (CK §1): the range and what produced it.
-	if ab.damage > 0:
+	# THE SCALING LINE STAYS OUTSIDE THE BLOCK (CK §1): the range and what produced it. The Rage dump deals a flat figure a
+	# point of Rage (JN §0.2) and never reads Attack, so it states none — its block states its figure.
+	if ab.damage > 0 and not Classes.is_rage_dump(ab):
 		tip += "\nScaling: %d%% of Attack" % ab.damage
 	# Trailing line, names only — the battle button's tooltip puts it in the same place.
 	var ups: Array = (seat["landed"] as Dictionary).get(ab.display_name, [])

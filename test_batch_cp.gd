@@ -427,13 +427,21 @@ func _computed_block() -> void:
 	ok(hover_src.contains("Classes.computed_block("),
 		"the moved hover (`Run.ability_hover`) calls the SAME builder")
 	# Damage and Perfect are both present for a card that has them.
-	var ab := Classes.pool_ability("Boil Over")
-	ok(ab != null, "Boil Over resolves")
+	# JN §0 RE-POINTED THE EXAMPLE: Boil Over stood here as a card whose damage scales with Attack, and since JN §0 it deals a
+	# flat figure a point of Rage, so its line is asked in its own terms below and the scaling line of a card that still scales.
+	var ab := Classes.pool_ability("Rampage")
+	ok(ab != null, "Rampage resolves")
 	if ab != null:
 		var block: String = Classes.computed_block(ab, 0, "Rage")
 		ok(block.contains("Damage"),
 			"...and the block prints a damage line (%s)" % block.split("\n")[0])
 		ok(block.contains("%"), "...as a scaling percentage at attack = 0")
+	var bo := Classes.pool_ability("Boil Over")
+	ok(bo != null, "Boil Over resolves")
+	if bo != null:
+		var bo_block: String = Classes.computed_block(bo, 0, "Rage")
+		ok(bo_block.contains("Damage") and bo_block.contains("a point of Rage") and not bo_block.contains("% of Attack"),
+			"...and Boil Over's block prints its flat figure a point of Rage, not a share of Attack (%s)" % bo_block.split("\n")[0])
 	# A card that STATES a Perfect gets it rendered.
 	var per := Classes.pool_ability("Unslaked")
 	if per != null and per.perfect_text != "":

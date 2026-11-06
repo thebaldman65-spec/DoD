@@ -1967,6 +1967,10 @@ func _spawn_units() -> void:
 		if u.opening_rage > 0 and u.max_resource > 0:
 			u.resource = maxi(u.resource, mini(u.opening_rage, u.max_resource))
 			u.refresh_bars()
+		# BATCH JN §0.1 — THE CLERIC GAINS HALF FROM HERE ON. Armed after the carried bar, the relic's floor and the opening
+		# Rage are settled, so what he walks in with is not cut; every rise after this passes the bar's setter and is.
+		if u.hero_key == "cleric":
+			u.mana_gain_cut = BattleUnit.CLERIC_MANA_CUT
 		heroes.append(u)
 
 	# Devoutness (Devout talent, ex-Devotion Aura): the whole party takes
@@ -8142,9 +8146,8 @@ func _damage_line(u: BattleUnit, ab: Ability) -> String:
 	if u.has_status("empower"):
 		buff_mult *= 1.25
 	# Live numbers: the ability's % of this unit's current Attack — and BOIL OVER's is the
-	# bar it would pour out now (HZ §2), off the same door its strike reads.
-	var pct := Classes.rage_dump_pct(u.resource) if Classes.is_rage_dump(ab) else float(ab.damage)
-	var base_hit := pct * 0.01 * u.attack
+	# bar it would pour out now, flat (JN §0.2), off the same door its strike reads.
+	var base_hit := Classes.rage_dump_damage(u.resource) if Classes.is_rage_dump(ab) else float(ab.damage) * 0.01 * u.attack
 	var line := "Damage: %d–%d (%s)    BD: %d" % [
 		int(base_hit * 0.9 * buff_mult), int(round(base_hit * 1.1 * buff_mult)),
 		ab.dmg_type.capitalize(), ab.pressure]
@@ -11409,11 +11412,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				pity_landed = true
 				pity_crit = pity_crit or is_crit
 			# Ability damage is a PERCENT of the attacker's current Attack.
-			# **BATCH HZ §2 — BOIL OVER'S PERCENT IS THE BAR IT POURED OUT** (`bo_spent`,
-			# taken at the price line), read through `Classes.rage_dump_pct`; it draws
-			# the one variance roll every strike draws, in the same place, and no other.
-			var raw := (Classes.rage_dump_pct(bo_spent) if bo_dump else float(ab.damage)) \
-				* 0.01 * attacker.attack * randf_range(0.9, 1.1) * dmg_mult
+			# **BATCH JN §0.2 — BUT BOIL OVER's IS FLAT: the bar it poured out** (`bo_spent`, taken at
+			# the price line) at `Classes.BOIL_OVER_DMG_PER_RAGE` a point, read through `Classes.rage_dump_damage`
+			# and never scaled by Attack; it draws the one variance roll every strike draws, in the same place, and no other.
+			var raw := (Classes.rage_dump_damage(bo_spent) if bo_dump else float(ab.damage) * 0.01 * attacker.attack) \
+				* randf_range(0.9, 1.1) * dmg_mult
 			# BATCH GO — REDOUBT BANKS WHAT IS KEPT OFF THE BODY IT IS HELD ON.
 			# **BATCH HL §3 — ONLY WHAT IS BLOCKED, PARRIED OR ABSORBED (ruled).** GO
 			# banked every mitigation site that books through `_prev` from this line

@@ -2040,6 +2040,11 @@ as a bug.
   shape. **NOTHING IS AUTHORED ONTO A CARD NOBODY HAS CAST (IA §0.1 and §0.5, the designer's)**: its rate stands at the
   figure it shipped with and it carries no Perfect until play says otherwise — the next change to either comes from the
   designer's hands, never from a batch's arithmetic, and the tension in the rate is recorded beside it, not tuned away.
+  · **SUPERSEDED FOR BOIL OVER AT JN §0, BY THE DESIGNER's OWN HAND, AND RECORDED RATHER THAN DELETED.** The dump deals a flat
+    figure a point of Rage (`Classes.BOIL_OVER_DMG_PER_RAGE`), no longer a share of the caster's Attack, so on `check_hz` §2's board
+    a full bar beats two of the best ordinary turn and a cast at the floor beats an ordinary card: the shape above no longer holds of
+    the one card it binds, and `check_hz` §2 prints the shape where it asserted it. **A later dump a batch authors is still shaped to
+    this rule until the designer rules on it** (JN's rulings).
 
 ## STANDING RULE — THE ENGINE RUNE CHARTER (Batch GK, the designer's)
 > **THERE ARE NO SPECS AND NO CORE ENGINES.** A hero is a CLASS. Everything that made a spec what it

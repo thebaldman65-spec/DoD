@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-11-05 (Batch JM &mdash; what the arc did, and what it cost the deck)</b></p>
+<p align="right"><b>Last updated: 2026-11-06 (Batch JN &mdash; the eleven kinds get a move worth taking)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1172,7 +1172,7 @@ so it carries no chip in battle.</p>
 <ul>
 <li><b>Warrior — Threatening Presence:</b> enemies choosing a target at random weigh the
 Warrior 20% more.</li>
-<li><b>Cleric — Holy Conduit:</b> all healing the Cleric receives is increased by 15%.</li>
+<li><b>Cleric — Holy Conduit:</b> all healing the Cleric receives is increased by 15%. Mana the Cleric gains in a fight is cut by 50% &mdash; every gain, at the bar itself; the bar carried into a fight is not.</li>
 <li><b>Hunter — Tracker:</b> always attacks first in every fight.</li>
 <li><b>Mage — Evocation:</b> regenerates an additional 10 Mana per turn (22 total).</li>
 </ul>
@@ -1180,7 +1180,7 @@ Warrior 20% more.</li>
 <ul>
 <li><b>Rage (Warrior):</b> starts at 0. +5 at the start of each of his turns; +10 whenever he
 is hit; every attack builds Rage (Strike 20, all spec/talent attacks 10).</li>
-<li><b>Mana (Mage/Cleric/Hunter):</b> +12 at the start of their turns; the Hunter's Perfect
+<li><b>Mana (Mage/Cleric/Hunter):</b> +12 at the start of their turns (a Cleric keeps half of every gain in a fight &mdash; the class's cut); the Hunter's Perfect
 basic adds +10; potions/Rally restore more.</li>
 <li><b>Focus (SHARPSHOOTER passive, NO CEILING, green second bar):</b> +20 per
 consecutive attack on the same enemy, CLEARED on
@@ -1884,7 +1884,7 @@ beside. A card that appears in nobody's build plan is a card that fills a slot.<
 <tr><td><b>Blood Debt</b></td><td>20 Rage, 2.0, 4cd, one enemy (10 BD)</td><td>Strikes for 30% of Attack and <b>marks the enemy for the rest of the battle</b>. Every time that enemy <b>bleeds out</b> &mdash; the bleedout that kills it included &mdash; the Berserker heals <b>25% of his maximum health</b> (Perfect: 35%).<br><b>The mark survives the bleedout it pays for</b>, so a re-opened wound pays again.</td><td>A reason to survive being low. Blood Frenzy pays him for missing health and nothing in his kit paid him back — this fills the sustain hole out of his own engine rather than with a heal.<br><b>Builds with:</b> <b>Gut Rip</b>, which cashes it on demand.</td></tr>
 <tr><td><b>Unslaked</b></td><td>30 Rage, 1.0, 5cd, self</td><td>For 4 turns, <b>Blood Frenzy's floor captures the FULL bonus he reaches</b> rather than half of it. The floor is the half of his passive that keeps paying after he is healed back up — so the play pattern is cast this, <i>then</i> dive, and what he banks at the bottom is his for the rest of the battle.</td><td>The ratchet rate. This is the first card in the game that touches the passive's floor at all, and it is a <b>window</b> rather than a permanent raise.<br><b>Builds with:</b> <b>Blood Offering</b>, the dive he controls, so the two are a two-card combo that banks a floor on his own schedule instead of waiting for an enemy to grant one. <b>Berserk</b> lands him deeper still.</td></tr>
 <tr><td><b>Spite</b></td><td>20 Rage, 1.0, 4cd, self</td><td>For 6 turns, he takes <b>1% less damage for every 5% of maximum health MISSING</b>, up to 40%. <b>It is mitigation and never healing</b> — it keeps him inside the frenzy band instead of lifting him out of it.</td><td>Surviving the band he is paid for standing in. A card that healed him here would fight his own passive: it would take back the missing health Blood Frenzy pays for, so it would cancel itself.<br><b>Builds with:</b> <b>Blood Frenzy</b> itself, which reads the same missing health — every point that makes this bigger makes his damage bigger too. <b>Berserk</b> invites the damage it refuses; <b>Blood Debt</b> is the deliberate opposite number (take that one to leave the band, this one to live in it).</td></tr>
-<tr><td><b>Boil Over</b></td><td>The whole Rage bar (no cost of its own), 2.5, 5cd, one enemy (15 BD)</td><td>Pours out <b>the whole Rage bar</b> into one strike: <b>0.8% of Attack for every point spent</b> &mdash; a full bar of 100 is 80%. <b>It needs at least 40% of the bar to cast.</b> Gated: a Sloppy check loses the cast and keeps the bar.</td><td>The Rage dump. Every other Rage card is a sip; this one is the whole bar at once, so the decision it makes is <b>wait, or dump now</b> &mdash; a full bar beats the best ordinary turn and does not beat two, and a cast at the floor is worse than an ordinary card. Every point it pours out feeds Blood Frenzy before the blow lands, so the Berserker's core multiplies it as it does every strike. Below a quarter's health it empties the bar <b>Pay a Lethal Hit out of Your Resource Pool</b> pays from &mdash; allowed, and the node's chip shows it.<br><b>Builds with:</b> <b>Blood Offering</b> fills the bar on demand; <b>Reckless Abandon</b> is the other whole-bar card and competes for it.</td></tr>
+<tr><td><b>Boil Over</b></td><td>The whole Rage bar (no cost of its own), 2.5, 5cd, one enemy (15 BD)</td><td>Pours out <b>the whole Rage bar</b> into one strike: <b>1.5 damage for every point spent, flat</b> &mdash; a full bar of 100 is 150, whatever the hero's Attack. <b>It needs at least 40% of the bar to cast.</b> Gated: a Sloppy check loses the cast and keeps the bar.</td><td>The Rage dump. Every other Rage card is a sip; this one is the whole bar at once, so the decision it makes is <b>wait, or dump now</b> &mdash; a full bar deals more than two of the best ordinary turn, and a cast at the floor more than an ordinary card. Every point it pours out feeds Blood Frenzy before the blow lands, so the Berserker's core multiplies it as it does every strike. Below a quarter's health it empties the bar <b>Pay a Lethal Hit out of Your Resource Pool</b> pays from &mdash; allowed, and the node's chip shows it.<br><b>Builds with:</b> <b>Blood Offering</b> fills the bar on demand; <b>Reckless Abandon</b> is the other whole-bar card and competes for it.</td></tr>
 <tr><td colspan="4"><b>Swordmaster</b> — <i>what is a stance worth</i>. There are <b>two kinds of stance card, and the distinction is the rule</b>: <b>READERS BRANCH AND FLIP</b> — Precision Strike and Feint read the stance, buy what the stance they leave him <b>arriving</b> in wants, and then switch it, so he is never stranded. <b>GATED CARDS REQUIRE AND STAY</b> — Sever and Battle Poise are <b>refused outright</b> in the wrong guard (unavailable, not weaker) and casting them moves nothing. Feigned Guard is the seam between the two.</td></tr>
 <tr><td><b>Precision Strike</b></td><td>20 Rage, 2.0, 3cd, one enemy</td><td><b>From Aggressive:</b> strikes <b>twice</b> for 20% of Attack each (6 BD a strike), and grants <b>+25% parry chance for 4 turns</b> — the defence the Defensive guard he lands in wants.<br><b>From Defensive:</b> strikes <b>once</b> for 15% of Attack with 15 BD, and <b>his attacks ignore ALL armor for 4 turns</b> — the offence the Aggressive guard he lands in wants.<br>Either way the stance then switches. Perfect: the stance it grants holds 5 turns.</td><td>The same blade, two intentions. Armor is bypassed outright rather than penetrated by a percentage, which against an unarmoured enemy would have been a clause that does nothing.</td></tr>
 <tr><td><b>Feint</b></td><td>25 Rage, 2.0, 4cd, one enemy</td><td><b>From Aggressive:</b> strikes for 35% of Attack (12 BD), and <b>that enemy's next attack lands on one of its own allies</b> (Perfect: 45%).<br><b>From Defensive:</b> no strike at all — he banks <b>2 charges</b> (Perfect: 3), each of which parries a melee blow against him outright (never an area attack, nor while he is Broken) and deals its damage to the attacker instead.<br>Either way the stance then switches.<br><b>Charges, not turns:</b> both halves wait until spent, so a Feint cast into a lull is not wasted and cannot be dodged by an enemy simply not swinging.</td><td>Their swing lands somewhere they did not intend. From the front foot he tricks them into a friend; from the back foot into themselves.</td></tr>
@@ -3077,10 +3077,13 @@ damage is a % of it. <i>Art note: all kinds still share the orc sheet (tint + sc
 so new enemies read as tinted orcs until per-kind art lands — a known, accepted limit.</i></p>
 <p><b>An enemy's biggest moves wait between uses.</b> A move worth 1.4 times its own basic attack or more &mdash;
 counting every hero an area blow reaches and the Burn or Poison it lays, and a heal at the health it restores &mdash;
-takes a cooldown of that enemy's own turns, longer the bigger it is: the Orc Whelp's Reckless Lunge, the Orc Totemist's
-Healing Wave, the Bog Troll's Regenerate, the Orc Chief's Heavy Strike, the Withered Warden's Roots of Wrath, the
-Ash-Wrought Tyrant's Immolating Wave and Tyrant's Verdict, the Ash Hurler's Siege Stone, the Grave Totem's Dark Vigil, and
-the Hollow Crown's Hollow Wail and The Long Dark &mdash; and, set by hand, the Rot Behemoth's Wretched Bellow. A basic attack never cools, so every enemy always has a move. An enemy
+takes a cooldown of that enemy's own turns, longer the bigger it is. <b>Every enemy's second damaging move is worth that much
+or more</b>, so it is the bigger blow, and it waits: the Orc Raider's Sundering Strike, the Orc Whelp's Reckless Lunge, the Orc
+Slinger's Skull Crack, the Orc Archer's Poison Arrow, the Orc Totemist's Healing Wave, the Orc Hexer's Withering Hex, the
+Wolfrider's Ride-by Slash, the Ashblade's Flame Lick, the Orc Brute's Overhead Crush, the Bog Troll's Swampy Grasp and
+Regenerate, the Rot Behemoth's Wretched Bellow, the Orc Chief's Heavy Strike, the Withered Warden's Roots of Wrath, the
+Ash-Wrought Tyrant's Immolating Wave and Tyrant's Verdict, the Ash Hurler's Siege Stone, the Orc Bloodcaller's Blood Tribute,
+the Grave Totem's Dark Vigil, and the Hollow Crown's Hollow Wail and The Long Dark. A basic attack never cools, so every enemy always has a move. An enemy
 never declares a move that will still be cooling when its turn comes, and while one cools its plate carries a <b>CD</b>
 chip: the fewest of its own turns until a move is back, its hover naming each. Encumbered binds these too.</p>
 <p><b>The warband shares one pool, Malice.</b> It fills by a point for every 10 points of damage the heroes deal it, by 25 when one

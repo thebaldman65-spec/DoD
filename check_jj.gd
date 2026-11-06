@@ -716,15 +716,18 @@ func _progress_label(s: Node) -> String:
 
 
 func _s5_the_bellow() -> void:
-	print("\n§5 — the Bellow's cooldown, a hand-tune through the cooldown rule's TUNED")
+	print("\n§5 — the Bellow's cooldown: a hand-tune at JJ §0, the rule's own since JN §1")
 	var data: Dictionary = Enemies._load()
 	var cd := -1
 	for a in (data.get("behemoth", {}) as Dictionary).get("abilities", []):
 		if String(a.get("display_name", "")) == "Wretched Bellow":
 			cd = int(a.get("cooldown", 0))
 	ok(cd == 2, "§5: the Rot Behemoth's Wretched Bellow carries %d, not the 2 a hand gave it" % cd)
+	# JN §1 RAISED THE BELLOW TO THE LINE (14 → 15, an area blow on four heroes, 1.46 of its basic), so the rule gives the 2 the hand
+	# gave, and the hand-tune went with its reason: `check_ji` §1a now derives the 2 and holds no tune for it (`check_jn` §1 the raise).
 	var tuned := Gate.strip_comments(FileAccess.get_file_as_string("res://check_ji.gd"))
-	ok(tuned.contains("const TUNED := {\"behemoth/Wretched Bellow\": 2}"), "§5: the Bellow's 2 is not the cooldown rule's hand-tune, where the rule reads it")
+	ok(tuned.contains("const TUNED := {}") and not tuned.contains("behemoth/Wretched Bellow"),
+		"§5: a hand-tune of the Bellow still stands beside the rule, which gives it the same 2 since JN §1")
 
 
 # ── §6 — THE RECORD ───────────────────────────────────────────────────────────

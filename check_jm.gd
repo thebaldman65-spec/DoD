@@ -42,7 +42,10 @@ const KEPT_ARC := "res://docs/reports/JM-arc.tsv"
 const KEPT_IMPURITIES := "res://docs/reports/JM-impurities.tsv"
 const KEPT_PLAYED := "res://docs/reports/JM-played.tsv"
 const KEPT_GRADES := "res://docs/reports/JM-grades.tsv"
-const KIT_PIN := "res://docs/reports/JM-kit.json"
+# SINCE JN THE KEPT KIT IS JN's: ten kinds' second damaging moves raised to the line (`check_jn` §1), every other move as JM left it.
+const KIT_PIN := "res://docs/reports/JN-kit.json"
+# THE TREE JM's FIVE RE-READS STAND FOR (§3), its digest as `check_jm` took it on JM's commit.
+const JM_TREE := "c2c74d46e931d8be168cf759e9e83353"
 const FOE := {"type": "fight", "theme": "Warband", "enemies": ["archer", "hexer", "raider", "shieldmaster"]}
 const SEATS := ["warrior", "mage", "cleric", "hunter"]
 const SCRATCH_PROFILE := "user://jm_profile.json"
@@ -605,13 +608,14 @@ func _s3_the_five() -> void:
 			wrong.append("%s: the table bands %d, the point estimate %d" % [id, said_band, band])
 		if (tie != "") != (said_tie != "" and said_tie != "none") or (tie != "" and said_tie != tie):
 			wrong.append("%s: a tie at %s, the table names '%s'" % [id, tie if tie != "" else "none", said_tie])
-		# A STALENESS TRIPWIRE, SAID SO: the digest is the tree the table stands for, every script and data file, so the next batch that
-		# edits one reds this arm and re-points it (with its own re-read or a replay). What it holds is the table against this tree; where
-		# the arms ran is held by the record's replay — the drive's code less one hover line and three comments, read line for line on this tree.
-		if c[8].strip_edges() != digest:
+		# A STALENESS TRIPWIRE, SAID SO, AND JN RE-POINTED IT: the digest was the tree the table stands for, every script and data file,
+		# and JN edited the tree. **SINCE JN THE TABLE IS A RECORD OF JM's TREE** (`994f747`, its digest `JM_TREE`, which JN's first
+		# arm reproduced line for line): the five readings stand where JM took them, and JN's re-read of Thin Air on the tree that
+		# lands is `check_jn` §0's, a tripwire of its own.
+		if c[8].strip_edges() != JM_TREE:
 			off_tree.append(id)
-	print("    this tree's game: %s" % digest)
-	ok(off_tree.is_empty(), "§3: a re-read ran on a tree that is not the one that lands: %s" % [off_tree])
+	print("    this tree's game: %s; the tree JM's re-reads stand for: %s" % [digest, JM_TREE])
+	ok(off_tree.is_empty(), "§3: a re-read ran on a tree that is not JM's: %s" % [off_tree])
 	ok(wrong.is_empty(), "§3: a grade is read otherwise than off its point estimate, or a tie at a cut is resolved or unnamed: %s" % [wrong])
 	var five := FIVE.duplicate()
 	five.sort()
@@ -630,7 +634,7 @@ func _s3_the_five() -> void:
 func _s4_not_done(s: Node) -> void:
 	print("\n§4 — every move but Gall as it stood, the hexes' and the pool's figures, the deck closed")
 	# A STALENESS TRIPWIRE, SAID SO: the kept kit is HEAD's warband less Gall, so the next batch that tunes a move or adds a kind reds
-	# this arm by design and re-points it at its own kit.
+	# this arm by design and re-points it at its own kit — JN did, at its §1 raise (`KIT_PIN`).
 	var pin: Variant = JSON.parse_string(_doc(KIT_PIN))
 	ok(pin is Dictionary and (pin as Dictionary).size() > 0, "§4: the kept kit %s is not in the tree" % KIT_PIN)
 	var moved: Array = []

@@ -4,6 +4,25 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The eleven kinds get a move worth taking (Batch JN) — 2026-11-06
+
+**Why the second moves were raised in damage, not given a bigger status.** Four batches of the warband's arc found that anything
+costing the enemy a turn made the game easier or did nothing, and that a status is worth less than a blow. Ten kinds' second moves
+were worth less than 1.4 times their basic, most of them less than the basic itself, so a player had nothing to read in them. Raising their damage until each is worth 1.4 times the basic is
+JI's own line applied to the moves it left under it: each now strikes harder and waits, the trade the player is meant to see.
+
+**Why the line still prices no Break damage.** Three of the raised moves are Break moves — a hero whose meter fills loses a turn — but
+nothing in the project converts Break damage into the damage the line is written in, so pricing it would have needed an exchange rate
+invented mid-batch. It is named and left for a ruling.
+
+**Why the Cleric's cut sits at the bar itself.** Every gain of Mana in a fight passes one door, the one Sap already reads; cutting
+the drip alone would leave the cards that refund Mana whole, which is one door of several. The bar a Cleric carries into a fight is not
+a gain, so the cut is armed after it is loaded.
+
+**Why Boil Over stopped scaling with Attack.** The designer asked for a flat figure a point of Rage, so the dump grows with the bar
+alone. On the census board it now beats two of the best ordinary turn, which the dump rule forbade; the rule records that it is
+superseded for this card rather than being deleted.
+
 ## What the arc did, and what it cost the deck (Batch JM) — 2026-11-05
 
 **Why the arc was read whole.** JI, JJ, JK and JL each read themselves against the batch before, on four different paired

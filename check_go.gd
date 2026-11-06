@@ -1730,14 +1730,32 @@ func _stretch(tag: String, specs: Array, engines: Array) -> void:
 	var frames := 0
 	var seen := {}
 	var down_for := 0
+	# BATCH JN — THE BASTION's BANK FILLS ONLY FROM A BLOW AIMED AT HIM (a block, a parry, a barrier's absorb), so once he is
+	# the one engine left the foes are held Mocked on him and the party stands; until then this stretch is HEAD's.
+	var bastion: BattleUnit = null
+	for hb in heroes:
+		if (hb as BattleUnit).has_engine("redoubt"):
+			bastion = hb
+	var held_from := -1
 	while frames < FRAME_CAP and seen.size() < want.size():
 		Engine.time_scale = 100.0
 		await process_frame
 		frames += 1
 		if not is_instance_valid(s) or bool(s.get("battle_over")):
 			break
+		var hold: bool = bastion != null and not bastion.dead and want.has("redoubt") and not seen.has("redoubt") \
+				and seen.size() == want.size() - 1
+		if hold:
+			if held_from < 0:
+				held_from = frames
+			var b_idx: int = (s.get("heroes") as Array).find(bastion)
+			for em in foes:
+				if not em.dead and not em.has_status("mocked"):
+					s._apply_status(em, "mocked", -1, b_idx, 0, bastion)
 		for h in heroes:
-			if not h.dead and h.hp < int(h.max_hp * 0.3):
+			if hold and not h.dead and h.hp < int(h.max_hp * 0.75):
+				h.hp = h.max_hp
+			elif not h.dead and h.hp < int(h.max_hp * 0.3):
 				h.hp = int(h.max_hp * 0.6)
 		if fragile != null:
 			if fragile.dead:
@@ -1765,6 +1783,9 @@ func _stretch(tag: String, specs: Array, engines: Array) -> void:
 			if not seen.has(pid2) and _fired(text2, String(pid2)):
 				seen[pid2] = frames
 		s.set("autoplay", false)
+	var standing: int = heroes.filter(func(hh): return not hh.dead).size()
+	print("    %s: the stretch ran %d frames, %d of %d heroes standing%s" % [tag, frames, standing, heroes.size(),
+		(", the foes held on the Bastion from frame %d" % held_from) if held_from >= 0 else ""])
 	var missing: Array = want.filter(func(p): return not seen.has(p))
 	ok(missing.is_empty(), "§12 (%s): every rule engine held fires in a live fight (%d frames; silent: %s)"
 		% [tag, frames, str(missing)])
