@@ -38,7 +38,8 @@ const SPEND_FIGURES := {"MALICE_RAISE_PCT": 0.40, "MALICE_RALLY_PCT": 0.30, "MAL
 const CENSUS_TABLE := "res://docs/reports/JA-shares.tsv"
 const LINE_SOURCE := "res://check_ji.gd"
 const KEPT_SPENDS := "res://docs/reports/JK-spends.tsv"
-const KEPT_HEXES := "res://docs/reports/JL-hexes.tsv"
+# The kept hex table as the tree holds the hexes: JL's, re-taken when JM §0 moved Gall (JL-hexes.tsv stays JL's record).
+const KEPT_HEXES := "res://docs/reports/JM-hexes.tsv"
 const KEPT_DRIVE := "res://docs/reports/JL-drive.tsv"
 const FOE := {"type": "fight", "theme": "Warband", "enemies": ["totemist", "raider", "shieldmaster", "brute", "slinger", "chief"]}
 const SEATS := ["warrior", "mage", "cleric", "hunter"]
@@ -582,7 +583,8 @@ func _s1_the_reserve(s: Node, free: bool) -> void:
 
 # ── §2 — FOUR HEXES ───────────────────────────────────────────────────────────
 
-# C08: THE CARRIERS, DERIVED OFF THE DATA — every hex has one, and the Orc Hexer carries at least two.
+# C08: THE CARRIERS, DERIVED OFF THE DATA — every hex has one, and the Orc Hexer carries one or more: its Sap, since JM §0 moved
+# Gall onto the Orc Archer (check_jm §0 holds who carries Gall).
 func _s2_the_carriers() -> void:
 	print("\n§2 — who carries each hex, off the data")
 	var data: Dictionary = Enemies._load()
@@ -602,7 +604,7 @@ func _s2_the_carriers() -> void:
 			hexer += 1
 	print("    %s; the Orc Hexer carries %d" % [str(carriers), hexer])
 	ok(none.is_empty(), "§2: a hex has no carrier: %s" % [none])
-	ok(hexer >= 2, "§2: the Orc Hexer carries %d hexes, not two or more" % hexer)
+	ok(hexer >= 1, "§2: the Orc Hexer carries %d hexes, not one or more" % hexer)
 	# THE KEPT TABLE SAYS WHO CARRIES WHAT AS THE DATA DOES.
 	var rows := _doc(KEPT_HEXES).split("\n", false)
 	var said := {}
@@ -874,6 +876,9 @@ func _s2_the_prices(s: Node) -> void:
 				"fester":
 					var tick := maxi(int(round(float(dot.get("fester", 0)) * 0.01 * float(kd["attack"]))), 1)
 					worth = tick * clock * (clock + 1) / 2.0
+			# A HEX THAT REACHES EVERY HERO (`aoe`, Gall since JM §0) denies it on each of the four, as an area blow is priced.
+			if bool(a2.get("aoe", false)):
+				worth *= REACH
 			var mult := worth / bp
 			var want := 0 if mult < line else (2 if mult < 2.0 else (3 if mult < 3.0 else 4))
 			var have := int(a2.get("cooldown", 0))
@@ -940,8 +945,8 @@ func _s2_the_selection(s: Node, hexes: bool) -> void:
 			if t == null or not t.is_hero or t.is_companion or t.has_status(id):
 				bad.append("%s at %s" % [id, str(t)])
 	print("    the Hexer's choices over 40 on a clean board: %s" % str(picked))
-	ok(picked.size() >= 2 and bad.is_empty(), "§2: the Hexer's selection lays no hex, or lays one on a hero who carries it: %s %s" % [str(picked), bad])
-	# EVERY HERO CARRYING BOTH: the Hexer lays neither.
+	ok(picked.size() >= 1 and bad.is_empty(), "§2: the Hexer's selection lays no hex, or lays one on a hero who carries it: %s %s" % [str(picked), bad])
+	# EVERY HERO CARRYING BOTH: the Hexer lays neither (it carries Sap alone since JM §0, Gall on the Orc Archer).
 	var e: BattleUnit = _foes(s)[0]
 	for h2 in _heroes(s):
 		for hx in ["gall", "sap"]:
@@ -1061,7 +1066,7 @@ func _s5_the_texts(s: Node, hexes: bool) -> void:
 		for a in Enemies._load()[kind]["abilities"]:
 			if String(a.get("special", "")) == HEX_SPECIAL:
 				turns[String(a["applies_status"]["id"])] = int(a["applies_status"]["turns"])
-	var sentence := "Gall cuts the healing a hero receives by %d%% for %d turns; Sap cuts what a hero's resource bar gains by %d%% for %d turns; Mire makes a hero act %d%% slower for %d turns; Fester deals %d%% of its applier's Attack a stack at each of the hero's turn starts and gains a stack each turn, until it is cleansed." % [
+	var sentence := "Gall cuts the healing every hero receives by %d%% for %d turns; Sap cuts what a hero's resource bar gains by %d%% for %d turns; Mire makes a hero act %d%% slower for %d turns; Fester deals %d%% of its applier's Attack a stack at each of the hero's turn starts and gains a stack each turn, until it is cleansed." % [
 		gall, int(turns.get("gall", -1)), sap, int(turns.get("sap", -1)), mire, int(turns.get("mire", -1)), fester]
 	ok(_flat(_block(_doc("res://docs/state.md"), HEXES_HEAD)).contains(sentence), "§5: the state does not state what each hex does off the constants: '%s'" % sentence)
 	ok(_untagged(_doc("res://docs/master.html")).contains(sentence), "§5: the master document does not state what each hex does off the constants: '%s'" % sentence.left(160))

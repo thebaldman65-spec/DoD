@@ -1,0 +1,5 @@
+kind	enemy	hex	worth (what it denies)	basic (as JI's line prices it)	multiple	cooldown	how the worth is read
+archer	Orc Archer	gall	42.5	21.0	2.02	3	on every hero (4): half of the 7.08 healing a hero receives a hero turn, over its clock of 3
+hexer	Orc Hexer	sap	35.1	22.0	1.60	2	half of the 14.94 resource a hero pays a hero turn, on the 2 turns it acts under it, at 2.352 damage a point paid
+behemoth	Rot Behemoth	fester	18.0	41.0	0.44	0	its own ticks over the clock the others carry, 3 a stack, a stack more each: 3 + 6 + 9
+grave_totem	Grave Totem	mire	23.4	9.0	2.60	3	a third of a turn on each of the 2 turns it acts under it, at 35.15 damage a hero turn

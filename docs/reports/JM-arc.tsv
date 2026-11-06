@@ -1,0 +1,75 @@
+reading	the tree before the arc	the tree that lands	paired: landing − before
+the tree before the arc	141b0be0e3addbd7a1b6e2239122b7d227e39000 (JH's commit, the tree JI's reading was taken against), driven as it stands: every tracked file of it and none added since, its lane named for itself, and the thirteen print-only probes JI drove it with; all sixty of its runs reproduce JI's own arm on it line for line		
+the tree that lands		34f4a9f8feecda4d754c424b303f70535457033e (JL's commit, HEAD) and JM §0's two edits to Gall, with the thirteen probes and four more, print-only	
+the line	berserker,cryomancer,inquisitor,beastmaster 0 warden 60 38 - none - 1 - 38: the reference four untalented at Warden, sixty runs, block 38 and its fight seed, no modifier laid (DOD_IV_FORCE=none), no crest worn (DOD_JF_NOCREST=1), no relic		
+runs	60	60	
+completed (runs)	3	5	+0.033 ± 0.033 (z +1.00)
+fights won a run (runs)	17.47	15.67	-1.80 ± 0.69 (z -2.62)
+falls a run (runs)	7.30	5.95	-1.35 ± 0.45 (z -2.97)
+falls a run, in the fights it won (runs)	3.48	2.28	-1.20 ± 0.39 (z -3.05)
+fights fought, all	1105	995	
+paired fights (same node, in order)	936	936	59 of 60 runs on one road throughout
+health at a fight's end, paired fights	0.8322	0.8109	-2.88 ± 1.00 points (z -2.89)
+falls a fight, paired fights	0.286	0.341	+0.094 ± 0.044 (z +2.12)
+hero turns a fight, paired fights	33.27	33.24	-0.25 ± 0.32 (z -0.77)
+the warband's blows a fight, paired fights	15.33	15.39	+0.23 ± 0.27 (z +0.88)
+  health at a fight's end, the paired fights both arms won			-1.57 ± 0.68 points (z -2.31)
+  falls a fight, the paired fights both arms won			+0.016 ± 0.024 (z +0.65)
+  hero turns a fight, the paired fights both arms won			+0.25 ± 0.22 (z +1.11)
+  the warband's blows a fight, the paired fights both arms won			+0.17 ± 0.20 (z +0.86)
+  paired fights holding a loss			22 lost by both arms, 27 by the landing tree alone, 8 by the tree before the arc alone
+the first fight: health at its end	0.9381	0.9266	-1.15 ± 0.64 points (z -1.80) (60 of 60 the same node)
+the first fight: the warband's blows	9.73	10.18	+0.45 ± 0.28 (z +1.60)
+the warband's blows a fight, every fight	15.77	15.50	
+enemy moves resolved through a declared turn, every fight (a spend is no move since JL; a hex is one)	18824	16887	
+SPLIT AT JL's TREE (HEAD, 34f4a9f): the arc alone, JH → JL	JH	JL	paired: JL − JH
+arc alone: runs	60	60	
+arc alone: completed (runs)	3	3	+0.000 ± 0.024 (z +0.00)
+arc alone: fights won a run (runs)	17.47	14.82	-2.65 ± 0.81 (z -3.29)
+arc alone: falls a run (runs)	7.30	6.00	-1.30 ± 0.49 (z -2.67)
+arc alone: falls a run, in the fights it won (runs)	3.48	2.20	-1.28 ± 0.44 (z -2.90)
+arc alone: fights fought, all	1105	946	
+arc alone: paired fights (same node, in order)	884	884	59 of 60 runs on one road throughout
+arc alone: health at a fight's end, paired fights	0.8376	0.8074	-3.82 ± 0.93 points (z -4.13)
+arc alone: falls a fight, paired fights	0.260	0.351	+0.131 ± 0.038 (z +3.40)
+arc alone: hero turns a fight, paired fights	33.07	33.15	-0.14 ± 0.36 (z -0.39)
+arc alone: the warband's blows a fight, paired fights	15.14	15.84	+0.84 ± 0.26 (z +3.23)
+arc alone:   health at a fight's end, the paired fights both arms won			-1.86 ± 0.53 points (z -3.52)
+arc alone:   falls a fight, the paired fights both arms won			+0.021 ± 0.018 (z +1.15)
+arc alone:   hero turns a fight, the paired fights both arms won			+0.39 ± 0.20 (z +1.97)
+arc alone:   the warband's blows a fight, the paired fights both arms won			+0.56 ± 0.18 (z +3.08)
+arc alone:   paired fights holding a loss			19 lost by both arms, 29 by JL's tree alone, 9 by JH's tree alone
+arc alone: the first fight: health at its end	0.9381	0.9259	-1.22 ± 0.47 points (z -2.59) (60 of 60 the same node)
+arc alone: the first fight: the warband's blows	9.73	10.33	+0.60 ± 0.23 (z +2.63)
+arc alone: the warband's blows a fight, every fight	15.77	15.97	
+arc alone: enemy moves resolved through a declared turn, every fight (a spend is no move since JL; a hex is one)	18824	16263	
+SPLIT AT JL's TREE: JM §0's Gall alone, JL → the tree that lands	JL	the tree that lands	paired: landing − JL
+Gall alone: runs	60	60	
+Gall alone: completed (runs)	3	5	+0.033 ± 0.023 (z +1.43)
+Gall alone: fights won a run (runs)	14.82	15.67	+0.85 ± 0.71 (z +1.19)
+Gall alone: falls a run (runs)	6.00	5.95	-0.05 ± 0.34 (z -0.15)
+Gall alone: falls a run, in the fights it won (runs)	2.20	2.28	+0.08 ± 0.35 (z +0.24)
+Gall alone: fights fought, all	946	995	
+Gall alone: paired fights (same node, in order)	884	884	60 of 60 runs on one road throughout
+Gall alone: health at a fight's end, paired fights	0.8063	0.8221	+1.77 ± 0.90 points (z +1.96)
+Gall alone: falls a fight, paired fights	0.352	0.287	-0.074 ± 0.037 (z -1.99)
+Gall alone: hero turns a fight, paired fights	32.86	32.94	+0.11 ± 0.34 (z +0.32)
+Gall alone: the warband's blows a fight, paired fights	15.64	15.18	-0.51 ± 0.30 (z -1.70)
+Gall alone:   health at a fight's end, the paired fights both arms won			+0.43 ± 0.55 points (z +0.78)
+Gall alone:   falls a fight, the paired fights both arms won			-0.007 ± 0.022 (z -0.34)
+Gall alone:   hero turns a fight, the paired fights both arms won			-0.19 ± 0.17 (z -1.15)
+Gall alone:   the warband's blows a fight, the paired fights both arms won			-0.34 ± 0.18 (z -1.94)
+Gall alone:   paired fights holding a loss			27 lost by both arms, 8 by the landing tree alone, 22 by JL's tree alone
+Gall alone: the first fight: health at its end	0.9259	0.9266	+0.07 ± 0.38 points (z +0.18) (60 of 60 the same node)
+Gall alone: the first fight: the warband's blows	10.33	10.18	-0.15 ± 0.23 (z -0.67)
+Gall alone: the warband's blows a fight, every fight	15.97	15.50	
+Gall alone: enemy moves resolved through a declared turn, every fight (a spend is no move since JL; a hex is one)	16263	16887	
+EACH HEX ON THE TWO TREES THAT LAY THEM, every fight	JL's tree	the tree that lands	
+Gall: uptime on hero turns	0.22% (68 of 30380)	5.95% (1909 of 32064)	
+Gall: cast, every fight	39	330	
+Sap: uptime on hero turns	0.18% (54 of 30380)	0.15% (48 of 32064)	
+Sap: cast, every fight	39	33	
+Mire: uptime on hero turns	0.41% (126 of 30380)	0.39% (125 of 32064)	
+Mire: cast, every fight	88	92	
+Fester: uptime on hero turns	0.06% (17 of 30380)	0.07% (24 of 32064)	
+Fester: cast, every fight	5	9	

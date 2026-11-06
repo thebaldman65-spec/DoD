@@ -567,7 +567,7 @@
   "term": "Gall",
   "category": "statuses",
   "short": "Healing received cut by {=Unit.GALL_HEAL_CUT*100}%.",
-  "long": "A hex the warband lays on one hero: every heal that hero receives lands {=Unit.GALL_HEAL_CUT*100}% smaller while it lasts, whoever casts it. It multiplies with Frostbite and Miasma. It is an affliction, so a cleanse lifts it.",
+  "long": "A hex the warband lays on every hero at once: every heal a hero carrying it receives lands {=Unit.GALL_HEAL_CUT*100}% smaller while it lasts, whoever casts it. It multiplies with Frostbite and Miasma. It is an affliction, so a cleanse lifts it.",
   "see_also": [
    "status_frostbite"
   ]

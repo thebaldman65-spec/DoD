@@ -4,6 +4,27 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## What the arc did, and what it cost the deck (Batch JM) — 2026-11-05
+
+**Why the arc was read whole.** JI, JJ, JK and JL each read themselves against the batch before, on four different paired
+populations, so their figures cannot be chained: two leaned easier and two harder. The only reading that says what the warband's
+systems did to the game is the tree before them against the tree after, on one line, by seed — so that is what was driven, and the
+difference was split at JL's tree to show how much of it is the arc and how much is Gall's move.
+
+**Why Gall moved and widened.** On one hero, Gall denied less than half a blow and went to a kind the heroes met in one fight of twenty. On the
+Orc Archer it meets the heroes in about a quarter of fights, and on every hero it denies the party's healing for three turns — the
+event it was built to be. Priced as an area blow is priced, it crosses twice its carrier's basic by a hair and cools 3; the record
+says how near the cut it sits and what convention decides it. **Measured alone it did not make the game harder** — it leans the other way, inside the noise: every Gall is an arrow the Archer did not shoot.
+
+**Why the played arm closes one divergence and names the other.** A player holding relics fills the draft's three slots, so the arm
+opens with three drawn as the boss's unlock draws them; a player's crest choice could only be modelled by an order nobody has
+measured, so it is named, with what measuring it would take. The figures are absolute and describe the bot's play of the game with
+its bargains and relics — closer to a player's game, not a player's game.
+
+**Why five cards and not twenty-five.** Each of the five is touched by name by something the arc built. Each is read against its own
+*none* on the tree that lands, and against the same card on the tree before the arc, run by run, so a move is measured and not
+inferred from two readings on one seed block.
+
 ## The spend costs no turn, and the warband learns four hexes (Batch JL) — 2026-11-05
 
 **A body's turn was worth more than anything the pool could buy with it.** JK's spends each took a body's turn, and JK's drive read

@@ -101,7 +101,7 @@ of `_enemy_turn` **byte-for-byte** — only *when* it runs moved, and a diff tou
 inside it breaks that promise.
 · **THE PROMISE BINDS THE POLICY, AND THE SELECTION ASKS THE DOOR's COOLDOWN AS IT ASKS ITS PRICE (JI §1).** Which move it
   prefers and at whom is the policy and does not move — save the hexes, which join its random pick at JL §2 and go only at a hero
-  who does not carry one, the promise standing beside the change rather than over it (JL's RULINGS OWED 7); a refusal the door makes is a rule, and IN §3 put the door's price
+  who does not carry one, the promise standing beside the change rather than over it (JL's ruling 7, accepted at JM §0); a refusal the door makes is a rule, and IN §3 put the door's price
   in the selection (`_eff_cost`). **A cooldown is the same kind of thing**: `_intent_ability_usable` refuses a cooling move,
   so the choice reads the counter as it will stand on the turn the move resolves (`battle._enemy_ready`, the unit's own
   ticks `ticks_ahead` away — one from the end of a turn, two from a stunned or frozen branch, which declares before its own
@@ -158,7 +158,8 @@ inside it breaks that promise.
   reaches one: `_choose_enemy_action` puts every ready hex some hero in reach lacks beside the attacks it picks from at random, and
   aims a hex it picks at a hero — never a companion — who does not carry it (`_hex_open`); no draw or evasion moves it, and as a
   `special` it rolls no miss. Its arm lays it through the status door
-  with the enemy as source. Each is an affliction in `DEBUFF_IDS`, and each is read at one door: Gall in `heal_amount`, Sap at the
+  with the enemy as source — **and a hex that reaches every hero (`aoe`, the data's reach key; Gall since JM §0) on every hero
+  standing**, each through that one door, a hero who carries it taking its clock back. Each is an affliction in `DEBUFF_IDS`, and each is read at one door: Gall in `heal_amount`, Sap at the
   bar's own setter, Mire at `effective_speed()`, Fester in `_dot_pass`.
 · **Declaration**: `_declare_intent(u)`, called from `_declare_all_intents()` at battle start
   (after the opening oath/Faith hooks, which move state the policy reads), from the turn loop

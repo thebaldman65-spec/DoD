@@ -1,0 +1,14 @@
+reading	the played arm	its error, or what it counts	the same line, relics at the default	paired: played − default
+DOD_SIM_RELICS	draw3 — three relics a run, drawn without replacement from the 25 a draw can reach, on a generator of its own seeded off the run (read off the arm's banner: relics=draw3)	60 of 60 runs opened holding three; 25 distinct relics held	none	
+the crest	worn as the bot wears it: the first party rune a fight drop hands it, never swapped (DV35, not closed)	43 of 60 runs end wearing one	44 of 60	
+the bargains	dealt and taken as the bot takes them (no modifier forced; DV30: the gamble in 96% of Warden's bargain fights, 98.5% of Ruin's, IN §1b, on another tree and deck)	367 taken, 15 kinds	316 taken	
+the line	berserker,cryomancer,inquisitor,beastmaster 0 warden 60 38 draw3 - - 1 - 38: the reference four untalented at Warden, sixty runs, block 38 and its fight seed, on the tree that lands		the same, relics -	
+completion rate	1.7% (1 of 60)	± 1.7	0.0% (0 of 60)	+0.017 ± 0.017 (z +1.00)
+falls a run	7.02	± 0.34	6.58	+0.43 ± 0.34 (z +1.26)
+health at a fight's end	0.7306	over 804 fights; run-clustered 0.7114 ± 0.0101	0.7128 (688 fights)	+4.21 ± 1.04 points (z +4.05) (paired fights)
+fights won a run	12.42	± 0.78	10.47	+1.95 ± 0.71 (z +2.76)
+health at a fight's end, the fights won	0.7885		0.7809	
+falls a fight, paired fights	0.395		0.533	-0.170 ± 0.050 (z -3.43)
+against the arc's line, relics at the default: completions, fights won a run, falls a run	-0.083 ± 0.036 (z -2.32); -5.20 ± 0.84 (z -6.21); +0.63 ± 0.40 (z +1.60)	paired by seed: the bargains dealt and the crest worn, against no modifier, no crest, no relic		
+against the arc's line, the played arm: completions, fights won a run, falls a run	-0.067 ± 0.032 (z -2.05); -3.25 ± 0.69 (z -4.69); +1.07 ± 0.41 (z +2.63)	paired by seed: the bargains dealt and the crest worn, with three relics, against no modifier, no crest, no relic		
+relics held, by how many runs opened with each	waystone 12; oxheart 11; chalice 10; dragonbone 10; lodestone 10; nightbloom 9; cairnmoss 9; stormflask 9; fleetstep 9; hourglass 9; drumskin 8; lantern 7; frostsigil 6; runedplate 6; whetstone 6; martyrbone 6; kingsledger 6; warhorn 6; ironbark 6; coin 5; packcharm 5; tollbell 5; tithe 4; prismveil 4; emberheart 2			

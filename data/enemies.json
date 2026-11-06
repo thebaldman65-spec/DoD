@@ -284,6 +284,19 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   },
+   {
+    "display_name": "Gall",
+    "cooldown": 3,
+    "special": "warband_hex",
+    "delay": 2.5,
+    "anim": "attack02",
+    "aoe": true,
+    "applies_status": {
+     "id": "gall",
+     "turns": 3
+    },
+    "description": "Every hero receives {=Unit.GALL_HEAL_CUT*100}% less healing."
    }
   ]
  },
@@ -468,17 +481,6 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
-   },
-   {
-    "display_name": "Gall",
-    "special": "warband_hex",
-    "delay": 2.5,
-    "anim": "attack02",
-    "applies_status": {
-     "id": "gall",
-     "turns": 3
-    },
-    "description": "One hero receives {=Unit.GALL_HEAL_CUT*100}% less healing."
    },
    {
     "display_name": "Sap",
