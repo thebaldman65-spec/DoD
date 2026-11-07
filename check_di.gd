@@ -150,10 +150,13 @@ const SRC_FLOOR := 107
 # on an ENEMY and pass the enemy that bought them as the source, DI's rule, so `with_src` moves with them; `SRC_FLOOR` is
 # a ratchet and did not have to move.
 #
-# **BATCH JL MOVED IT 223 -> 224, AND SAYS WHY. Net +1, one arrival.** The warband's hex arm (`"warband_hex"` in
-# `_resolve_special`) lays Gall, Sap, Mire or Fester on a hero, passing the enemy that cast it as the source, DI's rule, so
-# `with_src` moves with it. Fester's growth writes its own entry (`BattleUnit.fester_grow`) and calls no door.
-const CALL_SITES := 224
+# **BATCH JL MOVED IT 223 -> 224, AND SAYS WHY. Net +1, one arrival.** The warband's hex arm in `_resolve_special` laid Gall,
+# Sap, Mire or Fester on a hero, passing the enemy that cast it as the source, DI's rule, so `with_src` moved with it. Fester's
+# growth writes its own entry (`BattleUnit.fester_grow`) and calls no door.
+# **BATCH JO MOVED IT 224 -> 223, AND SAYS WHY. Net -1, one departure.** The hexes ride blows since JO §2 (no warband move lays a
+# status on a hero unless it deals damage), so the strike loop's one status call lays them, with the enemy as its source, and the
+# hex arm went with the special that reached it.
+const CALL_SITES := 223
 
 # Four plain afflictions: all in `DEBUFF_IDS`, none sticky, none on the boss
 # immunity list, so `_harvest_yield` counts all four and `purge_debuffs` takes

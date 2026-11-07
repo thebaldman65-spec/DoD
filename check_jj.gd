@@ -41,7 +41,8 @@ const BAR_HEAD := "MALICE"
 const MASTER_NEEDLE := "The warband shares one pool, Malice."
 const DECK_CLOSED_AT := 25
 const KINDS := 21
-const MOVES := 50
+# JK's fifty, and since JO §2 Gall and Mire among them, each a blow given damage (Sap and Fester ride two of the fifty).
+const MOVES := 52
 const KEPT_TABLE := "res://docs/reports/JJ-malice.tsv"
 const ANSWERED := "all accepted as taken"
 const FOE := {"type": "fight", "theme": "Warband", "enemies": ["raider", "raider", "raider", "raider", "raider", "raider"]}
@@ -722,12 +723,21 @@ func _s5_the_bellow() -> void:
 	for a in (data.get("behemoth", {}) as Dictionary).get("abilities", []):
 		if String(a.get("display_name", "")) == "Wretched Bellow":
 			cd = int(a.get("cooldown", 0))
-	ok(cd == 2, "§5: the Rot Behemoth's Wretched Bellow carries %d, not the 2 a hand gave it" % cd)
-	# JN §1 RAISED THE BELLOW TO THE LINE (14 → 15, an area blow on four heroes, 1.46 of its basic), so the rule gives the 2 the hand
-	# gave, and the hand-tune went with its reason: `check_ji` §1a now derives the 2 and holds no tune for it (`check_jn` §1 the raise).
+	# JO §2 FOLDED FESTER ONTO THE BELLOW, and JI's line prices the DoT a blow lays (Fester is one, off `DOT_STATUSES`): with its tick
+	# in the sum the rule gives it a longer band than the hand did. The hand's figure is the record of JJ §0; the data's band is the
+	# rule's, whatever it reads, as `JO-hexes.tsv` states it and `check_ji` §1a holds it.
+	var rule := 0
+	for line in FileAccess.get_file_as_string("res://docs/reports/JO-hexes.tsv").split("\n", false):
+		var c := String(line).split("\t")
+		if c.size() >= 17 and c[0] == "behemoth" and c[6] == "Wretched Bellow":
+			rule = int(c[16])
+	ok(cd > 0 and cd == rule, "§5: the Rot Behemoth's Wretched Bellow carries %d, not the %d the rule gives it with Fester on it" % [cd, rule])
+	# JN §1 RAISED THE BELLOW TO THE LINE (14 → 15, an area blow on four heroes, 1.46 of its basic), so the rule gave the 2 the hand
+	# gave, and the hand-tune went with its reason: `check_ji` §1a derives the band and holds no tune for it (`check_jn` §1 the raise);
+	# since JO §2 Fester rides the Bellow and the rule gives it 3, read above off the hexes' table.
 	var tuned := Gate.strip_comments(FileAccess.get_file_as_string("res://check_ji.gd"))
 	ok(tuned.contains("const TUNED := {}") and not tuned.contains("behemoth/Wretched Bellow"),
-		"§5: a hand-tune of the Bellow still stands beside the rule, which gives it the same 2 since JN §1")
+		"§5: a hand-tune of the Bellow still stands beside the rule, which gives it its band since JN §1")
 
 
 # ── §6 — THE RECORD ───────────────────────────────────────────────────────────
@@ -809,9 +819,10 @@ func _s7_not_done() -> void:
 	var data: Dictionary = Enemies._load()
 	var moves := 0
 	for k in data:
-		# JK §1 — the warband's Malice spends are JK's moves, held by `check_jk` §4; the fifty beside them are what this pins.
+		# JK §1 — the warband's Malice spends are JK's moves, held by `check_jk` §4; the moves beside them (fifty-two since JO §2) are
+		# what this pins.
 		for mv in (data[k] as Dictionary).get("abilities", []):
-			# JL §2 — and JL's hexes, held by `check_jl` §4.
+			# JL §2 — and JL's hex special, which no move carries since JO §2: each hex rides a blow, counted among the fifty-two.
 			if not String((mv as Dictionary).get("special", "")).begins_with("malice_") \
 					and String((mv as Dictionary).get("special", "")) != "warband_hex":
 				moves += 1

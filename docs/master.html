@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-11-06 (Batch JN &mdash; the eleven kinds get a move worth taking)</b></p>
+<p align="right"><b>Last updated: 2026-11-06 (Batch JO &mdash; Break gets a price, and the hexes ride blows)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -846,11 +846,11 @@ blow land whole.</td></tr>
 Its chip is <b>Ry</b>.</td></tr>
 <tr><td>Entrenched</td><td>Its armor is multiplied: every standing body of a warband that bought an Entrench with its Malice
 (&sect;9). Its chip is <b>Et</b>.</td></tr>
-<tr><td>Gall</td><td>Its healing received is cut: a hex the warband lays on every hero at once (&sect;9). Its chip is <b>Ga</b>.</td></tr>
-<tr><td>Sap</td><td>What its Rage or Mana gains is cut: a hex the warband lays on one hero (&sect;9). Its chip is <b>Sa</b>.</td></tr>
-<tr><td>Mire</td><td>It acts more slowly, its turns arriving later: a hex the warband lays on one hero (&sect;9). Its chip is <b>Me</b>.</td></tr>
+<tr><td>Gall</td><td>Its healing received is cut: a hex a warband blow lays on every ally it strikes at once (&sect;9). Its chip is <b>Ga</b>.</td></tr>
+<tr><td>Sap</td><td>What its Rage or Mana gains is cut: a hex a warband blow lays on the ally it strikes (&sect;9). Its chip is <b>Sa</b>.</td></tr>
+<tr><td>Mire</td><td>It acts more slowly, its turns arriving later: a hex a warband blow lays on the ally it strikes (&sect;9). Its chip is <b>Me</b>.</td></tr>
 <tr><td>Fester</td><td>It takes damage at each of its turn starts, a stack at a time, and gains a stack every turn until it is cleansed:
-a hex the warband lays on one hero (&sect;9). Its chip is <b>Fr</b> and its count.</td></tr>
+a hex a warband blow lays on every ally it strikes (&sect;9). Its chip is <b>Fr</b> and its count.</td></tr>
 <tr><td>Ruin</td><td>The Old Gods' mark (Occultist passive, NO maximum, and it does not wear
 off — only an enemy mender's Cleansing Rite, Harvest, Cull, Requiem, Transference (which moves it to another enemy) and the Open Wound rune take it
 away):
@@ -1083,8 +1083,8 @@ when two are hurt (&sect;9); the Orc Shieldmaster ALWAYS casts Shielding when no
 (&sect;9): a Raise on the largest of its warband's fallen the pool can pay for, a Rally while two or more stand and none is
 rallied or has declared one, an Entrench while none is entrenched or has declared one &mdash; each only when the pool can pay it beside the move it chose,
 its price set aside until it lands; it is bought first when the body's turn comes and costs the body nothing, and a taunted body buys nothing.
-<b>A hex is chosen as an affliction is</b>, among the moves an enemy is ready to make, and only while a hero does not already carry it;
-it goes at such a hero, and Gall at every hero at once; no draw or evasion moves it, and it does not miss (&sect;9).
+<b>A hex rides a blow</b>: the move that lays one deals damage, so it is chosen as any attack is, aimed through the draws and the
+evasions, and a single blow can miss; on a hit it lays its hex, and an area blow lays it on every ally it strikes (&sect;9).
 The Chief and the Ash-Wrought Tyrant build and spend Rage like a Warrior. <b>A move still cooling when its turn
 comes is never chosen</b> (&sect;9).</p>
 <h3>4.9 Enemy intent</h3>
@@ -3076,14 +3076,15 @@ Role-based Attack matches heroes — <b>Damage 100 (the Hollow Crown 115) / Tank
 damage is a % of it. <i>Art note: all kinds still share the orc sheet (tint + scale only),
 so new enemies read as tinted orcs until per-kind art lands — a known, accepted limit.</i></p>
 <p><b>An enemy's biggest moves wait between uses.</b> A move worth 1.4 times its own basic attack or more &mdash;
-counting every hero an area blow reaches and the Burn or Poison it lays, and a heal at the health it restores &mdash;
+counting every hero an area blow reaches, the Burn, Poison or Fester it lays and its Break damage &mdash; a point of it at what a
+hero's turn deals, spread over the Break bar a hero fills &mdash; and a heal at the health it restores &mdash;
 takes a cooldown of that enemy's own turns, longer the bigger it is. <b>Every enemy's second damaging move is worth that much
 or more</b>, so it is the bigger blow, and it waits: the Orc Raider's Sundering Strike, the Orc Whelp's Reckless Lunge, the Orc
-Slinger's Skull Crack, the Orc Archer's Poison Arrow, the Orc Totemist's Healing Wave, the Orc Hexer's Withering Hex, the
+Slinger's Skull Crack, the Orc Archer's Poison Arrow and Gall, the Orc Totemist's Healing Wave, the Orc Hexer's Withering Hex and Bone Rattle, the
 Wolfrider's Ride-by Slash, the Ashblade's Flame Lick, the Orc Brute's Overhead Crush, the Bog Troll's Swampy Grasp and
 Regenerate, the Rot Behemoth's Wretched Bellow, the Orc Chief's Heavy Strike, the Withered Warden's Roots of Wrath, the
 Ash-Wrought Tyrant's Immolating Wave and Tyrant's Verdict, the Ash Hurler's Siege Stone, the Orc Bloodcaller's Blood Tribute,
-the Grave Totem's Dark Vigil, and the Hollow Crown's Hollow Wail and The Long Dark. A basic attack never cools, so every enemy always has a move. An enemy
+the Grave Totem's Dark Vigil and Mire, and the Hollow Crown's Hollow Wail and The Long Dark. A basic attack never cools, so every enemy always has a move. An enemy
 never declares a move that will still be cooling when its turn comes, and while one cools its plate carries a <b>CD</b>
 chip: the fewest of its own turns until a move is back, its hover naming each. Encumbered binds these too.</p>
 <p><b>The warband shares one pool, Malice.</b> It fills by a point for every 10 points of damage the heroes deal it, by 25 when one
@@ -3096,7 +3097,7 @@ has been given; a heal on a body under Blight the Well restores nothing, so it c
 (two of them, for the Grave Totem's Dark Vigil);
 it declares only a heal the pool can pay, and sets the price aside until the heal lands.</p>
 <p><b>The pool buys three things beside a heal, each a move on its kind's list.</b> A Raise stands a fallen body of the warband back up at 40% of its maximum health, once a body a fight, for the health it stands it up with; a Rally makes every standing body of the warband deal 30% more damage with its blows for 3 turns, for 40 Malice; an Entrench multiplies their armor by 2 for 3 turns, for 30 Malice. Every kind holds one: a Rally the Orc Raider, the Orc Whelp, the Orc Slinger, the Orc Archer, the Orc Hexer, the Wolfrider, the Ashblade, the Orc Brute, the Rot Behemoth, the Orc Chief, the Ash-Wrought Tyrant, the Ash Hurler and the Orc Bloodcaller; an Entrench the Orc Shieldmaster, the Orc Shaman, the Bog Troll, the Withered Warden and the Hollow Crown; a Raise and an Entrench the Orc Totemist, the Orc Ritual Chanter and the Grave Totem. Each cools like any move, on its worth against its own kind's basic, and costs its body no turn: it rides the body's declared move, is bought first when the body's turn comes, and the body then acts as it declared &mdash; one a turn; a raised body rises un-Broken, its first turn a basic swing after it rises, at its own speed, and a body is raised once a fight. A Rally's clock counts down at each body's turn start, as every buff's but Eye of the Storm's does, so each rallied body strikes rallied twice, and the body that bought it three times, since it buys first on its own turn. A hero's Dispel strips a body's Rally and Entrenched, as it strips a ward.</p>
-<p><b>The warband lays four hexes on the heroes, each a move on its kind's list.</b> Gall cuts the healing every hero receives by 50% for 3 turns; Sap cuts what a hero's resource bar gains by 50% for 3 turns; Mire makes a hero act 25% slower for 3 turns; Fester deals 3% of its applier's Attack a stack at each of the hero's turn starts and gains a stack each turn, until it is cleansed. The Orc Archer carries Gall, the Orc Hexer Sap, the Grave Totem Mire and the Rot Behemoth Fester. Each cools like any move, on what it denies against its own kind's basic &mdash; Gall on every hero it reaches: Gall, Sap and Mire wait between uses, Fester does not. A hex goes at a hero who does not carry it, and Gall at every hero at once; no draw or evasion moves it, and it does not miss. Every hex is an affliction, so every cleanse reaches it, the Cleric's Unburden among them, and Fester grows until one does.</p>
+<p><b>The warband lays four hexes on the heroes, each riding a blow.</b> Gall cuts the healing every hero receives by 50% for 3 turns; Sap cuts what a hero's resource bar gains by 50% for 3 turns; Mire makes a hero act 25% slower for 3 turns; Fester deals 3% of its applier's Attack a stack at each of the hero's turn starts and gains a stack each turn, until it is cleansed. The Orc Archer's Gall strikes every ally and galls each it hits; the Orc Hexer's Bone Rattle lays Sap; the Grave Totem's Mire strikes one ally and mires it; the Rot Behemoth's Wretched Bellow lays Fester on every ally it strikes. No enemy move lays an affliction on the heroes without dealing damage, so each hex is a blow like any other: chosen as the attacks are, aimed through the draws and the evasions, a single blow able to miss, laid on a hit, and cooling on its worth as a blow &mdash; each of the four waits between uses. Every hex is an affliction, so every cleanse reaches it, the Cleric's Unburden among them, and Fester grows until one does.</p>
 <table border="1" cellpadding="4">
 <tr><th>Enemy</th><th>Pw</th><th>Roles</th><th>Zones</th><th>HP</th><th>Kit sketch (beside the Malice spend each holds, above)</th></tr>
 <tr><td>Orc Raider</td><td>1</td><td>skirmisher</td><td>1·2·3</td><td>140</td><td>Slash;
@@ -3112,7 +3113,7 @@ fingers).</td></tr>
 support: Totem Jab; Healing Wave (25% max to the most wounded hurt ally, tanks and supports first, paid in Malice). Nature resist
 25%; soft to shadow (spirit-open).</td></tr>
 <tr><td>Orc Archer (red)</td><td>1</td><td>sniper·hexer</td><td>1·2·3</td><td>110</td>
-<td>Arrow Shot; Poison Arrow (70% Poison 3t); Gall, a hex on every hero. Physical resist 5%; soft to frost.</td></tr>
+<td>Arrow Shot; Poison Arrow (70% Poison 3t); Gall, a blow on every ally that galls each. Physical resist 5%; soft to frost.</td></tr>
 <tr><td>Orc Shieldmaster (orange)</td><td>2</td><td>bulwark</td><td>1·2·3</td><td>150</td>
 <td>Strike; Shielding (25% ward, one ally at a time, always re-cast). Physical resist 15%;
 soft to arcane (the shield stops steel, not raw magic).</td></tr>
@@ -3120,7 +3121,7 @@ soft to arcane (the shield stops steel, not raw magic).</td></tr>
 Lightning (nature, every ally); Healing Wave, paid in Malice. Resists fire/frost 25%, nature 50%; soft to
 shadow (corruptible spirits).</td></tr>
 <tr><td>Orc Hexer (purple)</td><td>2</td><td>hexer</td><td>1·2·3</td><td>120</td><td>Ranged
-shadow caster: Hex Bolt; Withering Hex (70% Exposed 2t); Bone Rattle (34 BD); Sap, a hex. Resists
+shadow caster: Hex Bolt; Withering Hex (70% Exposed 2t); Bone Rattle (34 BD, lays Sap). Resists
 shadow 50%; soft to holy AND nature.</td></tr>
 <tr><td>Wolfrider (grey)</td><td>2</td><td>skirmisher</td><td>1·2</td><td>130</td><td>Speed
 125: Lunging Bite; Ride-by Slash (50% Cripple 2t). Physical resist 5%; soft to nature
@@ -3138,7 +3139,7 @@ battle: unremarkable fresh, hits like a Chief as the last one standing. The kill
 question, stated as an enemy. Shadow resist 25%; soft to holy AND nature.</td></tr>
 <tr><td>Grave Totem (dusk, large)</td><td>2</td><td>mender·hexer</td><td>1·3</td><td>80</td>
 <td>Speed 130, trivially Broken (Con 60): Grasping Roots (nature, 60% Cripple 2t); Dark
-Vigil — every living ally regains 6% of its OWN max health, paid in Malice; Mire, a hex. Physical resist 35%, shadow
+Vigil — every living ally regains 6% of its OWN max health, paid in Malice; Mire, a blow that mires. Physical resist 35%, shadow
 50%; soft to fire AND holy at 50% — a resist puzzle, not a stat check.</td></tr>
 <tr><td>Orc Brute (brown, large)</td><td>3</td><td>brute</td><td>1·2·3</td><td>260</td>
 <td>Smash; Overhead Crush (50 BD). Physical resist 10%; soft to shadow (dumb muscle, weak
@@ -3147,7 +3148,7 @@ mind).</td></tr>
 <td>Claw; Swampy Grasp (70% Slowed 2t); Regenerate (25% self-heal when hurt, paid in Malice). Nature
 resist 50%; soft to fire.</td></tr>
 <tr><td>Rot Behemoth (dun, large)</td><td>3</td><td>brute·hexer</td><td>2·3</td><td>280</td>
-<td>Rotting Fist (50% Poison 3t); Wretched Bellow (nature + BD, every ally); Fester, a hex. Nature 50%,
+<td>Rotting Fist (50% Poison 3t); Wretched Bellow (nature + BD, every ally, lays Fester). Nature 50%,
 shadow 25%; soft to holy.</td></tr>
 <tr><td>Ash Hurler (ember, large)</td><td>3</td><td>brute·sniper</td><td>2·3</td><td>190</td>
 <td>Slow (speed 60) ranged siege:

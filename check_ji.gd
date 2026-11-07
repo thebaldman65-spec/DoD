@@ -1,8 +1,8 @@
 # BATCH JI — THE WARBAND GETS COOLDOWNS.
 #
 #   §1a  THE POPULATION, DERIVED FROM THE DATA AND NEVER LISTED: every enemy ability priced against its own enemy's basic
-#        attack — a blow by its damage and the Burn or Poison it lays, times the heroes it reaches; a heal by the health it
-#        restores — and every one at or past the line carries exactly the figure its multiple names, every other none, and a
+#        attack — a blow by its damage and the Burn, Poison or Fester it lays, and since JO §1 its Break damage, times the heroes it
+#        reaches; a heal by the health it restores — and every one at or past the line carries exactly the figure its multiple names, every other none, and a
 #        basic never one (C01, C02). The table prints, every battery.
 #   §1b  THE UNIT IS THE ENEMY's OWN TURN: the loop ticks a unit's cooldowns at its own turn's start on all three of its paths
 #        and nowhere else, held at source (C03); and a move cast is refused for exactly its cooldown of the unit's own ticks
@@ -38,6 +38,20 @@ const LINE := 1.4
 const TUNED := {}
 const FIGURES := [[2.0, 2], [3.0, 3]]
 const TOP := 4
+# JO §1 — A POINT OF BREAK DAMAGE IS PRICED AT A HERO TURN's DAMAGE DIVIDED BY THE BREAK METER's SIZE (the designer's). A filled meter
+# costs a hero his next turn, and a hero turn is worth what the census says one deals: JA's census, the heroes' damage dealt over
+# their turns taken. The meter is a hero's `stability`, filled at 100 / Constitution a point of Break damage (`take_hit`), so in a
+# move's own Break damage it is stability x Constitution / 100 — one stability on every hero, a Constitution by spec — taken as the
+# mean of the reference four, the census's own party. Both figures are read where they stand and never typed (`break_figures`), and
+# every gate that prices on this line prices through `line_blow`, so the price is one answer.
+const BREAK_CENSUS := "res://docs/reports/JA-shares.tsv"
+const BREAK_SEATS := ["berserker", "cryomancer", "inquisitor", "beastmaster"]
+# A BAND THE REPAIRED LINE MOVES ON A MOVE NO BRIEF NAMED, held at the data's figure until the designer rules (JO's ruling 2): a
+# population of its own beside the hand-tunes, never mixed into `TUNED`, each printed with the band the line gives, and a hold the
+# line agrees with reds — an exception outlives its reason only by being kept. "kind/Move": the cooldown the data keeps. A spend
+# held here is read by `check_jk` §2, which prices the spends.
+const HELD := {"totemist/Healing Wave": 3, "bog_troll/Regenerate": 3, "chief/Chieftain's Maul": 0, "grave_totem/Dark Vigil": 4,
+	"totemist/Raise": 4, "shaman/Entrench": 2, "wolfrider/Rally": 2, "bog_troll/Entrench": 4, "hollow_crown/Entrench": 3}
 # An area blow reaches the party's four heroes; so does an every-ally heal.
 const REACH := 4
 # A heal is priced as the health it restores, a share of the body healed (the three arms of `_resolve_special`).
@@ -53,7 +67,10 @@ const UNPRICED := ["enemy_shield", "cleanse_allies"]
 # warband's pool allows and a body is hurt); its 25% and every other figure stand.
 # JN §1 re-pinned it: ten kinds' second damaging moves rose to the line — their damage, and their cooldowns beside them — and
 # `check_jn` §1 holds that nothing else of theirs moved; every other figure stands.
-const DATA_BEFORE := "af5c81065d506b347c1ac9ceed92a5e9"
+# JO re-pinned it: seven of those ten brought to the line priced with their Break, and the four hexes onto blows — Sap and Fester
+# folded onto Bone Rattle and the Wretched Bellow, Gall and Mire given damage, the hex special gone — and `check_jo` §1 and §2 hold
+# that nothing else moved; every other figure stands.
+const DATA_BEFORE := "ac418b1c8b40987acda318ffd3b457c2"
 const DECK_CLOSED_AT := 25
 const FOE := {"type": "fight", "theme": "Warband", "enemies": ["whelp", "raider", "archer"]}
 const SEATS := ["warrior", "mage", "cleric", "hunter"]
@@ -73,6 +90,54 @@ var _run: Node = null
 var _player := {}
 var _pop: Array = []   # [kind, ability, figure], derived by §1a
 
+
+# THESE TWO STAND ABOVE THE FILE's FIRST `func` ON PURPOSE: `Gate.returning_bodies` opens a window only at a `func ` line, so a static
+# below one would ride in that function's body and lengthen it.
+# A MOVE's WORTH ON THE LINE, IN HEALTH: its damage and the DoT it lays scaled by its kind's Attack, as the strike line scales both
+# (`_resolve`, `_dot_tick`), and its Break damage at the price — a blow's Break is never scaled by Attack — times the heroes it
+# reaches. Static, so every gate that prices on the line calls this one (`check_jo` §1 reds a second).
+static func line_blow(a: Dictionary, dot: Dictionary, atk: float, price: float) -> float:
+	var st: Dictionary = a.get("applies_status", {})
+	# A POISON SKIPS THE TURN IT LANDS (`_dot_pass`, its `fresh` flag), so it ticks one fewer than its turns; a Burn ticks every one.
+	var ticks := maxf(0.0, float(st.get("turns", 0)) - (1.0 if String(st.get("id", "")) == "poison" else 0.0))
+	var tick := float(dot.get(String(st.get("id", "")), 0)) * ticks * float(a.get("status_chance", 1.0))
+	return ((float(a.get("damage", 0)) + tick) * atk / 100.0 + float(a.get("pressure", 0)) * price) * (REACH if bool(a.get("aoe", false)) else 1)
+
+
+# THE BREAK PRICE's TWO FIGURES, READ WHERE THEY STAND: {turn, dealt, turns, meter, meters, price}; -1 where one cannot be read.
+static func break_figures() -> Dictionary:
+	var out := {"turn": -1.0, "meter": -1.0, "price": -1.0, "meters": {}}
+	var lines := FileAccess.get_file_as_string(BREAK_CENSUS).split("\n", false)
+	if lines.is_empty():
+		return out
+	var head := String(lines[0]).split("\t")
+	var col := head.find("ref_heroes")
+	var dealt := -1.0
+	var turns := -1.0
+	for r in lines.slice(1):
+		var c := String(r).split("\t")
+		if col < 0 or c.size() <= col:
+			continue
+		if c[0] == "damage dealt (the damage door)":
+			dealt = float(c[col])
+		elif c[0] == "turns taken":
+			turns = float(c[col])
+	var meters := {}
+	var sum := 0.0
+	for spec in BREAK_SEATS:
+		var cfg := Classes.hero_config(Classes.class_of_spec(String(spec)))
+		Classes.apply_spec_stats(cfg, String(spec))
+		var m := float(cfg.get("stability", 0)) * float(cfg.get("constitution", 0)) / 100.0
+		meters[spec] = m
+		sum += m
+	out["dealt"] = dealt
+	out["turns"] = turns
+	out["meters"] = meters
+	if dealt > 0.0 and turns > 0.0 and sum > 0.0:
+		out["turn"] = dealt / turns
+		out["meter"] = sum / BREAK_SEATS.size()
+		out["price"] = float(out["turn"]) / float(out["meter"])
+	return out
 
 func ok(cond: bool, what: String) -> void:
 	_g.ok(cond, what)
@@ -234,14 +299,6 @@ func _data_cd(kind: String, name: String) -> int:
 
 # ── §1a — THE POPULATION, DERIVED ─────────────────────────────────────────────
 
-func _blow(a: Dictionary, dot: Dictionary) -> float:
-	var st: Dictionary = a.get("applies_status", {})
-	# A POISON SKIPS THE TURN IT LANDS (`_dot_pass`, its `fresh` flag), so it ticks one fewer than its turns; a Burn ticks every one.
-	var ticks := maxf(0.0, float(st.get("turns", 0)) - (1.0 if String(st.get("id", "")) == "poison" else 0.0))
-	var tick := float(dot.get(String(st.get("id", "")), 0)) * ticks * float(a.get("status_chance", 1.0))
-	return (float(a.get("damage", 0)) + tick) * (REACH if bool(a.get("aoe", false)) else 1)
-
-
 func _figure(m: float) -> int:
 	if m < LINE:
 		return 0
@@ -256,6 +313,10 @@ func _s1a_the_population(s: Node) -> void:
 	var data: Dictionary = Enemies._load()
 	var dot: Dictionary = (s.get_script() as Script).get_script_constant_map().get("DOT_STATUSES", {})
 	ok(dot.has("burn") and dot.has("poison"), "§1a: the damage a Burn and a Poison tick could not be read off the battle")
+	var bf := break_figures()
+	var price := float(bf["price"])
+	print("    a point of Break damage: %.4f — a hero turn's damage %.2f (JA's census) over the meter %.2f (the reference four)" % [price, float(bf["turn"]), float(bf["meter"])])
+	ok(price > 0.0, "§1a: the Break price could not be read off the census and the meter")
 	var dot_pass := Gate.fn_body("scripts/battle.gd", "_dot_pass", _cache)
 	ok(dot_pass.contains("if pstatus.get(\"fresh\", false):"), "§1a: a Poison no longer skips the turn it lands — the blow's price is stale")
 	# JJ §3 LIFTED THE THREE FIGURES OUT OF `_resolve_special`'s ARMS, UNCHANGED, INTO THE ONE DOOR THE ARMS AND THE POOL's PRICE
@@ -276,6 +337,7 @@ func _s1a_the_population(s: Node) -> void:
 	var total := 0
 	var spends := 0
 	var hexes := 0
+	var stale_holds: Array = []
 	for kind in data:
 		var k: Dictionary = data[kind]
 		var basic: Dictionary = {}
@@ -286,15 +348,16 @@ func _s1a_the_population(s: Node) -> void:
 		ok(not basic.is_empty(), "§1a: %s has no basic attack — no move is free and damaging" % kind)
 		if basic.is_empty():
 			continue
-		var bp := _blow(basic, dot)
+		var atk := float(k["attack"])
+		var bp := line_blow(basic, dot, atk, price)
 		for a in k["abilities"]:
 			# JK §2 — A MALICE SPEND IS PRICED BY `check_jk` §2, on this line read out of this file: its worth on the reference board
-			# against this kind's basic. It is counted here and walked there, so this walk stays the fifty it was written for.
+			# against this kind's basic. It is counted here and walked there, so this walk is of the blows and the heals alone.
 			if String(a.get("special", "")).begins_with("malice_"):
 				spends += 1
 				continue
-			# JL §2 — A HEX IS PRICED BY `check_jl` §2, on this line read out of this file: its worth by what it denies, off JA's
-			# census, against this kind's basic. It deals nothing, so this walk would price it at nothing; it is counted and walked there.
+			# JL §2's HEX SPECIAL, GONE SINCE JO §2: each hex rides a blow and is priced above as the blow it rides, so this counts none
+			# (`check_jo` §2 reds a move that still carries the special); a move carrying it again would be counted here, not priced.
 			if String(a.get("special", "")) == "warband_hex":
 				hexes += 1
 				continue
@@ -313,14 +376,20 @@ func _s1a_the_population(s: Node) -> void:
 			elif HEALS.has(sp):
 				var b: float = float(k["max_hp"]) if SELF_HEALS.has(name) else body
 				var hp: float = float(HEALS[sp]) * b * (REACH if sp == "totem_pulse" else 1)
-				m = hp / (bp * float(k["attack"]) / 100.0)
-				how = "heals %.1f against a basic of %.1f" % [hp, bp * float(k["attack"]) / 100.0]
+				m = hp / bp
+				how = "heals %.1f against a basic of %.1f" % [hp, bp]
 			else:
-				m = _blow(a, dot) / bp
-				how = "%.1f against a basic of %.1f" % [_blow(a, dot), bp]
+				m = line_blow(a, dot, atk, price) / bp
+				how = "%.1f against a basic of %.1f" % [line_blow(a, dot, atk, price), bp]
 			var want := 0 if (m < 0.0 or a == basic) else _figure(m)
 			if TUNED.has("%s/%s" % [kind, name]):
 				want = int(TUNED["%s/%s" % [kind, name]])
+			# A HELD BAND: the data keeps its figure, the line's printed beside it; a hold the line agrees with is a stale one.
+			if HELD.has("%s/%s" % [kind, name]):
+				if want == int(HELD["%s/%s" % [kind, name]]):
+					stale_holds.append("%s/%s" % [kind, name])
+				how += "; the line gives %d, held at %d" % [want, int(HELD["%s/%s" % [kind, name]])]
+				want = int(HELD["%s/%s" % [kind, name]])
 			var have := int(a.get("cooldown", 0))
 			rows.append([m, kind, name, want, have, how])
 			if want > 0:
@@ -332,10 +401,11 @@ func _s1a_the_population(s: Node) -> void:
 		if float(r[0]) >= 1.0 and String(r[5]) != "its basic" or int(r[4]) > 0:
 			print("    %5.2f  %-16s %-18s rule %d, data %d  — %s" % [float(r[0]), r[1], r[2], int(r[3]), int(r[4]), r[5]])
 	print("    CHECKED %d of %d moves in %d kinds; the median composable body %.1f; %d take a cooldown" % [rows.size(), total, data.size(), body, _pop.size()])
-	print("    and %d Malice spends beside them, priced by check_jk §2, and %d hexes, priced by check_jl §2" % [spends, hexes])
+	print("    and %d Malice spends beside them, priced by check_jk §2; %d moves lay a hex and deal nothing (the hexes ride blows, priced above)" % [spends, hexes])
 	ok(rows.size() == total and total >= 50, "§1a: the walk priced %d of %d moves" % [rows.size(), total])
 	ok(wrong.is_empty(), "§1a: the data and the rule disagree: %s" % [wrong])
 	ok(basics_cooling.is_empty(), "§1a: a basic attack carries a cooldown: %s" % [basics_cooling])
+	ok(stale_holds.is_empty(), "§1a: a band is held where the line already gives it — the hold outlived its reason: %s" % [stale_holds])
 	ok(_pop.size() >= 1, "§1a: the rule names no move at all — the population is empty")
 
 
@@ -722,7 +792,8 @@ func _strip(v: Variant) -> Variant:
 		return out
 	if v is Array:
 		# JK §1 — AND THE WARBAND's MALICE SPENDS, the moves JK added and `check_jk` holds: the digest is of every other figure.
-		# JL §2 — AND THE WARBAND's HEXES, the moves JL added and `check_jl` holds.
+		# JL §2 — AND THE WARBAND's HEXES, the moves JL added: since JO §2 none carries the special — Gall and Mire are blows, in the
+		# digest, and Sap and Fester are gone.
 		return (v as Array).filter(func(x): return not (x is Dictionary and (String((x as Dictionary).get("special", "")).begins_with("malice_") \
 			or String((x as Dictionary).get("special", "")) == "warband_hex"))) \
 			.map(func(x): return _strip(x))

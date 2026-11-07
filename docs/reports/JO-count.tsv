@@ -1,0 +1,23 @@
+what	name	whose, or where	count	fights it happened in	fights its kind struck in	fights its kind is fielded in	of them with enemy attacks off	laid on a companion
+a hex laid	Gall	Orc Archer, on Gall	72	9	16	110	91	8
+a hex laid	Sap	Orc Hexer, on Bone Rattle	2	2	2	19	17	0
+a hex laid	Mire	Grave Totem, on Mire	2	1	1	14	13	0
+a hex laid	Fester	Rot Behemoth, on Wretched Bellow	12	3	3	10	7	0
+a re-derived move cast	Sundering Strike	Orc Raider	36	18	19	136	112	-
+a re-derived move cast	Skull Crack	Orc Slinger	13	4	6	53	47	-
+a re-derived move cast	Poison Arrow	Orc Archer	15	12	16	110	91	-
+a re-derived move cast	Withering Hex	Orc Hexer	1	1	2	19	17	-
+a re-derived move cast	Ride-by Slash	Wolfrider	6	3	3	33	30	-
+a re-derived move cast	Flame Lick	Ashblade	4	3	3	12	9	-
+a re-derived move cast	Overhead Crush	Orc Brute	4	2	3	8	4	-
+a re-derived move cast	Swampy Grasp	Bog Troll	0	0	1	22	21	-
+a re-derived move cast	Wretched Bellow	Rot Behemoth	3	3	3	10	7	-
+a re-derived move cast	Blood Tribute	Orc Bloodcaller	0	0	0	15	15	-
+a move that carries a hex, cast	Gall	Orc Archer	16	9	16	110	91	-
+a move that carries a hex, cast	Bone Rattle	Orc Hexer	2	2	2	19	17	-
+a move that carries a hex, cast	Mire	Grave Totem	2	1	1	14	13	-
+heroes Broken	every Break on the party's side	-	33	-	-	-	-	-
+heroes Broken	by one of the ten §1 re-derived	-	4	-	-	-	-	-
+heroes Broken	by one of the seven §1 moved	-	2	-	-	-	-	-
+fights the logs hold	-	-	322	-	-	-	-	-
+fights with enemy attacks off	-	-	270	-	-	-	-	-

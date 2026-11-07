@@ -36,7 +36,7 @@
    {
     "display_name": "Sundering Strike",
     "cooldown": 2,
-    "damage": 48,
+    "damage": 53,
     "pressure": 22,
     "delay": 2.5,
     "anim": "attack02",
@@ -269,7 +269,7 @@
     "display_name": "Poison Arrow",
     "cooldown": 2,
     "dmg_type": "nature",
-    "damage": 26,
+    "damage": 29,
     "pressure": 14,
     "delay": 2.5,
     "anim": "attack02",
@@ -290,8 +290,8 @@
    },
    {
     "display_name": "Gall",
-    "cooldown": 3,
-    "special": "warband_hex",
+    "cooldown": 2,
+    "damage": 10,
     "delay": 2.5,
     "anim": "attack02",
     "aoe": true,
@@ -458,7 +458,7 @@
    {
     "display_name": "Withering Hex",
     "cooldown": 2,
-    "damage": 62,
+    "damage": 69,
     "pressure": 10,
     "delay": 2.5,
     "anim": "attack02",
@@ -471,11 +471,17 @@
    },
    {
     "display_name": "Bone Rattle",
-    "damage": 16,
+    "cooldown": 2,
+    "damage": 52,
     "pressure": 34,
     "delay": 3.0,
     "anim": "attack02",
-    "dmg_type": "shadow"
+    "dmg_type": "shadow",
+    "applies_status": {
+     "id": "sap",
+     "turns": 3
+    },
+    "description": "One hero gains {=Unit.SAP_CUT*100}% less Rage or Mana."
    },
    {
     "display_name": "Rally",
@@ -485,18 +491,6 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
-   },
-   {
-    "display_name": "Sap",
-    "cooldown": 2,
-    "special": "warband_hex",
-    "delay": 2.5,
-    "anim": "attack02",
-    "applies_status": {
-     "id": "sap",
-     "turns": 3
-    },
-    "description": "One hero gains {=Unit.SAP_CUT*100}% less Rage or Mana."
    }
   ]
  },
@@ -538,7 +532,7 @@
    {
     "display_name": "Ride-by Slash",
     "cooldown": 2,
-    "damage": 51,
+    "damage": 55,
     "pressure": 16,
     "delay": 2.0,
     "anim": "attack02",
@@ -596,7 +590,7 @@
    {
     "display_name": "Flame Lick",
     "cooldown": 2,
-    "damage": 38,
+    "damage": 44,
     "pressure": 12,
     "delay": 2.5,
     "anim": "attack02",
@@ -712,7 +706,7 @@
    {
     "display_name": "Swampy Grasp",
     "cooldown": 2,
-    "damage": 56,
+    "damage": 64,
     "pressure": 18,
     "delay": 3.0,
     "anim": "attack02",
@@ -788,13 +782,18 @@
    },
    {
     "display_name": "Wretched Bellow",
-    "cooldown": 2,
+    "cooldown": 3,
     "damage": 15,
     "pressure": 22,
     "delay": 3.5,
     "anim": "attack02",
     "dmg_type": "nature",
-    "aoe": true
+    "aoe": true,
+    "applies_status": {
+     "id": "fester",
+     "turns": 3
+    },
+    "description": "Every hero takes {=Battle.DOT_STATUSES.fester}% of the applier's Attack\nper stack at the start of each turn, and\ngains a stack and its full clock each\nturn, until cleansed."
    },
    {
     "display_name": "Rally",
@@ -804,17 +803,6 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
-   },
-   {
-    "display_name": "Fester",
-    "special": "warband_hex",
-    "delay": 2.5,
-    "anim": "attack02",
-    "applies_status": {
-     "id": "fester",
-     "turns": 3
-    },
-    "description": "One hero takes {=Battle.DOT_STATUSES.fester}% of the applier's Attack\nper stack at the start of each turn, and\ngains a stack and its full clock each\nturn, until cleansed."
    }
   ]
  },
@@ -1209,7 +1197,7 @@
     "display_name": "Blood Tribute",
     "cooldown": 2,
     "special": "blood_tribute",
-    "damage": 42,
+    "damage": 44,
     "pressure": 24,
     "delay": 2.5,
     "anim": "attack02",
@@ -1301,8 +1289,8 @@
    },
    {
     "display_name": "Mire",
-    "cooldown": 3,
-    "special": "warband_hex",
+    "cooldown": 2,
+    "damage": 45,
     "delay": 2.5,
     "anim": "attack02",
     "applies_status": {

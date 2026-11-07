@@ -240,7 +240,7 @@ const STATUS_INFO := {
 	# BATCH JK §1 — what the warband's Rally and Entrench lay on every standing body, bought with Malice.
 	"warband_rally": ["Rally", "Ry", Color(0.92, 0.42, 0.34), "Its blows deal %d%% more damage\n(a Rally its warband bought with\nMalice)." % [int(round(MALICE_RALLY_PCT * 100))]],
 	"warband_entrench": ["Entrenched", "Et", Color(0.62, 0.72, 0.86), "Its armor is multiplied by %d\n(an Entrench its warband bought\nwith Malice)." % [BattleUnit.MALICE_ENTRENCH_MULT]],
-	# BATCH JL §2 — THE FOUR HEXES the warband lays on a hero (Gall on every hero since JM §0), each a move on a kind's list.
+	# BATCH JL §2 — THE FOUR HEXES the warband lays on a hero (Gall on every hero since JM §0); since JO §2 each rides a damaging blow.
 	"gall": ["Gall", "Ga", Color(0.62, 0.78, 0.30), "Healing received cut by %d%%\n(a hex the warband laid)." % [int(round(BattleUnit.GALL_HEAL_CUT * 100))]],
 	"sap": ["Sap", "Sa", Color(0.42, 0.56, 0.86), "Resource gained cut by %d%%\n(a hex the warband laid)." % [int(round(BattleUnit.SAP_CUT * 100))]],
 	"mire": ["Mire", "Me", Color(0.52, 0.50, 0.34), "-%d%% speed; turns arrive later\n(a hex the warband laid)." % [int(round(BattleUnit.MIRE_SLOW * 100))]],
@@ -8213,11 +8213,9 @@ func _intent_hover_text(u: BattleUnit) -> String:
 	# HOW MANY, never which: the reach of an attack on the heroes. A support aimed at its own
 	# side says its reach in its own description, which is printed above.
 	if ab.target != Ability.Target.ALLY and (ab.damage > 0 or ab.pressure > 0 or sid != ""):
-		# BATCH JM §0 — A HEX THAT REACHES EVERY HERO lays it on the heroes and never on a companion, so its reach names the heroes;
-		# an area blow reaches the companions too, and keeps its own line.
-		if ab.aoe and ab.special == "warband_hex":
-			lines.append("Reaches every hero")
-		elif ab.aoe:
+		# BATCH JO §2 — A HEX RIDES A BLOW, so a hex on an area blow reaches what the blow reaches, the companions too, and says so
+		# on the blow's own line; the line JM §0 gave a hex that reached the heroes alone went with the hex special.
+		if ab.aoe:
 			lines.append("Hits every ally")
 		elif ab.random_hits > 0:
 			lines.append("Hits %d times, each at random" % ab.random_hits)
@@ -8866,7 +8864,7 @@ func _intent_ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# **IT REFUSES EVERYTHING BUT THE UNIT'S OWN BASIC ATTACK, AND THE TEST IS
 	# IDENTITY AGAINST `_cheapest_attack` RATHER THAN `cost > 0`.** The first
 	# version of this clause tested cost, on the assumption that an enemy's
-	# better options are the ones it pays for. **THEY ARE NOT: 46 OF THE 50 (70 OF 74 WITH JK's SPENDS, 74 OF 78 WITH JL's HEXES)
+	# better options are the ones it pays for. **THEY ARE NOT: 46 OF THE 50 (70 OF 74 WITH JK's SPENDS, 74 OF 78 WITH JL's HEXES, 72 OF 76 SINCE JO §2 FOLDED TWO)
 	# ENEMY ABILITIES IN `data/enemies.json` COST ZERO** — Chain Lightning,
 	# Healing Wave, Sundering Strike and Poison Arrow among them — so a cost
 	# test would have left the card refusing FOUR abilities in the whole game
@@ -9124,12 +9122,10 @@ func _choose_enemy_action(u: BattleUnit, ticks_ahead := 1) -> Dictionary:
 	# is now reachable and says "nothing to declare" rather than indexing [0].
 	if affordable.is_empty():
 		return {}
-	# BATCH JL §2 — THE HEXES: a move that lays one of the four on a hero and deals nothing, so the line above (`damage > 0`)
-	# would never reach it — the Regalia trap. It stands among the moves the selection picks from at random, as the
-	# afflictions always have, whenever it is ready and some hero in reach does not already carry it, and it is aimed at one
-	# who does not (a hex that reaches every hero — Gall, since JM §0 — is laid on every hero standing). A Broken hero is still exploited with the hardest blow.
-	var hexes: Array = u.abilities.filter(func(a): return a.special == "warband_hex" \
-		and _eff_cost(u, a) <= u.resource and _enemy_ready(u, a, ticks_ahead) and not _hex_open(living, a).is_empty())
+	# BATCH JO §2 — THE HEXES RIDE BLOWS: no warband move lays a status on a hero unless it deals damage (the designer's), so a
+	# move that lays a hex is an attack the line above reaches, chosen as the attacks are and aimed through the draws and the
+	# evasions below, and a single blow rolls its miss in the strike loop (an area blow rolls none, as every area blow). JL §2's branch — a hex standing beside the attacks, aimed at a hero
+	# who did not carry it, past the draws and with no miss — went with the hex special.
 	var broken_heroes := living.filter(func(h): return h.broken)
 	if not broken_heroes.is_empty():
 		# Exploit a Broken hero with the hardest-hitting attack they can afford.
@@ -9143,11 +9139,7 @@ func _choose_enemy_action(u: BattleUnit, ticks_ahead := 1) -> Dictionary:
 		# Prefer finishing off wounded heroes; sometimes spread damage.
 		# Threatening Presence: Warriors draw 20% more of the random picks.
 		target = _lowest_hp(living) if randf() < 0.40 else _threat_pick(living)
-		ab = (affordable + hexes).pick_random()
-		if ab.special == "warband_hex":
-			var hx_open := _hex_open(living, ab)
-			return {"ability": ab, "target": _lowest_hp(hx_open) if randf() < 0.40 else _threat_pick(hx_open),
-				"support": false, "message": "", "logs": []}
+		ab = affordable.pick_random()
 		# Savage Presence (Ursus): the LIVE bear draws 15% of attacks its
 		# way, scaled by the bond curve — a certainty at a deep enough bond,
 		# which is what an uncapped meter is supposed to buy.
@@ -9201,14 +9193,6 @@ func _choose_enemy_action(u: BattleUnit, ticks_ahead := 1) -> Dictionary:
 					gh_was.unit_name, _evade_source(gh_was)], "#8ab070"])
 	return {"ability": ab, "target": target, "support": false,
 		"message": message, "logs": logs}
-
-
-# BATCH JL §2 — WHOM A HEX CAN TAKE, of the bodies the selection may aim at: a hero (a companion takes no turn and holds no
-# resource bar, so a hex on one would be spent on little but a Gall) who does not already carry it. No draw and no evasion
-# moves a hex once it is aimed, and it rolls no miss: it is a `special`.
-func _hex_open(pool: Array, ab: Ability) -> Array:
-	var hx_id := String(ab.applies_status.get("id", ""))
-	return pool.filter(func(h): return not h.dead and not h.is_companion and not h.has_status(hx_id))
 
 
 # Weighted random target: Warriors weigh 1.2, everyone else 1.0.
@@ -24978,39 +24962,6 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			tp_spent = int(malice_ledger["spent"]) - tp_spent
 			_log("%s: Dark Vigil — its whole warband regains 6%% of its own health (%d in all)%s" % [
 				attacker.unit_name, tp_total, " — %d Malice" % tp_spent if tp_spent > 0 else ""], "#70d878")
-		"warband_hex":
-			# BATCH JL §2 — A HEX: the warband lays one of its four on a hero — Gall, Sap, Mire or Fester, the move's own
-			# `applies_status` — through the status door, its applier the caster (Fester's tick reads its Attack). A hero who
-			# already carries it, a companion or a hero gone gives way to another hero who carries none; with none, nothing.
-			# BATCH JM §0 — A HEX THAT REACHES EVERY HERO (`aoe`, the data's reach key; Gall since JM) is laid on every hero standing
-			# — never a companion, which `heroes` does not hold — each through the same one door, a hero who carries it taking its
-			# clock back. Its aim is the selection's as any hex's: it is chosen while some hero in reach lacks it.
-			var hx_id := String(ab.applies_status.get("id", ""))
-			var hx_ts: Array = []
-			if ab.aoe:
-				hx_ts = heroes.filter(func(h): return not h.dead)
-			else:
-				var hx_t: BattleUnit = target
-				if hx_t == null or hx_t.dead or not hx_t.is_hero or hx_t.is_companion or hx_t.has_status(hx_id):
-					var hx_open: Array = heroes.filter(func(h): return not h.dead and not h.has_status(hx_id))
-					hx_t = hx_open.pick_random() if not hx_open.is_empty() else null
-				if hx_t != null:
-					hx_ts = [hx_t]
-			if hx_ts.is_empty() or not STATUS_INFO.has(hx_id):
-				_log("%s: %s finds no hero to hex" % [attacker.unit_name, ab.display_name], "#909090")
-			else:
-				var hx_took: Array = []
-				for hx_t in hx_ts:
-					_apply_status(hx_t, hx_id, int(ab.applies_status.get("turns", 0)), 0, _dot_tick(hx_id, attacker), attacker)
-					if hx_t.has_status(hx_id):
-						hx_took.append(hx_t.unit_name)
-				# The door may refuse it (a Hallowed hero), and says so itself; the hex is announced only where it took hold.
-				if not hx_took.is_empty():
-					var hx_who := "every hero" if ab.aoe and hx_took.size() == hx_ts.size() else ", ".join(hx_took)
-					_sfx("hit", -10.0, 0.7)
-					_message("%s: %s on %s!" % [attacker.unit_name, ab.display_name, hx_who])
-					_log("%s: %s on %s — %s" % [attacker.unit_name, ab.display_name, hx_who,
-						String(STATUS_INFO[hx_id][3]).split("\n(")[0].replace("\n", " ")], "#a070c0")
 		"malice_raise":
 			# BATCH JK §1 — RAISE: a fallen body of the warband stands back up at `MALICE_RAISE_PCT` of its health, once a body a fight,
 			# and the pool pays the health it stood up with. `_die()` laid its Break down with it (JD §3) and `take_hit` lays none

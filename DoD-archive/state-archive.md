@@ -17,6 +17,141 @@ heading stands in both files. **Since JE §3 it also takes what `CLAUDE.md` clos
 
 ---
 
+## ARCHIVED AT JO — 2026-11-06, FROM `docs/state.md` AS JN LEFT IT (`aa6f75f`)
+
+*Five blocks, six items and one block's figures, in the order they stood. JN's nine rulings, answered in JO's brief: all accepted as taken. JN's premises, its Break-unpriced item, which JO §1 closed, and its three later moves, re-read on the priced line in FOUND AT JO; JM's Gall priced by what it denies, which JO §2 answered; JL's hex uptime and its unpriced debuffs, the first read on the standalone hexes JO §2 retired and the second named again in FOUND AT JO; JB's and IY's findings, records that ask nothing; GJ's completion re-measure, a record the floor (no batch reads a completion figure) leaves asking nothing; IZ's two balance records and the figures of HOW LONG A FIGHT IS, readings the floor retires, archived for the state's room.*
+
+### ~~JN's RULINGS OWED~~ — **ALL NINE ANSWERED IN JO's BRIEF (§0): all accepted as taken**
+
+*Its head as it stood: NINE; EACH TAKEN ON THE RECOMMENDATION, NONE HOLDING ANYTHING UP*
+
+Full working: `docs/reports/JN.md`, NEEDS A RULING.
+
+1. **A KIND's SECOND DAMAGING MOVE IS THE FIRST MOVE AFTER ITS BASIC, IN THE DATA's ORDER, THAT DEALS DAMAGE (JN §1).** The derivation names 10 kinds, not the brief's eleven — the eleven was the content hole's count, which held the Orc Shaman, Shieldmaster and Ritual Chanter (no second damaging move) and left out the Bog Troll and the Rot Behemoth. **Taken**: the ten raised; the five whose other moves deal nothing (the Orc Totemist (Healing Wave), the Orc Shieldmaster (Shielding), the Orc Shaman (Healing Wave), the Orc Ritual Chanter (Cleansing Rite), the Grave Totem (Dark Vigil)) left with one damaging move and named, no move authored; and three later moves under the line on kinds whose second clears or was raised — Chieftain's Maul 1.21, the Hollow Crown's Sundering Decree 0.74, the Orc Hexer's Bone Rattle 0.36 — left and named. **The alternative**: every damaging move under the line raised, three more. **Reversing it** is three data keys and `check_jn` §1's walk.
+2. **A MOVE's BREAK DAMAGE IS NOT PRICED (JN §1 premise 1).** The kit row's third field is `pressure`, the move's Break damage; a hero whose meter fills is Broken and loses his next turn. JI's line prices damage, Burn and Poison, and reach — never Break damage, never delay — and three of the raised moves are Break moves, each laying more Break damage than damage before the raise (Skull Crack 12/38, Overhead Crush 28/50, Blood Tribute 20/24). Hero Breaks a fight, JN's probe: 1.23 (1228 over 995 fights) / 1.23 (926 over 751 fights) / 1.09 (562 over 514 fights) (JM's tree / §1 alone / the tree that lands). **Taken**: the brief's line as written; every raised move's Break damage as it stood. **The alternative**: price Break damage, which needs an exchange rate from a point of Break damage to a hero turn to damage that nothing in the tree holds — the raise would be smaller on the Break moves. **Reversing it** is the derivation and ten data keys.
+3. **THE BELLOW's HAND-TUNE IS RETIRED (JN §1).** JJ §0 gave it a 2 by hand at 1.37; at 15 it prices 1.46 and the rule gives the same 2, so the exception went with its reason (DR §2): `check_ji`'s `TUNED` holds none, `check_jj` §5 asks that none stands. **The alternative**: keep the tune beside a rule that now says the same. **Reversing it** is one line in each gate.
+4. **THE CLERIC's CUT IS AT THE BAR's SETTER, IN A FIGHT, ARMED ONCE THE OPENING BAR IS SETTLED (JN §0.1).** Every rise of a Cleric's bar in a fight passes `BattleUnit.resource`'s setter, Sap's door — the drip, a card's gain, a potion drunk in the fight, a refund — so the cut is there, `CLERIC_MANA_CUT` (50%), rounded in his favour; the bar he carries in, the Bottled Storm's floor and the spawn's loads are no gain. **It supersedes two rulings, recorded, not deleted**: IG's *the rate stays 12* and the playtest's *Mana stays*. **What it also does**: Sap and the cut compound on a sapped Cleric (each on the rise the other leaves); Recant's share, the Mana Potion's 40%, every talent and rune that pays a Cleric Mana in a fight — Siphon's draw among them, which `check_ic` §1c(b) reads cut — and Divine Plea's and Dark Pact's Perfects land cut on a Cleric, each card's words stating what it hands over and the class line stating the cut, as Holy Conduit's states the healing it adds; Resurrection raising a fallen Cleric lands his bar cut; and the IV probe's full-bar what-if reads short on a Cleric. **The alternatives**: the drip alone (`_mana_regen`), one door of several; or the four doors outside a fight too (the map's potion, an event, the Hourglass, a zone's restoring). **Reversing it** is the arming line in `battle._spawn_units`.
+5. **BOIL OVER's FLAT FIGURE (JN §0.2).** *1.5 extra damage per point of Rage* is read as the blow's whole damage, 1.5 a point poured — the card has no other damage to be extra to — never scaled by the caster's Attack, still met by armour, resistance, a crit and every multiplier. The brief's *share of the target* was a share of the caster's Attack (0.8% a point); the floor is the least bar it may be cast with. **At the top of the range** a full bar of 100 deals 150 before armour — on `check_hz` §2's board 118, and 150 there with the Berserker's core — 2.62 and 2.88 of the best ordinary turn, Rampage, where 0.8% of Attack dealt 63 and 88 — and a cast at its floor 47 and 55, past Crushing Blow's 30 and 31; 1.18 a point of Rage on that board, about the median Rage card's rate, where at 0.8 a full bar converted 0.63 a point, worse than every Rage card but the two that buy something besides damage — **past the dump rule's shape, which `CLAUDE.md` now records as superseded for Boil Over**, and a lever the old tension asked for. **The alternatives**: on top of the old share (230 at a full bar and Attack 100); or a rate that rises with the fraction poured (BOIL OVER'S RATE's unauthored lever). **Whether the dump rule stands for a later dump**: taken as standing until ruled. **Reversing it** is one constant and the strike line.
+6. **SANCTITY STAYS (JN §0.3).** Read out, unchanged: it is the Hierophant's engine, and things wait on it (SANCTITY's STEP). **The alternative**: retirement, which would orphan the Rune of the Hierophant, the readout's field and fourteen gates.
+7. **ARM B's TALENT POLICY: TIER 1 WHOLE (JN §2).** The bot cannot choose cells; it wears every cell of the first N tiers. A player at Warden has tier 1 open at most until Warden's end boss falls, so **every cell of tier 1** is the upper bound of a tier-1 player and the simplest defensible policy — named in the census (DV36) — with tiers 1 and 2 run beside it. **The alternatives**: a chosen part of tier 1 (no reading ranks one node against another); tiers 1 and 2. **Reversing it** is the arm's line.
+8. **THIN AIR's RE-READ IS RECORDED, NOT REPAIRED (JN §0.1).** +17.86 ± 1.14 on the tree that lands, band 5; its grade stays 5. The move against JM's reading carries §1 and §0 together. **Reversing it** is a re-grade, the designer's.
+9. **THE ARMS GO BEYOND THE BRIEF TWICE (JN §2).** Arm A's tree that lands carries §0 too (the reference four's Devout is a Cleric), so a third arm on HEAD with §1 alone reads §1 by itself; and Arm B's talented arms are paired against the same line untalented on the same tree, so the talents are read apart from §1 and §0. **Reversing it** is dropping the two arms.
+
+### FOUND AT JN AND NOT FIXED — ITS CLOSED ITEMS (archived at JO: a brief's premises, Break priced since JO §1, and the three later moves re-read on the priced line (FOUND AT JO); the block stays in `docs/state.md`)
+
+- **THE BRIEF's PREMISES THAT DID NOT HOLD** (JN §0; `docs/reports/JN.md`'s premise table): JM's four corrections hold — *HZ's tree* is JH's, `141b0be`; **Fleeting is a grade 2 and Encumbered a 1**; three of the five grades rest on a run seed (Miasma's on another population too); the six owed triggers were JL's. Of the brief's own: **the derivation names 10 kinds, not about eleven**; **Blood Tribute deals damage** (20, a quarter more for every one of its warband fallen), so the Orc Bloodcaller is one of the ten; **Boil Over was a share of the caster's Attack, not of the target**, and its floor is the least bar it may be cast with, not a floor on its damage; **the playthrough never drafted it** (its readout holds no Boil Over), so the Rage at a cast is JN's probe's; **the party's healing claws back half to two-thirds of an added pressure** held of Ambushed alone (JB §3) and was found false at JC and JL; and **talented figures exist** — the sim's default wears the whole tree, the incumbent at Ruin is talented, and the reference four's 5 of 60 at Warden stood beside the incumbent's 60 of 60 (FOUND AT JF). **A brief cites only what the repository holds** (`docs/ways-of-working.md`).
+- **A MOVE's BREAK DAMAGE IS UNPRICED, AND THREE OF THE RAISED MOVES ARE BREAK MOVES** (JN §1 premise 1; JN's ruling 2): the kit row's third field is `pressure`; a hero's Break costs him his next turn, about one a fight on the reference four (JA's census: 733 over 559 fights at Wanderer; JN's probe at Warden: 1.23 (1228 over 995 fights) on JM's tree, of them 327 (26.6%) by one of the ten). Skull Crack, Overhead Crush and Blood Tribute each laid more Break damage than damage before the raise. JI's line prices neither Break damage nor delay — Overhead Crush at 1.40 strikes slower than Smash by as much (56 over 3.5 against 40 over 2.5), so a turn of it buys no more damage than a basic's, and Swampy Grasp buys 1.17 of Claw's.
+- **THREE LATER MOVES STILL SIT UNDER THE LINE** (JN's ruling 1): Chieftain's Maul 1.21 and the Hollow Crown's Sundering Decree 0.74 on kinds whose second clears, and the Orc Hexer's Bone Rattle 0.36 behind its raised Withering Hex — the Hexer still attacks with a basic, a move worth taking and something weaker.
+
+### FOUND AT JM AND NOT FIXED — ITS CLOSED ITEMS (archived at JO: JI's line prices nothing a hex denies since JO §2, and Gall rides a blow; the block stays in `docs/state.md`)
+
+- **GALL ON EVERY HERO, PRICED PAST TWICE ITS CARRIER's BASIC, DID NOT MAKE THE GAME HARDER** (JM §1's split at JL's tree; `docs/reports/JM-arc.tsv`): JL → the tree that lands, §0's two edits alone — health at a fight's end +1.77 ± 0.90 points (z +1.96) (a tie at the edge, leaning easier); falls a fight −0.074 ± 0.037 (z −1.99) (a tie at the edge, leaning easier); fights won a run +0.85 ± 0.71 (z +1.19) (a tie); the warband's blows a fight −0.51 ± 0.30 (z −1.70) (a tie). It is cast far more (39 → 330 times over every fight; up on 0.22% → 5.95% of hero turns), and each cast is an Orc Archer turn that was an Arrow Shot or a Poison Arrow, so the warband's blows fall. **JI's line prices Gall at 2.02 of the blow its cast gives up, so a cast should press harder; the split leans the other way, a tie at the edge** — so either the census's figure for what Gall denies (half of 7.08 a hero turn, over three turns, on four heroes) over-prices what it denies in play, or the difference is noise. Named, nothing tuned; JM's ruling 2, accepted at JN §0.
+
+### FOUND AT JL AND NOT FIXED — ITS CLOSED ITEMS (archived at JO: the hex moves' uptime, read on the standalone hexes JO §2 retired, and the unpriced debuffs named again in FOUND AT JO; the block stays in `docs/state.md`)
+
+- **THE HEXES BARELY FIRE** (JL §3): up on under half a percent of hero turns over all fights, Fester on 0.06%, and on 3.96% to 7.91% of them in the fights each one's carrier acted in — its carrier, the Rot Behemoth, is a zone two and three body met in few fights, and a run ends sooner now. Every hex was laid; none carries the difficulty. **What would**: carriers met more often — the Orc Archer, a kind the data names `hexer` that carries none, acted in 265 of JL's 946 fights — a hex first when ready (JL's rulings 7, 11, accepted at JM §0). **Since JM §0 the Orc Archer carries Gall, on every hero**: on the tree that lands Gall is up on 5.95% of hero turns over all fights (THE ARC, READ WHOLE).
+- **THE OTHER FIVE NON-DAMAGE DEBUFFS THE WARBAND LAYS STAY UNPRICED** (the blocks' reader; FOUND AT JI): Sunder, Exposed, Cripple, Slowed and Dazed — Burn and Poison are priced by JI's line as damage, and the four hexes are the first non-damage debuffs priced, so Mire is priced and its twin Slowed is not.
+
+### ~~FOUND AT JB AND NOT FIXED~~ — **ARCHIVED WHOLE AT JO: JB's ties at a cut, named; nothing asked**
+
+- **AMBUSHED's GRADE SITS AT A CUT, AND THE CURVE BENDS THERE** (JB §3): on the reference party +6.67, +9.03 and +15.47 at 8, 9 and 11, with 50, 49 and 38 of 60 runs finished; on the incumbent +12.02 at 8 and +15.07 at 9, with 36 and 30 of 60 against the *none* arm's 59. The incumbent's reading at 8 stands 0.20 under grade 5's floor, inside two standard errors: **named here as a tie at the cut (IP §0.4).** *Pooled with JD's +12.34 ± 1.46 at JE: +12.149 ± 1.23, 0.068 under the cut, still a tie at it (`docs/reports/JE-pooled.tsv`).* The healing rises about 90 at each value on the reference party and has no more to give, so **one turn either way is a grade**, and a re-tune is a re-measure. A forced arm lays it on every bargain and every fixed encounter, so its finishes are the floor, not the rate.
+- **FRACTURED IS A TIE ON THE INCUMBENT** (JB §3): +0.33 ± 0.21 (z 1.54), because the warband Breaks that party almost never (278 Breaks in 1,658 fights). IZ §0.3's arm, taken because a Break rule is graded on a build whose plan is Break; the grade is the reference party's. A first read on an earlier deck gave -0.25 ± 0.24, also a tie.
+- **POROUS STANDS A SHADE PAST A CUT** (JB §3, IP §0.4): its two reference readings, +1.86 and +2.09, sit 0.08 and 0.31 past grade 2's floor of 1.78, inside two standard errors of it. Named here as a tie at the cut, with no second seed block: the later reading is the grade's.
+- **ALL FOUR GRADES SIT INSIDE TWO ERRORS OF A CUT** (JB §3, IP §0.4): Ambushed and Porous are named above. **Outpaced's 2 is +2.10 ± 0.51, 0.63 errors past grade 2's floor of 1.78, and Fractured's 1 is +0.86 ± 0.29, 1.31 errors past grade 1's floor of 0.48, under which it would carry no severity.** Each is a tie at its cut, named here as arbitrary, with no second seed block.
+
+### ~~FOUND AT IZ AND NOT FIXED~~ — **ARCHIVED WHOLE AT JO: IZ's two balance records — Tinderbox's shares, recorded beside its shape in `docs/design-notes.md`, and Deadened's grade; since JO no batch reads a grade**
+
+- **TINDERBOX WAS A ONE-SIDED RULE IN TWO-SIDED WORDS** (IZ §5's derivation, read after the stop condition decided it): on the fire party the heroes dealt 48,626 fire against the warband's 4,173 over ten runs — about twelve to one — so *every fire strike +75%, whoever deals it* fed the heroes far more than it charged them, which is IP §0.2's shape (*a rule keyed on a quantity the two sides do not produce equally pays the side that produces more of it*), the Hungering Dark's. Recorded beside its built shape in `docs/design-notes.md`; a fire rule authored again, if the deck reopens, names the two sides' shares first.
+- **DEADENED's REFERENCE READING IS FREE AND ITS GRADE IS 3** (IZ §1): +0.40 ± 0.29 on the default four (z 1.38), +5.23 ± 0.92 on the incumbent — the widest swing on IZ's readings, from no severity to three; the grade is the incumbent's (IY §0.3), and the default four cannot feel what it takes because their plan is not Break.
+
+### ~~FOUND AT IY AND NOT FIXED~~ — **ARCHIVED WHOLE AT JO: IY's two records; nothing asked**
+
+- **IX's ABSORPTION READING IS NOT CONFIRMED** (§3): on the two-sided reach arms the healing moved with the cost (Hoarfrost, -29.3 a bargain fight at 99 turns, down where absorption would have it rise) or not at all (Frenzied — Leaden's multiplier then — +0.1 at 3.0). IX read it off ONE-SIDED halves at the deck's values, which IY did not re-take; it stays read, not proved.
+- **THE WARBANDS WERE ALREADY PAIRED**: the map composes every node's warband when its zone is generated, so the run seed always decided which warbands a run meets; the fight seed pairs the dice from each node on (IY §1). A batch reading IX's *pairing buys little* as *the warbands diverge* reads it wrong.
+
+### ~~EVERY COMPLETION FIGURE DATED BEFORE GJ EXCLUDED THE FINAL FIGHT~~ — **RE-MEASURED AT GJ, BOTH WAYS** — **ARCHIVED WHOLE AT JO: a record of GJ's re-measure; since JO no batch reads a completion figure**
+
+- **Until GJ the sim ended every run at the third zone boss**, so a "completion" was a run that killed the third zone
+  boss — encounter 48 of 49, never the end boss. **That is what EN's 97 / 3 / 0, EO's and EP's arms and every
+  completion quoted since measured.** They stay readable as that: they are not wrong, they are a different count.
+- **RE-MEASURED AT GJ, UNTALENTED, 150 RUNS A RUNG, BOTH COUNTS OFF THE SAME RUNS: THE DELTA IS ZERO.** The end boss
+  stopped none of the runs that reached it at rungs 1 and 2, and no run reached it at rung 3, so counting the final fight
+  moves no rung's completion by a run. The table, HEAD's control and the rung-1 split are `docs/reports/GJ.md` §1b–§1e.
+- **NOT RE-MEASURED, BY THE BRIEF'S SCOPE:** EP's rows-3 and rows-9 arms, EV's, FV's and every other arm. Each stays a
+  third-zone-boss figure until a batch re-reads it.
+
+### HOW LONG A FIGHT IS — ITS FIGURES (archived at JO: the rounds tables, ramp arrival, the Loyalty and Faith rows and their two confounders, stale since DK, and since JO no batch re-reads a balance figure; the block stays in `docs/state.md` with its two instrument facts)
+
+**STALE SINCE DK. NOT ONE FIGURE BELOW HAS BEEN RE-MEASURED SINCE FIVE PARTY-WIDE EFFECTS BEGAN
+REACHING A FIFTH BODY.** Quote none of them as current — re-run the sim first.
+- **FU RE-MEASURED ONE CELL, THE ONE ITS BRIEF QUOTED: RUNG-1 UNTALENTED TRASH.** `DOD_SIM_ROWS=0`,
+  rung 1, `--run 100` per party, the default party with its Mage swapped: **7.48 / 8.23 / 8.04
+  rounds** for the Pyromancer / Cryomancer / Arcanist parties (n = 1,144 / 1,162 / 1,102 trash fights);
+  elite 7.27 / 7.79 / 7.33, boss 10.87 / 10.07 / 10.50. **The Cryomancer party IS the default party,
+  and EO read 9.1–9.2 on it** — so the "~9 rounds since EO" a brief quoted is about a round long now.
+  The ROWS=3 and ROWS=9 tables below were not re-run.
+- **FV READ THE SAME CELL ON FIVE PARTIES** (`DOD_SIM_ROWS=0`, rung 1, `--run 100` each): trash rounds ran from about 6 to
+  about 10.5 across them, the default party's about a quarter-round from FU's reading — **a fight's length is a property of the
+  PARTY**, so a rounds figure travels only beside the party it was taken on. The five figures are `docs/reports/FV.md`'s premise
+  table (IM §0.7).
+- **Rounds to resolution, measured as TURNS PER LIVING PARTY MEMBER** (companions excluded from
+  both halves), over four `--run 25` sims **after DA**: three to six turns per hero at every rung and kind. **DA's table is
+  `docs/reports/DA.md`'s (IM §0.7), and EN's below supersedes it.**
+  - **RE-MEASURED AT EN, `--run 30` A RUNG ON THE LIVE TREE, AND DA's ROUNDS TABLE IS
+    SUPERSEDED BY THIS ONE:**
+
+    | party / rung | trash | elite | boss |
+    |---|---|---|---|
+    | 1 wanderer | **4.4** (n=367) | **3.8** (n=358) | **4.1** (n=90) |
+    | 2 warden | 4.3 (n=240) | **3.7** (n=246) | 4.4 (n=57) |
+    | 3 ruin | 4.4 (n=235) | **4.0** (n=225) | 5.4 (n=55) |
+
+    **EP ADDED THE ROWS-3 PAIR AND IT IS THE ONE THAT ANSWERS "IS RUNG 2 A DIFFERENT FIGHT".**
+    Measured `DOD_SIM_ROWS=3`, `--run 100` a rung — the loadout a single rung-1 clear buys:
+
+    | party / rung, rows 1-3 | trash | elite | boss |
+    |---|---|---|---|
+    | 1 wanderer | **7.8** (n=1138) | **7.3** (n=1246) | **10.0** (n=297) |
+    | 2 warden | **7.4** (n=871) | **6.9** (n=946) | **10.1** (n=177) |
+
+    **The rung-2 fight is not longer, not shorter and not different.** Enemy health is
+    bit-identical between the two rungs, `stability` is a flat 100 on all 21 kinds and hero
+    `pressure` is untouched, so the Break gate costs the same hero turns and the fight runs the
+    same length — the enemy simply hits twice as hard while it happens. **Rung 2 untalented reads
+    7.5 / 7.4 / 10.9 and fully talented 4.4 / 3.7 / 4.8**, so talents SHORTEN the fight and the
+    rung does not.
+
+    **THE RUNG-1 ROW BELOW IS EO's AND THE OTHER TWO ARE EN's.** EO §2 stopped the rung discounting
+    enemy HEALTH, which lengthens a rung-1 fight and no other; re-measured at `--run 30`,
+    `DOD_SIM_ROWS=9`, it moves 3.9 / 3.4 / 3.8 → **4.4 / 3.8 / 4.1**. **Rungs 2 and 3 did not move
+    and were not re-measured** — the health multiplier floors the rung at 1.0, which is
+    bit-identical above rung 1 on 6 of 6 products. **The fully talented party still completes rung
+    1 at 100%** (30 of 30), which is the point EN made: a party that has already been through the
+    door the rung is finds it a formality either way. **The elite is still the shortest of the
+    three kinds at rung 1**, so EN §5's acceptance is unaffected.
+- **RAMP ARRIVAL, per-battle peak against what the spec is built around, AFTER DA:**
+
+  | spec | meter | rung 1 | rung 2 | rung 3 | SS party |
+  |---|---|---|---|---|---|
+  | Berserker | Blood Frenzy (of 40) | 17.1 | **20.7** | 22.6 | 26.2 |
+  | Devout | Faith (of 3) | 2.2 | **2.2** | 2.0 | 2.3 |
+  | Devout | releases/battle | 1.93 | **2.60** | 2.48 | 3.62 |
+  | Beastmaster | Loyalty (of 5) | 19.3 | 21.2 | 19.9 | — |   *(DA's, and see EQ below)*
+  | Sharpshooter | Focus (of 100) | — | — | — | 128.2 |
+
+  **Loyalty and Focus still over-arrive and have not been touched.**
+  - **THE LOYALTY ROW WAS RE-MEASURED AT EQ AND AGAIN AT ER; THE 21.2 IS A `rows=9` FIGURE.** ER's arms (the per-battle
+    deepest bond, rung 2, untalented / rows 1–3 / fully talented, each reproducing EQ within its standard error) are
+    `docs/reports/ER.md`'s, EQ's rung-1 arm `docs/reports/EQ.md`'s (IM §0.7); the two the Loyalty curve was priced on stand in
+    its own section above. **The rung makes the meter SHALLOWER**, because its governor is the companion's death and rung
+    2 kills companions three times as often. **Do not quote 21.2 as the meter's level — quote the loadout with it.**
+- **THE FAITH DECOMPOSITION AT RUNG 2, AFTER DA — AND STALE SINCE DK for the healing row**: its figures (absorbs, the ground's
+  drip, what lands on the Devout's own meter, the ground's uptime and the Devout's healing a battle across four arms) are
+  `docs/reports/DA.md`'s (IM §0.7). **Faith per absorb ACTUALLY LANDED was 1.56 against the 2 the constant promises.** The
+  healing row is stale: Sanctuary, Rally and the Field Medic now reach a fifth body, so every arm of it will rise.
+- **TWO CONFOUNDERS ON EVERY FIGURE ABOVE: the sim party is FULLY TALENTED (`rows=9 of 9`)**, and
+  **it wears each tree's FIRST lane — 24 of 36 lanes have never been measured at all.**
+
 ## ARCHIVED AT JN — 2026-11-06, FROM `docs/state.md` AS JM LEFT IT (`994f747`)
 
 *One block and eighteen items. JM's ten rulings, answered in JN's brief: all accepted as taken. The content hole the arc left, which JN §1 closed for eight of its eleven kinds: every kind's second damaging move prices at the line since JN, so no kind with a second damaging move attacks with a basic and something weaker — the Orc Shaman, Shieldmaster and Ritual Chanter attack with a basic alone, and the Orc Hexer's third move, Bone Rattle, stays under the line, both named in FOUND AT JN. And, the state's ceiling reached, sixteen items that ask nothing or are closed: ten premise and beyond-the-brief records of eight batches (IZ's, JC's, JF's, JH's, JI's, JJ's, JL's and JM's — JI's, JJ's, JL's and JM's at JN's first pass, IZ's, JC's, JF's and JH's when JN's readers' repairs took the file past its ceiling again), JM's probe anchor, JK's books, JJ's routing share, the support fallback's reach JL closed (JK's and JL's items), and JI's read of the moves that lay a debuff and carry no cooldown, which JN's raise superseded (FOUND AT JN).*

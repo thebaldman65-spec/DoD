@@ -17,6 +17,8 @@
 extends SceneTree
 
 const Gate = preload("res://gate_fixture.gd")
+# JI's LINE AND, SINCE JO §1, ITS BREAK PRICE: the one blow every gate on the line prices through.
+const JI = preload("res://check_ji.gd")
 
 const LINE_SOURCE := "res://check_ji.gd"
 const DECK_CLOSED_AT := 25
@@ -34,9 +36,15 @@ const KEPT_PLAYED := "res://docs/reports/JN-played.tsv"
 const KEPT_THINAIR := "res://docs/reports/JN-thinair.tsv"
 const CENSUS := "res://docs/reports/IU-bot-divergence.tsv"
 # THE DATA AS IT STOOD, every cooldown key aside and each raised move's damage aside: no other figure moved (C03). Printed below.
-const DATA_REST := "3684af8e932a63e128de85b8cc8174b3"
+# JO re-pinned it: JO §2 put the four hexes onto blows — Sap and Fester folded onto Bone Rattle and the Wretched Bellow, Gall and Mire
+# given damage, the hex special gone — and `check_jo` §1 and §2 hold that nothing else moved.
+const DATA_REST := "09f6815f57f2a8d102ed42c543304d82"
 # SANCTITY's STEP, AS IT STANDS — read out at §0, never changed (C10).
 const SANCTITY := {"SANCTITY_PER_STEP": 13, "SANCTITY_MAX_STEPS": 5, "SANCTITY_STEP_TURNS": 1}
+# THE TREE JN's THIN AIR RE-READ STANDS FOR — JN's tree that landed, its game digested by `_tree_digest`. Since JO no batch re-reads a
+# grade (balance is the designer's, judged by playing), so the tripwire that asked the next tree for its own re-read asks the record
+# instead: the reading names the tree it was taken on.
+const JN_TREE := "dedc365eb93690557e5bc51ef514ebb4"
 const SEATS := ["warden", "pyromancer", "inquisitor", "beastmaster"]
 # The Devout's seat (a Cleric) and the bar he carries in, under his maximum: a rise the spawn writes, never a gain.
 const CLERIC_SEAT := 2
@@ -69,6 +77,7 @@ var _line := 1.4
 var _reach := 4
 var _figs: Array = []
 var _top := 4
+var _price := -1.0
 var _pop: Array = []   # [kind, move, damage, band, multiple], derived by §1
 
 
@@ -251,6 +260,8 @@ func _read_the_line() -> void:
 	for p in pairs.search_all(m4.get_string(1)):
 		_figs.append([float(p.get_string(1)), int(p.get_string(2))])
 	print("    JI's line, read out of its source: %s times a move's own basic, an area blow on %d, bands %s, top %d" % [str(_line), _reach, str(_figs), _top])
+	_price = float(JI.break_figures().get("price", -1.0))
+	ok(_price > 0.0, "§1: JI's Break price could not be read off its source")
 
 
 func _dot() -> Dictionary:
@@ -258,12 +269,9 @@ func _dot() -> Dictionary:
 	return v if v is Dictionary else {}
 
 
-func _blow(a: Dictionary, dot: Dictionary) -> float:
-	var st: Dictionary = a.get("applies_status", {})
-	# A POISON SKIPS THE TURN IT LANDS (`_dot_pass`, its `fresh` flag), so it ticks one fewer than its turns; a Burn ticks every one.
-	var ticks := maxf(0.0, float(st.get("turns", 0)) - (1.0 if String(st.get("id", "")) == "poison" else 0.0))
-	var tick := float(dot.get(String(st.get("id", "")), 0)) * ticks * float(a.get("status_chance", 1.0))
-	return (float(a.get("damage", 0)) + tick) * (_reach if bool(a.get("aoe", false)) else 1)
+# A MOVE's WORTH ON JI's LINE, through its one blow: the kind's Attack scaling its damage and its DoT, its Break at the price (JO §1).
+func _blow(a: Dictionary, dot: Dictionary, atk: float) -> float:
+	return JI.line_blow(a, dot, atk, _price)
 
 
 func _figure(m: float) -> int:
@@ -329,7 +337,9 @@ func _s0_the_rulings() -> void:
 			stale.append(p)
 	ok(stale.is_empty(), "§0: an answered ruling is still cited as owed in %s" % [stale])
 	# THE BRIEF's FOUR CORRECTIONS, IN THE RECORD: the tree before the arc by its commit, and the two grades the brief misread.
-	var found := _flat(_block(state, FOUND_HEAD))
+	# SINCE JO THE PREMISES ITEM IS ARCHIVED WORD FOR WORD (a record that asks nothing): the corrections stand among FOUND AT JN's
+	# closed items in the archive, or in the block while it held them.
+	var found := _flat(_block(state, FOUND_HEAD)) + " " + _flat(_block(_doc("res://DoD-archive/state-archive.md"), FOUND_HEAD + " — ITS CLOSED ITEMS"))
 	var lacking: Array = ["141b0be", "Fleeting is a grade 2", "Encumbered a 1"].filter(func(x): return not found.contains(String(x)))
 	ok(found != "" and lacking.is_empty(), "§0: the record does not carry the brief's corrections: %s" % [lacking])
 
@@ -414,11 +424,11 @@ func _s0_the_thinair() -> void:
 	ok(row.size() >= 8, "§0: the kept table %s holds no Thin Air row" % KEPT_THINAIR)
 	if row.size() < 8:
 		return
-	# A STALENESS TRIPWIRE, SAID SO: the digest is the tree the re-read stands for, every script and data file, so the next batch
-	# that edits one reds this arm by design and re-points it at its own re-read or a replay.
+	# THE RECORD OF A RE-READ ON JN's TREE: the digest is the tree it stands for. JO edited the game and re-reads no grade, so this
+	# asks that the reading still names JN's tree — this tree's own digest printed beside it, never asked to match.
 	var digest := _tree_digest()
-	print("    this tree's game: %s; the table's: %s" % [digest, String(row[7]).strip_edges()])
-	ok(String(row[7]).strip_edges() == digest, "§0: Thin Air was not re-read on the tree that lands, after the cut")
+	print("    this tree's game: %s; the table's, JN's tree: %s" % [digest, String(row[7]).strip_edges()])
+	ok(String(row[7]).strip_edges() == JN_TREE, "§0: Thin Air's re-read does not name the tree it was taken on, JN's")
 	var grade := int(((_run.MODIFIERS as Dictionary).get("thinair", {}) as Dictionary).get("severity", -1))
 	ok(grade == int(DECK["thinair"]), "§0: Thin Air's grade was repaired rather than recorded: %d" % grade)
 	# THE RE-READ STANDS WITH JN's READINGS, AND THE GRADES BLOCK POINTS AT IT (the close-read, M4).
@@ -510,6 +520,12 @@ func _s1_the_population() -> void:
 	ok(dot.has("burn") and dot.has("poison"), "§1: the damage a Burn and a Poison tick could not be read off the battle")
 	var before := _kit(KIT_BEFORE)
 	ok(before.size() > 0, "§1: the kept kit %s is not in the tree" % KIT_BEFORE)
+	var jn_ten := {}
+	for r0 in _doc(KEPT_POPULATION).split("\n", false).slice(1):
+		var c0 := String(r0).split("\t")
+		if c0.size() > 13 and String(c0[13]) == "yes":
+			jn_ten["%s/%s" % [c0[0], c0[4]]] = true
+	ok(jn_ten.size() == 10, "§1: JN's kept table names %d raised moves, not ten" % jn_ten.size())
 	var under: Array = []
 	var bands: Array = []
 	var none: Array = []
@@ -526,20 +542,17 @@ func _s1_the_population() -> void:
 			continue
 		checked += 1
 		var a: Dictionary = abs_[j]
-		var m := _blow(a, dot) / _blow(abs_[b], dot)
+		var atk := float(data[kind]["attack"])
+		var m := _blow(a, dot, atk) / _blow(abs_[b], dot, atk)
 		var name := String(a["display_name"])
 		var was := ""
 		for r in (before.get(kind, []) as Array):
 			if String(r).begins_with(name + "|"):
 				was = String(r)
-		var raised := was != "" and int(String(was).split("|")[1]) != int(a.get("damage", 0))
-		# A RAISE IS A MOVE THAT STOOD UNDER THE LINE: a second move whose damage moved while it already cleared is no raise, and
-		# §1's kit walk then reads it as a move touched (C04 found the walk counting any moved second move as raised).
-		if raised:
-			var a_was := a.duplicate(true)
-			a_was["damage"] = int(String(was).split("|")[1])
-			if _blow(a_was, dot) / _blow(abs_[b], dot) >= _line:
-				raised = false
+		# SINCE JO THE RAISE IS JN's RECORD: the ten JN's kept table names. JO §1 re-derived them with their Break priced and JO §2
+		# gave Mire damage, so a move's damage beside JM's kit no longer says what JN raised; a raise was a move that stood under JN's
+		# line (C04 found the walk counting any moved second move as raised), and the table holds exactly those.
+		var raised := was != "" and jn_ten.has("%s/%s" % [kind, name])
 		if raised:
 			_pop.append([String(kind), name, int(a.get("damage", 0)), _figure(m), m])
 		print("    %-16s %-18s %5.2f of its basic, band %d, the data %d%s" % [kind, name, m, _figure(m), int(a.get("cooldown", 0)), "  (raised)" if raised else ""])
@@ -555,8 +568,10 @@ func _s1_the_population() -> void:
 
 
 func _s1_the_kit() -> void:
-	print("\n§1 — nothing moved but the raised moves' damage and band")
-	var data: Dictionary = Enemies._load()
+	print("\n§1 — nothing moved but the raised moves' damage and band, as JN landed its kit")
+	# SINCE JO THE LIVE DATA IS JO's: JO §1 re-derived seven of the ten with their Break priced and §2 put the hexes onto blows, and
+	# `check_jo` holds the data from JN's kit on. So this walk asks its question of JN's record — the kit JN kept as it landed,
+	# against the kit JM kept — which is the raise JN made, unmoved by what came after it.
 	var before := _kit(KIT_BEFORE)
 	var after := _kit(KIT_AFTER)
 	ok(after.size() > 0, "§1: the kept kit %s is not in the tree" % KIT_AFTER)
@@ -567,24 +582,27 @@ func _s1_the_kit() -> void:
 	var others: Array = []
 	var touched: Array = []
 	var authored: Array = []
-	var off_kit: Array = []
-	for kind in data:
-		var abs_: Array = (data[kind]["abilities"] as Array).filter(func(x): return String((x as Dictionary).get("display_name", "")) != "Gall")
+	for kind in after:
+		var abs_: Array = after[kind]
 		var was: Array = before.get(kind, [])
 		# C06: NO MOVE AUTHORED, NONE TAKEN: each kind holds the moves it held, by name, in order.
-		var names_now: Array = abs_.map(func(x): return String((x as Dictionary)["display_name"]))
+		var names_now: Array = abs_.map(func(x): return String(x).split("|")[0])
 		var names_was: Array = was.map(func(x): return String(x).split("|")[0])
 		if names_now != names_was:
 			authored.append("%s: %s, was %s" % [kind, str(names_now), str(names_was)])
 			continue
-		var b := _basic_at(data[kind]["abilities"])
+		var b := -1
+		for i0 in abs_.size():
+			var f0 := String(abs_[i0]).split("|")
+			if int(f0[1]) > 0 and int(f0[5]) == 0:
+				b = i0
+				break
 		var kind_raised := false
 		for i in abs_.size():
-			var a: Dictionary = abs_[i]
-			var now := _row(a)
-			var name := String(a["display_name"])
+			var now := String(abs_[i])
+			var name := now.split("|")[0]
 			var key := "%s/%s" % [kind, name]
-			if a == data[kind]["abilities"][b]:
+			if i == b:
 				if now != String(was[i]):
 					basics.append("%s's %s: %s, was %s" % [kind, name, now, was[i]])
 				continue
@@ -601,19 +619,16 @@ func _s1_the_kit() -> void:
 				touched.append("%s's %s: %s, was %s" % [kind, name, now, was[i]])
 		if not kind_raised:
 			for i2 in abs_.size():
-				if _row(abs_[i2]) != String(was[i2]):
+				if String(abs_[i2]) != String(was[i2]):
 					touched.append("%s (a kind that already cleared)" % kind)
 					break
-		if after.get(kind, []) != abs_.map(func(x): return _row(x)):
-			off_kit.append(kind)
-	if data.size() != before.size():
-		authored.append("%d kinds, not %d" % [data.size(), before.size()])
+	if after.size() != before.size():
+		authored.append("%d kinds, not %d" % [after.size(), before.size()])
 	print("    basics moved %s; raised moves' other fields moved %s; other moves moved %s" % [str(basics), str(others), str(touched)])
 	ok(basics.is_empty(), "§1: a basic attack moved: %s" % [basics])
 	ok(others.is_empty(), "§1: a raised move's status, delay or reach moved instead of its damage: %s" % [others])
 	ok(touched.is_empty(), "§1: a move that already cleared the line was touched: %s" % [touched])
 	ok(authored.is_empty(), "§1: a move was authored or taken away: %s" % [authored])
-	ok(off_kit.is_empty(), "§1: the kept kit does not hold the warband as the data does: %s" % [off_kit])
 	# AND EVERY OTHER KEY OF THE DATA — the status's chance, the damage's type, the words — as it stood: the data with every cooldown
 	# key and each raised move's damage set aside, digested.
 	var raw: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/enemies.json"))
@@ -640,7 +655,7 @@ func _strip(v: Variant, raised: Dictionary, kind: String) -> Variant:
 
 
 func _s1_the_texts() -> void:
-	print("\n§1 — the kept table and the record state the raise as the data does")
+	print("\n§1 — the kept table states the raise as JN's kit does, and the record names each move with its band")
 	var lines := _doc(KEPT_POPULATION).split("\n", false)
 	ok(lines.size() > 1, "§1: the kept table %s is not in the tree" % KEPT_POPULATION)
 	var t := {}
@@ -649,9 +664,15 @@ func _s1_the_texts() -> void:
 		if c.size() >= 18:
 			t[c[0].strip_edges()] = c
 	var wrong: Array = []
+	var jn_kit := _kit(KIT_AFTER)
 	for p in _pop:
 		var c2: Array = t.get(String(p[0]), [])
-		if c2.size() < 18 or String(c2[4]) != String(p[1]) or int(c2[14]) != int(p[2]) or int(c2[17]) != int(p[3]):
+		# SINCE JO THE TABLE IS JN's RECORD: the figure and the band JN landed, as JN's own kit keeps them.
+		var jf := PackedStringArray(["", "-1", "", "-1"])
+		for r9 in (jn_kit.get(String(p[0]), []) as Array):
+			if String(r9).begins_with(String(p[1]) + "|"):
+				jf = String(r9).split("|")
+		if c2.size() < 18 or String(c2[4]) != String(p[1]) or int(c2[14]) != int(jf[1]) or int(c2[17]) != int(jf[3]):
 			wrong.append("%s's %s" % [p[0], p[1]])
 	var said_pop := 0
 	for k in t:

@@ -1,0 +1,11 @@
+kind	unit	attack	basic	basic damage	basic Break damage	basic worth, Break unpriced	basic worth, Break priced	move	reach	its Break damage	damage before JN	damage at JN	multiple at JN, Break unpriced	multiple at JN, Break priced	least whole damage that clears, Break priced	what the re-derivation gives	damage at JO	multiple at JO, with what §2 folds onto it	cooldown the rule gives	an unpriced status it lays
+raider	Orc Raider	100	Slash	34	26	34.00	43.02	Sundering Strike	one	22	23	48	1.41	1.29	53	falls under the line priced: brought to it	53	1.41	2	sunder 2 turns at 60%
+slinger	Orc Slinger	100	Stone Sling	24	20	24.00	30.94	Skull Crack	one	38	12	34	1.42	1.53	31	still clears it priced: stays where JN put it	34	1.53	2	-
+archer	Orc Archer	100	Arrow Shot	21	16	21.00	26.55	Poison Arrow	one	14	16	26	1.44	1.32	29	falls under the line priced: brought to it	29	1.43	2	-
+hexer	Orc Hexer	50	Hex Bolt	44	14	22.00	26.86	Withering Hex	one	10	24	62	1.41	1.28	69	falls under the line priced: brought to it	69	1.41	2	exposed 2 turns at 70%
+wolfrider	Wolfrider	100	Lunging Bite	36	20	36.00	42.94	Ride-by Slash	one	16	28	51	1.42	1.32	55	falls under the line priced: brought to it	55	1.41	2	cripple 2 turns at 50%
+ashblade	Ashblade	100	Cinder Slash	32	20	32.00	38.94	Flame Lick	one	12	22	38	1.41	1.27	44	falls under the line priced: brought to it	44	1.42	2	-
+brute	Orc Brute	100	Smash	40	32	40.00	51.11	Overhead Crush	one	50	28	56	1.40	1.44	55	still clears it priced: stays where JN put it	56	1.44	2	-
+bog_troll	Bog Troll	75	Claw	40	24	30.00	38.33	Swampy Grasp	one	18	26	56	1.40	1.26	64	falls under the line priced: brought to it	64	1.42	2	slow 2 turns at 70%
+behemoth	Rot Behemoth	100	Rotting Fist	38	28	41.00	50.72	Wretched Bellow	every ally, four heroes priced	22	14	15	1.46	1.79	11	still clears it priced: stays where JN put it	15	2.50	3	-
+bloodcaller	Orc Bloodcaller	100	Ragged Cut	30	20	30.00	36.94	Blood Tribute	one	24	20	42	1.40	1.36	44	falls under the line priced: brought to it	44	1.42	2	-

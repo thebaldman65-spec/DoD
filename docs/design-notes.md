@@ -4,6 +4,20 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Break gets a price, and the hexes ride blows (Batch JO) — 2026-11-06
+
+**Why Break is priced on both sides of the line.** A filled Break bar costs a hero his next turn, so a point of Break damage is worth a hero
+turn's damage over the bar it fills. The line compares a move with its own basic, and the basic lays Break too; pricing it on one side only
+would be two prices for one quantity. So the raised moves whose basics carry a heavy Break fell under the line and rose, and the three whose own
+Break is heavy still cleared. The bands the price would move on moves no brief named are held for the designer, because a cooldown is a magnitude.
+
+**Why a hex rides a blow.** A hex replaced a blow and was worth less than the blow it replaced; riding one, it is a reason to fear the blow, not
+a turn the warband wastes. The line prices what a move deals and none of what it denies, so a hex on a blow is unpriced, as Sunder and Exposed
+are — save Fester's tick, which is damage and priced as a Burn's is — and each hex's blow carries damage enough to be worth casting on its own.
+
+**Why balance is the designer's.** The designer's floor (JO §0): balance is judged by playing, a batch's only job is making sure its code
+works, and a plain count of whether a mechanic fired stays, as correctness.
+
 ## The eleven kinds get a move worth taking (Batch JN) — 2026-11-06
 
 **Why the second moves were raised in damage, not given a bigger status.** Four batches of the warband's arc found that anything

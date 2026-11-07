@@ -118,6 +118,17 @@ notes live in a document outside the repository, so the brief ordered a premise 
 the backups or the memory the work reads. A brief cites only what the repository holds; the correction was the designer's, and JK owed
 nothing for it.
 
+**BALANCE IS THE DESIGNER's, JUDGED BY PLAYING (JO §0, the designer's, of 6 November).** **Balance is the designer's, judged by
+playing; a batch's only job is making sure its code works; no batch runs a balance drive; and a plain count of whether a new mechanic
+fired stays, as correctness.** The instruction that carried it named what a drive is — no multi-run arm, no pairing by seed, no
+prediction written as a file, no z-score, no standard error, no *past two errors*, no grade re-read, no completion-rate reading, no *does
+it do anything* section — and a brief that seems to want one does not. It sits here by the designer's order, beside the citation rule. *(The batch's reading, JO §0, not the designer's
+words:)* the prediction it retires is a balance figure's, so the battery's count predictions, an instrument rule, stand; the count that
+stays is a count, never a comparison, because a mechanic that never fires is code that does not work; and the rules of this file that
+order a reading — the pair for a brief that grades a modifier (JC §0.9, above) and *ORDER THE READING* (JH §0.8, below) — with the
+instrument rules about a reading and its errors, bind a reading no batch takes now and stand as written, for the day the designer
+orders one. Everything else a batch verifies is `docs/instrument-rules.md`'s and is not restated here.
+
 **ORDER THE READING, AND DO NOT WRITE THE CARD UNTIL IT COMES BACK (JH §0.8, the designer's note 35).** JG's brief wrote a card's
 condition in one section and ordered the reading that would falsify it in another, and the words carried a condition that was
 always true. **A brief names the axis, the shape and what the figure must clear; the words wait for the reading.**

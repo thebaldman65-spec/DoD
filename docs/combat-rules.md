@@ -100,8 +100,9 @@ NOT BE WRITTEN**; an ability obeys this rule by not passing `force`.
 of `_enemy_turn` **byte-for-byte** — only *when* it runs moved, and a diff touching the rules
 inside it breaks that promise.
 · **THE PROMISE BINDS THE POLICY, AND THE SELECTION ASKS THE DOOR's COOLDOWN AS IT ASKS ITS PRICE (JI §1).** Which move it
-  prefers and at whom is the policy and does not move — save the hexes, which join its random pick at JL §2 and go only at a hero
-  who does not carry one, the promise standing beside the change rather than over it (JL's ruling 7, accepted at JM §0); a refusal the door makes is a rule, and IN §3 put the door's price
+  prefers and at whom is the policy and does not move — the hexes, which joined its random pick at JL §2 and went only at a hero
+  who did not carry one, ride blows the attack half reaches since JO §2, so the promise stands with no exception beside it (JL's
+  ruling 7, accepted at JM §0, superseded at JO §2); a refusal the door makes is a rule, and IN §3 put the door's price
   in the selection (`_eff_cost`). **A cooldown is the same kind of thing**: `_intent_ability_usable` refuses a cooling move,
   so the choice reads the counter as it will stand on the turn the move resolves (`battle._enemy_ready`, the unit's own
   ticks `ticks_ahead` away — one from the end of a turn, two from a stunned or frozen branch, which declares before its own
@@ -114,17 +115,20 @@ inside it breaks that promise.
   naming each. A card that writes an enemy's counter any other way owes the chip a sync.
 · **AN ENEMY MOVE WORTH 1.4 TIMES ITS OWN BASIC ATTACK OR MORE TAKES A COOLDOWN, AND A BASIC NEVER DOES (JI §1, the brief's
   rule; its line, *about 1.5x*, moved to the gap below it).** A basic is its kind's first free damaging move, `_cheapest_attack`'s —
-  the move the Long Silence spares and re-validation falls back to. The price is what one cast does: a blow's damage and the
-  Burn or Poison it lays (`DOT_STATUSES`' share a tick, times its ticks — a Burn's turns, a Poison's one fewer, since it skips
-  the turn it lands — and its chance), times the heroes it reaches (four for an area blow; a companion standing is not
-  counted); a heal at the health it restores, on the median composable body or the caster's own for a self-heal, a
-  whole-warband heal on four bodies, the basic turned to health at the enemy's own Attack. A ward and a cleanse are not
-  priced; a Malice spend is, on its worth against its kind's basic (`check_jk` §2, the line read out of `check_ji`), and a hex on
-  what it denies, off JA's census, against its carrier's basic (`check_jl` §2).
+  the move the Long Silence spares and re-validation falls back to. The price is what one cast does, in health: a blow's damage and
+  the Burn, Poison or Fester it lays (`DOT_STATUSES`' share a tick, times its ticks — a Burn's and a Fester's turns, a Poison's
+  one fewer, since it skips the turn it lands — and its chance) at the enemy's own Attack, **and since JO §1 its Break damage, a
+  point at a hero turn's damage over the Break meter a hero fills, never scaled by Attack** (`check_ji`'s `break_figures` and
+  `line_blow`, the one blow every gate on the line prices through), times the heroes it reaches (four for an area blow; a
+  companion standing is not counted) — the move and its basic alike; a heal at the health it restores, on the median composable
+  body or the caster's own for a self-heal, a whole-warband heal on four bodies. A ward and a cleanse are not priced, nor is
+  anything a move denies — a hex on its blow among them, since JO §2; a Malice spend is, on its worth against its kind's basic
+  (`check_jk` §2, the line read out of `check_ji`).
   **The figure is 2 under 2x, 3 under 3x and 4 past it**, in the enemy's own turns. A move a resource already bounds
   takes one too — DU §1's *priced twice* is weighed and set aside (JI's ruling 3, accepted at JJ §0). `check_ji` §1a derives the
   population off the data every battery and reds on a move the rule and the data disagree about, so **a new enemy move is
-  priced in the batch that authors it** and its key written with it; a designer's hand-tune of one move goes in its `TUNED`.
+  priced in the batch that authors it** and its key written with it; a designer's hand-tune of one move goes in its `TUNED`, and a
+  band the line moves on a move no brief named waits for the designer in its `HELD`.
 · **THE SELECTION ASKS THE POOL WHERE IT ASKS THE COOLDOWN, AND A HEAL THE WARBAND CASTS PAYS FOR WHAT IT RESTORES (JJ §3).**
   The warband shares one pool, Malice, filled at BL's two doors — the damage door by the frame's side, which hands on what a
   blow spends past a body's last (`past_last`), and the death door — and a heal on the warband's own side costs a point of it
@@ -153,14 +157,23 @@ inside it breaks that promise.
   asked still down and unraised when it is bought. A
   Rally's clock counts down before its bearer acts, so a body strikes rallied one turn fewer than the clock — the body that bought it once more, since it acts on the turn it buys. No new body joins
   the warband once a fight has opened, so there is no Overrun (JK's ruling 1, accepted at JL §0).
-· **A HEX IS A MOVE ON ITS KIND's LIST, CHOSEN AS AN AFFLICTION IS, AT A HERO WHO DOES NOT CARRY IT (JL §2).** Gall, Sap, Mire and
-  Fester (special `warband_hex`, its status the move's own `applies_status`) deal nothing, so the attack half's `damage > 0` never
+· **~~A HEX IS A MOVE ON ITS KIND's LIST, CHOSEN AS AN AFFLICTION IS, AT A HERO WHO DOES NOT CARRY IT (JL §2)~~ — SUPERSEDED AT JO §2,
+  BY THE DESIGNER's RULE BELOW, AND KEPT AS IT STOOD.** Gall, Sap, Mire and
+  Fester (special *warband_hex*, its status the move's own `applies_status`) deal nothing, so the attack half's `damage > 0` never
   reaches one: `_choose_enemy_action` puts every ready hex some hero in reach lacks beside the attacks it picks from at random, and
-  aims a hex it picks at a hero — never a companion — who does not carry it (`_hex_open`); no draw or evasion moves it, and as a
+  aims a hex it picks at a hero — never a companion — who does not carry it (*_hex_open*); no draw or evasion moves it, and as a
   `special` it rolls no miss. Its arm lays it through the status door
   with the enemy as source — **and a hex that reaches every hero (`aoe`, the data's reach key; Gall since JM §0) on every hero
   standing**, each through that one door, a hero who carries it taking its clock back. Each is an affliction in `DEBUFF_IDS`, and each is read at one door: Gall in `heal_amount`, Sap at the
   bar's own setter, Mire at `effective_speed()`, Fester in `_dot_pass`.
+· **A HEX RIDES A BLOW: NO WARBAND MOVE LAYS A STATUS ON A HERO UNLESS IT DEALS DAMAGE (JO §2, the designer's).** Each of the four is a
+  damaging move's own `applies_status`: Sap on the Orc Hexer's Bone Rattle and Fester on the Rot Behemoth's Wretched Bellow, each
+  folded onto a damaging move of its carrier's that laid nothing, and Gall and Mire on their own moves, given the damage that clears
+  JI's line. So each is an attack `_choose_enemy_action` picks among the moves that deal damage, aimed as a blow is, through the
+  draws and the evasions, and a single blow rolls its miss in the strike loop as the warband's other status blows do (an area blow rolls none, as every area blow); on a hit it lays its
+  status through the door at the move's `status_chance`, on every body an area blow strikes, a companion among them. No move is a
+  hex that deals nothing, and nothing aims or lays one past the strike loop. Each is an affliction in `DEBUFF_IDS`, read at one
+  door: Gall in `heal_amount`, Sap at the bar's own setter, Mire at `effective_speed()`, Fester in `_dot_pass`.
 · **Declaration**: `_declare_intent(u)`, called from `_declare_all_intents()` at battle start
   (after the opening oath/Faith hooks, which move state the policy reads), from the turn loop
   **right after** `await _enemy_turn(u)` — **NOT from the bottom of `_enemy_turn`**, which returns

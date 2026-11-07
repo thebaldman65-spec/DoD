@@ -1940,6 +1940,9 @@ decision and the STRUCTURE is what shipped.
   (`battle._bot_drafted_pick`, `_bot_class_kit_pick`, `_autoplay_pick_kit`), and every grade, band and band's mean above was
   measured through this bot: **a constant bias cancels in a comparison; changing it mid-ladder does not.** So the divergence is
   not a defect to fix on noticing it — the comment at the drafted pick says so where a batch would notice.
+  · **SUPERSEDED IN ITS READING AT JO §0, BY THE DESIGNER's FLOOR, AND RECORDED RATHER THAN DELETED** (`docs/ways-of-working.md`: balance is
+    the designer's, judged by playing, and no batch runs a balance drive): a batch that changes a bot ally pool re-measures no ladder;
+    the ladder is the designer's to judge, by playing.
 **THE END BOSS is a 17th slot on the FINAL ZONE'S BOARD, so a run is 49 encounters** (BK settled
 on 48). `END_BOSS_SLOT` / `END_BOSS_KIND` / `total_slots()`. It is **FIXED, not composed** (the
 one node whose lineup does not come out of the budget system), so it can be learned, and it
@@ -2044,7 +2047,7 @@ as a bug.
     figure a point of Rage (`Classes.BOIL_OVER_DMG_PER_RAGE`), no longer a share of the caster's Attack, so on `check_hz` §2's board
     a full bar beats two of the best ordinary turn and a cast at the floor beats an ordinary card: the shape above no longer holds of
     the one card it binds, and `check_hz` §2 prints the shape where it asserted it. **A later dump a batch authors is still shaped to
-    this rule until the designer rules on it** (JN's rulings).
+    this rule** (JN's ruling 5, accepted at JO §0: the rule stands for a later dump).
 
 ## STANDING RULE — THE ENGINE RUNE CHARTER (Batch GK, the designer's)
 > **THERE ARE NO SPECS AND NO CORE ENGINES.** A hero is a CLASS. Everything that made a spec what it
@@ -2746,6 +2749,9 @@ UNDER WHICH IT IS RE-READ (FV §2, §3).**
   hastened turn closes a shorter span that the enemy reaches less often, so a lower cap is not the
   brake this meter needs. **A batch that makes an exchange easier to book weakens that thinning and
   re-runs the live pair in the same batch.**
+  · **SUPERSEDED IN ITS READING AT JO §0, BY THE DESIGNER's FLOOR, AND RECORDED RATHER THAN DELETED** (`docs/ways-of-working.md`: balance is
+    the designer's, judged by playing, and no batch runs a balance drive): a batch that makes an exchange easier to book re-runs no
+    live pair; the thinning is the designer's to judge, by playing.
 - **SANCTITY'S RATE IS SET AGAINST HALF A PAYOUT, AND THE BATCH THAT BUILDS THE OTHER HALF RE-MEASURES
   IT IN THE SAME BATCH.** `SANCTITY_PER_STEP` puts the three Cleric parties near half the cap with
   duration as the only payout; once potency exists a step buys more on every application that
@@ -2758,6 +2764,9 @@ UNDER WHICH IT IS RE-READ (FV §2, §3).**
   **And the potency half is worth almost nothing to two of the three Clerics until two things change
   that are not rates**: the Devout's Divine Shield barrier carries its `src` since IL §1 but is battle-long, so the
   duration payout cannot lengthen it, and the Occultist's Ruin is battle-long and carries no magnitude at the funnel.
+  · **SUPERSEDED IN ITS READING AT JO §0, BY THE DESIGNER's FLOOR, AND RECORDED RATHER THAN DELETED** (`docs/ways-of-working.md`: balance is
+    the designer's, judged by playing, and no batch runs a balance drive): the batch that builds the potency half re-measures no rate;
+    the rate stays set against the duration payout alone, and it is the designer's to judge, by playing.
 - **THE SPREAD BETWEEN SPECS IS REPORTED AND NEVER CLOSED WITH A PER-SPEC RATE** — FU's rule for
   Channel, held for both of these. A class core with a rate per spec is a spec engine.
 
@@ -4072,6 +4081,9 @@ the absence of a rule. `check_ez` §0 asserts the flat price as an EQUALITY over
   · **A NEW CREST RUNE's MAGNITUDE × UPTIME CLEARS 5% ON THE POPULATION THAT FINISHES RUNS, OR THE CONDITION IS TOO RARE AND THE RUNE DOES NOT SHIP (JG §1.4, the designer's).** The floor is derived from the pool's own two ends: Tithe's product is about 13%, Dirge's 0.77%, and 5% sits between the one that works and the three that do not, reachable at 25% uptime and 20%.
     **IF THE FIGURE THE FLOOR DEMANDS IS ABOVE 75%, THE POOL's LARGEST, THE CONDITION IS TOO RARE AND THE ANSWER IS A DIFFERENT CONDITION, NOT A BIGGER NUMBER.** *(The batch's reading, JG §3:)* the population is the two rows JF's worth rule names, the reference four at Wanderer and the incumbent at Ruin, and the figure answers to the lower. The two ends are in different units, Break healed and damage dealt, so the floor is a rule of thumb between them and the product stays a gross.
     **The floor does not replace the relation above it**: a conditioned rune still pays beyond the bare writer of its effect (HP §5), so on strike damage, where the tree writes 10%, a condition that holds half the time or more has a quotient the relation refuses. **There the relation sets the figure and the floor stands beside it as a minimum (JH §0.6, the designer's)**: 25% uptime at 20% is the case both rules allow.
+  · **THE TWO READINGS ABOVE — A RUNE PRICED AT THE FIGHT, AND A NEW CREST RUNE's FIVE PERCENT — ARE SUPERSEDED IN THEIR READING AT JO §0, BY THE DESIGNER's FLOOR, AND RECORDED RATHER THAN DELETED** (`docs/ways-of-working.md`:
+    balance is the designer's, judged by playing, and no batch runs a balance drive): no batch takes either reading; a new crest
+    rune's uptime is the designer's to judge by playing, and the five percent stands as the designer's own bar for it.
   · **COMMUNION READS WHAT THE FOUR CARRY: WHILE EVERY HERO WHO STANDS WEARS TWO OR MORE CORE RUNES (JH §0.1, the designer's: one key, one shape, authorized).** `heroes_all_hold_cores` counts the core runes each hero who stands has slotted, the list the spawn reads off the member (`Runes.held_engines`). **The condition's writers are the map's: `Run.awaken`, `Run.toggle_engine` and the swaps — and in a sim `Run.hold_rune`, whose bot asks it to slot a core it is handed — read at the spawn. A fight keeps what it opened with (GM §2), so inside one only a fall and a rise move it, and those two doors are where it is re-read.**
     **It pays every party that builds for it, and it rises through a run** — and only those: in about half the runs a hero never slots a second core and it pays nothing (the state's crest pool, JH's ruling 6, accepted at JJ §0). On the shipped key with no crest worn, on the union a party wearing it rolls (its own entry struck, the die shift's rule), on the runs that finish, 18.6% on the reference four at Wanderer and 13.5% on the incumbent at Ruin, 2.2, 9.2 and 38.2% by zone on the first (`docs/reports/JH-uptimes.tsv`). **Its figure is the worth rule's quotient on the lower row, a whole percent up**, past the bare 10% and inside the pool's range. **ITS ONE IMPURITY, NAMED BESIDE IT (JH §0.1, the designer's): IT PARTLY KEYS ON A FALL.** It switches on when the one hero short of a second core goes down, about a point of its 18.6%, 5.6% of its uptime on the row the designer read, and that is accepted; on the harder rungs, where heroes fall, it is up to a third of the uptime (the state's crest pool, JH's ruling 7, accepted at JJ §0). *Every hero holds a core* holds on every hero turn of every cell, because each takes one at class selection, and JG's named core was no party's uptime (19.6, 99.7 and 14.7% by party); `heroes_hold_core` stays a door no live rune carries.
 - **A CONDITION ON THE FOUR IS READ AS THE FIGHT RUNS, BECAUSE READ AT THE SPAWN IT WAS A CONSTANT (HP §1, ruled; HO §3c

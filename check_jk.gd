@@ -26,9 +26,12 @@
 extends SceneTree
 
 const Gate = preload("res://gate_fixture.gd")
+# JI's LINE AND ITS BREAK PRICE (JO §1): the one blow and the one price, read where they stand.
+const JI = preload("res://check_ji.gd")
 
 const KINDS := 21
-const MOVES_BEFORE := 50
+# JK's fifty, and since JO §2 Gall and Mire among them, each a blow given damage (Sap and Fester ride two of the fifty).
+const MOVES_BEFORE := 52
 const DECK_CLOSED_AT := 25
 # THE FILL AND THE HEALS AS JJ LEFT THEM (§4): a point a ten, a kill's 25, the cap of 150, hurt at half a heal's figure.
 const FILL := {"MALICE_DAMAGE_STEP": 10, "MALICE_PER_KILL": 25, "MALICE_CAP": 150}
@@ -759,8 +762,10 @@ func _s2_the_cooldowns(s: Node, spends: bool) -> void:
 	var m := rx.search(_doc(LINE_SOURCE))
 	var line := float(m.get_string(1)) if m != null else -1.0
 	ok(line > 1.0, "§2: JI's line could not be read out of %s" % LINE_SOURCE)
-	# THE BASIC IS PRICED AS JI's LINE PRICES IT: this gate's blow is check_ji's own, byte for byte, so a change there reds here.
-	ok(Gate.fn_body("check_ji.gd", "_blow", _cache) == Gate.fn_body("check_jk.gd", "_blow", _cache), "§2: this gate prices a blow otherwise than check_ji does")
+	# THE BASIC IS PRICED AS JI's LINE PRICES IT: through check_ji's one blow, its Break priced (JO §1), and no blow of this gate's own.
+	ok(Gate.fn_body("check_jk.gd", "_blow", _cache) == "" and Gate.fn_body("check_ji.gd", "line_blow", _cache) != "", "§2: this gate prices a blow otherwise than check_ji does")
+	var price := float(JI.break_figures().get("price", -1.0))
+	ok(price > 0.0, "§2: the Break price could not be read off check_ji")
 	var census := _doc(CENSUS_TABLE)
 	ok(census.contains("\t%s\t" % str(CENSUS_CUT)) and census.contains("\t%s\t" % str(CENSUS_TURNS).replace(".0", "") + ".0\t") or census.contains("%.1f" % CENSUS_TURNS),
 		"§2: JA's census no longer reads the warband's armor cut (%s) over its turns (%s)" % [str(CENSUS_CUT), str(CENSUS_TURNS)])
@@ -779,7 +784,7 @@ func _s2_the_cooldowns(s: Node, spends: bool) -> void:
 			if int(a.get("damage", 0)) > 0 and int(a.get("cost", 0)) == 0:
 				basic = a
 				break
-		basics[k] = _blow(basic, dot) * float(kd["attack"]) / 100.0
+		basics[k] = JI.line_blow(basic, dot, float(kd["attack"]), price)
 		if not bool(kd.get("is_boss", false)):
 			bodies.append(float(kd["max_hp"]))
 			bvals.append(float(basics[k]))
@@ -794,6 +799,9 @@ func _s2_the_cooldowns(s: Node, spends: bool) -> void:
 	print("    the reference board: the median composable body %.1f, the median basic %.1f; a Raise worth %.1f, a Rally %.1f, an Entrench %.1f" % [
 		body, med, worth["malice_raise"], worth["malice_rally"], worth["malice_entrench"]])
 	var wrong: Array = []
+	# A HOLD THE LINE AGREES WITH IS A STALE ONE (JO's ruling 2): check_ji's §1a passes every spend by, so the spends' holds are asked here.
+	var stale: Array = []
+	var held := 0
 	var cool := 0
 	for k2 in data:
 		for a2 in data[k2]["abilities"]:
@@ -803,21 +811,23 @@ func _s2_the_cooldowns(s: Node, spends: bool) -> void:
 			var mult := float(worth[sp]) / float(basics[k2])
 			var want := 0 if mult < line else (2 if mult < 2.0 else (3 if mult < 3.0 else 4))
 			var have := int(a2.get("cooldown", 0))
-			print("    %5.2f  %-16s %-9s the line %d, the data %d" % [mult, k2, String(a2["display_name"]), want, have])
+			# A BAND THE REPAIRED LINE MOVES ON A SPEND NO BRIEF NAMED is held at the data's figure, where check_ji holds it (JO's ruling 2).
+			var hk := "%s/%s" % [k2, String(a2["display_name"])]
+			var line_gives := want
+			if JI.HELD.has(hk):
+				want = int(JI.HELD[hk])
+			print("    %5.2f  %-16s %-9s the line %d, the data %d%s" % [mult, k2, String(a2["display_name"]), line_gives, have, (", held at %d" % want) if JI.HELD.has(hk) else ""])
+			if JI.HELD.has(hk):
+				held += 1
+			if JI.HELD.has(hk) and line_gives == int(JI.HELD[hk]):
+				stale.append("%s holds %d where the line gives it %d" % [hk, int(JI.HELD[hk]), line_gives])
 			if have > 0:
 				cool += 1
 			if want == 0 or want != have:
 				wrong.append("%s's %s carries %d, the line gives %d (%.2f of its basic)" % [k2, String(a2["display_name"]), have, want, mult])
-	print("    CHECKED %d spends; %d cool" % [_spends.size(), cool])
+	print("    CHECKED %d spends; %d cool; %d held, each asked whether the line still moves it" % [_spends.size(), cool, held])
 	ok(wrong.is_empty(), "§2: a spend carries no cooldown, or one not off the line: %s" % [wrong])
-
-
-func _blow(a: Dictionary, dot: Dictionary) -> float:
-	var st: Dictionary = a.get("applies_status", {})
-	# A POISON SKIPS THE TURN IT LANDS (`_dot_pass`, its `fresh` flag), so it ticks one fewer than its turns; a Burn ticks every one.
-	var ticks := maxf(0.0, float(st.get("turns", 0)) - (1.0 if String(st.get("id", "")) == "poison" else 0.0))
-	var tick := float(dot.get(String(st.get("id", "")), 0)) * ticks * float(a.get("status_chance", 1.0))
-	return (float(a.get("damage", 0)) + tick) * (REACH if bool(a.get("aoe", false)) else 1)
+	ok(stale.is_empty(), "§2: a spend's band is held where the line already gives it — the hold outlived its reason: %s" % [stale])
 
 
 func _median(xs: Array) -> float:
@@ -883,7 +893,7 @@ func _s4_not_done(s: Node) -> void:
 	var moves := 0
 	for k2 in data:
 		for a in (data[k2] as Dictionary).get("abilities", []):
-			# JL §2 — and JL's hexes, which `check_jl` §4 holds beside these fifty.
+			# JL §2 — and JL's hex special, which no move carries since JO §2: each hex rides a blow among these fifty-two.
 			if not String(a.get("special", "")).begins_with("malice_") and String(a.get("special", "")) != "warband_hex":
 				moves += 1
 	print("    %d kinds, %d moves beside the spends" % [data.size(), moves])

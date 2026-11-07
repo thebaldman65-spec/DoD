@@ -1,0 +1,120 @@
+{
+ "raider": [
+  "Slash|34|26|0|2.00|0|||0|",
+  "Sundering Strike|53|22|2|2.50|0||sunder|2|",
+  "Rally|0|0|3|2.50|0|malice_rally||0|"
+ ],
+ "whelp": [
+  "Frenzied Nip|26|16|0|1.50|0|||0|",
+  "Reckless Lunge|38|20|2|2.50|0|||0|",
+  "Rally|0|0|3|2.50|0|malice_rally||0|"
+ ],
+ "slinger": [
+  "Stone Sling|24|20|0|2.00|0|||0|",
+  "Skull Crack|34|38|2|2.50|0|||0|",
+  "Rally|0|0|3|2.50|0|malice_rally||0|"
+ ],
+ "totemist": [
+  "Totem Jab|30|12|0|2.00|0|||0|",
+  "Healing Wave|0|0|3|2.50|0|healing_wave||0|",
+  "Raise|0|0|4|2.50|0|malice_raise||0|",
+  "Entrench|0|0|4|2.50|0|malice_entrench||0|"
+ ],
+ "archer": [
+  "Arrow Shot|21|16|0|2.00|0|||0|",
+  "Poison Arrow|29|14|2|2.50|0||poison|3|",
+  "Rally|0|0|4|2.50|0|malice_rally||0|",
+  "Gall|10|0|2|2.50|0||gall|3|aoe"
+ ],
+ "shieldmaster": [
+  "Strike|37|20|0|2.00|0|||0|",
+  "Shielding|0|0|0|2.50|0|enemy_shield||0|",
+  "Entrench|0|0|4|2.50|0|malice_entrench||0|"
+ ],
+ "shaman": [
+  "Chain Lightning|30|15|0|3.00|0|||0|aoe",
+  "Healing Wave|0|0|0|2.50|0|healing_wave||0|",
+  "Entrench|0|0|2|2.50|0|malice_entrench||0|"
+ ],
+ "hexer": [
+  "Hex Bolt|44|14|0|2.00|0|||0|",
+  "Withering Hex|69|10|2|2.50|0||exposed|2|",
+  "Bone Rattle|52|34|2|3.00|0||sap|3|",
+  "Rally|0|0|4|2.50|0|malice_rally||0|"
+ ],
+ "wolfrider": [
+  "Lunging Bite|36|20|0|2.00|0|||0|",
+  "Ride-by Slash|55|16|2|2.00|0||cripple|2|",
+  "Rally|0|0|2|2.50|0|malice_rally||0|"
+ ],
+ "ashblade": [
+  "Cinder Slash|32|20|0|2.00|0|||0|",
+  "Flame Lick|44|12|2|2.50|0||burn|2|",
+  "Rally|0|0|3|2.50|0|malice_rally||0|"
+ ],
+ "brute": [
+  "Smash|40|32|0|2.50|0|||0|",
+  "Overhead Crush|56|50|2|3.50|0|||0|",
+  "Rally|0|0|2|2.50|0|malice_rally||0|"
+ ],
+ "bog_troll": [
+  "Claw|40|24|0|2.50|0|||0|",
+  "Swampy Grasp|64|18|2|3.00|0||slow|2|",
+  "Regenerate|0|0|3|2.50|0|healing_wave||0|",
+  "Entrench|0|0|4|2.50|0|malice_entrench||0|"
+ ],
+ "behemoth": [
+  "Rotting Fist|38|28|0|2.50|0||poison|3|",
+  "Wretched Bellow|15|22|3|3.50|0||fester|3|aoe",
+  "Rally|0|0|2|2.50|0|malice_rally||0|"
+ ],
+ "chief": [
+  "Strike|28|26|0|2.00|0|||0|",
+  "Heavy Strike|54|40|2|4.00|30|||0|",
+  "Chieftain's Maul|34|56|0|4.00|20|||0|",
+  "Rally|0|0|3|2.50|0|malice_rally||0|"
+ ],
+ "withered_warden": [
+  "Timber Slam|60|30|0|3.00|0||dazed|3|",
+  "Roots of Wrath|25|20|3|3.50|0||poison|3|aoe",
+  "Wild Growth|0|0|0|2.50|0|wild_growth||0|",
+  "Entrench|0|0|2|2.50|0|malice_entrench||0|"
+ ],
+ "ash_tyrant": [
+  "Cinder Cleave|30|24|0|2.00|0|||0|",
+  "Immolating Wave|18|14|4|3.50|30||burn|2|aoe",
+  "Tyrant's Verdict|44|40|2|4.00|20||sunder|2|",
+  "Rally|0|0|3|2.50|0|malice_rally||0|"
+ ],
+ "chanter": [
+  "Warding Chant|22|14|0|2.00|0|||0|",
+  "Cleansing Rite|0|0|0|3.00|0|cleanse_allies||0|",
+  "Raise|0|0|4|2.50|0|malice_raise||0|",
+  "Entrench|0|0|4|2.50|0|malice_entrench||0|"
+ ],
+ "hurler": [
+  "Ember Lob|30|18|0|2.50|0|||0|",
+  "Siege Stone|70|45|4|4.00|0|windup||0|aoe",
+  "Rally|0|0|3|2.50|0|malice_rally||0|"
+ ],
+ "bloodcaller": [
+  "Ragged Cut|30|20|0|2.00|0|||0|",
+  "Blood Tribute|44|24|2|2.50|0|blood_tribute||0|",
+  "Rally|0|0|3|2.50|0|malice_rally||0|"
+ ],
+ "grave_totem": [
+  "Grasping Roots|18|20|0|2.00|0||cripple|2|",
+  "Dark Vigil|0|0|4|2.50|0|totem_pulse||0|",
+  "Raise|0|0|4|2.50|0|malice_raise||0|",
+  "Entrench|0|0|4|2.50|0|malice_entrench||0|",
+  "Mire|45|0|2|2.50|0||mire|3|"
+ ],
+ "hollow_crown": [
+  "Crown of Thorns|46|30|0|2.50|0|||0|",
+  "Hollow Wail|20|22|2|3.50|0||dazed|2|aoe",
+  "Regalia|0|0|0|3.00|0|enemy_shield||0|",
+  "Sundering Decree|34|48|0|3.50|0||sunder|3|",
+  "The Long Dark|30|26|4|4.00|0||poison|4|aoe",
+  "Entrench|0|0|3|2.50|0|malice_entrench||0|"
+ ]
+}

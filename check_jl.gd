@@ -10,7 +10,8 @@
 #        cooled by JI's line (C10); each on the hero's plate (C11); the selection aims each at a hero who does not carry it.
 #   §3   THE READING: the record carries the warband's blows a fight and each hex's uptime, as the kept table holds them (C12).
 #   §4   WHAT IS DELIBERATELY NOT DONE: the fill, the cap, the heals and the three spends' figures and cooldowns unmoved (C13);
-#        twenty-one kinds, fifty moves beside the spends and the hexes; the deck closed at twenty-five (C14).
+#        twenty-one kinds, fifty moves beside the spends and the hexes (fifty-two since JO §2, the hexes riding blows among
+#        them); the deck closed at twenty-five (C14).
 #   §5   THE TEXTS FOLLOW THE CONSTANTS: what each hex does, stated off its constant wherever it is stated (R01).
 #   §6   THE PLAYER'S FILES, as this gate found them.
 #
@@ -20,11 +21,16 @@
 extends SceneTree
 
 const Gate = preload("res://gate_fixture.gd")
+# JI's LINE AND ITS BREAK PRICE (JO §1): the one blow every gate on the line prices through.
+const JI = preload("res://check_ji.gd")
 
 const KINDS := 21
-# The warband's moves beside its Malice spends and its hexes — JK's fifty, unmoved.
-const MOVES_BEFORE := 50
+# The warband's moves beside its Malice spends — JK's fifty, and since JO §2 Gall and Mire among them, each a blow given damage;
+# Sap and Fester ride two of the fifty, folded onto them.
+const MOVES_BEFORE := 52
 const HEXES := ["gall", "sap", "mire", "fester"]
+# THE HEX SPECIAL JL BUILT — a hex dealing nothing, rolling no miss — gone since JO §2, the designer's: no warband move lays a status
+# on a hero unless it deals damage. A hex's carrier is the kind whose move lays it (`_lays`); §2 asks that no move carries the special.
 const HEX_SPECIAL := "warband_hex"
 # An area blow reaches the party's four heroes, as check_ji prices it.
 const REACH := 4
@@ -38,8 +44,8 @@ const SPEND_FIGURES := {"MALICE_RAISE_PCT": 0.40, "MALICE_RALLY_PCT": 0.30, "MAL
 const CENSUS_TABLE := "res://docs/reports/JA-shares.tsv"
 const LINE_SOURCE := "res://check_ji.gd"
 const KEPT_SPENDS := "res://docs/reports/JK-spends.tsv"
-# The kept hex table as the tree holds the hexes: JL's, re-taken when JM §0 moved Gall (JL-hexes.tsv stays JL's record).
-const KEPT_HEXES := "res://docs/reports/JM-hexes.tsv"
+# The kept hex table as the tree holds the hexes: JO's since JO §2 put them onto blows (JL-hexes.tsv stays JL's record, JM-hexes.tsv JM's).
+const KEPT_HEXES := "res://docs/reports/JO-hexes.tsv"
 const KEPT_DRIVE := "res://docs/reports/JL-drive.tsv"
 const FOE := {"type": "fight", "theme": "Warband", "enemies": ["totemist", "raider", "shieldmaster", "brute", "slinger", "chief"]}
 const SEATS := ["warrior", "mage", "cleric", "hunter"]
@@ -202,6 +208,24 @@ func _const_i(s: Node, name: String) -> int:
 func _unit_f(name: String) -> float:
 	var v: Variant = (load("res://scripts/unit.gd") as Script).get_script_constant_map().get(name)
 	return float(v) if v != null else -1.0
+
+
+# THE HEX A MOVE LAYS, "" if none: a move carries a hex by laying it, since JO §2 always on a blow.
+func _lays(a: Dictionary) -> String:
+	var id := String((a.get("applies_status", {}) as Dictionary).get("id", ""))
+	return id if HEXES.has(id) else ""
+
+
+func _ab_lays(ab: Ability) -> String:
+	var id := String(ab.applies_status.get("id", ""))
+	return id if HEXES.has(id) else ""
+
+
+func _hex_host(u: BattleUnit, id: String) -> Ability:
+	for a in u.abilities:
+		if _ab_lays(a as Ability) == id:
+			return a
+	return null
 
 
 func _hexes_in(s: Node) -> bool:
@@ -593,8 +617,8 @@ func _s2_the_carriers() -> void:
 		carriers[h] = []
 	for kind in data:
 		for a in data[kind]["abilities"]:
-			if String(a.get("special", "")) == HEX_SPECIAL:
-				var id := String((a.get("applies_status", {}) as Dictionary).get("id", ""))
+			if _lays(a) != "":
+				var id := _lays(a)
 				if carriers.has(id):
 					(carriers[id] as Array).append(String(kind))
 	var none: Array = HEXES.filter(func(h): return (carriers[h] as Array).is_empty())
@@ -769,12 +793,15 @@ func _s2_fester(s: Node, hexes: bool) -> void:
 	var cl := _hero(s, "cleric")
 	var b: BattleUnit = _foes(s)[3]
 	_as_kind(b, "behemoth")
-	var fester := _move(b, HEX_SPECIAL, "Fester")
+	var fester := _hex_host(b, "fester")
 	ok(fester != null, "§2: the premise — the Rot Behemoth carries Fester")
 	if fester == null:
 		return
 	_clean(h)
 	h.hp = h.max_hp
+	# THE BLOW THAT LAYS IT IS STRUCK, SO NOTHING MAY GUARD IT: a Block negates a blow's on-hit effects, and this arm reads the tick.
+	h.block_chance = -10.0
+	h.parry_chance = 0.0
 	await s._resolve(b, fester, h, "good")
 	var tick := int(h.get_status("fester").get("tick", 0))
 	var lost: Array = []
@@ -812,39 +839,29 @@ func _s2_fester(s: Node, hexes: bool) -> void:
 	_as_kind(b, "brute")
 
 
-# C09, C10: EACH HEX PRICED BY WHAT IT DENIES, off JA's census, against its carrier's basic, on JI's line — and the kept table.
+# C09, C10: EACH HEX PRICED AND COOLED BY THE BLOW THAT CARRIES IT, ON JI's ONE LINE — and the kept table. JL priced each hex move by
+# what it denied, off JA's census; since JO §2 no move is a hex alone, so a hex rides a blow the line prices by its damage, the DoT
+# it lays (Fester is one) and its Break, and nothing a hex denies is priced (as Sunder and Exposed are not). JL-hexes.tsv and
+# JM-hexes.tsv keep the convention as JL and JM priced the standalone moves.
 func _s2_the_prices(s: Node) -> void:
-	print("\n§2 — each hex priced by what it denies, and cooled by JI's line")
+	print("\n§2 — each hex rides a blow, priced and cooled by JI's line")
 	var rx := RegEx.new()
 	rx.compile("\\nconst LINE := ([0-9.]+)\\n")
 	var m := rx.search(_doc(LINE_SOURCE))
 	var line := float(m.get_string(1)) if m != null else -1.0
 	ok(line > 1.0, "§2: JI's line could not be read out of %s" % LINE_SOURCE)
-	ok(Gate.fn_body("check_ji.gd", "_blow", _cache) == Gate.fn_body("check_jl.gd", "_blow", _cache), "§2: this gate prices a blow otherwise than check_ji does")
-	var census := {}
-	for r in _doc(CENSUS_TABLE).split("\n", false).slice(1):
-		var c := String(r).split("\t")
-		if c.size() > 3:
-			census[c[0]] = float(c[3])
-	var need := ["turns taken", "healing received", "resource paid for casts", "damage dealt (the damage door)"]
-	var lacking: Array = need.filter(func(q): return not census.has(q))
-	ok(lacking.is_empty(), "§2: JA's census lacks %s" % [lacking])
-	if not lacking.is_empty() or line <= 1.0:
-		return
-	var turns: float = census["turns taken"]
-	var heal_turn: float = census["healing received"] / turns
-	var paid_turn: float = census["resource paid for casts"] / turns
-	var dealt_turn: float = census["damage dealt (the damage door)"] / turns
-	var per_point: float = census["damage dealt (the damage door)"] / census["resource paid for casts"]
-	print("    the reference party a hero turn: healing received %.2f, resource paid %.2f, damage dealt %.2f (%.3f a point paid)" % [heal_turn, paid_turn, dealt_turn, per_point])
+	ok(Gate.fn_body("check_jl.gd", "_blow", _cache) == "" and Gate.fn_body("check_ji.gd", "line_blow", _cache) != "", "§2: this gate prices a blow otherwise than check_ji does")
+	var price := float(JI.break_figures().get("price", -1.0))
+	ok(price > 0.0, "§2: the Break price could not be read off check_ji")
 	var dot: Dictionary = _const(s, "DOT_STATUSES") if _const(s, "DOT_STATUSES") != null else {}
 	var data: Dictionary = Enemies._load()
 	var wrong: Array = []
+	var specials: Array = []
 	var table := {}
 	for r2 in _doc(KEPT_HEXES).split("\n", false).slice(1):
 		var c2 := String(r2).split("\t")
-		if c2.size() >= 7:
-			table["%s/%s" % [c2[0], c2[2]]] = [float(c2[3]), int(c2[6])]
+		if c2.size() >= 17:
+			table["%s/%s" % [c2[0], c2[2]]] = [float(c2[12]), int(c2[16])]
 	var checked := 0
 	for kind in data:
 		var kd: Dictionary = data[kind]
@@ -853,45 +870,31 @@ func _s2_the_prices(s: Node) -> void:
 			if int(a.get("damage", 0)) > 0 and int(a.get("cost", 0)) == 0:
 				basic = a
 				break
-		var bp := _blow(basic, dot) * float(kd["attack"]) / 100.0
+		var atk := float(kd["attack"])
+		var bp := JI.line_blow(basic, dot, atk, price)
 		for a2 in kd["abilities"]:
-			if String(a2.get("special", "")) != HEX_SPECIAL:
+			if String(a2.get("special", "")) == HEX_SPECIAL:
+				specials.append("%s/%s" % [kind, String(a2["display_name"])])
+			var id := _lays(a2)
+			if id == "":
 				continue
-			var st: Dictionary = a2.get("applies_status", {})
-			var id := String(st.get("id", ""))
-			var clock := int(st.get("turns", 0))
-			var worth := -1.0
-			# WHAT EACH DENIES (the convention, JL's ruling): Gall the healing its bearer would receive over its clock, as the
-			# Entrench's cut was counted (JK's ruling 2); Sap the resource its bearer would gain on the turns it acts under it —
-			# the clock less the turn it runs out on, as the Rally's blows were (JK's ruling 5) — a point at the damage the heroes
-			# deal a point paid; Mire the share of each turn it costs on the turns its bearer acts under it, at a hero turn's
-			# damage; Fester its own ticks over the clock the others carry, a stack more each.
-			match id:
-				"gall":
-					worth = _unit_f("GALL_HEAL_CUT") * heal_turn * clock
-				"sap":
-					worth = _unit_f("SAP_CUT") * paid_turn * (clock - 1) * per_point
-				"mire":
-					worth = (1.0 / (1.0 - _unit_f("MIRE_SLOW")) - 1.0) * (clock - 1) * dealt_turn
-				"fester":
-					var tick := maxi(int(round(float(dot.get("fester", 0)) * 0.01 * float(kd["attack"]))), 1)
-					worth = tick * clock * (clock + 1) / 2.0
-			# A HEX THAT REACHES EVERY HERO (`aoe`, Gall since JM §0) denies it on each of the four, as an area blow is priced.
-			if bool(a2.get("aoe", false)):
-				worth *= REACH
+			var worth := JI.line_blow(a2, dot, atk, price)
 			var mult := worth / bp
 			var want := 0 if mult < line else (2 if mult < 2.0 else (3 if mult < 3.0 else 4))
 			var have := int(a2.get("cooldown", 0))
 			checked += 1
-			print("    %5.2f  %-14s %-7s worth %6.1f against a basic of %5.1f: the line %d, the data %d" % [mult, kind, id, worth, bp, want, have])
-			if want != have:
-				wrong.append("%s's %s carries %d, the line gives %d (%.2f of its basic)" % [kind, String(a2["display_name"]).capitalize(), have, want, mult])
+			print("    %5.2f  %-14s %-7s on %-16s worth %6.1f against a basic of %5.1f: the line %d, the data %d" % [mult, kind, id, String(a2["display_name"]), worth, bp, want, have])
+			if int(a2.get("damage", 0)) <= 0:
+				wrong.append("%s's %s lays %s and deals nothing" % [kind, String(a2["display_name"]), id])
+			if mult < line or want != have:
+				wrong.append("%s's %s carries %d, the line gives %d (%.2f of its basic)" % [kind, String(a2["display_name"]), have, want, mult])
 			var row: Variant = table.get("%s/%s" % [kind, id])
 			if row == null or absf(float(row[0]) - worth) > 0.051 or int(row[1]) != have:
-				wrong.append("the kept table prices %s's %s at %s, its worth by what it denies is %.1f" % [kind, id, str(row), worth])
-	print("    CHECKED %d hexes" % checked)
+				wrong.append("the kept table prices %s's %s at %s, its blow on the line is %.1f" % [kind, id, str(row), worth])
+	print("    CHECKED %d hexes, each on a blow" % checked)
 	ok(checked >= HEXES.size(), "§2: the walk priced %d hexes, not four or more" % checked)
-	ok(wrong.is_empty(), "§2: a hex carries no cooldown, or one not off the line, or is priced otherwise than by what it denies: %s" % [wrong])
+	ok(specials.is_empty(), "§2: a move is still a hex that deals nothing and rolls no miss: %s" % [specials])
+	ok(wrong.is_empty(), "§2: a hex rides no blow, or one not cooled off the line: %s" % [wrong])
 
 
 # C11: EACH HEX ON THE HERO's PLATE — its chip, its own tag, in the row under the bars.
@@ -922,9 +925,11 @@ func _s2_the_plate(s: Node, hexes: bool) -> void:
 	_clean(h)
 
 
-# THE SELECTION: the Orc Hexer lays its hexes, each on a hero who does not carry it, and none once every hero does.
+# THE SELECTION (JO §2): the Orc Hexer's Bone Rattle, carrying Sap, is chosen as its attacks are — among the moves that deal damage —
+# and is still chosen once every hero carries Sap, since a blow is never withheld for the status it lays. JL's hex, aimed past the
+# draws at a hero who did not carry it and never once all did, went with the hex special.
 func _s2_the_selection(s: Node, hexes: bool) -> void:
-	print("\n§2 — the selection: a hex aimed at a hero who does not carry it")
+	print("\n§2 — the selection: a hex's blow chosen as an attack is")
 	if not hexes:
 		ok(false, "§2: the selection lays no hex — no hex in the tree")
 		return
@@ -933,31 +938,28 @@ func _s2_the_selection(s: Node, hexes: bool) -> void:
 	for h in _heroes(s):
 		_clean(h)
 	var picked := {}
-	var bad: Array = []
 	for _i in 40:
 		f.cooldowns = {}
 		var c: Dictionary = s.call("_choose_enemy_action", f)
 		var ab: Variant = c.get("ability")
-		if ab is Ability and String((ab as Ability).special) == HEX_SPECIAL:
-			var id := String((ab as Ability).applies_status.get("id", ""))
-			picked[id] = int(picked.get(id, 0)) + 1
-			var t: BattleUnit = c.get("target")
-			if t == null or not t.is_hero or t.is_companion or t.has_status(id):
-				bad.append("%s at %s" % [id, str(t)])
+		if ab is Ability:
+			var nm := (ab as Ability).display_name
+			picked[nm] = int(picked.get(nm, 0)) + 1
+	var host := _hex_host(f, "sap")
+	var name := host.display_name if host != null else "?"
 	print("    the Hexer's choices over 40 on a clean board: %s" % str(picked))
-	ok(picked.size() >= 1 and bad.is_empty(), "§2: the Hexer's selection lays no hex, or lays one on a hero who carries it: %s %s" % [str(picked), bad])
-	# EVERY HERO CARRYING BOTH: the Hexer lays neither (it carries Sap alone since JM §0, Gall on the Orc Archer).
+	ok(host != null and int(picked.get(name, 0)) >= 1 and picked.size() >= 2, "§2: the Hexer's selection does not take the blow that carries Sap among its attacks: %s" % str(picked))
 	var e: BattleUnit = _foes(s)[0]
 	for h2 in _heroes(s):
-		for hx in ["gall", "sap"]:
-			s._apply_status(h2, hx, 3, 0, 0, e)
+		s._apply_status(h2, "sap", 3, 0, 0, e)
 	var again := 0
 	for _j in 30:
+		f.cooldowns = {}
 		var c2: Dictionary = s.call("_choose_enemy_action", f)
-		if c2.get("ability") is Ability and String((c2["ability"] as Ability).special) == HEX_SPECIAL:
+		if c2.get("ability") is Ability and (c2["ability"] as Ability).display_name == name:
 			again += 1
-	print("    with every hero carrying Gall and Sap: %d hexes chosen of 30" % again)
-	ok(again == 0, "§2: the Hexer lays a hex on heroes who all carry it (%d of 30)" % again)
+	print("    with every hero carrying Sap: %s chosen %d of 30" % [name, again])
+	ok(again >= 1, "§2: the Hexer withholds the blow that lays Sap once every hero carries it (%d of 30)" % again)
 	for h3 in _heroes(s):
 		_clean(h3)
 	_as_kind(f, "shieldmaster")
@@ -987,14 +989,6 @@ func _s3_the_reading() -> void:
 				gone.append("%s: %s" % [k, fig])
 	ok(gone.is_empty(), "§3: the record states the reading without the warband's blows a fight or each hex's uptime: %s" % [gone])
 	print("    the reading held: %s" % str(rows))
-
-
-func _blow(a: Dictionary, dot: Dictionary) -> float:
-	var st: Dictionary = a.get("applies_status", {})
-	# A POISON SKIPS THE TURN IT LANDS (`_dot_pass`, its `fresh` flag), so it ticks one fewer than its turns; a Burn ticks every one.
-	var ticks := maxf(0.0, float(st.get("turns", 0)) - (1.0 if String(st.get("id", "")) == "poison" else 0.0))
-	var tick := float(dot.get(String(st.get("id", "")), 0)) * ticks * float(a.get("status_chance", 1.0))
-	return (float(a.get("damage", 0)) + tick) * (REACH if bool(a.get("aoe", false)) else 1)
 
 
 func _figures(cell: String) -> Array:
@@ -1044,12 +1038,12 @@ func _s4_not_done(s: Node) -> void:
 	for k3 in data:
 		for a2 in (data[k3] as Dictionary).get("abilities", []):
 			var sp := String(a2.get("special", ""))
-			if sp == HEX_SPECIAL:
+			if _lays(a2) != "":
 				hex_moves += 1
-			elif not sp.begins_with("malice_"):
+			if not sp.begins_with("malice_"):
 				moves += 1
-	print("    %d kinds, %d moves beside the spends and %d hexes" % [data.size(), moves, hex_moves])
-	ok(data.size() == KINDS and moves == MOVES_BEFORE, "§4: the warband holds %d kinds and %d moves beside its spends and hexes, not %d and %d" % [data.size(), moves, KINDS, MOVES_BEFORE])
+	print("    %d kinds, %d moves beside the spends, %d of them laying a hex" % [data.size(), moves, hex_moves])
+	ok(data.size() == KINDS and moves == MOVES_BEFORE, "§4: the warband holds %d kinds and %d moves beside its spends, not %d and %d" % [data.size(), moves, KINDS, MOVES_BEFORE])
 
 
 # ── §5 — THE TEXTS FOLLOW THE CONSTANTS ───────────────────────────────────────
@@ -1064,8 +1058,8 @@ func _s5_the_texts(s: Node, hexes: bool) -> void:
 	var turns := {}
 	for kind in Enemies._load():
 		for a in Enemies._load()[kind]["abilities"]:
-			if String(a.get("special", "")) == HEX_SPECIAL:
-				turns[String(a["applies_status"]["id"])] = int(a["applies_status"]["turns"])
+			if _lays(a) != "":
+				turns[_lays(a)] = int(a["applies_status"]["turns"])
 	var sentence := "Gall cuts the healing every hero receives by %d%% for %d turns; Sap cuts what a hero's resource bar gains by %d%% for %d turns; Mire makes a hero act %d%% slower for %d turns; Fester deals %d%% of its applier's Attack a stack at each of the hero's turn starts and gains a stack each turn, until it is cleansed." % [
 		gall, int(turns.get("gall", -1)), sap, int(turns.get("sap", -1)), mire, int(turns.get("mire", -1)), fester]
 	ok(_flat(_block(_doc("res://docs/state.md"), HEXES_HEAD)).contains(sentence), "§5: the state does not state what each hex does off the constants: '%s'" % sentence)
@@ -1088,8 +1082,8 @@ func _s5_the_texts(s: Node, hexes: bool) -> void:
 			off.append("%s's glossary line" % hx)
 	for kind in data:
 		for ab in Enemies.config(String(kind))["abilities"]:
-			if String((ab as Ability).special) == HEX_SPECIAL:
-				var id := String((ab as Ability).applies_status.get("id", ""))
+			if _ab_lays(ab as Ability) != "":
+				var id := _ab_lays(ab as Ability)
 				if not (ab as Ability).description.contains(String(want.get(id, "?"))):
 					off.append("%s's %s" % [kind, (ab as Ability).display_name])
 				for ln in (ab as Ability).description.split("\n"):

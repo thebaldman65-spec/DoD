@@ -18,7 +18,11 @@
 extends SceneTree
 
 const Gate = preload("res://gate_fixture.gd")
+# JI's LINE AND ITS BREAK PRICE (JO §1): the one blow every gate on the line prices through.
+const JI = preload("res://check_ji.gd")
 
+# THE HEX SPECIAL — gone since JO §2 (no warband move lays a status on a hero unless it deals damage): a kind carries Gall by a
+# move that lays it, always a blow now.
 const HEX_SPECIAL := "warband_hex"
 # An area blow reaches the party's four heroes, as check_ji prices it.
 const REACH := 4
@@ -37,13 +41,16 @@ const FESTER_RATE := 3
 const CENSUS_TABLE := "res://docs/reports/JA-shares.tsv"
 const LINE_SOURCE := "res://check_ji.gd"
 const KEPT_DRIVE := "res://docs/reports/JL-drive.tsv"
-const KEPT_HEXES := "res://docs/reports/JM-hexes.tsv"
+# The hexes as the tree holds them: JO's since JO §2 put them onto blows (JM-hexes.tsv stays JM's record of Gall by what it denies).
+const KEPT_HEXES := "res://docs/reports/JO-hexes.tsv"
 const KEPT_ARC := "res://docs/reports/JM-arc.tsv"
 const KEPT_IMPURITIES := "res://docs/reports/JM-impurities.tsv"
 const KEPT_PLAYED := "res://docs/reports/JM-played.tsv"
 const KEPT_GRADES := "res://docs/reports/JM-grades.tsv"
 # SINCE JN THE KEPT KIT IS JN's: ten kinds' second damaging moves raised to the line (`check_jn` §1), every other move as JM left it.
-const KIT_PIN := "res://docs/reports/JN-kit.json"
+# SINCE JO IT IS JO's, Gall among its moves: seven of the ten brought to the line priced with their Break, and the four hexes onto
+# blows (`check_jo` §1, §2).
+const KIT_PIN := "res://docs/reports/JO-kit.json"
 # THE TREE JM's FIVE RE-READS STAND FOR (§3), its digest as `check_jm` took it on JM's commit.
 const JM_TREE := "c2c74d46e931d8be168cf759e9e83353"
 const FOE := {"type": "fight", "theme": "Warband", "enemies": ["archer", "hexer", "raider", "shieldmaster"]}
@@ -228,8 +235,8 @@ func _carriers() -> Dictionary:
 	var data: Dictionary = Enemies._load()
 	for kind in data:
 		for a in data[kind]["abilities"]:
-			if String(a.get("special", "")) == HEX_SPECIAL:
-				var id := String((a.get("applies_status", {}) as Dictionary).get("id", ""))
+			var id := String((a.get("applies_status", {}) as Dictionary).get("id", ""))
+			if ["gall", "sap", "mire", "fester"].has(id):
 				if not out.has(id):
 					out[id] = []
 				(out[id] as Array).append(String(kind))
@@ -241,7 +248,7 @@ func _gall_move(kind: String) -> Dictionary:
 	if not data.has(kind):
 		return {}
 	for a in data[kind]["abilities"]:
-		if String(a.get("special", "")) == HEX_SPECIAL and String((a.get("applies_status", {}) as Dictionary).get("id", "")) == "gall":
+		if String((a.get("applies_status", {}) as Dictionary).get("id", "")) == "gall":
 			return a
 	return {}
 
@@ -259,14 +266,6 @@ func _tree_digest() -> String:
 	for n in names:
 		ctx.update(("%s %s\n" % [String(n).trim_prefix("res://"), FileAccess.get_md5(n)]).to_utf8_buffer())
 	return ctx.finish().hex_encode()
-
-
-func _blow(a: Dictionary, dot: Dictionary) -> float:
-	var st: Dictionary = a.get("applies_status", {})
-	# A POISON SKIPS THE TURN IT LANDS (`_dot_pass`, its `fresh` flag), so it ticks one fewer than its turns; a Burn ticks every one.
-	var ticks := maxf(0.0, float(st.get("turns", 0)) - (1.0 if String(st.get("id", "")) == "poison" else 0.0))
-	var tick := float(dot.get(String(st.get("id", "")), 0)) * ticks * float(a.get("status_chance", 1.0))
-	return (float(a.get("damage", 0)) + tick) * (REACH if bool(a.get("aoe", false)) else 1)
 
 
 func _figures(cell: String) -> Array:
@@ -325,9 +324,10 @@ func _s0_the_carrier() -> void:
 
 
 # C02: GALL REACHES EVERY HERO — the move's own reach, and one cast lays it on every hero standing, each hero's heal then halved
-# at that hero's own door.
+# at that hero's own door. SINCE JO §2 GALL IS AN AREA BLOW, so it reaches what an area blow strikes — every ally, a companion
+# among them — and its hover names that reach; JM's *never a companion* went with the hex special.
 func _s0_the_reach(s: Node) -> void:
-	print("\n§0 — Gall's reach: one cast, every hero standing")
+	print("\n§0 — Gall's reach: one cast, every ally standing")
 	var car := _carriers()
 	var kind := String((car.get("gall", [""]) as Array)[0]) if not (car.get("gall", []) as Array).is_empty() else ""
 	var mv := _gall_move(kind)
@@ -336,11 +336,13 @@ func _s0_the_reach(s: Node) -> void:
 	var cfg := Enemies.config(kind) if kind != "" else {}
 	var gall: Ability = null
 	for a in cfg.get("abilities", []):
-		if String((a as Ability).special) == HEX_SPECIAL and String((a as Ability).applies_status.get("id", "")) == "gall":
+		if String((a as Ability).applies_status.get("id", "")) == "gall":
 			gall = a
 	if gall == null:
 		ok(false, "§0: no kind carries Gall — it reaches nobody")
 		return
+	e.attack = int(cfg.get("attack", e.attack))
+	e.crit_bonus = -1.0
 	e.abilities = cfg["abilities"]
 	e.cooldowns = {}
 	e.intent = {}
@@ -353,6 +355,9 @@ func _s0_the_reach(s: Node) -> void:
 		w.heal_amount(40, true)
 		whole.append(w.hp - 1)
 		_clean(w)
+		# A BLOW IS STRUCK, SO NOTHING MAY GUARD IT HERE: a Block negates a blow's on-hit effects, and this arm reads the reach.
+		w.block_chance = -10.0
+		w.parry_chance = 0.0
 	# A COMPANION STANDS ON THE BOARD, SO "NEVER A COMPANION" IS ASKED AND NOT ASSUMED: the Beastmaster's seat summons one.
 	var bm: BattleUnit = null
 	for h0 in _heroes(s):
@@ -364,11 +369,11 @@ func _s0_the_reach(s: Node) -> void:
 	for c0 in pets:
 		(c0 as BattleUnit).remove_status("gall")
 	var aim: BattleUnit = _heroes(s)[1]
-	# ITS HOVER NAMES WHOM IT REACHES: every hero, never an ally a companion could be.
+	# ITS HOVER NAMES WHOM IT REACHES: every ally, as every area blow's does.
 	e.intent = {"ability": gall, "target": aim, "turns": 1, "support": false, "message": "", "logs": []}
 	var hover := String(s.call("_intent_hover_text", e))
 	e.intent = {}
-	ok(hover.contains("Reaches every hero") and not hover.contains("Hits every ally"), "§0: Gall's hover does not say it reaches every hero: '%s'" % hover.replace("\n", " / "))
+	ok(hover.contains("Hits every ally") and not hover.contains("Reaches every hero"), "§0: Gall's hover does not say it hits every ally: '%s'" % hover.replace("\n", " / "))
 	await s._resolve(e, gall, aim, "good")
 	var took: Array = []
 	var heal: Array = []
@@ -389,16 +394,17 @@ func _s0_the_reach(s: Node) -> void:
 	var pet_galled: Array = pets.filter(func(c): return (c as BattleUnit).has_status("gall"))
 	print("    CHECKED %d heroes, %d companions" % [_heroes(s).size(), pets.size()])
 	ok(not pets.is_empty(), "§0: no companion stood on the board, so Gall's reach was never asked of one")
-	ok(pet_galled.is_empty(), "§0: Gall reached a companion, which takes no turn and holds no bar: %s" % str(pet_galled.map(func(c): return (c as BattleUnit).unit_name)))
+	ok(pet_galled.size() == pets.size(), "§0: Gall, an area blow, missed a companion it struck: %d of %d galled" % [pet_galled.size(), pets.size()])
 	ok(off.is_empty(), "§0: a galled hero's heal did not land at the door's cut: %s" % [off])
 	for h2 in _heroes(s):
 		_clean(h2)
 
 
-# THE SELECTION: Gall's carrier chooses it while a hero lacks it, and never once every hero carries it — check_jl §2's selection
-# arm asked the Orc Hexer to lay two, and its Gall half stands here since Gall moved.
+# THE SELECTION: Gall's carrier chooses it as it chooses an attack — check_jl §2's selection arm asked the Orc Hexer to lay two, and
+# its Gall half stands here since Gall moved. SINCE JO §2 GALL IS A BLOW, so it is chosen among the attacks and still chosen once
+# every hero carries it: a blow is never withheld for the status it lays.
 func _s0_the_selection(s: Node) -> void:
-	print("\n§0 — the selection: Gall's carrier lays it while a hero lacks it")
+	print("\n§0 — the selection: Gall's carrier chooses it among the attacks")
 	var car := _carriers()
 	var kind := String((car.get("gall", [""]) as Array)[0]) if not (car.get("gall", []) as Array).is_empty() else ""
 	if kind == "":
@@ -416,11 +422,10 @@ func _s0_the_selection(s: Node) -> void:
 		f.cooldowns = {}
 		var c: Dictionary = s.call("_choose_enemy_action", f)
 		var ab: Variant = c.get("ability")
-		if ab is Ability and String((ab as Ability).special) == HEX_SPECIAL and String((ab as Ability).applies_status.get("id", "")) == "gall":
+		if ab is Ability and String((ab as Ability).applies_status.get("id", "")) == "gall":
 			picked += 1
-			var t: BattleUnit = c.get("target")
-			if t == null or not t.is_hero or t.is_companion or t.has_status("gall"):
-				bad.append(str(t))
+			if String((ab as Ability).special) != "":
+				bad.append("a special, %s" % (ab as Ability).special)
 	var e: BattleUnit = _foes(s)[1]
 	for h2 in _heroes(s):
 		s._apply_status(h2, "gall", 3, 0, 0, e)
@@ -428,38 +433,32 @@ func _s0_the_selection(s: Node) -> void:
 	for _j in 30:
 		f.cooldowns = {}
 		var c2: Dictionary = s.call("_choose_enemy_action", f)
-		if c2.get("ability") is Ability and String((c2["ability"] as Ability).special) == HEX_SPECIAL \
-				and String((c2["ability"] as Ability).applies_status.get("id", "")) == "gall":
+		if c2.get("ability") is Ability and String((c2["ability"] as Ability).applies_status.get("id", "")) == "gall":
 			again += 1
 	print("    %s chose Gall %d of 40 on a clean board, %d of 30 with every hero carrying it" % [kind, picked, again])
-	ok(picked >= 1 and bad.is_empty(), "§0: Gall's carrier never chooses it on a clean board, or aims it at a hero who carries it: %d %s" % [picked, bad])
-	ok(again == 0, "§0: Gall's carrier lays it on heroes who all carry it (%d of 30)" % again)
+	ok(picked >= 1 and bad.is_empty(), "§0: Gall's carrier never chooses it among its attacks on a clean board, or chooses a special: %d %s" % [picked, bad])
+	ok(again >= 1, "§0: Gall's carrier withholds its blow once every hero carries Gall (%d of 30)" % again)
 	for h3 in _heroes(s):
 		_clean(h3)
 	f.cooldowns = {}
 
 
-# C03: GALL's BAND IS ITS WORTH's — what it denies on every hero, against its carrier's basic, on JI's line; and the kept table.
+# C03: GALL's BAND IS ITS BLOW's — since JO §2 a blow on every ally, priced on JI's one line by its damage and its Break (what Gall
+# denies is unpriced, as a status a blow lays is), against its carrier's basic; and the kept table. JM-hexes.tsv keeps JM's
+# reading of Gall by what it denied.
 func _s0_the_band(s: Node) -> void:
-	print("\n§0 — Gall's cooldown, off what it denies")
+	print("\n§0 — Gall's cooldown, off its blow on JI's line")
 	var rx := RegEx.new()
 	rx.compile("\\nconst LINE := ([0-9.]+)\\n")
 	var m := rx.search(_doc(LINE_SOURCE))
 	var line := float(m.get_string(1)) if m != null else -1.0
 	ok(line > 1.0, "§0: JI's line could not be read out of %s" % LINE_SOURCE)
-	var census := {}
-	for r in _doc(CENSUS_TABLE).split("\n", false).slice(1):
-		var c := String(r).split("\t")
-		if c.size() > 3:
-			census[c[0]] = float(c[3])
-	if line <= 1.0 or not census.has("turns taken") or not census.has("healing received"):
-		ok(false, "§0: JA's census lacks the healing a hero receives a hero turn")
-		return
-	var heal_turn: float = census["healing received"] / census["turns taken"]
+	var price := float(JI.break_figures().get("price", -1.0))
+	ok(price > 0.0, "§0: the Break price could not be read off check_ji")
 	var car := _carriers()
 	var kind := String((car.get("gall", [""]) as Array)[0]) if not (car.get("gall", []) as Array).is_empty() else ""
 	var mv := _gall_move(kind)
-	if mv.is_empty():
+	if mv.is_empty() or line <= 1.0:
 		ok(false, "§0: no kind carries Gall, so nothing prices it")
 		return
 	var data: Dictionary = Enemies._load()
@@ -470,23 +469,23 @@ func _s0_the_band(s: Node) -> void:
 			basic = a
 			break
 	var dot: Dictionary = _const(s, "DOT_STATUSES") if _const(s, "DOT_STATUSES") != null else {}
-	ok(Gate.fn_body("check_ji.gd", "_blow", _cache) == Gate.fn_body("check_jm.gd", "_blow", _cache), "§0: this gate prices a blow otherwise than check_ji does")
-	var bp := _blow(basic, dot) * float(kd["attack"]) / 100.0
-	var clock := int((mv.get("applies_status", {}) as Dictionary).get("turns", 0))
-	var worth := _unit_f("GALL_HEAL_CUT") * heal_turn * clock * (REACH if bool(mv.get("aoe", false)) else 1)
+	ok(Gate.fn_body("check_jm.gd", "_blow", _cache) == "" and Gate.fn_body("check_ji.gd", "line_blow", _cache) != "", "§0: this gate prices a blow otherwise than check_ji does")
+	var atk := float(kd["attack"])
+	var bp := JI.line_blow(basic, dot, atk, price)
+	var worth := JI.line_blow(mv, dot, atk, price)
 	var mult := worth / bp
 	var want := 0 if mult < line else (2 if mult < 2.0 else (3 if mult < 3.0 else 4))
 	var have := int(mv.get("cooldown", 0))
-	print("    %.2f of %s's basic (%.1f): worth %.2f — %.2f a hero turn, cut by half, over %d turns, on %d heroes; the line %d, the data %d" % [
-		mult, kind, bp, worth, heal_turn, clock, REACH if bool(mv.get("aoe", false)) else 1, want, have])
-	ok(want == have, "§0: Gall's cooldown is not the line's on its worth: %.2f of its basic gives %d, the data carries %d" % [mult, want, have])
+	print("    %.2f of %s's basic (%.1f): its blow worth %.2f — %d damage on every ally it strikes; the line %d, the data %d" % [
+		mult, kind, bp, worth, int(mv.get("damage", 0)), want, have])
+	ok(int(mv.get("damage", 0)) > 0 and want == have, "§0: Gall's cooldown is not the line's on its blow: %.2f of its basic gives %d, the data carries %d" % [mult, want, have])
 	var row: Variant = null
 	for r2 in _doc(KEPT_HEXES).split("\n", false).slice(1):
 		var c2 := String(r2).split("\t")
-		if c2.size() >= 7 and c2[0] == kind and c2[2] == "gall":
+		if c2.size() >= 17 and c2[0] == kind and c2[2] == "gall":
 			row = c2
-	ok(row != null and absf(float(row[3]) - worth) <= 0.051 and int(row[6]) == have and absf(float(row[5]) - mult) <= 0.006,
-		"§0: the kept table does not price Gall as the data and the census do: %s, worth %.1f, %.2f, cooldown %d" % [str(row), worth, mult, have])
+	ok(row != null and absf(float(row[12]) - worth) <= 0.051 and int(row[16]) == have and absf(float(row[15]) - mult) <= 0.006,
+		"§0: the kept table does not price Gall as the data and the line do: %s, worth %.1f, %.2f, cooldown %d" % [str(row), worth, mult, have])
 
 
 # ── §1 — WHAT THE ARC DID ─────────────────────────────────────────────────────
@@ -643,8 +642,6 @@ func _s4_not_done(s: Node) -> void:
 		for kind in pin:
 			var have: Array = []
 			for a in (data.get(kind, {}) as Dictionary).get("abilities", []):
-				if String(a.get("display_name", "")) == "Gall":
-					continue
 				var st: Dictionary = a.get("applies_status", {})
 				have.append("%s|%d|%d|%d|%.2f|%d|%s|%s|%d|%s" % [a["display_name"], int(a.get("damage", 0)), int(a.get("pressure", 0)),
 					int(a.get("cooldown", 0)), float(a.get("delay", 0)), int(a.get("cost", 0)), String(a.get("special", "")),
@@ -685,7 +682,7 @@ func _s5_the_texts() -> void:
 		off.append("the master document")
 	var cfg := Enemies.config(kind) if kind != "" else {}
 	for a in cfg.get("abilities", []):
-		if String((a as Ability).special) == HEX_SPECIAL and String((a as Ability).applies_status.get("id", "")) == "gall" \
+		if String((a as Ability).applies_status.get("id", "")) == "gall" \
 				and not (a as Ability).description.contains("Every hero receives %d%%" % cut):
 			off.append("%s's %s" % [kind, (a as Ability).display_name])
 	var g := Glossary.entry("status_gall")
