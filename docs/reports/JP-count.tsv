@@ -1,0 +1,57 @@
+what	name	whose, or where	count	attacking fights it happened in	attacking fights its kind is fielded in	attacking fights its kind struck in	laid on a companion	the attacking fights it is taken over
+a hex laid	Gall	Orc Archer, on Gall	51	5	11	8	7	36
+a hex laid	Sap	Orc Hexer, on Bone Rattle	2	2	2	2	0	36
+a hex laid	Mire	Grave Totem, on Mire	2	1	1	1	0	36
+a hex laid	Fester	Rot Behemoth, on Wretched Bellow	4	1	2	2	0	36
+a re-derived move cast	Sundering Strike	Orc Raider	31	14	19	17	-	36
+a re-derived move cast	Skull Crack	Orc Slinger	8	2	3	3	-	36
+a re-derived move cast	Poison Arrow	Orc Archer	8	6	11	8	-	36
+a re-derived move cast	Withering Hex	Orc Hexer	1	1	2	2	-	36
+a re-derived move cast	Ride-by Slash	Wolfrider	2	1	1	1	-	36
+a re-derived move cast	Flame Lick	Ashblade	4	3	3	3	-	36
+a re-derived move cast	Overhead Crush	Orc Brute	3	2	4	3	-	36
+a re-derived move cast	Swampy Grasp	Bog Troll	0	0	1	1	-	36
+a re-derived move cast	Wretched Bellow	Rot Behemoth	1	1	2	2	-	36
+a re-derived move cast	Blood Tribute	Orc Bloodcaller	0	0	0	0	-	36
+a move that carries a hex, cast	Gall	Orc Archer	11	5	11	8	-	36
+a move that carries a hex, cast	Bone Rattle	Orc Hexer	2	2	2	2	-	36
+a move that carries a hex, cast	Mire	Grave Totem	2	1	1	1	-	36
+a warband kind	Orc Raider	raider	19	-	19	17	-	36
+a warband kind	Orc Whelp	whelp	7	-	7	6	-	36
+a warband kind	Orc Slinger	slinger	3	-	3	3	-	36
+a warband kind	Orc Totemist	totemist	1	-	1	1	-	36
+a warband kind	Orc Archer	archer	11	-	11	8	-	36
+a warband kind	Orc Shieldmaster	shieldmaster	6	-	6	3	-	36
+a warband kind	Orc Shaman	shaman	3	-	3	3	-	36
+a warband kind	Orc Hexer	hexer	2	-	2	2	-	36
+a warband kind	Wolfrider	wolfrider	1	-	1	1	-	36
+a warband kind	Ashblade	ashblade	3	-	3	3	-	36
+a warband kind	Orc Brute	brute	4	-	4	3	-	36
+a warband kind	Bog Troll	bog_troll	1	-	1	1	-	36
+a warband kind	Rot Behemoth	behemoth	2	-	2	2	-	36
+a warband kind	Orc Chief	chief	9	-	9	8	-	36
+a warband kind	Withered Warden	withered_warden	1	-	1	1	-	36
+a warband kind	Ash-Wrought Tyrant	ash_tyrant	0	-	0	0	-	36
+a warband kind	Orc Ritual Chanter	chanter	2	-	2	2	-	36
+a warband kind	Ash Hurler	hurler	2	-	2	1	-	36
+a warband kind	Orc Bloodcaller	bloodcaller	0	-	0	0	-	36
+a warband kind	Grave Totem	grave_totem	1	-	1	1	-	36
+a warband kind	The Hollow Crown	hollow_crown	1	-	1	1	-	36
+heroes Broken	every Break on the party's side	-	21	-	-	-	-	36
+heroes Broken	by one of the ten JO re-derived	-	2	-	-	-	-	36
+the fights	the logs hold	-	315	-	-	-	-	-
+the fights	with enemy attacks off	-	270	-	-	-	-	-
+the fights	with attacks on and no warband strike	-	9	-	-	-	-	-
+the fights	where the warband attacks	-	36	-	-	-	-	-
+a target's fights	check_fh	0 with enemy attacks off, 0 with no warband strike	20	-	-	-	-	-
+a target's fights	check_gf	0 with enemy attacks off, 3 with no warband strike	8	-	-	-	-	-
+a target's fights	check_gj	34 with enemy attacks off, 1 with no warband strike	35	-	-	-	-	-
+a target's fights	check_gp	70 with enemy attacks off, 0 with no warband strike	70	-	-	-	-	-
+a target's fights	check_gv	122 with enemy attacks off, 0 with no warband strike	122	-	-	-	-	-
+a target's fights	check_hk	37 with enemy attacks off, 0 with no warband strike	37	-	-	-	-	-
+a target's fights	check_ho	3 with enemy attacks off, 0 with no warband strike	3	-	-	-	-	-
+a target's fights	check_hr	2 with enemy attacks off, 0 with no warband strike	2	-	-	-	-	-
+a target's fights	check_if	0 with enemy attacks off, 0 with no warband strike	3	-	-	-	-	-
+a target's fights	test_batch_al	2 with enemy attacks off, 0 with no warband strike	2	-	-	-	-	-
+a target's fights	test_batch_bl	0 with enemy attacks off, 5 with no warband strike	7	-	-	-	-	-
+a target's fights	test_rune_battle	0 with enemy attacks off, 0 with no warband strike	6	-	-	-	-	-

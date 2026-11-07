@@ -4,6 +4,21 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The count gets fights, and the party's three answers are read out (Batch JP) — 2026-11-07
+
+**Why a count reads only the fights where the warband attacks.** A fight whose warband's attacks are switched off is one no warband
+move — a blow, a hex, a heal or a spend — can fire in (only Malice still fills, off the heroes' blows), so a count over it says how often the tests switch the attacks off, not whether the code works. The gates that
+switch them off need to: each walks a whole road, or holds a board still, and a wipe would end the road before the screen it checks. So the
+count keeps the fights and reads only those the warband attacks in, and says how many — a figure without its denominator is not a count.
+
+**Why the dials are written down and not pulled.** The warband was raised in two batches and the party's healer cut, and none of it has been
+played. Balance is the designer's, judged by playing, so the batch's part is to make each reversal exact and cheap — the keys and the figure
+to return to, written where the change is recorded — and to leave the pulling to play.
+
+**Why the readout quotes every door.** The brief's own premises about which side a mechanism belongs to have been wrong in both
+directions, and were again here: a hero declares no move, so a Break discards a declaration only on the warband's side. A door quoted at
+source can be checked every battery; a door described cannot.
+
 ## Break gets a price, and the hexes ride blows (Batch JO) — 2026-11-06
 
 **Why Break is priced on both sides of the line.** A filled Break bar costs a hero his next turn, so a point of Break damage is worth a hero

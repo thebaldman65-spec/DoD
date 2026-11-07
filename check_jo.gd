@@ -406,10 +406,12 @@ func _s1_the_price() -> void:
 	ok(apart.is_empty(), "§1: a gate prices on JI's line otherwise than through its one blow: %s" % [apart])
 	# THE RECORD STATES THE PRICE AND BOTH FIGURES OFF THEIR SOURCES (R01).
 	# Three places state it — the cooldowns' rule, WHERE and JO's ruling 1 — and each is asked, so a figure moved in one alone reds.
+	# RE-POINTED AT JP: the rulings were answered and archived word for word, the heading struck, so ruling 1 is read in the archive.
 	var said := [ "%.2f" % turn, "%.2f" % meter, "%.4f" % price]
 	var lacking: Array = []
-	for head in [COOLDOWNS_HEAD, "## WHERE THE PROJECT IS", "### JO's RULINGS OWED"]:
-		var rec := _flat(_block(_doc("res://docs/state.md"), String(head)))
+	for head in [COOLDOWNS_HEAD, "## WHERE THE PROJECT IS", "### ~~JO's RULINGS OWED~~"]:
+		var rec := _flat(_block(_doc("res://DoD-archive/state-archive.md"), String(head))) if String(head).begins_with("### ~~") \
+			else _flat(_block(_doc("res://docs/state.md"), String(head)))
 		var miss: Array = said.filter(func(x): return not rec.contains(String(x)))
 		if rec == "" or not miss.is_empty():
 			lacking.append("%s: %s" % [head, str(miss) if rec != "" else "absent"])

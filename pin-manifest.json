@@ -2,13 +2,13 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 2362,
+  "total": 2373,
   "source": 1447,
-  "other": 325,
+  "other": 336,
   "document": 590
  },
  "floor": {
-  "pins": 2362
+  "pins": 2373
  },
  "falls": [],
  "source_residency": {
@@ -12869,7 +12869,7 @@
   {
    "s": "check_jo.gd",
    "fn": "_s1_the_price",
-   "h": "docs/state.md",
+   "h": "DoD-archive/state-archive.md",
    "n": null,
    "p": "-",
    "r": "runtime",
@@ -12889,6 +12889,132 @@
    "how": "read",
    "g": "check_jo.gd#490",
    "expr": "RIDE"
+  },
+  {
+   "s": "check_jp.gd",
+   "fn": "_s0_the_dials",
+   "h": "docs/state.md",
+   "n": null,
+   "p": "-",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_jp.gd#185",
+   "expr": "NOT_PULLED"
+  },
+  {
+   "s": "check_jp.gd",
+   "fn": "_s0_the_dials",
+   "h": "docs/state.md",
+   "n": "all but the Wretched Bellow",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jp.gd#190"
+  },
+  {
+   "s": "check_jp.gd",
+   "fn": "_s0_the_dials",
+   "h": "docs/state.md",
+   "n": "cooldown key",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jp.gd#190"
+  },
+  {
+   "s": "check_jp.gd",
+   "fn": "_s0_the_dials",
+   "h": "docs/state.md",
+   "n": "on nine of them",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jp.gd#190"
+  },
+  {
+   "s": "check_jp.gd",
+   "fn": "_s0_the_rulings",
+   "h": "DoD-archive/state-archive.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_jp.gd#120",
+   "expr": "ANSWERED"
+  },
+  {
+   "s": "check_jp.gd",
+   "fn": "_s0_the_rulings",
+   "h": "docs/state.md",
+   "n": "\n",
+   "p": "-",
+   "r": "runtime",
+   "k": "composed",
+   "how": "read",
+   "g": "check_jp.gd#114"
+  },
+  {
+   "s": "check_jp.gd",
+   "fn": "_s0_the_rulings",
+   "h": "DoD-archive/state-archive.md",
+   "n": " %d. **",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "read",
+   "g": "check_jp.gd#118"
+  },
+  {
+   "s": "check_jp.gd",
+   "fn": "_s1_the_count",
+   "h": "docs/reports/JP-count.tsv",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_jp.gd#257",
+   "expr": "String"
+  },
+  {
+   "s": "check_jp.gd",
+   "fn": "_s1_the_rule",
+   "h": "docs/ways-of-working.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_jp.gd#263",
+   "expr": "FLOOR_HEAD"
+  },
+  {
+   "s": "check_jp.gd",
+   "fn": "_s1_the_rule",
+   "h": "docs/ways-of-working.md",
+   "n": "\n\n",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jp.gd#264"
+  },
+  {
+   "s": "check_jp.gd",
+   "fn": "_s2_the_answers",
+   "h": "docs/reports/JP-answers.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_jp.gd#323",
+   "expr": "String"
   },
   {
    "s": "test_batch_ah.gd",

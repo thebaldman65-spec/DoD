@@ -127,7 +127,10 @@ words:)* the prediction it retires is a balance figure's, so the battery's count
 stays is a count, never a comparison, because a mechanic that never fires is code that does not work; and the rules of this file that
 order a reading — the pair for a brief that grades a modifier (JC §0.9, above) and *ORDER THE READING* (JH §0.8, below) — with the
 instrument rules about a reading and its errors, bind a reading no batch takes now and stand as written, for the day the designer
-orders one. Everything else a batch verifies is `docs/instrument-rules.md`'s and is not restated here.
+orders one. **THE COUNT IS TAKEN ONLY ON FIGHTS WHERE THE WARBAND ATTACKS, AND IT SAYS HOW MANY SUCH FIGHTS IT HAD (JP §1, the designer's).**
+*(The batch's reading, JP §1, not the designer's words:)* a fight whose warband's attacks are switched off is one no warband move — a blow, a
+hex it lays, a heal or a spend — can fire in, so a count taken over it measures the harness; the count names the fights it read and carries their number beside every figure.
+Everything else a batch verifies is `docs/instrument-rules.md`'s and is not restated here.
 
 **ORDER THE READING, AND DO NOT WRITE THE CARD UNTIL IT COMES BACK (JH §0.8, the designer's note 35).** JG's brief wrote a card's
 condition in one section and ordered the reading that would falsify it in another, and the words carried a condition that was
