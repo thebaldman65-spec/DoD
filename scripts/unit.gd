@@ -131,6 +131,14 @@ const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",
 	# Burn and the Chilled inside it are what count, two, and the composition none.
 	"rupture"]
 
+# BATCH JQ §2 — THE FOUR HEXES, AS A LIST. The data does not mark the family: each hex is a row of `DEBUFF_IDS` (JL §2)
+# beside every other affliction, the status rows of three say *(a hex the warband laid)* in their prose and Fester's says
+# nothing, and the warband moves that lay them carry no key a hero's moves lack. So these are FOUR IDS WRITTEN DOWN, NOT A
+# DERIVATION. What would make it one is a mark on the data — a `hex` key on each hex's status row, or on the warband moves'
+# `applies_status` — read here in place of the list. `check_jq` §2 holds every id here in `DEBUFF_IDS`, and reds the day a
+# warband move's `applies_status` carries a key beyond its id and its turns, so a mark there is met while this list stands.
+const HEX_IDS := ["gall", "sap", "mire", "fester"]
+
 var frame_size := 100      # square frame edge of this unit's sprite strips
 var portrait_path := ""    # dedicated portrait art (falls back to a sheet crop)
 var hero_key := ""         # class id ("warrior"...) — display name may be the spec
@@ -3776,8 +3784,13 @@ func set_chilled_stacks(n: int) -> void:
 	_refresh_chips()
 
 
-# On the Mend: strip ONE random harmful status (Broken excluded).
+# THE SINGLE-PICK CLEANSE: strip ONE harmful status (Broken excluded).
 # Returns the removed status label, or "" if nothing was dispellable.
+# BATCH JQ §2 — IT AIMS, AND NO LONGER ROLLS (the designer's): a hex if the body carries one, and otherwise the harmful
+# status with the most turns left, the first laid on a tie (`aimed_cleanse_pick`). The filter is unchanged — only the pick
+# moved. Seven sources reach it at six calls: Dispel on a hero, Field Dressing, the Rune of the Medic, the talent Cleanse
+# Debuffs Each Turn and Fellowship's kept read (one call, its ally still drawn at random), and On the Mend's and Cleansing
+# Waters', whose fields nothing writes.
 func dispel_one_debuff() -> String:
 	var candidates: Array = []
 	for s in statuses:
@@ -3785,9 +3798,35 @@ func dispel_one_debuff() -> String:
 			candidates.append(s)
 	if candidates.is_empty():
 		return ""
-	var pick: Dictionary = candidates.pick_random()
+	var pick: Dictionary = aimed_cleanse_pick(candidates)
 	remove_status(pick.id)
 	return pick.label
+
+
+# BATCH JQ §2 — THE AIMED PICK among a cleanse's candidates: a hex before anything else, the most turns left within each
+# group (`status_turns_left`), the first laid on a tie — two hexes on equal turns included. **THE BLEED CHIP RANKS LAST**: it
+# is the warning of a meter (`log_bleed_chip`, battle-long), not a timed affliction, and taking it leaves the meter standing —
+# the reason the Rite's filter refuses it — so it is taken only where nothing else stands. Static over a list, so a gate reads
+# the rule without a body.
+static func aimed_cleanse_pick(candidates: Array) -> Dictionary:
+	var best: Dictionary = {}
+	var best_hex := -1
+	var best_left := -1
+	for s in candidates:
+		var hex := 1 if HEX_IDS.has(String((s as Dictionary).get("id", ""))) else 0
+		var left := -1 if String((s as Dictionary).get("id", "")) == "bleed" else status_turns_left(s)
+		if hex > best_hex or (hex == best_hex and left > best_left):
+			best = s
+			best_hex = hex
+			best_left = left
+	return best
+
+
+# The turns a status has left, for every most-turns-left comparison (the aimed cleanse here, a mender's Rite through
+# `battle._turns_left`): a battle-long status (turns < 0 — a Permafrost chill, Ruin) outlasts every timed one.
+static func status_turns_left(s: Dictionary) -> int:
+	var t := int(s.get("turns", 0))
+	return 999 if t < 0 else t
 
 
 # Cleanse: strip every harmful status. Broken stays — it's a Break-meter

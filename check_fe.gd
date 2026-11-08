@@ -180,7 +180,8 @@ func _s1_rune_tags_follow_the_cards() -> void:
 	# BATCH HB — 70 -> 71, AND NOTHING WAS RE-TAGGED: Summon Companion, the
 	# Hunter's new class-kit card, leads with OFFENSE. A row authored, not a
 	# column rewritten — BREAK first is still zero on the line above.
-	ok(card_offense == 71, "§1: the card OFFENSE column reads %d, not FD's 70 and HB's one more"
+	# BATCH JQ — 71 -> 72, AND NOTHING WAS RE-TAGGED: Read the Tell, the Warrior's new class card, leads with OFFENSE.
+	ok(card_offense == 72, "§1: the card OFFENSE column reads %d, not FD's 70, HB's one more and JQ's one more"
 		% card_offense)
 	# BATCH GN — AGAINST THE CORPUS, NOT A LITERAL (Magic Burst took it to 228).
 	ok(Classes.CARD_TAGS.size() == Classes.ability_corpus().size(),

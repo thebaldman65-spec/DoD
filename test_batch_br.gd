@@ -663,8 +663,12 @@ func _draft_flow() -> void:
 		for n in Classes.class_draft_pool(ck):
 			if left.has(String(n)):
 				wide += 1
-		ok(wide == 6,
-			"§4: a %s can reach %d of his six class-wide cards" % [ck, wide])
+		# RE-POINTED BY BATCH JQ, AND THE QUESTION IS UNCHANGED: is his whole class-wide shelf reachable? The Warrior's grew to
+		# seven (Read the Tell), so the literal six went red on an answer that was right; the shelf's size is test_batch_cd's
+		# to pin (`PER_CLASS_DEPTH`), and this reads against it.
+		var shelf := Classes.class_draft_pool(ck).size()
+		ok(shelf > 0 and wide == shelf,
+			"§4: a %s can reach %d of his %d class-wide cards" % [ck, wide, shelf])
 	# The no-return ledger covers a class card exactly as it covers a spec one.
 	# RE-POINTED BY BATCH CK §2, AND IT HAD TO BE. With the card renamed, a
 	# ledger holding "Iron Will" refuses a name the pool never carried, so the

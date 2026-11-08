@@ -1,0 +1,49 @@
+what	name	count	the attacking fights it is taken over
+Forsaken laid	by Forsake, the Cleric's card	29	56
+a body died Forsaken	its kill and its overkill denied	25	56
+a single-pick cleanse took a hex	Gall, Sap, Mire or Fester	2	56
+a single-pick cleanse took something else	any other harmful effect	2	56
+Read the Tell landed against a cooling move	a blow that landed: its target had declared a move with a cooldown	1	56
+Read the Tell landed against no cooling move	a blow that landed: a declared move that does not cool, or none	10	56
+the attacking fights it happened in	Forsaken laid	21	56
+the attacking fights it happened in	a body died Forsaken	20	56
+the attacking fights it happened in	a single-pick cleanse	3	56
+the attacking fights it happened in	Read the Tell	11	56
+a warband kind fielded	Orc Raider	20	56
+a warband kind fielded	Orc Whelp	8	56
+a warband kind fielded	Orc Slinger	5	56
+a warband kind fielded	Orc Totemist	2	56
+a warband kind fielded	Orc Archer	12	56
+a warband kind fielded	Orc Shieldmaster	6	56
+a warband kind fielded	Orc Shaman	4	56
+a warband kind fielded	Orc Hexer	2	56
+a warband kind fielded	Wolfrider	6	56
+a warband kind fielded	Ashblade	4	56
+a warband kind fielded	Orc Brute	6	56
+a warband kind fielded	Bog Troll	2	56
+a warband kind fielded	Rot Behemoth	1	56
+a warband kind fielded	Orc Chief	11	56
+a warband kind fielded	Withered Warden	2	56
+a warband kind fielded	Ash-Wrought Tyrant	1	56
+a warband kind fielded	Orc Ritual Chanter	3	56
+a warband kind fielded	Ash Hurler	3	56
+a warband kind fielded	Orc Bloodcaller	2	56
+a warband kind fielded	Grave Totem	2	56
+a warband kind fielded	The Hollow Crown	2	56
+the fights	the logs hold	335	-
+the fights	with enemy attacks off	270	-
+the fights	with attacks on and no warband strike	9	-
+the fights	where the warband attacks	56	-
+a target's fights	check_fh	19	19 in its logs, 0 with enemy attacks off, 0 with no warband strike
+a target's fights	check_gf	5	8 in its logs, 0 with enemy attacks off, 3 with no warband strike
+a target's fights	check_gj	0	37 in its logs, 36 with enemy attacks off, 1 with no warband strike
+a target's fights	check_gp	0	63 in its logs, 63 with enemy attacks off, 0 with no warband strike
+a target's fights	check_gv	0	125 in its logs, 125 with enemy attacks off, 0 with no warband strike
+a target's fights	check_hk	0	39 in its logs, 39 with enemy attacks off, 0 with no warband strike
+a target's fights	check_ho	0	3 in its logs, 3 with enemy attacks off, 0 with no warband strike
+a target's fights	check_hr	0	2 in its logs, 2 with enemy attacks off, 0 with no warband strike
+a target's fights	check_if	3	3 in its logs, 0 with enemy attacks off, 0 with no warband strike
+a target's fights	check_jq	21	21 in its logs, 0 with enemy attacks off, 0 with no warband strike
+a target's fights	test_batch_al	0	2 in its logs, 2 with enemy attacks off, 0 with no warband strike
+a target's fights	test_batch_bl	2	7 in its logs, 0 with enemy attacks off, 5 with no warband strike
+a target's fights	test_rune_battle	6	6 in its logs, 0 with enemy attacks off, 0 with no warband strike

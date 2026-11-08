@@ -556,8 +556,9 @@ const SPEC_DRAFT_POOLS := {
 # `test_batch_cd.PER_CLASS_DEPTH` — for the same reason the spec half became
 # one at DO. **DO NOT WRITE `4 * 6` AGAIN.**
 #
-# **THE DRAFT IS 179 AS OF BATCH IF (159 spec + 20 class-wide), AND NOTHING IS
-# OWED.** IF §2 put Smoulder, the designer's card, on the Pyromancer's shelf; it
+# **THE DRAFT IS 181 AS OF BATCH JQ (159 spec + 22 class-wide), AND NOTHING IS
+# OWED.** JQ put Forsake on the Cleric's class shelf and Read the Tell on the
+# Warrior's; it was 179 from IF §2 (159 + 20). IF §2 put Smoulder, the designer's card, on the Pyromancer's shelf; it
 # was 178 from HL §1, when Guard Change began travelling with the Stances again;
 # HB §2 put Tripwire on the Survivalist's shelf when Summon Companion
 # took its class-kit slot; it was 178 at GS (158 + 20), when GS §1 put the 29
@@ -620,7 +621,9 @@ const SPEC_DRAFT_POOLS := {
 # rebalance GP recorded as owed stays owed (`CLAUDE.md` keeps the rule, struck).
 const CLASS_DRAFT_POOLS := {
 	"warrior": ["Battle Trance", "Rally", "Charge", "Cleave", "Warcry",
-		"Ironclad"],
+		"Ironclad",
+		# BATCH JQ §3 — the punish on a cooling move (the designer's answer; the card and its class the batch's, ruled owed).
+		"Read the Tell"],
 	# BATCH DY §1 — THE CLASS HALF STOPS BEING A FLAT MULTIPLE, AND MANA SHIELD
 	# IS WHY. It was one of the seven vaulted abilities reachable nowhere, and
 	# it is the ONE of the seven that meets this block's own authoring rule
@@ -629,15 +632,18 @@ const CLASS_DRAFT_POOLS := {
 	# dilutes nothing, which is exactly what a class-wide card is for.
 	# **NO DUPLICATION EXISTS ANYWHERE**: derived over the whole corpus, it is
 	# the only ability in the game that converts damage taken into Mana.
-	# The Mage pool reads SEVEN; the other three still read six.
+	# The Mage pool reads SEVEN; the other three still read six. (DY's figures: since GN the Mage's reads five and the
+	# Cleric's three, and since JQ the Warrior's seven and the Cleric's four.)
 	# BATCH GN — FIVE CARDS LEFT FOR THE CLASS KITS, AND A POOL IS THE WHOLE
 	# SUPPLY OF A HERO WHO TOOK A SPINE. Magic Barrier (Nexus Ward since GN) and
 	# Magic Missiles left the Mage's, which reads FIVE; Ministration, Unburden
-	# and Consecration left the Cleric's, which reads THREE — so a Cleric who
-	# takes Sanctity draws his whole run from Chastise, Exhortation and Undying
-	# Vigil. The ruling named that cost. `CLASS_KITS` is where they went.
+	# and Consecration left the Cleric's, which read THREE — so a Cleric who
+	# took Sanctity drew his whole run from Chastise, Exhortation and Undying
+	# Vigil. The ruling named that cost. `CLASS_KITS` is where they went. Since
+	# JQ the Cleric's reads four, Forsake beside them.
 	"mage": ["Mirror Image", "Mana Well", "Dispel", "Blink", "Mana Shield"],
-	"cleric": ["Chastise", "Exhortation", "Undying Vigil"],
+	# BATCH JQ §1 — and Forsake, the kill that denies (the designer's answer; the card and its class the batch's, ruled owed).
+	"cleric": ["Chastise", "Exhortation", "Undying Vigil", "Forsake"],
 	"hunter": ["Field Dressing", "Camouflage", "Aimed Volley", "Bola",
 		"Hunter's Mark", "Arcane Arrows"],
 }
@@ -664,8 +670,8 @@ const CLASS_DRAFT_POOLS := {
 # class-wide cards are **written WEAKER than spec cards** — deliberately, so a
 # safe always-on default could not dilute every build (that half is RETIRED at
 # HD §1). In a merged pool that
-# reason is gone and they are simply **the worst cards in it**: six for the
-# Warrior and the Hunter, five for the Mage, three for the Cleric. **That is
+# reason is gone and they are simply **the worst cards in it**: seven for the
+# Warrior (six until JQ), six for the Hunter, five for the Mage, four for the Cleric (three until JQ). **That is
 # accepted and is NOT repaired here — it is a rebalance owed** (GN's ruling 7,
 # `docs/state.md`). A later reader finding weak class-wide cards should know
 # they were authored that way on purpose.
@@ -677,18 +683,18 @@ const CLASS_DRAFT_POOLS := {
 # channel reads which. THE MERGE JOINED THE DRAFT'S TWO, NOT THE GAME'S THREE.
 #
 # **THE DEPTHS, DERIVED** (`check_gp` §1 derives them again every battery, and
-# no figure here is authored twice): Warrior 42, Mage 52, Cleric 43, Hunter 42
-# — 179, which is `SPEC_DRAFT_POOLS`' 159 plus `CLASS_DRAFT_POOLS`' 20 with no
-# card in both. **GP's merge made them 38 / 41 / 34 / 36 and GS §1 added the 29
+# no figure here is authored twice): Warrior 43, Mage 52, Cleric 44, Hunter 42
+# — 181, which is `SPEC_DRAFT_POOLS`' 159 plus `CLASS_DRAFT_POOLS`' 22 with no
+# card in both (JQ put Read the Tell on the Warrior's class shelf and Forsake on the Cleric's). **GP's merge made them 38 / 41 / 34 / 36 and GS §1 added the 29
 # cards that stopped travelling with an engine** — 5 / 10 / 9 / 5 — each on the
 # shelf of the lineage that opened with it; **HB §2 added Tripwire to the
 # Hunter's** when it left his class kit; HL §1 took Guard Change off the
 # Warrior's (it travels with the Stances); **IF §2 added Smoulder to the Mage's**. A hero drew from 13 to 18 before the
 # merge (his lineage's shelf plus his class's) and a spine-taker from 3 to 6.
 # **AND WHAT HE CAN BE OFFERED IS NARROWER THAN THE POOL**, because of the gate
-# below: holding no engine at all he is offered 38 of the Warrior's 42 (40 until
+# below: holding no engine at all he is offered 39 of the Warrior's 43 (38 of 42 until JQ; 40 of 43 until
 # HD §1 ruled Guard Change and Lunge the Stances holder's), 39 of
-# the Mage's 52, 29 of the Cleric's 43 and 35 of the Hunter's 42 — and a
+# the Mage's 52, 30 of the Cleric's 44 (29 of 43 until JQ) and 35 of the Hunter's 42 — and a
 # Sharpshooter, who fields no companion (HB §4), fewer again (`COMPANION_READ`).
 static func draft_pool(class_key: String) -> Array:
 	var out: Array = []
@@ -1639,6 +1645,7 @@ const CARD_TAGS := {
 	"Ministration": ["DEFENSE"],
 	"Unburden": ["DEFENSE"],
 	"Undying Vigil": ["DEFENSE"],
+	"Forsake": ["MARK"],
 	# --- class:hunter ---
 	"Aimed Volley": ["OFFENSE", "BREAK"],
 	"Arcane Arrows": ["OFFENSE", "RESOURCE"],
@@ -1658,6 +1665,7 @@ const CARD_TAGS := {
 	"Battle Trance": ["DEFENSE", "RESOURCE"],
 	"Charge": ["DEBUFF", "BREAK"],
 	"Cleave": ["OFFENSE", "BREAK"],
+	"Read the Tell": ["OFFENSE", "BREAK"],
 	"Ironclad": ["DEFENSE"],
 	"Rally": ["TEMPO", "RESOURCE"],
 	"Warcry": ["OFFENSE"],
@@ -2036,8 +2044,8 @@ static func spec_draft_pool(spec: String) -> Array:
 	return SPEC_DRAFT_POOLS.get(spec, [])
 
 
-# **BATCH GP — A SHELF, NOT A POOL**, and the same warning: these six (five for
-# the Mage, three for the Cleric) are ordinary cards of the class pool now, with
+# **BATCH GP — A SHELF, NOT A POOL**, and the same warning: these seven for the
+# Warrior, six for the Hunter, five for the Mage and four for the Cleric (since JQ) are ordinary cards of the class pool now, with
 # no share and no tier of their own.
 static func class_draft_pool(class_name_key: String) -> Array:
 	return CLASS_DRAFT_POOLS.get(class_name_key, [])
@@ -2961,7 +2969,10 @@ static func talent_granted_names() -> Array:
 	return out
 
 
-# -- THE DRAFTED ABILITIES — ONE HUNDRED AND SEVENTY-NINE OF A TARGET 179 (BO..IF) --
+# -- THE DRAFTED ABILITIES — ONE HUNDRED AND EIGHTY-ONE OF A TARGET 181 (BO..JQ) --
+#
+# BATCH JQ — 181: Forsake joined the Cleric's class shelf and Read the Tell the Warrior's, the batch's cards for the
+# designer's answers to the warband (179 from IF §2).
 #
 # BATCH IF §2 — 179: Smoulder joined the Pyromancer's shelf (178 from HL §1, when
 # Guard Change left the Swordmaster's to travel with the Stances).
@@ -4126,6 +4137,17 @@ static func draft_ability(display_name: String) -> Ability:
 				"special": "undying_vigil", "target": Ability.Target.ALLY,
 				"perfect_id": "", "perfect_text": "",
 				"description": "Keep watch over one hero: for {=Battle.UNDYING_VIGIL_TURNS} turns,\nwhenever they are healed BY ANY SOURCE,\na second hero on lower health is healed\nfor half as much."})
+		# BATCH JQ §1 — AXIS: what a kill feeds the warband. Every body of it that falls fills its Malice by a kill's worth and
+		# by what the blow spent past its last, and the Malice buys back what the burst took (heals, a Raise, a Rally); this
+		# mark is the party's say in which kill feeds it nothing. Hunter's Mark's shape — a pure mark, no bar — at Unburden's price,
+		# the Cleric's own kit card in the bucket a status-only special lands in (`check_gu` §2), so it sits below none.
+		"Forsake":
+			return Ability.make({"display_name": "Forsake",
+				"dmg_type": "shadow", "cost": 20, "damage": 0, "pressure": 0,
+				"delay": 1.5, "cooldown": 4, "anim": "attack01",
+				"special": "forsake",
+				"perfect_id": "", "perfect_text": "",
+				"description": "Mark one enemy FORSAKEN for {=Battle.FORSAKE_TURNS} turns.\nIf it dies Forsaken, its death feeds the\nwarband no Malice: not the kill, and not\nwhat the killing blow spent past its last."})
 		# ============ BATCH BR: THE HUNTER AND WARRIOR CLASS-WIDE TWELVE ======
 		#
 		# THE SEAM CLOSES HERE. BQ filled Mage and Cleric; these twelve fill the
@@ -4379,6 +4401,15 @@ static func draft_ability(display_name: String) -> Ability:
 				"anim": "attack01", "special": "ironclad",
 				"perfect_id": "", "perfect_text": "",
 				"description": "Set your teeth: for {=Battle.IRONCLAD_TURNS} turns you cannot\nbe Stunned, Frozen, Dazed or Broken,\nand take {=Battle.IRONCLAD_CUT_PCT}% less damage. The Break\nstill piles up to 99 — it just cannot\ncross until this ends."})
+		# BATCH JQ §3 — AXIS: reading the warband's telegraph. A body's plate names the move it has declared, and since JQ its
+		# hover the move's cooldown — the CD chip counts down only moves already used — and this blow is worth more the longer
+		# that declared move cools. An ordinary attack (Hunt's shape), so its bar, its miss, its Block and its crit are every blow's.
+		"Read the Tell":
+			return Ability.make({"display_name": "Read the Tell", "cost": 20,
+				"damage": 30, "pressure": 15, "delay": 2.0, "cooldown": 3,
+				"anim": "attack02",
+				"perfect_id": "", "perfect_text": "{atk:{=@damage*Ability.GRADE_DMG_MULT.perfect}}",
+				"description": "Strike at what it means to do: {=@damage}% of\nAttack and {=@pressure} Break damage, {=Battle.READ_THE_TELL_PCT}% more\nfor each turn of cooldown on the move\nthe target has declared, none if that\nmove does not cool."})
 		# ========== BATCH BT: TRANCHE 2, THE MAGE NINE ==========
 		#
 		# THE SYNERGY RULE STARTS HERE AND IS STANDING FROM THIS TRANCHE ON.

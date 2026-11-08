@@ -796,6 +796,12 @@ const CATALOGUE_FIGURES := [
 	["Bola", "4 turns.", "4", "Battle.BOLA_TURNS"],
 	["Hunter's Mark", "6 turns", "6", "Battle.HUNTERS_MARK_TURNS"],
 	["Hunter's Mark", "15% more", "15%", "Battle.PARTY_MARK_PCT"],
+	# BATCH JQ — the two cards of the party's answers: Forsake's turns, and Read the Tell's blow and its figure a turn.
+	["Forsake", "3 turns", "3", "Battle.FORSAKE_TURNS"],
+	["Read the Tell", "30% of", "30%", "ab.damage"],
+	["Read the Tell", "34.5%)", "34.5%", "ab.damage * Ability.GRADE_DMG_MULT[\"perfect\"]"],
+	["Read the Tell", "15 Break", "15", "ab.pressure"],
+	["Read the Tell", "20% more", "20%", "Battle.READ_THE_TELL_PCT"],
 	["Battle Trance", "4 turns,", "4", "Battle.BATTLE_TRANCE_TURNS"],
 	["Battle Trance", "3% of", "3%", "Battle.BATTLE_TRANCE_FLOOR*100"],
 	["Rally", "15% of", "15%", "Battle.RALLY_RESOURCE_PCT*100"],

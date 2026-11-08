@@ -31,6 +31,9 @@ const JO_COUNT_MD5 := "accbbf300180293bb4d98a690009794f"
 # (`_content`) took on HEAD's tree (C05, C09): a card, a talent, a rune, a status, the deck, the warband's data.
 const CONTENT_AT_HEAD := {"abilities": "b40ad23bc9956e7e48f579d9a98b6da4", "talents": "39b2a530f39e58e62843ece5bbe05742", "runes": "d2ae95b06053d03696cd1d889a10cab3", "statuses": "67da0036a51071c6189ffbbb05bdb814",
 	"deck": "1d1f37491e4611bb78f94577074ede99", "warband": "f261e6345f22f42bc41a7f81276e066b"}
+# WHAT A LATER BATCH AUTHORED, EACH NAMED AND LEFT OUT OF THE DIGESTS ABOVE, so they go on asking whether JP's own tree authored
+# anything: the two cards and the status of the party's three answers, built after JP (Forsake, Read the Tell, Forsaken).
+const AUTHORED_SINCE := {"abilities": ["Forsake", "Read the Tell"], "statuses": ["forsaken"]}
 # MALICE's TERMS, ITS SPENDS' PRICES AND THE HEXES' FIGURES, AS THEY STAND (C09): each read off its constant, never retyped elsewhere.
 const BATTLE_FIGURES := {"MALICE_DAMAGE_STEP": 10, "MALICE_PER_KILL": 25, "MALICE_CAP": 150, "MALICE_HEAL_WORTH": 0.5,
 	"MALICE_RAISE_PCT": 0.4, "MALICE_RALLY_PCT": 0.3, "MALICE_RALLY_TURNS": 3, "MALICE_RALLY_PRICE": 40, "MALICE_ENTRENCH_TURNS": 3,
@@ -173,7 +176,8 @@ func _content() -> Dictionary:
 	var out := {}
 	var names: Array = []
 	for ab in Classes.ability_corpus():
-		names.append(String((ab as Ability).display_name))
+		if not (AUTHORED_SINCE["abilities"] as Array).has(String((ab as Ability).display_name)):
+			names.append(String((ab as Ability).display_name))
 	names.sort()
 	out["abilities"] = ("%d|" % names.size() + "|".join(names)).md5_text()
 	var nodes: Array = []
@@ -181,7 +185,8 @@ func _content() -> Dictionary:
 		nodes.append(JSON.stringify(n, "", true))
 	out["talents"] = ("%d|" % nodes.size() + "|".join(nodes)).md5_text()
 	out["runes"] = JSON.stringify(Runes._load(), "", true).md5_text()
-	var st: Array = (_consts("res://scripts/battle.gd")["STATUS_INFO"] as Dictionary).keys()
+	var st: Array = (_consts("res://scripts/battle.gd")["STATUS_INFO"] as Dictionary).keys().filter(
+		func(k): return not (AUTHORED_SINCE["statuses"] as Array).has(String(k)))
 	st.sort()
 	out["statuses"] = ("%d|" % st.size() + "|".join(st)).md5_text()
 	var deck: Array = (_run.MODIFIERS as Dictionary).keys()

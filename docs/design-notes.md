@@ -4,6 +4,27 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The party's three answers, built (Batch JQ) — 2026-11-07
+
+**Why a kill that denies, rather than a drain.** The complaint the warband arc came from was that bursting a body down fills the
+pool that pays to undo the burst. A drain riding a blow would have fought the pool's level; Forsaken fights the cause — the kill
+that feeds it — and makes it a choice: mark one body, then burst it, and its death feeds the warband nothing. The damage term is
+left alone on purpose: a tenth of the damage dealt still fills, because that loop is the one the designer said they liked, and it is
+not a kill. A death clears every status, so the mark dies with the body and a Raised body stands up unmarked; marking it again is
+the cost of a Raise, read the other way.
+
+**Why the cleanse aims at a hex first.** A single-pick cleanse that rolled could shed a Bleed while a Gall cut every heal that hero
+received. The hexes are what the warband lays on purpose, each riding a damaging blow, so the cleanse that can take one should take
+one. Where no hex stands, the most turns left is the one costing the most if it stays. The hexes are a written
+list of four, not a derivation: nothing in the data marks the family, and a list that says so is honest where a list called derived
+is not.
+
+**Why the punish reads the cooldown and not the move's worth.** A move's worth is a gate's arithmetic (JI's line), not the game's,
+and moving it into the game would make a second copy of a figure the rules allow one of. The cooldown is the data's own proxy for a
+big move — the line sets it. The CD chip counts down only moves already used, so the plate's hover now names the declared move's
+cooldown before it lands, and the player sees the trigger before choosing the card. It is an ordinary attack, as Hunt is, so a
+Block, a miss and a crit meet it like any blow.
+
 ## The count gets fights, and the party's three answers are read out (Batch JP) — 2026-11-07
 
 **Why a count reads only the fights where the warband attacks.** A fight whose warband's attacks are switched off is one no warband

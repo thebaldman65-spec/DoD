@@ -4480,11 +4480,12 @@ lineage, `Classes.opening_kit` hands them to any hero of the class who holds tha
 out when it is not held, and they sit OUTSIDE the slot count (`Classes.lineage_slots` is `slots` less
 the enablers).
 
-**THE DRAFT IS COMPLETE AND NOTHING IS OWED: 179 of 179, 159 spec + 20 class-wide (178 / 158 from HL §1 to IF §2) — FOUR POOLS OF
-42 / 52 / 43 / 42 SINCE IF §2** (Smoulder, the designer's card, joined the Pyromancer's shelf; Guard Change left the Warrior's for the Stances at HL §1; 43 from HB) (GP's merge made them 38 / 41 / 34 / 36 of 149, GS §1 put the 29 cards
+**THE DRAFT IS COMPLETE AND NOTHING IS OWED: 181 of 181, 159 spec + 22 class-wide (179 = 159 + 20 from IF §2 to JQ, 178 = 158 + 20 from HL §1 to IF §2) — FOUR POOLS OF
+43 / 52 / 44 / 42 SINCE JQ** (Read the Tell joined the Warrior's class shelf and Forsake the Cleric's; Smoulder, the designer's card, joined the Pyromancer's shelf at IF §2; Guard Change left the Warrior's for the Stances at HL §1; 43 from HB) (GP's merge made them 38 / 41 / 34 / 36 of 149, GS §1 put the 29 cards
 that stopped travelling with an engine on their lineages' shelves, and HB §2 put Tripwire on the
 Survivalist's when Summon Companion took its class-kit slot). All twelve lineage shelves hold at least TEN; the
-Warrior and Hunter class-wide shelves hold six, the Mage's five and the Cleric's three, since GN
+Warrior's class-wide shelf holds seven and the Hunter's six, the Mage's five and the Cleric's four (JQ added one to each of the
+Warrior's and the Cleric's), since GN
 moved five class-wide cards into the class kits.
 **DO NOT RE-RECORD ANY PART OF THE DRAFT AS OWED.** In particular:
 · **THE WARRIOR POOLS WERE OWED AND ARE PAID** — Berserker Blood Offering / Gut Rip, Warden
@@ -4619,7 +4620,7 @@ fact that they are.
 
 ## STANDING RULE — ONE DRAFT POOL A CLASS, AND A CARD THAT READS AN ENGINE IS OFFERED ONLY TO ITS HOLDER (Batch GP §1/§2)
 > **The three lineage shelves and the class-wide shelf of a class are ONE POOL. A hero draws from
-> all of it — 42 / 52 / 43 / 42 since IF §2 — and `Classes.draft_pool(class_key)` is the only thing a draw may
+> all of it — 43 / 52 / 44 / 42 since JQ — and `Classes.draft_pool(class_key)` is the only thing a draw may
 > read.** `spec_draft_pool()` and `class_draft_pool()` return what they always returned and are
 > SHELVES now: where a card was authored, not a channel it is drawn from. **A reader that takes
 > `spec_draft_pool(his spec)` for "what this hero can be offered" is wrong and still passes.**

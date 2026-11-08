@@ -99,10 +99,12 @@ func _s1_mark_population() -> void:
 	# **MOVED AT GO, 15 -> 17: the Tracker's and the Arbiter's marks**, laid on an
 	# enemy by two rule engines. The Oathkeeper's `oathbound` chip is NOT in the
 	# list — it sits on a hero, where Dispel never reads.
-	ok(battle_gd.DISPEL_NEVER.size() == 17,
-		"DISPEL_NEVER holds seventeen ids — twelve marks and five that are not (%d)"
+	# **MOVED AT JQ, 17 -> 18 and 12 -> 13: Forsaken**, the Cleric's mark (Forsake), laid on a body of the warband — the
+	# party's work on the enemy, so in this list and not in `DEBUFF_IDS`.
+	ok(battle_gd.DISPEL_NEVER.size() == 18,
+		"DISPEL_NEVER holds eighteen ids — thirteen marks and five that are not (%d)"
 			% battle_gd.DISPEL_NEVER.size())
-	ok(marks.size() == 12, "the game names twelve marks (%d: %s)" % [
+	ok(marks.size() == 13, "the game names thirteen marks (%d: %s)" % [
 		marks.size(), ", ".join(marks.keys())])
 	# **BATCH GO — TWO MARKS ARE LAID BY AN ENGINE, NOT BY A CARD.** The
 	# Tracker's and the Arbiter's go on through one site that reads its status

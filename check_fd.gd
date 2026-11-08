@@ -114,7 +114,7 @@ const TRIALS := 400
 # BATCH HB — the rows AUTHORED into `["OFFENSE", "BREAK"]` since FD, which did
 # not move and so are not FD's 53 (§2). Pinned at its size, and each name is
 # asserted to read the shape, so a stale or a vacuous entry reds.
-const AUTHORED_SINCE_FD := ["Summon Companion"]
+const AUTHORED_SINCE_FD := ["Summon Companion", "Read the Tell"]  # JQ: Read the Tell, authored into the shape
 
 
 func _s1_the_offer_sites() -> void:
@@ -648,8 +648,8 @@ func _s2_break_is_secondary_only() -> void:
 	ok(moved == 53,
 		"§2: %d rows read `[OFFENSE, BREAK]`, not the 53 that moved into that shape — the reconstruction is not exact"
 			% moved)
-	ok(since == AUTHORED_SINCE_FD.size() and AUTHORED_SINCE_FD.size() == 1,
-		"§2: %d of the %d rows authored into `[OFFENSE, BREAK]` since FD read that shape — HB's Summon Companion is the one"
+	ok(since == AUTHORED_SINCE_FD.size() and AUTHORED_SINCE_FD.size() == 2,
+		"§2: %d of the %d rows authored into `[OFFENSE, BREAK]` since FD read that shape — HB's Summon Companion and JQ's Read the Tell are the two"
 			% [since, AUTHORED_SINCE_FD.size()])
 	# **AND THE FIFTY-FOURTH IS FEINT, WHICH IS THE ONE PER-CARD JUDGEMENT IN
 	# §2 AND IS ASSERTED RATHER THAN LEFT IN PROSE.** EL §2 ruled that Feint

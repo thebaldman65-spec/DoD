@@ -570,6 +570,10 @@ const STATUS_INFO := {
 	"tracked": ["Tracked", "Tr", Color(0.70, 0.85, 0.40), "Tracked: every ally deals more damage\nto this enemy. When it falls, the\ntracking passes to another."],
 	"judged": ["Judged", "Jd", Color(0.95, 0.85, 0.55), "Judged: damage any ally deals to this\nenemy heals every ally. When it falls,\nanother enemy is judged in its place."],
 	"oathbound": ["Oathbound", "Ob", Color(0.95, 0.82, 0.55), "Bound to a Cleric: damage and healing\neither one takes are split between the\ntwo."],
+	# BATCH JQ §1 — FORSAKEN: a mark the party lays on one body of the warband (Forsake, a Cleric's card). Its death feeds the
+	# warband's Malice nothing — read where Malice fills, `_on_unit_died` and `_malice_on_damage`. In `DISPEL_NEVER`, not in
+	# `DEBUFF_IDS`: the party's work on the enemy, as the marks above are.
+	"forsaken": ["Forsaken", "Fk", Color(0.62, 0.58, 0.72), "Forsaken: its death feeds the warband\nno Malice — not the kill, and not what\nthe killing blow spent past its last."],
 }
 
 # Buff/Debuff keyword registry (DEBUFF_IDS) lives in unit.gd so chips can
@@ -1152,6 +1156,8 @@ const BATTLE_TRANCE_TURNS := 4                # Battle Trance
 const RALLY_RESOURCE_PCT := 0.15              # Rally
 const WARCRY_TURNS := 4                       # Warcry
 const IRONCLAD_TURNS := 4                     # Ironclad
+const FORSAKE_TURNS := 3                      # Forsake: the turns Forsaken lasts (JQ §1)
+const READ_THE_TELL_PCT := 20              # Read the Tell: % more a turn of the declared move's cooldown (JQ §3)
 const SUMMON_SWAP_COST := 10                  # Summon Companion: the swap's price, to the player
 const SUMMON_SWAP_DELAY := 1.0                # Summon Companion: the swap's initiative
 const DEEP_WINTER_DIVISOR := 2                # Deep Winter: the deepest pile divided by it, rounded up
@@ -6832,7 +6838,10 @@ const RECAST_GATED := ["aegis_wall", "alms", "anointing", "answering_steel",
 	"retaliate", "rime", "rite_of_return", "shield_block", "slow_burn", "spite",
 	"stalking_horse", "succession", "tripwire", "turn_the_blade",
 	"umbral_sigil", "undying_vigil", "unity", "unslaked", "venom_coat",
-	"vespers", "vow_suffering", "warcry"]
+	"vespers", "vow_suffering", "warcry",
+	# BATCH JQ §1 — Forsake: its whole payload is Forsaken on one enemy, so a recast onto a field where every body already wears
+	# it at full turns would buy nothing; its write below reads `FORSAKE_TURNS`, as its handler does.
+	"forsake"]
 
 # The self-buffs whose duration and power are both authored literals. Held as
 # data because forty match arms that each return one dictionary is the same
@@ -6877,7 +6886,7 @@ func _recast_targets(u: BattleUnit, ab: Ability) -> Array:
 			return heroes.filter(func(h): return not h.dead and not h.is_companion \
 				and h != u)
 		"hysteria", "slow_burn", "choking_smoke", "rime", "umbral_sigil", \
-				"penance", "bola", "counter_time", "glacial_prison":
+				"penance", "bola", "counter_time", "forsake", "glacial_prison":
 			return enemies.filter(func(e): return not e.dead)
 		# BATCH IR §1b — the picker's own pool, so a recast is weighed over the bodies the picker offers.
 		"covering_guard", "undying_vigil", "vow_suffering", "rite_of_return", "vespers", \
@@ -7059,6 +7068,8 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 			return [{"id": "rite_return", "turns": RITE_OF_RETURN_TURNS, "power": 0, "door": true}]
 		"umbral_sigil":
 			return [{"id": "umbral_sigil", "turns": 4, "power": 0, "door": true}]
+		"forsake":
+			return [{"id": "forsaken", "turns": FORSAKE_TURNS, "power": 0, "door": true}]
 		"penance":
 			return [{"id": "penance", "turns": PENANCE_TURNS,
 				"power": int(round(PENANCE_MIRROR * 100.0)), "door": true}]
@@ -8198,6 +8209,11 @@ func _intent_hover_text(u: BattleUnit) -> String:
 		lines.append("BD: %d" % ab.pressure)
 	if ab.heal > 0:
 		lines.append("Heals: %d" % ab.heal)
+	# BATCH JQ §3 — THE DECLARED MOVE's COOLDOWN, SAID BEFORE IT LANDS: what Read the Tell reads, shown where the player
+	# reads the declaration. A basic cools nothing and says nothing.
+	var cd_n := _declared_cooldown(u)
+	if cd_n > 0:
+		lines.append("Cooldown: %d turn%s" % [cd_n, "" if cd_n == 1 else "s"])
 	var sid := String(ab.applies_status.get("id", ""))
 	if sid != "":
 		var st_line := "Applies %s" % (String(STATUS_INFO[sid][0]) if STATUS_INFO.has(sid)
@@ -8224,6 +8240,17 @@ func _intent_hover_text(u: BattleUnit) -> String:
 		else:
 			lines.append("Hits one ally")
 	return "\n".join(lines)
+
+
+# BATCH JQ §3 — THE COOLDOWN OF THE MOVE A BODY HAS DECLARED: what its plate's hover states and what Read the Tell reads,
+# one door for both. 0 for a declared basic, and for a body that has declared nothing.
+func _declared_cooldown(u: BattleUnit) -> int:
+	if u == null or not is_instance_valid(u) or u.dead:
+		return 0
+	var ab_v: Variant = u.intent.get("ability")
+	if not (ab_v is Ability):
+		return 0
+	return maxi((ab_v as Ability).cooldown, 0)
 
 
 # Tooltip with live damage ranges (includes the unit's current buffs).
@@ -9362,6 +9389,11 @@ func _malice_on_damage(victim: BattleUnit, lost: int, past_last: int) -> void:
 	_malice_dealt += lost
 	var pts := _malice_dealt / MALICE_DAMAGE_STEP
 	_malice_dealt -= pts * MALICE_DAMAGE_STEP
+	# BATCH JQ §1 — A FORSAKEN BODY's OVERKILL FEEDS NOTHING: the damage term above stands — a point a step of what was dealt
+	# still fills — and what the blow spent past the body's last does not. The door fires before `_die()`, so the body still
+	# wears its mark here, whatever dealt the blow: a strike, a handler, a tick or a mirror.
+	if victim.has_status("forsaken"):
+		past_last = 0
 	_malice_fill(pts + maxi(past_last, 0))
 
 
@@ -9646,6 +9678,7 @@ func _malice_words() -> String:
 	var lines := PackedStringArray(["Malice — the warband's pool: %d of %d" % [malice, MALICE_CAP]])
 	lines.append_array(_wrap_words("It fills by a point for every %d damage the heroes deal the warband, by %d when one of its bodies falls, and by a point for every point of damage spent past a body's last." % [
 		MALICE_DAMAGE_STEP, MALICE_PER_KILL]))
+	lines.append_array(_wrap_words("A body that dies Forsaken: its death feeds it nothing — not its kill, nor what the blow spent past its last; the damage dealt it still fills."))
 	lines.append_array(_wrap_words("A heal the warband casts costs a point of Malice for every point of health it restores."))
 	lines.append_array(_wrap_words("A Raise costs the health it stands a fallen body up with, %d%% of its maximum; a Rally %d; an Entrench %d." % [
 		int(round(MALICE_RAISE_PCT * 100)), MALICE_RALLY_PRICE, MALICE_ENTRENCH_PRICE]))
@@ -9759,7 +9792,10 @@ const DISPEL_NEVER := ["covenant", "quarry", "snare_line", "feinted",
 	# the Arbiter's) are the heroes' work, so Dispel may not take them. The bond's
 	# `oathbound` chip is NOT here: it sits on a HERO, and Dispel reads this list
 	# on an enemy only — CH's convention, a hero-side status in neither list.
-	"tracked", "judged"]
+	"tracked", "judged",
+	# BATCH JQ §1 — `forsaken` is the party's MARK on a body of the warband (Forsake), the marks' convention above: no
+	# affliction, so it is not in `DEBUFF_IDS` (a mender's Rite cannot take it), and here, so a Mage's Dispel cannot either.
+	"forsaken"]
 
 
 func _dispellable_buffs(u: BattleUnit) -> Array:
@@ -9774,8 +9810,7 @@ func _dispellable_buffs(u: BattleUnit) -> Array:
 # Remaining turns for "longest-remaining" comparisons: battle-long
 # statuses (turns < 0 — Permafrost chill, Ruin) outlast everything.
 func _turns_left(s: Dictionary) -> int:
-	var t := int(s.get("turns", 0))
-	return 999 if t < 0 else t
+	return BattleUnit.status_turns_left(s)
 
 
 # BATCH HT §1.4 — THE CHILL AN ENEMY MENDER'S RITE READS IN ONE OF ITS CANDIDATES: the
@@ -11660,6 +11695,21 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_log("   → Hunt reads %d different affliction%s on %s" % [
 					hunt_n, "" if hunt_n == 1 else "s",
 					strike_target.unit_name], "#9ad070")
+			# BATCH JQ §3 — READ THE TELL (a Warrior's class card): `READ_THE_TELL_PCT` more for every turn of the cooldown
+			# on the move the struck body has DECLARED — the first card that reads the warband's telegraph. A declared basic
+			# cools nothing, and a body that has declared nothing — one the Cryomancer holds — gives nothing; a stunned, frozen or
+			# Broken body keeps its declaration until its own turn, and pays on it. The action, never a spend riding beside it.
+			# Hunt's shape: an ordinary blow, so the miss, the Block, the crit and the Break meet it as they meet every attack.
+			if ab.display_name == "Read the Tell":
+				var op_cool := _declared_cooldown(strike_target)
+				if op_cool > 0:
+					raw *= 1.0 + READ_THE_TELL_PCT * 0.01 * op_cool
+					_log("   → Read the Tell: %s's declared %s cools %d — %d%% more" % [
+						strike_target.unit_name, (strike_target.intent["ability"] as Ability).display_name, op_cool,
+						READ_THE_TELL_PCT * op_cool], "#e0a050")
+				else:
+					_log("   → Read the Tell: %s has declared no cooling move" % strike_target.unit_name,
+						"#909090")
 			# Overburn reads the field as it stands BEFORE this strike eats any
 			# of it — Detonation's own consumption must not shrink the bonus
 			# the consuming cast is paid (Batch AG).
@@ -17143,7 +17193,13 @@ func _on_unit_died(u: BattleUnit) -> void:
 		_readout.hero_fell(u)
 	if not u.is_hero:
 		# BATCH JJ §2 — A BODY OF THE WARBAND FALLS: its pool fills by a kill's worth, whoever dealt it.
-		_malice_fill(MALICE_PER_KILL)
+		# BATCH JQ §1 — UNLESS IT DIES FORSAKEN, AND THEN THE KILL FEEDS NOTHING. Every death of the warband passes here, from
+		# `unit._die`, before the body's statuses are cleared — a strike's, a handler's, a tick's, a debug kill's — so the mark
+		# is read on the body it is leaving; and the clearing takes it, so a Raised body stands up unmarked.
+		if u.has_status("forsaken"):
+			_log("   → Forsaken: %s's death feeds the warband no Malice" % u.unit_name, "#a89cc8")
+		else:
+			_malice_fill(MALICE_PER_KILL)
 		# SAVAGE ASSAULT — the enemy's death is the Reaver's when the frame that
 		# killed it names him: his strike, his handler, his echo or a tick he laid.
 		# An ally's kill, a companion's and the enemy's own do not count.
@@ -22698,6 +22754,19 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					target.unit_name])
 				_log("%s: Undying Vigil — every heal on %s also mends a second hero on lower health for half, %d turns" % [
 					attacker.unit_name, target.unit_name, uv_turns], "#70d878")
+		"forsake":
+			# BATCH JQ §1 — FORSAKE: the party's say in what a kill feeds the warband. The mark is the whole payload; what it
+			# denies is read where Malice fills — the kill's term in `_on_unit_died`, the overkill in `_malice_on_damage` — and
+			# a death clears it with every status, so a Raised body stands up unmarked and must be marked again.
+			if target != null and not target.dead:
+				var fk_turns := FORSAKE_TURNS
+				_apply_status(target, "forsaken", fk_turns, 0, 0, attacker)
+				fk_turns = int(target.get_status("forsaken").get("turns", fk_turns))
+				_sfx("crit", -8.0, 0.8)
+				target.float_text("FORSAKEN", Color(0.62, 0.58, 0.72))
+				_message("%s forsakes %s!" % [attacker.unit_name, target.unit_name])
+				_log("%s: %s — %s is Forsaken: its death feeds the warband no Malice (%d turns)" % [
+					attacker.unit_name, ab.display_name, target.unit_name, fk_turns], "#a89cc8")
 		# ====== BATCH BR: THE HUNTER AND WARRIOR CLASS-WIDE TWELVE ======
 		# EIGHT OF THE TWELVE RESOLVE HERE. Aimed Volley, Charge and Cleave are
 		# ordinary attacks and need no case at all — which is again the shape of

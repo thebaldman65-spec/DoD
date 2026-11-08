@@ -251,7 +251,7 @@ static func kill(tree: SceneTree, scene: Node) -> void:
 # **A FLOOR OF ZERO ASSERTS NOTHING, SO THE HELPER REFUSES ONE.** Every half must
 # be at least one, whatever the table says, so the day a class can be offered
 # nothing this goes red — rather than a zero row reading as correct. No class's
-# card pool is near it (the Cleric's no-engine half is the thinnest, 29 of 43);
+# card pool is near it (the Cleric's no-engine half is the thinnest, 30 of 44);
 # the class whose RUNE offer is zero with no engine is the Cleric, and that floor
 # is `check_gv` §3's, where the rune table is derived.
 # **BATCH HL §1 MOVED THE WARRIOR'S WHOLE FLOOR 43 → 42**: Guard Change left his
@@ -261,10 +261,12 @@ static func kill(tree: SceneTree, scene: Node) -> void:
 # **BATCH IU §1 RAISED THE MAGE's TWO FLOORS TO THE READING**: IF §2's Smoulder grew both
 # halves of his pool and the row was left below it, so the table stopped being what
 # `CLAUDE.md` says it is — the reading, never below it.
+# **BATCH JQ RAISED THE WARRIOR's AND THE CLERIC's TO THE READING**: Read the Tell joined the Warrior's class shelf and Forsake
+# the Cleric's, neither reading an engine, so each pool grew by one in both halves.
 const CLASS_POOL_FLOOR := {
-	"warrior": {"whole": 42, "bare": 38},
+	"warrior": {"whole": 43, "bare": 39},
 	"mage": {"whole": 52, "bare": 39},
-	"cleric": {"whole": 43, "bare": 29},
+	"cleric": {"whole": 44, "bare": 30},
 	"hunter": {"whole": 42, "bare": 35},
 }
 

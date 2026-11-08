@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-11-06 (Batch JO &mdash; Break gets a price, and the hexes ride blows)</b></p>
+<p align="right"><b>Last updated: 2026-11-07 (Batch JQ &mdash; the three answers, built)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -851,6 +851,9 @@ Its chip is <b>Ry</b>.</td></tr>
 <tr><td>Mire</td><td>It acts more slowly, its turns arriving later: a hex a warband blow lays on the ally it strikes (&sect;9). Its chip is <b>Me</b>.</td></tr>
 <tr><td>Fester</td><td>It takes damage at each of its turn starts, a stack at a time, and gains a stack every turn until it is cleansed:
 a hex a warband blow lays on every ally it strikes (&sect;9). Its chip is <b>Fr</b> and its count.</td></tr>
+<tr><td>Forsaken</td><td>Its death feeds the warband no Malice &mdash; neither the kill's worth nor what the killing blow spent past
+its last: a mark the Cleric's Forsake lays on one enemy for 3 turns (&sect;9). A death clears it with every status, so a body the
+warband Raises stands up unmarked. Its chip is <b>Fk</b>.</td></tr>
 <tr><td>Ruin</td><td>The Old Gods' mark (Occultist passive, NO maximum, and it does not wear
 off — only an enemy mender's Cleansing Rite, Harvest, Cull, Requiem, Transference (which moves it to another enemy) and the Open Wound rune take it
 away):
@@ -1099,7 +1102,7 @@ choice is what is displayed, and it is what resolves when the enemy's turn arriv
 <p>The intent appears in two places: an <b>icon under each enemy's portrait in the turn bar</b>
 (on its next turn's slot only), and an <b>icon plus a line on the enemy's nameplate</b>, so a
 player watching the battlefield never has to read the bar. <b>Hovering either one details the
-declared action</b>: its name, its damage band, the status it applies (for how many turns, and its
+declared action</b>: its name, its damage band, its cooldown when it has one, the status it applies (for how many turns, and its
 chance), its Break damage and how many heroes it hits &mdash; <b>never which hero it is aimed at</b>.
 Knowing what an attack does is what decides whether to pre-empt it; knowing whom it will hit would
 turn every defensive decision into arithmetic. <b>A body that has declared a Malice spend beside its move shows both on its
@@ -1472,7 +1475,7 @@ counter-attack and an ability that deals no damage. It returns once two of his t
 enemy blow reaching him; a blow he blocks or parries reached him, and a miss did not.</li>
 <li><b>Medic</b> (Hunter): whenever the Hunter lays a harmful effect on an enemy &mdash; a trap
 springing included &mdash; the hero with the lowest share of health heals 5% of that hero's maximum
-health and sheds one harmful effect.</li>
+health and sheds one harmful effect, a hex first.</li>
 </ul>
 
 <h3>6a. Ability progression</h3>
@@ -1584,8 +1587,8 @@ spec-locked, and it reads the live, curated shelves of §6b.
 <b>What it does not do is make the chain unemptiable.</b> No sibling drains it, because every
 hero filters it against what he himself owns; but the hero himself can, by taking at every
 offer. <b>And a hero is only offered what he can USE</b> — the cards the engine gate holds are
-offered only to their engine's holder (§6b) — so his reachable pool is smaller than his class pool: 38 of
-42, 39 of 52, 29 of 43 and 35 of 42 for a hero holding no engine at all. What holds the floor up
+offered only to their engine's holder (§6b) — so his reachable pool is smaller than his class pool: 39 of
+43, 39 of 52, 30 of 44 and 35 of 42 for a hero holding no engine at all. What holds the floor up
 is arithmetic: emptying the chain means owning every card he can be shown, and an offer pays
 one card.</p>
 <p><b>Ashes of Al'ar</b> &mdash; 30 Mana, 1.0 initiative, no cooldown, self-cast: wreathe
@@ -1748,12 +1751,12 @@ cards in it</b>: no share, no seam, no tier of their own. Class-wide abilities a
 untied and general — Mirror Image, not Frostbolt — and the test is whether an ability would read
 as off-theme for any spec of that class. <b>Nothing holds them weaker than a lineage's cards</b>:
 a class-wide card is just a card of its class's pool. As authored they are the weakest cards in
-it — six for the Warrior and the Hunter, five for the Mage and three for the Cleric — and <b>a
+it — seven for the Warrior, six for the Hunter, five for the Mage and four for the Cleric — and <b>a
 rebalance is owed</b>.</p>
 
 <p><b>A CARD THAT READS AN ENGINE IS OFFERED ONLY TO A HERO WHO HOLDS IT.</b> A wide
 pool is only worth having if what it widens is playable, and offering a Ruin card to a Cleric
-without Ruin is offering a card that does nothing. <b>Thirty-seven of the 179 read one</b> — five
+without Ruin is offering a card that does nothing. <b>Thirty-seven of the 181 read one</b> — five
 of Permafrost, eight of Runaway Resonance (Death Ray among them, refused below 8 Resonance), seven of
 Mercy (Hymn of Hope and Resurrection among them, both priced in Mercy), five of Conviction, two of
 Wrath of the Old Gods, five of Pack Bond, two of Lethal Aim, two of Heavy Plating and one of Blood
@@ -1774,8 +1777,8 @@ Calibrating Shot fire and bank no Focus) — a card
 that still does most of its job is a legitimate offer; and cards that FEED an engine without
 reading it (Blight the Well marks Ruin through the generic hook, Call the Wilds summons at 0
 Loyalty, every fire card builds the Overburn field) — they work for anyone and pre-arm an engine
-a hero might later draft. <b>What a hero holding no engine can be offered: 38 of 42, 39 of 52,
-29 of 43, 35 of 42.</b></p>
+a hero might later draft. <b>What a hero holding no engine can be offered: 39 of 43, 39 of 52,
+30 of 44, 35 of 42.</b></p>
 
 <p><b>A CARD THAT NEEDS A COMPANION IS NOT OFFERED TO A SHARPSHOOTER.</b> He dismisses
 the pet, so the gate above has a second half, and it is a negative one: <b>fifteen Hunter cards
@@ -1808,16 +1811,16 @@ below is part of one pool, its class's.</p>
 <tr><td><b>Survivalist</b></td><td>Choking Smoke, Snare Line, Loaded Shot, Hunt, Preparation, Stalking Horse, Downwind, Cull, <b>Thick Hide</b>, <b>Salve</b>, <b>Shrapnel Charge</b>, <b>Tripwire</b></td></tr>
 <tr><td colspan="2"><b>Class-wide shelves</b> — ordinary cards of the class pool, drawn at no special rate</td></tr>
 <tr><td><b>Mage</b> (all three specs)</td><td>Mirror Image, Mana Well, Dispel, Blink, <b>Mana Shield</b> (five)</td></tr>
-<tr><td><b>Cleric</b> (all three specs)</td><td>Chastise, Exhortation, Undying Vigil (three)</td></tr>
+<tr><td><b>Cleric</b> (all three specs)</td><td>Chastise, Exhortation, Undying Vigil, Forsake (four)</td></tr>
 <tr><td><b>Hunter</b> (all three specs)</td><td>Field Dressing, Camouflage, Aimed Volley, Bola, Hunter's Mark, Arcane Arrows</td></tr>
-<tr><td><b>Warrior</b> (all three specs)</td><td>Battle Trance, Rally, Charge, Cleave, Warcry, Ironclad</td></tr>
+<tr><td><b>Warrior</b> (all three specs)</td><td>Battle Trance, Rally, Charge, Cleave, Warcry, Ironclad, Read the Tell</td></tr>
 </table>
-<p><b>THE DRAFT IS COMPLETE.</b> <b>The draft stands at 179 of 179</b> &mdash; <b>159 spec</b>
-cards plus <b>20 class-wide</b> ones &mdash; and those are <b>four pools of 42, 52,
-43 and 42</b>; Guard
+<p><b>THE DRAFT IS COMPLETE.</b> <b>The draft stands at 181 of 181</b> &mdash; <b>159 spec</b>
+cards plus <b>22 class-wide</b> ones &mdash; and those are <b>four pools of 43, 52,
+44 and 42</b>; Guard
 Change is the Rune of the Swordmaster (core)'s rather than the Warrior's pool's. The class kits (&sect;5.2) hold twelve cards, three a class, that are guaranteed rather than drawn, and
 <b>a hero with no lineage draws the whole class pool</b>.
-<b>THE CLASS HALF IS NOT A FLAT MULTIPLE</b> — the Warrior and the Hunter draw six, the Mage five and the Cleric three —
+<b>THE CLASS HALF IS NOT A FLAT MULTIPLE</b> — the Warrior draws seven, the Hunter six, the Mage five and the Cleric four —
 and <b>the shallowest spec pool in the game is ELEVEN</b>, the Warden's.
 Each Hunter spec&#x27;s defence
 is shaped by its own engine: the companion pays for the Beastmaster, the Focus meter for the
@@ -1846,14 +1849,14 @@ named partner is dead most of the time.</p>
 <tr><td><b>Savage Sweep</b> (Beastmaster)</td><td>The run opens 12 Bleed on each of the three lowest-health enemies, whichever companion runs it</td><td>Feeds the <b>Berserker's</b> Battle Shout (which pays per 20 of the warband's bleed buildup) and the Survivalist's Trapper. Canis already bleeds; <b>Ursus and Aguila are the gap this closes</b></td></tr>
 <tr><td><b>Shared Grief</b> (Holy)</td><td>+1 Mercy for every other hero already below half health</td><td><b>The best coupling, and the reason is structural.</b> Mercy accrues only on the <i>crossing</i> below half, so she is starved when the heroes are healthy — and the <b>Berserker's</b> entire Blood Frenzy band lives down there on purpose. The two specs whose engines are inverted become each other's fuel</td></tr>
 </table>
-<p><b>What the eight deliberately do not do.</b> No new abilities (the pools are complete at 179
+<p><b>What the eight deliberately do not do.</b> No new abilities (the pools are complete at 181
 and a synergy card per spec would be twelve more), <b>no new statuses</b> (every coupling uses
 vocabulary already in the game), <b>no two-way pairs</b> (each clause runs one way into a hub,
 so no card is dead when its partner is absent), and <b>no magnitude on an existing effect
 moves</b> — a lone Pyromancer draws exactly what he always drew, and a Holy beside a healthy
 she gains exactly the 4 Mercy she always gained.</p>
 
-<p><b>Every hero draws from his class's one pool: forty-two cards for a Warrior, fifty-two for a Mage, forty-three for a Cleric and forty-two for a Hunter.</b>
+<p><b>Every hero draws from his class's one pool: forty-three cards for a Warrior, fifty-two for a Mage, forty-four for a Cleric and forty-two for a Hunter.</b>
 A class's pool is its three lineage shelves and its class-wide shelf together, so a shelf is where
 a card is written down rather than what a hero is offered; a card that reads an engine is offered
 only to a hero who holds that engine, so a hero holding none is offered fewer. What the depth buys
@@ -1864,10 +1867,10 @@ Mirror Image, not Frostbolt: the test is whether it would read as off-theme for 
 spec of that class. It is an ordinary card of its class's one pool, and nothing holds it weaker
 than a lineage's cards.</p>
 
-<p><b>The one hundred and twenty-three drafted abilities catalogued here.</b> Each names the
+<p><b>The one hundred and twenty-five drafted abilities catalogued here.</b> Each names the
 axis it serves, and — from the first Mage nine onward — <b>what it builds with</b>. The one
-hundred and four spec cards come first; the nineteen class-wide ones close the table.
-<b>The draft itself is one hundred and seventy-nine</b> (the pools above): the fifty-six not
+hundred and four spec cards come first; the twenty-one class-wide ones close the table.
+<b>The draft itself is one hundred and eighty-one</b> (the pools above): the fifty-six not
 listed here are described in their spec's section in §6.1&ndash;§6.4, <b>except four &mdash;
 Arcane Surge, Divine Wrath, Mana Shield and Reality Fracture &mdash; which are named in the
 pools and described nowhere.</b></p>
@@ -1996,14 +1999,15 @@ is lengthened by 2, which the window does not double), and <b>Firestorm</b>'s 6�
 <tr><td colspan="4"><b>Class-wide — MAGE</b> (all three specs) — <i>the tools every spine wants and no spine provides, because a spine that provided them would stop being a spine</i></td></tr>
 <tr><td><b>Mirror Image</b></td><td>20 Mana, 1.0, 4cd, self</td><td>The next <b>four single-target attacks</b> against him miss outright. Area attacks roll no miss at all, so they spend no image. The images <b>wait until spent</b>.</td><td>Evasion rather than absorption. Better than Nexus Ward, the kit's barrier, against three big hits, worse against a swarm — neither is a strict upgrade of the other.</td></tr>
 <tr><td><b>Mana Well</b></td><td>20 Mana, 1.0, 5cd, self</td><td>For 4 turns his <b>Mana regeneration is doubled</b> — the live figure, so Evocation and any rune are doubled with it.</td><td>Costs Mana to make Mana: net-positive only if the fight lasts, so it is a read on the fight rather than a free button.</td></tr>
-<tr><td><b>Dispel</b></td><td>15 Mana, 1.5, 3cd, either side</td><td>Removes <b>three harmful effects from an ally, or three beneficial effects from an enemy</b>. The only ability in the game that may target either side. <b>The heroes' own work on an enemy is never one of them</b>: a mark (Hunter's Mark, Arcane Echo and the rest), Rime and every debuff stay.</td><td>Utility nobody has. <b>Note:</b> the enemy half is thin — a ward from a Shieldmaster (on an ally) or the Hollow Crown&rsquo;s <b>Regalia</b> (on itself) are the beneficial effects an enemy can carry, with a warband's <b>Rally</b> and <b>Entrenched</b> (&sect;9).</td></tr>
+<tr><td><b>Dispel</b></td><td>15 Mana, 1.5, 3cd, either side</td><td>Removes <b>three harmful effects from an ally &mdash; a hex first, then those with the most turns left, the Bleed meter's chip last &mdash; or three beneficial effects from an enemy</b>. The only ability in the game that may target either side. <b>The heroes' own work on an enemy is never one of them</b>: a mark (Hunter's Mark, Arcane Echo and the rest), Rime and every debuff stay.</td><td>Utility nobody has. <b>Note:</b> the enemy half is thin — a ward from a Shieldmaster (on an ally) or the Hollow Crown&rsquo;s <b>Regalia</b> (on itself) are the beneficial effects an enemy can carry, with a warband's <b>Rally</b> and <b>Entrenched</b> (&sect;9).</td></tr>
 <tr><td><b>Blink</b></td><td>10 Mana, 1.0, 3cd, self</td><td>Clears <b>two turns from every one of his cooldowns</b>. Its own is exempt.</td><td>Timing, not damage. Worth most to whoever has the most on cooldown, so it scales with kit size rather than with any spec.</td></tr>
 <tr><td colspan="4"><b>Class-wide — CLERIC</b> (all three specs) — <i>three support-shaped spines with enormous conditional power; the plain heal, the heal for every hero and the cleanse are every Cleric's class kit (&sect;5.2), so these are the rest</i></td></tr>
 <tr><td><b>Chastise</b></td><td>15 Mana, 2.0, 2cd, one enemy</td><td><b>25% of Attack</b> as holy damage and <b>20 Break damage</b> (Perfect: 25 BD).</td><td>Something to do with a turn. All three Clerics have turns where nobody needs healing and their engine is not ready.</td></tr>
 <tr><td><b>Exhortation</b></td><td>25 Mana, 1.0, 4cd, every hero</td><td><b>Every hero's next attack deals 35% more damage</b>. <b>Banked, not timed</b> — it waits for each hero's next swing rather than expiring on a turn count.</td><td>The only class-wide offensive group buff a Cleric has.</td></tr>
 <tr><td><b>Undying Vigil</b></td><td>25 Mana, 1.0, 4cd, one hero</td><td>For 4 turns, whenever that hero is healed <b>by any source</b>, a second hero on lower health is healed for half as much. It offers only the heroes: the fork is wired on the four.</td><td>Making one heal into two. It is the one class ability that gets <i>better</i> the more spec-specific the build is — a deliberate inversion of the unconditional-floor role the other two play.</td></tr>
+<tr><td><b>Forsake</b></td><td>20 Mana, 1.5, 4cd, one enemy</td><td>Marks that enemy <b>Forsaken for 3 turns</b>. <b>A body that dies Forsaken feeds the warband no Malice</b> &mdash; not the kill's worth, and not what the killing blow spent past its last; the damage it took still fills the pool as any damage does. A death clears the mark, so a body the warband Raises stands up unmarked.</td><td>The heroes' say in what a kill feeds the warband: every body that falls fills the pool that pays to undo the burst, and this decides which one does not. Which body to mark is the decision.</td></tr>
 <tr><td colspan="4"><b>Class-wide &mdash; HUNTER</b> (all three specs) &mdash; <i>three spines that are all conditional, in a class with one unconditional self-heal and the thinnest defensive kit in the game</i></td></tr>
-<tr><td><b>Field Dressing</b></td><td>20 Mana, 2.0, 3cd, self</td><td>Heals <b>18% of maximum health</b> (Perfect: 24%) and removes <b>one</b> harmful effect.</td><td>The only <b>unconditional</b> self-heal a Hunter can get. <b>Harvest heals</b>, and it sits in the Survivalist's boss pool. <b>Salve</b> is a second. Nothing in the talent tree heals unconditionally (Breaking Heals a Hero pays only for Break dealt, and Cleanse Debuffs Each Turn <i>cleanses</i>), so this really is the only one that needs nothing set up.</td></tr>
+<tr><td><b>Field Dressing</b></td><td>20 Mana, 2.0, 3cd, self</td><td>Heals <b>18% of maximum health</b> (Perfect: 24%) and removes <b>one</b> harmful effect: a hex if he carries one, else the one with the most turns left (the Bleed meter's chip last).</td><td>The only <b>unconditional</b> self-heal a Hunter can get. <b>Harvest heals</b>, and it sits in the Survivalist's boss pool. <b>Salve</b> is a second. Nothing in the talent tree heals unconditionally (Breaking Heals a Hero pays only for Break dealt, and Cleanse Debuffs Each Turn <i>cleanses</i>), so this really is the only one that needs nothing set up.</td></tr>
 <tr><td><b>Camouflage</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For 3 turns enemies are <b>70% less likely to aim at him</b>.</td><td>Buying time rather than absorbing damage — the defensive shape the class does not have.</td></tr>
 <tr><td><b>Aimed Volley</b></td><td>20 Mana, 2.5, 3cd, one enemy</td><td><b>Three shots at 12% of Attack</b> each with <b>8 Break damage a shot</b> — 24 across the volley (Perfect: a fourth shot).</td><td>The reliable strike. Every Hunter kit is built on a conditional; this works when nothing is set up yet, and being multi-hit is what makes it play with a charge bank.</td></tr>
 <tr><td><b>Bola</b></td><td>15 Mana, 1.5, 3cd, one enemy</td><td>Applies <b>Slowed and Crippled for 4 turns</b>. No damage and no Break.</td><td>Two afflictions on one card and nothing else — the price of the breadth is that it is all it does.</td></tr>
@@ -2016,6 +2020,7 @@ is lengthened by 2, which the window does not double), and <b>Firestorm</b>'s 6�
 <tr><td><b>Cleave</b></td><td>25 Rage, 2.5, 3cd, three chosen enemies</td><td><b>15% of Attack</b> (Perfect: 17.25%) and <b>15 Break damage</b> to each of three chosen enemies.</td><td>Breadth from a narrow class. Three <i>chosen</i> enemies rather than three random ones is what separates it from War Stomp.</td></tr>
 <tr><td><b>Warcry</b></td><td>20 Rage, 1.0, 5cd, every hero</td><td>Every hero deals <b>20% more damage for 4 turns</b>.</td><td>A group buff — the Berserker's Battle Shout is the only other Warrior card that improves anyone else's numbers, and any Warrior can draw either.</td></tr>
 <tr><td><b>Ironclad</b></td><td>20 Rage, 1.0, 4cd, self</td><td>For 4 turns he <b>cannot be Stunned, Frozen, Dazed or Broken</b>, and takes <b>15% less damage</b>. The Break half is a <b>cap, not an immunity</b>: his meter fills to <b>99</b> and no further, so pressure still accumulates and simply cannot cross.</td><td>Refusing to be stopped. Every Warrior spine dies to losing a turn — and the cap makes it a delay rather than a negation: the moment it ends he is one hit from Broken.</td></tr>
+<tr><td><b>Read the Tell</b></td><td>20 Rage, 2.0, 3cd, one enemy</td><td><b>30% of Attack</b> (Perfect: 34.5%) and <b>15 Break damage</b>, and <b>20% more for each turn of cooldown on the move the target has declared</b> &mdash; nothing more against a move that does not cool (a basic among them), a spend declared beside it, or a body that has declared nothing. The declared move's cooldown is on its plate's hover.</td><td>Reading the warband's telegraph: the longer the declared move cools, the bigger the move, and the more the blow into it is worth. An ordinary attack, so it misses, is Blocked and crits as every blow does.</td></tr>
 </table>
 
 <h3>6c. ARCHETYPE TAGS</h3>
@@ -3090,14 +3095,19 @@ chip: the fewest of its own turns until a move is back, its hover naming each. E
 <p><b>The warband shares one pool, Malice.</b> It fills by a point for every 10 points of damage the heroes deal it, by 25 when one
 of the warband falls, and by a point for every point of damage a blow spends past a body's last (the Bomb's blast and the Wasting bargain's tick, which no
 hero is credited with, fill only by their kills), and it holds 150; its bar stands above the
-warband's plates, its count beside it, and a fight opens with it empty (a quit fight too). <b>Every heal the warband casts costs a point
+warband's plates, its count beside it, and a fight opens with it empty (a quit fight too). <b>A body that dies Forsaken feeds the warband
+no Malice</b> &mdash; not the kill's worth, and not what the killing blow spent past its last; the damage dealt it still fills
+(a Cleric's Forsake lays the mark, for 3 turns, and a death clears it). <b>Every heal the warband casts costs a point
 of Malice for every point of health it restores</b> &mdash; the Orc Totemist's and the Orc Shaman's Healing Wave, the Bog Troll's
 Regenerate, the Withered Warden's Wild Growth and the Grave Totem's Dark Vigil &mdash; so the warband never heals more than its pool
 has been given; a heal on a body under Blight the Well restores nothing, so it costs nothing. A healer heals whenever the pool can pay and one of its warband is missing at least half of what the heal would restore
 (two of them, for the Grave Totem's Dark Vigil);
 it declares only a heal the pool can pay, and sets the price aside until the heal lands.</p>
 <p><b>The pool buys three things beside a heal, each a move on its kind's list.</b> A Raise stands a fallen body of the warband back up at 40% of its maximum health, once a body a fight, for the health it stands it up with; a Rally makes every standing body of the warband deal 30% more damage with its blows for 3 turns, for 40 Malice; an Entrench multiplies their armor by 2 for 3 turns, for 30 Malice. Every kind holds one: a Rally the Orc Raider, the Orc Whelp, the Orc Slinger, the Orc Archer, the Orc Hexer, the Wolfrider, the Ashblade, the Orc Brute, the Rot Behemoth, the Orc Chief, the Ash-Wrought Tyrant, the Ash Hurler and the Orc Bloodcaller; an Entrench the Orc Shieldmaster, the Orc Shaman, the Bog Troll, the Withered Warden and the Hollow Crown; a Raise and an Entrench the Orc Totemist, the Orc Ritual Chanter and the Grave Totem. Each cools like any move, on its worth against its own kind's basic, and costs its body no turn: it rides the body's declared move, is bought first when the body's turn comes, and the body then acts as it declared &mdash; one a turn; a raised body rises un-Broken, its first turn a basic swing after it rises, at its own speed, and a body is raised once a fight. A Rally's clock counts down at each body's turn start, as every buff's but Eye of the Storm's does, so each rallied body strikes rallied twice, and the body that bought it three times, since it buys first on its own turn. A hero's Dispel strips a body's Rally and Entrenched, as it strips a ward.</p>
-<p><b>The warband lays four hexes on the heroes, each riding a blow.</b> Gall cuts the healing every hero receives by 50% for 3 turns; Sap cuts what a hero's resource bar gains by 50% for 3 turns; Mire makes a hero act 25% slower for 3 turns; Fester deals 3% of its applier's Attack a stack at each of the hero's turn starts and gains a stack each turn, until it is cleansed. The Orc Archer's Gall strikes every ally and galls each it hits; the Orc Hexer's Bone Rattle lays Sap; the Grave Totem's Mire strikes one ally and mires it; the Rot Behemoth's Wretched Bellow lays Fester on every ally it strikes. No enemy move lays an affliction on the heroes without dealing damage, so each hex is a blow like any other: chosen as the attacks are, aimed through the draws and the evasions, a single blow able to miss, laid on a hit, and cooling on its worth as a blow &mdash; each of the four waits between uses. Every hex is an affliction, so every cleanse reaches it, the Cleric's Unburden among them, and Fester grows until one does.</p>
+<p><b>The warband lays four hexes on the heroes, each riding a blow.</b> Gall cuts the healing every hero receives by 50% for 3 turns; Sap cuts what a hero's resource bar gains by 50% for 3 turns; Mire makes a hero act 25% slower for 3 turns; Fester deals 3% of its applier's Attack a stack at each of the hero's turn starts and gains a stack each turn, until it is cleansed. The Orc Archer's Gall strikes every ally and galls each it hits; the Orc Hexer's Bone Rattle lays Sap; the Grave Totem's Mire strikes one ally and mires it; the Rot Behemoth's Wretched Bellow lays Fester on every ally it strikes. No enemy move lays an affliction on the heroes without dealing damage, so each hex is a blow like any other: chosen as the attacks are, aimed through the draws and the evasions, a single blow able to miss, laid on a hit, and cooling on its worth as a blow &mdash; each of the four waits between uses. Every hex is an affliction, so every cleanse reaches it, the Cleric's Unburden among them, and Fester grows until one does. <b>A
+cleanse that removes one harmful effect aims</b>: it takes a hex if the hero carries one, and otherwise the harmful effect with the
+most turns left (the first laid, on a tie, and the Bleed meter's chip last) &mdash; Dispel on an ally (three, one after another), Field Dressing, the Rune of the
+Medic and Cleanse Debuffs Each Turn alike. A cleanse that removes every harmful effect takes them all, as it always has.</p>
 <table border="1" cellpadding="4">
 <tr><th>Enemy</th><th>Pw</th><th>Roles</th><th>Zones</th><th>HP</th><th>Kit sketch (beside the Malice spend each holds, above)</th></tr>
 <tr><td>Orc Raider</td><td>1</td><td>skirmisher</td><td>1·2·3</td><td>140</td><td>Slash;

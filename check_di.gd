@@ -156,7 +156,9 @@ const SRC_FLOOR := 107
 # **BATCH JO MOVED IT 224 -> 223, AND SAYS WHY. Net -1, one departure.** The hexes ride blows since JO §2 (no warband move lays a
 # status on a hero unless it deals damage), so the strike loop's one status call lays them, with the enemy as its source, and the
 # hex arm went with the special that reached it.
-const CALL_SITES := 223
+# **BATCH JQ MOVED IT 223 -> 224, AND SAYS WHY. Net +1, one arrival.** Forsake (JQ §1) lays Forsaken on a body of the warband,
+# passing its caster as the source, DI's rule, so `with_src` moves with it.
+const CALL_SITES := 224
 
 # Four plain afflictions: all in `DEBUFF_IDS`, none sticky, none on the boss
 # immunity list, so `_harvest_yield` counts all four and `purge_debuffs` takes

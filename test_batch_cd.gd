@@ -78,8 +78,8 @@ const DEAD_TEST_SYMBOLS := ["award_talent_points", "award_spec_point",
 # across twelve. **A STALENESS TRIPWIRE IS A SINGLE INSTRUMENT WHOSE MESSAGE SAYS
 # THE GROUND MOVED**; thirty-five copies of one is not a tripwire, it is a tax.
 const SPEC_TARGET := 159     # the twelve pools, summed from PER_SPEC_DEPTH — 129 until GS, 158 until HB, 159 until HL, 158 until IF
-const CLASS_TARGET := 20     # summed from PER_CLASS_DEPTH — 25 until GN
-const DRAFT_TARGET := 179    # 159 + 20 (179 until HL §1, 178 until IF §2)
+const CLASS_TARGET := 22     # summed from PER_CLASS_DEPTH — 25 until GN, 20 until JQ
+const DRAFT_TARGET := 181    # 159 + 22 (179 until HL §1, 178 until IF §2, 179 until JQ)
 const SPEC_FLOOR := 8        # CI's flat eight a shelf; asserted until HH §2, printed since (see §2)
 # What each spec drafts from now. The nine that grew are the nine that HAD an
 # ability-granting talent node; beastmaster, sharpshooter and mystic had none,
@@ -142,8 +142,10 @@ const PER_SPEC_DEPTH := {
 # shallowest pool the ruling leaves, three, for the reason it always had.
 # **BATCH HI FOLDED THE FLOOR** into `Fixture.class_pool_floors` (§2): `CLASS_FLOOR`
 # floors nothing now and is kept only as `PER_CLASS_DEPTH`'s lookup default.
+# **BATCH JQ MOVED IT: the Warrior 6 -> 7 and the Cleric 3 -> 4**, two cards authored for the designer's answers to the
+# warband — Read the Tell on the Warrior's class shelf, Forsake on the Cleric's. No card was moved or deleted.
 const PER_CLASS_DEPTH := {
-	"warrior": 6, "mage": 5, "cleric": 3, "hunter": 6,
+	"warrior": 7, "mage": 5, "cleric": 4, "hunter": 6,
 }
 const CLASS_FLOOR := 3
 # BATCH DO DELETED `DEEP_SPECS`, AND DELETED IT RATHER THAN LEAVING IT.
