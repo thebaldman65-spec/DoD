@@ -421,7 +421,8 @@
   "unit_name": "Orc Hexer",
   "power": 2,
   "roles": [
-   "hexer"
+   "hexer",
+   "sniper"
   ],
   "zones": [
    1,
@@ -745,6 +746,7 @@
    "hexer"
   ],
   "zones": [
+   1,
    2,
    3
   ],
@@ -1224,6 +1226,7 @@
   ],
   "zones": [
    1,
+   2,
    3
   ],
   "enemy_role": "support",

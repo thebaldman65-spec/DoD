@@ -65,13 +65,13 @@ gate asserts the count at 2 so a *third* caller, which would be a second revivin
 
 | site | owner |
 |---|---|
-| `battle.gd:8257` | **Answering Steel** — Swordmaster draft card |
-| `battle.gd:8263` | **Battle Poise** — Swordmaster draft card |
-| `battle.gd:16629` | **BLINK — A MAGE CLASS-WIDE DRAFT CARD.** Its own comment: *"AXIS: tempo, not damage. It goes through `_tick_cooldowns`, THE one implementation."* |
-| `battle.gd:15150` | **BLESSING OF ZEAL — the Devout's PROTECTED CORE**, ticking the target's cooldowns on cast |
-| `battle.gd:11608` | **Frostbound Hours** (`cr_frostbound`, Cryomancer Thaw r8) — **every hero's** cooldowns |
-| `battle.gd:3795` | **Practised Hands** (`sv_practised`, Survivalist Guerilla r8) |
-| `battle.gd:9787` | **Follow-Through** (`ss_follow`, Sharpshooter Tempo r5) |
+| `scripts/battle.gd` `_resolve`: `var as_n := _tick_cooldowns(strike_target, ANSWERING_TICK,` | **Answering Steel** — Swordmaster draft card |
+| `scripts/battle.gd` `_resolve`: `var bp_n := _tick_cooldowns(strike_target, BATTLE_POISE_TICK,` (on the tree this report mostly cites) | **Battle Poise** — Swordmaster draft card |
+| `scripts/battle.gd` `_resolve_special`: `var bl_n := _tick_cooldowns(attacker, bl_turns, ab.display_name)` | **BLINK — A MAGE CLASS-WIDE DRAFT CARD.** Its own comment: *"AXIS: tempo, not damage. It goes through `_tick_cooldowns`, THE one implementation."* |
+| `scripts/battle.gd` `_resolve_special`: `var zeal_ticked := _tick_cooldowns(target, zeal_ticks) > 0` | **BLESSING OF ZEAL — the Devout's PROTECTED CORE**, ticking the target's cooldowns on cast |
+| `scripts/battle.gd` `_hold_release_body`: `_tick_cooldowns(h, refund)` | **Frostbound Hours** (`cr_frostbound`, Cryomancer Thaw r8) — **every hero's** cooldowns |
+| `scripts/battle.gd` `_player_turn`: `var ph_cut := _tick_cooldowns(u, u.practised_hands, ph_cast)` | **Practised Hands** (`sv_practised`, Survivalist Guerilla r8) |
+| `scripts/battle.gd` `_resolve`: `_tick_cooldowns(attacker, attacker.follow_through)` | **Follow-Through** (`ss_follow`, Sharpshooter Tempo r5) |
 
 Five more sites clear a cooldown **outright** through `cooldowns.erase` — Sever against a Broken
 target, Hex of Ruin's perfect, Apex Predator, Overkill, Mark of the Hunt — plus Terminal Velocity.

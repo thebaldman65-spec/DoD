@@ -28,7 +28,7 @@ single-line grep cannot see any of them. The number was never re-derived; it was
 documents.
 
 `check_di` §1 walks rather than greps, and it **skips the two COMMENTS that name
-`_apply_status(`** — `battle.gd:5494` and `battle.gd:19192`. Without that skip the new count reads
+`_apply_status(`** — `scripts/battle.gd` `_recast_writes`: `` # `_apply_status(_, "frozen", …)` has exactly ONE call site, inside `` and `scripts/battle.gd` `_resolve_special`: `` # an `_apply_status(_, "bleed", …)` here would index a table that `` (on the tree this report mostly cites). Without that skip the new count reads
 206 instead of 204, which is the same fault one layer down.
 
 ---
@@ -112,8 +112,8 @@ DH's Harvest comment reads:
 
 **It does not.**
 
-- `heroes.append` is reached at **exactly one site** — `battle.gd:1337`, the party spawn loop.
-- A companion is appended to `companions` at `battle.gd:19517`.
+- `heroes.append` is reached at **exactly one site** — `scripts/battle.gd` `_spawn_units`: `heroes.append(u)`, the party spawn loop.
+- A companion is appended to `companions` at `scripts/battle.gd` `_do_summon`: `` # standing at the time. `_on_bloodbond_guard` decides whether it fires. `` (on the tree this report mostly cites).
 - **Four sites** in `battle.gd` write `heroes + companions` (1939, 1966, 12377, 13352) precisely
   because the union is not free, and `_hero_side()` exists solely to build it.
 - `_living_hero_with` filters `not h.is_companion` as though companions might be there — which is
@@ -274,7 +274,7 @@ about seventeen in eighteen has told you nothing when it reads clean.
   read — buffs, marks, hero-side wards — so nothing currently mis-credits off them. The standing
   rule now covers them and the full sweep stays visible.
 - **One further site is out of reach by SHAPE rather than by scope.** `melted` is applied through
-  `unit.add_status` (`battle.gd:2553`), which **accepts no source argument at all** — stamping it
+  `unit.add_status` (`scripts/battle.gd` `_run_battle`: `u.add_status("melted", "Melt Armor", "-%d%%" % melt_pct,`), which **accepts no source argument at all** — stamping it
   is a signature change, not an argument, and this batch's rule was "supply what is already
   accepted". It is the only Harvest-readable status applied outside `_apply_status`.
 - **The seven companion sites** — §3.

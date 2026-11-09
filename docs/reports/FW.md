@@ -49,7 +49,7 @@ four are false, and three are recorded nowhere in the repo.** The full table wit
 
 | Premise | Verdict | What the repo says |
 |---|---|---|
-| FV just added an initiative write and named the constraint | **FALSE** | **FT** (`97577a1`) wrote Momentum's initiative payout and the "NOT A SECOND WRITER OF TURN ORDER" comment; `next_time` writes are **23 before FT and 23 now**; FV added a blow-met door and a rate constant. "A second set of rules for one question" is `check_ft.gd:601`, FT's. The constraint is real. |
+| FV just added an initiative write and named the constraint | **FALSE** | **FT** (`97577a1`) wrote Momentum's initiative payout and the "NOT A SECOND WRITER OF TURN ORDER" comment; `next_time` writes are **23 before FT and 23 now**; FV added a blow-met door and a rate constant. "A second set of rules for one question" is `check_ft.gd` `_s2_momentum`: `# second writer of turn order is a second set of rules for one question, so`, FT's. The constraint is real. |
 | Poison is nobody's in particular | **FALSE FOR HEROES** | every hero-side path is the Survivalist's, and `CLAUDE.md` BA §1 says so as a standing rule; four enemy kinds apply it too |
 | The loadout has a swap cost | **FALSE** | benching is free and reversible since EG |
 | The party has downed heroes | **FALSE** | no "downed" state exists anywhere in the repo |
@@ -57,9 +57,9 @@ four are false, and three are recorded nowhere in the repo.** The full table wit
 | What a rest does | **FALSE PREMISE** | there are no rests (AN §6); `rest_heal_add` has no read site |
 | The basic attack is `abilities[0]` | **PARTLY** | one of three definitions in the code (`cost == 0`; `damage > 0 and cost == 0 and not is_counter`) |
 | An item has a handler and a cost | **PARTLY** | the cost is gold and one use a turn — no turn, no resource; an item is never an `Ability` |
-| Fault Line, Turn the Blade and Bring It Down all generate Break | **TWO OF THREE** | Bring It Down is a damage buff (`battle.gd:9610-9611`) |
+| Fault Line, Turn the Blade and Bring It Down all generate Break | **TWO OF THREE** | Bring It Down is a damage buff (`scripts/battle.gd` `_resolve`: `if attacker.has_status("bring_it_down"):` to `raw *= 1.0 + attacker.status_power("bring_it_down") / 100.0`) |
 | CN made the profile a five-field dict | **STALE** | five at CN (`8c3c676`), six since CS (`5d43b07`); `check_cn` pins six |
-| Interference queued since CM | **NOT SUPPORTED** | earliest record is CT's comment (`battle.gd:5337-5341`); `state.md`'s line arrived at CW |
+| Interference queued since CM | **NOT SUPPORTED** | earliest record is CT's comment (`scripts/battle.gd` `_use_item`: `# ---------- BATCH CT §4: the three new ones ----------` to `# worsens the moment enemy interference lands.`); `state.md`'s line arrived at CW |
 | Four flavours from Shadow Hearts; the "adds to the loop" test | **NOT IN THE TREE** | both are the brief's own account |
 | FO found searches return the wrong spec's section | **NOT FOUND** | nothing in `FO.md`, its changelog entry or `docs/`; the instruction was followed anyway |
 | 50 survivors / 274 is the target | **HELD FOR FP'S RULE** | **43 and 281 under the designer's line** (§3 G) |
@@ -256,9 +256,9 @@ other finding is in `docs/state.md`'s queue.
 2. **ENEMY INTERFERENCE** — whether to build it; priced in `SR-INTERFERE`, and a third, non-opt-in exception to the
    standing profile rule if it is.
 3. **PLAYER-FACING TEXT THAT IS WRONG TODAY** (found, not fixed — a report touches no code):
-   - the first-bar orientation card says every action runs a timing check (`battle.gd:24398`);
-   - the map's help says elites pay a talent point (`map_screen.gd:158`);
-   - **Cracked Hourglass promises every hero 30% Mana and the Hunter gets none** (`run_state.gd:1356-1360`).
+   - the first-bar orientation card says every action runs a timing check (`scripts/battle.gd` `_show_skill_check_hint`: `body.text = ("Every action runs a timing check: a marker sweeps the bar\n" +`);
+   - the map's help says elites pay a talent point (`scripts/map_screen.gd` `_maybe_show_framing`: `"ELITES pay a talent point and a rune, and cost you health. The\n" +`);
+   - **Cracked Hourglass promises every hero 30% Mana and the Hunter gets none** (`scripts/run_state.gd` `sync_spec_hp`, a blank line — a line JR could not settle).
 4. **THE KNOWLEDGE SYNC:** `docs/systems-recon.html` is what the 281 nodes will be authored against, and
    `CLAUDE.md`'s must-stay-selected list does not name it (FW added no `CLAUDE.md` line). Selecting it is the
    designer's.

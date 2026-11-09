@@ -54,7 +54,7 @@ attaching batch will meet, measured rather than predicted:
 
 **AND `second_resource` IS THREE CURRENCIES, NOT FOUR — FP's premise 6 re-verified.** It is written
 in exactly three places (Resonance, Mercy, Focus). **Faith is `faith_stacks`**, a separate int on
-every ally, and `faith_cost` is a misnamed MERCY cost — `classes.gd:1291` says so in as many words.
+every ally, and `faith_cost` is a misnamed MERCY cost — `scripts/classes.gd` `computed_block`: `` # `faith_cost` IS MERCY EVERYWHERE IT APPEARS — Resurrection, Divine Plea `` says so in as many words.
 
 ---
 
@@ -62,7 +62,7 @@ every ally, and `faith_cost` is a misnamed MERCY cost — `classes.gd:1291` says
 
 **FP's two findings both held.** `note_resource_spent` is generic in shape and books the NET off
 the bar at the one line every ability in the game pays through; `dmg_bonus` is read at **exactly
-one site** — `battle.gd:9770`, the whole general damage multiplier in the game. Both verified at
+one site** — `scripts/battle.gd` `_resolve`: `raw *= 1.10` (on the tree this report mostly cites), the whole general damage multiplier in the game. Both verified at
 the site, not quoted.
 
 ### THE BUILD HALF IS TWO LINES AND A SECOND FIELD

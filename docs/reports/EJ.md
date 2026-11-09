@@ -24,7 +24,7 @@ design documents state as current, and the charter deletes the rule rather than 
 |---|---|---|
 | **65 authored runes** | **true** | 5 universal + 12 class-wide + 48 spec |
 | **`master.html` and `design-notes.md` both state "one rune per talent lane, plus one splash" as current** | **true** | with the "worth more to a hero whose points went elsewhere" reasoning, in both |
-| **`battle.gd`'s comment says most spec runes ride an existing talent counter** | **true**, `battle.gd:1259` | *"Batch AA roll call: most spec runes ride an EXISTING talent counter"* — and it is right: 59 of 109 spec-rune clauses do |
+| **`battle.gd`'s comment says most spec runes ride an existing talent counter** | **true**, `scripts/battle.gd` `_spawn_units`: `# Batch AA roll call: most spec runes ride an EXISTING` | *"Batch AA roll call: most spec runes ride an EXISTING talent counter"* — and it is right: 59 of 109 spec-rune clauses do |
 | **`check_dp` §4 asserts every rune stat field has a live read site — 116 fields, 0 dead** | **true**, run live: `116 rune stat fields across 65 runes; 0 read nowhere` | and the brief is right that it is a different question — see §2 |
 | **DP proved one rune's fields would have been orphaned; nobody checked the other 64** | **half true** | `check_dp` §4 *did* check all 65 for DEAD fields. What nobody checked is whether a live field still buys what it was authored to buy |
 | **25 cells re-authored** | **true** | `docs/reports/DO.md` §2's table is exactly 25 rows, and all 25 reproduce against the trees |
@@ -113,7 +113,7 @@ tree as it stood at `DN~1`. Five moved.**
 |---|---|---|---|---|
 | `hungering_ranks` | Long Winter | a SECOND read site added — companions read it too | DU | a **widening** |
 | `max_hp` | Broad Path | an unrelated new site (the Salve heal) | DS | incidental; a universal stat |
-| `spread_ranks`, `spread_ruin` | **Whispering Dark** | read site moved 7,225 lines (`:6783` &rarr; `:14008` at DP) and from `_max_hero_rank` to `occ.` — Psychosis spreading between minions became **a mark of Ruin leaping to another enemy** | **DP** | **known and handled** |
+| `spread_ranks`, `spread_ruin` | **Whispering Dark** | read site moved 7,225 lines (a line JR could not resolve &rarr; a line JR could not resolve at DP) and from `_max_hero_rank` to `occ.` — Psychosis spreading between minions became **a mark of Ruin leaping to another enemy** | **DP** | **known and handled** |
 | `pulse_ranks` | **Standing Vow** | read LINE byte-identical; the `if` above it lost its `unity` half | **DO** | **recorded nowhere** |
 
 **THE WHISPERING DARK IS THE CASE DP FOUND AND CLOSED.** It kept both fields deliberately and
@@ -139,7 +139,7 @@ the rune got worse than it was, and no instrument in the project could see it.
 
 **Its node dictionary changed by DESCRIPTION ONLY at DP.** Id, lane, row, `scale` and both payload
 fields are byte-identical across the whole rebuild — while `battle.gd`'s read site moved **7,225
-lines** — `:6783` to `:14008`, measured at DP itself rather than against HEAD — and changed which
+lines** — `_intent_category`: `# Only when the status is the point. An ability that both afflicts and` (its file read from the text around it) to `_sanctified_refund`: `# flag (the Faith trigger) can never be missed.` (its file read from the text around it), measured at DP itself rather than against HEAD — and changed which
 unit it reads from. **A diff of the talent trees, which is the obvious
 instrument and the one this audit reached for first, would have filed `oc_spread` as a
 documentation edit.** What found it was diffing the read site. What found the Standing Vow beside
@@ -196,7 +196,7 @@ owed and none was made** — which is also why §5's standing rule does not fire
 
 **THE LINEAGE IS FOUR DEEP NOW.** CT was told the ladder existed and caught it; EG's brief asserted
 it eleven batches later; EH's brief blamed `master.html`; **EJ's brief quoted two contradictory
-descriptions as both live in a document that carries only one.** `battle.gd:23066-67` has read *"Batch AN §9
+descriptions as both live in a document that carries only one.** `scripts/battle.gd` `_resolve_boss`: `# no such announcement to copy (Batch AN §9 deleted the rune ladder` to `# does not.** A later batch reading four as arbitrary and raising it is the` has read *"Batch AN §9
 deleted the rune ladder outright and rune_slots() has been flat 3 ever since"* the whole time —
 and **that comment WRAPS, so a line-anchored grep for it returns nothing.** The refutation has been
 as hard to find as the claim.
@@ -285,7 +285,7 @@ would move almost entirely.**
   opposite. The standing rule requires a correction where there is a contradiction; there is none.
 - **The White Flame's middle clause stays inert.** `pyromaniac_ranks` is the one rune field in the
   game written by a rune and read by nothing — Inferno Master's per-turn step stopped existing at
-  AR. `unit.gd:515` already flags it *"INERT: the White Flame writes it, nothing reads it"*, and
+  AR. `scripts/unit.gd` `var pyromaniac_ranks`: `var pyromaniac_ranks := 0     # INERT: the White Flame writes it, nothing reads it` already flags it *"INERT: the White Flame writes it, nothing reads it"*, and
   inventing a read site is the guess AR §4 forbids. **It is the 135th clause and it pays nothing
   today**, on a 120g scarred Epic whose other two clauses are live.
 - **The six "→ Talent:" log lines are not changed.** Player-facing text.
@@ -323,10 +323,10 @@ correcting an asserted document behind one is the fault that cost DL two runs.
 **All three were the same species, and it is the species this project keeps paying for:**
 
 1. **"the read site moved 7,700 lines"** was measured from `DN~1` to **HEAD**, which folds DQ–EI's
-   growth into DP's move. **DP's own move is 7,225** (`:6783` to `:14008`). A figure derived
+   growth into DP's move. **DP's own move is 7,225** (a line JR could not resolve (no file named) to a line JR could not resolve (no file named)). A figure derived
    against the wrong endpoint.
-2. **"`battle.gd:23067`"** — the grep that was supposed to confirm that citation **returned
-   nothing**, because the comment WRAPS across `:23066`–`:23067`. **The refutation of the slot
+2. **"`scripts/battle.gd` `_resolve_boss`: `# outright and rune_slots() has been flat 3 ever since), so this is it,`"** — the grep that was supposed to confirm that citation **returned
+   nothing**, because the comment WRAPS across `_resolve_boss`: `# no such announcement to copy (Batch AN §9 deleted the rune ladder` (its file read from the text around it)–`_resolve_boss`: `# outright and rune_slots() has been flat 3 ever since), so this is it,` (its file read from the text around it). **The refutation of the slot
    ladder is itself invisible to a line-anchored grep**, which is EI's `master.html` lesson
    arriving in a source file.
 3. **"three further mentions"** of the flat slot count in `master.html` — there are **four**, five

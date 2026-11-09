@@ -317,19 +317,19 @@ renumbering moves.*
 the draft screen's iteration order), `LEGACY_DIFFICULTY` (`{"standard": "warden"}`, Batch Y's id),
 `difficulty_id` (unknown ids fall back to **`"wanderer"`** — a removal makes that fallback name a
 rung that does not exist), `difficulty_def`, `difficulty_rung`, `difficulty_mult`,
-`zone_base_mult`, and the save load at `run_state.gd:1959` which defaults a missing key to
+`zone_base_mult`, and the save load at `scripts/run_state.gd` `load_run`: `difficulty = difficulty_id(String(data.get("difficulty", "wanderer")))` which defaults a missing key to
 `"wanderer"`.
 
 **THE READERS OF THE RUNG AS A NUMBER — there are three and they are the whole surface:**
 
 | site | what it does with the index |
 |---|---|
-| `battle.gd:1078` | `Enemies.config(kind, Run.difficulty_rung())` — drops any authored ability tagged `"rung": N` above the rung played |
-| `battle.gd:23186` | `Profile.note_end_boss(Run.difficulty_rung())` — **the meta gate** |
-| `run_sim.gd:240` | `diff_rung = run.difficulty_rung()`, printed in the run report's header |
+| `scripts/battle.gd` `_enemy_config`: `var cfg := Enemies.config(kind, Run.difficulty_rung() if Run.active else Enemies.MAX_RUNG)` | `Enemies.config(kind, Run.difficulty_rung())` — drops any authored ability tagged `"rung": N` above the rung played |
+| `scripts/battle.gd` `_resolve_boss`: `Profile.note_end_boss(Run.difficulty_rung())` | `Profile.note_end_boss(Run.difficulty_rung())` — **the meta gate** |
+| `scripts/run_sim.gd` `start_run`: `diff_rung = run.difficulty_rung()` | `diff_rung = run.difficulty_rung()`, printed in the run report's header |
 
 **THE INDEX IS ALSO THE TALENT TIER, AND THAT COUPLING IS THE RENUMBERING RISK.**
-`draft_screen.gd:147-148` advertises each rung's unlock as
+`scripts/draft_screen.gd` `_draw_screen`: `Talents.rows_unlocked(int(def["rung"]) - 1) + 1,` to `Talents.rows_unlocked(int(def["rung"]))]` advertises each rung's unlock as
 `Talents.rows_unlocked(int(def["rung"]) - 1) + 1 .. Talents.rows_unlocked(int(def["rung"]))`.
 **It reads `def["rung"]` as a tier index directly.** If the ladder were renumbered so today's
 middle rung became rung 1, `note_end_boss` would open rows 1–3 for a clear the button advertises
@@ -363,10 +363,10 @@ untalented sweep says a first clear needs. **None of them is a removal.**
 
 | site | what it says |
 |---|---|
-| `run_state.gd:210` | `var active_relics: Array = []  # up to 3 relic ids chosen at the draft` — **a flat list of ids. No hero key anywhere.** |
-| `run_state.gd:451-457` | `relic_add(hook)` / `relic_dict(hook)` — **both take a hook and nothing else.** No hero parameter, so no read site could name one |
-| `run_state.gd:464` | `active_relics = relics.slice(0, 3)` at `new_run` |
-| `run_state.gd:1916 / 1956` | saved as `"active_relics": active_relics`, read back as a hard key with no default — **the save format never moved** |
+| `scripts/run_state.gd` `var active_relics`: `var active_relics: Array = []  # up to 3 relic ids chosen at the draft` | `var active_relics: Array = []  # up to 3 relic ids chosen at the draft` — **a flat list of ids. No hero key anywhere.** |
+| `scripts/run_state.gd` `relic_add`: from `func relic_add(hook: String) -> float:` | `relic_add(hook)` / `relic_dict(hook)` — **both take a hook and nothing else.** No hero parameter, so no read site could name one |
+| `scripts/run_state.gd` `new_run`: `active_relics = relics.slice(0, 3)` | `active_relics = relics.slice(0, 3)` at `new_run` |
+| `scripts/run_state.gd` `save_run`: `"active_relics": active_relics, "map": map,`; `load_run`: `active_relics = data["active_relics"]` | saved as `"active_relics": active_relics`, read back as a hard key with no default — **the save format never moved** |
 | the 25 read sites | `battle.gd` 12, `run_state.gd` 8, `run_sim.gd` 4, `shop_screen.gd` 1 — every one aggregates over the whole list and applies the result to the whole party |
 
 **The run save is v12 and is tolerant. Per-hero relics would take it to v13** — which is itself the

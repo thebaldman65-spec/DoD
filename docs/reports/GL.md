@@ -20,12 +20,12 @@ deliverable is **`docs/kit-recon.html`** (NEW).*
 2. **WHERE A PICK COMES FROM — BOTH SOURCES MOVE SOMETHING.**
    - **A class-wide card** taken into a kit leaves every hero's class draw. **It is also a spine-taker's whole
      supply**: a hero with no lineage draws every card of his run — the drafts and the zone-boss awards — from that pool
-     alone (`run_state.gd:2202-2214`, `3801-3810`). Six cards, the Mage's seven; three once three leave, the Mage's
+     alone (`scripts/run_state.gd` `draft_pool_left`: `func draft_pool_left(member: Dictionary) -> Dictionary:` to `var class_left: Array = Classes.class_draft_pool(`, `3801-3810`). Six cards, the Mage's seven; three once three leave, the Mage's
      four.
    - **A protected core** taken into a kit is already in its lineage's opening kit until the pool merge. A kit builder
      owes an answer for the hero who would hold it twice.
 3. **THE CLASS-WIDE CARDS WERE AUTHORED WEAKER THAN SPEC CARDS, ON PURPOSE** (the header over `CLASS_DRAFT_POOLS`,
-   `classes.gd:518-526`), and EB §1 ruled that the protected core is the baseline. **A kit made of class-wide cards
+   `scripts/classes.gd` (file scope): `# THE AUTHORING RULES, RECORDED WITH THE CONTENT THEY GOVERN: a class-wide` to `# spec's engine is not online yet, which is a real role and a different one.`), and EB §1 ruled that the protected core is the baseline. **A kit made of class-wide cards
    gives the baseline role to the cards written as the fallback.** Whether that is intended is the designer's.
 4. **THE CLERIC'S ONLY REVIVE AND ONLY PARTY BURST HEAL ARE PRICED IN MERCY ALONE.** Resurrection and Hymn of Hope cost
    0 Mana and 1 Mercy, and a Cleric without the Mercy engine has no Mercy. **Cut the Mercy and each is free**, so
@@ -67,16 +67,16 @@ as a ruling, and nine did not hold as written.**
 | A hero who takes Momentum, Channel or Sanctity opens with his class's basic attack alone | **HELD** | GK's ruling 7; `Classes.opening_kit(class, "", [])` returns the basic alone for the Warrior, the Mage and the Cleric (the probe, §VERIFICATION) |
 | The other twelve engines bring enablers; those three bring a rule | **HALF FALSE** | **Nine** of the twelve bring enablers. Blood Frenzy, Heavy Plating and Trapper bring none, and their holders still open with three abilities. **What the twelve bring is a lineage** and its opening kit, and that is what a spine lacks |
 | Three of fifteen engine runes produce a materially worse opening | **HELD** | For the Warrior, the Mage and the Cleric. **The Hunter has no spine**, so no Hunter opens with Quick Shot alone today |
-| A player cannot know that at the draft | **FALSE AS WRITTEN** | The class-selection card lists every ability the rune opens with, off `Classes.opening_kit` (`spec_choice_screen.gd:141-152`), so a spine's card lists one line. **What no card says** is that a spine-taker's every later card comes from his class pool alone |
-| THREE abilities, INSIDE the slot count; a protected core took a slot and this is the same object | **HELD** | `core_slots` is 3 for eleven lineages and 4 for Holy, and the basic sits outside it (`Classes.lineage_slots`; `Run.ability_slots_used`, `run_state.gd:2116-2121`). Three kit abilities are three slots |
+| A player cannot know that at the draft | **FALSE AS WRITTEN** | The class-selection card lists every ability the rune opens with, off `Classes.opening_kit` (`scripts/spec_choice_screen.gd` `_draw_screen`: `# THE KIT THIS RUNE OPENS WITH, off the one builder the battle reads: the` to `ab.description, vctx).replace("\n", " "))`), so a spine's card lists one line. **What no card says** is that a spine-taker's every later card comes from his class pool alone |
+| THREE abilities, INSIDE the slot count; a protected core took a slot and this is the same object | **HELD** | `core_slots` is 3 for eleven lineages and 4 for Holy, and the basic sits outside it (`Classes.lineage_slots`; `Run.ability_slots_used`, `scripts/run_state.gd` `ability_slots_used`: `func ability_slots_used(member: Dictionary) -> int:` to `+ equipped_ability_names(member).size()`). Three kit abilities are three slots |
 | Remove the specs and a hero's entire kit is drafted | **HELD, AS A RULING** | The pool merge is RULED, NOT BUILT; today a lineage hero keeps his kit with no engine (GK's ruling 5) |
 | GK found 67 of 104 targets red, 42 throwing, 38 on `passive_id` alone | **HELD** | `GK.md` §3a |
 | DV found `apply_kit_overrides` builds the four Mage specs' `abilities[0]` and the corpus returned the unoverridden Magic Bolt | **MISATTRIBUTED — AND IT IS THE ERROR DV CORRECTED** | **DU §4** found the corpus blind spot. **DV §5** corrected DU's "four Mage specs": there are three, and **the fourth override is Shadowrend, the Occultist's — a Cleric** (`DoD-archive/changelog-archive.html`, DV's entry). **CLAUDE.md's EI §2 shape: a false precedent survives being caught.** So the Mage's slot 0 has four definitions and the Cleric's two |
-| `PROTECTED_CORES` names sixteen enablers across nine specs | **HELD** | `classes.gd:580-613`; the probe |
-| Six cards per class in the class-wide pools | **FALSE FOR THE MAGE** | **Seven** (Mana Shield joined at DY §1), so **25** in all (`classes.gd:527-545`; `test_batch_cd.PER_CLASS_DEPTH`) |
+| `PROTECTED_CORES` names sixteen enablers across nine specs | **HELD** | `scripts/classes.gd` `const PROTECTED_CORES`: `const PROTECTED_CORES := {` to `}`; the probe |
+| Six cards per class in the class-wide pools | **FALSE FOR THE MAGE** | **Seven** (Mana Shield joined at DY §1), so **25** in all (`scripts/classes.gd` `const CLASS_DRAFT_POOLS`: `const CLASS_DRAFT_POOLS := {` to `}`; `test_batch_cd.PER_CLASS_DEPTH`) |
 | Nine specs had three or more cores and only sixteen are enablers | **FALSE COUNT** | **All twelve** lineages open with three or more abilities beside the basic (Holy four; the Beastmaster five in three slots); **nine** name enablers. The remainder is **28**: Warrior 8, Mage 7, Cleric 5, Hunter 8 |
 | The remainder were guaranteed abilities that no engine needs | **PARTLY FALSE** | Of the 28, **17 CLEAN, 8 ALMOST, 3 BOUND** — Death Ray (Resonance), Resurrection (Mercy), Kill Command (a companion only the Pack Bond summons bring) |
-| The engines to test for include Rage | **RAGE IS NOT AN ENGINE** | It is the Warrior's class resource (`classes.gd:61`). Blood Frenzy is the engine and reads Rage **spent** (CZ §1), so a card that builds or spends Rage feeds it without reading it. **Burn and Chilled** are statuses cards lay, read by Overburn and Glacial Hold |
+| The engines to test for include Rage | **RAGE IS NOT AN ENGINE** | It is the Warrior's class resource (`scripts/classes.gd` `hero_config`: `"resource_name": "Rage", "resource": 0, "max_resource": 100,`). Blood Frenzy is the engine and reads Rage **spent** (CZ §1), so a card that builds or spends Rage feeds it without reading it. **Burn and Chilled** are statuses cards lay, read by Overburn and Glacial Hold |
 | FY's SR-REACH found TODAY meant *works for some hero* | **HELD** | `FY.md` §1d. This batch applies the correction: *works* means for every hero of the class, with any engine or none |
 | Two of FX's 27 nodes shipped against items that were never what they were written from | **MISSTATED** | The two were among the four of FX's **brief**'s nodes that failed, and FX swapped all four for alternates before it shipped (`docs/state.md`, FX's ruling item 3). None of the 27 that shipped rests on them |
 | DN priced a restructure at 97 new nodes | **HELD** | DN's text in `docs/state.md`; FX's one tree superseded it |
@@ -97,7 +97,7 @@ row.** In short:
 | **Class-wide pool** | 6 | **7** | 6 | 6 |
 | **Cores that are not enablers** | 8 | 7 | 5 | 8 |
 
-- **EVERY BASIC RESOLVES AT A FIXED GOOD** (`battle.gd:4118-4119`) — **except a Lethal Aim holder's Quick Shot** —
+- **EVERY BASIC RESOLVES AT A FIXED GOOD** (`scripts/battle.gd` `_player_turn`: `if not ab.runs_skill_check() \` to `or (ab == u.abilities[0] and not u.has_engine("lethal_aim")):`) — **except a Lethal Aim holder's Quick Shot** —
   **so every basic's Perfect is advertised and unreachable** (FOUND below).
 - **THE SIXTEEN ENABLERS, EACH AGAINST ITS ENGINE.**
   - **Six pass clean.** Four are basic overrides (Fireball, Frostbolt, Arcane Explosion, Shadowrend). The other two,
@@ -131,11 +131,11 @@ the card's number** — Overburn's damage term, Mercy's +5% a stack on every hea
 **The two readings disagreed on three cards, and each is recorded in the recon (KR-TEST):**
 
 - **Arcane Explosion — resolved toward the census pass: CLEAN, with a WORDING note.** Its "Builds 1 Resonance" is the
-  build every damaging cast pays a Resonance holder (`battle.gd:12418-12457`). Cutting the words cuts no mechanic.
+  build every damaging cast pays a Resonance holder (`scripts/battle.gd` `_resolve`: `var res_gain := (2 + attacker.rune_overflow + attacker.attunement_crit` to `else "th", res_gain], "#b0a8e0")`). Cutting the words cuts no mechanic.
 - **Ministration — kept CLEAN; the Cleric pass read ALMOST**, because `_healing_done_mult` adds Mercy's +5% a stack
-  (`battle.gd:14727`). That term is the engine's payout on every heal. Without Mercy the card pays exactly its own 20%.
+  (`scripts/battle.gd` `_healing_done_mult`: `if caster.second_resource_name == "Mercy":`). That term is the engine's payout on every heal. Without Mercy the card pays exactly its own 20%.
 - **Divine Shield — kept CLEAN; the Cleric pass read ALMOST**, because the barrier stamps a hidden `divine` rider that
-  only Faith and two Devout cards read, and the recast table counts it as an improvement (`battle.gd:6069`,
+  only Faith and two Devout cards read, and the recast table counts it as an improvement (`scripts/battle.gd` `_recast_writes`: `"divine": 1.0,`,
   `6104-6106`). Without Conviction it pays nothing and harms nothing, and the card's text never names it. **It feeds
   Faith.**
 
@@ -145,12 +145,12 @@ the card's number** — Overburn's damage term, Mercy's +5% a stack on every hea
 re-read by hand against the census passes:**
 
 - **Chilled works without Glacial Hold.** Four stacks freeze for one turn and drop the pile to one
-  (`battle.gd:13300`, `12737-12741`); only the hold is the engine's (`12668`, `12742`).
-- **The Pack Bond gates.** A companion strikes beside the Hunter only under the engine (`battle.gd:12282`); its boon
+  (`scripts/battle.gd` `_apply_status`: `if target.status_stacks("chilled") >= 4 and not target.has_status("frozen"):`, `12737-12741`); only the hold is the engine's (`12668`, `12742`).
+- **The Pack Bond gates.** A companion strikes beside the Hunter only under the engine (`scripts/battle.gd` `_resolve`: `if attacker.is_hero and attacker.has_engine("pack") and ab.damage > 0 \`); its boon
   and Loyalty are refused without it (`14336`, `14533`).
-- **Mercy is set up only under its engine** (`battle.gd:1183-1186`), and a `faith_cost` card is refused without it
+- **Mercy is set up only under its engine** (`scripts/battle.gd` `_spawn_units`: `if engines.has("mercy"):` to `cfg["second_max"] = 5`), and a `faith_cost` card is refused without it
   (`6152`).
-- **A one-turn Daze never acts.** It ticks off at the target's own turn start (`battle.gd:3295`), before any miss roll
+- **A one-turn Daze never acts.** It ticks off at the target's own turn start (`scripts/battle.gd` `_run_battle`: `u.tick_statuses()`), before any miss roll
   reads it (`7981`).
 
 ---
@@ -197,7 +197,7 @@ the problem. The pick has three costs, and the report does not choose between th
   - **Nothing heals, shields or cleanses another hero, and no tempo or resource card.**
 
 **THE PARTY DAMAGE BUFFS PAY ON ORDINARY STRIKES ONLY.** Warcry, Exhortation, Blessing of Zeal and Hunter's Mark are
-read in the strike path (`battle.gd:9689`, `8423-8425`, `9240`, `9892`). A card resolving in its own `special`
+read in the strike path (`scripts/battle.gd` `_resolve`: `if attacker.has_status("warcry"):`, `8423-8425`, `9240`, `9892`). A card resolving in its own `special`
 handler reads none of them.
 
 **"SALVAGE CLEANLY" MEANS THE CARD WORKS FOR EVERY HERO OF ITS CLASS. IT DOES NOT MEAN IT IS PRICED RIGHT AS A
@@ -231,30 +231,30 @@ GUARANTEED CARD.** Mocking Blow is free on a one-turn cooldown. No balance was m
      holding Lethal Aim, whose first shot spends it.
 2. **PLAYER-FACING: THREE BUTTONS THAT CAN NEVER BE PRESSED.** Each stays in its lineage's kit when the engine is
    dropped (GK §5's table lists all three):
-   - **Death Ray** — refused below 8 Resonance (`battle.gd:6469`);
+   - **Death Ray** — refused below 8 Resonance (`scripts/battle.gd` `_ability_usable`: `if ab.display_name == "Death Ray" and u.second_resource < DEATH_RAY_STACKS:`);
    - **Resurrection** — refused without 1 Mercy (`6152`), and its button label reads a bare "1" (`6572-6573`);
    - **Kill Command** — refused with no companion (`6157-6159`).
 
    **Driven:** each was refused in an engine-less kit, Resurrection with a hero down.
 3. **PLAYER-FACING: LINEAGE CARDS THAT HALF-WORK WITHOUT THEIR ENGINE**, because their payload sits inside the engine's
    block:
-   - inside Trapper's block (`battle.gd:12059-12079`): Shrapnel Charge's Poison, Hamstring's Slow and Exposed, and
+   - inside Trapper's block (`scripts/battle.gd` `_resolve`: `if attacker.is_hero and attacker.has_engine("trapper") \` to `_apply_poison(attacker, sv_t, 5)`): Shrapnel Charge's Poison, Hamstring's Slow and Exposed, and
      Venom Coating's poison;
    - inside Lethal Aim's block (`12214-12227`): Pinning Shot's Daze and Called Shot's rider.
 4. **PLAYER-FACING: THE SPLIT SHIELD RUNE DOES NOTHING IN A FIGHT.**
    - A live, 100-gold, Warden-scoped rune. `rune_split_shield` is read only by the recast table
-     (`battle.gd:5945`); Shieldwall's cast (`20902`) never reads it.
+     (`scripts/battle.gd` `_recast_writes`: `if u.rune_split_shield > 0:`); Shieldwall's cast (`20902`) never reads it.
    - **`check_ez` §5 drives `_recast_writes` and says in its comment that it is "the same answer the cast itself
      uses". It is not.** A gate that has stopped asking its question.
    - Found by the Warrior census pass, confirmed by grep and by reading the cast, then **driven**: the cast laid 25 on
      the Warden and covered no ally, while the table proposed 12.
 5. **DISPEL STRIPS THE PARTY'S OWN MARKS.**
    - `party_mark` (Hunter's Mark), `rime` and `arcane_echo` are in neither `DEBUFF_IDS` nor `DISPEL_NEVER`.
-   - So `_dispellable_buffs` (`battle.gd:7763-7770`) offers them to a Mage's Dispel cast on an enemy.
+   - So `_dispellable_buffs` (`scripts/battle.gd` `_dispellable_buffs`: from `func _dispellable_buffs(u: BattleUnit) -> Array:`) offers them to a Mage's Dispel cast on an enemy.
    - That is the trap `DISPEL_NEVER`'s own comment describes. Found by the Mage census pass, confirmed, and **driven**:
      a Hunter's Mark laid, a Mage's Dispel cast on that enemy, and the mark gone.
 6. **DIVINE SHIELD'S RECAST PROPOSAL IGNORES THE LIVE BARE ALTAR RUNE.**
-   - The rune halves the cast (`battle.gd:17157-17158`); the table proposes the full 35% (`6064`).
+   - The rune halves the cast (`scripts/battle.gd` `_resolve_special`: `if attacker.rune_bare_altar > 0:` to `ds_pct *= 0.5`); the table proposes the full 35% (`6064`).
    - So a wasted recast reads as an improvement. CR §3's rule, one rune along. Found by the Cleric census pass and
      confirmed.
 7. **PLAYER-FACING: EVERY CLASS BASIC ADVERTISES A PERFECT IT CANNOT REACH.**
@@ -273,7 +273,7 @@ GUARANTEED CARD.** Mocking Blow is free on a one-turn cooldown. No balance was m
    - Renewal and Undying Vigil cast on a companion do nothing;
    - Kill Command's "both companions" names a mode nothing writes (`the_pack`);
    - Arcane Explosion's "Builds 1 Resonance".
-9. **THE SIM BOT CASTS FIVE CANDIDATES ONLY INSIDE ENGINE BRANCHES** (`battle.gd:4656-4760`). A class kit owes it a
+9. **THE SIM BOT CASTS FIVE CANDIDATES ONLY INSIDE ENGINE BRANCHES** (`scripts/battle.gd` `_autoplay_pick_kit`: `if u.has_engine("bloodrage"):` to `if wd_stomp != null and u.resource >= wd_stomp.cost \`). A class kit owes it a
    class-level branch.
 10. **ONE SYNC LINE, AS AT FW.** `CLAUDE.md`'s must-stay-selected list does not name `docs/kit-recon.html`. The brief
     forbade rules, so **selecting it in the picker is the designer's**.

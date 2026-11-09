@@ -226,11 +226,11 @@ rather than its WHERE block, because that block is replaced every batch and a po
 lasts exactly one.
 
 **FP's `block_chance` finding travels with it and was re-verified rather than quoted.** Every part
-holds: `block_chance` defaults to **0.0** with no sentinel (`unit.gd:142`); the **Warden alone**
-declares it at **0.10** (`classes.gd:5380`); the only other unconditional source is
-`_plating_slice`, which opens `if u.passive_id == "heavy_plating"` (`battle.gd:15488`); and the
+holds: `block_chance` defaults to **0.0** with no sentinel (`scripts/unit.gd` `var block_chance`: `var block_chance := 0.0    # Block: fully negates an incoming attack (pure tanks)`); the **Warden alone**
+declares it at **0.10** (`scripts/classes.gd` `const SPEC_INFO`: `"max_hp": 200, "armor": 0.32, "block_chance": 0.10,`); the only other unconditional source is
+`_plating_slice`, which opens `if u.passive_id == "heavy_plating"` (`scripts/battle.gd` `_plating_slice`: `var slice := (0.15 + u.plating_bonus) if u.passive_id == "heavy_plating" \`); and the
 contrast is `parry_chance`'s **−1.0** sentinel against `PARRY_CHANCE := 0.05` for every hero
-(`battle.gd:7777`).
+(`scripts/battle.gd` `const PARRY_CHANCE`: `const PARRY_CHANCE := 0.05        # hero baseline`).
 
 **TWO THINGS THE RECON DID NOT STATE:**
 

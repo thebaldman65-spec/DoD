@@ -409,5 +409,5 @@ as one failing assertion rather than as a throw that silently deletes a section.
 
 **NOTHING IN THE TREE OPENS EITHER PATH, RE-DERIVED HERE RATHER THAN INHERITED.** Every `.gd` in
 the repo was swept **comment-stripped** for `state.md` and `docs/reports`: the only surviving hit is
-`check_eb.gd:143`, and it is a **failure MESSAGE** naming `docs/reports/EB.md` inside an `ok()`
+`check_eb.gd` `_s1_no_second_crossover`: `"§1: %s's known crossover (core %s against draft %s) is gone — the pair was re-priced, so EB §1's …`, and it is a **failure MESSAGE** naming `docs/reports/EB.md` inside an `ok()`
 string, not a read. No `FileAccess`, `_src`, `load(` or `open(` call anywhere names either path.

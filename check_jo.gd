@@ -68,6 +68,10 @@ const COMPARING := ["±", " z ", "(z ", "against", "paired", "before", "fell", "
 const FOLDED := ["behemoth/Fester", "hexer/Sap"]
 # THE REST OF THE WARBAND's DATA ON JN's TREE (HEAD aa6f75f), computed there by `rest_digest` under JO's names: what §1 asks stood.
 const JN_REST := "425c9c523cfbd5de4b2a12dd9089fdab"
+# BATCH JR — THREE APPEARANCE TAGS MOVED AFTER THIS GATE LANDED (JR §1): the Grave Totem and the Rot Behemoth each took a
+# roster, the Orc Hexer a second role. Each is named here and put back before the digest, so it goes on asking whether
+# anything else in the warband's data moved.
+const MOVED_SINCE := {"grave_totem": {"zones": [1.0, 3.0]}, "behemoth": {"zones": [2.0, 3.0]}, "hexer": {"roles": ["hexer"]}}
 # A HOST's KEYS §2 MOVED: its damage, its cooldown, the special it lost, the status it took and its words.
 const HOST_KEYS := ["damage", "cooldown", "special", "applies_status", "description"]
 
@@ -519,6 +523,12 @@ func _s1_nothing_else() -> void:
 		if c5.size() > 7:
 			hosts.append("%s/%s" % [c5[0], c5[6]])
 	var raw: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/enemies.json"))
+	# BATCH JR — THREE APPEARANCE TAGS MOVED AFTER THIS GATE LANDED (JR §1), each named in `MOVED_SINCE` and put back
+	# before the digest, so it goes on asking whether anything else in the warband's data moved.
+	for jr_kind in MOVED_SINCE:
+		if (raw as Dictionary).has(jr_kind):
+			for jr_field in MOVED_SINCE[jr_kind]:
+				raw[jr_kind][jr_field] = (MOVED_SINCE[jr_kind][jr_field] as Array).duplicate()
 	var rest := rest_digest(raw, ten, hosts, FOLDED)
 	print("    the rest of the data, the ten's damage, the hosts' moved keys and the folded moves aside: %s (JN's %s; %d of the ten, %d hosts)" % [
 		rest, JN_REST, ten.size(), hosts.size()])

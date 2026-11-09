@@ -262,8 +262,8 @@ twelve specs at the ladder's top rung, **the widest menu any of them can raise i
 eleven on every one of the twelve, which is itself worth noting. So §10's promised range of 10–18
 reaches **⇧Q and ⇧W**, and ⇧E through ⇧G are headroom. The document now says so.
 
-**AND TWO SOURCE COMMENTS CARRIED THE SAME CLAIM.** `battle.gd:131` (*"Batch AH: there is no cap on
-how many abilities a hero holds"*) and `battle.gd:22547` (*"Batch AH: heroes hold as many abilities
+**AND TWO SOURCE COMMENTS CARRIED THE SAME CLAIM.** `scripts/battle.gd` `const SS_SEQ_SWEEP`: `# buttons). Batch AH: there is no cap on how many abilities a hero holds,` (on the tree this report mostly cites) (*"Batch AH: there is no cap on
+how many abilities a hero holds"*) and `scripts/battle.gd` `_kb_confirm_target`: `# Batch AH: heroes hold as many abilities as they earn, so slots 10-18 bind` (*"Batch AH: heroes hold as many abilities
 as they earn"*), one screen apart from the code that contradicts them. **This is EH's `classes.gd`
 stance-swap comment arriving in a second file**, and it is CLAUDE.md's own EB §2 rule: *a comment
 naming code is a claim, and it goes stale silently.* Both corrected.

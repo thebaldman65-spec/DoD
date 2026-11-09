@@ -15,7 +15,7 @@ are load-bearing enough that the rune they describe could not have been built as
 
 | the brief's claim | what the tree says |
 |---|---|
-| *"CONFIRM EY LANDED BEFORE PRICING IT. If `SC_PROFILE_DEFAULT.sweep_time` still reads 0.72, stop"* | **IT LANDED.** `battle.gd:57` reads `"sweep_time": 1.00`. Long Draw is priced against 1.00s. |
+| *"CONFIRM EY LANDED BEFORE PRICING IT. If `SC_PROFILE_DEFAULT.sweep_time` still reads 0.72, stop"* | **IT LANDED.** `scripts/battle.gd` `const SC_PROFILE_DEFAULT`: `"sweep_time": 1.00,` reads `"sweep_time": 1.00`. Long Draw is priced against 1.00s. |
 | *"`BOND_CONVERT` is 8 and `_bond_convert()` is the one place it is decided, built that way so a rune moves one line. Confirm it still is."* | **CONFIRMED, AND THE RUNE MOVED EXACTLY ONE LINE.** `const BOND_CONVERT := 8`; `_bond_convert(_hunter)` took the hunter and discarded it. The Long Leash is `BOND_CONVERT + hunter.rune_long_leash`, and the underscore came off the parameter. |
 | *"Second Whistle names three abilities in the protected core, so every Beastmaster can roll it"* | **CONFIRMED.** `PROTECTED_CORES["beastmaster"].enablers` is exactly `Summon Ursus / Summon Canis / Summon Aguila`. |
 | *"A hero drafts 4 slots at zone 1 and 7 by the end"* | **CONFIRMED FOR ALL FOUR SPECS IN THIS BATCH.** `ABILITY_SLOTS_BY_BOSS` is `[7, 8, 9, 10]` against `core_slots` of 3 for the Occultist, Warden, Sharpshooter and Beastmaster — 4 earned to 7. (**It is 3-to-6 for the Holy Cleric, whose core is 4**; no rune here is his.) |
@@ -445,7 +445,7 @@ Every item on the brief's §5 list, read out of the tree after the batch:
 
 | | |
 |---|---|
-| `SC_PROFILE_DEFAULT.sweep_time` | **1.00** — EY's, untouched (`battle.gd:57`) |
+| `SC_PROFILE_DEFAULT.sweep_time` | **1.00** — EY's, untouched (`scripts/battle.gd` `const SC_PROFILE_DEFAULT`: `"sweep_time": 1.00,`) |
 | `perfect_half` / `good_half` | **0.045 / 0.16** — untouched |
 | `CRIT_EXCESS_STEP` | **0.50** — EX's, untouched |
 | `BOND_CONVERT` | **8** — the rune moves it through `_bond_convert()`, the constant is unmoved |

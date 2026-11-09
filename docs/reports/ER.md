@@ -21,7 +21,7 @@ out-of-repo instrumented copy: **not one executable byte of the shipped tree car
 | claim | verdict |
 |---|---|
 | *"EQ priced its loss column at zero … above nominal depth pays in a different currency rather than more of the same"* | **TRUE OF FOCUS, NOT INHERITED BY LOYALTY, AND THIS IS THE BATCH'S MAIN FINDING.** Focus's zero rests on two unstated preconditions: its first half **SATURATES** (crit chance stops paying at +50%, so converted points bought nothing) and its **RATE IS UNTOUCHABLE** (`FOCUS_STEP` is a const no node modifies; Deep Focus moves the *split point*). **Loyalty's first half never saturates and every one of its rates carries a node.** Measured cost of converting at nominal: **20.35% of the companion strike step**, blow-weighted at the read site. See §1a/§1b. |
-| *"Focus … past 100 it stops adding crit chance and starts adding crit multiplier"* | **HOLDS, AND IS SHARPER THAN STATED.** `focus_crit_chance()` is `mini(second_resource, focus_convert()) * FOCUS_STEP`, `focus_crit_mult()` is `maxi(second_resource - focus_convert(), 0) * FOCUS_STEP` (`unit.gd:840/846`). **The threshold is NOT a fixed 100** — `focus_convert()` is `maxi(FOCUS_CONVERT - deep_focus - rune_deep_focus, 1)`, so a node and a rune move it. That movable point is §2's whole answer. |
+| *"Focus … past 100 it stops adding crit chance and starts adding crit multiplier"* | **HOLDS, AND IS SHARPER THAN STATED.** `focus_crit_chance()` is `mini(second_resource, focus_convert()) * FOCUS_STEP`, `focus_crit_mult()` is `maxi(second_resource - focus_convert(), 0) * FOCUS_STEP` (`scripts/unit.gd` `focus_crit_chance`: `func focus_crit_chance() -> float:`; `focus_crit_mult`: `func focus_crit_mult() -> float:`). **The threshold is NOT a fixed 100** — `focus_convert()` is `maxi(FOCUS_CONVERT - deep_focus - rune_deep_focus, 1)`, so a node and a rune move it. That movable point is §2's whole answer. |
 | *"21.2 was a rows=9 figure; Loyalty reads 10.13 ± 0.11, and untalented 6.61 ± 0.09"* | **REPRODUCES ON ALL THREE ARMS.** Live: **10.08 ± 0.12** (n=1947), **6.64 ± 0.09** (n=1391), **18.98 ± 0.17** at rows 1–9 (n=2649). A fourth arm read **10.2** (n=2030). See §1c. |
 | *"A meter arriving twice over, not four times"* | **HOLDS.** 10.08 / 5 = **2.02×** nominal at the first-clear loadout; 3.80× fully talented. |
 | *"the rung already suppresses [it] by killing companions three times as often at rung 2"* | **NOT RE-MEASURED HERE — EQ's rung-1 arm was not re-run**, so this batch neither confirms nor disturbs it. Stated so it is not read as verified. |
@@ -30,13 +30,13 @@ out-of-repo instrumented copy: **not one executable byte of the shipped tree car
 | *"The game already flattens Loyalty three times … Bring It Down's hard cap binds on 41.5% of casts at rows 1–3"* | **NOT RE-MEASURED — quoted from `docs/reports/EQ.md` §1b with its loadout attached**, as the standing rule requires. What IS re-derived is the consequence: §1f. |
 | *"No cap below 8, ever … Kindred is a row-8 node"* | **HOLDS, AND A CONVERSION SATISFIES IT BY CONSTRUCTION** rather than by care — it writes nothing into the accrual, so Kindred at 8, Lone Bond at 6 and None Left Behind at 5 all keep firing. §1f. |
 | *"Today it buys 20–21% of a node in rows 1–3"* (§2) | **HOLDS** — `rune_wild_communion_step` 1.5 against Wild Communion's 7 is 21%, `rune_absolute_step` 3.0 against Absolute Devotion's 15 is 20% (`docs/reports/EP.md` §4's table, re-checked against `talents.gd` and `data/runes.json`). |
-| *"`SWAP_COOLDOWN` is 3, Quick Whistle shaves 3, and the read site floors at 0"* (§3) | **HOLDS AT THE LINE.** `battle.gd:20366` is 3; the read site is `maxi(SWAP_COOLDOWN - hunter.quick_whistle_ranks - hunter.rune_quick_whistle_ranks, 0)` at `:20520`. |
+| *"`SWAP_COOLDOWN` is 3, Quick Whistle shaves 3, and the read site floors at 0"* (§3) | **HOLDS AT THE LINE.** `scripts/battle.gd` `const SWAP_COOLDOWN`: `const SWAP_COOLDOWN := 3` (on the tree this report mostly cites) is 3; the read site is `maxi(SWAP_COOLDOWN - hunter.quick_whistle_ranks - hunter.rune_quick_whistle_ranks, 0)` at `_do_summon`: `hunter.cooldowns["Swap Companion"] = maxi(` (its file read from the text around it). |
 | *"swaps fall 0.38 → 0.21 → 0.02"* (§3) | **THE DIRECTION REPRODUCES; THE UNTALENTED END DOES NOT.** Live per trash fight: **0.28** (rows 0, n=1295), **0.22 / 0.23** (rows 1–3, n=1777 / 1854), **0.01** (rows 1–9, n=2360). The untalented arm has now read 0.35 (EP), 0.38 (EQ) and 0.28 (ER). |
 | **"Tempo is the axis his kit is thinnest on"** (§3) | **TRUE INSIDE HIS KIT AND EQ'S OWN COUNT IS OFF BY ONE.** EQ recorded *"eight of the twelve specs carry ZERO TEMPO"*; re-derived over EQ's own population it is **SEVEN**, and over the pool a player can actually reach since EH §1 opened the class-wide tier it is **THREE**, with **two** specs beating his one. §3b. |
 | **"0.22 companion deaths a trash fight and 0.39 at a boss"** (§4) | **THE TRASH FIGURE IS SOLID; THE BOSS FIGURE IS NOT A MEASUREMENT AT ITS n.** Trash reproduces four times over: **0.22 / 0.22 / 0.23 / 0.22**. The boss figure at the untalented arm has read **0.39 (EP), 0.48 (EQ) and 0.26 (ER)** on n ≈ 95 each time. **The brief quotes EP's 0.39, which EQ had already superseded with 0.48 — and neither reproduces.** §4a. |
 | *"Two in-game strings still say the swap cooldown is 2"* (§5) | **HOLDS, AND THERE WERE FOUR COPIES, NOT TWO.** The two strings, plus a source comment one screen above, **plus a third copy in `master.html` 750 lines below the one EQ corrected**. §5. |
 | *"`master.html` carried the same error from BB until EQ fixed it"* | **HALF RIGHT — EQ FIXED ONE COPY OF TWO.** §5(4). |
-| *"`inquisitor` is the Devout, `mystic` the Survivalist"* (§6) | **HOLDS** — `classes.gd:5289` and `:5317`. Every spec table below carries both. |
+| *"`inquisitor` is the Devout, `mystic` the Survivalist"* (§6) | **HOLDS** — `scripts/classes.gd` `const SPEC_INFO`: `"inquisitor": {"name": "Devout", "constitution": 110, "archetype": "Warder", "passive": …` and `const SPEC_INFO`: `"mystic": {"name": "Survivalist", "constitution": 100, "archetype": "Pressure", "passive": …` (its file read from the text around it). Every spec table below carries both. |
 
 ---
 
@@ -186,7 +186,7 @@ them and leaves the third alone.**
 
 **Focus's phase change is visible because the nameplate prints both halves side by side**:
 `"Focus %d (+%d%% crit / x%s)"` (`unit.gd:~2011`), feeding `focus_crit_chance()` and
-`lethal_crit_mult()`. **`battle._stamp_loyalty_chip` (`battle.gd:13432`) is the counterpart
+`lethal_crit_mult()`. **`battle._stamp_loyalty_chip` (`scripts/battle.gd` `_stamp_loyalty_chip`: `func _stamp_loyalty_chip(hunter: BattleUnit, comp: BattleUnit) -> void:` (on the tree this report mostly cites)) is the counterpart
 surface and it already builds a two-line chip** — `"Loyalty %s: +%d%% strike damage\nand %s."`
 plus `"\nPack Bond boon x%.1f (+%d%% a stack)."` — **so the structure to carry a second phase is
 already there and the cost is one format string, exactly as Focus's was.**
@@ -262,7 +262,7 @@ is unchosen:
 
 ### §3a — **HALF OF IT IS STILL WORTH ZERO, CONFIRMED AT THE LINE**
 
-`battle.gd:20520`:
+`scripts/battle.gd` `_do_summon`: `# of it (the floor is zero — "no cooldown" has to be reachable).` (on the tree this report mostly cites):
 
 ```gdscript
 hunter.cooldowns["Swap Companion"] = maxi(
@@ -270,7 +270,7 @@ hunter.cooldowns["Swap Companion"] = maxi(
         - hunter.rune_quick_whistle_ranks, 0)
 ```
 
-`SWAP_COOLDOWN` is **3** (`:20366`), Quick Whistle shaves **3**, and Quick Whistle is **pack row
+`SWAP_COOLDOWN` is **3** (`const SWAP_COOLDOWN`: `const SWAP_COOLDOWN := 3` (on the tree this report mostly cites; its file read from the text around it)), Quick Whistle shaves **3**, and Quick Whistle is **pack row
 1** — inside the rows a single rung-1 clear opens. **A Beastmaster holding it is already at the
 floor and the rune's +1 pays exactly nothing.** Wild Rotation skips the block outright
 (`if was_swap and hunter.wild_rotation == 0`).
@@ -444,8 +444,8 @@ somewhere else** — which is `CLAUDE.md`'s EH §2 rule firing three times in on
 
 | where | was | now |
 |---|---|---|
-| `battle.gd:6398` — the swap picker card's own `description` | *"Shared cooldown: 2 turns."* | *"Shared cooldown: 3 turns."* |
-| `battle.gd:5306` — the group-button tooltip | *"shared 2-turn cooldown"* | *"shared 3-turn cooldown"* |
+| `scripts/battle.gd` `_open_summon_picker`: `var swap_desc := "Swap the pack: %s arrives with its\nswap effect and +1 Loyalty.\nShared cooldown: …` (on the tree this report mostly cites) — the swap picker card's own `description` | *"Shared cooldown: 2 turns."* | *"Shared cooldown: 3 turns."* |
+| `scripts/battle.gd` `_show_actions`: `group_btn.tooltip_text = "Swap the active companion (10 %s, 1.0 int,\nshared 3-turn cooldown). The …` (on the tree this report mostly cites) — the group-button tooltip | *"shared 2-turn cooldown"* | *"shared 3-turn cooldown"* |
 
 **`SWAP_COOLDOWN` is 3.** Both replacements are the same width as what they replace, so the
 44-character ceiling is not in the way. **Swept first: no suite or gate contains `Swap the pack`,
@@ -454,7 +454,7 @@ somewhere else** — which is `CLAUDE.md`'s EH §2 rule firing three times in on
 
 ### (3) — **THE SOURCE COMMENT ONE SCREEN ABOVE, WHICH SAID THE SAME WRONG 2**
 
-`battle.gd:5296` read *"(10 Mana, shared 2cd)"*. Corrected, and pointed at `SWAP_COOLDOWN` so the
+`scripts/battle.gd` `_show_actions`: `# With a beast already out it becomes the Swap (10 Mana, shared 3cd` read *"(10 Mana, shared 2cd)"*. Corrected, and pointed at `SWAP_COOLDOWN` so the
 next reader has the constant rather than a copy of its value. **This is `CLAUDE.md`'s "A COMMENT
 NAMING CODE IS A CLAIM" rule; the comment is the copy nobody greps.**
 
@@ -496,8 +496,8 @@ conflation has now been written twice and would read as a natural "fix" to a lat
 ### **WHAT WAS NOT CORRECTED, AND WHY**
 
 - **THE KINDRED / SUCCESSION CONFUSION WAS NEVER RECORDED OUTSIDE THE BRIEF.** Swept:
-  `master.html:2370` describes Kindred correctly (*"At 8 or more Loyalty the companion's arrival
-  effect fires again"*), `:1558` describes Succession correctly (*"half the Loyalty of the one it
+  `docs/master.html` (file scope): `<tr><td>8</td><td><b>Kindred</b> — At 8 or more Loyalty the companion&#x27;s arrival effect fires …` describes Kindred correctly (*"At 8 or more Loyalty the companion's arrival
+  effect fires again"*), (file scope): `<tr><td><b>Succession</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For <b>6 turns</b> a swap hands …` (its file read from the text around it) describes Succession correctly (*"half the Loyalty of the one it
   replaces… raises, never lowers"*), and `docs/state.md` already classes the half-carry as
   Succession's. **There was nothing to sweep**, and `CLAUDE.md`'s EI §2 rule says explicitly not to
   sweep past briefs.
@@ -505,7 +505,7 @@ conflation has now been written twice and would read as a natural "fix" to a lat
   are history and the project's own precedent — the two closed audit HTMLs kept *"as written — it is
   the evidence of which way each disagreement pointed"* — governs. **The live records are corrected:
   `docs/state.md` is rewritten and `master.html`'s copy is fixed.**
-- **`scripts/classes.gd:5305`'s `passive_desc` says the boon *"grows 20% a stack — x2 at five"*,
+- **`scripts/classes.gd` `const SPEC_INFO`: `"blurb": "Forbidden rites — leech life and trade blood for power."},` (on the tree this report mostly cites)'s `passive_desc` says the boon *"grows 20% a stack — x2 at five"*,
   which is CORRECT** and describes the curve, not a cliff. Left alone. **It is the sentence that
   looks like the wrong premise and is not.**
 
@@ -603,7 +603,7 @@ FLAKE THAT BAND EXISTS FOR.**
   `CLAUDE.md`'s own rule — *A KNOWN FLAKE IS A PLACE A SECOND RED CAN HIDE* — paid a second time**,
   and it is why that rule says to check the red in front of you is the cause you were told about.
 - **THE RED WAS THE ASSERTION, NOT THE RUNE.** EN §1 moved the Deepening Ruin's Break clause onto a
-  rune-owned field, and `battle.gd:2699` sums the pair: `ent_occ.entropy_ranks +
+  rune-owned field, and `scripts/battle.gd` `_run_battle`: `else ent_occ.entropy_ranks + ent_occ.rune_entropy_ranks` sums the pair: `ent_occ.entropy_ranks +
   ent_occ.rune_entropy_ranks`. **The suite line still read the NODE's `entropy_ranks` alone**, which
   the rune correctly stopped writing — while **its sibling one line above had been re-pointed
   through this same file's `_paid()` helper** (`u.get(field) + u.get("rune_" + field)`). One clause

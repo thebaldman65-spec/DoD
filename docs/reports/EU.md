@@ -105,15 +105,15 @@ raw-only. Seven call sites read the split, three of them inside the chip.**
 
 | site | what it is | what it reads |
 |---|---|---|
-| `_bond_mult` :13443 | the Pack Bond boon | **RECEIVES** — `l + _bond_converted(...)` |
-| `_comp_dmg_mult` :21984 | the companion strike step | `_bond_paid(...)` |
-| `_ghost_hit` :20845 | the bodiless blow's strike step | `_bond_paid(...)` |
-| `_bot_boon_worth` :20486 | the bot's swap valuation | **RECEIVES** (mirrors `_bond_mult`) |
-| `_stamp_loyalty_chip` :13529/13551/13553 | the chip's strike figure and phase line | `_bond_paid` / `_bond_converted` / `_bond_convert` |
+| `_bond_mult` `scripts/battle.gd` `_bond_mult`: `var curve := 1.0 + _bond_step(hunter) * (l + _bond_converted(hunter, l))` | the Pack Bond boon | **RECEIVES** — `l + _bond_converted(...)` |
+| `_comp_dmg_mult` `scripts/battle.gd` `_comp_dmg_mult`: `var l: int = _bond_paid(pm, int(pm.loyalty.get(comp.companion_kind, 0)))` | the companion strike step | `_bond_paid(...)` |
+| `_ghost_hit` `scripts/battle.gd` `_ghost_hit`: `var paid: int = _bond_paid(hunter, l)` | the bodiless blow's strike step | `_bond_paid(...)` |
+| `_bot_boon_worth` `scripts/battle.gd` `_bot_boon_worth`: `var curve := 1.0 + _bond_step(hunter) * (l + _bond_converted(hunter, l))` | the bot's swap valuation | **RECEIVES** (mirrors `_bond_mult`) |
+| `_stamp_loyalty_chip` `scripts/battle.gd` `_stamp_loyalty_chip`: `var paid: int = _bond_paid(hunter, stacks)` | the chip's strike figure and phase line | `_bond_paid` / `_bond_converted` / `_bond_convert` |
 
 **FOUR MORE READERS TAKE THE CONVERSION WITHOUT A LINE CHANGING**, because they reach the meter
-only through `_bond_mult`: Ursus's mitigation (`:9438`), Canis's wounded bonus (`:9380`), Savage
-Presence's taunt pull (`:7249`) and `_party_crit_bonus` (`:13566`). **That is why ER's "nine payout
+only through `_bond_mult`: Ursus's mitigation (a line JR could not resolve (no file named)), Canis's wounded bonus (a line JR could not resolve (no file named)), Savage
+Presence's taunt pull (a line JR could not resolve (no file named)) and `_party_crit_bonus` (`_party_crit_bonus`: `best = maxf(best, 0.10 * _bond_mult(h, "aguila"))`). **That is why ER's "nine payout
 sites" and this batch's "five edits" are both right and are not the same count.**
 
 ### THE RAW-STACK READERS, WHICH DO NOT CONVERT
@@ -122,19 +122,19 @@ sites" and this batch's "five edits" are both right and are not the same count.*
 
 | site | what it is |
 |---|---|
-| `_resolve_special` :18565 | **UNLEASH** — `0.20 x stacks x Attack`, the game's largest single Loyalty payout |
-| `_resolve_special` :19047 | **PRIMAL SURGE** — `0.15 x stacks x Attack` per companion |
-| `_on_beast_death` :21853 | **LAST HOWL** — banks `3 x` the meter the dying companion held |
-| `_resolve_special` :18735 | **BRING IT DOWN** — `min(stacks x 2, 20)` points, party-wide |
-| `_resolve_special` :16021 | Kill Command's Canis Bleed, `10 + 2 x stacks` |
-| `_resolve_special` :18963 | Devoted Fury's Wrath extension |
-| `_ghost_hit` :20858 / `_companion_strike` :20896 | **Aguila's armor pierce and Canis's Bleed** — both off the raw `l` read at :20838 and :20896, beside the paid half at :20845 |
-| `_stamp_loyalty_chip` :13512 | the three companion gifts on the chip |
-| `_row8_turn_start` :3488 | **Kindred's gate** (`>= u.kindred`) |
-| `_ability_usable` :5975/:5987 | the two spender doors |
-| `_do_summon` :20612-20648 | Succession, None Left Behind, Lone Bond |
-| `_gain_loyalty` / `_loyalty_cap` :13479/:13484 | **the accrual and the ceiling** |
-| `_deepest_bond` :20462, `_swap_victim` :20570, `_autoplay_pick_kit` :4775, `_cy_sample` :14755 | selection and instruments |
+| `_resolve_special` `scripts/battle.gd` `_resolve_special`: `var ul_stacks: int = int(attacker.loyalty.get(ul_kind, 0))` | **UNLEASH** — `0.20 x stacks x Attack`, the game's largest single Loyalty payout |
+| `_resolve_special` `scripts/battle.gd` `_resolve_special`: `var ps_l: int = int(attacker.loyalty.get(ps_comp.companion_kind, 0))` | **PRIMAL SURGE** — `0.15 x stacks x Attack` per companion |
+| `_on_beast_death` `scripts/battle.gd` `_on_beast_death`: `var had: int = int(pm.loyalty.get(kind, 0))` | **LAST HOWL** — banks `3 x` the meter the dying companion held |
+| `_resolve_special` `scripts/battle.gd` `_resolve_special`: `bid_stacks = int(attacker.loyalty.get(bid_beast.companion_kind, 0))` | **BRING IT DOWN** — `min(stacks x 2, 20)` points, party-wide |
+| `_resolve_special` `scripts/battle.gd` `_resolve_special`: `var kc_l: int = int(attacker.loyalty.get(comp.companion_kind, 0))` | Kill Command's Canis Bleed, `10 + 2 x stacks` |
+| `_resolve_special` `scripts/battle.gd` `_resolve_special`: `bw_turns += int(attacker.loyalty.get(` | Devoted Fury's Wrath extension |
+| `_ghost_hit` `scripts/battle.gd` `_ghost_hit`: `var pen := clampf(((0.20 * l) if kind == "aguila" else 0.0), 0.0, 1.0)` / `_companion_strike` `scripts/battle.gd` `_companion_strike`: `l = int(comp.pack_master.loyalty.get(comp.companion_kind, 0))` | **Aguila's armor pierce and Canis's Bleed** — both off the raw `l` read at a line JR could not resolve (no file named) and a line JR could not resolve (no file named), beside the paid half at a line JR could not resolve (no file named) |
+| `_stamp_loyalty_chip` `scripts/battle.gd` `_stamp_loyalty_chip`: `var stacks: int = hunter.loyalty.get(comp.companion_kind, 0)` | the three companion gifts on the chip |
+| `_row8_turn_start` `scripts/battle.gd` `_row8_turn_start`: `if int(u.loyalty.get(beast.companion_kind, 0)) >= u.kindred:` | **Kindred's gate** (`>= u.kindred`) |
+| `_ability_usable` `scripts/battle.gd` `_ability_usable`: `if ul_b == null or int(u.loyalty.get(ul_b.companion_kind, 0)) < 1:`/a line JR could not resolve (no file named) | the two spender doors |
+| `_do_summon` `scripts/battle.gd` `_do_summon`: `sc_out_loyalty = int(hunter.loyalty.get(sc_victim.companion_kind, 0))` | Succession, None Left Behind, Lone Bond |
+| `_gain_loyalty` / `_loyalty_cap` a line JR could not resolve (no file named)/a line JR could not resolve (no file named) | **the accrual and the ceiling** |
+| `_deepest_bond` `scripts/battle.gd` `_deepest_bond`: `if int(hunter.loyalty.get(cand.companion_kind, 0)) \`, `_swap_victim` `scripts/battle.gd` `_swap_victim`: `var worst_l: int = int(hunter.loyalty.get(worst.companion_kind, 0))`, `_autoplay_pick_kit` `scripts/battle.gd` `_autoplay_pick_kit`: `return int(u.loyalty.get(b.companion_kind, 0)) >= 4):`, `_cy_sample` `scripts/battle.gd` `_cy_sample`: `v = maxf(v, float(int(h.loyalty[kind])))` | selection and instruments |
 
 **`check_eu` §3 asserts that `_gain_loyalty` and `_loyalty_cap` contain no reference to the split at
 all** — not `_bond_paid`, not `_bond_converted`, not `BOND_CONVERT`. That is the property

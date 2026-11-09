@@ -116,9 +116,9 @@ Each was checked against the repo, the reports and the recon before anything was
 |---|---|---|---|---|
 | *kill what is down* | SR-BREAK 4 (`bonecracker_ranks`, `off_balance_ranks`) | every class, through his ordinary blows | **YES**: Kill What Is Down (`tn_kill_down`, `bonecracker_ranks` 40), FX's alternate for *debuffs on you expire sooner* | **No**: already shipped |
 | *a crit pays* | SR-CRIT 2 (`follow_through`, `sundering_shot`, `whetstone`, `exposed_nerve`, `temporal_ranks`, `through_and_through`) | every class, through his ordinary blows | **YES**: A Crit Pays (`tn_crit_pays`, `whetstone` 3), FX's alternate for *a Perfect pays*. The same item is also A Cooldown Ticks on a Crit and Your Crits Crack Guards | **No**: already shipped, three times over by FW's count |
-| *when an ally falls low I answer* | SR-TIMELINE 2 (`watchtower`) | **the party, once** | no | **No**: `_living_hero_with("watchtower")` (`battle.gd`:3430) pulls only the first living holder, so the second, third and fourth class to buy it is paid nothing |
+| *when an ally falls low I answer* | SR-TIMELINE 2 (`watchtower`) | **the party, once** | no | **No**: `_living_hero_with("watchtower")` (`scripts/battle.gd` `_watchtower_check`: `var cleric := _living_hero_with("watchtower")`) pulls only the first living holder, so the second, third and fourth class to buy it is paid nothing |
 | *Breaking heals the party* | SR-BREAK 5 (`blood_communion`) | every class, through his ordinary blows | **YES**: Breaking Heals a Hero (`tn_break_heal`, `blood_communion` 20), FX's alternate for *regenerate more resource* | **No**: already shipped |
-| *enemy debuffs rebound* | SR-STATUS 2 (`mirror_ranks`) | **the party, once** | no | **No**: `_max_hero_rank("mirror_ranks")` (`battle.gd`:10910) reads only the best holder |
+| *enemy debuffs rebound* | SR-STATUS 2 (`mirror_ranks`) | **the party, once** | no | **No**: `_max_hero_rank("mirror_ranks")` (`scripts/battle.gd` `_resolve`: `var mirror_r := _max_hero_rank("mirror_ranks")`) reads only the best holder |
 
 **The two party-once readings were taken at the read sites, not only from SR-REACH.** The three shipped ones are read
 in `_resolve`'s ordinary strike branch, which FY §1b traced and `check_fx` §4 drives.
@@ -215,7 +215,7 @@ at **23:25:33** and the file was not touched until **23:26:50**. The list is rep
 | A12 | 887 | *Gates that pass* (DD §1) | *"`bk` has not been exceeded and was not widened"* | This describes a band in the table that is gone | **GONE: deleted** |
 | A13 | 888–890 | *Gates that pass* (DD §1) | *"AND IT COSTS 22 MINUTES … `run_battery.sh` carries `TMO[test_batch_cd]=2400`"* (FZ's second) | `run_battery.sh`'s own comment records that it went at DE | **GONE: the sub-bullet is deleted** |
 | A14 | 944–946 | *Suites and the harness* | *"…and why a redirect decided in `Run._ready()` fires in all 98 battery targets and not just the two scene ones"* | `run_state.gd` has no `_ready()`. FI moved the redirect to `_init()`, because `_ready()` never fires on the 24 targets that `.new()` the script. The reason given belongs to the version that was replaced | **GONE: the clause is deleted** |
-| A15 | 950 | *Suites and the harness* | *"`Run._ready()` points it at `Run.TEST_SAVE_PATH`"* | `Run._init()` does, for the same three kinds of process (`run_state.gd`:213) | **MOVED:** *"`Run._init()` points it at"* |
+| A15 | 950 | *Suites and the harness* | *"`Run._ready()` points it at `Run.TEST_SAVE_PATH`"* | `Run._init()` does, for the same three kinds of process (`scripts/run_state.gd` `_init`: `func _init() -> void:`) | **MOVED:** *"`Run._init()` points it at"* |
 | A16 | 1033–1034 | *Verify before shipping* | *"The rule that binds it is in `CLAUDE.md`; this line is the pointer"* | FF §1 moved the parse-floor rule into this file. `CLAUDE.md` carries only its index row | **MOVED:** *"the parse-floor bullet above, in FF §1's block"* |
 | A17 | 1036 | *Verify before shipping* | *"it walks the whole 211-ability corpus"* | `check_cm` walks `Classes.ability_corpus()`. 211 was the corpus at CM | **FIGURE: "211-" deleted** |
 | A18 | 1432 | FR §5a/FS §1 | *"ten others name it"* | Eight other files name `docs/state.md` today. Seven do so in a comment, and `check_fr` names it in its §4 list | **FIGURE: "ten" deleted** |
@@ -290,7 +290,7 @@ rather than merely stale.
   The FR §5a/FS §1 block, which **is** over there, has no row. The index's *"The last four rows are FG's, FH's and
   FI's"* stopped being true when three more rows were added after them. `check_ff` §1 and §4 read that index, and the
   brief left `CLAUDE.md` out.
-- **`scripts/run_state.gd`:198**, FI's header comment, says the redirect is *"decided once in `_ready()`"*. The
+- **`scripts/run_state.gd` `const SAVE_PATH`: `# save went missing. The redirect is a property of the PROCESS instead, decided`**, FI's header comment, says the redirect is *"decided once in `_ready()`"*. The
   comment fifteen lines below it says **"`_init`, NOT `_ready`"**, and that matches the code. The brief touches no
   game file.
 - **`docs/state.md`'s *Knowledge sync, re-measured at EG* section** still carries EG's 104.70 KiB for this file. A3

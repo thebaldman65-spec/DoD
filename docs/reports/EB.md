@@ -14,7 +14,7 @@ Recorded first, because three of them changed the work.
 
 1. **§2 SAYS `Run.roll_ability_offer` IS "a function DY deleted". IT WAS DELETED AT AN §4** —
    eighteen batches earlier — and `test_batch_an` §1 has asserted its absence ever since, in its
-   `gone_fn` list. `scripts/classes.gd:155` records the correct attribution in the file the brief
+   `gone_fn` list. `scripts/classes.gd` `cleric_kit`: `` # `CLASS_POOLS`, THROUGH `Run.roll_ability_offer`. BATCH AN §4 RE-POINTED THE `` records the correct attribution in the file the brief
    was reasoning about. DY §3 deleted `CLASS_POOLS`; AN §4 deleted the roller. **Two deletions, two
    batches, and the brief merged them.**
 2. **§1's PROPERTY AS LITERALLY STATED IS NOT ASSERTABLE, AND IT IS RED AT HEAD.** *"A draft card
@@ -120,8 +120,8 @@ judgement per row, which is why the list was reported before it was repaired.
 
 The first version of this sweep **could not see `Run.roll_ability_offer` at all.**
 
-- `check_dv.gd:68` asserts `not rs.contains("func roll_ability_offer")`.
-- `test_batch_an.gd:126` holds the bare literal `"roll_ability_offer"` in its `gone_fn` list.
+- `check_dv.gd` `_s0_premises`: `ok(not rs.contains("func roll_ability_offer"),` asserts `not rs.contains("func roll_ability_offer")`.
+- `test_batch_an.gd` `_test_deletions`: `"roll_ability_offer"]:` holds the bare literal `"roll_ability_offer"` in its `gone_fn` list.
 
 **The two checks that prove the function is dead are exactly what make a text sweep report it as
 alive.** The universe has to be a SYMBOL TABLE of declarations matched by equality — and the
@@ -134,22 +134,22 @@ bug wearing a different hat, in a different instrument, found the same week.**
 
 | site | named | is actually | repair |
 |---|---|---|---|
-| `scripts/run_sim.gd:865` | `Run.roll_ability_offer` | deleted at AN §4 | **deleted** — the rollers are named at the site below |
-| `scripts/run_state.gd:2396` | `PERFECT_HALF` | replaced by `SC_PROFILE_DEFAULT` at CN §1 | **deleted** — `battle.gd` carries the current version |
-| `scripts/battle.gd:912` | `_hero_turn` | `_player_turn` | corrected |
-| `scripts/battle.gd:6786` | `_intent_detail_note` | **never existed** — written at BL, never shipped | **deleted** |
-| `scripts/battle.gd:24705` | `_devout_break_cut` | `faith_break_cut`, in `_on_unit_credit` | corrected |
-| `scripts/battle.gd:440` | `mirror_images` | the `mirror` chip, charges in its POWER | corrected |
-| `scripts/unit.gd:71` | `anathema` | `breaking_darkness` (renamed at CG) | corrected |
-| `scripts/unit.gd:3280` | `drink_overheal` | `_bank_overheal` | corrected |
-| `scripts/classes.gd:2896` | `Classes.CONFIGS` | `Classes.hero_config()` | corrected |
-| `check_da.gd:145` | `_battle()` | `_spawn_battle()` | corrected |
-| `check_de.gd:22` | `BASELINE` | `baselines.json` | corrected |
-| `test_batch_cd.gd:39` | `BASELINE` | `baselines.json` | corrected |
-| `test_batch_au.gd:588` | `unit.can_overcharge` | `unit.overcharge_ready()` | corrected |
-| `test_batch_bq.gd:25` | `CLASS_POOLS` byte-unchanged | the body asserts it **DELETED** | header re-pointed at the body |
-| `test_batch_br.gd:28` | `CLASS_POOLS` byte-unchanged | the body asserts it **DELETED** | header re-pointed at the body |
-| **`test_batch_bp.gd:341`** | `CLASS_POOLS`, and *"in no DRAFT pool at all"* | **Rallying Shout is in the WARDEN's** | corrected **and asserted** |
+| `scripts/run_sim.gd` `_award_upgrades`: `# player would see and picks from THAT, so a sim can never take an ability` (on the tree this report mostly cites) | `Run.roll_ability_offer` | deleted at AN §4 | **deleted** — the rollers are named at the site below |
+| `scripts/run_state.gd` `victory_heal_pct`: `` # time it was not. **THE MECHANISM IS RECORDED ONCE, IN `battle.gd`'s `` (on the tree this report mostly cites) | `PERFECT_HALF` | replaced by `SC_PROFILE_DEFAULT` at CN §1 | **deleted** — `battle.gd` carries the current version |
+| `scripts/battle.gd` `var sc_perfect_zone`: `` # cleared at the top of every `_player_turn` grade attempt and written by `` (on the tree this report mostly cites) | `_hero_turn` | `_player_turn` | corrected |
+| `scripts/battle.gd` `_intent_category`: `` # seven rows and THIS BATCH DOES NOT SHIP ONE — see `_intent_detail_note` and `` | `_intent_detail_note` | **never existed** — written at BL, never shipped | **deleted** |
+| `scripts/battle.gd` `_devout_heal`: `` # points, which are different units and are banked by `_devout_break_cut` `` | `_devout_break_cut` | `faith_break_cut`, in `_on_unit_credit` | corrected |
+| `scripts/battle.gd` `const STATUS_INFO`: `` # (`mirror_images`, the `feint_guards` shape) because its charges must not `` | `mirror_images` | the `mirror` chip, charges in its POWER | corrected |
+| `scripts/unit.gd` `const DEBUFF_IDS`: `` # enemy carrying it. That is the rule CE set for `breaking_darkness`/`penance`. `` (on the tree this report mostly cites) | `anathema` | `breaking_darkness` (renamed at CG) | corrected |
+| `scripts/unit.gd` `heal_amount`: `` # stamps `font_of_light` onto the healer and calls `_bank_overheal` — this `` (on the tree this report mostly cites) | `drink_overheal` | `_bank_overheal` | corrected |
+| `scripts/classes.gd` `draft_ability`: `` # classes, decided once in `Classes.hero_config()` with no spec override. FOCUS `` (on the tree this report mostly cites) | `Classes.CONFIGS` | `Classes.hero_config()` | corrected |
+| `check_da.gd` `const HAND_SPAWN_SITES`: `` "test_batch_an.gd": 1,        # `_spawn_battle()`, its own differently-named helper `` | `_battle()` | `_spawn_battle()` | corrected |
+| `check_de.gd` (file scope): `` # `baselines.json` may hold every target including `test_batch_cd`, which the `` | `BASELINE` | `baselines.json` | corrected |
+| `test_batch_cd.gd` (file scope): `` # `baselines.json` could never hold `test_batch_cd.gd`, because a suite that `` | `BASELINE` | `baselines.json` | corrected |
+| `test_batch_au.gd` `_live_fallback_overcharge`: `# collision and no talent grants. The read site` (on the tree this report mostly cites) | `unit.can_overcharge` | `unit.overcharge_ready()` | corrected |
+| `test_batch_bq.gd` (file scope): `` #   · `CLASS_POOLS` GONE from the source, asserted directly — DY §3 deleted `` (on the tree this report mostly cites) | `CLASS_POOLS` byte-unchanged | the body asserts it **DELETED** | header re-pointed at the body |
+| `test_batch_br.gd` (file scope): `` #   · plus `CLASS_POOLS` GONE from the source, asserted the same way BQ's is `` (on the tree this report mostly cites) | `CLASS_POOLS` byte-unchanged | the body asserts it **DELETED** | header re-pointed at the body |
+| **`test_batch_bp.gd` `_warrior_draft_flow`: `# it. **BATCH EB §2 CORRECTED THIS SENTENCE TWICE OVER.** It named`** | `CLASS_POOLS`, and *"in no DRAFT pool at all"* | **Rallying Shout is in the WARDEN's** | corrected **and asserted** |
 
 **THE RULE IS SPLIT WHERE DR's WAS NOT.** DR's rule from Flash Freeze stands — *a comment corrected
 to describe a deleted feature is still a comment about a deleted feature* — but it is about

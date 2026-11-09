@@ -24,7 +24,7 @@ is a claim the brief makes twice.**
 | *"rows 0 must read exactly zero … the conversion **provably cannot fire there**, 0 of 45,635 rolls reached a certainty"* | **THE REQUIREMENT IS MET AND THE REASON GIVEN FOR IT IS FALSE.** The EX arm paid exactly zero on **0 of 40,766** strikes. But the rate-0 arm at the same setting crossed a certainty **twice in 40,437**, with a distribution reaching **1.09** and 208 strikes at or past 0.50. **§2 — rows 0 is a rare event, not a structural zero.** |
 | *"a total assembled from **twelve terms** across four heroes"* | **TWELVE STATEMENTS, THIRTEEN TERMS** — the first statement carries the base and a Broken target's 25% together. Derived mechanically. **And `battle.gd`'s own comment said "eight sources", which is wrong under every reading. §3.** |
 | *"`check_ew`'s count is predicted UNMOVED at 38"* | **CONFIRMED — 38 / 0, three identical standalone readings at 0.50.** Nothing was pinning the value. §4. |
-| *"`FOCUS_CONVERT` 100, `FOCUS_STEP` 0.005 … `BOND_MITIGATION_MAX` stays at 0.75. The Loyalty split stays at 8"* | **ALL FOUR CONFIRMED IN PLACE AND UNTOUCHED** — `unit.gd:824-825`, `battle.gd:13415`, `BOND_CONVERT := 8` at `battle.gd:13376`. §5. |
+| *"`FOCUS_CONVERT` 100, `FOCUS_STEP` 0.005 … `BOND_MITIGATION_MAX` stays at 0.75. The Loyalty split stays at 8"* | **ALL FOUR CONFIRMED IN PLACE AND UNTOUCHED** — `scripts/unit.gd` `const FOCUS_CONVERT`: `const FOCUS_CONVERT := 100      # where chance stops and multiplier starts` to `const FOCUS_STEP := 0.005       # what one point of Focus buys, either side`, `scripts/battle.gd` `const BOND_MITIGATION_MAX`: `const BOND_MITIGATION_MAX := 0.75` (on the tree this report mostly cites), `BOND_CONVERT := 8` at `scripts/battle.gd` `const BOND_CONVERT`: `const BOND_CONVERT := 8`. §5. |
 
 ---
 
@@ -223,13 +223,13 @@ shows exactly `const CRIT_EXCESS_STEP := 1.0` → `:= 0.50`, with identical line
 so the comment rewrite above it swallowed no code.
 
 - **Focus's conversion is untouched** — `FOCUS_CONVERT := 100` and `FOCUS_STEP := 0.005` at
-  `unit.gd:824-825`, both asserted live by `check_ew` §6.
+  `scripts/unit.gd` `const FOCUS_CONVERT`: `const FOCUS_CONVERT := 100      # where chance stops and multiplier starts` to `const FOCUS_STEP := 0.005       # what one point of Focus buys, either side`, both asserted live by `check_ew` §6.
 - **The four roll sites keep their structure** — `check_ew` §0 derives the census through
   `CRIT_CHANCE` and still reads four rolls, four calls, one body, every rolled name a converted
   name.
 - **The roll is still unclamped** and the three thin sites are still paid exactly zero.
-- **`BOND_MITIGATION_MAX := 0.75`** (`battle.gd:13415`), **`BOND_CONVERT := 8`**
-  (`battle.gd:13376`), **`_bond_fallback` byte-unchanged**.
+- **`BOND_MITIGATION_MAX := 0.75`** (`scripts/battle.gd` `const BOND_MITIGATION_MAX`: `const BOND_MITIGATION_MAX := 0.75` (on the tree this report mostly cites)), **`BOND_CONVERT := 8`**
+  (`scripts/battle.gd` `const BOND_CONVERT`: `const BOND_CONVERT := 8` (on the tree this report mostly cites)), **`_bond_fallback` byte-unchanged**.
 - **No rune is authored.** Rune content is the designer's, one rune at a time.
 
 ---

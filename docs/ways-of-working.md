@@ -113,6 +113,16 @@ reading can actually see, too**: JE's brief ordered a re-read of a gap of 45 off
 citation did not resolve — a charter row one off at JG, after JD's and JF's. A row's number, a line or an entry's place is not a
 citation: **if the brief cannot name where a thing stands, it is not a premise.**
 
+**AND A RECORD CITES A FILE, A FUNCTION AND A QUOTED LINE, NEVER A LINE NUMBER (JR §2, the designer's).** JH's rule, carried
+from a brief to every record: this file, the state, the rule files, the master document and every report. A line number decays
+each time anything above it is edited and nothing in the tree notices — JO's close-read found one in FOUND AT HA pointing fifty
+lines from what it meant, after it had drifted once already — while a quoted line that stops standing is found by reading it.
+So *a record cites a file, a function and a quoted line, never a line number*, the shape JP's readout used; a number quoted
+between documents is DJ §3's in `docs/instrument-rules.md`. `check_jr` §2 holds it over every document and report, in the
+four spellings a line number takes after a file's name or on its own, names in its own list the kinds that keep a line by
+design — a census or count table, the data a tool reads (the pin manifest among it) and a gate's own source — and holds at
+their count the closed records JR did not sweep and the rarer spellings old reports keep, so none grows.
+
 **A BRIEF CITES ONLY WHAT THE REPOSITORY HOLDS (JL §0, the designer's).** JK's brief cited a process note by its number, and process
 notes live in a document outside the repository, so the brief ordered a premise nobody could check: JK found it nowhere in the tree,
 the backups or the memory the work reads. A brief cites only what the repository holds; the correction was the designer's, and JK owed

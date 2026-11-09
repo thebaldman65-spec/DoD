@@ -125,7 +125,7 @@ highest-volume bar there is.
 **THE SHARPSHOOTER'S PRESS LADDER** — up to four presses, each on the new base, per §1a.
 
 **EVERY ORDINARY CAST IN THE GAME.** There are exactly **two call sites** of `_run_skill_check` in
-the tree: the cast path (`battle.gd:3894`) and the defensive check (`battle.gd:23175`). The second
+the tree: the cast path (`scripts/battle.gd` `_player_turn`, a line JR could not settle between two trees) and the defensive check (`scripts/battle.gd` `_defensive_brace`, a line JR could not settle between two trees). The second
 passes no profile at all, so it is the pure default; the first passes the default for everything
 that is not the Sharpshooter's basic.
 

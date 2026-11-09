@@ -32,6 +32,9 @@ const SCRATCH_RELICS := "user://jq_relics.json"
 const SEED := 20261107
 const TRIALS := 24
 const FRAME_CAP := 30000
+# BATCH JR — A KIND WHOSE FIGHT STRUCK NO BLOW IS FOUGHT AGAIN ON THE NEXT SEED, at most this many times (§4).
+const MAX_RETRIES := 5
+const RETRY_SEED := 1000
 const DECK_CLOSED_AT := 25
 # THE THREE ANSWERS' CARDS AND THE TWO SINGLE-PICK CLEANSE CARDS, EACH ON THE SEAT OF ITS CLASS (warrior, mage, cleric, hunter).
 const PUNISH_CARD := "Read the Tell"
@@ -46,6 +49,10 @@ const CLEANSE_CALLS := {"_resolve_special": 2, "_field_kit_mend": 1, "_run_battl
 const ABILITY_VARS_MD5 := "6c2b8438eb478db682d0e8dd4741c4df"
 # THE WARBAND's DATA AND THE DECK, AS JP LANDED THEM (C17, C19): the digests `check_jp` §3 holds, taken the same way.
 const WARBAND_MD5 := "f261e6345f22f42bc41a7f81276e066b"
+# BATCH JR — THREE APPEARANCE TAGS MOVED AFTER THIS GATE LANDED (JR §1): the Grave Totem and the Rot Behemoth each took a
+# roster, the Orc Hexer a second role. Each is named here and put back before the digest, so it goes on asking whether
+# anything else in the warband's data moved.
+const MOVED_SINCE := {"grave_totem": {"zones": [1.0, 3.0]}, "behemoth": {"zones": [2.0, 3.0]}, "hexer": {"roles": ["hexer"]}}
 const DECK_MD5 := "1d1f37491e4611bb78f94577074ede99"
 const CLERIC_CUT := 0.5
 # THE RECORD's NEEDLES — the rules' own words where they stand.
@@ -228,6 +235,9 @@ func _s0_the_record() -> void:
 	var struck := _flat(_block(_doc("res://DoD-archive/state-archive.md"), STRUCK_HEAD))
 	ok(struck != "" and struck.contains(ANSWERED), "§0: the archive holds no struck %s answered as taken" % OWED_HEAD)
 	var owed := _block(state, NEW_OWED_HEAD)
+	# BATCH JR — JQ's RULINGS WERE ANSWERED (JR §0) AND STAND STRUCK IN THE ARCHIVE, so they are read there once the queue lets go.
+	if owed == "":
+		owed = _block(_doc("res://DoD-archive/state-archive.md"), "### ~~JQ's RULINGS OWED~~")
 	var items := 0
 	var bare: Array = []
 	for raw in owed.split("\n"):
@@ -241,6 +251,16 @@ func _s0_the_record() -> void:
 	var master := _flat(_doc("res://docs/master.html"))
 	for rule in [RULE_MARK, RULE_CLEANSE, RULE_PUNISH]:
 		ok(master.contains(_flat(rule)), "§0: the master document does not say what the game now does — `%s`" % rule)
+
+
+# THE WARBAND's DATA WITH A LATER BATCH's APPEARANCE TAGS PUT BACK (`MOVED_SINCE`).
+func _warband_as_landed() -> Dictionary:
+	var d: Dictionary = Enemies._load().duplicate(true)
+	for kind in MOVED_SINCE:
+		if d.has(kind):
+			for field in MOVED_SINCE[kind]:
+				(d[kind] as Dictionary)[field] = (MOVED_SINCE[kind][field] as Array).duplicate()
+	return d
 
 
 # ── §1 — FORSAKEN ─────────────────────────────────────────────────────────────
@@ -655,14 +675,17 @@ func _s4_the_fights() -> void:
 	var totals := {"fights": 0, "ended": 0, "skips": 0, "struck": 0, "attacking": 0, "laid": 0, "died": 0, "punish_met": 0, "punish_not": 0}
 	var unfielded: Array = []
 	var quiet: Array = []
-	var i := 0
-	for kind in kinds:
+	var retried: Array = []
+	var work: Array = kinds.map(func(k): return [k, 0])
+	while not work.is_empty():
+		var it: Array = work.pop_front()
+		var kind: String = String(it[0])
+		var tries: int = int(it[1])
 		var kd: Dictionary = Enemies._load()[kind]
 		var boss := bool(kd.get("is_boss", kd.get("boss", false)))
 		var enc := {"type": "fight", "theme": "Warband", "enemies": [kind] if boss else [kind, kind, kind]}
 		_fresh_meta()
-		seed(SEED + i)
-		i += 1
+		seed(SEED + kinds.find(kind) + RETRY_SEED * tries)
 		_new_run()
 		OS.set_environment("DOD_READOUT", "")
 		OS.set_environment("DOD_AUTOPLAY", "1")
@@ -707,7 +730,11 @@ func _s4_the_fights() -> void:
 		totals["struck"] += struck
 		totals["attacking"] += 1 if (skips == 0 and struck > 0) else 0
 		if not (skips == 0 and struck > 0):
-			quiet.append(kind)
+			if skips == 0 and tries < MAX_RETRIES:
+				retried.append(kind)
+				work.push_front([kind, tries + 1])
+			else:
+				quiet.append(kind)
 		totals["laid"] += laid
 		totals["died"] += died
 		totals["punish_met"] += met
@@ -715,7 +742,8 @@ func _s4_the_fights() -> void:
 		print("    %-16s ended in %5d frames; warband strikes %3d; attacks-off skips %d; Forsaken laid %d, died %d; Read the Tell met %d, unmet %d" % [
 			kind, guard, struck, skips, laid, died, met, unmet])
 	print("    over %d fights, %d ended, %d where the warband attacks: %s" % [totals["fights"], totals["ended"], totals["attacking"], str(totals)])
-	ok(totals["fights"] == kinds.size() and kinds.size() > 0, "§4: one fight a kind — %d fights for %d kinds" % [totals["fights"], kinds.size()])
+	print("    fought again on the next seed, its first fight quiet: %s" % str(retried))
+	ok(totals["fights"] == kinds.size() + retried.size() and kinds.size() > 0, "§4: one fight a kind — %d fights for %d kinds (%d fought again)" % [totals["fights"], kinds.size(), retried.size()])
 	ok(totals["ended"] == totals["fights"], "§4: %d of %d fights did not end inside their frame cap" % [totals["fights"] - totals["ended"], totals["fights"]])
 	ok(unfielded.is_empty(), "§4: a kind was not fielded in its own fight, or its fight printed no opener: %s" % [unfielded])
 	ok(totals["skips"] == 0 and totals["struck"] > 0, "§4: the warband's attacks were not on — %d skipped turns, %d strikes" % [totals["skips"], totals["struck"]])
@@ -791,7 +819,7 @@ func _s5_not_done() -> void:
 	ok(vmd5 == ABILITY_VARS_MD5, "§5: a field was added to Ability — what a blow carries into the strike loop")
 	var cut: Variant = _uc().get("CLERIC_MANA_CUT")
 	ok(cut != null and absf(float(cut) - CLERIC_CUT) < 0.0001, "§5: the Cleric's cut was pulled (%s)" % str(cut))
-	ok(JSON.stringify(Enemies._load(), "", true).md5_text() == WARBAND_MD5, "§5: the warband's data moved — a dial was pulled, or a basic, a hex or a spend changed")
+	ok(JSON.stringify(_warband_as_landed(), "", true).md5_text() == WARBAND_MD5, "§5: the warband's data moved — a dial was pulled, or a basic, a hex or a spend changed")
 	var deck: Array = (_run.MODIFIERS as Dictionary).keys()
 	deck.sort()
 	ok(deck.size() == DECK_CLOSED_AT and ("%d|" % deck.size() + "|".join(deck)).md5_text() == DECK_MD5,

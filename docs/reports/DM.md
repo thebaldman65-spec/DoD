@@ -190,8 +190,8 @@ the property the reasoning rests on (`> 1`) and the live count is **printed**.
 
 | reason | derived at |
 |---|---|
-| no resource bar to refuel | `unit.gd:111` — `resource_name := ""`; the summon `cfg` sets no `resource_name` and no `max_resource` (default 100) |
-| `_companion_hit` reads none of the hero strike loop's multiplier block | `_companion_hit` (`battle.gd:19873`) is its own path; the multipliers live in `_resolve` |
+| no resource bar to refuel | `scripts/unit.gd` `var resource_name`: `var resource_name := ""    # "Rage" or "Mana" (heroes only)` — `resource_name := ""`; the summon `cfg` sets no `resource_name` and no `max_resource` (default 100) |
+| `_companion_hit` reads none of the hero strike loop's multiplier block | `_companion_hit` (`scripts/battle.gd` `_companion_hit`: `func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int,`) is its own path; the multipliers live in `_resolve` |
 | stamped once at party spawn, before a companion exists | `heroes.append` is reached at exactly one site; `companions.append` is the summon |
 | per-turn: `_next_unit()` walks `heroes + enemies` | and the summon carries `comp.next_time = INF` |
 | `_gain_faith` refuses companions outright | its first line: `if devout == null or u.dead or u.is_companion or not u.is_hero: return` |

@@ -166,12 +166,12 @@ a live rule behind it.**
 
 | site | was | is now | the rule it was actually testing |
 |---|---|---|---|
-| `test_batch_bn:497` | `"BATCH BN"` | `"## STANDING REFERENCE — THE DIFFICULTY LADDER AND THE END BOSS"` | the ladder is a standing reference |
-| `test_batch_bn:504` | `"BATCH BN §2 — WAS x0.70"` | `"rung 1 Wanderer x0.50"` | rung 1 alone moved; the NUMBER is the claim |
-| `test_batch_bs:415` | `"BATCH BS"` | `"## STANDING REFERENCE — THE UNCAPPED-METER GOVERNOR TABLE"` | the governor table BS's row lives in |
-| `test_batch_bs:422` | `"REWRITTEN AT BATCH BS, NOT AMENDED"` | `"TABLE THAT IS A CEILING RATHER THAN A COST"` | Overburn is a ceiling, not a cost |
-| `test_batch_ce:585` | `"BATCH CE"` | `"RE-POINTS IN PLACE, with the reason in the file"` | the re-point discipline CE helped close |
-| `test_batch_ce:586` | **`"BATCH CG"`** | `"BINDING ON EVERY CONTENT BATCH FROM IT"` | the content-batch convention CG set |
+| `test_batch_bn.gd` `_docs`: `ok(claude.contains("BATCH BN"), "CLAUDE.md carries a Batch BN block")` | `"BATCH BN"` | `"## STANDING REFERENCE — THE DIFFICULTY LADDER AND THE END BOSS"` | the ladder is a standing reference |
+| `test_batch_bn.gd` `_docs`: `ok(claude.contains("BATCH BN §2 — WAS x0.70")` | `"BATCH BN §2 — WAS x0.70"` | `"rung 1 Wanderer x0.50"` | rung 1 alone moved; the NUMBER is the claim |
+| `test_batch_bs.gd` `_docs`: `ok(claude.contains("BATCH BS"), "§5: CLAUDE.md has a Batch BS block")` | `"BATCH BS"` | `"## STANDING REFERENCE — THE UNCAPPED-METER GOVERNOR TABLE"` | the governor table BS's row lives in |
+| `test_batch_bs.gd` `_docs`: `ok(claude.contains("REWRITTEN AT BATCH BS, NOT AMENDED"),` | `"REWRITTEN AT BATCH BS, NOT AMENDED"` | `"TABLE THAT IS A CEILING RATHER THAN A COST"` | Overburn is a ceiling, not a cost |
+| `test_batch_ce.gd` `_docs`: `ok(cm.contains("BATCH CE"), "CLAUDE.md carries the batch block")` (on the tree this report mostly cites) | `"BATCH CE"` | `"RE-POINTS IN PLACE, with the reason in the file"` | the re-point discipline CE helped close |
+| `test_batch_ce.gd` `_docs`: `ok(cm.contains("BATCH CG"), "...and CG's, which revised it")` (on the tree this report mostly cites) | **`"BATCH CG"`** | `"BINDING ON EVERY CONTENT BATCH FROM IT"` | the content-batch convention CG set |
 
 ### EVERY ONE OF THE SIX WAS PASSING OFF A DIFFERENT SENTENCE THAN ITS MESSAGE CLAIMED
 
@@ -367,7 +367,7 @@ Predicted from what each suite **READS**, not from what this batch writes:
    armed on a string nobody asserts proves nothing, and it reports the same word a real pass
    does.** Check the needle is a needle before you break it.
 2. **RE-ARMED ON ONE OF EA's OWN RE-POINTED NEEDLES, AND BOTH INSTRUMENTS BIT.**
-   `TABLE THAT IS A CEILING RATHER THAN A COST` — the string EA §2 moved `test_batch_bs:422` onto —
+   `TABLE THAT IS A CEILING RATHER THAN A COST` — the string EA §2 moved `test_batch_bs.gd` `_docs`: `ok(claude.contains("REWRITTEN AT BATCH BS, NOT AMENDED"),` (on the tree this report mostly cites) onto —
    was split across a line wrap, **not one character deleted**. **The verifier named the violation
    and the file that asserts it, and `test_batch_bs` went 266 / 1** with
    *"§5: CLAUDE.md's governor row still states Overburn is a ceiling, not a cost"*. **So EA §2's

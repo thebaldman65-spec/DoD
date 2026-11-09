@@ -32,7 +32,7 @@ five that did not hold and what each cost.
 every ally.**
 
 **The confusion is real and it is in the code, not in the brief.** `Ability.faith_cost` reads
-`u.second_resource`, and `classes.gd:1291` states it flatly: *"`faith_cost` IS MERCY EVERYWHERE IT
+`u.second_resource`, and `scripts/classes.gd` `computed_block`: `` # `faith_cost` IS MERCY EVERYWHERE IT APPEARS — Resurrection, Divine Plea `` states it flatly: *"`faith_cost` IS MERCY EVERYWHERE IT
 APPEARS"* — the field is a misnamed **Mercy** cost, and the only three abilities that carry one
 (Resurrection, Divine Plea, Hymn of Hope) are all the Holy Cleric's.
 

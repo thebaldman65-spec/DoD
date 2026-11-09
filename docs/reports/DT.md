@@ -13,7 +13,7 @@ Recorded first, because both changed what this batch did.
    `_seeded()` immediately before the forced White Flame hit — **the exact site that flakes** — and
    nowhere else, which is the per-site idiom §3 itself asks for. Its own `baselines.json` row says
    so in as many words, and so does `docs/state.md`. **Nothing was owed there and nothing was done.**
-   The one stale artefact is a comment inside the file (`test_rune_battle.gd:23`) that still reads
+   The one stale artefact is a comment inside the file (`test_rune_battle.gd` `var _pierce_why`: `` # `seed()` zero times, so every run draws a different stream. ``) that still reads
    *"`seed()` zero times"* — pre-DF prose describing the defect the seed below it fixed. It is left
    alone deliberately: it sits inside DF's own explanatory header, four lines above the fix, and
    editing prose inside a suite is not this batch's business.
@@ -473,7 +473,7 @@ message. **All ten were checked against the suites individually and none is asse
 that gained it**: four landed in `changelog.html` (`raider`, `Magic Bolt`, `Smite`, `Necrosis`) and
 no suite does `changelog.contains()` on any of them; four landed in `design-notes.md`, which is only
 ever asserted on for its own batch heading; and two landed in `draft-audit.html`, **which no suite
-reads at all**. The one near-miss is `"125 spec"`: `test_batch_cd.gd:245` asserts it, but against
+reads at all**. The one near-miss is `"125 spec"`: `test_batch_cd.gd` `_target`: `ok(master.contains("125 spec"), "...and names the 125-card spec half")` asserts it, but against
 **`master.html`**, whose only change this batch is the stamp.
 
 

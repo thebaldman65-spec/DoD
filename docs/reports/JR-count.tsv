@@ -1,0 +1,47 @@
+what	name	count	the attacking fights it is taken over
+a warband kind fielded	Orc Raider	22	57
+a warband kind fielded	Orc Whelp	13	57
+a warband kind fielded	Orc Slinger	7	57
+a warband kind fielded	Orc Totemist	3	57
+a warband kind fielded	Orc Archer	16	57
+a warband kind fielded	Orc Shieldmaster	5	57
+a warband kind fielded	Orc Shaman	5	57
+a warband kind fielded	Orc Hexer	7	57
+a warband kind fielded	Wolfrider	1	57
+a warband kind fielded	Ashblade	4	57
+a warband kind fielded	Orc Brute	5	57
+a warband kind fielded	Bog Troll	1	57
+a warband kind fielded	Rot Behemoth	3	57
+a warband kind fielded	Orc Chief	12	57
+a warband kind fielded	Withered Warden	2	57
+a warband kind fielded	Ash-Wrought Tyrant	1	57
+a warband kind fielded	Orc Ritual Chanter	3	57
+a warband kind fielded	Ash Hurler	3	57
+a warband kind fielded	Orc Bloodcaller	1	57
+a warband kind fielded	Grave Totem	2	57
+a warband kind fielded	The Hollow Crown	2	57
+a hex laid on a hero or a companion	Gall (the Orc Archer)	66	57
+a hex laid on a hero or a companion	Sap (the Orc Hexer, on Bone Rattle)	6	57
+a hex laid on a hero or a companion	Mire (the Grave Totem)	7	57
+a hex laid on a hero or a companion	Fester (the Rot Behemoth, on Wretched Bellow)	14	57
+the attacking fights a hex was laid in	Gall	9	57
+the attacking fights a hex was laid in	Sap	6	57
+the attacking fights a hex was laid in	Mire	2	57
+the attacking fights a hex was laid in	Fester	2	57
+the fights	the logs hold	333	-
+the fights	with enemy attacks off	265	-
+the fights	with attacks on and no warband strike	11	-
+the fights	where the warband attacks	57	-
+a target's fights	check_fh	20	20 in its logs, 0 with enemy attacks off, 0 with no warband strike
+a target's fights	check_gf	5	8 in its logs, 0 with enemy attacks off, 3 with no warband strike
+a target's fights	check_gj	0	37 in its logs, 36 with enemy attacks off, 1 with no warband strike
+a target's fights	check_gp	0	65 in its logs, 65 with enemy attacks off, 0 with no warband strike
+a target's fights	check_gv	0	117 in its logs, 117 with enemy attacks off, 0 with no warband strike
+a target's fights	check_hk	0	40 in its logs, 40 with enemy attacks off, 0 with no warband strike
+a target's fights	check_ho	0	3 in its logs, 3 with enemy attacks off, 0 with no warband strike
+a target's fights	check_hr	0	2 in its logs, 2 with enemy attacks off, 0 with no warband strike
+a target's fights	check_if	3	3 in its logs, 0 with enemy attacks off, 0 with no warband strike
+a target's fights	check_jq	21	23 in its logs, 0 with enemy attacks off, 2 with no warband strike
+a target's fights	test_batch_al	0	2 in its logs, 2 with enemy attacks off, 0 with no warband strike
+a target's fights	test_batch_bl	2	7 in its logs, 0 with enemy attacks off, 5 with no warband strike
+a target's fights	test_rune_battle	6	6 in its logs, 0 with enemy attacks off, 0 with no warband strike

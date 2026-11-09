@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-11-07 (Batch JQ &mdash; the three answers, built)</b></p>
+<p align="right"><b>Last updated: 2026-11-09 (Batch JR &mdash; three hex carriers met more often)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -423,8 +423,7 @@ rather than taking the gold, and greys a type with no slot as <b>NO SLOT</b>.</l
 one zone from its own authored candidate pool — zones are designed FOR a position
 (openers are not finales), so a zone def carries its name, its boss, and a roster per
 slot it can host. The current pools run fixed: 1. Forest of Old (roster 1) → 2. The
-Scarlands (roster 2) → 3. Forest of Old as the finale (tougher roster 3 — behemoths walk
-the old woods). A run takes each pool's first zone; a random draw within a pool is a simulator's
+Scarlands (roster 2) → 3. Forest of Old as the finale (tougher roster 3). A run takes each pool's first zone; a random draw within a pool is a simulator's
 switch (DOD_ZONE_ROTATION=1), and every pool holds one candidate today; every zone keeps the same 16-slot generated shape. Deeper-slot enemies are tinted redder, and the slot sets
 the stat multiplier (§4.3). The finale ends in a zone boss like the other two, and
 the <b>END BOSS</b> stands in a seventeenth slot after it: the run ends on the END BOSS's
@@ -3130,7 +3129,7 @@ soft to arcane (the shield stops steel, not raw magic).</td></tr>
 <tr><td>Orc Shaman (blue)</td><td>2</td><td>mender</td><td>1·2·3</td><td>110</td><td>Chain
 Lightning (nature, every ally); Healing Wave, paid in Malice. Resists fire/frost 25%, nature 50%; soft to
 shadow (corruptible spirits).</td></tr>
-<tr><td>Orc Hexer (purple)</td><td>2</td><td>hexer</td><td>1·2·3</td><td>120</td><td>Ranged
+<tr><td>Orc Hexer (purple)</td><td>2</td><td>hexer·sniper</td><td>1·2·3</td><td>120</td><td>Ranged
 shadow caster: Hex Bolt; Withering Hex (70% Exposed 2t); Bone Rattle (34 BD, lays Sap). Resists
 shadow 50%; soft to holy AND nature.</td></tr>
 <tr><td>Wolfrider (grey)</td><td>2</td><td>skirmisher</td><td>1·2</td><td>130</td><td>Speed
@@ -3147,7 +3146,7 @@ first, or play around it.</td></tr>
 <td>Ragged Cut; Blood Tribute (shadow) — +25% damage and Break damage per ally fallen this
 battle: unremarkable fresh, hits like a Chief as the last one standing. The kill-order
 question, stated as an enemy. Shadow resist 25%; soft to holy AND nature.</td></tr>
-<tr><td>Grave Totem (dusk, large)</td><td>2</td><td>mender·hexer</td><td>1·3</td><td>80</td>
+<tr><td>Grave Totem (dusk, large)</td><td>2</td><td>mender·hexer</td><td>1·2·3</td><td>80</td>
 <td>Speed 130, trivially Broken (Con 60): Grasping Roots (nature, 60% Cripple 2t); Dark
 Vigil — every living ally regains 6% of its OWN max health, paid in Malice; Mire, a blow that mires. Physical resist 35%, shadow
 50%; soft to fire AND holy at 50% — a resist puzzle, not a stat check.</td></tr>
@@ -3157,7 +3156,7 @@ mind).</td></tr>
 <tr><td>Bog Troll (green, large)</td><td>3</td><td>brute·bulwark</td><td>1·3</td><td>300</td>
 <td>Claw; Swampy Grasp (70% Slowed 2t); Regenerate (25% self-heal when hurt, paid in Malice). Nature
 resist 50%; soft to fire.</td></tr>
-<tr><td>Rot Behemoth (dun, large)</td><td>3</td><td>brute·hexer</td><td>2·3</td><td>280</td>
+<tr><td>Rot Behemoth (dun, large)</td><td>3</td><td>brute·hexer</td><td>1·2·3</td><td>280</td>
 <td>Rotting Fist (50% Poison 3t); Wretched Bellow (nature + BD, every ally, lays Fester). Nature 50%,
 shadow 25%; soft to holy.</td></tr>
 <tr><td>Ash Hurler (ember, large)</td><td>3</td><td>brute·sniper</td><td>2·3</td><td>190</td>

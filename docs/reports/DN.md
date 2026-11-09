@@ -49,7 +49,7 @@ ruled against.
 
 *Everything else the brief asserts checked out.* `runes.json` does carry a `lane` field on spec
 runes — **36 of them, every lane name exactly once**. The party screen does render live lane-point
-headers (`party_screen.gd:518-525`). CV did correct six nodes. CU's three named cross-row
+headers (`scripts/party_screen.gd` `_draw_lane_tree`: `var lane: String = lane_order[ci]` to `str(Talents.LANE_NAMES.get(lane, lane)).to_upper(), taken]`). CV did correct six nodes. CU's three named cross-row
 conditionals are all live, and all three read the spec's own mechanics.
 
 ---
@@ -248,12 +248,12 @@ read a lane name.
 | Site | What three names does to it |
 |---|---|
 | `data/runes.json` — **36 `lane` fields** | **THE COUPLING THE DESIGN REMOVES.** 36 unique values collapse to 3, repeated twelve times. The rune stays identifiable because `scope: "spec:berserker"` already disambiguates — but **the field stops naming the rune's THEME and names only its category.** "Rune of Exsanguination, Berserker, Offense" says strictly less than "Rune of Exsanguination, Bloodletting" did. |
-| `scripts/runes.gd:353,373` | Carries the value onto the live record. Unchanged mechanically. |
-| `scripts/run_sim.gd:86,943,962,971` | **EVERY `DOD_SIM_BUILDS` VALUE EVER TYPED BECOMES INVALID** (`cryomancer:Deep Freeze` and the rest). And `_target_lane` falls back to `tree[0].lane` — today twelve DIFFERENT lanes, after the change "Offense" twelve times, so **the default sim build stops being twelve distinct arms.** |
-| `scripts/talents_screen.gd:186-191, 199-209, 243` | **Keeps working, and gets simpler.** `_lane_order` derives three columns from first appearance; three repeated names still resolve to three columns. |
-| `scripts/party_screen.gd:470-475, 518-525, 541` | The live lane-point headers. Keep working, and **read better**: "OFFENSE 4 / DEFENSE 2 / UTILITY 1" is a build summary; "BLOODLETTING 4 / FURY 2 / WARPATH 1" is a lane tally. |
-| `scripts/battle.gd:23281-23293` | The party log line's lane-count summary. Keeps working. |
-| `Talents.LANE_NAMES` *(talents.gd:30)* | **Becomes dead, or becomes the whole mechanism.** It exists today only to translate the Beastmaster's three lowercase keys; the other eleven specs store display names directly. |
+| `scripts/runes.gd` `template_rune`: `"lane": "",`; `build`: `"lane": String(e.get("lane", "")),` | Carries the value onto the live record. Unchanged mechanically. |
+| `scripts/run_sim.gd` `var builds`: `static var builds := {}           # spec -> target lane name`; `install_builds`: `if String(t.get("lane", "")) == target:`; `_target_lane`: `return String(tree[0].get("lane", ""))`; `_pick_rune_candidate`: `if String(c.get("lane", "")) == target:` | **EVERY `DOD_SIM_BUILDS` VALUE EVER TYPED BECOMES INVALID** (`cryomancer:Deep Freeze` and the rest). And `_target_lane` falls back to `tree[0].lane` — today twelve DIFFERENT lanes, after the change "Offense" twelve times, so **the default sim build stops being twelve distinct arms.** |
+| `scripts/talents_screen.gd` `_lane_order`: `var lanes: Array = []` to `return lanes.slice(0, 3)`; `_draw_tree`: `var lanes := _lane_order(tree)` to `hdr.text = str(Talents.LANE_NAMES.get(lanes[ci], lanes[ci])).to_upper()`; `_draw_tree`: `var col := maxi(lanes.find(str(t.get("lane", ""))), 0)` | **Keeps working, and gets simpler.** `_lane_order` derives three columns from first appearance; three repeated names still resolve to three columns. |
+| `scripts/party_screen.gd` `_tree_lanes`: `var lanes: Array = []` to `return lanes.slice(0, 3)`; `_draw_lane_tree`: `var lane: String = lane_order[ci]` to `str(Talents.LANE_NAMES.get(lane, lane)).to_upper(), taken]`; `_draw_lane_tree`: `var lane2: String = str(talent.get("lane", ""))` | The live lane-point headers. Keep working, and **read better**: "OFFENSE 4 / DEFENSE 2 / UTILITY 1" is a build summary; "BLOODLETTING 4 / FURY 2 / WARPATH 1" is a lane tally. |
+| `scripts/battle.gd` `_member_summary`: `var lane := String(node.get("lane", ""))` to `lane_counts[lane]])` | The party log line's lane-count summary. Keeps working. |
+| `Talents.LANE_NAMES` *(`scripts/talents.gd` `const LANE_NAMES`: `const LANE_NAMES := {"devotion": "Devotion", "pack": "The Pack", "handler": "Handler"}`)* | **Becomes dead, or becomes the whole mechanism.** It exists today only to translate the Beastmaster's three lowercase keys; the other eleven specs store display names directly. |
 
 **THE TEST TREE IS THE LARGER SURFACE AND IS NOT COUNTED ABOVE.** **Twenty-five** `test_batch_*`
 files reference a lane, several with hard-coded name tables — `test_batch_ak.gd`'s per-node fixture

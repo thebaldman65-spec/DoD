@@ -35,7 +35,7 @@ before anything is built. It does. This is that report.**
 
 | site | what it assembles | terms | deepest total measured |
 |---|---|---|---|
-| `_resolve`'s strike loop (`battle.gd:8684`) | the base (or Pommel Strike's 0.25), a Broken target's +0.25, Resonance, `crit_bonus`, **Aguila's shared boon**, Precision Strikes, Seasoned Fighter, Killing Edge, Super Nova (rune-only), Brittle Ice, the Sweeping Strikes rider, Lethal Aim's sub-split Focus and Tunnel Vision | **12** | **12.24** |
+| `_resolve`'s strike loop (`scripts/battle.gd` `_resolve`: `crit_chance += 0.01 * _max_hero_rank("frostbite_ranks",` (on the tree this report mostly cites)) | the base (or Pommel Strike's 0.25), a Broken target's +0.25, Resonance, `crit_bonus`, **Aguila's shared boon**, Precision Strikes, Seasoned Fighter, Killing Edge, Super Nova (rune-only), Brittle Ice, the Sweeping Strikes rider, Lethal Aim's sub-split Focus and Tunnel Vision | **12** | **12.24** |
 | `_heal_crit_mult` | base + `crit_bonus` | 2 | **n = 0** at all three arms |
 | `_ghost_hit` (Call of the Wild) | base + `crit_bonus` + Broken | 3 | **0.37** |
 | `_companion_hit` | base + `crit_bonus` + Broken | 3 | **0.37** |
@@ -74,7 +74,7 @@ prevent.
 
 ### THE THREE OTHER READERS OF `CRIT_CHANCE`, NAMED SO A LATER SWEEP DOES NOT MISTAKE THEM FOR ROLLS
 
-`party_screen.gd:222` and two `battle.gd` sites print `CRIT_CHANCE + crit_bonus` as a **display**;
+`scripts/party_screen.gd` `_draw_detail`: `var crit_pct := int(round((0.10 + cfg.get("crit_bonus", 0.0)) * 100))` and two `battle.gd` sites print `CRIT_CHANCE + crit_bonus` as a **display**;
 three more spend that same sum as a **Burn magnitude** (`status_meta`, Immolate's retaliation,
 Detonation's perfect). **None can know the assembled total** — it depends on the ability, the target
 and the board — so none was changed. Six reads, zero rolls.

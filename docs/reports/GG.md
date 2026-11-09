@@ -49,15 +49,15 @@
 | # | Premise | Verdict | What the record says |
 |---|---|---|---|
 | 1 | *"On `class-merge`."* | **HELD** | HEAD `bc6e258` (GF), and `origin/class-merge` read the same |
-| 2 | *"GF made a quit fight restart against the same warband at entry health"* | **HELD** | `resume_scene` sends an unresolved encounter back to `battle.tscn`, and `_spawn_units` reads each hero's `Run.party[i]["hp"]` as the step saved it (`battle.gd:1449`) |
+| 2 | *"GF made a quit fight restart against the same warband at entry health"* | **HELD** | `resume_scene` sends an unresolved encounter back to `battle.tscn`, and `_spawn_units` reads each hero's `Run.party[i]["hp"]` as the step saved it (`scripts/battle.gd` `_spawn_units`: `u.hp = clampi(Run.party[i]["hp"], 1, u.max_hp)`) |
 | 3 | *"the only way in the game to retry a losing fight"* | **HELD, AND WIDER THAN STATED** | It is the only player route: Restart Run abandons the run and a forfeit ends it. But the retry also refunds every item the abandoned fight used and re-rolls the opening turn order. **The window also runs past the loss itself**: a quit after the fatal blow, before the defeat screen, restarts a fight already lost (§2c) |
 | 4 | *"GF moved the run save to v13 and older saves still load"* | **HELD** | v13 is tolerant; below v10 is still refused and cleared (`run_state.gd` `load_run`) |
 | 5 | *"GF proved a won fight can never be fought or paid twice"* | **HELD** | GF §2c; `claim_reward` marks the encounter resolved before any victory's first save. The reconnaissance battery re-read `check_gf` at 98 / 0 |
 | 6 | *"statuses and their durations, cooldowns, every meter, the initiative timeline's positions, Break and stability, companions and their Loyalty, the bar's own state, the log"* | **HELD, AND IT REACHES ABOUT TWENTY OF 130** | A fight writes 130 fields on each unit and about forty on the battle (§1c); the list's items map to about twenty of the unit's |
 | 7 | *"the initiative timeline's positions and each unit's `delay`"* | **NOT AS STATED** | No unit carries a delay. The position is `next_time`; a delay belongs to the ability and is paid at the cast |
-| 8 | *"CZ's Blood Frenzy is health-missing plus Rage-spent and stores neither"* | **HALF** | The health half is derived from `hp` and `max_hp`. **Rage spent is a stored ledger**: `rage_spent` (`unit.gd:392`), written only by `note_resource_spent`, and `CLAUDE.md`'s CZ §1 block says so (*"THE LEDGER BOOKS WHAT LEFT THE BAR"*). A capture saves it |
+| 8 | *"CZ's Blood Frenzy is health-missing plus Rage-spent and stores neither"* | **HALF** | The health half is derived from `hp` and `max_hp`. **Rage spent is a stored ledger**: `rage_spent` (`scripts/unit.gd` `var rage_spent`: `var rage_spent := 0      # Blood Frenzy v3 (Batch CZ §1): Rage that has LEFT`), written only by `note_resource_spent`, and `CLAUDE.md`'s CZ §1 block says so (*"THE LEDGER BOOKS WHAT LEFT THE BAR"*). A capture saves it |
 | 9 | *"every meter (… Ruin, Burn, Chilled …, the three new spines)"* | **HELD, WITH TWO CORRECTIONS** | Ruin, Burn and Chilled are statuses, carried as stacks and turns inside `statuses`, not meters. The three spines are machinery on nobody, but their ledgers are written anyway: `note_momentum_turn` runs for every unit on every turn |
-| 10 | *"companions, their Loyalty and their health"* | **NOT AS STATED** | Loyalty is the hunter's, keyed by beast (`unit.gd:178`); the chip on the companion is stamped from it. The companion's health is its own |
+| 10 | *"companions, their Loyalty and their health"* | **NOT AS STATED** | Loyalty is the hunter's, keyed by beast (`scripts/unit.gd` `var loyalty`: `var loyalty := {}           # Beastmaster: per-beast Loyalty stacks (on the hunter)`); the chip on the companion is stamped from it. The companion's health is its own |
 | 11 | *"GB worked it out from the code and GF is the first batch to drive it"* | **HELD** | GF §0 row 2 |
 | 12 | *"`check_gf` … its 98 checks"* | **HELD** | `baselines.json` `check_gf` 98 / 0 |
 | 13 | *"Decay and Elemental Weakness cannot be applied by anything"* | **HELD** | §3a |
@@ -86,7 +86,7 @@ floor.**
 - It filed each write under the function holding it.
 
 It cannot see a write through a local alias, or one made through `set()` with a computed name. The spawn's own
-`set(key, config[key])` loop (`unit.gd:2164`) is the only such loop and runs once, before the fight. **The live
+`set(key, config[key])` loop (`scripts/unit.gd` `setup`: `for key in config:`) is the only such loop and runs once, before the fight. **The live
 population a build would face is at least this.**
 
 ### 1b. The brief's list, item by item
@@ -95,17 +95,17 @@ population a build would face is at least this.**
 |---|---|---|---|---|
 | Statuses and durations | `BattleUnit.statuses`: an array of dictionaries — id, turns, power, stacks, tick, `full_turns`, and per-status extras such as `src` (a name), Frostbind's `partner` (a name), Poison's `fresh` | no | the chips are | every unit's array. It holds names, never objects |
 | Cooldowns | `cooldowns`, card name → turns | no | no | every unit's dictionary |
-| Rage and Mana | `resource` | Mana carries between fights on the member (`unit.gd:1044`); Rage does not | no | the live value |
+| Rage and Mana | `resource` | Mana carries between fights on the member (`scripts/unit.gd` `sync_victory_state`: `member["mana"] = resource`); Rage does not | no | the live value |
 | Focus, Mercy, Resonance | `second_resource`, one field under three names | only the two rune carries between fights | no | the live value |
 | Loyalty | `loyalty` on the **hunter**, beast kind → stacks | no | the chip is | the hunter's dictionary |
 | Faith | `faith_stacks`, `faith_peak` | no | no | both |
 | Ruin, Burn, Chilled | inside `statuses` (stacks, turns, power), plus Burn's clock fields | no | no | inside the arrays |
 | Frenzy | health half from `hp`/`max_hp`; Rage half from `rage_spent` | no | **half** | `rage_spent` |
 | Plating | `plating_bonus` | no | no | the field |
-| The three spines | `mana_spent`; `momentum` and its four ledgers; Sanctity's three **static** fields (`unit.gd:2035-2037`) | no | the steps are | the ledgers and the statics |
-| The timeline | `next_time` on each unit — **the opening one is rolled at spawn** (`battle.gd:1710`) — and `_clock` on the battle | no | whose turn it is (`_next_unit`) | both |
+| The three spines | `mana_spent`; `momentum` and its four ledgers; Sanctity's three **static** fields (`scripts/unit.gd` `var sanctity_events`: `static var sanctity_events := 0` to `static var _sanctity_turn := -1`) | no | the steps are | the ledgers and the statics |
+| The timeline | `next_time` on each unit — **the opening one is rolled at spawn** (`scripts/battle.gd` `_spawn_units`: `u.next_time = (100.0 / maxf(u.effective_speed(), 0.1)) * randf_range(0.0, 1.0)`) — and `_clock` on the battle | no | whose turn it is (`_next_unit`) | both |
 | Break and stability | `pressure`, `broken`, `broken_pending`, `broken_extra_turns`; `stability` comes from the config and no fight writes it | no | stability is | the four |
-| Companions | their own `BattleUnit`s in `companions`, built mid-fight by `_do_summon` (`battle.gd:22213`), each pointing at its hunter through `pack_master` | no | no | each one, **rebuilt without `_do_summon`'s arrival, Loyalty gain and log lines** |
+| Companions | their own `BattleUnit`s in `companions`, built mid-fight by `_do_summon` (`scripts/battle.gd` `_do_summon`: `func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> void:`), each pointing at its hunter through `pack_master` | no | no | each one, **rebuilt without `_do_summon`'s arrival, Loyalty gain and log lines** |
 | Items used this fight | the battle's own copy, `items`, plus `item_used` (one a character a turn); `_init_items` copies the pouch in (`1028`) and `_check_end` writes it back (`25063`) | the pouch as it stood at the step | no | the battle's copy |
 | The turn number, whose turn | `_turns_taken`; whose turn is derived | no | whose turn is | `_turns_taken` |
 | The bar, if open | `sc_active`, `sc_pos`, `sc_dir`, `sc_profile`, `sc_sequence`, and the suspended cast around them | no | no | **not capturable mid-press** (§1e) |
@@ -325,14 +325,14 @@ onto the run, then saves. It stays out of every suspended function, because it w
 ### 3a. Nothing applies either, confirmed before either was removed
 
 - **Decay has two appliers, and both are talent riders whose fields nothing writes.**
-  - Empowered Hex on Hex of Ruin (`battle.gd:10983`) is guarded by `attacker.emp_hex_ranks > 0`.
+  - Empowered Hex on Hex of Ruin (`scripts/battle.gd` `_resolve`: `_apply_status(strike_target, "decay", 3, 0, 0, attacker)`) is guarded by `attacker.emp_hex_ranks > 0`.
   - Lingering Torment, as a madness ends (`_on_status_expired`, `15711`), returns early on `occ.torment_ranks == 0`.
 
-  Both fields are declared (`unit.gd:1389`, `:1416`) and read at those lines, and **written nowhere in `scripts/` or
+  Both fields are declared (`scripts/unit.gd` `var emp_hex_ranks`: `var emp_hex_ranks := 0        # Empowered Hex: % chance Hex applies Decay (100 = always)`, `var torment_ranks`: `var torment_ranks := 0        # Lingering Torment: Decay turns expired madness leaves` (its file read from the text around it)) and read at those lines, and **written nowhere in `scripts/` or
   `data/`**. The last code that wrote either was the talent trees FX replaced: `git log -S` finds both leaving
   `talents.gd` at `59491e3`.
 - **Elemental Weakness has one applier.** It is a Crushing Blow rider (`11132`) guarded by
-  `attacker.elem_weak_ranks > 0`. That field (`unit.gd:455`) is written nowhere, and its writer, the Warden node
+  `attacker.elem_weak_ranks > 0`. That field (`scripts/unit.gd` `var elem_weak_ranks`: `var elem_weak_ranks := 0      # Elemental Weakness: Crushing Blow resist shred`) is written nowhere, and its writer, the Warden node
   `wd_elem_weak` that `test_batch_al`'s table still names, left at the same commit.
 - **No data names either id.** There is no `applies_status` or status `id` for either in `classes.gd`,
   `data/enemies.json`, `data/runes.json`, the events, the relics or the run's modifiers.

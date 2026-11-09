@@ -10,7 +10,7 @@ S4 *every environment read*, S6 *the claims*) met rows only where a trigger happ
 ## THE BRIEF'S SUBJECTS
 
 - **S1** the bargain's rune cache the sim never answers (DV26) and the elite's order — the draft before the cache, a core rune held unworn (DV27); `map_screen._take_rune_pick`'s path; the bot's cache policy (§1a)
-- **S2** the merchant's doors — the potion at the stack cap (DV24), the rune at a full bag or holding (DV25); the comment at `run_sim.gd:584-590` (§1b)
+- **S2** the merchant's doors — the potion at the stack cap (DV24), the rune at a full bag or holding (DV25); the comment at `scripts/run_sim.gd` a line JR could not settle between two trees (§1b)
 - **S3** what moved, measured: every figure taken from a default sim — the dry shares, the Hourglass readings, Sanctity's figures, completion and depth, the rune-supply figures, the bargain ladder's 26 recorded figures; the superseded-pending marks (§1c)
 - **S4** the experiment arms that leak out of the sim (DV32): `DOD_SIM_RUNES`, `DOD_SIM_GRANT_ALL`; every environment read in the game scripts, one row each (§2)
 - **S5** the four remaining repairs — the fallback bodies (DV11), the zone boss's pick and the cap (DV29), `_autoplay_pick` re-asking the door (DV05, DV06, DV07); the divergence census's RULE count at zero as a ceiling, beside `check_gw`'s and IU §5's (§3)

@@ -78,7 +78,7 @@ source, allies' included**. He is the one spec already built to be fed.
 |---|---|
 | **Card text added** | *"The smoke also sets EVERY enemy / Burning 2 turns — fuel for a / Pyromancer's Ember Debt, and one more / affliction under your own Trapper."* |
 | **Reads / applies** | applies `burn`, 2 turns, at `_dot_tick("burn", attacker)` |
-| **In `DEBUFF_IDS`?** | **`burn` — CONFIRMED IN** (`unit.gd:19`) |
+| **In `DEBUFF_IDS`?** | **`burn` — CONFIRMED IN** (`scripts/unit.gd` `const DEBUFF_IDS`: `const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",`) |
 
 **One clause, two couplings.** It widens his own breadth, and it arms the Pyromancer's Ember Debt
 and Funeral Pyre, which consume Burn and have never had a second applier in the party. It goes
@@ -92,7 +92,7 @@ Emberkeep see this fire at all.
 |---|---|
 | **Card text added** | *"The line binds a CHILLED enemy harder: / the spring holds it 2 turns, not 1. / A Cryomancer lays that ice."* |
 | **Reads** | `u.has_status("chilled")` at the spring site; applies `stunned` for `SNARE_LINE_COLD_STUN` = 2 |
-| **In `DEBUFF_IDS`?** | **`chilled` — CONFIRMED IN** (`unit.gd:19`) |
+| **In `DEBUFF_IDS`?** | **`chilled` — CONFIRMED IN** (`scripts/unit.gd` `const DEBUFF_IDS`: `const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",`) |
 
 **Written at the line's spring site and deliberately NOT inside `_spring_trap`.** That helper is
 shared with the placed deadfall and Snare Trap, so a clause in it would have moved a magnitude on
@@ -197,7 +197,7 @@ Whispers and Spread of Madness name Broken only as the boss gate.
 |---|---|
 | **Card text added** | *"The run opens 12 Bleed on each, ANY / companion — feeding a Berserker's / Battle Shout and a Survivalist's / Trapper."* |
 | **Applies** | `_add_bleed_with_burst(ss_t, SAVAGE_SWEEP_BLEED)` = 12, per enemy struck |
-| **In `DEBUFF_IDS`?** | **`bleed` — CONFIRMED IN** (`unit.gd:20`), via the chip `log_bleed_chip` synthesizes |
+| **In `DEBUFF_IDS`?** | **`bleed` — CONFIRMED IN** (`scripts/unit.gd` `const DEBUFF_IDS`: `"bleed", "sunder", "mocked", "stunned", "exposed", "cripple", "dazed",`), via the chip `log_bleed_chip` synthesizes |
 
 The consuming end is a **Berserker card that exists today with nothing to author on it**: Battle
 Shout pays +1% party damage per 20 of the enemy party's `bleed_buildup`, summed across every living

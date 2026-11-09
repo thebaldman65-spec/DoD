@@ -39,6 +39,10 @@ const CENSUS := "res://docs/reports/IU-bot-divergence.tsv"
 # JO re-pinned it: JO §2 put the four hexes onto blows — Sap and Fester folded onto Bone Rattle and the Wretched Bellow, Gall and Mire
 # given damage, the hex special gone — and `check_jo` §1 and §2 hold that nothing else moved.
 const DATA_REST := "09f6815f57f2a8d102ed42c543304d82"
+# BATCH JR — THREE APPEARANCE TAGS MOVED AFTER THIS GATE LANDED (JR §1): the Grave Totem and the Rot Behemoth each took a
+# roster, the Orc Hexer a second role. Each is named here and put back before the digest, so it goes on asking whether
+# anything else in the warband's data moved.
+const MOVED_SINCE := {"grave_totem": {"zones": [1.0, 3.0]}, "behemoth": {"zones": [2.0, 3.0]}, "hexer": {"roles": ["hexer"]}}
 # SANCTITY's STEP, AS IT STANDS — read out at §0, never changed (C10).
 const SANCTITY := {"SANCTITY_PER_STEP": 13, "SANCTITY_MAX_STEPS": 5, "SANCTITY_STEP_TURNS": 1}
 # THE TREE JN's THIN AIR RE-READ STANDS FOR — JN's tree that landed, its game digested by `_tree_digest`. Since JO no batch re-reads a
@@ -632,6 +636,12 @@ func _s1_the_kit() -> void:
 	# AND EVERY OTHER KEY OF THE DATA — the status's chance, the damage's type, the words — as it stood: the data with every cooldown
 	# key and each raised move's damage set aside, digested.
 	var raw: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/enemies.json"))
+	# BATCH JR — THREE APPEARANCE TAGS MOVED AFTER THIS GATE LANDED (JR §1), each named in `MOVED_SINCE` and put back
+	# before the digest, so it goes on asking whether anything else in the warband's data moved.
+	for jr_kind in MOVED_SINCE:
+		if (raw as Dictionary).has(jr_kind):
+			for jr_field in MOVED_SINCE[jr_kind]:
+				raw[jr_kind][jr_field] = (MOVED_SINCE[jr_kind][jr_field] as Array).duplicate()
 	var rest := JSON.stringify(_strip(raw, raised, "")).md5_text()
 	print("    the data, every cooldown and each raised move's damage aside: %s" % rest)
 	ok(rest == DATA_REST, "§1: a figure of the warband moved beside the raised moves' damage and bands (%s)" % rest)

@@ -414,7 +414,7 @@ rune does not call it — the clearest statement of what the rune traded.
   and the four stance literals are all **byte-unchanged**; every rune reads *beside* them.
 - **`RESONANCE_TAKEN_STEP` GOT NO BONUS TERM**, which the brief made a condition. The Dissonance
   reaches the taken curve by **doubling the meter inside `resonance_curve()`** — the one function
-  both curves already share — so the authored decision at `unit.gd:766` stands untouched and the
+  both curves already share — so the authored decision at `scripts/unit.gd` `const RESONANCE_TAKEN_STEP`: `const RESONANCE_TAKEN_STEP := 0.75  # % damage TAKEN per point — nothing modifies` stands untouched and the
   nameplate chip follows for free.
 - **NONE of the Cryomancer's five writes a party-wide MAX field.** `rune_frigid_ranks`,
   `rune_frostbite_ranks`, `rune_hungering_ranks` and `rune_hypothermia_ranks` are untouched; all

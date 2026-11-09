@@ -17,6 +17,76 @@ heading stands in both files. **Since JE §3 it also takes what `CLAUDE.md` clos
 
 ---
 
+## ARCHIVED AT JR — 2026-11-09, FROM `docs/state.md` AS JQ LEFT IT (`11756af`)
+
+*In the order they stood. JQ's seven rulings, answered in JR's brief: all accepted as taken. The items JR's two comment fixes closed (§3). Six look-list rows the designer's play passed and THE CLASS MERGE's two sizing bullets (§4). And three citations whose subjects had closed (§2): **these three carry JR §2's replaced citations, not the line numbers JQ's state held** — FOUND AT FW's and FOUND AT GL's pieces as the state stood after JR's sweep, and FOUND AT HA's half a record of the item as it stood with its two gate citations named by function; every number is in `docs/reports/JR-citations.tsv`.*
+
+### ~~JQ's RULINGS OWED~~ — **ALL SEVEN ANSWERED IN JR's BRIEF (§0): all accepted as taken**
+
+*Its head as it stood: SEVEN; THE BATCH's FIGURES, NAMES AND SHAPES FOR THE DESIGNER's THREE ANSWERS, EACH TAKEN ON THE RECOMMENDATION, NONE HOLDING ANYTHING UP*
+
+
+Full working: `docs/reports/JQ.md`, NEEDS A RULING.
+
+1. **FORSAKEN's NAME, ITS TURNS AND ITS CARD (JQ §1).** The status is **Forsaken** (`forsaken`, chip `Fk`) — BR §1's sweep, exact, contained, sharing a word and by stem, met nothing across the 1,019 names the game holds (the engines' names and nouns among them) — and it lasts **3 turns** (`Battle.FORSAKE_TURNS`, which the card's text reads). It is laid by **Forsake**, a new card on the **Cleric's** class shelf in Hunter's Mark's shape — a pure mark with no bar, one enemy — at Unburden's price, 20 Mana, 1.5, cooldown 4 (Hunter's Mark's 15 would sit below the Cleric's own kit card, `check_gu` §2) — the Cleric because condemnation is its theme (Penance, Breaking Darkness, the Arbiter's Judged) and its shelf was the thinnest, three cards. It is the heroes' mark: in `DISPEL_NEVER` and not `DEBUFF_IDS`, so neither a Dispel nor a mender's Rite lifts it, and Hunt, the Trapper and Hallowed do not count it. **The alternatives**: a Hunter's mark, beside Hunter's Mark on his shelf, or a Mage's, beside Rime and Arcane Echo on the Cryomancer's and the Arcanist's shelves (the Warrior's kit holds no mark); an affliction any cleanse takes. **Reversing it** is the name's strings, the turns' one constant (the master document types them, held to it by `check_iq` §2f), the two lists, and a shelf entry and a `CARD_TAGS` row — with every count the shelf moves (JQ.md, NEEDS A RULING, lists each).
+2. **A DEATH CLEARS FORSAKEN, SO A RAISED BODY STANDS UP UNMARKED (JQ §1, the brief's premise 2).** What the code already does: `unit._die` hands the death to `_on_unit_died` and then clears every status, so a body the warband Raises carries no mark and its second fall feeds the kill's worth again until it is marked again. **The alternative**: the mark survives the Raise. **Reversing it** keeps the mark across the death — a snapshot at `_die`, as Chain Ignition keeps `burn_at_death`, laid again at the Raise: two lines and a field.
+3. **THE CLEANSE AIMS AT EVERY SINGLE-PICK SITE — A BUFF TO SEVEN SOURCES, THE DESIGNER's TO TURN (JQ §2).** A hex if the body carries one, else the harmful status with the most turns left, the first laid on a tie, **and the Bleed chip last** — a meter's warning, battle-long, which *most turns left* would take first and leave the meter (the Rite refuses it for that reason): Dispel on a hero, Field Dressing, the Rune of the Medic, the talent Cleanse Debuffs Each Turn and Fellowship's kept read at one call, and On the Mend's and Cleansing Waters' calls, which nothing writes. **The alternatives**: the random pick; the chip ranked by its turns, which takes it first. **Reversing it** is one line of `BattleUnit.dispel_one_debuff` (`candidates.pick_random()`) and the master document's four clauses that state the aim; the chip's place alone is the `bleed` arm of `aimed_cleanse_pick`, three of those clauses and `check_jq` §2's Bleed case.
+4. **THE FOUR HEXES ARE A WRITTEN LIST, NOT A DERIVATION (JQ §2, the brief's premise 2).** Nothing in the data marks the family — three status rows say *(a hex the warband laid)* in prose and Fester's says nothing — so `BattleUnit.HEX_IDS` is four ids written down and says so. **What marking it would take**: a `hex` key on each hex's status row, or on the warband moves' `applies_status`, read in the list's place. **Reversing it** is nothing; marking the data replaces the list, and `check_jq` §2 reds the day a laying move's `applies_status` carries a key beyond its id and turns.
+5. **THE PUNISH's CARD, ITS FIGURE AND ITS SHAPE (JQ §3).** **Read the Tell**, a new card on the **Warrior's** class shelf — 20 Rage, 2.0, cooldown 3, one enemy, 30% of Attack and 15 Break damage, priced as Pommel Strike so it sits below no kit card — dealing **20% more for each turn of cooldown on the move its target has declared** (`Battle.READ_THE_TELL_PCT`), nothing more against a move that does not cool (a basic, or seven other moves that cool 0) or a body that has declared nothing — the declared action, never a spend beside it; its name met nothing across the same 1,019 (the first, *Into the Opening*, held the Skirmisher's engine); an ordinary attack in Hunt's shape, its term read in `_resolve`'s damage line, so its bar, the miss, the Block, the crit and the Break meet it as they meet every blow. **The alternatives**: the Hunter, who reads a target by trade; a `_resolve_special` arm, which would have to hand-roll the strike. **Reversing it** is one constant for the figure, the card's own fields for its numbers, and a shelf entry and a `CARD_TAGS` row for its class — with every count the shelf moves (JQ.md, NEEDS A RULING, lists each).
+6. **THE PLATE's HOVER NAMES THE DECLARED MOVE's COOLDOWN (JQ §3, the brief's premise 3).** The punish's trigger shows before the cast in the shape the game's other conditional cards take: offered on every body — a pick that produces less is offered (IL §0.7) — its condition in its words, and its trigger where the player reads the declaration (`_intent_hover_text`, off `_declared_cooldown`, the one door the card reads too). **The alternative**: a line on the picker's hover naming each body's bonus, a second surface. **Reversing it** is one line of the hover.
+7. **ONE FIGHT A KIND WITH THE WARBAND's ATTACKS ON, IN `check_jq` §4 (JP's ruling 2's recommendation, taken).** Twenty-one fights on autoplay through the fixture's door, the three answers' cards seated, each fight's log printed so a count read off the battery's logs has fights where the warband acts — the Orc Bloodcaller's and the Orc Hexer's among them. **The alternative**: leave it named. **Reversing it** is that section's fights deleted; its kept-count arm stays.
+
+### FOUND AT JP AND NOT FIXED — ITS CLOSED ITEMS (archived at JR: the ledger's comment, put right at JR §3; the block stays in `docs/state.md`)
+
+- **`battle.gd`'s MALICE LEDGER COMMENT IS STALE**: *nothing in the game reads it* — three warband heals' log lines print *— N Malice* off its `spent` key. JP edits no code; a drain that books there would show in those lines only around one heal.
+
+### FOUND AT JM AND NOT FIXED — ITS CLOSED ITEMS (archived at JR: `relics.gd`'s header, put right at JR §3; the block stays in `docs/state.md`)
+
+- **A RELIC IS HANDED AT EVERY BOSS KILL, THE END BOSS's INCLUDED** (FOUND AT GB, the close-read): `scripts/relics.gd`'s header says one per zone-boss kill; JM's ruling 4, accepted at JN §0 reads the unlock as the code does.
+
+### THE PLAYTEST'S OTHER FINDINGS — ITS CLOSED ITEMS (archived at JR: six look-list rows from JI to JQ, passed in the designer's play of 9 November, JR's ruling 5; the block, the list and the two rows `check_jj` §6 reads stay in `docs/state.md`)
+
+  · **THE ENEMY PLATE's `CD` CHIP** (JI §1): the fewest of its own turns until a cooling move is back, its hover naming each, drawn ahead of the statuses; driven headless, never seen. *One look*: a fight against an Ash Hurler or an Orc Whelp, one of them on a crowded plate.
+  · **THE PLATE's TWO NAMES AND THE FOUR HEXES' CHIPS** (JL §1, §2): a plate reading *▲ Rally · → Slash*, its hover *First, free*, and Gall's, Sap's, Mire's and Fester's chips (`Ga`, `Sa`, `Me`, `Fr`) on a hero's plate — since JM §0 an Orc Archer's ⇉ Gall — since JO §2 a blow, its hover *Hits every ally* and its `Ga` chips on the companions too; driven headless, never seen. *One look*: a fight against an Orc Archer, an Orc Hexer and an Orc Raider.
+  · **THE WARBAND's SPENDS ON THE FIELD** (JK §1): a Raise standing a fallen body up, the Rally and Entrenched chips on every standing plate and the strip's words naming what the pool buys; driven headless, never seen. *One look*: a fight against an Orc Totemist and an Orc Raider, one falling and raised.
+  · **THE RAISE, THE CUT AND THE DUMP ON SCREEN** (JN §0, §1): nine raised moves new in the `CD` chip's hover (every kind's chip was drawn already, by a cooling spend); the intent glyph of eight raised moves reading *strike* where it read *afflict* or *crush* (FOUND AT JN); Boil Over's card, tooltip and draft-card line in damage a point; Holy Conduit's line on the hero sheet and the class-selection card. Driven headless, never seen. *One look*: a fight against an Orc Raider and an Orc Slinger, a Cleric's sheet, a Warrior holding Boil Over.
+  · **THE HEXES ON THEIR BLOWS** (JO §2): Bone Rattle's glyph *afflict* where it read *crush* and Mire's *strike* where it read *afflict*; Bone Rattle's `CD` chip and the Bellow's three turns; a companion's `Ga` and `Fr` chips; the defensive bar a hero in the Defensive guard now presses against an Orc Archer's Gall and a Grave Totem's Mire; driven headless, never seen. *One look*: a fight against an Orc Archer, an Orc Hexer, a Grave Totem and a Rot Behemoth, a Warden in his Defensive guard, a companion out.
+  · **THE THREE ANSWERS ON SCREEN** (JQ §1–§3): Forsaken's `Fk` chip and its *FORSAKEN* float on a marked body, the strip's new sentence, the plate's hover line *Cooldown: N turns* — the declared move's own, where the `CD` chip counts down moves already used and shares the word — and the two cards' texts on the draft card; driven headless, never seen. *One look*: a fight against an Orc Totemist with Forsake and Read the Tell seated — a marked kill, a Raise, a cooling declaration.
+
+### FOUND AT HA AND NOT FIXED — ITS CLOSED ITEMS (archived at JR: `check_gn`'s half of the slot-door item — its arm was re-pointed at HJ to ask the door against `Classes.opening_kit`; the item stays for `check_gm`'s)
+
+- **`Run.ability_slots_used` IS LINEAGE-KEYED, AND SINCE HB IT READS ONE ENGINE QUESTION** — whether one held dismisses the pet (`Classes.kit_slots(class, spec, engines)`) — so two gate arms are still near-tautologies against its lineage half (`check_gm`'s `_s2_bound_cards`, `check_gn`'s `_s0_the_kit`). Correct while `lineage_slots` is zero for every lineage.
+
+### FOUND AT GL AND NOT FIXED — ITS CLOSED ITEMS (archived at JR: Charge's clause of the card-text item, closed at HW §3 — its Daze lasts 2 turns, 3 on a Perfect; the item and the block stay in `docs/state.md`)
+
+- Charge's one-turn Daze never acts (it ticks off at the target's turn start, `battle.gd` `_run_battle`'s `u.tick_statuses()` outside the freeze branches, before any miss roll) and its Perfect has no code;
+
+### FOUND AT GB AND NOT FIXED — ITS CLOSED ITEMS (archived at JR: one stale comment of its list, `relics.gd`'s header, put right at JR §3; the block stays in `docs/state.md`)
+
+- `relics.gd`'s header says relics come *"one per zone-boss kill"* (the end boss unlocks one too).
+
+### FOUND AT FW AND NOT FIXED — ITS CLOSED ITEMS (archived at JR: the struck sentence of the death-refusals item, closed at GB §4; the item stays in `docs/state.md`)
+
+- **`CLAUDE.md`'s "four death-refusals"** — **~~Its CV §1 cites `tick_statuses` by its line in `unit.gd`~~ — CLOSED AT GB §4: the line number is dropped.**
+
+### THE CLASS MERGE — ITS CLOSED ITEMS (archived at JR: the sizing of a project whose running order is done; the block stays in `docs/state.md`)
+
+- **THE SIZE, IN BATCHES: TWELVE TO FOURTEEN, AND THE GAME IS BROKEN THROUGH ROUGHLY EIGHT OF
+  THEM.** Not degraded — broken. From the moment the engines move, **52 battery targets carrying
+  71.6% of the project's asserted checks are red** for as long as it takes. **This project has
+  never worked in that condition**: every red it has carried has been the one sanctioned
+  `check_cm_live` red with a note in `baselines.json`, and **a tree with fifty reds has no
+  differ.** **GK MEASURED IT: the engine move read 67 of 104 targets red against the unmodified
+  battery, and GK repaired its own damage inside the same batch** (`docs/reports/GK.md` §3).
+- **THE ENGINE MOVE CANNOT BE STAGED PER SPEC, AND THIS IS THE STRUCTURAL ANSWER.** The unit of
+  the merge is a **class** — three specs collapse into one pool, one tree and one stat line
+  simultaneously, because there is no state in which the Berserker has merged and the Warden has
+  not: they would need one tree and two. **So "merge one class as a pilot" is not a pilot** — it
+  is four batches, eight to thirteen nodes salvaged out of 81, and a battery whose engine-bound
+  targets do not care that only a quarter of the game moved. **FX has since merged the TREE on its own, ahead
+  of the pools and the stat lines, so the tree half of *simultaneously* did not hold and the pilot's salvage out
+  of 81 is moot; the engine half stands.**
+
 ## ARCHIVED AT JQ — 2026-11-07, FROM `docs/state.md` AS JP LEFT IT (`4c08af1`)
 
 *Two blocks and three items, in the order they stood. JP's four rulings, answered in JQ's brief: all accepted as taken. THE PARTY's THREE ANSWERS, READ OUT, built at JQ — its doors stay in `docs/reports/JP-answers.md`, which `check_jp` §2 reads. JP's and JO's premise tables, records that ask nothing; and JP's finding that the battery's attacking fights cannot show every mechanic, answered by `check_jq` §4's one fight a kind with the warband's attacks on.*

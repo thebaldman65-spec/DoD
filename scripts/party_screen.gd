@@ -114,7 +114,7 @@ func _select_hero(idx: int) -> void:
 # BATCH CL §7 — AND IT IS FLATTENED HERE, NOT IN THE FIELD. The brief and the
 # standard both describe `passive_desc` as rendering only in this autowrapping
 # 400px label, and it has a THIRD surface neither of them names:
-# `battle.gd:1086` hands the same field to `add_status`, and `unit.gd:2291`
+# `battle.gd`'s `_spawn_units` hands the same field to `u.set_engine_chip(`, and `unit.gd`'s `_refresh_chips`
 # makes that a Godot default tooltip — which does NOT autowrap and grows to fit
 # its longest line. So the authored breaks STAY in the field and come out at the
 # two surfaces that soft-wrap: this label and the spec-choice column. Deleting

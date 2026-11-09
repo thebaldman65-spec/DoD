@@ -1,7 +1,7 @@
 # BATCH HI — HALF THE RE-POINTS, AND A CHECK NOBODY EVER WROTE
 
 **On `class-merge`, from `b05907c` (HH). IMPLEMENT ONLY.** The brief's population is **fifty, not fifty-one**: it
-counts `check_gn:208` twice (§0 row 3). **Priced, it is two batches** — by the designer's own yardstick, HD's whole
+counts `check_gn.gd` `_s0_the_kit`: `` # `ability_slots_used`, a near-tautology while `lineage_slots` is zero for `` twice (§0 row 3). **Priced, it is two batches** — by the designer's own yardstick, HD's whole
 batch and HH's — **so it is split by TARGET, as the brief directs** (§1): **HI re-points the twenty-seven arms in
 sixteen suites** — every arm the brief names but `check_gn`'s, the ruled fiftieth among them — **and HJ takes the
 twenty-three in the eight gates, `test_batch_ah` and `test_run_harness`**, where both of the LARGER re-derivations
@@ -21,9 +21,9 @@ between it and `class-merge` is unchanged (§5).
    Classes.spec_draft_pool(spec)` — and its comment says the class-wide shelf is left out *"for exactly AU §5's
    reason, and is empty today besides"*. Neither half holds under one pool a class: every class-wide shelf holds cards
    today (Rally and Field Dressing among them), and a hero drafts every shelf of his class, so the aid grants less
-   than a hero can hold. `test_batch_au`'s named-complaint arm (`:986`–`:996`, *"the Arcanist holds no Pyromancer
+   than a hero can hold. `test_batch_au`'s named-complaint arm (`_live_debug_grant`: `# The named complaint, stated as its own check: the Arcanist and the` (its file read from the text around it)–`_live_debug_grant`: `"...nor any Cryomancer one (%s)" % cryo)` (its file read from the text around it), *"the Arcanist holds no Pyromancer
    ability"*) pins the lineage scope, and **under HI's control K14r — the grant handed the class's pool — it reds in
-   both copies, eleven lines, Firestorm and Rime among them**, cards `au:682` asserts are in the Mage pool. It is in
+   both copies, eleven lines, Firestorm and Rime among them**, cards `test_batch_au.gd` `_live_fallback_generic`: `ok(Classes.draft_pool("mage").has(name),` (on the tree this report mostly cites) asserts are in the Mage pool. It is in
    no census, and HI moved nothing under `scripts/`. **Whether the grant should be the class pool is the designer's
    call** — a dev tool, not a player surface; if it should, the comment and that arm move with it.
 
@@ -34,17 +34,17 @@ between it and `class-merge` is unchanged (§5).
 | # | premise | verdict | what the record says |
 |---|---|---|---|
 | 1 | *"On `class-merge`"* | **HELD** | HEAD `b05907c` = `origin/class-merge` before anything moved; the tree clean but for the untracked `save-backups/` |
-| 2 | *"HH retired twenty-one of twenty-two and found the twenty-second had never checked anything — `test_batch_bw:417` fires zero times … the same broken loop HD fixed in `test_batch_bu`"* | **HELD** | HH §2a (an ok() trace: zero fires); `test_batch_bu`'s HD §2 note is the same walk over the four class keys |
-| 3 | *"HI takes 49 by HH's count, plus two more ruled below: 51"* | **FIFTY: `check_gn:208` IS ALREADY ONE OF THE FORTY-NINE** | HG's forty-eight carried it as a FLAGGED re-point; HH §3 ruled it a re-point and HH §4's table lists it (`check_gn:216`, HEAD line 208). **49 + the class-wide floor = 50**, in twenty-six targets |
+| 2 | *"HH retired twenty-one of twenty-two and found the twenty-second had never checked anything — `test_batch_bw.gd` `_synergy_rule`: `var at := src.find('"%s":\n' % n)` fires zero times … the same broken loop HD fixed in `test_batch_bu`"* | **HELD** | HH §2a (an ok() trace: zero fires); `test_batch_bu`'s HD §2 note is the same walk over the four class keys |
+| 3 | *"HI takes 49 by HH's count, plus two more ruled below: 51"* | **FIFTY: `check_gn.gd` `_s0_the_kit`: `` # `ability_slots_used`, a near-tautology while `lineage_slots` is zero for `` IS ALREADY ONE OF THE FORTY-NINE** | HG's forty-eight carried it as a FLAGGED re-point; HH §3 ruled it a re-point and HH §4's table lists it (`check_gn.gd` `_s0_the_kit`: `ok(used == Classes.lineage_slots(spec) + Classes.kit_slots(ck, spec)`, HEAD line 208). **49 + the class-wide floor = 50**, in twenty-six targets |
 | 4 | *"HH's 49 … each already mapped to its current line with its text unchanged, and all 48 confirmed to fire"* | **HELD, AND RE-VERIFIED** | HEAD is HH's tree, so each line HH mapped is the line today: all 49 were read at it, byte-identical to HG's line, before anything was edited |
 | 5 | *"`test_batch_cd`'s CLASS-WIDE SHELF FLOOR … is in no census. Ruled: it is the fiftieth"* | **HELD, AND TAKEN** | `cd` §2's per-class-wide-shelf `>= CLASS_FLOOR`; folded onto the class floors (§2) |
-| 6 | *"`check_gn:208`, which HA contradicts itself about — §1d says retire, §1g says keep. Ruled at HH: §1g"* | **HELD AS HH READ IT** | HH §0 row 11: §1g does not say *keep* in words; HH §3 recorded the ruling. It is HJ's (§1) |
-| 7 | *"HG found `check_fk:368`'s `ok(` line byte-identical … while HC had repaired it two batches ago"* | **AS HH §0 ROW 5 CORRECTED IT** | HC came two batches after HA and four before HG; the brief repeats HG's phrase |
+| 6 | *"`check_gn.gd` `_s0_the_kit`: `` # `ability_slots_used`, a near-tautology while `lineage_slots` is zero for ``, which HA contradicts itself about — §1d says retire, §1g says keep. Ruled at HH: §1g"* | **HELD AS HH READ IT** | HH §0 row 11: §1g does not say *keep* in words; HH §3 recorded the ruling. It is HJ's (§1) |
+| 7 | *"HG found `check_fk.gd` `_s5_requires_ability_resolves`: `ok(unreachable.is_empty(),`'s `ok(` line byte-identical … while HC had repaired it two batches ago"* | **AS HH §0 ROW 5 CORRECTED IT** | HC came two batches after HA and four before HG; the brief repeats HG's phrase |
 | 8 | *"29 of 71 arms sat in moved code and 28 of those were a neighbour's repair"* | **HELD** | HG §1b |
 | 9 | *"HD's rule … break what it guards, confirm the re-pointed arm goes red, and confirm HEAD's version does NOT"* | **HELD** | `docs/reports/HD.md` §6: each control beside HEAD's version of the same target on the same defect |
 | 10 | *"HG measured this half at 48 arms in 25 targets — bigger than HD's whole batch — and ~40 two-armed controls"* | **HELD** | HG §1a and §3: 48 in 25, *"≥ 40"* controls, against HD's 56 arms and 26 controls |
 | 11 | *"FZ's rule: if it is two batches, report the count and the method and stop"* | **THE BRIEF'S READING OF FZ's RULE** | FZ wrote *A BRIEF PRICES WHAT IT ASKS FOR* (`docs/ways-of-working.md`): ask the size first and defer. Applied here as the brief's own §2 directs: priced, split by target, the first half done, the second half's count and method reported (§1) |
-| 12 | *"`test_batch_br` passed on a `CLAUDE.md` sentence GP had deleted from the game"* (GZ's shape) | **HELD IN SUBSTANCE** | The instance is HA's (its census row `test_batch_br:1566`, *"the seam GP deleted; the document still carries it"*), repaired at HD; GZ named the shape |
+| 12 | *"`test_batch_br` passed on a `CLAUDE.md` sentence GP had deleted from the game"* (GZ's shape) | **HELD IN SUBSTANCE** | The instance is HA's (its census row `test_batch_br.gd` `_docs`: `# RE-POINTED AT BATCH DF. THE OLD CHECK CANNOT PASS AND MUST NOT: CW §1 split` (on the tree this report mostly cites), *"the seam GP deleted; the document still carries it"*), repaired at HD; GZ named the shape |
 | 13 | *"across all 125 targets, nothing asserts that an ability name resolves to exactly one definition"* | **HELD, AND MEASURED** | HH wrote *may be asked by nothing*; §4b plants a second definition and reads HEAD's readers of it: nothing asks the question, and the two that go red misname it |
 | 14 | *"CJ's Iron Will"* | **HELD** | `CLAUDE.md`'s text-standard block: CK renamed the Warrior ability `Ironclad` because a node, a status and a card shared *Iron Will* |
 | 15 | *"FN found ten exact collisions where a brief named five"* | **THE BATCH IS FK** | `docs/reports/FK.md`: *"Five collisions were named in the brief; the sweep found TEN EXACT hits"*; `CLAUDE.md` BR §1 says the same of FK |
@@ -63,7 +63,7 @@ between it and `class-merge` is unchanged (§5).
 ## §1 — THE PRICE, AND THE SPLIT
 
 **THE POPULATION IS FIFTY IN TWENTY-SIX TARGETS**: HH's forty-nine and `test_batch_cd`'s class-wide shelf floor
-(`check_gn:208` is already inside the forty-nine, §0 row 3). **Every one owes a re-point and a two-armed control**,
+(`check_gn.gd` `_s0_the_kit`: `` # `ability_slots_used`, a near-tautology while `lineage_slots` is zero for `` is already inside the forty-nine, §0 row 3). **Every one owes a re-point and a two-armed control**,
 and several owe more than a one-line door: `check_ea`'s four award floors share one re-derivation over class × engines
 held, and `check_do`/`check_dp` need their guaranteed-status table re-keyed by class — HG's two LARGER items.
 
@@ -75,8 +75,8 @@ batches**, so the brief's rule applies: **the first half is done, and the second
 
 | | targets | arms | what it is |
 |---|---|---|---|
-| **HI** (this batch) | 16 suites: `test_batch_ah_battle`, `aj`, `an`, `at`, `au`, `av`, `aw`, `ay`, `bb`, `bo`, `bp`, `br`, `bw`, `bx`, `cb`, `cd` | **27** | the shelf-to-pool family, the definitions-versus-opening family, `bw:417` (the check that never ran), the ruled fiftieth, `cb`'s `master.html` pin (the brief's constraint 3) and `bp`'s Quick Shot (constraint 1) |
-| **HJ** (owed) | 8 gates — `check_do`, `check_dp`, `check_dr`, `check_dv`, `check_ea`, `check_eh`, `check_es`, `check_gn` — and `test_batch_ah`, `test_run_harness` | **23** | both LARGER re-derivations (`check_ea` ×4 with `:400`, `check_do:475` with `check_dp:191`/`:200`), the award chain's un-awakened hero (`ah:324`/`:326`, `run_harness:432`), `check_gn`'s ruled door (constraint 2) |
+| **HI** (this batch) | 16 suites: `test_batch_ah_battle`, `aj`, `an`, `at`, `au`, `av`, `aw`, `ay`, `bb`, `bo`, `bp`, `br`, `bw`, `bx`, `cb`, `cd` | **27** | the shelf-to-pool family, the definitions-versus-opening family, `test_batch_bw.gd` `_synergy_rule`: `var at := src.find('"%s":\n' % n)` (the check that never ran), the ruled fiftieth, `cb`'s `master.html` pin (the brief's constraint 3) and `bp`'s Quick Shot (constraint 1) |
+| **HJ** (owed) | 8 gates — `check_do`, `check_dp`, `check_dr`, `check_dv`, `check_ea`, `check_eh`, `check_es`, `check_gn` — and `test_batch_ah`, `test_run_harness` | **23** | both LARGER re-derivations (`check_ea` ×4 with `_s1_depth`: `ok(emptiable == 8,` (its file read from the text around it), `check_do.gd` `_s4_status_sweep`: `ok(gated.is_empty(),` with `check_dp.gd` `_s1_property`: `ok(nodes > 0,`/`_s1_property`: `ok(fresh.is_empty(),` (its file read from the text around it)), the award chain's un-awakened hero (`test_batch_ah.gd` `_test_offers`: `ok(not run.award_ability_pick(nospec),`/`_s4_rune_coupling`: `# THIS BATCH NEARLY PAID: every stat field any rune writes has a live read` (its file read from the text around it), `test_run_harness.gd` `_gate_talent_conservation`: `_check("the un-awakened one did not",`), `check_gn`'s ruled door (constraint 2) |
 
 **WHY THIS HALF FIRST.** Every arm the brief names but one is in it, the half's controls share a small family of
 defects (a pool that stops reading a shelf, a gate row deleted, a card put where every hero opens), and the two LARGER
@@ -85,8 +85,8 @@ re-read at its line with the lines that feed it, re-pointed to what it was for, 
 isolated copy, HEAD's copy of the target beside it, read by FAIL text; a repair that narrows takes the reversed
 control too (§3b). **HI's twenty-five controls took 93 Godot runs and thirty-nine minutes of wall clock** (§3c). HJ's
 ten targets each ran in 4 to 32 seconds in HI's reconnaissance battery, so its controls are cheap to RUN; **its cost
-is the two re-derivations** — the award floors over class × engines held (`check_ea` ×4 with `:400`,
-`check_dv:251`/`:260`), and the guaranteed-status table re-keyed by class (`check_do:475`, `check_dp:191`/`:200`) —
+is the two re-derivations** — the award floors over class × engines held (`check_ea` ×4 with `_s1_depth`: `ok(emptiable == 8,` (its file read from the text around it),
+`check_dv.gd` `_s2_boss_depth`: `ok(emptiable.size() == 8,`/`_s2_boss_depth`: `ok(holy_safe == 2,` (its file read from the text around it)), and the guaranteed-status table re-keyed by class (`check_do.gd` `_s4_status_sweep`: `ok(gated.is_empty(),`, `check_dp.gd` `_s1_property`: `ok(nodes > 0,`/`_s1_property`: `ok(fresh.is_empty(),` (its file read from the text around it)) —
 which is why they were kept together in one batch rather than split across two.
 
 ---
@@ -98,45 +98,45 @@ recorded at its own site with what it asked and what it asks now. *(Lines after 
 
 | arm (HEAD → now) | what it asked | what it asks now | control | NEW / HEAD's copy |
 |---|---|---|---|---|
-| `test_batch_ah_battle:207` → 211 | 8 fillers off the class-wide + Berserker shelves; "new" = not in `spec_abilities` | 8 fillers **offered off `draft_pool("warrior")`** to a Berserker holding his engine; "new" = not in his **live opening** | K1 | red (*"got 6"*) / silent |
-| `test_batch_aj:409` → 420 | Hack and Slash *"is in the Berserker kit"* (`spec_abilities`) | **defined** in his table, **drafted** off the Warrior pool, in **no** opening | K1, K8 | red (*"drafted: false"*) / silent |
-| `test_batch_aj:552` → 570 | Battle Shout *"drafts from the Berserker"* (his shelf) | Battle Shout in **`draft_pool("warrior")`** | K1 | red / silent |
-| `test_batch_aj:584` → 603 | Rampage, the same | Rampage, the same | K1 | red / silent |
-| `test_batch_an:824` → 829 | the siblings hold spec-foreign entries (boss pools **and shelves**) | the siblings hold **boss cards only a sibling can reach** (not in his boss pool, not in the Warrior pool) | K11 | red (*"[]"*) / silent |
-| `test_batch_an:829` → 838 | no zone-boss offer returns a sibling-spec entry (that mixed set) | no zone-boss offer returns a card **only a sibling can reach** | K12f, **K12r** | **narrowing** (§3b): forward both red; reversed HEAD alone red |
-| `test_batch_at:603` → 608 | Stabilize *"OUT of the opening three"* (`spec_abilities`) | Stabilize out of his **live opening** | K4b | red / silent |
-| `test_batch_at:628` → 641 | Stabilize *"spec-only"* — absent from the class-wide shelf | Stabilize's **`ENGINE_READ` row** names Resonance's engine; the door refuses it bare and offers it held | K3 | red (*"row: ''"*) / silent |
-| `test_batch_au:679` → 682 (×2) | Firestorm / Rime *"drafts from the <spec> instead"* | each in **`draft_pool("mage")`** | K1 | red ×2 / silent |
-| `test_batch_au:799` → 803 | Magi's Wrath *"drafts from the Arcanist"* | in **`draft_pool("mage")`** | K1 | red / silent |
-| `test_batch_au:968` → 980 | the debug grant holds no sibling-spec entry (siblings' **shelves** counted as theirs) | the grant holds no **sibling boss card no hero of the class can draft**; the set asserted non-empty | K14f, **K14r** | **narrowing** (§3b): forward both red; reversed HEAD alone red |
-| `test_batch_av:303` → 316 | Resurrection / Intercession not on the Cleric class-wide shelf | both are **`ENGINE_READ` rows** on Mercy: refused bare, offered held | K3 | red (*"rows: '', ''"*) / silent |
-| `test_batch_aw:466` → 470 | Sacred Resolve *"drafts from the Devout"* | in **`draft_pool("cleric")`** | K1 | red / silent |
-| `test_batch_aw:468` → 472 | Bulwark of Fortitude, the same | the same | K1 | red / silent |
-| `test_batch_ay:403` → 415 | a retired payload edits Kill Command *"which every Beastmaster owns"* | the payload lands on Kill Command **as a Hunter gets it — off his class's one pool** | K1, K9 | red (*"found false"*) / silent |
-| `test_batch_ay:410` → 422 | Hunter's Instinct, the same | the same | K1, K9 | red / silent |
-| `test_batch_bb:765` → 772 | no Mage lineage's `spec_abilities` holds Ashes of Al'ar (nine checks) | no Mage lineage **opens** with it (three) | K4b | red / silent |
-| `test_batch_bo:190` → 198 (×3) | the Warrior shelf is NAMED (*"one of four heroes had no draft"*) | each shelf NAMED — **an authoring location** — and **wholly inside the Warrior pool** | K1 | red ×3 / silent |
-| `test_batch_bo:369` → 386 | `CAP - core_slots` ≥ 3 (the enablers' bar entries, which take no slot) | `CAP - (lineage_slots + kit_slots)` ≥ 3 — **what the opening uses inside the count** | K7 | red (*"2 of 7; 5 used"*) / silent |
-| `test_batch_bp:280` → 289 | an enabler absent from its **own** shelf | absent from the **class's one pool** — Quick Shot still asked; a walk guard beside it | K6 | red on Bloodlust **and Quick Shot** / silent |
-| `test_batch_br:289` → 293 (×3) | each Warrior can draw Rally (class-wide shelf) | Rally in **`draft_pool("warrior")`** | K2 | red ×3 / silent |
-| `test_batch_br:294` → 298 (×3) | each Hunter can draw Field Dressing | Field Dressing in **`draft_pool("hunter")`** | K2 | red ×3 / silent |
-| `test_batch_bw:417` → 475 | *"kit does not already hold"* a NINE card — **fired zero times** | **repaired**: the twelve lineages' definitions (a NINE name drafted off its own shelf), every class's basic and kit, and the walk asserted | K5, K5b | red (*"also an opening-kit ability"*; *"defined by berserker"*) / **silent — it never ran** |
-| `test_batch_bx:251` → 258 | the Warden shelf ≥ 8 *"spec cards to be offered"* | the Warden's shelf ≥ 8 **and wholly inside the Warrior pool** | K1 | red / silent |
-| `test_batch_cb:1239` → 1251 | `master.html`: *"All twelve specs draft from at least ten"* | `master.html`: **the pool a hero draws, per class, rendered from the live pools** — the sentence moved with it | K10 | red / silent (it pins the old sentence) |
-| `test_batch_cd:453` → 463 | the thinnest SHELF (`PER_SPEC_DEPTH`) ≥ DY's ten | the thinnest POOL — a no-engine hero's offer, the half that thins — against its class floor | K1, K13 | red / silent |
-| `test_batch_cd:466` (§2's class-wide floor, **the fiftieth**) → 494 | each class-wide SHELF ≥ `CLASS_FLOOR` (three) | **folded**: `Fixture.class_pool_floors`, four classes × two halves | K1, K13 | red / silent |
+| `test_batch_ah_battle.gd` `_test_action_bar`: `var earned: Array = []` → 211 | 8 fillers off the class-wide + Berserker shelves; "new" = not in `spec_abilities` | 8 fillers **offered off `draft_pool("warrior")`** to a Berserker holding his engine; "new" = not in his **live opening** | K1 | red (*"got 6"*) / silent |
+| `test_batch_aj.gd` `_ability_nodes`: `` # **BATCH HI — RE-POINTED: "IN THE BERSERKER KIT" WAS FALSE.** `spec_abilities` `` → 420 | Hack and Slash *"is in the Berserker kit"* (`spec_abilities`) | **defined** in his table, **drafted** off the Warrior pool, in **no** opening | K1, K8 | red (*"drafted: false"*) / silent |
+| `test_batch_aj.gd` `_upgrade_paths`: `ok(Classes.spec_draft_pool("berserker").has("Battle Shout"),` → 570 | Battle Shout *"drafts from the Berserker"* (his shelf) | Battle Shout in **`draft_pool("warrior")`** | K1 | red / silent |
+| `test_batch_aj.gd` `_upgrade_paths`: `ok(Classes.spec_draft_pool("berserker").has("Rampage"),` → 603 | Rampage, the same | Rampage, the same | K1 | red / silent |
+| `test_batch_an.gd` `_test_rewards`: `ok(not class_only.is_empty(), "the Warrior siblings hold spec-foreign entries")` → 829 | the siblings hold spec-foreign entries (boss pools **and shelves**) | the siblings hold **boss cards only a sibling can reach** (not in his boss pool, not in the Warrior pool) | K11 | red (*"[]"*) / silent |
+| `test_batch_an.gd` `_test_rewards`: `ok(not class_only.is_empty(),` (on the tree this report mostly cites) → 838 | no zone-boss offer returns a sibling-spec entry (that mixed set) | no zone-boss offer returns a card **only a sibling can reach** | K12f, **K12r** | **narrowing** (§3b): forward both red; reversed HEAD alone red |
+| `test_batch_at.gd` `_kit`: `` # **BATCH HI — RE-POINTED: "THE OPENING" IS ASKED OF THE OPENING.** `names` is `` (on the tree this report mostly cites) → 608 | Stabilize *"OUT of the opening three"* (`spec_abilities`) | Stabilize out of his **live opening** | K4b | red / silent |
+| `test_batch_at.gd` `_kit`: `ok(not Classes.class_draft_pool("mage").has("Stabilize"),` → 641 | Stabilize *"spec-only"* — absent from the class-wide shelf | Stabilize's **`ENGINE_READ` row** names Resonance's engine; the door refuses it bare and offers it held | K3 | red (*"row: ''"*) / silent |
+| `test_batch_au.gd` `_live_fallback_generic`: `ok(Classes.spec_draft_pool(String(probe["spec"])).has(name),` → 682 (×2) | Firestorm / Rime *"drafts from the <spec> instead"* | each in **`draft_pool("mage")`** | K1 | red ×2 / silent |
+| `test_batch_au.gd` `_live_capstones`: `ok(Classes.spec_draft_pool("arcanist").has("Magi's Wrath"),` → 803 | Magi's Wrath *"drafts from the Arcanist"* | in **`draft_pool("mage")`** | K1 | red / silent |
+| `test_batch_au.gd` `_live_debug_grant`: `sibling_names.append(sn)` (on the tree this report mostly cites) → 980 | the debug grant holds no sibling-spec entry (siblings' **shelves** counted as theirs) | the grant holds no **sibling boss card no hero of the class can draft**; the set asserted non-empty | K14f, **K14r** | **narrowing** (§3b): forward both red; reversed HEAD alone red |
+| `test_batch_av.gd` `_kit_and_pool`: `ok(not Classes.class_draft_pool("cleric").has("Resurrection")` → 316 | Resurrection / Intercession not on the Cleric class-wide shelf | both are **`ENGINE_READ` rows** on Mercy: refused bare, offered held | K3 | red (*"rows: '', ''"*) / silent |
+| `test_batch_aw.gd` `_authored_fallbacks`: `ok(Classes.spec_draft_pool("inquisitor").has("Sacred Resolve"),` → 470 | Sacred Resolve *"drafts from the Devout"* | in **`draft_pool("cleric")`** | K1 | red / silent |
+| `test_batch_aw.gd` `_authored_fallbacks`: `ok(Classes.spec_draft_pool("inquisitor").has("Bulwark of Fortitude"),` → 472 | Bulwark of Fortitude, the same | the same | K1 | red / silent |
+| `test_batch_ay.gd` `_magnitudes`: `ok(bool(kc["found"]) and int(kc["cost"]) == int(kc["base_cost"]) - 10` → 415 | a retired payload edits Kill Command *"which every Beastmaster owns"* | the payload lands on Kill Command **as a Hunter gets it — off his class's one pool** | K1, K9 | red (*"found false"*) / silent |
+| `test_batch_ay.gd` `_magnitudes`: `ok(bool(hi["found"]) and int(hi["cost"]) == int(hi["base_cost"]) - 10,` → 422 | Hunter's Instinct, the same | the same | K1, K9 | red / silent |
+| `test_batch_bb.gd` `_ashes_pools`: `# GS §1 — a lineage opens with its engine's enablers, the class basic and the` → 772 | no Mage lineage's `spec_abilities` holds Ashes of Al'ar (nine checks) | no Mage lineage **opens** with it (three) | K4b | red / silent |
+| `test_batch_bo.gd` `_pools`: `# "One of four heroes had no draft" was true while a lineage drew its own` → 198 (×3) | the Warrior shelf is NAMED (*"one of four heroes had no draft"*) | each shelf NAMED — **an authoring location** — and **wholly inside the Warrior pool** | K1 | red ×3 / silent |
+| `test_batch_bo.gd` `_cores`: `ok(CAP - slots >= 3,` → 386 | `CAP - core_slots` ≥ 3 (the enablers' bar entries, which take no slot) | `CAP - (lineage_slots + kit_slots)` ≥ 3 — **what the opening uses inside the count** | K7 | red (*"2 of 7; 5 used"*) / silent |
+| `test_batch_bp.gd` `_pools`: `# pool: an enabler on a SIBLING's shelf reaches every hero of the class, which is` (on the tree this report mostly cites) → 289 | an enabler absent from its **own** shelf | absent from the **class's one pool** — Quick Shot still asked; a walk guard beside it | K6 | red on Bloodlust **and Quick Shot** / silent |
+| `test_batch_br.gd` `_pools`: `` # what makes either card drawable — asked through `Classes.draft_pool`. `` (on the tree this report mostly cites) → 293 (×3) | each Warrior can draw Rally (class-wide shelf) | Rally in **`draft_pool("warrior")`** | K2 | red ×3 / silent |
+| `test_batch_br.gd` `_pools`: `ok(Classes.class_draft_pool(Classes.class_of_spec(spec2)).has("Field Dressing"),` → 298 (×3) | each Hunter can draw Field Dressing | Field Dressing in **`draft_pool("hunter")`** | K2 | red ×3 / silent |
+| `test_batch_bw.gd` `_synergy_rule`: `var at := src.find('"%s":\n' % n)` → 475 | *"kit does not already hold"* a NINE card — **fired zero times** | **repaired**: the twelve lineages' definitions (a NINE name drafted off its own shelf), every class's basic and kit, and the walk asserted | K5, K5b | red (*"also an opening-kit ability"*; *"defined by berserker"*) / **silent — it never ran** |
+| `test_batch_bx.gd` `_own_pools`: `# **BATCH HI — RE-POINTED: THE WARDEN'S SHELF IS A NAMED PART OF THE WARRIOR POOL.**` → 258 | the Warden shelf ≥ 8 *"spec cards to be offered"* | the Warden's shelf ≥ 8 **and wholly inside the Warrior pool** | K1 | red / silent |
+| `test_batch_cb.gd` `_docs`: `# **BATCH HI — RE-POINTED, AND THE SENTENCE IT PINS MOVED WITH IT (GZ's shape).**` → 1251 | `master.html`: *"All twelve specs draft from at least ten"* | `master.html`: **the pool a hero draws, per class, rendered from the live pools** — the sentence moved with it | K10 | red / silent (it pins the old sentence) |
+| `test_batch_cd.gd` `_pools`: `# four classes, named here as the one a card is owed to next and held to its own` → 463 | the thinnest SHELF (`PER_SPEC_DEPTH`) ≥ DY's ten | the thinnest POOL — a no-engine hero's offer, the half that thins — against its class floor | K1, K13 | red / silent |
+| `test_batch_cd.gd` `_pools`: `ok(cpool.size() >= CLASS_FLOOR,` (§2's class-wide floor, **the fiftieth**) → 494 | each class-wide SHELF ≥ `CLASS_FLOOR` (three) | **folded**: `Fixture.class_pool_floors`, four classes × two halves | K1, K13 | red / silent |
 
 **THE CHECK COUNT EITHER SIDE, PER SUITE** (CQ §3's audit — a repair moves the count only where it changes what
 fires):
 
 | suite | HH | HI | move | where it comes from (the ok() trace, §7d) |
 |---|---|---|---|---|
-| `test_batch_au` | 285 | 181 | **−104** | `au:968` fired 121 — every sibling SHELF card counted foreign — and `:980` fires 16, the siblings' boss cards no hero of the class can draft; the new guard `:984` fires once |
-| `test_batch_bb` | 173 | 167 | **−6** | `bb:765` fired 9, each Mage definition table card by card; `:772` fires 3, each Mage lineage's opening once |
-| `test_batch_bp` | 429 | 430 | **+1** | `bp:289` fires 6 as `:280` did; the walk guard `:292` fires once |
-| `test_batch_bw` | 455 | 512 | **+57** | `bw:417` fired **0**; `:475` fires 40 (the twelve lineages' definitions), `:482` 16 (every class's basic and kit), and the guard `:486` once |
-| `test_batch_cd` | 88 | 92 | **+4** | `cd:466`, the class-wide shelf floor, fired 4; the class floors at `:494` fire 8; `:453` → `:463` one for one |
-| the other eleven of the sixteen | — | — | **0** | each re-pointed line fires exactly as the line it replaced — `bo:369` → `:386` twelve times, `br`'s six, `an:829` → `:838` nine hundred — and `ay`'s two arms moved inside the helper they call, not on their `ok(` lines |
+| `test_batch_au` | 285 | 181 | **−104** | `test_batch_au.gd` `_live_debug_grant`: `sibling_names.append(sn)` (on the tree this report mostly cites) fired 121 — every sibling SHELF card counted foreign — and `_live_debug_grant`: `ok(not names.has(entry2),` (its file read from the text around it) fires 16, the siblings' boss cards no hero of the class can draft; the new guard `_live_debug_grant`: `ok(sib_walked > 0,` (its file read from the text around it) fires once |
+| `test_batch_bb` | 173 | 167 | **−6** | `test_batch_bb.gd` `_ashes_pools`: `# GS §1 — a lineage opens with its engine's enablers, the class basic and the` fired 9, each Mage definition table card by card; `_ashes_pools`: `ok(not opens.has("Ashes of Al'ar"),` (its file read from the text around it) fires 3, each Mage lineage's opening once |
+| `test_batch_bp` | 429 | 430 | **+1** | `test_batch_bp.gd` `_pools`: `ok(not Classes.draft_pool(Classes.class_of_spec(spec7)).has(en),` (on the tree this report mostly cites) fires 6 as `_pools`: `# pool: an enabler on a SIBLING's shelf reaches every hero of the class, which is` (on the tree this report mostly cites; its file read from the text around it) did; the walk guard `_pools`: `ok(en_walked >= 1 and Classes.core_enablers("sharpshooter").has("Quick Shot"),` (on the tree this report mostly cites; its file read from the text around it) fires once |
+| `test_batch_bw` | 455 | 512 | **+57** | `test_batch_bw.gd` `_synergy_rule`: `var at := src.find('"%s":\n' % n)` fired **0**; `_names`: `# (DG §2 — 2 CHECKS REMOVED, recorded here at the site).** Two checks read` (its file read from the text around it) fires 40 (the twelve lineages' definitions), `_names`: `ok(not NINE.has(ab2.display_name),` (on the tree this report mostly cites; its file read from the text around it) 16 (every class's basic and kit), and the guard `_names`: `ok(nine_walked >= 40,` (its file read from the text around it) once |
+| `test_batch_cd` | 88 | 92 | **+4** | `test_batch_cd.gd` `_pools`: `print("  thinnest pool (what a no-engine hero is offered): %s at %d, floor %d — the one a card is …` (on the tree this report mostly cites), the class-wide shelf floor, fired 4; the class floors at `_pools`: `ok(bool(fl[0]), String(fl[1]))` (its file read from the text around it) fire 8; `_pools`: `# four classes, named here as the one a card is owed to next and held to its own` (its file read from the text around it) → `_pools`: `ok(thin_who != "" and thinnest >= maxi(thin_floor, 1),` (on the tree this report mostly cites; its file read from the text around it) one for one |
+| the other eleven of the sixteen | — | — | **0** | each re-pointed line fires exactly as the line it replaced — `test_batch_bo.gd` `_cores`: `ok(CAP - slots >= 3,` → `_target`: `for f in _test_tree():` (on the tree this report mostly cites; its file read from the text around it) twelve times, `br`'s six, `test_batch_an.gd` `_test_rewards`: `ok(not class_only.is_empty(),` (on the tree this report mostly cites) → a line JR could not resolve nine hundred — and `ay`'s two arms moved inside the helper they call, not on their `ok(` lines |
 | the six comment-only suites | — | — | **0** | every line fires as on HEAD |
 
 `test_batch_an`'s band FLOOR moved as well (6049 → 6047), for a reading and not for an edit: §7c and §7d.
@@ -157,13 +157,13 @@ only NEW printed and only HEAD printed, and every line below is one it printed.
 |---|---|---|---|---|
 | **K1** | every class's pool stops reading its lineage shelves (the class-wide shelf alone) | `ah_battle`, `aj`, `au`, `aw`, `ay`, `bo`, `bx`, `cd` | **all fourteen of HI's arms there that ask the one pool** (twenty-four FAIL lines) — *"offers a Berserker 8 … (got 6)"*, *"Hack and Slash … drafted: false"*, the two Warrior, three Mage and two Cleric *"drafted off the … one pool"*, *"Kill Command … found false"* and Hunter's Instinct, the three NAMED shelves *"12 of 12 outside it"*, the Warden's *"every one is in the one Warrior pool"*, and `cd`'s thinnest pool and eight class floors | **none** |
 | **K2** | every class's pool stops reading its class-wide shelf | `br` | the six *"can draw Rally / Field Dressing off the … one pool"* | none |
-| **K3** | three `ENGINE_READ` rows deleted — Stabilize, Resurrection, Intercession | `at`, `av` | `at:628` *"(row: '')"*, `av:303` *"(rows: Resurrection '', Intercession '')"* | none |
-| **K4b** | Stabilize and Ashes of Al'ar put in the Mage class kit, where every Mage opens | `at`, `bb` | `at:603` *"STABILIZE IS OUT of the kit he opens with … (opens: [… "Stabilize" …])"*; `bb:765` for all three Mage lineages | none |
+| **K3** | three `ENGINE_READ` rows deleted — Stabilize, Resurrection, Intercession | `at`, `av` | `test_batch_at.gd` `_kit`: `ok(Classes.trimmed_kit_ability("Stabilize") != null,` *"(row: '')"*, `test_batch_av.gd` `_kit_and_pool`: `ok(not Classes.class_draft_pool("cleric").has("Resurrection")` *"(rows: Resurrection '', Intercession '')"* | none |
+| **K4b** | Stabilize and Ashes of Al'ar put in the Mage class kit, where every Mage opens | `at`, `bb` | `test_batch_at.gd` `_kit`: `` # **BATCH HI — RE-POINTED: "THE OPENING" IS ASKED OF THE OPENING.** `names` is `` (on the tree this report mostly cites) *"STABILIZE IS OUT of the kit he opens with … (opens: [… "Stabilize" …])"*; `test_batch_bb.gd` `_ashes_pools`: `# GS §1 — a lineage opens with its engine's enablers, the class basic and the` (on the tree this report mostly cites) for all three Mage lineages | none |
 | **K5** | = HH's c9c: Aegis Wall in the Warrior class kit | `bw` | *"Aegis Wall is also an opening-kit ability — the warrior basic or class kit already holds a NINE name"* | none — HEAD's arm never ran |
 | **K5b** | = HH's c9b: Aegis Wall defined in the Berserker's table | `bw` | *"Aegis Wall is defined by berserker but not drafted off its shelf"* | none |
 | **K6** | Quick Shot on the Beastmaster's shelf, Bloodlust on the Warden's — a SIBLING's shelf | `bp` | *"berserker's enabler 'Bloodlust' is still NOT draftable"* and **the Sharpshooter's Quick Shot** — the case constraint 1 keeps | none |
 | **K7** | the Berserker's authored slots 1 → 3, so his lineage opens two slots INSIDE the count | `bo` | *"berserker keeps at least 3 draftable slots after what it opens with inside the count (2 of 7; 5 used)"* | none |
-| **K8** | Hack and Slash off every shelf — defined, drafted by nobody (DY §3's shape) | `aj` | `aj:409` *"drafted: false"* | none |
+| **K8** | Hack and Slash off every shelf — defined, drafted by nobody (DY §3's shape) | `aj` | `test_batch_aj.gd` `_ability_nodes`: `` # **BATCH HI — RE-POINTED: "IN THE BERSERKER KIT" WAS FALSE.** `spec_abilities` `` *"drafted: false"* | none |
 | **K9** | Kill Command and Hunter's Instinct off every shelf | `ay` | both, *"found false"* | none |
 | **K10** | `master.html`'s old floor paragraph put back | `cb` | *"master.html records the pool a hero draws …"* | none — HEAD pins the old sentence |
 | **K11** | the five sibling boss cards only a sibling reached, put on the Warrior class-wide shelf | `an` | *"the Warrior siblings hold boss cards only a sibling can reach ([])"* | none |
@@ -181,7 +181,7 @@ opening and tested nothing. K4b put both cards in the Mage class kit instead, wh
 
 ### §3b — THE TWO REPAIRS THAT NARROW, AND THE CONTROL RUN REVERSED
 
-`test_batch_an:829` (the zone-boss offer) and `test_batch_au:968` (the debug grant) each called a SIBLING's draft
+`test_batch_an.gd` `_test_rewards`: `ok(not class_only.is_empty(),` (on the tree this report mostly cites) (the zone-boss offer) and `test_batch_au.gd` `_live_debug_grant`: `sibling_names.append(sn)` (on the tree this report mostly cites) (the debug grant) each called a SIBLING's draft
 shelf foreign to the hero. **Under one pool a class it is his own pool**, so the repair takes those cards out: what
 only a sibling reaches now is a card in a sibling's BOSS pool that is in neither the hero's boss pool nor his class's
 one pool. **A narrower set sees nothing the wider one missed, so HD's second arm cannot hold for these two** — HEAD's
@@ -360,7 +360,7 @@ to the backup again**: the same four sums, off the live folder.
 - **The ok() trace** (HH's `trace_ok.py`): in an isolated copy every `ok(` call site is rewritten to print its own
   line, line numbers kept. **Its self-check is the ledger**: in every traced suite the fires sum to the count the
   suite printed, 21 of 22 exactly on HEAD and on HI, and `test_batch_bx` one over on both — a call it takes back on
-  the next line (§7d). **Its bite is `bw:417`**, which fired zero times on HEAD (HH §2a) and fires on HI's tree (§7d).
+  the next line (§7d). **Its bite is `test_batch_bw.gd` `_synergy_rule`: `var at := src.find('"%s":\n' % n)`**, which fired zero times on HEAD (HH §2a) and fires on HI's tree (§7d).
 - **The code-only diff.** Comments stripped quote-aware, blank lines dropped: the six suites whose only edit is the
   helper's population word (`bq`, `bt`, `bu`, `bv`, `ce`, `cp`) are **identical to HEAD's**, and the trace reads every
   one of their lines firing as on HEAD (§7d).
@@ -399,9 +399,9 @@ Decay HI trace all`), HEAD's lines mapped onto HI's through a diff of the two so
   −6, `bp` +1, `bw` +57, `cd` +4, and `an` +3, which is drift (below).
 - **The six comment-only suites move no line**: `bq`, `bt`, `bu`, `bv`, `ce` and `cp` fire line for line as on HEAD.
   So does `ay`, whose two re-points sit inside the helper its `ok(` lines call.
-- **`bw:417` is the trace's bite**: zero fires on HEAD, as HH found (§0 row 2); on HI's tree the repaired arm fires 57.
+- **`test_batch_bw.gd` `_synergy_rule`: `var at := src.find('"%s":\n' % n)` is the trace's bite**: zero fires on HEAD, as HH found (§0 row 2); on HI's tree the repaired arm fires 57.
 - **The ledger holds, with one known exception**: in every traced run the fires sum to the count the suite printed,
-  **but `test_batch_bx` reads one over, on HEAD and on HI alike**, and the one is `bx:572`, a call the suite takes
+  **but `test_batch_bx` reads one over, on HEAD and on HI alike**, and the one is `test_batch_bx.gd` `_live_one_action`: `ok((map.get("_draft_columns") != null) or true, "")   # keep the count honest` (on the tree this report mostly cites), a call the suite takes
   back on the next line with `checks -= 1` (*"keep the count honest"*).
 - **HEAD's `test_batch_cb` read one failure in HI's tree**, *"master.html records the FLOOR, which DS and DY moved to
   ten"*: HEAD's copy pins the `master.html` sentence HI moved (§2), which is K10's control run the other way.

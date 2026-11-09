@@ -71,6 +71,10 @@ const UNPRICED := ["enemy_shield", "cleanse_allies"]
 # folded onto Bone Rattle and the Wretched Bellow, Gall and Mire given damage, the hex special gone — and `check_jo` §1 and §2 hold
 # that nothing else moved; every other figure stands.
 const DATA_BEFORE := "ac418b1c8b40987acda318ffd3b457c2"
+# BATCH JR — THREE APPEARANCE TAGS MOVED AFTER THIS GATE LANDED (JR §1): the Grave Totem and the Rot Behemoth each took a
+# roster, the Orc Hexer a second role. Each is named here and put back before the digest, so it goes on asking whether
+# anything else in the warband's data moved.
+const MOVED_SINCE := {"grave_totem": {"zones": [1.0, 3.0]}, "behemoth": {"zones": [2.0, 3.0]}, "hexer": {"roles": ["hexer"]}}
 const DECK_CLOSED_AT := 25
 const FOE := {"type": "fight", "theme": "Warband", "enemies": ["whelp", "raider", "archer"]}
 const SEATS := ["warrior", "mage", "cleric", "hunter"]
@@ -803,6 +807,12 @@ func _strip(v: Variant) -> Variant:
 func _s4_not_done() -> void:
 	print("\n§4 — no enemy figure but the cooldown moved; the deck closed; Encumbered's grade")
 	var raw: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/enemies.json"))
+	# BATCH JR — THREE APPEARANCE TAGS MOVED AFTER THIS GATE LANDED (JR §1), each named in `MOVED_SINCE` and put back
+	# before the digest, so it goes on asking whether anything else in the warband's data moved.
+	for jr_kind in MOVED_SINCE:
+		if (raw as Dictionary).has(jr_kind):
+			for jr_field in MOVED_SINCE[jr_kind]:
+				raw[jr_kind][jr_field] = (MOVED_SINCE[jr_kind][jr_field] as Array).duplicate()
 	var digest := JSON.stringify(_strip(raw)).md5_text()
 	print("    the data, every cooldown key aside: %s" % digest)
 	ok(digest == DATA_BEFORE, "§4: a figure of the warband moved beside its cooldowns (%s)" % digest)

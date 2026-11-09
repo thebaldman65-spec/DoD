@@ -9361,7 +9361,7 @@ const MALICE_HEAL_WORTH := 0.5
 var malice := 0
 var _malice_dealt := 0  # the hero side's damage this fight not yet a whole point
 # What the pool did this fight: points it was given (`generated`), took (`banked`), let fall at the cap (`wasted`) and paid
-# for healing (`spent`). Read by the instruments; nothing in the game reads it.
+# for healing (`spent`). Read by the instruments, and by three warband heals' log lines, each around its own call.
 var malice_ledger := {"generated": 0, "banked": 0, "wasted": 0, "spent": 0}
 
 

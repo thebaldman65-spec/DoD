@@ -4,6 +4,20 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Three hex carriers met more often, and the record put right (Batch JR) — 2026-11-09
+
+**Why the carriers, not the hexes.** The playtest asked which enemies lay which hex, and the answer was that the hexes are on the
+right enemies and those enemies are rare. A fight's bodies come from a theme's role pools filled from the zone's roster, every
+exact-budget combination equally likely, so a kind's frequency falls out of the rosters it sits in and the roles it fills —
+there is no weight to raise. The Grave Totem and the Rot Behemoth each sat out of one roster, and each takes it now; the Orc Hexer
+already sat in all three, so it takes a second role instead, *sniper*, the Orc Archer's — a ranged caster, two of whose three
+cooling moves strike. Folding the three hexes onto commoner kinds' free damaging moves would have used more machinery and read wrong:
+Sap is a hexer's curse, and a Whelp casting it reads as a bug.
+
+**Why a citation is the text.** A line number decays every time anything above it is edited, and nothing in the tree notices; a
+quoted line in its function decays too, but visibly, because a reader who looks finds it gone. So the documents quote, and a gate
+holds them to it.
+
 ## The party's three answers, built (Batch JQ) — 2026-11-07
 
 **Why a kill that denies, rather than a drain.** The complaint the warband arc came from was that bursting a body down fills the

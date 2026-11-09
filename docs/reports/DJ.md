@@ -49,7 +49,7 @@ The union is written out as `heroes + companions` and hoisted above the status l
 array for every status on the body, and `+` allocates). `check_dj` §4 is the control that catches
 the substitution; it is the section this batch exists to have.
 
-**`battle.gd:17821` / `:17831`.**
+**`scripts/battle.gd` `_resolve_special`, a line JR could not settle between two trees / `_resolve_special`, a line JR could not settle between two trees.**
 
 ### THE SEVEN WITHHELD SITES ARE STAMPED
 
@@ -340,7 +340,7 @@ that reds about one time in eighteen is the expected outcome rather than evidenc
 - **98 `_apply_status` call sites still pass no source**, recorded as owed. They apply buffs, marks
   and hero-side wards, so nothing currently mis-credits off them.
 - **`melted` is still out of reach by SHAPE** — applied through `unit.add_status`
-  (`battle.gd:2553`), which accepts no source argument at all. Stamping it is a signature change.
+  (`scripts/battle.gd` `_run_battle`: `u.add_status("melted", "Melt Armor", "-%d%%" % melt_pct,`), which accepts no source argument at all. Stamping it is a signature change.
 - **The seven remaining ambiguous sites** are unchanged and still named in `docs/reports/DI.md` §2:
   Umbral Mirror's rebound, Chain Ignition, the Cursed Visage, Spread of Madness, the bewitched
   strike, Hemorrhage, and the Hoarfrost modifier stamp. Getting the source wrong is worse than

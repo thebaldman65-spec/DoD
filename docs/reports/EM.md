@@ -19,7 +19,7 @@ every log, off the streams, never a tally and never an exit code.
 |---|---|---|
 | **59 clauses across 32 runes write a live talent node's own counter** | **true, and reproduced two ways** | EJ's audit page parses to exactly 59 TALENT clauses in 32 runes; an independent derivation off a LIVE `LANE_TREES` dump agrees clause-for-clause |
 | **56 of the 59 need only a field of their own** | **true** | 59 − the 3 with no home = 56, and all 56 re-keyed with the read site summing the pair |
-| **AL shipped this repair three times** | **true** | `rune_grudge_bonus`, `rune_vigil_bonus`, `rune_on_edge_ranks`, all three live, with the method and the MAX/SUM rule in the source comments at `battle.gd:9267` and `:10244` |
+| **AL shipped this repair three times** | **true** | `rune_grudge_bonus`, `rune_vigil_bonus`, `rune_on_edge_ranks`, all three live, with the method and the MAX/SUM rule in the source comments at `scripts/battle.gd` `_resolve`: `+ attacker.rune_grudge_bonus` and `_resolve`: `var oe_rune_thr := (20.0 + 5.0 * strike_target.rune_on_edge_ranks) \` (its file read from the text around it) |
 | **the rule any re-key needs: a threshold takes the MAX, a payout SUMS** | **true, and it has ZERO applications here** | every one of the 56 is a payout. The `> 0` tests beside them are presence tests, not thresholds — see §1 |
 | **16 runes are wholly talent-keyed** | **true** | the same sixteen EJ names, reproduced from the data |
 | **all 59 sit in the 48 spec runes; the 5 universal and 12 class-wide carry none** | **true** | |

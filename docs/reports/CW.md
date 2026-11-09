@@ -111,7 +111,7 @@ on two-letter codes sorting lexically, and a three-letter batch code needs one m
 of the fourteen.**
 
 ### ONE DOCUMENTATION FAULT CORRECTED TOWARD THE CODE
-**The Architecture section said the run save was `v7`. It is `v10`** (`run_state.gd:1752` refuses
+**The Architecture section said the run save was `v7`. It is `v10`** (`scripts/run_state.gd` `load_run`: `if save_version < 10:` refuses
 anything below 10). Corrected in place, per the standing rule that documentation moves toward
 code and never the reverse.
 

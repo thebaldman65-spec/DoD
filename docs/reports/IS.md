@@ -53,7 +53,7 @@ measured — 10 of IQ's 171 false facts sat in a history clause. **No save versi
 | 13 | §2a premise 3: a gate pins a loadout size a drop moves | **None** — no fixture holds either card. |
 | 14 | §2a premise 4: a surface exists at the load | **True** — `Run.load_notes`, read by the map's arrival toast (HR §1). **And it was one unwrapped 1,280-px line**, which two notes ran off — it wraps now. |
 | 15 | §2b: a payload is a dictionary of fields applied by `set()`, and today's definition names its own fields | **True** — `Runes.definition` / `Runes.payload_fields`; a TEMPLATE rune's noun names its own too. The ruling has the right shape. |
-| 16 | §3a: three sites, at `battle.gd:13611` (recoil) and `27214` (bleedout) besides the blow | **Four** — Blowback's outward split is the same rounding (dormant: nothing writes `blowback`). The line numbers had moved. |
+| 16 | §3a: three sites, at `scripts/battle.gd` `_resolve`, a line JR could not settle between two trees (recoil) and `27214` (bleedout) besides the blow | **Four** — Blowback's outward split is the same rounding (dormant: nothing writes `blowback`). The line numbers had moved. |
 | 17 | §3a: no text promises the floor | **True** — *split evenly* is true as written now; no text moved. |
 | 18 | §3b: the three rows' line numbers and readings | **True**; each driven (§3b). |
 | 19 | §3c: Tithe's comment repeats the brief's four doors | **False** — HEAD's comment already names the reachable three (Broken, Deadened, Constitution or Muffled). The census read IR's working tree mid-edit. |

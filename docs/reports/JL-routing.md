@@ -142,31 +142,31 @@ Each bullet gives the diagnostic first and ends with the trigger that would have
 
 - `` ### THE TALENT LAYER IS BUILT (FX); FIVE THINGS IN IT, AND SEVEN OF FW'S EDGES, ARE THE DESIGNER'S `` — **NOT ROUTED · PLAINLY.**
   Its edge 8 is what CX's *"Enemy interference as a status"* means on the project's record: *ENEMY INTERFERENCE WITH
-  THE SKILL CHECK — priced in `SR-INTERFERE` … all four need one hero-to-bar hook* (state.md:1909). `docs/systems-recon.html`
-  §2 (*SR-INTERFERE — ENEMIES ATTACKING THE SKILL CHECK*, :1706–1719) quotes that very state line as the idea's record.
-  JL amended the line (state.md:2788) to stand its four hexes beside it: *"Not yet specified as the designer named it;
+  THE SKILL CHECK — priced in `SR-INTERFERE` … all four need one hero-to-bar hook* (`docs/state.md` under `THE TALENT LAYER IS BUILT (FX); FIVE THINGS IN IT, AND SEVEN…`: `4. **THE FOUR CLASS PASSIVES** — Threatening Presence, Holy Conduit, Tracker, Evocation — are …`). `docs/systems-recon.html`
+  §2 (*SR-INTERFERE — ENEMIES ATTACKING THE SKILL CHECK*, `docs/systems-recon.html` (file scope): `<hr><h2 id="sr-interfere">&sect;2 &mdash; SR-INTERFERE &mdash; ENEMIES ATTACKING THE SKILL CHECK …` to `<td><i>&ldquo;Enemy interference as a status. Not yet specified.&rdquo;</i></td></tr>` (its file read from the text around it)) quotes that very state line as the idea's record.
+  JL amended the line (`docs/state.md` under `Carried, with measurements attached`: `the surface nobody swept, and it stood wrong from DA to DG.** **When a batch reverts two` (on the tree this report mostly cites)) to stand its four hexes beside it: *"Not yet specified as the designer named it;
   JL's four hexes are the warband's first statuses built to take capacity"*. No hex touches the skill check, so the
   amendment points the item at the wrong mechanic (findings M2).
   Its item 4 also names one of the party's cleanses, the talent *Cleanse Debuffs Each Turn* (`tn_cleanse`,
-  talents.gd:169). §2 premise 1 enumerates those cleanses. JL found the talent through FOUND AT HO, which was opened, but
+  `scripts/talents.gd` `const TREE`: `{"id": "tn_cleanse", "name": "Cleanse Debuffs Each Turn", "tier": 2,`). §2 premise 1 enumerates those cleanses. JL found the talent through FOUND AT HO, which was opened, but
   calls it *"the cleanse talent where drafted"*, and a talent is bought, not drafted (findings L2).
   No trigger on its row names enemy interference or a cleanse. **Would have routed it: *enemy interference*** (with
   *SR-INTERFERE*). The row stands at 391 B, so adding the trigger needs a trim (its label or *crest money*) to stay under
   `check_is` §5's 400.
 - `` ### THE SHARED MARK'S MAGNITUDE IS PROPOSED, NOT RULED `` — **NOT ROUTED · ARGUABLY, WITH A CONSEQUENCE.** It records
   Focus as the Sharpshooter's own meter. His consecutive attack on his mark pays it 20, and an ally's strike on that mark
-  pays `SHARED_MARK_FOCUS` 5. Both gains run through `_gain_focus` into `second_resource` (battle.gd:27653) and never reach
+  pays `SHARED_MARK_FOCUS` 5. Both gains run through `_gain_focus` into `second_resource` (`scripts/battle.gd` `_focus_mark`: `# ONE function, both payout sites, so they cannot disagree.` (on the tree this report mostly cites)) and never reach
   the `resource` setter, which is where Sap is read. Four player-facing Sap texts promise to cut *"Rage, Mana or Focus"*
   (findings H1). This block is a closed record that Focus is not the bar. Its triggers name *Sharpshooter Focus* and
   *SHARED_MARK_FOCUS 5*, and no subject names either. **Would have routed it: *Focus gain*** (or *resource gain*).
 - `` ### THE `master.html` STAMP CAN SIT MANY BATCHES STALE AND PASS `` — **NOT ROUTED (BY THE BRIEF) · ARGUABLY, HONOURED.**
   No gate asks whether the stamp moved when the file moved, so a batch that edits `docs/master.html` bumps the stamp by
-  hand. JL edited the file and bumped it (master.html:4, *2026-11-05 (Batch JL …)*). JL's one edit to `test_batch_ce.gd`,
+  hand. JL edited the file and bumped it (`docs/master.html` (file scope): `<p align="right"><b>Last updated: 2026-11-05 (Batch JL &mdash; the spend costs no turn, and the …` (on the tree this report mostly cites), *2026-11-05 (Batch JL …)*). JL's one edit to `test_batch_ce.gd`,
   the newest of the fourteen stamp suites, is the glossary count (109 → 113), not the stamp arm. No subject names the
   stamp. Its own trigger *test_batch_ce* names a file the work edited. That is a work-side match, which the routing does
   not run. **No trigger owed.**
 - `` ### FOUND AT GY AND NOT FIXED `` — **NOT ROUTED · ARGUABLY, HONOURED.** Nothing asserts where an entry sits in
-  `docs/design-notes.md`, so newest-first is the batch's to keep. JL's entry stands at the top (design-notes.md:7).
+  `docs/design-notes.md`, so newest-first is the batch's to keep. JL's entry stands at the top (`docs/design-notes.md` under `The spend costs no turn, and the warband learns four hexes (…`: `## The spend costs no turn, and the warband learns four hexes (Batch JL) — 2026-11-05` (on the tree this report mostly cites)).
   `combat-rules.md` has no ceiling, and JL took it from 48,754 B to 50,109 B (48.9 KiB, against GR's proposed 70). The
   order rule was also reachable through GY's RULINGS OWED, which the positional-picks population opened. **Would have
   routed it: *design-notes entry*.**
@@ -182,7 +182,7 @@ Each bullet gives the diagnostic first and ends with the trigger that would have
   **Would have routed it: *new gate*.** The row stands at 389 B, so the trigger needs a trim.
 - `` ### FOUR GATES CAN WRITE THE PLAYER'S `relics.json` THE DAY A RELIC IS LOCKED `` — **NOT ROUTED (BY THE BRIEF) ·
   ARGUABLY, HONOURED.** A gate that runs live fights writes the player's file unless it redirects `Relics.save_path`.
-  `check_jl` points it at `user://jl_relics.json` before its fights (check_jl.gd:46, :161), as `check_gj` does, so it is
+  `check_jl` points it at `user://jl_relics.json` before its fights (`check_jl.gd` `const SCRATCH_RELICS`: `const SCRATCH_RELICS := "user://jl_relics.json"`, `check_jl.gd` `_fresh_meta`: `Relics.save_path = SCRATCH_RELICS` (its file read from the text around it)), as `check_gj` does, so it is
   not a fifth writer. Its trigger *Relics.save_path* matches the work's own text. **No trigger owed.**
 - `` ### FY §1: THREE NODES PAID BY WHO ELSE HELD THEM, AND TODAY'S COUNT DOUBLES FOUR ITEMS `` — **NOT ROUTED · ARGUABLY,
   BY NAME ONLY.** JL made *hex* a family noun on four player-facing surfaces. This block carries Deepening Hex, one of
@@ -194,8 +194,8 @@ Each bullet gives the diagnostic first and ends with the trigger that would have
   leaving with its block. It mended two by hand (THE WARBAND's SPENDS and the sim's recorded figures) and re-stamped eight
   that its edits moved. `index_stamp.py` reads 161 entries, 0 missing or stale. **One mend was missed.** FOUND AT JK's
   row was re-stamped, but its label still reads *"the fallback on every kind … the hole JL is sized against"*. JL closed
-  the first (the block's own new sentence, state.md:587) and was not sized against the second: brief §4 left it, and the
-  WHERE block says it *"stays named"* (state.md:282). The preamble's rule, *re-read the row against the block, mend its
+  the first (the block's own new sentence, `docs/state.md` under `FOUND AT JL AND NOT FIXED`: `` - **TWO GATES READ A LITTLE LESS SHARPLY** (the positional readers): `check_in` §3's needle … ``) and was not sized against the second: brief §4 left it, and the
+  WHERE block says it *"stays named"* (`docs/state.md` under `WHERE THE PROJECT IS`: `- **Next: the rulings below, and the arc's fifth batch** — JM: the bargain deck's grades re-read …`). The preamble's rule, *re-read the row against the block, mend its
   label*, was not met there (findings M6).
 
 Read and found to bear on nothing JL wrote: the other 40 closed blocks. They include every other ruling owed from GJ

@@ -227,8 +227,8 @@ moments. **On the initiative, no — because only one of the two has one.**
 
 ### AND THE TWO STACK, MEASURED
 
-The two damage terms are **adjacent `if` blocks in the hero strike loop**, `battle.gd:8712` and
-`battle.gd:8715`, `raw *= 1.15` each, with no `elif` between them. Twelve seeded blows on a Warden,
+The two damage terms are **adjacent `if` blocks in the hero strike loop**, `scripts/battle.gd` `_resolve`: `if attacker.has_status("wrath"):` and
+`scripts/battle.gd` `_resolve`: `if attacker.has_status("zeal"):`, `raw *= 1.15` each, with no `elif` between them. Twelve seeded blows on a Warden,
 run in both orders:
 
 | arm | forward order | reversed order |

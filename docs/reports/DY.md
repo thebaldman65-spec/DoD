@@ -28,7 +28,7 @@ Recorded first, because four of them changed the work.
    quoted twice in the record was wrong by 28.
 3. **DX §1 reports that its sweep left exactly SIX equalities against the draft, all in
    `test_batch_cd`. A SEVENTH SURVIVED, AND IT IS THE ONE THIS BATCH WOULD TRIP.**
-   `test_batch_bq:184` reads `ok(live.size() == 6, …)` where `live` was assigned from
+   `test_batch_bq.gd` `_pools`: `ok(live.size() == 6, "§3/§4: the %s class pool holds six (%d)" % [cls, live.size()])` reads `ok(live.size() == 6, …)` where `live` was assigned from
    `class_draft_pool(cls)` two lines above — so a sweep matching the pool ACCESSOR inside the `ok()`
    condition could not see it. Mana Shield takes the Mage class pool to seven. **A condition reading
    a local is still a condition reading the pool.**
@@ -174,7 +174,7 @@ the finding:
   game. **The spec with the emptiest pool also had the least room to receive a card**, which is why
   the card-shaped fallbacks DV priced were worth least exactly where the hole was worst.
 
-**AND THE GATE WENT RED ON THE FIX, WHICH IS WHAT IT IS FOR.** `check_dv:185` pinned Holy's pool at
+**AND THE GATE WENT RED ON THE FIX, WHICH IS WHAT IT IS FOR.** `check_dv.gd` `_s2_boss_depth`: `ok(Classes.SPEC_POOLS.get("holy", []).size() == 1,` (on the tree this report mostly cites) pinned Holy's pool at
 ONE as a staleness tripwire on an open finding; DX examined it in its sweep and left it standing on
 exactly that reasoning. It failed the moment DY §2 landed and said the report was stale. It reads
 `== 3` now, beside a derived count of the specs that can still be emptied.

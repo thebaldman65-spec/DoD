@@ -34,13 +34,13 @@ table carries four fields with a consequence and they have exactly ten readers b
 
 | field | readers | what it does |
 |---|---|---|
-| `rung` | `battle.gd:1078`, `battle.gd:23193`, `run_sim.gd:240` | the enemy-ability filter, the meta gate, the report header |
-| `mult` | `run_state.gd:1084` (`zone_base_mult`), `run_state.gd:1105` (`zone_base_mult_hp`) | ATTACK, and HEALTH with the rung floored out of it |
-| `severity_floor` | `run_state.gd:2366` (`roll_offer`) | what the guaranteed mild bargain may be |
-| `fixed_modifier` | `run_state.gd:2413` (`arm_fixed_modifier`) | rung 3 only |
+| `rung` | `scripts/battle.gd` `_enemy_config`: `var cfg := Enemies.config(kind, Run.difficulty_rung() if Run.active else Enemies.MAX_RUNG)`, `scripts/battle.gd` `_resolve_boss`: `Profile.note_end_boss(Run.difficulty_rung())`, `scripts/run_sim.gd` `start_run`: `diff_rung = run.difficulty_rung()` | the enemy-ability filter, the meta gate, the report header |
+| `mult` | `scripts/run_state.gd` `zone_base_mult`: `return _zone_ladder(slot) * difficulty_mult()` (`zone_base_mult`), `scripts/run_state.gd` `zone_base_mult_hp`: `return _zone_ladder(slot) * maxf(difficulty_mult(), 1.0)` (`zone_base_mult_hp`) | ATTACK, and HEALTH with the rung floored out of it |
+| `severity_floor` | `scripts/run_state.gd` `roll_offer`: `var floor_sev := int(difficulty_def()["severity_floor"])` (`roll_offer`) | what the guaranteed mild bargain may be |
+| `fixed_modifier` | `scripts/run_state.gd` `arm_fixed_modifier`: `if not bool(difficulty_def()["fixed_modifier"]):` (on the tree this report mostly cites) (`arm_fixed_modifier`) | rung 3 only |
 
-**`Run.difficulty` outside that block is display and save only** — `draft_screen.gd:141`,
-`battle.gd:23994`, and the two setters at `run_state.gd:463` / `:1989`.
+**`Run.difficulty` outside that block is display and save only** — `scripts/draft_screen.gd` `_draw_screen`: `var def: Dictionary = Run.DIFFICULTIES[key]`,
+`scripts/battle.gd` `_run_snapshot`: `"difficulty": Run.difficulty,`, and the two setters at `scripts/run_state.gd` `new_run`: `difficulty = difficulty_id(diff)` / `load_run`: `difficulty = difficulty_id(String(data.get("difficulty", "wanderer")))` (its file read from the text around it).
 
 ### THE ANSWER: **NO. AND HEALTH IS NOT A LEVER BETWEEN THESE TWO RUNGS AT ALL.**
 
@@ -56,7 +56,7 @@ warden    z1 atk=1.000000 hp=1.000000  z2 atk=1.500000 hp=1.500000  z3 atk=2.200
 rung 1's 0.50 as 1.00 and rung 2's 1.00 as 1.00. **EO floored the rung out of the health path to
 stop rung 1 being short. The same floor makes rung 2's enemies exactly as durable as rung 1's.**
 
-*Zone 1, slot 8, reproducing `battle.gd:1604-1616`'s own arithmetic including the ceil-to-10:*
+*Zone 1, slot 8, reproducing `scripts/battle.gd` `_spawn_units`: `cfg.erase("tint")` to `* (1.0 + 0.02 * zone_tier)))`'s own arithmetic including the ceil-to-10:*
 
 | enemy | rung 1 hp | rung 2 hp | rung 1 atk | rung 2 atk | stability |
 |---|---|---|---|---|---|
@@ -298,17 +298,17 @@ policies **exclude** — each read off the code, not off the document.
 
 | the decision | what the bot does | where |
 |---|---|---|
-| **which ability to cast** | a fixed per-spec rotation of `if` clauses, identical on turn 1 and turn 30 | `battle.gd:4367` |
-| **which drafted card to cast** | **the first usable one in slot order** — and only when the kit rotation has already fallen through to the basic attack | `battle.gd:4042` |
-| **items in battle** | one Health Potion, drunk when a hero *opens a turn* below 35% HP. **Bomb, revive, defense and mana items are never used at all** — the branch reads `items["health"]` and nothing else | `battle.gd:3581` |
+| **which ability to cast** | a fixed per-spec rotation of `if` clauses, identical on turn 1 and turn 30 | `scripts/battle.gd` `_autoplay_pick_kit`: `func _autoplay_pick_kit(u: BattleUnit) -> Array:` |
+| **which drafted card to cast** | **the first usable one in slot order** — and only when the kit rotation has already fallen through to the basic attack | `scripts/battle.gd` `_bot_drafted_pick`: `func _bot_drafted_pick(u: BattleUnit) -> Array:` |
+| **items in battle** | one Health Potion, drunk when a hero *opens a turn* below 35% HP. **Bomb, revive, defense and mana items are never used at all** — the branch reads `items["health"]` and nothing else | `scripts/battle.gd` `_player_turn`: `if autoplay and RunSim.active and RunSim.items_on and not u.is_companion \` |
 | **items before a fight** | never. There is no pre-emptive or offensive item use of any kind | — |
-| **routing** | one tier ahead only: it ranks the nodes it can reach *from where it stands* and takes the best-ranked | `run_sim.gd:376` |
-| **shops** | heal-first, then the priciest affordable thing not already carried. **Rune picks ignore build synergy entirely**, and the fight-first route means it reaches **0.0 of 0.0 shops** on this party | `run_sim.gd:507` |
-| **bargains** | severity-extreme: the harshest offered above 60% party HP, the mildest below. It never reads what the modifier *does* | `run_sim.gd:393` |
+| **routing** | one tier ahead only: it ranks the nodes it can reach *from where it stands* and takes the best-ranked | `scripts/run_sim.gd` `_route_pick`: `static func _route_pick(run: Node, slot: int, reach: Array) -> int:` |
+| **shops** | heal-first, then the priciest affordable thing not already carried. **Rune picks ignore build synergy entirely**, and the fight-first route means it reaches **0.0 of 0.0 shops** on this party | `scripts/run_sim.gd` `_shop_visit`: `static func _shop_visit(run: Node) -> void:` |
+| **bargains** | severity-extreme: the harshest offered above 60% party HP, the mildest below. It never reads what the modifier *does* | `scripts/run_sim.gd` `_take_offer`: `static func _take_offer(run: Node) -> void:` |
 | **ability picks** | the first entry in the offer | `trophies=first-in-pool` |
 | **events** | the first valid option | `events=first-valid` |
-| **talents** | one lane, cheapest node first, **the tree's FIRST lane — 24 of 36 lanes have never been measured at all** | `run_sim.gd:972` |
-| **the timing bar** | 20% Perfect, otherwise Good, on offence; on defence it rolls 20% and otherwise takes **no mitigation at all** | `battle.gd:3877`, `DEF_BOT_PERFECT` |
+| **talents** | one lane, cheapest node first, **the tree's FIRST lane — 24 of 36 lanes have never been measured at all** | `scripts/run_sim.gd` `install_builds`: `static func install_builds(run: Node) -> void:` |
+| **the timing bar** | 20% Perfect, otherwise Good, on offence; on defence it rolls 20% and otherwise takes **no mitigation at all** | `scripts/battle.gd` `_player_turn`: `var one := "perfect" if roll < 0.20 else ("fail" if roll > 0.85 else "good")`, `DEF_BOT_PERFECT` |
 
 **A player does every one of those things better after their first run, and several of them are
 the whole of the difficulty.** The two that matter most at rung 2 specifically are the ones §1b
@@ -362,11 +362,11 @@ question in front of the designer.
 **RUNE OF THE DEEP BOND** — 100g, rare, `spec:beastmaster`, lane *devotion*. Both clauses scale on
 Loyalty: `rune_wild_communion_step` 1.5 and `rune_absolute_step` 3.0.
 
-· *What it does today, at the read sites.* `_bond_step` (`battle.gd:13349`) computes
+· *What it does today, at the read sites.* `_bond_step` (`scripts/battle.gd` `_bond_step`: `var step := BOND_STEP + 0.01 * (hunter.absolute_step + hunter.rune_absolute_step)`) computes
   `BOND_STEP + 0.01 * (absolute_step + rune_absolute_step)`, doubled again by Ancient Pact; the
   Loyalty strike step is `5.0 + wild_communion_step + rune_wild_communion_step`
-  (`battle.gd:13444`), and the same sum is read again for a bodiless blow (`:20730`) and for a
-  living companion's damage (`:21860`). **Four read sites, all live.**
+  (`scripts/battle.gd` `_stamp_loyalty_chip`: `var strike_step := 5.0 + hunter.wild_communion_step + hunter.rune_wild_communion_step`), and the same sum is read again for a bodiless blow (`_ghost_hit`: `+ hunter.rune_wild_communion_step)) * l) \` (its file read from the text around it)) and for a
+  living companion's damage (`_comp_dmg_mult`: `var step := 0.05 + 0.01 * (pm.wild_communion_step + pm.rune_wild_communion_step)` (its file read from the text around it)). **Four read sites, all live.**
 · *Theme.* The bond that deepens rather than the bond that spreads: the longest-standing companion
   is the one that has earned something.
 · *Axis.* **DEPTH** — read the accumulated meter and pay its depth. The row-8 shape applied to an
@@ -382,8 +382,8 @@ Loyalty: `rune_wild_communion_step` 1.5 and `rune_absolute_step` 3.0.
 `rune_quick_whistle_ranks` 1 and `rune_momentum_ranks` 8.
 
 · *What it does today.* The first shaves one turn off the shared Swap Companion cooldown
-  (`battle.gd:20522`, floored at zero); the second is Feral Momentum's per-distinct-beast
-  multiplier, read for a bodiless blow (`:20732`) and for a companion's damage (`:21862`).
+  (`scripts/battle.gd` `_do_summon`: `- hunter.rune_quick_whistle_ranks, 0)`, floored at zero); the second is Feral Momentum's per-distinct-beast
+  multiplier, read for a bodiless blow (`_ghost_hit`: `if hunter.momentum_ranks + hunter.rune_momentum_ranks > 0 \` (its file read from the text around it)) and for a companion's damage (`_comp_dmg_mult`: `if pm.momentum_ranks + pm.rune_momentum_ranks > 0 and pm.kinds_summoned.size() > 0:` (its file read from the text around it)).
 · *Theme.* The handler who never shows the same animal twice.
 · *Axis.* **BREADTH / TEMPO** — pay for the SWAP itself rather than for what the swapped-in beast
   hits for.
@@ -401,7 +401,7 @@ Loyalty: `rune_wild_communion_step` 1.5 and `rune_absolute_step` 3.0.
 
 · *What it does today.* The first two are the other two runes' clauses; the third is its own —
   `base_hp = stats[0] * (1.0 + companion_hp_pct + rune_companion_hp_pct)` at the summon
-  (`battle.gd:20543`).
+  (`scripts/battle.gd` `_do_summon`: `+ hunter.rune_companion_hp_pct)))`).
 · *Theme.* The beast that comes home. The only one of the three about the companion's body.
 · *Axis.* **SURVIVAL** — the companion living through the fight rather than hitting harder in it.
 · *Balance.* **Safest of the three.** It adds no damage to a spec whose damage is already
@@ -424,7 +424,7 @@ universal rune does either — **and the companion IS the spec.**
 `rune_seasoned_off_bonus` +0.10 and `rune_seasoned_def_bonus` −0.15.
 
 **ITS TWO CLAUSES ARE THE TRADE, AND THE ARITHMETIC IS EXACT.** Seasoned Fighter's two stances
-resolve at `battle.gd:9335` and `:9809`:
+resolve at `scripts/battle.gd` `_resolve`: `raw *= 1.15 + attacker.seasoned_off_bonus \` and `_resolve`: `raw *= maxf(0.85 - strike_target.seasoned_def_bonus` (its file read from the text around it):
 
 | | deals | takes |
 |---|---|---|
@@ -609,7 +609,7 @@ else. **Both are read by ZERO targets**, derived by grepping `res://docs/reports
 suite or gate opens, and the needle sweep is a formality rather than the argument.
 
 **ONE OF THE TWO CORRECTIONS IS THIS BATCH'S OWN TRAP CLOSING ON IT.** §1's reader table cited
-`run_state.gd:2406` for `arm_fixed_modifier` — measured before the eight-line comment this batch
+`scripts/run_state.gd` `arm_fixed_modifier`: `if not bool(difficulty_def()["fixed_modifier"]):` for `arm_fixed_modifier` — measured before the eight-line comment this batch
 inserted at line 2381. **The guard is at 2413 now.** A comment that documents a mechanism moves
 every line number below it, including the ones in the report that documents the same mechanism.
 

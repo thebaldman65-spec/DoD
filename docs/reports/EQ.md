@@ -61,39 +61,39 @@ only these.**
 
 | site | what it computes |
 |---|---|
-| `battle.gd:13349` `_bond_step` | `BOND_STEP + 0.01 × (absolute_step + rune_absolute_step)`, doubled by Ancient Pact |
-| `battle.gd:13363` `_bond_mult` | `1 + step × Loyalty` — **the boon itself** |
-| `battle.gd:21860` `_comp_dmg_mult` | the companion strike step, `0.05 + 0.01 × (wild_communion_step + rune_wild_communion_step)` per stack |
-| `battle.gd:20729` `_ghost_hit` | the same step, on a bodiless blow (Call of the Wild, Ghost Pack) |
-| `battle.gd:9379` | Canis's +15% per wounded enemy, **scaled by `_bond_mult`** |
-| `battle.gd:9437` | Ursus's mitigation, `_bond_mult` **clamped at `BOND_MITIGATION_MAX` 0.75** |
-| `battle.gd:7248` | Savage Presence's taunt pull, `_bond_mult` **clamped at 1.0** |
-| `battle.gd:13462` `_party_crit_bonus` | Aguila's party crit, `0.10 × _bond_mult` |
-| `battle.gd:13444` | **the chip's own text** — a display read, not a payout |
+| `scripts/battle.gd` `_bond_step`: `var step := BOND_STEP + 0.01 * (hunter.absolute_step + hunter.rune_absolute_step)` `_bond_step` | `BOND_STEP + 0.01 × (absolute_step + rune_absolute_step)`, doubled by Ancient Pact |
+| `scripts/battle.gd` `_bond_mult`: `var curve := 1.0 + _bond_step(hunter) * int(hunter.loyalty.get(kind, 0))` `_bond_mult` | `1 + step × Loyalty` — **the boon itself** |
+| `scripts/battle.gd` `_comp_dmg_mult`: `var step := 0.05 + 0.01 * (pm.wild_communion_step + pm.rune_wild_communion_step)` `_comp_dmg_mult` | the companion strike step, `0.05 + 0.01 × (wild_communion_step + rune_wild_communion_step)` per stack |
+| `scripts/battle.gd` `_ghost_hit`: `var raw := dmg * (1.0 + (0.05 + 0.01 * (hunter.wild_communion_step` `_ghost_hit` | the same step, on a bodiless blow (Call of the Wild, Ghost Pack) |
+| `scripts/battle.gd` `_resolve`: `var bm_canis := _bond_mult(attacker, "canis")` | Canis's +15% per wounded enemy, **scaled by `_bond_mult`** |
+| `scripts/battle.gd` `_resolve`: `var sp_ursus := _bond_mult(strike_target, "ursus")` | Ursus's mitigation, `_bond_mult` **clamped at `BOND_MITIGATION_MAX` 0.75** |
+| `scripts/battle.gd` `_choose_enemy_action`: `var sp_pull := minf(0.15 * _bond_mult(sp_c.pack_master, "ursus"), 1.0)` | Savage Presence's taunt pull, `_bond_mult` **clamped at 1.0** |
+| `scripts/battle.gd` `_party_crit_bonus`: `best = maxf(best, 0.10 * _bond_mult(h, "aguila"))` `_party_crit_bonus` | Aguila's party crit, `0.10 × _bond_mult` |
+| `scripts/battle.gd` `_stamp_loyalty_chip`: `var strike_step := 5.0 + hunter.wild_communion_step + hunter.rune_wild_communion_step` | **the chip's own text** — a display read, not a payout |
 
 **CLASS 2 — STACK-COUNT READERS. Linear in the raw meter; they never see the curve. A payout
 flattening leaves every one of them exactly where it is.**
 
 | site | what it pays |
 |---|---|
-| `battle.gd:18461` **Unleash** | `0.20 × stacks × Attack` (0.25 Perfect) + 12 flat Break, then **writes the meter to 0** |
-| `battle.gd:18943` **Primal Surge** | `0.15 × stacks × Attack` **per living companion**, + a damage buff for the total turns; **zeroes each meter after the blow** (not on a Perfect) |
-| `battle.gd:21756` **Last Howl** | `last_howl (3) × the meter the fallen companion held`, accumulated into `last_howl_dmg` |
-| `battle.gd:18632` **Bring It Down** | `min(stacks × 2, BRING_IT_DOWN_CAP 20)` percentage points, party-wide — **already hard-capped** |
-| `battle.gd:15917` Kill Command | Canis's bite Bleed, `10 + 2 × stacks` |
-| `battle.gd:20741` `_ghost_hit`'s pierce | Aguila, `0.20 × stacks`, clamped to 1.0 |
-| `battle.gd:13414` / `20545` Ursus's gift | +3% of base max health per stack, at the gain AND at the summon |
-| `battle.gd:20502-20514` **Succession** | carries **half** the outgoing meter to the arriving companion, raising never lowering |
-| `battle.gd:18859` **Devoted Fury** | +1 Wrath turn per stack — **and it can never fire; see §6** |
-| `battle.gd:20358` `_deepest_bond`, `:20460` `_swap_victim` | which companion an ordered action goes to, and which a swap evicts |
-| `battle.gd:20375` `_bot_boon_worth` | the bot's swap comparison (it reads the curve too, off the raw meter) |
-| `battle.gd:14650` the CY sampler | the reported peak |
+| `scripts/battle.gd` `_resolve_special`: `var ul_stacks: int = int(attacker.loyalty.get(ul_kind, 0))` **Unleash** | `0.20 × stacks × Attack` (0.25 Perfect) + 12 flat Break, then **writes the meter to 0** |
+| `scripts/battle.gd` `_resolve_special`: `var ps_l: int = int(attacker.loyalty.get(ps_comp.companion_kind, 0))` **Primal Surge** | `0.15 × stacks × Attack` **per living companion**, + a damage buff for the total turns; **zeroes each meter after the blow** (not on a Perfect) |
+| `scripts/battle.gd` `_on_beast_death`: `var lh_gain: int = pm.last_howl * had` **Last Howl** | `last_howl (3) × the meter the fallen companion held`, accumulated into `last_howl_dmg` |
+| `scripts/battle.gd` `_resolve_special`: `var bid_pct: int = mini(bid_stacks * BRING_IT_DOWN_PER, bid_cap)` **Bring It Down** | `min(stacks × 2, BRING_IT_DOWN_CAP 20)` percentage points, party-wide — **already hard-capped** |
+| `scripts/battle.gd` `_resolve_special`: `var kc_l: int = int(attacker.loyalty.get(comp.companion_kind, 0))` Kill Command | Canis's bite Bleed, `10 + 2 × stacks` |
+| `scripts/battle.gd` `_ghost_hit`: `var pen := clampf(((0.20 * l) if kind == "aguila" else 0.0), 0.0, 1.0)` `_ghost_hit`'s pierce | Aguila, `0.20 × stacks`, clamped to 1.0 |
+| `scripts/battle.gd` `_gain_loyalty`: `var hp_step: int = int(round(COMPANION_STATS["ursus"][0] * 0.03)) \` / `20545` Ursus's gift | +3% of base max health per stack, at the gain AND at the summon |
+| `scripts/battle.gd` `_do_summon`: `sc_out_loyalty = int(hunter.loyalty.get(sc_victim.companion_kind, 0))` to `hunter.loyalty[kind] = sc_carry` **Succession** | carries **half** the outgoing meter to the arriving companion, raising never lowering |
+| `scripts/battle.gd` `_resolve_special`: `bw_turns += int(attacker.loyalty.get(` **Devoted Fury** | +1 Wrath turn per stack — **and it can never fire; see §6** |
+| `scripts/battle.gd` `_deepest_bond`: `if int(hunter.loyalty.get(cand.companion_kind, 0)) \` `_deepest_bond`, `_swap_victim`: `var worst_l: int = int(hunter.loyalty.get(worst.companion_kind, 0))` (its file read from the text around it) `_swap_victim` | which companion an ordered action goes to, and which a swap evicts |
+| `scripts/battle.gd` `_bot_boon_worth`: `var l: int = int(hunter.loyalty.get(kind, 0))` `_bot_boon_worth` | the bot's swap comparison (it reads the curve too, off the raw meter) |
+| `scripts/battle.gd` `_cy_sample`: `for kind in h.loyalty:` the CY sampler | the reported peak |
 
 **CLASS 3 — THRESHOLD READERS. Only ever "has the meter passed N".** Kindred at **8**
-(`battle.gd:3488`); Unleash's door at **1** (`:5974`); Primal Surge's door at **1** (`:5986`); the
-bot's Primal Surge preference at **4** (`:4775`). **And three sites WRITE a floor rather than
-reading one**: Lone Bond seats at **6** (`:20535`), None Left Behind at **5** (`:20531`), and Wild
-Rotation is the one node that hands `_loyalty_cap` a number — **3** (`:13379`).
+(`scripts/battle.gd` `_row8_turn_start`: `if int(u.loyalty.get(beast.companion_kind, 0)) >= u.kindred:`); Unleash's door at **1** (`_ability_usable`: `if ul_b == null or int(u.loyalty.get(ul_b.companion_kind, 0)) < 1:` (its file read from the text around it)); Primal Surge's door at **1** (`_ability_usable`: `return int(u.loyalty.get(b.companion_kind, 0)) >= 1):` (its file read from the text around it)); the
+bot's Primal Surge preference at **4** (`_autoplay_pick_kit`: `return int(u.loyalty.get(b.companion_kind, 0)) >= 4):` (its file read from the text around it)). **And three sites WRITE a floor rather than
+reading one**: Lone Bond seats at **6** (`_do_summon`: `if hunter.lone_bond > 0 and int(hunter.loyalty.get(kind, 0)) < hunter.lone_bond:` (its file read from the text around it)), None Left Behind at **5** (`_do_summon`: `if hunter.no_beast_left_loyalty > int(hunter.loyalty.get(kind, 0)):` (its file read from the text around it)), and Wild
+Rotation is the one node that hands `_loyalty_cap` a number — **3** (`_loyalty_cap`: `if hunter.wild_rotation > 0:` (its file read from the text around it)).
 
 ### THE ANSWER THE CLASSIFICATION GIVES
 
@@ -178,7 +178,7 @@ total).** Both are Class 2, so **a payout flattening changes neither.**
 |---|---|---|---|
 | **Bring It Down, a hard cap at 20 points** | `BRING_IT_DOWN_CAP` | **binds on 41.5% ±3.6** of casts (mean L 9.66; paid 15.99 of a possible 19.32) | **binds on 94.1% ±5.7** (mean L 25.29; paid **20.00 of a possible 50.59**) |
 | **Ursus's mitigation, clamped at 0.75** | `BOND_MITIGATION_MAX` | binds on **0.0–0.2%** (mean 0.187–0.194) | binds on **23.4–26.8%** (mean 0.649–0.711) |
-| **Savage Presence's pull, clamped at 1.0** | `battle.gd:7248` | binds on **0.4%** (mean 0.322) | binds on **46.6–49.1%** (mean 1.209–1.262) — **the taunt is a certainty on half its rolls** |
+| **Savage Presence's pull, clamped at 1.0** | `scripts/battle.gd` `_choose_enemy_action`: `var sp_pull := minf(0.15 * _bond_mult(sp_c.pack_master, "ursus"), 1.0)` | binds on **0.4%** (mean 0.322) | binds on **46.6–49.1%** (mean 1.209–1.262) — **the taunt is a certainty on half its rolls** |
 
 **`master.html` already says of Bring It Down that "the cap binds about where the meter actually
 sits". Measured, that is exactly right at rows 1–3 and badly under at rows 1–9.** Flattening above
@@ -315,7 +315,7 @@ the designer's to take; it is recorded here so it is taken knowingly.
 
 ### **THE FACT THAT SHOULD DECIDE IT, AND IT IS NEW: HALF THE RUNE IS ALREADY WORTH ZERO**
 
-`rune_quick_whistle_ranks` is read once, at `battle.gd:20520`:
+`rune_quick_whistle_ranks` is read once, at `scripts/battle.gd` `_do_summon`: `hunter.cooldowns["Swap Companion"] = maxi(`:
 
 ```gdscript
 hunter.cooldowns["Swap Companion"] = maxi(
@@ -368,7 +368,7 @@ existing `rune_*` field and a read site; a new field needs both authored, plus a
 |---|---|---|---|---|
 | **1** | **Pay the swap in BREAK.** The arriving companion's first blow carries flat Break damage. | **New field + one read site** at `_do_summon`'s arrival, or at `_companion_hit`'s `pr` for the arriving companion's next strike. | Both concentration findings at once: it is Break the pool has none of *by field*, and it makes the swap worth taking. | Break is the axis §2's rejected option B showed is unevenly held — but this is an ITEM, not a rung, so the standing rule does not bind it. |
 | **2** | **Pay the swap in a DAMAGE WINDOW.** The arriving companion strikes harder for N turns. | **New field + one read site** in `_comp_dmg_mult` or as a status. | Tempo, and it stacks with the arrival effects the pack lane already fires. | It is a fourth multiplier on companion damage, which is the number three of his runes and four of his nodes already push. |
-| **3** | **Pay the swap in LOYALTY.** The arriving companion enters holding N. | **Zero new machinery** — `no_beast_left_loyalty`'s read site at `:20531` is the exact shape, and Succession is the draft-card precedent. | Makes rotation stop costing depth, which is the real reason the bot stops swapping. | **It is the one option §2 can invalidate**: it writes into the meter, so an accrual flattening prices it and a payout flattening does not. |
+| **3** | **Pay the swap in LOYALTY.** The arriving companion enters holding N. | **Zero new machinery** — `no_beast_left_loyalty`'s read site at a line JR could not resolve is the exact shape, and Succession is the draft-card precedent. | Makes rotation stop costing depth, which is the real reason the bot stops swapping. | **It is the one option §2 can invalidate**: it writes into the meter, so an accrual flattening prices it and a payout flattening does not. |
 | **4** | **Remove the swap's TURN cost instead of its cooldown.** | `free_swap` exists (Instinctive Rotation, pack row 8) and `_swapped_free` is read once. **Zero new machinery.** | The measured cost of a swap is a turn, not a cooldown — BJ measured 0.05 swaps a battle before the node existed. | It duplicates a row-8 node outright, which is the charter's own complaint about these three runes restated. |
 | **5** | **Keep the cooldown clause and fix its collision** by making the rune shave the FLOOR rather than the term. | One read-site change. | Nothing new; it only stops half the rune being worth zero. | It is a repair, not a re-author, and the brief asked for a re-author. |
 
@@ -401,7 +401,7 @@ meter's ceiling indirectly — **which is worth saying out loud in a batch about
 
 ### THE CLAUSE IT OWNS
 
-`rune_companion_hp_pct` is read **once**, at `battle.gd:20542`, purely additive into the summon's
+`rune_companion_hp_pct` is read **once**, at `scripts/battle.gd` `_do_summon`: `var base_hp: int = int(round(stats[0] * (1.0 + hunter.companion_hp_pct`, purely additive into the summon's
 `base_hp`. **Unlike the Turning Pack's first clause it can never be worth nothing** — no node
 drives it to a floor, and `companion_hp_pct` (The Wild Within, handler row 2, +0.40) adds rather
 than saturates. Its two other clauses are the other two runes' (`rune_wild_communion_step` 1.5 and
@@ -413,7 +413,7 @@ than saturates. Its two other clauses are the other two runes' (`rune_wild_commu
 |---|---|---|---|---|
 | **1** | **Keep all three clauses and re-price nothing.** | **Zero.** | Nothing — but it is the only option that does not spend the splash. | The charter's complaint stands: three unrelated numbers in a bundle. |
 | **2** | **Deepen the health clause alone** (0.05 → a larger share) and drop the other two. | **Zero — a JSON edit.** | Companion durability, the one Beastmaster number no other rune touches, against a measured 0.20–0.22 deaths a trash fight. | **This is the splash's death and it should be priced as one** — see below. |
-| **3** | **Pay on the DEATH rather than before it**: a share of the fallen companion's meter survives, or the next summon costs nothing. | `steadfast_bond` (`:21766`) and `no_beast_left_loyalty` (`:20531`) are both existing read sites. **Zero new machinery.** | It acts on the measured event directly rather than on the chance of it. | It duplicates two devotion/pack nodes, which is the charter's complaint again. |
+| **3** | **Pay on the DEATH rather than before it**: a share of the fallen companion's meter survives, or the next summon costs nothing. | `steadfast_bond` (a line JR could not resolve (no file named)) and `no_beast_left_loyalty` (a line JR could not resolve (no file named)) are both existing read sites. **Zero new machinery.** | It acts on the measured event directly rather than on the chance of it. | It duplicates two devotion/pack nodes, which is the charter's complaint again. |
 | **4** | **Heal or shield the companion in flight** rather than raising its bar. | New field + a read site; `spirit_heal` and `bloodbond_cb` are the shapes. | The same event, on a different axis from The Wild Within, so the rune and the node stop being the same idea. | The largest build of the four, and Ancient Pact makes a companion unhealable by ANY source — so the clause is dead for exactly the build with the deepest bond. |
 
 ### **THE COST EP NAMED, PRICED**
@@ -458,10 +458,10 @@ of three.* **Corrected toward the code**, together with the shared cooldown: the
 
 ### (2) THE SAME WRONG **2** IS STILL IN THE GAME'S OWN TEXT — **REPORTED, NOT FIXED**
 
-- `battle.gd:6397` — the swap picker card's own description: *"Shared cooldown: 2 turns."*
-- `battle.gd:5305` — the group-button tooltip: *"shared 2-turn cooldown"*
-- `battle.gd:5296` — a source comment: *"(10 Mana, shared 2cd)"*
-- `battle.gd:16296` — a comment that gets it **right**: *"the shared 3-turn Swap cooldown"*
+- `scripts/battle.gd` `_open_summon_picker`: `var swap_desc := "Swap the pack: %s arrives with its\nswap effect and +1 Loyalty.\nShared cooldown: …` — the swap picker card's own description: *"Shared cooldown: 2 turns."*
+- `scripts/battle.gd` `_show_actions`: `group_btn.tooltip_text = "Swap the active companion (10 %s, 1.0 int,\nshared 2-turn cooldown). The …` — the group-button tooltip: *"shared 2-turn cooldown"*
+- `scripts/battle.gd` `_show_actions`: `# With a beast already out it becomes the Swap (10 Mana, shared 2cd).` — a source comment: *"(10 Mana, shared 2cd)"*
+- `scripts/battle.gd` `_resolve_special`: `# actually costs is a TURN and the shared 3-turn Swap cooldown, so` — a comment that gets it **right**: *"the shared 3-turn Swap cooldown"*
 
 **The card a player reads says 2 and the constant says 3.** Both strings are the same width as the
 correction, so the 44-character ceiling is not in the way. **It is a source edit this brief did not
@@ -469,8 +469,8 @@ ask for, and it lands squarely on the mechanism §3 is about.**
 
 ### (3) THE RUN REPORT'S SHOP CONFOUNDER IS A VACUOUS READING THAT PRINTS LIKE A REAL ONE
 
-`run_sim.gd:1136` reads `type_taken.get("shop", 0)` and `:1137` reads `type_offered.get("shop", 0)`.
-**The node type is `"merchant"`** — `ROUTE_ORDER` and the type loop at `:1443` both say so — so
+`scripts/run_sim.gd` `_print_report`: `var shops_taken: float = float(type_taken.get("shop", 0)) / runs` reads `type_taken.get("shop", 0)` and `_print_report`: `var shops_seen: float = float(type_offered.get("shop", 0)) / runs` (its file read from the text around it) reads `type_offered.get("shop", 0)`.
+**The node type is `"merchant"`** — `ROUTE_ORDER` and the type loop at `_print_report`: `for ty in ["fight", "elite", "miniboss", "blacksmith", "merchant",` (its file read from the text around it) both say so — so
 **`"shop"` is a key nothing ever writes and the line prints a structural zero**: *"it takes 0.0 of
 0.0 shops offered per run."* The same report, four blocks lower and off the correct key, prints
 **Merchants met 4.57/run walked + 2.73/run bought, Shop offered 17.45 bought 6.98, runes acquired
@@ -489,9 +489,9 @@ mid-measurement describes an instrument that produced none of the numbers in the
 
 ### (4) ONE LOYALTY READ SITE CAN NEVER FIRE
 
-`unit.devoted_fury` — *"Bestial Wrath: +N turns per Loyalty stack"* — is read at `battle.gd:18858`
+`unit.devoted_fury` — *"Bestial Wrath: +N turns per Loyalty stack"* — is read at `scripts/battle.gd` `_resolve_special`: `if attacker.devoted_fury > 0:`
 and **written by nothing**. Batch DO re-authored `bm_devoted_fury` onto Kill Command's cost and
-cooldown, and `test_batch_ay:258` asserts the counter absent: *"...and writes no `devoted_fury`
+cooldown, and `test_batch_ay.gd` `_magnitudes`: `ok(_stat_of("bm_devoted_fury", "devoted_fury") == null,` asserts the counter absent: *"...and writes no `devoted_fury`
 counter at all now"*. **A read-only-zero field with a live read site**, in the family
 `icy_resolve_ranks` is already recorded in. **Reported, not deleted** — deleting a read site is a
 mechanic deletion.
@@ -501,7 +501,7 @@ mechanic deletion.
 `battle.STATUS_INFO["bloodbond"]`'s registry description says the hunter takes **HALF** of the
 refused blow. The card says **a QUARTER**, `master.html` says a quarter, the cast writes
 `bb_pct = 25` into a computed chip line, and `_recast_writes` proposes `power: 25`. **The registry
-string has exactly one consumer — the cast at `:20189` — and that call passes its own text
+string has exactly one consumer — the cast at a line JR could not resolve — and that call passes its own text
 instead**, so the wrong number is unreachable today. **It is a live trap rather than a live
 defect**: the next batch that adds a second `add_status("bloodbond", …)` without a custom
 description ships HALF.

@@ -34,6 +34,10 @@ const CONTENT_AT_HEAD := {"abilities": "b40ad23bc9956e7e48f579d9a98b6da4", "tale
 # WHAT A LATER BATCH AUTHORED, EACH NAMED AND LEFT OUT OF THE DIGESTS ABOVE, so they go on asking whether JP's own tree authored
 # anything: the two cards and the status of the party's three answers, built after JP (Forsake, Read the Tell, Forsaken).
 const AUTHORED_SINCE := {"abilities": ["Forsake", "Read the Tell"], "statuses": ["forsaken"]}
+# BATCH JR — THREE APPEARANCE TAGS MOVED AFTER THIS GATE LANDED (JR §1): the Grave Totem and the Rot Behemoth each took a
+# roster, the Orc Hexer a second role. Each is named here and put back before the digest, so it goes on asking whether
+# anything else in the warband's data moved.
+const MOVED_SINCE := {"grave_totem": {"zones": [1.0, 3.0]}, "behemoth": {"zones": [2.0, 3.0]}, "hexer": {"roles": ["hexer"]}}
 # MALICE's TERMS, ITS SPENDS' PRICES AND THE HEXES' FIGURES, AS THEY STAND (C09): each read off its constant, never retyped elsewhere.
 const BATTLE_FIGURES := {"MALICE_DAMAGE_STEP": 10, "MALICE_PER_KILL": 25, "MALICE_CAP": 150, "MALICE_HEAL_WORTH": 0.5,
 	"MALICE_RAISE_PCT": 0.4, "MALICE_RALLY_PCT": 0.3, "MALICE_RALLY_TURNS": 3, "MALICE_RALLY_PRICE": 40, "MALICE_ENTRENCH_TURNS": 3,
@@ -192,8 +196,17 @@ func _content() -> Dictionary:
 	var deck: Array = (_run.MODIFIERS as Dictionary).keys()
 	deck.sort()
 	out["deck"] = ("%d|" % deck.size() + "|".join(deck)).md5_text()
-	out["warband"] = JSON.stringify(Enemies._load(), "", true).md5_text()
+	out["warband"] = JSON.stringify(_warband_as_landed(), "", true).md5_text()
 	return out
+
+# THE WARBAND's DATA WITH A LATER BATCH's APPEARANCE TAGS PUT BACK (`MOVED_SINCE`).
+func _warband_as_landed() -> Dictionary:
+	var d: Dictionary = Enemies._load().duplicate(true)
+	for kind in MOVED_SINCE:
+		if d.has(kind):
+			for field in MOVED_SINCE[kind]:
+				(d[kind] as Dictionary)[field] = (MOVED_SINCE[kind][field] as Array).duplicate()
+	return d
 
 
 # ── §0 — JO's EIGHT RULINGS, AND THE THREE DIALS ──────────────────────────────

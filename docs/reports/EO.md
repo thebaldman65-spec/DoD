@@ -36,7 +36,7 @@ four fields with a consequence, and every reader of each was swept.
 
 | field | who reads it | what it does |
 |---|---|---|
-| `rung` | `battle.gd:1078`, `battle.gd:23186`, `run_sim.gd:240` | the enemy-ability filter, the meta gate, the run-report header |
+| `rung` | `scripts/battle.gd` `_enemy_config`: `var cfg := Enemies.config(kind, Run.difficulty_rung() if Run.active else Enemies.MAX_RUNG)`, `scripts/battle.gd` `_resolve_boss`: `Profile.note_end_boss(Run.difficulty_rung())`, `scripts/run_sim.gd` `start_run`: `diff_rung = run.difficulty_rung()` | the enemy-ability filter, the meta gate, the run-report header |
 | `mult` | `run_state.zone_base_mult` only | the spawn multiplier |
 | `severity_floor` | `run_state.roll_offer` | the guaranteed mild bargain gets less mild |
 | `fixed_modifier` | `run_state.arm_fixed_modifier` | rung 3 only: the unduckable nodes carry a modifier |
@@ -73,7 +73,7 @@ boredom is a magnitude problem.**
 
 ### BUT THE MAGNITUDE IS ON THE WRONG AXIS, AND THAT IS THE FINDING
 
-**The multiplier applies to `max_hp` AND `attack` together** (`battle.gd:1604-1608`).
+**The multiplier applies to `max_hp` AND `attack` together** (`scripts/battle.gd` `_spawn_units`: `if Run.active and Run.encounter.get("type", "") == "miniboss" else 1.0` to `cfg["attack"] = int(round(cfg["attack"] * slot_mult`).
 
 **Health is not forgiveness. It is the fight's LENGTH, and length is the only thing that lets an
 enemy ask its question.** Because `stability` is a flat 100 at every rung and `ab.pressure` is

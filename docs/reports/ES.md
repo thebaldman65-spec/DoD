@@ -51,13 +51,13 @@ reassuring direction. **Five negative controls were armed and all five bit.**
 | `display_name()` | `runes.gd` | prepended the tier or Scarred prefix | **returns the authored name** |
 | `template_rune(class_key, rarity_key, …)` | `runes.gd` | `base × mult`, tier price, tier prefix in the name | **parameter dropped; `base`, `TEMPLATE_PRICE`, no prefix** |
 | `build()` → `rarity`, `rarity_color` | `runes.gd` | two display fields on every instance | **`scope_label`, `scope_color`** |
-| `rune["rarity"]` | `map_screen.gd:895`, `shop_screen.gd:213` | the word on the offer button and the shop row | **`scope_label`** |
+| `rune["rarity"]` | `scripts/map_screen.gd` `_open_pick_overlay`: `_pick_button(box, "%s  [%s]" % [rune["name"], rune["scope_label"]],` (on the tree this report mostly cites), `scripts/shop_screen.gd` `_draw_screen`: `rune["scope_label"], member["key"].capitalize(), offer["member_idx"] + 1, rune["desc"]]` (on the tree this report mostly cites) | the word on the offer button and the shop row | **`scope_label`** |
 | `rune["rarity_color"]` | `map_screen.gd` ×3, `party_screen.gd`, `shop_screen.gd` | the tint on five surfaces | **`scope_color`** |
 | `"rarity"`, `"scarred"` keys | `data/runes.json` ×65 / ×17 | the authored tier and flag | **removed** |
 | `RARITY_KEYS` + the schema check | `test_runes.gd` | required a valid tier | **inverted to an absence pin** |
 | the scarred-undercuts-its-peer price check | `test_runes.gd` | compared price to `RARITIES[…]["price"]` | **no peer left; replaced by §3's derived census** |
-| `wrist["rarity"]` | `test_batch_ak.gd:593` | copied into a hand-built rune dict | **dropped — nothing read it** |
-| prose | `run_sim.gd:471`, `events.gd:69`, `master.html` ×5, `CLAUDE.md`, `design-notes.md`, `glossary.json` | | **corrected or annotated** |
+| `wrist["rarity"]` | `test_batch_ak.gd` `_live_guard_change`: `` # field is dropped rather than replaced, because the spawn reads `id`, `` | copied into a hand-built rune dict | **dropped — nothing read it** |
+| prose | `scripts/run_sim.gd` `_avg_hp`: `# visit, dupes re-rolled. (BATCH ES §1: the price used to be set by the rune's` (on the tree this report mostly cites), `scripts/events.gd` `const VERBS`: `# for two of lower rarity". That needs a rune to be SURRENDERED, and nothing`, `master.html` ×5, `CLAUDE.md`, `design-notes.md`, `glossary.json` | | **corrected or annotated** |
 
 **WHAT REPLACED THE LABEL AND THE COLOUR: SCOPE.** It is the axis §2 makes the only one, it is
 derived from a field that decides eligibility, and **it drives no odds, no price and no magnitude**
@@ -226,7 +226,7 @@ other nine.
 **`exsanguination` IS THE ONE THE FLAG WAS THE ONLY RECORD OF.** Its entire payload is
 `{"stat": {"blood_pact": -15}}`. `blood_pact` is in `INVERTED_STAT_FIELDS`, where a **negative is
 the rune's PROMISE** — enemy veins pop at 85 instead of 100. Its price is at the same read site:
-`battle._add_bleed_with_burst` (`battle.gd:21876`), where the presence of a negative `pact` makes the
+`battle._add_bleed_with_burst` (`scripts/battle.gd` `_add_bleed_with_burst`: `# Rune of Exsanguination (blood_pact, a NEGATIVE threshold shift; its`), where the presence of a negative `pact` makes the
 bleedout tear **15% of max health instead of 20%**. **One field, two behaviours, one read site, and
 nothing for any sweep to find.** It is NAMED in `test_runes.COST_WITHOUT_A_TERM` and in
 `check_es` §3 with its reason rather than suppressed — the project's own idiom.

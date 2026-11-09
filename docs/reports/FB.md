@@ -20,15 +20,15 @@ than stated.**
 
 | premise | verdict |
 |---|---|
-| `compose` floors the BUDGET at 6, not the enemy count | **CONFIRMED** — `run_state.gd:1136`, `budget = maxi(budget, 6)`, inside `compose` |
+| `compose` floors the BUDGET at 6, not the enemy count | **CONFIRMED** — `scripts/run_state.gd` `compose`: `budget = maxi(budget, 6)`, `budget = maxi(budget, 6)`, inside `compose` |
 | a budget of 6 buys three power-2 enemies | **CONFIRMED as arithmetic** — `_combo_walk` accepts a composition only when `left == 0`, so the spend is exact; 8 of the 21 enemy kinds are power 2 |
-| the board caps at six | **CONFIRMED** — `battle.gd:1598`, `ENEMY_LAYOUTS[clampi(composition.size(), 1, 6)]` |
+| the board caps at six | **CONFIRMED** — `scripts/battle.gd` `_spawn_units`: `var layout: Array = ENEMY_LAYOUTS[clampi(composition.size(), 1, 6)]`, `ENEMY_LAYOUTS[clampi(composition.size(), 1, 6)]` |
 | elite rosters are three enemies at tiers 1 and 4, every draw | **CONFIRMED AS FA's, NOT RE-DERIVED** — the mechanism is verified above; the 200×6 composition census is FA's and is cited as FA's |
 | FA measured ×0.61 at three and ×0.79 at four | **CONFIRMED, INDEPENDENTLY** — see §2c: FB's own 20% arms times 12/20 reproduce FA's whole row |
 | break-even is not reached until five | **CONFIRMED** — `N × 12 = 3 × 20` at `N = 5`, and FB's ratios put the 20% row at exactly `N/3` |
 | Break moves ×1.00 / ×1.33 / ×1.67 / ×2.00 | **CONFIRMED** — measured again at §2a, and it is now the DAMAGE row too |
 | the rune pays 1 Ruin a target instead of 2 | **NARROWER THAN STATED** — see §2d. The rune pays a hard `1`; the base is `_old_gods_mark()`, which is `2 + whispers_step + rune_wide_rite`. "Instead of 2" holds only at the untalented base |
-| Hex of Ruin is authored at 20% against three chosen enemies | **CONFIRMED** — `classes.gd:5650`, `"damage": 20 … "choose_three": true` |
+| Hex of Ruin is authored at 20% against three chosen enemies | **CONFIRMED** — `scripts/classes.gd` `spec_abilities`: `Ability.make({"display_name": "Hex of Ruin", "cooldown": 2, "dmg_type": "shadow", "cost": 20, …`, `"damage": 20 … "choose_three": true` |
 | §1's empty-loadout guard stands; Bracing Line at 32; the named constants unmoved | **CONFIRMED** — all read back unchanged, §5 |
 | **"Record both in `CLAUDE.md`"** | **FALSE for one of the two.** *Run the unmodified gates against new code* is ALREADY there, authored by FA. See §4 |
 

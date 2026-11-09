@@ -172,9 +172,9 @@ swept the section it was writing in and not the one above it, which is now a rul
 
 ### AND TWO SOURCE COMMENTS, FOUND BY THE SAME SWEEP
 
-- **`classes.gd:4444`** carried a **third** copy of the stance-swap claim, one screen above the
+- **`scripts/classes.gd` `trimmed_kit_ability`, a line JR could not settle between two trees** carried a **third** copy of the stance-swap claim, one screen above the
   `PROTECTED_CORES` `why` that BP corrected. BP fixed one of three.
-- **`unit.gd:691`**: *"Both ends are uncapped and nothing removes stacks."* The "uncapped" half is
+- **`scripts/unit.gd` `const FRENZY_RAGE_PER_STEP`, a line JR could not settle between two trees**: *"Both ends are uncapped and nothing removes stacks."* The "uncapped" half is
   true; **two earned cards remove Resonance** — Stabilize floors the meter at 2, Arcane Bolt halves
   it. Corrected, with both named.
 

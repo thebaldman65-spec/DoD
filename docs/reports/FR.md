@@ -180,7 +180,7 @@ status magnitude in §4.6, and the twelve `THEMES` with their exact node columns
 
 **THE THREE RAW FLAGS ARE ALL ONE SHAPE AND `battle.gd` NAMES IT**: *"those two fields are zero on
 Feint, Guard Change and Kill Command, which hit hard from inside their handlers."* Guard Change's
-15 BD is dealt at `battle.gd:20640`, Kill Command's 40 BD is **Ursus's maul** at `battle.gd:17348`,
+15 BD is dealt at `scripts/battle.gd` `_resolve_special`: `var gc_bd: int = attacker.guard_change_bd if gc_wide else 15`, Kill Command's 40 BD is **Ursus's maul** at `scripts/battle.gd` `_resolve_special`: `await _companion_hit(comp, kc_target,`,
 and the third was Shadowrend's parenthetical caught by a window that started at "Smite".
 
 ### §2d — TWO SUITE NEEDLES MOVED, WHICH IS DO'S OWN PRECEDENT
@@ -222,7 +222,7 @@ the pools decide, so a later batch that authors a card moves it and the arm says
 
 ### §2f — A CASE WHERE THE CODE LOOKS WRONG, REPORTED AND NOT CHANGED
 
-**`scripts/events.gd:8–12` carries the same false worked example** the document did — its comment
+**`scripts/events.gd` (file scope): `# BATCH BK §4 — EVENTS ARE RESOURCE CONVERSIONS NOW, in three kinds, and` to `#                   health for talent points — a rate offered, taken or not.` carries the same false worked example** the document did — its comment
 says the tradeoff kind offers *"Health for a rune, gold for maximum health, health for talent
 points"*, and `talent_points` has never been a verb. **The brief forbids changing code and
 `instrument-rules.md` records that a `.gd` comment is an asserted surface**, so it is reported here
@@ -330,7 +330,7 @@ this one did, and it found fourteen.**
   document. Writing their rows is authoring. **The gap is now stated in the document itself** and
   routed to the queue.
 - **`events.gd`'s comment is not corrected** — see §2f.
-- **ONE PROSE TYPO IS REPORTED AND NOT FIXED.** `master.html:108` reads *"clearing any encounter
+- **ONE PROSE TYPO IS REPORTED AND NOT FIXED.** `docs/master.html` (file scope): `<li><b>Victory rewards:</b> gold for every fight, and <b>clearing any encounter heals the` reads *"clearing any encounter
   heals **the every hero** 15% of max HP"*. It is a one-word repair and it is out of §2's scope
   (a number sweep), **and by the time it was noticed the tree was frozen for the battery** — a
   post-run edit would have made the shipped tree differ from the tree that was verified, which is

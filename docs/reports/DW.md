@@ -164,8 +164,8 @@ said *"the **five** abilities"* against a table of six, and says neither now.
 DV recorded Shadowrend's rendered Perfect at **49** against the measured **44**-character ceiling as
 *the one thing DU §4's corpus fix made visible*. **It was not.**
 
-`"Cleric recovers {mhp:5}"` is authored at **two** sites — `classes.gd:140` on **SMITE**, the Cleric
-class basic, and `classes.gd:4560` on Shadowrend — and `Classes.ability_corpus()` has walked
+`"Cleric recovers {mhp:5}"` is authored at **two** sites — `scripts/classes.gd` `cleric_kit`: `"perfect_id": "self_heal", "perfect_text": "Cleric recovers {mhp:5}",` on **SMITE**, the Cleric
+class basic, and `scripts/classes.gd` `apply_kit_overrides`: `"perfect_id": "self_heal", "perfect_text": "Cleric recovers {mhp:5}",` (on the tree this report mostly cites) on Shadowrend — and `Classes.ability_corpus()` has walked
 `kit("cleric")` since long before DU. **The identical 49-character breach was already in the corpus
 under Smite's name. DU added a second instance of a breach that was always visible.**
 

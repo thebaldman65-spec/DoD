@@ -27,10 +27,10 @@ such — and two of the thirteen held in a way that changed what had to be writt
 | 6 | A condition can be live at one bar size and dead at the next | **HELD, AND NOW MEASURED ON THE FOUR SPECS THAT ACTUALLY CARRY THESE RUNES** — the Wide Rite is 2.1% at four drafted cards, **0.0% at five**, 3.6% at six and **0.0% at seven**. §1 |
 | 7 | **IT IS EIGHT, NOT SIX**, and eleven lines across five files say six | **HELD** — the eleven located and all eleven corrected. §4 |
 | 8 | The eleven include a brief that enumerated 4 + 4 and called it six | **UNVERIFIABLE FROM THE REPO** — FK's brief is not a tracked file. FL §2a records it; nothing here can check it |
-| 9 | Bracing Line's 8.98% prices the LEVEL, not the condition — measured with the threshold assumed met | **HELD** — `battle.gd:10049`'s read site tests `passive_id == "heavy_plating"` and `plating_bonus * 100 >= BRACING_LINE_LEVEL` and **never sees a tag** |
+| 9 | Bracing Line's 8.98% prices the LEVEL, not the condition — measured with the threshold assumed met | **HELD** — `scripts/battle.gd` `_resolve`: `and bl_h.rune_bracing_line > 0 \`'s read site tests `passive_id == "heavy_plating"` and `plating_bonus * 100 >= BRACING_LINE_LEVEL` and **never sees a tag** |
 | 10 | Anything in the record saying otherwise is wrong and should be corrected | **HELD AND ALREADY DONE — THERE WAS NOTHING LEFT TO CORRECT.** Both readable copies (`docs/state.md`'s queue item and the changelog's FL entry) already state it FL's way. Swept: no file in the tree prices 8.98% as the condition's rate |
 | 11 | Nothing has measured the other seven's conditions | **HELD** — `docs/spec-recon.html`'s tag-spread tables cover the **eight UNAUTHORED specs**, not the four that carry these runes. §1 is new work |
-| 12 | `Classes.tag_count` and the census are read by `check_es` §4's per-spec table | **HELD** — `check_es.gd:544/560/581/609/633/644` |
+| 12 | `Classes.tag_count` and the census are read by `check_es` §4's per-spec table | **HELD** — `check_es.gd` `_s4_tags_are_read`: `var census: Dictionary = Classes.tag_census(names)`; `_s4_tags_are_read`: `var empty: Dictionary = Classes.tag_census([])`; `_s4_tags_are_read`: `ok(Classes.tag_count([two_tagged], String(pair[0])) == 1`; `_s4_tags_are_read`: `var carried: Dictionary = Classes.tag_census(run.loadout_ability_names(m))`; `_s4_tags_are_read`: `var again: Dictionary = Classes.tag_census(run.loadout_ability_names(m))`; `_s4_tags_are_read`: `var live: Dictionary = Classes.tag_census(lo_names)` |
 | 13 | The `.docx` ruling exists only in a closed report and contradicts the Working agreement | **HELD** — `docs/reports/FH.md` §4 and nowhere else; step (3) required the rebuild. §3 |
 | 14 | FM found "five per hero" wrong in both directions and five empty branches reachable at once | **HELD** — `docs/reports/FM.md` §0 and §2 |
 
@@ -178,12 +178,12 @@ more, and both are worse than Bracing Line's, because both make the rune worth E
 |---|---|---|
 | Deepening Hex | `battle._ruin_threshold` | Ruin detonates every 8th stack rather than 10th, **always** — unless Avatar of Ruin is held, when it is worth 0 either way |
 | Wide Rite | `battle._old_gods_mark` | +1 Ruin marked per debuff, **always**. Pure addition, no second gate. **The largest real change of the eight** — it went from 1.4% to 100% |
-| Bracing Line | `battle.gd:10049` | −5% damage to other heroes **whenever the plating stands at +32%**, which is now the whole condition |
-| Long Watch | `battle.gd:10600` | Break damage carries to a second enemy on any Break-dealing hit, **always** |
+| Bracing Line | `scripts/battle.gd` `_resolve`: `and bl_h.rune_bracing_line > 0 \` | −5% damage to other heroes **whenever the plating stands at +32%**, which is now the whole condition |
+| Long Watch | `scripts/battle.gd` `_resolve`: `if attacker.rune_long_watch > 0 and attacker.is_hero \` | Break damage carries to a second enemy on any Break-dealing hit, **always** |
 | Heavy Bolts | `unit.focus_convert` | The conversion point drops 100 → 80, **always** — from 0–8% to 100%, the second largest change |
 | Wide Watch | `battle._sharpshooter_focus` | Focus survives a kill whole, **always** — unless Overkill is held, when it is worth 0 either way |
 | Answering Pack | `battle._on_brunt_guard` | The deepest bond takes the killing blow once a fight, **always**, as the fallback below Bear the Brunt |
-| Shared Scent | `battle.gd:22097` / `:23515` | A fallen companion's Loyalty banks and carries to the next called, **always** |
+| Shared Scent | `scripts/battle.gd` `_do_summon`: `if hunter.rune_shared_scent > 0 and hunter.shared_scent_bank > 0:` / `_on_beast_death`: `if pm.rune_shared_scent > 0 and had > 0:` (its file read from the text around it) | A fallen companion's Loyalty banks and carries to the next called, **always** |
 
 ---
 

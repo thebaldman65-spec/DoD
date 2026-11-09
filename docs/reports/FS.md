@@ -49,7 +49,7 @@ under `--quit-after 30` and with no flag at all:
 
 **AND FR'S REASSURANCE WAS FALSE.** FR §5a(2) closes with *"`run_battery.sh` does not use the flag
 — its watchdog is wall-clock — so the battery was never affected, only the pre-check."* **HEAD's
-`run_battery.sh:176` reads `--quit-after 900 res://check_ct_map.tscn`.** The battery had exactly
+`run_battery.sh` `run_one`: `"$GODOT" --headless --path . --quit-after 900 res://check_ct_map.tscn \` reads `--quit-after 900 res://check_ct_map.tscn`.** The battery had exactly
 one frame-budgeted target, and it was also one of the two targets written out by hand below the
 `run_one` loop — so it had **no watchdog and no completion test either.** The one place the fault
 could bite in the battery was the one place nothing was watching.
@@ -351,7 +351,7 @@ and are on it now.**
   exists to read, and `check_fs` contributes none. Extending the generator is a batch of its own.
   It is written into `docs/instrument-rules.md` beside FH's typed-holder rule, because the
   dangerous half is that regeneration then reports success.
-- **THE FOUR UNDESCRIBED DRAFT CARDS, `master.html:108`'s *"the every hero"*, `events.gd`'s false
+- **THE FOUR UNDESCRIBED DRAFT CARDS, `docs/master.html` (file scope): `<li><b>Victory rewards:</b> gold for every fight, and <b>clearing any encounter heals the`'s *"the every hero"*, `events.gd`'s false
   worked example and §3b's 66-damaging-abilities denominator are all still open.** They are FR's
   queue items; this brief did not name them and none is an instrument question.
 
@@ -418,7 +418,7 @@ document.
 
 **AND THE ZEROS ARE NOT VACUOUS — A TWO-ARMED CONTROL.** The needle
 `Funeral Pyre, Firedraw, Pyre Wake, Emberkeep` was chosen **out of the present set** and is one
-`test_batch_cb.gd:1198` demonstrably asserts. Removed from the shipped copy, **LOST went 0 → 1**;
+`test_batch_cb.gd` `_docs`: `ok(master.contains("Funeral Pyre, Firedraw, Pyre Wake, Emberkeep"),` demonstrably asserts. Removed from the shipped copy, **LOST went 0 → 1**;
 removed from HEAD's copy instead, **GAINED went 0 → 1**. The sweep bites in both directions.
 
 ### §5d — EVERY CHANGED REGION READ AS FLATTENED PROSE

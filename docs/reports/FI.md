@@ -18,7 +18,7 @@ The brief asked for every premise to be verified. Six were, and two needed corre
 | the 24 spawning targets that touch the save | **right for what it measured, wrong for what it was used for** — see §1 |
 | FH found 24 of 80 by behavioural census | **TRUE**, and reproduced name for name |
 | BN documented that a battery wipes the save; the guidance has been "back it up first" | **TRUE** — `docs/instrument-rules.md`, in the SUITES AND THE HARNESS block |
-| `check_ct` §2 restores the save with a passing arm and §3 destroys it again | **TRUE** — `check_ct.gd:213` asserts it, `check_ct.gd:220` spawns the battle that eats it |
+| `check_ct` §2 restores the save with a passing arm and §3 destroys it again | **TRUE** — `check_ct.gd` `_initialize`: `# progress and on one without.` asserts it, `check_ct.gd` `_initialize`: `# A HELD, EMPTY SLOT goes in deliberately: "the pouch renders full and` spawns the battle that eats it |
 | a wrapper is bypassed by running one gate alone | **TRUE**, and it is why the redirect is a property of the process |
 | a boss trophy does not award a rune (FH's correction) | **TRUE**, unchanged |
 | **`Profile.save_path` is swapped by 37 of 39 suites' `_run` preamble** | **FALSE — it is 39 of 39** |
@@ -71,7 +71,7 @@ nothing in FH's list failed to.** The difference is one addition and one framing
 
 - **THE ADDITION IS `test_batch_ah`.** FH derived its candidates as *"reaches a spawn or sets
   `sim_run`"* — 80 of 98 — and `test_batch_ah` does neither. It calls `run.new_run()`, and
-  `run_state.gd:465` calls `clear_save()` from inside it. It destroys the save, restores nothing,
+  `scripts/run_state.gd` `new_run`: `clear_save()` calls `clear_save()` from inside it. It destroys the save, restores nothing,
   and was never in the 80. **FH's own transferable lesson was "derive the candidates from the
   source, then measure every member of it"; the correction is that THE DERIVATION is the step that
   fails silently.** FI censused all 98 and derived nothing.

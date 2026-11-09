@@ -525,7 +525,7 @@ flipped a level), and `check_ix` re-derives the cuts, the grades, the band holdi
 239 / 0 and no `Parse Error` or `SCRIPT ERROR` in its log (23:56:02). **HEAD's gates against the new code first** (FA §1b; the
 pre-check, 24 targets that read a grade, a band or the offer, lanes *IA pre1*, *IA pre2*): reds only where a gate pinned IO's
 counts, modelled a floor on the whole deck, read IW's grade column or master.html's table — and two suites that threw on a
-severity-0 key (`test_batch_an`:175, `test_batch_bb`:558). Each re-pointed to its intent (`apply_gates.py`, its reason beside it).
+severity-0 key (`test_batch_an.gd` `_test_offer`: `var by_sev := {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0}`, `test_batch_bb.gd` `_rot_pool`: `var by_sev := {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0}`). Each re-pointed to its intent (`apply_gates.py`, its reason beside it).
 **The throw hid an arm**: `test_batch_an`'s *X is graded 1-5* sat below the throw, so the pre-check could not read it — recon 1
 did (below).
 

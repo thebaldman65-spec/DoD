@@ -82,11 +82,11 @@ A rule's first sweep is also where it finds out what it must *not* touch.
 
 | site | why it stays |
 |---|---|
-| `check_di:148` `sites == CALL_SITES` | **The brief's own rule names call-site counts — and this equality is load-bearing.** It caught DP silently deleting an `_apply_status` site, which is what it is for; its sibling `SRC_FLOOR` is a ratchet because that one measures progress. **One site, and its message reads as a notice.** |
-| `check_dv:174/175` `SPEC_POOLS == 42 / 40 distinct` | DV's boss-pick census. One site each; messages say *"not the 42 on record"* — a staleness notice, not a regression claim. |
-| `check_dv:185` Holy's boss pool `== 1` | A tripwire on an **open finding**: if the shortfall is ruled on and the pool deepens, the gate says DV's report is stale. That is the whole point of it. |
-| `check_cz:359` `SHIELD_SPECIALS == SHIELDS` | The only thing asserting the registry's membership; a seventh shield **should** have to be reviewed against the cap rule. |
-| `check_dv:329` archive `== 149` | **Not a growing collection** — only a cut moves the archive. DW ruled this correctly and it stands. |
+| `check_di.gd` `_coverage`: `ok(sites == CALL_SITES,` `sites == CALL_SITES` | **The brief's own rule names call-site counts — and this equality is load-bearing.** It caught DP silently deleting an `_apply_status` site, which is what it is for; its sibling `SRC_FLOOR` is a ratchet because that one measures progress. **One site, and its message reads as a notice.** |
+| `check_dv.gd` `_s2_boss_depth`: `` ok(total == 42, "§2: `SPEC_POOLS` is %d entries, not the 42 on record" % total) ``; `_s2_boss_depth`: `ok(distinct.size() == 40,` `SPEC_POOLS == 42 / 40 distinct` | DV's boss-pick census. One site each; messages say *"not the 42 on record"* — a staleness notice, not a regression claim. |
+| `check_dv.gd` `_s2_boss_depth`: `ok(Classes.SPEC_POOLS.get("holy", []).size() == 1,` Holy's boss pool `== 1` | A tripwire on an **open finding**: if the shortfall is ruled on and the pool deepens, the gate says DV's report is stale. That is the whole point of it. |
+| `check_cz.gd` `_s3_shields`: `ok(listed == want, "SHIELD_SPECIALS is %s, want %s" % [listed, want])` `SHIELD_SPECIALS == SHIELDS` | The only thing asserting the registry's membership; a seventh shield **should** have to be reviewed against the cap rule. |
+| `check_dv.gd` `_s4_the_cut`: `ok(arch_span == 149, "§4: the archive holds %d entries, not the 149 the cut made" % arch_span)` archive `== 149` | **Not a growing collection** — only a cut moves the archive. DW ruled this correctly and it stands. |
 | `CLASS_POOLS` freeze pins (`bt`, `cb`, `ce`, `bq`, `br`, `check_dv`) | A **frozen** collection is not a growing one; being byte-untouched is the claim. §3's ruling would move six sites at once, deliberately. |
 | `.size() == 12` / `== 4` / tree `== 27` / `== 324` | Structural invariants — twelve specs, four classes, 27 cells. A batch doing its job does not add a thirteenth spec. |
 | tranche-lead pins (`spec_draft_pool(x)[0] == …`, `slice(0,5) == […]`) | Properties of the **head** of a list. Appending cannot break them, which is why they were authored that way. |
@@ -370,7 +370,7 @@ after: no suite reads either, and `check_de` reads neither.
 - **THE LITERAL SWEEP: 10,912 literals at a floor of 4**, from all 82 suites, gates and fixtures,
   evaluated against **all four** edited documents. **17 needles GAINED presence, 0 LOST**, and every
   one was cross-referenced against the **241** `not <x>.contains(L)` assertions in the tree. **One
-  hit, and it is not the dangerous kind**: `test_batch_bw:680` `not vd_body.contains("func ")` reads
+  hit, and it is not the dangerous kind**: `test_batch_bw.gd` `_source_rules`: `ok(not vd_body.contains("func "),` `not vd_body.contains("func ")` reads
   a 1600-character slice of **`battle.gd` source**, not a document — and `battle.gd` is untouched.
 - **THE COMMENT-STRIPPED DIFF AGAINST `HEAD`.** Every suite gained exactly as many code lines as it
   lost (the `==` → `>=` conversions and their messages); `check_dr` +6/−4 and `test_batch_cd` +4/−3,

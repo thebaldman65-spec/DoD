@@ -145,8 +145,8 @@ Elevation row says *An ally who reaches the cap with it RELEASES on the spot*.
 
 **THE STANDING RULE IS IN `CLAUDE.md`**, under its own heading beside DF §1's: *card text and comments do not name a
 magnitude a constant holds.* It is forward-looking. **Five comments still name Faith's threshold as five** — the census
-the rule asks for, carried in `docs/state.md` for the batch that touches each: `unit.gd:988`, `battle.gd:17555`,
-`:17571`, `:17967`, `:27524`.
+the rule asks for, carried in `docs/state.md` for the batch that touches each: `scripts/unit.gd` `var faith_stacks`: `# THE DEVOUT'S OWN HOLD THERE (Batch BH §2).` (on the tree this report mostly cites), `scripts/battle.gd` `var _communion_chain`: `# five of them RELEASE. Every one of the eight Faith nodes acts on the release`,
+`var _communion_chain`: `# ===== BATCH HL §3 — THE RELEASE MOVES TO EIGHT (ruled) =====` (on the tree this report mostly cites; its file read from the text around it), `_gain_faith`: `` # THE LANDMINE, AND IT IS EXACTLY WHY `rot` WAS DROPPED FROM BATCH AQ: the `` (on the tree this report mostly cites; its file read from the text around it), `cy_report_line`: `var peak: float = stats.get("cy_meter_" + String(m[0]), 0.0) / mn` (on the tree this report mostly cites; its file read from the text around it).
 
 ### §0c — THE REPLACE-NOT-ADD TRAP IS CLOSED
 
@@ -864,8 +864,8 @@ carry its own hash, so the two hashes side by side are in the batch's closing me
   out, as core runes have been since GK and the bag since HK.
 - **THE SIM'S COUNTER CAN STILL STOCK A CORE RUNE** (`run_sim._roll_rune_offers` rolls `generate_rune`); the real
   Peddler has sold none since HL §1. `check_he` §1's and `check_hf` §3's "Peddler" tallies roll the same door.
-- **FIVE COMMENTS STILL NAME FAITH'S THRESHOLD AS FIVE** (§0b): `unit.gd:988`, `battle.gd:17555`, `:17571`, `:17967`,
-  `:27524`.
+- **FIVE COMMENTS STILL NAME FAITH'S THRESHOLD AS FIVE** (§0b): `scripts/unit.gd` `var faith_stacks`: `# THE DEVOUT'S OWN HOLD THERE (Batch BH §2).` (on the tree this report mostly cites), `scripts/battle.gd` `var _communion_chain`: `` # Faith pays mitigation and damage on `faith_peak`, the HIGHEST count held this ``, `var _communion_chain`: `# ===== BATCH HL §3 — THE RELEASE MOVES TO EIGHT (ruled) =====` (its file read from the text around it), `_gain_faith`: `` # THE LANDMINE, AND IT IS EXACTLY WHY `rot` WAS DROPPED FROM BATCH AQ: the `` (its file read from the text around it),
+  `cy_report_line`: `var peak: float = stats.get("cy_meter_" + String(m[0]), 0.0) / mn` (on the tree this report mostly cites; its file read from the text around it).
 - **TITHE'S RULE PAYS AT LEAST 1 A BLOW, EVEN A BLOW THAT APPLIED NO BREAK, AND A PARTY AT FULL HEALTH PAYS THE
   WARRIOR** and wastes it. Both are the talent's read site, unchanged.
 - **FELLOWSHIP CAN CLEAR THE BLEED WARNING CHIP**, which comes back on the next hit; the talent always could.
@@ -889,8 +889,8 @@ carry its own hash, so the two hashes side by side are in the batch's closing me
 - **THE SIM'S REPORT KEYS, FOUND WHILE MEASURING**: `hero_deaths` counts companions (1,711 against 1,480 hero bodies in
   one log), and `heal_hero_*` includes overheal. A full-depth sim puts *Cleanse Debuffs Each Turn* and *Mitigation per
   Debuff You Carry* on all four heroes, so a talented baseline is already eight cleanses a round.
-- **TWO STALE THINGS THE CENSUS MET, NEITHER THE CREST'S**: `check_ct_map.gd:107` has been vacuous since FD §1, and
-  `check_gp.gd:1039`'s comment says `hold_rune` slots an engine while a slot is free.
+- **TWO STALE THINGS THE CENSUS MET, NEITHER THE CREST'S**: `check_ct_map.gd` `_process`: `ok(lowest <= draft_top,` has been vacuous since FD §1, and
+  `check_gp.gd` `_leave`: `# **BATCH GS — THE NO-ENGINE ARM HOLDS NO ENGINE FOR THE WHOLE ROAD.** It is the`'s comment says `hold_rune` slots an engine while a slot is free.
 
 **On the machine.**
 - **461 OLDER ISOLATED USER-DATA FOLDERS REMAIN** (142,224 KiB) — outside the policy; the designer's.

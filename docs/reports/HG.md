@@ -19,17 +19,17 @@ controls measured instead. `main` is untouched, and the merge is reported (§4),
    The proposal is **HH: the 22 retirements** (the smaller half, and the one whose controls are already run and
    recorded below), **then HI: the 48 re-points**, which inverts the brief's order for the reason FZ's rule exists.
    Taking the re-points first is the designer's to say.
-2. **`test_batch_bp:234` IS KEPT WHERE ITS TWO SIBLINGS ARE RETIRED, AND THE CONTROL IS WHY.** Control c3 put two
+2. **`test_batch_bp.gd` `_pools`: `ok(not Classes.spec_draft_pool(spec7).has(en),` IS KEPT WHERE ITS TWO SIBLINGS ARE RETIRED, AND THE CONTROL IS WHY.** Control c3 put two
    enablers on their own lineage shelves. `check_gs` §1:338 — the check this batch proposed to retire all three
    onto — caught **Bloodlust and not Quick Shot**, because the Sharpshooter's enabler IS the Hunter's class basic
    and `check_gs` §0:242 exempts it by name. So one of the three is kept and re-pointed over the class pool.
    Confirm, or rule the Sharpshooter's case not worth an arm.
-3. **`check_gn:208` HAS TWO ANSWERS IN HA's OWN REPORT.** HA §1d marks it RETIRE; HA §1g calls it *"the door a
+3. **`check_gn.gd` `_s0_the_kit`: `ok(used == Classes.lineage_slots(spec) + Classes.kit_slots(ck, spec)` HAS TWO ANSWERS IN HA's OWN REPORT.** HA §1d marks it RETIRE; HA §1g calls it *"the door a
    future lineage card would have to pass through"*, which is a reason to keep it. It is sorted **A** here, on §1g.
    Confirm.
 4. **THE SUPERSEDED SEVENTEEN ARE A SECOND COPY, AND RETIRING THEM NARROWS NOTHING — EXCEPT THAT THEY ARE THE
    SECOND COPY.** Each was proved by control to leave a live arm red on the same defect. Two of those live arms are
-   in a DIFFERENT suite (`test_batch_bt:318` covers `test_batch_bp:214` and `test_batch_cp:232`), which is a
+   in a DIFFERENT suite (`test_batch_bt.gd` `_names`: `"no ability name is used twice across the whole draft (%s)" % str(dupes))` covers `test_batch_bp.gd` `_pools`: `ok(Classes.class_draft_pool("warrior").find(n3) < 0,` and `test_batch_cp.gd` `_standard_shape`: `ok(not Classes.CLASS_DRAFT_POOLS[cls].has(nm),`), which is a
    cross-suite dependency rather than a local one. Accept that, or keep those two.
 
 ---
@@ -41,9 +41,9 @@ controls measured instead. `main` is untouched, and the merge is reported (§4),
 | 1 | *"On `class-merge`"* | **HELD** | HEAD `e532d1e` = `origin/class-merge` before anything moved; the tree was clean |
 | 2 | *"HA read all 119 targets … and found 130 passing while still asking about specs"* | **HELD** | HA §1a: 119 launched targets, 125 files read; §1d: 42 targets, 130 arms |
 | 3 | *"HD repaired the twenty HOLES"* | **HELD** | HD's own figures: sixteen repaired, four retired |
-| 4 | *"HE's `state.md` called them seventy-three; HA counted 110"* | **BOTH HELD, AND NEITHER IS THE NUMBER** | HA's 110 is every tier-2 arm INCLUDING the 35 FOLD arms HD folded; HE's 73 is 75 non-FOLD arms less `test_batch_bq`'s two. **Seventy survive** — HE's 73 less `check_dr:126`, `test_batch_bo:437` (both HB) and `check_fk:368` (HC). §1 |
+| 4 | *"HE's `state.md` called them seventy-three; HA counted 110"* | **BOTH HELD, AND NEITHER IS THE NUMBER** | HA's 110 is every tier-2 arm INCLUDING the 35 FOLD arms HD folded; HE's 73 is 75 non-FOLD arms less `test_batch_bq`'s two. **Seventy survive** — HE's 73 less `check_dr.gd` `_s1_summoning`: `print("§1 — COMPANION SUMMONING is exclusive to the Hunter (the Beastmaster defines the calls; the …`, `test_batch_bo.gd` `_cap_and_slots`: `"engines": [{"engine": "overburn", "equipped": true}]}` (both HB) and `check_fk.gd` `_s5_requires_ability_resolves`: `ok(unreachable.is_empty(),` (HC). §1 |
 | 5 | *"HD and HE have both moved code since"* | **HELD, AND HB, HC AND HF DID TOO** | 63 battery targets moved between HA's commit and HEAD; four gates are new |
-| 6 | *"verify each entry is still where HA found it"* | **HELD, AND IT WAS NOT ENOUGH** | HA's line numbers are exact **at HA's own commit** — all 110 land on an assertion head there. Today **39 of the 110 have moved or gone**. And a line check alone would have been wrong: **`check_fk:368`'s `ok(` line is byte-identical while HC re-pointed the four lines that feed it.** §1c |
+| 6 | *"verify each entry is still where HA found it"* | **HELD, AND IT WAS NOT ENOUGH** | HA's line numbers are exact **at HA's own commit** — all 110 land on an assertion head there. Today **39 of the 110 have moved or gone**. And a line check alone would have been wrong: **`check_fk.gd` `_s5_requires_ability_resolves`: `ok(unreachable.is_empty(),`'s `ok(` line is byte-identical while HC re-pointed the four lines that feed it.** §1c |
 | 7 | *"HF found HC's own census missed Long Poison"* | **HELD** | HF §6; the caution is answered by §1d's sweep of everything added since HA, which found nothing new |
 | 8 | *"GK through HF built `check_gk` to `check_hf`"* | **ONE WORD SHORT** | there is no `check_gk`, `check_gl`, `check_gh`, `check_gi` or `check_hb`; the gates of that stretch are `check_gm`–`check_gx` and `check_hc`–`check_hf`. Seventeen, not twenty-two |
 | 9 | *"several of these may be superseded"* | **HELD — SEVENTEEN OF THEM** | §2, and the eight controls that measured it |
@@ -62,10 +62,10 @@ controls measured instead. `main` is untouched, and the merge is reported (§4),
 | **= tier 2** | **110** | HA's figure, and the brief's |
 | less the FOLD family — **HD §3** | −35 | every one verified GONE, replaced by `Fixture.class_pool_floors` |
 | = non-FOLD tier 2 | **75** | |
-| less `test_batch_bq:344`, `:349` — **HD §1b**, retired by ruling | −2 | |
+| less `test_batch_bq.gd` `_break_damage`: `# struck and says why. The cards are still authored weaker; the rebalance GP`, `_break_damage`: `# free core attack.` (its file read from the text around it) — **HD §1b**, retired by ruling | −2 | |
 | **= HE's figure** | **73** | as `docs/state.md` carries it |
-| less `check_dr:126` and `test_batch_bo:437` — **HB** | −2 | both re-pointed in place, with their reasons in the source |
-| less `check_fk:368` — **HC §1** | −1 | the reach set became the class's |
+| less `check_dr.gd` `_s1_summoning`: `print("§1 — COMPANION SUMMONING is exclusive to the Hunter (the Beastmaster defines the calls; the …` and `test_batch_bo.gd` `_cap_and_slots`: `"engines": [{"engine": "overburn", "equipped": true}]}` — **HB** | −2 | both re-pointed in place, with their reasons in the source |
+| less `check_fk.gd` `_s5_requires_ability_resolves`: `ok(unreachable.is_empty(),` — **HC §1** | −1 | the reach set became the class's |
 | **= WHAT IS LEFT** | **70** | **in 34 targets** |
 
 ### §1b — How it was derived, and the instrument that failed first
@@ -77,17 +77,17 @@ against the live one and carrying the arm's index through the unchanged runs. **
 **THEN THE MAPPING WAS CHECKED AGAINST THE ONE THING IT COULD NOT SEE, AND IT HAD MISSED ONE.** An arm's `ok(` line
 can be byte-identical while the repair lands in the lines above it. So the ENCLOSING FUNCTION of all 71 was diffed,
 comments stripped: **29 sit in a function whose code moved.** Twenty-eight of those moves are HD's fold or HB's pet
-work landing beside the arm; **one is a repair — `check_fk:368`, re-pointed at HC §1 from the lineage's own shelf to
+work landing beside the arm; **one is a repair — `check_fk.gd` `_s5_requires_ability_resolves`: `ok(unreachable.is_empty(),`, re-pointed at HC §1 from the lineage's own shelf to
 `Classes.draft_pool(cls)`, with the reason written into the source.** Counting by line alone would have reported 71.
 
 ### §1c — The four that were already done, named
 
 | arm | done at | what happened |
 |---|---|---|
-| `check_dr:126` | **HB** | the summons' owner became the Hunter class; the arm admits the kit's pet card and asserts its three calls |
-| `test_batch_bo:437` | **HB** | `core_slots("beastmaster") == 1` became `== 0` — Pack Bond brings nothing |
-| `test_batch_bq:344`, `:349` | **HD §1b** | the *"class-wide cards are weaker"* rule retired by ruling; both comparisons kept computed and printed, neither asserted |
-| `check_fk:368` | **HC §1** | the reach is the class's: kit + `draft_pool(cls)` + every lineage's boss pool and protected names |
+| `check_dr.gd` `_s1_summoning`: `print("§1 — COMPANION SUMMONING is exclusive to the Hunter (the Beastmaster defines the calls; the …` | **HB** | the summons' owner became the Hunter class; the arm admits the kit's pet card and asserts its three calls |
+| `test_batch_bo.gd` `_cap_and_slots`: `"engines": [{"engine": "overburn", "equipped": true}]}` | **HB** | `core_slots("beastmaster") == 1` became `== 0` — Pack Bond brings nothing |
+| `test_batch_bq.gd` `_break_damage`: `# struck and says why. The cards are still authored weaker; the rebalance GP`, `_break_damage`: `# free core attack.` (its file read from the text around it) | **HD §1b** | the *"class-wide cards are weaker"* rule retired by ruling; both comparisons kept computed and printed, neither asserted |
+| `check_fk.gd` `_s5_requires_ability_resolves`: `ok(unreachable.is_empty(),` | **HC §1** | the reach is the class's: kit + `draft_pool(cls)` + every lineage's boss pool and protected names |
 
 ### §1d — WHAT HA COULD NOT HAVE CENSUSED, SWEPT HERE
 
@@ -120,21 +120,21 @@ check, both run, **both read by their FAIL text rather than by a count**.
 
 | ctl | the defect injected | the retired arms | did they red? | did the NAMED check red? |
 |---|---|---|---|---|
-| **c1** | War Stomp authored back into the Warden's lineage definitions | `ah:62`, `ah:80`, `al:692` | **yes**, all three | **check_gs §1:306 red** — *"War Stomp (the warden's) has 0 homes"*. But `al:519/:521` stayed **green** |
-| **c2** | eight lineage-shelf cards put into `CLASS_DRAFT_POOLS["warrior"]` | `bp:214`, `bt:200`, `bu:208`, `bv:246`, `bw:251`, `cb:197`, `ce:247`, `cp:232` | **yes**, all eight | **`check_gs` read 0 failures.** Six suites' OWN arms red instead; `bp` and `cp` only through `test_batch_bt:318` |
-| **c3** | Bloodlust and Quick Shot made draftable off their own shelves | `bp:234`, `bv:270`, `bw:272` | **yes**, all three | **check_gs §1:338 red on Bloodlust and SILENT on Quick Shot** |
-| **c4** | the Holy's authored `slots` moved 0 → 1 | `dv:270` | **yes** | **check_gs §0:254 red** — *"holy's authored slots (1) are not its enablers' bar entries (0)"* |
-| **c5** | Stabilize put into the Mage class-wide shelf | `ah:138` | **yes** | **`check_gp` read 0 failures** |
-| **c6** | the Warden's shelf emptied | `bp:139`, `cd:404` | **yes**, both | **`Fixture.class_pool_floors` red in both `bp` and `bo`** — *"the warrior pool holds 32 cards, below its floor of 43"* |
+| **c1** | War Stomp authored back into the Warden's lineage definitions | `test_batch_ah.gd` `_test_kits`: `ok(slots == want, "%s opens with %d spec abilities (got %d)" % [`, `test_batch_ah.gd` `_test_kits`: `ok(not Classes.spec_abilities(spec).any(func(a): return a.display_name == name),`, `test_batch_al.gd` `_kit_unchanged`: `ok(not kit.has("War Stomp") and not kit.has("Interpose"),` | **yes**, all three | **check_gs §1:306 red** — *"War Stomp (the warden's) has 0 homes"*. But `` `test_batch_al.gd` `_conditional_halves`: `ok(not Talents.owns_ability(_member({}), "War Stomp"),` `/` `check_gs.gd` `_s3_the_warrior_kit`: `ok(kit.count("Bloodlust") == int(c[3]),` (its file read from the text around it) `` stayed **green** |
+| **c2** | eight lineage-shelf cards put into `CLASS_DRAFT_POOLS["warrior"]` | `test_batch_bp.gd` `_pools`: `ok(Classes.class_draft_pool("warrior").find(n3) < 0,`, `test_batch_bt.gd` `_pools`: `ok(not Classes.class_draft_pool(cls).has(n),`, `test_batch_bu.gd` `_pools`: `ok(not Classes.class_draft_pool(cls).has(n),`, `test_batch_bv.gd` `_pools`: `ok(not Classes.class_draft_pool(cls).has(n),`, `test_batch_bw.gd` `_pools`: `ok(not Classes.class_draft_pool(cls).has(n),`, `test_batch_cb.gd` `_pools`: `ok(not Classes.class_draft_pool(cls).has(n),`, `test_batch_ce.gd` `_pools`: `ok(not Classes.class_draft_pool(cls).has(n),`, `test_batch_cp.gd` `_standard_shape`: `ok(not Classes.CLASS_DRAFT_POOLS[cls].has(nm),` | **yes**, all eight | **`check_gs` read 0 failures.** Six suites' OWN arms red instead; `bp` and `cp` only through `test_batch_bt.gd` `_names`: `"no ability name is used twice across the whole draft (%s)" % str(dupes))` |
+| **c3** | Bloodlust and Quick Shot made draftable off their own shelves | `test_batch_bp.gd` `_pools`: `ok(not Classes.spec_draft_pool(spec7).has(en),`, `test_batch_bv.gd` `_pools`: `ok(not Classes.spec_draft_pool(spec).has(enabler),`, `test_batch_bw.gd` `_pools`: `ok(not Classes.spec_draft_pool(spec).has(en),` | **yes**, all three | **check_gs §1:338 red on Bloodlust and SILENT on Quick Shot** |
+| **c4** | the Holy's authored `slots` moved 0 → 1 | `check_dv.gd` `_s2_boss_depth`: `ok(Classes.core_slots("holy") == 0,` | **yes** | **check_gs §0:254 red** — *"holy's authored slots (1) are not its enablers' bar entries (0)"* |
+| **c5** | Stabilize put into the Mage class-wide shelf | `test_batch_ah.gd` `_test_pools`: `ok(not ab.special in ["stabilize", "overcharge", "wildfire", "bestial",` | **yes** | **`check_gp` read 0 failures** |
+| **c6** | the Warden's shelf emptied | `test_batch_bp.gd` `_pools`: `ok(not Classes.spec_draft_pool(spec2).is_empty(),`, `test_batch_cd.gd` `_pools`: `ok(pool.size() >= SPEC_FLOOR,` | **yes**, both | **`Fixture.class_pool_floors` red in both `bp` and `bo`** — *"the warrior pool holds 32 cards, below its floor of 43"* |
 | **c7** | *(merged into c1 — the same injection)* | | | |
-| **c8** | Flame Shield authored back into the Pyromancer's definitions | `ar:614` | **yes** | **`test_batch_ar:676` red** — *"resolves to NOTHING — the name is dead in every pool"* |
+| **c8** | Flame Shield authored back into the Pyromancer's definitions | `test_batch_ar.gd` `_kit`: `ok(not by_name.has("Flame Shield"), "Flame Shield is not in the kit")` | **yes** | **`test_batch_ar.gd` `_pools`: `ok(Classes.pool_ability("Flame Shield") == null,` red** — *"resolves to NOTHING — the name is dead in every pool"* |
 
 **No copy showed a `Parse Error`.** The clean arm was read first: `check_gs` on an unmodified copy of the same tree
 reads **749 checks / 0 failures**, which is `baselines.json`'s figure for it.
 
 ### §2b — THREE OF THE EIGHT REFUTED THE RULING, AND THE SORT CARRIES WHAT WAS MEASURED
 
-- **c5 — `test_batch_ah:138` IS NOT SUPERSEDED, AND IT MOVES C → A.** The ruling was that `check_gp` §2, which casts
+- **c5 — `test_batch_ah.gd` `_test_pools`: `ok(not ab.special in ["stabilize", "overcharge", "wildfire", "bestial",` IS NOT SUPERSEDED, AND IT MOVES C → A.** The ruling was that `check_gp` §2, which casts
   every `ENGINE_READ` row with and without its engine, asks it better. It does not: **`check_gp` read 0 failures**
   with Stabilize sitting in the Mage class-wide shelf, because the gate withholds the card at the OFFER door
   whichever shelf it sits on, so nothing it drives breaks. The live form of AH's curation rule is *a class-pool card
@@ -142,25 +142,25 @@ reads **749 checks / 0 failures**, which is `baselines.json`'s figure for it.
 - **c3 — ONE OF THE THREE ENABLER ARMS IS KEPT, C → A.** `check_gs` §1:338 asks whether an enabler is in the class
   DRAFT pool, which is strictly wider than the three arms' *"not on its own shelf"* — except for the Sharpshooter,
   **whose enabler is the Hunter's class basic and which `check_gs` §0:242 exempts by name.** Retiring all three
-  would have lost that case silently. `test_batch_bp:234` is the widest of the three and is kept.
-- **c1 — `test_batch_ah:62` MOVES B → A, and `al:692`'s SUPERSEDER IS A DIFFERENT ARM.** `al:519/:521` — HA's
+  would have lost that case silently. `test_batch_bp.gd` `_pools`: `ok(not Classes.spec_draft_pool(spec7).has(en),` is the widest of the three and is kept.
+- **c1 — `test_batch_ah.gd` `_test_kits`: `ok(slots == want, "%s opens with %d spec abilities (got %d)" % [` MOVES B → A, and `test_batch_al.gd` `_kit_unchanged`: `ok(not kit.has("War Stomp") and not kit.has("Interpose"),`'s SUPERSEDER IS A DIFFERENT ARM.** `` `test_batch_al.gd` `_conditional_halves`: `ok(not Talents.owns_ability(_member({}), "War Stomp"),` `/` `test_batch_ah.gd` `_find_anywhere`: `for ab in Classes.spec_abilities(spec):` (its file read from the text around it) `` — HA's
   named duplicate — stayed **green**: they ask `Talents.owns_ability` of a fresh Warden, and under GS a lineage
-  opens with its enablers alone, so a card added to its DEFINITIONS never reaches them. What red beside `al:692`
-  was **`al:689`**, *"the Warden still DEFINES exactly 3 lineage abilities (has 4)"* — the live question, and the
-  real superseder. And because `al:689` asks it of the Warden alone, **`ah:62`'s all-twelve definition count is the
+  opens with its enablers alone, so a card added to its DEFINITIONS never reaches them. What red beside `test_batch_al.gd` `_kit_unchanged`: `ok(not kit.has("War Stomp") and not kit.has("Interpose"),`
+  was **`test_batch_al.gd` `_kit_unchanged`: `ok(kit.size() == 3, "the Warden still DEFINES exactly 3 lineage abilities (has %d)" % kit.size())`**, *"the Warden still DEFINES exactly 3 lineage abilities (has 4)"* — the live question, and the
+  real superseder. And because `test_batch_al.gd` `_kit_unchanged`: `ok(kit.size() == 3, "the Warden still DEFINES exactly 3 lineage abilities (has %d)" % kit.size())` asks it of the Warden alone, **`test_batch_ah.gd` `_test_kits`: `ok(slots == want, "%s opens with %d spec abilities (got %d)" % [`'s all-twelve definition count is the
   only arm that asks it of every lineage**: its subject is not gone, only the words *"opens with"* are.
 - **c2 — THE NAMED SUPERSEDER WAS WRONG FOR ALL EIGHT.** `check_gs` §1:320 counts homes for the THIRTY RETURNING
   cards; the eight arms guard authored draft cards, which are not in that population. `check_gs` read **0**. The
   real superseders are each suite's own cross-pool arm — *"appears in exactly ONE pool"* in `bu`, `bv`, `bw`;
   *"is not in a spec pool as well"* in `cb`; *"is not also a spec draft card"* in `ce` — and, for `bp` and `cp`
-  which have none of their own, **`test_batch_bt:318`, the whole-draft uniqueness sweep over every shelf and every
+  which have none of their own, **`test_batch_bt.gd` `_names`: `"no ability name is used twice across the whole draft (%s)" % str(dupes))`, the whole-draft uniqueness sweep over every shelf and every
   class pool.** The disposition stands; the reason recorded is the measured one.
 
 ### §2c — THE SHAPE GZ FOUND, RE-CHECKED
 
 HA named two documents keeping a pin green on a pre-merge fact. **`CLAUDE.md`'s one-in-four class seam is gone** —
-HD repaired `test_batch_br:1566`, which was a tier-1 arm, and the sentence no longer appears in the file.
-**`docs/master.html`'s *"All twelve specs draft from at least ten"* is still there, pinned at `test_batch_cb:1216`,
+HD repaired `test_batch_br.gd` `_docs`: `# passing WITHOUT ITS SUBJECT BEING ENUMERATED AT ALL — the same fault BE`, which was a tier-1 arm, and the sentence no longer appears in the file.
+**`docs/master.html`'s *"All twelve specs draft from at least ten"* is still there, pinned at `test_batch_cb.gd` `_docs`: `ok(master.contains("All twelve specs draft from at least ten"),`,
 and it is left as HA left it**: the sentence is arithmetically TRUE today (the thinnest shelf is the Warden's
 eleven) while describing a relation the merge dissolved — a hero draws his class's one pool, not his lineage's
 shelf. **The sentence and its pin move together, in the batch that re-points the pin.** Correcting the document
@@ -201,86 +201,86 @@ still owes is the inverted arm and its comment, and a re-run.
 
 | arm (line TODAY) | HA | what it asks | the door it should ask |
 |---|---|---|---|
-| `check_do:475` | 475 | precision_ranks read-site pin keeps a reason about the Swordmaster's guaranteed statuses (dorma | the guaranteed-status table re-keyed by class (with check_dp:200) |
-| `check_dp:191` | 191 | the per-lineage tree sweep read more than 0 nodes | the positive arm; the sweep walks SPEC_IDS, re-point to the one tree per class |
-| `check_dp:200` | 200 | no node reads a status outside a per-spec guaranteed-status table built on cores and passives | LARGER: needs check_do's per-spec guaranteed-status table re-keyed by class |
-| `check_dr:205` | 168 | resurrection 'belongs to the Holy Cleric' via spec_abilities ownership | resurrection's owner: defined once, reachable by every Cleric of the class pool |
-| `check_dv:251` | 251 | emptiable boss pools counted against the lineage's own shelf | emptiable boss pools, counted against the class pool, not the lineage shelf |
-| `check_dv:260` | 260 | Holy's un-draftable boss cards checked against the Holy shelf only | Holy's un-draftable boss cards, against the class pool |
-| `check_ea:317` | 316 | award-always-pays floor per lineage shelf, not per class pool x engines held | LARGER: one re-derivation over class x engines held, shared by the four |
-| `check_ea:332` | 331 | full-three floor over the pre-GP two-tier chain | LARGER: same re-derivation |
-| `check_ea:347` | 346 | no lineage's shelf floor below 3 | LARGER: same re-derivation |
-| `check_ea:395` | 394 | lost awards from the per-spec two-tier floor | LARGER: same re-derivation |
-| `check_ea:400` | 399 | emptiable boss pools counted against the lineage's own shelf | emptiable against the class pool |
-| `check_eh:156` | 156 | arm C: the lineage's reach is gone and EH's third tier must pay - the tier GP deleted | arm C reaches the tier GP deleted; re-point onto the two live tiers |
-| `check_eh:213` | 213 | all 12 lineages: boss pool + lineage shelf held still leaves the class tier paying 3 | the class tier, asked per class x engines held rather than per lineage |
-| `check_es:656` | 640 | a swap card taken from the Berserker's shelf as 'one a player could actually make' | a swap card taken off the class pool, which is what a player draws |
-| `check_gn:208` | 197 | ability_slots_used == lineage_slots + kit_slots with no engine held | FLAGGED: HA's action says RETIRE, HA §1g says the door is worth keeping |
-| `test_batch_ah:62` | 62 | each lineage's spec_abilities holds 3 bar entries - 'opens with' | c1: only test_batch_al:689 re-states it, and only for the Warden; the all-twelve definition count survives the merge |
-| `test_batch_ah:130` | 130 | no class-wide card costs a spec-exclusive secondary resource | the curation rule, over the class pool |
-| `test_batch_ah:133` | 133 | no class-wide card is a 'Beastmaster signature' | ditto, and the summons are every Hunter's kit card since HB |
-| `test_batch_ah:136` | 136 | Hex of Ruin 'stays Occultist-only' | Hex of Ruin, over the class pool |
-| `test_batch_ah:138` | 138 | no class-wide card is 'gated on a spec passive' - replaced by ENGINE_READ / SITS_OUT | c5: check_gp read 0 failures on the injection — NOT superseded; re-point onto the ENGINE_READ row the gate uses now |
-| `test_batch_ah:297` | 285 | the award refuses a member 'with no spec' | the award's refusal: seat the spine-taker who DOES bank |
-| `test_batch_ah:299` | 287 | the fallback refuses a member 'with no spec' | ditto |
-| `test_batch_ah_battle:207` | 207 | action-bar fillers from class-wide + Berserker shelf, 'new' = not in spec_abilities | fillers off draft_pool('warrior'), the one pool a Warrior draws |
-| `test_batch_aj:409` | 409 | Hack and Slash 'is in the Berserker kit' via spec_abilities | Hack and Slash: the definition table's wording, not 'the kit' |
-| `test_batch_aj:552` | 552 | Battle Shout 'drafts from the Berserker' as reachability | Battle Shout reachable off the class pool |
-| `test_batch_aj:584` | 584 | Rampage 'drafts from the Berserker' as reachability | Rampage, same |
-| `test_batch_an:824` | 824 | sibling-spec set built from boss pools AND draft shelves (positive arm) | the spec-foreign set under one pool a class |
-| `test_batch_an:829` | 829 | no zone-boss offer returns a sibling-spec entry, over the same mixed set | the zone-boss offer against that set |
-| `test_batch_at:603` | 603 | 'STABILIZE IS OUT of the opening three' = spec_abilities | 'out of the opening three' asked of the live opening |
-| `test_batch_at:628` | 628 | Stabilize 'spec-only: it reads Resonance' via the class-wide shelf | Stabilize's gate is ENGINE_READ now, not absence from a shelf |
-| `test_batch_au:657` | 657 | Firestorm / Rime 'drafts from the <spec> instead' | Firestorm / Rime reachable off the class pool |
-| `test_batch_au:777` | 777 | Magi's Wrath 'drafts from the Arcanist instead' | Magi's Wrath, same |
-| `test_batch_au:946` | 946 | the debug grant holds no sibling-spec entry, siblings' shelves counted as theirs | the debug grant vs sibling entries, under one pool |
-| `test_batch_av:303` | 303 | Resurrection / Intercession not on the Cleric class-wide shelf 'never offered to a sibling with | the two Mercy spenders, against the class pool |
-| `test_batch_aw:466` | 466 | Sacred Resolve 'drafts from the Devout' | Sacred Resolve off the class pool |
-| `test_batch_aw:468` | 468 | Bulwark of Fortitude 'drafts from the Devout' | Bulwark of Fortitude, same |
-| `test_batch_ay:403` | 403 | retired payload edits Kill Command 'which every Beastmaster owns' | 'which every Beastmaster owns': the pet card is every Hunter's since HB |
-| `test_batch_ay:410` | 410 | retired payload edits Hunter's Instinct 'which every Beastmaster owns' | ditto |
-| `test_batch_bb:765` | 760 | no Mage lineage's spec_abilities holds Ashes of Al'ar - 'does not START with it' | 'does not START with it' asked of the live opening |
-| `test_batch_bo:190` | 223 | the Warrior shelf is NAMED - 'one of four heroes had no draft' | the three Warrior shelves NAMED: an authoring location, said so |
-| `test_batch_bo:348` | 394 | CAP - core_slots(spec) >= 3 free slots | CAP - slots >= 3, re-worded off enabler_slots |
-| `test_batch_bp:234` | 232 | a lineage's enablers are absent from its OWN shelf only | c3: check_gs:338 caught Bloodlust and NOT Quick Shot (the Sharpshooter's enabler is the Hunter's basic); this is the widest of the three and is KEPT, re-pointed over the class pool |
-| `test_batch_br:289` | 313 | each Warrior lineage can draw Rally, via the class-wide shelf | Rally: every Warrior draws it off the class pool |
-| `test_batch_br:294` | 318 | each Hunter lineage can draw Field Dressing, via the class-wide shelf | Field Dressing, same |
-| `test_batch_bx:251` | 251 | the Warden shelf >= 8 'spec cards to be offered' | the Warden's shelf as a real, named part of the one Warrior pool |
-| `test_batch_cb:1216` | 1246 | pins master.html's 'All twelve specs draft from at least ten' (a doc edit rides with it) | GZ's SHAPE: master.html's sentence and its pin move together |
-| `test_batch_cd:426` | 422 | the thinnest shelf >= 10 as 'the one a card is owed to next' | the thinnest pool as the one a card is owed to next |
-| `test_run_harness:432` | 407 | a hero with his spec blanked banks nothing - the spine-taker who does bank is never seated | the un-awakened hero: seat the spine-taker who banks |
+| `check_do.gd` `_s4_status_sweep`: `ok(gated.is_empty(),` | 475 | precision_ranks read-site pin keeps a reason about the Swordmaster's guaranteed statuses (dorma | the guaranteed-status table re-keyed by class (with `check_dp.gd` `_s1_property`: `ok(fresh.is_empty(),`) |
+| `check_dp.gd` `_s1_property`: `ok(nodes > 0,` | 191 | the per-lineage tree sweep read more than 0 nodes | the positive arm; the sweep walks SPEC_IDS, re-point to the one tree per class |
+| `check_dp.gd` `_s1_property`: `ok(fresh.is_empty(),` | 200 | no node reads a status outside a per-spec guaranteed-status table built on cores and passives | LARGER: needs check_do's per-spec guaranteed-status table re-keyed by class |
+| `check_dr.gd` `_s2_revival`: `ok(found == REVIVE_SPEC,` | 168 | resurrection 'belongs to the Holy Cleric' via spec_abilities ownership | resurrection's owner: defined once, reachable by every Cleric of the class pool |
+| `check_dv.gd` `_s2_boss_depth`: `ok(emptiable.size() == 8,` | 251 | emptiable boss pools counted against the lineage's own shelf | emptiable boss pools, counted against the class pool, not the lineage shelf |
+| `check_dv.gd` `_s2_boss_depth`: `ok(holy_safe == 2,` | 260 | Holy's un-draftable boss cards checked against the Holy shelf only | Holy's un-draftable boss cards, against the class pool |
+| `check_ea.gd` `_s1_depth`: `ok(floor_now >= 1,` | 316 | award-always-pays floor per lineage shelf, not per class pool x engines held | LARGER: one re-derivation over class x engines held, shared by the four |
+| `check_ea.gd` `_s1_depth`: `ok(floor_all >= awards,` | 331 | full-three floor over the pre-GP two-tier chain | LARGER: same re-derivation |
+| `check_ea.gd` `_s1_depth`: `ok(short_specs.is_empty(),` | 346 | no lineage's shelf floor below 3 | LARGER: same re-derivation |
+| `check_ea.gd` `_s1_depth`: `ok(lost_after == 0,` | 394 | lost awards from the per-spec two-tier floor | LARGER: same re-derivation |
+| `check_ea.gd` `_s1_depth`: `ok(emptiable == 8,` | 399 | emptiable boss pools counted against the lineage's own shelf | emptiable against the class pool |
+| `check_eh.gd` `_arm`: `ok(int((q[0] as Array).size()) == mini(3, left),` | 156 | arm C: the lineage's reach is gone and EH's third tier must pay - the tier GP deleted | arm C reaches the tier GP deleted; re-point onto the two live tiers |
+| `check_eh.gd` `_s2_depth_fully_held`: `ok(t2.size() == 3,` | 213 | all 12 lineages: boss pool + lineage shelf held still leaves the class tier paying 3 | the class tier, asked per class x engines held rather than per lineage |
+| `check_es.gd` `_s4_tags_are_read`: `ok(card != "", "§4: no tagged card in the %s draft pool to swap" % spec3)` | 640 | a swap card taken from the Berserker's shelf as 'one a player could actually make' | a swap card taken off the class pool, which is what a player draws |
+| `check_gn.gd` `_s0_the_kit`: `ok(used == Classes.lineage_slots(spec) + Classes.kit_slots(ck, spec)` | 197 | ability_slots_used == lineage_slots + kit_slots with no engine held | FLAGGED: HA's action says RETIRE, HA §1g says the door is worth keeping |
+| `test_batch_ah.gd` `_test_kits`: `ok(slots == want, "%s opens with %d spec abilities (got %d)" % [` | 62 | each lineage's spec_abilities holds 3 bar entries - 'opens with' | c1: only `test_batch_al.gd` `_kit_unchanged`: `ok(kit.size() == 3, "the Warden still DEFINES exactly 3 lineage abilities (has %d)" % kit.size())` re-states it, and only for the Warden; the all-twelve definition count survives the merge |
+| `test_batch_ah.gd` `_test_pools`: `ok(ab.faith_cost == 0,` | 130 | no class-wide card costs a spec-exclusive secondary resource | the curation rule, over the class pool |
+| `test_batch_ah.gd` `_test_pools`: `ok(ab.special != "summon" and ab.special != "call_wild"` | 133 | no class-wide card is a 'Beastmaster signature' | ditto, and the summons are every Hunter's kit card since HB |
+| `test_batch_ah.gd` `_test_pools`: `ok(name != "Hex of Ruin", "Hex of Ruin stays Occultist-only")` | 136 | Hex of Ruin 'stays Occultist-only' | Hex of Ruin, over the class pool |
+| `test_batch_ah.gd` `_test_pools`: `ok(not ab.special in ["stabilize", "overcharge", "wildfire", "bestial",` | 138 | no class-wide card is 'gated on a spec passive' - replaced by ENGINE_READ / SITS_OUT | c5: check_gp read 0 failures on the injection — NOT superseded; re-point onto the ENGINE_READ row the gate uses now |
+| `test_batch_ah.gd` `_test_offers`: `ok(not run.award_ability_pick(nospec),` | 285 | the award refuses a member 'with no spec' | the award's refusal: seat the spine-taker who DOES bank |
+| `test_batch_ah.gd` `_test_offers`: `ok(int(nospec.get("bm_picks_owed", 0)) == 0, "...and owes no pick")` | 287 | the fallback refuses a member 'with no spec' | ditto |
+| `test_batch_ah_battle.gd` `_test_action_bar`: `ok(earned.size() == 8, "the Warrior draft pools can supply 8 new abilities")` | 207 | action-bar fillers from class-wide + Berserker shelf, 'new' = not in spec_abilities | fillers off draft_pool('warrior'), the one pool a Warrior draws |
+| `test_batch_aj.gd` `_ability_nodes`: `ok(base_hs != null, "Hack and Slash is in the Berserker kit")` | 409 | Hack and Slash 'is in the Berserker kit' via spec_abilities | Hack and Slash: the definition table's wording, not 'the kit' |
+| `test_batch_aj.gd` `_upgrade_paths`: `ok(Classes.spec_draft_pool("berserker").has("Battle Shout"),` | 552 | Battle Shout 'drafts from the Berserker' as reachability | Battle Shout reachable off the class pool |
+| `test_batch_aj.gd` `_upgrade_paths`: `ok(Classes.spec_draft_pool("berserker").has("Rampage"),` | 584 | Rampage 'drafts from the Berserker' as reachability | Rampage, same |
+| `test_batch_an.gd` `_test_rewards`: `ok(not class_only.is_empty(), "the Warrior siblings hold spec-foreign entries")` | 824 | sibling-spec set built from boss pools AND draft shelves (positive arm) | the spec-foreign set under one pool a class |
+| `test_batch_an.gd` `_test_rewards`: `ok(not class_only.has(n), "%s never arrives from a sibling spec" % n)` | 829 | no zone-boss offer returns a sibling-spec entry, over the same mixed set | the zone-boss offer against that set |
+| `test_batch_at.gd` `_kit`: `ok(not names.has("Stabilize"),` | 603 | 'STABILIZE IS OUT of the opening three' = spec_abilities | 'out of the opening three' asked of the live opening |
+| `test_batch_at.gd` `_kit`: `ok(not Classes.class_draft_pool("mage").has("Stabilize"),` | 628 | Stabilize 'spec-only: it reads Resonance' via the class-wide shelf | Stabilize's gate is ENGINE_READ now, not absence from a shelf |
+| `test_batch_au.gd` `_live_fallback_generic`: `ok(Classes.spec_draft_pool(String(probe["spec"])).has(name),` | 657 | Firestorm / Rime 'drafts from the <spec> instead' | Firestorm / Rime reachable off the class pool |
+| `test_batch_au.gd` `_live_capstones`: `ok(Classes.spec_draft_pool("arcanist").has("Magi's Wrath"),` | 777 | Magi's Wrath 'drafts from the Arcanist instead' | Magi's Wrath, same |
+| `test_batch_au.gd` `_live_debug_grant`: `ok(not names.has(entry2),` | 946 | the debug grant holds no sibling-spec entry, siblings' shelves counted as theirs | the debug grant vs sibling entries, under one pool |
+| `test_batch_av.gd` `_kit_and_pool`: `ok(not Classes.class_draft_pool("cleric").has("Resurrection")` | 303 | Resurrection / Intercession not on the Cleric class-wide shelf 'never offered to a sibling with | the two Mercy spenders, against the class pool |
+| `test_batch_aw.gd` `_authored_fallbacks`: `ok(Classes.spec_draft_pool("inquisitor").has("Sacred Resolve"),` | 466 | Sacred Resolve 'drafts from the Devout' | Sacred Resolve off the class pool |
+| `test_batch_aw.gd` `_authored_fallbacks`: `ok(Classes.spec_draft_pool("inquisitor").has("Bulwark of Fortitude"),` | 468 | Bulwark of Fortitude 'drafts from the Devout' | Bulwark of Fortitude, same |
+| `test_batch_ay.gd` `_magnitudes`: `ok(bool(kc["found"]) and int(kc["cost"]) == int(kc["base_cost"]) - 10` | 403 | retired payload edits Kill Command 'which every Beastmaster owns' | 'which every Beastmaster owns': the pet card is every Hunter's since HB |
+| `test_batch_ay.gd` `_magnitudes`: `ok(bool(hi["found"]) and int(hi["cost"]) == int(hi["base_cost"]) - 10,` | 410 | retired payload edits Hunter's Instinct 'which every Beastmaster owns' | ditto |
+| `test_batch_bb.gd` `_ashes_pools`: `ok(kit.display_name != "Ashes of Al'ar",` | 760 | no Mage lineage's spec_abilities holds Ashes of Al'ar - 'does not START with it' | 'does not START with it' asked of the live opening |
+| `test_batch_bo.gd` `_pools`: `ok(Classes.SPEC_DRAFT_POOLS.has(w),` | 223 | the Warrior shelf is NAMED - 'one of four heroes had no draft' | the three Warrior shelves NAMED: an authoring location, said so |
+| `test_batch_bo.gd` `_cores`: `ok(CAP - slots >= 3,` | 394 | CAP - core_slots(spec) >= 3 free slots | CAP - slots >= 3, re-worded off enabler_slots |
+| `test_batch_bp.gd` `_pools`: `ok(not Classes.spec_draft_pool(spec7).has(en),` | 232 | a lineage's enablers are absent from its OWN shelf only | c3: `check_gs.gd` `_s1_nothing_lost`: `ok(not Classes.draft_pool(cls).has(n5), "§1: the enabler %s is in the %s draft pool" % [n5, cls])` caught Bloodlust and NOT Quick Shot (the Sharpshooter's enabler is the Hunter's basic); this is the widest of the three and is KEPT, re-pointed over the class pool |
+| `test_batch_br.gd` `_pools`: `ok(Classes.class_draft_pool(Classes.class_of_spec(spec)).has("Rally"),` | 313 | each Warrior lineage can draw Rally, via the class-wide shelf | Rally: every Warrior draws it off the class pool |
+| `test_batch_br.gd` `_pools`: `ok(Classes.class_draft_pool(Classes.class_of_spec(spec2)).has("Field Dressing"),` | 318 | each Hunter lineage can draw Field Dressing, via the class-wide shelf | Field Dressing, same |
+| `test_batch_bx.gd` `_own_pools`: `ok(warden_cards.size() >= 8, "§2: the Warden has at least eight spec cards to be offered")` | 251 | the Warden shelf >= 8 'spec cards to be offered' | the Warden's shelf as a real, named part of the one Warrior pool |
+| `test_batch_cb.gd` `_docs`: `ok(master.contains("All twelve specs draft from at least ten"),` | 1246 | pins master.html's 'All twelve specs draft from at least ten' (a doc edit rides with it) | GZ's SHAPE: master.html's sentence and its pin move together |
+| `test_batch_cd.gd` `_pools`: `ok(thinnest >= 10,` | 422 | the thinnest shelf >= 10 as 'the one a card is owed to next' | the thinnest pool as the one a card is owed to next |
+| `test_run_harness.gd` `_gate_talent_conservation`: `_check("the un-awakened one did not",` | 407 | a hero with his spec blanked banks nothing - the spine-taker who does bank is never seated | the un-awakened hero: seat the spine-taker who banks |
 
 ### B — RETIRE, THE SUBJECT IS GONE — 5 arms in 5 targets
 
 | arm (line TODAY) | HA | what it asks | what removed its subject |
 |---|---|---|---|
-| `check_eh:251` | 251 | core_slots != protected_names size - the ladder no longer reads core_slots | the ladder that read core_slots is gone; the disagreement's reason with it |
-| `test_batch_au:364` | 364 | each of 12 per-lineage trees deals 27 cells and none grants | twelve per-lineage trees: FX left one tree |
-| `test_batch_az:669` | 627 | each Sharpshooter rune's lane is one of his deleted tree's lanes | the lanes of the Sharpshooter tree FX deleted |
-| `test_batch_bo:297` | 343 | no card on one lineage's shelf is in a sibling's boss pool | the shelf-vs-sibling-boss collision; live half -> a corpus name sweep |
-| `test_batch_br:682` | 677 | a Warden's offer holds a Warden-shelf card - the per-card seam roll GP deleted | the per-card seam roll GP deleted |
+| `check_eh.gd` `_s3_the_record`: `ok(disagree == 12,` | 251 | core_slots != protected_names size - the ladder no longer reads core_slots | the ladder that read core_slots is gone; the disagreement's reason with it |
+| `test_batch_au.gd` `_arcanist_authored`: `ok(bad.is_empty() and dealt.size() == 27,` | 364 | each of 12 per-lineage trees deals 27 cells and none grants | twelve per-lineage trees: FX left one tree |
+| `test_batch_az.gd` `_rune_audit`: `ok(lane == "" or lanes.has(lane),` | 627 | each Sharpshooter rune's lane is one of his deleted tree's lanes | the lanes of the Sharpshooter tree FX deleted |
+| `test_batch_bo.gd` `_pools`: `ok(not sib_hit,` | 343 | no card on one lineage's shelf is in a sibling's boss pool | the shelf-vs-sibling-boss collision; live half -> a corpus name sweep |
+| `test_batch_br.gd` `_draft_flow`: `ok(saw_spec, "§4: ...beside real spec cards")` | 677 | a Warden's offer holds a Warden-shelf card - the per-card seam roll GP deleted | the per-card seam roll GP deleted |
 
 ### C — RETIRE, SUPERSEDED — 17 arms in 13 targets
 
 | arm (line TODAY) | HA | what it asks | the check that supersedes it, and the control that proved it |
 |---|---|---|---|
-| `check_dv:270` | 270 | core_slots('holy') == 0 | check_gs §0:254 (core_slots == enabler_slots) — CONFIRMED by c4 |
-| `test_batch_ah:80` | 80 | the five AH trims absent from spec_abilities - 'left the kit' | check_gs §1:306 (homes == 1) — CONFIRMED by c1 |
-| `test_batch_al:692` | 692 | War Stomp / Interpose not in spec_abilities('warden') as 'not opening kit' (duplicate of 519/52 | test_batch_al:689 ('the Warden still DEFINES exactly 3') — c1 refuted :519/:521, which stayed green |
-| `test_batch_ar:614` | 614 | Flame Shield 'not in the kit' = spec_abilities (covered by 676) | test_batch_ar:676 ('resolves to NOTHING') — CONFIRMED by c8 |
-| `test_batch_bp:139` | 139 | each of the 12 shelves non-empty - 'EVERY spec has a draft now' | HD §3's Fixture.class_pool_floors — CONFIRMED by c6 |
-| `test_batch_bp:214` | 212 | a tranche card is not in the class-wide draft | test_batch_bt:318, the whole-draft uniqueness sweep — c2 refuted check_gs:320, which stayed green |
-| `test_batch_bt:200` | 255 | a tranche card is not on a class-wide shelf ('leaking into a class pool') | test_batch_bt:318, its own whole-draft uniqueness sweep — CONFIRMED by c2 |
-| `test_batch_bu:208` | 255 | a tranche card is not on a class-wide shelf | test_batch_bu:332 ('appears in exactly ONE pool') — CONFIRMED by c2 |
-| `test_batch_bv:246` | 276 | a NINE card is not on a class-wide shelf | test_batch_bv:420 ('appears in exactly ONE pool') — CONFIRMED by c2 |
-| `test_batch_bv:270` | 300 | a Hunter lineage's enablers are absent from its OWN shelf only | check_gs §1:338 — CONFIRMED by c3 (the Quick Shot case is kept at test_batch_bp:234) |
-| `test_batch_bw:251` | 289 | a tranche card is not on a class-wide shelf | test_batch_bw:412 ('appears in exactly ONE pool') — CONFIRMED by c2 |
-| `test_batch_bw:272` | 310 | a lineage's enablers are absent from its OWN shelf only | check_gs §1:338 — CONFIRMED by c3 (the Quick Shot case is kept at test_batch_bp:234) |
-| `test_batch_bw:417` | 455 | no NINE card in any spec_abilities 'kit does not already hold' | check_gs §1 (:306) |
-| `test_batch_cb:197` | 227 | a tranche card is not on a class-wide shelf | test_batch_cb's own cross-pool arm ('is not in a spec pool as well') — CONFIRMED by c2 |
-| `test_batch_cd:404` | 400 | every shelf >= SPEC_FLOOR 8 | HD §3's Fixture.class_pool_floors — CONFIRMED by c6 |
-| `test_batch_ce:247` | 267 | a tranche card is not on a class-wide shelf | test_batch_ce's own cross-pool arm ('is not also a spec draft card') — CONFIRMED by c2 |
-| `test_batch_cp:232` | 229 | a CP card is absent from every class-wide shelf | test_batch_bt:318, the whole-draft uniqueness sweep — c2 found no arm of cp's own |
+| `check_dv.gd` `_s2_boss_depth`: `ok(Classes.core_slots("holy") == 0,` | 270 | core_slots('holy') == 0 | check_gs §0:254 (core_slots == enabler_slots) — CONFIRMED by c4 |
+| `test_batch_ah.gd` `_test_kits`: `ok(not Classes.spec_abilities(spec).any(func(a): return a.display_name == name),` | 80 | the five AH trims absent from spec_abilities - 'left the kit' | check_gs §1:306 (homes == 1) — CONFIRMED by c1 |
+| `test_batch_al.gd` `_kit_unchanged`: `ok(not kit.has("War Stomp") and not kit.has("Interpose"),` | 692 | War Stomp / Interpose not in spec_abilities('warden') as 'not opening kit' (duplicate of 519/52 | `test_batch_al.gd` `_kit_unchanged`: `ok(kit.size() == 3, "the Warden still DEFINES exactly 3 lineage abilities (has %d)" % kit.size())` ('the Warden still DEFINES exactly 3') — c1 refuted `test_batch_al.gd` `_conditional_halves`: `ok(not Talents.owns_ability(_member({}), "War Stomp"),` (its file read from the text around it)/`test_batch_al.gd` `_conditional_halves`: `ok(not Talents.owns_ability(_member({}), "Interpose"),` (its file read from the text around it), which stayed green |
+| `test_batch_ar.gd` `_kit`: `ok(not by_name.has("Flame Shield"), "Flame Shield is not in the kit")` | 614 | Flame Shield 'not in the kit' = spec_abilities (covered by 676) | `test_batch_ar.gd` `_pools`: `ok(Classes.pool_ability("Flame Shield") == null,` ('resolves to NOTHING') — CONFIRMED by c8 |
+| `test_batch_bp.gd` `_pools`: `ok(not Classes.spec_draft_pool(spec2).is_empty(),` | 139 | each of the 12 shelves non-empty - 'EVERY spec has a draft now' | HD §3's Fixture.class_pool_floors — CONFIRMED by c6 |
+| `test_batch_bp.gd` `_pools`: `ok(Classes.class_draft_pool("warrior").find(n3) < 0,` | 212 | a tranche card is not in the class-wide draft | `test_batch_bt.gd` `_names`: `"no ability name is used twice across the whole draft (%s)" % str(dupes))`, the whole-draft uniqueness sweep — c2 refuted `check_gs.gd` `_s1_nothing_lost`: `ok(ab3 != null and ab3.display_name == String(n3), "§1: %s does not resolve through the pool …`, which stayed green |
+| `test_batch_bt.gd` `_pools`: `ok(not Classes.class_draft_pool(cls).has(n),` | 255 | a tranche card is not on a class-wide shelf ('leaking into a class pool') | `test_batch_bt.gd` `_names`: `"no ability name is used twice across the whole draft (%s)" % str(dupes))`, its own whole-draft uniqueness sweep — CONFIRMED by c2 |
+| `test_batch_bu.gd` `_pools`: `ok(not Classes.class_draft_pool(cls).has(n),` | 255 | a tranche card is not on a class-wide shelf | `test_batch_bu.gd` `_names`: `ok(int(seen.get(n, 0)) == 1,` ('appears in exactly ONE pool') — CONFIRMED by c2 |
+| `test_batch_bv.gd` `_pools`: `ok(not Classes.class_draft_pool(cls).has(n),` | 276 | a NINE card is not on a class-wide shelf | `test_batch_bv.gd` `_names`: `ok(int(seen.get(n, 0)) == 1,` ('appears in exactly ONE pool') — CONFIRMED by c2 |
+| `test_batch_bv.gd` `_pools`: `ok(not Classes.spec_draft_pool(spec).has(enabler),` | 300 | a Hunter lineage's enablers are absent from its OWN shelf only | check_gs §1:338 — CONFIRMED by c3 (the Quick Shot case is kept at `test_batch_bp.gd` `_pools`: `ok(not Classes.spec_draft_pool(spec7).has(en),`) |
+| `test_batch_bw.gd` `_pools`: `ok(not Classes.class_draft_pool(cls).has(n),` | 289 | a tranche card is not on a class-wide shelf | `test_batch_bw.gd` `_names`: `ok(int(seen.get(n, 0)) == 1,` ('appears in exactly ONE pool') — CONFIRMED by c2 |
+| `test_batch_bw.gd` `_pools`: `ok(not Classes.spec_draft_pool(spec).has(en),` | 310 | a lineage's enablers are absent from its OWN shelf only | check_gs §1:338 — CONFIRMED by c3 (the Quick Shot case is kept at `test_batch_bp.gd` `_pools`: `ok(not Classes.spec_draft_pool(spec7).has(en),`) |
+| `test_batch_bw.gd` `_names`: `ok(not NINE.has(ab.display_name),` | 455 | no NINE card in any spec_abilities 'kit does not already hold' | check_gs §1 (`check_gs.gd` `_s1_nothing_lost`: `ok(homes == 1, "§1: %s (the %s's) has %d homes among enabler, kit, shelf and the pet's calls — one" …` (its file read from the text around it)) |
+| `test_batch_cb.gd` `_pools`: `ok(not Classes.class_draft_pool(cls).has(n),` | 227 | a tranche card is not on a class-wide shelf | test_batch_cb's own cross-pool arm ('is not in a spec pool as well') — CONFIRMED by c2 |
+| `test_batch_cd.gd` `_pools`: `ok(pool.size() >= SPEC_FLOOR,` | 400 | every shelf >= SPEC_FLOOR 8 | HD §3's Fixture.class_pool_floors — CONFIRMED by c6 |
+| `test_batch_ce.gd` `_pools`: `ok(not Classes.class_draft_pool(cls).has(n),` | 267 | a tranche card is not on a class-wide shelf | test_batch_ce's own cross-pool arm ('is not also a spec draft card') — CONFIRMED by c2 |
+| `test_batch_cp.gd` `_standard_shape`: `ok(not Classes.CLASS_DRAFT_POOLS[cls].has(nm),` | 229 | a CP card is absent from every class-wide shelf | `test_batch_bt.gd` `_names`: `"no ability name is used twice across the whole draft (%s)" % str(dupes))`, the whole-draft uniqueness sweep — c2 found no arm of cp's own |
 
 ---
 
@@ -336,7 +336,7 @@ brief:
   repository; the repository tree carries no instrument change.
 - **No merge to `main`**, and `main` is untouched.
 - **HF's five open rulings stay open.**
-- **`docs/master.html` is not edited**, so `test_batch_cb:1216`'s pinned sentence and the sentence itself stay
+- **`docs/master.html` is not edited**, so `test_batch_cb.gd` `_docs`: `ok(master.contains("All twelve specs draft from at least ten"),`'s pinned sentence and the sentence itself stay
   together for the batch that re-points the pin (§2c). The stamp this batch owes is `docs/state.md`'s
   *Last rewritten* line (FU §0), and that is what moved.
 

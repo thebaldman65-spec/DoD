@@ -226,8 +226,8 @@ sheet, where the authored breaks fight the soft wrap instead of helping it: <b>2
 lines are wider than the box that holds them</b> (measured, up to 71 characters against a
 61-character budget), across five specs — Arcanist, Holy, Inquisitor, Occultist and
 Beastmaster. That finding is real and it is fixed. <b>But this field has a THIRD surface that
-CJ's audit and CL's brief both missed:</b> <code>battle.gd:1086</code> hands the same string to
-<code>add_status</code>, and <code>unit.gd:2291</code> makes that a chip
+CJ's audit and CL's brief both missed:</b> <code>scripts/battle.gd</code>'s <code>_spawn_units</code> hands the same string to
+<code>u.set_engine_chip(</code>, and <code>scripts/unit.gd</code>'s <code>_refresh_chips</code> makes that a chip
 <code>tooltip_text</code> — <b>a Godot default tooltip, which does not autowrap either.</b>
 Deleting the breaks from the field would tidy the hero sheet and render the Arcanist's block as
 one ~2000px line in the middle of a fight, which is the exact failure this section records for

@@ -403,7 +403,7 @@ mark on ONE enemy, so the word is doing the same work, **while the rune's own ta
 **Renaming `rune_hex_threshold` did not fail an assertion. It THREW:**
 
 > `SCRIPT ERROR: Invalid assignment of property or key 'rune_hex_threshold' with value of type
-> 'int' on a base object of type 'Node2D (BattleUnit)'.` — `_s5_the_read_sites (check_ez.gd:437)`
+> 'int' on a base object of type 'Node2D (BattleUnit)'.` — `_s5_the_read_sites (`check_ez.gd` `_s5_the_read_sites`: `var ss: BattleUnit = heroes[2]`)`
 
 **The throw aborted the function, and the gate printed `check_ez: 34 checks / 1 failures` against
 a baseline of 96 / 0.** **SIXTY-TWO ASSERTIONS NEVER RAN AND THE VERDICT LINE SAID NOTHING ABOUT

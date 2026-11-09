@@ -289,7 +289,7 @@ fell into), format-bearing literals separated out so they do not inflate the den
 **25 GAINED across four documents — 14 distinct — and no negative assertion anywhere touches one.**
 303 negative `contains` assertions were swept out of the corpus (flattened first, so one split
 across a line continuation is still seen). Zero match a gained needle exactly. **One matches by
-containment**: `test_batch_bd.gd:165` asserts `not ab.perfect_text.to_lower().contains("choose")`,
+containment**: `test_batch_bd.gd` `_the_spec`: `"§1: the perfect text is CLEARED — the fourth spring is base now (reads '%s')" % \` asserts `not ab.perfect_text.to_lower().contains("choose")`,
 and `choose_two` contains `choose` — but that is **an Ability's `perfect_text`, not a document**,
 so no document edit can reach it. Exact-match sweeps are blind to containment, which is why the
 containment direction is swept separately.

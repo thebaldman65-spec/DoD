@@ -21,8 +21,8 @@ Five were checked. **Four held. One was a naming trap that would have wasted a r
 | `master.html` may hold claims that contradict the code | **HELD.** Two found, both corrected — §4 |
 | "CN found 137 abilities that field-level reads misjudge" | **NOT REPRODUCED, and not re-derived.** My own population is different: **160 of the 227-card corpus carry a `special`.** Stated as my number, not as CN's |
 
-**THE NAMING TRAP.** **Devout is `inquisitor` and Survivalist is `mystic`.** `classes.gd:373-374`
-and `:412-414` record that the docs and the code disagree **by design**, and that a `"devout":`
+**THE NAMING TRAP.** **Devout is `inquisitor` and Survivalist is `mystic`.** `scripts/classes.gd` `const SPEC_DRAFT_POOLS`: `# display name "Devout" and master.html's draft table prints "Devout", so` to `` # the docs and the code disagree BY DESIGN. A `"devout":` entry here would ``
+and `const SPEC_DRAFT_POOLS`: `# display name "Survivalist" and master.html prints "Survivalist", so the` to `` # A `"survivalist":` entry here would raise nothing, resolve nothing, and `` (its file read from the text around it) record that the docs and the code disagree **by design**, and that a `"devout":`
 entry "would raise nothing, resolve nothing". `Runes._scope_ok` matches on the spec key, so **a
 rune scoped `spec:devout` or `spec:survivalist` would roll for nobody, silently.** Two of the eight
 rune sets were one string away from being unreachable.
@@ -40,7 +40,7 @@ deleted before the commit.
 
 ### THE POPULATION IS THREE CHANNELS, AND THAT CHANGES EVERY CONDITION SUM
 
-`hold_ability()` (`run_state.gd:1975`) is **the one place a card enters the pool from either
+`hold_ability()` (`scripts/run_state.gd` `equip_earned_ability`: `# through one writer now instead of two.`) is **the one place a card enters the pool from either
 channel** — `take_draft_ability` for the elite draft, `map_screen._pick_ability` for the zone-boss
 pick. Both write `bm_abilities`. **`Runes.drafted_names()` reads that list**, so a boss-pick card
 counts toward a THRESHOLD exactly as a drafted one does.
@@ -128,12 +128,12 @@ THRESHOLD rune gated on BREAK is inert for **every hero in every build, in all t
 
 | Spec | Term | Line | Has a bonus field? |
 |---|---|---|---|
-| Swordmaster | aggressive **dealt** `1.15 + …` | `battle.gd:9507` | **yes** — node + rune + Discipline |
-| Swordmaster | defensive **taken** `maxf(0.85 - …)` | `battle.gd:10015` | **yes** — node + rune + Discipline |
-| Swordmaster | aggressive **taken** `raw *= 1.10` | `battle.gd:10013` | **NO** |
-| Swordmaster | defensive **dealt** `raw *= 0.90` | `battle.gd:9510` | **NO** |
-| Survivalist | +8% per distinct status | `battle.gd:9227` | **NO** |
-| Survivalist | 25% poison barb | `battle.gd:10964` | **NO** |
+| Swordmaster | aggressive **dealt** `1.15 + …` | `scripts/battle.gd` `_resolve`: `raw *= 1.15 + attacker.seasoned_off_bonus \` | **yes** — node + rune + Discipline |
+| Swordmaster | defensive **taken** `maxf(0.85 - …)` | `scripts/battle.gd` `_resolve`: `raw *= maxf(0.85 - strike_target.seasoned_def_bonus` | **yes** — node + rune + Discipline |
+| Swordmaster | aggressive **taken** `raw *= 1.10` | `scripts/battle.gd` `_resolve`: `raw *= 1.10` | **NO** |
+| Swordmaster | defensive **dealt** `raw *= 0.90` | `scripts/battle.gd` `_resolve`: `raw *= 0.90` | **NO** |
+| Survivalist | +8% per distinct status | `scripts/battle.gd` `_resolve`: `raw *= 1.0 + 0.08 * sv_n` | **NO** |
+| Survivalist | 25% poison barb | `scripts/battle.gd` `_resolve`: `and not attacker.dead and randf() < 0.25:` | **NO** |
 
 **Both of the Swordmaster's UPSIDES are reachable and both of his DOWNSIDES are not.** *"Your
 Defensive guard no longer blunts your blade"* is the natural sentence and it is unimplementable
@@ -156,7 +156,7 @@ plumbing an author reaches **with no new code**, and it is wildly uneven:
 
 **The Cryomancer's four are a special case.** `rune_frigid_ranks`, `rune_frostbite_ranks`,
 `rune_hungering_ranks` and `rune_hypothermia_ranks` all arrive through
-`_max_hero_rank(field, rune_field)` (`battle.gd:7614`), which takes the highest `node + rune`
+`_max_hero_rank(field, rune_field)` (`scripts/battle.gd` `_max_hero_rank`: `func _max_hero_rank(field: String, rune_field: String = "") -> int:`), which takes the highest `node + rune`
 **across living heroes**. A rune written against one **competes with the talent node on a different
 hero rather than stacking with it**, and it pays for the whole party's cold rather than the
 wearer's. No other spec's rune plumbing is read that way.
@@ -192,7 +192,7 @@ section, **four lines below a paragraph that states the rule correctly** — EI'
 
 1. **"The protected core is in the count, because it is carried: it is half to two thirds of the
    bar."** **False.** `Runes.drafted_names()` reads `bm_equipped`, falling back to `bm_abilities` —
-   the EARNED cards. Both surfaces that draw the tick (`party_screen.gd:425`, `map_screen.gd:1763`)
+   the EARNED cards. Both surfaces that draw the tick (`scripts/party_screen.gd` `_draw_detail`: `var ez_drafted: Array = Runes.drafted_names(member)`, `scripts/map_screen.gd` `_open_loadout_panel`: `var ez_dr: Array = Runes.drafted_names(member)`)
    call it. **The denominator is 4–7, or 3–6 for the Holy Cleric — not the 7-to-10 bar.** The
    whole-bar figure belongs to a different question: `Run.loadout_ability_names()` is core + earned,
    and that is what the on-screen tag census walks.
@@ -218,7 +218,7 @@ on purpose: a drop or a duplication moves the file size and a weaker check would
 
 **Every GAINED was checked** against the pin manifest and against whether any target uses it
 negatively. All are common identifiers (`bm_equipped`, `bm_abilities`, `core_slots`, `inquisitor`,
-`mystic`, `devout`). The only negative use of any of them is `check_eh.gd:255`, and it is against a
+`mystic`, `devout`). The only negative use of any of them is `check_eh.gd` `_s3_the_record`: `ok(not cbody.contains("core_slots") and not cbody.contains("protected_names"),`, and it is against a
 substring of `run_state.gd`, not against a document. The changelog's negative assertions are all of
 the form *"this old batch's `<h2>` is not in the live file"*, and FJ's heading matches none.
 

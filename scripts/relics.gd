@@ -1,8 +1,8 @@
 # Relics: permanent account-wide unlocks (the meta-progression layer).
-# Earned one per zone-boss kill; the DRAFT screen assigns up to 3 of the
-# unlocked collection to a run (Run.active_relics), and events can slot
-# a run-scoped extra via the relic_grant verb. Persisted to
-# user://relics.json across sessions.
+# Earned one per boss kill, the end boss's included; the DRAFT screen
+# assigns up to 3 of the unlocked collection to a run (Run.active_relics),
+# and events can slot a run-scoped extra via the relic_grant verb.
+# Persisted to user://relics.json across sessions.
 #
 # THE HOOK VOCABULARY (Batch 39 audit — what a relic can attach to
 # without new plumbing; every entry below is read at exactly one site):

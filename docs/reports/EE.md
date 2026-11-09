@@ -282,7 +282,7 @@ already known.
 
 Reported rather than repaired, because each is genuinely covered:
 
-- **`test_batch_bm:175`** (`func _resolve_boss`) — unasserted, but **both members of the alternation
+- **`test_batch_bm.gd` `_earning`: `var body := bs.substr(idx, 2400)`** (`func _resolve_boss`) — unasserted, but **both members of the alternation
   below it read slices of `body`**, so a −1 empties both and the group reds.
 - **`test_batch_bm`'s `Run_end_boss_kind()`** — unasserted, but its return feeds
   `Enemies.kinds().has(…)`, and a garbage slice fails that.

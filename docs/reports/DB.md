@@ -127,7 +127,7 @@ because a hand-written name is the next thing to drift.
 
 **§1 asked for `run_battery.sh`'s hand-rolled `grep -E "checks,"` to be fixed to read the one
 format. That grep does not exist.** The only occurrence of `checks,` in the file is **inside the
-header comment recording it as a scar CP already fixed** (`run_battery.sh:6`). The live matcher is
+header comment recording it as a scar CP already fixed** (`run_battery.sh` (file scope): `` # (test_batch_bl silently under-ran), a `grep -E "checks,"` that missed every ``). The live matcher is
 already general:
 
 ```

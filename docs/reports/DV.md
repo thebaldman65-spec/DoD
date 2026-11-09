@@ -46,9 +46,9 @@ resolving entries no run can reach, with `run_state.gd`'s own comment saying not
 
 | source | what it says |
 |---|---|
-| `classes.gd:148-151` | the Batch AH award offered *"1 from its SPEC_POOLS entry and 2 from its class's CLASS_POOLS entry (`Run.roll_ability_offer`)"* |
-| `run_state.gd:1417-1421` | *"BATCH AN §4 re-pointed this at the SPEC POOL ONLY — the 1-spec-plus-2-class draw Batch AH built is dropped … nothing in the run reads them any more"* |
-| `test_batch_an.gd:126` | asserts **`roll_ability_offer()` is DELETED**, in the list of AN's deletions |
+| `scripts/classes.gd` `cleric_kit`: `# EARNS 6 more over a run — two per zone, one from the mini-boss and one` to `# (Run.roll_ability_offer). Nothing here is new content: a pool entry is` | the Batch AH award offered *"1 from its SPEC_POOLS entry and 2 from its class's CLASS_POOLS entry (`Run.roll_ability_offer`)"* |
+| `scripts/run_state.gd` `owned_ability_names`: `#` to `# nothing in the run reads them any more, so re-opening the class draw is a` | *"BATCH AN §4 re-pointed this at the SPEC POOL ONLY — the 1-spec-plus-2-class draw Batch AH built is dropped … nothing in the run reads them any more"* |
+| `test_batch_an.gd` `_test_deletions`: `"roll_ability_offer"]:` | asserts **`roll_ability_offer()` is DELETED**, in the list of AN's deletions |
 
 The Batch AN changelog entry in the archive agrees in its own words: *"drawn from the hero's spec
 pool only — the class-pool draw Batch AH added is dropped, abilities are spec-locked now."*

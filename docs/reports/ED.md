@@ -96,8 +96,8 @@ records of deletions, which EB's rule says must not be swept, or they name engin
 
 1. **`wild_communion_ranks` has not existed since Batch AY.** The names-that-look-wrong block named
    it as the Beastmaster's live field. The live field is **`wild_communion_step`**, and
-   `test_batch_ay.gd:348` pins `0.015 * pm.wild_communion_ranks` **absent** from `battle.gd` — so the
-   guide named the dead one while a suite asserted it dead, and `talents.gd:2143` states the same
+   `test_batch_ay.gd` `_additive_units`: `for dead in ["0.015 * pm.wild_communion_ranks", "0.08 * pm.momentum_ranks",` pins `0.015 * pm.wild_communion_ranks` **absent** from `battle.gd` — so the
+   guide named the dead one while a suite asserted it dead, and `scripts/talents.gd` `const LANE_TREES`: `` # WATCH THE ONE NAME TRAP: `wild_communion_step` IS NOT `communion_ranks` `` states the same
    trap correctly one file away. The *rule* is true and still binds — `communion_ranks` is the
    Devout's and the two share no counter — and `test_batch_ay` §6 does walk both trees in both
    directions, as the block claims. **Corrected the name, and recorded that the ranked form is

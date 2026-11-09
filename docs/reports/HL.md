@@ -506,10 +506,10 @@ And three of this batch's own:
 
 - **THREE CARD TEXTS USE *ENGINE* AS A WORD FOR A RULE**, not as the rune's name, and are left as authored (card text is
   the designer's, and §2's ruling was about the rune): a Cleric damage card's *"For the turns when nobody needs mending
-  and the engine is not ready"* (`classes.gd:3891`), Downwind's *"His engine, fed by every hero"* (`:5624`) and
-  Shrapnel Charge's *"the engine of the hunt"* (`:6944`). A player who reads *core rune* on every screen meets *engine*
+  and the engine is not ready"* (`scripts/classes.gd` `draft_ability`: `"description": "Rebuke one enemy: 25% of Attack as holy\ndamage and 20 Break damage. For the\nturns …`), Downwind's *"His engine, fed by every hero"* (`draft_ability`: `"description": "For 4 turns the wind carries it: every\nharmful effect any hero lands on an\nenemy …` (its file read from the text around it)) and
+  Shrapnel Charge's *"the engine of the hunt"* (`spec_abilities`: `"description": "A scattering charge rips TWO chosen\nenemies for 20% of Attack as nature\ndamage …` (its file read from the text around it)). A player who reads *core rune* on every screen meets *engine*
   on three cards.
-- **TWO COMMENTS IN ORDINATION'S HANDLER SAY FIVE** (`battle.gd:23240`, `:23245` — *"`faith_stacks` caps at five"*, *"his
+- **TWO COMMENTS IN ORDINATION'S HANDLER SAY FIVE** (`scripts/battle.gd` `_resolve_special`: `` # THE LOWEST HOLDER, NOT A CLICK. `faith_stacks` caps at five, so ``, `_resolve_special`: `# THE CASTER IS EXCLUDED: his own Faith holds at five and never` (on the tree this report mostly cites; its file read from the text around it) — *"`faith_stacks` caps at five"*, *"his
   own Faith holds at five"*): the cap is the threshold, three from CZ to HL and eight now. Stale since CZ, not moved
   here; comments are asserted surfaces, and a sweep that edits them owes a literal sweep.
 - **AN OLD SAVE WHOSE SWORDMASTER DRAFTED GUARD CHANGE HOLDS IT TWICE** — the kit's copy (the enabler) and his earned one

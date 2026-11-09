@@ -19,15 +19,15 @@ stated, one imprecise.**
 
 | premise | verdict |
 |---|---|
-| Deepening Hex moves the detonation *cadence* | **CONFIRMED** — `rune_hex_threshold: 8` → `_ruin_threshold()`, `battle.gd:15136` |
-| Standing Mark moves the lifesteal *cap* | **CONFIRMED** — `rune_ruin_leech_cap: 0.20`, read into `leech_cap` at `battle.gd:10284` |
+| Deepening Hex moves the detonation *cadence* | **CONFIRMED** — `rune_hex_threshold: 8` → `_ruin_threshold()`, `scripts/battle.gd` `_ruin_threshold`: `if occ != null and occ.rune_hex_threshold > 0:` |
+| Standing Mark moves the lifesteal *cap* | **CONFIRMED** — `rune_ruin_leech_cap: 0.20`, read into `leech_cap` at `scripts/battle.gd` `_resolve`: `+ occ_leech.rune_ruin_leech_cap` |
 | Wide Rite moves the mark *rate* | **CONFIRMED** — `rune_wide_rite: 1` → `_old_gods_mark()`, the one function all five quoting sites call |
 | Open Wound trades *permanence* for reach | **CONFIRMED** — Shadowrend marks every enemy; Ruin decays 1 a turn on every bearer |
-| **nothing changes what a detonation DOES** | **CONFIRMED, AND IT IS THE LOAD-BEARING ONE** — `_detonate_ruin` reads only the Occultist's Attack, `grim_ranks` and `unravel_ranks`, and **no rune writes either counter** (`talents.gd:2352`, `2362` are their only writers) |
+| **nothing changes what a detonation DOES** | **CONFIRMED, AND IT IS THE LOAD-BEARING ONE** — `_detonate_ruin` reads only the Occultist's Attack, `grim_ranks` and `unravel_ranks`, and **no rune writes either counter** (`scripts/talents.gd` `const LANE_TREES`: `"payload": {"stat": {"grim_ranks": 80}}},`, `2362` are their only writers) |
 | `_ruin_threshold()` and the detonation site are already read by Deepening Hex and by the primer | **CONFIRMED** — and the survivors are known in exactly one place, the `not target.dead` arm |
 | Requiem consumes the whole pile and **fires no detonation** | **CONFIRMED** — it removes `ruin_primed` and `ruin` and never calls `_detonate_ruin`; asserted two ways at `check_ez` §5 |
 | the pool stays at twenty-one live runes | **CONFIRMED as a consequence, not as an input** — one out, one in; the FILE goes 86 → 87 because a retirement is kept |
-| Hex of Ruin is base 20% against three chosen enemies | **CONFIRMED** — `classes.gd:5650`, and after FC nothing in `data/runes.json` modifies that card |
+| Hex of Ruin is base 20% against three chosen enemies | **CONFIRMED** — `scripts/classes.gd` `spec_abilities`: `Ability.make({"display_name": "Hex of Ruin", "cooldown": 2, "dmg_type": "shadow", "cost": 20, …`, and after FC nothing in `data/runes.json` modifies that card |
 | FA priced it at 12% against a false roster premise; FB measured it strictly worse | **CONFIRMED as FA's and FB's, cited rather than re-derived** |
 | the named constants are unmoved | **CONFIRMED** — `SC_PROFILE_DEFAULT`, `CRIT_EXCESS_STEP`, `BOND_CONVERT`, `BOND_MITIGATION_MAX` and every `SS_SEQ_*` read back unchanged |
 | **"Ruin already survives its own detonation — that is Requiem's whole design"** | **IMPRECISE, AND THE DISTINCTION MATTERS.** The stacks surviving is **AX §1's** design, not Requiem's; Requiem *depends* on it and *spends* it. The phrase is also the project's own idiom for "the mark is not consumed by its blast" — which is why it is **not** a claim about death, and why §2's death case resolves the way it does |
@@ -415,7 +415,7 @@ labelled.**
   with it (`[5, 55, 0]`), so the decay bill doubles.
 - **STANDING MARK IS THE ONE WHERE THE READING IS NOT OBVIOUS, AND IT IS REPORTED AS ARITHMETIC
   RATHER THAN AS A MEASUREMENT.** The draught is `min(0.02 × stacks, cap)`
-  (`battle.gd:10286`), so halving a pile halves the draught **on that body** wherever the pile sits
+  (`scripts/battle.gd` `_resolve`: `* (2 + occ_leech.soul_leech_step + occ_leech.rune_soul_leech_step`), so halving a pile halves the draught **on that body** wherever the pile sits
   under the cap — and the Standing Mark's raised 60% cap puts *more* of the pile inside that linear
   region, which makes the halving cost more rather than less. **But the stacks are not destroyed,
   they move**, so striking the receiver now heals more, and whether it nets out depends on which body

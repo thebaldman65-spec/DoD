@@ -642,12 +642,12 @@ backup: the folder has never been tracked, and it stays that way.
 - About 349 comment lines in `scripts/` carry the retired vocabulary: lanes, capstones, rows and node names. They are
   mostly the SYNERGY and AXIS lines above each card in `classes.gd`, and `unit.gd`'s field headers.
 - Named instances:
-  - the `DOD_SIM_TALENTS` example at `battle.gd:1205`;
-  - the Battle Shout tiers note at `battle.gd:208-219`;
+  - the `DOD_SIM_TALENTS` example at `scripts/battle.gd` `_spawn_units`: `# DOD_SIM_TALENTS="bz_bloodcraze:3,wd_toughness:2" force-learns`;
+  - the Battle Shout tiers note at `scripts/battle.gd` `const STATUS_INFO`: `# BATCH CK §3 — THIS FALLBACK CARRIES NO MAGNITUDE ON PURPOSE, AND THAT IS` to `# lists all three tiers; it was deliberately left alone.`;
   - the Iron Will note at `classes.gd` ~3003;
   - the Killing Frost collision note at ~3110;
-  - `unit.gd:1114`'s "quadruple" (x3 since BI);
-  - the "Richocet" misspelling at `battle.gd:8647` and `unit.gd:457`;
+  - `scripts/unit.gd` `var fervor`: `# all; stacks with Apostle for quadruple. Shaped`'s "quadruple" (x3 since BI);
+  - the "Richocet" misspelling at `scripts/battle.gd` `_resolve`: `_log("   → Talent: Richocet — the block staggers %s" % \` and `scripts/unit.gd` `var ricochet_ranks`: `var ricochet_ranks := 0       # Richocet: chance to stun on block`;
   - `Run._migrate_trees`' header, which says vanished points "are refunded".
 
 **PRE-EXISTING, FOUND IN PASSING, NOT FX's.**
