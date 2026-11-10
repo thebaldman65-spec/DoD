@@ -88,7 +88,8 @@ const NEAR_MISSES := {
 	# A relic, *Tithing Scales*, whose id is the rune's own in another table.
 	"Tithe": ["relic id:tithe", "relic:Tithing Scales"],
 	"Fellowship": [],
-	"Gravesong": ["enemy:Grave Totem", "relic:Gravelight Lantern", "relic:Gravewrought Coin"],
+	# The Grave Husk joined at JU §1: the designer's kind name, its near-miss named (JU's ruling 5).
+	"Gravesong": ["enemy:Grave Husk", "enemy:Grave Totem", "relic:Gravelight Lantern", "relic:Gravewrought Coin"],
 	"Empty Pulpit": [],
 	"Cold Hearth": ["ability:Cold Iron", "rune:Cold Snap", "rune:Deep Cold", "rune:Killing Cold",
 		"rune:Rune of the Killing Cold"],

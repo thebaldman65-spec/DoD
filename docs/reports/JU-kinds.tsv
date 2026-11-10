@@ -1,0 +1,7 @@
+kind	name	patterned on	roles	power	enemy role	Attack	health	armor	speed	rosters	resists	basic	basic damage	basic Break	basic worth	second move	second damage	second Break	what it lays	second worth	multiple	a point less	band	cooldown	spend	spend worth	spend multiple	spend band	spend cooldown
+grave_husk	Grave Husk	whelp (Orc Whelp)	skirmisher	1	damage	100	90	0.05	115.0	3	nature -25%, shadow -25%	Rattling Swipe	26	16	31.5538	Shambling Lurch	38	20	nothing	44.9423	1.4243	1.3926	2	2	Rally	87.8285	2.7834	3	3
+mossback	Mossback	bog_troll (Bog Troll)	brute·bulwark	3	tank	75	300	0.15	70.0	1	nature +50%, fire -25%	Bark Ram	40	24	38.3308	Silt Smother	64	18	slow 2t 70%	54.2481	1.4153	1.3957	2	2	Entrench	106.2812	2.7727	3	3
+blight_speaker	Blight-Speaker	hexer (Orc Hexer)	hexer·sniper	2	support	50	120	0.05	95.0	1	shadow +50%, holy -25%, nature -25%	Sour Whisper	44	14	26.8596	Canker Litany	43	34	fester 3t	37.8019	1.4074	1.3888	2	2	Rally	87.8285	3.2699	4	4
+carrion_pack	Carrion Pack	wolfrider (Wolfrider)	skirmisher	2	damage	100	130	0.12	125.0	3	physical +5%, nature -25%	Snapping Jaws	36	20	42.9423	Worrying Bites	55	16	cripple 2t 50%	60.5538	1.4101	1.3868	2	2	Rally	87.8285	2.0453	3	3
+the reference board	the median composable body	127.5	HEAD's	127.5	the median basic	36.595	HEAD's	36.595	the Break price	0.34712
+kinds a roster holds	roster 1: 18 at HEAD, 20 now	roster 2: 17 at HEAD, 17 now	roster 3: 17 at HEAD, 19 now	roster 4: 16 at HEAD, 16 now	roster 5: 19 at HEAD, 19 now

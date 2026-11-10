@@ -293,12 +293,18 @@ itself, which that file holds, so it is not restated here.
 > 2. **WHAT WAS DECIDED**, as agreed in conversation, in the designer's own terms — **and what is deliberately out of
 >    scope**, because scope is part of the decision.
 > 3. **WHAT IT WAS WRITTEN FROM** — the reports and kept tables, named by batch code, and the conversation. **A record that
->    names no source is a guess, which is visible before the work starts.** Each fact about the code it carries is a file, a
->    function and a quoted line, as the report it is quoted from states them.
+>    names no source is a guess, which is visible before the work starts.** Each fact ~~about the code~~ it carries that is
+>    not a design decision is quoted from a named report — about the code, a file, a function and a quoted line, as that
+>    report states them.
 > 4. **THE OPEN QUESTIONS** — what the record does not know, each with the decision taken for both branches so nothing
->    stalls: *if X, do this; if not X, do that and say so.* **Never a fact about the code asserted as a premise.**
+>    stalls: *if X, do this; if not X, do that and say so.* **Never a fact ~~about the code~~ asserted as a premise.**
 
-**ANYTHING ABOUT THE CODE IS QUOTED FROM A NAMED REPORT, OR IT IS AN OPEN QUESTION. THERE IS NO THIRD OPTION.** The record's
+~~**ANYTHING ABOUT THE CODE IS QUOTED FROM A NAMED REPORT, OR IT IS AN OPEN QUESTION. THERE IS NO THIRD OPTION.**~~
+**EVERY FACT IN A RECORD THAT IS NOT A DESIGN DECISION IS QUOTED FROM A NAMED REPORT, WHATEVER IT IS ABOUT, OR IT IS AN OPEN
+QUESTION (JU §0, the designer's ruling of 10 November, widening JT §1's).** The code, the project's own record, a batch's
+outcome, a size, a count, a time and the author's own earlier claims alike: of JT's fourteen premise departures, four were
+facts about the code and ten were about the record or the author's earlier claims (the designer's count, of JT's premise
+table). There is no third option. The record's
 author does not read the repository and does not claim to. Since JR every citation in a report is a file, a function and a
 quoted line, verified at source by the party that ran the tree, so a report is a better source for the design side than its
 author's own search would be. **What no report covers, the record does not know**: it goes among the open questions, never
@@ -324,8 +330,9 @@ inferred from silence.
 
 ### A MALFORMED RECORD IS REPORTED, NOT GUESSED AT
 
-> **A record that arrives without its four sections — above all one that names no source, or asserts a fact about the code
-> that no named report carries — is named so in the report's first line, and the batch proceeds on what it does carry.**
+> **A record that arrives without its four sections — above all one that names no source, or asserts a fact ~~about the code~~
+> that no named report carries, whatever it is about (JU §0) — is named so in the report's first line, and the batch proceeds
+> on what it does carry.**
 
 **The gap is not filled by inferring what was meant, and the batch does not stall waiting for a better record.** The batch that
 reads these rules every time is the party placed to notice, and the report is read anyway, so the designer does not have to

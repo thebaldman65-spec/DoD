@@ -49,11 +49,15 @@ const RULE_FIELDED := ["chief", "withered_warden", "ash_tyrant", "hollow_crown"]
 # BATCH JS — SEVEN KINDS AND TWO ROSTERS JOINED THE WARBAND AFTER THIS GATE LANDED (JS §1–§3): the Frozen Plains' six and its
 # boss, and rosters 4 and 5 on the kinds tagged for all three old rosters. Each is named here and read apart, so this gate goes on
 # asking its own question of the warband its batch left; `check_js` holds the seven.
-const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan"]
+# BATCH JU §1 — AND THE FOUR KINDS JU ADDED TO THE FOREST OF OLD, set aside as JS's seven are: this gate holds the warband its
+# batch left, and a kind added after it is no figure of that warband moving.
+const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan",
+	"grave_husk", "mossback", "blight_speaker", "carrion_pack"]
 const ROSTERS_SINCE := [4, 5]
 # AND WHAT THE SEVEN ADD TO TWO OF THIS GATE's LISTS: the Stillwrought lays Sap on its blow (Sap's second carrier), and the
 # Icewrought Titan is fielded by a rule (the Frozen Plains' boss).
-const CARRIERS_SINCE := {"sap": ["stillwrought"]}
+# BATCH JU §1 — the Blight-Speaker's Canker Litany lays Fester beside the Rot Behemoth's Bellow.
+const CARRIERS_SINCE := {"sap": ["stillwrought"], "fester": ["blight_speaker"]}
 const RULE_FIELDED_SINCE := ["icewrought_titan"]
 # THE WARBAND's DATA AS JQ LANDED IT — `check_jq` §5's digest. With the three tags put back as they were, the tree's data must
 # read it: nothing else in a kind moved (C15).
@@ -359,6 +363,13 @@ func _s1_the_carriers() -> void:
 			ok(JSON.stringify(as_set) == JSON.stringify(AS_JR[kind][field]),
 				"§1: %s's %s is %s, not the %s JR set" % [kind, field, str(as_set), str(AS_JR[kind][field])])
 	# C01 — DERIVED OFF THE DATA, THROUGH THE COMPOSER's OWN DOOR: HEAD's tags put in, derived, and put back.
+	# BATCH JU §1 — THE KINDS ADDED SINCE STAND ASIDE FROM BOTH DERIVATIONS: JR's rates are of the warband JR left, and JU's four
+	# in rosters 1 and 3 would thin every kind's share there. Their rosters are put back after the second.
+	var aside := {}
+	for k0 in ADDED_SINCE:
+		if data.has(k0):
+			aside[k0] = ((data[k0] as Dictionary).get("zones", []) as Array).duplicate()
+			(data[k0] as Dictionary)["zones"] = []
 	var kept := {}
 	for kind in AS_HEAD:
 		if data.has(kind):
@@ -372,6 +383,9 @@ func _s1_the_carriers() -> void:
 		(data[bits[0]] as Dictionary)[bits[1]] = kept[key]
 	_cache.clear()
 	var per := _rates()
+	for k0 in aside:
+		(data[k0] as Dictionary)["zones"] = aside[k0]
+	_cache.clear()
 	for kind in CARRIERS:
 		var mean := 0.0
 		var cells: Array = []

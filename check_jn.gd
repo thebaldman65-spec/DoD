@@ -46,7 +46,10 @@ const MOVED_SINCE := {"grave_totem": {"zones": [1.0, 3.0]}, "behemoth": {"zones"
 # BATCH JS — SEVEN KINDS AND TWO ROSTERS JOINED THE WARBAND AFTER THIS GATE LANDED (JS §1–§3): the Frozen Plains' six and its
 # boss, and rosters 4 and 5 on the kinds tagged for all three old rosters. Each is named here and read apart, so this gate goes on
 # asking its own question of the warband its batch left; `check_js` holds the seven.
-const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan"]
+# BATCH JU §1 — AND THE FOUR KINDS JU ADDED TO THE FOREST OF OLD, set aside as JS's seven are: this gate holds the warband its
+# batch left, and a kind added after it is no figure of that warband moving.
+const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan",
+	"grave_husk", "mossback", "blight_speaker", "carrion_pack"]
 const ROSTERS_SINCE := [4, 5]
 # SANCTITY's STEP, AS IT STANDS — read out at §0, never changed (C10).
 const SANCTITY := {"SANCTITY_PER_STEP": 13, "SANCTITY_MAX_STEPS": 5, "SANCTITY_STEP_TURNS": 1}

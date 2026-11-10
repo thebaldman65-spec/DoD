@@ -1844,5 +1844,238 @@
     "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
    }
   ]
+ },
+ "grave_husk": {
+  "unit_name": "Grave Husk",
+  "power": 1,
+  "roles": [
+   "skirmisher"
+  ],
+  "zones": [
+   3
+  ],
+  "enemy_role": "damage",
+  "max_hp": 90,
+  "attack": 100,
+  "armor": 0.05,
+  "speed": 115.0,
+  "stability": 100,
+  "constitution": 70,
+  "tint": [
+   0.78,
+   0.76,
+   0.66
+  ],
+  "sprite_scale": 2.9,
+  "resists": {
+   "nature": -0.25,
+   "shadow": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Rattling Swipe",
+    "damage": 26,
+    "pressure": 16,
+    "delay": 1.5,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Shambling Lurch",
+    "cooldown": 2,
+    "damage": 38,
+    "pressure": 20,
+    "delay": 2.5,
+    "anim": "attack02"
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "mossback": {
+  "unit_name": "Mossback",
+  "power": 3,
+  "roles": [
+   "brute",
+   "bulwark"
+  ],
+  "zones": [
+   1
+  ],
+  "enemy_role": "tank",
+  "max_hp": 300,
+  "attack": 75,
+  "armor": 0.15,
+  "speed": 70.0,
+  "stability": 100,
+  "constitution": 130,
+  "tint": [
+   0.52,
+   0.66,
+   0.38
+  ],
+  "sprite_scale": 3.8,
+  "resists": {
+   "nature": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Bark Ram",
+    "damage": 40,
+    "pressure": 24,
+    "delay": 2.5,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Silt Smother",
+    "cooldown": 2,
+    "damage": 64,
+    "pressure": 18,
+    "delay": 3.0,
+    "anim": "attack02",
+    "dmg_type": "nature",
+    "applies_status": {
+     "id": "slow",
+     "turns": 2
+    },
+    "status_chance": 0.7
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 3,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+   }
+  ]
+ },
+ "blight_speaker": {
+  "unit_name": "Blight-Speaker",
+  "power": 2,
+  "roles": [
+   "hexer",
+   "sniper"
+  ],
+  "zones": [
+   1
+  ],
+  "enemy_role": "support",
+  "max_hp": 120,
+  "attack": 50,
+  "armor": 0.05,
+  "speed": 95.0,
+  "stability": 100,
+  "constitution": 90,
+  "is_ranged": true,
+  "tint": [
+   0.74,
+   0.78,
+   0.36
+  ],
+  "resists": {
+   "shadow": 0.5,
+   "holy": -0.25,
+   "nature": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Sour Whisper",
+    "damage": 44,
+    "pressure": 14,
+    "delay": 2.0,
+    "anim": "attack01",
+    "dmg_type": "shadow"
+   },
+   {
+    "display_name": "Canker Litany",
+    "cooldown": 2,
+    "damage": 43,
+    "pressure": 34,
+    "delay": 3.0,
+    "anim": "attack02",
+    "dmg_type": "shadow",
+    "applies_status": {
+     "id": "fester",
+     "turns": 3
+    },
+    "description": "One hero takes {=Battle.DOT_STATUSES.fester}% of the applier's Attack\nper stack at the start of each turn, and\ngains a stack and its full clock each\nturn, until cleansed."
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 4,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "carrion_pack": {
+  "unit_name": "Carrion Pack",
+  "power": 2,
+  "roles": [
+   "skirmisher"
+  ],
+  "zones": [
+   3
+  ],
+  "enemy_role": "damage",
+  "max_hp": 130,
+  "attack": 100,
+  "armor": 0.12,
+  "speed": 125.0,
+  "stability": 100,
+  "constitution": 95,
+  "tint": [
+   0.5,
+   0.42,
+   0.36
+  ],
+  "sprite_scale": 3.5,
+  "resists": {
+   "physical": 0.05,
+   "nature": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Snapping Jaws",
+    "damage": 36,
+    "pressure": 20,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Worrying Bites",
+    "cooldown": 2,
+    "damage": 55,
+    "pressure": 16,
+    "delay": 2.0,
+    "anim": "attack02",
+    "applies_status": {
+     "id": "cripple",
+     "turns": 2
+    },
+    "status_chance": 0.5
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
  }
 }

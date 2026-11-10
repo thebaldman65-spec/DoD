@@ -45,7 +45,10 @@ const DECK_CLOSED_AT := 25
 # BATCH JS — SEVEN KINDS JOINED THE WARBAND AFTER THIS GATE LANDED (JS §1–§3): the Frozen Plains' six and its boss. Each
 # is named here and read apart, so this gate goes on asking its own question of the warband its batch left; `check_js` holds
 # the seven. (Rosters 4 and 5 joined too; nothing this gate counts reads a roster.)
-const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan"]
+# BATCH JU §1 — AND THE FOUR KINDS JU ADDED TO THE FOREST OF OLD, set aside as JS's seven are: this gate holds the warband its
+# batch left, and a kind added after it is no figure of that warband moving.
+const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan",
+	"grave_husk", "mossback", "blight_speaker", "carrion_pack"]
 const KINDS := 21
 # JK's fifty, and since JO §2 Gall and Mire among them, each a blow given damage (Sap and Fester ride two of the fifty).
 const MOVES := 52

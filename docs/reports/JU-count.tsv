@@ -1,0 +1,31 @@
+what	name	count	the fights where the warband attacks	where	why
+a JU kind	grave_husk	1	66	check_jq 1	roster 3; fielded in 1 attacking fight
+its second move cast	Shambling Lurch (Grave Husk)	3	66	-	
+a JU kind	mossback	1	66	check_jq 1	roster 1; fielded in 1 attacking fight
+its second move cast	Silt Smother (Mossback)	4	66	-	
+a JU kind	blight_speaker	3	66	check_fh 2, check_jq 1	roster 1; fielded in 3 attacking fights
+its second move cast	Canker Litany (Blight-Speaker)	4	66	-	
+a JU kind	carrion_pack	1	66	check_jq 1	roster 3; fielded in 1 attacking fight
+its second move cast	Worrying Bites (Carrion Pack)	6	66	-	
+Fester laid on a hero or a companion	the Rot Behemoth	15	66	-	
+Fester laid on a hero or a companion	the Blight-Speaker	4	66	-	
+Fester laid on a hero or a companion	no carrier read	0	66	-	every Fester landing followed a carrier's strike line
+the fights	the logs hold	355	66	-	
+the fights	with enemy attacks off	276	66	-	
+the fights	with attacks on and no warband strike	12	66	-	
+the fights	struck in by a gate's own hand	1	66	-	check_js §3 casts the Entombs; the warband takes no turn of its own
+the fights	where the warband attacks	66	66	-	
+a target's fights	check_fh	19	66	19 in its logs, 0 with enemy attacks off, 0 with no warband strike, 0 struck by its own hand	
+a target's fights	check_gf	4	66	8 in its logs, 0 with enemy attacks off, 4 with no warband strike, 0 struck by its own hand	
+a target's fights	check_gj	0	66	35 in its logs, 34 with enemy attacks off, 1 with no warband strike, 0 struck by its own hand	
+a target's fights	check_gp	0	66	66 in its logs, 64 with enemy attacks off, 2 with no warband strike, 0 struck by its own hand	
+a target's fights	check_gv	0	66	133 in its logs, 133 with enemy attacks off, 0 with no warband strike, 0 struck by its own hand	
+a target's fights	check_hk	0	66	38 in its logs, 38 with enemy attacks off, 0 with no warband strike, 0 struck by its own hand	
+a target's fights	check_ho	0	66	3 in its logs, 3 with enemy attacks off, 0 with no warband strike, 0 struck by its own hand	
+a target's fights	check_hr	0	66	2 in its logs, 2 with enemy attacks off, 0 with no warband strike, 0 struck by its own hand	
+a target's fights	check_if	3	66	3 in its logs, 0 with enemy attacks off, 0 with no warband strike, 0 struck by its own hand	
+a target's fights	check_jq	32	66	32 in its logs, 0 with enemy attacks off, 0 with no warband strike, 0 struck by its own hand	
+a target's fights	check_js	0	66	1 in its logs, 0 with enemy attacks off, 0 with no warband strike, 1 struck by its own hand	
+a target's fights	test_batch_al	0	66	2 in its logs, 2 with enemy attacks off, 0 with no warband strike, 0 struck by its own hand	
+a target's fights	test_batch_bl	2	66	7 in its logs, 0 with enemy attacks off, 5 with no warband strike, 0 struck by its own hand	
+a target's fights	test_rune_battle	6	66	6 in its logs, 0 with enemy attacks off, 0 with no warband strike, 0 struck by its own hand	

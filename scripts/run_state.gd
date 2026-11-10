@@ -1458,47 +1458,85 @@ func _theme_combos(spec: Dictionary, budget: int, roster := -1,
 					lst.append(kind)
 					claimed[kind] = true
 		role_kinds[role] = lst
+	# BATCH JU §1 — THE WALK CUTS A BRANCH THAT CANNOT SPEND ITS BUDGET, AND COPIES NOTHING UNTIL A WARBAND IS FOUND. Every kind a
+	# role holds multiplies this walk, and the map composes every fight node of a zone as it is built, so four kinds in the Forest's
+	# two rosters made a Forest map three to four times slower to compose. A branch is cut only when what is left of its budget is
+	# more than its role's remaining slots at that role's dearest remaining kind, plus every later role's slots at its own dearest
+	# (`caps`), or more than its free field slots at the dearest power still to come (`dear`): such a branch can never end at zero,
+	# so the walk returns the same warbands in the same order and no die moves (JU's probe hashed the whole output on both codes).
+	var roles: Array = spec["pool"].keys()
+	var caps: Array = []
+	var dear: Array = []
+	var rest := {}
+	caps.resize(roles.size() + 1)
+	dear.resize(roles.size() + 1)
+	caps[roles.size()] = 0
+	dear[roles.size()] = 0
+	for i in range(roles.size() - 1, -1, -1):
+		var ks: Array = role_kinds[roles[i]]
+		var suffix: Array = []
+		suffix.resize(ks.size())
+		var mp := 0
+		for j in range(ks.size() - 1, -1, -1):
+			mp = maxi(mp, Enemies.power(ks[j]))
+			suffix[j] = mp
+		rest[i] = suffix
+		caps[i] = int(caps[i + 1]) + int(spec["pool"][roles[i]]) * mp
+		dear[i] = maxi(int(dear[i + 1]), mp)
 	var results: Array = []
-	_combo_walk(spec, spec["pool"].keys(), role_kinds, 0, budget, [], {}, results)
+	_combo_walk(spec, roles, role_kinds, 0, budget, [], {}, results, {"caps": caps, "dear": dear, "rest": rest})
 	return results
 
 
 func _combo_walk(spec: Dictionary, roles: Array, role_kinds: Dictionary,
 		r_idx: int, left: int, picked: Array, role_counts: Dictionary,
-		results: Array) -> void:
+		results: Array, cut := {}) -> void:
 	if r_idx == roles.size():
 		if left == 0 and _combo_ok(spec, picked, role_counts):
 			results.append(picked.duplicate())
 		return
 	var role: String = roles[r_idx]
 	_role_walk(spec, roles, role_kinds, r_idx, role_kinds[role], 0,
-		int(spec["pool"][role]), left, picked, role_counts, results)
+		int(spec["pool"][role]), left, picked, role_counts, results, cut)
 
 
 # Chooses how many of each kind fill one role's slots (the pool value caps
-# the ROLE total, not each kind).
+# the ROLE total, not each kind). `picked` and `role_counts` are grown and put
+# back as the walk goes (JU §1), so a copy is made only of a warband found.
 func _role_walk(spec: Dictionary, roles: Array, role_kinds: Dictionary,
 		r_idx: int, kinds: Array, k_idx: int, role_left: int, left: int,
-		picked: Array, role_counts: Dictionary, results: Array) -> void:
+		picked: Array, role_counts: Dictionary, results: Array, cut := {}) -> void:
 	if k_idx == kinds.size() or role_left == 0:
 		_combo_walk(spec, roles, role_kinds, r_idx + 1, left, picked,
-			role_counts, results)
+			role_counts, results, cut)
 		return
+	var max_units: int = spec.get("max_units", MAX_FIELD)
+	if not cut.is_empty():
+		var here: int = int((cut["rest"][r_idx] as Array)[k_idx])
+		var reach: int = mini(role_left * here + int(cut["caps"][r_idx + 1]),
+			(max_units - picked.size()) * maxi(here, int(cut["dear"][r_idx + 1])))
+		if left > reach:
+			return
 	var kind: String = kinds[k_idx]
 	var role: String = roles[r_idx]
-	var max_units: int = spec.get("max_units", MAX_FIELD)
 	var kp := Enemies.power(kind)
+	var base := picked.size()
+	var had_key := role_counts.has(role)
+	var had := int(role_counts.get(role, 0))
 	for n in range(0, role_left + 1):
 		var cost: int = kp * n
-		if cost > left or picked.size() + n > max_units:
+		if cost > left or base + n > max_units:
 			break
-		var next: Array = picked.duplicate()
-		for i in n:
-			next.append(kind)
-		var next_counts: Dictionary = role_counts.duplicate()
-		next_counts[role] = int(next_counts.get(role, 0)) + n
+		if n > 0:
+			picked.append(kind)
+		role_counts[role] = had + n
 		_role_walk(spec, roles, role_kinds, r_idx, kinds, k_idx + 1,
-			role_left - n, left - cost, next, next_counts, results)
+			role_left - n, left - cost, picked, role_counts, results, cut)
+	picked.resize(base)
+	if had_key:
+		role_counts[role] = had
+	else:
+		role_counts.erase(role)
 
 
 func _combo_ok(spec: Dictionary, picked: Array, role_counts: Dictionary) -> bool:

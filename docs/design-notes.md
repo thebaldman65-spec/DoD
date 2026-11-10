@@ -4,6 +4,35 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Four kinds for the Forest of Old (Batch JU) — 2026-11-10
+
+**Why rot opens the Forest and grave closes it.** The record asked for kinds *for rot and grave* and counted them per roster; the
+Forest has two rosters, its opener and its finale, and the six names split three and three by their words — the Mossback, the
+Blight-Speaker and the Fen Lurker of rot, the Grave Husk, the Carrion Pack and the Barrow-Sworn of the grave. Rot opens (the wood
+going bad), the grave closes it (what the wood holds underneath).
+
+**Why each family to one roster and not to both.** The warband for a fight is chosen from every warband that spends its budget
+exactly, and the map lists them all for every fight node as it is built. Each kind a roster holds multiplies that list — one more
+kind in the Forest's opener made the list about 1.3 to 1.5 times longer, and all four in both rosters about three times — so a
+family to each roster is half the cost of all four everywhere.
+
+**Why the choosing was changed, and why nothing it chooses moved.** Even at two a roster a Forest map took half again as long to build (0.94 of
+a second against 0.59, in JU's probe), and one check ran within three seconds of its time limit. The walk now drops a branch the moment its budget can no longer be spent exactly, and builds no copy until a
+warband is found; it lists the same warbands in the same order, so the same die picks the same one, and a Forest map builds in 0.80. A walk that lists them all is
+still the shape, and it will not scale to ten more kinds a roster: picking a warband without listing them all is the structural
+answer, and it would move the dice.
+
+**Why each new kind is built as an existing one is.** The record had every kit derived from rules already in the tree and no figure
+set as a target, and named no role, so each name's role was read off its words and the kind patterned on the nearest existing kind
+of that role, carrying that kind's every figure. What a kind adds is only what the rules derive: the second blow sized at JI's line,
+its cooldown and its spend's at the line's band. The designer tunes by playing.
+
+**Why the Mossback and the Carrion Pack, and not a lighter pair.** The line prices every heal on the median body and every Rally on
+the median basic attack. A heavy tank and a fast skirmisher sit above both medians and the two lighter kinds below, so both stand and
+no existing kind's cooldown moved.
+
+**Why the Blight-Speaker lays Fester.** A hexer's blow lays a hex, and its pattern's lays Sap; *blight* names the rot hex.
+
 ## The Frozen Plains (Batch JS) — 2026-11-09
 
 **Why a candidate and not a fourth slot.** A run is three zones, and every zone runs the same sixteen slots, so a new zone is a

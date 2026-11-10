@@ -17,7 +17,7 @@
 #        every fall the record carries names its batch and its reason.
 #   §7   A BARE PROBE IS A LANE: `lane.sh probe` names a probe inside a spent pattern and refuses a file of the game's,
 #        and the user-data folders outside every spent pattern are the live one and the named strays — no new one.
-#   §8   THE ROUTING IS A STEP: the last batch's routing of record stands, with its subjects, the rows the triggers
+#   §8   THE ROUTING IS A STEP — LANES A's AND C's SINCE JU §0: the last batch's routing of record stands, with its subjects, the rows the triggers
 #        matched (each a block the state file or its archive carries), the core, the three lists — every miss with
 #        ROUTED or NOT ROUTED — and the upkeep as a rate.
 #
@@ -528,9 +528,11 @@ func _s5_the_standing_misses() -> void:
 				standing += 1
 				if _stamp_of(path) != iu.substr(10, 6):
 					touched.append("%s %s" % [path, r["section"]])
-			elif iu == "REPAIRED AT IU §5":
+			# BATCH JU §1 — A LATER BATCH's REPAIR NAMES ITSELF AS IU's DID: `REPAIRED AT <code> §<n>`, its target saying so in its
+			# source (JU repaired check_hl §1e when it touched the file).
+			elif iu.begins_with("REPAIRED AT "):
 				repaired += 1
-				if not _doc("res://" + path).contains("IU §5"):
+				if not _doc("res://" + path).contains(iu.substr(12)):
 					silent.append(path)
 			else:
 				bad.append("%s %s carries '%s'" % [path, r["section"], iu])
@@ -666,6 +668,12 @@ func _s7_the_bare_probe() -> void:
 # hold is the shape — the subjects, the rows the triggers matched (a heading the state file or its archive carries), the
 # core, the three lists with a diagnostic per miss, and the upkeep as a rate. **Whether the rows were read is the
 # batch's** (IT §5's own honesty: a stamp proves a touch, not a read).
+# **AND THE STEP IS LANES A's AND C's (JU §0, the designer's ruling of 10 November).** Lane B's floor takes no routing of record
+# (`docs/instrument-rules.md`, *A BATCH RUNS THE FLOOR OF ITS LANE*), so a Lane B batch would red here with nothing wrong. The lane
+# is read where the batch declares it, on the state's *Last batch:* line (the first `Lane A`, `B` or `C` on it), and Lane B is
+# exempt only while the floor's own Lane B sentence says so — strike that sentence and a Lane B batch owes a routing again.
+# A line naming no lane is held as before. Every routing still written keeps THE BRIEF'S SUBJECTS as its first heading.
+const LANE_B_NO_ROUTING := "No routing of record, no blocks' reader, no close-read and no new gate"
 const ROUTING_HEADS := ["## THE BRIEF'S SUBJECTS", "## THE ROWS THE TRIGGERS MATCHED", "## THE CORE", "## OPENED", "## NEEDED",
 	"## FOUND AT THE CLOSE TO HAVE BORNE ON THE WORK AND NOT OPENED", "## THE INDEX's UPKEEP"]
 
@@ -689,6 +697,17 @@ func _s8_the_routing() -> void:
 	if m == null:
 		return
 	var code := m.get_string(1)
+	var last_line := state.substr(m.get_start(), state.find("\n", m.get_start()) - m.get_start())
+	var ln := RegEx.new()
+	ln.compile("\\bLane ([ABC])\\b")
+	var lane_m := ln.search(last_line)
+	var lane := lane_m.get_string(1) if lane_m != null else ""
+	if lane == "B":
+		var floor_doc := _doc("res://docs/instrument-rules.md")
+		ok(floor_doc.contains(LANE_B_NO_ROUTING),
+			"§8: %s ran Lane B, and docs/instrument-rules.md's Lane B floor no longer says it takes no routing of record" % code)
+		print("    CHECKED %s: Lane B by the state's Last batch line, so no routing of record is owed (the Lane B floor says so)" % code)
+		return
 	var path := "docs/reports/%s-routing.md" % code
 	var rec := _doc("res://" + path)
 	ok(rec.length() > 500, "§8: %s is not in the tree — the routing is a step with a written output, before the work" % path)

@@ -17,6 +17,22 @@ heading stands in both files. **Since JE §3 it also takes what `CLAUDE.md` clos
 
 ---
 
+## ARCHIVED AT JU — 2026-11-10, FROM `docs/state.md` AS JT AND THE RULING AFTER IT LEFT IT (`ac0da62`)
+
+*One item, closed by JU §0: `check_iu` §8 re-pointed by the designer's ruling, so a Lane B batch owes no routing of record.*
+
+### FOUND AT JT AND NOT FIXED — ITS CLOSED ITEMS
+
+*Closed at JU §0: §8 reads the lane off the WHERE block's* Last batch: *line, and a Lane B batch owes no routing while the Lane B floor in `docs/instrument-rules.md` says so; every routing still written keeps THE BRIEF'S SUBJECTS.*
+
+- **`check_iu` §8 ASKS EVERY BATCH FOR A ROUTING OF RECORD, AND LANE B TAKES NONE** (the new text's reader): it reads the WHERE
+  block's *Last batch:* code and reds unless `docs/reports/<code>-routing.md` stands with its seven sections, the first headed
+  *THE BRIEF'S SUBJECTS*. So the first Lane B batch reds it, and a routing written from a record keeps that heading or the gate
+  moves. The re-point — §8 reads a routing only where the WHERE names a lane that takes one — is owed before the first Lane B
+  batch lands; JT's brief allowed no gate but `check_jt`.
+
+---
+
 ## ARCHIVED AT JT — 2026-11-10, FROM `docs/state.md` AS JS AND THE THREE COMMITS AFTER IT LEFT IT (`2cb36bd`)
 
 *In the order they stood. JS's seven rulings, answered in JT's brief: all accepted as taken; and three items JT's repairs closed: two claims about `docs/ways-of-working.md`, and `CLAUDE.md`'s support-cast clause (FOUND AT JL).*

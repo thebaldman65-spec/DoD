@@ -38,6 +38,9 @@ const DECK_CLOSED_AT := 25
 const ZONE := "frozen_plains"
 const ZONE_NAME := "The Frozen Plains"
 const BOSS := "icewrought_titan"
+# BATCH JU §1 — THE FOUR KINDS JU ADDED TO THE FOREST OF OLD, set aside where this gate sets its own seven aside: JS's rule for
+# the kind each of the six stands for reads the kinds JS stood among, and §5's digest is the warband beside JS's additions.
+const ADDED_SINCE := ["grave_husk", "mossback", "blight_speaker", "carrion_pack"]
 # THE SLOTS IT HOSTS (1-based, as `ZONE_DEFS`' rosters key them) and the slot it never takes: the Scarlands keeps its own.
 const HOSTS := [1, 3]
 const NOT_HOST := 2
@@ -728,7 +731,7 @@ func _stands_for(data: Dictionary, kd: Dictionary) -> String:
 	var own := ""
 	var travels := ""
 	for k in data:
-		if SIX.has(k) or String(k) == BOSS:
+		if SIX.has(k) or String(k) == BOSS or ADDED_SINCE.has(String(k)):
 			continue
 		var c: Dictionary = data[k]
 		if bool(c.get("is_boss", false)) or not (c.get("roles", []) as Array).has(role) or int(c.get("power", 0)) != int(kd.get("power", -1)) \
@@ -1115,7 +1118,7 @@ func _s4_the_count() -> void:
 func _s5_not_done() -> void:
 	print("\n§5 — the warband as JR landed it beside JS's additions, the Cleric's cut, the deck at twenty-five")
 	var data: Dictionary = Enemies._load().duplicate(true)
-	for k in SIX.keys() + [BOSS]:
+	for k in SIX.keys() + [BOSS] + ADDED_SINCE:
 		data.erase(k)
 	for k2 in data:
 		var z: Array = []

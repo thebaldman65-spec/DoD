@@ -451,25 +451,37 @@ func _s1b_the_counter() -> void:
 
 func _s1c_the_purchase() -> void:
 	print("\n§1c — a rune bought through the Buy button lands, and the map shows it")
-	_new_run()
-	_run.gold = 1000
-	change_scene_to_file("res://scenes/shop.tscn")
-	await Gate.frames(self, 6)
-	var shop: Node = current_scene
-	var offers: Array = shop.get("offers")
-	ok(not offers.is_empty(), "§1c: the Peddler has nothing on the counter")
-	if offers.is_empty():
-		return
 	# BATCH HO §1 — THE RUNE BOUGHT IS ONE THE HERO IT IS OFFERED TO CAN WEAR. The arm
 	# bought the counter's FIRST row, and since HO §3 a first row can be a crest rune:
 	# rolled against a hero, worn by the crest, and never drawn on his panel — so the
 	# Equip this arm goes on to press would not exist whenever the roll put one
 	# first. Its question is a hero's own rune; a crest rune's route is `check_ho` §1's.
+	# BATCH JU §1 — AND THE COUNTER IS A ROLL THIS ARM's QUESTION IS NOT ABOUT. A new run composes its first map's warbands
+	# before the shop rolls, so new kinds move the dice it rolls with: JU's four dealt this seed a counter of four crest runes.
+	# A counter with no hero's rune is rolled again on a fixed seed of its own, at most eight times, and the roll it took is printed;
+	# the first roll is the one the arm always took, so a tree that dealt a hero's rune at once reads as it did.
+	var shop: Node = null
+	var offers: Array = []
 	var buy_at := -1
-	for oi in offers.size():
-		if buy_at < 0 and not Runes.is_party_rune((offers[oi] as Dictionary)["rune"]):
-			buy_at = oi
-	ok(buy_at >= 0, "§1c: every row on the counter is a crest rune — the arm has no hero's rune to buy (%d rows)" % offers.size())
+	var rolls := 0
+	while buy_at < 0 and rolls < 8:
+		if rolls > 0:
+			seed(HL_SEED + 1000 + rolls)
+		_new_run()
+		_run.gold = 1000
+		change_scene_to_file("res://scenes/shop.tscn")
+		await Gate.frames(self, 6)
+		shop = current_scene
+		offers = shop.get("offers")
+		for oi in offers.size():
+			if buy_at < 0 and not Runes.is_party_rune((offers[oi] as Dictionary)["rune"]):
+				buy_at = oi
+		rolls += 1
+	print("    the counter dealt a hero's rune on roll %d of at most 8" % rolls)
+	ok(not offers.is_empty(), "§1c: the Peddler has nothing on the counter")
+	if offers.is_empty():
+		return
+	ok(buy_at >= 0, "§1c: every row on the counter is a crest rune — the arm has no hero's rune to buy (%d rows, %d rolls)" % [offers.size(), rolls])
 	if buy_at < 0:
 		return
 	var o0: Dictionary = offers[buy_at]
@@ -580,8 +592,11 @@ func _special_reads() -> Dictionary:
 	var out := {}
 	if start < 0:
 		return out
+	# BATCH JU §1 — THE WINDOW ENDS WHERE THE FUNCTION DOES (IT §3b; the positional census's MISSES row, repaired at JU §1 by
+	# the touch that rolls §1c's counter again): the first line after the header that is neither blank nor indented closes
+	# `_resolve_special`, so the top-level const between it and the next `func` is no longer read as the last arm's body.
 	var end := start + 1
-	while end < lines.size() and not lines[end].begins_with("func "):
+	while end < lines.size() and (lines[end].strip_edges() == "" or lines[end].begins_with("\t") or lines[end].begins_with(" ")):
 		end += 1
 	var arm_re := RegEx.create_from_string("^\\t\\t((?:\"[a-z_]+\"(?:,\\s*)?)+):\\s*$")
 	var name_re := RegEx.create_from_string("\"([a-z_]+)\"")
