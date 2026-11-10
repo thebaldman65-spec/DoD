@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-11-09 (Batch JR &mdash; three hex carriers met more often)</b></p>
+<p align="right"><b>Last updated: 2026-11-09 (Batch JS &mdash; the Frozen Plains)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -162,7 +162,7 @@ deep. The final zone carries one extra slot after its boss.</p>
 and its bargain opens "The MINI-BOSS of this zone blocks the road."</td></tr>
 <tr><td>9&ndash;15</td><td>branching, 3 nodes per column</td></tr>
 <tr><td>16</td><td><b>ZONE BOSS</b> &mdash; every path converges. The boss is always the zone's
-own &mdash; the Withered Warden in the Forest of Old, the Ash-Wrought Tyrant in the Scarlands &mdash;
+own &mdash; the Withered Warden in the Forest of Old, the Ash-Wrought Tyrant in the Scarlands, the Icewrought Titan in the Frozen Plains &mdash;
 with an escort drawn from the budget. Pays gold, a relic, an
 ability pick, and banks <b>one meta talent point per class</b>.</td></tr>
 <tr><td>17</td><td><b>THE END BOSS</b> &mdash; the final zone only. A single <b>FIXED</b>
@@ -377,7 +377,7 @@ return; no event uses it) / relic_grant (random inactive relic; +40 gold when sl
 <b>ability_draft</b> (the three-card offer itself, answered on the hero's own draft screen like any
 other owed pick) —
 aimed by <b>target selectors</b> (<code>party</code>, random, lowest_hp, fell, class:&lt;key&gt;) and gated by
-<b>requirement conditions</b> (min_gold, max_gold, zone_slot, has_item, <code>spec_in_party</code>,
+<b>requirement conditions</b> (min_gold, max_gold, zone_slot, zone, has_item, <code>spec_in_party</code>,
 fallen_hero (no event uses it), fell_last_fight). Adding an event is a JSON edit; adding a verb is one handler. <b>20 events</b>
 ship now. Seen events persist in the save and never repeat within a run until the pool
 exhausts.</p>
@@ -422,9 +422,11 @@ rather than taking the gold, and greys a type with no slot as <b>NO SLOT</b>.</l
 <li><b>Zones — authored slots:</b> a run is <b>three zone slots</b>, and each slot draws
 one zone from its own authored candidate pool — zones are designed FOR a position
 (openers are not finales), so a zone def carries its name, its boss, and a roster per
-slot it can host. The current pools run fixed: 1. Forest of Old (roster 1) → 2. The
-Scarlands (roster 2) → 3. Forest of Old as the finale (tougher roster 3). A run takes each pool's first zone; a random draw within a pool is a simulator's
-switch (DOD_ZONE_ROTATION=1), and every pool holds one candidate today; every zone keeps the same 16-slot generated shape. Deeper-slot enemies are tinted redder, and the slot sets
+slot it can host. The pools: 1. the Forest of Old (roster 1) or the Frozen Plains (roster 4) → 2. The
+Scarlands (roster 2) → 3. the Forest of Old as the finale (tougher roster 3) or the Frozen Plains as the finale (roster 5), so a run
+takes one of four shapes. Every run draws each slot of two at random, a simulator's as the player's, and a simulator can hold each
+pool's first zone (DOD_ZONE_ROTATION=0); every zone keeps the same 16-slot generated shape. The Frozen Plains shows the Forest's art
+on its map, its events and its battles: it has none of its own. Deeper-slot enemies are tinted redder, and the slot sets
 the stat multiplier (§4.3). The finale ends in a zone boss like the other two, and
 the <b>END BOSS</b> stands in a seventeenth slot after it: the run ends on the END BOSS's
 death.</li>
@@ -3074,9 +3076,10 @@ and a refused profile is every run the player has ever finished.</li>
 
 <h2>9. Enemies</h2>
 <p><b>The roster lives in data/enemies.json</b>: every kind declares its power,
-role tags, zone slots, stats, resists, tint, and kit; the Enemies class loads it, so adding
+role tags, rosters (the table's Zones column: 1 and 3 the Forest's, 2 the Scarlands', 4 and 5 the Frozen Plains'), stats,
+resists, tint, and kit; the Enemies class loads it, so adding
 an enemy is a data edit that automatically enrolls it in every theme wanting its roles.
-Role-based Attack matches heroes — <b>Damage 100 (the Hollow Crown 115) / Tank 75 (the Withered Warden 100) / Support 50</b> — and ability
+Role-based Attack matches heroes — <b>Damage 100 (the Hollow Crown 115) / Tank 75 (the Withered Warden and the Icewrought Titan 100) / Support 50</b> — and ability
 damage is a % of it. <i>Art note: all kinds still share the orc sheet (tint + scale only),
 so new enemies read as tinted orcs until per-kind art lands — a known, accepted limit.</i></p>
 <p><b>An enemy's biggest moves wait between uses.</b> A move worth 1.4 times its own basic attack or more &mdash;
@@ -3088,7 +3091,9 @@ Slinger's Skull Crack, the Orc Archer's Poison Arrow and Gall, the Orc Totemist'
 Wolfrider's Ride-by Slash, the Ashblade's Flame Lick, the Orc Brute's Overhead Crush, the Bog Troll's Swampy Grasp and
 Regenerate, the Rot Behemoth's Wretched Bellow, the Orc Chief's Heavy Strike, the Withered Warden's Roots of Wrath, the
 Ash-Wrought Tyrant's Immolating Wave and Tyrant's Verdict, the Ash Hurler's Siege Stone, the Orc Bloodcaller's Blood Tribute,
-the Grave Totem's Dark Vigil and Mire, and the Hollow Crown's Hollow Wail and The Long Dark. A basic attack never cools, so every enemy always has a move. An enemy
+the Grave Totem's Dark Vigil and Mire, the Hollow Crown's Hollow Wail and The Long Dark, and in the Frozen Plains the Frostbitten
+Thrall's Hobbling Bite, the Icebound Bulwark's Glacier Press, the Hailcaster's Hailstorm, the Rimehorn's Trampling Charge, the Hoarfrost
+Warden's Healing Wave, the Stillwrought's Leaching Stillness and the Icewrought Titan's Entomb. A basic attack never cools, so every enemy always has a move. An enemy
 never declares a move that will still be cooling when its turn comes, and while one cools its plate carries a <b>CD</b>
 chip: the fewest of its own turns until a move is back, its hover naming each. Encumbered binds these too.</p>
 <p><b>The warband shares one pool, Malice.</b> It fills by a point for every 10 points of damage the heroes deal it, by 25 when one
@@ -3097,19 +3102,19 @@ hero is credited with, fill only by their kills), and it holds 150; its bar stan
 warband's plates, its count beside it, and a fight opens with it empty (a quit fight too). <b>A body that dies Forsaken feeds the warband
 no Malice</b> &mdash; not the kill's worth, and not what the killing blow spent past its last; the damage dealt it still fills
 (a Cleric's Forsake lays the mark, for 3 turns, and a death clears it). <b>Every heal the warband casts costs a point
-of Malice for every point of health it restores</b> &mdash; the Orc Totemist's and the Orc Shaman's Healing Wave, the Bog Troll's
+of Malice for every point of health it restores</b> &mdash; the Orc Totemist's, the Orc Shaman's and the Hoarfrost Warden's Healing Wave, the Bog Troll's
 Regenerate, the Withered Warden's Wild Growth and the Grave Totem's Dark Vigil &mdash; so the warband never heals more than its pool
 has been given; a heal on a body under Blight the Well restores nothing, so it costs nothing. A healer heals whenever the pool can pay and one of its warband is missing at least half of what the heal would restore
 (two of them, for the Grave Totem's Dark Vigil);
 it declares only a heal the pool can pay, and sets the price aside until the heal lands.</p>
-<p><b>The pool buys three things beside a heal, each a move on its kind's list.</b> A Raise stands a fallen body of the warband back up at 40% of its maximum health, once a body a fight, for the health it stands it up with; a Rally makes every standing body of the warband deal 30% more damage with its blows for 3 turns, for 40 Malice; an Entrench multiplies their armor by 2 for 3 turns, for 30 Malice. Every kind holds one: a Rally the Orc Raider, the Orc Whelp, the Orc Slinger, the Orc Archer, the Orc Hexer, the Wolfrider, the Ashblade, the Orc Brute, the Rot Behemoth, the Orc Chief, the Ash-Wrought Tyrant, the Ash Hurler and the Orc Bloodcaller; an Entrench the Orc Shieldmaster, the Orc Shaman, the Bog Troll, the Withered Warden and the Hollow Crown; a Raise and an Entrench the Orc Totemist, the Orc Ritual Chanter and the Grave Totem. Each cools like any move, on its worth against its own kind's basic, and costs its body no turn: it rides the body's declared move, is bought first when the body's turn comes, and the body then acts as it declared &mdash; one a turn; a raised body rises un-Broken, its first turn a basic swing after it rises, at its own speed, and a body is raised once a fight. A Rally's clock counts down at each body's turn start, as every buff's but Eye of the Storm's does, so each rallied body strikes rallied twice, and the body that bought it three times, since it buys first on its own turn. A hero's Dispel strips a body's Rally and Entrenched, as it strips a ward.</p>
-<p><b>The warband lays four hexes on the heroes, each riding a blow.</b> Gall cuts the healing every hero receives by 50% for 3 turns; Sap cuts what a hero's resource bar gains by 50% for 3 turns; Mire makes a hero act 25% slower for 3 turns; Fester deals 3% of its applier's Attack a stack at each of the hero's turn starts and gains a stack each turn, until it is cleansed. The Orc Archer's Gall strikes every ally and galls each it hits; the Orc Hexer's Bone Rattle lays Sap; the Grave Totem's Mire strikes one ally and mires it; the Rot Behemoth's Wretched Bellow lays Fester on every ally it strikes. No enemy move lays an affliction on the heroes without dealing damage, so each hex is a blow like any other: chosen as the attacks are, aimed through the draws and the evasions, a single blow able to miss, laid on a hit, and cooling on its worth as a blow &mdash; each of the four waits between uses. Every hex is an affliction, so every cleanse reaches it, the Cleric's Unburden among them, and Fester grows until one does. <b>A
+<p><b>The pool buys three things beside a heal, each a move on its kind's list.</b> A Raise stands a fallen body of the warband back up at 40% of its maximum health, once a body a fight, for the health it stands it up with; a Rally makes every standing body of the warband deal 30% more damage with its blows for 3 turns, for 40 Malice; an Entrench multiplies their armor by 2 for 3 turns, for 30 Malice. Every kind holds one: a Rally the Orc Raider, the Orc Whelp, the Orc Slinger, the Orc Archer, the Orc Hexer, the Wolfrider, the Ashblade, the Orc Brute, the Rot Behemoth, the Orc Chief, the Ash-Wrought Tyrant, the Ash Hurler, the Orc Bloodcaller, the Frostbitten Thrall, the Hailcaster and the Rimehorn; an Entrench the Orc Shieldmaster, the Orc Shaman, the Bog Troll, the Withered Warden, the Hollow Crown, the Icebound Bulwark, the Stillwrought and the Icewrought Titan; a Raise and an Entrench the Orc Totemist, the Orc Ritual Chanter, the Grave Totem and the Hoarfrost Warden. Each cools like any move, on its worth against its own kind's basic, and costs its body no turn: it rides the body's declared move, is bought first when the body's turn comes, and the body then acts as it declared &mdash; one a turn; a raised body rises un-Broken, its first turn a basic swing after it rises, at its own speed, and a body is raised once a fight. A Rally's clock counts down at each body's turn start, as every buff's but Eye of the Storm's does, so each rallied body strikes rallied twice, and the body that bought it three times, since it buys first on its own turn. A hero's Dispel strips a body's Rally and Entrenched, as it strips a ward.</p>
+<p><b>The warband lays four hexes on the heroes, each riding a blow.</b> Gall cuts the healing every hero receives by 50% for 3 turns; Sap cuts what a hero's resource bar gains by 50% for 3 turns; Mire makes a hero act 25% slower for 3 turns; Fester deals 3% of its applier's Attack a stack at each of the hero's turn starts and gains a stack each turn, until it is cleansed. The Orc Archer's Gall strikes every ally and galls each it hits; the Orc Hexer's Bone Rattle and the Stillwrought's Leaching Stillness lay Sap; the Grave Totem's Mire strikes one ally and mires it; the Rot Behemoth's Wretched Bellow lays Fester on every ally it strikes. No enemy move lays an affliction on the heroes without dealing damage, so each hex is a blow like any other: chosen as the attacks are, aimed through the draws and the evasions, a single blow able to miss, laid on a hit, and cooling on its worth as a blow &mdash; each of the four waits between uses. Every hex is an affliction, so every cleanse reaches it, the Cleric's Unburden among them, and Fester grows until one does. <b>A
 cleanse that removes one harmful effect aims</b>: it takes a hex if the hero carries one, and otherwise the harmful effect with the
 most turns left (the first laid, on a tie, and the Bleed meter's chip last) &mdash; Dispel on an ally (three, one after another), Field Dressing, the Rune of the
 Medic and Cleanse Debuffs Each Turn alike. A cleanse that removes every harmful effect takes them all, as it always has.</p>
 <table border="1" cellpadding="4">
 <tr><th>Enemy</th><th>Pw</th><th>Roles</th><th>Zones</th><th>HP</th><th>Kit sketch (beside the Malice spend each holds, above)</th></tr>
-<tr><td>Orc Raider</td><td>1</td><td>skirmisher</td><td>1·2·3</td><td>140</td><td>Slash;
+<tr><td>Orc Raider</td><td>1</td><td>skirmisher</td><td>1·2·3·4·5</td><td>140</td><td>Slash;
 Sundering Strike (60% Sunder 2t). Physical resist 10% — otherwise the neutral
 baseline orc.</td></tr>
 <tr><td>Orc Whelp (pale)</td><td>1</td><td>skirmisher</td><td>1·3</td><td>90</td><td>Fast,
@@ -3121,15 +3126,15 @@ fingers).</td></tr>
 <tr><td>Orc Totemist (teal)</td><td>1</td><td>mender</td><td>1·3</td><td>90</td><td>Weak
 support: Totem Jab; Healing Wave (25% max to the most wounded hurt ally, tanks and supports first, paid in Malice). Nature resist
 25%; soft to shadow (spirit-open).</td></tr>
-<tr><td>Orc Archer (red)</td><td>1</td><td>sniper·hexer</td><td>1·2·3</td><td>110</td>
+<tr><td>Orc Archer (red)</td><td>1</td><td>sniper·hexer</td><td>1·2·3·4·5</td><td>110</td>
 <td>Arrow Shot; Poison Arrow (70% Poison 3t); Gall, a blow on every ally that galls each. Physical resist 5%; soft to frost.</td></tr>
-<tr><td>Orc Shieldmaster (orange)</td><td>2</td><td>bulwark</td><td>1·2·3</td><td>150</td>
+<tr><td>Orc Shieldmaster (orange)</td><td>2</td><td>bulwark</td><td>1·2·3·4·5</td><td>150</td>
 <td>Strike; Shielding (25% ward, one ally at a time, always re-cast). Physical resist 15%;
 soft to arcane (the shield stops steel, not raw magic).</td></tr>
-<tr><td>Orc Shaman (blue)</td><td>2</td><td>mender</td><td>1·2·3</td><td>110</td><td>Chain
+<tr><td>Orc Shaman (blue)</td><td>2</td><td>mender</td><td>1·2·3·4·5</td><td>110</td><td>Chain
 Lightning (nature, every ally); Healing Wave, paid in Malice. Resists fire/frost 25%, nature 50%; soft to
 shadow (corruptible spirits).</td></tr>
-<tr><td>Orc Hexer (purple)</td><td>2</td><td>hexer·sniper</td><td>1·2·3</td><td>120</td><td>Ranged
+<tr><td>Orc Hexer (purple)</td><td>2</td><td>hexer·sniper</td><td>1·2·3·4·5</td><td>120</td><td>Ranged
 shadow caster: Hex Bolt; Withering Hex (70% Exposed 2t); Bone Rattle (34 BD, lays Sap). Resists
 shadow 50%; soft to holy AND nature.</td></tr>
 <tr><td>Wolfrider (grey)</td><td>2</td><td>skirmisher</td><td>1·2</td><td>130</td><td>Speed
@@ -3137,26 +3142,26 @@ shadow 50%; soft to holy AND nature.</td></tr>
 (living companion — poison rips through).</td></tr>
 <tr><td>Ashblade (ember)</td><td>2</td><td>skirmisher</td><td>2</td><td>135</td><td>Cinder
 Slash (fire); Flame Lick (60% Burn 2t). Fire resist 50%; soft to frost.</td></tr>
-<tr><td>Orc Ritual Chanter (pale gold)</td><td>2</td><td>mender</td><td>1·2·3</td><td>105</td>
+<tr><td>Orc Ritual Chanter (pale gold)</td><td>2</td><td>mender</td><td>1·2·3·4·5</td><td>105</td>
 <td>Fast (speed 105) ranged support: Warding Chant; Cleansing Rite — strips the
 longest-lasting debuff from EACH ally (Chilled thaws one stack at a time, never the pile, inside a Rupture as
 anywhere; sticky poisons and meters hold). Holy resist 25%; soft to shadow AND physical — kill it
 first, or play around it.</td></tr>
-<tr><td>Orc Bloodcaller (crimson)</td><td>2</td><td>hexer</td><td>1·2·3</td><td>125</td>
+<tr><td>Orc Bloodcaller (crimson)</td><td>2</td><td>hexer</td><td>1·2·3·4·5</td><td>125</td>
 <td>Ragged Cut; Blood Tribute (shadow) — +25% damage and Break damage per ally fallen this
 battle: unremarkable fresh, hits like a Chief as the last one standing. The kill-order
 question, stated as an enemy. Shadow resist 25%; soft to holy AND nature.</td></tr>
-<tr><td>Grave Totem (dusk, large)</td><td>2</td><td>mender·hexer</td><td>1·2·3</td><td>80</td>
+<tr><td>Grave Totem (dusk, large)</td><td>2</td><td>mender·hexer</td><td>1·2·3·4·5</td><td>80</td>
 <td>Speed 130, trivially Broken (Con 60): Grasping Roots (nature, 60% Cripple 2t); Dark
 Vigil — every living ally regains 6% of its OWN max health, paid in Malice; Mire, a blow that mires. Physical resist 35%, shadow
 50%; soft to fire AND holy at 50% — a resist puzzle, not a stat check.</td></tr>
-<tr><td>Orc Brute (brown, large)</td><td>3</td><td>brute</td><td>1·2·3</td><td>260</td>
+<tr><td>Orc Brute (brown, large)</td><td>3</td><td>brute</td><td>1·2·3·4·5</td><td>260</td>
 <td>Smash; Overhead Crush (50 BD). Physical resist 10%; soft to shadow (dumb muscle, weak
 mind).</td></tr>
 <tr><td>Bog Troll (green, large)</td><td>3</td><td>brute·bulwark</td><td>1·3</td><td>300</td>
 <td>Claw; Swampy Grasp (70% Slowed 2t); Regenerate (25% self-heal when hurt, paid in Malice). Nature
 resist 50%; soft to fire.</td></tr>
-<tr><td>Rot Behemoth (dun, large)</td><td>3</td><td>brute·hexer</td><td>1·2·3</td><td>280</td>
+<tr><td>Rot Behemoth (dun, large)</td><td>3</td><td>brute·hexer</td><td>1·2·3·4·5</td><td>280</td>
 <td>Rotting Fist (50% Poison 3t); Wretched Bellow (nature + BD, every ally, lays Fester). Nature 50%,
 shadow 25%; soft to holy.</td></tr>
 <tr><td>Ash Hurler (ember, large)</td><td>3</td><td>brute·sniper</td><td>2·3</td><td>190</td>
@@ -3164,7 +3169,7 @@ shadow 25%; soft to holy.</td></tr>
 Ember Lob (fire); Siege Stone, a visible wind-up that lands NEXT turn as heavy ally-wide
 damage — Breaking, Freezing, or Stunning the charger cancels the throw outright. Softest
 Break target of any power-3 (Con 90), by design. Fire resist 50%; soft to frost.</td></tr>
-<tr><td>Orc Chief (elite)</td><td>4</td><td>elite</td><td>1·2·3</td><td>250</td><td>Rage
+<tr><td>Orc Chief (elite)</td><td>4</td><td>elite</td><td>1·2·3·4·5</td><td>250</td><td>Rage
 user: Strike (+15 Rage); Heavy Strike 30R; Chieftain&rsquo;s Maul 20R (56 BD). Physical resist 15%;
 soft to arcane (magic pierces plate).</td></tr>
 <tr><td>Withered Warden (boss)</td><td>7</td><td>boss</td><td>1·3</td><td>500</td><td>Unique
@@ -3174,6 +3179,22 @@ soft to fire (withered wood burns) — both scoutable on the map from tier 1.</t
 user (20 starting), unique fire kit: Cinder Cleave (+15 Rage); Immolating Wave 30R
 (fire on every ally, 80% Burn 2t); Tyrant's Verdict 20R (heavy fire, 70% Sunder 2t). Fire
 50%, physical 10%; soft to frost.</td></tr>
+<tr><td>Frostbitten Thrall (pale ice)</td><td>1</td><td>skirmisher</td><td>4·5</td><td>95</td><td>The cheap body,
+slower than the Whelp: Numb Claws; Hobbling Bite (70% Slowed 2t). Frost resist 50%; soft to fire, as all the Frozen Plains' kinds are.</td></tr>
+<tr><td>Icebound Bulwark (ice blue)</td><td>2</td><td>bulwark</td><td>4·5</td><td>190</td><td>The wall: the highest
+armor in the game, and very slow (speed 65). Ice-Shod Bash; Glacier Press (70 BD — a Break move). Frost resist 50%; soft to fire.</td></tr>
+<tr><td>Hailcaster (frost white)</td><td>1</td><td>sniper</td><td>4·5</td><td>85</td><td>Ranged and frail:
+Hailstone (frost); Hailstorm (frost, every ally, Dazed 2t). Frost resist 50%; soft to fire.</td></tr>
+<tr><td>Rimehorn (rime grey, large)</td><td>3</td><td>brute</td><td>5</td><td>300</td><td>The most health of the
+Frozen Plains' six: Gore; Trampling Charge (64 BD), which its plate declares as a crush. Frost resist 50%; soft to fire.</td></tr>
+<tr><td>Hoarfrost Warden (frost white)</td><td>2</td><td>mender</td><td>5</td><td>130</td><td>Ranged support:
+Chill Touch (frost); Healing Wave (25% max to the most wounded hurt ally, tanks and supports first, paid in Malice). Frost resist 50%; soft
+to fire.</td></tr>
+<tr><td>The Stillwrought (dusk blue)</td><td>2</td><td>hexer</td><td>5</td><td>120</td><td>Ranged shadow-frost
+caster: Stillbolt (frost); Leaching Stillness (shadow, lays Sap). Frost resist 50%; soft to fire.</td></tr>
+<tr><td>Icewrought Titan (boss)</td><td>7</td><td>boss</td><td>4·5</td><td>460</td><td>The Frozen Plains' boss:
+Glacier Fist (frost); Entomb (frost, freezes one hero solid: a turn lost, unless a Block, a miss, Ironclad or Hallowed stops it, and a
+cleanse lifts it). Frost resist 50%; soft to fire.</td></tr>
 </table>
 <p><b>Compositions — the power-budget system:</b> every battle rolls a power budget that is
 ALWAYS spent exactly. Fight budgets climb a <b>continuous ramp</b> across the zone: a

@@ -1370,6 +1370,8 @@ func _build_arena() -> void:
 	var bg_by_zone := {
 		"Forest of Old": "res://assets/backgrounds/battle_background_1.png",
 		"The Scarlands": "res://assets/backgrounds/battle_background_scarlands.png",
+		# BATCH JS §1 — A PLACEHOLDER, NAMED: the Frozen Plains has no art yet and wears the Forest's.
+		"The Frozen Plains": "res://assets/backgrounds/battle_background_1.png",
 	}
 	var zone: String = Run.zone_name if Run.active else "Forest of Old"
 	var tex: Texture2D = load(bg_by_zone.get(zone, bg_by_zone["Forest of Old"]))
@@ -7108,6 +7110,12 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 		# `_apply_status(_, "frozen", …)` has exactly ONE call site, inside
 		# `_hold_freeze`, and it cannot produce that pairing — it needs a
 		# Cryomancer who died, let the ice land timed, and was resurrected.
+		# Since JS §3 the strike loop's status line lays it too, off the
+		# Icewrought Titan's Entomb: on a hero; on the Titan, a boss, by Umbral
+		# Mirror's rebound; and on an escort that is no boss when the Swordmaster's
+		# sold opening sends the declared Entomb to the Titan's fellow — so that
+		# pairing is reachable, and the error stays the safe one: the button errs
+		# toward allowing.
 		# Allowing a wasted cast is the safe error; refusing a live one is not.
 		"glacial_prison":
 			var gp: Array = []

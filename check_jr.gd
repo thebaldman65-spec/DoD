@@ -46,6 +46,15 @@ const HEX_CARRIER := {"gall": "archer", "sap": "hexer", "mire": "grave_totem", "
 # chief, who appears only through the elite themes. A fight node never draws one (C03).
 const RULE_ROLES := ["boss", "elite"]
 const RULE_FIELDED := ["chief", "withered_warden", "ash_tyrant", "hollow_crown"]
+# BATCH JS — SEVEN KINDS AND TWO ROSTERS JOINED THE WARBAND AFTER THIS GATE LANDED (JS §1–§3): the Frozen Plains' six and its
+# boss, and rosters 4 and 5 on the kinds tagged for all three old rosters. Each is named here and read apart, so this gate goes on
+# asking its own question of the warband its batch left; `check_js` holds the seven.
+const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan"]
+const ROSTERS_SINCE := [4, 5]
+# AND WHAT THE SEVEN ADD TO TWO OF THIS GATE's LISTS: the Stillwrought lays Sap on its blow (Sap's second carrier), and the
+# Icewrought Titan is fielded by a rule (the Frozen Plains' boss).
+const CARRIERS_SINCE := {"sap": ["stillwrought"]}
+const RULE_FIELDED_SINCE := ["icewrought_titan"]
 # THE WARBAND's DATA AS JQ LANDED IT — `check_jq` §5's digest. With the three tags put back as they were, the tree's data must
 # read it: nothing else in a kind moved (C15).
 const WARBAND_AT_HEAD_MD5 := "f261e6345f22f42bc41a7f81276e066b"
@@ -343,8 +352,12 @@ func _s1_the_carriers() -> void:
 	for kind in AS_JR:
 		var kd: Dictionary = data.get(kind, {})
 		for field in AS_JR[kind]:
-			ok(JSON.stringify(kd.get(field, [])) == JSON.stringify(AS_JR[kind][field]),
-				"§1: %s's %s is %s, not the %s JR set" % [kind, field, str(kd.get(field, [])), str(AS_JR[kind][field])])
+			# BATCH JS — a roster added since (`ROSTERS_SINCE`) is read aside: the tag JR set is the old rosters'.
+			var as_set: Variant = kd.get(field, [])
+			if field == "zones":
+				as_set = (kd.get(field, []) as Array).filter(func(z): return not ROSTERS_SINCE.has(int(z)))
+			ok(JSON.stringify(as_set) == JSON.stringify(AS_JR[kind][field]),
+				"§1: %s's %s is %s, not the %s JR set" % [kind, field, str(as_set), str(AS_JR[kind][field])])
 	# C01 — DERIVED OFF THE DATA, THROUGH THE COMPOSER's OWN DOOR: HEAD's tags put in, derived, and put back.
 	var kept := {}
 	for kind in AS_HEAD:
@@ -389,7 +402,7 @@ func _s1_the_carriers() -> void:
 					(carriers[h] as Array).append(kind)
 	print("    the hexes' carriers: %s" % str(carriers))
 	for h in HEX_CARRIER:
-		ok(carriers.get(h, []) == [HEX_CARRIER[h]], "§1: %s is laid by %s, not by %s alone — a hex moved or a carrier was added" % [h, str(carriers.get(h, [])), HEX_CARRIER[h]])
+		ok(carriers.get(h, []) == [HEX_CARRIER[h]] + (CARRIERS_SINCE.get(h, []) as Array), "§1: %s is laid by %s, not by %s alone — a hex moved or a carrier was added" % [h, str(carriers.get(h, [])), HEX_CARRIER[h]])
 	# C03 — A KIND FIELDED BY A RULE IS NEVER DRAWN BY A FIGHT, AND NONE OF THE THREE IS ONE.
 	var ruled: Array = []
 	for kind in data:
@@ -397,7 +410,7 @@ func _s1_the_carriers() -> void:
 			if ((data[kind] as Dictionary).get("roles", []) as Array).has(role) and not ruled.has(kind):
 				ruled.append(kind)
 	ruled.sort()
-	var want := RULE_FIELDED.duplicate()
+	var want := RULE_FIELDED.duplicate() + RULE_FIELDED_SINCE
 	want.sort()
 	print("    fielded by a rule: %s" % str(ruled))
 	ok(ruled == want, "§1: the kinds fielded by a rule are %s, not %s — a boss or an elite was added or taken off its rule" % [str(ruled), str(want)])
@@ -415,6 +428,12 @@ func _s1_the_carriers() -> void:
 		ok(ruled.has(b), "§1: the zone boss %s carries no boss role" % b)
 	# C15 — NOTHING ELSE IN THE WARBAND's DATA MOVED.
 	var as_head: Dictionary = data.duplicate(true)
+	# BATCH JS — the seven kinds and the two rosters added since (`ADDED_SINCE`, `ROSTERS_SINCE`) out before the digest.
+	for js_kind in ADDED_SINCE:
+		as_head.erase(js_kind)
+	for js_k in as_head:
+		if (as_head[js_k] as Dictionary).has("zones"):
+			(as_head[js_k] as Dictionary)["zones"] = ((as_head[js_k] as Dictionary)["zones"] as Array).filter(func(z): return not ROSTERS_SINCE.has(int(z)))
 	for kind in AS_HEAD:
 		if as_head.has(kind):
 			for field in AS_HEAD[kind]:

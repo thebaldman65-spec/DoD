@@ -49,8 +49,8 @@
 #   last won fight ended (`BattleUnit.FELL_LAST_FIGHT`).
 #
 # REQUIREMENT CONDITIONS (event-level gates selection, choice-level
-# greys the button): min_gold, max_gold, zone_slot [slots], has_item
-# {id}, spec_in_party [spec ids], fallen_hero (bool), fell_last_fight (bool).
+# greys the button): min_gold, max_gold, zone_slot [slots], zone [zone ids],
+# has_item {id}, spec_in_party [spec ids], fallen_hero (bool), fell_last_fight (bool).
 class_name Events
 
 const DATA_PATH := "res://data/events.json"
@@ -181,6 +181,16 @@ static func failed_reason(run: Node, req: Dictionary) -> String:
 			slots.append(str(int(slot)))
 		return "Only in zone %s (the heroes are in zone %d)." % [
 			"/".join(slots), int(run.get("zone_idx")) + 1]
+	# BATCH JS §1 — A SLOT IS NO LONGER A ZONE: the Forest of Old and the Frozen Plains share slots 1 and 3, so an
+	# event written for a zone names it (`zone`, zone ids), read off the run's own draw (`zone_draw`).
+	# The run's own draw is read, never re-drawn: a run with none drawn yet meets no zone requirement.
+	var drawn: Array = run.get("zone_draw")
+	var here := "" if drawn.is_empty() else String(drawn[clampi(int(run.get("zone_idx")), 0, drawn.size() - 1)])
+	if req.has("zone") and not (req["zone"] as Array).has(here):
+		var zones := PackedStringArray()
+		for z in req["zone"]:
+			zones.append("the " + String((run.ZONE_DEFS as Dictionary).get(String(z), {}).get("name", String(z))).trim_prefix("The "))
+		return "Only in %s (the heroes are in the %s)." % [" or ".join(zones), String(run.get("zone_name")).trim_prefix("The ")]
 	if req.has("has_item"):
 		var items: Dictionary = run.get("items")
 		if int(items.get(String(req["has_item"]), 0)) <= 0:

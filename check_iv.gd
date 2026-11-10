@@ -401,7 +401,7 @@ const ENV_ROWS := {
 	"run_state.gd|rune_econ|DOD_SIM_RUNE_ECON": [1, "GATED", "if not sim_run:", "a run sim's arm (AD)"],
 	"run_state.gd|rune_power|DOD_SIM_RUNE_POWER": [1, "GATED", "if not sim_run:", "a run sim's arm (AD)"],
 	"run_state.gd|runes_mode|DOD_SIM_RUNES": [1, "GATED", "if not sim_run:", "a run sim's arm (IV §2, DV32: a player's run read it)"],
-	"run_state.gd|rotation_enabled|DOD_ZONE_ROTATION": [1, "GATED", "return sim_run and OS.get_environment(\"DOD_ZONE_ROTATION\")", "the sim's since IW §0.3 (a flag that changes what a run contains is the sim's) — a player's run draws each pool's first zone (the latent arm below)"],
+	"run_state.gd|rotation_enabled|DOD_ZONE_ROTATION": [1, "GATED", "return not (sim_run and OS.get_environment(\"DOD_ZONE_ROTATION\")", "the sim's since IW §0.3 (a flag that changes what a run contains is the sim's): since JS §1 a run draws within a pool of two and the flag's one arm, `=0`, holds a sim to each pool's first zone (the door below)"],
 }
 # The variables §2's drive exports into a player's run, and clears after.
 const SIM_FAMILY_DRIVEN := ["DOD_SIM_RUNES", "DOD_SIM_GRANT_ALL", "DOD_SIM_RELICS", "DOD_SIM_ENEMIES", "DOD_SIM_THEME", "DOD_SIM_DEBUG"]
@@ -508,12 +508,29 @@ func _s2_the_environment() -> void:
 	ok(miscount.is_empty(), "§2: %d rows read a variable a different number of times than the row says: %s" % [miscount.size(), str(miscount)])
 	ok(gone.is_empty(), "§2: %d rows name a read the scripts no longer make — delete them: %s" % [gone.size(), str(gone)])
 	ok(unguarded.is_empty(), "§2: %d sim-family reads stand behind no guard — a sim's arm leaks into a player's game: %s" % [unguarded.size(), str(unguarded)])
-	# THE LATENT ARM: since IW §0.3 the rotation is the sim's, so a player's run draws each slot pool's first zone — and a
-	# pool of two holds a zone no player can draw, which is owed its door the day it is authored.
+	# THE LATENT ARM, AND THE WRITER ARRIVED WITH ITS DOOR (JS §1): the Frozen Plains is a second zone at slots 1 and 3, and a
+	# player's run draws within a pool of two (`Run.draw_zones`). The arm asks the door, driven: a player's run, the flag exported in
+	# each of its spellings or not at all, meets every zone of every pool.
 	var pools: Array = _run.SLOT_POOLS
-	var multi: Array = pools.filter(func(p): return (p as Array).size() > 1)
-	ok(multi.is_empty(),
-		"§2: a slot pool holds %d zones — a player's run takes each pool's first (`DOD_ZONE_ROTATION` is the sim's since IW §0.3), so the second is a zone no player can draw; the draw a player gets is owed its door before the pool ships" % (multi[0] as Array).size() if not multi.is_empty() else "")
+	var unmet: Array = []
+	var was_sim: bool = _run.sim_run
+	_run.sim_run = false
+	for flag in ["", "0", "1"]:
+		OS.set_environment("DOD_ZONE_ROTATION", flag)
+		var met := {}
+		seed(4646)
+		for i in 48:
+			_run.draw_zones()
+			for s in pools.size():
+				met["%d/%s" % [s, String(_run.zone_draw[s])]] = true
+		for s2 in pools.size():
+			for z in pools[s2]:
+				if not met.has("%d/%s" % [s2, String(z)]):
+					unmet.append("slot %d's %s (DOD_ZONE_ROTATION='%s')" % [s2 + 1, String(z), flag])
+	OS.set_environment("DOD_ZONE_ROTATION", "")
+	_run.sim_run = was_sim
+	ok(unmet.is_empty(),
+		"§2: a slot pool holds a zone no player can draw, so the draw a player gets is owed its door before the pool ships: %s" % [unmet])
 	# DRIVEN: a player's run with every sim-family arm exported plays the game it drafted.
 	OS.set_environment("DOD_SIM_RUNES", "stats")
 	OS.set_environment("DOD_SIM_GRANT_ALL", "1")

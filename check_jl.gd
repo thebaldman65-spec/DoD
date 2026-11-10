@@ -24,6 +24,10 @@ const Gate = preload("res://gate_fixture.gd")
 # JI's LINE AND ITS BREAK PRICE (JO §1): the one blow every gate on the line prices through.
 const JI = preload("res://check_ji.gd")
 
+# BATCH JS — SEVEN KINDS JOINED THE WARBAND AFTER THIS GATE LANDED (JS §1–§3): the Frozen Plains' six and its boss. Each
+# is named here and read apart, so this gate goes on asking its own question of the warband its batch left; `check_js` holds
+# the seven. (Rosters 4 and 5 joined too; nothing this gate counts reads a roster.)
+const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan"]
 const KINDS := 21
 # The warband's moves beside its Malice spends — JK's fifty, and since JO §2 Gall and Mire among them, each a blow given damage;
 # Sap and Fester ride two of the fifty, folded onto them.
@@ -639,6 +643,8 @@ func _s2_the_carriers() -> void:
 	var missing: Array = []
 	for h3 in HEXES:
 		for k in carriers[h3]:
+			if ADDED_SINCE.has(String(k)):
+				continue
 			if not said.has("%s/%s" % [k, h3]):
 				missing.append("%s/%s" % [k, h3])
 	var extra: Array = said.keys().filter(func(x): return not (carriers.get(String(x).split("/")[1], []) as Array).has(String(x).split("/")[0]))
@@ -889,6 +895,8 @@ func _s2_the_prices(s: Node) -> void:
 			if mult < line or want != have:
 				wrong.append("%s's %s carries %d, the line gives %d (%.2f of its basic)" % [kind, String(a2["display_name"]), have, want, mult])
 			var row: Variant = table.get("%s/%s" % [kind, id])
+			if row == null and ADDED_SINCE.has(String(kind)):
+				continue
 			if row == null or absf(float(row[0]) - worth) > 0.051 or int(row[1]) != have:
 				wrong.append("the kept table prices %s's %s at %s, its blow on the line is %.1f" % [kind, id, str(row), worth])
 	print("    CHECKED %d hexes, each on a blow" % checked)
@@ -1036,6 +1044,8 @@ func _s4_not_done(s: Node) -> void:
 	var moves := 0
 	var hex_moves := 0
 	for k3 in data:
+		if ADDED_SINCE.has(String(k3)):
+			continue
 		for a2 in (data[k3] as Dictionary).get("abilities", []):
 			var sp := String(a2.get("special", ""))
 			if _lays(a2) != "":
@@ -1043,7 +1053,8 @@ func _s4_not_done(s: Node) -> void:
 			if not sp.begins_with("malice_"):
 				moves += 1
 	print("    %d kinds, %d moves beside the spends, %d of them laying a hex" % [data.size(), moves, hex_moves])
-	ok(data.size() == KINDS and moves == MOVES_BEFORE, "§4: the warband holds %d kinds and %d moves beside its spends, not %d and %d" % [data.size(), moves, KINDS, MOVES_BEFORE])
+	var kinds_then := data.keys().filter(func(k): return not ADDED_SINCE.has(String(k))).size()
+	ok(kinds_then == KINDS and moves == MOVES_BEFORE, "§4: the warband holds %d kinds and %d moves beside its spends, not %d and %d" % [kinds_then, moves, KINDS, MOVES_BEFORE])
 
 
 # ── §5 — THE TEXTS FOLLOW THE CONSTANTS ───────────────────────────────────────

@@ -17,6 +17,32 @@ heading stands in both files. **Since JE §3 it also takes what `CLAUDE.md` clos
 
 ---
 
+## ARCHIVED AT JS — 2026-11-09, FROM `docs/state.md` AS JR LEFT IT (`2d603b5`)
+
+*In the order they stood. JR's five rulings, answered in JS's brief: all accepted as taken; and FOUND AT IW's item the door JS built closed (§1).*
+
+### ~~JR's RULINGS OWED~~ — **ALL FIVE ANSWERED IN JS's BRIEF (§0): all accepted as taken**
+
+*Its head as it stood: FIVE; THE BATCH's CHOICES FOR THE THREE CARRIERS, THE CITATION SWEEP, THE INDEX AND THE LOOK-LIST, EACH TAKEN ON THE RECOMMENDATION, NONE HOLDING ANYTHING UP*
+
+
+Full working: `docs/reports/JR.md`, NEEDS A RULING.
+
+1. **THE THREE CARRIERS' TAGS (JR §1).** A fight's bodies are a draw with no weight, so a kind's frequency falls out of its rosters and roles. **The Grave Totem takes roster 2, the Rot Behemoth roster 1, and the Orc Hexer — already in all three — a second role, *sniper***, the Orc Archer's (the Hexer is ranged; two of its three cooling moves strike). Derived off the data (`check_jr` §1): a fight fields the Hexer 10.2% → 17.4%, the Totem 12.5% → 19.6%, the Behemoth 5.3% → 7.8%; *sniper* also seats the Hexer in zone-boss escorts (0 → 13.4%) and elite fights (0 → 1.4%), and the Totem's escort share goes 10.2% → 14.4%. No hex, move or kind moved; none of the three is fielded by a rule. **The alternatives**: the Hexer as a skirmisher (15.4%; it is ranged), or left as it was; folding the hexes onto commoner kinds' free damaging moves (the brief's, not taken: Sap is a hexer's curse). **Reversing it** is the three arrays in `data/enemies.json`, the master document's three roster cells and its *behemoths walk the old woods*, and `check_jr` §1's arms; the five gates' `MOVED_SINCE` need nothing.
+2. **THE SWEEP's REACH (JR §2).** Swept: the six documents named, `docs/text-standard.html`, `scripts/party_screen.gd`'s comment and every report's `.md`. **Held at their count, not swept**: the state's archive (738) — word for word by its own rule, hashed by `check_jf` and `check_jh` §3a; the changelog's archive (25) and the addendum (0); the eight recon and audit pages (544) — a recon is regenerated, never hand-edited, and the audits are kept as written; and the reports' rarer spellings (*line N* 65, *L N* 34, a section's mark and colon 38, a colon-closed number 7, a script's `#` 2). A report's fenced block is quoted output, read around. **Excluded by kind, in the gate**: a census or count table, the data a tool reads, a gate's own source. **The alternative**: sweep the held records too, against their own rules. **Reversing it** is nothing to undo; extending it is the same tools and the ceilings lowered.
+3. **A CITATION's TREE (JR §2).** Each report's citation was read against its batch's landing and the HEAD it read, with the commit of any batch its sentence names: 1,659 settled by the sentence's own words or the function it names, 368 the same on every tree, 498 by the tree the report's settled citations mostly used, 64 not settled, of 2,589. A majority pick and a number whose file was read from the sentence each say so in the text; an unsettled one says it could not be resolved or settled. `docs/reports/JR-citations.tsv` keeps every number, its file, function, tree and how it was settled, and what an unsettled one may have meant. **The alternative**: every one by hand. **Reversing it** is the table.
+4. **A TRIGGER MET BY THE ROW's OWN (JR §3).** THE TALENT LAYER's row carries *Cleanse Debuffs*, which a brief naming *Cleanse Debuffs Each Turn* meets, at 396 of `check_is` §5's 400 bytes; `check_jr` §3 counts as met, for all twelve owed phrases, a row trigger of four or more characters the phrase contains; this row is the one it decides. **The alternative**: trim one trigger and write the full phrase. **Reversing it** is that trim.
+5. **THE LOOK-LIST's ROWS FROM JI TO JQ, PASSED (JR §0, *AND THE ARC WAS PLAYED*).** The designer played JI through JQ on 9 November against a twelve-item list and every item passed, the two-name plate among the surfaces. JR reads the eight rows from JI to JQ as those surfaces: six went to the archive, and the two `check_jj` §6 reads by name say *seen and passed* in place. **The alternative**: the two-name plate's row alone. **Reversing it** is the six rows back from the archive and the two phrases.
+
+### FOUND AT IW AND NOT FIXED — ITS CLOSED ITEMS (archived at JS: the second zone no player could draw — its door built at JS §1, JS's ruling 1; the block stays in `docs/state.md`)
+
+- **A SLOT POOL's SECOND ZONE IS ONE NO PLAYER CAN DRAW** (read in the code beside IW §0.3): `Run.draw_zones` takes a pool's random
+  member only while the rotation is enabled and the pool's first otherwise, and since IW the rotation is the sim's — so a player's run
+  draws each pool's first author, and a zone authored second into a pool is reached by the sim's flag and by no player. Inert while
+  every pool in `SLOT_POOLS` holds one zone; `check_iv` §2's latent arm reds the day one holds two, and **the draw a player gets is owed
+  its door then** — a random draw, or the first author always — the designer's. (IW's brief read *the player gets the draw*; today's
+  code gives him the first.)
+
 ## ARCHIVED AT JR — 2026-11-09, FROM `docs/state.md` AS JQ LEFT IT (`11756af`)
 
 *In the order they stood. JQ's seven rulings, answered in JR's brief: all accepted as taken. The items JR's two comment fixes closed (§3). Six look-list rows the designer's play passed and THE CLASS MERGE's two sizing bullets (§4). And three citations whose subjects had closed (§2): **these three carry JR §2's replaced citations, not the line numbers JQ's state held** — FOUND AT FW's and FOUND AT GL's pieces as the state stood after JR's sweep, and FOUND AT HA's half a record of the item as it stood with its two gate citations named by function; every number is in `docs/reports/JR-citations.tsv`.*

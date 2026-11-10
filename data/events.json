@@ -188,6 +188,9 @@
         "text": "Clear water rises through roots that predate the Decay.\nThe rot has not found this place. Yet.",
         "weight": 10,
         "requires": {
+            "zone": [
+                "forest"
+            ],
             "zone_slot": [
                 1,
                 3
@@ -485,6 +488,9 @@
         "text": "The trees here grow in the Warden's image, and dream its dreams\naloud. Listening is knowledge. Listening is also listening back.",
         "weight": 8,
         "requires": {
+            "zone": [
+                "forest"
+            ],
             "zone_slot": [
                 3
             ]

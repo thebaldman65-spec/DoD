@@ -4,6 +4,26 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The Frozen Plains (Batch JS) — 2026-11-09
+
+**Why a candidate and not a fourth slot.** A run is three zones, and every zone runs the same sixteen slots, so a new zone is a
+second candidate for a slot an existing zone holds. The Frozen Plains takes the two the Forest holds, the opener and the finale, so a
+run is one of four shapes and the Scarlands keeps the middle.
+
+**Why every run draws.** Until a pool held two, the draw was moot and the switch that turned it on was the simulator's alone; a
+second candidate a player can never meet is not content. So a slot of two draws for every run, the player's and the simulator's
+alike, and the simulator keeps one arm: holding each slot to its first zone, the old road.
+
+**Why these figures.** The brief gave each enemy its role, its shape and what its second move lays. The rest was set against the
+enemy each stands for elsewhere — slower, better armoured, frost-hardened, weak to fire — and against two figures the cooldown line
+reads, the middle health and the middle basic attack of the whole warband: three of the new enemies sit under each and three over,
+so adding them moves neither, and no existing enemy's heal or spend cools differently. Each second move is the least damage that
+clears the line, as JN's and JO's raises were.
+
+**Why the Titan's freeze rides a blow.** A hero already loses a turn to `frozen` when it lands; riding a blow, the freeze meets
+everything a blow meets — a Block, a miss — and everything a status meets — Ironclad, Hallowed, a cleanse — so nothing new decides
+whether it lands.
+
 ## Three hex carriers met more often, and the record put right (Batch JR) — 2026-11-09
 
 **Why the carriers, not the hexes.** The playtest asked which enemies lay which hex, and the answer was that the hexes are on the

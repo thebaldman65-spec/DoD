@@ -8,7 +8,9 @@
   "zones": [
    1,
    2,
-   3
+   3,
+   4,
+   5
   ],
   "enemy_role": "damage",
   "max_hp": 140,
@@ -238,7 +240,9 @@
   "zones": [
    1,
    2,
-   3
+   3,
+   4,
+   5
   ],
   "enemy_role": "damage",
   "max_hp": 110,
@@ -312,7 +316,9 @@
   "zones": [
    1,
    2,
-   3
+   3,
+   4,
+   5
   ],
   "enemy_role": "tank",
   "max_hp": 150,
@@ -367,7 +373,9 @@
   "zones": [
    1,
    2,
-   3
+   3,
+   4,
+   5
   ],
   "enemy_role": "support",
   "max_hp": 110,
@@ -427,7 +435,9 @@
   "zones": [
    1,
    2,
-   3
+   3,
+   4,
+   5
   ],
   "enemy_role": "support",
   "max_hp": 120,
@@ -622,7 +632,9 @@
   "zones": [
    1,
    2,
-   3
+   3,
+   4,
+   5
   ],
   "enemy_role": "damage",
   "max_hp": 260,
@@ -748,7 +760,9 @@
   "zones": [
    1,
    2,
-   3
+   3,
+   4,
+   5
   ],
   "enemy_role": "damage",
   "max_hp": 280,
@@ -817,7 +831,9 @@
   "zones": [
    1,
    2,
-   3
+   3,
+   4,
+   5
   ],
   "enemy_role": "damage",
   "max_hp": 250,
@@ -1042,7 +1058,9 @@
   "zones": [
    1,
    2,
-   3
+   3,
+   4,
+   5
   ],
   "enemy_role": "support",
   "max_hp": 105,
@@ -1168,7 +1186,9 @@
   "zones": [
    1,
    2,
-   3
+   3,
+   4,
+   5
   ],
   "enemy_role": "damage",
   "max_hp": 125,
@@ -1227,7 +1247,9 @@
   "zones": [
    1,
    2,
-   3
+   3,
+   4,
+   5
   ],
   "enemy_role": "support",
   "max_hp": 80,
@@ -1313,7 +1335,9 @@
   "zones": [
    1,
    2,
-   3
+   3,
+   4,
+   5
   ],
   "enemy_role": "damage",
   "max_hp": 620,
@@ -1396,6 +1420,419 @@
      "turns": 4
     },
     "status_chance": 0.9
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 3,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+   }
+  ]
+ },
+ "frostbitten_thrall": {
+  "unit_name": "Frostbitten Thrall",
+  "power": 1,
+  "roles": [
+   "skirmisher"
+  ],
+  "zones": [
+   4,
+   5
+  ],
+  "enemy_role": "damage",
+  "max_hp": 95,
+  "attack": 100,
+  "armor": 0.07,
+  "speed": 100.0,
+  "stability": 100,
+  "constitution": 75,
+  "tint": [
+   0.72,
+   0.86,
+   1.0
+  ],
+  "sprite_scale": 2.9,
+  "resists": {
+   "frost": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Numb Claws",
+    "damage": 33,
+    "pressure": 12,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Hobbling Bite",
+    "cooldown": 2,
+    "damage": 46,
+    "pressure": 18,
+    "delay": 2.5,
+    "anim": "attack02",
+    "applies_status": {
+     "id": "slow",
+     "turns": 2
+    },
+    "status_chance": 0.7
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "icebound_bulwark": {
+  "unit_name": "Icebound Bulwark",
+  "power": 2,
+  "roles": [
+   "bulwark"
+  ],
+  "zones": [
+   4,
+   5
+  ],
+  "enemy_role": "tank",
+  "max_hp": 190,
+  "attack": 75,
+  "armor": 0.4,
+  "speed": 65.0,
+  "stability": 100,
+  "constitution": 130,
+  "block_chance": 0.05,
+  "tint": [
+   0.6,
+   0.78,
+   0.95
+  ],
+  "resists": {
+   "frost": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Ice-Shod Bash",
+    "damage": 38,
+    "pressure": 26,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Glacier Press",
+    "cooldown": 2,
+    "damage": 38,
+    "pressure": 70,
+    "delay": 3.0,
+    "anim": "attack02"
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 3,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+   }
+  ]
+ },
+ "hailcaster": {
+  "unit_name": "Hailcaster",
+  "power": 1,
+  "roles": [
+   "sniper"
+  ],
+  "zones": [
+   4,
+   5
+  ],
+  "enemy_role": "damage",
+  "max_hp": 85,
+  "attack": 100,
+  "armor": 0.1,
+  "speed": 92.0,
+  "stability": 100,
+  "constitution": 75,
+  "is_ranged": true,
+  "tint": [
+   0.82,
+   0.9,
+   1.0
+  ],
+  "resists": {
+   "frost": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Hailstone",
+    "damage": 24,
+    "pressure": 18,
+    "delay": 2.0,
+    "anim": "attack01",
+    "dmg_type": "frost"
+   },
+   {
+    "display_name": "Hailstorm",
+    "cooldown": 2,
+    "damage": 8,
+    "pressure": 8,
+    "delay": 3.0,
+    "anim": "attack02",
+    "dmg_type": "frost",
+    "aoe": true,
+    "applies_status": {
+     "id": "dazed",
+     "turns": 2
+    }
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "rimehorn": {
+  "unit_name": "Rimehorn",
+  "power": 3,
+  "roles": [
+   "brute"
+  ],
+  "zones": [
+   5
+  ],
+  "enemy_role": "damage",
+  "max_hp": 300,
+  "attack": 100,
+  "armor": 0.24,
+  "speed": 68.0,
+  "stability": 100,
+  "constitution": 135,
+  "tint": [
+   0.66,
+   0.8,
+   0.9
+  ],
+  "sprite_scale": 3.9,
+  "resists": {
+   "frost": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Gore",
+    "damage": 42,
+    "pressure": 30,
+    "delay": 2.5,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Trampling Charge",
+    "cooldown": 2,
+    "damage": 52,
+    "pressure": 64,
+    "delay": 3.5,
+    "anim": "attack02"
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 2,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "hoarfrost_warden": {
+  "unit_name": "Hoarfrost Warden",
+  "power": 2,
+  "roles": [
+   "mender"
+  ],
+  "zones": [
+   5
+  ],
+  "enemy_role": "support",
+  "max_hp": 130,
+  "attack": 50,
+  "armor": 0.08,
+  "speed": 90.0,
+  "stability": 100,
+  "constitution": 85,
+  "is_ranged": true,
+  "tint": [
+   0.9,
+   0.95,
+   1.0
+  ],
+  "resists": {
+   "frost": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Chill Touch",
+    "damage": 32,
+    "pressure": 12,
+    "delay": 2.0,
+    "anim": "attack01",
+    "dmg_type": "frost"
+   },
+   {
+    "display_name": "Healing Wave",
+    "cooldown": 2,
+    "special": "healing_wave",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Mends the most wounded of its warband\nfor 25% of their max HP, paid in\nMalice (tanks and supports first)."
+   },
+   {
+    "display_name": "Raise",
+    "cooldown": 3,
+    "special": "malice_raise",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Stands a fallen body of its warband back\nup at {=Battle.MALICE_RAISE_PCT*100}% of its maximum health, for\nthat health in Malice (once a body, a fight)."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 4,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+   }
+  ]
+ },
+ "stillwrought": {
+  "unit_name": "The Stillwrought",
+  "power": 2,
+  "roles": [
+   "hexer"
+  ],
+  "zones": [
+   5
+  ],
+  "enemy_role": "support",
+  "max_hp": 120,
+  "attack": 50,
+  "armor": 0.1,
+  "speed": 88.0,
+  "stability": 100,
+  "constitution": 90,
+  "is_ranged": true,
+  "tint": [
+   0.55,
+   0.6,
+   0.85
+  ],
+  "resists": {
+   "frost": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Stillbolt",
+    "damage": 46,
+    "pressure": 14,
+    "delay": 2.0,
+    "anim": "attack01",
+    "dmg_type": "frost"
+   },
+   {
+    "display_name": "Leaching Stillness",
+    "cooldown": 2,
+    "damage": 58,
+    "pressure": 30,
+    "delay": 3.0,
+    "anim": "attack02",
+    "dmg_type": "shadow",
+    "applies_status": {
+     "id": "sap",
+     "turns": 3
+    },
+    "description": "One hero gains {=Unit.SAP_CUT*100}% less Rage or Mana."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 4,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+   }
+  ]
+ },
+ "icewrought_titan": {
+  "unit_name": "Icewrought Titan",
+  "power": 7,
+  "roles": [
+   "boss"
+  ],
+  "zones": [
+   4,
+   5
+  ],
+  "enemy_role": "tank",
+  "max_hp": 460,
+  "attack": 100,
+  "armor": 0.32,
+  "speed": 75.0,
+  "stability": 100,
+  "constitution": 155,
+  "is_boss": true,
+  "tint": [
+   0.62,
+   0.82,
+   1.0
+  ],
+  "sprite_scale": 4.4,
+  "resists": {
+   "frost": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Glacier Fist",
+    "damage": 44,
+    "pressure": 24,
+    "delay": 3.0,
+    "anim": "attack01",
+    "dmg_type": "frost"
+   },
+   {
+    "display_name": "Entomb",
+    "cooldown": 2,
+    "damage": 60,
+    "pressure": 40,
+    "delay": 3.5,
+    "anim": "attack02",
+    "dmg_type": "frost",
+    "applies_status": {
+     "id": "frozen",
+     "turns": 1
+    },
+    "description": "Freezes one hero solid: a turn lost."
    },
    {
     "display_name": "Entrench",

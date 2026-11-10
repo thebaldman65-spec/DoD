@@ -29,6 +29,10 @@ const Gate = preload("res://gate_fixture.gd")
 # JI's LINE AND ITS BREAK PRICE (JO §1): the one blow and the one price, read where they stand.
 const JI = preload("res://check_ji.gd")
 
+# BATCH JS — SEVEN KINDS JOINED THE WARBAND AFTER THIS GATE LANDED (JS §1–§3): the Frozen Plains' six and its boss. Each
+# is named here and read apart, so this gate goes on asking its own question of the warband its batch left; `check_js` holds
+# the seven. (Rosters 4 and 5 joined too; nothing this gate counts reads a roster.)
+const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan"]
 const KINDS := 21
 # JK's fifty, and since JO §2 Gall and Mire among them, each a blow given damage (Sap and Fester ride two of the fifty).
 const MOVES_BEFORE := 52
@@ -366,7 +370,7 @@ func _s1_every_kind_buys(s: Node, spends: bool) -> void:
 		print("    %-16s buys %s; its selection on the board: %s" % [kind, str(mine), str(got)])
 	print("    CHECKED %d of %d kinds; %d spends on their lists; the kinds that own no cooling move of their own: %d, and %d of them hold a spend" % [
 		holds.size(), KINDS, _spends.size(), own_cooling, own_cooling_buy])
-	ok(holds.size() == KINDS, "§1: the walk read %d kinds, not %d" % [holds.size(), KINDS])
+	ok(holds.size() == KINDS + ADDED_SINCE.size(), "§1: the walk read %d kinds, not %d" % [holds.size(), KINDS + ADDED_SINCE.size()])
 	ok(none.is_empty(), "§1: a kind holds no move the pool buys: %s" % [none])
 	ok(no_floor.is_empty(), "§1: a kind holds neither a Rally nor an Entrench, the pair every kind can buy: %s" % [no_floor])
 	ok(no_buy.is_empty(), "§1: a kind declares no spend on a board that wants one: %s" % [no_buy])
@@ -892,12 +896,15 @@ func _s4_not_done(s: Node) -> void:
 	var data: Dictionary = Enemies._load()
 	var moves := 0
 	for k2 in data:
+		if ADDED_SINCE.has(String(k2)):
+			continue
 		for a in (data[k2] as Dictionary).get("abilities", []):
 			# JL §2 — and JL's hex special, which no move carries since JO §2: each hex rides a blow among these fifty-two.
 			if not String(a.get("special", "")).begins_with("malice_") and String(a.get("special", "")) != "warband_hex":
 				moves += 1
 	print("    %d kinds, %d moves beside the spends" % [data.size(), moves])
-	ok(data.size() == KINDS and moves == MOVES_BEFORE, "§4: the warband holds %d kinds and %d moves beside its spends, not %d and %d" % [data.size(), moves, KINDS, MOVES_BEFORE])
+	var kinds_then := data.keys().filter(func(k): return not ADDED_SINCE.has(String(k))).size()
+	ok(kinds_then == KINDS and moves == MOVES_BEFORE, "§4: the warband holds %d kinds and %d moves beside its spends, not %d and %d" % [kinds_then, moves, KINDS, MOVES_BEFORE])
 
 
 # ── §5 — THE TEXTS FOLLOW THE CONSTANTS ───────────────────────────────────────

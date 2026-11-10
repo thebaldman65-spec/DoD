@@ -72,6 +72,11 @@ const JN_REST := "425c9c523cfbd5de4b2a12dd9089fdab"
 # roster, the Orc Hexer a second role. Each is named here and put back before the digest, so it goes on asking whether
 # anything else in the warband's data moved.
 const MOVED_SINCE := {"grave_totem": {"zones": [1.0, 3.0]}, "behemoth": {"zones": [2.0, 3.0]}, "hexer": {"roles": ["hexer"]}}
+# BATCH JS — SEVEN KINDS AND TWO ROSTERS JOINED THE WARBAND AFTER THIS GATE LANDED (JS §1–§3): the Frozen Plains' six and its
+# boss, and rosters 4 and 5 on the kinds tagged for all three old rosters. Each is named here and read apart, so this gate goes on
+# asking its own question of the warband its batch left; `check_js` holds the seven.
+const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan"]
+const ROSTERS_SINCE := [4, 5]
 # A HOST's KEYS §2 MOVED: its damage, its cooldown, the special it lost, the status it took and its words.
 const HOST_KEYS := ["damage", "cooldown", "special", "applies_status", "description"]
 
@@ -485,6 +490,8 @@ func _s1_nothing_else() -> void:
 	var touched: Array = []
 	var gone: Array = []
 	for kind in data:
+		if ADDED_SINCE.has(String(kind)):
+			continue
 		var abs_: Array = data[kind]["abilities"]
 		var b := _basic(abs_)
 		var was: Array = jn.get(kind, [])
@@ -529,6 +536,12 @@ func _s1_nothing_else() -> void:
 		if (raw as Dictionary).has(jr_kind):
 			for jr_field in MOVED_SINCE[jr_kind]:
 				raw[jr_kind][jr_field] = (MOVED_SINCE[jr_kind][jr_field] as Array).duplicate()
+	# BATCH JS — the seven kinds and the two rosters added since (`ADDED_SINCE`, `ROSTERS_SINCE`) out before the digest.
+	for js_kind in ADDED_SINCE:
+		(raw as Dictionary).erase(js_kind)
+	for js_k in (raw as Dictionary):
+		if ((raw as Dictionary)[js_k] as Dictionary).has("zones"):
+			raw[js_k]["zones"] = (raw[js_k]["zones"] as Array).filter(func(z): return not ROSTERS_SINCE.has(int(z)))
 	var rest := rest_digest(raw, ten, hosts, FOLDED)
 	print("    the rest of the data, the ten's damage, the hosts' moved keys and the folded moves aside: %s (JN's %s; %d of the ten, %d hosts)" % [
 		rest, JN_REST, ten.size(), hosts.size()])

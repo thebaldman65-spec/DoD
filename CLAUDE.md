@@ -540,8 +540,8 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
     is the record working, which is why this one is kept beside its reversal.**
     · **AND THE ROOM IS FINITE, SAID PLAINLY.** The two files at their two ceilings — this one at 510
       KiB, `docs/state.md` at its own 380 KiB (HY §3) — were a read of **911,360 B: 857 B under where
-      the read stood at HW's close** (912,217 B), the read the trim was taken to relieve. *JJ §1 raised that file's to 440 KiB,
-      the designer's, because the routing bounds a batch's working read of it: the two ceilings are 972,800 B now, past where HX
+      the read stood at HW's close** (912,217 B), the read the trim was taken to relieve. *JJ §1 raised that file's to 440 KiB and JS §0 to 520 KiB,
+      the designer's, because the routing bounds a batch's working read of it: the two ceilings are 1,054,720 B now, past where HX
       began, and the ceiling no longer measures the working read, so the sentence that follows is HY's, kept as its record.* The room is
       real and it runs out where HX began; **when it does, the re-measure decides the shape, not a
       sixth run of this arithmetic.**
@@ -2822,10 +2822,10 @@ sim/autoplay/sim_run).
   gated on the sim, or on a battle outside a run; `check_iv` §2 holds every environment read in the game's scripts, one
   row each, and reds on a new one nobody sorted.
   **AND A FLAG THAT CHANGES WHAT A RUN CONTAINS IS THE SIM's, UNLESS THE PLAYER CHOOSES THAT CONTENT SOMEWHERE ELSE TOO (IW §0.3, the designer's)**:
-  a player chooses his party and his build, never his zones — the run draws them — so `DOD_ZONE_ROTATION` (randomize
-  the zone draw within slot pools) is read by a run sim only, beside the five, and a player's run takes each pool's first
-  zone. Inert while every pool holds one zone; the day one holds two, the sim can force a draw for a measurement, and
-  the draw a player gets is owed its own door (`check_iv` §2's latent arm reds that day).
+  a player chooses his party and his build, never his zones — the run draws them — so `DOD_ZONE_ROTATION` is read by a
+  run sim only, beside the five. *Until JS a player's run took each pool's first zone and the flag randomized a sim's draw,
+  the player's door owed the day a pool held two (`check_iv` §2's latent arm); JS §1 built it (JS's ruling 1): every run
+  draws within a pool of two, and the flag's one arm left, `=0`, holds a sim to each pool's first.*
 · ENV FLAGS, non-sim: `DOD_AUTOPLAY` (1 debug battle, echoes "[LOG]"; never exits on its own —
   timeout/kill it), `DOD_DEBUG` (above), `DOD_ENEMIES_OFF` (above), `DOD_READOUT` (IF §1: `0` turns the playtest readout off in the player's
   game; `1` turns it on in a harness, which then writes `user://readout_harness/` — the block *THE READOUT IS A READ*).

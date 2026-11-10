@@ -1,0 +1,40 @@
+what	name	count	the fights where the warband attacks	where	why
+a JS kind	frostbitten_thrall	2	62	check_gf 1, check_jq 1	rosters 4 and 5; fielded in 2 attacking fights
+its second move cast	Hobbling Bite (Frostbitten Thrall)	4	62	-	
+a JS kind	icebound_bulwark	1	62	check_jq 1	rosters 4 and 5; fielded in 1 attacking fight
+its second move cast	Glacier Press (Icebound Bulwark)	2	62	-	
+a JS kind	hailcaster	1	62	check_jq 1	rosters 4 and 5; fielded in 1 attacking fight
+its second move cast	Hailstorm (Hailcaster)	3	62	15 lines, an area move a line a body struck	
+a JS kind	rimehorn	1	62	check_jq 1	roster 5; fielded in 1 attacking fight
+its second move cast	Trampling Charge (Rimehorn)	4	62	-	
+a JS kind	hoarfrost_warden	1	62	check_jq 1	roster 5; fielded in 1 attacking fight
+its second move cast	Healing Wave (Hoarfrost Warden)	0	62	-	its bodies took 9 turns of their own in the attacking fights and declared it on none
+a JS kind	stillwrought	1	62	check_jq 1	roster 5; fielded in 1 attacking fight
+its second move cast	Leaching Stillness (The Stillwrought)	3	62	-	
+a JS kind	icewrought_titan	1	62	check_jq 1	rosters 4 and 5; fielded in 1 attacking fight
+its second move cast	Entomb (Icewrought Titan)	1	62	-	
+Sap laid on a hero or a companion	the Orc Hexer	2	62	-	
+Sap laid on a hero or a companion	the Stillwrought	3	62	-	
+Sap laid on a hero or a companion	no carrier read	0	62	-	every Sap landing followed a carrier's strike line
+Frozen laid on a hero or a companion	the Icewrought Titan	0	62	-	Entomb was cast once in the attacking fights, and missed
+a hero's turn lost to Frozen	the loop	0	62	-	no freeze landed
+the attacking fights a hero was Frozen in	the Icewrought Titan	0	62	-	no freeze landed
+the fights	the logs hold	342	62	-	
+the fights	with enemy attacks off	268	62	-	
+the fights	with attacks on and no warband strike	11	62	-	
+the fights	struck in by a gate's own hand	1	62	-	check_js §3 casts the Entombs; the warband takes no turn of its own
+the fights	where the warband attacks	62	62	-	
+a target's fights	check_fh	19	62	19 in its logs, 0 with enemy attacks off, 0 with no warband strike, 0 struck by its own hand	
+a target's fights	check_gf	4	62	8 in its logs, 0 with enemy attacks off, 4 with no warband strike, 0 struck by its own hand	
+a target's fights	check_gj	0	62	35 in its logs, 34 with enemy attacks off, 1 with no warband strike, 0 struck by its own hand	
+a target's fights	check_gp	0	62	59 in its logs, 59 with enemy attacks off, 0 with no warband strike, 0 struck by its own hand	
+a target's fights	check_gv	0	62	133 in its logs, 133 with enemy attacks off, 0 with no warband strike, 0 struck by its own hand	
+a target's fights	check_hk	0	62	35 in its logs, 35 with enemy attacks off, 0 with no warband strike, 0 struck by its own hand	
+a target's fights	check_ho	0	62	3 in its logs, 3 with enemy attacks off, 0 with no warband strike, 0 struck by its own hand	
+a target's fights	check_hr	0	62	2 in its logs, 2 with enemy attacks off, 0 with no warband strike, 0 struck by its own hand	
+a target's fights	check_if	3	62	3 in its logs, 0 with enemy attacks off, 0 with no warband strike, 0 struck by its own hand	
+a target's fights	check_jq	28	62	29 in its logs, 0 with enemy attacks off, 1 with no warband strike, 0 struck by its own hand	
+a target's fights	check_js	0	62	1 in its logs, 0 with enemy attacks off, 0 with no warband strike, 1 struck by its own hand	
+a target's fights	test_batch_al	0	62	2 in its logs, 2 with enemy attacks off, 0 with no warband strike, 0 struck by its own hand	
+a target's fights	test_batch_bl	2	62	7 in its logs, 0 with enemy attacks off, 5 with no warband strike, 0 struck by its own hand	
+a target's fights	test_rune_battle	6	62	6 in its logs, 0 with enemy attacks off, 0 with no warband strike, 0 struck by its own hand	

@@ -168,7 +168,8 @@ inside it breaks that promise.
   bar's own setter, Mire at `effective_speed()`, Fester in `_dot_pass`.
 · **A HEX RIDES A BLOW: NO WARBAND MOVE LAYS A STATUS ON A HERO UNLESS IT DEALS DAMAGE (JO §2, the designer's).** Each of the four is a
   damaging move's own `applies_status`: Sap on the Orc Hexer's Bone Rattle and Fester on the Rot Behemoth's Wretched Bellow, each
-  folded onto a damaging move of its carrier's that laid nothing, and Gall and Mire on their own moves, given the damage that clears
+  folded onto a damaging move of its carrier's that laid nothing (and since JS Sap on the Stillwrought's Leaching Stillness, authored
+  with it), and Gall and Mire on their own moves, given the damage that clears
   JI's line. So each is an attack `_choose_enemy_action` picks among the moves that deal damage, aimed as a blow is, through the
   draws and the evasions, and a single blow rolls its miss in the strike loop as the warband's other status blows do (an area blow rolls none, as every area blow); on a hit it lays its
   status through the door at the move's `status_chance`, on every body an area blow strikes, a companion among them. No move is a

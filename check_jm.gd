@@ -51,6 +51,10 @@ const KEPT_GRADES := "res://docs/reports/JM-grades.tsv"
 # SINCE JO IT IS JO's, Gall among its moves: seven of the ten brought to the line priced with their Break, and the four hexes onto
 # blows (`check_jo` §1, §2).
 const KIT_PIN := "res://docs/reports/JO-kit.json"
+# BATCH JS — SEVEN KINDS JOINED THE WARBAND AFTER THIS GATE LANDED (JS §1–§3): the Frozen Plains' six and its boss. Each
+# is named here and read apart, so this gate goes on asking its own question of the warband its batch left; `check_js` holds
+# the seven. (Rosters 4 and 5 joined too; nothing this gate counts reads a roster.)
+const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan"]
 # THE TREE JM's FIVE RE-READS STAND FOR (§3), its digest as `check_jm` took it on JM's commit.
 const JM_TREE := "c2c74d46e931d8be168cf759e9e83353"
 const FOE := {"type": "fight", "theme": "Warband", "enemies": ["archer", "hexer", "raider", "shieldmaster"]}
@@ -320,7 +324,7 @@ func _s0_the_carrier() -> void:
 	print("    the hexers met: %s; the most, %s (%d fights); Gall on %s, Sap on %s" % [str(met), best, most, str(car.get("gall", [])), str(car.get("sap", []))])
 	ok(met.size() >= 5 and best != "", "§0: the kept drive table does not say how often each hexer met the heroes: %s" % str(met))
 	ok(car.get("gall", []) == [best], "§0: Gall is not carried by the hexer the heroes meet most (%s), but by %s" % [best, str(car.get("gall", []))])
-	ok(car.get("sap", []) == ["hexer"], "§0: Sap is not the Orc Hexer's alone: %s" % str(car.get("sap", [])))
+	ok((car.get("sap", []) as Array).filter(func(k): return not ADDED_SINCE.has(String(k))) == ["hexer"], "§0: Sap is not the Orc Hexer's alone: %s" % str(car.get("sap", [])))
 
 
 # C02: GALL REACHES EVERY HERO — the move's own reach, and one cast lays it on every hero standing, each hero's heal then halved
@@ -648,8 +652,9 @@ func _s4_not_done(s: Node) -> void:
 					String(st.get("id", "")), int(st.get("turns", 0)), "aoe" if bool(a.get("aoe", false)) else ""])
 			if have != Array(pin[kind]):
 				moved.append(kind)
-		if data.size() != (pin as Dictionary).size():
-			moved.append("%d kinds, not %d" % [data.size(), (pin as Dictionary).size()])
+		var kinds_then := data.keys().filter(func(k): return not ADDED_SINCE.has(String(k))).size()
+		if kinds_then != (pin as Dictionary).size():
+			moved.append("%d kinds, not %d" % [kinds_then, (pin as Dictionary).size()])
 	for k in UNIT_FIGURES:
 		if absf(_unit_f(k) - float(UNIT_FIGURES[k])) > 0.0001:
 			moved.append("%s %s" % [k, str(_unit_f(k))])

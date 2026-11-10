@@ -5,7 +5,7 @@
 #        and the two claims that stood on them are repaired in the ledger, so none stands.
 #   §0.2 ONE PROCESS A LANE, DRIVEN: an idle lane runs a launch in place; a lane already running Godot is refused by name and
 #        pid, and the launch runs in a lane the driver hands out — a refusal with a way forward.
-#   §0.3 `DOD_ZONE_ROTATION` IS THE SIM's, DRIVEN: exported, a player's run does not read it, and a sim does.
+#   §0.3 `DOD_ZONE_ROTATION` IS THE SIM's, DRIVEN: exported, a player's run does not read it, and a sim does (since JS its `=0` holds a sim to each pool's first).
 #   §1   THE LADDER's MEASUREMENT IS KEPT: the screen's table (every candidate's five readings, R5 and R4 recomputed from them,
 #        the winner the largest R5) and the ladder's (every modifier on the winner, its level and the cuts re-derived off the
 #        readings by the pre-registered rule) — and the arm the batch took is the arm the tables give.
@@ -259,20 +259,22 @@ func _s02_the_lock() -> void:
 
 
 # ── §0.3 — `DOD_ZONE_ROTATION` IS THE SIM's, DRIVEN ──────────────────────────────────────────────────
-# A flag that changes what a run contains is the sim's: with it exported a player's run draws each pool's first zone, and a sim
-# reaches the draw. The absence (a player's run does not read it) and the positive arm (the sim does) are one drive; `check_iv`
+# A flag that changes what a run contains is the sim's: exported, a player's run does not read it, and a sim does — since JS §1 every
+# run draws within a pool of two and the flag's one arm, `=0`, holds a sim to each pool's first zone. The absence (a player's run does not read it) and the positive arm (the sim does) are one drive; `check_iv`
 # §2 holds its row (GATED, its guard) beside the other five.
 func _s03_the_zone_flag() -> void:
 	print("\n§0.3 — DOD_ZONE_ROTATION is the sim's: a player's run does not read it, a sim does")
 	var body := Gate.fn_body("scripts/run_state.gd", "rotation_enabled", _docs)
-	ok(Gate.strip_comments(body).contains("return sim_run and OS.get_environment(\"DOD_ZONE_ROTATION\") == \"1\""),
+	# BATCH JS §1 — SINCE A POOL HOLDS TWO THE DRAW IS THE GAME's (JS's ruling 1): every run draws within a pool of two, and the flag's
+	# one arm left is a sim's `DOD_ZONE_ROTATION=0`, which holds it to each pool's first author. The rule is IW's — the flag is the sim's.
+	ok(Gate.strip_comments(body).contains("return not (sim_run and OS.get_environment(\"DOD_ZONE_ROTATION\") == \"0\")"),
 		"§0.3: `Run.rotation_enabled` reads DOD_ZONE_ROTATION with no sim gate — a flag that changes what a run contains is the sim's")
 	var was: bool = _run.sim_run
-	OS.set_environment("DOD_ZONE_ROTATION", "1")
+	OS.set_environment("DOD_ZONE_ROTATION", "0")
 	_run.sim_run = false
-	ok(not _run.rotation_enabled(), "§0.3: DRIVEN — `DOD_ZONE_ROTATION=1` reached a player's run: it changes what a run contains with nothing to say so")
+	ok(_run.rotation_enabled(), "§0.3: DRIVEN — `DOD_ZONE_ROTATION=0` reached a player's run: it changes what a run contains with nothing to say so")
 	_run.sim_run = true
-	ok(_run.rotation_enabled(), "§0.3: DRIVEN — under the sim `DOD_ZONE_ROTATION=1` no longer arms: the gate shut the sim's arm too")
+	ok(not _run.rotation_enabled(), "§0.3: DRIVEN — under the sim `DOD_ZONE_ROTATION=0` no longer holds the first author: the gate shut the sim's arm too")
 	_run.sim_run = was
 	OS.set_environment("DOD_ZONE_ROTATION", "")
 	print("    CHECKED the guard and both arms, a player's run and a sim's")

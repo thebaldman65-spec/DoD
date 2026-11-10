@@ -32,7 +32,9 @@ extends SceneTree
 const Gate = preload("res://gate_fixture.gd")
 
 # THE STATE FILE's CEILING and the reason the brief gave for it, in the rule's own words.
-const CEILING_KIB := 440
+# BATCH JS §0 — RAISED AGAIN, TO 520, the designer's, for the reason this gate already holds beside it (the routing bounds what a
+# batch reads); JJ's 440 stands in the preamble as the record JS's raise superseded.
+const CEILING_KIB := 520
 const CEILING_REASON := "THE CEILING's JOB WAS TO BOUND WHAT A BATCH READS, AND THE ROUTING DOES THAT NOW"
 const CEILING_RECORD := "ten batches of this file's mean growth"
 # THE POOL's RULE, in the words the record carries.
@@ -40,6 +42,10 @@ const COST_RULE := "A HEAL THE WARBAND CASTS COSTS A POINT OF MALICE FOR EVERY P
 const BAR_HEAD := "MALICE"
 const MASTER_NEEDLE := "The warband shares one pool, Malice."
 const DECK_CLOSED_AT := 25
+# BATCH JS — SEVEN KINDS JOINED THE WARBAND AFTER THIS GATE LANDED (JS §1–§3): the Frozen Plains' six and its boss. Each
+# is named here and read apart, so this gate goes on asking its own question of the warband its batch left; `check_js` holds
+# the seven. (Rosters 4 and 5 joined too; nothing this gate counts reads a roster.)
+const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan"]
 const KINDS := 21
 # JK's fifty, and since JO §2 Gall and Mire among them, each a blow given damage (Sap and Fester ride two of the fifty).
 const MOVES := 52
@@ -821,13 +827,16 @@ func _s7_not_done() -> void:
 	for k in data:
 		# JK §1 — the warband's Malice spends are JK's moves, held by `check_jk` §4; the moves beside them (fifty-two since JO §2) are
 		# what this pins.
+		if ADDED_SINCE.has(String(k)):
+			continue
 		for mv in (data[k] as Dictionary).get("abilities", []):
 			# JL §2 — and JL's hex special, which no move carries since JO §2: each hex rides a blow, counted among the fifty-two.
 			if not String((mv as Dictionary).get("special", "")).begins_with("malice_") \
 					and String((mv as Dictionary).get("special", "")) != "warband_hex":
 				moves += 1
 	print("    %d kinds, %d moves" % [data.size(), moves])
-	ok(data.size() == KINDS and moves == MOVES, "§7: the warband holds %d kinds and %d moves, not %d and %d" % [data.size(), moves, KINDS, MOVES])
+	var kinds_then := data.keys().filter(func(k): return not ADDED_SINCE.has(String(k))).size()
+	ok(kinds_then == KINDS and moves == MOVES, "§7: the warband holds %d kinds and %d moves, not %d and %d" % [kinds_then, moves, KINDS, MOVES])
 
 
 # ── §8 — THE PLAYER's FILES ───────────────────────────────────────────────────

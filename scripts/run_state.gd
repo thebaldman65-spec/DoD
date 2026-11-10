@@ -321,21 +321,28 @@ func note_debug(action: String, taken: String) -> void:
 # carries its display name (art + save key), its boss kind, and a
 # roster id per slot it can host — roster ids are what the "zones"
 # tags in enemies.json actually mean. The Forest of Old hosts slots 1
-# AND 3: roster 1 as the opener, the tougher roster 3 as the finale.
-# Random draws stay behind DOD_ZONE_ROTATION=1 (fixed first-candidate
-# order otherwise), and since IW §0.3 that flag is the SIM's: a player's run
-# takes each pool's first author. With today's single-candidate pools both
-# modes draw identically.
+# AND 3: roster 1 as the opener, the tougher roster 3 as the finale; the
+# Frozen Plains hosts the same two, roster 4 as the opener and 5 as the finale.
+# BATCH JS §1 — A SLOT WHOSE POOL HOLDS TWO ZONES DRAWS BETWEEN THEM, A PLAYER's
+# RUN AND A SIM's ALIKE (`draw_zones`): the opener and the finale each hold the
+# Forest and the Frozen Plains, so a run takes one of four shapes; a slot of one
+# takes it with no die. `DOD_ZONE_ROTATION=0` holds a SIM to each pool's first
+# author, and a player's run never reads it (IW §0.3: a flag that changes what a
+# run contains is the sim's).
 # Adding a zone = ZONE_DEFS entry + SLOT_POOLS candidacy + roster tags
-# in enemies.json + zone_name keys in the battle/map background dicts.
+# in enemies.json + zone_name keys in the background dicts — the battle's,
+# the map's and the event screen's; each falls back to the Forest's art —
+# and a `zone` key on each slot-dealt event written for one zone alone.
 const SLOT_COUNT := 3
 const ZONE_DEFS := {
 	"forest": {"name": "Forest of Old", "boss": "withered_warden",
 		"rosters": {1: 1, 3: 3}},
 	"scarlands": {"name": "The Scarlands", "boss": "ash_tyrant",
 		"rosters": {2: 2}},
+	"frozen_plains": {"name": "The Frozen Plains", "boss": "icewrought_titan",
+		"rosters": {1: 4, 3: 5}},
 }
-const SLOT_POOLS := [["forest"], ["scarlands"], ["forest"]]
+const SLOT_POOLS := [["forest", "frozen_plains"], ["scarlands"], ["forest", "frozen_plains"]]
 var active_relics: Array = []  # up to 3 relic ids chosen at the draft
 var zone_idx := 0
 # BATCH EG §1 — HOW MANY ZONE BOSSES THIS RUN HAS PUT DOWN, AND WHY IT IS NOT
@@ -3900,20 +3907,23 @@ func draft_price() -> int:
 
 
 # BATCH IW §0.3 — A FLAG THAT CHANGES WHAT A RUN CONTAINS IS THE SIM's (the designer's): a player chooses
-# his party and his build, never his zones, so the rotation is read by a run sim only, beside the run
-# sim's other arms (`runes_mode`, `rune_econ`, `rune_power`). A player's run draws each pool's first.
+# his party and his build, never his zones, so the flag is read by a run sim only, beside the run
+# sim's other arms (`runes_mode`, `rune_econ`, `rune_power`).
+# BATCH JS §1 — AND SINCE A POOL HOLDS TWO, THE DRAW IS THE GAME's, NOT THE FLAG's: a player's run draws
+# within each pool, as the zone was authored to be met, and so does a sim, which plays the player's game;
+# the flag's one arm left is a sim's `DOD_ZONE_ROTATION=0`, which holds it to each pool's first author.
 func rotation_enabled() -> bool:
-	return sim_run and OS.get_environment("DOD_ZONE_ROTATION") == "1"
+	return not (sim_run and OS.get_environment("DOD_ZONE_ROTATION") == "0")
 
 
-# One zone id per slot for this run. Fixed order = each pool's first
-# author; the rotation flag (a sim's, IW §0.3) draws randomly within the
-# authored pools.
+# One zone id per slot for this run: a pool of one is taken with no die, and a
+# pool of two or more draws among its authors (JS §1) — unless a sim's flag
+# holds the fixed order, each pool's first author.
 func draw_zones() -> void:
 	zone_draw = []
 	for slot in SLOT_COUNT:
 		var pool: Array = SLOT_POOLS[slot]
-		zone_draw.append(pool.pick_random() if rotation_enabled() else pool[0])
+		zone_draw.append(pool.pick_random() if pool.size() > 1 and rotation_enabled() else pool[0])
 
 
 func current_zone_id() -> String:

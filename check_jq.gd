@@ -53,6 +53,11 @@ const WARBAND_MD5 := "f261e6345f22f42bc41a7f81276e066b"
 # roster, the Orc Hexer a second role. Each is named here and put back before the digest, so it goes on asking whether
 # anything else in the warband's data moved.
 const MOVED_SINCE := {"grave_totem": {"zones": [1.0, 3.0]}, "behemoth": {"zones": [2.0, 3.0]}, "hexer": {"roles": ["hexer"]}}
+# BATCH JS — SEVEN KINDS AND TWO ROSTERS JOINED THE WARBAND AFTER THIS GATE LANDED (JS §1–§3): the Frozen Plains' six and its
+# boss, and rosters 4 and 5 on the kinds tagged for all three old rosters. Each is named here and read apart, so this gate goes on
+# asking its own question of the warband its batch left; `check_js` holds the seven.
+const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan"]
+const ROSTERS_SINCE := [4, 5]
 const DECK_MD5 := "1d1f37491e4611bb78f94577074ede99"
 const CLERIC_CUT := 0.5
 # THE RECORD's NEEDLES — the rules' own words where they stand.
@@ -260,6 +265,12 @@ func _warband_as_landed() -> Dictionary:
 		if d.has(kind):
 			for field in MOVED_SINCE[kind]:
 				(d[kind] as Dictionary)[field] = (MOVED_SINCE[kind][field] as Array).duplicate()
+	# BATCH JS — and the seven kinds and two rosters added since (`ADDED_SINCE`, `ROSTERS_SINCE`) taken out.
+	for js_kind in ADDED_SINCE:
+		d.erase(js_kind)
+	for js_k in d:
+		if (d[js_k] as Dictionary).has("zones"):
+			(d[js_k] as Dictionary)["zones"] = ((d[js_k] as Dictionary)["zones"] as Array).filter(func(z): return not ROSTERS_SINCE.has(int(z)))
 	return d
 
 

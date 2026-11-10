@@ -75,6 +75,11 @@ const DATA_BEFORE := "ac418b1c8b40987acda318ffd3b457c2"
 # roster, the Orc Hexer a second role. Each is named here and put back before the digest, so it goes on asking whether
 # anything else in the warband's data moved.
 const MOVED_SINCE := {"grave_totem": {"zones": [1.0, 3.0]}, "behemoth": {"zones": [2.0, 3.0]}, "hexer": {"roles": ["hexer"]}}
+# BATCH JS — SEVEN KINDS AND TWO ROSTERS JOINED THE WARBAND AFTER THIS GATE LANDED (JS §1–§3): the Frozen Plains' six and its
+# boss, and rosters 4 and 5 on the kinds tagged for all three old rosters. Each is named here and read apart, so this gate goes on
+# asking its own question of the warband its batch left; `check_js` holds the seven.
+const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan"]
+const ROSTERS_SINCE := [4, 5]
 const DECK_CLOSED_AT := 25
 const FOE := {"type": "fight", "theme": "Warband", "enemies": ["whelp", "raider", "archer"]}
 const SEATS := ["warrior", "mage", "cleric", "hunter"]
@@ -711,17 +716,27 @@ func _s1f_the_texts() -> void:
 	var to2 := warband.find("**the line under them**", at2)
 	var eleven := warband.substr(at2, to2 - at2) if at2 >= 0 and to2 > at2 else ""
 	var stale: Array = []
+	# BATCH JS — A NAME TWO COOLING MOVES SHARE (the Orc Totemist's and the Hoarfrost Warden's Healing Wave) is read at every place the
+	# record states it: the figures stated there are the data's for that name, one each.
+	var have_by := {}
 	for entry3 in _pop:
-		var nm := String(entry3[1])
-		var have := _data_cd(String(entry3[0]), nm)
-		var i3 := eleven.find(nm + " ")
-		var said := -1
-		if i3 >= 0:
+		var nm0 := String(entry3[1])
+		if not have_by.has(nm0):
+			have_by[nm0] = []
+		(have_by[nm0] as Array).append(_data_cd(String(entry3[0]), nm0))
+	for nm in have_by:
+		var have: Array = (have_by[nm] as Array).duplicate()
+		have.sort()
+		var said: Array = []
+		var i3 := eleven.find(String(nm) + " ")
+		while i3 >= 0:
 			var p3 := eleven.find("(", i3)
-			if p3 >= 0 and p3 - i3 <= nm.length() + 8:
-				said = int(eleven.substr(p3 + 1, 1))
+			if p3 >= 0 and p3 - i3 <= String(nm).length() + 8:
+				said.append(int(eleven.substr(p3 + 1, 1)))
+			i3 = eleven.find(String(nm) + " ", i3 + 1)
+		said.sort()
 		if said != have:
-			stale.append("%s: the record says %d, the data %d" % [nm, said, have])
+			stale.append("%s: the record says %s, the data %s" % [nm, str(said), str(have)])
 	print("    the state's record of the eleven: %d of %d stated as the data gives them" % [_pop.size() - stale.size(), _pop.size()])
 	ok(eleven != "" and stale.is_empty(), "§1f: the state's record does not state each cooling move's cooldown as the data gives it: %s" % [stale])
 
@@ -813,6 +828,12 @@ func _s4_not_done() -> void:
 		if (raw as Dictionary).has(jr_kind):
 			for jr_field in MOVED_SINCE[jr_kind]:
 				raw[jr_kind][jr_field] = (MOVED_SINCE[jr_kind][jr_field] as Array).duplicate()
+	# BATCH JS — the seven kinds and the two rosters added since (`ADDED_SINCE`, `ROSTERS_SINCE`) out before the digest.
+	for js_kind in ADDED_SINCE:
+		(raw as Dictionary).erase(js_kind)
+	for js_k in (raw as Dictionary):
+		if ((raw as Dictionary)[js_k] as Dictionary).has("zones"):
+			raw[js_k]["zones"] = (raw[js_k]["zones"] as Array).filter(func(z): return not ROSTERS_SINCE.has(int(z)))
 	var digest := JSON.stringify(_strip(raw)).md5_text()
 	print("    the data, every cooldown key aside: %s" % digest)
 	ok(digest == DATA_BEFORE, "§4: a figure of the warband moved beside its cooldowns (%s)" % digest)

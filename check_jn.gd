@@ -43,6 +43,11 @@ const DATA_REST := "09f6815f57f2a8d102ed42c543304d82"
 # roster, the Orc Hexer a second role. Each is named here and put back before the digest, so it goes on asking whether
 # anything else in the warband's data moved.
 const MOVED_SINCE := {"grave_totem": {"zones": [1.0, 3.0]}, "behemoth": {"zones": [2.0, 3.0]}, "hexer": {"roles": ["hexer"]}}
+# BATCH JS — SEVEN KINDS AND TWO ROSTERS JOINED THE WARBAND AFTER THIS GATE LANDED (JS §1–§3): the Frozen Plains' six and its
+# boss, and rosters 4 and 5 on the kinds tagged for all three old rosters. Each is named here and read apart, so this gate goes on
+# asking its own question of the warband its batch left; `check_js` holds the seven.
+const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan"]
+const ROSTERS_SINCE := [4, 5]
 # SANCTITY's STEP, AS IT STANDS — read out at §0, never changed (C10).
 const SANCTITY := {"SANCTITY_PER_STEP": 13, "SANCTITY_MAX_STEPS": 5, "SANCTITY_STEP_TURNS": 1}
 # THE TREE JN's THIN AIR RE-READ STANDS FOR — JN's tree that landed, its game digested by `_tree_digest`. Since JO no batch re-reads a
@@ -642,6 +647,12 @@ func _s1_the_kit() -> void:
 		if (raw as Dictionary).has(jr_kind):
 			for jr_field in MOVED_SINCE[jr_kind]:
 				raw[jr_kind][jr_field] = (MOVED_SINCE[jr_kind][jr_field] as Array).duplicate()
+	# BATCH JS — the seven kinds and the two rosters added since (`ADDED_SINCE`, `ROSTERS_SINCE`) out before the digest.
+	for js_kind in ADDED_SINCE:
+		(raw as Dictionary).erase(js_kind)
+	for js_k in (raw as Dictionary):
+		if ((raw as Dictionary)[js_k] as Dictionary).has("zones"):
+			raw[js_k]["zones"] = (raw[js_k]["zones"] as Array).filter(func(z): return not ROSTERS_SINCE.has(int(z)))
 	var rest := JSON.stringify(_strip(raw, raised, "")).md5_text()
 	print("    the data, every cooldown and each raised move's damage aside: %s" % rest)
 	ok(rest == DATA_REST, "§1: a figure of the warband moved beside the raised moves' damage and bands (%s)" % rest)

@@ -292,6 +292,8 @@ func _draw_screen() -> void:
 	var zone_backgrounds := {
 		"Forest of Old": "res://assets/backgrounds/node_background_forest.png",
 		"The Scarlands": "res://assets/backgrounds/node_background_scarlands.png",
+		# BATCH JS §1 — A PLACEHOLDER, NAMED: the Frozen Plains has no art yet and wears the Forest's.
+		"The Frozen Plains": "res://assets/backgrounds/node_background_forest.png",
 	}
 	var art_tex: Texture2D = load(zone_backgrounds.get(Run.zone_name,
 		"res://assets/backgrounds/node_background_forest.png"))
