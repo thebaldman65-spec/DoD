@@ -12,7 +12,7 @@
 #        fire not, slower and more armoured than the kind it stands for (the rule that picks it, DERIVED); each second move the
 #        least whole damage that clears JI's line with its Break in the sum, priced through `check_ji.line_blow`, and its
 #        cooldown the line's band (C06); the line's reference board where it stood, so no existing band moved; what each lays an
-#        existing status, and no status new (C08); the Hoarfrost Warden a mender that Raises and heals — its heal chosen by the
+#        existing status, and no status new (C08); the Sleetveil Matron a mender that Raises and heals — its heal chosen by the
 #        warband's door, DRIVEN — and the Stillwrought a second carrier of Sap (C09); the kept table `JS-kinds.tsv` re-derived
 #        row by row, and master §9's table row for each of the seven read against the data (H02).
 #   §3   THE ICEWROUGHT TITAN: the Frozen Plains' boss lays `frozen` on one hero for one turn with a blow (C10); DRIVEN on a real
@@ -664,7 +664,7 @@ func _s2_the_six() -> void:
 	print("    Sap is laid by %s" % str(sap_by))
 	ok(sap_by.has("stillwrought") and sap_by.has("hexer"), "§2: Sap is laid by %s — the Stillwrought is its second carrier, beside the Orc Hexer" % str(sap_by))
 	ok(data.has("hoarfrost_warden") and (data["hoarfrost_warden"]["roles"] as Array).has("mender") and not _move(data.get("hoarfrost_warden", {}), "Raise").is_empty(),
-		"§2: the Hoarfrost Warden is not a mender that Raises")
+		"§2: the Sleetveil Matron is not a mender that Raises")
 	# C08 — NO STATUS AUTHORED: what the seven lay stood before JS, and STATUS_INFO holds the ids it held.
 	var bad: Array = []
 	for k5 in SIX.keys() + [BOSS]:
@@ -987,10 +987,10 @@ func _s3_the_freeze(s: Node) -> void:
 # the board in the Warden's kit, hurt by a quarter, with a pool that pays — the Wave on itself; with an empty pool — no heal. The
 # battery's one Warden fight declared none (§4's count says so); this is the choice itself, driven.
 func _s2_the_warden_heals(s: Node) -> void:
-	print("\n§2 — the Hoarfrost Warden's heal, chosen by the warband's door: hurt and paid for, the Wave; an empty pool, none")
+	print("\n§2 — the Sleetveil Matron's heal, chosen by the warband's door: hurt and paid for, the Wave; an empty pool, none")
 	var foes := _foes(s) if s != null else []
 	if foes.is_empty() or not Enemies._load().has("hoarfrost_warden"):
-		ok(false, "§2: no board, or no Hoarfrost Warden, to drive the heal on")
+		ok(false, "§2: no board, or no Sleetveil Matron, to drive the heal on")
 		return
 	var f: BattleUnit = foes[0]
 	var was_ab: Array = f.abilities
@@ -1007,7 +1007,7 @@ func _s2_the_warden_heals(s: Node) -> void:
 	var healed: bool = paid.size() == 2 and (paid[0] as Ability).display_name == "Healing Wave" and paid[1] == f
 	var refused: bool = broke.is_empty() or (broke[0] as Ability).display_name != "Healing Wave"
 	print("    hurt by a quarter: %s; with an empty pool: %s" % [str(paid.map(func(x): return (x as Ability).display_name if x is Ability else (x as BattleUnit).unit_name)), str(broke.map(func(x): return (x as Ability).display_name if x is Ability else (x as BattleUnit).unit_name))])
-	ok(healed and refused, "§2: the warband's door does not choose the Hoarfrost Warden's Healing Wave when a body is hurt and the pool pays, or chooses it with none to pay")
+	ok(healed and refused, "§2: the warband's door does not choose the Sleetveil Matron's Healing Wave when a body is hurt and the pool pays, or chooses it with none to pay")
 	f.abilities = was_ab
 	f.hp = was_hp
 	s.set("malice", was_pool)

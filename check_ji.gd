@@ -716,7 +716,7 @@ func _s1f_the_texts() -> void:
 	var to2 := warband.find("**the line under them**", at2)
 	var eleven := warband.substr(at2, to2 - at2) if at2 >= 0 and to2 > at2 else ""
 	var stale: Array = []
-	# BATCH JS — A NAME TWO COOLING MOVES SHARE (the Orc Totemist's and the Hoarfrost Warden's Healing Wave) is read at every place the
+	# BATCH JS — A NAME TWO COOLING MOVES SHARE (the Orc Totemist's and the Sleetveil Matron's Healing Wave) is read at every place the
 	# record states it: the figures stated there are the data's for that name, one each.
 	var have_by := {}
 	for entry3 in _pop:
