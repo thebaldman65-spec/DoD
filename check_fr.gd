@@ -17,12 +17,15 @@
 #
 # ── WHAT THIS GATE CANNOT DO, SAID FIRST ────────────────────────────────────
 # **MOST OF THAT FILE IS NOT MECHANICALLY CHECKABLE AND THIS GATE DOES NOT
-# PRETEND OTHERWISE.** Seven of its nine rule blocks are about how a batch comes
+# PRETEND OTHERWISE.** Seven of its first nine rule blocks are about how a batch comes
 # to EXIST — design settled before a brief, a brief pricing what it asks for, a
 # recon read before authoring, the assistant able to state what a thing changes
 # and reads, findings routed to the queue, implementation calls belonging to the
 # batch, a batch being mostly transcription. **Not one of those leaves an
-# artefact in the tree.** There is no file whose contents differ according to
+# artefact in the tree.** JT §1's — the lanes, the decision record, the plan,
+# who owns what — leave theirs, where they leave one, in a report (its first
+# line, the lane it ran, its closing block), and `check_jt` reads the one it
+# can: the closing block. There is no file whose contents differ according to
 # whether the designer and the assistant settled a name in conversation first,
 # and none according to whether a brief said how large a population it sent a
 # batch to walk: a brief is not in the repository (FZ). A check claiming to
@@ -259,8 +262,9 @@ func _s4_the_conflict_table(wow: String) -> void:
 # that go stale and no history.*
 #
 # THE SIZE BAR IS DERIVED, NOT INVENTED. No byte figure is pinned anywhere here.
-# The file's own claim is that it is a THIRD FILE and not a third seam of the
-# rule tree, so the bar is its two neighbours: it must stay the smallest of the
+# The file's own claim is that it is a file of its own and not a seam of
+# `CLAUDE.md` (*a third file* until JT §1 struck the count), so the bar is its
+# two FL neighbours: it must stay the smallest of the
 # three. That is the rule's own words made measurable, and it moves when they do.
 #
 # **IT DOES NOT ASSERT "no measurements".** The file carries several today —

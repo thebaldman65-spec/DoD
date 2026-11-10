@@ -123,7 +123,7 @@ block stood and never a new file.
 the equality rule travel with their parent. **Eight of the rows are FF §2's**, and they are the
 residue: rules written into this file AFTER the seam was taken, which the seam's own test puts on
 the other side of it. **Every row after those eight was written straight into the reference rather
-than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one, IE's two, II's two, IJ's one, IK's one, IM's three, IN's one, IO's two, IP's two, IQ's two, IR's one, IS's one, IT's three and IV's two —
+than moved there** — FG's, FH's, FI's, FR §5a's as FS §1 closed it, GZ §6's as HA §5 recorded it, HO's two, HP's one, HQ's one, HR's two, HS's one, HX's two, HY's two, ID's one, IE's two, II's two, IJ's one, IK's one, IM's three, IN's one, IO's two, IP's two, IQ's two, IR's one, IS's one, IT's three, IV's two and JT's two —
 and GW §2's, written there at GW and given its row only at HX (HV §3e found it missing; `check_hx` §1a now reds on one) —
 and four more are MOVED, FF §2's way: HG–HJ's census and supersession blocks, written back into this file after the seam
 was taken and sent over at HY §4 by the designer's ruling, and II §4's two, the archive practice's first pass — CP §3's
@@ -210,6 +210,8 @@ new block written here):
 | A LATENT DEFECT THAT NEEDS A WRITER GETS A GATE THAT REDS WHEN THE WRITER APPEARS | IT §7 |
 | WHEN A RULE AND ITS OWN GATE CONTRADICT, THE CODE DECIDES | IV §0.4 |
 | A BATCH READS `docs/state.md` AGAINST ITS FINISHED WORK: THE CLOSE-READ | IV §0.1 |
+| A BATCH RUNS THE FLOOR OF ITS LANE | JT §1 |
+| A CHECK THAT HAS PASSED EVERY BATCH FOR TEN BATCHES IS A CANDIDATE FOR RETIREMENT, AND EVERY REPORT NAMES ITS CANDIDATES | JT §1 |
 
 ## THE COMBAT RULES LIVE IN `docs/combat-rules.md` (STANDING, SET AT GR §2, RULED BY THE DESIGNER)
 > **THIS FILE IS STILL THE ONE A BATCH MUST READ. `docs/combat-rules.md` IS A REFERENCE IT POINTS AT,
@@ -479,7 +481,8 @@ new block written here):
 
 **`docs/reports/<CODE>.md`, committed with the batch.** Same content as the chat summary — what
 shipped, what was measured, what was found and not fixed, what needs a ruling — but committed,
-so it arrives through the knowledge sync instead of being hand-copied into a chat window.
+so it arrives through the knowledge sync instead of being hand-copied into a chat window. *(On the merge branch it does not: the
+synced copy stops at Batch GI, and the designer forwards the report — FOUND AT JT in `docs/state.md`.)*
 
 - **THE COPYING IS WHAT THIS REPLACES, AND IT HAD ALREADY LOST THINGS.** CL's overflow
   measurement was written into `text-standard.html` §4.8 and then reported as missing. **A report
@@ -495,10 +498,15 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
 - **A REPORT DOES NOT SHIP WITH AN UNSUBSTITUTED TEMPLATE TOKEN (STANDING, SET AT HU §0, the designer's).** Grep the
   finished report for `@@` before it is written out. **The verdict is what the next batch is built on; a report without one
   has not reported.** `docs/state.md` is held to the same grep, for the same reason.
-  · **AND THE DRAFT STAYS IN THE SCRATCHPAD UNTIL ITS VERDICT IS IN (HU's addition, not the designer's words).** Nothing in
-    the tree reads `docs/reports/`, so landing a report before its run buys nothing — and a draft in the tree is read as the
+  · **AND THE DRAFT STAYS IN THE SCRATCHPAD UNTIL ITS VERDICT IS IN (HU's addition, not the designer's words).** ~~Nothing in
+    the tree reads `docs/reports/`, so landing a report before its run buys nothing~~ *(false since `check_jc` §3,
+    `check_iu` §8, `check_jr` §2 and `check_jt` read it — struck at JT §1)* — and a draft in the tree is read as the
     report. HT's, with its verdict, its acceptance paragraph and its count of copies still tokens, stood in the working tree
     for the whole acceptance run and was read there; the file it committed carried none (`docs/reports/HU.md` §0).
+  · **AND A SECOND GREP, ON THE SAME FINISHED REPORT, ASKS FOR ITS CLOSING BLOCK (JT §1, the designer's).** A report whose last block is not
+    headed *WHAT THE NEXT DECISION RECORD OWES*, naming the lane, what was decided, what it was written from and the open
+    questions, has not reported either, and it does not land. What the block holds is `docs/ways-of-working.md`'s;
+    `check_jt` reads the newest report for it every battery, the backstop a batch late if this step is skipped.
 
 ## THIS FILE IS MEASURED IN KiB, AND THE CEILING IS 510 KiB (STANDING, RULED AT EE §1, RAISED AT FU §1, GY §1 AND HN §1, AND AT HY §2 OVER HN's OWN RULING)
 > **`CLAUDE.md` IS MEASURED AS A SIZE, NEVER AS A SHARE OF THE SYNC, AND THE CEILING IS 510 KiB.**
@@ -1531,8 +1539,9 @@ as a live decision.
   `"ally"` and nothing else, so **`"target": "self"` is silently unmapped and falls through to
   `Target.ENEMY`** — a boss authored that way wards a hero. **Every self-cast in the game is
   tagged `"ally"`**: the Bog Troll's Regenerate, the Ritual Chanter's Cleansing Rite, the Grave
-  Totem's Dark Vigil, and the Hollow Crown's Regalia. **The unit a support cast lands on is chosen
-  in `_enemy_support_action`, not in the data** — re-point a cast there, never in the JSON.
+  Totem's Dark Vigil, the Hollow Crown's Regalia, and the warband's Malice spends — Rally, Entrench and Raise.
+  **The unit a support cast lands on is chosen in `_enemy_support_action`, and a spend's in `_warband_spend`, which
+  `_declare_intent` asks (JL §1) — not in the data** — re-point a cast there, never in the JSON.
 - **A PAYLOAD SHARED BY TWO ABILITIES MUST LOG `ab.display_name`, NEVER A LITERAL NAME.** The
   `enemy_shield` branch printed the string "Shielding", which was harmless while one ability used
   it and became a lie the moment a second did — the Hollow Crown announced its Regalia as the

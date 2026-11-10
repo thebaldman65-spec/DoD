@@ -1997,11 +1997,11 @@ the drive keeps the fast frames.
   battery.
 
 
-**THE READERS ARE THE FLOOR AND THE RECON IS THE VARIABLE PART (JF §6, the designer's).** JE's 87-minute recon found two reds; its fresh reader found two unmet orders and eleven false claims in the batch's own report, and three of its readers cost about 1.3 million tokens between them. **The blocks' reader, the close-read, a reader on the new text before any pre-run, a positional reader and a fresh reader on the assembled report are not optional and not negotiable against time. If something must be dropped for time it is a recon, by the rule below, and never a reader.**
+**THE READERS ARE THE FLOOR AND THE RECON IS THE VARIABLE PART (JF §6, the designer's).** JE's 87-minute recon found two reds; its fresh reader found two unmet orders and eleven false claims in the batch's own report, and three of its readers cost about 1.3 million tokens between them. **~~The blocks' reader, the close-read, a reader on the new text before any pre-run, a positional reader and a fresh reader on the assembled report are not optional and not negotiable against time.~~** *Struck at JT §1 for every lane but A: each lane runs the readers its floor names (A BATCH RUNS THE FLOOR OF ITS LANE, below), and in Lane A all five stand and are not negotiable against time.* **If something must be dropped for time it is a recon, by the rule below, and never a reader.**
 
-**A RECON IS OWED WHEN THE GAME's CODE OR DATA MOVES. A GATE's, AN INSTRUMENT's OR THE RUNNER's OWN CHANGE IS COVERED BY THE PRE-RUN THAT RUNS IT, PLUS THE STANDALONE `check_de` AND THE ACCEPTANCE (JF §6, the designer's, extended to instruments and the runner at JG §0.4; it replaces JE §7's wording, which said *code and gates* where JE did this).** *The test, the batch's reading at JF, confirmed at JG §0.4, the designer's: a diff of `scripts/` and `data/` against the recon's tree or HEAD; a comment moves no die, and a code line owes the recon.* **The acceptance reads the whole either way.**
+**A RECON IS OWED WHEN THE GAME's CODE OR DATA MOVES. A GATE's, AN INSTRUMENT's OR THE RUNNER's OWN CHANGE IS COVERED BY THE PRE-RUN THAT RUNS IT, PLUS THE STANDALONE `check_de` AND THE ACCEPTANCE (JF §6, the designer's, extended to instruments and the runner at JG §0.4; it replaces JE §7's wording, which said *code and gates* where JE did this).** *(Lane A's since JT §1; a Lane C batch that moves a gate or the runner replays the readers of what it moved and runs `check_de` standalone over their logs.)* *The test, the batch's reading at JF, confirmed at JG §0.4, the designer's: a diff of `scripts/` and `data/` against the recon's tree or HEAD; a comment moves no die, and a code line owes the recon.* **The acceptance reads the whole either way** *(in Lane A; Lanes B and C run none since JT §1, and JT's ruling 4 asks whether Lane A keeps it)*.
 
-**THE POSITIONAL RE-RUN RE-DERIVES ALL 489 READS EVERY BATCH, THE MECHANICAL PASSES DOING WHAT THEY CAN (JF §6, the designer's; JE §7's cut is withdrawn).** The honest skip was 26 of 489, and the selecting tool's parse, wrong since IX at the latest, had hidden 65 of JE's 91 skips, 24 of them over files JE edited: a cut worth five per cent is not worth a derivation that was wrong that long. **A haystack the census writes as a population — *every check_ .gd*, *six scripts*, a runtime log — goes to a reader**: it names no file, so no diff can clear it.
+**THE POSITIONAL RE-RUN RE-DERIVES ALL 489 READS EVERY BATCH, THE MECHANICAL PASSES DOING WHAT THEY CAN (JF §6, the designer's; JE §7's cut is withdrawn).** *(Every Lane A batch since JT §1: Lanes B and C run no positional reads.)* The honest skip was 26 of 489, and the selecting tool's parse, wrong since IX at the latest, had hidden 65 of JE's 91 skips, 24 of them over files JE edited: a cut worth five per cent is not worth a derivation that was wrong that long. **A haystack the census writes as a population — *every check_ .gd*, *six scripts*, a runtime log — goes to a reader**: it names no file, so no diff can clear it.
 
 **A TOOL THAT CLEARS A READ HAS A CONTROL OF ITS OWN (JF §6, the designer's order; the sentence is the batch's).** The positional pass *pos_seq.py* cleared reads at two batches with none. Its control's first run found a move it read as unmoved, a needle on another line of one hunk, and a limit it could not see, a fixed-width read pushed by lines that hold no needle. The first is repaired and the second narrowed to what the census's prose names (`docs/reports/JF-posseq.tsv`, the tool as JE left it beside the tool as it stands).
 
@@ -2183,7 +2183,8 @@ a detail to note — it is the ruling being wrong.
   liveness arm** that reds the day the field gets a writer (`check_is` §3b holds the Cryomancer's upkeep so).
 
 ## STANDING RULE — A BRIEF STATES WHAT A BATCH INTENDS TO TOUCH, NEVER WHAT IT DOES NOT (Batch IE §0.6, ruled by the designer)
-> **A brief states what a batch intends to touch, never what it does not.** The blast radius is the batch's to establish
+> **A brief states what a batch intends to touch, never what it does not.** *(JT §1: a decision record's scope section is not what
+> this rule forbids — `docs/ways-of-working.md`'s record section says why.)* The blast radius is the batch's to establish
 > and the recon's shape follows from it — **so a brief that wants one recon says *confirm nothing reaches the damage path,
 > then take one recon*, and a batch that finds otherwise takes two and says so.**
 
@@ -2390,7 +2391,8 @@ NOT a wrapping problem.
   Shatter's and Winter's Toll's floor of 1 a defect; nothing writes the route today, so it is armed, not repaired, and
   `check_is` §3b reds when a writer appears.
 - **A LATENT SHAPE A BATCH FINDS AND DOES NOT REPAIR IS OFFERED THIS FIRST.** Where its writers can be derived, the gate is
-  written in the batch that finds it; a FOUND AT line is for the shape whose writers cannot be.
+  written in the batch that finds it; a FOUND AT line is for the shape whose writers cannot be. *(In Lane A since JT §1: a Lane B or
+  C floor builds no gate, so such a batch records the shape in FOUND AT, names the lane that owes it, and says so in its closing block.)*
 
 ## STANDING RULE — WHEN A RULE AND ITS OWN GATE CONTRADICT, THE CODE DECIDES (Batch IV §0.4, ruled by the designer)
 > **A RULE AND ITS OWN GATE ARE TWO DESCRIPTIONS OF ONE BEHAVIOUR. WHEN THEY DISAGREE, THE BEHAVIOUR IS THE ARBITER, AND
@@ -2409,7 +2411,7 @@ NOT a wrapping problem.
 
 ## STANDING RULE — A BATCH READS `docs/state.md` AGAINST ITS FINISHED WORK: THE CLOSE-READ (Batch IV §0.1, the designer's)
 > **A BATCH's WORK CHANGES WHAT THE FILE SAYS IS TRUE. READING THE FILE AGAINST THE FINISHED WORK IS HOW THE BATCH FINDS OUT.**
-> At its close a batch reads every block of `docs/state.md` it did not open — whole, by a reader outside the working
+> At its close a batch reads every block of `docs/state.md` it did not open *(a Lane A or C batch since JT §1; Lane B takes no close-read)* — whole, by a reader outside the working
 > read — and records each that bore on the work with what it found there and whether a trigger would have routed it
 > (ROUTED, or NOT ROUTED with the row repaired in the batch). Its output is the routing record's third list.
 
@@ -2421,3 +2423,53 @@ NOT a wrapping problem.
   the two references by the names a diff touches; this one reads the state file block by block. Each finds what the
   other cannot.
 - **WHAT IT COSTS**: a reader, not a batch — IU's read the 85 blocks it had not opened, 152,392 B (its report, §8).
+
+## STANDING RULE — A BATCH RUNS THE FLOOR OF ITS LANE (Batch JT §1, the designer's)
+> **A batch runs its lane's floor.** The lanes — what work each covers, that the decision record declares one, and that the
+> report says which ran — are `docs/ways-of-working.md`'s; what each lane verifies is here, because a floor is how a batch
+> verifies itself.
+
+- **LANE A, STRUCTURAL — THE WHOLE FLOOR.** The push check; the routing of record before any edit; the blocks' reader before
+  the first edit reaches a lane; the premises at source; the literal sweep; the documents replayed from HEAD behind a hash
+  guard; the new text's reader and the close-read; a recon; the pre-run; a new gate; all the positional reads; the controls;
+  the fresh reader on the assembled report; the acceptance; the landing; the two ceiling readings.
+- **LANE B, CONTENT — IT PARSES, IT RUNS, THE EXISTING GATES PASS, THE COUNT, THE PUSH CHECK, THE LANDING, THE TWO CEILING
+  READINGS.** No routing of record, no blocks' reader, no close-read and no new gate — **unless the content makes a document
+  false, and then that document is named and mended, and the batch says so.**
+  · **WHY THAT IS ENOUGH: IT IS THE PAYOFF FOR A DELIBERATE DECISION.** The rules that govern content derive their populations
+    off the data rather than listing them — JI's 1.4× line, JO's Break price, JK's spend coverage, JO's *no status on a move
+    that deals nothing*, JQ's `HEX_IDS` — so a kind whose second move falls under the line reds a gate with no new check
+    written. That is how JS added seven kinds and had every one priced, banded and coverage-checked without a figure invented.
+- **LANE C, RECORD — THE DOCUMENTARY HALF ONLY.** The push check; the routing of record; the close-read; the documents replayed
+  from HEAD; the new text's reader; the two ceiling readings; the landing. **No recon, no new game gate and no count: no line
+  a fight runs through moves, and the batch says so plainly.**
+- **WHERE THE WORK MOVES WHAT ITS LANE DOES NOT COVER, THE WORK DECIDES** *(JT's reading, not the designer's words)*: a Lane C
+  batch whose work moves a line a fight runs through takes the floor that line owes — JT's own brief ordered the recon on that
+  condition — and the report names the lane it actually ran. A document a Lane B batch's content makes false is mended inside
+  Lane B, as above.
+- **IN EVERY LANE THE RECORD's QUOTES AND THE PLAN's PREMISES ARE CHECKED AT SOURCE BEFORE AN EDIT** *(JT's reading)*:
+  `CLAUDE.md`'s *VERIFY THE BRIEF AGAINST THE REPO* binds the record as it bound a brief; only Lane A's floor keeps them as a
+  table. **And in every lane *it parses* is read off stderr** (the parse floor, above), never off a tally or an exit code.
+
+## STANDING RULE — A CHECK THAT HAS PASSED EVERY BATCH FOR TEN BATCHES IS A CANDIDATE FOR RETIREMENT, AND EVERY REPORT NAMES ITS CANDIDATES (Batch JT §1, the designer's)
+> **Every check in this tree was earned by a real defect, which is why the floor became the dominant cost of making
+> anything. A check that has passed every batch for ten batches is a candidate for retirement, and every report names its
+> candidates.**
+
+- **A CHECK HERE IS A STEP OF THE FLOOR, NOT A GATE's ARM** *(JT's reading, not the designer's words)*: the steps each lane
+  runs, as JT §2's audit read them. An arm that passes every battery is a gate working, and an arm that cannot fail is the
+  vacuous-arm rules' (*GATES THAT PASS WITHOUT ASKING THEIR QUESTION*, above), not this one's.
+- **NAMING IS NOT RETIRING.** Each candidate goes to the report's NEEDS A RULING with its figures — the batches it ran in, the
+  times it discriminated and what it caught — and a recommendation, and the designer rules. **A floor with no way to shrink
+  only grows**, and a check that has not discriminated in ten batches is either load-bearing in a way nobody has stated or it
+  is ritual: the report is where the difference becomes visible.
+- **A CANDIDATE's RULING IS HELD, NEVER TAKEN ON THE RECOMMENDATION** *(JT's reading)*: `CLAUDE.md`'s *DO NOT ASK* takes a
+  recommendation so nothing waits, but a check stays in its floor until the designer retires it, so the floor never shrinks by default.
+- **A GUARD THAT PREVENTS IS NAMED APART, NEVER A CANDIDATE ON ITS SILENCE** *(JT's brief §2 asked it of the audit; keeping
+  it standing is JT's reading)*. A step whose work is to stop a defect being made — a hash guard that refuses to land over a
+  moved file, a push check before a batch builds on its tree, an alarm read before a ceiling is crossed — leaves nothing in a
+  report when it works. It is listed with what it prevents.
+- **A CATCH IS COUNTED ONLY WHERE THE REPORT SAYS WHAT CAUGHT IT** *(JT's addition, not the designer's words)*. A finding
+  reported with no element named cannot feed this rule, so a report names the step of the floor that found each finding.
+  JT §2's audit over JI–JS is the first count (`docs/reports/JT-floor.tsv`) and says which catches the reports left
+  unattributable.

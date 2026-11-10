@@ -1,0 +1,904 @@
+batch	element	type	unique	severity	catch	where
+JI	premises	premise	UNCLEAR	—	brief credits the 2,217-fight zero-cooldown census to JD/JC; it is JA's (559 plus 1,658 fights, JA-shares.tsv)	§0 THE BRIEF's PREMISES, VERIFIED row 2
+JI	premises	premise	N	—	start_cooldown and tick_cooldowns called hero-side; both are every unit's and already tick on the enemy's own turn, so no tick site needed	§0 THE BRIEF's PREMISES, VERIFIED row 3; §5 VERIFICATION THE BLOCKS' READER
+JI	premises	premise	N	—	brief named two pickers (live _enemy_turn, sim bot); there is one, and its selection never asked the cooldown	§0 THE BRIEF's PREMISES, VERIFIED row 4; §5 VERIFICATION THE BLOCKS' READER
+JI	premises	premise	UNCLEAR	—	brief expected fifteen to twenty cooling moves; priced as written eleven of fifty, the line moved 1.5 to 1.4	§0 THE BRIEF's PREMISES, VERIFIED row 5; §1
+JI	premises	premise	UNCLEAR	—	premise 2 vacuous: every one of the 21 kinds opens with a free damaging basic, so no kit clears the line	§0 THE BRIEF's PREMISES, VERIFIED row 6
+JI	premises	premise	N	—	HZ put no chips on the enemy plate; its chips and strip are the heroes' and the crest's	§0 THE BRIEF's PREMISES, VERIFIED row 7; §5 VERIFICATION THE BLOCKS' READER
+JI	premises	premise	UNCLEAR	—	Encumbered 'bound the party alone since built' is true in effect only; its branch always walked every unit	§0 THE BRIEF's PREMISES, VERIFIED row 9
+JI	premises	premise	UNCLEAR	—	ruling accepting the four one-sided cards credited to JE; it is JB §0.1's, the designer's	§0 THE BRIEF's PREMISES, VERIFIED row 10
+JI	premises	premise	N	—	state.md holds no list of one-sided cards to lose a row; the list is check_jb's arm derived from JA-shares.tsv	§0 THE BRIEF's PREMISES, VERIFIED row 12; §5 VERIFICATION THE BLOCKS' READER
+JI	premises	premise	UNCLEAR	—	§3's reference four at Warden: the reference party is defined at Wanderer and completes about 5 of 60 at Warden	§0 THE BRIEF's PREMISES, VERIFIED row 14
+JI	premises	premise	UNCLEAR	—	brief says eight strays in KNOWN_STRAYS; it holds ten	§0 THE BRIEF's PREMISES, VERIFIED row 15
+JI	premises	premise	UNCLEAR	—	brief cites JH's projected room but states no expected writing; JI stated its own (+12 KiB net) and wrote 13.60	§0 THE BRIEF's PREMISES, VERIFIED row 18
+JI	blocks_reader	premise	N	—	one picker, not two, and its selection did not ask the cooldown (same as §0 row 4)	§5 VERIFICATION THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED row 4
+JI	blocks_reader	premise	N	—	the tick was already the enemy's own turn on all three loop paths (same as §0 row 3)	§5 VERIFICATION THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED row 3
+JI	blocks_reader	premise	N	—	HZ put no display chip on the enemy plate (same as §0 row 7)	§5 VERIFICATION THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED row 7
+JI	blocks_reader	premise	N	—	the census list is check_jb's arm, not a list in state.md (same as §0 row 12)	§5 VERIFICATION THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED row 12
+JI	blocks_reader	stale-claim	Y	—	combat-rules.md intent block promised the selection lifted out byte-for-byte; a cooldown filter breaks it, so the rule was amended beside IN §3	§0 THE BRIEF's PREMISES, VERIFIED row 20; §5 VERIFICATION THE BLOCKS' READER
+JI	blocks_reader	defect	Y	—	a declared support cast failing re-validation falls back to the basic keeping its ally target; reachable at HEAD via Heads Down; left	§0 THE BRIEF's PREMISES, VERIFIED row 21; FOUND AT JI AND NOT FIXED
+JI	blocks_reader	defect	Y	—	check_jh §3d and check_jg §3c pin the WHERE block's batch text; a rewrite dropping PROJECTED FOR or Communion's card reds them	§0 THE BRIEF's PREMISES, VERIFIED row 22; FOUND AT JI AND NOT FIXED
+JI	close_read	false-sentence	N	MEDIUM	coverage sentence said it covered every pre-JI sim figure but wrote only the grades in (both outside readers)	§5 VERIFICATION THE CLOSE-READ; JI-routing FOUND AT THE CLOSE; §2
+JI	close_read	defect	Y	—	routing miss: THE TALENT LAYER block, routable by trigger 'basic attack' held verbatim in S1, was not opened	JI-routing FOUND AT THE CLOSE
+JI	close_read	false-sentence	Y	—	'a basic never takes one' named none of the code's three basic-attack definitions; now names _cheapest_attack's	§5 VERIFICATION THE CLOSE-READ; JI-routing FOUND AT THE CLOSE
+JI	close_read	stale-claim	Y	—	Encumbered's three readings not marked where ruling 5 said, and a third reading never named	§5 VERIFICATION THE CLOSE-READ; JI-routing FOUND AT THE CLOSE
+JI	close_read	false-sentence	Y	—	projected room's arithmetic left out the archive's 0.50 KiB; 'their bars' had no referent	§5 VERIFICATION THE CLOSE-READ; JI-routing FOUND AT THE CLOSE
+JI	close_read	false-sentence	Y	—	instruments line left out baselines.json and the pin manifest	§5 VERIFICATION THE CLOSE-READ; JI-routing FOUND AT THE CLOSE
+JI	close_read	false-sentence	Y	—	axes sentence's conclusion fought its own new parenthesis	§5 VERIFICATION THE CLOSE-READ; JI-routing FOUND AT THE CLOSE
+JI	close_read	false-sentence	Y	—	JI's CLAUDE.md text in the wrong (present) tense	§5 VERIFICATION THE CLOSE-READ; JI-routing FOUND AT THE CLOSE
+JI	close_read	false-sentence	Y	—	Orc Chief misnamed in the changelog	§5 VERIFICATION THE CLOSE-READ; JI-routing FOUND AT THE CLOSE
+JI	close_read	false-sentence	Y	—	changelog overpromised the fifth batch's re-read	§5 VERIFICATION THE CLOSE-READ; JI-routing FOUND AT THE CLOSE
+JI	close_read	false-sentence	Y	—	two wording slips in JI's text (not named)	§5 VERIFICATION THE CLOSE-READ; JI-routing FOUND AT THE CLOSE
+JI	close_read	stale-claim	Y	—	population row 'the sim's recorded figures' short six member blocks holding unmarked pre-JI sim figures (JE, JB, JC, IZ, HP, THREE SPINES) and JI's record	§5 VERIFICATION THE CLOSE-READ; JI-routing FOUND AT THE CLOSE
+JI	close_read	stale-claim	Y	—	two battle.gd comments (Heads Down, Long Silence) and combat-rules.md's state-sensitive bullet still called the selection untouched	§5 VERIFICATION THE CLOSE-READ; JI-routing FOUND AT THE CLOSE
+JI	close_read	stale-claim	Y	—	master.html §4.8 never said a cooling move is passed over	§5 VERIFICATION THE CLOSE-READ; JI-routing FOUND AT THE CLOSE
+JI	new_text_reader	false-sentence	N	MEDIUM	coverage sentence covered only the grades, not every pre-JI figure (with the close-read)	§5 VERIFICATION THE NEW TEXT's READER; §2
+JI	new_text_reader	defect	Y	—	check_ji held the selection only at ticks it chose; callers' ticks unheld, so a declaration default moved to two passed every arm	§5 VERIFICATION THE NEW TEXT's READER; THE CONTROLS (C04b, C04c, C04d)
+JI	new_text_reader	defect	Y	—	check_ji §1b arm driving the heroes' ticks could not fail; removed	§5 VERIFICATION THE NEW TEXT's READER; THE CONTROLS (how C03 is held)
+JI	new_text_reader	false-sentence	Y	—	§3 mechanism wrong: the picker chose big moves at its own rate; effect small because two-thirds of moves come from kinds owning none	§5 VERIFICATION THE NEW TEXT's READER; §3
+JI	new_text_reader	defect	Y	—	price counted every Poison tick; Poison skips the turn it lands, so multiples moved (Long Dark 3.55 to 3.31, Bellow 1.32 to 1.37)	§5 VERIFICATION THE NEW TEXT's READER; §1; THE CONTROLS (C05b)
+JI	fresh_reader	false-sentence	Y	HIGH	recon 1 prediction 5 graded with a false reason (fight gates field raiders and archers); eight targets field an owner and hand-set state	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; RECON 1's predictions
+JI	fresh_reader	false-sentence	Y	HIGH	THE ORDER cited a time for apply_rules.py that no file shows (rewrites reset birth times)	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; THE ORDER
+JI	fresh_reader	defect	Y	MEDIUM	state's record of the eleven stated each cooldown with nothing holding it, so R01's meaning unmet; check_ji §1f and R01c added	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; THE CONTROLS
+JI	fresh_reader	stale-claim	Y	MEDIUM	check_ji's header still described the arm the new text's reader had removed	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JI	fresh_reader	false-sentence	Y	MEDIUM	WHERE block's 'before the work' should read 'before the drive'	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JI	fresh_reader	false-sentence	Y	MEDIUM	routing record called the pre-run 'recon 2'	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JI	fresh_reader	false-sentence	Y	—	report said the Lunge fell most; Dark Vigil did, of the large counts	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §3
+JI	fresh_reader	false-sentence	Y	—	Roots of Wrath's 90 to 57 mis-scoped; it counts every fight	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §2
+JI	fresh_reader	false-sentence	Y	—	comments still calling the selection untouched miscounted; they were two	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JI	fresh_reader	false-sentence	Y	—	standing positional MISSES miscounted; they are thirteen	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JI	fresh_reader	false-sentence	Y	—	each ruling's reversal did not name the gate arms and texts it moves	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; NEEDS A RULING
+JI	fresh_reader	false-sentence	Y	—	summary's lost turn unspecified; it is the stunned or frozen one	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JI	fresh_reader	false-sentence	Y	—	§0 departure tally wrong	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JI	fresh_reader	false-sentence	Y	—	stamp window tightened by JI unstated (10 characters short of its </b>, 19 at JH)	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; A POSITIONAL RE-RUN
+JI	fresh_reader	false-sentence	Y	—	Rage bar refill omitted blows taken	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JI	fresh_reader	false-sentence	Y	—	The Long Dark's absence at Warden unstated (the drive met ten of the eleven)	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §3
+JI	fresh_reader	defect	Y	—	earlier pre-run's literal sweep finished four minutes after that pre-run's launch, out of IE §0.5's order	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; THE ORDER
+JI	fresh_reader	false-sentence	Y	—	positional delta did not name which tree each pass read	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; A POSITIONAL RE-RUN
+JI	positional	defect	N	—	check_is §5 400-byte index row: grades' (438 B), census's (433 B) and FOUND AT JI's (424 B) rows ran long; recon 1 also redded	§5 VERIFICATION A POSITIONAL RE-RUN: ALL 489; RECON 1; JI-routing THE INDEX's UPKEEP
+JI	positional	expected	Y	—	check_hu §4a tag census 190 to 191 (cooldown=CD); check_ed §2 pins 2,299 to 2,303, none missing	§5 VERIFICATION A POSITIONAL RE-RUN: ALL 489
+JI	positional	expected	Y	—	master stamp windows now end 10 characters short of </b> (19 at JH): JI's subtitle shorter	§5 VERIFICATION A POSITIONAL RE-RUN: ALL 489
+JI	litsweep	defect	Y	—	gained literal 'binds both sides' in JI's CLAUDE.md Encumbered sentence would red check_jb §1 (JB ruling); reworded before recon 1	§5 VERIFICATION THE LITERAL SWEEP
+JI	litsweep	expected	Y	—	3 LOST literals, each an edit's own removal (JH's WHERE line, a runtime note, the census sentence check_ji requires gone)	§5 VERIFICATION THE LITERAL SWEEP
+JI	control_subject	defect	Y	—	C04 reddened must-hold §1d: check_ji §1d's FAIL text said only 'left with no move', not what the arm asserts; reworded	§5 VERIFICATION THE CONTROLS
+JI	recon	defect	N	—	check_is §5 red on index rows over 400 B, already repaired (positional reader B found it first)	§5 VERIFICATION RECON 1
+JI	recon	expected	Y	—	check_iu §8 x2: routing's close owed on that tree, as predicted	§5 VERIFICATION RECON 1
+JI	prerun	defect	Y	—	check_iu §8 red (14 misses carry no ROUTED/NOT ROUTED): close-read's draft of routing's third list used sub-bullets; reshaped	§5 VERIFICATION THE PRE-RUN OF RECORD; JI-routing
+JI	landing	expected	Y	—	test_batch_an 6,021 to 6,022 (map drifter, in band); check_jc 166 to 167 codes with the report in	§5 VERIFICATION THE REPORT's LANDING
+JI	ceilings	defect	Y	—	state.md closes 9.77 KiB under 380; at JG's rate JJ would close 4.49 KiB past: under one batch of room (drove JJ §1)	§5 VERIFICATION TWO READINGS, BOTH FILES; five findings
+JI	other	defect	Y	—	THE ORDER (file times): edit scripts drafted alongside the premise table, so premises-before-edit held for the repository, not scripts' first drafts	§5 VERIFICATION THE ORDER, AS THE FOLDER SHOWS IT
+JI	unattributed	stale-claim	UNCLEAR	—	CD chip is a twentieth display chip, outside IE's census of nineteen and check_ig's list; left	FOUND AT JI AND NOT FIXED
+JJ	premises	premise	UNCLEAR	—	'cut in five of the last eight': all eight archived something; the 7.8 KB line was drawn after the fact	§0 THE BRIEF's PREMISES, VERIFIED row 5
+JJ	premises	premise	N	—	'the routing reads less than half the file': true of JI (45.7%), false of JJ (53.8%)	§0 THE BRIEF's PREMISES, VERIFIED row 6; §6 VERIFICATION THE BLOCKS' READER; FOUND AT JJ AND NOT FIXED
+JJ	premises	premise	UNCLEAR	—	1,241 damage over 35 turns a fight holds only at Wanderer on a no-cooldown warband; Warden drive gave 282.5	§0 THE BRIEF's PREMISES, VERIFIED row 10; §2
+JJ	premises	premise	N	—	'four to six enemies a fight': warband loses 3.70 bodies a fight, so the kill term is about 92	§0 THE BRIEF's PREMISES, VERIFIED row 11; §6 VERIFICATION THE BLOCKS' READER
+JJ	premises	premise	N	—	premise 1 false: a fight in flight does not survive a quit; it restarts at full strength (GH), so the pool restarts empty	§0 THE BRIEF's PREMISES, VERIFIED row 12; §6 VERIFICATION THE BLOCKS' READER
+JJ	premises	premise	N	—	damage door dropped the blow's own figure, and 'overkill' is the Berserker's field; past_last added	§0 THE BRIEF's PREMISES, VERIFIED row 13; §6 VERIFICATION THE BLOCKS' READER
+JJ	premises	premise	UNCLEAR	—	no warband-level bar existed anywhere on screen; a new strip placed above the stack	§0 THE BRIEF's PREMISES, VERIFIED row 15; §2
+JJ	premises	premise	N	—	brief's heal table (31.9, 30.6, 75.0, 25.5, 31.9) is JI's reference-body prices; data carries shares of the body healed	§0 THE BRIEF's PREMISES, VERIFIED row 17; §3
+JJ	premises	premise	UNCLEAR	—	'bounded by JI's cooldown': two of five heals carry none (Shaman's Healing Wave, Wild Growth)	§0 THE BRIEF's PREMISES, VERIFIED row 20
+JJ	premises	premise	UNCLEAR	—	count 'on the strip JI's CD chip rides': CD is an enemy-plate display chip; count went to the crest strip	§0 THE BRIEF's PREMISES, VERIFIED row 24; ruling 5
+JJ	premises	premise	N	—	'twelve kinds whose second move is weaker': nine, two unpriced, and the Behemoth, now cooling by hand	§0 THE BRIEF's PREMISES, VERIFIED row 27b; §6 VERIFICATION THE NEW TEXT's READER
+JJ	premises	premise	Y	—	brief's C01 to C13, H01, H02, R01: twenty-two controls built (C02, C10 split; C04b to C04d, C08b added)	§0 THE BRIEF's PREMISES, VERIFIED row 29
+JJ	blocks_reader	premise	N	—	a quit fight restarts its warband, so the pool restarts with it (same as §0 row 12)	§6 VERIFICATION THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED row 12
+JJ	blocks_reader	premise	N	—	the door dropped the blow's own figure; overkill is the Berserker's field (same as §0 row 13)	§6 VERIFICATION THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED row 13
+JJ	blocks_reader	premise	N	—	warband loses 3.70 bodies a fight (same as §0 row 11)	§6 VERIFICATION THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED row 11
+JJ	blocks_reader	premise	N	—	routing read 53.8% of the file at JJ (same as §0 row 6)	§6 VERIFICATION THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED row 6; FOUND AT JJ AND NOT FIXED
+JJ	blocks_reader	premise	N	—	recomputed the brief's heal prices on the median 127.5 body: JI's reference-body figures (same as §0 row 17)	§3; §0 THE BRIEF's PREMISES, VERIFIED row 17
+JJ	blocks_reader	stale-claim	Y	—	intent block (BL §1) promises the selection's policy does not move; the spend policy moves it; block amended beside the promise	§0 THE BRIEF's PREMISES, VERIFIED row 30; §6 VERIFICATION THE BLOCKS' READER
+JJ	blocks_reader	defect	Y	—	two healers on one pool would reach JI's support fallback (ally target) at re-validation; answered by the reserve (ruling 2)	§0 THE BRIEF's PREMISES, VERIFIED row 31; §6 VERIFICATION THE BLOCKS' READER
+JJ	blocks_reader	defect	Y	—	check_ji §1c reds on an empty pool, §4's digest on any data key; check_jh §3d and check_jg §3c pin the WHERE block	§0 THE BRIEF's PREMISES, VERIFIED row 32; §6 VERIFICATION THE BLOCKS' READER
+JJ	blocks_reader	premise	Y	—	psychotic support asks _enemy_ready naming no body: asks the cooldown alone; its heal lands on heroes and pays nothing	§0 THE BRIEF's PREMISES, VERIFIED row 34; §6 VERIFICATION THE BLOCKS' READER
+JJ	blocks_reader	stale-claim	Y	—	warband healed 18.5 a fight at Warden on JI's tree where the share census reads 31.6 at Wanderer; census left JA's	FOUND AT JJ AND NOT FIXED
+JJ	close_read	defect	Y	MEDIUM	not routed (FOUND AT II): damage the frame credits to nobody (Bomb, sourceless Burn) fills no Malice but its kill; now said in four places	§6 VERIFICATION THE CLOSE-READ; JJ-routing FOUND AT THE CLOSE; FOUND AT JJ
+JJ	close_read	false-sentence	Y	—	not routed (THE SEVENTH FAMILY): three warband heals' descriptions name no Malice; Healing Wave's gained a clause	JJ-routing FOUND AT THE CLOSE; FOUND AT JJ AND NOT FIXED
+JJ	close_read	defect	Y	HIGH	project.godot carries the lane's name in the tree, so the landing's copy list leaves it out (it always has)	§6 VERIFICATION THE CLOSE-READ; THE LANDING
+JJ	close_read	false-sentence	Y	MEDIUM	ceiling's reason said the routing bounds 'the' read; it bounds the working read	§6 VERIFICATION THE CLOSE-READ; §1
+JJ	close_read	stale-claim	Y	MEDIUM	CLAUDE.md's 'the room runs out where HX began' false at 440; kept as HY's record with a note	§6 VERIFICATION THE CLOSE-READ; §1
+JJ	close_read	false-sentence	Y	MEDIUM	'until JI gave twelve' misstated (no detail given)	§6 VERIFICATION THE CLOSE-READ
+JJ	close_read	stale-claim	UNCLEAR	MEDIUM	intent block's 'policy untouched' still stood after the spend policy moved it (overlaps blocks' reader §0 row 30)	§6 VERIFICATION THE CLOSE-READ
+JJ	close_read	false-sentence	Y	MEDIUM	'one of them falls' reads as a hero, not a warband body	§6 VERIFICATION THE CLOSE-READ
+JJ	close_read	stale-claim	Y	MEDIUM	FOUND AT JI's WHERE-block pin item only half repaired	§6 VERIFICATION THE CLOSE-READ
+JJ	close_read	defect	N	MEDIUM	check_jh §3d's regex satisfied by the checking line itself (with the new text's reader)	§6 VERIFICATION THE CLOSE-READ; §6 VERIFICATION THE NEW TEXT's READER
+JJ	close_read	defect	Y	MEDIUM	THE WARBAND's COOLDOWNS index row lost its triggers	§6 VERIFICATION THE CLOSE-READ
+JJ	close_read	false-sentence	N	MEDIUM	master document silent on Communion's count; second half (§10 strip and count) taken only after the fresh reader	§6 VERIFICATION THE CLOSE-READ; §6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JJ	close_read	false-sentence	Y	LOW	'Dark Vigil's two' (no detail given)	§6 VERIFICATION THE CLOSE-READ
+JJ	close_read	false-sentence	Y	LOW	master table's 'paid in Malice' (no detail given)	§6 VERIFICATION THE CLOSE-READ
+JJ	close_read	stale-claim	Y	LOW	share census's 'eleven' cooling moves (now twelve)	§6 VERIFICATION THE CLOSE-READ; JJ-routing NEEDED
+JJ	close_read	false-sentence	Y	LOW	the record's head (no detail given)	§6 VERIFICATION THE CLOSE-READ
+JJ	close_read	false-sentence	Y	LOW	JI's paired footnote (no detail given)	§6 VERIFICATION THE CLOSE-READ
+JJ	close_read	false-sentence	Y	LOW	'a third' that is 43%	§6 VERIFICATION THE CLOSE-READ
+JJ	close_read	false-sentence	Y	LOW	companion's own tick, credited by name, fills nothing; unstated	§6 VERIFICATION THE CLOSE-READ; ruling 6
+JJ	close_read	false-sentence	Y	LOW	the eleven moves' 'two-thirds' (no detail given)	§6 VERIFICATION THE CLOSE-READ
+JJ	close_read	false-sentence	Y	LOW	jj_timing.py's home outside the repository unstated	§6 VERIFICATION THE CLOSE-READ; FOUND AT JJ AND NOT FIXED
+JJ	close_read	stale-claim	Y	LOW	check_ih's list in CLAUDE.md (no detail given)	§6 VERIFICATION THE CLOSE-READ
+JJ	close_read	stale-claim	Y	LOW	the index's ceiling sentence (no detail given)	§6 VERIFICATION THE CLOSE-READ
+JJ	close_read	defect	Y	LOW	Communion's count lagged a fall by a turn; chips now redraw at every fall and rise, and check_jj §5 stopped redrawing by hand	§6 VERIFICATION THE CLOSE-READ; §5
+JJ	close_read	false-sentence	Y	LOW	no Malice keyword: master now carries one; in-game glossary entry left	§6 VERIFICATION THE CLOSE-READ; FOUND AT JJ AND NOT FIXED
+JJ	close_read	stale-claim	Y	—	#14, not taken: JJ's RULINGS OWED 3 cited in combat-rules.md dangles once JK answers it (left to JK)	§6 VERIFICATION THE CLOSE-READ
+JJ	new_text_reader	defect	Y	—	Blight the Well's damage shrank with the warband's pool (a hero card's payout moving); asked whole again, check_jj §3 drives it	§6 VERIFICATION THE NEW TEXT's READER; §3; THE CONTROLS (C04c)
+JJ	new_text_reader	defect	N	—	check_jh §3d's regex satisfied by its own checking line (with the close-read)	§6 VERIFICATION THE NEW TEXT's READER; §6 VERIFICATION THE CLOSE-READ
+JJ	new_text_reader	defect	Y	—	check_jj arm weaker than its message: a short pool's heal now must restore exactly what the pool held	§6 VERIFICATION THE NEW TEXT's READER
+JJ	new_text_reader	defect	Y	—	check_jj named the pool's askers loosely; now by function	§6 VERIFICATION THE NEW TEXT's READER
+JJ	new_text_reader	defect	Y	—	policy arm's 'held back' half cannot tell HEAD's Dark Vigil from JJ's; left	§6 VERIFICATION THE NEW TEXT's READER; FOUND AT JJ AND NOT FIXED
+JJ	new_text_reader	false-sentence	Y	—	'shorter' fights is a tie; verdict reworded to 'harder and no longer' (later re-corrected by the fresh reader)	§6 VERIFICATION THE NEW TEXT's READER
+JJ	new_text_reader	false-sentence	Y	—	'empty' pool never measured; reworded 'too low to pay a heal' early, the first fights the evidence	§6 VERIFICATION THE NEW TEXT's READER; §4
+JJ	new_text_reader	false-sentence	Y	—	cap figures should lead with the fights a healer stood in (16.0% of turns, 79.6% of ends)	§6 VERIFICATION THE NEW TEXT's READER; §4
+JJ	new_text_reader	false-sentence	Y	—	pool figure 'taken' undefined	§6 VERIFICATION THE NEW TEXT's READER
+JJ	new_text_reader	false-sentence	Y	—	two timing rows used different cuts; now one (5.3% to 1.5%, 17.4% to 18.2%)	§6 VERIFICATION THE NEW TEXT's READER; §4
+JJ	new_text_reader	false-sentence	Y	—	health healed reported unpaired; now paired, -5.03 ± 1.94	§6 VERIFICATION THE NEW TEXT's READER; §4
+JJ	new_text_reader	false-sentence	Y	—	first fights split 24 and 36 by casts and end line; 27 and 33 by every printed one	§6 VERIFICATION THE NEW TEXT's READER; §4
+JJ	new_text_reader	premise	N	—	brief's 'twelve kinds' are nine, two unpriced and the Behemoth (§0 row 27b)	§6 VERIFICATION THE NEW TEXT's READER; §0 THE BRIEF's PREMISES, VERIFIED row 27b
+JJ	new_text_reader	false-sentence	Y	—	changelog's 'one in fifteen' is one in twenty	§6 VERIFICATION THE NEW TEXT's READER
+JJ	new_text_reader	defect	Y	—	selection's price ignores Frostbite's half, Miasma and refusals, so can ask more than the heal restores; left	§6 VERIFICATION THE NEW TEXT's READER; FOUND AT JJ AND NOT FIXED
+JJ	new_text_reader	defect	Y	—	two healers can each reserve a price for one wound; a future warband heal multiplier would overrun the reserve, the floor hiding it; left	§6 VERIFICATION THE NEW TEXT's READER; FOUND AT JJ AND NOT FIXED
+JJ	new_text_reader	expected	Y	—	Wild Growth's coin gone, so Withered Warden fights spend one die fewer a choice; seeded fights diverge from there; left	§6 VERIFICATION THE NEW TEXT's READER; FOUND AT JJ AND NOT FIXED
+JJ	fresh_reader	false-sentence	Y	HIGH	verdict 'harder' rested on falls a fight, outside the brief's readings; on its own readings every outcome ties: 'not measurably harder'	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §4
+JJ	fresh_reader	defect	Y	HIGH	Blight the Well still waited on the pool at the selection (priced at its figure); now priced at nothing, C04d reds the old	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §3
+JJ	fresh_reader	stale-claim	Y	MEDIUM	drive's JJ lane preceded code changes (it named three of four); its account why none could reach the drive was the batch's to test	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; FOUND AT JJ AND NOT FIXED
+JJ	fresh_reader	false-sentence	Y	MEDIUM	heal casts per hundred moves called a tie on paired fights; casts a fight is the paired tie	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §4
+JJ	fresh_reader	false-sentence	Y	MEDIUM	first fights' 27 not split (16 Totemist jabs, 5 the reverse, 4 dice, 2 another kind)	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §4
+JJ	fresh_reader	false-sentence	Y	MEDIUM	controls miscounted; twenty-two, C04c and C04d among them	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; THE CONTROLS
+JJ	fresh_reader	false-sentence	N	MEDIUM	close-read counted twenty-five with #22's second half untaken: master §10 named neither the strip nor the count	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §6 VERIFICATION THE CLOSE-READ
+JJ	fresh_reader	stale-claim	Y	MEDIUM	two living code citations of an answered ruling (battle.gd's door, check_ji's TUNED) still read RULINGS OWED	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; THE RULINGS
+JJ	fresh_reader	false-sentence	Y	MEDIUM	prediction 6 misquoted; held on its own four outcomes	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §4 THE PREDICTIONS
+JJ	fresh_reader	defect	Y	MEDIUM	THE ORDER gap: check_jj's header and baseline row (66 to 67) written after the subset's build, so the subset ran neither	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; THE ORDER
+JJ	fresh_reader	false-sentence	Y	LOW	'four heals': four heal moves, three specials	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §0 row 16
+JJ	fresh_reader	false-sentence	Y	LOW	the archive's sizes (no detail given)	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JJ	fresh_reader	false-sentence	Y	LOW	omitted that the party's losses do ride the save	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §2 premise 1
+JJ	fresh_reader	false-sentence	Y	LOW	'71%' (heal share of HEAD's) (no detail given)	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §4 THE PREDICTIONS
+JJ	fresh_reader	false-sentence	Y	LOW	HEAD-arm reproduction cited by a coincident level, not by its 60 runs	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §4
+JJ	fresh_reader	false-sentence	Y	LOW	healed row not labelled 'all fights'	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §4
+JJ	fresh_reader	false-sentence	Y	LOW	born and written file times conflated	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; THE ORDER
+JJ	fresh_reader	false-sentence	Y	LOW	check_jj's first test run (11:05:51) missing from THE ORDER	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; THE ORDER
+JJ	fresh_reader	false-sentence	Y	LOW	Blight the Well's paragraph missing from §3	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §3
+JJ	fresh_reader	false-sentence	Y	LOW	Communion's count missing from master §8	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; THE RULINGS
+JJ	fresh_reader	false-sentence	Y	LOW	closed gates 're-pointed', not 'follow the code'	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JJ	fresh_reader	false-sentence	Y	LOW	'asks no pool' (re-validation) (no detail given)	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JJ	fresh_reader	false-sentence	Y	LOW	Dark Vigil's tighter condition unstated	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; ruling 3
+JJ	fresh_reader	defect	Y	LOW	the Wasting bargain's tick on the warband is credited to nobody and fills no Malice; added to ruling 6	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; ruling 6; FOUND AT JJ AND NOT FIXED
+JJ	fresh_reader	false-sentence	Y	LOW	cap's late arrival given without its median (19% of turns)	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §4
+JJ	fresh_reader	false-sentence	Y	LOW	'the casts and the end line' (no detail given)	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §4
+JJ	fresh_reader	false-sentence	Y	LOW	report used its own terms with no glossary of them	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; THE WORDS THIS REPORT USES
+JJ	fresh_reader	false-sentence	Y	LOW	'no cooling move' (no detail given)	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JJ	fresh_reader	false-sentence	Y	LOW	'its pool was given' (no detail given)	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JJ	fresh_reader	false-sentence	Y	LOW	'an overheal's excess' (no detail given)	§6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; ruling 1
+JJ	positional	self	Y	—	pos_width's tally prints 9 reads cleared by occurrence under the hunk pass's label, READER (pos_seq had cleared them)	§6 VERIFICATION ALL 489 POSITIONAL READS
+JJ	positional	expected	Y	—	check_ht's _bodies now carries JJ's two top-level blocks; no composition mark, population still 30 functions	§6 VERIFICATION ALL 489 POSITIONAL READS
+JJ	positional	expected	Y	—	f4 to f6: three index-reading reads hit changed lines; only the index stamps differ	§6 VERIFICATION ALL 489 POSITIONAL READS
+JJ	litsweep	expected	Y	—	one LOST literal held nowhere else: check_jj's own absence needle on master's 'under 40% HP'	§6 VERIFICATION THE LITERAL SWEEP
+JJ	litsweep	expected	Y	—	LOST 'OWED' citations leaving combat-rules.md and check_ji's comment; holders check_is and check_iu green in the subset	§6 VERIFICATION THE LITERAL SWEEP
+JJ	control_subject	defect	Y	—	control mapping found two arms missing from check_jj (unnamed); added before the repaired build	§6 VERIFICATION THE ORDER
+JJ	control_dry	self	Y	—	C09's anchor, written against an earlier state draft, matched no tree; dry-check on f6 caught it; re-anchored	§6 VERIFICATION THE CONTROLS; §6 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JJ	control_h01	self	Y	—	H01's spec held lines HEAD's code must red (pool sentences read off constants); spec corrected, H01 re-run alone	§6 VERIFICATION THE CONTROLS
+JJ	recon	expected	Y	—	check_iu §8 x2 (routing's close owed) and check_de 721/1, as predicted	§6 VERIFICATION RECON 1
+JJ	recon	expected	Y	—	five seeded gates (check_gj, gp, gv, hk, hr) read a different game from HEAD; what moved inside each was not traced	§6 VERIFICATION RECON 1
+JJ	acceptance	expected	Y	—	check_hk 166 to 168 and test_batch_an 6,019 to 6,022 against the pre-run, inside bands (between-run wobble)	§6 VERIFICATION THE ACCEPTANCE
+JJ	landing	expected	Y	—	test_batch_an 6,022 to 6,024 in band; check_jc and check_is 167 to 168 codes with the report in	§6 VERIFICATION THE LANDING (THE REPORT's LANDING)
+JJ	other	stale-claim	Y	—	drive replay on landing code: Blight's re-price reached the sim, run 24's twentieth fight parted; §4 heal figures moved (13.0 to 13.2)	§4; FOUND AT JJ AND NOT FIXED
+JJ	unattributed	defect	UNCLEAR	—	heal float and log line print the pipeline's return including overheal, not health gained; intent hover names a heal, not its price; left	FOUND AT JJ AND NOT FIXED
+JK	premises	premise	N	—	'process note 37' exists nowhere in the tree, the backups or the memory the work reads	§0 THE BRIEF's PREMISES, VERIFIED row 3; FOUND AT JK AND NOT FIXED
+JK	premises	premise	N	—	brute and slinger second moves 'strictly worse' on damage only; they deal more Break	§0 THE BRIEF's PREMISES, VERIFIED row 6
+JK	premises	premise	N	—	no summon path for the warband: only _spawn_units adds bodies; Overrun not built, RULED, NOT BUILT (ruling 1)	§0 THE BRIEF's PREMISES, VERIFIED row 8; §5 VERIFICATION THE BLOCKS' READER
+JK	premises	premise	N	—	Raise's 51 and 120 true only on zone one's unscaled bodies; a body over 377 passes the cap and is never raised	§0 THE BRIEF's PREMISES, VERIFIED row 12; FOUND AT JK AND NOT FIXED
+JK	premises	premise	N	—	Overrun's whelp priced as written costs past the cap from zone two's fifth slot at Warden	§0 THE BRIEF's PREMISES, VERIFIED row 13
+JK	premises	premise	UNCLEAR	—	appetite near 250 counts Overrun's 90; the three shipping spends come to 161 to 191, only for a warband holding all three	§0 THE BRIEF's PREMISES, VERIFIED row 14; §2
+JK	premises	premise	UNCLEAR	—	JI's 1.4x line prices only a blow and a heal; Rally and Entrench needed a pricing convention (ruling 2)	§0 THE BRIEF's PREMISES, VERIFIED row 15; §2
+JK	premises	premise	N	—	first draft's 2-turn Rally clock paid one rallied blow a body while priced on two (both outside readers)	§0 THE BRIEF's PREMISES, VERIFIED row 16; §5 VERIFICATION THE CLOSE-READ; §5 VERIFICATION THE NEW TEXT's READER
+JK	premises	premise	Y	—	brief: the game should get harder, spends 100 to 200 a fight; every named outcome a tie, pool spends 38.0	§0 THE BRIEF's PREMISES, VERIFIED row 18; §3
+JK	premises	premise	N	—	'sevenfold supply gap' holds only where a healer stood; over every fight it was twenty-onefold (row added by the fresh reader)	§0 THE BRIEF's PREMISES, VERIFIED row 28; §5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JK	premises	premise	N	—	'neither needs a condition' is the spend's, not the policy's: a Rally-only kind buys nothing once two or fewer stand	§0 THE BRIEF's PREMISES, VERIFIED row 29; §5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JK	premises	defect	Y	—	check_dr §2 would also red on JK's moves, found at source beyond the blocks' reader's list; re-pointed	§0 THE BRIEF's PREMISES, VERIFIED row 25
+JK	blocks_reader	premise	N	—	warband added to only in _spawn_units; the source says it never grows mid-fight (same as §0 row 8)	§5 VERIFICATION THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED row 8
+JK	blocks_reader	defect	Y	—	re-validation re-aims a declaration whose target is dead; a Raise's fallen target had to be left alone	§5 VERIFICATION THE BLOCKS' READER; §1 PREMISE 2
+JK	blocks_reader	premise	N	—	a body over about 375 health is past the cap (same as §0 row 12; fresh reader set the bound at 377)	§5 VERIFICATION THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED row 12
+JK	blocks_reader	premise	N	—	process note 37 not found (same as §0 row 3)	§0 THE BRIEF's PREMISES, VERIFIED row 3
+JK	blocks_reader	premise	N	—	second moves worse on damage only, more Break (same as §0 row 6)	§0 THE BRIEF's PREMISES, VERIFIED row 6
+JK	blocks_reader	premise	N	—	Overrun's whelp past the cap from zone two (same as §0 row 13)	§0 THE BRIEF's PREMISES, VERIFIED row 13
+JK	blocks_reader	defect	Y	—	name 'Rally' collides with the Warrior's card, Rallying Shout's handler and the Rallied label; shipped and flagged (ruling 7)	§0 THE BRIEF's PREMISES, VERIFIED row 23; §5 VERIFICATION THE BLOCKS' READER
+JK	blocks_reader	defect	N	—	support fallback widened: a Rally or Entrench names its caster, so Heads Down sends the basic at the caster; the drive met it once	§0 THE BRIEF's PREMISES, VERIFIED row 24; §5 VERIFICATION THE BLOCKS' READER; FOUND AT JK AND NOT FIXED
+JK	blocks_reader	defect	Y	—	gates JK's moves red: check_ji §1a and §4, check_jj §7, check_di, check_hi §2, check_jg §3h, test_batch_bm §6; each re-pointed	§0 THE BRIEF's PREMISES, VERIFIED row 25; §5 VERIFICATION THE BLOCKS' READER
+JK	blocks_reader	defect	N	—	Raise skips Bloodless: revive sets health, so the no-heals modifier stands a body up (with the new text's reader)	FOUND AT JK AND NOT FIXED
+JK	close_read	false-sentence	N	HIGH	Rally priced on two rallied blows a body while its 2-turn clock paid one (with the new text's reader)	§5 VERIFICATION THE CLOSE-READ; ruling 5
+JK	close_read	stale-claim	Y	HIGH	not routed (GM's RULINGS OWED): Dispel strips Rally and Entrenched; master's Dispel note and two comments called a ward the only enemy buff	§5 VERIFICATION THE CLOSE-READ; JK-routing FOUND AT THE CLOSE
+JK	close_read	defect	Y	HIGH	Fleeting leaves a Rally nothing and an Entrench one turn, unrecorded, and the policy still buys both; Brittle zeroes an Entrench	§5 VERIFICATION THE CLOSE-READ; FOUND AT JK AND NOT FIXED
+JK	close_read	false-sentence	N	MEDIUM	a raised body's first turn is a basic swing after it rises, not after its raiser's next (four places; with new text's reader)	§5 VERIFICATION THE CLOSE-READ
+JK	close_read	false-sentence	Y	MEDIUM	every spend's 2.5 delay stated and ruled nowhere	§5 VERIFICATION THE CLOSE-READ; ruling 4
+JK	close_read	false-sentence	Y	MEDIUM	the split's figures carried no errors and were missing from the kept table	§5 VERIFICATION THE CLOSE-READ; §3
+JK	close_read	false-sentence	Y	LOW	Overrun lacked its RULED, NOT BUILT marker	§5 VERIFICATION THE CLOSE-READ
+JK	close_read	false-sentence	N	LOW	the Encumbered line's 'twelve' (with the new text's reader's Encumbered count)	§5 VERIFICATION THE CLOSE-READ; §5 VERIFICATION THE NEW TEXT's READER
+JK	close_read	false-sentence	Y	LOW	the strip's hover (no detail given)	§5 VERIFICATION THE CLOSE-READ
+JK	close_read	false-sentence	Y	LOW	FOUND AT JJ's tense	§5 VERIFICATION THE CLOSE-READ
+JK	close_read	stale-claim	Y	LOW	four stale counts in comments, the ladder and the debug toggle	§5 VERIFICATION THE CLOSE-READ
+JK	close_read	defect	Y	LOW	spend arms logged literal names; CLAUDE.md requires ab.display_name for a shared payload	§5 VERIFICATION THE CLOSE-READ
+JK	close_read	false-sentence	Y	LOW	'40% of its health' named no maximum	§5 VERIFICATION THE CLOSE-READ
+JK	close_read	defect	Y	LOW	name sweep's form (GN's ruling 5, not routed) and RALLY_ constants beside the Warrior's; renamed MALICE_RALLY_*	§5 VERIFICATION THE CLOSE-READ; JK-routing FOUND AT THE CLOSE; ruling 7
+JK	close_read	false-sentence	Y	LOW	'no body' where a Raise puts one back; now 'no new body'	§5 VERIFICATION THE CLOSE-READ
+JK	close_read	false-sentence	Y	LOW	the kit table and the intent's Bolster row (no detail given)	§5 VERIFICATION THE CLOSE-READ
+JK	close_read	false-sentence	Y	LOW	the design note's menders (no detail given)	§5 VERIFICATION THE CLOSE-READ
+JK	close_read	stale-claim	Y	LOW	FOUND AT IT's reason for the Chilled row's literal does not hold: Sunder and Entrenched rows name constants and parse	§5 VERIFICATION THE CLOSE-READ; FOUND AT JK AND NOT FIXED
+JK	close_read	false-sentence	Y	LOW	the WHERE block's unpinned figures; left (rewritten every batch)	§5 VERIFICATION THE CLOSE-READ
+JK	close_read	defect	Y	—	not routed (GO's RULINGS OWED): a raised body's second fall is a second kill; the Reaver's uncapped count can pass the warband's size	JK-routing FOUND AT THE CLOSE; FOUND AT JK AND NOT FIXED
+JK	close_read	stale-claim	Y	—	not routed (FOUND AT HA): its check_di line citation drifted again with JK's comment in that gate	JK-routing FOUND AT THE CLOSE
+JK	new_text_reader	false-sentence	N	HIGH	Rally's 2-turn clock paid one rallied blow while priced on two (with the close-read); clock set to 3, drive re-run	§5 VERIFICATION THE NEW TEXT's READER; ruling 5
+JK	new_text_reader	defect	Y	HIGH	check_jk arm 'raised body kept its declaration' could not fail (is_empty() or ... >= 0); now plants a reserved declaration, C02c	§5 VERIFICATION THE NEW TEXT's READER; THE CONTROLS
+JK	new_text_reader	false-sentence	N	MEDIUM	the raised body's first turn timing (with the close-read)	§5 VERIFICATION THE NEW TEXT's READER
+JK	new_text_reader	false-sentence	Y	MEDIUM	reading reported one effect three times: first arm's easing sat in fights one arm lost; run-clustered Rally fights tied	§5 VERIFICATION THE NEW TEXT's READER; §3
+JK	new_text_reader	false-sentence	Y	MEDIUM	the report's correction of the brief's 187 cheap gates wrong: 187 is right, 188 the ceiling	§5 VERIFICATION THE NEW TEXT's READER; §0 THE BRIEF's PREMISES, VERIFIED row 20
+JK	new_text_reader	false-sentence	N	MEDIUM	the Encumbered count (with the close-read's 'twelve')	§5 VERIFICATION THE NEW TEXT's READER
+JK	new_text_reader	defect	Y	MEDIUM	check_dr's new arm read only a label; now reads the arm's .revive(	§5 VERIFICATION THE NEW TEXT's READER; §5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JK	new_text_reader	false-sentence	Y	MEDIUM	the lane's name in project.godot, which never lands, counted among the tree's files	§5 VERIFICATION THE NEW TEXT's READER; THE LITERAL SWEEP
+JK	new_text_reader	false-sentence	Y	LOW	books' identity (spent equals heals plus spends) proves the books, not the reserve; _malice_pay books even at an empty pool	§5 VERIFICATION THE NEW TEXT's READER; FOUND AT JK AND NOT FIXED
+JK	new_text_reader	false-sentence	Y	LOW	the 66,078-line replay's two asides unstated	§5 VERIFICATION THE NEW TEXT's READER; §3
+JK	new_text_reader	false-sentence	Y	LOW	Eye of the Storm breaking 'every buff' (no detail given)	§5 VERIFICATION THE NEW TEXT's READER
+JK	new_text_reader	false-sentence	Y	LOW	Caught Fast, which no corpse carries	§5 VERIFICATION THE NEW TEXT's READER
+JK	new_text_reader	defect	Y	LOW	Blood Tribute now counts bodies down, so a raised body that fell stops feeding it; its words say 'fallen this battle'	§5 VERIFICATION THE NEW TEXT's READER; FOUND AT JK AND NOT FIXED
+JK	new_text_reader	stale-claim	Y	LOW	stale '46 of the 50' comment	§5 VERIFICATION THE NEW TEXT's READER
+JK	new_text_reader	defect	Y	LOW	Overrun absence arm checked three spellings; six now	§5 VERIFICATION THE NEW TEXT's READER
+JK	new_text_reader	defect	Y	LOW	check_jk's copied _blow helper; now asserted byte-identical to check_ji's	§5 VERIFICATION THE NEW TEXT's READER
+JK	new_text_reader	defect	Y	LOW	loose rallied-blow arm; now a 160 blow	§5 VERIFICATION THE NEW TEXT's READER
+JK	new_text_reader	false-sentence	UNCLEAR	LOW	the fallback on every kind (overlaps blocks' reader §0 row 24)	§5 VERIFICATION THE NEW TEXT's READER
+JK	new_text_reader	defect	Y	LOW	the strip's empty branch (no detail given)	§5 VERIFICATION THE NEW TEXT's READER
+JK	new_text_reader	defect	Y	LOW	no check_jk arm on two raisers; one added, C03b	§5 VERIFICATION THE NEW TEXT's READER; THE CONTROLS
+JK	new_text_reader	false-sentence	Y	—	one pair of drive levels (hero turns) not cut to each run's first parting	§5 VERIFICATION THE NEW TEXT's READER; §3
+JK	fresh_reader	false-sentence	Y	HIGH	'fights an Entrench was bought in read easier' false twice: the group excluded Rally fights (all Entrench fights tie); easier only where both arms won	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §3
+JK	fresh_reader	false-sentence	Y	MEDIUM	spends' 44.3 a fight was the first arm's; the record's is 28.6	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §0 THE BRIEF's PREMISES, VERIFIED row 14
+JK	fresh_reader	stale-claim	Y	MEDIUM	master §4.8 still gave a Rally two bodies	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JK	fresh_reader	false-sentence	Y	MEDIUM	tree that lands named f4; it was f5 (now f6, its carry said)	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; THE ORDER
+JK	fresh_reader	false-sentence	Y	MEDIUM	controls' first run misreported: five did not bite, C06a's anchor caught before it, 16 of 24 dry-checked	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; THE CONTROLS
+JK	fresh_reader	defect	Y	MEDIUM	Entrench priced on three intervals where only its caster has three; convention stated in ruling 2 (moves Hollow Crown 3 to 2)	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §2; ruling 2
+JK	fresh_reader	premise	N	MEDIUM	brief's 'neither needs a condition' broken by the policy's three bodies for a Rally-only kind (§0 row 29)	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §0 THE BRIEF's PREMISES, VERIFIED row 29; ruling 4
+JK	fresh_reader	false-sentence	Y	LOW	effective_armor()'s call count (25) and the sim's raw armor read in run_sim.gd unstated	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §0 THE BRIEF's PREMISES, VERIFIED row 11; FOUND AT JK AND NOT FIXED
+JK	fresh_reader	false-sentence	Y	LOW	battery target count is 176	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JK	fresh_reader	false-sentence	N	LOW	Raise's bound is 377, not 375 (the blocks' reader's figure)	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; FOUND AT JK AND NOT FIXED
+JK	fresh_reader	false-sentence	Y	LOW	Dispel takes three beneficial effects	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §1
+JK	fresh_reader	false-sentence	Y	LOW	THE ORDER's control and sweep times	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; THE ORDER
+JK	fresh_reader	false-sentence	Y	LOW	six citations re-pointed, not eleven	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; THE RULINGS
+JK	fresh_reader	false-sentence	Y	LOW	the replay's bets 2 and 4 misgraded	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §3 THE PREDICTIONS
+JK	fresh_reader	false-sentence	Y	LOW	a parting's definition missing	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §3
+JK	fresh_reader	false-sentence	Y	LOW	the first arm's levels (no detail given)	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §3
+JK	fresh_reader	false-sentence	Y	LOW	self-strike is the code's branch, not the diagnostic's line (which logged the refusal's reason, not the target)	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §3; FOUND AT JK AND NOT FIXED
+JK	fresh_reader	false-sentence	Y	LOW	changelog's 'maximum', and Eye of the Storm in master §9 and the design note	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JK	fresh_reader	false-sentence	N	LOW	two missing §0 rows: zero fallbacks (row 27) and sevenfold (row 28)	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §0 THE BRIEF's PREMISES, VERIFIED rows 27, 28
+JK	fresh_reader	false-sentence	Y	LOW	check_dr's credit (no detail given)	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JK	fresh_reader	false-sentence	Y	LOW	THE LANDING did not say its hash guard	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; THE LANDING
+JK	positional	defect	Y	—	check_ed's population lets check_iz's _s3_the_removal run past static func turn_order; HEAD's quirk too (positional reader A)	§5 VERIFICATION ALL 489 POSITIONAL READS; FOUND AT JK AND NOT FIXED
+JK	positional	expected	Y	—	in-place moves, same subjects: _apply_status sites 221 to 223, special arms 168 to 171, enemy hovers 50 to 74, manifest 1,568 to 1,570	§5 VERIFICATION ALL 489 POSITIONAL READS
+JK	litsweep	expected	Y	—	7 LOST, each held elsewhere but 'JJ's RULINGS OWED', which check_jk §0 holds absent on purpose	§5 VERIFICATION THE LITERAL SWEEP
+JK	docs_subset	defect	Y	—	first-build subset: check_hu §4a caught Entrenched's chip tag 'En', already the Encumbered modifier's; re-tagged 'Et'	§0 THE BRIEF's PREMISES, VERIFIED row 26; §5 VERIFICATION THE ORDER; RECON 1
+JK	docs_subset	defect	Y	—	first-build subset: a JK edit pushed a check_ji §2 needle past its window	§5 VERIFICATION THE ORDER
+JK	control_subject	defect	Y	—	C01: with a kind's spend gone check_jk §2 threw on a missing move's name, hiding every arm below; now reds by name (61/7)	§5 VERIFICATION THE CONTROLS
+JK	control_subject	self	Y	—	C10a and C10b wanted text carried an apostrophe GDScript escapes in a printed array; made quote-free	§5 VERIFICATION THE CONTROLS
+JK	control_subject	self	Y	—	C11a's break left the figures it meant to strike; now strikes the sentence	§5 VERIFICATION THE CONTROLS
+JK	control_subject	self	Y	—	C02c's break removed a line the arm does not need; now removes the declaration too	§5 VERIFICATION THE CONTROLS
+JK	control_dry	self	Y	—	C06a's anchor written on the state's first wording; dry-check caught it before the f4 run; re-anchored	§5 VERIFICATION THE CONTROLS; §5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JK	recon	expected	Y	—	check_de notice: check_gp 448 to 471, seeded road parted at the first spend, all green; row moved (on the first build's Rally)	§5 VERIFICATION RECON 1
+JK	recon	expected	Y	—	check_iu §8 x2 (routing's close owed) and check_de 725/1, as predicted	§5 VERIFICATION RECON 1
+JK	prerun	defect	Y	—	check_de red: check_gp fell to 436 against a row of 471 moved on recon 1's superseded two-body-Rally build; row reset 448 to 436	§5 VERIFICATION THE PRE-RUN OF RECORD
+JK	acceptance	expected	Y	—	check_hk 166 to 168, test_batch_an 6,029 to 6,028, test_batch_bk 131 to 129: between-run wobble inside bands	§5 VERIFICATION THE ACCEPTANCE
+JK	landing	self	Y	—	report-landing comparison passed test_batch_an vacuously (its verdict line is outside the pattern); count read by hand	§5 VERIFICATION THE LANDING (THE REPORT's LANDING)
+JK	landing	expected	Y	—	test_batch_an 6,028 to 6,034 in band; check_jc and check_is 168 to 169 codes; check_gv exit-leak count 14 to 19	§5 VERIFICATION THE LANDING (THE REPORT's LANDING)
+JK	count	defect	N	—	drive's fallback count: one re-validation fallback in 1,107 fights, a Raider's Rally under Heads Down aiming its basic at itself	§3; FOUND AT JK AND NOT FIXED; §0 THE BRIEF's PREMISES, VERIFIED row 27
+JK	other	defect	Y	—	THE ORDER: blocks' reader's findings born at 12:04, after the code's edit script and the drive's launch; a departure from JJ's order	§5 VERIFICATION THE ORDER, AS THE FOLDER SHOWS IT
+JK	other	expected	Y	—	drive replay with Rally's clock at 3: the first arm's easing (completions 3 to 10, health +2.40) gone	§3
+JK	unattributed	defect	UNCLEAR	—	Called Shot's mode reads a body's own armor, not its Entrenched armor (the bot's choice of a hero card's mode)	FOUND AT JK AND NOT FIXED; §0 THE BRIEF's PREMISES, VERIFIED row 11
+JK	unattributed	defect	UNCLEAR	—	Rally reaches the warband's blows, not the Burn and Poison it lays	FOUND AT JK AND NOT FIXED; §1 PREMISE 3
+JL	premises	premise	N	—	warband already laid seven debuffs on fifteen moves, not Poison alone	§0 THE BRIEF's PREMISES, VERIFIED row 13; §5 VERIFICATION THE BLOCKS' READER
+JL	premises	premise	N	—	Frostbite and Miasma already cut healing received; Gall ships as Frostbite's figure on the heroes' side	§0 THE BRIEF's PREMISES, VERIFIED row 14; THE BLOCKS' READER
+JL	premises	premise	N	—	Mire is Slowed's effect, which the Bog Troll already lays on heroes	§0 THE BRIEF's PREMISES, VERIFIED row 17; THE BLOCKS' READER
+JL	premises	premise	UNCLEAR	—	resource gain had no door (about fifty bar writes), so Sap's door was built at the bar's setter; no hero's bar is Focus	§0 THE BRIEF's PREMISES, VERIFIED row 22
+JL	premises	premise	N	—	brief expected every hex to cool; on its own price Gall (0.48) and Fester (0.44) fall under JI's 1.4 line	§0 THE BRIEF's PREMISES, VERIFIED row 20; THE BLOCKS' READER
+JL	premises	premise	Y	—	brief predicted the pool spends 120 to 220 a fight; the drive read 52.8	§0 THE BRIEF's PREMISES, VERIFIED row 24; §3
+JL	premises	premise	Y	—	brief's 'harder on falls a run or health' held on health only; falls a run a tie because runs end sooner	§0 THE BRIEF's PREMISES, VERIFIED row 26; §3
+JL	premises	premise	UNCLEAR	—	'every capability I have added spends a body's turn' false of JI's cooldowns, which take options away	§0 THE BRIEF's PREMISES, VERIFIED row 5
+JL	premises	premise	UNCLEAR	—	JK's 'broken Rally' arm also differed by a Rally waiting for two bodies, the only reading of §1's loosening	§0 THE BRIEF's PREMISES, VERIFIED row 6
+JL	premises	premise	UNCLEAR	—	'1.25 of a turn' holds only on a 2.0 basic; 1.0, 0.83 and 1.67 on other kinds	§0 THE BRIEF's PREMISES, VERIFIED row 7
+JL	premises	premise	UNCLEAR	—	two-body Rally does nothing for the Ash Hurler or Rot Behemoth: neither bought a Rally	§0 THE BRIEF's PREMISES, VERIFIED row 9; §1
+JL	premises	premise	UNCLEAR	—	'the plate can only show one' intent false: one line names both; eight of 61 Entrench pairings trim	§0 THE BRIEF's PREMISES, VERIFIED row 10; §1 PREMISE 1
+JL	premises	premise	N	—	free spend leaves the reserve live, adds two reserve hazards, and kills JK's Raise branch in _revalidate_intent	§0 THE BRIEF's PREMISES, VERIFIED row 11; §1 PREMISE 2
+JL	premises	premise	UNCLEAR	—	four brakes on a free spend, not one; JK's bands priced spends against a displaced basic no spend displaces now	§0 THE BRIEF's PREMISES, VERIFIED row 12; §1 PREMISE 3
+JL	premises	premise	N	—	'leave the support fallback's reach as JK found it' impossible: the free spend closes it; Fleeting also cuts every hex to one turn	§0 THE BRIEF's PREMISES, VERIFIED row 28; FOUND AT JL
+JL	blocks_reader	premise	N	—	warband lays seven debuffs, not Poison alone	§5 VERIFICATION THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED row 13
+JL	blocks_reader	premise	N	—	Frostbite and Miasma already cut healing received; Slowed already does Mire's work	THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED rows 14, 17
+JL	blocks_reader	defect	Y	—	Regalia trap: a hex dealing nothing could never be chosen through the attack half's damage > 0	THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED row 31; ruling 7
+JL	blocks_reader	defect	N	—	a body's own heal reserve beside its spend: _malice_free leaves out the asker; closed by _enemy_ready's held	THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED row 11
+JL	blocks_reader	defect	N	—	JK's Raise case in _revalidate_intent dead once spends ride a declaration; deleted	THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED row 11; ruling 2
+JL	blocks_reader	stale-claim	N	—	FOUND AT JK's support-fallback every-kind reach is closed by the free spend	THE BLOCKS' READER; FOUND AT JL; §0 THE BRIEF's PREMISES, VERIFIED row 28
+JL	blocks_reader	defect	Y	—	a Fester counter written F%d would collide with Burn's counter; four tags Ga, Sa, Me, Fr found free	THE BLOCKS' READER; §2 ON THE PLATE
+JL	blocks_reader	premise	N	—	Gall prices under the 1.4 line on every kind, so the brief's control C10 would read 'no cooldown' as a break	THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED row 20; ruling 6
+JL	blocks_reader	expected	Y	—	named every closed gate JL's moves would red (check_jk, check_ji, check_jj, check_di, check_ir, check_is); each re-pointed	THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED row 32
+JL	blocks_reader	stale-claim	Y	—	WHERE block's 'Next: JL … the content hole JK sized' overtaken by the brief's §4	THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED row 33
+JL	blocks_reader	defect	Y	—	Returned Burden casts a lifted hex back onto the warband, unpriced	FOUND AT JL AND NOT FIXED
+JL	blocks_reader	stale-claim	Y	—	the warband's five other non-damage debuffs stay unpriced, so Mire is priced while its twin Slowed is not	FOUND AT JL AND NOT FIXED
+JL	blocks_reader	defect	Y	—	bot casts Unburden only when no ally is under half, so a festering hero waits	FOUND AT JL AND NOT FIXED
+JL	close_read	false-sentence	N	HIGH	Sap's player texts promised to cut 'Rage, Mana or Focus'; Focus is a spec's own meter, never the bar	§5 VERIFICATION THE CLOSE-READ; JL-routing.md CLOSE-READ (SHARED MARK)
+JL	close_read	false-sentence	N	MEDIUM	'seven debuffs unpriced' where five are	THE CLOSE-READ
+JL	close_read	false-sentence	N	MEDIUM	CX enemy-interference line re-pointed at the hexes, a wrong mechanic (it means the skill check); its 'first … capacity' false	THE CLOSE-READ; JL-routing.md CLOSE-READ (TALENT LAYER)
+JL	close_read	false-sentence	N	MEDIUM	design note stated the brief's premise as the record	THE CLOSE-READ
+JL	close_read	stale-claim	Y	MEDIUM	combat-rules.md's enemy-policy promise left standing over the hexes	THE CLOSE-READ
+JL	close_read	defect	Y	MEDIUM	family word 'hex' shares six live names (Hexed, Hex of Ruin…) with no name sweep recorded	THE CLOSE-READ; §0 THE BRIEF's PREMISES, VERIFIED row 34; ruling 12
+JL	close_read	stale-claim	Y	MEDIUM	FOUND AT JK's 'hole JL is sized against' and its index label left unmended after re-stamp	THE CLOSE-READ; JL-routing.md THE INDEX's UPKEEP
+JL	close_read	false-sentence	UNCLEAR	LOW	Fester 'never runs out' false under Fleeting	THE CLOSE-READ
+JL	close_read	false-sentence	Y	LOW	'where drafted' said of a worn rune and a bought talent	THE CLOSE-READ; JL-routing.md CLOSE-READ
+JL	close_read	defect	Y	LOW	twenty-four spend moves keep a delay 2.5 nothing charges now; dead key, named not deleted	THE CLOSE-READ; FOUND AT JL
+JL	close_read	stale-claim	Y	LOW	process note's count and FOUND AT JK's answered line	THE CLOSE-READ
+JL	close_read	stale-claim	Y	LOW	the cooldowns block silent on the hexes	THE CLOSE-READ
+JL	close_read	stale-claim	Y	LOW	CLAUDE.md places a support cast's target in _enemy_support_action; spends now chosen in _warband_spend (not fixed)	THE CLOSE-READ; FOUND AT JL
+JL	close_read	stale-claim	Y	LOW	a closed block's line citation wrong, left because it was wrong at HEAD	THE CLOSE-READ
+JL	close_read	defect	Y	—	routing missed TALENT LAYER (plainly) and SHARED MARK (with consequence); six closed index rows lacked a trigger, added	JL-routing.md FOUND AT THE CLOSE; THE CLOSE-READ
+JL	new_text_reader	false-sentence	N	HIGH	Sap's texts promised to cut Focus, which no hero's bar is	§5 VERIFICATION THE NEW TEXT's READER
+JL	new_text_reader	false-sentence	Y	HIGH	three rule texts still gave every rallied body two rallied turns; the buyer now strikes rallied three times	THE NEW TEXT's READER; ruling 4
+JL	new_text_reader	defect	Y	MEDIUM	check_jl's free-turn arm a coin flip against C01: the Raider's Sundering Strike shares the spend's 2.5 delay	THE NEW TEXT's READER
+JL	new_text_reader	false-sentence	UNCLEAR	MEDIUM	both Fleeting claims wrong: a one-turn Mire slows nothing	THE NEW TEXT's READER; FOUND AT JL
+JL	new_text_reader	false-sentence	Y	MEDIUM	Ash Hurler and Rot Behemoth reason half-true: nobody rallied in 14 of the Hurler's 26 fights	THE NEW TEXT's READER
+JL	new_text_reader	stale-claim	Y	MEDIUM	hero turns a fight missing from the record (longer in fights both arms won)	THE NEW TEXT's READER; §3
+JL	new_text_reader	false-sentence	Y	MEDIUM	a hex skipping the draws and evasions left unsaid	THE NEW TEXT's READER; ruling 7
+JL	new_text_reader	false-sentence	N	MEDIUM	design note stated the brief's premise as the record	THE NEW TEXT's READER
+JL	new_text_reader	defect	Y	MEDIUM	the intent plate's two-name line unmeasured against its 126 px label	THE NEW TEXT's READER; §1 PREMISE 1
+JL	new_text_reader	false-sentence	Y	MEDIUM	pooled levels and paired differences that do not subtract, uncaveated	THE NEW TEXT's READER; §3
+JL	new_text_reader	false-sentence	Y	MEDIUM	Fester priced over a clock it does not have; census scale against zone-one basics unstated	THE NEW TEXT's READER; ruling 6
+JL	new_text_reader	false-sentence	Y	—	drive label: Hurler and Behemoth 'met in 38 and 12 fights' were their moves; they acted in 26 and 7	THE NEW TEXT's READER
+JL	new_text_reader	defect	Y	LOW	hex arm's log announced a hex the door refused	THE NEW TEXT's READER
+JL	new_text_reader	defect	Y	LOW	under Sap a gain's own line prints the uncut figure (Overburn, Holy Light, Mana floats); not fixed	THE NEW TEXT's READER; FOUND AT JL
+JL	new_text_reader	false-sentence	Y	LOW	'gains' said where the clamped rise is what Sap cuts	THE NEW TEXT's READER
+JL	new_text_reader	false-sentence	N	LOW	'seven' debuffs	THE NEW TEXT's READER
+JL	new_text_reader	stale-claim	Y	LOW	a dangling citation	THE NEW TEXT's READER
+JL	new_text_reader	false-sentence	Y	LOW	taunt test a hair wider than JK's, unsaid	THE NEW TEXT's READER; ruling 4
+JL	new_text_reader	false-sentence	Y	LOW	the glossary's Fester entry	THE NEW TEXT's READER
+JL	new_text_reader	false-sentence	N	LOW	the CX line's 'first'	THE NEW TEXT's READER
+JL	new_text_reader	false-sentence	Y	LOW	changelog and design note credit the difficulty to 'free spends alone'	THE NEW TEXT's READER
+JL	new_text_reader	defect	Y	LOW	the hexes' 2.5 delay unruled	THE NEW TEXT's READER
+JL	new_text_reader	false-sentence	Y	LOW	Gall priced over three intervals where it covers about two and a half	THE NEW TEXT's READER; ruling 6
+JL	new_text_reader	defect	Y	LOW	check_jl §5 did not read the WHERE block's copy	THE NEW TEXT's READER
+JL	new_text_reader	false-sentence	Y	LOW	drive prediction born in the launch's own second, unsaid	THE NEW TEXT's READER; §3
+JL	new_text_reader	defect	Y	LOW	IV probe's full-bar what-if writes the bar, so its dry reading misreads on a sapped hero's turn	THE NEW TEXT's READER; FOUND AT JL
+JL	new_text_reader	defect	Y	LOW	the readout's md5 not read at the close	THE NEW TEXT's READER
+JL	new_text_reader	stale-claim	Y	LOW	_hex_open's comment	THE NEW TEXT's READER
+JL	fresh_reader	stale-claim	Y	HIGH	Hurler/Behemoth 'met in 38 and 12 fights' survived the earlier repair in two drafts and the spends block; drive figures now tokenised	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT
+JL	fresh_reader	false-sentence	Y	MEDIUM	pool and spend levels were all-fight means under a caveat calling every level paired	THE FRESH READER
+JL	fresh_reader	false-sentence	Y	MEDIUM	'the data's other hexer kinds carry the rest' false: Orc Archer and Bloodcaller carry none; Archer meets heroes most	THE FRESH READER; ruling 5
+JL	fresh_reader	false-sentence	Y	MEDIUM	premise row 29's edit-script time wrong (01:01:21)	THE FRESH READER; §0 THE BRIEF's PREMISES, VERIFIED row 29
+JL	fresh_reader	defect	Y	MEDIUM	reserve hole called closed: re-validation cleared the heal's reserve before the Raise rider was bought; code repaired, C02b, drive re-run	THE FRESH READER; §1 PREMISE 2; ruling 2
+JL	fresh_reader	stale-claim	Y	LOW	the spends block's five citations	THE FRESH READER
+JL	fresh_reader	false-sentence	Y	LOW	the Orc Whelp's 1.67 missing from premise row 7	THE FRESH READER
+JL	fresh_reader	false-sentence	Y	LOW	Faith listed among second_resource meters where Mercy is (setter comment too)	THE FRESH READER
+JL	fresh_reader	false-sentence	Y	LOW	Thin Air's incumbent reading is a band-2 reading	THE FRESH READER
+JL	fresh_reader	false-sentence	Y	LOW	a time, 01:11:57	THE FRESH READER
+JL	fresh_reader	stale-claim	Y	LOW	f1's rebuild unnamed; sweep not re-taken on closing candidate; three LOST literals unnamed; rebuild and hash guard unsaid	THE FRESH READER; THE LITERAL SWEEP
+JL	fresh_reader	defect	Y	LOW	the plate's widths had no kept source	THE FRESH READER
+JL	fresh_reader	stale-claim	Y	LOW	two stale counts in battle.gd's comments	THE FRESH READER
+JL	fresh_reader	false-sentence	Y	LOW	'enemy moves resolved' compared as like for like	THE FRESH READER; §3
+JL	fresh_reader	false-sentence	Y	LOW	figures' populations unstated (carriers' fights, Fester's four, the split's runs, the paired fights)	THE FRESH READER; §3
+JL	fresh_reader	stale-claim	Y	LOW	tools/jl_kept_drive.py uncited	THE FRESH READER
+JL	fresh_reader	false-sentence	Y	LOW	'the pool bound it'	THE FRESH READER
+JL	fresh_reader	false-sentence	Y	LOW	JC's claw-back held of Ambushed's pressure, not Porous's	THE FRESH READER; §0 THE BRIEF's PREMISES, VERIFIED row 15
+JL	fresh_reader	false-sentence	Y	LOW	the controls' count	THE FRESH READER
+JL	fresh_reader	false-sentence	Y	LOW	plain words' 'free spends' and the Rally's two bodies''	THE FRESH READER
+JL	fresh_reader	false-sentence	Y	LOW	design note named one brake on a free spend, not four	THE FRESH READER
+JL	fresh_reader	false-sentence	Y	LOW	ruling 6's 'a turn traded for under half a basic'	THE FRESH READER
+JL	fresh_reader	false-sentence	Y	LOW	'at most 54' sapped hero turns	THE FRESH READER; FOUND AT JL
+JL	fresh_reader	false-sentence	Y	—	plate widths read by hand were wrong: kept measure finds eight of 61 Entrench pairings trim, not four	THE FRESH READER; §1 PREMISE 1
+JL	fresh_reader	false-sentence	Y	MEDIUM	second reader: partings classifier tested a re-aim first, reading 5 and 16 where runs are 8 and 13; state mended after pre-run	A SECOND OUTSIDE READER; §3; THE NEEDLE PROOF
+JL	fresh_reader	false-sentence	Y	MEDIUM	second reader: THE ORDER called the 02:13 replay 'the code that lands' and 'arm of record'	A SECOND OUTSIDE READER
+JL	fresh_reader	stale-claim	Y	MEDIUM	second reader: that draft's close readings still lanes/f4's	A SECOND OUTSIDE READER
+JL	fresh_reader	false-sentence	Y	MEDIUM	second reader: §1 premise 2 silent on the reserve's second hazard	A SECOND OUTSIDE READER
+JL	fresh_reader	false-sentence	Y	LOW	second reader: second arm's figures unlabelled in the new text's reader's paragraph	A SECOND OUTSIDE READER
+JL	fresh_reader	false-sentence	Y	LOW	second reader: FOUND AT JL said the drive's arm ran twice	A SECOND OUTSIDE READER
+JL	fresh_reader	false-sentence	Y	LOW	second reader: first f1 subsets ended 01:32:57, not 01:29	A SECOND OUTSIDE READER
+JL	fresh_reader	false-sentence	Y	LOW	second reader: positional hits' three reasons, and 'seven' for eight in the note	A SECOND OUTSIDE READER
+JL	fresh_reader	stale-claim	Y	LOW	second reader: FOUND AT JL's index row had no trigger for the new bullet	A SECOND OUTSIDE READER
+JL	fresh_reader	false-sentence	Y	LOW	second reader: four of thirteen re-aims were from a target off the board, not fallen	A SECOND OUTSIDE READER
+JL	fresh_reader	false-sentence	Y	LOW	second reader: 'every status floats' wanted 'where it lands'	A SECOND OUTSIDE READER
+JL	positional	defect	Y	—	check_in §3's needle _eff_cost(u, a) <= u.resource now stands twice; its arm would stay green if the attacks' line went	§5 VERIFICATION ALL 489 POSITIONAL READS; FOUND AT JL
+JL	positional	defect	Y	—	check_hu §4a's counter walk reads P%d, C%d, R%d, Bl%d but not Fester's Fr%d	ALL 489 POSITIONAL READS; FOUND AT JL
+JL	positional	defect	Y	—	check_hz §1a builds intents with no spend, so the hover's 'First, free' is held by check_jl §1 alone	ALL 489 POSITIONAL READS; FOUND AT JL
+JL	docs_subset	defect	Y	—	first build lanes/f1's subsets redded check_jl §3 and check_is §5; both repaired, f1 rebuilt (causes not stated)	§5 VERIFICATION THE ORDER
+JL	other	defect	Y	—	two-order traces: 13 of 21 partings were float_text's randf_range drawing the game's die before a re-aim; report credits 'the third drive arm' [JT: the drive replay found it, as JL.md says; read under other]	§3; FOUND AT JL AND NOT FIXED
+JL	control_subject	self	Y	—	six controls wanted FAIL text unescaped; the gate prints apostrophes escaped inside arrays (hexer\'s, cast\'s)	§5 VERIFICATION THE CONTROLS
+JL	control_h01	self	Y	—	H01's must-hold held §0 whole; HEAD's battle.gd carries JK's citation and reds §0's citation arm by construction	THE CONTROLS
+JL	control_subject	self	Y	—	C02's break absorbed by the reserve: the second spend's Entrench was short; break now buys outright	THE CONTROLS
+JL	control_subject	self	Y	—	C12a wanted the second arm's blows figures typed in; now reads the kept table off the tree under test	THE CONTROLS
+JL	recon	defect	Y	—	first build's baselines row for check_jl written at 72 before its count was read (57); check_de redded it	§5 VERIFICATION RECON 1
+JL	recon	expected	Y	—	check_gp rose 436 → 458: seeded road parted at the first free spend or hex; row moved	RECON 1
+JL	recon	expected	Y	—	check_iu 185 / 2 (§8 twice): the routing's close owed on the first build	RECON 1
+JL	acceptance	expected	Y	—	test_batch_an 6,022 → 6,029 inside its band (unseeded map); the prediction did not name it	§5 VERIFICATION THE ACCEPTANCE
+JL	landing	self	Y	—	rep_compare's pattern misses test_batch_an's verdict line, so it compared nothing there; read by hand	§5 VERIFICATION THE LANDING
+JL	landing	self	Y	—	report-landing prediction said 50 targets; the list's fiftieth line is gate_fixture, which the runner skips	THE LANDING
+JL	landing	expected	Y	—	check_jc and check_is read 170 codes against the acceptance's 169 with the report in	THE LANDING
+JM	premises	premise	N	—	'HZ's tree' is JH's 141b0be; HZ's own commit stands 37 earlier and carries no fight seed	§0 THE BRIEF's PREMISES, VERIFIED row 7; ruling 1
+JM	premises	premise	N	—	Gall on four heroes prices 2.02 of the Archer's basic and cools 3; brief's 1.9 and 2 used the Hexer's basic	§0 THE BRIEF's PREMISES, VERIFIED row 4; ruling 2
+JM	premises	premise	N	—	§0.2 is not one data edit: a data aoe on a special widens nothing but plate and hover; code needed	§0 THE BRIEF's PREMISES, VERIFIED row 5
+JM	premises	premise	UNCLEAR	—	'four drifts in the same direction' false: JI easier, JJ and JL harder, JK leaned easier	§0 THE BRIEF's PREMISES, VERIFIED row 8
+JM	premises	premise	N	—	'no job has ever set DOD_SIM_RELICS' false: JE §5, JF and JG set three relics	§0 THE BRIEF's PREMISES, VERIFIED row 13
+JM	premises	premise	N	—	Fleeting is grade 2, not 3 (3 is FLEETING_TURNS)	§0 THE BRIEF's PREMISES, VERIFIED row 18
+JM	premises	premise	N	—	Encumbered is graded 1, not —; its cooling count is 39 once Gall cools	§0 THE BRIEF's PREMISES, VERIFIED row 19
+JM	premises	premise	UNCLEAR	—	'Thin Air likeliest to move' false by arithmetic: 8.81 over its cut; only Bloodless further	§0 THE BRIEF's PREMISES, VERIFIED row 23
+JM	premises	premise	N	—	three of five grades rest on another instrument than the fight seed (run-seeded or the incumbent at Ruin)	§0 THE BRIEF's PREMISES, VERIFIED row 25; ruling 7
+JM	premises	premise	N	—	index's six owed triggers and FOUND AT JK's label already taken by JL; JL's landed routing file said otherwise	§0 THE BRIEF's PREMISES, VERIFIED row 26
+JM	premises	premise	UNCLEAR	—	JL's ruling 6 calls JA's census Warden's; it is Wanderer's	§0 THE BRIEF's PREMISES, VERIFIED row 2; ruling 9
+JM	premises	premise	N	—	relics as handed are a choice; holding three, the Collector's Grave pays gold instead of its relic	§0 THE BRIEF's PREMISES, VERIFIED row 16; ruling 4
+JM	premises	premise	UNCLEAR	—	of 'six new statuses on the warband' two are the warband's and four the heroes'	§0 THE BRIEF's PREMISES, VERIFIED row 20
+JM	premises	premise	UNCLEAR	—	Thin Air and Sap cut one bar at two doors (drip and setter); Thin Air carries no Sap	§0 THE BRIEF's PREMISES, VERIFIED row 22
+JM	premises	premise	UNCLEAR	—	Miasma's grade is the incumbent's at Ruin; '§0 doubles Gall's reach' is one hero to four	§0 THE BRIEF's PREMISES, VERIFIED row 21
+JM	blocks_reader	premise	N	—	'HZ' is JH's tree	§5 VERIFICATION THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED row 7
+JM	blocks_reader	premise	N	—	Gall bands 3 on the Orc Archer, not 2	THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED row 4
+JM	blocks_reader	defect	N	—	a special reads no reach: data aoe changes plate and hover only; hex arm built to lay on every hero	THE BLOCKS' READER; FOUND AT JM; §0 THE BRIEF's PREMISES, VERIFIED row 5
+JM	blocks_reader	expected	Y	—	four closed gates pin the WHERE block's words (check_jg §3c, check_jh §3d, check_jk §5, check_jl §5)	THE BLOCKS' READER; JM-routing.md NEEDED
+JM	blocks_reader	premise	N	—	Fleeting a 2 and Encumbered a 1	THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED rows 18, 19
+JM	blocks_reader	premise	N	—	three grades rest on another instrument; collision with IZ §0.1	THE BLOCKS' READER; FOUND AT JM
+JM	blocks_reader	stale-claim	Y	—	three of the five grades already stood within two errors of a cut, unnamed in the grades block	THE BLOCKS' READER; FOUND AT JM
+JM	blocks_reader	defect	Y	—	arc's move per card must be paired run by run; an unpaired move between two readings overstates its error	THE BLOCKS' READER; ruling 8
+JM	blocks_reader	premise	N	—	'no job ever set relics' false	THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED row 13
+JM	blocks_reader	premise	N	—	no reading ranks one crest rune against another; crest divergence cannot be closed on a measured basis	THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED row 15; ruling 5
+JM	blocks_reader	defect	N	—	a run opening with three relics loses the Collector's Grave's relic (events.gd pays 40 gold)	THE BLOCKS' READER; FOUND AT JM
+JM	blocks_reader	premise	N	—	the index's six owed triggers were JL's, already taken	THE BLOCKS' READER; §0 THE BRIEF's PREMISES, VERIFIED row 26
+JM	close_read	defect	Y	HIGH	token ARCH_B named both the Archer's basic and the archived bytes	§5 VERIFICATION THE CLOSE-READ
+JM	close_read	false-sentence	Y	HIGH	WHERE block: 'Gall and Fester are moves under JI's line' false once Gall cools 3	THE CLOSE-READ
+JM	close_read	false-sentence	Y	MEDIUM	ruling 1's count of batches	THE CLOSE-READ
+JM	close_read	false-sentence	Y	MEDIUM	ruling 10 described a split not yet run	THE CLOSE-READ
+JM	close_read	false-sentence	UNCLEAR	MEDIUM	Thin Air's distance from its cut	THE CLOSE-READ; §0 THE BRIEF's PREMISES, VERIFIED row 23
+JM	close_read	false-sentence	Y	MEDIUM	'draw3' written as the sim's; it is the drive probe's alone	THE CLOSE-READ; ruling 4
+JM	close_read	false-sentence	Y	MEDIUM	WHERE's 'baselines and pin manifest moved' false until the row and manifest were added	THE CLOSE-READ
+JM	close_read	stale-claim	Y	MEDIUM	FOUND AT JJ's census line	THE CLOSE-READ
+JM	close_read	stale-claim	Y	MEDIUM	THE SHARE CENSUS's sentence on which hexes cool	THE CLOSE-READ
+JM	close_read	false-sentence	Y	MEDIUM	ruling 6's talents	THE CLOSE-READ
+JM	close_read	defect	Y	MEDIUM	Gall's hover said 'Hits every ally', false for a hex no companion takes; code repaired to 'Reaches every hero'	THE CLOSE-READ; §0 THE REACH
+JM	close_read	false-sentence	Y	—	end boss also hands a relic; ruling 4 and premise 16 had repeated relics.gd's header (FOUND AT GB, not routed)	JM-routing.md FOUND AT THE CLOSE; FOUND AT JM
+JM	close_read	false-sentence	Y	—	ruling 5 omitted HP's and HQ's crest-rune shares (THE RUNE CHARTER, not routed)	JM-routing.md FOUND AT THE CLOSE
+JM	close_read	defect	Y	—	routing missed FOUND AT GB plainly; five more closed rows owed a trigger (crest choice, new gate, enemies.json…), added	JM-routing.md FOUND AT THE CLOSE; THE INDEX's UPKEEP
+JM	new_text_reader	stale-claim	Y	HIGH	the record stated Gall's hover as 'Hits every ally' in four places, written before the hover line changed	§5 VERIFICATION THE NEW TEXT's READER
+JM	new_text_reader	false-sentence	N	HIGH	THE ARC block signed §0's impurity 'toward harder' where table and split read easier; check_jm §1 now holds the sign	THE NEW TEXT's READER
+JM	new_text_reader	false-sentence	Y	HIGH	check_jm §3's digest presented as proof of where arms ran; it records the tree, now named a staleness tripwire	THE NEW TEXT's READER
+JM	new_text_reader	false-sentence	N	MEDIUM	census claim: JI's line does price the displaced blow; what the split questions is Gall's worth	THE NEW TEXT's READER
+JM	new_text_reader	defect	Y	MEDIUM	check_jm's reach arm had no companion on its board; one is summoned and asked now	THE NEW TEXT's READER
+JM	new_text_reader	defect	Y	MEDIUM	two stray files written into docs/reports/	THE NEW TEXT's READER; THE LITERAL SWEEP
+JM	new_text_reader	false-sentence	Y	MEDIUM	three false facts in the changelog and design note	THE NEW TEXT's READER
+JM	new_text_reader	false-sentence	N	MEDIUM	the first launch's two good arms unsaid	THE NEW TEXT's READER
+JM	new_text_reader	premise	Y	MEDIUM	brief's 'four batches moved the runner' false and unnamed: lane.sh, sim.sh, run_sim.gd byte-identical	THE NEW TEXT's READER; FOUND AT JM
+JM	new_text_reader	defect	Y	MEDIUM	check_jm §5 carried a WHERE-block arm (dropped)	THE NEW TEXT's READER
+JM	new_text_reader	stale-claim	UNCLEAR	LOW	four stale comments, three in battle.gd and one in check_jl.gd; mended, second replay	THE NEW TEXT's READER; THE DRIVES' OWN PROOFS
+JM	new_text_reader	false-sentence	Y	LOW	'all sixty' and 'over twenty runs' wordings	THE NEW TEXT's READER
+JM	new_text_reader	false-sentence	N	LOW	JE's 16 to 19 of 60	THE NEW TEXT's READER
+JM	new_text_reader	false-sentence	Y	LOW	falls a run's sign	THE NEW TEXT's READER
+JM	new_text_reader	false-sentence	Y	LOW	a doubled word	THE NEW TEXT's READER
+JM	new_text_reader	stale-claim	Y	LOW	DV30's source	THE NEW TEXT's READER
+JM	new_text_reader	false-sentence	Y	LOW	the WHERE block's file list	THE NEW TEXT's READER
+JM	new_text_reader	false-sentence	Y	LOW	FOUND AT JM's index label	THE NEW TEXT's READER
+JM	new_text_reader	defect	Y	LOW	the blow's price copied inline into the gate; now held to check_ji's	THE NEW TEXT's READER
+JM	new_text_reader	defect	Y	LOW	a tie test that kept only the last cut	THE NEW TEXT's READER
+JM	new_text_reader	defect	Y	LOW	two staleness tripwires unnamed	THE NEW TEXT's READER
+JM	new_text_reader	false-sentence	Y	LOW	'§0 doubles Gall's reach' (one hero to four)	THE NEW TEXT's READER
+JM	new_text_reader	defect	Y	LOW	project.godot's lane name	THE NEW TEXT's READER
+JM	fresh_reader	false-sentence	N	HIGH	premise row 12 signed §0's impurity 'toward harder'; record and split read easier	§5 VERIFICATION THE FRESH READER, ON THE ASSEMBLED REPORT; §0 THE BRIEF's PREMISES, VERIFIED row 12
+JM	fresh_reader	false-sentence	N	HIGH	first landing launch said to have read nothing; two of its eleven arms ran to the end	THE FRESH READER
+JM	fresh_reader	false-sentence	Y	HIGH	user-data folders said unmoved; one was new, handed out by lane.sh to a busy lane	THE FRESH READER; TWO READINGS
+JM	fresh_reader	false-sentence	N	HIGH	split said the census price ignores the blow Gall displaces; JI's line prices it against that blow	THE FRESH READER; §1 SPLIT AT JL's TREE
+JM	fresh_reader	false-sentence	Y	MEDIUM	pooled level and paired difference weighted differently with nothing saying so	THE FRESH READER; §1, §2
+JM	fresh_reader	false-sentence	Y	MEDIUM	the four batches' chain read across mixed instruments; now their four health readings	THE FRESH READER; §1
+JM	fresh_reader	false-sentence	Y	MEDIUM	bargains-against-relics claim unpaired; now read paired against the arc's line	THE FRESH READER; §2
+JM	fresh_reader	false-sentence	Y	MEDIUM	Thin Air's arms finished 23 → 14 of 60 across the arc (z −2.87), unreported	THE FRESH READER; §3; FOUND AT JM
+JM	fresh_reader	defect	Y	MEDIUM	split's loss rows labelled the wrong arms (tools/jm_arc_table.py)	THE FRESH READER; §1
+JM	fresh_reader	false-sentence	Y	MEDIUM	count of JL's rulings-block citations (eleven in the state, one in combat-rules.md)	THE FRESH READER; §0 THE BRIEF's PREMISES, VERIFIED row 2
+JM	fresh_reader	false-sentence	N	MEDIUM	JE's three-relic arms (s5c–s5h, 16 to 19 of 60)	THE FRESH READER; §0 THE BRIEF's PREMISES, VERIFIED row 13
+JM	fresh_reader	false-sentence	Y	MEDIUM	§3's instrument named as the brief's	THE FRESH READER; §3
+JM	fresh_reader	false-sentence	Y	MEDIUM	IZ §0.1's collision covers two grades, not three	THE FRESH READER; ruling 7
+JM	fresh_reader	false-sentence	Y	MEDIUM	two premise rows (unnamed)	THE FRESH READER
+JM	fresh_reader	false-sentence	Y	MEDIUM	the probe finding's title and lesson	THE FRESH READER; FOUND AT JM
+JM	fresh_reader	false-sentence	Y	MEDIUM	Gall's clean-board choices not given as a range	THE FRESH READER; §0 THE REACH
+JM	fresh_reader	false-sentence	Y	MEDIUM	THE ORDER's times, re-read off stat	THE FRESH READER; THE ORDER
+JM	fresh_reader	false-sentence	Y	LOW	the drive line counts' end markers	THE FRESH READER
+JM	fresh_reader	stale-claim	Y	LOW	literal sweep not re-run on the tree that lands	THE FRESH READER; THE LITERAL SWEEP
+JM	fresh_reader	stale-claim	UNCLEAR	LOW	four stale comments	THE FRESH READER
+JM	fresh_reader	defect	Y	LOW	controls' scratch copies unlogged (now logs/ctl_dry.out)	THE FRESH READER; THE CONTROLS
+JM	fresh_reader	false-sentence	Y	LOW	the archive's growth not stated beside what left the state	THE FRESH READER; TWO READINGS
+JM	fresh_reader	false-sentence	Y	LOW	a bare events.gd citation	THE FRESH READER
+JM	docs_subset	expected	Y	—	first candidate's subset: check_iu 2 reds, the routing's close not yet written; green after	§5 VERIFICATION THE ORDER
+JM	code_stage	expected	Y	—	HEAD's check_jl on the new code: four failures, each a Gall line, read before re-pointing at intent	§0 HEAD's check_jl ON THE NEW CODE
+JM	code_stage	expected	Y	—	check_jm on the code alone: sixteen reds where the documents were not yet written	§5 VERIFICATION THE ORDER
+JM	control_subject	self	Y	—	C01 and C02 also redded §3's tree digest (a tripwire by design); must-holds re-named to §3's other arms	§5 VERIFICATION THE CONTROLS
+JM	control_subject	self	Y	—	C05 wanted a FAIL text the gate prints with its apostrophe escaped	THE CONTROLS
+JM	control_subject	self	Y	—	R01 wanted the WHERE block, which check_jm §5 no longer reads	THE CONTROLS
+JM	control_subject	defect	Y	—	C01 exposed check_jm's selection arm counting every hex of Gall's carrier, not Gall: it caught the Hexer's Sap	THE CONTROLS
+JM	control_subject	defect	Y	—	C01 exposed check_jm §5's words arm asking of every hex of Gall's carrier rather than of Gall	THE CONTROLS
+JM	recon	expected	Y	—	check_gp fell 458 → 436: the Archer's fourth move parts the seeded road; HEAD's check_gp on HEAD read 458	§5 VERIFICATION RECON 1
+JM	landing	self	Y	—	rep_compare.py still named JL's work folder and would have compared JL's logs; re-pointed at the close	§5 VERIFICATION THE LANDING
+JM	landing	self	Y	—	rep_compare's pattern misses test_batch_an's verdict: compared two empty lines; hand-read 6,033 against 6,027, in band	THE LANDING
+JM	landing	expected	Y	—	check_jc and check_is read 171 codes against 170 with the report in; bet 2 lost on test_batch_an	THE LANDING
+JM	other	self	Y	—	drive launch: JL's hex probe anchored from its indent matched a deeper line; 9 of 11 lanes failed to load battle.gd	§1 PREMISE 2; FOUND AT JM; THE ORDER
+JM	unattributed	false-sentence	UNCLEAR	—	JM-routing.md gives blocks' reader findings born 13:01:43, stat reads 13:01:49; 'found at the close', finder unnamed; landed unmended	§5 VERIFICATION THE LANDING; JM-routing.md OPENED
+JN	premises	premise	UNCLEAR	—	Cleric's cut door is a choice (bar's setter); four unstated consequences: Sap compounds, Recant/Siphon/potion cut, IV probe short	§0 PREMISES, row 7
+JN	premises	premise	UNCLEAR	—	healing claws back half to two-thirds of added pressure: false as a general figure, held of Ambushed only	§0 PREMISES, row 8
+JN	premises	premise	N	—	Parched and Warded, keyed on hero resource, stand at a tie with the 1.78 cut, unnamed by brief	§0 PREMISES, row 9; FOUND AT JN (the blocks' reader)
+JN	premises	premise	UNCLEAR	—	Boil Over was 0.8% of the caster's Attack a Rage point, never a share of the target; floor is a cast minimum	§0 PREMISES, row 11
+JN	premises	premise	UNCLEAR	—	no record of the Warrior's Rage at a Boil Over cast existed; playthrough never drafted it	§0 PREMISES, row 12
+JN	premises	premise	UNCLEAR	—	Sanctity's step not retirable: Hierophant's engine, potency half, IP §0.1 and IL §1 wait on it	§0 PREMISES, row 13
+JN	premises	premise	UNCLEAR	—	derivation names ten kinds, not about eleven; eleven was the content hole's count, three with no second damaging move	§0 PREMISES, row 16
+JN	premises	premise	UNCLEAR	—	kit row's third field is Break damage, unpriced by JI's line; three raised moves are Break moves	§0 PREMISES, row 17
+JN	premises	premise	UNCLEAR	—	Blood Tribute deals damage, so the Bloodcaller is one of the ten; two unnamed kinds lack a second damaging move	§0 PREMISES, row 19
+JN	premises	premise	UNCLEAR	—	every absolute figure untalented is false: sim default wears whole tree; incumbent at Ruin talented	§0 PREMISES, row 22
+JN	premises	premise	UNCLEAR	—	bot takes talents only by tier depth, cannot choose cells; tier-1-whole policy named DV36	§0 PREMISES, row 23
+JN	blocks_reader	defect	Y	—	plate intent glyph changes on eight raised moves (afflict and crush now read strike)	FOUND AT JN AND NOT FIXED
+JN	blocks_reader	stale-claim	Y	—	Encumbered now binds nine more cooling moves	FOUND AT JN AND NOT FIXED
+JN	blocks_reader	stale-claim	N	—	Parched and Warded grades at a tie with the Cleric's cut, not re-read	FOUND AT JN AND NOT FIXED; §0 PREMISES row 9
+JN	close_read	false-sentence	Y	—	content hole called closed while three of its eleven kinds still attack with a basic alone	§4 THE CLOSE-READ; FOUND AT JN
+JN	close_read	stale-claim	N	—	Boil Over's old shape in present tense in the state and master.html (new text's reader found master row too)	§4 THE CLOSE-READ
+JN	close_read	stale-claim	Y	—	FOUND AT JI still priced Blood Tribute at 0.67	§4 THE CLOSE-READ
+JN	close_read	defect	Y	—	hero-panel hover (Run.ability_hover) told the player Boil Over scales at 150% of Attack, made false by JN's change	§4 THE CLOSE-READ
+JN	close_read	false-sentence	Y	—	wording, pointer to an archived item, readings row naming the wrong block, seven gates where eight	§4 THE CLOSE-READ
+JN	close_read	stale-claim	Y	—	THE CLASS MERGE plainly bore: Sanctity's potency layer is what waits on Sanctity's step; routed, not followed	JN-routing.md FOUND AT THE CLOSE
+JN	close_read	defect	Y	—	Arm B's tier 1 wears the +20 pool node: Mana heroes open at 100 of 120, biasing against the talented arm	JN-routing.md FOUND AT THE CLOSE; FOUND AT JN
+JN	close_read	defect	Y	—	routing misses: GK's rulings, pricing questions, FOUND AT IH not routed, GW and GR routed-not-followed; triggers added, nothing false	JN-routing.md FOUND AT THE CLOSE
+JN	new_text_reader	stale-claim	N	—	master row and a comment stated Boil Over's old shape (close-read found the state and master too)	§4 THE NEW TEXT's READER
+JN	new_text_reader	false-sentence	Y	—	deck's own none falling 54 to 27 of 60 (-9.18 points) unstated, so the other grades are stale	§4 THE NEW TEXT's READER; §0 THIN AIR
+JN	new_text_reader	defect	Y	—	check_jn §0's carried-bar arm could not red: the Cleric carried a full bar	§4 THE NEW TEXT's READER
+JN	new_text_reader	defect	N	—	check_jn §1 counted any moved move as raised (C04 found it first)	§4 THE NEW TEXT's READER; THE CONTROLS
+JN	new_text_reader	defect	Y	—	a needle pinned the batch code JN §0 against CLAUDE.md; re-pointed to the rule's words	§4 THE NEW TEXT's READER
+JN	new_text_reader	defect	Y	—	check_ea §3's batch-code pattern wants the word BATCH, so a JN-code pin passes; left as named	§4 THE NEW TEXT's READER; FOUND AT JN
+JN	new_text_reader	false-sentence	Y	—	rules census claimed a hold that only a print makes (S2-098 now NONE)	§4 THE NEW TEXT's READER
+JN	new_text_reader	defect	Y	—	hero-sheet Mana and Attack tooltips wrong after the change; repaired to read off the constant	§4 THE NEW TEXT's READER
+JN	new_text_reader	defect	Y	—	a Boil Over resolves check dropped from test_batch_cp; restored (586 to 588)	§4 THE NEW TEXT's READER
+JN	new_text_reader	stale-claim	Y	—	cut reaches Resurrection, Divine Plea and Dark Pact Perfects, Font of Light; their words print the uncut figure (left)	§4 THE NEW TEXT's READER; FOUND AT JN
+JN	fresh_reader	false-sentence	Y	—	Thin Air's margin misread as 12.22 points; it is 5.64 over its floor at 12.22	§4 THE FRESH READER
+JN	fresh_reader	defect	Y	—	repair seating the Cleric at 40 still left check_jn §0's carried-bar arm unable to red; became an order pin, C16	§4 THE FRESH READER; THE NEW TEXT's READER
+JN	fresh_reader	false-sentence	Y	—	plain words stated tier 1's upper bound as what a player holds	§4 THE FRESH READER
+JN	fresh_reader	false-sentence	Y	—	Arm B's health row mixed every-fight levels with a paired difference	§4 THE FRESH READER
+JN	fresh_reader	false-sentence	Y	—	controls' anchor dry check claimed beyond what a log keeps	§4 THE FRESH READER; THE CONTROLS
+JN	fresh_reader	false-sentence	Y	—	six controls counted as five	§4 THE FRESH READER
+JN	fresh_reader	false-sentence	Y	—	THE ORDER gave birth times as last writes and omitted the tree's last rebuild	§4 THE FRESH READER
+JN	fresh_reader	stale-claim	Y	—	check_go's repair missing from the state's instruments (WHERE block)	§4 THE FRESH READER; WHAT THE PRE-RUN DID NOT READ
+JN	fresh_reader	stale-claim	Y	—	near-ceiling positional reads stale on the tree that lands	§4 THE FRESH READER
+JN	fresh_reader	false-sentence	Y	—	ruling 5 stated its 150 twice and one parenthetical twice	§4 THE FRESH READER
+JN	fresh_reader	false-sentence	Y	—	archive preamble's two passes swapped	§4 THE FRESH READER
+JN	fresh_reader	false-sentence	Y	—	replay line counts counted each run-end marker as a line	§4 THE FRESH READER
+JN	fresh_reader	false-sentence	Y	—	FOUND AT JN sentence on the +20 pool and WHERE block's account of what the archive took	WHAT THE PRE-RUN DID NOT READ
+JN	fresh_reader	false-sentence	Y	MEDIUM	report did not say what the pre-run had not read (M7); post-run subset, sweep and controls added	WHAT THE PRE-RUN DID NOT READ
+JN	fresh_reader	false-sentence	Y	—	unit.gd comment calls the doubly cut Cleric galled-and-sapped, a loose word; left to keep the game digest	§4 THE FRESH READER
+JN	litsweep	expected	Y	—	18 literals lost (re-pointed needles, archived state items, lane name), each traced; one more at final (JH archive)	§4 THE LITERAL SWEEP
+JN	docs_subset	defect	Y	—	check_ji §2's 400-character window: JN's added clause pushed its phrase to 402; clause shortened	§4 THE SUBSET, ON THE CANDIDATE
+JN	docs_subset	stale-claim	Y	—	check_is §5: index rows over 400 B and still naming items JN archived; five relabelled	§4 THE SUBSET, ON THE CANDIDATE
+JN	docs_subset	defect	Y	—	check_ec §2 read check_jn's presence test as an absence pin; read moved through a variable	§4 THE SUBSET, ON THE CANDIDATE
+JN	docs_subset	expected	Y	—	check_iu §8 red until the close render fills the routing's third list; predicted and carried	§4 THE SUBSET, ON THE CANDIDATE
+JN	code_stage	expected	Y	—	HEAD's check_ic §1c(b) on new code read Siphon 1 Mana not 2 on a Devout; re-pointed to the cut	§4 THE SUBSET; THE CONTROLS (C14, C14h)
+JN	control_subject	defect	N	—	C04: check_jn §1 counted any moved move as raised, so a move already clearing could be raised unseen	§4 THE CONTROLS
+JN	control_subject	self	Y	—	driver's wanted texts lacked Godot's backslash-apostrophe escape inside Array prints (C01, C02, C05)	§4 THE CONTROLS
+JN	control_subject	self	Y	—	C10: constant read through a float helper printed 14.0; gate now prints %d	§4 THE CONTROLS
+JN	control_subject	self	Y	—	Thin Air digest tripwire sat under a must-hold naming all of §0 (C08b, C13)	§4 THE CONTROLS
+JN	recon	defect	Y	—	check_go §12 red: Bastion silent 4,019 frames, a coin the raise re-rolled; repaired to intent (C15)	§4 RECON 1
+JN	recon	expected	Y	—	check_gp rose 436 to 450: drafting road re-dealt; HEAD's gate on HEAD 436/0	§4 RECON 1
+JN	unattributed	defect	UNCLEAR	—	readers' repairs took state.md 2.25 KiB past its 440 KiB ceiling; five records archived	§4 THE REPAIRS AND THE CEILING
+JN	unattributed	defect	UNCLEAR	—	Poison Arrow now lays its debuff one turn longer than its cooldown	FOUND AT JN AND NOT FIXED
+JN	unattributed	defect	UNCLEAR	—	Blood Tribute banded off its fresh figure (1.40) though it prices 3.15 with five fallen	FOUND AT JN AND NOT FIXED
+JN	unattributed	stale-claim	UNCLEAR	—	Rally's worth rose with the raised blows; check_jk §2 green on a stale median-basic price	FOUND AT JN AND NOT FIXED
+JN	unattributed	defect	UNCLEAR	—	three later moves still under the line: Chieftain's Maul 1.21, Sundering Decree 0.74, Bone Rattle 0.36	FOUND AT JN AND NOT FIXED
+JN	unattributed	defect	UNCLEAR	—	kept JN-arc.tsv carried a doubled label; re-written at 03:47:57	§4 THE ORDER
+JO	premises	premise	N	—	a Break costs more than its lost turn: armour x0.7, +25% crit against, no Block or parry; named, not priced	§0 PREMISES, row 7; FOUND AT JO (the blocks' reader)
+JO	premises	premise	UNCLEAR	—	Break meter is not one number: fills at 100/Constitution, 85 to 130 by spec; reference mean 101.25 taken	§0 PREMISES, row 9
+JO	premises	premise	N	—	pricing the basic's Break too sends seven of ten under the line; none comes down, against the brief's direction	§0 PREMISES, row 10; THE BLOCKS' READER
+JO	premises	premise	UNCLEAR	—	repaired line reaches past the ten: nine bands move (three heals, five spends, Chieftain's Maul); held	§0 PREMISES, row 11
+JO	premises	premise	UNCLEAR	—	four of the ten lay an unpriced status, not six; none lays Dazed	§0 PREMISES, row 12
+JO	premises	premise	UNCLEAR	—	Shielding and Regalia lay shielded on a hero when Psychosis turns a support cast	§0 PREMISES, row 13
+JO	premises	premise	UNCLEAR	—	Fester on the Wretched Bellow with its tick priced gives band 3, not 2	§0 PREMISES, row 14
+JO	premises	premise	UNCLEAR	—	Bone Rattle prices 0.74 on the repaired line, not 0.36	§0 PREMISES, row 15
+JO	premises	premise	UNCLEAR	—	Orc Archer's only damaging move laying nothing is its basic, so Gall is given damage, not folded	§0 PREMISES, row 16
+JO	premises	premise	UNCLEAR	—	Grave Totem's basic is 18 in data but 9 at Attack 50; Mire clears at 45	§0 PREMISES, row 17
+JO	premises	premise	UNCLEAR	—	an area hex blow strikes companions too, superseding JM's ruling that a companion never takes one	§0 PREMISES, row 20
+JO	premises	premise	N	—	count off the gates' fights is thin: carriers seldom act, most fights attacks-off (blocks' reader's coverage tally)	§0 PREMISES, row 21
+JO	premises	premise	UNCLEAR	—	Chieftain's Maul clears the line once its 56 Break is priced (1.44); band held at 0	§0 PREMISES, row 22
+JO	blocks_reader	defect	Y	—	Break price assumes every point fills a meter that breaks: census laid 246.3 Break damage a Break, about 2.4 meters	FOUND AT JO AND NOT FIXED
+JO	blocks_reader	premise	N	—	recommended reading A (Break on move alone, ten brought down): taken reading B runs against the brief	§5 THE BLOCKS' READER; ruling 1; §0 row 10
+JO	blocks_reader	defect	N	—	coverage tally of HEAD's acceptance logs: hex moves cast under a handful of times; led to check_jo §3 carrier turns	§0 PREMISES, row 21
+JO	close_read	stale-claim	Y	LOW	FOUND AT HA cited a check_di line JO's new comment moved (routed, not followed); now cited by its text	§5 THE CLOSE-READ; JO-routing.md THE CLOSE-READ
+JO	close_read	false-sentence	Y	LOW	ruling 5's can be blocked holds only for heroes with a Block source (FOUND AT GP and FP block_chance, not routed)	JO-routing.md THE CLOSE-READ
+JO	close_read	stale-claim	N	—	WHERE block's content-hole sentence stale (new text's reader found it already mended)	§5 THE CLOSE-READ
+JO	close_read	stale-claim	Y	—	WHAT THE RAISE DID stated Break unpriced in the present tense	§5 THE CLOSE-READ
+JO	close_read	stale-claim	Y	—	LOOK-LIST's hex row and JO's own row stale	§5 THE CLOSE-READ
+JO	close_read	stale-claim	Y	—	FOUND AT JM's hex arm stale once hexes ride blows	§5 THE CLOSE-READ
+JO	close_read	stale-claim	Y	—	THE CROSS-TARGET SUPERSESSIONS' three rows stale	§5 THE CLOSE-READ
+JO	close_read	stale-claim	Y	—	CX concern (debuff against cooldown) not re-read on the hexes' blows	§5 THE CLOSE-READ
+JO	close_read	false-sentence	Y	—	the state file's header still named JN	§5 THE CLOSE-READ
+JO	close_read	defect	Y	—	an unfilled template token beside which the sizes were computed	§5 THE CLOSE-READ
+JO	close_read	stale-claim	Y	HIGH/MEDIUM	opened blocks JO made false and left: LADDER, SPENDS, SHARE CENSUS, IX, JI, JN, JL, GRADES, SANCTITY	JO-routing.md THE CLOSE-READ (HIGH-3-6, MED-6-12)
+JO	new_text_reader	stale-claim	UNCLEAR	—	combat-rules.md rule of record still priced what §1 and §2 changed (mended before it wrote; mender unstated)	§5 THE NEW TEXT's READER
+JO	new_text_reader	stale-claim	N	—	WHERE block's nine of its eleven (already mended; close-read's content-hole sentence)	§5 THE NEW TEXT's READER
+JO	new_text_reader	stale-claim	Y	—	Momentum's live pair, a reading the floor retires, not recorded beside its rule	§5 THE NEW TEXT's READER
+JO	new_text_reader	false-sentence	Y	—	Rally's 87.8 figure	§5 THE NEW TEXT's READER
+JO	new_text_reader	defect	Y	—	spends' held bands could not go stale; check_jk §2 now asks each (C17)	§5 THE NEW TEXT's READER
+JO	new_text_reader	defect	Y	—	nothing-else-moved pinned on JO's own data; check_jo §1 now digests the rest against JN's (C18)	§5 THE NEW TEXT's READER
+JO	new_text_reader	false-sentence	Y	—	floor paragraph: designer's sentence to stand verbatim, JO's reading to be marked as the batch's	§5 THE NEW TEXT's READER
+JO	new_text_reader	false-sentence	N	—	reading B's direction against the brief not stated plainly in ruling 1, row 10, findings (fresh reader too)	§5 THE NEW TEXT's READER
+JO	new_text_reader	stale-claim	Y	—	stale comments and prints in five gates and two in battle.gd	§5 THE NEW TEXT's READER
+JO	new_text_reader	defect	Y	—	count tool's rebound and area-cast weaknesses	§5 THE NEW TEXT's READER
+JO	new_text_reader	defect	Y	—	R01's reach: a price moved in ruling 1 alone went uncontrolled; C19 added	§5 THE NEW TEXT's READER; THE CONTROLS
+JO	new_text_reader	defect	Y	—	the meter's four heroes not read against check_ix's census party	§5 THE NEW TEXT's READER
+JO	new_text_reader	defect	Y	—	line prices a DoT tick unrounded (The Long Dark 3.45 against 3 dealt); no band moves; recorded	§5 THE NEW TEXT's READER; FOUND AT JO
+JO	fresh_reader	false-sentence	Y	—	count's explanation false: carriers are fielded (Archer 110 fights) but seldom act; 270 of 322 fights attacks-off	§5 THE FRESH READER; §3
+JO	fresh_reader	false-sentence	Y	—	recon 1 prediction's 14:34:25 birth no longer on disk (rewritten 15:40:34); order now rests on the transcript	§5 THE FRESH READER; THE ORDER
+JO	fresh_reader	false-sentence	N	—	ruling 1's alternative not one thing everywhere; taken reading's direction unstated (new text's reader too)	§5 THE FRESH READER
+JO	fresh_reader	false-sentence	Y	—	THE ORDER claimed blocks' reader findings preceded the first edit script; met only before any edit reached a lane	§5 THE FRESH READER; THE ORDER
+JO	fresh_reader	false-sentence	Y	—	recon 1's end and copy times not what the files show	§5 THE FRESH READER
+JO	fresh_reader	defect	Y	MEDIUM	controls' dry check ran on the 15:38 rebuild and kept no log (M4); retaken on the frozen tree, kept	§5 THE FRESH READER; THE CONTROLS
+JO	fresh_reader	defect	Y	MEDIUM	brief's C12 and C08 cells implied three controls never run: C12b, C12c, C08b (M5)	§5 THE FRESH READER; THE CONTROLS
+JO	fresh_reader	false-sentence	Y	—	§3 never established that recon 1's tree behaves as the tree that lands	§5 THE FRESH READER
+JO	fresh_reader	false-sentence	Y	LOW	floor's paragraph had dropped two items of the designer's list	§5 THE FRESH READER
+JO	fresh_reader	false-sentence	Y	LOW	LOW group: positional times, premise tally 13, kinds under Attack 100, 2.4 meters, ruling 5's Block, row 23, H01's reach	§5 THE FRESH READER
+JO	fresh_reader	false-sentence	Y	LOW	L9 (half not taken): Gall's and the Bellow's Every hero descriptions against a Block; data left	§5 THE FRESH READER
+JO	positional	defect	Y	—	row 304 OFF-SUBJECT: JO's two statics sat inside check_ji::_data_cd's window; moved above the first func	§5 ALL 489 POSITIONAL READS
+JO	litsweep	defect	Y	—	check_jn §0's corrections pin lost when JO's archive moved the literal; re-pointed to the archive	§5 THE LITERAL SWEEP
+JO	litsweep	expected	Y	—	48, 57, then 55 literals lost, each read at holders; one absence pin met by the degenerate . in battle.gd	§5 THE LITERAL SWEEP
+JO	docs_subset	expected	Y	—	check_jo §3 red until recon 1's logs supply the count table	§5 THE SUBSETS
+JO	docs_subset	defect	Y	—	check_ji §2 window: close-read's longer cooling-moves list pushed its phrase to 429 of 400; shortened to 397	§5 THE SUBSETS; FOUND AT JO
+JO	docs_subset	defect	Y	—	check_is §5: five relabelled index rows ran past 400 B (412 to 548); rewritten	§5 THE SUBSETS
+JO	docs_subset	defect	Y	—	check_jm §2, check_iw §3 red: archiving for room moved THE SIM's FIGURES they pin; manifest and sweep blind	§5 THE SUBSETS; THE LITERAL SWEEP
+JO	control_subject	self	Y	—	C12 and C19 wanted texts lacked Godot's backslash-apostrophe escape in Array prints (recurs from JN)	§5 THE CONTROLS
+JO	recon	expected	Y	—	check_gp rose 450 to 481: seeded road moved; HEAD's gate on HEAD 450/0	§5 RECON 1
+JO	count	defect	N	—	battery's fights seldom let carriers act: Swampy Grasp, Blood Tribute never cast; Sap and Mire laid twice each	§3 THE COUNT; FOUND AT JO
+JO	other	defect	Y	—	user-data count found one new folder made at 14:31:48 by scratch lane f1-2; inside spent pattern	§5 TWO READINGS (user-data folders)
+JO	unattributed	false-sentence	UNCLEAR	—	routing's NEEDED line said 24 where 26 of 111 blocks changed; pre-run's first launch stopped to correct it	§5 THE ORDER; THE PRE-RUN OF RECORD
+JO	unattributed	defect	UNCLEAR	—	recon's battery-out folder held earlier batteries' logs; count limited to recon's 181 logs by .ran	§5 RECON 1
+JO	unattributed	defect	UNCLEAR	—	Break term is a larger share of weak-Attack kinds' worth and shrinks deeper in a run	FOUND AT JO AND NOT FIXED
+JP	premises	premise	N	—	dial 1 is one constant but five texts state the cut, two would print 0% less; check_jn §0 asks cut above 0	§0 PREMISES, row 6; THE BLOCKS' READER
+JP	premises	premise	UNCLEAR	—	Cleric's 15.72 points were read on JN's §0 arm, which moved Boil Over's rate beside the cut	§0 PREMISES, row 7
+JP	premises	premise	N	—	dial 2 alone leaves seven cooling moves under the line; check_ji §1a reds unless their cooldowns go	§0 PREMISES, row 8; THE BLOCKS' READER
+JP	premises	premise	UNCLEAR	—	JN's ten raises are nineteen keys: ten damage keys and nine cooldown keys	§0 PREMISES, row 9
+JP	premises	premise	N	—	about fifty-two attacking fights: 52 lack a skip line, 51 had attacks on, 43 had a warband strike	§0 PREMISES, row 11; THE BLOCKS' READER
+JP	premises	premise	UNCLEAR	—	no drain hook was reserved at JJ; JJ built the kill's fill	§0 PREMISES, row 14
+JP	premises	premise	UNCLEAR	—	Block-source list omits Shieldwall and Bulwark Line; Covering Guard only lends the Warden's chance; Shieldmaster 0.05	§0 PREMISES, row 16
+JP	premises	premise	N	—	Hallowed (an Empowered Divine Plea's) refuses all four hexes before they land	§0 PREMISES, row 17; THE BLOCKS' READER
+JP	premises	premise	N	—	a hero's Break discards no intent: a hero declares nothing	§0 PREMISES, row 18; THE BLOCKS' READER
+JP	premises	premise	N	—	every warband body has its own Break meter; the asymmetry runs the other way	§0 PREMISES, row 19; THE BLOCKS' READER
+JP	premises	premise	UNCLEAR	—	JO's brief named Blood Tribute among its three, not the Bellow	§0 PREMISES, row 24
+JP	premises	premise	UNCLEAR	—	party's kit not as before JI: JN cut the Cleric's Mana and made Boil Over flat	§0 PREMISES, row 25
+JP	premises	premise	UNCLEAR	—	seventeen raises fell on ten moves; JO also raised Bone Rattle, Gall and Mire	§0 PREMISES, row 26
+JP	blocks_reader	premise	N	—	attacking-fight definition needs a warband strike: 43 not 52 (check_gj §5's constructed defeat, 9 with no strike)	§4 THE BLOCKS' READER; §1
+JP	blocks_reader	premise	N	—	dial 1's five texts and the gates each dial moves	§4 THE BLOCKS' READER
+JP	blocks_reader	premise	N	—	a Hallowed refusal already exists	§4 THE BLOCKS' READER
+JP	blocks_reader	premise	N	—	inverted Break premise: heroes declare nothing; every warband body has a meter	§4 THE BLOCKS' READER
+JP	blocks_reader	defect	Y	—	Malice floor would hide a drain: a drain between declaration and buy lets a spend land underpaid	§4 THE BLOCKS' READER; FOUND AT JP
+JP	blocks_reader	defect	Y	—	control C08 (JO's count edited) had no holder in the gate	§4 THE BLOCKS' READER
+JP	blocks_reader	defect	Y	—	WHERE block carries five needles closed gates pin	§4 THE BLOCKS' READER
+JP	blocks_reader	defect	Y	—	check_jn §0 heading trap	§4 THE BLOCKS' READER
+JP	blocks_reader	defect	Y	—	routing file's heading	§4 THE BLOCKS' READER
+JP	close_read	stale-claim	Y	—	THE INDEX absent from routing; dial blocks only re-stamped so no trigger names a dial; answers row lacked block_chance	JP-routing.md FOUND AT THE CLOSE; §4 THE CLOSE-READ
+JP	close_read	stale-claim	Y	—	FOUND AT JO row kept hex-count triggers after its item was archived; claims row named nonexistent IV's RULINGS OWED	JP-routing.md FOUND AT THE CLOSE
+JP	close_read	defect	Y	—	FOUND AT HN not routed: Talents.party_condition_met prices a shape answer 3 ignored; trigger condition on owed	JP-routing.md FOUND AT THE CLOSE
+JP	close_read	defect	Y	—	Small, and still owed not routed: check_da §3 ratchet binds ruling 2's gate to the fixture; trigger owed	JP-routing.md FOUND AT THE CLOSE
+JP	close_read	false-sentence	N	—	check_jp §1 holds every one was false: it held 11 of 44 attacks-off switches (new text's reader too)	§4 THE CLOSE-READ; JP-routing.md
+JP	close_read	expected	Y	—	count table's placeholders unfilled while recon 1 ran; filled from recon 1	§4 THE CLOSE-READ
+JP	close_read	false-sentence	N	—	WHERE block said four texts state dial 1's cut, not five (blocks' and new text's readers too)	§4 THE CLOSE-READ
+JP	close_read	false-sentence	N	—	count rule said no warband mechanic though Malice still fills; now no warband move	§4 THE CLOSE-READ
+JP	close_read	stale-claim	Y	—	FOUND AT JP premise item missing six departures	§4 THE CLOSE-READ
+JP	close_read	false-sentence	Y	—	ruling 4's 1.54 to 1.68 figures	§4 THE CLOSE-READ
+JP	close_read	false-sentence	Y	—	dial 1's 15.72 reading carried without its error and population	§4 THE CLOSE-READ
+JP	close_read	stale-claim	Y	—	drain hazard not recorded in the state	§4 THE CLOSE-READ
+JP	close_read	stale-claim	Y	—	spends' block omitted that a Break and a hold discard a declared spend	§4 THE CLOSE-READ; JP-routing.md NEEDED
+JP	close_read	defect	N	—	nine cooldown keys had no needle; C07d added (new text's reader too)	§4 THE CLOSE-READ
+JP	new_text_reader	defect	N	—	attacks-off switch population is 44 sites and check_jp §1 held fewer; all held now, C03b on a board	§4 THE NEW TEXT's READER
+JP	new_text_reader	false-sentence	N	—	dial 1's cut stated by five texts	§4 THE NEW TEXT's READER
+JP	new_text_reader	stale-claim	Y	—	battle.gd Malice ledger comment says nothing reads it; three heals' log lines print off spent	§4 THE NEW TEXT's READER; FOUND AT JP
+JP	new_text_reader	false-sentence	Y	—	cleanse list missed the tier-2 talent's two cleanses	§4 THE NEW TEXT's READER
+JP	new_text_reader	false-sentence	N	—	count rule's wording	§4 THE NEW TEXT's READER
+JP	new_text_reader	false-sentence	Y	—	ruling 4's alternative named as the line's half of JO's reversal, with the four bands it moves	§4 THE NEW TEXT's READER
+JP	new_text_reader	defect	Y	—	count tool counted a blocked warband blow as a strike and cast; no figure moved	§4 THE NEW TEXT's READER
+JP	new_text_reader	false-sentence	Y	—	recon 1's check_fh road is 20 fights	§4 THE NEW TEXT's READER
+JP	new_text_reader	defect	Y	—	controls C05d and C05e (a class card, a warband move authored) missing	§4 THE NEW TEXT's READER
+JP	new_text_reader	defect	N	—	nine cooldown keys' needle (C07d)	§4 THE NEW TEXT's READER
+JP	new_text_reader	false-sentence	N	LOW	Shieldmaster's Block omitted (fresh reader's M1 too)	§4 THE NEW TEXT's READER
+JP	new_text_reader	false-sentence	Y	LOW	H01 reported as a control that passed; it is moot, no code moved	§4 THE NEW TEXT's READER; THE CONTROLS
+JP	new_text_reader	false-sentence	Y	LOW	LOW group: changelog's nine of those moves, Heads Down and hijacks as levers, two more dormant cleanse sites	§4 THE NEW TEXT's READER
+JP	fresh_reader	false-sentence	Y	HIGH	verdict tied Swampy Grasp to the Ash-Wrought Tyrant; it is the Bog Troll's, fielded once (H1)	§4 THE FRESH READER
+JP	fresh_reader	false-sentence	Y	HIGH	base-Block paragraph wrong: Warden's 0.10 replaces the default, sheet reads the spec, gate_fixture -10.0 an overwrite (H2)	§4 THE FRESH READER
+JP	fresh_reader	false-sentence	N	MEDIUM	Shieldmaster's 0.05 missing from premise row 16 and the readout (M1)	§4 THE FRESH READER
+JP	fresh_reader	false-sentence	Y	MEDIUM	36 openings are 31 distinct encounters (M2)	§4 THE FRESH READER
+JP	fresh_reader	false-sentence	Y	MEDIUM	check_gj §5's fight ran with the switch set, so 271 had it (M3)	§4 THE FRESH READER
+JP	fresh_reader	false-sentence	Y	MEDIUM	THE ORDER's times written as births; 04:24:25 freeze not cited at its own file (M4)	§4 THE FRESH READER
+JP	fresh_reader	false-sentence	Y	MEDIUM	recon 1's 52 to 45 to 36 not explained (M5)	§4 THE FRESH READER
+JP	fresh_reader	false-sentence	Y	MEDIUM	62 targets, not 63 (M6)	§4 THE FRESH READER
+JP	fresh_reader	false-sentence	Y	LOW	no-one-flag scope overclaimed in headline, findings and verdict (only gates whose fights the logs hold)	§4 THE FRESH READER
+JP	fresh_reader	false-sentence	Y	LOW	close-read miscounted the closed entries as 57; they are 56	§4 THE FRESH READER; THE CLOSE-READ
+JP	fresh_reader	false-sentence	Y	LOW	underpaid and the ledger's over-statement; killer reachable by _frame_dealer(); declaration's set and clear lists	§4 THE FRESH READER
+JP	fresh_reader	false-sentence	Y	LOW	rest of LOW: sweep's tree, new gate's log, premises' check, row 7 attribution, check_hk clause, Hallowed's as laid, readings	§4 THE FRESH READER
+JP	litsweep	expected	Y	—	8 literals lost (re-pointed heading, kept-file names, own table words, lane name), each read at holders	§4 THE LITERAL SWEEP
+JP	docs_subset	expected	Y	—	check_jp §1 red until recon 1's count; check_iu §8 red until routing's close lists written	§4 THE SUBSETS
+JP	docs_subset	self	UNCLEAR	—	s5's second lane first ran a stale copy for a minute; stopped and re-cloned	§4 THE SUBSETS
+JP	recon	false-sentence	Y	—	JO's recon-1 check_fh road wiped after 38 encounters, HEAD and JO's pre-run after 28: contradicts JO §3's same-fights claim	§4 RECON 1 — THE COUNT's BATTERY, ON HEAD
+JP	prerun	expected	Y	—	seven count rows differ from recon 1 (Gall 56 against 51) via unseeded test_rune_battle and test_batch_bl	§4 THE PRE-RUN OF RECORD
+JP	acceptance	expected	Y	—	attacking fights 35 not 36: an unseeded test_rune_battle fight saw no warband strike; count varies run to run	§4 THE ACCEPTANCE
+JP	count	defect	Y	—	attacking fights cannot show every mechanic: Bloodcaller and Ash-Wrought Tyrant in none, ten kinds in one or two	§1 THE COUNT; FOUND AT JP
+JP	unattributed	stale-claim	UNCLEAR	—	Umbral Mirror's rebound is dormant (no writer), so JO's ruling 6 can-rebound-a-hex holds of no game	FOUND AT JP AND NOT FIXED
+JP	unattributed	defect	UNCLEAR	—	a fight with an unthemed encounter prints no Enemy warband opener, so a log-read count cannot see it	FOUND AT JP AND NOT FIXED; §1
+JQ	premises	premise	N	—	brief's premise 3 false: a tick kill does reach the Forsaken condition, every death passes _die (blocks' reader names it too)	THE BRIEF's PREMISES, VERIFIED; THE BLOCKS' READER
+JQ	premises	premise	Y	—	'one function reaches seven sites' half: six calls, seven sources, four live; one code comment promised a random pick	THE BRIEF's PREMISES, VERIFIED
+JQ	premises	premise	Y	—	'most turns left' half: the battle-long Bleed chip would always be taken; ranked last instead	THE BRIEF's PREMISES, VERIFIED
+JQ	premises	premise	Y	—	punish's door half: built as an ordinary attack in _resolve's damage line, not a _resolve_special arm	THE BRIEF's PREMISES, VERIFIED
+JQ	premises	premise	Y	—	'nothing against a basic' half: nothing against any non-cooling move (seven non-basics cool 0); Encumbered adds 2	THE BRIEF's PREMISES, VERIFIED
+JQ	premises	premise	Y	—	'CLAUDE.md is not cut' true but its draft reference figures (179 to 181) had to move; test_batch_cd reads them	THE BRIEF's PREMISES, VERIFIED
+JQ	premises	premise	Y	—	brief's summary of JP ruling 2 dropped 'its combat log printed', which the count needs	THE BRIEF's PREMISES, VERIFIED
+JQ	premises	premise	Y	—	brief states no expected writing; batch stated its own before document edits	THE BRIEF's PREMISES, VERIFIED
+JQ	blocks_reader	defect	Y	—	foresaw the pins the two cards move before any edit: check_el 17/12, check_di 223, test_batch_br shelf, check_fe, check_fd	THE BLOCKS' READER
+JQ	blocks_reader	defect	UNCLEAR	—	check_iq §2f needs a door for the master's new rows; NTR later still found five unheld catalogue figures	THE BLOCKS' READER; THE NEW TEXT's READER
+JQ	blocks_reader	defect	Y	—	STATUS_INFO's readers slice keys by place (check_ih, check_ii); the new status must be appended last	THE BLOCKS' READER; §1
+JQ	blocks_reader	premise	N	—	the tick kill and the Raise premises (shared with the premise table)	THE BLOCKS' READER; THE BRIEF's PREMISES, VERIFIED
+JQ	close_read	defect	Y	—	ten closed blocks bore on the work unopened (2 routed, 8 not); eight index rows given owed triggers	THE CLOSE-READ; JQ-routing.md FOUND AT THE CLOSE TO HAVE BORNE ON THE WORK AND NOT OPENED
+JQ	close_read	false-sentence	Y	—	FOUND AT JJ's damage credited to nobody refutes the WHERE block's 'every death of the warband passes both conditions'	JQ-routing.md FOUND AT THE CLOSE TO HAVE BORNE ON THE WORK AND NOT OPENED
+JQ	close_read	false-sentence	N	MEDIUM	ruling 1's 'FORSAKE_TURNS, which every text reads' false: master types '3 turns' thrice, '20%' once (M3; NTR L12; R01i proves)	THE CONTROLS; JQ-routing.md FOUND AT THE CLOSE
+JQ	close_read	stale-claim	Y	—	THE DRAFT AUDIT's present-tense 'THE CORPUS IS 227' stale at 233; block opened at the close and mended	JQ-routing.md NEEDED; FOUND AT THE CLOSE
+JQ	close_read	defect	UNCLEAR	HIGH/MEDIUM	the rest of its 2 HIGH, 9 MEDIUM, 11 taken LOW in JQ's own text; not itemised in the report	THE CLOSE-READ (route/readers_decisions.md, work folder)
+JQ	new_text_reader	defect	N	HIGH	H1 check_iq §2f: five master catalogue figures with no door; recon 1 also red (check_iq 88/2)	THE NEW TEXT's READER; RECON 1
+JQ	new_text_reader	defect	N	HIGH	H2 check_it §1's CLAUDE.md join broken by the edit; also the literal sweep's live loss and recon 1's check_it 43/2	THE NEW TEXT's READER; THE LITERAL SWEEP; RECON 1
+JQ	new_text_reader	defect	Y	HIGH	H3 check_jq threw on HEAD's code, so control H01 could not bite	THE NEW TEXT's READER
+JQ	new_text_reader	false-sentence	N	LOW	L12 master types the two figures; answered by control R01i (close-read's M3 too)	THE NEW TEXT's READER; THE CONTROLS
+JQ	new_text_reader	defect	N	LOW	L13 the listing gates must read the report in place at the close (fresh reader MEDIUM too)	THE NEW TEXT's READER; THE LANDING
+JQ	new_text_reader	defect	UNCLEAR	MEDIUM/LOW	its 9 MEDIUM and 11 other taken LOW, not itemised in the report	THE NEW TEXT's READER (route/readers_decisions.md)
+JQ	fresh_reader	false-sentence	Y	HIGH	H1 recon paragraph said the prediction held; test_batch_br line failed, ten rises unnamed, 'seven' unpredicted reds were five	THE FRESH READER, ON THE ASSEMBLED REPORT; RECON 1
+JQ	fresh_reader	false-sentence	Y	HIGH	H2 the sweep and positional delta reported for the landing tree were read on the 15:39 tree	THE FRESH READER, ON THE ASSEMBLED REPORT
+JQ	fresh_reader	defect	Y	HIGH	H3 ranking the Bleed chip last departed from the designer's wording and owed no ruling; ruling 3 now owes it	THE FRESH READER; NEEDS A RULING
+JQ	fresh_reader	false-sentence	Y	MEDIUM	THE ORDER not in time order; rewritten from file times	THE FRESH READER; THE ORDER, AS THE FOLDER SHOWS IT
+JQ	fresh_reader	false-sentence	Y	MEDIUM	dial 2's clause in the state hung Read the Tell's payoff on the wrong alternative	THE FRESH READER, ON THE ASSEMBLED REPORT
+JQ	fresh_reader	defect	Y	MEDIUM	rulings 1 and 5's reversals omitted holders; every holder now listed	THE FRESH READER; WHAT EACH REVERSAL MOVES, IN FULL
+JQ	fresh_reader	defect	N	MEDIUM	listing gates to be run with the report in at the close (NTR L13 too)	THE FRESH READER; THE LANDING
+JQ	fresh_reader	false-sentence	Y	MEDIUM	readers' LOW uncounted; count's events all check_jq §4's unsaid; recon 1's code difference inexact; CLAUDE.md figures named unlike	THE FRESH READER, ON THE ASSEMBLED REPORT
+JQ	fresh_reader	false-sentence	Y	LOW	11 taken LOW, e.g. the psychotic blow among the 56, check_gp traces run beside recon 1 unsaid	THE FRESH READER, ON THE ASSEMBLED REPORT
+JQ	positional	defect	Y	—	OFF-SUBJECT: const HEX_IDS placed between functions made dispel_one_debuff's body run into it (check_ht body census)	ALL 489 POSITIONAL READS
+JQ	positional	expected	Y	—	163 LINE-SHIFT and 79 IN-PLACE verdicts across readings, each JQ's own edits	ALL 489 POSITIONAL READS
+JQ	litsweep	defect	N	—	the one live loss of 17: CLAUDE.md's join that check_it §1 reads (NTR H2, recon 1 too)	THE LITERAL SWEEP
+JQ	litsweep	expected	Y	—	the other lost literals re-pointed or archived with their blocks, holders green	THE LITERAL SWEEP
+JQ	docs_subset	defect	Y	—	s2: new catalogue rows' quotes escaped one level short; check_parse 259/1 and a check_iq parse error	THE SUBSETS
+JQ	docs_subset	defect	Y	—	s2: check_iu §8 red; a second ## heading in the close-read's file split the routing's third list	THE SUBSETS
+JQ	docs_subset	expected	Y	—	check_jq 62/1 on §4's kept count, which recon 1's logs supply	THE SUBSETS
+JQ	code_stage	expected	Y	—	sa: test_batch_cd 92/1 'master.html states 181 of 181', owed by the documents' stage	THE SUBSETS
+JQ	code_stage	expected	Y	—	check_gp 481 to 451 traced: HEAD and JQ's code with cards off shelves both 481; traces ran beside recon 1, against the rule	RECON 1; THE ORDER
+JQ	control_h01	expected	Y	—	C07 9 then 8 and H01 24 then 23 failures: the restored random pick found the hex by chance	THE CONTROLS
+JQ	recon	defect	Y	—	test_batch_as 273/1: Forsake appended after "glacial_prison" in _recast_targets cut that arm's count to two	RECON 1 — ON THE CANDIDATE
+JQ	recon	defect	Y	—	test_batch_bx 164/1: master stamp and Forsake's role cell said 'party'	RECON 1 — ON THE CANDIDATE
+JQ	recon	defect	N	—	check_iq 88/2, check_it 43/2, check_iu 185/1: readers' H1/H2 and the routing's close lists, already repaired	RECON 1 — ON THE CANDIDATE
+JQ	recon	expected	Y	—	ten unpredicted rises (check_co to test_batch_ce), each a shelf walk meeting the two cards, traced on lanes/stS	RECON 1 — ON THE CANDIDATE
+JQ	recon	self	Y	—	prediction misses: 'no row moves for a repaired pin' failed on test_batch_br; check_jq read 61, not 'a few above'	RECON 1 — ON THE CANDIDATE
+JQ	other	defect	Y	—	BR §1 name sweep: the punish's first name 'Into the Opening' held 'Opening', the Skirmisher's engine; renamed Read the Tell	THE BRIEF's PREMISES, VERIFIED; NEEDS A RULING
+JQ	unattributed	defect	UNCLEAR	—	bot aims both new cards at the lowest-health body, so smokes meet Read the Tell's condition rarely (count: 1 of 11)	FOUND AT JQ AND NOT FIXED; §4
+JQ	unattributed	defect	UNCLEAR	—	dispel_one_debuff skips no sticky status where purge_debuffs_taken does; latent, no gate reds	FOUND AT JQ AND NOT FIXED
+JQ	unattributed	defect	UNCLEAR	—	punish reads the declaration as it stands (Encumbered +2, refused re-validation, Break timing); report calls it not a defect	FOUND AT JQ AND NOT FIXED
+JR	premises	premise	Y	—	ruling 7's 'finally seated the Hexer' half (fielded in 2 of JP's 36); an Into-the-Opening quote assigned to the wrong ruling	THE BRIEF's PREMISES, VERIFIED
+JR	premises	premise	N	—	carrier counts true but not evidence: 21 of the 56 are check_jq §4's own seats (blocks' reader too)	THE BRIEF's PREMISES, VERIFIED; THE BLOCKS' READER
+JR	premises	premise	Y	—	hex uptimes do not follow from the 56; they are JM's sim drive figures, another population	THE BRIEF's PREMISES, VERIFIED
+JR	premises	premise	Y	—	'add each to more rosters' half: the Orc Hexer already sat in all three; given the sniper role	THE BRIEF's PREMISES, VERIFIED
+JR	premises	premise	N	—	'not a line of code' half: five gates digest the warband's data and red (blocks' reader: five, not two)	THE BRIEF's PREMISES, VERIFIED; THE BLOCKS' READER
+JR	premises	premise	N	—	'nothing else moves' false: tags reach elite themes and escorts; dice re-roll check_jq §4's Hollow Crown fight	THE BRIEF's PREMISES, VERIFIED; THE BLOCKS' READER
+JR	premises	premise	N	—	file:NNN has four spellings; the .gd regex misses six of the state's 21 and ~1,307 of reports' 2,356	THE BRIEF's PREMISES, VERIFIED; THE BLOCKS' READER
+JR	premises	premise	Y	—	named documents hold 21 citations, all in the state; reports 2,606; text standard and party_screen comment unnamed	THE BRIEF's PREMISES, VERIFIED
+JR	premises	premise	N	—	three cited subjects had closed (Charge's Daze, check_gn, FW's CV sentence); check_gx's quoted line changed	THE BRIEF's PREMISES, VERIFIED; THE BLOCKS' READER
+JR	premises	premise	N	—	the rule's neighbour: JL's is the repository's rule; the line-number rule is JH's	THE BRIEF's PREMISES, VERIFIED; THE BLOCKS' READER
+JR	premises	premise	Y	—	'twelve triggers untaken': six owed, the rest taken at JP and JQ	THE BRIEF's PREMISES, VERIFIED
+JR	premises	premise	Y	—	row sizes 396 and 394 B at HEAD, not 391 and 389	THE BRIEF's PREMISES, VERIFIED
+JR	premises	premise	Y	—	all four index defects the brief named were already put right	THE BRIEF's PREMISES, VERIFIED
+JR	premises	premise	Y	—	changelog 171,620 B was JL's figure; HEAD's is 182,378 B	THE BRIEF's PREMISES, VERIFIED
+JR	premises	premise	Y	—	brief states no expected writing	THE BRIEF's PREMISES, VERIFIED
+JR	blocks_reader	premise	N	HIGH	five digest gates red on the data, not two	THE BLOCKS' READER; THE BRIEF's PREMISES, VERIFIED
+JR	blocks_reader	defect	N	HIGH	archiving JQ's rulings reds check_jq §0; re-point and the core's role (premise table records it)	THE BLOCKS' READER; THE BRIEF's PREMISES, VERIFIED
+JR	blocks_reader	premise	N	HIGH	the rule's place between JH's and JL's	THE BLOCKS' READER
+JR	blocks_reader	premise	N	HIGH	the gate's wider pattern, and a report quoting a citation would red its own gate	THE BLOCKS' READER
+JR	blocks_reader	defect	Y	HIGH	H5: two blocks the routing missed (FOUND AT HL, TWO SMALL DOC REPAIRS FR) held citations; opened before edit	THE BLOCKS' READER; JR-routing.md OPENED
+JR	blocks_reader	premise	N	HIGH	the three closed citation subjects go to the archive, not re-pointed	THE BLOCKS' READER
+JR	blocks_reader	premise	N	HIGH	the brief's carrier evidence is a gate's seat	THE BLOCKS' READER
+JR	blocks_reader	premise	N	HIGH	H8: the sniper tag seats the Hexer in elite themes and escorts	THE BLOCKS' READER; §1
+JR	blocks_reader	defect	Y	HIGH	H9: master's enemy table states rosters and roles; no gate holds it	THE BLOCKS' READER; §1
+JR	blocks_reader	defect	Y	HIGH	the WHERE block's six gate needles must survive its rewrite	THE BLOCKS' READER
+JR	close_read	defect	Y	—	eleven closed blocks bore unrouted (4 plainly, 7 arguably); each row given the owed trigger	THE CLOSE-READ; JR-routing.md FOUND AT THE CLOSE
+JR	close_read	stale-claim	Y	HIGH/MEDIUM	look-list's 'never seen' against the designer's 9 November play; became ruling 5	THE CLOSE-READ
+JR	close_read	defect	Y	HIGH/MEDIUM	CROSS-TARGET SUPERSESSIONS had no row for the narrowed digests and the three tags	THE CLOSE-READ; JR-routing.md FOUND AT THE CLOSE
+JR	close_read	stale-claim	Y	HIGH/MEDIUM	second clean run still owed: WHERE dropped the pointer; both 9 November runs debug-touched	THE CLOSE-READ; JR-routing.md FOUND AT THE CLOSE
+JR	close_read	defect	N	HIGH/MEDIUM	the archive cut's order and words (NTR flagged it; fresh H4 still found the last two swapped)	THE CLOSE-READ; THE NEW TEXT's READER; THE FRESH READER
+JR	close_read	defect	N	MEDIUM	M5: check_jr reads four places unlisted in pin-manifest.json (readers' M4, fresh M2 too)	FOUND AT JR AND NOT FIXED; THE CLOSE-READ
+JR	close_read	defect	N	HIGH/MEDIUM	check_jr's reads the next batch moves (NTR: 'the gate's reads at JS')	THE CLOSE-READ; THE NEW TEXT's READER
+JR	close_read	false-sentence	N	HIGH/MEDIUM	the escorts: sniper's reach beyond fight nodes unsaid (NTR's changelog escorts; blocks' H8)	THE CLOSE-READ
+JR	close_read	stale-claim	Y	HIGH/MEDIUM	GY's ruling 3 kept a line distance ('twelve lines below') and three line-number triggers	THE CLOSE-READ; §3
+JR	close_read	defect	Y	HIGH/MEDIUM	figures not read off the kept table; the report not checked by the gate before it lands	THE CLOSE-READ
+JR	close_read	stale-claim	Y	—	THE CLASS MERGE's two sizing bullets are history no gate holds; archived	JR-routing.md FOUND AT THE CLOSE; §4 — THE CEILINGS AND THE ARCHIVE
+JR	close_read	stale-claim	Y	LOW	FOUND AT JL's 'CLAUDE.md takes nothing this arc' outlived the arc; not taken (L7, not JR's subject)	THE CLOSE-READ; JR-routing.md FOUND AT THE CLOSE
+JR	new_text_reader	defect	Y	HIGH	H1 citation ledger stale against the final sweep; rebuilt	THE NEW TEXT's READER
+JR	new_text_reader	defect	Y	HIGH	H2 the CSV reader stripped the opening quotation mark from 142 quotes; re-applied, 141 checked	THE NEW TEXT's READER
+JR	new_text_reader	false-sentence	N	HIGH	H3 rarer spellings unheld and 'every' overclaimed (fresh H1 still found an 'every' overclaiming)	THE NEW TEXT's READER; THE FRESH READER
+JR	new_text_reader	defect	Y	HIGH	H4 bare follow-on numbers misattributed; nearest-name rule, majority picks marked, misattributed said unresolved	THE NEW TEXT's READER
+JR	new_text_reader	defect	Y	MEDIUM	tools' formatting, the gate copy the controls test, prose-form name, quote words, HEAD's rate in gate, shortfall, stamp	THE NEW TEXT's READER
+JR	new_text_reader	defect	N	MEDIUM	archive's order, the gate's reads at JS, escorts in the changelog (close-read too)	THE NEW TEXT's READER; THE CLOSE-READ
+JR	fresh_reader	false-sentence	Y	HIGH	H1 header and premise said 2,606 against §2's 2,589 and 85 files; an 'every' overclaimed	THE FRESH READER
+JR	fresh_reader	false-sentence	Y	HIGH	H2 header said four rulings; there are five	THE FRESH READER
+JR	fresh_reader	defect	Y	HIGH	H3 sweep wrote wrong-file quotes into IR's ally census via NTR H4's nearest-name rule; 110 rows re-resolved	THE FRESH READER; FOUND AT JR AND NOT FIXED
+JR	fresh_reader	defect	UNCLEAR	HIGH	H4 archive cut's last two pieces swapped, after close-read and NTR had both flagged the archive's order	THE FRESH READER
+JR	fresh_reader	false-sentence	Y	HIGH	H5 THE ORDER's times wrong; rewritten off the files' own stamps	THE FRESH READER; THE ORDER, AS THE FOLDER SHOWS IT
+JR	fresh_reader	false-sentence	Y	MEDIUM	M1 two of the Hexer's three cooling moves strike, not all	THE FRESH READER
+JR	fresh_reader	defect	N	MEDIUM	M2 the manifest's four unlisted reads (close-read M5, readers' M4)	THE FRESH READER; FOUND AT JR AND NOT FIXED
+JR	fresh_reader	false-sentence	Y	MEDIUM	M3 controls paragraph not from the runs' evidence; H02's narrowed want list now said plainly	THE FRESH READER; THE CONTROLS
+JR	fresh_reader	false-sentence	Y	MEDIUM	M4 count's one composed road, check_fh's 6/2/1, checked on recon 1's logs before written	THE FRESH READER
+JR	fresh_reader	false-sentence	Y	MEDIUM	M5 the player's files' append time	THE FRESH READER
+JR	fresh_reader	false-sentence	Y	LOW	LOW items taken but L11 and L14	THE FRESH READER
+JR	positional	expected	Y	—	20 LINE-SHIFT and 38 IN-PLACE verdicts (changelog entry, state index), each JR's edits	ALL 489 POSITIONAL READS
+JR	litsweep	defect	UNCLEAR	—	citation sweep had taken check_it's pinned {res:3} token for a citation; now left alone (finder implied by placement)	THE LITERAL SWEEP
+JR	litsweep	expected	Y	—	51 lost literals read at their holders, archived or re-pointed; holders green	THE LITERAL SWEEP
+JR	docs_subset	expected	Y	—	check_iu §8 close lists red until the close stage wrote them	THE SUBSETS; THE ORDER
+JR	code_stage	defect	Y	—	HEAD's check_jq §4 on JR's data: the Hollow Crown's fight struck no blow; retry added (R1r proves it)	THE ORDER; THE BRIEF's PREMISES, VERIFIED; THE CONTROLS
+JR	code_stage	expected	Y	—	HEAD's five digest gates red on the digest; re-pointed with MOVED_SINCE	THE ORDER; THE BRIEF's PREMISES, VERIFIED
+JR	code_stage	expected	Y	—	check_gp 451 to 458 traced side by side: HEAD and JR's code with HEAD's data both 451, so data re-roll	RECON 1 — ON THE CANDIDATE
+JR	control_subject	defect	Y	—	C05r: check_jr's 'line N' ceiling 69 where reports held 65 (fenced output); gate repaired	THE CONTROLS
+JR	control_subject	defect	Y	—	C08: check_jr's owed-trigger list lacked condition_met	THE CONTROLS
+JR	control_h02	defect	Y	—	H02: check_jr's strays and projection arms read by shape, cannot tell HEAD's record from JR's; want list narrowed	THE CONTROLS; FOUND AT JR AND NOT FIXED
+JR	control_subject	self	Y	—	C01a-c must-hold too strict: one carrier's tag moves the others' shares of one draw	THE CONTROLS
+JR	control_subject	self	Y	—	R1b bit for the wrong reason in two runs: its operation emptied the archive before reading	THE CONTROLS
+JR	recon	self	Y	—	prediction said check_de reds each moved row; a rise is a notice; its one red was check_iu §8	RECON 1 — ON THE CANDIDATE
+JR	recon	expected	Y	—	check_gp 458 and check_iu 185/2, each traced	RECON 1 — ON THE CANDIDATE
+JR	prerun	expected	Y	—	unseeded test_rune_battle moved the Archer 16 to 15 and Gall 66 to 51	THE PRE-RUN OF RECORD
+JR	acceptance	expected	Y	—	test_batch_al's lone Raider died before its turn: the count read an empty fight as 'attacks on, no strike'	THE ACCEPTANCE
+JR	acceptance	self	Y	—	prediction named test_rune_battle as an unseeded mover, not test_batch_bl	THE ACCEPTANCE
+JR	other	defect	Y	—	archive pass: two closed core blocks held by check_is §5's seven-of-nine derivation; archive short of 25 KiB	§4 — THE CEILINGS AND THE ARCHIVE; FOUND AT JR AND NOT FIXED
+JR	unattributed	defect	UNCLEAR	—	a move written A to B is two citations; nothing holds that both quote one line (HJ's pin moves)	FOUND AT JR AND NOT FIXED
+JS	premises	premise	Y	—	'5.6 batches' is the raise's 80 KiB; the room at JR's close under 520 is 5.78	THE BRIEF's PREMISES, VERIFIED
+JS	premises	premise	N	—	unsaid: check_jj §1 pins CEILING_KIB 440, and two more places state 440 (blocks' reader too)	THE BRIEF's PREMISES, VERIFIED; THE ROUTING OF RECORD
+JS	premises	premise	Y	—	CLAUDE.md's sentence stating the state's ceiling (972,800 B) stale once the raise lands	THE BRIEF's PREMISES, VERIFIED
+JS	premises	premise	N	—	DOD_ZONE_ROTATION is the sim's since IW; a player's run takes each pool's first, so never meets the zone	THE BRIEF's PREMISES, VERIFIED; THE ROUTING OF RECORD
+JS	premises	premise	N	—	False: no comment says ~35 talent points from 3 zones x 11 tiers; talents are meta	THE BRIEF's PREMISES, VERIFIED; THE ROUTING OF RECORD
+JS	premises	premise	N	—	'keeps 11 tiers' figure false: no zone carries a tier count; sixteen slots	THE BRIEF's PREMISES, VERIFIED; THE ROUTING OF RECORD
+JS	premises	premise	Y	—	a third background dict (the event screen's); nothing crashes today, all fall back	THE BRIEF's PREMISES, VERIFIED
+JS	premises	premise	Y	—	'adding an enemy is a JSON edit' false for a heal under a new name: cast by display name	THE BRIEF's PREMISES, VERIFIED
+JS	premises	premise	Y	—	Glacial Hold and Bitter Cold are not statuses	THE BRIEF's PREMISES, VERIFIED
+JS	premises	premise	Y	—	no code defines a role's Attack; Hex Bolt at Attack 50 deals 22 and prices 26.86	THE BRIEF's PREMISES, VERIFIED
+JS	premises	premise	N	—	the Warden's Raise alone reds check_jk §1; given Raise and Entrench	THE BRIEF's PREMISES, VERIFIED; THE ROUTING OF RECORD
+JS	premises	premise	Y	—	Sap 0.15% is JM's drive uptime; there is no weight (JR moved tags)	THE BRIEF's PREMISES, VERIFIED
+JS	premises	premise	N	—	False: the sweep does not flag Icewrought against Ash-Wrought; stem at a compound's end is unread	THE BRIEF's PREMISES, VERIFIED; THE ROUTING OF RECORD
+JS	premises	premise	Y	—	ability corpus and LIVE COUNTS do not move; THE LADDER's count does (76 to 98)	THE BRIEF's PREMISES, VERIFIED
+JS	premises	premise	N	—	'slower and more armoured' true only by a stated comparator rule (row added after NTR named it)	THE BRIEF's PREMISES, VERIFIED; THE NEW TEXT's READER
+JS	routing	defect	Y	—	LIVE COUNTS is named by the brief and no trigger of its row holds the words; trigger owed	JS-routing.md NAMED BY THE BRIEF, AND NO TRIGGER HOLDS THE WORDS
+JS	blocks_reader	premise	N	HIGH	the ceiling's raise reds check_jj §1	THE ROUTING OF RECORD
+JS	blocks_reader	premise	N	HIGH	the draw a player gets owes a door (ruling 1)	THE ROUTING OF RECORD
+JS	blocks_reader	defect	N	HIGH	the fifth thing a zone keys on: event dict and two Forest events (ruling 7; premise table too)	THE ROUTING OF RECORD; THE BRIEF's PREMISES, VERIFIED
+JS	blocks_reader	defect	Y	HIGH	the universal core holds all three of JR's carriers; check_jr §1's tags read with the new rosters aside	THE ROUTING OF RECORD
+JS	blocks_reader	defect	N	HIGH	every warband digest and count reds on seven added kinds; ADDED_SINCE, twelve re-points (code stage reds too)	THE ROUTING OF RECORD; THE CODE STAGE
+JS	blocks_reader	defect	Y	HIGH	H6: six kinds at wrong figures would move JI's reference board medians and existing bands	THE ROUTING OF RECORD; §2
+JS	blocks_reader	premise	N	HIGH	the Warden's Raise alone reds two gates	THE ROUTING OF RECORD
+JS	blocks_reader	defect	N	HIGH	the Titan's freeze rides a blow, as JO's ruling 5 shapes a hex (premise table too)	THE ROUTING OF RECORD
+JS	blocks_reader	defect	Y	HIGH	the Stillwrought's Sap at exactly 3 turns	THE ROUTING OF RECORD
+JS	blocks_reader	premise	N	HIGH	the name sweep run three ways and by stem	THE ROUTING OF RECORD
+JS	blocks_reader	defect	Y	HIGH	the text pins the new moves move	THE ROUTING OF RECORD
+JS	blocks_reader	premise	N	HIGH	two false premises, '11 tiers' and '~35 points'	THE ROUTING OF RECORD
+JS	blocks_reader	defect	Y	HIGH	the count's population	THE ROUTING OF RECORD
+JS	blocks_reader	defect	Y	HIGH	archive only what the rulings close	THE ROUTING OF RECORD
+JS	blocks_reader	defect	Y	HIGH	the standing picks	THE ROUTING OF RECORD
+JS	blocks_reader	defect	Y	HIGH	the routing's heading must be spelled as check_iu §8 reads it	THE ROUTING OF RECORD
+JS	close_read	defect	Y	—	THE RULES A GATE COULD CHEAPLY HOLD routed, not followed: S2-046 and S2-090 unbuilt and unrecorded	THE CLOSE-READ; JS-routing.md FOUND AT THE CLOSE; FOUND AT JS
+JS	close_read	defect	Y	—	seven arguably-bearing blocks unrouted; each row given its owed trigger	JS-routing.md FOUND AT THE CLOSE TO HAVE BORNE ON THE WORK AND NOT OPENED
+JS	close_read	false-sentence	N	HIGH/MEDIUM	CLAUDE.md's IW §0.3 flag clause false after ruling 1; rewritten with supersession (NTR H1 too)	THE CLOSE-READ; THE NEW TEXT's READER
+JS	close_read	stale-claim	N	HIGH/MEDIUM	sim figures' road: a default sim now draws four shapes; only =0 replays the Forest (NTR too)	THE CLOSE-READ; JS-routing.md FOUND AT THE CLOSE
+JS	close_read	stale-claim	Y	HIGH/MEDIUM	events.gd's REQUIREMENT CONDITIONS comment omits the new zone key	THE CLOSE-READ; JS-routing.md FOUND AT THE CLOSE
+JS	close_read	stale-claim	Y	—	FOUND AT IE's 'check_gp's seeded road meets a Cinderfall eight times' moved by JS's dice	JS-routing.md FOUND AT THE CLOSE
+JS	close_read	defect	Y	HIGH/MEDIUM	count's words, spends' holders, hexes' second carrier, cooldowns' heading, stamp, standing-list rows, latent-shapes row	THE CLOSE-READ
+JS	new_text_reader	false-sentence	N	HIGH	H1 CLAUDE.md's flag rule; already repaired by the close-read's pass	THE NEW TEXT's READER
+JS	new_text_reader	defect	Y	HIGH	H2 master §9's enemy table read by no gate; check_js §2 now reads the seven rows	THE NEW TEXT's READER
+JS	new_text_reader	defect	Y	HIGH	H3 count would credit check_js's own hand-cast Entombs to the warband; the prediction said the reverse	THE NEW TEXT's READER; §4
+JS	new_text_reader	defect	Y	MEDIUM	Feint path in a comment, lost-turn drive inexact, spends' counts, dead delay 32, JS-kinds.tsv, FREEZE_TURNS, check_iw comment	THE NEW TEXT's READER
+JS	new_text_reader	defect	Y	MEDIUM	check_js's document needles bind to no pin-manifest holder	THE NEW TEXT's READER; FOUND AT JS AND NOT FIXED
+JS	new_text_reader	stale-claim	N	MEDIUM	the sim's road (close-read too)	THE NEW TEXT's READER
+JS	new_text_reader	premise	N	MEDIUM	the comparator stated as a rule (premise row added)	THE NEW TEXT's READER; THE BRIEF's PREMISES, VERIFIED
+JS	new_text_reader	false-sentence	Y	LOW	about twenty LOW, all taken but one (name near-misses kept out of the state)	THE NEW TEXT's READER
+JS	fresh_reader	false-sentence	Y	HIGH	H1 recon paragraph: HEAD-code-with-JS-data arm cannot tell the draw's dice from the zone; check_gp move misread	THE FRESH READER; RECON 1
+JS	fresh_reader	false-sentence	Y	HIGH	H2 the prediction's grade: three lines missed, not two	THE FRESH READER
+JS	fresh_reader	defect	Y	MEDIUM	count_js.py counted Hailstorm's lines, not casts (15 vs 3)	THE FRESH READER; §4
+JS	fresh_reader	false-sentence	Y	MEDIUM	comparator worded 'the Forest's own' would pick the Archer and fail; reworded as check_js runs it	THE FRESH READER
+JS	fresh_reader	false-sentence	Y	MEDIUM	expected writing vs written, Hexer's share with/without JR's tag, Thrall's 'slow', near-miss list, code stage lanes	THE FRESH READER
+JS	fresh_reader	false-sentence	Y	LOW	12 LOW, e.g. two CLAUDE.md clauses, Wardens' nine turns, routing's sum, close-read's 'routed'	THE FRESH READER
+JS	positional	expected	Y	—	117 LINE-SHIFT, 45 IN-PLACE; near misses: stamp window's one character, FROZEN PLAINS row one byte under 400	ALL 489 POSITIONAL READS
+JS	positional	expected	Y	—	repaired _recast_writes comment sent 21 reads on ordinary words; reworded before the delta reader	ALL 489 POSITIONAL READS
+JS	litsweep	expected	Y	—	12 lost literals, same holders both readings, re-pointed or unread	THE LITERAL SWEEP
+JS	code_stage	expected	Y	—	HEAD's twelve gates red on JS's work, each traced to a digest, count or door, then re-pointed	THE CODE STAGE
+JS	code_stage	expected	Y	—	check_gp 458 to 484 traced: JS's draw moves it, data alone does not (first reading corrected by fresh H1)	RECON 1 — ON THE CANDIDATE
+JS	control_subject	self	Y	—	first run: eight wants lacked the escaped apostrophe an array prints (thrall\'s)	THE CONTROLS
+JS	control_subject	self	Y	—	first run: two two-gate controls asked each gate for the other's text; driver now takes wants by gate	THE CONTROLS
+JS	control_subject	self	Y	—	two controls share id R_jjh; both ran, one JSON kept (not fixed)	THE CONTROLS
+JS	recon	self	N	—	prediction's check_js board reading wrong; corrected by append (NTR H3)	RECON 1 — ON THE CANDIDATE
+JS	recon	self	Y	—	prediction 'a hero Frozen at least once' failed; the Titan's one Entomb missed	RECON 1 — ON THE CANDIDATE; §4
+JS	recon	expected	Y	—	five rows rose (check_ji, check_jr, check_ih, test_batch_bm, check_gp), each traced side by side	RECON 1 — ON THE CANDIDATE
+JS	prerun	defect	Y	—	count_js.py double-counted check_js's lost-turn fight once the NTR-prompted repaired board printed the attacks-off skip	THE PRE-RUN OF RECORD
+JS	other	self	UNCLEAR	—	carried name-sweep tool read no enemy's name until JS's copy read unit_name; finder not named	§2 THE NAMES
+JS	other	defect	Y	—	name sweep: no exact hit; near-misses (Hoarfrost, Rime, Charge, Frostbite, Bulwark) flagged and shipped	§2 THE NAMES; FOUND AT JS AND NOT FIXED
+JS	other	self	Y	—	user-data count 622 against 621: lane f1 named fresh where an idle name should be reused	THE PLAYER's FILES
+JS	unattributed	defect	UNCLEAR	—	a JS save opened in an older build plays the Forest with Orc Raiders where frost kinds stood	FOUND AT JS AND NOT FIXED
+JS	unattributed	defect	UNCLEAR	—	parried Entomb still freezes; a frozen companion loses nothing; cleanse takes Sap before the freeze	FOUND AT JS AND NOT FIXED
+JS	unattributed	defect	UNCLEAR	—	the zone's refusal sentence is reached by the debug picker alone	FOUND AT JS AND NOT FIXED
+JS	unattributed	defect	UNCLEAR	—	state's growth would pass ES's +13,700 B record; WHERE count line shortened and tree refrozen	THE ORDER, AS THE FOLDER SHOWS IT; THE FRESH READER

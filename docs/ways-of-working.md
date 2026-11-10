@@ -2,14 +2,16 @@
 
 **THIS FILE IS ABOUT HOW A BATCH COMES TO EXIST. IT IS NOT A SEAM OF `CLAUDE.md`.**
 
-`CLAUDE.md` and `docs/instrument-rules.md` bind what a batch DOES once it has a brief — what the
+`CLAUDE.md`, `docs/instrument-rules.md` and `docs/combat-rules.md` bind what a batch DOES once it has a brief — what the
 game may contain, and how the batch verifies itself. **This file binds what happens BEFORE the
-brief: how design is settled, what is read first, and which decisions belong to whom.** It is a
+brief: how design is settled, what is read first, and which decisions belong to whom** — and, since JT §1, the
+few things a report owes the next record: its first line on a malformed record, and its closing block. It is a
 different audience — the designer and the assistant in conversation, rather than the session
-executing a brief — which is why it is a third file and not a third seam.
+executing a brief — which is why it is ~~a third file and not a third seam~~ a file of its own and not a seam of
+`CLAUDE.md` (a fourth rule file since GR §2's split, so the struck words are kept as the record JT §1 repaired).
 
 **IT HOLDS ONLY RULES THAT ARE NOT RECORDED ELSEWHERE.** Nothing here is a summary of a rule that
-lives in `CLAUDE.md` or `docs/instrument-rules.md`; a second copy of a rule is the defect that let
+lives in `CLAUDE.md`, `docs/instrument-rules.md` or `docs/combat-rules.md`; a second copy of a rule is the defect that let
 `CLAUDE.md` contradict itself 1900 lines apart after CW's split. **Where a rule below has a
 neighbour in another file, it POINTS at it and does not restate it.**
 
@@ -21,7 +23,9 @@ in the tree opened it, so the branch rule below was enforced by nothing at all. 
 what it can and says in its own header what it cannot** — the branch rule, the no-second-copy rule,
 that every path named here resolves, that the conflict table still names the files it was measured
 over, and that this file stays the smallest of the three. **The rules above the branch section are
-about people and are checked by nobody**, which is stated there rather than left to be discovered.
+about people and are checked by nobody**, which is stated there rather than left to be discovered. **JT §1's, below the
+branch section, are about people too, but one: the report's closing block, which `check_jt` reads in the reports and for
+whose heading it reads this file.**
 
 ---
 
@@ -62,17 +66,23 @@ both answered in conversation, neither reached a brief, and HV's report still li
 
 ## A BRIEF PRICES WHAT IT ASKS FOR
 
-> **Before an instruction that sweeps, censuses, drives or walks a population, the brief states how
+> ~~**Before an instruction that sweeps, censuses, drives or walks a population, the brief states how
 > large that population is and roughly what the work costs — and if it does not know, it says so
-> and asks for the size before the run rather than after.**
+> and asks for the size before the run rather than after.**~~
 >
 > **A one-line instruction can be an hour of batteries.** *"Take the census"* over 98 targets run
 > alone against a fresh copy is not the same size as the sentence that asks for it, and neither is
 > *"drive all 27 across four classes."*
 >
 > **The failure is asymmetric.** An under-priced instruction costs a session; an over-priced one
-> costs a sentence. **When the size is unknown, ask for the method and the population first and
-> defer the run.**
+> costs a sentence. ~~**When the size is unknown, ask for the method and the population first and
+> defer the run.**~~
+
+**STRUCK AT JT §1 BY THE DESIGNER's NEW RULES BELOW, AND KEPT AS THE RECORD.** A decision record states no fact about
+the code — a population's size among them, unless a named report carries it — and the plan that sizes the work is
+Claude Code's, written against code it reads and never sent back for approval (THE DECISION RECORD REPLACES THE BRIEF
+and CLAUDE CODE WRITES THE PLAN, below). **The reason stands**: a one-line instruction can still be an hour of
+batteries, and the plan that orders it is where it is priced now.
 
 **Three instances, kept with the rule because a rule with its history attached survives a
 compaction.** Each was a sentence or less.
@@ -151,7 +161,8 @@ always true. **A brief names the axis, the shape and what the figure must clear;
 > **Before content is written for an area, a batch reads out what already exists there: the
 > engine, the constants, what is already true, and what is structurally unavailable.**
 
-**`docs/spec-recon.html` is the pattern.** It cost one batch (FJ) and made forty runes possible in
+*(JT's reading since JT §1: a recon reaches the record's author as a report or a kept table named by batch code, never read
+from the tree — THE DECISION RECORD REPLACES THE BRIEF, below.)* **`docs/spec-recon.html` is the pattern.** It cost one batch (FJ) and made forty runes possible in
 the next; **the four spec sets authored without it (EZ) spent that report's first section
 correcting six premises, and five batches followed it — FA, FB, FC, FD, FE.**
 
@@ -225,7 +236,7 @@ the three anyone predicts, and the two hardest entries are not documents at all.
 
 | File | Convention |
 |---|---|
-| `docs/state.md` | **Take the branch's wholesale.** It is rewritten every batch and has no reader. |
+| `docs/state.md` | **Take the branch's wholesale.** It is rewritten every batch ~~and has no reader~~ — gates read it (struck at JT §1, a claim FOUND AT GC). |
 | `docs/changelog.html` | **Append-only at the top; BOTH sides' entries survive, ordered by batch code.** Neither side's history is a draft. |
 | `docs/design-notes.md` | **Newest first, at the top** — its own header, and `CLAUDE.md`'s step (4). Both sides survive. |
 | `docs/reports/XX.md` | One new file per batch. Cannot conflict. |
@@ -257,3 +268,124 @@ the three anyone predicts, and the two hardest entries are not documents at all.
 **The authoring is not the batch's, and the verification is not the designer's.** A batch that
 believes it is authoring has taken a decision nobody gave it; a batch that hands its verification
 to the designer has handed over the half only it can do.
+
+## THE THREE LANES, AND A BATCH DECLARES ITS OWN
+
+> **A batch declares its lane in its decision record, and its report says which lane it ran** (JT §1, the designer's). One
+> floor for every batch is why adding seven enemies cost twelve hours (the designer's figure; JS's folder reads about seven
+> hours open to commit).
+
+- **LANE A — STRUCTURAL.** A new system or mechanic, a new zone, a change to how the game is shaped, or anything that moves a
+  rule other work derives from. *JI, JJ, JL and JS were Lane A.*
+- **LANE B — CONTENT.** Enemy kinds, cards, events, relics, runes, zone rosters: data that rules already in the tree govern.
+- **LANE C — RECORD.** Citations, triggers, the index, the archive, stale claims, document repairs. *JR was Lane C* (the
+  designer's) — *JT's reading: mostly, with three kinds' roster tags, which are Lane B's.*
+
+**What each lane runs is `docs/instrument-rules.md`'s** (*A BATCH RUNS THE FLOOR OF ITS LANE*): a floor is how a batch verifies
+itself, which that file holds, so it is not restated here.
+
+## THE DECISION RECORD REPLACES THE BRIEF
+
+> **What arrives is a record of what was decided, about forty lines, not a specification. It carries four sections and
+> nothing else** (JT §1, the designer's):
+>
+> 1. **THE LANE**, declared.
+> 2. **WHAT WAS DECIDED**, as agreed in conversation, in the designer's own terms — **and what is deliberately out of
+>    scope**, because scope is part of the decision.
+> 3. **WHAT IT WAS WRITTEN FROM** — the reports and kept tables, named by batch code, and the conversation. **A record that
+>    names no source is a guess, which is visible before the work starts.** Each fact about the code it carries is a file, a
+>    function and a quoted line, as the report it is quoted from states them.
+> 4. **THE OPEN QUESTIONS** — what the record does not know, each with the decision taken for both branches so nothing
+>    stalls: *if X, do this; if not X, do that and say so.* **Never a fact about the code asserted as a premise.**
+
+**ANYTHING ABOUT THE CODE IS QUOTED FROM A NAMED REPORT, OR IT IS AN OPEN QUESTION. THERE IS NO THIRD OPTION.** The record's
+author does not read the repository and does not claim to. Since JR every citation in a report is a file, a function and a
+quoted line, verified at source by the party that ran the tree, so a report is a better source for the design side than its
+author's own search would be. **What no report covers, the record does not know**: it goes among the open questions, never
+inferred from silence.
+
+· **THE SOFTER VERSION FAILED, SO THIS ONE DEPENDS ON A CITATION EXISTING RATHER THAN ON CARE.** *Read the code before writing
+  the brief* was set on 10 November and lasted under an hour: the design side's synced copy of the repository is pinned to
+  `main`, which stops at Batch GI — about a hundred batch commits behind the work (*nine batches* as handed over; JT read the
+  branch) — and the four failure modes a direct clone leaves were all still live: a stale snapshot, a search that finds
+  strings and not meaning, a partial read of a huge file that reads as a whole one, and a wrong search term returning a
+  confident nothing.
+· **THE QUESTIONS ARE THE HALF THAT WORKED.** The old briefs stated twenty to forty-two premises about code their author had
+  not read, and fifteen to thirty-three broke a batch (the designer's figures, JA to JS); their questions found real defects.
+  *Is there a fifth thing keyed on a zone id?* found the Forest's two events dealt by slot, and *should the rotation flag be on
+  now a pool holds two?* found a player's run taking each pool's first candidate, which would have left a new zone undrawable
+  (both at JS). **So the record asks and never asserts.**
+· **ITS *OUT OF SCOPE* IS A DECISION ABOUT THE WORK, NEVER A PREMISE ABOUT THE CODE's REACH** *(JT's reading)*: what a change
+  will not reach is the batch's to establish, by IE §0.6's rule in `docs/instrument-rules.md`.
+· **A RECORD DOES NOT RESTATE THE FLOOR.** It lives in `docs/instrument-rules.md`, and the lane the record declares names it.
+· **WHERE A RULE ABOVE SAYS *BRIEF*, IT BINDS THE RECORD NOW** *(JT's reading)*. A ruling lands in the next record's WHAT WAS
+  DECIDED, where it landed in a brief's §0; a citation names what the repository holds. The one rule above that the record
+  retires is struck where it stands, with what struck it (A BRIEF PRICES WHAT IT ASKS FOR).
+
+### A MALFORMED RECORD IS REPORTED, NOT GUESSED AT
+
+> **A record that arrives without its four sections — above all one that names no source, or asserts a fact about the code
+> that no named report carries — is named so in the report's first line, and the batch proceeds on what it does carry.**
+
+**The gap is not filled by inferring what was meant, and the batch does not stall waiting for a better record.** The batch that
+reads these rules every time is the party placed to notice, and the report is read anyway, so the designer does not have to
+audit the record. **The clause exists because the record's author has slid back from every process rule that was kept only as
+a thing to remember.**
+
+### EVERY REPORT ENDS WITH WHAT THE NEXT DECISION RECORD OWES
+
+> **The last block of every report is addressed to the next decision record. It is headed WHAT THE NEXT DECISION RECORD
+> OWES, it runs six lines, and it names the four sections** — the lane; what was decided and what is out of scope; what it was
+> written from, files and functions with a quoted line each; the open questions, both branches of each decided — **and
+> anything the batch found that the next record must not get wrong**: a figure that moved, a rule that now derives
+> differently, a document that is now the authority on something.
+
+**This is the preventive half, and the designer's own suggestion (10 November)**; the clause above is the reactive one, which
+catches a bad record after it has cost something. The report is the one artifact the record's author certainly reads, and reads
+immediately before writing the next record, so the rule arrives at the moment of use. **It is the first check in this project
+pointed at the design side**: every other guard here was built because the code failed, and the longest-running defect in the
+project is a brief asserting things about code its author never read.
+
+**IT IS HELD BY A CHECK, NOT BY GOOD INTENTIONS:**
+1. **The report's landing check reads for the heading** (`CLAUDE.md`'s report block), after the report is written and before
+   the batch closes, so it has no latency.
+2. **`check_jt` reads the newest report in `docs/reports/` every battery** and reds if it lacks the heading or a section's
+   name — a batch late, should the landing check be skipped, so the omission cannot persist.
+3. **Its absence is visible to the designer**, because the block is the report's last lines and the report is what the
+   designer reads.
+
+**There is no fourth layer, and this file does not pretend otherwise**: a party that runs neither its own landing check nor the
+next battery is beyond what a document can hold, and then the third layer is the whole guarantee.
+
+## CLAUDE CODE WRITES THE PLAN
+
+> **The implementation plan is Claude Code's, written against code it reads. Its premises are its own** (JT §1, the
+> designer's).
+
+**This deletes a category of waste rather than trimming it.** From JA to JS, fifteen to thirty-three of every twenty to
+forty-two premises an incoming brief stated broke — JF's were thirty-two of forty-two — and a large share of each batch went on
+correcting them, after which the close-read found the documents made false during the correction (the designer's figures,
+JA to JS; from JJ to JS the reports' own premise tables held twenty-four to thirty-five premises a batch). There is no second
+party guessing now.
+
+· **NO PLAN IS REPORTED BACK FOR APPROVAL, IN ANY LANE.** The designer hands over the record and the batch does the work: a
+  round trip costs the designer time and buys nothing, because the premises are verified against the code either way.
+· **THE STANDING WORD IS UNCHANGED, AND SO IS THE RULINGS TABLE** — `CLAUDE.md`'s *DO NOT ASK. DECIDE, AND SAY WHAT YOU
+  DECIDED*: nothing waits on a reply, and a choice that is the designer's goes to NEEDS A RULING with the recommendation
+  already taken. The table is the best artifact in this system and not a formality.
+
+## WHO OWNS WHAT
+
+| | owns |
+|---|---|
+| **The designer** | Balance, tuning, and whether anything is fun — never a measurement. **One run between batches.** Abilities, runes and cards chosen from options, never authored for the designer |
+| **Claude, the design side** | Design and brainstorming; the decision record; reading across reports for the pattern no single batch can see; the roadmap and what is owed; saying when something does not add up |
+| **Claude Code** | The implementation plan, its own premises, the build, the floor for its lane, the rulings, the report |
+
+## WHAT IS UNCHANGED, AND WHERE EACH STANDS
+
+**Handed over with the rules above as things not to touch, each named where it already stands:** balance (BALANCE IS THE
+DESIGNER's, above); a citation (JR §2's rule, above); a parse (`docs/instrument-rules.md`'s *VERIFY A PARSE BY GREPPING
+STDERR, NEVER BY A TALLY*); a population (`CLAUDE.md`'s *ASSERT THE GENERAL PROPERTY, NEVER A LIST*), the decision Lane B rests
+on; commit and push (the branch rule above). **Two more handed over with these live beside what they govern**: the state's
+ceiling, in `docs/state.md`'s preamble, and the retirement of a silent check, in `docs/instrument-rules.md`.

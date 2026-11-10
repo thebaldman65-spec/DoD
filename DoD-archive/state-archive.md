@@ -17,6 +17,49 @@ heading stands in both files. **Since JE §3 it also takes what `CLAUDE.md` clos
 
 ---
 
+## ARCHIVED AT JT — 2026-11-10, FROM `docs/state.md` AS JS AND THE THREE COMMITS AFTER IT LEFT IT (`2cb36bd`)
+
+*In the order they stood. JS's seven rulings, answered in JT's brief: all accepted as taken; and three items JT's repairs closed: two claims about `docs/ways-of-working.md`, and `CLAUDE.md`'s support-cast clause (FOUND AT JL).*
+
+### ~~JS's RULINGS OWED~~ — **ALL SEVEN ANSWERED IN JT's BRIEF (§0): all accepted as taken**
+
+*Its head as it stood: SEVEN; THE BATCH's CHOICES FOR THE DRAW, THE SIX KINDS, THE TITAN, THE BACKDROP, THE CORE THAT TRAVELS AND THE FOREST's EVENTS, EACH TAKEN ON THE RECOMMENDATION, NONE HOLDING ANYTHING UP*
+
+Full working: `docs/reports/JS.md`, NEEDS A RULING.
+
+1. **THE DRAW IS THE GAME's: A SLOT OF TWO DRAWS FOR EVERY RUN (JS §1).** Since IW §0.3 the flag was the sim's and a player's run took each pool's first, so the Frozen Plains would be a zone no player draws (`check_iv` §2's latent arm reds the day a pool holds two). **Taken**: `Run.draw_zones` draws within a pool of two for a player's run and a sim's alike; a pool of one takes its zone with no die; the flag's one arm left is a sim's `DOD_ZONE_ROTATION=0`, holding it to each pool's first, which a player's run never reads. The draw spends two dice at a new run, so every seeded gate that starts one rolls its fights anew. **The alternatives**: the fixed order for the player (the Frozen Plains never met), or the Frozen Plains first in its pools (the Forest never met). **Reversing it** is `rotation_enabled`'s line and `draw_zones`' condition, and `check_iv` §2's and `check_iw` §0.3's arms.
+2. **THE SIX KINDS' FIGURES AND NAMES (JS §2).** Health, armour, speed, tint and scale set against the kind each stands for (the Whelp, the Shieldmaster, the Slinger, the Orc Brute, the Orc Shaman, the Orc Hexer) — by one rule, `check_js` §2's: the first kind in data order of its role, power and enemy role that the Forest's opener roster fields, one that does not travel (not tagged for every old roster) before one that does; against every kind of its role it is not so (the Orc Raider beside the Thrall is slower and more armoured still, the Orc Archer as armoured as the Hailcaster); each basic off its role's Attack; each second move the least whole damage that clears JI's line; every cooldown the line's band; the riders' turns after the moves that already lay them; the moves' names, swept with no exact hit. **The healths and basics straddle the line's reference board** (its median body 127.5, its median basic 36.595), so no existing heal or spend is priced anew. **The Matron heals with the warband's Healing Wave**, the name `_enemy_support_action` casts by, and **holds an Entrench beside its Raise**, as the other Raise holders do — the brief's *Raise* alone reds `check_jk` §1, which every kind's Rally or Entrench answers. **The alternative**: figures that move the medians, and existing bands with them. **Reversing it** is the seven blocks of `data/enemies.json`.
+3. **THE RIMEHORN's *TELEGRAPHED CHARGE* IS A DECLARED BLOW, NOT A WIND-UP (JS §2).** Every warband move is declared on the plate a turn ahead, and one whose Break exceeds its damage is declared a *crush*: Trampling Charge is one. **The alternative**: the Ash Hurler's `windup`, whose chip says *heavy damage to every ally*, false on a single blow without a handler line changed. **Reversing it** is the move's `special` and the chip's line.
+4. **THE TITAN's FIGURES (JS §3).** A freeze of one turn, the ordinary freeze's, on Entomb, a single frost blow at JI's line (cooldown 2); Glacier Fist its basic, Entrench its spend; 460 health, armour 0.32, speed 75, Attack 100, the tank's role as the Withered Warden's — slower than it and less armoured (0.32 against 0.35): the six's signature is theirs, not the boss's — scale 4.4 as the zone bosses'. **The alternatives**: a longer freeze, or a heavier Entomb in a longer band. **Reversing it** is the Titan's block.
+5. **THE FROZEN PLAINS WEARS THE FOREST's BACKDROP (JS §1).** No art exists; the battle's, the map's and the event screen's dicts name the zone against the Forest's art — the cooler of the two, and each dict's fallback — with a comment saying it is a placeholder. **The alternative**: the Scarlands' red. **Reversing it** is three strings; the art is the designer's.
+6. **THE CORE THAT TRAVELS IS EVERY KIND TAGGED FOR ALL THREE OLD ROSTERS, THE ORC CHIEF AND THE HOLLOW CROWN AMONG THEM (JS §1).** The brief's derivation read literally: twelve kinds. The Orc Chief is fielded by the elite themes from any roster that tags him, so the Frozen Plains' elites field him; the Hollow Crown is never composed, so its two tags read nothing. **The alternative**: the ten drawn kinds alone, which leaves the Frozen Plains' elite nodes no elite, so `compose` falls to its plain fallback at an elite's pay. **Reversing it** is two `zones` arrays — and JR's ruling 1's reversal now takes rosters 4 and 5 off the Grave Totem and the Rot Behemoth too.
+7. **THE FOREST's TWO EVENTS NAME THEIR ZONE (JS §1, the fifth thing a zone keys on).** The Old Spring and the Echo of the Warden were dealt by slot because a slot was a zone. **Taken**: a `zone` requirement in `Events.failed_reason`, read off the run's own draw (`zone_draw`), the two keyed to the Forest beside their slots. **The alternative**: the Forest's words dealt in the Frozen Plains. **Reversing it** is the clause and the two `zone` keys.
+
+
+### FOUND AT GR AND NOT FIXED — ITS CLOSED ITEMS
+
+*Closed at JT §1: JT edited `docs/ways-of-working.md` for its new rules and repaired the claim in place, the old words struck and kept.*
+
+- **`docs/ways-of-working.md`'s HEADER STILL NAMES TWO RULE FILES** — *"`CLAUDE.md` and `docs/instrument-rules.md`
+  bind what a batch DOES"*, and *"a third file and not a third seam"*. True of what it names and silent on the third.
+  Not edited: the brief did not list the file, and `check_fr` reads it line by line.
+
+
+### FOUND AT GC AND NOT FIXED — ITS CLOSED ITEMS
+
+*Closed at JT §1: JT edited `docs/ways-of-working.md` for its new rules and repaired the claim in place, the old words struck and kept.*
+
+- **`docs/ways-of-working.md`'s conflict table says this file "has no reader"**; `check_es` §4 reads it.
+
+
+### FOUND AT JL AND NOT FIXED — ITS CLOSED ITEMS
+
+*Closed at JT: JT opened `CLAUDE.md` for its new rules and repaired the clause — a Malice spend's target is chosen in `_warband_spend`, and the spends are among the self-casts tagged `"ally"`.*
+
+- **`CLAUDE.md` STILL PLACES A SUPPORT CAST's TARGET IN `_enemy_support_action`** (the close-read): since JL §1 the spends' targets are chosen in `_warband_spend`, which `_declare_intent` asks, and its list of every self-cast omits the Rally and the Entrench since JK. One clause, the next time that file is opened; `CLAUDE.md` takes nothing this arc.
+
+---
+
 ## ARCHIVED AT JS — 2026-11-09, FROM `docs/state.md` AS JR LEFT IT (`2d603b5`)
 
 *In the order they stood. JR's five rulings, answered in JS's brief: all accepted as taken; and FOUND AT IW's item the door JS built closed (§1).*
