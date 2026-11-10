@@ -3980,19 +3980,23 @@ func leave_zone_boss() -> void:
 # holds `zone_id` takes it, so a later zone is sent there too; if the slot the party stands in is one of them, that zone
 # begins again in it — a new map, the party at its start, the boss the zone's own. The party is not restored: nothing is
 # won. Returns whether the zone the party stands in changed. Reached only through the map's debug dispatch, which marks
-# the run (`debug_used`) and names the action to the readout before it runs.
+# the run (`debug_used`) and names the action to the readout before it runs. The slot the party stands in is the one
+# `current_zone_id` reads — `zone_idx` clamped to the run — so a run whose index ran past the last zone (the debug
+# advance did that until it learned to stop) is put back on its last slot when that zone begins again.
 func debug_force_zone(zone_id: String) -> bool:
 	if not ZONE_DEFS.has(zone_id):
 		return false
 	if zone_draw.is_empty():
 		draw_zones()
+	var at := clampi(zone_idx, 0, SLOT_COUNT - 1)
 	var here := false
 	for slot in SLOT_COUNT:
 		if (SLOT_POOLS[slot] as Array).has(zone_id) and String(zone_draw[slot]) != zone_id:
 			zone_draw[slot] = zone_id
-			if slot == zone_idx:
+			if slot == at:
 				here = true
 	if here:
+		zone_idx = at
 		_enter_zone()
 		slot_idx = -1
 		node_idx = 0

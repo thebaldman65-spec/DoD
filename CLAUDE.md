@@ -2792,7 +2792,7 @@ and `DOD_DEBUG=0` FORCES it shut; every use trips `Run.debug_used` → the run s
 clean data point" line — and names itself to the playtest readout (`Run.note_debug`, IH §0.2). Sims can never reach the UI surfaces (`_debug_allowed()` excludes
 sim/autoplay/sim_run).
 · MAP BURGER debug items (map_screen, ids 10-17/20-26): +200 Gold | Talent Points to 60 (all) — every tier's end-boss gate open,
-  the spend gate still applies | Full Heal Standing Heroes | Jump to Boss Slot | Advance to Next Zone | Send Run to the Frozen
+  the spend gate still applies | Full Heal Standing Heroes | Jump to Boss Slot | Advance to Next Zone (never past the last) | Send Run to the Frozen
   Plains (`Run.debug_force_zone`: every slot whose pool holds it takes it, and the zone the heroes stand in begins again there if
   it is one; nothing restored) | Reroll Specs | "All Class
   Abilities Unlocked" check = `Run.debug_grant_all`, the PRE-GRANT toggle — **the hero's CLASS

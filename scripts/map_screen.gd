@@ -4260,6 +4260,11 @@ func _on_burger(id: int) -> void:
 			_map_scroll = -1.0
 			_draw_screen()
 		14:
+			# After JS — the last zone has no next one: advancing past it ran the zone index off the run ("Zone 6 of 3")
+			# while the screen kept reading the last slot under a stale name.
+			if not Run.has_next_zone():
+				_toast("DEBUG: this is the last zone — there is no next one")
+				return
 			Run.advance_zone()
 			Run.save_run()
 			_draw_screen()
