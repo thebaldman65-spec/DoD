@@ -368,6 +368,7 @@ func _draw_header() -> void:
 		bpop.add_item("Full Heal Standing Heroes", 12)
 		bpop.add_item("Jump to Boss Slot", 13)
 		bpop.add_item("Advance to Next Zone", 14)
+		bpop.add_item("Send Run to the Frozen Plains", 17)
 		bpop.add_item("Reroll Specs", 15)
 		bpop.add_check_item("All Class Abilities Unlocked", 16)
 		bpop.set_item_checked(bpop.get_item_index(16), Run.debug_grant_all)
@@ -4262,6 +4263,15 @@ func _on_burger(id: int) -> void:
 			Run.advance_zone()
 			Run.save_run()
 			_draw_screen()
+		17:
+			# After JS — every slot that can hold the Frozen Plains takes it; the zone the party stands in begins
+			# again there if it is one of them (`Run.debug_force_zone`).
+			var restarted: bool = Run.debug_force_zone("frozen_plains")
+			Run.save_run()
+			_map_scroll = -1.0
+			_draw_screen()
+			_toast("DEBUG: the Frozen Plains holds every slot it can%s" % (
+				" — this zone begins again there" if restarted else ""))
 		15:
 			_debug_reroll_specs()
 		16:
@@ -4312,6 +4322,8 @@ func _debug_action_name(id: int) -> String:
 			return "Advance to Next Zone"
 		15:
 			return "Reroll Specs"
+		17:
+			return "Send Run to the Frozen Plains"
 		16:
 			return "All Class Abilities Unlocked: %s" % ("off" if Run.debug_grant_all else "on")
 		20:

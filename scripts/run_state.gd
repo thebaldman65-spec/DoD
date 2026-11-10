@@ -3976,6 +3976,34 @@ func leave_zone_boss() -> void:
 		restore_party()
 
 
+# DEBUG — A TESTER's WAY TO A ZONE THE DRAW CAN DEAL (after JS, for the designer's playtest): every slot whose pool
+# holds `zone_id` takes it, so a later zone is sent there too; if the slot the party stands in is one of them, that zone
+# begins again in it — a new map, the party at its start, the boss the zone's own. The party is not restored: nothing is
+# won. Returns whether the zone the party stands in changed. Reached only through the map's debug dispatch, which marks
+# the run (`debug_used`) and names the action to the readout before it runs.
+func debug_force_zone(zone_id: String) -> bool:
+	if not ZONE_DEFS.has(zone_id):
+		return false
+	if zone_draw.is_empty():
+		draw_zones()
+	var here := false
+	for slot in SLOT_COUNT:
+		if (SLOT_POOLS[slot] as Array).has(zone_id) and String(zone_draw[slot]) != zone_id:
+			zone_draw[slot] = zone_id
+			if slot == zone_idx:
+				here = true
+	if here:
+		_enter_zone()
+		slot_idx = -1
+		node_idx = 0
+		encounter = {}
+		pending_modifier = ""
+		pending_reward = {}
+		pending_shop = false
+		_generate_map()
+	return here
+
+
 # Move to the next zone: fresh map, path reset; the party is fully
 # restored as a reward for cleansing the zone.
 func advance_zone() -> void:
