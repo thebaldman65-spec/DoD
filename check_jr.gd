@@ -2,7 +2,8 @@
 #
 #   §0   JQ's SEVEN RULINGS answered and archived; the batch's own choices each owed as a ruling with its reversal (H02).
 #   §1   THE THREE RARE CARRIERS: the Orc Hexer, the Grave Totem and the Rot Behemoth are fielded materially more often than they
-#        were, DERIVED OFF THE DATA through the composer's own door (`Run._theme_combos`) for every roster and every budget a fight
+#        were, DERIVED OFF THE DATA through the composer's list (`Run._theme_combos`, which the game's draw counts — `check_jv`
+#        holds the two one answer) for every roster and every budget a fight
 #        node rolls (C01); every hex is still laid by the one kind that laid it, and no move moved (C02); no kind fielded by a rule
 #        rather than a draw — a boss, an elite — is drawn by a fight, and none of the three is one (C03); and nothing in the
 #        warband's data moved but the three appearance tags JR set (C15).

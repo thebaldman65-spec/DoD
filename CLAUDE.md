@@ -3555,7 +3555,8 @@ the next**, because the denominator moves with the slot ladder.
   from that floor is reasoning about a board the player mostly does not meet.
 - **AND THE BOARD ITSELF CAPS AT SIX.** `ENEMY_LAYOUTS[clampi(composition.size(), 1, 6)]`, so a
   seventh enemy would index past the layout array. **Six is the ceiling any AoE magnitude can ever
-  be priced against**, and `_theme_combos` is what actually decides the count.
+  be priced against**, and the composer's walk is what actually decides the count — `_theme_combos`
+  lists it, and `_theme_pick` draws from it without listing (JV §1).
 
 ## STANDING RULE — A SUBTRACTION IS OPEN AT THE BOTTOM WHERE AN ASSIGNMENT IS NOT (Batch FO §1)
 

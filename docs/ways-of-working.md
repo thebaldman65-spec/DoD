@@ -328,6 +328,12 @@ inferred from silence.
   DECIDED, where it landed in a brief's §0; a citation names what the repository holds. The one rule above that the record
   retires is struck where it stands, with what struck it (A BRIEF PRICES WHAT IT ASKS FOR).
 
+**TWO HABITS, FROM THE TWO WAYS THE RECORD BROKE ITS OWN RULE AT JU (JV §0, the designer's).** **A container a record names — a
+roster, a zone, a family, a pool, a theme — is named as a report names it, or it is an open question**: JU's first line reports
+*rot* and *grave* naming nothing in the tree. **A sentence in quotation marks is pasted, not paraphrased, and two figures set side
+by side say what population each was read on**: JR's words are *A fight's bodies are a draw with no weight*, not what JU's record
+quoted, and that record's two Sap figures were read on 322 fights and on 57.
+
 ### A MALFORMED RECORD IS REPORTED, NOT GUESSED AT
 
 > **A record that arrives without its four sections — above all one that names no source, or asserts a fact ~~about the code~~

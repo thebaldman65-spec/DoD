@@ -1162,11 +1162,10 @@ var last_theme := ""  # theme of the most recently composed encounter
 func compose_test(theme_name: String, budget: int, roster := 1) -> Array:
 	if not THEMES.has(theme_name):
 		return []
-	var combos := _theme_combos(THEMES[theme_name], budget, roster)
-	if combos.is_empty():
+	var warband := _theme_pick(THEMES[theme_name], budget, roster)
+	if warband.is_empty():
 		return []
 	last_theme = theme_name
-	var warband: Array = combos.pick_random()
 	warband.shuffle()
 	return warband
 
@@ -1181,11 +1180,10 @@ func compose_budget(budget: int, roster := 1) -> Array:
 			candidates.append(theme_name)
 	candidates.shuffle()
 	for theme_name in candidates:
-		var combos := _theme_combos(THEMES[theme_name], budget, roster)
-		if combos.is_empty():
+		var warband := _theme_pick(THEMES[theme_name], budget, roster)
+		if warband.is_empty():
 			continue  # theme can't spend this budget — try another
 		last_theme = theme_name
-		var warband: Array = combos.pick_random()
 		warband.shuffle()
 		return warband
 	return []
@@ -1414,11 +1412,10 @@ func compose(node_type: String, tier := -1) -> Array:
 			candidates.append(theme_name)
 	candidates.shuffle()
 	for theme_name in candidates:
-		var combos := _theme_combos(THEMES[theme_name], budget, -1, named_boss)
-		if combos.is_empty():
+		var warband := _theme_pick(THEMES[theme_name], budget, -1, named_boss)
+		if warband.is_empty():
 			continue  # theme can't spend this budget — try another
 		last_theme = theme_name
-		var warband: Array = combos.pick_random()
 		warband.shuffle()
 		return warband
 	# Nothing fit — plain mob fallback (kept as a safety net).
@@ -1433,34 +1430,20 @@ func compose(node_type: String, tier := -1) -> Array:
 	return fallback
 
 
-# Every exact-budget warband a theme can field (arrays of enemy kinds).
-# Roles resolve to the kinds legal in the CURRENT zone; a kind with two
-# role tags is claimed by the first pooled role that wants it, so pool
-# caps never double-count.
+# Every exact-budget warband a theme can field (arrays of enemy kinds), in
+# the walk's order. **NO GAME PATH CALLS THIS SINCE JV §1**: a fight draws
+# through `_theme_pick`, which counts this list and takes one warband from it
+# without building it. The list stays the door for what reads the list itself
+# — `check_jr` §1's and `check_js` §1's derivations over every warband — and
+# the reference `check_jv` holds the draw to.
 func _theme_combos(spec: Dictionary, budget: int, roster := -1,
 		named_boss := "") -> Array:
 	if roster <= 0:
 		roster = active_roster() if active else 1
-	var zone_kinds := Enemies.kinds_for_roster(roster)
-	var role_kinds := {}
-	var claimed := {}
-	for role in spec["pool"]:
-		var lst: Array = []
-		# BATCH GI — on a zone boss node the `boss` role is the zone's named boss
-		# and nothing else (`compose` says why). Every other caller passes none
-		# and resolves the role against the roster as it always did.
-		if role == "boss" and named_boss != "":
-			lst.append(named_boss)
-			claimed[named_boss] = true
-		else:
-			for kind in zone_kinds:
-				if not claimed.has(kind) and Enemies.roles(kind).has(role):
-					lst.append(kind)
-					claimed[kind] = true
-		role_kinds[role] = lst
+	var role_kinds := _role_kinds(spec, roster, named_boss)
 	# BATCH JU §1 — THE WALK CUTS A BRANCH THAT CANNOT SPEND ITS BUDGET, AND COPIES NOTHING UNTIL A WARBAND IS FOUND. Every kind a
-	# role holds multiplies this walk, and the map composes every fight node of a zone as it is built, so four kinds in the Forest's
-	# two rosters made a Forest map three to four times slower to compose. A branch is cut only when what is left of its budget is
+	# role holds multiplies this walk, and until JV §1 the map walked it for every fight node of a zone as it was built, so four
+	# kinds in the Forest's two rosters made a Forest map three to four times slower to compose (the map draws through `_theme_pick` now). A branch is cut only when what is left of its budget is
 	# more than its role's remaining slots at that role's dearest remaining kind, plus every later role's slots at its own dearest
 	# (`caps`), or more than its free field slots at the dearest power still to come (`dear`): such a branch can never end at zero,
 	# so the walk returns the same warbands in the same order and no die moves (JU's probe hashed the whole output on both codes).
@@ -1486,6 +1469,257 @@ func _theme_combos(spec: Dictionary, budget: int, roster := -1,
 	var results: Array = []
 	_combo_walk(spec, roles, role_kinds, 0, budget, [], {}, results, {"caps": caps, "dear": dear, "rest": rest})
 	return results
+
+
+# The kinds each of a theme's roles draws from on a roster — the one answer the
+# list and the draw both read. Roles resolve to the kinds legal on the roster;
+# a kind with two role tags is claimed by the first pooled role that wants it,
+# so pool caps never double-count.
+func _role_kinds(spec: Dictionary, roster: int, named_boss: String) -> Dictionary:
+	var zone_kinds := Enemies.kinds_for_roster(roster)
+	var role_kinds := {}
+	var claimed := {}
+	for role in spec["pool"]:
+		var lst: Array = []
+		# BATCH GI — on a zone boss node the `boss` role is the zone's named boss
+		# and nothing else (`compose` says why). Every other caller passes none
+		# and resolves the role against the roster as it always did.
+		if role == "boss" and named_boss != "":
+			lst.append(named_boss)
+			claimed[named_boss] = true
+		else:
+			for kind in zone_kinds:
+				if not claimed.has(kind) and Enemies.roles(kind).has(role):
+					lst.append(kind)
+					claimed[kind] = true
+		role_kinds[role] = lst
+	return role_kinds
+
+
+# BATCH JV §1 — THE DRAW COUNTS THE LIST AND NEVER BUILDS IT (the designer's
+# decision: a roster's kind count stops setting the cost of building a map).
+# `_theme_combos` lists every warband a theme can field at a budget, and every
+# kind a roster holds multiplied that list (JU §1). The draw COUNTS the
+# warbands the same walk would reach from each state instead — memoised on
+# what the leaf test reads: the role and the kind, the role's slots left, the
+# budget left, the units so far, the majority role's units, the weak units and
+# the distinct kinds (those two capped where the test stops caring) and the
+# menders — so its work grows with those states, not with the warbands. It then walks
+# down the branches, by their counts, to the warband the die names.
+# **ONE DIE, THE SAME DIE**: `pick_random()` is `arr[randi() % arr.size()]`
+# and spends one `randi()` (JV's probe on Godot 4.7), so the draw takes
+# `randi() % count` and returns the warband the list holds at that index — a
+# seed draws the warband it drew before and leaves the same die behind, and a
+# theme that cannot spend its budget spends none, as an empty list spent none.
+# `check_jv` holds the count and the order to the list's on every theme and
+# every roster the zones name, at budgets 1 to two past the game's top.
+func _theme_pick(spec: Dictionary, budget: int, roster := -1,
+		named_boss := "") -> Array:
+	var dw := _draw_frame(spec, budget, roster, named_boss)
+	var total := _draw_total(dw)
+	if total <= 0:
+		return []
+	return _draw_unrank(dw, randi() % total)
+
+
+# How many warbands `_theme_combos` would list, counted without listing them.
+func _theme_count(spec: Dictionary, budget: int, roster := -1,
+		named_boss := "") -> int:
+	return _draw_total(_draw_frame(spec, budget, roster, named_boss))
+
+
+# The warband `_theme_combos` would list at `index`, found without listing (no
+# die: the index is given). Empty when the index is past the count.
+func _theme_at(spec: Dictionary, budget: int, index: int, roster := -1,
+		named_boss := "") -> Array:
+	var dw := _draw_frame(spec, budget, roster, named_boss)
+	if index < 0 or index >= _draw_total(dw):
+		return []
+	return _draw_unrank(dw, index)
+
+
+# What one draw reads, built once a call: each role's kinds with their power,
+# weakness and mender tag, the pool's caps and floors, the leaf test's terms,
+# the radices the memo's key packs the state in, and the memo.
+func _draw_frame(spec: Dictionary, budget: int, roster: int, named_boss: String) -> Dictionary:
+	if roster <= 0:
+		roster = active_roster() if active else 1
+	var role_kinds := _role_kinds(spec, roster, named_boss)
+	var roles: Array = spec["pool"].keys()
+	var mins: Dictionary = spec.get("mins", {})
+	# A floor on a role the pool never draws can never be met: `_combo_ok`
+	# reads its count as 0, so no warband passes.
+	var nothing_fits := budget < 0
+	for role in mins:
+		if not role_kinds.has(role) and int(mins[role]) > 0:
+			nothing_fits = true
+	var kinds: Array = []
+	var powers: Array = []
+	var weak: Array = []
+	var mender: Array = []
+	var caps: Array = []
+	var floors: Array = []
+	var kmax := 0
+	var pmax := 0
+	for role in roles:
+		var ks: Array = role_kinds[role]
+		var ps: Array = []
+		var ws: Array = []
+		var ms: Array = []
+		for kind in ks:
+			ps.append(Enemies.power(kind))
+			ws.append(Enemies.power(kind) <= 1)
+			ms.append(Enemies.roles(kind).has("mender"))
+		kinds.append(ks)
+		powers.append(ps)
+		weak.append(ws)
+		mender.append(ms)
+		caps.append(int(spec["pool"][role]))
+		floors.append(int(mins.get(role, 0)))
+		kmax = maxi(kmax, ks.size())
+		pmax = maxi(pmax, int(spec["pool"][role]))
+	var mu: int = spec.get("max_units", MAX_FIELD)
+	var wcap := int(spec.get("min_weak", 0)) if spec.has("min_weak") else 0
+	var kcap := int(spec.get("min_kinds", 0)) if spec.has("min_kinds") else 0
+	return {"n": roles.size(), "kinds": kinds, "powers": powers, "weak": weak,
+		"mender": mender, "caps": caps, "floors": floors, "nothing_fits": nothing_fits,
+		"budget": maxi(budget, 0), "max_units": mu,
+		"min_units": int(spec.get("min_units", 1)),
+		"maj": roles.find(spec["majority"]) if spec.has("majority") else -1,
+		"has_maj": spec.has("majority"), "wcap": maxi(wcap, 0), "kcap": maxi(kcap, 0),
+		"rk": kmax + 1, "rp": pmax + 1, "rb": maxi(budget, 0) + 1, "ru": mu + 1,
+		"memo": {}}
+
+
+func _draw_total(dw: Dictionary) -> int:
+	if dw["nothing_fits"]:
+		return 0
+	var first := int(dw["caps"][0]) if int(dw["n"]) > 0 else 0
+	return _draw_count(dw, 0, 0, first, int(dw["budget"]), 0, 0, 0, 0, 0)
+
+
+# `_combo_ok` at a leaf, on the state's terms. The floors (`mins`) are read as
+# each role is left, so they are not here; a mender past the ceiling is cut as
+# it is picked (`_menders_ok`), so neither is that.
+func _draw_leaf(dw: Dictionary, units: int, maj: int, weak: int, dist: int) -> bool:
+	if units < int(dw["min_units"]):
+		return false
+	if weak < int(dw["wcap"]):
+		return false
+	if bool(dw["has_maj"]) and maj * 2 < units:
+		return false
+	if dist < int(dw["kcap"]):
+		return false
+	return true
+
+
+# How many warbands the walk reaches from a state: role `r`, its kind `k`, `rl`
+# of its slots left, `left` of the budget, `units` fielded, `maj` of the
+# majority role, `weak` units of power 1 or less (capped at the floor), `dist`
+# distinct kinds (capped at the floor) and `mend` mender-tagged units.
+func _draw_count(dw: Dictionary, r: int, k: int, rl: int, left: int, units: int,
+		maj: int, weak: int, dist: int, mend: int) -> int:
+	var n_roles: int = dw["n"]
+	if r == n_roles:
+		return 1 if left == 0 and _draw_leaf(dw, units, maj, weak, dist) else 0
+	var ks: Array = dw["kinds"][r]
+	if k == ks.size() or rl == 0:
+		if int(dw["caps"][r]) - rl < int(dw["floors"][r]):
+			return 0
+		var next_cap := int(dw["caps"][r + 1]) if r + 1 < n_roles else 0
+		return _draw_count(dw, r + 1, 0, next_cap, left, units, maj, weak, dist, mend)
+	var ru: int = dw["ru"]
+	var key: int = r * int(dw["rk"]) + k
+	key = key * int(dw["rp"]) + rl
+	key = key * int(dw["rb"]) + left
+	key = key * ru + units
+	key = key * ru + maj
+	key = key * (int(dw["wcap"]) + 1) + weak
+	key = key * (int(dw["kcap"]) + 1) + dist
+	key = key * ru + mend
+	var memo: Dictionary = dw["memo"]
+	if memo.has(key):
+		return memo[key]
+	var kp: int = dw["powers"][r][k]
+	var is_weak: bool = dw["weak"][r][k]
+	var is_mender: bool = dw["mender"][r][k]
+	var is_maj := r == int(dw["maj"])
+	var mu: int = dw["max_units"]
+	var wcap: int = dw["wcap"]
+	var kcap: int = dw["kcap"]
+	var tot := 0
+	for n in range(0, rl + 1):
+		if kp * n > left or units + n > mu:
+			break
+		var m2 := mend + (n if is_mender else 0)
+		if not _menders_ok(m2):
+			break
+		tot += _draw_count(dw, r, k + 1, rl - n, left - kp * n, units + n,
+			maj + (n if is_maj else 0), mini(wcap, weak + (n if is_weak else 0)),
+			mini(kcap, dist + (1 if n > 0 else 0)), m2)
+	memo[key] = tot
+	return tot
+
+
+# The warband at `index` in the walk's order: at each kind, the branches in the
+# walk's own order (none of it, then one, then two …), the one whose count holds
+# what is left of the index taken.
+func _draw_unrank(dw: Dictionary, index: int) -> Array:
+	var picked: Array = []
+	var n_roles: int = dw["n"]
+	var mu: int = dw["max_units"]
+	var wcap: int = dw["wcap"]
+	var kcap: int = dw["kcap"]
+	var r := 0
+	var k := 0
+	var rl := int(dw["caps"][0]) if n_roles > 0 else 0
+	var left: int = dw["budget"]
+	var units := 0
+	var maj := 0
+	var weak := 0
+	var dist := 0
+	var mend := 0
+	while r < n_roles:
+		var ks: Array = dw["kinds"][r]
+		if k == ks.size() or rl == 0:
+			r += 1
+			k = 0
+			rl = int(dw["caps"][r]) if r < n_roles else 0
+			continue
+		var kp: int = dw["powers"][r][k]
+		var is_weak: bool = dw["weak"][r][k]
+		var is_mender: bool = dw["mender"][r][k]
+		var is_maj := r == int(dw["maj"])
+		var took := -1
+		for n in range(0, rl + 1):
+			if kp * n > left or units + n > mu:
+				break
+			var m2 := mend + (n if is_mender else 0)
+			if not _menders_ok(m2):
+				break
+			var u2 := units + n
+			var j2 := maj + (n if is_maj else 0)
+			var w2 := mini(wcap, weak + (n if is_weak else 0))
+			var d2 := mini(kcap, dist + (1 if n > 0 else 0))
+			var c := _draw_count(dw, r, k + 1, rl - n, left - kp * n, u2, j2, w2, d2, m2)
+			if index < c:
+				took = n
+				units = u2
+				maj = j2
+				weak = w2
+				dist = d2
+				mend = m2
+				break
+			index -= c
+		if took < 0:
+			push_error("Run._draw_unrank: the index ran past the count — the draw and its count disagree")
+			return []
+		for _x in took:
+			picked.append(ks[k])
+		rl -= took
+		left -= kp * took
+		k += 1
+	return picked
 
 
 func _combo_walk(spec: Dictionary, roles: Array, role_kinds: Dictionary,
@@ -1570,9 +1804,16 @@ func _combo_ok(spec: Dictionary, picked: Array, role_counts: Dictionary) -> bool
 	for kind in picked:
 		if Enemies.roles(kind).has("mender"):
 			menders += 1
-	if menders > 2:
+	if not _menders_ok(menders):
 		return false
 	return true
+
+
+# The mender ceiling, one answer for the list's test and the draw's (JV §1). It
+# is a ceiling — a count past it fails, and so does every larger one — so the
+# draw stops a kind's branches at the first count past it.
+func _menders_ok(menders: int) -> bool:
+	return menders <= 2
 
 
 func heal_party(pct: float, fell_pct := -1.0) -> void:

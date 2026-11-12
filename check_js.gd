@@ -4,7 +4,8 @@
 #        state's ceiling at 520 KiB in the sentence `check_fg` §4 reads, its reason beside it and the 440 it supersedes recorded (C15).
 #   §1   THE ZONE: the Frozen Plains a candidate at slots 1 and 3 and never at 2, the slot count three (C01); a roster for each slot
 #        it hosts (C02); every kind tagged for all three old rosters takes both new ones, and no kind tagged for fewer travels (C04);
-#        each new roster fields four to six bodies, DERIVED through the composer's own door for every budget a fight node rolls
+#        each new roster fields four to six bodies, DERIVED through the composer's list (which the game's draw counts, `check_jv`)
+#        for every budget a fight node rolls
 #        (C03); a player's run and a sim's draw both candidates at both slots and the Scarlands alone at slot 2, and a sim's flag
 #        holds the first (DRIVEN); each of the six's shares of a fight node as the state records it; and every background dict
 #        names the zone and a zone it does not name falls back (C05: the battle's DRIVEN, the map's and the event screen's read).
