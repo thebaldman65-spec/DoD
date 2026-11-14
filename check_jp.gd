@@ -33,7 +33,8 @@ const CONTENT_AT_HEAD := {"abilities": "b40ad23bc9956e7e48f579d9a98b6da4", "tale
 	"deck": "1d1f37491e4611bb78f94577074ede99", "warband": "f261e6345f22f42bc41a7f81276e066b"}
 # WHAT A LATER BATCH AUTHORED, EACH NAMED AND LEFT OUT OF THE DIGESTS ABOVE, so they go on asking whether JP's own tree authored
 # anything: the two cards and the status of the party's three answers, built after JP (Forsake, Read the Tell, Forsaken).
-const AUTHORED_SINCE := {"abilities": ["Forsake", "Read the Tell"], "statuses": ["forsaken"]}
+# BATCH JW §3 — and the Drowned Barrow's three statuses, which a warband move lays or wears.
+const AUTHORED_SINCE := {"abilities": ["Forsake", "Read the Tell"], "statuses": ["forsaken", "black_rot", "noxious_fumes", "submerged"]}
 # BATCH JR — THREE APPEARANCE TAGS MOVED AFTER THIS GATE LANDED (JR §1): the Grave Totem and the Rot Behemoth each took a
 # roster, the Orc Hexer a second role. Each is named here and put back before the digest, so it goes on asking whether
 # anything else in the warband's data moved.
@@ -44,8 +45,11 @@ const MOVED_SINCE := {"grave_totem": {"zones": [1.0, 3.0]}, "behemoth": {"zones"
 # BATCH JU §1 — AND THE FOUR KINDS JU ADDED TO THE FOREST OF OLD, set aside as JS's seven are: this gate holds the warband its
 # batch left, and a kind added after it is no figure of that warband moving.
 const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan",
-	"grave_husk", "mossback", "blight_speaker", "carrion_pack"]
-const ROSTERS_SINCE := [4, 5]
+	"grave_husk", "mossback", "blight_speaker", "carrion_pack",
+	# BATCH JW §1 — AND THE DROWNED BARROW's THREE, set aside as JS's seven and JU's four are.
+	"rotfiend", "fen_lurker", "bone_shepherd"]
+# BATCH JW §1 — and roster 6, the Drowned Barrow's, which the travelling core takes as it took 4 and 5.
+const ROSTERS_SINCE := [4, 5, 6]
 # MALICE's TERMS, ITS SPENDS' PRICES AND THE HEXES' FIGURES, AS THEY STAND (C09): each read off its constant, never retyped elsewhere.
 const BATTLE_FIGURES := {"MALICE_DAMAGE_STEP": 10, "MALICE_PER_KILL": 25, "MALICE_CAP": 150, "MALICE_HEAL_WORTH": 0.5,
 	"MALICE_RAISE_PCT": 0.4, "MALICE_RALLY_PCT": 0.3, "MALICE_RALLY_TURNS": 3, "MALICE_RALLY_PRICE": 40, "MALICE_ENTRENCH_TURNS": 3,

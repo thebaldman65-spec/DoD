@@ -57,7 +57,9 @@ const KIT_PIN := "res://docs/reports/JO-kit.json"
 # BATCH JU §1 — AND THE FOUR KINDS JU ADDED TO THE FOREST OF OLD, set aside as JS's seven are: this gate holds the warband its
 # batch left, and a kind added after it is no figure of that warband moving.
 const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan",
-	"grave_husk", "mossback", "blight_speaker", "carrion_pack"]
+	"grave_husk", "mossback", "blight_speaker", "carrion_pack",
+	# BATCH JW §1 — AND THE DROWNED BARROW's THREE, set aside as JS's seven and JU's four are.
+	"rotfiend", "fen_lurker", "bone_shepherd"]
 # THE TREE JM's FIVE RE-READS STAND FOR (§3), its digest as `check_jm` took it on JM's commit.
 const JM_TREE := "c2c74d46e931d8be168cf759e9e83353"
 const FOE := {"type": "fight", "theme": "Warband", "enemies": ["archer", "hexer", "raider", "shieldmaster"]}

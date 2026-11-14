@@ -741,8 +741,8 @@ func _docs() -> void:
 	# with no entry behind them. `check_ir` §1e now reads every affliction the game lists against its entry, so the
 	# next status added without one reds there; this count still says that adding one was a decision.
 	# JL §2 ADDED FOUR: Gall, Sap, Mire and Fester, the warband's hexes, afflictions `check_ir` §1e asks a line of.
-	ok(gj != null and gj.size() == 113,
-		"the glossary holds 113 entries (98 + HS's conjunctions and status_rupture + IK's strike_damage + IL's most_health + IR's seven statuses + JL's four hexes)")
+	ok(gj != null and gj.size() == 116,
+		"the glossary holds 116 entries (98 + HS's conjunctions and status_rupture + IK's strike_damage + IL's most_health + IR's seven statuses + JL's four hexes + JW's three statuses)")
 	# RE-POINTED AT THE ARCHIVE BY BATCH CX. The live changelog passed CW's 400 KB
 	# threshold, so CX cut it at the CN/CO boundary: Batch CE — with everything
 	# from BP to CN — moved OUT OF THE REPO into `changelog-archive.html`. The old

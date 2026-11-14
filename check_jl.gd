@@ -30,7 +30,9 @@ const JI = preload("res://check_ji.gd")
 # BATCH JU §1 — AND THE FOUR KINDS JU ADDED TO THE FOREST OF OLD, set aside as JS's seven are: this gate holds the warband its
 # batch left, and a kind added after it is no figure of that warband moving.
 const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan",
-	"grave_husk", "mossback", "blight_speaker", "carrion_pack"]
+	"grave_husk", "mossback", "blight_speaker", "carrion_pack",
+	# BATCH JW §1 — AND THE DROWNED BARROW's THREE, set aside as JS's seven and JU's four are.
+	"rotfiend", "fen_lurker", "bone_shepherd"]
 const KINDS := 21
 # The warband's moves beside its Malice spends — JK's fifty, and since JO §2 Gall and Mire among them, each a blow given damage;
 # Sap and Fester ride two of the fifty, folded onto them.

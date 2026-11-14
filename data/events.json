@@ -226,6 +226,9 @@
         "text": "Across the ash flats shimmers a caravan that is not there \u2014\nyet its strongbox glitters with a weight that might be.",
         "weight": 10,
         "requires": {
+            "zone": [
+                "scarlands"
+            ],
             "zone_slot": [
                 2
             ]

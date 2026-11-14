@@ -1,0 +1,206 @@
+file	line	function	code	class	note (a line number inside a note is HEAD b38bf2d's; the line column is the tree's)
+scripts/battle.gd	664		var enemies: Array = []	S	Declaration of the warband array; no body is chosen.
+scripts/battle.gd	1341	_ready	RunSim.note_battle_start(Run, heroes, enemies, sim_stats)	S	Sim ledger: RunSim.note_battle_start measures both sides as spawned.
+scripts/battle.gd	2224	_spawn_units	enemies.append(eu)	S	Spawn: appends the body.
+scripts/battle.gd	2227	_spawn_units	_fit_enemy_target_zones(enemies)	S	UI geometry: fits each body's click zone. The picker arms only pool members (`_pick_target` set_targetable), so a submerged body is unclickable once the pools change; no edit.
+scripts/battle.gd	2242	_spawn_units	for u in heroes + enemies:	S	Opening turn order (next_time roll).
+scripts/battle.gd	2352	_stamp_fk_enemy_runes	for e in enemies:	S	Spawn-time rune stamps (burn clock held / chill uncapped flags).
+scripts/battle.gd	2377	_apply_battle_modifier	for u in heroes + enemies:	S	Battle-modifier stamping at battle start.
+scripts/battle.gd	2588	_stack_enemy_plates	for e in enemies:	S	Enemy plate layout (height sum).
+scripts/battle.gd	2594	_stack_enemy_plates	for e2 in enemies:	S	Enemy plate layout (placement).
+scripts/battle.gd	2838	_on_debug_menu	for u2 in heroes + companions + enemies:	S	Debug menu: clears every unit's cooldowns.
+scripts/battle.gd	2916	_debug_kill_enemies	for e in enemies:	S	Debug kill-all; not a game path.
+scripts/battle.gd	3220	_rebuild_turn_bar	var alive := (heroes + enemies).filter(	S	Turn bar: who stands on the timeline (a submerged body still takes turns).
+scripts/battle.gd	3487	_run_battle	_stat("enemy_count", enemies.size())	S	Sim stat enemy_count.
+scripts/battle.gd	3568	_run_battle	for tu in heroes + enemies:	S	Stamps battle_turn on every unit.
+scripts/battle.gd	3577	_run_battle	for e in enemies:	S	Clears a dead body's declared intent.
+scripts/battle.gd	3602	_run_battle	enemies.filter(func(e): return not e.dead).size())	S	Sim stat enemies_alive_r3 (statement opens at 3561).
+scripts/battle.gd	3844	_run_battle	for lf_e in enemies:	C	Living Flame: counts burning living enemies for a >= 3 condition; figure only.
+scripts/battle.gd	3858	_run_battle	var ew_pool: Array = enemies.filter(func(e): return _pickable(e))	P	Eternal Winter (capstone upkeep) chills EVERY living enemy each turn. EDIT: `enemies.filter(func(e): return _pickable(e))` (the inner `not ew_e.dead` at 3823 may stay).
+scripts/battle.gd	3866	_run_battle	var wg_pool: Array = enemies.filter(	P	Winter's Grasp: N RANDOM Chilled enemies gain a stack (shuffled pool). EDIT on 3827: `func(e): return _pickable(e) and e.has_status("chilled") \` (keeps `and not _is_held(e)`).
+scripts/battle.gd	3952	_run_battle	for sv2_e in enemies:	R	Salve: reads the distinct afflictions standing on living enemies to size the hero's own heal; no body is chosen.
+scripts/battle.gd	4300	_wasting_tick	var ws_foes: Array = enemies if u.is_hero else heroes	C	Wasting tick: tests whether the other side still has a living body; the tick lands on the unit itself.
+scripts/battle.gd	4341	_watchtower_check	for u in heroes + enemies:	S	Watchtower: soonest next_time on the timeline.
+scripts/battle.gd	4405	_next_unit	var alive := (heroes + enemies).filter(func(u): return not u.dead)	S	_next_unit: turn order.
+scripts/battle.gd	4453	_update_talent_chips	for foe in enemies:	R	Crushing Blows chip: sums bleed buildup across living enemies.
+scripts/battle.gd	4479	_update_talent_chips	for foe in enemies:	S	Seeding Embers: harvests burning CORPSES (death handling).
+scripts/battle.gd	4503	_update_talent_chips	for foe in enemies:	S	Chain Ignition: corpse scan (death handling).
+scripts/battle.gd	4509	_update_talent_chips	var ew_pool: Array = enemies.filter(func(e): return _pickable(e))	P	Chain Ignition: a burning corpse's Burn turns are SPLIT among the survivors (spread target). EDIT: `enemies.filter(func(e): return _pickable(e))`.
+scripts/battle.gd	4654	_player_turn	if enemies.all(func(e): return e.dead):	C	_player_turn: all-dead end check.
+scripts/battle.gd	4918	_player_turn	var foes := enemies.filter(func(e): return _pickable(e))	P	Player/bot area or random-hit card: placeholder target `foes[0]` ('resolve picks the real targets'). EDIT: `enemies.filter(func(e): return _pickable(e))`. GUARD: `foes[0]` errors when every living enemy is submerged — needs an empty-pool path (no door refuses an area card today).
+scripts/battle.gd	4934	_player_turn	pool.append_array(enemies.filter(func(e): return _pickable(e)))	P	Dispel picker pool, its enemy half. EDIT: `pool.append_array(enemies.filter(func(e): return _pickable(e)))`.
+scripts/battle.gd	4940	_player_turn	pool = enemies.filter(func(e): return _pickable(e))	P	The player's target picker pool for an enemy-target card (then narrowed by `_enemy_pick_pool`). EDIT: `pool = enemies.filter(func(e): return _pickable(e))`. GUARD: pool may be empty while enemies live.
+scripts/battle.gd	4958	_player_turn	var pool2: Array = enemies.filter(func(e): return _pickable(e) and e != target)	P	choose_two / Aguila Kill Command second pick pool. EDIT: `func(e): return _pickable(e) and e != target`.
+scripts/battle.gd	4967	_player_turn	var pool3: Array = enemies.filter(	P	choose_three third pick pool. EDIT on 4928: `func(e): return _pickable(e) and e != target and e != second_target`.
+scripts/battle.gd	5083	_player_turn	auto_target = enemies.filter(func(e): return _pickable(e)).front()	P	Bot null-target fallback (basic on the first living enemy). EDIT: `enemies.filter(func(e): return _pickable(e)).front()`; `.front()` on an empty array returns null, so the loop needs an exit when nothing is pickable.
+scripts/battle.gd	5224	_autoplay_pick	var fb_foes := enemies.filter(func(e): return _pickable(e))	P	Bot fallback when the door refuses the rotation's card: basic at lowest-hp (Broken first). EDIT: `enemies.filter(func(e): return _pickable(e))`. GUARD: `_lowest_hp(fb_foes)` indexes pool[0] and errors on empty.
+scripts/battle.gd	5253	_bot_class_kit_pick	var foes := enemies.filter(func(e): return _pickable(e))	P	Bot class-kit pick: foes pool and its mark. EDIT: `enemies.filter(func(e): return _pickable(e))` (empty already returns []).
+scripts/battle.gd	5362	_bot_drafted_pick	var foes := enemies.filter(func(e): return _pickable(e))	P	Bot drafted-ability pick: foes pool (fed to `_enemy_pick_pool`). EDIT: `enemies.filter(func(e): return _pickable(e))`.
+scripts/battle.gd	5722	_autoplay_pick_kit	var foes := enemies.filter(func(e): return _pickable(e))	P	Bot rotation (`_autoplay_pick_kit`): foes and target_foe for every spec's arm. EDIT: `enemies.filter(func(e): return _pickable(e))` (empty already returns the basic at self).
+scripts/battle.gd	6144	_autoplay_pick_kit	and enemies.filter(func(e): return not e.dead).size() >= 3:	C	Bot heuristic: cast Call of the Wild while >= 3 enemies stand (statement opens at 6103); a count.
+scripts/battle.gd	6431	_use_item	for e in enemies.filter(func(en): return _pickable(en)):	P	Bomb item hits every living enemy. EDIT: `for e in enemies.filter(func(en): return _pickable(en)):`.
+scripts/battle.gd	6568	_use_item	var vs_living := enemies.filter(func(en): return _pickable(en))	P	Cursed Visage item hexes every living enemy; refunds when the list is empty. EDIT: `enemies.filter(func(en): return _pickable(en))` (the refund then fires when nothing is pickable).
+scripts/battle.gd	6606	_use_item	for hg_u in heroes + enemies:	S	Resonating Hourglass: timeline (soonest other unit).
+scripts/battle.gd	6769	_eff_cost	elif enemies.any(func(e): return _pickable(e) and e.broken):	P	DOOR: `_eff_cost` with no target in hand prices upgraded Execute FREE when a living Broken enemy stands; the picker then narrows to bodies it can offer. EDIT: `elif enemies.any(func(e): return _pickable(e) and e.broken):`.
+scripts/battle.gd	6932	_recast_targets	return enemies.filter(func(e): return _pickable(e))	P	DOOR: `_recast_targets` — the bodies a recast-gated enemy card (Hysteria, Slow Burn, Choking Smoke, Rime, Umbral Sigil, Penance, Bola, Counter Time, Forsake, Glacial Prison) would write to, i.e. the picker's pool or the area card's population. EDIT: `return enemies.filter(func(e): return _pickable(e))`.
+scripts/battle.gd	7439	_ability_usable	if ab.special == "cull" and not enemies.any(func(e): \	P	DOOR: Cull lights only when a living body has something to reap. EDIT on 7400: `return _pickable(e) and _harvest_yield(e) > 0):`.
+scripts/battle.gd	7475	_ability_usable	for e in enemies:	C	Trap-slot count: snares this hero holds on living enemies. An occupied slot is occupied whether its body is submerged or not; a count.
+scripts/battle.gd	7520	_ability_usable	if ab.special == "transference" and not enemies.any(func(e): \	P	DOOR: Transference needs Ruin on the field. EDIT on 7481: `return _pickable(e) and e.status_stacks("ruin") > 0):`.
+scripts/battle.gd	7541	_ability_usable	if ab.special == "requiem" and not enemies.any(func(e): \	P	DOOR: Requiem needs a mark on the field. EDIT on 7502: `return _pickable(e) and e.status_stacks("ruin") > 0):`.
+scripts/battle.gd	7549	_ability_usable	and not enemies.any(func(e): return _execute_qualifies(u, e)):	P	DOOR: Execute needs a qualifying body (statement opens at 7508). EDIT at the one answer, `_execute_qualifies` (8510): `return _pickable(e) and (e.hp < e.max_hp * _execute_line(u) or e.broken)` — covers this door, the pool, the refusal hover, the tell (7794) and the bot. NO EDIT on this line.
+scripts/battle.gd	7565	_ability_usable	and not enemies.any(func(e): return _pickable(e) and e.has_status("burn")):	P	DOOR: Wildfire needs a burning body (statement opens at 7524). EDIT: `return _pickable(e) and e.has_status("burn")`.
+scripts/battle.gd	7568	_ability_usable	and not enemies.any(func(e): return _pickable(e) and e.has_status("burn")):	P	DOOR: Backdraft needs a burning body (statement opens at 7527). EDIT: `return _pickable(e) and e.has_status("burn")`.
+scripts/battle.gd	7574	_ability_usable	and not enemies.any(func(e): return _pickable(e) and e.has_status("burn")):	P	DOOR: Funeral Pyre needs a burning body (statement opens at 7533). EDIT: `return _pickable(e) and e.has_status("burn")`.
+scripts/battle.gd	7579	_ability_usable	and not enemies.any(func(e): return _pickable(e) and e.has_status("chilled")):	P	DOOR: Killing Frost needs a Chilled body (statement opens at 7538). EDIT: `return _pickable(e) and e.has_status("chilled")`.
+scripts/battle.gd	7594	_ability_usable	and not enemies.any(func(e): return _pickable(e) and e.has_status("burn")):	P	DOOR: Firedraw needs a burning body (statement opens at 7553). EDIT: `return _pickable(e) and e.has_status("burn")`.
+scripts/battle.gd	7597	_ability_usable	and not enemies.any(func(e): return _pickable(e) and e.has_status("burn")):	P	DOOR: Pyre Wake needs a burning body (statement opens at 7556). EDIT: `return _pickable(e) and e.has_status("burn")`.
+scripts/battle.gd	7665	_ability_usable	if ab.display_name == "Hunt" and not enemies.any(func(e): \	P	DOOR: Hunt needs an afflicted body. EDIT on 7626: `return _pickable(e) and _status_count(e) > 0):`.
+scripts/battle.gd	7714	_ability_usable	enemies.filter(func(e): return _pickable(e))).is_empty():	P	DOOR: a PICK_DUD card is refused when `_enemy_pick_pool` over the living offers nobody (statement opens at 7673). EDIT: `enemies.filter(func(e): return _pickable(e))`.
+scripts/battle.gd	7774	_ability_popup_button	if ab.special == "transference" and not enemies.any(func(e): \	P	TELL for the Transference door (7480). EDIT on 7735: `return _pickable(e) and e.status_stacks("ruin") > 0):`.
+scripts/battle.gd	7783	_ability_popup_button	if ab.special == "requiem" and not enemies.any(func(e): \	P	TELL for the Requiem door (7501). EDIT on 7744: `return _pickable(e) and e.status_stacks("ruin") > 0):`.
+scripts/battle.gd	7795	_ability_popup_button	and not enemies.any(func(e): return _pickable(e) and e.has_status("burn")):	P	TELL for the Funeral Pyre door (statement opens at 7754). EDIT: `return _pickable(e) and e.has_status("burn")`.
+scripts/battle.gd	7798	_ability_popup_button	and not enemies.any(func(e): return _pickable(e) and e.has_status("chilled")):	P	TELL for the Killing Frost door (statement opens at 7757). EDIT: `return _pickable(e) and e.has_status("chilled")`.
+scripts/battle.gd	7805	_ability_popup_button	and not enemies.any(func(e): return _pickable(e) and e.has_status("burn")):	P	TELL for the Firedraw / Pyre Wake doors (statement opens at 7764). EDIT: `return _pickable(e) and e.has_status("burn")`.
+scripts/battle.gd	7826	_ability_popup_button	if ab.display_name == "Hunt" and not enemies.any(func(e): \	P	TELL for the Hunt door (7625). EDIT on 7787: `return _pickable(e) and _status_count(e) > 0):`.
+scripts/battle.gd	7834	_ability_popup_button	and not enemies.any(func(e): return _execute_qualifies(u, e)):	P	TELL for the Execute door (statement opens at 7793). NO EDIT HERE: covered by `_execute_qualifies` (8510).
+scripts/battle.gd	7840	_ability_popup_button	if ab.special == "cull" and not enemies.any(func(e): \	P	TELL for the Cull door (7399). EDIT on 7801: `return _pickable(e) and _harvest_yield(e) > 0):`.
+scripts/battle.gd	7846	_ability_popup_button	var pl_live: Array = enemies.filter(func(e): return _pickable(e))	P	TELL: Firedraw/Transference/Cryoclasm 'last enemy standing carries the only X' — the pool it asks `_enemy_pick_pool` over. EDIT: `enemies.filter(func(e): return _pickable(e))`.
+scripts/battle.gd	8448	_open_item_picker	usable = usable and enemies.any(func(e): return _pickable(e))	P	DOOR: the Cursed Visage item button is usable while a living enemy stands (its effect, 6528). EDIT: `usable = usable and enemies.any(func(e): return _pickable(e))`.
+scripts/battle.gd	8609	_pick_dud	if enemies.any(func(o): return _pickable(o) and o != e and _burn_turns_on(o) > 0):	P	`_pick_dud` Firedraw: is there ANOTHER burning body to draw from — the draw acts on every other enemy (23174), so its source bodies are picks. EDIT: `func(o): return _pickable(o) and o != e and _burn_turns_on(o) > 0`.
+scripts/battle.gd	8613	_pick_dud	if enemies.any(func(o): return _pickable(o) and o != e and o.status_stacks("ruin") > 0):	P	`_pick_dud` Transference: is there ANOTHER body carrying Ruin to move from (25817). EDIT: `func(o): return _pickable(o) and o != e and o.status_stacks("ruin") > 0`.
+scripts/battle.gd	8662	_target_refusals	for e in enemies:	P	`_target_refusals` (PICK_DUD cards): the picker's refusal hover on living bodies outside the pool. A submerged body is not a choice and should carry no 'would produce nothing' reason. EDIT on 8618: `if not _pickable(e) or pool.has(e):`.
+scripts/battle.gd	8669	_target_refusals	for e in enemies:	P	`_target_refusals` (Execute): refusal hover on living bodies outside the pool. EDIT on 8625: `if not _pickable(e) or pool.has(e):`.
+scripts/battle.gd	8832	_declare_all_intents	for e in enemies:	S	Declares every body's intent.
+scripts/battle.gd	8920	_revalidate_intent	var pool: Array = enemies.filter(func(e): return _pickable(e)) if want_ally \	P	`_revalidate_intent`: a support cast whose declared fellow is gone is re-targeted onto the lowest-hp fellow (hero blows use `_hero_side()`, unchanged). EDIT: `enemies.filter(func(e): return _pickable(e)) if want_ally \`. ALSO the trigger at 8866: add `or (want_ally and target != u and not _pickable(target))` so a fellow that submerged after the declaration is re-targeted (a self-cast stays SELF).
+scripts/battle.gd	9040	_enemy_turn	var hys_fellows := enemies.filter(func(e): return _pickable(e) and e != u)	P	Hysteria: the maddened body strikes a random fellow. EDIT: `func(e): return _pickable(e) and e != u`.
+scripts/battle.gd	9084	_enemy_turn	var psy_fellows := enemies.filter(func(e): return _pickable(e) and e != u)	P	Psychosis: the body mauls a random fellow. EDIT: `func(e): return _pickable(e) and e != u`.
+scripts/battle.gd	9138	_enemy_turn	var ft_fellows := enemies.filter(func(e): return _pickable(e) and e != u)	P	Feint redirect onto a random fellow. EDIT: `func(e): return _pickable(e) and e != u` (an empty pool already keeps the mark).
+scripts/battle.gd	9335	_enemy_support_action	var allies: Array = enemies.filter(func(e): return _pickable(e))	P	`_enemy_support_action` allies pool: Healing Wave / Shielding / Wild Growth targets and the Rite/Vigil conditions. EDIT: `enemies.filter(func(e): return _pickable(e))`. Self-casts (Regenerate, Regalia, Rite, Vigil) name `u` directly and are SELF, unaffected; a submerged healer drops out of its own Wave/Growth pool.
+scripts/battle.gd	9485	_malice_free	for e in enemies:	S	Malice: what the declared heals and spends hold in reserve.
+scripts/battle.gd	9525	_malice_price	for e in enemies:	R	Dark Vigil's Malice PRICE: sums its heal figure over living unblighted bodies. Unchanged by class, but it must mirror the Vigil's own population (25027, P): if that skips submerged bodies, price it `not e.dead and _pickable(e) and not e.has_status("blight")` so the price and the heal stay one (JJ §3).
+scripts/battle.gd	9620	_submerge_holds	return enemies.any(func(e): return e != u and _pickable(e))	C	JW: the stall rule asks whether another body of the warband can be picked — an existence test, no body chosen.
+scripts/battle.gd	9624	_surface_if_alone	if enemies.any(func(e): return _pickable(e)):	C	JW: the stall rule asks whether any body of the warband can be picked — an existence test.
+scripts/battle.gd	9626	_surface_if_alone	for e in enemies:	S	JW: every submerged body surfaces — the status lifted from each, no body chosen as a target.
+scripts/battle.gd	9665	_corpse_explosion	var nbrs: Array = _adjacent_enemies(u).filter(func(e): return _pickable(e))	P	JW: Corpse Explosion heals one living neighbour, `_pickable`, the lower-health of two.
+scripts/battle.gd	9705	_raise_holds	for e in enemies:	S	Raise bookkeeping: another body's declared Raise names this fallen body.
+scripts/battle.gd	9717	_spend_declared	for e in enemies:	S	Has any standing body declared this spend.
+scripts/battle.gd	9742	_warband_spend	var standing: Array = enemies.filter(func(e): return not e.dead)	C	Malice spends: `standing` sizes the Rally condition (>= MALICE_RALLY_BODIES) and tests whether any is already rallied/entrenched; counts.
+scripts/battle.gd	9745	_warband_spend	var fallen: Array = enemies.filter(func(e): return _raise_holds(e, u) and _enemy_ready(u, raise, ticks_ahead, e, held))	S	Raise chooses a DOWN body; `_pickable` is false for every dead body, so it cannot apply here (statuses are cleared on death).
+scripts/battle.gd	9859	_malice_words	for e in enemies:	S	Malice tooltip: lists the warband's spenders.
+scripts/battle.gd	10059	_likeliest_target	for e in enemies:	R	`_likeliest_target`: reads taunts on living enemies to choose a HERO for the Devout bot's shield; no enemy body is chosen.
+scripts/battle.gd	10112	_adjacent_enemies	func _adjacent_enemies(target: BattleUnit) -> Array:	P	`_adjacent_enemies` definition (Sundering, Total Commitment, Ursus sweep). NO EDIT on this line: the picks are 9952/9954.
+scripts/battle.gd	10113	_adjacent_enemies	var idx := enemies.find(target)	S	Formation index lookup.
+scripts/battle.gd	10117	_adjacent_enemies	if idx > 0 and _pickable(enemies[idx - 1]):	P	Adjacent left neighbour. EDIT: `if idx > 0 and _pickable(enemies[idx - 1]):` (a submerged neighbour negates that side as a corpse does; never jumps past it).
+scripts/battle.gd	10118	_adjacent_enemies	adjacent.append(enemies[idx - 1])	P	Adjacent left neighbour appended. NO EDIT HERE: guarded by 9952.
+scripts/battle.gd	10119	_adjacent_enemies	if idx + 1 < enemies.size() and _pickable(enemies[idx + 1]):	P	Adjacent right neighbour. EDIT: `if idx + 1 < enemies.size() and _pickable(enemies[idx + 1]):`.
+scripts/battle.gd	10120	_adjacent_enemies	adjacent.append(enemies[idx + 1])	P	Adjacent right neighbour appended. NO EDIT HERE: guarded by 9954.
+scripts/battle.gd	10647	_resolve	for cs_e in enemies:	P	Rune of the Cold Snap: Ice Lance also strikes EVERY Chilled body. EDIT on 10474: `if not _pickable(cs_e) or cs_e == target or not cs_e.has_status("chilled"):`.
+scripts/battle.gd	10655	_resolve	strike_targets = enemies.filter(func(t): return _pickable(t)) \	P	AoE strike targets (hero side; an enemy AoE uses `_hero_side()`, unchanged). EDIT: `enemies.filter(func(t): return _pickable(t)) \`.
+scripts/battle.gd	10667	_resolve	var two_side: Array = _hero_side() if _hero_side().has(target) else enemies.filter(func(e): return _pickable(e) and e != attacker)	P	JW: choose_two / choose_three fallback, the target's own side, every body `_pickable` (the Fen Lurker's Swipe is the first warband move to carry it).
+scripts/battle.gd	10682	_resolve	var rest := enemies.filter(	P	choose_three fallback third body. EDIT on 10504: `func(e): return _pickable(e) and e != target and e != second)`; 10502 `third.dead` likewise.
+scripts/battle.gd	10751	_resolve	seek_bodies = enemies.filter(	P	Rune of Seeking Missiles: one missile per weakened body. EDIT on 10573: `func(e): return _pickable(e) and e.has_status("elem_weak"))`.
+scripts/battle.gd	10842	_resolve	var live_pool: Array = enemies.filter(func(t): return _pickable(t)) \	P	Random-hit shard pool, re-picked every hit (hero side; enemy uses `_hero_side()`). EDIT: `enemies.filter(func(t): return _pickable(t)) \` (an empty pool already breaks the loop).
+scripts/battle.gd	11922	_resolve	det_pool = enemies.filter(func(e): return _pickable(e))	P	Detonation under Cataclysm empties EVERY burning bank. EDIT: `det_pool = enemies.filter(func(e): return _pickable(e))`.
+scripts/battle.gd	11924	_resolve	det_pool = [strike_target] + _adjacent_enemies(strike_target)	P	Detonation under Total Commitment: target plus neighbours. NO EDIT HERE: `_adjacent_enemies` (9952/9954).
+scripts/battle.gd	12190	_resolve	for e in enemies:	C	Sea of Flame: counts lit bodies for a damage multiplier.
+scripts/battle.gd	12390	_resolve	var bm_wounded := enemies.filter(func(en): return not en.dead and en.hp < en.max_hp * 0.35).size()	C	Pack Bond (Canis): counts wounded bodies for a damage multiplier.
+scripts/battle.gd	12976	_resolve	for foe in enemies:	R	Crushing Blows: sums bleed buildup across living enemies for armor pen.
+scripts/battle.gd	13352	_resolve	var lw_pool := enemies.filter(	P	Rune of the Long Watch: Break carried to the lowest-hp other body. EDIT on 13174: `func(e): return _pickable(e) and e != strike_target)`.
+scripts/battle.gd	13461	_resolve	var ok_pool := enemies.filter(	P	Overkill: the excess carries to the lowest-hp other body. EDIT on 13283: `func(e): return _pickable(e) and e != strike_target)`.
+scripts/battle.gd	13617	_resolve	var rift_pool := enemies.filter(func(e): return _pickable(e))	P	Temporal Rift: the crit's echo lands on a random living enemy. EDIT: `enemies.filter(func(e): return _pickable(e))`.
+scripts/battle.gd	13721	_resolve	for ow_e in enemies:	P	Rune of the Open Wound: Shadowrend marks EVERY other enemy. EDIT on 13543: `if not _pickable(ow_e) or ow_e == strike_target:`.
+scripts/battle.gd	13771	_resolve	lg_marks = enemies.filter(func(e): \	P	Lunge (Defensive): Break to EVERY other enemy. EDIT on 13593: `return _pickable(e) and e != strike_target)`.
+scripts/battle.gd	13821	_resolve	for lb_e in enemies:	C	Rune of the Long Blade: is any enemy Broken anywhere on the field; a condition.
+scripts/battle.gd	13893	_resolve	for ur_e in enemies:	P	Rune of Unravel: weakness spreads to EVERY other enemy. EDIT on 13715: `if not _pickable(ur_e) or ur_e == strike_target:`.
+scripts/battle.gd	13905	_resolve	var neighbors := _adjacent_enemies(strike_target)	P	Sundering: Break to the neighbours. NO EDIT HERE: `_adjacent_enemies` (9952/9954).
+scripts/battle.gd	13968	_resolve	var others := enemies.filter(	P	Mocking Blow / Provoke: extra taunts on shuffled other bodies. EDIT on 13790: `func(e): return _pickable(e) and e != strike_target)`.
+scripts/battle.gd	14229	_resolve	var ct_pool: Array = enemies.filter(	P	Rune of the Cinder Trail: embers onto a random other body. EDIT on 14051: `func(e): return _pickable(e) and e != strike_target)`.
+scripts/battle.gd	14363	_resolve	for cat_e in enemies:	P	Cataclysm chain: each link fires at the enemy with the most Burn left. EDIT on 14185: `if not _pickable(cat_e) or not cat_e.has_status("burn"):`.
+scripts/battle.gd	14572	_resolve	for ae_e in enemies:	S	Arcane Echo: clears the old mark off every other enemy (one mark at a time); cleanup, not an aim.
+scripts/battle.gd	14649	_resolve	var bl_targets := enemies.filter(func(e): return _pickable(e))	P	Blowback: recoil split outward across living enemies. EDIT: `enemies.filter(func(e): return _pickable(e))`.
+scripts/battle.gd	14943	_resolve	var sp_pool := enemies.filter(	P	Spray of Arrows: extra random bodies. EDIT on 14760: `func(e): return _pickable(e) and e != target)`.
+scripts/battle.gd	15067	_resolve	var foes := enemies.filter(func(e): return _pickable(e))	P	Companion AI: the pack's fallback target when the hero's target is gone. EDIT: `enemies.filter(func(e): return _pickable(e))`; trigger on 14882 `comp_target.dead` -> `not _pickable(comp_target)`.
+scripts/battle.gd	15221	_resolve	var rampage_foes := enemies.filter(func(e): return _pickable(e))	P	Rampage: the free recast surges to a random living enemy. EDIT: `enemies.filter(func(e): return _pickable(e))`.
+scripts/battle.gd	15579	_killing_cold_cast	for e in enemies:	P	Rune of Killing Cold: damages EVERY enemy at 4+ Chilled. EDIT on 15396: `if not _pickable(e) or not e.has_status("chilled"):`.
+scripts/battle.gd	15626	_hold_freeze_riders	var bc_pool := enemies.filter(func(e): return _pickable(e) and e != target)	P	Bitter Cold: the freeze rolls onto EVERY other enemy. EDIT: `func(e): return _pickable(e) and e != target`.
+scripts/battle.gd	15732	_hold_release_body	for e in enemies:	P	Shockwave: sets EVERY other unheld enemy back on the timeline (an area effect a talent applies to every enemy). EDIT on 15549: `if _pickable(e) and e != target and not _is_held(e):`.
+scripts/battle.gd	16063	_apply_status	var dw_others: Array = enemies.filter(	P	Downwind: a hero's debuff is copied onto another body (every other under the Carrion rune). EDIT on 15880: `func(e): return _pickable(e) and e != target)`.
+scripts/battle.gd	16164	_apply_status	var others := enemies.filter(func(e): return _pickable(e) and e != target)	P	Rime: the chill leaps to a random other body. EDIT: `func(e): return _pickable(e) and e != target`.
+scripts/battle.gd	16456	_total_burn_turns	for foe in enemies:	R	`_total_burn_turns`: sums Burn turns across living enemies (Overburn's fuel).
+scripts/battle.gd	16473	_burning_foe_count	for foe in enemies:	C	`_burning_foe_count`: counts burning bodies.
+scripts/battle.gd	16736	_frostbind_partner	for foe in enemies:	R	`_frostbind_partner` loop: finds the named partner; lookup only (see 16543).
+scripts/battle.gd	16877	_rally_forward	for u in heroes + enemies + companions:	S	`_rally_forward`: timeline.
+scripts/battle.gd	16938	_arcane_arrow_splash	var pool: Array = enemies.filter(func(e): return _pickable(e) and e != struck)	P	Arcane Arrow splash: a random other body. EDIT: `func(e): return _pickable(e) and e != struck`.
+scripts/battle.gd	16980	_crossfire_splash	var pool: Array = enemies.filter(func(e): return _pickable(e) and e != struck)	P	Crossfire splash: the lowest-hp other bodies. EDIT: `func(e): return _pickable(e) and e != struck`.
+scripts/battle.gd	17052	_umbral_sigil_echo	for fellow in enemies:	P	Umbral Sigil: the branded body's pain echoes onto EVERY fellow. EDIT on 16869: `if not _pickable(fellow) or fellow == branded:`.
+scripts/battle.gd	17080	_arcane_echo_repeat	for e in enemies:	P	Arcane Echo: every hit repeats onto the body wearing his mark. Ambiguous (a laid mark), classed P because the echo is a fresh hero blow aimed at a body, not a tick. EDIT on 16897: `if not _pickable(e) or not e.has_status("arcane_echo"):`.
+scripts/battle.gd	17259	_engine_mark_on	for e in enemies:	R	`_engine_mark_on`: which living body wears this holder's mark (a lookup deciding whether a new mark is due; the new mark lands on the victim just struck).
+scripts/battle.gd	17294	_mark_destination	for e in enemies:	P	`_mark_destination`: where a fallen body's engine mark moves (mark moving to a new body). EDIT on 17111: `if e == fallen or not _pickable(e) or e.hp <= 0:`.
+scripts/battle.gd	17307	_blood_debt_payer	for e in enemies:	P	`_blood_debt_payer`: the body that pays Blood Price's debt. EDIT on 17124: `if not _pickable(e) or e.hp <= 0:`.
+scripts/battle.gd	17525	_bot_redoubt_pick	var foes := enemies.filter(func(e): return _pickable(e))	P	Bot (Redoubt): spends the bank on the basic at lowest-hp (Broken first). EDIT: `enemies.filter(func(e): return _pickable(e))`.
+scripts/battle.gd	17601	_forge_body_throw	var alight := enemies.filter(func(e): return _pickable(e) and e.has_status("burn"))	P	Forge Body: the stopped blow is thrown at a random burning body. EDIT: `func(e): return _pickable(e) and e.has_status("burn")`.
+scripts/battle.gd	17673	_overburn_refund	var el_pool: Array = enemies.filter(func(e): return _pickable(e))	P	Rune of the Ember Leap: half the consumed fire jumps to the least-burning body. EDIT: `enemies.filter(func(e): return _pickable(e))`.
+scripts/battle.gd	18813	_preparation_tick	for other in heroes + enemies + companions:	S	Preparation: timeline.
+scripts/battle.gd	18847	_grant_free_action	for other in heroes + enemies + companions:	S	`_grant_free_action`: timeline.
+scripts/battle.gd	19345	_bewitched_strike	var fellows := enemies.filter(func(e): return _pickable(e) and e != u)	P	Bewitch: the charmed body basic-attacks a random fellow. EDIT: `func(e): return _pickable(e) and e != u`.
+scripts/battle.gd	19452	_unique_enemy_debuffs	for e in enemies:	R	`_unique_enemy_debuffs`: counts distinct debuff ids across living enemies (a figure).
+scripts/battle.gd	19650	_gain_ruin	for mirror in enemies:	P	Covenant of Ash: Ruin landing anywhere is mirrored onto the covenant's bearer (mark spread). EDIT on 19464: `if mirror == target or not _pickable(mirror) or not mirror.has_status("covenant"):`.
+scripts/battle.gd	19678	_gain_ruin	var catchers := enemies.filter(func(e): return _pickable(e) and e != target)	P	Spread of Madness: the mark leaps to a random other body. EDIT: `func(e): return _pickable(e) and e != target`.
+scripts/battle.gd	19748	_boss_fight	for e in enemies:	C	`_boss_fight`: is a boss on the field.
+scripts/battle.gd	19833	_detonate_ruin	for e in enemies:	P	Unraveling: the blast seeds Ruin in EVERY other enemy. EDIT on 19647: `if _pickable(e) and e != target:`.
+scripts/battle.gd	19897	_detonate_ruin	for sr_e in enemies:	P	Rune of the Shared Ruin: half the mark jumps to the most-Ruined other body. EDIT on 19711: `if not _pickable(sr_e) or sr_e == target:`.
+scripts/battle.gd	20208	_ward_detonate	for wd_e in enemies.duplicate():	P	Rune of the Detonating Ward: the ward hits EVERY enemy. EDIT on 20022: `if not _pickable(wd_e):`.
+scripts/battle.gd	20528	_burning_ground_tick	for bg_e in enemies.duplicate():	P	Rune of Burning Ground: ticks EVERY enemy. EDIT on 20342: `if not _pickable(bg_e):`.
+scripts/battle.gd	20576	_return_burden	for rb_e in enemies:	P	Rune of Returned Burden: each lifted status goes back to the enemy that laid it (status moving to a body). EDIT on 20390: `if _pickable(rb_e) and rb_e.unit_name == rb_src:`.
+scripts/battle.gd	20581	_return_burden	var rb_live: Array = enemies.filter(func(e): return _pickable(e))	P	Returned Burden fallback: a random living enemy. EDIT: `enemies.filter(func(e): return _pickable(e))` (empty already breaks).
+scripts/battle.gd	21329	_resolve_special	for e in enemies.filter(func(en): return _pickable(en)):	P	Mass Hysteria: applies to EVERY living enemy. EDIT: `for e in enemies.filter(func(en): return _pickable(en)):`.
+scripts/battle.gd	21336	_resolve_special	for e in enemies:	R	Rampage (special): sums bleed buildup across living enemies for its own buff.
+scripts/battle.gd	21383	_resolve_special	var kc_next := enemies.filter(func(e): return _pickable(e))	P	Kill Command (companion): the pack turns on the next weakest when the prey falls. EDIT: `enemies.filter(func(e): return _pickable(e))`; trigger on 21195 `kc_target.dead` -> `not _pickable(kc_target)`.
+scripts/battle.gd	21415	_resolve_special	var kc_pool := enemies.filter(	P	Kill Command (Aguila): fallback second body. EDIT on 21229: `func(e): return _pickable(e) and e != kc_target)`.
+scripts/battle.gd	21482	_resolve_special	for foe in enemies:	P	Cinderfall: hits EVERY living enemy and skims its Burn. EDIT on 21296: `if not _pickable(foe):`.
+scripts/battle.gd	21717	_resolve_special	for foe2 in enemies:	S	Covenant of Ash: clears the old covenant off every enemy (one at a time); cleanup.
+scripts/battle.gd	21811	_resolve_special	var cw_foes := enemies.filter(func(e): return _pickable(e))	P	Call the Wilds: the arriving beast strikes the lowest-hp body (companion target). EDIT: `enemies.filter(func(e): return _pickable(e))`.
+scripts/battle.gd	21824	_resolve_special	for foe3 in enemies:	S	Quarry's Mark: clears the old mark; cleanup.
+scripts/battle.gd	21859	_resolve_special	for foe4 in enemies:	P	Choking Smoke: Blind and Burn on EVERY enemy. EDIT on 21673: `if not _pickable(foe4):`.
+scripts/battle.gd	21885	_resolve_special	for foe5 in enemies:	P	Snare Line: the line on EVERY enemy. EDIT on 21699: `if not _pickable(foe5):`.
+scripts/battle.gd	22271	_resolve_special	for es_e in enemies:	P	Eye of the Storm: taunts EVERY enemy. EDIT on 22085: `if not _pickable(es_e):`.
+scripts/battle.gd	23028	_resolve_special	for hm_e in enemies:	S	Hunter's Mark: clears the old mark off other bodies; cleanup.
+scripts/battle.gd	23158	_resolve_special	for foe in enemies:	P	Slow Burn: the marker on EVERY living enemy. EDIT on 22972: `if not _pickable(foe):`.
+scripts/battle.gd	23259	_resolve_special	for foe in enemies:	P	Killing Frost: strikes EVERY Chilled body. EDIT on 23073: `if not _pickable(foe) or not foe.has_status("chilled"):`.
+scripts/battle.gd	23312	_resolve_special	var ia_alive := enemies.filter(func(e): return not e.dead).size()	C	Inner Arcane: Resonance scales with how many enemies stand; a payout count.
+scripts/battle.gd	23361	_resolve_special	for foe in enemies:	P	Firedraw: draws Burn OUT of every other burning body (source bodies acted on). EDIT on 23175: `if not _pickable(foe) or foe == target:`.
+scripts/battle.gd	23437	_resolve_special	var pw_pool := enemies.filter(func(e): return _pickable(e))	P	Pyre Wake: each turn of the pyre scatters onto a random living enemy. EDIT: `enemies.filter(func(e): return _pickable(e))`.
+scripts/battle.gd	23537	_resolve_special	for foe in enemies:	P	Deep Winter: Chilled on EVERY enemy. EDIT on 23351: `if not _pickable(foe):`.
+scripts/battle.gd	23567	_resolve_special	var fb_pool := enemies.filter(	P	Frostbind: fallback second body (most Chilled). EDIT on 23381: `func(e): return _pickable(e) and e != fb_first)`.
+scripts/battle.gd	24030	_resolve_special	ul_tgt = _lowest_hp(enemies.filter(	P	Unleash (companion): fallback at the lowest-hp body. EDIT on 23844: `func(e): return _pickable(e)))`. GUARD: `_lowest_hp([])` errors (pool[0]) when every living enemy is submerged — the `ul_tgt == null` branch is never reached.
+scripts/battle.gd	24065	_resolve_special	for rq_old in enemies:	S	Reacquire: clears the old mark; cleanup.
+scripts/battle.gd	24152	_resolve_special	for cu_e in enemies.duplicate():	P	Cull: EVERY enemy pays for the afflictions consumed. EDIT on 23966: `if not _pickable(cu_e):`.
+scripts/battle.gd	24462	_resolve_special	var bw_pool := enemies.filter(func(e): return _pickable(e))	P	Bestial Wrath: the bear taunts 3 random enemies. EDIT: `enemies.filter(func(e): return _pickable(e))`.
+scripts/battle.gd	24686	_resolve_special	for e in enemies:	R	Battle Shout: sums bleed buildup across living enemies for its own buff.
+scripts/battle.gd	24790	_resolve_special	gc_marks = enemies.filter(func(e): return _pickable(e))	P	Sunder Guard: Break to EVERY living enemy. EDIT: `gc_marks = enemies.filter(func(e): return _pickable(e))`.
+scripts/battle.gd	24796	_resolve_special	for e in enemies:	P	Guard Change: auto-picks the un-Broken body nearest to Breaking. EDIT on 24610: `if _pickable(e) and not e.broken \`.
+scripts/battle.gd	25083	_resolve_special	for a in (enemies if not attacker.is_hero else heroes):	S	Enemy ward (Shielding/Regalia): clears `shielded` off the caster's other allies (one ward at a time); cleanup.
+scripts/battle.gd	25127	_resolve_special	var rite_side: Array = heroes if target.is_hero else enemies	P	Cleansing Rite (warband support): strips a debuff from EVERY living body on the target's side (heroes under Psychosis, unaffected). Ambiguous — an area support cast on fellows; classed P under the support-cast rule. EDIT on 24944: `if not _pickable(cl_a):`.
+scripts/battle.gd	25203	_resolve_special	var bt_fallen := enemies.filter(func(e): return e.dead).size()	C	Blood Tribute: counts the fallen.
+scripts/battle.gd	25218	_resolve_special	var tp_side: Array = heroes if target.is_hero else enemies	P	Dark Vigil (warband support): heals EVERY living body on the target's side. EDIT on 25031: `if not _pickable(tp_a):`. Mirror the price at 9460.
+scripts/battle.gd	25257	_resolve_special	for ra in enemies:	P	Malice Rally: every standing body of the warband is rallied (area support on fellows). Ambiguous; classed P under the support-cast rule. EDIT on 25067: `if _pickable(ra):`.
+scripts/battle.gd	25268	_resolve_special	for en in enemies:	P	Malice Entrench: every standing body is entrenched (area support). Ambiguous; P as 25066. EDIT on 25078: `if _pickable(en):`.
+scripts/battle.gd	25293	_resolve_special	for foe in enemies:	P	Wildfire Spread: lights EVERY unburnt body. EDIT on 25103: `if not _pickable(foe) or foe.has_status("burn"):`.
+scripts/battle.gd	25305	_resolve_special	for foe in enemies:	P	Wildfire: skims EVERY burning body. EDIT on 25115: `if not _pickable(foe) or not foe.has_status("burn"):`.
+scripts/battle.gd	25377	_resolve_special	for foe in enemies:	P	Backdraft: deepens EVERY burning body. EDIT on 25187: `if not _pickable(foe) or not foe.has_status("burn"):`.
+scripts/battle.gd	25433	_resolve_special	var gp_pool: Array = enemies.filter(	P	Rune of the Glass Prison: seals a random second body. EDIT on 25243: `func(e): return _pickable(e) and e != target and not _is_held(e))`.
+scripts/battle.gd	26008	_resolve_special	for tf_e in enemies:	P	Transference: the source — the deepest OTHER mark — is moved off that body. EDIT on 25818: `if not _pickable(tf_e) or tf_e == target:`.
+scripts/battle.gd	26105	_resolve_special	var ss_pool: Array = enemies.filter(func(e): return _pickable(e))	P	Savage Sweep (companion): the 3 lowest-hp bodies. EDIT: `enemies.filter(func(e): return _pickable(e))`.
+scripts/battle.gd	26287	_bot_boon_worth	var wounded := enemies.filter(func(e): return not e.dead \	C	Bot `_bot_boon_worth` (Canis): counts wounded bodies for a worth figure.
+scripts/battle.gd	26627	_arrival_for_kind	var pool := enemies.filter(func(e): return _pickable(e))	P	Guardian's Roar (Ursus arrival): taunts the weakest bodies. EDIT: `enemies.filter(func(e): return _pickable(e))`.
+scripts/battle.gd	26667	_arrival_for_kind	var howl_live: Array = enemies.filter(func(en): return _pickable(en))	P	Bloodhowl (Canis arrival): Bleed on EVERY enemy. EDIT: `enemies.filter(func(en): return _pickable(en))`.
+scripts/battle.gd	26683	_arrival_for_kind	var foes := enemies.filter(func(e): return _pickable(e))	P	Aguila arrival dive: fallback at the lowest-hp body. EDIT: `enemies.filter(func(e): return _pickable(e))`; trigger on 26491 `dive.dead` -> `not _pickable(dive)`.
+scripts/battle.gd	26689	_arrival_for_kind	var others := enemies.filter(	P	Herald: extra dives on the weakest other bodies. EDIT on 26499: `func(e): return _pickable(e) and not dives.has(e))`.
+scripts/battle.gd	26789	_companion_strike	for adj in _adjacent_enemies(victim):	P	Ursus sweep: the bear's blow also mauls the neighbours. NO EDIT HERE: `_adjacent_enemies` (9952/9954).
+scripts/battle.gd	28557	_add_bleed_with_burst	var hosts: Array = enemies.filter(	P	Arterial Spray / Exsanguination: burst blood surges to a random new host. EDIT on 28367: `func(e): return _pickable(e) and e != victim and not chain_hops.has(e))`.
+scripts/battle.gd	29711	_refresh_rune_chips	live = live or enemies.any(func(e): return not e.dead and e.has_status("ruin"))	C	Rune chip liveness: does any living enemy carry Ruin (display).
+scripts/battle.gd	29924	_check_end	var victory := enemies.all(func(e): return e.dead) and not stalemate	C	`_check_end` victory: every enemy dead.
+scripts/battle.gd	30013	_check_end	enemies.filter(func(e): return not e.dead).size())	S	Sim stat enemies_alive_r3 at the end (statement opens at 29821).
+scripts/battle.gd	32212	_backblast_check	for foe in enemies:	P	Backblast: sets EVERY enemy alight. EDIT on 32022: `if not _pickable(foe):`.
+scripts/run_sim.gd	763	note_battle_start	static func note_battle_start(run: Node, heroes: Array, enemies: Array,	S	`note_battle_start` signature: the warband passed for the sim's power table.
+scripts/run_sim.gd	784	note_battle_start	for e in enemies:	S	Sim ledger: sums enemy attack and effective HP as spawned.

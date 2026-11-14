@@ -17,6 +17,48 @@ heading stands in both files. **Since JE §3 it also takes what `CLAUDE.md` clos
 
 ---
 
+## ARCHIVED AT JW — 2026-11-14, FROM `docs/state.md` AS JV LEFT IT (`b38bf2d`)
+
+*In the order they stood. JV's three rulings, answered in JW's record (§0): all accepted as taken; and one item JW §0 closed — `Run.advance_zone`'s own guard and its gate (FOUND AT JS).*
+
+### ~~JV's RULINGS OWED~~ — **ALL THREE ANSWERED IN JW's RECORD (§0): all accepted as taken**
+
+*Its head as it stood: THREE; THE DRAW's DIE, THE LIST KEPT FOR THE GATES, AND WHERE THE TWO RULE ADDITIONS LANDED — EACH TAKEN ON THE RECOMMENDATION, NONE HOLDING ANYTHING UP*
+
+Full working: `docs/reports/JV.md`, NEEDS A RULING.
+
+1. **THE DRAW SPENDS THE SAME DIE, SO NO ROLL MOVED (JV §1; the record's open questions 1 and 4).** The record expected a draw that picks without listing to move every seeded fight, and said not to preserve the old rolls. **Taken**: the draw counts the list and takes `randi() % count`, the die `pick_random()` spends, then walks to the warband the list holds at that index — the exactness the record's first branch asks for, proved against the list warband for warband and die for die (`check_jv` §1 and §2). The rolls stand because the draw is the same draw, not because anything was kept to hold them. **The alternative**: a draw that spends a die at each choice — the role, the kind, how many — weighted by the counts, the same odds and every seeded row re-rolled. **Reversing it** is `_draw_unrank`'s walk, and a recon.
+2. **THE LIST STAYS, AS THE TWO GATES' DOOR (JV §1; the record's open question 2).** `check_jr` §1 and `check_js` §1 each derive a share over every warband, so `_theme_combos` and the walk JU cut stay, nothing in a run calls them, and `check_jv` holds the draw to them. **The alternative**: derive both gates' shares through counts and delete the list — a count by kind and by size written into two gates, wider than the record's scope. **Reversing it** is that derivation, then the list's three functions and `_combo_ok`, which only the list calls (`_menders_ok` stays for the draw).
+3. **WHERE THE TWO RULE ADDITIONS LANDED (JV §0).** **The recon clause in `docs/instrument-rules.md`'s Lane B floor**, where JT §1 placed the floors, as its own sentence, so `check_iu` §8 still reads the floor's no-routing sentence whole; the recon rule's lane note points at it. **The two habits in `docs/ways-of-working.md`**, beside the no-fact rule they serve — and in JV's closing block, because the design side's synced copy stops at Batch GI (FOUND AT JT). **The alternative**: the habits in the closing block alone, or the recon clause beside the recon rule. **Reversing it** is moving the two paragraphs.
+
+### FOUND AT JS AND NOT FIXED — ITS CLOSED ITEM
+
+*Closed at JW §0: `Run.advance_zone` asks `has_next_zone` itself and moves nothing at the last zone, and `check_jw` §5 derives every caller of `advance_zone(` in `scripts/` and reds on one whose function does not ask first.*
+
+- **`Run.advance_zone` HAS NO GUARD OF ITS OWN — A LATENT SHAPE, ITS WRITER A CALLER THAT DOES NOT ASK FIRST** (found in the
+  designer's play after JS, recorded at JT §0): its body opens `zone_idx += 1` and asks nothing, so a caller that does not ask
+  `has_next_zone` first runs the index past the run's last slot — the playtest save read *Zone 6 of 3* — while `current_zone_id`
+  reads `zone_draw[clampi(zone_idx, 0, SLOT_COUNT - 1)]` and shows the last slot under its old name. **The map's debug *Advance to
+  Next Zone* was that caller; it asks since `55a5e6d`**, and the run's own path asks already (`leave_zone_boss`: `if
+  has_next_zone():`, then `advance_zone()`). `55a5e6d` also made `Run.debug_force_zone` (`scripts/run_state.gd`, reached only
+  through the map's debug dispatch) read the slot `current_zone_id` reads and put `zone_idx` back on it. Of the gates and suites
+  that call `advance_zone`, four ask `has_next_zone` first (`check_eg`, `check_fh`, `check_gj`, `check_hr`), `test_batch_an` bounds
+  its own loop, `test_batch_ah` calls it once on a run it has just begun, and `check_ig` §4 once in each arm, putting `zone_idx`
+  back after. Nothing is broken today. **A cheap gate could hold it**: derive the callers of `advance_zone(` in `scripts/` and red
+  on one whose function does not ask `has_next_zone` before it — or the guard moves into the function, a line of game code.
+  **IT §7's rule owes that gate in the batch that finds the shape, since its callers derive; JT's brief allowed one gate, so it is
+  owed to the next Lane A batch that touches the zone path (a Lane B or C floor builds no gate) — the one member of the latent
+  shapes not armed.** *JV, a Lane A batch whose draw sits on that path (`advance_zone` → `_generate_map` → `compose`), did not
+  take it: its record carried it to the zone batch.*
+
+### FOUND AT JI AND NOT FIXED — ITS CLOSED ITEM
+
+*Closed at JW §3: a support cast refused at its turn falls back to the basic and re-aims it at the heroes' side, the most wounded of them (`_revalidate_intent`, the Long Silence's shape) — reached in ordinary play since JW by a Fen Lurker's refused Submerge, and driven by `check_jw` §3.*
+
+- **A DECLARED SUPPORT CAST THAT RE-VALIDATION REFUSES FALLS BACK TO THE BASIC AND KEEPS ITS ALLY TARGET** (the blocks' reader, read in the code and driven nowhere): `_revalidate_intent` swaps in `_cheapest_attack`, clears `support`, and re-targets only a target that is gone or held, so the basic lands on the enemy's own ally. Reachable at HEAD through Heads Down on an enemy that declared a support cast; JI's selection never declares a move that will still be cooling, so a cooldown cannot reach it. The Long Silence's declaration (`_declare_intent`) is the shape a repair copies: re-aim at the hero side.
+
+---
+
 ## ARCHIVED AT JV — 2026-11-12, FROM `docs/state.md` AS JU LEFT IT (`daf465d`)
 
 *In the order they stood. JU's six rulings and the four of JT's still owed, answered in JV's record (§0): all accepted as taken; and one item JV §1 closed — the composer's cost of a kind (FOUND AT JU), whose last words did not hold: the draw that picks without listing moved no seeded fight.*

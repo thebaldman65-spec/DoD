@@ -1,0 +1,15 @@
+kind	name	patterned on	roles	power	enemy role	Attack	health	armor	speed	rosters	resists	tint	move	what it is	damage	Break	delay	what it lays or does	worth	multiple of its basic	the line's band	cooldown	held
+rotfiend	Rotfiend	whelp (Orc Whelp)	skirmisher	1	damage	100	90	0.05	115.0	6	nature -25%, shadow -25%	0.46,0.56,0.36	Sodden Claw	its basic	26	16	1.5	-	31.5538	1.0000	0	0	-
+rotfiend	Rotfiend	whelp (Orc Whelp)	skirmisher	1	damage	100	90	0.05	115.0	6	nature -25%, shadow -25%	0.46,0.56,0.36	Corpse Explosion	an area blow	5	20	2.5	black_rot battle-long; the Rotfiend dies; a neighbour heals 15%, paid in Malice; only at half its health or less	47.7692	1.5139	2	2	-
+rotfiend	Rotfiend	whelp (Orc Whelp)	skirmisher	1	damage	100	90	0.05	115.0	6	nature -25%, shadow -25%	0.46,0.56,0.36	Rake	a blow	13	8	1.5	black_rot battle-long	15.7769	0.5000	0	0	-
+rotfiend	Rotfiend	whelp (Orc Whelp)	skirmisher	1	damage	100	90	0.05	115.0	6	nature -25%, shadow -25%	0.46,0.56,0.36	Rally	a Malice spend	0	0	2.5	rally	87.8285	2.7834	3	3	-
+fen_lurker	Fen Lurker	brute (Orc Brute)	brute	3	damage	100	260	0.2	75.0	6	physical +10%, shadow -25%	0.4,0.56,0.54	Swipe	its basic	40	32	2.5	two heroes	51.1077	1.0000	0	0	-
+fen_lurker	Fen Lurker	brute (Orc Brute)	brute	3	damage	100	260	0.2	75.0	6	physical +10%, shadow -25%	0.4,0.56,0.54	Lacerate	a blow	55	50	3.5	20 Bleed	72.3558	1.4158	2	2	-
+fen_lurker	Fen Lurker	brute (Orc Brute)	brute	3	damage	100	260	0.2	75.0	6	physical +10%, shadow -25%	0.4,0.56,0.54	Submerge	a self-cast	0	0	2.5	submerged 3t on itself, once a fight, under half, while another can be picked	0.0000	0.0000	0	0	-
+fen_lurker	Fen Lurker	brute (Orc Brute)	brute	3	damage	100	260	0.2	75.0	6	physical +10%, shadow -25%	0.4,0.56,0.54	Rally	a Malice spend	0	0	2.5	rally	87.8285	1.7185	2	2	-
+bone_shepherd	Bone Shepherd	ash_tyrant (Ash-Wrought Tyrant)	boss	7	damage	100	370	0.22	85.0	6	holy -25%	0.84,0.82,0.68	Soul Leech	its basic	30	24	2.0	heals 50% of what it lands, paid in Malice	38.3308	1.0000	0	0	-
+bone_shepherd	Bone Shepherd	ash_tyrant (Ash-Wrought Tyrant)	boss	7	damage	100	370	0.22	85.0	6	holy -25%	0.84,0.82,0.68	Noxious Fumes	an area blow	9	14	3.5	noxious_fumes 3t	55.4385	1.4463	2	2	-
+bone_shepherd	Bone Shepherd	ash_tyrant (Ash-Wrought Tyrant)	boss	7	damage	100	370	0.22	85.0	6	holy -25%	0.84,0.82,0.68	Call the Drowned	a Malice spend	0	0	2.5	raise	51.0000	1.3305	0	4	4
+bone_shepherd	Bone Shepherd	ash_tyrant (Ash-Wrought Tyrant)	boss	7	damage	100	370	0.22	85.0	6	holy -25%	0.84,0.82,0.68	Rally	a Malice spend	0	0	2.5	rally	87.8285	2.2913	3	3	-
+the reference board	the median composable body	127.5	HEAD's	127.5	the median basic	36.595	HEAD's	36.595	the Break price	0.34712
+kinds a roster holds	roster 1: 20 at HEAD, 18 now	roster 2: 17 at HEAD, 17 now	roster 3: 19 at HEAD, 17 now	roster 4: 16 at HEAD, 16 now	roster 5: 19 at HEAD, 19 now	roster 6: 0 at HEAD, 19 now

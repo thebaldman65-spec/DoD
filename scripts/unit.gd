@@ -62,6 +62,10 @@ const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",
 	# the Cleric's Unburden, the Cleansing Draught, a Dispel — and none is sticky: Fester, which grows until it is cleansed,
 	# must have an answer (the brief's). Listed, each also counts toward what counts a hero's debuffs (Iron Will).
 	"gall", "sap", "mire", "fester",
+	# BATCH JW §3 — THE DROWNED BARROW's TWO AFFLICTIONS ON A HERO, cleansed as the hexes are: Black Rot, which never runs out,
+	# must have an answer (the record's *cleansed, as Fester is*), and Noxious Fumes. `submerged` sits on a warband body and is
+	# not here.
+	"black_rot", "noxious_fumes",
 	"frostbind", "unmade",
 	# BATCH CE — `breaking_darkness` (Anathema, renamed at CG §3) AND `penance`
 	# are the tranche-3 Cleric draft's two enemy-side statuses and both are
@@ -3600,6 +3604,12 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 			s.desc = "Takes %d nature damage at the start of each\nturn (%d per stack); new stacks refresh the timer." % [
 				int(s.get("tick", 3)) * s.stacks, int(s.get("tick", 3))]
 			float_text("%s x%d" % [label, s.stacks], color)
+		elif id == "black_rot":
+			# BATCH JW §3 — BLACK ROT STACKS, an arm of its own beside Fester's: a stack for every application. It is battle-long
+			# (turns -1), so there is no clock to refresh — Ruin's shape — and it does not grow on its own.
+			s.stacks = int(s.get("stacks", 1)) + 1
+			_black_rot_words(s)
+			float_text("%s x%d" % [label, s.stacks], color)
 		elif id == "fester":
 			# BATCH JL §2 — FESTER STACKS as Poison does: a second hex adds a stack and refreshes its clock.
 			s.stacks = int(s.get("stacks", 1)) + 1
@@ -3661,6 +3671,8 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 		entry["fresh"] = true  # no tick on the turn it lands
 	if id == "fester":
 		_fester_words(entry)
+	if id == "black_rot":
+		_black_rot_words(entry)
 	if id == "chilled":
 		entry["short"] = "C1"
 		entry["desc"] = _chilled_desc(1, turns < 0)
@@ -3680,6 +3692,14 @@ func _fester_words(s: Dictionary) -> void:
 	s["short"] = "Fr%d" % int(s.get("stacks", 1))
 	s["desc"] = "Festering: takes %d damage at the start of\neach turn (%d per stack), and gains a stack\neach turn until it is cleansed." % [
 		int(s.get("tick", 1)) * int(s.get("stacks", 1)), int(s.get("tick", 1))]
+
+
+# BATCH JW §3 — BLACK ROT's CHIP: its counter and what it deals now, read off the stack it stands at and the bearer's maximum.
+func _black_rot_words(s: Dictionary) -> void:
+	var stacks := int(s.get("stacks", 1))
+	s["short"] = "Rk%d" % stacks
+	s["desc"] = "Black Rot: takes %d damage at the start of\neach turn (%d%% of maximum health a stack).\nIt never runs out; a cleanse lifts it." % [
+		maxi(int(round(max_hp * BLACK_ROT_PCT * stacks)), 1), int(round(BLACK_ROT_PCT * 100))]
 
 
 # BATCH JL §2 — FESTER GROWS: after each of its bearer's ticks it gains a stack and its full clock back — Poison's rule, a new
@@ -4229,6 +4249,9 @@ const SAP_CUT := 0.5
 # BATCH JN §0.1 — WHAT A CLERIC's BAR GAINS IN A FIGHT IS CUT BY THIS, at the bar's own setter (Sap's door).
 const CLERIC_MANA_CUT := 0.5
 const MIRE_SLOW := 0.25
+# BATCH JW §3 — BLACK ROT's FIGURE: the share of its bearer's maximum health a stack ticks at each turn start (the battle's DoT
+# pass reads it, and the chip below).
+const BLACK_ROT_PCT := 0.01
 # BATCH IK §3a — SUNDER's OWN DURATION: what its base application lays — Crushing Blow, the card every
 # Warrior holds — and what a Perfect Sever lays on the body it cut, read here by both, never retyped.
 const SUNDER_TURNS := 3

@@ -97,11 +97,12 @@
   "term": "Missing",
   "category": "combat",
   "short": "{=Battle.MISS_CHANCE*100}% base chance for most single-target attacks to whiff.",
-  "long": "Single-target attacks miss {=Battle.MISS_CHANCE*100}% of the time at base - all but a counter and the few strikes an ability deals by its own rule (Shield Slam, Feint, Precision Strike), which never roll one. Being Dazed adds +20%, Blind adds +{=Battle.BLIND_MISS_PCT*100}%, and attacking an Elusive target adds +25%. Area attacks never miss. A miss deals nothing at all - no damage, no Break, no on-hit effects.",
+  "long": "Single-target attacks miss {=Battle.MISS_CHANCE*100}% of the time at base - all but a counter and the few strikes an ability deals by its own rule (Shield Slam, Feint, Precision Strike), which never roll one. Being Dazed adds +20%, Blind adds +{=Battle.BLIND_MISS_PCT*100}%, Noxious Fumes adds +{=Battle.NOXIOUS_FUMES_MISS_PCT*100}%, and attacking an Elusive target adds +25%. Area attacks never miss. A miss deals nothing at all - no damage, no Break, no on-hit effects.",
   "see_also": [
    "status_dazed",
    "status_blind",
-   "parry"
+   "parry",
+   "status_noxious_fumes"
   ]
  },
  {
@@ -602,6 +603,35 @@
   "see_also": [
    "status_poison"
   ]
+ },
+ {
+  "id": "status_black_rot",
+  "term": "Black Rot",
+  "category": "statuses",
+  "short": "{=Unit.BLACK_ROT_PCT*100}% of its bearer's maximum health each turn start, a stack at a time; never runs out.",
+  "long": "A disease the Drowned Barrow's Rotfiends lay - one stack with a Rake, one on every hero a Corpse Explosion strikes. At each of that hero's turn starts it deals {=Unit.BLACK_ROT_PCT*100}% of the hero's own maximum health for every stack. Every application adds a stack, and it never runs out on its own: only a cleanse, the hero's fall or the fight's end stops it. It is an affliction, so a cleanse lifts it.",
+  "see_also": [
+   "status_fester"
+  ]
+ },
+ {
+  "id": "status_noxious_fumes",
+  "term": "Noxious Fumes",
+  "category": "statuses",
+  "short": "Single-target attacks are {=Battle.NOXIOUS_FUMES_MISS_PCT*100}% more likely to miss.",
+  "long": "The Bone Shepherd's Noxious Fumes strikes every hero and lays it on each: while it lasts, the hero's single-target attacks miss {=Battle.NOXIOUS_FUMES_MISS_PCT*100}% more often, added to every other chance to miss - a multi-hit or scattering attack rolls its miss on every strike. An area attack and a counter roll none, so they are untouched. It is an affliction, so a cleanse lifts it.",
+  "see_also": [
+   "miss",
+   "status_blind"
+  ]
+ },
+ {
+  "id": "status_submerged",
+  "term": "Submerged",
+  "category": "statuses",
+  "short": "Beneath the water: nothing can pick it as a target. It still acts.",
+  "long": "The Fen Lurker submerges once a fight, on a turn it stands under {=Battle.SUBMERGE_AT*100}% of its health while another of its warband can be picked: for {=Battle.SUBMERGE_TURNS} turns no blow, card, spell or area attack can reach it, though it still acts, and what it already carries still ticks. When the last of its warband that can be picked falls, it surfaces at once.",
+  "see_also": []
  },
  {
   "id": "dmg_schools",

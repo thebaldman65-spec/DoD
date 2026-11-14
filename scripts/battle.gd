@@ -245,6 +245,12 @@ const STATUS_INFO := {
 	"sap": ["Sap", "Sa", Color(0.42, 0.56, 0.86), "Resource gained cut by %d%%\n(a hex the warband laid)." % [int(round(BattleUnit.SAP_CUT * 100))]],
 	"mire": ["Mire", "Me", Color(0.52, 0.50, 0.34), "-%d%% speed; turns arrive later\n(a hex the warband laid)." % [int(round(BattleUnit.MIRE_SLOW * 100))]],
 	"fester": ["Fester", "Fr", Color(0.58, 0.66, 0.26), "Takes %d%% of the applier's Attack per\nstack at the start of each turn, and\ngains a stack each turn until cleansed." % [DOT_STATUSES["fester"]]],
+	# BATCH JW §3 — THE DROWNED BARROW's THREE. Black Rot is a stacking disease with its own arm in `unit.add_status` (a stack an
+	# application, no clock — Ruin's shape) and its own tick at the foot of `_dot_pass`, never expiring; Noxious Fumes is a term
+	# of `_miss_chance`; Submerged is the one status that makes a body unpickable (`_pickable`).
+	"black_rot": ["Black Rot", "Rk", Color(0.30, 0.34, 0.22), "Takes %d%% of its own maximum health per\nstack at the start of each turn. It never\nruns out; a cleanse lifts it." % [int(round(BattleUnit.BLACK_ROT_PCT * 100))]],
+	"noxious_fumes": ["Noxious Fumes", "Fu", Color(0.56, 0.64, 0.30), "Single-target attacks are %d%%\nmore likely to miss." % [int(round(NOXIOUS_FUMES_MISS_PCT * 100))]],
+	"submerged": ["Submerged", "Su", Color(0.30, 0.50, 0.56), "Beneath the water: no blow, card or\nspell can pick it. It still acts."],
 	"shielded": ["Shielded", "Sh", Color(0.95, 0.65, 0.25), "Takes 25% less strike damage\n(a Shieldmaster's ward, or the\nHollow Crown's Regalia)."],
 	"wrath": ["Divine Wrath", "DW", Color(1.0, 0.85, 0.35), "+15% damage dealt and +15% speed."],
 	"umbral_sigil": ["Umbral Sigil", "US", Color(0.55, 0.30, 0.70), "Branded: half of every strike this\nunit takes echoes to its whole\nwarband."],
@@ -1128,6 +1134,12 @@ const HEADS_DOWN_TURNS := 3                   # Heads Down
 const HEADS_DOWN_PERFECT_TURNS := 4           # Heads Down (Perfect)
 const CHOKING_SMOKE_TURNS := 3                # Choking Smoke
 const BLIND_MISS_PCT := 0.50                  # Choking Smoke: the miss chance it adds
+# BATCH JW §2–§3 — THE DROWNED BARROW's FIGURES, each its own constant: a re-tune of one moves none of the others.
+const NOXIOUS_FUMES_MISS_PCT := 0.25          # Noxious Fumes: the miss chance it adds (additive points, as Blind's)
+const CORPSE_EXPLOSION_HEAL_PCT := 0.15       # Corpse Explosion: the share of its own maximum health a neighbour is healed
+const CORPSE_EXPLOSION_AT := 0.5              # Corpse Explosion: declared only at or under this share of the Rotfiend's health
+const SUBMERGE_TURNS := 3                     # Submerge: the turns it lays
+const SUBMERGE_AT := 0.5                      # Submerge: cast once a fight, under this share of the Fen Lurker's health
 const SNARE_LINE_TURNS := 2                   # Snare Line
 const LOADED_SHOT_PERFECT_POISON_TURNS := 2   # Loaded Shot: the Poison's turns (Perfect)
 const HUNT_PERFECT_PCT := 0.20                # Hunt (Perfect)
@@ -1372,6 +1384,8 @@ func _build_arena() -> void:
 		"The Scarlands": "res://assets/backgrounds/battle_background_scarlands.png",
 		# BATCH JS §1 — A PLACEHOLDER, NAMED: the Frozen Plains has no art yet and wears the Forest's.
 		"The Frozen Plains": "res://assets/backgrounds/battle_background_1.png",
+		# BATCH JW §1 — A PLACEHOLDER, NAMED: the Drowned Barrow has no art yet and wears the Forest's.
+		"The Drowned Barrow": "res://assets/backgrounds/battle_background_1.png",
 	}
 	var zone: String = Run.zone_name if Run.active else "Forest of Old"
 	var tex: Texture2D = load(bg_by_zone.get(zone, bg_by_zone["Forest of Old"]))
@@ -3432,6 +3446,32 @@ func _dot_pass(u: BattleUnit) -> void:
 			if dot_died:
 				_message("%s succumbs to %s!" % [u.unit_name, info[0]])
 				_log("† %s dies" % u.unit_name, "#e05050")
+	# BATCH JW §3 — BLACK ROT TICKS HERE, AFTER THE DoTs THE TABLE NAMES: a share of its bearer's own maximum health a stack,
+	# never a snapshot of the applier's Attack, so it is not a row of `DOT_STATUSES` (whose figures are points of Attack).
+	await _black_rot_tick(u)
+
+
+# BATCH JW §3 — BLACK ROT: `BattleUnit.BLACK_ROT_PCT` of the bearer's maximum health a stack, rounded, at least one, through the tick door,
+# credited to whoever laid it (`src_name`, the status door's stamp). It never expires: a cleanse lifts it, or the fight ends.
+func _black_rot_tick(u: BattleUnit) -> void:
+	if u.dead or not u.has_status("black_rot"):
+		return
+	var br_stacks := maxi(u.status_stacks("black_rot"), 1)
+	var br_dmg := maxi(int(round(u.max_hp * BattleUnit.BLACK_ROT_PCT * br_stacks)), 1)
+	var br_src := String(u.get_status("black_rot").get("src_name", ""))
+	_dmg_frame(null, "Black Rot", br_src)
+	var br_land := _landed(u, br_dmg)
+	_sfx("hit", -14.0, 0.8)
+	var br_died: bool = u.take_tick_damage(br_dmg, "-%d Black Rot" % br_dmg, Color(0.45, 0.52, 0.30))
+	if br_dmg > 0 and br_land == 0:
+		_log("%s's Black Rot tick — silenced by %s" % [u.unit_name, _vow_name()], "#e08850")
+	else:
+		_log("%s takes %d Black Rot damage%s" % [u.unit_name, br_dmg,
+			" (x%d stacks)" % br_stacks if br_stacks > 1 else ""], "#e08850")
+	await _wait(0.5)
+	if br_died:
+		_message("%s succumbs to Black Rot!" % u.unit_name)
+		_log("† %s dies" % u.unit_name, "#e05050")
 
 
 func _run_battle() -> void:
@@ -3815,7 +3855,7 @@ func _run_battle() -> void:
 		# Eternal Winter chills EVERYONE first; Winter's Grasp then deepens
 		# the cold on those already caught.
 		if u.is_hero and not u.dead and u.eternal_winter > 0:
-			var ew_pool: Array = enemies.filter(func(e): return not e.dead)
+			var ew_pool: Array = enemies.filter(func(e): return _pickable(e))
 			if not ew_pool.is_empty():
 				_log("   → Capstone: Eternal Winter — the cold claims the field",
 					"#7cc8f0")
@@ -3824,7 +3864,7 @@ func _run_battle() -> void:
 						_apply_status(ew_e, "chilled", 3, 0, 0, u)
 		if u.is_hero and not u.dead and u.grasp_ranks > 0:
 			var wg_pool: Array = enemies.filter(
-				func(e): return not e.dead and e.has_status("chilled") \
+				func(e): return _pickable(e) and e.has_status("chilled") \
 					and not _is_held(e))
 			wg_pool.shuffle()
 			var wg_n := mini(u.grasp_ranks, wg_pool.size())
@@ -4466,7 +4506,7 @@ func _update_talent_chips() -> void:
 		foe.ember_consumed = true
 		if _living_hero_with("ember_wind") == null:
 			continue
-		var ew_pool: Array = enemies.filter(func(e): return not e.dead)
+		var ew_pool: Array = enemies.filter(func(e): return _pickable(e))
 		if ew_pool.is_empty():
 			continue
 		var ew_tick: int = maxi(foe.burn_tick_at_death, 0)
@@ -4875,7 +4915,7 @@ func _player_turn(u: BattleUnit) -> void:
 				used_targeting = true
 				target = await _pick_target(fallen)
 		elif ab.aoe or ab.random_hits > 0:
-			var foes := enemies.filter(func(e): return not e.dead)
+			var foes := enemies.filter(func(e): return _pickable(e))
 			target = foes[0]  # resolve picks the real targets
 		elif autoplay:
 			target = auto_target
@@ -4891,13 +4931,13 @@ func _player_turn(u: BattleUnit) -> void:
 			# is, which is the whole cost of the feature.
 			if ab.special == "dispel":
 				pool = _hero_side()
-				pool.append_array(enemies.filter(func(e): return not e.dead))
+				pool.append_array(enemies.filter(func(e): return _pickable(e)))
 			elif ab.target == Ability.Target.ALLY:
 				# BATCH IR §1b — the pool is `_ally_pick_pool`'s, the one answer the picker,
 				# the recast refusal and the button ask (below it, and why).
 				pool = _ally_pick_pool(u, ab)
 			else:
-				pool = enemies.filter(func(e): return not e.dead)
+				pool = enemies.filter(func(e): return _pickable(e))
 				# BATCH IK §2 — EXECUTE OFFERS ONLY WHAT QUALIFIES, and since IL §3 the narrowing is
 				# `_enemy_pick_pool`'s, the one answer the bot's drafted hook asks too.
 				pool = _enemy_pick_pool(u, ab, pool)
@@ -4915,7 +4955,7 @@ func _player_turn(u: BattleUnit) -> void:
 		third_target = null
 		if target != null and (ab.choose_two or ab.choose_three or kc_two) \
 				and not autoplay:
-			var pool2: Array = enemies.filter(func(e): return not e.dead and e != target)
+			var pool2: Array = enemies.filter(func(e): return _pickable(e) and e != target)
 			if pool2.size() == 1:
 				second_target = pool2[0]
 			elif pool2.size() > 1:
@@ -4925,7 +4965,7 @@ func _player_turn(u: BattleUnit) -> void:
 					target = null  # cancelled: back to the action bar
 		if target != null and ab.choose_three and second_target != null:
 			var pool3: Array = enemies.filter(
-				func(e): return not e.dead and e != target and e != second_target)
+				func(e): return _pickable(e) and e != target and e != second_target)
 			if pool3.size() == 1:
 				third_target = pool3[0]
 			elif pool3.size() > 1:
@@ -5040,7 +5080,7 @@ func _player_turn(u: BattleUnit) -> void:
 			push_warning("autoplay: null target for %s — basic-attack fallback"
 				% ab.display_name)
 			ab = u.abilities[0]
-			auto_target = enemies.filter(func(e): return not e.dead).front()
+			auto_target = enemies.filter(func(e): return _pickable(e)).front()
 			continue
 		_preview_locked = false
 		_rebuild_turn_bar()
@@ -5181,7 +5221,7 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 	# is dark. A pick the door refuses falls back to the basic, as an arm that found nothing to cast
 	# does, so the kit card and the drafted hook below are still asked. Every door reaches the bot.
 	if not pick.is_empty() and pick[0] != u.abilities[0] and not _ability_usable(u, pick[0]):
-		var fb_foes := enemies.filter(func(e): return not e.dead)
+		var fb_foes := enemies.filter(func(e): return _pickable(e))
 		var fb_broken := fb_foes.filter(func(e): return e.broken)
 		pick = [u.abilities[0], _lowest_hp(fb_broken) if not fb_broken.is_empty() else _lowest_hp(fb_foes)]
 	if pick.is_empty() or pick[0] != u.abilities[0]:
@@ -5210,7 +5250,7 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 # so this is the one place the bot decides them. Each card is cast when it has
 # something to do — the same honesty rule as the drafted refinements.
 func _bot_class_kit_pick(u: BattleUnit) -> Array:
-	var foes := enemies.filter(func(e): return not e.dead)
+	var foes := enemies.filter(func(e): return _pickable(e))
 	if foes.is_empty():
 		return []
 	var allies := heroes.filter(func(h): return not h.dead and not h.is_companion)
@@ -5319,7 +5359,7 @@ func _bot_kit_card(u: BattleUnit, card_name: String) -> Ability:
 # rotation had already chosen. Self-casts and area attacks resolve their own
 # targets, so what is returned for those is never read.
 func _bot_drafted_pick(u: BattleUnit) -> Array:
-	var foes := enemies.filter(func(e): return not e.dead)
+	var foes := enemies.filter(func(e): return _pickable(e))
 	if foes.is_empty():
 		return []
 	# BATCH IS §4 — THE BOT's ALLY POOLS ARE HEROES-ONLY WHERE THE PLAYER's PICKER ADMITS A COMPANION, AND THAT IS
@@ -5679,7 +5719,7 @@ func _bot_drafted_pick(u: BattleUnit) -> Array:
 
 
 func _autoplay_pick_kit(u: BattleUnit) -> Array:
-	var foes := enemies.filter(func(e): return not e.dead)
+	var foes := enemies.filter(func(e): return _pickable(e))
 	if foes.is_empty():
 		return [u.abilities[0], u]  # battle is over; the loop ends it
 	var allies := heroes.filter(func(h): return not h.dead)
@@ -6388,7 +6428,7 @@ func _use_item(item_id: String) -> void:
 			var bm_was_label := _dmg_label
 			var bm_was_name := _dmg_src_name
 			_dmg_frame(null, String(Run.ITEM_INFO["bomb"][0]))
-			for e in enemies.filter(func(en): return not en.dead):
+			for e in enemies.filter(func(en): return _pickable(en)):
 				var result: Dictionary = e.take_hit(bomb_dmg, 0)
 				e.float_text(str(bomb_dmg), Color(1.0, 0.8, 0.4))
 				if result.died:
@@ -6525,7 +6565,7 @@ func _use_item(item_id: String) -> void:
 			# FLAGGED, NOT TUNED (§4's own words). Nothing else in the game applies
 			# a permanent, party-wide debuff from one button that costs no turn.
 			# The -15% magnitude is modest for exactly that reason.
-			var vs_living := enemies.filter(func(en): return not en.dead)
+			var vs_living := enemies.filter(func(en): return _pickable(en))
 			if vs_living.is_empty():
 				_refund_item(item_id)
 				_message("Nothing left to curse.")
@@ -6726,7 +6766,7 @@ func _eff_cost(u: BattleUnit, ab: Ability, target: BattleUnit = null) -> int:
 		if target != null:
 			if target.broken:
 				return 0
-		elif enemies.any(func(e): return not e.dead and e.broken):
+		elif enemies.any(func(e): return _pickable(e) and e.broken):
 			return 0
 	var c := ab.cost
 	if u.lone_hunter > 0 and _beasts(u).is_empty():
@@ -6889,7 +6929,7 @@ func _recast_targets(u: BattleUnit, ab: Ability) -> Array:
 				and h != u)
 		"hysteria", "slow_burn", "choking_smoke", "rime", "umbral_sigil", \
 				"penance", "bola", "counter_time", "forsake", "glacial_prison":
-			return enemies.filter(func(e): return not e.dead)
+			return enemies.filter(func(e): return _pickable(e))
 		# BATCH IR §1b — the picker's own pool, so a recast is weighed over the bodies the picker offers.
 		"covering_guard", "undying_vigil", "vow_suffering", "rite_of_return", "vespers", \
 				"divine_shield", "mantle":
@@ -7397,7 +7437,7 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# can never disagree about whether a sticky poison counts. Shatter's and
 	# Cryoclasm's precedent: a spender with an empty board is a dud cast.
 	if ab.special == "cull" and not enemies.any(func(e): \
-			return not e.dead and _harvest_yield(e) > 0):
+			return _pickable(e) and _harvest_yield(e) > 0):
 		return false
 	# Primal Surge needs a beast with Loyalty to spend.
 	if ab.special == "primal_surge":
@@ -7478,7 +7518,7 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	if ab.special == "reprisal" and u.healing_done_recent() <= 0:
 		return false
 	if ab.special == "transference" and not enemies.any(func(e): \
-			return not e.dead and e.status_stacks("ruin") > 0):
+			return _pickable(e) and e.status_stacks("ruin") > 0):
 		return false
 	# BATCH CE — THREE MORE OF THE SAME SHAPE, and each reads an accumulation
 	# that is simply not there yet. JUBILEE spends held Faith and needs three;
@@ -7499,7 +7539,7 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	if ab.special == "jubilee" and u.faith_stacks < JUBILEE_MIN_FAITH:
 		return false
 	if ab.special == "requiem" and not enemies.any(func(e): \
-			return not e.dead and e.status_stacks("ruin") > 0):
+			return _pickable(e) and e.status_stacks("ruin") > 0):
 		return false
 	# Execute: needs an enemy below 20% health — or a Broken one; the
 	# Bruiser's own loop sets up his finisher. The upgraded copy raises the
@@ -7522,21 +7562,21 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# living enemy is enough. Backdraft only DEEPENS existing fires, so it
 	# keeps the strict rule with no exception.
 	if ab.special == "wildfire" and u.wildfire_spread == 0 \
-			and not enemies.any(func(e): return not e.dead and e.has_status("burn")):
+			and not enemies.any(func(e): return _pickable(e) and e.has_status("burn")):
 		return false
 	if ab.special == "backdraft" \
-			and not enemies.any(func(e): return not e.dead and e.has_status("burn")):
+			and not enemies.any(func(e): return _pickable(e) and e.has_status("burn")):
 		return false
 	# ---- BATCH BT: the Mage nine's gates ----
 	# Funeral Pyre CONSUMES a bank; with nothing alight there is no bank, so
 	# there is no shield and no refund — Backdraft's rule exactly.
 	if ab.special == "funeral_pyre" \
-			and not enemies.any(func(e): return not e.dead and e.has_status("burn")):
+			and not enemies.any(func(e): return _pickable(e) and e.has_status("burn")):
 		return false
 	# Killing Frost only touches CHILLED enemies, so an unchilled field is a
 	# cast that hits nothing at all.
 	if ab.special == "killing_frost" \
-			and not enemies.any(func(e): return not e.dead and e.has_status("chilled")):
+			and not enemies.any(func(e): return _pickable(e) and e.has_status("chilled")):
 		return false
 	# Arcane Bolt pays per stack: at zero it is a 30-Mana cast for nothing.
 	# A single stack is a real (small) blow, so the gate is the smallest pile and no higher —
@@ -7551,10 +7591,10 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# Firedraw needs the fire to be on somebody ELSE, which is the whole card.
 	# Both gates SAY SO in the darkened button's tooltip (Death Ray's rule).
 	if ab.special == "firedraw" \
-			and not enemies.any(func(e): return not e.dead and e.has_status("burn")):
+			and not enemies.any(func(e): return _pickable(e) and e.has_status("burn")):
 		return false
 	if ab.special == "pyre_wake" \
-			and not enemies.any(func(e): return not e.dead and e.has_status("burn")):
+			and not enemies.any(func(e): return _pickable(e) and e.has_status("burn")):
 		return false
 	# UNMAKING pays per stack: at zero it is a 30-Mana cast for nothing, which is
 	# Arcane Bolt's gate five lines above and for its reason. ONE stack is a real
@@ -7623,7 +7663,7 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# HUNT reads the count and nothing else: against a clean field it is
 	# `damage * 0` and lands the floor of 1.
 	if ab.display_name == "Hunt" and not enemies.any(func(e): \
-			return not e.dead and _status_count(e) > 0):
+			return _pickable(e) and _status_count(e) > 0):
 		return false
 	# PREPARATION CANNOT CHAIN, AND THIS LINE IS THE WHOLE REASON IT CANNOT.
 	# Casting it ON the extra turn it bought is the unbounded loop — a hang, not
@@ -7671,7 +7711,7 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# Transference, Cryoclasm — produces nothing on any body when the last enemy standing is the one holding
 	# it, so the door asks the pool too and the button, the picker and the bot never disagree.
 	if ab.special in PICK_DUD_SPECIALS and _enemy_pick_pool(u, ab,
-			enemies.filter(func(e): return not e.dead)).is_empty():
+			enemies.filter(func(e): return _pickable(e))).is_empty():
 		return false
 	# ---- BATCH CO — THE RECAST THAT WOULD DO NOTHING ----
 	# LAST, AND DELIBERATELY LAST: every gate above answers "can this be cast at
@@ -7732,7 +7772,7 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 	if ab.special == "reprisal" and u.healing_done_recent() <= 0:
 		ab_btn.tooltip_text += "\n(No healing landed in the last two turns)"
 	if ab.special == "transference" and not enemies.any(func(e): \
-			return not e.dead and e.status_stacks("ruin") > 0):
+			return _pickable(e) and e.status_stacks("ruin") > 0):
 		ab_btn.tooltip_text += "\n(No Ruin on the field to move)"
 	# BATCH CE — the tranche-3 Cleric gates say so too, with the LIVE number. A
 	# darkened button that does not explain itself reads as a bug. ELEVATION
@@ -7741,7 +7781,7 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 		ab_btn.tooltip_text += "\n(Requires %d Faith held — you have %d)" % [
 			JUBILEE_MIN_FAITH, u.faith_stacks]
 	if ab.special == "requiem" and not enemies.any(func(e): \
-			return not e.dead and e.status_stacks("ruin") > 0):
+			return _pickable(e) and e.status_stacks("ruin") > 0):
 		ab_btn.tooltip_text += "\n(No Ruin on the field to consume)"
 	# Death Ray's gate has to SAY so, and say the LIVE number, or a button dark
 	# for most of a fight reads as a bug rather than as the ramp it measures.
@@ -7752,17 +7792,17 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 	# rule: a button dark for most of a fight reads as a bug rather than as the
 	# condition it is measuring.
 	if ab.special == "funeral_pyre" \
-			and not enemies.any(func(e): return not e.dead and e.has_status("burn")):
+			and not enemies.any(func(e): return _pickable(e) and e.has_status("burn")):
 		ab_btn.tooltip_text += "\n(Nothing is Burning)"
 	if ab.special == "killing_frost" \
-			and not enemies.any(func(e): return not e.dead and e.has_status("chilled")):
+			and not enemies.any(func(e): return _pickable(e) and e.has_status("chilled")):
 		ab_btn.tooltip_text += "\n(No Chilled enemy)"
 	if ab.display_name == "Arcane Bolt" and u.second_resource < ARCANE_BOLT_MIN_STACKS:
 		ab_btn.tooltip_text += "\n(Requires at least %d Resonance)" % ARCANE_BOLT_MIN_STACKS
 	# BATCH CB — the three tranche-3 gates say so too. A darkened button that
 	# does not explain itself is the same bug in a smaller form.
 	if ab.special in ["firedraw", "pyre_wake"] \
-			and not enemies.any(func(e): return not e.dead and e.has_status("burn")):
+			and not enemies.any(func(e): return _pickable(e) and e.has_status("burn")):
 		ab_btn.tooltip_text += "\n(Nothing is Burning)"
 	if ab.display_name == "Unmaking" and u.second_resource < UNMAKING_MIN_STACKS:
 		ab_btn.tooltip_text += "\n(Requires at least %d Resonance)" % UNMAKING_MIN_STACKS
@@ -7784,7 +7824,7 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 		ab_btn.tooltip_text += "\n(The %s fields no companion)" % Classes.engine_title(String(
 			Classes.PET_DISMISSERS.filter(func(p): return u.engines.has(String(p)))[0]))
 	if ab.display_name == "Hunt" and not enemies.any(func(e): \
-			return not e.dead and _status_count(e) > 0):
+			return _pickable(e) and _status_count(e) > 0):
 		ab_btn.tooltip_text += "\n(Nothing on the field is afflicted)"
 	# BATCH IL §0.2 — EXECUTE's GATE SAYS SO, IN THE VOICE THE OTHERS USE, its line read off
 	# `_execute_line` — the door, the picker and the hover's answer — so the upgraded copy says 35%.
@@ -7798,12 +7838,12 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 	# buttons with no line (the others' are above); and the door refuses a card that moves a thing from
 	# ANOTHER enemy while the last one standing holds it, because its pick then offers nobody.
 	if ab.special == "cull" and not enemies.any(func(e): \
-			return not e.dead and _harvest_yield(e) > 0):
+			return _pickable(e) and _harvest_yield(e) > 0):
 		ab_btn.tooltip_text += "\n(Nothing on the field can be reaped)"
 	if ab.special == "cryoclasm" and _cryoclasm_source() == null:
 		ab_btn.tooltip_text += "\n(No enemy is held in a prison)"
 	if ab.special in ["firedraw", "transference", "cryoclasm"]:
-		var pl_live: Array = enemies.filter(func(e): return not e.dead)
+		var pl_live: Array = enemies.filter(func(e): return _pickable(e))
 		if pl_live.size() == 1 and _enemy_pick_pool(u, ab, pl_live).is_empty():
 			var pl_last: BattleUnit = pl_live[0]
 			if ab.special == "firedraw" and _burn_turns_on(pl_last) > 0:
@@ -8245,6 +8285,9 @@ func _intent_hover_text(u: BattleUnit) -> String:
 			lines.append("Hits %d times, each at random" % ab.random_hits)
 		elif ab.multi_hits > 0:
 			lines.append("Hits one ally %d times" % ab.multi_hits)
+		elif ab.choose_two:
+			# BATCH JW §3 — the Fen Lurker's Swipe, the first warband blow to strike two.
+			lines.append("Hits two allies")
 		else:
 			lines.append("Hits one ally")
 	return "\n".join(lines)
@@ -8402,7 +8445,7 @@ func _open_item_picker() -> void:
 			if not usable and entry[1] > 0:
 				b.tooltip_text = "%s\n\nNo one is afflicted." % entry[2]
 		if id == "visage":
-			usable = usable and enemies.any(func(e): return not e.dead)
+			usable = usable and enemies.any(func(e): return _pickable(e))
 		b.disabled = not usable
 		b.focus_mode = Control.FOCUS_NONE
 		b.pressed.connect(_confirm_item.bind(_item_ids.size()))
@@ -8507,7 +8550,7 @@ func _execute_line(u: BattleUnit) -> float:
 
 
 func _execute_qualifies(u: BattleUnit, e: BattleUnit) -> bool:
-	return not e.dead and (e.hp < e.max_hp * _execute_line(u) or e.broken)
+	return _pickable(e) and (e.hp < e.max_hp * _execute_line(u) or e.broken)
 
 
 # BATCH IL §3 — WHICH LIVING ENEMIES A CARD's PICK OFFERS: the player's picker (`_player_turn`) and the
@@ -8534,6 +8577,8 @@ func _execute_qualifies(u: BattleUnit, e: BattleUnit) -> bool:
 # back as it went in — Hunt's among them: against a clean body it strikes the floor of 1 and its Break
 # damage, its base paid, so a weaker pick is the player's to make.
 func _enemy_pick_pool(u: BattleUnit, ab: Ability, pool: Array) -> Array:
+	# BATCH JW §3 — AND A BODY NO PICK MAY REACH IS NONE OF ANY CARD's: the door every card's pick narrows in asks `_pickable` first.
+	pool = pool.filter(func(e): return _pickable(e))
 	if ab.display_name == "Execute":
 		var out: Array = pool.filter(func(e): return _execute_qualifies(u, e))
 		if u.execute_upgraded > 0:
@@ -8561,11 +8606,11 @@ func _pick_dud(_u: BattleUnit, ab: Ability, e: BattleUnit) -> String:
 	# reads — a `match` arm and `sp == "x":` both carry it, and gates find each handler by its first occurrence.
 	var sp := String(ab.special)
 	if "firedraw" == sp:
-		if enemies.any(func(o): return not o.dead and o != e and _burn_turns_on(o) > 0):
+		if enemies.any(func(o): return _pickable(o) and o != e and _burn_turns_on(o) > 0):
 			return ""
 		return "Firedraw: no other enemy is Burning,\nso no fire would be drawn onto %s." % e.unit_name
 	if "transference" == sp:
-		if enemies.any(func(o): return not o.dead and o != e and o.status_stacks("ruin") > 0):
+		if enemies.any(func(o): return _pickable(o) and o != e and o.status_stacks("ruin") > 0):
 			return ""
 		return "Transference: no other enemy carries\nRuin, so no mark would move onto %s." % e.unit_name
 	if "cryoclasm" == sp:
@@ -8615,14 +8660,14 @@ func _target_refusals(u: BattleUnit, ab: Ability, pool: Array) -> Dictionary:
 	var out := {}
 	if ab.special in PICK_DUD_SPECIALS:
 		for e in enemies:
-			if e.dead or pool.has(e):
+			if not _pickable(e) or pool.has(e):
 				continue
 			out[e] = _pick_dud(u, ab, e)
 		return out
 	if ab.display_name != "Execute":
 		return out
 	for e in enemies:
-		if e.dead or pool.has(e):
+		if not _pickable(e) or pool.has(e):
 			continue
 		if _execute_qualifies(u, e):
 			out[e] = "Execute: only a Broken enemy is free,\nand %s cannot pay its Rage." % u.unit_name
@@ -8848,6 +8893,13 @@ func _revalidate_intent(u: BattleUnit) -> Dictionary:
 		decl["ability"] = basic
 		decl["support"] = false
 		decl["message"] = ""
+		# BATCH JW §3 — AND IT RE-AIMS AT THE HEROES' SIDE (FOUND AT JI's first item, closed): a support cast was aimed at its own
+		# side — a Fen Lurker's refused Submerge at the Lurker itself — and the basic it falls back to strikes the heroes. The Long
+		# Silence's shape (`_declare_intent`): the most wounded of them, no die spent.
+		var fb_raw = decl.get("target")
+		var fb_side := _hero_side()
+		if fb_raw == null or not is_instance_valid(fb_raw) or not fb_side.has(fb_raw):
+			decl["target"] = _lowest_hp(fb_side) if not fb_side.is_empty() else null
 	# --- 1: is the target still there? ---
 	# READ UNTYPED FIRST. A declared target can be FREED between declaration and
 	# resolution — a Beastmaster's beast is queue_free'd when it is swapped, and
@@ -8863,9 +8915,9 @@ func _revalidate_intent(u: BattleUnit) -> Dictionary:
 		or ab.target == Ability.Target.ALLY
 	# BATCH JL §1 — JK's RAISE CASE STOOD HERE (a Raise's target is down by design) and is deleted: a spend is never the
 	# declared action now, so no Raise reaches this branch; a spend's own re-validation is `_warband_free_spend`'s.
-	if target == null or target.dead \
+	if target == null or not _pickable(target) \
 			or (not want_ally and _is_held(target)):
-		var pool: Array = enemies.filter(func(e): return not e.dead) if want_ally \
+		var pool: Array = enemies.filter(func(e): return _pickable(e)) if want_ally \
 			else _hero_side()
 		if pool.is_empty():
 			return {}
@@ -8920,6 +8972,12 @@ func _intent_ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# enemy has used falls back to its basic attack, which the Silence never refuses, with the
 	# shipped announcement.
 	if u.silenced(ab):
+		return false
+	# BATCH JW §3 — A SUBMERGE THAT NO LONGER HOLDS (the last pickable fellow fell since it was declared) and a blow its own
+	# condition withholds fall back to the basic attack, with the shipped announcement.
+	if ab.special == "submerge" and not _submerge_holds(u):
+		return false
+	if _blow_withheld(u, ab):
 		return false
 	return true
 
@@ -8979,7 +9037,7 @@ func _enemy_turn(u: BattleUnit) -> void:
 		# Acting IS the hysteria's expiry — Lingering Torment listens here
 		# too (natural tick-outs go through unit.tick_statuses instead).
 		_on_status_expired(u, "hysteria")
-		var hys_fellows := enemies.filter(func(e): return not e.dead and e != u)
+		var hys_fellows := enemies.filter(func(e): return _pickable(e) and e != u)
 		var hys_basic := _cheapest_attack(u)
 		if not hys_fellows.is_empty() and hys_basic != null:
 			var hys_target: BattleUnit = hys_fellows.pick_random()
@@ -9023,7 +9081,7 @@ func _enemy_turn(u: BattleUnit) -> void:
 				await _wait(0.4)
 				await _resolve(u, psy_support[0], psy_support[1], "good")
 				return
-			var psy_fellows := enemies.filter(func(e): return not e.dead and e != u)
+			var psy_fellows := enemies.filter(func(e): return _pickable(e) and e != u)
 			var psy_basic := _cheapest_attack(u)
 			if not psy_fellows.is_empty() and psy_basic != null:
 				var psy_target: BattleUnit = psy_fellows.pick_random()
@@ -9077,7 +9135,7 @@ func _enemy_turn(u: BattleUnit) -> void:
 	# ability failing silently — so the mark waits.
 	if u.has_status("feinted") and d_ab.damage > 0 and d_target != null \
 			and d_target.is_hero:
-		var ft_fellows := enemies.filter(func(e): return not e.dead and e != u)
+		var ft_fellows := enemies.filter(func(e): return _pickable(e) and e != u)
 		if ft_fellows.is_empty():
 			# Nothing to trick it into — the mark HOLDS rather than being spent on
 			# a redirect that cannot happen. Said out loud: a charge that silently
@@ -9147,9 +9205,11 @@ func _choose_enemy_action(u: BattleUnit, ticks_ahead := 1) -> Dictionary:
 	var message := ""
 	# Only damaging, off-cooldown abilities count as attacks; support casts
 	# are chosen above.
+	# BATCH JW §3 — AND A BLOW ITS OWN CONDITION WITHHOLDS IS NONE (`_blow_withheld`: the Rotfiend's Corpse Explosion until it
+	# stands at half its health). Which ready blow it prefers is untouched.
 	var affordable: Array = u.abilities.filter(
 		func(a): return (_eff_cost(u, a) <= u.resource and a.damage > 0
-			and _enemy_ready(u, a, ticks_ahead)))
+			and _enemy_ready(u, a, ticks_ahead) and not _blow_withheld(u, a)))
 	# BATCH BL §1: the ONE genuinely new line in this function. Selection used
 	# to run at the instant of acting, where every enemy in the roster has at
 	# least one free attack and the list could not be empty; a declaration made
@@ -9272,7 +9332,7 @@ func _find_ready(u: BattleUnit, ability_name: String, ticks_ahead := 1) -> Abili
 # Non-attack decisions for enemies with support abilities. Returns
 # [ability, ally_target], or [] to fall through to a normal attack.
 func _enemy_support_action(u: BattleUnit, ticks_ahead := 1) -> Array:
-	var allies: Array = enemies.filter(func(e): return not e.dead)
+	var allies: Array = enemies.filter(func(e): return _pickable(e))
 	# BATCH JI §1 — a support cast is gated by the conditions below, by resources,
 	# and by its cooldown where the data gives it one (Healing Wave on the Totemist,
 	# Regenerate, Dark Vigil): a cooling cast is passed by, as a condition that does
@@ -9342,6 +9402,11 @@ func _enemy_support_action(u: BattleUnit, ticks_ahead := 1) -> Array:
 		var nicked: Array = allies.filter(func(a): return _malice_hurt(vigil, a))
 		if nicked.size() >= 2 and _enemy_ready(u, vigil, ticks_ahead, u):
 			return [vigil, u]
+	# BATCH JW §3 — THE FEN LURKER SUBMERGES, once a fight, on a turn it stands under `SUBMERGE_AT` of its health while another
+	# body of its warband can be picked (`_submerge_holds`): a self-cast, after every heal and ward (a taunt passes the half by).
+	var dive := _find_ready(u, "Submerge", ticks_ahead)
+	if dive != null and _submerge_holds(u):
+		return [dive, u]
 	# BATCH JL §1 — THE SPENDS ARE NO LONGER THE SUPPORT HALF's LAST CHOICE: a spend costs its body no turn, so it rides the
 	# body's declaration beside whatever this half or the attack half chose (`_declare_intent`), still after every heal and ward.
 	return []
@@ -9458,7 +9523,7 @@ func _malice_price(caster: BattleUnit, ab: Ability, body: BattleUnit) -> int:
 	if ab.special == "totem_pulse":
 		var all := 0
 		for e in enemies:
-			if not e.dead and not e.has_status("blight"):
+			if _pickable(e) and not e.has_status("blight"):
 				all += mini(_warband_heal_figure(ab.special, e), maxi(e.max_hp - e.hp, 0))
 		return all
 	if body.has_status("blight"):
@@ -9478,8 +9543,13 @@ func _malice_hurt(ab: Ability, body: BattleUnit) -> bool:
 # set aside — and it pays a point for every point of health the body gained, measured on the body, so an overheal and a
 # heal the body refuses pay nothing. A heal on the heroes' side is no warband heal and pays nothing. Returns what the heal
 # pipeline returned, as the arms always printed it.
-func _warband_heal(caster: BattleUnit, body: BattleUnit, special: String) -> int:
+func _warband_heal(caster: BattleUnit, body: BattleUnit, special: String, figure := -1) -> int:
 	var fig := _warband_heal_figure(special, body)
+	# BATCH JW §2–§3 — A HEAL WHOSE FIGURE IS NO SHARE OF THE BODY's MAXIMUM BY ITS SPECIAL — the Bone Shepherd's Soul Leech (half of
+	# what it landed) and the Rotfiend's Corpse Explosion (its neighbour's 15%) — hands its figure here, at resolution, and pays out of
+	# what the pool holds unreserved: neither is declared on the pool or sets a price aside.
+	if figure >= 0:
+		fig = figure
 	if body.is_hero:
 		return body.heal_amount(fig, body != caster)
 	var hp0 := body.hp
@@ -9518,6 +9588,7 @@ const MALICE_ENTRENCH_PRICE := 30
 # Rally no longer has a blow of its own to beat: two bodies, the brief's.
 const MALICE_RALLY_BODIES := 2
 var _malice_raised: Array = []   # the bodies a Raise stood up this fight: once a body, a fight
+var _submerged_once: Array = []  # BATCH JW §3 — the bodies that have submerged this fight: once a body, a fight
 
 
 # The unit's move carrying `special`, or null.
@@ -9526,6 +9597,100 @@ func _find_spend(u: BattleUnit, special: String) -> Ability:
 		if (a as Ability).special == special:
 			return a
 	return null
+
+
+# ══ BATCH JW — THE DROWNED BARROW: THE PICK DOOR, THE STALL RULE, AND THE THREE MOVES THAT NEED A HANDLER ════════════════
+#
+# **ONE DOOR ANSWERS *MAY THIS BODY BE PICKED*: `_pickable`.** A submerged body is in no pool any blow, card, spell, scatter,
+# splash, redirect, counter or support cast picks from — the census of every site is `docs/reports/JW-picks.tsv`, and `check_jw`
+# §4 derives the sites from the source and reds on one the census does not hold. What reaches a body with no pick still
+# reaches it: a tick it carries, damage returned to the body that struck.
+func _pickable(u: BattleUnit) -> bool:
+	return u != null and not u.dead and not u.has_status("submerged")
+
+
+# THE STALL RULE (the record's open question 8): a Submerge is refused unless another body of the warband stands pickable, and
+# when the last pickable body falls every submerged one surfaces — so while any enemy lives, one can be picked, and the
+# heroes' side is never left with a living warband and nothing to aim at.
+func _submerge_holds(u: BattleUnit) -> bool:
+	if u == null or u.dead or u.has_status("submerged") or _submerged_once.has(u):
+		return false
+	if float(u.hp) >= u.max_hp * SUBMERGE_AT:
+		return false
+	return enemies.any(func(e): return e != u and _pickable(e))
+
+
+func _surface_if_alone() -> void:
+	if enemies.any(func(e): return _pickable(e)):
+		return
+	for e in enemies:
+		if not e.dead and e.has_status("submerged"):
+			e.remove_status("submerged")
+			e.float_text("SURFACES", Color(0.55, 0.80, 0.85))
+			_log("   → %s surfaces — none of its warband is left to hide behind" % e.unit_name, "#7cc8c8")
+
+
+# A BLOW ITS OWN CONDITION WITHHOLDS: the Rotfiend's Corpse Explosion, until it stands at `CORPSE_EXPLOSION_AT` of its health or
+# less — a death throe, so a Rotfiend felled from above it never bursts.
+func _blow_withheld(u: BattleUnit, ab: Ability) -> bool:
+	return ab.special == "corpse_explosion" and float(u.hp) > u.max_hp * CORPSE_EXPLOSION_AT
+
+
+# THE FEN LURKER's SUBMERGE: `submerged` for `SUBMERGE_TURNS` on itself, once a fight. The picker cannot pass (an empty choice
+# resolves to the basic), so it still acts while under — the record's open question 8, its second branch.
+func _submerge(u: BattleUnit, ab: Ability) -> void:
+	if not _submerge_holds(u):
+		_log("%s: %s — nothing of its warband left to hide behind" % [u.unit_name, ab.display_name], "#909090")
+		return
+	_submerged_once.append(u)
+	_apply_status(u, "submerged", SUBMERGE_TURNS, 0, 0, u)
+	_sfx("heal", -9.0, 0.6)
+	_message("%s sinks beneath the water!" % u.unit_name)
+	_log("%s: %s — no blow, card or spell can pick it for %d turns" % [u.unit_name, ab.display_name, SUBMERGE_TURNS], "#7cc8c8")
+
+
+# THE ROTFIEND's CORPSE EXPLOSION: an area blow on the heroes' side as the data writes it (its damage, Break and Black Rot,
+# resolved as a plain copy — the Bloodcaller's pattern), then the Rotfiend dies through the one death door, so the pool fills a
+# kill's worth and a Raise can stand it back up (once a body, a fight), and then, of its living neighbours that can be picked
+# (`_adjacent_enemies`, the ADJACENT keyword), the one with the lower share of its health is healed `CORPSE_EXPLOSION_HEAL_PCT` of its own maximum health,
+# paid by Malice a point a point through `_warband_heal`, the one way Malice goes out to a heal (JJ §3).
+func _corpse_explosion(u: BattleUnit, ab: Ability, target: BattleUnit, grade: String) -> void:
+	_message("%s bursts!" % u.unit_name)
+	var ce_copy: Ability = Ability.make({"display_name": ab.display_name, "damage": ab.damage, "pressure": ab.pressure,
+		"dmg_type": ab.dmg_type, "anim": ab.anim, "delay": ab.delay, "aoe": true,
+		"applies_status": ab.applies_status.duplicate(), "status_chance": ab.status_chance})
+	await _resolve(u, ce_copy, target, grade)
+	if u.dead or battle_over:
+		return
+	var nbrs: Array = _adjacent_enemies(u).filter(func(e): return _pickable(e))
+	u.hp = 0
+	u._die()
+	u.refresh_bars()
+	_log("† %s is spent in the blast" % u.unit_name, "#e05050")
+	if nbrs.is_empty():
+		_log("   → %s: no neighbour stands to take the rot's gift" % ab.display_name, "#909090")
+		return
+	var nb: BattleUnit = _lowest_hp(nbrs)
+	var hp0 := nb.hp
+	var got: int = _warband_heal(u, nb, ab.special, maxi(int(round(nb.max_hp * CORPSE_EXPLOSION_HEAL_PCT)), 1))
+	if got > 0:
+		nb.float_text("+%d" % got, Color(0.55, 0.5, 0.75))
+	_log("   → %s: %s regains %d health — %d Malice" % [ab.display_name, nb.unit_name, maxi(nb.hp - hp0, 0),
+		maxi(nb.hp - hp0, 0)], "#70d878")
+
+
+# THE BONE SHEPHERD's SOUL LEECH: what a warband body's lifesteal asks, through `_warband_heal` — no more than the pool holds unspent,
+# paid point for point on what the body gained — so an overheal and a heal the pool cannot fund pay nothing.
+func _warband_leech(u: BattleUnit, ab: Ability, ask: int) -> void:
+	if ask <= 0:
+		return
+	var hp0 := u.hp
+	_warband_heal(u, u, ab.special, ask)
+	var gained := maxi(u.hp - hp0, 0)
+	if gained > 0:
+		u.float_text("+%d" % gained, Color(0.4, 0.9, 0.45))
+	_log("   → %s: %s leeches %d of the %d it asked — %d Malice" % [ab.display_name, u.unit_name, gained, ask, gained],
+		"#70d878")
 
 
 # THE HEALTH A RAISE STANDS A BODY UP WITH — `revive`'s own figure, so the price asked and the health it buys are one.
@@ -9949,9 +10114,9 @@ func _adjacent_enemies(target: BattleUnit) -> Array:
 	if idx < 0:
 		return []
 	var adjacent: Array = []
-	if idx > 0 and not enemies[idx - 1].dead:
+	if idx > 0 and _pickable(enemies[idx - 1]):
 		adjacent.append(enemies[idx - 1])
-	if idx + 1 < enemies.size() and not enemies[idx + 1].dead:
+	if idx + 1 < enemies.size() and _pickable(enemies[idx + 1]):
 		adjacent.append(enemies[idx + 1])
 	return adjacent
 
@@ -10061,7 +10226,8 @@ func _miss_chance(attacker: BattleUnit, defender: BattleUnit = null) -> float:
 	if attacker.no_cover > 0:
 		return 0.0
 	var chance := MISS_CHANCE + (0.20 if attacker.has_status("dazed") else 0.0) \
-		+ (BLIND_MISS_PCT if attacker.has_status("blind") else 0.0)
+		+ (BLIND_MISS_PCT if attacker.has_status("blind") else 0.0) \
+		+ (NOXIOUS_FUMES_MISS_PCT if attacker.has_status("noxious_fumes") else 0.0)
 	# Numbing Veil: chilled fingers fumble the blow. THE NODE IS GONE (Batch AS
 	# gave its id to Glacial Prison) — this read site is KEPT because the Rune
 	# of the Killing Cold still writes the counter. ADDITIVE: percentage points.
@@ -10172,6 +10338,14 @@ func _impact_sfx(attacker: BattleUnit, ab: Ability) -> String:
 
 func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: String,
 		is_counter := false) -> void:
+	# BATCH JW §3 — THE PICK DOOR's BACKSTOP, AT THE BLOW's OWN DOOR: a single blow aimed at a body no pick may reach (a submerged
+	# one) does not land — a counter, a riposte, a redirect, or any aim that did not ask `_pickable` first. An area or a scatter
+	# drops it from its own targets (`strike_targets`, the shard pool), and a body's own self-cast is no pick.
+	if target != null and target != attacker and not target.dead and target.has_status("submerged") \
+			and not ab.aoe and ab.random_hits == 0:
+		_log("%s: %s cannot reach %s — it is beneath the water" % [attacker.unit_name, ab.display_name, target.unit_name],
+			"#909090")
+		return
 	# BATCH BL §2 — THE ATTRIBUTION FRAME, set once at the top and covering
 	# everything this cast does to anyone's health: the strike itself, its
 	# splash and echoes, the reflect and retaliation it draws, and the recoil
@@ -10471,14 +10645,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		if ab.display_name == "Ice Lance" and attacker.rune_cold_snap > 0 \
 				and attacker.is_hero:
 			for cs_e in enemies:
-				if cs_e.dead or cs_e == target or not cs_e.has_status("chilled"):
+				if not _pickable(cs_e) or cs_e == target or not cs_e.has_status("chilled"):
 					continue
 				strike_targets.append(cs_e)
 			if strike_targets.size() > 1:
 				_log("Rune: the Cold Snap — the lance finds every chilled body (%d)" % \
 					strike_targets.size(), "#7cc8f0")
 		if ab.aoe:
-			strike_targets = enemies.filter(func(t): return not t.dead) \
+			strike_targets = enemies.filter(func(t): return _pickable(t)) \
 				if attacker.is_hero else _hero_side()
 			# Shatter only detonates what he is HOLDING (Batch AS): the
 			# capstone is the mass release, so its victims are the prisons.
@@ -10486,9 +10660,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				strike_targets = strike_targets.filter(func(t): return _is_held(t))
 		elif ab.choose_two or ab.choose_three:
 			var second: BattleUnit = second_target
-			if second == null or second.dead or second == target:
+			# BATCH JW §3 — THE SECOND BODY COMES FROM THE SIDE THE BLOW IS AIMED AT — the heroes' for a warband blow, the
+			# pickable warband for a hero's (the Fen Lurker's Swipe is the first warband move to carry `choose_two`): it was read off
+			# `enemies` whatever the attacker, and the battle var still holds the last hero's pick. A body off that side, or one no
+			# pick may reach, is no second target.
+			var two_side: Array = _hero_side() if _hero_side().has(target) else enemies.filter(func(e): return _pickable(e) and e != attacker)
+			if second == null or second.dead or second == target or not two_side.has(second):
 				# Autoplay (or a lone survivor): fall back to another live foe.
-				var others := enemies.filter(func(e): return not e.dead and e != target)
+				var others := two_side.filter(func(e): return e != target)
 				second = null if others.is_empty() else others.pick_random()
 			# **BATCH IV §3 — THE FALLBACK's BODY IS WRITTEN BACK (DV11).** The on-hit package below reads
 			# `second_target` and `third_target` — a Trapper's Shrapnel Charge poisons every body it chose —
@@ -10499,9 +10678,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				strike_targets = [target, second]
 			if ab.choose_three:
 				var third: BattleUnit = third_target
-				if third == null or third.dead or third == target or third == second:
+				if third == null or not _pickable(third) or third == target or third == second:
 					var rest := enemies.filter(
-						func(e): return not e.dead and e != target and e != second)
+						func(e): return _pickable(e) and e != target and e != second)
 					third = null if rest.is_empty() else rest.pick_random()
 				third_target = third
 				if third != null:
@@ -10570,7 +10749,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		if ab.display_name == "Magic Missiles" and attacker.rune_seeking_missiles > 0.0 \
 				and not is_counter and attacker.is_hero:
 			seek_bodies = enemies.filter(
-				func(e): return not e.dead and e.has_status("elem_weak"))
+				func(e): return _pickable(e) and e.has_status("elem_weak"))
 			if not seek_bodies.is_empty():
 				total_hits += seek_bodies.size()
 				_log("   → Rune: Seeking Missiles — %d more missile%s seek%s the weakened" % [
@@ -10660,7 +10839,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			var strike_target: BattleUnit
 			if ab.random_hits > 0:
 				# Each shard picks a fresh living target at launch time.
-				var live_pool: Array = enemies.filter(func(t): return not t.dead) \
+				var live_pool: Array = enemies.filter(func(t): return _pickable(t)) \
 					if attacker.is_hero else _hero_side()
 				if live_pool.is_empty():
 					break
@@ -11128,7 +11307,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					# Sundering and Elemental Weakness riders included).
 					if strike_target.vengeful_guardian > 0 \
 							and strike_target.vengeful_ready \
-							and not attacker.dead and not attacker.is_hero:
+							and _pickable(attacker) and not attacker.is_hero:
 						var vg_cb := _find_ability(strike_target, "Crushing Blow")
 						if vg_cb != null:
 							strike_target.vengeful_ready = false
@@ -11740,7 +11919,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if ab.display_name == "Detonation":
 				var det_pool: Array = [strike_target]
 				if attacker.cataclysm > 0:
-					det_pool = enemies.filter(func(e): return not e.dead)
+					det_pool = enemies.filter(func(e): return _pickable(e))
 				elif attacker.total_commitment > 0:
 					det_pool = [strike_target] + _adjacent_enemies(strike_target)
 				var det_mult: float = (2.5 + 0.75 * attacker.focused_flame) \
@@ -13171,7 +13350,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if attacker.rune_long_watch > 0 and attacker.is_hero \
 					and not strike_target.is_hero and pr > 0:
 				var lw_pool := enemies.filter(
-					func(e): return not e.dead and e != strike_target)
+					func(e): return _pickable(e) and e != strike_target)
 				if not lw_pool.is_empty():
 					var lw_t: BattleUnit = _lowest_hp(lw_pool)
 					var lw_res: Dictionary = lw_t.take_hit(0, pr)
@@ -13280,7 +13459,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var excess := final - hp_before
 				if excess > 0:
 					var ok_pool := enemies.filter(
-						func(e): return not e.dead and e != strike_target)
+						func(e): return _pickable(e) and e != strike_target)
 					if not ok_pool.is_empty():
 						var ok_t: BattleUnit = _lowest_hp(ok_pool)
 						var ok_res: Dictionary = ok_t.take_hit(excess, 0)
@@ -13435,7 +13614,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# flip on top of a crit is variance stacked on variance, and the one
 			# thing a compounding spec must not be is random.
 			if is_crit and attacker.is_hero and attacker.temporal_ranks > 0:
-				var rift_pool := enemies.filter(func(e): return not e.dead)
+				var rift_pool := enemies.filter(func(e): return _pickable(e))
 				if not rift_pool.is_empty():
 					var rift_t: BattleUnit = rift_pool.pick_random()
 					var rift_dmg := maxi(int(round(final * 0.01
@@ -13540,7 +13719,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					if attacker.rune_open_wound > 0 and attacker.is_hero \
 							and ab.display_name == "Shadowrend":
 						for ow_e in enemies:
-							if ow_e.dead or ow_e == strike_target:
+							if not _pickable(ow_e) or ow_e == strike_target:
 								continue
 							_gain_ruin(ow_e, _old_gods_mark())
 				# Empowered Hex: the curse can set the rot in.
@@ -13590,7 +13769,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					# twice would make the Defensive branch the deeper one and
 					# delete the trade the card is sold on.
 					lg_marks = enemies.filter(func(e): \
-						return not e.dead and e != strike_target)
+						return _pickable(e) and e != strike_target)
 				var lg_bd: int = LUNGE_DEPTH_BD if lunge_aggr else LUNGE_BREADTH_BD
 				for lg_hit in lg_marks:
 					var lg_res: Dictionary = lg_hit.take_hit(0, lg_bd)
@@ -13712,7 +13891,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if ab.display_name == "Magic Burst" and attacker.rune_unravel > 0.0:
 				var ur_n := 0
 				for ur_e in enemies:
-					if ur_e.dead or ur_e == strike_target:
+					if not _pickable(ur_e) or ur_e == strike_target:
 						continue
 					_apply_elem_weak(ur_e, ELEM_WEAK_PCT, ELEM_WEAK_TURNS, attacker)
 					ur_n += 1
@@ -13787,7 +13966,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					# Provoke widens the net: +2 taunted foes per rank on top
 					# of those the base ability already drags in.
 					var others := enemies.filter(
-						func(e): return not e.dead and e != strike_target)
+						func(e): return _pickable(e) and e != strike_target)
 					others.shuffle()
 					var taunt_extra := mini(MOCKING_BLOW_EXTRA_TAUNTS + 2 * attacker.provoke_ranks,
 						others.size())
@@ -14048,7 +14227,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if ab.display_name == "Fireball" and attacker.is_hero \
 					and attacker.rune_cinder_ember > 0:
 				var ct_pool: Array = enemies.filter(
-					func(e): return not e.dead and e != strike_target)
+					func(e): return _pickable(e) and e != strike_target)
 				if not ct_pool.is_empty():
 					var ct_t: BattleUnit = ct_pool.pick_random()
 					_log("   → Rune: the Cinder Trail — embers drift onto %s" % \
@@ -14093,7 +14272,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_apply_perfect_bonus(attacker, strike_target, ab, result.died)
 			# Retaliation stance: the victim counters with their basic attack.
 			if strike_target.has_status("retaliate") and not is_counter \
-					and not strike_target.dead and not attacker.dead and ab.damage > 0:
+					and _pickable(strike_target) and _pickable(attacker) and ab.damage > 0:
 				strike_target.float_text("RETALIATE", Color(0.95, 0.6, 0.25))
 				_log("%s retaliates!" % strike_target.unit_name, "#50c8e0")
 				await _wait(0.4)
@@ -14182,7 +14361,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					var cat_t: BattleUnit = null
 					var cat_best := 0
 					for cat_e in enemies:
-						if cat_e.dead or not cat_e.has_status("burn"):
+						if not _pickable(cat_e) or not cat_e.has_status("burn"):
 							continue
 						var cat_turns := int(cat_e.get_status("burn").get("turns", 0))
 						if cat_turns > cat_best:
@@ -14209,7 +14388,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# bought from two different lanes, so a parry fires ONE
 			# counter; the log names the node that paid for it.
 			if parried and not is_counter \
-					and not strike_target.dead and not attacker.dead:
+					and _pickable(strike_target) and _pickable(attacker):
 				var ut_pommel: Ability = _find_ability(strike_target, "Pommel Strike") \
 					if (strike_target.untouchable > 0 \
 					and strike_target.stance == "defensive") else null
@@ -14467,7 +14646,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# split or pay for; whatever it takes, they never see.
 			if attacker.blowback > 0:
 				var out: int = mini(int(round(recoil * attacker.blowback / 100.0)), recoil)
-				var bl_targets := enemies.filter(func(e): return not e.dead)
+				var bl_targets := enemies.filter(func(e): return _pickable(e))
 				if out > 0 and not bl_targets.is_empty():
 					recoil -= out
 					# BATCH IS §3a — the fourth split of the shape, dormant (no writer of `blowback`): what goes
@@ -14552,7 +14731,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				attacker.refresh_bars()
 				_log("   → Talent: Siphon — %s draws %d Mana from the wound" % [
 					attacker.unit_name, sip_got], "#b0a8e0")
-		if ab.lifesteal > 0.0 and total_dealt > 0 and not attacker.dead:
+		# BATCH JW §2 — A WARBAND BODY's LIFESTEAL IS A WARBAND HEAL (the Bone Shepherd's Soul Leech): it asks its share of what
+		# landed, no more than the pool holds unspent, and pays a point of Malice for every point of health it restores (JJ §3's
+		# rule, `_warband_leech`) — so healing himself and raising his dead draw on one bar. A hero's is unchanged.
+		if ab.lifesteal > 0.0 and total_dealt > 0 and not attacker.dead and not attacker.is_hero:
+			_warband_leech(attacker, ab, int(total_dealt * ab.lifesteal))
+		elif ab.lifesteal > 0.0 and total_dealt > 0 and not attacker.dead:
 			var leech := int(total_dealt * ab.lifesteal * (1.5 if is_perfect else 1.0))
 			attacker.heal_amount(leech)
 			attacker.float_text("+%d" % leech, Color(0.4, 0.9, 0.45))
@@ -14757,7 +14941,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# ceiling, and that cap is what the breadth costs.
 			if attacker.spray > 0 and ab.multi_hits == 0 and ab.random_hits == 0:
 				var sp_pool := enemies.filter(
-					func(e): return not e.dead and e != target)
+					func(e): return _pickable(e) and e != target)
 				for _sp_i in attacker.spray:
 					if sp_pool.is_empty():
 						break
@@ -14879,8 +15063,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					await _ghost_hit(attacker, gpk, comp_target,
 						GHOSTPACK_SHARE * attacker.attack)
 			for cs_b in pack_now:
-				if comp_target == null or comp_target.is_hero or comp_target.dead:
-					var foes := enemies.filter(func(e): return not e.dead)
+				if comp_target == null or comp_target.is_hero or not _pickable(comp_target):
+					var foes := enemies.filter(func(e): return _pickable(e))
 					comp_target = null if foes.is_empty() else _lowest_hp(foes)
 				if comp_target == null:
 					break
@@ -15034,7 +15218,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				and target != null and target.dead and not battle_over \
 				and attacker.rampage_chains < 1 + attacker.rampage_upgraded:
 			attacker.rampage_chains += 1
-			var rampage_foes := enemies.filter(func(e): return not e.dead)
+			var rampage_foes := enemies.filter(func(e): return _pickable(e))
 			if not rampage_foes.is_empty():
 				var next_target: BattleUnit = rampage_foes.pick_random()
 				_message("RAMPAGE surges onward!")
@@ -15393,7 +15577,7 @@ func _killing_cold_cast(caster: BattleUnit) -> void:
 			or not caster.has_engine("permafrost"):
 		return
 	for e in enemies:
-		if e.dead or not e.has_status("chilled"):
+		if not _pickable(e) or not e.has_status("chilled"):
 			continue
 		var kc_stacks: int = e.status_stacks("chilled")
 		if kc_stacks < 4:
@@ -15439,7 +15623,7 @@ func _hold_freeze_riders(target: BattleUnit, cryo: BattleUnit) -> void:
 	var bc_h := _living_hero_with("bitter_cold_ranks")
 	if bc_h != null and not _bitter_echoing:
 		_bitter_echoing = true
-		var bc_pool := enemies.filter(func(e): return not e.dead and e != target)
+		var bc_pool := enemies.filter(func(e): return _pickable(e) and e != target)
 		if not bc_pool.is_empty():
 			_log("   → Talent: Bitter Cold — the freeze rolls across the field",
 				"#b0a8e0")
@@ -15546,7 +15730,7 @@ func _hold_release_body(target: BattleUnit, reason: String) -> void:
 		_log("   → Talent: Shockwave — the release sets the field back",
 			"#b0a8e0")
 		for e in enemies:
-			if not e.dead and e != target and not _is_held(e):
+			if _pickable(e) and e != target and not _is_held(e):
 				e.next_time += st * 100.0 / maxf(e.effective_speed(), 0.1)
 	# Honed Shards LAST: the release leaves the thawed target already deep in the
 	# cold. Since BATCH BN §1 it can no longer re-freeze the enemy it just thawed
@@ -15841,7 +16025,7 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 	# release resolves.
 	if id == "chilled" and not _frostbinding and target.has_status("frostbind"):
 		var fb_mate := _frostbind_partner(target)
-		if fb_mate != null:
+		if fb_mate != null and _pickable(fb_mate):
 			_frostbinding = true
 			_apply_status(fb_mate, "chilled", turns, power, tick, src, force)
 			_frostbinding = false
@@ -15877,7 +16061,7 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 				break
 		if dw_src != null:
 			var dw_others: Array = enemies.filter(
-				func(e): return not e.dead and e != target)
+				func(e): return _pickable(e) and e != target)
 			var dw_fresh: Array = dw_others.filter(
 				func(e): return not e.has_status(id))
 			var dw_pool: Array = dw_fresh if not dw_fresh.is_empty() else dw_others
@@ -15977,7 +16161,7 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 		target.frigid_bonus = 0.01 * _max_hero_rank("frigid_ranks", "rune_frigid_ranks")
 		# Rime: the chill leaps to one other random enemy (never chains).
 		if target.has_status("rime") and not _rime_echoing:
-			var others := enemies.filter(func(e): return not e.dead and e != target)
+			var others := enemies.filter(func(e): return _pickable(e) and e != target)
 			if not others.is_empty():
 				var echo_t: BattleUnit = others.pick_random()
 				_rime_echoing = true
@@ -16751,7 +16935,7 @@ func _arcane_arrow_splash(attacker: BattleUnit, struck: BattleUnit,
 	var left := attacker.status_power("arrows")
 	if left < 1 or final <= 0:
 		return
-	var pool: Array = enemies.filter(func(e): return not e.dead and e != struck)
+	var pool: Array = enemies.filter(func(e): return _pickable(e) and e != struck)
 	if pool.is_empty():
 		return
 	var victim: BattleUnit = pool.pick_random()
@@ -16793,7 +16977,7 @@ func _crossfire_splash(attacker: BattleUnit, struck: BattleUnit,
 		final: int) -> void:
 	if final <= 0:
 		return
-	var pool: Array = enemies.filter(func(e): return not e.dead and e != struck)
+	var pool: Array = enemies.filter(func(e): return _pickable(e) and e != struck)
 	if pool.is_empty():
 		return
 	var picks: Array = []
@@ -16866,7 +17050,7 @@ func _umbral_sigil_echo(branded: BattleUnit, landed: int) -> void:
 	var echoed := false
 	var sg_landed := false
 	for fellow in enemies:
-		if fellow.dead or fellow == branded:
+		if not _pickable(fellow) or fellow == branded:
 			continue
 		echoed = true
 		var sg_land := _landed(fellow, echo)
@@ -16894,7 +17078,7 @@ func _arcane_echo_repeat(attacker: BattleUnit, ab: Ability, final: int) -> void:
 		return
 	var mark: BattleUnit = null
 	for e in enemies:
-		if e.dead or not e.has_status("arcane_echo"):
+		if not _pickable(e) or not e.has_status("arcane_echo"):
 			continue
 		if String(e.get_status("arcane_echo").get("src_name", "")) \
 				!= attacker.unit_name:
@@ -17101,27 +17285,27 @@ func _lay_engine_mark(holder: BattleUnit, pid: String, target: BattleUnit) -> vo
 		"tracks" if pid == "quarry_hunt" else "judges", target.unit_name], "#e0c880")
 
 
-# Where a mark goes when the enemy wearing it falls: the living enemy with the most
+# Where a mark goes when the enemy wearing it falls: the living enemy that can be picked (`_pickable`, JW) with the most
 # health left — a mark wants the body that will stand longest — the first in the
 # warband on a tie. The brief says the Tracker's MOVES; the Arbiter's is given the
 # same move so neither engine dies with its first target (NEEDS A RULING).
 func _mark_destination(fallen: BattleUnit) -> BattleUnit:
 	var best: BattleUnit = null
 	for e in enemies:
-		if e == fallen or e.dead or e.hp <= 0:
+		if e == fallen or not _pickable(e) or e.hp <= 0:
 			continue
 		if best == null or e.hp > best.hp:
 			best = e
 	return best
 
 
-# BATCH IK §1 — WHO PAYS A BLOOD DEBT: the living enemy with the most health left, the first in the
+# BATCH IK §1 — WHO PAYS A BLOOD DEBT: the living enemy that can be picked (`_pickable`, JW) with the most health left, the first in the
 # warband on a tie — the standing order a moving mark already uses (`_mark_destination`), and no die.
 # Null when no enemy stands. Its one caller is Blood Price's arm in `_resolve_special`.
 func _blood_debt_payer() -> BattleUnit:
 	var best: BattleUnit = null
 	for e in enemies:
-		if e.dead or e.hp <= 0:
+		if not _pickable(e) or e.hp <= 0:
 			continue
 		if best == null or e.hp > best.hp:
 			best = e
@@ -17200,6 +17384,9 @@ func _on_unit_died(u: BattleUnit) -> void:
 	if _readout != null and u.is_hero:
 		_readout.hero_fell(u)
 	if not u.is_hero:
+		# BATCH JW §3 — THE STALL RULE's SECOND HALF: when no pickable body of the warband stands, every submerged one surfaces,
+		# so while any enemy lives one can be picked.
+		_surface_if_alone()
 		# BATCH JJ §2 — A BODY OF THE WARBAND FALLS: its pool fills by a kill's worth, whoever dealt it.
 		# BATCH JQ §1 — UNLESS IT DIES FORSAKEN, AND THEN THE KILL FEEDS NOTHING. Every death of the warband passes here, from
 		# `unit._die`, before the body's statuses are cleared — a strike's, a handler's, a tick's, a debug kill's — so the mark
@@ -17335,7 +17522,7 @@ func _bot_redoubt_pick(u: BattleUnit) -> Array:
 	if u.redoubt_bank < maxf(basic.damage * 0.01 * u.attack, 1.0) \
 			or not _ability_usable(u, basic):
 		return []
-	var foes := enemies.filter(func(e): return not e.dead)
+	var foes := enemies.filter(func(e): return _pickable(e))
 	if foes.is_empty():
 		return []
 	var broken_foes := foes.filter(func(e): return e.broken)
@@ -17411,7 +17598,7 @@ func _overburn_mult(u: BattleUnit, burn_turns: int) -> float:
 func _forge_body_throw(hero: BattleUnit, prevented: float) -> void:
 	if hero == null or battle_over or prevented <= 0.0:
 		return
-	var alight := enemies.filter(func(e): return not e.dead and e.has_status("burn"))
+	var alight := enemies.filter(func(e): return _pickable(e) and e.has_status("burn"))
 	if alight.is_empty():
 		return
 	var thrown := maxi(int(round(prevented)), 1)
@@ -17483,7 +17670,7 @@ func _overburn_refund(u: BattleUnit, turns_consumed: int) -> void:
 	if u.rune_ember_leap > 0:
 		var el_half: int = turns_consumed / 2
 		if el_half > 0:
-			var el_pool: Array = enemies.filter(func(e): return not e.dead)
+			var el_pool: Array = enemies.filter(func(e): return _pickable(e))
 			var el_to: BattleUnit = null
 			for el_e in el_pool:
 				var el_have: int = maxi(int(el_e.get_status("burn").get("turns", 0)), 0)
@@ -19155,7 +19342,7 @@ func _cheapest_attack(u: BattleUnit) -> Ability:
 # would feed a Hierophant off an enemy's action, let Downwind copy it and book it to him (IL §1a's kept-
 # apart four). The Ruin stack is laid on its own line below, through `_gain_ruin`; the Daze feeds nothing.
 func _bewitched_strike(u: BattleUnit) -> bool:
-	var fellows := enemies.filter(func(e): return not e.dead and e != u)
+	var fellows := enemies.filter(func(e): return _pickable(e) and e != u)
 	var basic := _cheapest_attack(u)
 	if fellows.is_empty() or basic == null:
 		return false
@@ -19461,7 +19648,7 @@ func _gain_ruin(target: BattleUnit, n: int = 1) -> void:
 	# exactly as a directly-applied stack does — which is the point of
 	# "spread pressure becomes focused pressure without giving up the spread".
 	for mirror in enemies:
-		if mirror == target or mirror.dead or not mirror.has_status("covenant"):
+		if mirror == target or not _pickable(mirror) or not mirror.has_status("covenant"):
 			continue
 		_log("   → Covenant of Ash: the ash claims %d stack%s on %s too" % [
 			n, "" if n == 1 else "s", mirror.unit_name], "#a050b0")
@@ -19488,7 +19675,7 @@ func _gain_ruin(target: BattleUnit, n: int = 1) -> void:
 	var sp_ruin := occ.spread_ruin + occ.rune_spread_ruin
 	if not _ruin_spreading and sp_chance > 0 and sp_ruin > 0 \
 			and randf() < 0.01 * sp_chance:
-		var catchers := enemies.filter(func(e): return not e.dead and e != target)
+		var catchers := enemies.filter(func(e): return _pickable(e) and e != target)
 		if not catchers.is_empty():
 			var caught: BattleUnit = catchers.pick_random()
 			_log("   → Talent: Spread of Madness — the mark leaps to %s (+%d Ruin)" % [
@@ -19644,7 +19831,7 @@ func _detonate_ruin(target: BattleUnit) -> void:
 	if occ.unravel_ranks > 0:
 		var unr_hit := 0
 		for e in enemies:
-			if not e.dead and e != target:
+			if _pickable(e) and e != target:
 				_gain_ruin(e, occ.unravel_ranks)
 				unr_hit += 1
 		if unr_hit > 0:
@@ -19708,7 +19895,7 @@ func _detonate_ruin(target: BattleUnit) -> void:
 			var sr_to: BattleUnit = null
 			var sr_best := -1
 			for sr_e in enemies:
-				if sr_e.dead or sr_e == target:
+				if not _pickable(sr_e) or sr_e == target:
 					continue
 				var sr_r: int = sr_e.status_stacks("ruin")
 				if sr_r > sr_best:
@@ -20019,7 +20206,7 @@ func _ward_detonate(holder: BattleUnit, how: String) -> void:
 	var wd_was_name := _dmg_src_name
 	var wd_hit: Array = []
 	for wd_e in enemies.duplicate():
-		if wd_e.dead:
+		if not _pickable(wd_e):
 			continue
 		_dmg_frame(holder, "Detonating Ward")
 		var wd_res: Dictionary = wd_e.take_hit(wd_amt, 0)
@@ -20339,7 +20526,7 @@ func _burning_ground_tick(u: BattleUnit) -> void:
 	var bg_base := u.max_hp * u.rune_burning_ground
 	var bg_hit: Array = []
 	for bg_e in enemies.duplicate():
-		if bg_e.dead:
+		if not _pickable(bg_e):
 			continue
 		var bg_amt := maxi(int(round(bg_base
 			* (1.0 - float(bg_e.resists.get("holy", 0.0))))), 1)
@@ -20387,11 +20574,11 @@ func _return_burden(cleric: BattleUnit, from: BattleUnit, taken: Array) -> void:
 		var rb_src := String(rb.get("src_name", ""))
 		if rb_src != "":
 			for rb_e in enemies:
-				if not rb_e.dead and rb_e.unit_name == rb_src:
+				if _pickable(rb_e) and rb_e.unit_name == rb_src:
 					rb_to = rb_e
 					break
 		if rb_to == null:
-			var rb_live: Array = enemies.filter(func(e): return not e.dead)
+			var rb_live: Array = enemies.filter(func(e): return _pickable(e))
 			if rb_live.is_empty():
 				break
 			rb_to = rb_live.pick_random()
@@ -20670,7 +20857,7 @@ func _free_copy(ab: Ability) -> Ability:
 func _try_opportunist(defender: BattleUnit, attacker: BattleUnit) -> void:
 	if defender == null or attacker == null or defender.opportunist <= 0 \
 			or not defender.is_hero or attacker.is_hero \
-			or defender.dead or attacker.dead:
+			or not _pickable(defender) or not _pickable(attacker):
 		return
 	var op := _find_ability(defender, "Overpower")
 	if op == null:
@@ -21139,7 +21326,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.unit_name, pact_cost, int(round(pact_heal_pct * 100))], "#b070d0")
 		"hysteria":
 			_sfx("break", -6.0, 1.2)
-			for e in enemies.filter(func(en): return not en.dead):
+			for e in enemies.filter(func(en): return _pickable(en)):
 				_apply_status(e, "hysteria", -1, 0, 0, attacker)
 			_message("%s unleashes MASS HYSTERIA!" % attacker.unit_name)
 			_log("%s: Mass Hysteria — the warband turns on itself next turn" % \
@@ -21192,8 +21379,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				for comp in kc_beasts:
 					if comp.dead:
 						continue
-					if kc_target == null or kc_target.dead:
-						var kc_next := enemies.filter(func(e): return not e.dead)
+					if kc_target == null or not _pickable(kc_target):
+						var kc_next := enemies.filter(func(e): return _pickable(e))
 						if kc_next.is_empty():
 							break
 						kc_target = _lowest_hp(kc_next)
@@ -21226,7 +21413,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 							var kc_second: BattleUnit = second_target
 							if kc_second == null or kc_second.dead or kc_second == kc_target:
 								var kc_pool := enemies.filter(
-									func(e): return not e.dead and e != kc_target)
+									func(e): return _pickable(e) and e != kc_target)
 								kc_second = (null if kc_pool.is_empty() \
 									else _lowest_hp(kc_pool))
 							for kc_t in [kc_target, kc_second]:
@@ -21293,7 +21480,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var cf_turns := 0
 			var cf_lit := 0
 			for foe in enemies:
-				if foe.dead:
+				if not _pickable(foe):
 					continue
 				# The wide hit: 20% of Attack on everything standing.
 				var cf_raw := 0.01 * ab.damage * attacker.attack * mult \
@@ -21621,7 +21808,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					int(attacker.loyalty.get(cw_pick, 0))], "#e0a050")
 				var cw_new: Array = _beasts(attacker).filter(
 					func(b): return b.companion_kind == cw_pick)
-				var cw_foes := enemies.filter(func(e): return not e.dead)
+				var cw_foes := enemies.filter(func(e): return _pickable(e))
 				if not cw_new.is_empty() and not cw_foes.is_empty():
 					var cw_mark: BattleUnit = _lowest_hp(cw_foes)
 					await _companion_strike(cw_new[0], cw_mark, 1.0, false)
@@ -21670,7 +21857,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var cs_hit := 0
 			var cs_lit := 0
 			for foe4 in enemies:
-				if foe4.dead:
+				if not _pickable(foe4):
 					continue
 				_apply_status(foe4, "blind", cs_turns, 0, 0, attacker)
 				if foe4.has_status("blind"):
@@ -21696,7 +21883,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var sl_idx := heroes.find(attacker)
 			var sl_hit := 0
 			for foe5 in enemies:
-				if foe5.dead:
+				if not _pickable(foe5):
 					continue
 				_apply_status(foe5, "snare_line", sl_turns, sl_idx, 0, attacker)
 				sl_hit += 1
@@ -22082,7 +22269,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var es_n := 0
 			if es_idx >= 0:
 				for es_e in enemies:
-					if es_e.dead:
+					if not _pickable(es_e):
 						continue
 					_apply_status(es_e, "mocked", es_turns, es_idx, 0, attacker)
 					if es_e.has_status("mocked") \
@@ -22969,7 +23156,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var sb_turns := SLOW_BURN_TURNS
 			var sb_n := 0
 			for foe in enemies:
-				if foe.dead:
+				if not _pickable(foe):
 					continue
 				_apply_status(foe, "slow_burn", sb_turns, 0, 0, attacker)
 				sb_n += 1
@@ -23070,7 +23257,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var kf_total := 0
 			var kf_n := 0
 			for foe in enemies:
-				if foe.dead or not foe.has_status("chilled"):
+				if not _pickable(foe) or not foe.has_status("chilled"):
 					continue
 				var kf_raw := 0.01 * ab.damage * attacker.attack * mult \
 					* randf_range(0.9, 1.1)
@@ -23172,7 +23359,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var fd_from := 0
 				var fd_deep := 0
 				for foe in enemies:
-					if foe.dead or foe == target:
+					if not _pickable(foe) or foe == target:
 						continue
 					var fd_st: Dictionary = foe.get_status("burn")
 					var fd_left: int = maxi(int(fd_st.get("turns", 0)), 0)
@@ -23247,7 +23434,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var pw_total := 0
 				var pw_lit := 0
 				for _pw_i in pw_turns:
-					var pw_pool := enemies.filter(func(e): return not e.dead)
+					var pw_pool := enemies.filter(func(e): return _pickable(e))
 					if pw_pool.is_empty():
 						break
 					var pw_mark: BattleUnit = pw_pool.pick_random()
@@ -23348,7 +23535,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				else:
 					var dw_hit := 0
 					for foe in enemies:
-						if foe.dead:
+						if not _pickable(foe):
 							continue
 						for _dw_i in dw_n:
 							if not foe.dead:
@@ -23378,7 +23565,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			if fb_first != null and (fb_second == null or fb_second.dead \
 					or fb_second == fb_first):
 				var fb_pool := enemies.filter(
-					func(e): return not e.dead and e != fb_first)
+					func(e): return _pickable(e) and e != fb_first)
 				fb_second = null
 				for fb_cand in fb_pool:
 					if fb_second == null or fb_cand.status_stacks("chilled") \
@@ -23841,7 +24028,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					var ul_tgt: BattleUnit = target
 					if ul_tgt == null or ul_tgt.dead or ul_tgt.is_hero:
 						ul_tgt = _lowest_hp(enemies.filter(
-							func(e): return not e.dead))
+							func(e): return _pickable(e)))
 					if ul_tgt == null:
 						_log("%s: Unleash finds nothing to loose it at" % \
 							attacker.unit_name, "#909090")
@@ -23963,7 +24150,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					" [PERFECT]" if is_perfect else ""], "#70d878")
 				_sfx("crit", -6.0, 0.7)
 				for cu_e in enemies.duplicate():
-					if cu_e.dead:
+					if not _pickable(cu_e):
 						continue
 					var cu_raw := cu_pct * attacker.attack * cu_n \
 						* randf_range(0.9, 1.1)
@@ -24272,7 +24459,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 						bw_comp.armor += bw_comp.bestial_armor_bonus
 						bw_comp.refresh_bars()
 						var bw_idx := heroes.find(attacker)
-						var bw_pool := enemies.filter(func(e): return not e.dead)
+						var bw_pool := enemies.filter(func(e): return _pickable(e))
 						bw_pool.shuffle()
 						var bw_taunted := 0
 						for bw_e in bw_pool:
@@ -24600,14 +24787,14 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var gc_bd: int = attacker.guard_change_bd if gc_wide else 15
 			var gc_marks: Array = []
 			if gc_wide:
-				gc_marks = enemies.filter(func(e): return not e.dead)
+				gc_marks = enemies.filter(func(e): return _pickable(e))
 				if not gc_marks.is_empty():
 					_log("   → Talent: Sunder Guard — the pivot sunders every guard (%d BD)" % \
 						gc_bd, "#b0a8e0")
 			else:
 				var gc_mark: BattleUnit = null
 				for e in enemies:
-					if not e.dead and not e.broken \
+					if _pickable(e) and not e.broken \
 							and (gc_mark == null or e.pressure > gc_mark.pressure):
 						gc_mark = e
 				if gc_mark != null:
@@ -24941,7 +25128,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var rite_hits := 0
 			_message("%s intones a Cleansing Rite!" % attacker.unit_name)
 			for cl_a in rite_side:
-				if cl_a.dead:
+				if not _pickable(cl_a):
 					continue
 				var cl_opts := _cleansable_debuffs(cl_a)
 				if cl_opts.is_empty():
@@ -25004,6 +25191,10 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s hoists a massive blow!" % attacker.unit_name)
 			_log("%s is charging %s — it lands next turn! (Break, Freeze, or Stun cancels it)" % [
 				attacker.unit_name, ab.display_name], "#e08850")
+		"corpse_explosion":
+			await _corpse_explosion(attacker, ab, target, grade)
+		"submerge":
+			_submerge(attacker, ab)
 		"blood_tribute":
 			# Orc Bloodcaller (Batch V): every fallen ally feeds the rite —
 			# +25% damage and Break damage per corpse. Resolved as a plain
@@ -25028,7 +25219,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var tp_total := 0
 			var tp_spent := int(malice_ledger["spent"])
 			for tp_a in tp_side:
-				if tp_a.dead:
+				if not _pickable(tp_a):
 					continue
 				# BATCH JJ §3 — a warband heal on each body: no more than the pool can pay, paid point for point.
 				var tp_got: int = _warband_heal(attacker, tp_a, "totem_pulse")
@@ -25064,7 +25255,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# BATCH JK §1 — RALLY: every standing body of the warband strikes `MALICE_RALLY_PCT` harder for `MALICE_RALLY_TURNS` turns, read
 			# in the strike loop, which no heal passes; the pool pays `MALICE_RALLY_PRICE`.
 			for ra in enemies:
-				if not ra.dead:
+				if _pickable(ra):
 					_apply_status(ra, "warband_rally", MALICE_RALLY_TURNS, 0, 0, attacker)
 			_malice_pay(MALICE_RALLY_PRICE)
 			_sfx("break", -9.0, 0.8)
@@ -25075,7 +25266,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# BATCH JK §1 — ENTRENCH: every standing body of the warband wears its armor `BattleUnit.MALICE_ENTRENCH_MULT` times over for
 			# `MALICE_ENTRENCH_TURNS` turns, read at `effective_armor()`, the one door; the pool pays `MALICE_ENTRENCH_PRICE`.
 			for en in enemies:
-				if not en.dead:
+				if _pickable(en):
 					_apply_status(en, "warband_entrench", MALICE_ENTRENCH_TURNS, 0, 0, attacker)
 			_malice_pay(MALICE_ENTRENCH_PRICE)
 			_sfx("parry", -8.0, 0.7)
@@ -25100,7 +25291,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			if attacker.wildfire_spread > 0:
 				var wf_lit := 0
 				for foe in enemies:
-					if foe.dead or foe.has_status("burn"):
+					if not _pickable(foe) or foe.has_status("burn"):
 						continue
 					_apply_status(foe, "burn", attacker.wildfire_spread, 0,
 						_dot_tick("burn", attacker), attacker)
@@ -25112,7 +25303,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var wf_total := 0
 			var wf_turns := 0
 			for foe in enemies:
-				if foe.dead or not foe.has_status("burn"):
+				if not _pickable(foe) or not foe.has_status("burn"):
 					continue
 				var wf_st: Dictionary = foe.get_status("burn")
 				var wf_left: int = maxi(int(wf_st.get("turns", 0)), 0)
@@ -25184,7 +25375,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var bd_binfo: Array = STATUS_INFO["burn"]
 			var bd_hit := 0
 			for foe in enemies:
-				if foe.dead or not foe.has_status("burn"):
+				if not _pickable(foe) or not foe.has_status("burn"):
 					continue
 				var bd_st: Dictionary = foe.get_status("burn")
 				foe.update_status("burn", bd_binfo[1], bd_binfo[3], -1,
@@ -25240,7 +25431,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			if attacker.rune_glass_prison > 0:
 				target.glass_hold = true
 				var gp_pool: Array = enemies.filter(
-					func(e): return not e.dead and e != target and not _is_held(e))
+					func(e): return _pickable(e) and e != target and not _is_held(e))
 				if gp_pool.is_empty():
 					_log("   → Rune: the Glass Prison finds no second body to seal", "#909090")
 				else:
@@ -25815,7 +26006,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# release payoff fires on a relocation.
 			var tf_from: BattleUnit = null
 			for tf_e in enemies:
-				if tf_e.dead or tf_e == target:
+				if not _pickable(tf_e) or tf_e == target:
 					continue
 				if tf_e.status_stacks("ruin") <= 0:
 					continue
@@ -25911,7 +26102,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					attacker.unit_name, "#909090")
 			else:
 				var ss_marks: Array = []
-				var ss_pool: Array = enemies.filter(func(e): return not e.dead)
+				var ss_pool: Array = enemies.filter(func(e): return _pickable(e))
 				while ss_marks.size() < SAVAGE_SWEEP_TARGETS and not ss_pool.is_empty():
 					var ss_pick: BattleUnit = _lowest_hp(ss_pool)
 					ss_marks.append(ss_pick)
@@ -26433,7 +26624,7 @@ func _arrival_for_kind(hunter: BattleUnit, kind: String, body: BattleUnit,
 		"ursus":
 			# Guardian's Roar: taunt the weakest enemy (preferring one not
 			# already taunted); a real bear digs in for 2 turns.
-			var pool := enemies.filter(func(e): return not e.dead)
+			var pool := enemies.filter(func(e): return _pickable(e))
 			if pool.is_empty():
 				return
 			_sfx("break", -6.0, 0.8)
@@ -26473,7 +26664,7 @@ func _arrival_for_kind(hunter: BattleUnit, kind: String, body: BattleUnit,
 			_log("%s: Bloodhowl — 15 Bleed to every enemy" % caller_name,
 				"#e05050")
 			# Herald widens it to the `herald` bloodiest enemies.
-			var howl_live: Array = enemies.filter(func(en): return not en.dead)
+			var howl_live: Array = enemies.filter(func(en): return _pickable(en))
 			var bloodiest: Array = howl_live.duplicate()
 			bloodiest.sort_custom(
 				func(a, b): return a.bleed_buildup > b.bleed_buildup)
@@ -26488,15 +26679,15 @@ func _arrival_for_kind(hunter: BattleUnit, kind: String, body: BattleUnit,
 			# The eagle dives a chosen enemy: 15% of the hunter's Attack,
 			# Dazed (Herald: a second dive on the weakest other enemy).
 			var dive: BattleUnit = target
-			if dive == null or dive.dead or dive.is_hero:
-				var foes := enemies.filter(func(e): return not e.dead)
+			if dive == null or not _pickable(dive) or dive.is_hero:
+				var foes := enemies.filter(func(e): return _pickable(e))
 				dive = null if foes.is_empty() else _lowest_hp(foes)
 			if dive == null:
 				return
 			var dives: Array = [dive]
 			for _extra in hunter.herald:
 				var others := enemies.filter(
-					func(e): return not e.dead and not dives.has(e))
+					func(e): return _pickable(e) and not dives.has(e))
 				if others.is_empty():
 					break
 				dives.append(_lowest_hp(others))
@@ -27385,7 +27576,7 @@ func _snare_line_tick(u: BattleUnit) -> void:
 
 
 func _deadfall_tick(u: BattleUnit) -> void:
-	if u == null or u.is_hero or u.dead:
+	if u == null or u.is_hero or not _pickable(u):
 		return
 	for df_h in heroes:
 		if df_h.dead or df_h.deadfall_armed <= 0:
@@ -28364,7 +28555,7 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int,
 			if t_pct > 0.0:
 				chain_hops.append(victim)
 				var hosts: Array = enemies.filter(
-					func(e): return not e.dead and e != victim and not chain_hops.has(e))
+					func(e): return _pickable(e) and e != victim and not chain_hops.has(e))
 				if not hosts.is_empty():
 					var host: BattleUnit = hosts.pick_random()
 					var surge := int(round(100.0 * t_pct))
@@ -31799,7 +31990,7 @@ func _on_damage_taken(victim: BattleUnit, lost: int, hp_before: int, past_last :
 	if not _frostbind_mirroring and not victim.is_hero \
 			and victim.has_status("frostbind"):
 		var fb_mate := _frostbind_partner(victim)
-		if fb_mate != null:
+		if fb_mate != null and _pickable(fb_mate):
 			var fb_share := maxi(int(round(lost * FROSTBIND_SHARE)), 1)
 			var fb_owner := _frostbind_caster(victim)
 			_frostbind_mirroring = true
@@ -32019,7 +32210,7 @@ func _backblast_check(u: BattleUnit) -> void:
 		u.float_text("+%d" % bb_heal, Color(1.0, 0.7, 0.4))
 	var bb_lit := 0
 	for foe in enemies:
-		if foe.dead:
+		if not _pickable(foe):
 			continue
 		_apply_status(foe, "burn", BACKBLAST_BURN, 0, _dot_tick("burn", u), u)
 		bb_lit += 1

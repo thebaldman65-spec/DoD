@@ -17,7 +17,7 @@
 #        order — and the one same-turn route, the Cryomancer's turn-start upkeep, has no writer; the day it gets one this
 #        reds); Cull's and Harvest's yield against the count they pay, over bodies carrying sticky and non-sticky
 #        afflictions and a conjunction; Returned Burden's re-lay of a 0-turn effect, driven, and every source of a harmful
-#        effect on a hero laying a positive duration.
+#        effect on a hero laying a positive duration or a battle-long one.
 #   §4   THE THREE WORDS (Mantle's Faith clause, the glossary's Faith, Split Shield) to the word the code reaches, and THE
 #        PICK POPULATION WIDENED FROM CARDS TO PICKS: every pick that offers a body on the hero side, its words against the
 #        pool it offers with a companion standing, and every function that builds a hero-side pool sorted — so a new pick
@@ -760,15 +760,19 @@ func _s3b_the_three_rows() -> void:
 		if (e as BattleUnit).has_status("slow"):
 			landed = int((e as BattleUnit).get_status("slow").get("turns", -9))
 	ok(landed == 1, "§3b-3: an effect lifted at 0 turns was re-laid for %d (the guard reads 1)" % landed)
-	# Every harmful effect an enemy lays on a hero carries a positive duration, the door floors a positive one at 1 under
+	# Every harmful effect an enemy lays on a hero carries a positive duration or a battle-long one, the door floors a positive one at 1 under
 	# Fleeting, and the clock removes a 0 the pass it reaches it — so a hero never carries a 0-turn effect to be lifted.
 	var zero := []
 	var enemies_json: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/enemies.json"))
 	var applies := []
 	_collect_applies(enemies_json, applies)
+	# BATCH JW §3 — A NEGATIVE COUNT IS PERMANENCE, NOT A ZERO (Black Rot lays -1, battle-long): only a 0 is the defect.
+	var lasting := 0
 	for a in applies:
-		if int((a as Dictionary).get("turns", 0)) <= 0:
+		if int((a as Dictionary).get("turns", 0)) == 0:
 			zero.append(str(a))
+		elif int((a as Dictionary).get("turns", 0)) < 0:
+			lasting += 1
 	w.mod_status_turns = -1
 	for a in applies:
 		var sid := String((a as Dictionary).get("id", ""))
@@ -783,7 +787,7 @@ func _s3b_the_three_rows() -> void:
 			w.tick_statuses()
 	w.mod_status_turns = 0
 	ok(applies.size() >= 10 and zero.is_empty(), "§3b-3: a harmful effect reaches a hero at 0 turns — %s (of %d sources)" % [str(zero), applies.size()])
-	print("    Returned Burden: a 0-turn effect re-laid for %d; %d enemy sources each lay a positive duration, none stands at 0" % [landed, applies.size()])
+	print("    Returned Burden: a 0-turn effect re-laid for %d; %d enemy sources each lay a positive duration or a battle-long one (%d), none stands at 0" % [landed, applies.size(), lasting])
 	await _clear(s3)
 
 

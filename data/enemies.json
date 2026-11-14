@@ -10,7 +10,8 @@
    2,
    3,
    4,
-   5
+   5,
+   6
   ],
   "enemy_role": "damage",
   "max_hp": 140,
@@ -242,7 +243,8 @@
    2,
    3,
    4,
-   5
+   5,
+   6
   ],
   "enemy_role": "damage",
   "max_hp": 110,
@@ -318,7 +320,8 @@
    2,
    3,
    4,
-   5
+   5,
+   6
   ],
   "enemy_role": "tank",
   "max_hp": 150,
@@ -375,7 +378,8 @@
    2,
    3,
    4,
-   5
+   5,
+   6
   ],
   "enemy_role": "support",
   "max_hp": 110,
@@ -437,7 +441,8 @@
    2,
    3,
    4,
-   5
+   5,
+   6
   ],
   "enemy_role": "support",
   "max_hp": 120,
@@ -634,7 +639,8 @@
    2,
    3,
    4,
-   5
+   5,
+   6
   ],
   "enemy_role": "damage",
   "max_hp": 260,
@@ -762,7 +768,8 @@
    2,
    3,
    4,
-   5
+   5,
+   6
   ],
   "enemy_role": "damage",
   "max_hp": 280,
@@ -833,7 +840,8 @@
    2,
    3,
    4,
-   5
+   5,
+   6
   ],
   "enemy_role": "damage",
   "max_hp": 250,
@@ -1060,7 +1068,8 @@
    2,
    3,
    4,
-   5
+   5,
+   6
   ],
   "enemy_role": "support",
   "max_hp": 105,
@@ -1188,7 +1197,8 @@
    2,
    3,
    4,
-   5
+   5,
+   6
   ],
   "enemy_role": "damage",
   "max_hp": 125,
@@ -1249,7 +1259,8 @@
    2,
    3,
    4,
-   5
+   5,
+   6
   ],
   "enemy_role": "support",
   "max_hp": 80,
@@ -1337,7 +1348,8 @@
    2,
    3,
    4,
-   5
+   5,
+   6
   ],
   "enemy_role": "damage",
   "max_hp": 620,
@@ -1852,7 +1864,7 @@
    "skirmisher"
   ],
   "zones": [
-   3
+   6
   ],
   "enemy_role": "damage",
   "max_hp": 90,
@@ -1906,7 +1918,7 @@
    "bulwark"
   ],
   "zones": [
-   1
+   6
   ],
   "enemy_role": "tank",
   "max_hp": 300,
@@ -1966,7 +1978,7 @@
    "sniper"
   ],
   "zones": [
-   1
+   6
   ],
   "enemy_role": "support",
   "max_hp": 120,
@@ -2027,7 +2039,7 @@
    "skirmisher"
   ],
   "zones": [
-   3
+   6
   ],
   "enemy_role": "damage",
   "max_hp": 130,
@@ -2066,6 +2078,215 @@
      "turns": 2
     },
     "status_chance": 0.5
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "rotfiend": {
+  "unit_name": "Rotfiend",
+  "power": 1,
+  "roles": [
+   "skirmisher"
+  ],
+  "zones": [
+   6
+  ],
+  "enemy_role": "damage",
+  "max_hp": 90,
+  "attack": 100,
+  "armor": 0.05,
+  "speed": 115.0,
+  "stability": 100,
+  "constitution": 70,
+  "tint": [
+   0.46,
+   0.56,
+   0.36
+  ],
+  "sprite_scale": 2.9,
+  "resists": {
+   "nature": -0.25,
+   "shadow": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Sodden Claw",
+    "damage": 26,
+    "pressure": 16,
+    "delay": 1.5,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Corpse Explosion",
+    "cooldown": 2,
+    "special": "corpse_explosion",
+    "damage": 5,
+    "pressure": 20,
+    "delay": 2.5,
+    "anim": "attack02",
+    "aoe": true,
+    "applies_status": {
+     "id": "black_rot",
+     "turns": -1
+    },
+    "description": "The Rotfiend bursts and dies: every\nhero is struck and takes a stack of\nBlack Rot, and one neighbour heals\n{=Battle.CORPSE_EXPLOSION_HEAL_PCT*100}% of that neighbour's maximum\nhealth, paid in Malice. Only while the\nRotfiend is at {=Battle.CORPSE_EXPLOSION_AT*100}% of its health or less."
+   },
+   {
+    "display_name": "Rake",
+    "damage": 13,
+    "pressure": 8,
+    "delay": 1.5,
+    "anim": "attack02",
+    "applies_status": {
+     "id": "black_rot",
+     "turns": -1
+    },
+    "description": "Lays a stack of Black Rot on one hero."
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "fen_lurker": {
+  "unit_name": "Fen Lurker",
+  "power": 3,
+  "roles": [
+   "brute"
+  ],
+  "zones": [
+   6
+  ],
+  "enemy_role": "damage",
+  "max_hp": 260,
+  "attack": 100,
+  "armor": 0.2,
+  "speed": 75.0,
+  "stability": 100,
+  "constitution": 125,
+  "tint": [
+   0.4,
+   0.56,
+   0.54
+  ],
+  "sprite_scale": 3.7,
+  "resists": {
+   "physical": 0.1,
+   "shadow": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Swipe",
+    "damage": 40,
+    "pressure": 32,
+    "delay": 2.5,
+    "anim": "attack01",
+    "choose_two": true,
+    "description": "Strikes two heroes."
+   },
+   {
+    "display_name": "Lacerate",
+    "cooldown": 2,
+    "damage": 55,
+    "pressure": 50,
+    "delay": 3.5,
+    "anim": "attack02",
+    "bleed_build": 20,
+    "description": "Opens a wound: {=@bleed_build} Bleed on one hero."
+   },
+   {
+    "display_name": "Submerge",
+    "special": "submerge",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Sinks beneath the water: no blow, card or\nspell can pick it for {=Battle.SUBMERGE_TURNS} turns, and it\nstill acts. Once a fight, on a turn it\nstands under {=Battle.SUBMERGE_AT*100}% of its health while\nanother of its warband can be picked."
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 2,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "bone_shepherd": {
+  "unit_name": "Bone Shepherd",
+  "power": 7,
+  "roles": [
+   "boss"
+  ],
+  "zones": [
+   6
+  ],
+  "enemy_role": "damage",
+  "max_hp": 370,
+  "attack": 100,
+  "armor": 0.22,
+  "speed": 85.0,
+  "stability": 100,
+  "constitution": 160,
+  "is_boss": true,
+  "tint": [
+   0.84,
+   0.82,
+   0.68
+  ],
+  "sprite_scale": 4.4,
+  "resists": {
+   "holy": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Soul Leech",
+    "dmg_type": "shadow",
+    "damage": 30,
+    "pressure": 24,
+    "delay": 2.0,
+    "anim": "attack01",
+    "lifesteal": 0.5,
+    "description": "Heals the Bone Shepherd {=@lifesteal*100}% of the damage\nit deals, paid from the warband's Malice."
+   },
+   {
+    "display_name": "Noxious Fumes",
+    "cooldown": 2,
+    "dmg_type": "nature",
+    "damage": 9,
+    "pressure": 14,
+    "delay": 3.5,
+    "anim": "attack02",
+    "aoe": true,
+    "applies_status": {
+     "id": "noxious_fumes",
+     "turns": 3
+    },
+    "description": "Every hero it strikes misses\n{=Battle.NOXIOUS_FUMES_MISS_PCT*100}% more of the time for {=@applies_status.turns}\nturns, added to its chance to miss."
+   },
+   {
+    "display_name": "Call the Drowned",
+    "cooldown": 4,
+    "special": "malice_raise",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Stands a fallen body of its warband back\nup at {=Battle.MALICE_RAISE_PCT*100}% of its maximum health, for\nthat health in Malice (once a body, a fight)."
    },
    {
     "display_name": "Rally",

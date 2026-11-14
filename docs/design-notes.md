@@ -4,6 +4,35 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The Drowned Barrow (Batch JW) — 2026-11-14
+
+**Why every boss fight asks its own question.** The designer's value, set on 14 November: a boss that is only a bigger body of
+the warband is beaten by the same play that beats the fights before it. A fight that asks one question &mdash; here, *can you
+deal enough damage fast enough* &mdash; gives the player a strategy to find, and gives the boss an identity no figure can. The Bone
+Shepherd is built to it first; the three older zone bosses and the end boss are revisited later, one by one, so the value is recorded where it binds
+every boss authored from now on.
+
+**Why the Shepherd's healing is paid from Malice.** The warband's pool is its whole economy: every heal it casts costs a point
+of Malice a point restored, which the heroes' own damage and the warband's deaths fill, so the warband is taxed and never out-heals what it was given.
+His Soul Leech heals on that rule, and his Call the Drowned is the warband's Raise, so healing himself and raising his dead
+draw on one bar &mdash; and a long fight is what fills it. That is the damage check: the bar is his clock, and the heroes' own
+damage winds it.
+
+**Why the Rotfiend bursts only once it is badly hurt.** A body that kills itself at full health on a random turn would be a
+coin flip, not a choice; one that bursts as it is dying makes *kill it from above half in one go* the answer the zone asks for,
+and its death fills the pool a kill's worth the Shepherd can spend to stand it back up &mdash; the zone's loop, as the designer
+described it.
+
+**Why Submerge lasts its turns even though the Lurker acts.** The record wanted it to end when the Lurker acts; the warband
+cannot choose to do nothing &mdash; a body with nothing to declare swings its basic attack &mdash; so it would end at once. It lasts
+its three turns instead, and it is cast once a fight, only while another of its warband can be targeted, and the Lurker surfaces
+the moment none can: so whatever lives can always be reached, and a fight never stalls on a warband nobody can aim at.
+
+**Why Black Rot never runs out.** It is the zone's attrition, the other half of the damage check: the record asks for a disease
+cleansed as Fester is, so it stands until a cleanse lifts it, stacking with every application. It reuses the stack counter, the turn-start pass and the debuff
+list, with an arm and a tick of its own (a stack an application and no clock, Ruin's shape), and takes a share of the hero's own
+maximum health, which no status took before.
+
 ## Four kinds for the Forest of Old (Batch JU) — 2026-11-10
 
 **Why rot opens the Forest and grave closes it.** The record asked for kinds *for rot and grave* and counted them per roster; the

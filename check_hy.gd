@@ -58,6 +58,7 @@ const PENANCE_POWER := 50
 #   DEALER   — deals under the frame of the wound it carries, by design.
 const DAMAGE_FUNCS := {
 	"battle.gd::_dot_pass": "OWN — a tick at its bearer's turn start; the frame names the status's applier (BL §2)",
+	"battle.gd::_black_rot_tick": "OWN — Black Rot's tick, at the foot of the DoT pass; the frame names the stack's applier (JW §3)",
 	"battle.gd::_run_battle": "BREAK — Decay, Entropy and Cold Snap take Break and no health",
 	"battle.gd::_player_turn": "ACTION — Entropy's Toll, the hero's own price after his own action (no writer of its field since FX)",
 	"battle.gd::_use_item": "OWN — the bomb is the pouch's, so its frame names nobody (HY §1b)",
@@ -844,7 +845,18 @@ func _s6_the_census() -> void:
 		var at := tx.find("_spring_trap(")
 		while at >= 0:
 			trap_callers += 1
-			var call := tx.substr(at, tx.find("\n", at) - at)
+			# BATCH JW §3 — THE WHOLE CALL, TO ITS CLOSING PARENTHESIS (IT §3b; the positional census's MISSES row, repaired at
+			# JW §3 by the touch that gave `_black_rot_tick` its row): the Snare Line's call wraps, and its damage argument stands
+			# on the next line, which a window of the call's first line never held.
+			var close := at + "_spring_trap(".length()
+			var depth := 1
+			while close < tx.length() and depth > 0:
+				if tx[close] == "(":
+					depth += 1
+				elif tx[close] == ")":
+					depth -= 1
+				close += 1
+			var call := tx.substr(at, close - at)
 			var dealing := not call.contains(", 0.0)")
 			var framed := tx.substr(0, at).contains("_dmg_frame(")
 			ok(not dealing or framed, "§6: `%s` springs a trap that deals with no frame of its own: %s" % [k4, call.strip_edges()])

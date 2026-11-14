@@ -6,7 +6,7 @@
 #        it hosts (C02); every kind tagged for all three old rosters takes both new ones, and no kind tagged for fewer travels (C04);
 #        each new roster fields four to six bodies, DERIVED through the composer's list (which the game's draw counts, `check_jv`)
 #        for every budget a fight node rolls
-#        (C03); a player's run and a sim's draw both candidates at both slots and the Scarlands alone at slot 2, and a sim's flag
+#        (C03); a player's run and a sim's draw both candidates at both slots and the Frozen Plains never at slot 2, and a sim's flag
 #        holds the first (DRIVEN); each of the six's shares of a fight node as the state records it; and every background dict
 #        names the zone and a zone it does not name falls back (C05: the battle's DRIVEN, the map's and the event screen's read).
 #   §2   THE SIX KINDS: each its role, power and enemy role, its Attack its role's (C07), the zone's signature — frost resisted,
@@ -41,8 +41,10 @@ const ZONE_NAME := "The Frozen Plains"
 const BOSS := "icewrought_titan"
 # BATCH JU §1 — THE FOUR KINDS JU ADDED TO THE FOREST OF OLD, set aside where this gate sets its own seven aside: JS's rule for
 # the kind each of the six stands for reads the kinds JS stood among, and §5's digest is the warband beside JS's additions.
-const ADDED_SINCE := ["grave_husk", "mossback", "blight_speaker", "carrion_pack"]
-# THE SLOTS IT HOSTS (1-based, as `ZONE_DEFS`' rosters key them) and the slot it never takes: the Scarlands keeps its own.
+const ADDED_SINCE := ["grave_husk", "mossback", "blight_speaker", "carrion_pack",
+	# BATCH JW §1 — AND THE DROWNED BARROW's THREE.
+	"rotfiend", "fen_lurker", "bone_shepherd"]
+# THE SLOTS IT HOSTS (1-based, as `ZONE_DEFS`' rosters key them) and the slot it never takes: slot 2, the Scarlands' and (since JW) the Barrow's.
 const HOSTS := [1, 3]
 const NOT_HOST := 2
 const SLOTS := 3
@@ -80,6 +82,8 @@ const LAID := ["slow", "dazed", "sap", "frozen"]
 # STATUS_INFO's ids as JR landed them: their count and their digest (sorted, joined by `|`). A status authored reds here.
 const STATUS_IDS_AT_HEAD := 168
 const STATUS_IDS_MD5 := "73daa5a35fc15fe44b74bf493d079976"
+# BATCH JW §3 — THE STATUSES AUTHORED SINCE, set aside from the digest: Black Rot, Noxious Fumes and Submerged.
+const STATUSES_SINCE := ["black_rot", "noxious_fumes", "submerged"]
 # THE REFERENCE BOARD THE LINE PRICES HEALS AND SPENDS ON (`check_ji` §1a, `check_jk` §2): the median composable body and the
 # median basic, DERIVED with the seven taken out and with them in. JS's six straddle both, so no band of an existing kind moved.
 # THE STATE's RECORD OF THE SIX SECOND MOVES' FIGURES (R01): the sentence and the moves it names, each read against the data.
@@ -312,8 +316,10 @@ func _s1_the_zone() -> void:
 	ok(defs.has(ZONE), "§1: ZONE_DEFS holds no %s" % ZONE)
 	for slot in HOSTS:
 		ok(pools.size() >= slot and (pools[slot - 1] as Array).has(ZONE), "§1: the Frozen Plains is no candidate at slot %d" % slot)
-	ok(pools.size() >= NOT_HOST and not (pools[NOT_HOST - 1] as Array).has(ZONE) and pools[NOT_HOST - 1] == ["scarlands"],
-		"§1: slot %d's pool is %s — the Scarlands keeps its single candidacy, and the Frozen Plains is no candidate there" % [NOT_HOST, str(pools[NOT_HOST - 1]) if pools.size() >= NOT_HOST else "[]"])
+	# BATCH JW §1 — REPAIRED TO ITS INTENT: the Scarlands kept slot 2 alone until the Drowned Barrow joined it there (JW §1), so the
+	# arm asks what JS decided — the Frozen Plains is no candidate at slot 2, and the Scarlands still is, its first.
+	ok(pools.size() >= NOT_HOST and not (pools[NOT_HOST - 1] as Array).has(ZONE) and String((pools[NOT_HOST - 1] as Array).front()) == "scarlands",
+		"§1: slot %d's pool is %s — the Scarlands is its first candidate, and the Frozen Plains is no candidate there" % [NOT_HOST, str(pools[NOT_HOST - 1]) if pools.size() >= NOT_HOST else "[]"])
 	if not defs.has(ZONE):
 		return
 	var zd: Dictionary = defs[ZONE]
@@ -677,7 +683,7 @@ func _s2_the_six() -> void:
 			if id != "" and not LAID.has(id):
 				bad.append("%s lays %s" % [k5, id])
 	var info: Dictionary = (load("res://scripts/battle.gd") as Script).get_script_constant_map().get("STATUS_INFO", {})
-	var ids: Array = info.keys()
+	var ids: Array = info.keys().filter(func(k): return not STATUSES_SINCE.has(String(k)))
 	ids.sort()
 	var dig := ("|".join(ids)).md5_text()
 	print("    STATUS_INFO holds %d ids (%s); JR landed %d" % [ids.size(), dig, STATUS_IDS_AT_HEAD])

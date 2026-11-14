@@ -11,7 +11,7 @@ const SHEET := "res://assets/sprites/orc"
 
 # JSON numbers arrive as floats; these ability fields must stay ints.
 const AB_INT_KEYS := ["damage", "pressure", "cost", "cooldown", "resource_gain",
-	"multi_hits", "random_hits", "faith_cost"]
+	"multi_hits", "random_hits", "faith_cost", "bleed_build"]
 const CFG_INT_KEYS := ["max_hp", "attack", "stability", "constitution",
 	"resource", "max_resource", "power"]
 # The default rung `config` reads at: every caller that is not a live run

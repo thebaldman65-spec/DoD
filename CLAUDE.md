@@ -1539,7 +1539,8 @@ as a live decision.
   `"ally"` and nothing else, so **`"target": "self"` is silently unmapped and falls through to
   `Target.ENEMY`** — a boss authored that way wards a hero. **Every self-cast in the game is
   tagged `"ally"`**: the Bog Troll's Regenerate, the Ritual Chanter's Cleansing Rite, the Grave
-  Totem's Dark Vigil, the Hollow Crown's Regalia, and the warband's Malice spends — Rally, Entrench and Raise.
+  Totem's Dark Vigil, the Hollow Crown's Regalia, the Fen Lurker's Submerge, and the warband's Malice spends — Rally, Entrench
+  and Raise.
   **The unit a support cast lands on is chosen in `_enemy_support_action`, and a spend's in `_warband_spend`, which
   `_declare_intent` asks (JL §1) — not in the data** — re-point a cast there, never in the JSON.
 - **A PAYLOAD SHARED BY TWO ABILITIES MUST LOG `ab.display_name`, NEVER A LITERAL NAME.** The
@@ -4837,6 +4838,26 @@ same breath as the removal.
   shown 29 of his 43 — so the floor sits below the depth. **Under a fully-held LOADOUT no hero can be
   paid nothing; under a fully-held POOL every hero still can.** `check_eh` §2 asserts both
   directions and `check_gp` §2b prints the reachable count per class.
+
+## STANDING DESIGN RULE — EVERY BOSS FIGHT HAS A STRATEGY SPECIFIC TO IT (Batch JW §0, the designer's)
+> **A boss is not a bigger body of the warband. EACH BOSS FIGHT ASKS THE PARTY ONE QUESTION OF ITS OWN, and the boss's kit is
+> built so that the answer is a strategy that wins that fight and no other.**
+
+- **THE BONE SHEPHERD, THE DROWNED BARROW's BOSS, IS THE FIRST BUILT TO IT — A PURE DAMAGE CHECK: burst him down, or lose to
+  attrition.** His Call the Drowned stands his fallen back up (the warband's Raise), his Soul Leech heals him half of what it
+  lands, and both are paid from the warband's Malice, which the heroes' own damage and the warband's deaths fill — so a long fight fills the bar that
+  pays for his healing and his raising — and his Noxious Fumes makes every hero likelier to miss for 3 turns. His zone's
+  Rotfiends feed the same loop: each one's Corpse Explosion fills the bar a kill's worth, and he can stand it back up, once.
+- **THE WITHERED WARDEN, THE ASH-WROUGHT TYRANT AND THE ICEWROUGHT TITAN ARE TO BE REVISITED THE SAME WAY — RULED, NOT BUILT.**
+  Each is given a strategy of its own by a later batch, and nothing here says any of them has one. **THE HOLLOW CROWN, THE END
+  BOSS, IS A BOSS FIGHT TOO, AND IS OWED ONE LIKE THE THREE — RULED, NOT BUILT** (JW's reading, which the designer places). A
+  mini-boss is a composed elite fight, no boss kind, and not one.
+- **A BOSS AUTHORED FROM NOW ON IS AUTHORED TO IT**: its record names the strategy its fight asks for, and its kit is read
+  against that strategy rather than against the other bosses' figures. `check_jw` §0 reads every zone boss `Run.ZONE_DEFS` names
+  and the end boss against this block — named in the bullet built to it, or in a bullet marked owed — so a zone added later reds
+  until its boss is placed.
+- **WHY IT IS A VALUE AND NOT A FIGURE**: it says what a boss fight is for, and leaves the numbers to play (`docs/ways-of-working.md`,
+  WHO OWNS WHAT). A strategy is the question; how hard it presses is tuning.
 
 ## STANDING DESIGN RULE — THE PROTECTED CORE IS THE BASELINE (Batch EB §1)
 > **A protected core may be cheaper and faster than a comparable draft card. The core is the

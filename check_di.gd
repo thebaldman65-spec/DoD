@@ -158,7 +158,9 @@ const SRC_FLOOR := 107
 # hex arm went with the special that reached it.
 # **BATCH JQ MOVED IT 223 -> 224, AND SAYS WHY. Net +1, one arrival.** Forsake (JQ §1) lays Forsaken on a body of the warband,
 # passing its caster as the source, DI's rule, so `with_src` moves with it.
-const CALL_SITES := 224
+# **BATCH JW MOVED IT 224 -> 225, AND SAYS WHY. Net +1, one arrival.** The Fen Lurker's Submerge (JW §3) lays `submerged` on
+# itself in `_submerge`, passing itself as the source, DI's rule, so `with_src` moves with it.
+const CALL_SITES := 225
 
 # Four plain afflictions: all in `DEBUFF_IDS`, none sticky, none on the boss
 # immunity list, so `_harvest_yield` counts all four and `purge_debuffs` takes

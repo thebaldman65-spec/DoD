@@ -51,7 +51,8 @@ const BREAK_SEATS := ["berserker", "cryomancer", "inquisitor", "beastmaster"]
 # line agrees with reds — an exception outlives its reason only by being kept. "kind/Move": the cooldown the data keeps. A spend
 # held here is read by `check_jk` §2, which prices the spends.
 const HELD := {"totemist/Healing Wave": 3, "bog_troll/Regenerate": 3, "chief/Chieftain's Maul": 0, "grave_totem/Dark Vigil": 4,
-	"totemist/Raise": 4, "shaman/Entrench": 2, "wolfrider/Rally": 2, "bog_troll/Entrench": 4, "hollow_crown/Entrench": 3}
+	"totemist/Raise": 4, "shaman/Entrench": 2, "wolfrider/Rally": 2, "bog_troll/Entrench": 4, "hollow_crown/Entrench": 3,
+	"bone_shepherd/Call the Drowned": 4}
 # An area blow reaches the party's four heroes; so does an every-ally heal.
 const REACH := 4
 # A heal is priced as the health it restores, a share of the body healed (the three arms of `_resolve_special`).
@@ -81,8 +82,11 @@ const MOVED_SINCE := {"grave_totem": {"zones": [1.0, 3.0]}, "behemoth": {"zones"
 # BATCH JU §1 — AND THE FOUR KINDS JU ADDED TO THE FOREST OF OLD, set aside as JS's seven are: this gate holds the warband its
 # batch left, and a kind added after it is no figure of that warband moving.
 const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan",
-	"grave_husk", "mossback", "blight_speaker", "carrion_pack"]
-const ROSTERS_SINCE := [4, 5]
+	"grave_husk", "mossback", "blight_speaker", "carrion_pack",
+	# BATCH JW §1 — AND THE DROWNED BARROW's THREE, set aside as JS's seven and JU's four are.
+	"rotfiend", "fen_lurker", "bone_shepherd"]
+# BATCH JW §1 — and roster 6, the Drowned Barrow's, which the travelling core takes as it took 4 and 5.
+const ROSTERS_SINCE := [4, 5, 6]
 const DECK_CLOSED_AT := 25
 const FOE := {"type": "fight", "theme": "Warband", "enemies": ["whelp", "raider", "archer"]}
 const SEATS := ["warrior", "mage", "cleric", "hunter"]
@@ -506,6 +510,10 @@ func _s1c_the_selection(s: Node) -> void:
 		if ab == null:
 			dead.append("%s's %s is not in its kit" % [kind, name])
 			continue
+		# BATCH JW §3 — A BLOW ITS OWN CONDITION WITHHOLDS (the Rotfiend's Corpse Explosion, above half its health) is driven with its
+		# body where the condition holds, so the arms below ask the cooldown and nothing else.
+		while s.has_method("_blow_withheld") and s._blow_withheld(f, ab) and f.hp > 1:
+			f.hp = maxi(f.hp / 2, 1)
 		checked += 1
 		# STILL COOLING WHEN ITS TURN COMES: two on the counter at the end of a turn is one at the next — refused.
 		f.cooldowns = {name: 2}

@@ -49,8 +49,11 @@ const MOVED_SINCE := {"grave_totem": {"zones": [1.0, 3.0]}, "behemoth": {"zones"
 # BATCH JU §1 — AND THE FOUR KINDS JU ADDED TO THE FOREST OF OLD, set aside as JS's seven are: this gate holds the warband its
 # batch left, and a kind added after it is no figure of that warband moving.
 const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan",
-	"grave_husk", "mossback", "blight_speaker", "carrion_pack"]
-const ROSTERS_SINCE := [4, 5]
+	"grave_husk", "mossback", "blight_speaker", "carrion_pack",
+	# BATCH JW §1 — AND THE DROWNED BARROW's THREE, set aside as JS's seven and JU's four are.
+	"rotfiend", "fen_lurker", "bone_shepherd"]
+# BATCH JW §1 — and roster 6, the Drowned Barrow's, which the travelling core takes as it took 4 and 5.
+const ROSTERS_SINCE := [4, 5, 6]
 # SANCTITY's STEP, AS IT STANDS — read out at §0, never changed (C10).
 const SANCTITY := {"SANCTITY_PER_STEP": 13, "SANCTITY_MAX_STEPS": 5, "SANCTITY_STEP_TURNS": 1}
 # THE TREE JN's THIN AIR RE-READ STANDS FOR — JN's tree that landed, its game digested by `_tree_digest`. Since JO no batch re-reads a

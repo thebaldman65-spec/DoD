@@ -323,9 +323,11 @@ func note_debug(action: String, taken: String) -> void:
 # tags in enemies.json actually mean. The Forest of Old hosts slots 1
 # AND 3: roster 1 as the opener, the tougher roster 3 as the finale; the
 # Frozen Plains hosts the same two, roster 4 as the opener and 5 as the finale.
+# BATCH JW §1 — THE DROWNED BARROW IS THE SECOND CANDIDATE AT SLOT 2: one roster for the one slot it hosts, roster 6, as the
+# Scarlands holds roster 2 — so every slot's pool holds two, and a run takes one of eight shapes.
 # BATCH JS §1 — A SLOT WHOSE POOL HOLDS TWO ZONES DRAWS BETWEEN THEM, A PLAYER's
 # RUN AND A SIM's ALIKE (`draw_zones`): the opener and the finale each hold the
-# Forest and the Frozen Plains, so a run takes one of four shapes; a slot of one
+# Forest and the Frozen Plains, so a run takes one of four shapes (eight since JW §1); a slot of one
 # takes it with no die. `DOD_ZONE_ROTATION=0` holds a SIM to each pool's first
 # author, and a player's run never reads it (IW §0.3: a flag that changes what a
 # run contains is the sim's).
@@ -341,8 +343,10 @@ const ZONE_DEFS := {
 		"rosters": {2: 2}},
 	"frozen_plains": {"name": "The Frozen Plains", "boss": "icewrought_titan",
 		"rosters": {1: 4, 3: 5}},
+	"drowned_barrow": {"name": "The Drowned Barrow", "boss": "bone_shepherd",
+		"rosters": {2: 6}},
 }
-const SLOT_POOLS := [["forest", "frozen_plains"], ["scarlands"], ["forest", "frozen_plains"]]
+const SLOT_POOLS := [["forest", "frozen_plains"], ["scarlands", "drowned_barrow"], ["forest", "frozen_plains"]]
 var active_relics: Array = []  # up to 3 relic ids chosen at the draft
 var zone_idx := 0
 # BATCH EG §1 — HOW MANY ZONE BOSSES THIS RUN HAS PUT DOWN, AND WHY IT IS NOT
@@ -4289,7 +4293,14 @@ func debug_force_zone(zone_id: String) -> bool:
 
 # Move to the next zone: fresh map, path reset; the party is fully
 # restored as a reward for cleansing the zone.
+# BATCH JW §0 — AND IT ASKS FOR A NEXT ZONE ITSELF. Every caller asks `has_next_zone` first (`check_jw` §5 derives them), and
+# a caller that did not would have run the index off the run — the debug advance did, before it learned to ask (JT §0). At the last
+# zone nothing moves: the index, the map and the zone's name stand, and the warning names the mistake.
 func advance_zone() -> void:
+	if not has_next_zone():
+		push_warning("Run.advance_zone: zone %d of %d is the last — there is no next zone, and nothing moved." % [
+			zone_idx + 1, SLOT_COUNT])
+		return
 	zone_idx += 1
 	_enter_zone()
 	slot_idx = -1
