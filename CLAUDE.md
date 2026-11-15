@@ -2803,8 +2803,8 @@ clean data point" line — and names itself to the playtest readout (`Run.note_d
 sim/autoplay/sim_run).
 · MAP BURGER debug items (map_screen, ids 10-17/20-26): +200 Gold | Talent Points to 60 (all) — every tier's end-boss gate open,
   the spend gate still applies | Full Heal Standing Heroes | Jump to Boss Slot | Advance to Next Zone (never past the last) | Send Run to the Frozen
-  Plains (`Run.debug_force_zone`: every slot whose pool holds it takes it, and the zone the heroes stand in begins again there if
-  it is one; nothing restored) | Reroll Specs | "All Class
+  Plains (`Run.debug_force_zone`: the stage the heroes stand in begins again there, and a later stage that held it takes the
+  zone it replaced; nothing restored) | Reroll Specs | "All Class
   Abilities Unlocked" check = `Run.debug_grant_all`, the PRE-GRANT toggle — **the hero's CLASS
   pool and his lineage's boss pool (HJ §3, ruled by the designer; the NAME is HJ's proposal, the
   designer's to confirm)**; also armable in a sim via `DOD_SIM_GRANT_ALL=1` | Free Travel check =
@@ -2836,8 +2836,9 @@ sim/autoplay/sim_run).
   **AND A FLAG THAT CHANGES WHAT A RUN CONTAINS IS THE SIM's, UNLESS THE PLAYER CHOOSES THAT CONTENT SOMEWHERE ELSE TOO (IW §0.3, the designer's)**:
   a player chooses his party and his build, never his zones — the run draws them — so `DOD_ZONE_ROTATION` is read by a
   run sim only, beside the five. *Until JS a player's run took each pool's first zone and the flag randomized a sim's draw,
-  the player's door owed the day a pool held two (`check_iv` §2's latent arm); JS §1 built it (JS's ruling 1): every run
-  draws within a pool of two, and the flag's one arm left, `=0`, holds a sim to each pool's first.*
+  the player's door owed the day a pool held two (`check_iv` §2's latent arm); JS §1 built it (JS's ruling 1), and since JX §1
+  every run draws three different zones of the four, one a stage, and the flag's one arm left, `=0`, holds a sim to the order's
+  first three.*
 · ENV FLAGS, non-sim: `DOD_AUTOPLAY` (1 debug battle, echoes "[LOG]"; never exits on its own —
   timeout/kill it), `DOD_DEBUG` (above), `DOD_ENEMIES_OFF` (above), `DOD_READOUT` (IF §1: `0` turns the playtest readout off in the player's
   game; `1` turns it on in a harness, which then writes `user://readout_harness/` — the block *THE READOUT IS A READ*).

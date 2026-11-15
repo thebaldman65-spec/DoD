@@ -357,6 +357,9 @@ func _rates() -> Dictionary:
 func _s1_the_carriers() -> void:
 	print("\n§1 — the three rare carriers fielded more often, derived off the data; every hex on its carrier; no rule-fielded kind drawn")
 	var data: Dictionary = Enemies._load()
+	# BATCH JX §1 — JR's RATES ARE OF ROSTERS 1, 2 AND 3, which JX folded (3 into 1, 5 into 4): the tags as they stood before JX go
+	# into the warband's own table, which the composer reads, for this section, and JX's come back at its end.
+	Gate.rosters_before_jx(data)
 	# THE TAGS, AS JR SET THEM.
 	for kind in AS_JR:
 		var kd: Dictionary = data.get(kind, {})
@@ -460,6 +463,7 @@ func _s1_the_carriers() -> void:
 	var d := JSON.stringify(as_head, "", true).md5_text()
 	print("    the warband's data with the three tags put back: %s" % d)
 	ok(d == WARBAND_AT_HEAD_MD5, "§1: something in the warband's data moved besides the three tags — a move, a figure, a kind")
+	Gate.rosters_at_jx(data)
 
 
 # ── §2 — A CITATION IS THE TEXT ───────────────────────────────────────────────

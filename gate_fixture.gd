@@ -407,6 +407,36 @@ static func eval_door(expr: String, names: Array, values: Array) -> Variant:
 	return null if e.has_execute_failed() else v
 
 
+# BATCH JX §1 — THE ROSTER TAGS AS THEY STOOD BEFORE THE STAGES. JX folded roster 3 into 1 and 5 into 4 (one roster a zone), so a
+# gate that digests the warband's data as an earlier batch left it puts every kind's `zones` back as they stood before JX, off the
+# kept table (`docs/reports/JX-rosters.tsv`), before its own strips — one door, so no gate carries a copy of the fold. The tags keep
+# the type the dictionary already holds (a parsed file's floats, a loaded table's ints). Returns how many kinds it put back.
+const JX_ROSTERS := "res://docs/reports/JX-rosters.tsv"
+static func rosters_before_jx(raw: Dictionary) -> int:
+	return _rosters_jx(raw, 2)
+
+
+# AND BACK: the tags JX set, put back after a replay that put the old ones into the warband's own table.
+static func rosters_at_jx(raw: Dictionary) -> int:
+	return _rosters_jx(raw, 3)
+
+
+static func _rosters_jx(raw: Dictionary, col: int) -> int:
+	var n := 0
+	for r in FileAccess.get_file_as_string(JX_ROSTERS).split("\n", false).slice(1):
+		var c := String(r).split("\t")
+		if c.size() < 4 or not raw.has(c[0]) or not (raw[c[0]] as Dictionary).has("zones"):
+			continue
+		var have: Array = (raw[c[0]] as Dictionary)["zones"]
+		var floats := not have.is_empty() and typeof(have[0]) == TYPE_FLOAT
+		var tags: Array = []
+		for t in String(c[col]).split(",", false):
+			tags.append(float(t) if floats else int(t))
+		(raw[c[0]] as Dictionary)["zones"] = tags
+		n += 1
+	return n
+
+
 static func strip_comments(src: String) -> String:
 	var out := ""
 	for raw_line in src.split("\n"):
@@ -444,8 +474,11 @@ static func strip_comments(src: String) -> String:
 static func returning_bodies(src: String) -> Dictionary:
 	var lines := strip_comments(src).split("\n")
 	var starts: Array = []
+	# BATCH JX §1 — REPAIRED AT JX §1 (IT's census, this function's MISSES row): a `static func` line opens a window too, so a window
+	# ends at the next function of either kind and a static function is a body of its own; it was read as the tail of the `func`
+	# above it (`check_eb`'s `_role_of`, `check_ij`'s `_count_whole`).
 	for i in lines.size():
-		if String(lines[i]).begins_with("func "):
+		if String(lines[i]).begins_with("func ") or String(lines[i]).begins_with("static func "):
 			starts.append(i)
 	var out := {}
 	for n in starts.size():
@@ -472,7 +505,7 @@ static func returning_bodies(src: String) -> Dictionary:
 				head += String(lines[sig_i])
 		if head.contains("-> void"):
 			continue
-		head = String(lines[a])
+		head = String(lines[a]).trim_prefix("static ")
 		var fname := head.substr(5, head.length() - 5)
 		var paren := fname.find("(")
 		if paren >= 0:

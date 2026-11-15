@@ -8,9 +8,7 @@
   "zones": [
    1,
    2,
-   3,
    4,
-   5,
    6
   ],
   "enemy_role": "damage",
@@ -67,8 +65,7 @@
    "skirmisher"
   ],
   "zones": [
-   1,
-   3
+   1
   ],
   "enemy_role": "damage",
   "max_hp": 90,
@@ -174,8 +171,7 @@
    "mender"
   ],
   "zones": [
-   1,
-   3
+   1
   ],
   "enemy_role": "support",
   "max_hp": 90,
@@ -241,9 +237,7 @@
   "zones": [
    1,
    2,
-   3,
    4,
-   5,
    6
   ],
   "enemy_role": "damage",
@@ -318,9 +312,7 @@
   "zones": [
    1,
    2,
-   3,
    4,
-   5,
    6
   ],
   "enemy_role": "tank",
@@ -376,9 +368,7 @@
   "zones": [
    1,
    2,
-   3,
    4,
-   5,
    6
   ],
   "enemy_role": "support",
@@ -439,9 +429,7 @@
   "zones": [
    1,
    2,
-   3,
    4,
-   5,
    6
   ],
   "enemy_role": "support",
@@ -637,9 +625,7 @@
   "zones": [
    1,
    2,
-   3,
    4,
-   5,
    6
   ],
   "enemy_role": "damage",
@@ -694,8 +680,7 @@
    "bulwark"
   ],
   "zones": [
-   1,
-   3
+   1
   ],
   "enemy_role": "tank",
   "max_hp": 300,
@@ -766,9 +751,7 @@
   "zones": [
    1,
    2,
-   3,
    4,
-   5,
    6
   ],
   "enemy_role": "damage",
@@ -838,9 +821,7 @@
   "zones": [
    1,
    2,
-   3,
    4,
-   5,
    6
   ],
   "enemy_role": "damage",
@@ -907,8 +888,7 @@
    "boss"
   ],
   "zones": [
-   1,
-   3
+   1
   ],
   "enemy_role": "tank",
   "max_hp": 500,
@@ -1066,9 +1046,7 @@
   "zones": [
    1,
    2,
-   3,
    4,
-   5,
    6
   ],
   "enemy_role": "support",
@@ -1133,8 +1111,8 @@
    "sniper"
   ],
   "zones": [
-   2,
-   3
+   1,
+   2
   ],
   "enemy_role": "damage",
   "max_hp": 190,
@@ -1195,9 +1173,7 @@
   "zones": [
    1,
    2,
-   3,
    4,
-   5,
    6
   ],
   "enemy_role": "damage",
@@ -1257,9 +1233,7 @@
   "zones": [
    1,
    2,
-   3,
    4,
-   5,
    6
   ],
   "enemy_role": "support",
@@ -1346,9 +1320,7 @@
   "zones": [
    1,
    2,
-   3,
    4,
-   5,
    6
   ],
   "enemy_role": "damage",
@@ -1451,8 +1423,7 @@
    "skirmisher"
   ],
   "zones": [
-   4,
-   5
+   4
   ],
   "enemy_role": "damage",
   "max_hp": 95,
@@ -1510,8 +1481,7 @@
    "bulwark"
   ],
   "zones": [
-   4,
-   5
+   4
   ],
   "enemy_role": "tank",
   "max_hp": 190,
@@ -1564,8 +1534,7 @@
    "sniper"
   ],
   "zones": [
-   4,
-   5
+   4
   ],
   "enemy_role": "damage",
   "max_hp": 85,
@@ -1625,7 +1594,7 @@
    "brute"
   ],
   "zones": [
-   5
+   4
   ],
   "enemy_role": "damage",
   "max_hp": 300,
@@ -1678,7 +1647,7 @@
    "mender"
   ],
   "zones": [
-   5
+   4
   ],
   "enemy_role": "support",
   "max_hp": 130,
@@ -1742,7 +1711,7 @@
    "hexer"
   ],
   "zones": [
-   5
+   4
   ],
   "enemy_role": "support",
   "max_hp": 120,
@@ -1802,8 +1771,7 @@
    "boss"
   ],
   "zones": [
-   4,
-   5
+   4
   ],
   "enemy_role": "tank",
   "max_hp": 460,
@@ -2255,12 +2223,20 @@
   },
   "abilities": [
    {
-    "display_name": "Soul Leech",
-    "dmg_type": "shadow",
+    "display_name": "Bone Smash",
     "damage": 30,
     "pressure": 24,
     "delay": 2.0,
-    "anim": "attack01",
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Soul Leech",
+    "cooldown": 2,
+    "dmg_type": "shadow",
+    "damage": 46,
+    "pressure": 24,
+    "delay": 2.0,
+    "anim": "attack02",
     "lifesteal": 0.5,
     "description": "Heals the Bone Shepherd {=@lifesteal*100}% of the damage\nit deals, paid from the warband's Malice."
    },
@@ -2287,15 +2263,6 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Stands a fallen body of its warband back\nup at {=Battle.MALICE_RAISE_PCT*100}% of its maximum health, for\nthat health in Malice (once a body, a fight)."
-   },
-   {
-    "display_name": "Rally",
-    "cooldown": 3,
-    "special": "malice_rally",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
    }
   ]
  }

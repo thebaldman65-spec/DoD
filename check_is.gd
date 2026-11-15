@@ -62,7 +62,7 @@ const SAVE_KEYS := {
 	"tally": "the run's ledger — a name in it is history, read by the summary alone",
 	"difficulty": "`difficulty_id`: an id the ladder does not hold reads the first rung",
 	"zone_name": "a label the zone draw sets",
-	"zone_draw": "IQ §4: a zone the table does not hold takes its slot's first",
+	"zone_draw": "IQ §4: a zone the table does not hold takes the first zone of the order the draw lacks (JX §1)",
 	"seen_events": "a history list — an id in it names nothing anything reads",
 	"active_relics": "read at its door: `Relics.POOL.get` adds nothing for an id it lacks",
 	"map": "the board — the floor (BK)",

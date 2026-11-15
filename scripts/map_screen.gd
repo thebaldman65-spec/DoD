@@ -4271,14 +4271,14 @@ func _on_burger(id: int) -> void:
 			Run.save_run()
 			_draw_screen()
 		17:
-			# After JS — every slot that can hold the Frozen Plains takes it; the zone the party stands in begins
-			# again there if it is one of them (`Run.debug_force_zone`).
+			# After JS, JX §1's shape — the stage the party stands in begins again in the Frozen Plains, and a later stage
+			# that held it takes the zone it replaced (`Run.debug_force_zone`).
 			var restarted: bool = Run.debug_force_zone("frozen_plains")
 			Run.save_run()
 			_map_scroll = -1.0
 			_draw_screen()
-			_toast("DEBUG: the Frozen Plains holds every slot it can%s" % (
-				" — this zone begins again there" if restarted else ""))
+			_toast("DEBUG: %s" % ("this stage begins again in the Frozen Plains" if restarted
+				else "the heroes already stand in the Frozen Plains"))
 		15:
 			_debug_reroll_specs()
 		16:

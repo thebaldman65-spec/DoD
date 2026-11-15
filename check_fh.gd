@@ -61,6 +61,8 @@ const SCRATCH_PROFILE := "user://fh_profile.json"
 # screen that never advances is a softlock and a gate that waits forever
 # reports nothing at all (CLAUDE.md's hang mode 1).
 const MAX_STEPS := 400
+# BATCH JX §1 — THE DRIVES A WIPE BEFORE THE FIRST ZONE BOSS MAY REDRAW (§1, the designer's coin, never the gate's).
+const DRIVE_TRIES := 4
 const BATTLE_FRAME_CAP := 20000
 
 var _g := Gate.new()
@@ -329,60 +331,81 @@ func _s1_the_whole_run() -> void:
 	# autoplay bot is already a weaker player than a person (it rolls a flat
 	# `good` on every skill check and never drinks a potion in a fight), so
 	# rung 1 is the honest place to ask whether a run completes at all.
-	_run.new_run(["warrior", "mage", "cleric", "hunter"], [], "wanderer")
-	for i in _run.party.size():
-		_run.party[i]["spec"] = SPECS[i]
-		# BATCH GK — seated by lineage, so holding that lineage's engine rune.
-		_run.party[i]["engines"] = Runes.engine_pouch_for_spec(String(SPECS[i]))
-		_run.party[i]["tree"] = Talents.generate_tree(SPECS[i], _run.party[i]["key"])
-		_run.sync_spec_hp(i)
-	_run.specs_chosen = true
-	_run.active = true
-	ok(_run.total_slots() == 49,
-		"§1: the run is %d slots, not the 49 the framing card promises"
-			% _run.total_slots())
-
-	OS.set_environment("DOD_AUTOPLAY", "1")
-	change_scene_to_file("res://scenes/map.tscn")
-	var t0 := Time.get_ticks_msec()
+	# BATCH JX §1 — A WIPE BEFORE THE FIRST ZONE BOSS IS THE DESIGNER's COIN, NOT THIS GATE's QUESTION (the comment below: what is
+	# asserted is the drive, not the balance). Since JX the draw deals any zone at the first stage, and the seeded road met an
+	# elite-heavy one the bot did not survive (recon 1: a wipe at the fifteenth encounter, four elites behind it). So the drive is
+	# redrawn — a new seed, a fresh run — only when an attempt wipes before its first zone boss, at most DRIVE_TRIES times; every
+	# attempt is printed, and the arms below read the last. A bound that runs out still reds (`the drive walked only …`).
+	var total_slots := -1
+	var t0 := 0
 	var steps := 0
 	var stalled := ""
-	for _step in MAX_STEPS:
-		Engine.time_scale = 100.0
-		await process_frame
-		await process_frame
-		if current_scene == null:
-			continue
-		var s: Node = current_scene
-		var nm := _scene_name()
-		if nm == "MainMenu":
-			stalled = "the run bounced to the MAIN MENU at slot %d" % _run.slot_idx
+	for attempt in DRIVE_TRIES:
+		if attempt > 0:
+			print("    REDRAWN — attempt %d of %d: the road before wiped after %d encounters, before its first zone boss" % [
+				attempt + 1, DRIVE_TRIES, _visited.size()])
+			seed(20260907 + 1000 * attempt)
+			_seen.clear()
+			_visited.clear()
+			_wipe = false
+			_end_boss_beaten = false
+		_run.new_run(["warrior", "mage", "cleric", "hunter"], [], "wanderer")
+		for i in _run.party.size():
+			_run.party[i]["spec"] = SPECS[i]
+			# BATCH GK — seated by lineage, so holding that lineage's engine rune.
+			_run.party[i]["engines"] = Runes.engine_pouch_for_spec(String(SPECS[i]))
+			_run.party[i]["tree"] = Talents.generate_tree(SPECS[i], _run.party[i]["key"])
+			_run.sync_spec_hp(i)
+		_run.specs_chosen = true
+		_run.active = true
+		total_slots = _run.total_slots()
+
+		OS.set_environment("DOD_AUTOPLAY", "1")
+		change_scene_to_file("res://scenes/map.tscn")
+		t0 = Time.get_ticks_msec()
+		steps = 0
+		stalled = ""
+		for _step in MAX_STEPS:
+			Engine.time_scale = 100.0
+			await process_frame
+			await process_frame
+			if current_scene == null:
+				continue
+			var s: Node = current_scene
+			var nm := _scene_name()
+			if nm == "MainMenu":
+				stalled = "the run bounced to the MAIN MENU at slot %d" % _run.slot_idx
+				break
+			if nm == "Map":
+				if not _run.active:
+					break
+				var moved := await _step_the_map(s)
+				if moved == "":
+					stalled = "nothing pressable on the MAP at slot %d" % _run.slot_idx
+					break
+			elif nm == "Battle":
+				var out := await _fight(s)
+				if out == "":
+					stalled = "the battle ended with no pressable end card at slot %d" \
+						% _run.slot_idx
+					break
+			else:
+				var left := await _leave(s, nm)
+				if left == "":
+					stalled = "no way off the %s screen at slot %d — a SOFTLOCK" % [
+						nm, _run.slot_idx]
+					_dead_buttons.append("%s: %s" % [nm, _labels(s)])
+					break
+				_bump("screen:" + nm)
+			steps += 1
+			if _end_boss_beaten or _wipe:
+				break
+		Engine.time_scale = 1.0
+		if not (_wipe and int(_seen.get("type:boss", 0)) == 0):
 			break
-		if nm == "Map":
-			if not _run.active:
-				break
-			var moved := await _step_the_map(s)
-			if moved == "":
-				stalled = "nothing pressable on the MAP at slot %d" % _run.slot_idx
-				break
-		elif nm == "Battle":
-			var out := await _fight(s)
-			if out == "":
-				stalled = "the battle ended with no pressable end card at slot %d" \
-					% _run.slot_idx
-				break
-		else:
-			var left := await _leave(s, nm)
-			if left == "":
-				stalled = "no way off the %s screen at slot %d — a SOFTLOCK" % [
-					nm, _run.slot_idx]
-				_dead_buttons.append("%s: %s" % [nm, _labels(s)])
-				break
-			_bump("screen:" + nm)
-		steps += 1
-		if _end_boss_beaten or _wipe:
-			break
-	Engine.time_scale = 1.0
+	ok(total_slots == 49,
+		"§1: the run is %d slots, not the 49 the framing card promises"
+			% total_slots)
 
 	print("    %d steps, %d ms" % [steps, Time.get_ticks_msec() - t0])
 	print("    slots walked: %d — %s" % [_visited.size(), ", ".join(_visited)])

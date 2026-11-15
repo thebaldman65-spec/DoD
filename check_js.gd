@@ -2,11 +2,12 @@
 #
 #   §0   THE RECORD: JR's five rulings answered and archived; the batch's own choices each owed as a ruling with its reversal; the
 #        state's ceiling at 520 KiB in the sentence `check_fg` §4 reads, its reason beside it and the 440 it supersedes recorded (C15).
-#   §1   THE ZONE: the Frozen Plains a candidate at slots 1 and 3 and never at 2, the slot count three (C01); a roster for each slot
+#   §1   THE ZONE: JS's placement (slots 1 and 3, never 2) and its two rosters replayed as JS's; since JX (the designer's ruling) the
+#        Frozen Plains a candidate at every stage, the stage count three (C01); a roster for each slot
 #        it hosts (C02); every kind tagged for all three old rosters takes both new ones, and no kind tagged for fewer travels (C04);
 #        each new roster fields four to six bodies, DERIVED through the composer's list (which the game's draw counts, `check_jv`)
 #        for every budget a fight node rolls
-#        (C03); a player's run and a sim's draw both candidates at both slots and the Frozen Plains never at slot 2, and a sim's flag
+#        (C03); a player's run and a sim's draw every zone at every stage (since JX), and a sim's flag
 #        holds the first (DRIVEN); each of the six's shares of a fight node as the state records it; and every background dict
 #        names the zone and a zone it does not name falls back (C05: the battle's DRIVEN, the map's and the event screen's read).
 #   §2   THE SIX KINDS: each its role, power and enemy role, its Attack its role's (C07), the zone's signature — frost resisted,
@@ -44,12 +45,15 @@ const BOSS := "icewrought_titan"
 const ADDED_SINCE := ["grave_husk", "mossback", "blight_speaker", "carrion_pack",
 	# BATCH JW §1 — AND THE DROWNED BARROW's THREE.
 	"rotfiend", "fen_lurker", "bone_shepherd"]
-# THE SLOTS IT HOSTS (1-based, as `ZONE_DEFS`' rosters key them) and the slot it never takes: slot 2, the Scarlands' and (since JW) the Barrow's.
+# THE SLOTS JS GAVE IT (1-based), replayed in §1, and the slot it never took: slot 2. Since JX it stands at every stage.
 const HOSTS := [1, 3]
 const NOT_HOST := 2
 const SLOTS := 3
 # THE OLD ROSTERS, whose every-one-of-them kinds are the universal core the new rosters take (§1's derivation).
 const OLD_ROSTERS := [1, 2, 3]
+# BATCH JX §1 — THE TWO ROSTERS JS GAVE THE ZONE, its opener's and its finale's, which JX folded into the opener's (one roster a
+# zone, JX's choice and owed: JX's RULINGS OWED 3). §1 replays JS's derivations on them, the tags as they stood before JX put back.
+const JS_ROSTERS := [4, 5]
 # A FIGHT NODE's BODIES, AS A ROSTER MUST FIELD THEM: four to six, in at least this share of the fight draws (the old rosters
 # field them in 61–70%, derived here too and printed beside).
 const FOUR_TO_SIX := [4, 5, 6]
@@ -145,7 +149,11 @@ func _initialize() -> void:
 		_player[p] = [had, FileAccess.get_file_as_bytes(p) if had else PackedByteArray()]
 	_fresh_meta()
 	_s0_the_record()
+	# BATCH JX §1 — §1's DERIVATIONS REPLAY JS's WORLD: the roster tags as they stood before JX's fold go into the warband's own
+	# table (the composer reads it) for the zone's section, and JX's come back after it.
+	Gate.rosters_before_jx(Enemies._load())
 	_s1_the_zone()
+	Gate.rosters_at_jx(Enemies._load())
 	_s1_the_draw()
 	_s2_the_six()
 	_s3_the_titan_data()
@@ -311,19 +319,22 @@ func _s0_the_record() -> void:
 func _s1_the_zone() -> void:
 	print("\n§1 — the Frozen Plains: its slots, its rosters, the kinds that travel and the bodies each roster fields")
 	var defs: Dictionary = _run.ZONE_DEFS
-	var pools: Array = _run.SLOT_POOLS
+	var pools: Array = _jx_pools()
 	ok(int(_run.SLOT_COUNT) == SLOTS and pools.size() == SLOTS, "§1: the run is %d slots over %d pools — not three, and a zone takes no fourth" % [int(_run.SLOT_COUNT), pools.size()])
 	ok(defs.has(ZONE), "§1: ZONE_DEFS holds no %s" % ZONE)
 	for slot in HOSTS:
 		ok(pools.size() >= slot and (pools[slot - 1] as Array).has(ZONE), "§1: the Frozen Plains is no candidate at slot %d" % slot)
-	# BATCH JW §1 — REPAIRED TO ITS INTENT: the Scarlands kept slot 2 alone until the Drowned Barrow joined it there (JW §1), so the
-	# arm asks what JS decided — the Frozen Plains is no candidate at slot 2, and the Scarlands still is, its first.
-	ok(pools.size() >= NOT_HOST and not (pools[NOT_HOST - 1] as Array).has(ZONE) and String((pools[NOT_HOST - 1] as Array).front()) == "scarlands",
-		"§1: slot %d's pool is %s — the Scarlands is its first candidate, and the Frozen Plains is no candidate there" % [NOT_HOST, str(pools[NOT_HOST - 1]) if pools.size() >= NOT_HOST else "[]"])
+	# BATCH JW §1 — REPAIRED TO ITS INTENT: the Scarlands kept slot 2 alone until the Drowned Barrow joined it there (JW §1).
+	# BATCH JX §1 — AND JS's PLACEMENT IS OVERTURNED BY THE DESIGNER's RULING (a zone stands at any stage): the arm asks the ruling's
+	# fact — the Frozen Plains is a candidate at slot 2 too, and the Scarlands holds it first, as the order's second zone.
+	ok(pools.size() >= NOT_HOST and (pools[NOT_HOST - 1] as Array).has(ZONE) and String((pools[NOT_HOST - 1] as Array).front()) == "scarlands",
+		"§1: slot %d's pool is %s — every zone stands there, the Scarlands held first" % [NOT_HOST, str(pools[NOT_HOST - 1]) if pools.size() >= NOT_HOST else "[]"])
 	if not defs.has(ZONE):
 		return
 	var zd: Dictionary = defs[ZONE]
-	var rosters: Dictionary = zd.get("rosters", {})
+	# BATCH JX §1 — ONE ROSTER NOW, THE OPENER's: JS's two (`JS_ROSTERS`), replayed below on the tags as they stood before JX.
+	ok(int(zd.get("roster", -1)) == int(JS_ROSTERS[0]), "§1: the Frozen Plains fields roster %s, not its opener's %d, folded at JX" % [str(zd.get("roster", "—")), int(JS_ROSTERS[0])])
+	var rosters: Dictionary = {HOSTS[0]: JS_ROSTERS[0], HOSTS[1]: JS_ROSTERS[1]}
 	print("    %s: '%s', boss %s, rosters %s; the pools %s" % [ZONE, String(zd.get("name", "")), String(zd.get("boss", "")), str(rosters), str(pools)])
 	ok(String(zd.get("name", "")) == ZONE_NAME and String(zd.get("boss", "")) == BOSS, "§1: the zone def names '%s' and boss %s" % [String(zd.get("name", "")), String(zd.get("boss", ""))])
 	# C02 — A ROSTER FOR EACH SLOT IT HOSTS, EACH ITS OWN, NEITHER AN OLD ONE.
@@ -482,11 +493,11 @@ func _sizes(roster: int) -> Dictionary:
 	return sorted
 
 
-# THE DRAW, DRIVEN: a player's run and a sim's draw within each pool of two, a pool of one takes its zone, and a sim's flag holds
-# each pool's first author.
+# THE DRAW, DRIVEN: a player's run and a sim's draw every zone of the order at every stage (`_jx_pools`, since JX), and a sim's
+# flag holds the order's first three.
 func _s1_the_draw() -> void:
-	print("\n§1 — the draw: a player's run and a sim's meet both candidates at both slots; a sim's flag holds the first")
-	var pools: Array = _run.SLOT_POOLS
+	print("\n§1 — the draw: a player's run and a sim's meet every zone at every stage; a sim's flag holds the order's first three")
+	var pools: Array = _jx_pools()
 	var was: bool = _run.sim_run
 	var seen := {}
 	OS.set_environment("DOD_ZONE_ROTATION", "")
@@ -527,7 +538,7 @@ func _s1_the_draw() -> void:
 	_run.sim_run = was
 	ok(held, "§1: a sim with DOD_ZONE_ROTATION=0 does not hold each pool's first author")
 	ok(player_moved, "§1: a player's run read DOD_ZONE_ROTATION=0 and drew each pool's first — the flag is the sim's")
-	# THE ROSTER A SLOT FIELDS FOLLOWS THE ZONE: the Frozen Plains' opener roster at slot 1, its finale at slot 3.
+	# THE ROSTER A SLOT FIELDS FOLLOWS THE ZONE: the Frozen Plains fields its one roster at slot 1 and at slot 3 (JS gave it 4 and 5).
 	if (_run.ZONE_DEFS as Dictionary).has(ZONE):
 		_run.zone_draw = [ZONE, "scarlands", ZONE]
 		var got: Array = []
@@ -535,8 +546,8 @@ func _s1_the_draw() -> void:
 			_run.zone_idx = zi
 			got.append(int(_run.active_roster()))
 		_run.zone_idx = 0
-		var rz: Dictionary = _run.ZONE_DEFS[ZONE].get("rosters", {})
-		var want: Array = [int(rz.get(HOSTS[0], -1)), int(rz.get(HOSTS[1], -1))]
+		# BATCH JX §1 — ONE ROSTER WHEREVER IT STANDS (JX's choice, owed: JX's RULINGS OWED 3): the opener's and the finale's were JS's.
+		var want: Array = [int(_run.ZONE_DEFS[ZONE].get("roster", -1)), int(_run.ZONE_DEFS[ZONE].get("roster", -1))]
 		print("    the Frozen Plains at slot 1 fields roster %d and at slot 3 roster %d; its boss %s" % [int(got[0]), int(got[1]), String(_run.boss_kind())])
 		ok(got == want and String(_run.boss_kind()) == BOSS, "§1: the Frozen Plains fields rosters %s, not %s, or its boss is %s" % [str(got), str(want), String(_run.boss_kind())])
 		_run.draw_zones()
@@ -731,6 +742,31 @@ func _s2_the_six() -> void:
 	_s2_the_master_rows(data)
 
 
+# BATCH JX §1 — A KIND's TAGS AS JS READ THEM: JX folded roster 3 into 1 and 5 into 4, so a question JS asked of the old rosters
+# reads the tags as they stood before JX (the fold's kept table, through `Gate.rosters_before_jx`), never the folded ones.
+var _before_jx := {}
+func _zones_js(k: String, kd: Dictionary) -> Array:
+	if _before_jx.is_empty():
+		for kk in Enemies._load():
+			_before_jx[kk] = {"zones": ((Enemies._load()[kk] as Dictionary).get("zones", []) as Array).duplicate()}
+		Gate.rosters_before_jx(_before_jx)
+	return _zones(_before_jx.get(k, kd))
+
+
+# BATCH JX §1 — THE POOLS AS THE RUN HOLDS THEM NOW: every stage draws among every zone of `ZONE_ORDER`, and a sim's flag holds the
+# order's first three — so a stage's pool is the whole order, the zone the flag holds there first.
+func _jx_pools() -> Array:
+	var order: Array = (_run.get_script() as Script).get_script_constant_map().get("ZONE_ORDER", [])
+	var out: Array = []
+	for st in int(_run.SLOT_COUNT):
+		var p: Array = [order[st]] if st < order.size() else []
+		for z in order:
+			if not p.has(z):
+				p.append(z)
+		out.append(p)
+	return out
+
+
 # THE KIND A NEW KIND STANDS FOR (JS's ruling 2): the first in data order of its role tag, power and enemy role that the Forest's opener
 # roster fields, one that does not travel (not tagged for every old roster) before one that does. "" when none.
 func _stands_for(data: Dictionary, kd: Dictionary) -> String:
@@ -742,9 +778,9 @@ func _stands_for(data: Dictionary, kd: Dictionary) -> String:
 			continue
 		var c: Dictionary = data[k]
 		if bool(c.get("is_boss", false)) or not (c.get("roles", []) as Array).has(role) or int(c.get("power", 0)) != int(kd.get("power", -1)) \
-				or String(c.get("enemy_role", "")) != String(kd.get("enemy_role", "")) or not _zones(c).has(STANDS_FOR_ROSTER):
+				or String(c.get("enemy_role", "")) != String(kd.get("enemy_role", "")) or not _zones_js(String(k), c).has(STANDS_FOR_ROSTER):
 			continue
-		var everywhere := OLD_ROSTERS.all(func(r): return _zones(c).has(r))
+		var everywhere := OLD_ROSTERS.all(func(r): return _zones_js(String(k), c).has(r))
 		if not everywhere and own == "":
 			own = k
 		elif everywhere and travels == "":
@@ -1125,6 +1161,8 @@ func _s4_the_count() -> void:
 func _s5_not_done() -> void:
 	print("\n§5 — the warband as JR landed it beside JS's additions, the Cleric's cut, the deck at twenty-five")
 	var data: Dictionary = Enemies._load().duplicate(true)
+	# BATCH JX §1 — THE ROSTER TAGS AS THEY STOOD BEFORE THE STAGES, put back first (JX folded roster 3 into 1 and 5 into 4): this gate digests the warband its batch left.
+	Gate.rosters_before_jx(data)
 	for k in SIX.keys() + [BOSS] + ADDED_SINCE:
 		data.erase(k)
 	for k2 in data:

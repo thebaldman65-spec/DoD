@@ -442,9 +442,14 @@ func _s2b_the_cairn() -> void:
 		var mystic := String(r["mystic"]) == "yes"
 		var total := 0
 		var n := 0
+		# BATCH JX §1 — JE READ ITS ROWS WHEN A ZONE STOOD AT FIXED STAGES (the Forest at 1 and 3, the Scarlands at 2); since JX a zone's
+		# boon is dealt wherever its zone stands, so a row's stage is read as the zone that stood there at JE (`zone`, JS §1).
+		var here := "scarlands" if zone == 2 else "forest"
 		for id in boons:
 			var req: Dictionary = Events.config(id).get("requires", {})
 			if req.has("zone_slot") and not (req["zone_slot"] as Array).any(func(z): return int(z) == zone):
+				continue
+			if req.has("zone") and not (req["zone"] as Array).has(here):
 				continue
 			# THE MAGE's BOON STANDS IN EVERY ROW: both parties the rows are read for field one.
 			if (req.get("spec_in_party", []) as Array).has("mystic") and not mystic:

@@ -401,7 +401,7 @@ const ENV_ROWS := {
 	"run_state.gd|rune_econ|DOD_SIM_RUNE_ECON": [1, "GATED", "if not sim_run:", "a run sim's arm (AD)"],
 	"run_state.gd|rune_power|DOD_SIM_RUNE_POWER": [1, "GATED", "if not sim_run:", "a run sim's arm (AD)"],
 	"run_state.gd|runes_mode|DOD_SIM_RUNES": [1, "GATED", "if not sim_run:", "a run sim's arm (IV §2, DV32: a player's run read it)"],
-	"run_state.gd|rotation_enabled|DOD_ZONE_ROTATION": [1, "GATED", "return not (sim_run and OS.get_environment(\"DOD_ZONE_ROTATION\")", "the sim's since IW §0.3 (a flag that changes what a run contains is the sim's): since JS §1 a run draws within a pool of two and the flag's one arm, `=0`, holds a sim to each pool's first zone (the door below)"],
+	"run_state.gd|rotation_enabled|DOD_ZONE_ROTATION": [1, "GATED", "return not (sim_run and OS.get_environment(\"DOD_ZONE_ROTATION\")", "the sim's since IW §0.3 (a flag that changes what a run contains is the sim's): since JX §1 a run draws three different zones of the four and the flag's one arm, `=0`, holds a sim to the order's first three (the door below)"],
 }
 # The variables §2's drive exports into a player's run, and clears after.
 const SIM_FAMILY_DRIVEN := ["DOD_SIM_RUNES", "DOD_SIM_GRANT_ALL", "DOD_SIM_RELICS", "DOD_SIM_ENEMIES", "DOD_SIM_THEME", "DOD_SIM_DEBUG"]
@@ -508,10 +508,13 @@ func _s2_the_environment() -> void:
 	ok(miscount.is_empty(), "§2: %d rows read a variable a different number of times than the row says: %s" % [miscount.size(), str(miscount)])
 	ok(gone.is_empty(), "§2: %d rows name a read the scripts no longer make — delete them: %s" % [gone.size(), str(gone)])
 	ok(unguarded.is_empty(), "§2: %d sim-family reads stand behind no guard — a sim's arm leaks into a player's game: %s" % [unguarded.size(), str(unguarded)])
-	# THE LATENT ARM, AND THE WRITER ARRIVED WITH ITS DOOR (JS §1): the Frozen Plains is a second zone at slots 1 and 3, and a
-	# player's run draws within a pool of two (`Run.draw_zones`). The arm asks the door, driven: a player's run, the flag exported in
-	# each of its spellings or not at all, meets every zone of every pool.
-	var pools: Array = _run.SLOT_POOLS
+	# THE LATENT ARM, AND THE WRITER ARRIVED WITH ITS DOOR (JS §1). BATCH JX §1 — every stage draws among every zone of the order now
+	# (the designer's ruling), three different zones a run (JX's choice, owed) (`Run.draw_zones`). The arm asks the door, driven: a player's run, the flag
+	# exported in each of its spellings or not at all, meets every zone at every stage.
+	var order: Array = (_run.get_script() as Script).get_script_constant_map().get("ZONE_ORDER", [])
+	var pools: Array = []
+	for st in int(_run.SLOT_COUNT):
+		pools.append(order)
 	var unmet: Array = []
 	var was_sim: bool = _run.sim_run
 	_run.sim_run = false

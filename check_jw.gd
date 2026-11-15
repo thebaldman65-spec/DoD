@@ -2,9 +2,10 @@
 #
 #   §0   THE RECORD: JV's rulings stand archived, not owed; the standing value (every boss fight has a strategy of its own) stands
 #        in `CLAUDE.md`, and every zone boss `Run.ZONE_DEFS` names is built to it or named there as owed
-#   §1   THE ZONE: the Drowned Barrow is slot 2's second candidate with one roster of its own; the roster is the travelling core,
-#        JU's four (moved, in no other roster) and the Barrow's three; both slot-2 candidates are drawn on a player's road and a
-#        sim's, and `DOD_ZONE_ROTATION=0` holds a sim to the Scarlands; every node of a Barrow map composes from its roster, the
+#   §1   THE ZONE: the Drowned Barrow is a zone of the order with one roster of its own (since JX any zone stands at any stage, the
+#        designer's ruling; JW made it slot 2's second candidate); the roster is the travelling core,
+#        JU's four (moved, in no other roster) and the Barrow's three; the Barrow is drawn at every stage on a player's road and a
+#        sim's, and `DOD_ZONE_ROTATION=0` holds a sim to the order's first three, the Barrow outside them; every node of a Barrow map composes from its roster, the
 #        boss node fields the Bone Shepherd; the backdrops name it; the Scarland Mirage is the Scarlands' alone
 #   §2   THE BONE SHEPHERD, DRIVEN: Soul Leech heals half of what it lands, no more than the pool holds unspent, paid point for
 #        point; Noxious Fumes lays its status on every hero it strikes, and the hit chance moves by its figure
@@ -47,7 +48,6 @@ const SLOT := 2
 const OLD := "scarlands"
 const FOUR := ["mossback", "blight_speaker", "grave_husk", "carrion_pack"]
 const KINDS := ["rotfiend", "fen_lurker"]
-const OLD_ROSTERS := [1, 2, 3]
 const BACKDROPS := ["scripts/battle.gd", "scripts/map_screen.gd", "scripts/event_screen.gd"]
 const STATE := "res://docs/state.md"
 const ARCHIVE := "res://DoD-archive/state-archive.md"
@@ -145,26 +145,26 @@ func _zones(k: Dictionary) -> Array:
 
 
 func _s1_the_zone(data: Dictionary) -> void:
-	print("\n§1 — the Drowned Barrow: slot 2's second candidate, its roster, its draw, its map, its backdrop, its events")
+	print("\n§1 — the Drowned Barrow: a zone of the order, its roster, its draw at every stage, its map, its backdrop, its events")
 	var zd: Dictionary = _run.ZONE_DEFS[ZONE]
-	var pools: Array = _run.SLOT_POOLS
-	print("    %s: '%s', boss %s, rosters %s; slot %d's pool %s" % [ZONE, String(zd["name"]), String(zd["boss"]), str(zd["rosters"]), SLOT, str(pools[SLOT - 1])])
+	# BATCH JX §1 — REPAIRED TO ITS INTENT (a zone stands at any stage, the designer's ruling; one roster a zone, JX's, owed). JW
+	# asked that the Barrow be slot 2's second candidate with a roster of its own; the arm asks that it is a zone of the order, drawn
+	# at every stage, and that its roster is its own.
+	var order: Array = (_run.get_script() as Script).get_script_constant_map().get("ZONE_ORDER", [])
+	print("    %s: '%s', boss %s, roster %s; the order %s" % [ZONE, String(zd["name"]), String(zd["boss"]), str(zd.get("roster", "—")), str(order)])
 	ok(String(zd["name"]) == ZONE_NAME and String(zd["boss"]) == BOSS, "§1: the zone def names '%s' and boss %s, not '%s' and %s" % [String(zd["name"]), String(zd["boss"]), ZONE_NAME, BOSS])
-	ok((pools[SLOT - 1] as Array) == [OLD, ZONE], "§1: slot %d's pool is %s — the Scarlands first, the Barrow its second candidate" % [SLOT, str(pools[SLOT - 1])])
-	var rosters: Dictionary = zd["rosters"]
-	ok(rosters.size() == 1 and rosters.has(SLOT), "§1: the Barrow does not host slot %d alone: it carries %s" % [SLOT, str(rosters)])
-	var roster := int(rosters.get(SLOT, -1))
-	var taken: Array = []
+	ok(order.has(ZONE) and order.has(OLD), "§1: the order %s does not hold both the Barrow and the Scarlands" % str(order))
+	var roster := int(zd.get("roster", -1))
+	var every: Array = []
 	for z2 in (_run.ZONE_DEFS as Dictionary):
-		if z2 != ZONE:
-			for r in (_run.ZONE_DEFS[z2]["rosters"] as Dictionary).values():
-				taken.append(int(r))
-	ok(roster > 0 and not taken.has(roster), "§1: the Barrow's roster %d is another zone's" % roster)
-	# THE ROSTER, DERIVED: the core (every kind tagged for rosters 1, 2 and 3), JU's four and the Barrow's three, and nothing else.
+		every.append(int((_run.ZONE_DEFS[z2] as Dictionary).get("roster", -1)))
+	ok(roster > 0 and every.count(roster) == 1, "§1: the Barrow's roster %d is another zone's, or none" % roster)
+	# THE ROSTER, DERIVED: the core (every kind tagged for every zone's roster — JW's *rosters 1, 2 and 3* before JX folded 3 into 1),
+	# JU's four and the Barrow's three, and nothing else.
 	var want: Array = []
 	for k in data:
 		var z := _zones(data[k])
-		if OLD_ROSTERS.all(func(r): return z.has(r)):
+		if every.all(func(r): return z.has(r)):
 			want.append(String(k))
 	want.append_array(FOUR)
 	want.append_array(KINDS)
@@ -180,10 +180,10 @@ func _s1_the_zone(data: Dictionary) -> void:
 			strays.append("%s %s" % [k2, str(_zones(data[k2]))])
 	ok(strays.is_empty(), "§1: a kind of the Barrow's stands in another roster too: %s" % str(strays))
 	var counts := []
-	for r2 in [1, 2, 3, 4, 5, roster]:
+	for r2 in every:
 		counts.append("%d: %d" % [r2, Enemies.kinds_for_roster(r2).size()])
 	print("    kinds a roster holds — %s" % ", ".join(PackedStringArray(counts)))
-	# THE DRAW: a player's road and a sim's each draw both of slot 2's candidates; the flag holds a sim to the first.
+	# THE DRAW: a player's road and a sim's each meet the Barrow at every stage; the flag holds a sim to the order's first three.
 	var seen := {"player": {}, "sim": {}, "held": {}}
 	for arm in ["player", "sim", "held"]:
 		_run.sim_run = arm != "player"
@@ -191,13 +191,14 @@ func _s1_the_zone(data: Dictionary) -> void:
 		seed(20261114)
 		for i in 60:
 			_run.draw_zones()
-			seen[arm][String(_run.zone_draw[SLOT - 1])] = true
+			var at := (_run.zone_draw as Array).find(ZONE)
+			seen[arm][str(at + 1) if at >= 0 else "none"] = true
 	_run.sim_run = false
 	OS.set_environment("DOD_ZONE_ROTATION", "")
-	print("    slot %d drawn — a player's road %s; a sim's %s; a sim held by DOD_ZONE_ROTATION=0 %s" % [SLOT, str(seen["player"].keys()), str(seen["sim"].keys()), str(seen["held"].keys())])
-	ok(seen["player"].has(ZONE) and seen["player"].has(OLD), "§1: a player's road never draws one of slot %d's candidates: %s" % [SLOT, str(seen["player"].keys())])
-	ok(seen["sim"].has(ZONE) and seen["sim"].has(OLD), "§1: a sim's road never draws one of slot %d's candidates: %s" % [SLOT, str(seen["sim"].keys())])
-	ok(seen["held"].keys() == [OLD], "§1: DOD_ZONE_ROTATION=0 does not hold a sim to the Scarlands: %s" % str(seen["held"].keys()))
+	print("    the stages the Barrow is drawn at — a player's road %s; a sim's %s; a sim held by DOD_ZONE_ROTATION=0 %s" % [str(seen["player"].keys()), str(seen["sim"].keys()), str(seen["held"].keys())])
+	for arm2 in ["player", "sim"]:
+		ok(["1", "2", "3"].all(func(st): return (seen[arm2] as Dictionary).has(st)), "§1: a %s's road never draws the Barrow at a stage: %s" % [arm2, str(seen[arm2].keys())])
+	ok(seen["held"].keys() == ["none"], "§1: DOD_ZONE_ROTATION=0 does not hold a sim to the order's first three: %s" % str(seen["held"].keys()))
 	# THE MAP: a Barrow zone's every fight node composes from its roster, the boss node fields the Shepherd.
 	_run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
 	_run.zone_draw[SLOT - 1] = ZONE
@@ -284,14 +285,15 @@ func _s2_the_shepherd() -> void:
 	var leech := _ab(sh, "Soul Leech")
 	var fumes := _ab(sh, "Noxious Fumes")
 	var call := _ab(sh, "Call the Drowned")
-	# FOUR MOVES (the record's Q9, its first branch): the fourth his pattern's, the Tyrant's Rally — JK's floor, a Rally or an Entrench.
-	var rally := _ab(sh, "Rally")
-	ok(leech != null and fumes != null and call != null and rally != null and sh.abilities.size() == 4, "§2: the Shepherd's kit is not Soul Leech, Noxious Fumes, Call the Drowned and a Rally: %s" % str(sh.abilities.map(func(a): return (a as Ability).display_name)))
+	# BATCH JX §3 — REPAIRED TO ITS INTENT (the designer's ruling): his fourth move is Bone Smash, his basic, and Soul Leech an ability;
+	# the borrowed Rally answered JK's floor, which JX §2 removed.
+	var smash := _ab(sh, "Bone Smash")
+	ok(leech != null and fumes != null and call != null and smash != null and sh.abilities.size() == 4, "§2: the Shepherd's kit is not Bone Smash, Soul Leech, Noxious Fumes and Call the Drowned: %s" % str(sh.abilities.map(func(a): return (a as Ability).display_name)))
 	if leech == null or fumes == null or call == null:
 		await _done(s)
 		return
-	ok(s._cheapest_attack(sh) == leech and leech.lifesteal > 0.0, "§2: Soul Leech is not the Shepherd's basic, or carries no lifesteal")
-	ok(call.special == "malice_raise" and rally != null and rally.special == "malice_rally", "§2: Call the Drowned is not JK's Raise (%s), or the fourth no Rally" % call.special)
+	ok(s._cheapest_attack(sh) == smash and leech.lifesteal > 0.0 and leech.cooldown > 0, "§2: Bone Smash is not the Shepherd's basic, or Soul Leech carries no lifesteal or no cooldown")
+	ok(call.special == "malice_raise" and _ab(sh, "Rally") == null, "§2: Call the Drowned is not JK's Raise (%s), or the borrowed Rally stands" % call.special)
 	var h: BattleUnit = _heroes(s)[0]
 	# A POOL OF NOTHING: the blow lands, the heal asks and gets nothing, the pool pays nothing.
 	for arm in [0, 9999]:

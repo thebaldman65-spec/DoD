@@ -214,6 +214,8 @@ func _content() -> Dictionary:
 # THE WARBAND's DATA WITH A LATER BATCH's APPEARANCE TAGS PUT BACK (`MOVED_SINCE`).
 func _warband_as_landed() -> Dictionary:
 	var d: Dictionary = Enemies._load().duplicate(true)
+	# BATCH JX §1 — THE ROSTER TAGS AS THEY STOOD BEFORE THE STAGES, put back first (JX folded roster 3 into 1 and 5 into 4): this gate digests the warband its batch left.
+	Gate.rosters_before_jx(d)
 	for kind in MOVED_SINCE:
 		if d.has(kind):
 			for field in MOVED_SINCE[kind]:

@@ -2,7 +2,8 @@
 #
 #   §0   JJ's SIX RULINGS, ANSWERED: the block left the open queue for the archive, struck, with the answer (H02).
 #   §1   EVERY KIND CAN BUY SOMETHING, DERIVED OFF THE DATA AND NEVER LISTED: every kind's kit holds a move the pool prices that
-#        is no heal, every one holds a Rally or an Entrench, and on a board where the pool is full, a body is down and nothing
+#        is no heal (JK's floor — every one holding a Rally or an Entrench — was removed at JX §2 by the designer's ruling, and the
+#        kinds holding neither are printed as a record), and on a board where the pool is full, a body is down and nothing
 #        is hurt, warded or rallied, every kind's own selection declares one (C01); the kept table is the data's. RAISE stands a
 #        fallen body up at its share of its health, un-Broken, once a body a fight (C02, C03); RALLY's blow is struck harder and
 #        no heal it reaches restores or pays past its figure, so the reserve's arithmetic stands (C04); ENTRENCH is read at the one
@@ -359,6 +360,7 @@ func _s1_every_kind_buys(s: Node, spends: bool) -> void:
 		holds[kind] = mine
 		if mine.is_empty():
 			none.append(String(kind))
+		# JK's FLOOR, REMOVED AT JX §2 (the designer's ruling, as written: "This gate does not need to exsist, remove it"): what it read is printed.
 		if _spend_of(f, "malice_rally") == null and _spend_of(f, "malice_entrench") == null:
 			no_floor.append(String(kind))
 		var got := _chosen(s, f, 6)
@@ -377,7 +379,7 @@ func _s1_every_kind_buys(s: Node, spends: bool) -> void:
 		holds.size(), KINDS, _spends.size(), own_cooling, own_cooling_buy])
 	ok(holds.size() == KINDS + ADDED_SINCE.size(), "§1: the walk read %d kinds, not %d" % [holds.size(), KINDS + ADDED_SINCE.size()])
 	ok(none.is_empty(), "§1: a kind holds no move the pool buys: %s" % [none])
-	ok(no_floor.is_empty(), "§1: a kind holds neither a Rally nor an Entrench, the pair every kind can buy: %s" % [no_floor])
+	print("    [record] the kinds holding neither a Rally nor an Entrench (JK's floor, removed at JX §2): %d — %s" % [no_floor.size(), str(no_floor)])
 	ok(no_buy.is_empty(), "§1: a kind declares no spend on a board that wants one: %s" % [no_buy])
 	# THE KEPT TABLE IS THE DATA's: each kind's row names the spends its list holds, each with the cooldown it carries.
 	var rows := _doc(KEPT_COVER).split("\n", false)

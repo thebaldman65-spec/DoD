@@ -236,15 +236,17 @@ func _s4b_the_other_keys() -> void:
 	ok(_roundtrip(), "§4b items: the save did not load")
 	ok(not (_run.items as Dictionary).has("iq_gone_item") and _run.pending_item_offers == ["health"],
 		"§4b items: the load kept a type the item table does not hold — pouch %s, offers %s" % [str(_run.items.keys()), str(_run.pending_item_offers)])
-	# The zone draw: a zone the table does not hold takes its slot's first candidate, and the name follows.
+	# The zone draw: a zone the table does not hold takes the first zone of the order the draw does not hold (JX §1; its slot's first
+	# candidate until JX), and the name follows.
 	_new_run()
 	_run.zone_draw = ["forest", "iq_gone_zone", "forest"]
 	_run.zone_idx = 1
 	_run.zone_name = "iq nowhere"
 	ok(_roundtrip(), "§4b zone: the save did not load")
-	var slot1 := String((_run.SLOT_POOLS[1] as Array)[0])
+	var order: Array = (_run.get_script() as Script).get_script_constant_map().get("ZONE_ORDER", ["forest"])
+	var slot1 := String(order.filter(func(z): return z != "forest")[0])
 	ok(String(_run.zone_draw[1]) == slot1 and String(_run.zone_name) == String(_run.ZONE_DEFS[slot1]["name"]),
-		"§4b zone: the load kept %s / '%s' — not slot 1's first candidate %s" % [str(_run.zone_draw), _run.zone_name, slot1])
+		"§4b zone: the load kept %s / '%s' — not the order's first zone the draw lacks, %s" % [str(_run.zone_draw), _run.zone_name, slot1])
 	ok(String(_run.boss_kind()) == String(_run.ZONE_DEFS[slot1]["boss"]), "§4b zone: the map's boss read '%s'" % _run.boss_kind())
 	# The event in flight: an id the event table does not hold is cleared, and the resume walks to the map.
 	_new_run()

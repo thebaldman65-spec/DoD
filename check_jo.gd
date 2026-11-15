@@ -536,6 +536,8 @@ func _s1_nothing_else() -> void:
 		if c5.size() > 7:
 			hosts.append("%s/%s" % [c5[0], c5[6]])
 	var raw: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/enemies.json"))
+	# BATCH JX §1 — THE ROSTER TAGS AS THEY STOOD BEFORE THE STAGES, put back first (JX folded roster 3 into 1 and 5 into 4): this gate digests the warband its batch left.
+	Gate.rosters_before_jx(raw)
 	# BATCH JR — THREE APPEARANCE TAGS MOVED AFTER THIS GATE LANDED (JR §1), each named in `MOVED_SINCE` and put back
 	# before the digest, so it goes on asking whether anything else in the warband's data moved.
 	for jr_kind in MOVED_SINCE:

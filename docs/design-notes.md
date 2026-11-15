@@ -4,6 +4,29 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The stages (Batch JX) — 2026-11-15
+
+**Why a zone can stand at any stage.** The designer's ruling of 15 November: the zones are for variety, and what a fight asks is
+the stage's. Every enemy's figures already followed the stage &mdash; a multiplier read at the stage and a ladder inside it &mdash;
+so what had tied a zone to a difficulty was where it was allowed to stand (two zones only at the first and third stages, two only
+at the second) and which roster it fielded there (an opener's and a finale's). Lifting both makes the stage the one thing that
+scales the difficulty, and makes every run a fresh draw of places; each zone's boss and kinds keep their own base figures.
+
+**Why a run never meets a zone twice.** Variety is the zones' whole job, and a zone drawn twice in three stages spends a third of
+the run repeating itself. Three different zones of four keep every run new, and every zone still turns up in three runs of four.
+
+**Why one roster a zone.** A zone that brought different enemies at different stages would carry its difficulty in its roster,
+which is the coupling the ruling removes. The union of the old opener's and finale's kinds is the zone's identity at every stage,
+and the stage's multiplier and the tier's budget, not the roster, set how hard a fight is meant to be.
+
+**Why the Bone Shepherd's Soul Leech cools.** A second damaging move is the bigger blow and waits between uses &mdash; the rule every
+enemy's kit follows &mdash; so making Soul Leech an ability rather than his basic gives it the line's figure and the line's wait, and
+Bone Smash takes the plain swing Soul Leech used to be.
+
+**Why the Rally-or-Entrench floor is gone.** The designer removed it (15 November) without a reason given. JX's reading: a boss's
+kit is built to its own fight (the standing value set at JW), and a floor that put a borrowed Rally into the Shepherd's four moves was
+the floor speaking, not the fight.
+
 ## The Drowned Barrow (Batch JW) — 2026-11-14
 
 **Why every boss fight asks its own question.** The designer's value, set on 14 November: a boss that is only a bigger body of

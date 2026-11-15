@@ -85,10 +85,10 @@ func _s0_the_population() -> Dictionary:
 	var rosters: Array = []
 	var bosses: Array = [""]
 	for z in (_run.ZONE_DEFS as Dictionary):
-		for slot in (_run.ZONE_DEFS[z]["rosters"] as Dictionary):
-			var r := int(_run.ZONE_DEFS[z]["rosters"][slot])
-			if not rosters.has(r):
-				rosters.append(r)
+		# BATCH JX §1 — ONE ROSTER A ZONE (JX's choice, owed: JX's RULINGS OWED 3), read where the def holds it.
+		var r := int((_run.ZONE_DEFS[z] as Dictionary).get("roster", -1))
+		if r > 0 and not rosters.has(r):
+			rosters.append(r)
 		bosses.append(String(_run.ZONE_DEFS[z]["boss"]))
 	rosters.sort()
 	# The budgets: every one the game rolls (the boss node's band is the top), and two past them.

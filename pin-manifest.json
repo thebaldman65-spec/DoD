@@ -2,19 +2,19 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 2415,
-  "source": 1459,
+  "total": 2416,
+  "source": 1460,
   "other": 364,
   "document": 592
  },
  "floor": {
-  "pins": 2415
+  "pins": 2416
  },
  "falls": [],
  "source_residency": {
   "narrow": 49,
   "code": 899,
-  "absent": 332,
+  "absent": 333,
   "runtime": 114,
   "unresolved": 6,
   "comment": 51,
@@ -2676,7 +2676,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fh.gd#1417"
+   "g": "check_fh.gd#1433"
   },
   {
    "s": "check_fh.gd",
@@ -2687,7 +2687,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_fh.gd#770"
+   "g": "check_fh.gd#786"
   },
   {
    "s": "check_fh.gd",
@@ -2698,7 +2698,7 @@
    "r": "unresolved",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_fh.gd#774"
+   "g": "check_fh.gd#790"
   },
   {
    "s": "check_fh.gd",
@@ -2709,7 +2709,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_fh.gd#774"
+   "g": "check_fh.gd#790"
   },
   {
    "s": "check_fh.gd",
@@ -2720,7 +2720,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_fh.gd#774"
+   "g": "check_fh.gd#790"
   },
   {
    "s": "check_fi.gd",
@@ -7896,7 +7896,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "param",
-   "g": "check_iq.gd#385",
+   "g": "check_iq.gd#386",
    "expr": "h"
   },
   {
@@ -7908,7 +7908,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "param",
-   "g": "check_iq.gd#387",
+   "g": "check_iq.gd#388",
    "expr": "h"
   },
   {
@@ -7920,7 +7920,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iq.gd#210"
+   "g": "check_iq.gd#211"
   },
   {
    "s": "check_iq.gd",
@@ -7931,7 +7931,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iq.gd#208"
+   "g": "check_iq.gd#209"
   },
   {
    "s": "check_iq.gd",
@@ -7942,7 +7942,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iq.gd#213"
+   "g": "check_iq.gd#214"
   },
   {
    "s": "check_iq.gd",
@@ -7953,7 +7953,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iq.gd#212"
+   "g": "check_iq.gd#213"
   },
   {
    "s": "check_iq.gd",
@@ -7964,7 +7964,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iq.gd#214"
+   "g": "check_iq.gd#215"
   },
   {
    "s": "check_iq.gd",
@@ -7975,7 +7975,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iq.gd#209"
+   "g": "check_iq.gd#210"
   },
   {
    "s": "check_iq.gd",
@@ -7986,7 +7986,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iq.gd#205"
+   "g": "check_iq.gd#206"
   },
   {
    "s": "check_iq.gd",
@@ -7997,7 +7997,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iq.gd#206"
+   "g": "check_iq.gd#207"
   },
   {
    "s": "check_iq.gd",
@@ -8008,7 +8008,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iq.gd#207"
+   "g": "check_iq.gd#208"
   },
   {
    "s": "check_iq.gd",
@@ -8019,7 +8019,7 @@
    "r": "runtime",
    "k": "composed",
    "how": "read",
-   "g": "check_iq.gd#222"
+   "g": "check_iq.gd#223"
   },
   {
    "s": "check_iq.gd",
@@ -8030,7 +8030,7 @@
    "r": "runtime",
    "k": "composed",
    "how": "read",
-   "g": "check_iq.gd#223"
+   "g": "check_iq.gd#224"
   },
   {
    "s": "check_iq.gd",
@@ -8041,7 +8041,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_iq.gd#291",
+   "g": "check_iq.gd#292",
    "expr": "String"
   },
   {
@@ -8053,7 +8053,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iq.gd#347",
+   "g": "check_iq.gd#348",
    "expr": "said"
   },
   {
@@ -8065,7 +8065,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_iq.gd#356",
+   "g": "check_iq.gd#357",
    "expr": "mult"
   },
   {
@@ -8077,7 +8077,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iq.gd#326"
+   "g": "check_iq.gd#327"
   },
   {
    "s": "check_iq.gd",
@@ -8088,7 +8088,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iq.gd#325"
+   "g": "check_iq.gd#326"
   },
   {
    "s": "check_iq.gd",
@@ -8099,7 +8099,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_iq.gd#340"
+   "g": "check_iq.gd#341"
   },
   {
    "s": "check_ir.gd",
@@ -8784,7 +8784,7 @@
    "r": "code",
    "k": "literal",
    "how": "param",
-   "g": "check_iv.gd#537"
+   "g": "check_iv.gd#540"
   },
   {
    "s": "check_iv.gd",
@@ -9240,7 +9240,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iv.gd#497",
+   "g": "check_iv.gd#500",
    "expr": "gone"
   },
   {
@@ -9252,7 +9252,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iv.gd#497",
+   "g": "check_iv.gd#500",
    "expr": "stands"
   },
   {
@@ -9264,7 +9264,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_iv.gd#497",
+   "g": "check_iv.gd#500",
    "expr": "gone"
   },
   {
@@ -9276,7 +9276,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "read",
-   "g": "check_iv.gd#506"
+   "g": "check_iv.gd#509"
   },
   {
    "s": "check_iv.gd",
@@ -9287,7 +9287,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "read",
-   "g": "check_iv.gd#506"
+   "g": "check_iv.gd#509"
   },
   {
    "s": "check_iv.gd",
@@ -9298,7 +9298,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "read",
-   "g": "check_iv.gd#506"
+   "g": "check_iv.gd#509"
   },
   {
    "s": "check_iv.gd",
@@ -9309,7 +9309,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iv.gd#515"
+   "g": "check_iv.gd#518"
   },
   {
    "s": "check_iv.gd",
@@ -9320,7 +9320,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iv.gd#514"
+   "g": "check_iv.gd#517"
   },
   {
    "s": "check_iv.gd",
@@ -9331,7 +9331,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iv.gd#553"
+   "g": "check_iv.gd#556"
   },
   {
    "s": "check_iv.gd",
@@ -9342,7 +9342,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_iv.gd#554"
+   "g": "check_iv.gd#557"
   },
   {
    "s": "check_iw.gd",
@@ -10793,7 +10793,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_je.gd#378",
+   "g": "check_je.gd#381",
    "expr": "String"
   },
   {
@@ -10805,7 +10805,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_je.gd#383",
+   "g": "check_je.gd#386",
    "expr": "at_head"
   },
   {
@@ -10817,7 +10817,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_je.gd#377",
+   "g": "check_je.gd#380",
    "expr": "String"
   },
   {
@@ -10829,7 +10829,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_je.gd#384",
+   "g": "check_je.gd#387",
    "expr": "at_head"
   },
   {
@@ -10841,7 +10841,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_je.gd#372",
+   "g": "check_je.gd#375",
    "expr": "LAW_HEAD"
   },
   {
@@ -10853,7 +10853,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_je.gd#376",
+   "g": "check_je.gd#379",
    "expr": "String"
   },
   {
@@ -10865,7 +10865,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_je.gd#385"
+   "g": "check_je.gd#388"
   },
   {
    "s": "check_je.gd",
@@ -10876,7 +10876,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_je.gd#380",
+   "g": "check_je.gd#383",
    "alt": true
   },
   {
@@ -10888,7 +10888,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_je.gd#374"
+   "g": "check_je.gd#377"
   },
   {
    "s": "check_je.gd",
@@ -10899,7 +10899,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_je.gd#379"
+   "g": "check_je.gd#382"
   },
   {
    "s": "check_je.gd",
@@ -10910,7 +10910,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_je.gd#380",
+   "g": "check_je.gd#383",
    "alt": true
   },
   {
@@ -12783,7 +12783,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_jn.gd#531"
+   "g": "check_jn.gd#532"
   },
   {
    "s": "check_jn.gd",
@@ -12794,7 +12794,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_jn.gd#535"
+   "g": "check_jn.gd#536"
   },
   {
    "s": "check_jn.gd",
@@ -12805,7 +12805,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jn.gd#546",
+   "g": "check_jn.gd#547",
    "expr": "fig"
   },
   {
@@ -12886,7 +12886,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jo.gd#423",
+   "g": "check_jo.gd#424",
    "expr": "HELD_WORDS"
   },
   {
@@ -12910,7 +12910,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jo.gd#504",
+   "g": "check_jo.gd#505",
    "expr": "RIDE"
   },
   {
@@ -12922,7 +12922,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jp.gd#202",
+   "g": "check_jp.gd#203",
    "expr": "NOT_PULLED"
   },
   {
@@ -12934,7 +12934,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_jp.gd#207"
+   "g": "check_jp.gd#208"
   },
   {
    "s": "check_jp.gd",
@@ -12945,7 +12945,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_jp.gd#207"
+   "g": "check_jp.gd#208"
   },
   {
    "s": "check_jp.gd",
@@ -12956,7 +12956,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_jp.gd#207"
+   "g": "check_jp.gd#208"
   },
   {
    "s": "check_jp.gd",
@@ -12967,7 +12967,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jp.gd#137",
+   "g": "check_jp.gd#138",
    "expr": "ANSWERED"
   },
   {
@@ -12979,7 +12979,7 @@
    "r": "runtime",
    "k": "composed",
    "how": "read",
-   "g": "check_jp.gd#131"
+   "g": "check_jp.gd#132"
   },
   {
    "s": "check_jp.gd",
@@ -12990,7 +12990,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_jp.gd#135"
+   "g": "check_jp.gd#136"
   },
   {
    "s": "check_jp.gd",
@@ -13001,7 +13001,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jp.gd#274",
+   "g": "check_jp.gd#275",
    "expr": "String"
   },
   {
@@ -13013,7 +13013,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jp.gd#280",
+   "g": "check_jp.gd#281",
    "expr": "FLOOR_HEAD"
   },
   {
@@ -13025,7 +13025,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_jp.gd#281"
+   "g": "check_jp.gd#282"
   },
   {
    "s": "check_jp.gd",
@@ -13036,7 +13036,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jp.gd#340",
+   "g": "check_jp.gd#341",
    "expr": "String"
   },
   {
@@ -13105,7 +13105,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_jq.gd#344"
+   "g": "check_jq.gd#345"
   },
   {
    "s": "check_jq.gd",
@@ -13116,7 +13116,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_jq.gd#344"
+   "g": "check_jq.gd#345"
   },
   {
    "s": "check_jq.gd",
@@ -13127,7 +13127,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jq.gd#434",
+   "g": "check_jq.gd#435",
    "expr": "PUNISH_CARD"
   },
   {
@@ -13139,7 +13139,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jq.gd#434",
+   "g": "check_jq.gd#435",
    "expr": "PUNISH_CARD"
   },
   {
@@ -13151,7 +13151,7 @@
    "r": "code",
    "k": "literal",
    "how": "inline",
-   "g": "check_jq.gd#501"
+   "g": "check_jq.gd#502"
   },
   {
    "s": "check_jq.gd",
@@ -13162,7 +13162,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_jq.gd#434"
+   "g": "check_jq.gd#435"
   },
   {
    "s": "check_jq.gd",
@@ -13173,7 +13173,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_jq.gd#434"
+   "g": "check_jq.gd#435"
   },
   {
    "s": "check_jq.gd",
@@ -13184,7 +13184,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_jq.gd#643"
+   "g": "check_jq.gd#644"
   },
   {
    "s": "check_jr.gd",
@@ -13273,7 +13273,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jr.gd#456",
+   "g": "check_jr.gd#458",
    "expr": "_flat"
   },
   {
@@ -13285,7 +13285,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_jr.gd#513",
+   "g": "check_jr.gd#515",
    "expr": "LEDGER_STALE"
   },
   {
@@ -13297,7 +13297,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_jr.gd#513",
+   "g": "check_jr.gd#515",
    "expr": "LEDGER_SAYS"
   },
   {
@@ -13309,7 +13309,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_jr.gd#517",
+   "g": "check_jr.gd#519",
    "expr": "RELICS_STALE"
   },
   {
@@ -13321,7 +13321,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_jr.gd#517",
+   "g": "check_jr.gd#519",
    "expr": "RELICS_SAYS"
   },
   {
@@ -13333,7 +13333,7 @@
    "r": "runtime",
    "k": "composed",
    "how": "read",
-   "g": "check_jr.gd#504"
+   "g": "check_jr.gd#506"
   },
   {
    "s": "check_jr.gd",
@@ -13344,7 +13344,7 @@
    "r": "runtime",
    "k": "composed",
    "how": "read",
-   "g": "check_jr.gd#504"
+   "g": "check_jr.gd#506"
   },
   {
    "s": "check_jr.gd",
@@ -13355,7 +13355,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_jr.gd#509"
+   "g": "check_jr.gd#511"
   },
   {
    "s": "check_jr.gd",
@@ -13366,7 +13366,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_jr.gd#515"
+   "g": "check_jr.gd#517"
   },
   {
    "s": "check_js.gd",
@@ -13377,7 +13377,7 @@
    "r": "runtime",
    "k": "composed",
    "how": "param",
-   "g": "check_js.gd#95"
+   "g": "check_js.gd#98"
   },
   {
    "s": "check_js.gd",
@@ -13388,7 +13388,7 @@
    "r": "code",
    "k": "literal",
    "how": "param",
-   "g": "check_js.gd#99"
+   "g": "check_js.gd#102"
   },
   {
    "s": "check_js.gd",
@@ -13399,7 +13399,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_js.gd#167",
+   "g": "check_js.gd#170",
    "expr": "ANSWERED"
   },
   {
@@ -13411,7 +13411,7 @@
    "r": "runtime",
    "k": "composed",
    "how": "read",
-   "g": "check_js.gd#161"
+   "g": "check_js.gd#164"
   },
   {
    "s": "check_js.gd",
@@ -13422,7 +13422,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_js.gd#165"
+   "g": "check_js.gd#168"
   },
   {
    "s": "check_js.gd",
@@ -13433,7 +13433,7 @@
    "r": "missing-file",
    "k": "format",
    "how": "read",
-   "g": "check_js.gd#412"
+   "g": "check_js.gd#415"
   },
   {
    "s": "check_js.gd",
@@ -13444,7 +13444,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_js.gd#413",
+   "g": "check_js.gd#416",
    "alt": true
   },
   {
@@ -13456,7 +13456,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_js.gd#413",
+   "g": "check_js.gd#416",
    "alt": true
   },
   {
@@ -13468,7 +13468,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_js.gd#281",
+   "g": "check_js.gd#285",
    "expr": "String"
   },
   {
@@ -13480,7 +13480,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_js.gd#554",
+   "g": "check_js.gd#557",
    "expr": "RECORD_SAYS"
   },
   {
@@ -13492,7 +13492,18 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_js.gd#563"
+   "g": "check_js.gd#566"
+  },
+  {
+   "s": "check_jx.gd",
+   "fn": "_s2_the_floor",
+   "h": "check_jk.gd",
+   "n": "no_floor.is_empty()",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jx.gd#186"
   },
   {
    "s": "test_batch_ah.gd",

@@ -181,7 +181,7 @@ static func failed_reason(run: Node, req: Dictionary) -> String:
 			slots.append(str(int(slot)))
 		return "Only in zone %s (the heroes are in zone %d)." % [
 			"/".join(slots), int(run.get("zone_idx")) + 1]
-	# BATCH JS §1 — A SLOT IS NO LONGER A ZONE: the Forest of Old and the Frozen Plains share slots 1 and 3, so an
+	# BATCH JS §1 — A SLOT IS NO LONGER A ZONE: since JX §1 any zone stands at any stage (JS put two at slots 1 and 3), so an
 	# event written for a zone names it (`zone`, zone ids), read off the run's own draw (`zone_draw`).
 	# The run's own draw is read, never re-drawn: a run with none drawn yet meets no zone requirement.
 	var drawn: Array = run.get("zone_draw")

@@ -177,8 +177,8 @@ func _label_with(n: Node, needle: String) -> Label:
 	return null
 
 
-# A `static func`'s body out of comment-stripped source — `Gate.returning_bodies`
-# reads `func` lines only, and every function in `classes.gd` is static.
+# A `static func`'s body out of comment-stripped source, to the next function or const — this gate's own reader of
+# `classes.gd`, whose every function is static (`Gate.returning_bodies` reads statics too since JX, and drops void ones).
 func _static_body(code: String, fname: String) -> String:
 	var lines := code.split("\n")
 	var out := ""

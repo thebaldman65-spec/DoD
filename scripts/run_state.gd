@@ -314,39 +314,25 @@ func readout_is_player() -> bool:
 func note_debug(action: String, taken: String) -> void:
 	load("res://scripts/readout.gd").note_debug(self, action, taken)
 
-# Zone rotation (Batch 37): a run is SLOT_COUNT zone slots and each
-# slot draws ONE zone from its authored candidate pool — zones are
-# designed FOR a position (openers are not finales), so pools are
-# per-slot, never flat. Every zone runs the same SLOTS_PER_ZONE tiers. A zone def
-# carries its display name (art + save key), its boss kind, and a
-# roster id per slot it can host — roster ids are what the "zones"
-# tags in enemies.json actually mean. The Forest of Old hosts slots 1
-# AND 3: roster 1 as the opener, the tougher roster 3 as the finale; the
-# Frozen Plains hosts the same two, roster 4 as the opener and 5 as the finale.
-# BATCH JW §1 — THE DROWNED BARROW IS THE SECOND CANDIDATE AT SLOT 2: one roster for the one slot it hosts, roster 6, as the
-# Scarlands holds roster 2 — so every slot's pool holds two, and a run takes one of eight shapes.
-# BATCH JS §1 — A SLOT WHOSE POOL HOLDS TWO ZONES DRAWS BETWEEN THEM, A PLAYER's
-# RUN AND A SIM's ALIKE (`draw_zones`): the opener and the finale each hold the
-# Forest and the Frozen Plains, so a run takes one of four shapes (eight since JW §1); a slot of one
-# takes it with no die. `DOD_ZONE_ROTATION=0` holds a SIM to each pool's first
-# author, and a player's run never reads it (IW §0.3: a flag that changes what a
-# run contains is the sim's).
-# Adding a zone = ZONE_DEFS entry + SLOT_POOLS candidacy + roster tags
-# in enemies.json + zone_name keys in the background dicts — the battle's,
-# the map's and the event screen's; each falls back to the Forest's art —
-# and a `zone` key on each slot-dealt event written for one zone alone.
+# THE STAGES (BATCH JX §1, the designer's): a run is SLOT_COUNT stages and then the end boss, and each stage draws ONE
+# zone. A zone is for variety: every zone can stand at every stage, and the stage scales what a fight asks of the heroes — the
+# multiplier `_zone_ladder` reads at the stage and the tier ladder inside it — whichever zone stands there, the zone's boss and
+# kinds bringing their own base figures. JX's choices, owed (JX's RULINGS OWED 2 and 3): `draw_zones`
+# deals three DIFFERENT zones out of `ZONE_ORDER`, one a stage, and a zone fields its ONE roster wherever it stands, so a run
+# takes one of 24 shapes. Every zone runs the same SLOTS_PER_ZONE tiers. A zone def carries its display name (art + save key),
+# its boss kind and its roster id — the id the "zones" tags in enemies.json mean. `DOD_ZONE_ROTATION=0` holds a SIM to the
+# order's first three zones, and a player's run never reads it (IW §0.3: a flag that changes what a run contains is the sim's).
+# Adding a zone = ZONE_DEFS entry + ZONE_ORDER + roster tags in enemies.json + zone_name keys in the background dicts — the
+# battle's, the map's and the event screen's; each falls back to the Forest's art — and a `zone` key on each event written for
+# one zone alone.
 const SLOT_COUNT := 3
 const ZONE_DEFS := {
-	"forest": {"name": "Forest of Old", "boss": "withered_warden",
-		"rosters": {1: 1, 3: 3}},
-	"scarlands": {"name": "The Scarlands", "boss": "ash_tyrant",
-		"rosters": {2: 2}},
-	"frozen_plains": {"name": "The Frozen Plains", "boss": "icewrought_titan",
-		"rosters": {1: 4, 3: 5}},
-	"drowned_barrow": {"name": "The Drowned Barrow", "boss": "bone_shepherd",
-		"rosters": {2: 6}},
+	"forest": {"name": "Forest of Old", "boss": "withered_warden", "roster": 1},
+	"scarlands": {"name": "The Scarlands", "boss": "ash_tyrant", "roster": 2},
+	"frozen_plains": {"name": "The Frozen Plains", "boss": "icewrought_titan", "roster": 4},
+	"drowned_barrow": {"name": "The Drowned Barrow", "boss": "bone_shepherd", "roster": 6},
 }
-const SLOT_POOLS := [["forest", "frozen_plains"], ["scarlands", "drowned_barrow"], ["forest", "frozen_plains"]]
+const ZONE_ORDER := ["forest", "scarlands", "frozen_plains", "drowned_barrow"]
 var active_relics: Array = []  # up to 3 relic ids chosen at the draft
 var zone_idx := 0
 # BATCH EG §1 — HOW MANY ZONE BOSSES THIS RUN HAS PUT DOWN, AND WHY IT IS NOT
@@ -1196,14 +1182,16 @@ func compose_budget(budget: int, roster := 1) -> Array:
 # The budget scales across EACH ZONE (tier = the floor within the zone,
 # 1-16 with the boss on 16) as a continuous ramp (Batch T): the old three
 # bands (3-6 / 6-9 / 10-12) put a cliff exactly at tier 4, and 40 of 50
-# simulated wipes landed on it. Later zones restart the ladder with a
-# tougher roster carrying higher base stats.
+# simulated wipes landed on it. Every stage restarts the ladder (BATCH JX §1: the
+# zone standing at a stage fields its one roster, and the stage's multiplier below
+# carries the escalation).
 # Enemy stat scaling is zone-local (Batch 36): every zone replays the
 # 1..16 tier ladder and its position in the run applies a flat base
-# multiplier. Keyed by SLOT, not zone identity — the Forest of Old is
-# x1.0 as the opener and x2.2 when revisited as the finale — and slots
-# past the authored list continue the ~x1.5 step, so adding a 4th zone
-# is data work, never formula work.
+# multiplier. Keyed by the STAGE, never the zone (BATCH JX §1, the designer's: a
+# zone's enemies take their stage's stats) — any zone is x1.0 at the first stage
+# and x2.2 at the third — so adding a zone is data work, never formula work: it
+# takes the multiplier of whatever stage it stands at (a fourth stage, were
+# SLOT_COUNT raised, would continue the ~x1.5 step).
 const ZONE_BASE_MULTS := [1.0, 1.5, 2.2]
 
 # BATCH BM §5 — THE DIFFICULTY LADDER. Three rungs, and the ladder is what
@@ -4192,21 +4180,23 @@ func draft_price() -> int:
 # BATCH IW §0.3 — A FLAG THAT CHANGES WHAT A RUN CONTAINS IS THE SIM's (the designer's): a player chooses
 # his party and his build, never his zones, so the flag is read by a run sim only, beside the run
 # sim's other arms (`runes_mode`, `rune_econ`, `rune_power`).
-# BATCH JS §1 — AND SINCE A POOL HOLDS TWO, THE DRAW IS THE GAME's, NOT THE FLAG's: a player's run draws
-# within each pool, as the zone was authored to be met, and so does a sim, which plays the player's game;
-# the flag's one arm left is a sim's `DOD_ZONE_ROTATION=0`, which holds it to each pool's first author.
+# BATCH JS §1 — THE DRAW IS THE GAME's, NOT THE FLAG's (JS's ruling 1): a player's run draws its zones, and so does a sim,
+# which plays the player's game; since JX §1 every run draws three different zones of the four;
+# the flag's one arm left is a sim's `DOD_ZONE_ROTATION=0`, which holds it to the order's first three zones (JX §1).
 func rotation_enabled() -> bool:
 	return not (sim_run and OS.get_environment("DOD_ZONE_ROTATION") == "0")
 
 
-# One zone id per slot for this run: a pool of one is taken with no die, and a
-# pool of two or more draws among its authors (JS §1) — unless a sim's flag
-# holds the fixed order, each pool's first author.
+# BATCH JX §1 — THREE DIFFERENT ZONES, ONE A STAGE, OUT OF ALL FOUR: each stage draws among the zones not yet drawn (four, then
+# three, then two) — three dice, as the per-stage pools spent before, so every later roll keeps its place in the stream — unless
+# a sim's flag holds the order's first three.
 func draw_zones() -> void:
 	zone_draw = []
+	var left: Array = ZONE_ORDER.duplicate()
 	for slot in SLOT_COUNT:
-		var pool: Array = SLOT_POOLS[slot]
-		zone_draw.append(pool.pick_random() if pool.size() > 1 and rotation_enabled() else pool[0])
+		var z: String = left.pick_random() if rotation_enabled() else left[0]
+		left.erase(z)
+		zone_draw.append(z)
 
 
 func current_zone_id() -> String:
@@ -4221,11 +4211,9 @@ func next_zone_name() -> String:
 	return ZONE_DEFS[zone_draw[zone_idx + 1]]["name"]
 
 
-# The enemy pool this zone fields AT ITS CURRENT SLOT (the Forest is
-# roster 1 as the opener, roster 3 as the finale).
+# The enemy pool this zone fields: its one roster, at whichever stage it stands (JX §1).
 func active_roster() -> int:
-	var rosters: Dictionary = ZONE_DEFS[current_zone_id()]["rosters"]
-	return int(rosters.get(zone_idx + 1, rosters.values().front()))
+	return int(ZONE_DEFS[current_zone_id()]["roster"])
 
 
 func boss_kind() -> String:
@@ -4259,36 +4247,36 @@ func leave_zone_boss() -> void:
 		restore_party()
 
 
-# DEBUG — A TESTER's WAY TO A ZONE THE DRAW CAN DEAL (after JS, for the designer's playtest): every slot whose pool
-# holds `zone_id` takes it, so a later zone is sent there too; if the slot the party stands in is one of them, that zone
-# begins again in it — a new map, the party at its start, the boss the zone's own. The party is not restored: nothing is
-# won. Returns whether the zone the party stands in changed. Reached only through the map's debug dispatch, which marks
-# the run (`debug_used`) and names the action to the readout before it runs. The slot the party stands in is the one
-# `current_zone_id` reads — `zone_idx` clamped to the run — so a run whose index ran past the last zone (the debug
-# advance did that until it learned to stop) is put back on its last slot when that zone begins again.
+# DEBUG — A TESTER's WAY TO A ZONE (after JS, for the designer's playtest; JX §1's shape): the stage the party stands in takes
+# `zone_id` and begins again in it — a new map, the party at its start, the boss the zone's own — and a later stage the draw
+# had given it takes the zone it replaced, so no zone stands twice ahead of the party. The party is not restored: nothing is
+# won. Returns whether the zone the party stands in changed. Reached only through the map's debug dispatch, which marks the
+# run (`debug_used`) and names the action to the readout before it runs. The stage the party stands in is the one
+# `current_zone_id` reads — `zone_idx` clamped to the run — so a run whose index ran past the last zone (the debug advance did
+# that until it learned to stop) is put back on its last stage when the zone begins.
 func debug_force_zone(zone_id: String) -> bool:
 	if not ZONE_DEFS.has(zone_id):
 		return false
 	if zone_draw.is_empty():
 		draw_zones()
 	var at := clampi(zone_idx, 0, SLOT_COUNT - 1)
-	var here := false
-	for slot in SLOT_COUNT:
-		if (SLOT_POOLS[slot] as Array).has(zone_id) and String(zone_draw[slot]) != zone_id:
-			zone_draw[slot] = zone_id
-			if slot == at:
-				here = true
-	if here:
-		zone_idx = at
-		_enter_zone()
-		slot_idx = -1
-		node_idx = 0
-		encounter = {}
-		pending_modifier = ""
-		pending_reward = {}
-		pending_shop = false
-		_generate_map()
-	return here
+	var was := String(zone_draw[at])
+	if was == zone_id:
+		return false
+	for slot in range(at + 1, SLOT_COUNT):
+		if String(zone_draw[slot]) == zone_id:
+			zone_draw[slot] = was
+	zone_draw[at] = zone_id
+	zone_idx = at
+	_enter_zone()
+	slot_idx = -1
+	node_idx = 0
+	encounter = {}
+	pending_modifier = ""
+	pending_reward = {}
+	pending_shop = false
+	_generate_map()
+	return true
 
 
 # Move to the next zone: fresh map, path reset; the party is fully
@@ -4553,9 +4541,10 @@ func load_run() -> bool:
 	zone_name = data["zone_name"]
 	zone_draw = data.get("zone_draw", [])
 	if zone_draw.is_empty():
-		# Saves from before zone rotation ran the fixed order.
+		# Saves from before zone rotation ran Forest, Scarlands, Forest (none loads past the v10 floor); a
+		# draw-less save takes the order's first three (JX §1).
 		for slot in SLOT_COUNT:
-			zone_draw.append(SLOT_POOLS[slot][0])
+			zone_draw.append(ZONE_ORDER[slot])
 	slot_idx = int(data["slot_idx"])
 	node_idx = int(data.get("node_idx", 0))
 	pending_shop = bool(data.get("pending_shop", false))
@@ -4688,7 +4677,7 @@ func _drop_stale_offer_options() -> void:
 # - `pending_item_offers`, which the map's swap offer reads into `ITEM_INFO` on arrival, and the
 #   pouch's own keys, each a slot nothing draws and nothing can empty.
 # - `zone_draw`, which four `ZONE_DEFS` reads take on trust (the map's header first): an unknown
-#   zone takes its slot's first candidate, as an empty draw does, and the zone's name follows.
+#   zone takes the first zone of the order the draw does not hold (JX §1), and the zone's name follows.
 # - `pending_event`: an id the event table does not hold opens a screen with no choice and no way
 #   out, so it is cleared and the node stays spent.
 func _drop_stale_save_keys() -> void:
@@ -4699,7 +4688,7 @@ func _drop_stale_save_keys() -> void:
 	var reseeded := false
 	for slot in mini(zone_draw.size(), SLOT_COUNT):
 		if not ZONE_DEFS.has(String(zone_draw[slot])):
-			zone_draw[slot] = SLOT_POOLS[slot][0]
+			zone_draw[slot] = ZONE_ORDER.filter(func(z): return not zone_draw.has(z))[0]
 			reseeded = true
 	if reseeded:
 		_enter_zone()
