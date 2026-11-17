@@ -94,9 +94,9 @@ of this pilot is read by a reader that already carries the project's practices, 
 has no instance, and more batches of the same reader will not make one.
 
 **THE CORE — READ WHOLE:**
-- **CORE** `` ## WHERE THE PROJECT IS `` `#30aeb2`
+- **CORE** `` ## WHERE THE PROJECT IS `` `#e5a019`
 - **CORE** `` ## THE OPEN QUEUE `` `#17e1f1`
-- **CORE** `` ### JX's RULINGS OWED `` `#4fa83a`
+- **CORE** `` ### JX's RULINGS OWED `` `#04f787`
 - **CORE** `` ### THE CLERIC's MANA RATE `` `#045567`
 - **CORE** `` ### SANCTITY's STEP `` `#8c6773`
 - **CORE** `` ### BOIL OVER'S RATE `` `#c3c9c3`
@@ -297,9 +297,9 @@ population row carries a stamp over its member blocks, in their order, and reds 
 - **PROJECTED FOR JY**: the room at JX's close, less what JY expects to write, against each bar (the condition's rule, `docs/instrument-rules.md`): `CLAUDE.md` 7.49 KiB of room, 1.4 batches at JG's +5,329 B; `docs/state.md` 43.77 KiB, 3.1 batches at JG's 14,605 B written — **and this ceiling does not move, so a batch that would overrun it archives what its own rulings close**. At JG's writing JY would close with 2.29 KiB of room in `CLAUDE.md`, and in this file 29.50 KiB under its 520.
 - **No save version moved.** `zone_draw` already rides the save and every id it can hold is still a zone; a JW save that drew a zone twice loads as it stands (FOUND AT JX), and an older build reading a JX save meets every zone it knows, at whatever stage (its own `active_roster` falls back to the zone's first roster at a stage the zone never stood at). Game files moved: `scripts/run_state.gd` (the order, the draw, one roster a zone, the load's fallbacks, the debug jump), `scripts/map_screen.gd` (the debug toast), `data/enemies.json` (24 kinds' roster tags, the Shepherd's kit) and `data/events.json` (two zone events' stage lists).
 - **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in a build older than HL**: HL's ceiling refuses a newer save from HL's build on — HR's v15 is the first bump it has guarded — and HJ's and HK's builds, and `main`, carry no ceiling. **Tag `b722cc4` before merging** if the pre-merge game should stay one checkout away; nothing tags it today (HA's advice, its block archived at JH §3).
-- **Next.** JX's rulings are owed (JX's RULINGS OWED), the first the zone bosses' base figures. **The three older zone bosses and the end boss are owed a strategy each** (RULED AND NOT BUILT). The stages in play: the LOOK-LIST (a zone at a stage it never stood at, the Shepherd's Bone Smash). **The second forest boss is closed by JX's draw** — a run meets each zone, and its boss, once (a JW save holding a zone twice, and the debug jump, excepted: FOUND AT JX). Carried, not closed: S2-090; the Sleetveil Matron's heal and the Titan's Entomb, neither yet landed in a warband's own turn in a gate's fight; the sim figures read on a road no longer the default, which JX moved again.
+- **Next.** JX's seven rulings are accepted as taken (17 November); seven texts still say *owed*. **The three older zone bosses and the end boss are owed a strategy each** (RULED AND NOT BUILT). The stages in play: the LOOK-LIST (a zone at a stage it never stood at, the Shepherd's Bone Smash). **The second forest boss is closed by JX's draw** — a run meets each zone, and its boss, once (a JW save holding a zone twice, and the debug jump, excepted: FOUND AT JX). Carried, not closed: S2-090; the Sleetveil Matron's heal and the Titan's Entomb, neither yet landed in a warband's own turn in a gate's fight; the sim figures read on a road no longer the default, which JX moved again.
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### JX's RULINGS OWED — **SEVEN; THE ZONE BOSSES' BASE FIGURES, A ZONE ONCE A RUN, ONE ROSTER A ZONE, SOUL LEECH AND BONE SMASH, THE ZONE EVENTS AND THE SIM's HELD ROAD — EACH TAKEN ON THE RECOMMENDATION, NONE HOLDING ANYTHING UP**
+### JX's RULINGS OWED — **SEVEN; THE ZONE BOSSES' BASE FIGURES, A ZONE ONCE A RUN, ONE ROSTER A ZONE, SOUL LEECH AND BONE SMASH, THE ZONE EVENTS AND THE SIM's HELD ROAD — ALL SEVEN ACCEPTED AS TAKEN BY THE DESIGNER, 17 NOVEMBER**
 
 Full working: `docs/reports/JX.md`, NEEDS A RULING.
 
