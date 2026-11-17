@@ -52,7 +52,7 @@ const SLOTS := 3
 # THE OLD ROSTERS, whose every-one-of-them kinds are the universal core the new rosters take (§1's derivation).
 const OLD_ROSTERS := [1, 2, 3]
 # BATCH JX §1 — THE TWO ROSTERS JS GAVE THE ZONE, its opener's and its finale's, which JX folded into the opener's (one roster a
-# zone, JX's choice and owed: JX's RULINGS OWED 3). §1 replays JS's derivations on them, the tags as they stood before JX put back.
+# zone, JX's ruling 3, accepted as taken). §1 replays JS's derivations on them, the tags as they stood before JX put back.
 const JS_ROSTERS := [4, 5]
 # A FIGHT NODE's BODIES, AS A ROSTER MUST FIELD THEM: four to six, in at least this share of the fight draws (the old rosters
 # field them in 61–70%, derived here too and printed beside).
@@ -546,7 +546,7 @@ func _s1_the_draw() -> void:
 			_run.zone_idx = zi
 			got.append(int(_run.active_roster()))
 		_run.zone_idx = 0
-		# BATCH JX §1 — ONE ROSTER WHEREVER IT STANDS (JX's choice, owed: JX's RULINGS OWED 3): the opener's and the finale's were JS's.
+		# BATCH JX §1 — ONE ROSTER WHEREVER IT STANDS (JX's ruling 3, accepted as taken): the opener's and the finale's were JS's.
 		var want: Array = [int(_run.ZONE_DEFS[ZONE].get("roster", -1)), int(_run.ZONE_DEFS[ZONE].get("roster", -1))]
 		print("    the Frozen Plains at slot 1 fields roster %d and at slot 3 roster %d; its boss %s" % [int(got[0]), int(got[1]), String(_run.boss_kind())])
 		ok(got == want and String(_run.boss_kind()) == BOSS, "§1: the Frozen Plains fields rosters %s, not %s, or its boss is %s" % [str(got), str(want), String(_run.boss_kind())])

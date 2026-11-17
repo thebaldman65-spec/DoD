@@ -17,6 +17,155 @@ heading stands in both files. **Since JE §3 it also takes what `CLAUDE.md` clos
 
 ---
 
+## ARCHIVED AT JY — 2026-11-17, FROM `docs/state.md` AS JX AND THE COMMIT AFTER IT LEFT IT (`0ba18d4`)
+
+*In the order they stood. JX's seven rulings, accepted as taken by the designer on 17 November (After JX); and the audit's settled items (JY §1, `docs/reports/JY-audit.tsv`), each settled by later work or a later ruling, read at source by one reader and not refuted by a second asked to: HD's ruling whole, and items of GU's, GO's, GN's and GM's and of seven older blocks.*
+
+### ~~JX's RULINGS OWED~~ — **ALL SEVEN ACCEPTED AS TAKEN BY THE DESIGNER, 17 NOVEMBER (AFTER JX, `0ba18d4`)**
+
+*Its head as it stood: SEVEN; THE ZONE BOSSES' BASE FIGURES, A ZONE ONCE A RUN, ONE ROSTER A ZONE, SOUL LEECH AND BONE SMASH, THE ZONE EVENTS AND THE SIM's HELD ROAD — ALL SEVEN ACCEPTED AS TAKEN BY THE DESIGNER, 17 NOVEMBER*
+
+Full working: `docs/reports/JX.md`, NEEDS A RULING.
+
+1. **THE FOUR ZONE BOSSES' BASE FIGURES (JX §1, the record's ruling 2).** **Taken**: each keeps its own — health 500, 460, 370 and 370 (the Withered Warden, the Icewrought Titan, the Ash-Wrought Tyrant, the Bone Shepherd), armour 0.35, 0.32, 0.22 and 0.22 — the stage multiplying each as it multiplies every body. So the ladder is the stage's, and the boss a zone brings is still its own: at one stage the Warden's health after armour is 1.62 times the Tyrant's (769 against 474). **Measured** (JX §6, 200 untalented runs a tree, rung 1): completions 22% on HEAD and 20% on JX, a tie; where a run ends moved from the second stage toward the third (wipes at stage 2 86 → 75, at stage 3 53 → 73, 2.2 standard errors; every other shift inside two), and the zone bosses themselves stopped 5, 7 and 1 runs on HEAD and 6, 6 and 3 on JX — too few to say a boss moved it. **The alternative**: one base for every zone boss, health after armour equal — at the two opener bosses' mean (722.9) the Warden 470, the Titan 490, the Tyrant and the Shepherd 560 each, so the first and third stages' bosses stand about as before JX and a second-stage boss about half as tough again as the Tyrant stood there. **Reversing it** is four health figures.
+2. **A RUN MEETS A ZONE ONCE (JX §1).** **Taken**: three different zones of the four, one a stage — 24 shapes; a zone in three runs of four (the debug jump alone can stand a zone the party already met, FOUND AT JX). **The alternative**: each stage draws all four (64 shapes, a zone twice in a run, as the Forest could stand before JX). **Reversing it** is `draw_zones`' one erase.
+3. **ONE ROSTER A ZONE (JX §1).** **Taken**: the Forest's finale roster folded into its opener's and the Frozen Plains' the same, so wherever it stands the Forest fields its old opener's kinds and the Ash Hurler, and the Frozen Plains its opener's and the Rimehorn, the Sleetveil Matron and the Stillwrought (24 kinds re-tagged, `docs/reports/JX-rosters.tsv`). **The alternative**: a zone's opener mix at the first stage, its finale mix at the third and a second-stage mix — the Forest and the Frozen Plains a second-stage roster each, the Scarlands and the Barrow an opener's and a finale's each (six new rosters). **Reversing it** is the tags off the kept table and the four defs.
+4. **SOUL LEECH's FIGURES (JX §3, the record's ruling 4).** **Taken**: an ability by JN §1's rule — a kind's second damaging move clears the line — so the least whole damage that clears it against Bone Smash with its Break and delay kept: 46 (1.42), cooling 2; its heal half of what it lands, paid in Malice, as taken at JW. **The alternative**: the old basic's figures, 30 and uncooled, placed third after Noxious Fumes as Rake stands (an ability by its heal alone). **Reversing it** is its damage and cooldown keys.
+5. **BONE SMASH (JX §3).** **Taken**: the figures of the Tyrant's basic as Soul Leech carried them — 30 damage, 24 Break damage, a 2.0 delay — and physical, no damage type (Cinder Cleave is fire, Soul Leech shadow). **The alternative**: a figure or a damage type the designer names. **Reversing it** is one move's keys.
+6. **THE ZONE EVENTS (JX §1).** **Taken**: the Old Spring and the Scarland Mirage deal wherever their zone stands (their stage lists named every stage their zone could stand at); the Echo of the Warden keeps stage 3, so it deals in about a quarter of runs where it dealt in half. **The alternative**: the Echo freed too. **Reversing it** is one key.
+7. **THE SIM's HELD ROAD (JX §1).** **Taken**: `DOD_ZONE_ROTATION=0` holds the order's first three — the Forest, the Scarlands, the Frozen Plains — so a held sim never meets the Barrow, and its third stage is the Frozen Plains where it was the Forest's finale. **The alternative**: another order. **Reversing it** is `ZONE_ORDER`'s order.
+
+### THE FIRST CLEAN PLAYTHROUGH — **2026-10-18, WARDEN, ZONE ONE THROUGH ITS BOSS; SIX FINDINGS, ALL THE DESIGNER's TO RULE OR AUTHOR, NOTHING BUILT FROM THEM (IP §0.1, §4)** — ITS CLOSED ITEMS (archived at JY; the section stays in `docs/state.md`)
+
+*Settled at JY — PLAY-4: answered at JN §0, the designer's — the Cleric's Mana gain is halved.*
+- **THE CLERIC WAS THE DRIEST HERO, NOT THE FULLEST**: 3 hard-dry and 6 soft-dry turns of his 58, where **the Mage read 0 of 56
+  and the Hunter 0 of 65** — the opposite of IE's and IF's sim (THE CLERIC's MANA RATE, below). The rate is unmoved (since JN §0 a Cleric gains 50% less in a fight).
+
+### THE PLAYTEST'S OTHER FINDINGS — **LATER BATCHES BY RULING (HW's brief §5); THE ROADMAP HOLDS THE ORDER** — ITS CLOSED ITEMS (archived at JY; the section stays in `docs/state.md`)
+
+*Settled at JY — PLAYTEST-b1: IQ's ruling 2 answered at IV §0.1, the designer's — the pilot ended, `CLAUDE.md` takes no index, this file keeps its own.*
+- **THE RE-MEASURE RAN AT IQ §3, ON BOTH FILES — PRICED, NOT BUILT (IC §5's schedule, kept)**: HV §3b's census over the twenty
+  batches HW–IP, and HV §3f's shape priced on today's files — `CLAUDE.md` read at about 245 KiB of 472 a batch (48% less, where
+  HV found 38%), this file at about 85 KiB of HEAD's 361 (77% less) — with what building it re-points (`docs/reports/IQ.md` §3).
+  **Whether to build the block index, for which file, or HV's pilot first, is IQ's ruling 2: nothing waits on another
+  measurement.**
+
+### ~~HD's RULINGS OWED~~ — **ITS ONE ITEM SETTLED BY LATER WORK, AUDITED AT JY: NEITHER FLOOR TABLE HOLDS THE BRIEF's FIGURES (THE RUNE FLOOR RE-SET AT HE §1, HF AND HL §1, THE CARD FLOOR AT HL, IU AND JQ), SO NO ANSWER MOVES A NUMBER**
+
+*Its head as it stood: ONE LEFT; THREE CLOSED AT HE (1 AND 2 RULED AND BUILT AT HE §3, 3 KEPT AT HE §5 AS THE REPRICE'S PINS)*
+
+Full working: `docs/reports/HD.md`, NEEDS A RULING.
+
+4. **THE BRIEF'S §3 FIGURES WENT TO THE RUNES, AND THE FOLD TOOK THE CARDS' OWN.** The thirty-five floors are card-pool
+   floors; the figures were HC's rune table (a hero holding no engine is offered no Cleric rune, but 29 Cleric cards).
+   Built both ways (`docs/reports/HD.md` §3); confirm that is what was meant. **HE's brief did not answer it, so it is
+   still owed**; the rune floor has since moved (HE §1).
+
+### GU's RULINGS OWED — **THREE, ALL PLAYER-VISIBLE** — ITS CLOSED ITEMS (archived at JY; the section stays in `docs/state.md`)
+
+*Settled at JY — GU-2: Guard Change is the Swordmaster's enabler since HL §1 and in no draft pool, so a draft card's price beside a kit card no longer applies.*
+2. **GUARD CHANGE: NONE OF ITS THREE AXES MOVED.** Against Mocking Blow only its initiative is under, and that is the
+   swap's point (AK priced it a bargain on purpose). At a strike's price it would be Crushing Blow's 20 / 2 / 3.0 or
+   Pommel Strike's 20 / 3 / 2.0 — and a longer cooldown also slows Battle Poise's free pivot, which respects it.
+
+### GO's RULINGS OWED — **TWELVE; ALL BUT THE LAST TWO ARE PLAYER-VISIBLE** — ITS CLOSED ITEMS (archived at JY; the section stays in `docs/state.md`)
+
+*Settled at JY — GO-2: ruled in conversation, recorded at HP §7 — the Tracker and the Skirmisher become ordinary runes, each owing a new name before it is built (THE SKIRMISHER AND THE TRACKER; the names are JY's ruling 10).*
+2. **THE NAMES, SWEPT OVER 1,432.** **Rune of the Tracker is the Hunter's class passive's exact name**, so a Hunter
+   holding it wears two chips labelled *Tracker*. *Leech* is a retired Occultist rune's lane, which no screen shows.
+   Near-misses: the retired Rune of the Reaper (Reaver, Weaver), the retired Rune of the Binding Oath (Oathkeeper,
+   Oathbound), the live Long Leash (Leech), the Survivalist's own engine id `trapper` (Tracker), the glossary's
+   Bound (Oathbound), and several mechanical ones. Bastion, Skirmisher and Judged met nothing.
+
+### GN's RULINGS OWED — **EIGHT; THE FIRST FIVE ARE PLAYER-VISIBLE** — ITS CLOSED ITEMS (archived at JY; the section stays in `docs/state.md`)
+
+*Settled at JY — GN-6: GP made a class's shelves one pool, so no Cleric drafts from three cards.*
+6. **THE CLERIC'S CLASS POOL IS THREE** — Chastise, Exhortation and Undying Vigil are the whole draft (Forsake the fourth since JQ) of a Cleric who
+   took Sanctity, and an Occultist can no longer stack five cards on any tag but DEBUFF (`check_fn` §4 reads two).
+
+### GM's RULINGS OWED — **SEVEN, ALL PLAYER-VISIBLE** — ITS CLOSED ITEMS (archived at JY; the section stays in `docs/state.md`)
+
+*Settled at JY — GM-7: Divine Plea, Hymn of Hope and Resurrection sit out a fight without Mercy (GT §3), so the bare cost cannot reach a hero.*
+7. **THE BARE-NUMBER LABEL SURVIVES, ON DIVINE PLEA.** An engine-less Holy who drafted it sees *"Divine Plea   2"*;
+   Resurrection's bare "1" left with the card. The brief kept it out of GM. **It came back at GS on Resurrection and
+   Hymn of Hope**, for a Holy who drafts either and then drops Mercy (FOUND AT GS, above).
+
+### THE ARCHETYPE TAGS — READABLE AT ES, KEYED TO NOTHING, AND EVERY DESIGN QUESTION STILL OPEN — ITS CLOSED ITEMS (archived at JY; the section stays in `docs/state.md`)
+
+*Settled at JY — ARCH-q13: one flat tree since FX, so no lane is left for either word to name; both audits are closed records.*
+- **AND TWO CLOSED AUDIT REPORTS STILL SAY `Tempo`.** `docs/talent-audit.html` and
+  `docs/rune-audit.html` were deliberately not edited: both are CLOSED (CV / DN) and kept *"as
+  written — it is the evidence of which way each disagreement pointed"*. **A reader searching
+  either file for the Sharpshooter's lanes finds the old name.** A header note on each is one line
+  and is the designer's call.
+
+### THE DRAFT AUDIT — TWO FINDINGS RULED AT DR, THE REST STILL OPEN — ITS CLOSED ITEMS (archived at JY; the section stays in `docs/state.md`)
+
+*Settled at JY — DRAFT-q6: every hero of a class wears one tree since FX, and it carries Deflection and four more defensive nodes (the banner's stale line: FOUND AT JY).*
+- **THE HUNTER CLASS GAP IS RULED AT DS AND ITS DRAFT HALF IS CLOSED.** All three pools are 10
+  now and the class has its first heal and its first hero-side mitigation. **ONE HALF OF THE
+  FINDING IS DELIBERATELY STILL OPEN AND THE AUDIT'S BANNER SAYS SO**: the Sharpshooter still has
+  **no defensive node in his 27**, because DS moved no talent cell — a cell that changes row
+  mis-prices the ledger. Only the DRAFT half of "both halves of his progression offer him nothing"
+  is answered. **The talent half went with the twelve trees at FX (GB §4 census): the one tree every
+  hero wears carries defensive nodes, Deflection among them since GB.** `docs/draft-audit.html`'s
+  banner still calls that half open.
+
+*Settled at JY — DRAFT-q7, q8: GP made a class's shelves one pool, so no all-ice, all-Burn or all-companion shelf bounds an offer.*
+- **THE OTHER CONCENTRATION FINDINGS ARE DESIGN AND ARE UNRULED.** The Cryomancer's remaining
+  **11-of-11** ice and the Pyromancer's 12-of-13 Burn are reported with their card lists.
+  **THE BEASTMASTER'S 8-OF-8 IS NOW 10-OF-10 AND THAT IS NOT THE SAME FINDING WEAKENED** — DS's
+  two cards both read the companion, so the ENGINE binding is untouched and is if anything tighter;
+  what moved is the AXIS breadth, from 5 decisions to 7. **Whether a total engine binding is a
+  problem at all is still unruled**, and DR's framework says it is not by itself.
+
+### THE RUNE CHARTER — MECHANICS TAKEN AT EM, EVERY DESIGN QUESTION IN IT STILL OPEN — ITS CLOSED ITEMS (archived at JY; the section stays in `docs/state.md`)
+
+*Settled at JY — CHARTER-q2, q3: the sixty-five runes are retired (EO §3, ET §1), the twelve splashes and the thirty-six lane runes among them, and FN's ruling forbids a tag condition.*
+- **WHAT SEVERING THE LANE RULE DELETES, RECORDED BECAUSE IT WAS MEASURED — AND ES §5 ANSWERED THE
+  SPLASH HALF OF IT.** 36 lane runes and 12 splashes — **48 of the 65** — were authored to *"one rune
+  per talent lane, plus one splash"*, whose point was that a rune is *"worth more to a hero whose
+  points went elsewhere."* **A rune with its own field is worth the same to every hero of its spec**,
+  which is the power increment the rule existed to prevent. **The 36 `lane` fields are still
+  authored** and now describe where a rune came from rather than what it reaches.
+  - **THE SPLASH HALF IS RULED AT ES §5: A SPLASH PAYS FOR BREADTH ACROSS TAGS.** EJ's finding was
+    that with the lanes severed *"a little of every bond"* had nothing left to reach across; **tags
+    are the thing to reach across.** The machinery is `Runes.breadth_met`, **no splash is authored**,
+    and `check_es` §5 prints the live census every battery. At ES §5 it read **SEVEN of the twelve
+    alive, not six retired as the brief said — FIVE were retired at EO**, and they fell along class
+    lines: **all three Warriors kept theirs and the whole CLERIC class had none.**
+  - **THE LANE-RUNE HALF IS STILL THE OPEN DESIGN QUESTION.** What replaces the variance mechanism
+    for the 36 is unruled; **the archetype tags are now not merely the candidate but a BUILT one** —
+    a threshold rune is worth more to a hero whose loadout points the same way, which is exactly the
+    asymmetry the lane rule provided. **Nothing is authored.**
+
+*Settled at JY — CHARTER-q5: every rune costs 150g, ruled in HK's brief; the rest of the line records what was not measured.*
+- **WHAT IS STILL NOT MEASURED, STATED SO THIS IS NOT READ AS CLEAN.** No sim and no balance
+  judgement; **not one magnitude was measured in play, before or after** *(of the lane runes: HP and HQ measured the crest's four, and the worth rule prices a crest rune, JF §0.3)*. Runes were not compared
+  against each other, nor against relics, items or enemy abilities. Rune PRICING was not opened —
+  and it is now a live question, because a rune whose value no longer depends on the holder's build
+  is a different object to price.
+
+### THE THREE PRICING QUESTIONS — THE LAYER-WIDE ONE IS **RULED AT EB §1**; THE OTHER TWO ARE STILL THE DESIGNER'S — ITS CLOSED ITEMS (archived at JY; the section stays in `docs/state.md`)
+
+*Settled at JY — PRICING-q4: Hymn of Hope is a drafted card since GS §1, so Sanctuary overlaps an optional card; moving Sanctuary stays with the Devout's shortfall in THE BOSS-PICK POOLS.*
+- **(3) SANCTUARY OVERLAPS HYMN OF HOPE, HOLY'S PROTECTED CORE PARTY-HEAL, AND THAT IS UNTOUCHED
+  SINCE DY.** Hymn: 0 Mana + 1 Mercy, all heroes 20% of max (35% empowered; *heroes* on the card since IJ §2), initiative 3.5,
+  cooldown 2. Sanctuary: 30 Mana, no Mercy, every ally 12% (18% on a Perfect), initiative 3.5,
+  cooldown 4. **It clears the LETTER of the no-duplication rule** — that rule forbids a strictly
+  BETTER card in the same pool, and Sanctuary is strictly worse on magnitude and pays a different
+  currency — **and raises the question the rule exists for.** DY recommended moving it to the
+  DEVOUT's boss pool, which would answer this and shorten the Devout's shortfall at once.
+  **It is not taken, and DZ did not revisit it.**
+
+### Named by the designer, carried from CX — ITS CLOSED ITEMS (archived at JY; the section stays in `docs/state.md`)
+
+*Settled at JY — CX-b5: the content pass happened — EZ's twenty-one runes with the designer, HF's fifteen, GO's nine engines, the crest runes.*
+- **Rune content.** The rune economy is measured and the system is built; the content pass has
+  not been authored. **AND THE CHARTER DECISION COMES FIRST — see the RUNE CHARTER block above.**
+
+---
+
 ## ARCHIVED AT JX — 2026-11-15, FROM `docs/state.md` AS JW LEFT IT (`0bb550b`)
 
 *JW's eight rulings, answered in JX's record (the designer's answers of 15 November): 1, 5, 6, 7 and 8 accepted as taken; 2 answered by the stages (JX §1), the Barrow's templates standing as base figures; 3 reversed in its first half — JK's floor removed (JX §2) and Bone Smash the Shepherd's fourth move in the Rally's place (JX §3), its second half, Call the Drowned held at 4, standing; 4 amended — Soul Leech an ability, Noxious Fumes as taken (JX §3).*

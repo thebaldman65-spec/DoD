@@ -147,7 +147,7 @@ func _zones(k: Dictionary) -> Array:
 func _s1_the_zone(data: Dictionary) -> void:
 	print("\n§1 — the Drowned Barrow: a zone of the order, its roster, its draw at every stage, its map, its backdrop, its events")
 	var zd: Dictionary = _run.ZONE_DEFS[ZONE]
-	# BATCH JX §1 — REPAIRED TO ITS INTENT (a zone stands at any stage, the designer's ruling; one roster a zone, JX's, owed). JW
+	# BATCH JX §1 — REPAIRED TO ITS INTENT (a zone stands at any stage, the designer's ruling; one roster a zone, JX's ruling 3, accepted). JW
 	# asked that the Barrow be slot 2's second candidate with a roster of its own; the arm asks that it is a zone of the order, drawn
 	# at every stage, and that its roster is its own.
 	var order: Array = (_run.get_script() as Script).get_script_constant_map().get("ZONE_ORDER", [])

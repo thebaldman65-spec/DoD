@@ -509,7 +509,7 @@ func _s2_the_environment() -> void:
 	ok(gone.is_empty(), "§2: %d rows name a read the scripts no longer make — delete them: %s" % [gone.size(), str(gone)])
 	ok(unguarded.is_empty(), "§2: %d sim-family reads stand behind no guard — a sim's arm leaks into a player's game: %s" % [unguarded.size(), str(unguarded)])
 	# THE LATENT ARM, AND THE WRITER ARRIVED WITH ITS DOOR (JS §1). BATCH JX §1 — every stage draws among every zone of the order now
-	# (the designer's ruling), three different zones a run (JX's choice, owed) (`Run.draw_zones`). The arm asks the door, driven: a player's run, the flag
+	# (the designer's ruling), three different zones a run (JX's ruling 2, accepted as taken) (`Run.draw_zones`). The arm asks the door, driven: a player's run, the flag
 	# exported in each of its spellings or not at all, meets every zone at every stage.
 	var order: Array = (_run.get_script() as Script).get_script_constant_map().get("ZONE_ORDER", [])
 	var pools: Array = []

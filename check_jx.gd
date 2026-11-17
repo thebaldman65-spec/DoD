@@ -25,8 +25,8 @@
 #
 # ── WHAT IT CANNOT DO, SAID FIRST ───────────────────────────────────────────
 # §1's draw is read over a walk of seeds, so "every zone at every stage" is what that walk met, printed with its counts; it
-# is not a proof over every seed. Whether one zone's boss is harder than another's at the same stage is the designer's open
-# ruling (`docs/reports/JX.md`, NEEDS A RULING), so no arm here asserts the four bosses equal.
+# is not a proof over every seed. Whether one zone's boss is harder than another's at the same stage is JX's ruling 1, accepted
+# as taken after JX (each boss keeps its own base figures), so no arm here asserts the four bosses equal.
 extends SceneTree
 
 const Gate = preload("res://gate_fixture.gd")

@@ -317,7 +317,7 @@ func note_debug(action: String, taken: String) -> void:
 # THE STAGES (BATCH JX §1, the designer's): a run is SLOT_COUNT stages and then the end boss, and each stage draws ONE
 # zone. A zone is for variety: every zone can stand at every stage, and the stage scales what a fight asks of the heroes — the
 # multiplier `_zone_ladder` reads at the stage and the tier ladder inside it — whichever zone stands there, the zone's boss and
-# kinds bringing their own base figures. JX's choices, owed (JX's RULINGS OWED 2 and 3): `draw_zones`
+# kinds bringing their own base figures. JX's choices, accepted as taken (JX's rulings 2 and 3): `draw_zones`
 # deals three DIFFERENT zones out of `ZONE_ORDER`, one a stage, and a zone fields its ONE roster wherever it stands, so a run
 # takes one of 24 shapes. Every zone runs the same SLOTS_PER_ZONE tiers. A zone def carries its display name (art + save key),
 # its boss kind and its roster id — the id the "zones" tags in enemies.json mean. `DOD_ZONE_ROTATION=0` holds a SIM to the

@@ -85,7 +85,7 @@ func _s0_the_population() -> Dictionary:
 	var rosters: Array = []
 	var bosses: Array = [""]
 	for z in (_run.ZONE_DEFS as Dictionary):
-		# BATCH JX §1 — ONE ROSTER A ZONE (JX's choice, owed: JX's RULINGS OWED 3), read where the def holds it.
+		# BATCH JX §1 — ONE ROSTER A ZONE (JX's ruling 3, accepted as taken), read where the def holds it.
 		var r := int((_run.ZONE_DEFS[z] as Dictionary).get("roster", -1))
 		if r > 0 and not rosters.has(r):
 			rosters.append(r)
