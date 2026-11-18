@@ -4,6 +4,25 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The kit cards' new figures (Batch KA) — 2026-11-17
+
+**Why the five kit cards were re-priced.** The designer's ruling (JZ's ruling 1, accepted as recommended; the pricing JZ's): every
+Mage and Cleric holds these cards, and four of the five were written below the cards of their own role in their class's pool
+&mdash; Magic Missiles' Break under even Magic Bolt's, the ward and the cut under the shields and mitigations beside them, the
+heal under the heals. Each was set beside its role's median, per cast, per Mana, per initiative and per cooldown turn;
+Consecration was already level and stays. The shield and mitigation figures rest on an assumed blow rate, not a measurement.
+
+**Why Ministration now out-heals Holy's Heal on a large ally.** It reads the target's maximum and Heal reads the caster's, so
+at 35% it pays more than Heal on an ally past about 172 maximum health and less on a small one. The comparison that kept it the
+lesser came from the class-wide *weaker* rule, retired at HD §1, so no standing rule keeps it under Heal; the designer's figure
+is kept and the comparison is put to the designer.
+
+**Why the Tracker and the Skirmisher keep their places for now.** Their new names are JZ's recommended pair, which the designer accepted (JZ's ruling 2), but the change they
+are named for gives their two core slots to Volley and the Ambusher, and those two have a direction each and no rule. Making the
+two runes ordinary first would leave the Hunter four core runes where every class holds six, so the names wait with the change,
+and the two cores' rules are the designer's to write, one rune at a time; KA brings the cards each direction names and the
+machinery each can ride, so the batch that builds them can build the whole change.
+
 ## The rulings answered (Batch JZ) — 2026-11-17
 
 **Why a Rupture ticks on its maker's turn.** The designer's ruling (JY's ruling 2, accepted as recommended): a Rupture's Break

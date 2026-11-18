@@ -309,7 +309,7 @@ func _break_damage() -> void:
 	# an ability that never strikes is Break from nowhere.
 	var want := {
 		"Chastise": 20,          # the one figure the brief names
-		"Magic Missiles": 3,     # PER BOLT — 9 across three, 12 on a perfect
+		"Magic Missiles": 5,     # PER BOLT (KA) — 15 across three, 24 on a perfect
 		"Nexus Ward": 0, "Mirror Image": 0, "Mana Well": 0, "Dispel": 0,
 		"Blink": 0, "Ministration": 0, "Consecration": 0, "Unburden": 0,
 		"Exhortation": 0, "Undying Vigil": 0,
@@ -319,8 +319,8 @@ func _break_damage() -> void:
 		ok(ab != null and ab.pressure == int(want[nm]),
 			"§2: %s carries %d Break damage" % [nm, int(want[nm])])
 	# THE SIBLING COMPARISON THE ASSIGNMENT WAS MADE AGAINST, pinned so a later
-	# reprice has to come and say so: Magic Missiles' 3 a bolt sits under Razor
-	# Ice's 10 and level with Arcane Barrage's 3 while throwing half as many.
+	# reprice has to come and say so: Magic Missiles' 5 a bolt (KA) sits under
+	# Razor Ice's 10 and above Arcane Barrage's 3 while throwing half as many.
 	var razor: Ability = Classes.pool_ability("Razor Ice")
 	var barrage: Ability = Classes.pool_ability("Arcane Barrage")
 	var missiles: Ability = Classes.pool_ability("Magic Missiles")
@@ -364,12 +364,12 @@ func _weaker_half() -> void:
 	ok(not claude.contains("**WEAKER THAN SPEC ABILITIES AND UNCONDITIONAL**"),
 		"§2: CLAUDE.md still states the class-wide 'weaker' rule as a live rule")
 	# MINISTRATION AGAINST HOLY'S HEAL. Heal is 40% of the CLERIC's maximum;
-	# Ministration is 20% of the TARGET's. The worst case for the rule was the
+	# Ministration is 35% of the TARGET's since KA. The worst case for the rule was the
 	# beefiest target in the game, so that is the one it was checked against.
 	var holy_max := int(Classes.SPEC_INFO["holy"].get("max_hp", 150))
 	var warden_max := int(Classes.SPEC_INFO["warden"].get("max_hp", 200))
 	var heal_on_holy := int(round(holy_max * 0.40))
-	var ministration_on_warden := int(round(warden_max * 0.20))
+	var ministration_on_warden := int(round(warden_max * 0.35))
 	_retired(ministration_on_warden < heal_on_holy,
 		"§2: Ministration on the beefiest ally (%d) is LESS than Holy's Heal (%d)" % [
 			ministration_on_warden, heal_on_holy])
@@ -387,10 +387,11 @@ func _weaker_half() -> void:
 			barrage.damage * barrage.random_hits])
 	# NEXUS WARD (MAGIC BARRIER UNTIL GN) AGAINST DIVINE SHIELD, the game's other
 	# absorb. (Its first comparison was two literals, 0.20 against 0.30, and could
-	# never have failed; it is printed with the rest.)
+	# never have failed; it is printed with the rest — since KA two literals still, Nexus Ward's
+	# 0.25 against Divine Shield's base 0.35.)
 	var barrier: Ability = Classes.pool_ability("Nexus Ward")
 	var shield: Ability = Classes.pool_ability("Divine Shield")
-	_retired(0.20 < 0.30, "§2: Nexus Ward's 20% of maximum is under Divine Shield's 30%")
+	_retired(0.25 < 0.35, "§2: Nexus Ward's 25% of maximum is under Divine Shield's 35%")
 	_retired(barrier.cost > shield.cost and barrier.cooldown > shield.cooldown,
 		"§2: ...for more Mana and a longer cooldown")
 	# MIRROR IMAGE AND NEXUS WARD ARE NOT A STRICT UPGRADE OF EACH OTHER,
@@ -608,13 +609,14 @@ func _live_barrier_and_mirror() -> void:
 	var foe: BattleUnit = foes[0]
 	mage.resource = mage.max_resource
 	mage.hp = mage.max_hp
-	# ---- NEXUS WARD ABSORBS 20% OF **MAXIMUM** HEALTH ----
-	# BATCH CQ §3 — TWENTY SINCE CN §3'S FOLD (the perfect's 20% became the base).
+	# ---- NEXUS WARD ABSORBS 25% OF **MAXIMUM** HEALTH ----
+	# BATCH CQ §3 — TWENTY SINCE CN §3'S FOLD (the perfect's 20% became the base);
+	# TWENTY-FIVE SINCE KA (JZ's ruling 1, the designer's).
 	await scene.call("_resolve", mage, barrier, mage, "good")
-	var want_absorb := int(round(mage.max_hp * 0.20))
+	var want_absorb := int(round(mage.max_hp * 0.25))
 	ok(mage.has_status("barrier"), "§3: Nexus Ward lands a barrier")
 	ok(mage.status_power("barrier") == want_absorb,
-		"§3: ...worth 20%% of his MAXIMUM health (%d, wanted %d)" % [
+		"§3: ...worth 25%% of his MAXIMUM health (%d, wanted %d)" % [
 			mage.status_power("barrier"), want_absorb])
 	# It is NOT a Divine Shield: Faith is the Devout's engine and a Mage ward
 	# feeding Conviction would be a spec mechanic leaking through a class card.
@@ -872,12 +874,12 @@ func _live_cleric_heals() -> void:
 	ally.hp = 1
 	cleric.resource = cleric.max_resource
 	await scene.call("_resolve", cleric, minist, ally, "good")
-	var want := int(round(ally.max_hp * 0.20))
+	var want := int(round(ally.max_hp * 0.35))
 	ok(ally.hp == 1 + want,
-		"§4: Ministration heals 20%% of the TARGET's maximum (%d, wanted %d)" % [
+		"§4: Ministration heals 35%% of the TARGET's maximum (%d, wanted %d)" % [
 			ally.hp - 1, want])
-	ok(want != int(round(cleric.max_hp * 0.20)) or ally.max_hp == cleric.max_hp,
-		"§4: ...which is a different number from 20%% of the caster's")
+	ok(want != int(round(cleric.max_hp * 0.35)) or ally.max_hp == cleric.max_hp,
+		"§4: ...which is a different number from 35%% of the caster's")
 	# ---- CONSECRATION: THE WHOLE PARTY, AND ITS TICK IS ITS OWN FUNCTION ----
 	cleric.resource = cleric.max_resource
 	cleric.cooldowns.clear()
@@ -977,7 +979,7 @@ func _live_chastise_and_unburden() -> void:
 	await scene.call("_resolve", cleric, unburden, clean, "good")
 	ok(clean.has_status("unburdened"),
 		"§4: ...and with nothing to remove it is still the mitigation")
-	# And the 20% is real, measured as a delta against the same blow twice.
+	# And the cut is real, measured as a delta against the same blow twice.
 	ally.remove_status("unburdened")
 	ally.armor = 0.0
 	ally.parry_chance = 0.0

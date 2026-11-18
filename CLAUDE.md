@@ -309,10 +309,13 @@ new block written here):
 - **DO NOT ASK. DECIDE, AND SAY WHAT YOU DECIDED (STANDING, SET AT JC, THE DESIGNER's WORD, GIVEN TWICE).** JB asked seven times and the
   answer was the recommendation seven times out of seven: the asking cost a conversation and changed nothing. **Nothing waits on a reply**:
   no step of any brief is blocked on one, and a brief that seems to need one got a premise wrong, which is what the report's premise table is for.
+  *A balance decision is not taken: it goes before the designer with its options (the last bullet below); that its build waits on
+  the answer is KA's reading.*
   · **A PREMISE THAT TURNS OUT FALSE**: when a card, a rule or a measurement has to change because of one, change it the way you would
-    recommend, and write down what you changed and why. Those are findings with an obvious answer, not preferences.
+    recommend — a figure excepted, which goes before the designer (the last bullet below) — and write down what you changed and why. Those are findings with an obvious answer, not preferences.
   · **A CHOICE THAT IS GENUINELY THE DESIGNER's AND CANNOT BE UNMADE INSIDE THE BATCH**: take the recommendation anyway and put it in NEEDS A
-    RULING — what you took, what the alternative was, and what reversing it would cost. **A ruling owed is not a batch stalled.**
+    RULING — what you took, what the alternative was, and what reversing it would cost. **A ruling owed is not a batch stalled.** A
+    balance decision is not taken this way: it is laid before the designer with its options (the last bullet below).
   · **THE BRIEF STAYS WRONG WHERE IT WAS WRONG**: correcting a premise in flight does not shrink the premise table. Every departure is
     still named there and in FOUND AT.
   · **IT SETTLES WHO DECIDES IN FLIGHT, NOT WHAT A BATCH MAY AUTHOR**: a batch still authors no rune, and still applies no fold that moves a
@@ -321,6 +324,16 @@ new block written here):
   · **THE WORD REMOVES THE QUESTION, NOT THE RULING (JD §0.3, the designer's, who kept the clause above as it was written).** A premise breaking mid-batch is a **correctness** question and
     belongs to whoever is holding the code. A rune's text or a magnitude is a **taste** question and belongs to the designer. The word does not move the second kind; it only stops the first
     kind from waiting. *Break has no rate* forced a mechanic to be invented mid-batch, and it was, and it was right, which is correctness; authoring Fractured from nothing would not have been.
+  · **EVERY BALANCE DECISION IS THE DESIGNER's, AND IT GOES IN FRONT OF THE DESIGNER WITH OPTIONS (KA, the designer's word, given
+    mid-batch):** *"make a note that i will handle all balance decisions, you only need to run sim to test your code. when a
+    balance decision is made,  palce it infront of me with options"*. So a batch decides no balance figure on its own judgment and
+    takes no balance recommendation as its own: it lays each before the designer with its options, and a figure the designer has
+    ruled is built as ruled. **The sim tests the batch's code** — that a change does what it says and breaks nothing — **and decides
+    no figure.** *KA's reading, not the word's letter: what counts as balance (a figure, a magnitude, a price, a cooldown, a
+    re-tune); the recommendation first among the options; nothing built on an open balance question until it is answered; a figure
+    a ruled derivation reads off a measurement (IX §3's grades) is that ruling applied, and the batch reports the move. And a rune's
+    rule and text stay RUNE CONTENT IS WRITTEN WITH THE DESIGNER's, never offered as options, while its figures go before the
+    designer with options once the designer has written it — KA's RULINGS OWED asks.*
 - **A FOLD, A RENAME OR A REFACTOR THAT CHANGES A MAGNITUDE IS A DESIGN CHANGE. IT GOES TO THE
   DESIGNER AS A REPORT AND IS NEVER APPLIED ON THE BATCH'S OWN JUDGMENT (STANDING, SET AT BATCH
   CQ §6).** The rule exists because of CN §3: removing the timing bar from 113 abilities orphaned
@@ -2686,9 +2699,10 @@ the block left out, spend what they were paid.
   consumes nothing twice; a card that wants its effect repeated needs a ruling, not an arm in `_echo_fire`.
 - **SIX A CLASS IS `Classes.class_engines`**, the one list the deal, the pouch and the gates read.
 - **THE SKIRMISHER AND THE TRACKER ARE RULED INTO ORDINARY RUNES — RULED, NOT BUILT (recorded at HP §7; ruled in
-  conversation, never briefed).** Both are live core runes today, dealt and slotted as any of the nine are, and each
-  owes a new name before it is built. **A brief that cites their retirement as a precedent is citing a ruling, not the
-  game** — HO caught one.
+  conversation, never briefed).** Both are live core runes today, dealt and slotted as any of the nine are. **Their names
+  are ruled — *Common Foe* for the Tracker, *Pounce* for the Skirmisher (KA, JZ's ruling 2) — and the build waits on
+  Volley's and the Ambusher's rules, which take the two core slots and are not written (KA's ruling 1).** **A brief
+  that cites their retirement as a precedent is citing a ruling, not the game** — HO caught one.
 - **THE CHARTER'S *none of the three accrues anything* HOLDS FOR THE STANCES AND TRAPPER ONLY.** Heavy Plating's
   climb accrues, +8% an unblocked hit to +40%, and a block resets it — the Standing Wall halves it (GO §0).
 

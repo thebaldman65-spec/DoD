@@ -4003,11 +4003,12 @@ static func draft_ability(display_name: String) -> Ability:
 		# AXIS: the reliable filler. Multi-hit, so it plays with anything
 		# reading HITS rather than casts, and cheap enough to cast while saving
 		# for something bigger. DELIBERATELY THE LESSER of the Mage's multi-hit
-		# fillers: 3 x 12% against Razor Ice's 3 x 15% and Arcane Barrage's
-		# 6 x 8%, and 3 BD a bolt against their 10 and 3.
+		# fillers in damage, under Razor Ice and Arcane Barrage. Its Break
+		# damage a bolt was raised at KA (JZ's ruling 1, the designer's): under
+		# Razor Ice's, above Arcane Barrage's.
 		"Magic Missiles":
 			return Ability.make({"display_name": "Magic Missiles",
-				"dmg_type": "arcane", "cost": 15, "damage": 12, "pressure": 3,
+				"dmg_type": "arcane", "cost": 15, "damage": 12, "pressure": 5,
 				"delay": 2.0, "cooldown": 2, "anim": "attack01",
 				"multi_hits": 3,
 				"perfect_id": "", "perfect_text": "A fourth bolt",
@@ -4056,10 +4057,10 @@ static func draft_ability(display_name: String) -> Ability:
 		# rather than which side he is on, and every one has to sit on an
 		# Occultist tongue as easily as on Holy's.
 		#
-		# AXIS: the plain heal none of them has. DELIBERATELY THE LESSER of it
-		# and Holy's Heal — 20% of the TARGET's maximum tops out at 40 on the
-		# Warden's 200, against Heal's 40% of her own 150, i.e. 60, and both
-		# are multiplied by the same Mercy term.
+		# AXIS: the plain heal none of them has, read off the TARGET's maximum.
+		# Since KA's re-tune (JZ's ruling 1, the designer's) it out-heals Holy's
+		# Heal on a large ally and under-heals it on a small one, and both are
+		# multiplied by the same Mercy term.
 		"Ministration":
 			return Ability.make({"display_name": "Ministration",
 				"dmg_type": "holy", "cost": 20, "damage": 0, "pressure": 0,

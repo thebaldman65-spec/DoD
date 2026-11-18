@@ -458,7 +458,7 @@ func _cleric_five() -> void:
 		smite_pick = "%s, the Cleric's slot 0 in kit order" % String((c2.abilities[0] as Ability).display_name)
 		var bd := e0.pressure - p_was
 		var w2 := _hero(s2, "warrior")
-		w2.hp = int(w2.max_hp * 0.5)
+		w2.hp = int(w2.max_hp * 0.4)  # KA: low enough that a vowed heal at 35% fits under what is missing
 		var w_was := w2.hp
 		seed(DMG_SEED)
 		await s2._resolve(c2, _ab(s2, c2, "Ministration"), w2, "good")
@@ -474,7 +474,7 @@ func _cleric_five() -> void:
 		s2._dmg_frame(null, "Poison", c2.unit_name)
 		e1.take_tick_damage(12, "-12 Poison", Color.WHITE)
 		v[arm2[0]] = {"smite": dmg, "bd": bd, "mn": mn, "drip": drip, "tick": e1_was - e1.hp,
-			"mn_want": maxi(int(round(w2.max_hp * 0.20 * (1.5 if arm2[0] == "worn" else 1.0))), 1),
+			"mn_want": maxi(int(round(w2.max_hp * 0.35 * (1.5 if arm2[0] == "worn" else 1.0))), 1),
 			"drip_want": maxi(int(round(h2.max_hp * 0.05 * (1.5 if arm2[0] == "worn" else 1.0))), 1)}
 		await _clear(s2)
 	ok(int(v["worn"]["smite"]) == 0 and int(v["bare"]["smite"]) > 0,

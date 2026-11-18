@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-11-17 (Batch JZ &mdash; Rupture on its maker's turn)</b></p>
+<p align="right"><b>Last updated: 2026-11-17 (Batch KA &mdash; the kit cards' new figures)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -546,7 +546,7 @@ itself while it sweeps. <b>No healing or revival ability is ever gated.</b></p>
 <p><b>A RECAST THAT WOULD NOT IMPROVE IS REFUSED.</b> Re-applying most statuses keeps the BETTER
 of the two on both counts &mdash; the longer duration and the stronger power, never simply the newer
 one (Burn, Chilled, Poison and Ruin re-apply by rules of their own, in their own rows). Many powers are read LIVE at the moment of the cast (Vespers is a fifth of the Cleric's own
-maximum health, Nexus Ward a fifth of the Mage's, Divine Shield better than a third of the
+maximum health, Nexus Ward a quarter of the Mage's, Divine Shield better than a third of the
 Devout's), so recasting one while it still stands can produce a <i>smaller</i> number than the one
 already on the board. The smaller number is discarded; the turn, the resource and the cooldown are
 not. <b>So the cast is refused instead:</b> when an ability's whole effect is the status it
@@ -1149,7 +1149,7 @@ text. No banner text appears at the top of the battle.</p>
 <h2>5. Heroes</h2>
 <p><b>All ability damage is a % of the user's Attack</b> (see §4.3); the flat numbers in
 the kit lists below are the values at the class/spec base Attack, before node scaling.
-<b>Ability shields and healing scale off the CASTER's max health</b> (Nexus Ward 20%, Divine Shield 35%, Heal 40%,
+<b>Ability shields and healing scale off the CASTER's max health</b> (Nexus Ward 25%, Divine Shield 35%, Heal 40%,
 Renewal 15%/turn, Hymn of Hope reads each target's own health) — a beefier healer heals
 harder.</p>
 <p>All four classes are drafted every run (one of each). Sprites currently share the Soldier
@@ -1264,10 +1264,10 @@ does.</li>
 <tr><td><b>Pommel Strike</b></td><td>20 Rage, 2.0, 3cd, one enemy</td><td><b>25% of Attack</b> and <b>30 Break damage</b>, with a 25% crit chance of its own; the target is always <b>Stunned for 1 turn</b>, and a boss shrugs the Stun off until it is Broken. Builds 10 Rage (Perfect: the Stun lands even on an unbroken boss).</td></tr>
 <tr><td><b>Mocking Blow</b></td><td>free, 2.0, 1cd, one enemy</td><td><b>27% of Attack</b> and 15 Break damage; the target and one other enemy must attack him for 4 turns. Builds 10 Rage (Perfect: 5 turns).</td></tr>
 <tr><td rowspan="3"><b>Mage</b></td><td><b>Magic Burst</b></td><td>25 Mana, 3.0, 2cd, one enemy</td><td><b>40% of Attack</b> as arcane and 15 Break damage, and the target is left with <b>Elemental Weakness</b> for 3 turns: its resistance to every school but physical is 15% lower (&sect;4.6), so a Cleric's holy and a Survivalist's nature land harder on it as surely as the Mage's own arcane. A second burst refreshes the 3 turns (Perfect: 46% of Attack).</td></tr>
-<tr><td><b>Nexus Ward</b></td><td>25 Mana, 1.0, 4cd, self</td><td>Absorbs damage equal to <b>20% of his maximum health</b> for 3 turns. It is an ordinary barrier, so it eats every blow, area attacks included, but no tick, recoil or reflected damage.</td></tr>
-<tr><td><b>Magic Missiles</b></td><td>15 Mana, 2.0, 2cd, one enemy</td><td>Three bolts at <b>12% of Attack</b> each, 3 BD a bolt (Perfect: a fourth bolt).</td></tr>
-<tr><td rowspan="3"><b>Cleric</b></td><td><b>Ministration</b></td><td>20 Mana, 2.0, 2cd, one ally</td><td>Heals <b>20% of that ally's maximum health</b> (Perfect: 26%).</td></tr>
-<tr><td><b>Unburden</b></td><td>20 Mana, 1.5, 4cd, one ally</td><td>Removes <b>every</b> harmful effect from that ally, and they take <b>20% less damage for 3 turns</b>.</td></tr>
+<tr><td><b>Nexus Ward</b></td><td>25 Mana, 1.0, 4cd, self</td><td>Absorbs damage equal to <b>25% of his maximum health</b> for 3 turns. It is an ordinary barrier, so it eats every blow, area attacks included, but no tick, recoil or reflected damage.</td></tr>
+<tr><td><b>Magic Missiles</b></td><td>15 Mana, 2.0, 2cd, one enemy</td><td>Three bolts at <b>12% of Attack</b> each, 5 BD a bolt (Perfect: a fourth bolt).</td></tr>
+<tr><td rowspan="3"><b>Cleric</b></td><td><b>Ministration</b></td><td>20 Mana, 2.0, 2cd, one ally</td><td>Heals <b>35% of that ally's maximum health</b> (Perfect: 45%).</td></tr>
+<tr><td><b>Unburden</b></td><td>20 Mana, 1.5, 4cd, one ally</td><td>Removes <b>every</b> harmful effect from that ally, and they take <b>30% less damage for 3 turns</b>.</td></tr>
 <tr><td><b>Consecration</b></td><td>25 Mana, 1.0, 5cd, every hero</td><td>For 4 turns <b>every hero regains 5% of maximum health</b> at the start of each of their turns.</td></tr>
 <tr><td rowspan="3"><b>Hunter</b></td><td><b>Powershot</b></td><td>25 Mana, 3.0, 2cd, one enemy</td><td><b>20% of Attack</b> and <b>20 Break damage</b>, +2% damage for every point of the target's Break meter already full.</td></tr>
 <tr><td><b>Snare Trap</b></td><td>20 Mana, 2.0, 3cd, one enemy</td><td>The next time that enemy acts it is <b>Stunned for 1 turn</b> and <b>Poisoned for 4</b>. A boss shrugs the Stun off until it is Broken.</td></tr>

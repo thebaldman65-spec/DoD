@@ -1020,12 +1020,12 @@ const POMMEL_STRIKE_CRIT := 0.25              # Pommel Strike
 const MOCKING_BLOW_EXTRA_TAUNTS := 1          # Mocking Blow
 const MOCKING_BLOW_TURNS := 4                 # Mocking Blow
 const MOCKING_BLOW_PERFECT_TURNS := 5         # Mocking Blow
-const NEXUS_WARD_PCT := 0.20                  # Nexus Ward
+const NEXUS_WARD_PCT := 0.25                  # Nexus Ward
 const NEXUS_WARD_TURNS := 3                   # Nexus Ward
 const PERFECT_EXTRA_HITS := 1                 # Magic Missiles: the Perfect's extra missile
-const MINISTRATION_PCT := 0.20                # Ministration
-const MINISTRATION_PERFECT_PCT := 0.26        # Ministration
-const UNBURDEN_CUT := 0.20                    # Unburden: the cut in damage taken (the strike reads 1.0 less it)
+const MINISTRATION_PCT := 0.35                # Ministration
+const MINISTRATION_PERFECT_PCT := 0.45        # Ministration
+const UNBURDEN_CUT := 0.30                    # Unburden: the cut in damage taken (the strike reads 1.0 less it)
 const UNBURDEN_TURNS := 3                     # Unburden
 const CONSECRATION_TURNS := 4                 # Consecration
 const POWERSHOT_PCT_PER_POINT := 2.0          # Powershot
@@ -12512,7 +12512,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					strike_target.status_power("eye_storm") / 100.0, 0.95)
 				if strike_target.is_hero:
 					_prev(strike_target, es_was - raw)
-			# BATCH BQ — UNBURDEN's tail. A flat 20% while it holds, booked to
+			# BATCH BQ — UNBURDEN's tail. A flat cut (UNBURDEN_CUT) while it holds, booked to
 			# the prevented ledger like every other instrumented mitigation and
 			# CREDITED TO THE CLERIC WHO CAST IT rather than to the ally wearing
 			# it — Batch W's rule (a barrier's absorbs credit its caster, an
@@ -22884,10 +22884,10 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					"" if bl_turns == 1 else "s"], "#70d878")
 		"ministration":
 			# AXIS: the plain heal none of the three Clerics has. It reads the
-			# TARGET's maximum rather than the caster's, which is what keeps it
-			# the LESSER of it and Holy's Heal — its share of the Warden's maximum
-			# against Heal's larger share of her own smaller one — and the same Mercy
-			# multiplier is applied to both so the gap survives every build.
+			# TARGET's maximum rather than the caster's. Since KA's re-tune (JZ's
+			# ruling 1, the designer's) it out-heals Holy's Heal on a large ally and
+			# under-heals it on a small one; the same Mercy multiplier is applied to
+			# both, so Mercy never moves that comparison.
 			if target != null and not target.dead:
 				var mn_pct := MINISTRATION_PERFECT_PCT if is_perfect else MINISTRATION_PCT
 				# BATCH HF — ELEVENTH HOUR: twice as much on an ally below a quarter

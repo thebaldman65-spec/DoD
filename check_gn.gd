@@ -414,7 +414,7 @@ func _s1_the_twelve() -> void:
 		for e in foes:
 			_reset_foe(e)
 
-	# NEXUS WARD — a barrier worth 20% of the Mage's maximum health, 3 turns,
+	# NEXUS WARD — a barrier worth 25% of the Mage's maximum health, 3 turns (KA),
 	# and it eats a blow before his health does.
 	var ward_ab := _card(M, "Nexus Ward")
 	if ward_ab != null:
@@ -422,9 +422,9 @@ func _s1_the_twelve() -> void:
 		await s._resolve_special(M, ward_ab, M, "good", 1.0)
 		var ward: Dictionary = M.get_status("barrier")
 		var ward_power := int(ward.get("power", 0))
-		ok(not ward.is_empty() and ward_power == int(round(M.max_hp * 0.20))
+		ok(not ward.is_empty() and ward_power == int(round(M.max_hp * 0.25))
 				and int(ward.get("turns", 0)) == 3,
-			"§1: Nexus Ward raises a barrier of %d (20%% of %d) for 3 turns" % [ward_power, M.max_hp])
+			"§1: Nexus Ward raises a barrier of %d (25%% of %d) for 3 turns" % [ward_power, M.max_hp])
 		var lost_warded := await _blow(s, striker, M)
 		var ward_left: int = M.status_power("barrier") if M.has_status("barrier") else 0
 		M.remove_status("barrier")
@@ -433,33 +433,33 @@ func _s1_the_twelve() -> void:
 				and ward_left == maxi(ward_power - lost_bare, 0),
 			"§1: ...and it eats a blow before the Mage's health does (%d of a %d blow reached him; %d of the ward left)"
 				% [lost_warded, lost_bare, ward_left])
-		print("    Nexus Ward: barrier %d (20%% of %d) for %d turns; a %d blow reached him for %d" % [
+		print("    Nexus Ward: barrier %d (25%% of %d) for %d turns; a %d blow reached him for %d" % [
 			ward_power, M.max_hp, int(ward.get("turns", 0)), lost_bare, lost_warded])
 
-	# MAGIC MISSILES — three hits, 3 Break damage each.
+	# MAGIC MISSILES — three hits, 5 Break damage each (KA).
 	var missiles := _card(M, "Magic Missiles")
 	if missiles != null:
 		_ready_to_cast(M)
 		var hits_before: int = e0.hp
 		await s._resolve(M, missiles, e0, "good")
-		ok(e0.hp < hits_before and e0.pressure == 9,
-			"§1: Magic Missiles lands three bolts — 9 Break damage from three 3s (%d)" % e0.pressure)
+		ok(e0.hp < hits_before and e0.pressure == 15,
+			"§1: Magic Missiles lands three bolts — 15 Break damage from three 5s (%d)" % e0.pressure)
 		print("    Magic Missiles: %d damage, %d Break damage" % [hits_before - e0.hp, e0.pressure])
 		_reset_foe(e0)
 
-	# MINISTRATION — 20% of THE TARGET's maximum health.
+	# MINISTRATION — 35% of THE TARGET's maximum health (KA).
 	var mend := _card(C, "Ministration")
 	if mend != null:
 		_ready_to_cast(C)
 		W.hp = 1
 		await s._resolve_special(C, mend, W, "good", 1.0)
-		ok(W.hp - 1 == int(round(W.max_hp * 0.20)) and C.max_hp != W.max_hp,
-			"§1: Ministration heals the Warrior %d — 20%% of HIS maximum (%d), not the Cleric's (%d)"
+		ok(W.hp - 1 == int(round(W.max_hp * 0.35)) and C.max_hp != W.max_hp,
+			"§1: Ministration heals the Warrior %d — 35%% of HIS maximum (%d), not the Cleric's (%d)"
 				% [W.hp - 1, W.max_hp, C.max_hp])
 		print("    Ministration: the Warrior regains %d of his %d" % [W.hp - 1, W.max_hp])
 		W.hp = W.max_hp
 
-	# UNBURDEN — every harmful effect off, 20% less damage for 3 turns.
+	# UNBURDEN — every harmful effect off, 30% less damage for 3 turns (KA).
 	var lift := _card(C, "Unburden")
 	if lift != null:
 		_ready_to_cast(C)
@@ -473,8 +473,8 @@ func _s1_the_twelve() -> void:
 		var lost := await _blow(s, striker, H)
 		H.remove_status("unburdened")
 		var lost_plain := await _blow(s, striker, H)
-		ok(lost_plain > 0 and absf(float(lost) / float(lost_plain) - 0.80) <= 0.05,
-			"§1: ...and takes 20%% less from the same blow (%d against %d)" % [lost, lost_plain])
+		ok(lost_plain > 0 and absf(float(lost) / float(lost_plain) - 0.70) <= 0.05,
+			"§1: ...and takes 30%% less from the same blow (%d against %d)" % [lost, lost_plain])
 		print("    Unburden: two afflictions lifted; the same blow %d unburdened, %d without" % [lost, lost_plain])
 
 	# CONSECRATION — every hero, 4 turns, 5% of maximum at the turn start.

@@ -48,8 +48,9 @@ const RETIRED_RULE_ENGINES := ["quarry_hunt", "opening_strike"]
 const JG_CORE := "conviction"
 const JG_FIG := 0.11
 const JH_KEY := "heroes_all_hold_cores"
-# THE DESIGNED NAMES THE RECORD HOLDS (no list of reserved names exists): the conjunctions, their old names, the two engines owing new ones, and BA §1's space.
-const RESERVED := ["Seize", "Marrowfire", "Contagion", "Reckoning", "Breach", "Blight", "Skirmisher", "Tracker", "Virulence", "Epidemic", "Plague Bearer", "Creeping Death"]
+# THE DESIGNED NAMES THE RECORD HOLDS (no list of reserved names exists): the conjunctions, their old names, the two engines and the names
+# ruled for them at KA (built when Volley's and the Ambusher's rules are), and BA §1's space.
+const RESERVED := ["Seize", "Marrowfire", "Contagion", "Reckoning", "Breach", "Blight", "Skirmisher", "Tracker", "Common Foe", "Pounce", "Virulence", "Epidemic", "Plague Bearer", "Creeping Death"]
 
 var _g := Gate.new()
 var _docs := {}

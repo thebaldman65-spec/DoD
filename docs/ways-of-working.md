@@ -385,7 +385,8 @@ party guessing now.
   round trip costs the designer time and buys nothing, because the premises are verified against the code either way.
 · **THE STANDING WORD IS UNCHANGED, AND SO IS THE RULINGS TABLE** — `CLAUDE.md`'s *DO NOT ASK. DECIDE, AND SAY WHAT YOU
   DECIDED*: nothing waits on a reply, and a choice that is the designer's goes to NEEDS A RULING with the recommendation
-  already taken. The table is the best artifact in this system and not a formality.
+  already taken. The table is the best artifact in this system and not a formality. **A balance choice is the one exception since
+  KA** (the designer's word, in that block's last bullet): it is put to the designer with its options rather than taken.
 
 ## WHO OWNS WHAT
 
