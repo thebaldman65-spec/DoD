@@ -71,7 +71,7 @@ func _draw_screen() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
 
-	# PROPOSED WORDS (GK). The old line promised the choice was "permanent for
+	# GK's words, accepted as they read (JY's ruling 1, at JZ). The old line promised the choice was "permanent for
 	# the run", which the charter makes false: an engine can be dropped or swapped.
 	var subtitle := Label.new()
 	subtitle.text = "Take one of three core runes — %d more can join it later, and any can be dropped (hero %d of %d)" % [
@@ -153,7 +153,7 @@ func _draw_screen() -> void:
 		body.text = engine_text
 		var adds := _adds(key, lineage, pid, shared)
 		if adds != "":
-			# PROPOSED WORDS (GQ).
+			# GQ's words, accepted as they read (JY's ruling 4, at JZ).
 			body.text += "\n\nAlso opens with: %s" % adds
 		# BATCH HB §4 — AND WHAT IT OPENS WITHOUT: the Sharpshooter dismisses the
 		# pet, so his card leaves Summon Companion out of the kit drawn below it.
@@ -226,8 +226,8 @@ static func _ability_text(ab: Ability, atk: int) -> String:
 func _draw_kit(column: VBoxContainer, key: String, shared: Array, base_atk: int,
 		dealt: Array) -> void:
 	var head := Label.new()
-	# PROPOSED WORDS (GQ); "or leaves out" is HB's, for the Sharpshooter's rune,
-	# which opens without the pet.
+	# GQ's words, accepted as they read (JY's ruling 4, at JZ); "or leaves out" is HB's,
+	# for the Sharpshooter's rune, which opens without the pet.
 	head.text = "With no core rune, the %s opens every fight with these. A rune adds, or leaves out, what its card names." % key.capitalize()
 	head.add_theme_font_size_override("font_size", 14)
 	head.add_theme_color_override("font_color", Color(0.82, 0.74, 0.55))
@@ -250,7 +250,7 @@ func _draw_kit(column: VBoxContainer, key: String, shared: Array, base_atk: int,
 				break
 	if not movers.is_empty():
 		var note := Label.new()
-		# PROPOSED WORDS (GQ).
+		# GQ's words, accepted as they read (JY's ruling 4, at JZ).
 		note.text = "Figures are for the %s with no core rune: %s, and they move with it." % [
 			key.capitalize(), " and ".join(movers)]
 		note.add_theme_font_size_override("font_size", 12)

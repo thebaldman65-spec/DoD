@@ -26,8 +26,8 @@ file as a rule file, so a pin written against it is inside the instruments' terr
 §5 asserts that every heading here has one row in `CLAUDE.md`'s index and that no rule stands in
 both files.
 
-**THIS FILE IS UNDER THE SAME CEILING PROCEDURE AS `CLAUDE.md` AND HAS NO STATED CEILING.** Deriving
-one is a ruling; the arithmetic is in `docs/reports/GR.md` §5. **Do not state this file's live size
+**IT TAKES NO CEILING** — JY's ruling 14, accepted at JZ: the file is read only when a batch changes how a fight resolves. EE's
+method for one is in `docs/reports/GR.md` §5. **Do not state this file's live size
 in this file.**
 
 ---

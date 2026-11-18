@@ -2486,6 +2486,44 @@ func sanctity_steps() -> int:
 	return mini(sanctity_events / SANCTITY_PER_STEP, SANCTITY_MAX_STEPS)
 
 
+# BATCH JZ §4 — THE THREE CLASS ENGINES SHOW THE STEPS BUILT (JY's ruling 7, the designer's): the count on
+# the engine's own chip, `n/cap`, as the Weaver's count and Aper's Rhythm read; the rule text is
+# `Classes.engine_desc`'s, resolved as the spawn resolves it, and the live line sits under it. Display
+# only — no event, no float, no die — and it rewrites the chip only when the count or its line moved.
+var _meter_seen := {}
+
+
+func _meter_live(pid: String) -> Array:
+	match pid:
+		"momentum":
+			return [mini(momentum, MOMENTUM_MAX_STEPS), MOMENTUM_MAX_STEPS, ""]
+		"channel":
+			var c := channel_steps()
+			return [c, CHANNEL_MAX_STEPS, "Mana spent: %d." % mana_spent if c >= CHANNEL_MAX_STEPS
+				else "Mana spent: %d; the next step at %d." % [mana_spent, (c + 1) * CHANNEL_MANA_PER_STEP]]
+		"sanctity":
+			var n := sanctity_steps()
+			return [n, SANCTITY_MAX_STEPS, "Status changes: %d." % sanctity_events if n >= SANCTITY_MAX_STEPS
+				else "Status changes: %d; the next step at %d." % [sanctity_events, (n + 1) * SANCTITY_PER_STEP]]
+	return []
+
+
+func refresh_meter_chips() -> void:
+	for pid in ["momentum", "channel", "sanctity"]:
+		if not engines.has(pid) or engine_chip(pid).is_empty():
+			continue
+		var live := _meter_live(pid)
+		var short := "%d/%d" % [int(live[0]), int(live[1])]
+		var line := "Steps built this battle: %d of %d." % [int(live[0]), int(live[1])]
+		if String(live[2]) != "":
+			line += "\n" + String(live[2])
+		if String(_meter_seen.get(pid, "")) == short + "|" + line:
+			continue
+		_meter_seen[pid] = short + "|" + line
+		update_engine_chip(pid, short, "%s\n%s" % [Classes.resolve_values(Classes.engine_desc(pid),
+			Classes.value_ctx_from_unit(self)), line])
+
+
 # Sanctity's payout: EXTRA TURNS on a status this unit applies. Read at
 # `battle._apply_status`, off the APPLIER, and never off the victim — which is
 # the read `mod_status_turns` (Fleeting) already occupies pointing the other way.
@@ -3327,6 +3365,8 @@ func refresh_bars() -> void:
 				s.desc = "%s\n%s" % [Classes.engine_desc(String(re_pid)), String(re_live[1])]
 				_refresh_chips()
 				break
+	# BATCH JZ §4 — and the three class engines' step count, display only.
+	refresh_meter_chips()
 	var pressure_ratio := clampf(pressure / float(stability), 0.0, 1.0)
 	_pressure_fill.size.x = PLATE_BAR_W * pressure_ratio
 	_pressure_text.text = "Break %d/%d" % [pressure, stability]

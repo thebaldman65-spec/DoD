@@ -36,8 +36,8 @@ rather than decorative. And
 `build_pin_manifest.py` and `check_ec` both treat this file as a tracked document, so a pin written
 against it is inside the instruments' territory rather than outside it.
 
-**THIS FILE IS UNDER THE SAME CEILING PROCEDURE AS `CLAUDE.md` AND HAS NO STATED CEILING YET.** A
-ceiling is DERIVED, not chosen, and deriving one is a ruling; the arithmetic is in
+**THIS FILE TAKES NO CEILING (ruled at JZ, JY's ruling 14, the designer's): it is opened on demand, and a ceiling bounds what
+every batch reads.** A ceiling is DERIVED, not chosen; the arithmetic for one is in
 `docs/reports/EF.md` §2 and the live size is printed by `check_fr` §5 every battery. **Do not state this file's live
 size in this file.**
 

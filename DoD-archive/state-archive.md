@@ -17,6 +17,611 @@ heading stands in both files. **Since JE §3 it also takes what `CLAUDE.md` clos
 
 ---
 
+## ARCHIVED AT JZ — 2026-11-17, FROM `docs/state.md` AS JY LEFT IT (`c293029`)
+
+*In the order they stood. The designer accepted JY's eighteen rulings as recommended on 17 November (`RECORD_JZ.md` in JZ's work folder; `docs/reports/JZ.md` §0): JY's RULINGS OWED, struck; the fourteen sections every audited item of which that answer closed, whole and struck; and 54 answered items of 13 more sections, each where its words stood alone on whole lines (`docs/reports/JY-audit.tsv` names every item's ruling). An answered item whose words share a line with live ones stays in `docs/state.md`, and its section's head says so.*
+
+### ~~JY's RULINGS OWED~~ — **ALL EIGHTEEN ACCEPTED AS RECOMMENDED BY THE DESIGNER, 17 NOVEMBER (JZ's RECORD); BUILT AT JZ: RUPTURE (2), THE FIVE TEXTS (4), APER (5) AND THE METERS' COUNT (7); THE KIT CARDS' FIGURES (3) AND THE NAMES (10) HANDED BACK AS JZ's RULINGS; PER-HERO RELICS (12) STILL RULED AND NOT BUILT**
+
+*Its head as it stood: EIGHTEEN; ONE ACCEPTANCE OF SIXTY-THREE ITEMS BUILT AS TAKEN, SIXTEEN OPEN QUESTIONS THE AUDIT FOUND AND JY's OWN READINGS — EACH WITH A RECOMMENDATION; NOTHING BUILT ON ONE BUT JY's OWN READINGS (18), AND NONE HOLDS UP A BATCH: 10, 11 AND 12 EACH WAIT ON THEIR OWN ANSWER*
+
+Full working: `docs/reports/JY.md`, NEEDS A RULING; every item's row, its evidence and a line in the player's terms: `docs/reports/JY-audit.tsv`.
+
+1. **SIXTY-THREE ITEMS BUILT AS TAKEN, ACCEPTED IN ONE WORD (JY §1).** Each records a default a batch built — a figure, a rule, proposed words — and the game holds it as the item says (a second reader, asked to refute each, confirmed 60; it refuted HW-5's glossary half and GO-3's Bastion text, both rewritten since, so those two stand for the rest, and was unsure of GX-1, which HC's brief may already have settled). **The items**: HW's 5; HJ's 1; HF's 1 to 3; GX's 1; GV's 2; GU's 3; GT's 1 and 2; GQ's 2; GO's 1, 3 and 5 to 10; GN's 1 to 5; GM's 5 and 6; GK's 2 to 6 and 9; GJ's 1 to 3; the talent layer's four things (FX); Long Draw's words (GE); the three spines' four (FT); the Shared Mark's 5 Focus; the enemy debuffs that outlast their cooldown (CX); Profligate's price and this file's ceiling (THE PLAYTEST'S OTHER FINDINGS); Sanctity's step of 13 though play read 1.17 steps a fight, the Vow though play read it an auto-take at 2.2 to 1, and Boil Over (THE FIRST CLEAN PLAYTHROUGH); six of THE ARCHETYPE TAGS' questions, among them the seven-word set and no eighth tag; Ashes of Al'ar's cooldown (THE DRAFT AUDIT); four of THE BOSS-PICK POOLS', among them Sanctuary staying in Holy's boss pool (DY's move, not taken); Arcane Surge's 3.0. **Recommended**: accept them as taken; the next batch archives each and the sections they empty. **The alternative**: name any to keep open.
+2. **RUPTURE NEVER GRINDS IN PLAY (PLAY-1, PLAYTEST-b4).** Burn and Chill on one enemy make a Rupture, which deals its Break only on that enemy's own turns; the Cryomancer's fourth Chill holds the enemy, so it takes none; in the sim a Rupture stands on 1.7% of a Cryomancer's turns (IW). A shape to change, not a figure. **Recommended**: a Rupture ticks on the turn of the hero who made it. **The alternatives**: a held enemy still takes its Burn and Rupture ticks on the turns it loses; or leave it a rare combination.
+3. **THE CLASS-WIDE AND KIT CARDS WRITTEN WEAK (GP-1, GN-7).** Twenty of the 22 class-wide cards (JQ's Read the Tell and Forsake came after), and five kit cards every Mage and Cleric starts with, were written below the lineage cards on purpose, by a rule the designer retired at HD; none was re-tuned. **Recommended**: a batch sets each beside the pool's cards of its role — a price comparison on paper, not a balance drive (JO's floor) — and proposes figures for the designer's approval, the five kit cards first; unlike ruling 16's three, these were made weak by a rule that no longer stands. **The alternatives**: keep them as the pool's plain commons, judged in play; or retire the weakest few.
+4. **FIVE PLAYER-FACING TEXTS (HF-4, GM-4, CODE-b6, GO-11, GQ-1).** Mark of the Hunt's card still says *"Works with or without a companion"*, though the Hunter's own half needs the Rune of the Beastmaster — **recommended**: HF's proposal B, *"Mark an enemy for 7 turns: the Hunter's and the companion's attacks on it deal +25% damage, and every strike on it restores 3% of the Hunter's max Mana. The companion's half needs only a companion; the Hunter's needs the Rune of the Beastmaster. The cooldown resets if the marked enemy dies."* The Split Shield's covered ally wears a chip and a block line called *Bulwark Line*, a talent deleted at FX, under a hover that says *Split Shield* — **recommended**: rename both Split Shield. A refused recast says *Frozen* where the enemy's chip says *HELD* — **recommended**: say Held. Fifteen older core runes' texts open with their engine's name (*Overburn:*, *Momentum:*) where the designer ruled engine names never reach the player — **recommended**: keep that ruling to the nine it was built for, since the fifteen names are words the player meets on cards and meters. The class-selection screen's three lines for a hero with no core rune, still marked PROPOSED — *"Also opens with: …"*, *"With no core rune, the [class] opens every fight with these. A rune adds, or leaves out, what its card names."* and *"Figures are for the [class] with no core rune: …, and they move with it."* — **recommended**: accept them as they read. **The alternative**: any of the five as it stands, or words the designer writes.
+5. **APER AND THE THREE COMPANION CARDS (HF-5).** With Aper alone out, Kill Command spends the turn and the boar does nothing, and Ghostpack and Call of the Wild leave it out. **Recommended**: Aper obeys Kill Command with an ordinary charge, counting toward its every-third stun, and joins the other two cards when its rune is worn. **The alternatives**: Kill Command only; or the cards say Aper does not answer.
+6. **COUNTER TIME BESIDE POMMEL STRIKE (HW-4).** It costs more and deals nothing for the same one-turn stun; its edge is that it cannot miss, be parried or be blocked. **Recommended**: leave it until play shows nobody takes it. **The alternatives**: a small extra (Break damage, or a lower cost); or make a stun's length count both its turns, which moves every stun.
+7. **THE SECOND METERS' LIVE COUNT (SPINES-b5).** A hero holding Momentum, Channel or Sanctity cannot see how many steps he has built. **Recommended**: the count on the engine's own chip (*3/8*), as Bloodrage and Lethal Aim show theirs. **The alternatives**: a second fill on the nameplate bar; or keep it hidden.
+8. **RUNE TAGS ARE NEVER SHOWN (ARCH-q10).** Runes carry tag words in the data that nothing displays. **Recommended**: keep them hidden — since FN no rune may carry a condition on a tag (the designer's ruling), so the words would show the player something that changes nothing. **The alternative**: show them where runes are offered, as draft cards show theirs.
+9. **LONG DRAW's PLAYER (GE-b1).** Its extra press is a gain for a player who times well and a loss for the sim's bot at a flat 85%. **Recommended**: balance it for the human — keep the drain at 16. **The alternatives**: balance it for the bot (a smaller drain or a larger pay); or make it a real trade for a skilled player.
+10. **THE TRACKER's AND THE SKIRMISHER's NEW NAMES (PLAYTEST-b8; GO-2 archived).** Ruled in conversation, recorded at HP §7: the two become ordinary runes, and each owes a new name before it is built (THE SKIRMISHER AND THE TRACKER); the Hunter's cores are Volley and the Ambusher. Until then the Rune of the Tracker shares its name with the Hunter's *Tracker* passive, and both show on one screen. **Recommended**: name the two from a short list a batch offers, so one batch can build the change. **The alternative**: withdraw the ruling and keep both as they are — live, and working.
+11. **FIVE IDEAS NEVER SPECIFIED (CX-b1, PLAYTEST-b3, PLAYTEST-b6, PLAYTEST-b7, CODE-b1).** Enemy interference with the skill check; Channel's tempo payout (*Mana spent buys speed*); what Marrowfire (Sunder and Burn) does; the Occultist's Break card; the event that trades *a held rune for two of lower rarity*, which cannot be built while runes have no rarity. **Recommended**: the first four wait as ideas until the designer writes their shape — Channel's payout and the Occultist's card a batch can draft as options the day the designer asks, Marrowfire after Rupture works — and the event is retired: the Peddler already turns a rune into gold. **The alternatives**: write any of the shapes now for a batch; or retire any.
+12. **PER-HERO RELICS (CX-b3, CX-b4).** Before a relic can belong to one hero: do the after-fight heal, the Mana refill, the fallen hero's recovery and Bottled Storm's opening resource help only their holder or every hero, and should a relic still be handed out at the draft, before the classes are chosen? **Recommended**: keep those four for every hero, as their text says, and hand each relic to a hero after the classes are chosen, on the first map. **The alternatives**: each pays its holder alone; or withdraw the per-hero ruling.
+13. **THE TALENT LAYER's EDGES, FOR WHEN A NEW TALENT IS WRITTEN (FX-E2 to FX-E6).** **Recommended**, each as the 27 built talents already stand: the run's setup — gold, the shop, the pouch, rewards — stays a relic's, never a talent's; *a talent may not touch an engine* means its meter only, not the ordinary stats an engine counts; the four class passives are off-limits; no talent touches the basic attack; a talent counts statuses and never reads a named one. **The alternatives**: each edge opened, as FW's brief listed them.
+14. **THE SIZE OF THE TWO REFERENCE FILES (GR-1, AWAIT-b2).** `docs/combat-rules.md` (51 KiB) and `docs/instrument-rules.md` (221 KiB) have no ceiling. **Recommended**: none — a ceiling bounds what every batch reads, and these two are opened on demand. **The alternatives**: GR's 70 KiB for the first; or a ceiling each by `CLAUDE.md`'s method.
+15. **WHAT THE KNOWLEDGE SYNC CARRIES (SYNC-b1, CODE-b9, FX-E9).** Only the designer's picker knows: whether `docs/reports/` is selected (the rules file still calls it disputed); whether `text-audit.html` and `talent-audit.html`, both closed, leave it; whether `systems-recon.html` joins it. **Recommended**: reports stay out and are forwarded by hand; the two closed audits leave; the recon page stays out. **The alternative**: select the reports, keep the audits, or add the recon page.
+16. **THREE PRICES NEVER RULED (FN-b1, CODE-b8, PRICING-q2).** Wide Rite and Heavy Bolts, always on since FN took their conditions off, cost every rune's flat 150g; Mind Flay, a shelf card any Occultist drafts, overlaps Hex of Ruin, his enabler; Divine Wrath stacks its damage term on Blessing of Zeal's and was never priced against anything. **Recommended**: leave each as it stands — balance is judged in play (JO's floor). **The alternative**: a batch proposes figures for any of them.
+17. **A BOSS AWARD WITH NOTHING LEFT TO OFFER (BOSSPICK-q1, AWAIT-b1).** The award falls back from the boss pool to the hero's one class pool; a hero who owns every card his class can be offered gets nothing, the award skipped — EA's *always pays* fails in that case alone. **Recommended**: accept the skip — no run is known to reach it (not measured, and the state's *Carried* block says it is no guarantee). **The alternative**: gold or a rune in its place.
+18. **JY's OWN READINGS (JY §1).** **Taken**: a brief's words count as the designer's for a ruling a later batch built on; an item that asks the designer nothing is left where it stands, unless it shares a line that went to the archive (two records did); a settled half of a bullet whose other half is live stays with it; an item is archived only when a second reader, asked to refute it, could not, no gate reads its words where they stood and no live text points at it (GM-1), and a claim the second reader refuted goes back to the designer, or to the class the refutation names. **The alternative**: any of these read the other way, and the audit's table re-sorts in a line.
+
+### THE FIRST CLEAN PLAYTHROUGH — **2026-10-18, WARDEN, ZONE ONE THROUGH ITS BOSS; SIX FINDINGS, THE DESIGNER's TO RULE OR AUTHOR, NOTHING BUILT FROM THEM BUT JN §0's CUT (IP §0.1, §4); THE DRIEST CLERIC's RULED AT JN §0 (ARCHIVED AT JY)** — ITS ANSWERED ITEMS (archived at JZ; the section stays in `docs/state.md`)
+
+*Answered at JZ — PLAY-1: a Rupture ticks on the turn of the hero who made it — built at JZ §1.*
+- **RUPTURE IS UNREACHABLE, NOT MIS-TUNED.** The one Rupture formed at turn 20 on the mini-boss's Orc Chief (the Mage's Burn on his
+  own chill) and its body died at turn 29: **stood 0 of its body's turns, ticks 0, Break 0.** The Mage held the Cryomancer's core
+  by then, the Cryomancer's fourth chill FREEZES a body, and **a Rupture grinds on its body's own turns** — so the class that lays
+  the chill takes the turns the Rupture pays on. Both Ruptures ever recorded ground nothing (IH's, debug-touched, stood one turn).
+  **The designer's to author; no number fixes it** — `RUPTURE_BREAK_PER_TICK` is unmoved.
+
+*Answered at JZ — PLAY-2: accepted as taken.*
+- **SANCTITY: A NORMAL FIGHT BOOKED 18.33 EVENTS AND 1.17 STEPS**, against the bot's 40.43 and 2.56 at IO §3's rung-1 road — **the
+  bot books 2.2 times a player's status events** (different roads: the player's at rung 2 with his own party, the bot's at rung 1
+  beside the default lineages, both untalented) — **and the boss booked 51, 2.78 times a normal fight.** *(The brief set that against
+  FV's 1.55: 1.55 is II's brief's figure, a ratio of STEPS — IG's boss 4.04 against 2.58 — where FV's own boss-to-trash ratio of
+  EVENTS read 1.09–1.16; the playthrough's steps ratio is 3 against 1.17, 2.57.)* **So a step set for half the cap in a normal
+  fight puts a boss at 1.4 times the cap.** The target and the cap are the designer's; `SANCTITY_PER_STEP` is unmoved.
+
+*Answered at JZ — PLAY-3: accepted as taken.*
+- **THE VOW PAID 2.2 TO 1**: over the seven fights it was worn, **322 damage refused for 707 healing added**, where ID ruled it
+  roughly even — **an auto-take in zone one at rung 2** (TO WATCH IN PLAY's vow item).
+
+*Answered at JZ — PLAY-5: accepted as taken.*
+- **BOIL OVER WAS NEVER DRAFTED**, so its rate is still unfelt; the question is its availability, not its figure (BOIL OVER'S
+  RATE, below).
+
+### HW's RULINGS OWED — **THREE LEFT; THE TOAST'S WAS ANSWERED IN HZ's BRIEF AND BUILT AT HZ §3 (IT NAMES THE PET), AND THE MERCHANT'S READING IN IN's BRIEF (BUILT AT IN §2)** — ITS ANSWERED ITEMS (archived at JZ; the section stays in `docs/state.md`)
+
+*Answered at JZ — HW-4: Counter Time left as it stands until play shows nobody takes it.*
+4. **COUNTER TIME BESIDE POMMEL STRIKE (§3).** At one turn it is Pommel Strike's stun without the blow — its edge is that it
+   cannot miss, be parried or be blocked, and it stacks a second stun in a window. Whether it wants more is the designer's;
+   its second turn back is the stun-length system, ruled out of this batch.
+
+*Answered at JZ — HW-5: accepted as taken.*
+5. **THE WORDS, PROPOSED**: Charge's *DAZED for 2 turns* (Perfect: *Dazed for 3 turns*); Counter Time's *loses its next
+   turn*, on the card and in its log line; Snare Line's card without its chilled clause; the glossary's three (Runes, the
+   Peddler, Severity); `master.html`'s rows (the partner-spec table is eight). **IJ §2 has since moved Snare Line's (*Stun*,
+   not *Break*) and all three glossary entries'** — what waits for confirmation is IJ's words now (IJ's ruling 10).
+
+### ~~HJ's RULINGS OWED~~ — **ITS ONE ITEM ACCEPTED AS TAKEN (JY's RULING 1, ACCEPTED AT JZ)**
+
+*Its head as it stood: ONE, AND NOTHING WAITS ON IT*
+
+Full working: `docs/reports/HJ.md`, NEEDS A RULING.
+
+1. **THE DEBUG TOGGLE'S NAME — PROPOSED: *"All Class Abilities Unlocked"*.** HI's ruling is built: the toggle grants the
+   hero's class draft pool and his lineage's zone-boss pool (the boss half is HJ's implementation call — the boss pools
+   were not merged — stated so it can be ruled otherwise). The label is the map burger's menu item and nothing keys on
+   it; the variable and the sim flag never said *spec*. Confirm, or name it.
+
+### ~~HF's RULINGS OWED~~ — **ALL FIVE ANSWERED AT JZ: THE THREE MAGNITUDES ACCEPTED AS TAKEN (JY's RULING 1); MARK OF THE HUNT's WORDS AND APER's ORDERS RULED (JY's RULINGS 4 AND 5) AND BUILT AT JZ**
+
+*Its head as it stood: FIVE; THE FIRST THREE ARE MAGNITUDES THE BRIEF LEFT UNSET, THE FOURTH IS WORDING*
+
+Full working: `docs/reports/HF.md`, NEEDS A RULING.
+
+1. **BURNING GROUND'S BURN — PROPOSED 5% OF THE CLERIC'S MAXIMUM HEALTH, HOLY, AT THE START OF EACH OF HIS TURNS WHILE
+   HIS CONSECRATION HOLDS.** Priced against Consecration's own 5% heal, pointed the other way: four burns a cast, 6 to
+   each enemy at his 121 maximum, 72 over a cast against three enemies beside the heal's ~97 across four heroes. The
+   magnitude is the rune's payload (`rune_burning_ground` 0.05), so a ruling moves data. If the card should name a
+   number, wording is proposed.
+2. **APER'S BODY, CHARGE AND BOON — PROPOSED.** 80 health and a charge of 20% of the Hunter's Attack (the wolf's and the
+   eagle's); Pack Bond's boon its own charge, 15% harder a step of the bond's curve (the wolf's rate). No arrival
+   effect and no raw-stack gift: none was authored.
+3. **ABUNDANCE'S SHIELD — IT ADDS, IT HOLDS TWO TURNS (PROPOSED), AND NO CEILING WAS WRITTEN.** Under Consecration it
+   grows by the drip's spill every turn (about 5% of each maximum), and it is bounded by the healing poured into full
+   bars. Cap it, or let it stand.
+4. **MARK OF THE HUNT'S TEXT — TWO PROPOSALS THAT NAME WHAT EACH HALF NEEDS.** (A) keeps the card's five lines and
+   replaces the sixth; (B) also takes out the *"you"* and *"your"* the text standard forbids. HE's proposal no longer
+   fits. The designer confirms.
+5. **KILL COMMAND HAS NO ORDER FOR APER, AND GHOSTPACK AND CALL OF THE WILD NAME THE THREE.** A card that orders a
+   companion by kind does nothing for a kind it does not name; none was given an arm (a card's effect is the
+   designer's). The smallest fix, if wanted: Aper obeys Kill Command with an ordinary charge.
+
+### ~~GX's RULINGS OWED~~ — **ITS ONE ITEM ACCEPTED AS TAKEN (JY's RULING 1, ACCEPTED AT JZ)**
+
+*Its head as it stood: ONE LEFT; THE SECOND AND THIRD ARE BOTH CLOSED AT GY*
+
+Full working: `docs/reports/GX.md`, NEEDS A RULING.
+
+1. **THE BATTLE LOG'S ROLL CALL WAS A FOURTH SURFACE AND THE BRIEF NAMED THREE.** The brief's §1 listed the pouch,
+   the hero sheet, the Peddler and a cache offer. The census found a fifth thing that shows a held rune — the
+   `Rune:` lines the spawn writes into the combat log — and **a rune that sits out was named there in the log of a
+   fight it paid nothing in**. It says so now. **This is the one place GX went past what the brief named**, on the
+   brief's own instruction that *every* surface says it, and the asymmetry is real: a card that sits out is absent
+   from the fight, so GT had nothing to mark; a rune is still equipped and its payload is still applied. Whether a
+   log line should carry it, or the screens are enough, is the designer's.
+
+### ~~GV's RULINGS OWED~~ — **ITS ONE ITEM ACCEPTED AS TAKEN (JY's RULING 1, ACCEPTED AT JZ)**
+
+*Its head as it stood: THREE LEFT; THE FIRST AND THE FOURTH ARE ANSWERED AT GW*
+
+Full working: `docs/reports/GV.md`, NEEDS A RULING.
+
+2. **THE GATE READS WHAT HE HAS EQUIPPED, AND THAT IS THE ONLY READING THAT GATES ANYTHING.** *(Its reason was the
+   spec scope, which went at HC §1: a row reaches every hero of its class now, most of whom do not own its engine, so
+   the equipped reading withholds far more than it did; the ruling asked for stands.)* A spec rune is offered by
+   LINEAGE, the lineage is the engine taken at class selection, and nothing sells or discards an engine rune — so every
+   hero who can be offered a row owns its engine all run, and an ownership gate would withhold nothing. **What the
+   designer asked to be told**: a hero who unequips his engine is sold different runes at the Peddler (rolled as he
+   stands, re-equipping before the visit restores them), a cache or bargain ROLLED while it was out never contains its
+   rows at all, and an elite fought with it out drops a cache without them — the same reading the card draft already
+   takes at a victory.
+
+### GU's RULINGS OWED — **TWO LEFT, BOTH PLAYER-VISIBLE, THE FIRST RULED AND NOT BUILT; GUARD CHANGE's SETTLED AT HL §1 (ARCHIVED AT JY)** — ITS ANSWERED ITEMS (archived at JZ; the section stays in `docs/state.md`)
+
+*Answered at JZ — GU-3: accepted as taken.*
+3. **SWEEPING STRIKES IS THE ONE MAGNITUDE GU MOVED** — cooldown 0 → 2, Crushing Blow's — on the batch's judgment that
+   it is a genuine mispricing (the brief delegated the grouping). The groupings of the other ten are the batch's
+   reading, reported and ruled on by nobody, per the brief.
+
+### ~~GT's RULINGS OWED~~ — **BOTH ACCEPTED AS TAKEN (JY's RULING 1, ACCEPTED AT JZ)**
+
+*Its head as it stood: TWO LEFT; THE THIRD RULED AND THE FOURTH ANSWERED AT GU*
+
+Full working: `docs/reports/GT.md`, NEEDS A RULING.
+
+1. **FIREBALL'S AND FROSTBOLT'S MOVES ARE LARGE, AND NOT FOR THE REASON THE BRIEF EXPECTED.** Free with no cooldown to
+   15 Mana and cooldown 2 — both were basic attacks until GS, and a basic is free by construction, so the size measures
+   the change of job the merge gave them, not a price that was wrong before it. Aimed Shot moved by 5 Mana and one
+   turn. **Parity on both axes is what was built** (the baseline read off the kit card); the smallest move that ends
+   EB's inversion is one axis — Fireball and Frostbolt free with cooldown 2, or 15 Mana with none — and is priced in
+   the report.
+2. **A CARD THAT SITS OUT KEEPS ITS SLOT.** Built as GM §2 left a dropped bound card's: it is still carried and still
+   counted, and benching frees the slot. Freeing it automatically would let the player fill it, and the engine's
+   return would then leave the kit over its cap — which is the ruling this would need.
+
+### ~~GR's RULINGS OWED~~ — **ANSWERED AT JZ: NO CEILING FOR EITHER REFERENCE FILE (JY's RULING 14)**
+
+*Its head as it stood: ONE LEFT; THE SECOND IS CLOSED AT GY §1*
+
+Full working: `docs/reports/GR.md`, NEEDS A RULING.
+
+1. **`docs/combat-rules.md` HAS NO STATED CEILING**, like `docs/instrument-rules.md`. EE's method on its own record —
+   the file as split, 29.73 KiB, plus ten of the largest single-batch growth its nine blocks have ever had (+4,340 B,
+   the crit rule's birth at EW) — gives 72.11 KiB, stated **70 KiB**. It has grown +19.5 B a batch since FF, so the
+   figure is the designer's to adopt or not, not a wall anyone is near.
+
+### ~~GQ's RULINGS OWED~~ — **BOTH ANSWERED AT JZ: THE CLASS-SELECTION LINES ACCEPTED AS THEY READ, THEIR PROPOSED MARK REMOVED (JY's RULING 4), AND THE OTHER ACCEPTED AS TAKEN (RULING 1)**
+
+*Its head as it stood: TWO LEFT, BOTH PLAYER-VISIBLE; THE THIRD RULED AND TAKEN AT GR*
+
+Full working: `docs/reports/GQ.md`, NEEDS A RULING.
+
+1. **THE CLASS-SELECTION SCREEN'S NEW WORDS ARE PROPOSED.** On a card, *"Also opens with: …"* and *"(in place of
+   Magic Bolt)"* — **the second went at GS §1, which left no engine replacing a basic, and the first now names an
+   enabler alone**; under the cards, *"With no engine, the Warrior opens every fight with these. A rune adds what its card
+   names."*; and on a Warrior's screen dealt the Rune of the Warden, *"Figures are for the Warrior with no engine: the
+   Rune of the Warden sets Attack to 75, and they move with it."* **Since GS the same line names the Rune of the
+   Occultist on a Cleric's screen** (Attack 100): an Occultist opens on Smite now, and Smite reads his Attack.
+2. **THE CARD'S TEXT WINDOW IS FIXED AT 280 PIXELS**, so a deal of three short rules shows empty card space. Sized so no
+   rune's text scrolls and the kit fits the screen, with the kit and the buttons in one place on every deal; cards fitted
+   to the tallest text on the screen would move both from deal to deal, and were not taken.
+
+### GO's RULINGS OWED — **TWELVE; ALL BUT THE LAST TWO ARE PLAYER-VISIBLE; THE BASTION's (4) ARCHIVED AT IQ, THE NAMES' (2) ANSWERED AT HP §7 AND ARCHIVED AT JY** — ITS ANSWERED ITEMS (archived at JZ; the section stays in `docs/state.md`)
+
+*Answered at JZ — GO-1: accepted as taken.*
+1. **FOUR PROPOSED MAGNITUDES** — the Reaver's +10% a kill (uncapped, as ruled), the Leech's 25% returned and 1 Mana
+   a point, the Arbiter's 5% of the damage, and the Skirmisher's +200% (*enormous*, read as triple). The ruled
+   numbers are in: every third cast, half strength, 25%, 5% and halved.
+
+*Answered at JZ — GO-3: accepted as taken.*
+3. **THE NINE RULE TEXTS AND THE THREE CHIPS** (*Tracked*, *Judged*, *Oathbound*) are the batch's words.
+
+*Answered at JZ — GO-5: accepted as taken.*
+5. **THE WEAVER REPEATS DAMAGE, NOT THE CARD** — half of what each enemy took, no status, heal, summon, Break damage
+   or second consumption. His basic attack counts as a cast; a counter does not.
+
+*Answered at JZ — GO-6: accepted as taken.*
+6. **THE LEECH** pays after a barrier and before Conversion, falls through to health at zero Mana, and books nothing
+   as Mana spent.
+
+*Answered at JZ — GO-7: accepted as taken.*
+7. **THE OATHKEEPER'S BOND** is chosen by the game — the other hero with the lowest maximum health — and never by the
+   player; it is HERO by choice; it passes on the bound hero's death, ends on the Cleric's, and binds again when a
+   revived Cleric takes a turn. Self-inflicted damage and Break damage are not shared; ticks are. A heal into a full
+   bar is spent there.
+
+*Answered at JZ — GO-8: accepted as taken.*
+8. **THE ARBITER** judges the first enemy the Cleric damages, heals every ally (companions included) and not on the
+   judging blow, and **moves to the healthiest enemy when the judged one falls — not in the brief** (one that can be picked, since JW).
+
+*Answered at JZ — GO-9: accepted as taken.*
+9. **THE TRACKER** marks the first enemy the Hunter damages; the mark pays in the strike loop and on a companion's
+   blow, not on ticks or self-computed damage (Exposed's coverage), and moves to the healthiest enemy (one that can be picked, since JW).
+
+*Answered at JZ — GO-10: accepted as taken.*
+10. **THE SKIRMISHER** is spent by the first damaging cast through the strike loop (a counter and a miss keep it) and
+    re-arms after two turn-starts no blow reached him; a block or a parry is a blow that reached him.
+
+*Answered at JZ — GO-11: the fifteen keep their engine names; the ruling stays with the nine.*
+11. **THE ENGINE NAMES OF THE FIFTEEN STILL REACH THE PLAYER.** Their rule texts open with them (*Momentum:*, *Blood
+    Frenzy:*…). The ruling was built for the nine; whether it reaches the fifteen is a question of its scope.
+
+### ~~GN's RULINGS OWED~~ — **ALL ANSWERED AT JZ: THE FIVE ON MAGIC BURST, ELEMENTAL WEAKNESS AND THE REWORDINGS ACCEPTED AS TAKEN (JY's RULING 1), AND THE KIT OF CARDS AUTHORED WEAKER PRICED ON PAPER AT JZ, ITS FIGURES JZ's RULING (JY's RULING 3); THE CLERIC's POOL OF THREE (6) ARCHIVED AT JY**
+
+*Its head as it stood: EIGHT; THE FIRST FIVE ARE PLAYER-VISIBLE; THE CLERIC's POOL OF THREE (6) GONE SINCE GP (ARCHIVED AT JY)*
+
+Full working: `docs/reports/GN.md`, NEEDS A RULING.
+
+1. **MAGIC BURST'S UNRULED NUMBERS.** The ruling gave 40% of Attack in arcane and Elemental Weakness. Proposed, and
+   live until ruled: **25 Mana, cooldown 2, initiative 3.0, 15 Break damage, a 46% Perfect (the generic x1.15), tagged
+   DEBUFF and BREAK**, and its card text.
+2. **ELEMENTAL WEAKNESS IS A RESISTANCE CUT, NOT A MULTIPLIER.** The ruling said *+15% damage taken*; the retired
+   status cut resistance, and that mechanism was taken at the ruled 15 points. **They agree where an enemy resists
+   nothing** (x1.148–x1.150 measured, rounding) **and part where it does**: x1.212 at +30% resistance, x1.124 at
+   −20%. Which is meant is the designer's.
+3. **ITS COVERAGE IS THE STRIKE LOOP'S ALONE**, as Exposed's is. Seventeen other non-physical reads do not see it —
+   the poison and burn ticks, Arcane Arrows' splash, Arcane Echo's repeat, the Ruin detonation, Cinderfall, Winter's
+   Toll, Killing Frost, Pyre Wake, Requiem, Cull, Harvest, Wildfire, Reprisal, Suffering, a sprung trap and a shadow
+   payout in the damage door — and Unmaking's zeroed resistance ignores it.
+4. **THE FOUR REWORDINGS** — Nexus Ward *"20% of the Mage's maximum health"*, Tripwire *"another ally"*, Consecration
+   *"the ground underfoot"*, Powershot *"allies break them"* — are the batch's words, for confirmation.
+5. **NEXUS WARD CONTAINS THE `Ward` STATUS LABEL.** The BR §1 sweep over 1,309 names: Nexus Ward — 0 exact, 2
+   contained (the `ward` status id and its `Ward` label), 3 sharing a word (the Ironbark Ward relic and the retired
+   Triage Ward rune, id and name). Magic Burst — 0 exact, 0 contained, 2 sharing a word (Magic Bolt, Magic Missiles).
+   A label collision ships and is flagged; renaming is one string.
+7. **A KIT OF CLASS-WIDE CARDS HANDS THE BASELINE ROLE TO CARDS AUTHORED WEAKER** (GL's item 3): the Mage's two and
+   all three of the Cleric's were authored as draft fallbacks.
+
+### GM's RULINGS OWED — **SEVEN, ALL PLAYER-VISIBLE; THE BARE LABEL (7) SETTLED BY LATER WORK (ARCHIVED AT JY)** — ITS ANSWERED ITEMS (archived at JZ; the section stays in `docs/state.md`)
+
+*Answered at JZ — GM-4: the chip and the block line say Split Shield — built at JZ §2.*
+4. **THE SPLIT SHIELD's HALF IS CALLED "BULWARK LINE".** The half is EZ's `bulwark_line` status, whose chip and block
+   log read *Bulwark Line*, a node deleted at FX; the chip's own line reads *"Split Shield: …"*. *(The item's first half,
+   the rune's word, is answered at IS §4 — it says* hero *— and archived.)*
+
+*Answered at JZ — GM-5: accepted as taken.*
+5. **DISPEL WAS REPAIRED ON THE CARD TEXT'S AUTHORITY.** It strips beneficial effects from an enemy, and the heroes'
+   marks and Rime are not that. Read as a cost instead, it is three ids in `DISPEL_NEVER`. **Rime is tagged an
+   affliction and sits outside `DEBUFF_IDS`**; listing it there would let a mender's rite take it and a Survivalist
+   count it.
+
+*Answered at JZ — GM-6: accepted as taken.*
+6. **A LETHAL AIM HOLDER'S AREA CASTS, CALLED VOLLEY AND DRUMFIRE SPEND THE BREATH NOW.** They were paid the promised
+   shot on every target and kept it. The repair closes it as the same defect; a Sharpshooter player can feel it.
+
+### ~~GK's RULINGS OWED~~ — **ALL SIX ACCEPTED AS TAKEN (JY's RULING 1, ACCEPTED AT JZ)**
+
+*Its head as it stood: SIX LEFT; THE NAMES CONFIRMED AT IW §0.1; THE WORDS AND THE THIN KIT ARE PLAYER-VISIBLE*
+
+Full working: `docs/reports/GK.md`, NEEDS A RULING.
+
+2. **The three spines' rule texts** (`Classes.SPINE_INFO`), which no player read before GK.
+3. **The class-selection words** — *"Take one of three engine runes — a second can join it later, and either can be
+   dropped"*. Since IJ §2: *"Take one of three core runes — 2 more can join it later, and any can be dropped"* (the count read
+   off `Run.ENGINE_SLOTS`).
+4. **An engine rune's cost** — the flat rune price until one is set: 150 gold since HK §3, 100 until then.
+5. **The lineage interim** — a hero who drops his lineage's engine keeps its name, stats and pools. **GL found what
+   else he keeps**: Death Ray, Resurrection and Kill Command, which can then never be cast, a Hold Breath that never
+   runs out, and five lineage cards that half-work (GL's findings above). **GM closed the first two** — the three
+   leave with the engine (ruled) and the breath is spent — **and the rest is GM's ruling 1.** **Since GS §1 the
+   interim holds its name, stats and boss pool and no card at all**: a lineage opens with its enablers alone, and they
+   leave with the engine.
+6. **Heavy Plating's base is a stat** — the Warden's 0.10 Block stays with the lineage, so another Warrior's plating
+   climbs from zero plus its own slice.
+9. **No engine rune carries a tag** — `check_ek` exempts all twenty-four as a set.
+
+### ~~GJ's RULINGS OWED~~ — **ALL THREE ACCEPTED AS TAKEN (JY's RULING 1, ACCEPTED AT JZ)**
+
+*Its head as it stood: THREE, ALL PLAYER-VISIBLE*
+
+1. **WHICH READING OF "THE END BOSS IS NOT SCALED BY THE DIFFICULTY MULTIPLIER".** Built: the rung may not DISCOUNT
+   it (`maxf(mult, 1.0)`), which keeps rungs 2 and 3 bit-identical as the brief required. The other reading — the
+   rung term taken off outright, rung 2's values at every rung — would take rung 3's x1.30 off the end boss (1,910
+   health against 2,490, Attack 334 against 434). It is one line either way (`Run.end_boss_mult`).
+2. **THE RUNG-1 WORDS ARE PROPOSED.** The draft screen's Wanderer tooltip reads *"Enemies at 50% strength, the end
+   boss at full."* where it read *"Enemies at 50% strength."*, and the glossary's road entry *"its enemies hit half
+   as hard - all but the END BOSS - "*. Each was a claim §3 made false. **IJ §2 moved the tooltip to *Enemies strike at 50%
+   strength*** — the rung discounts the attack path, never health (`Run.zone_base_mult` against `maxf(mult, 1.0)`).
+3. **THE END BOSS'S TOOLTIP AND ITS READOUT NAME (GI) ARE STILL OWED A CONFIRMATION.** GJ's brief confirmed the END
+   BOSS label; it said nothing of the tooltip or of the readout's *"— the Hollow Crown waits"*.
+
+### THE TALENT LAYER IS BUILT (FX); FIVE THINGS IN IT, AND SEVEN OF FW'S EDGES, ARE THE DESIGNER'S — **OWED A RULING** — ITS ANSWERED ITEMS (archived at JZ; the section stays in `docs/state.md`)
+
+*Answered at JZ — FX-T1: accepted as taken.*
+1. **`TIER_SPEND_MIN` is a candidate at 3**, and the brief made it the designer's. FX §1 prices 1 and 9.
+
+*Answered at JZ — FX-T2: accepted as taken.*
+2. **Five magnitudes are PROPOSED**, each against a stated reference (FX §3): More Attack +10, More Armor +5%,
+   A Bigger Resource Pool +20, More Damage Dealt +10% and Less Damage Taken 10%.
+
+*Answered at JZ — FX-T3: accepted as taken.*
+3. **Four of the brief's nodes are swapped for alternates**, because none is TODAY for a tree four classes buy:
+   regenerate more resource, debuffs expire sooner, a Perfect pays, and Elusive while afflicted. Each would need
+   a hook (FX §2). **FY §1 re-read the four:** two are the currency shape FW had flagged, and two were never TODAY
+   in FW's own costing.
+   - *Debuffs expire sooner* is FW's SMALL item.
+   - *Elusive while afflicted* is FW's TODAY item with its trigger reversed. That TODAY item pays the Survivalist
+     alone, measured.
+
+*Answered at JZ — FX-T4: accepted as taken.*
+4. **Two names deviate from the brief's labels**, each for a stated reason: Cleanse Debuffs Each Turn, and
+   Breaking Heals a Hero.
+
+*Answered at JZ — FX-E2: each edge stands as the twenty-seven built talents stand (`CLAUDE.md`'s talent block, written at JZ).*
+2. **EN §4's RELIC SEAM.** *"If it sets the run up — the purse, the pouch, the shop, the spawn line, what a victory
+   pays, what an elite drops — it is a RELIC."* The brief lists those systems as fair game; **15 of the recon's 32
+   ruling-gated things wait on this seam alone**, and the rule has no tiebreak for a per-hero run effect, which
+   passes both of its tests.
+
+*Answered at JZ — FX-E3: each edge stands as the twenty-seven built talents stand (`CLAUDE.md`'s talent block, written at JZ).*
+3. **THE CLASS SPINES — TWO READINGS OF "TOUCH".** Momentum, Channel, Sanctity and Focus are engines by the letter,
+   and as class spines all four are **RULED, NOT BUILT**: the three are machinery on nobody (FT), and Focus is the
+   Sharpshooter's meter, built off his own attacks and cards rather than off universal traffic. The other three read
+   universal traffic (Mana spent, exchanges, every status event). **GK: the three are engine runes now, held by
+   whoever takes one — no class carries a spine.** "May not touch an engine" means
+   either "may not read or write one" or "may not change what one reads" — **and the second excludes most of the
+   recon for three classes.**
+
+*Answered at JZ — FX-E4: each edge stands as the twenty-seven built talents stand (`CLAUDE.md`'s talent block, written at JZ).*
+4. **THE FOUR CLASS PASSIVES** — Threatening Presence, Holy Conduit, Tracker, Evocation — are passives by the
+   letter, and two of them assign over the fields a stat node would naturally write.
+
+*Answered at JZ — FX-E5: each edge stands as the twenty-seven built talents stand (`CLAUDE.md`'s talent block, written at JZ).*
+5. **THE BASIC ATTACK HAS THREE DEFINITIONS IN THE CODE** — `abilities[0]`; `cost == 0`; `damage > 0 and cost == 0
+   and not is_counter`. A ruling that a node may touch "the basic attack" also has to say which.
+
+*Answered at JZ — FX-E6: each edge stands as the twenty-seven built talents stand (`CLAUDE.md`'s talent block, written at JZ).*
+6. **SPEC STATUSES AFTER THE MERGE** are legal by the line and bets by the DO/DP charter unless every spec of a
+   class can apply them. Reading statuses **by count** (`DEBUFF_IDS`) is the shape that touches no owner.
+
+*Answered at JZ — FX-E9: reports stay out of the sync and are forwarded by hand; the two closed audits leave it; the recon page stays out (`CLAUDE.md`, written at JZ).*
+9. **AND ONE SYNC LINE:** `CLAUDE.md`'s must-stay-selected list names `spec-recon.html` and `merge-recon.html` but
+   not `systems-recon.html`, which is what the talent authoring reads. FW added no `CLAUDE.md` line (the brief
+   forbade rules); **selecting it in the picker is the designer's**.
+
+### ~~FOUND AT GE AND NOT FIXED~~ — **ANSWERED AT JZ: LONG DRAW IS BALANCED FOR THE HUMAN, THE DRAIN STAYS AT 16 (JY's RULING 9), AND ITS WORDS ACCEPTED (RULING 1)**
+
+*Its head as it stood: LONG DRAW IS STILL A GAIN ON THE PLAYER'S MODEL (OWED A RULING), AND ITS NEW WORDS AWAIT CONFIRMATION*
+
+- **OWED A RULING: THE DRAIN MADE LONG DRAW'S GAIN SMALLER, NOT A TRADE, ON `check_cs`'s OWN MODEL.** With the rune
+  held, a missed press drains 16 Focus (GE §1). Priced in Focus a basic, the rune against the bare chain, on the model
+  `check_cs` §7 prints every battery:
+
+  On that model the drain leaves the rune a gain at every stage (+6.5 to +8.0 Focus a basic); on the sim bot's flat 85%
+  roll it is a loss at every stage, and at a timing SD of 100 ms rather than 60 a trade at 150+ only. `docs/reports/GE.md`
+  §1 carries the tables.
+  Which model the rune should answer to is the designer's. Rune content is written with the designer, so no number
+  moved beyond the ruled 16 and no alternative is offered here.
+- **LONG DRAW'S NEW WORDS ARE PROPOSED, NOT CONFIRMED:** *"His basic attack runs one EXTRA press at every stage — but a
+  missed press drains 16 Focus."* `check_ez` §5 reads the number off `SS_SEQ_MISS_DRAIN`, so a confirmed rewording that
+  keeps *"drains 16 Focus"* needs no gate edit, and one that drops the phrase moves that arm.
+
+### THE THREE SPINES ARE BUILT AND ALL THREE RATES ARE SET (FU, FV); WHAT IS STILL FLAGGED — **OWED A RULING (FT)** — ITS ANSWERED ITEMS (archived at JZ; the section stays in `docs/state.md`)
+
+*Answered at JZ — SPINES-b1: accepted as taken.*
+- **CHANNEL'S PARTITION.** *Spell damage* = **not physical** (implemented,
+  `CHANNEL_SPARES_PHYSICAL`), or Channel pays all damage and buys the basic attack with it. There
+  is **no `is_spell` flag on `Ability`** and the only available partition is `dmg_type`, so those
+  are the two readings that exist.
+
+*Answered at JZ — SPINES-b2: accepted as taken.*
+- **~~CHANNEL'S RATE~~ — RULED AND BUILT AT FU §2**: every CAST books `max(net, CHANNEL_CAST_FLOOR)`, the floor **10** and
+  the step **42** — the figures, and the correction to FT's own economy (a Mage regenerates 22, not 12), are
+  `docs/reports/FU.md` §2. **The spread one rate cannot close is a ruling only if it matters** (the Cryomancer near 3.4
+  steps a trash fight, the Arcanist near 2.6): a per-spec rate would make a class core a spec engine.
+
+*Answered at JZ — SPINES-b3, SPINES-b4: accepted as taken.*
+- **~~MOMENTUM'S RATE~~ — SET AT FV §2, AND ITS TAKEN HALF REPAIRED AT FV §1.** One step an exchange,
+  now `MOMENTUM_EXCHANGES_PER_STEP` = 1 — the rate is at its stop, because a normal fight already ends
+  around a third of the cap and an exchange books at most once a turn. **The taken half counts a blow
+  MET as well as health lost**, so a Block, an absolute parry and a shield that eats a blow whole all
+  book now. The cap (8 steps × 4% = −32%) is flagged, not tuned, and is a long-fight event.
+  - **ONE CONSEQUENCE FV STATES AND DOES NOT RULE: HEALTH A WARRIOR TAKES FROM HIMSELF BOOKS THE TAKEN
+    HALF**, because the health door books any health lost. In rung-1 trash no span booked on it alone;
+    in elite fights 5–9% of spans did. Whether paying your own health is half of an exchange is the
+    designer's; `docs/reports/FV.md` §1 carries the reading and its caveat.
+
+*Answered at JZ — SPINES-b5: the step count on the engine's own chip — built at JZ §4.*
+- **AND THE ONE THAT IS NOT A NUMBER: HOW A SECOND METER DISPLAYS.** The nameplate bar is ONE fill,
+  ONE colour chosen by a ternary on the NAME and ONE label, and it breaks by construction under two
+  currencies. **The game already answered this three times and never widened the bar** — Faith,
+  Loyalty and Ruin all display as chips. **A chip costs nothing and cannot show a fill**, which is
+  what a ramping meter most wants to show. That is the trade.
+
+### TWO SYNC DESELECTIONS ARE DISPUTED BETWEEN THE REPO AND A BRIEF — **OWED A ONE-LINE RULING (FS §3)** — ITS ANSWERED ITEMS (archived at JZ; the section stays in `docs/state.md`)
+
+*Answered at JZ — SYNC-b1: reports stay out of the sync and are forwarded by hand; the two closed audits leave it; the recon page stays out (`CLAUDE.md`, written at JZ).*
+- **`docs/reports/` — growing every batch.** `CLAUDE.md` listed it as MUST STAY SELECTED
+  from EE until FS moved it to a disputed line of its own, and this file declined to move it on exactly
+  that ground; **FS's
+  brief opens §3 with *"Reports are already deselected."*** It is the largest single item still in
+  question. **Do not read the absence of a change as agreement.**
+
+### ~~FN HANDED OVER THREE DESIGN QUESTIONS~~ — **THE ONE STILL OPEN ANSWERED AT JZ: WIDE RITE's AND HEAVY BOLTS' PRICE LEFT AS IT STANDS (JY's RULING 16)**
+
+*Its head as it stood: FO TOOK TWO. ONE IS STILL OPEN.*
+
+**FN flagged and did not retune, which is what its brief required. FO ruled on the two that were
+worth EXACTLY ZERO and left the pricing question alone.**
+
+- **AND TWO OF THE EIGHT JUST GOT MUCH STRONGER, WHICH IS THE OTHER SIDE OF THE SAME MEASUREMENT —
+  STILL OPEN, AND FO DID NOT TOUCH IT.** The Wide Rite went from **1.4%** of an Occultist's build
+  space to 100%, and Heavy Bolts from **2.6%** to 100%. **Neither magnitude was retuned and neither
+  should be re-read as a bug**; whether they are now correctly priced at 100g is a design question
+  and it is the designer's.
+
+### ~~THE SHARED MARK'S MAGNITUDE IS PROPOSED, NOT RULED~~ — **5 FOCUS ACCEPTED AS TAKEN (JY's RULING 1, ACCEPTED AT JZ)**
+
+*Its head as it stood: OWED A DECISION (FO §2)*
+
+**`SHARED_MARK_FOCUS := 5`, and the batch claims the DERIVATION rather than the number.** It is
+priced against the **20** a consecutive attack on his own mark pays him (`20 + muscle_memory_ranks`,
+both terms zero untalented). **The ally population in a legal run is the three other heroes**, so a
+quarter pays **15 against his own 20** and keeps his own shot the largest single source under every
+composition; a half would pay 30 and the rune would stop supplementing his patience and start
+replacing it, which BI §1 says a single meter cannot afford. **One authored copy in `battle.gd` and
+one string on the card**, so a re-tune is two lines — and `check_fo` §2c asserts the two agree, so
+they cannot part.
+
+### THE ARCHETYPE TAGS — READABLE AT ES, KEYED TO NOTHING; ITS QUESTIONS IN JY's RULINGS 1 AND 8, THE HERO SHEET's TAKEN AT ES §4 AND THE TWO AUDITS' WORD ARCHIVED AT JY — ITS ANSWERED ITEMS (archived at JZ; the section stays in `docs/state.md`)
+
+*Answered at JZ — ARCH-q4: accepted as taken.*
+- **WHETHER THE SET IS RIGHT IS STILL THE WHOLE QUESTION AND IT IS STILL THE DESIGNER'S.** The
+  alternative — six STATUS names — is measured rather than described: **40 of 154 covered, 114
+  under no tag, and six of the sixteen pools reading a single value.** The seven shipped cover 154
+  of 154. **EL proved the rename is cheap**: 292 rows, two files
+  and a `sed`, because no reader outside the tables names a tag word. **Changing the set after the
+  runes are re-keyed is the rune layer, and that is still true.**
+
+*Answered at JZ — ARCH-q5: accepted as taken.*
+- **TWO WORDS SHIP COLLIDING AND EITHER CAN BE OVERTURNED FOR ONE ROW.** **MARK** meets Hunter's
+  Mark, Quarry's Mark, Mark of the Hunt and the `party_mark` chip; **DEFENSE** meets the Defense
+  Potion. Both were shipped on the rule that **a same-meaning collision ships and is named**.
+  **BRAND, PREY, TETHER, BOUNTY and TARGET are all swept clean** and would carry MARK's ten cards
+  without one. The cost is one row of `TAG_ORDER`, one of `TAG_INFO`, and a `sed` over two tables.
+
+*Answered at JZ — ARCH-q6: accepted as taken.*
+- **SEVEN IS RECORDED AS THE CEILING AND AN EIGHTH NEEDS AN ARGUMENT.** Much of the draft is
+  already the only card in its pool with its combination, and one pool of sixteen is fully unique.
+
+*Answered at JZ — ARCH-q7: accepted as taken.*
+- **57 PRIMARIES WERE A JUDGEMENT AT EK AND EIGHT MORE MOVED AT EL.** EK's 57 are listed in its
+  report with the alternative beside each; **nine were flagged as genuinely arguable** — the stance
+  cards, the companion cards, the marks, Anointing, Immolate, Emberkeep, Divine Presence, Fault
+  Line and the three consume-cards. **EL's eight are the marks, and they are no longer arguable:
+  each had been tagged for what its mark PAYS.** **Two remain arguable and are named**: Snare Line
+  (MARK second because it marks the FIELD) and Feint (MARK second because it marks on one branch).
+
+*Answered at JZ — ARCH-q8: accepted as taken.*
+- **PET AND STANCE ARE THE TWO CANDIDATES LEFT, AND SEVEN IS THE STATED CEILING.** **PET** would
+  carry the Beastmaster's whole **10-card pool** plus his three summons and Kill Command;
+  **STANCE** would carry 3. Both are cards tagged today for what their payoff does rather than for
+  what they are — **which is exactly the argument that MARK won on**, so the ceiling is what stands
+  between them and a row, not the strength of the reading.
+
+*Answered at JZ — ARCH-q11: accepted as taken.*
+- **THE WORD "ARCHETYPE" STILL NAMES TWO UNRELATED THINGS AND ONLY THE CODE SIDE IS SEPARATED.**
+  `ARCHETYPE_ROLE` / `ARCHETYPE_DESC` and `master.html` §6 use it for a SPEC's role, which decides
+  base Attack. The constants are `CARD_TAGS` and `RUNE_TAGS` deliberately, and `master.html` §6c
+  states the two are unrelated — **but the document still uses one word for both.** Renaming the
+  nine spec archetypes is a design decision with a stat table under it.
+
+### THE BOSS-PICK POOLS — AUDITED AT DU §5, RULED ON NOWHERE — ITS ANSWERED ITEMS (archived at JZ; the section stays in `docs/state.md`)
+
+*Answered at JZ — BOSSPICK-q1: the skip is accepted.*
+- **THE FALLBACK IS BUILT AT EA §1, WIDENED TO THREE TIERS AT EH §1, AND THIS WHOLE BLOCK IS NOW
+  HISTORY WITH ONE LIVE HALF.** **NO ZONE-BOSS AWARD CAN PAY NOTHING UNDER A FULLY-HELD LOADOUT** —
+  an exhausted boss pool falls back to the hero's own spec DRAFT pool and then to his CLASS-WIDE
+  draft pool, three offered and announced like any other award. **What is still
+  true, and is why the block below is kept rather than cut:** the boss POOLS are as thin as they
+  ever were, eight specs can still empty one, and the Devout's is still 2 with both entries
+  draftable. **Deepening a boss pool is still a live design option; it is no longer a defect.**
+  `check_ea` §1 derives the depth table every run and `check_dv` §2 still measures the eight.
+
+*Answered at JZ — BOSSPICK-q4: accepted as taken.*
+  - **AND DY §1 RECOMMENDS ONE MOVE THAT WOULD CLOSE THE DEVOUT'S HALF AND THE SANCTUARY OVERLAP AT
+    ONCE — PUTTING SANCTUARY IN HIS BOSS POOL RATHER THAN HOLY'S. It is not taken.** *(The overlap is settled since GS §1 and archived at JY; the move stays for the Devout's half, in JY's ruling 1.)*
+
+*Answered at JZ — BOSSPICK-q6: accepted as taken.*
+- **AXIS COVERAGE: the Beastmaster's five deal no damage and no Break at all** — every one is a
+  `special`. Coherent with the spec (the companion is the damage) rather than obviously wrong,
+  which is why it is reported and not ruled on.
+
+*Answered at JZ — BOSSPICK-q9: accepted as taken.*
+- **`ASHES_RETURN` (25) IS A DEAD CONSTANT, AND IT HAD ALREADY COST A DOCUMENTATION DEFECT.** The
+  handler writes `ASHES_RETURN_PERFECT` (40) unconditionally — `FIREDRAW_TAKE`'s shape exactly.
+  **`master.html` said the phoenix returns at 25% where the card and the code both pay 40**;
+  corrected toward the code at DV. **Collapsing the constant moves a magnitude and was not taken.**
+
+### THE THREE PRICING QUESTIONS — THE LAYER-WIDE ONE IS **RULED AT EB §1**; OF THE OTHER THREE, DIVINE WRATH's IS JY's RULING 16, ARCANE SURGE's IN RULING 1 AND SANCTUARY's SETTLED AT GS §1 (ARCHIVED AT JY) — ITS ANSWERED ITEMS (archived at JZ; the section stays in `docs/state.md`)
+
+*Answered at JZ — PRICING-q2: each price left as it stands; balance is judged in play.*
+- **(1) DIVINE WRATH AGAINST BLESSING OF ZEAL — AND THE QUESTION AS ASKED HAS NO ANSWER, BECAUSE
+  ONLY ONE OF THE TWO HAS A PRICE.** `divine_wrath` is in `Ability.PURE_BUFFS`, so
+  `Ability.make()` clamps it to `BUFF_DELAY_CAP` and the definition writes the constant.
+  **Both memberships are CORRECT, driven live**: Zeal moves the target's cooldowns at cast and
+  Arcane Surge moves the caster's Resonance — the two exclusions `ability.gd`'s own header already
+  names for Blink and Stabilize — while Divine Wrath writes one status to four heroes and nothing
+  else. **The structural finding is that the cap is the only instrument in the project that prices
+  an initiative and it binds by membership**, so a card excluded for a second payload is priced
+  against nothing.
+  - **THE FAMILY IS WHAT PRICES THEM, AND ARCANE SURGE IS THE CARD THAT BREAKS THE PATTERN.** Across
+    the eleven second-payload exclusions the header names, Mana rises with initiative — and Arcane
+    Surge carries the family's TOP initiative (3.0) on **15 Mana / cooldown 3**, against Hold the
+    Line's **30 / 6** at the same 3.0. **Blessing of Zeal sits ON the line on initiative and UNDER
+    it on cost and cooldown**, so **if either of the two is mispriced it is the protected core and
+    it is mispriced LOW.**
+  - **AND THE TWO DAMAGE TERMS STACK: a Devout who drafts Divine Wrath and casts Zeal on the same
+    hero pays both**, 1.3225. Measured at 1.3333 over twelve seeded blows, with the three chipped
+    arms byte-identical across both orders.
+  - **NOTHING WAS RETUNED AND `PURE_BUFFS` WAS NOT WIDENED.**
+
+*Answered at JZ — PRICING-q3: accepted as taken.*
+- **(2) ARCANE SURGE'S 3.0 IS THE SAME QUESTION, AND IT IS ANSWERED BY THE FAMILY RATHER THAN BY THE
+  CAP.** It is legitimately outside `PURE_BUFFS` — the Resonance bank is a real second cast-time
+  payload, measured — so *"three times the cap"* is not the comparison that means anything. **The
+  comparison that does is Hold the Line at the same initiative for double the Mana and double the
+  cooldown.** For scale, the corpus holds 37 abilities at 3.0 and 19 above it.
+
+### ~~Carried, and still awaiting a ruling~~ — **BOTH ANSWERED AT JZ: THE EMPTY BOSS AWARD's SKIP ACCEPTED (JY's RULING 17) AND NO CEILING FOR THE TWO REFERENCES (RULING 14)**
+
+*Its head as it stood: the heading alone*
+
+- **~~WHETHER THE ZONE-BOSS FALLBACK NEEDS A THIRD TIER~~ — RAISED BY EG, RULED AND BUILT AT
+  EH §1.** Closed. The chain is boss pool → spec draft pool → class-wide draft pool; the
+  loadout-bound floor runs 8–13 where it ran 2–6. **What is NOT closed, and is stated here so
+  nobody reads this line as a guarantee: under a fully-held POOL the chain still floors at zero**,
+  and that is a design decision nobody has taken rather than an oversight. Full working in
+  `docs/reports/EH.md` §1.
+- **WHAT A CEILING SHOULD BE FOR EACH HALF — `CLAUDE.md`'s HALF RULED AT FU §1 (340 KiB, 510 SINCE HY §2); THE
+  REFERENCE HALF STILL RULED ON NOWHERE.** EE's 290 KiB was derived for one file and its FLOOR term
+  held both halves. **FU re-derived `CLAUDE.md`'s own ceiling by EE's method off FF's post-split
+  reading (261.03 + ten × EZ's 8.10 = 342.03, stated as 340)**, which is the per-half move for that
+  file. `docs/instrument-rules.md` has no stated ceiling and deriving one is still the designer's.
+
+### Named by the designer, carried from CX — **RUNE CONTENT SETTLED AND ARCHIVED AT JY** — ITS ANSWERED ITEMS (archived at JZ; the section stays in `docs/state.md`)
+
+*Answered at JZ — CX-b3: the four hooks stay party-wide, and each relic is handed to a hero on the first map when per-hero relics are built (RULED AND NOT BUILT).*
+  - **FOUR HOOKS NEED A RULING BEFORE ANY OF IT.** Party-wide by nature and staying that way:
+    `start_items`, `start_gold`, `gold_find_mult`, `shop_discount`, `loot_extra`, `victory_gold`.
+    Per-hero already: the battle-spawn hooks. **Genuinely ambiguous:**
+    `victory_heal_pct` (Chalice of Dawn, Cracked Hourglass, Martyr's Knucklebone),
+    `victory_mana_pct` (Cracked Hourglass), `fallen_recover` (Cairnmoss Poultice), and
+    `resource_floor_pct` (Bottled Storm).
+
+*Answered at JZ — CX-b4: the four hooks stay party-wide, and each relic is handed to a hero on the first map when per-hero relics are built (RULED AND NOT BUILT).*
+  - **The draft assigns relics BEFORE specs are chosen**, which is the point at which "which hero
+    gambles" has the least information behind it. Worth deciding whether assignment moves.
+
+*Answered at JZ — CX-b6: accepted as taken.*
+- **The enemy debuffs whose duration exceeds their own cooldown.** Reported by the fold census. *Read at JI: of the five moves that carry a debuff and a cooldown none lays one longer than its cooldown, and ten lay one and carry none (FOUND AT JI, archived at JN). Since JN §1 six of the ten carry a cooldown, and the Orc Archer's Poison Arrow lays 3 and cools 2 (FOUND AT JN). Since JL the Orc Hexer's Sap lays 3 turns and cools 2, one longer; since JM §0 the Orc Archer's Gall lays 3 on every hero and cools 3, equal; since JO §2 Gall, Mire and Bone Rattle's Sap each lay 3 and cool 2, a turn longer, and the Bellow's Fester takes its full clock back each turn (THE WARBAND's HEXES). Since JS §2 the Stillwrought's Leaching Stillness lays Sap 3 and cools 2, a turn longer; the Frostbitten Thrall's Slowed and the Hailcaster's Dazed lay 2 and cool 2, equal; the Icewrought Titan's Entomb lays Frozen 1 and cools 2. Since JW the Bone Shepherd's Noxious Fumes lays Noxious Fumes 3 and cools 2, a turn longer; the Rotfiend's Corpse Explosion lays Black Rot battle-long and cools 2, and its Rake lays it with no cooldown — Black Rot never runs out, a cleanse its end (and JU's Canker Litany, Fester 3 cooling 2, a turn longer, joins here late).*
+
+### Carried from the code, reported and deliberately not fixed — ITS ANSWERED ITEMS (archived at JZ; the section stays in `docs/state.md`)
+
+*Answered at JZ — CODE-b1: the ideas wait for the designer's shape; the rune-trade event is retired.*
+- **THE "a held rune for two of lower rarity" EVENT NEEDS RE-SPECIFYING NOW, NOT JUST BUILDING
+  (ES §1).** It was already blocked on a surrender path that has never existed (the pouch only
+  grows). **With no tiers there is no "lower rarity" to trade down to**, so
+  the idea needs a new statement before it can be costed. `master.html` and `events.gd` both say so.
+
+*Answered at JZ — CODE-b6: the refusal says Held for a Cryomancer's hold — built at JZ §2.*
+- **`_recast_refusal_note` SAYS "FROZEN" WHERE THE NAMEPLATE SAYS "HELD".** The refusal on a held
+  enemy reads *"Frozen already stands at full strength"*; Batch AS §4 renamed that chip to **HELD**
+  deliberately. **The note is accurate and the vocabulary is inconsistent.** One string, and it is
+  the designer's call.
+
+*Answered at JZ — CODE-b8: each price left as it stands; balance is judged in play.*
+- **THE BASE-KIT CHECK IS DONE AS OF DQ AND THIS LINE RECORDS THE RESULT RATHER THAN THE DEBT.**
+  All twelve spec pools were compared against their protected core kits. **No draft card shares a
+  NAME or a `special` id with any core ability** — asserted, not assumed. **The overlaps are all at
+  the behaviour level**, and the sharpest is **Killing Frost against Blizzard**: the drafted card is
+  cheaper, faster, shorter on cooldown, higher in damage, lays a flat 2 Chilled against Blizzard's
+  1–2 roll, and is gated in `_ability_usable` where Blizzard is not. **Mind Flay against Hex of
+  Ruin**, **Rampage against Hack and Slash**, **Divine Plea against Heal**, **Cinderfall against
+  Wildfire** and **Arcane Bolt / Unmaking against Death Ray** are the rest. **Reported in
+  `docs/draft-audit.html` §6, ruled on nowhere.**
+
+*Answered at JZ — CODE-b9: reports stay out of the sync and are forwarded by hand; the two closed audits leave it; the recon page stays out (`CLAUDE.md`, written at JZ).*
+- **`docs/text-audit.html` holds findings that have been ruled on and applied.** Once the designer
+  confirms, it can leave the knowledge sync. **`docs/talent-audit.html` CANNOT: DN's §8 is an open
+  question, not a closed one**, and the file went 37 → 165 KiB carrying it. **`docs/draft-audit.html`
+  is NEW at DQ and cannot leave either** — every finding in it is open.
+
+---
+
 ## ARCHIVED AT JY — 2026-11-17, FROM `docs/state.md` AS JX AND THE COMMIT AFTER IT LEFT IT (`0ba18d4`)
 
 *In the order they stood. JX's seven rulings, accepted as taken by the designer on 17 November (After JX); and the audit's settled items (JY §1, `docs/reports/JY-audit.tsv`), each settled by later work or a later ruling, read at source by one reader and not refuted by a second asked to: HD's ruling whole, and items of GU's, GO's, GN's and GM's and of seven older blocks.*

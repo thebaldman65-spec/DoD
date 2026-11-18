@@ -679,9 +679,9 @@ synced copy stops at Batch GI, and the designer forwards the report — FOUND AT
 - **THE 510 KiB BINDS THIS FILE, THE REQUIRED READ, AND ITS FLOOR IS THIS FILE ALONE.** EE's 290 was
   derived on a file that still held the instrument half, so it was conservative for this file alone
   and fired later than its own derivation would have. **FF's post-split reading carries no such
-  term**, so that caveat retires with the number it described. **`docs/instrument-rules.md` is under
-  the same procedure and has no stated ceiling yet**; deriving one is a ruling nobody has taken, and
-  the arithmetic is in `docs/reports/EF.md` §2.
+  term**, so that caveat retires with the number it described. **`docs/instrument-rules.md` and
+  `docs/combat-rules.md` take no ceiling (ruled at JZ, JY's ruling 14, the designer's)**: a ceiling bounds what every
+  batch reads, and those two are opened on demand; EF's arithmetic for one is in `docs/reports/EF.md` §2.
 - **DO NOT STATE THIS FILE'S LIVE SIZE IN THIS FILE.** The live reading belongs in `docs/state.md`
   and the batch report. **A file that records its own size changes it by recording it**, which is
   the same shape as *an instrument's corpus must not contain what the instrument rewrites*, in
@@ -744,13 +744,12 @@ them** — they move every batch.
   `unit.gd`, `classes.gd`, `talents.gd`, `run_state.gd` and the screens and contains ZERO test
   suites. **A SPLIT ADDS A FILE TO THIS LIST, NEVER REMOVES ONE FROM THE SYNC** — the rules did not
   stop being rules by moving.
-- **`docs/reports/` IS THE ONE ENTRY THIS LIST AND THE PICKER DISAGREE ABOUT, AND THE DISAGREEMENT
-  IS RECORDED RATHER THAN RESOLVED (FS §3).** This list said *must stay selected* from EE until FS
-  moved the entry here, and `docs/state.md` declined to move it on exactly that ground; **FS's brief states the reports are
-  already deselected.** The picker's state is not in the repo and no instrument can read it, so
-  neither claim is checkable here. **It is the largest single item still in question, and it grows
-  every batch.** A ruling either way belongs on this line, and
-  until there is one **do not read the absence of a change as agreement.**
+- **`docs/reports/` STAYS OUT OF THE SYNC, AND EACH REPORT IS FORWARDED BY HAND (RULED AT JZ, JY's RULING 15,
+  THE DESIGNER's).** This list said *must stay selected* from EE until FS moved the entry here, and FS's brief stated the
+  reports already deselected; the picker's state is not in the repo and no instrument can read it, so the disagreement stood
+  recorded from FS to JY. **The ruling settles it the picker's way**, and with it **`docs/text-audit.html` and
+  `docs/talent-audit.html` leave the sync** — both closed, their findings ruled — **and `docs/systems-recon.html` stays
+  out.** The picker is the designer's; this line says what it is ruled to hold, and the designer makes the change.
 - **THE TEST SUITES ARE AT THE REPO ROOT, NOT IN `scripts/`.** `scripts/` is game code and stays
   selected in full. **Deselecting "the scripts folder" would drop `battle.gd` and keep every
   suite — the exact inverse of the intent.** Check a path before acting on a size figure.
@@ -1072,8 +1071,8 @@ specs carry the same object.
     smaller.** On `check_cs`'s model a chain breaks 1.2–4.0% of the time, so sixteen Focus a miss
     costs 0.2–0.6 a basic against the seven or eight the added press pays, and `check_cs` §7
     prints the worth every battery. The sim bot's flat 85%-a-press roll prices the same rune as a
-    LOSS at every stage. Whether it should be a trade on the player's model is the designer's; the
-    tables are in `docs/reports/GE.md` §1.
+    LOSS at every stage. **It is balanced for the human player, and the drain
+    stays (ruled at JZ, JY's ruling 9, the designer's)**; the tables are in `docs/reports/GE.md` §1.
 - **IT PAYS IN FOCUS, NOT DAMAGE.** Damage resolves off the FIRST press's grade and later presses
   add none — a deep-Focus Sharpshooter **ramps faster, he does not hit harder per swing**, because
   Focus already converts to crit chance and then crit multiplier.
@@ -1657,6 +1656,10 @@ merged.** A Berserker wears the Warrior's cells.
 · **NO TWO NODES WRITE ONE FIELD.** A node is a second magnitude of another only by sharing its
   field, and `check_fx` §1 asserts the tree holds none. That is the whole of BM's row-8 rule that
   survives the lanes.
+· **A TALENT WRITTEN LATER STANDS INSIDE FIVE EDGES, AS THE TWENTY-SEVEN DO (RULED AT JZ, JY's RULING 13, THE
+  DESIGNER's).** The run's setup — gold, the shop, the pouch, rewards — is a relic's, never a talent's; *a talent may not
+  touch an engine* means its meter only, not the ordinary stats an engine counts; the four class passives are off-limits;
+  no talent touches the basic attack; and a talent counts statuses, never reading a named one.
 · **A NODE MUST PAY EVERY CLASS THAT CAN BUY IT.** The tree is one population of four classes, so a
   field read for one currency pays a whole class nothing — the project's most common shipped
   defect, a payload that attaches and pays 1.0000. **FX swapped four of its brief's twenty-seven
@@ -1761,10 +1764,10 @@ later batch to infer.
   already have more than one (`docs/state.md` carries the census).
 
 **WHAT THIS RULE DOES NOT DECIDE.** It says what each layer is FOR; it does not say a relic must
-stay party-wide. **THE PER-HERO RULING (a relic assigned to one hero at pickup) STANDS AND IS
-UNBUILT** — see the relic block in `docs/state.md`, and note that four hooks (`victory_heal_pct`,
-`victory_mana_pct`, `fallen_recover`, `resource_floor_pct`) need a ruling before any of it, and that
-the draft assigns relics before there are specs to assign them to.
+stay party-wide. **THE PER-HERO RULING (a relic assigned to one hero) STANDS AND IS UNBUILT** — see
+RULED AND NOT BUILT in `docs/state.md`; its two questions are answered (ruled at JZ, JY's ruling 12, the designer's): the
+four hooks (`victory_heal_pct`, `victory_mana_pct`, `fallen_recover`, `resource_floor_pct`) stay for every hero, and each relic
+is handed to a hero after the classes are chosen, on the first map.
 
 ## STANDING REFERENCE — THE DIFFICULTY LADDER AND THE END BOSS (Batch BM §5/§6)
 **`Run.difficulty` WAS REUSED, NOT SHADOWED** — it was already a saved String var chosen at the
@@ -2298,7 +2301,7 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
     display chip laid through the status door is a status to everything that counts statuses** — so a chip is drawn as
     the rune chips are (`set_rune_chips`) and never laid through that door.
   · **A CHIP IS NOT A STATUS (IE §0.2, the designer's): a chip is drawn to tell the player something; it is not an event
-    in the fiction**, and Sanctity claims to count statuses. **The engine chips (★) are drawn so since IE §2a** — one a
+    in the fiction**, and Sanctity claims to count statuses. **The engine chips (★, or a count) are drawn so since IE §2a** — one a
     held engine, in `BattleUnit.engine_chips` (`set_engine_chip`, read by `engine_chip`), first in the plate's row;
     nothing ticks, dispels or counts them, and they book no Sanctity event and float no die. Up to twelve of them had
     fed a Hierophant before anyone acted; `check_ie` §2 drives them. **AND SINCE IG §1 EVERY DISPLAY CHIP IS DRAWN SO (IF's
@@ -2477,8 +2480,9 @@ the block left out, spend what they were paid.
   `DEBUFF_IDS` against `has_status`**: with components present that counts the composition AND its ingredients. A new
   breadth reader owes the base view (`docs/reports/HS.md` §2c holds the census).
 - **NOTHING RUNS TWICE.** A composition is about what a reader SEES. The Burn inside a Rupture ticks ONCE, as the
-  Rupture's (`battle._dot_pass`); the chill slows once; and what the composition adds rides that same tick
-  (`TICK_BREAK`, `_dot_tick_rider`).
+  Rupture's (`battle._dot_pass`); the chill slows once; and what the composition adds is its own half, dealt at the start
+  of its maker's turn (`TICK_BREAK`, `_dot_tick_rider`, `_conj_maker_tick` — JZ §1, JY's ruling 2, the designer's), or with
+  the Burn's tick when no standing hero made it.
 - **ITS CLOCK IS THE SHORTER INGREDIENT'S AT EVERY MOMENT, AND THE LONGER STANDS ALONE AFTER IT.** Each ingredient keeps
   its own clock and the composition's is derived (`composition_turns`, a permanent one counting as endless), so the
   window to climb closes with the shorter. When that one runs out, or a consumer eats an ingredient, the composition
@@ -2631,10 +2635,11 @@ the block left out, spend what they were paid.
     stays the three every Hunter's card offers; **a kind a rune adds lives in `Classes.RUNE_COMPANION_KINDS`**, the doors
     that ask *is this a companion at all* ask `Classes.is_companion_kind`, and the one door that asks *may this hunter
     call it* is `battle._summon_choice`, which builds every call — so the picker, the swap and the bot are gated in one
-    line. The bot's order of preference is `battle.BOT_PET_ORDER`, once, with the rune's kind first: a bot that owned
+    line; it asks `battle._pack_kinds` since JZ §3, as Ghostpack and Call of the Wild do. The bot's order of preference is `battle.BOT_PET_ORDER`, once, with the rune's kind first: a bot that owned
     the rune and never fielded the boar would measure a build nobody plays (GN, GS). **A card that orders a companion
-    BY KIND owes a new kind its arm, or it does nothing for it** — Kill Command, Ghostpack and Call of the Wild name the
-    three and were not given one (the designer's, `docs/state.md`). **Aper's rhythm is FIXED — every third strike — and
+    BY KIND owes a new kind its arm, or it does nothing for it** — Kill Command, Ghostpack and Call of the Wild were given
+    Aper's at JZ §3 (JY's ruling 5, the designer's); Call the Wilds, Twin Hunt and Primal Surge still name the three or
+    strike through `_companion_hit` (FOUND AT JZ). **Aper's rhythm is FIXED — every third strike — and
     lives on the body** (`aper_strikes`), so a swap, a fresh call and a new fight each start it over, and its chip says
     which charge stuns; a stun that tightened with the bond is what the ruling forbids.
 - **THE SUMMON DOOR REFUSES A DISMISSER EVERY ROUTE**, Call the Wilds included, so *a Sharpshooter has no companion* is
@@ -2676,7 +2681,7 @@ the block left out, spend what they were paid.
   at its own site.** A miss is not a blow and banks nothing.
 - **THE NINE'S ENGINE NAMES ARE INTERNAL; THE RUNE NOUN IS THE NAME (ruled).** No text a player reads carries one, in
   any inflection: the rule text, the chips, the floats and the log say *Reaver*, *Bastion*, *Weaver*. `check_go` §0
-  and §12 sweep all four. The fifteen's texts still open with their engine names (`docs/state.md`).
+  and §12 sweep all four. The fifteen's texts open with their engine names and keep them (ruled at JZ, JY's ruling 4: words the player meets on cards and meters).
 - **A REPEAT IS THE DAMAGE, NEVER THE CARD.** The Weaver's repeat lays no status, heal, summon or Break damage and
   consumes nothing twice; a card that wants its effect repeated needs a ruling, not an arm in `_echo_fire`.
 - **SIX A CLASS IS `Classes.class_engines`**, the one list the deal, the pouch and the gates read.

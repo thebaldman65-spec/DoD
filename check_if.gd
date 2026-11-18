@@ -493,6 +493,7 @@ func _s1d_the_longest_case() -> void:
 	await s.call("_resolve", mage, smoulder, a, "good")
 	ok(a.has_status("rupture"), "§1d: the premise — Frostbolt then Smoulder on one body made no Rupture")
 	await s.call("_dot_pass", a)
+	s.call("_conj_maker_tick", mage)  # JZ §1: the Rupture's Break is its maker's turn's; the Cryomancer made it
 	war.resource = war.max_resource
 	await s.call("_resolve", war, boil, b, "good")
 	cl.resource = cl.max_resource

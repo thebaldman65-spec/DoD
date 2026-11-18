@@ -2,22 +2,22 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 2416,
-  "source": 1460,
+  "total": 2427,
+  "source": 1471,
   "other": 364,
   "document": 592
  },
  "floor": {
-  "pins": 2416
+  "pins": 2427
  },
  "falls": [],
  "source_residency": {
   "narrow": 49,
-  "code": 899,
-  "absent": 333,
+  "code": 907,
+  "absent": 335,
   "runtime": 114,
   "unresolved": 6,
-  "comment": 51,
+  "comment": 52,
   "missing-file": 5,
   "alt-sibling": 3
  },
@@ -6621,7 +6621,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_if.gd#401",
+   "g": "check_if.gd#402",
    "expr": "n"
   },
   {
@@ -6633,7 +6633,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_if.gd#429"
+   "g": "check_if.gd#430"
   },
   {
    "s": "check_if.gd",
@@ -6644,7 +6644,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_if.gd#408"
+   "g": "check_if.gd#409"
   },
   {
    "s": "check_if.gd",
@@ -6655,7 +6655,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_if.gd#430"
+   "g": "check_if.gd#431"
   },
   {
    "s": "check_if.gd",
@@ -6666,7 +6666,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_if.gd#428"
+   "g": "check_if.gd#429"
   },
   {
    "s": "check_if.gd",
@@ -6677,7 +6677,7 @@
    "r": "narrow",
    "k": "literal",
    "how": "derived",
-   "g": "check_if.gd#430"
+   "g": "check_if.gd#431"
   },
   {
    "s": "check_if.gd",
@@ -6688,7 +6688,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_if.gd#408"
+   "g": "check_if.gd#409"
   },
   {
    "s": "check_ih.gd",
@@ -13504,6 +13504,127 @@
    "k": "literal",
    "how": "read",
    "g": "check_jx.gd#186"
+  },
+  {
+   "s": "check_jz.gd",
+   "fn": "_s1_rupture",
+   "h": "scripts/battle.gd",
+   "n": "_conj_maker_tick(u)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jz.gd#165"
+  },
+  {
+   "s": "check_jz.gd",
+   "fn": "_s1_rupture",
+   "h": "scripts/battle.gd",
+   "n": "and _conj_maker(dot_comp) == null",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jz.gd#165"
+  },
+  {
+   "s": "check_jz.gd",
+   "fn": "_s2_texts",
+   "h": "scripts/battle.gd",
+   "n": "\nfunc ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jz.gd#176"
+  },
+  {
+   "s": "check_jz.gd",
+   "fn": "_s2_texts",
+   "h": "scripts/spec_choice_screen.gd",
+   "n": "GQ's words, accepted as they read",
+   "p": "+",
+   "r": "comment",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jz.gd#179"
+  },
+  {
+   "s": "check_jz.gd",
+   "fn": "_s2_texts",
+   "h": "scripts/spec_choice_screen.gd",
+   "n": "PROPOSED WORDS (GQ)",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jz.gd#179"
+  },
+  {
+   "s": "check_jz.gd",
+   "fn": "_s2_texts",
+   "h": "scripts/battle.gd",
+   "n": "func _recast_refusal_note(",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jz.gd#175"
+  },
+  {
+   "s": "check_jz.gd",
+   "fn": "_s2_texts",
+   "h": "scripts/battle.gd",
+   "n": "if sid == \"frozen\" and _is_held(t):",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_jz.gd#177"
+  },
+  {
+   "s": "check_jz.gd",
+   "fn": "_s2_texts",
+   "h": "scripts/battle.gd",
+   "n": "nm = \"Held\"",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_jz.gd#177"
+  },
+  {
+   "s": "check_jz.gd",
+   "fn": "_s2_texts",
+   "h": "scripts/battle.gd",
+   "n": "plate_label = \"Bulwark Line\"",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jz.gd#174"
+  },
+  {
+   "s": "check_jz.gd",
+   "fn": "_s2_texts",
+   "h": "scripts/battle.gd",
+   "n": "plate_label = \"Split Shield\"",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jz.gd#174"
+  },
+  {
+   "s": "check_jz.gd",
+   "fn": "_s4_meters",
+   "h": "scripts/battle.gd",
+   "n": "u.note_momentum_turn()\n\t\tu.refresh_meter_chips()",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_jz.gd#293"
   },
   {
    "s": "test_batch_ah.gd",

@@ -67,13 +67,13 @@ const VERBS := ["gold", "gold_pct", "heal_pct", "damage_pct", "mana_pct",
 # when it is not: an event must not be the one source that can overfill.
 #
 # NOT WRITTEN, and the reason is worth keeping: §4 also suggests "a held rune
-# for two of lower rarity". That needs a rune to be SURRENDERED, and nothing
-# in the project has ever removed a rune from a hero — `equipped` is written
-# in one place and the pouch only ever grows. Building the removal path for
+# for two of lower rarity". That needs a rune to be SURRENDERED, and when this
+# was written nothing removed a rune from a hero (the Peddler buys one since HK §3). Building the removal path for
 # one event would put a second, untested writer next to the one careful one.
 # **AND BATCH ES §1 REMOVED THE OTHER HALF OF IT: there are no rune tiers, so
 # "of lower rarity" now names nothing.** The event would have to be re-specified
 # before it could be built, on top of the surrender path it always needed.
+# **RETIRED AT JZ (JY's ruling 11, the designer's): the Peddler already turns a rune into gold.**
 const KIND_WEIGHTS := {"tradeoff": 60, "boon": 25, "bane": 15}
 
 static var _data := {}

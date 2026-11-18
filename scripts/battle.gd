@@ -188,7 +188,7 @@ const STATUS_INFO := {
 	# and the chip's tooltip is re-built off its ingredients as they stand
 	# (`BattleUnit._resync_composition`), so this description is the fallback only.
 	# `Ru`, NOT `BD`: Break damage's shorthand in every log line (CG §3's precedent).
-	"rupture": ["Rupture", "Ru", Color(0.86, 0.48, 0.80), "Burn and Chilled, joined: each Burn\ntick also deals Break damage, and the\nchill still slows. It ends when the\nshorter of the two would."],
+	"rupture": ["Rupture", "Ru", Color(0.86, 0.48, 0.80), "Burn and Chilled, joined: Break damage\non each turn of the hero who made it\n(or this body's, if none stands), and\nthe chill still slows. It ends when the\nshorter of the two would."],
 	# ("bleed" had a registry row here until Batch BJ §1 — never applied by any
 	# path and never displayed: the bleed chip is synthesized from bleed_buildup
 	# in unit.gd with its own label and colour. Deleted, not left unreachable.)
@@ -293,7 +293,7 @@ const STATUS_INFO := {
 	# Bulwark Line (Batch AL): the Warden's Shieldwall covers the line. The
 	# grant rides the same Heavy Plating slice of the block roll his own
 	# stance does, so what it buys is real Block, not a separate ward.
-	"bulwark_line": ["Bulwark Line", "Bu", Color(0.72, 0.8, 0.95),
+	"bulwark_line": ["Split Shield", "Bu", Color(0.72, 0.8, 0.95),
 		"+%d%% Block chance (the Warden's Shieldwall)." % [SHIELDWALL_BLOCK / 2]],
 	"rally_heal": ["Rallied", "Rl", Color(0.95, 0.75, 0.45), "+30% healing received\n(the Warden's Rally)."],
 	"immolate": ["Immolate", "IM", Color(1.0, 0.55, 0.25), "Wrapped in his own fire: he takes %d%%\nless damage, and anything that strikes\nhim is set Burning (3 turns)." % [int(round(IMMOLATE_CUT * 100))]],
@@ -655,9 +655,13 @@ const CONJUNCTIONS := {"rupture": ["burn", "chilled"]}
 # most of its Ruptures die with the body — 73 of the Pyromancer party's 117, and 20 of
 # them before they ticked at all; 38 of the Cryomancer party's 40, 29 before a tick
 # (HS's lanes, re-read at HT) — so the figure counts a rotation nobody plays.
+# **SINCE JZ §1 THE BREAK TICKS ON ITS MAKER's TURN (JY's ruling 2, the designer's)**, not the
+# bearer's, so a held body no longer starves it: the watch condition above was read on the
+# bearer's turns, and on a held body the Rupture now pays until the body Breaks.
 const RUPTURE_BREAK_PER_TICK := 10
-# The Break a composed status's tick adds, by composed id: the tick is the Burn's,
-# ONCE, and this is the composition's own half riding it (`_dot_tick_rider`).
+# The Break a composed status adds, by composed id: the Burn's tick is the bearer's, ONCE, and
+# this is the composition's own half, dealt by `_dot_tick_rider` on its maker's turn (JZ §1), or
+# on the bearer's own pass when no hero who made it stands.
 const TICK_BREAK := {"rupture": RUPTURE_BREAK_PER_TICK}
 
 var heroes: Array = []
@@ -1919,6 +1923,8 @@ func _spawn_units() -> void:
 				Color(0.9, 0.78, 0.4), Classes.resolve_values(
 					Classes.engine_desc(String(pid)),
 					Classes.value_ctx_from_unit(u)))
+		# BATCH JZ §4 — Momentum, Channel and Sanctity open at their count, `0/cap`, not ★.
+		u.refresh_meter_chips()
 		# BATCH ID §3 — THE CLASS PASSIVE'S CHIP IS DELETED (ID §0.1, the designer's). It was a
 		# status laid on every hero at the spawn, tagged ◆, for a payout that never turns off; a
 		# chip is for a payout that turns on and off (HZ §1d), and the passive is read where it
@@ -3311,7 +3317,8 @@ func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability
 
 # BATCH HS §2 — the damage-over-time pass at the top of a unit's turn, extracted
 # from `_run_battle` unchanged. A composition's Burn ticks here once, as the
-# composition's, with its own half riding the same tick (`_dot_tick_rider`).
+# composition's; its own half rides its maker's turn since JZ §1 (`_conj_maker_tick`),
+# and this pass only when no standing hero made it.
 func _dot_pass(u: BattleUnit) -> void:
 	for dot_id in DOT_STATUSES:
 		if u.has_status(dot_id) and not u.dead:
@@ -3407,7 +3414,8 @@ func _dot_pass(u: BattleUnit) -> void:
 			else:
 				_log("%s's %s ticks — the %s: %d damage%s" % [u.unit_name,
 					String(dot_comp.label), info[0], dot_dmg, stack_tag], "#e08850")
-			if dot_id == "burn" and not dot_comp.is_empty() and not dot_died:
+			if dot_id == "burn" and not dot_comp.is_empty() and not dot_died \
+					and _conj_maker(dot_comp) == null:
 				_dot_tick_rider(u)
 			# BATCH JL §2 — AND FESTER GROWS, after its tick: a stack and its full clock back, until it is cleansed.
 			if dot_id == "fester" and not dot_died:
@@ -3622,6 +3630,7 @@ func _run_battle() -> void:
 		# (FV §1) — which is what makes a Berserker and a Warden build it
 		# identically.
 		u.note_momentum_turn()
+		u.refresh_meter_chips()  # JZ §4: the step just booked shows before he chooses
 		# BATCH GO — THE SAME MOMENT CLOSES THE SKIRMISHER'S QUIET SPAN AND TRUES
 		# UP THE OATHKEEPER'S BOND, for Momentum's reason: the span is "since this
 		# unit's last turn", so it ends when the unit is chosen to act.
@@ -3815,6 +3824,9 @@ func _run_battle() -> void:
 		# BATCH HF — and Burning Ground's burn beside it, on the caster's own turn,
 		# in its own function for the same reason.
 		_burning_ground_tick(u)
+		# BATCH JZ §1 — AND A RUPTURE HE MADE TICKS ITS BREAK HERE, at the start of its maker's
+		# turn (JY's ruling 2, the designer's): a Cryomancer's hold cannot starve it.
+		_conj_maker_tick(u)
 		if u.has_status("focus") and u.resource_name == "Mana":
 			u.resource = mini(u.resource + 10, u.max_resource)
 			u.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
@@ -4475,6 +4487,11 @@ func _update_talent_chips() -> void:
 		h.update_engine_chip("overburn", "+%d%%" % ob_pct,
 			"Overburn: +%d%% damage for every turn of Burn\non the enemy team, up to +%d%%.\nCurrently +%d%% (%d Burn turns standing).\nEvery turn of Burn you CONSUME refunds Mana." % [
 				int(OVERBURN_STEP), int(OVERBURN_CAP), ob_pct, burn_turns])
+	# BATCH JZ §4 — the class engines' step count on Overburn's cadence: Sanctity's ledger moves
+	# on any body's status, so its chip is re-read every tick.
+	for mh in heroes:
+		if not mh.dead and not mh.is_companion:
+			mh.refresh_meter_chips()
 	# Seeding Embers: harvest burning deaths (once per corpse).
 	for foe in enemies:
 		if not foe.dead or foe.seeding_consumed or foe.burn_at_death <= 0:
@@ -7283,6 +7300,9 @@ func _recast_refusal_note(u: BattleUnit, ab: Ability) -> String:
 			var sid := String(w["id"])
 			var nm: String = String(STATUS_INFO[sid][0]) if STATUS_INFO.has(sid) \
 				else sid.capitalize()
+			# BATCH JZ §2 — A CRYOMANCER's HOLD IS *HELD* HERE, AS ITS CHIP SAYS (JY's ruling 4).
+			if sid == "frozen" and _is_held(t):
+				nm = "Held"
 			if not names.has(nm):
 				names.append(nm)
 	if names.is_empty():
@@ -7948,6 +7968,17 @@ func _on_summon_group_pressed(popup: PopupPanel) -> void:
 		_open_summon_picker(current_hero)
 
 
+# BATCH JZ §3 — THE COMPANIONS A HUNTER's PACK HOLDS: the three every pet card offers, and Aper while
+# Tusk and Bristle is worn (JY's ruling 5, the designer's). THE ONE ANSWER to "does the rune hand him the
+# boar": the call (`_summon_choice`), Ghostpack's ghosts and Call of the Wild ask it; Kill Command orders
+# whatever stands, and Aper stands only through the call.
+func _pack_kinds(u: BattleUnit) -> Array:
+	var out: Array = Classes.COMPANION_KINDS.duplicate()
+	if u != null and u.rune_tusk_and_bristle > 0.0:
+		out.append("aper")
+	return out
+
+
 # BATCH HB §1 — WHAT A SUMMON COMPANION CAST CALLS FOR `kind`, AND THE ONE PLACE
 # IT IS BUILT: that companion's own call (`Classes.companion_call` — its arrival,
 # its stats, its words) at THE CARD's price as the spawn baked it, so an upgrade
@@ -7964,8 +7995,9 @@ func _summon_choice(u: BattleUnit, kind: String) -> Ability:
 		return null
 	# BATCH HF — APER IS TUSK AND BRISTLE'S: every Hunter's card offers the three,
 	# and only one wearing the rune is handed the fourth. The ONE place a call is
-	# built, so the picker, the swap and the bot are all gated by this line.
-	if kind == "aper" and u.rune_tusk_and_bristle <= 0.0:
+	# built, so the picker, the swap and the bot are all gated by this line (the rune
+	# read in `_pack_kinds` since JZ §3).
+	if not _pack_kinds(u).has(kind):
 		return null
 	var own := _find_ability(u, "Summon " + kind.capitalize())
 	if own != null and own.special == "summon":
@@ -10991,20 +11023,20 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					var plating := _plating_slice(strike_target)
 					var plate_label := "Heavy Plating"
 					# Heavy Plating is the Warden's own passive, so on an ALLY
-					# the Bulwark Line share is the only thing in the slice —
+					# the Split Shield's share is the only thing in the slice —
 					# hence its own label, which also keeps Tenacity and Rally
 					# (they test for "Heavy Plating") from firing off a
 					# teammate's block.
 					if strike_target.has_status("bulwark_line") \
 							and not strike_target.has_engine("heavy_plating"):
-						plate_label = "Bulwark Line"
+						plate_label = "Split Shield"
 					# BATCH BP — COVERING GUARD. A THIRD SLICE, WITH THE WARDEN'S
 					# LIVE BLOCK CHANCE IN IT. This is not redirection: nothing
 					# moves to him, the blow simply stops — which is what Block
 					# does and what nothing else in the game does. Read live
 					# (`_live_block_chance`), so Shieldwall, Heavy Plating's
-					# climb and Bulwark Line all feed a ward laid turns ago.
-					# ITS OWN LABEL for the same reason Bulwark Line has one:
+					# climb and the Split Shield's share all feed a ward laid turns ago.
+					# ITS OWN LABEL for the same reason the Split Shield's share has one:
 					# Tenacity and Rally must not fire off a covered ally's
 					# block, and the log has to name what actually stopped it.
 					var cover := 0.0
@@ -15055,7 +15087,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# standing testing scope.
 			if pack_bond and attacker.has_status("ghostpack") and comp_target != null \
 					and not comp_target.dead:
-				for gpk in Classes.COMPANION_KINDS:
+				for gpk in _pack_kinds(attacker):
 					if not attacker.kinds_summoned.has(gpk):
 						continue
 					if comp_target.dead:
@@ -16277,7 +16309,12 @@ func _conjunction_rider(comp_id: String) -> String:
 	var bd: int = int(TICK_BREAK.get(comp_id, 0))
 	if bd <= 0:
 		return ""
-	return "Each Burn tick also deals %d Break damage." % bd
+	return "Deals %d Break damage at the start of\neach turn of the hero who made it, or\nof this body's, if no such hero stands." % bd
+
+
+# JZ §1 — the Break line's tail on its maker's turn: whose turn paid it.
+func _maker_tag(maker: BattleUnit) -> String:
+	return "" if maker == null else " (on %s's turn)" % maker.unit_name
 
 
 # HS §2g, AS BUILT: a component re-applied inside a composition runs ITS OWN rule
@@ -16312,11 +16349,38 @@ func _log_reapplied_inside(target: BattleUnit, id: String, comp: Dictionary,
 		target.unit_name, String(comp.label), what, clock_txt], "#d090e0")
 
 
-# HS §3 — A COMPOSITION'S TICK IS ITS BURN'S, ONCE: the DoT pass has just dealt the
-# Burn's damage, and the composition's own half rides the same tick — Break damage,
-# through `take_hit`'s Break block like Decay's (every Break-taken term applies),
-# skipped while the body is Broken as Decay's is.
-func _dot_tick_rider(u: BattleUnit) -> void:
+# BATCH JZ §1 — WHO MADE A COMPOSITION: the hero whose write completed it, as `_conjoin` stamped
+# its `src_name`, resolved against the party (a companion's to its hunter, `_layer_credit_name`);
+# null when nobody standing made it — an enemy, no source at all (a bargain's, Chain Ignition's),
+# or a hero who has fallen. Null sends its tick back to the bearer's own pass.
+func _conj_maker(comp: Dictionary) -> BattleUnit:
+	var who := _layer_credit_name(String(comp.get("src_name", "")))
+	var h: BattleUnit = _hero_named(who) if who != "" else null
+	return h if h != null and not h.dead else null
+
+
+# BATCH JZ §1 — A RUPTURE TICKS ON THE TURN OF THE HERO WHO MADE IT (JY's ruling 2, accepted at JZ,
+# the designer's): at the start of his turn, beside Burning Ground (the caster's-turn precedent),
+# every composition he made pays its own half — on a HELD body too, which is the ruling's point.
+# It deals nothing itself: `_dot_tick_rider` stays the one Break dealer.
+func _conj_maker_tick(u: BattleUnit) -> void:
+	if u.dead or not u.is_hero or u.is_companion:
+		return
+	for body in enemies.duplicate() + _hero_side():
+		if body.dead:
+			continue
+		var comp: Dictionary = body.composition_of("burn")
+		if comp.is_empty() or not TICK_BREAK.has(String(comp.id)):
+			continue
+		if _conj_maker(comp) == u:
+			_dot_tick_rider(body, u)
+
+
+# HS §3 — A COMPOSITION'S OWN HALF: Break damage, through `take_hit`'s Break block like
+# Decay's (every Break-taken term applies), skipped while the body is Broken as Decay's
+# is. Since JZ §1 it is dealt on its maker's turn (`maker`, named in the line), and on
+# the bearer's own pass, after the Burn's tick, only when no standing hero made it.
+func _dot_tick_rider(u: BattleUnit, maker: BattleUnit = null) -> void:
 	var comp: Dictionary = u.composition_of("burn")
 	if comp.is_empty() or u.dead:
 		return
@@ -16328,16 +16392,16 @@ func _dot_tick_rider(u: BattleUnit) -> void:
 	if u.broken:
 		if _readout != null:
 			_readout.conj_tick(u, String(comp.id), 0, false)
-		_log("   → %s's %s ticks — the Break: none, while %s is Broken" % [u.unit_name,
-			String(comp.label), u.unit_name], "#d090e0")
+		_log("   → %s's %s ticks — the Break: none, while %s is Broken%s" % [u.unit_name,
+			String(comp.label), u.unit_name, _maker_tag(maker)], "#d090e0")
 		return
 	var rp_result: Dictionary = u.take_hit(0, bd)
 	if _readout != null:
 		_readout.conj_tick(u, String(comp.id), int(rp_result.get("bd", 0)), bool(rp_result.broke))
 	_stat_bd(String(comp.get("src_name", "")), bd)
 	u.float_text("+%d BD" % rp_result.get("bd", 0), STATUS_INFO[String(comp.id)][2])
-	_log("   → %s's %s ticks — the Break: +%d Break damage" % [u.unit_name,
-		String(comp.label), int(rp_result.get("bd", 0))], "#d090e0")
+	_log("   → %s's %s ticks — the Break: +%d Break damage%s" % [u.unit_name,
+		String(comp.label), int(rp_result.get("bd", 0)), _maker_tag(maker)], "#d090e0")
 	if rp_result.broke:
 		_sfx("break", -4.0)
 		_message("%s BREAKS!" % u.unit_name)
@@ -21369,7 +21433,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			else:
 				await _do_summon(attacker, sm_kind, target)
 		"kill_command":
-			# The order is the beast's own: maul, feast, or blinding dive.
+			# The order is the beast's own: maul, feast, blinding dive, or the boar's charge (JZ §3).
 			# The Pack: BOTH beasts obey; if the prey falls mid-order the
 			# rest of the pack turns on the next weakest.
 			var kc_beasts: Array = _beasts(attacker)
@@ -21425,6 +21489,11 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 									# BATCH DJ §1 — the EAGLE blinded it, not the
 									# hunter who gave the order.
 									_apply_status(kc_t, "blind", 3, 0, 0, comp)
+						"aper":
+							# BATCH JZ §3 — THE BOAR OBEYS WITH AN ORDINARY CHARGE (JY's ruling 5,
+							# the designer's): the charge it makes beside the Hunter, through
+							# `_companion_strike`, so it counts toward the every-third stun.
+							await _companion_strike(comp, kc_target, 1.0, false)
 					# A perfect order deepens the bond.
 					if is_perfect:
 						_gain_loyalty(attacker, comp.companion_kind)
@@ -24550,13 +24619,14 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 							"#70d878")
 		"call_wild":
 			# The whole pack answers: every beast strikes and announces
-			# itself; the absent ones return to the wild after.
+			# itself; the absent ones return to the wild after. Aper answers
+			# too, for one wearing its rune (`_pack_kinds`, JZ §3).
 			if target != null and not target.dead:
 				_message("%s: CALL OF THE WILD!" % attacker.unit_name)
 				_log("%s sounds the Call of the Wild!" % attacker.unit_name,
 					"#e0a050")
 				var cw_beasts: Array = _beasts(attacker)
-				for cw_kind in ["ursus", "canis", "aguila"]:
+				for cw_kind in _pack_kinds(attacker):
 					attacker.kinds_summoned[cw_kind] = true
 					if target.dead:
 						break
@@ -26768,7 +26838,7 @@ func _ghost_hit(hunter: BattleUnit, kind: String, victim: BattleUnit,
 	await _wait(0.3)
 
 
-# One companion attack. `mult` scales damage (Kill Command: x2); `boosted`
+# One companion attack. `mult` scales damage (every caller passes 1.0); `boosted`
 # doubles the special effect (doubled Bleed, Exposed twice as long). Loyalty
 # feeds every blow: +5% per stack, plus the beast's own gift.
 func _companion_strike(comp: BattleUnit, victim: BattleUnit, mult: float,

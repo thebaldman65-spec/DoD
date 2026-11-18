@@ -104,6 +104,7 @@ const HERO_SIDE_FUNCS := {
 	"_enemy_turn": "ENEMY — a wind-up's stored blow",
 	"_choose_enemy_action": "ENEMY — an enemy's target",
 	"_psychotic_support": "ENEMY — a maddened support's pick",
+	"_conj_maker_tick": "WALK — a Rupture's maker's turn: every body wearing one he made (JZ §1)",
 }
 
 # §5 — THE PILOT's MARKERS, AND THE NINE BATCHES' NEEDS (IJ–IR) BY BLOCK: how many of the nine needed each block, off IQ's

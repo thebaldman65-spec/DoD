@@ -4,6 +4,39 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The rulings answered (Batch JZ) — 2026-11-17
+
+**Why a Rupture ticks on its maker's turn.** The designer's ruling (JY's ruling 2, accepted as recommended): a Rupture's Break
+rode the burning body's own turn, and the Cryomancer's hold takes that turn away, so the one combination built to grind a meter
+never did. Ticking on the turn of the hero who made it lets a freeze and a fire build work together instead of cancelling. Only
+the Break moves: the Burn keeps its own clock, as every ingredient keeps its own rule. A Rupture nobody standing made &mdash; an
+enemy's, a sourceless one, or a fallen maker's &mdash; ticks on its bearer's turn as before. A Rupture's clock still runs on its
+bearer's turns, so a maker slower than the body pays fewer Breaks than before, and a held body pays until it Breaks.
+
+**Why Aper's order is an ordinary charge.** The designer's ruling (JY's ruling 5): with the boar alone, Kill Command spent the
+turn for nothing. The charge it already makes beside the hunter is its whole identity &mdash; the every-third stun &mdash; so the
+order is that charge, counted toward the stun, and the two pack cards take the boar for a hunter whose rune brought it.
+
+**Why the three engines show a count.** The designer's ruling (JY's ruling 7): Momentum, Channel and Sanctity paid on a step the
+player could not see. Bloodrage and Lethal Aim already put their live figure on their chip; these three now do too, as the steps
+built against the cap.
+
+**Why the rune-trade event is retired.** The designer's ruling (JY's ruling 11): the event that traded a held rune for two of
+lower rarity could not be built while runes have no rarity, and the Peddler already turns a rune into gold, so the idea is
+retired rather than re-specified. The other ideas from the same ruling wait for the designer's shape.
+
+**Why per-hero relics will be handed out on the first map.** The designer's ruling (JY's ruling 12, accepted as recommended; the reason CX's and JY's): a relic that belongs to one
+hero is best given when the player knows what each hero has become, which is after the classes are chosen; the four hooks &mdash;
+the after-fight heal and Mana, the fallen hero's recovery and Bottled Storm's opening resource &mdash; keep paying every hero, as
+their relics' texts already say.
+
+**Why a talent stays inside five edges.** The designer's ruling (JY's ruling 13): the twenty-seven built talents already stand
+inside them &mdash; the run's setup is a relic's, an engine's meter is the engine's, the class passives and the basic attack are
+off-limits, and a talent counts statuses without naming one &mdash; so the next talent is written to the same shape.
+
+**Why Long Draw is balanced for the player.** The designer's ruling (JY's ruling 9, accepted as recommended; the reason GE's and JY's): the bot presses at a flat rate no player
+plays at, so a rune priced for it would be priced for nobody; the drain stays as it is.
+
 ## The stages (Batch JX) — 2026-11-15
 
 **Why a zone can stand at any stage.** The designer's ruling of 15 November: the zones are for variety, and what a fight asks is

@@ -413,7 +413,7 @@ func _s2_the_mechanism() -> void:
 			shut += 1
 	ok(shut == 5, "§2d: with nothing alight %d of the five fire gates were shut — the arm above read nothing" % shut)
 	# §2 — THE NEGATIVE, HARDEST: THE COMPOSITION DOES NOT RUN ITS INGREDIENTS TWICE.
-	# One Burn tick, the same as the unmerged twin's, and the Break beside it; one slow.
+	# One Burn tick, the same as the unmerged twin's, and the Break on its maker's turn (JZ §1); one slow.
 	_burn(scene, a, pyro, 3)
 	_chill(scene, a, sv, 3)
 	_unmerged_twin(scene, b, c, pyro, sv, 3, 3)
@@ -431,6 +431,13 @@ func _s2_the_mechanism() -> void:
 	await scene.call("_dot_pass", a)
 	var said := _log_text(scene).substr(log_was)
 	await scene.call("_dot_pass", b)
+	# BATCH JZ §1 — THE BREAK RIDES ITS MAKER's TURN (JY's ruling 2, the designer's): the Survivalist's
+	# chill completed the pair, so the bearer's pass deals the Burn alone while he stands, and the start
+	# of his turn deals the Break (`_conj_maker_tick`).
+	var pr_pass := a.pressure
+	var log_mk := _log_text(scene).length()
+	scene.call("_conj_maker_tick", sv)
+	var said_mk := _log_text(scene).substr(log_mk)
 	Engine.time_scale = 1.0
 	var tick_a := hp_a - a.hp
 	var tick_b := hp_b - b.hp
@@ -438,13 +445,15 @@ func _s2_the_mechanism() -> void:
 		tick_a, a.pressure - pr_a, tick_b, b.pressure - pr_b])
 	ok(tick_a > 0 and tick_a == tick_b,
 		"§2: a ruptured body took %d from its Burn's tick, the unmerged twin %d — the Burn ticks ONCE" % [tick_a, tick_b])
-	ok(a.pressure - pr_a > 0 and b.pressure == pr_b,
-		"§2: the Break rode the wrong tick (ruptured +%d, unmerged +%d)" % [a.pressure - pr_a, b.pressure - pr_b])
+	ok(pr_pass == pr_a and a.pressure - pr_pass > 0 and b.pressure == pr_b,
+		"§2: the Break rode the wrong turn (ruptured +%d on its pass, +%d on its maker's; unmerged +%d)" % [
+			pr_pass - pr_a, a.pressure - pr_pass, b.pressure - pr_b])
 	var plain_lines := said.count("%s takes" % a.unit_name)
 	ok(said.count("%s's %s ticks — the %s" % [a.unit_name, String(info[0]), String(scene.STATUS_INFO["burn"][0])]) == 1
-			and said.count("%s's %s ticks — the Break" % [a.unit_name, String(info[0])]) == 1
-			and plain_lines == 0,
-		"§2: the ruptured body's pass did not log ONE tick, its Burn and its Break apart (%d plain lines)" % plain_lines)
+			and said.count("%s's %s ticks — the Break" % [a.unit_name, String(info[0])]) == 0
+			and said_mk.count("%s's %s ticks — the Break" % [a.unit_name, String(info[0])]) == 1
+			and said_mk.contains("(on %s's turn)" % sv.unit_name) and plain_lines == 0,
+		"§2: the ruptured body's pass did not log ONE Burn tick and no Break, and its maker's turn ONE Break named his (%d plain lines)" % plain_lines)
 	# AND ON A BROKEN BODY THE BREAK HALF IS SKIPPED, AND THE LOG SAYS SO (Decay's shape:
 	# a Broken body takes no Break). Broken through the live door, then one pass more.
 	a.take_hit(0, 999)
@@ -454,6 +463,7 @@ func _s2_the_mechanism() -> void:
 	var log_k := _log_text(scene).length()
 	Engine.time_scale = 50.0
 	await scene.call("_dot_pass", a)
+	scene.call("_conj_maker_tick", sv)  # JZ §1: the Break's half is its maker's turn's
 	Engine.time_scale = 1.0
 	var said_k := _log_text(scene).substr(log_k)
 	print("    broken: -%d HP +%d Break; %s" % [hp_k - a.hp, a.pressure - pr_k,
@@ -752,7 +762,7 @@ func _s3_rupture() -> void:
 	print("    the chip's words:\n      %s" % desc.replace("\n", "\n      "))
 	# BATCH HT §1.6 — ON SCREEN A TIER IS A DEGREE (ruled): this needle read `tier 2` until HT;
 	# the chip says the ordinal now, and `check_ht` §2 sweeps every surface for the old word.
-	ok(desc.contains("Each Burn tick also deals %d Break damage." % fig) and desc.contains("(second degree)"),
+	ok(desc.contains("Deals %d Break damage at the start of\neach turn of the hero who made it, or\nof this body's, if no such hero stands." % fig) and desc.contains("(second degree)"),
 		"§3b: the chip does not carry the figure computed off the constant, or its degree")
 	var longest := 0
 	for ln in desc.split("\n"):
@@ -820,6 +830,7 @@ func _s5_the_log() -> void:
 	var ends := -1
 	var burns := 0
 	var breaks := 0
+	var makers := 0  # JZ §1: a Break line its maker's turn paid (`_maker_tag`)
 	for i in lines.size():
 		var l3 := String(lines[i])
 		if forms < 0 and l3.contains("%s forms on %s" % [lname, mark.unit_name]):
@@ -830,12 +841,16 @@ func _s5_the_log() -> void:
 			burns += 1
 		if l3.contains("%s's %s ticks — the Break" % [mark.unit_name, lname]):
 			breaks += 1
+			if l3.contains("(on %s's turn)" % heroes[3].unit_name):
+				makers += 1
 		if ends < 0 and l3.contains("%s ends on %s" % [lname, mark.unit_name]):
 			ends = i
 	ok(forms >= 0 and reapp > forms and ends > reapp,
 		"§5: the log did not read forms, re-applied, ends in that order (%d, %d, %d)" % [forms, reapp, ends])
-	ok(burns == 3 and breaks == 3,
-		"§5: the Rupture ticked %d times for its Burn and %d for its Break — want its three turns, each with both" % [burns, breaks])
+	# JZ §1: the Breaks follow the maker's turns, not the bearer's, so their count follows the maker's speed — this fight read
+	# two at JZ where the bearer's three turns paid three at HEAD (JZ's ruling 4); every Break is held to its maker's turn.
+	ok(burns == 3 and breaks >= 1 and makers == breaks,
+		"§5: the Rupture ticked %d times for its Burn and %d for its Break, %d on its maker's turn — want its three turns' Burn, and every Break its maker's (JZ §1)" % [burns, breaks, makers])
 	ok(ends >= 0 and String(lines[ends]).contains("the clock: its Chilled ran out; Burn stands alone (1 turn)"),
 		"§5: the end did not say the clock ran its Chilled out and the Burn stands on (%s)" % (String(lines[ends]) if ends >= 0 else "none"))
 	# BATCH HT §1.6 — the forming line says the DEGREE (ruled); it read `tier 2` until HT.

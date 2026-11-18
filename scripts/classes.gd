@@ -1325,7 +1325,8 @@ const PET_DISMISSERS := ["lethal_aim"]
 # still reads three, and this list is what the doors ask beside it — the summon
 # door and `_ability_usable` (is this a companion at all) through
 # `is_companion_kind`, and `battle._summon_choice` (may THIS hunter call it)
-# through the rune.
+# through the rune — by `battle._pack_kinds` since JZ §3, which Ghostpack's ghosts and Call of
+# the Wild ask too; Kill Command orders whatever stands, and Aper stands only through the call.
 const RUNE_COMPANION_KINDS := ["aper"]
 
 
@@ -5169,7 +5170,8 @@ static func draft_ability(display_name: String) -> Ability:
 		# card. Excluding the ones currently standing would make the ability get
 		# SMALLER the moment a beast arrived, which is the opposite of what a
 		# Pack payoff should feel like; a rotator who has fielded all three gets
-		# three ghosts every attack whatever is on the board. Lone Bond gets one.
+		# three ghosts every attack whatever is on the board, and Aper a fourth for
+		# one wearing its rune (JZ §3). Lone Bond gets one.
 		# IT REUSES `kinds_summoned` (the ledger AY already keeps for Feral
 		# Momentum and Menagerie) rather than writing a second one, and it rides
 		# `_ghost_hit`, WHICH CREDITS THE HUNTER — BB §4 fixed exactly that site
@@ -6571,7 +6573,7 @@ static func beastmaster_pool_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Mark of the Hunt", "cooldown": 3, "cost": 15,
 				"special": "mark_hunt", "delay": 2.0, "anim": "attack02",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Mark an enemy for 7 turns: you and\nyour companion deal +25% damage to it\nand every strike on it restores 3%\nof your max Mana. The cooldown resets\nif the marked enemy dies.\nWorks with or without a companion."})
+				"description": "Mark an enemy for 7 turns: the Hunter's\nand the companion's attacks on it deal\n+25% damage, and every strike on it\nrestores 3% of the Hunter's max Mana.\nThe companion's half needs only a\ncompanion; the Hunter's needs the Rune\nof the Beastmaster. The cooldown resets\nif the marked enemy dies."})
 	return null
 
 
@@ -7163,7 +7165,7 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Kill Command", "cooldown": 3, "cost": 30, "special": "kill_command",
 					"delay": 4.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "The companion gains 1 Loyalty",
-					"description": "The order depends on the companion —\nUrsus: mauls for 45% of your Attack\nplus 40 Break damage. Canis: 3 bites\nof 18% Attack, 10 Bleed each; the wolf\nfeasts, healing 30% of its max health.\nAguila: strikes TWO chosen enemies for\n25% Attack, BLINDING them 3 turns.\nRequires a living companion.\nThe Pack: BOTH companions obey."}),
+					"description": "The order depends on the companion —\nUrsus: mauls for 45% of the Hunter's\nAttack plus 40 Break damage.\nCanis: 3 bites of 18% Attack, 10 Bleed\neach; the wolf feasts, healing 30% of\nits max health.\nAguila: strikes TWO chosen enemies for\n25% Attack, BLINDING them for 3 turns.\nAper: one charge, as beside the Hunter,\ncounted toward the every-third STUN.\nRequires a living companion.\nThe Pack: BOTH companions obey."}),
 			]
 		"sharpshooter":
 			# BATCH GT §2 — AIMED SHOT IS PRICED AT THE BASELINE (ruled). Drafted

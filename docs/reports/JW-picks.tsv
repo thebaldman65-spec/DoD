@@ -204,3 +204,4 @@ scripts/battle.gd	30013	_check_end	enemies.filter(func(e): return not e.dead).si
 scripts/battle.gd	32212	_backblast_check	for foe in enemies:	P	Backblast: sets EVERY enemy alight. EDIT on 32022: `if not _pickable(foe):`.
 scripts/run_sim.gd	763	note_battle_start	static func note_battle_start(run: Node, heroes: Array, enemies: Array,	S	`note_battle_start` signature: the warband passed for the sim's power table.
 scripts/run_sim.gd	784	note_battle_start	for e in enemies:	S	Sim ledger: sums enemy attack and effective HP as spawned.
+scripts/battle.gd	16369	_conj_maker_tick	for body in enemies.duplicate() + _hero_side():	S	JZ §1: a Rupture's maker's tick walks every body for the Ruptures he made and deals each one's Break where it stands — a status ticking on the body that wears it, as the bearer's own pass ticks its Burn; no body is chosen.
