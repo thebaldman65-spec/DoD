@@ -276,7 +276,7 @@ const DAMAGE_SPECIALS := ["blood_tribute", "breaking_darkness", "call_wild",
 # healed only on a Perfect.
 const HEAL_SPECIALS := ["dark_pact", "dawnbreak", "divine_plea",
 	"field_dressing", "fortified_spirit", "healing_wave", "holy_heal", "hymn",
-	"jubilee", "ministration", "renewal", "reliquary", "sanctuary",
+	"jubilee", "kit_heal", "renewal", "reliquary", "sanctuary",
 	# BATCH DS — SALVE. Its heal RIDES A STATUS IT APPLIES rather than landing
 	# at cast, which is exactly RENEWAL's shape two lines up, and this list is
 	# the answer to "is this ability a heal" — a question about the card. Being

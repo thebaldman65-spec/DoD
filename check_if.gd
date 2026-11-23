@@ -475,7 +475,7 @@ func _s1d_the_longest_case() -> void:
 	var foes := _foes(s)
 	var boil: Ability = _ability(war, "Boil Over") if war != null else null
 	var smoulder: Ability = _ability(mage, "Smoulder") if mage != null else null
-	var heal: Ability = Classes.pool_ability("Heal")
+	var heal: Ability = Classes.pool_ability("Greater Heal")
 	ok(war != null and mage != null and cl != null and foes.size() >= 2 and boil != null and smoulder != null
 			and s.get("_readout") != null and float(cl.rune_vow_of_silence) > 0.0 and bool(cl.sanctity_active),
 		"§1d: the premise — a Berserker with Boil Over, a Cryomancer with Smoulder, a vowed Hierophant Cleric, two enemies and the readout on")

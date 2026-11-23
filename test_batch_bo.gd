@@ -444,10 +444,10 @@ func _cores() -> void:
 	# with no enabler it is none, like every lineage but the five that bring a card.
 	ok(Classes.core_slots("beastmaster") == 0,
 		"§2: ...so the Beastmaster's lineage fills NO slot of its own — nothing opens with it (HB §3; the summons' one entry until then)")
-	# BATCH GS §1 — Mercy pays on every heal she casts, the kit's Ministration among
+	# BATCH GS §1 — Mercy pays on every heal she casts, the kit's Heal (Ministration until KB) among
 	# them, so the Holy opens with no card of her lineage: her four are on her shelf
 	# and cost no slot, and Batch AV's deliberate parity break ended with them.
-	var holy_four: Array = ["Heal", "Renewal", "Hymn of Hope", "Resurrection"]
+	var holy_four: Array = ["Greater Heal", "Renewal", "Hymn of Hope", "Resurrection"]  # Heal until KB
 	ok(Classes.core_slots("holy") == 0
 			and holy_four.all(func(n): return Classes.spec_draft_pool("holy").has(n)),
 		"§2: Holy's four opening abilities are on her shelf now and cost no slot (GS §1)")

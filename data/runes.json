@@ -295,7 +295,7 @@
 	"triage_ward": {
 		"name": "Rune of the Triage Ward", "scope": "class:cleric", "written_for": "holy",
 		"price": 100, "lane": "Radiance",
-		"desc": "Her instant heals can critically strike and mend 3% harder, and 5% of her overhealing is stored for the next Heal.",
+		"desc": "Her instant heals can critically strike and mend 3% harder, and 5% of her overhealing is stored for the next Greater Heal.",
 		"retired": "RETIRED at BATCH ET §1 — kept, and said to be kept. LOST: the only writer of `capacitor_ranks` — the one item that STORES overhealing for the next Heal, and a field no node writes. Its `rune_triage_heal` half was shared only with `open_hand`, retired at EO, so the rune side of that field loses its last writer too.",
 		"payload": {"stat": {"rune_triage_heal": 3, "capacitor_ranks": 1}}
 	},
@@ -888,7 +888,7 @@
 	"eleventh_hour": {
 		"name": "Eleventh Hour", "scope": "class:cleric",
 		"price": 150,
-		"desc": "Ministration heals twice as much on an ally below {=Battle.ELEVENTH_HOUR_AT*100}% health.",
+		"desc": "Heal restores twice as much on an ally below {=Battle.ELEVENTH_HOUR_AT*100}% health.",
 		"payload": {"stat": {"rune_eleventh_hour": 1.0}}
 	},
 	"vow_of_silence": {
@@ -1124,14 +1124,26 @@
 		"payload": {}
 	},
 	"engine_quarry_hunt": {
-		"name": "Rune of the Tracker (core)", "scope": "class:hunter",
-		"price": 150, "engine": "quarry_hunt",
+		"name": "Common Foe", "scope": "class:hunter",
+		"price": 150,
+		"desc": "Every ally deals {=Classes.QUARRY_PCT}% more to the first enemy the Hunter damages each battle, and when it falls, to the enemy with the most health.",
+		"payload": {"stat": {"rune_common_foe": 1.0}}
+	},
+	"engine_opening_strike": {
+		"name": "Pounce", "scope": "class:hunter",
+		"price": 150,
+		"desc": "The Hunter's first attack each battle deals {=Classes.OPENING_BONUS_PCT}% more damage. The bonus returns after {=Classes.OPENING_QUIET_TURNS} of the Hunter's turns go by unstruck.",
+		"payload": {"stat": {"rune_pounce": 1.0}}
+	},
+	"engine_volley": {
+		"name": "Rune of the Volley (core)", "scope": "class:hunter",
+		"price": 150, "engine": "volley",
 		"desc": "A Hunter engine.",
 		"payload": {}
 	},
-	"engine_opening_strike": {
-		"name": "Rune of the Skirmisher (core)", "scope": "class:hunter",
-		"price": 150, "engine": "opening_strike",
+	"engine_ambusher": {
+		"name": "Rune of the Ambusher (core)", "scope": "class:hunter",
+		"price": 150, "engine": "ambusher",
 		"desc": "A Hunter engine.",
 		"payload": {}
 	},

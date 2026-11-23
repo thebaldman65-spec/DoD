@@ -655,7 +655,7 @@ func _s1c_e_beyond_the_five() -> void:
 
 func _s1d_the_price() -> void:
 	print("\n§1d — what the vow gives and what it costs, per Cleric lineage, on one board (printed, not priced)")
-	print("    %-10s %-26s %-26s %s" % ["lineage", "Ministration bare → vowed", "Consecration drip", "his basic lands (bare → vowed)"])
+	print("    %-10s %-26s %-26s %s" % ["lineage", "Heal bare → vowed", "Consecration drip", "his basic lands (bare → vowed)"])
 	for spec in Classes.SPEC_IDS["cleric"]:
 		var row := {}
 		for vowed in [false, true]:
@@ -666,10 +666,10 @@ func _s1d_the_price() -> void:
 			var w := _hero(s, "warrior")
 			var h := _hero(s, "hunter")
 			var foe := _melee(s)
-			var mn: Ability = _ability(c, "Ministration") if c != null else null
+			var mn: Ability = _ability(c, "Heal") if c != null else null
 			var cn: Ability = _ability(c, "Consecration") if c != null else null
 			if [c, w, h, foe, mn, cn].any(func(x): return x == null):
-				ok(false, "§1d (%s): the board seats a Cleric with Ministration and Consecration, a Warden, a Hunter and a raider" % spec)
+				ok(false, "§1d (%s): the board seats a Cleric with Heal and Consecration, a Warden, a Hunter and a raider" % spec)
 				await _clear(s)
 				continue
 			w.hp = int(w.max_hp / 2)
@@ -757,7 +757,7 @@ func _s2_the_door_calls() -> void:
 					ok(foe.status_stacks("ruin") == 4, "§2 Requiem (%s): the premise — the raider carries no Ruin to sing out" % tag)
 				"Reprisal":
 					w.hp = int(w.max_hp / 2)
-					await s._resolve(c, _ability(c, "Ministration"), w, "good")
+					await s._resolve(c, _ability(c, "Heal"), w, "good")
 					ok(c.healing_done_recent() > 0, "§2 Reprisal (%s): the premise — he healed nothing to answer for" % tag)
 				"detonation":
 					label = String(s.get("STATUS_INFO")["ruin"][0])

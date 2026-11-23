@@ -173,7 +173,8 @@ func _s1_rarity_is_gone() -> void:
 	# Fellowship retired rather than deleted (HP §3, ET's contract) — so the file
 	# grows by the three and keeps the one.
 	# **BATCH JG: 171 -> 172.** Communion.
-	ok(data.size() == 172, "§1: the authored pool is %d entries, expected 172" % data.size())
+	# **BATCH KB: 172 -> 174.** Volley's and the Ambusher's engine runes.
+	ok(data.size() == 174, "§1: the authored pool is %d entries, expected 174" % data.size())
 	ok(with_rarity.is_empty(), "§1: %s still carry a `rarity` key" % [with_rarity])
 	ok(with_scarred.is_empty(), "§1: %s still carry a `scarred` key" % [with_scarred])
 

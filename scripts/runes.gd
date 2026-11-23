@@ -539,6 +539,9 @@ const RUNE_TAGS := {
 	# Hunter —
 	"opportunist": ["OFFENSE"],                # Opportunist — Powershot cashes the stun
 	"tusk_and_bristle": ["DEBUFF", "OFFENSE"], # Tusk and Bristle — the boar, and its stun
+	# BATCH KB — THE TRACKER AND THE SKIRMISHER, ORDINARY RUNES NOW (their ids kept; seventeen read no engine)
+	"engine_quarry_hunt": ["OFFENSE"],         # Common Foe — every ally hits the tracked one harder
+	"engine_opening_strike": ["OFFENSE"],      # Pounce — the first attack, and again after quiet turns
 	# BATCH HO §3 — THE CREST. Read at the payload's read site, as every row is:
 	# the heal on the lowest hero is what Tithe is FOR and Break is what it is paid
 	# in (a secondary, FD §2); a cleanse is what Unburden's row already calls it.
@@ -693,6 +696,8 @@ const RUNE_SHAPES := {
 	"grudge": ["PASSIVE", "TRADEOFF"],
 	"opportunist": ["ABILITY"],
 	"tusk_and_bristle": ["ABILITY"],
+	"engine_quarry_hunt": ["PASSIVE"],
+	"engine_opening_strike": ["PASSIVE"],
 	# BATCH HO §3 — THE CREST'S TWO. Each pays through a rule every hero already
 	# passes and carries no gate: a condition on a flat-priced rune is FN's ruling,
 	# and these two read the four without one (HL §4's test).

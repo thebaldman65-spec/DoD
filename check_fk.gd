@@ -153,8 +153,8 @@ func _s1_the_pool() -> void:
 			priced_wrong.append("%s=%s" % [id, cfg.get("price", 0)])
 		by_spec[wf] = int(by_spec.get(wf, 0)) + 1
 	ok(live.size() == 60, "§1: the live pool is %d, not 60" % live.size())
-	ok(hf_class.size() == 15,
-		"§1: %d live runes are written for no lineage, not HF's fifteen — %s" % [hf_class.size(), hf_class])
+	ok(hf_class.size() == 17,
+		"§1: %d live runes are written for no lineage, not HF's fifteen and KB's two — %s" % [hf_class.size(), hf_class])
 	# BATCH HP §2 — FOUR SINCE HP: Tithe, and the three that pay while a condition on
 	# who stands holds (Empty Pulpit, Dead Air, Dirge). Fellowship is retired (HP §3)
 	# and is skipped with the other retired entries at the head of the walk.

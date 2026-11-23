@@ -3,18 +3,20 @@
 # What this gate asserts, section by section (`docs/reports/KA.md` has the working):
 #
 #   §1  THE FIGURES AT THEIR SOURCE (JZ's ruling 1, the designer's): Nexus Ward a quarter of the Mage's
-#       maximum, Ministration 35% of the ally's and its Perfect 45%, Unburden's cut 30%, Magic Missiles
+#       maximum, the Cleric's kit heal (Ministration at KA; Heal since KB, re-ruled: 20% of the CLERIC's maximum and
+#       26% on a Perfect), Unburden's cut 30%, Magic Missiles
 #       5 Break damage a bolt over its three bolts — and Consecration HELD at its 5%, the one of the five
 #       the ruling left as it stood.
-#   §2  THE CARDS READ THEM: the texts of Nexus Ward, Ministration (and its Perfect) and Unburden, built by the
+#   §2  THE CARDS READ THEM: the texts of Nexus Ward, Heal (and its Perfect) and Unburden, built by the
 #       game, state their new figures; Missiles' card states no Break figure, so §1 and §3 hold it.
 #   §3  THE CASTS PAY THEM: on a board of heroes holding no engine, the ward, the three bolts, the heal at
 #       Good and at Perfect, and the cut against the same blow twice, each against its own figure and
 #       not the one it replaced.
 #   §4  THE ONE COMPARISON THE FIGURES MOVED THAT A COMMENT NOW STATES: Missiles' Break damage a bolt
 #       sits under Razor Ice's and above Arcane Barrage's.
-#   §5  THE TWO NAMES ARE RULED AND THE BUILD IS NOT (JZ's ruling 2; KA's ruling 1): the Tracker and the
-#       Skirmisher are still the Hunter's rule engines under their old names, and the Hunter still holds
+#   §5  THE TWO NAMES WERE RULED HERE AND THE BUILD WAITED (JZ's ruling 2; KA's ruling 1) — BUILT AT KB, so §5 now holds
+#       the build: Volley and the Ambusher are the Hunter's rule engines, the Tracker's and the Skirmisher's are not, and
+#       the Hunter still holds
 #       six. A batch that builds the conversion reds here, and takes the RULED, NOT BUILT marker off with it.
 #   §9  The player's files are as this gate found them.
 #
@@ -164,9 +166,9 @@ func _s1_to_s3() -> void:
 		over[seat] = {"engines": []}
 	var s: Node = await Gate.spawn(self, NO_LINEAGE, {"deterministic": true, "party": over})
 	ok(is_equal_approx(_k(s, "NEXUS_WARD_PCT"), 0.25), "§1: Nexus Ward is a quarter of the Mage's maximum (%s)" % str(_k(s, "NEXUS_WARD_PCT")))
-	ok(is_equal_approx(_k(s, "MINISTRATION_PCT"), 0.35), "§1: Ministration heals 35%% of the ally's maximum (%s)" % str(_k(s, "MINISTRATION_PCT")))
-	ok(is_equal_approx(_k(s, "MINISTRATION_PERFECT_PCT"), 0.45),
-		"§1: Ministration's Perfect heals 45%% (%s), its own constant" % str(_k(s, "MINISTRATION_PERFECT_PCT")))
+	ok(is_equal_approx(_k(s, "HEAL_PCT"), 0.20), "§1: Heal (Ministration at KA, re-ruled at KB) heals 20%% of the Cleric's maximum (%s)" % str(_k(s, "HEAL_PCT")))
+	ok(is_equal_approx(_k(s, "HEAL_PERFECT_PCT"), 0.26),
+		"§1: Heal's Perfect heals 26%% (%s), its own constant" % str(_k(s, "HEAL_PERFECT_PCT")))
 	ok(is_equal_approx(_k(s, "UNBURDEN_CUT"), 0.30), "§1: Unburden cuts 30%% of a strike (%s)" % str(_k(s, "UNBURDEN_CUT")))
 	ok(is_equal_approx(_k(s, "CONSECRATION_PCT"), 0.05),
 		"§1: Consecration is HELD at 5%% a turn (%s) — the ruling left it as it stood" % str(_k(s, "CONSECRATION_PCT")))
@@ -178,7 +180,7 @@ func _s1_to_s3() -> void:
 	print("\n§2 — the cards read them")
 	var texts := {
 		"Nexus Ward": ["description", "25% of the"],
-		"Ministration": ["description", "for 35%"],
+		"Heal": ["description", "for 20%"],
 		"Unburden": ["description", "take 30%"],
 	}
 	for nm in texts:
@@ -187,9 +189,9 @@ func _s1_to_s3() -> void:
 		var want: String = texts[nm][1]
 		var got := String(ab.get(field)) if ab != null else ""
 		ok(got.contains(want), "§2: %s's card says %s (%s)" % [nm, want, got.replace("\n", " ")])
-	var mn: Ability = Classes.pool_ability("Ministration")
-	ok(mn != null and String(mn.perfect_text).contains("{mhp:45|ally}"),
-		"§2: Ministration's Perfect reads 45 (%s)" % (String(mn.perfect_text) if mn != null else "no card"))
+	var mn: Ability = Classes.pool_ability("Heal")
+	ok(mn != null and String(mn.perfect_text).contains("{mhp:26}"),
+		"§2: Heal's Perfect reads 26 (%s)" % (String(mn.perfect_text) if mn != null else "no card"))
 
 	print("\n§3 — the casts pay them")
 	var M := _hero(s, "mage")
@@ -234,19 +236,19 @@ func _s1_to_s3() -> void:
 			"§3: three Good bolts lay %d Break damage on a body of Constitution %d (%d a bolt)" % [
 				e0.pressure, e0.constitution, per_bolt])
 		_reset_foe(e0)
-	# The heal, at Good and at Perfect, off the TARGET's maximum.
-	var mend := _card(C, "Ministration")
+	# The heal, at Good and at Perfect, off the CLERIC's maximum (re-ruled at KB).
+	var mend := _card(C, "Heal")
 	if mend == null:
-		ok(false, "§3: the Cleric holds Ministration")
+		ok(false, "§3: the Cleric holds Heal")
 	else:
 		for grade in ["good", "perfect"]:
 			_ready_to_cast(C)
 			W.hp = 1
 			await s._resolve_special(C, mend, W, grade, 1.0)
-			var pct := 0.45 if grade == "perfect" else 0.35
-			ok(W.hp - 1 == int(round(W.max_hp * pct)),
-				"§3: a %s Ministration heals the Warrior %d — %d%% of HIS maximum (%d)" % [
-					grade.capitalize(), W.hp - 1, int(round(pct * 100)), W.max_hp])
+			var pct := 0.26 if grade == "perfect" else 0.20
+			ok(W.hp - 1 == int(round(C.max_hp * pct)),
+				"§3: a %s Heal mends the Warrior %d — %d%% of the CLERIC's maximum (%d)" % [
+					grade.capitalize(), W.hp - 1, int(round(pct * 100)), C.max_hp])
 			W.hp = W.max_hp
 	# The cut, against the same blow twice.
 	var lift := _card(C, "Unburden")
@@ -280,13 +282,12 @@ func _s4_the_comparison() -> void:
 # ── §5 — THE TWO NAMES RULED, THE BUILD NOT ─────────────────────────────────
 
 func _s5_the_names_ruled() -> void:
-	print("\n§5 — the Tracker and the Skirmisher: named, not yet converted")
+	print("\n§5 — the Tracker and the Skirmisher: named at KA, converted at KB")
 	var re: Dictionary = Classes.RULE_ENGINES
-	ok(re.has("quarry_hunt") and String(re["quarry_hunt"]["name"]) == "Tracker"
-			and re.has("opening_strike") and String(re["opening_strike"]["name"]) == "Skirmisher",
+	ok(not re.has("quarry_hunt") and not re.has("opening_strike") and re.has("volley") and re.has("ambusher"),
 		"§5: both are still the Hunter's rule engines under their old names — the conversion to Common Foe and Pounce waits on Volley's and the Ambusher's rules")
 	var hunter: Array = Classes.class_engines("hunter")
-	ok(hunter.size() == 6 and hunter.has("quarry_hunt") and hunter.has("opening_strike"),
+	ok(hunter.size() == 6 and hunter.has("volley") and hunter.has("ambusher"),
 		"§5: the Hunter holds six engines, the two among them (%s)" % str(hunter))
 
 

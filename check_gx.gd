@@ -312,7 +312,8 @@ func _s1_the_predicate() -> void:
 	# the crest's share is four: 17 + 1 + 15 + 4.
 	ok(_gated.size() == 42, "§1: %d gated runes — the table holds 42 (GV's 35, HC's Layered Aegis and HE's seven less Long Poison)" % _gated.size())
 	# **BATCH JG §3 — 42 AND 38: COMMUNION.** Worn by the crest, so it sits out for no hero's engine: 17 + 1 + 15 + 5.
-	ok(_ungated.size() == 38, "§1: %d ungated live ordinary runes — 38 since JG (HE's 17, Long Poison, HF's fifteen and the crest's five)" % _ungated.size())
+	# **BATCH KB — 40: COMMON FOE AND POUNCE**, ordinary since KB and reading no engine: 17 + 1 + 15 + 2 + 5.
+	ok(_ungated.size() == 40, "§1: %d ungated live ordinary runes — 40 since KB (HE's 17, Long Poison, HF's fifteen, KB's two and the crest's five)" % _ungated.size())
 	# THE GATED FORTY-THREE: out without the engine, in with it. Both arms.
 	var out_without := 0
 	var in_with := 0

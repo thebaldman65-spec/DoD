@@ -35,6 +35,16 @@ const CONTENT_AT_HEAD := {"abilities": "b40ad23bc9956e7e48f579d9a98b6da4", "tale
 # anything: the two cards and the status of the party's three answers, built after JP (Forsake, Read the Tell, Forsaken).
 # BATCH JW §3 — and the Drowned Barrow's three statuses, which a warband move lays or wears.
 const AUTHORED_SINCE := {"abilities": ["Forsake", "Read the Tell"], "statuses": ["forsaken", "black_rot", "noxious_fumes", "submerged"]}
+# BATCH KB — TWO CARDS RENAMED AND FOUR RUNE ROWS MOVED AFTER THIS GATE LANDED, PUT BACK (the designer's renames and the
+# conversion): the names read as JP's tree held them, both at once, and the rune rows as they stood, the two cores KB added out.
+const RENAMED_SINCE := {"Greater Heal": "Heal", "Heal": "Ministration"}
+const RUNES_ADDED_SINCE := ["engine_volley", "engine_ambusher"]
+const RUNES_MOVED_SINCE := {
+	"engine_quarry_hunt": {"name": "Rune of the Tracker (core)", "engine": "quarry_hunt", "desc": "A Hunter engine.", "payload": {}},
+	"engine_opening_strike": {"name": "Rune of the Skirmisher (core)", "engine": "opening_strike", "desc": "A Hunter engine.", "payload": {}},
+	"eleventh_hour": {"desc": "Ministration heals twice as much on an ally below 25% health."},
+	"triage_ward": {"desc": "Her instant heals can critically strike and mend 3% harder, and 5% of her overhealing is stored for the next Heal."},
+}
 # BATCH JR — THREE APPEARANCE TAGS MOVED AFTER THIS GATE LANDED (JR §1): the Grave Totem and the Rot Behemoth each took a
 # roster, the Orc Hexer a second role. Each is named here and put back before the digest, so it goes on asking whether
 # anything else in the warband's data moved.
@@ -193,14 +203,14 @@ func _content() -> Dictionary:
 	var names: Array = []
 	for ab in Classes.ability_corpus():
 		if not (AUTHORED_SINCE["abilities"] as Array).has(String((ab as Ability).display_name)):
-			names.append(String((ab as Ability).display_name))
+			names.append(String(RENAMED_SINCE.get(String((ab as Ability).display_name), String((ab as Ability).display_name))))
 	names.sort()
 	out["abilities"] = ("%d|" % names.size() + "|".join(names)).md5_text()
 	var nodes: Array = []
 	for n in Talents.TREE:
 		nodes.append(JSON.stringify(n, "", true))
 	out["talents"] = ("%d|" % nodes.size() + "|".join(nodes)).md5_text()
-	out["runes"] = JSON.stringify(Runes._load(), "", true).md5_text()
+	out["runes"] = JSON.stringify(_runes_as_landed(), "", true).md5_text()
 	var st: Array = (_consts("res://scripts/battle.gd")["STATUS_INFO"] as Dictionary).keys().filter(
 		func(k): return not (AUTHORED_SINCE["statuses"] as Array).has(String(k)))
 	st.sort()
@@ -210,6 +220,18 @@ func _content() -> Dictionary:
 	out["deck"] = ("%d|" % deck.size() + "|".join(deck)).md5_text()
 	out["warband"] = JSON.stringify(_warband_as_landed(), "", true).md5_text()
 	return out
+
+# THE RUNE ROWS AS JP LANDED THEM: KB's two added out, the four it moved put back (`RUNES_MOVED_SINCE`).
+func _runes_as_landed() -> Dictionary:
+	var d: Dictionary = Runes._load().duplicate(true)
+	for rid in RUNES_ADDED_SINCE:
+		d.erase(rid)
+	for rid2 in RUNES_MOVED_SINCE:
+		if d.has(rid2):
+			for f in RUNES_MOVED_SINCE[rid2]:
+				(d[rid2] as Dictionary)[f] = RUNES_MOVED_SINCE[rid2][f]
+	return d
+
 
 # THE WARBAND's DATA WITH A LATER BATCH's APPEARANCE TAGS PUT BACK (`MOVED_SINCE`).
 func _warband_as_landed() -> Dictionary:

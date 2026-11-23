@@ -1025,8 +1025,8 @@ var martyrdom_cb := Callable()
 # retired the Holy Capacitor and Beacon NODES, but the Rune of the Triage Ward
 # and the Rune of the Sleepless Vigil still write these. Flagged for
 # re-authoring — never silently deleted.
-var capacitor_ranks := 0      # Holy Capacitor: overheal banks for next Heal
-var stored_overheal := 0      # the banked amount (released by Heal)
+var capacitor_ranks := 0      # Holy Capacitor: overheal banks for next Greater Heal
+var stored_overheal := 0      # the banked amount (released by Greater Heal)
 var beacon_ranks := 0         # Beacon: turn-start pulse on the nearly-dead
 # Devout Conviction + tree (07-23; magnitudes and units re-authored in Batch
 # AW). EVERY COUNTER BELOW IS ADDITIVE — it holds its own magnitude in the
@@ -1723,7 +1723,7 @@ var rune_thin_blood := 0      # rune-owned: Thin Blood 1 (a FLAG)
 var rune_abundance := 0.0         # Abundance 1.0: his overheal becomes a shield on them
 var rune_returned_burden := 0.0   # Returned Burden 1.0: what Unburden lifts is cast onto an enemy
 var rune_burning_ground := 0.0    # Burning Ground 0.05: the burn's share of his maximum health (PROPOSED)
-var rune_eleventh_hour := 0.0     # Eleventh Hour 1.0: Ministration's increase below a quarter health
+var rune_eleventh_hour := 0.0     # Eleventh Hour 1.0: Heal's increase below Battle.ELEVENTH_HOUR_AT of the ally's health
 var rune_vow_of_silence := 0.0    # Vow of Silence 0.50: his heals' increase — and he deals no damage
 # Mage —
 var rune_unravel := 0.0           # Unravel 1.0: Magic Burst's weakness reaches every enemy
@@ -1737,6 +1737,8 @@ var rune_rending_blows := 0.0     # Rending Blows 3.0: the deepest Sunder a Crus
 var rune_grudge_struck := 0.0     # Grudge 0.40: more against the last enemy that struck him
 var rune_grudge_rest := 0.0       # Grudge -0.20: against every other enemy — ITS COST, a real term
 # Hunter —
+var rune_common_foe := 0.0        # Common Foe 1.0 (the Tracker until KB): the first enemy he damages is tracked
+var rune_pounce := 0.0            # Pounce 1.0 (the Skirmisher until KB): the opening attack, and again after quiet turns
 var rune_opportunist_shot := 0.0  # Opportunist 1.0: Powershot's increase against a stunned enemy.
 # (NOT named after the rune alone: `opportunist` is the Swordmaster node counter FX
 # left dormant, and `rune_X` beside `X` is the re-keyed pair `check_em` holds
@@ -2558,9 +2560,9 @@ func sanctity_turn_bonus() -> int:
 var reaver_kills := 0        # Savage Assault: enemies his own damage felled this battle
 var redoubt_bank := 0.0      # Redoubt: damage kept off him, waiting for his basic attack (fractional cuts add up)
 var echo_casts := 0          # Echo: casts made this battle; every Nth echoes
-var opening_armed := false   # Opening: the next attack is the enormous one
-var opening_quiet := 0       # Opening: his turns begun with no blow reaching him since
-var opening_struck := false  # Opening: a blow reached him since his last turn began
+var opening_armed := false   # Pounce (a rune): the next attack is the enormous one
+var opening_quiet := 0       # Pounce: his turns begun with no blow reaching him since
+var opening_struck := false  # Pounce: a blow reached him since his last turn began
 var siphon_returned := 0     # Siphon: Mana his damage has returned this battle (display only)
 # Covenant: the hero this unit shares damage and healing with, on BOTH ends of the
 # bond, and the guard that stops a shared half being shared again (One Soul's shape).
@@ -2617,12 +2619,6 @@ func _rule_engine_live(pid: String) -> Array:
 			var p := covenant_partner()
 			return ["bound" if p != null else "unbound",
 				("Bound to the %s." % p.unit_name) if p != null else "Bound to nobody."]
-		"opening_strike":
-			return ["READY" if opening_armed else "%d/%d" % [
-				opening_quiet, Classes.OPENING_QUIET_TURNS],
-				"The bonus is ready." if opening_armed else \
-				"Quiet turns toward the bonus: %d of %d." % [
-					opening_quiet, Classes.OPENING_QUIET_TURNS]]
 	return []
 
 
@@ -2670,8 +2666,8 @@ func setup(config: Dictionary) -> void:
 		if key != "sheet_dir" and key != "sprite_scale":
 			set(key, config[key])
 	_sync_engine_switches()
-	# BATCH GO — the Skirmisher opens every fight with the enormous attack armed.
-	opening_armed = has_engine("opening_strike")
+	# BATCH GO — Pounce (the Skirmisher's rule, an ordinary rune since KB) opens every fight with the attack armed.
+	opening_armed = rune_pounce > 0.0
 	# Weaknesses: listed damage types hit this unit 25% harder.
 	for weak_type in config.get("weak", []):
 		resists[weak_type] = float(resists.get(weak_type, 0.0)) - WEAKNESS_EXTRA

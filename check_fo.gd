@@ -516,8 +516,9 @@ func _s2_data() -> void:
 	# authored and Fellowship retired (HP §2, §3), none written for a lineage, so the
 	# pool written for one is still FO's 60.
 	# **BATCH JG MOVED THE CREST'S 4 -> 5 AND NOT THE TRADE**: Communion, written for no lineage.
-	ok(live == 80 and hf_live == 15 and crest_live == 5 and live - hf_live - crest_live == 60,
-		"§2c: the live pool is %d (%d of them HF's, %d the crest's), not 60 + 15 + 5 — one out and one in was not the trade" % [live, hf_live, crest_live])
+	# **BATCH KB MOVED HF's 15 -> 17**: Common Foe and Pounce, the Tracker's and the Skirmisher's rules made ordinary.
+	ok(live == 82 and hf_live == 17 and crest_live == 5 and live - hf_live - crest_live == 60,
+		"§2c: the live pool is %d (%d of them HF's, %d the crest's), not 60 + 17 + 5 — one out and one in was not the trade" % [live, hf_live, crest_live])
 	ok(engines == 24 and engines_of == engines,
 		"§2c: ...and the twenty-four ENGINE runes beside it all wear `Rune of the …`, the charter's names (%d of %d)"
 			% [engines_of, engines])

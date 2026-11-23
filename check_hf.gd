@@ -64,7 +64,7 @@ const HF_RUNES := {
 	"burning_ground": ["cleric", "Burning Ground", ["ABILITY"],
 		"Consecration also deals holy damage to every enemy each turn it lasts."],
 	"eleventh_hour": ["cleric", "Eleventh Hour", ["ABILITY"],
-		"Ministration heals twice as much on an ally below 25% health."],
+		"Heal restores twice as much on an ally below 25% health."],
 	"vow_of_silence": ["cleric", "Vow of Silence", ["PASSIVE", "TRADEOFF"],
 		"His heals are 50% stronger (not those Faith and Ruin pay), and he deals no damage."],
 	"unravel": ["mage", "Unravel", ["ABILITY"],
@@ -87,6 +87,11 @@ const HF_RUNES := {
 		"Powershot deals double damage to a stunned enemy."],
 	"tusk_and_bristle": ["hunter", "Tusk and Bristle", ["ABILITY"],
 		"Adds a fourth choice to Summon Companion: Aper, the boar."],
+	# BATCH KB — THE TRACKER's AND THE SKIRMISHER's RULES, ORDINARY RUNES SINCE KB (their ids kept), on the same terms.
+	"engine_quarry_hunt": ["hunter", "Common Foe", ["PASSIVE"],
+		"Every ally deals 25% more to the first enemy the Hunter damages each battle, and when it falls, to the enemy with the most health."],
+	"engine_opening_strike": ["hunter", "Pounce", ["PASSIVE"],
+		"The Hunter's first attack each battle deals 200% more damage. The bonus returns after 2 of the Hunter's turns go by unstruck."],
 }
 # HC's no-engine reading after HE gated the six status runes (HE §1c): the
 # floor each class stood at before these fifteen, at spawn.
@@ -398,7 +403,8 @@ func _s0_the_data() -> void:
 	var fields := ["rune_abundance", "rune_returned_burden", "rune_burning_ground", "rune_eleventh_hour",
 		"rune_vow_of_silence", "rune_unravel", "rune_seeking_missiles", "rune_detonating_ward",
 		"rune_clarity", "rune_profligate", "rune_goading_roar", "rune_rending_blows",
-		"rune_grudge_struck", "rune_grudge_rest", "rune_opportunist_shot", "rune_tusk_and_bristle"]
+		"rune_grudge_struck", "rune_grudge_rest", "rune_opportunist_shot", "rune_tusk_and_bristle",
+		"rune_common_foe", "rune_pounce"]
 	for f in fields:
 		ok(unit_src.contains("var %s := 0.0" % f) and not Runes.STAT_INT_KEYS.has(f),
 			"§0: `BattleUnit.%s` is not a float off `STAT_INT_KEYS`" % f)
@@ -417,6 +423,7 @@ func _s1_the_fifteen() -> void:
 	await _mage_five()
 	await _warrior_three()
 	await _hunter_two()
+	await _hunter_kb_two()
 
 
 func _cleric_five() -> void:
@@ -434,15 +441,15 @@ func _cleric_five() -> void:
 			w.hp = int(w.max_hp * frac)
 			var was := w.hp
 			seed(DMG_SEED)
-			await s._resolve(c, _ab(s, c, "Ministration"), w, "good")
+			await s._resolve(c, _ab(s, c, "Heal"), w, "good")
 			got.append(w.hp - was)
 		heals[arm[0]] = got
 		await _clear(s)
 	ok(int(heals["worn"][0]) >= 2 * int(heals["bare"][0]) - 1 and int(heals["worn"][0]) <= 2 * int(heals["bare"][0]) + 1,
-		"§1 Eleventh Hour: below a quarter health Ministration healed %d worn against %d bare — twice" % [heals["worn"][0], heals["bare"][0]])
+		"§1 Eleventh Hour: below a quarter health Heal healed %d worn against %d bare — twice" % [heals["worn"][0], heals["bare"][0]])
 	ok(int(heals["worn"][1]) == int(heals["bare"][1]) and int(heals["bare"][1]) > 0,
-		"§1 Eleventh Hour: at 27%% health, just above a quarter, Ministration healed %d worn against %d bare — the same" % [heals["worn"][1], heals["bare"][1]])
-	print("    Eleventh Hour: Ministration at 20%% health %d worn / %d bare; at 27%% %d / %d" % [
+		"§1 Eleventh Hour: at 27%% health, just above a quarter, Heal healed %d worn against %d bare — the same" % [heals["worn"][1], heals["bare"][1]])
+	print("    Eleventh Hour: Heal at 20%% health %d worn / %d bare; at 27%% %d / %d" % [
 		heals["worn"][0], heals["bare"][0], heals["worn"][1], heals["bare"][1]])
 	# ── VOW OF SILENCE: Smite deals nothing and still Breaks; heals 50% stronger,
 	# the Consecration drip included; a tick booked to him deals nothing.
@@ -458,10 +465,10 @@ func _cleric_five() -> void:
 		smite_pick = "%s, the Cleric's slot 0 in kit order" % String((c2.abilities[0] as Ability).display_name)
 		var bd := e0.pressure - p_was
 		var w2 := _hero(s2, "warrior")
-		w2.hp = int(w2.max_hp * 0.4)  # KA: low enough that a vowed heal at 35% fits under what is missing
+		w2.hp = int(w2.max_hp * 0.4)  # low enough that a vowed Heal (20% of the Cleric's maximum, KB) fits under what is missing
 		var w_was := w2.hp
 		seed(DMG_SEED)
-		await s2._resolve(c2, _ab(s2, c2, "Ministration"), w2, "good")
+		await s2._resolve(c2, _ab(s2, c2, "Heal"), w2, "good")
 		var mn := w2.hp - w_was
 		await s2._resolve(c2, _ab(s2, c2, "Consecration"), c2, "good")
 		var h2 := _hero(s2, "hunter")
@@ -474,7 +481,7 @@ func _cleric_five() -> void:
 		s2._dmg_frame(null, "Poison", c2.unit_name)
 		e1.take_tick_damage(12, "-12 Poison", Color.WHITE)
 		v[arm2[0]] = {"smite": dmg, "bd": bd, "mn": mn, "drip": drip, "tick": e1_was - e1.hp,
-			"mn_want": maxi(int(round(w2.max_hp * 0.35 * (1.5 if arm2[0] == "worn" else 1.0))), 1),
+			"mn_want": maxi(int(round(c2.max_hp * 0.20 * (1.5 if arm2[0] == "worn" else 1.0))), 1),
 			"drip_want": maxi(int(round(h2.max_hp * 0.05 * (1.5 if arm2[0] == "worn" else 1.0))), 1)}
 		await _clear(s2)
 	ok(int(v["worn"]["smite"]) == 0 and int(v["bare"]["smite"]) > 0,
@@ -482,14 +489,14 @@ func _cleric_five() -> void:
 	ok(int(v["worn"]["bd"]) > 0 and int(v["worn"]["bd"]) == int(v["bare"]["bd"]),
 		("§1 Vow of Silence: Smite's Break damage read %d worn against %d bare — Break damage is its own word and still lands" % [v["worn"]["bd"], v["bare"]["bd"]]) + " — %s" % smite_pick)
 	ok(int(v["worn"]["mn"]) == int(v["worn"]["mn_want"]) and int(v["bare"]["mn"]) == int(v["bare"]["mn_want"]),
-		"§1 Vow of Silence: Ministration healed %d worn (want %d) and %d bare (want %d) — 50%% stronger" % [
+		"§1 Vow of Silence: Heal healed %d worn (want %d) and %d bare (want %d) — 50%% stronger" % [
 			v["worn"]["mn"], v["worn"]["mn_want"], v["bare"]["mn"], v["bare"]["mn_want"]])
 	ok(int(v["worn"]["drip"]) == int(v["worn"]["drip_want"]) and int(v["bare"]["drip"]) == int(v["bare"]["drip_want"]),
 		"§1 Vow of Silence: the Consecration drip healed %d worn (want %d) and %d bare (want %d)" % [
 			v["worn"]["drip"], v["worn"]["drip_want"], v["bare"]["drip"], v["bare"]["drip_want"]])
 	ok(int(v["worn"]["tick"]) == 0 and int(v["bare"]["tick"]) == 12,
 		"§1 Vow of Silence: a tick booked to him took %d worn against %d bare — nothing he deals lands" % [v["worn"]["tick"], v["bare"]["tick"]])
-	print("    Vow of Silence: Smite %d / %d (BD %d / %d); Ministration %d / %d; drip %d / %d; his tick %d / %d" % [
+	print("    Vow of Silence: Smite %d / %d (BD %d / %d); Heal %d / %d; drip %d / %d; his tick %d / %d" % [
 		v["worn"]["smite"], v["bare"]["smite"], v["worn"]["bd"], v["bare"]["bd"], v["worn"]["mn"], v["bare"]["mn"],
 		v["worn"]["drip"], v["bare"]["drip"], v["worn"]["tick"], v["bare"]["tick"]])
 	# ── ABUNDANCE: the overheal becomes a shield, and the shield ADDS.
@@ -500,7 +507,7 @@ func _cleric_five() -> void:
 		var w3 := _hero(s3, "warrior")
 		w3.hp = w3.max_hp
 		seed(DMG_SEED)
-		await s3._resolve(c3, _ab(s3, c3, "Ministration"), w3, "good")
+		await s3._resolve(c3, _ab(s3, c3, "Heal"), w3, "good")
 		var after_mn := maxi(w3.status_power("barrier"), 0)
 		var mn_spill := int(w3.last_overheal)
 		await s3._resolve(c3, _ab(s3, c3, "Consecration"), c3, "good")
@@ -521,14 +528,14 @@ func _cleric_five() -> void:
 			"hurt": maxi(m3.status_power("barrier"), 0)}
 		await _clear(s3)
 	ok(int(ab["worn"]["mn"]) == int(ab["worn"]["spill"]) and int(ab["worn"]["spill"]) > 0 and int(ab["bare"]["mn"]) == 0,
-		"§1 Abundance: Ministration on a full ally left a shield of %d worn (spill %d) and %d bare" % [
+		"§1 Abundance: Heal on a full ally left a shield of %d worn (spill %d) and %d bare" % [
 			ab["worn"]["mn"], ab["worn"]["spill"], ab["bare"]["mn"]])
 	var d := int(ab["worn"]["drip"])
 	ok(d > 0 and ab["worn"]["steps"] == [d, 2 * d, 3 * d] and ab["bare"]["steps"] == [0, 0, 0],
 		"§1 Abundance: three drips on a full hero left shields %s worn and %s bare — each spill ADDS %d" % [
 			ab["worn"]["steps"], ab["bare"]["steps"], d])
 	ok(int(ab["worn"]["hurt"]) == 0, "§1 Abundance: a drip on a hurt ally shielded %d — nothing spilled" % ab["worn"]["hurt"])
-	print("    Abundance: Ministration's spill %d -> shield %d; three drips %s (bare %s)" % [
+	print("    Abundance: Heal's spill %d -> shield %d; three drips %s (bare %s)" % [
 		ab["worn"]["spill"], ab["worn"]["mn"], ab["worn"]["steps"], ab["bare"]["steps"]])
 	# ── RETURNED BURDEN: what Unburden lifts goes back to whoever laid it.
 	var rb := {}
@@ -793,6 +800,44 @@ func _warrior_three() -> void:
 	print("    Grudge: before %d / %d; on his foe %d / %d; on another %d / %d; foe fallen %d / %d" % [
 		gd["worn"]["before"], gd["bare"]["before"], gd["worn"]["foe"], gd["bare"]["foe"],
 		gd["worn"]["other"], gd["bare"]["other"], gd["worn"]["fallen"], gd["bare"]["fallen"]])
+
+
+# BATCH KB — COMMON FOE AND POUNCE, worn and bare on a party holding no engine, on the same board under the same dice.
+func _hunter_kb_two() -> void:
+	var cf := {}
+	for arm in [["worn", ["engine_quarry_hunt"]], ["bare", []]]:
+		var s: Node = await _fight({3: arm[1]})
+		_sturdy(s)
+		var h := _hero(s, "hunter")
+		var w := _hero(s, "warrior")
+		var fs: Array = s.get("enemies")
+		await _cast_dmg(s, h, h.abilities[0], fs[0], DMG_SEED)
+		var hit: int = await _cast_dmg(s, w, w.abilities[0], fs[0], DMG_SEED)
+		cf[arm[0]] = [hit, 1 if fs[0].has_status("tracked") else 0]
+		await _clear(s)
+	ok(int(cf["worn"][1]) == 1 and int(cf["bare"][1]) == 0,
+		"§1 Common Foe: the Hunter's first blow tracks its enemy worn (%d) and nobody bare (%d)" % [cf["worn"][1], cf["bare"][1]])
+	ok(int(cf["bare"][0]) > 0 and absi(int(cf["worn"][0]) - int(round(cf["bare"][0] * (1.0 + 0.01 * Classes.QUARRY_PCT)))) <= 1,
+		"§1 Common Foe: the Warrior's blow on the tracked enemy dealt %d worn against %d bare — %d%% more" % [
+			cf["worn"][0], cf["bare"][0], Classes.QUARRY_PCT])
+	var po := {}
+	for arm2 in [["worn", ["engine_opening_strike"]], ["bare", []]]:
+		var s2: Node = await _fight({3: arm2[1]})
+		_sturdy(s2)
+		var h2 := _hero(s2, "hunter")
+		var fs2: Array = s2.get("enemies")
+		var first: int = await _cast_dmg(s2, h2, h2.abilities[0], fs2[0], DMG_SEED)
+		var second: int = await _cast_dmg(s2, h2, h2.abilities[0], fs2[0], DMG_SEED)
+		po[arm2[0]] = [first, second]
+		await _clear(s2)
+	# the bare blow is itself rounded, so the tripled one may sit up to the multiplier off the product
+	ok(int(po["bare"][0]) > 0 and absi(int(po["worn"][0]) - int(round(po["bare"][0] * (1.0 + 0.01 * Classes.OPENING_BONUS_PCT)))) <= int(ceil(1.0 + 0.01 * Classes.OPENING_BONUS_PCT)),
+		"§1 Pounce: the Hunter's first attack dealt %d worn against %d bare — %d%% more" % [
+			po["worn"][0], po["bare"][0], Classes.OPENING_BONUS_PCT])
+	ok(int(po["worn"][1]) == int(po["bare"][1]),
+		"§1 Pounce: the second attack dealt %d worn against %d bare — the bonus is spent" % [po["worn"][1], po["bare"][1]])
+	print("    Common Foe: the Warrior on the tracked %d / %d; Pounce: first %d / %d, second %d / %d" % [
+		cf["worn"][0], cf["bare"][0], po["worn"][0], po["bare"][0], po["worn"][1], po["bare"][1]])
 
 
 func _hunter_two() -> void:

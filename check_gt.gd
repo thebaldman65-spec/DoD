@@ -91,7 +91,7 @@ const CARD_ROUTES := {
 }
 # A card of each row's class that is earned, carried and NOT a row — the arm
 # that proves a fight which leaves the rows out still seats what it should.
-const CONTROL := {"mage": "Arcane Cannon", "cleric": "Heal", "hunter": "Hunter's Instinct"}
+const CONTROL := {"mage": "Arcane Cannon", "cleric": "Greater Heal", "hunter": "Hunter's Instinct"}
 
 # §4 — what each retuned card is priced against, and what GS shipped of it that
 # GT did not move.
@@ -954,7 +954,7 @@ func _s3_the_card_that_sits_out() -> void:
 				await s2._resolve(u2, Classes.pool_ability("Precision Strike"), foes[0], "good")
 			"heal":
 				var ally: BattleUnit = _hero(s2, "warrior")
-				await s2._resolve(u2, Classes.pool_ability("Ministration"), ally, "good")
+				await s2._resolve(u2, Classes.pool_ability("Heal"), ally, "good")
 			"low":
 				foes[0].hp = int(foes[0].max_hp * 0.1)
 			"companion":

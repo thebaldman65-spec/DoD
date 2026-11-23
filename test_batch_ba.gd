@@ -614,8 +614,8 @@ func _rune_audit() -> void:
 			continue
 		# BATCH GK — the Hunter ENGINE runes are class:hunter too; their payload
 		# is empty, so the walk below passes them, and they are counted apart so
-		# the three ordinary ones stay pinned. Six since GO (the Tracker, the
-		# Skirmisher and the Medic), the charter's six a class.
+		# the three ordinary ones stay pinned. Six since GO (the Medic and, since KB,
+		# Volley and the Ambusher — the Tracker's and the Skirmisher's until KB), the charter's six a class.
 		# BATCH HF — AND THE ORDINARY ONES ARE TWO SETS NOW: the three this was
 		# written about are RETIRED, and HF's two are LIVE runes written for the
 		# class that read no engine. Counted apart, and both walked below: a rune

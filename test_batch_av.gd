@@ -136,11 +136,11 @@ const RETIRED := {
 	"hl_martyr": {"name": "Martyr's Vigor", "payload": {"stat": {"mercy_cap_bonus": 3}}},
 	# FX: the payload the retired hl_soothe (Soothing Touch) carried — the node
 	# is deleted; the `ability` arm and its `also` are live machinery (runes).
-	"hl_soothe": {"name": "Soothing Touch", "payload": {"ability": "Heal",
+	"hl_soothe": {"name": "Soothing Touch", "payload": {"ability": "Greater Heal",
 		"add": {"cost": -10}, "also": [{"ability": "Renewal", "add": {"cost": -10}}]}},
 	# FX: the payload the retired hl_swift (Swift Mending) carried — the node is
 	# deleted; the `ability` arm and its `also` are live machinery (runes).
-	"hl_swift": {"name": "Swift Mending", "payload": {"ability": "Heal",
+	"hl_swift": {"name": "Swift Mending", "payload": {"ability": "Greater Heal",
 		"set": {"cooldown": 0}, "also": [{"ability": "Hymn of Hope", "add": {"cooldown": -1}}]}},
 	# FX: the payload the retired hl_serenity (Serenity) carried — the node is
 	# deleted; the `ability` arm is live machinery (runes).
@@ -282,7 +282,7 @@ func _kit_and_pool() -> void:
 		"Resurrection is a Holy card on her SHELF, out of the kit she opens with (%s)" % str(opening))
 	ok(names.size() == 4 and opening == plain,
 		"...her lineage still defines FOUR and she opens with none of them — a Cleric's opening, the parity break gone (got %d)" % names.size())
-	for expected in ["Heal", "Renewal", "Hymn of Hope"]:
+	for expected in ["Greater Heal", "Renewal", "Hymn of Hope"]:  # Heal until KB
 		ok(names.has(expected) and shelf.has(expected) and not opening.has(expected),
 			"the original three survive, on her shelf: %s" % expected)
 	# A boss does not offer it — AV took it out of her boss pool when it joined
@@ -676,7 +676,7 @@ func _live_kit_at_spawn() -> void:
 	ok(_find(c2, "Intercession") == null, "...nor Intercession (DO; FX)")
 	ok(c2.second_resource == 2, "Zealous Light opens her on 2 Mercy (got %d)" % c2.second_resource)
 	ok(c2.second_max == 8, "Martyr's Vigor raises the ceiling to 8 (got %d)" % c2.second_max)
-	var heal := _find(c2, "Heal")
+	var heal := _find(c2, "Greater Heal")
 	var ren := _find(c2, "Renewal")
 	var hymn := _find(c2, "Hymn of Hope")
 	ok(heal != null and heal.cost == 10, "Soothing Touch: Heal costs 10 (got %s)" % heal.cost)
@@ -934,7 +934,7 @@ func _live_vigil_and_vestments() -> void:
 	var ally := _hero(vest, 0)
 	ally.hp = int(ally.max_hp * 0.3)
 	ally.remove_status("barrier")
-	var heal := _find(c2, "Heal")
+	var heal := _find(c2, "Greater Heal")
 	await vest._resolve_special(c2, heal, ally, "good", 1.0)
 	ok(ally.has_status("barrier"), "the heal leaves cloth-of-light behind")
 	if ally.has_status("barrier"):

@@ -998,7 +998,7 @@ func _s6_cairnmoss_and_the_bomb() -> void:
 	ok(String(Glossary.entry("consumables").get("long", "")).count(line) == 1, "§6: the items entry does not carry the bomb's line once")
 	var s: Node = await _board(["berserker", "arcanist", "holy", "mystic"],
 		{0: {"engines": _engines(["bloodrage", "savage_assault"])}, 1: {"engines": _engines(["siphon"])},
-		3: {"engines": _engines(["quarry_hunt"])}})
+		3: {"engines": [], "runes": [_rune("engine_quarry_hunt")]}})  # Common Foe, the Tracker's rule as a rune since KB
 	var war := _hero(s, "warrior")
 	var mage := _hero(s, "mage")
 	_calm(s, 100000)
@@ -1033,7 +1033,7 @@ func _s6_cairnmoss_and_the_bomb() -> void:
 	ok(mage.resource > 0, "§6: the Leech's own blow fed him nothing — the bomb's arm reads a dead door")
 	var hunter := _hero(s, "hunter")
 	await s._resolve(hunter, hunter.abilities[0], _foes(s)[0], "good")
-	ok(_foes(s).any(func(e): return (e as BattleUnit).has_status("tracked")), "§6: the Tracker's own blow laid no mark — the bomb's arm reads a dead door")
+	ok(_foes(s).any(func(e): return (e as BattleUnit).has_status("tracked")), "§6: the Hunter's own blow laid no Common Foe mark — the bomb's arm reads a dead door")
 	await _clear(s)
 
 

@@ -433,9 +433,10 @@ const SPEC_DRAFT_POOLS := {
 		# BATCH DO — moved out of the talent tree, unchanged.
 		"Divine Plea", "Intercession",
 		# BATCH GS §1 — OUT OF THE OPENING KIT: Mercy pays on every heal, the
-		# kit's Ministration among them. Hymn of Hope and Resurrection are priced
-		# in Mercy and are offered only to its holder (`ENGINE_READ`).
-		"Heal", "Renewal", "Hymn of Hope", "Resurrection"],
+		# kit's Heal among them (Ministration until KB). Hymn of Hope and Resurrection are priced
+		# in Mercy and are offered only to its holder (`ENGINE_READ`). BATCH KB — this shelf's heal is GREATER HEAL
+		# (the designer's): its old name went to the kit card.
+		"Greater Heal", "Renewal", "Hymn of Hope", "Resurrection"],
 	"inquisitor": ["Vow of Suffering", "Aegis Reversal", "Ordination",
 		"Fortified Spirit", "Reliquary", "Elevation",
 		"Blessing of the Faithful", "Mantle",
@@ -1217,7 +1218,7 @@ const PROTECTED_CORES := {
 	"arcanist": {"slots": 0, "enablers": [],
 		"why": "Runaway Resonance builds on every damaging cast, and the Mage's own basic is one."},
 	"holy": {"slots": 0, "enablers": [],
-		"why": "Mercy is gained when an ally falls below half health and pays on every heal she casts, the kit's Ministration among them."},
+		"why": "Mercy is gained when an ally falls below half health and pays on every heal she casts, the kit's Heal among them."},
 	"inquisitor": {"slots": 1, "enablers": ["Divine Shield"],
 		"why": "Conviction builds Faith when Divine Shield absorbs, which is what its own rule says, and no Cleric basic or kit card lays a divine shield (derived at GS, ruled at GT)."},
 	"occultist": {"slots": 1, "enablers": ["Hex of Ruin"],
@@ -1295,7 +1296,7 @@ const PROTECTED_CORES := {
 const CLASS_KITS := {
 	"warrior": ["Crushing Blow", "Pommel Strike", "Mocking Blow"],
 	"mage": ["Magic Burst", "Nexus Ward", "Magic Missiles"],
-	"cleric": ["Ministration", "Unburden", "Consecration"],
+	"cleric": ["Heal", "Unburden", "Consecration"],
 	"hunter": ["Powershot", "Snare Trap", "Summon Companion"],
 }
 
@@ -1643,7 +1644,7 @@ const CARD_TAGS := {
 	"Chastise": ["OFFENSE", "BREAK"],
 	"Consecration": ["DEFENSE", "RESOURCE"],
 	"Exhortation": ["DEFENSE", "OFFENSE"],
-	"Ministration": ["DEFENSE"],
+	"Heal": ["DEFENSE"],
 	"Unburden": ["DEFENSE"],
 	"Undying Vigil": ["DEFENSE"],
 	"Forsake": ["MARK"],
@@ -1697,7 +1698,7 @@ const CARD_TAGS := {
 	"Ice Lance": ["DEBUFF", "BREAK"],
 	"Razor Ice": ["DEBUFF", "BREAK"],
 	# --- core:holy ---
-	"Heal": ["DEFENSE"],
+	"Greater Heal": ["DEFENSE"],
 	"Hymn of Hope": ["DEFENSE", "RESOURCE"],
 	"Renewal": ["DEFENSE"],
 	"Resurrection": ["DEFENSE"],
@@ -2151,6 +2152,15 @@ const QUARRY_PCT := 25               # ruled: every ally deals 25% more to it
 const OPENING_BONUS_PCT := 200       # PROPOSED: "enormous" — the first attack deals triple
 const OPENING_QUIET_TURNS := 2       # ruled: two turns unstruck
 const FIELD_KIT_HEAL_PCT := 5        # ruled: the most wounded hero heals 5%
+# BATCH KB — VOLLEY AND THE AMBUSHER: the designer wrote both rules with Claude in conversation and ruled every figure
+# below (`docs/reports/KB.md` §0). QUARRY_PCT and the two OPENING figures above are COMMON FOE's and POUNCE's now,
+# the Tracker and the Skirmisher made ordinary runes, their rules kept.
+const VOLLEY_STEP := 4               # ruled: arrow k on a target adds k times this Bleed buildup (k counts the arrows
+                                     # that landed, KB's reading: a miss does not advance it)
+const VOLLEY_CLEAN_MULT := 2         # ruled: when every arrow at a target lands (two or more), the last one's counts twice
+const VOLLEY_RIDER_FLOOR := 1.0      # ruled: from the second arrow on, the damage roll's floor (the second to land, KB's reading)
+const OVERDRAW_MAX_ARROWS := 2       # ruled: at most two copies of the arrow a cast
+const OVERDRAW_MAX_DELAY := 4.0     # ruled: no more than 4.0 initiative added in all
 
 const RULE_ENGINES := {
 	"savage_assault": {"class": "warrior", "name": "Reaver"},
@@ -2159,8 +2169,8 @@ const RULE_ENGINES := {
 	"siphon": {"class": "mage", "name": "Leech"},
 	"covenant_oath": {"class": "cleric", "name": "Oathkeeper"},
 	"judgment": {"class": "cleric", "name": "Arbiter"},
-	"quarry_hunt": {"class": "hunter", "name": "Tracker"},
-	"opening_strike": {"class": "hunter", "name": "Skirmisher"},
+	"volley": {"class": "hunter", "name": "Volley"},
+	"ambusher": {"class": "hunter", "name": "Ambusher"},
 	"field_kit": {"class": "hunter", "name": "Medic"},
 }
 
@@ -2204,14 +2214,23 @@ static func _rule_engine_desc(pid: String) -> String:
 				+ "ally damages the judged enemy, every ally\nheals %d%% of that damage. When the judged\n"
 				+ "enemy falls, the enemy with the most\nhealth is judged in its place.") % [
 				nm, JUDGMENT_HEAL_PCT]
-		"quarry_hunt":
-			return ("%s: the first enemy the Hunter\ndamages each battle is tracked, and every\n"
-				+ "ally deals %d%% more damage to it. When the\ntracked enemy falls, the tracking passes\n"
-				+ "to the enemy with the most health.") % [nm, QUARRY_PCT]
-		"opening_strike":
-			return ("%s: the Hunter's first attack each\nbattle deals %d%% more damage. The bonus\n"
-				+ "returns whenever %d of the Hunter's turns\npass without an enemy striking the Hunter.") % [
-				nm, OPENING_BONUS_PCT, OPENING_QUIET_TURNS]
+		"volley":
+			# BATCH KB — the designer's rule, rendered to the text standard (shown in `docs/reports/KB.md` for review).
+			return ("%s: in each attack, every arrow the\nHunter or a companion lands on an enemy\n"
+				+ "adds Bleed buildup to it: %d for the\nfirst to land, %d for the second, %d for\n"
+				+ "the third, and so on. When two or more\narrows fly at an enemy and every one\n"
+				+ "lands, the last one's buildup counts\n%s. Once an arrow has landed on an\n"
+				+ "enemy, each later arrow at it rolls at\nleast %d%% of its damage.") % [
+				nm, VOLLEY_STEP, VOLLEY_STEP * 2, VOLLEY_STEP * 3,
+				"twice" if VOLLEY_CLEAN_MULT == 2 else "%d times" % VOLLEY_CLEAN_MULT,
+				int(round(VOLLEY_RIDER_FLOOR * 100.0))]
+		"ambusher":
+			# BATCH KB — the designer's overdraw, rendered to the text standard (shown in `docs/reports/KB.md` for review).
+			return ("%s: before an attack, the Hunter may\nadd up to %d copies of the attack's\n"
+				+ "arrow, each shot at its main target.\nEach copy delays the Hunter's next\n"
+				+ "turn by the attack's initiative divided\nby its arrows, no more than %.1f\n"
+				+ "initiative in all, and costs no Mana.\nAn attack on every enemy, a companion's\n"
+				+ "own attack, Twin Hunt, Harvest and Cull\ntake no copies.") % [nm, OVERDRAW_MAX_ARROWS, OVERDRAW_MAX_DELAY]
 		"field_kit":
 			return ("%s: whenever the Hunter lays a harmful\neffect on an enemy, the most wounded hero\n"
 				+ "heals %d%% of that hero's maximum health\nand sheds one harmful effect.") % [
@@ -4057,18 +4076,17 @@ static func draft_ability(display_name: String) -> Ability:
 		# rather than which side he is on, and every one has to sit on an
 		# Occultist tongue as easily as on Holy's.
 		#
-		# AXIS: the plain heal none of them has, read off the TARGET's maximum.
-		# Since KA's re-tune (JZ's ruling 1, the designer's) it out-heals Holy's
-		# Heal on a large ally and under-heals it on a small one, and both are
-		# multiplied by the same Mercy term.
-		"Ministration":
-			return Ability.make({"display_name": "Ministration",
+		# AXIS: the plain heal none of them has. BATCH KB — HEAL, Ministration until KB (the designer's ruling: the name
+		# is kept for a later card). It reads the CLERIC's maximum, as Greater Heal does, at a smaller share of it
+		# (the Eleventh Hour doubles it on an ally below its threshold); the same Mercy term multiplies both.
+		"Heal":
+			return Ability.make({"display_name": "Heal",
 				"dmg_type": "holy", "cost": 20, "damage": 0, "pressure": 0,
 				"delay": 2.0, "cooldown": 2, "anim": "attack02",
-				"special": "ministration", "target": Ability.Target.ALLY,
-				"perfect_id": "", "perfect_text": "Heals {mhp:{=Battle.MINISTRATION_PERFECT_PCT*100}|ally}",
-				"description": "The plain office: heal one ally for {=Battle.MINISTRATION_PCT*100}%\nof THEIR maximum health. No stacks, no\nshields, no marks — it simply works."})
-		# AXIS: sustained rather than burst, the opposite read to Ministration.
+				"special": "kit_heal", "target": Ability.Target.ALLY,
+				"perfect_id": "", "perfect_text": "Heals {mhp:{=Battle.HEAL_PERFECT_PCT*100}}",
+				"description": "Heal one ally for {=Battle.HEAL_PCT*100}% of the Cleric's\nmaximum health."})
+		# AXIS: sustained rather than burst, the opposite read to Heal.
 		# Per target it is small on purpose; what it buys is that it is small
 		# for EVERYONE, every turn, while it holds.
 		"Consecration":
@@ -7075,7 +7093,7 @@ static func spec_abilities(spec: String) -> Array:
 			# of the Last Rites still grants it by name and both must read the
 			# same numbers. It LEFT `SPEC_POOLS["holy"]` for the same reason.
 			return [
-				Ability.make({"display_name": "Heal", "cooldown": 1, "cost": 20, "special": "holy_heal",
+				Ability.make({"display_name": "Greater Heal", "cooldown": 1, "cost": 20, "special": "holy_heal",
 					"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "Also recovers {mhp:5}",
 					"description": "Mend an ally for 40% of the Cleric's\nmax health. Empower for 1 Mercy:\nalso cleanses all harmful effects."}),

@@ -2,20 +2,20 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 2427,
-  "source": 1471,
-  "other": 364,
-  "document": 592
+  "total": 2431,
+  "source": 1474,
+  "other": 363,
+  "document": 594
  },
  "floor": {
-  "pins": 2427
+  "pins": 2431
  },
  "falls": [],
  "source_residency": {
   "narrow": 49,
-  "code": 907,
-  "absent": 335,
-  "runtime": 114,
+  "code": 908,
+  "absent": 336,
+  "runtime": 115,
   "unresolved": 6,
   "comment": 52,
   "missing-file": 5,
@@ -5135,6 +5135,17 @@
   {
    "s": "check_hp.gd",
    "fn": "_s5_the_records",
+   "h": "docs/state.md",
+   "n": "### THE SKIRMISHER AND THE TRACKER — **RULED INTO ORDINARY RUNES",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#852"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s5_the_records",
    "h": "CLAUDE.md",
    "n": "A CARD STATING ITS OWN COST AND PAYOUT IS WHAT A CARD IS",
    "p": "+",
@@ -5190,6 +5201,17 @@
   {
    "s": "check_hp.gd",
    "fn": "_s5_the_records",
+   "h": "docs/state.md",
+   "n": "BUILT AT KB: COMMON FOE AND POUNCE",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_hp.gd#852"
+  },
+  {
+   "s": "check_hp.gd",
+   "fn": "_s5_the_records",
    "h": "CLAUDE.md",
    "n": "HERO-SIDE DEBUFF SUPPLY IS 0.296 A ROUND",
    "p": "+",
@@ -5197,39 +5219,6 @@
    "k": "literal",
    "how": "read",
    "g": "check_hp.gd#846"
-  },
-  {
-   "s": "check_hp.gd",
-   "fn": "_s5_the_records",
-   "h": "docs/state.md",
-   "n": "RULED, NOT BUILT",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "read",
-   "g": "check_hp.gd#852"
-  },
-  {
-   "s": "check_hp.gd",
-   "fn": "_s5_the_records",
-   "h": "docs/state.md",
-   "n": "Skirmisher",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "read",
-   "g": "check_hp.gd#852"
-  },
-  {
-   "s": "check_hp.gd",
-   "fn": "_s5_the_records",
-   "h": "docs/state.md",
-   "n": "Tracker",
-   "p": "+",
-   "r": "code",
-   "k": "literal",
-   "how": "read",
-   "g": "check_hp.gd#852"
   },
   {
    "s": "check_hp.gd",
@@ -12922,7 +12911,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jp.gd#203",
+   "g": "check_jp.gd#215",
    "expr": "NOT_PULLED"
   },
   {
@@ -12934,7 +12923,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_jp.gd#208"
+   "g": "check_jp.gd#220"
   },
   {
    "s": "check_jp.gd",
@@ -12945,7 +12934,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_jp.gd#208"
+   "g": "check_jp.gd#220"
   },
   {
    "s": "check_jp.gd",
@@ -12956,7 +12945,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_jp.gd#208"
+   "g": "check_jp.gd#220"
   },
   {
    "s": "check_jp.gd",
@@ -12967,7 +12956,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jp.gd#138",
+   "g": "check_jp.gd#150",
    "expr": "ANSWERED"
   },
   {
@@ -12979,7 +12968,7 @@
    "r": "runtime",
    "k": "composed",
    "how": "read",
-   "g": "check_jp.gd#132"
+   "g": "check_jp.gd#144"
   },
   {
    "s": "check_jp.gd",
@@ -12990,7 +12979,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_jp.gd#136"
+   "g": "check_jp.gd#148"
   },
   {
    "s": "check_jp.gd",
@@ -13001,7 +12990,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jp.gd#275",
+   "g": "check_jp.gd#287",
    "expr": "String"
   },
   {
@@ -13013,7 +13002,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jp.gd#281",
+   "g": "check_jp.gd#293",
    "expr": "FLOOR_HEAD"
   },
   {
@@ -13025,7 +13014,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_jp.gd#282"
+   "g": "check_jp.gd#294"
   },
   {
    "s": "check_jp.gd",
@@ -13036,7 +13025,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jp.gd#341",
+   "g": "check_jp.gd#353",
    "expr": "String"
   },
   {
@@ -13625,6 +13614,63 @@
    "k": "literal",
    "how": "read",
    "g": "check_jz.gd#293"
+  },
+  {
+   "s": "check_kb.gd",
+   "fn": "_fn_body",
+   "h": "scripts/battle.gd",
+   "n": "\nfunc ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "param",
+   "g": "check_kb.gd#92"
+  },
+  {
+   "s": "check_kb.gd",
+   "fn": "_fn_body",
+   "h": "scripts/battle.gd",
+   "n": "\nfunc %s(",
+   "p": "+",
+   "r": "runtime",
+   "k": "format",
+   "how": "param",
+   "g": "check_kb.gd#89"
+  },
+  {
+   "s": "check_kb.gd",
+   "fn": "_passage",
+   "h": "docs/master.html",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "param",
+   "g": "check_kb.gd#342",
+   "expr": "head"
+  },
+  {
+   "s": "check_kb.gd",
+   "fn": "_passage",
+   "h": "docs/master.html",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "param",
+   "g": "check_kb.gd#345",
+   "expr": "tail"
+  },
+  {
+   "s": "check_kb.gd",
+   "fn": "_s2_bot_picks",
+   "h": "scripts/battle.gd",
+   "n": "\"Ministration\"",
+   "p": "-",
+   "r": "absent",
+   "k": "literal",
+   "how": "read",
+   "g": "check_kb.gd#137"
   },
   {
    "s": "test_batch_ah.gd",
@@ -22954,7 +23000,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "test_batch_bq.gd#596",
+   "g": "test_batch_bq.gd#595",
    "expr": "nm"
   },
   {
@@ -22966,7 +23012,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "test_batch_bq.gd#591"
+   "g": "test_batch_bq.gd#590"
   },
   {
    "s": "test_batch_bq.gd",
@@ -22977,7 +23023,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#599"
+   "g": "test_batch_bq.gd#598"
   },
   {
    "s": "test_batch_bq.gd",
@@ -22988,7 +23034,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#601"
+   "g": "test_batch_bq.gd#600"
   },
   {
    "s": "test_batch_bq.gd",
@@ -22999,7 +23045,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#605"
+   "g": "test_batch_bq.gd#604"
   },
   {
    "s": "test_batch_bq.gd",
@@ -23010,7 +23056,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#620"
+   "g": "test_batch_bq.gd#619"
   },
   {
    "s": "test_batch_bq.gd",
@@ -23021,7 +23067,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#621"
+   "g": "test_batch_bq.gd#620"
   },
   {
    "s": "test_batch_bq.gd",
@@ -23032,7 +23078,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#588"
+   "g": "test_batch_bq.gd#587"
   },
   {
    "s": "test_batch_bq.gd",
@@ -23043,7 +23089,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#618"
+   "g": "test_batch_bq.gd#617"
   },
   {
    "s": "test_batch_bq.gd",
@@ -23054,7 +23100,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#597"
+   "g": "test_batch_bq.gd#596"
   },
   {
    "s": "test_batch_bq.gd",
@@ -23065,7 +23111,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#597"
+   "g": "test_batch_bq.gd#596"
   },
   {
    "s": "test_batch_bq.gd",
@@ -23076,7 +23122,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#399"
+   "g": "test_batch_bq.gd#398"
   },
   {
    "s": "test_batch_bq.gd",
@@ -23087,7 +23133,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#398"
+   "g": "test_batch_bq.gd#397"
   },
   {
    "s": "test_batch_bq.gd",
@@ -23098,7 +23144,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#353"
+   "g": "test_batch_bq.gd#352"
   },
   {
    "s": "test_batch_bq.gd",
@@ -23109,7 +23155,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#352"
+   "g": "test_batch_bq.gd#351"
   },
   {
    "s": "test_batch_bq.gd",
@@ -23120,7 +23166,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#303"
+   "g": "test_batch_bq.gd#302"
   },
   {
    "s": "test_batch_bq.gd",
@@ -23131,7 +23177,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#302"
+   "g": "test_batch_bq.gd#301"
   },
   {
    "s": "test_batch_bq.gd",
@@ -23142,7 +23188,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#584"
+   "g": "test_batch_bq.gd#583"
   },
   {
    "s": "test_batch_bq.gd",
@@ -23153,7 +23199,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#582"
+   "g": "test_batch_bq.gd#581"
   },
   {
    "s": "test_batch_bq.gd",
@@ -23175,7 +23221,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "test_batch_bq.gd#120"
+   "g": "test_batch_bq.gd#119"
   },
   {
    "s": "test_batch_bq.gd",

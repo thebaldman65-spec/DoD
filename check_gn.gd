@@ -51,7 +51,7 @@ const SCRATCH_PROFILE := "user://gn_profile.json"
 const SCRATCH_RELICS := "user://gn_relics.json"
 const FRAME_CAP := 6000
 # The five that were class-wide and are guaranteed now.
-const LEFT_THE_POOLS := ["Nexus Ward", "Magic Missiles", "Ministration",
+const LEFT_THE_POOLS := ["Nexus Ward", "Magic Missiles", "Heal",
 	"Unburden", "Consecration"]
 
 var _g := Gate.new()
@@ -447,16 +447,16 @@ func _s1_the_twelve() -> void:
 		print("    Magic Missiles: %d damage, %d Break damage" % [hits_before - e0.hp, e0.pressure])
 		_reset_foe(e0)
 
-	# MINISTRATION — 35% of THE TARGET's maximum health (KA).
-	var mend := _card(C, "Ministration")
+	# HEAL (Ministration until KB) — 20% of THE CLERIC's maximum health (KB, the designer's).
+	var mend := _card(C, "Heal")
 	if mend != null:
 		_ready_to_cast(C)
 		W.hp = 1
 		await s._resolve_special(C, mend, W, "good", 1.0)
-		ok(W.hp - 1 == int(round(W.max_hp * 0.35)) and C.max_hp != W.max_hp,
-			"§1: Ministration heals the Warrior %d — 35%% of HIS maximum (%d), not the Cleric's (%d)"
-				% [W.hp - 1, W.max_hp, C.max_hp])
-		print("    Ministration: the Warrior regains %d of his %d" % [W.hp - 1, W.max_hp])
+		ok(W.hp - 1 == int(round(C.max_hp * 0.20)) and C.max_hp != W.max_hp,
+			"§1: Heal mends the Warrior %d — 20%% of the CLERIC's maximum (%d), not his own (%d)"
+				% [W.hp - 1, C.max_hp, W.max_hp])
+		print("    Heal: the Warrior regains %d of his %d" % [W.hp - 1, W.max_hp])
 		W.hp = W.max_hp
 
 	# UNBURDEN — every harmful effect off, 30% less damage for 3 turns (KA).
@@ -965,11 +965,11 @@ func _s4_the_bot() -> void:
 	M.remove_status("barrier")
 	for e in foes:
 		_reset_foe(e)
-	# CLERIC: a hero under half -> Ministration; an afflicted hero -> Unburden;
+	# CLERIC: a hero under half -> Heal; an afflicted hero -> Unburden;
 	# two hurt and no blessing -> Consecration.
 	_ready_to_cast(C)
 	W.hp = int(W.max_hp * 0.3)
-	picks["Ministration"] = _pick_name(s, C)
+	picks["Heal"] = _pick_name(s, C)
 	W.hp = W.max_hp
 	s._apply_status(H, "cripple", 3, 0, 0, foes[0])
 	picks["Unburden"] = _pick_name(s, C)

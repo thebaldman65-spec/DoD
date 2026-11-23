@@ -4422,6 +4422,13 @@ func save_run() -> void:
 	# so it is HL's ceiling this change is guarded by, not the keys. **A v14 save is
 	# not refused**: `_hand_out_the_bag` gives each class rune in its bag to the hero
 	# of its class, unworn, on load. The floor does not move.
+	# **BATCH KB — v16** (the designer's renames and conversion): the kit card Ministration became Heal and Holy's
+	# Heal became Greater Heal, so the name *Heal* means a different card on each side of 16; and the Tracker and the
+	# Skirmisher became ordinary runes while Volley and the Ambusher took their core slots. A v15 build reading a v16
+	# save would drop the two new cores and blank the two ordinary payloads — a key it would write away, so HL's
+	# ceiling guards it. **A v15 save is not refused**: its cards are read by the names v16 gave them
+	# (`RENAMED_CARDS_BY_VERSION`), and a rune whose engine field today's definition does not carry is rebuilt and,
+	# if it is no core now, moved to its hero's ordinary runes (`_reseat_former_cores`). The floor does not move.
 	file.store_var({
 		"version": SAVE_VERSION, "party": party, "items": items, "gold": gold,
 		"rune_bag": rune_bag, "crest": party_runes,
@@ -4464,7 +4471,7 @@ func has_save() -> bool:
 # **IT IS READ OFF THE DISK AT EVERY WRITE, NOT CACHED**: the file is what the
 # ceiling protects, a check that trusted a cached answer could be stale by the
 # time it mattered, and one read beside a write costs next to nothing.
-const SAVE_VERSION := 15
+const SAVE_VERSION := 16
 # The floor, for the refusal's sentence. `load_run` reads it as the literal
 # `save_version < 10`, which three gates pin as it stands (`test_batch_bk`,
 # `test_batch_bm`, `check_hk`); the two are the same number and neither moved.
@@ -4624,10 +4631,14 @@ func load_run() -> bool:
 	# this is a no-op; a v13 save never had a bag, and its unworn runes stay where it
 	# held them — on the hero, which is where an unworn rune lives again.
 	load_notes = []
+	# BATCH KB — every reader of a saved card's name below reads the save's version (`_card_now`), the bag's door included
+	_loaded_save_version = save_version
 	_hand_out_the_bag()
 	_refresh_rune_names()
 	_rebuild_stale_payloads()
+	_reseat_former_cores()
 	_rename_saved_cards()
+	_loaded_save_version = SAVE_VERSION
 	readout = {}
 	active = true
 	return true
@@ -4784,9 +4795,9 @@ func _refresh_rune_names() -> int:
 const LOAD_DOOR_ANSWERS := {
 	"take": "a name today's game has, or a payload whose every field today's definition names — read as it is",
 	"translate": "a name the rename map translates — read by today's (IR §2)",
-	"drop": "a name the removal map names, or a rune today's game defines nowhere — dropped, its slot freed, and said where the player can see it",
+	"drop": "a name the removal map names, a rune today's game defines nowhere, or an id a deal holds that is no core rune now — dropped, its slot freed, and said where the player can see it",
 	"keep": "a name in neither map and in no table — kept as saved and said out loud (IR §2: it is evidence)",
-	"rebuild": "a payload naming a field today's definition does not name — rebuilt from today's definition, and said",
+	"rebuild": "a payload naming a field today's definition does not name, or an engine today's definition does not carry — rebuilt from today's definition, and said",
 }
 # The places a save carries a card's name, on each member — the rename map's walk (IR §2), one more
 # answer since IS — and the places it carries a rune or a rune's id. The two walks below name exactly these,
@@ -4836,8 +4847,13 @@ func _rebuild_stale_payloads() -> void:
 		if md.get("engine_offer") is Array:
 			var dealt: Array = []
 			for id in md["engine_offer"]:
-				if bool(Runes.definition(String(id))["defined"]):
+				if bool(Runes.definition(String(id))["defined"]) and Runes.is_engine_rune(String(id)):
 					dealt.append(id)
+				elif bool(Runes.definition(String(id))["defined"]):
+					# BATCH KB — a core ruled ordinary (the Tracker, the Skirmisher) is no card of this deal now.
+					load_dropped_runes.append({"hero": who, "rune": String(id)})
+					load_notes.append("%s is no longer a core rune: it leaves the %s's offer." % [
+						String(Runes.config(String(id)).get("name", id)), who])
 				else:
 					load_dropped_runes.append({"hero": who, "rune": String(id)})
 					load_notes.append("%s is no longer in the game: it leaves the %s's offer." % [String(id), who])
@@ -4859,6 +4875,15 @@ func _rebuilt_rune_list(runes: Array, who: String) -> Array:
 				continue
 			"rebuild":
 				var stale := _stale_paths(rd)
+				# BATCH KB — A RUNE WHOSE ENGINE TODAY's DEFINITION DOES NOT CARRY IS REBUILT WHOLE (the engine field with
+				# the rest), its slot kept: a core ruled ordinary loses its engine here and leaves the core slot below.
+				var rb_id := String(rd.get("id", ""))
+				if String(rd.get("engine", "")) != String(Runes.config(rb_id).get("engine", "")):
+					stale.append("engine")
+					var rb_on := bool(rd.get("equipped", false))
+					rd.clear()
+					rd.merge(Runes.build(rb_id), true)
+					rd["equipped"] = rb_on
 				rd["payload"] = (Runes.definition(String(rd.get("id", "")))["payload"] as Dictionary).duplicate(true)
 				# BATCH JH §1 — AND ITS CARD WITH IT: a payload rebuilt under the saved words pays today's rune and shows the one
 				# the save was written with (a JG save's Communion paid 37% under JG's 11% card). The name is refreshed on load already.
@@ -4879,7 +4904,39 @@ func _rune_answer(rune: Dictionary) -> String:
 		return "take"
 	if not bool(Runes.definition(id)["defined"]):
 		return "drop"
+	if String(rune.get("engine", "")) != String(Runes.config(id).get("engine", "")):
+		return "rebuild"
 	return "rebuild" if not _stale_paths(rune).is_empty() else "take"
+
+
+# ══ BATCH KB — A RUNE THAT IS NO CORE NOW LEAVES THE CORE SLOT ══════════════════════════════════════════════════════════
+# The Tracker and the Skirmisher became Common Foe and Pounce. Rebuilt by the door above, such a rune still sits in its
+# hero's `engines`; it moves to his ordinary runes — worn if he wore it and an ordinary slot is free, held otherwise —
+# and his core slot is left empty, which is a legal state (the hero sheet's). Said where the player reads. Derived, not
+# mapped: it moves any instance in `engines` that carries no engine. No die.
+func _reseat_former_cores() -> void:
+	for m in party:
+		var md: Dictionary = m
+		if not (md.get("engines") is Array):
+			continue
+		var keep: Array = []
+		var moved: Array = []
+		for r in md["engines"]:
+			if r is Dictionary and String((r as Dictionary).get("engine", "")) == "":
+				moved.append(r)
+			else:
+				keep.append(r)
+		if moved.is_empty():
+			continue
+		md["engines"] = keep
+		for r2 in moved:
+			var rd2: Dictionary = r2
+			var was_worn := bool(rd2.get("equipped", false))
+			rd2["equipped"] = was_worn and runes_worn(md) < rune_slots()
+			md["runes"] = md.get("runes", []) + [rd2]
+			load_notes.append("%s is an ordinary rune now: it %s among the %s's runes, and the core slot is empty." % [
+				String(rd2.get("name", rd2.get("id", ""))), "is worn" if bool(rd2["equipped"]) else "waits",
+				nameplate(md)])
 
 
 # What makes a saved payload one today's game cannot read: every field path today's definition does not
@@ -4900,7 +4957,7 @@ func _removed_cards_named(p: Variant, out: Array) -> void:
 		for k in (p as Dictionary).keys():
 			var v: Variant = (p as Dictionary)[k]
 			if v is String and String(k) in ["ability", "grant_ability", "owns_ability"] \
-					and REMOVED_CARDS.has(String(RENAMED_CARDS.get(String(v), String(v)))):
+					and REMOVED_CARDS.has(_card_now(String(v))):
 				out.append("%s: %s" % [String(k), String(v)])
 			else:
 				_removed_cards_named(v, out)
@@ -4937,6 +4994,23 @@ const RENAMED_CARDS := {
 	"Matins": "Divine Presence",                 # CG §1
 	"Magic Barrier": "Nexus Ward",               # GN
 }
+# ══ BATCH KB — A RENAME THAT HANDS AN OLD NAME TO ANOTHER CARD IS TRANSLATED BY THE VERSION THAT MADE IT ══════════════
+# KB gave Holy's *Heal* the name Greater Heal and the kit's Ministration the name *Heal*: on a save older than 16 *Heal*
+# is Holy's card, on a v16 save the kit's. RENAMED_CARDS is read on every load, so a row there would turn every v16
+# kit Heal into Greater Heal; these rows are read only for a save older than their key, both at once, one hop.
+const RENAMED_CARDS_BY_VERSION := {
+	16: {"Heal": "Greater Heal", "Ministration": "Heal"},   # KB
+}
+var _loaded_save_version := SAVE_VERSION  # the save being read; SAVE_VERSION outside a load
+
+
+# The name a saved card answers to today: a version-keyed row for a save older than its key, else RENAMED_CARDS, else
+# the name itself. Every reader of a saved card's name asks this one function.
+func _card_now(name: String) -> String:
+	for ver in RENAMED_CARDS_BY_VERSION:
+		if _loaded_save_version < int(ver) and (RENAMED_CARDS_BY_VERSION[ver] as Dictionary).has(name):
+			return String(RENAMED_CARDS_BY_VERSION[ver][name])
+	return String(RENAMED_CARDS.get(name, name))
 # ══ BATCH IS §2a — THE REMOVAL MAP (the designer's, IS's brief §0.3) ═════════════════════════════════
 #
 # **A REMOVED CARD IS A CARD THE PLAYER NO LONGER HAS EITHER WAY.** Kept, it holds a slot and shows a button
@@ -4968,7 +5042,7 @@ var _dropped_here: Array = []
 # One saved card name, sorted: TAKE (a card today), TRANSLATE (a rename row), DROP (a removal row) or
 # KEEP (neither, and no table holds it). A rename that lands on a removed card is a drop.
 func _card_answer(name: String) -> String:
-	var now := String(RENAMED_CARDS.get(name, name))
+	var now := _card_now(name)
 	if REMOVED_CARDS.has(now):
 		return "drop"
 	if not _card_names.has(now):
@@ -5028,10 +5102,10 @@ func _rename_saved_cards() -> void:
 func _renamed_card(name: String) -> String:
 	var answer := _card_answer(name)
 	if answer == "drop":
-		if not _dropped_here.has(String(RENAMED_CARDS.get(name, name))):
-			_dropped_here.append(String(RENAMED_CARDS.get(name, name)))
+		if not _dropped_here.has(_card_now(name)):
+			_dropped_here.append(_card_now(name))
 		return ""
-	var now := String(RENAMED_CARDS.get(name, name))
+	var now := _card_now(name)
 	if answer == "keep" and not load_unknown_cards.has(now):
 		load_unknown_cards.append(now)
 		push_error("Run: the save names a card this build does not hold, and no rename row maps it: '%s'" % now)

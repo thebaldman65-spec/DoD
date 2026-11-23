@@ -17,6 +17,46 @@ heading stands in both files. **Since JE §3 it also takes what `CLAUDE.md` clos
 
 ---
 
+## ARCHIVED AT KB — 2026-11-22, FROM `docs/state.md` AS KA LEFT IT (`579467a`)
+
+*The designer answered KA's four rulings in conversation between 18 and 22 November (`RECORD_KB.md` in KB's work folder; `docs/reports/KB.md` §0): KA's RULINGS OWED, struck. Every other line the answers touched stays in `docs/state.md`, re-worded in place.*
+
+### ~~KA's RULINGS OWED~~ — **ALL FOUR ANSWERED BY THE DESIGNER IN CONVERSATION, 18-22 NOVEMBER (KB's RECORD); BUILT AT KB: VOLLEY's AND THE AMBUSHER's RULES, WRITTEN WITH THE DESIGNER, AND THE CONVERSION (1); MINISTRATION RENAMED HEAL AT 20% OF THE CLERIC's MAXIMUM HEALTH, THE HOLY CARD RENAMED GREATER HEAL (2); THE KIT CARDS' OTHER FIGURES HELD (3); KA's READING OF THE BALANCE WORD AND ES's RULE TAKEN (4)**
+
+*Its head as it stood: FOUR; VOLLEY's AND THE AMBUSHER's RULES, THE DESIGNER's TO WRITE, WHICH THE CONVERSION WAITS ON; TWO BALANCE QUESTIONS, EACH LAID OUT WITH ITS OPTIONS; AND WHERE THE BALANCE WORD MEETS ES's RUNE RULE, KA's READING TAKEN*
+
+Full working: `docs/reports/KA.md`, NEEDS A RULING.
+
+1. **VOLLEY's AND THE AMBUSHER's RULES — THE DESIGNER's TO WRITE, ONE RUNE AT A TIME (JZ's ruling 2's build; `CLAUDE.md`'s RUNE CONTENT IS WRITTEN WITH THE DESIGNER; not built).** The conversion gives the Hunter's two core slots to Volley and the Ambusher, and neither has a rule: HL §4 gave each a direction (*Volley says multi-hit; Ambusher says long cooldowns*, and the Ambusher a second, *cards that want to follow each other with no turn between*) and nothing more, so JZ's *the build waits on the pick* was half the truth. **What KA brings, not options** (`recon/cores.md` in KA's work folder): the cards each direction would name among the Hunter's 42 draft cards and 15 boss cards — 30 of the 42 at a cooldown of 4 turns or more, eight of them at 5; and a multi-hit population that runs from 4 draft cards (attacks that strike their target more than once) to 11 (every card that lands more than one blow a cast, a companion's and an area's included); the machinery each can ride — the damage door's hit tally, where the Weaver's echo already counts, and the Skirmisher's armed-bonus site and chip; and the questions a rule will have to answer — whether a companion's blows and a retaliation count, a card's authored or its live cooldown (Encumbered's +2), a ceiling beside Pounce and Lethal Aim, a bot arm, and Volley's shared word with Aimed Volley and Called Volley and the Ambusher's with the Ambush rune. **The build, once both are written**: seven game files and about 300 to 350 lines, about eleven gates repaired and one new — three of them (`check_go`, `check_ik`, `check_hy`) hang rather than red when the Tracker's rune leaves, so they run first — and a saved hero awakened on the Tracker or the Skirmisher owed a choice (left with no core, or handed a replacement) and a save step (`SAVE_VERSION` 15 → 16). **The other way**: convert now with the Hunter at four cores — nothing crashes, but about eight more gates red on a literal 24 or 6, about twelve baseline counts fall, and *six a class* stops being true. **KA's brief broke ES**: it asked its reader to draft each rule with alternatives; those drafts stay in KA's work folder and are not put to the designer (FOUND AT KA).
+2. **MINISTRATION OUT-HEALS HOLY's HEAL ON A LARGE ALLY (KA §1; balance).** Ministration reads the target's maximum and Heal the caster's, so at the ruled 35% it heals 70 on the Warden's 200 against Heal's 60 off a Holy Cleric's 150 — more than Heal on any ally past about 172 maximum, less on a small one (35 on a Mage). The comments that called it *the lesser* are re-worded, and `test_batch_bq` §2's retired comparison prints that it no longer holds. **Built as ruled**: the 35% the designer accepted (JZ's ruling 1). **The options**: (a) keep 35% — recommended, the figure accepted; (b) JZ's conservative stop of 30%, which ties Heal on the Warden, 60 and 60; (c) a cap at Heal's own figure; (d) raise Heal beside it.
+3. **THE FIVE KIT CARDS' OTHER FIGURES (KA §1; balance).** The ruling named one figure a card, two on Ministration; KA built those and moved nothing else, so each card's cost, cooldown and initiative stand. **The options**: (a) hold them — recommended, the ruling as accepted; (b) re-price each of the five against its role's median, per cast, per Mana, per initiative and per cooldown turn — the work the twenty class-wide cards' owed batch does (GP-1).
+4. **WHERE THE BALANCE WORD MEETS ES's RUNE RULE (process; KA's reading taken).** The designer's word, given during KA, puts every balance decision before the designer with options; ES's rule says a batch never authors, retunes or presents rune content as options. A rune's figure is both. **Taken**, and written in `CLAUDE.md` as KA's reading: (a) a rune's rule and text stay ES's — written with the designer, never offered as options — and its figures go before the designer with options once the designer has written it. **The alternatives**: (b) the balance word governs both, so a batch may lay out a rune's rule as options too, as JY and JZ did for names; (c) ES stands whole, and a rune's figures are written in conversation with the rest of it.
+
+### FOUND AT KA AND NOT FIXED — ONE ITEM, CLOSED AT KB (the v16 load step, `Run._reseat_former_cores`)
+
+- **A SAVED TRACKER OR SKIRMISHER WOULD OUTLIVE THE CONVERSION** (KA's cores reader, read and not driven): the load door takes a core slot as it stands and `Run.awaken` refuses a rune that is no longer a core, so a hero saved on either would keep a slot that does nothing, a saved class-selection deal would show a card whose button does nothing, and a hero awakened on either would lose his only core — left with none, or handed a replacement, which is the designer's. The build owes a save step (KA's ruling 1).
+
+### FOUND AT GQ AND NOT FIXED — ONE ITEM CLOSED AT KB, ONE IN PART (the Tracker is *Common Foe*, an ordinary rune; Ministration's text left with its card, Heal's written new)
+
+- **THE HUNTER'S CLASS PASSIVE AND A HUNTER RUNE ARE BOTH *TRACKER*,** and on a deal holding the Rune of the Tracker the
+  two stand one above the other on this screen. GO's ruling 2, re-observed (archived at JY; the names ruled at KA — *Common Foe* and *Pounce*, RULED, NOT BUILT — and the build waiting on
+  Volley's and the Ambusher's rules, KA's ruling 1).
+- **PLAYER-FACING, MET ON THIS SCREEN FIRST: FOUR KIT TEXTS BREAK THE TEXT STANDARD.** Ministration's *"No stacks, no
+  shields, no marks — it simply works"* and Magic Missiles' *"Cheap, certain, and it never needs anything to be true
+  first"* are design rationale on a card; Magic Missiles restates *"12% of Attack each"* beside the line that prints it;
+  *(Nexus Ward's and Ministration's figures read their constants since IT §2 — archived at IT.)* A kit
+  card's text was outside GQ.
+
+### STRUCK FROM `CLAUDE.md` AT KB — THE AMBUSHER's UNBUILT DIRECTION, SUPERSEDED BY THE RULE THE DESIGNER WROTE
+
+*It stood under the core-rune block (HL §4) until the designer wrote the Ambusher's rule — overdraw — in conversation; `CLAUDE.md` says so where it stood.*
+
+- **AMBUSHER'S SHARPEST DIRECTION IS UNBUILT: cards that want to follow each other with no turn between.** Nothing in
+  the game reads what was cast last turn — the nearest are `last_attack_target` and Overtone's cast count — so a combo
+  family is new machinery, and it wants a recon first.
+
+---
+
 ## ARCHIVED AT KA — 2026-11-17, FROM `docs/state.md` AS JZ LEFT IT (`144a253`)
 
 *The designer accepted JZ's nine rulings as recommended on 17 November (`RECORD_KA.md` in KA's work folder; `docs/reports/KA.md` §0): JZ's RULINGS OWED, struck. Every other line the answer touched stays in `docs/state.md`, re-worded in place.*

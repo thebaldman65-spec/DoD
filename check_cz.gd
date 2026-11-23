@@ -54,7 +54,7 @@ const SHIELDS := ["divine_shield", "interpose", "magic_barrier", "mantle",
 # these ever comes down to the cap it is a design decision, and it should have
 # to come through this list rather than through a table edit nobody reads.
 const HEALS_STAY := ["dark_pact", "dawnbreak", "divine_plea", "field_dressing",
-	"fortified_spirit", "holy_heal", "hymn", "jubilee", "ministration",
+	"fortified_spirit", "holy_heal", "hymn", "jubilee", "kit_heal",
 	"renewal", "reliquary", "sanctuary", "second_wind_holy", "spirit_bond"]
 
 var _g := Gate.new()

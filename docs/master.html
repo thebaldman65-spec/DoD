@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-11-17 (Batch KA &mdash; the kit cards' new figures)</b></p>
+<p align="right"><b>Last updated: 2026-11-22 (Batch KB &mdash; Heal, and the Hunter's two new cores)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -724,7 +724,7 @@ individual blow that does land past a certainty is much larger.</li>
 <li><b>Attacker modifiers:</b> Resonance +1.5% × N(N+1)/2 at N stacks (a COMPOUNDING
 curve, not a per-stack slope — see §5.1); Surge +20%; Empower +25%; Cripple −25%; Hexed −15%;
 Blood Frenzy up to +40%, built from HP missing AND Rage spent; Seasoned Fighter +30% in the Aggressive stance and −10% in the Defensive one; the Reaver
-+10% for every enemy the hero has felled, and the Skirmisher +200% on the first attack (&sect;6.0); relic bonuses
++10% for every enemy the hero has felled, and the rune Pounce +200% on the first attack (&sect;6.0); relic bonuses
 (global +10% dragonbone; fire/holy +20% emberheart); Powershot +2% per 1% of the target's
 Break bar already full; Overpower +0.5 per point of target Break; Fireball perfects at 25% of
 Attack. <b>Neither Arcane Cannon nor Magi's Wrath
@@ -737,7 +737,7 @@ damage does not reach them; nor does it, or the Shieldmaster's ward, reach a str
 own (a Killing Frost's). The school relics, Clarity, Profligate and the ward each say <i>strike</i>.</li>
 <li><b>A companion's blows resolve on their own path and read almost none of that list.</b> They
 carry their own damage roll and their own flat critical, and of the strike loop's terms they read
-<b>Mark of the Hunt</b>, the ownerless <b>Hunter's Mark</b>, the Tracker's mark (&sect;6.0), <b>Cripple and Chilled</b>. <b>TWO RUNES REACH IT AS WELL</b> &mdash; the <b>Bared Fang</b>'s flat +30%,
+<b>Mark of the Hunt</b>, the ownerless <b>Hunter's Mark</b>, Common Foe's mark (&sect;6.0), <b>Cripple and Chilled</b>. <b>TWO RUNES REACH IT AS WELL</b> &mdash; the <b>Bared Fang</b>'s flat +30%,
 read off the hunter, and the <b>Shared Hide</b>, which turns on eleven damage terms the companion is
 already wearing (four flat buff statuses, five that carry their own number, and the hunter's Last
 Howl and Vengeance, both of which are about a bond that already broke). <b>The Shared Hide's flag
@@ -959,7 +959,7 @@ taken to the attacker (Devout ability, 3 turns).</td></tr>
 <tr><td>Bulwark of Fortitude</td><td>NO Break damage taken, armor increased by 50%, and
 10% max health regained each turn; the cast itself heals 5% at once (Devout ability,
 3 turns — every HERO, companions excluded).</td></tr>
-<tr><td>Holy Capacitor</td><td>Overhealing banked for the next Heal, shown
+<tr><td>Holy Capacitor</td><td>Overhealing banked for the next Greater Heal, shown
 with a live counter, and released by it (nothing in the game applies it at present).</td></tr>
 <tr><td>Intercession</td><td>The next lethal blow or tick against ANY hero is refused — they
 survive at 1 HP and the Cleric loses 1 Mercy. She must be holding one when it lands
@@ -1149,7 +1149,7 @@ text. No banner text appears at the top of the battle.</p>
 <h2>5. Heroes</h2>
 <p><b>All ability damage is a % of the user's Attack</b> (see §4.3); the flat numbers in
 the kit lists below are the values at the class/spec base Attack, before node scaling.
-<b>Ability shields and healing scale off the CASTER's max health</b> (Nexus Ward 25%, Divine Shield 35%, Heal 40%,
+<b>Ability shields and healing scale off the CASTER's max health</b> (Nexus Ward 25%, Divine Shield 35%, Greater Heal 40%, Heal 20%,
 Renewal 15%/turn, Hymn of Hope reads each target's own health) — a beefier healer heals
 harder.</p>
 <p>All four classes are drafted every run (one of each). Sprites currently share the Soldier
@@ -1266,7 +1266,7 @@ does.</li>
 <tr><td rowspan="3"><b>Mage</b></td><td><b>Magic Burst</b></td><td>25 Mana, 3.0, 2cd, one enemy</td><td><b>40% of Attack</b> as arcane and 15 Break damage, and the target is left with <b>Elemental Weakness</b> for 3 turns: its resistance to every school but physical is 15% lower (&sect;4.6), so a Cleric's holy and a Survivalist's nature land harder on it as surely as the Mage's own arcane. A second burst refreshes the 3 turns (Perfect: 46% of Attack).</td></tr>
 <tr><td><b>Nexus Ward</b></td><td>25 Mana, 1.0, 4cd, self</td><td>Absorbs damage equal to <b>25% of his maximum health</b> for 3 turns. It is an ordinary barrier, so it eats every blow, area attacks included, but no tick, recoil or reflected damage.</td></tr>
 <tr><td><b>Magic Missiles</b></td><td>15 Mana, 2.0, 2cd, one enemy</td><td>Three bolts at <b>12% of Attack</b> each, 5 BD a bolt (Perfect: a fourth bolt).</td></tr>
-<tr><td rowspan="3"><b>Cleric</b></td><td><b>Ministration</b></td><td>20 Mana, 2.0, 2cd, one ally</td><td>Heals <b>35% of that ally's maximum health</b> (Perfect: 45%).</td></tr>
+<tr><td rowspan="3"><b>Cleric</b></td><td><b>Heal</b></td><td>20 Mana, 2.0, 2cd, one ally</td><td>Heals <b>20% of the Cleric's maximum health</b> (Perfect: 26%).</td></tr>
 <tr><td><b>Unburden</b></td><td>20 Mana, 1.5, 4cd, one ally</td><td>Removes <b>every</b> harmful effect from that ally, and they take <b>30% less damage for 3 turns</b>.</td></tr>
 <tr><td><b>Consecration</b></td><td>25 Mana, 1.0, 5cd, every hero</td><td>For 4 turns <b>every hero regains 5% of maximum health</b> at the start of each of their turns.</td></tr>
 <tr><td rowspan="3"><b>Hunter</b></td><td><b>Powershot</b></td><td>25 Mana, 3.0, 2cd, one enemy</td><td><b>20% of Attack</b> and <b>20 Break damage</b>, +2% damage for every point of the target's Break meter already full.</td></tr>
@@ -1350,7 +1350,7 @@ Kit panel says which rune brings it back, on its row and on its hover, and the k
 Kill Command and the companion cards on the companion every Hunter but the Sharpshooter summons
 &mdash; always fights.</li>
 <li><b>A rune that reads an engine is offered only while that engine is equipped.</b> Forty-two of
-the eighty ordinary runes pay nothing at all to a hero whose engine slots do not hold their engine &mdash;
+the eighty-two ordinary runes pay nothing at all to a hero whose engine slots do not hold their engine &mdash;
 a Ruin rune to a Cleric who has unequipped the Rune of the Occultist (core), a Focus rune to a Hunter who has
 unequipped the Rune of the Sharpshooter (core) &mdash; and none of them is rolled for him, at the Peddler, in
 an elite's cache, in a bargain or from an event. <b>A rune that still does part of its job without its
@@ -1428,8 +1428,8 @@ rule engine has no lineage, and opens with his class's basic attack and his clas
 <tr><td rowspan="6">Hunter</td><td>Rune of the Beastmaster (core)</td><td>Pack Bond</td><td>—</td></tr>
 <tr><td>Rune of the Sharpshooter (core)</td><td>Lethal Aim</td><td>Quick Shot (every Hunter's basic)</td></tr>
 <tr><td>Rune of the Survivalist (core)</td><td>Trapper</td><td>—</td></tr>
-<tr><td>Rune of the Tracker (core)</td><td>Quarry</td><td>—</td></tr>
-<tr><td>Rune of the Skirmisher (core)</td><td>Opening</td><td>—</td></tr>
+<tr><td>Rune of the Volley (core)</td><td>Volley</td><td>—</td></tr>
+<tr><td>Rune of the Ambusher (core)</td><td>Overdraw</td><td>—</td></tr>
 <tr><td>Rune of the Medic (core)</td><td>Field Kit</td><td>—</td></tr>
 </table>
 <p><b>The three class engines</b> carry no spec: <b>Momentum</b> makes a Warrior's later turns in a
@@ -1470,14 +1470,17 @@ companions.</li>
 heals nobody. Whenever an ally damages the judged enemy afterwards, every living ally &mdash;
 companions included &mdash; heals 5% of that damage. When it falls, the enemy with the most health is
 judged in its place. A fallen Cleric judges nothing.</li>
-<li><b>Tracker</b> (Hunter): the first enemy the Hunter damages in a battle is tracked, and every
-ally's attacks and abilities that strike it deal 25% more damage &mdash; a companion's blows included.
-Damage over time and an ability that works out its own damage do not read it, as with Exposed. When it
-falls, the tracking passes to the enemy with the most health. A fallen Hunter's mark pays nothing.</li>
-<li><b>Skirmisher</b> (Hunter): the Hunter's first attack in a battle &mdash; his basic attack or an
-ability that strikes &mdash; deals 200% more damage. A miss keeps the bonus, and so do a
-counter-attack and an ability that deals no damage. It returns once two of his turns pass without an
-enemy blow reaching him; a blow he blocks or parries reached him, and a miss did not.</li>
+<li><b>Volley</b> (Hunter): in each attack, every arrow the Hunter or a companion lands on an enemy adds
+Bleed buildup to it &mdash; 4 for the first to land, 8 for the second, 12 for the third, and so on; a
+companion's blow is an arrow and never misses, and a missed or Blocked arrow adds nothing. When two or more
+arrows fly at an enemy and every one lands, the last one's buildup counts twice. Once an arrow has landed
+on an enemy, each later arrow at it rolls at least 100% of its damage. Nothing carries from one attack to
+the next.</li>
+<li><b>Ambusher</b> (Hunter): before an attack at an enemy he picks, the Hunter may add up to 2 copies of
+the attack's arrow, each shot at its main target with its own miss, Block and critical. Each copy pushes his next turn
+further out by the attack's initiative divided by its arrows &mdash; 1.0 for Drumfire, 3.0 for Aimed Shot
+&mdash; never more than 4.0 initiative in all, and costs no Mana; the turn bar shows where the turn lands
+before he commits. An attack on every enemy, a companion's own attack, and Twin Hunt, Harvest and Cull take no copies.</li>
 <li><b>Medic</b> (Hunter): whenever the Hunter lays a harmful effect on an enemy &mdash; a trap
 springing included &mdash; the hero with the lowest share of health heals 5% of that hero's maximum
 health and sheds one harmful effect, a hex first.</li>
@@ -1742,7 +1745,7 @@ answer — that engine runs on the class basic and the class kit alone.</p>
 <tr><td><b>Pyromancer</b></td><td>0</td><td>Flamewave</td><td>Overburn reads Burn standing on the field, and no Mage basic or kit card lays any; Flamewave lays it on every enemy.</td></tr>
 <tr><td><b>Cryomancer</b></td><td>0</td><td>Razor Ice</td><td>Glacial Hold needs four Chilled on one enemy, and no Mage basic or kit card lays any; Razor Ice lays three on one target in one cast.</td></tr>
 <tr><td><b>Arcanist</b></td><td>0</td><td>—</td><td>Runaway Resonance builds on every damaging cast, and Magic Bolt, every Mage's free basic, is one.</td></tr>
-<tr><td><b>Holy</b></td><td>0</td><td>—</td><td>Mercy is gained when a hero falls below half health and pays +5% healing a stack on every heal but Consecration's drip and a revive, the kit's Ministration among them.</td></tr>
+<tr><td><b>Holy</b></td><td>0</td><td>—</td><td>Mercy is gained when a hero falls below half health and pays +5% healing a stack on every heal but Consecration's drip and a revive, the kit's Heal among them.</td></tr>
 <tr><td><b>Devout</b></td><td>0</td><td>Divine Shield</td><td>Conviction builds Faith when Divine Shield absorbs, and no Cleric basic or kit card lays a divine shield.</td></tr>
 <tr><td><b>Occultist</b></td><td>0</td><td>Hex of Ruin</td><td>Wrath of the Old Gods marks Ruin on debuffs he applies, and no Cleric basic or kit card applies one; Hex of Ruin curses three at once.</td></tr>
 <tr><td><b>Beastmaster</b></td><td>0</td><td>—</td><td>Pack Bond reads a living companion, and every Hunter but the Sharpshooter summons one from the class kit's Summon Companion. The engine brings nothing: it makes the bond grow.</td></tr>
@@ -1808,7 +1811,7 @@ below is part of one pool, its class's.</p>
 <tr><td><b>Pyromancer</b></td><td>Cinderfall, Ember Debt, Slow Burn, Stoke, Funeral Pyre, Firedraw, Pyre Wake, Emberkeep, <b>Backdraft</b>, <b>Immolate</b>, <b>Pyroblast</b>, <b>Firestorm</b>, <b>Phoenix Rebirth</b>, <b>Fireball</b>, <b>Detonation</b>, <b>Wildfire</b>, <b>Smoulder</b></td></tr>
 <tr><td><b>Cryomancer</b></td><td>Winter&#x27;s Toll, Rimebinding, Killing Frost, Hoarfrost Armor, Deep Winter, Cold Iron, Frostbind, <b>Rime</b>, <b>Glacial Prison</b>, <b>Cryoclasm</b>, <b>Shatter</b>, <b>Frostbolt</b>, <b>Blizzard</b>, <b>Ice Lance</b></td></tr>
 <tr><td><b>Arcanist</b></td><td>Null Field, Kindled Mind, Arcane Bolt, Inner Arcane, Arcane Echo, Resonant Field, Threshold, Unmaking, <b>Overcharge</b>, <b>Magi&#x27;s Wrath</b>, <b>Arcane Surge</b>, <b>Reality Fracture</b>, <b>Arcane Explosion</b>, <b>Arcane Cannon</b>, <b>Arcane Barrage</b>, <b>Death Ray</b></td></tr>
-<tr><td><b>Holy</b></td><td>Second Wind, Rite of Return, Recant, Shared Grief, Reprisal, Divine Presence, Alms, Vespers, <b>Divine Plea</b>, <b>Intercession</b>, <b>Heal</b>, <b>Renewal</b>, <b>Hymn of Hope</b>, <b>Resurrection</b></td></tr>
+<tr><td><b>Holy</b></td><td>Second Wind, Rite of Return, Recant, Shared Grief, Reprisal, Divine Presence, Alms, Vespers, <b>Divine Plea</b>, <b>Intercession</b>, <b>Greater Heal</b>, <b>Renewal</b>, <b>Hymn of Hope</b>, <b>Resurrection</b></td></tr>
 <tr><td><b>Devout</b></td><td>Vow of Suffering, Aegis Reversal, Ordination, Fortified Spirit, Reliquary, Elevation, Blessing of the Faithful, Mantle, <b>Sacred Resolve</b>, <b>Bulwark of Fortitude</b>, <b>Divine Wrath</b>, <b>Consecrated Ground</b>, <b>Blessing of Zeal</b></td></tr>
 <tr><td><b>Occultist</b></td><td>Blight the Well, Covenant of Ash, Suffering, Transference, Anointing, Breaking Darkness, Requiem, Penance, <b>Mind Flay</b>, <b>Mass Hysteria</b>, <b>Shadowrend</b>, <b>Bewitch</b>, <b>Dark Pact</b></td></tr>
 <tr><td><b>Beastmaster</b></td><td>Twin Hunt, Call the Wilds, Bloodbond, Savage Sweep, Ghostpack, Last Howl, Succession, Unleash, <b>Bear the Brunt</b>, <b>Bring It Down</b>, <b>Hunter's Instinct</b>, <b>Kill Command</b></td></tr>
@@ -2327,14 +2330,14 @@ costs 3.5 initiative instead).<br>
 <b>Talents:</b> the one tree, bought with the Mage's points — see §7.</li>
 </ul>
 <h3>6.3 Cleric</h3>
-<p>Every Cleric holds the class kit &mdash; <b>Ministration, Unburden and Consecration</b> (&sect;5.2) &mdash; whatever engine he holds, and his basic attack is Smite.</p>
+<p>Every Cleric holds the class kit &mdash; <b>Heal, Unburden and Consecration</b> (&sect;5.2) &mdash; whatever engine he holds, and his basic attack is Smite.</p>
 <ul>
 <li><b>Holy (Healer)</b> — <b>Stat block:</b> 150 HP / 10% armor / +20% holy resist,
 −15% shadow (cloth and light: light armour and the smallest pool of the three —
-her Heal and Renewal are percentages of her own maximum, so her health bar IS their throughput;
+her Greater Heal and Renewal are percentages of her own maximum, so her health bar IS their throughput;
 light turns aside light, and shadow finds her).<br>
 Passive <i>Mercy</i> (the stack mechanic itself; see §5.1).<br>
-<i>Drafted (§6b):</i> Heal — 20 Mana, 3.0, 1cd; heal an ally for 40% of the Cleric's max health. Empower
+<i>Drafted (§6b):</i> Greater Heal — 20 Mana, 3.0, 1cd; heal an ally for 40% of the Cleric's max health. Empower
 (1 Mercy): also cleanses all harmful effects from the recipient (Perfect: the Cleric
 recovers 5% max health).<br>
 <i>Drafted (§6b):</i> Renewal — 20 Mana, 3.0, 3cd; the hero heals 15% of the Cleric's max health at the start
@@ -2825,9 +2828,9 @@ Warrior, one Mage, one Cleric and one Hunter, and a hero who falls in a fight th
 so every fight opens with all four standing unless it is resumed after a quit, when a hero who fell before the quit is
 still down. A card a crest rune grants is on every hero's bar for the fight, priced in each hero's own resource, and is
 not kept after it.
-<br><b>ALL TWELVE SPECS ARE AUTHORED, AND FIFTEEN CLASS RUNES READ NO ENGINE.
-148 ORDINARY ENTRIES: 68 RETIRED AND 80 LIVE.</b> Sixty were written for a lineage &mdash; ten
-lineages have five, the Beastmaster six, and the Devout four &mdash; <b>fifteen were written for
+<br><b>ALL TWELVE SPECS ARE AUTHORED, AND SEVENTEEN CLASS RUNES READ NO ENGINE.
+150 ORDINARY ENTRIES: 68 RETIRED AND 82 LIVE.</b> Sixty were written for a lineage &mdash; ten
+lineages have five, the Beastmaster six, and the Devout four &mdash; <b>seventeen were written for
 their class and read no engine</b> (below), and <b>five are the Crest's</b> (above). <b>The Devout's fifth is OWED, not missing</b>: a rune saying
 <i>&ldquo;Consecrated Ground grants Faith to allies standing in it, not only to its caster&rdquo;</i>
 would ship 100% inert, because that is <b>the base kit</b>.
@@ -2835,10 +2838,10 @@ would ship 100% inert, because that is <b>the base kit</b>.
 ANY RUNE NOBODY WEARS FOR A THIRD (50g)</b> &mdash; there is no rarity and price does not signal power, so the
 player pays for FIT rather than for magnitude; selling is a decision rather than free money, and the
 Peddler is where the luck of a drop is fixed. <b>SCOPE IS
-THE CLASS for seventy-five of them</b> &mdash; a rune reaches every hero of its class, and three gates decide which
+THE CLASS for seventy-seven of them</b> &mdash; a rune reaches every hero of its class, and three gates decide which
 of them he is offered (Eligibility, below) &mdash; <b>and the Crest's five belong to no class</b> and are offered to every
 hero; and every hero in the game draws an authored pool rather than the generated stat family alone.
-<br><b>THE FIFTEEN THAT READ NO ENGINE.</b> Each reads only what every hero of its class already has
+<br><b>THE SEVENTEEN THAT READ NO ENGINE.</b> Each reads only what every hero of its class already has
 &mdash; his three kit cards and his basic, his class resource, the statuses his own kit lays &mdash; and
 healing and damage in general, so a hero holding no engine can use it from the first fight. None needs a
 drafted card. <b>Cleric:</b> <b>Abundance</b> (passive) &mdash; his healing beyond an ally's missing health
@@ -2847,7 +2850,7 @@ Burden</b> (Unburden) &mdash; every harmful effect Unburden removes is cast onto
 or onto a random enemy if that one has fallen or nobody applied it, as it stood (its turns, strength and
 stacks); <b>Burning Ground</b> (Consecration) &mdash; at the start of each of the Cleric's turns while his
 Consecration holds, every enemy takes holy damage equal to 5% of his maximum health, less its holy
-resistance; <b>Eleventh Hour</b> (Ministration) &mdash; twice the heal on an ally below a quarter health;
+resistance; <b>Eleventh Hour</b> (Heal) &mdash; twice the heal on an ally below a quarter health;
 <b>Vow of Silence</b> (passive, a tradeoff) &mdash; his heals are 50% stronger, Consecration's included (not those Faith and Ruin pay), and no
 damage he deals lands, though his Break damage does: a blow of his floats SILENT with no figure, and nothing that
 pays off damage dealt is paid off it &mdash; the ticks of a status he laid, the heal his Blight the Well turns, a
@@ -2865,11 +2868,16 @@ up to three deep: each depth takes 35% of the enemy's armor, so three leave it n
 other, and neither before any enemy has struck him or once that enemy has fallen. <b>Hunter:</b>
 <b>Opportunist</b> (Powershot) &mdash; double damage to a stunned enemy, whatever stunned it; <b>Tusk and
 Bristle</b> (Summon Companion) &mdash; a fourth companion, Aper the boar (&sect;6.4), for any Hunter but the
-one holding the Rune of the Sharpshooter (core). <b>Burning Ground sits out beside Vow of Silence</b> (&sect;6.0).
+one holding the Rune of the Sharpshooter (core); <b>Common Foe</b> &mdash; the first enemy the Hunter damages in a
+battle is tracked, and every ally's attacks and abilities that strike it deal 25% more damage, a companion's
+blows included (damage over time and an ability that works out its own damage do not read it); when it falls, the
+tracking passes to the enemy with the most health; <b>Pounce</b> &mdash; the Hunter's first attack in a battle deals
+200% more damage, and the bonus returns once two of his turns pass without an enemy blow reaching him; a miss keeps
+it. <b>Burning Ground sits out beside Vow of Silence</b> (&sect;6.0).
 <br><b>EVERY RUNE CARRIES A PRIMARY TYPE AND AN OPTIONAL SECONDARY.</b> The
 primary is what it touches &mdash; <b>ABILITY, PASSIVE or STAT</b>; the secondary is what gates
 it, if anything, and there are two. <b>TRADEOFF</b> is a cost paired with a bigger upside,
-self-balancing and readable on the card, and <b>fifteen of the eighty carry it</b>.
+self-balancing and readable on the card, and <b>fifteen of the eighty-two carry it</b>.
 <b>CONDITIONAL</b> is a payload gated on a condition, so the rune pays only while
 that condition holds: <b><i>Empty Pulpit</i>, <i>Dead Air</i>, <i>Dirge</i> and <i>Communion</i> carry it</b>, the
 four crest runes that read who stands and what they wear, and no other rune's payload carries a condition of any
@@ -2945,7 +2953,7 @@ map card). Shop offers avoid duplicates per hero.
 reach is decided by his engines and by what he has earned &mdash; a hero holding no engine can reach
 <b>five</b> of the Warrior's at spawn and eight once he has earned what they name (nine for a Berserker,
 whose boss pool holds Blood Price), <b>five</b> of the Mage's at spawn and nine once he has earned
-theirs, <b>seven</b> of the Hunter's and then nine, and <b>five</b> of the Cleric's nineteen &mdash; the
+theirs, <b>nine</b> of the Hunter's and then eleven, and <b>five</b> of the Cleric's nineteen &mdash; the
 five that read no engine; every other one reads Mercy, Faith or Ruin. Seventeen live entries name a <code>requires_ability</code>: fifteen name a card he must earn, and
 two an engine's enabler (Guard Change, Divine Shield), which his kit holds while that engine is equipped, so <b>a hero's rune pool DEEPENS as he earns abilities</b>. When there is nothing left, the
 Peddler names the hero and the reason, the elite cache and the bargain print a line instead of
@@ -2954,7 +2962,7 @@ left offers one or two</b> rather than discarding them, and the spoils line read
 the offer. <b>And an owed cache pick whose triple repairs to nothing can be SPENT</b> from the
 hero's card &mdash; it cannot be filled, so holding it would strand the run.
 <br><b>EVERY LIVE RUNE IS SCOPED TO ITS CLASS, OR TO THE CREST</b>: the Warrior's eighteen, the Mage's
-twenty, the Cleric's nineteen and the Hunter's eighteen, retired entries scoped the same way, and the
+twenty, the Cleric's nineteen and the Hunter's twenty, retired entries scoped the same way, and the
 Crest's five, which belong to no class. The five universal entries are retired, and
 <code>_scope_ok</code> resolves the class, the Crest's scope and the universal band and nothing else.
 <br><b>Every live rune is 150g, flat</b> &mdash; the player pays for FIT rather than for magnitude.
@@ -2973,7 +2981,7 @@ now owned, tops the triple back to three through the same <code>eligible_ids</co
 uses, and <b>writes the repair back</b> so it happens once rather than on every screen open. It
 is <b>not a reroll</b> — a triple with nothing wrong with it is returned untouched.
 <br><b>AND A RUNE THAT READS AN ENGINE IS OFFERED ONLY WHILE THAT ENGINE IS EQUIPPED (&sect;6.0).</b>
-Forty-two of the eighty are in that table &mdash; every Ruin, Focus and Resonance rune, the Mercy
+Forty-two of the eighty-two are in that table &mdash; every Ruin, Focus and Resonance rune, the Mercy
 and Faith runes and the one that adds to Divine Shield, both Heavy Plating runes and Bared Plate, both
 stance-number runes and Mirror Guard, two of the Pack Bond runes, two of the Trapper runes, both Overburn
 runes and Long Fuse, the Glacial Hold rune and the Cryomancer's Killing Cold and Deep Cold, and the Blood Frenzy rune and the Berserker's Slaughterhouse
@@ -2989,8 +2997,8 @@ triple and the repair is saved; but <b>unequipping an engine is one press away f
 so writing that repair back would let a moment's experiment before a cache is answered destroy those
 runes for good, and save the loss. <b>A state the player can undo is not a state to destroy.</b>
 <b>A hero with no engine equipped is offered only the runes that read none</b>: up to eight of the
-Warrior's eighteen (nine with Blood Price earned), nine of the Mage's twenty, nine of the Hunter's
-eighteen, and five of the Cleric's nineteen. <b>Each engine he equips adds its own runes</b>, and
+Warrior's eighteen (nine with Blood Price earned), nine of the Mage's twenty, eleven of the Hunter's
+twenty, and five of the Cleric's nineteen. <b>Each engine he equips adds its own runes</b>, and
 a second engine adds its runes too. The engine runes of his class are still offered to him.
 <br><b>AND A RUNE'S COST IS GATED WITH ITS PAYOUT: NO ENGINE, NO COST AND NO PAYOUT.</b> The offer
 door cannot reach a rune he has <b>already bought</b>, and three of the forty-two charge him for
@@ -3360,9 +3368,13 @@ highlighted one, X closes. One item per hero per turn, and items never consume t
 turn.</li>
 <li><b>C — Empower (Holy Cleric):</b> toggles the Empower button on the action bar
 while at least 1 Mercy is held — the next
-Heal / Renewal / Hymn / Resurrection / Divine Plea spends +1 Mercy for its bonus effect
+Greater Heal / Renewal / Hymn / Resurrection / Divine Plea spends +1 Mercy for its bonus effect
 (and forgoes its perfect bonus). The toggle disarms after the cast and at the start of
 every turn.</li>
+<li><b>V — Overdraw (a Hunter holding the Rune of the Ambusher):</b> each press of V, or of the
+<i>Overdraw +N</i> button on the action bar, asks one more copy of the next attack's arrow, up to 2, and
+then none; hovering a card shows on the turn bar where the turn lands, at the copies that card can take.
+The count clears at the cast and at the start of every turn.</li>
 <li><b>Space continues:</b> on a victory screen or the run summary (where every wipe and forfeit ends), Space (or Enter) presses the primary
 button — Continue / Descend / New Run. Only the standalone battle scene's defeat panel still requires a click.</li>
 <li><b>Summon Companion</b> sits at the TOP of the Hunter's ability list (every Hunter's but the Sharpshooter's) on hotkey

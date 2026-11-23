@@ -59,7 +59,7 @@ const Fixture = preload("res://suite_fixture.gd")
 #
 # **BATCH GN MOVED FIVE OF THE TWELVE INTO THE CLASS KITS, BY RULING, AND RENAMED
 # ONE.** Magic Barrier is NEXUS WARD; it and Magic Missiles open every Mage's
-# kit, and Ministration, Unburden and Consecration open every Cleric's. A card in
+# kit, and Heal (Ministration until KB), Unburden and Consecration open every Cleric's. A card in
 # a class kit leaves the class draw, so each of the twelve is now in its class
 # pool OR its class kit, never both and never neither — which is what §1 asserts.
 # The BQ changelog entry is history and names the card BQ shipped, so it is read
@@ -67,7 +67,7 @@ const Fixture = preload("res://suite_fixture.gd")
 const TRANCHE_3 := {
 	"mage": ["Nexus Ward", "Mirror Image", "Magic Missiles", "Mana Well",
 		"Dispel", "Blink"],
-	"cleric": ["Ministration", "Consecration", "Chastise", "Unburden",
+	"cleric": ["Heal", "Consecration", "Chastise", "Unburden",
 		"Exhortation", "Undying Vigil"],
 }
 
@@ -84,7 +84,7 @@ const TRANCHE_3 := {
 # against anything live. **THE CONTROL ITSELF IS NOT LOST**: what it protected
 # was "this batch's twelve did not leak into the boss channel", and the boss
 # channel is `SPEC_POOLS` alone now, which is what is asserted below.
-const SHIPPED_AS := {"Nexus Ward": "Magic Barrier"}
+const SHIPPED_AS := {"Nexus Ward": "Magic Barrier", "Heal": "Ministration"}
 
 const CLASS_POOLS_AT_BQ := {
 	"warrior": ["Bloodlust", "Wildstrikes", "Hack and Slash", "Blood Price",
@@ -248,8 +248,8 @@ func _pools() -> void:
 	for spec2 in ["holy", "inquisitor", "occultist"]:
 		ok(Classes.class_of_spec(spec2) == "cleric",
 			"§6: %s is a Cleric, so the Cleric class pool is his" % spec2)
-		ok(_opens_with("cleric", spec2, "Ministration"),
-			"§6: ...and %s opens holding Ministration, engine or none" % spec2)
+		ok(_opens_with("cleric", spec2, "Heal"),
+			"§6: ...and %s opens holding Heal, engine or none" % spec2)
 	# NOTHING IN THE CLASS POOL IS ALSO IN A SPEC POOL. The two sides of one
 	# offer must not be able to hold the same card.
 	for cls3 in Classes.CLASS_DRAFT_POOLS:
@@ -311,7 +311,7 @@ func _break_damage() -> void:
 		"Chastise": 20,          # the one figure the brief names
 		"Magic Missiles": 5,     # PER BOLT (KA) — 15 across three, 24 on a perfect
 		"Nexus Ward": 0, "Mirror Image": 0, "Mana Well": 0, "Dispel": 0,
-		"Blink": 0, "Ministration": 0, "Consecration": 0, "Unburden": 0,
+		"Blink": 0, "Heal": 0, "Consecration": 0, "Unburden": 0,
 		"Exhortation": 0, "Undying Vigil": 0,
 	}
 	for nm in want:
@@ -363,17 +363,16 @@ func _weaker_half() -> void:
 		"§2: CLAUDE.md does not record the class-wide 'weaker' rule as retired (HD §1)")
 	ok(not claude.contains("**WEAKER THAN SPEC ABILITIES AND UNCONDITIONAL**"),
 		"§2: CLAUDE.md still states the class-wide 'weaker' rule as a live rule")
-	# MINISTRATION AGAINST HOLY'S HEAL. Heal is 40% of the CLERIC's maximum;
-	# Ministration is 35% of the TARGET's since KA. The worst case for the rule was the
-	# beefiest target in the game, so that is the one it was checked against.
+	# THE KIT HEAL AGAINST HOLY'S. Greater Heal (Holy's Heal until KB) is 40% of the CLERIC's maximum; the kit's Heal
+	# (Ministration until KB) read 35% of the TARGET's at KA and reads 20% of the CLERIC's since KB (the designer's), so
+	# on any one Cleric it is the smaller of the two whatever the ally.
 	var holy_max := int(Classes.SPEC_INFO["holy"].get("max_hp", 150))
-	var warden_max := int(Classes.SPEC_INFO["warden"].get("max_hp", 200))
 	var heal_on_holy := int(round(holy_max * 0.40))
-	var ministration_on_warden := int(round(warden_max * 0.35))
-	_retired(ministration_on_warden < heal_on_holy,
-		"§2: Ministration on the beefiest ally (%d) is LESS than Holy's Heal (%d)" % [
-			ministration_on_warden, heal_on_holy])
-	_retired(int(round(ministration_on_warden * 1.25)) < int(round(heal_on_holy * 1.25)),
+	var kit_heal_on_holy := int(round(holy_max * 0.20))
+	_retired(kit_heal_on_holy < heal_on_holy,
+		"§2: the kit's Heal from a Holy Cleric (%d) is LESS than her Greater Heal (%d)" % [
+			kit_heal_on_holy, heal_on_holy])
+	_retired(int(round(kit_heal_on_holy * 1.25)) < int(round(heal_on_holy * 1.25)),
 		"§2: ...and still less at five Mercy, because one term scales both")
 	# MAGIC MISSILES AGAINST THE MAGE FILLERS IT SITS BESIDE.
 	var missiles: Ability = Classes.pool_ability("Magic Missiles")
@@ -843,7 +842,7 @@ func _live_dispel() -> void:
 # ---------- LIVE: THE CLERIC SIX ----------
 
 func _live_cleric_heals() -> void:
-	# BATCH GN — NOTHING IS GRANTED: Ministration and Consecration are the Cleric
+	# BATCH GN — NOTHING IS GRANTED: Heal (Ministration until KB) and Consecration are the Cleric
 	# class kit's, so the Occultist opens holding both.
 	var scene := await _spawn(["berserker", "cryomancer", "occultist", "beastmaster"],
 		{"occultist": []},
@@ -853,10 +852,10 @@ func _live_cleric_heals() -> void:
 	if cleric == null:
 		await _drop(scene)
 		return
-	var minist: Ability = scene.call("_find_ability", cleric, "Ministration")
+	var minist: Ability = scene.call("_find_ability", cleric, "Heal")
 	var consec: Ability = scene.call("_find_ability", cleric, "Consecration")
 	ok(minist != null and consec != null,
-		"§4: Ministration and Consecration are on the unit, out of the Cleric class kit")
+		"§4: Heal and Consecration are on the unit, out of the Cleric class kit")
 	if minist == null or consec == null:
 		await _drop(scene)
 		return
@@ -868,18 +867,18 @@ func _live_cleric_heals() -> void:
 	if ally == null:
 		await _drop(scene)
 		return
-	# ---- MINISTRATION READS THE TARGET'S MAXIMUM, NOT THE CASTER'S ----
+	# ---- HEAL READS THE CASTER's MAXIMUM, NOT THE TARGET's (KB, the designer's; Ministration read the target's) ----
 	# The two Clerics have very different maximums from the Berserker, so a
-	# caster-side reading would give a different number and this check knows it.
+	# target-side reading would give a different number and this check knows it.
 	ally.hp = 1
 	cleric.resource = cleric.max_resource
 	await scene.call("_resolve", cleric, minist, ally, "good")
-	var want := int(round(ally.max_hp * 0.35))
+	var want := int(round(cleric.max_hp * 0.20))
 	ok(ally.hp == 1 + want,
-		"§4: Ministration heals 35%% of the TARGET's maximum (%d, wanted %d)" % [
+		"§4: Heal heals 20%% of the CLERIC's maximum (%d, wanted %d)" % [
 			ally.hp - 1, want])
-	ok(want != int(round(cleric.max_hp * 0.35)) or ally.max_hp == cleric.max_hp,
-		"§4: ...which is a different number from 35%% of the caster's")
+	ok(want != int(round(ally.max_hp * 0.20)) or ally.max_hp == cleric.max_hp,
+		"§4: ...which is a different number from 20%% of the ally's")
 	# ---- CONSECRATION: THE WHOLE PARTY, AND ITS TICK IS ITS OWN FUNCTION ----
 	cleric.resource = cleric.max_resource
 	cleric.cooldowns.clear()

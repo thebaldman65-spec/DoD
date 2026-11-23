@@ -59,12 +59,12 @@ const NINE := {
 	"savage_assault": "warrior", "redoubt": "warrior",
 	"cast_echo": "mage", "siphon": "mage",
 	"covenant_oath": "cleric", "judgment": "cleric",
-	"quarry_hunt": "hunter", "opening_strike": "hunter", "field_kit": "hunter",
+	"volley": "hunter", "ambusher": "hunter", "field_kit": "hunter",
 }
 const NOUNS := {
 	"savage_assault": "Reaver", "redoubt": "Bastion", "cast_echo": "Weaver",
 	"siphon": "Leech", "covenant_oath": "Oathkeeper", "judgment": "Arbiter",
-	"quarry_hunt": "Tracker", "opening_strike": "Skirmisher", "field_kit": "Medic",
+	"volley": "Volley", "ambusher": "Ambusher", "field_kit": "Medic",
 }
 const ENGINE_NAMES := ["Savage" + " Assault", "Redo" + "ubt", "Ec" + "ho",
 	"Sip" + "hon", "Cove" + "nant", "Judg" + "ment", "Quar" + "ry",
@@ -99,8 +99,8 @@ func _initialize() -> void:
 	await _s5_siphon()
 	await _s6_covenant()
 	await _s7_judgment()
-	await _s8_quarry()
-	await _s9_opening()
+	await _s8_volley()
+	await _s9_ambusher()
 	await _s10_field_kit()
 	await _s11_the_bot()
 	await _s12_live()
@@ -337,8 +337,8 @@ func _s0_the_nine() -> void:
 	ok(Classes.engine_desc("savage_assault").contains("+%d%%" % Classes.REAVER_KILL_PCT)
 			and Classes.engine_desc("siphon").contains("%d%%" % Classes.SIPHON_RETURN_PCT)
 			and Classes.engine_desc("judgment").contains("%d%%" % Classes.JUDGMENT_HEAL_PCT)
-			and Classes.engine_desc("quarry_hunt").contains("%d%%" % Classes.QUARRY_PCT)
-			and Classes.engine_desc("opening_strike").contains("%d%%" % Classes.OPENING_BONUS_PCT)
+			and Classes.engine_desc("volley").contains("%d for the" % Classes.VOLLEY_STEP)
+			and Classes.engine_desc("ambusher").contains("up to %d copies" % Classes.OVERDRAW_MAX_ARROWS)
 			and Classes.engine_desc("field_kit").contains("%d%%" % Classes.FIELD_KIT_HEAL_PCT)
 			and Classes.engine_desc("cast_echo").contains("%d%%" % int(round(Classes.ECHO_SHARE * 100.0))),
 		"§0: every rule text states its engine's own constants")
@@ -366,8 +366,8 @@ func _s0_the_nine() -> void:
 	ok(info.has("oathbound") and not never.has("oathbound")
 			and not BattleUnit.DEBUFF_IDS.has("oathbound"),
 		"§0: oathbound has a chip and, sitting on a hero, is in neither list")
-	ok((consts.get("ENGINE_MARKS", {}) as Dictionary) == {"quarry_hunt": "tracked", "judgment": "judged"},
-		"§0: the two marking engines and their marks are the Tracker's and the Arbiter's")
+	ok((consts.get("ENGINE_MARKS", {}) as Dictionary) == {"rune_common_foe": "tracked", "judgment": "judged"},
+		"§0: the two marks and who lays them: Common Foe's (the Tracker's rule, a rune's field since KB) and the Arbiter's")
 	# The three chips' own words carry no engine name either — beside the chip's
 	# label, which each carries (the positive arm).
 	for sid2 in ["tracked", "judged", "oathbound"]:
@@ -405,8 +405,8 @@ func _float_sweep() -> void:
 		for n in ENGINE_NAMES:
 			if _has_name(String(f), String(n)):
 				leaked.append(f)
-	ok(floats.size() > 100 and floats.has("SKIRMISHER") and floats.has("OATHBOUND"),
-		"§0: the float sweep reads the battle's floats, the nine's among them (%d)" % floats.size())
+	ok(floats.size() > 100 and floats.has("POUNCE") and floats.has("OATHBOUND"),
+		"§0: the float sweep reads the battle's floats, the Oathkeeper's and Pounce's among them (%d)" % floats.size())
 	ok(leaked.is_empty(), "§0: no float names an engine (%s)" % str(leaked))
 	ok(exempt_seen.size() == FLOAT_EXEMPT.size(),
 		"§0: every exempt float still exists (%s of %s)" % [str(exempt_seen.keys()), str(FLOAT_EXEMPT.keys())])
@@ -479,7 +479,7 @@ func _screen_pass(controlled: bool) -> void:
 	_run.specs_chosen = false
 	_run.active = true
 	var takes := {"warrior": "engine_savage_assault", "mage": "engine_siphon",
-		"cleric": "engine_judgment", "hunter": "engine_opening_strike"}
+		"cleric": "engine_judgment", "hunter": "engine_volley"}
 	var tag := "controlled" if controlled else "as dealt"
 	if controlled:
 		for i in _run.party.size():
@@ -1323,183 +1323,83 @@ func _arbiter_arm(s: Node, tag: String, with_beast: bool) -> void:
 	W.attack = 100
 
 
-# ── §8 — QUARRY: THE RUNE OF THE TRACKER ────────────────────────────────────
-func _s8_quarry() -> void:
-	print("--- GO §8: the Rune of the Tracker ---")
-	var s: Node = await _board(NO_LINEAGE, [[], [], [], ["quarry_hunt"]])
-	await _tracker_arm(s, "alone", false)
+# ── §8 — VOLLEY: THE RUNE OF THE VOLLEY (KB; the Tracker's slot until KB, its rule an ordinary rune now) ──────────
+# GO's two boards, alone and beside a lineage engine: a clean three-arrow volley at one raider lays the climbing buildup,
+# the last arrow's again, and every beast that follows the cast is one more arrow (the designer's rule). Common Foe's and
+# Pounce's drives are `check_hf` §1's and `check_kb`'s, as worn runes.
+func _s8_volley() -> void:
+	print("--- GO §8: the Rune of the Volley ---")
+	var s: Node = await _board(NO_LINEAGE, [[], [], [], ["volley"]])
+	await _volley_arm(s, "alone")
 	await _clear(s)
-	s = await _board(["", "", "", "beastmaster"], [[], [], [], ["pack", "quarry_hunt"]])
-	await _tracker_arm(s, "beside Pack Bond", true)
+	s = await _board(["", "", "", "beastmaster"], [[], [], [], ["pack", "volley"]])
+	await _volley_arm(s, "beside Pack Bond")
 	await _clear(s)
 
 
-# One seeded Strike on a foe whose statuses are kept: the mark is the question.
-func _marked_hit(s: Node, W: BattleUnit, e: BattleUnit, sd: int) -> int:
+func _volley_arm(s: Node, tag: String) -> void:
+	var H := _hero(s, "hunter")
+	var rd := _raiders(s)
+	if H == null or rd.is_empty() or not H.has_engine("volley"):
+		ok(false, "§8 (%s): the board seats a Hunter holding Volley and a raider" % tag)
+		return
+	var e: BattleUnit = rd[0]
+	_reset_foe(e)
+	e.max_hp = 100000
 	e.hp = e.max_hp
-	e.pressure = 0
-	e.broken = false
-	_ready_to_cast(W)
-	seed(sd)
-	var before := e.hp
-	await s._resolve(W, W.abilities[0], e, "good")
-	return before - e.hp
-
-
-func _tracker_arm(s: Node, tag: String, with_beast: bool) -> void:
-	var W := _hero(s, "warrior")
-	var H := _hero(s, "hunter")
-	var rd := _raiders(s)
-	if W == null or H == null or rd.size() < 2:
-		ok(false, "§8 (%s): the board seats a Warrior, a Hunter and two raiders" % tag)
-		return
-	var e0: BattleUnit = rd[0]
-	var e1: BattleUnit = rd[1]
-	_all_clean(s)
-	ok(_foes(s).all(func(e): return not e.has_status("tracked")),
-		"§8 (%s): no enemy is tracked before the Hunter has struck" % tag)
+	e.bleed_buildup = 0
 	_ready_to_cast(H)
-	await s._resolve(H, H.abilities[0], e0, "good")
-	ok(e0.has_status("tracked")
-			and String(e0.get_status("tracked").get("src_name", "")) == H.unit_name,
-		"§8 (%s): the first enemy the Hunter damages is tracked, in his name" % tag)
-	ok(not e1.has_status("tracked"), "§8 (%s): ...and only that one" % tag)
-	# HIS LATER BLOWS DO NOT MOVE IT: a commitment, not a re-aim.
-	_ready_to_cast(H)
-	await s._resolve(H, H.abilities[0], e1, "good")
-	ok(e0.has_status("tracked") and not e1.has_status("tracked"),
-		"§8 (%s): a blow on another enemy leaves the tracking where it was" % tag)
-	# EVERY ALLY DEALS 25% MORE TO IT — beside the same blow on an untracked one.
-	W.attack = 1000
-	var on_tracked := await _marked_hit(s, W, e0, GO_SEED + 81)
-	var on_other := await _marked_hit(s, W, e1, GO_SEED + 81)
-	var want := 1.0 + 0.01 * Classes.QUARRY_PCT
-	ok(on_other > 0 and absf(float(on_tracked) / float(on_other) - want) <= 0.01,
-		"§8 (%s): the Warrior's Strike lands x%.3f on the tracked enemy (%d against %d)"
-			% [tag, float(on_tracked) / maxf(float(on_other), 1.0), on_tracked, on_other])
-	if with_beast:
-		await s._do_summon(H, "canis")
-		var wolf: BattleUnit = null
-		for b in s._beasts(H):
-			wolf = b
-		ok(wolf != null, "§8 (%s): a wolf stands beside the Hunter" % tag)
-		if wolf != null:
-			var bites := {}
-			for e in [e0, e1]:
-				e.hp = e.max_hp
-				seed(GO_SEED + 82)
-				var hb: int = e.hp
-				await s._companion_hit(wolf, e, 200.0, 0)
-				bites[e] = hb - e.hp
-			ok(int(bites[e1]) > 0 and absf(float(bites[e0]) / float(bites[e1]) - want) <= 0.03,
-				"§8 (%s): ...and so does the wolf's bite (%d against %d)" % [tag, bites[e0], bites[e1]])
-	print("    %s: Strike %d on the tracked enemy, %d on another" % [tag, on_tracked, on_other])
-	# THE TRACKING PASSES TO THE HEALTHIEST ENEMY WHEN ITS TARGET FALLS.
-	var healthiest: BattleUnit = null
-	for e in _foes(s):
-		if e == e0:
-			continue
-		e.hp = e.max_hp - (0 if e == e1 else 10)
-		if healthiest == null or e.hp > healthiest.hp:
-			healthiest = e
-	e0.hp = 1
-	_ready_to_cast(W)
-	await s._resolve(W, W.abilities[0], e0, "good")
-	ok(e0.dead and healthiest != null and healthiest.has_status("tracked")
-			and String(healthiest.get_status("tracked").get("src_name", "")) == H.unit_name,
-		"§8 (%s): the tracked enemy falls and the tracking passes to the healthiest (%s)"
-			% [tag, healthiest.unit_name if healthiest != null else "?"])
-	# A FALLEN TRACKER'S MARK PAYS NOTHING — the same enemy, the same seeded
-	# Strike, the mark on and then off.
-	H.hp = 0
-	H._die()
-	var dead_tracked := await _marked_hit(s, W, healthiest, GO_SEED + 83)
-	var saved: Dictionary = healthiest.get_status("tracked").duplicate()
-	healthiest.remove_status("tracked")
-	var dead_plain := await _marked_hit(s, W, healthiest, GO_SEED + 83)
-	ok(dead_plain > 0 and dead_tracked == dead_plain and not saved.is_empty(),
-		"§8 (%s): with the Hunter fallen, the mark he left pays nothing (%d against %d)"
-			% [tag, dead_tracked, dead_plain])
-	W.attack = 100
+	var beasts: Array = (s.get("companions") as Array).filter(func(c): return not c.dead and c.pack_master == H)
+	var wolf := beasts.any(func(c): return String(c.companion_kind) == "canis")
+	seed(GO_SEED + 91)
+	await s._resolve(H, Classes.pool_ability("Aimed Volley"), e, "good")
+	var n := 3 + beasts.size()
+	var want: int = Classes.VOLLEY_STEP * (n * (n + 1) / 2 + n)
+	ok(e.bleed_buildup == want or (wolf and e.bleed_buildup > want),
+		"§8 (%s): a clean volley of %d arrows (%d beast%s following) lays %d Bleed buildup, the last arrow's again (%d)" % [
+			tag, n, beasts.size(), "" if beasts.size() == 1 else "s", want, e.bleed_buildup])
 
 
-# ── §9 — OPENING: THE RUNE OF THE SKIRMISHER ────────────────────────────────
-func _s9_opening() -> void:
-	print("--- GO §9: the Rune of the Skirmisher ---")
-	# BATCH HB — TRIPWIRE IS A DRAFTED CARD SINCE HB (the Survivalist's shelf;
-	# Summon Companion took its kit slot), so the Hunter carries it the way a
-	# player now gets it, drafted, on both boards.
-	var s: Node = await _board(NO_LINEAGE, [[], [], [], ["opening_strike"]], {3: ["Tripwire"]})
-	await _skirmisher_arm(s, "alone")
+# ── §9 — THE AMBUSHER: OVERDRAW (KB; the Skirmisher's slot until KB, its rule an ordinary rune now) ─────────────────
+# GO's two boards: the Hunter's basic asked for two copies costs two more of its own initiative, strikes the same raider
+# three times, and spends the count; unasked, it costs its own.
+func _s9_ambusher() -> void:
+	print("--- GO §9: the Rune of the Ambusher ---")
+	var s: Node = await _board(NO_LINEAGE, [[], [], [], ["ambusher"]])
+	await _ambusher_arm(s, "alone")
 	await _clear(s)
-	s = await _board(["", "", "", "sharpshooter"], [[], [], [], ["lethal_aim", "opening_strike"]],
-		{3: ["Tripwire"]})
-	await _skirmisher_arm(s, "beside Lethal Aim")
+	s = await _board(["", "", "", "sharpshooter"], [[], [], [], ["lethal_aim", "ambusher"]])
+	await _ambusher_arm(s, "beside Lethal Aim")
 	await _clear(s)
 
 
-func _skirmisher_arm(s: Node, tag: String) -> void:
+func _ambusher_arm(s: Node, tag: String) -> void:
 	var H := _hero(s, "hunter")
 	var rd := _raiders(s)
-	if H == null or rd.size() < 2:
-		ok(false, "§9 (%s): the board seats a Hunter and two raiders" % tag)
+	if H == null or rd.is_empty() or not H.has_engine("ambusher"):
+		ok(false, "§9 (%s): the board seats a Hunter holding the Ambusher and a raider" % tag)
 		return
-	var e0: BattleUnit = rd[0]
-	var foe: BattleUnit = rd[1]
-	var shot: Ability = H.abilities[0]
-	H.attack = 1000
-	ok(H.opening_armed, "§9 (%s): the Hunter opens the battle with the bonus ready" % tag)
-	# A MISS KEEPS IT — beside the shot that spends it.
-	_blind(H, e0, true)
-	var whiff := await _cast(s, H, shot, e0, GO_SEED + 91)
-	_blind(H, e0, false)
-	ok(whiff == 0 and H.opening_armed, "§9 (%s): a shot that misses keeps it ready" % tag)
-	var countered := await _cast(s, H, shot, e0, GO_SEED + 91, true)
-	ok(countered > 0 and H.opening_armed, "§9 (%s): a shot swung as a counter keeps it ready" % tag)
-	var wire := _find(H, "Tripwire")
-	if wire != null:
+	var e: BattleUnit = rd[0]
+	var qs: Ability = H.abilities[0]
+	var arms := {}
+	for armed in [0, 2]:
+		_reset_foe(e)
+		e.max_hp = 100000
+		e.hp = e.max_hp
 		_ready_to_cast(H)
-		await s._resolve(H, wire, H, "good")
-		ok(H.opening_armed, "§9 (%s): Tripwire, which deals no damage, keeps it ready" % tag)
-	else:
-		ok(false, "§9 (%s): the Hunter holds Tripwire" % tag)
-	var first := await _cast(s, H, shot, e0, GO_SEED + 92)
-	ok(not H.opening_armed, "§9 (%s): the first attack that lands spends it" % tag)
-	# The armed shot floats its word above the roll, so its control spends that die.
-	var second := await _cast(s, H, shot, e0, GO_SEED + 92, false, 1)
-	var want := 1.0 + 0.01 * Classes.OPENING_BONUS_PCT
-	ok(second > 0 and absf(float(first) - want * float(second)) <= 0.5 + 0.5 * want,
-		"§9 (%s): the first attack lands x%.3f (%d against %d)" % [tag, float(first) / maxf(float(second), 1.0),
-			first, second])
-	print("    %s: first shot %d, the next %d" % [tag, first, second])
-	# IT RETURNS AFTER TWO OF HIS TURNS NO BLOW REACHES HIM.
-	s._rule_engine_turn(H)
-	ok(not H.opening_armed and H.opening_quiet == 1, "§9 (%s): one quiet turn is not enough" % tag)
-	s._rule_engine_turn(H)
-	ok(H.opening_armed, "§9 (%s): the second quiet turn brings it back" % tag)
-	H.refresh_bars()
-	var chip: Dictionary = H.engine_chip("opening_strike")
-	ok(String(chip.get("label", "")) == "Skirmisher" and String(chip.get("short", "")) == "READY",
-		"§9 (%s): the chip is named Skirmisher and reads READY (%s)" % [tag, chip.get("short", "")])
-	# A BLOW THAT REACHES HIM STARTS THE COUNT AGAIN — a blocked one too.
-	await _cast(s, H, shot, e0, GO_SEED + 92)
-	s._rule_engine_turn(H)
-	_deep(H)
-	s._apply_status(H, "shield_charges", -1, 1)
-	var blocked := await _blow(s, foe, H, GO_SEED + 93)
-	s._rule_engine_turn(H)
-	ok(blocked == 0 and not H.opening_armed and H.opening_quiet == 0,
-		"§9 (%s): a blow he blocks still struck him, and the quiet count starts over" % tag)
-	s._rule_engine_turn(H)
-	ok(not H.opening_armed, "§9 (%s): ...so one more quiet turn is not enough" % tag)
-	# A BLOW THAT MISSES HIM DOES NOT.
-	_blind(foe, H, true)
-	var missed := await _blow(s, foe, H, GO_SEED + 93)
-	_blind(foe, H, false)
-	s._rule_engine_turn(H)
-	ok(missed == 0 and H.opening_armed,
-		"§9 (%s): a blow that misses him leaves the span quiet, and the bonus returns" % tag)
-	H.attack = 100
+		s.set("current_hero", H)
+		s.set("overdraw_armed", armed)
+		var t0 := H.next_time
+		seed(GO_SEED + 93)
+		await s._resolve(H, qs, e, "good")
+		arms[armed] = [H.next_time - t0, e.max_hp - e.hp, int(s.get("overdraw_armed"))]
+	var per: float = H.momentum_delay_mult() * 100.0 / H.effective_speed()
+	ok(absf(float(arms[2][0]) - qs.delay * 3.0 * per) < 0.01 and absf(float(arms[0][0]) - qs.delay * per) < 0.01,
+		"§9 (%s): two copies of %s cost two more of its own initiative (%.2f against %.2f)" % [
+			tag, qs.display_name, arms[2][0], arms[0][0]])
+	ok(int(arms[2][1]) > 2 * int(arms[0][1]) and int(arms[0][1]) > 0,
+		"§9 (%s): the copies struck the same raider — %d against %d unasked" % [tag, arms[2][1], arms[0][1]])
+	ok(int(arms[2][2]) == 0, "§9 (%s): the cast spent the armed count" % tag)
 
 
 # ── §10 — FIELD KIT: THE RUNE OF THE MEDIC ──────────────────────────────────
@@ -1633,15 +1533,15 @@ func _s12_live() -> void:
 	print("--- GO §12: live, with the enemies striking ---")
 	await _stretch("the nine, no lineage", NO_LINEAGE,
 		[["savage_assault", "redoubt"], ["cast_echo", "siphon"],
-		["covenant_oath", "judgment"], ["quarry_hunt", "opening_strike"]])
+		["covenant_oath", "judgment"], ["volley", "ambusher"]])
 	await _stretch("beside lineage engines, one", ["berserker", "pyromancer", "holy", "mystic"],
 		[["bloodrage", "savage_assault"], ["overburn", "cast_echo"],
-		["mercy", "covenant_oath"], ["trapper", "field_kit"]])
+		["mercy", "covenant_oath"], ["trapper", "ambusher"]])
 	await _stretch("beside lineage engines, two", ["warden", "arcanist", "occultist", "sharpshooter"],
 		[["heavy_plating", "redoubt"], ["resonance", "siphon"],
-		["old_gods", "judgment"], ["lethal_aim", "opening_strike"]])
+		["old_gods", "judgment"], ["lethal_aim", "field_kit"]])
 	await _stretch("beside Pack Bond", ["", "", "", "beastmaster"],
-		[[], [], [], ["pack", "quarry_hunt"]])
+		[[], [], [], ["pack", "volley"]])
 
 
 # BATCH HL §2 — EACH PREFIX WEARS "(core)": a rule engine's log line names its
@@ -1653,8 +1553,8 @@ const LIVE_NEEDLES := {
 	"siphon": ["Rune of the Leech (core)", "in Mana"],
 	"covenant_oath": ["Rune of the Oathkeeper (core):", "wound"],
 	"judgment": ["Rune of the Arbiter (core):", "mends"],
-	"quarry_hunt": ["Rune of the Tracker (core):", "tracks"],
-	"opening_strike": ["Rune of the Skirmisher (core):", "(spent)"],
+	"volley": ["Rune of the Volley (core):", "counts again"],
+	"ambusher": ["Rune of the Ambusher (core):", "more arrow"],
 	"field_kit": ["Rune of the Medic (core):", "mends"],
 }
 

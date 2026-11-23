@@ -374,7 +374,7 @@ const STATUS_INFO := {
 	"stabilized": ["Stabilized", "St+", Color(0.55, 0.68, 0.95), "Grounded resonance: takes less\ndamage (10% per stack consumed)."],
 	"overcharged": ["Overcharged", "OC", Color(0.8, 0.5, 1.0), "Overcharge is spent for this\nbattle — the storm has no feeding\nleft in it."],
 	"sanctified": ["Hallowed", "Hw", Color(0.98, 0.88, 0.55), "Warded by the light: immune to\nnew debuffs."],
-	"capacitor": ["Holy Capacitor", "HC", Color(0.95, 0.9, 0.6), "Stored overhealing, released by\nthe next Heal."],
+	"capacitor": ["Holy Capacitor", "HC", Color(0.95, 0.9, 0.6), "Stored overhealing, released by\nthe next Greater Heal."],
 	"faith": ["Faith", "Fa1", Color(0.98, 0.85, 0.45), "Conviction: Divine Shield absorbs\nbuild Faith, 2 a hit — 2% mitigation\nand +1.5% damage per stack, paid on\nthe HIGHEST count held this battle.\nAt 8 the bearer is healed and the\ncount resets; the peak keeps paying."],
 	"cons_ground": ["Consecrated Ground", "CG", Color(0.9, 0.82, 0.5), "Standing on holy ground: takes 15%\nless damage and reflects 10% of\ndamage taken."],
 	"zeal": ["Blessing of Zeal", "Z+", Color(1.0, 0.78, 0.35), "+15% damage dealt; Faith gain\nis doubled."],
@@ -511,7 +511,7 @@ const STATUS_INFO := {
 	# this file needs), Mirror Image carries a COUNT and a chip of its own
 	# (the `mirror` chip, whose POWER carries them) because its charges must not
 	# tick away on a turn count, Exhortation is banked in a field for the same
-	# reason, and Magic Missiles / Chastise / Dispel / Blink / Ministration
+	# reason, and Magic Missiles / Chastise / Dispel / Blink / Heal
 	# resolve and are done.
 	"mana_well": ["Mana Well", "MW", Color(0.45, 0.65, 0.95), "The well is open: Mana regeneration\nis DOUBLED while it holds."],
 	"mirror": ["Mirror Image", "MI", Color(0.70, 0.75, 0.95), "Images stand in his place: the next\nsingle-target attacks against him miss\noutright — ONE PER HIT, so a multi-hit\nblow spends one an arrow. Area attacks\nnever miss and spend none. They wait\nuntil spent."],
@@ -756,6 +756,9 @@ var _vigil_forking := false
 # The Weaver's armed cast: {caster, label, tally} while a third cast resolves,
 # {} otherwise. `_resolve` saves and restores it around the cast.
 var _echo_state: Dictionary = {}
+# BATCH KB — VOLLEY's cast: {caster, fired, landed, last}, each keyed by target, while a holder's damaging cast
+# resolves; {} otherwise. `_resolve` empties it for a nested resolve and restores it at its tail, as the Echo's.
+var _volley_state: Dictionary = {}
 # The body the strike loop names while its mitigation terms run, if it holds
 # Redoubt — what the parry cut banks into (HL §3: `_prev` banks nothing since the
 # bank was ruled to the block, the parry and a barrier's absorb). Set and cleared
@@ -765,8 +768,9 @@ var _redoubt_victim: BattleUnit = null
 # run inside a door they could otherwise re-enter.
 var _field_kit_mending := false
 var _judging := false
-# The two rule engines that lay a mark on an enemy, and the status each lays.
-const ENGINE_MARKS := {"quarry_hunt": "tracked", "judgment": "judged"}
+# The two rules that lay a mark on an enemy, and the status each lays — keyed by what holds each: an engine id (the
+# Arbiter's) or a rune's field (Common Foe's, the Tracker until KB). `_holds_mark_rule` asks which.
+const ENGINE_MARKS := {"rune_common_foe": "tracked", "judgment": "judged"}
 var _clock := 0.0  # the acting unit's position on the timeline, this turn
 # HOW MANY UNIT TURNS THIS BATTLE HAS SPENT. It drives the stalemate guard and
 # the forfeit nudge, and since Batch BB it is also the clock a once-per-turn
@@ -776,6 +780,7 @@ var _clock := 0.0  # the acting unit's position on the timeline, this turn
 # by hand and asserts the second application is refused.
 var _turns_taken := 0
 var empower_armed := false  # Mercy: the next heal cast spends +1 stack
+var overdraw_armed := 0  # BATCH KB — the Ambusher: copies asked for the next attack, clamped per card at the cast
 var _debug_popup: PopupMenu
 
 # Accumulated across scene reloads within one simulation run.
@@ -1023,8 +1028,8 @@ const MOCKING_BLOW_PERFECT_TURNS := 5         # Mocking Blow
 const NEXUS_WARD_PCT := 0.25                  # Nexus Ward
 const NEXUS_WARD_TURNS := 3                   # Nexus Ward
 const PERFECT_EXTRA_HITS := 1                 # Magic Missiles: the Perfect's extra missile
-const MINISTRATION_PCT := 0.35                # Ministration
-const MINISTRATION_PERFECT_PCT := 0.45        # Ministration
+const HEAL_PCT := 0.20                        # Heal (the Cleric's kit card): a share of the CLERIC's maximum
+const HEAL_PERFECT_PCT := 0.26                # Heal
 const UNBURDEN_CUT := 0.30                    # Unburden: the cut in damage taken (the strike reads 1.0 less it)
 const UNBURDEN_TURNS := 3                     # Unburden
 const CONSECRATION_TURNS := 4                 # Consecration
@@ -3240,7 +3245,8 @@ func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability
 				# not honour, which is a lie the player can see and no gate
 				# asserting on `next_time` would ever notice.
 				entry.t += preview_unit.momentum_delay_mult() \
-					* preview_ability.delay * 100.0 / preview_unit.effective_speed()
+					* (preview_ability.delay + _overdraw_preview_delay(preview_unit, preview_ability)) \
+					* 100.0 / preview_unit.effective_speed()
 	for i in 14:
 		var best: Dictionary = {}
 		for entry in sim:
@@ -3631,7 +3637,7 @@ func _run_battle() -> void:
 		# identically.
 		u.note_momentum_turn()
 		u.refresh_meter_chips()  # JZ §4: the step just booked shows before he chooses
-		# BATCH GO — THE SAME MOMENT CLOSES THE SKIRMISHER'S QUIET SPAN AND TRUES
+		# BATCH GO — THE SAME MOMENT CLOSES POUNCE'S QUIET SPAN (the Skirmisher's until KB) AND TRUES
 		# UP THE OATHKEEPER'S BOND, for Momentum's reason: the span is "since this
 		# unit's last turn", so it ends when the unit is chosen to act.
 		_rule_engine_turn(u)
@@ -4673,6 +4679,7 @@ func _player_turn(u: BattleUnit) -> void:
 	current_hero = u
 	item_used = false
 	empower_armed = false  # Mercy Empowerment never carries between turns
+	overdraw_armed = 0     # nor does an Ambusher's overdraw (BATCH KB)
 	u.rampage_chains = 0   # the capstone's kill-recast budget is per turn
 	u.res_cast_this_turn = false  # Resonant Core pays the FIRST cast of a turn
 	u.watchtower_used = false     # Watchtower pulls her turn forward once a turn
@@ -4828,7 +4835,7 @@ func _player_turn(u: BattleUnit) -> void:
 				"deep_winter", "emberkeep", "resonant_field", "threshold",
 				# BATCH BQ. Four of the twelve are self-casts and two are
 				# party-wide, which is the same thing to this list. `dispel`,
-				# `ministration`, `unburden` and `undying_vigil` are NOT here:
+				# `kit_heal`, `unburden` and `undying_vigil` are NOT here:
 				# the first picks either side (see below) and the other three
 				# are ally-facing and fall through to the ALLY branch.
 				"magic_barrier", "mirror_image", "mana_well", "blink",
@@ -5124,6 +5131,8 @@ func _player_turn(u: BattleUnit) -> void:
 	#
 	# IT COVERS AUTOPLAY AND SIMS FOR FREE (§3): the bot's rolled grade arrives in
 	# the same local, so a bot Sloppy loses the same cast a player's does.
+	if autoplay:
+		overdraw_armed = _bot_overdraw(u, ab, target)  # BATCH KB — the Ambusher's policy; 0 for anyone else
 	if ab.gated and grade == "fail":
 		await _gated_failure(u, ab)
 	else:
@@ -5315,7 +5324,7 @@ func _bot_class_kit_pick(u: BattleUnit) -> Array:
 			if ck_miss != null:
 				return [ck_miss, mark]
 		"cleric":
-			var ck_mend := _bot_kit_card(u, "Ministration")
+			var ck_mend := _bot_kit_card(u, "Heal")
 			var ck_low := allies.filter(func(h): return h.hp < h.max_hp * 0.5)
 			if ck_mend != null and not ck_low.is_empty():
 				return [ck_mend, _lowest_hp(ck_low)]
@@ -6297,8 +6306,8 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 					and weakest_ally.hp < weakest_ally.max_hp * 0.8 \
 					and not weakest_ally.has_status("renewal"):
 				return [renew, weakest_ally]
-			# Heal otherwise — the fallback, so a hurt party is always mended.
-			var hheal := _find_ability(u, "Heal")
+			# Greater Heal otherwise — the fallback, so a hurt party is always mended (BATCH KB: Holy's card, never the kit's Heal).
+			var hheal := _find_ability(u, "Greater Heal")
 			if hheal != null and u.resource >= _eff_cost(u, hheal) and u.ability_ready(hheal) \
 					and weakest_ally.hp < weakest_ally.max_hp:
 				return [hheal, weakest_ally]
@@ -6747,11 +6756,23 @@ func _show_actions(u: BattleUnit) -> void:
 		emp_btn.custom_minimum_size = Vector2(112, 32)
 		emp_btn.add_theme_font_size_override("font_size", 13)
 		emp_btn.disabled = u.second_resource < 1 and u.avatar_of_mercy <= 0
-		emp_btn.tooltip_text = "Spend +1 Mercy to Empower the next\nHeal / Renewal / Hymn / Resurrection /\nDivine Plea. Empowered casts forgo\ntheir perfect bonus. C toggles."
+		emp_btn.tooltip_text = "Spend +1 Mercy to Empower the next\nGreater Heal / Renewal / Hymn /\nResurrection / Divine Plea. Empowered\ncasts forgo their perfect bonus.\nC toggles."
 		if u.avatar_of_mercy > 0:
 			emp_btn.tooltip_text += "\nAvatar of Mercy: it costs nothing and\nGRANTS a stack instead."
 		emp_btn.toggled.connect(func(on: bool): empower_armed = on)
 		action_box.add_child(emp_btn)
+	# BATCH KB — THE AMBUSHER's OVERDRAW: chosen before the card, as Empower is, so no step waits between the pick and
+	# the cast; each press asks for one more copy and wraps to none. Hovering a card shows where the turn lands.
+	if u.has_engine("ambusher"):
+		var od_btn := Button.new()
+		od_btn.text = _overdraw_face()
+		od_btn.custom_minimum_size = Vector2(132, 32)
+		od_btn.add_theme_font_size_override("font_size", 13)
+		od_btn.tooltip_text = ("Add copies of the next attack's arrow,\neach shot at its main target. Each copy\n"
+			+ "pushes the next turn further out. V adds\none, up to %d, then none. A card takes\n"
+			+ "only the copies its cap allows; the turn\nbar shows where the turn lands.") % Classes.OVERDRAW_MAX_ARROWS
+		od_btn.pressed.connect(_on_overdraw_pressed.bind(od_btn))
+		action_box.add_child(od_btn)
 	action_panel.visible = true
 
 
@@ -9993,8 +10014,8 @@ const DISPEL_NEVER := ["covenant", "quarry", "snare_line", "feinted",
 	# mender's Cleansing Rite, so moving it there would move two magnitudes,
 	# and this list moves only what Dispel may take.
 	"party_mark", "arcane_echo", "rime",
-	# BATCH GO — the two marks the rule engines lay on an enemy (the Tracker's and
-	# the Arbiter's) are the heroes' work, so Dispel may not take them. The bond's
+	# BATCH GO — the two marks a rule lays on an enemy (Common Foe's and the
+	# Arbiter's) are the heroes' work, so Dispel may not take them. The bond's
 	# `oathbound` chip is NOT here: it sits on a HERO, and Dispel reads this list
 	# on an enemy only — CH's convention, a hero-side status in neither list.
 	"tracked", "judged",
@@ -10500,6 +10521,18 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		attacker.refresh_bars()
 		if echo_now:
 			_echo_state = {"caster": attacker, "label": ab.display_name, "tally": {}}
+	# BATCH KB — VOLLEY COUNTS THIS CAST's ARROWS, TARGET BY TARGET, AND NOTHING CARRIES TO THE NEXT (the designer's
+	# rule). Armed for a holder's damaging cast; a nested resolve (a free copy, a counter) is not this attack, so it
+	# runs with the state empty and this call's tail puts it back. The strike loop and `_companion_hit` feed it.
+	var volley_saved: Dictionary = _volley_state
+	_volley_state = {}
+	if not is_counter and attacker.is_hero and not attacker.is_companion \
+			and attacker.has_engine("volley") \
+			and (ab.damage > 0 or Ability.DAMAGE_SPECIALS.has(ab.special)):
+		_volley_state = {"caster": attacker, "fired": {}, "landed": {}, "last": {}}
+	# BATCH KB — THE AMBUSHER's OVERDRAW, READ ONCE FOR THIS CAST: the copies asked for, clamped by the card's caps,
+	# and spent here so they reach nothing else this turn. Zero for anyone else and for every nested resolve.
+	var od_n := _overdraw_count(attacker, ab, is_counter)
 	if was_free_ability:
 		attacker.free_ability -= 1
 		_log("   → Twin Hunt: the companion's kill pays for this one (%d left)" % \
@@ -10648,7 +10681,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	# two rolls on one blow. The kinds are `Ability`'s targeting fields (`aoe`, `multi_hits`,
 	# `random_hits` and every `choose_*`), and `check_ir` §1g reads this guard against them.
 	elif not is_counter and not ab.aoe and ab.multi_hits == 0 and ab.random_hits == 0 \
-			and not ab.choose_two and not ab.choose_three \
+			and not ab.choose_two and not ab.choose_three and od_n == 0 \
 			and (_mirror_dodge(attacker, target) \
 				or randf() < _miss_chance(attacker, target)):
 		_stat("attacks")
@@ -10766,6 +10799,16 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					bk_doubled, "" if bk_doubled == 1 else "s",
 					"s" if bk_doubled == 1 else "", attacker.berserk_strikes],
 					"#e05050")
+		# BATCH KB — THE AMBUSHER's COPIES: each a copy of the card's own arrow at the main target, an ordinary strike of
+		# this loop with its own miss, Block, crit and roll. A multi-hit re-aims at `target` every iteration, so its count
+		# grows alone; any other card's list grows with the target, Berserk's expansion's shape.
+		if od_n > 0:
+			if ab.multi_hits == 0 and ab.random_hits == 0:
+				for od_i in od_n:
+					strike_targets.append(target)
+			total_hits += od_n
+			_log("   → Rune of the Ambusher (core): %d more arrow%s at %s" % [od_n, "" if od_n == 1 else "s",
+				target.unit_name], "#e0a050")
 		# BATCH HF — SEEKING MISSILES: ONE EXTRA MISSILE FOR EACH ENEMY UNDER
 		# ELEMENTAL WEAKNESS, COUNTED AS THE CAST BEGINS. **WHERE THEY GO: EACH
 		# SEEKS THE ENEMY IT WAS COUNTED FOR** — spread, not piled on the target:
@@ -10837,15 +10880,16 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# does not reach it either; that coverage is Exposed's and Exhortation's,
 		# and `docs/reports/GO.md` names it.
 		var opening_mult := 1.0
-		if attacker.opening_armed and attacker.has_engine("opening_strike") \
+		if attacker.opening_armed and attacker.rune_pounce > 0.0 \
 				and ab.damage > 0 and not is_counter:
 			opening_mult = 1.0 + 0.01 * Classes.OPENING_BONUS_PCT
 			attacker.opening_armed = false
 			attacker.opening_quiet = 0
 			attacker.opening_struck = false
 			attacker.refresh_bars()
-			attacker.float_text("SKIRMISHER", Color(0.75, 0.95, 0.55))
-			_log("   → Rune of the Skirmisher (core): %s's first attack lands %d%% harder (spent)" % [
+			_refresh_rune_chips()
+			attacker.float_text("POUNCE", Color(0.75, 0.95, 0.55))
+			_log("   → Rune: Pounce — %s's attack lands %d%% harder (spent)" % [
 				attacker.unit_name, Classes.OPENING_BONUS_PCT], "#b8e070")
 		# **BATCH FK — THE BOUND IS LIVE NOW, AND THE RUNE OF THE BUTCHER'S BILL
 		# IS THE ONLY THING THAT MOVES IT MID-CAST.** `for hit_i in total_hits`
@@ -10943,10 +10987,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Mage, so the branch is unreachable — it is the rule made TRUE
 			# rather than a behaviour change, and the day an enemy gains a
 			# multi-hit blow it is already right.
-			if not is_counter and (ab.multi_hits > 0 or ab.random_hits > 0
+			if not is_counter and (od_n > 0 or ab.multi_hits > 0 or ab.random_hits > 0
 					or ab.choose_two or ab.choose_three):
 				if (ab.multi_hits > 0 and _mirror_dodge(attacker, strike_target)) \
 						or randf() < _miss_chance(attacker, strike_target):
+					_volley_arrow(attacker, strike_target, false)
 					_stat("attacks")
 					_stat("attack_miss")
 					_sfx("miss")
@@ -11068,6 +11113,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							+ plating + cover:
 						block_source = "Covering Guard"
 				if block_source != "":
+					_volley_arrow(attacker, strike_target, false)
 					_stat("attacks")
 					_stat("attack_block")
 					# BJ §3a: a landed BLOCK is the Warden's signature moment —
@@ -11654,7 +11700,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# the price line) at `Classes.BOIL_OVER_DMG_PER_RAGE` a point, read through `Classes.rage_dump_damage`
 			# and never scaled by Attack; it draws the one variance roll every strike draws, in the same place, and no other.
 			var raw := (Classes.rage_dump_damage(bo_spent) if bo_dump else float(ab.damage) * 0.01 * attacker.attack) \
-				* randf_range(0.9, 1.1) * dmg_mult
+				* randf_range(_volley_floor(attacker, strike_target), 1.1) * dmg_mult
 			# BATCH GO — REDOUBT BANKS WHAT IS KEPT OFF THE BODY IT IS HELD ON.
 			# **BATCH HL §3 — ONLY WHAT IS BLOCKED, PARRIED OR ABSORBED (ruled).** GO
 			# banked every mitigation site that books through `_prev` from this line
@@ -11909,7 +11955,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if ab.display_name == "Hunt":
 				var hunt_n := _status_count(strike_target)
 				if is_perfect:
-					raw = HUNT_PERFECT_PCT * attacker.attack * randf_range(0.9, 1.1) * dmg_mult
+					raw = HUNT_PERFECT_PCT * attacker.attack * randf_range(_volley_floor(attacker, strike_target), 1.1) * dmg_mult
 				raw *= float(hunt_n)
 				_log("   → Hunt reads %d different affliction%s on %s" % [
 					hunt_n, "" if hunt_n == 1 else "s",
@@ -12098,7 +12144,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# than three — which is what the card says and what a per-strike
 			# consumption would quietly make false.
 			raw *= exhort_mult
-			# BATCH GO — the Skirmisher's opening, read and spent above the loop
+			# BATCH GO — Pounce's opening (the Skirmisher's until KB), read and spent above the loop
 			# for Exhortation's reason.
 			raw *= opening_mult
 			# BATCH HF — CLARITY AND PROFLIGATE, both decided at the spend line
@@ -13213,6 +13259,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# nothing — which a hit-count rider reads (Anointing's Ruin, below): a silenced
 			# hit still connects, and its Break still lands.
 			var connected := final > 0
+			var volley_share := _volley_arrow(attacker, strike_target, connected)  # BATCH KB — Volley's count
 			var refused := silenced and final > 0
 			if refused:
 				if _readout != null:
@@ -13967,6 +14014,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				# inside _add_bleed_with_burst.
 				if ab.damage > 0:
 					bleed_amount += attacker.mod_bleed_add
+				bleed_amount += volley_share  # BATCH KB — Volley's share, one call with the card's own
 				if bleed_amount > 0:
 					_add_bleed_with_burst(strike_target, bleed_amount)
 					# BATCH FK — THE RUNE OF THE BUTCHER'S BILL. The wound buys
@@ -15259,6 +15307,21 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				await _wait(0.5)
 				await _resolve(attacker, _free_copy(ab), next_target, "good", true)
 				_dmg_frame(attacker, ab.display_name)
+	# BATCH KB — VOLLEY's CLEAN VOLLEY, PAID ONCE THE WHOLE CAST HAS RESOLVED (the companion's blow included): a target
+	# that took two or more arrows and every one of them landed takes the last one's share again. Then the state of the
+	# cast this one sits inside, if any, comes back.
+	if not _volley_state.is_empty():
+		var vc: Dictionary = _volley_state
+		_volley_state = {}
+		for vt in vc["fired"]:
+			var v_fired := int(vc["fired"][vt])
+			if is_instance_valid(vt) and not vt.dead and v_fired >= 2 \
+					and int(vc["landed"].get(vt, 0)) == v_fired:
+				var v_again := int(vc["last"].get(vt, 0)) * (Classes.VOLLEY_CLEAN_MULT - 1)
+				_log("   → Rune of the Volley (core): every arrow at %s landed; the last one's buildup counts again (+%d)" % [
+					vt.unit_name, v_again], "#e0a050")
+				_add_bleed_with_burst(vt, v_again)
+	_volley_state = volley_saved
 	# BATCH GO — ECHO FIRES HERE, once the whole cast has resolved: a strike, a
 	# special handler, a heal and a miss all arrive at this line. The tally is
 	# taken and the state restored BEFORE the echo lands, so the echo's own damage
@@ -15317,6 +15380,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			_log("   → Talent: Instinctive Rotation — the swap costs no turn",
 				"#b0a8e0")
 		_swapped_free = false
+		# BATCH KB — THE AMBUSHER's PRICE: each copy costs the card's own pace (its initiative / its arrows), so the copies
+		# ride Momentum and speed exactly as the card's own initiative does, through this one line.
+		eff_delay += float(od_n) * _overdraw_price(ab)
 		# BATCH FT — MOMENTUM'S PAYOUT, READ SITE 1 OF 3. It scales the DELAY
 		# the turn being scheduled costs rather than adding a seventh term to
 		# `effective_speed()`, which is what all 23 `next_time` writes divide by
@@ -17192,12 +17258,13 @@ func _party_mark_mult(victim: BattleUnit) -> float:
 #   · Siphon         — `take_hit` / `take_tick_damage` (unit.gd) and the damage door.
 #   · Covenant       — the same two unit doors and `heal_amount`, billed here.
 #   · Judgment       — the damage door; the mark is laid there too.
-#   · Quarry         — the damage door (the mark); paid beside the Hunter's Mark.
-#   · Opening        — above the strike loop, beside Exhortation; re-armed at the
-#     turn start, beside Momentum.
+#   · Volley         — `_resolve`'s strike loop and `_companion_hit` (each landed
+#     arrow counted at `connected`); the clean volley paid at `_resolve`'s tail.
+#   · Ambusher       — the action bar's `overdraw_armed`, read once at `_resolve`'s
+#     door; the copies priced at the delay line.
 #   · Field Kit      — `_apply_status`, beside Downwind.
 # **A HOLDER WHO HAS FALLEN RUNS NO RULE**: a dead Arbiter judges nothing and a
-# dead Tracker's mark pays nothing, though the mark stays on its enemy — a rule is
+# dead holder of Common Foe pays nothing through its mark, though the mark stays on its enemy — a rule is
 # the hero's, where a card's mark (the Hunter's) is ownerless.
 
 # Who dealt the damage the frame is describing: the unit, or — for a tick, whose
@@ -17222,7 +17289,7 @@ func _open_rule_engines() -> void:
 		h.refresh_bars()
 
 
-# A UNIT IS CHOSEN TO ACT, beside Momentum's span. The Skirmisher's quiet span
+# A UNIT IS CHOSEN TO ACT, beside Momentum's span. Pounce's quiet span
 # closes: a span no blow reached counts toward the opening, a struck one resets
 # the count, and the opening re-arms at `OPENING_QUIET_TURNS` — a count that
 # starts only once the opening has been spent. An Oathkeeper with no living bond
@@ -17230,7 +17297,8 @@ func _open_rule_engines() -> void:
 func _rule_engine_turn(u: BattleUnit) -> void:
 	if u == null or u.dead or not u.is_hero or u.is_companion:
 		return
-	if u.has_engine("opening_strike"):
+	# BATCH KB — POUNCE's clock (the Skirmisher's rule, an ordinary rune now), kept at this turn door.
+	if u.rune_pounce > 0.0:
 		if u.opening_armed or u.opening_struck:
 			u.opening_quiet = 0
 		else:
@@ -17238,8 +17306,8 @@ func _rule_engine_turn(u: BattleUnit) -> void:
 			if u.opening_quiet >= Classes.OPENING_QUIET_TURNS:
 				u.opening_armed = true
 				u.opening_quiet = 0
-				u.float_text("SKIRMISHER READY", Color(0.75, 0.95, 0.55))
-				_log("Rune of the Skirmisher (core): %d turns unstruck — %s's bonus returns" % [
+				u.float_text("POUNCE READY", Color(0.75, 0.95, 0.55))
+				_log("   → Rune: Pounce — %d turns unstruck: %s's bonus returns" % [
 					Classes.OPENING_QUIET_TURNS, u.unit_name], "#b8e070")
 		u.opening_struck = false
 		u.refresh_bars()
@@ -17337,7 +17405,7 @@ func _lay_engine_mark(holder: BattleUnit, pid: String, target: BattleUnit) -> vo
 		return
 	var info: Array = STATUS_INFO[sid]
 	var desc := ""
-	if pid == "quarry_hunt":
+	if pid == "rune_common_foe":
 		desc = "Tracked by the %s: every ally deals\n%d%% more damage to this enemy. When it\nfalls, the tracking passes to another." % [
 			holder.unit_name, Classes.QUARRY_PCT]
 	else:
@@ -17345,14 +17413,25 @@ func _lay_engine_mark(holder: BattleUnit, pid: String, target: BattleUnit) -> vo
 			holder.unit_name, Classes.JUDGMENT_HEAL_PCT]
 	target.update_status(sid, String(info[1]), desc)
 	target.float_text(String(info[0]).to_upper(), info[2])
-	_log("Rune of the %s (core): %s %s %s" % [Classes.engine_title(pid), holder.unit_name,
-		"tracks" if pid == "quarry_hunt" else "judges", target.unit_name], "#e0c880")
+	if Classes.is_rule_engine(pid):
+		_log("Rune of the %s (core): %s judges %s" % [Classes.engine_title(pid), holder.unit_name,
+			target.unit_name], "#e0c880")
+	else:
+		_log("   → Rune: %s — %s tracks %s" % [String(Runes.config("engine_quarry_hunt").get("name", "")),
+			holder.unit_name, target.unit_name], "#e0c880")
+
+
+# BATCH KB — WHO HOLDS A MARK's RULE: an engine's holder by `has_engine`, a rune's by its field (Common Foe's).
+func _holds_mark_rule(u: BattleUnit, key: String) -> bool:
+	if u == null:
+		return false
+	return u.has_engine(key) if Classes.is_rule_engine(key) else float(u.get(key)) > 0.0
 
 
 # Where a mark goes when the enemy wearing it falls: the living enemy that can be picked (`_pickable`, JW) with the most
 # health left — a mark wants the body that will stand longest — the first in the
-# warband on a tie. The brief says the Tracker's MOVES; the Arbiter's is given the
-# same move so neither engine dies with its first target (NEEDS A RULING).
+# warband on a tie. GO's brief said the Tracker's mark MOVES (Common Foe's since KB); the
+# Arbiter's is given the same move so neither rule dies with its first target (NEEDS A RULING).
 func _mark_destination(fallen: BattleUnit) -> BattleUnit:
 	var best: BattleUnit = null
 	for e in enemies:
@@ -17376,13 +17455,13 @@ func _blood_debt_payer() -> BattleUnit:
 	return best
 
 
-# QUARRY'S PAYOUT, read by the hero strike loop and by `_companion_hit` —
-# `_party_mark_mult`'s shape, so the two damage paths cannot disagree.
+# COMMON FOE's PAYOUT (the Tracker's rule, an ordinary rune since KB), read by the hero strike loop and by
+# `_companion_hit` — `_party_mark_mult`'s shape, so the two damage paths cannot disagree.
 func _quarry_mult(victim: BattleUnit) -> float:
 	if victim == null or not victim.has_status("tracked"):
 		return 1.0
 	var holder := _hero_named(String(victim.get_status("tracked").get("src_name", "")))
-	if holder == null or holder.dead or not holder.has_engine("quarry_hunt"):
+	if holder == null or holder.dead or holder.rune_common_foe <= 0.0:
 		return 1.0
 	return 1.0 + 0.01 * Classes.QUARRY_PCT
 
@@ -17436,7 +17515,7 @@ func _rule_engines_on_damage(victim: BattleUnit, lost: int) -> void:
 	# its target marks nothing.
 	if not dealer.is_companion and not dealer.dead and victim.hp > 0:
 		for mk_pid in ENGINE_MARKS:
-			if dealer.has_engine(String(mk_pid)) \
+			if _holds_mark_rule(dealer, String(mk_pid)) \
 					and _engine_mark_on(dealer, String(ENGINE_MARKS[mk_pid])) == null:
 				_lay_engine_mark(dealer, String(mk_pid), victim)
 
@@ -17476,7 +17555,7 @@ func _on_unit_died(u: BattleUnit) -> void:
 			if not u.has_status(sid):
 				continue
 			var holder := _hero_named(String(u.get_status(sid).get("src_name", "")))
-			if holder == null or holder.dead or not holder.has_engine(String(mk_pid)):
+			if holder == null or holder.dead or not _holds_mark_rule(holder, String(mk_pid)):
 				continue
 			var dest := _mark_destination(u)
 			if dest != null:
@@ -18388,7 +18467,7 @@ func _overflow_share(caster: BattleUnit) -> int:
 
 
 # Holy Capacitor: bank a share of the overheal the last heal spilled; the
-# next Heal releases the whole battery. RUNE-ONLY SINCE BATCH AV — the node
+# next Greater Heal releases the whole battery. RUNE-ONLY SINCE BATCH AV — the node
 # became Martyrdom, and the Rune of the Triage Ward is the last writer. The
 # read site is KEPT and gated (the AR vault pattern), never silently deleted,
 # and it is FLAGGED FOR RE-AUTHORING.
@@ -18413,7 +18492,7 @@ func _bank_overheal(caster: BattleUnit, target: BattleUnit) -> void:
 	if banked <= 0:
 		return
 	caster.stored_overheal += banked
-	var cap_desc := "Holy Capacitor: %d overhealing stored,\nreleased by the next Heal." % caster.stored_overheal
+	var cap_desc := "Holy Capacitor: %d overhealing stored,\nreleased by the next Greater Heal." % caster.stored_overheal
 	caster.set_display_chip("capacitor", "Holy Capacitor", "%d" % caster.stored_overheal,
 		Color(0.95, 0.9, 0.6), cap_desc)
 	_log("   → Talent: Holy Capacitor banks %d overhealing (%d stored)" % [
@@ -18445,7 +18524,7 @@ func _radiant_cascade(caster: BattleUnit, healed: int, primary: BattleUnit) -> v
 
 # Overflow: a share of the overheal spills onto the lowest-health OTHER
 # ally at once. Reads the same overheal Holy Capacitor banks from, at the
-# same three sites (Heal, Hymn voices, Renewal's perfect burst).
+# same three sites (Greater Heal, Hymn voices, Renewal's perfect burst).
 func _overflow_spill(caster: BattleUnit, target: BattleUnit) -> void:
 	if _overflow_share(caster) <= 0 or target.last_overheal <= 0:
 		return
@@ -22882,26 +22961,24 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s: Blink — %d cooldown%s tick %d turn%s early" % [
 					attacker.unit_name, bl_n, "" if bl_n == 1 else "s", bl_turns,
 					"" if bl_turns == 1 else "s"], "#70d878")
-		"ministration":
-			# AXIS: the plain heal none of the three Clerics has. It reads the
-			# TARGET's maximum rather than the caster's. Since KA's re-tune (JZ's
-			# ruling 1, the designer's) it out-heals Holy's Heal on a large ally and
-			# under-heals it on a small one; the same Mercy multiplier is applied to
-			# both, so Mercy never moves that comparison.
+		"kit_heal":
+			# AXIS: the plain heal none of the three Clerics has. BATCH KB — HEAL (Ministration until KB, the designer's
+			# ruling): it reads the CLERIC's maximum, as Greater Heal does, at a smaller share; the same Mercy
+			# multiplier is applied to both.
 			if target != null and not target.dead:
-				var mn_pct := MINISTRATION_PERFECT_PCT if is_perfect else MINISTRATION_PCT
+				var mn_pct := HEAL_PERFECT_PCT if is_perfect else HEAL_PCT
 				# BATCH HF — ELEVENTH HOUR: twice as much on an ally below a quarter
 				# health, read BEFORE the heal lands (after it, nobody is low). The
 				# rune's field is the increase, so 1.0 is twice; it multiplies the
 				# whole heal, the Perfect and the healer terms included.
 				var mn_eleventh := attacker.rune_eleventh_hour > 0.0 \
 					and target.hp < target.max_hp * ELEVENTH_HOUR_AT
-				var mn_amount := maxi(int(round(target.max_hp * mn_pct
+				var mn_amount := maxi(int(round(attacker.max_hp * mn_pct
 					* _healing_done_mult(attacker)
 					* (1.0 + attacker.rune_eleventh_hour if mn_eleventh else 1.0))), 1)
 				if mn_eleventh:
-					_log("   → Rune: Eleventh Hour — %s is below a quarter health; the office doubles" % \
-						target.unit_name, "#70d878")
+					_log("   → Rune: Eleventh Hour — %s is below %d%% health; the heal doubles" % [
+						target.unit_name, int(round(ELEVENTH_HOUR_AT * 100.0))], "#70d878")
 				_sfx("heal", -8.0)
 				# Book what LANDED, not what was asked for (the BC log-honesty
 				# rule): a heal into a full bar must not read like a heal into
@@ -22909,15 +22986,15 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var mn_got := target.heal_amount(mn_amount, target != attacker)
 				_stat_heal(attacker, mn_got, target)
 				target.float_text("+%d" % mn_got, Color(0.4, 0.9, 0.45))
-				_message("%s ministers to %s" % [attacker.unit_name,
+				_message("%s heals %s" % [attacker.unit_name,
 					target.unit_name])
-				_log("%s: Ministration — %s regains %d (%d%% of their maximum)%s" % [
-					attacker.unit_name, target.unit_name, mn_got,
+				_log("%s: %s — %s regains %d (%d%% of the Cleric's maximum)%s" % [
+					attacker.unit_name, ab.display_name, target.unit_name, mn_got,
 					int(round(mn_pct * 100)),
 					" [PERFECT]" if is_perfect else ""], "#70d878")
 		"consecration":
 			# AXIS: sustained rather than burst, the opposite read to
-			# Ministration. THE TICK IS ITS OWN FUNCTION (`_consecration_tick`)
+			# Heal. THE TICK IS ITS OWN FUNCTION (`_consecration_tick`)
 			# for the standing reason: `_run_battle` cannot be driven headlessly
 			# (the AR trap), so a rule left inside its loop can only ever be
 			# checked by a grep and its negative control could never fail — the
@@ -25644,7 +25721,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.float_text("+%d" % self_got, Color(0.4, 0.9, 0.45))
 				_stat_heal(attacker, self_got, attacker)
 			_message("%s mends %s" % [attacker.unit_name, target.unit_name])
-			_log("%s: Heal — %s recovers %d%s (40%% of the Cleric's health)%s" % [
+			_log("%s: Greater Heal — %s recovers %d%s (40%% of the Cleric's health)%s" % [
 				attacker.unit_name, target.unit_name, hh_got,
 				" CRIT" if hh_crit > 1.0 else "", hh_note], "#70d878")
 		"intercession":
@@ -26982,7 +27059,7 @@ func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int,
 		pen := 0.0) -> void:
 	if victim == null or victim.dead:
 		return
-	var raw := (dmg + comp.companion_power) * randf_range(0.9, 1.1)
+	var raw := (dmg + comp.companion_power) * randf_range(_volley_floor(comp.pack_master, victim), 1.1)
 	# BATCH EW: named so the roll and the surplus read ONE value. The companion
 	# inherits `crit_bonus` from its hunter (`_spawn_companion`) and wears none of
 	# the strike loop's other terms, so this total is three terms as well.
@@ -27056,7 +27133,7 @@ func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int,
 	# function the strike loop calls. A second literal here is how the two
 	# paths would eventually disagree about what a mark is worth.
 	raw *= _party_mark_mult(victim)
-	# BATCH GO — and the Tracker's quarry reaches it the same way: "every ally".
+	# BATCH GO — and Common Foe's quarry (the Tracker's until KB) reaches it the same way: "every ally".
 	raw *= _quarry_mult(victim)
 	# Necrosis: poisoned enemies take more from ALL sources — a beast's jaws
 	# included. ADDITIVE (Batch BA): the counter is percentage points.
@@ -27068,6 +27145,10 @@ func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int,
 	var comp_armor := victim.effective_armor() * (1.0 - clampf(pen, 0.0, 1.0))
 	var final := maxi(int(round(raw * (1.0 - comp_armor))), 1)
 	var result: Dictionary = victim.take_hit(final, pr)
+	# BATCH KB — VOLLEY: a companion's blow is an arrow (the designer's), and it never misses.
+	var vb_share := _volley_arrow(comp.pack_master, victim, true)
+	if vb_share > 0 and not victim.dead:
+		_add_bleed_with_burst(victim, vb_share)
 	# Sim bookkeeping: the beast's damage is the hunter's damage.
 	if not victim.is_hero:
 		var comp_credit: BattleUnit = pm if pm != null else comp
@@ -28430,6 +28511,109 @@ func _comp_dmg_mult(comp: BattleUnit) -> float:
 	return mult
 
 
+# ══ BATCH KB — VOLLEY AND THE AMBUSHER (the designer's rules, written with Claude in conversation) ════════════════════
+#
+# **VOLLEY: each arrow of a holder's attack that lands on a target adds Bleed buildup, more for each that landed there
+# before it.** `_volley_arrow` books one arrow — fired, and landed or not — against the cast `_resolve` armed, and
+# returns the buildup a landed one adds: its place among the arrows that landed on that body this cast, times
+# `Classes.VOLLEY_STEP`. A miss and a Block are fired and not landed; a companion's blow always lands. Anyone else's
+# arrow, and an arrow at a hero, books nothing and returns 0.
+func _volley_arrow(caster: BattleUnit, t: BattleUnit, landed: bool) -> int:
+	if _volley_state.is_empty() or caster == null or t == null or t.is_hero \
+			or _volley_state.get("caster") != caster:
+		return 0
+	var v_fired: Dictionary = _volley_state["fired"]
+	v_fired[t] = int(v_fired.get(t, 0)) + 1
+	if not landed:
+		return 0
+	var v_landed: Dictionary = _volley_state["landed"]
+	v_landed[t] = int(v_landed.get(t, 0)) + 1
+	var share: int = int(v_landed[t]) * Classes.VOLLEY_STEP
+	_volley_state["last"][t] = share
+	return share
+
+
+# THE RIDER: once an arrow has landed on a body this cast, the next one's damage roll starts at
+# `Classes.VOLLEY_RIDER_FLOOR` instead of the bottom of its spread. A read, never a draw: the roll stays one call.
+func _volley_floor(caster: BattleUnit, t: BattleUnit) -> float:
+	if _volley_state.is_empty() or caster == null or _volley_state.get("caster") != caster:
+		return 0.9
+	return Classes.VOLLEY_RIDER_FLOOR if int(_volley_state["landed"].get(t, 0)) >= 1 else 0.9
+
+
+# **THE AMBUSHER: copies of a card's own arrow, each at its own pace, capped.** A card's arrows are what it strikes
+# when cast as authored: its multi-hit count, the bodies a chosen pair or trio strikes, else one.
+func _overdraw_arrows(ab: Ability) -> int:
+	if ab.multi_hits > 0:
+		return ab.multi_hits
+	if ab.choose_three:
+		return 3
+	if ab.choose_two:
+		return 2
+	return 1
+
+
+func _overdraw_price(ab: Ability) -> float:
+	return ab.delay / float(_overdraw_arrows(ab))
+
+
+# The most copies this card takes for this hero: none unless the hero holds the Ambusher and the card is an attack of
+# the strike loop with a target he picks (a special — a companion's attack among them — and an attack on every enemy take
+# none); then as many as `Classes.OVERDRAW_MAX_ARROWS` allows while the added initiative stays within
+# `Classes.OVERDRAW_MAX_DELAY`.
+func _overdraw_max(u: BattleUnit, ab: Ability) -> int:
+	if u == null or not u.is_hero or u.is_companion or not u.has_engine("ambusher") or ab == null:
+		return 0
+	if ab.special != "" or ab.damage <= 0 or ab.aoe or ab.random_hits > 0:
+		return 0
+	var price := _overdraw_price(ab)
+	var n := 0
+	while n < Classes.OVERDRAW_MAX_ARROWS and price * float(n + 1) <= Classes.OVERDRAW_MAX_DELAY + 0.0001:
+		n += 1
+	return n
+
+
+# The copies a cast takes, read once at its door and spent there: only the hero whose turn it is, never a nested resolve.
+func _overdraw_count(u: BattleUnit, ab: Ability, is_counter: bool) -> int:
+	if is_counter or u == null or u != current_hero:
+		return 0
+	var n: int = mini(overdraw_armed, _overdraw_max(u, ab))
+	overdraw_armed = 0
+	return n
+
+
+# The initiative the turn bar adds for the copies asked, clamped by this card as the cast will clamp it.
+func _overdraw_preview_delay(u: BattleUnit, ab: Ability) -> float:
+	return float(mini(overdraw_armed, _overdraw_max(u, ab))) * _overdraw_price(ab)
+
+
+func _overdraw_face() -> String:
+	return "Overdraw +%d (V)" % overdraw_armed
+
+
+func _on_overdraw_pressed(btn: Button) -> void:
+	overdraw_armed = (overdraw_armed + 1) % (Classes.OVERDRAW_MAX_ARROWS + 1)
+	if is_instance_valid(btn):
+		btn.text = _overdraw_face()
+
+
+# THE BOT's POLICY (an instrument's choice, not a rule): copies only to finish the main target before it acts again —
+# the fewest whose plain damage, at the middle of the roll and through its armour, reaches its health; none when the
+# card alone does, or when the caps cannot. No die is drawn.
+func _bot_overdraw(u: BattleUnit, ab: Ability, t: BattleUnit) -> int:
+	var most := _overdraw_max(u, ab)
+	if most <= 0 or t == null or t.dead or t.is_hero:
+		return 0
+	var per := float(ab.damage) * 0.01 * u.attack * (1.0 - t.effective_armor())
+	var base := float(maxi(ab.multi_hits, 1))
+	if per <= 0.0 or per * base >= float(t.hp):
+		return 0
+	for n in range(1, most + 1):
+		if per * (base + float(n)) >= float(t.hp):
+			return n
+	return 0
+
+
 # Adds bleed buildup (logged) and detonates the bleedout when the meter fills.
 # Bleedout damage IGNORES armor (take_hit applies none — armor only reduces
 # attack damage inside _resolve) and respects Unity's soul-binding.
@@ -29165,6 +29349,13 @@ func _input(event: InputEvent) -> void:
 		if event.keycode == KEY_TAB:
 			_on_tab_pressed()
 			return
+		# BATCH KB — V asks the Ambusher for one more copy while the action bar is open.
+		if event.keycode == KEY_V and action_panel.visible \
+				and current_hero != null and current_hero.has_engine("ambusher"):
+			overdraw_armed = (overdraw_armed + 1) % (Classes.OVERDRAW_MAX_ARROWS + 1)
+			_show_actions(current_hero)
+			get_viewport().set_input_as_handled()
+			return
 		# C toggles Mercy Empowerment while the action bar is open.
 		if event.keycode == KEY_C and action_panel.visible \
 				and current_hero != null \
@@ -29789,6 +29980,18 @@ func _refresh_rune_chips() -> void:
 					int(round(hu.rune_vow_of_silence * 100.0)), said]))
 				per_hero[hu].append({"name": vow_name, "tag": RUNE_CHIP_TAG, "paying": live,
 					"tip": "\n".join(v_lines)})
+		# BATCH KB — POUNCE (the Skirmisher's rule, an ordinary rune now): READY while the next attack is the large one,
+		# ARMED while the quiet turns toward its return are counted. Its state left the engine chip with the engine.
+		if hu.rune_pounce > 0.0:
+			var po_name := String(Runes.config("engine_opening_strike").get("name", ""))
+			var po_lines := PackedStringArray(["%s — %s" % [po_name, "READY" if hu.opening_armed else "ARMED"]])
+			if hu.opening_armed:
+				po_lines.append("The next attack deals %d%% more damage." % Classes.OPENING_BONUS_PCT)
+			else:
+				po_lines.append("Quiet turns toward the bonus: %d of %d." % [hu.opening_quiet,
+					Classes.OPENING_QUIET_TURNS])
+			per_hero[hu].append({"name": po_name, "tag": RUNE_CHIP_TAG, "paying": hu.opening_armed,
+				"tip": "\n".join(po_lines)})
 	for h3 in per_hero:
 		(h3 as BattleUnit).set_rune_chips(per_hero[h3])
 	_draw_crest_strip(crest)

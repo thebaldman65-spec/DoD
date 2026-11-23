@@ -333,7 +333,7 @@ new block written here):
     re-tune); the recommendation first among the options; nothing built on an open balance question until it is answered; a figure
     a ruled derivation reads off a measurement (IX §3's grades) is that ruling applied, and the batch reports the move. And a rune's
     rule and text stay RUNE CONTENT IS WRITTEN WITH THE DESIGNER's, never offered as options, while its figures go before the
-    designer with options once the designer has written it — KA's RULINGS OWED asks.*
+    designer with options once the designer has written it — ruled so at KB, KA's ruling 4 (a), the designer's.*
 - **A FOLD, A RENAME OR A REFACTOR THAT CHANGES A MAGNITUDE IS A DESIGN CHANGE. IT GOES TO THE
   DESIGNER AS A REPORT AND IS NEVER APPLIED ON THE BATCH'S OWN JUDGMENT (STANDING, SET AT BATCH
   CQ §6).** The rule exists because of CN §3: removing the timing bar from 113 abilities orphaned
@@ -1564,7 +1564,7 @@ as a live decision.
 
 ## Architecture (all UI built in code, no editor scenes)
 - `scripts/run_state.gd` (autoload `Run`): party/items/gold/the LINE/zones,
-  save (user://run_save.bin v15, auto-saved at every step onto a node, at every
+  save (user://run_save.bin v16, auto-saved at every step onto a node, at every
   resolution, and inside a fight as each party loss lands — GH; `resume_scene` places
   a resumed run — GF), relic slots
   (max 3), the offer table (MODIFIERS/REWARDS), merchant+event scheduling,
@@ -1616,10 +1616,11 @@ questions now; `can_equip`, `equipped_learned` and `Profile.equip_cell` are dele
 · **VERSIONS** — `Profile` is **v3** (FX: the ledger keys to the CLASS) and reads a **v2 profile
   by a one-step migration** that folds its twelve spec purses into four. **Its floor,
   `MIN_VERSION`, is 2 — the oldest version this build carries a migration for** — so a v1 profile
-  is REFUSED rather than silently zeroed. The run save is **v15** and **a pre-v10 save is REFUSED and
+  is REFUSED rather than silently zeroed. The run save is **v16** and **a pre-v10 save is REFUSED and
   cleared** (the final zone gained a 17th slot; a v9 map has no position after its boss).
-  **v11 (CT), v12 (EG), v13 (GF), v14 (HK: the rune bag, the crest and the waiting drops) AND v15 (HR: the
-  bag's class and core runes handed to their heroes on load) ARE ALL TOLERANT AND NONE MOVED THE REFUSAL
+  **v11 (CT), v12 (EG), v13 (GF), v14 (HK: the rune bag, the crest and the waiting drops), v15 (HR: the
+  bag's class and core runes handed to their heroes on load) AND v16 (KB: two cards' names read by the save's version,
+  two cores made ordinary runes) ARE ALL TOLERANT AND NONE MOVED THE REFUSAL
   THRESHOLD** — the
   threshold is a claim about a structure this build cannot walk, and a version bump for a field
   with a sane default is not one. **DO NOT RAISE THE THRESHOLD TO MATCH THE VERSION.** **AND A SAVE FROM A NEWER
@@ -2212,9 +2213,12 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
 > party's slot.** It fails the same test. **A party rune has to read the party** — its composition,
 > its condition, its moments together.
 
-- **AMBUSHER'S SHARPEST DIRECTION IS UNBUILT: cards that want to follow each other with no turn between.** Nothing in
-  the game reads what was cast last turn — the nearest are `last_attack_target` and Overtone's cast count — so a combo
-  family is new machinery, and it wants a recon first.
+- **VOLLEY AND THE AMBUSHER ARE WRITTEN AND BUILT (KB, the designer's rules, written in conversation)**: Volley's Bleed
+  buildup climbs arrow by arrow on one body, and the Ambusher OVERDRAWS — copies of a card's arrow, paid in initiative.
+  So Volley names the cards that strike one body many times and the Ambusher the heavy single shots a copy is worth most
+  on — two drafts, as the test asks (KB's reading of the ruled price; the two may sit on one Hunter). **The *long
+  cooldowns* direction is superseded by overdraw (the designer's), and *no turn between* by the rules as written (KB's
+  reading)**; the bullet that kept the second unbuilt is in the state archive under KB's cut.
 - **OF HK's EIGHT CREST DOORS (`docs/reports/HK.md` §4b), ONE IS BUILT, BOTH HALVES**: the party's composition read at
   the spawn (HL §6) and its condition as the fight runs (HP §1; the crest block's live-door bullet). Its moments
   together, its money and its companions are still new machinery (`docs/reports/HL.md` §6 lists the doors).
@@ -2685,7 +2689,7 @@ the block left out, spend what they were paid.
 - **THE DOORS.** A death is `unit._die()`, once a body until it is raised (JD §3), which calls `died_cb` BEFORE the statuses clear (the Reaver's kill, a mark
   that moves, a bond that passes). Damage is BL's `_report_taken` door, read through the attribution frame (the
   Weaver's tally, the Leech's return, the Arbiter's heal, the marks). An effect laid on an enemy is `_apply_status`
-  (the Medic). A blow is `_resolve`'s strike loop (the Tracker's and the Skirmisher's pay, the Bastion's spend). **A
+  (the Medic). A blow is `_resolve`'s strike loop (Volley's count and the Ambusher's copies, the Bastion's spend), and a companion's blow `_companion_hit`, Volley's second door. **A
   kill outside `_die()`, damage outside the two unit doors or a status written around `_apply_status` is invisible to
   the nine.**
 - **THE BASTION BANKS WHAT IS BLOCKED, PARRIED OR ABSORBED, AND NOTHING ELSE (HL §3, ruled; GO banked every cut)** —
@@ -2698,11 +2702,9 @@ the block left out, spend what they were paid.
 - **A REPEAT IS THE DAMAGE, NEVER THE CARD.** The Weaver's repeat lays no status, heal, summon or Break damage and
   consumes nothing twice; a card that wants its effect repeated needs a ruling, not an arm in `_echo_fire`.
 - **SIX A CLASS IS `Classes.class_engines`**, the one list the deal, the pouch and the gates read.
-- **THE SKIRMISHER AND THE TRACKER ARE RULED INTO ORDINARY RUNES — RULED, NOT BUILT (recorded at HP §7; ruled in
-  conversation, never briefed).** Both are live core runes today, dealt and slotted as any of the nine are. **Their names
-  are ruled — *Common Foe* for the Tracker, *Pounce* for the Skirmisher (KA, JZ's ruling 2) — and the build waits on
-  Volley's and the Ambusher's rules, which take the two core slots and are not written (KA's ruling 1).** **A brief
-  that cites their retirement as a precedent is citing a ruling, not the game** — HO caught one.
+- **THE SKIRMISHER AND THE TRACKER ARE ORDINARY RUNES, *POUNCE* AND *COMMON FOE* (ruled at HP §7, named at KA, built at
+  KB once Volley's and the Ambusher's rules took their core slots).** Their rules are kept whole and their rune ids kept,
+  so a save reads them by id; a saved one in a core slot leaves it on load for its hero's ordinary runes.
 - **THE CHARTER'S *none of the three accrues anything* HOLDS FOR THE STANCES AND TRAPPER ONLY.** Heavy Plating's
   climb accrues, +8% an unblocked hit to +40%, and a block resets it — the Standing Wall halves it (GO §0).
 
@@ -3436,6 +3438,9 @@ runes have always carried their own.
 > authored so (HF §1-§4): each is class-scoped at the flat price, written for no lineage (`written_for` absent), and on
 > no `Runes.ENGINE_READ` row — `check_hf` §0 asserts all three and §1 drives every one on a hero holding no engine.
 
+- **SEVENTEEN SINCE KB**: Common Foe and Pounce, the Tracker's and the Skirmisher's rules made ordinary. Common Foe
+  reads the mark it lays itself, its own state and no engine's (KB's reading).
+
 - **CONFIRM IT AT THE READ SITE, NEVER FROM THE NAME.** A no-engine rune that reads an engine it did not name is the
   defect this rule exists to prevent, and only the line that pays it can show one (HF §0's table in
   `docs/reports/HF.md` names each read site and what it reads).
@@ -3671,7 +3676,10 @@ false of the cache, whose triple rides `member["rune_candidates"]` into the save
   upgrades queued and held, a saved rune's payload — and a card renamed after BM's v10 floor reached four reads straight: a
   blank takeable button, a slot no card fills, an upgrade that never lands. **Nothing crashed, and that is the ruling's
   reason, not its comfort: an invisible wrong outlives a crash, because nobody reports it.** `Run.RENAMED_CARDS` is read in
-  `load_run` beside IQ's guards — the same door, the same shape — and it is **append-only, forever**. **A name no row maps
+  `load_run` beside IQ's guards — the same door, the same shape — and it is **append-only, forever**. **A rename that
+  hands an old name to ANOTHER card is the one exception (KB): its row is `Run.RENAMED_CARDS_BY_VERSION`'s, read only
+  for a save older than the version that made it** — Holy's *Heal* became *Greater Heal* and the kit's Ministration took
+  *Heal*, and the every-load map would rename the name's new holder. **A name no row maps
   and no table holds is kept as the save holds it and said out loud**, never guessed and never dropped; a card REMOVED has no
   name today to be read by, so it is no row here — it is a row of the removal map (the bullet below).
 - **A CARD REMOVED AFTER THE SAVE FLOOR ADDS A ROW TO THE LOAD DOOR's REMOVAL MAP, IN THE BATCH THAT REMOVES IT (IS §2a, the

@@ -4,6 +4,29 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Heal, and the Hunter's two new cores (Batch KB) — 2026-11-22
+
+**Why the kit heal reads the Cleric's health now.** The designer's ruling: it is simply *Heal*, 20% of the Cleric's maximum
+health to an ally, so a sturdier Cleric heals more, as with every other heal that reads the caster. Reading the target's
+maximum had made it out-heal Holy's card on a large ally; on the caster's maximum it is a smaller share of the same
+maximum (the Eleventh Hour doubles it on an ally below its threshold).
+The name Ministration is kept for a later card, so nothing in the game is called that now.
+
+**Why Volley pays in Bleed and climbs.** The designer's identity for it: the Volley Hunter kills with what the arrows leave
+behind. A flat payment a hit is what a multi-hit card already gives; a payment that grows with each arrow makes the length
+of a volley matter, with no chain and nothing carried between turns, and Bleed's bleed-out ignores armour, so against a
+heavily armoured enemy the Hunter fills the meter rather than chipping the health. It is the Sharpshooter's opposite:
+volume into a meter that only climbs, where the Sharpshooter turns chance into spikes.
+
+**Why the Ambusher overdraws.** Enemies show their next move, so killing one before its move lands removes that move: a
+burst now, paid for with a later turn, is worth more than the damage. Each copy costs the card's own pace, so the trade is
+the timing and not free damage, and the cap keeps the Hunter from vanishing for several turns. A copy is worth what its
+arrow is; that the Ambusher leans to heavy single shots where Volley wants many small arrows, two different drafts, is
+KB's reading of the price, not the designer's words &mdash; the two runes may sit on one Hunter.
+
+**Why the Tracker and the Skirmisher became ordinary runes.** Their rules are kept; only their slots moved to the two new
+cores, whose rules the designer wrote in conversation.
+
 ## The kit cards' new figures (Batch KA) — 2026-11-17
 
 **Why the five kit cards were re-priced.** The designer's ruling (JZ's ruling 1, accepted as recommended; the pricing JZ's): every

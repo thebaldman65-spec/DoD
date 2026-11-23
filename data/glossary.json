@@ -86,7 +86,7 @@
   "term": "The Enemy With the Most Health",
   "category": "combat",
   "short": "Where a rule picks an enemy for you, it is the one with the most health left - the first in the warband on a tie.",
-  "long": "Some rules choose the enemy themselves: the Blood Debt rune bills the enemy with the most health for Blood Price, and the Tracker's and the Arbiter's marks, when the enemy wearing one falls, move to the enemy with the most health. It is the living enemy with the most health LEFT, counted in points rather than as a share - so a large enemy at half health is picked over a small one untouched. On a tie it is the first in the warband, the order the enemies stand in. No die is rolled, so the pick can be planned around.",
+  "long": "Some rules choose the enemy themselves: the Blood Debt rune bills the enemy with the most health for Blood Price, and Common Foe's and the Arbiter's marks, when the enemy wearing one falls, move to the enemy with the most health. It is the living enemy with the most health LEFT, counted in points rather than as a share - so a large enemy at half health is picked over a small one untouched. On a tie it is the first in the warband, the order the enemies stand in. No die is rolled, so the pick can be planned around.",
   "see_also": [
    "hero_vs_ally",
    "frenzy_floor"
@@ -788,7 +788,7 @@
   "term": "Empower",
   "category": "resources",
   "short": "Spend a Mercy stack to supercharge the next Holy cast.",
-  "long": "The Holy cleric can arm an Empower (C in battle), spending 1 Mercy to supercharge the next Heal, Renewal, Hymn, Resurrection, or Divine Plea - Resurrection, for one, returns the fallen at FULL health. An Empowered cast forgoes its Perfect skill-check bonus; the surge replaces finesse.",
+  "long": "The Holy cleric can arm an Empower (C in battle), spending 1 Mercy to supercharge the next Greater Heal, Renewal, Hymn, Resurrection, or Divine Plea - Resurrection, for one, returns the fallen at FULL health. An Empowered cast forgoes its Perfect skill-check bonus; the surge replaces finesse.",
   "see_also": [
    "res_mercy",
    "skill_check"

@@ -210,6 +210,8 @@ const GROUPS := {
 	"grudge": ["KIT", "damage in general: the last enemy whose blow reached him"],
 	"opportunist": ["KIT", "Powershot, a Hunter kit card, and a stun"],
 	"tusk_and_bristle": ["KIT", "Summon Companion, a Hunter kit card"],
+	"engine_quarry_hunt": ["KIT", "damage in general: the first enemy the Hunter damages, its own mark (Common Foe, KB)"],
+	"engine_opening_strike": ["KIT", "damage in general: the Hunter's first attack and his quiet turns (Pounce, KB)"],
 	# **BATCH HO §3 — `CREST`: THE TWO RUNES THE CREST WEARS.** Scope `party`, written
 	# for no lineage and for no class: each is worn by the crest and stamped on all
 	# four heroes, and each reads a rule every hero already passes — the strike

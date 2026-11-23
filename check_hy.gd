@@ -669,7 +669,7 @@ func _s4_the_other_callbacks() -> void:
 func _s5_the_retaliations() -> void:
 	print("\n§5 — a retaliation inside an enemy's swing is its owner's")
 	# THE TRIPWIRE, read through the Tracker's mark.
-	var s: Node = await _board(SPECS, {3: {"engines": _engines(["trapper", "quarry_hunt"])}})
+	var s: Node = await _board(SPECS, {3: {"engines": _engines(["trapper"]), "runes": [_rune("engine_quarry_hunt")]}})  # Common Foe since KB
 	var w := _hero(s, "warrior")
 	var h := _hero(s, "hunter")
 	var foe := _melee(s)
@@ -685,7 +685,7 @@ func _s5_the_retaliations() -> void:
 		print("  the Tripwire: the raider is tracked by %s" % String(foe.get_status("tracked").get("src_name", "")))
 	await _clear(s)
 	# THE WHOLE FOREST — the wire's bite on a support cast (no writer of the field since FX; set by hand).
-	var sf: Node = await _board(SPECS, {3: {"engines": _engines(["trapper", "quarry_hunt"])}})
+	var sf: Node = await _board(SPECS, {3: {"engines": _engines(["trapper"]), "runes": [_rune("engine_quarry_hunt")]}})
 	var hf := _hero(sf, "hunter")
 	var ff := _melee(sf)
 	if hf == null or ff == null:

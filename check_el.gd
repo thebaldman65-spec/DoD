@@ -115,10 +115,12 @@ func _s1_mark_population() -> void:
 	var engine_marks := {}
 	for pid in battle_gd.ENGINE_MARKS:
 		engine_marks[String(battle_gd.ENGINE_MARKS[pid])] = String(pid)
+	# **BATCH KB — ONE OF THE TWO IS A RUNE's NOW**: the Tracker became Common Foe, an ordinary rune, and its mark rides the same
+	# table keyed by the rune's field (`rune_common_foe`); the Arbiter's is still a rule engine's.
 	ok(engine_marks.size() == 2
 			and engine_marks.keys().all(func(m): return marks.has(String(m)))
-			and engine_marks.values().all(func(p): return Classes.is_rule_engine(String(p))),
-		"the engine-laid marks are two rule engines' and both are marks (%s)" % str(engine_marks))
+			and engine_marks.values().all(func(p): return Classes.is_rule_engine(String(p)) or String(p).begins_with("rune_")),
+		"the table's two marks are laid by a rule engine or a rune's field, and both are marks (%s)" % str(engine_marks))
 	var absent: Array = []
 	for m in marks:
 		if not bsrc.contains("_apply_status(") or not bsrc.contains('"%s"' % m):

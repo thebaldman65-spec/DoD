@@ -1303,8 +1303,9 @@ func _s5_the_records() -> void:
 	ok(cm.contains("AND THE BRIEF WAS THE ERROR") and cm.contains("four live keys beside one stale one is a trap"),
 		"§5: CLAUDE.md does not record a brief's line as the error, or why the fifth key is live")
 	var st := FileAccess.get_file_as_string("res://docs/state.md")
-	ok(st.contains("RULED, NOT BUILT") and st.contains("Skirmisher") and st.contains("Tracker"),
-		"§5: docs/state.md does not record the Skirmisher and Tracker ruling as ruled and unbuilt")
+	# BATCH KB — BUILT: the ruling recorded here as ruled and unbuilt since HP §7 was built at KB, so the record it reads is the build.
+	ok(st.contains("### THE SKIRMISHER AND THE TRACKER — **RULED INTO ORDINARY RUNES") and st.contains("BUILT AT KB: COMMON FOE AND POUNCE"),
+		"§5: docs/state.md does not record the Skirmisher and Tracker ruling as built at KB")
 
 
 # ── §6 — THE SMALL THINGS ───────────────────────────────────────────────────

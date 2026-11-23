@@ -407,8 +407,8 @@ func _s04_blood_debt_words() -> void:
 	ok(not desc.contains("ENEMY's health") and not desc.contains("fullest"),
 		"§0.4: the rune keeps an old or a fraction word ('%s')" % desc)
 	ok(not desc.contains("first in the warband"), "§0.4: the tie rule stands on the rune, not in the glossary ('%s')" % desc)
-	ok(String(Classes.engine_desc("quarry_hunt")).replace("\n", " ").contains("the enemy with the most health"),
-		"§0.4: the Tracker's rule no longer says the enemy with the most health — the rune's words are its words")
+	ok(String(Runes.config("engine_quarry_hunt").get("desc", "")).contains("the enemy with the most health"),
+		"§0.4: Common Foe's text (the Tracker's rule, an ordinary rune since KB) no longer says the enemy with the most health — the rune's words are its words")
 	var g := Glossary.entry("most_health")
 	var listed := Glossary.in_category("combat").any(func(e): return String(e.get("id", "")) == "most_health")
 	ok(not g.is_empty() and listed, "§0.4: the glossary has no `most_health` entry the combat panel lists (listed: %s)" % listed)
