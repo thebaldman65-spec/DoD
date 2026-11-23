@@ -17,6 +17,22 @@ heading stands in both files. **Since JE §3 it also takes what `CLAUDE.md` clos
 
 ---
 
+## ARCHIVED AT KC — 2026-11-23, FROM `docs/state.md` AS AFTER KB LEFT IT (`98bd1ec`)
+
+*The designer accepted KB's three rulings as recommended in conversation on 23 November (`RECORD_KC.md` in KC's work folder; `docs/reports/KC.md` §0): KB's RULINGS OWED, struck. Its items 2 and 3 still call their choices the designer's to settle, as they stood; the struck head is the answer.*
+
+### ~~KB's RULINGS OWED~~ — **ALL THREE ACCEPTED AS RECOMMENDED BY THE DESIGNER IN CONVERSATION, 23 NOVEMBER (*Accept all as recommended.*; recorded at After KB, `98bd1ec`): THE SAVED FORMER CORE AN ORDINARY RUNE BESIDE AN EMPTY CORE SLOT (1); THE RULES' EDGES AS READ NARROWLY (2); THE TEXTS AS WRITTEN (3)**
+
+*Its head as it stood: THREE; THE SAVED HERO WHOSE CORE WAS THE TRACKER OR THE SKIRMISHER, THE RULES' EDGES, THE TEXTS: ACCEPTED AS RECOMMENDED BY THE DESIGNER ON 23 NOV.; KB OPENS NO BALANCE QUESTION*
+
+Full working: `docs/reports/KB.md`, NEEDS A RULING.
+
+1. **THE SAVED HERO WHOSE CORE WAS THE TRACKER OR THE SKIRMISHER (KB §4; correctness, taken).** On load the rune is rebuilt as Common Foe or Pounce and moved to his ordinary runes — worn if he wore it and a slot is free, held if not — and that core slot is left empty, said in the load notes; a saved class-selection deal drops the id, so an un-awakened Hunter is dealt the rest. **The alternative**: hand him Volley or the Ambusher in the slot by a fixed map, and deal one in the dropped card's place, which keeps his core count — and Communion paying a party that wore two cores apiece — at the cost of a core he never chose. **Reversing it**: a two-row map (the Tracker's slot to one new core, the Skirmisher's to the other) added to `Run._reseat_former_cores` and the deal's drop, and its note.
+2. **THE RULES' EDGES, READ NARROWLY (KB §2, §3; rune content, the designer's to settle in conversation).** Where the rule as written leaves a case open, KB built the narrowest reading the code supports: an arrow *lands* when it is neither missed nor Blocked, and the step's *k* counts the arrows that landed on that body (a miss does not advance it; the designer's words were *arrow k*); every blow of a companion counts and takes the rider, a ghost's does not; a special's own Hunter blow (Twin Hunt, Harvest, Cull) is not counted; a counter or a free copy (each resolved as a counter) counts nothing and takes no copies; the rider starts once an arrow has *landed* on the body; each of the Ambusher's copies rolls its own miss, and its price divides by the card's authored arrows, never a Perfect's extra one; **narrower than the ruling, for a reason in the code** (proposal 5: *any card where the Hunter shoots*): **an attack whose blows its own handler resolves — Twin Hunt, Harvest, Cull and every companion's attack — takes no copies** (the strike loop's attacks only), and an attack on every enemy picks no target and takes none; Shrapnel Charge's arrows are its two bodies; and **Common Foe reads the mark it lays itself**, which widens HF §0's *the statuses its own kit lays* (the `tracked` mark is no kit card's) for the rule the designer ruled ordinary.
+3. **THE TEXTS, RENDERED FROM THE RULES (KB §1–§4; rune text, the designer's to settle in conversation).** Volley's and the Ambusher's rule texts, Common Foe's and Pounce's descriptions (the old rule texts made ordinary, cut to fit the merchant's offer row), the Eleventh Hour's *Heal restores twice as much*, the Overdraw button's face and tooltip, and the load note a former core leaves — written to the text standard by KB and shown whole in the report. **The names sit beside live ones**: the Ambusher beside the rune *Ambush* and the bargain *Ambushed*, Volley beside *Called Volley* and *Aimed Volley* — the ids are kept apart (`volley`, `ambusher`), and the player reads the words side by side.
+
+---
+
 ## ARCHIVED AT KB — 2026-11-22, FROM `docs/state.md` AS KA LEFT IT (`579467a`)
 
 *The designer answered KA's four rulings in conversation between 18 and 22 November (`RECORD_KB.md` in KB's work folder; `docs/reports/KB.md` §0): KA's RULINGS OWED, struck. Every other line the answers touched stays in `docs/state.md`, re-worded in place.*

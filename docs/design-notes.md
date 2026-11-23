@@ -4,6 +4,22 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## CLAUDE.md's ceiling, its sixth run (Batch KC) — 2026-11-23
+
+**Why the ceiling moved after HY said the re-measure would decide.** HY wrote that when the room ran out, a rethink of the
+file's shape would decide what came next, not another run of the arithmetic. The rethink ran: the designer ruled at Batch IV
+that the file takes no index and nothing is struck from it, because 112 of its 120 blocks hold a rule no gate fully holds,
+and an index whose core is nearly the whole file routes around nothing. With the shape settled, the designer chose a raise
+over splitting a subject out or removing the ceiling. HY's sentence stays beside the ruling that reversed it, as HN's stays
+beside HY's.
+
+**Why 580 and not a rounder number above it.** The method takes the file's size at the last close and adds ten of the largest
+growth any batch has made since DK, then rounds down: a ceiling above its own derivation is one nobody trusts, and one within
+a single batch's reach fires on whoever writes the big batch rather than on the file's condition.
+
+**What it costs.** Every batch reads the whole file, so the bar is a bar on the read: at 580 KiB a batch reads up to 14.6%
+more than at KB's close. The raise adds nothing by itself; the file grows only as batches write rules into it.
+
 ## Heal, and the Hunter's two new cores (Batch KB) — 2026-11-22
 
 **Why the kit heal reads the Cleric's health now.** The designer's ruling: it is simply *Heal*, 20% of the Cleric's maximum

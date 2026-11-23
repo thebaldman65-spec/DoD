@@ -2149,7 +2149,7 @@ const SIPHON_MANA_PER_POINT := 1     # PROPOSED: Mana a point of damage taken co
 const COVENANT_SHARE := 0.5          # ruled: shared, halved
 const JUDGMENT_HEAL_PCT := 5         # PROPOSED: % of the damage dealt each ally heals
 const QUARRY_PCT := 25               # ruled: every ally deals 25% more to it
-const OPENING_BONUS_PCT := 200       # PROPOSED: "enormous" — the first attack deals triple
+const OPENING_BONUS_PCT := 200       # ACCEPTED AS BUILT AT JZ (GO-1): "enormous" — the first attack deals triple
 const OPENING_QUIET_TURNS := 2       # ruled: two turns unstruck
 const FIELD_KIT_HEAL_PCT := 5        # ruled: the most wounded hero heals 5%
 # BATCH KB — VOLLEY AND THE AMBUSHER: the designer wrote both rules with Claude in conversation and ruled every figure
