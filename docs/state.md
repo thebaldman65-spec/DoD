@@ -94,9 +94,9 @@ of this pilot is read by a reader that already carries the project's practices, 
 has no instance, and more batches of the same reader will not make one.
 
 **THE CORE — READ WHOLE:**
-- **CORE** `` ## WHERE THE PROJECT IS `` `#cdbb23`
+- **CORE** `` ## WHERE THE PROJECT IS `` `#7ed9fb`
 - **CORE** `` ## THE OPEN QUEUE `` `#17e1f1`
-- **CORE** `` ### KB's RULINGS OWED `` `#3b5907`
+- **CORE** `` ### KB's RULINGS OWED `` `#c80700`
 - **CORE** `` ### THE CLERIC's MANA RATE `` `#4eea1d`
 - **CORE** `` ### SANCTITY's STEP `` `#0eda52`
 - **CORE** `` ### BOIL OVER'S RATE `` `#6f0308`
@@ -288,9 +288,9 @@ population row carries a stamp over its member blocks, in their order, and reds 
 - **PROJECTED FOR KC**: the room at KB's close, less what KC expects to write, against each bar (the condition's rule, `docs/instrument-rules.md`): `CLAUDE.md` 3.81 KiB of room, 0.7 batches at JG's +5,329 B; `docs/state.md` 73.70 KiB, 5.2 batches at JG's 14,605 B written — **and this ceiling does not move, so a batch that would overrun it archives what its own rulings close**. At JG's writing KC would close with -1.40 KiB of room in `CLAUDE.md`, and in this file 59.44 KiB under its 520.
 - **The game files that moved**: `scripts/battle.gd`, `scripts/classes.gd`, `scripts/unit.gd`, `scripts/run_state.gd`, `scripts/runes.gd`, `scripts/ability.gd`, `data/runes.json` and `data/glossary.json`.
 - **Phase.** The merge's running order stays complete; the branch is not merged. **Do not open a `class-merge` save in a build older than HL**: HL's ceiling refuses a newer save from HL's build on — HR's v15 and KB's v16 are the bumps it has guarded — and HJ's and HK's builds, and `main`, carry no ceiling. **Tag `b722cc4` before merging** if the pre-merge game should stay one checkout away; nothing tags it today (HA's advice, its block archived at JH §3).
-- **Next.** **The designer's rulings** (KB's RULINGS OWED): the saved hero whose core was the Tracker or the Skirmisher, left with an empty core slot (taken); the rules' edges, read narrowly, and the texts rendered from the rules — both the designer's to settle in conversation. **The knowledge sync is the designer's picker**: `docs/text-audit.html` and `docs/talent-audit.html` leave it, `docs/reports/` and `docs/systems-recon.html` stay out. **Per-hero relics** are unblocked and unbuilt (RULED AND NOT BUILT). **The three older zone bosses and the end boss are owed a strategy each** (RULED AND NOT BUILT). In play: the kit cards at their figures, Heal among them, and Greater Heal; a Hunter on Volley and the Ambusher, overdrawing on the turn bar; a held enemy wearing a Rupture (TO WATCH IN PLAY); the LOOK-LIST. Carried, not closed: S2-090; the Sleetveil Matron's heal and the Titan's Entomb, neither yet landed in a warband's own turn in a gate's fight; the sim figures read on a road no longer the default.
+- **Next.** **KB's three rulings are accepted as recommended** (23 November, KB's RULINGS OWED): the saved former core left an ordinary rune beside an empty core slot, the rules' edges as read narrowly, the texts as written; its items 2 and 3 still say *the designer's to settle*. **The knowledge sync is the designer's picker**: `docs/text-audit.html` and `docs/talent-audit.html` leave it, `docs/reports/` and `docs/systems-recon.html` stay out. **Per-hero relics** are unblocked and unbuilt (RULED AND NOT BUILT). **The three older zone bosses and the end boss are owed a strategy each** (RULED AND NOT BUILT). In play: the kit cards at their figures, Heal among them, and Greater Heal; a Hunter on Volley and the Ambusher, overdrawing on the turn bar; a held enemy wearing a Rupture (TO WATCH IN PLAY); the LOOK-LIST. Carried, not closed: S2-090; the Sleetveil Matron's heal and the Titan's Entomb, neither yet landed in a warband's own turn in a gate's fight; the sim figures read on a road no longer the default.
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
-### KB's RULINGS OWED — **THREE; THE SAVED HERO WHOSE CORE WAS THE TRACKER OR THE SKIRMISHER, TAKEN; THE RULES' EDGES AND THE TEXTS, THE DESIGNER's TO SETTLE IN CONVERSATION; KB OPENS NO BALANCE QUESTION**
+### KB's RULINGS OWED — **THREE; THE SAVED HERO WHOSE CORE WAS THE TRACKER OR THE SKIRMISHER, THE RULES' EDGES, THE TEXTS: ACCEPTED AS RECOMMENDED BY THE DESIGNER ON 23 NOV.; KB OPENS NO BALANCE QUESTION**
 
 Full working: `docs/reports/KB.md`, NEEDS A RULING.
 
