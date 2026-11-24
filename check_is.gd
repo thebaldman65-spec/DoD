@@ -65,6 +65,7 @@ const SAVE_KEYS := {
 	"zone_draw": "IQ §4: a zone the table does not hold takes the first zone of the order the draw lacks (JX §1)",
 	"seen_events": "a history list — an id in it names nothing anything reads",
 	"active_relics": "read at its door: `Relics.POOL.get` adds nothing for an id it lacks",
+	"relic_holders": "KD: an entry for a relic not carried or not held, or an index that is no hero's, is dropped and said (`_repair_relic_holders`)",
 	"map": "the board — the floor (BK)",
 }
 const MEMBER_KEYS := {

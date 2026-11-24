@@ -50,6 +50,11 @@
 #   Blacksmith               buy the first offered pairing when the gold
 #                            clears the 40g reserve (Batch BK §3).
 #   Relics (DOD_SIM_RELICS)  armed at the draft; none by default.
+#                            A HELD relic (KD) is handed through the
+#                            player's door (`Run.hand_relic`) to the hero
+#                            holding fewest, the lowest index first, after
+#                            the class selection and after an event
+#                            (`hand_owed_relics`).
 #   Rune caches              the elite's and the bargain's, each rolled at
 #                            the victory and ANSWERED after the draft, in
 #                            the player's order and through his door
@@ -227,6 +232,19 @@ static var _run_r8 := -1.0
 static var fight_seed_block := ""
 
 
+# BATCH KD — THE BOT's HAND-OUT, A POLICY: every relic owed (`Run.relics_owed`, in the order carried) to the hero who holds
+# fewest, the lowest index first, through the door the map's buttons use. Read for a standalone sim's loadout too
+# (`battle._ready`). A player may stack; the bot spreads. The rule — one door, one holder a relic — is the same.
+static func hand_owed_relics(run: Node) -> void:
+	var n: int = run.call("_relic_hero_count")
+	for id in run.call("relics_owed"):
+		var best := 0
+		for i in n:
+			if (run.call("hero_relics", i) as Array).size() < (run.call("hero_relics", best) as Array).size():
+				best = i
+		run.call("hand_relic", String(id), best)
+
+
 static func begin(run: Node, n: int) -> void:
 	active = true
 	runs_target = maxi(n, 1)
@@ -309,6 +327,8 @@ static func start_run(run: Node) -> void:
 	# _pick_rune_candidate policy the elite cache uses — otherwise the
 	# harness measures a different game than the one shipping.
 	run.specs_chosen = true
+	# BATCH KD — the relics are handed after the classes are chosen, as the player's first map hands them.
+	hand_owed_relics(run)
 	_run_gold_spent = 0
 	_run_r8 = -1.0
 	if not walk_to_next_fight(run):
@@ -753,6 +773,8 @@ static func _resolve_event(run: Node) -> void:
 		if Events.requires_met(run, choice.get("requires", {})):
 			for fx in choice.get("effects", []):
 				Events.apply(run, fx)
+			# BATCH KD — a relic the event granted is handed now, as the player's next arrival would hand it.
+			hand_owed_relics(run)
 			return
 
 

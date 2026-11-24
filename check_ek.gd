@@ -706,7 +706,7 @@ func _s4_name_sweep() -> void:
 			# the talent lane was: the sweep read the NAME and nothing else.
 			if _has_word(String(cfg.get("lane", "")).to_lower(), word):
 				clashes.append("rune lane:" + String(cfg["lane"]))
-		# BATCH EL §3 — THE RELICS. Party-wide, named on their own screen, and
+		# BATCH EL §3 — THE RELICS. Named on their own screen (since KD twelve pay one hero, the rest every hero), and
 		# `Ironbark Ward` is exactly the shape that made WARD untenable.
 		for relic_id in Relics.POOL:
 			if _has_word(String(relic_id).to_lower(), word):

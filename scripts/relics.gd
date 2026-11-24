@@ -2,13 +2,22 @@
 # Earned one per boss kill, the end boss's included; the DRAFT screen
 # assigns up to 3 of the unlocked collection to a run (Run.active_relics),
 # and events can slot a run-scoped extra via the relic_grant verb.
+# BATCH KD — A RELIC BELONGS TO ONE HERO (CX's ruling; JY's ruling 12, answered
+# at JZ): a relic on a HOLDER hook (below) pays only the hero it is handed to,
+# on the map after the classes are chosen (`Run.hand_relic`, the one door;
+# `Run.relic_holders`); every other hook pays every hero, as it always has.
 # Persisted to user://relics.json across sessions.
 #
 # THE HOOK VOCABULARY (Batch 39 audit — what a relic can attach to
-# without new plumbing; every entry below is read at exactly one site):
+# without new plumbing; each row names where its hook is read, and some are
+# read at more than one site — gold_find_mult (award_gold, claim_reward),
+# victory_heal_pct (victory_heal_pct, fallen_heal_pct) and fallen_recover
+# (fallen_heal_pct, clearing_heal_note) at two, shop_discount at five price
+# functions, one of them the sim's; the sim reads the victory and spoils hooks
+# again (`run_sim.gd`). FOUND AT FW, closed at KD):
 #   start_gold            new_run             flat gold at run start
 #   start_items {id: n}   new_run             consumables at run start
-#   hero_attack_mult      battle spawn        party damage dealt (+frac,
+#   hero_attack_mult      battle spawn        the holder's damage dealt (+frac,
 #                                             via the dmg_bonus field)
 #   dmg_type_mult {t: f}  battle spawn        typed damage (type_dmg_bonus)
 #   hero_max_hp_mult      battle spawn        max HP (+frac, max_hp_pct)
@@ -16,7 +25,7 @@
 #   hero_speed_add        battle spawn        flat Speed
 #   hero_crit_add         battle spawn        flat crit chance
 #   hero_con_add          battle spawn        flat Constitution (Break)
-#   hero_resist_add {t:f} battle spawn        party resistances
+#   hero_resist_add {t:f} battle spawn        the holder's resistances
 #   resource_floor_pct    battle spawn        open battles with at least
 #                                             this fraction of resource
 #   victory_heal_pct      victory screen      party heal per victory
@@ -29,14 +38,28 @@
 # NEEDS PLUMBING (declared out for now): on-kill/per-turn procs,
 # revive-on-death, enemy-side auras, DoT tick and Break-damage mults.
 #
+# The eight battle-spawn STAT hooks above (hero_attack_mult to hero_resist_add)
+# are HOLDER hooks since KD: read per hero at the spawn (`Run.hero_relic_add`),
+# never party-wide. Bottled Storm's resource_floor_pct is read at the spawn too
+# and stays every hero's with the victory heal and Mana and fallen_recover
+# (JY's ruling 12's four); the six that set up the run (start_gold, start_items,
+# gold_find_mult, shop_discount, loot_extra, victory_gold) pay every hero too.
 # Scalar hooks SUM across the run's relics; dict hooks merge by summing
 # per key. Tiers feed the events' relic_grant pools: common | rare.
 class_name Relics
 
 const SAVE_PATH := "user://relics.json"
 
+# BATCH KD — THE HOOKS THAT PAY ONLY A RELIC's HOLDER (CX's ruling, JY's ruling 12). The battle-spawn stat hooks, which
+# CX found already ran once per hero: a relic on any of them is HELD (`is_held`) and is handed to one hero on the map.
+# No relic carries a holder hook beside an every-hero hook (`check_kd` §1).
+const HOLDER_HOOKS := ["hero_attack_mult", "dmg_type_mult", "hero_max_hp_mult", "hero_armor_add",
+	"hero_speed_add", "hero_crit_add", "hero_con_add", "hero_resist_add"]
+
 const POOL := {
 	# ---------- common ----------
+	# BATCH KD — THE TWELVE ON A HOLDER HOOK PAY THEIR HOLDER ALONE, AT TWICE THE FIGURE THEY PAID EVERY HERO (the designer's
+	# balance ruling at KD: "Double them"); the thirteen others pay every hero as they did.
 	# BATCH BM re-specced this in place: talent points became a META currency
 	# banked on Profile, so a per-run grant of them had nothing to buy. Same
 	# id, same tier, same "you start ahead" role — a different opening purse.
@@ -50,14 +73,14 @@ const POOL := {
 		"desc": "Every hero heals {=@hooks.victory_heal_pct*100}% of maximum\nhealth after every victory.",
 		"hooks": {"victory_heal_pct": 0.10}},
 	"emberheart": {"name": "Emberheart", "tier": "common",
-		"desc": "Fire and Holy strike damage +{=@hooks.dmg_type_mult.fire*100}%.",
-		"hooks": {"dmg_type_mult": {"fire": 0.20, "holy": 0.20}}},
+		"desc": "The hero holding it: Fire and Holy\nstrike damage +{=@hooks.dmg_type_mult.fire*100}%.",
+		"hooks": {"dmg_type_mult": {"fire": 0.40, "holy": 0.40}}},
 	"frostsigil": {"name": "Frostbound Sigil", "tier": "common",
-		"desc": "Frost and Arcane strike damage +{=@hooks.dmg_type_mult.frost*100}%.",
-		"hooks": {"dmg_type_mult": {"frost": 0.20, "arcane": 0.20}}},
+		"desc": "The hero holding it: Frost and Arcane\nstrike damage +{=@hooks.dmg_type_mult.frost*100}%.",
+		"hooks": {"dmg_type_mult": {"frost": 0.40, "arcane": 0.40}}},
 	"nightbloom": {"name": "Nightbloom Charm", "tier": "common",
-		"desc": "Shadow and Nature strike damage +{=@hooks.dmg_type_mult.shadow*100}%.",
-		"hooks": {"dmg_type_mult": {"shadow": 0.20, "nature": 0.20}}},
+		"desc": "The hero holding it: Shadow and Nature\nstrike damage +{=@hooks.dmg_type_mult.shadow*100}%.",
+		"hooks": {"dmg_type_mult": {"shadow": 0.40, "nature": 0.40}}},
 	"packcharm": {"name": "Packmother's Satchel", "tier": "common",
 		"desc": "Begin each run with {=@hooks.start_items.health} extra Health Potions\nand {=@hooks.start_items.mana} extra Mana Potion.",
 		"hooks": {"start_items": {"health": 2, "mana": 1}}},
@@ -78,34 +101,34 @@ const POOL := {
 		"desc": "Gold won in battles and bargains +{=@hooks.gold_find_mult*100}%.",
 		"hooks": {"gold_find_mult": 0.25}},
 	"whetstone": {"name": "Ancestral Whetstone", "tier": "common",
-		"desc": "All heroes: +{=@hooks.hero_crit_add*100}% critical chance.",
-		"hooks": {"hero_crit_add": 0.05}},
+		"desc": "The hero holding it: +{=@hooks.hero_crit_add*100}% critical chance.",
+		"hooks": {"hero_crit_add": 0.10}},
 	"ironbark": {"name": "Ironbark Ward", "tier": "common",
-		"desc": "All heroes: +{=@hooks.hero_armor_add*100}% armor.",
-		"hooks": {"hero_armor_add": 0.05}},
+		"desc": "The hero holding it: +{=@hooks.hero_armor_add*100}% armor.",
+		"hooks": {"hero_armor_add": 0.10}},
 	"fleetstep": {"name": "Fleetstep Talisman", "tier": "common",
-		"desc": "All heroes: +{=@hooks.hero_speed_add} Speed.",
-		"hooks": {"hero_speed_add": 5}},
+		"desc": "The hero holding it: +{=@hooks.hero_speed_add} Speed.",
+		"hooks": {"hero_speed_add": 10}},
 	"oxheart": {"name": "Oxheart Fetish", "tier": "common",
-		"desc": "All heroes: +{=@hooks.hero_max_hp_mult*100}% max Health.",
-		"hooks": {"hero_max_hp_mult": 0.10}},
+		"desc": "The hero holding it: +{=@hooks.hero_max_hp_mult*100}% max Health.",
+		"hooks": {"hero_max_hp_mult": 0.20}},
 	"stormflask": {"name": "Bottled Storm", "tier": "common",
 		"desc": "Heroes open every battle with at least\n{=@hooks.resource_floor_pct*100}% of their resource.",
 		"hooks": {"resource_floor_pct": 0.35}},
 	"drumskin": {"name": "Wardrums of the Old Horde", "tier": "common",
-		"desc": "All heroes: +{=@hooks.hero_con_add} Constitution (Break resistance).",
-		"hooks": {"hero_con_add": 15}},
+		"desc": "The hero holding it: +{=@hooks.hero_con_add} Constitution\n(Break resistance).",
+		"hooks": {"hero_con_add": 30}},
 	# ---------- rare ----------
 	"dragonbone": {"name": "Dragonbone Idol", "tier": "rare",
-		"desc": "All heroes deal +{=@hooks.hero_attack_mult*100}% strike damage.",
-		"hooks": {"hero_attack_mult": 0.10}},
+		"desc": "The hero holding it deals +{=@hooks.hero_attack_mult*100}% strike damage.",
+		"hooks": {"hero_attack_mult": 0.20}},
 	"runedplate": {"name": "Runed Bulwark", "tier": "rare",
-		"desc": "All heroes: {=@hooks.hero_resist_add.physical*100}% physical resistance.",
-		"hooks": {"hero_resist_add": {"physical": 0.10}}},
+		"desc": "The hero holding it: {=@hooks.hero_resist_add.physical*100}% physical resistance.",
+		"hooks": {"hero_resist_add": {"physical": 0.20}}},
 	"prismveil": {"name": "Prism Veil", "tier": "rare",
-		"desc": "All heroes: {=@hooks.hero_resist_add.fire*100}% resistance to every element.",
-		"hooks": {"hero_resist_add": {"fire": 0.10, "frost": 0.10,
-			"nature": 0.10, "shadow": 0.10, "holy": 0.10, "arcane": 0.10}}},
+		"desc": "The hero holding it: {=@hooks.hero_resist_add.fire*100}% resistance\nto every element.",
+		"hooks": {"hero_resist_add": {"fire": 0.20, "frost": 0.20,
+			"nature": 0.20, "shadow": 0.20, "holy": 0.20, "arcane": 0.20}}},
 	"hourglass": {"name": "Cracked Hourglass", "tier": "rare",
 		"desc": "After every victory: every hero with Mana\nrecovers {=@hooks.victory_mana_pct*100}% of maximum Mana, and every\nhero heals {=@hooks.victory_heal_pct*100}% of maximum health.",
 		"hooks": {"victory_mana_pct": 0.30, "victory_heal_pct": 0.05}},
@@ -115,8 +138,8 @@ const POOL := {
 	# BATCH BM: same re-spec, same reason. Its damage clause is untouched and
 	# the vacated half became more of it.
 	"warhorn": {"name": "Horn of the First War", "tier": "rare",
-		"desc": "Every hero deals +{=@hooks.hero_attack_mult*100}% strike damage.",
-		"hooks": {"hero_attack_mult": 0.12}},
+		"desc": "The hero holding it deals +{=@hooks.hero_attack_mult*100}% strike damage.",
+		"hooks": {"hero_attack_mult": 0.24}},
 	"martyrbone": {"name": "Martyr's Knucklebone", "tier": "rare",
 		"desc": "Every hero heals {=@hooks.victory_heal_pct*100}% of maximum\nhealth after every victory.",
 		"hooks": {"victory_heal_pct": 0.15}},
@@ -195,6 +218,15 @@ static func unlock_random() -> Dictionary:
 	# carries the resolved words, never the tokens.
 	info["desc"] = desc_of(id)
 	return info
+
+
+# BATCH KD — A RELIC IS HELD WHEN ANY OF ITS HOOKS PAYS ONLY ITS HOLDER: it is handed to one hero on the map
+# (`Run.relics_owed`, `Run.hand_relic`), and a relic that is not held pays every hero and is handed to nobody.
+static func is_held(id: String) -> bool:
+	for hook in (POOL.get(id, {}).get("hooks", {}) as Dictionary):
+		if HOLDER_HOOKS.has(hook):
+			return true
+	return false
 
 
 # ---------- hook aggregation (the sites read these) ----------

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-11-22 (Batch KB &mdash; Heal, and the Hunter's two new cores)</b></p>
+<p align="right"><b>Last updated: 2026-11-23 (Batch KD &mdash; a relic belongs to one hero)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -28,7 +28,7 @@ what its bosses paid is kept: relic unlocks and talent points banked to the prof
 timing skill check on attacks and heals — the player's execution matters as much as their build.</p>
 
 <h2>2. Run Flow</h2>
-<p><b>Main Menu</b> → <b>Draft</b> (pick 4 heroes + equip up to 3 relics) →
+<p><b>Main Menu</b> → <b>Draft</b> (pick 4 heroes + equip up to 3 relics; a relic that adds a fighting stat is handed to one hero on the first map) →
 <b>Class Selection</b> (each hero is dealt three of his class's engine runes and takes one; heroes begin with <b>no ordinary runes</b> and three empty slots) →
 <b>Map</b> (a generated 16-slot lattice) → the node you route to: <b>Battle</b>, or
 <b>Smith</b>, or <b>Trade</b>, or <b>???</b> — with <b>Offer</b> (three bargains) in front of
@@ -46,7 +46,8 @@ three route into the same <b>run summary</b> (§11a).</p>
 viewer), Settings (master volume, fullscreen — persisted to user://settings.cfg), Exit.</li>
 <li><b>Draft:</b> heroes shown as sprite cards; click to select. Selection order = battle
 position (slot order also sets each hero's tint). One of each class — clicking a chosen hero takes him
-out of the order. Up to 3 unlocked relics may be equipped for the run. <b>The Road</b> picks the run's
+out of the order. Up to 3 unlocked relics may be equipped for the run; each that adds a fighting stat is handed to one
+hero on the first map, after the classes are chosen. <b>The Road</b> picks the run's
 <b>DIFFICULTY RUNG</b>, and it is the run's most consequential choice: beating the END BOSS
 on a rung opens that tier of the meta talent tree for every spec (§7). Saved with the run.
 Also reachable from here: the <b>Talents</b> build screen, because talents are chosen
@@ -448,7 +449,8 @@ ability-upgrade count</b> in its top corner (hidden at zero; hovering it lists t
 per line — it takes no click of its own); <b>clicking a card
 opens that hero's talent tree and full sheet</b>. <b>Every pick a hero is owed opens by itself
 when the heroes arrive at the map</b> &mdash; after a fight, an event, a shop or a load, never on a return
-from the hero sheet &mdash; one after another, in the order the picks were earned: <b>every pick a hero is owed
+from the hero sheet &mdash; a held relic still owed first, its hand-out one relic at a time (Relics, below); then
+one after another, in the order the picks were earned: <b>every pick a hero is owed
 is a section of his own screen</b> &mdash; a draft and a zone boss's ability, a mini-boss's upgrade, a rune
 cache &mdash; then a full pouch's offer and a full holding's panel. Each choice shows its full description under
 it rather than behind a hover. <b>Later</b> leaves every pick on the screen owed: the card keeps a
@@ -725,7 +727,7 @@ individual blow that does land past a certainty is much larger.</li>
 curve, not a per-stack slope — see §5.1); Surge +20%; Empower +25%; Cripple −25%; Hexed −15%;
 Blood Frenzy up to +40%, built from HP missing AND Rage spent; Seasoned Fighter +30% in the Aggressive stance and −10% in the Defensive one; the Reaver
 +10% for every enemy the hero has felled, and the rune Pounce +200% on the first attack (&sect;6.0); relic bonuses
-(global +10% dragonbone; fire/holy +20% emberheart); Powershot +2% per 1% of the target's
+(its holder's +20% dragonbone; fire/holy +40% emberheart); Powershot +2% per 1% of the target's
 Break bar already full; Overpower +0.5 per point of target Break; Fireball perfects at 25% of
 Attack. <b>Neither Arcane Cannon nor Magi's Wrath
 carries a per-stack damage term</b> — the passive compounds, and an ability-side per-stack
@@ -3041,17 +3043,19 @@ defect</b> &mdash; there is no fall to the generated stat family and no tier to
 widen out of. Every offer site announces the empty rather than skipping it.</li>
 <li><b>Relics</b> (permanent meta): one random unlock per boss kill, stored in
 user://relics.json; up to 3 equipped per run at the draft (scrolling shelf; events can slot
-a run-scoped extra via relic_grant). <b>EVERY EQUIPPED RELIC APPLIES TO ALL FOUR HEROES, AND THE
-PER-HERO RULING IS STILL UNBUILT.</b> `Run.active_relics` is a flat list of up to 3 ids with no hero key, and
-both accessors (`Run.relic_add` / `relic_dict`) take a hook and nothing else — so every
-relic belongs to one hero, at any read site, and what one adds to the clearing heal reaches every hero, a hero left down among them. The ruling that a relic is
-assigned to ONE hero at pickup stands and has never been started. <b>The draft also
-assigns relics BEFORE specs are chosen</b>, so "which hero" has the least information behind
-it at exactly the moment it would be asked.
+a run-scoped extra via relic_grant). <b>A RELIC THAT ADDS A FIGHTING STAT BELONGS TO ONE HERO.</b> The twelve on the
+battle-spawn stat hooks (`Relics.HOLDER_HOOKS`: strike damage, a school's damage, maximum health, armor, Speed, crit,
+Constitution, resistances) pay only the hero holding them, and say
+<i>The hero holding it</i>; each is handed on the first map, after the classes are chosen, one at a time, a button a hero
+(the arrival walk's first step, before any hero's pick; no Later, since a held relic handed to nobody pays nobody), and
+an event's is handed at the next arrival. One hero may hold several, and keeps each for the run; a hero card's tooltip
+names what he holds. <b>The other thirteen pay every hero</b> and are handed to nobody: the purse, the pouch, the shop,
+the elite's spoils, the victory's gold, heal and Mana, a fallen hero's recovery and Bottled Storm's floor.
+`Run.relic_holders` keeps who holds what (the run save, v17); a holder is made only through `Run.hand_relic`.
 <br><b>WHAT A RELIC IS FOR, versus a talent and a rune.</b> A relic sets up the
 RUN, a talent changes what every hero of a CLASS does inside a fight, and a rune is the one
 layer that can be tied to a SPEC. <b>No permanent layer is spec-specific.</b> A relic is chosen
-at the draft, before any spec exists, and reaches all four heroes; the one talent tree is bought
+at the draft, before any spec exists, and reads none: it pays every hero, or its holder whatever his spec; the one talent tree is bought
 per class, and every node pays every class that can buy it, whichever spec wears it. An effect
 that must know which spec a hero is belongs on a rune, which one hero buys for one run and which
 is scoped to his class and offered only while any engine it reads is equipped. Not one relic hook is read inside a turn — the read sites are run
@@ -3061,14 +3065,14 @@ and elite spoils, 25 in all, and five of the hooks are read at more than one. Th
 Break multipliers — is exactly the in-combat one, and the talent tree is the only permanent
 layer that reaches a turn as it resolves. <b>Pool: 25 relics — 17 common, 8 rare (marked RARE on the shelf and in the picker)</b> — every
 effect expressed through an audited <b>hook vocabulary</b> (18 hooks, listed atop relics.gd:
-run-start gold/items, per-hero stat boosts at battle spawn — attack, typed damage, max
-HP, armor, speed, crit, Constitution, resistances, resource floor — victory heal/mana/gold,
+run-start gold/items, the holder's stat boosts at battle spawn — attack, typed damage, max
+HP, armor, speed, crit, Constitution, resistances — every hero's resource floor, victory heal/mana/gold,
 gold-find, shop discount, elite loot, and a hero left down taking the base victory heal with the rest, which is Cairnmoss Poultice alone: the base passes that hero by, and what a relic adds to it does not). Scalar hooks SUM and dict hooks merge
-across the equipped set, so stacking is well-defined. Adding a relic on an existing hook is
+across the equipped set — a held relic's across what its holder holds — so stacking is well-defined. Adding a relic on an existing hook is
 pure data. Highlights: Waystone Shard opens the run with a Health Potion, a Mana Potion and a Bomb; the elemental trio
 (Emberheart / Frostbound Sigil / Nightbloom Charm) raises strike damage in all six non-physical
 damage schools; Prism Veil
-gives 10% resistance to every element; The King's Ledger compounds gold.</li>
+gives its holder 20% resistance to every element; The King's Ledger compounds gold.</li>
 <li><b>Persistent profile</b> (user://profile.json, outside the run save): counts runs
 started/completed/wiped/<b>forfeited</b> per spec, bosses killed by kind, events seen (with
 repeats), and zones cleared. <b>Forfeits are their own bucket, never folded into wipes</b> —

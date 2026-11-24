@@ -484,7 +484,8 @@ func _s2_strike_texts() -> void:
 	ok(int(reads["attacker.dmg_bonus"]) == 1 and int(reads["strike_target.dmg_taken_bonus"]) == 1 and elsewhere == 0,
 		"§2: `_resolve` reads `dmg_bonus` %d and `dmg_taken_bonus` %d times, and battle.gd %d more elsewhere — want once each, in the strike loop alone" % [
 			reads["attacker.dmg_bonus"], reads["strike_target.dmg_taken_bonus"], elsewhere])
-	ok(b_src.contains("cfg[\"dmg_bonus\"] = cfg.get(\"dmg_bonus\", 0.0) \\\n\t\t\t\t+ Run.relic_add(\"hero_attack_mult\")"),
+	# RE-POINTED AT KD: a relic belongs to one hero, so the hook lands through the holder's own sum (`Run.hero_relic_add`).
+	ok(b_src.contains("cfg[\"dmg_bonus\"] = cfg.get(\"dmg_bonus\", 0.0) \\\n\t\t\t\t+ Run.hero_relic_add(i, \"hero_attack_mult\")"),
 		"§2: the relic hook `hero_attack_mult` no longer lands in `dmg_bonus` at the spawn")
 
 

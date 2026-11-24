@@ -449,6 +449,9 @@ static func apply(run: Node, fx: Dictionary) -> String:
 				return "nothing left to unearth — +40 gold instead"
 			var relic_id: String = pool.pick_random()
 			active.append(relic_id)
+			# BATCH KD — a held relic belongs to one hero: it is owed, and the map's hand-out gives it to one on arrival.
+			if Relics.is_held(relic_id):
+				return "RELIC: %s — handed to one hero on the map" % String(Relics.POOL[relic_id].get("name", relic_id))
 			return "RELIC: %s" % String(Relics.POOL[relic_id].get("name", relic_id))
 	push_warning("Events: unknown effect verb '%s'" % fx.get("effect", ""))
 	return ""

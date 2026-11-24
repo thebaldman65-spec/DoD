@@ -943,6 +943,18 @@ func _answer_a_pick(s: Node, idx: int) -> void:
 
 
 func _step_map(s: Node) -> String:
+	# BATCH KD — THE RELICS' HAND-OUT IS THE WALK'S FIRST STEP, AND THE WALKER ANSWERS IT AS A PLAYER WOULD: an event on
+	# the road can grant a held relic, which pays nobody until it is handed, so the walker hands each owed one to the first
+	# hero through the overlay's own button (its policy; the door is `Run.hand_relic`, behind the press).
+	for c in s.get_children():
+		if c is Control and not c.is_queued_for_deletion() and (c as Control).z_index == 66:
+			var hb: Array = []
+			Gate.buttons(c, hb, false)
+			for b in hb:
+				if (b as Button).has_meta("relic_hero") and int((b as Button).get_meta("relic_hero")) == 0:
+					(b as Button).emit_signal("pressed")
+					await Gate.frames(self, 3)
+					return "relic"
 	if Gate.hero_draft(s) != null:
 		await _answer_the_draft(s)
 		return "draft"

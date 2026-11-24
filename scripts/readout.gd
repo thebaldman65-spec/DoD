@@ -415,7 +415,10 @@ func _header(resumed: bool) -> Dictionary:
 	var relics: Array = []
 	for rid in _run.get("active_relics"):
 		var def: Dictionary = Relics.POOL.get(String(rid), {})
-		relics.append({"id": String(rid), "name": String(def.get("name", rid))})
+		# BATCH KD — and who holds it: a party index, -1 where the relic pays every hero or nobody holds it yet.
+		var holders: Dictionary = _run.get("relic_holders")
+		relics.append({"id": String(rid), "name": String(def.get("name", rid)),
+			"holder": int(holders.get(String(rid), -1))})
 	var crest: Array = []
 	for r in _run.get("party_runes"):
 		crest.append(_rune_name(r))

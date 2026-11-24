@@ -17,6 +17,55 @@ heading stands in both files. **Since JE §3 it also takes what `CLAUDE.md` clos
 
 ---
 
+## ARCHIVED AT KD — 2026-11-23, FROM `docs/state.md` AS KC LEFT IT (`090687d`)
+
+*Per-hero relics are built at KD (`docs/reports/KD.md`): a relic on a battle-spawn stat hook pays only the hero it is handed to on the first map, at twice its figure (the designer's ruling at KD), and the thirteen others pay every hero. What recorded the build as owed, and what KD's edits closed, moved here word for word. CX's scope said every read would change signature and the save's one key its format; KD kept all four signatures and added a key (`relic_holders`, v17). CX counted thirteen texts worded party-wide; KD rewords twelve — nine of those and the three school relics, which named nobody — and the four on JY's ruling 12's hooks keep their words.*
+
+### FOUND AT JZ AND NOT FIXED — ITS CLOSED ITEMS (archived at KD; the section stays in `docs/state.md`)
+
+- **`docs/master.html`'s RELIC PARAGRAPH CARRIES THE PER-HERO RULING** (*stands and has never been started*), which the document's own rule keeps out of it — a ruling not built is absent from master, not marked in it; and its *at pickup* and *BEFORE specs are chosen* sentences are superseded by JY's ruling 12 (handed out on the first map). JZ added nothing to it.
+
+### FOUND AT JY AND NOT FIXED — ITS CLOSED ITEMS (archived at KD; the section stays in `docs/state.md`)
+
+- `docs/master.html`'s per-hero relic paragraph says a flat list makes *every relic belongs to one hero*, where it makes every relic every hero's
+- the per-hero relic line's *v12 → v13* (the save is v16)
+
+### RULED AND NOT BUILT — ITS CLOSED ITEMS (archived at KD; the section stays in `docs/state.md`)
+
+- **PER-HERO RELICS — RULED, NOT BUILT; ITS TWO QUESTIONS ANSWERED AT JZ (JY's ruling 12, the designer's).** The four hooks
+  (`victory_heal_pct`, `victory_mana_pct`, `fallen_recover`, `resource_floor_pct`) stay for every hero, as their texts say, and
+  each relic is handed to a hero after the classes are chosen, on the first map. The scope and the save's cost are under
+  *Named by the designer, carried from CX*.
+
+### FOUND AT GC AND NOT FIXED — ITS CLOSED ITEMS (archived at KD; the section stays in `docs/state.md`)
+
+- It also carries the per-hero relic ruling as unbuilt, a plan in the one document that holds none.
+
+### FOUND AT FW AND NOT FIXED — ITS CLOSED ITEMS (archived at KD; the section stays in `docs/state.md`)
+
+- **`relics.gd`'s header says every hook is read at exactly one site** — `gold_find_mult`, `fallen_recover` and `victory_heal_pct` are read at two and `shop_discount` at five, one of them the sim's. **`docs/master.html`'s copy of the
+  claim was corrected at GE §2**, where six hooks read at more than one site were counted; this header still owes its own.
+
+### Named by the designer, carried from CX — ITS CLOSED ITEMS (archived at KD; the section stays in `docs/state.md`)
+
+- **RELICS PER-HERO — RULED, SCOPED, AND NOT STARTED.** The ruling stands (a relic belongs to one hero; since JZ it is handed out
+  on the first map, after the classes are chosen); CX reported the scope and stopped. **VERIFIED AT EN: NOT ONE LINE OF IT
+  LANDED**, and neither `master.html` nor the code was wrong about the other — they agree, and what
+  was missing is that the ruling points elsewhere and is unbuilt, which `master.html` now says.
+  **It is a SAVE-FORMAT change: the run save would go v12 → v13** (this block recorded v10 → v11,
+  written when the save was v10; CT took it to v11 and EG to v12).** `Run.active_relics` is a flat `Array` read back as a hard key
+  (`data["active_relics"]`, no default), so every existing save breaks without a migration. It
+  also touches **28 read sites** (`battle.gd` 12, `run_state.gd` 11, `run_sim.gd` 4,
+  `shop_screen.gd` 1), the two aggregators (`Relics.hook_add` / `hook_dict`), the two accessors
+  (`Run.relic_add` / `relic_dict`) — **all four change signature** — both acquisition sites, and
+  **13 of the 25 relic descriptions**, which are worded party-wide. **It can be split; it should
+  not be started casually.**
+  - **ITS TWO QUESTIONS ANSWERED AT JZ (JY's ruling 12, the designer's):** the four hooks stay for every hero, as their texts
+    say, and each relic is handed to a hero after the classes are chosen, on the first map. The build is still RULED AND NOT
+    BUILT.
+
+---
+
 ## ARCHIVED AT KC — 2026-11-23, FROM `docs/state.md` AS AFTER KB LEFT IT (`98bd1ec`)
 
 *The designer accepted KB's three rulings as recommended in conversation on 23 November (`RECORD_KC.md` in KC's work folder; `docs/reports/KC.md` §0): KB's RULINGS OWED, struck. Its items 2 and 3 still call their choices the designer's to settle, as they stood; the struck head is the answer.*

@@ -124,11 +124,12 @@ func _ready() -> void:
 	# (`Run.map_reentry`), so what the party carried here is opened once, when it came.
 	var arrived := not Run.map_reentry
 	Run.map_reentry = false
+	_arrived_here = arrived
 	# The walk never opens under the framing card: it starts only when the card is not
-	# up, and dismissing the card starts nothing. The two cannot meet in play — the card
-	# shows only before the run's first step, and nothing is owed then — so a pick owed
-	# under it (a fixture's) waits for the next arrival; a screen over an orientation
-	# card is the failure this order is written to prevent.
+	# up — a screen over an orientation card is the failure this order is written to
+	# prevent. **BATCH KD — AND DISMISSING THE CARD STARTS IT, ON AN ARRIVAL**: the card
+	# shows only before the run's first step, and since KD something is owed then — the
+	# held relics, handed on the first map after the classes are chosen (JY's ruling 12).
 	if not _maybe_show_framing() and arrived:
 		_begin_arrival()
 
@@ -249,7 +250,10 @@ func _maybe_show_framing() -> bool:
 	btn.pressed.connect(func():
 		Profile.set_flag("run_framing_seen")
 		dim.queue_free()
-		panel.queue_free())
+		panel.queue_free()
+		# BATCH KD — the arrival the card covered goes on behind it (the held relics' hand-out first).
+		if _arrived_here:
+			_begin_arrival.call_deferred())
 	vbox.add_child(btn)
 	# BATCH IR — THE CARD IS PLACED BY ITS OWN HEIGHT, SO ITS BUTTON IS ON THE SCREEN. It stood at y=150
 	# and measured 660 px tall, so "Take the road" — the one way past it — sat below the 720-px screen on a
@@ -758,6 +762,10 @@ func _draw_hero_card_parts(idx: int, at: Vector2) -> void:
 	open.flat = true
 	open.tooltip_text = "Open %s's talents and full sheet." % (
 		Classes.SPEC_INFO[spec]["name"] if spec != "" else key.capitalize())
+	# BATCH KD — and the relics he holds, each with its words: the card's own place for them (the hand-out's buttons name them too).
+	for rid in Run.hero_relics(idx):
+		open.tooltip_text += "\n\nRelic held: %s\n%s" % [String(Relics.POOL.get(String(rid), {}).get("name", rid)),
+			Relics.desc_of(String(rid))]
 	open.pressed.connect(Music.click)
 	open.pressed.connect(_open_hero.bind(idx))
 	add_child(open)
@@ -1368,9 +1376,12 @@ const DRAFT_COL_H := 548.0
 #   opens nothing.
 var _arrival_queue: Array = []
 var _arrival_live := false
+# BATCH KD — whether this visit to the map is an arrival (`_ready`), for the framing card's dismissal.
+var _arrived_here := false
 # The overlays a step of the walk, or what it chains to, can put up; nothing opens over
 # one. The framing card and the kit preview (90) and the debug pickers (95) count too.
-const ARRIVAL_MODALS := [60, 62, 64, 70, 72, 74, 80, 90, 91, 95]
+# BATCH KD — and 66, the relics' hand-out.
+const ARRIVAL_MODALS := [60, 62, 64, 66, 70, 72, 74, 80, 90, 91, 95]
 
 
 func _begin_arrival() -> void:
@@ -1394,6 +1405,11 @@ func _modal_open() -> bool:
 # pouch's swap offers and the full holdings, as the screen has always chained them.
 func _arrival_next() -> void:
 	if not _arrival_live or _modal_open():
+		return
+	# BATCH KD — THE HELD RELICS FIRST: they were carried before any pick was earned (the draft's, or an event's on the
+	# way here), and every pick after them is a hero's, which a relic's holder may bear on.
+	if not Run.relics_owed().is_empty():
+		_open_relic_handout()
 		return
 	while not _arrival_queue.is_empty():
 		var t: Dictionary = _arrival_queue.pop_front()
@@ -4005,6 +4021,65 @@ func _confirm_discard(id: String) -> void:
 	no.custom_minimum_size = Vector2(320, 32)
 	no.pressed.connect(overlay.queue_free)
 	box.add_child(no)
+
+
+# ══ BATCH KD — THE RELICS' HAND-OUT ═══════════════════════════════════════════════════════════════════════════════
+#
+# **A RELIC BELONGS TO ONE HERO, HANDED AFTER THE CLASSES ARE CHOSEN, ON THE MAP (JY's ruling 12, the designer's).** A
+# relic on a holder hook pays only the hero it is handed to; this overlay is where it is handed, one relic at a time in
+# the order carried, a button a hero naming the relics he already holds. **No Later**: a held relic handed to nobody
+# pays nobody, so the question has no answer that waits (KD's reading). The door is `Run.hand_relic`, the bot's too.
+func _open_relic_handout() -> void:
+	var owed: Array = Run.relics_owed()
+	if owed.is_empty():
+		_arrival_next.call_deferred()
+		return
+	var id := String(owed[0])
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.z_index = 66
+	add_child(overlay)
+	var dim := ColorRect.new()
+	dim.size = Vector2(1280, 720)
+	dim.color = Color(0, 0, 0, 0.8)
+	overlay.add_child(dim)
+	var panel := PanelContainer.new()
+	panel.position = Vector2(408, 150)
+	overlay.add_child(panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 6)
+	panel.add_child(box)
+	var title := Label.new()
+	title.text = "A RELIC FOR ONE HERO — %s" % String(Relics.POOL[id]["name"])
+	title.add_theme_font_size_override("font_size", 18)
+	title.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
+	box.add_child(title)
+	var body := Label.new()
+	body.text = "%s\n\nIt pays only the hero holding it, for the rest of the run.\nHand it to which hero?" % Relics.desc_of(id)
+	body.add_theme_font_size_override("font_size", 13)
+	body.add_theme_color_override("font_color", Color(0.75, 0.72, 0.68))
+	body.custom_minimum_size = Vector2(400, 0)
+	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(body)
+	for i in Run.party.size():
+		var b := Button.new()
+		var holds := PackedStringArray()
+		for rid in Run.hero_relics(i):
+			holds.append(String(Relics.POOL.get(String(rid), {}).get("name", rid)))
+		b.text = Run.nameplate(Run.party[i]) + ("  — holds %s" % ", ".join(holds) if not holds.is_empty() else "")
+		b.custom_minimum_size = Vector2(400, 32)
+		b.add_theme_font_size_override("font_size", 13)
+		b.set_meta("relic_hero", i)
+		b.pressed.connect(Music.click)
+		b.pressed.connect(func():
+			overlay.queue_free()
+			if Run.hand_relic(id, i):
+				_toast("%s goes to the %s." % [String(Relics.POOL[id]["name"]), Run.nameplate(Run.party[i])])
+			Run.save_run()
+			_draw_screen()
+			# The next relic owed, or the heroes' picks after the last.
+			_arrival_next.call_deferred())
+		box.add_child(b)
 
 
 # ---------- BATCH CT §3: a drop with no room is a SWAP OFFER ----------

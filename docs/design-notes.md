@@ -4,6 +4,23 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A relic belongs to one hero (Batch KD) — 2026-11-23
+
+**Why only twelve relics are handed out.** The ruling is that a relic belongs to one hero, and JZ answered its two
+questions: the after-victory heal and Mana, the fallen hero's recovery and Bottled Storm's opening floor stay every hero's,
+as their words say, and the six that set up the run — gold, items, the shop, the elite's spoils — stay every hero's, as
+ruled before CX. What is left are the
+battle-spawn stats, which already ran once per hero. A relic whose effect helps every hero whoever holds it would make the
+hand-out a click with one answer, which is the shape the talent tree's retired equip step was taken out for, so those
+thirteen have no holder. **Why the figures doubled.** One hero holding a relic that used to help four gets a quarter of its
+old worth across the heroes; at the old figures the twelve would have been the weak picks beside the thirteen that kept
+paying everyone. The designer chose double over keeping the figures and over four times (the old total on one hero): twice
+one hero's share is half the old total, enough to stay worth bringing without letting one hero carry four heroes' worth.
+**Why on the map and not at the draft.** At the draft no hero has a spec yet, which is the moment *which hero* has the
+least behind it; on the first map the classes are chosen, so the player hands Dragonbone Idol to the hero he knows will
+strike most. **Why the save moved to v17.** An older build reads every key it knows and writes the rest away, so its next
+save would forget who holds what; that is the one case a version bump exists for.
+
 ## CLAUDE.md's ceiling, its sixth run (Batch KC) — 2026-11-23
 
 **Why the ceiling moved after HY said the re-measure would decide.** HY wrote that when the room ran out, a rethink of the

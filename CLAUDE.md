@@ -1574,10 +1574,10 @@ as a live decision.
 
 ## Architecture (all UI built in code, no editor scenes)
 - `scripts/run_state.gd` (autoload `Run`): party/items/gold/the LINE/zones,
-  save (user://run_save.bin v16, auto-saved at every step onto a node, at every
+  save (user://run_save.bin v17, auto-saved at every step onto a node, at every
   resolution, and inside a fight as each party loss lands — GH; `resume_scene` places
   a resumed run — GF), relic slots
-  (max 3), the offer table (MODIFIERS/REWARDS), merchant+event scheduling,
+  (max 3) and who holds each held one (KD), the offer table (MODIFIERS/REWARDS), merchant+event scheduling,
   and the ability-upgrade pool.
 - `scripts/settings.gd` (autoload `Settings`): volume/fullscreen.
 - `scripts/classes.gd`: hero configs, core kits, spec info/abilities, passives.
@@ -1594,7 +1594,7 @@ as a live decision.
 - `scripts/unit.gd`: combatant node (sheet animations, bars, status chips,
   bleed buildup meter, outline shader hover).
 - Screens: main_menu → draft (pick 4 + relics) → class selection (`spec_choice.tscn`: three engine runes dealt, one taken — GK) →
-  map (THE hub: the road, four hero cards, potions, burger) → offer (before
+  map (THE hub: the road, four hero cards, potions, burger; its first arrival hands the held relics, an event's at the next — KD) → offer (before
   every elite/mini-boss) → battle → sometimes shop and/or event → back to map.
   party.tscn is the HERO SHEET now, opened from a card.
 
@@ -1626,11 +1626,12 @@ questions now; `can_equip`, `equipped_learned` and `Profile.equip_cell` are dele
 · **VERSIONS** — `Profile` is **v3** (FX: the ledger keys to the CLASS) and reads a **v2 profile
   by a one-step migration** that folds its twelve spec purses into four. **Its floor,
   `MIN_VERSION`, is 2 — the oldest version this build carries a migration for** — so a v1 profile
-  is REFUSED rather than silently zeroed. The run save is **v16** and **a pre-v10 save is REFUSED and
+  is REFUSED rather than silently zeroed. The run save is **v17** and **a pre-v10 save is REFUSED and
   cleared** (the final zone gained a 17th slot; a v9 map has no position after its boss).
   **v11 (CT), v12 (EG), v13 (GF), v14 (HK: the rune bag, the crest and the waiting drops), v15 (HR: the
-  bag's class and core runes handed to their heroes on load) AND v16 (KB: two cards' names read by the save's version,
-  two cores made ordinary runes) ARE ALL TOLERANT AND NONE MOVED THE REFUSAL
+  bag's class and core runes handed to their heroes on load), v16 (KB: two cards' names read by the save's version,
+  two cores made ordinary runes) AND v17 (KD: who holds each held relic — a v16 save loads with its held relics owed,
+  handed at the next map arrival) ARE ALL TOLERANT AND NONE MOVED THE REFUSAL
   THRESHOLD** — the
   threshold is a claim about a structure this build cannot walk, and a version bump for a field
   with a sane default is not one. **DO NOT RAISE THE THRESHOLD TO MATCH THE VERSION.** **AND A SAVE FROM A NEWER
@@ -1745,7 +1746,8 @@ merged.** A Berserker wears the Warrior's cells.
 where each is read, and the sites are: `new_run` (the opening purse and pouch), **battle
 SPAWN** (base stats, written before turn one), the victory screen, `award_gold`, shop
 prices, elite spoils, and the clearing heal for a hero left down. **NOT ONE RELIC HOOK IS READ WHILE A TURN IS RESOLVING** — swept over every
-read site of `relic_add` / `relic_dict`, which land in `_spawn_units`, `_check_end`,
+read site of `relic_add` / `relic_dict` — and since KD `hero_relic_add` / `hero_relic_dict`, read in `_spawn_units` alone —
+which land in `_spawn_units`, `_check_end`,
 `new_run`, `award_gold`, `claim_reward`, `victory_heal_pct`, `fallen_heal_pct`, `clearing_heal_note`, the price functions (`draft_price`,
 `blacksmith_price`, `rune_price`, and the shop's and RunSim's `_price`) and RunSim's `on_battle_end`. And the header's own
 *"NEEDS PLUMBING (declared out for now)"* list — on-kill and per-turn procs, revive-on-death,
@@ -1754,15 +1756,16 @@ A talent counter, by contrast, is a `BattleUnit` field read inside `battle.gd`'s
 the one talent tree is **the only meta layer that reaches a turn as it resolves.**
 
 **THE SECOND AXIS FOLLOWS FROM WHEN EACH IS CHOSEN.** Relics are assigned at the DRAFT, **before
-specs are chosen**, so a relic *cannot* be about a spec — it is party-wide by construction rather
-than by preference. Talents are copied off `Profile` the moment a hero is awakened and locked for
+specs are chosen**, so a relic *cannot* be about a spec — no relic hook reads one. *Since KD a held relic is
+handed to its hero on the first map, after the classes are chosen (an event's at the next arrival), so the player knows the spec he hands it to;
+the relic still reads none, and pays its holder whatever his spec.* Talents are copied off `Profile` the moment a hero is awakened and locked for
 the run, **but since FX the tree keys to the CLASS**: every hero of a class wears every cell the
 class has bought, whichever spec he is, and every node must pay every class that can buy it — so a
 talent cannot be about a spec either.
 
 **NO PERMANENT LAYER IS SPEC-SPECIFIC ANY MORE (RULED BY THE DESIGNER AT GE §2), AND THAT IS WHAT FX
-INTENDED, NOT A GAP IT LEFT.** A relic is party-wide because it is chosen before a spec exists; a
-talent is class-wide because one tree serves every spec of every class. **THE ONE LAYER THAT CAN
+INTENDED, NOT A GAP IT LEFT.** A relic reads no spec because it is chosen before a spec exists — it pays every hero, or since KD its holder
+whatever his spec; a talent is class-wide because one tree serves every spec of every class. **THE ONE LAYER THAT CAN
 STILL BE TIED TO A SPEC IS THE RUNE** — bought by one hero, for one run, scoped to his class, and tied
 to a spec's ENGINE by the offer gate that withholds it from a hero whose slots do not hold the engine
 it reads (the spec scope went at HC §1). Stated here so the question is closed rather than left for a
@@ -1774,8 +1777,8 @@ later batch to infer.
   rung, and it must pay every class that can buy it (FX). **An effect that must know which spec the
   hero is cannot be one** — the tree has no spec to know.
 - **If it sets the run up — the purse, the pouch, the shop, the spawn line, what a victory pays,
-  what an elite drops — it is a RELIC.** It is earned automatically, it is party-wide, and adding
-  one on an existing hook is **pure data**.
+  what an elite drops — it is a RELIC.** It is earned automatically, it pays every hero — or its holder
+  alone, where its hook is a battle-spawn stat (KD, below) — and adding one on an existing hook is **pure data**.
 - **If it is this run's kit rather than this account's — a stat, a resource, or the mechanics and
   values of a core ability, draft ability or passive — it is a RUNE** (the charter, Batch EM).
   Runes are the run-scoped, per-hero, bought layer between the two permanent ones. **AND IF IT MUST
@@ -1788,10 +1791,21 @@ later batch to infer.
   already have more than one (`docs/state.md` carries the census).
 
 **WHAT THIS RULE DOES NOT DECIDE.** It says what each layer is FOR; it does not say a relic must
-stay party-wide. **THE PER-HERO RULING (a relic assigned to one hero) STANDS AND IS UNBUILT** — see
-RULED AND NOT BUILT in `docs/state.md`; its two questions are answered (ruled at JZ, JY's ruling 12, the designer's): the
-four hooks (`victory_heal_pct`, `victory_mana_pct`, `fallen_recover`, `resource_floor_pct`) stay for every hero, and each relic
-is handed to a hero after the classes are chosen, on the first map.
+stay party-wide — **AND SINCE KD A RELIC BELONGS TO ONE HERO WHERE ITS HOOK PAYS ONE** (CX's ruling; its two questions
+answered at JZ, JY's ruling 12, the designer's; built at KD):
+- **THE BATTLE-SPAWN STAT HOOKS PAY ONLY A RELIC's HOLDER** (`Relics.HOLDER_HOOKS`: attack, typed damage, maximum
+  health, armor, Speed, crit, Constitution, resistances) and **EVERY OTHER HOOK PAYS EVERY HERO** — the four the ruling
+  kept (`victory_heal_pct`, `victory_mana_pct`, `fallen_recover`, `resource_floor_pct`) and the six that set up the run.
+  A relic on a holder hook is HELD (`Relics.is_held`); **no relic mixes the two kinds**, and a new hook is classified
+  one or the other in the batch that writes it (`check_kd` §1).
+- **A HELD RELIC IS HANDED ON THE MAP, AFTER THE CLASSES ARE CHOSEN, THROUGH ONE DOOR** (`Run.hand_relic`; the map's
+  hand-out and the bot's policy both): the arrival walk opens it first, before any hero's pick, and an event's relic is
+  handed at the next arrival. Until it is handed it pays nobody. `Run.relic_add` / `relic_dict` refuse a holder hook;
+  the spawn reads a hero's own (`Run.hero_relic_add`).
+- **THE TWELVE STAT RELICS PAY THEIR HOLDER TWICE WHAT EACH PAID EVERY HERO** (the designer's balance ruling at KD,
+  *Double them*), and each says *The hero holding it*.
+- *Four of KD's six readings* (all six in `docs/state.md`'s KD's RULINGS OWED): a relic that pays every hero is handed to nobody; one hero may hold several;
+  a holder is kept for the run; the hand-out has no Later.
 
 ## STANDING REFERENCE — THE DIFFICULTY LADDER AND THE END BOSS (Batch BM §5/§6)
 **`Run.difficulty` WAS REUSED, NOT SHADOWED** — it was already a saved String var chosen at the
@@ -4605,6 +4619,8 @@ fact that they are.
   the map is one by default.
 - **IT NEVER COVERS ANOTHER CHOICE.** The walk starts in the map's `_ready`, after the map is drawn and behind the
   framing card, and every next step waits until no overlay is up (`map_screen._modal_open`).
+  **AND THE HELD RELICS' HAND-OUT GOES FIRST (KD)** — the party's pick, not a hero's, owed from the first map — so the
+  framing card, which covers that first arrival, starts the walk when it is dismissed.
 - **THE ORDER IS STAMPED AS A PICK IS EARNED** (`Run.note_pick_earned`, a serial on the member's `pick_serials`), so **A
   NEW DOOR THAT AWARDS A PICK STAMPS IT, AND A NEW KIND OF PICK OWES THE WALK ITS SCREEN.** A pick with no stamp — an
   older save, a fixture — still opens, in the party's order. The stamp rides the member, which the save carries whole:

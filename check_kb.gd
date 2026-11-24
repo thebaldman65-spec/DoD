@@ -225,7 +225,8 @@ func _s2_bot_picks() -> void:
 
 func _s3_save_names() -> void:
 	print("\n§3 — a save's card names, read by the version that renamed them")
-	ok(int(_run.SAVE_VERSION) == 16, "§3: the save version is 16 (%d)" % int(_run.SAVE_VERSION))
+	# RE-POINTED AT KD (v17, the relics' holders): the version a v16 save is read by is 16 or later, never the literal.
+	ok(int(_run.SAVE_VERSION) >= 16, "§3: the save version is under 16 (%d)" % int(_run.SAVE_VERSION))
 	var rmap: Dictionary = _run.RENAMED_CARDS
 	ok(not rmap.has("Heal") and not rmap.has("Ministration"),
 		"§3: neither rename sits in the map every load reads")

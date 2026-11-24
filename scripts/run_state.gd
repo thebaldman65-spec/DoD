@@ -334,6 +334,10 @@ const ZONE_DEFS := {
 }
 const ZONE_ORDER := ["forest", "scarlands", "frozen_plains", "drowned_barrow"]
 var active_relics: Array = []  # up to 3 relic ids chosen at the draft
+# BATCH KD — WHO HOLDS A RELIC (CX's ruling; JY's ruling 12, answered at JZ): {relic id: party index}, for a HELD relic
+# (`Relics.is_held`) only: a holder is made only through `hand_relic`, and a load restores the saved ones (`_repair_relic_holders`). A held relic in `active_relics` with no entry is OWED
+# (`relics_owed`): it pays nobody until the map's hand-out gives it to a hero. A relic that is not held has no entry.
+var relic_holders: Dictionary = {}
 var zone_idx := 0
 # BATCH EG §1 — HOW MANY ZONE BOSSES THIS RUN HAS PUT DOWN, AND WHY IT IS NOT
 # `zone_idx`. The ability slot ladder grants on a ZONE BOSS, and the third zone
@@ -641,12 +645,84 @@ func debug_enabled() -> bool:
 
 # Aggregated relic hooks (see the vocabulary audit atop relics.gd):
 # scalar hooks sum, dict hooks merge, across this run's active relics.
+# BATCH KD — AN EVERY-HERO HOOK ONLY. A holder hook read here would pay every hero what one holds, which is the
+# party-wide relic the ruling retired, so it is refused and said (`hero_relic_add` is its reader).
 func relic_add(hook: String) -> float:
+	if Relics.HOLDER_HOOKS.has(hook):
+		push_error("Run.relic_add: '%s' pays a relic's holder alone — read it with hero_relic_add" % hook)
+		return 0.0
 	return Relics.hook_add(active_relics, hook)
 
 
 func relic_dict(hook: String) -> Dictionary:
+	if Relics.HOLDER_HOOKS.has(hook):
+		push_error("Run.relic_dict: '%s' pays a relic's holder alone — read it with hero_relic_dict" % hook)
+		return {}
 	return Relics.hook_dict(active_relics, hook)
+
+
+# ══ BATCH KD — A RELIC BELONGS TO ONE HERO ═══════════════════════════════════════════════════════════════════════
+#
+# **THE RULING (CX's, its two questions answered at JZ — JY's ruling 12, the designer's)**: a relic on a holder hook
+# (`Relics.HOLDER_HOOKS`, the battle-spawn stats) pays only the hero it is handed to, and each is handed after the classes
+# are chosen, on the map (`map_screen`'s hand-out, first in the arrival walk). The four ambiguous hooks — the victory heal
+# and Mana, a fallen hero's recovery and Bottled Storm's floor — stay every hero's, as their words say, with the six that
+# set up the run; so a relic on those has no holder and is handed to nobody (KD's reading: a hand-out with one answer is
+# a click that can only say yes). **One hero may hold several; a holder is kept for the run** (KD's readings, NEEDS A
+# RULING in `docs/reports/KD.md`).
+
+# The held relics carried and handed to nobody, in the order carried: the hand-out's queue, and what a spawn pays nobody.
+func relics_owed() -> Array:
+	return active_relics.filter(func(id): return Relics.is_held(String(id)) and not relic_holders.has(String(id)))
+
+
+# THE ONE DOOR A HOLDER IS WRITTEN THROUGH — the hand-out's buttons and the bot's policy both. Refused (false, nothing
+# written) for a relic not carried, not held or already handed, and for an index that is no hero's.
+func hand_relic(id: String, idx: int) -> bool:
+	if not active_relics.has(id) or not Relics.is_held(id) or relic_holders.has(id):
+		return false
+	if idx < 0 or idx >= _relic_hero_count():
+		return false
+	relic_holders[id] = idx
+	return true
+
+
+# Four outside a run: a standalone sim fields the four default heroes with no party (`battle._spawn_units`).
+func _relic_hero_count() -> int:
+	return party.size() if not party.is_empty() else 4
+
+
+# The relics hero `idx` holds, in the order carried.
+func hero_relics(idx: int) -> Array:
+	return active_relics.filter(func(id): return relic_holders.has(String(id)) and int(relic_holders[String(id)]) == idx)
+
+
+# What hero `idx`'s relics pay on a hook: the holder's own sum, through the aggregators every read uses.
+func hero_relic_add(idx: int, hook: String) -> float:
+	return Relics.hook_add(hero_relics(idx), hook)
+
+
+func hero_relic_dict(idx: int, hook: String) -> Dictionary:
+	return Relics.hook_dict(hero_relics(idx), hook)
+
+
+# A loaded or fixture-written map repaired: an entry for a relic not carried, not held, or for an index that is no hero's
+# goes, and is said; a held relic left with no holder is owed, and the next arrival hands it.
+func _repair_relic_holders(raw: Variant) -> void:
+	relic_holders = {}
+	if not (raw is Dictionary):
+		return
+	for k in (raw as Dictionary):
+		var id := String(k)
+		var idx := int((raw as Dictionary)[k])
+		if active_relics.has(id) and Relics.is_held(id) and idx >= 0 and idx < _relic_hero_count():
+			relic_holders[id] = idx
+		elif active_relics.has(id) and Relics.is_held(id):
+			load_notes.append("%s had no hero to hold it: it is handed again on the map." % String(
+				Relics.POOL.get(id, {}).get("name", id)))
+		else:
+			load_notes.append("%s is not a relic one hero holds in this run: its holder was dropped." % String(
+				Relics.POOL.get(id, {}).get("name", id)))
 
 
 func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = [],
@@ -655,6 +731,7 @@ func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []
 	specs_chosen = false
 	difficulty = difficulty_id(diff)
 	active_relics = relics.slice(0, 3)
+	relic_holders = {}  # BATCH KD — handed on the first map, after the classes are chosen
 	readout = {"fresh": true}
 	clear_save()
 	party = []
@@ -4442,7 +4519,7 @@ func save_run() -> void:
 		"zone_idx": zone_idx, "zone_name": zone_name, "zone_draw": zone_draw,
 		"slot_idx": slot_idx, "node_idx": node_idx, "seen_events": seen_events,
 		"pending_shop": pending_shop, "specs_chosen": specs_chosen,
-		"active_relics": active_relics, "map": map,
+		"active_relics": active_relics, "relic_holders": relic_holders, "map": map,
 		"combat_wins": combat_wins,
 	}, true)
 
@@ -4471,7 +4548,10 @@ func has_save() -> bool:
 # **IT IS READ OFF THE DISK AT EVERY WRITE, NOT CACHED**: the file is what the
 # ceiling protects, a check that trusted a cached answer could be stale by the
 # time it mattered, and one read beside a write costs next to nothing.
-const SAVE_VERSION := 16
+# **BATCH KD — v17: THE RELICS' HOLDERS** (`relic_holders`). Without the bump a v16 build would read the save, keep every
+# key it knows and write the holders away on its next save — the destructive case a bump is for (IB §0.2); with it, a v16
+# build refuses the save and keeps it (HL §5). A v16 save loads here with its held relics owed. The floor does not move.
+const SAVE_VERSION := 17
 # The floor, for the refusal's sentence. `load_run` reads it as the literal
 # `save_version < 10`, which three gates pin as it stands (`test_batch_bk`,
 # `test_batch_bm`, `check_hk`); the two are the same number and neither moved.
@@ -4638,6 +4718,10 @@ func load_run() -> bool:
 	_rebuild_stale_payloads()
 	_reseat_former_cores()
 	_rename_saved_cards()
+	# BATCH KD — the holders, read with a default: a v16 save carries none, so its held relics are owed and the next map
+	# arrival hands them (a load onto the map is one; a save resumed into a fight hands them after it — KD's reading 5).
+	# After `load_notes` is cleared, so a dropped entry is said.
+	_repair_relic_holders(data.get("relic_holders", {}))
 	_loaded_save_version = SAVE_VERSION
 	readout = {}
 	active = true

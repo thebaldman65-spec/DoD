@@ -53,9 +53,14 @@ const SCRATCH_RELICS := "user://hp_relics.json"
 const FOE := {"type": "fight", "theme": "Warband", "enemies": ["raider", "raider", "archer"]}
 const FRAME_CAP := 60000
 const CREST_FX := "hp_fixture_crest"
-# The relic whose hook sets every hero's `dmg_bonus` at the spawn: the base a cycle
-# runs on, so a subtraction would have something to drift from.
+# The relics whose hook sets a hero's `dmg_bonus` at the spawn: the base a cycle
+# runs on, so a subtraction would have something to drift from. RE-POINTED AT KD: a relic
+# belongs to one hero, so the fixture hands both to the Warrior (`_battle`), and the base is
+# the two together — Dragonbone's doubled 0.20 alone is one a float subtraction returns
+# exactly (0.20 + 0.25 − 0.25 == 0.20), and the controls of §1d and §1f would prove nothing
+# on it, so both run on the two together.
 const BASE_RELIC := "dragonbone"
+const BASE_RELICS := ["dragonbone", "warhorn"]
 
 # §1b — HN §3a's twenty-eight every-hero fields, as its table lists them: the
 # population the derivation was run over. The four `rune_` twins are the fields a
@@ -244,6 +249,9 @@ func _battle(payload: Dictionary, real := "", fallen := -1, relics: Array = [], 
 	table[CREST_FX] = {"name": "HP Fixture Crest", "scope": "party", "price": 150,
 		"desc": "A fixture of check_hp, never in the file.", "payload": payload}
 	_new_run(SEATS, ENG4, relics)
+	# BATCH KD — a held relic pays its holder alone: the fixture hands each to the Warrior.
+	for r in relics:
+		_run.hand_relic(String(r), 0)
 	if not payload.is_empty():
 		_wear_crest(CREST_FX)
 	if real != "":
@@ -641,13 +649,16 @@ func _s1d_the_cycle() -> void:
 	print("\n§1d — a full cycle: pays, a hero falls, stops, he is revived, pays again — on a base a subtraction would drift from")
 	var add := 0.25
 	var pay := {"stat": {"dmg_bonus": add}, "condition": {"heroes_all_standing": false}}
-	var s: Node = await _battle(pay, "", -1, [BASE_RELIC], true)
+	var s: Node = await _battle(pay, "", -1, BASE_RELICS, true)
 	var hs: Array = _heroes(s)
 	var base: Array = _field_row(s, "dmg_bonus")
-	var relic_base := float(Relics.POOL[BASE_RELIC]["hooks"]["hero_attack_mult"])
-	# THE BASE IS THE RELIC'S, SO A SUBTRACTION HAS SOMETHING TO DRIFT FROM.
-	ok(hs.size() == 4 and base.all(func(v): return is_equal_approx(float(v), relic_base)) and relic_base > 0.0,
-		"§1d: the heroes open at dmg_bonus %s, not the relic's %.2f" % [base, relic_base])
+	var relic_base := 0.0
+	for r in BASE_RELICS:
+		relic_base += float(Relics.POOL[r]["hooks"]["hero_attack_mult"])
+	# THE BASE IS THE RELICS', SO A SUBTRACTION HAS SOMETHING TO DRIFT FROM — the Warrior's, who holds both (KD).
+	ok(hs.size() == 4 and is_equal_approx(float(base[0]), relic_base) and relic_base > 0.0
+			and base.slice(1).all(func(v): return is_zero_approx(float(v))),
+		"§1d: the heroes open at dmg_bonus %s, not the Warrior at the relics' %.2f and the others at none" % [base, relic_base])
 	var roll: Array = s.get("_rune_roll_call")
 	var opened_off := false
 	for line in roll:
@@ -755,9 +766,9 @@ func _s1f_hold_core_is_read_as_the_fight_runs() -> void:
 	# THE CYCLE. The bare battle first, for the base each hero opens at.
 	var add := 0.25
 	var pay := {"stat": {"dmg_bonus": add}, "condition": {"heroes_hold_core": "pack"}}
-	var bare: Node = await _battle({}, "", -1, [BASE_RELIC])
+	var bare: Node = await _battle({}, "", -1, BASE_RELICS)
 	var base: Array = _field_row(bare, "dmg_bonus")
-	var s: Node = await _battle(pay, "", -1, [BASE_RELIC], true)
+	var s: Node = await _battle(pay, "", -1, BASE_RELICS, true)
 	var hunter: BattleUnit = _heroes(s)[3]
 	ok(hunter.has_engine("pack") and not (_heroes(s)[0] as BattleUnit).has_engine("pack"),
 		"§1f: the Hunter is not the one Pack Bond holder this drive is built on")
@@ -799,7 +810,7 @@ func _s1f_hold_core_is_read_as_the_fight_runs() -> void:
 		"§1f: the switch ON is not in the log once")
 	# A FALL THAT IS NOT THE HOLDER'S SWITCHES NOTHING — its own fight, so the pouch's one
 	# potion above is never asked to choose between two fallen.
-	var s3: Node = await _battle(pay, "", -1, [BASE_RELIC])
+	var s3: Node = await _battle(pay, "", -1, BASE_RELICS)
 	var paid3: Array = _field_row(s3, "dmg_bonus")
 	await _fell(s3, 1)
 	ok(_field_row(s3, "dmg_bonus") == paid3 and not _log_text(s3).contains(_c(s3, "LIVE_OFF_TAIL")),

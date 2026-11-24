@@ -1306,6 +1306,9 @@ func _ready() -> void:
 	# read found it beside DV32's two; `check_iv` §2).
 	if sim and not run_sim and OS.get_environment("DOD_SIM_RELICS") != "":
 		Run.active_relics = OS.get_environment("DOD_SIM_RELICS").split(",")
+		# BATCH KD — and handed as the bot hands a run's (`RunSim.hand_owed_relics`), so a held one pays its holder.
+		Run.relic_holders = {}
+		RunSim.hand_owed_relics(Run)
 	# DOD_SIM_GRANT_ALL=1: full-kit sims (every talent/trophy ability
 	# pre-granted) — the default measures real gated progression.
 	# **BATCH IV §2 — A SIM'S ARM, AND ONLY A SIM'S (DV32).** It armed the player's own debug
@@ -1837,25 +1840,27 @@ func _spawn_units() -> void:
 				ss_open = mini(ss_open, int(cfg["second_max"]))
 			cfg["second_resource"] = ss_open
 		# Relic hooks (see the audit atop relics.gd): numeric boons
-		# aggregate across the run's relics. Outside the Run.active gate so
-		# DOD_SIM_RELICS loadouts drive the same code in standalone sims.
-		if not Run.active_relics.is_empty():
+		# aggregate across the relics THIS HERO HOLDS (BATCH KD — a relic belongs
+		# to one hero: `Run.hero_relic_add`, hero i's own sum; a held relic nobody
+		# holds yet pays nobody). Outside the Run.active gate so DOD_SIM_RELICS
+		# loadouts drive the same code in standalone sims.
+		if not Run.hero_relics(i).is_empty():
 			cfg["dmg_bonus"] = cfg.get("dmg_bonus", 0.0) \
-				+ Run.relic_add("hero_attack_mult")
-			var relic_types := Run.relic_dict("dmg_type_mult")
+				+ Run.hero_relic_add(i, "hero_attack_mult")
+			var relic_types := Run.hero_relic_dict(i, "dmg_type_mult")
 			if not relic_types.is_empty():
 				var bonuses: Dictionary = cfg.get("type_dmg_bonus", {})
 				for dtype in relic_types:
 					bonuses[dtype] = float(bonuses.get(dtype, 0.0)) + relic_types[dtype]
 				cfg["type_dmg_bonus"] = bonuses
 			cfg["max_hp_pct"] = cfg.get("max_hp_pct", 0.0) \
-				+ Run.relic_add("hero_max_hp_mult")
-			cfg["armor"] = float(cfg.get("armor", 0.0)) + Run.relic_add("hero_armor_add")
-			cfg["speed"] = float(cfg.get("speed", 100.0)) + Run.relic_add("hero_speed_add")
-			cfg["crit_bonus"] = cfg.get("crit_bonus", 0.0) + Run.relic_add("hero_crit_add")
+				+ Run.hero_relic_add(i, "hero_max_hp_mult")
+			cfg["armor"] = float(cfg.get("armor", 0.0)) + Run.hero_relic_add(i, "hero_armor_add")
+			cfg["speed"] = float(cfg.get("speed", 100.0)) + Run.hero_relic_add(i, "hero_speed_add")
+			cfg["crit_bonus"] = cfg.get("crit_bonus", 0.0) + Run.hero_relic_add(i, "hero_crit_add")
 			cfg["constitution"] = int(cfg.get("constitution", 100)
-				+ Run.relic_add("hero_con_add"))
-			var relic_resists := Run.relic_dict("hero_resist_add")
+				+ Run.hero_relic_add(i, "hero_con_add"))
+			var relic_resists := Run.hero_relic_dict(i, "hero_resist_add")
 			if not relic_resists.is_empty():
 				var res: Dictionary = cfg.get("resists", {})
 				for dtype in relic_resists:
@@ -31482,6 +31487,7 @@ func _run_snapshot(outcome: String, closing_text: String) -> Dictionary:
 		"gold": Run.gold,
 		"difficulty": Run.difficulty,
 		"relics": Run.active_relics.duplicate(),
+		"relic_holders": Run.relic_holders.duplicate(),
 		"events_seen": Run.seen_events.size(),
 		"combat_wins": Run.combat_wins,
 		"tally": Run.tally.duplicate(true),
@@ -31624,7 +31630,12 @@ func _summary_lines(snap: Dictionary) -> Array:
 	if not (snap["relics"] as Array).is_empty():
 		var relic_names := PackedStringArray()
 		for id in snap["relics"]:
-			relic_names.append(String(Relics.POOL.get(String(id), {}).get("name", id)))
+			var rel_name := String(Relics.POOL.get(String(id), {}).get("name", id))
+			# BATCH KD — a held relic names the hero who held it (`relic_holders`, snapped beside the ids).
+			var holder_i := int((snap.get("relic_holders", {}) as Dictionary).get(String(id), -1))
+			if holder_i >= 0 and holder_i < Run.party.size():
+				rel_name += " (%s)" % Run.nameplate(Run.party[holder_i])
+			relic_names.append(rel_name)
 		lines.append(["p", "Relics carried: %s" % ", ".join(relic_names)])
 	# --- the chronicle ---
 	lines.append(["s", "The chronicle"])

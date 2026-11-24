@@ -823,7 +823,8 @@ func _s5_strike() -> void:
 	ok(String(texts["rune profligate"]).contains("a Killing Frost costs double and is paid nothing"),
 		"§5b: Profligate does not name its asymmetry")
 	var fig := "+%d%%" % int(round(float(Relics.POOL["emberheart"]["hooks"]["dmg_type_mult"]["fire"]) * 100.0))
-	ok(String(texts["relic emberheart"]) == "Fire and Holy strike damage %s." % fig, "§5b: Emberheart reads '%s'" % texts["relic emberheart"])
+	# RE-POINTED AT KD: the relic names its holder (a relic belongs to one hero), the words after it unchanged.
+	ok(String(texts["relic emberheart"]) == "The hero holding it: Fire and Holy\nstrike damage %s." % fig, "§5b: Emberheart reads '%s'" % texts["relic emberheart"])
 	var clar := _body("scripts/battle.gd", "_resolve")
 	ok(clar.contains("its strikes land") and not clar.contains("the spell lands")
 			and clar.contains("if ab.special == \"\" and ab.heal <= 0:\n\t\t\t_log(\"   → Rune: Clarity"),
